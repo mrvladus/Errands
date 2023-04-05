@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-	<id>com.github.mrvladus.List</id>
+	<id>io.github.mrvladus.List</id>
 	<metadata_license>CC0-1.0</metadata_license>
 	<project_license>MIT</project_license>
 	<content_rating type="oars-1.1" />
 	<developer_name>Vlad Krupinski</developer_name>
 	<url type="homepage">https://github.com/mrvladus/List</url>
 
-	<launchable type="desktop-id">com.github.mrvladus.List.desktop</launchable>
+	<launchable type="desktop-id">io.github.mrvladus.List.desktop</launchable>
 	<provides>
 		<binary>list</binary>
 	</provides>
@@ -22,16 +22,23 @@
 	<screenshots>
 		<screenshot type="default">
 			<image>
-				https://github.com/mrvladus/List/blob/eafaad393f73cccbcc71c38b55a0ebf061c6ad07/screenshots/light.png?raw=true</image>
+				https://github.com/mrvladus/List/blob/fedf7f5448343062b8469ece8470896fbf0f09bf/screenshots/light.png?raw=true</image>
 		</screenshot>
 		<screenshot>
 			<image>
-				https://github.com/mrvladus/List/blob/eafaad393f73cccbcc71c38b55a0ebf061c6ad07/screenshots/dark.png?raw=true</image>
+				https://github.com/mrvladus/List/blob/fedf7f5448343062b8469ece8470896fbf0f09bf/screenshots/dark.png?raw=true</image>
 		</screenshot>
 	</screenshots>
 
 	<releases>
-		<release version="44.0" date="2023-04-05">
+	<release version="44.0.1" date="2023-04-05">
+			<description>
+				<p>
+					Bug fixes.
+				</p>
+			</description>
+		</release>
+		<release version="44.0" date="2023-04-04">
 			<description>
 				<p>
 					First release.

@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=List
 Exec=list
-Icon=com.github.mrvladus.List
+Icon=io.github.mrvladus.List
 Terminal=false
 Type=Application
 Categories=Office;

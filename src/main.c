@@ -1,8 +1,7 @@
 #include <adwaita.h>
-#include <stdio.h>
 #include <string.h>
 
-#define APP_ID "com.github.mrvladus.List"
+#define APP_ID "io.github.mrvladus.List"
 
 // ---------- Functions defenition ---------- //
 
@@ -44,7 +43,7 @@ void InfoBtnClicked()
         gtk_application_get_active_window(GTK_APPLICATION(app)),
         "application-name", "List",
         "application-icon", APP_ID,
-        "version", "44.0",
+        "version", "44.0.1",
         "copyright", "© 2023 Vlad Krupinsky",
         "website", "https://github.com/mrvladus/List",
         "license-type", GTK_LICENSE_MIT_X11,

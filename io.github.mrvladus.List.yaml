@@ -1,4 +1,4 @@
-app-id: com.github.mrvladus.List
+app-id: io.github.mrvladus.List
 runtime: org.gnome.Platform
 runtime-version: '44'
 sdk: org.gnome.Sdk

@@ -1,4 +1,4 @@
-APP_ID=com.github.mrvladus.List
+APP_ID=io.github.mrvladus.List
 BIN=list
 PREFIX=/app
 CC=gcc
@@ -16,5 +16,5 @@ install: build
 	glib-compile-schemas $(PREFIX)/share/glib-2.0/schemas
 
 run:
-	flatpak-builder --user --install --force-clean _build $(APP_ID).yml
+	flatpak-builder --user --install --force-clean _build $(APP_ID).yaml
 	flatpak run $(APP_ID)
