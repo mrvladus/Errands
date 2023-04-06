@@ -31,7 +31,14 @@
 	</screenshots>
 
 	<releases>
-	<release version="44.0.1" date="2023-04-05">
+		<release version="44.0.2" date="2023-04-06">
+			<description>
+				<p>
+					Bug fixes.
+				</p>
+			</description>
+		</release>
+		<release version="44.0.1" date="2023-04-05">
 			<description>
 				<p>
 					Bug fixes.

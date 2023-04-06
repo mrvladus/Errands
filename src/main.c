@@ -1,7 +1,7 @@
 #include <adwaita.h>
 
 #define APP_ID "io.github.mrvladus.List"
-#define VERSION "44.0.1"
+#define VERSION "44.0.2"
 
 // ---------- Functions defenition ---------- //
 
