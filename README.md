@@ -14,4 +14,7 @@ List is available as a Flatpak on Flathub:
 
 ## Building from source
 1. Clone repo `git clone https://github.com/mrvladus/List`
-2. Run `make run`
+2. Install dependencies: 
+  - Fedora 37 and later: `libadwaita-devel flatpak-builder`
+  - Debian 12 / Ubuntu 22.10 and later`libadwaita-1-dev flatpak-builder`
+4. Run `make run`
