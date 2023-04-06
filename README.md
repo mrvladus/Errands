@@ -14,4 +14,4 @@ List is available as a Flatpak on Flathub:
 
 ## Building from source
 1. Clone repo `git clone https://github.com/mrvladus/List`
-2. Use Gnome Builder to build and install a flatpak
+2. Run `make run`
