@@ -1,7 +1,7 @@
 #include <adwaita.h>
-#include <string.h>
 
 #define APP_ID "io.github.mrvladus.List"
+#define VERSION "44.0.1"
 
 // ---------- Functions defenition ---------- //
 
@@ -14,13 +14,12 @@ void UpdateTodoListVisibility();
 GtkWidget* Todo(const char* text);
 void DeleteTodo(GtkButton* btn, gpointer todo);
 void CreateWindow();
-void ApplicationActivate();
 
 // ---------- Global variables ---------- //
 
 AdwApplication* app; // Application object
 GSettings* settings; // GSettings object
-GtkWidget* todos_group; // Todo's list
+GtkWidget* todos_list; // Todo's list box
 
 // ---------- Header bar ---------- //
 
@@ -43,7 +42,7 @@ void InfoBtnClicked()
         gtk_application_get_active_window(GTK_APPLICATION(app)),
         "application-name", "List",
         "application-icon", APP_ID,
-        "version", "44.0.1",
+        "version", VERSION,
         "copyright", "© 2023 Vlad Krupinsky",
         "website", "https://github.com/mrvladus/List",
         "license-type", GTK_LICENSE_MIT_X11,
@@ -67,17 +66,23 @@ void EntryActivated(GtkEntry* entry)
 {
     // Get text from entry
     const char* text = gtk_entry_buffer_get_text(gtk_entry_get_buffer(entry));
+    // Check for empty string
     if (strlen(text) == 0)
         return;
-    // Prepend todo to todos in gsettings
+    // Check if todo already exists
     g_auto(GStrv) todos = g_settings_get_strv(settings, "todos");
+    for (int i = 0; todos[i]; i++) {
+        if (g_strcmp0(text, todos[i]) == 0)
+            return;
+    }
+    // Prepend todo to todos in gsettings
     g_autoptr(GStrvBuilder) builder = g_strv_builder_new();
     g_strv_builder_add(builder, text);
     g_strv_builder_addv(builder, (const char**)todos);
     g_auto(GStrv) new_todos = g_strv_builder_end(builder);
     g_settings_set_strv(settings, "todos", (const gchar* const*)new_todos);
     // Add todo row
-    gtk_list_box_prepend(GTK_LIST_BOX(todos_group), Todo(text));
+    gtk_list_box_prepend(GTK_LIST_BOX(todos_list), Todo(text));
     UpdateTodoListVisibility();
     // Clear entry
     gtk_entry_buffer_set_text(gtk_entry_get_buffer(entry), "", -1);
@@ -87,25 +92,25 @@ void EntryActivated(GtkEntry* entry)
 
 GtkWidget* TodoList()
 {
-    todos_group = gtk_list_box_new();
-    gtk_widget_add_css_class(todos_group, "boxed-list");
-    g_object_set(G_OBJECT(todos_group), "valign", GTK_ALIGN_START, NULL);
-    g_object_set(G_OBJECT(todos_group), "selection-mode", 0, NULL);
-    g_object_set(G_OBJECT(todos_group), "margin-top", 20, NULL);
-    g_object_set(G_OBJECT(todos_group), "margin-bottom", 20, NULL);
-    g_object_set(G_OBJECT(todos_group), "margin-start", 40, NULL);
-    g_object_set(G_OBJECT(todos_group), "margin-end", 40, NULL);
+    todos_list = gtk_list_box_new();
+    gtk_widget_add_css_class(todos_list, "boxed-list");
+    g_object_set(G_OBJECT(todos_list), "valign", GTK_ALIGN_START, NULL);
+    g_object_set(G_OBJECT(todos_list), "selection-mode", 0, NULL);
+    g_object_set(G_OBJECT(todos_list), "margin-top", 20, NULL);
+    g_object_set(G_OBJECT(todos_list), "margin-bottom", 20, NULL);
+    g_object_set(G_OBJECT(todos_list), "margin-start", 40, NULL);
+    g_object_set(G_OBJECT(todos_list), "margin-end", 40, NULL);
     // Fill new ones from gsettings
     g_auto(GStrv) todos = g_settings_get_strv(settings, "todos");
     for (int i = 0; todos[i]; i++) {
-        gtk_list_box_append(GTK_LIST_BOX(todos_group), Todo(todos[i]));
+        gtk_list_box_append(GTK_LIST_BOX(todos_list), Todo(todos[i]));
     }
     UpdateTodoListVisibility();
     // Add list to the scrolled container
     GtkWidget* scrolled_win = gtk_scrolled_window_new();
     g_object_set(G_OBJECT(scrolled_win), "vexpand", TRUE, NULL);
     g_object_set(G_OBJECT(scrolled_win), "hexpand", TRUE, NULL);
-    gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrolled_win), todos_group);
+    gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrolled_win), todos_list);
 
     return scrolled_win;
 }
@@ -115,9 +120,9 @@ void UpdateTodoListVisibility()
 {
     g_auto(GStrv) todos = g_settings_get_strv(settings, "todos");
     if (g_strv_length(todos) > 0) {
-        gtk_widget_set_visible(GTK_WIDGET(todos_group), TRUE);
+        gtk_widget_set_visible(GTK_WIDGET(todos_list), TRUE);
     } else {
-        gtk_widget_set_visible(GTK_WIDGET(todos_group), FALSE);
+        gtk_widget_set_visible(GTK_WIDGET(todos_list), FALSE);
     }
 }
 // ---------- Todo  ---------- //
@@ -155,7 +160,7 @@ void DeleteTodo(GtkButton* btn, gpointer todo)
     // Save new todos
     g_settings_set_strv(settings, "todos", (const gchar* const*)new_todos);
     // Remove row
-    gtk_list_box_remove(GTK_LIST_BOX(todos_group), todo);
+    gtk_list_box_remove(GTK_LIST_BOX(todos_list), todo);
     UpdateTodoListVisibility();
 }
 
@@ -163,6 +168,8 @@ void DeleteTodo(GtkButton* btn, gpointer todo)
 
 void CreateWindow()
 {
+    // Load gsettings
+    settings = g_settings_new(APP_ID);
     // Main window
     GtkWidget* win = adw_application_window_new(GTK_APPLICATION(app));
     g_object_set(G_OBJECT(win), "title", "List", NULL);
@@ -180,17 +187,9 @@ void CreateWindow()
 
 // ---------- Application creation ---------- //
 
-void ApplicationActivate()
-{
-    // Load gsettings
-    settings = g_settings_new(APP_ID);
-    // Show window
-    CreateWindow();
-}
-
 int main(int argc, char* argv[])
 {
     app = adw_application_new(APP_ID, G_APPLICATION_DEFAULT_FLAGS);
-    g_signal_connect(app, "activate", G_CALLBACK(ApplicationActivate), NULL);
+    g_signal_connect(app, "activate", G_CALLBACK(CreateWindow), NULL);
     return g_application_run(G_APPLICATION(app), argc, argv);
 }
