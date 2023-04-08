@@ -31,6 +31,13 @@
 	</screenshots>
 
 	<releases>
+		<release version="44.1" date="2023-04-08">
+			<description>
+				<p>
+					Added menu with theme switcher.
+				</p>
+			</description>
+		</release>
 		<release version="44.0.2" date="2023-04-06">
 			<description>
 				<p>

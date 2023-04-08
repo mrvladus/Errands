@@ -1,12 +1,16 @@
 #include <adwaita.h>
 
 #define APP_ID "io.github.mrvladus.List"
-#define VERSION "44.0.2"
+#define VERSION "44.1"
 
 // ---------- Functions defenition ---------- //
 
 GtkWidget* HeaderBar();
-void InfoBtnClicked();
+GtkWidget* MainMenu();
+GtkWidget* ThemeSwitcher();
+void ThemeSwitcherToggle(GtkCheckButton* btn, int theme);
+void ActionAbout();
+void ActionQuit();
 GtkWidget* Entry();
 void EntryActivated(GtkEntry* entry);
 GtkWidget* TodoList();
@@ -27,16 +31,95 @@ GtkWidget* HeaderBar()
 {
     GtkWidget* hb = gtk_header_bar_new();
     gtk_widget_add_css_class(hb, "flat");
-
-    GtkWidget* info_btn = gtk_button_new_from_icon_name("dialog-information-symbolic");
-    g_signal_connect(info_btn, "clicked", G_CALLBACK(InfoBtnClicked), NULL);
-    gtk_header_bar_pack_end(GTK_HEADER_BAR(hb), info_btn);
+    gtk_header_bar_pack_end(GTK_HEADER_BAR(hb), MainMenu());
 
     return hb;
 }
 
-// Show about window on info button click
-void InfoBtnClicked()
+GtkWidget* MainMenu()
+{
+    // Create menu model
+    GMenu* main_menu = g_menu_new();
+    // Create theme submenu
+    GMenu* theme_menu = g_menu_new();
+    g_menu_append_submenu(main_menu, "Theme", G_MENU_MODEL(theme_menu));
+
+    // Create custom theme menu item
+    GMenuItem* theme = g_menu_item_new("Theme", NULL);
+    g_menu_item_set_attribute(theme, "custom", "s", "theme");
+    g_menu_append_item(theme_menu, theme);
+
+    // Create popover menu with model of main_menu
+    GtkWidget* popover = gtk_popover_menu_new_from_model(G_MENU_MODEL(main_menu));
+    // Add theme switcher widget to theme submenu
+    gtk_popover_menu_add_child(GTK_POPOVER_MENU(popover), ThemeSwitcher(), "theme");
+
+    // About menu item
+    g_menu_append(main_menu, "About", "app.about");
+    GSimpleAction* action = g_simple_action_new("about", NULL);
+    g_signal_connect(action, "activate", G_CALLBACK(ActionAbout), NULL);
+    g_action_map_add_action(G_ACTION_MAP(app), G_ACTION(action));
+
+    // Quit menu item
+    g_menu_append(main_menu, "Quit", "app.quit");
+    action = g_simple_action_new("quit", NULL);
+    g_signal_connect(action, "activate", G_CALLBACK(ActionQuit), NULL);
+    g_action_map_add_action(G_ACTION_MAP(app), G_ACTION(action));
+    gtk_application_set_accels_for_action(GTK_APPLICATION(app), "app.quit",
+        (const char*[]) { "<Primary>Q", NULL });
+
+    // Menu button
+    GtkWidget* menu_btn = gtk_menu_button_new();
+    g_object_set(G_OBJECT(menu_btn),
+        "icon-name", "open-menu-symbolic",
+        "popover", popover,
+        NULL);
+
+    return menu_btn;
+}
+
+GtkWidget* ThemeSwitcher()
+{
+    GtkWidget* system_theme = gtk_check_button_new_with_label("System");
+    g_signal_connect(system_theme, "toggled", G_CALLBACK(ThemeSwitcherToggle), (gpointer)0);
+
+    GtkWidget* light_theme = gtk_check_button_new_with_label("Light");
+    gtk_check_button_set_group(GTK_CHECK_BUTTON(light_theme), GTK_CHECK_BUTTON(system_theme));
+    g_signal_connect(light_theme, "toggled", G_CALLBACK(ThemeSwitcherToggle), (gpointer)1);
+
+    GtkWidget* dark_theme = gtk_check_button_new_with_label("Dark");
+    gtk_check_button_set_group(GTK_CHECK_BUTTON(dark_theme), GTK_CHECK_BUTTON(system_theme));
+    g_signal_connect(dark_theme, "toggled", G_CALLBACK(ThemeSwitcherToggle), (gpointer)4);
+
+    // Set switcher button active depending on settings
+    int theme = g_settings_get_int(settings, "theme");
+    if (theme == 0) {
+        gtk_check_button_set_active(GTK_CHECK_BUTTON(system_theme), TRUE);
+    } else if (theme == 1) {
+        gtk_check_button_set_active(GTK_CHECK_BUTTON(light_theme), TRUE);
+    } else if (theme == 4) {
+        gtk_check_button_set_active(GTK_CHECK_BUTTON(dark_theme), TRUE);
+    }
+    // Set app theme
+    ThemeSwitcherToggle(NULL, theme);
+
+    GtkWidget* box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_box_append(GTK_BOX(box), system_theme);
+    gtk_box_append(GTK_BOX(box), light_theme);
+    gtk_box_append(GTK_BOX(box), dark_theme);
+
+    return box;
+}
+
+void ThemeSwitcherToggle(GtkCheckButton* btn, int theme)
+{
+    AdwStyleManager* mgr = adw_style_manager_get_default();
+    adw_style_manager_set_color_scheme(mgr, theme);
+    g_settings_set_int(settings, "theme", theme);
+}
+
+// Show about window
+void ActionAbout()
 {
     adw_show_about_window(
         gtk_application_get_active_window(GTK_APPLICATION(app)),
@@ -49,14 +132,22 @@ void InfoBtnClicked()
         NULL);
 }
 
+// Exit application
+void ActionQuit()
+{
+    g_application_quit(G_APPLICATION(app));
+}
+
 // ---------- Todo entry field ---------- //
 
 GtkWidget* Entry()
 {
     GtkWidget* entry = gtk_entry_new();
-    g_object_set(G_OBJECT(entry), "secondary-icon-name", "list-add-symbolic", NULL);
-    g_object_set(G_OBJECT(entry), "margin-start", 30, NULL);
-    g_object_set(G_OBJECT(entry), "margin-end", 30, NULL);
+    g_object_set(G_OBJECT(entry),
+        "secondary-icon-name", "list-add-symbolic",
+        "margin-start", 50,
+        "margin-end", 50,
+        NULL);
     g_signal_connect(entry, "activate", G_CALLBACK(EntryActivated), NULL);
 
     return entry;
@@ -94,12 +185,14 @@ GtkWidget* TodoList()
 {
     todos_list = gtk_list_box_new();
     gtk_widget_add_css_class(todos_list, "boxed-list");
-    g_object_set(G_OBJECT(todos_list), "valign", GTK_ALIGN_START, NULL);
-    g_object_set(G_OBJECT(todos_list), "selection-mode", 0, NULL);
-    g_object_set(G_OBJECT(todos_list), "margin-top", 20, NULL);
-    g_object_set(G_OBJECT(todos_list), "margin-bottom", 20, NULL);
-    g_object_set(G_OBJECT(todos_list), "margin-start", 40, NULL);
-    g_object_set(G_OBJECT(todos_list), "margin-end", 40, NULL);
+    g_object_set(G_OBJECT(todos_list),
+        "valign", GTK_ALIGN_START,
+        "selection-mode", 0,
+        "margin-top", 20,
+        "margin-bottom", 20,
+        "margin-start", 50,
+        "margin-end", 50,
+        NULL);
     // Fill new ones from gsettings
     g_auto(GStrv) todos = g_settings_get_strv(settings, "todos");
     for (int i = 0; todos[i]; i++) {
@@ -108,8 +201,10 @@ GtkWidget* TodoList()
     UpdateTodoListVisibility();
     // Add list to the scrolled container
     GtkWidget* scrolled_win = gtk_scrolled_window_new();
-    g_object_set(G_OBJECT(scrolled_win), "vexpand", TRUE, NULL);
-    g_object_set(G_OBJECT(scrolled_win), "hexpand", TRUE, NULL);
+    g_object_set(G_OBJECT(scrolled_win),
+        "vexpand", TRUE,
+        "hexpand", TRUE,
+        NULL);
     gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrolled_win), todos_list);
 
     return scrolled_win;
