@@ -145,10 +145,12 @@ GtkWidget* Entry()
     GtkWidget* entry = gtk_entry_new();
     g_object_set(G_OBJECT(entry),
         "secondary-icon-name", "list-add-symbolic",
+        "secondary-icon-activatable", TRUE,
         "margin-start", 50,
         "margin-end", 50,
         NULL);
     g_signal_connect(entry, "activate", G_CALLBACK(EntryActivated), NULL);
+    g_signal_connect(entry, "icon-release", G_CALLBACK(EntryActivated), NULL);
 
     return entry;
 }
