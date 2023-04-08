@@ -31,6 +31,13 @@
 	</screenshots>
 
 	<releases>
+		<release version="44.1.1" date="2023-04-09">
+			<description>
+				<p>
+					Fixed add task button not being clickable.
+				</p>
+			</description>
+		</release>
 		<release version="44.1" date="2023-04-08">
 			<description>
 				<p>
