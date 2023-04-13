@@ -1,5 +1,5 @@
 #include "todolist.h"
-#include "../main.h"
+#include "../global.h"
 #include "todo.h"
 
 // Set list box insvisible if no todos (because of weird css shadow)

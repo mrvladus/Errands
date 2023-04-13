@@ -1,5 +1,5 @@
 #include "todo.h"
-#include "../main.h"
+#include "../global.h"
 #include "todolist.h"
 
 // Get all todos array and create new one without deleted todo

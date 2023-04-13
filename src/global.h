@@ -4,7 +4,7 @@
 #define IDS
 
 #define APP_ID "io.github.mrvladus.List"
-#define VERSION "44.2"
+#define VERSION "44.1.2"
 
 #endif
 

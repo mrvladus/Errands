@@ -1,12 +1,7 @@
-#include "main.h"
+#include "global.h"
 #include "widgets/entry.h"
 #include "widgets/headerbar.h"
 #include "widgets/todolist.h"
-
-// ---------- Global variables ---------- //
-
-GSettings* settings; // GSettings object
-GtkWidget* todos_list; // Todo's list box
 
 // ---------- Main window ---------- //
 

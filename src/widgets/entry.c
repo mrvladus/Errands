@@ -1,5 +1,5 @@
 #include "entry.h"
-#include "../main.h"
+#include "../global.h"
 #include "todo.h"
 #include "todolist.h"
 

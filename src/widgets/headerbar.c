@@ -1,4 +1,4 @@
-#include "../main.h"
+#include "../global.h"
 
 // Show about window
 static void ActionAbout()
