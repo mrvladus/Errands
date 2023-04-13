@@ -4,7 +4,7 @@ PREFIX=/app
 CC=gcc
 
 build:
-	$(CC) -Wall `pkg-config --cflags --libs libadwaita-1` src/main.c -o $(BIN)
+	$(CC) -Wall `pkg-config --cflags --libs libadwaita-1` src/main.c src/widgets/*.c -o $(BIN)
 
 install: build
 	install -D $(BIN) $(PREFIX)/bin/$(BIN)
