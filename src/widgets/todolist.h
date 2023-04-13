@@ -3,7 +3,7 @@
 
 #include <adwaita.h>
 
-void UpdateTodoListVisibility();
+// void UpdateTodoListVisibility();
 GtkWidget* TodoList();
 
 #endif

@@ -10,8 +10,8 @@
 		<key name="theme" type="i">
 			<default>0</default>
 		</key>
-		<key name="todos" type="as">
-			<default>[]</default>
+		<key name="todos" type="aas">
+			<default>[['hello'],['world']]</default>
 		</key>
 	</schema>
 </schemalist>
