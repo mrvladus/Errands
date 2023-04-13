@@ -13,8 +13,15 @@ List is available as a Flatpak on Flathub:
 <a href="https://flathub.org/apps/details/io.github.mrvladus.List"><img src="https://flathub.org/assets/badges/flathub-badge-en.png" alt="Download on Flathub" width="240"></a>
 
 ## Building from source
-1. Clone repo `git clone https://github.com/mrvladus/List`
-2. Install dependencies: 
-  - Fedora 37 and later: `libadwaita-devel flatpak-builder`
-  - Debian 12 / Ubuntu 22.10 and later`libadwaita-1-dev flatpak-builder`
-4. Run `make run`
+1. Clone repo 
+```
+git clone https://github.com/mrvladus/List
+```
+2. Install dependencies
+```
+flatpak install org.gnome.Sdk//44 org.flatpak.Builder org.freedesktop.appstream-glib -y
+```
+4. Run 
+```
+make run
+```
