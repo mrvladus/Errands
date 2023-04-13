@@ -19,5 +19,5 @@ validate:
 	flatpak run org.freedesktop.appstream-glib validate data/$(APP_ID).metainfo.xml
 
 run:
-	flatpak-builder --user --install --force-clean _build $(APP_ID).yaml
+	flatpak run org.flatpak.Builder --user --install --force-clean _build $(APP_ID).yaml
 	flatpak run $(APP_ID)
