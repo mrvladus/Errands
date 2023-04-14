@@ -2,17 +2,6 @@
 #include "../global.h"
 #include "todo.h"
 
-// // Set list box insvisible if no todos (because of weird css shadow)
-// void UpdateTodoListVisibility()
-// {
-//     g_auto(GStrv) todos = g_settings_get_strv(settings, "todos");
-//     if (g_strv_length(todos) > 0) {
-//         gtk_widget_set_visible(GTK_WIDGET(todos_list), TRUE);
-//     } else {
-//         gtk_widget_set_visible(GTK_WIDGET(todos_list), FALSE);
-//     }
-// }
-
 // GtkWidget* TodoList()
 // {
 //     todos_list = gtk_list_box_new();
@@ -45,16 +34,14 @@
 GtkWidget* TodoList()
 {
     todos_list = adw_preferences_page_new();
-    // Load todos
+    // Load todos as array [['todo1', 'sub1', 'sub2'], ['todo2', 'sub1', 'sub2']]
     GVariant* todos = g_settings_get_value(settings, "todos");
+    // For each sub-array:
     for (int i = 0; i < g_variant_n_children(todos); i++) {
-        GVariant* todo = g_variant_get_child_value(todos, i);
-        const gchar** todo_items = g_variant_get_strv(todo, NULL);
-        for (int j = 0; todo_items[j]; j++) {
-            adw_preferences_page_add(ADW_PREFERENCES_PAGE(todos_list), Todo((const char*)todo_items[j]));
-        }
-
-        g_free(todo_items);
+        // Get string array { 'todo1', 'sub1', 'sub2', NULL }
+        const gchar** todo_items = g_variant_get_strv(g_variant_get_child_value(todos, i), NULL);
+        // Create new todo row and pass array as arg
+        adw_preferences_page_add(ADW_PREFERENCES_PAGE(todos_list), Todo(todo_items));
     }
 
     return todos_list;

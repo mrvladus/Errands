@@ -3,6 +3,6 @@
 
 #include <adwaita.h>
 
-AdwPreferencesGroup* Todo(const char* text);
+AdwPreferencesGroup* Todo(const gchar** todo_items);
 
 #endif
