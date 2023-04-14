@@ -3,8 +3,32 @@
 #include "entry.h"
 #include "todolist.h"
 
+// FIX ERRORS
 static void DeleteSubTodo(GtkButton* btn)
 {
+    // Remove todo from gsettings
+    const char* text = (const char*)g_object_get_data(G_OBJECT(btn), "sub-todo-text");
+
+    GVariantBuilder g_var_builder;
+    g_variant_builder_init(&g_var_builder, G_VARIANT_TYPE_ARRAY);
+
+    GVariant* todos = g_settings_get_value(settings, "todos");
+    for (int i = 0; i < g_variant_n_children(todos); i++) {
+        const gchar** todo_items = g_variant_get_strv(g_variant_get_child_value(todos, i), NULL);
+        g_autoptr(GStrvBuilder) sub_builder = g_strv_builder_new();
+        // Add main todo text
+        g_strv_builder_add(sub_builder, todo_items[0]);
+        // Add sub-todos exept deleted
+        for (int j = 1; todo_items[j]; j++)
+            if (g_strcmp0(todo_items[i], text) != 0)
+                g_strv_builder_add(sub_builder, todo_items[i]);
+        g_auto(GStrv) array = g_strv_builder_end(sub_builder);
+        g_variant_builder_add(&g_var_builder, "as", array);
+        g_free(todo_items);
+    }
+    GVariant* new_todos = g_variant_builder_end(&g_var_builder);
+    g_settings_set_value(settings, "todos", new_todos);
+    // Remove row
     adw_expander_row_remove(
         ADW_EXPANDER_ROW(g_object_get_data(G_OBJECT(btn), "parent-todo")),
         g_object_get_data(G_OBJECT(btn), "sub-todo"));
@@ -19,6 +43,7 @@ static GtkWidget* SubTodo(const char* text, GtkWidget* parent)
     g_object_set(G_OBJECT(del_btn), "valign", GTK_ALIGN_CENTER, NULL);
     g_object_set_data(G_OBJECT(del_btn), "parent-todo", parent);
     g_object_set_data(G_OBJECT(del_btn), "sub-todo", sub_todo);
+    g_object_set_data(G_OBJECT(del_btn), "sub-todo-text", (gpointer)text);
     g_signal_connect(del_btn, "clicked", G_CALLBACK(DeleteSubTodo), NULL);
     adw_action_row_add_prefix(ADW_ACTION_ROW(sub_todo), del_btn);
 
