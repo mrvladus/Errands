@@ -28,6 +28,9 @@ static GtkWidget* SubTodo(const char* text, GtkWidget* parent)
 static void SubEntryActivated(GtkEntry* entry, GtkWidget* parent)
 {
     const char* text = gtk_entry_buffer_get_text(gtk_entry_get_buffer(entry));
+    // Check for empty string
+    if (strlen(text) == 0)
+        return;
     adw_expander_row_add_row(ADW_EXPANDER_ROW(parent), SubTodo(text, parent));
     // Clear entry
     gtk_entry_buffer_set_text(gtk_entry_get_buffer(entry), "", -1);
