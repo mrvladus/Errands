@@ -3,20 +3,6 @@
 #include "entry.h"
 #include "todolist.h"
 
-static GtkWidget* SubEntry()
-{
-    GtkWidget* sub_entry = gtk_entry_new();
-    g_object_set(G_OBJECT(sub_entry),
-        "secondary-icon-name", "list-add-symbolic",
-        "secondary-icon-activatable", TRUE,
-        "margin-start", 5,
-        "margin-end", 5,
-        "margin-top", 5,
-        "margin-bottom", 5,
-        NULL);
-    return sub_entry;
-}
-
 static void DeleteSubTodo(GtkButton* btn)
 {
     adw_expander_row_remove(
@@ -39,6 +25,32 @@ static GtkWidget* SubTodo(const char* text, GtkWidget* parent)
     return sub_todo;
 }
 
+static void SubEntryActivated(GtkEntry* entry, GtkWidget* parent)
+{
+    const char* text = gtk_entry_buffer_get_text(gtk_entry_get_buffer(entry));
+    adw_expander_row_add_row(ADW_EXPANDER_ROW(parent), SubTodo(text, parent));
+    // Clear entry
+    gtk_entry_buffer_set_text(gtk_entry_get_buffer(entry), "", -1);
+}
+
+static GtkWidget* SubEntry(GtkWidget* parent)
+{
+    GtkWidget* sub_entry = gtk_entry_new();
+    g_object_set(G_OBJECT(sub_entry),
+        "secondary-icon-name", "list-add-symbolic",
+        "secondary-icon-activatable", TRUE,
+        "margin-start", 5,
+        "margin-end", 5,
+        "margin-top", 5,
+        "margin-bottom", 5,
+        NULL);
+
+    g_signal_connect(sub_entry, "activate", G_CALLBACK(SubEntryActivated), parent);
+    g_signal_connect(sub_entry, "icon-release", G_CALLBACK(SubEntryActivated), parent);
+
+    return sub_entry;
+}
+
 static void DeleteTodo(GtkButton* btn, GtkWidget* todo)
 {
     adw_preferences_page_remove(ADW_PREFERENCES_PAGE(todos_list), ADW_PREFERENCES_GROUP(todo));
@@ -59,8 +71,7 @@ AdwPreferencesGroup* Todo(const gchar** todo_items)
     g_signal_connect(del_btn, "clicked", G_CALLBACK(DeleteTodo), todo_group);
     adw_expander_row_add_prefix(ADW_EXPANDER_ROW(todo_row), del_btn);
     // Add entry for sub-todos
-    adw_expander_row_add_row(ADW_EXPANDER_ROW(todo_row), SubEntry());
-
+    adw_expander_row_add_row(ADW_EXPANDER_ROW(todo_row), SubEntry(todo_row));
     // Add sub todos begining from second element
     for (int i = 1; todo_items[i]; i++) {
         adw_expander_row_add_row(ADW_EXPANDER_ROW(todo_row), SubTodo(todo_items[i], todo_row));

@@ -15,8 +15,7 @@
 	<name>List</name>
 	<summary>Focus on your tasks.</summary>
 	<description>
-		<p>Todo application for those who prefer simplicity. Add new todo's, remove comleted,
-			nothing more.</p>
+		<p>Todo application for those who prefer simplicity. Add new tasks and sub-tasks, remove comleted.</p>
 	</description>
 
 	<screenshots>
@@ -31,6 +30,13 @@
 	</screenshots>
 
 	<releases>
+		<release version="44.2" date="2023-04-20">
+			<description>
+				<ul>
+					<li>You can now add sub-tasks!</li>
+				</ul>
+			</description>
+		</release>
 		<release version="44.1.1" date="2023-04-09">
 			<description>
 				<p>
