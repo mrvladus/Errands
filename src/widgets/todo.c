@@ -1,32 +1,48 @@
 #include "todo.h"
 #include "../global.h"
-#include "entry.h"
 #include "todolist.h"
 
-// FIX ERRORS
 static void DeleteSubTodo(GtkButton* btn)
 {
-    // Remove todo from gsettings
-    const char* text = (const char*)g_object_get_data(G_OBJECT(btn), "sub-todo-text");
+    const char* parent_text = adw_preferences_row_get_title(
+        ADW_PREFERENCES_ROW(g_object_get_data(G_OBJECT(btn), "parent-todo")));
+    // Get text
+    const char* sub_todo_text = (const char*)g_object_get_data(G_OBJECT(btn), "sub-todo-text");
 
     GVariantBuilder g_var_builder;
     g_variant_builder_init(&g_var_builder, G_VARIANT_TYPE_ARRAY);
 
-    GVariant* todos = g_settings_get_value(settings, "todos");
-    for (int i = 0; i < g_variant_n_children(todos); i++) {
-        const gchar** todo_items = g_variant_get_strv(g_variant_get_child_value(todos, i), NULL);
+    GVariant* old_todos = g_settings_get_value(settings, "todos");
+    // For each sub array
+    for (int i = 0; i < g_variant_n_children(old_todos); i++) {
+        // Get sub array
+        const gchar** todo_items = g_variant_get_strv(
+            g_variant_get_child_value(old_todos, i), NULL);
+
         g_autoptr(GStrvBuilder) sub_builder = g_strv_builder_new();
         // Add main todo text
         g_strv_builder_add(sub_builder, todo_items[0]);
         // Add sub-todos exept deleted
-        for (int j = 1; todo_items[j]; j++)
-            if (g_strcmp0(todo_items[i], text) != 0)
-                g_strv_builder_add(sub_builder, todo_items[i]);
+        if (g_strcmp0(todo_items[0], parent_text) == 0) {
+            for (int j = 1; todo_items[j]; j++)
+                if (g_strcmp0(todo_items[j], sub_todo_text) != 0)
+                    g_strv_builder_add(sub_builder, todo_items[j]);
+        } else {
+            // Add other sub-todos
+            for (int j = 1; todo_items[j]; j++)
+                g_strv_builder_add(sub_builder, todo_items[j]);
+        }
+        // Finish building sub-array
         g_auto(GStrv) array = g_strv_builder_end(sub_builder);
-        g_variant_builder_add(&g_var_builder, "as", array);
+        GVariant* new_sub_todo = g_variant_new_strv((const char* const*)array, -1);
+        // Add sub array to array of todos
+        g_variant_builder_add_value(&g_var_builder, new_sub_todo);
+        // Free memory
         g_free(todo_items);
     }
+    // Finish building new todos array
     GVariant* new_todos = g_variant_builder_end(&g_var_builder);
+    // Save new todos to gsettings
     g_settings_set_value(settings, "todos", new_todos);
     // Remove row
     adw_expander_row_remove(
@@ -79,9 +95,37 @@ static GtkWidget* SubEntry(GtkWidget* parent)
     return sub_entry;
 }
 
-static void DeleteTodo(GtkButton* btn, GtkWidget* todo)
+static void DeleteTodo(GtkButton* btn)
 {
-    adw_preferences_page_remove(ADW_PREFERENCES_PAGE(todos_list), ADW_PREFERENCES_GROUP(todo));
+    // Create builder for new todos array
+    GVariantBuilder g_var_builder;
+    g_variant_builder_init(&g_var_builder, G_VARIANT_TYPE_ARRAY);
+    // Get todos from settings
+    GVariant* old_todos = g_settings_get_value(settings, "todos");
+    // For each todo
+    for (int i = 0; i < g_variant_n_children(old_todos); i++) {
+        const gchar** todo_items = g_variant_get_strv(
+            g_variant_get_child_value(old_todos, i), NULL);
+
+        const char* todo_text = adw_preferences_row_get_title(
+            ADW_PREFERENCES_ROW(g_object_get_data(G_OBJECT(btn), "todo-row")));
+        // Skip deleted todo
+        if (g_strcmp0(todo_items[0], todo_text) == 0) {
+            g_free(todo_items);
+            continue;
+        } else {
+            // Add other todos
+            g_variant_builder_add_value(&g_var_builder, g_variant_get_child_value(old_todos, i));
+            g_free(todo_items);
+        }
+    }
+    // Finish building new todos array
+    GVariant* new_todos = g_variant_builder_end(&g_var_builder);
+    // Save new todos to gsettings
+    g_settings_set_value(settings, "todos", new_todos);
+    // Remove row
+    adw_preferences_page_remove(ADW_PREFERENCES_PAGE(todos_list),
+        ADW_PREFERENCES_GROUP(g_object_get_data(G_OBJECT(btn), "todo-group")));
 }
 
 AdwPreferencesGroup* Todo(const gchar** todo_items)
@@ -96,7 +140,9 @@ AdwPreferencesGroup* Todo(const gchar** todo_items)
     GtkWidget* del_btn = gtk_button_new_from_icon_name("user-trash-symbolic");
     gtk_widget_add_css_class(del_btn, "destructive-action");
     g_object_set(G_OBJECT(del_btn), "valign", GTK_ALIGN_CENTER, NULL);
-    g_signal_connect(del_btn, "clicked", G_CALLBACK(DeleteTodo), todo_group);
+    g_object_set_data(G_OBJECT(del_btn), "todo-row", todo_row);
+    g_object_set_data(G_OBJECT(del_btn), "todo-group", todo_group);
+    g_signal_connect(del_btn, "clicked", G_CALLBACK(DeleteTodo), NULL);
     adw_expander_row_add_prefix(ADW_EXPANDER_ROW(todo_row), del_btn);
     // Add entry for sub-todos
     adw_expander_row_add_row(ADW_EXPANDER_ROW(todo_row), SubEntry(todo_row));
@@ -106,8 +152,6 @@ AdwPreferencesGroup* Todo(const gchar** todo_items)
     }
     // Adw expander row to group
     adw_preferences_group_add(ADW_PREFERENCES_GROUP(todo_group), todo_row);
-    // Free memory
-    g_free(todo_items);
 
     return ADW_PREFERENCES_GROUP(todo_group);
 }

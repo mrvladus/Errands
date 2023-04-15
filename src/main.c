@@ -1,5 +1,5 @@
 #include "global.h"
-#include "widgets/entry.h"
+// #include "widgets/entry.h"
 #include "widgets/headerbar.h"
 #include "widgets/todolist.h"
 
@@ -17,7 +17,7 @@ void CreateWindow()
     // Construct interface
     GtkWidget* box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 20);
     gtk_box_append(GTK_BOX(box), HeaderBar());
-    gtk_box_append(GTK_BOX(box), Entry());
+    // gtk_box_append(GTK_BOX(box), Entry());
     gtk_box_append(GTK_BOX(box), TodoList());
     adw_application_window_set_content(ADW_APPLICATION_WINDOW(win), box);
     // Show window
