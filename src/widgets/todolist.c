@@ -1,6 +1,6 @@
 #include "todolist.h"
 #include "../global.h"
-#include "todo.h"
+#include "todo/todo.h"
 
 static void EntryActivated(AdwEntryRow* entry)
 {
@@ -9,10 +9,21 @@ static void EntryActivated(AdwEntryRow* entry)
     // Check for empty string
     if (strlen(text) == 0)
         return;
+    // Check if todo already exists
+    GVariant* old_todos = g_settings_get_value(settings, "todos");
+    for (int i = 0; i < g_variant_n_children(old_todos); i++) {
+        // Get sub array
+        GVariant* todo = g_variant_get_child_value(old_todos, i);
+        const gchar** todos = g_variant_get_strv(todo, NULL);
+        if (g_strcmp0(todos[0], text) == 0) {
+            g_free(todos);
+            return;
+        }
+        g_free(todos);
+    }
     // Add new todo to gsettings
     GVariantBuilder g_var_builder;
     g_variant_builder_init(&g_var_builder, G_VARIANT_TYPE_ARRAY);
-    GVariant* old_todos = g_settings_get_value(settings, "todos");
     // For each sub array
     for (int i = 0; i < g_variant_n_children(old_todos); i++) {
         g_variant_builder_add_value(&g_var_builder, g_variant_get_child_value(old_todos, i));
@@ -44,6 +55,7 @@ GtkWidget* TodoList()
     GtkWidget* entry_group = adw_preferences_group_new();
     adw_preferences_group_add(ADW_PREFERENCES_GROUP(entry_group), entry);
     adw_preferences_page_add(ADW_PREFERENCES_PAGE(todos_list), ADW_PREFERENCES_GROUP(entry_group));
+
     // Load todos as array [['todo1', 'sub1', 'sub2'], ['todo2', 'sub1', 'sub2']]
     GVariant* todos = g_settings_get_value(settings, "todos");
     // For each sub-array:
