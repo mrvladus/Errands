@@ -11,7 +11,7 @@
 			<default>0</default>
 		</key>
 		<key name="todos" type="aas">
-			<default>[['todo1', 'sub1', 'sub2'], ['todo2', 'sub1', 'sub2'], ['todo3', 'sub1', 'sub2'], ['todo4', 'sub1', 'sub2']]</default>
+			<default>[]</default>
 		</key>
 	</schema>
 </schemalist>

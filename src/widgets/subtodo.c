@@ -1,5 +1,5 @@
 #include "subtodo.h"
-#include "../../global.h"
+#include "../global.h"
 
 static void DeleteSubTodo(GtkButton* btn)
 {

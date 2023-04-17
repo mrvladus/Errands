@@ -2,7 +2,7 @@ APP_ID=io.github.mrvladus.List
 BIN=list
 PREFIX=/app
 CC=gcc
-SOURCE_FILES=src/*.c src/widgets/*.c src/widgets/*/*.c
+SOURCE_FILES=src/*.c src/widgets/*.c
 
 build:
 	$(CC) -Wall `pkg-config --cflags --libs libadwaita-1` $(SOURCE_FILES) -o $(BIN)

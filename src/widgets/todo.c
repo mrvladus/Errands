@@ -1,7 +1,7 @@
 #include "todo.h"
-#include "../../global.h"
-#include "../todolist.h"
+#include "../global.h"
 #include "subtodo.h"
+#include "todolist.h"
 
 // Add sub todo when text is entered
 static void SubEntryActivated(GtkEntry* entry, GtkWidget* parent)
