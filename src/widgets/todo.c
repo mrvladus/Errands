@@ -13,7 +13,7 @@ static void SubEntryActivated(GtkEntry* entry, GtkWidget* parent)
         return;
     // Check if todo already exists
     const char* parent_text = adw_preferences_row_get_title(ADW_PREFERENCES_ROW(parent));
-    GVariant* old_todos = g_settings_get_value(settings, "todos");
+    GVariant* old_todos = g_settings_get_value(settings, "todos-v2");
     for (int i = 0; i < g_variant_n_children(old_todos); i++) {
         // Get sub array
         GVariant* todo = g_variant_get_child_value(old_todos, i);
@@ -51,7 +51,7 @@ static void SubEntryActivated(GtkEntry* entry, GtkWidget* parent)
     }
     // Save new todos
     GVariant* new_todos = g_variant_builder_end(&g_var_builder);
-    g_settings_set_value(settings, "todos", new_todos);
+    g_settings_set_value(settings, "todos-v2", new_todos);
     adw_expander_row_add_row(ADW_EXPANDER_ROW(parent), SubTodo(text, parent));
     // Clear entry
     gtk_editable_set_text(GTK_EDITABLE(entry), "");
@@ -64,11 +64,11 @@ static void DeleteTodo(GtkButton* btn)
     GVariantBuilder g_var_builder;
     g_variant_builder_init(&g_var_builder, G_VARIANT_TYPE_ARRAY);
     // Get todos from settings
-    GVariant* old_todos = g_settings_get_value(settings, "todos");
+    GVariant* old_todos = g_settings_get_value(settings, "todos-v2");
     int num_of_old_todos = g_variant_n_children(old_todos);
     // If only one todo left: just set empty array in gsettings
     if (num_of_old_todos == 1)
-        g_settings_set(settings, "todos", "aas", (const gchar**) { NULL });
+        g_settings_set(settings, "todos-v2", "aas", (const gchar**) { NULL });
     // Else remove only one from array
     else {
         // For each todo
@@ -92,7 +92,7 @@ static void DeleteTodo(GtkButton* btn)
         // Finish building new todos array
         GVariant* new_todos = g_variant_builder_end(&g_var_builder);
         // Save new todos to gsettings
-        g_settings_set_value(settings, "todos", new_todos);
+        g_settings_set_value(settings, "todos-v2", new_todos);
     }
     // Remove main todo row
     adw_preferences_page_remove(ADW_PREFERENCES_PAGE(todos_list),

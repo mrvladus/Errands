@@ -3,12 +3,32 @@
 #include "widgets/headerbar.h"
 #include "widgets/todolist.h"
 
+// ---------- Compatability functions ---------- //
+
+// Convert to a new gsettings todos-v2 format from versions 44.1.x to 44.2.x
+void ConvertSettings()
+{
+    // Get old todos and transfer them to a new key "todos-v2"
+    g_auto(GStrv) old_todos = g_settings_get_strv(settings, "todos");
+    // Create new array of arrays
+    GVariantBuilder g_var_builder;
+    g_variant_builder_init(&g_var_builder, G_VARIANT_TYPE_ARRAY);
+    for (int i = 0; old_todos[i]; i++) {
+        g_variant_builder_add_parsed(&g_var_builder, "{ <%s>, NULL }", old_todos[i]);
+    }
+    // Finish building new todos array
+    GVariant* new_todos = g_variant_builder_end(&g_var_builder);
+    // Save new todos to gsettings
+    g_settings_set_value(settings, "todos-v2", new_todos);
+}
+
 // ---------- Main window ---------- //
 
 void CreateWindow()
 {
     // Load gsettings
     settings = g_settings_new(APP_ID);
+    ConvertSettings();
     // Main window
     GtkWidget* win = adw_application_window_new(GTK_APPLICATION(g_application_get_default()));
     g_object_set(G_OBJECT(win), "title", "List", NULL);

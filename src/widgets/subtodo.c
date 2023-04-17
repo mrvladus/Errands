@@ -12,7 +12,7 @@ static void DeleteSubTodo(GtkButton* btn)
     GVariantBuilder g_var_builder;
     g_variant_builder_init(&g_var_builder, G_VARIANT_TYPE_ARRAY);
     // Get todos from gsettings
-    GVariant* old_todos = g_settings_get_value(settings, "todos");
+    GVariant* old_todos = g_settings_get_value(settings, "todos-v2");
     // For each sub array
     for (int i = 0; i < g_variant_n_children(old_todos); i++) {
         // Get sub array
@@ -43,7 +43,7 @@ static void DeleteSubTodo(GtkButton* btn)
     // Finish building new todos array
     GVariant* new_todos = g_variant_builder_end(&g_var_builder);
     // Save new todos to gsettings
-    g_settings_set_value(settings, "todos", new_todos);
+    g_settings_set_value(settings, "todos-v2", new_todos);
     // Remove sub todo row from main todo
     adw_expander_row_remove(
         ADW_EXPANDER_ROW(g_object_get_data(G_OBJECT(btn), "parent-todo")),

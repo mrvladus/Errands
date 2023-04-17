@@ -6,7 +6,7 @@ GtkWidget* TodoList()
 {
     todos_list = adw_preferences_page_new();
     // Load todos as array [['todo1', 'sub1', 'sub2'], ['todo2', 'sub1', 'sub2']]
-    GVariant* todos = g_settings_get_value(settings, "todos");
+    GVariant* todos = g_settings_get_value(settings, "todos-v2");
     // For each sub-array:
     for (int i = 0; i < g_variant_n_children(todos); i++) {
         // Get string array { 'todo1', 'sub1', 'sub2', NULL }

@@ -22,3 +22,6 @@ validate:
 run:
 	flatpak run org.flatpak.Builder --user --install --force-clean _build $(APP_ID).yaml
 	flatpak run $(APP_ID)
+
+clean:
+	rm -rf ~/.var/app/$(APP_ID)

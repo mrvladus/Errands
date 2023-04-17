@@ -10,7 +10,7 @@ static void EntryActivated(AdwEntryRow* entry)
     if (strlen(text) == 0)
         return;
     // Check if todo already exists
-    GVariant* old_todos = g_settings_get_value(settings, "todos");
+    GVariant* old_todos = g_settings_get_value(settings, "todos-v2");
     for (int i = 0; i < g_variant_n_children(old_todos); i++) {
         // Get sub array
         GVariant* todo = g_variant_get_child_value(old_todos, i);
@@ -36,7 +36,7 @@ static void EntryActivated(AdwEntryRow* entry)
     g_variant_builder_add_value(&g_var_builder, new_todo);
     // Save new todos
     GVariant* new_todos = g_variant_builder_end(&g_var_builder);
-    g_settings_set_value(settings, "todos", new_todos);
+    g_settings_set_value(settings, "todos-v2", new_todos);
     // Add row
     adw_preferences_page_add(ADW_PREFERENCES_PAGE(todos_list), Todo((const gchar**)array));
     // Clear entry
