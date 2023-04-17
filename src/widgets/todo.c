@@ -105,12 +105,13 @@ AdwPreferencesGroup* Todo(const gchar** todo_items)
 {
     // Create new todo group
     GtkWidget* todo_group = adw_preferences_group_new();
+
     // Create expander row
     GtkWidget* todo_row = adw_expander_row_new();
+    // Set main todo text as first item of todo_items
+    g_object_set(G_OBJECT(todo_row), "title", todo_items[0], NULL);
     // Adw expander row to group
     adw_preferences_group_add(ADW_PREFERENCES_GROUP(todo_group), todo_row);
-    // Set main todo text as first item of todo_items
-    adw_preferences_row_set_title(ADW_PREFERENCES_ROW(todo_row), todo_items[0]);
 
     // Add delete button
     GtkWidget* del_btn = gtk_button_new_from_icon_name("user-trash-symbolic");

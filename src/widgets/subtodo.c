@@ -54,7 +54,8 @@ GtkWidget* SubTodo(const char* text, GtkWidget* parent)
 {
     // Sub todo row
     GtkWidget* sub_todo = adw_action_row_new();
-    adw_preferences_row_set_title(ADW_PREFERENCES_ROW(sub_todo), text);
+    g_object_set(G_OBJECT(sub_todo), "title", text, NULL);
+
     // Add delete button
     GtkWidget* del_btn = gtk_button_new_from_icon_name("user-trash-symbolic");
     g_object_set(G_OBJECT(del_btn), "valign", GTK_ALIGN_CENTER, NULL);
