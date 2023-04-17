@@ -14,7 +14,11 @@ void ConvertSettings()
     GVariantBuilder g_var_builder;
     g_variant_builder_init(&g_var_builder, G_VARIANT_TYPE_ARRAY);
     for (int i = 0; old_todos[i]; i++) {
-        g_variant_builder_add_parsed(&g_var_builder, "{ <%s>, NULL }", old_todos[i]);
+        g_autoptr(GStrvBuilder) sub_builder = g_strv_builder_new();
+        g_strv_builder_add(sub_builder, old_todos[i]);
+        g_auto(GStrv) array = g_strv_builder_end(sub_builder);
+        GVariant* new_todo = g_variant_new_strv((const char* const*)array, -1);
+        g_variant_builder_add_value(&g_var_builder, new_todo);
     }
     // Finish building new todos array
     GVariant* new_todos = g_variant_builder_end(&g_var_builder);
