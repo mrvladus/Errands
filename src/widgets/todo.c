@@ -123,7 +123,7 @@ AdwPreferencesGroup* Todo(const gchar** todo_items)
 
     // Add entry for sub-todos
     GtkWidget* sub_entry = adw_entry_row_new();
-    adw_preferences_row_set_title(ADW_PREFERENCES_ROW(sub_entry), "Add sub-task");
+    adw_preferences_row_set_title(ADW_PREFERENCES_ROW(sub_entry), "Add new sub-task");
     g_signal_connect(sub_entry, "apply", G_CALLBACK(SubEntryActivated), todo_row);
     g_signal_connect(sub_entry, "entry-activated", G_CALLBACK(SubEntryActivated), todo_row);
     adw_expander_row_add_row(ADW_EXPANDER_ROW(todo_row), sub_entry);
