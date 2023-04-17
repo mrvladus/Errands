@@ -21,7 +21,7 @@ git clone https://github.com/mrvladus/List
 ```
 flatpak install org.gnome.Sdk//44 org.flatpak.Builder org.freedesktop.appstream-glib -y
 ```
-4. Run 
+3. Run 
 ```
 make run
 ```
