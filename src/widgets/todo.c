@@ -129,8 +129,12 @@ AdwPreferencesGroup* Todo(const gchar** todo_items)
     adw_expander_row_add_row(ADW_EXPANDER_ROW(todo_row), sub_entry);
 
     // Add sub todos begining from second element
-    for (int i = 1; todo_items[i]; i++)
+    int i;
+    for (i = 1; todo_items[i]; i++)
         adw_expander_row_add_row(ADW_EXPANDER_ROW(todo_row), SubTodo(todo_items[i], todo_row));
+    // Expand row if sub-todos exists
+    if (i > 1)
+        g_object_set(G_OBJECT(todo_row), "expanded", TRUE, NULL);
 
     return ADW_PREFERENCES_GROUP(todo_group);
 }
