@@ -79,7 +79,7 @@ static GtkWidget* MainMenu()
     gtk_popover_menu_add_child(GTK_POPOVER_MENU(popover), ThemeSwitcher(), "theme");
 
     // About menu item
-    g_menu_append(main_menu, "About", "app.about");
+    g_menu_append(main_menu, "About List", "app.about");
     GSimpleAction* action = g_simple_action_new("about", NULL);
     g_signal_connect(action, "activate", G_CALLBACK(ActionAbout), NULL);
     g_action_map_add_action(G_ACTION_MAP(g_application_get_default()), G_ACTION(action));
@@ -96,6 +96,7 @@ static GtkWidget* MainMenu()
     GtkWidget* menu_btn = gtk_menu_button_new();
     g_object_set(G_OBJECT(menu_btn),
         "icon-name", "open-menu-symbolic",
+        "tooltip-text", "Menu",
         "popover", popover,
         NULL);
 

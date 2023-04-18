@@ -115,8 +115,10 @@ AdwPreferencesGroup* Todo(const gchar** todo_items)
 
     // Add delete button
     GtkWidget* del_btn = gtk_button_new_from_icon_name("user-trash-symbolic");
-    gtk_widget_add_css_class(del_btn, "destructive-action");
-    g_object_set(G_OBJECT(del_btn), "valign", GTK_ALIGN_CENTER, NULL);
+    g_object_set(G_OBJECT(del_btn),
+        "valign", GTK_ALIGN_CENTER,
+        "tooltip-text", "Delete task",
+        NULL);
     g_object_set_data(G_OBJECT(del_btn), "todo-row", todo_row);
     g_object_set_data(G_OBJECT(del_btn), "todo-group", todo_group);
     g_signal_connect(del_btn, "clicked", G_CALLBACK(DeleteTodo), NULL);
