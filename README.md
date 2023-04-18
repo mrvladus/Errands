@@ -4,8 +4,8 @@ Focus on your tasks.
 Todo application for those who prefer simplicity. Add new tasks and sub-tasks, remove comleted.
 
 ## Screenshots
-<a href="./screenshots/light.png"><img src="./screenshots/light.png" height="500"></a>
-<a href="./screenshots/light.png"><img src="./screenshots/dark.png" height="500"></a>
+<a href="./screenshots/light.png"><img src="./screenshots/light.png" height="400"></a>
+<a href="./screenshots/light.png"><img src="./screenshots/dark.png" height="400"></a>
 
 ## Installing
 List is available as a Flatpak on Flathub:
