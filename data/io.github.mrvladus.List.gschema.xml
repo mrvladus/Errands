@@ -13,5 +13,8 @@
 		<key name="todos" type="as">
 			<default>[]</default>
 		</key>
+		<key name="todos-v2" type="aas">
+			<default>[]</default>
+		</key>
 	</schema>
 </schemalist>

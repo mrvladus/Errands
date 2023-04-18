@@ -15,22 +15,29 @@
 	<name>List</name>
 	<summary>Focus on your tasks.</summary>
 	<description>
-		<p>Todo application for those who prefer simplicity. Add new todo's, remove comleted,
-			nothing more.</p>
+		<p>Todo application for those who prefer simplicity. Add new tasks and sub-tasks, remove comleted.</p>
 	</description>
 
 	<screenshots>
 		<screenshot type="default">
 			<image>
-				https://github.com/mrvladus/List/blob/ea746ec9d9573b7a3ec34e56ac8ea8826ad7868c/screenshots/light.png?raw=true</image>
+				https://github.com/mrvladus/List/blob/5778e6b47352e92e2d09beeef6a8bda34b981bc9/screenshots/light.png?raw=true</image>
 		</screenshot>
 		<screenshot>
 			<image>
-				https://github.com/mrvladus/List/blob/ea746ec9d9573b7a3ec34e56ac8ea8826ad7868c/screenshots/dark.png?raw=true</image>
+				https://github.com/mrvladus/List/blob/5778e6b47352e92e2d09beeef6a8bda34b981bc9/screenshots/dark.png?raw=true</image>
 		</screenshot>
 	</screenshots>
 
 	<releases>
+		<release version="44.2" date="2023-04-18">
+			<description>
+				<ul>
+					<li>You can now add sub-tasks!</li>
+					<li>Redesigned interface for better visibility and contrast</li>
+				</ul>
+			</description>
+		</release>
 		<release version="44.1.1" date="2023-04-09">
 			<description>
 				<p>

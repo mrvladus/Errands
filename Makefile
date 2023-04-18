@@ -2,9 +2,10 @@ APP_ID=io.github.mrvladus.List
 BIN=list
 PREFIX=/app
 CC=gcc
+SOURCE_FILES=src/*.c src/widgets/*.c
 
 build:
-	$(CC) -Wall `pkg-config --cflags --libs libadwaita-1` src/*.c src/widgets/*.c -o $(BIN)
+	$(CC) -Wall `pkg-config --cflags --libs libadwaita-1` $(SOURCE_FILES) -o $(BIN)
 
 install: build
 	install -D $(BIN) $(PREFIX)/bin/$(BIN)
@@ -21,3 +22,6 @@ validate:
 run:
 	flatpak run org.flatpak.Builder --user --install --force-clean _build $(APP_ID).yaml
 	flatpak run $(APP_ID)
+
+clean:
+	rm -rf ~/.var/app/$(APP_ID)

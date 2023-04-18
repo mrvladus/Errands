@@ -1,4 +1,6 @@
 #include <adwaita.h>
 
-GSettings* settings;
-GtkWidget* todos_list;
+// ---------- Global variables ---------- //
+
+GSettings* settings; // GSettings object
+GtkWidget* todos_list; // Todo's list box

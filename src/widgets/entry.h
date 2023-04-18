@@ -3,7 +3,6 @@
 
 #include <adwaita.h>
 
-void EntryActivated(GtkEntry* entry);
 GtkWidget* Entry();
 
 #endif

@@ -3,6 +3,6 @@
 
 #include <adwaita.h>
 
-GtkWidget* Todo(const char* text);
+AdwPreferencesGroup* Todo(const gchar** todo_items);
 
 #endif
