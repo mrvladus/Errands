@@ -58,6 +58,7 @@ GtkWidget* SubTodo(const char* text, GtkWidget* parent)
 
     // Add delete button
     GtkWidget* del_btn = gtk_button_new_from_icon_name("user-trash-symbolic");
+    gtk_widget_add_css_class(del_btn, "flat");
     g_object_set(G_OBJECT(del_btn),
         "valign", GTK_ALIGN_CENTER,
         "tooltip-text", "Delete sub-task",
