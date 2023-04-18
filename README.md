@@ -15,7 +15,7 @@ List is available as a Flatpak on Flathub:
 ## Building from source
 1. Clone repo
 ```
-git clone https://github.com/mrvladus/List
+git clone https://github.com/mrvladus/List && cd List/
 ```
 2. Install dependencies
 ```
