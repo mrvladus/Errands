@@ -14,6 +14,7 @@ void CreateWindow()
     // Main window
     GtkWidget* win = adw_application_window_new(GTK_APPLICATION(g_application_get_default()));
     g_object_set(G_OBJECT(win), "title", "List", NULL);
+    gtk_widget_set_size_request(win, 500, 500);
     g_settings_bind(settings, "width", win, "default-width", 0);
     g_settings_bind(settings, "height", win, "default-height", 0);
     // Construct interface
