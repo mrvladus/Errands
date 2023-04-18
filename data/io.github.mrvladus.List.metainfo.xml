@@ -30,6 +30,13 @@
 	</screenshots>
 
 	<releases>
+		<release version="44.2.1" date="2023-04-18">
+			<description>
+				<ul>
+					<li>UI improvements.</li>
+				</ul>
+			</description>
+		</release>
 		<release version="44.2" date="2023-04-18">
 			<description>
 				<ul>
