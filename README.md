@@ -1,7 +1,7 @@
 # List
 
 Focus on your tasks.
-Todo application for those who prefer simplicity. Add new tasks and sub-tasks, remove comleted.
+Todo application for those who prefer simplicity. Add new tasks and sub-tasks, remove completed.
 
 ## Screenshots
 <a href="./screenshots/light.png"><img src="./screenshots/light.png" height="400"></a>
