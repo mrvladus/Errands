@@ -1,4 +1,6 @@
 from gi.repository import Gio, Gtk
+from .about_window import AboutWindow
+from ..globals import data
 
 
 class HeaderBar(Gtk.HeaderBar):
@@ -9,9 +11,15 @@ class HeaderBar(Gtk.HeaderBar):
         self.menu = Gio.Menu()
 
         self.menu.append("About List", "app.about")
-        action = Gio.SimpleAction.new("app.about", None)
+        action = Gio.SimpleAction.new("about", None)
+        action.connect("activate", lambda *_: AboutWindow().present())
+        data["app"].add_action(action)
+
         self.menu.append("Quit", "app.quit")
-        action.connect("activate", self.on_about_action)
+        action = Gio.SimpleAction.new("quit", None)
+        action.connect("activate", lambda *_: data["app"].quit())
+        data["app"].add_action(action)
+        data["app"].set_accels_for_action("app.quit", ["<primary>q"])
 
         self.menu_btn = Gtk.MenuButton(
             icon_name="open-menu-symbolic",
@@ -19,8 +27,3 @@ class HeaderBar(Gtk.HeaderBar):
             menu_model=self.menu,
         )
         self.pack_end(self.menu_btn)
-
-    def on_about_action(self, widget, _):
-        from .about_window import AboutWindow
-
-        AboutWindow(self.props.active_window).present()

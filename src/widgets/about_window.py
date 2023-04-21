@@ -1,10 +1,10 @@
 from gi.repository import Adw
-from ..globals import APP_ID, VERSION
+from ..globals import APP_ID, VERSION, data
 
 
-def AboutWindow(parent):
+def AboutWindow():
     win = Adw.AboutWindow(
-        transient_for=parent,
+        transient_for=data["app"].props.active_window,
         application_name="List",
         application_icon=APP_ID,
         developer_name="Vlad Krupinski",
