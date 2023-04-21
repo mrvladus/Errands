@@ -2,8 +2,7 @@
 import sys
 import signal
 
-pkgdatadir = "/app/share/list"
-sys.path.insert(1, pkgdatadir)
+sys.path.insert(1, "/app/share/list")
 
 # import locale
 # import gettext

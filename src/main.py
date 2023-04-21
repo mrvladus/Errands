@@ -14,18 +14,12 @@ class Application(Adw.Application):
             flags=Gio.ApplicationFlags.DEFAULT_FLAGS,
         )
         self.create_action("quit", lambda *_: self.quit(), ["<primary>q"])
-        self.create_action("about", self.on_about_action)
         self.create_action("preferences", self.on_preferences_action)
 
     def do_activate(self):
         from .widgets.main_window import MainWindow
 
         MainWindow(self).present()
-
-    def on_about_action(self, widget, _):
-        from .widgets.about_window import AboutWindow
-
-        AboutWindow(self.props.active_window).present()
 
     def on_preferences_action(self, widget, _):
         print("app.preferences action activated")
