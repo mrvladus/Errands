@@ -1,6 +1,5 @@
-from gi.repository import Gio, Gtk
-from .about_window import AboutWindow
-from ..globals import data
+from gi.repository import Gio, Gtk, Adw
+from ..globals import data, APP_ID, VERSION
 
 
 class HeaderBar(Gtk.HeaderBar):
@@ -12,7 +11,7 @@ class HeaderBar(Gtk.HeaderBar):
 
         self.menu.append("About List", "app.about")
         action = Gio.SimpleAction.new("about", None)
-        action.connect("activate", lambda *_: AboutWindow().present())
+        action.connect("activate", self.on_about_action)
         data["app"].add_action(action)
 
         self.menu.append("Quit", "app.quit")
@@ -27,3 +26,15 @@ class HeaderBar(Gtk.HeaderBar):
             menu_model=self.menu,
         )
         self.pack_end(self.menu_btn)
+
+    def on_about_action(self, *args):
+        win = Adw.AboutWindow(
+            transient_for=data["app"].props.active_window,
+            application_name="List",
+            application_icon=APP_ID,
+            developer_name="Vlad Krupinski",
+            version=VERSION,
+            copyright="© 2023 Vlad Krupinski",
+            website="https://github.com/mrvladus/List",
+        )
+        win.present()

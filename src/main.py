@@ -14,8 +14,8 @@ class Application(Adw.Application):
             application_id=APP_ID,
             flags=Gio.ApplicationFlags.DEFAULT_FLAGS,
         )
-        data["app"] = self
 
     def do_activate(self):
-        data["gsettings"] = Gio.Settings.new("")
+        data["app"] = self
+        data["gsettings"] = Gio.Settings.new(APP_ID)
         MainWindow(self).present()
