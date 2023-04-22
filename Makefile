@@ -4,7 +4,7 @@ PREFIX=/app
 install:
 	install -D src/list $(PREFIX)/bin/list
 	install -D src/main.py $(PREFIX)/share/list/list/main.py
-	install -D src/settings.py $(PREFIX)/share/list/list/settings.py
+	install -D src/data.py $(PREFIX)/share/list/list/data.py
 	install -D src/globals.py $(PREFIX)/share/list/list/globals.py
 	install -D src/widgets/main_window.py $(PREFIX)/share/list/list/widgets/main_window.py
 	install -D src/widgets/headerbar.py $(PREFIX)/share/list/list/widgets/headerbar.py

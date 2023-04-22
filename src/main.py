@@ -6,6 +6,7 @@ require_version("Adw", "1")
 from gi.repository import Gio, Adw
 from .globals import APP_ID, data
 from .widgets.main_window import MainWindow
+from .data import InitData
 
 
 class Application(Adw.Application):
@@ -18,4 +19,5 @@ class Application(Adw.Application):
     def do_activate(self):
         data["app"] = self
         data["gsettings"] = Gio.Settings.new(APP_ID)
+        InitData()
         MainWindow(self).present()
