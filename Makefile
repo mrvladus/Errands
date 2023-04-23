@@ -2,6 +2,7 @@ APP_ID=io.github.mrvladus.List
 PREFIX=/app
 
 install:
+	# Source files
 	install -D src/list $(PREFIX)/bin/list
 	install -D src/main.py $(PREFIX)/share/list/list/main.py
 	install -D src/data.py $(PREFIX)/share/list/list/data.py
@@ -11,12 +12,13 @@ install:
 	install -D src/widgets/entry.py $(PREFIX)/share/list/list/widgets/entry.py
 	install -D src/widgets/todolist.py $(PREFIX)/share/list/list/widgets/todolist.py
 	install -D src/widgets/todo.py $(PREFIX)/share/list/list/widgets/todo.py
-
+	# Data files
 	install -D data/$(APP_ID).desktop $(PREFIX)/share/applications/$(APP_ID).desktop
 	install -D data/icons/$(APP_ID).svg $(PREFIX)/share/icons/hicolor/scalable/apps/$(APP_ID).svg
 	install -D data/icons/$(APP_ID)-symbolic.svg $(PREFIX)/share/icons/hicolor/symbolic/apps/$(APP_ID)-symbolic.svg
 	install -D data/$(APP_ID).metainfo.xml $(PREFIX)/share/metainfo/$(APP_ID).metainfo.xml
 	install -D data/$(APP_ID).gschema.xml $(PREFIX)/share/glib-2.0/schemas/$(APP_ID).gschema.xml
+	# Post install
 	glib-compile-schemas $(PREFIX)/share/glib-2.0/schemas
 
 validate:
