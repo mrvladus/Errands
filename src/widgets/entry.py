@@ -23,6 +23,7 @@ class Entry(Adw.PreferencesPage):
         # Check if todo exists
         if entry.props.text in new_data["todos"]:
             return
+        # Add new todo
         new_data["todos"][entry.props.text] = {"sub": [], "color": ""}
         WriteData(new_data)
         data["todo_list"].add(Todo(entry.props.text))

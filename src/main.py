@@ -5,8 +5,8 @@ require_version("Adw", "1")
 
 from gi.repository import Gio, Adw
 from .globals import APP_ID, data
-from .widgets.main_window import MainWindow
 from .data import InitData
+from .widgets.main_window import MainWindow
 
 
 class Application(Adw.Application):

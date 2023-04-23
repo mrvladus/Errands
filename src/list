@@ -1,21 +1,20 @@
 #!/bin/python3
 import sys
 import signal
-
-sys.path.insert(1, "/app/share/list")
-
 # import locale
 # import gettext
 # localedir = "@localedir@"
 # locale.bindtextdomain("list", localedir)
 # locale.textdomain("list")
 # gettext.install("list", localedir)
-
-signal.signal(signal.SIGINT, signal.SIG_DFL)
+# resource = Gio.Resource.load(os.path.join(pkgdatadir, "list.gresource"))
+# resource._register()
 
 if __name__ == "__main__":
-    # resource = Gio.Resource.load(os.path.join(pkgdatadir, "list.gresource"))
-    # resource._register()
+
+    sys.path.insert(1, "/app/share/list")
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
+
     from list import main
 
     app = main.Application()
