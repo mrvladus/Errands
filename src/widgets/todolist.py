@@ -1,6 +1,6 @@
 from gi.repository import Adw
 from ..globals import data
-from ..data import LoadData
+from ..data import ReadData
 from .todo import Todo
 
 
@@ -11,7 +11,7 @@ class TodoList(Adw.PreferencesPage):
         self.load_todos()
 
     def load_todos(self):
-        data = LoadData()
+        data = ReadData()
         if data["todos"] != {}:
             for todo in data["todos"]:
                 self.add(Todo(todo, data["todos"][todo]["sub"]))
