@@ -23,6 +23,28 @@ class SubTodo(Adw.ActionRow):
         self.parent_todo.remove(self)
 
 
+class TodoMenu(Gtk.MenuButton):
+    def __init__(self, parent):
+        super().__init__()
+        self.props.icon_name = "view-more-symbolic"
+        self.props.css_classes = ["flat"]
+        self.props.valign = Gtk.Align.CENTER
+        # Delete button
+        del_btn = Gtk.Button(icon_name="user-trash-symbolic")
+        del_btn.connect("clicked", self.on_delete, parent)
+        # Box
+        box = Gtk.Box(orientation="horizontal", css_classes=["toolbar"])
+        box.append(del_btn)
+        self.props.popover = Gtk.Popover(child=box)
+
+    def on_delete(self, btn, parent):
+        self.props.popover.popdown()
+        new_data = ReadData()
+        new_data["todos"].pop(parent.text)
+        WriteData(new_data)
+        data["todo_list"].remove(parent)
+
+
 class Todo(Adw.PreferencesGroup):
     def __init__(self, text, subtodos=[]):
         super().__init__()
@@ -35,25 +57,13 @@ class Todo(Adw.PreferencesGroup):
         sub_entry = Adw.EntryRow(title="Add new sub task")
         sub_entry.connect("entry-activated", self.on_sub_entry_activated)
         self.row.add_row(sub_entry)
-        # Delete todo button
-        del_btn = Gtk.Button(
-            icon_name="user-trash-symbolic",
-            css_classes=["flat"],
-            valign="center",
-        )
-        del_btn.connect("clicked", self.on_delete)
-        self.row.add_prefix(del_btn)
+        # Menu
+        self.row.add_prefix(TodoMenu(self))
         # Sub-todos
         for todo in subtodos:
             self.row.add_row(SubTodo(todo, self.row))
 
         self.add(self.row)
-
-    def on_delete(self, _):
-        new_data = ReadData()
-        new_data["todos"].pop(self.text)
-        WriteData(new_data)
-        data["todo_list"].remove(self)
 
     def on_sub_entry_activated(self, entry):
         # Check for empty string

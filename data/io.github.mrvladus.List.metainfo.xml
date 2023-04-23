@@ -30,10 +30,13 @@
 	</screenshots>
 
 	<releases>
-		<release version="44.2.2" date="2023-04-19">
+		<release version="44.3" date="2023-04-25">
 			<description>
+				<p>In this new version application rewritten in Python</p>
+				<p>Added features:</p>
 				<ul>
-					<li>Fixed typos.</li>
+					<li>Color tags</li>
+					<li>Tasks editing</li>
 				</ul>
 			</description>
 		</release>
