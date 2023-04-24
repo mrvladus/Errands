@@ -8,10 +8,21 @@ from ..globals import data
 class MainWindow(Adw.ApplicationWindow):
     def __init__(self, app):
         super().__init__(application=app, title="List")
+        self.setup_size()
+        self.setup_theme()
+        self.build_interface()
+
+    def setup_size(self):
+        # Set minimum size
         self.set_size_request(500, 500)
+        # Remember window size when resizing
         data["gsettings"].bind("width", self, "default_width", 0)
         data["gsettings"].bind("height", self, "default_height", 0)
-        self.build_interface()
+
+    def setup_theme(self):
+        Adw.StyleManager.get_default().set_color_scheme(
+            data["gsettings"].get_value("theme").unpack()
+        )
 
     def build_interface(self):
         box = Gtk.Box(orientation="vertical")

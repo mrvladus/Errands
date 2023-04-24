@@ -7,15 +7,12 @@ import signal
 # locale.bindtextdomain("list", localedir)
 # locale.textdomain("list")
 # gettext.install("list", localedir)
-# resource = Gio.Resource.load(os.path.join(pkgdatadir, "list.gresource"))
-# resource._register()
+
 
 if __name__ == "__main__":
-
     sys.path.insert(1, "/app/share/list")
     signal.signal(signal.SIGINT, signal.SIG_DFL)
 
     from list import main
-
     app = main.Application()
     sys.exit(app.run(sys.argv))
