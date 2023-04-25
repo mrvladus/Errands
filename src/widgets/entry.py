@@ -1,6 +1,6 @@
 from gi.repository import Adw
 from ..globals import data
-from ..data import ReadData, WriteData
+from ..data import UserData
 from .todo import Todo
 
 
@@ -19,12 +19,12 @@ class Entry(Adw.PreferencesPage):
         # Check for empty string
         if entry.props.text == "":
             return
-        new_data = ReadData()
+        new_data = UserData.get()
         # Check if todo exists
         if entry.props.text in new_data["todos"]:
             return
         # Add new todo
         new_data["todos"][entry.props.text] = {"sub": [], "color": ""}
-        WriteData(new_data)
+        UserData.set(new_data)
         data["todo_list"].add(Todo(entry.props.text))
         entry.props.text = ""

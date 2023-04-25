@@ -49,20 +49,13 @@ class HeaderBar(Gtk.HeaderBar):
         self.menu = Gio.Menu()
 
         self.menu.append("Preferences", "app.preferences")
-        action = Gio.SimpleAction.new("preferences", None)
-        action.connect("activate", lambda *_: PreferencesWindow())
-        data["app"].add_action(action)
+        self.create_action("preferences", lambda *_: PreferencesWindow())
 
         self.menu.append("About List", "app.about")
-        action = Gio.SimpleAction.new("about", None)
-        action.connect("activate", self.on_about_action)
-        data["app"].add_action(action)
+        self.create_action("about", self.on_about_action)
 
         self.menu.append("Quit", "app.quit")
-        action = Gio.SimpleAction.new("quit", None)
-        action.connect("activate", lambda *_: data["app"].quit())
-        data["app"].add_action(action)
-        data["app"].set_accels_for_action("app.quit", ["<primary>q"])
+        self.create_action("quit", lambda *_: data["app"].quit(), ["<primary>q"])
 
         self.menu_btn = Gtk.MenuButton(
             icon_name="open-menu-symbolic",
@@ -70,6 +63,13 @@ class HeaderBar(Gtk.HeaderBar):
             menu_model=self.menu,
         )
         self.pack_end(self.menu_btn)
+
+    def create_action(self, name: str, handler, accels=[]):
+        action = Gio.SimpleAction.new(name, None)
+        action.connect("activate", handler)
+        data["app"].add_action(action)
+        if accels != []:
+            data["app"].set_accels_for_action(f"app.{name}", accels)
 
     def on_about_action(self, *args):
         win = Adw.AboutWindow(

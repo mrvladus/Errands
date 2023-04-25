@@ -1,11 +1,24 @@
 .accent_red {
-    background: red;
+    background: @red_1;
+    color: @light_1;
 }
 
 .accent_orange {
-    background: orange;
+    background: @orange_2;
+    color: @light_1;
 }
 
 .accent_green {
-    background: green;
+    background: @green_2;
+    color: @light_1;
+}
+
+.accent_blue {
+    background: @blue_2;
+    color: @light_1;
+}
+
+.accent_purple {
+    background: @purple_2;
+    color: @light_1;
 }

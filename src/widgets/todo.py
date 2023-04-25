@@ -1,6 +1,6 @@
 from gi.repository import Adw, Gtk
 from ..globals import data
-from ..data import ReadData, WriteData, default_data
+from ..data import UserData
 
 
 class TodoMenu(Gtk.MenuButton):
@@ -27,10 +27,16 @@ class TodoMenu(Gtk.MenuButton):
         row1.append(del_btn)
         row1.append(edit_entry)
         # 2nd menu row
-        row2 = Gtk.Box(orientation="horizontal", css_classes=["toolbar"])
+        row2 = Gtk.Box(
+            orientation="horizontal",
+            css_classes=["toolbar"],
+            halign=Gtk.Align.CENTER,
+        )
         row2.append(Gtk.Button(css_classes=["circular", "accent_red"]))
         row2.append(Gtk.Button(css_classes=["circular", "accent_orange"]))
         row2.append(Gtk.Button(css_classes=["circular", "accent_green"]))
+        row2.append(Gtk.Button(css_classes=["circular", "accent_blue"]))
+        row2.append(Gtk.Button(css_classes=["circular", "accent_purple"]))
         # Menu box
         box = Gtk.Box(orientation="vertical", spacing=10)
         box.append(row1)
@@ -39,9 +45,9 @@ class TodoMenu(Gtk.MenuButton):
 
     def on_delete(self, btn, parent):
         self.props.popover.popdown()
-        new_data = ReadData()
+        new_data = UserData.get()
         new_data["todos"].pop(parent.text)
-        WriteData(new_data)
+        UserData.set(new_data)
         data["todo_list"].remove(parent)
 
     def on_edit(self, entry, parent):
@@ -51,14 +57,14 @@ class TodoMenu(Gtk.MenuButton):
         old_text = parent.row.props.title
         new_text = entry.get_buffer().props.text
         # Create new dict and change todo text
-        new_data = ReadData()
-        tmp = default_data
+        new_data = UserData.get()
+        tmp = UserData.default_data
         for key in new_data["todos"]:
             if key == old_text:
                 tmp["todos"][new_text] = new_data["todos"][old_text]
             else:
                 tmp["todos"][key] = new_data["todos"][key]
-        WriteData(tmp)
+        UserData.set(tmp)
         # Set new title and placeholder
         parent.row.props.title = entry.props.placeholder_text = new_text
         # Clear entry
@@ -79,9 +85,9 @@ class SubTodo(Adw.ActionRow):
         self.add_prefix(del_btn)
 
     def on_delete(self, _):
-        new_data = ReadData()
+        new_data = UserData.get()
         new_data["todos"][self.parent_todo.get_title()]["sub"].remove(self.props.title)
-        WriteData(new_data)
+        UserData.set(new_data)
         self.parent_todo.remove(self)
 
 
@@ -93,6 +99,7 @@ class Todo(Adw.PreferencesGroup):
         self.row = Adw.ExpanderRow(
             title=self.text, expanded=True if subtodos != [] else False
         )
+        self.row.add_css_class("accent_orange")
         self.add(self.row)
         # Sub entry
         sub_entry = Adw.EntryRow(title="Add new sub task")
@@ -108,11 +115,11 @@ class Todo(Adw.PreferencesGroup):
         # Check for empty string
         if entry.props.text == "":
             return
-        new_data = ReadData()
+        new_data = UserData.get()
         # Check if todo exists
         if entry.props.text in new_data["todos"][self.text]:
             return
         new_data["todos"][self.text]["sub"].append(entry.props.text)
-        WriteData(new_data)
+        UserData.set(new_data)
         self.row.add_row(SubTodo(entry.props.text, self.row))
         entry.props.text = ""
