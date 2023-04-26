@@ -1,24 +1,39 @@
-.accent_red {
+.row_red {
+    background: mix(@card_bg_color, @red_1, 0.3);
+}
+
+.row_orange {
+    background: mix(@card_bg_color, @orange_1, 0.3);
+}
+
+.row_green {
+    background: mix(@card_bg_color, @green_1, 0.3);
+}
+
+.row_blue {
+    background: mix(@card_bg_color, @blue_1, 0.3);
+}
+
+.row_purple {
+   background: mix(@card_bg_color, @purple_1, 0.3);
+}
+
+.btn_red {
     background: @red_1;
-    color: @light_1;
 }
 
-.accent_orange {
-    background: @orange_2;
-    color: @light_1;
+.btn_orange {
+    background: @orange_1;
 }
 
-.accent_green {
-    background: @green_2;
-    color: @light_1;
+.btn_green {
+    background: @green_1;
 }
 
-.accent_blue {
-    background: @blue_2;
-    color: @light_1;
+.btn_blue {
+    background: @blue_1;
 }
 
-.accent_purple {
-    background: @purple_2;
-    color: @light_1;
+.btn_purple {
+    background: @purple_1;
 }

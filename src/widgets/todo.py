@@ -9,21 +9,26 @@ class TodoMenu(Gtk.MenuButton):
         self.props.icon_name = "view-more-symbolic"
         self.props.css_classes = ["flat"]
         self.props.valign = Gtk.Align.CENTER
+        self.parent = parent
         # Delete button
         del_btn = Gtk.Button(
             icon_name="user-trash-symbolic",
             css_classes=["destructive-action"],
             tooltip_text="Delete task",
         )
-        del_btn.connect("clicked", self.on_delete, parent)
+        del_btn.connect("clicked", self.on_delete, self.parent)
         # Edit entry
         edit_entry = Gtk.Entry(
             placeholder_text=parent.text,
             tooltip_text="Edit task",
         )
-        edit_entry.connect("activate", self.on_edit, parent)
+        edit_entry.connect("activate", self.on_edit, self.parent)
         # 1st menu row
-        row1 = Gtk.Box(orientation="horizontal", css_classes=["toolbar"])
+        row1 = Gtk.Box(
+            orientation="horizontal",
+            css_classes=["toolbar"],
+            halign=Gtk.Align.CENTER,
+        )
         row1.append(del_btn)
         row1.append(edit_entry)
         # 2nd menu row
@@ -32,16 +37,34 @@ class TodoMenu(Gtk.MenuButton):
             css_classes=["toolbar"],
             halign=Gtk.Align.CENTER,
         )
-        row2.append(Gtk.Button(css_classes=["circular", "accent_red"]))
-        row2.append(Gtk.Button(css_classes=["circular", "accent_orange"]))
-        row2.append(Gtk.Button(css_classes=["circular", "accent_green"]))
-        row2.append(Gtk.Button(css_classes=["circular", "accent_blue"]))
-        row2.append(Gtk.Button(css_classes=["circular", "accent_purple"]))
+        row2.append(self.accent_btn(None, "window-close-symbolic"))
+        row2.append(self.accent_btn("red"))
+        row2.append(self.accent_btn("orange"))
+        row2.append(self.accent_btn("green"))
+        row2.append(self.accent_btn("blue"))
+        row2.append(self.accent_btn("purple"))
         # Menu box
         box = Gtk.Box(orientation="vertical", spacing=10)
         box.append(row1)
         box.append(row2)
         self.props.popover = Gtk.Popover(child=box)
+
+    def accent_btn(self, color, icon=None):
+        btn = Gtk.Button(
+            css_classes=["circular", f"btn_{color}"] if color else ["circular"],
+            icon_name=icon if icon else "",
+        )
+        btn.connect("clicked", self.on_accent_clicked, color)
+        return btn
+
+    def on_accent_clicked(self, _, color):
+        self.props.popover.popdown()
+        self.parent.row.props.css_classes = (
+            ["expander", f"row_{color}"] if color else ["expander"]
+        )
+        new_data = UserData.get()
+        new_data["todos"][self.parent.text]["color"] = color if color else ""
+        UserData.set(new_data)
 
     def on_delete(self, btn, parent):
         self.props.popover.popdown()
@@ -92,14 +115,15 @@ class SubTodo(Adw.ActionRow):
 
 
 class Todo(Adw.PreferencesGroup):
-    def __init__(self, text, subtodos=[]):
+    def __init__(self, text, color, subtodos=[]):
         super().__init__()
         self.text = text
         # Expander row
         self.row = Adw.ExpanderRow(
-            title=self.text, expanded=True if subtodos != [] else False
+            title=self.text,
+            expanded=True if subtodos != [] else False,
+            css_classes=["expander", f"row_{color}"] if color else ["expander"],
         )
-        self.row.add_css_class("accent_orange")
         self.add(self.row)
         # Sub entry
         sub_entry = Adw.EntryRow(title="Add new sub task")
@@ -117,7 +141,7 @@ class Todo(Adw.PreferencesGroup):
             return
         new_data = UserData.get()
         # Check if todo exists
-        if entry.props.text in new_data["todos"][self.text]:
+        if entry.props.text in new_data["todos"][self.text]["sub"]:
             return
         new_data["todos"][self.text]["sub"].append(entry.props.text)
         UserData.set(new_data)

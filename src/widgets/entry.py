@@ -26,5 +26,5 @@ class Entry(Adw.PreferencesPage):
         # Add new todo
         new_data["todos"][entry.props.text] = {"sub": [], "color": ""}
         UserData.set(new_data)
-        data["todo_list"].add(Todo(entry.props.text))
+        data["todo_list"].add(Todo(entry.props.text, "", []))
         entry.props.text = ""

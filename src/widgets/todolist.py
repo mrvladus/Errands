@@ -14,4 +14,6 @@ class TodoList(Adw.PreferencesPage):
         data = UserData.get()
         if data["todos"] != {}:
             for todo in data["todos"]:
-                self.add(Todo(todo, data["todos"][todo]["sub"]))
+                self.add(
+                    Todo(todo, data["todos"][todo]["color"], data["todos"][todo]["sub"])
+                )
