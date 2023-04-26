@@ -49,7 +49,7 @@ class TodoMenu(Gtk.MenuButton):
 
     def accent_btn(self, color, icon=None):
         btn = Gtk.Button(
-            css_classes=["circular", f"btn_{color}"] if color else ["circular"],
+            css_classes=["circular", "btn", f"btn_{color}"] if color else ["circular"],
             icon_name=icon if icon else "",
         )
         btn.connect("clicked", self.on_accent_clicked, color)

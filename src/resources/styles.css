@@ -22,18 +22,39 @@
     background: @red_1;
 }
 
+.btn_red:hover {
+    background: shade(@red_1, 1.2);
+}
+
 .btn_orange {
     background: @orange_1;
+}
+
+.btn_orange:hover {
+    background: shade(@orange_1, 1.2);
 }
 
 .btn_green {
     background: @green_1;
 }
 
+.btn_green:hover {
+    background: shade(@green_1, 1.2);
+}
+
 .btn_blue {
     background: @blue_1;
+}
+
+.btn_blue:hover {
+    background: shade(@blue_1, 1.2);
 }
 
 .btn_purple {
     background: @purple_1;
 }
+
+.btn_purple:hover {
+    background: shade(@purple_1, 1.2);
+}
+

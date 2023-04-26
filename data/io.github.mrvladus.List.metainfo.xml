@@ -1,95 +1,89 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-	<id>io.github.mrvladus.List</id>
-	<metadata_license>CC0-1.0</metadata_license>
-	<project_license>MIT</project_license>
-	<content_rating type="oars-1.1" />
-	<developer_name>Vlad Krupinski</developer_name>
-	<url type="homepage">https://github.com/mrvladus/List</url>
-
-	<launchable type="desktop-id">io.github.mrvladus.List.desktop</launchable>
-	<provides>
-		<binary>list</binary>
-	</provides>
-
-	<name>List</name>
-	<summary>Focus on your tasks.</summary>
-	<description>
-		<p>Todo application for those who prefer simplicity. Add new tasks and sub-tasks, remove completed.</p>
-	</description>
-
-	<screenshots>
-		<screenshot type="default">
-			<image>
+  <id>io.github.mrvladus.List</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <content_rating type="oars-1.1"/>
+  <developer_name>Vlad Krupinski</developer_name>
+  <url type="homepage">https://github.com/mrvladus/List</url>
+  <launchable type="desktop-id">io.github.mrvladus.List.desktop</launchable>
+  <provides>
+    <binary>list</binary>
+  </provides>
+  <name>List</name>
+  <summary>Focus on your tasks.</summary>
+  <description>
+    <p>Todo application for those who prefer simplicity.</p>
+    <p>Add and edit tasks and sub-tasks, change accent colors, remove completed.</p>
+  </description>
+  <screenshots>
+    <screenshot type="default">
+      <image>
 				https://github.com/mrvladus/List/blob/41abb30876a753af351c191b9b031196e3d51eb6/screenshots/light.png?raw=true</image>
-		</screenshot>
-		<screenshot>
-			<image>
+    </screenshot>
+    <screenshot>
+      <image>
 				https://github.com/mrvladus/List/blob/41abb30876a753af351c191b9b031196e3d51eb6/screenshots/dark.png?raw=true</image>
-		</screenshot>
-	</screenshots>
-
-	<releases>
-		<release version="44.3" date="2023-04-25">
-			<description>
-				<p>In this new version application rewritten in Python</p>
-				<p>Added features:</p>
-				<ul>
-					<li>Color tags</li>
-					<li>Tasks editing</li>
-				</ul>
-			</description>
-		</release>
-		<release version="44.2.1" date="2023-04-18">
-			<description>
-				<ul>
-					<li>UI improvements.</li>
-				</ul>
-			</description>
-		</release>
-		<release version="44.2" date="2023-04-18">
-			<description>
-				<ul>
-					<li>You can now add sub-tasks!</li>
-					<li>Redesigned interface for better visibility and contrast</li>
-				</ul>
-			</description>
-		</release>
-		<release version="44.1.1" date="2023-04-09">
-			<description>
-				<p>
+    </screenshot>
+  </screenshots>
+  <releases>
+    <release version="44.3" date="2023-04-26">
+      <description>
+        <ul>
+          <li>Color tags</li>
+          <li>Tasks and sub-task editing</li>
+        </ul>
+      </description>
+    </release>
+    <release version="44.2.1" date="2023-04-18">
+      <description>
+        <ul>
+          <li>UI improvements.</li>
+        </ul>
+      </description>
+    </release>
+    <release version="44.2" date="2023-04-18">
+      <description>
+        <ul>
+          <li>You can now add sub-tasks!</li>
+          <li>Redesigned interface for better visibility and contrast</li>
+        </ul>
+      </description>
+    </release>
+    <release version="44.1.1" date="2023-04-09">
+      <description>
+        <p>
 					Fixed add task button not being clickable.
 				</p>
-			</description>
-		</release>
-		<release version="44.1" date="2023-04-08">
-			<description>
-				<p>
+      </description>
+    </release>
+    <release version="44.1" date="2023-04-08">
+      <description>
+        <p>
 					Added menu with theme switcher.
 				</p>
-			</description>
-		</release>
-		<release version="44.0.2" date="2023-04-06">
-			<description>
-				<p>
+      </description>
+    </release>
+    <release version="44.0.2" date="2023-04-06">
+      <description>
+        <p>
 					Bug fixes.
 				</p>
-			</description>
-		</release>
-		<release version="44.0.1" date="2023-04-05">
-			<description>
-				<p>
+      </description>
+    </release>
+    <release version="44.0.1" date="2023-04-05">
+      <description>
+        <p>
 					Bug fixes.
 				</p>
-			</description>
-		</release>
-		<release version="44.0" date="2023-04-04">
-			<description>
-				<p>
+      </description>
+    </release>
+    <release version="44.0" date="2023-04-04">
+      <description>
+        <p>
 					First release.
 				</p>
-			</description>
-		</release>
-	</releases>
-
+      </description>
+    </release>
+  </releases>
 </component>

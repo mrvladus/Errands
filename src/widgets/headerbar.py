@@ -80,5 +80,6 @@ class HeaderBar(Gtk.HeaderBar):
             version=VERSION,
             copyright="© 2023 Vlad Krupinski",
             website="https://github.com/mrvladus/List",
+            license_type=7,
         )
         win.present()
