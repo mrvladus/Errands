@@ -9,6 +9,7 @@ class TodoMenu(Gtk.MenuButton):
         self.props.icon_name = "view-more-symbolic"
         self.props.css_classes = ["flat"]
         self.props.valign = Gtk.Align.CENTER
+        self.props.tooltip_text = "Task menu"
         self.parent = parent
         # Delete button
         del_btn = Gtk.Button(
@@ -66,7 +67,7 @@ class TodoMenu(Gtk.MenuButton):
     def on_delete(self, btn, parent):
         self.props.popover.popdown()
         new_data = UserData.get()
-        new_data["todos"].pop(parent.text)
+        new_data["todos"].pop(parent.row.props.title)
         UserData.set(new_data)
         data["todo_list"].remove(parent)
 
@@ -99,7 +100,9 @@ class SubTodo(Adw.ActionRow):
         self.parent = parent
         # Delete sub-todo button
         del_btn = Gtk.Button(
-            icon_name="user-trash-symbolic", css_classes=["destructive-action"]
+            icon_name="user-trash-symbolic",
+            css_classes=["destructive-action"],
+            tooltip_text="Delete sub-task",
         )
         del_btn.connect("clicked", self.on_delete)
         # Edit sub-todo
@@ -117,6 +120,7 @@ class SubTodo(Adw.ActionRow):
                 valign="center",
                 css_classes=["flat"],
                 popover=self.popover,
+                tooltip_text="Sub-task menu",
             )
         )
 
