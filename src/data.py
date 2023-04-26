@@ -37,6 +37,7 @@ class UserData:
             json.dump(data, f)
 
     # Port todos from older versions (for updates)
+    @classmethod
     def convert(self):
         # 44.1.x
         todos_v1 = data["gsettings"].get_value("todos").unpack()
@@ -48,6 +49,7 @@ class UserData:
                     "color": "",
                 }
             self.set(new_data)
+            data["gsettings"].set_value("todos", GLib.Variant("as", []))
         # 44.2.x
         todos_v2 = data["gsettings"].get_value("todos-v2").unpack()
         if todos_v2 != []:
@@ -58,3 +60,4 @@ class UserData:
                     "color": "",
                 }
             self.set(new_data)
+            data["gsettings"].set_value("todos-v2", GLib.Variant("aas", []))
