@@ -18,10 +18,7 @@ class TodoMenu(Gtk.MenuButton):
         )
         del_btn.connect("clicked", self.on_delete, self.parent)
         # Edit entry
-        edit_entry = Gtk.Entry(
-            placeholder_text=parent.text,
-            tooltip_text="Edit task",
-        )
+        edit_entry = Gtk.Entry(placeholder_text="Edit task")
         edit_entry.connect("activate", self.on_edit, self.parent)
         # 1st menu row
         row1 = Gtk.Box(
@@ -74,13 +71,13 @@ class TodoMenu(Gtk.MenuButton):
         data["todo_list"].remove(parent)
 
     def on_edit(self, entry, parent):
-        # Hide popup
-        self.props.popover.popdown()
         # Get old and new text
         old_text = parent.row.props.title
         new_text = entry.get_buffer().props.text
-        # Create new dict and change todo text
         new_data = UserData.get()
+        if old_text == new_text or new_text in new_data["todos"] or new_text == "":
+            return
+        # Create new dict and change todo text
         tmp = UserData.default_data
         for key in new_data["todos"]:
             if key == old_text:
@@ -88,30 +85,65 @@ class TodoMenu(Gtk.MenuButton):
             else:
                 tmp["todos"][key] = new_data["todos"][key]
         UserData.set(tmp)
-        # Set new title and placeholder
-        parent.row.props.title = entry.props.placeholder_text = new_text
+        # Set new title
+        parent.row.props.title = new_text
         # Clear entry
         entry.get_buffer().props.text = ""
+        # Hide popup
+        self.props.popover.popdown()
 
 
 class SubTodo(Adw.ActionRow):
     def __init__(self, text, parent):
         super().__init__(title=text)
-        self.parent_todo = parent
+        self.parent = parent
         # Delete sub-todo button
         del_btn = Gtk.Button(
-            icon_name="user-trash-symbolic",
-            css_classes=["flat"],
-            valign="center",
+            icon_name="user-trash-symbolic", css_classes=["destructive-action"]
         )
         del_btn.connect("clicked", self.on_delete)
-        self.add_prefix(del_btn)
+        # Edit sub-todo
+        edit_entry = Gtk.Entry(placeholder_text="Edit task")
+        edit_entry.connect("activate", self.on_edit)
+        # Box
+        box = Gtk.Box(css_classes=["toolbar"])
+        box.append(del_btn)
+        box.append(edit_entry)
+        # Popover
+        self.popover = Gtk.Popover(child=box)
+        self.add_prefix(
+            Gtk.MenuButton(
+                icon_name="view-more-symbolic",
+                valign="center",
+                css_classes=["flat"],
+                popover=self.popover,
+            )
+        )
 
     def on_delete(self, _):
+        self.popover.popdown()
         new_data = UserData.get()
-        new_data["todos"][self.parent_todo.get_title()]["sub"].remove(self.props.title)
+        new_data["todos"][self.parent.get_title()]["sub"].remove(self.props.title)
         UserData.set(new_data)
-        self.parent_todo.remove(self)
+        self.parent.remove(self)
+
+    def on_edit(self, entry):
+        old_text = self.props.title
+        new_text = entry.get_buffer().props.text
+        new_data = UserData.get()
+        if (
+            new_text == old_text
+            or new_text == ""
+            or new_text in new_data["todos"][self.parent.props.title]["sub"]
+        ):
+            return
+        # Change sub-todo
+        idx = new_data["todos"][self.parent.props.title]["sub"].index(old_text)
+        new_data["todos"][self.parent.props.title]["sub"][idx] = new_text
+        UserData.set(new_data)
+        # Set new title
+        self.props.title = new_text
+        self.popover.popdown()
 
 
 class Todo(Adw.PreferencesGroup):
