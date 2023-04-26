@@ -1,7 +1,7 @@
 # List
 
 Focus on your tasks.
-Todo application for those who prefer simplicity. Add new tasks and sub-tasks, remove completed.
+Todo application for those who prefer simplicity. Add and edit tasks and sub-tasks, change accent colors, remove completed.
 
 ## Screenshots
 <a href="./screenshots/light.png"><img src="./screenshots/light.png" height="400"></a>
@@ -21,7 +21,7 @@ git clone https://github.com/mrvladus/List && cd List/
 ```
 flatpak install org.gnome.Sdk//44 org.flatpak.Builder org.freedesktop.appstream-glib -y
 ```
-3. Run 
+3. Run
 ```
 make run
 ```
