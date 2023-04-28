@@ -10,7 +10,7 @@ Todo application for those who prefer simplicity. Add and edit tasks and sub-tas
 ## Installing
 List is available as a Flatpak on Flathub:
 
-<a href="https://flathub.org/apps/details/io.github.mrvladus.List"><img src="https://flathub.org/assets/badges/flathub-badge-en.png" alt="Download on Flathub" width="240"></a>
+<a href="https://flathub.org/apps/details/io.github.mrvladus.List"><img width='240' alt='Download on Flathub' src='https://dl.flathub.org/assets/badges/flathub-badge-en.png'/></a>
 
 ## Building from source
 1. Clone repo
