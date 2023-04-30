@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="Adw" version="1.0"/>
+  <template class="PreferencesWindow" parent="AdwPreferencesWindow">
+    <property name="hide-on-close">true</property>
+    <property name="search-enabled">false</property>
+    <child>
+      <object class="AdwPreferencesPage">
+        <!-- Theme -->
+        <child>
+          <object class="AdwPreferencesGroup">
+            <property name="title">Application theme</property>
+            <!-- System -->
+            <child>
+              <object class="AdwActionRow">
+                <property name="title">System</property>
+                <property name="activatable_widget">system_theme</property>
+                <child type="suffix">
+                  <object class="GtkCheckButton" id="system_theme">
+                    <signal name="toggled" handler="on_theme_change" swapped="no"/>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <!-- Light -->
+            <child>
+              <object class="AdwActionRow">
+                <property name="title">Light</property>
+                <property name="activatable_widget">light_theme</property>
+                <child type="suffix">
+                  <object class="GtkCheckButton" id="light_theme">
+                    <property name="group">system_theme</property>
+                    <signal name="toggled" handler="on_theme_change" swapped="no"/>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <!-- Dark -->
+            <child>
+              <object class="AdwActionRow">
+                <property name="title">Dark</property>
+                <property name="activatable_widget">dark_theme</property>
+                <child type="suffix">
+                  <object class="GtkCheckButton" id="dark_theme">
+                    <property name="group">system_theme</property>
+                    <signal name="toggled" handler="on_theme_change" swapped="no"/>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </template>
+</interface>

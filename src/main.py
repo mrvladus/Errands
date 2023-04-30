@@ -40,7 +40,6 @@ class Window(Adw.ApplicationWindow):
     box = Gtk.Template.Child()
     todo_list = Gtk.Template.Child()
     about_window = Gtk.Template.Child()
-    preferences_window = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -60,8 +59,7 @@ class Window(Adw.ApplicationWindow):
         )
 
     def setup_actions(self):
-        # Menu
-        self.create_action("preferences", lambda *_: self.preferences_window.show())
+        self.create_action("preferences", lambda *_: PreferencesWindow(self).show())
         self.create_action("about", lambda *_: self.about_window.show())
         self.create_action(
             "quit", lambda *_: self.props.application.quit(), ["<primary>q"]
@@ -79,11 +77,13 @@ class Window(Adw.ApplicationWindow):
         if data["todos"] != {}:
             for todo in data["todos"]:
                 self.todo_list.add(
-                    Todo(todo, data["todos"][todo]["color"], data["todos"][todo]["sub"])
+                    Todo(
+                        todo,
+                        data["todos"][todo]["color"],
+                        data["todos"][todo]["sub"],
+                        self.todo_list,
+                    )
                 )
-
-    def on_theme_change(self, *args):
-        print(args)
 
     @Gtk.Template.Callback()
     def on_entry_activated(self, entry):
@@ -95,9 +95,41 @@ class Window(Adw.ApplicationWindow):
         # Add new todo
         new_data["todos"][text] = {"sub": [], "color": ""}
         UserData.set(new_data)
-        self.todo_list.add(Todo(text, "", []))
+        self.todo_list.add(Todo(text, "", [], self.todo_list))
         # Clear entry
         entry.props.text = ""
+
+
+@Gtk.Template(resource_path="/io/github/mrvladus/List/preferences_window.ui")
+class PreferencesWindow(Adw.PreferencesWindow):
+    __gtype_name__ = "PreferencesWindow"
+
+    system_theme = Gtk.Template.Child()
+    light_theme = Gtk.Template.Child()
+    dark_theme = Gtk.Template.Child()
+
+    def __init__(self, win):
+        super().__init__()
+        self.props.transient_for = win
+        theme = data["gsettings"].get_value("theme").unpack()
+        if theme == 0:
+            self.system_theme.props.active = True
+        if theme == 1:
+            self.light_theme.props.active = True
+        if theme == 4:
+            self.dark_theme.props.active = True
+
+    @Gtk.Template.Callback()
+    def on_theme_change(self, btn):
+        id = btn.get_buildable_id()
+        if id == "system_theme":
+            theme = 0
+        elif id == "light_theme":
+            theme = 1
+        elif id == "dark_theme":
+            theme = 4
+        Adw.StyleManager.get_default().set_color_scheme(theme)
+        data["gsettings"].set_value("theme", GLib.Variant("i", theme))
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/List/todo.ui")
@@ -107,23 +139,47 @@ class Todo(Adw.PreferencesGroup):
     task_row = Gtk.Template.Child()
     task_popover = Gtk.Template.Child()
 
-    def __init__(self, text, color, sub_todos):
+    def __init__(self, text, color, sub_todos, parent):
         super().__init__()
+        self.parent = parent
         self.task_row.props.title = text
         if color != "":
             self.task_row.add_css_class(f"row_{color}")
         for todo in sub_todos:
-            self.task_row.add_row(SubTodo(todo))
+            self.task_row.add_row(SubTodo(todo, self.task_row))
         if sub_todos != []:
             self.task_row.props.expanded = True
 
     @Gtk.Template.Callback()
     def on_task_delete(self, _):
-        pass
+        self.task_popover.popdown()
+        new_data = UserData.get()
+        new_data["todos"].pop(self.task_row.props.title)
+        UserData.set(new_data)
+        self.parent.remove(self)
 
     @Gtk.Template.Callback()
-    def on_task_edit(self, _):
-        pass
+    def on_task_edit(self, entry):
+        # Hide popup
+        self.task_popover.popdown()
+        # Get old and new text
+        old_text = self.task_row.props.title
+        new_text = entry.get_buffer().props.text
+        new_data = UserData.get()
+        if old_text == new_text or new_text in new_data["todos"] or new_text == "":
+            return
+        # Create new dict and change todo text
+        tmp = UserData.default_data
+        for key in new_data["todos"]:
+            if key == old_text:
+                tmp["todos"][new_text] = new_data["todos"][old_text]
+            else:
+                tmp["todos"][key] = new_data["todos"][key]
+        UserData.set(tmp)
+        # Set new title
+        self.task_row.props.title = new_text
+        # Clear entry
+        entry.get_buffer().props.text = ""
 
     @Gtk.Template.Callback()
     def on_style_selected(self, btn):
@@ -151,13 +207,18 @@ class SubTodo(Adw.ActionRow):
 
     sub_task_popover = Gtk.Template.Child()
 
-    def __init__(self, text):
+    def __init__(self, text, parent):
         super().__init__()
+        self.parent = parent
         self.props.title = text
 
     @Gtk.Template.Callback()
     def on_sub_task_delete(self, _):
-        pass
+        self.sub_task_popover.popdown()
+        new_data = UserData.get()
+        new_data["todos"][self.parent.get_title()]["sub"].remove(self.props.title)
+        UserData.set(new_data)
+        self.parent.remove(self)
 
     @Gtk.Template.Callback()
     def on_sub_task_edit(self, entry):

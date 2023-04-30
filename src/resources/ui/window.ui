@@ -66,8 +66,8 @@
   </menu>
   <!-- About window -->
   <object class="AdwAboutWindow" id="about_window">
-    <property name="transient-for">Window</property>
     <property name="hide-on-close">true</property>
+    <property name="transient-for">Window</property>
     <property name="version">44.3.1</property>
     <property name="application-name">List</property>
     <property name="application-icon">io.github.mrvladus.List</property>
@@ -75,62 +75,5 @@
     <property name="copyright">© 2023 Vlad Krupinski</property>
     <property name="website">https://github.com/mrvladus/List</property>
     <property name="license-type">7</property>
-  </object>
-  <!-- Settings window -->
-  <object class="AdwPreferencesWindow" id="preferences_window">
-    <property name="transient-for">Window</property>
-    <property name="hide-on-close">true</property>
-    <property name="search-enabled">false</property>
-    <child>
-      <object class="AdwPreferencesPage">
-        <!-- Theme -->
-        <child>
-          <object class="AdwPreferencesGroup">
-            <property name="title">Application theme</property>
-            <!-- System -->
-            <child>
-              <object class="AdwActionRow">
-                <property name="title">System</property>
-                <property name="activatable_widget">system_theme</property>
-                <child type="suffix">
-                  <object class="GtkCheckButton" id="system_theme">
-                    <property name="action-name">app.theme</property>
-                    <property name="action-target">'system'</property>
-                  </object>
-                </child>
-              </object>
-            </child>
-            <!-- Light -->
-            <child>
-              <object class="AdwActionRow">
-                <property name="title">Light</property>
-                <property name="activatable_widget">light_theme</property>
-                <child type="suffix">
-                  <object class="GtkCheckButton" id="light_theme">
-                    <property name="group">system_theme</property>
-                    <property name="action-name">app.theme</property>
-                    <property name="action-target">'light'</property>
-                  </object>
-                </child>
-              </object>
-            </child>
-            <!-- Dark -->
-            <child>
-              <object class="AdwActionRow">
-                <property name="title">Dark</property>
-                <property name="activatable_widget">dark_theme</property>
-                <child type="suffix">
-                  <object class="GtkCheckButton" id="dark_theme">
-                    <property name="group">system_theme</property>
-                    <property name="action-name">app.theme</property>
-                    <property name="action-target">'dark'</property>
-                  </object>
-                </child>
-              </object>
-            </child>
-          </object>
-        </child>
-      </object>
-    </child>
   </object>
 </interface>
