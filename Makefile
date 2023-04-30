@@ -12,8 +12,12 @@ install:
 	install -D src/widgets/entry.py $(PREFIX)/share/list/list/widgets/entry.py
 	install -D src/widgets/todolist.py $(PREFIX)/share/list/list/widgets/todolist.py
 	install -D src/widgets/todo.py $(PREFIX)/share/list/list/widgets/todo.py
-	# CSS
-	install -D src/resources/styles.css $(PREFIX)/share/list/styles.css
+	# GResource
+	glib-compile-resources src/resources/list.gresource.xml
+	install -D src/resources/list.gresource $(PREFIX)/share/list/list.gresource
+	# GSchema
+	install -D data/$(APP_ID).gschema.xml $(PREFIX)/share/glib-2.0/schemas/$(APP_ID).gschema.xml
+	glib-compile-schemas $(PREFIX)/share/glib-2.0/schemas
 	# Desktop file
 	install -D data/$(APP_ID).desktop $(PREFIX)/share/applications/$(APP_ID).desktop
 	# Icons
@@ -21,10 +25,6 @@ install:
 	install -D data/icons/$(APP_ID)-symbolic.svg $(PREFIX)/share/icons/hicolor/symbolic/apps/$(APP_ID)-symbolic.svg
 	# Metadata
 	install -D data/$(APP_ID).metainfo.xml $(PREFIX)/share/metainfo/$(APP_ID).metainfo.xml
-	# GSchema
-	install -D data/$(APP_ID).gschema.xml $(PREFIX)/share/glib-2.0/schemas/$(APP_ID).gschema.xml
-	glib-compile-schemas $(PREFIX)/share/glib-2.0/schemas
-
 
 validate:
 	flatpak run org.freedesktop.appstream-glib validate data/$(APP_ID).metainfo.xml
