@@ -68,7 +68,6 @@
   <object class="AdwAboutWindow" id="about_window">
     <property name="hide-on-close">true</property>
     <property name="transient-for">Window</property>
-    <property name="version">44.3.1</property>
     <property name="application-name">List</property>
     <property name="application-icon">io.github.mrvladus.List</property>
     <property name="developer-name">Vlad Krupinski</property>

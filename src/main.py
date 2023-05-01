@@ -8,14 +8,9 @@ require_version("Adw", "1")
 from gi.repository import Gio, Adw, Gtk, Gdk, GLib
 
 
-VERSION = "44.3"
+VERSION = "44.3.1"
 APP_ID = "io.github.mrvladus.List"
-
-data = {
-    "app": None,
-    "todo_list": None,
-    "gsettings": None,
-}
+data = {"gsettings": None}
 
 
 class Application(Adw.Application):
@@ -26,7 +21,6 @@ class Application(Adw.Application):
         )
 
     def do_activate(self):
-        data["app"] = self
         data["gsettings"] = Gio.Settings.new(APP_ID)
         UserData.init()
         self.load_css()
@@ -69,7 +63,7 @@ class Window(Adw.ApplicationWindow):
 
     def setup_actions(self):
         self.create_action("preferences", lambda *_: PreferencesWindow(self).show())
-        self.create_action("about", lambda *_: self.about_window.show())
+        self.create_action("about", self.on_about_action)
         self.create_action(
             "quit", lambda *_: self.props.application.quit(), ["<primary>q"]
         )
@@ -93,6 +87,10 @@ class Window(Adw.ApplicationWindow):
                         self.todo_list,
                     )
                 )
+
+    def on_about_action(self, *args):
+        self.about_window.props.version = VERSION
+        self.about_window.show()
 
     @Gtk.Template.Callback()
     def on_entry_activated(self, entry):
