@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="Adw" version="1.0"/>
+  <template class="Window" parent="AdwApplicationWindow">
+    <property name="width-request">500</property>
+    <property name="height-request">500</property>
+    <property name="title">List</property>
+    <child>
+      <object class="GtkBox" id="box">
+        <property name="orientation">vertical</property>
+        <!-- Header bar -->
+        <child>
+          <object class="GtkHeaderBar" id="header_bar">
+            <style>
+              <class name="flat"/>
+            </style>
+            <!-- Menu -->
+            <child type="end">
+              <object class="GtkMenuButton">
+                <property name="icon-name">open-menu-symbolic</property>
+                <property name="menu-model">primary_menu</property>
+              </object>
+            </child>
+          </object>
+        </child>
+        <!-- Entry -->
+        <child>
+          <object class="AdwPreferencesPage">
+            <child>
+              <object class="AdwPreferencesGroup">
+                <child>
+                  <object class="AdwEntryRow" id="entry">
+                    <property name="title">Add new task</property>
+                    <signal name="entry-activated" handler="on_entry_activated" swapped="no"/>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <!-- Todo list -->
+        <child>
+          <object class="AdwPreferencesPage" id="todo_list">
+          </object>
+        </child>
+      </object>
+    </child>
+  </template>
+  <!-- Main menu -->
+  <menu id="primary_menu">
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">Preferences</attribute>
+        <attribute name="action">app.preferences</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">About List</attribute>
+        <attribute name="action">app.about</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Quit</attribute>
+        <attribute name="action">app.quit</attribute>
+      </item>
+    </section>
+  </menu>
+  <!-- About window -->
+  <object class="AdwAboutWindow" id="about_window">
+    <property name="hide-on-close">true</property>
+    <property name="transient-for">Window</property>
+    <property name="version">44.3.1</property>
+    <property name="application-name">List</property>
+    <property name="application-icon">io.github.mrvladus.List</property>
+    <property name="developer-name">Vlad Krupinski</property>
+    <property name="copyright">© 2023 Vlad Krupinski</property>
+    <property name="website">https://github.com/mrvladus/List</property>
+    <property name="license-type">7</property>
+  </object>
+</interface>

@@ -7,11 +7,15 @@ import signal
 # locale.bindtextdomain("list", localedir)
 # locale.textdomain("list")
 # gettext.install("list", localedir)
-
+pkgdatadir = "/app/share/list"
 
 if __name__ == "__main__":
-    sys.path.insert(1, "/app/share/list")
+    sys.path.insert(1, pkgdatadir)
     signal.signal(signal.SIGINT, signal.SIG_DFL)
+
+    from gi.repository import Gio
+    resource = Gio.Resource.load(pkgdatadir + '/list.gresource')
+    resource._register()
 
     from list import main
     app = main.Application()

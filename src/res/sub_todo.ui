@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="SubTodo" parent="AdwActionRow">
+    <!-- Task menu -->
+    <child type="prefix">
+      <object class="GtkMenuButton" id="sub_task_menu">
+        <property name="icon-name">view-more-symbolic</property>
+        <property name="valign">center</property>
+        <property name="tooltip-text">Sub task menu</property>
+        <style>
+          <class name="flat"/>
+        </style>
+        <!-- Menu popover -->
+        <property name="popover">
+          <object class="GtkPopover" id="sub_task_popover">
+            <child>
+              <object class="GtkBox">
+                <property name="orientation">vertical</property>
+                <property name="spacing">10</property>
+                <!-- First row -->
+                <child>
+                  <object class="GtkBox">
+                    <property name="orientation">horizontal</property>
+                    <property name="halign">center</property>
+                    <style>
+                      <class name="toolbar"/>
+                    </style>
+                    <!-- Delete task button -->
+                    <child>
+                      <object class="GtkButton">
+                        <property name="icon-name">user-trash-symbolic</property>
+                        <property name="tooltip-text">Delete sub task</property>
+                        <signal name="clicked" handler="on_sub_task_delete" swapped="no"/>
+                        <style>
+                          <class name="destructive-action"/>
+                        </style>
+                      </object>
+                    </child>
+                    <!-- Edit entry -->
+                    <child>
+                      <object class="GtkEntry">
+                        <property name="placeholder-text">Edit sub task</property>
+                        <signal name="activate" handler="on_sub_task_edit" swapped="no"/>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </property>
+      </object>
+    </child>
+  </template>
+</interface>
