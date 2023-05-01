@@ -1,12 +1,21 @@
+import os
+import json
 from gi import require_version
 
 require_version("Gtk", "4.0")
 require_version("Adw", "1")
 
 from gi.repository import Gio, Adw, Gtk, Gdk, GLib
-from .globals import APP_ID, data, VERSION
-from .data import UserData
-from .widgets.main_window import MainWindow
+
+
+VERSION = "44.3"
+APP_ID = "io.github.mrvladus.List"
+
+data = {
+    "app": None,
+    "todo_list": None,
+    "gsettings": None,
+}
 
 
 class Application(Adw.Application):
@@ -198,7 +207,15 @@ class Todo(Adw.PreferencesGroup):
 
     @Gtk.Template.Callback()
     def on_sub_entry_activated(self, entry):
-        pass
+        todo = self.task_row.props.title
+        sub_todo = entry.props.text
+        new_data = UserData.get()
+        if sub_todo in new_data["todos"][todo]["sub"] or sub_todo == "":
+            return
+        new_data["todos"][todo]["sub"].append(sub_todo)
+        UserData.set(new_data)
+        self.task_row.add_row(SubTodo(sub_todo, self.task_row))
+        entry.props.text = ""
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/List/sub_todo.ui")
@@ -222,4 +239,80 @@ class SubTodo(Adw.ActionRow):
 
     @Gtk.Template.Callback()
     def on_sub_task_edit(self, entry):
-        pass
+        self.sub_task_popover.popdown()
+        old_text = self.props.title
+        new_text = entry.get_buffer().props.text
+        new_data = UserData.get()
+        if (
+            new_text == old_text
+            or new_text == ""
+            or new_text in new_data["todos"][self.parent.props.title]["sub"]
+        ):
+            return
+        # Change sub-todo
+        idx = new_data["todos"][self.parent.props.title]["sub"].index(old_text)
+        new_data["todos"][self.parent.props.title]["sub"][idx] = new_text
+        UserData.set(new_data)
+        # Set new title
+        self.props.title = new_text
+
+
+class UserData:
+    """Class for accessing data file with user tasks"""
+
+    data_dir = GLib.get_user_data_dir() + "/list"
+    default_data = {
+        "version": VERSION,
+        "todos": {},
+    }
+
+    # Create data dir and data.json file
+    @classmethod
+    def init(self):
+        if not os.path.exists(self.data_dir):
+            os.mkdir(self.data_dir)
+        if not os.path.exists(self.data_dir + "/data.json"):
+            with open(self.data_dir + "/data.json", "w+") as f:
+                json.dump(self.default_data, f)
+            self.convert()
+
+    # Load user data from json
+    @classmethod
+    def get(self):
+        if not os.path.exists(self.data_dir + "/data.json"):
+            self.init()
+        with open(self.data_dir + "/data.json", "r") as f:
+            data = json.load(f)
+            return data
+
+    # Save user data to json
+    @classmethod
+    def set(self, data: dict):
+        with open(self.data_dir + "/data.json", "w") as f:
+            json.dump(data, f)
+
+    # Port todos from older versions (for updates)
+    @classmethod
+    def convert(self):
+        # 44.1.x
+        todos_v1 = data["gsettings"].get_value("todos").unpack()
+        if todos_v1 != []:
+            new_data = self.get()
+            for todo in todos_v1:
+                new_data["todos"][todo] = {
+                    "sub": [],
+                    "color": "",
+                }
+            self.set(new_data)
+            data["gsettings"].set_value("todos", GLib.Variant("as", []))
+        # 44.2.x
+        todos_v2 = data["gsettings"].get_value("todos-v2").unpack()
+        if todos_v2 != []:
+            new_data = self.get()
+            for todo in todos_v2:
+                new_data["todos"][todo[0]] = {
+                    "sub": [i for i in todo[1:]],
+                    "color": "",
+                }
+            self.set(new_data)
+            data["gsettings"].set_value("todos-v2", GLib.Variant("aas", []))

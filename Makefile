@@ -5,16 +5,9 @@ install:
 	# Source files
 	install -D src/list $(PREFIX)/bin/list
 	install -D src/main.py $(PREFIX)/share/list/list/main.py
-	install -D src/data.py $(PREFIX)/share/list/list/data.py
-	install -D src/globals.py $(PREFIX)/share/list/list/globals.py
-	install -D src/widgets/main_window.py $(PREFIX)/share/list/list/widgets/main_window.py
-	install -D src/widgets/headerbar.py $(PREFIX)/share/list/list/widgets/headerbar.py
-	install -D src/widgets/entry.py $(PREFIX)/share/list/list/widgets/entry.py
-	install -D src/widgets/todolist.py $(PREFIX)/share/list/list/widgets/todolist.py
-	install -D src/widgets/todo.py $(PREFIX)/share/list/list/widgets/todo.py
 	# GResource
-	glib-compile-resources src/resources/list.gresource.xml
-	install -D src/resources/list.gresource $(PREFIX)/share/list/list.gresource
+	glib-compile-resources src/res/list.gresource.xml
+	install -D src/res/list.gresource $(PREFIX)/share/list/list.gresource
 	# GSchema
 	install -D data/$(APP_ID).gschema.xml $(PREFIX)/share/glib-2.0/schemas/$(APP_ID).gschema.xml
 	glib-compile-schemas $(PREFIX)/share/glib-2.0/schemas
