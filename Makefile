@@ -6,8 +6,8 @@ install:
 	install -D src/list $(PREFIX)/bin/list
 	install -D src/main.py $(PREFIX)/share/list/list/main.py
 	# GResource
-	glib-compile-resources src/res/list.gresource.xml
-	install -D src/res/list.gresource $(PREFIX)/share/list/list.gresource
+	glib-compile-resources src/res/$(APP_ID).gresource.xml
+	install -D src/res/$(APP_ID).gresource $(PREFIX)/share/list/$(APP_ID).gresource
 	# GSchema
 	install -D data/$(APP_ID).gschema.xml $(PREFIX)/share/glib-2.0/schemas/$(APP_ID).gschema.xml
 	glib-compile-schemas $(PREFIX)/share/glib-2.0/schemas

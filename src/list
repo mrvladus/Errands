@@ -14,7 +14,7 @@ if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal.SIG_DFL)
 
     from gi.repository import Gio
-    resource = Gio.Resource.load(pkgdatadir + '/list.gresource')
+    resource = Gio.Resource.load(pkgdatadir + '/io.github.mrvladus.List.gresource')
     resource._register()
 
     from list import main

@@ -32,7 +32,7 @@ from gi.repository import Gio, Adw, Gtk, Gdk, GLib
 
 VERSION = "44.3.1"
 APP_ID = "io.github.mrvladus.List"
-data = {"gsettings": None}
+gsettings = Gio.Settings.new(APP_ID)
 
 
 class Application(Adw.Application):
@@ -43,12 +43,9 @@ class Application(Adw.Application):
         )
 
     def do_activate(self):
-        data["gsettings"] = Gio.Settings.new(APP_ID)
+        # Initialize data.json file
         UserData.init()
-        self.load_css()
-        Window(application=self).present()
-
-    def load_css(self):
+        # Load css styles
         css_provider = Gtk.CssProvider()
         css_provider.load_from_resource("/io/github/mrvladus/List/styles.css")
         Gtk.StyleContext.add_provider_for_display(
@@ -56,6 +53,8 @@ class Application(Adw.Application):
             css_provider,
             Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION,
         )
+        # Show window
+        Window(application=self).present()
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/List/window.ui")
@@ -68,27 +67,21 @@ class Window(Adw.ApplicationWindow):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.setup_size()
-        self.setup_theme()
-        self.setup_actions()
-        self.load_todos()
-
-    def setup_size(self):
         # Remember window size
-        data["gsettings"].bind("width", self, "default_width", 0)
-        data["gsettings"].bind("height", self, "default_height", 0)
-
-    def setup_theme(self):
+        gsettings.bind("width", self, "default_width", 0)
+        gsettings.bind("height", self, "default_height", 0)
+        # Setup theme
         Adw.StyleManager.get_default().set_color_scheme(
-            data["gsettings"].get_value("theme").unpack()
+            gsettings.get_value("theme").unpack()
         )
-
-    def setup_actions(self):
+        # Create actions for main menu
         self.create_action("preferences", lambda *_: PreferencesWindow(self).show())
         self.create_action("about", self.on_about_action)
         self.create_action(
             "quit", lambda *_: self.props.application.quit(), ["<primary>q"]
         )
+        # Load tasks
+        self.load_todos()
 
     def create_action(self, name, callback, shortcuts=None):
         action = Gio.SimpleAction.new(name, None)
@@ -99,16 +92,17 @@ class Window(Adw.ApplicationWindow):
 
     def load_todos(self):
         data = UserData.get()
-        if data["todos"] != {}:
-            for todo in data["todos"]:
-                self.todo_list.add(
-                    Todo(
-                        todo,
-                        data["todos"][todo]["color"],
-                        data["todos"][todo]["sub"],
-                        self.todo_list,
-                    )
+        if data["todos"] == {}:
+            return
+        for todo in data["todos"]:
+            self.todo_list.add(
+                Todo(
+                    todo,
+                    data["todos"][todo]["color"],
+                    data["todos"][todo]["sub"],
+                    self.todo_list,
                 )
+            )
 
     def on_about_action(self, *args):
         self.about_window.props.version = VERSION
@@ -140,7 +134,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
     def __init__(self, win):
         super().__init__()
         self.props.transient_for = win
-        theme = data["gsettings"].get_value("theme").unpack()
+        theme = gsettings.get_value("theme").unpack()
         if theme == 0:
             self.system_theme.props.active = True
         if theme == 1:
@@ -158,7 +152,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
         elif id == "dark_theme":
             theme = 4
         Adw.StyleManager.get_default().set_color_scheme(theme)
-        data["gsettings"].set_value("theme", GLib.Variant("i", theme))
+        gsettings.set_value("theme", GLib.Variant("i", theme))
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/List/todo.ui")
@@ -315,7 +309,7 @@ class UserData:
     @classmethod
     def convert(self):
         # 44.1.x
-        todos_v1 = data["gsettings"].get_value("todos").unpack()
+        todos_v1 = gsettings.get_value("todos").unpack()
         if todos_v1 != []:
             new_data = self.get()
             for todo in todos_v1:
@@ -324,9 +318,9 @@ class UserData:
                     "color": "",
                 }
             self.set(new_data)
-            data["gsettings"].set_value("todos", GLib.Variant("as", []))
+            gsettings.set_value("todos", GLib.Variant("as", []))
         # 44.2.x
-        todos_v2 = data["gsettings"].get_value("todos-v2").unpack()
+        todos_v2 = gsettings.get_value("todos-v2").unpack()
         if todos_v2 != []:
             new_data = self.get()
             for todo in todos_v2:
@@ -335,4 +329,4 @@ class UserData:
                     "color": "",
                 }
             self.set(new_data)
-            data["gsettings"].set_value("todos-v2", GLib.Variant("aas", []))
+            gsettings.set_value("todos-v2", GLib.Variant("aas", []))
