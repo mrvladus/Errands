@@ -27,6 +27,13 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="44.4" date="2023-05-06">
+      <description>
+        <ul>
+          <li>Checkbox to mark sub-task as completed</li>
+        </ul>
+      </description>
+    </release>
     <release version="44.3" date="2023-04-26">
       <description>
         <ul>

@@ -19,7 +19,7 @@ git clone https://github.com/mrvladus/List && cd List/
 ```
 2. Install dependencies
 ```
-flatpak install org.gnome.Sdk//44 org.flatpak.Builder org.freedesktop.appstream-glib -y
+flatpak install org.gnome.{Platform,Sdk}//44 org.flatpak.Builder org.freedesktop.appstream-glib -y
 ```
 3. Run
 ```

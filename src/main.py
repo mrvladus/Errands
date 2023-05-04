@@ -30,7 +30,7 @@ require_version("Adw", "1")
 from gi.repository import Gio, Adw, Gtk, Gdk, GLib
 
 
-VERSION = "44.3.1"
+VERSION = "44.4"
 APP_ID = "io.github.mrvladus.List"
 gsettings = Gio.Settings.new(APP_ID)
 
@@ -182,7 +182,7 @@ class Todo(Adw.PreferencesGroup):
         self.parent.remove(self)
 
     @Gtk.Template.Callback()
-    def on_task_edit(self, entry):
+    def on_task_added(self, entry):
         # Hide popup
         self.task_popover.popdown()
         # Get old and new text
@@ -237,11 +237,14 @@ class SubTodo(Adw.ActionRow):
     __gtype_name__ = "SubTodo"
 
     sub_task_popover = Gtk.Template.Child()
+    sub_task_completed_btn = Gtk.Template.Child()
 
     def __init__(self, text, parent):
         super().__init__()
         self.parent = parent
         self.props.title = text
+        # If task completed set checkbox active
+        # self.sub_task_completed_btn.props.active = task["completed"]
 
     @Gtk.Template.Callback()
     def on_sub_task_delete(self, _):
@@ -269,6 +272,14 @@ class SubTodo(Adw.ActionRow):
         UserData.set(new_data)
         # Set new title
         self.props.title = new_text
+        # # Mark as uncompleted
+        # self.sub_task_completed_btn.props.active = False
+        # Clear entry
+        entry.get_buffer().props.text = ""
+
+    @Gtk.Template.Callback()
+    def on_sub_task_complete_toggle(self, btn):
+        pass
 
 
 class UserData:

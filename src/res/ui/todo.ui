@@ -43,7 +43,7 @@
                         <child>
                           <object class="GtkEntry">
                             <property name="placeholder-text">Edit task</property>
-                            <signal name="activate" handler="on_task_edit" swapped="no"/>
+                            <signal name="activate" handler="on_task_added" swapped="no"/>
                           </object>
                         </child>
                       </object>
