@@ -243,8 +243,7 @@ class SubTodo(Adw.ActionRow):
         super().__init__()
         self.parent = parent
         self.props.title = text
-        # If task completed set checkbox active
-        # self.sub_task_completed_btn.props.active = task["completed"]
+        self.sub_task_completed_btn.props.active = "<s>" in text
 
     @Gtk.Template.Callback()
     def on_sub_task_delete(self, _):
@@ -272,14 +271,28 @@ class SubTodo(Adw.ActionRow):
         UserData.set(new_data)
         # Set new title
         self.props.title = new_text
-        # # Mark as uncompleted
-        # self.sub_task_completed_btn.props.active = False
+        # Mark as uncompleted
+        self.sub_task_completed_btn.props.active = False
         # Clear entry
         entry.get_buffer().props.text = ""
 
     @Gtk.Template.Callback()
     def on_sub_task_complete_toggle(self, btn):
-        pass
+        old_text = self.props.title
+        active = btn.props.active
+        # Ignore at app launch
+        if "<s>" in old_text and active:
+            return
+        # Ignore when sub task was just edited
+        if not active and "<s>" not in old_text:
+            return
+        new_sub_task = f"<s>{old_text}</s>" if active else old_text[3:-4]
+        self.props.title = new_sub_task
+        # Save new sub task
+        new_data = UserData.get()
+        idx = new_data["todos"][self.parent.props.title]["sub"].index(old_text)
+        new_data["todos"][self.parent.props.title]["sub"][idx] = new_sub_task
+        UserData.set(new_data)
 
 
 class UserData:

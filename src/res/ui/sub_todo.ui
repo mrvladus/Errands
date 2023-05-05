@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <template class="SubTodo" parent="AdwActionRow">
-    <property name="title-selectable">true</property>
+    <property name="use-markup">true</property>
+    <property name="activatable-widget">sub_task_completed_btn</property>
     <!-- Task menu -->
     <child type="prefix">
       <object class="GtkMenuButton" id="sub_task_menu">
@@ -55,6 +56,7 @@
     <!-- Mark as completed button -->
     <child type="suffix">
       <object class="GtkCheckButton" id="sub_task_completed_btn">
+        <property name="valign">center</property>
         <signal name="toggled" handler="on_sub_task_complete_toggle" swapped="no"/>
       </object>
     </child>
