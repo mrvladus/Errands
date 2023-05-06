@@ -74,6 +74,7 @@ class Window(Adw.ApplicationWindow):
         Adw.StyleManager.get_default().set_color_scheme(
             gsettings.get_value("theme").unpack()
         )
+        self.get_settings().props.gtk_icon_theme_name = "Adwaita"
         # Create actions for main menu
         self.create_action("preferences", lambda *_: PreferencesWindow(self).show())
         self.create_action("about", self.on_about_action)

@@ -15,7 +15,8 @@
             <child>
               <object class="AdwActionRow">
                 <property name="title">System</property>
-                <property name="activatable_widget">system_theme</property>
+                <property name="activatable-widget">system_theme</property>
+                <property name="icon-name">applications-system-symbolic</property>
                 <child type="suffix">
                   <object class="GtkCheckButton" id="system_theme">
                     <signal name="toggled" handler="on_theme_change" swapped="no"/>
@@ -27,7 +28,8 @@
             <child>
               <object class="AdwActionRow">
                 <property name="title">Light</property>
-                <property name="activatable_widget">light_theme</property>
+                <property name="activatable-widget">light_theme</property>
+                <property name="icon-name">display-brightness-symbolic</property>
                 <child type="suffix">
                   <object class="GtkCheckButton" id="light_theme">
                     <property name="group">system_theme</property>
@@ -40,7 +42,8 @@
             <child>
               <object class="AdwActionRow">
                 <property name="title">Dark</property>
-                <property name="activatable_widget">dark_theme</property>
+                <property name="activatable-widget">dark_theme</property>
+                <property name="icon-name">weather-clear-night-symbolic</property>
                 <child type="suffix">
                   <object class="GtkCheckButton" id="dark_theme">
                     <property name="group">system_theme</property>
