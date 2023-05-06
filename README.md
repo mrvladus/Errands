@@ -1,5 +1,4 @@
-# List
-
+# <img width='64' src='./data/icons/io.github.mrvladus.List.svg'/> List
 Focus on your tasks.
 Todo application for those who prefer simplicity. Add and edit tasks and sub-tasks, change accent colors, remove completed.
 
