@@ -76,10 +76,14 @@ class Window(Adw.ApplicationWindow):
         )
         self.get_settings().props.gtk_icon_theme_name = "Adwaita"
         # Create actions for main menu
-        self.create_action("preferences", lambda *_: PreferencesWindow(self).show())
+        self.create_action(
+            "preferences",
+            lambda *_: PreferencesWindow(self).show(),
+            ["<Ctrl>comma"],
+        )
         self.create_action("about", self.on_about_action)
         self.create_action(
-            "quit", lambda *_: self.props.application.quit(), ["<primary>q"]
+            "quit", lambda *_: self.props.application.quit(), ["<Ctrl>q"]
         )
         # Load tasks
         self.load_todos()

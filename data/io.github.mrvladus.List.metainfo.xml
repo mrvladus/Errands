@@ -21,12 +21,16 @@
       <image>
 				https://github.com/mrvladus/List/blob/1cc62f5b546540dcf869e5b42eee4a7744e91c6d/screenshots/light.png?raw=true</image>
     </screenshot>
-    <screenshot>
-      <image>
-				https://github.com/mrvladus/List/blob/1cc62f5b546540dcf869e5b42eee4a7744e91c6d/screenshots/dark.png?raw=true</image>
-    </screenshot>
   </screenshots>
   <releases>
+    <release version="44.5" date="2023-05-12">
+      <description>
+        <ul>
+          <li>Checkbox to mark sub-task as completed</li>
+          <li>UI improvements</li>
+        </ul>
+      </description>
+    </release>
     <release version="44.4" date="2023-05-06">
       <description>
         <ul>
