@@ -2,7 +2,7 @@
 <interface>
   <template class="SubTodo" parent="AdwActionRow">
     <property name="use-markup">true</property>
-    <property name="activatable-widget">sub_task_completed_btn</property>
+    <property name="title-selectable">true</property>
     <!-- Task menu -->
     <child type="prefix">
       <object class="GtkMenuButton" id="sub_task_menu">
@@ -18,7 +18,7 @@
             <child>
               <object class="GtkBox">
                 <property name="orientation">vertical</property>
-                <property name="spacing">10</property>
+                <property name="spacing">5</property>
                 <!-- First row -->
                 <child>
                   <object class="GtkBox">

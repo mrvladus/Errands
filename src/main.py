@@ -30,7 +30,7 @@ require_version("Adw", "1")
 from gi.repository import Gio, Adw, Gtk, Gdk, GLib
 
 
-VERSION = "44.4"
+VERSION = "44.4.1"
 APP_ID = "io.github.mrvladus.List"
 gsettings = Gio.Settings.new(APP_ID)
 
@@ -79,12 +79,9 @@ class Window(Adw.ApplicationWindow):
         self.create_action(
             "preferences",
             lambda *_: PreferencesWindow(self).show(),
-            ["<Ctrl>comma"],
         )
         self.create_action("about", self.on_about_action)
-        self.create_action(
-            "quit", lambda *_: self.props.application.quit(), ["<Ctrl>q"]
-        )
+        self.create_action("quit", lambda *_: self.props.application.quit())
         # Load tasks
         self.load_todos()
 
@@ -92,8 +89,6 @@ class Window(Adw.ApplicationWindow):
         action = Gio.SimpleAction.new(name, None)
         action.connect("activate", callback)
         self.props.application.add_action(action)
-        if shortcuts:
-            self.props.application.set_accels_for_action(f"app.{name}", shortcuts)
 
     def load_todos(self):
         data = UserData.get()
@@ -187,9 +182,7 @@ class Todo(Adw.PreferencesGroup):
         self.parent.remove(self)
 
     @Gtk.Template.Callback()
-    def on_task_added(self, entry):
-        # Hide popup
-        self.task_popover.popdown()
+    def on_task_edited(self, entry):
         # Get old and new text
         old_text = self.task_row.props.title
         new_text = entry.get_buffer().props.text
@@ -208,6 +201,8 @@ class Todo(Adw.PreferencesGroup):
         self.task_row.props.title = new_text
         # Clear entry
         entry.get_buffer().props.text = ""
+        # Hide popup
+        self.task_popover.popdown()
 
     @Gtk.Template.Callback()
     def on_style_selected(self, btn):
@@ -246,9 +241,23 @@ class SubTodo(Adw.ActionRow):
 
     def __init__(self, text, parent):
         super().__init__()
+        self.text = text
         self.parent = parent
-        self.props.title = text
-        self.sub_task_completed_btn.props.active = "<s>" in text
+        # Escape markup symbols
+        if "<s>" in text:
+            self.props.title = self.text
+            self.sub_task_completed_btn.props.active = True
+        else:
+            old_text = self.text
+            self.text = GLib.markup_escape_text(self.text)
+            self.update_data(old_text, self.text)
+            self.props.title = self.text
+
+    def update_data(self, old_text: str, new_text: str):
+        new_data = UserData.get()
+        idx = new_data["todos"][self.parent.props.title]["sub"].index(old_text)
+        new_data["todos"][self.parent.props.title]["sub"][idx] = new_text
+        UserData.set(new_data)
 
     @Gtk.Template.Callback()
     def on_sub_task_delete(self, _):
@@ -260,26 +269,24 @@ class SubTodo(Adw.ActionRow):
 
     @Gtk.Template.Callback()
     def on_sub_task_edit(self, entry):
-        self.sub_task_popover.popdown()
         old_text = self.props.title
         new_text = entry.get_buffer().props.text
-        new_data = UserData.get()
         if (
             new_text == old_text
             or new_text == ""
-            or new_text in new_data["todos"][self.parent.props.title]["sub"]
+            or new_text in UserData.get()["todos"][self.parent.props.title]["sub"]
         ):
             return
         # Change sub-todo
-        idx = new_data["todos"][self.parent.props.title]["sub"].index(old_text)
-        new_data["todos"][self.parent.props.title]["sub"][idx] = new_text
-        UserData.set(new_data)
+        self.update_data(old_text, new_text)
         # Set new title
         self.props.title = new_text
         # Mark as uncompleted
         self.sub_task_completed_btn.props.active = False
         # Clear entry
         entry.get_buffer().props.text = ""
+        # Hide popup
+        self.sub_task_popover.popdown()
 
     @Gtk.Template.Callback()
     def on_sub_task_complete_toggle(self, btn):
@@ -294,10 +301,7 @@ class SubTodo(Adw.ActionRow):
         new_sub_task = f"<s>{old_text}</s>" if active else old_text[3:-4]
         self.props.title = new_sub_task
         # Save new sub task
-        new_data = UserData.get()
-        idx = new_data["todos"][self.parent.props.title]["sub"].index(old_text)
-        new_data["todos"][self.parent.props.title]["sub"][idx] = new_sub_task
-        UserData.set(new_data)
+        self.update_data(old_text, new_sub_task)
 
 
 class UserData:

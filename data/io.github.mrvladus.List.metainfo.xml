@@ -23,11 +23,10 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="44.5" date="2023-05-12">
+    <release version="44.4.1" date="2023-05-08">
       <description>
         <ul>
-          <li>Checkbox to mark sub-task as completed</li>
-          <li>UI improvements</li>
+          <li>Fixed bug with URL's not being visible (Thanks to fastrizwaan)</li>
         </ul>
       </description>
     </release>
