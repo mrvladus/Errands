@@ -3,8 +3,7 @@ Focus on your tasks.
 Todo application for those who prefer simplicity. Add and edit tasks and sub-tasks, change accent colors, remove completed.
 
 ## Screenshots
-<a href="./screenshots/light.png"><img src="./screenshots/light.png" height="400"></a>
-<a href="./screenshots/light.png"><img src="./screenshots/dark.png" height="400"></a>
+<a href="./screenshots/light.png"><img src="./screenshots/main.png" height="400"></a>
 
 ## Installing
 List is available as a Flatpak on Flathub:
