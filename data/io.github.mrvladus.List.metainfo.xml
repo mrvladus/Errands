@@ -23,6 +23,13 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="44.4.2" date="2023-05-10">
+      <description>
+        <ul>
+          <li>Fixed another one bug with URL's</li>
+        </ul>
+      </description>
+    </release>
     <release version="44.4.1" date="2023-05-08">
       <description>
         <ul>

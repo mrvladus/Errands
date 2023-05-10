@@ -4,6 +4,8 @@
     <!-- Expander row -->
     <child>
       <object class="AdwExpanderRow" id="task_row">
+        <property name="use-markup">true</property>
+        <property name="title-selectable">true</property>
         <!-- Task menu -->
         <child type="prefix">
           <object class="GtkMenuButton" id="task_menu">

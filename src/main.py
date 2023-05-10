@@ -30,7 +30,7 @@ require_version("Adw", "1")
 from gi.repository import Gio, Adw, Gtk, Gdk, GLib
 
 
-VERSION = "44.4.1"
+VERSION = "44.4.2"
 APP_ID = "io.github.mrvladus.List"
 gsettings = Gio.Settings.new(APP_ID)
 
@@ -164,14 +164,42 @@ class Todo(Adw.PreferencesGroup):
 
     def __init__(self, text, color, sub_todos, parent):
         super().__init__()
+        self.text = text
         self.parent = parent
-        self.task_row.props.title = text
+        old_text = self.text
+        # Detect if text was escaped
+        if (
+            "&amp;" in old_text
+            or "&lt;" in old_text
+            or "&gt;" in old_text
+            or "&#39;" in old_text
+        ):
+            self.text = old_text
+        # If not then escape it
+        else:
+            self.text = GLib.markup_escape_text(self.text)
+        self.update_data(old_text, self.text)
+        self.task_row.props.title = self.text
+        # Set accent color
         if color != "":
             self.task_row.add_css_class(f"row_{color}")
+        # Add sub tasks
         for todo in sub_todos:
             self.task_row.add_row(SubTodo(todo, self.task_row))
+        # Expand if sub tasks exists
         if sub_todos != []:
             self.task_row.props.expanded = True
+
+    def update_data(self, old_text: str, new_text: str):
+        new_data = UserData.get()
+        # Create new dict and change todo text
+        tmp = UserData.default_data
+        for key in new_data["todos"]:
+            if key == old_text:
+                tmp["todos"][new_text] = new_data["todos"][old_text]
+            else:
+                tmp["todos"][key] = new_data["todos"][key]
+        UserData.set(tmp)
 
     @Gtk.Template.Callback()
     def on_task_delete(self, _):
@@ -185,18 +213,11 @@ class Todo(Adw.PreferencesGroup):
     def on_task_edited(self, entry):
         # Get old and new text
         old_text = self.task_row.props.title
-        new_text = entry.get_buffer().props.text
+        new_text = GLib.markup_escape_text(entry.get_buffer().props.text)
         new_data = UserData.get()
         if old_text == new_text or new_text in new_data["todos"] or new_text == "":
             return
-        # Create new dict and change todo text
-        tmp = UserData.default_data
-        for key in new_data["todos"]:
-            if key == old_text:
-                tmp["todos"][new_text] = new_data["todos"][old_text]
-            else:
-                tmp["todos"][key] = new_data["todos"][key]
-        UserData.set(tmp)
+        self.update_data(old_text, new_text)
         # Set new title
         self.task_row.props.title = new_text
         # Clear entry
@@ -249,7 +270,17 @@ class SubTodo(Adw.ActionRow):
             self.sub_task_completed_btn.props.active = True
         else:
             old_text = self.text
-            self.text = GLib.markup_escape_text(self.text)
+            # Detect if text was escaped
+            if (
+                "&amp;" in old_text
+                or "&lt;" in old_text
+                or "&gt;" in old_text
+                or "&#39;" in old_text
+            ):
+                self.text = old_text
+            # If not then escape it
+            else:
+                self.text = GLib.markup_escape_text(self.text)
             self.update_data(old_text, self.text)
             self.props.title = self.text
 
@@ -270,7 +301,7 @@ class SubTodo(Adw.ActionRow):
     @Gtk.Template.Callback()
     def on_sub_task_edit(self, entry):
         old_text = self.props.title
-        new_text = entry.get_buffer().props.text
+        new_text = GLib.markup_escape_text(entry.get_buffer().props.text)
         if (
             new_text == old_text
             or new_text == ""
