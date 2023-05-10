@@ -95,8 +95,8 @@ class Window(Adw.ApplicationWindow):
         if data["todos"] == {}:
             return
         for todo in data["todos"]:
-            self.todo_list.add(
-                Todo(
+            self.todo_list.append(
+                Task(
                     todo,
                     data["todos"][todo]["color"],
                     data["todos"][todo]["sub"],
@@ -118,7 +118,7 @@ class Window(Adw.ApplicationWindow):
         # Add new todo
         new_data["todos"][text] = {"sub": [], "color": ""}
         UserData.set(new_data)
-        self.todo_list.add(Todo(text, "", [], self.todo_list))
+        self.todo_list.append(Task(text, "", [], self.todo_list))
         # Clear entry
         entry.props.text = ""
 
@@ -156,101 +156,30 @@ class PreferencesWindow(Adw.PreferencesWindow):
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/List/todo.ui")
-class Todo(Adw.PreferencesGroup):
-    __gtype_name__ = "Todo"
+class Task(Gtk.Box):
+    __gtype_name__ = "Task"
 
-    task_row = Gtk.Template.Child()
-    task_popover = Gtk.Template.Child()
+    task_text = Gtk.Template.Child()
+    sub_tasks = Gtk.Template.Child()
 
     def __init__(self, text, color, sub_todos, parent):
         super().__init__()
-        self.text = text
-        self.parent = parent
-        old_text = self.text
-        # Detect if text was escaped
-        if (
-            "&amp;" in old_text
-            or "&lt;" in old_text
-            or "&gt;" in old_text
-            or "&#39;" in old_text
-        ):
-            self.text = old_text
-        # If not then escape it
+        self.task_text.props.label = text
+        # # Set accent color
+        # if color != "":
+        #     self.task_row.add_css_class(f"row_{color}")
+        # # Add sub tasks
+        # for todo in sub_todos:
+        #     self.task_row.add_row(SubTodo(todo, self.task_row))
+
+    @Gtk.Template.Callback()
+    def on_add_btn_clicked(self, btn):
+        if "down" in btn.props.icon_name:
+            self.sub_tasks.set_reveal_child(True)
+            btn.props.icon_name = "go-up-symbolic"
         else:
-            self.text = GLib.markup_escape_text(self.text)
-        self.update_data(old_text, self.text)
-        self.task_row.props.title = self.text
-        # Set accent color
-        if color != "":
-            self.task_row.add_css_class(f"row_{color}")
-        # Add sub tasks
-        for todo in sub_todos:
-            self.task_row.add_row(SubTodo(todo, self.task_row))
-        # Expand if sub tasks exists
-        if sub_todos != []:
-            self.task_row.props.expanded = True
-
-    def update_data(self, old_text: str, new_text: str):
-        new_data = UserData.get()
-        # Create new dict and change todo text
-        tmp = UserData.default_data
-        for key in new_data["todos"]:
-            if key == old_text:
-                tmp["todos"][new_text] = new_data["todos"][old_text]
-            else:
-                tmp["todos"][key] = new_data["todos"][key]
-        UserData.set(tmp)
-
-    @Gtk.Template.Callback()
-    def on_task_delete(self, _):
-        self.task_popover.popdown()
-        new_data = UserData.get()
-        new_data["todos"].pop(self.task_row.props.title)
-        UserData.set(new_data)
-        self.parent.remove(self)
-
-    @Gtk.Template.Callback()
-    def on_task_edited(self, entry):
-        # Get old and new text
-        old_text = self.task_row.props.title
-        new_text = GLib.markup_escape_text(entry.get_buffer().props.text)
-        new_data = UserData.get()
-        if old_text == new_text or new_text in new_data["todos"] or new_text == "":
-            return
-        self.update_data(old_text, new_text)
-        # Set new title
-        self.task_row.props.title = new_text
-        # Clear entry
-        entry.get_buffer().props.text = ""
-        # Hide popup
-        self.task_popover.popdown()
-
-    @Gtk.Template.Callback()
-    def on_style_selected(self, btn):
-        self.task_popover.popdown()
-        for i in btn.get_css_classes():
-            color = ""
-            if i.startswith("btn_"):
-                color = i.split("_")[1]
-                break
-        self.task_row.set_css_classes(
-            ["expander"] if color == "" else ["expander", f"row_{color}"]
-        )
-        new_data = UserData.get()
-        new_data["todos"][self.task_row.props.title]["color"] = color
-        UserData.set(new_data)
-
-    @Gtk.Template.Callback()
-    def on_sub_entry_activated(self, entry):
-        todo = self.task_row.props.title
-        sub_todo = entry.props.text
-        new_data = UserData.get()
-        if sub_todo in new_data["todos"][todo]["sub"] or sub_todo == "":
-            return
-        new_data["todos"][todo]["sub"].append(sub_todo)
-        UserData.set(new_data)
-        self.task_row.add_row(SubTodo(sub_todo, self.task_row))
-        entry.props.text = ""
+            self.sub_tasks.set_reveal_child(False)
+            btn.props.icon_name = "go-down-symbolic"
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/List/sub_todo.ui")

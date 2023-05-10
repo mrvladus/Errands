@@ -45,7 +45,13 @@
         </child>
         <!-- Todo list -->
         <child>
-          <object class="AdwPreferencesPage" id="todo_list">
+          <object class="AdwClamp">
+            <child>
+              <object class="GtkBox" id="todo_list">
+                <property name="orientation">vertical</property>
+                <property name="spacing">20</property>
+              </object>
+            </child>
           </object>
         </child>
       </object>

@@ -1,21 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <template class="Task" parent="GtkBox">
-    <style>
-      <class name="card"/>
-    </style>
-    <property name="orientation">vertical</property>
-    <!-- Horizontal box -->
+  <template class="Todo" parent="AdwPreferencesGroup">
+    <!-- Expander row -->
     <child>
-      <object class="GtkBox">
-        <property name="orientation">horizontal</property>
-        <property name="spacing">10</property>
-        <property name="margin-top">10</property>
-        <property name="margin-bottom">10</property>
-        <property name="margin-start">10</property>
-        <property name="margin-end">10</property>
-        <!-- Menu button -->
-        <child>
+      <object class="AdwExpanderRow" id="task_row">
+        <property name="use-markup">true</property>
+        <property name="title-selectable">true</property>
+        <!-- Task menu -->
+        <child type="prefix">
           <object class="GtkMenuButton" id="task_menu">
             <property name="icon-name">view-more-symbolic</property>
             <property name="valign">center</property>
@@ -43,7 +35,7 @@
                           <object class="GtkButton">
                             <property name="icon-name">user-trash-symbolic</property>
                             <property name="tooltip-text">Delete task</property>
-                            <!-- <signal name="clicked" handler="on_task_delete" swapped="no"/> -->
+                            <signal name="clicked" handler="on_task_delete" swapped="no"/>
                             <style>
                               <class name="destructive-action"/>
                             </style>
@@ -53,7 +45,7 @@
                         <child>
                           <object class="GtkEntry">
                             <property name="placeholder-text">Edit task</property>
-                            <!-- <signal name="activate" handler="on_task_edited" swapped="no"/> -->
+                            <signal name="activate" handler="on_task_edited" swapped="no"/>
                           </object>
                         </child>
                       </object>
@@ -71,7 +63,7 @@
                           <object class="GtkButton">
                             <property name="icon-name">window-close-symbolic</property>
                             <property name="tooltip-text">Clear style</property>
-                            <!-- <signal name="clicked" handler="on_style_selected" swapped="no"/> -->
+                            <signal name="clicked" handler="on_style_selected" swapped="no"/>
                             <style>
                               <class name="circular"/>
                             </style>
@@ -85,7 +77,7 @@
                               <class name="btn"/>
                               <class name="btn_red"/>
                             </style>
-                            <!-- <signal name="clicked" handler="on_style_selected" swapped="no"/> -->
+                            <signal name="clicked" handler="on_style_selected" swapped="no"/>
                           </object>
                         </child>
                         <!-- Orange style button -->
@@ -96,7 +88,7 @@
                               <class name="btn"/>
                               <class name="btn_orange"/>
                             </style>
-                            <!-- <signal name="clicked" handler="on_style_selected" swapped="no"/> -->
+                            <signal name="clicked" handler="on_style_selected" swapped="no"/>
                           </object>
                         </child>
                         <!-- Green style button -->
@@ -107,7 +99,7 @@
                               <class name="btn"/>
                               <class name="btn_green"/>
                             </style>
-                            <!-- <signal name="clicked" handler="on_style_selected" swapped="no"/> -->
+                            <signal name="clicked" handler="on_style_selected" swapped="no"/>
                           </object>
                         </child>
                         <!-- Blue style button -->
@@ -118,7 +110,7 @@
                               <class name="btn"/>
                               <class name="btn_blue"/>
                             </style>
-                            <!-- <signal name="clicked" handler="on_style_selected" swapped="no"/> -->
+                            <signal name="clicked" handler="on_style_selected" swapped="no"/>
                           </object>
                         </child>
                         <!-- Purple style button -->
@@ -129,7 +121,7 @@
                               <class name="btn"/>
                               <class name="btn_purple"/>
                             </style>
-                            <!-- <signal name="clicked" handler="on_style_selected" swapped="no"/> -->
+                            <signal name="clicked" handler="on_style_selected" swapped="no"/>
                           </object>
                         </child>
                       </object>
@@ -140,48 +132,11 @@
             </property>
           </object>
         </child>
-        <!-- Task title -->
+        <!-- Sub-task entry -->
         <child>
-          <object class="GtkLabel" id="task_text">
-            <property name="wrap">true</property>
-            <property name="wrap-mode">2</property>
-            <property name="hexpand">true</property>
-            <property name="halign">start</property>
-            <property name="selectable">true</property>
-            <style>
-              <class name="heading"/>
-            </style>
-          </object>
-        </child>
-        <!-- Add task button -->
-        <child>
-          <object class="GtkButton" id="add_task_btn">
-            <property name="icon-name">go-down-symbolic</property>
-            <property name="valign">center</property>
-            <property name="tooltip-text" translatable="yes">Add sub task</property>
-            <style>
-              <class name="flat"/>
-            </style>
-            <signal name="clicked" handler="on_add_btn_clicked"/>
-          </object>
-        </child>
-      </object>
-    </child>
-    <!-- Sub tasks -->
-    <child>
-      <object class="GtkRevealer" id="sub_tasks">
-        <child>
-          <object class="GtkBox">
-            <property name="orientation">vertical</property>
-            <property name="spacing">10</property>
-            <property name="margin-bottom">10</property>
-            <property name="margin-start">10</property>
-            <property name="margin-end">10</property>
-            <!-- Sub task entry -->
-            <child>
-              <object class="GtkEntry">
-              </object>
-            </child>
+          <object class="AdwEntryRow" id="sub_entry">
+            <property name="title">Add new sub-task</property>
+            <signal name="entry-activated" handler="on_sub_entry_activated" swapped="no"/>
           </object>
         </child>
       </object>
