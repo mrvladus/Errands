@@ -1,5 +1,6 @@
 from gi.repository import Gtk
 from .sub_task import SubTask
+from .utils import Markup
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/List/task.ui")
@@ -15,10 +16,14 @@ class Task(Gtk.Box):
 
     # Data
     n_sub_tasks = 0
+    n_sub_tasks_completed = 0
 
     def __init__(self, text, color, sub_tasks, parent):
         super().__init__()
-        self.task_text.props.label = text
+        self.text = text
+        if not Markup.is_escaped(text):
+            self.text = Markup.escape(self.text)
+        self.task_text.props.label = self.text
         # Set accent color
         if color != "":
             self.add_css_class(f"task_{color}")
@@ -28,7 +33,6 @@ class Task(Gtk.Box):
         # Add sub tasks
         for task in sub_tasks:
             self.add_sub_task(task)
-            self.n_sub_tasks += 1
         # Update statusbar
         self.update_statusbar()
 
@@ -41,11 +45,14 @@ class Task(Gtk.Box):
 
     def add_sub_task(self, text):
         self.sub_tasks.append(SubTask(text, self))
+        self.n_sub_tasks += 1
 
     def update_statusbar(self):
         if self.n_sub_tasks > 0:
             self.task_status.props.visible = True
-            self.task_status.set_label(f"Completed sub-tasks: 0 / {self.n_sub_tasks}")
+            self.task_status.set_label(
+                f"Completed: {self.n_sub_tasks_completed} / {self.n_sub_tasks}"
+            )
         else:
             self.task_status.props.visible = False
 
@@ -53,7 +60,13 @@ class Task(Gtk.Box):
 
     @Gtk.Template.Callback()
     def on_completed_btn_toggled(self, btn):
-        pass
+        if Markup.is_crosslined(self.text) and btn.props.active:
+            return
+        if btn.props.active:
+            self.text = Markup.add_crossline(self.text)
+        else:
+            self.text = Markup.rm_crossline(self.text)
+        self.task_text.props.label = self.text
 
     @Gtk.Template.Callback()
     def on_expand_btn_clicked(self, _):

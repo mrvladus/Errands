@@ -59,14 +59,15 @@
     <!-- Sub-task text -->
     <child>
       <object class="GtkLabel" id="sub_task_text">
-        <property name="wrap">true</property>
-        <property name="wrap-mode">1</property>
         <property name="margin-start">10</property>
         <property name="margin-end">10</property>
+        <property name="wrap">true</property>
+        <property name="wrap-mode">1</property>
         <property name="hexpand">true</property>
         <property name="halign">start</property>
         <property name="valign">center</property>
         <property name="selectable">true</property>
+        <property name="use-markup">true</property>
       </object>
     </child>
     <!-- Mark as completed button -->

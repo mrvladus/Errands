@@ -9,14 +9,42 @@ class Markup:
     """Class for useful markup functions"""
 
     @classmethod
-    def is_crosslined(self, text: str) -> bool:
-        if text.startswith("<s>") or text.endswith("</s>"):
-            return True
-
-    @classmethod
     def is_escaped(self, text: str) -> bool:
         if "&amp;" in text or "&lt;" in text or "&gt;" in text or "&#39;" in text:
             return True
+        else:
+            return False
+
+    @classmethod
+    def escape(self, text: str):
+        return GLib.markup_escape_text(text)
+
+    @classmethod
+    def is_crosslined(self, text: str) -> bool:
+        if text.startswith("<s>") and text.endswith("</s>"):
+            return True
+        else:
+            return False
+
+    @classmethod
+    def add_crossline(self, text: str):
+        return f"<s>{text}</s>"
+
+    @classmethod
+    def rm_crossline(self, text: str):
+        return text.replace("<s>", "").replace("</s>", "")
+
+    @classmethod
+    def find_url(self, text: str):
+        """Convert urls to markup. Make sure to escape text before calling."""
+        arr = text.split(" ")
+        new_str = []
+        for i in arr:
+            if i.startswith("http://") or i.startswith("https://"):
+                new_str.append(f'<a href="{i}">{i}</a>')
+            else:
+                new_str.append(i)
+        return " ".join(new_str)
 
 
 class UserData:

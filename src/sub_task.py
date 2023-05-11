@@ -1,5 +1,5 @@
 from gi.repository import Gtk, GLib
-from .utils import UserData
+from .utils import UserData, Markup
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/List/sub_task.ui")
@@ -11,32 +11,31 @@ class SubTask(Gtk.Box):
 
     def __init__(self, text, parent):
         super().__init__()
-        self.sub_task_text.props.label = text
-        # self.text = text
-        # self.parent = parent
-        # # Escape markup symbols
-        # if "<s>" in text:
-        #     self.props.title = self.text
-        #     self.sub_task_completed_btn.props.active = True
-        # else:
-        #     old_text = self.text
-        #     # Detect if text was escaped
-        #     if (
-        #         "&amp;" in old_text
-        #         or "&lt;" in old_text
-        #         or "&gt;" in old_text
-        #         or "&#39;" in old_text
-        #     ):
-        #         self.text = old_text
-        #     # If not then escape it
-        #     else:
-        #         self.text = GLib.markup_escape_text(self.text)
-        #     self.update_data(old_text, self.text)
-        #     self.props.title = self.text
+        self.parent = parent
+        self.text = text
+        if not Markup.is_escaped(text):
+            self.text = Markup.escape(self.text)
+        self.text = Markup.find_url(self.text)
+        print(self.text)
+        self.sub_task_text.props.label = self.text
+        # Check if text crosslined
+        if Markup.is_crosslined(self.text):
+            self.sub_task_completed_btn.props.active = True
 
     @Gtk.Template.Callback()
     def on_completed_btn_toggled(self, btn):
-        pass
+        if Markup.is_crosslined(self.text) and btn.props.active:
+            self.parent.n_sub_tasks_completed += 1
+            return
+        if btn.props.active:
+            self.text = Markup.add_crossline(self.text)
+            self.parent.n_sub_tasks_completed += 1
+            self.parent.update_statusbar()
+        else:
+            self.text = Markup.rm_crossline(self.text)
+            self.parent.n_sub_tasks_completed -= 1
+            self.parent.update_statusbar()
+        self.sub_task_text.props.label = self.text
 
     # def update_data(self, old_text: str, new_text: str):
     #     new_data = UserData.get()
@@ -72,18 +71,3 @@ class SubTask(Gtk.Box):
     #     entry.get_buffer().props.text = ""
     #     # Hide popup
     #     self.sub_task_popover.popdown()
-
-    # @Gtk.Template.Callback()
-    # def on_sub_task_complete_toggle(self, btn):
-    #     old_text = self.props.title
-    #     active = btn.props.active
-    #     # Ignore at app launch
-    #     if "<s>" in old_text and active:
-    #         return
-    #     # Ignore when sub task was just edited
-    #     if not active and "<s>" not in old_text:
-    #         return
-    #     new_sub_task = f"<s>{old_text}</s>" if active else old_text[3:-4]
-    #     self.props.title = new_sub_task
-    #     # Save new sub task
-    #     self.update_data(old_text, new_sub_task)

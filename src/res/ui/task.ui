@@ -150,6 +150,7 @@
             <property name="halign">start</property>
             <property name="valign">center</property>
             <property name="selectable">true</property>
+            <property name="use-markup">true</property>
           </object>
         </child>
         <!-- Expand button -->
