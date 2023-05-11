@@ -45,11 +45,19 @@
         </child>
         <!-- Todo list -->
         <child>
-          <object class="AdwClamp">
+          <object class="GtkScrolledWindow">
+            <property name="propagate-natural-height">true</property>
+            <property name="propagate-natural-width">true</property>
             <child>
-              <object class="GtkBox" id="todo_list">
-                <property name="orientation">vertical</property>
-                <property name="spacing">20</property>
+              <object class="AdwClamp">
+                <property name="margin-top">20</property>
+                <property name="margin-bottom">20</property>
+                <child>
+                  <object class="GtkBox" id="todo_list">
+                    <property name="orientation">vertical</property>
+                    <property name="spacing">20</property>
+                  </object>
+                </child>
               </object>
             </child>
           </object>

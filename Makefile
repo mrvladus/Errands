@@ -5,6 +5,9 @@ install:
 	# Source files
 	install -D src/list $(PREFIX)/bin/list
 	install -D src/main.py $(PREFIX)/share/list/list/main.py
+	install -D src/task.py $(PREFIX)/share/list/list/task.py
+	install -D src/sub_task.py $(PREFIX)/share/list/list/sub_task.py
+	install -D src/utils.py $(PREFIX)/share/list/list/utils.py
 	# GResource
 	glib-compile-resources src/res/$(APP_ID).gresource.xml
 	install -D src/res/$(APP_ID).gresource $(PREFIX)/share/list/$(APP_ID).gresource

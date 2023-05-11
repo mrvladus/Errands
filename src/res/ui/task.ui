@@ -53,6 +53,7 @@
                         <child>
                           <object class="GtkEntry">
                             <property name="placeholder-text">Edit task</property>
+                            <property name="hexpand">true</property>
                             <!-- <signal name="activate" handler="on_task_edited" swapped="no"/> -->
                           </object>
                         </child>
@@ -140,46 +141,69 @@
             </property>
           </object>
         </child>
-        <!-- Task title -->
+        <!-- Task text -->
         <child>
           <object class="GtkLabel" id="task_text">
             <property name="wrap">true</property>
-            <property name="wrap-mode">2</property>
+            <property name="wrap-mode">1</property>
             <property name="hexpand">true</property>
             <property name="halign">start</property>
+            <property name="valign">center</property>
             <property name="selectable">true</property>
-            <style>
-              <class name="heading"/>
-            </style>
           </object>
         </child>
-        <!-- Add task button -->
+        <!-- Expand button -->
         <child>
-          <object class="GtkButton" id="add_task_btn">
+          <object class="GtkButton" id="expand_btn">
             <property name="icon-name">go-down-symbolic</property>
             <property name="valign">center</property>
-            <property name="tooltip-text" translatable="yes">Add sub task</property>
+            <property name="tooltip-text" translatable="yes">Toggle sub-tasks</property>
             <style>
               <class name="flat"/>
+              <class name="circular"/>
+              <class name="expand-btn"/>
             </style>
-            <signal name="clicked" handler="on_add_btn_clicked"/>
+            <signal name="clicked" handler="on_expand_btn_clicked"/>
+          </object>
+        </child>
+        <!-- Mark as completed button -->
+        <child>
+          <object class="GtkCheckButton" id="completed_btn">
+            <property name="valign">center</property>
+            <property name="tooltip-text" translatable="yes">Mark as completed</property>
+            <signal name="toggled" handler="on_completed_btn_toggled"/>
           </object>
         </child>
       </object>
     </child>
+    <!-- Status bar -->
+    <child>
+      <object class="GtkLabel" id="task_status">
+        <property name="halign">start</property>
+        <property name="margin-bottom">10</property>
+        <property name="margin-start">10</property>
+        <property name="margin-end">10</property>
+        <style>
+          <class name="caption"/>
+          <class name="statusbar"/>
+        </style>
+      </object>
+    </child>
     <!-- Sub tasks -->
     <child>
-      <object class="GtkRevealer" id="sub_tasks">
+      <object class="GtkRevealer" id="sub_tasks_revealer">
         <child>
-          <object class="GtkBox">
+          <object class="GtkBox" id="sub_tasks">
             <property name="orientation">vertical</property>
-            <property name="spacing">10</property>
-            <property name="margin-bottom">10</property>
-            <property name="margin-start">10</property>
-            <property name="margin-end">10</property>
+            <property name="spacing">0</property>
             <!-- Sub task entry -->
             <child>
               <object class="GtkEntry">
+                <property name="placeholder-text" translatable="yes">Add new sub-task</property>
+                <property name="margin-bottom">10</property>
+                <property name="margin-start">10</property>
+                <property name="margin-end">10</property>
+                <signal name="activate" handler="on_sub_task_added"/>
               </object>
             </child>
           </object>

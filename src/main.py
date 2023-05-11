@@ -20,8 +20,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os
-import json
 from gi import require_version
 
 require_version("Gtk", "4.0")
@@ -29,10 +27,14 @@ require_version("Adw", "1")
 
 from gi.repository import Gio, Adw, Gtk, Gdk, GLib
 
-
-VERSION = "44.4.2"
+# Global data
+VERSION = "44.5"
 APP_ID = "io.github.mrvladus.List"
 gsettings = Gio.Settings.new(APP_ID)
+
+# Import widgets
+from .utils import UserData
+from .task import Task
 
 
 class Application(Adw.Application):
@@ -153,173 +155,3 @@ class PreferencesWindow(Adw.PreferencesWindow):
             theme = 4
         Adw.StyleManager.get_default().set_color_scheme(theme)
         gsettings.set_value("theme", GLib.Variant("i", theme))
-
-
-@Gtk.Template(resource_path="/io/github/mrvladus/List/todo.ui")
-class Task(Gtk.Box):
-    __gtype_name__ = "Task"
-
-    task_text = Gtk.Template.Child()
-    sub_tasks = Gtk.Template.Child()
-
-    def __init__(self, text, color, sub_todos, parent):
-        super().__init__()
-        self.task_text.props.label = text
-        # # Set accent color
-        # if color != "":
-        #     self.task_row.add_css_class(f"row_{color}")
-        # # Add sub tasks
-        # for todo in sub_todos:
-        #     self.task_row.add_row(SubTodo(todo, self.task_row))
-
-    @Gtk.Template.Callback()
-    def on_add_btn_clicked(self, btn):
-        if "down" in btn.props.icon_name:
-            self.sub_tasks.set_reveal_child(True)
-            btn.props.icon_name = "go-up-symbolic"
-        else:
-            self.sub_tasks.set_reveal_child(False)
-            btn.props.icon_name = "go-down-symbolic"
-
-
-@Gtk.Template(resource_path="/io/github/mrvladus/List/sub_todo.ui")
-class SubTodo(Adw.ActionRow):
-    __gtype_name__ = "SubTodo"
-
-    sub_task_popover = Gtk.Template.Child()
-    sub_task_completed_btn = Gtk.Template.Child()
-
-    def __init__(self, text, parent):
-        super().__init__()
-        self.text = text
-        self.parent = parent
-        # Escape markup symbols
-        if "<s>" in text:
-            self.props.title = self.text
-            self.sub_task_completed_btn.props.active = True
-        else:
-            old_text = self.text
-            # Detect if text was escaped
-            if (
-                "&amp;" in old_text
-                or "&lt;" in old_text
-                or "&gt;" in old_text
-                or "&#39;" in old_text
-            ):
-                self.text = old_text
-            # If not then escape it
-            else:
-                self.text = GLib.markup_escape_text(self.text)
-            self.update_data(old_text, self.text)
-            self.props.title = self.text
-
-    def update_data(self, old_text: str, new_text: str):
-        new_data = UserData.get()
-        idx = new_data["todos"][self.parent.props.title]["sub"].index(old_text)
-        new_data["todos"][self.parent.props.title]["sub"][idx] = new_text
-        UserData.set(new_data)
-
-    @Gtk.Template.Callback()
-    def on_sub_task_delete(self, _):
-        self.sub_task_popover.popdown()
-        new_data = UserData.get()
-        new_data["todos"][self.parent.get_title()]["sub"].remove(self.props.title)
-        UserData.set(new_data)
-        self.parent.remove(self)
-
-    @Gtk.Template.Callback()
-    def on_sub_task_edit(self, entry):
-        old_text = self.props.title
-        new_text = GLib.markup_escape_text(entry.get_buffer().props.text)
-        if (
-            new_text == old_text
-            or new_text == ""
-            or new_text in UserData.get()["todos"][self.parent.props.title]["sub"]
-        ):
-            return
-        # Change sub-todo
-        self.update_data(old_text, new_text)
-        # Set new title
-        self.props.title = new_text
-        # Mark as uncompleted
-        self.sub_task_completed_btn.props.active = False
-        # Clear entry
-        entry.get_buffer().props.text = ""
-        # Hide popup
-        self.sub_task_popover.popdown()
-
-    @Gtk.Template.Callback()
-    def on_sub_task_complete_toggle(self, btn):
-        old_text = self.props.title
-        active = btn.props.active
-        # Ignore at app launch
-        if "<s>" in old_text and active:
-            return
-        # Ignore when sub task was just edited
-        if not active and "<s>" not in old_text:
-            return
-        new_sub_task = f"<s>{old_text}</s>" if active else old_text[3:-4]
-        self.props.title = new_sub_task
-        # Save new sub task
-        self.update_data(old_text, new_sub_task)
-
-
-class UserData:
-    """Class for accessing data file with user tasks"""
-
-    data_dir = GLib.get_user_data_dir() + "/list"
-    default_data = {
-        "version": VERSION,
-        "todos": {},
-    }
-
-    # Create data dir and data.json file
-    @classmethod
-    def init(self):
-        if not os.path.exists(self.data_dir):
-            os.mkdir(self.data_dir)
-        if not os.path.exists(self.data_dir + "/data.json"):
-            with open(self.data_dir + "/data.json", "w+") as f:
-                json.dump(self.default_data, f)
-            self.convert()
-
-    # Load user data from json
-    @classmethod
-    def get(self):
-        if not os.path.exists(self.data_dir + "/data.json"):
-            self.init()
-        with open(self.data_dir + "/data.json", "r") as f:
-            data = json.load(f)
-            return data
-
-    # Save user data to json
-    @classmethod
-    def set(self, data: dict):
-        with open(self.data_dir + "/data.json", "w") as f:
-            json.dump(data, f)
-
-    # Port todos from older versions (for updates)
-    @classmethod
-    def convert(self):
-        # 44.1.x
-        todos_v1 = gsettings.get_value("todos").unpack()
-        if todos_v1 != []:
-            new_data = self.get()
-            for todo in todos_v1:
-                new_data["todos"][todo] = {
-                    "sub": [],
-                    "color": "",
-                }
-            self.set(new_data)
-            gsettings.set_value("todos", GLib.Variant("as", []))
-        # 44.2.x
-        todos_v2 = gsettings.get_value("todos-v2").unpack()
-        if todos_v2 != []:
-            new_data = self.get()
-            for todo in todos_v2:
-                new_data["todos"][todo[0]] = {
-                    "sub": [i for i in todo[1:]],
-                    "color": "",
-                }
-            self.set(new_data)
-            gsettings.set_value("todos-v2", GLib.Variant("aas", []))

@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <template class="SubTodo" parent="AdwActionRow">
-    <property name="use-markup">true</property>
-    <property name="title-selectable">true</property>
-    <!-- Task menu -->
-    <child type="prefix">
+  <template class="SubTask" parent="GtkBox">
+    <property name="orientation">horizontal</property>
+    <style>
+      <class name="sub-task"/>
+    </style>
+    <!-- Menu button -->
+    <child>
       <object class="GtkMenuButton" id="sub_task_menu">
         <property name="icon-name">view-more-symbolic</property>
         <property name="valign">center</property>
-        <property name="tooltip-text">Sub task menu</property>
+        <property name="tooltip-text">Sub-task menu</property>
         <style>
           <class name="flat"/>
         </style>
@@ -18,7 +20,7 @@
             <child>
               <object class="GtkBox">
                 <property name="orientation">vertical</property>
-                <property name="spacing">5</property>
+                <property name="spacing">10</property>
                 <!-- First row -->
                 <child>
                   <object class="GtkBox">
@@ -31,8 +33,8 @@
                     <child>
                       <object class="GtkButton">
                         <property name="icon-name">user-trash-symbolic</property>
-                        <property name="tooltip-text">Delete sub task</property>
-                        <signal name="clicked" handler="on_sub_task_delete" swapped="no"/>
+                        <property name="tooltip-text">Delete task</property>
+                        <!-- <signal name="clicked" handler="on_task_delete" swapped="no"/> -->
                         <style>
                           <class name="destructive-action"/>
                         </style>
@@ -41,8 +43,9 @@
                     <!-- Edit entry -->
                     <child>
                       <object class="GtkEntry">
-                        <property name="placeholder-text">Edit sub task</property>
-                        <signal name="activate" handler="on_sub_task_edit" swapped="no"/>
+                        <property name="placeholder-text">Edit task</property>
+                        <property name="hexpand">true</property>
+                        <!-- <signal name="activate" handler="on_task_edited" swapped="no"/> -->
                       </object>
                     </child>
                   </object>
@@ -53,11 +56,25 @@
         </property>
       </object>
     </child>
+    <!-- Sub-task text -->
+    <child>
+      <object class="GtkLabel" id="sub_task_text">
+        <property name="wrap">true</property>
+        <property name="wrap-mode">1</property>
+        <property name="margin-start">10</property>
+        <property name="margin-end">10</property>
+        <property name="hexpand">true</property>
+        <property name="halign">start</property>
+        <property name="valign">center</property>
+        <property name="selectable">true</property>
+      </object>
+    </child>
     <!-- Mark as completed button -->
-    <child type="suffix">
+    <child>
       <object class="GtkCheckButton" id="sub_task_completed_btn">
         <property name="valign">center</property>
-        <signal name="toggled" handler="on_sub_task_complete_toggle" swapped="no"/>
+        <property name="tooltip-text" translatable="yes">Mark as completed</property>
+        <signal name="toggled" handler="on_completed_btn_toggled"/>
       </object>
     </child>
   </template>
