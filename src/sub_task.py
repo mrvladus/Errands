@@ -13,12 +13,12 @@ class SubTask(Gtk.Box):
         super().__init__()
         self.parent = parent
         self.text = text
+        # Escape text and find URL's'
         if not Markup.is_escaped(text):
             self.text = Markup.escape(self.text)
         self.text = Markup.find_url(self.text)
-        print(self.text)
         self.sub_task_text.props.label = self.text
-        # Check if text crosslined
+        # Check if text crosslined and toggle checkbox
         if Markup.is_crosslined(self.text):
             self.sub_task_completed_btn.props.active = True
 

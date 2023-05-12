@@ -43,7 +43,7 @@
                           <object class="GtkButton">
                             <property name="icon-name">user-trash-symbolic</property>
                             <property name="tooltip-text">Delete task</property>
-                            <!-- <signal name="clicked" handler="on_task_delete" swapped="no"/> -->
+                            <signal name="clicked" handler="on_task_delete"/>
                             <style>
                               <class name="destructive-action"/>
                             </style>

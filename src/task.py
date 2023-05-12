@@ -1,6 +1,6 @@
 from gi.repository import Gtk
 from .sub_task import SubTask
-from .utils import Markup
+from .utils import Markup, UserData
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/List/task.ui")
@@ -8,6 +8,7 @@ class Task(Gtk.Box):
     __gtype_name__ = "Task"
 
     # Template items
+    task_popover = Gtk.Template.Child()
     task_text = Gtk.Template.Child()
     expand_btn = Gtk.Template.Child()
     task_status = Gtk.Template.Child()
@@ -20,6 +21,7 @@ class Task(Gtk.Box):
 
     def __init__(self, text, color, sub_tasks, parent):
         super().__init__()
+        self.parent = parent
         self.text = text
         if not Markup.is_escaped(text):
             self.text = Markup.escape(self.text)
@@ -57,6 +59,14 @@ class Task(Gtk.Box):
             self.task_status.props.visible = False
 
     # --- Template handlers --- #
+
+    @Gtk.Template.Callback()
+    def on_task_delete(self, _):
+        self.task_popover.popdown()
+        new_data: dict = UserData.get()
+        new_data["todos"].pop(self.text)
+        UserData.set(new_data)
+        self.parent.remove(self)
 
     @Gtk.Template.Callback()
     def on_completed_btn_toggled(self, btn):
