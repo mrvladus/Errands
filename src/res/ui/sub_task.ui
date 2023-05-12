@@ -29,12 +29,12 @@
                     <style>
                       <class name="toolbar"/>
                     </style>
-                    <!-- Delete task button -->
+                    <!-- Delete sub-task button -->
                     <child>
                       <object class="GtkButton">
                         <property name="icon-name">user-trash-symbolic</property>
-                        <property name="tooltip-text">Delete task</property>
-                        <!-- <signal name="clicked" handler="on_task_delete" swapped="no"/> -->
+                        <property name="tooltip-text">Delete sub-task</property>
+                        <signal name="clicked" handler="on_sub_task_delete"/>
                         <style>
                           <class name="destructive-action"/>
                         </style>

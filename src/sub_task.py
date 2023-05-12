@@ -6,6 +6,7 @@ from .utils import UserData, Markup
 class SubTask(Gtk.Box):
     __gtype_name__ = "SubTask"
 
+    sub_task_popover = Gtk.Template.Child()
     sub_task_text = Gtk.Template.Child()
     sub_task_completed_btn = Gtk.Template.Child()
 
@@ -37,19 +38,13 @@ class SubTask(Gtk.Box):
             self.parent.update_statusbar()
         self.sub_task_text.props.label = self.text
 
-    # def update_data(self, old_text: str, new_text: str):
-    #     new_data = UserData.get()
-    #     idx = new_data["todos"][self.parent.props.title]["sub"].index(old_text)
-    #     new_data["todos"][self.parent.props.title]["sub"][idx] = new_text
-    #     UserData.set(new_data)
-
-    # @Gtk.Template.Callback()
-    # def on_sub_task_delete(self, _):
-    #     self.sub_task_popover.popdown()
-    #     new_data = UserData.get()
-    #     new_data["todos"][self.parent.get_title()]["sub"].remove(self.props.title)
-    #     UserData.set(new_data)
-    #     self.parent.remove(self)
+    @Gtk.Template.Callback()
+    def on_sub_task_delete(self, btn):
+        self.sub_task_popover.popdown()
+        new_data = UserData.get()
+        new_data["todos"][self.parent.text]["sub"].remove(self.text)
+        UserData.set(new_data)
+        self.parent.sub_tasks.remove(self)
 
     # @Gtk.Template.Callback()
     # def on_sub_task_edit(self, entry):
