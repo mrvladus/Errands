@@ -23,6 +23,13 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="44.4.3" date="2023-05-13">
+      <description>
+        <ul>
+          <li>Fixed bug with apostrophe character being displayed incorrectly (Thanks to CastelJeremy)</li>
+        </ul>
+      </description>
+    </release>
     <release version="44.4.2" date="2023-05-10">
       <description>
         <ul>

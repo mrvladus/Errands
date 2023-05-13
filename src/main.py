@@ -30,7 +30,7 @@ require_version("Adw", "1")
 from gi.repository import Gio, Adw, Gtk, Gdk, GLib
 
 
-VERSION = "44.4.2"
+VERSION = "44.4.3"
 APP_ID = "io.github.mrvladus.List"
 gsettings = Gio.Settings.new(APP_ID)
 
@@ -276,6 +276,7 @@ class SubTodo(Adw.ActionRow):
                 or "&lt;" in old_text
                 or "&gt;" in old_text
                 or "&#39;" in old_text
+                or "&apos;" in old_text
             ):
                 self.text = old_text
             # If not then escape it
