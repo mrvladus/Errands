@@ -1,20 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist gettext-domain="list">
-	<schema id="io.github.mrvladus.List" path="/io/github/mrvladus/List/">
-		<key name="width" type="i">
-			<default>500</default>
-		</key>
-		<key name="height" type="i">
-			<default>600</default>
-		</key>
-		<key name="theme" type="i">
-			<default>0</default>
-		</key>
-		<key name="todos" type="as">
-			<default>[]</default>
-		</key>
-		<key name="todos-v2" type="aas">
-			<default>[]</default>
-		</key>
-	</schema>
+  <schema id="io.github.mrvladus.List" path="/io/github/mrvladus/List/">
+    <key name="width" type="i">
+      <default>500</default>
+    </key>
+    <key name="height" type="i">
+      <default>600</default>
+    </key>
+    <key name="theme" type="i">
+      <default>0</default>
+    </key>
+  </schema>
 </schemalist>

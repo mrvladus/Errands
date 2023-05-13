@@ -53,7 +53,7 @@
                 <property name="margin-top">20</property>
                 <property name="margin-bottom">20</property>
                 <child>
-                  <object class="GtkBox" id="todo_list">
+                  <object class="GtkBox" id="tasks_list">
                     <property name="orientation">vertical</property>
                     <property name="spacing">20</property>
                   </object>

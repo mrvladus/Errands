@@ -1,4 +1,4 @@
-from gi.repository import Gtk, GLib
+from gi.repository import Gtk
 from .utils import UserData, Markup
 
 
@@ -10,32 +10,40 @@ class SubTask(Gtk.Box):
     sub_task_text = Gtk.Template.Child()
     sub_task_completed_btn = Gtk.Template.Child()
 
-    def __init__(self, text, parent):
+    def __init__(self, task: dict, parent):
         super().__init__()
         self.parent = parent
-        self.text = text
+        self.task = task
         # Escape text and find URL's'
-        if not Markup.is_escaped(text):
-            self.text = Markup.escape(self.text)
-        # self.text = Markup.find_url(self.text)
-        self.sub_task_text.props.label = Markup.find_url(self.text)
-        # Check if text crosslined and toggle checkbox
-        if Markup.is_crosslined(self.text):
+        self.text = Markup.escape(self.task["text"])
+        self.text = Markup.find_url(self.text)
+        # Check if sub-task completed and toggle checkbox
+        if self.task["completed"]:
             self.sub_task_completed_btn.props.active = True
+        # Set text
+        self.sub_task_text.props.label = self.text
+
+    def update_sub_task(self, new_sub_task):
+        new_data = UserData.get()
+        for task in new_data["tasks"]:
+            if task["text"] == self.parent.task["text"]:
+                for i, sub in enumerate(task["sub"]):
+                    if sub["text"] == self.task["text"]:
+                        task["sub"][i] = new_sub_task
+                        UserData.set(new_data)
+                        return
 
     @Gtk.Template.Callback()
     def on_completed_btn_toggled(self, btn):
-        # TODO: use label text instead self.text
-        if Markup.is_crosslined(self.text) and btn.props.active:
-            self.parent.n_sub_tasks_completed += 1
-            return
-        if not Markup.is_crosslined(self.text) and not btn.props.active:
-            return
         if btn.props.active:
+            self.task = {"text": self.task["text"], "completed": True}
+            self.update_sub_task(self.task)
             self.text = Markup.add_crossline(self.text)
             self.parent.n_sub_tasks_completed += 1
             self.parent.update_statusbar()
         else:
+            self.task = {"text": self.task["text"], "completed": False}
+            self.update_sub_task(self.task)
             self.text = Markup.rm_crossline(self.text)
             self.parent.n_sub_tasks_completed -= 1
             self.parent.update_statusbar()
@@ -44,36 +52,44 @@ class SubTask(Gtk.Box):
     @Gtk.Template.Callback()
     def on_sub_task_delete(self, btn):
         self.sub_task_popover.popdown()
+        # Remove sub-task data
         new_data = UserData.get()
-        new_data["todos"][self.parent.text]["sub"].remove(self.text)
+        for task in new_data["tasks"]:
+            if task["text"] == self.parent.task["text"]:
+                for sub in task["sub"]:
+                    if sub["text"] == self.task["text"]:
+                        task["sub"].remove(sub)
+                        break
+                break
         UserData.set(new_data)
+        # Remove sub-task widget
         self.parent.sub_tasks.remove(self)
 
     @Gtk.Template.Callback()
     def on_sub_task_edit(self, entry):
-        old_text = self.text
+        old_text = self.task["text"]
         new_text = entry.get_buffer().props.text
-        # Escape text and find URL's'
-        new_text = Markup.escape(new_text)
         # Return if text the same or empty
-        if (
-            new_text == old_text
-            or new_text == ""
-            or new_text in UserData.get()["todos"][self.parent.text]["sub"]
-        ):
+        if new_text == old_text or new_text == "":
             return
-        # Change sub-task text
+        # Return if sub-task exists
         new_data = UserData.get()
-        for idx, task in enumerate(new_data["todos"][self.parent.text]["sub"]):
-            if task == old_text:
-                new_data["todos"][self.parent.text]["sub"][idx] = new_text
-                UserData.set(new_data)
-                break
+        for task in new_data["tasks"]:
+            if task["text"] == self.parent.task["text"]:
+                # Return if sub-task exists
+                for sub in task["sub"]:
+                    if sub["text"] == new_text:
+                        return
         # Set new text
-        self.text = Markup.find_url(new_text)
-        self.sub_task_text.props.label = self.text
-        # Mark as uncompleted
+        self.task = {"text": new_text, "completed": False}
+        self.update_sub_task(self.task)
+        # Escape text and find URL's'
+        self.text = Markup.escape(self.task["text"])
+        self.text = Markup.find_url(self.text)
+        # Check if text crosslined and toggle checkbox
         self.sub_task_completed_btn.props.active = False
+        # Set text
+        self.sub_task_text.props.label = self.text
         # Clear entry
         entry.get_buffer().props.text = ""
         # Hide popup

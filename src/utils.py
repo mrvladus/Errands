@@ -2,7 +2,7 @@ import os
 import json
 from gi.repository import GLib
 
-from .main import VERSION, gsettings
+from .main import VERSION
 
 
 class Markup:
@@ -10,7 +10,13 @@ class Markup:
 
     @classmethod
     def is_escaped(self, text: str) -> bool:
-        if "&amp;" in text or "&lt;" in text or "&gt;" in text or "&#39;" in text:
+        if (
+            "&amp;" in text
+            or "&lt;" in text
+            or "&gt;" in text
+            or "&#39;" in text
+            or "&apos;" in text
+        ):
             return True
         else:
             return False
@@ -53,7 +59,7 @@ class UserData:
     data_dir = GLib.get_user_data_dir() + "/list"
     default_data = {
         "version": VERSION,
-        "todos": {},
+        "tasks": [],
     }
 
     # Create data dir and data.json file
@@ -84,25 +90,4 @@ class UserData:
     # Port todos from older versions (for updates)
     @classmethod
     def convert(self):
-        # 44.1.x
-        todos_v1 = gsettings.get_value("todos").unpack()
-        if todos_v1 != []:
-            new_data = self.get()
-            for todo in todos_v1:
-                new_data["todos"][todo] = {
-                    "sub": [],
-                    "color": "",
-                }
-            self.set(new_data)
-            gsettings.set_value("todos", GLib.Variant("as", []))
-        # 44.2.x
-        todos_v2 = gsettings.get_value("todos-v2").unpack()
-        if todos_v2 != []:
-            new_data = self.get()
-            for todo in todos_v2:
-                new_data["todos"][todo[0]] = {
-                    "sub": [i for i in todo[1:]],
-                    "color": "",
-                }
-            self.set(new_data)
-            gsettings.set_value("todos-v2", GLib.Variant("aas", []))
+        pass

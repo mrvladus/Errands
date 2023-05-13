@@ -64,7 +64,7 @@ class Window(Adw.ApplicationWindow):
     __gtype_name__ = "Window"
 
     box = Gtk.Template.Child()
-    todo_list = Gtk.Template.Child()
+    tasks_list = Gtk.Template.Child()
     about_window = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
@@ -94,17 +94,10 @@ class Window(Adw.ApplicationWindow):
 
     def load_todos(self):
         data = UserData.get()
-        if data["todos"] == {}:
+        if data["tasks"] == []:
             return
-        for todo in data["todos"]:
-            self.todo_list.append(
-                Task(
-                    todo,
-                    data["todos"][todo]["color"],
-                    data["todos"][todo]["sub"],
-                    self.todo_list,
-                )
-            )
+        for task in data["tasks"]:
+            self.tasks_list.append(Task(task, self.tasks_list))
 
     def on_about_action(self, *args):
         self.about_window.props.version = VERSION
@@ -115,12 +108,16 @@ class Window(Adw.ApplicationWindow):
         text = entry.props.text
         new_data = UserData.get()
         # Check for empty string or todo exists
-        if text == "" or text in new_data["todos"]:
+        if text == "":
             return
+        for task in new_data["tasks"]:
+            if task["text"] == text:
+                return
         # Add new todo
-        new_data["todos"][text] = {"sub": [], "color": ""}
+        new_task = {"text": text, "sub": [], "color": "", "completed": False}
+        new_data["tasks"].append(new_task)
         UserData.set(new_data)
-        self.todo_list.append(Task(text, "", [], self.todo_list))
+        self.tasks_list.append(Task(new_task, self.tasks_list))
         # Clear entry
         entry.props.text = ""
 

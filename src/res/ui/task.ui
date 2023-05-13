@@ -54,7 +54,7 @@
                           <object class="GtkEntry">
                             <property name="placeholder-text">Edit task</property>
                             <property name="hexpand">true</property>
-                            <!-- <signal name="activate" handler="on_task_edited" swapped="no"/> -->
+                            <signal name="activate" handler="on_task_edit"/>
                           </object>
                         </child>
                       </object>
@@ -72,7 +72,7 @@
                           <object class="GtkButton">
                             <property name="icon-name">window-close-symbolic</property>
                             <property name="tooltip-text">Clear style</property>
-                            <!-- <signal name="clicked" handler="on_style_selected" swapped="no"/> -->
+                            <signal name="clicked" handler="on_style_selected"/>
                             <style>
                               <class name="circular"/>
                             </style>
@@ -86,7 +86,7 @@
                               <class name="btn"/>
                               <class name="btn_red"/>
                             </style>
-                            <!-- <signal name="clicked" handler="on_style_selected" swapped="no"/> -->
+                            <signal name="clicked" handler="on_style_selected"/>
                           </object>
                         </child>
                         <!-- Orange style button -->
@@ -97,7 +97,7 @@
                               <class name="btn"/>
                               <class name="btn_orange"/>
                             </style>
-                            <!-- <signal name="clicked" handler="on_style_selected" swapped="no"/> -->
+                            <signal name="clicked" handler="on_style_selected"/>
                           </object>
                         </child>
                         <!-- Green style button -->
@@ -108,7 +108,7 @@
                               <class name="btn"/>
                               <class name="btn_green"/>
                             </style>
-                            <!-- <signal name="clicked" handler="on_style_selected" swapped="no"/> -->
+                            <signal name="clicked" handler="on_style_selected"/>
                           </object>
                         </child>
                         <!-- Blue style button -->
@@ -119,7 +119,7 @@
                               <class name="btn"/>
                               <class name="btn_blue"/>
                             </style>
-                            <!-- <signal name="clicked" handler="on_style_selected" swapped="no"/> -->
+                            <signal name="clicked" handler="on_style_selected"/>
                           </object>
                         </child>
                         <!-- Purple style button -->
@@ -130,7 +130,7 @@
                               <class name="btn"/>
                               <class name="btn_purple"/>
                             </style>
-                            <!-- <signal name="clicked" handler="on_style_selected" swapped="no"/> -->
+                            <signal name="clicked" handler="on_style_selected"/>
                           </object>
                         </child>
                       </object>
@@ -169,10 +169,10 @@
         </child>
         <!-- Mark as completed button -->
         <child>
-          <object class="GtkCheckButton" id="completed_btn">
+          <object class="GtkCheckButton" id="task_completed_btn">
             <property name="valign">center</property>
             <property name="tooltip-text" translatable="yes">Mark as completed</property>
-            <signal name="toggled" handler="on_completed_btn_toggled"/>
+            <signal name="toggled" handler="on_task_completed_btn_toggled"/>
           </object>
         </child>
       </object>
