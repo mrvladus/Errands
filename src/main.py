@@ -45,6 +45,7 @@ class Application(Adw.Application):
         )
 
     def do_activate(self):
+        print("Activate app...")
         # Initialize data.json file
         UserData.init()
         # Load css styles
@@ -69,6 +70,7 @@ class Window(Adw.ApplicationWindow):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        print("Load window...")
         # Remember window size
         gsettings.bind("width", self, "default_width", 0)
         gsettings.bind("height", self, "default_height", 0)
@@ -93,6 +95,7 @@ class Window(Adw.ApplicationWindow):
         self.props.application.add_action(action)
 
     def load_todos(self):
+        print("Loading tasks...")
         data = UserData.get()
         if data["tasks"] == []:
             return

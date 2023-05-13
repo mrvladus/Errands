@@ -12,6 +12,8 @@ class SubTask(Gtk.Box):
 
     def __init__(self, task: dict, parent):
         super().__init__()
+        print("Add sub-task: ", task)
+
         self.parent = parent
         self.task = task
         # Escape text and find URL's'
@@ -27,6 +29,7 @@ class SubTask(Gtk.Box):
         new_data = UserData.get()
         for task in new_data["tasks"]:
             if task["text"] == self.parent.task["text"]:
+                print("found: ", self.parent.task["text"])
                 for i, sub in enumerate(task["sub"]):
                     if sub["text"] == self.task["text"]:
                         task["sub"][i] = new_sub_task

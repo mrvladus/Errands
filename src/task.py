@@ -22,6 +22,7 @@ class Task(Gtk.Box):
 
     def __init__(self, task: dict, parent):
         super().__init__()
+        print("Add task: ", task)
         self.parent = parent
         self.task = task
         # Escape text and find URL's'
@@ -31,7 +32,7 @@ class Task(Gtk.Box):
         if self.task["completed"]:
             self.task_completed_btn.props.active = True
         # Set text
-        self.sub_task_text.props.label = self.text
+        self.task_text.props.label = self.text
         # Set accent color
         if self.task["color"] != "":
             self.add_css_class(f'task_{self.task["color"]}')
@@ -40,7 +41,9 @@ class Task(Gtk.Box):
             self.expand(True)
         # Add sub tasks
         for task in self.task["sub"]:
+            print(task)
             self.add_sub_task(task)
+        self.update_statusbar()
 
     def expand(self, expand: bool):
         self.sub_tasks_revealer.set_reveal_child(expand)
@@ -51,6 +54,12 @@ class Task(Gtk.Box):
 
     def add_sub_task(self, text):
         new_sub_task: dict = {"text": text, "completed": False}
+        self.task = {
+            "text": self.task["text"],
+            "completed": True,
+            "sub": self.task["sub"].append(new_sub_task),
+            "color": self.task["color"],
+        }
         self.sub_tasks.append(SubTask(new_sub_task, self))
         self.n_sub_tasks += 1
         self.update_statusbar()
@@ -116,20 +125,21 @@ class Task(Gtk.Box):
 
     @Gtk.Template.Callback()
     def on_sub_task_added(self, entry):
-        new_sub_task = entry.get_buffer().props.text
-        self.add_sub_task(new_sub_task)
+        new_sub_task = {
+            "text": entry.get_buffer().props.text,
+            "completed": False,
+        }
         self.task = {
             "text": self.task["text"],
             "completed": self.task["completed"],
             "color": self.task["color"],
-            "sub": self.task["sub"].append(
-                {
-                    "text": new_sub_task,
-                    "completed": False,
-                }
-            ),
+            "sub": self.task["sub"].append(new_sub_task),
         }
         self.update_task(self.task)
+        self.sub_tasks.append(SubTask(new_sub_task, self))
+        self.n_sub_tasks += 1
+        self.update_statusbar()
+        # Clear entry
         entry.get_buffer().props.text = ""
 
     @Gtk.Template.Callback()
