@@ -173,6 +173,7 @@ class Todo(Adw.PreferencesGroup):
             or "&lt;" in old_text
             or "&gt;" in old_text
             or "&#39;" in old_text
+            or "&apos;" in old_text
         ):
             self.text = old_text
         # If not then escape it
