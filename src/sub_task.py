@@ -29,11 +29,12 @@ class SubTask(Gtk.Box):
         new_data = UserData.get()
         for task in new_data["tasks"]:
             if task["text"] == self.parent.task["text"]:
-                print("found: ", self.parent.task["text"])
                 for i, sub in enumerate(task["sub"]):
                     if sub["text"] == self.task["text"]:
                         task["sub"][i] = new_sub_task
                         UserData.set(new_data)
+                        # Update parent data
+                        self.parent.task["sub"] = task["sub"]
                         return
 
     @Gtk.Template.Callback()
@@ -42,13 +43,11 @@ class SubTask(Gtk.Box):
             self.task = {"text": self.task["text"], "completed": True}
             self.update_sub_task(self.task)
             self.text = Markup.add_crossline(self.text)
-            self.parent.n_sub_tasks_completed += 1
             self.parent.update_statusbar()
         else:
             self.task = {"text": self.task["text"], "completed": False}
             self.update_sub_task(self.task)
             self.text = Markup.rm_crossline(self.text)
-            self.parent.n_sub_tasks_completed -= 1
             self.parent.update_statusbar()
         self.sub_task_text.props.label = self.text
 
@@ -62,9 +61,12 @@ class SubTask(Gtk.Box):
                 for sub in task["sub"]:
                     if sub["text"] == self.task["text"]:
                         task["sub"].remove(sub)
+                        UserData.set(new_data)
+                        # Update parent data
+                        self.parent.task["sub"] = task["sub"]
+                        self.parent.update_statusbar()
                         break
                 break
-        UserData.set(new_data)
         # Remove sub-task widget
         self.parent.sub_tasks.remove(self)
 
@@ -83,9 +85,18 @@ class SubTask(Gtk.Box):
                 for sub in task["sub"]:
                     if sub["text"] == new_text:
                         return
-        # Set new text
-        self.task = {"text": new_text, "completed": False}
-        self.update_sub_task(self.task)
+                # Set new data
+                print(f"Change sub-task: '{old_text}' to '{new_text}'")
+                self.task = {"text": new_text, "completed": False}
+                for i, sub in enumerate(task["sub"]):
+                    if sub["text"] == old_text:
+                        task["sub"][i] = self.task
+                        UserData.set(new_data)
+                        # Update parent data
+                        self.parent.task["sub"] = task["sub"]
+                        self.parent.update_statusbar()
+                        break
+                break
         # Escape text and find URL's'
         self.text = Markup.escape(self.task["text"])
         self.text = Markup.find_url(self.text)

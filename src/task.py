@@ -16,10 +16,6 @@ class Task(Gtk.Box):
     sub_tasks_revealer = Gtk.Template.Child()
     sub_tasks = Gtk.Template.Child()
 
-    # Data
-    n_sub_tasks = 0
-    n_sub_tasks_completed = 0
-
     def __init__(self, task: dict, parent):
         super().__init__()
         print("Add task: ", task)
@@ -41,8 +37,7 @@ class Task(Gtk.Box):
             self.expand(True)
         # Add sub tasks
         for task in self.task["sub"]:
-            print(task)
-            self.add_sub_task(task)
+            self.sub_tasks.append(SubTask(task, self))
         self.update_statusbar()
 
     def expand(self, expand: bool):
@@ -52,24 +47,16 @@ class Task(Gtk.Box):
         else:
             self.expand_btn.remove_css_class("expanded")
 
-    def add_sub_task(self, text):
-        new_sub_task: dict = {"text": text, "completed": False}
-        self.task = {
-            "text": self.task["text"],
-            "completed": True,
-            "sub": self.task["sub"].append(new_sub_task),
-            "color": self.task["color"],
-        }
-        self.sub_tasks.append(SubTask(new_sub_task, self))
-        self.n_sub_tasks += 1
-        self.update_statusbar()
-
     def update_statusbar(self):
-        if self.n_sub_tasks > 0:
+        n_completed = 0
+        n_total = 0
+        for sub in self.task["sub"]:
+            n_total += 1
+            if sub["completed"]:
+                n_completed += 1
+        if n_total > 0:
             self.task_status.props.visible = True
-            self.task_status.set_label(
-                f"Completed: {self.n_sub_tasks_completed} / {self.n_sub_tasks}"
-            )
+            self.task_status.set_label(f"Completed: {n_completed} / {n_total}")
         else:
             self.task_status.props.visible = False
 
@@ -118,6 +105,7 @@ class Task(Gtk.Box):
 
     @Gtk.Template.Callback()
     def on_expand_btn_clicked(self, _):
+        """Expand task row"""
         if self.sub_tasks_revealer.get_child_revealed():
             self.expand(False)
         else:
@@ -125,19 +113,28 @@ class Task(Gtk.Box):
 
     @Gtk.Template.Callback()
     def on_sub_task_added(self, entry):
+        # Return if entry is empty
+        if entry.get_buffer().props.text == "":
+            return
+        # Return if task exists
+        for sub in self.task["sub"]:
+            if sub["text"] == entry.get_buffer().props.text:
+                return
+        # Add new sub-task
         new_sub_task = {
             "text": entry.get_buffer().props.text,
             "completed": False,
         }
+        self.task["sub"].append(new_sub_task)
         self.task = {
             "text": self.task["text"],
             "completed": self.task["completed"],
             "color": self.task["color"],
-            "sub": self.task["sub"].append(new_sub_task),
+            "sub": self.task["sub"],
         }
         self.update_task(self.task)
+        # Add row
         self.sub_tasks.append(SubTask(new_sub_task, self))
-        self.n_sub_tasks += 1
         self.update_statusbar()
         # Clear entry
         entry.get_buffer().props.text = ""
@@ -149,11 +146,13 @@ class Task(Gtk.Box):
         # Return if text the same or empty
         if new_text == old_text or new_text == "":
             return
-        # Return if sub-task exists
+        # Return if task exists
         new_data = UserData.get()
         for task in new_data["tasks"]:
-            if task["text"] == self.task["text"]:
+            if task["text"] == new_text:
                 return
+        # Change task
+        print(f"Change '{old_text}' to '{new_text}'")
         # Set new text
         self.task = {
             "text": new_text,
@@ -161,7 +160,12 @@ class Task(Gtk.Box):
             "completed": False,
             "color": self.task["color"],
         }
-        self.update_task(self.task)
+        # Set new data
+        for i, task in enumerate(new_data["tasks"]):
+            if task["text"] == old_text:
+                new_data["tasks"][i] = self.task
+                UserData.set(new_data)
+                break
         # Escape text and find URL's'
         self.text = Markup.escape(self.task["text"])
         self.text = Markup.find_url(self.text)
@@ -176,6 +180,7 @@ class Task(Gtk.Box):
 
     @Gtk.Template.Callback()
     def on_style_selected(self, btn):
+        """Apply accent color"""
         self.task_popover.popdown()
         for i in btn.get_css_classes():
             color = ""
