@@ -1,13 +1,15 @@
-from gi.repository import Gtk
+from gi.repository import Gtk, Adw
 from .utils import UserData, Markup
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/List/sub_task.ui")
-class SubTask(Gtk.Box):
+class SubTask(Adw.Bin):
     __gtype_name__ = "SubTask"
 
-    sub_task_popover = Gtk.Template.Child()
+    sub_task_delete_btn = Gtk.Template.Child()
     sub_task_text = Gtk.Template.Child()
+    sub_task_edit_entry = Gtk.Template.Child()
+    sub_task_edit_btn = Gtk.Template.Child()
     sub_task_completed_btn = Gtk.Template.Child()
 
     def __init__(self, task: dict, parent):
@@ -52,8 +54,7 @@ class SubTask(Gtk.Box):
         self.sub_task_text.props.label = self.text
 
     @Gtk.Template.Callback()
-    def on_sub_task_delete(self, btn):
-        self.sub_task_popover.popdown()
+    def on_sub_task_delete_btn_clicked(self, btn):
         # Remove sub-task data
         new_data = UserData.get()
         for task in new_data["tasks"]:
@@ -69,6 +70,26 @@ class SubTask(Gtk.Box):
                 break
         # Remove sub-task widget
         self.parent.sub_tasks.remove(self)
+
+    @Gtk.Template.Callback()
+    def on_sub_task_edit_btn_clicked(self, btn):
+        # Change icon
+        if btn.props.icon_name == "document-edit-symbolic":
+            btn.props.icon_name = "edit-delete-symbolic"
+        else:
+            btn.props.icon_name = "document-edit-symbolic"
+        # Show entry and hide label
+        self.sub_task_edit_entry.grab_focus()
+        self.sub_task_edit_entry.get_buffer().props.text = self.task["text"]
+        self.sub_task_edit_entry.select_region(0, len(self.task["text"]))
+        self.sub_task_edit_entry.props.visible = (
+            not self.sub_task_edit_entry.props.visible
+        )
+        self.sub_task_text.props.visible = not self.sub_task_edit_entry.props.visible
+        # Hide other buttons
+        self.sub_task_completed_btn.props.visible = (
+            self.sub_task_delete_btn.props.visible
+        ) = self.sub_task_text.props.visible
 
     @Gtk.Template.Callback()
     def on_sub_task_edit(self, entry):
@@ -104,7 +125,11 @@ class SubTask(Gtk.Box):
         self.sub_task_completed_btn.props.active = False
         # Set text
         self.sub_task_text.props.label = self.text
-        # Clear entry
-        entry.get_buffer().props.text = ""
-        # Hide popup
-        self.sub_task_popover.popdown()
+        # Show other buttons
+        self.sub_task_completed_btn.props.visible = (
+            self.sub_task_delete_btn.props.visible
+        ) = self.sub_task_text.props.visible = True
+        # Hide entry
+        self.sub_task_edit_entry.props.visible = False
+        # Change edit icon back
+        self.sub_task_edit_btn.props.icon_name = "document-edit-symbolic"

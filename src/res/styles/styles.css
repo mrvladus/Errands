@@ -3,14 +3,6 @@
     opacity: 0.5;
 }
 
-.expand-btn {
-    transition: transform 0.2s ease-out;
-}
-
-.expanded {
-    transform: rotate(180deg);
-}
-
 .task_red {
     background: mix(@card_bg_color, @red_1, 0.3);
 }
@@ -73,7 +65,6 @@
 
 /* Sub-task */
 .sub-task {
-    padding: 10px;
     border-top-width: 1px;
     border-style: solid;
     border-color: @card_shade_color;

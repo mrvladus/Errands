@@ -43,9 +43,9 @@ class Task(Gtk.Box):
     def expand(self, expand: bool):
         self.sub_tasks_revealer.set_reveal_child(expand)
         if expand:
-            self.expand_btn.add_css_class("expanded")
+            self.expand_btn.set_icon_name("go-up-symbolic")
         else:
-            self.expand_btn.remove_css_class("expanded")
+            self.expand_btn.set_icon_name("go-down-symbolic")
 
     def update_statusbar(self):
         n_completed = 0

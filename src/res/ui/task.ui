@@ -1,65 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <template class="Task" parent="GtkBox">
+    <property name="orientation">vertical</property>
     <style>
       <class name="card"/>
     </style>
-    <property name="orientation">vertical</property>
     <!-- Horizontal box -->
     <child>
       <object class="GtkBox">
         <property name="orientation">horizontal</property>
-        <property name="spacing">10</property>
-        <property name="margin-top">10</property>
-        <property name="margin-bottom">10</property>
-        <property name="margin-start">10</property>
-        <property name="margin-end">10</property>
-        <!-- Menu button -->
+        <property name="margin-top">5</property>
+        <property name="margin-bottom">5</property>
+        <property name="margin-start">5</property>
+        <property name="margin-end">5</property>
+        <style>
+          <class name="toolbar"/>
+        </style>
+        <!-- Mark as completed button -->
         <child>
-          <object class="GtkMenuButton" id="task_menu">
-            <property name="icon-name">view-more-symbolic</property>
+          <object class="GtkCheckButton" id="task_completed_btn">
             <property name="valign">center</property>
-            <property name="tooltip-text">Task menu</property>
+            <property name="tooltip-text" translatable="yes">Mark as completed</property>
+            <signal name="toggled" handler="on_task_completed_btn_toggled"/>
+          </object>
+        </child>
+        <!-- Task text -->
+        <child>
+          <object class="GtkLabel" id="task_text">
+            <property name="margin-start">5</property>
+            <property name="margin-end">5</property>
+            <property name="wrap">true</property>
+            <property name="wrap-mode">1</property>
+            <property name="hexpand">true</property>
+            <property name="halign">start</property>
+            <property name="valign">center</property>
+            <property name="selectable">true</property>
+            <property name="use-markup">true</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkBox">
             <style>
-              <class name="flat"/>
+              <class name="linked"/>
             </style>
-            <!-- Menu popover -->
-            <property name="popover">
-              <object class="GtkPopover" id="task_popover">
-                <child>
-                  <object class="GtkBox">
-                    <property name="orientation">vertical</property>
-                    <property name="spacing">10</property>
-                    <!-- First row -->
-                    <child>
-                      <object class="GtkBox">
-                        <property name="orientation">horizontal</property>
-                        <property name="halign">center</property>
-                        <style>
-                          <class name="toolbar"/>
-                        </style>
-                        <!-- Delete task button -->
-                        <child>
-                          <object class="GtkButton">
-                            <property name="icon-name">user-trash-symbolic</property>
-                            <property name="tooltip-text">Delete task</property>
-                            <signal name="clicked" handler="on_task_delete"/>
-                            <style>
-                              <class name="destructive-action"/>
-                            </style>
-                          </object>
-                        </child>
-                        <!-- Edit entry -->
-                        <child>
-                          <object class="GtkEntry">
-                            <property name="placeholder-text">Edit task</property>
-                            <property name="hexpand">true</property>
-                            <signal name="activate" handler="on_task_edit"/>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
-                    <!-- Second row -->
+            <!-- Expand button -->
+            <child>
+              <object class="GtkButton" id="expand_btn">
+                <property name="icon-name">go-down-symbolic</property>
+                <property name="tooltip-text" translatable="yes">Toggle sub-tasks</property>
+                <signal name="clicked" handler="on_expand_btn_clicked"/>
+              </object>
+            </child>
+            <!-- Accent colors menu button -->
+            <child>
+              <object class="GtkMenuButton" id="task_menu">
+                <property name="icon-name">view-more-horizontal-symbolic</property>
+                <property name="valign">center</property>
+                <property name="tooltip-text">Accent color</property>
+                <style>
+                  <class name="flat"/>
+                </style>
+                <!-- Menu popover -->
+                <property name="popover">
+                  <object class="GtkPopover" id="task_popover">
                     <child>
                       <object class="GtkBox">
                         <property name="orientation">horizontal</property>
@@ -136,58 +139,67 @@
                       </object>
                     </child>
                   </object>
-                </child>
+                </property>
               </object>
-            </property>
-          </object>
-        </child>
-        <!-- Task text -->
-        <child>
-          <object class="GtkLabel" id="task_text">
-            <property name="wrap">true</property>
-            <property name="wrap-mode">1</property>
-            <property name="hexpand">true</property>
-            <property name="halign">start</property>
-            <property name="valign">center</property>
-            <property name="selectable">true</property>
-            <property name="use-markup">true</property>
-          </object>
-        </child>
-        <!-- Expand button -->
-        <child>
-          <object class="GtkButton" id="expand_btn">
-            <property name="icon-name">go-down-symbolic</property>
-            <property name="valign">center</property>
-            <property name="tooltip-text" translatable="yes">Toggle sub-tasks</property>
-            <style>
-              <class name="flat"/>
-              <class name="circular"/>
-              <class name="expand-btn"/>
-            </style>
-            <signal name="clicked" handler="on_expand_btn_clicked"/>
-          </object>
-        </child>
-        <!-- Mark as completed button -->
-        <child>
-          <object class="GtkCheckButton" id="task_completed_btn">
-            <property name="valign">center</property>
-            <property name="tooltip-text" translatable="yes">Mark as completed</property>
-            <signal name="toggled" handler="on_task_completed_btn_toggled"/>
+            </child>
+            <!-- Edit entry -->
+            <child>
+              <object class="GtkEntry" id="task_edit_entry">
+                <property name="hexpand">true</property>
+                <property name="visible">false</property>
+                <signal name="activate" handler="on_task_edit"/>
+              </object>
+            </child>
+            <!-- Edit task button -->
+            <child>
+              <object class="GtkButton" id="task_edit_btn">
+                <property name="icon-name">document-edit-symbolic</property>
+                <property name="tooltip-text" translatable="yes">Toggle edit mode</property>
+                <property name="valign">center</property>
+                <!-- <signal name="clicked" handler="on_task_edit_btn_clicked"/> -->
+                <style>
+                  <class name="flat"/>
+                </style>
+              </object>
+            </child>
+            <!-- Delete task button -->
+            <child>
+              <object class="GtkButton">
+                <property name="icon-name">user-trash-symbolic</property>
+                <property name="tooltip-text">Delete task</property>
+                <signal name="clicked" handler="on_task_delete"/>
+                <style>
+                  <class name="flat"/>
+                </style>
+              </object>
+            </child>
           </object>
         </child>
       </object>
     </child>
-    <!-- Status bar -->
     <child>
-      <object class="GtkLabel" id="task_status">
-        <property name="halign">start</property>
-        <property name="margin-bottom">10</property>
+      <object class="GtkBox">
+        <property name="margin-bottom">5</property>
         <property name="margin-start">10</property>
         <property name="margin-end">10</property>
-        <style>
-          <class name="caption"/>
-          <class name="statusbar"/>
-        </style>
+        <!-- Status bar -->
+        <child>
+          <object class="GtkLabel" id="task_status">
+            <style>
+              <class name="caption"/>
+              <class name="statusbar"/>
+            </style>
+          </object>
+        </child>
+        <!-- Remove completed button -->
+        <child>
+          <object class="GtkLabel">
+            <style>
+              <class name="caption"/>
+              <class name="statusbar"/>
+            </style>
+          </object>
+        </child>
       </object>
     </child>
     <!-- Sub tasks -->
