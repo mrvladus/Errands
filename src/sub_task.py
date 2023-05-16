@@ -6,13 +6,13 @@ from .utils import UserData, Markup
 class SubTask(Adw.Bin):
     __gtype_name__ = "SubTask"
 
-    sub_task_delete_btn = Gtk.Template.Child()
-    sub_task_text = Gtk.Template.Child()
-    sub_task_edit_box = Gtk.Template.Child()
-    sub_task_edit_entry = Gtk.Template.Child()
-    sub_task_edit_btn = Gtk.Template.Child()
     sub_task_completed_btn = Gtk.Template.Child()
+    sub_task_text = Gtk.Template.Child()
+    sub_task_edit_entry = Gtk.Template.Child()
+    sub_task_cancel_edit_btn = Gtk.Template.Child()
     sub_task_menu = Gtk.Template.Child()
+    sub_task_edit_btn = Gtk.Template.Child()
+    sub_task_delete_btn = Gtk.Template.Child()
 
     # State
     edit_mode = False
@@ -89,13 +89,15 @@ class SubTask(Adw.Bin):
 
     @Gtk.Template.Callback()
     def on_sub_task_edit_btn_clicked(self, btn):
+        # Switch edit mode
         self.edit_mode = True
         # Hide overlay, label and checkbox
         self.sub_task_menu.props.visible = False
         self.sub_task_text.props.visible = False
         self.sub_task_completed_btn.props.visible = False
-        # Show edit box
-        self.sub_task_edit_box.props.visible = True
+        # Show edit entry and button
+        self.sub_task_edit_entry.props.visible = True
+        self.sub_task_cancel_edit_btn.props.visible = True
         # Set entry text and select it
         self.sub_task_edit_entry.get_buffer().props.text = self.task["text"]
         self.sub_task_edit_entry.select_region(0, len(self.task["text"]))
@@ -103,13 +105,15 @@ class SubTask(Adw.Bin):
 
     @Gtk.Template.Callback()
     def on_sub_task_cancel_edit_btn_clicked(self, _):
+        # Switch edit mode
         self.edit_mode = False
         # Show overlay, label and checkbox
         self.sub_task_menu.props.visible = True
         self.sub_task_text.props.visible = True
         self.sub_task_completed_btn.props.visible = True
-        # Hide edit box
-        self.sub_task_edit_box.props.visible = False
+        # Show edit entry and button
+        self.sub_task_edit_entry.props.visible = False
+        self.sub_task_cancel_edit_btn.props.visible = False
 
     @Gtk.Template.Callback()
     def on_sub_task_edit(self, entry):
@@ -149,7 +153,8 @@ class SubTask(Adw.Bin):
         self.sub_task_menu.props.visible = True
         self.sub_task_text.props.visible = True
         self.sub_task_completed_btn.props.visible = True
-        # Hide edit box
-        self.sub_task_edit_box.props.visible = False
+        # Show edit entry and button
+        self.sub_task_edit_entry.props.visible = False
+        self.sub_task_cancel_edit_btn.props.visible = False
         # Switch edit mode
         self.edit_mode = False
