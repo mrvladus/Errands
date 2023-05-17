@@ -9,11 +9,12 @@
         <style>
           <class name="toolbar"/>
         </style>
-        <!-- Menu -->
+        <!-- Delete button -->
         <child>
-          <object class="GtkMenuButton">
-            <property name="icon-name">view-more-symbolic</property>
-            <property name="menu-model">sub_task_menu</property>
+          <object class="GtkButton" id="sub_task_delete_btn">
+            <property name="icon-name">user-trash-symbolic</property>
+            <property name="tooltip-text" translatable="yes">Delete</property>
+            <signal name="clicked" handler="on_sub_task_delete_btn_clicked"/>
           </object>
         </child>
         <!-- Sub-task text -->
@@ -45,6 +46,14 @@
             <signal name="clicked" handler="on_sub_task_cancel_edit_btn_clicked"/>
           </object>
         </child>
+        <!-- Edit button -->
+        <child>
+          <object class="GtkButton" id="sub_task_edit_btn">
+            <property name="icon-name">document-edit-symbolic</property>
+            <property name="tooltip-text" translatable="yes">Edit</property>
+            <signal name="clicked" handler="on_sub_task_edit_btn_clicked"/>
+          </object>
+        </child>
         <!-- Mark as completed button -->
         <child>
           <object class="GtkCheckButton" id="sub_task_completed_btn">
@@ -57,7 +66,7 @@
     </child>
   </template>
   <!-- Menu -->
-  <menu id="sub_task_menu">
+  <menu id="sub_task_menu_model">
     <section>
       <item>
         <attribute name="label" translatable="yes">Delete</attribute>
