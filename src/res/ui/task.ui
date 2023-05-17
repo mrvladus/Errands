@@ -38,141 +38,150 @@
             <property name="use-markup">true</property>
           </object>
         </child>
+        <!-- Edit entry -->
         <child>
-          <object class="GtkBox">
-            <style>
-              <class name="linked"/>
-            </style>
-            <!-- Expand button -->
-            <child>
-              <object class="GtkButton" id="expand_btn">
-                <property name="icon-name">go-down-symbolic</property>
-                <property name="tooltip-text" translatable="yes">Toggle sub-tasks</property>
-                <signal name="clicked" handler="on_expand_btn_clicked"/>
-              </object>
-            </child>
-            <!-- Accent colors menu button -->
-            <child>
-              <object class="GtkMenuButton" id="task_menu">
-                <property name="icon-name">view-more-horizontal-symbolic</property>
+          <object class="GtkEntry" id="task_edit_entry">
+            <property name="hexpand">true</property>
+            <property name="visible">false</property>
+            <signal name="activate" handler="on_task_edit"/>
+          </object>
+        </child>
+        <!-- Overlay -->
+        <child>
+          <object class="GtkOverlay">
+            <!-- Menu overlay -->
+            <child type="overlay">
+              <object class="GtkBox" id="task_menu">
+                <property name="halign">end</property>
                 <property name="valign">center</property>
-                <property name="tooltip-text">Accent color</property>
+                <!-- <property name="visible">false</property> -->
                 <style>
-                  <class name="flat"/>
+                  <class name="linked"/>
                 </style>
-                <!-- Menu popover -->
-                <property name="popover">
-                  <object class="GtkPopover" id="task_popover">
-                    <child>
-                      <object class="GtkBox">
-                        <property name="orientation">horizontal</property>
-                        <property name="halign">center</property>
-                        <style>
-                          <class name="toolbar"/>
-                        </style>
-                        <!-- Clear style button -->
+                <!-- Accent colors menu button -->
+                <child>
+                  <object class="GtkMenuButton" id="accent_colors_menu">
+                    <property name="icon-name">view-more-horizontal-symbolic</property>
+                    <property name="valign">center</property>
+                    <property name="tooltip-text">Accent color</property>
+                    <style>
+                      <class name="flat"/>
+                    </style>
+                    <!-- Menu popover -->
+                    <property name="popover">
+                      <object class="GtkPopover" id="task_popover">
                         <child>
-                          <object class="GtkButton">
-                            <property name="icon-name">window-close-symbolic</property>
-                            <property name="tooltip-text">Clear style</property>
-                            <signal name="clicked" handler="on_style_selected"/>
+                          <object class="GtkBox">
+                            <property name="orientation">horizontal</property>
+                            <property name="halign">center</property>
                             <style>
-                              <class name="circular"/>
+                              <class name="toolbar"/>
                             </style>
-                          </object>
-                        </child>
-                        <!-- Red style button -->
-                        <child>
-                          <object class="GtkButton" id="btn_red">
-                            <style>
-                              <class name="circular"/>
-                              <class name="btn"/>
-                              <class name="btn_red"/>
-                            </style>
-                            <signal name="clicked" handler="on_style_selected"/>
-                          </object>
-                        </child>
-                        <!-- Orange style button -->
-                        <child>
-                          <object class="GtkButton">
-                            <style>
-                              <class name="circular"/>
-                              <class name="btn"/>
-                              <class name="btn_orange"/>
-                            </style>
-                            <signal name="clicked" handler="on_style_selected"/>
-                          </object>
-                        </child>
-                        <!-- Green style button -->
-                        <child>
-                          <object class="GtkButton">
-                            <style>
-                              <class name="circular"/>
-                              <class name="btn"/>
-                              <class name="btn_green"/>
-                            </style>
-                            <signal name="clicked" handler="on_style_selected"/>
-                          </object>
-                        </child>
-                        <!-- Blue style button -->
-                        <child>
-                          <object class="GtkButton">
-                            <style>
-                              <class name="circular"/>
-                              <class name="btn"/>
-                              <class name="btn_blue"/>
-                            </style>
-                            <signal name="clicked" handler="on_style_selected"/>
-                          </object>
-                        </child>
-                        <!-- Purple style button -->
-                        <child>
-                          <object class="GtkButton">
-                            <style>
-                              <class name="circular"/>
-                              <class name="btn"/>
-                              <class name="btn_purple"/>
-                            </style>
-                            <signal name="clicked" handler="on_style_selected"/>
+                            <!-- Clear style button -->
+                            <child>
+                              <object class="GtkButton">
+                                <property name="icon-name">window-close-symbolic</property>
+                                <property name="tooltip-text">Clear style</property>
+                                <signal name="clicked" handler="on_style_selected"/>
+                                <style>
+                                  <class name="circular"/>
+                                </style>
+                              </object>
+                            </child>
+                            <!-- Red style button -->
+                            <child>
+                              <object class="GtkButton" id="btn_red">
+                                <style>
+                                  <class name="circular"/>
+                                  <class name="btn"/>
+                                  <class name="btn_red"/>
+                                </style>
+                                <signal name="clicked" handler="on_style_selected"/>
+                              </object>
+                            </child>
+                            <!-- Orange style button -->
+                            <child>
+                              <object class="GtkButton">
+                                <style>
+                                  <class name="circular"/>
+                                  <class name="btn"/>
+                                  <class name="btn_orange"/>
+                                </style>
+                                <signal name="clicked" handler="on_style_selected"/>
+                              </object>
+                            </child>
+                            <!-- Green style button -->
+                            <child>
+                              <object class="GtkButton">
+                                <style>
+                                  <class name="circular"/>
+                                  <class name="btn"/>
+                                  <class name="btn_green"/>
+                                </style>
+                                <signal name="clicked" handler="on_style_selected"/>
+                              </object>
+                            </child>
+                            <!-- Blue style button -->
+                            <child>
+                              <object class="GtkButton">
+                                <style>
+                                  <class name="circular"/>
+                                  <class name="btn"/>
+                                  <class name="btn_blue"/>
+                                </style>
+                                <signal name="clicked" handler="on_style_selected"/>
+                              </object>
+                            </child>
+                            <!-- Purple style button -->
+                            <child>
+                              <object class="GtkButton">
+                                <style>
+                                  <class name="circular"/>
+                                  <class name="btn"/>
+                                  <class name="btn_purple"/>
+                                </style>
+                                <signal name="clicked" handler="on_style_selected"/>
+                              </object>
+                            </child>
                           </object>
                         </child>
                       </object>
-                    </child>
+                    </property>
                   </object>
-                </property>
+                </child>
+                <!-- Edit task button -->
+                <child>
+                  <object class="GtkButton" id="task_edit_btn">
+                    <property name="icon-name">document-edit-symbolic</property>
+                    <property name="tooltip-text" translatable="yes">Toggle edit mode</property>
+                    <property name="valign">center</property>
+                    <signal name="clicked" handler="on_task_edit_btn_clicked"/>
+                    <style>
+                      <class name="flat"/>
+                    </style>
+                  </object>
+                </child>
+                <!-- Delete task button -->
+                <child>
+                  <object class="GtkButton">
+                    <property name="icon-name">user-trash-symbolic</property>
+                    <property name="tooltip-text">Delete task</property>
+                    <signal name="clicked" handler="on_task_delete"/>
+                    <style>
+                      <class name="flat"/>
+                    </style>
+                  </object>
+                </child>
               </object>
             </child>
-            <!-- Edit entry -->
-            <child>
-              <object class="GtkEntry" id="task_edit_entry">
-                <property name="hexpand">true</property>
-                <property name="visible">false</property>
-                <signal name="activate" handler="on_task_edit"/>
-              </object>
-            </child>
-            <!-- Edit task button -->
-            <child>
-              <object class="GtkButton" id="task_edit_btn">
-                <property name="icon-name">document-edit-symbolic</property>
-                <property name="tooltip-text" translatable="yes">Toggle edit mode</property>
-                <property name="valign">center</property>
-                <!-- <signal name="clicked" handler="on_task_edit_btn_clicked"/> -->
-                <style>
-                  <class name="flat"/>
-                </style>
-              </object>
-            </child>
-            <!-- Delete task button -->
-            <child>
-              <object class="GtkButton">
-                <property name="icon-name">user-trash-symbolic</property>
-                <property name="tooltip-text">Delete task</property>
-                <signal name="clicked" handler="on_task_delete"/>
-                <style>
-                  <class name="flat"/>
-                </style>
-              </object>
-            </child>
+          </object>
+        </child>
+        <!-- Expand button -->
+        <child>
+          <object class="GtkButton" id="expand_btn">
+            <property name="icon-name">go-down-symbolic</property>
+            <property name="tooltip-text" translatable="yes">Toggle sub-tasks</property>
+            <signal name="clicked" handler="on_expand_btn_clicked"/>
           </object>
         </child>
       </object>
@@ -185,15 +194,6 @@
         <!-- Status bar -->
         <child>
           <object class="GtkLabel" id="task_status">
-            <style>
-              <class name="caption"/>
-              <class name="statusbar"/>
-            </style>
-          </object>
-        </child>
-        <!-- Remove completed button -->
-        <child>
-          <object class="GtkLabel">
             <style>
               <class name="caption"/>
               <class name="statusbar"/>

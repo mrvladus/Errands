@@ -1,4 +1,4 @@
-from gi.repository import Gtk, Adw
+from gi.repository import Gtk, Adw, Gio
 from .utils import UserData, Markup
 
 
@@ -10,9 +10,6 @@ class SubTask(Adw.Bin):
     sub_task_text = Gtk.Template.Child()
     sub_task_edit_entry = Gtk.Template.Child()
     sub_task_cancel_edit_btn = Gtk.Template.Child()
-    sub_task_menu = Gtk.Template.Child()
-    sub_task_edit_btn = Gtk.Template.Child()
-    sub_task_delete_btn = Gtk.Template.Child()
 
     # State
     edit_mode = False
@@ -30,18 +27,20 @@ class SubTask(Adw.Bin):
             self.sub_task_completed_btn.props.active = True
         # Set text
         self.sub_task_text.props.label = self.text
-        # Setup overlay menu
-        self.ctrl = Gtk.EventControllerMotion()
-        self.ctrl.connect("enter", self.show_menu)
-        self.ctrl.connect("leave", self.hide_menu)
-        self.add_controller(self.ctrl)
+        self.setup_actions()
 
-    def show_menu(self, *args):
-        if not self.edit_mode:
-            self.sub_task_menu.props.visible = True
-
-    def hide_menu(self, *args):
-        self.sub_task_menu.props.visible = False
+    def setup_actions(self):
+        ag = Gio.SimpleActionGroup()
+        # Edit action
+        edit_action = Gio.SimpleAction.new("edit", None)
+        edit_action.connect("activate", self.on_sub_task_edit_clicked)
+        ag.add_action(edit_action)
+        # Delete action
+        delete_action = Gio.SimpleAction.new("delete", None)
+        delete_action.connect("activate", self.on_sub_task_delete_clicked)
+        ag.add_action(delete_action)
+        # Add actions
+        self.insert_action_group("sub_task", ag)
 
     def update_sub_task(self, new_sub_task):
         new_data = UserData.get()
@@ -69,8 +68,7 @@ class SubTask(Adw.Bin):
             self.parent.update_statusbar()
         self.sub_task_text.props.label = self.text
 
-    @Gtk.Template.Callback()
-    def on_sub_task_delete_btn_clicked(self, btn):
+    def on_sub_task_delete_clicked(self, *args):
         # Remove sub-task data
         new_data = UserData.get()
         for task in new_data["tasks"]:
@@ -87,12 +85,10 @@ class SubTask(Adw.Bin):
         # Remove sub-task widget
         self.parent.sub_tasks.remove(self)
 
-    @Gtk.Template.Callback()
-    def on_sub_task_edit_btn_clicked(self, btn):
+    def on_sub_task_edit_clicked(self, *args):
         # Switch edit mode
         self.edit_mode = True
-        # Hide overlay, label and checkbox
-        self.sub_task_menu.props.visible = False
+        # Hide label and checkbox
         self.sub_task_text.props.visible = False
         self.sub_task_completed_btn.props.visible = False
         # Show edit entry and button
@@ -107,11 +103,10 @@ class SubTask(Adw.Bin):
     def on_sub_task_cancel_edit_btn_clicked(self, _):
         # Switch edit mode
         self.edit_mode = False
-        # Show overlay, label and checkbox
-        self.sub_task_menu.props.visible = True
+        # Show label and checkbox
         self.sub_task_text.props.visible = True
         self.sub_task_completed_btn.props.visible = True
-        # Show edit entry and button
+        # Hide edit entry and button
         self.sub_task_edit_entry.props.visible = False
         self.sub_task_cancel_edit_btn.props.visible = False
 
@@ -150,10 +145,9 @@ class SubTask(Adw.Bin):
         # Set text
         self.sub_task_text.props.label = self.text
         # Show overlay, label and checkbox
-        self.sub_task_menu.props.visible = True
         self.sub_task_text.props.visible = True
         self.sub_task_completed_btn.props.visible = True
-        # Show edit entry and button
+        # Hide edit entry and button
         self.sub_task_edit_entry.props.visible = False
         self.sub_task_cancel_edit_btn.props.visible = False
         # Switch edit mode

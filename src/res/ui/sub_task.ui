@@ -9,21 +9,18 @@
         <style>
           <class name="toolbar"/>
         </style>
-        <!-- Mark as completed button -->
+        <!-- Menu -->
         <child>
-          <object class="GtkCheckButton" id="sub_task_completed_btn">
-            <property name="valign">center</property>
-            <property name="tooltip-text" translatable="yes">Mark as completed</property>
-            <signal name="toggled" handler="on_completed_btn_toggled"/>
+          <object class="GtkMenuButton">
+            <property name="icon-name">view-more-symbolic</property>
+            <property name="menu-model">sub_task_menu</property>
           </object>
         </child>
         <!-- Sub-task text -->
         <child>
           <object class="GtkLabel" id="sub_task_text">
-            <property name="margin-top">15</property>
-            <property name="margin-bottom">15</property>
             <property name="wrap">true</property>
-            <property name="wrap-mode">1</property>
+            <property name="wrap-mode">2</property>
             <property name="hexpand">true</property>
             <property name="halign">start</property>
             <property name="valign">center</property>
@@ -48,41 +45,28 @@
             <signal name="clicked" handler="on_sub_task_cancel_edit_btn_clicked"/>
           </object>
         </child>
-        <!-- Overlay -->
+        <!-- Mark as completed button -->
         <child>
-          <object class="GtkOverlay">
-            <!-- Menu overlay -->
-            <child type="overlay">
-              <object class="GtkBox" id="sub_task_menu">
-                <property name="halign">end</property>
-                <property name="valign">center</property>
-                <property name="visible">false</property>
-                <style>
-                  <class name="linked"/>
-                </style>
-                <!-- Edit sub-task button -->
-                <child>
-                  <object class="GtkButton" id="sub_task_edit_btn">
-                    <property name="icon-name">document-edit-symbolic</property>
-                    <property name="tooltip-text" translatable="yes">Toggle edit mode</property>
-                    <property name="valign">center</property>
-                    <signal name="clicked" handler="on_sub_task_edit_btn_clicked"/>
-                  </object>
-                </child>
-                <!-- Delete sub-task button -->
-                <child>
-                  <object class="GtkButton" id="sub_task_delete_btn">
-                    <property name="icon-name">user-trash-symbolic</property>
-                    <property name="tooltip-text" translatable="yes">Delete sub-task</property>
-                    <property name="valign">center</property>
-                    <signal name="clicked" handler="on_sub_task_delete_btn_clicked"/>
-                  </object>
-                </child>
-              </object>
-            </child>
+          <object class="GtkCheckButton" id="sub_task_completed_btn">
+            <property name="valign">center</property>
+            <property name="tooltip-text" translatable="yes">Mark as completed</property>
+            <signal name="toggled" handler="on_completed_btn_toggled"/>
           </object>
         </child>
       </object>
     </child>
   </template>
+  <!-- Menu -->
+  <menu id="sub_task_menu">
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">Delete</attribute>
+        <attribute name="action">sub_task.delete</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Edit</attribute>
+        <attribute name="action">sub_task.edit</attribute>
+      </item>
+    </section>
+  </menu>
 </interface>

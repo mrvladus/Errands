@@ -15,6 +15,7 @@ class Task(Gtk.Box):
     task_status = Gtk.Template.Child()
     sub_tasks_revealer = Gtk.Template.Child()
     sub_tasks = Gtk.Template.Child()
+    accent_colors_menu = Gtk.Template.Child()
 
     def __init__(self, task: dict, parent):
         super().__init__()
@@ -138,6 +139,10 @@ class Task(Gtk.Box):
         self.update_statusbar()
         # Clear entry
         entry.get_buffer().props.text = ""
+
+    @Gtk.Template.Callback()
+    def on_task_edit_btn_clicked(self, _):
+        pass
 
     @Gtk.Template.Callback()
     def on_task_edit(self, entry):
