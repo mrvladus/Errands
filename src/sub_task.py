@@ -13,9 +13,6 @@ class SubTask(Adw.Bin):
     sub_task_cancel_edit_btn = Gtk.Template.Child()
     sub_task_edit_btn = Gtk.Template.Child()
 
-    # State
-    edit_mode = False
-
     def __init__(self, task: dict, parent):
         super().__init__()
         print("Add sub-task: ", task)
@@ -76,8 +73,6 @@ class SubTask(Adw.Bin):
 
     @Gtk.Template.Callback()
     def on_sub_task_edit_btn_clicked(self, *args):
-        # Switch edit mode
-        self.edit_mode = True
         # Hide menu, label and checkbox
         self.sub_task_delete_btn.props.visible = False
         self.sub_task_text.props.visible = False
@@ -93,8 +88,6 @@ class SubTask(Adw.Bin):
 
     @Gtk.Template.Callback()
     def on_sub_task_cancel_edit_btn_clicked(self, _):
-        # Switch edit mode
-        self.edit_mode = False
         # Show menu, label and checkbox
         self.sub_task_delete_btn.props.visible = True
         self.sub_task_text.props.visible = True
@@ -139,12 +132,10 @@ class SubTask(Adw.Bin):
         # Set text
         self.sub_task_text.props.label = self.text
         # Show menu, label and checkbox
-        self.sub_task_delete_btn.props.visible = False
+        self.sub_task_delete_btn.props.visible = True
         self.sub_task_text.props.visible = True
-        self.sub_task_edit_btn.props.visible = False
+        self.sub_task_edit_btn.props.visible = True
         self.sub_task_completed_btn.props.visible = True
         # Hide edit entry and button
         self.sub_task_edit_entry.props.visible = False
         self.sub_task_cancel_edit_btn.props.visible = False
-        # Switch edit mode
-        self.edit_mode = False

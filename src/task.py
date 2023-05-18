@@ -12,10 +12,15 @@ class Task(Gtk.Box):
     task_text = Gtk.Template.Child()
     expand_btn = Gtk.Template.Child()
     task_completed_btn = Gtk.Template.Child()
+    task_delete_btn = Gtk.Template.Child()
     task_status = Gtk.Template.Child()
     sub_tasks_revealer = Gtk.Template.Child()
     sub_tasks = Gtk.Template.Child()
-    accent_colors_menu = Gtk.Template.Child()
+    accent_colors_btn = Gtk.Template.Child()
+    task_text_box = Gtk.Template.Child()
+    task_cancel_edit_btn = Gtk.Template.Child()
+    task_edit_entry = Gtk.Template.Child()
+    task_edit_btn = Gtk.Template.Child()
 
     def __init__(self, task: dict, parent):
         super().__init__()
@@ -142,7 +147,33 @@ class Task(Gtk.Box):
 
     @Gtk.Template.Callback()
     def on_task_edit_btn_clicked(self, _):
-        pass
+        # Hide widgets
+        self.task_delete_btn.props.visible = False
+        self.task_text_box.props.visible = False
+        self.expand_btn.props.visible = False
+        self.task_completed_btn.props.visible = False
+        self.accent_colors_btn.props.visible = False
+        self.task_edit_btn.props.visible = False
+        # Show widgets
+        self.task_cancel_edit_btn.props.visible = True
+        self.task_edit_entry.props.visible = True
+        # Set entry text and select it
+        self.task_edit_entry.get_buffer().props.text = self.task["text"]
+        self.task_edit_entry.select_region(0, len(self.task["text"]))
+        self.task_edit_entry.grab_focus()
+
+    @Gtk.Template.Callback()
+    def on_task_cancel_edit_btn_clicked(self, _):
+        # Show widgets
+        self.task_delete_btn.props.visible = True
+        self.task_text_box.props.visible = True
+        self.expand_btn.props.visible = True
+        self.task_completed_btn.props.visible = True
+        self.task_edit_btn.props.visible = True
+        self.accent_colors_btn.props.visible = True
+        # Hide widgets
+        self.task_cancel_edit_btn.props.visible = False
+        self.task_edit_entry.props.visible = False
 
     @Gtk.Template.Callback()
     def on_task_edit(self, entry):
@@ -178,10 +209,16 @@ class Task(Gtk.Box):
         self.task_completed_btn.props.active = False
         # Set text
         self.task_text.props.label = self.text
-        # Clear entry
-        entry.get_buffer().props.text = ""
-        # Hide popup
-        self.task_popover.popdown()
+        # Show widgets
+        self.task_delete_btn.props.visible = True
+        self.task_text_box.props.visible = True
+        self.expand_btn.props.visible = True
+        self.task_completed_btn.props.visible = True
+        self.task_edit_btn.props.visible = True
+        self.accent_colors_btn.props.visible = True
+        # Hide widgets
+        self.task_cancel_edit_btn.props.visible = False
+        self.task_edit_entry.props.visible = False
 
     @Gtk.Template.Callback()
     def on_style_selected(self, btn):
