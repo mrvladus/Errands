@@ -21,6 +21,7 @@ class Task(Gtk.Box):
     task_cancel_edit_btn = Gtk.Template.Child()
     task_edit_entry = Gtk.Template.Child()
     task_edit_btn = Gtk.Template.Child()
+    delete_completed_btn = Gtk.Template.Child()
 
     def __init__(self, task: dict, parent):
         super().__init__()
@@ -65,6 +66,8 @@ class Task(Gtk.Box):
             self.task_status.set_label(f"Completed: {n_completed} / {n_total}")
         else:
             self.task_status.props.visible = False
+        # Show delete completed button
+        self.delete_completed_btn.props.visible = True if n_completed > 0 else False
 
     def update_task(self, new_task: dict):
         new_data = UserData.get()
@@ -78,7 +81,6 @@ class Task(Gtk.Box):
 
     @Gtk.Template.Callback()
     def on_task_delete(self, _):
-        self.task_popover.popdown()
         new_data: dict = UserData.get()
         for task in new_data["tasks"]:
             if task["text"] == self.task["text"]:
@@ -86,6 +88,31 @@ class Task(Gtk.Box):
                 break
         UserData.set(new_data)
         self.parent.remove(self)
+
+    @Gtk.Template.Callback()
+    def on_delete_completed_btn_clicked(self, _):
+        # Remove data
+        for sub in self.task["sub"]:
+            if sub["completed"]:
+                self.task["sub"].remove(sub)
+        new_data = UserData.get()
+        for i, task in enumerate(new_data["tasks"]):
+            if task["text"] == self.task["text"]:
+                new_data["tasks"][i] = self.task
+                UserData.set(new_data)
+                break
+        # Remove widgets
+        to_remove = []
+        childrens = self.sub_tasks.observe_children()
+        for i in range(childrens.get_n_items()):
+            child = childrens.get_item(i)
+            if child.task["completed"]:
+                to_remove.append(child)
+        for task in to_remove:
+            print("Remove:", task.task["text"])
+            self.sub_tasks.remove(task)
+        # Update statusbar
+        self.update_statusbar()
 
     @Gtk.Template.Callback()
     def on_task_completed_btn_toggled(self, btn):

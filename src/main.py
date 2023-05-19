@@ -83,15 +83,22 @@ class Window(Adw.ApplicationWindow):
         self.create_action(
             "preferences",
             lambda *_: PreferencesWindow(self).show(),
+            ["<primary>comma"],
         )
         self.create_action("about", self.on_about_action)
-        self.create_action("quit", lambda *_: self.props.application.quit())
+        self.create_action(
+            "quit",
+            lambda *_: self.props.application.quit(),
+            ["<primary>q"],
+        )
         # Load tasks
         self.load_todos()
 
     def create_action(self, name, callback, shortcuts=None):
         action = Gio.SimpleAction.new(name, None)
         action.connect("activate", callback)
+        if shortcuts:
+            self.props.application.set_accels_for_action(f"app.{name}", shortcuts)
         self.props.application.add_action(action)
 
     def load_todos(self):

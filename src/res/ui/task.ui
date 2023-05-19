@@ -191,17 +191,42 @@
     <child>
       <object class="GtkRevealer" id="sub_tasks_revealer">
         <child>
-          <object class="GtkBox" id="sub_tasks">
+          <object class="GtkBox">
             <property name="orientation">vertical</property>
-            <property name="spacing">0</property>
-            <!-- Sub task entry -->
+            <!-- Entry -->
             <child>
-              <object class="GtkEntry">
-                <property name="placeholder-text" translatable="yes">Add new sub-task</property>
-                <property name="margin-bottom">5</property>
-                <property name="margin-start">5</property>
-                <property name="margin-end">5</property>
-                <signal name="activate" handler="on_sub_task_added"/>
+              <object class="GtkBox">
+                <property name="orientation">vertical</property>
+                <child>
+                  <object class="GtkBox">
+                    <style>
+                      <class name="toolbar"/>
+                    </style>
+                    <!-- Sub task entry -->
+                    <child>
+                      <object class="GtkEntry">
+                        <property name="placeholder-text" translatable="yes">Add new sub-task</property>
+                        <property name="hexpand">true</property>
+                        <signal name="activate" handler="on_sub_task_added"/>
+                      </object>
+                    </child>
+                    <!-- Delete completed sub-tasks button -->
+                    <child>
+                      <object class="GtkButton" id="delete_completed_btn">
+                        <property name="icon-name">edit-clear-all-symbolic</property>
+                        <property name="tooltip-text">Delete completed sub-tasks</property>
+                        <property name="valign">center</property>
+                        <signal name="clicked" handler="on_delete_completed_btn_clicked"/>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <!-- Sub tasks -->
+            <child>
+              <object class="GtkBox" id="sub_tasks">
+                <property name="orientation">vertical</property>
               </object>
             </child>
           </object>
@@ -209,21 +234,4 @@
       </object>
     </child>
   </template>
-  <!-- Menu -->
-  <menu id="task_menu_model">
-    <section>
-      <item>
-        <attribute name="label" translatable="yes">Edit</attribute>
-        <attribute name="action">task.edit</attribute>
-      </item>
-      <item>
-        <attribute name="label" translatable="yes">Delete completed</attribute>
-        <attribute name="action">task.delete_completed</attribute>
-      </item>
-      <item>
-        <attribute name="label" translatable="yes">Delete task</attribute>
-        <attribute name="action">task.delete</attribute>
-      </item>
-    </section>
-  </menu>
 </interface>
