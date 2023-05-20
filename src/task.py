@@ -1,4 +1,5 @@
 from gi.repository import Gtk, Adw
+from .main import gsettings
 from .sub_task import SubTask
 from .utils import Markup, UserData
 
@@ -42,7 +43,7 @@ class Task(Adw.Bin):
         if self.task["color"] != "":
             self.task_box.add_css_class(f'task_{self.task["color"]}')
         # Expand if sub-tasks exists
-        if self.task["sub"] != []:
+        if self.task["sub"] != [] and gsettings.get_value("tasks-expanded").unpack():
             self.expand(True)
         # Add sub tasks
         for task in self.task["sub"]:

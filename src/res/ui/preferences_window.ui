@@ -33,7 +33,7 @@
                 <child type="suffix">
                   <object class="GtkCheckButton" id="light_theme">
                     <property name="group">system_theme</property>
-                    <signal name="toggled" handler="on_theme_change" swapped="no"/>
+                    <signal name="toggled" handler="on_theme_change"/>
                   </object>
                 </child>
               </object>
@@ -47,7 +47,26 @@
                 <child type="suffix">
                   <object class="GtkCheckButton" id="dark_theme">
                     <property name="group">system_theme</property>
-                    <signal name="toggled" handler="on_theme_change" swapped="no"/>
+                    <signal name="toggled" handler="on_theme_change"/>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <!-- Tasks settings -->
+        <child>
+          <object class="AdwPreferencesGroup">
+            <property name="title">Tasks</property>
+            <!-- Dark -->
+            <child>
+              <object class="AdwActionRow">
+                <property name="title">Tasks expanded on startup</property>
+                <property name="activatable-widget">tasks_expanded</property>
+                <child type="suffix">
+                  <object class="GtkSwitch" id="tasks_expanded">
+                    <property name="valign">center</property>
+                    <signal name="state-set" handler="on_tasks_expanded_toggle"/>
                   </object>
                 </child>
               </object>

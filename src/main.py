@@ -139,10 +139,12 @@ class PreferencesWindow(Adw.PreferencesWindow):
     system_theme = Gtk.Template.Child()
     light_theme = Gtk.Template.Child()
     dark_theme = Gtk.Template.Child()
+    tasks_expanded = Gtk.Template.Child()
 
     def __init__(self, win):
         super().__init__()
         self.props.transient_for = win
+        # Setup theme
         theme = gsettings.get_value("theme").unpack()
         if theme == 0:
             self.system_theme.props.active = True
@@ -150,6 +152,9 @@ class PreferencesWindow(Adw.PreferencesWindow):
             self.light_theme.props.active = True
         if theme == 4:
             self.dark_theme.props.active = True
+        # Setup tasks
+        expanded = gsettings.get_value("tasks-expanded").unpack()
+        self.tasks_expanded.props.active = expanded
 
     @Gtk.Template.Callback()
     def on_theme_change(self, btn):
@@ -162,3 +167,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
             theme = 4
         Adw.StyleManager.get_default().set_color_scheme(theme)
         gsettings.set_value("theme", GLib.Variant("i", theme))
+
+    @Gtk.Template.Callback()
+    def on_tasks_expanded_toggle(self, widget, state):
+        gsettings.set_value("tasks-expanded", GLib.Variant("b", state))
