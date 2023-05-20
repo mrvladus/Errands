@@ -1,9 +1,9 @@
-from gi.repository import Gtk, Adw, Gio
+from gi.repository import Gtk
 from .utils import UserData, Markup
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/List/sub_task.ui")
-class SubTask(Adw.Bin):
+class SubTask(Gtk.Box):
     __gtype_name__ = "SubTask"
 
     sub_task_text = Gtk.Template.Child()
@@ -12,6 +12,8 @@ class SubTask(Adw.Bin):
     sub_task_edit_entry = Gtk.Template.Child()
     sub_task_cancel_edit_btn = Gtk.Template.Child()
     sub_task_edit_btn = Gtk.Template.Child()
+    sub_task_edit_box = Gtk.Template.Child()
+    sub_task_box = Gtk.Template.Child()
 
     def __init__(self, task: dict, parent):
         super().__init__()
@@ -26,6 +28,10 @@ class SubTask(Adw.Bin):
             self.sub_task_completed_btn.props.active = True
         # Set text
         self.sub_task_text.props.label = self.text
+
+    def toggle_edit_box(self):
+        self.sub_task_edit_box.props.visible = not self.sub_task_edit_box.props.visible
+        self.sub_task_box.props.visible = not self.sub_task_box.props.visible
 
     def update_sub_task(self, new_sub_task):
         new_data = UserData.get()
@@ -73,14 +79,7 @@ class SubTask(Adw.Bin):
 
     @Gtk.Template.Callback()
     def on_sub_task_edit_btn_clicked(self, *args):
-        # Hide menu, label and checkbox
-        self.sub_task_delete_btn.props.visible = False
-        self.sub_task_text.props.visible = False
-        self.sub_task_edit_btn.props.visible = False
-        self.sub_task_completed_btn.props.visible = False
-        # Show edit entry and button
-        self.sub_task_edit_entry.props.visible = True
-        self.sub_task_cancel_edit_btn.props.visible = True
+        self.toggle_edit_box()
         # Set entry text and select it
         self.sub_task_edit_entry.get_buffer().props.text = self.task["text"]
         self.sub_task_edit_entry.select_region(0, len(self.task["text"]))
@@ -88,14 +87,7 @@ class SubTask(Adw.Bin):
 
     @Gtk.Template.Callback()
     def on_sub_task_cancel_edit_btn_clicked(self, _):
-        # Show menu, label and checkbox
-        self.sub_task_delete_btn.props.visible = True
-        self.sub_task_text.props.visible = True
-        self.sub_task_edit_btn.props.visible = True
-        self.sub_task_completed_btn.props.visible = True
-        # Hide edit entry and button
-        self.sub_task_edit_entry.props.visible = False
-        self.sub_task_cancel_edit_btn.props.visible = False
+        self.toggle_edit_box()
 
     @Gtk.Template.Callback()
     def on_sub_task_edit(self, entry):
@@ -131,11 +123,4 @@ class SubTask(Adw.Bin):
         self.sub_task_completed_btn.props.active = False
         # Set text
         self.sub_task_text.props.label = self.text
-        # Show menu, label and checkbox
-        self.sub_task_delete_btn.props.visible = True
-        self.sub_task_text.props.visible = True
-        self.sub_task_edit_btn.props.visible = True
-        self.sub_task_completed_btn.props.visible = True
-        # Hide edit entry and button
-        self.sub_task_edit_entry.props.visible = False
-        self.sub_task_cancel_edit_btn.props.visible = False
+        self.toggle_edit_box()

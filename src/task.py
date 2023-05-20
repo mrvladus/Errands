@@ -22,6 +22,7 @@ class Task(Gtk.Box):
     task_edit_entry = Gtk.Template.Child()
     task_edit_btn = Gtk.Template.Child()
     delete_completed_btn = Gtk.Template.Child()
+    delete_completed_btn_revealer = Gtk.Template.Child()
 
     def __init__(self, task: dict, parent):
         super().__init__()
@@ -67,7 +68,10 @@ class Task(Gtk.Box):
         else:
             self.task_status.props.visible = False
         # Show delete completed button
-        self.delete_completed_btn.props.visible = True if n_completed > 0 else False
+        if n_completed > 0:
+            self.delete_completed_btn_revealer.set_reveal_child(True)
+        else:
+            self.delete_completed_btn_revealer.set_reveal_child(False)
 
     def update_task(self, new_task: dict):
         new_data = UserData.get()

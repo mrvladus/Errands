@@ -196,23 +196,25 @@
             <!-- Entry -->
             <child>
               <object class="GtkBox">
-                <property name="orientation">vertical</property>
+                <!-- <property name="margin-top">5</property> -->
+                <property name="margin-bottom">5</property>
+                <property name="margin-start">5</property>
+                <property name="margin-end">5</property>
+                <!-- Sub task entry -->
                 <child>
-                  <object class="GtkBox">
-                    <style>
-                      <class name="toolbar"/>
-                    </style>
-                    <!-- Sub task entry -->
-                    <child>
-                      <object class="GtkEntry">
-                        <property name="placeholder-text" translatable="yes">Add new sub-task</property>
-                        <property name="hexpand">true</property>
-                        <signal name="activate" handler="on_sub_task_added"/>
-                      </object>
-                    </child>
-                    <!-- Delete completed sub-tasks button -->
+                  <object class="GtkEntry">
+                    <property name="placeholder-text" translatable="yes">Add new sub-task</property>
+                    <property name="hexpand">true</property>
+                    <signal name="activate" handler="on_sub_task_added"/>
+                  </object>
+                </child>
+                <!-- Delete completed sub-tasks button -->
+                <child>
+                  <object class="GtkRevealer" id="delete_completed_btn_revealer">
+                    <property name="transition-type">3</property>
                     <child>
                       <object class="GtkButton" id="delete_completed_btn">
+                        <property name="margin-start">5</property>
                         <property name="icon-name">edit-clear-all-symbolic</property>
                         <property name="tooltip-text">Delete completed sub-tasks</property>
                         <property name="valign">center</property>
@@ -223,6 +225,10 @@
                 </child>
               </object>
             </child>
+            <!-- <child> -->
+            <!--   <object class="GtkRevealer"> -->
+            <!--   </object> -->
+            <!-- </child> -->
             <!-- Sub tasks -->
             <child>
               <object class="GtkBox" id="sub_tasks">

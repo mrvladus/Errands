@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <template class="SubTask" parent="AdwBin">
+  <template class="SubTask" parent="GtkBox">
     <style>
       <class name="sub-task"/>
     </style>
+    <!-- Sub-task box -->
     <child>
-      <object class="GtkBox">
+      <object class="GtkBox" id="sub_task_box">
         <style>
           <class name="toolbar"/>
         </style>
@@ -14,6 +15,7 @@
           <object class="GtkButton" id="sub_task_delete_btn">
             <property name="icon-name">user-trash-symbolic</property>
             <property name="tooltip-text" translatable="yes">Delete</property>
+            <property name="valign">center</property>
             <signal name="clicked" handler="on_sub_task_delete_btn_clicked"/>
           </object>
         </child>
@@ -29,28 +31,12 @@
             <property name="use-markup">true</property>
           </object>
         </child>
-        <!-- Edit entry -->
-        <child>
-          <object class="GtkEntry" id="sub_task_edit_entry">
-            <property name="hexpand">true</property>
-            <property name="visible">false</property>
-            <signal name="activate" handler="on_sub_task_edit"/>
-          </object>
-        </child>
-        <!-- Cancel edit button -->
-        <child>
-          <object class="GtkButton" id="sub_task_cancel_edit_btn">
-            <property name="icon-name">edit-delete-symbolic</property>
-            <property name="tooltip-text" translatable="yes">Cancel</property>
-            <property name="visible">false</property>
-            <signal name="clicked" handler="on_sub_task_cancel_edit_btn_clicked"/>
-          </object>
-        </child>
         <!-- Edit button -->
         <child>
           <object class="GtkButton" id="sub_task_edit_btn">
             <property name="icon-name">document-edit-symbolic</property>
             <property name="tooltip-text" translatable="yes">Edit</property>
+            <property name="valign">center</property>
             <signal name="clicked" handler="on_sub_task_edit_btn_clicked"/>
           </object>
         </child>
@@ -64,18 +50,31 @@
         </child>
       </object>
     </child>
+    <!-- Sub-task edit box -->
+    <child>
+      <object class="GtkBox" id="sub_task_edit_box">
+        <property name="visible">false</property>
+        <style>
+          <class name="toolbar"/>
+        </style>
+        <!-- Edit entry -->
+        <child>
+          <object class="GtkEntry" id="sub_task_edit_entry">
+            <property name="hexpand">true</property>
+            <property name="valign">center</property>
+            <signal name="activate" handler="on_sub_task_edit"/>
+          </object>
+        </child>
+        <!-- Cancel edit button -->
+        <child>
+          <object class="GtkButton" id="sub_task_cancel_edit_btn">
+            <property name="icon-name">edit-delete-symbolic</property>
+            <property name="tooltip-text" translatable="yes">Cancel</property>
+            <property name="valign">center</property>
+            <signal name="clicked" handler="on_sub_task_cancel_edit_btn_clicked"/>
+          </object>
+        </child>
+      </object>
+    </child>
   </template>
-  <!-- Menu -->
-  <menu id="sub_task_menu_model">
-    <section>
-      <item>
-        <attribute name="label" translatable="yes">Delete</attribute>
-        <attribute name="action">sub_task.delete</attribute>
-      </item>
-      <item>
-        <attribute name="label" translatable="yes">Edit</attribute>
-        <attribute name="action">sub_task.edit</attribute>
-      </item>
-    </section>
-  </menu>
 </interface>
