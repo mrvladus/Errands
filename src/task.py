@@ -1,13 +1,14 @@
-from gi.repository import Gtk
+from gi.repository import Gtk, Adw
 from .sub_task import SubTask
 from .utils import Markup, UserData
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/List/task.ui")
-class Task(Gtk.Box):
+class Task(Adw.Bin):
     __gtype_name__ = "Task"
 
     # Template items
+    task_box = Gtk.Template.Child()
     task_popover = Gtk.Template.Child()
     task_text = Gtk.Template.Child()
     expand_btn = Gtk.Template.Child()
@@ -39,7 +40,7 @@ class Task(Gtk.Box):
         self.task_text.props.label = self.text
         # Set accent color
         if self.task["color"] != "":
-            self.add_css_class(f'task_{self.task["color"]}')
+            self.task_box.add_css_class(f'task_{self.task["color"]}')
         # Expand if sub-tasks exists
         if self.task["sub"] != []:
             self.expand(True)
@@ -260,7 +261,9 @@ class Task(Gtk.Box):
             if i.startswith("btn_"):
                 color = i.split("_")[1]
                 break
-        self.set_css_classes(["card"] if color == "" else ["card", f"task_{color}"])
+        self.task_box.set_css_classes(
+            ["card"] if color == "" else ["card", f"task_{color}"]
+        )
         # Set new color
         self.task = {
             "text": self.task["text"],

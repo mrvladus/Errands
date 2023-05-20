@@ -23,7 +23,7 @@
         <child>
           <object class="GtkLabel" id="sub_task_text">
             <property name="wrap">true</property>
-            <property name="wrap-mode">2</property>
+            <property name="wrap-mode">1</property>
             <property name="hexpand">true</property>
             <property name="halign">start</property>
             <property name="valign">center</property>
