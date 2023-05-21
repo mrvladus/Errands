@@ -22,8 +22,18 @@ class Markup:
             return False
 
     @classmethod
-    def escape(self, text: str):
+    def escape(self, text: str) -> str:
         return GLib.markup_escape_text(text)
+
+    @classmethod
+    def unescape(self, text: str) -> str:
+        new_text = text
+        new_text = new_text.replace("&amp;", "&")
+        new_text = new_text.replace("&lt;", "<")
+        new_text = new_text.replace("&gt;", ">")
+        new_text = new_text.replace("&#39;", "'")
+        new_text = new_text.replace("&apos;", "'")
+        return new_text
 
     @classmethod
     def is_crosslined(self, text: str) -> bool:
@@ -52,6 +62,13 @@ class Markup:
                 new_str.append(i)
         return " ".join(new_str)
 
+    @classmethod
+    def remove_url(self, text: str):
+        if "<a href=" in text:
+            return text.split('"')[1]
+        else:
+            return text
+
 
 class UserData:
     """Class for accessing data file with user tasks"""
@@ -70,7 +87,7 @@ class UserData:
         if not os.path.exists(self.data_dir + "/data.json"):
             with open(self.data_dir + "/data.json", "w+") as f:
                 json.dump(self.default_data, f)
-            self.convert()
+        self.convert()
 
     # Load user data from json
     @classmethod
@@ -87,7 +104,41 @@ class UserData:
         with open(self.data_dir + "/data.json", "w") as f:
             json.dump(data, f)
 
-    # Port todos from older versions (for updates)
+    # Port tasks from older versions (for updates)
     @classmethod
     def convert(self):
-        pass
+        data = self.get()
+        new_data = self.default_data
+        if data["version"].startswith("44.4"):
+            old_tasks = data["todos"]
+            for task in old_tasks:
+                old_sub_tasks = old_tasks[task]["sub"]
+                new_sub_tasks = []
+                for sub in old_sub_tasks:
+                    print("sub:", sub)
+                    new_text = Markup.unescape(sub)
+                    print("unescape:", new_text)
+                    new_text = Markup.remove_url(new_text)
+                    if Markup.is_crosslined(sub):
+                        completed = True
+                    else:
+                        completed = False
+                    new_sub_tasks.append(
+                        {
+                            "text": Markup.rm_crossline(new_text),
+                            "completed": completed,
+                        }
+                    )
+                if Markup.is_crosslined(task):
+                    completed = True
+                else:
+                    completed = False
+                new_data["tasks"].append(
+                    {
+                        "text": Markup.rm_crossline(task),
+                        "sub": new_sub_tasks,
+                        "color": old_tasks[task]["color"],
+                        "completed": completed,
+                    }
+                )
+            UserData.set(new_data)

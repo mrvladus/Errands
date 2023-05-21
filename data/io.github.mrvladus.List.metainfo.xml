@@ -23,6 +23,31 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="44.5" date="2023-05-22">
+      <description>
+        <p>UI/UX:</p>
+        <ul>
+          <li>New custom widgets for tasks</li>
+          <li>Task widgets are wider</li>
+          <li>URL's are now clickable</li>
+          <li>Better and more intuitive editing of tasks</li>
+          <li>Info of how many sub-task are completed</li>
+          <li>Button for deleting completed sub-tasks</li>
+          <li>Tasks can now be marked as completed too</li>
+        </ul>
+        <p>Settings:</p>
+        <ul>
+          <li>New setting for tasks expansion on startup</li>
+        </ul>
+      </description>
+    </release>
+    <release version="44.4.3" date="2023-05-13">
+      <description>
+        <ul>
+          <li>Fixed bug with apostrophe character being displayed incorrectly (Thanks to CastelJeremy)</li>
+        </ul>
+      </description>
+    </release>
     <release version="44.4.2" date="2023-05-10">
       <description>
         <ul>
