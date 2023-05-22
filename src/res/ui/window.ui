@@ -30,13 +30,17 @@
         </child>
         <!-- Entry -->
         <child>
-          <object class="AdwPreferencesPage">
+          <object class="AdwClamp">
+            <property name="maximum-size">800</property>
+            <property name="tightening-threshold">300</property>
+            <property name="margin-top">10</property>
+            <property name="margin-bottom">10</property>
             <child>
               <object class="AdwPreferencesGroup">
                 <child>
                   <object class="AdwEntryRow" id="entry">
                     <property name="title">Add new task</property>
-                    <signal name="entry-activated" handler="on_entry_activated" swapped="no"/>
+                    <signal name="entry-activated" handler="on_entry_activated"/>
                   </object>
                 </child>
               </object>

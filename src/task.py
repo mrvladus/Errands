@@ -1,3 +1,25 @@
+# MIT License
+
+# Copyright (c) 2023 Vlad Krupinski <mrvladus@yandex.ru>
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
 from gi.repository import Gtk, Adw
 from .main import gsettings
 from .sub_task import SubTask
@@ -28,7 +50,7 @@ class Task(Adw.Bin):
 
     def __init__(self, task: dict, parent):
         super().__init__()
-        print("Add task: ", task)
+        print("Add task:", task["text"])
         self.parent = parent
         self.task = task
         # Escape text and find URL's'
@@ -56,6 +78,19 @@ class Task(Adw.Bin):
             self.expand_btn.set_icon_name("go-up-symbolic")
         else:
             self.expand_btn.set_icon_name("go-down-symbolic")
+
+    def toggle_edit_mode(self):
+        visible = self.task_text_box.props.visible
+        # Hide widgets
+        self.task_delete_btn.props.visible = not visible
+        self.task_text_box.props.visible = not visible
+        self.expand_btn.props.visible = not visible
+        self.task_completed_btn.props.visible = not visible
+        self.accent_colors_btn.props.visible = not visible
+        self.task_edit_btn.props.visible = not visible
+        # Show widgets
+        self.task_cancel_edit_btn.props.visible = visible
+        self.task_edit_entry.props.visible = visible
 
     def update_statusbar(self):
         n_completed = 0
@@ -98,9 +133,7 @@ class Task(Adw.Bin):
     @Gtk.Template.Callback()
     def on_delete_completed_btn_clicked(self, _):
         # Remove data
-        for sub in self.task["sub"]:
-            if sub["completed"]:
-                self.task["sub"].remove(sub)
+        self.task["sub"] = [sub for sub in self.task["sub"] if not sub["completed"]]
         new_data = UserData.get()
         for i, task in enumerate(new_data["tasks"]):
             if task["text"] == self.task["text"]:
@@ -180,16 +213,7 @@ class Task(Adw.Bin):
 
     @Gtk.Template.Callback()
     def on_task_edit_btn_clicked(self, _):
-        # Hide widgets
-        self.task_delete_btn.props.visible = False
-        self.task_text_box.props.visible = False
-        self.expand_btn.props.visible = False
-        self.task_completed_btn.props.visible = False
-        self.accent_colors_btn.props.visible = False
-        self.task_edit_btn.props.visible = False
-        # Show widgets
-        self.task_cancel_edit_btn.props.visible = True
-        self.task_edit_entry.props.visible = True
+        self.toggle_edit_mode()
         # Set entry text and select it
         self.task_edit_entry.get_buffer().props.text = self.task["text"]
         self.task_edit_entry.select_region(0, len(self.task["text"]))
@@ -197,16 +221,7 @@ class Task(Adw.Bin):
 
     @Gtk.Template.Callback()
     def on_task_cancel_edit_btn_clicked(self, _):
-        # Show widgets
-        self.task_delete_btn.props.visible = True
-        self.task_text_box.props.visible = True
-        self.expand_btn.props.visible = True
-        self.task_completed_btn.props.visible = True
-        self.task_edit_btn.props.visible = True
-        self.accent_colors_btn.props.visible = True
-        # Hide widgets
-        self.task_cancel_edit_btn.props.visible = False
-        self.task_edit_entry.props.visible = False
+        self.toggle_edit_mode()
 
     @Gtk.Template.Callback()
     def on_task_edit(self, entry):
@@ -242,16 +257,7 @@ class Task(Adw.Bin):
         self.task_completed_btn.props.active = False
         # Set text
         self.task_text.props.label = self.text
-        # Show widgets
-        self.task_delete_btn.props.visible = True
-        self.task_text_box.props.visible = True
-        self.expand_btn.props.visible = True
-        self.task_completed_btn.props.visible = True
-        self.task_edit_btn.props.visible = True
-        self.accent_colors_btn.props.visible = True
-        # Hide widgets
-        self.task_cancel_edit_btn.props.visible = False
-        self.task_edit_entry.props.visible = False
+        self.toggle_edit_mode()
 
     @Gtk.Template.Callback()
     def on_style_selected(self, btn):

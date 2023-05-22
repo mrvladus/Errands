@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
   <gresource prefix="/io/github/mrvladus/List">
-    <file preprocess="xml-stripblanks" compressed="true" alias="window.ui">src/res/ui/window.ui</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="preferences_window.ui">src/res/ui/preferences_window.ui</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="task.ui">src/res/ui/task.ui</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="sub_task.ui">src/res/ui/sub_task.ui</file>
-    <file alias="styles.css">src/res/styles/styles.css</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="window.ui">ui/window.ui</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="preferences_window.ui">ui/preferences_window.ui</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="task.ui">ui/task.ui</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="sub_task.ui">ui/sub_task.ui</file>
+    <file alias="styles.css">styles/styles.css</file>
   </gresource>
 </gresources>

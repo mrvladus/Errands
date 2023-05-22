@@ -7,6 +7,8 @@
     <!-- Sub-task box -->
     <child>
       <object class="GtkBox" id="sub_task_box">
+        <property name="margin-top">5</property>
+        <property name="margin-bottom">5</property>
         <style>
           <class name="toolbar"/>
         </style>
@@ -53,6 +55,8 @@
     <!-- Sub-task edit box -->
     <child>
       <object class="GtkBox" id="sub_task_edit_box">
+        <property name="margin-top">5</property>
+        <property name="margin-bottom">5</property>
         <property name="visible">false</property>
         <style>
           <class name="toolbar"/>

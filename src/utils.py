@@ -1,3 +1,25 @@
+# MIT License
+
+# Copyright (c) 2023 Vlad Krupinski <mrvladus@yandex.ru>
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
 import os
 import json
 from gi.repository import GLib
@@ -108,37 +130,26 @@ class UserData:
     @classmethod
     def convert(self):
         data = self.get()
-        new_data = self.default_data
         if data["version"].startswith("44.4"):
+            new_data = self.default_data
             old_tasks = data["todos"]
             for task in old_tasks:
-                old_sub_tasks = old_tasks[task]["sub"]
                 new_sub_tasks = []
-                for sub in old_sub_tasks:
-                    print("sub:", sub)
+                for sub in old_tasks[task]["sub"]:
                     new_text = Markup.unescape(sub)
-                    print("unescape:", new_text)
                     new_text = Markup.remove_url(new_text)
-                    if Markup.is_crosslined(sub):
-                        completed = True
-                    else:
-                        completed = False
                     new_sub_tasks.append(
                         {
                             "text": Markup.rm_crossline(new_text),
-                            "completed": completed,
+                            "completed": True if Markup.is_crosslined(sub) else False,
                         }
                     )
-                if Markup.is_crosslined(task):
-                    completed = True
-                else:
-                    completed = False
                 new_data["tasks"].append(
                     {
                         "text": Markup.rm_crossline(task),
                         "sub": new_sub_tasks,
                         "color": old_tasks[task]["color"],
-                        "completed": completed,
+                        "completed": True if Markup.is_crosslined(task) else False,
                     }
                 )
             UserData.set(new_data)
