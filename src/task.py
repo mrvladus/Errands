@@ -19,7 +19,6 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
 from gi.repository import Gtk, Adw
 from .main import gsettings
 from .sub_task import SubTask
@@ -101,7 +100,7 @@ class Task(Adw.Bin):
                 n_completed += 1
         if n_total > 0:
             self.task_status.props.visible = True
-            self.task_status.set_label(f"Completed: {n_completed} / {n_total}")
+            self.task_status.set_label(_("Completed:") + f" {n_completed} / {n_total}")
         else:
             self.task_status.props.visible = False
         # Show delete completed button

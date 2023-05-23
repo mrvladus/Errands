@@ -17,7 +17,7 @@ class SubTask(Gtk.Box):
 
     def __init__(self, task: dict, parent):
         super().__init__()
-        print("Add sub-task: ", task)
+        print("Add sub-task: ", task["text"])
         self.parent = parent
         self.task = task
         # Escape text and find URL's'

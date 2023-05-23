@@ -1,8 +1,4 @@
 /* Task */
-.statusbar {
-    opacity: 0.5;
-}
-
 .task_red {
     background: mix(@card_bg_color, @red_1, 0.3);
 }

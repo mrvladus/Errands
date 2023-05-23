@@ -39,7 +39,7 @@
               <object class="AdwPreferencesGroup">
                 <child>
                   <object class="AdwEntryRow" id="entry">
-                    <property name="title">Add new task</property>
+                    <property name="title" translatable="yes">Add new task</property>
                     <signal name="entry-activated" handler="on_entry_activated"/>
                   </object>
                 </child>

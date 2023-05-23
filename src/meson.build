@@ -22,6 +22,7 @@ configure_file(
 
 list_sources = [
   'main.py',
+  'preferences.py',
   'sub_task.py',
   'task.py',
   'utils.py',

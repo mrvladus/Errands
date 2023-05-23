@@ -28,24 +28,26 @@ require_version("Adw", "1")
 from gi.repository import Gio, Adw, Gtk, Gdk, GLib
 
 # Global data
-VERSION = "44.5"
+VERSION = ""
 APP_ID = "io.github.mrvladus.List"
 gsettings = Gio.Settings.new(APP_ID)
 
 # Import widgets
 from .utils import UserData
 from .task import Task
+from .preferences import PreferencesWindow
 
 
 class Application(Adw.Application):
-    def __init__(self):
+    def __init__(self, _VERSION):
         super().__init__(
             application_id=APP_ID,
             flags=Gio.ApplicationFlags.DEFAULT_FLAGS,
         )
+        global VERSION
+        VERSION = _VERSION
 
     def do_activate(self):
-        print("Activate app...")
         # Initialize data.json file
         UserData.init()
         # Load css styles
@@ -70,7 +72,6 @@ class Window(Adw.ApplicationWindow):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        print("Load window...")
         # Remember window size
         gsettings.bind("width", self, "default_width", 0)
         gsettings.bind("height", self, "default_height", 0)
@@ -130,44 +131,3 @@ class Window(Adw.ApplicationWindow):
         self.tasks_list.append(Task(new_task, self.tasks_list))
         # Clear entry
         entry.props.text = ""
-
-
-@Gtk.Template(resource_path="/io/github/mrvladus/List/preferences_window.ui")
-class PreferencesWindow(Adw.PreferencesWindow):
-    __gtype_name__ = "PreferencesWindow"
-
-    system_theme = Gtk.Template.Child()
-    light_theme = Gtk.Template.Child()
-    dark_theme = Gtk.Template.Child()
-    tasks_expanded = Gtk.Template.Child()
-
-    def __init__(self, win):
-        super().__init__()
-        self.props.transient_for = win
-        # Setup theme
-        theme = gsettings.get_value("theme").unpack()
-        if theme == 0:
-            self.system_theme.props.active = True
-        if theme == 1:
-            self.light_theme.props.active = True
-        if theme == 4:
-            self.dark_theme.props.active = True
-        # Setup tasks
-        expanded = gsettings.get_value("tasks-expanded").unpack()
-        self.tasks_expanded.props.active = expanded
-
-    @Gtk.Template.Callback()
-    def on_theme_change(self, btn):
-        id = btn.get_buildable_id()
-        if id == "system_theme":
-            theme = 0
-        elif id == "light_theme":
-            theme = 1
-        elif id == "dark_theme":
-            theme = 4
-        Adw.StyleManager.get_default().set_color_scheme(theme)
-        gsettings.set_value("theme", GLib.Variant("i", theme))
-
-    @Gtk.Template.Callback()
-    def on_tasks_expanded_toggle(self, widget, state):
-        gsettings.set_value("tasks-expanded", GLib.Variant("b", state))
