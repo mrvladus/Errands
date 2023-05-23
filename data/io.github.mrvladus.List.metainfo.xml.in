@@ -32,11 +32,11 @@
   <screenshots>
     <screenshot type="default">
       <image>
-				https://github.com/mrvladus/List/blob/24ad7c229e1645ef0323f79305fd4d107496cb0a/screenshots/main.png?raw=true</image>
+				https://raw.githubusercontent.com/mrvladus/List/main/screenshots/main.png</image>
     </screenshot>
   </screenshots>
   <releases>
-    <release version="44.5" date="2023-05-24">
+    <release version="44.5" date="2023-05-23">
       <description>
         <p>UI/UX:</p>
         <ul>
