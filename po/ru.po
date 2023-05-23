@@ -1,13 +1,13 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# LIST.
+# Copyright (C) 2023
 # This file is distributed under the same license as the list package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Vlad Krupinski <mrvladus@yandex.ru>, 2023.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: list\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-23 14:04+0300\n"
+"POT-Creation-Date: 2023-05-23 19:27+0300\n"
 "PO-Revision-Date: 2023-05-23 12:49+0300\n"
 "Last-Translator: Vlad Krupinski <mrvladus@yandex.ru>\n"
 "Language-Team: \n"
@@ -19,7 +19,7 @@ msgstr ""
 "n%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
 "X-Generator: Poedit 3.1.1\n"
 
-#: src/task.py:103
+#: src/task.py:104
 msgid "Completed:"
 msgstr "Выполнено:"
 

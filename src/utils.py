@@ -130,7 +130,10 @@ class UserData:
     @classmethod
     def convert(self):
         data = self.get()
-        if data["version"].startswith("44.4") or data["version"].startswith("44.3"):
+        ver = data["version"]
+        if ver.startswith("44.1") or ver.startswith("44.2"):
+            self.set(self.default_data)
+        if ver.startswith("44.4") or ver.startswith("44.3"):
             new_data = self.default_data
             old_tasks = data["todos"]
             for task in old_tasks:
