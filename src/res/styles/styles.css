@@ -1,20 +1,21 @@
-.row_red {
+/* Task */
+.task_red {
     background: mix(@card_bg_color, @red_1, 0.3);
 }
 
-.row_orange {
+.task_orange {
     background: mix(@card_bg_color, @orange_1, 0.3);
 }
 
-.row_green {
+.task_green {
     background: mix(@card_bg_color, @green_1, 0.3);
 }
 
-.row_blue {
+.task_blue {
     background: mix(@card_bg_color, @blue_1, 0.3);
 }
 
-.row_purple {
+.task_purple {
    background: mix(@card_bg_color, @purple_1, 0.3);
 }
 
@@ -58,3 +59,9 @@
     background: shade(@purple_1, 1.2);
 }
 
+/* Sub-task */
+.sub-task {
+    border-top-width: 1px;
+    border-style: solid;
+    border-color: @card_shade_color;
+}

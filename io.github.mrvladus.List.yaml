@@ -10,9 +10,7 @@ finish-args:
   - --socket=wayland
 modules:
   - name: list
-    buildsystem: simple
-    build-commands:
-      - make install
+    buildsystem: meson
     sources:
       - type: dir
         path: .

@@ -1,0 +1,104 @@
+# LIST.
+# Copyright (C) 2023
+# This file is distributed under the same license as the list package.
+# Vlad Krupinski <mrvladus@yandex.ru>, 2023.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: list\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-05-23 19:27+0300\n"
+"PO-Revision-Date: 2023-05-23 12:49+0300\n"
+"Last-Translator: Vlad Krupinski <mrvladus@yandex.ru>\n"
+"Language-Team: \n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
+"X-Generator: Poedit 3.1.1\n"
+
+#: src/task.py:104
+msgid "Completed:"
+msgstr "Выполнено:"
+
+#: src/res/ui/window.ui:25
+msgid "Main menu"
+msgstr "Главное меню"
+
+#: src/res/ui/window.ui:42
+msgid "Add new task"
+msgstr "Добавьте задачу"
+
+#: src/res/ui/window.ui:69
+msgid "Preferences"
+msgstr "Настройки"
+
+#: src/res/ui/window.ui:73
+msgid "About List"
+msgstr "О приложении"
+
+#: src/res/ui/window.ui:77
+msgid "Quit"
+msgstr "Выход"
+
+#: src/res/ui/preferences.ui:13
+msgid "Application theme"
+msgstr "Тема"
+
+#: src/res/ui/preferences.ui:17
+msgid "System"
+msgstr "Системная"
+
+#: src/res/ui/preferences.ui:30
+msgid "Light"
+msgstr "Светлая"
+
+#: src/res/ui/preferences.ui:44
+msgid "Dark"
+msgstr "Темная"
+
+#: src/res/ui/preferences.ui:60
+msgid "Tasks"
+msgstr "Задачи"
+
+#: src/res/ui/preferences.ui:64
+msgid "Tasks expanded on startup"
+msgstr "Раскрывать подзадачи при старте"
+
+#: src/res/ui/sub_task.ui:19 src/res/ui/task.ui:28
+msgid "Delete"
+msgstr "Удалить"
+
+#: src/res/ui/sub_task.ui:40 src/res/ui/task.ui:183
+msgid "Edit"
+msgstr "Правка"
+
+#: src/res/ui/sub_task.ui:49 src/res/ui/task.ui:195
+msgid "Mark as completed"
+msgstr "Пометить как выполненное"
+
+#: src/res/ui/sub_task.ui:76 src/res/ui/task.ui:87
+msgid "Cancel"
+msgstr "Отмена"
+
+#: src/res/ui/task.ui:70
+msgid "Toggle sub-tasks"
+msgstr "Переключить подзадачи"
+
+#: src/res/ui/task.ui:98
+msgid "Accent color"
+msgstr "Цвет акцента"
+
+#: src/res/ui/task.ui:116
+msgid "Clear style"
+msgstr "Отчистить цвет"
+
+#: src/res/ui/task.ui:216
+msgid "Add new sub-task"
+msgstr "Добавьте подзадачу"
+
+#: src/res/ui/task.ui:229
+msgid "Delete completed sub-tasks"
+msgstr "Удалить выполненные подзадачи"

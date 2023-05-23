@@ -6,23 +6,65 @@
   <content_rating type="oars-1.1"/>
   <developer_name>Vlad Krupinski</developer_name>
   <url type="homepage">https://github.com/mrvladus/List</url>
+  <url type="bugtracker">https://github.com/mrvladus/List/issues</url>
   <launchable type="desktop-id">io.github.mrvladus.List.desktop</launchable>
+  <custom>
+    <value key="Purism::form_factor">workstation</value>
+    <value key="Purism::form_factor">mobile</value>
+  </custom>
   <provides>
     <binary>list</binary>
   </provides>
+  <categories>
+      <category>Utility</category>
+  </categories>
   <name>List</name>
   <summary>Focus on your tasks.</summary>
   <description>
     <p>Todo application for those who prefer simplicity.</p>
-    <p>Add and edit tasks and sub-tasks, change accent colors, remove completed.</p>
+    <p>Features:</p>
+    <ul>
+      <li>Add, remove, edit tasks and sub-tasks</li>
+      <li>Mark task and sub-tasks as completed</li>
+      <li>Add accent color for each task</li>
+    </ul>
   </description>
   <screenshots>
     <screenshot type="default">
       <image>
-				https://github.com/mrvladus/List/blob/24ad7c229e1645ef0323f79305fd4d107496cb0a/screenshots/main.png?raw=true</image>
+				https://raw.githubusercontent.com/mrvladus/List/main/screenshots/main.png</image>
     </screenshot>
   </screenshots>
   <releases>
+    <release version="44.5" date="2023-05-23">
+      <description>
+        <p>UI/UX:</p>
+        <ul>
+          <li>New custom widgets for tasks</li>
+          <li>Task widgets are wider</li>
+          <li>URL's are now clickable</li>
+          <li>Better and more intuitive editing of tasks</li>
+          <li>Info of how many sub-task are completed</li>
+          <li>Button for deleting completed sub-tasks</li>
+          <li>Tasks can now be marked as completed too</li>
+          <li>Fixed icon size</li>
+        </ul>
+        <p>Settings:</p>
+        <ul>
+          <li>New setting for tasks expansion on startup</li>
+        </ul>
+        <p>Translations:</p>
+        <ul>
+          <li>You can now help translate this application! For more info visit GitHub project page.</li>
+          <li>Added Russian translation.</li>
+        </ul>
+        <p>Backend:</p>
+        <ul>
+          <li>Rewritten most of the app. Reorganized project structure.</li>
+          <li>Use Meson build system instead of Make.</li>
+        </ul>
+      </description>
+    </release>
     <release version="44.4.3" date="2023-05-13">
       <description>
         <ul>

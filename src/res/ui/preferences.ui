@@ -10,16 +10,16 @@
         <!-- Theme -->
         <child>
           <object class="AdwPreferencesGroup">
-            <property name="title">Application theme</property>
+            <property name="title" translatable="yes">Application theme</property>
             <!-- System -->
             <child>
               <object class="AdwActionRow">
-                <property name="title">System</property>
+                <property name="title" translatable="yes">System</property>
                 <property name="activatable-widget">system_theme</property>
                 <property name="icon-name">applications-system-symbolic</property>
                 <child type="suffix">
                   <object class="GtkCheckButton" id="system_theme">
-                    <signal name="toggled" handler="on_theme_change" swapped="no"/>
+                    <signal name="toggled" handler="on_theme_change"/>
                   </object>
                 </child>
               </object>
@@ -27,13 +27,13 @@
             <!-- Light -->
             <child>
               <object class="AdwActionRow">
-                <property name="title">Light</property>
+                <property name="title" translatable="yes">Light</property>
                 <property name="activatable-widget">light_theme</property>
                 <property name="icon-name">display-brightness-symbolic</property>
                 <child type="suffix">
                   <object class="GtkCheckButton" id="light_theme">
                     <property name="group">system_theme</property>
-                    <signal name="toggled" handler="on_theme_change" swapped="no"/>
+                    <signal name="toggled" handler="on_theme_change"/>
                   </object>
                 </child>
               </object>
@@ -41,13 +41,32 @@
             <!-- Dark -->
             <child>
               <object class="AdwActionRow">
-                <property name="title">Dark</property>
+                <property name="title" translatable="yes">Dark</property>
                 <property name="activatable-widget">dark_theme</property>
                 <property name="icon-name">weather-clear-night-symbolic</property>
                 <child type="suffix">
                   <object class="GtkCheckButton" id="dark_theme">
                     <property name="group">system_theme</property>
-                    <signal name="toggled" handler="on_theme_change" swapped="no"/>
+                    <signal name="toggled" handler="on_theme_change"/>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <!-- Tasks settings -->
+        <child>
+          <object class="AdwPreferencesGroup">
+            <property name="title" translatable="yes">Tasks</property>
+            <!-- Dark -->
+            <child>
+              <object class="AdwActionRow">
+                <property name="title" translatable="yes">Tasks expanded on startup</property>
+                <property name="activatable-widget">tasks_expanded</property>
+                <child type="suffix">
+                  <object class="GtkSwitch" id="tasks_expanded">
+                    <property name="valign">center</property>
+                    <!-- <signal name="state-set" handler="on_tasks_expanded_toggle"/> -->
                   </object>
                 </child>
               </object>

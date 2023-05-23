@@ -4,5 +4,5 @@ Exec=list
 Icon=io.github.mrvladus.List
 Terminal=false
 Type=Application
-Categories=Office;
+Categories=GNOME;GTK;Utility;
 StartupNotify=true
