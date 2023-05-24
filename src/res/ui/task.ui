@@ -120,22 +120,12 @@
                                 </style>
                               </object>
                             </child>
-                            <!-- Red style button -->
+                            <!-- Blue style button -->
                             <child>
                               <object class="GtkButton">
                                 <style>
                                   <class name="circular"/>
-                                  <class name="btn_red"/>
-                                </style>
-                                <signal name="clicked" handler="on_style_selected"/>
-                              </object>
-                            </child>
-                            <!-- Orange style button -->
-                            <child>
-                              <object class="GtkButton">
-                                <style>
-                                  <class name="circular"/>
-                                  <class name="btn_orange"/>
+                                  <class name="btn_blue"/>
                                 </style>
                                 <signal name="clicked" handler="on_style_selected"/>
                               </object>
@@ -150,12 +140,32 @@
                                 <signal name="clicked" handler="on_style_selected"/>
                               </object>
                             </child>
-                            <!-- Blue style button -->
+                            <!-- Yellow style button -->
                             <child>
                               <object class="GtkButton">
                                 <style>
                                   <class name="circular"/>
-                                  <class name="btn_blue"/>
+                                  <class name="btn_yellow"/>
+                                </style>
+                                <signal name="clicked" handler="on_style_selected"/>
+                              </object>
+                            </child>
+                            <!-- Orange style button -->
+                            <child>
+                              <object class="GtkButton">
+                                <style>
+                                  <class name="circular"/>
+                                  <class name="btn_orange"/>
+                                </style>
+                                <signal name="clicked" handler="on_style_selected"/>
+                              </object>
+                            </child>
+                            <!-- Red style button -->
+                            <child>
+                              <object class="GtkButton">
+                                <style>
+                                  <class name="circular"/>
+                                  <class name="btn_red"/>
                                 </style>
                                 <signal name="clicked" handler="on_style_selected"/>
                               </object>
