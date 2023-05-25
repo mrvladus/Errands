@@ -28,7 +28,7 @@ from .utils import UserData, Markup
 class SubTask(Gtk.Box):
     __gtype_name__ = "SubTask"
 
-    sub_task_box = Gtk.Template.Child()
+    sub_task_main_box = Gtk.Template.Child()
     sub_task_text = Gtk.Template.Child()
     sub_task_delete_btn = Gtk.Template.Child()
     sub_task_completed_btn = Gtk.Template.Child()
@@ -56,7 +56,7 @@ class SubTask(Gtk.Box):
 
     def toggle_edit_box(self):
         self.sub_task_edit_box.props.visible = not self.sub_task_edit_box.props.visible
-        self.sub_task_box.props.visible = not self.sub_task_box.props.visible
+        self.sub_task_main_box.props.visible = not self.sub_task_main_box.props.visible
 
     def update_sub_task(self, new_sub_task):
         new_data = UserData.get()
@@ -177,14 +177,14 @@ class SubTask(Gtk.Box):
             new_data["tasks"][task_idx]["sub"][sub_idx - 1],
         )
         UserData.set(new_data)
-        # Update parent tasks
+        # Update parent task
         self.parent.task["sub"] = new_data["tasks"][task_idx]["sub"]
         # Update buttons
         self.update_move_buttons()
+        self.get_next_sibling().update_move_buttons()
 
     @Gtk.Template.Callback()
     def on_sub_task_move_down_btn_clicked(self, btn):
-        new_data = UserData.get()
         if self.parent.task["sub"].index(self.task) + 1 == len(self.parent.task["sub"]):
             return
         print(f"""Move task "{self.task['text']}" down""")
@@ -202,7 +202,8 @@ class SubTask(Gtk.Box):
             new_data["tasks"][task_idx]["sub"][sub_idx + 1],
         )
         UserData.set(new_data)
-        # Update parent tasks
+        # Update parent task
         self.parent.task["sub"] = new_data["tasks"][task_idx]["sub"]
         # Update buttons
         self.update_move_buttons()
+        self.get_prev_sibling().update_move_buttons()

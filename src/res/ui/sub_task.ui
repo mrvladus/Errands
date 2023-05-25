@@ -6,7 +6,7 @@
     </style>
     <!-- Sub-task box -->
     <child>
-      <object class="GtkBox" id="sub_task_box">
+      <object class="GtkBox" id="sub_task_main_box">
         <property name="margin-top">5</property>
         <property name="margin-bottom">5</property>
         <style>
