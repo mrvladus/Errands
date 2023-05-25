@@ -107,12 +107,9 @@ class Task(Adw.Bin):
             self.delete_completed_btn_revealer.set_reveal_child(False)
 
     def update_task(self, new_task: dict):
-        new_data = UserData.get()
-        for i, task in enumerate(new_data["tasks"]):
-            if task["text"] == self.task["text"]:
-                new_data["tasks"][i] = new_task
-                UserData.set(new_data)
-                return
+        new_data: dict = UserData.get()
+        new_data["tasks"][new_data["tasks"].index(self.task)] = new_task
+        UserData.set(new_data)
 
     def update_move_buttons(self):
         data = UserData.get()
@@ -126,23 +123,17 @@ class Task(Adw.Bin):
     @Gtk.Template.Callback()
     def on_task_delete(self, _):
         new_data: dict = UserData.get()
-        for task in new_data["tasks"]:
-            if task["text"] == self.task["text"]:
-                new_data["tasks"].remove(task)
-                break
+        new_data["tasks"].remove(self.task)
         UserData.set(new_data)
         self.parent.remove(self)
 
     @Gtk.Template.Callback()
     def on_delete_completed_btn_clicked(self, _):
         # Remove data
-        self.task["sub"] = [sub for sub in self.task["sub"] if not sub["completed"]]
         new_data = UserData.get()
-        for i, task in enumerate(new_data["tasks"]):
-            if task["text"] == self.task["text"]:
-                new_data["tasks"][i] = self.task
-                UserData.set(new_data)
-                break
+        idx = new_data["tasks"].index(self.task)
+        self.task["sub"] = [sub for sub in self.task["sub"] if not sub["completed"]]
+        new_data["tasks"][idx] = self.task
         # Remove widgets
         to_remove = []
         childrens = self.sub_tasks.observe_children()
