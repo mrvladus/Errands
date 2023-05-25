@@ -28,14 +28,16 @@ from .utils import UserData, Markup
 class SubTask(Gtk.Box):
     __gtype_name__ = "SubTask"
 
+    sub_task_box = Gtk.Template.Child()
     sub_task_text = Gtk.Template.Child()
     sub_task_delete_btn = Gtk.Template.Child()
     sub_task_completed_btn = Gtk.Template.Child()
-    sub_task_edit_entry = Gtk.Template.Child()
-    sub_task_cancel_edit_btn = Gtk.Template.Child()
     sub_task_edit_btn = Gtk.Template.Child()
     sub_task_edit_box = Gtk.Template.Child()
-    sub_task_box = Gtk.Template.Child()
+    sub_task_edit_entry = Gtk.Template.Child()
+    sub_task_move_up_btn = Gtk.Template.Child()
+    sub_task_move_down_btn = Gtk.Template.Child()
+    sub_task_cancel_edit_btn = Gtk.Template.Child()
 
     def __init__(self, task: dict, parent):
         super().__init__()
@@ -50,6 +52,7 @@ class SubTask(Gtk.Box):
             self.sub_task_completed_btn.props.active = True
         # Set text
         self.sub_task_text.props.label = self.text
+        self.update_move_buttons()
 
     def toggle_edit_box(self):
         self.sub_task_edit_box.props.visible = not self.sub_task_edit_box.props.visible
@@ -66,6 +69,14 @@ class SubTask(Gtk.Box):
                         # Update parent data
                         self.parent.task["sub"] = task["sub"]
                         return
+
+    def update_move_buttons(self):
+        idx = self.parent.task["sub"].index(self.task)
+        length = len(self.parent.task)
+        self.sub_task_move_up_btn.props.sensitive = False if idx == 0 else True
+        self.sub_task_move_down_btn.props.sensitive = (
+            False if idx == length - 1 else True
+        )
 
     @Gtk.Template.Callback()
     def on_completed_btn_toggled(self, btn):
@@ -146,3 +157,52 @@ class SubTask(Gtk.Box):
         # Set text
         self.sub_task_text.props.label = self.text
         self.toggle_edit_box()
+
+    @Gtk.Template.Callback()
+    def on_sub_task_move_up_btn_clicked(self, btn):
+        if self.parent.task["sub"].index(self.task) == 0:
+            return
+        print(f"""Move task "{self.task['text']}" up""")
+        # Move widget
+        self.parent.sub_tasks.reorder_child_after(self.get_prev_sibling(), self)
+        # Update data
+        new_data = UserData.get()
+        task_idx = new_data["tasks"].index(self.parent.task)
+        sub_idx = new_data["tasks"][task_idx]["sub"].index(self.task)
+        (
+            new_data["tasks"][task_idx]["sub"][sub_idx - 1],
+            new_data["tasks"][task_idx]["sub"][sub_idx],
+        ) = (
+            new_data["tasks"][task_idx]["sub"][sub_idx],
+            new_data["tasks"][task_idx]["sub"][sub_idx - 1],
+        )
+        UserData.set(new_data)
+        # Update parent tasks
+        self.parent.task["sub"] = new_data["tasks"][task_idx]["sub"]
+        # Update buttons
+        self.update_move_buttons()
+
+    @Gtk.Template.Callback()
+    def on_sub_task_move_down_btn_clicked(self, btn):
+        new_data = UserData.get()
+        if self.parent.task["sub"].index(self.task) + 1 == len(self.parent.task["sub"]):
+            return
+        print(f"""Move task "{self.task['text']}" down""")
+        # Move widget
+        self.parent.sub_tasks.reorder_child_after(self, self.get_next_sibling())
+        # Update data
+        new_data = UserData.get()
+        task_idx = new_data["tasks"].index(self.parent.task)
+        sub_idx = new_data["tasks"][task_idx]["sub"].index(self.task)
+        (
+            new_data["tasks"][task_idx]["sub"][sub_idx + 1],
+            new_data["tasks"][task_idx]["sub"][sub_idx],
+        ) = (
+            new_data["tasks"][task_idx]["sub"][sub_idx],
+            new_data["tasks"][task_idx]["sub"][sub_idx + 1],
+        )
+        UserData.set(new_data)
+        # Update parent tasks
+        self.parent.task["sub"] = new_data["tasks"][task_idx]["sub"]
+        # Update buttons
+        self.update_move_buttons()

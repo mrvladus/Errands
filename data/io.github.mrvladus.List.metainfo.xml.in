@@ -12,6 +12,11 @@
     <value key="Purism::form_factor">workstation</value>
     <value key="Purism::form_factor">mobile</value>
   </custom>
+  <recommends>
+    <control>touch</control>
+    <control>keyboard</control>
+    <control>pointing</control>
+  </recommends>
   <provides>
     <binary>list</binary>
   </provides>
