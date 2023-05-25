@@ -41,6 +41,13 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="44.5.1" date="2023-05-25">
+      <description>
+        <ul>
+          <li>Added buttons for moving tasks and sub-tasks up and down in list. To show them just click edit button.</li>
+        </ul>
+      </description>
+    </release>
     <release version="44.5" date="2023-05-23">
       <description>
         <p>UI/UX:</p>
