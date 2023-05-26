@@ -86,6 +86,7 @@
     <property name="application-name">List</property>
     <property name="application-icon">io.github.mrvladus.List</property>
     <property name="developer-name">Vlad Krupinski</property>
+    <property name="translator-credits" translatable="yes">translator-credits</property>
     <property name="copyright">© 2023 Vlad Krupinski</property>
     <property name="website">https://github.com/mrvladus/List</property>
     <property name="license-type">7</property>

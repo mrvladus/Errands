@@ -34,9 +34,9 @@ localedir = "@localedir@"
 
 sys.path.insert(1, pkgdatadir)
 signal.signal(signal.SIGINT, signal.SIG_DFL)
+gettext.install("list", localedir)
 locale.bindtextdomain("list", localedir)
 locale.textdomain("list")
-gettext.install("list", localedir)
 
 if __name__ == "__main__":
 
