@@ -45,7 +45,7 @@ To translate List to your language you can use <a href="https://flathub.org/ru/a
 - Open `po/list.pot` file.
 - Select your language and start translation. Remember to add your name and email in settings.
 - Save it in `po` directory. Turn off compilation to `.mo` files on save in settings. We dont need those.
-- Add your language in `po/LINGUAS` file separated by space. Example: `ru fr gr ...`
+- Add your language in `po/LINGUAS` file separated by new line.
 3. Test if you translation works:
 ```sh
 ./build-aux/run-flatpak.sh
