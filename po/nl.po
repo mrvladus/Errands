@@ -1,13 +1,13 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# LIST.
+# Copyright (C) 2023
 # This file is distributed under the same license as the list package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Heimen Stoffels <vistausss@fastmail.com>, 2023.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: list\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-25 14:43+0300\n"
+"POT-Creation-Date: 2023-05-25 19:12+0300\n"
 "PO-Revision-Date: 2023-05-25 16:59+0200\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: \n"
