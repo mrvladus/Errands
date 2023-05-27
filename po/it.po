@@ -1,0 +1,113 @@
+# ITALIAN TRANSLATION.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the list package.
+# ALBANO BATTISTELLA <ALBANOBATTISTELLA@GMAIL.COM>, 2023.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: list\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-05-26 17:00+0300\n"
+"PO-Revision-Date: 2023-05-27 17:34+0100\n"
+"Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
+"Language-Team: Italian <LL@li.org>\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/task.py:100
+msgid "Completed:"
+msgstr "Completata:"
+
+#: src/res/ui/window.ui:25
+msgid "Main menu"
+msgstr "Menu principale"
+
+#: src/res/ui/window.ui:42
+msgid "Add new task"
+msgstr "Aggiungi nuova attività"
+
+#: src/res/ui/window.ui:69
+msgid "Preferences"
+msgstr "Preferenze"
+
+#: src/res/ui/window.ui:73
+msgid "About List"
+msgstr "Informazioni su List"
+
+#: src/res/ui/window.ui:77
+msgid "Quit"
+msgstr "Esci"
+
+#: src/res/ui/window.ui:89
+msgid "translator-credits"
+msgstr "Albano Battistella"
+
+#: src/res/ui/preferences.ui:13
+msgid "Application theme"
+msgstr "Tema applicazione"
+
+#: src/res/ui/preferences.ui:17
+msgid "System"
+msgstr "Sistema"
+
+#: src/res/ui/preferences.ui:30
+msgid "Light"
+msgstr "Chiaro"
+
+#: src/res/ui/preferences.ui:44
+msgid "Dark"
+msgstr "Scuro"
+
+#: src/res/ui/preferences.ui:60
+msgid "Tasks"
+msgstr "Attività"
+
+#: src/res/ui/preferences.ui:64
+msgid "Tasks expanded on startup"
+msgstr "Attività ampliate all'avvio"
+
+#: src/res/ui/sub_task.ui:19 src/res/ui/task.ui:31
+msgid "Delete"
+msgstr "Cancella"
+
+#: src/res/ui/sub_task.ui:40 src/res/ui/task.ui:178
+msgid "Edit"
+msgstr "Modifica"
+
+#: src/res/ui/sub_task.ui:49 src/res/ui/task.ui:190
+msgid "Mark as completed"
+msgstr "Contrassegna come completato"
+
+#: src/res/ui/sub_task.ui:82 src/res/ui/task.ui:222
+msgid "Move up"
+msgstr "Sposto sopra"
+
+#: src/res/ui/sub_task.ui:90 src/res/ui/task.ui:230
+msgid "Move down"
+msgstr "Sposta giù"
+
+#: src/res/ui/sub_task.ui:100 src/res/ui/task.ui:240
+msgid "Cancel"
+msgstr "Cancella"
+
+#: src/res/ui/task.ui:73
+msgid "Toggle sub-tasks"
+msgstr "Attiva o disattiva le attività secondarie"
+
+#: src/res/ui/task.ui:83
+msgid "Accent color"
+msgstr "Preferenza colore"
+
+#: src/res/ui/task.ui:101
+msgid "Clear style"
+msgstr "Stile chiaro"
+
+#: src/res/ui/task.ui:264
+msgid "Add new sub-task"
+msgstr "Aggiungi una nuova attività secondaria"
+
+#: src/res/ui/task.ui:277
+msgid "Delete completed sub-tasks"
+msgstr "Elimina le attività secondarie completate"
