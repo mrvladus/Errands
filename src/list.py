@@ -49,5 +49,5 @@ if __name__ == "__main__":
 
     from list import main
 
-    app = main.Application(VERSION)
+    app = main.Application()
     sys.exit(app.run(sys.argv))

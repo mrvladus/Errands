@@ -39,13 +39,11 @@ from .preferences import PreferencesWindow
 
 
 class Application(Adw.Application):
-    def __init__(self, _VERSION):
+    def __init__(self):
         super().__init__(
             application_id=APP_ID,
             flags=Gio.ApplicationFlags.DEFAULT_FLAGS,
         )
-        global VERSION
-        VERSION = _VERSION
 
     def do_activate(self):
         # Initialize data.json file
@@ -93,7 +91,7 @@ class Window(Adw.ApplicationWindow):
             ["<primary>q"],
         )
         # Load tasks
-        self.load_todos()
+        self.load_tasks()
 
     def create_action(self, name, callback, shortcuts=None):
         action = Gio.SimpleAction.new(name, None)
@@ -102,13 +100,16 @@ class Window(Adw.ApplicationWindow):
             self.props.application.set_accels_for_action(f"app.{name}", shortcuts)
         self.props.application.add_action(action)
 
-    def load_todos(self):
+    def load_tasks(self):
         print("Loading tasks...")
         data = UserData.get()
         if data["tasks"] == []:
             return
         for task in data["tasks"]:
             self.tasks_list.append(Task(task, self.tasks_list))
+        # Update move buttons
+        if len(data["tasks"]) > 1:
+            self.tasks_list.get_first_child().update_move_buttons()
 
     def on_about_action(self, *args):
         self.about_window.props.version = VERSION
@@ -129,5 +130,8 @@ class Window(Adw.ApplicationWindow):
         new_data["tasks"].append(new_task)
         UserData.set(new_data)
         self.tasks_list.append(Task(new_task, self.tasks_list))
+        # Update move buttons
+        if len(new_data["tasks"]) > 1:
+            self.tasks_list.get_first_child().update_move_buttons()
         # Clear entry
         entry.props.text = ""

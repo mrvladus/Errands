@@ -41,17 +41,24 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="44.5.2" date="2023-05-27">
+      <description>
+        <ul>
+          <li>Bug fixes.</li>
+        </ul>
+      </description>
+    </release>
     <release version="44.5.1" date="2023-05-25">
       <description>
-      <p>UI/UX:</p>
-      <ul>
-        <li>Added buttons for moving tasks and sub-tasks up and down in list. To show them just click edit button.</li>
-      </ul>
-      <p>Translations:</p>
-      <ul>
-        <li>Added Dutch translation. Thanks to Heimen Stoffels.</li>
-        <li>Added French translation. Thanks to Jeremy Castel.</li>
-      </ul>
+        <p>UI/UX:</p>
+        <ul>
+          <li>Added buttons for moving tasks and sub-tasks up and down in list. To show them just click edit button.</li>
+        </ul>
+        <p>Translations:</p>
+        <ul>
+          <li>Added Dutch translation. Thanks to Heimen Stoffels.</li>
+          <li>Added French translation. Thanks to Jeremy Castel.</li>
+        </ul>
       </description>
     </release>
     <release version="44.5" date="2023-05-23">
