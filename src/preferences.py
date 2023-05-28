@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 from gi.repository import Adw, Gtk, GLib
-from .main import gsettings
+from .application import gsettings
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/List/preferences.ui")

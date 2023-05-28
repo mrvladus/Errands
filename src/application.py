@@ -1,5 +1,3 @@
-#!@PYTHON@
-
 # MIT License
 
 # Copyright (c) 2023 Vlad Krupinski <mrvladus@yandex.ru>
@@ -22,32 +20,39 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os
-import sys
-import signal
-import locale
-import gettext
+from gi import require_version
 
-VERSION = "@VERSION@"
-pkgdatadir = "@pkgdatadir@"
-localedir = "@localedir@"
+require_version("Gtk", "4.0")
+require_version("Adw", "1")
 
-sys.path.insert(1, pkgdatadir)
-signal.signal(signal.SIGINT, signal.SIG_DFL)
-gettext.install("list", localedir)
-locale.bindtextdomain("list", localedir)
-locale.textdomain("list")
+from gi.repository import Gio, Adw, Gtk, Gdk
 
-if __name__ == "__main__":
+# Global data
+VERSION = ""
+APP_ID = "io.github.mrvladus.List"
+gsettings = Gio.Settings.new(APP_ID)
 
-    from gi.repository import Gio
+from .utils import UserData
+from .window import Window
 
-    resource = Gio.Resource.load(
-        os.path.join(pkgdatadir, "io.github.mrvladus.List.gresource")
-    )
-    resource._register()
 
-    from list import application
+class Application(Adw.Application):
+    def __init__(self):
+        super().__init__(
+            application_id=APP_ID,
+            flags=Gio.ApplicationFlags.DEFAULT_FLAGS,
+        )
 
-    app = application.Application()
-    sys.exit(app.run(sys.argv))
+    def do_activate(self):
+        # Initialize data.json file
+        UserData.init()
+        # Load css styles
+        css_provider = Gtk.CssProvider()
+        css_provider.load_from_resource("/io/github/mrvladus/List/styles.css")
+        Gtk.StyleContext.add_provider_for_display(
+            Gdk.Display.get_default(),
+            css_provider,
+            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION,
+        )
+        # Show window
+        Window(application=self).present()

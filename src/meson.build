@@ -21,11 +21,12 @@ configure_file(
 )
 
 list_sources = [
-  'main.py',
+  'application.py',
   'preferences.py',
   'sub_task.py',
   'task.py',
   'utils.py',
+  'window.py',
 ]
 
 install_data(list_sources, install_dir: moduledir)

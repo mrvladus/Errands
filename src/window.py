@@ -20,44 +20,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from gi import require_version
-
-require_version("Gtk", "4.0")
-require_version("Adw", "1")
-
-from gi.repository import Gio, Adw, Gtk, Gdk, GLib
-
-# Global data
-VERSION = ""
-APP_ID = "io.github.mrvladus.List"
-gsettings = Gio.Settings.new(APP_ID)
-
-# Import widgets
+from gi.repository import Gio, Adw, Gtk
+from .application import gsettings, VERSION
 from .utils import UserData
 from .task import Task
 from .preferences import PreferencesWindow
-
-
-class Application(Adw.Application):
-    def __init__(self):
-        super().__init__(
-            application_id=APP_ID,
-            flags=Gio.ApplicationFlags.DEFAULT_FLAGS,
-        )
-
-    def do_activate(self):
-        # Initialize data.json file
-        UserData.init()
-        # Load css styles
-        css_provider = Gtk.CssProvider()
-        css_provider.load_from_resource("/io/github/mrvladus/List/styles.css")
-        Gtk.StyleContext.add_provider_for_display(
-            Gdk.Display.get_default(),
-            css_provider,
-            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION,
-        )
-        # Show window
-        Window(application=self).present()
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/List/window.ui")

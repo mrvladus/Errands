@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 from gi.repository import Gtk, Adw
-from .main import gsettings
+from .application import gsettings
 from .sub_task import SubTask
 from .utils import Markup, UserData
 
