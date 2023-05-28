@@ -7,7 +7,7 @@
     <property name="height-request">500</property>
     <property name="title">List</property>
     <child>
-      <object class="GtkBox" id="box">
+      <object class="GtkBox">
         <property name="orientation">vertical</property>
         <!-- Header bar -->
         <child>

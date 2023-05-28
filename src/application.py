@@ -26,10 +26,8 @@ require_version("Gtk", "4.0")
 require_version("Adw", "1")
 
 from gi.repository import Gio, Adw, Gtk, Gdk
+from __main__ import APP_ID
 
-# Global data
-VERSION = ""
-APP_ID = "io.github.mrvladus.List"
 gsettings = Gio.Settings.new(APP_ID)
 
 from .utils import UserData

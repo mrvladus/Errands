@@ -21,7 +21,8 @@
 # SOFTWARE.
 
 from gi.repository import Gio, Adw, Gtk
-from .application import gsettings, VERSION
+from __main__ import VERSION
+from .application import gsettings
 from .utils import UserData
 from .task import Task
 from .preferences import PreferencesWindow
@@ -31,7 +32,6 @@ from .preferences import PreferencesWindow
 class Window(Adw.ApplicationWindow):
     __gtype_name__ = "Window"
 
-    box = Gtk.Template.Child()
     tasks_list = Gtk.Template.Child()
     about_window = Gtk.Template.Child()
 

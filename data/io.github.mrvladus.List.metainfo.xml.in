@@ -41,7 +41,15 @@
     </screenshot>
   </screenshots>
   <releases>
-  <release version="44.5.3" date="2023-05-28">
+    <release version="44.5.4" date="2023-05-28">
+      <description>
+        <ul>
+          <li>Use Blueprint for UI files</li>
+          <li>Code cleanup</li>
+        </ul>
+      </description>
+    </release>
+    <release version="44.5.3" date="2023-05-28">
       <description>
         <ul>
           <li>Added Italian translation. Thanks to Albano Battistella.</li>

@@ -28,6 +28,7 @@ import signal
 import locale
 import gettext
 
+APP_ID = "@APP_ID@"
 VERSION = "@VERSION@"
 pkgdatadir = "@pkgdatadir@"
 localedir = "@localedir@"
@@ -42,9 +43,7 @@ if __name__ == "__main__":
 
     from gi.repository import Gio
 
-    resource = Gio.Resource.load(
-        os.path.join(pkgdatadir, "io.github.mrvladus.List.gresource")
-    )
+    resource = Gio.Resource.load(os.path.join(pkgdatadir, f"{APP_ID}.gresource"))
     resource._register()
 
     from list import application

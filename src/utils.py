@@ -23,7 +23,7 @@
 import os
 import json
 from gi.repository import GLib
-from .application import VERSION
+from __main__ import VERSION
 
 
 class Markup:
