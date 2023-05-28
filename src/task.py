@@ -76,8 +76,6 @@ class Task(Adw.Bin):
             self.sub_tasks.append(SubTask(task, self))
         self.update_statusbar()
         self.update_move_buttons()
-        # if self.get_prev_sibling():
-        #     self.get_prev_sibling().update_move_buttons()
 
     def expand(self, expand: bool):
         self.sub_tasks_revealer.set_reveal_child(expand)
