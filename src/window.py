@@ -73,10 +73,10 @@ class Window(Adw.ApplicationWindow):
         if data["tasks"] == []:
             return
         for task in data["tasks"]:
-            self.tasks_list.append(Task(task, self.tasks_list))
-        # Update move buttons
-        if len(data["tasks"]) > 1:
-            self.tasks_list.get_first_child().update_move_buttons()
+            new_task = Task(task, self.tasks_list)
+            self.tasks_list.append(new_task)
+            if new_task.get_prev_sibling():
+                new_task.get_prev_sibling().update_move_buttons()
 
     def on_about_action(self, *args):
         self.about_window.props.version = VERSION
