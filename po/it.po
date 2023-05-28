@@ -1,5 +1,5 @@
-# ITALIAN TRANSLATION.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# LIST.
+# Copyright (C) 2023
 # This file is distributed under the same license as the list package.
 # ALBANO BATTISTELLA <ALBANOBATTISTELLA@GMAIL.COM>, 2023.
 #
@@ -42,7 +42,7 @@ msgstr "Esci"
 
 #: src/res/ui/window.ui:89
 msgid "translator-credits"
-msgstr "Albano Battistella"
+msgstr "Albano Battistella <albanobattistella@gmail.com>"
 
 #: src/res/ui/preferences.ui:13
 msgid "Application theme"

@@ -119,13 +119,13 @@ class Window(Adw.ApplicationWindow):
     def on_entry_activated(self, entry):
         text = entry.props.text
         new_data = UserData.get()
-        # Check for empty string or todo exists
+        # Check for empty string or task exists
         if text == "":
             return
         for task in new_data["tasks"]:
             if task["text"] == text:
                 return
-        # Add new todo
+        # Add new task
         new_task = {"text": text, "sub": [], "color": "", "completed": False}
         new_data["tasks"].append(new_task)
         UserData.set(new_data)

@@ -41,6 +41,13 @@
     </screenshot>
   </screenshots>
   <releases>
+  <release version="44.5.3" date="2023-05-28">
+      <description>
+        <ul>
+          <li>Added Italian translation. Thanks to Albano Battistella.</li>
+        </ul>
+      </description>
+    </release>
     <release version="44.5.2" date="2023-05-27">
       <description>
         <ul>
