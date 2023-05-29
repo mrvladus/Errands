@@ -1,0 +1,87 @@
+using Gtk 4.0;
+
+template $SubTask : Box {
+  styles [
+    "sub-task",
+  ]
+
+  Box sub_task_main_box {
+    margin-top: 5;
+    margin-bottom: 5;
+
+    styles [
+      "toolbar",
+    ]
+
+    Button sub_task_delete_btn {
+      icon-name: "user-trash-symbolic";
+      tooltip-text: _("Delete");
+      valign: center;
+      clicked => $on_sub_task_delete_btn_clicked();
+    }
+
+    Label sub_task_text {
+      wrap: true;
+      wrap-mode: char;
+      hexpand: true;
+      halign: start;
+      valign: center;
+      selectable: true;
+      use-markup: true;
+    }
+
+    Button sub_task_edit_btn {
+      icon-name: "document-edit-symbolic";
+      tooltip-text: _("Edit");
+      valign: center;
+      clicked => $on_sub_task_edit_btn_clicked();
+    }
+
+    CheckButton sub_task_completed_btn {
+      valign: center;
+      tooltip-text: _("Mark as completed");
+      toggled => $on_completed_btn_toggled();
+    }
+  }
+
+  Box sub_task_edit_box {
+    margin-top: 5;
+    margin-bottom: 5;
+    visible: false;
+
+    styles [
+      "toolbar",
+    ]
+
+    Entry sub_task_edit_entry {
+      hexpand: true;
+      valign: center;
+      activate => $on_sub_task_edit();
+    }
+
+    Box {
+      styles [
+        "linked",
+      ]
+
+      Button sub_task_move_up_btn {
+        icon-name: "go-up-symbolic";
+        tooltip-text: _("Move up");
+        clicked => $on_sub_task_move_up_btn_clicked();
+      }
+
+      Button sub_task_move_down_btn {
+        icon-name: "go-down-symbolic";
+        tooltip-text: _("Move down");
+        clicked => $on_sub_task_move_down_btn_clicked();
+      }
+    }
+
+    Button sub_task_cancel_edit_btn {
+      icon-name: "edit-delete-symbolic";
+      tooltip-text: _("Cancel");
+      valign: center;
+      clicked => $on_sub_task_cancel_edit_btn_clicked();
+    }
+  }
+}
