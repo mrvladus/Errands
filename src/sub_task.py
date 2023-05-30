@@ -48,8 +48,7 @@ class SubTask(Gtk.Box):
         self.text = Markup.escape(self.task["text"])
         self.text = Markup.find_url(self.text)
         # Check if sub-task completed and toggle checkbox
-        if self.task["completed"]:
-            self.sub_task_completed_btn.props.active = True
+        self.sub_task_completed_btn.props.active = self.task["completed"]
         # Set text
         self.sub_task_text.props.label = self.text
         self.update_move_buttons()
@@ -92,6 +91,9 @@ class SubTask(Gtk.Box):
 
     @Gtk.Template.Callback()
     def on_sub_task_delete_btn_clicked(self, *args):
+        # self.props.visible = False
+        # self.task["deleted"] = True
+        # self.update_sub_task(self.task)
         # Remove sub-task data
         new_data = UserData.get()
         for task in new_data["tasks"]:
