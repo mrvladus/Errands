@@ -163,7 +163,7 @@ class Task(Adw.Bin):
         if self.task["completed"]:
             self.text = Markup.add_crossline(self.text)
         else:
-            Markup.rm_crossline(self.text)
+            self.text = Markup.rm_crossline(self.text)
         self.task_text.props.label = self.text
 
     @Gtk.Template.Callback()
