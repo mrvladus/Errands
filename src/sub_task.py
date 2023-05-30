@@ -70,7 +70,6 @@ class SubTask(Gtk.Box):
                         return
 
     def update_move_buttons(self):
-        data = UserData.get()
         idx = self.parent.task["sub"].index(self.task)
         length = len(self.parent.task["sub"])
         self.sub_task_move_up_btn.props.sensitive = False if idx == 0 else True
