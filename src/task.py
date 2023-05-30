@@ -158,14 +158,12 @@ class Task(Adw.Bin):
 
     @Gtk.Template.Callback()
     def on_task_completed_btn_toggled(self, btn):
-        if btn.props.active:
-            self.task["completed"] = True
-            self.update_task(self.task)
+        self.task["completed"] = btn.props.active
+        self.update_task(self.task)
+        if self.task["completed"]:
             self.text = Markup.add_crossline(self.text)
         else:
-            self.task["completed"] = False
-            self.update_task(self.task)
-            self.text = Markup.rm_crossline(self.text)
+            Markup.rm_crossline(self.text)
         self.task_text.props.label = self.text
 
     @Gtk.Template.Callback()

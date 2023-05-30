@@ -81,16 +81,13 @@ class SubTask(Gtk.Box):
 
     @Gtk.Template.Callback()
     def on_completed_btn_toggled(self, btn):
-        if btn.props.active:
-            self.task["completed"] = True
-            self.update_sub_task(self.task)
+        self.task["completed"] = btn.props.active
+        self.update_sub_task(self.task)
+        self.parent.update_statusbar()
+        if self.task["completed"]:
             self.text = Markup.add_crossline(self.text)
-            self.parent.update_statusbar()
         else:
-            self.task["completed"] = False
-            self.update_sub_task(self.task)
             self.text = Markup.rm_crossline(self.text)
-            self.parent.update_statusbar()
         self.sub_task_text.props.label = self.text
 
     @Gtk.Template.Callback()
