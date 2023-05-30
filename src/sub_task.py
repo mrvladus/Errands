@@ -91,22 +91,15 @@ class SubTask(Gtk.Box):
 
     @Gtk.Template.Callback()
     def on_sub_task_delete_btn_clicked(self, *args):
-        # self.props.visible = False
-        # self.task["deleted"] = True
-        # self.update_sub_task(self.task)
+        print(f"Delete sub-task: {self.task['text']}")
         # Remove sub-task data
         new_data = UserData.get()
-        for task in new_data["tasks"]:
-            if task["text"] == self.parent.task["text"]:
-                for sub in task["sub"]:
-                    if sub["text"] == self.task["text"]:
-                        task["sub"].remove(sub)
-                        UserData.set(new_data)
-                        # Update parent data
-                        self.parent.task["sub"] = task["sub"]
-                        self.parent.update_statusbar()
-                        break
-                break
+        sub = new_data["tasks"][new_data["tasks"].index(self.parent.task)]["sub"]
+        del sub[sub.index(self.task)]
+        UserData.set(new_data)
+        # Update parent data
+        self.parent.task["sub"] = sub
+        self.parent.update_statusbar()
         # Remove sub-task widget
         self.parent.sub_tasks.remove(self)
 
