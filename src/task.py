@@ -263,12 +263,7 @@ class Task(Adw.Bin):
             ["card"] if color == "" else ["card", f"task_{color}"]
         )
         # Set new color
-        self.task = {
-            "text": self.task["text"],
-            "sub": self.task["sub"],
-            "completed": self.task["completed"],
-            "color": color,
-        }
+        self.task["color"] = color
         self.update_task(self.task)
 
     @Gtk.Template.Callback()
