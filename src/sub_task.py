@@ -121,7 +121,6 @@ class SubTask(Gtk.Box):
         # Return if text the same or empty
         if new_text == old_text or new_text == "":
             return
-        # Return if sub-task exists
         new_data = UserData.get()
         for task in new_data["tasks"]:
             if task["text"] == self.parent.task["text"]:

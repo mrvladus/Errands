@@ -223,12 +223,8 @@ class Task(Adw.Bin):
         # Change task
         print(f"Change '{old_text}' to '{new_text}'")
         # Set new text
-        self.task = {
-            "text": new_text,
-            "sub": self.task["sub"],
-            "completed": False,
-            "color": self.task["color"],
-        }
+        self.task["text"] = new_text
+        self.task["completed"] = False
         # Set new data
         for i, task in enumerate(new_data["tasks"]):
             if task["text"] == old_text:
