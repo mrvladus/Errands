@@ -189,12 +189,6 @@ class Task(Adw.Bin):
             "completed": False,
         }
         self.task["sub"].append(new_sub_task)
-        self.task = {
-            "text": self.task["text"],
-            "completed": self.task["completed"],
-            "color": self.task["color"],
-            "sub": self.task["sub"],
-        }
         self.update_task(self.task)
         # Add row
         self.sub_tasks.append(SubTask(new_sub_task, self))
