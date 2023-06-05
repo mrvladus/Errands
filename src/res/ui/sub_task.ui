@@ -9,6 +9,8 @@
       <object class="GtkBox" id="sub_task_main_box">
         <property name="margin-top">5</property>
         <property name="margin-bottom">5</property>
+        <property name="margin-end">5</property>
+        <property name="margin-start">5</property>
         <style>
           <class name="toolbar"/>
         </style>
@@ -57,6 +59,8 @@
       <object class="GtkBox" id="sub_task_edit_box">
         <property name="margin-top">5</property>
         <property name="margin-bottom">5</property>
+        <property name="margin-end">5</property>
+        <property name="margin-start">5</property>
         <property name="visible">false</property>
         <style>
           <class name="toolbar"/>
