@@ -27,11 +27,10 @@ from .utils import Markup, UserData
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/List/task.ui")
-class Task(Adw.Bin):
+class Task(Gtk.Box):
     __gtype_name__ = "Task"
 
     # Template items
-    task_box = Gtk.Template.Child()
     task_delete_btn = Gtk.Template.Child()
     task_text_box = Gtk.Template.Child()
     task_text = Gtk.Template.Child()
@@ -65,7 +64,7 @@ class Task(Adw.Bin):
         self.task_text.props.label = self.text
         # Set accent color
         if self.task["color"] != "":
-            self.task_box.add_css_class(f'task_{self.task["color"]}')
+            self.add_css_class(f'task_{self.task["color"]}')
         # Expand if sub-tasks exists
         if self.task["sub"] != [] and gsettings.get_value("tasks-expanded").unpack():
             self.expand(True)
@@ -258,9 +257,7 @@ class Task(Adw.Bin):
             if i.startswith("btn_"):
                 color = i.split("_")[1]
                 break
-        self.task_box.set_css_classes(
-            ["card"] if color == "" else ["card", f"task_{color}"]
-        )
+        self.set_css_classes(["card"] if color == "" else ["card", f"task_{color}"])
         # Set new color
         self.task["color"] = color
         self.update_task(self.task)
