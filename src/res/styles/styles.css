@@ -77,3 +77,7 @@
     border-style: solid;
     border-color: @card_shade_color;
 }
+
+.box-padded {
+    padding: 5px 10px;
+}
