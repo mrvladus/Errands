@@ -28,9 +28,11 @@ from .utils import UserData, Markup
 class SubTask(Gtk.Box):
     __gtype_name__ = "SubTask"
 
+    sub_task_box = Gtk.Template.Child()
     sub_task_text = Gtk.Template.Child()
     sub_task_delete_btn = Gtk.Template.Child()
     sub_task_completed_btn = Gtk.Template.Child()
+    sub_task_edit_box = Gtk.Template.Child()
     sub_task_edit_btn = Gtk.Template.Child()
     sub_task_edit_entry = Gtk.Template.Child()
     sub_task_move_up_btn = Gtk.Template.Child()
@@ -52,17 +54,8 @@ class SubTask(Gtk.Box):
         self.update_move_buttons()
 
     def toggle_edit_box(self):
-        visible = self.sub_task_edit_entry.props.visible
-        # Sub task items
-        self.sub_task_delete_btn.set_visible(visible)
-        self.sub_task_text.set_visible(visible)
-        self.sub_task_edit_btn.set_visible(visible)
-        self.sub_task_completed_btn.set_visible(visible)
-        # Sub task edit items
-        self.sub_task_edit_entry.set_visible(not visible)
-        self.sub_task_move_up_btn.set_visible(not visible)
-        self.sub_task_move_down_btn.set_visible(not visible)
-        self.sub_task_cancel_edit_btn.set_visible(not visible)
+        self.sub_task_box.props.visible = not self.sub_task_box.props.visible
+        self.sub_task_edit_box.props.visible = not self.sub_task_edit_box.props.visible
 
     def update_sub_task(self, new_sub_task):
         new_data = UserData.get()

@@ -31,6 +31,7 @@ class Task(Gtk.Box):
     __gtype_name__ = "Task"
 
     # Template items
+    task_box = Gtk.Template.Child()
     task_delete_btn = Gtk.Template.Child()
     task_text_box = Gtk.Template.Child()
     task_text = Gtk.Template.Child()
@@ -40,6 +41,7 @@ class Task(Gtk.Box):
     accent_colors_popover = Gtk.Template.Child()
     task_edit_btn = Gtk.Template.Child()
     task_completed_btn = Gtk.Template.Child()
+    task_edit_box = Gtk.Template.Child()
     task_edit_entry = Gtk.Template.Child()
     task_move_up_btn = Gtk.Template.Child()
     task_move_down_btn = Gtk.Template.Child()
@@ -82,19 +84,8 @@ class Task(Gtk.Box):
             self.expand_btn.set_icon_name("go-down-symbolic")
 
     def toggle_edit_mode(self):
-        visible = self.task_edit_entry.props.visible
-        # Task items
-        self.task_delete_btn.set_visible(visible)
-        self.task_text_box.set_visible(visible)
-        self.expand_btn.set_visible(visible)
-        self.accent_colors_btn.set_visible(visible)
-        self.task_edit_btn.set_visible(visible)
-        self.task_completed_btn.set_visible(visible)
-        # Task edit items
-        self.task_edit_entry.set_visible(not visible)
-        self.task_move_up_btn.set_visible(not visible)
-        self.task_move_down_btn.set_visible(not visible)
-        self.task_cancel_edit_btn.set_visible(not visible)
+        self.task_box.props.visible = not self.task_box.props.visible
+        self.task_edit_box.props.visible = not self.task_edit_box.props.visible
 
     def update_statusbar(self):
         n_completed = 0

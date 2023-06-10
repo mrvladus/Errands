@@ -33,12 +33,13 @@
           <object class="AdwClamp">
             <property name="maximum-size">800</property>
             <property name="tightening-threshold">300</property>
-            <property name="margin-top">10</property>
-            <property name="margin-bottom">10</property>
             <child>
               <object class="AdwPreferencesGroup">
+                <property name="margin-top">10</property>
+                <property name="margin-bottom">10</property>
                 <child>
                   <object class="AdwEntryRow" id="entry">
+                    <property name="height-request">60</property>
                     <property name="title" translatable="yes">Add new task</property>
                     <signal name="entry-activated" handler="on_entry_activated"/>
                   </object>
@@ -60,6 +61,7 @@
                 <child>
                   <object class="GtkBox" id="tasks_list">
                     <property name="orientation">vertical</property>
+                    <property name="hexpand">true</property>
                   </object>
                 </child>
               </object>
