@@ -82,10 +82,10 @@ class Task(Gtk.Box):
 
     def expand(self, expand: bool):
         self.sub_tasks_revealer.set_reveal_child(expand)
-        icon_name = "go-up-symbolic" if expand else "go-down-symbolic"
-        self.expand_btn.set_icon_name(icon_name)
+        self.expand_btn.set_icon_name(
+            "go-up-symbolic" if expand else "go-down-symbolic"
+        )
         self.update_statusbar()
-        self.task_status.props.visible = not (self.n_completed == 0 and not expand)
 
     def toggle_edit_mode(self):
         self.task_box.props.visible = not self.task_box.props.visible
@@ -100,10 +100,6 @@ class Task(Gtk.Box):
                 self.n_completed += 1
         if self.n_total > 0:
             self.task_status.props.fraction = self.n_completed / self.n_total
-            self.task_status.props.visible = True
-        else:
-            self.task_status.props.visible = False
-
         # Show delete completed button
         self.delete_completed_btn_revealer.set_reveal_child(self.n_completed > 0)
 
@@ -193,7 +189,10 @@ class Task(Gtk.Box):
         self.task["sub"].append(new_sub_task)
         self.update_task(self.task)
         # Add row
-        self.sub_tasks.append(SubTask(new_sub_task, self))
+        sub_task = SubTask(new_sub_task, self)
+        self.sub_tasks.append(sub_task)
+        if sub_task.get_prev_sibling():
+            sub_task.get_prev_sibling().update_move_buttons()
         self.update_statusbar()
         # Clear entry
         entry.get_buffer().props.text = ""

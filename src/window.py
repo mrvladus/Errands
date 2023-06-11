@@ -106,7 +106,10 @@ class Window(Adw.ApplicationWindow):
         new_task = {"text": text, "sub": [], "color": "", "completed": False}
         new_data["tasks"].append(new_task)
         UserData.set(new_data)
-        self.tasks_list.append(Task(new_task, self))
+        task = Task(new_task, self)
+        self.tasks_list.append(task)
+        if task.get_prev_sibling():
+            task.get_prev_sibling().update_move_buttons()
         # Update move buttons
         if len(new_data["tasks"]) > 1:
             self.tasks_list.get_first_child().update_move_buttons()
