@@ -50,10 +50,11 @@ class Task(Gtk.Box):
     delete_completed_btn = Gtk.Template.Child()
     sub_tasks = Gtk.Template.Child()
 
-    def __init__(self, task: dict, parent):
+    def __init__(self, task: dict, window):
         super().__init__()
         print("Add task:", task["text"])
-        self.parent = parent
+        self.window = window
+        self.parent = self.window.tasks_list
         self.task = task
         # Escape text and find URL's'
         self.text = Markup.escape(self.task["text"])
@@ -75,6 +76,9 @@ class Task(Gtk.Box):
             self.sub_tasks.append(SubTask(task, self))
         self.update_statusbar()
         self.update_move_buttons()
+
+    def delete_task(self):
+        pass
 
     def expand(self, expand: bool):
         self.sub_tasks_revealer.set_reveal_child(expand)
@@ -162,6 +166,7 @@ class Task(Gtk.Box):
         else:
             self.text = Markup.rm_crossline(self.text)
         self.task_text.props.label = self.text
+        self.window.update_toolbar()
 
     @Gtk.Template.Callback()
     def on_expand_btn_clicked(self, _):

@@ -32,6 +32,8 @@ from .preferences import PreferencesWindow
 class Window(Adw.ApplicationWindow):
     __gtype_name__ = "Window"
 
+    delete_completed_tasks_btn_revealer = Gtk.Template.Child()
+    delete_completed_tasks_btn = Gtk.Template.Child()
     tasks_list = Gtk.Template.Child()
     about_window = Gtk.Template.Child()
 
@@ -60,7 +62,7 @@ class Window(Adw.ApplicationWindow):
         # Load tasks
         self.load_tasks()
 
-    def create_action(self, name, callback, shortcuts=None):
+    def create_action(self, name: str, callback: callable, shortcuts=None):
         action = Gio.SimpleAction.new(name, None)
         action.connect("activate", callback)
         if shortcuts:
@@ -73,7 +75,7 @@ class Window(Adw.ApplicationWindow):
         if data["tasks"] == []:
             return
         for task in data["tasks"]:
-            new_task = Task(task, self.tasks_list)
+            new_task = Task(task, self)
             self.tasks_list.append(new_task)
             if new_task.get_prev_sibling():
                 new_task.get_prev_sibling().update_move_buttons()
@@ -81,6 +83,14 @@ class Window(Adw.ApplicationWindow):
     def on_about_action(self, *args):
         self.about_window.props.version = VERSION
         self.about_window.show()
+
+    def update_toolbar(self):
+        data = UserData.get()
+        for task in data["tasks"]:
+            if task["completed"]:
+                self.delete_completed_tasks_btn_revealer.set_reveal_child(True)
+                return
+        self.delete_completed_tasks_btn_revealer.set_reveal_child(False)
 
     @Gtk.Template.Callback()
     def on_entry_activated(self, entry):
@@ -96,9 +106,26 @@ class Window(Adw.ApplicationWindow):
         new_task = {"text": text, "sub": [], "color": "", "completed": False}
         new_data["tasks"].append(new_task)
         UserData.set(new_data)
-        self.tasks_list.append(Task(new_task, self.tasks_list))
+        self.tasks_list.append(Task(new_task, self))
         # Update move buttons
         if len(new_data["tasks"]) > 1:
             self.tasks_list.get_first_child().update_move_buttons()
         # Clear entry
         entry.props.text = ""
+
+    @Gtk.Template.Callback()
+    def on_delete_completed_tasks_btn_clicked(self, _):
+        new_data = UserData.get()
+        new_data["tasks"] = [t for t in new_data["tasks"] if not t["completed"]]
+        UserData.set(new_data)
+        # Remove widgets
+        to_remove = []
+        childrens = self.tasks_list.observe_children()
+        for i in range(childrens.get_n_items()):
+            child = childrens.get_item(i)
+            if child.task["completed"]:
+                to_remove.append(child)
+        for task in to_remove:
+            print("Remove:", task.task["text"])
+            self.tasks_list.remove(task)
+        self.update_toolbar()
