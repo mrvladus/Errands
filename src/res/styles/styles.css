@@ -1,73 +1,73 @@
 /* Task */
-.task_blue {
-    background: mix(@card_bg_color, @blue_1, 0.3);
+.task-blue {
+    background: alpha(@blue_1, 0.3);
 }
 
-.task_green {
-    background: mix(@card_bg_color, @green_1, 0.3);
+.task-green {
+    background: alpha(@green_1, 0.3);
 }
 
-.task_yellow {
-    background: mix(@card_bg_color, @yellow_1, 0.3);
+.task-yellow {
+    background: alpha(@yellow_1, 0.3);
 }
 
-.task_orange {
-    background: mix(@card_bg_color, @orange_1, 0.3);
+.task-orange {
+    background: alpha(@orange_1, 0.3);
 }
 
-.task_red {
-    background: mix(@card_bg_color, @red_1, 0.3);
+.task-red {
+    background: alpha(@red_1, 0.3);
 }
 
-.task_purple {
-   background: mix(@card_bg_color, @purple_1, 0.3);
+.task-purple {
+   background: alpha(@purple_1, 0.3);
 }
 
-.btn_blue {
+.btn-blue {
     background: @blue_1;
 }
 
-.btn_blue:hover {
+.btn-blue:hover {
     background: shade(@blue_1, 1.2);
 }
 
-.btn_green {
+.btn-green {
     background: @green_1;
 }
 
-.btn_green:hover {
+.btn-green:hover {
     background: shade(@green_1, 1.2);
 }
 
-.btn_yellow {
+.btn-yellow {
     background: @yellow_1;
 }
 
-.btn_yellow:hover {
+.btn-yellow:hover {
     background: shade(@yellow_1, 1.2);
 }
 
-.btn_orange {
+.btn-orange {
     background: @orange_1;
 }
 
-.btn_orange:hover {
+.btn-orange:hover {
     background: shade(@orange_1, 1.2);
 }
 
-.btn_red {
+.btn-red {
     background: @red_1;
 }
 
-.btn_red:hover {
+.btn-red:hover {
     background: shade(@red_1, 1.2);
 }
 
-.btn_purple {
+.btn-purple {
     background: @purple_1;
 }
 
-.btn_purple:hover {
+.btn-purple:hover {
     background: shade(@purple_1, 1.2);
 }
 
@@ -78,6 +78,31 @@
     border-color: @card_shade_color;
 }
 
-.box-padded {
-    padding: 5px 10px;
+/* Progress bar */
+.progress-blue progress {
+  background-color: @blue_2;
+}
+
+.progress-green progress {
+  background-color: @green_2;
+}
+
+.progress-yellow progress {
+  background-color: @yellow_3;
+}
+
+.progress-orange progress {
+  background-color: @orange_2;
+}
+
+.progress-red progress {
+  background-color: @red_2;
+}
+
+.progress-purple progress {
+  background-color: @purple_2;
+}
+
+progressbar.osd {
+    background-color: @card_shade_color;
 }

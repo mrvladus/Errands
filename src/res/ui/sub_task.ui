@@ -21,6 +21,9 @@
             <property name="tooltip-text" translatable="yes">Delete</property>
             <property name="valign">center</property>
             <signal name="clicked" handler="on_sub_task_delete_btn_clicked"/>
+            <style>
+              <class name="flat"/>
+            </style>
           </object>
         </child>
         <!-- Sub-task text -->
@@ -42,6 +45,9 @@
             <property name="tooltip-text" translatable="yes">Edit</property>
             <property name="valign">center</property>
             <signal name="clicked" handler="on_sub_task_edit_btn_clicked"/>
+            <style>
+              <class name="flat"/>
+            </style>
           </object>
         </child>
         <!-- Mark as completed button -->
@@ -103,6 +109,9 @@
             <property name="tooltip-text" translatable="yes">Cancel</property>
             <property name="valign">center</property>
             <signal name="clicked" handler="on_sub_task_cancel_edit_btn_clicked"/>
+            <style>
+              <class name="flat"/>
+            </style>
           </object>
         </child>
       </object>

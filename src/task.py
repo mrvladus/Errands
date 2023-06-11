@@ -33,7 +33,6 @@ class Task(Gtk.Box):
     # Template items
     task_box = Gtk.Template.Child()
     task_delete_btn = Gtk.Template.Child()
-    task_text_box = Gtk.Template.Child()
     task_text = Gtk.Template.Child()
     task_status = Gtk.Template.Child()
     expand_btn = Gtk.Template.Child()
@@ -66,7 +65,8 @@ class Task(Gtk.Box):
         self.task_text.props.label = self.text
         # Set accent color
         if self.task["color"] != "":
-            self.add_css_class(f'task_{self.task["color"]}')
+            self.add_css_class(f'task-{self.task["color"]}')
+            self.task_status.add_css_class(f'progress-{self.task["color"]}')
         # Expand if sub-tasks exists
         if self.task["sub"] != [] and gsettings.get_value("tasks-expanded").unpack():
             self.expand(True)
@@ -78,32 +78,30 @@ class Task(Gtk.Box):
 
     def expand(self, expand: bool):
         self.sub_tasks_revealer.set_reveal_child(expand)
-        if expand:
-            self.expand_btn.set_icon_name("go-up-symbolic")
-        else:
-            self.expand_btn.set_icon_name("go-down-symbolic")
+        icon_name = "go-up-symbolic" if expand else "go-down-symbolic"
+        self.expand_btn.set_icon_name(icon_name)
+        self.update_statusbar()
+        self.task_status.props.visible = not (self.n_completed == 0 and not expand)
 
     def toggle_edit_mode(self):
         self.task_box.props.visible = not self.task_box.props.visible
         self.task_edit_box.props.visible = not self.task_edit_box.props.visible
 
     def update_statusbar(self):
-        n_completed = 0
-        n_total = 0
+        self.n_completed = 0
+        self.n_total = 0
         for sub in self.task["sub"]:
-            n_total += 1
+            self.n_total += 1
             if sub["completed"]:
-                n_completed += 1
-        if n_total > 0:
+                self.n_completed += 1
+        if self.n_total > 0:
+            self.task_status.props.fraction = self.n_completed / self.n_total
             self.task_status.props.visible = True
-            self.task_status.set_label(_("Completed:") + f" {n_completed} / {n_total}")
         else:
             self.task_status.props.visible = False
+
         # Show delete completed button
-        if n_completed > 0:
-            self.delete_completed_btn_revealer.set_reveal_child(True)
-        else:
-            self.delete_completed_btn_revealer.set_reveal_child(False)
+        self.delete_completed_btn_revealer.set_reveal_child(self.n_completed > 0)
 
     def update_task(self, new_task: dict):
         new_data = UserData.get()
@@ -245,10 +243,17 @@ class Task(Gtk.Box):
         self.accent_colors_popover.popdown()
         for i in btn.get_css_classes():
             color = ""
-            if i.startswith("btn_"):
-                color = i.split("_")[1]
+            if i.startswith("btn-"):
+                color = i.split("-")[1]
                 break
-        self.set_css_classes(["card"] if color == "" else ["card", f"task_{color}"])
+        # Color card
+        self.set_css_classes(["card"] if color == "" else ["card", f"task-{color}"])
+        # Color statusbar
+        for c in self.task_status.get_css_classes():
+            if "progress-" in c:
+                self.task_status.remove_css_class(c)
+        if color != "":
+            self.task_status.add_css_class(f"progress-{color}")
         # Set new color
         self.task["color"] = color
         self.update_task(self.task)
