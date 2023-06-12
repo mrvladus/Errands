@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: list\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-28 13:08+0300\n"
+"POT-Creation-Date: 2023-06-12 16:33+0300\n"
 "PO-Revision-Date: 2023-05-25 14:45+0300\n"
 "Last-Translator: Vlad Krupinski <mrvladus@yandex.ru>\n"
 "Language: ru\n"
@@ -18,31 +18,31 @@ msgstr ""
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Generator: Poedit 3.1.1\n"
 
-#: src/task.py:100
-msgid "Completed:"
-msgstr "Выполнено:"
-
 #: src/res/ui/window.ui:25
 msgid "Main menu"
 msgstr "Главное меню"
 
-#: src/res/ui/window.ui:42
+#: src/res/ui/window.ui:61
 msgid "Add new task"
 msgstr "Добавьте задачу"
 
-#: src/res/ui/window.ui:69
+#: src/res/ui/window.ui:71
+msgid "Delete completed tasks"
+msgstr "Удалить выполненные задачи"
+
+#: src/res/ui/window.ui:117
 msgid "Preferences"
 msgstr "Настройки"
 
-#: src/res/ui/window.ui:73
+#: src/res/ui/window.ui:121
 msgid "About List"
 msgstr "О приложении"
 
-#: src/res/ui/window.ui:77
+#: src/res/ui/window.ui:125
 msgid "Quit"
 msgstr "Выход"
 
-#: src/res/ui/window.ui:89
+#: src/res/ui/window.ui:137
 msgid "translator-credits"
 msgstr "Vlad Krupinski <mrvladus@yandex.ru>"
 
@@ -70,46 +70,46 @@ msgstr "Задачи"
 msgid "Tasks expanded on startup"
 msgstr "Раскрывать подзадачи при старте"
 
-#: src/res/ui/sub_task.ui:19 src/res/ui/task.ui:31
+#: src/res/ui/sub_task.ui:21 src/res/ui/task.ui:45
 msgid "Delete"
 msgstr "Удалить"
 
-#: src/res/ui/sub_task.ui:40 src/res/ui/task.ui:178
+#: src/res/ui/sub_task.ui:45 src/res/ui/task.ui:176
 msgid "Edit"
 msgstr "Правка"
 
-#: src/res/ui/sub_task.ui:49 src/res/ui/task.ui:190
+#: src/res/ui/sub_task.ui:57 src/res/ui/task.ui:188
 msgid "Mark as completed"
 msgstr "Пометить как выполненное"
 
-#: src/res/ui/sub_task.ui:82 src/res/ui/task.ui:222
+#: src/res/ui/sub_task.ui:90 src/res/ui/task.ui:221
 msgid "Move up"
 msgstr "Сдвинуть вверх"
 
-#: src/res/ui/sub_task.ui:90 src/res/ui/task.ui:230
+#: src/res/ui/sub_task.ui:99 src/res/ui/task.ui:230
 msgid "Move down"
 msgstr "Сдвинуть вниз"
 
-#: src/res/ui/sub_task.ui:100 src/res/ui/task.ui:240
+#: src/res/ui/sub_task.ui:109 src/res/ui/task.ui:240
 msgid "Cancel"
 msgstr "Отмена"
 
-#: src/res/ui/task.ui:73
+#: src/res/ui/task.ui:68
 msgid "Toggle sub-tasks"
 msgstr "Переключить подзадачи"
 
-#: src/res/ui/task.ui:83
+#: src/res/ui/task.ui:81
 msgid "Accent color"
 msgstr "Цвет акцента"
 
-#: src/res/ui/task.ui:101
+#: src/res/ui/task.ui:96
 msgid "Clear style"
 msgstr "Отчистить цвет"
 
-#: src/res/ui/task.ui:264
+#: src/res/ui/task.ui:270
 msgid "Add new sub-task"
 msgstr "Добавьте подзадачу"
 
-#: src/res/ui/task.ui:277
+#: src/res/ui/task.ui:283
 msgid "Delete completed sub-tasks"
 msgstr "Удалить выполненные подзадачи"
