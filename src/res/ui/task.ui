@@ -19,6 +19,7 @@
             <property name="valign">end</property>
             <style>
               <class name="osd"/>
+              <class name="task-progressbar"/>
             </style>
           </object>
         </child>

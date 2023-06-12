@@ -105,7 +105,6 @@ class Task(Gtk.Box):
             self.task_status.props.visible = False
         else:
             self.task_status.props.visible = True
-
         # Show delete completed button
         self.delete_completed_btn_revealer.set_reveal_child(self.n_completed > 0)
 
@@ -135,6 +134,7 @@ class Task(Gtk.Box):
                 break
         UserData.set(new_data)
         self.parent.remove(self)
+        self.window.update_status()
 
     @Gtk.Template.Callback()
     def on_delete_completed_btn_clicked(self, _):
@@ -168,7 +168,7 @@ class Task(Gtk.Box):
         else:
             self.text = Markup.rm_crossline(self.text)
         self.task_text.props.label = self.text
-        self.window.update_toolbar()
+        self.window.update_status()
 
     @Gtk.Template.Callback()
     def on_expand_btn_clicked(self, _):

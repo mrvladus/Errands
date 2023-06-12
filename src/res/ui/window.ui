@@ -15,19 +15,6 @@
             <style>
               <class name="flat"/>
             </style>
-            <!-- Toolbar -->
-            <child type="start">
-              <object class="GtkRevealer" id="delete_completed_tasks_btn_revealer">
-                <property name="transition-type">2</property>
-                <child>
-                  <object class="GtkButton" id="delete_completed_tasks_btn">
-                    <property name="icon-name">edit-clear-all-symbolic</property>
-                    <property name="tooltip-text" translatable="yes">Delete completed tasks</property>
-                    <signal name="clicked" handler="on_delete_completed_tasks_btn_clicked"/>
-                  </object>
-                </child>
-              </object>
-            </child>
             <!-- Menu -->
             <child type="end">
               <object class="GtkMenuButton">
@@ -41,40 +28,79 @@
             </child>
           </object>
         </child>
-        <!-- Entry -->
         <child>
-          <object class="AdwClamp">
-            <property name="maximum-size">800</property>
-            <property name="tightening-threshold">300</property>
-            <child>
-              <object class="AdwPreferencesGroup">
-                <property name="margin-top">10</property>
-                <property name="margin-bottom">10</property>
-                <child>
-                  <object class="AdwEntryRow" id="entry">
-                    <property name="height-request">60</property>
-                    <property name="title" translatable="yes">Add new task</property>
-                    <signal name="entry-activated" handler="on_entry_activated"/>
-                  </object>
-                </child>
-              </object>
-            </child>
-          </object>
-        </child>
-        <!-- Todo list -->
-        <child>
-          <object class="GtkScrolledWindow">
-            <property name="propagate-natural-height">true</property>
-            <property name="propagate-natural-width">true</property>
+          <object class="GtkBox">
+            <property name="orientation">vertical</property>
+            <!-- Entry -->
             <child>
               <object class="AdwClamp">
                 <property name="maximum-size">800</property>
                 <property name="tightening-threshold">300</property>
-                <property name="vexpand">true</property>
                 <child>
-                  <object class="GtkBox" id="tasks_list">
-                    <property name="orientation">vertical</property>
-                    <property name="hexpand">true</property>
+                  <object class="GtkOverlay">
+                    <!-- Status bar -->
+                    <child type="overlay">
+                      <object class="GtkProgressBar" id="status">
+                        <property name="valign">end</property>
+                        <property name="margin-bottom">10</property>
+                        <property name="margin-start">10</property>
+                        <property name="margin-end">10</property>
+                        <style>
+                          <class name="osd"/>
+                        </style>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="AdwPreferencesGroup">
+                        <property name="margin-top">10</property>
+                        <property name="margin-bottom">10</property>
+                        <child>
+                          <object class="AdwEntryRow" id="entry">
+                            <property name="activatable">false</property>
+                            <property name="height-request">60</property>
+                            <property name="title" translatable="yes">Add new task</property>
+                            <signal name="entry-activated" handler="on_entry_activated"/>
+                            <!-- Toolbar -->
+                            <child type="suffix">
+                              <object class="GtkRevealer" id="delete_completed_tasks_btn_revealer">
+                                <property name="transition-type">2</property>
+                                <child>
+                                  <object class="GtkButton" id="delete_completed_tasks_btn">
+                                    <property name="valign">center</property>
+                                    <property name="icon-name">edit-clear-all-symbolic</property>
+                                    <property name="tooltip-text" translatable="yes">Delete completed tasks</property>
+                                    <signal name="clicked" handler="on_delete_completed_tasks_btn_clicked"/>
+                                    <style>
+                                      <class name="flat"/>
+                                    </style>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <!-- Todo list -->
+            <child>
+              <object class="GtkScrolledWindow">
+                <property name="propagate-natural-height">true</property>
+                <property name="propagate-natural-width">true</property>
+                <child>
+                  <object class="AdwClamp">
+                    <property name="maximum-size">800</property>
+                    <property name="tightening-threshold">300</property>
+                    <property name="vexpand">true</property>
+                    <child>
+                      <object class="GtkBox" id="tasks_list">
+                        <property name="orientation">vertical</property>
+                        <property name="hexpand">true</property>
+                      </object>
+                    </child>
                   </object>
                 </child>
               </object>

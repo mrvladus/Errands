@@ -35,6 +35,7 @@ class Window(Adw.ApplicationWindow):
     delete_completed_tasks_btn_revealer = Gtk.Template.Child()
     delete_completed_tasks_btn = Gtk.Template.Child()
     tasks_list = Gtk.Template.Child()
+    status = Gtk.Template.Child()
     about_window = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
@@ -61,6 +62,7 @@ class Window(Adw.ApplicationWindow):
         )
         # Load tasks
         self.load_tasks()
+        self.update_status()
 
     def create_action(self, name: str, callback: callable, shortcuts=None):
         action = Gio.SimpleAction.new(name, None)
@@ -81,16 +83,26 @@ class Window(Adw.ApplicationWindow):
                 new_task.get_prev_sibling().update_move_buttons()
 
     def on_about_action(self, *args):
+        """Show about window"""
         self.about_window.props.version = VERSION
         self.about_window.show()
 
-    def update_toolbar(self):
+    def update_status(self):
         data = UserData.get()
+        n_total = 0
+        n_completed = 0
         for task in data["tasks"]:
+            n_total += 1
             if task["completed"]:
-                self.delete_completed_tasks_btn_revealer.set_reveal_child(True)
-                return
-        self.delete_completed_tasks_btn_revealer.set_reveal_child(False)
+                n_completed += 1
+        # Update progress bar
+        if n_total > 0:
+            self.status.props.fraction = n_completed / n_total
+        else:
+            self.status.props.fraction = 0
+
+        # Show delete completed button
+        self.delete_completed_tasks_btn_revealer.set_reveal_child(n_completed > 0)
 
     @Gtk.Template.Callback()
     def on_entry_activated(self, entry):
@@ -131,4 +143,4 @@ class Window(Adw.ApplicationWindow):
         for task in to_remove:
             print("Remove:", task.task["text"])
             self.tasks_list.remove(task)
-        self.update_toolbar()
+        self.update_status()

@@ -103,6 +103,10 @@
   background-color: @purple_2;
 }
 
-progressbar.osd {
+.task-progressbar {
     background-color: @card_shade_color;
+}
+
+progress {
+  opacity: 0.7;
 }
