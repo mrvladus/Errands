@@ -50,6 +50,9 @@ class Task(Gtk.Box):
     delete_completed_btn = Gtk.Template.Child()
     sub_tasks = Gtk.Template.Child()
 
+    # State
+    expanded: bool = None
+
     def __init__(self, task: dict, window):
         super().__init__()
         print("Add task:", task["text"])
@@ -77,13 +80,11 @@ class Task(Gtk.Box):
         self.update_statusbar()
         self.update_move_buttons()
 
-    def delete_task(self):
-        pass
-
-    def expand(self, expand: bool):
-        self.sub_tasks_revealer.set_reveal_child(expand)
+    def expand(self, expanded: bool):
+        self.expanded = expanded
+        self.sub_tasks_revealer.set_reveal_child(expanded)
         self.expand_btn.set_icon_name(
-            "go-up-symbolic" if expand else "go-down-symbolic"
+            "go-up-symbolic" if expanded else "go-down-symbolic"
         )
         self.update_statusbar()
 
@@ -100,6 +101,11 @@ class Task(Gtk.Box):
                 self.n_completed += 1
         if self.n_total > 0:
             self.task_status.props.fraction = self.n_completed / self.n_total
+        if not self.expanded and self.n_completed == 0:
+            self.task_status.props.visible = False
+        else:
+            self.task_status.props.visible = True
+
         # Show delete completed button
         self.delete_completed_btn_revealer.set_reveal_child(self.n_completed > 0)
 
