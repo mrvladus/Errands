@@ -21,7 +21,7 @@
     <binary>list</binary>
   </provides>
   <categories>
-      <category>Utility</category>
+    <category>Utility</category>
   </categories>
   <name>List</name>
   <summary>Focus on your tasks.</summary>
@@ -41,11 +41,15 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="44.5.4" date="2023-05-28">
+    <release version="44.5.4" date="2023-06-12">
       <description>
         <ul>
-          <li>Use Blueprint for UI files</li>
-          <li>Code cleanup</li>
+          <li>Add progress bar for completed tasks and sub-tasks</li>
+          <li>Add button for deleting completed tasks</li>
+          <li>UI improvements</li>
+          <li>Code improvements and refactoring</li>
+          <li>Updated application icon</li>
+          <li>Bug fixes</li>
         </ul>
       </description>
     </release>
