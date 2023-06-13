@@ -23,7 +23,7 @@
 from gi.repository import Gio, Adw, Gtk
 from __main__ import VERSION
 from .application import gsettings
-from .utils import UserData
+from .utils import TaskUtils, UserData
 from .task import Task
 from .preferences import PreferencesWindow
 
@@ -115,7 +115,7 @@ class Window(Adw.ApplicationWindow):
             if task["text"] == text:
                 return
         # Add new task
-        new_task = {"text": text, "sub": [], "color": "", "completed": False}
+        new_task: dict = TaskUtils.new_task(text)
         new_data["tasks"].append(new_task)
         UserData.set(new_data)
         task = Task(new_task, self)

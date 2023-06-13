@@ -23,7 +23,7 @@
 from gi.repository import Gtk, Adw
 from .application import gsettings
 from .sub_task import SubTask
-from .utils import Markup, UserData
+from .utils import Markup, TaskUtils, UserData
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/List/task.ui")
@@ -185,10 +185,7 @@ class Task(Gtk.Box):
             if sub["text"] == entry.get_buffer().props.text:
                 return
         # Add new sub-task
-        new_sub_task = {
-            "text": entry.get_buffer().props.text,
-            "completed": False,
-        }
+        new_sub_task = TaskUtils.new_sub_task(entry.get_buffer().props.text)
         self.task["sub"].append(new_sub_task)
         self.update_task(self.task)
         # Add row

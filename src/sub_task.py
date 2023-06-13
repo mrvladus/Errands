@@ -53,9 +53,33 @@ class SubTask(Gtk.Box):
         self.sub_task_text.props.label = self.text
         self.update_move_buttons()
 
+    def delete(self) -> None:
+        print(f"Completely delete sub-task: {self.task['text']}")
+        # Remove sub-task data
+        new_data: dict = UserData.get()
+        sub: list = new_data["tasks"][new_data["tasks"].index(self.parent.task)]["sub"]
+        del sub[sub.index(self.task)]
+        UserData.set(new_data)
+        # Update parent data
+        self.parent.task["sub"] = sub
+        self.parent.update_statusbar()
+        # Remove sub-task widget
+        self.parent.sub_tasks.remove(self)
+
     def toggle_edit_box(self) -> None:
         self.sub_task_box.props.visible = not self.sub_task_box.props.visible
         self.sub_task_edit_box.props.visible = not self.sub_task_edit_box.props.visible
+
+    def toggle_visibility(self) -> None:
+        self.props.visible = not self.props.visible
+
+    def update_move_buttons(self) -> None:
+        idx: int = self.parent.task["sub"].index(self.task)
+        length: int = len(self.parent.task["sub"])
+        self.sub_task_move_up_btn.props.sensitive = False if idx == 0 else True
+        self.sub_task_move_down_btn.props.sensitive = (
+            False if idx == length - 1 else True
+        )
 
     def update_sub_task(self, new_sub_task: dict) -> None:
         new_data: dict = UserData.get()
@@ -68,14 +92,6 @@ class SubTask(Gtk.Box):
                         # Update parent data
                         self.parent.task["sub"] = task["sub"]
                         return
-
-    def update_move_buttons(self) -> None:
-        idx: int = self.parent.task["sub"].index(self.task)
-        length: int = len(self.parent.task["sub"])
-        self.sub_task_move_up_btn.props.sensitive = False if idx == 0 else True
-        self.sub_task_move_down_btn.props.sensitive = (
-            False if idx == length - 1 else True
-        )
 
     @Gtk.Template.Callback()
     def on_completed_btn_toggled(self, btn: Gtk.Button) -> None:
@@ -91,16 +107,8 @@ class SubTask(Gtk.Box):
     @Gtk.Template.Callback()
     def on_sub_task_delete_btn_clicked(self, _) -> None:
         print(f"Delete sub-task: {self.task['text']}")
-        # Remove sub-task data
-        new_data: dict = UserData.get()
-        sub: list = new_data["tasks"][new_data["tasks"].index(self.parent.task)]["sub"]
-        del sub[sub.index(self.task)]
-        UserData.set(new_data)
-        # Update parent data
-        self.parent.task["sub"] = sub
-        self.parent.update_statusbar()
-        # Remove sub-task widget
-        self.parent.sub_tasks.remove(self)
+        self.toggle_visibility()
+        self.task["deleted"] = True
 
     @Gtk.Template.Callback()
     def on_sub_task_edit_btn_clicked(self, _) -> None:

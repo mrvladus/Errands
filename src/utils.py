@@ -22,6 +22,7 @@
 
 import os
 import json
+import uuid
 from gi.repository import GLib
 from __main__ import VERSION
 
@@ -89,6 +90,34 @@ class Markup:
             return text.split('"')[1]
         else:
             return text
+
+
+class TaskUtils:
+    """Task related functions"""
+
+    @classmethod
+    def generate_id(self) -> str:
+        return str(uuid.uuid4())
+
+    @classmethod
+    def new_task(self, text: str) -> dict:
+        return {
+            "id": self.generate_id(),
+            "text": text,
+            "sub": [],
+            "color": "",
+            "completed": False,
+            "deleted": False,
+        }
+
+    @classmethod
+    def new_sub_task(self, text: str) -> dict:
+        return {
+            "id": self.generate_id(),
+            "text": text,
+            "completed": False,
+            "deleted": False,
+        }
 
 
 class UserData:
