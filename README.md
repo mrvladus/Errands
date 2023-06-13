@@ -2,7 +2,7 @@
 
 # List
 
-Focus on your tasks.
+Manage your tasks.
 
 <div align="center">
   <img src="https://raw.githubusercontent.com/mrvladus/List/main/screenshots/main.png" height="400"/>
@@ -57,3 +57,6 @@ To translate List to your language you can use <a href="https://flathub.org/ru/a
 5. Commit your changes with message "Add translation to YOUR_LANGUAGE_HERE" and open a pull request.
 6. Watch for updates in the future to provide additional translations.
 
+## Code of conduct
+
+List follows the GNOME project [Code of Conduct](https://wiki.gnome.org/Foundation/CodeOfConduct).
