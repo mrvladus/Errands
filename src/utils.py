@@ -64,17 +64,17 @@ class Markup:
             return False
 
     @classmethod
-    def add_crossline(self, text: str):
+    def add_crossline(self, text: str) -> str:
         return f"<s>{text}</s>"
 
     @classmethod
-    def rm_crossline(self, text: str):
+    def rm_crossline(self, text: str) -> str:
         return text.replace("<s>", "").replace("</s>", "")
 
     @classmethod
-    def find_url(self, text: str):
+    def find_url(self, text: str) -> str:
         """Convert urls to markup. Make sure to escape text before calling."""
-        arr = text.split(" ")
+        arr: list = text.split(" ")
         new_str = []
         for i in arr:
             if i.startswith("http://") or i.startswith("https://"):
@@ -84,7 +84,7 @@ class Markup:
         return " ".join(new_str)
 
     @classmethod
-    def remove_url(self, text: str):
+    def remove_url(self, text: str) -> str:
         if "<a href=" in text:
             return text.split('"')[1]
         else:
@@ -94,7 +94,7 @@ class Markup:
 class UserData:
     """Class for accessing data file with user tasks"""
 
-    data_dir = GLib.get_user_data_dir() + "/list"
+    data_dir: str = GLib.get_user_data_dir() + "/list"
     default_data = {
         "version": VERSION,
         "tasks": [],
@@ -102,7 +102,7 @@ class UserData:
 
     # Create data dir and data.json file
     @classmethod
-    def init(self):
+    def init(self) -> None:
         if not os.path.exists(self.data_dir):
             os.mkdir(self.data_dir)
         if not os.path.exists(self.data_dir + "/data.json"):
@@ -112,31 +112,31 @@ class UserData:
 
     # Load user data from json
     @classmethod
-    def get(self):
+    def get(self) -> dict:
         if not os.path.exists(self.data_dir + "/data.json"):
             self.init()
         with open(self.data_dir + "/data.json", "r") as f:
-            data = json.load(f)
+            data: dict = json.load(f)
             return data
 
     # Save user data to json
     @classmethod
-    def set(self, data: dict):
+    def set(self, data: dict) -> None:
         with open(self.data_dir + "/data.json", "w") as f:
             json.dump(data, f)
 
     # Port tasks from older versions (for updates)
     @classmethod
-    def convert(self):
-        data = self.get()
-        ver = data["version"]
+    def convert(self) -> None:
+        data: dict = self.get()
+        ver: str = data["version"]
         if ver.startswith("44.4") or ver.startswith("44.3"):
-            new_data = self.default_data
-            old_tasks = data["todos"]
+            new_data: dict = self.default_data
+            old_tasks: list = data["todos"]
             for task in old_tasks:
                 new_sub_tasks = []
                 for sub in old_tasks[task]["sub"]:
-                    new_text = Markup.unescape(sub)
+                    new_text: str = Markup.unescape(sub)
                     new_text = Markup.remove_url(new_text)
                     new_sub_tasks.append(
                         {

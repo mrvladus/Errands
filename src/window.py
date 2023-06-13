@@ -64,16 +64,16 @@ class Window(Adw.ApplicationWindow):
         self.load_tasks()
         self.update_status()
 
-    def create_action(self, name: str, callback: callable, shortcuts=None):
+    def create_action(self, name: str, callback: callable, shortcuts=None) -> None:
         action = Gio.SimpleAction.new(name, None)
         action.connect("activate", callback)
         if shortcuts:
             self.props.application.set_accels_for_action(f"app.{name}", shortcuts)
         self.props.application.add_action(action)
 
-    def load_tasks(self):
+    def load_tasks(self) -> None:
         print("Loading tasks...")
-        data = UserData.get()
+        data: dict = UserData.get()
         if data["tasks"] == []:
             return
         for task in data["tasks"]:
@@ -82,13 +82,13 @@ class Window(Adw.ApplicationWindow):
             if new_task.get_prev_sibling():
                 new_task.get_prev_sibling().update_move_buttons()
 
-    def on_about_action(self, *args):
+    def on_about_action(self, *args) -> None:
         """Show about window"""
         self.about_window.props.version = VERSION
         self.about_window.show()
 
-    def update_status(self):
-        data = UserData.get()
+    def update_status(self) -> None:
+        data: dict = UserData.get()
         n_total = 0
         n_completed = 0
         for task in data["tasks"]:
@@ -105,9 +105,9 @@ class Window(Adw.ApplicationWindow):
         self.delete_completed_tasks_btn_revealer.set_reveal_child(n_completed > 0)
 
     @Gtk.Template.Callback()
-    def on_entry_activated(self, entry):
-        text = entry.props.text
-        new_data = UserData.get()
+    def on_entry_activated(self, entry: Gtk.Entry) -> None:
+        text: str = entry.props.text
+        new_data: dict = UserData.get()
         # Check for empty string or task exists
         if text == "":
             return
@@ -129,8 +129,8 @@ class Window(Adw.ApplicationWindow):
         entry.props.text = ""
 
     @Gtk.Template.Callback()
-    def on_delete_completed_tasks_btn_clicked(self, _):
-        new_data = UserData.get()
+    def on_delete_completed_tasks_btn_clicked(self, _) -> None:
+        new_data: dict = UserData.get()
         new_data["tasks"] = [t for t in new_data["tasks"] if not t["completed"]]
         UserData.set(new_data)
         # Remove widgets

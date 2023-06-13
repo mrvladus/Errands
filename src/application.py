@@ -41,7 +41,7 @@ class Application(Adw.Application):
             flags=Gio.ApplicationFlags.DEFAULT_FLAGS,
         )
 
-    def do_activate(self):
+    def do_activate(self) -> None:
         # Initialize data.json file
         UserData.init()
         # Load css styles

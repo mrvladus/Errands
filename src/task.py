@@ -53,7 +53,7 @@ class Task(Gtk.Box):
     # State
     expanded: bool = None
 
-    def __init__(self, task: dict, window):
+    def __init__(self, task: dict, window: Adw.ApplicationWindow):
         super().__init__()
         print("Add task:", task["text"])
         self.window = window
@@ -80,7 +80,7 @@ class Task(Gtk.Box):
         self.update_statusbar()
         self.update_move_buttons()
 
-    def expand(self, expanded: bool):
+    def expand(self, expanded: bool) -> None:
         self.expanded = expanded
         self.sub_tasks_revealer.set_reveal_child(expanded)
         self.expand_btn.set_icon_name(
@@ -88,11 +88,11 @@ class Task(Gtk.Box):
         )
         self.update_statusbar()
 
-    def toggle_edit_mode(self):
+    def toggle_edit_mode(self) -> None:
         self.task_box.props.visible = not self.task_box.props.visible
         self.task_edit_box.props.visible = not self.task_edit_box.props.visible
 
-    def update_statusbar(self):
+    def update_statusbar(self) -> None:
         self.n_completed = 0
         self.n_total = 0
         for sub in self.task["sub"]:
@@ -108,25 +108,25 @@ class Task(Gtk.Box):
         # Show delete completed button
         self.delete_completed_btn_revealer.set_reveal_child(self.n_completed > 0)
 
-    def update_task(self, new_task: dict):
-        new_data = UserData.get()
+    def update_task(self, new_task: dict) -> None:
+        new_data: dict = UserData.get()
         for i, task in enumerate(new_data["tasks"]):
             if task["text"] == self.task["text"]:
                 new_data["tasks"][i] = new_task
                 UserData.set(new_data)
                 return
 
-    def update_move_buttons(self):
-        data = UserData.get()
-        idx = data["tasks"].index(self.task)
-        length = len(data["tasks"])
+    def update_move_buttons(self) -> None:
+        data: dict = UserData.get()
+        idx: int = data["tasks"].index(self.task)
+        length: int = len(data["tasks"])
         self.task_move_up_btn.props.sensitive = False if idx == 0 else True
         self.task_move_down_btn.props.sensitive = False if idx == length - 1 else True
 
     # --- Template handlers --- #
 
     @Gtk.Template.Callback()
-    def on_task_delete(self, _):
+    def on_task_delete(self, _) -> None:
         new_data: dict = UserData.get()
         for task in new_data["tasks"]:
             if task["text"] == self.task["text"]:
@@ -137,10 +137,10 @@ class Task(Gtk.Box):
         self.window.update_status()
 
     @Gtk.Template.Callback()
-    def on_delete_completed_btn_clicked(self, _):
+    def on_delete_completed_btn_clicked(self, _) -> None:
         # Remove data
         self.task["sub"] = [sub for sub in self.task["sub"] if not sub["completed"]]
-        new_data = UserData.get()
+        new_data: dict = UserData.get()
         for i, task in enumerate(new_data["tasks"]):
             if task["text"] == self.task["text"]:
                 new_data["tasks"][i] = self.task
@@ -160,7 +160,7 @@ class Task(Gtk.Box):
         self.update_statusbar()
 
     @Gtk.Template.Callback()
-    def on_task_completed_btn_toggled(self, btn):
+    def on_task_completed_btn_toggled(self, btn: Gtk.Button) -> None:
         self.task["completed"] = btn.props.active
         self.update_task(self.task)
         if self.task["completed"]:
@@ -171,15 +171,12 @@ class Task(Gtk.Box):
         self.window.update_status()
 
     @Gtk.Template.Callback()
-    def on_expand_btn_clicked(self, _):
+    def on_expand_btn_clicked(self, _) -> None:
         """Expand task row"""
-        if self.sub_tasks_revealer.get_child_revealed():
-            self.expand(False)
-        else:
-            self.expand(True)
+        self.expand(not self.sub_tasks_revealer.get_child_revealed())
 
     @Gtk.Template.Callback()
-    def on_sub_task_added(self, entry):
+    def on_sub_task_added(self, entry: Gtk.Entry) -> None:
         # Return if entry is empty
         if entry.get_buffer().props.text == "":
             return
@@ -204,7 +201,7 @@ class Task(Gtk.Box):
         entry.get_buffer().props.text = ""
 
     @Gtk.Template.Callback()
-    def on_task_edit_btn_clicked(self, _):
+    def on_task_edit_btn_clicked(self, _) -> None:
         self.toggle_edit_mode()
         # Set entry text and select it
         self.task_edit_entry.get_buffer().props.text = self.task["text"]
@@ -212,18 +209,18 @@ class Task(Gtk.Box):
         self.task_edit_entry.grab_focus()
 
     @Gtk.Template.Callback()
-    def on_task_cancel_edit_btn_clicked(self, _):
+    def on_task_cancel_edit_btn_clicked(self, _) -> None:
         self.toggle_edit_mode()
 
     @Gtk.Template.Callback()
-    def on_task_edit(self, entry):
-        old_text = self.task["text"]
-        new_text = entry.get_buffer().props.text
+    def on_task_edit(self, entry: Gtk.Entry) -> None:
+        old_text: str = self.task["text"]
+        new_text: str = entry.get_buffer().props.text
         # Return if text the same or empty
         if new_text == old_text or new_text == "":
             return
         # Return if task exists
-        new_data = UserData.get()
+        new_data: dict = UserData.get()
         for task in new_data["tasks"]:
             if task["text"] == new_text:
                 return
@@ -248,7 +245,7 @@ class Task(Gtk.Box):
         self.toggle_edit_mode()
 
     @Gtk.Template.Callback()
-    def on_style_selected(self, btn):
+    def on_style_selected(self, btn: Gtk.Button) -> None:
         """Apply accent color"""
         self.accent_colors_popover.popdown()
         for i in btn.get_css_classes():
@@ -269,9 +266,9 @@ class Task(Gtk.Box):
         self.update_task(self.task)
 
     @Gtk.Template.Callback()
-    def on_task_move_up_btn_clicked(self, btn):
-        new_data = UserData.get()
-        idx = new_data["tasks"].index(self.task)
+    def on_task_move_up_btn_clicked(self, _) -> None:
+        new_data: dict = UserData.get()
+        idx: int = new_data["tasks"].index(self.task)
         if idx == 0:
             return
         print(f"""Move task "{self.task['text']}" up""")
@@ -290,9 +287,9 @@ class Task(Gtk.Box):
         self.get_next_sibling().update_move_buttons()
 
     @Gtk.Template.Callback()
-    def on_task_move_down_btn_clicked(self, btn):
-        new_data = UserData.get()
-        idx = new_data["tasks"].index(self.task)
+    def on_task_move_down_btn_clicked(self, _) -> None:
+        new_data: dict = UserData.get()
+        idx: int = new_data["tasks"].index(self.task)
         if idx + 1 == len(new_data["tasks"]):
             return
         print(f"""Move task "{self.task['text']}" down""")
