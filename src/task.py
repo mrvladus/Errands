@@ -74,6 +74,12 @@ class Task(Gtk.Box):
         # Expand if sub-tasks exists
         if self.task["sub"] != [] and gsettings.get_value("tasks-expanded").unpack():
             self.expand(True)
+        # Show or hide accent colors menu
+        print(gsettings.get_value("show-accent-colors-menu").unpack())
+        self.accent_colors_btn.props.visible = gsettings.get_value(
+            "show-accent-colors-menu"
+        ).unpack()
+
         # Add sub tasks
         for task in self.task["sub"]:
             self.sub_tasks.append(SubTask(task, self))

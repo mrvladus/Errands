@@ -13,5 +13,8 @@
     <key name="tasks-expanded" type="b">
       <default>true</default>
     </key>
+    <key name="show-accent-colors-menu" type="b">
+      <default>true</default>
+    </key>
   </schema>
 </schemalist>

@@ -58,7 +58,7 @@
         <child>
           <object class="AdwPreferencesGroup">
             <property name="title" translatable="yes">Tasks</property>
-            <!-- Dark -->
+            <!-- Expand task -->
             <child>
               <object class="AdwActionRow">
                 <property name="title" translatable="yes">Tasks expanded on startup</property>
@@ -66,7 +66,18 @@
                 <child type="suffix">
                   <object class="GtkSwitch" id="tasks_expanded">
                     <property name="valign">center</property>
-                    <!-- <signal name="state-set" handler="on_tasks_expanded_toggle"/> -->
+                  </object>
+                </child>
+              </object>
+            </child>
+            <!-- Show accent colors menu -->
+            <child>
+              <object class="AdwActionRow">
+                <property name="title" translatable="yes">Show accent colors menu</property>
+                <property name="activatable-widget">show_accent_colors_menu</property>
+                <child type="suffix">
+                  <object class="GtkSwitch" id="show_accent_colors_menu">
+                    <property name="valign">center</property>
                   </object>
                 </child>
               </object>

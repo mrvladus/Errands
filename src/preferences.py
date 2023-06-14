@@ -32,6 +32,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
     light_theme = Gtk.Template.Child()
     dark_theme = Gtk.Template.Child()
     tasks_expanded = Gtk.Template.Child()
+    show_accent_colors_menu = Gtk.Template.Child()
 
     def __init__(self, win: Adw.ApplicationWindow) -> None:
         super().__init__(transient_for=win)
@@ -45,6 +46,9 @@ class PreferencesWindow(Adw.PreferencesWindow):
             self.dark_theme.props.active = True
         # Setup tasks
         gsettings.bind("tasks-expanded", self.tasks_expanded, "active", 0)
+        gsettings.bind(
+            "show-accent-colors-menu", self.show_accent_colors_menu, "active", 0
+        )
 
     @Gtk.Template.Callback()
     def on_theme_change(self, btn: Gtk.Button) -> None:
