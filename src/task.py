@@ -58,6 +58,8 @@ class Task(Gtk.Box):
         self.window = window
         self.parent = self.window.tasks_list
         self.task = task
+        # Hide if task is deleted
+        self.props.visible = not self.task["deleted"]
         # Escape text and find URL's'
         self.text = Markup.escape(self.task["text"])
         self.text = Markup.find_url(self.text)
@@ -74,7 +76,6 @@ class Task(Gtk.Box):
         self.expand(self.task["sub"] != [] and GSettings.get("tasks-expanded"))
         # Show or hide accent colors menu
         self.accent_colors_btn.set_visible(GSettings.get("show-accent-colors-menu"))
-
         self.add_sub_tasks()
         self.update_statusbar()
         self.update_move_buttons()
@@ -152,7 +153,10 @@ class Task(Gtk.Box):
         self.toggle_visibility()
         self.task["deleted"] = True
         self.update_data()
-        self.delete()
+        new_data: dict = UserData.get()
+        new_data["history"].append(self.task["id"])
+        UserData.set(new_data)
+        self.window.update_undo()
 
     @Gtk.Template.Callback()
     def on_delete_completed_btn_clicked(self, _) -> None:

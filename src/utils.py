@@ -150,6 +150,7 @@ class UserData:
     default_data = {
         "version": VERSION,
         "tasks": [],
+        "history": [],
     }
 
     # Create data dir and data.json file
@@ -215,6 +216,7 @@ class UserData:
         if ver.startswith("44.5"):
             new_data: dict = self.get()
             new_data["version"] = VERSION
+            new_data["history"] = []
             for task in new_data["tasks"]:
                 task["id"] = TaskUtils.generate_id()
                 task["deleted"] = False

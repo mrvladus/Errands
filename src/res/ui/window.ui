@@ -21,8 +21,21 @@
                 <property name="primary">true</property>
                 <property name="icon-name">open-menu-symbolic</property>
                 <property name="menu-model">primary_menu</property>
+                <property name="tooltip-text" translatable="yes">Main menu</property>
                 <accessibility>
                   <property name="label" translatable="yes">Main menu</property>
+                </accessibility>
+              </object>
+            </child>
+            <!-- Undo button -->
+            <child type="start">
+              <object class="GtkButton" id="undo_btn">
+                <property name="icon-name">edit-undo-symbolic</property>
+                <property name="tooltip-text" translatable="yes">Undo</property>
+                <property name="sensitive">false</property>
+                <signal name="clicked" handler="on_undo_clicked"/>
+                <accessibility>
+                  <property name="label" translatable="yes">Undo</property>
                 </accessibility>
               </object>
             </child>

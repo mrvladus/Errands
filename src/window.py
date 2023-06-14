@@ -31,6 +31,7 @@ from .preferences import PreferencesWindow
 class Window(Adw.ApplicationWindow):
     __gtype_name__ = "Window"
 
+    undo_btn = Gtk.Template.Child()
     delete_completed_tasks_btn_revealer = Gtk.Template.Child()
     delete_completed_tasks_btn = Gtk.Template.Child()
     tasks_list = Gtk.Template.Child()
@@ -60,6 +61,7 @@ class Window(Adw.ApplicationWindow):
         # Load tasks
         self.load_tasks()
         self.update_status()
+        self.update_undo()
 
     def create_action(self, name: str, callback: callable, shortcuts=None) -> None:
         action = Gio.SimpleAction.new(name, None)
@@ -101,6 +103,10 @@ class Window(Adw.ApplicationWindow):
         # Show delete completed button
         self.delete_completed_tasks_btn_revealer.set_reveal_child(n_completed > 0)
 
+    def update_undo(self):
+        data: dict = UserData.get()
+        self.undo_btn.props.sensitive = len(data["history"]) > 0
+
     @Gtk.Template.Callback()
     def on_entry_activated(self, entry: Gtk.Entry) -> None:
         text: str = entry.props.text
@@ -141,3 +147,23 @@ class Window(Adw.ApplicationWindow):
             print("Remove:", task.task["text"])
             self.tasks_list.remove(task)
         self.update_status()
+
+    @Gtk.Template.Callback()
+    def on_undo_clicked(self, btn: Gtk.Button) -> None:
+        data: dict = UserData.get()
+        if len(data["history"]) == 0:
+            return
+        last_task_id: str = data["history"][-1]
+        for task in data["tasks"]:
+            if task["id"] == last_task_id:
+                task["deleted"] = False
+                childrens = self.tasks_list.observe_children()
+                for i in range(childrens.get_n_items()):
+                    child = childrens.get_item(i)
+                    if child.task["id"] == last_task_id:
+                        child.task["deleted"] = False
+                        child.toggle_visibility()
+                        data["history"].pop()
+                        UserData.set(data)
+                        self.update_undo()
+                        return
