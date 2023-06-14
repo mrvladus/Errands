@@ -196,7 +196,7 @@ class UserData:
             for task in new_data["tasks"]:
                 task["id"] = TaskUtils.generate_id()
                 task["deleted"] = False
-                for sub in task:
+                for sub in task["sub"]:
                     sub["id"] = TaskUtils.generate_id()
                     sub["deleted"] = False
             self.set(new_data)
