@@ -83,6 +83,17 @@ class Task(Gtk.Box):
         for task in self.task["sub"]:
             self.sub_tasks.append(SubTask(task, self))
 
+    def delete(self):
+        print(f"Completely delete task: {self.task['text']}")
+        new_data: dict = UserData.get()
+        for task in new_data["tasks"]:
+            if task["id"] == self.task["id"]:
+                new_data["tasks"].remove(task)
+                break
+        UserData.set(new_data)
+        self.parent.remove(self)
+        self.window.update_status()
+
     def expand(self, expanded: bool) -> None:
         self.expanded = expanded
         self.sub_tasks_revealer.set_reveal_child(expanded)
@@ -94,6 +105,9 @@ class Task(Gtk.Box):
     def toggle_edit_mode(self) -> None:
         self.task_box.props.visible = not self.task_box.props.visible
         self.task_edit_box.props.visible = not self.task_edit_box.props.visible
+
+    def toggle_visibility(self) -> None:
+        self.props.visible = not self.props.visible
 
     def update_statusbar(self) -> None:
         n_completed = 0
@@ -114,11 +128,12 @@ class Task(Gtk.Box):
         # Show delete completed button
         self.delete_completed_btn_revealer.set_reveal_child(n_completed > 0)
 
-    def update_task(self, new_task: dict) -> None:
+    def update_data(self):
+        """Sync self.task with user data.json"""
         new_data: dict = UserData.get()
         for i, task in enumerate(new_data["tasks"]):
-            if task["text"] == self.task["text"]:
-                new_data["tasks"][i] = new_task
+            if self.task["id"] == task["id"]:
+                new_data["tasks"][i] = self.task
                 UserData.set(new_data)
                 return
 
@@ -133,25 +148,17 @@ class Task(Gtk.Box):
 
     @Gtk.Template.Callback()
     def on_task_delete(self, _) -> None:
-        new_data: dict = UserData.get()
-        for task in new_data["tasks"]:
-            if task["text"] == self.task["text"]:
-                new_data["tasks"].remove(task)
-                break
-        UserData.set(new_data)
-        self.parent.remove(self)
-        self.window.update_status()
+        print(f"Delete task: {self.task['text']}")
+        self.toggle_visibility()
+        self.task["deleted"] = True
+        self.update_data()
+        self.delete()
 
     @Gtk.Template.Callback()
     def on_delete_completed_btn_clicked(self, _) -> None:
         # Remove data
         self.task["sub"] = [sub for sub in self.task["sub"] if not sub["completed"]]
-        new_data: dict = UserData.get()
-        for i, task in enumerate(new_data["tasks"]):
-            if task["text"] == self.task["text"]:
-                new_data["tasks"][i] = self.task
-                UserData.set(new_data)
-                break
+        self.update_data()
         # Remove widgets
         to_remove = []
         childrens = self.sub_tasks.observe_children()
@@ -168,12 +175,12 @@ class Task(Gtk.Box):
     @Gtk.Template.Callback()
     def on_task_completed_btn_toggled(self, btn: Gtk.Button) -> None:
         self.task["completed"] = btn.props.active
-        self.update_task(self.task)
-        if self.task["completed"]:
+        if btn.props.active:
             self.text = Markup.add_crossline(self.text)
         else:
             self.text = Markup.rm_crossline(self.text)
         self.task_text.props.label = self.text
+        self.update_data()
         self.window.update_status()
 
     @Gtk.Template.Callback()
@@ -193,7 +200,7 @@ class Task(Gtk.Box):
         # Add new sub-task
         new_sub_task = TaskUtils.new_sub_task(entry.get_buffer().props.text)
         self.task["sub"].append(new_sub_task)
-        self.update_task(self.task)
+        self.update_data()
         # Add row
         sub_task = SubTask(new_sub_task, self)
         self.sub_tasks.append(sub_task)
@@ -232,16 +239,11 @@ class Task(Gtk.Box):
         # Set new text
         self.task["text"] = new_text
         self.task["completed"] = False
-        # Set new data
-        for i, task in enumerate(new_data["tasks"]):
-            if task["text"] == old_text:
-                new_data["tasks"][i] = self.task
-                UserData.set(new_data)
-                break
+        self.update_data()
         # Escape text and find URL's'
         self.text = Markup.escape(self.task["text"])
         self.text = Markup.find_url(self.text)
-        # Check if text crosslined and toggle checkbox
+        # Toggle checkbox
         self.task_completed_btn.props.active = False
         # Set text
         self.task_text.props.label = self.text
@@ -266,7 +268,7 @@ class Task(Gtk.Box):
             self.task_status.add_css_class(f"progress-{color}")
         # Set new color
         self.task["color"] = color
-        self.update_task(self.task)
+        self.update_data()
 
     @Gtk.Template.Callback()
     def on_task_move_up_btn_clicked(self, _) -> None:
