@@ -23,8 +23,8 @@
 import os
 import json
 import uuid
-from gi.repository import GLib
 from __main__ import VERSION
+from gi.repository import GLib
 
 
 class Markup:
@@ -97,6 +97,7 @@ class TaskUtils:
 
     @classmethod
     def generate_id(self) -> str:
+        """Generate unique immutable id for task"""
         return str(uuid.uuid4())
 
     @classmethod
@@ -152,13 +153,14 @@ class UserData:
     @classmethod
     def set(self, data: dict) -> None:
         with open(self.data_dir + "/data.json", "w") as f:
-            json.dump(data, f)
+            json.dump(data, f, indent=4)
 
     # Port tasks from older versions (for updates)
     @classmethod
     def convert(self) -> None:
         data: dict = self.get()
         ver: str = data["version"]
+        # Versions 44.3.x and 44.4.x
         if ver.startswith("44.4") or ver.startswith("44.3"):
             new_data: dict = self.default_data
             old_tasks: list = data["todos"]
@@ -169,16 +171,32 @@ class UserData:
                     new_text = Markup.remove_url(new_text)
                     new_sub_tasks.append(
                         {
+                            "id": TaskUtils.generate_id(),
                             "text": Markup.rm_crossline(new_text),
                             "completed": True if Markup.is_crosslined(sub) else False,
+                            "deleted": False,
                         }
                     )
                 new_data["tasks"].append(
                     {
+                        "id": TaskUtils.generate_id(),
                         "text": Markup.rm_crossline(task),
                         "sub": new_sub_tasks,
                         "color": old_tasks[task]["color"],
                         "completed": True if Markup.is_crosslined(task) else False,
+                        "deleted": False,
                     }
                 )
             UserData.set(new_data)
+            return
+        # Versions 44.5.x
+        if ver.startswith("44.5"):
+            new_data: dict = self.get()
+            new_data["version"] = VERSION
+            for task in new_data["tasks"]:
+                task["id"] = TaskUtils.generate_id()
+                task["deleted"] = False
+                for sub in task:
+                    sub["id"] = TaskUtils.generate_id()
+                    sub["deleted"] = False
+            self.set(new_data)
