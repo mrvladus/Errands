@@ -22,8 +22,7 @@
 
 from gi.repository import Gio, Adw, Gtk
 from __main__ import VERSION
-from .application import gsettings
-from .utils import TaskUtils, UserData
+from .utils import GSettings, TaskUtils, UserData
 from .task import Task
 from .preferences import PreferencesWindow
 
@@ -41,12 +40,10 @@ class Window(Adw.ApplicationWindow):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         # Remember window size
-        gsettings.bind("width", self, "default_width", 0)
-        gsettings.bind("height", self, "default_height", 0)
+        GSettings.bind("width", self, "default_width")
+        GSettings.bind("height", self, "default_height")
         # Setup theme
-        Adw.StyleManager.get_default().set_color_scheme(
-            gsettings.get_value("theme").unpack()
-        )
+        Adw.StyleManager.get_default().set_color_scheme(GSettings.get("theme"))
         self.get_settings().props.gtk_icon_theme_name = "Adwaita"
         # Create actions for main menu
         self.create_action(

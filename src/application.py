@@ -26,11 +26,10 @@ require_version("Gtk", "4.0")
 require_version("Adw", "1")
 
 from gi.repository import Gio, Adw, Gtk, Gdk
+
 from __main__ import APP_ID
 
-gsettings = Gio.Settings.new(APP_ID)
-
-from .utils import UserData
+from .utils import GSettings, UserData
 from .window import Window
 
 
@@ -42,6 +41,8 @@ class Application(Adw.Application):
         )
 
     def do_activate(self) -> None:
+        # Initialize gsettings
+        GSettings.init()
         # Initialize data.json file
         UserData.init()
         # Load css styles

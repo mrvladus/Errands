@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 from gi.repository import Adw, Gtk, GLib
-from .application import gsettings
+from .utils import GSettings
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/List/preferences.ui")
@@ -37,7 +37,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
     def __init__(self, win: Adw.ApplicationWindow) -> None:
         super().__init__(transient_for=win)
         # Setup theme
-        theme: int = gsettings.get_value("theme").unpack()
+        theme: int = GSettings.get("theme")
         if theme == 0:
             self.system_theme.props.active = True
         if theme == 1:
@@ -45,9 +45,9 @@ class PreferencesWindow(Adw.PreferencesWindow):
         if theme == 4:
             self.dark_theme.props.active = True
         # Setup tasks
-        gsettings.bind("tasks-expanded", self.tasks_expanded, "active", 0)
-        gsettings.bind(
-            "show-accent-colors-menu", self.show_accent_colors_menu, "active", 0
+        GSettings.bind("tasks-expanded", self.tasks_expanded, "active")
+        GSettings.bind(
+            "show-accent-colors-menu", self.show_accent_colors_menu, "active"
         )
 
     @Gtk.Template.Callback()
@@ -60,4 +60,4 @@ class PreferencesWindow(Adw.PreferencesWindow):
         elif id == "dark_theme":
             theme = 4
         Adw.StyleManager.get_default().set_color_scheme(theme)
-        gsettings.set_value("theme", GLib.Variant("i", theme))
+        GSettings.set("theme", "i", theme)

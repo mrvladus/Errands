@@ -23,8 +23,30 @@
 import os
 import json
 import uuid
-from __main__ import VERSION
-from gi.repository import GLib
+from gi.repository import GLib, Gio
+from __main__ import VERSION, APP_ID
+
+
+class GSettings:
+    """Class for accessing gsettings"""
+
+    gsettings = None
+
+    @classmethod
+    def bind(self, setting, obj, prop):
+        self.gsettings.bind(setting, obj, prop, 0)
+
+    @classmethod
+    def get(self, setting: str):
+        return self.gsettings.get_value(setting).unpack()
+
+    @classmethod
+    def set(self, setting: str, gvariant: str, value):
+        self.gsettings.set_value(setting, GLib.Variant(gvariant, value))
+
+    @classmethod
+    def init(self):
+        self.gsettings = Gio.Settings.new(APP_ID)
 
 
 class Markup:

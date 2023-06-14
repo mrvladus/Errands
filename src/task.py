@@ -21,9 +21,8 @@
 # SOFTWARE.
 
 from gi.repository import Gtk, Adw
-from .application import gsettings
 from .sub_task import SubTask
-from .utils import Markup, TaskUtils, UserData
+from .utils import GSettings, Markup, TaskUtils, UserData
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/List/task.ui")
@@ -71,13 +70,10 @@ class Task(Gtk.Box):
         if self.task["color"] != "":
             self.add_css_class(f'task-{self.task["color"]}')
             self.task_status.add_css_class(f'progress-{self.task["color"]}')
-        # Expand if sub-tasks exists
-        if self.task["sub"] != [] and gsettings.get_value("tasks-expanded").unpack():
-            self.expand(True)
+        # Expand sub tasks
+        self.expand(self.task["sub"] != [] and GSettings.get("tasks-expanded"))
         # Show or hide accent colors menu
-        self.accent_colors_btn.props.visible = gsettings.get_value(
-            "show-accent-colors-menu"
-        ).unpack()
+        self.accent_colors_btn.set_visible(GSettings.get("show-accent-colors-menu"))
 
         self.add_sub_tasks()
         self.update_statusbar()
@@ -100,20 +96,23 @@ class Task(Gtk.Box):
         self.task_edit_box.props.visible = not self.task_edit_box.props.visible
 
     def update_statusbar(self) -> None:
-        self.n_completed = 0
-        self.n_total = 0
+        n_completed = 0
+        n_total = 0
         for sub in self.task["sub"]:
-            self.n_total += 1
+            n_total += 1
             if sub["completed"]:
-                self.n_completed += 1
-        if self.n_total > 0:
-            self.task_status.props.fraction = self.n_completed / self.n_total
-        if not self.expanded and self.n_completed == 0:
-            self.task_status.props.visible = False
-        else:
+                n_completed += 1
+        if n_total > 0:
+            self.task_status.props.fraction = n_completed / n_total
+        if self.expanded:
             self.task_status.props.visible = True
+            self.task_status.add_css_class("task-progressbar")
+        else:
+            self.task_status.remove_css_class("task-progressbar")
+            if n_completed == 0:
+                self.task_status.props.visible = False
         # Show delete completed button
-        self.delete_completed_btn_revealer.set_reveal_child(self.n_completed > 0)
+        self.delete_completed_btn_revealer.set_reveal_child(n_completed > 0)
 
     def update_task(self, new_task: dict) -> None:
         new_data: dict = UserData.get()
