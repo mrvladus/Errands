@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: list\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-12 16:33+0300\n"
+"POT-Creation-Date: 2023-06-15 20:54+0300\n"
 "PO-Revision-Date: 2023-05-25 16:59+0200\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language: nl\n"
@@ -16,31 +16,35 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.3.1\n"
 
-#: src/res/ui/window.ui:25
+#: src/res/ui/window.ui:24 src/res/ui/window.ui:26
 msgid "Main menu"
 msgstr "Hoofdmenu"
 
-#: src/res/ui/window.ui:61
+#: src/res/ui/window.ui:35 src/res/ui/window.ui:38
+msgid "Undo (Ctrl+Z)"
+msgstr ""
+
+#: src/res/ui/window.ui:85
 msgid "Add new task"
 msgstr "Taak toevoegen"
 
-#: src/res/ui/window.ui:71
+#: src/res/ui/window.ui:95
 msgid "Delete completed tasks"
 msgstr ""
 
-#: src/res/ui/window.ui:117
+#: src/res/ui/window.ui:141
 msgid "Preferences"
 msgstr "Voorkeuren"
 
-#: src/res/ui/window.ui:121
+#: src/res/ui/window.ui:145
 msgid "About List"
 msgstr "Over List"
 
-#: src/res/ui/window.ui:125
+#: src/res/ui/window.ui:149
 msgid "Quit"
 msgstr "Afsluiten"
 
-#: src/res/ui/window.ui:137
+#: src/res/ui/window.ui:161
 msgid "translator-credits"
 msgstr "Heimen Stoffels <vistausss@fastmail.com>"
 
@@ -67,6 +71,22 @@ msgstr "Taken"
 #: src/res/ui/preferences.ui:64
 msgid "Tasks expanded on startup"
 msgstr "Taken altijd uitklappen"
+
+#: src/res/ui/preferences.ui:76
+msgid "Show accent colors menu"
+msgstr ""
+
+#: src/res/ui/preferences.ui:90
+msgid "History"
+msgstr ""
+
+#: src/res/ui/preferences.ui:94
+msgid "Clear history on startup"
+msgstr ""
+
+#: src/res/ui/preferences.ui:106
+msgid "History size"
+msgstr ""
 
 #: src/res/ui/sub_task.ui:21 src/res/ui/task.ui:45
 msgid "Delete"
