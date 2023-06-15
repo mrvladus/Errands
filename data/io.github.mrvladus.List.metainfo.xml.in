@@ -41,6 +41,21 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="44.6" date="2023-06-16">
+      <description>
+        <p>UI/UX:</p>
+        <ul>
+          <li>Added undo button for restoring deleted tasks and sub-tasks</li>
+          <li>Added new setting for clearing history on startup (OFF by default)</li>
+          <li>Added new setting for history size (50 items by default)</li>
+          <li>Added new setting for hiding accent color button if you don't use it</li>
+        </ul>
+        <p>Translations:</p>
+        <ul>
+          <li>Updated Russian translation</li>
+        </ul>
+      </description>
+    </release>
     <release version="44.5.4" date="2023-06-12">
       <description>
         <ul>
