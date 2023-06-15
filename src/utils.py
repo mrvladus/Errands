@@ -33,7 +33,7 @@ class GSettings:
     gsettings = None
 
     @classmethod
-    def bind(self, setting, obj, prop):
+    def bind(self, setting, obj, prop) -> None:
         self.gsettings.bind(setting, obj, prop, 0)
 
     @classmethod
@@ -41,11 +41,11 @@ class GSettings:
         return self.gsettings.get_value(setting).unpack()
 
     @classmethod
-    def set(self, setting: str, gvariant: str, value):
+    def set(self, setting: str, gvariant: str, value) -> None:
         self.gsettings.set_value(setting, GLib.Variant(gvariant, value))
 
     @classmethod
-    def init(self):
+    def init(self) -> None:
         self.gsettings = Gio.Settings.new(APP_ID)
 
 

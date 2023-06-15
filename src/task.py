@@ -80,11 +80,11 @@ class Task(Gtk.Box):
         self.update_statusbar()
         self.update_move_buttons()
 
-    def add_sub_tasks(self):
+    def add_sub_tasks(self) -> None:
         for task in self.task["sub"]:
             self.sub_tasks.append(SubTask(task, self, self.window))
 
-    def delete(self):
+    def delete(self) -> None:
         print(f"Delete task: {self.task['text']}")
         self.toggle_visibility()
         new_data: dict = UserData.get()
@@ -128,7 +128,7 @@ class Task(Gtk.Box):
         # Show delete completed button
         self.delete_completed_btn_revealer.set_reveal_child(n_completed > 0)
 
-    def update_data(self):
+    def update_data(self) -> None:
         """Sync self.task with user data.json"""
         new_data: dict = UserData.get()
         for i, task in enumerate(new_data["tasks"]):

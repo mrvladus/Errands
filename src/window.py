@@ -112,7 +112,7 @@ class Window(Adw.ApplicationWindow):
         # Show delete completed button
         self.delete_completed_tasks_btn_revealer.set_reveal_child(n_completed > 0)
 
-    def update_undo(self):
+    def update_undo(self) -> None:
         data: dict = UserData.get()
         # Remove old tasks from history
         if len(data["history"]) > GSettings.get("history-size"):
