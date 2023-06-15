@@ -19,5 +19,8 @@
     <key name="clear-history-on-startup" type="b">
       <default>false</default>
     </key>
+    <key name="history-size" type="i">
+      <default>50</default>
+    </key>
   </schema>
 </schemalist>

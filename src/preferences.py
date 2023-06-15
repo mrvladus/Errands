@@ -34,6 +34,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
     tasks_expanded = Gtk.Template.Child()
     show_accent_colors_menu = Gtk.Template.Child()
     clear_history_on_startup = Gtk.Template.Child()
+    history_size = Gtk.Template.Child()
 
     def __init__(self, win: Adw.ApplicationWindow) -> None:
         super().__init__(transient_for=win)
@@ -53,6 +54,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
         GSettings.bind(
             "clear-history-on-startup", self.clear_history_on_startup, "active"
         )
+        GSettings.bind("history-size", self.history_size, "value")
 
     @Gtk.Template.Callback()
     def on_theme_change(self, btn: Gtk.Button) -> None:

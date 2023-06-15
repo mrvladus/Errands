@@ -88,7 +88,7 @@
         <child>
           <object class="AdwPreferencesGroup">
             <property name="title" translatable="yes">History</property>
-            <!-- Expand task -->
+            <!-- Delete history on startup -->
             <child>
               <object class="AdwActionRow">
                 <property name="title" translatable="yes">Clear history on startup</property>
@@ -96,6 +96,26 @@
                 <child type="suffix">
                   <object class="GtkSwitch" id="clear_history_on_startup">
                     <property name="valign">center</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <!-- History size -->
+            <child>
+              <object class="AdwActionRow">
+                <property name="title" translatable="yes">History size</property>
+                <child type="suffix">
+                  <object class="GtkSpinButton">
+                    <property name="valign">center</property>
+                    <property name="numeric">true</property>
+                    <property name="update-policy">1</property>
+                    <property name="adjustment">
+                      <object class="GtkAdjustment" id="history_size">
+                        <property name="lower">0</property>
+                        <property name="upper">100</property>
+                        <property name="step-increment">1</property>
+                      </object>
+                    </property>
                   </object>
                 </child>
               </object>

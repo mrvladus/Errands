@@ -114,6 +114,20 @@ class Window(Adw.ApplicationWindow):
 
     def update_undo(self):
         data: dict = UserData.get()
+        # Remove old tasks from history
+        if len(data["history"]) > GSettings.get("history-size"):
+            to_del_id = data["history"].pop(0)
+            for task in data["tasks"]:
+                if task["id"] == to_del_id:
+                    data["tasks"].remove(task)
+                    break
+                else:
+                    for sub in task["sub"]:
+                        if sub["id"] == to_del_id:
+                            task["sub"].remove(sub)
+                            break
+            UserData.set(data)
+        # Set sensitivity of undo button
         self.undo_btn.props.sensitive = len(data["history"]) > 0
 
     @Gtk.Template.Callback()
