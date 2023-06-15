@@ -82,17 +82,15 @@ class Task(Gtk.Box):
 
     def add_sub_tasks(self):
         for task in self.task["sub"]:
-            self.sub_tasks.append(SubTask(task, self))
+            self.sub_tasks.append(SubTask(task, self, self.window))
 
     def delete(self):
-        print(f"Completely delete task: {self.task['text']}")
+        print(f"Delete task: {self.task['text']}")
+        self.toggle_visibility()
         new_data: dict = UserData.get()
-        for task in new_data["tasks"]:
-            if task["id"] == self.task["id"]:
-                new_data["tasks"].remove(task)
-                break
+        new_data["history"].append(self.task["id"])
         UserData.set(new_data)
-        self.parent.remove(self)
+        self.window.update_undo()
         self.window.update_status()
 
     def expand(self, expanded: bool) -> None:
@@ -114,9 +112,10 @@ class Task(Gtk.Box):
         n_completed = 0
         n_total = 0
         for sub in self.task["sub"]:
-            n_total += 1
-            if sub["completed"]:
-                n_completed += 1
+            if sub["id"] not in UserData.get()["history"]:
+                n_total += 1
+                if sub["completed"]:
+                    n_completed += 1
         if n_total > 0:
             self.task_status.props.fraction = n_completed / n_total
         if self.expanded:
@@ -149,30 +148,15 @@ class Task(Gtk.Box):
 
     @Gtk.Template.Callback()
     def on_task_delete(self, _) -> None:
-        print(f"Delete task: {self.task['text']}")
-        self.toggle_visibility()
-        new_data: dict = UserData.get()
-        new_data["history"].append(self.task["id"])
-        UserData.set(new_data)
-        self.window.update_undo()
+        self.delete()
 
     @Gtk.Template.Callback()
     def on_delete_completed_btn_clicked(self, _) -> None:
-        # Remove data
-        self.task["sub"] = [sub for sub in self.task["sub"] if not sub["completed"]]
-        self.update_data()
-        # Remove widgets
-        to_remove = []
-        childrens = self.sub_tasks.observe_children()
-        for i in range(childrens.get_n_items()):
-            child = childrens.get_item(i)
-            if child.task["completed"]:
-                to_remove.append(child)
-        for task in to_remove:
-            print("Remove:", task.task["text"])
-            self.sub_tasks.remove(task)
-        # Update statusbar
-        self.update_statusbar()
+        sub_tasks = self.sub_tasks.observe_children()
+        for i in range(sub_tasks.get_n_items()):
+            sub = sub_tasks.get_item(i)
+            if sub.task["completed"]:
+                sub.delete()
 
     @Gtk.Template.Callback()
     def on_task_completed_btn_toggled(self, btn: Gtk.Button) -> None:
@@ -204,7 +188,7 @@ class Task(Gtk.Box):
         self.task["sub"].append(new_sub_task)
         self.update_data()
         # Add row
-        sub_task = SubTask(new_sub_task, self)
+        sub_task = SubTask(new_sub_task, self, self.window)
         self.sub_tasks.append(sub_task)
         if sub_task.get_prev_sibling():
             sub_task.get_prev_sibling().update_move_buttons()

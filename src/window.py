@@ -100,15 +100,15 @@ class Window(Adw.ApplicationWindow):
         n_total = 0
         n_completed = 0
         for task in data["tasks"]:
-            n_total += 1
-            if task["completed"]:
-                n_completed += 1
+            if task["id"] not in data["history"]:
+                n_total += 1
+                if task["completed"]:
+                    n_completed += 1
         # Update progress bar
         if n_total > 0:
             self.status.props.fraction = n_completed / n_total
         else:
             self.status.props.fraction = 0
-
         # Show delete completed button
         self.delete_completed_tasks_btn_revealer.set_reveal_child(n_completed > 0)
 
@@ -142,20 +142,11 @@ class Window(Adw.ApplicationWindow):
 
     @Gtk.Template.Callback()
     def on_delete_completed_tasks_btn_clicked(self, _) -> None:
-        new_data: dict = UserData.get()
-        new_data["tasks"] = [t for t in new_data["tasks"] if not t["completed"]]
-        UserData.set(new_data)
-        # Remove widgets
-        to_remove = []
-        childrens = self.tasks_list.observe_children()
-        for i in range(childrens.get_n_items()):
-            child = childrens.get_item(i)
-            if child.task["completed"]:
-                to_remove.append(child)
-        for task in to_remove:
-            print("Remove:", task.task["text"])
-            self.tasks_list.remove(task)
-        self.update_status()
+        tasks = self.tasks_list.observe_children()
+        for i in range(tasks.get_n_items()):
+            task = tasks.get_item(i)
+            if task.task["completed"]:
+                task.delete()
 
     @Gtk.Template.Callback()
     def on_undo_clicked(self, _) -> None:
@@ -167,10 +158,26 @@ class Window(Adw.ApplicationWindow):
             if task["id"] == last_task_id:
                 childrens = self.tasks_list.observe_children()
                 for i in range(childrens.get_n_items()):
+                    # Get task
                     child = childrens.get_item(i)
                     if child.task["id"] == last_task_id:
                         child.toggle_visibility()
                         data["history"].pop()
                         UserData.set(data)
+                        self.update_status()
                         self.update_undo()
                         return
+            else:
+                tasks = self.tasks_list.observe_children()
+                for i in range(tasks.get_n_items()):
+                    task = tasks.get_item(i)
+                    sub_tasks = task.sub_tasks.observe_children()
+                    for i in range(sub_tasks.get_n_items()):
+                        sub = sub_tasks.get_item(i)
+                        if sub.task["id"] == last_task_id:
+                            sub.toggle_visibility()
+                            data["history"].pop()
+                            UserData.set(data)
+                            task.update_statusbar()
+                            self.update_undo()
+                            return

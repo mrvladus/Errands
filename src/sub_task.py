@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from gi.repository import Gtk
+from gi.repository import Gtk, Adw
 from .utils import UserData, Markup
 
 
@@ -39,11 +39,14 @@ class SubTask(Gtk.Box):
     sub_task_move_down_btn = Gtk.Template.Child()
     sub_task_cancel_edit_btn = Gtk.Template.Child()
 
-    def __init__(self, task: dict, parent: Gtk.Box):
+    def __init__(self, task: dict, parent: Gtk.Box, window: Adw.ApplicationWindow):
         super().__init__()
         print("Add sub-task: ", task["text"])
         self.parent = parent
         self.task = task
+        self.window = window
+        # Hide if sub task is deleted
+        self.props.visible = self.task["id"] not in UserData.get()["history"]
         # Escape text and find URL's'
         self.text = Markup.escape(self.task["text"])
         self.text = Markup.find_url(self.text)
@@ -54,17 +57,13 @@ class SubTask(Gtk.Box):
         self.update_move_buttons()
 
     def delete(self) -> None:
-        print(f"Completely delete sub-task: {self.task['text']}")
-        # Remove sub-task data
+        print(f"Delete sub-task: {self.task['text']}")
+        self.toggle_visibility()
         new_data: dict = UserData.get()
-        sub: list = new_data["tasks"][new_data["tasks"].index(self.parent.task)]["sub"]
-        del sub[sub.index(self.task)]
+        new_data["history"].append(self.task["id"])
         UserData.set(new_data)
-        # Update parent data
-        self.parent.task["sub"] = sub
+        self.window.update_undo()
         self.parent.update_statusbar()
-        # Remove sub-task widget
-        self.parent.sub_tasks.remove(self)
 
     def toggle_edit_box(self) -> None:
         self.sub_task_box.props.visible = not self.sub_task_box.props.visible
@@ -106,9 +105,7 @@ class SubTask(Gtk.Box):
 
     @Gtk.Template.Callback()
     def on_sub_task_delete_btn_clicked(self, _) -> None:
-        print(f"Delete sub-task: {self.task['text']}")
-        self.toggle_visibility()
-        self.task["deleted"] = True
+        self.delete()
 
     @Gtk.Template.Callback()
     def on_sub_task_edit_btn_clicked(self, _) -> None:
