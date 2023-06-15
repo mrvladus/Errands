@@ -130,7 +130,6 @@ class TaskUtils:
             "sub": [],
             "color": "",
             "completed": False,
-            "deleted": False,
         }
 
     @classmethod
@@ -139,7 +138,6 @@ class TaskUtils:
             "id": self.generate_id(),
             "text": text,
             "completed": False,
-            "deleted": False,
         }
 
 
@@ -197,7 +195,6 @@ class UserData:
                             "id": TaskUtils.generate_id(),
                             "text": Markup.rm_crossline(new_text),
                             "completed": True if Markup.is_crosslined(sub) else False,
-                            "deleted": False,
                         }
                     )
                 new_data["tasks"].append(
@@ -207,7 +204,6 @@ class UserData:
                         "sub": new_sub_tasks,
                         "color": old_tasks[task]["color"],
                         "completed": True if Markup.is_crosslined(task) else False,
-                        "deleted": False,
                     }
                 )
             UserData.set(new_data)
@@ -219,8 +215,6 @@ class UserData:
             new_data["history"] = []
             for task in new_data["tasks"]:
                 task["id"] = TaskUtils.generate_id()
-                task["deleted"] = False
                 for sub in task["sub"]:
                     sub["id"] = TaskUtils.generate_id()
-                    sub["deleted"] = False
             self.set(new_data)

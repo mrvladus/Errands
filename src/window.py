@@ -58,7 +58,6 @@ class Window(Adw.ApplicationWindow):
             lambda *_: self.props.application.quit(),
             ["<primary>q"],
         )
-        # Load tasks
         self.load_tasks()
         self.update_status()
         self.update_undo()
@@ -71,6 +70,16 @@ class Window(Adw.ApplicationWindow):
         self.props.application.add_action(action)
 
     def load_tasks(self) -> None:
+        # Clear history
+        if GSettings.get("clear-history-on-startup"):
+            print("Clearing history...")
+            data: dict = UserData.get()
+            data["tasks"] = [t for t in data["tasks"] if not t["id"] in data["history"]]
+            for task in data["tasks"]:
+                task["sub"] = [s for s in task["sub"] if not s["id"] in data["history"]]
+            data["history"] = []
+            UserData.set(data)
+        # Load tasks
         print("Loading tasks...")
         data: dict = UserData.get()
         if data["tasks"] == []:
@@ -149,19 +158,17 @@ class Window(Adw.ApplicationWindow):
         self.update_status()
 
     @Gtk.Template.Callback()
-    def on_undo_clicked(self, btn: Gtk.Button) -> None:
+    def on_undo_clicked(self, _) -> None:
         data: dict = UserData.get()
         if len(data["history"]) == 0:
             return
         last_task_id: str = data["history"][-1]
         for task in data["tasks"]:
             if task["id"] == last_task_id:
-                task["deleted"] = False
                 childrens = self.tasks_list.observe_children()
                 for i in range(childrens.get_n_items()):
                     child = childrens.get_item(i)
                     if child.task["id"] == last_task_id:
-                        child.task["deleted"] = False
                         child.toggle_visibility()
                         data["history"].pop()
                         UserData.set(data)

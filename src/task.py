@@ -59,7 +59,7 @@ class Task(Gtk.Box):
         self.parent = self.window.tasks_list
         self.task = task
         # Hide if task is deleted
-        self.props.visible = not self.task["deleted"]
+        self.props.visible = self.task["id"] not in UserData.get()["history"]
         # Escape text and find URL's'
         self.text = Markup.escape(self.task["text"])
         self.text = Markup.find_url(self.text)
@@ -151,8 +151,6 @@ class Task(Gtk.Box):
     def on_task_delete(self, _) -> None:
         print(f"Delete task: {self.task['text']}")
         self.toggle_visibility()
-        self.task["deleted"] = True
-        self.update_data()
         new_data: dict = UserData.get()
         new_data["history"].append(self.task["id"])
         UserData.set(new_data)

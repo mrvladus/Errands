@@ -84,6 +84,24 @@
             </child>
           </object>
         </child>
+        <!-- History settings -->
+        <child>
+          <object class="AdwPreferencesGroup">
+            <property name="title" translatable="yes">History</property>
+            <!-- Expand task -->
+            <child>
+              <object class="AdwActionRow">
+                <property name="title" translatable="yes">Clear history on startup</property>
+                <property name="activatable-widget">clear_history_on_startup</property>
+                <child type="suffix">
+                  <object class="GtkSwitch" id="clear_history_on_startup">
+                    <property name="valign">center</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
       </object>
     </child>
   </template>
