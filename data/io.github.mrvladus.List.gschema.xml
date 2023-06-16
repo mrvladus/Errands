@@ -20,7 +20,7 @@
       <default>false</default>
     </key>
     <key name="history-size" type="i">
-      <default>50</default>
+      <default>20</default>
     </key>
   </schema>
 </schemalist>
