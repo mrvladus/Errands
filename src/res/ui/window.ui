@@ -94,6 +94,9 @@
                                     <property name="icon-name">edit-clear-all-symbolic</property>
                                     <property name="tooltip-text" translatable="yes">Delete completed tasks</property>
                                     <signal name="clicked" handler="on_delete_completed_tasks_btn_clicked"/>
+                                    <accessibility>
+                                      <property name="label" translatable="yes">Delete completed tasks</property>
+                                    </accessibility>
                                     <style>
                                       <class name="flat"/>
                                     </style>

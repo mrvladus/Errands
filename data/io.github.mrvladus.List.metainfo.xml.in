@@ -49,6 +49,8 @@
           <li>Added new setting for clearing history on startup (OFF by default)</li>
           <li>Added new setting for history size (20 items by default)</li>
           <li>Added new setting for hiding accent color button if you don't use it</li>
+          <li>UI improvements</li>
+          <li>Accessibility improvements</li>
         </ul>
         <p>Translations:</p>
         <ul>

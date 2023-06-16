@@ -21,6 +21,9 @@
             <property name="tooltip-text" translatable="yes">Delete</property>
             <property name="valign">center</property>
             <signal name="clicked" handler="on_sub_task_delete_btn_clicked"/>
+            <accessibility>
+              <property name="label" translatable="yes">Delete</property>
+            </accessibility>
             <style>
               <class name="flat"/>
             </style>
@@ -45,6 +48,9 @@
             <property name="tooltip-text" translatable="yes">Edit</property>
             <property name="valign">center</property>
             <signal name="clicked" handler="on_sub_task_edit_btn_clicked"/>
+            <accessibility>
+              <property name="label" translatable="yes">Edit</property>
+            </accessibility>
             <style>
               <class name="flat"/>
             </style>
@@ -56,6 +62,9 @@
             <property name="valign">center</property>
             <property name="tooltip-text" translatable="yes">Mark as completed</property>
             <signal name="toggled" handler="on_completed_btn_toggled"/>
+            <accessibility>
+              <property name="label" translatable="yes">Mark as completed</property>
+            </accessibility>
           </object>
         </child>
       </object>
@@ -89,6 +98,9 @@
                 <property name="icon-name">go-up-symbolic</property>
                 <property name="tooltip-text" translatable="yes">Move up</property>
                 <signal name="clicked" handler="on_sub_task_move_up_btn_clicked"/>
+                <accessibility>
+                  <property name="label" translatable="yes">Move up</property>
+                </accessibility>
               </object>
             </child>
             <!-- Move down button -->
@@ -98,6 +110,9 @@
                 <property name="icon-name">go-down-symbolic</property>
                 <property name="tooltip-text" translatable="yes">Move down</property>
                 <signal name="clicked" handler="on_sub_task_move_down_btn_clicked"/>
+                <accessibility>
+                  <property name="label" translatable="yes">Move down</property>
+                </accessibility>
               </object>
             </child>
           </object>
@@ -109,6 +124,9 @@
             <property name="tooltip-text" translatable="yes">Cancel</property>
             <property name="valign">center</property>
             <signal name="clicked" handler="on_sub_task_cancel_edit_btn_clicked"/>
+            <accessibility>
+              <property name="label" translatable="yes">Cancel</property>
+            </accessibility>
             <style>
               <class name="flat"/>
             </style>
