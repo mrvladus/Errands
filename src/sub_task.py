@@ -71,13 +71,7 @@ class SubTask(Gtk.Box):
     def toggle_visibility(self) -> None:
         self.props.visible = not self.props.visible
 
-    def update_move_buttons(self) -> None:
-        # idx: int = self.parent.task["sub"].index(self.task)
-        # length: int = len(self.parent.task["sub"])
-        # self.sub_task_move_up_btn.props.sensitive = False if idx == 0 else True
-        # self.sub_task_move_down_btn.props.sensitive = (
-        #     False if idx == length - 1 else True
-        # )
+    def update_move_buttons(self):
         pass
 
     def update_data(self) -> None:
@@ -128,25 +122,11 @@ class SubTask(Gtk.Box):
         # Return if text the same or empty
         if new_text == old_text or new_text == "":
             return
-        new_data: dict = UserData.get()
-        for task in new_data["tasks"]:
-            if task["text"] == self.parent.task["text"]:
-                # Return if sub-task exists
-                for sub in task["sub"]:
-                    if sub["text"] == new_text:
-                        return
-                # Set new data
-                print(f"Change sub-task: '{old_text}' to '{new_text}'")
-                self.task = {"text": new_text, "completed": False}
-                for i, sub in enumerate(task["sub"]):
-                    if sub["text"] == old_text:
-                        task["sub"][i] = self.task
-                        UserData.set(new_data)
-                        # Update parent data
-                        self.parent.task["sub"] = task["sub"]
-                        self.parent.update_statusbar()
-                        break
-                break
+        print(f"Change sub-task: '{old_text}' to '{new_text}'")
+        self.task["text"] = new_text
+        self.task["completed"] = False
+        self.update_data()
+        self.parent.update_statusbar()
         # Escape text and find URL's'
         self.text = Markup.escape(self.task["text"])
         self.text = Markup.find_url(self.text)
