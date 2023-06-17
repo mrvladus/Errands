@@ -41,6 +41,13 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="44.6.2" date="2023-06-18">
+      <description>
+        <ul>
+          <li>Added transition animation for progress bar color switching</li>
+        </ul>
+      </description>
+    </release>
     <release version="44.6.1" date="2023-06-17">
       <description>
         <ul>
