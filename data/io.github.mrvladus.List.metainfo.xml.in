@@ -41,6 +41,14 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="44.6.1" date="2023-06-17">
+      <description>
+        <ul>
+          <li>Fixed bug with app not opening</li>
+          <li>Added animations for accent color switching</li>
+        </ul>
+      </description>
+    </release>
     <release version="44.6" date="2023-06-16">
       <description>
         <p>UI/UX:</p>
