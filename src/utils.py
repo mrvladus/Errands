@@ -209,7 +209,7 @@ class UserData:
             UserData.set(new_data)
             return
         # Versions 44.5.x
-        if ver.startswith("44.5"):
+        elif ver.startswith("44.5"):
             new_data: dict = self.get()
             new_data["version"] = VERSION
             new_data["history"] = []
