@@ -181,6 +181,11 @@ class UserData:
     def convert(self) -> None:
         data: dict = self.get()
         ver: str = data["version"]
+        # Bugfix
+        if ver == "":
+            data["version"] = "44.5"
+            self.set(data)
+            ver = "44.5"
         # Versions 44.3.x and 44.4.x
         if ver.startswith("44.4") or ver.startswith("44.3"):
             new_data: dict = self.default_data
