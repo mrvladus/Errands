@@ -117,7 +117,29 @@ class Task(Gtk.Box):
                 if sub["completed"]:
                     n_completed += 1
         if n_total > 0:
-            self.task_status.props.fraction = n_completed / n_total
+            animation = Adw.TimedAnimation.new(
+                self.task_status,
+                self.task_status.props.fraction,
+                n_completed / n_total,
+                250,
+                Adw.CallbackAnimationTarget.new(
+                    self.update_statusbar_animation,
+                    None,
+                ),
+            )
+            animation.play()
+        else:
+            animation = Adw.TimedAnimation.new(
+                self.task_status,
+                self.task_status.props.fraction,
+                0,
+                250,
+                Adw.CallbackAnimationTarget.new(
+                    self.update_statusbar_animation,
+                    None,
+                ),
+            )
+            animation.play()
         if self.expanded:
             self.task_status.props.visible = True
             self.task_status.add_css_class("task-progressbar")
@@ -127,6 +149,9 @@ class Task(Gtk.Box):
                 self.task_status.props.visible = False
         # Show delete completed button
         self.delete_completed_btn_revealer.set_reveal_child(n_completed > 0)
+
+    def update_statusbar_animation(self, value, _):
+        self.task_status.props.fraction = value
 
     def update_data(self) -> None:
         """Sync self.task with user data.json"""
@@ -155,8 +180,12 @@ class Task(Gtk.Box):
         sub_tasks = self.sub_tasks.observe_children()
         for i in range(sub_tasks.get_n_items()):
             sub = sub_tasks.get_item(i)
-            if sub.task["completed"]:
+            if (
+                sub.task["completed"]
+                and sub.task["id"] not in UserData.get()["history"]
+            ):
                 sub.delete()
+        self.update_statusbar()
 
     @Gtk.Template.Callback()
     def on_task_completed_btn_toggled(self, btn: Gtk.Button) -> None:

@@ -63,7 +63,6 @@ class SubTask(Gtk.Box):
         new_data["history"].append(self.task["id"])
         UserData.set(new_data)
         self.window.update_undo()
-        self.parent.update_statusbar()
 
     def toggle_edit_box(self) -> None:
         self.sub_task_box.props.visible = not self.sub_task_box.props.visible
@@ -106,6 +105,7 @@ class SubTask(Gtk.Box):
     @Gtk.Template.Callback()
     def on_sub_task_delete_btn_clicked(self, _) -> None:
         self.delete()
+        self.parent.update_statusbar()
 
     @Gtk.Template.Callback()
     def on_sub_task_edit_btn_clicked(self, _) -> None:
