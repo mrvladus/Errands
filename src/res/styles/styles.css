@@ -83,13 +83,17 @@
 }
 
 /* Progress bar */
-.task-progressbar {
-    background-color: @card_shade_color;
-}
-
 progressbar {
   transition: background-color 0.5s;
   opacity: 0.7;
+}
+
+progress {
+  transition: background-color 0.5s;
+}
+
+.task-progressbar {
+  background-color: @card_shade_color;
 }
 
 .progress-blue progress {
