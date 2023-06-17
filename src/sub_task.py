@@ -138,50 +138,41 @@ class SubTask(Gtk.Box):
 
     @Gtk.Template.Callback()
     def on_sub_task_move_up_btn_clicked(self, _) -> None:
-        if self.parent.task["sub"].index(self.task) == 0:
-            return
         print(f"""Move task "{self.task['text']}" up""")
+        data: dict = UserData.get()
+        subs: list = data["tasks"][data["tasks"].index(self.parent.task)]["sub"]
+        idx = subs.index(self.task)
+        subs[idx], subs[idx - 1] = subs[idx - 1], subs[idx]
+        UserData.set(data)
+        self.parent.task["sub"] = subs
         # Move widget
-        self.parent.sub_tasks.reorder_child_after(self.get_prev_sibling(), self)
-        # Update data
-        new_data: dict = UserData.get()
-        task_idx: int = new_data["tasks"].index(self.parent.task)
-        sub_idx: int = new_data["tasks"][task_idx]["sub"].index(self.task)
-        (
-            new_data["tasks"][task_idx]["sub"][sub_idx - 1],
-            new_data["tasks"][task_idx]["sub"][sub_idx],
-        ) = (
-            new_data["tasks"][task_idx]["sub"][sub_idx],
-            new_data["tasks"][task_idx]["sub"][sub_idx - 1],
-        )
-        UserData.set(new_data)
-        # Update parent task
-        self.parent.task["sub"] = new_data["tasks"][task_idx]["sub"]
-        # Update buttons
-        self.update_move_buttons()
-        self.get_next_sibling().update_move_buttons()
+        if self.get_prev_sibling():
+            self.parent.sub_tasks.reorder_child_after(self.get_prev_sibling(), self)
+        else:
+            self.parent.sub_tasks.reorder_child_after(
+                self, self.parent.sub_tasks.get_last_child()
+            )
 
     @Gtk.Template.Callback()
     def on_sub_task_move_down_btn_clicked(self, _) -> None:
-        if self.parent.task["sub"].index(self.task) + 1 == len(self.parent.task["sub"]):
+        data: dict = UserData.get()
+        subs: list = data["tasks"][data["tasks"].index(self.parent.task)]["sub"]
+        idx = subs.index(self.task)
+        # Find if sub-task is last undeleted
+        deleted = 0
+        for i in range(idx + 1, len(subs)):
+            if subs[i]["id"] in data["history"]:
+                deleted += 1
+            else:
+                break
+        if deleted == undeleted == 0:
+            print("last")
             return
         print(f"""Move task "{self.task['text']}" down""")
-        # Move widget
-        self.parent.sub_tasks.reorder_child_after(self, self.get_next_sibling())
-        # Update data
-        new_data: dict = UserData.get()
-        task_idx: int = new_data["tasks"].index(self.parent.task)
-        sub_idx: int = new_data["tasks"][task_idx]["sub"].index(self.task)
-        (
-            new_data["tasks"][task_idx]["sub"][sub_idx + 1],
-            new_data["tasks"][task_idx]["sub"][sub_idx],
-        ) = (
-            new_data["tasks"][task_idx]["sub"][sub_idx],
-            new_data["tasks"][task_idx]["sub"][sub_idx + 1],
-        )
-        UserData.set(new_data)
-        # Update parent task
-        self.parent.task["sub"] = new_data["tasks"][task_idx]["sub"]
-        # Update buttons
-        self.update_move_buttons()
-        self.get_prev_sibling().update_move_buttons()
+        print(subs, deleted)
+        subs[idx], subs[idx + deleted + 1] = subs[idx + deleted + 1], subs[idx]
+        UserData.set(data)
+        print(subs)
+        self.parent.task["sub"] = subs
+        if self.get_next_sibling():
+            self.parent.sub_tasks.reorder_child_after(self, self.get_next_sibling())
