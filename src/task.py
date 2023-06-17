@@ -245,7 +245,12 @@ class Task(Gtk.Box):
                 color = i.split("-")[1]
                 break
         # Color card
-        self.set_css_classes(["card"] if color == "" else ["card", f"task-{color}"])
+        for c in self.get_css_classes():
+            if "task-" in c:
+                self.remove_css_class(c)
+                break
+        self.add_css_class(f"task-{color}")
+        # self.set_css_classes(["card"] if color == "" else ["card", f"task-{color}"])
         # Color statusbar
         for c in self.task_status.get_css_classes():
             if "progress-" in c:

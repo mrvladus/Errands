@@ -7,6 +7,7 @@
     <property name="hexpand">true</property>
     <style>
       <class name="card"/>
+      <class name="task"/>
     </style>
     <!-- Horizontal box -->
     <child>

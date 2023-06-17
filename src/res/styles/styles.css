@@ -1,4 +1,8 @@
 /* Task */
+.task {
+    transition: background 0.5s;
+}
+
 .task-blue {
     background: alpha(@blue_1, 0.3);
 }
