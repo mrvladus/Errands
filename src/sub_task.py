@@ -72,20 +72,21 @@ class SubTask(Gtk.Box):
         self.props.visible = not self.props.visible
 
     def update_move_buttons(self) -> None:
-        idx: int = self.parent.task["sub"].index(self.task)
-        length: int = len(self.parent.task["sub"])
-        self.sub_task_move_up_btn.props.sensitive = False if idx == 0 else True
-        self.sub_task_move_down_btn.props.sensitive = (
-            False if idx == length - 1 else True
-        )
+        # idx: int = self.parent.task["sub"].index(self.task)
+        # length: int = len(self.parent.task["sub"])
+        # self.sub_task_move_up_btn.props.sensitive = False if idx == 0 else True
+        # self.sub_task_move_down_btn.props.sensitive = (
+        #     False if idx == length - 1 else True
+        # )
+        pass
 
-    def update_sub_task(self, new_sub_task: dict) -> None:
+    def update_data(self) -> None:
         new_data: dict = UserData.get()
         for task in new_data["tasks"]:
-            if task["text"] == self.parent.task["text"]:
+            if task["id"] == self.parent.task["id"]:
                 for i, sub in enumerate(task["sub"]):
-                    if sub["text"] == self.task["text"]:
-                        task["sub"][i] = new_sub_task
+                    if sub["id"] == self.task["id"]:
+                        task["sub"][i] = self.task
                         UserData.set(new_data)
                         # Update parent data
                         self.parent.task["sub"] = task["sub"]
@@ -94,8 +95,9 @@ class SubTask(Gtk.Box):
     @Gtk.Template.Callback()
     def on_completed_btn_toggled(self, btn: Gtk.Button) -> None:
         self.task["completed"] = btn.props.active
-        self.update_sub_task(self.task)
+        self.update_data()
         self.parent.update_statusbar()
+        # Set crosslined text
         if self.task["completed"]:
             self.text = Markup.add_crossline(self.text)
         else:

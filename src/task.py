@@ -208,10 +208,6 @@ class Task(Gtk.Box):
         # Return if entry is empty
         if entry.get_buffer().props.text == "":
             return
-        # Return if task exists
-        for sub in self.task["sub"]:
-            if sub["text"] == entry.get_buffer().props.text:
-                return
         # Add new sub-task
         new_sub_task = TaskUtils.new_sub_task(entry.get_buffer().props.text)
         self.task["sub"].append(new_sub_task)
