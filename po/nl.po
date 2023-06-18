@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: list\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-15 20:54+0300\n"
+"POT-Creation-Date: 2023-06-18 19:40+0300\n"
 "PO-Revision-Date: 2023-05-25 16:59+0200\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language: nl\n"
@@ -28,23 +28,23 @@ msgstr ""
 msgid "Add new task"
 msgstr "Taak toevoegen"
 
-#: src/res/ui/window.ui:95
+#: src/res/ui/window.ui:95 src/res/ui/window.ui:98
 msgid "Delete completed tasks"
 msgstr ""
 
-#: src/res/ui/window.ui:141
+#: src/res/ui/window.ui:144
 msgid "Preferences"
 msgstr "Voorkeuren"
 
-#: src/res/ui/window.ui:145
+#: src/res/ui/window.ui:148
 msgid "About List"
 msgstr "Over List"
 
-#: src/res/ui/window.ui:149
+#: src/res/ui/window.ui:152
 msgid "Quit"
 msgstr "Afsluiten"
 
-#: src/res/ui/window.ui:161
+#: src/res/ui/window.ui:164
 msgid "translator-credits"
 msgstr "Heimen Stoffels <vistausss@fastmail.com>"
 
@@ -88,46 +88,64 @@ msgstr ""
 msgid "History size"
 msgstr ""
 
-#: src/res/ui/sub_task.ui:21 src/res/ui/task.ui:45
+#: src/res/ui/preferences.ui:128
+msgid "Backup"
+msgstr ""
+
+#: src/res/ui/preferences.ui:131
+msgid "Save data backup to your HOME folder"
+msgstr ""
+
+#: src/res/ui/preferences.ui:132
+msgid "File name is \"list_backup_data.json\""
+msgstr ""
+
+#: src/res/ui/sub_task.ui:21 src/res/ui/sub_task.ui:25 src/res/ui/task.ui:46
+#: src/res/ui/task.ui:50
 msgid "Delete"
 msgstr "Verwijderen"
 
-#: src/res/ui/sub_task.ui:45 src/res/ui/task.ui:176
+#: src/res/ui/sub_task.ui:48 src/res/ui/sub_task.ui:52 src/res/ui/task.ui:189
+#: src/res/ui/task.ui:193
 msgid "Edit"
 msgstr "Bewerken"
 
-#: src/res/ui/sub_task.ui:57 src/res/ui/task.ui:188
+#: src/res/ui/sub_task.ui:63 src/res/ui/sub_task.ui:66 src/res/ui/task.ui:204
+#: src/res/ui/task.ui:207
 msgid "Mark as completed"
 msgstr "Markeren als afgerond"
 
-#: src/res/ui/sub_task.ui:90 src/res/ui/task.ui:221
+#: src/res/ui/sub_task.ui:99 src/res/ui/sub_task.ui:102 src/res/ui/task.ui:240
+#: src/res/ui/task.ui:243
 msgid "Move up"
 msgstr "Omhoog verplaatsen"
 
-#: src/res/ui/sub_task.ui:99 src/res/ui/task.ui:230
+#: src/res/ui/sub_task.ui:111 src/res/ui/sub_task.ui:114 src/res/ui/task.ui:252
+#: src/res/ui/task.ui:255
 msgid "Move down"
 msgstr "Omlaag verplaatsen"
 
-#: src/res/ui/sub_task.ui:109 src/res/ui/task.ui:240
+#: src/res/ui/sub_task.ui:124 src/res/ui/sub_task.ui:128 src/res/ui/task.ui:265
+#: src/res/ui/task.ui:269
 msgid "Cancel"
 msgstr "Annuleren"
 
-#: src/res/ui/task.ui:68
+#: src/res/ui/task.ui:72 src/res/ui/task.ui:76
 msgid "Toggle sub-tasks"
 msgstr "Bijkomende taken tonen/verbergen"
 
-#: src/res/ui/task.ui:81
+#: src/res/ui/task.ui:88 src/res/ui/task.ui:178
 msgid "Accent color"
 msgstr "Accentkleur"
 
-#: src/res/ui/task.ui:96
+#: src/res/ui/task.ui:103 src/res/ui/task.ui:106
 msgid "Clear style"
 msgstr "Standaard"
 
-#: src/res/ui/task.ui:270
+#: src/res/ui/task.ui:298
 msgid "Add new sub-task"
 msgstr "Bijkomende taak toevoegen"
 
-#: src/res/ui/task.ui:283
+#: src/res/ui/task.ui:311 src/res/ui/task.ui:315
 msgid "Delete completed sub-tasks"
 msgstr "Afgeronde bijkomende taken wissen"

@@ -19,9 +19,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
 from gi.repository import Adw, Gtk, GLib
-from .utils import GSettings
+from .utils import GSettings, UserData
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/List/preferences.ui")
@@ -67,3 +66,9 @@ class PreferencesWindow(Adw.PreferencesWindow):
             theme = 4
         Adw.StyleManager.get_default().set_color_scheme(theme)
         GSettings.set("theme", "i", theme)
+
+    @Gtk.Template.Callback()
+    def on_save_backup(self, _):
+        UserData.backup()
+        GLib.spawn_command_line_async(f"xdg-open {GLib.get_home_dir()}")
+        self.hide()
