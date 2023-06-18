@@ -43,9 +43,14 @@
   <releases>
     <release version="44.6.2" date="2023-06-19">
       <description>
+        <p>UI/UX:</p>
         <ul>
           <li>Added animations for progress bars</li>
           <li>Bug fixes and improvements</li>
+        </ul>
+        <p>Translations:</p>
+        <ul>
+          <li>Added Turkish translation (Sabri Ünal)</li>
         </ul>
       </description>
     </release>
