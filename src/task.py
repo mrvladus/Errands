@@ -307,18 +307,27 @@ class Task(Gtk.Box):
 
     @Gtk.Template.Callback()
     def on_task_move_down_btn_clicked(self, _) -> None:
-        new_data: dict = UserData.get()
-        idx: int = new_data["tasks"].index(self.task)
-        if idx + 1 == len(new_data["tasks"]):
+        data: dict = UserData.get()
+        tasks: dict = data["tasks"]
+        idx: int = tasks.index(self.task)
+        # Find if sub-task is last
+        deleted = 0
+        for i in range(idx + 1, len(tasks)):
+            if tasks[i]["id"] in data["history"]:
+                deleted += 1
+            else:
+                break
+        if len(tasks) - 1 == idx + deleted:
+            print("Can't move down: task is last")
             return
         print(f"""Move task "{self.task['text']}" down""")
+        tasks[idx], tasks[idx + deleted + 1] = tasks[idx + deleted + 1], tasks[idx]
+        UserData.set(data)
         # Move widget
-        self.get_parent().reorder_child_after(self, self.get_next_sibling())
-        # Update data
-        new_data["tasks"][idx + 1], new_data["tasks"][idx] = (
-            new_data["tasks"][idx],
-            new_data["tasks"][idx + 1],
-        )
-        UserData.set(new_data)
-        # Update task
-        self.task = new_data["tasks"][idx + 1]
+        sibling = self.get_next_sibling()
+        while True:
+            if sibling.task["id"] in data["history"]:
+                sibling = sibling.get_next_sibling()
+            else:
+                break
+        self.get_parent().reorder_child_after(self, sibling)

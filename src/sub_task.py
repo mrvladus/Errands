@@ -188,7 +188,9 @@ class SubTask(Gtk.Box):
         self.parent.task["sub"] = subs
         # Move widget
         sibling = self.get_next_sibling()
-        if deleted > 0:
-            for i in range(deleted):
+        while True:
+            if sibling.task["id"] in data["history"]:
                 sibling = sibling.get_next_sibling()
-        self.parent.sub_tasks.reorder_child_after(self, sibling)
+            else:
+                break
+        self.get_parent().reorder_child_after(self, sibling)
