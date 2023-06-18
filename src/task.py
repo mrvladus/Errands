@@ -161,7 +161,7 @@ class Task(Gtk.Box):
 
     @Gtk.Template.Callback()
     def on_delete_completed_btn_clicked(self, _) -> None:
-        history = UserData.get()["history"]
+        history: list = UserData.get()["history"]
         sub_tasks = self.sub_tasks.observe_children()
         for i in range(sub_tasks.get_n_items()):
             sub = sub_tasks.get_item(i)

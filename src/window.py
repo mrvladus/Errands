@@ -158,7 +158,7 @@ class Window(Adw.ApplicationWindow):
 
     @Gtk.Template.Callback()
     def on_delete_completed_tasks_btn_clicked(self, _) -> None:
-        history = UserData.get()["history"]
+        history: list = UserData.get()["history"]
         tasks = self.tasks_list.observe_children()
         for i in range(tasks.get_n_items()):
             task = tasks.get_item(i)

@@ -180,6 +180,13 @@ class UserData:
                 json.dump(self.default_data, f)
         self.convert()
 
+    # Backup user data
+    @classmethod
+    def backup(self) -> None:
+        data = self.get()
+        with open(GLib.get_home_dir() + "/list_backup_data.json", "w+") as f:
+            json.dump(data, f, indent=4)
+
     # Load user data from json
     @classmethod
     def get(self) -> dict:
