@@ -1,6 +1,6 @@
 /* Task */
 .task {
-    transition: background 0.5s;
+    transition: background 0.25s;
 }
 
 .task-blue {
@@ -84,12 +84,12 @@
 
 /* Progress bar */
 progressbar {
-  transition: background-color 0.5s;
+  transition: background-color 0.25s;
   opacity: 0.7;
 }
 
 progress {
-  transition: background-color 0.5s;
+  transition: background-color 0.25s;
 }
 
 .task-progressbar {
