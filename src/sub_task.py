@@ -142,37 +142,50 @@ class SubTask(Gtk.Box):
         data: dict = UserData.get()
         subs: list = data["tasks"][data["tasks"].index(self.parent.task)]["sub"]
         idx = subs.index(self.task)
-        subs[idx], subs[idx - 1] = subs[idx - 1], subs[idx]
+        # Find if sub-task is first
+        if idx == 0:
+            print("Can't move up: task is first")
+            return
+        deleted = 0
+        for i in range(idx - 1, -1, -1):
+            if subs[i]["id"] in data["history"]:
+                deleted += 1
+            else:
+                break
+        if idx - deleted == 0:
+            print("Can't move up: task is first")
+            return
+        subs[idx], subs[idx - deleted - 1] = subs[idx - deleted - 1], subs[idx]
         UserData.set(data)
         self.parent.task["sub"] = subs
         # Move widget
-        if self.get_prev_sibling():
-            self.parent.sub_tasks.reorder_child_after(self.get_prev_sibling(), self)
-        else:
-            self.parent.sub_tasks.reorder_child_after(
-                self, self.parent.sub_tasks.get_last_child()
-            )
+        sibling = self.get_prev_sibling()
+        for i in range(deleted):
+            sibling = sibling.get_prev_sibling()
+        self.parent.sub_tasks.reorder_child_after(sibling, self)
 
     @Gtk.Template.Callback()
     def on_sub_task_move_down_btn_clicked(self, _) -> None:
         data: dict = UserData.get()
         subs: list = data["tasks"][data["tasks"].index(self.parent.task)]["sub"]
         idx = subs.index(self.task)
-        # Find if sub-task is last undeleted
+        # Find if sub-task is last
         deleted = 0
         for i in range(idx + 1, len(subs)):
             if subs[i]["id"] in data["history"]:
                 deleted += 1
             else:
                 break
-        if deleted == undeleted == 0:
-            print("last")
+        if len(subs) - 1 == idx + deleted:
+            print("Can't move down: task is last")
             return
         print(f"""Move task "{self.task['text']}" down""")
-        print(subs, deleted)
         subs[idx], subs[idx + deleted + 1] = subs[idx + deleted + 1], subs[idx]
         UserData.set(data)
-        print(subs)
         self.parent.task["sub"] = subs
-        if self.get_next_sibling():
-            self.parent.sub_tasks.reorder_child_after(self, self.get_next_sibling())
+        # Move widget
+        sibling = self.get_next_sibling()
+        if deleted > 0:
+            for i in range(deleted):
+                sibling = sibling.get_next_sibling()
+        self.parent.sub_tasks.reorder_child_after(self, sibling)
