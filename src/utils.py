@@ -23,8 +23,27 @@
 import os
 import json
 import uuid
-from gi.repository import GLib, Gio
+from gi.repository import GLib, Gio, Adw
 from __main__ import VERSION, APP_ID
+
+
+class Animation:
+    """Wrapper for Adw.Animation"""
+
+    def __init__(self, obj, prop: str, v_from, v_to, time_ms):
+        self.obj = obj
+        self.prop = prop
+        animation = Adw.TimedAnimation.new(
+            self.obj,
+            v_from,
+            v_to,
+            time_ms,
+            Adw.CallbackAnimationTarget.new(self.callback, None),
+        )
+        animation.play()
+
+    def callback(self, value, _):
+        self.obj.set_property(self.prop, value)
 
 
 class GSettings:

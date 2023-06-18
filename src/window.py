@@ -22,7 +22,7 @@
 
 from gi.repository import Gio, Adw, Gtk
 from __main__ import VERSION
-from .utils import GSettings, TaskUtils, UserData
+from .utils import Animation, GSettings, TaskUtils, UserData
 from .task import Task
 from .preferences import PreferencesWindow
 
@@ -104,9 +104,21 @@ class Window(Adw.ApplicationWindow):
                     n_completed += 1
         # Update progress bar
         if n_total > 0:
-            self.status.props.fraction = n_completed / n_total
+            Animation(
+                self.status,
+                "fraction",
+                self.status.props.fraction,
+                n_completed / n_total,
+                250,
+            )
         else:
-            self.status.props.fraction = 0
+            Animation(
+                self.status,
+                "fraction",
+                self.status.props.fraction,
+                0,
+                250,
+            )
         # Show delete completed button
         self.delete_completed_tasks_btn_revealer.set_reveal_child(n_completed > 0)
 
@@ -146,11 +158,13 @@ class Window(Adw.ApplicationWindow):
 
     @Gtk.Template.Callback()
     def on_delete_completed_tasks_btn_clicked(self, _) -> None:
+        history = UserData.get()["history"]
         tasks = self.tasks_list.observe_children()
         for i in range(tasks.get_n_items()):
             task = tasks.get_item(i)
-            if task.task["completed"]:
+            if task.task["completed"] and task.task["id"] not in history:
                 task.delete()
+        self.update_status()
 
     @Gtk.Template.Callback()
     def on_undo_clicked(self, _) -> None:

@@ -22,7 +22,7 @@
 
 from gi.repository import Gtk, Adw
 from .sub_task import SubTask
-from .utils import GSettings, Markup, TaskUtils, UserData
+from .utils import Animation, GSettings, Markup, TaskUtils, UserData
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/List/task.ui")
@@ -90,7 +90,6 @@ class Task(Gtk.Box):
         new_data["history"].append(self.task["id"])
         UserData.set(new_data)
         self.window.update_undo()
-        self.window.update_status()
 
     def expand(self, expanded: bool) -> None:
         self.expanded = expanded
@@ -116,29 +115,21 @@ class Task(Gtk.Box):
                 if sub["completed"]:
                     n_completed += 1
         if n_total > 0:
-            animation = Adw.TimedAnimation.new(
+            Animation(
                 self.task_status,
+                "fraction",
                 self.task_status.props.fraction,
                 n_completed / n_total,
                 250,
-                Adw.CallbackAnimationTarget.new(
-                    self.update_statusbar_animation,
-                    None,
-                ),
             )
-            animation.play()
         else:
-            animation = Adw.TimedAnimation.new(
+            Animation(
                 self.task_status,
+                "fraction",
                 self.task_status.props.fraction,
                 0,
                 250,
-                Adw.CallbackAnimationTarget.new(
-                    self.update_statusbar_animation,
-                    None,
-                ),
             )
-            animation.play()
         if self.expanded:
             self.task_status.props.visible = True
             self.task_status.add_css_class("task-progressbar")
@@ -166,16 +157,15 @@ class Task(Gtk.Box):
     @Gtk.Template.Callback()
     def on_task_delete(self, _) -> None:
         self.delete()
+        self.window.update_status()
 
     @Gtk.Template.Callback()
     def on_delete_completed_btn_clicked(self, _) -> None:
+        history = UserData.get()["history"]
         sub_tasks = self.sub_tasks.observe_children()
         for i in range(sub_tasks.get_n_items()):
             sub = sub_tasks.get_item(i)
-            if (
-                sub.task["completed"]
-                and sub.task["id"] not in UserData.get()["history"]
-            ):
+            if sub.task["completed"] and sub.task["id"] not in history:
                 sub.delete()
         self.update_statusbar()
 
