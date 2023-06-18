@@ -1,0 +1,136 @@
+# Turkish translation for io.github.mrvladus.List.
+# Copyright (C) 2023 io.github.mrvladus.List's copyright holder
+# This file is distributed under the same license as the io.github.mrvladus.List package.
+#
+# Sabri Ünal <libreajans@gmail.com>, 2023.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: io.github.mrvladus.List\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-06-15 20:54+0300\n"
+"PO-Revision-Date: 2023-06-17 23:28+0300\n"
+"Last-Translator: Sabri Ünal <libreajans@gmail.com>\n"
+"Language-Team: Turkish <takim@gnome.org.tr>\n"
+"Language: tr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Poedit 3.2.2\n"
+
+#: src/res/ui/window.ui:24 src/res/ui/window.ui:26
+msgid "Main menu"
+msgstr "Ana menü"
+
+#: src/res/ui/window.ui:35 src/res/ui/window.ui:38
+msgid "Undo (Ctrl+Z)"
+msgstr "Geri Al (Ctrl+Z)"
+
+#: src/res/ui/window.ui:85
+msgid "Add new task"
+msgstr "Yeni görev ekle"
+
+#: src/res/ui/window.ui:95
+msgid "Delete completed tasks"
+msgstr "Tamamlanmış görevleri sil"
+
+#: src/res/ui/window.ui:141
+msgid "Preferences"
+msgstr "Tercihler"
+
+#: src/res/ui/window.ui:145
+msgid "About List"
+msgstr "List Hakkında"
+
+#: src/res/ui/window.ui:149
+msgid "Quit"
+msgstr "Çık"
+
+#: src/res/ui/window.ui:161
+msgid "translator-credits"
+msgstr "Sabri Ünal <libreajans@gmail.com>"
+
+#: src/res/ui/preferences.ui:13
+msgid "Application theme"
+msgstr "Uygulama teması"
+
+#: src/res/ui/preferences.ui:17
+msgid "System"
+msgstr "Sistem"
+
+#: src/res/ui/preferences.ui:30
+msgid "Light"
+msgstr "Açık"
+
+#: src/res/ui/preferences.ui:44
+msgid "Dark"
+msgstr "Koyu"
+
+#: src/res/ui/preferences.ui:60
+msgid "Tasks"
+msgstr "Görevler"
+
+#: src/res/ui/preferences.ui:64
+msgid "Tasks expanded on startup"
+msgstr "Görevler başlangıçta genişletilmiş"
+
+#: src/res/ui/preferences.ui:76
+msgid "Show accent colors menu"
+msgstr "Vurgu renkleri menüsünü göster"
+
+#: src/res/ui/preferences.ui:90
+msgid "History"
+msgstr "Geçmiş"
+
+#: src/res/ui/preferences.ui:94
+msgid "Clear history on startup"
+msgstr "Başlangıçta geçmişi temizle"
+
+#: src/res/ui/preferences.ui:106
+msgid "History size"
+msgstr "Geçmiş boyutu"
+
+#: src/res/ui/sub_task.ui:21 src/res/ui/task.ui:45
+msgid "Delete"
+msgstr "Sil"
+
+#: src/res/ui/sub_task.ui:45 src/res/ui/task.ui:176
+msgid "Edit"
+msgstr "Düzenle"
+
+#: src/res/ui/sub_task.ui:57 src/res/ui/task.ui:188
+msgid "Mark as completed"
+msgstr "Tamamlanmadı olarak imle"
+
+#: src/res/ui/sub_task.ui:90 src/res/ui/task.ui:221
+msgid "Move up"
+msgstr "Yukarı taşı"
+
+#: src/res/ui/sub_task.ui:99 src/res/ui/task.ui:230
+msgid "Move down"
+msgstr "Aşağı taşı"
+
+#: src/res/ui/sub_task.ui:109 src/res/ui/task.ui:240
+msgid "Cancel"
+msgstr "İptal"
+
+#: src/res/ui/task.ui:68
+msgid "Toggle sub-tasks"
+msgstr "Alt görevleri aç/kapat"
+
+#: src/res/ui/task.ui:81
+msgid "Accent color"
+msgstr "Vurgu rengi"
+
+#: src/res/ui/task.ui:96
+msgid "Clear style"
+msgstr "Biçemi temizle"
+
+#: src/res/ui/task.ui:270
+msgid "Add new sub-task"
+msgstr "Yeni alt görev ekle"
+
+#: src/res/ui/task.ui:283
+msgid "Delete completed sub-tasks"
+msgstr "Tamamlanmış alt görevleri sil"
