@@ -78,7 +78,6 @@ class Task(Gtk.Box):
         self.accent_colors_btn.set_visible(GSettings.get("show-accent-colors-menu"))
         self.add_sub_tasks()
         self.update_statusbar()
-        self.update_move_buttons()
 
     def add_sub_tasks(self) -> None:
         for task in self.task["sub"]:
@@ -161,13 +160,6 @@ class Task(Gtk.Box):
                 new_data["tasks"][i] = self.task
                 UserData.set(new_data)
                 return
-
-    def update_move_buttons(self) -> None:
-        data: dict = UserData.get()
-        idx: int = data["tasks"].index(self.task)
-        length: int = len(data["tasks"])
-        self.task_move_up_btn.props.sensitive = False if idx == 0 else True
-        self.task_move_down_btn.props.sensitive = False if idx == length - 1 else True
 
     # --- Template handlers --- #
 
@@ -275,7 +267,6 @@ class Task(Gtk.Box):
                 self.remove_css_class(c)
                 break
         self.add_css_class(f"task-{color}")
-        # self.set_css_classes(["card"] if color == "" else ["card", f"task-{color}"])
         # Color statusbar
         for c in self.task_status.get_css_classes():
             if "progress-" in c:
@@ -288,24 +279,31 @@ class Task(Gtk.Box):
 
     @Gtk.Template.Callback()
     def on_task_move_up_btn_clicked(self, _) -> None:
-        new_data: dict = UserData.get()
-        idx: int = new_data["tasks"].index(self.task)
+        data: dict = UserData.get()
+        tasks: list = data["tasks"]
+        idx: int = tasks.index(self.task)
         if idx == 0:
+            print("Can't move up: task is first")
+            return
+        deleted = 0
+        for i in range(idx - 1, -1, -1):
+            if tasks[i]["id"] in data["history"]:
+                deleted += 1
+            else:
+                break
+        if idx - deleted == 0:
+            print("Can't move up: task is first")
             return
         print(f"""Move task "{self.task['text']}" up""")
-        # Move widget
-        self.get_parent().reorder_child_after(self.get_prev_sibling(), self)
-        # Update data
-        new_data["tasks"][idx - 1], new_data["tasks"][idx] = (
-            new_data["tasks"][idx],
-            new_data["tasks"][idx - 1],
-        )
-        UserData.set(new_data)
-        # Update task
-        self.task = new_data["tasks"][idx - 1]
-        # Update buttons
-        self.update_move_buttons()
-        self.get_next_sibling().update_move_buttons()
+        tasks[idx], tasks[idx - deleted - 1] = tasks[idx - deleted - 1], tasks[idx]
+        UserData.set(data)
+        sibling = self.get_prev_sibling()
+        while True:
+            if sibling.task["id"] in data["history"]:
+                sibling = sibling.get_prev_sibling()
+            else:
+                break
+        self.get_parent().reorder_child_after(sibling, self)
 
     @Gtk.Template.Callback()
     def on_task_move_down_btn_clicked(self, _) -> None:
@@ -324,6 +322,3 @@ class Task(Gtk.Box):
         UserData.set(new_data)
         # Update task
         self.task = new_data["tasks"][idx + 1]
-        # Update buttons
-        self.update_move_buttons()
-        self.get_prev_sibling().update_move_buttons()

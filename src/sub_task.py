@@ -138,7 +138,6 @@ class SubTask(Gtk.Box):
 
     @Gtk.Template.Callback()
     def on_sub_task_move_up_btn_clicked(self, _) -> None:
-        print(f"""Move task "{self.task['text']}" up""")
         data: dict = UserData.get()
         subs: list = data["tasks"][data["tasks"].index(self.parent.task)]["sub"]
         idx = subs.index(self.task)
@@ -155,14 +154,18 @@ class SubTask(Gtk.Box):
         if idx - deleted == 0:
             print("Can't move up: task is first")
             return
+        print(f"""Move task "{self.task['text']}" up""")
         subs[idx], subs[idx - deleted - 1] = subs[idx - deleted - 1], subs[idx]
         UserData.set(data)
         self.parent.task["sub"] = subs
         # Move widget
         sibling = self.get_prev_sibling()
-        for i in range(deleted):
-            sibling = sibling.get_prev_sibling()
-        self.parent.sub_tasks.reorder_child_after(sibling, self)
+        while True:
+            if sibling.task["id"] in data["history"]:
+                sibling = sibling.get_prev_sibling()
+            else:
+                break
+        self.get_parent().reorder_child_after(sibling, self)
 
     @Gtk.Template.Callback()
     def on_sub_task_move_down_btn_clicked(self, _) -> None:

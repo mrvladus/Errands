@@ -80,15 +80,13 @@ class Window(Adw.ApplicationWindow):
             data["history"] = []
             UserData.set(data)
         # Load tasks
-        print("Loading tasks...")
         data: dict = UserData.get()
         if data["tasks"] == []:
             return
+        print("Loading tasks...")
         for task in data["tasks"]:
             new_task = Task(task, self)
             self.tasks_list.append(new_task)
-            if new_task.get_prev_sibling():
-                new_task.get_prev_sibling().update_move_buttons()
 
     def on_about_action(self, *args) -> None:
         """Show about window"""
@@ -137,20 +135,12 @@ class Window(Adw.ApplicationWindow):
         # Check for empty string or task exists
         if text == "":
             return
-        for task in new_data["tasks"]:
-            if task["text"] == text:
-                return
         # Add new task
         new_task: dict = TaskUtils.new_task(text)
         new_data["tasks"].append(new_task)
         UserData.set(new_data)
         task = Task(new_task, self)
         self.tasks_list.append(task)
-        if task.get_prev_sibling():
-            task.get_prev_sibling().update_move_buttons()
-        # Update move buttons
-        if len(new_data["tasks"]) > 1:
-            self.tasks_list.get_first_child().update_move_buttons()
         # Clear entry
         entry.props.text = ""
 
