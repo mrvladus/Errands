@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: io.github.mrvladus.List\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-18 19:44+0300\n"
+"POT-Creation-Date: 2023-06-19 16:56+0300\n"
 "PO-Revision-Date: 2023-06-17 23:28+0300\n"
 "Last-Translator: Sabri Ünal <libreajans@gmail.com>\n"
 "Language-Team: Turkish <takim@gnome.org.tr>\n"
@@ -27,27 +27,27 @@ msgstr "Ana menü"
 msgid "Undo (Ctrl+Z)"
 msgstr "Geri Al (Ctrl+Z)"
 
-#: src/res/ui/window.ui:85
+#: src/res/ui/window.ui:87
 msgid "Add new task"
 msgstr "Yeni görev ekle"
 
-#: src/res/ui/window.ui:95 src/res/ui/window.ui:98
+#: src/res/ui/window.ui:97 src/res/ui/window.ui:100
 msgid "Delete completed tasks"
 msgstr "Tamamlanmış görevleri sil"
 
-#: src/res/ui/window.ui:144
+#: src/res/ui/window.ui:146
 msgid "Preferences"
 msgstr "Tercihler"
 
-#: src/res/ui/window.ui:148
+#: src/res/ui/window.ui:150
 msgid "About List"
 msgstr "List Hakkında"
 
-#: src/res/ui/window.ui:152
+#: src/res/ui/window.ui:154
 msgid "Quit"
 msgstr "Çık"
 
-#: src/res/ui/window.ui:164
+#: src/res/ui/window.ui:166
 msgid "translator-credits"
 msgstr "Sabri Ünal <libreajans@gmail.com>"
 
@@ -79,76 +79,80 @@ msgstr "Görevler başlangıçta genişletilmiş"
 msgid "Show accent colors menu"
 msgstr "Vurgu renkleri menüsünü göster"
 
-#: src/res/ui/preferences.ui:90
+#: src/res/ui/preferences.ui:77
+msgid "Restart required"
+msgstr ""
+
+#: src/res/ui/preferences.ui:91
 msgid "History"
 msgstr "Geçmiş"
 
-#: src/res/ui/preferences.ui:94
+#: src/res/ui/preferences.ui:95
 msgid "Clear history on startup"
 msgstr "Başlangıçta geçmişi temizle"
 
-#: src/res/ui/preferences.ui:106
+#: src/res/ui/preferences.ui:107
 msgid "History size"
 msgstr "Geçmiş boyutu"
 
-#: src/res/ui/preferences.ui:128
+#: src/res/ui/preferences.ui:129
 msgid "Backup"
 msgstr ""
 
-#: src/res/ui/preferences.ui:131
+#: src/res/ui/preferences.ui:132
 msgid "Save data backup to your HOME folder"
 msgstr ""
 
-#: src/res/ui/preferences.ui:132
+#: src/res/ui/preferences.ui:133
 msgid "File name is \"list_backup_data.json\""
 msgstr ""
 
-#: src/res/ui/sub_task.ui:21 src/res/ui/sub_task.ui:25 src/res/ui/task.ui:46
-#: src/res/ui/task.ui:50
+#: src/res/ui/sub_task.ui:23 src/res/ui/sub_task.ui:27 src/res/ui/task.ui:50
+#: src/res/ui/task.ui:54
 msgid "Delete"
 msgstr "Sil"
 
-#: src/res/ui/sub_task.ui:48 src/res/ui/sub_task.ui:52 src/res/ui/task.ui:189
-#: src/res/ui/task.ui:193
+#: src/res/ui/sub_task.ui:50 src/res/ui/sub_task.ui:54 src/res/ui/task.ui:193
+#: src/res/ui/task.ui:197
 msgid "Edit"
 msgstr "Düzenle"
 
-#: src/res/ui/sub_task.ui:63 src/res/ui/sub_task.ui:66 src/res/ui/task.ui:204
-#: src/res/ui/task.ui:207
+#: src/res/ui/sub_task.ui:65 src/res/ui/sub_task.ui:68 src/res/ui/task.ui:208
+#: src/res/ui/task.ui:211
 msgid "Mark as completed"
 msgstr "Tamamlanmadı olarak imle"
 
-#: src/res/ui/sub_task.ui:99 src/res/ui/sub_task.ui:102 src/res/ui/task.ui:240
-#: src/res/ui/task.ui:243
+#: src/res/ui/sub_task.ui:101 src/res/ui/sub_task.ui:104 src/res/ui/task.ui:244
+#: src/res/ui/task.ui:247
 msgid "Move up"
 msgstr "Yukarı taşı"
 
-#: src/res/ui/sub_task.ui:111 src/res/ui/sub_task.ui:114 src/res/ui/task.ui:252
-#: src/res/ui/task.ui:255
+#: src/res/ui/sub_task.ui:113 src/res/ui/sub_task.ui:116 src/res/ui/task.ui:256
+#: src/res/ui/task.ui:259
 msgid "Move down"
 msgstr "Aşağı taşı"
 
-#: src/res/ui/sub_task.ui:124 src/res/ui/sub_task.ui:128 src/res/ui/task.ui:265
-#: src/res/ui/task.ui:269
+#: src/res/ui/sub_task.ui:126 src/res/ui/sub_task.ui:130 src/res/ui/task.ui:269
+#: src/res/ui/task.ui:273
 msgid "Cancel"
 msgstr "İptal"
 
-#: src/res/ui/task.ui:72 src/res/ui/task.ui:76
+#: src/res/ui/task.ui:76 src/res/ui/task.ui:80
 msgid "Toggle sub-tasks"
 msgstr "Alt görevleri aç/kapat"
 
-#: src/res/ui/task.ui:88 src/res/ui/task.ui:178
+#: src/res/ui/task.ui:92 src/res/ui/task.ui:182
 msgid "Accent color"
 msgstr "Vurgu rengi"
 
-#: src/res/ui/task.ui:103 src/res/ui/task.ui:106
+#: src/res/ui/task.ui:107 src/res/ui/task.ui:110
 msgid "Clear style"
 msgstr "Biçemi temizle"
 
-#: src/res/ui/task.ui:298
+#: src/res/ui/task.ui:302
 msgid "Add new sub-task"
 msgstr "Yeni alt görev ekle"
 
-#: src/res/ui/task.ui:311 src/res/ui/task.ui:315
+#: src/res/ui/task.ui:315 src/res/ui/task.ui:319
 msgid "Delete completed sub-tasks"
 msgstr "Tamamlanmış alt görevleri sil"

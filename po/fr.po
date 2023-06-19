@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: list\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-18 19:44+0300\n"
+"POT-Creation-Date: 2023-06-19 16:56+0300\n"
 "PO-Revision-Date: 2023-05-25 11:05+0200\n"
 "Last-Translator: Jeremy Castel <jeremy.castel@protonmail.com>\n"
 "Language: fr\n"
@@ -25,27 +25,27 @@ msgstr "Menu principal"
 msgid "Undo (Ctrl+Z)"
 msgstr ""
 
-#: src/res/ui/window.ui:85
+#: src/res/ui/window.ui:87
 msgid "Add new task"
 msgstr "Ajouter une tâche"
 
-#: src/res/ui/window.ui:95 src/res/ui/window.ui:98
+#: src/res/ui/window.ui:97 src/res/ui/window.ui:100
 msgid "Delete completed tasks"
 msgstr ""
 
-#: src/res/ui/window.ui:144
+#: src/res/ui/window.ui:146
 msgid "Preferences"
 msgstr "Préférences"
 
-#: src/res/ui/window.ui:148
+#: src/res/ui/window.ui:150
 msgid "About List"
 msgstr "À propos de List"
 
-#: src/res/ui/window.ui:152
+#: src/res/ui/window.ui:154
 msgid "Quit"
 msgstr "Fermer"
 
-#: src/res/ui/window.ui:164
+#: src/res/ui/window.ui:166
 msgid "translator-credits"
 msgstr "Jeremy Castel <jeremy.castel@protonmail.com>"
 
@@ -77,76 +77,80 @@ msgstr "Dérouler les tâches au démarrage"
 msgid "Show accent colors menu"
 msgstr ""
 
-#: src/res/ui/preferences.ui:90
+#: src/res/ui/preferences.ui:77
+msgid "Restart required"
+msgstr ""
+
+#: src/res/ui/preferences.ui:91
 msgid "History"
 msgstr ""
 
-#: src/res/ui/preferences.ui:94
+#: src/res/ui/preferences.ui:95
 msgid "Clear history on startup"
 msgstr ""
 
-#: src/res/ui/preferences.ui:106
+#: src/res/ui/preferences.ui:107
 msgid "History size"
 msgstr ""
 
-#: src/res/ui/preferences.ui:128
+#: src/res/ui/preferences.ui:129
 msgid "Backup"
 msgstr ""
 
-#: src/res/ui/preferences.ui:131
+#: src/res/ui/preferences.ui:132
 msgid "Save data backup to your HOME folder"
 msgstr ""
 
-#: src/res/ui/preferences.ui:132
+#: src/res/ui/preferences.ui:133
 msgid "File name is \"list_backup_data.json\""
 msgstr ""
 
-#: src/res/ui/sub_task.ui:21 src/res/ui/sub_task.ui:25 src/res/ui/task.ui:46
-#: src/res/ui/task.ui:50
+#: src/res/ui/sub_task.ui:23 src/res/ui/sub_task.ui:27 src/res/ui/task.ui:50
+#: src/res/ui/task.ui:54
 msgid "Delete"
 msgstr "Supprimer"
 
-#: src/res/ui/sub_task.ui:48 src/res/ui/sub_task.ui:52 src/res/ui/task.ui:189
-#: src/res/ui/task.ui:193
+#: src/res/ui/sub_task.ui:50 src/res/ui/sub_task.ui:54 src/res/ui/task.ui:193
+#: src/res/ui/task.ui:197
 msgid "Edit"
 msgstr "Modifier"
 
-#: src/res/ui/sub_task.ui:63 src/res/ui/sub_task.ui:66 src/res/ui/task.ui:204
-#: src/res/ui/task.ui:207
+#: src/res/ui/sub_task.ui:65 src/res/ui/sub_task.ui:68 src/res/ui/task.ui:208
+#: src/res/ui/task.ui:211
 msgid "Mark as completed"
 msgstr "Marquer comme terminée"
 
-#: src/res/ui/sub_task.ui:99 src/res/ui/sub_task.ui:102 src/res/ui/task.ui:240
-#: src/res/ui/task.ui:243
+#: src/res/ui/sub_task.ui:101 src/res/ui/sub_task.ui:104 src/res/ui/task.ui:244
+#: src/res/ui/task.ui:247
 msgid "Move up"
 msgstr ""
 
-#: src/res/ui/sub_task.ui:111 src/res/ui/sub_task.ui:114 src/res/ui/task.ui:252
-#: src/res/ui/task.ui:255
+#: src/res/ui/sub_task.ui:113 src/res/ui/sub_task.ui:116 src/res/ui/task.ui:256
+#: src/res/ui/task.ui:259
 msgid "Move down"
 msgstr ""
 
-#: src/res/ui/sub_task.ui:124 src/res/ui/sub_task.ui:128 src/res/ui/task.ui:265
-#: src/res/ui/task.ui:269
+#: src/res/ui/sub_task.ui:126 src/res/ui/sub_task.ui:130 src/res/ui/task.ui:269
+#: src/res/ui/task.ui:273
 msgid "Cancel"
 msgstr "Annuler"
 
-#: src/res/ui/task.ui:72 src/res/ui/task.ui:76
+#: src/res/ui/task.ui:76 src/res/ui/task.ui:80
 msgid "Toggle sub-tasks"
 msgstr "Dérouler les sous-tâches"
 
-#: src/res/ui/task.ui:88 src/res/ui/task.ui:178
+#: src/res/ui/task.ui:92 src/res/ui/task.ui:182
 msgid "Accent color"
 msgstr "Couleur d'accentuation"
 
-#: src/res/ui/task.ui:103 src/res/ui/task.ui:106
+#: src/res/ui/task.ui:107 src/res/ui/task.ui:110
 msgid "Clear style"
 msgstr "Effacer le style"
 
-#: src/res/ui/task.ui:298
+#: src/res/ui/task.ui:302
 msgid "Add new sub-task"
 msgstr "Ajouter une sous-tâche"
 
-#: src/res/ui/task.ui:311 src/res/ui/task.ui:315
+#: src/res/ui/task.ui:315 src/res/ui/task.ui:319
 msgid "Delete completed sub-tasks"
 msgstr "Supprimer les sous-tâches terminées"

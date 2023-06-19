@@ -74,6 +74,7 @@
             <child>
               <object class="AdwActionRow">
                 <property name="title" translatable="yes">Show accent colors menu</property>
+                <property name="subtitle" translatable="yes">Restart required</property>
                 <property name="activatable-widget">show_accent_colors_menu</property>
                 <child type="suffix">
                   <object class="GtkSwitch" id="show_accent_colors_menu">
