@@ -30,6 +30,7 @@ class Task(Gtk.Revealer):
     __gtype_name__ = "Task"
 
     # Template items
+    main_box = Gtk.Template.Child()
     task_box = Gtk.Template.Child()
     task_delete_btn = Gtk.Template.Child()
     task_text = Gtk.Template.Child()
@@ -68,7 +69,7 @@ class Task(Gtk.Revealer):
         self.task_text.props.label = self.text
         # Set accent color
         if self.task["color"] != "":
-            self.add_css_class(f'task-{self.task["color"]}')
+            self.main_box.add_css_class(f'task-{self.task["color"]}')
             self.task_status.add_css_class(f'progress-{self.task["color"]}')
         # Expand sub tasks
         self.expand(self.task["sub"] != [] and GSettings.get("tasks-expanded"))
@@ -223,11 +224,6 @@ class Task(Gtk.Revealer):
         # Return if text the same or empty
         if new_text == old_text or new_text == "":
             return
-        # Return if task exists
-        new_data: dict = UserData.get()
-        for task in new_data["tasks"]:
-            if task["text"] == new_text:
-                return
         # Change task
         print(f"Change '{old_text}' to '{new_text}'")
         # Set new text
@@ -253,11 +249,11 @@ class Task(Gtk.Revealer):
                 color = i.split("-")[1]
                 break
         # Color card
-        for c in self.get_css_classes():
+        for c in self.main_box.get_css_classes():
             if "task-" in c:
-                self.remove_css_class(c)
+                self.main_box.remove_css_class(c)
                 break
-        self.add_css_class(f"task-{color}")
+        self.main_box.add_css_class(f"task-{color}")
         # Color statusbar
         for c in self.task_status.get_css_classes():
             if "progress-" in c:
