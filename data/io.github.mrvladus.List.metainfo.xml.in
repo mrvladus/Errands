@@ -41,12 +41,12 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="44.6.3" date="2023-06-20">
+    <release version="44.6.3" date="2023-06-19">
       <description>
         <p>UI/UX:</p>
         <ul>
-          <li>Added task animations</li>
-          <li>Added sub-task animations</li>
+          <li>Added task add/remove animations</li>
+          <li>Added sub-task add/remove animations</li>
         </ul>
         <p>Translations:</p>
         <ul>
