@@ -41,6 +41,18 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="44.6.3" date="2023-06-20">
+      <description>
+        <p>UI/UX:</p>
+        <ul>
+          <li>Added sub-task animations</li>
+        </ul>
+        <p>Translations:</p>
+        <ul>
+          <li>Updated Italian translation (Albano Battistella)</li>
+        </ul>
+      </description>
+    </release>
     <release version="44.6.2" date="2023-06-18">
       <description>
         <p>UI/UX:</p>

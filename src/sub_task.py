@@ -25,7 +25,7 @@ from .utils import UserData, Markup
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/List/sub_task.ui")
-class SubTask(Gtk.Box):
+class SubTask(Gtk.Revealer):
     __gtype_name__ = "SubTask"
 
     sub_task_box = Gtk.Template.Child()
@@ -54,7 +54,6 @@ class SubTask(Gtk.Box):
         self.sub_task_completed_btn.props.active = self.task["completed"]
         # Set text
         self.sub_task_text.props.label = self.text
-        self.update_move_buttons()
 
     def delete(self) -> None:
         print(f"Delete sub-task: {self.task['text']}")
@@ -69,10 +68,7 @@ class SubTask(Gtk.Box):
         self.sub_task_edit_box.props.visible = not self.sub_task_edit_box.props.visible
 
     def toggle_visibility(self) -> None:
-        self.props.visible = not self.props.visible
-
-    def update_move_buttons(self):
-        pass
+        self.set_reveal_child(not self.get_child_revealed())
 
     def update_data(self) -> None:
         new_data: dict = UserData.get()

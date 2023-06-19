@@ -81,7 +81,9 @@ class Task(Gtk.Box):
 
     def add_sub_tasks(self) -> None:
         for task in self.task["sub"]:
-            self.sub_tasks.append(SubTask(task, self, self.window))
+            sub_task = SubTask(task, self, self.window)
+            self.sub_tasks.append(sub_task)
+            sub_task.toggle_visibility()
 
     def delete(self) -> None:
         print(f"Delete task: {self.task['text']}")
@@ -197,8 +199,7 @@ class Task(Gtk.Box):
         # Add row
         sub_task = SubTask(new_sub_task, self, self.window)
         self.sub_tasks.append(sub_task)
-        if sub_task.get_prev_sibling():
-            sub_task.get_prev_sibling().update_move_buttons()
+        sub_task.toggle_visibility()
         self.update_statusbar()
         # Clear entry
         entry.get_buffer().props.text = ""

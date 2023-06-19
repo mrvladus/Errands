@@ -1,135 +1,139 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <template class="SubTask" parent="GtkBox">
-    <property name="height-request">60</property>
-    <property name="orientation">vertical</property>
-    <property name="vexpand">false</property>
-    <property name="hexpand">true</property>
-    <style>
-      <class name="sub-task"/>
-    </style>
+  <template class="SubTask" parent="GtkRevealer">
     <child>
-      <object class="GtkBox" id="sub_task_box">
-        <property name="margin-start">10</property>
-        <property name="margin-end">10</property>
-        <property name="spacing">5</property>
-        <property name="vexpand">true</property>
-        <!-- Delete button -->
+      <object class="GtkBox">
+        <property name="height-request">60</property>
+        <property name="orientation">vertical</property>
+        <property name="vexpand">false</property>
+        <property name="hexpand">true</property>
+        <style>
+          <class name="sub-task"/>
+        </style>
         <child>
-          <object class="GtkButton" id="sub_task_delete_btn">
-            <property name="icon-name">user-trash-symbolic</property>
-            <property name="tooltip-text" translatable="yes">Delete</property>
-            <property name="valign">center</property>
-            <signal name="clicked" handler="on_sub_task_delete_btn_clicked"/>
-            <accessibility>
-              <property name="label" translatable="yes">Delete</property>
-            </accessibility>
-            <style>
-              <class name="flat"/>
-            </style>
-          </object>
-        </child>
-        <!-- Sub-task text -->
-        <child>
-          <object class="GtkLabel" id="sub_task_text">
-            <property name="wrap">true</property>
-            <property name="wrap-mode">1</property>
-            <property name="hexpand">true</property>
-            <property name="halign">start</property>
-            <property name="valign">center</property>
-            <property name="selectable">true</property>
-            <property name="use-markup">true</property>
-          </object>
-        </child>
-        <!-- Edit button -->
-        <child>
-          <object class="GtkButton" id="sub_task_edit_btn">
-            <property name="icon-name">document-edit-symbolic</property>
-            <property name="tooltip-text" translatable="yes">Edit</property>
-            <property name="valign">center</property>
-            <signal name="clicked" handler="on_sub_task_edit_btn_clicked"/>
-            <accessibility>
-              <property name="label" translatable="yes">Edit</property>
-            </accessibility>
-            <style>
-              <class name="flat"/>
-            </style>
-          </object>
-        </child>
-        <!-- Mark as completed button -->
-        <child>
-          <object class="GtkCheckButton" id="sub_task_completed_btn">
-            <property name="valign">center</property>
-            <property name="tooltip-text" translatable="yes">Mark as completed</property>
-            <signal name="toggled" handler="on_completed_btn_toggled"/>
-            <accessibility>
-              <property name="label" translatable="yes">Mark as completed</property>
-            </accessibility>
-          </object>
-        </child>
-      </object>
-    </child>
-    <!-- Sub task edit box -->
-    <child>
-      <object class="GtkBox" id="sub_task_edit_box">
-        <property name="margin-start">10</property>
-        <property name="margin-end">10</property>
-        <property name="spacing">5</property>
-        <property name="visible">false</property>
-        <property name="vexpand">true</property>
-        <!-- Edit entry -->
-        <child>
-          <object class="GtkEntry" id="sub_task_edit_entry">
-            <property name="hexpand">true</property>
-            <property name="valign">center</property>
-            <signal name="activate" handler="on_sub_task_edit"/>
-          </object>
-        </child>
-        <!-- Move box -->
-        <child>
-          <object class="GtkBox">
-            <style>
-              <class name="linked"/>
-            </style>
-            <!-- Move up button -->
+          <object class="GtkBox" id="sub_task_box">
+            <property name="margin-start">10</property>
+            <property name="margin-end">10</property>
+            <property name="spacing">5</property>
+            <property name="vexpand">true</property>
+            <!-- Delete button -->
             <child>
-              <object class="GtkButton" id="sub_task_move_up_btn">
+              <object class="GtkButton" id="sub_task_delete_btn">
+                <property name="icon-name">user-trash-symbolic</property>
+                <property name="tooltip-text" translatable="yes">Delete</property>
                 <property name="valign">center</property>
-                <property name="icon-name">go-up-symbolic</property>
-                <property name="tooltip-text" translatable="yes">Move up</property>
-                <signal name="clicked" handler="on_sub_task_move_up_btn_clicked"/>
+                <signal name="clicked" handler="on_sub_task_delete_btn_clicked"/>
                 <accessibility>
-                  <property name="label" translatable="yes">Move up</property>
+                  <property name="label" translatable="yes">Delete</property>
                 </accessibility>
+                <style>
+                  <class name="flat"/>
+                </style>
               </object>
             </child>
-            <!-- Move down button -->
+            <!-- Sub-task text -->
             <child>
-              <object class="GtkButton" id="sub_task_move_down_btn">
+              <object class="GtkLabel" id="sub_task_text">
+                <property name="wrap">true</property>
+                <property name="wrap-mode">1</property>
+                <property name="hexpand">true</property>
+                <property name="halign">start</property>
                 <property name="valign">center</property>
-                <property name="icon-name">go-down-symbolic</property>
-                <property name="tooltip-text" translatable="yes">Move down</property>
-                <signal name="clicked" handler="on_sub_task_move_down_btn_clicked"/>
+                <property name="selectable">true</property>
+                <property name="use-markup">true</property>
+              </object>
+            </child>
+            <!-- Edit button -->
+            <child>
+              <object class="GtkButton" id="sub_task_edit_btn">
+                <property name="icon-name">document-edit-symbolic</property>
+                <property name="tooltip-text" translatable="yes">Edit</property>
+                <property name="valign">center</property>
+                <signal name="clicked" handler="on_sub_task_edit_btn_clicked"/>
                 <accessibility>
-                  <property name="label" translatable="yes">Move down</property>
+                  <property name="label" translatable="yes">Edit</property>
+                </accessibility>
+                <style>
+                  <class name="flat"/>
+                </style>
+              </object>
+            </child>
+            <!-- Mark as completed button -->
+            <child>
+              <object class="GtkCheckButton" id="sub_task_completed_btn">
+                <property name="valign">center</property>
+                <property name="tooltip-text" translatable="yes">Mark as completed</property>
+                <signal name="toggled" handler="on_completed_btn_toggled"/>
+                <accessibility>
+                  <property name="label" translatable="yes">Mark as completed</property>
                 </accessibility>
               </object>
             </child>
           </object>
         </child>
-        <!-- Cancel edit button -->
+        <!-- Sub task edit box -->
         <child>
-          <object class="GtkButton" id="sub_task_cancel_edit_btn">
-            <property name="icon-name">edit-delete-symbolic</property>
-            <property name="tooltip-text" translatable="yes">Cancel</property>
-            <property name="valign">center</property>
-            <signal name="clicked" handler="on_sub_task_cancel_edit_btn_clicked"/>
-            <accessibility>
-              <property name="label" translatable="yes">Cancel</property>
-            </accessibility>
-            <style>
-              <class name="flat"/>
-            </style>
+          <object class="GtkBox" id="sub_task_edit_box">
+            <property name="margin-start">10</property>
+            <property name="margin-end">10</property>
+            <property name="spacing">5</property>
+            <property name="visible">false</property>
+            <property name="vexpand">true</property>
+            <!-- Edit entry -->
+            <child>
+              <object class="GtkEntry" id="sub_task_edit_entry">
+                <property name="hexpand">true</property>
+                <property name="valign">center</property>
+                <signal name="activate" handler="on_sub_task_edit"/>
+              </object>
+            </child>
+            <!-- Move box -->
+            <child>
+              <object class="GtkBox">
+                <style>
+                  <class name="linked"/>
+                </style>
+                <!-- Move up button -->
+                <child>
+                  <object class="GtkButton" id="sub_task_move_up_btn">
+                    <property name="valign">center</property>
+                    <property name="icon-name">go-up-symbolic</property>
+                    <property name="tooltip-text" translatable="yes">Move up</property>
+                    <signal name="clicked" handler="on_sub_task_move_up_btn_clicked"/>
+                    <accessibility>
+                      <property name="label" translatable="yes">Move up</property>
+                    </accessibility>
+                  </object>
+                </child>
+                <!-- Move down button -->
+                <child>
+                  <object class="GtkButton" id="sub_task_move_down_btn">
+                    <property name="valign">center</property>
+                    <property name="icon-name">go-down-symbolic</property>
+                    <property name="tooltip-text" translatable="yes">Move down</property>
+                    <signal name="clicked" handler="on_sub_task_move_down_btn_clicked"/>
+                    <accessibility>
+                      <property name="label" translatable="yes">Move down</property>
+                    </accessibility>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <!-- Cancel edit button -->
+            <child>
+              <object class="GtkButton" id="sub_task_cancel_edit_btn">
+                <property name="icon-name">edit-delete-symbolic</property>
+                <property name="tooltip-text" translatable="yes">Cancel</property>
+                <property name="valign">center</property>
+                <signal name="clicked" handler="on_sub_task_cancel_edit_btn_clicked"/>
+                <accessibility>
+                  <property name="label" translatable="yes">Cancel</property>
+                </accessibility>
+                <style>
+                  <class name="flat"/>
+                </style>
+              </object>
+            </child>
           </object>
         </child>
       </object>
