@@ -26,7 +26,7 @@ from .utils import Animation, GSettings, Markup, TaskUtils, UserData
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/List/task.ui")
-class Task(Gtk.Box):
+class Task(Gtk.Revealer):
     __gtype_name__ = "Task"
 
     # Template items
@@ -58,8 +58,9 @@ class Task(Gtk.Box):
         self.window = window
         self.parent = self.window.tasks_list
         self.task = task
-        # Hide if task is deleted
-        self.props.visible = self.task["id"] not in UserData.get()["history"]
+        # Show if task is not deleted
+        if self.task["id"] not in UserData.get()["history"]:
+            self.toggle_visibility()
         # Escape text and find URL's'
         self.text = Markup.escape(self.task["text"])
         self.text = Markup.find_url(self.text)
@@ -106,7 +107,7 @@ class Task(Gtk.Box):
         self.task_edit_box.props.visible = not self.task_edit_box.props.visible
 
     def toggle_visibility(self) -> None:
-        self.props.visible = not self.props.visible
+        self.set_reveal_child(not self.get_child_revealed())
 
     def update_statusbar(self) -> None:
         n_completed = 0

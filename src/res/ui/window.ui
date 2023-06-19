@@ -58,7 +58,7 @@
             <!-- Entry -->
             <child>
               <object class="AdwClamp">
-                <property name="maximum-size">800</property>
+                <property name="maximum-size">850</property>
                 <property name="tightening-threshold">300</property>
                 <child>
                   <object class="GtkOverlay">
@@ -78,6 +78,8 @@
                       <object class="AdwPreferencesGroup">
                         <property name="margin-top">10</property>
                         <property name="margin-bottom">10</property>
+                        <property name="margin-start">5</property>
+                        <property name="margin-end">5</property>
                         <child>
                           <object class="AdwEntryRow" id="entry">
                             <property name="activatable">false</property>
@@ -119,7 +121,7 @@
                 <property name="propagate-natural-width">true</property>
                 <child>
                   <object class="AdwClamp">
-                    <property name="maximum-size">800</property>
+                    <property name="maximum-size">850</property>
                     <property name="tightening-threshold">300</property>
                     <property name="vexpand">true</property>
                     <child>

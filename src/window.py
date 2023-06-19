@@ -83,7 +83,8 @@ class Window(Adw.ApplicationWindow):
         data: dict = UserData.get()
         print("Loading tasks...")
         for task in data["tasks"]:
-            self.tasks_list.append(Task(task, self))
+            new_task = Task(task, self)
+            self.tasks_list.append(new_task)
 
     def on_about_action(self, *args) -> None:
         """Show about window"""
