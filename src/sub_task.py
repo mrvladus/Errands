@@ -30,14 +30,9 @@ class SubTask(Gtk.Revealer):
 
     sub_task_box = Gtk.Template.Child()
     sub_task_text = Gtk.Template.Child()
-    sub_task_delete_btn = Gtk.Template.Child()
     sub_task_completed_btn = Gtk.Template.Child()
     sub_task_edit_box = Gtk.Template.Child()
-    sub_task_edit_btn = Gtk.Template.Child()
     sub_task_edit_entry = Gtk.Template.Child()
-    sub_task_move_up_btn = Gtk.Template.Child()
-    sub_task_move_down_btn = Gtk.Template.Child()
-    sub_task_cancel_edit_btn = Gtk.Template.Child()
 
     def __init__(self, task: dict, parent: Gtk.Box, window: Adw.ApplicationWindow):
         super().__init__()

@@ -45,7 +45,7 @@
                     <property name="valign">center</property>
                     <!-- Delete task button -->
                     <child>
-                      <object class="GtkButton" id="task_delete_btn">
+                      <object class="GtkButton">
                         <property name="icon-name">user-trash-symbolic</property>
                         <property name="tooltip-text" translatable="yes">Delete</property>
                         <property name="valign">center</property>
@@ -188,7 +188,7 @@
                     </child>
                     <!-- Edit task button -->
                     <child>
-                      <object class="GtkButton" id="task_edit_btn">
+                      <object class="GtkButton">
                         <property name="icon-name">document-edit-symbolic</property>
                         <property name="tooltip-text" translatable="yes">Edit</property>
                         <property name="valign">center</property>
@@ -238,7 +238,7 @@
                         </style>
                         <!-- Move up button -->
                         <child>
-                          <object class="GtkButton" id="task_move_up_btn">
+                          <object class="GtkButton">
                             <property name="valign">center</property>
                             <property name="icon-name">go-up-symbolic</property>
                             <property name="tooltip-text" translatable="yes">Move up</property>
@@ -250,7 +250,7 @@
                         </child>
                         <!-- Move down button -->
                         <child>
-                          <object class="GtkButton" id="task_move_down_btn">
+                          <object class="GtkButton">
                             <property name="valign">center</property>
                             <property name="icon-name">go-down-symbolic</property>
                             <property name="tooltip-text" translatable="yes">Move down</property>
@@ -264,7 +264,7 @@
                     </child>
                     <!-- Cancel edit button -->
                     <child>
-                      <object class="GtkButton" id="task_cancel_edit_btn">
+                      <object class="GtkButton">
                         <property name="icon-name">edit-delete-symbolic</property>
                         <property name="tooltip-text" translatable="yes">Cancel</property>
                         <property name="valign">center</property>
@@ -309,7 +309,7 @@
                       <object class="GtkRevealer" id="delete_completed_btn_revealer">
                         <property name="transition-type">3</property>
                         <child>
-                          <object class="GtkButton" id="delete_completed_btn">
+                          <object class="GtkButton">
                             <property name="margin-start">5</property>
                             <property name="icon-name">edit-clear-all-symbolic</property>
                             <property name="tooltip-text" translatable="yes">Delete completed sub-tasks</property>

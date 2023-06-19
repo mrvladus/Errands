@@ -11,7 +11,7 @@
         <property name="orientation">vertical</property>
         <!-- Header bar -->
         <child>
-          <object class="GtkHeaderBar" id="header_bar">
+          <object class="GtkHeaderBar">
             <style>
               <class name="flat"/>
             </style>
@@ -81,7 +81,7 @@
                         <property name="margin-start">5</property>
                         <property name="margin-end">5</property>
                         <child>
-                          <object class="AdwEntryRow" id="entry">
+                          <object class="AdwEntryRow">
                             <property name="activatable">false</property>
                             <property name="height-request">60</property>
                             <property name="title" translatable="yes">Add new task</property>
@@ -91,7 +91,7 @@
                               <object class="GtkRevealer" id="delete_completed_tasks_btn_revealer">
                                 <property name="transition-type">2</property>
                                 <child>
-                                  <object class="GtkButton" id="delete_completed_tasks_btn">
+                                  <object class="GtkButton">
                                     <property name="valign">center</property>
                                     <property name="icon-name">edit-clear-all-symbolic</property>
                                     <property name="tooltip-text" translatable="yes">Delete completed tasks</property>

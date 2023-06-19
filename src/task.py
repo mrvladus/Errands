@@ -32,22 +32,16 @@ class Task(Gtk.Revealer):
     # Template items
     main_box = Gtk.Template.Child()
     task_box = Gtk.Template.Child()
-    task_delete_btn = Gtk.Template.Child()
     task_text = Gtk.Template.Child()
     task_status = Gtk.Template.Child()
     expand_btn = Gtk.Template.Child()
     accent_colors_btn = Gtk.Template.Child()
     accent_colors_popover = Gtk.Template.Child()
-    task_edit_btn = Gtk.Template.Child()
     task_completed_btn = Gtk.Template.Child()
     task_edit_box = Gtk.Template.Child()
     task_edit_entry = Gtk.Template.Child()
-    task_move_up_btn = Gtk.Template.Child()
-    task_move_down_btn = Gtk.Template.Child()
-    task_cancel_edit_btn = Gtk.Template.Child()
     sub_tasks_revealer = Gtk.Template.Child()
     delete_completed_btn_revealer = Gtk.Template.Child()
-    delete_completed_btn = Gtk.Template.Child()
     sub_tasks = Gtk.Template.Child()
 
     # State

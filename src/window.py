@@ -33,7 +33,6 @@ class Window(Adw.ApplicationWindow):
 
     undo_btn = Gtk.Template.Child()
     delete_completed_tasks_btn_revealer = Gtk.Template.Child()
-    delete_completed_tasks_btn = Gtk.Template.Child()
     tasks_list = Gtk.Template.Child()
     status = Gtk.Template.Child()
     about_window = Gtk.Template.Child()
