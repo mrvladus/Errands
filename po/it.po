@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: list\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-06-18 19:44+0300\n"
-"PO-Revision-Date: 2023-05-27 17:34+0100\n"
+"PO-Revision-Date: 2023-06-27 08:34+0100\n"
 "Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
 "Language-Team: Italian <LL@li.org>\n"
 "Language: it\n"
@@ -22,7 +22,7 @@ msgstr "Menu principale"
 
 #: src/res/ui/window.ui:35 src/res/ui/window.ui:38
 msgid "Undo (Ctrl+Z)"
-msgstr ""
+msgstr "Annulla (Ctrl+Z)"
 
 #: src/res/ui/window.ui:85
 msgid "Add new task"
@@ -30,7 +30,7 @@ msgstr "Aggiungi nuova attività"
 
 #: src/res/ui/window.ui:95 src/res/ui/window.ui:98
 msgid "Delete completed tasks"
-msgstr ""
+msgstr "Elimina le attività completate"
 
 #: src/res/ui/window.ui:144
 msgid "Preferences"
@@ -74,31 +74,31 @@ msgstr "Attività ampliate all'avvio"
 
 #: src/res/ui/preferences.ui:76
 msgid "Show accent colors menu"
-msgstr ""
+msgstr "Mostra il menu dei colori"
 
 #: src/res/ui/preferences.ui:90
 msgid "History"
-msgstr ""
+msgstr "Cronologia"
 
 #: src/res/ui/preferences.ui:94
 msgid "Clear history on startup"
-msgstr ""
+msgstr "Cancella cronologia all'avvio"
 
 #: src/res/ui/preferences.ui:106
 msgid "History size"
-msgstr ""
+msgstr "Dimensione della cronologia"
 
 #: src/res/ui/preferences.ui:128
 msgid "Backup"
-msgstr ""
+msgstr "Backup"
 
 #: src/res/ui/preferences.ui:131
 msgid "Save data backup to your HOME folder"
-msgstr ""
+msgstr "Salva il backup dei dati nella cartella HOME"
 
 #: src/res/ui/preferences.ui:132
 msgid "File name is \"list_backup_data.json\""
-msgstr ""
+msgstr "Il nome del file è \"list_backup_data.json\""
 
 #: src/res/ui/sub_task.ui:21 src/res/ui/sub_task.ui:25 src/res/ui/task.ui:46
 #: src/res/ui/task.ui:50
