@@ -45,11 +45,13 @@
       <description>
         <p>UI/UX:</p>
         <ul>
+          <li>Added task animations</li>
           <li>Added sub-task animations</li>
         </ul>
         <p>Translations:</p>
         <ul>
           <li>Updated Italian translation (Albano Battistella)</li>
+          <li>Updated Dutch translation (Heimen Stoffels)</li>
         </ul>
       </description>
     </release>

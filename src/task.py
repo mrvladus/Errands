@@ -58,9 +58,6 @@ class Task(Gtk.Revealer):
         self.window = window
         self.parent = self.window.tasks_list
         self.task = task
-        # Show if task is not deleted
-        if self.task["id"] not in UserData.get()["history"]:
-            self.toggle_visibility()
         # Escape text and find URL's'
         self.text = Markup.escape(self.task["text"])
         self.text = Markup.find_url(self.text)
@@ -81,10 +78,12 @@ class Task(Gtk.Revealer):
         self.update_statusbar()
 
     def add_sub_tasks(self) -> None:
+        history: list = UserData.get()["history"]
         for task in self.task["sub"]:
             sub_task = SubTask(task, self, self.window)
             self.sub_tasks.append(sub_task)
-            sub_task.toggle_visibility()
+            if task["id"] not in history:
+                sub_task.toggle_visibility()
 
     def delete(self) -> None:
         print(f"Delete task: {self.task['text']}")

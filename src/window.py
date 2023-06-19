@@ -85,6 +85,8 @@ class Window(Adw.ApplicationWindow):
         for task in data["tasks"]:
             new_task = Task(task, self)
             self.tasks_list.append(new_task)
+            if task["id"] not in data["history"]:
+                new_task.toggle_visibility()
 
     def on_about_action(self, *args) -> None:
         """Show about window"""
@@ -152,6 +154,7 @@ class Window(Adw.ApplicationWindow):
         UserData.set(new_data)
         task = Task(new_task, self)
         self.tasks_list.append(task)
+        task.toggle_visibility()
         # Clear entry
         entry.props.text = ""
 

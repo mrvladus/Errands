@@ -45,9 +45,6 @@ class SubTask(Gtk.Revealer):
         self.parent = parent
         self.task = task
         self.window = window
-        # Show if sub task is deleted
-        if self.task["id"] not in UserData.get()["history"]:
-            self.toggle_visibility()
         # Escape text and find URL's'
         self.text = Markup.escape(self.task["text"])
         self.text = Markup.find_url(self.text)
