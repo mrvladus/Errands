@@ -83,7 +83,7 @@
                             <property name="activatable">false</property>
                             <property name="height-request">60</property>
                             <property name="title" translatable="yes">Add new task</property>
-                            <signal name="entry-activated" handler="on_entry_activated"/>
+                            <signal name="entry-activated" handler="on_task_added"/>
                             <!-- Toolbar -->
                             <child type="suffix">
                               <object class="GtkRevealer" id="delete_completed_tasks_btn_revealer">

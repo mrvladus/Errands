@@ -81,12 +81,9 @@ class Window(Adw.ApplicationWindow):
             UserData.set(data)
         # Load tasks
         data: dict = UserData.get()
-        if data["tasks"] == []:
-            return
         print("Loading tasks...")
         for task in data["tasks"]:
-            new_task = Task(task, self)
-            self.tasks_list.append(new_task)
+            self.tasks_list.append(Task(task, self))
 
     def on_about_action(self, *args) -> None:
         """Show about window"""
@@ -94,6 +91,7 @@ class Window(Adw.ApplicationWindow):
         self.about_window.show()
 
     def update_status(self) -> None:
+        """Update progress bar on the top"""
         data: dict = UserData.get()
         n_total = 0
         n_completed = 0
@@ -102,7 +100,7 @@ class Window(Adw.ApplicationWindow):
                 n_total += 1
                 if task["completed"]:
                     n_completed += 1
-        # Update progress bar
+        # Update progress bar animation
         if n_total > 0:
             Animation(
                 self.status,
@@ -141,13 +139,13 @@ class Window(Adw.ApplicationWindow):
         self.undo_btn.props.sensitive = len(data["history"]) > 0
 
     @Gtk.Template.Callback()
-    def on_entry_activated(self, entry: Gtk.Entry) -> None:
+    def on_task_added(self, entry: Gtk.Entry) -> None:
         text: str = entry.props.text
-        new_data: dict = UserData.get()
         # Check for empty string or task exists
         if text == "":
             return
         # Add new task
+        new_data: dict = UserData.get()
         new_task: dict = TaskUtils.new_task(text)
         new_data["tasks"].append(new_task)
         UserData.set(new_data)
