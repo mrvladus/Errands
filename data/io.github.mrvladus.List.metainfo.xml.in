@@ -41,6 +41,15 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="44.6.4" date="2023-06-21">
+      <description>
+        <p>UI/UX:</p>
+        <ul>
+          <li>Remember if window is maximized</li>
+          <li>Small color tweaks for better contrast</li>
+        </ul>
+      </description>
+    </release>
     <release version="44.6.3" date="2023-06-19">
       <description>
         <p>UI/UX:</p>

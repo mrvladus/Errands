@@ -42,6 +42,7 @@ class Window(Adw.ApplicationWindow):
         # Remember window size
         GSettings.bind("width", self, "default_width")
         GSettings.bind("height", self, "default_height")
+        GSettings.bind("maximized", self, "maximized")
         # Setup theme
         Adw.StyleManager.get_default().set_color_scheme(GSettings.get("theme"))
         self.get_settings().props.gtk_icon_theme_name = "Adwaita"
