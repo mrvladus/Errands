@@ -101,11 +101,11 @@ progress {
 }
 
 .progress-green progress {
-  background-color: @green_2;
+  background-color: @green_3;
 }
 
 .progress-yellow progress {
-  background-color: @yellow_3;
+  background-color: @yellow_4;
 }
 
 .progress-orange progress {
