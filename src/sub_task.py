@@ -28,10 +28,12 @@ from .utils import UserData, Markup
 class SubTask(Gtk.Revealer):
     __gtype_name__ = "SubTask"
 
+    sub_task_box_rev = Gtk.Template.Child()
     sub_task_box = Gtk.Template.Child()
     sub_task_text = Gtk.Template.Child()
     sub_task_completed_btn = Gtk.Template.Child()
     sub_task_edit_box = Gtk.Template.Child()
+    sub_task_edit_box_rev = Gtk.Template.Child()
     sub_task_edit_entry = Gtk.Template.Child()
 
     def __init__(self, task: dict, parent: Gtk.Box, window: Adw.ApplicationWindow):
@@ -57,8 +59,12 @@ class SubTask(Gtk.Revealer):
         self.window.update_undo()
 
     def toggle_edit_box(self) -> None:
-        self.sub_task_box.props.visible = not self.sub_task_box.props.visible
-        self.sub_task_edit_box.props.visible = not self.sub_task_edit_box.props.visible
+        self.sub_task_box_rev.set_reveal_child(
+            not self.sub_task_box_rev.get_child_revealed()
+        )
+        self.sub_task_edit_box_rev.set_reveal_child(
+            not self.sub_task_edit_box_rev.get_child_revealed()
+        )
 
     def toggle_visibility(self) -> None:
         self.set_reveal_child(not self.get_child_revealed())

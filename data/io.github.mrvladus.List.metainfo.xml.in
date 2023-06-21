@@ -23,6 +23,11 @@
   <categories>
     <category>Utility</category>
   </categories>
+  <keywords>
+    <keyword>List</keyword>
+    <keyword>To Do</keyword>
+    <keyword>Task manager</keyword>
+  </keywords>
   <name>List</name>
   <summary>Manage your tasks.</summary>
   <description>
