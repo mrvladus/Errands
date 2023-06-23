@@ -1,4 +1,4 @@
-<img width='128' src='https://raw.githubusercontent.com/mrvladus/List/main/data/icons/hicolor/scalable/apps/io.github.mrvladus.List.svg' align="left"/>
+<img width='128' src='https://raw.githubusercontent.com/mrvladus/List/main/data/icons/io.github.mrvladus.List.svg' align="left"/>
 
 # List
 
