@@ -31,14 +31,14 @@ class Task(Gtk.Revealer):
 
     # Template items
     main_box = Gtk.Template.Child()
-    task_box = Gtk.Template.Child()
+    task_box_rev = Gtk.Template.Child()
     task_text = Gtk.Template.Child()
     task_status = Gtk.Template.Child()
     expand_btn = Gtk.Template.Child()
     accent_colors_btn = Gtk.Template.Child()
     accent_colors_popover = Gtk.Template.Child()
     task_completed_btn = Gtk.Template.Child()
-    task_edit_box = Gtk.Template.Child()
+    task_edit_box_rev = Gtk.Template.Child()
     task_edit_entry = Gtk.Template.Child()
     sub_tasks_revealer = Gtk.Template.Child()
     delete_completed_btn_revealer = Gtk.Template.Child()
@@ -97,8 +97,10 @@ class Task(Gtk.Revealer):
         self.update_statusbar()
 
     def toggle_edit_mode(self) -> None:
-        self.task_box.props.visible = not self.task_box.props.visible
-        self.task_edit_box.props.visible = not self.task_edit_box.props.visible
+        self.task_box_rev.set_reveal_child(not self.task_box_rev.get_child_revealed())
+        self.task_edit_box_rev.set_reveal_child(
+            not self.task_edit_box_rev.get_child_revealed()
+        )
 
     def toggle_visibility(self) -> None:
         self.set_reveal_child(not self.get_child_revealed())

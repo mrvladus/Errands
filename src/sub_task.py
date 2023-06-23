@@ -29,10 +29,8 @@ class SubTask(Gtk.Revealer):
     __gtype_name__ = "SubTask"
 
     sub_task_box_rev = Gtk.Template.Child()
-    sub_task_box = Gtk.Template.Child()
     sub_task_text = Gtk.Template.Child()
     sub_task_completed_btn = Gtk.Template.Child()
-    sub_task_edit_box = Gtk.Template.Child()
     sub_task_edit_box_rev = Gtk.Template.Child()
     sub_task_edit_entry = Gtk.Template.Child()
 
