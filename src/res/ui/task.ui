@@ -44,8 +44,6 @@
                         <property name="margin-start">10</property>
                         <property name="margin-end">10</property>
                         <property name="spacing">5</property>
-                        <property name="valign">center</property>
-                        <property name="hexpand">true</property>
                         <!-- Delete task button -->
                         <child>
                           <object class="GtkButton">
@@ -65,7 +63,7 @@
                         <child>
                           <object class="GtkLabel" id="task_text">
                             <property name="wrap">true</property>
-                            <property name="wrap-mode">2</property>
+                            <property name="wrap-mode">1</property>
                             <property name="selectable">true</property>
                             <property name="use-markup">true</property>
                             <property name="valign">center</property>
