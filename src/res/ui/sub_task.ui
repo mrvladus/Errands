@@ -13,7 +13,7 @@
             <property name="reveal-child">true</property>
             <property name="transition-type">9</property>
             <child>
-              <object class="GtkBox" id="sub_task_box">
+              <object class="GtkBox">
                 <property name="height-request">60</property>
                 <property name="margin-start">10</property>
                 <property name="margin-end">10</property>
@@ -80,7 +80,7 @@
             <property name="transition-type">8</property>
             <!-- Sub task edit box -->
             <child>
-              <object class="GtkBox" id="sub_task_edit_box">
+              <object class="GtkBox">
                 <property name="height-request">60</property>
                 <property name="margin-start">10</property>
                 <property name="margin-end">10</property>
