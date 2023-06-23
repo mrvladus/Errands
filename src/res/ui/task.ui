@@ -32,6 +32,7 @@
               <object class="GtkBox">
                 <property name="orientation">vertical</property>
                 <property name="vexpand">false</property>
+                <property name="hexpand">true</property>
                 <child>
                   <object class="GtkRevealer" id="task_box_rev">
                     <property name="reveal-child">true</property>
@@ -43,8 +44,8 @@
                         <property name="margin-start">10</property>
                         <property name="margin-end">10</property>
                         <property name="spacing">5</property>
-                        <property name="vexpand">true</property>
                         <property name="valign">center</property>
+                        <property name="hexpand">true</property>
                         <!-- Delete task button -->
                         <child>
                           <object class="GtkButton">
@@ -67,8 +68,10 @@
                             <property name="wrap-mode">2</property>
                             <property name="selectable">true</property>
                             <property name="use-markup">true</property>
+                            <property name="valign">center</property>
                             <property name="halign">start</property>
                             <property name="hexpand">true</property>
+                            <property name="vexpand">true</property>
                           </object>
                         </child>
                         <!-- Expand button -->
