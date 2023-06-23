@@ -46,12 +46,14 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="44.6.4" date="2023-06-21">
+    <release version="44.6.4" date="2023-06-23">
       <description>
         <p>UI/UX:</p>
         <ul>
+          <li>Added animation for task and sub-task edit mode switching</li>
           <li>Remember if window is maximized</li>
           <li>Small color tweaks for better contrast</li>
+          <li>Updated symbolic icon</li>
         </ul>
       </description>
     </release>
