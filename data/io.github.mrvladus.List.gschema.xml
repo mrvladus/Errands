@@ -19,6 +19,9 @@
     <key name="show-accent-colors-menu" type="b">
       <default>true</default>
     </key>
+    <key name="enable-sub-tasks" type="b">
+      <default>true</default>
+    </key>
     <key name="clear-history-on-startup" type="b">
       <default>false</default>
     </key>

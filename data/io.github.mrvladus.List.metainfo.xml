@@ -46,6 +46,15 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="44.6.5" date="2023-06-24">
+      <description>
+        <p>UI/UX:</p>
+        <ul>
+          <li>Set minimum window size to 250px for better phone screen support</li>
+          <li>Added new setting for disabling sub-tasks if you don't need them</li>
+        </ul>
+      </description>
+    </release>
     <release version="44.6.4" date="2023-06-23">
       <description>
         <p>UI/UX:</p>
