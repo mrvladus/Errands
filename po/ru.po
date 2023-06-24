@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: list\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-19 16:56+0300\n"
+"POT-Creation-Date: 2023-06-24 13:13+0300\n"
 "PO-Revision-Date: 2023-05-25 14:45+0300\n"
 "Last-Translator: Vlad Krupinski <mrvladus@yandex.ru>\n"
 "Language: ru\n"
@@ -78,80 +78,84 @@ msgstr "Раскрывать подзадачи при старте"
 msgid "Show accent colors menu"
 msgstr "Показывать меню с цветом акцента"
 
-#: src/res/ui/preferences.ui:77
+#: src/res/ui/preferences.ui:77 src/res/ui/preferences.ui:90
 msgid "Restart required"
 msgstr "Необходим перезапуск"
 
-#: src/res/ui/preferences.ui:91
+#: src/res/ui/preferences.ui:89
+msgid "Enable sub-tasks"
+msgstr "Включить подзадачи"
+
+#: src/res/ui/preferences.ui:104
 msgid "History"
 msgstr "История"
 
-#: src/res/ui/preferences.ui:95
+#: src/res/ui/preferences.ui:108
 msgid "Clear history on startup"
 msgstr "Отчищать историю при старте"
 
-#: src/res/ui/preferences.ui:107
+#: src/res/ui/preferences.ui:120
 msgid "History size"
 msgstr "Размер истории"
 
-#: src/res/ui/preferences.ui:129
+#: src/res/ui/preferences.ui:142
 msgid "Backup"
 msgstr "Бэкап"
 
-#: src/res/ui/preferences.ui:132
+#: src/res/ui/preferences.ui:145
 msgid "Save data backup to your HOME folder"
 msgstr "Сохранить бэкап в домашней папке"
 
-#: src/res/ui/preferences.ui:133
+#: src/res/ui/preferences.ui:146
 msgid "File name is \"list_backup_data.json\""
 msgstr "Имя файла \"list_backup_data.json\""
 
-#: src/res/ui/sub_task.ui:23 src/res/ui/sub_task.ui:27 src/res/ui/task.ui:50
-#: src/res/ui/task.ui:54
+#: src/res/ui/sub_task.ui:25 src/res/ui/sub_task.ui:29 src/res/ui/task.ui:51
+#: src/res/ui/task.ui:55
 msgid "Delete"
 msgstr "Удалить"
 
-#: src/res/ui/sub_task.ui:50 src/res/ui/sub_task.ui:54 src/res/ui/task.ui:193
-#: src/res/ui/task.ui:197
+#: src/res/ui/sub_task.ui:52 src/res/ui/sub_task.ui:56 src/res/ui/task.ui:196
+#: src/res/ui/task.ui:200
 msgid "Edit"
 msgstr "Правка"
 
-#: src/res/ui/sub_task.ui:65 src/res/ui/sub_task.ui:68 src/res/ui/task.ui:208
-#: src/res/ui/task.ui:211
+#: src/res/ui/sub_task.ui:67 src/res/ui/sub_task.ui:70 src/res/ui/task.ui:211
+#: src/res/ui/task.ui:214
 msgid "Mark as completed"
 msgstr "Пометить как выполненное"
 
-#: src/res/ui/sub_task.ui:101 src/res/ui/sub_task.ui:104 src/res/ui/task.ui:244
-#: src/res/ui/task.ui:247
+#: src/res/ui/sub_task.ui:107 src/res/ui/sub_task.ui:110 src/res/ui/task.ui:252
+#: src/res/ui/task.ui:255
 msgid "Move up"
 msgstr "Сдвинуть вверх"
 
-#: src/res/ui/sub_task.ui:113 src/res/ui/sub_task.ui:116 src/res/ui/task.ui:256
-#: src/res/ui/task.ui:259
+#: src/res/ui/sub_task.ui:119 src/res/ui/sub_task.ui:122 src/res/ui/task.ui:264
+#: src/res/ui/task.ui:267
 msgid "Move down"
 msgstr "Сдвинуть вниз"
 
-#: src/res/ui/sub_task.ui:126 src/res/ui/sub_task.ui:130 src/res/ui/task.ui:269
-#: src/res/ui/task.ui:273
+#: src/res/ui/sub_task.ui:132 src/res/ui/sub_task.ui:136 src/res/ui/task.ui:277
+#: src/res/ui/task.ui:281
 msgid "Cancel"
 msgstr "Отмена"
 
-#: src/res/ui/task.ui:76 src/res/ui/task.ui:80
+#: src/res/ui/task.ui:79 src/res/ui/task.ui:83
 msgid "Toggle sub-tasks"
 msgstr "Переключить подзадачи"
 
-#: src/res/ui/task.ui:92 src/res/ui/task.ui:182
+#: src/res/ui/task.ui:95 src/res/ui/task.ui:185
 msgid "Accent color"
 msgstr "Цвет акцента"
 
-#: src/res/ui/task.ui:107 src/res/ui/task.ui:110
+#: src/res/ui/task.ui:110 src/res/ui/task.ui:113
 msgid "Clear style"
 msgstr "Отчистить цвет"
 
-#: src/res/ui/task.ui:302
+#: src/res/ui/task.ui:312
 msgid "Add new sub-task"
 msgstr "Добавьте подзадачу"
 
-#: src/res/ui/task.ui:315 src/res/ui/task.ui:319
+#: src/res/ui/task.ui:325 src/res/ui/task.ui:329
 msgid "Delete completed sub-tasks"
 msgstr "Удалить выполненные подзадачи"
