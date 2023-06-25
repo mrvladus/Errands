@@ -46,6 +46,18 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="44.6.6" date="2023-06-25">
+      <description>
+        <p>UI/UX:</p>
+        <ul>
+          <li>Updated .desktop file for better mobile support</li>
+        </ul>
+        <p>Translations:</p>
+        <ul>
+          <li>Added Catalan translation (cubells)</li>
+        </ul>
+      </description>
+    </release>
     <release version="44.6.5" date="2023-06-24">
       <description>
         <p>UI/UX:</p>
