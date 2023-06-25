@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from gi.repository import Gtk, Adw
+from gi.repository import Gtk, Adw, Gdk
 from .sub_task import SubTask
 from .utils import Animation, GSettings, Markup, TaskUtils, UserData
 
@@ -66,9 +66,14 @@ class Task(Gtk.Revealer):
             self.main_box.add_css_class(f'task-{self.task["color"]}')
             self.task_status.add_css_class(f'progress-{self.task["color"]}')
         # Expand sub tasks
-        self.expand(self.task["sub"] != [] and GSettings.get("tasks-expanded"))
+        self.expand(
+            self.task["sub"] != []
+            and GSettings.get("tasks-expanded")
+            and GSettings.get("enable-sub-tasks")
+        )
         # Show or hide accent colors menu
         self.accent_colors_btn.set_visible(GSettings.get("show-accent-colors-menu"))
+        self.setup_drag_n_drop()
         self.add_sub_tasks()
         self.update_statusbar()
 
@@ -100,6 +105,10 @@ class Task(Gtk.Revealer):
             "go-up-symbolic" if expanded else "go-down-symbolic"
         )
         self.update_statusbar()
+
+    def setup_drag_n_drop(self):
+        drop_target = Gtk.DropTarget.new(Gtk.Revealer, Gdk.DragAction.MOVE)
+        self.sub_tasks.add_controller(drop_target)
 
     def toggle_edit_mode(self) -> None:
         self.task_box_rev.set_reveal_child(not self.task_box_rev.get_child_revealed())
