@@ -1,0 +1,160 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the list package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: list\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-06-24 13:13+0300\n"
+"PO-Revision-Date: 2023-06-25 08:14+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ca\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.3.1\n"
+
+#: src/res/ui/window.ui:24 src/res/ui/window.ui:26
+msgid "Main menu"
+msgstr "Menú principal"
+
+#: src/res/ui/window.ui:35 src/res/ui/window.ui:38
+msgid "Undo (Ctrl+Z)"
+msgstr "Desfés (Ctrl+Z)"
+
+#: src/res/ui/window.ui:87
+msgid "Add new task"
+msgstr "Afegeix tasca"
+
+#: src/res/ui/window.ui:97 src/res/ui/window.ui:100
+msgid "Delete completed tasks"
+msgstr "Suprimeix les tasques completades"
+
+#: src/res/ui/window.ui:146
+msgid "Preferences"
+msgstr "Preferències"
+
+#: src/res/ui/window.ui:150
+msgid "About List"
+msgstr "Quan a List"
+
+#: src/res/ui/window.ui:154
+msgid "Quit"
+msgstr "Surt"
+
+#: src/res/ui/window.ui:166
+msgid "translator-credits"
+msgstr "cubells <vicent@vcubells.net>"
+
+#: src/res/ui/preferences.ui:13
+msgid "Application theme"
+msgstr "Tema de l'aplicació"
+
+#: src/res/ui/preferences.ui:17
+msgid "System"
+msgstr "Sistema"
+
+#: src/res/ui/preferences.ui:30
+msgid "Light"
+msgstr "Clar"
+
+#: src/res/ui/preferences.ui:44
+msgid "Dark"
+msgstr "Fosc"
+
+#: src/res/ui/preferences.ui:60
+msgid "Tasks"
+msgstr "Tasques"
+
+#: src/res/ui/preferences.ui:64
+msgid "Tasks expanded on startup"
+msgstr "Les tasques s'expandeixen  l'inici"
+
+#: src/res/ui/preferences.ui:76
+msgid "Show accent colors menu"
+msgstr "Mostra el menú d'accentuació dels colors"
+
+#: src/res/ui/preferences.ui:77 src/res/ui/preferences.ui:90
+msgid "Restart required"
+msgstr "Es necessari reiniciar"
+
+#: src/res/ui/preferences.ui:89
+msgid "Enable sub-tasks"
+msgstr "Activa les subtasques"
+
+#: src/res/ui/preferences.ui:104
+msgid "History"
+msgstr "Historial"
+
+#: src/res/ui/preferences.ui:108
+msgid "Clear history on startup"
+msgstr "Netaja l'historial en iniciar"
+
+#: src/res/ui/preferences.ui:120
+msgid "History size"
+msgstr "Mida de l'historial"
+
+#: src/res/ui/preferences.ui:142
+msgid "Backup"
+msgstr "Còpia de seguretat"
+
+#: src/res/ui/preferences.ui:145
+msgid "Save data backup to your HOME folder"
+msgstr "Desa la còpia de seguretat de les dades a la carpeta de l'usuari"
+
+#: src/res/ui/preferences.ui:146
+msgid "File name is \"list_backup_data.json\""
+msgstr "El nom de fitxer és \"list_backup_data.json\""
+
+#: src/res/ui/sub_task.ui:25 src/res/ui/sub_task.ui:29 src/res/ui/task.ui:51
+#: src/res/ui/task.ui:55
+msgid "Delete"
+msgstr "Suprimeix"
+
+#: src/res/ui/sub_task.ui:52 src/res/ui/sub_task.ui:56 src/res/ui/task.ui:196
+#: src/res/ui/task.ui:200
+msgid "Edit"
+msgstr "Edita"
+
+#: src/res/ui/sub_task.ui:67 src/res/ui/sub_task.ui:70 src/res/ui/task.ui:211
+#: src/res/ui/task.ui:214
+msgid "Mark as completed"
+msgstr "Marca com a completada"
+
+#: src/res/ui/sub_task.ui:107 src/res/ui/sub_task.ui:110 src/res/ui/task.ui:252
+#: src/res/ui/task.ui:255
+msgid "Move up"
+msgstr "Mou cap a dalt"
+
+#: src/res/ui/sub_task.ui:119 src/res/ui/sub_task.ui:122 src/res/ui/task.ui:264
+#: src/res/ui/task.ui:267
+msgid "Move down"
+msgstr "Mou cap a baix"
+
+#: src/res/ui/sub_task.ui:132 src/res/ui/sub_task.ui:136 src/res/ui/task.ui:277
+#: src/res/ui/task.ui:281
+msgid "Cancel"
+msgstr "Cancel·la"
+
+#: src/res/ui/task.ui:79 src/res/ui/task.ui:83
+msgid "Toggle sub-tasks"
+msgstr "Commuta les subtasques"
+
+#: src/res/ui/task.ui:95 src/res/ui/task.ui:185
+msgid "Accent color"
+msgstr "Accentuació del color"
+
+#: src/res/ui/task.ui:110 src/res/ui/task.ui:113
+msgid "Clear style"
+msgstr "Neteja l'estil"
+
+#: src/res/ui/task.ui:312
+msgid "Add new sub-task"
+msgstr "Afegeix una subtasca"
+
+#: src/res/ui/task.ui:325 src/res/ui/task.ui:329
+msgid "Delete completed sub-tasks"
+msgstr "Suprimeix les subtasques completades"
