@@ -5,13 +5,6 @@
       <class name="no-outline"/>
     </style>
     <child>
-      <object class="GtkDragSource">
-        <property name="actions">move</property>
-        <signal name="prepare" handler="on_drag_prepare"/>
-        <signal name="drag-begin" handler="on_drag_begin"/>
-      </object>
-    </child>
-    <child>
       <object class="GtkDropTarget">
         <property name="actions">move</property>
         <property name="formats">SubTask</property>
@@ -103,44 +96,25 @@
                 <property name="margin-start">10</property>
                 <property name="margin-end">10</property>
                 <property name="spacing">5</property>
+                <!-- Move handle -->
+                <child>
+                  <object class="GtkImage">
+                    <property name="icon-name">list-drag-handle-symbolic</property>
+                    <child>
+                      <object class="GtkDragSource">
+                        <property name="actions">move</property>
+                        <signal name="prepare" handler="on_drag_prepare"/>
+                        <signal name="drag-begin" handler="on_drag_begin"/>
+                      </object>
+                    </child>
+                  </object>
+                </child>
                 <!-- Edit entry -->
                 <child>
                   <object class="GtkEntry" id="sub_task_edit_entry">
                     <property name="hexpand">true</property>
                     <property name="valign">center</property>
                     <signal name="activate" handler="on_sub_task_edit"/>
-                  </object>
-                </child>
-                <!-- Move box -->
-                <child>
-                  <object class="GtkBox">
-                    <style>
-                      <class name="linked"/>
-                    </style>
-                    <!-- Move up button -->
-                    <child>
-                      <object class="GtkButton">
-                        <property name="valign">center</property>
-                        <property name="icon-name">go-up-symbolic</property>
-                        <property name="tooltip-text" translatable="yes">Move up</property>
-                        <signal name="clicked" handler="on_sub_task_move_up_btn_clicked"/>
-                        <accessibility>
-                          <property name="label" translatable="yes">Move up</property>
-                        </accessibility>
-                      </object>
-                    </child>
-                    <!-- Move down button -->
-                    <child>
-                      <object class="GtkButton">
-                        <property name="valign">center</property>
-                        <property name="icon-name">go-down-symbolic</property>
-                        <property name="tooltip-text" translatable="yes">Move down</property>
-                        <signal name="clicked" handler="on_sub_task_move_down_btn_clicked"/>
-                        <accessibility>
-                          <property name="label" translatable="yes">Move down</property>
-                        </accessibility>
-                      </object>
-                    </child>
                   </object>
                 </child>
                 <!-- Cancel edit button -->
