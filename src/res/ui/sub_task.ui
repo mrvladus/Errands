@@ -100,6 +100,15 @@
                 <child>
                   <object class="GtkImage">
                     <property name="icon-name">list-drag-handle-symbolic</property>
+                    <property name="tooltip-text" translatable="yes">Drag to move</property>
+                    <property name="cursor">
+                      <object class="GdkCursor">
+                        <property name="name">grab</property>
+                      </object>
+                    </property>
+                    <accessibility>
+                      <property name="label" translatable="yes">Drag to move</property>
+                    </accessibility>
                     <child>
                       <object class="GtkDragSource">
                         <property name="actions">move</property>
