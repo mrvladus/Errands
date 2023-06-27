@@ -1,12 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <template class="SubTask" parent="GtkRevealer">
+    <style>
+      <class name="no-outline"/>
+    </style>
     <child>
-      <object class="GtkBox">
+      <object class="GtkDragSource">
+        <property name="actions">move</property>
+        <signal name="prepare" handler="on_drag_prepare"/>
+        <signal name="drag-begin" handler="on_drag_begin"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkDropTarget">
+        <property name="actions">move</property>
+        <property name="formats">SubTask</property>
+        <signal name="drop" handler="on_drop"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkBox" id="sub_task_main_box">
         <property name="orientation">vertical</property>
         <property name="height-request">60</property>
         <style>
           <class name="sub-task"/>
+          <class name="no-outline"/>
         </style>
         <child>
           <object class="GtkRevealer" id="sub_task_box_rev">

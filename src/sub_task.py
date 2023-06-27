@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from gi.repository import Gtk, Adw
+from gi.repository import Gtk, Adw, GObject, Gdk
 from .utils import UserData, Markup
 
 
@@ -28,6 +28,7 @@ from .utils import UserData, Markup
 class SubTask(Gtk.Revealer):
     __gtype_name__ = "SubTask"
 
+    sub_task_main_box = Gtk.Template.Child()
     sub_task_box_rev = Gtk.Template.Child()
     sub_task_text = Gtk.Template.Child()
     sub_task_completed_btn = Gtk.Template.Child()
@@ -78,6 +79,41 @@ class SubTask(Gtk.Revealer):
                         # Update parent data
                         self.parent.task["sub"] = task["sub"]
                         return
+
+    @Gtk.Template.Callback()
+    def on_drag_prepare(self, _source, _x, _y):
+        value = GObject.Value(SubTask)
+        value.set_object(self)
+        return Gdk.ContentProvider.new_for_value(value)
+
+    @Gtk.Template.Callback()
+    def on_drag_begin(self, _source, drag):
+        widget = Gtk.Button(label=self.task["text"])
+        icon = Gtk.DragIcon.get_for_drag(drag)
+        icon.set_child(widget)
+
+    @Gtk.Template.Callback()
+    def on_drop(self, _drop, sub_task, _x, _y):
+        if sub_task.parent != self.parent:
+            return
+        # Get index
+        child = self.parent.sub_tasks.get_first_child()
+        self_idx = None
+        sub_idx = None
+        idx = 0
+        while True:
+            if child == self:
+                self_idx = idx
+            if child == sub_task:
+                sub_idx = idx
+            idx += 1
+            child = child.get_next_sibling()
+            if not child:
+                break
+        # Move widget
+        self.parent.sub_tasks.reorder_child_after(sub_task, self)
+        if self_idx < sub_idx:
+            self.parent.sub_tasks.reorder_child_after(self, sub_task)
 
     @Gtk.Template.Callback()
     def on_completed_btn_toggled(self, btn: Gtk.Button) -> None:
