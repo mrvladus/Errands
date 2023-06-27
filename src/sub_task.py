@@ -114,6 +114,9 @@ class SubTask(Gtk.Revealer):
         self.parent.sub_tasks.reorder_child_after(sub_task, self)
         if self_idx < sub_idx:
             self.parent.sub_tasks.reorder_child_after(self, sub_task)
+        # Update data
+        self.parent.task["sub"].insert(self_idx, self.parent.task["sub"].pop(sub_idx))
+        self.parent.update_data()
 
     @Gtk.Template.Callback()
     def on_completed_btn_toggled(self, btn: Gtk.Button) -> None:
