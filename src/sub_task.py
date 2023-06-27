@@ -97,13 +97,8 @@ class SubTask(Gtk.Revealer):
         if sub_task.parent != self.parent:
             return
         # Get indexes
-        self_idx = None
-        sub_idx = None
-        for idx, sub in enumerate(self.parent.task["sub"]):
-            if sub["id"] == self.task["id"]:
-                self_idx = idx
-            if sub["id"] == sub_task.task["id"]:
-                sub_idx = idx
+        self_idx = self.parent.task["sub"].index(self.task)
+        sub_idx = self.parent.task["sub"].index(sub_task.task)
         # Move widget
         self.parent.sub_tasks.reorder_child_after(sub_task, self)
         if self_idx < sub_idx:
