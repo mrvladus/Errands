@@ -80,17 +80,21 @@ class SubTask(Gtk.Revealer):
                         return
 
     @Gtk.Template.Callback()
-    def on_drag_prepare(self, _source, _x, _y):
-        value = GObject.Value(SubTask)
-        value.set_object(self)
-        return Gdk.ContentProvider.new_for_value(value)
-
-    @Gtk.Template.Callback()
     def on_drag_begin(self, _source, drag):
         self.toggle_visibility()
         widget = Gtk.Button(label=self.task["text"])
         icon = Gtk.DragIcon.get_for_drag(drag)
         icon.set_child(widget)
+
+    @Gtk.Template.Callback()
+    def on_drag_cancel(self, *_):
+        self.toggle_visibility()
+
+    @Gtk.Template.Callback()
+    def on_drag_prepare(self, _source, _x, _y):
+        value = GObject.Value(SubTask)
+        value.set_object(self)
+        return Gdk.ContentProvider.new_for_value(value)
 
     @Gtk.Template.Callback()
     def on_drop(self, _drop, sub_task, _x, _y):
@@ -119,8 +123,6 @@ class SubTask(Gtk.Revealer):
             self_idx = self.parent.task["sub"].index(self.task)
             sub_idx = self.parent.task["sub"].index(sub_task.task)
             # Move widget
-            # self.parent.sub_tasks.reorder_child_after(sub_task, self)
-            # if self_idx < sub_idx:
             self.parent.sub_tasks.reorder_child_after(sub_task, self)
             self.parent.sub_tasks.reorder_child_after(self, sub_task)
             sub_task.toggle_visibility()
