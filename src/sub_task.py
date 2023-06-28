@@ -95,6 +95,17 @@ class SubTask(Gtk.Revealer):
     @Gtk.Template.Callback()
     def on_drop(self, _drop, sub_task, _x, _y):
         if sub_task.parent != self.parent:
+            # Remove sub-task
+            sub_task.parent.task["sub"].pop(
+                sub_task.parent.task["sub"].index(sub_task.task)
+            )
+            sub_task.parent.update_data()
+            sub_task.parent.sub_tasks.remove(sub_task)
+            # Insert new sub-task
+            self.parent.task["sub"].insert(
+                self.parent.task["sub"].index(self.task), sub_task.task.copy()
+            )
+            self.parent.update_data()
             new_sub_task = SubTask(sub_task.task.copy(), self.parent, self.window)
             self.parent.sub_tasks.insert_child_after(
                 new_sub_task,
@@ -103,15 +114,6 @@ class SubTask(Gtk.Revealer):
             self.parent.sub_tasks.reorder_child_after(self, new_sub_task)
             new_sub_task.toggle_visibility()
             new_sub_task.on_sub_task_edit_btn_clicked(None)
-            self.parent.task["sub"].insert(
-                self.parent.task["sub"].index(self.task), sub_task.task.copy()
-            )
-            self.parent.update_data()
-            sub_task.parent.task["sub"].pop(
-                sub_task.parent.task["sub"].index(sub_task.task)
-            )
-            sub_task.parent.update_data()
-            sub_task.parent.sub_tasks.remove(sub_task)
         else:
             # Get indexes
             self_idx = self.parent.task["sub"].index(self.task)
