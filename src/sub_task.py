@@ -131,6 +131,7 @@ class SubTask(Gtk.Revealer):
                 self_idx - 1, self.parent.task["sub"].pop(sub_idx)
             )
             self.parent.update_data()
+        sub_task.parent.update_statusbar()
 
     @Gtk.Template.Callback()
     def on_completed_btn_toggled(self, btn: Gtk.Button) -> None:
