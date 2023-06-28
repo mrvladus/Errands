@@ -28,7 +28,6 @@ from .utils import UserData, Markup
 class SubTask(Gtk.Revealer):
     __gtype_name__ = "SubTask"
 
-    sub_task_main_box = Gtk.Template.Child()
     sub_task_box_rev = Gtk.Template.Child()
     sub_task_text = Gtk.Template.Child()
     sub_task_completed_btn = Gtk.Template.Child()
@@ -88,6 +87,7 @@ class SubTask(Gtk.Revealer):
 
     @Gtk.Template.Callback()
     def on_drag_begin(self, _source, drag):
+        self.toggle_visibility()
         widget = Gtk.Button(label=self.task["text"])
         icon = Gtk.DragIcon.get_for_drag(drag)
         icon.set_child(widget)
@@ -95,17 +95,38 @@ class SubTask(Gtk.Revealer):
     @Gtk.Template.Callback()
     def on_drop(self, _drop, sub_task, _x, _y):
         if sub_task.parent != self.parent:
-            return
-        # Get indexes
-        self_idx = self.parent.task["sub"].index(self.task)
-        sub_idx = self.parent.task["sub"].index(sub_task.task)
-        # Move widget
-        self.parent.sub_tasks.reorder_child_after(sub_task, self)
-        if self_idx < sub_idx:
+            new_sub_task = SubTask(sub_task.task.copy(), self.parent, self.window)
+            self.parent.sub_tasks.insert_child_after(
+                new_sub_task,
+                self,
+            )
+            self.parent.sub_tasks.reorder_child_after(self, new_sub_task)
+            new_sub_task.toggle_visibility()
+            new_sub_task.on_sub_task_edit_btn_clicked(None)
+            self.parent.task["sub"].insert(
+                self.parent.task["sub"].index(self.task), sub_task.task.copy()
+            )
+            self.parent.update_data()
+            sub_task.parent.task["sub"].pop(
+                sub_task.parent.task["sub"].index(sub_task.task)
+            )
+            sub_task.parent.update_data()
+            sub_task.parent.sub_tasks.remove(sub_task)
+        else:
+            # Get indexes
+            self_idx = self.parent.task["sub"].index(self.task)
+            sub_idx = self.parent.task["sub"].index(sub_task.task)
+            # Move widget
+            # self.parent.sub_tasks.reorder_child_after(sub_task, self)
+            # if self_idx < sub_idx:
+            self.parent.sub_tasks.reorder_child_after(sub_task, self)
             self.parent.sub_tasks.reorder_child_after(self, sub_task)
-        # Update data
-        self.parent.task["sub"].insert(self_idx, self.parent.task["sub"].pop(sub_idx))
-        self.parent.update_data()
+            sub_task.toggle_visibility()
+            # Update data
+            self.parent.task["sub"].insert(
+                self_idx - 1, self.parent.task["sub"].pop(sub_idx)
+            )
+            self.parent.update_data()
 
     @Gtk.Template.Callback()
     def on_completed_btn_toggled(self, btn: Gtk.Button) -> None:
