@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from gi.repository import Gtk, Adw, Gdk
+from gi.repository import Gtk, Adw, Gdk, GObject
 from .sub_task import SubTask
 from .utils import Animation, GSettings, Markup, TaskUtils, UserData
 
@@ -275,56 +275,27 @@ class Task(Gtk.Revealer):
         self.update_data()
 
     @Gtk.Template.Callback()
-    def on_task_move_up_btn_clicked(self, _) -> None:
-        data: dict = UserData.get()
-        tasks: list = data["tasks"]
-        idx: int = tasks.index(self.task)
-        if idx == 0:
-            print("Can't move up: task is first")
-            return
-        deleted = 0
-        for i in range(idx - 1, -1, -1):
-            if tasks[i]["id"] in data["history"]:
-                deleted += 1
-            else:
-                break
-        if idx - deleted == 0:
-            print("Can't move up: task is first")
-            return
-        print(f"""Move task "{self.task['text']}" up""")
-        tasks[idx], tasks[idx - deleted - 1] = tasks[idx - deleted - 1], tasks[idx]
-        UserData.set(data)
-        sibling = self.get_prev_sibling()
-        while True:
-            if sibling.task["id"] in data["history"]:
-                sibling = sibling.get_prev_sibling()
-            else:
-                break
-        self.get_parent().reorder_child_after(sibling, self)
+    def on_drag_begin(self, _source, drag):
+        self.toggle_visibility()
+        widget = Gtk.Button(label=self.task["text"])
+        icon = Gtk.DragIcon.get_for_drag(drag)
+        icon.set_child(widget)
 
     @Gtk.Template.Callback()
-    def on_task_move_down_btn_clicked(self, _) -> None:
-        data: dict = UserData.get()
-        tasks: dict = data["tasks"]
-        idx: int = tasks.index(self.task)
-        # Find if sub-task is last
-        deleted = 0
-        for i in range(idx + 1, len(tasks)):
-            if tasks[i]["id"] in data["history"]:
-                deleted += 1
-            else:
-                break
-        if len(tasks) - 1 == idx + deleted:
-            print("Can't move down: task is last")
-            return
-        print(f"""Move task "{self.task['text']}" down""")
-        tasks[idx], tasks[idx + deleted + 1] = tasks[idx + deleted + 1], tasks[idx]
+    def on_drag_cancel(self, *_):
+        self.toggle_visibility()
+
+    @Gtk.Template.Callback()
+    def on_drag_prepare(self, _source, _x, _y):
+        value = GObject.Value(Task)
+        value.set_object(self)
+        return Gdk.ContentProvider.new_for_value(value)
+
+    @Gtk.Template.Callback()
+    def on_drop(self, _drop, task, _x, _y):
+        data = UserData.get()
+        tasks = data["tasks"]
+        tasks.insert(tasks.index(self.task) - 1, tasks.pop(tasks.index(task.task)))
         UserData.set(data)
-        # Move widget
-        sibling = self.get_next_sibling()
-        while True:
-            if sibling.task["id"] in data["history"]:
-                sibling = sibling.get_next_sibling()
-            else:
-                break
-        self.get_parent().reorder_child_after(self, sibling)
+        self.parent.reorder_child_after(task, self)
+        self.parent.reorder_child_after(self, task)
