@@ -116,9 +116,15 @@
             </child>
             <!-- Todo list -->
             <child>
-              <object class="GtkScrolledWindow">
+              <object class="GtkScrolledWindow" id="scrolled_window">
                 <property name="propagate-natural-height">true</property>
                 <property name="propagate-natural-width">true</property>
+                <!-- Drag and Drop scroll controller -->
+                <child>
+                  <object class="GtkDropControllerMotion">
+                    <signal name="motion" handler="on_dnd_scroll"/>
+                  </object>
+                </child>
                 <child>
                   <object class="AdwClamp">
                     <property name="maximum-size">850</property>

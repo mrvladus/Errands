@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from gi.repository import Gio, Adw, Gtk
+from gi.repository import Gio, Adw, Gtk, GLib
 from __main__ import VERSION
 from .utils import Animation, GSettings, TaskUtils, UserData
 from .task import Task
@@ -35,7 +35,10 @@ class Window(Adw.ApplicationWindow):
     delete_completed_tasks_btn_revealer = Gtk.Template.Child()
     tasks_list = Gtk.Template.Child()
     status = Gtk.Template.Child()
+    scrolled_window = Gtk.Template.Child()
     about_window = Gtk.Template.Child()
+
+    scrolling = False
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -140,6 +143,30 @@ class Window(Adw.ApplicationWindow):
             UserData.set(data)
         # Set sensitivity of undo button
         self.undo_btn.props.sensitive = len(data["history"]) > 0
+
+    def scroll(self, scroll_up: bool):
+        if not self.scrolling:
+            return False
+        adj = self.scrolled_window.get_vadjustment()
+        if scroll_up:
+            adj.set_value(adj.get_value() - 5)
+            return True
+        else:
+            adj.set_value(adj.get_value() + 5)
+            return True
+
+    @Gtk.Template.Callback()
+    def on_dnd_scroll(self, _motion, _x, y):
+        MARGIN = 50
+        height = self.scrolled_window.get_allocation().height
+        if y < MARGIN:
+            self.scrolling = True
+            GLib.timeout_add(100, self.scroll, True)
+        elif y > height - MARGIN:
+            self.scrolling = True
+            GLib.timeout_add(100, self.scroll, False)
+        else:
+            self.scrolling = False
 
     @Gtk.Template.Callback()
     def on_task_added(self, entry: Gtk.Entry) -> None:
