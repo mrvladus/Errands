@@ -120,22 +120,10 @@
                   <object class="GtkEntry" id="sub_task_edit_entry">
                     <property name="hexpand">true</property>
                     <property name="valign">center</property>
+                    <property name="secondary-icon-name">edit-delete-symbolic</property>
+                    <property name="secondary-icon-tooltip-text">Cancel</property>
                     <signal name="activate" handler="on_sub_task_edit"/>
-                  </object>
-                </child>
-                <!-- Cancel edit button -->
-                <child>
-                  <object class="GtkButton">
-                    <property name="icon-name">edit-delete-symbolic</property>
-                    <property name="tooltip-text" translatable="yes">Cancel</property>
-                    <property name="valign">center</property>
-                    <signal name="clicked" handler="on_sub_task_cancel_edit_btn_clicked"/>
-                    <accessibility>
-                      <property name="label" translatable="yes">Cancel</property>
-                    </accessibility>
-                    <style>
-                      <class name="flat"/>
-                    </style>
+                    <signal name="icon-release" handler="on_sub_task_cancel_edit_btn_clicked"/>
                   </object>
                 </child>
               </object>

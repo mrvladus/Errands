@@ -161,7 +161,7 @@ class SubTask(Gtk.Revealer):
         self.sub_task_edit_entry.grab_focus()
 
     @Gtk.Template.Callback()
-    def on_sub_task_cancel_edit_btn_clicked(self, _) -> None:
+    def on_sub_task_cancel_edit_btn_clicked(self, *_) -> None:
         self.toggle_edit_box()
 
     @Gtk.Template.Callback()

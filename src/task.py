@@ -216,7 +216,7 @@ class Task(Gtk.Revealer):
         self.task_edit_entry.grab_focus()
 
     @Gtk.Template.Callback()
-    def on_task_cancel_edit_btn_clicked(self, _) -> None:
+    def on_task_cancel_edit_btn_clicked(self, *_) -> None:
         self.toggle_edit_mode()
 
     @Gtk.Template.Callback()
