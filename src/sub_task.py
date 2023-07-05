@@ -103,9 +103,7 @@ class SubTask(Gtk.Revealer):
     def on_drop(self, _drop, sub_task, _x, _y) -> None:
         if sub_task.parent != self.parent:
             # Remove sub-task
-            sub_task.parent.task["sub"].pop(
-                sub_task.parent.task["sub"].index(sub_task.task)
-            )
+            sub_task.parent.task["sub"].remove(sub_task.task)
             sub_task.parent.sub_tasks.remove(sub_task)
             sub_task.parent.update_data()
             sub_task.parent.update_statusbar()
