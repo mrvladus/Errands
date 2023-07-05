@@ -89,6 +89,7 @@ class SubTask(Gtk.Revealer):
     @Gtk.Template.Callback()
     def on_drag_cancel(self, *_):
         self.toggle_visibility()
+        return True
 
     @Gtk.Template.Callback()
     def on_drag_prepare(self, _source, _x, _y):
@@ -131,6 +132,7 @@ class SubTask(Gtk.Revealer):
                 self_idx - 1, self.parent.task["sub"].pop(sub_idx)
             )
             self.parent.update_data()
+        # Update status
         sub_task.parent.update_statusbar()
 
     @Gtk.Template.Callback()

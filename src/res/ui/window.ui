@@ -121,7 +121,7 @@
                 <property name="propagate-natural-width">true</property>
                 <!-- Drag and Drop scroll controller -->
                 <child>
-                  <object class="GtkDropControllerMotion">
+                  <object class="GtkDropControllerMotion" id="drop_motion_ctrl">
                     <signal name="motion" handler="on_dnd_scroll"/>
                   </object>
                 </child>

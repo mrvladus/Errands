@@ -36,8 +36,10 @@ class Window(Adw.ApplicationWindow):
     tasks_list = Gtk.Template.Child()
     status = Gtk.Template.Child()
     scrolled_window = Gtk.Template.Child()
+    drop_motion_ctrl = Gtk.Template.Child()
     about_window = Gtk.Template.Child()
 
+    # State
     scrolling = False
 
     def __init__(self, **kwargs):
@@ -147,12 +149,14 @@ class Window(Adw.ApplicationWindow):
     def scroll(self, scroll_up: bool):
         if not self.scrolling:
             return False
+        if not self.drop_motion_ctrl.contains_pointer():
+            return False
         adj = self.scrolled_window.get_vadjustment()
         if scroll_up:
-            adj.set_value(adj.get_value() - 5)
+            adj.set_value(adj.get_value() - 2)
             return True
         else:
-            adj.set_value(adj.get_value() + 5)
+            adj.set_value(adj.get_value() + 2)
             return True
 
     @Gtk.Template.Callback()
