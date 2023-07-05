@@ -104,13 +104,15 @@ class SubTask(Gtk.Revealer):
             sub_task.parent.task["sub"].pop(
                 sub_task.parent.task["sub"].index(sub_task.task)
             )
-            sub_task.parent.update_data()
             sub_task.parent.sub_tasks.remove(sub_task)
+            sub_task.parent.update_data()
+            sub_task.parent.update_statusbar()
             # Insert new sub-task
             self.parent.task["sub"].insert(
                 self.parent.task["sub"].index(self.task), sub_task.task.copy()
             )
             self.parent.update_data()
+            self.parent.update_statusbar()
             new_sub_task = SubTask(sub_task.task.copy(), self.parent, self.window)
             self.parent.sub_tasks.insert_child_after(
                 new_sub_task,
@@ -132,8 +134,6 @@ class SubTask(Gtk.Revealer):
                 self_idx - 1, self.parent.task["sub"].pop(sub_idx)
             )
             self.parent.update_data()
-        # Update status
-        sub_task.parent.update_statusbar()
 
     @Gtk.Template.Callback()
     def on_completed_btn_toggled(self, btn: Gtk.Button) -> None:

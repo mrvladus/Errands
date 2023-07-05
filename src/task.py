@@ -73,7 +73,6 @@ class Task(Gtk.Revealer):
         )
         # Show or hide accent colors menu
         self.accent_colors_btn.set_visible(GSettings.get("show-accent-colors-menu"))
-        self.setup_drag_n_drop()
         self.add_sub_tasks()
         self.update_statusbar()
 
@@ -105,10 +104,6 @@ class Task(Gtk.Revealer):
             "go-up-symbolic" if expanded else "go-down-symbolic"
         )
         self.update_statusbar()
-
-    def setup_drag_n_drop(self):
-        drop_target = Gtk.DropTarget.new(Gtk.Revealer, Gdk.DragAction.MOVE)
-        self.sub_tasks.add_controller(drop_target)
 
     def toggle_edit_mode(self) -> None:
         self.task_box_rev.set_reveal_child(not self.task_box_rev.get_child_revealed())
@@ -292,10 +287,28 @@ class Task(Gtk.Revealer):
         return Gdk.ContentProvider.new_for_value(value)
 
     @Gtk.Template.Callback()
-    def on_drop(self, _drop, task, _x, _y):
-        data = UserData.get()
-        tasks = data["tasks"]
-        tasks.insert(tasks.index(self.task) - 1, tasks.pop(tasks.index(task.task)))
-        UserData.set(data)
-        self.parent.reorder_child_after(task, self)
-        self.parent.reorder_child_after(self, task)
+    def on_drop(self, drop, task, _x, _y):
+        if task.__gtype_name__ == "Task":
+            data = UserData.get()
+            tasks = data["tasks"]
+            tasks.insert(tasks.index(self.task) - 1, tasks.pop(tasks.index(task.task)))
+            UserData.set(data)
+            self.parent.reorder_child_after(task, self)
+            self.parent.reorder_child_after(self, task)
+        elif task.__gtype_name__ == "SubTask":
+            # Remove sub-task
+            new_sub_task = task.parent.task["sub"].pop(
+                task.parent.task["sub"].index(task.task)
+            )
+            task.parent.update_data()
+            task.parent.sub_tasks.remove(task)
+            task.parent.update_statusbar()
+            # Add sub-task
+            self.task["sub"].append(new_sub_task)
+            self.update_data()
+            sub_task = SubTask(new_sub_task, self, self.window)
+            self.sub_tasks.append(sub_task)
+            sub_task.toggle_visibility()
+            self.update_statusbar()
+            # Expand
+            self.expand(True)

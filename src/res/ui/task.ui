@@ -16,7 +16,7 @@
         <child>
           <object class="GtkDropTarget">
             <property name="actions">move</property>
-            <property name="formats">Task</property>
+            <property name="formats">Task SubTask</property>
             <signal name="drop" handler="on_drop"/>
           </object>
         </child>
