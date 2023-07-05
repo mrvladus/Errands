@@ -57,6 +57,8 @@ class PreferencesWindow(Adw.PreferencesWindow):
         GSettings.bind("history-size", self.history_size, "value")
         GSettings.bind("enable-sub-tasks", self.enable_sub_tasks, "active")
 
+    # --- Template handlers --- #
+
     @Gtk.Template.Callback()
     def on_theme_change(self, btn: Gtk.Button) -> None:
         id: str = btn.get_buildable_id()

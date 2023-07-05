@@ -146,7 +146,7 @@ class Window(Adw.ApplicationWindow):
         # Set sensitivity of undo button
         self.undo_btn.props.sensitive = len(data["history"]) > 0
 
-    def scroll(self, scroll_up: bool):
+    def scroll(self, scroll_up: bool) -> bool:
         if not self.scrolling:
             return False
         if not self.drop_motion_ctrl.contains_pointer():
@@ -159,8 +159,10 @@ class Window(Adw.ApplicationWindow):
             adj.set_value(adj.get_value() + 2)
             return True
 
+    # --- Template handlers --- #
+
     @Gtk.Template.Callback()
-    def on_dnd_scroll(self, _motion, _x, y):
+    def on_dnd_scroll(self, _motion, _x, y) -> bool:
         MARGIN = 50
         height = self.scrolled_window.get_allocation().height
         if y < MARGIN:

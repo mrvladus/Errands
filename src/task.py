@@ -148,9 +148,6 @@ class Task(Gtk.Revealer):
         # Show delete completed button
         self.delete_completed_btn_revealer.set_reveal_child(n_completed > 0)
 
-    def update_statusbar_animation(self, value, _):
-        self.task_status.props.fraction = value
-
     def update_data(self) -> None:
         """Sync self.task with user data.json"""
         new_data: dict = UserData.get()
@@ -270,24 +267,25 @@ class Task(Gtk.Revealer):
         self.update_data()
 
     @Gtk.Template.Callback()
-    def on_drag_begin(self, _source, drag):
+    def on_drag_begin(self, _source, drag) -> None:
         self.toggle_visibility()
         widget = Gtk.Button(label=self.task["text"])
         icon = Gtk.DragIcon.get_for_drag(drag)
         icon.set_child(widget)
 
     @Gtk.Template.Callback()
-    def on_drag_cancel(self, *_):
+    def on_drag_cancel(self, *_) -> bool:
         self.toggle_visibility()
+        return True
 
     @Gtk.Template.Callback()
-    def on_drag_prepare(self, _source, _x, _y):
+    def on_drag_prepare(self, _source, _x, _y) -> Gdk.ContentProvider:
         value = GObject.Value(Task)
         value.set_object(self)
         return Gdk.ContentProvider.new_for_value(value)
 
     @Gtk.Template.Callback()
-    def on_drop(self, drop, task, _x, _y):
+    def on_drop(self, drop, task, _x, _y) -> None:
         if task.__gtype_name__ == "Task":
             data = UserData.get()
             tasks = data["tasks"]
@@ -300,15 +298,15 @@ class Task(Gtk.Revealer):
             new_sub_task = task.parent.task["sub"].pop(
                 task.parent.task["sub"].index(task.task)
             )
-            task.parent.update_data()
             task.parent.sub_tasks.remove(task)
+            task.parent.update_data()
             task.parent.update_statusbar()
             # Add sub-task
             self.task["sub"].append(new_sub_task)
-            self.update_data()
             sub_task = SubTask(new_sub_task, self, self.window)
             self.sub_tasks.append(sub_task)
             sub_task.toggle_visibility()
+            self.update_data()
             self.update_statusbar()
             # Expand
             self.expand(True)

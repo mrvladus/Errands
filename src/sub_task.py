@@ -79,26 +79,28 @@ class SubTask(Gtk.Revealer):
                         self.parent.task["sub"] = task["sub"]
                         return
 
+    # --- Template handlers --- #
+
     @Gtk.Template.Callback()
-    def on_drag_begin(self, _source, drag):
+    def on_drag_begin(self, _source, drag) -> None:
         self.toggle_visibility()
         widget = Gtk.Button(label=self.task["text"])
         icon = Gtk.DragIcon.get_for_drag(drag)
         icon.set_child(widget)
 
     @Gtk.Template.Callback()
-    def on_drag_cancel(self, *_):
+    def on_drag_cancel(self, *_) -> bool:
         self.toggle_visibility()
         return True
 
     @Gtk.Template.Callback()
-    def on_drag_prepare(self, _source, _x, _y):
+    def on_drag_prepare(self, _source, _x, _y) -> Gdk.ContentProvider:
         value = GObject.Value(SubTask)
         value.set_object(self)
         return Gdk.ContentProvider.new_for_value(value)
 
     @Gtk.Template.Callback()
-    def on_drop(self, _drop, sub_task, _x, _y):
+    def on_drop(self, _drop, sub_task, _x, _y) -> None:
         if sub_task.parent != self.parent:
             # Remove sub-task
             sub_task.parent.task["sub"].pop(
