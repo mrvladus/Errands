@@ -152,9 +152,7 @@ class Window(Adw.ApplicationWindow):
     def on_dnd_scroll(self, _motion, _x, y) -> bool:
         def auto_scroll(scroll_up: bool) -> bool:
             """Scroll while drag is near the edge"""
-            if not self.scrolling:
-                return False
-            if not self.drop_motion_ctrl.contains_pointer():
+            if not self.scrolling or not self.drop_motion_ctrl.contains_pointer():
                 return False
             adj = self.scrolled_window.get_vadjustment()
             if scroll_up:
