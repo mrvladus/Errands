@@ -146,31 +146,32 @@ class Window(Adw.ApplicationWindow):
         # Set sensitivity of undo button
         self.undo_btn.props.sensitive = len(data["history"]) > 0
 
-    def scroll(self, scroll_up: bool) -> bool:
-        if not self.scrolling:
-            return False
-        if not self.drop_motion_ctrl.contains_pointer():
-            return False
-        adj = self.scrolled_window.get_vadjustment()
-        if scroll_up:
-            adj.set_value(adj.get_value() - 2)
-            return True
-        else:
-            adj.set_value(adj.get_value() + 2)
-            return True
-
     # --- Template handlers --- #
 
     @Gtk.Template.Callback()
     def on_dnd_scroll(self, _motion, _x, y) -> bool:
+        def auto_scroll(scroll_up: bool) -> bool:
+            """Scroll while drag is near the edge"""
+            if not self.scrolling:
+                return False
+            if not self.drop_motion_ctrl.contains_pointer():
+                return False
+            adj = self.scrolled_window.get_vadjustment()
+            if scroll_up:
+                adj.set_value(adj.get_value() - 2)
+                return True
+            else:
+                adj.set_value(adj.get_value() + 2)
+                return True
+
         MARGIN = 50
         height = self.scrolled_window.get_allocation().height
         if y < MARGIN:
             self.scrolling = True
-            GLib.timeout_add(100, self.scroll, True)
+            GLib.timeout_add(100, auto_scroll, True)
         elif y > height - MARGIN:
             self.scrolling = True
-            GLib.timeout_add(100, self.scroll, False)
+            GLib.timeout_add(100, auto_scroll, False)
         else:
             self.scrolling = False
 

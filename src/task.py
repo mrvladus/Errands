@@ -267,7 +267,7 @@ class Task(Gtk.Revealer):
         self.update_data()
 
     @Gtk.Template.Callback()
-    def on_drag_begin(self, _source, drag) -> None:
+    def on_drag_begin(self, _source, drag) -> bool:
         self.toggle_visibility()
         widget = Gtk.Button(label=self.task["text"])
         icon = Gtk.DragIcon.get_for_drag(drag)
