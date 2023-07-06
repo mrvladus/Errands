@@ -77,8 +77,10 @@ class Task(Gtk.Revealer):
         self.update_statusbar()
 
     def add_sub_tasks(self) -> None:
+        # Hide sub-tasks if disabeled
         if not GSettings.get("enable-sub-tasks"):
             self.expand_btn.props.visible = False
+            self.task_status.props.visible = False
             return
         if self.task["sub"] == []:
             return

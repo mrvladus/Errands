@@ -10,7 +10,7 @@
         <!-- Theme -->
         <child>
           <object class="AdwPreferencesGroup">
-            <property name="title" translatable="yes">Application theme</property>
+            <property name="title" translatable="yes">Application Theme</property>
             <!-- System -->
             <child>
               <object class="AdwActionRow">
@@ -58,22 +58,10 @@
         <child>
           <object class="AdwPreferencesGroup">
             <property name="title" translatable="yes">Tasks</property>
-            <!-- Expand task -->
-            <child>
-              <object class="AdwActionRow">
-                <property name="title" translatable="yes">Tasks expanded on startup</property>
-                <property name="activatable-widget">tasks_expanded</property>
-                <child type="suffix">
-                  <object class="GtkSwitch" id="tasks_expanded">
-                    <property name="valign">center</property>
-                  </object>
-                </child>
-              </object>
-            </child>
             <!-- Show accent colors menu -->
             <child>
               <object class="AdwActionRow">
-                <property name="title" translatable="yes">Show accent colors menu</property>
+                <property name="title" translatable="yes">Accent Colors Menu</property>
                 <property name="subtitle" translatable="yes">Restart required</property>
                 <property name="activatable-widget">show_accent_colors_menu</property>
                 <child type="suffix">
@@ -86,11 +74,23 @@
             <!-- Enable sub-tasks -->
             <child>
               <object class="AdwActionRow">
-                <property name="title" translatable="yes">Enable sub-tasks</property>
+                <property name="title" translatable="yes">Sub Tasks</property>
                 <property name="subtitle" translatable="yes">Restart required</property>
                 <property name="activatable-widget">enable_sub_tasks</property>
                 <child type="suffix">
                   <object class="GtkSwitch" id="enable_sub_tasks">
+                    <property name="valign">center</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <!-- Expand sub-tasks -->
+            <child>
+              <object class="AdwActionRow">
+                <property name="title" translatable="yes">Tasks Expanded On Startup</property>
+                <property name="activatable-widget">tasks_expanded</property>
+                <child type="suffix">
+                  <object class="GtkSwitch" id="tasks_expanded">
                     <property name="valign">center</property>
                   </object>
                 </child>
@@ -105,7 +105,7 @@
             <!-- Delete history on startup -->
             <child>
               <object class="AdwActionRow">
-                <property name="title" translatable="yes">Clear history on startup</property>
+                <property name="title" translatable="yes">Clear History On Startup</property>
                 <property name="activatable-widget">clear_history_on_startup</property>
                 <child type="suffix">
                   <object class="GtkSwitch" id="clear_history_on_startup">
@@ -117,7 +117,7 @@
             <!-- History size -->
             <child>
               <object class="AdwActionRow">
-                <property name="title" translatable="yes">History size</property>
+                <property name="title" translatable="yes">History Size</property>
                 <child type="suffix">
                   <object class="GtkSpinButton">
                     <property name="valign">center</property>
@@ -142,7 +142,7 @@
             <property name="title" translatable="yes">Backup</property>
             <child>
               <object class="AdwActionRow">
-                <property name="title" translatable="yes">Save data backup to your HOME folder</property>
+                <property name="title" translatable="yes">Save Data Backup To Your HOME Folder</property>
                 <property name="subtitle" translatable="yes">File name is "list_backup_data.json"</property>
                 <property name="activatable-widget">save_backup</property>
                 <child type="suffix">
