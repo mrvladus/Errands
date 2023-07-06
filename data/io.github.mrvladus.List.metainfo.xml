@@ -53,7 +53,7 @@
           <li>Added support for Drag and Drop. Now you can easily move tasks around. Moving sub-tasks between tasks now works too.</li>
           <li>Removed "Quit" menu as unnecessary</li>
           <li>"Undo" button renamed to "Undo deletion" for clearer understanding of its purpose</li>
-          <li>Improvements and bug fixes</li>
+          <li>Minor preferences window improvements</li>
         </ul>
       </description>
     </release>

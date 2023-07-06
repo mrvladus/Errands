@@ -89,6 +89,7 @@
               <object class="AdwActionRow">
                 <property name="title" translatable="yes">Tasks Expanded On Startup</property>
                 <property name="activatable-widget">tasks_expanded</property>
+                <property name="sensitive" bind-source="enable_sub_tasks" bind-property="active" bind-flags="sync-create"/>
                 <child type="suffix">
                   <object class="GtkSwitch" id="tasks_expanded">
                     <property name="valign">center</property>
