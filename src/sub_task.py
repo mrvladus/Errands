@@ -131,7 +131,7 @@ class SubTask(Gtk.Revealer):
             sub_task.toggle_visibility()
             # Update data
             self.parent.task["sub"].insert(
-                self_idx - 1, self.parent.task["sub"].pop(sub_idx)
+                self_idx, self.parent.task["sub"].pop(sub_idx)
             )
             self.parent.update_data()
 

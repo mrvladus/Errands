@@ -43,6 +43,8 @@
                 <!-- Sub-task text -->
                 <child>
                   <object class="GtkLabel" id="sub_task_text">
+                    <property name="margin-top">5</property>
+                    <property name="margin-bottom">5</property>
                     <property name="wrap">true</property>
                     <property name="wrap-mode">1</property>
                     <property name="hexpand">true</property>

@@ -15,18 +15,6 @@
             <style>
               <class name="flat"/>
             </style>
-            <!-- Menu -->
-            <child type="end">
-              <object class="GtkMenuButton">
-                <property name="primary">true</property>
-                <property name="icon-name">open-menu-symbolic</property>
-                <property name="menu-model">primary_menu</property>
-                <property name="tooltip-text" translatable="yes">Main menu</property>
-                <accessibility>
-                  <property name="label" translatable="yes">Main menu</property>
-                </accessibility>
-              </object>
-            </child>
             <!-- Undo button -->
             <child type="start">
               <object class="GtkButton" id="undo_btn">
@@ -48,6 +36,18 @@
                     </child>
                   </object>
                 </child>
+              </object>
+            </child>
+            <!-- Menu -->
+            <child type="end">
+              <object class="GtkMenuButton">
+                <property name="primary">true</property>
+                <property name="icon-name">open-menu-symbolic</property>
+                <property name="menu-model">primary_menu</property>
+                <property name="tooltip-text" translatable="yes">Main menu</property>
+                <accessibility>
+                  <property name="label" translatable="yes">Main menu</property>
+                </accessibility>
               </object>
             </child>
           </object>
@@ -90,6 +90,7 @@
                             <child type="suffix">
                               <object class="GtkRevealer" id="delete_completed_tasks_btn_revealer">
                                 <property name="transition-type">2</property>
+                                <!-- Delete completed tasks button -->
                                 <child>
                                   <object class="GtkButton">
                                     <property name="valign">center</property>
@@ -116,24 +117,41 @@
             </child>
             <!-- Todo list -->
             <child>
-              <object class="GtkScrolledWindow" id="scrolled_window">
-                <property name="propagate-natural-height">true</property>
-                <property name="propagate-natural-width">true</property>
-                <!-- Drag and Drop scroll controller -->
-                <child>
-                  <object class="GtkDropControllerMotion" id="drop_motion_ctrl">
-                    <signal name="motion" handler="on_dnd_scroll"/>
+              <object class="GtkOverlay">
+                <!-- Smooth fade on top -->
+                <child type="overlay">
+                  <object class="GtkBox">
+                    <property name="valign">start</property>
+                    <property name="can-target">false</property>
+                    <property name="height-request">10</property>
+                    <style>
+                      <class name="tasks-list-fade-top"/>
+                    </style>
                   </object>
                 </child>
+                <!-- Scrolled window -->
                 <child>
-                  <object class="AdwClamp">
-                    <property name="maximum-size">850</property>
-                    <property name="tightening-threshold">300</property>
-                    <property name="vexpand">true</property>
+                  <object class="GtkScrolledWindow" id="scrolled_window">
+                    <property name="propagate-natural-height">true</property>
+                    <property name="propagate-natural-width">true</property>
+                    <!-- Drag and Drop scroll controller -->
                     <child>
-                      <object class="GtkBox" id="tasks_list">
-                        <property name="orientation">vertical</property>
-                        <property name="hexpand">true</property>
+                      <object class="GtkDropControllerMotion" id="drop_motion_ctrl">
+                        <signal name="motion" handler="on_dnd_scroll"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="AdwClamp">
+                        <property name="maximum-size">850</property>
+                        <property name="tightening-threshold">300</property>
+                        <property name="vexpand">true</property>
+                        <!-- Tasks list -->
+                        <child>
+                          <object class="GtkBox" id="tasks_list">
+                            <property name="orientation">vertical</property>
+                            <property name="hexpand">true</property>
+                          </object>
+                        </child>
                       </object>
                     </child>
                   </object>

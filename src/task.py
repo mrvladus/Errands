@@ -291,7 +291,7 @@ class Task(Gtk.Revealer):
         if task.__gtype_name__ == "Task":
             data = UserData.get()
             tasks = data["tasks"]
-            tasks.insert(tasks.index(self.task) - 1, tasks.pop(tasks.index(task.task)))
+            tasks.insert(tasks.index(self.task), tasks.pop(tasks.index(task.task)))
             UserData.set(data)
             self.parent.reorder_child_after(task, self)
             self.parent.reorder_child_after(self, task)

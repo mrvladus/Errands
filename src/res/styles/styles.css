@@ -1,3 +1,7 @@
+/* Tasks list */
+.tasks-list-fade-top {
+  background: linear-gradient(to bottom, @window_bg_color, transparent);
+}
 /* Task */
 .task {
     transition: background 0.25s;
