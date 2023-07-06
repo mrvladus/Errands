@@ -56,6 +56,7 @@
           <li>Minor preferences window improvements</li>
           <li>Added smooth fade effect on top of the tasks list</li>
           <li>Tasks list now scrolls when new task added</li>
+          <li>Added button to scroll to the top</li>
         </ul>
       </description>
     </release>

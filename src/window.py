@@ -35,6 +35,7 @@ class Window(Adw.ApplicationWindow):
     delete_completed_tasks_btn_revealer = Gtk.Template.Child()
     tasks_list = Gtk.Template.Child()
     status = Gtk.Template.Child()
+    scroll_up_btn_rev = Gtk.Template.Child()
     scrolled_window = Gtk.Template.Child()
     drop_motion_ctrl = Gtk.Template.Child()
     about_window = Gtk.Template.Child()
@@ -124,6 +125,7 @@ class Window(Adw.ApplicationWindow):
         self.delete_completed_tasks_btn_revealer.set_reveal_child(n_completed > 0)
 
     def update_undo(self) -> None:
+        """Change undo button sensitivity"""
         data: dict = UserData.get()
         # Remove old tasks from history
         if len(data["history"]) > GSettings.get("history-size"):
@@ -145,6 +147,8 @@ class Window(Adw.ApplicationWindow):
 
     @Gtk.Template.Callback()
     def on_dnd_scroll(self, _motion, _x, y) -> bool:
+        """Autoscroll while dragging task"""
+
         def auto_scroll(scroll_up: bool) -> bool:
             """Scroll while drag is near the edge"""
             if not self.scrolling or not self.drop_motion_ctrl.contains_pointer():
@@ -169,7 +173,18 @@ class Window(Adw.ApplicationWindow):
             self.scrolling = False
 
     @Gtk.Template.Callback()
+    def on_scroll(self, adj):
+        """Show scroll up button"""
+        self.scroll_up_btn_rev.set_reveal_child(adj.get_value() > 0)
+
+    @Gtk.Template.Callback()
+    def on_scroll_up_btn_clicked(self, _):
+        """Scroll up"""
+        AnimationScroll(self.scrolled_window, False)
+
+    @Gtk.Template.Callback()
     def on_task_added(self, entry: Gtk.Entry) -> None:
+        """Add new task"""
         text: str = entry.props.text
         # Check for empty string or task exists
         if text == "":
@@ -189,6 +204,7 @@ class Window(Adw.ApplicationWindow):
 
     @Gtk.Template.Callback()
     def on_delete_completed_tasks_btn_clicked(self, _) -> None:
+        """Hide completed tasks"""
         history: list = UserData.get()["history"]
         tasks = self.tasks_list.observe_children()
         for i in range(tasks.get_n_items()):

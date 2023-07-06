@@ -50,6 +50,24 @@
                 </accessibility>
               </object>
             </child>
+            <!-- Scroll up button -->
+            <child type="end">
+              <object class="GtkRevealer" id="scroll_up_btn_rev">
+                <property name="valign">end</property>
+                <property name="halign">end</property>
+                <property name="transition-type">1</property>
+                <child>
+                  <object class="GtkButton">
+                    <property name="icon-name">go-up-symbolic</property>
+                    <property name="tooltip-text" translatable="yes">Scroll up</property>
+                    <signal name="clicked" handler="on_scroll_up_btn_clicked"/>
+                    <accessibility>
+                      <property name="label" translatable="yes">Scroll up</property>
+                    </accessibility>
+                  </object>
+                </child>
+              </object>
+            </child>
           </object>
         </child>
         <child>
@@ -134,6 +152,11 @@
                   <object class="GtkScrolledWindow" id="scrolled_window">
                     <property name="propagate-natural-height">true</property>
                     <property name="propagate-natural-width">true</property>
+                    <property name="vadjustment">
+                      <object class="GtkAdjustment">
+                        <signal name="value_changed" handler="on_scroll"/>
+                      </object>
+                    </property>
                     <!-- Drag and Drop scroll controller -->
                     <child>
                       <object class="GtkDropControllerMotion" id="drop_motion_ctrl">
