@@ -32,10 +32,10 @@
               <object class="GtkButton" id="undo_btn">
                 <property name="sensitive">false</property>
                 <property name="icon-name">edit-undo-symbolic</property>
-                <property name="tooltip-text" translatable="yes">Undo (Ctrl+Z)</property>
+                <property name="tooltip-text" translatable="yes">Undo deletion (Ctrl+Z)</property>
                 <signal name="clicked" handler="on_undo_clicked"/>
                 <accessibility>
-                  <property name="label" translatable="yes">Undo (Ctrl+Z)</property>
+                  <property name="label" translatable="yes">Undo deletion (Ctrl+Z)</property>
                 </accessibility>
                 <child>
                   <object class="GtkShortcutController">
@@ -155,10 +155,6 @@
       <item>
         <attribute name="label" translatable="yes">About List</attribute>
         <attribute name="action">app.about</attribute>
-      </item>
-      <item>
-        <attribute name="label" translatable="yes">Quit</attribute>
-        <attribute name="action">app.quit</attribute>
       </item>
     </section>
   </menu>

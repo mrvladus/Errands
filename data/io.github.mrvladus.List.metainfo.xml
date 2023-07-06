@@ -29,7 +29,7 @@
     <keyword>Task manager</keyword>
   </keywords>
   <name>List</name>
-  <summary>Manage your tasks.</summary>
+  <summary>Manage your tasks</summary>
   <description>
     <p>Todo application for those who prefer simplicity.</p>
     <p>Features:</p>
@@ -46,6 +46,17 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="44.6.7" date="2023-07-07">
+      <description>
+        <p>UI/UX:</p>
+        <ul>
+          <li>Added support for Drag and Drop. Now you can easily move tasks around. Moving sub-tasks between tasks now works too.</li>
+          <li>Removed "Quit" menu as unnecessary</li>
+          <li>"Undo" button renamed to "Undo deletion" for clearer understanding of its purpose</li>
+          <li>Improvements and bug fixes</li>
+        </ul>
+      </description>
+    </release>
     <release version="44.6.6" date="2023-06-25">
       <description>
         <p>UI/UX:</p>

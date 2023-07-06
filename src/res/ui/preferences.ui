@@ -74,7 +74,7 @@
             <!-- Enable sub-tasks -->
             <child>
               <object class="AdwActionRow">
-                <property name="title" translatable="yes">Sub Tasks</property>
+                <property name="title" translatable="yes">Sub-Tasks</property>
                 <property name="subtitle" translatable="yes">Restart required</property>
                 <property name="activatable-widget">enable_sub_tasks</property>
                 <child type="suffix">
@@ -142,7 +142,7 @@
             <property name="title" translatable="yes">Backup</property>
             <child>
               <object class="AdwActionRow">
-                <property name="title" translatable="yes">Save Data Backup To Your HOME Folder</property>
+                <property name="title" translatable="yes">Save Data Backup To HOME Folder</property>
                 <property name="subtitle" translatable="yes">File name is "list_backup_data.json"</property>
                 <property name="activatable-widget">save_backup</property>
                 <child type="suffix">

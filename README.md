@@ -2,7 +2,7 @@
 
 # List
 
-Manage your tasks.
+Manage your tasks
 
 <div align="center">
   <img src="https://raw.githubusercontent.com/mrvladus/List/main/screenshots/main.png" height="400"/>

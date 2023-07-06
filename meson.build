@@ -1,6 +1,6 @@
 project(
   'list',
-  version: '44.6.6',
+  version: '44.6.7',
   meson_version: '>= 0.62.0',
 )
 
