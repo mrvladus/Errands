@@ -50,10 +50,12 @@
       <description>
         <p>UI/UX:</p>
         <ul>
-          <li>Added support for Drag and Drop. Now you can easily move tasks around. Moving sub-tasks between tasks now works too.</li>
+          <li>Added support for Drag and Drop operations. Now you can easily move tasks around. Moving sub-tasks between tasks now works too.</li>
           <li>Removed "Quit" menu as unnecessary</li>
           <li>"Undo" button renamed to "Undo deletion" for clearer understanding of its purpose</li>
           <li>Minor preferences window improvements</li>
+          <li>Added smooth fade effect on top of the tasks list</li>
+          <li>Tasks list now scrolls when new task added</li>
         </ul>
       </description>
     </release>

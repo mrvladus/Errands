@@ -46,6 +46,30 @@ class Animation:
         self.obj.set_property(self.prop, value)
 
 
+class AnimationScroll:
+    """Wrapper for scroll animation"""
+
+    def __init__(self, scrolled_window, scroll_down: bool = True, widget=None):
+        self.adj = scrolled_window.get_vadjustment()
+        # TODO
+        if not widget:
+            scroll_to = self.adj.get_upper() if scroll_down else self.adj.get_lower()
+        else:
+            scroll_to = widget.get_allocation().height + self.adj.get_value()
+
+        animation = Adw.TimedAnimation.new(
+            scrolled_window,
+            self.adj.get_value(),
+            scroll_to,
+            250,
+            Adw.CallbackAnimationTarget.new(self.callback, None),
+        )
+        animation.play()
+
+    def callback(self, value, _):
+        self.adj.set_property("value", value)
+
+
 class GSettings:
     """Class for accessing gsettings"""
 

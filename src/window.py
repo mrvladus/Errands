@@ -22,7 +22,7 @@
 
 from gi.repository import Gio, Adw, Gtk, GLib
 from __main__ import VERSION
-from .utils import Animation, GSettings, TaskUtils, UserData
+from .utils import Animation, AnimationScroll, GSettings, TaskUtils, UserData
 from .task import Task
 from .preferences import PreferencesWindow
 
@@ -184,6 +184,8 @@ class Window(Adw.ApplicationWindow):
         task.toggle_visibility()
         # Clear entry
         entry.props.text = ""
+        # Scroll to the end
+        AnimationScroll(self.scrolled_window, True)
 
     @Gtk.Template.Callback()
     def on_delete_completed_tasks_btn_clicked(self, _) -> None:

@@ -22,7 +22,7 @@
 
 from gi.repository import Gtk, Adw, Gdk, GObject
 from .sub_task import SubTask
-from .utils import Animation, GSettings, Markup, TaskUtils, UserData
+from .utils import Animation, AnimationScroll, GSettings, Markup, TaskUtils, UserData
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/List/task.ui")
