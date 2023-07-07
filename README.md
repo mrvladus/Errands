@@ -12,6 +12,8 @@ Manage your tasks
 - Add, remove, edit tasks and sub-tasks
 - Mark task and sub-tasks as completed
 - Add accent color for each task
+- Drag and Drop support
+- Deletion history
 
 ## Install
 List is only available as a Flatpak on Flathub:
