@@ -59,6 +59,11 @@ class Window(Adw.ApplicationWindow):
             ["<primary>comma"],
         )
         self.create_action("about", self.on_about_action)
+        self.create_action(
+            "quit",
+            lambda *_: self.props.application.quit(),
+            ["<primary>q"],
+        )
         self.load_tasks()
         self.update_status()
         self.update_undo()
