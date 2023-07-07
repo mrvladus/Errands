@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: list\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-24 13:13+0300\n"
+"POT-Creation-Date: 2023-07-07 17:00+0300\n"
 "PO-Revision-Date: 2023-06-27 08:34+0100\n"
 "Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
 "Language-Team: Italian <LL@li.org>\n"
@@ -16,40 +16,41 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/res/ui/window.ui:24 src/res/ui/window.ui:26
+#: src/res/ui/window.ui:23 src/res/ui/window.ui:26
+#, fuzzy
+msgid "Undo deletion (Ctrl+Z)"
+msgstr "Annulla (Ctrl+Z)"
+
+#: src/res/ui/window.ui:47 src/res/ui/window.ui:49
 msgid "Main menu"
 msgstr "Menu principale"
 
-#: src/res/ui/window.ui:35 src/res/ui/window.ui:38
-msgid "Undo (Ctrl+Z)"
-msgstr "Annulla (Ctrl+Z)"
+#: src/res/ui/window.ui:62 src/res/ui/window.ui:65
+msgid "Scroll up"
+msgstr ""
 
-#: src/res/ui/window.ui:87
+#: src/res/ui/window.ui:105
 msgid "Add new task"
 msgstr "Aggiungi nuova attività"
 
-#: src/res/ui/window.ui:97 src/res/ui/window.ui:100
+#: src/res/ui/window.ui:116 src/res/ui/window.ui:119
 msgid "Delete completed tasks"
 msgstr "Elimina le attività completate"
 
-#: src/res/ui/window.ui:146
+#: src/res/ui/window.ui:193
 msgid "Preferences"
 msgstr "Preferenze"
 
-#: src/res/ui/window.ui:150
+#: src/res/ui/window.ui:197
 msgid "About List"
 msgstr "Informazioni su List"
 
-#: src/res/ui/window.ui:154
-msgid "Quit"
-msgstr "Esci"
-
-#: src/res/ui/window.ui:166
+#: src/res/ui/window.ui:209
 msgid "translator-credits"
 msgstr "Albano Battistella <albanobattistella@gmail.com>"
 
 #: src/res/ui/preferences.ui:13
-msgid "Application theme"
+msgid "Application Theme"
 msgstr "Tema applicazione"
 
 #: src/res/ui/preferences.ui:17
@@ -69,91 +70,86 @@ msgid "Tasks"
 msgstr "Attività"
 
 #: src/res/ui/preferences.ui:64
-msgid "Tasks expanded on startup"
-msgstr "Attività ampliate all'avvio"
+msgid "Accent Colors Menu"
+msgstr "Preferenza colore"
 
-#: src/res/ui/preferences.ui:76
-msgid "Show accent colors menu"
-msgstr "Mostra il menu dei colori"
-
-#: src/res/ui/preferences.ui:77 src/res/ui/preferences.ui:90
+#: src/res/ui/preferences.ui:65 src/res/ui/preferences.ui:78
 msgid "Restart required"
 msgstr ""
 
-#: src/res/ui/preferences.ui:89
-msgid "Enable sub-tasks"
-msgstr ""
+#: src/res/ui/preferences.ui:77
+#, fuzzy
+msgid "Sub-Tasks"
+msgstr "Attività"
 
-#: src/res/ui/preferences.ui:104
+#: src/res/ui/preferences.ui:90
+msgid "Tasks Expanded On Startup"
+msgstr "Attività ampliate all'avvio"
+
+#: src/res/ui/preferences.ui:105
 msgid "History"
 msgstr "Cronologia"
 
-#: src/res/ui/preferences.ui:108
-msgid "Clear history on startup"
+#: src/res/ui/preferences.ui:109
+msgid "Clear History On Startup"
 msgstr "Cancella cronologia all'avvio"
 
-#: src/res/ui/preferences.ui:120
-msgid "History size"
+#: src/res/ui/preferences.ui:121
+msgid "History Size"
 msgstr "Dimensione della cronologia"
 
-#: src/res/ui/preferences.ui:142
+#: src/res/ui/preferences.ui:143
 msgid "Backup"
 msgstr "Backup"
 
-#: src/res/ui/preferences.ui:145
-msgid "Save data backup to your HOME folder"
+#: src/res/ui/preferences.ui:146
+msgid "Save Data Backup To HOME Folder"
 msgstr "Salva il backup dei dati nella cartella HOME"
 
-#: src/res/ui/preferences.ui:146
+#: src/res/ui/preferences.ui:147
 msgid "File name is \"list_backup_data.json\""
 msgstr "Il nome del file è \"list_backup_data.json\""
 
-#: src/res/ui/sub_task.ui:25 src/res/ui/sub_task.ui:29 src/res/ui/task.ui:51
-#: src/res/ui/task.ui:55
+#: src/res/ui/sub_task.ui:35 src/res/ui/sub_task.ui:39 src/res/ui/task.ui:58
+#: src/res/ui/task.ui:62
 msgid "Delete"
 msgstr "Cancella"
 
-#: src/res/ui/sub_task.ui:52 src/res/ui/sub_task.ui:56 src/res/ui/task.ui:196
-#: src/res/ui/task.ui:200
+#: src/res/ui/sub_task.ui:64 src/res/ui/sub_task.ui:68 src/res/ui/task.ui:203
+#: src/res/ui/task.ui:207
 msgid "Edit"
 msgstr "Modifica"
 
-#: src/res/ui/sub_task.ui:67 src/res/ui/sub_task.ui:70 src/res/ui/task.ui:211
-#: src/res/ui/task.ui:214
+#: src/res/ui/sub_task.ui:79 src/res/ui/sub_task.ui:82 src/res/ui/task.ui:218
+#: src/res/ui/task.ui:221
 msgid "Mark as completed"
 msgstr "Contrassegna come completato"
 
-#: src/res/ui/sub_task.ui:107 src/res/ui/sub_task.ui:110 src/res/ui/task.ui:252
-#: src/res/ui/task.ui:255
-msgid "Move up"
-msgstr "Sposto sopra"
+#: src/res/ui/sub_task.ui:104 src/res/ui/sub_task.ui:111 src/res/ui/task.ui:244
+#: src/res/ui/task.ui:251
+msgid "Drag to move"
+msgstr ""
 
-#: src/res/ui/sub_task.ui:119 src/res/ui/sub_task.ui:122 src/res/ui/task.ui:264
-#: src/res/ui/task.ui:267
-msgid "Move down"
-msgstr "Sposta giù"
-
-#: src/res/ui/sub_task.ui:132 src/res/ui/sub_task.ui:136 src/res/ui/task.ui:277
-#: src/res/ui/task.ui:281
+#: src/res/ui/sub_task.ui:129 src/res/ui/task.ui:269
 msgid "Cancel"
 msgstr "Cancella"
 
-#: src/res/ui/task.ui:79 src/res/ui/task.ui:83
+#: src/res/ui/task.ui:86 src/res/ui/task.ui:90
 msgid "Toggle sub-tasks"
 msgstr "Attiva o disattiva le attività secondarie"
 
-#: src/res/ui/task.ui:95 src/res/ui/task.ui:185
+#: src/res/ui/task.ui:102 src/res/ui/task.ui:192
 msgid "Accent color"
 msgstr "Preferenza colore"
 
-#: src/res/ui/task.ui:110 src/res/ui/task.ui:113
+#: src/res/ui/task.ui:117 src/res/ui/task.ui:120
 msgid "Clear style"
 msgstr "Stile chiaro"
 
-#: src/res/ui/task.ui:312
+#: src/res/ui/task.ui:298
 msgid "Add new sub-task"
 msgstr "Aggiungi una nuova attività secondaria"
 
-#: src/res/ui/task.ui:325 src/res/ui/task.ui:329
+#: src/res/ui/task.ui:311 src/res/ui/task.ui:315
 msgid "Delete completed sub-tasks"
 msgstr "Elimina le attività secondarie completate"

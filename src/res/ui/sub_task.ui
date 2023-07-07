@@ -126,7 +126,7 @@
                     <property name="hexpand">true</property>
                     <property name="valign">center</property>
                     <property name="secondary-icon-name">edit-delete-symbolic</property>
-                    <property name="secondary-icon-tooltip-text">Cancel</property>
+                    <property name="secondary-icon-tooltip-text" translatable="yes">Cancel</property>
                     <signal name="activate" handler="on_sub_task_edit"/>
                     <signal name="icon-release" handler="on_sub_task_cancel_edit_btn_clicked"/>
                   </object>
