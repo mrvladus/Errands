@@ -48,7 +48,6 @@
   <releases>
     <release version="44.6.7" date="2023-07-07">
       <description>
-        <p>UI/UX:</p>
         <ul>
           <li>Added support for Drag and Drop operations. Now you can easily move tasks around. Moving sub-tasks between tasks now works too.</li>
           <li>Removed "Quit" menu as unnecessary</li>
