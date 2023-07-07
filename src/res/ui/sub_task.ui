@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <template class="SubTask" parent="GtkRevealer">
+    <style>
+      <class name="sub-task-rev"/>
+    </style>
     <child>
       <object class="GtkDropTarget">
         <property name="actions">move</property>

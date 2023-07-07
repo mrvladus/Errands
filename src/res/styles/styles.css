@@ -2,6 +2,7 @@
 .tasks-list-fade-top {
   background: linear-gradient(to bottom, @window_bg_color, transparent);
 }
+
 /* Task */
 .task {
     transition: background 0.25s;
@@ -80,10 +81,14 @@
 }
 
 /* Sub-task */
+.sub-task-rev {
+  border-radius: 10px;
+}
+
 .sub-task {
-    border-top-width: 1px;
-    border-style: solid;
-    border-color: @card_shade_color;
+  border-top-width: 1px;
+  border-style: solid;
+  border-color: @card_shade_color;
 }
 
 /* Progress bar */
