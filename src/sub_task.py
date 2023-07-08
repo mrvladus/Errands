@@ -84,7 +84,11 @@ class SubTask(Gtk.Revealer):
     @Gtk.Template.Callback()
     def on_drag_begin(self, _source, drag) -> bool:
         self.toggle_visibility()
-        widget = Gtk.Button(label=self.task["text"])
+        widget = Gtk.Button(
+            label=self.task["text"]
+            if len(self.task["text"]) < 20
+            else f"{self.task['text'][0:20]}..."
+        )
         icon = Gtk.DragIcon.get_for_drag(drag)
         icon.set_child(widget)
 
