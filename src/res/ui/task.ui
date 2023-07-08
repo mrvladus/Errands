@@ -77,6 +77,9 @@
                             <property name="halign">start</property>
                             <property name="hexpand">true</property>
                             <property name="vexpand">true</property>
+                            <property name="ellipsize">none</property>
+                            <property name="wrap-mode">2</property>
+                            <property name="xalign">0</property>
                           </object>
                         </child>
                         <!-- Expand button -->

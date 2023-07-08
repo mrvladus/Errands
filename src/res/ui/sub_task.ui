@@ -55,6 +55,9 @@
                     <property name="valign">center</property>
                     <property name="selectable">true</property>
                     <property name="use-markup">true</property>
+                    <property name="ellipsize">none</property>
+                    <property name="wrap-mode">2</property>
+                    <property name="xalign">0</property>
                   </object>
                 </child>
                 <!-- Edit button -->
