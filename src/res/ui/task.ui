@@ -70,7 +70,6 @@
                         <child>
                           <object class="GtkLabel" id="task_text">
                             <property name="wrap">true</property>
-                            <property name="wrap-mode">1</property>
                             <property name="selectable">true</property>
                             <property name="use-markup">true</property>
                             <property name="valign">center</property>

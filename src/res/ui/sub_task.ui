@@ -49,7 +49,6 @@
                     <property name="margin-top">5</property>
                     <property name="margin-bottom">5</property>
                     <property name="wrap">true</property>
-                    <property name="wrap-mode">1</property>
                     <property name="hexpand">true</property>
                     <property name="halign">start</property>
                     <property name="valign">center</property>
