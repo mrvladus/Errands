@@ -48,6 +48,14 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="44.6.8" date="2023-07-10">
+      <description>
+        <ul>
+          <li>Improved text aligment</li>
+          <li>Fixed Drag and Drop widget being too long</li>
+        </ul>
+      </description>
+    </release>
     <release version="44.6.7" date="2023-07-07">
       <description>
         <ul>
