@@ -27,14 +27,26 @@ from gi.repository import GLib, Gio, Adw, Gtk
 from __main__ import VERSION, APP_ID
 
 
+# class Action:
+#     """Gio Actions helper class"""
+
+#     @staticmethod
+#     def create(name: str, callback: callable, shortcuts=None) -> None:
+#         action = Gio.SimpleAction.new(name, None)
+#         action.connect("activate", callback)
+#         if shortcuts:
+#             self.props.application.set_accels_for_action(f"app.{name}", shortcuts)
+#         self.props.application.add_action(action)
+
+
 class Animate:
     """Class for creating UI animations using Adw.Animation"""
 
     @staticmethod
-    def property(obj: Gtk.Widget, prop: str, val_from, val_to, time_ms: int):
+    def property(obj: Gtk.Widget, prop: str, val_from, val_to, time_ms: int) -> None:
         """Animate widget property"""
 
-        def callback(value, _):
+        def callback(value, _) -> None:
             obj.set_property(prop, value)
 
         animation = Adw.TimedAnimation.new(
@@ -47,12 +59,12 @@ class Animate:
         animation.play()
 
     @staticmethod
-    def scroll(win: Gtk.ScrolledWindow, scroll_down: bool = True, widget=None):
+    def scroll(win: Gtk.ScrolledWindow, scroll_down: bool = True, widget=None) -> None:
         """Animate scrolling"""
 
         adj = win.get_vadjustment()
 
-        def callback(value, _):
+        def callback(value, _) -> None:
             adj.set_property("value", value)
 
         if not widget:
