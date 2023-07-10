@@ -22,7 +22,7 @@
 
 from gi.repository import Gio, Adw, Gtk, GLib
 from __main__ import VERSION
-from .utils import Animation, AnimationScroll, GSettings, TaskUtils, UserData
+from .utils import Animate, GSettings, TaskUtils, UserData
 from .task import Task
 from .preferences import PreferencesWindow
 
@@ -111,7 +111,7 @@ class Window(Adw.ApplicationWindow):
                     n_completed += 1
         # Update progress bar animation
         if n_total > 0:
-            Animation(
+            Animate.property(
                 self.status,
                 "fraction",
                 self.status.props.fraction,
@@ -119,7 +119,7 @@ class Window(Adw.ApplicationWindow):
                 250,
             )
         else:
-            Animation(
+            Animate.property(
                 self.status,
                 "fraction",
                 self.status.props.fraction,
@@ -185,7 +185,7 @@ class Window(Adw.ApplicationWindow):
     @Gtk.Template.Callback()
     def on_scroll_up_btn_clicked(self, _):
         """Scroll up"""
-        AnimationScroll(self.scrolled_window, False)
+        Animate.scroll(self.scrolled_window, False)
 
     @Gtk.Template.Callback()
     def on_task_added(self, entry: Gtk.Entry) -> None:
@@ -205,7 +205,7 @@ class Window(Adw.ApplicationWindow):
         # Clear entry
         entry.props.text = ""
         # Scroll to the end
-        AnimationScroll(self.scrolled_window, True)
+        Animate.scroll(self.scrolled_window, True)
 
     @Gtk.Template.Callback()
     def on_delete_completed_tasks_btn_clicked(self, _) -> None:

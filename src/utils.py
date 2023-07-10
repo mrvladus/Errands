@@ -23,51 +23,52 @@
 import os
 import json
 import uuid
-from gi.repository import GLib, Gio, Adw
+from gi.repository import GLib, Gio, Adw, Gtk
 from __main__ import VERSION, APP_ID
 
 
-class Animation:
-    """Wrapper for Adw.Animation"""
+class Animate:
+    """Class for creating UI animations using Adw.Animation"""
 
-    def __init__(self, obj, prop: str, v_from, v_to, time_ms):
-        self.obj = obj
-        self.prop = prop
+    @staticmethod
+    def property(obj: Gtk.Widget, prop: str, val_from, val_to, time_ms: int):
+        """Animate widget property"""
+
+        def callback(value, _):
+            obj.set_property(prop, value)
+
         animation = Adw.TimedAnimation.new(
-            self.obj,
-            v_from,
-            v_to,
+            obj,
+            val_from,
+            val_to,
             time_ms,
-            Adw.CallbackAnimationTarget.new(self.callback, None),
+            Adw.CallbackAnimationTarget.new(callback, None),
         )
         animation.play()
 
-    def callback(self, value, _):
-        self.obj.set_property(self.prop, value)
+    @staticmethod
+    def scroll(win: Gtk.ScrolledWindow, scroll_down: bool = True, widget=None):
+        """Animate scrolling"""
 
+        adj = win.get_vadjustment()
 
-class AnimationScroll:
-    """Wrapper for scroll animation"""
+        def callback(value, _):
+            adj.set_property("value", value)
 
-    def __init__(self, scrolled_window, scroll_down: bool = True, widget=None):
-        self.adj = scrolled_window.get_vadjustment()
-        # TODO
         if not widget:
-            scroll_to = self.adj.get_upper() if scroll_down else self.adj.get_lower()
+            # Scroll to the top or bottom
+            scroll_to = adj.get_upper() if scroll_down else adj.get_lower()
         else:
-            scroll_to = widget.get_allocation().height + self.adj.get_value()
+            scroll_to = widget.get_allocation().height + adj.get_value()
 
         animation = Adw.TimedAnimation.new(
-            scrolled_window,
-            self.adj.get_value(),
+            win,
+            adj.get_value(),
             scroll_to,
             250,
-            Adw.CallbackAnimationTarget.new(self.callback, None),
+            Adw.CallbackAnimationTarget.new(callback, None),
         )
         animation.play()
-
-    def callback(self, value, _):
-        self.adj.set_property("value", value)
 
 
 class GSettings:

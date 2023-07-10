@@ -22,7 +22,7 @@
 
 from gi.repository import Gtk, Adw, Gdk, GObject
 from .sub_task import SubTask
-from .utils import Animation, AnimationScroll, GSettings, Markup, TaskUtils, UserData
+from .utils import Animate, GSettings, Markup, TaskUtils, UserData
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/List/task.ui")
@@ -125,7 +125,7 @@ class Task(Gtk.Revealer):
                 if sub["completed"]:
                     n_completed += 1
         if n_total > 0:
-            Animation(
+            Animate.property(
                 self.task_status,
                 "fraction",
                 self.task_status.props.fraction,
@@ -133,7 +133,7 @@ class Task(Gtk.Revealer):
                 250,
             )
         else:
-            Animation(
+            Animate.property(
                 self.task_status,
                 "fraction",
                 self.task_status.props.fraction,
