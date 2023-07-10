@@ -33,6 +33,7 @@ class Window(Adw.ApplicationWindow):
 
     undo_btn = Gtk.Template.Child()
     delete_completed_tasks_btn_revealer = Gtk.Template.Child()
+    separator = Gtk.Template.Child()
     tasks_list = Gtk.Template.Child()
     status = Gtk.Template.Child()
     scroll_up_btn_rev = Gtk.Template.Child()
@@ -181,6 +182,10 @@ class Window(Adw.ApplicationWindow):
     def on_scroll(self, adj):
         """Show scroll up button"""
         self.scroll_up_btn_rev.set_reveal_child(adj.get_value() > 0)
+        if adj.get_value() > 0:
+            self.separator.add_css_class("separator")
+        else:
+            self.separator.remove_css_class("separator")
 
     @Gtk.Template.Callback()
     def on_scroll_up_btn_clicked(self, _):

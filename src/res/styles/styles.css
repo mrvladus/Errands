@@ -1,6 +1,6 @@
 /* Tasks list */
-.tasks-list-fade-top {
-  background: linear-gradient(to bottom, @window_bg_color, transparent);
+.separator {
+    background: linear-gradient(to bottom, @headerbar_shade_color, transparent);
 }
 
 /* Task */
@@ -129,3 +129,7 @@ progress {
   background-color: @purple_2;
 }
 
+/* Utils */
+.fade {
+  transition: 0.2s;
+}

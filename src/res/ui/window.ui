@@ -95,7 +95,7 @@
                     <child>
                       <object class="AdwPreferencesGroup">
                         <property name="margin-top">10</property>
-                        <property name="margin-bottom">10</property>
+                        <property name="margin-bottom">20</property>
                         <property name="margin-start">5</property>
                         <property name="margin-end">5</property>
                         <child>
@@ -138,12 +138,12 @@
               <object class="GtkOverlay">
                 <!-- Smooth fade on top -->
                 <child type="overlay">
-                  <object class="GtkBox">
+                  <object class="GtkBox" id="separator">
                     <property name="valign">start</property>
                     <property name="can-target">false</property>
-                    <property name="height-request">10</property>
+                    <property name="height-request">4</property>
                     <style>
-                      <class name="tasks-list-fade-top"/>
+                      <class name="fade"/>
                     </style>
                   </object>
                 </child>
