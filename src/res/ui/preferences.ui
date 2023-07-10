@@ -87,7 +87,7 @@
             <!-- Expand sub-tasks -->
             <child>
               <object class="AdwActionRow">
-                <property name="title" translatable="yes">Tasks Expanded On Startup</property>
+                <property name="title" translatable="yes">Tasks Expanded on Startup</property>
                 <property name="activatable-widget">tasks_expanded</property>
                 <property name="sensitive" bind-source="enable_sub_tasks" bind-property="active" bind-flags="sync-create"/>
                 <child type="suffix">
@@ -106,7 +106,7 @@
             <!-- Delete history on startup -->
             <child>
               <object class="AdwActionRow">
-                <property name="title" translatable="yes">Clear History On Startup</property>
+                <property name="title" translatable="yes">Clear History on Startup</property>
                 <property name="activatable-widget">clear_history_on_startup</property>
                 <child type="suffix">
                   <object class="GtkSwitch" id="clear_history_on_startup">
@@ -143,7 +143,7 @@
             <property name="title" translatable="yes">Backup</property>
             <child>
               <object class="AdwActionRow">
-                <property name="title" translatable="yes">Save Data Backup To HOME Folder</property>
+                <property name="title" translatable="yes">Save data backup to Home folder</property>
                 <property name="subtitle" translatable="yes">File name is "list_backup_data.json"</property>
                 <property name="activatable-widget">save_backup</property>
                 <child type="suffix">
@@ -161,3 +161,4 @@
     </child>
   </template>
 </interface>
+

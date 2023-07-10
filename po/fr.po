@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: list\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-07 17:00+0300\n"
+"POT-Creation-Date: 2023-07-10 20:03+0300\n"
 "PO-Revision-Date: 2023-05-25 11:05+0200\n"
 "Last-Translator: Jeremy Castel <jeremy.castel@protonmail.com>\n"
 "Language: fr\n"
@@ -83,7 +83,7 @@ msgid "Sub-Tasks"
 msgstr "Tâches"
 
 #: src/res/ui/preferences.ui:90
-msgid "Tasks Expanded On Startup"
+msgid "Tasks Expanded on Startup"
 msgstr "Dérouler les tâches au démarrage"
 
 #: src/res/ui/preferences.ui:105
@@ -91,7 +91,7 @@ msgid "History"
 msgstr ""
 
 #: src/res/ui/preferences.ui:109
-msgid "Clear History On Startup"
+msgid "Clear History on Startup"
 msgstr ""
 
 #: src/res/ui/preferences.ui:121
@@ -103,7 +103,7 @@ msgid "Backup"
 msgstr ""
 
 #: src/res/ui/preferences.ui:146
-msgid "Save Data Backup To HOME Folder"
+msgid "Save data backup to Home folder"
 msgstr ""
 
 #: src/res/ui/preferences.ui:147
@@ -115,41 +115,41 @@ msgstr ""
 msgid "Delete"
 msgstr "Supprimer"
 
-#: src/res/ui/sub_task.ui:64 src/res/ui/sub_task.ui:68 src/res/ui/task.ui:203
-#: src/res/ui/task.ui:207
+#: src/res/ui/sub_task.ui:66 src/res/ui/sub_task.ui:70 src/res/ui/task.ui:205
+#: src/res/ui/task.ui:209
 msgid "Edit"
 msgstr "Modifier"
 
-#: src/res/ui/sub_task.ui:79 src/res/ui/sub_task.ui:82 src/res/ui/task.ui:218
-#: src/res/ui/task.ui:221
+#: src/res/ui/sub_task.ui:81 src/res/ui/sub_task.ui:84 src/res/ui/task.ui:220
+#: src/res/ui/task.ui:223
 msgid "Mark as completed"
 msgstr "Marquer comme terminée"
 
-#: src/res/ui/sub_task.ui:104 src/res/ui/sub_task.ui:111 src/res/ui/task.ui:244
-#: src/res/ui/task.ui:251
+#: src/res/ui/sub_task.ui:106 src/res/ui/sub_task.ui:113 src/res/ui/task.ui:246
+#: src/res/ui/task.ui:253
 msgid "Drag to move"
 msgstr ""
 
-#: src/res/ui/sub_task.ui:129 src/res/ui/task.ui:269
+#: src/res/ui/sub_task.ui:131 src/res/ui/task.ui:271
 msgid "Cancel"
 msgstr "Annuler"
 
-#: src/res/ui/task.ui:86 src/res/ui/task.ui:90
+#: src/res/ui/task.ui:88 src/res/ui/task.ui:92
 msgid "Toggle sub-tasks"
 msgstr "Dérouler les sous-tâches"
 
-#: src/res/ui/task.ui:102 src/res/ui/task.ui:192
+#: src/res/ui/task.ui:104 src/res/ui/task.ui:194
 msgid "Accent color"
 msgstr "Couleur d'accentuation"
 
-#: src/res/ui/task.ui:117 src/res/ui/task.ui:120
+#: src/res/ui/task.ui:119 src/res/ui/task.ui:122
 msgid "Clear style"
 msgstr "Effacer le style"
 
-#: src/res/ui/task.ui:298
+#: src/res/ui/task.ui:300
 msgid "Add new sub-task"
 msgstr "Ajouter une sous-tâche"
 
-#: src/res/ui/task.ui:311 src/res/ui/task.ui:315
+#: src/res/ui/task.ui:313 src/res/ui/task.ui:317
 msgid "Delete completed sub-tasks"
 msgstr "Supprimer les sous-tâches terminées"
