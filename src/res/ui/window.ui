@@ -84,7 +84,7 @@
                     <child type="overlay">
                       <object class="GtkProgressBar" id="status">
                         <property name="valign">end</property>
-                        <property name="margin-bottom">10</property>
+                        <property name="margin-bottom">20</property>
                         <property name="margin-start">15</property>
                         <property name="margin-end">15</property>
                         <style>
