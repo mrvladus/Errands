@@ -1,6 +1,6 @@
 /* Tasks list */
 .separator {
-    background: linear-gradient(to bottom, @headerbar_shade_color, transparent);
+    background: linear-gradient(to bottom, @borders, transparent);
 }
 
 /* Task */
