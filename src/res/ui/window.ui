@@ -84,25 +84,29 @@
                     <child type="overlay">
                       <object class="GtkProgressBar" id="status">
                         <property name="valign">end</property>
-                        <property name="margin-bottom">20</property>
-                        <property name="margin-start">15</property>
-                        <property name="margin-end">15</property>
+                        <property name="margin-bottom">12</property>
+                        <property name="margin-start">20</property>
+                        <property name="margin-end">20</property>
                         <style>
                           <class name="osd"/>
                         </style>
                       </object>
                     </child>
                     <child>
-                      <object class="AdwPreferencesGroup">
+                      <object class="GtkListBox">
                         <property name="margin-top">10</property>
-                        <property name="margin-bottom">20</property>
-                        <property name="margin-start">5</property>
-                        <property name="margin-end">5</property>
+                        <property name="margin-bottom">12</property>
+                        <property name="margin-start">12</property>
+                        <property name="margin-end">12</property>
+                        <property name="selection-mode">0</property>
+                        <style>
+                          <class name="boxed-list"/>
+                        </style>
                         <child>
                           <object class="AdwEntryRow">
                             <property name="activatable">false</property>
                             <property name="height-request">60</property>
-                            <property name="title" translatable="yes">Add new task</property>
+                            <property name="title" translatable="yes">Add new Task</property>
                             <signal name="entry-activated" handler="on_task_added"/>
                             <!-- Toolbar -->
                             <child type="suffix">
