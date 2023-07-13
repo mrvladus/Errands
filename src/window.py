@@ -32,7 +32,7 @@ class Window(Adw.ApplicationWindow):
     __gtype_name__ = "Window"
 
     undo_btn = Gtk.Template.Child()
-    delete_completed_tasks_btn_revealer = Gtk.Template.Child()
+    delete_completed_tasks_btn = Gtk.Template.Child()
     separator = Gtk.Template.Child()
     tasks_list = Gtk.Template.Child()
     status = Gtk.Template.Child()
@@ -128,7 +128,7 @@ class Window(Adw.ApplicationWindow):
                 250,
             )
         # Show delete completed button
-        self.delete_completed_tasks_btn_revealer.set_reveal_child(n_completed > 0)
+        self.delete_completed_tasks_btn.set_sensitive(n_completed > 0)
 
     def update_undo(self) -> None:
         """Change undo button sensitivity"""

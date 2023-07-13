@@ -38,6 +38,21 @@
                 </child>
               </object>
             </child>
+            <!-- Delete completed tasks button -->
+            <child type="start">
+              <object class="GtkButton" id="delete_completed_tasks_btn">
+                <property name="valign">center</property>
+                <property name="icon-name">edit-clear-all-symbolic</property>
+                <property name="tooltip-text" translatable="yes">Delete completed tasks</property>
+                <signal name="clicked" handler="on_delete_completed_tasks_btn_clicked"/>
+                <accessibility>
+                  <property name="label" translatable="yes">Delete completed tasks</property>
+                </accessibility>
+                <style>
+                  <class name="flat"/>
+                </style>
+              </object>
+            </child>
             <!-- Menu -->
             <child type="end">
               <object class="GtkMenuButton">
@@ -108,27 +123,6 @@
                             <property name="height-request">60</property>
                             <property name="title" translatable="yes">Add new Task</property>
                             <signal name="entry-activated" handler="on_task_added"/>
-                            <!-- Toolbar -->
-                            <child type="suffix">
-                              <object class="GtkRevealer" id="delete_completed_tasks_btn_revealer">
-                                <property name="transition-type">2</property>
-                                <!-- Delete completed tasks button -->
-                                <child>
-                                  <object class="GtkButton">
-                                    <property name="valign">center</property>
-                                    <property name="icon-name">edit-clear-all-symbolic</property>
-                                    <property name="tooltip-text" translatable="yes">Delete completed tasks</property>
-                                    <signal name="clicked" handler="on_delete_completed_tasks_btn_clicked"/>
-                                    <accessibility>
-                                      <property name="label" translatable="yes">Delete completed tasks</property>
-                                    </accessibility>
-                                    <style>
-                                      <class name="flat"/>
-                                    </style>
-                                  </object>
-                                </child>
-                              </object>
-                            </child>
                           </object>
                         </child>
                       </object>

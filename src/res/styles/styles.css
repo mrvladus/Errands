@@ -5,8 +5,12 @@
 
 /* Task */
 .task {
-    transition: background 0.25s;
+    transition: 0.25s;
 }
+
+/* .task:hover { */
+/*   background: shade(@card_bg_color, .95); */
+/* } */
 
 .task-blue {
     background: alpha(@blue_1, 0.3);

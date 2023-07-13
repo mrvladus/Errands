@@ -23,6 +23,11 @@
         <!-- Horizontal box -->
         <child>
           <object class="GtkOverlay">
+            <property name="cursor">
+              <object class="GdkCursor">
+                <property name="name">pointer</property>
+              </object>
+            </property>
             <!-- Status bar -->
             <child type="overlay">
               <object class="GtkProgressBar" id="task_status">
