@@ -48,6 +48,17 @@
                 <accessibility>
                   <property name="label" translatable="yes">Delete completed tasks</property>
                 </accessibility>
+                <child>
+                  <object class="GtkShortcutController">
+                    <property name="scope">managed</property>
+                    <child>
+                      <object class="GtkShortcut">
+                        <property name="trigger">&lt;Control&gt;Delete</property>
+                        <property name="action">activate</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
                 <style>
                   <class name="flat"/>
                 </style>
