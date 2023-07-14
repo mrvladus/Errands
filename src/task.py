@@ -34,7 +34,6 @@ class Task(Gtk.Revealer):
     task_box_rev = Gtk.Template.Child()
     task_text = Gtk.Template.Child()
     task_status = Gtk.Template.Child()
-    expand_btn = Gtk.Template.Child()
     accent_colors_btn = Gtk.Template.Child()
     accent_colors_popover = Gtk.Template.Child()
     task_completed_btn = Gtk.Template.Child()
@@ -43,6 +42,7 @@ class Task(Gtk.Revealer):
     sub_tasks_revealer = Gtk.Template.Child()
     delete_completed_btn_revealer = Gtk.Template.Child()
     sub_tasks = Gtk.Template.Child()
+    expand_icon = Gtk.Template.Child()
 
     # State
     expanded: bool = None
@@ -102,7 +102,7 @@ class Task(Gtk.Revealer):
     def expand(self, expanded: bool) -> None:
         self.expanded = expanded
         self.sub_tasks_revealer.set_reveal_child(expanded)
-        self.expand_btn.set_icon_name(
+        self.expand_icon.props.icon_name = (
             "go-up-symbolic" if expanded else "go-down-symbolic"
         )
         self.update_statusbar()
@@ -188,7 +188,7 @@ class Task(Gtk.Revealer):
         self.window.update_status()
 
     @Gtk.Template.Callback()
-    def on_expand_btn_clicked(self, _) -> None:
+    def on_expand(self, *_) -> None:
         """Expand task row"""
         self.expand(not self.sub_tasks_revealer.get_child_revealed())
 

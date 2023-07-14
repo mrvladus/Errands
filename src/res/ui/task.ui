@@ -11,7 +11,6 @@
         <property name="hexpand">true</property>
         <style>
           <class name="card"/>
-          <class name="task"/>
         </style>
         <child>
           <object class="GtkDropTarget">
@@ -23,11 +22,6 @@
         <!-- Horizontal box -->
         <child>
           <object class="GtkOverlay">
-            <property name="cursor">
-              <object class="GdkCursor">
-                <property name="name">pointer</property>
-              </object>
-            </property>
             <!-- Status bar -->
             <child type="overlay">
               <object class="GtkProgressBar" id="task_status">
@@ -40,11 +34,30 @@
                 </style>
               </object>
             </child>
+            <child type="overlay">
+              <object class="GtkImage" id="expand_icon">
+                <property name="valign">end</property>
+                <property name="halign">center</property>
+                <property name="icon-name">go-down-symbolic</property>
+                <property name="visible" bind-source="hover_event" bind-property="contains-pointer" bind-flags="sync-create"/>
+                <style>
+                  <class name="task-expand-icon"/>
+                </style>
+              </object>
+            </child>
             <child>
               <object class="GtkBox">
                 <property name="orientation">vertical</property>
                 <property name="vexpand">false</property>
                 <property name="hexpand">true</property>
+                <child>
+                  <object class="GtkGestureClick">
+                    <signal name="released" handler="on_expand"/>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkEventControllerMotion" id="hover_event"/>
+                </child>
                 <child>
                   <object class="GtkRevealer" id="task_box_rev">
                     <property name="reveal-child">true</property>
@@ -84,21 +97,6 @@
                             <property name="ellipsize">none</property>
                             <property name="wrap-mode">2</property>
                             <property name="xalign">0</property>
-                          </object>
-                        </child>
-                        <!-- Expand button -->
-                        <child>
-                          <object class="GtkButton" id="expand_btn">
-                            <property name="icon-name">go-down-symbolic</property>
-                            <property name="tooltip-text" translatable="yes">Toggle sub-tasks</property>
-                            <property name="valign">center</property>
-                            <signal name="clicked" handler="on_expand_btn_clicked"/>
-                            <accessibility>
-                              <property name="label" translatable="yes">Toggle sub-tasks</property>
-                            </accessibility>
-                            <style>
-                              <class name="flat"/>
-                            </style>
                           </object>
                         </child>
                         <!-- Accent colors menu button -->

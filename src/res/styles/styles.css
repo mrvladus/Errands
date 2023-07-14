@@ -8,9 +8,24 @@
     transition: 0.25s;
 }
 
-/* .task:hover { */
-/*   background: shade(@card_bg_color, .95); */
-/* } */
+@keyframes wobble {
+  0% {
+    margin-bottom: 0px;
+  }
+
+  50% {
+    margin-bottom: 5px;
+  }
+
+  100% {
+    margin-bottom: 0px;
+  }
+}
+
+.task-expand-icon {
+  animation: wobble 1s linear infinite;
+  opacity: 0.2;
+}
 
 .task-blue {
     background: alpha(@blue_1, 0.3);
