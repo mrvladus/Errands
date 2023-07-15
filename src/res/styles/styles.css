@@ -8,23 +8,9 @@
     transition: 0.25s;
 }
 
-@keyframes wobble {
-  0% {
-    margin-bottom: 0px;
-  }
-
-  50% {
-    margin-bottom: 5px;
-  }
-
-  100% {
-    margin-bottom: 0px;
-  }
-}
-
 .task-expand-icon {
-  animation: wobble 1s linear infinite;
-  opacity: 0.2;
+  opacity: 0.3;
+  transition: transform 0.25s;
 }
 
 .task-blue {
@@ -151,4 +137,8 @@ progress {
 /* Utils */
 .fade {
   transition: 0.2s;
+}
+
+.rotate {
+  transform: rotate(180deg);
 }

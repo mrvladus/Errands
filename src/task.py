@@ -34,6 +34,7 @@ class Task(Gtk.Revealer):
     task_box_rev = Gtk.Template.Child()
     task_text = Gtk.Template.Child()
     task_status = Gtk.Template.Child()
+    expand_icon = Gtk.Template.Child()
     accent_colors_btn = Gtk.Template.Child()
     accent_colors_popover = Gtk.Template.Child()
     task_completed_btn = Gtk.Template.Child()
@@ -66,11 +67,7 @@ class Task(Gtk.Revealer):
             self.main_box.add_css_class(f'task-{self.task["color"]}')
             self.task_status.add_css_class(f'progress-{self.task["color"]}')
         # Expand sub tasks
-        self.expand(
-            self.task["sub"] != []
-            and GSettings.get("tasks-expanded")
-            and GSettings.get("enable-sub-tasks")
-        )
+        self.expand(self.task["sub"] != [])
         # Show or hide accent colors menu
         self.accent_colors_btn.set_visible(GSettings.get("show-accent-colors-menu"))
         self.add_sub_tasks()
@@ -102,9 +99,10 @@ class Task(Gtk.Revealer):
     def expand(self, expanded: bool) -> None:
         self.expanded = expanded
         self.sub_tasks_revealer.set_reveal_child(expanded)
-        self.expand_icon.props.icon_name = (
-            "go-up-symbolic" if expanded else "go-down-symbolic"
-        )
+        if expanded:
+            self.expand_icon.add_css_class("rotate")
+        else:
+            self.expand_icon.remove_css_class("rotate")
         self.update_statusbar()
 
     def toggle_edit_mode(self) -> None:

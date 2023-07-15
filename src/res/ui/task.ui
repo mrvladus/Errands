@@ -35,14 +35,20 @@
               </object>
             </child>
             <child type="overlay">
-              <object class="GtkImage" id="expand_icon">
+              <object class="GtkRevealer">
+                <property name="transition-type">1</property>
                 <property name="valign">end</property>
                 <property name="halign">center</property>
-                <property name="icon-name">go-down-symbolic</property>
-                <property name="visible" bind-source="hover_event" bind-property="contains-pointer" bind-flags="sync-create"/>
-                <style>
-                  <class name="task-expand-icon"/>
-                </style>
+                <property name="can-target">false</property>
+                <property name="reveal-child" bind-source="hover_ctrl" bind-property="contains-pointer" bind-flags="sync-create"/>
+                <child>
+                  <object class="GtkImage" id="expand_icon">
+                    <property name="icon-name">go-down-symbolic</property>
+                    <style>
+                      <class name="task-expand-icon"/>
+                    </style>
+                  </object>
+                </child>
               </object>
             </child>
             <child>
@@ -50,14 +56,6 @@
                 <property name="orientation">vertical</property>
                 <property name="vexpand">false</property>
                 <property name="hexpand">true</property>
-                <child>
-                  <object class="GtkGestureClick">
-                    <signal name="released" handler="on_expand"/>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkEventControllerMotion" id="hover_event"/>
-                </child>
                 <child>
                   <object class="GtkRevealer" id="task_box_rev">
                     <property name="reveal-child">true</property>
@@ -69,6 +67,14 @@
                         <property name="margin-start">10</property>
                         <property name="margin-end">10</property>
                         <property name="spacing">5</property>
+                        <child>
+                          <object class="GtkGestureClick">
+                            <signal name="released" handler="on_expand"/>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkEventControllerMotion" id="hover_ctrl"/>
+                        </child>
                         <!-- Delete task button -->
                         <child>
                           <object class="GtkButton">
