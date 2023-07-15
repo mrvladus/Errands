@@ -306,7 +306,7 @@
                     <!-- Sub task entry -->
                     <child>
                       <object class="GtkEntry">
-                        <property name="placeholder-text" translatable="yes">Add new sub-task</property>
+                        <property name="placeholder-text" translatable="yes">Add new Sub-Task</property>
                         <property name="hexpand">true</property>
                         <signal name="activate" handler="on_sub_task_added"/>
                       </object>
