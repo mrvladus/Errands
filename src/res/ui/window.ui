@@ -203,7 +203,7 @@
         <attribute name="action">app.preferences</attribute>
       </item>
       <item>
-        <attribute name="label" translatable="yes">About List</attribute>
+        <attribute name="label" translatable="yes">About Errands</attribute>
         <attribute name="action">app.about</attribute>
       </item>
     </section>
@@ -217,7 +217,7 @@
     <property name="developer-name">Vlad Krupinski</property>
     <property name="translator-credits" translatable="yes">translator-credits</property>
     <property name="copyright">© 2023 Vlad Krupinski</property>
-    <property name="website">https://github.com/mrvladus/List</property>
+    <property name="website">https://github.com/mrvladus/Errands</property>
     <property name="license-type">7</property>
   </object>
 </interface>
