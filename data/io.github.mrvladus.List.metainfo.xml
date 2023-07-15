@@ -24,11 +24,11 @@
     <category>Utility</category>
   </categories>
   <keywords>
-    <keyword>List</keyword>
+    <keyword>Errands</keyword>
     <keyword>To Do</keyword>
     <keyword>Task manager</keyword>
   </keywords>
-  <name>List</name>
+  <name>Errands</name>
   <summary>Manage your tasks</summary>
   <description>
     <p>Todo application for those who prefer simplicity.</p>
@@ -44,10 +44,20 @@
   <screenshots>
     <screenshot type="default">
       <image>
-				https://raw.githubusercontent.com/mrvladus/List/main/screenshots/main.png</image>
+				https://raw.githubusercontent.com/mrvladus/Errands/main/screenshots/main.png</image>
     </screenshot>
   </screenshots>
   <releases>
+    <release version="44.7" date="2023-07-20">
+      <description>
+        <ul>
+          <li>App renamed to Errands</li>
+          <li>Removed expand button. Now you can click on Task to expand it.</li>
+          <li>Added expand indicator on mouseover</li>
+          <li>Moved "Delete completed tasks" button to the headerbar</li>
+        </ul>
+      </description>
+    </release>
     <release version="44.6.8" date="2023-07-10">
       <description>
         <ul>
