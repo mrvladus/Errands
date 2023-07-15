@@ -58,38 +58,11 @@
         <child>
           <object class="AdwPreferencesGroup">
             <property name="title" translatable="yes">Tasks</property>
-            <!-- Show accent colors menu -->
-            <child>
-              <object class="AdwActionRow">
-                <property name="title" translatable="yes">Accent Colors Menu</property>
-                <property name="subtitle" translatable="yes">Restart required</property>
-                <property name="activatable-widget">show_accent_colors_menu</property>
-                <child type="suffix">
-                  <object class="GtkSwitch" id="show_accent_colors_menu">
-                    <property name="valign">center</property>
-                  </object>
-                </child>
-              </object>
-            </child>
-            <!-- Enable sub-tasks -->
-            <child>
-              <object class="AdwActionRow">
-                <property name="title" translatable="yes">Sub-Tasks</property>
-                <property name="subtitle" translatable="yes">Restart required</property>
-                <property name="activatable-widget">enable_sub_tasks</property>
-                <child type="suffix">
-                  <object class="GtkSwitch" id="enable_sub_tasks">
-                    <property name="valign">center</property>
-                  </object>
-                </child>
-              </object>
-            </child>
             <!-- Expand sub-tasks -->
             <child>
               <object class="AdwActionRow">
                 <property name="title" translatable="yes">Tasks Expanded on Startup</property>
                 <property name="activatable-widget">tasks_expanded</property>
-                <property name="sensitive" bind-source="enable_sub_tasks" bind-property="active" bind-flags="sync-create"/>
                 <child type="suffix">
                   <object class="GtkSwitch" id="tasks_expanded">
                     <property name="valign">center</property>
@@ -161,4 +134,3 @@
     </child>
   </template>
 </interface>
-

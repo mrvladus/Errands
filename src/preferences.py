@@ -31,8 +31,6 @@ class PreferencesWindow(Adw.PreferencesWindow):
     light_theme = Gtk.Template.Child()
     dark_theme = Gtk.Template.Child()
     tasks_expanded = Gtk.Template.Child()
-    show_accent_colors_menu = Gtk.Template.Child()
-    enable_sub_tasks = Gtk.Template.Child()
     clear_history_on_startup = Gtk.Template.Child()
     history_size = Gtk.Template.Child()
 
@@ -49,13 +47,9 @@ class PreferencesWindow(Adw.PreferencesWindow):
         # Setup tasks
         GSettings.bind("tasks-expanded", self.tasks_expanded, "active")
         GSettings.bind(
-            "show-accent-colors-menu", self.show_accent_colors_menu, "active"
-        )
-        GSettings.bind(
             "clear-history-on-startup", self.clear_history_on_startup, "active"
         )
         GSettings.bind("history-size", self.history_size, "value")
-        GSettings.bind("enable-sub-tasks", self.enable_sub_tasks, "active")
 
     # --- Template handlers --- #
 

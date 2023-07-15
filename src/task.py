@@ -69,16 +69,10 @@ class Task(Gtk.Revealer):
         # Expand sub tasks
         self.expand(self.task["sub"] != [])
         # Show or hide accent colors menu
-        self.accent_colors_btn.set_visible(GSettings.get("show-accent-colors-menu"))
         self.add_sub_tasks()
         self.update_statusbar()
 
     def add_sub_tasks(self) -> None:
-        # Hide sub-tasks if disabeled
-        if not GSettings.get("enable-sub-tasks"):
-            self.expand_btn.props.visible = False
-            self.task_status.props.visible = False
-            return
         if self.task["sub"] == []:
             return
         history: list = UserData.get()["history"]
