@@ -5,7 +5,7 @@
   <template class="Window" parent="AdwApplicationWindow">
     <property name="width-request">250</property>
     <property name="height-request">250</property>
-    <property name="title">List</property>
+    <property name="title">Errands</property>
     <child>
       <object class="GtkBox">
         <property name="orientation">vertical</property>
@@ -212,7 +212,7 @@
   <object class="AdwAboutWindow" id="about_window">
     <property name="hide-on-close">true</property>
     <property name="transient-for">Window</property>
-    <property name="application-name">List</property>
+    <property name="application-name">Errands</property>
     <property name="application-icon">io.github.mrvladus.List</property>
     <property name="developer-name">Vlad Krupinski</property>
     <property name="translator-credits" translatable="yes">translator-credits</property>
