@@ -3,7 +3,7 @@
   <id>io.github.mrvladus.List</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>MIT</project_license>
-  <content_rating type="oars-1.1"/>
+  <content_rating type="oars-1.1" />
   <developer_name>Vlad Krupinski</developer_name>
   <url type="homepage">https://github.com/mrvladus/Errands</url>
   <url type="bugtracker">https://github.com/mrvladus/Errands/issues</url>
@@ -43,8 +43,7 @@
   </description>
   <screenshots>
     <screenshot type="default">
-      <image>
-				https://raw.githubusercontent.com/mrvladus/Errands/main/screenshots/main.png</image>
+      <image>https://raw.githubusercontent.com/mrvladus/Errands/main/screenshots/main.png</image>
     </screenshot>
   </screenshots>
   <releases>
@@ -70,7 +69,8 @@
     <release version="44.6.7" date="2023-07-07">
       <description>
         <ul>
-          <li>Added support for Drag and Drop operations. Now you can easily move tasks around. Moving sub-tasks between tasks now works too.</li>
+          <li>Added support for Drag and Drop operations. Now you can easily move tasks around.
+            Moving sub-tasks between tasks now works too.</li>
           <li>Removed "Quit" menu as unnecessary</li>
           <li>"Undo" button renamed to "Undo deletion" for clearer understanding of its purpose</li>
           <li>Minor preferences window improvements</li>
@@ -195,7 +195,8 @@
       <description>
         <p>UI/UX:</p>
         <ul>
-          <li>Added buttons for moving tasks and sub-tasks up and down in list. To show them just click edit button.</li>
+          <li>Added buttons for moving tasks and sub-tasks up and down in list. To show them just
+            click edit button.</li>
         </ul>
         <p>Translations:</p>
         <ul>
@@ -236,7 +237,8 @@
     <release version="44.4.3" date="2023-05-13">
       <description>
         <ul>
-          <li>Fixed bug with apostrophe character being displayed incorrectly (Thanks to CastelJeremy)</li>
+          <li>Fixed bug with apostrophe character being displayed incorrectly (Thanks to
+            CastelJeremy)</li>
         </ul>
       </description>
     </release>
@@ -288,36 +290,36 @@
     <release version="44.1.1" date="2023-04-09">
       <description>
         <p>
-					Fixed add task button not being clickable.
-				</p>
+          Fixed add task button not being clickable.
+        </p>
       </description>
     </release>
     <release version="44.1" date="2023-04-08">
       <description>
         <p>
-					Added menu with theme switcher.
-				</p>
+          Added menu with theme switcher.
+        </p>
       </description>
     </release>
     <release version="44.0.2" date="2023-04-06">
       <description>
         <p>
-					Bug fixes.
-				</p>
+          Bug fixes.
+        </p>
       </description>
     </release>
     <release version="44.0.1" date="2023-04-05">
       <description>
         <p>
-					Bug fixes.
-				</p>
+          Bug fixes.
+        </p>
       </description>
     </release>
     <release version="44.0" date="2023-04-04">
       <description>
         <p>
-					First release.
-				</p>
+          First release.
+        </p>
       </description>
     </release>
   </releases>
