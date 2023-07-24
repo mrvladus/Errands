@@ -1,6 +1,6 @@
 <img width='128' src='https://raw.githubusercontent.com/mrvladus/List/main/data/icons/io.github.mrvladus.List.svg' align="left"/>
 
-# List
+# Errands
 
 Manage your tasks
 
@@ -16,7 +16,7 @@ Manage your tasks
 - Deletion history
 
 ## Install
-List is only available as a Flatpak on Flathub:
+Errands is only available as a Flatpak on Flathub:
 
 <a href="https://flathub.org/apps/details/io.github.mrvladus.List"><img width='240' alt='Download on Flathub' src='https://dl.flathub.org/assets/badges/flathub-badge-en.png'/></a>
 
@@ -24,7 +24,7 @@ List is only available as a Flatpak on Flathub:
 Make sure you have `git` and `flatpak` installed and `Flathub` is setup
 1. Clone repo:
 ```sh
-git clone https://github.com/mrvladus/List && cd List/
+git clone https://github.com/mrvladus/Errands && cd Errands/
 ```
 2. Setup project:
 ```sh
@@ -41,7 +41,7 @@ git clone https://github.com/mrvladus/List && cd List/
 
 ## Contribute
 ### Translations
-To translate List to your language you can use <a href="https://flathub.org/ru/apps/net.poedit.Poedit">Poedit</a>
+To translate Errands to your language you can use <a href="https://flathub.org/ru/apps/net.poedit.Poedit">Poedit</a>
 1. Fork and clone repo.
 2. Open Poedit.
 - Open `po/list.pot` file.

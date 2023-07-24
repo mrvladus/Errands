@@ -27,18 +27,6 @@ from gi.repository import GLib, Gio, Adw, Gtk
 from __main__ import VERSION, APP_ID
 
 
-# class Action:
-#     """Gio Actions helper class"""
-
-#     @staticmethod
-#     def create(name: str, callback: callable, shortcuts=None) -> None:
-#         action = Gio.SimpleAction.new(name, None)
-#         action.connect("activate", callback)
-#         if shortcuts:
-#             self.props.application.set_accels_for_action(f"app.{name}", shortcuts)
-#         self.props.application.add_action(action)
-
-
 class Animate:
     """Class for creating UI animations using Adw.Animation"""
 

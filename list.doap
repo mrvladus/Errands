@@ -4,10 +4,10 @@
          xmlns:gnome="http://api.gnome.org/doap-extensions#"
          xmlns="http://usefulinc.com/ns/doap#">
 
-  <name xml:lang="en">List</name>
+  <name xml:lang="en">Errands</name>
   <shortdesc xml:lang="en">Manage your tasks</shortdesc>
-  <homepage rdf:resource="https://github.com/mrvladus/List" />
-  <bug-database rdf:resource="https://github.com/mrvladus/List/issues/"/>
+  <homepage rdf:resource="https://github.com/mrvladus/Errands" />
+  <bug-database rdf:resource="https://github.com/mrvladus/Errands/issues/"/>
 
   <programming-language>Python</programming-language>
   <platform>GTK 4</platform>
