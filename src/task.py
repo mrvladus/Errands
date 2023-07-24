@@ -300,7 +300,6 @@ class Task(Gtk.Revealer):
             sub_task = SubTask(new_sub_task, self, self.window)
             self.sub_tasks.append(sub_task)
             sub_task.toggle_visibility()
-            sub_task.on_sub_task_edit_btn_clicked(None)
             self.update_data()
             self.update_statusbar()
             # Expand
