@@ -63,8 +63,7 @@
                 <property name="halign">end</property>
                 <property name="margin-end">45</property>
                 <property name="can-target">false</property>
-                <property name="reveal-child" bind-source="hover_ctrl"
-                  bind-property="contains-pointer" bind-flags="sync-create" />
+                <property name="reveal-child" bind-source="hover_ctrl" bind-property="contains-pointer" bind-flags="sync-create" />
                 <child>
                   <object class="GtkImage" id="expand_icon">
                     <property name="icon-name">go-down-symbolic</property>
@@ -296,8 +295,7 @@
                           <object class="GtkButton">
                             <property name="margin-start">5</property>
                             <property name="icon-name">edit-clear-all-symbolic</property>
-                            <property name="tooltip-text" translatable="yes">Delete completed
-                              sub-tasks</property>
+                            <property name="tooltip-text" translatable="yes">Delete completed sub-tasks</property>
                             <property name="valign">center</property>
                             <signal name="clicked" handler="on_delete_completed_btn_clicked" />
                             <accessibility>
