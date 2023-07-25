@@ -29,8 +29,6 @@ class SubTask(Gtk.Revealer):
     __gtype_name__ = "SubTask"
 
     sub_task_box_rev = Gtk.Template.Child()
-    sub_task_menu_rev = Gtk.Template.Child()
-    sub_task_menu_btn = Gtk.Template.Child()
     sub_task_text = Gtk.Template.Child()
     sub_task_completed_btn = Gtk.Template.Child()
     sub_task_edit_box_rev = Gtk.Template.Child()
@@ -126,6 +124,7 @@ class SubTask(Gtk.Revealer):
             )
             self.parent.sub_tasks.reorder_child_after(self, new_sub_task)
             new_sub_task.toggle_visibility()
+            new_sub_task.on_sub_task_edit_btn_clicked(None)
         else:
             # Get indexes
             self_idx = self.parent.task["sub"].index(self.task)
@@ -151,16 +150,6 @@ class SubTask(Gtk.Revealer):
         else:
             self.text = Markup.rm_crossline(self.text)
         self.sub_task_text.props.label = self.text
-
-    @Gtk.Template.Callback()
-    def on_sub_task_menu_btn_clicked(self, _):
-        self.sub_task_menu_rev.set_reveal_child(
-            not self.sub_task_menu_rev.get_child_revealed()
-        )
-        if self.sub_task_menu_btn.has_css_class("rotate"):
-            self.sub_task_menu_btn.remove_css_class("rotate")
-        else:
-            self.sub_task_menu_btn.add_css_class("rotate")
 
     @Gtk.Template.Callback()
     def on_sub_task_delete_btn_clicked(self, _) -> None:
