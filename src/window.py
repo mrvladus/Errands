@@ -102,9 +102,9 @@ class Window(Adw.ApplicationWindow):
 
     def update_status(self) -> None:
         """Update progress bar on the top"""
-        data: dict = UserData.get()
         n_total = 0
         n_completed = 0
+        data: dict = UserData.get()
         for task in data["tasks"]:
             if task["id"] not in data["history"]:
                 n_total += 1
