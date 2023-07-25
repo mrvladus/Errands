@@ -139,22 +139,13 @@ class Task(Gtk.Revealer):
                 n_total += 1
                 if sub["completed"]:
                     n_completed += 1
-        if n_total > 0:
-            Animate.property(
-                self.task_status,
-                "fraction",
-                self.task_status.props.fraction,
-                n_completed / n_total,
-                250,
-            )
-        else:
-            Animate.property(
-                self.task_status,
-                "fraction",
-                self.task_status.props.fraction,
-                0,
-                250,
-            )
+        Animate.property(
+            self.task_status,
+            "fraction",
+            self.task_status.props.fraction,
+            n_completed / n_total if n_total > 0 else 0,
+            250,
+        )
         if self.expanded:
             self.task_status.props.visible = True
             self.task_status.add_css_class("task-progressbar")

@@ -111,22 +111,14 @@ class Window(Adw.ApplicationWindow):
                 if task["completed"]:
                     n_completed += 1
         # Update progress bar animation
-        if n_total > 0:
-            Animate.property(
-                self.status,
-                "fraction",
-                self.status.props.fraction,
-                n_completed / n_total,
-                250,
-            )
-        elif n_total == 0:
-            Animate.property(
-                self.status,
-                "fraction",
-                self.status.props.fraction,
-                0,
-                250,
-            )
+        # Animate.property(
+        #     self.status,
+        #     "fraction",
+        #     self.status.props.fraction,
+        #     n_completed / n_total if n_total > 0 else 0,
+        #     250,
+        # )
+        self.status.props.fraction = n_completed / n_total if n_total > 0 else 0
         # Show delete completed button
         self.delete_completed_tasks_btn.set_sensitive(n_completed > 0)
 
