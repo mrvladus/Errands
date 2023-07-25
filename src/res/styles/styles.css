@@ -41,6 +41,8 @@
 .accent-color-btn {
   border-radius: 50%;
   transition: 0.25s;
+  min-width: 5px;
+  min-height: 5px;
 }
 
 .accent-color-btn:hover {

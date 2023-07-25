@@ -117,7 +117,7 @@
                                 <property name="halign">center</property>
                                 <child type="accent">
                                   <object class="GtkBox">
-                                    <property name="spacing">3</property>
+                                    <property name="spacing">5</property>
                                     <!-- Clear style button -->
                                     <child>
                                       <object class="GtkButton">
