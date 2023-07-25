@@ -119,7 +119,7 @@ class Window(Adw.ApplicationWindow):
                 n_completed / n_total,
                 250,
             )
-        else:
+        elif n_total == 0:
             Animate.property(
                 self.status,
                 "fraction",
@@ -148,6 +148,7 @@ class Window(Adw.ApplicationWindow):
             UserData.set(data)
         # Set sensitivity of undo button
         self.undo_btn.props.sensitive = len(data["history"]) > 0
+        self.update_status()
 
     # --- Template handlers --- #
 
@@ -211,6 +212,7 @@ class Window(Adw.ApplicationWindow):
         entry.props.text = ""
         # Scroll to the end
         Animate.scroll(self.scrolled_window, True)
+        self.update_status()
 
     @Gtk.Template.Callback()
     def on_delete_completed_tasks_btn_clicked(self, _) -> None:
@@ -221,7 +223,6 @@ class Window(Adw.ApplicationWindow):
             task = tasks.get_item(i)
             if task.task["completed"] and task.task["id"] not in history:
                 task.delete()
-        self.update_status()
 
     @Gtk.Template.Callback()
     def on_undo_clicked(self, _) -> None:

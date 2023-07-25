@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from gi.repository import Gtk, Adw, GObject, Gdk
+from gi.repository import Gtk, Adw, GObject, Gdk, Gio
 from .utils import UserData, Markup
 
 
@@ -47,14 +47,40 @@ class SubTask(Gtk.Revealer):
         self.sub_task_completed_btn.props.active = self.task["completed"]
         # Set text
         self.sub_task_text.props.label = self.text
+        self.add_actions()
 
-    def delete(self) -> None:
+    def add_actions(self):
+        group = Gio.SimpleActionGroup.new()
+        self.insert_action_group("sub_task", group)
+
+        def add_action(name: str, callback):
+            action = Gio.SimpleAction.new(name, None)
+            action.connect("activate", callback)
+            group.add_action(action)
+
+        add_action("delete", self.delete)
+        add_action("edit", self.edit)
+        add_action("copy", self.copy)
+
+    def copy(self, *_) -> None:
+        clp: Gdk.Clipboard = Gdk.Display.get_default().get_clipboard()
+        clp.set(self.task["text"])
+
+    def delete(self, *_) -> None:
         print(f"Delete sub-task: {self.task['text']}")
         self.toggle_visibility()
         new_data: dict = UserData.get()
         new_data["history"].append(self.task["id"])
         UserData.set(new_data)
         self.window.update_undo()
+        self.parent.update_statusbar()
+
+    def edit(self, *_) -> None:
+        self.toggle_edit_box()
+        # Set entry text and select it
+        self.sub_task_edit_entry.get_buffer().props.text = self.task["text"]
+        self.sub_task_edit_entry.select_region(0, len(self.task["text"]))
+        self.sub_task_edit_entry.grab_focus()
 
     def toggle_edit_box(self) -> None:
         self.sub_task_box_rev.set_reveal_child(
@@ -124,7 +150,6 @@ class SubTask(Gtk.Revealer):
             )
             self.parent.sub_tasks.reorder_child_after(self, new_sub_task)
             new_sub_task.toggle_visibility()
-            new_sub_task.on_sub_task_edit_btn_clicked(None)
         else:
             # Get indexes
             self_idx = self.parent.task["sub"].index(self.task)
@@ -150,19 +175,6 @@ class SubTask(Gtk.Revealer):
         else:
             self.text = Markup.rm_crossline(self.text)
         self.sub_task_text.props.label = self.text
-
-    @Gtk.Template.Callback()
-    def on_sub_task_delete_btn_clicked(self, _) -> None:
-        self.delete()
-        self.parent.update_statusbar()
-
-    @Gtk.Template.Callback()
-    def on_sub_task_edit_btn_clicked(self, _) -> None:
-        self.toggle_edit_box()
-        # Set entry text and select it
-        self.sub_task_edit_entry.get_buffer().props.text = self.task["text"]
-        self.sub_task_edit_entry.select_region(0, len(self.task["text"]))
-        self.sub_task_edit_entry.grab_focus()
 
     @Gtk.Template.Callback()
     def on_sub_task_cancel_edit_btn_clicked(self, *_) -> None:

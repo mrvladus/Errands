@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from gi.repository import Gtk, Adw, Gdk, GObject
+from gi.repository import Gtk, Adw, Gdk, GObject, Gio
 from .sub_task import SubTask
 from .utils import Animate, Markup, TaskUtils, UserData
 
@@ -35,8 +35,6 @@ class Task(Gtk.Revealer):
     task_text = Gtk.Template.Child()
     task_status = Gtk.Template.Child()
     expand_icon = Gtk.Template.Child()
-    accent_colors_btn = Gtk.Template.Child()
-    accent_colors_popover = Gtk.Template.Child()
     task_completed_btn = Gtk.Template.Child()
     task_edit_box_rev = Gtk.Template.Child()
     task_edit_entry = Gtk.Template.Child()
@@ -71,6 +69,20 @@ class Task(Gtk.Revealer):
         # Show or hide accent colors menu
         self.add_sub_tasks()
         self.update_statusbar()
+        self.add_actions()
+
+    def add_actions(self):
+        group = Gio.SimpleActionGroup.new()
+        self.insert_action_group("task", group)
+
+        def add_action(name: str, callback):
+            action = Gio.SimpleAction.new(name, None)
+            action.connect("activate", callback)
+            group.add_action(action)
+
+        add_action("delete", self.delete)
+        add_action("edit", self.edit)
+        add_action("copy", self.copy)
 
     def add_sub_tasks(self) -> None:
         if self.task["sub"] == []:
@@ -82,13 +94,24 @@ class Task(Gtk.Revealer):
             if task["id"] not in history:
                 sub_task.toggle_visibility()
 
-    def delete(self) -> None:
+    def copy(self, *_) -> None:
+        clp: Gdk.Clipboard = Gdk.Display.get_default().get_clipboard()
+        clp.set(self.task["text"])
+
+    def delete(self, *_) -> None:
         print(f"Delete task: {self.task['text']}")
         self.toggle_visibility()
         new_data: dict = UserData.get()
         new_data["history"].append(self.task["id"])
         UserData.set(new_data)
         self.window.update_undo()
+
+    def edit(self, *_) -> None:
+        self.toggle_edit_mode()
+        # Set entry text and select it
+        self.task_edit_entry.get_buffer().props.text = self.task["text"]
+        self.task_edit_entry.select_region(0, len(self.task["text"]))
+        self.task_edit_entry.grab_focus()
 
     def expand(self, expanded: bool) -> None:
         self.expanded = expanded
@@ -154,11 +177,6 @@ class Task(Gtk.Revealer):
     # --- Template handlers --- #
 
     @Gtk.Template.Callback()
-    def on_task_delete(self, _) -> None:
-        self.delete()
-        self.window.update_status()
-
-    @Gtk.Template.Callback()
     def on_delete_completed_btn_clicked(self, _) -> None:
         history: list = UserData.get()["history"]
         sub_tasks = self.sub_tasks.observe_children()
@@ -202,14 +220,6 @@ class Task(Gtk.Revealer):
         entry.get_buffer().props.text = ""
 
     @Gtk.Template.Callback()
-    def on_task_edit_btn_clicked(self, _) -> None:
-        self.toggle_edit_mode()
-        # Set entry text and select it
-        self.task_edit_entry.get_buffer().props.text = self.task["text"]
-        self.task_edit_entry.select_region(0, len(self.task["text"]))
-        self.task_edit_entry.grab_focus()
-
-    @Gtk.Template.Callback()
     def on_task_cancel_edit_btn_clicked(self, *_) -> None:
         self.toggle_edit_mode()
 
@@ -238,7 +248,6 @@ class Task(Gtk.Revealer):
     @Gtk.Template.Callback()
     def on_style_selected(self, btn: Gtk.Button) -> None:
         """Apply accent color"""
-        self.accent_colors_popover.popdown()
         for i in btn.get_css_classes():
             color = ""
             if i.startswith("btn-"):
@@ -300,7 +309,6 @@ class Task(Gtk.Revealer):
             sub_task = SubTask(new_sub_task, self, self.window)
             self.sub_tasks.append(sub_task)
             sub_task.toggle_visibility()
-            sub_task.on_sub_task_edit_btn_clicked(None)
             self.update_data()
             self.update_statusbar()
             # Expand

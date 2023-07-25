@@ -1,92 +1,79 @@
 /* Tasks list */
 .separator {
-    background: linear-gradient(to bottom, @borders, transparent);
+  background: linear-gradient(to bottom, @borders, transparent);
 }
 
 /* Task */
 .task {
-    transition: 0.25s;
+  transition: 0.25s;
 }
 
 .task-expand-icon {
-  opacity: 0.3;
   transition: transform 0.25s;
 }
 
 .task-blue {
-    background: alpha(@blue_1, 0.3);
+  background: alpha(@blue_1, 0.3);
 }
 
 .task-green {
-    background: alpha(@green_1, 0.3);
+  background: alpha(@green_1, 0.3);
 }
 
 .task-yellow {
-    background: alpha(@yellow_1, 0.3);
+  background: alpha(@yellow_1, 0.3);
 }
 
 .task-orange {
-    background: alpha(@orange_1, 0.3);
+  background: alpha(@orange_1, 0.3);
 }
 
 .task-red {
-    background: alpha(@red_1, 0.3);
+  background: alpha(@red_1, 0.3);
 }
 
 .task-purple {
-   background: alpha(@purple_1, 0.3);
+  background: alpha(@purple_1, 0.3);
+}
+
+/* Accent colors buttons */
+
+.accent-color-btn {
+  border-radius: 50%;
+  transition: 0.25s;
+}
+
+.accent-color-btn:hover {
+  filter: brightness(1.2);
 }
 
 .btn-blue {
-    background: @blue_1;
-}
-
-.btn-blue:hover {
-    background: shade(@blue_1, 1.2);
+  background: @blue_1;
 }
 
 .btn-green {
-    background: @green_1;
-}
-
-.btn-green:hover {
-    background: shade(@green_1, 1.2);
+  background: @green_1;
 }
 
 .btn-yellow {
-    background: @yellow_1;
-}
-
-.btn-yellow:hover {
-    background: shade(@yellow_1, 1.2);
+  background: @yellow_1;
 }
 
 .btn-orange {
-    background: @orange_1;
-}
-
-.btn-orange:hover {
-    background: shade(@orange_1, 1.2);
+  background: @orange_1;
 }
 
 .btn-red {
-    background: @red_1;
-}
-
-.btn-red:hover {
-    background: shade(@red_1, 1.2);
+  background: @red_1;
 }
 
 .btn-purple {
-    background: @purple_1;
-}
-
-.btn-purple:hover {
-    background: shade(@purple_1, 1.2);
+  background: @purple_1;
 }
 
 /* Sub-task */
-.sub-task-rev {
+
+.sub-task-rev:drop(active) {
   border-radius: 10px;
 }
 
