@@ -115,7 +115,6 @@
                             <property name="popover">
                               <object class="GtkPopoverMenu">
                                 <property name="menu-model">task_menu</property>
-                                <property name="halign">center</property>
                                 <child type="accent">
                                   <object class="GtkBox">
                                     <property name="spacing">5</property>

@@ -40,6 +40,9 @@ class Window(Adw.ApplicationWindow):
     scrolled_window = Gtk.Template.Child()
     drop_motion_ctrl = Gtk.Template.Child()
     about_window = Gtk.Template.Child()
+    trash_list = Gtk.Template.Child()
+    trash_list_box = Gtk.Template.Child()
+    trash_status = Gtk.Template.Child()
 
     # State
     scrolling = False
@@ -215,6 +218,23 @@ class Window(Adw.ApplicationWindow):
         self.update_status()
 
     @Gtk.Template.Callback()
+    def on_trash_empty(self, *_) -> None:
+        pass
+
+    @Gtk.Template.Callback()
+    def on_trash_opened(self, *_) -> None:
+        data: dict = UserData.get()
+        history: list = data["history"]
+        for task in data["tasks"]:
+            if task["id"] in history:
+                self.trash_list.append(TrashItem(task, self))
+            for sub in task["sub"]:
+                if sub["id"] in history:
+                    self.trash_list.append(TrashItem(sub, self))
+        self.trash_list_box.set_visible(len(history) > 0)
+        self.trash_status.set_visible(not len(history) > 0)
+
+    @Gtk.Template.Callback()
     def on_undo_clicked(self, _) -> None:
         data: dict = UserData.get()
         if len(data["history"]) == 0:
@@ -247,3 +267,24 @@ class Window(Adw.ApplicationWindow):
                             task.update_statusbar()
                             self.update_undo()
                             return
+
+
+@Gtk.Template(resource_path="/io/github/mrvladus/List/trash_item.ui")
+class TrashItem(Gtk.Box):
+    __gtype_name__ = "TrashItem"
+
+    label = Gtk.Template.Child()
+
+    def __init__(self, task: dict, window: Adw.ApplicationWindow):
+        super().__init__()
+        self.id = task["id"]
+        self.label.props.label = task["text"]
+        print(task["text"])
+
+    @Gtk.Template.Callback()
+    def on_delete(self, _):
+        pass
+
+    @Gtk.Template.Callback()
+    def on_restore(self, _):
+        pass

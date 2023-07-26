@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0" />
+  <requires lib="Adw" version="1.0" />
+  <template class="TrashItem" parent="GtkBox">
+    <property name="halign">start</property>
+    <property name="hexpand">false</property>
+
+    <child>
+      <object class="GtkLabel" id="label">
+        <property name="width-chars">30</property>
+        <property name="halign">start</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkButton">
+        <property name="icon-name">user-trash-symbolic</property>
+        <property name="tooltip-text">Delete</property>
+        <signal name="clicked" handler="on_delete" />
+        <accessibility>
+          <property name="label" translatable="yes">Delete</property>
+        </accessibility>
+      </object>
+    </child>
+    <child>
+      <object class="GtkButton">
+        <property name="icon-name">user-trash-symbolic</property>
+        <property name="tooltip-text">Restore</property>
+        <signal name="clicked" handler="on_restore" />
+        <accessibility>
+          <property name="label" translatable="yes">Restore</property>
+        </accessibility>
+      </object>
+    </child>
+  </template>
+</interface>

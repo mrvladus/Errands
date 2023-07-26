@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <requires lib="gtk" version="4.0"/>
-  <requires lib="Adw" version="1.0"/>
+  <requires lib="gtk" version="4.0" />
+  <requires lib="Adw" version="1.0" />
   <template class="Window" parent="AdwApplicationWindow">
     <property name="width-request">250</property>
     <property name="height-request">250</property>
@@ -13,15 +13,81 @@
         <child>
           <object class="GtkHeaderBar">
             <style>
-              <class name="flat"/>
+              <class name="flat" />
             </style>
+            <!-- Trash -->
+            <child type="start">
+              <object class="GtkMenuButton">
+                <property name="icon-name">user-trash-full-symbolic</property>
+                <property name="tooltip-text" translatable="yes">Trash</property>
+                <property name="popover">
+                  <object class="GtkPopover">
+                    <child>
+                      <object class="GtkScrolledWindow">
+                        <property name="width-request">200</property>
+                        <property name="height-request">350</property>
+                        <property name="hexpand">false</property>
+                        <child>
+                          <object class="GtkBox">
+                            <property name="orientation">vertical</property>
+                            <!-- List -->
+                            <child>
+                              <object class="GtkBox" id="trash_list_box">
+                                <property name="orientation">vertical</property>
+                                <child>
+                                  <object class="GtkButton">
+                                    <property name="child">
+                                      <object class="AdwButtonContent">
+                                        <property name="icon-name">user-trash-symbolic</property>
+                                        <property name="label" translatable="yes">Empty Trash</property>
+                                      </object>
+                                    </property>
+                                    <signal name="clicked" handler="on_trash_empty" />
+                                    <style>
+                                      <class name="flat" />
+                                    </style>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkSeparator">
+                                    <property name="margin-top">5</property>
+                                    <property name="margin-bottom">5</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkBox" id="trash_list">
+                                    <property name="orientation">vertical</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                            <!-- Status -->
+                            <child>
+                              <object class="AdwStatusPage" id="trash_status">
+                                <property name="title">Empty</property>
+                                <property name="icon-name">user-trash-symbolic</property>
+                                <property name="vexpand">true</property>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <signal name="show" handler="on_trash_opened" />
+                  </object>
+                </property>
+                <accessibility>
+                  <property name="label" translatable="yes">Trash</property>
+                </accessibility>
+              </object>
+            </child>
             <!-- Undo button -->
             <child type="start">
               <object class="GtkButton" id="undo_btn">
                 <property name="sensitive">false</property>
                 <property name="icon-name">edit-undo-symbolic</property>
                 <property name="tooltip-text" translatable="yes">Undo deletion (Ctrl+Z)</property>
-                <signal name="clicked" handler="on_undo_clicked"/>
+                <signal name="clicked" handler="on_undo_clicked" />
                 <accessibility>
                   <property name="label" translatable="yes">Undo deletion (Ctrl+Z)</property>
                 </accessibility>
@@ -44,7 +110,7 @@
                 <property name="valign">center</property>
                 <property name="icon-name">edit-clear-all-symbolic</property>
                 <property name="tooltip-text" translatable="yes">Delete completed tasks</property>
-                <signal name="clicked" handler="on_delete_completed_tasks_btn_clicked"/>
+                <signal name="clicked" handler="on_delete_completed_tasks_btn_clicked" />
                 <accessibility>
                   <property name="label" translatable="yes">Delete completed tasks</property>
                 </accessibility>
@@ -60,7 +126,7 @@
                   </object>
                 </child>
                 <style>
-                  <class name="flat"/>
+                  <class name="flat" />
                 </style>
               </object>
             </child>
@@ -86,7 +152,7 @@
                   <object class="GtkButton">
                     <property name="icon-name">go-up-symbolic</property>
                     <property name="tooltip-text" translatable="yes">Scroll up</property>
-                    <signal name="clicked" handler="on_scroll_up_btn_clicked"/>
+                    <signal name="clicked" handler="on_scroll_up_btn_clicked" />
                     <accessibility>
                       <property name="label" translatable="yes">Scroll up</property>
                     </accessibility>
@@ -114,7 +180,7 @@
                         <property name="margin-start">20</property>
                         <property name="margin-end">20</property>
                         <style>
-                          <class name="osd"/>
+                          <class name="osd" />
                         </style>
                       </object>
                     </child>
@@ -126,14 +192,14 @@
                         <property name="margin-end">12</property>
                         <property name="selection-mode">0</property>
                         <style>
-                          <class name="boxed-list"/>
+                          <class name="boxed-list" />
                         </style>
                         <child>
                           <object class="AdwEntryRow">
                             <property name="activatable">false</property>
                             <property name="height-request">60</property>
                             <property name="title" translatable="yes">Add new Task</property>
-                            <signal name="entry-activated" handler="on_task_added"/>
+                            <signal name="entry-activated" handler="on_task_added" />
                           </object>
                         </child>
                       </object>
@@ -152,7 +218,7 @@
                     <property name="can-target">false</property>
                     <property name="height-request">4</property>
                     <style>
-                      <class name="fade"/>
+                      <class name="fade" />
                     </style>
                   </object>
                 </child>
@@ -163,13 +229,13 @@
                     <property name="propagate-natural-width">true</property>
                     <property name="vadjustment">
                       <object class="GtkAdjustment">
-                        <signal name="value_changed" handler="on_scroll"/>
+                        <signal name="value_changed" handler="on_scroll" />
                       </object>
                     </property>
                     <!-- Drag and Drop scroll controller -->
                     <child>
                       <object class="GtkDropControllerMotion" id="drop_motion_ctrl">
-                        <signal name="motion" handler="on_dnd_scroll"/>
+                        <signal name="motion" handler="on_dnd_scroll" />
                       </object>
                     </child>
                     <child>

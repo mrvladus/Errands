@@ -5,6 +5,7 @@
     <file preprocess="xml-stripblanks" compressed="true" alias="preferences.ui">ui/preferences.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="task.ui">ui/task.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="sub_task.ui">ui/sub_task.ui</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="trash_item.ui">ui/trash_item.ui</file>
     <file alias="styles.css">styles/styles.css</file>
   </gresource>
 </gresources>
