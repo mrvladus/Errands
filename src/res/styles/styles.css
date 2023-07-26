@@ -39,7 +39,7 @@
 /* Accent colors buttons */
 
 .accent-color-btn {
-  border-radius: 50%;
+  border-radius: 15px;
   transition: 0.25s;
   min-width: 5px;
   min-height: 5px;

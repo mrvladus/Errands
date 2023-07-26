@@ -33,6 +33,7 @@
         <property name="hexpand">true</property>
         <style>
           <class name="card" />
+          <class name="fade" />
         </style>
         <child>
           <object class="GtkDropTarget">
