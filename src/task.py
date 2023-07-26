@@ -69,6 +69,7 @@ class Task(Gtk.Revealer):
         # Show or hide accent colors menu
         self.add_sub_tasks()
         self.update_statusbar()
+        self.window.update_status()
         self.add_actions()
 
     def add_actions(self):

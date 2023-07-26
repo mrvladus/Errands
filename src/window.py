@@ -66,7 +66,6 @@ class Window(Adw.ApplicationWindow):
             ["<primary>q"],
         )
         self.load_tasks()
-        self.update_status()
         self.update_undo()
 
     def create_action(self, name: str, callback: callable, shortcuts=None) -> None:
@@ -139,7 +138,6 @@ class Window(Adw.ApplicationWindow):
             UserData.set(data)
         # Set sensitivity of undo button
         self.undo_btn.props.sensitive = len(data["history"]) > 0
-        self.update_status()
 
     # --- Template handlers --- #
 
