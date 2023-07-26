@@ -111,14 +111,13 @@ class Window(Adw.ApplicationWindow):
                 if task["completed"]:
                     n_completed += 1
         # Update progress bar animation
-        # Animate.property(
-        #     self.status,
-        #     "fraction",
-        #     self.status.props.fraction,
-        #     n_completed / n_total if n_total > 0 else 0,
-        #     250,
-        # )
-        self.status.props.fraction = n_completed / n_total if n_total > 0 else 0
+        Animate.property(
+            self.status,
+            "fraction",
+            self.status.props.fraction,
+            n_completed / n_total if n_total > 0 else 0,
+            250,
+        )
         # Show delete completed button
         self.delete_completed_tasks_btn.set_sensitive(n_completed > 0)
 
@@ -215,6 +214,7 @@ class Window(Adw.ApplicationWindow):
             task = tasks.get_item(i)
             if task.task["completed"] and task.task["id"] not in history:
                 task.delete()
+        self.update_status()
 
     @Gtk.Template.Callback()
     def on_undo_clicked(self, _) -> None:
