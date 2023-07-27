@@ -40,9 +40,6 @@ class Window(Adw.ApplicationWindow):
     scrolled_window = Gtk.Template.Child()
     drop_motion_ctrl = Gtk.Template.Child()
     about_window = Gtk.Template.Child()
-    trash_list = Gtk.Template.Child()
-    trash_list_box = Gtk.Template.Child()
-    trash_status = Gtk.Template.Child()
 
     # State
     scrolling = False
@@ -217,22 +214,14 @@ class Window(Adw.ApplicationWindow):
                 task.delete()
         self.update_status()
 
-    @Gtk.Template.Callback()
-    def on_trash_empty(self, *_) -> None:
-        pass
-
-    @Gtk.Template.Callback()
-    def on_trash_opened(self, *_) -> None:
-        data: dict = UserData.get()
-        history: list = data["history"]
-        for task in data["tasks"]:
-            if task["id"] in history:
-                self.trash_list.append(TrashItem(task, self))
-            for sub in task["sub"]:
-                if sub["id"] in history:
-                    self.trash_list.append(TrashItem(sub, self))
-        self.trash_list_box.set_visible(len(history) > 0)
-        self.trash_status.set_visible(not len(history) > 0)
+    # @Gtk.Template.Callback()
+    # def on_trash_empty(self, *_) -> None:
+    #     data: dict = UserData.get()
+    #     data["tasks"] = [t for t in data["tasks"] if not t["id"] in data["history"]]
+    #     for task in data["tasks"]:
+    #         task["sub"] = [s for s in task["sub"] if not s["id"] in data["history"]]
+    #     data["history"] = []
+    #     UserData.set(data)
 
     @Gtk.Template.Callback()
     def on_undo_clicked(self, _) -> None:
@@ -277,13 +266,10 @@ class TrashItem(Gtk.Box):
 
     def __init__(self, task: dict, window: Adw.ApplicationWindow):
         super().__init__()
+        self.trash_list = window.trash_list
         self.id = task["id"]
         self.label.props.label = task["text"]
         print(task["text"])
-
-    @Gtk.Template.Callback()
-    def on_delete(self, _):
-        pass
 
     @Gtk.Template.Callback()
     def on_restore(self, _):
