@@ -132,6 +132,7 @@
                   <object class="AdwStatusPage">
                     <property name="icon-name">user-trash-symbolic</property>
                     <property name="title">Empty</property>
+                    <property name="vexpand">true</property>
                     <property name="visible" bind-source="trash_list_scrl" bind-property="visible" bind-flags="sync-create|invert-boolean" />
                   </object>
                 </child>
@@ -140,9 +141,15 @@
                 <child>
                   <object class="GtkScrolledWindow" id="trash_list_scrl">
                     <child>
-                      <object class="GtkListBox" id="trash_list">
+                      <object class="GtkBox" id="trash_list">
+                        <property name="orientation">vertical</property>
+                        <property name="spacing">5</property>
                         <property name="hexpand">false</property>
                         <property name="vexpand">true</property>
+                        <property name="margin-start">5</property>
+                        <property name="margin-end">5</property>
+                        <property name="margin-top">5</property>
+                        <property name="margin-bottom">5</property>
                       </object>
                     </child>
                   </object>
@@ -173,6 +180,7 @@
                             <property name="label" translatable="yes">Clear</property>
                           </object>
                         </property>
+                        <signal name="clicked" handler="on_trash_clear" />
                       </object>
                     </child>
 
@@ -185,6 +193,7 @@
                             <property name="label" translatable="yes">Restore all</property>
                           </object>
                         </property>
+                        <signal name="clicked" handler="on_trash_restore" />
                       </object>
                     </child>
 

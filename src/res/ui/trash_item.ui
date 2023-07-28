@@ -4,10 +4,16 @@
   <requires lib="Adw" version="1.0" />
   <template class="TrashItem" parent="GtkBox">
     <property name="spacing">5</property>
-    <property name="margin-top">5</property>
+    <child>
+      <object class="GtkLabel" id="label">
+        <property name="halign">start</property>
+        <property name="ellipsize">3</property>
+        <property name="hexpand">true</property>
+      </object>
+    </child>
     <child>
       <object class="GtkButton">
-        <property name="icon-name">go-next-symbolic</property>
+        <property name="icon-name">emblem-ok-symbolic</property>
         <property name="tooltip-text">Restore</property>
         <property name="valign">center</property>
         <signal name="clicked" handler="on_restore" />
@@ -16,14 +22,8 @@
         </accessibility>
         <style>
           <class name="flat" />
+          <class name="circular" />
         </style>
-      </object>
-    </child>
-    <child>
-      <object class="GtkLabel" id="label">
-        <property name="halign">start</property>
-        <property name="ellipsize">3</property>
-        <property name="hexpand">true</property>
       </object>
     </child>
   </template>

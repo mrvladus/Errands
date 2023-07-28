@@ -20,6 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from re import sub
 from gi.repository import Gio, Adw, Gtk, GLib
 from __main__ import VERSION
 from .utils import Animate, GSettings, TaskUtils, UserData
@@ -31,15 +32,17 @@ from .preferences import PreferencesWindow
 class Window(Adw.ApplicationWindow):
     __gtype_name__ = "Window"
 
-    undo_btn = Gtk.Template.Child()
+    about_window = Gtk.Template.Child()
     delete_completed_tasks_btn = Gtk.Template.Child()
-    separator = Gtk.Template.Child()
-    tasks_list = Gtk.Template.Child()
-    status = Gtk.Template.Child()
+    drop_motion_ctrl = Gtk.Template.Child()
     scroll_up_btn_rev = Gtk.Template.Child()
     scrolled_window = Gtk.Template.Child()
-    drop_motion_ctrl = Gtk.Template.Child()
-    about_window = Gtk.Template.Child()
+    separator = Gtk.Template.Child()
+    status = Gtk.Template.Child()
+    tasks_list = Gtk.Template.Child()
+    trash_list = Gtk.Template.Child()
+    trash_list_scrl = Gtk.Template.Child()
+    undo_btn = Gtk.Template.Child()
 
     # State
     scrolling = False
@@ -67,6 +70,7 @@ class Window(Adw.ApplicationWindow):
         )
         self.load_tasks()
         self.update_undo()
+        self.trash_add_items()
 
     def create_action(self, name: str, callback: callable, shortcuts=None) -> None:
         action = Gio.SimpleAction.new(name, None)
@@ -98,6 +102,45 @@ class Window(Adw.ApplicationWindow):
         """Show about window"""
         self.about_window.props.version = VERSION
         self.about_window.show()
+
+    def trash_add(self, task: dict) -> None:
+        self.trash_list.append(TrashItem(task, self))
+        self.trash_update()
+
+    def trash_add_items(self) -> None:
+        """Populate trash on startup"""
+
+        self.trash_update()
+
+        data: dict = UserData.get()
+        history: list[str] = data["history"]
+        if len(history) == 0:
+            return
+        for task in data["tasks"]:
+            if task["id"] in history:
+                self.trash_add(task)
+            for sub in task["sub"]:
+                if sub["id"] in history:
+                    self.trash_add(sub)
+
+    def trash_clear(self) -> None:
+        """Clear unneeded items from trash"""
+
+        history: list[str] = UserData.get()["history"]
+        children = self.trash_list.observe_children()
+        items = [
+            children.get_item(i)
+            for i in range(children.get_n_items())
+            if children.get_item(i).id not in history
+        ]
+        for item in items:
+            self.trash_list.remove(item)
+            print(item.label.props.label)
+
+        self.trash_update()
+
+    def trash_update(self) -> None:
+        self.trash_list_scrl.set_visible(len(UserData.get()["history"]) > 0)
 
     def update_status(self) -> None:
         """Update progress bar on the top"""
@@ -214,14 +257,67 @@ class Window(Adw.ApplicationWindow):
                 task.delete()
         self.update_status()
 
-    # @Gtk.Template.Callback()
-    # def on_trash_empty(self, *_) -> None:
-    #     data: dict = UserData.get()
-    #     data["tasks"] = [t for t in data["tasks"] if not t["id"] in data["history"]]
-    #     for task in data["tasks"]:
-    #         task["sub"] = [s for s in task["sub"] if not s["id"] in data["history"]]
-    #     data["history"] = []
-    #     UserData.set(data)
+    @Gtk.Template.Callback()
+    def on_trash_clear(self, _) -> None:
+        data: dict = UserData.get()
+        history: list = data["history"]
+
+        # Remove data
+        data["tasks"] = [t for t in data["tasks"] if t["id"] not in history]
+        for task in data["tasks"]:
+            task["sub"] = [t for t in task["sub"] if t["id"] not in history]
+
+        # Delete tasks
+        to_remove = []
+        tasks = self.tasks_list.observe_children()
+        for i in range(tasks.get_n_items()):
+            task = tasks.get_item(i)
+            if task.task["id"] in history:
+                to_remove.append(task)
+            subs = task.sub_tasks.observe_children()
+            to_remove_subs = []
+            for j in range(subs.get_n_items()):
+                sub = subs.get_item(j)
+                if sub.task["id"] in history:
+                    to_remove_subs.append(sub)
+            for sub in to_remove_subs:
+                task.sub_tasks.remove(sub)
+        for task in to_remove:
+            self.tasks_list.remove(task)
+
+        # Clear trash
+        history = []
+        UserData.set(data)
+
+        children = self.trash_list.observe_children()
+        items = [children.get_item(i) for i in range(children.get_n_items())]
+        for item in items:
+            self.trash_list.remove(item)
+
+        self.trash_update()
+
+    @Gtk.Template.Callback()
+    def on_trash_restore(self, _) -> None:
+        data: dict = UserData.get()
+        data["history"] = []
+        UserData.set(data)
+
+        # Restore tasks
+        tasks = self.tasks_list.observe_children()
+        for i in range(tasks.get_n_items()):
+            task = tasks.get_item(i)
+            if not task.get_child_revealed():
+                task.toggle_visibility()
+            subs = task.sub_tasks.observe_children()
+            for j in range(subs.get_n_items()):
+                sub = subs.get_item(j)
+                if not sub.get_child_revealed():
+                    sub.toggle_visibility()
+            task.update_statusbar()
+
+        # Clear trash
+        self.trash_clear()
+        self.update_status()
 
     @Gtk.Template.Callback()
     def on_undo_clicked(self, _) -> None:
@@ -264,13 +360,36 @@ class TrashItem(Gtk.Box):
 
     label = Gtk.Template.Child()
 
-    def __init__(self, task: dict, window: Adw.ApplicationWindow):
+    def __init__(self, task: dict, window: Window):
         super().__init__()
-        self.trash_list = window.trash_list
+        self.window = window
         self.id = task["id"]
         self.label.props.label = task["text"]
-        print(task["text"])
 
     @Gtk.Template.Callback()
     def on_restore(self, _):
-        pass
+        """Restore task"""
+
+        # Clear from history
+        data: dict = UserData.get()
+        data["history"].remove(self.id)
+        UserData.set(data)
+        self.window.trash_clear()
+
+        # Show task
+        tasks = self.window.tasks_list.observe_children()
+        for i in range(tasks.get_n_items()):
+            task = tasks.get_item(i)
+            if task.task["id"] == self.id:
+                task.toggle_visibility()
+                self.window.update_status()
+                self.window.update_undo()
+                return
+            else:
+                subs = task.sub_tasks.observe_children()
+                for j in range(subs.get_n_items()):
+                    sub = subs.get_item(j)
+                    if sub.task["id"] == self.id:
+                        sub.toggle_visibility()
+                        task.update_statusbar()
+                        return

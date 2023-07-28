@@ -106,6 +106,7 @@ class Task(Gtk.Revealer):
         new_data["history"].append(self.task["id"])
         UserData.set(new_data)
         self.window.update_undo()
+        self.window.trash_add(self.task)
 
     def edit(self, *_) -> None:
         self.toggle_edit_mode()
