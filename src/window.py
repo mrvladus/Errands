@@ -68,6 +68,7 @@ class Window(Adw.ApplicationWindow):
             lambda *_: self.props.application.quit(),
             ["<primary>q"],
         )
+        self.update_status()
         self.load_tasks()
         self.update_undo()
         self.trash_add_items()
