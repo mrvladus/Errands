@@ -287,7 +287,7 @@ class Window(Adw.ApplicationWindow):
             self.tasks_list.remove(task)
 
         # Clear trash
-        history = []
+        data["history"] = []
         UserData.set(data)
 
         children = self.trash_list.observe_children()
