@@ -24,7 +24,7 @@ Errands is only available as a Flatpak on Flathub:
 Make sure you have `git` and `flatpak` installed and `Flathub` is setup
 1. Clone repo:
 ```sh
-git clone https://github.com/mrvladus/Errands && cd Errands/
+git clone https://github.com/mrvladus/List && cd List/
 ```
 2. Setup project:
 ```sh
