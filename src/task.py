@@ -300,6 +300,7 @@ class Task(Gtk.Revealer):
                     task.parent.sub_tasks.remove(task)
                     task.parent.update_data()
                     task.parent.update_statusbar()
+                    return False
 
             task.toggle_visibility()
             GLib.timeout_add(100, check_visible)
