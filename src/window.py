@@ -263,11 +263,6 @@ class Window(Adw.ApplicationWindow):
         data: dict = UserData.get()
         history: list = data["history"]
 
-        # Remove data
-        data["tasks"] = [t for t in data["tasks"] if t["id"] not in history]
-        for task in data["tasks"]:
-            task["sub"] = [t for t in task["sub"] if t["id"] not in history]
-
         # Delete tasks
         to_remove = []
         tasks = self.tasks_list.observe_children()
@@ -286,7 +281,10 @@ class Window(Adw.ApplicationWindow):
         for task in to_remove:
             self.tasks_list.remove(task)
 
-        # Clear trash
+        # Remove data
+        data["tasks"] = [t for t in data["tasks"] if t["id"] not in history]
+        for task in data["tasks"]:
+            task["sub"] = [t for t in task["sub"] if t["id"] not in history]
         data["history"] = []
         UserData.set(data)
 
@@ -371,26 +369,38 @@ class TrashItem(Gtk.Box):
     def on_restore(self, _):
         """Restore task"""
 
-        # Clear from history
         data: dict = UserData.get()
-        data["history"].remove(self.id)
-        UserData.set(data)
-        self.window.trash_clear()
 
-        # Show task
         tasks = self.window.tasks_list.observe_children()
         for i in range(tasks.get_n_items()):
             task = tasks.get_item(i)
+
+            # If it's a task
             if task.task["id"] == self.id:
+                data["history"].remove(self.id)
+                UserData.set(data)
                 task.toggle_visibility()
                 self.window.update_status()
                 self.window.update_undo()
+                self.window.trash_clear()
                 return
+
+            # If it's a sub-task
             else:
                 subs = task.sub_tasks.observe_children()
                 for j in range(subs.get_n_items()):
                     sub = subs.get_item(j)
                     if sub.task["id"] == self.id:
+                        # If task deleted restore it with sub-task
+                        if task.task["id"] in data["history"]:
+                            data["history"].remove(task.task["id"])
+                            UserData.set(data)
+                            task.toggle_visibility()
+                            self.window.update_status()
+                            self.window.update_undo()
+                        data["history"].remove(self.id)
+                        UserData.set(data)
                         sub.toggle_visibility()
                         task.update_statusbar()
+                        self.window.trash_clear()
                         return
