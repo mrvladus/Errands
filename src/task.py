@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from gi.repository import Gtk, Adw, Gdk, GObject, Gio
+from gi.repository import Gtk, Adw, Gdk, GObject, Gio, GLib
 from .sub_task import SubTask
 from .utils import Animate, Markup, TaskUtils, UserData
 
@@ -290,13 +290,23 @@ class Task(Gtk.Revealer):
             self.parent.reorder_child_after(task, self)
             self.parent.reorder_child_after(self, task)
         elif task.__gtype_name__ == "SubTask":
+            if task.parent == self:
+                return
+
+            def check_visible():
+                if task.get_child_revealed():
+                    return True
+                else:
+                    task.parent.sub_tasks.remove(task)
+                    task.parent.update_data()
+                    task.parent.update_statusbar()
+
+            task.toggle_visibility()
+            GLib.timeout_add(100, check_visible)
             # Remove sub-task
             new_sub_task = task.parent.task["sub"].pop(
                 task.parent.task["sub"].index(task.task)
             )
-            task.parent.sub_tasks.remove(task)
-            task.parent.update_data()
-            task.parent.update_statusbar()
             # Add sub-task
             self.task["sub"].append(new_sub_task)
             sub_task = SubTask(new_sub_task, self, self.window)

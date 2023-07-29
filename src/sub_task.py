@@ -112,7 +112,7 @@ class SubTask(Gtk.Revealer):
 
     @Gtk.Template.Callback()
     def on_drag_begin(self, _source, drag) -> bool:
-        self.toggle_visibility()
+        self.add_css_class("dim-label")
         widget = Gtk.Button(
             label=self.task["text"]
             if len(self.task["text"]) < 20
@@ -123,8 +123,13 @@ class SubTask(Gtk.Revealer):
 
     @Gtk.Template.Callback()
     def on_drag_cancel(self, *_) -> bool:
-        self.toggle_visibility()
-        return False
+        self.remove_css_class("dim-label")
+        return True
+
+    @Gtk.Template.Callback()
+    def on_drag_end(self, *_) -> bool:
+        self.remove_css_class("dim-label")
+        return True
 
     @Gtk.Template.Callback()
     def on_drag_prepare(self, _source, _x, _y) -> Gdk.ContentProvider:
@@ -134,6 +139,8 @@ class SubTask(Gtk.Revealer):
 
     @Gtk.Template.Callback()
     def on_drop(self, _drop, sub_task, _x, _y) -> None:
+        if sub_task == self:
+            return
         if sub_task.parent != self.parent:
             # Remove sub-task
             sub_task.parent.task["sub"].remove(sub_task.task)
@@ -160,7 +167,6 @@ class SubTask(Gtk.Revealer):
             # Move widget
             self.parent.sub_tasks.reorder_child_after(sub_task, self)
             self.parent.sub_tasks.reorder_child_after(self, sub_task)
-            sub_task.toggle_visibility()
             # Update data
             self.parent.task["sub"].insert(
                 self_idx, self.parent.task["sub"].pop(sub_idx)
