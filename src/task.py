@@ -174,9 +174,9 @@ class Task(Gtk.Revealer):
         history: list = UserData.get()["history"]
         sub_tasks = self.sub_tasks.observe_children()
         for i in range(sub_tasks.get_n_items()):
-            sub = sub_tasks.get_item(i)
+            sub: SubTask = sub_tasks.get_item(i)
             if sub.task["completed"] and sub.task["id"] not in history:
-                sub.delete()
+                sub.delete(update_sts=False)
         self.update_statusbar()
 
     @Gtk.Template.Callback()

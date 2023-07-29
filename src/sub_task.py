@@ -66,12 +66,15 @@ class SubTask(Gtk.Revealer):
         clp: Gdk.Clipboard = Gdk.Display.get_default().get_clipboard()
         clp.set(self.task["text"])
 
-    def delete(self, *_) -> None:
+    def delete(self, *_, update_sts: bool = True) -> None:
         print(f"Delete sub-task: {self.task['text']}")
         self.toggle_visibility()
         new_data: dict = UserData.get()
         new_data["history"].append(self.task["id"])
         UserData.set(new_data)
+        # Don't update if called externally
+        if update_sts:
+            self.parent.update_statusbar()
         self.window.update_undo()
         self.window.trash_add(self.task)
 
@@ -121,7 +124,7 @@ class SubTask(Gtk.Revealer):
     @Gtk.Template.Callback()
     def on_drag_cancel(self, *_) -> bool:
         self.toggle_visibility()
-        return True
+        return False
 
     @Gtk.Template.Callback()
     def on_drag_prepare(self, _source, _x, _y) -> Gdk.ContentProvider:
