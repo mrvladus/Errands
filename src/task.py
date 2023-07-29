@@ -264,14 +264,19 @@ class Task(Gtk.Revealer):
 
     @Gtk.Template.Callback()
     def on_drag_begin(self, _source, drag) -> bool:
-        self.toggle_visibility()
+        self.add_css_class("dim-label")
         widget = Gtk.Button(label=self.task["text"])
         icon = Gtk.DragIcon.get_for_drag(drag)
         icon.set_child(widget)
 
     @Gtk.Template.Callback()
     def on_drag_cancel(self, *_) -> bool:
-        self.toggle_visibility()
+        self.remove_css_class("dim-label")
+        return True
+
+    @Gtk.Template.Callback()
+    def on_drag_end(self, *_) -> bool:
+        self.remove_css_class("dim-label")
         return True
 
     @Gtk.Template.Callback()
@@ -282,13 +287,19 @@ class Task(Gtk.Revealer):
 
     @Gtk.Template.Callback()
     def on_drop(self, drop, task, _x, _y) -> None:
+        # If drop is task
         if task.__gtype_name__ == "Task":
+            if task == self or self.get_prev_sibling() == task:
+                return
+
             data = UserData.get()
             tasks = data["tasks"]
             tasks.insert(tasks.index(self.task), tasks.pop(tasks.index(task.task)))
             UserData.set(data)
             self.parent.reorder_child_after(task, self)
             self.parent.reorder_child_after(self, task)
+
+        # If drop is sub-task
         elif task.__gtype_name__ == "SubTask":
             if task.parent == self:
                 return
