@@ -200,19 +200,6 @@
                         <child>
                           <object class="GtkOverlay">
 
-                            <!-- Status bar -->
-                            <child type="overlay">
-                              <object class="GtkProgressBar" id="status">
-                                <property name="valign">end</property>
-                                <property name="margin-bottom">12</property>
-                                <property name="margin-start">20</property>
-                                <property name="margin-end">20</property>
-                                <style>
-                                  <class name="osd" />
-                                </style>
-                              </object>
-                            </child>
-
                             <!-- Entry -->
                             <child>
                               <object class="GtkListBox">
@@ -225,13 +212,26 @@
                                   <class name="boxed-list" />
                                 </style>
                                 <child>
-                                  <object class="AdwEntryRow">
+                                  <object class="AdwEntryRow" id="task_entry_row">
                                     <property name="activatable">false</property>
                                     <property name="height-request">60</property>
                                     <property name="title" translatable="yes">Add new Task</property>
                                     <signal name="entry-activated" handler="on_task_added" />
                                   </object>
                                 </child>
+                              </object>
+                            </child>
+
+                            <!-- Status bar -->
+                            <child type="overlay">
+                              <object class="GtkProgressBar" id="status">
+                                <property name="valign">end</property>
+                                <property name="margin-bottom">12</property>
+                                <property name="margin-start">22</property>
+                                <property name="margin-end">22</property>
+                                <style>
+                                  <class name="osd" />
+                                </style>
                               </object>
                             </child>
 
