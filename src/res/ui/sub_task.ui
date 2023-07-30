@@ -4,6 +4,8 @@
     <style>
       <class name="sub-task-rev" />
     </style>
+
+    <!-- Drop target -->
     <child>
       <object class="GtkDropTarget">
         <property name="actions">move</property>
@@ -11,6 +13,8 @@
         <signal name="drop" handler="on_drop" />
       </object>
     </child>
+
+    <!-- Sub task main box -->
     <child>
       <object class="GtkBox" id="sub_task_main_box">
         <property name="orientation">vertical</property>
@@ -18,6 +22,8 @@
         <style>
           <class name="sub-task" />
         </style>
+
+        <!-- Drag source -->
         <child>
           <object class="GtkDragSource">
             <property name="actions">move</property>
@@ -27,16 +33,21 @@
             <signal name="drag-end" handler="on_drag_end" />
           </object>
         </child>
+
+        <!-- Sub task box revealer -->
         <child>
           <object class="GtkRevealer" id="sub_task_box_rev">
             <property name="reveal-child">true</property>
             <property name="transition-type">9</property>
+
+            <!-- Sub task box -->
             <child>
               <object class="GtkBox">
                 <property name="height-request">60</property>
                 <property name="margin-start">10</property>
                 <property name="margin-end">10</property>
                 <property name="spacing">5</property>
+
                 <!-- Menu -->
                 <child type="end">
                   <object class="GtkMenuButton">
@@ -52,6 +63,7 @@
                     </style>
                   </object>
                 </child>
+
                 <!-- Sub-task text -->
                 <child>
                   <object class="GtkLabel" id="sub_task_text">
@@ -67,6 +79,7 @@
                     <property name="xalign">0</property>
                   </object>
                 </child>
+
                 <!-- Mark as completed button -->
                 <child>
                   <object class="GtkCheckButton" id="sub_task_completed_btn">
@@ -78,13 +91,18 @@
                     </accessibility>
                   </object>
                 </child>
+
               </object>
             </child>
+
           </object>
         </child>
+
+        <!-- Sub task edit box revealer -->
         <child>
           <object class="GtkRevealer" id="sub_task_edit_box_rev">
             <property name="transition-type">8</property>
+
             <!-- Sub task edit box -->
             <child>
               <object class="GtkBox">
@@ -92,6 +110,7 @@
                 <property name="margin-start">10</property>
                 <property name="margin-end">10</property>
                 <property name="spacing">5</property>
+
                 <!-- Edit entry -->
                 <child>
                   <object class="GtkEntry" id="sub_task_edit_entry">
@@ -103,13 +122,18 @@
                     <signal name="icon-release" handler="on_sub_task_cancel_edit_btn_clicked" />
                   </object>
                 </child>
+
               </object>
             </child>
+
           </object>
         </child>
+
       </object>
     </child>
+
   </template>
+
   <!-- Sub-task menu -->
   <menu id="sub_task_menu">
     <section>
@@ -127,4 +151,5 @@
       </item>
     </section>
   </menu>
+
 </interface>
