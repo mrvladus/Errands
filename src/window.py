@@ -330,7 +330,6 @@ class TrashItem(Gtk.Box):
                 UserData.set(data)
                 task.toggle_visibility()
                 self.window.update_status()
-                self.window.update_undo()
                 self.window.trash_clear()
                 return
 
@@ -346,7 +345,6 @@ class TrashItem(Gtk.Box):
                             UserData.set(data)
                             task.toggle_visibility()
                             self.window.update_status()
-                            self.window.update_undo()
                         data["history"].remove(self.id)
                         UserData.set(data)
                         sub.toggle_visibility()

@@ -37,7 +37,7 @@ msgstr "Пусто"
 
 #: src/res/ui/window.ui:183
 msgid "Clear"
-msgstr "Отчистить"
+msgstr "Очистить"
 
 #: src/res/ui/window.ui:196
 msgid "Restore all"
