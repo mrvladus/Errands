@@ -98,6 +98,7 @@ class Task(Gtk.Revealer):
     def copy(self, *_) -> None:
         clp: Gdk.Clipboard = Gdk.Display.get_default().get_clipboard()
         clp.set(self.task["text"])
+        self.window.add_toast(self.window.toast_copied)
 
     def delete(self, *_) -> None:
         print(f"Delete task: {self.task['text']}")
@@ -105,7 +106,6 @@ class Task(Gtk.Revealer):
         new_data: dict = UserData.get()
         new_data["history"].append(self.task["id"])
         UserData.set(new_data)
-        self.window.update_undo()
         self.window.trash_add(self.task)
 
     def edit(self, *_) -> None:

@@ -40,9 +40,10 @@ class Window(Adw.ApplicationWindow):
     separator = Gtk.Template.Child()
     status = Gtk.Template.Child()
     tasks_list = Gtk.Template.Child()
+    toast_overlay = Gtk.Template.Child()
+    toast_copied = Gtk.Template.Child()
     trash_list = Gtk.Template.Child()
     trash_list_scrl = Gtk.Template.Child()
-    undo_btn = Gtk.Template.Child()
 
     # State
     scrolling = False
@@ -70,8 +71,10 @@ class Window(Adw.ApplicationWindow):
         )
         self.update_status()
         self.load_tasks()
-        self.update_undo()
         self.trash_add_items()
+
+    def add_toast(self, toast: Adw.Toast):
+        self.toast_overlay.add_toast(toast)
 
     def create_action(self, name: str, callback: callable, shortcuts=None) -> None:
         action = Gio.SimpleAction.new(name, None)
@@ -136,7 +139,6 @@ class Window(Adw.ApplicationWindow):
         ]
         for item in items:
             self.trash_list.remove(item)
-            print(item.label.props.label)
 
         self.trash_update()
 
@@ -163,25 +165,6 @@ class Window(Adw.ApplicationWindow):
         )
         # Show delete completed button
         self.delete_completed_tasks_btn.set_sensitive(n_completed > 0)
-
-    def update_undo(self) -> None:
-        """Change undo button sensitivity"""
-        data: dict = UserData.get()
-        # Remove old tasks from history
-        if len(data["history"]) > GSettings.get("history-size"):
-            to_del_id = data["history"].pop(0)
-            for task in data["tasks"]:
-                if task["id"] == to_del_id:
-                    data["tasks"].remove(task)
-                    break
-                else:
-                    for sub in task["sub"]:
-                        if sub["id"] == to_del_id:
-                            task["sub"].remove(sub)
-                            break
-            UserData.set(data)
-        # Set sensitivity of undo button
-        self.undo_btn.props.sensitive = len(data["history"]) > 0
 
     # --- Template handlers --- #
 
@@ -317,40 +300,6 @@ class Window(Adw.ApplicationWindow):
         # Clear trash
         self.trash_clear()
         self.update_status()
-
-    @Gtk.Template.Callback()
-    def on_undo_clicked(self, _) -> None:
-        data: dict = UserData.get()
-        if len(data["history"]) == 0:
-            return
-        last_task_id: str = data["history"][-1]
-        for task in data["tasks"]:
-            if task["id"] == last_task_id:
-                childrens = self.tasks_list.observe_children()
-                for i in range(childrens.get_n_items()):
-                    # Get task
-                    child = childrens.get_item(i)
-                    if child.task["id"] == last_task_id:
-                        child.toggle_visibility()
-                        data["history"].pop()
-                        UserData.set(data)
-                        self.update_status()
-                        self.update_undo()
-                        return
-            else:
-                tasks = self.tasks_list.observe_children()
-                for i in range(tasks.get_n_items()):
-                    task = tasks.get_item(i)
-                    sub_tasks = task.sub_tasks.observe_children()
-                    for i in range(sub_tasks.get_n_items()):
-                        sub = sub_tasks.get_item(i)
-                        if sub.task["id"] == last_task_id:
-                            sub.toggle_visibility()
-                            data["history"].pop()
-                            UserData.set(data)
-                            task.update_statusbar()
-                            self.update_undo()
-                            return
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/List/trash_item.ui")

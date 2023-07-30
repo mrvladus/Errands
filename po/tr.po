@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: io.github.mrvladus.List\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-24 11:17+0300\n"
+"POT-Creation-Date: 2023-07-30 15:02+0300\n"
 "PO-Revision-Date: 2023-06-17 23:28+0300\n"
 "Last-Translator: Sabri Ünal <libreajans@gmail.com>\n"
 "Language-Team: Turkish <takim@gnome.org.tr>\n"
@@ -19,38 +19,51 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Poedit 3.2.2\n"
 
-#: src/res/ui/window.ui:23 src/res/ui/window.ui:26
-#, fuzzy
-msgid "Undo deletion (Ctrl+Z)"
-msgstr "Geri Al (Ctrl+Z)"
-
-#: src/res/ui/window.ui:46 src/res/ui/window.ui:49
+#: src/res/ui/window.ui:54 src/res/ui/window.ui:57
 msgid "Delete completed tasks"
 msgstr "Tamamlanmış görevleri sil"
 
-#: src/res/ui/window.ui:73 src/res/ui/window.ui:75
+#: src/res/ui/window.ui:82 src/res/ui/window.ui:84
 msgid "Main menu"
 msgstr "Ana menü"
 
-#: src/res/ui/window.ui:88 src/res/ui/window.ui:91
+#: src/res/ui/window.ui:98 src/res/ui/window.ui:101
 msgid "Scroll up"
 msgstr ""
 
-#: src/res/ui/window.ui:135
+#: src/res/ui/window.ui:136
+msgid "Empty"
+msgstr ""
+
+#: src/res/ui/window.ui:183
+#, fuzzy
+msgid "Clear"
+msgstr "Biçemi temizle"
+
+#: src/res/ui/window.ui:196
+msgid "Restore all"
+msgstr ""
+
+#: src/res/ui/window.ui:248
 msgid "Add new Task"
 msgstr "Yeni görev ekle"
 
-#: src/res/ui/window.ui:202
+#: src/res/ui/window.ui:327
 msgid "Preferences"
 msgstr "Tercihler"
 
-#: src/res/ui/window.ui:206
-msgid "About List"
+#: src/res/ui/window.ui:331
+#, fuzzy
+msgid "About Errands"
 msgstr "List Hakkında"
 
-#: src/res/ui/window.ui:218
+#: src/res/ui/window.ui:344
 msgid "translator-credits"
 msgstr "Sabri Ünal <libreajans@gmail.com>"
+
+#: src/res/ui/window.ui:352
+msgid "Copied to Clipboard"
+msgstr ""
 
 #: src/res/ui/preferences.ui:13
 msgid "Application Theme"
@@ -100,43 +113,47 @@ msgstr ""
 msgid "File name is \"list_backup_data.json\""
 msgstr ""
 
-#: src/res/ui/sub_task.ui:35 src/res/ui/sub_task.ui:39 src/res/ui/task.ui:82
-#: src/res/ui/task.ui:86
-msgid "Delete"
-msgstr "Sil"
+#: src/res/ui/sub_task.ui:46 src/res/ui/sub_task.ui:48 src/res/ui/task.ui:203
+#: src/res/ui/task.ui:205
+msgid "Menu"
+msgstr ""
 
-#: src/res/ui/sub_task.ui:66 src/res/ui/sub_task.ui:70 src/res/ui/task.ui:214
-#: src/res/ui/task.ui:218
-msgid "Edit"
-msgstr "Düzenle"
-
-#: src/res/ui/sub_task.ui:81 src/res/ui/sub_task.ui:84 src/res/ui/task.ui:229
-#: src/res/ui/task.ui:232
+#: src/res/ui/sub_task.ui:74 src/res/ui/sub_task.ui:77 src/res/ui/task.ui:233
+#: src/res/ui/task.ui:236
 msgid "Mark as completed"
 msgstr "Tamamlanmadı olarak imle"
 
-#: src/res/ui/sub_task.ui:106 src/res/ui/sub_task.ui:113 src/res/ui/task.ui:255
-#: src/res/ui/task.ui:262
-msgid "Drag to move"
-msgstr ""
-
-#: src/res/ui/sub_task.ui:131 src/res/ui/task.ui:280
+#: src/res/ui/sub_task.ui:101 src/res/ui/task.ui:261
 msgid "Cancel"
 msgstr "İptal"
 
-#: src/res/ui/task.ui:113 src/res/ui/task.ui:203
-msgid "Accent color"
-msgstr "Vurgu rengi"
+#: src/res/ui/sub_task.ui:117 src/res/ui/task.ui:12
+msgid "Delete"
+msgstr "Sil"
 
-#: src/res/ui/task.ui:128 src/res/ui/task.ui:131
+#: src/res/ui/sub_task.ui:121 src/res/ui/task.ui:16
+msgid "Edit"
+msgstr "Düzenle"
+
+#: src/res/ui/sub_task.ui:125 src/res/ui/task.ui:20
+msgid "Copy"
+msgstr ""
+
+#: src/res/ui/task.ui:129 src/res/ui/task.ui:132
 msgid "Clear style"
 msgstr "Biçemi temizle"
 
-#: src/res/ui/task.ui:309
+#: src/res/ui/task.ui:290
 msgid "Add new Sub-Task"
 msgstr "Yeni alt görev ekle"
 
-#: src/res/ui/task.ui:322 src/res/ui/task.ui:326
+#: src/res/ui/task.ui:303 src/res/ui/task.ui:307
 msgid "Delete completed sub-tasks"
 msgstr "Tamamlanmış alt görevleri sil"
 
+#, fuzzy
+#~ msgid "Undo deletion (Ctrl+Z)"
+#~ msgstr "Geri Al (Ctrl+Z)"
+
+#~ msgid "Accent color"
+#~ msgstr "Vurgu rengi"

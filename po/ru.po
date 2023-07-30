@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: list\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-24 11:17+0300\n"
+"POT-Creation-Date: 2023-07-30 15:02+0300\n"
 "PO-Revision-Date: 2023-07-07 16:56+0300\n"
 "Last-Translator: Vlad Krupinski <mrvladus@yandex.ru>\n"
 "Language-Team: \n"
@@ -19,37 +19,49 @@ msgstr ""
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Generator: Poedit 3.3.1\n"
 
-#: src/res/ui/window.ui:23 src/res/ui/window.ui:26
-msgid "Undo deletion (Ctrl+Z)"
-msgstr "Отменить удаление(Ctrl+Z)"
-
-#: src/res/ui/window.ui:46 src/res/ui/window.ui:49
+#: src/res/ui/window.ui:54 src/res/ui/window.ui:57
 msgid "Delete completed tasks"
 msgstr "Удалить выполненные задачи"
 
-#: src/res/ui/window.ui:73 src/res/ui/window.ui:75
+#: src/res/ui/window.ui:82 src/res/ui/window.ui:84
 msgid "Main menu"
 msgstr "Главное меню"
 
-#: src/res/ui/window.ui:88 src/res/ui/window.ui:91
+#: src/res/ui/window.ui:98 src/res/ui/window.ui:101
 msgid "Scroll up"
 msgstr "Прокрутить вверх"
 
-#: src/res/ui/window.ui:135
+#: src/res/ui/window.ui:136
+msgid "Empty"
+msgstr "Пусто"
+
+#: src/res/ui/window.ui:183
+msgid "Clear"
+msgstr "Отчистить"
+
+#: src/res/ui/window.ui:196
+msgid "Restore all"
+msgstr "Восстановить всё"
+
+#: src/res/ui/window.ui:248
 msgid "Add new Task"
 msgstr "Добавьте задачу"
 
-#: src/res/ui/window.ui:202
+#: src/res/ui/window.ui:327
 msgid "Preferences"
 msgstr "Настройки"
 
-#: src/res/ui/window.ui:206
-msgid "About List"
+#: src/res/ui/window.ui:331
+msgid "About Errands"
 msgstr "О приложении"
 
-#: src/res/ui/window.ui:218
+#: src/res/ui/window.ui:344
 msgid "translator-credits"
 msgstr "Vlad Krupinski <mrvladus@yandex.ru>"
+
+#: src/res/ui/window.ui:352
+msgid "Copied to Clipboard"
+msgstr "Скопировано в буфер обмена"
 
 #: src/res/ui/preferences.ui:13
 msgid "Application Theme"
@@ -99,42 +111,49 @@ msgstr "Сохранить бэкап в домашней папке"
 msgid "File name is \"list_backup_data.json\""
 msgstr "Имя файла \"list_backup_data.json\""
 
-#: src/res/ui/sub_task.ui:35 src/res/ui/sub_task.ui:39 src/res/ui/task.ui:82
-#: src/res/ui/task.ui:86
-msgid "Delete"
-msgstr "Удалить"
+#: src/res/ui/sub_task.ui:46 src/res/ui/sub_task.ui:48 src/res/ui/task.ui:203
+#: src/res/ui/task.ui:205
+msgid "Menu"
+msgstr "Меню"
 
-#: src/res/ui/sub_task.ui:66 src/res/ui/sub_task.ui:70 src/res/ui/task.ui:214
-#: src/res/ui/task.ui:218
-msgid "Edit"
-msgstr "Правка"
-
-#: src/res/ui/sub_task.ui:81 src/res/ui/sub_task.ui:84 src/res/ui/task.ui:229
-#: src/res/ui/task.ui:232
+#: src/res/ui/sub_task.ui:74 src/res/ui/sub_task.ui:77 src/res/ui/task.ui:233
+#: src/res/ui/task.ui:236
 msgid "Mark as completed"
 msgstr "Пометить как выполненное"
 
-#: src/res/ui/sub_task.ui:106 src/res/ui/sub_task.ui:113 src/res/ui/task.ui:255
-#: src/res/ui/task.ui:262
-msgid "Drag to move"
-msgstr "Перемещать"
-
-#: src/res/ui/sub_task.ui:131 src/res/ui/task.ui:280
+#: src/res/ui/sub_task.ui:101 src/res/ui/task.ui:261
 msgid "Cancel"
 msgstr "Отмена"
 
-#: src/res/ui/task.ui:113 src/res/ui/task.ui:203
-msgid "Accent color"
-msgstr "Цвет акцента"
+#: src/res/ui/sub_task.ui:117 src/res/ui/task.ui:12
+msgid "Delete"
+msgstr "Удалить"
 
-#: src/res/ui/task.ui:128 src/res/ui/task.ui:131
+#: src/res/ui/sub_task.ui:121 src/res/ui/task.ui:16
+msgid "Edit"
+msgstr "Правка"
+
+#: src/res/ui/sub_task.ui:125 src/res/ui/task.ui:20
+msgid "Copy"
+msgstr "Копировать"
+
+#: src/res/ui/task.ui:129 src/res/ui/task.ui:132
 msgid "Clear style"
 msgstr "Отчистить цвет"
 
-#: src/res/ui/task.ui:309
+#: src/res/ui/task.ui:290
 msgid "Add new Sub-Task"
 msgstr "Добавьте подзадачу"
 
-#: src/res/ui/task.ui:322 src/res/ui/task.ui:326
+#: src/res/ui/task.ui:303 src/res/ui/task.ui:307
 msgid "Delete completed sub-tasks"
 msgstr "Удалить выполненные подзадачи"
+
+#~ msgid "Undo deletion (Ctrl+Z)"
+#~ msgstr "Отменить удаление(Ctrl+Z)"
+
+#~ msgid "Drag to move"
+#~ msgstr "Перемещать"
+
+#~ msgid "Accent color"
+#~ msgstr "Цвет акцента"

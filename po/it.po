@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: list\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-24 11:17+0300\n"
+"POT-Creation-Date: 2023-07-30 15:02+0300\n"
 "PO-Revision-Date: 2023-06-27 08:34+0100\n"
 "Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
 "Language-Team: Italian <LL@li.org>\n"
@@ -16,38 +16,51 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/res/ui/window.ui:23 src/res/ui/window.ui:26
-#, fuzzy
-msgid "Undo deletion (Ctrl+Z)"
-msgstr "Annulla (Ctrl+Z)"
-
-#: src/res/ui/window.ui:46 src/res/ui/window.ui:49
+#: src/res/ui/window.ui:54 src/res/ui/window.ui:57
 msgid "Delete completed tasks"
 msgstr "Elimina le attività completate"
 
-#: src/res/ui/window.ui:73 src/res/ui/window.ui:75
+#: src/res/ui/window.ui:82 src/res/ui/window.ui:84
 msgid "Main menu"
 msgstr "Menu principale"
 
-#: src/res/ui/window.ui:88 src/res/ui/window.ui:91
+#: src/res/ui/window.ui:98 src/res/ui/window.ui:101
 msgid "Scroll up"
 msgstr ""
 
-#: src/res/ui/window.ui:135
+#: src/res/ui/window.ui:136
+msgid "Empty"
+msgstr ""
+
+#: src/res/ui/window.ui:183
+#, fuzzy
+msgid "Clear"
+msgstr "Stile chiaro"
+
+#: src/res/ui/window.ui:196
+msgid "Restore all"
+msgstr ""
+
+#: src/res/ui/window.ui:248
 msgid "Add new Task"
 msgstr "Aggiungi nuova attività"
 
-#: src/res/ui/window.ui:202
+#: src/res/ui/window.ui:327
 msgid "Preferences"
 msgstr "Preferenze"
 
-#: src/res/ui/window.ui:206
-msgid "About List"
+#: src/res/ui/window.ui:331
+#, fuzzy
+msgid "About Errands"
 msgstr "Informazioni su List"
 
-#: src/res/ui/window.ui:218
+#: src/res/ui/window.ui:344
 msgid "translator-credits"
 msgstr "Albano Battistella <albanobattistella@gmail.com>"
+
+#: src/res/ui/window.ui:352
+msgid "Copied to Clipboard"
+msgstr ""
 
 #: src/res/ui/preferences.ui:13
 msgid "Application Theme"
@@ -97,42 +110,47 @@ msgstr "Salva il backup dei dati nella cartella HOME"
 msgid "File name is \"list_backup_data.json\""
 msgstr "Il nome del file è \"list_backup_data.json\""
 
-#: src/res/ui/sub_task.ui:35 src/res/ui/sub_task.ui:39 src/res/ui/task.ui:82
-#: src/res/ui/task.ui:86
-msgid "Delete"
-msgstr "Cancella"
+#: src/res/ui/sub_task.ui:46 src/res/ui/sub_task.ui:48 src/res/ui/task.ui:203
+#: src/res/ui/task.ui:205
+msgid "Menu"
+msgstr ""
 
-#: src/res/ui/sub_task.ui:66 src/res/ui/sub_task.ui:70 src/res/ui/task.ui:214
-#: src/res/ui/task.ui:218
-msgid "Edit"
-msgstr "Modifica"
-
-#: src/res/ui/sub_task.ui:81 src/res/ui/sub_task.ui:84 src/res/ui/task.ui:229
-#: src/res/ui/task.ui:232
+#: src/res/ui/sub_task.ui:74 src/res/ui/sub_task.ui:77 src/res/ui/task.ui:233
+#: src/res/ui/task.ui:236
 msgid "Mark as completed"
 msgstr "Contrassegna come completato"
 
-#: src/res/ui/sub_task.ui:106 src/res/ui/sub_task.ui:113 src/res/ui/task.ui:255
-#: src/res/ui/task.ui:262
-msgid "Drag to move"
-msgstr ""
-
-#: src/res/ui/sub_task.ui:131 src/res/ui/task.ui:280
+#: src/res/ui/sub_task.ui:101 src/res/ui/task.ui:261
 msgid "Cancel"
 msgstr "Cancella"
 
-#: src/res/ui/task.ui:113 src/res/ui/task.ui:203
-msgid "Accent color"
-msgstr "Preferenza colore"
+#: src/res/ui/sub_task.ui:117 src/res/ui/task.ui:12
+msgid "Delete"
+msgstr "Cancella"
 
-#: src/res/ui/task.ui:128 src/res/ui/task.ui:131
+#: src/res/ui/sub_task.ui:121 src/res/ui/task.ui:16
+msgid "Edit"
+msgstr "Modifica"
+
+#: src/res/ui/sub_task.ui:125 src/res/ui/task.ui:20
+msgid "Copy"
+msgstr ""
+
+#: src/res/ui/task.ui:129 src/res/ui/task.ui:132
 msgid "Clear style"
 msgstr "Stile chiaro"
 
-#: src/res/ui/task.ui:309
+#: src/res/ui/task.ui:290
 msgid "Add new Sub-Task"
 msgstr "Aggiungi una nuova attività secondaria"
 
-#: src/res/ui/task.ui:322 src/res/ui/task.ui:326
+#: src/res/ui/task.ui:303 src/res/ui/task.ui:307
 msgid "Delete completed sub-tasks"
 msgstr "Elimina le attività secondarie completate"
+
+#, fuzzy
+#~ msgid "Undo deletion (Ctrl+Z)"
+#~ msgstr "Annulla (Ctrl+Z)"
+
+#~ msgid "Accent color"
+#~ msgstr "Preferenza colore"
