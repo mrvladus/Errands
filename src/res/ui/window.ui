@@ -24,9 +24,9 @@
                   <object class="GtkToggleButton" id="toggle_trash_btn">
                     <property name="icon-name">sidebar-show-symbolic</property>
                     <property name="active">false</property>
-                    <property name="tooltip-text" translatable="yes">Show deleted tasks</property>
+                    <property name="tooltip-text" translatable="yes">Show Deleted Tasks</property>
                     <accessibility>
-                      <property name="label" translatable="yes">Show deleted tasks</property>
+                      <property name="label" translatable="yes">Show Deleted Tasks</property>
                     </accessibility>
                   </object>
                 </child>
@@ -36,10 +36,10 @@
                   <object class="GtkButton" id="delete_completed_tasks_btn">
                     <property name="valign">center</property>
                     <property name="icon-name">edit-clear-all-symbolic</property>
-                    <property name="tooltip-text" translatable="yes">Delete completed tasks</property>
+                    <property name="tooltip-text" translatable="yes">Delete Completed Tasks</property>
                     <signal name="clicked" handler="on_delete_completed_tasks_btn_clicked" />
                     <accessibility>
-                      <property name="label" translatable="yes">Delete completed tasks</property>
+                      <property name="label" translatable="yes">Delete Completed Tasks</property>
                     </accessibility>
                     <child>
                       <object class="GtkShortcutController">
@@ -64,9 +64,9 @@
                     <property name="primary">true</property>
                     <property name="icon-name">open-menu-symbolic</property>
                     <property name="menu-model">primary_menu</property>
-                    <property name="tooltip-text" translatable="yes">Main menu</property>
+                    <property name="tooltip-text" translatable="yes">Main Menu</property>
                     <accessibility>
-                      <property name="label" translatable="yes">Main menu</property>
+                      <property name="label" translatable="yes">Main Menu</property>
                     </accessibility>
                   </object>
                 </child>
@@ -80,10 +80,10 @@
                     <child>
                       <object class="GtkButton">
                         <property name="icon-name">go-up-symbolic</property>
-                        <property name="tooltip-text" translatable="yes">Scroll up</property>
+                        <property name="tooltip-text" translatable="yes">Scroll Up</property>
                         <signal name="clicked" handler="on_scroll_up_btn_clicked" />
                         <accessibility>
-                          <property name="label" translatable="yes">Scroll up</property>
+                          <property name="label" translatable="yes">Scroll Up</property>
                         </accessibility>
                       </object>
                     </child>
@@ -125,7 +125,6 @@
                     </child>
 
                     <!-- Trash list -->
-
                     <child>
                       <object class="GtkScrolledWindow" id="trash_list_scrl">
                         <child>
@@ -177,7 +176,7 @@
                             <property name="child">
                               <object class="AdwButtonContent">
                                 <property name="icon-name">emblem-ok-symbolic</property>
-                                <property name="label" translatable="yes">Restore all</property>
+                                <property name="label" translatable="yes">Restore All</property>
                               </object>
                             </property>
                             <signal name="clicked" handler="on_trash_restore" />
