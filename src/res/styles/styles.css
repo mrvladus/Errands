@@ -74,6 +74,9 @@
 }
 
 /* Sub-task */
+.sub-task-rev {
+  transition: opacity 0.25s;
+}
 
 .sub-task-rev:drop(active) {
   border-radius: 10px;
