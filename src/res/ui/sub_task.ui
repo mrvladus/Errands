@@ -71,10 +71,10 @@
                 <child>
                   <object class="GtkCheckButton" id="sub_task_completed_btn">
                     <property name="valign">center</property>
-                    <property name="tooltip-text" translatable="yes">Mark as completed</property>
+                    <property name="tooltip-text" translatable="yes">Mark as Completed</property>
                     <signal name="toggled" handler="on_completed_btn_toggled" />
                     <accessibility>
-                      <property name="label" translatable="yes">Mark as completed</property>
+                      <property name="label" translatable="yes">Mark as Completed</property>
                     </accessibility>
                   </object>
                 </child>

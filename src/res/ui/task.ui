@@ -230,10 +230,10 @@
                         <child>
                           <object class="GtkCheckButton" id="task_completed_btn">
                             <property name="valign">center</property>
-                            <property name="tooltip-text" translatable="yes">Mark as completed</property>
+                            <property name="tooltip-text" translatable="yes">Mark as Completed</property>
                             <signal name="toggled" handler="on_task_completed_btn_toggled" />
                             <accessibility>
-                              <property name="label" translatable="yes">Mark as completed</property>
+                              <property name="label" translatable="yes">Mark as Completed</property>
                             </accessibility>
                           </object>
                         </child>
@@ -300,11 +300,11 @@
                           <object class="GtkButton">
                             <property name="margin-start">5</property>
                             <property name="icon-name">edit-clear-all-symbolic</property>
-                            <property name="tooltip-text" translatable="yes">Delete completed sub-tasks</property>
+                            <property name="tooltip-text" translatable="yes">Delete Completed Sub-Tasks</property>
                             <property name="valign">center</property>
                             <signal name="clicked" handler="on_delete_completed_btn_clicked" />
                             <accessibility>
-                              <property name="label" translatable="yes">Delete completed sub-tasks</property>
+                              <property name="label" translatable="yes">Delete Completed Sub-Tasks</property>
                             </accessibility>
                           </object>
                         </child>
