@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
+
   <!-- Task menu -->
   <menu id="task_menu">
     <section>
@@ -22,10 +23,13 @@
       </item>
     </section>
   </menu>
+
   <template class="Task" parent="GtkRevealer">
     <style>
       <class name="fade" />
     </style>
+
+    <!-- Task card -->
     <child>
       <object class="GtkBox" id="main_box">
         <property name="margin-top">10</property>
@@ -38,6 +42,8 @@
           <class name="card" />
           <class name="fade" />
         </style>
+
+        <!-- Drop target -->
         <child>
           <object class="GtkDropTarget">
             <property name="actions">move</property>
@@ -45,9 +51,11 @@
             <signal name="drop" handler="on_drop" />
           </object>
         </child>
-        <!-- Horizontal box -->
+
+        <!-- Task overlay -->
         <child>
           <object class="GtkOverlay">
+
             <!-- Status bar -->
             <child type="overlay">
               <object class="GtkProgressBar" id="task_status">
@@ -60,6 +68,8 @@
                 </style>
               </object>
             </child>
+
+            <!-- Expand icon -->
             <child type="overlay">
               <object class="GtkRevealer">
                 <property name="transition-type">1</property>
@@ -78,11 +88,15 @@
                 </child>
               </object>
             </child>
+
+            <!-- Task rows box -->
             <child>
               <object class="GtkBox">
                 <property name="orientation">vertical</property>
                 <property name="vexpand">false</property>
                 <property name="hexpand">true</property>
+
+                <!-- Drag source -->
                 <child>
                   <object class="GtkDragSource">
                     <property name="actions">move</property>
@@ -92,10 +106,13 @@
                     <signal name="drag-end" handler="on_drag_end" />
                   </object>
                 </child>
+
+                <!-- Task box revealer -->
                 <child>
                   <object class="GtkRevealer" id="task_box_rev">
                     <property name="reveal-child">true</property>
                     <property name="transition-type">9</property>
+
                     <!-- Task box -->
                     <child>
                       <object class="GtkBox">
@@ -103,14 +120,19 @@
                         <property name="margin-start">10</property>
                         <property name="margin-end">10</property>
                         <property name="spacing">5</property>
+
+                        <!-- Click controller -->
                         <child>
                           <object class="GtkGestureClick">
                             <signal name="released" handler="on_expand" />
                           </object>
                         </child>
+
+                        <!-- Hover controller -->
                         <child>
                           <object class="GtkEventControllerMotion" id="hover_ctrl" />
                         </child>
+
                         <!-- Menu -->
                         <child type="end">
                           <object class="GtkMenuButton">
@@ -209,6 +231,7 @@
                             </style>
                           </object>
                         </child>
+
                         <!-- Task text -->
                         <child>
                           <object class="GtkLabel" id="task_text">
@@ -226,6 +249,7 @@
                             <property name="margin-end">20</property>
                           </object>
                         </child>
+
                         <!-- Mark as completed button -->
                         <child>
                           <object class="GtkCheckButton" id="task_completed_btn">
@@ -237,13 +261,18 @@
                             </accessibility>
                           </object>
                         </child>
+
                       </object>
                     </child>
+
                   </object>
                 </child>
+
+                <!-- Task edit box revealer -->
                 <child>
                   <object class="GtkRevealer" id="task_edit_box_rev">
                     <property name="transition-type">8</property>
+
                     <!-- Task edit box -->
                     <child>
                       <object class="GtkBox">
@@ -252,6 +281,7 @@
                         <property name="margin-end">10</property>
                         <property name="spacing">5</property>
                         <property name="vexpand">true</property>
+
                         <!-- Edit entry -->
                         <child>
                           <object class="GtkEntry" id="task_edit_entry">
@@ -263,27 +293,34 @@
                             <signal name="icon-release" handler="on_task_cancel_edit_btn_clicked" />
                           </object>
                         </child>
+
                       </object>
                     </child>
+
                   </object>
                 </child>
+
               </object>
             </child>
+
           </object>
         </child>
+
         <!-- Sub tasks revealer -->
         <child>
           <object class="GtkRevealer" id="sub_tasks_revealer">
             <child>
               <object class="GtkBox">
                 <property name="orientation">vertical</property>
-                <!-- Entry -->
+
+                <!-- Entry box -->
                 <child>
                   <object class="GtkBox">
                     <property name="margin-top">10</property>
                     <property name="margin-bottom">10</property>
                     <property name="margin-start">10</property>
                     <property name="margin-end">10</property>
+
                     <!-- Sub task entry -->
                     <child>
                       <object class="GtkEntry">
@@ -292,6 +329,7 @@
                         <signal name="activate" handler="on_sub_task_added" />
                       </object>
                     </child>
+
                     <!-- Delete completed sub-tasks button -->
                     <child>
                       <object class="GtkRevealer" id="delete_completed_btn_revealer">
@@ -310,22 +348,22 @@
                         </child>
                       </object>
                     </child>
+
                   </object>
                 </child>
-                <!-- <child> -->
-                <!--   <object class="GtkRevealer"> -->
-                <!--   </object> -->
-                <!-- </child> -->
+
                 <!-- Sub tasks -->
                 <child>
                   <object class="GtkBox" id="sub_tasks">
                     <property name="orientation">vertical</property>
                   </object>
                 </child>
+
               </object>
             </child>
           </object>
         </child>
+
       </object>
     </child>
   </template>
