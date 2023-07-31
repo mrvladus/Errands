@@ -100,12 +100,15 @@ class Task(Gtk.Revealer):
         clp.set(self.task["text"])
         self.window.add_toast(self.window.toast_copied)
 
-    def delete(self, *_) -> None:
+    def delete(self, *_, update_sts: bool = True) -> None:
         print(f"Delete task: {self.task['text']}")
         self.toggle_visibility()
         new_data: dict = UserData.get()
         new_data["history"].append(self.task["id"])
         UserData.set(new_data)
+        # Don't update if called externally
+        if update_sts:
+            self.window.update_status()
         self.window.trash_add(self.task)
 
     def edit(self, *_) -> None:

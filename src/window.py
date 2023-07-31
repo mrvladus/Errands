@@ -238,7 +238,7 @@ class Window(Adw.ApplicationWindow):
         for i in range(tasks.get_n_items()):
             task = tasks.get_item(i)
             if task.task["completed"] and task.task["id"] not in history:
-                task.delete()
+                task.delete(update_sts=False)
         self.update_status()
 
     @Gtk.Template.Callback()
