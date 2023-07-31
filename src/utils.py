@@ -22,6 +22,7 @@
 
 import os
 import json
+import shutil
 import uuid
 from gi.repository import GLib, Gio, Adw, Gtk
 from __main__ import VERSION, APP_ID
@@ -195,12 +196,23 @@ class UserData:
         "history": [],
     }
 
-    # Create data dir and data.json file
     @classmethod
     def init(self) -> None:
+        # Create data dir
         if not os.path.exists(self.data_dir):
             os.mkdir(self.data_dir)
+        # Create data file if not exists
         if not os.path.exists(self.data_dir + "/data.json"):
+            with open(self.data_dir + "/data.json", "w+") as f:
+                json.dump(self.default_data, f)
+        # Create new file if old is corrupted
+        try:
+            with open(self.data_dir + "/data.json", "r") as f:
+                data: dict = json.load(f)
+        except json.JSONDecodeError:
+            print("Data file is corrupted. Creating new...")
+            shutil.copy(self.data_dir + "/data.json", self.data_dir + "/data_old.json")
+            print("Old file is saved at: ", self.data_dir + "/data_old.json")
             with open(self.data_dir + "/data.json", "w+") as f:
                 json.dump(self.default_data, f)
         self.convert()
@@ -232,7 +244,7 @@ class UserData:
     def convert(self) -> None:
         data: dict = self.get()
         ver: str = data["version"]
-        # Bugfix
+        # Bugfix for 44.5
         if ver == "":
             data["version"] = "44.5"
             self.set(data)
