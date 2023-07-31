@@ -150,6 +150,7 @@
                     <child>
                       <object class="GtkBox">
                         <property name="hexpand">true</property>
+                        <property name="halign">center</property>
                         <property name="margin-top">5</property>
                         <property name="margin-bottom">5</property>
                         <property name="margin-start">5</property>
@@ -244,7 +245,7 @@
                     <child>
                       <object class="GtkOverlay">
 
-                        <!-- Smooth fade on top -->
+                        <!-- Separator on top -->
                         <child type="overlay">
                           <object class="GtkBox" id="separator">
                             <property name="valign">start</property>
