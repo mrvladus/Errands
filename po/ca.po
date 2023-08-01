@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: list\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-30 15:02+0300\n"
+"POT-Creation-Date: 2023-08-01 18:25+0300\n"
 "PO-Revision-Date: 2023-06-25 08:14+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -17,141 +17,137 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.3.1\n"
 
-#: src/res/ui/window.ui:54 src/res/ui/window.ui:57
-msgid "Delete completed tasks"
-msgstr "Suprimeix les tasques completades"
-
-#: src/res/ui/window.ui:82 src/res/ui/window.ui:84
-msgid "Main menu"
-msgstr "Menú principal"
-
-#: src/res/ui/window.ui:98 src/res/ui/window.ui:101
-msgid "Scroll up"
+#: src/res/ui/window.ui:27 src/res/ui/window.ui:29
+msgid "Show Deleted Tasks"
 msgstr ""
 
-#: src/res/ui/window.ui:136
+#: src/res/ui/window.ui:39 src/res/ui/window.ui:42
+msgid "Delete Completed Tasks"
+msgstr "Suprimeix les tasques completades"
+
+#: src/res/ui/window.ui:67 src/res/ui/window.ui:69
+msgid "Main Menu"
+msgstr "Menú principal"
+
+#: src/res/ui/window.ui:83 src/res/ui/window.ui:86
+msgid "Scroll Up"
+msgstr ""
+
+#: src/res/ui/window.ui:121
 msgid "Empty"
 msgstr ""
 
-#: src/res/ui/window.ui:183
-#, fuzzy
+#: src/res/ui/window.ui:167
 msgid "Clear"
 msgstr "Neteja l'estil"
 
-#: src/res/ui/window.ui:196
-msgid "Restore all"
+#: src/res/ui/window.ui:180
+msgid "Restore All"
 msgstr ""
 
-#: src/res/ui/window.ui:248
+#: src/res/ui/window.ui:219
 msgid "Add new Task"
 msgstr "Afegeix tasca"
 
-#: src/res/ui/window.ui:327
+#: src/res/ui/window.ui:311
 msgid "Preferences"
 msgstr "Preferències"
 
-#: src/res/ui/window.ui:331
+#: src/res/ui/window.ui:315
 #, fuzzy
 msgid "About Errands"
-msgstr "Quan a List"
+msgstr "Quan a Errands"
 
-#: src/res/ui/window.ui:344
+#: src/res/ui/window.ui:328
 msgid "translator-credits"
 msgstr "cubells <vicent@vcubells.net>"
 
-#: src/res/ui/window.ui:352
+#: src/res/ui/window.ui:336
 msgid "Copied to Clipboard"
 msgstr ""
 
-#: src/res/ui/preferences.ui:13
+#: src/res/ui/preferences.ui:14
 msgid "Application Theme"
 msgstr "Tema de l'aplicació"
 
-#: src/res/ui/preferences.ui:17
+#: src/res/ui/preferences.ui:19
 msgid "System"
 msgstr "Sistema"
 
-#: src/res/ui/preferences.ui:30
+#: src/res/ui/preferences.ui:33
 msgid "Light"
 msgstr "Clar"
 
-#: src/res/ui/preferences.ui:44
+#: src/res/ui/preferences.ui:48
 msgid "Dark"
 msgstr "Fosc"
 
-#: src/res/ui/preferences.ui:60
+#: src/res/ui/preferences.ui:66
 msgid "Tasks"
 msgstr "Tasques"
 
-#: src/res/ui/preferences.ui:64
+#: src/res/ui/preferences.ui:71
 msgid "Tasks Expanded on Startup"
 msgstr "Les tasques s'expandeixen  l'inici"
 
-#: src/res/ui/preferences.ui:78
+#: src/res/ui/preferences.ui:87
 msgid "History"
 msgstr "Historial"
 
-#: src/res/ui/preferences.ui:82
+#: src/res/ui/preferences.ui:92
 msgid "Clear History on Startup"
 msgstr "Netaja l'historial en iniciar"
 
-#: src/res/ui/preferences.ui:94
+#: src/res/ui/preferences.ui:105
 msgid "History Size"
 msgstr "Mida de l'historial"
 
-#: src/res/ui/preferences.ui:116
+#: src/res/ui/preferences.ui:129
 msgid "Backup"
 msgstr "Còpia de seguretat"
 
-#: src/res/ui/preferences.ui:119
+#: src/res/ui/preferences.ui:132
 msgid "Save data backup to Home folder"
 msgstr "Desa la còpia de seguretat de les dades a la carpeta de l'usuari"
 
-#: src/res/ui/preferences.ui:120
+#: src/res/ui/preferences.ui:133
 msgid "File name is \"list_backup_data.json\""
 msgstr "El nom de fitxer és \"list_backup_data.json\""
 
-#: src/res/ui/sub_task.ui:46 src/res/ui/sub_task.ui:48 src/res/ui/task.ui:203
-#: src/res/ui/task.ui:205
+#: src/res/ui/sub_task.ui:57 src/res/ui/sub_task.ui:59 src/res/ui/task.ui:225
+#: src/res/ui/task.ui:227
 msgid "Menu"
 msgstr ""
 
-#: src/res/ui/sub_task.ui:74 src/res/ui/sub_task.ui:77 src/res/ui/task.ui:233
-#: src/res/ui/task.ui:236
-msgid "Mark as completed"
+#: src/res/ui/sub_task.ui:87 src/res/ui/sub_task.ui:90 src/res/ui/task.ui:257
+#: src/res/ui/task.ui:260
+msgid "Mark as Completed"
 msgstr "Marca com a completada"
 
-#: src/res/ui/sub_task.ui:101 src/res/ui/task.ui:261
+#: src/res/ui/sub_task.ui:120 src/res/ui/task.ui:291
 msgid "Cancel"
 msgstr "Cancel·la"
 
-#: src/res/ui/sub_task.ui:117 src/res/ui/task.ui:12
+#: src/res/ui/sub_task.ui:141 src/res/ui/task.ui:13
 msgid "Delete"
 msgstr "Suprimeix"
 
-#: src/res/ui/sub_task.ui:121 src/res/ui/task.ui:16
+#: src/res/ui/sub_task.ui:145 src/res/ui/task.ui:17
 msgid "Edit"
 msgstr "Edita"
 
-#: src/res/ui/sub_task.ui:125 src/res/ui/task.ui:20
+#: src/res/ui/sub_task.ui:149 src/res/ui/task.ui:21
 msgid "Copy"
 msgstr ""
 
-#: src/res/ui/task.ui:129 src/res/ui/task.ui:132
+#: src/res/ui/task.ui:151 src/res/ui/task.ui:154
 msgid "Clear style"
 msgstr "Neteja l'estil"
 
-#: src/res/ui/task.ui:290
+#: src/res/ui/task.ui:327
 msgid "Add new Sub-Task"
 msgstr "Afegeix una subtasca"
 
-#: src/res/ui/task.ui:303 src/res/ui/task.ui:307
-msgid "Delete completed sub-tasks"
+#: src/res/ui/task.ui:341 src/res/ui/task.ui:345
+msgid "Delete Completed Sub-Tasks"
 msgstr "Suprimeix les subtasques completades"
-
-#, fuzzy
-#~ msgid "Undo deletion (Ctrl+Z)"
-#~ msgstr "Desfés (Ctrl+Z)"
-
-#~ msgid "Accent color"
-#~ msgstr "Accentuació del color"
