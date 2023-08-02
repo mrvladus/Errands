@@ -5,8 +5,7 @@ template $Window : Adw.ApplicationWindow {
   width-request: 300;
   height-request: 300;
   title: "Errands";
-  content: 
-  Adw.ToastOverlay toast_overlay {
+  content: Adw.ToastOverlay toast_overlay {
     Box {
       orientation: vertical;
 
@@ -37,6 +36,10 @@ template $Window : Adw.ApplicationWindow {
             label: _("Delete Completed Tasks");
           }
 
+          styles [
+            "flat",
+          ]
+
           ShortcutController {
             scope: managed;
 
@@ -46,9 +49,6 @@ template $Window : Adw.ApplicationWindow {
             }
           }
 
-          styles [
-            "flat",
-          ]
         }
 
         [end]
@@ -85,8 +85,7 @@ template $Window : Adw.ApplicationWindow {
         locked: true;
         fold-policy: always;
         reveal-flap: bind toggle_trash_btn.active bidirectional;
-        flap: 
-        Box {
+        flap: Box {
           orientation: vertical;
           width-request: 250;
           hexpand: false;
@@ -95,8 +94,7 @@ template $Window : Adw.ApplicationWindow {
             "background",
           ]
 
-          Separator {
-          }
+          Separator {}
 
           Adw.StatusPage {
             icon-name: "user-trash-symbolic";
@@ -118,8 +116,7 @@ template $Window : Adw.ApplicationWindow {
             }
           }
 
-          Separator {
-          }
+          Separator {}
 
           Box {
             hexpand: true;
@@ -135,9 +132,7 @@ template $Window : Adw.ApplicationWindow {
               child: Adw.ButtonContent {
                 icon-name: "edit-delete-symbolic";
                 label: _("Clear");
-              }
-
-              ;
+              };
               clicked => $on_trash_clear();
             }
 
@@ -145,9 +140,7 @@ template $Window : Adw.ApplicationWindow {
               child: Adw.ButtonContent {
                 icon-name: "emblem-ok-symbolic";
                 label: _("Restore All");
-              }
-
-              ;
+              };
               clicked => $on_trash_restore();
             }
           }
@@ -211,12 +204,9 @@ template $Window : Adw.ApplicationWindow {
             ScrolledWindow scrolled_window {
               propagate-natural-height: true;
               propagate-natural-width: true;
-              vadjustment: 
-              Adjustment {
+              vadjustment: Adjustment {
                 value-changed => $on_scroll();
-              }
-
-              ;
+              };
 
               DropControllerMotion drop_motion_ctrl {
                 motion => $on_dnd_scroll();

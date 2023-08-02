@@ -114,8 +114,7 @@ template $Task : Revealer {
             MenuButton {
               icon-name: "view-more-symbolic";
               valign: center;
-              popover: 
-              PopoverMenu {
+              popover: PopoverMenu {
                 menu-model: task_menu;
 
                 [accent]
@@ -190,9 +189,7 @@ template $Task : Revealer {
                     clicked => $on_style_selected();
                   }
                 }
-              }
-
-              ;
+              };
               tooltip-text: _("Menu");
 
               accessibility {
