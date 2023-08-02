@@ -46,20 +46,6 @@ template $PreferencesWindow : Adw.PreferencesWindow {
     }
 
     Adw.PreferencesGroup {
-      title: _("Tasks");
-
-      Adw.ActionRow {
-        title: _("Tasks Expanded on Startup");
-        activatable-widget: tasks_expanded;
-
-        [suffix]
-        Switch tasks_expanded {
-          valign: center;
-        }
-      }
-    }
-
-    Adw.PreferencesGroup {
       title: _("History");
 
       Adw.ActionRow {
@@ -85,9 +71,7 @@ template $PreferencesWindow : Adw.PreferencesWindow {
             lower: 0;
             upper: 100;
             step-increment: 1;
-          }
-
-          ;
+          };
         }
       }
     }

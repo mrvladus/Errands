@@ -132,7 +132,7 @@ template $Window : Adw.ApplicationWindow {
             visible: bind trash_list_scrl.visible;
 
             Button {
-              child:               Adw.ButtonContent {
+              child: Adw.ButtonContent {
                 icon-name: "edit-delete-symbolic";
                 label: _("Clear");
               }
@@ -142,7 +142,7 @@ template $Window : Adw.ApplicationWindow {
             }
 
             Button {
-              child:               Adw.ButtonContent {
+              child: Adw.ButtonContent {
                 icon-name: "emblem-ok-symbolic";
                 label: _("Restore All");
               }
@@ -234,14 +234,10 @@ template $Window : Adw.ApplicationWindow {
               }
             }
           }
-        }
-
-        ;
+        };
       }
     }
-  }
-
-  ;
+  };
 }
 
 menu primary_menu {
