@@ -105,8 +105,13 @@ class Log:
 
     @classmethod
     def init(self):
+        # Create data dir
+        if not os.path.exists(self.data_dir):
+            os.mkdir(self.data_dir)
+        # Copy old log
         if os.path.exists(self.log_file):
             os.rename(self.log_file, self.log_old_file)
+        # Start new log
         self.log(self, f"Log for Errands {VERSION}")
 
     @classmethod
@@ -237,9 +242,6 @@ class UserData:
     @classmethod
     def init(self) -> None:
         Log.debug("Initialize user data")
-        # Create data dir
-        if not os.path.exists(self.data_dir):
-            os.mkdir(self.data_dir)
         # Create data file if not exists
         if not os.path.exists(self.data_dir + "/data.json"):
             with open(self.data_dir + "/data.json", "w+") as f:

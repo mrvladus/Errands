@@ -48,7 +48,7 @@ class Task(Gtk.Revealer):
 
     def __init__(self, task: dict, window: Adw.ApplicationWindow):
         super().__init__()
-        Log.info("Add task:" + task["text"])
+        Log.info("Add task: " + task["text"])
         self.window = window
         self.parent = self.window.tasks_list
         self.task = task

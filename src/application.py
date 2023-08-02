@@ -39,12 +39,12 @@ class Application(Adw.Application):
             application_id=APP_ID,
             flags=Gio.ApplicationFlags.DEFAULT_FLAGS,
         )
+        Log.init()
         Log.debug("Starting Errands " + VERSION)
 
     def do_activate(self) -> None:
         GSettings.init()
         UserData.init()
-        Log.init()
         self.load_css()
         # Show window
         Window(application=self).present()
