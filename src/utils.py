@@ -94,6 +94,22 @@ class GSettings:
         self.gsettings = Gio.Settings.new(APP_ID)
 
 
+class Log:
+    """Logging functions"""
+
+    @staticmethod
+    def info(msg: str) -> None:
+        print(f"\033[32;1m[INFO] {msg}\033[0m")
+
+    @staticmethod
+    def warning(msg: str) -> None:
+        print(f"\033[33;1m[WARNING] {msg}\033[0m")
+
+    @staticmethod
+    def error(msg: str) -> None:
+        print(f"\033[31;1m[ERROR] {msg}\033[0m")
+
+
 class Markup:
     """Class for useful markup functions"""
 
