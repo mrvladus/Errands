@@ -27,9 +27,9 @@ require_version("Adw", "1")
 
 from gi.repository import Gio, Adw, Gtk, Gdk
 
-from __main__ import APP_ID
+from __main__ import APP_ID, VERSION
 
-from .utils import GSettings, UserData
+from .utils import GSettings, UserData, Log
 from .window import Window
 
 
@@ -39,13 +39,17 @@ class Application(Adw.Application):
             application_id=APP_ID,
             flags=Gio.ApplicationFlags.DEFAULT_FLAGS,
         )
+        Log.debug("Starting Errands " + VERSION)
 
     def do_activate(self) -> None:
-        # Initialize gsettings
         GSettings.init()
-        # Initialize data.json file
         UserData.init()
-        # Load css styles
+        self.load_css()
+        # Show window
+        Window(application=self).present()
+
+    def load_css(self):
+        Log.debug("Load CSS styles")
         css_provider = Gtk.CssProvider()
         css_provider.load_from_resource("/io/github/mrvladus/List/styles.css")
         Gtk.StyleContext.add_provider_for_display(
@@ -53,5 +57,3 @@ class Application(Adw.Application):
             css_provider,
             Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION,
         )
-        # Show window
-        Window(application=self).present()

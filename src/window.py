@@ -23,7 +23,7 @@
 from re import sub
 from gi.repository import Gio, Adw, Gtk, GLib
 from __main__ import VERSION
-from .utils import Animate, GSettings, TaskUtils, UserData
+from .utils import Animate, GSettings, Log, TaskUtils, UserData
 from .task import Task
 from .preferences import PreferencesWindow
 
@@ -86,7 +86,7 @@ class Window(Adw.ApplicationWindow):
     def load_tasks(self) -> None:
         # Clear history
         if GSettings.get("clear-history-on-startup"):
-            print("Clearing history...")
+            Log.debug("Clearing history")
             data: dict = UserData.get()
             data["tasks"] = [t for t in data["tasks"] if not t["id"] in data["history"]]
             for task in data["tasks"]:
@@ -94,8 +94,8 @@ class Window(Adw.ApplicationWindow):
             data["history"] = []
             UserData.set(data)
         # Load tasks
+        Log.debug("Loading tasks")
         data: dict = UserData.get()
-        print("Loading tasks...")
         for task in data["tasks"]:
             new_task = Task(task, self)
             self.tasks_list.append(new_task)
@@ -198,6 +198,7 @@ class Window(Adw.ApplicationWindow):
     @Gtk.Template.Callback()
     def on_scroll(self, adj):
         """Show scroll up button"""
+
         self.scroll_up_btn_rev.set_reveal_child(adj.get_value() > 0)
         if adj.get_value() > 0:
             self.separator.add_css_class("separator")
@@ -207,11 +208,13 @@ class Window(Adw.ApplicationWindow):
     @Gtk.Template.Callback()
     def on_scroll_up_btn_clicked(self, _):
         """Scroll up"""
+
         Animate.scroll(self.scrolled_window, False)
 
     @Gtk.Template.Callback()
     def on_task_added(self, entry: Gtk.Entry) -> None:
         """Add new task"""
+
         text: str = entry.props.text
         # Check for empty string or task exists
         if text == "":
@@ -233,6 +236,7 @@ class Window(Adw.ApplicationWindow):
     @Gtk.Template.Callback()
     def on_delete_completed_tasks_btn_clicked(self, _) -> None:
         """Hide completed tasks"""
+
         history: list = UserData.get()["history"]
         tasks = self.tasks_list.observe_children()
         for i in range(tasks.get_n_items()):
@@ -243,6 +247,7 @@ class Window(Adw.ApplicationWindow):
 
     @Gtk.Template.Callback()
     def on_trash_clear(self, _) -> None:
+        Log.info("Clear Trash")
         data: dict = UserData.get()
         history: list = data["history"]
 
@@ -280,6 +285,7 @@ class Window(Adw.ApplicationWindow):
 
     @Gtk.Template.Callback()
     def on_trash_restore(self, _) -> None:
+        Log.info("Restore Trash")
         data: dict = UserData.get()
         data["history"] = []
         UserData.set(data)
@@ -318,8 +324,9 @@ class TrashItem(Gtk.Box):
     def on_restore(self, _):
         """Restore task"""
 
-        data: dict = UserData.get()
+        Log.info("Restore: " + self.label.props.label)
 
+        data: dict = UserData.get()
         tasks = self.window.tasks_list.observe_children()
         for i in range(tasks.get_n_items()):
             task = tasks.get_item(i)

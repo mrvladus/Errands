@@ -22,7 +22,7 @@
 
 # from gettext import gettext as _
 from gi.repository import Gtk, Adw, GObject, Gdk, Gio
-from .utils import UserData, Markup
+from .utils import Log, UserData, Markup
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/List/sub_task.ui")
@@ -37,7 +37,7 @@ class SubTask(Gtk.Revealer):
 
     def __init__(self, task: dict, parent: Gtk.Box, window: Adw.ApplicationWindow):
         super().__init__()
-        print("Add sub-task: ", task["text"])
+        Log.info("Add sub-task: " + task["text"])
         self.parent = parent
         self.task = task
         self.window = window
@@ -64,12 +64,13 @@ class SubTask(Gtk.Revealer):
         add_action("copy", self.copy)
 
     def copy(self, *_) -> None:
+        Log.info("Copy to clipboard: " + self.task["text"])
         clp: Gdk.Clipboard = Gdk.Display.get_default().get_clipboard()
         clp.set(self.task["text"])
         self.window.add_toast(self.window.toast_copied)
 
     def delete(self, *_, update_sts: bool = True) -> None:
-        print(f"Delete sub-task: {self.task['text']}")
+        Log.info(f"Delete sub-task: {self.task['text']}")
         self.toggle_visibility()
         new_data: dict = UserData.get()
         new_data["history"].append(self.task["id"])
@@ -197,7 +198,7 @@ class SubTask(Gtk.Revealer):
         # Return if text the same or empty
         if new_text == old_text or new_text == "":
             return
-        print(f"Change sub-task: '{old_text}' to '{new_text}'")
+        Log.info(f"Change sub-task: '{old_text}' to '{new_text}'")
         self.task["text"] = new_text
         self.task["completed"] = False
         self.update_data()

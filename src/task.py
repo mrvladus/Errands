@@ -22,7 +22,7 @@
 
 from gi.repository import Gtk, Adw, Gdk, GObject, Gio, GLib
 from .sub_task import SubTask
-from .utils import Animate, Markup, TaskUtils, UserData
+from .utils import Animate, Log, Markup, TaskUtils, UserData
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/List/task.ui")
@@ -48,7 +48,7 @@ class Task(Gtk.Revealer):
 
     def __init__(self, task: dict, window: Adw.ApplicationWindow):
         super().__init__()
-        print("Add task:", task["text"])
+        Log.info("Add task:" + task["text"])
         self.window = window
         self.parent = self.window.tasks_list
         self.task = task
@@ -66,7 +66,6 @@ class Task(Gtk.Revealer):
             self.task_status.add_css_class(f'progress-{self.task["color"]}')
         # Expand sub tasks
         self.expand(self.task["sub"] != [])
-        # Show or hide accent colors menu
         self.add_sub_tasks()
         self.update_statusbar()
         self.window.update_status()
@@ -96,12 +95,13 @@ class Task(Gtk.Revealer):
                 sub_task.toggle_visibility()
 
     def copy(self, *_) -> None:
+        Log.info("Copy to clipboard: " + self.task["text"])
         clp: Gdk.Clipboard = Gdk.Display.get_default().get_clipboard()
         clp.set(self.task["text"])
         self.window.add_toast(self.window.toast_copied)
 
     def delete(self, *_, update_sts: bool = True) -> None:
-        print(f"Delete task: {self.task['text']}")
+        Log.info(f"Delete task: {self.task['text']}")
         self.toggle_visibility()
         new_data: dict = UserData.get()
         new_data["history"].append(self.task["id"])

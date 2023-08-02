@@ -91,6 +91,7 @@ class GSettings:
 
     @classmethod
     def init(self) -> None:
+        Log.debug("Initialize GSettings")
         self.gsettings = Gio.Settings.new(APP_ID)
 
 
@@ -98,16 +99,16 @@ class Log:
     """Logging functions"""
 
     @staticmethod
-    def info(msg: str) -> None:
-        print(f"\033[32;1m[INFO] {msg}\033[0m")
-
-    @staticmethod
-    def warning(msg: str) -> None:
-        print(f"\033[33;1m[WARNING] {msg}\033[0m")
+    def debug(msg: str) -> None:
+        print(f"\033[33;1m[DEBUG]\033[0m {msg}")
 
     @staticmethod
     def error(msg: str) -> None:
-        print(f"\033[31;1m[ERROR] {msg}\033[0m")
+        print(f"\033[31;1m[ERROR]\033[0m {msg}")
+
+    @staticmethod
+    def info(msg: str) -> None:
+        print(f"\033[32;1m[INFO]\033[0m {msg}")
 
 
 class Markup:
@@ -214,6 +215,7 @@ class UserData:
 
     @classmethod
     def init(self) -> None:
+        Log.debug("Initialize user data")
         # Create data dir
         if not os.path.exists(self.data_dir):
             os.mkdir(self.data_dir)
@@ -226,9 +228,9 @@ class UserData:
             with open(self.data_dir + "/data.json", "r") as f:
                 data: dict = json.load(f)
         except json.JSONDecodeError:
-            print("Data file is corrupted. Creating new...")
+            Log.error("Data file is corrupted. Creating new.")
             shutil.copy(self.data_dir + "/data.json", self.data_dir + "/data_old.json")
-            print("Old file is saved at: ", self.data_dir + "/data_old.json")
+            Log.error("Old file is saved at: ", self.data_dir + "/data_old.json")
             with open(self.data_dir + "/data.json", "w+") as f:
                 json.dump(self.default_data, f)
         self.convert()
@@ -236,6 +238,9 @@ class UserData:
     # Backup user data
     @classmethod
     def backup(self) -> None:
+        Log.debug(
+            "Create backup file at: " + GLib.get_home_dir() + "/list_backup_data.json"
+        )
         data = self.get()
         with open(GLib.get_home_dir() + "/list_backup_data.json", "w+") as f:
             json.dump(data, f, indent=4)
