@@ -1,0 +1,296 @@
+using Gtk 4.0;
+
+menu task_menu {
+  section {
+    item {
+      custom: "accent";
+    }
+  }
+
+  section {
+    item {
+      label: _("Delete");
+      action: "task.delete";
+    }
+
+    item {
+      label: _("Edit");
+      action: "task.edit";
+    }
+
+    item {
+      label: _("Copy");
+      action: "task.copy";
+    }
+  }
+}
+
+template $Task : Revealer {
+  styles [
+    "fade",
+  ]
+
+  Box main_box {
+    margin-top: 10;
+    margin-bottom: 10;
+    margin-start: 12;
+    margin-end: 12;
+    orientation: vertical;
+    hexpand: true;
+
+    styles [
+      "card",
+      "fade",
+    ]
+
+    DropTarget {
+      actions: move;
+      formats: "Task SubTask";
+      drop => $on_drop();
+    }
+
+    Overlay {
+      [overlay]
+      ProgressBar task_status {
+        margin-start: 10;
+        margin-end: 10;
+        valign: end;
+
+        styles [
+          "osd",
+          "task-progressbar",
+        ]
+      }
+
+      [overlay]
+      Revealer {
+        transition-type: crossfade;
+        valign: center;
+        halign: end;
+        margin-end: 45;
+        can-target: false;
+        reveal-child: bind hover_ctrl.contains-pointer;
+
+        Image expand_icon {
+          icon-name: "go-down-symbolic";
+
+          styles [
+            "fade",
+          ]
+        }
+      }
+
+      Box {
+        orientation: vertical;
+        vexpand: false;
+        hexpand: true;
+
+        DragSource {
+          actions: move;
+          prepare => $on_drag_prepare();
+          drag-begin => $on_drag_begin();
+          drag-cancel => $on_drag_cancel();
+          drag-end => $on_drag_end();
+        }
+
+        Revealer task_box_rev {
+          reveal-child: true;
+          transition-type: swing_down;
+
+          Box {
+            height-request: 60;
+            margin-start: 10;
+            margin-end: 10;
+            spacing: 5;
+
+            GestureClick {
+              released => $on_expand();
+            }
+
+            EventControllerMotion hover_ctrl {
+            }
+
+            [end]
+            MenuButton {
+              icon-name: "view-more-symbolic";
+              valign: center;
+              popover: 
+              PopoverMenu {
+                menu-model: task_menu;
+
+                [accent]
+                Box {
+                  spacing: 5;
+
+                  Button {
+                    icon-name: "window-close-symbolic";
+                    tooltip-text: _("Clear style");
+                    clicked => $on_style_selected();
+
+                    accessibility {
+                      label: _("Clear style");
+                    }
+
+                    styles [
+                      "accent-color-btn",
+                    ]
+                  }
+
+                  Button {
+                    styles [
+                      "accent-color-btn",
+                      "btn-blue",
+                    ]
+
+                    clicked => $on_style_selected();
+                  }
+
+                  Button {
+                    styles [
+                      "accent-color-btn",
+                      "btn-green",
+                    ]
+
+                    clicked => $on_style_selected();
+                  }
+
+                  Button {
+                    styles [
+                      "accent-color-btn",
+                      "btn-yellow",
+                    ]
+
+                    clicked => $on_style_selected();
+                  }
+
+                  Button {
+                    styles [
+                      "accent-color-btn",
+                      "btn-orange",
+                    ]
+
+                    clicked => $on_style_selected();
+                  }
+
+                  Button {
+                    styles [
+                      "accent-color-btn",
+                      "btn-red",
+                    ]
+
+                    clicked => $on_style_selected();
+                  }
+
+                  Button {
+                    styles [
+                      "accent-color-btn",
+                      "btn-purple",
+                    ]
+
+                    clicked => $on_style_selected();
+                  }
+                }
+              }
+
+              ;
+              tooltip-text: _("Menu");
+
+              accessibility {
+                label: _("Menu");
+              }
+
+              styles [
+                "flat",
+              ]
+            }
+
+            Label task_text {
+              wrap: true;
+              use-markup: true;
+              valign: center;
+              halign: start;
+              hexpand: true;
+              vexpand: true;
+              ellipsize: none;
+              wrap-mode: word_char;
+              xalign: 0;
+              margin-top: 5;
+              margin-bottom: 5;
+              margin-end: 20;
+            }
+
+            CheckButton task_completed_btn {
+              valign: center;
+              tooltip-text: _("Mark as Completed");
+              toggled => $on_task_completed_btn_toggled();
+
+              accessibility {
+                label: _("Mark as Completed");
+              }
+            }
+          }
+        }
+
+        Revealer task_edit_box_rev {
+          transition-type: swing_up;
+
+          Box {
+            height-request: 60;
+            margin-start: 10;
+            margin-end: 10;
+            spacing: 5;
+            vexpand: true;
+
+            Entry task_edit_entry {
+              valign: center;
+              hexpand: true;
+              secondary-icon-name: "edit-delete-symbolic";
+              secondary-icon-tooltip-text: _("Cancel");
+              activate => $on_task_edit();
+              icon-release => $on_task_cancel_edit_btn_clicked();
+            }
+          }
+        }
+      }
+    }
+
+    Revealer sub_tasks_revealer {
+      Box {
+        orientation: vertical;
+
+        Box {
+          margin-top: 10;
+          margin-bottom: 10;
+          margin-start: 10;
+          margin-end: 10;
+
+          Entry {
+            placeholder-text: _("Add new Sub-Task");
+            hexpand: true;
+            activate => $on_sub_task_added();
+          }
+
+          Revealer delete_completed_btn_revealer {
+            transition-type: slide_left;
+
+            Button {
+              margin-start: 5;
+              icon-name: "edit-clear-all-symbolic";
+              tooltip-text: _("Delete Completed Sub-Tasks");
+              valign: center;
+              clicked => $on_delete_completed_btn_clicked();
+
+              accessibility {
+                label: _("Delete Completed Sub-Tasks");
+              }
+            }
+          }
+        }
+
+        Box sub_tasks {
+          orientation: vertical;
+        }
+      }
+    }
+  }
+}

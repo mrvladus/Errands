@@ -1,0 +1,276 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $Window : Adw.ApplicationWindow {
+  width-request: 300;
+  height-request: 300;
+  title: "Errands";
+  content: 
+  Adw.ToastOverlay toast_overlay {
+    Box {
+      orientation: vertical;
+
+      Adw.HeaderBar {
+        styles [
+          "flat",
+        ]
+
+        [start]
+        ToggleButton toggle_trash_btn {
+          icon-name: "sidebar-show-symbolic";
+          active: false;
+          tooltip-text: _("Show Deleted Tasks");
+
+          accessibility {
+            label: _("Show Deleted Tasks");
+          }
+        }
+
+        [start]
+        Button delete_completed_tasks_btn {
+          valign: center;
+          icon-name: "edit-clear-all-symbolic";
+          tooltip-text: _("Delete Completed Tasks");
+          clicked => $on_delete_completed_tasks_btn_clicked();
+
+          accessibility {
+            label: _("Delete Completed Tasks");
+          }
+
+          ShortcutController {
+            scope: managed;
+
+            Shortcut {
+              trigger: "<Control>Delete";
+              action: "activate";
+            }
+          }
+
+          styles [
+            "flat",
+          ]
+        }
+
+        [end]
+        MenuButton {
+          primary: true;
+          icon-name: "open-menu-symbolic";
+          menu-model: primary_menu;
+          tooltip-text: _("Main Menu");
+
+          accessibility {
+            label: _("Main Menu");
+          }
+        }
+
+        [end]
+        Revealer scroll_up_btn_rev {
+          valign: end;
+          halign: end;
+          transition-type: crossfade;
+
+          Button {
+            icon-name: "go-up-symbolic";
+            tooltip-text: _("Scroll Up");
+            clicked => $on_scroll_up_btn_clicked();
+
+            accessibility {
+              label: _("Scroll Up");
+            }
+          }
+        }
+      }
+
+      Adw.Flap {
+        locked: true;
+        fold-policy: always;
+        reveal-flap: bind toggle_trash_btn.active bidirectional;
+        flap: 
+        Box {
+          orientation: vertical;
+          width-request: 250;
+          hexpand: false;
+
+          styles [
+            "background",
+          ]
+
+          Separator {
+          }
+
+          Adw.StatusPage {
+            icon-name: "user-trash-symbolic";
+            title: _("Empty");
+            vexpand: true;
+            visible: bind trash_list_scrl.visible inverted;
+          }
+
+          ScrolledWindow trash_list_scrl {
+            Box trash_list {
+              orientation: vertical;
+              spacing: 5;
+              hexpand: false;
+              vexpand: true;
+              margin-start: 5;
+              margin-end: 5;
+              margin-top: 5;
+              margin-bottom: 5;
+            }
+          }
+
+          Separator {
+          }
+
+          Box {
+            hexpand: true;
+            halign: center;
+            margin-top: 5;
+            margin-bottom: 5;
+            margin-start: 5;
+            margin-end: 5;
+            spacing: 5;
+            visible: bind trash_list_scrl.visible;
+
+            Button {
+              child:               Adw.ButtonContent {
+                icon-name: "edit-delete-symbolic";
+                label: _("Clear");
+              }
+
+              ;
+              clicked => $on_trash_clear();
+            }
+
+            Button {
+              child:               Adw.ButtonContent {
+                icon-name: "emblem-ok-symbolic";
+                label: _("Restore All");
+              }
+
+              ;
+              clicked => $on_trash_restore();
+            }
+          }
+        }
+
+        ;
+        content: 
+        Box {
+          orientation: vertical;
+
+          Adw.Clamp {
+            maximum-size: 850;
+            tightening-threshold: 300;
+
+            Overlay {
+              ListBox {
+                margin-top: 10;
+                margin-bottom: 12;
+                margin-start: 12;
+                margin-end: 12;
+                selection-mode: none;
+
+                styles [
+                  "boxed-list",
+                ]
+
+                Adw.EntryRow task_entry_row {
+                  activatable: false;
+                  height-request: 60;
+                  title: _("Add new Task");
+                  entry-activated => $on_task_added();
+                }
+              }
+
+              [overlay]
+              ProgressBar status {
+                valign: end;
+                margin-bottom: 12;
+                margin-start: 22;
+                margin-end: 22;
+
+                styles [
+                  "osd",
+                ]
+              }
+            }
+          }
+
+          Overlay {
+            [overlay]
+            Box separator {
+              valign: start;
+              can-target: false;
+              height-request: 4;
+
+              styles [
+                "fade",
+              ]
+            }
+
+            ScrolledWindow scrolled_window {
+              propagate-natural-height: true;
+              propagate-natural-width: true;
+              vadjustment: 
+              Adjustment {
+                value-changed => $on_scroll();
+              }
+
+              ;
+
+              DropControllerMotion drop_motion_ctrl {
+                motion => $on_dnd_scroll();
+              }
+
+              Adw.Clamp {
+                maximum-size: 850;
+                tightening-threshold: 300;
+                vexpand: true;
+
+                Box tasks_list {
+                  orientation: vertical;
+                  hexpand: true;
+                }
+              }
+            }
+          }
+        }
+
+        ;
+      }
+    }
+  }
+
+  ;
+}
+
+menu primary_menu {
+  section {
+    item {
+      label: _("Preferences");
+      action: "app.preferences";
+    }
+
+    item {
+      label: _("About Errands");
+      action: "app.about";
+    }
+  }
+}
+
+Adw.AboutWindow about_window {
+  hide-on-close: true;
+  transient-for: template;
+  application-name: "Errands";
+  application-icon: "io.github.mrvladus.List";
+  developer-name: "Vlad Krupinski";
+  translator-credits: _("translator-credits");
+  copyright: "© 2023 Vlad Krupinski";
+  website: "https://github.com/mrvladus/Errands";
+  license-type: mit_x11;
+}
+
+Adw.Toast toast_copied {
+  title: _("Copied to Clipboard");
+  timeout: 3;
+}
