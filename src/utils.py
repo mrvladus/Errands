@@ -20,6 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import datetime
 import os
 import json
 import shutil
@@ -96,19 +97,39 @@ class GSettings:
 
 
 class Log:
-    """Logging functions"""
+    """Logging class"""
 
-    @staticmethod
-    def debug(msg: str) -> None:
+    data_dir: str = GLib.get_user_data_dir() + "/list"
+    log_file: str = data_dir + "/log.txt"
+    log_old_file: str = data_dir + "/log.old.txt"
+
+    @classmethod
+    def init(self):
+        if os.path.exists(self.log_file):
+            os.rename(self.log_file, self.log_old_file)
+        self.log(self, f"Log for Errands {VERSION}")
+
+    @classmethod
+    def debug(self, msg: str) -> None:
         print(f"\033[33;1m[DEBUG]\033[0m {msg}")
+        self.log(self, f"[DEBUG] {msg}")
 
-    @staticmethod
-    def error(msg: str) -> None:
+    @classmethod
+    def error(self, msg: str) -> None:
         print(f"\033[31;1m[ERROR]\033[0m {msg}")
+        self.log(self, f"[ERROR] {msg}")
 
-    @staticmethod
-    def info(msg: str) -> None:
+    @classmethod
+    def info(self, msg: str) -> None:
         print(f"\033[32;1m[INFO]\033[0m {msg}")
+        self.log(self, f"[INFO] {msg}")
+
+    def log(self, msg: str) -> None:
+        try:
+            with open(self.log_file, "a") as f:
+                f.write(msg + "\n")
+        except OSError:
+            self.error("Can't write to the log file")
 
 
 class Markup:

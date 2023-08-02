@@ -44,6 +44,7 @@ class Application(Adw.Application):
     def do_activate(self) -> None:
         GSettings.init()
         UserData.init()
+        Log.init()
         self.load_css()
         # Show window
         Window(application=self).present()
