@@ -51,22 +51,26 @@
       <description>
         <p>UI/UX:</p>
         <ul>
-          <li>App renamed to Errands.</li>
+          <li>App renamed to Errands</li>
           <li>Added sidebar with history of deleted tasks. You can restore them individually or all at once.</li>
-          <li>Cleaner UI with task menus.</li>
-          <li>Accent colors selector moved to task's menu.</li>
-          <li>Added menu item for quick text copy to clipboard.</li>
+          <li>Cleaner UI with task menus</li>
+          <li>Accent colors selector moved to task's menu</li>
+          <li>Added menu item for quick text copy to clipboard</li>
           <li>Improved Drag and Drop experience. Now you don't need to click edit button to access it. Just drag tasks as you want!</li>
           <li>Removed expand button. Click everywhere on Task to expand it.</li>
-          <li>Added expand indicator on mouseover.</li>
-          <li>Moved "Delete completed tasks" button to the headerbar from entry.</li>
-          <li>Removed unnecessary settings.</li>
-          <li>Added toasts.</li>
+          <li>Added expand indicator on mouseover</li>
+          <li>Moved "Delete completed tasks" button to the headerbar from entry</li>
+          <li>Removed unnecessary settings</li>
+          <li>Added toasts</li>
         </ul>
         <p>Translations:</p>
         <ul>
           <li>Added Czech translation (Amerey.eu)</li>
           <li>Added Portuguese translation (Vitor Gabriel Gomes)</li>
+        </ul>
+        <p>Backend:</p>
+        <ul>
+          <li>Ported UI files to Blueprint</li>
         </ul>
       </description>
     </release>
