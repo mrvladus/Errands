@@ -98,7 +98,8 @@ template $Window : Adw.ApplicationWindow {
 
           Adw.StatusPage {
             icon-name: "user-trash-symbolic";
-            title: _("Empty");
+            title: _("Empty Trash");
+            description: _("No deleted items");
             vexpand: true;
             visible: bind trash_list_scrl.visible inverted;
 
