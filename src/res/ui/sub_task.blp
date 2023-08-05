@@ -1,5 +1,24 @@
 using Gtk 4.0;
 
+menu sub_task_menu {
+  section {
+    item {
+      label: _("Delete");
+      action: "sub_task.delete";
+    }
+
+    item {
+      label: _("Edit");
+      action: "sub_task.edit";
+    }
+
+    item {
+      label: _("Copy");
+      action: "sub_task.copy";
+    }
+  }
+}
+
 template $SubTask : Revealer {
   styles [
     "sub-task-rev",
@@ -37,7 +56,30 @@ template $SubTask : Revealer {
         margin-end: 10;
         spacing: 5;
 
-        [end]
+        CheckButton sub_task_completed_btn {
+          valign: center;
+          tooltip-text: _("Mark as Completed");
+          toggled => $on_completed_btn_toggled();
+
+          accessibility {
+            label: _("Mark as Completed");
+          }
+        }
+        
+        Label sub_task_text {
+          margin-top: 5;
+          margin-bottom: 5;
+          margin-start: 5;
+          wrap: true;
+          hexpand: true;
+          halign: start;
+          valign: center;
+          use-markup: true;
+          ellipsize: none;
+          wrap-mode: word_char;
+          xalign: 0;
+        }
+
         MenuButton {
           icon-name: "view-more-symbolic";
           menu-model: sub_task_menu;
@@ -51,29 +93,6 @@ template $SubTask : Revealer {
           styles [
             "flat",
           ]
-        }
-
-        Label sub_task_text {
-          margin-top: 5;
-          margin-bottom: 5;
-          wrap: true;
-          hexpand: true;
-          halign: start;
-          valign: center;
-          use-markup: true;
-          ellipsize: none;
-          wrap-mode: word_char;
-          xalign: 0;
-        }
-
-        CheckButton sub_task_completed_btn {
-          valign: center;
-          tooltip-text: _("Mark as Completed");
-          toggled => $on_completed_btn_toggled();
-
-          accessibility {
-            label: _("Mark as Completed");
-          }
         }
       }
     }
@@ -96,25 +115,6 @@ template $SubTask : Revealer {
           icon-release => $on_sub_task_cancel_edit_btn_clicked();
         }
       }
-    }
-  }
-}
-
-menu sub_task_menu {
-  section {
-    item {
-      label: _("Delete");
-      action: "sub_task.delete";
-    }
-
-    item {
-      label: _("Edit");
-      action: "sub_task.edit";
-    }
-
-    item {
-      label: _("Copy");
-      action: "sub_task.copy";
     }
   }
 }

@@ -67,7 +67,7 @@ template $Task : Revealer {
         transition-type: crossfade;
         valign: center;
         halign: end;
-        margin-end: 45;
+        margin-end: 50;
         can-target: false;
         reveal-child: bind hover_ctrl.contains-pointer;
 
@@ -110,10 +110,36 @@ template $Task : Revealer {
             EventControllerMotion hover_ctrl {
             }
 
-            [end]
+            CheckButton task_completed_btn {
+              valign: center;
+              tooltip-text: _("Mark as Completed");
+              toggled => $on_task_completed_btn_toggled();
+
+              accessibility {
+                label: _("Mark as Completed");
+              }
+            }
+            
+            Label task_text {
+              wrap: true;
+              use-markup: true;
+              valign: center;
+              halign: start;
+              hexpand: true;
+              vexpand: true;
+              ellipsize: none;
+              wrap-mode: word_char;
+              xalign: 0;
+              margin-top: 5;
+              margin-bottom: 5;
+              margin-end: 20;
+              margin-start: 5;
+            }
+
             MenuButton {
               icon-name: "view-more-symbolic";
               valign: center;
+              tooltip-text: _("Menu");
               popover: PopoverMenu {
                 menu-model: task_menu;
 
@@ -190,7 +216,6 @@ template $Task : Revealer {
                   }
                 }
               };
-              tooltip-text: _("Menu");
 
               accessibility {
                 label: _("Menu");
@@ -199,31 +224,6 @@ template $Task : Revealer {
               styles [
                 "flat",
               ]
-            }
-
-            Label task_text {
-              wrap: true;
-              use-markup: true;
-              valign: center;
-              halign: start;
-              hexpand: true;
-              vexpand: true;
-              ellipsize: none;
-              wrap-mode: word_char;
-              xalign: 0;
-              margin-top: 5;
-              margin-bottom: 5;
-              margin-end: 20;
-            }
-
-            CheckButton task_completed_btn {
-              valign: center;
-              tooltip-text: _("Mark as Completed");
-              toggled => $on_task_completed_btn_toggled();
-
-              accessibility {
-                label: _("Mark as Completed");
-              }
             }
           }
         }
