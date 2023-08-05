@@ -36,13 +36,16 @@
   background: alpha(@purple_1, 0.3);
 }
 
+.task-brown {
+  background: alpha(@brown_1, 0.3);
+}
+
 /* Accent colors buttons */
 
 .accent-color-btn {
-  border-radius: 15px;
   transition: 0.25s;
-  min-width: 5px;
-  min-height: 5px;
+  min-width: 30px;
+  min-height: 30px;
 }
 
 .accent-color-btn:hover {
@@ -71,6 +74,10 @@
 
 .btn-purple {
   background: @purple_1;
+}
+
+.btn-brown {
+  background: @brown_1;
 }
 
 /* Sub-task */
@@ -124,6 +131,10 @@ progress {
 
 .progress-purple progress {
   background-color: @purple_2;
+}
+
+.progress-brown progress {
+  background-color: @brown_2;
 }
 
 /* Utils */

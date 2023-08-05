@@ -145,74 +145,101 @@ template $Task : Revealer {
 
                 [accent]
                 Box {
+                  orientation: vertical;
+                  homogeneous: true;
                   spacing: 5;
+                  
+                  Box {
+                    spacing: 5;
 
-                  Button {
-                    icon-name: "window-close-symbolic";
-                    tooltip-text: _("Clear style");
-                    clicked => $on_style_selected();
+                    Button {
+                      icon-name: "window-close-symbolic";
+                      tooltip-text: _("Clear style");
+                      clicked => $on_style_selected();
 
-                    accessibility {
-                      label: _("Clear style");
+                      accessibility {
+                        label: _("Clear style");
+                      }
+
+                      styles [
+                        "accent-color-btn",
+                        "circular",
+                      ]
                     }
 
-                    styles [
-                      "accent-color-btn",
-                    ]
+                    Button {
+                      styles [
+                        "accent-color-btn",
+                        "circular",
+                        "btn-blue",
+                      ]
+
+                      clicked => $on_style_selected();
+                    }
+
+                    Button {
+                      styles [
+                        "accent-color-btn",
+                        "circular",
+                        "btn-green",
+                      ]
+
+                      clicked => $on_style_selected();
+                    }
+
+                    Button {
+                      styles [
+                        "accent-color-btn",
+                        "circular",
+                        "btn-yellow",
+                      ]
+
+                      clicked => $on_style_selected();
+                    }
                   }
 
-                  Button {
-                    styles [
-                      "accent-color-btn",
-                      "btn-blue",
-                    ]
+                  Box {
+                    spacing: 5;
+                    
+                    Button {
+                      styles [
+                        "accent-color-btn",
+                        "circular",
+                        "btn-orange",
+                      ]
 
-                    clicked => $on_style_selected();
-                  }
+                      clicked => $on_style_selected();
+                    }
 
-                  Button {
-                    styles [
-                      "accent-color-btn",
-                      "btn-green",
-                    ]
+                    Button {
+                      styles [
+                        "accent-color-btn",
+                        "circular",
+                        "btn-red",
+                      ]
 
-                    clicked => $on_style_selected();
-                  }
+                      clicked => $on_style_selected();
+                    }
 
-                  Button {
-                    styles [
-                      "accent-color-btn",
-                      "btn-yellow",
-                    ]
+                    Button {
+                      styles [
+                        "accent-color-btn",
+                        "circular",
+                        "btn-purple",
+                      ]
 
-                    clicked => $on_style_selected();
-                  }
+                      clicked => $on_style_selected();
+                    }
 
-                  Button {
-                    styles [
-                      "accent-color-btn",
-                      "btn-orange",
-                    ]
+                    Button {
+                      styles [
+                        "accent-color-btn",
+                        "circular",
+                        "btn-brown",
+                      ]
 
-                    clicked => $on_style_selected();
-                  }
-
-                  Button {
-                    styles [
-                      "accent-color-btn",
-                      "btn-red",
-                    ]
-
-                    clicked => $on_style_selected();
-                  }
-
-                  Button {
-                    styles [
-                      "accent-color-btn",
-                      "btn-purple",
-                    ]
-
-                    clicked => $on_style_selected();
+                      clicked => $on_style_selected();
+                    }
                   }
                 }
               };
