@@ -101,6 +101,10 @@ template $Window : Adw.ApplicationWindow {
             title: _("Empty");
             vexpand: true;
             visible: bind trash_list_scrl.visible inverted;
+
+            styles [
+            "compact",
+            ]
           }
 
           ScrolledWindow trash_list_scrl {
