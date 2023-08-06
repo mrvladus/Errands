@@ -2,8 +2,8 @@ using Gtk 4.0;
 using Adw 1;
 
 template $Window : Adw.ApplicationWindow {
-  width-request: 300;
-  height-request: 300;
+  width-request: 360;
+  height-request: 294;
   title: "Errands";
   content: Adw.ToastOverlay toast_overlay {
     Box {
@@ -87,7 +87,7 @@ template $Window : Adw.ApplicationWindow {
         reveal-flap: bind toggle_trash_btn.active bidirectional;
         flap: Box {
           orientation: vertical;
-          width-request: 250;
+          width-request: 300;
           hexpand: false;
 
           styles [
@@ -112,12 +112,11 @@ template $Window : Adw.ApplicationWindow {
             Box trash_list {
               orientation: vertical;
               spacing: 5;
-              hexpand: false;
+              margin-bottom: 6;
+              margin-top: 6;
+              margin-start: 12;
+              margin-end: 6;
               vexpand: true;
-              margin-start: 5;
-              margin-end: 5;
-              margin-top: 5;
-              margin-bottom: 5;
             }
           }
 
@@ -125,13 +124,12 @@ template $Window : Adw.ApplicationWindow {
 
           Box {
             hexpand: true;
-            halign: center;
-            margin-top: 5;
-            margin-bottom: 5;
-            margin-start: 5;
-            margin-end: 5;
-            spacing: 5;
+            homogeneous: true;
             visible: bind trash_list_scrl.visible;
+
+            styles [
+              "toolbar",
+            ]
 
             Button {
               child: Adw.ButtonContent {
