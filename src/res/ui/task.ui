@@ -75,7 +75,7 @@
                 <property name="transition-type">1</property>
                 <property name="valign">center</property>
                 <property name="halign">end</property>
-                <property name="margin-end">45</property>
+                <property name="margin-end">50</property>
                 <property name="can-target">false</property>
                 <property name="reveal-child" bind-source="hover_ctrl" bind-property="contains-pointer" bind-flags="sync-create" />
                 <child>
@@ -133,102 +133,16 @@
                           <object class="GtkEventControllerMotion" id="hover_ctrl" />
                         </child>
 
-                        <!-- Menu -->
-                        <child type="end">
-                          <object class="GtkMenuButton">
-                            <property name="icon-name">view-more-symbolic</property>
+                        <!-- Mark as completed button -->
+                        <child>
+                          <object class="GtkCheckButton" id="task_completed_btn">
+                            <property name="margin-end">5</property>
                             <property name="valign">center</property>
-                            <property name="popover">
-                              <object class="GtkPopoverMenu">
-                                <property name="menu-model">task_menu</property>
-                                <child type="accent">
-                                  <object class="GtkBox">
-                                    <property name="spacing">5</property>
-                                    <!-- Clear style button -->
-                                    <child>
-                                      <object class="GtkButton">
-                                        <property name="icon-name">window-close-symbolic</property>
-                                        <property name="tooltip-text" translatable="yes">Clear style</property>
-                                        <signal name="clicked" handler="on_style_selected" />
-                                        <accessibility>
-                                          <property name="label" translatable="yes">Clear style</property>
-                                        </accessibility>
-                                        <style>
-                                          <class name="accent-color-btn" />
-                                        </style>
-                                      </object>
-                                    </child>
-                                    <!-- Blue style button -->
-                                    <child>
-                                      <object class="GtkButton">
-                                        <style>
-                                          <class name="accent-color-btn" />
-                                          <class name="btn-blue" />
-                                        </style>
-                                        <signal name="clicked" handler="on_style_selected" />
-                                      </object>
-                                    </child>
-                                    <!-- Green style button -->
-                                    <child>
-                                      <object class="GtkButton">
-                                        <style>
-                                          <class name="accent-color-btn" />
-                                          <class name="btn-green" />
-                                        </style>
-                                        <signal name="clicked" handler="on_style_selected" />
-                                      </object>
-                                    </child>
-                                    <!-- Yellow style button -->
-                                    <child>
-                                      <object class="GtkButton">
-                                        <style>
-                                          <class name="accent-color-btn" />
-                                          <class name="btn-yellow" />
-                                        </style>
-                                        <signal name="clicked" handler="on_style_selected" />
-                                      </object>
-                                    </child>
-                                    <!-- Orange style button -->
-                                    <child>
-                                      <object class="GtkButton">
-                                        <style>
-                                          <class name="accent-color-btn" />
-                                          <class name="btn-orange" />
-                                        </style>
-                                        <signal name="clicked" handler="on_style_selected" />
-                                      </object>
-                                    </child>
-                                    <!-- Red style button -->
-                                    <child>
-                                      <object class="GtkButton">
-                                        <style>
-                                          <class name="accent-color-btn" />
-                                          <class name="btn-red" />
-                                        </style>
-                                        <signal name="clicked" handler="on_style_selected" />
-                                      </object>
-                                    </child>
-                                    <!-- Purple style button -->
-                                    <child>
-                                      <object class="GtkButton">
-                                        <style>
-                                          <class name="accent-color-btn" />
-                                          <class name="btn-purple" />
-                                        </style>
-                                        <signal name="clicked" handler="on_style_selected" />
-                                      </object>
-                                    </child>
-                                  </object>
-                                </child>
-                              </object>
-                            </property>
-                            <property name="tooltip-text" translatable="yes">Menu</property>
+                            <property name="tooltip-text" translatable="yes">Mark as Completed</property>
+                            <signal name="toggled" handler="on_task_completed_btn_toggled" />
                             <accessibility>
-                              <property name="label" translatable="yes">Menu</property>
+                              <property name="label" translatable="yes">Mark as Completed</property>
                             </accessibility>
-                            <style>
-                              <class name="flat" />
-                            </style>
                           </object>
                         </child>
 
@@ -250,15 +164,133 @@
                           </object>
                         </child>
 
-                        <!-- Mark as completed button -->
-                        <child>
-                          <object class="GtkCheckButton" id="task_completed_btn">
+                        <!-- Menu -->
+                        <child type="end">
+                          <object class="GtkMenuButton">
+                            <property name="icon-name">view-more-symbolic</property>
                             <property name="valign">center</property>
-                            <property name="tooltip-text" translatable="yes">Mark as Completed</property>
-                            <signal name="toggled" handler="on_task_completed_btn_toggled" />
+                            <property name="popover">
+                              <object class="GtkPopoverMenu">
+                                <property name="menu-model">task_menu</property>
+                                <child type="accent">
+                                  <object class="GtkBox">
+                                    <property name="spacing">5</property>
+                                    <property name="orientation">vertical</property>
+                                    <property name="homogeneous">true</property>
+                                    <child>
+                                      <object class="GtkBox">
+                                        <property name="spacing">5</property>
+                                        <!-- Clear style button -->
+                                        <child>
+                                          <object class="GtkButton">
+                                            <property name="icon-name">window-close-symbolic</property>
+                                            <property name="tooltip-text" translatable="yes">Clear style</property>
+                                            <signal name="clicked" handler="on_style_selected" />
+                                            <accessibility>
+                                              <property name="label" translatable="yes">Clear style</property>
+                                            </accessibility>
+                                            <style>
+                                              <class name="accent-color-btn" />
+                                              <class name="circular" />
+                                            </style>
+                                          </object>
+                                        </child>
+                                        <!-- Blue style button -->
+                                        <child>
+                                          <object class="GtkButton">
+                                            <style>
+                                              <class name="accent-color-btn" />
+                                              <class name="btn-blue" />
+                                              <class name="circular" />
+                                            </style>
+                                            <signal name="clicked" handler="on_style_selected" />
+                                          </object>
+                                        </child>
+                                        <!-- Green style button -->
+                                        <child>
+                                          <object class="GtkButton">
+                                            <style>
+                                              <class name="accent-color-btn" />
+                                              <class name="btn-green" />
+                                              <class name="circular" />
+                                            </style>
+                                            <signal name="clicked" handler="on_style_selected" />
+                                          </object>
+                                        </child>
+                                        <!-- Yellow style button -->
+                                        <child>
+                                          <object class="GtkButton">
+                                            <style>
+                                              <class name="accent-color-btn" />
+                                              <class name="btn-yellow" />
+                                              <class name="circular" />
+                                            </style>
+                                            <signal name="clicked" handler="on_style_selected" />
+                                          </object>
+                                        </child>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="GtkBox">
+                                        <property name="spacing">5</property>
+                                        <!-- Orange style button -->
+                                        <child>
+                                          <object class="GtkButton">
+                                            <style>
+                                              <class name="accent-color-btn" />
+                                              <class name="btn-orange" />
+                                              <class name="circular" />
+                                            </style>
+                                            <signal name="clicked" handler="on_style_selected" />
+                                          </object>
+                                        </child>
+                                        <!-- Red style button -->
+                                        <child>
+                                          <object class="GtkButton">
+                                            <style>
+                                              <class name="accent-color-btn" />
+                                              <class name="btn-red" />
+                                              <class name="circular" />
+                                            </style>
+                                            <signal name="clicked" handler="on_style_selected" />
+                                          </object>
+                                        </child>
+                                        <!-- Purple style button -->
+                                        <child>
+                                          <object class="GtkButton">
+                                            <style>
+                                              <class name="accent-color-btn" />
+                                              <class name="btn-purple" />
+                                              <class name="circular" />
+                                            </style>
+                                            <signal name="clicked" handler="on_style_selected" />
+                                          </object>
+                                        </child>
+                                        <!-- Brown style button -->
+                                        <child>
+                                          <object class="GtkButton">
+                                            <style>
+                                              <class name="accent-color-btn" />
+                                              <class name="btn-brown" />
+                                              <class name="circular" />
+                                            </style>
+                                            <signal name="clicked" handler="on_style_selected" />
+                                          </object>
+                                        </child>
+                                      </object>
+                                    </child>
+
+                                  </object>
+                                </child>
+                              </object>
+                            </property>
+                            <property name="tooltip-text" translatable="yes">Menu</property>
                             <accessibility>
-                              <property name="label" translatable="yes">Mark as Completed</property>
+                              <property name="label" translatable="yes">Menu</property>
                             </accessibility>
+                            <style>
+                              <class name="flat" />
+                            </style>
                           </object>
                         </child>
 

@@ -48,19 +48,16 @@
                 <property name="margin-end">10</property>
                 <property name="spacing">5</property>
 
-                <!-- Menu -->
-                <child type="end">
-                  <object class="GtkMenuButton">
-                    <property name="icon-name">view-more-symbolic</property>
-                    <property name="menu-model">sub_task_menu</property>
+                <!-- Mark as completed button -->
+                <child>
+                  <object class="GtkCheckButton" id="sub_task_completed_btn">
+                    <property name="margin-end">5</property>
                     <property name="valign">center</property>
-                    <property name="tooltip-text" translatable="yes">Menu</property>
+                    <property name="tooltip-text" translatable="yes">Mark as Completed</property>
+                    <signal name="toggled" handler="on_completed_btn_toggled" />
                     <accessibility>
-                      <property name="label" translatable="yes">Menu</property>
+                      <property name="label" translatable="yes">Mark as Completed</property>
                     </accessibility>
-                    <style>
-                      <class name="flat" />
-                    </style>
                   </object>
                 </child>
 
@@ -80,15 +77,19 @@
                   </object>
                 </child>
 
-                <!-- Mark as completed button -->
-                <child>
-                  <object class="GtkCheckButton" id="sub_task_completed_btn">
+                <!-- Menu -->
+                <child type="end">
+                  <object class="GtkMenuButton">
+                    <property name="icon-name">view-more-symbolic</property>
+                    <property name="menu-model">sub_task_menu</property>
                     <property name="valign">center</property>
-                    <property name="tooltip-text" translatable="yes">Mark as Completed</property>
-                    <signal name="toggled" handler="on_completed_btn_toggled" />
+                    <property name="tooltip-text" translatable="yes">Menu</property>
                     <accessibility>
-                      <property name="label" translatable="yes">Mark as Completed</property>
+                      <property name="label" translatable="yes">Menu</property>
                     </accessibility>
+                    <style>
+                      <class name="flat" />
+                    </style>
                   </object>
                 </child>
 

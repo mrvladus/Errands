@@ -3,303 +3,309 @@
   <requires lib="gtk" version="4.0" />
   <requires lib="Adw" version="1.0" />
   <template class="Window" parent="AdwApplicationWindow">
-    <property name="width-request">300</property>
-    <property name="height-request">300</property>
+    <property name="width-request">360</property>
+    <property name="height-request">296</property>
     <property name="title">Errands</property>
     <property name="content">
       <object class="AdwToastOverlay" id="toast_overlay">
-        <child>
-          <object class="GtkBox">
-            <property name="orientation">vertical</property>
 
-            <!-- Header bar -->
-            <child>
-              <object class="AdwHeaderBar">
+        <!-- Flap -->
+        <child>
+          <object class="AdwFlap">
+            <property name="locked">true</property>
+            <property name="fold-policy">auto</property>
+            <property name="reveal-flap" bind-source="toggle_trash_btn" bind-property="active" bind-flags="sync-create|bidirectional" />
+
+            <!-- Trash panel -->
+            <property name="flap">
+              <object class="GtkBox">
+                <property name="orientation">vertical</property>
+                <property name="width-request">300</property>
+                <property name="hexpand">false</property>
                 <style>
-                  <class name="flat" />
+                  <class name="background" />
                 </style>
 
-                <!-- Toggle trash button -->
-                <child type="start">
-                  <object class="GtkToggleButton" id="toggle_trash_btn">
-                    <property name="icon-name">sidebar-show-symbolic</property>
-                    <property name="active">false</property>
-                    <property name="tooltip-text" translatable="yes">Show Deleted Tasks</property>
-                    <accessibility>
-                      <property name="label" translatable="yes">Show Deleted Tasks</property>
-                    </accessibility>
-                  </object>
-                </child>
-
-                <!-- Delete completed tasks button -->
-                <child type="start">
-                  <object class="GtkButton" id="delete_completed_tasks_btn">
-                    <property name="valign">center</property>
-                    <property name="icon-name">edit-clear-all-symbolic</property>
-                    <property name="tooltip-text" translatable="yes">Delete Completed Tasks</property>
-                    <signal name="clicked" handler="on_delete_completed_tasks_btn_clicked" />
-                    <accessibility>
-                      <property name="label" translatable="yes">Delete Completed Tasks</property>
-                    </accessibility>
-                    <child>
-                      <object class="GtkShortcutController">
-                        <property name="scope">managed</property>
-                        <child>
-                          <object class="GtkShortcut">
-                            <property name="trigger">&lt;Control&gt;Delete</property>
-                            <property name="action">activate</property>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
+                <!-- Status page -->
+                <child>
+                  <object class="AdwStatusPage">
+                    <property name="icon-name">user-trash-symbolic</property>
+                    <property name="title" translatable="yes">Empty Trash</property>
+                    <property name="description" translatable="yes">No deleted items</property>
+                    <property name="vexpand">true</property>
+                    <property name="visible" bind-source="trash_list_scrl" bind-property="visible" bind-flags="sync-create|invert-boolean" />
                     <style>
-                      <class name="flat" />
+                      <class name="compact" />
                     </style>
                   </object>
                 </child>
 
-                <!-- Menu -->
-                <child type="end">
-                  <object class="GtkMenuButton">
-                    <property name="primary">true</property>
-                    <property name="icon-name">open-menu-symbolic</property>
-                    <property name="menu-model">primary_menu</property>
-                    <property name="tooltip-text" translatable="yes">Main Menu</property>
-                    <accessibility>
-                      <property name="label" translatable="yes">Main Menu</property>
-                    </accessibility>
+                <!-- Trash list -->
+                <child>
+                  <object class="GtkScrolledWindow" id="trash_list_scrl">
+                    <child>
+                      <object class="GtkBox" id="trash_list">
+                        <property name="orientation">vertical</property>
+                        <property name="spacing">5</property>
+                        <property name="hexpand">false</property>
+                        <property name="vexpand">true</property>
+                        <property name="margin-start">12</property>
+                        <property name="margin-end">6</property>
+                        <property name="margin-top">6</property>
+                        <property name="margin-bottom">6</property>
+                      </object>
+                    </child>
                   </object>
                 </child>
 
-                <!-- Scroll up button -->
-                <child type="end">
-                  <object class="GtkRevealer" id="scroll_up_btn_rev">
-                    <property name="valign">end</property>
-                    <property name="halign">end</property>
-                    <property name="transition-type">1</property>
+                <child>
+                  <object class="GtkSeparator">
+                    <property name="visible" bind-source="trash_list_scrl" bind-property="visible" bind-flags="sync-create" />
+                  </object>
+                </child>
+
+                <!-- Buttons -->
+                <child>
+                  <object class="GtkBox">
+                    <property name="hexpand">true</property>
+                    <property name="visible" bind-source="trash_list_scrl" bind-property="visible" bind-flags="sync-create" />
+                    <style>
+                      <class name="toolbar" />
+                    </style>
+
+                    <!-- Clear button -->
                     <child>
                       <object class="GtkButton">
-                        <property name="icon-name">go-up-symbolic</property>
-                        <property name="tooltip-text" translatable="yes">Scroll Up</property>
-                        <signal name="clicked" handler="on_scroll_up_btn_clicked" />
-                        <accessibility>
-                          <property name="label" translatable="yes">Scroll Up</property>
-                        </accessibility>
+                        <property name="hexpand">true</property>
+                        <property name="child">
+                          <object class="AdwButtonContent">
+                            <property name="icon-name">edit-delete-symbolic</property>
+                            <property name="label" translatable="yes">Clear</property>
+                          </object>
+                        </property>
+                        <signal name="clicked" handler="on_trash_clear" />
                       </object>
                     </child>
+
+                    <!-- Restore all button -->
+                    <child>
+                      <object class="GtkButton">
+                        <property name="hexpand">true</property>
+                        <property name="child">
+                          <object class="AdwButtonContent">
+                            <property name="icon-name">emblem-ok-symbolic</property>
+                            <property name="label" translatable="yes">Restore All</property>
+                          </object>
+                        </property>
+                        <signal name="clicked" handler="on_trash_restore" />
+                      </object>
+                    </child>
+
                   </object>
                 </child>
 
               </object>
-            </child>
+            </property>
 
-            <!-- Flap -->
-            <child>
-              <object class="AdwFlap">
-                <property name="locked">true</property>
-                <property name="fold-policy">1</property>
-                <property name="reveal-flap" bind-source="toggle_trash_btn" bind-property="active" bind-flags="sync-create|bidirectional" />
+            <property name="separator">
+              <object class="GtkSeparator">
+                <property name="orientation">vertical</property>
+              </object>
+            </property>
 
-                <!-- Trash panel -->
-                <property name="flap">
-                  <object class="GtkBox">
-                    <property name="orientation">vertical</property>
-                    <property name="width-request">250</property>
-                    <property name="hexpand">false</property>
+            <!-- Main content box -->
+            <property name="content">
+              <object class="GtkBox">
+                <property name="orientation">vertical</property>
+
+                <!-- Header bar -->
+                <child>
+                  <object class="AdwHeaderBar">
                     <style>
-                      <class name="background" />
+                      <class name="flat" />
                     </style>
 
-                    <child>
-                      <object class="GtkSeparator" />
-                    </child>
-
-                    <!-- Status page -->
-                    <child>
-                      <object class="AdwStatusPage">
-                        <property name="icon-name">user-trash-symbolic</property>
-                        <property name="title" translatable="yes">Empty</property>
-                        <property name="vexpand">true</property>
-                        <property name="visible" bind-source="trash_list_scrl" bind-property="visible" bind-flags="sync-create|invert-boolean" />
+                    <!-- Toggle trash button -->
+                    <child type="start">
+                      <object class="GtkToggleButton" id="toggle_trash_btn">
+                        <property name="icon-name">sidebar-show-symbolic</property>
+                        <property name="active">false</property>
+                        <property name="tooltip-text" translatable="yes">Show Deleted Tasks</property>
+                        <accessibility>
+                          <property name="label" translatable="yes">Show Deleted Tasks</property>
+                        </accessibility>
                       </object>
                     </child>
 
-                    <!-- Trash list -->
-                    <child>
-                      <object class="GtkScrolledWindow" id="trash_list_scrl">
+                    <!-- Delete completed tasks button -->
+                    <child type="start">
+                      <object class="GtkButton" id="delete_completed_tasks_btn">
+                        <property name="valign">center</property>
+                        <property name="icon-name">edit-clear-all-symbolic</property>
+                        <property name="tooltip-text" translatable="yes">Delete Completed Tasks</property>
+                        <signal name="clicked" handler="on_delete_completed_tasks_btn_clicked" />
+                        <accessibility>
+                          <property name="label" translatable="yes">Delete Completed Tasks</property>
+                        </accessibility>
                         <child>
-                          <object class="GtkBox" id="trash_list">
-                            <property name="orientation">vertical</property>
-                            <property name="spacing">5</property>
-                            <property name="hexpand">false</property>
-                            <property name="vexpand">true</property>
-                            <property name="margin-start">5</property>
-                            <property name="margin-end">5</property>
-                            <property name="margin-top">5</property>
-                            <property name="margin-bottom">5</property>
+                          <object class="GtkShortcutController">
+                            <property name="scope">managed</property>
+                            <child>
+                              <object class="GtkShortcut">
+                                <property name="trigger">&lt;Control&gt;Delete</property>
+                                <property name="action">activate</property>
+                              </object>
+                            </child>
                           </object>
                         </child>
+                        <style>
+                          <class name="flat" />
+                        </style>
                       </object>
                     </child>
 
-                    <child>
-                      <object class="GtkSeparator" />
+                    <!-- Menu -->
+                    <child type="end">
+                      <object class="GtkMenuButton">
+                        <property name="primary">true</property>
+                        <property name="icon-name">open-menu-symbolic</property>
+                        <property name="menu-model">primary_menu</property>
+                        <property name="tooltip-text" translatable="yes">Main Menu</property>
+                        <accessibility>
+                          <property name="label" translatable="yes">Main Menu</property>
+                        </accessibility>
+                      </object>
                     </child>
 
-                    <!-- Buttons -->
-                    <child>
-                      <object class="GtkBox">
-                        <property name="hexpand">true</property>
-                        <property name="halign">center</property>
-                        <property name="margin-top">5</property>
-                        <property name="margin-bottom">5</property>
-                        <property name="margin-start">5</property>
-                        <property name="margin-end">5</property>
-                        <property name="spacing">5</property>
-                        <property name="visible" bind-source="trash_list_scrl" bind-property="visible" bind-flags="sync-create" />
-
-                        <!-- Clear button -->
+                    <!-- Scroll up button -->
+                    <child type="end">
+                      <object class="GtkRevealer" id="scroll_up_btn_rev">
+                        <property name="valign">end</property>
+                        <property name="halign">end</property>
+                        <property name="transition-type">1</property>
                         <child>
                           <object class="GtkButton">
-                            <property name="child">
-                              <object class="AdwButtonContent">
-                                <property name="icon-name">edit-delete-symbolic</property>
-                                <property name="label" translatable="yes">Clear</property>
-                              </object>
-                            </property>
-                            <signal name="clicked" handler="on_trash_clear" />
+                            <property name="icon-name">go-up-symbolic</property>
+                            <property name="tooltip-text" translatable="yes">Scroll Up</property>
+                            <signal name="clicked" handler="on_scroll_up_btn_clicked" />
+                            <accessibility>
+                              <property name="label" translatable="yes">Scroll Up</property>
+                            </accessibility>
                           </object>
                         </child>
-
-                        <!-- Restore all button -->
-                        <child>
-                          <object class="GtkButton">
-                            <property name="child">
-                              <object class="AdwButtonContent">
-                                <property name="icon-name">emblem-ok-symbolic</property>
-                                <property name="label" translatable="yes">Restore All</property>
-                              </object>
-                            </property>
-                            <signal name="clicked" handler="on_trash_restore" />
-                          </object>
-                        </child>
-
                       </object>
                     </child>
 
                   </object>
-                </property>
+                </child>
 
-                <!-- Main content box -->
-                <property name="content">
-                  <object class="GtkBox">
-                    <property name="orientation">vertical</property>
-                    <child>
-                      <object class="AdwClamp">
-                        <property name="maximum-size">850</property>
-                        <property name="tightening-threshold">300</property>
-                        <child>
-                          <object class="GtkOverlay">
-
-                            <!-- Entry -->
-                            <child>
-                              <object class="GtkListBox">
-                                <property name="margin-top">10</property>
-                                <property name="margin-bottom">12</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="selection-mode">0</property>
-                                <style>
-                                  <class name="boxed-list" />
-                                </style>
-                                <child>
-                                  <object class="AdwEntryRow" id="task_entry_row">
-                                    <property name="activatable">false</property>
-                                    <property name="height-request">60</property>
-                                    <property name="title" translatable="yes">Add new Task</property>
-                                    <signal name="entry-activated" handler="on_task_added" />
-                                  </object>
-                                </child>
-                              </object>
-                            </child>
-
-                            <!-- Status bar -->
-                            <child type="overlay">
-                              <object class="GtkProgressBar" id="status">
-                                <property name="valign">end</property>
-                                <property name="margin-bottom">12</property>
-                                <property name="margin-start">22</property>
-                                <property name="margin-end">22</property>
-                                <style>
-                                  <class name="osd" />
-                                </style>
-                              </object>
-                            </child>
-
-                          </object>
-                        </child>
-                      </object>
-                    </child>
-
-                    <!-- Todo list -->
+                <child>
+                  <object class="AdwClamp">
+                    <property name="maximum-size">850</property>
+                    <property name="tightening-threshold">300</property>
                     <child>
                       <object class="GtkOverlay">
 
-                        <!-- Separator on top -->
-                        <child type="overlay">
-                          <object class="GtkBox" id="separator">
-                            <property name="valign">start</property>
-                            <property name="can-target">false</property>
-                            <property name="height-request">4</property>
+                        <!-- Entry -->
+                        <child>
+                          <object class="GtkListBox">
+                            <property name="margin-top">10</property>
+                            <property name="margin-bottom">12</property>
+                            <property name="margin-start">12</property>
+                            <property name="margin-end">12</property>
+                            <property name="selection-mode">0</property>
                             <style>
-                              <class name="fade" />
+                              <class name="boxed-list" />
+                            </style>
+                            <child>
+                              <object class="AdwEntryRow" id="task_entry_row">
+                                <property name="activatable">false</property>
+                                <property name="height-request">60</property>
+                                <property name="title" translatable="yes">Add new Task</property>
+                                <signal name="entry-activated" handler="on_task_added" />
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+
+                        <!-- Status bar -->
+                        <child type="overlay">
+                          <object class="GtkProgressBar" id="status">
+                            <property name="valign">end</property>
+                            <property name="margin-bottom">12</property>
+                            <property name="margin-start">22</property>
+                            <property name="margin-end">22</property>
+                            <style>
+                              <class name="osd" />
                             </style>
                           </object>
                         </child>
 
-                        <!-- Scrolled window -->
-                        <child>
-                          <object class="GtkScrolledWindow" id="scrolled_window">
-                            <property name="propagate-natural-height">true</property>
-                            <property name="propagate-natural-width">true</property>
-                            <property name="vadjustment">
-                              <object class="GtkAdjustment">
-                                <signal name="value_changed" handler="on_scroll" />
-                              </object>
-                            </property>
-
-                            <!-- Drag and Drop scroll controller -->
-                            <child>
-                              <object class="GtkDropControllerMotion" id="drop_motion_ctrl">
-                                <signal name="motion" handler="on_dnd_scroll" />
-                              </object>
-                            </child>
-
-                            <!-- Tasks list -->
-                            <child>
-                              <object class="AdwClamp">
-                                <property name="maximum-size">850</property>
-                                <property name="tightening-threshold">300</property>
-                                <property name="vexpand">true</property>
-                                <child>
-                                  <object class="GtkBox" id="tasks_list">
-                                    <property name="orientation">vertical</property>
-                                    <property name="hexpand">true</property>
-                                  </object>
-                                </child>
-                              </object>
-                            </child>
-
-                          </object>
-                        </child>
                       </object>
                     </child>
                   </object>
-                </property>
+                </child>
+
+                <!-- Todo list -->
+                <child>
+                  <object class="GtkOverlay">
+
+                    <!-- Separator on top -->
+                    <child type="overlay">
+                      <object class="GtkBox" id="separator">
+                        <property name="valign">start</property>
+                        <property name="can-target">false</property>
+                        <property name="height-request">4</property>
+                        <style>
+                          <class name="fade" />
+                        </style>
+                      </object>
+                    </child>
+
+                    <!-- Scrolled window -->
+                    <child>
+                      <object class="GtkScrolledWindow" id="scrolled_window">
+                        <property name="propagate-natural-height">true</property>
+                        <property name="propagate-natural-width">true</property>
+                        <property name="vadjustment">
+                          <object class="GtkAdjustment">
+                            <signal name="value_changed" handler="on_scroll" />
+                          </object>
+                        </property>
+
+                        <!-- Drag and Drop scroll controller -->
+                        <child>
+                          <object class="GtkDropControllerMotion" id="drop_motion_ctrl">
+                            <signal name="motion" handler="on_dnd_scroll" />
+                          </object>
+                        </child>
+
+                        <!-- Tasks list -->
+                        <child>
+                          <object class="AdwClamp">
+                            <property name="maximum-size">850</property>
+                            <property name="tightening-threshold">300</property>
+                            <property name="vexpand">true</property>
+                            <child>
+                              <object class="GtkBox" id="tasks_list">
+                                <property name="orientation">vertical</property>
+                                <property name="hexpand">true</property>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+
+                      </object>
+                    </child>
+                  </object>
+                </child>
+
               </object>
-            </child>
+            </property>
+
           </object>
         </child>
+
       </object>
     </property>
   </template>

@@ -60,27 +60,6 @@
           </object>
         </child>
 
-        <!-- Tasks settings -->
-        <child>
-          <object class="AdwPreferencesGroup">
-            <property name="title" translatable="yes">Tasks</property>
-
-            <!-- Expand sub-tasks -->
-            <child>
-              <object class="AdwActionRow">
-                <property name="title" translatable="yes">Tasks Expanded on Startup</property>
-                <property name="activatable-widget">tasks_expanded</property>
-                <child type="suffix">
-                  <object class="GtkSwitch" id="tasks_expanded">
-                    <property name="valign">center</property>
-                  </object>
-                </child>
-              </object>
-            </child>
-
-          </object>
-        </child>
-
         <!-- History settings -->
         <child>
           <object class="AdwPreferencesGroup">
