@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0" />
+  <requires lib="Adw" version="1.0" />
+  <template class="PreferencesWindow" parent="AdwPreferencesWindow">
+    <property name="hide-on-close">true</property>
+    <property name="search-enabled">false</property>
+    <child>
+      <object class="AdwPreferencesPage">
+
+        <!-- Theme -->
+        <child>
+          <object class="AdwPreferencesGroup">
+            <property name="title" translatable="yes">Application Theme</property>
+
+            <!-- System -->
+            <child>
+              <object class="AdwActionRow">
+                <property name="title" translatable="yes">System</property>
+                <property name="activatable-widget">system_theme</property>
+                <property name="icon-name">applications-system-symbolic</property>
+                <child type="suffix">
+                  <object class="GtkCheckButton" id="system_theme">
+                    <signal name="toggled" handler="on_theme_change" />
+                  </object>
+                </child>
+              </object>
+            </child>
+
+            <!-- Light -->
+            <child>
+              <object class="AdwActionRow">
+                <property name="title" translatable="yes">Light</property>
+                <property name="activatable-widget">light_theme</property>
+                <property name="icon-name">display-brightness-symbolic</property>
+                <child type="suffix">
+                  <object class="GtkCheckButton" id="light_theme">
+                    <property name="group">system_theme</property>
+                    <signal name="toggled" handler="on_theme_change" />
+                  </object>
+                </child>
+              </object>
+            </child>
+
+            <!-- Dark -->
+            <child>
+              <object class="AdwActionRow">
+                <property name="title" translatable="yes">Dark</property>
+                <property name="activatable-widget">dark_theme</property>
+                <property name="icon-name">weather-clear-night-symbolic</property>
+                <child type="suffix">
+                  <object class="GtkCheckButton" id="dark_theme">
+                    <property name="group">system_theme</property>
+                    <signal name="toggled" handler="on_theme_change" />
+                  </object>
+                </child>
+              </object>
+            </child>
+
+          </object>
+        </child>
+
+        <!-- Tasks settings -->
+        <child>
+          <object class="AdwPreferencesGroup">
+            <property name="title" translatable="yes">Tasks</property>
+
+            <!-- Expand sub-tasks -->
+            <child>
+              <object class="AdwActionRow">
+                <property name="title" translatable="yes">Tasks Expanded on Startup</property>
+                <property name="activatable-widget">tasks_expanded</property>
+                <child type="suffix">
+                  <object class="GtkSwitch" id="tasks_expanded">
+                    <property name="valign">center</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+
+          </object>
+        </child>
+
+        <!-- History settings -->
+        <child>
+          <object class="AdwPreferencesGroup">
+            <property name="title" translatable="yes">History</property>
+
+            <!-- Delete history on startup -->
+            <child>
+              <object class="AdwActionRow">
+                <property name="title" translatable="yes">Clear History on Startup</property>
+                <property name="activatable-widget">clear_history_on_startup</property>
+                <child type="suffix">
+                  <object class="GtkSwitch" id="clear_history_on_startup">
+                    <property name="valign">center</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+
+            <!-- History size -->
+            <child>
+              <object class="AdwActionRow">
+                <property name="title" translatable="yes">History Size</property>
+                <child type="suffix">
+                  <object class="GtkSpinButton">
+                    <property name="valign">center</property>
+                    <property name="numeric">true</property>
+                    <property name="update-policy">1</property>
+                    <property name="adjustment">
+                      <object class="GtkAdjustment" id="history_size">
+                        <property name="lower">0</property>
+                        <property name="upper">100</property>
+                        <property name="step-increment">1</property>
+                      </object>
+                    </property>
+                  </object>
+                </child>
+              </object>
+            </child>
+
+          </object>
+        </child>
+
+        <!-- Backup settings -->
+        <child>
+          <object class="AdwPreferencesGroup">
+            <property name="title" translatable="yes">Backup</property>
+            <child>
+              <object class="AdwActionRow">
+                <property name="title" translatable="yes">Save data backup to Home folder</property>
+                <property name="subtitle" translatable="yes">File name is "list_backup_data.json"</property>
+                <property name="activatable-widget">save_backup</property>
+                <child type="suffix">
+                  <object class="GtkButton" id="save_backup">
+                    <property name="icon-name">document-save-symbolic</property>
+                    <property name="valign">center</property>
+                    <signal name="clicked" handler="on_save_backup" />
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+
+      </object>
+    </child>
+  </template>
+</interface>
