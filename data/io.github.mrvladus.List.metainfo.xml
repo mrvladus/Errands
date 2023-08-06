@@ -68,10 +68,6 @@
           <li>Added Czech translation (Amerey.eu)</li>
           <li>Added Portuguese translation (Vitor Gabriel Gomes)</li>
         </ul>
-        <p>Backend:</p>
-        <ul>
-          <li>Ported UI files to Blueprint</li>
-        </ul>
       </description>
     </release>
     <release version="44.6.8" date="2023-07-10">
