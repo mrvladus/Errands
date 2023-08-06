@@ -6,229 +6,226 @@ template $Window : Adw.ApplicationWindow {
   height-request: 294;
   title: "Errands";
   content: Adw.ToastOverlay toast_overlay {
-    Box {
-      orientation: vertical;
+    Adw.Flap {
+      locked: true;
+      fold-policy: auto;
+      reveal-flap: bind toggle_trash_btn.active bidirectional;
+      flap: Box {
+        orientation: vertical;
+        width-request: 300;
+        hexpand: false;
 
-      Adw.HeaderBar {
         styles [
-          "flat",
+          "background",
         ]
 
-        [start]
-        ToggleButton toggle_trash_btn {
-          icon-name: "sidebar-show-symbolic";
-          active: false;
-          tooltip-text: _("Show Deleted Tasks");
+        Separator {}
 
-          accessibility {
-            label: _("Show Deleted Tasks");
+        Adw.StatusPage {
+          icon-name: "user-trash-symbolic";
+          title: _("Empty Trash");
+          description: _("No deleted items");
+          vexpand: true;
+          visible: bind trash_list_scrl.visible inverted;
+
+          styles [
+          "compact",
+          ]
+        }
+
+        ScrolledWindow trash_list_scrl {
+          Box trash_list {
+            orientation: vertical;
+            spacing: 5;
+            margin-bottom: 6;
+            margin-top: 6;
+            margin-start: 12;
+            margin-end: 6;
+            vexpand: true;
+            hexpand: false;
           }
         }
 
-        [start]
-        Button delete_completed_tasks_btn {
-          valign: center;
-          icon-name: "edit-clear-all-symbolic";
-          tooltip-text: _("Delete Completed Tasks");
-          clicked => $on_delete_completed_tasks_btn_clicked();
+        Separator {}
 
-          accessibility {
-            label: _("Delete Completed Tasks");
+        Box {
+          hexpand: true;
+          homogeneous: true;
+          visible: bind trash_list_scrl.visible;
+
+          styles [
+            "toolbar",
+          ]
+
+          Button {
+            child: Adw.ButtonContent {
+              icon-name: "edit-delete-symbolic";
+              label: _("Clear");
+            };
+            clicked => $on_trash_clear();
           }
 
+          Button {
+            child: Adw.ButtonContent {
+              icon-name: "emblem-ok-symbolic";
+              label: _("Restore All");
+            };
+            clicked => $on_trash_restore();
+          }
+        }
+      };
+      separator: Separator {
+        orientation: vertical;
+      };
+      content: Box {
+        orientation: vertical;
+
+        Adw.HeaderBar {
           styles [
             "flat",
           ]
 
-          ShortcutController {
-            scope: managed;
-
-            Shortcut {
-              trigger: "<Control>Delete";
-              action: "activate";
-            }
-          }
-
-        }
-
-        [end]
-        MenuButton {
-          primary: true;
-          icon-name: "open-menu-symbolic";
-          menu-model: primary_menu;
-          tooltip-text: _("Main Menu");
-
-          accessibility {
-            label: _("Main Menu");
-          }
-        }
-
-        [end]
-        Revealer scroll_up_btn_rev {
-          valign: end;
-          halign: end;
-          transition-type: crossfade;
-
-          Button {
-            icon-name: "go-up-symbolic";
-            tooltip-text: _("Scroll Up");
-            clicked => $on_scroll_up_btn_clicked();
+          [start]
+          ToggleButton toggle_trash_btn {
+            icon-name: "sidebar-show-symbolic";
+            active: false;
+            tooltip-text: _("Show Deleted Tasks");
 
             accessibility {
-              label: _("Scroll Up");
+              label: _("Show Deleted Tasks");
             }
           }
-        }
-      }
 
-      Adw.Flap {
-        locked: true;
-        fold-policy: always;
-        reveal-flap: bind toggle_trash_btn.active bidirectional;
-        flap: Box {
-          orientation: vertical;
-          width-request: 300;
-          hexpand: false;
+          [start]
+          Button delete_completed_tasks_btn {
+            valign: center;
+            icon-name: "edit-clear-all-symbolic";
+            tooltip-text: _("Delete Completed Tasks");
+            clicked => $on_delete_completed_tasks_btn_clicked();
 
-          styles [
-            "background",
-          ]
-
-          Separator {}
-
-          Adw.StatusPage {
-            icon-name: "user-trash-symbolic";
-            title: _("Empty Trash");
-            description: _("No deleted items");
-            vexpand: true;
-            visible: bind trash_list_scrl.visible inverted;
+            accessibility {
+              label: _("Delete Completed Tasks");
+            }
 
             styles [
-            "compact",
+              "flat",
             ]
+
+            ShortcutController {
+              scope: managed;
+
+              Shortcut {
+                trigger: "<Control>Delete";
+                action: "activate";
+              }
+            }
+
           }
 
-          ScrolledWindow trash_list_scrl {
-            Box trash_list {
-              orientation: vertical;
-              spacing: 5;
-              margin-bottom: 6;
-              margin-top: 6;
-              margin-start: 12;
-              margin-end: 6;
-              vexpand: true;
+          [end]
+          MenuButton {
+            primary: true;
+            icon-name: "open-menu-symbolic";
+            menu-model: primary_menu;
+            tooltip-text: _("Main Menu");
+
+            accessibility {
+              label: _("Main Menu");
             }
           }
 
-          Separator {}
-
-          Box {
-            hexpand: true;
-            homogeneous: true;
-            visible: bind trash_list_scrl.visible;
-
-            styles [
-              "toolbar",
-            ]
+          [end]
+          Revealer scroll_up_btn_rev {
+            valign: end;
+            halign: end;
+            transition-type: crossfade;
 
             Button {
-              child: Adw.ButtonContent {
-                icon-name: "edit-delete-symbolic";
-                label: _("Clear");
-              };
-              clicked => $on_trash_clear();
-            }
+              icon-name: "go-up-symbolic";
+              tooltip-text: _("Scroll Up");
+              clicked => $on_scroll_up_btn_clicked();
 
-            Button {
-              child: Adw.ButtonContent {
-                icon-name: "emblem-ok-symbolic";
-                label: _("Restore All");
-              };
-              clicked => $on_trash_restore();
+              accessibility {
+                label: _("Scroll Up");
+              }
             }
           }
         }
 
-        ;
-        content: 
-        Box {
-          orientation: vertical;
-
-          Adw.Clamp {
-            maximum-size: 850;
-            tightening-threshold: 300;
-
-            Overlay {
-              ListBox {
-                margin-top: 10;
-                margin-bottom: 12;
-                margin-start: 12;
-                margin-end: 12;
-                selection-mode: none;
-
-                styles [
-                  "boxed-list",
-                ]
-
-                Adw.EntryRow task_entry_row {
-                  activatable: false;
-                  height-request: 60;
-                  title: _("Add new Task");
-                  entry-activated => $on_task_added();
-                }
-              }
-
-              [overlay]
-              ProgressBar status {
-                valign: end;
-                margin-bottom: 12;
-                margin-start: 22;
-                margin-end: 22;
-
-                styles [
-                  "osd",
-                ]
-              }
-            }
-          }
+        Adw.Clamp {
+          maximum-size: 850;
+          tightening-threshold: 300;
 
           Overlay {
-            [overlay]
-            Box separator {
-              valign: start;
-              can-target: false;
-              height-request: 4;
+            ListBox {
+              margin-top: 10;
+              margin-bottom: 12;
+              margin-start: 12;
+              margin-end: 12;
+              selection-mode: none;
 
               styles [
-                "fade",
+                "boxed-list",
               ]
+
+              Adw.EntryRow task_entry_row {
+                activatable: false;
+                height-request: 60;
+                title: _("Add new Task");
+                entry-activated => $on_task_added();
+              }
             }
 
-            ScrolledWindow scrolled_window {
-              propagate-natural-height: true;
-              propagate-natural-width: true;
-              vadjustment: Adjustment {
-                value-changed => $on_scroll();
-              };
+            [overlay]
+            ProgressBar status {
+              valign: end;
+              margin-bottom: 12;
+              margin-start: 22;
+              margin-end: 22;
 
-              DropControllerMotion drop_motion_ctrl {
-                motion => $on_dnd_scroll();
-              }
+              styles [
+                "osd",
+              ]
+            }
+          }
+        }
 
-              Adw.Clamp {
-                maximum-size: 850;
-                tightening-threshold: 300;
-                vexpand: true;
+        Overlay {
+          [overlay]
+          Box separator {
+            valign: start;
+            can-target: false;
+            height-request: 4;
 
-                Box tasks_list {
-                  orientation: vertical;
-                  hexpand: true;
-                }
+            styles [
+              "fade",
+            ]
+          }
+
+          ScrolledWindow scrolled_window {
+            propagate-natural-height: true;
+            propagate-natural-width: true;
+            vadjustment: Adjustment {
+              value-changed => $on_scroll();
+            };
+
+            DropControllerMotion drop_motion_ctrl {
+              motion => $on_dnd_scroll();
+            }
+
+            Adw.Clamp {
+              maximum-size: 850;
+              tightening-threshold: 300;
+              vexpand: true;
+
+              Box tasks_list {
+                orientation: vertical;
+                hexpand: true;
               }
             }
           }
-        };
-      }
+        }
+      };
     }
   };
 }
