@@ -19,8 +19,6 @@ template $Window : Adw.ApplicationWindow {
           "background",
         ]
 
-        Separator {}
-
         Adw.StatusPage {
           icon-name: "user-trash-symbolic";
           title: _("Empty Trash");
@@ -46,7 +44,9 @@ template $Window : Adw.ApplicationWindow {
           }
         }
 
-        Separator {}
+        Separator {
+          visible: bind trash_list_scrl.visible;
+        }
 
         Box {
           hexpand: true;
