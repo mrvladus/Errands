@@ -117,6 +117,7 @@
             <property name="content">
               <object class="GtkBox">
                 <property name="orientation">vertical</property>
+                <property name="width-request">360</property>
 
                 <!-- Header bar -->
                 <child>
@@ -210,6 +211,7 @@
                   </object>
                 </child>
 
+                <!-- Entry section -->
                 <child>
                   <object class="AdwClamp">
                     <property name="maximum-size">850</property>
