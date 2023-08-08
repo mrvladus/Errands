@@ -13,14 +13,5 @@
     <key name="theme" type="i">
       <default>0</default>
     </key>
-    <key name="tasks-expanded" type="b">
-      <default>true</default>
-    </key>
-    <key name="clear-history-on-startup" type="b">
-      <default>false</default>
-    </key>
-    <key name="history-size" type="i">
-      <default>20</default>
-    </key>
   </schema>
 </schemalist>

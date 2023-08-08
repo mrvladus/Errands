@@ -30,8 +30,6 @@ class PreferencesWindow(Adw.PreferencesWindow):
     system_theme = Gtk.Template.Child()
     light_theme = Gtk.Template.Child()
     dark_theme = Gtk.Template.Child()
-    clear_history_on_startup = Gtk.Template.Child()
-    history_size = Gtk.Template.Child()
 
     def __init__(self, win: Adw.ApplicationWindow) -> None:
         super().__init__(transient_for=win)
@@ -43,11 +41,6 @@ class PreferencesWindow(Adw.PreferencesWindow):
             self.light_theme.props.active = True
         if theme == 4:
             self.dark_theme.props.active = True
-        # Setup tasks
-        GSettings.bind(
-            "clear-history-on-startup", self.clear_history_on_startup, "active"
-        )
-        GSettings.bind("history-size", self.history_size, "value")
 
     # --- Template handlers --- #
 

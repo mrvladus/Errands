@@ -84,16 +84,6 @@ class Window(Adw.ApplicationWindow):
         self.props.application.add_action(action)
 
     def load_tasks(self) -> None:
-        # Clear history
-        if GSettings.get("clear-history-on-startup"):
-            Log.debug("Clearing history")
-            data: dict = UserData.get()
-            data["tasks"] = [t for t in data["tasks"] if not t["id"] in data["history"]]
-            for task in data["tasks"]:
-                task["sub"] = [s for s in task["sub"] if not s["id"] in data["history"]]
-            data["history"] = []
-            UserData.set(data)
-        # Load tasks
         Log.debug("Loading tasks")
         data: dict = UserData.get()
         for task in data["tasks"]:
