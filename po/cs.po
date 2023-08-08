@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: list\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-08-06 20:39+0300\n"
-"PO-Revision-Date: 2023-07-15 13:27+0200\n"
+"PO-Revision-Date: 2023-08-08 10:42+0200\n"
 "Last-Translator: Amerey.eu <info@amerey.eu>\n"
 "Language-Team: \n"
 "Language: cs\n"
@@ -19,11 +19,11 @@ msgstr ""
 
 #: src/res/ui/window.ui:33
 msgid "Empty Trash"
-msgstr ""
+msgstr "Vyprázdnit koš"
 
 #: src/res/ui/window.ui:34
 msgid "No deleted items"
-msgstr ""
+msgstr "Žádné smazané položky"
 
 #: src/res/ui/window.ui:83
 msgid "Clear"
@@ -31,11 +31,11 @@ msgstr "Zrušit zvýraznění"
 
 #: src/res/ui/window.ui:97
 msgid "Restore All"
-msgstr ""
+msgstr "Obnovit vše"
 
 #: src/res/ui/window.ui:134 src/res/ui/window.ui:136
 msgid "Show Deleted Tasks"
-msgstr ""
+msgstr "Zobrazit smazané úkoly"
 
 #: src/res/ui/window.ui:157 src/res/ui/window.ui:160
 msgid "Delete Completed Tasks"
@@ -67,7 +67,7 @@ msgstr "Amerey.eu"
 
 #: src/res/ui/window.ui:355
 msgid "Copied to Clipboard"
-msgstr ""
+msgstr "Zkopírováno do schránky"
 
 #: src/res/ui/preferences.ui:14
 msgid "Application Theme"
@@ -117,7 +117,7 @@ msgstr "Označit jako dokončené"
 #: src/res/ui/sub_task.ui:86 src/res/ui/sub_task.ui:88 src/res/ui/task.ui:287
 #: src/res/ui/task.ui:289
 msgid "Menu"
-msgstr ""
+msgstr "Menu"
 
 #: src/res/ui/sub_task.ui:121 src/res/ui/task.ui:323
 msgid "Cancel"
@@ -133,7 +133,7 @@ msgstr "Editovat"
 
 #: src/res/ui/sub_task.ui:150 src/res/ui/task.ui:21
 msgid "Copy"
-msgstr ""
+msgstr "Kopírovat"
 
 #: src/res/ui/task.ui:187 src/res/ui/task.ui:190
 msgid "Clear style"
