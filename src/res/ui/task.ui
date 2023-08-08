@@ -32,8 +32,8 @@
     <!-- Task card -->
     <child>
       <object class="GtkBox" id="main_box">
-        <property name="margin-top">10</property>
-        <property name="margin-bottom">10</property>
+        <property name="margin-top">6</property>
+        <property name="margin-bottom">6</property>
         <property name="margin-start">12</property>
         <property name="margin-end">12</property>
         <property name="orientation">vertical</property>
