@@ -88,6 +88,7 @@
                 <child>
                   <object class="GtkBox">
                     <property name="hexpand">true</property>
+                    <property name="homogeneous">true</property>
                     <property name="visible" bind-source="trash_list_scrl" bind-property="visible" bind-flags="sync-create" />
                     <style>
                       <class name="toolbar" />
@@ -96,7 +97,7 @@
                     <!-- Clear button -->
                     <child>
                       <object class="GtkButton">
-                        <property name="hexpand">true</property>
+                        <property name="halign">center</property>
                         <property name="child">
                           <object class="AdwButtonContent">
                             <property name="icon-name">edit-delete-symbolic</property>
@@ -110,7 +111,7 @@
                     <!-- Restore all button -->
                     <child>
                       <object class="GtkButton">
-                        <property name="hexpand">true</property>
+                        <property name="halign">center</property>
                         <property name="child">
                           <object class="AdwButtonContent">
                             <property name="icon-name">emblem-ok-symbolic</property>
