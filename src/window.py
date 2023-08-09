@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from re import sub
+import json
 from gi.repository import Gio, Adw, Gtk, GLib
 from __main__ import VERSION
 from .utils import Animate, GSettings, Log, TaskUtils, UserData
@@ -36,6 +36,7 @@ class Window(Adw.ApplicationWindow):
     delete_completed_tasks_btn = Gtk.Template.Child()
     drop_motion_ctrl = Gtk.Template.Child()
     export_dialog = Gtk.Template.Child()
+    import_dialog = Gtk.Template.Child()
     scroll_up_btn_rev = Gtk.Template.Child()
     scrolled_window = Gtk.Template.Child()
     separator = Gtk.Template.Child()
@@ -43,7 +44,9 @@ class Window(Adw.ApplicationWindow):
     tasks_list = Gtk.Template.Child()
     toast_overlay = Gtk.Template.Child()
     toast_copied = Gtk.Template.Child()
+    toast_err = Gtk.Template.Child()
     toast_exported = Gtk.Template.Child()
+    toast_imported = Gtk.Template.Child()
     trash_list = Gtk.Template.Child()
     trash_list_scrl = Gtk.Template.Child()
 
@@ -82,7 +85,8 @@ class Window(Adw.ApplicationWindow):
             lambda *_: PreferencesWindow(self).show(),
             ["<primary>comma"],
         )
-        create_action("export", self.export, ["<primary>e"])
+        create_action("export", self.export_tasks, ["<primary>e"])
+        create_action("import", self.import_tasks, ["<primary>i"])
         create_action("about", self.about)
         create_action(
             "quit",
@@ -104,18 +108,62 @@ class Window(Adw.ApplicationWindow):
         self.about_window.props.version = VERSION
         self.about_window.show()
 
-    def export(self, *args) -> None:
+    def export_tasks(self, *_) -> None:
         """Show export dialog"""
 
         def finish_export(_dial, res, _data):
             try:
                 file: Gio.File = self.export_dialog.save_finish(res)
-                UserData.export(file.get_path())
-                self.add_toast(self.toast_exported)
             except GLib.GError:
                 Log.debug("Export cancelled")
+            path = file.get_path()
+            with open(path, "w+") as f:
+                json.dump(UserData.get(), f, indent=4)
+            self.add_toast(self.toast_exported)
+            Log.info(f"Export tasks to: {path}")
 
         self.export_dialog.save(self, None, finish_export, None)
+
+    def import_tasks(self, *_):
+        """Show import dialog"""
+
+        def finish_import(_dial, res, _data):
+            Log.debug("Importing tasks")
+
+            try:
+                file: Gio.File = self.import_dialog.open_finish(res)
+            except GLib.GError:
+                Log.debug("Import cancelled")
+                return
+
+            with open(file.get_path(), "r") as f:
+                text = f.read()
+                if not UserData.validate(text):
+                    self.add_toast(self.toast_err)
+                    return
+                UserData.set(json.loads(text))
+
+            # Reload tasks
+            children = self.tasks_list.observe_children()
+            to_remove: list = [
+                children.get_item(i) for i in range(children.get_n_items())
+            ]
+            for task in to_remove:
+                self.tasks_list.remove(task)
+            self.load_tasks()
+
+            # Reload trash
+            children = self.trash_list.observe_children()
+            to_remove: list = [
+                children.get_item(i) for i in range(children.get_n_items())
+            ]
+            for task in to_remove:
+                self.trash_list.remove(task)
+            self.trash_add_items()
+            self.add_toast(self.toast_imported)
+            Log.info("Tasks imported")
+
+        self.import_dialog.open(self, None, finish_import, None)
 
     def trash_add(self, task: dict) -> None:
         self.trash_list.append(TrashItem(task, self))

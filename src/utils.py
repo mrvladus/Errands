@@ -20,7 +20,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import datetime
 import os
 import json
 import shutil
@@ -246,34 +245,22 @@ class UserData:
         if not os.path.exists(self.data_dir + "/data.json"):
             with open(self.data_dir + "/data.json", "w+") as f:
                 json.dump(self.default_data, f)
-        # Create new file if old is corrupted
-        try:
-            with open(self.data_dir + "/data.json", "r") as f:
-                data: dict = json.load(f)
-        except json.JSONDecodeError:
-            Log.error("Data file is corrupted. Creating new.")
-            shutil.copy(self.data_dir + "/data.json", self.data_dir + "/data_old.json")
-            Log.error("Old file is saved at: ", self.data_dir + "/data_old.json")
-            with open(self.data_dir + "/data.json", "w+") as f:
-                json.dump(self.default_data, f)
+                Log.debug(f"Create data file at: {self.data_dir}/data.json")
+        # Convert old formats
         self.convert()
-
-    # Backup user data
-    @classmethod
-    def export(self, path: str) -> None:
-        Log.info(f"Export tasks file to: {path}")
-        data = self.get()
-        with open(path, "w+") as f:
-            json.dump(data, f, indent=4)
 
     # Load user data from json
     @classmethod
     def get(self) -> dict:
         if not os.path.exists(self.data_dir + "/data.json"):
             self.init()
-        with open(self.data_dir + "/data.json", "r") as f:
-            data: dict = json.load(f)
-            return data
+        try:
+            with open(self.data_dir + "/data.json", "r") as f:
+                data: dict = json.load(f)
+                return data
+        except json.JSONDecodeError:
+            Log.error(f"Can't read data file at: {self.data_dir}/data.json")
+            exit(1)
 
     # Save user data to json
     @classmethod
@@ -281,45 +268,53 @@ class UserData:
         with open(self.data_dir + "/data.json", "w") as f:
             json.dump(data, f, indent=4)
 
+    # Validate data json
+    @classmethod
+    def validate(self, data: str | dict) -> bool:
+        Log.debug("Validating data file")
+        if type(data) == dict:
+            val_data = data
+        # Validate JSON
+        else:
+            try:
+                val_data = json.loads(data)
+            except json.JSONDecodeError:
+                Log.error("Data file is not valid")
+                return False
+        valid: bool = True
+        # Validate schema
+        for key in ["version", "tasks", "history"]:
+            if not key in val_data:
+                valid = False
+        # Validate tasks
+        if val_data["tasks"] != []:
+            for task in val_data["tasks"]:
+                for key in ["id", "text", "sub", "color", "completed"]:
+                    if not key in task:
+                        valid = False
+                # Validate sub-tasks
+                if task["sub"] != []:
+                    for sub in task["sub"]:
+                        for key in ["id", "text", "completed"]:
+                            if not key in sub:
+                                valid = False
+        if valid:
+            Log.debug("Data file is valid")
+            return True
+        else:
+            Log.error("Data file is not valid")
+            return False
+
     # Port tasks from older versions (for updates)
     @classmethod
     def convert(self) -> None:
+        Log.debug("Converting data file")
+
         data: dict = self.get()
         ver: str = data["version"]
-        # Bugfix for 44.5
-        if ver == "":
-            data["version"] = "44.5"
-            self.set(data)
-            ver = "44.5"
-        # Versions 44.3.x and 44.4.x
-        if ver.startswith("44.4") or ver.startswith("44.3"):
-            new_data: dict = self.default_data
-            old_tasks: list = data["todos"]
-            for task in old_tasks:
-                new_sub_tasks = []
-                for sub in old_tasks[task]["sub"]:
-                    new_text: str = Markup.unescape(sub)
-                    new_text = Markup.remove_url(new_text)
-                    new_sub_tasks.append(
-                        {
-                            "id": TaskUtils.generate_id(),
-                            "text": Markup.rm_crossline(new_text),
-                            "completed": True if Markup.is_crosslined(sub) else False,
-                        }
-                    )
-                new_data["tasks"].append(
-                    {
-                        "id": TaskUtils.generate_id(),
-                        "text": Markup.rm_crossline(task),
-                        "sub": new_sub_tasks,
-                        "color": old_tasks[task]["color"],
-                        "completed": True if Markup.is_crosslined(task) else False,
-                    }
-                )
-            UserData.set(new_data)
-            return
+
         # Versions 44.5.x
-        elif ver.startswith("44.5"):
+        if ver.startswith("44.5") or ver == "":
             new_data: dict = self.get()
             new_data["version"] = VERSION
             new_data["history"] = []
@@ -328,3 +323,12 @@ class UserData:
                 for sub in task["sub"]:
                     sub["id"] = TaskUtils.generate_id()
             self.set(new_data)
+
+        # Create new file if old is corrupted
+        if not self.validate(self.get()):
+            Log.error(
+                f"Data file is corrupted. Creating backup at {self.data_dir + '/data_old.json'}"
+            )
+            shutil.copy(self.data_dir + "/data.json", self.data_dir + "/data_old.json")
+            self.set(self.default_data)
+            return

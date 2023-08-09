@@ -348,12 +348,18 @@
   <menu id="primary_menu">
     <section>
       <item>
-        <attribute name="label" translatable="yes">Preferences</attribute>
-        <attribute name="action">app.preferences</attribute>
-      </item>
-      <item>
         <attribute name="label" translatable="yes">Export Tasks...</attribute>
         <attribute name="action">app.export</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Import Tasks...</attribute>
+        <attribute name="action">app.import</attribute>
+      </item>
+    </section>
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">Preferences</attribute>
+        <attribute name="action">app.preferences</attribute>
       </item>
       <item>
         <attribute name="label" translatable="yes">About Errands</attribute>
@@ -388,6 +394,18 @@
     </property>
   </object>
 
+  <!-- Import dialog -->
+  <object class="GtkFileDialog" id="import_dialog">
+    <property name="modal">true</property>
+    <property name="default-filter">
+      <object class="GtkFileFilter">
+        <patterns>
+          <pattern>*.json</pattern>
+        </patterns>
+      </object>
+    </property>
+  </object>
+
   <!-- Toasts -->
 
   <object class="AdwToast" id="toast_copied">
@@ -398,6 +416,16 @@
   <object class="AdwToast" id="toast_exported">
     <property name="title" translatable="yes">Tasks Exported</property>
     <property name="timeout">3</property>
+  </object>
+
+  <object class="AdwToast" id="toast_imported">
+    <property name="title" translatable="yes">Tasks Imported</property>
+    <property name="timeout">3</property>
+  </object>
+
+  <object class="AdwToast" id="toast_err">
+    <property name="title" translatable="yes">Error. Open log for information.</property>
+    <property name="timeout">10</property>
   </object>
 
 </interface>
