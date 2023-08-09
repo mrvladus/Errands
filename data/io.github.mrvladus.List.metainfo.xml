@@ -61,7 +61,8 @@
           <li>Added expand indicator on mouseover</li>
           <li>Moved "Delete completed tasks" button to the headerbar from entry</li>
           <li>Removed unnecessary settings</li>
-          <li>Added toasts</li>
+          <li>Added toast notifications</li>
+          <li>Added "Export Tasks..." item to the main menu</li>
         </ul>
         <p>Translations:</p>
         <ul>

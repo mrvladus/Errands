@@ -60,27 +60,6 @@
           </object>
         </child>
 
-        <!-- Backup settings -->
-        <child>
-          <object class="AdwPreferencesGroup">
-            <property name="title" translatable="yes">Backup</property>
-            <child>
-              <object class="AdwActionRow">
-                <property name="title" translatable="yes">Save data backup to Home folder</property>
-                <property name="subtitle" translatable="yes">File name is "list_backup_data.json"</property>
-                <property name="activatable-widget">save_backup</property>
-                <child type="suffix">
-                  <object class="GtkButton" id="save_backup">
-                    <property name="icon-name">document-save-symbolic</property>
-                    <property name="valign">center</property>
-                    <signal name="clicked" handler="on_save_backup" />
-                  </object>
-                </child>
-              </object>
-            </child>
-          </object>
-        </child>
-
       </object>
     </child>
   </template>

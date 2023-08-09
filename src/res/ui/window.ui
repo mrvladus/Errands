@@ -331,6 +331,10 @@
         <attribute name="action">app.preferences</attribute>
       </item>
       <item>
+        <attribute name="label" translatable="yes">Export Tasks...</attribute>
+        <attribute name="action">app.export</attribute>
+      </item>
+      <item>
         <attribute name="label" translatable="yes">About Errands</attribute>
         <attribute name="action">app.about</attribute>
       </item>
@@ -350,9 +354,27 @@
     <property name="license-type">7</property>
   </object>
 
+  <!-- Export dialog -->
+  <object class="GtkFileDialog" id="export_dialog">
+    <property name="modal">true</property>
+    <property name="initial-name">data.json</property>
+    <property name="default-filter">
+      <object class="GtkFileFilter">
+        <patterns>
+          <pattern>*.json</pattern>
+        </patterns>
+      </object>
+    </property>
+  </object>
+
   <!-- Toasts -->
   <object class="AdwToast" id="toast_copied">
     <property name="title" translatable="yes">Copied to Clipboard</property>
+    <property name="timeout">3</property>
+  </object>
+
+  <object class="AdwToast" id="toast_exported">
+    <property name="title" translatable="yes">Tasks Exported</property>
     <property name="timeout">3</property>
   </object>
 

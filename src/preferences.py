@@ -55,9 +55,3 @@ class PreferencesWindow(Adw.PreferencesWindow):
             theme = 4
         Adw.StyleManager.get_default().set_color_scheme(theme)
         GSettings.set("theme", "i", theme)
-
-    @Gtk.Template.Callback()
-    def on_save_backup(self, _):
-        UserData.backup()
-        GLib.spawn_command_line_async(f"xdg-open {GLib.get_home_dir()}")
-        self.hide()

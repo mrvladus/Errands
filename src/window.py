@@ -35,6 +35,7 @@ class Window(Adw.ApplicationWindow):
     about_window = Gtk.Template.Child()
     delete_completed_tasks_btn = Gtk.Template.Child()
     drop_motion_ctrl = Gtk.Template.Child()
+    export_dialog = Gtk.Template.Child()
     scroll_up_btn_rev = Gtk.Template.Child()
     scrolled_window = Gtk.Template.Child()
     separator = Gtk.Template.Child()
@@ -42,6 +43,7 @@ class Window(Adw.ApplicationWindow):
     tasks_list = Gtk.Template.Child()
     toast_overlay = Gtk.Template.Child()
     toast_copied = Gtk.Template.Child()
+    toast_exported = Gtk.Template.Child()
     trash_list = Gtk.Template.Child()
     trash_list_scrl = Gtk.Template.Child()
 
@@ -57,18 +59,7 @@ class Window(Adw.ApplicationWindow):
         # Setup theme
         Adw.StyleManager.get_default().set_color_scheme(GSettings.get("theme"))
         self.get_settings().props.gtk_icon_theme_name = "Adwaita"
-        # Create actions for main menu
-        self.create_action(
-            "preferences",
-            lambda *_: PreferencesWindow(self).show(),
-            ["<primary>comma"],
-        )
-        self.create_action("about", self.on_about_action)
-        self.create_action(
-            "quit",
-            lambda *_: self.props.application.quit(),
-            ["<primary>q"],
-        )
+        self.create_actions()
         self.update_status()
         self.load_tasks()
         self.trash_add_items()
@@ -76,12 +67,28 @@ class Window(Adw.ApplicationWindow):
     def add_toast(self, toast: Adw.Toast):
         self.toast_overlay.add_toast(toast)
 
-    def create_action(self, name: str, callback: callable, shortcuts=None) -> None:
-        action = Gio.SimpleAction.new(name, None)
-        action.connect("activate", callback)
-        if shortcuts:
-            self.props.application.set_accels_for_action(f"app.{name}", shortcuts)
-        self.props.application.add_action(action)
+    def create_actions(self):
+        """Create actions for main menu"""
+
+        def create_action(name: str, callback: callable, shortcuts=None) -> None:
+            action = Gio.SimpleAction.new(name, None)
+            action.connect("activate", callback)
+            if shortcuts:
+                self.props.application.set_accels_for_action(f"app.{name}", shortcuts)
+            self.props.application.add_action(action)
+
+        create_action(
+            "preferences",
+            lambda *_: PreferencesWindow(self).show(),
+            ["<primary>comma"],
+        )
+        create_action("export", self.export, ["<primary>e"])
+        create_action("about", self.about)
+        create_action(
+            "quit",
+            lambda *_: self.props.application.quit(),
+            ["<primary>q"],
+        )
 
     def load_tasks(self) -> None:
         Log.debug("Loading tasks")
@@ -92,10 +99,23 @@ class Window(Adw.ApplicationWindow):
             if task["id"] not in data["history"]:
                 new_task.toggle_visibility()
 
-    def on_about_action(self, *args) -> None:
+    def about(self, *args) -> None:
         """Show about window"""
         self.about_window.props.version = VERSION
         self.about_window.show()
+
+    def export(self, *args) -> None:
+        """Show export dialog"""
+
+        def finish_export(_dial, res, _data):
+            try:
+                file: Gio.File = self.export_dialog.save_finish(res)
+                UserData.export(file.get_path())
+                self.add_toast(self.toast_exported)
+            except GLib.GError:
+                Log.debug("Export cancelled")
+
+        self.export_dialog.save(self, None, finish_export, None)
 
     def trash_add(self, task: dict) -> None:
         self.trash_list.append(TrashItem(task, self))

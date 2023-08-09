@@ -260,12 +260,10 @@ class UserData:
 
     # Backup user data
     @classmethod
-    def backup(self) -> None:
-        Log.debug(
-            "Create backup file at: " + GLib.get_home_dir() + "/list_backup_data.json"
-        )
+    def export(self, path: str) -> None:
+        Log.info(f"Export tasks file to: {path}")
         data = self.get()
-        with open(GLib.get_home_dir() + "/list_backup_data.json", "w+") as f:
+        with open(path, "w+") as f:
             json.dump(data, f, indent=4)
 
     # Load user data from json
