@@ -26,6 +26,20 @@
                   <class name="background" />
                 </style>
 
+                <child>
+                  <object class="AdwHeaderBar">
+                    <property name="decoration-layout">null</property>
+                    <property name="title-widget">
+                      <object class="AdwWindowTitle">
+                        <property name="title" translatable="yes">Deleted Tasks</property>
+                      </object>
+                    </property>
+                    <style>
+                      <class name="flat" />
+                    </style>
+                  </object>
+                </child>
+
                 <!-- Status page -->
                 <child>
                   <object class="AdwStatusPage">
@@ -37,6 +51,12 @@
                     <style>
                       <class name="compact" />
                     </style>
+                  </object>
+                </child>
+
+                <child>
+                  <object class="GtkSeparator">
+                    <property name="visible" bind-source="trash_list_scrl" bind-property="visible" bind-flags="sync-create" />
                   </object>
                 </child>
 
@@ -368,6 +388,7 @@
   </object>
 
   <!-- Toasts -->
+
   <object class="AdwToast" id="toast_copied">
     <property name="title" translatable="yes">Copied to Clipboard</property>
     <property name="timeout">3</property>
