@@ -128,7 +128,7 @@ class Window(Adw.ApplicationWindow):
         """Show import dialog"""
 
         def finish_import(_dial, res, _data):
-            Log.debug("Importing tasks")
+            Log.info("Importing tasks")
 
             try:
                 file: Gio.File = self.import_dialog.open_finish(res)
