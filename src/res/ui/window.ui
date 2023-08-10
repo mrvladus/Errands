@@ -97,7 +97,7 @@
                     <child>
                       <object class="GtkButton">
                         <property name="hexpand">true</property>
-                        <property name="halign">center</property>
+                        <property name="halign">start</property>
                         <property name="valign">center</property>
                         <property name="child">
                           <object class="AdwButtonContent">
@@ -113,7 +113,7 @@
                     <child>
                       <object class="GtkButton">
                         <property name="hexpand">true</property>
-                        <property name="halign">center</property>
+                        <property name="halign">end</property>
                         <property name="valign">center</property>
                         <property name="child">
                           <object class="AdwButtonContent">
