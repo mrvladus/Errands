@@ -3,15 +3,15 @@
 # This file is distributed under the same license as the list package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: list\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-08-10 21:11+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2023-08-10 21:16+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -19,154 +19,154 @@ msgstr ""
 
 #: src/res/ui/window.ui:33 src/res/ui/window.ui:47
 msgid "Empty Trash"
-msgstr ""
+msgstr "Papierkorb löschen"
 
 #: src/res/ui/window.ui:34
 msgid "Deleted Tasks"
-msgstr ""
+msgstr "Gelöschte Aufgaben"
 
 #: src/res/ui/window.ui:48
 msgid "No deleted items"
-msgstr ""
+msgstr "Keine gelöschten Aufgaben"
 
 #: src/res/ui/window.ui:83
 msgid "Clear"
-msgstr ""
+msgstr "Leeren"
 
 #: src/res/ui/window.ui:97
 msgid "Restore All"
-msgstr ""
+msgstr "Alles wiederherstellen"
 
 #: src/res/ui/window.ui:134 src/res/ui/window.ui:136
 msgid "Show Deleted Tasks"
-msgstr ""
+msgstr "Zeige gelöschte Aufgaben"
 
 #: src/res/ui/window.ui:157 src/res/ui/window.ui:160
 msgid "Delete Completed Tasks"
-msgstr ""
+msgstr "Lösche abgeschlossene Aufgaben"
 
 #: src/res/ui/window.ui:185 src/res/ui/window.ui:187
 msgid "Main Menu"
-msgstr ""
+msgstr "Hauptmenü"
 
 #: src/res/ui/window.ui:201 src/res/ui/window.ui:204
 msgid "Scroll Up"
-msgstr ""
+msgstr "Nach oben scrollen"
 
 #: src/res/ui/window.ui:237
 msgid "Add new Task"
-msgstr ""
+msgstr "Neue Aufgabe hinzufügen"
 
 #: src/res/ui/window.ui:330
 msgid "Preferences"
-msgstr ""
+msgstr "Einstellungen"
 
 #: src/res/ui/window.ui:334
 msgid "About Errands"
-msgstr ""
+msgstr "Über Errands"
 
 #: src/res/ui/window.ui:347
 msgid "translator-credits"
-msgstr ""
+msgstr "Christoph Bähr"
 
 #: src/res/ui/window.ui:354
 msgid "Export Tasks..."
-msgstr ""
+msgstr "Aufgaben exportieren..."
 
 #: src/res/ui/window.ui:358
 msgid "Import Tasks..."
-msgstr ""
+msgstr "Aufgaben importieren..."
 
 #: src/res/ui/window.ui:415
 msgid "Copied to Clipboard"
-msgstr ""
+msgstr "Zur Zwischenablage kopiert"
 
 #: src/res/ui/window.ui:420
 msgid "Tasks Exported"
-msgstr ""
+msgstr "Aufgaben exportiert"
 
 #: src/res/ui/window.ui:425
 msgid "Tasks Imported"
-msgstr ""
+msgstr "Aufgaben importiert"
 
 #: src/res/ui/window.ui:429
 msgid "Error. Open log for information."
-msgstr ""
+msgstr "Fehler. Öffne das Log für weitere Informationen."
 
 #: src/res/ui/preferences.ui:14
 msgid "Application Theme"
-msgstr ""
+msgstr "Darstellung"
 
 #: src/res/ui/preferences.ui:19
 msgid "System"
-msgstr ""
+msgstr "System"
 
 #: src/res/ui/preferences.ui:33
 msgid "Light"
-msgstr ""
+msgstr "Hell"
 
 #: src/res/ui/preferences.ui:48
 msgid "Dark"
-msgstr ""
+msgstr "Dunkel"
 
 #: src/res/ui/preferences.ui:66
 msgid "History"
-msgstr ""
+msgstr "Verlauf"
 
 #: src/res/ui/preferences.ui:71
 msgid "Clear History on Startup"
-msgstr ""
+msgstr "Verlauf beim Programmstart leeren"
 
 #: src/res/ui/preferences.ui:84
 msgid "History Size"
-msgstr ""
+msgstr "Verlaufsgröße"
 
 #: src/res/ui/preferences.ui:108
 msgid "Backup"
-msgstr ""
+msgstr "Backup"
 
 #: src/res/ui/preferences.ui:111
 msgid "Save data backup to Home folder"
-msgstr ""
+msgstr "Speichere Backup im Home Verzeichnis"
 
 #: src/res/ui/preferences.ui:112
 msgid "File name is \"list_backup_data.json\""
-msgstr ""
+msgstr "Dateiname lautet \"list_backup_data.json\""
 
 #: src/res/ui/sub_task.ui:56 src/res/ui/sub_task.ui:59 src/res/ui/task.ui:141
 #: src/res/ui/task.ui:144
 msgid "Mark as Completed"
-msgstr ""
+msgstr "Als abgeschlossen markieren"
 
 #: src/res/ui/sub_task.ui:86 src/res/ui/sub_task.ui:88 src/res/ui/task.ui:287
 #: src/res/ui/task.ui:289
 msgid "Menu"
-msgstr ""
+msgstr "Menü"
 
 #: src/res/ui/sub_task.ui:121 src/res/ui/task.ui:323
 msgid "Cancel"
-msgstr ""
+msgstr "Abbrechen"
 
 #: src/res/ui/sub_task.ui:142 src/res/ui/task.ui:13
 msgid "Delete"
-msgstr ""
+msgstr "Löschen"
 
 #: src/res/ui/sub_task.ui:146 src/res/ui/task.ui:17
 msgid "Edit"
-msgstr ""
+msgstr "Bearbeiten"
 
 #: src/res/ui/sub_task.ui:150 src/res/ui/task.ui:21
 msgid "Copy"
-msgstr ""
+msgstr "Kopieren"
 
 #: src/res/ui/task.ui:187 src/res/ui/task.ui:190
 msgid "Clear style"
-msgstr ""
+msgstr "Style entfernen"
 
 #: src/res/ui/task.ui:359
 msgid "Add new Sub-Task"
-msgstr ""
+msgstr "Neue Unteraufgabe anlegen"
 
 #: src/res/ui/task.ui:373 src/res/ui/task.ui:377
 msgid "Delete Completed Sub-Tasks"
-msgstr ""
+msgstr "Lösche abgeschlossene Unteraufgaben"
