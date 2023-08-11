@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: list\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-06 20:39+0300\n"
+"POT-Creation-Date: 2023-08-11 14:21+0300\n"
 "PO-Revision-Date: 2023-07-07 16:56+0300\n"
 "Last-Translator: Vlad Krupinski <mrvladus@yandex.ru>\n"
 "Language-Team: \n"
@@ -19,57 +19,81 @@ msgstr ""
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Generator: Poedit 3.3.1\n"
 
-#: src/res/ui/window.ui:33
+#: src/res/ui/window.ui:34
+msgid "Deleted Tasks"
+msgstr "Удаленные задачи"
+
+#: src/res/ui/window.ui:47
 msgid "Empty Trash"
 msgstr "Корзина пуста"
 
-#: src/res/ui/window.ui:34
+#: src/res/ui/window.ui:48
 msgid "No deleted items"
 msgstr "Нет удаленных задач"
 
-#: src/res/ui/window.ui:83
+#: src/res/ui/window.ui:105
 msgid "Clear"
 msgstr "Очистить"
 
-#: src/res/ui/window.ui:97
+#: src/res/ui/window.ui:121
 msgid "Restore All"
 msgstr "Восстановить всё"
 
-#: src/res/ui/window.ui:134 src/res/ui/window.ui:136
+#: src/res/ui/window.ui:158 src/res/ui/window.ui:160
 msgid "Show Deleted Tasks"
 msgstr "Показать удаленные задачи"
 
-#: src/res/ui/window.ui:157 src/res/ui/window.ui:160
+#: src/res/ui/window.ui:181 src/res/ui/window.ui:184
 msgid "Delete Completed Tasks"
 msgstr "Удалить выполненные задачи"
 
-#: src/res/ui/window.ui:185 src/res/ui/window.ui:187
+#: src/res/ui/window.ui:209 src/res/ui/window.ui:211
 msgid "Main Menu"
 msgstr "Главное меню"
 
-#: src/res/ui/window.ui:201 src/res/ui/window.ui:204
+#: src/res/ui/window.ui:225 src/res/ui/window.ui:228
 msgid "Scroll Up"
 msgstr "Прокрутить вверх"
 
-#: src/res/ui/window.ui:237
+#: src/res/ui/window.ui:261
 msgid "Add new Task"
 msgstr "Добавьте задачу"
 
-#: src/res/ui/window.ui:330
+#: src/res/ui/window.ui:354
+msgid "Export Tasks..."
+msgstr "Экспорт задач..."
+
+#: src/res/ui/window.ui:358
+msgid "Import Tasks..."
+msgstr "Импорт задач..."
+
+#: src/res/ui/window.ui:364
 msgid "Preferences"
 msgstr "Настройки"
 
-#: src/res/ui/window.ui:334
+#: src/res/ui/window.ui:368
 msgid "About Errands"
 msgstr "О приложении"
 
-#: src/res/ui/window.ui:347
+#: src/res/ui/window.ui:381
 msgid "translator-credits"
 msgstr "Vlad Krupinski <mrvladus@yandex.ru>"
 
-#: src/res/ui/window.ui:355
+#: src/res/ui/window.ui:415
 msgid "Copied to Clipboard"
 msgstr "Скопировано в буфер обмена"
+
+#: src/res/ui/window.ui:420
+msgid "Tasks Exported"
+msgstr "Экспорт завершен"
+
+#: src/res/ui/window.ui:425
+msgid "Tasks Imported"
+msgstr "Импорт завершен"
+
+#: src/res/ui/window.ui:430
+msgid "Error. Open log for information."
+msgstr "Ошибка. Откройте лог для доп. информации"
 
 #: src/res/ui/preferences.ui:14
 msgid "Application Theme"
@@ -86,30 +110,6 @@ msgstr "Светлая"
 #: src/res/ui/preferences.ui:48
 msgid "Dark"
 msgstr "Темная"
-
-#: src/res/ui/preferences.ui:66
-msgid "History"
-msgstr "История"
-
-#: src/res/ui/preferences.ui:71
-msgid "Clear History on Startup"
-msgstr "Отчищать историю при старте"
-
-#: src/res/ui/preferences.ui:84
-msgid "History Size"
-msgstr "Размер истории"
-
-#: src/res/ui/preferences.ui:108
-msgid "Backup"
-msgstr "Бэкап"
-
-#: src/res/ui/preferences.ui:111
-msgid "Save data backup to Home folder"
-msgstr "Сохранить бэкап в домашней папке"
-
-#: src/res/ui/preferences.ui:112
-msgid "File name is \"list_backup_data.json\""
-msgstr "Имя файла \"list_backup_data.json\""
 
 #: src/res/ui/sub_task.ui:56 src/res/ui/sub_task.ui:59 src/res/ui/task.ui:141
 #: src/res/ui/task.ui:144
@@ -148,3 +148,7 @@ msgstr "Добавьте подзадачу"
 #: src/res/ui/task.ui:373 src/res/ui/task.ui:377
 msgid "Delete Completed Sub-Tasks"
 msgstr "Удалить выполненные подзадачи"
+
+#: src/res/ui/trash_item.ui:17 src/res/ui/trash_item.ui:21
+msgid "Restore"
+msgstr "Восстановить"

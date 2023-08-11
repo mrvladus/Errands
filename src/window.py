@@ -116,6 +116,7 @@ class Window(Adw.ApplicationWindow):
                 file: Gio.File = self.export_dialog.save_finish(res)
             except GLib.GError:
                 Log.debug("Export cancelled")
+                return
             path = file.get_path()
             with open(path, "w+") as f:
                 json.dump(UserData.get(), f, indent=4)

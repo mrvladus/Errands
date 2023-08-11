@@ -8,65 +8,53 @@ msgid ""
 msgstr ""
 "Project-Id-Version: list\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-10 21:11+0200\n"
+"POT-Creation-Date: 2023-08-11 14:21+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.3.2\n"
-
-#: src/res/ui/window.ui:33 src/res/ui/window.ui:47
-msgid "Empty Trash"
-msgstr ""
 
 #: src/res/ui/window.ui:34
 msgid "Deleted Tasks"
+msgstr ""
+
+#: src/res/ui/window.ui:47
+msgid "Empty Trash"
 msgstr ""
 
 #: src/res/ui/window.ui:48
 msgid "No deleted items"
 msgstr ""
 
-#: src/res/ui/window.ui:83
+#: src/res/ui/window.ui:105
 msgid "Clear"
 msgstr ""
 
-#: src/res/ui/window.ui:97
+#: src/res/ui/window.ui:121
 msgid "Restore All"
 msgstr ""
 
-#: src/res/ui/window.ui:134 src/res/ui/window.ui:136
+#: src/res/ui/window.ui:158 src/res/ui/window.ui:160
 msgid "Show Deleted Tasks"
 msgstr ""
 
-#: src/res/ui/window.ui:157 src/res/ui/window.ui:160
+#: src/res/ui/window.ui:181 src/res/ui/window.ui:184
 msgid "Delete Completed Tasks"
 msgstr ""
 
-#: src/res/ui/window.ui:185 src/res/ui/window.ui:187
+#: src/res/ui/window.ui:209 src/res/ui/window.ui:211
 msgid "Main Menu"
 msgstr ""
 
-#: src/res/ui/window.ui:201 src/res/ui/window.ui:204
+#: src/res/ui/window.ui:225 src/res/ui/window.ui:228
 msgid "Scroll Up"
 msgstr ""
 
-#: src/res/ui/window.ui:237
+#: src/res/ui/window.ui:261
 msgid "Add new Task"
-msgstr ""
-
-#: src/res/ui/window.ui:330
-msgid "Preferences"
-msgstr ""
-
-#: src/res/ui/window.ui:334
-msgid "About Errands"
-msgstr ""
-
-#: src/res/ui/window.ui:347
-msgid "translator-credits"
 msgstr ""
 
 #: src/res/ui/window.ui:354
@@ -75,6 +63,18 @@ msgstr ""
 
 #: src/res/ui/window.ui:358
 msgid "Import Tasks..."
+msgstr ""
+
+#: src/res/ui/window.ui:364
+msgid "Preferences"
+msgstr ""
+
+#: src/res/ui/window.ui:368
+msgid "About Errands"
+msgstr ""
+
+#: src/res/ui/window.ui:381
+msgid "translator-credits"
 msgstr ""
 
 #: src/res/ui/window.ui:415
@@ -89,7 +89,7 @@ msgstr ""
 msgid "Tasks Imported"
 msgstr ""
 
-#: src/res/ui/window.ui:429
+#: src/res/ui/window.ui:430
 msgid "Error. Open log for information."
 msgstr ""
 
@@ -107,30 +107,6 @@ msgstr ""
 
 #: src/res/ui/preferences.ui:48
 msgid "Dark"
-msgstr ""
-
-#: src/res/ui/preferences.ui:66
-msgid "History"
-msgstr ""
-
-#: src/res/ui/preferences.ui:71
-msgid "Clear History on Startup"
-msgstr ""
-
-#: src/res/ui/preferences.ui:84
-msgid "History Size"
-msgstr ""
-
-#: src/res/ui/preferences.ui:108
-msgid "Backup"
-msgstr ""
-
-#: src/res/ui/preferences.ui:111
-msgid "Save data backup to Home folder"
-msgstr ""
-
-#: src/res/ui/preferences.ui:112
-msgid "File name is \"list_backup_data.json\""
 msgstr ""
 
 #: src/res/ui/sub_task.ui:56 src/res/ui/sub_task.ui:59 src/res/ui/task.ui:141
@@ -169,4 +145,8 @@ msgstr ""
 
 #: src/res/ui/task.ui:373 src/res/ui/task.ui:377
 msgid "Delete Completed Sub-Tasks"
+msgstr ""
+
+#: src/res/ui/trash_item.ui:17 src/res/ui/trash_item.ui:21
+msgid "Restore"
 msgstr ""

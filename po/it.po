@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: list\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-06 20:39+0300\n"
+"POT-Creation-Date: 2023-08-11 14:21+0300\n"
 "PO-Revision-Date: 2023-06-27 08:34+0100\n"
 "Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
 "Language-Team: Italian <LL@li.org>\n"
@@ -16,56 +16,81 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/res/ui/window.ui:33
+#: src/res/ui/window.ui:34
+#, fuzzy
+msgid "Deleted Tasks"
+msgstr "Elimina le attività completate"
+
+#: src/res/ui/window.ui:47
 msgid "Empty Trash"
 msgstr ""
 
-#: src/res/ui/window.ui:34
+#: src/res/ui/window.ui:48
 msgid "No deleted items"
 msgstr ""
 
-#: src/res/ui/window.ui:83
+#: src/res/ui/window.ui:105
 msgid "Clear"
 msgstr "Stile chiaro"
 
-#: src/res/ui/window.ui:97
+#: src/res/ui/window.ui:121
 msgid "Restore All"
 msgstr ""
 
-#: src/res/ui/window.ui:134 src/res/ui/window.ui:136
+#: src/res/ui/window.ui:158 src/res/ui/window.ui:160
 msgid "Show Deleted Tasks"
 msgstr ""
 
-#: src/res/ui/window.ui:157 src/res/ui/window.ui:160
+#: src/res/ui/window.ui:181 src/res/ui/window.ui:184
 msgid "Delete Completed Tasks"
 msgstr "Elimina le attività completate"
 
-#: src/res/ui/window.ui:185 src/res/ui/window.ui:187
+#: src/res/ui/window.ui:209 src/res/ui/window.ui:211
 msgid "Main Menu"
 msgstr "Menu principale"
 
-#: src/res/ui/window.ui:201 src/res/ui/window.ui:204
+#: src/res/ui/window.ui:225 src/res/ui/window.ui:228
 msgid "Scroll Up"
 msgstr ""
 
-#: src/res/ui/window.ui:237
+#: src/res/ui/window.ui:261
 msgid "Add new Task"
 msgstr "Aggiungi nuova attività"
 
-#: src/res/ui/window.ui:330
+#: src/res/ui/window.ui:354
+msgid "Export Tasks..."
+msgstr ""
+
+#: src/res/ui/window.ui:358
+msgid "Import Tasks..."
+msgstr ""
+
+#: src/res/ui/window.ui:364
 msgid "Preferences"
 msgstr "Preferenze"
 
-#: src/res/ui/window.ui:334
+#: src/res/ui/window.ui:368
 msgid "About Errands"
 msgstr "Informazioni su Errands"
 
-#: src/res/ui/window.ui:347
+#: src/res/ui/window.ui:381
 msgid "translator-credits"
 msgstr "Albano Battistella <albanobattistella@gmail.com>"
 
-#: src/res/ui/window.ui:355
+#: src/res/ui/window.ui:415
 msgid "Copied to Clipboard"
+msgstr ""
+
+#: src/res/ui/window.ui:420
+msgid "Tasks Exported"
+msgstr ""
+
+#: src/res/ui/window.ui:425
+msgid "Tasks Imported"
+msgstr ""
+
+#: src/res/ui/window.ui:430
+msgid "Error. Open log for information."
 msgstr ""
 
 #: src/res/ui/preferences.ui:14
@@ -83,30 +108,6 @@ msgstr "Chiaro"
 #: src/res/ui/preferences.ui:48
 msgid "Dark"
 msgstr "Scuro"
-
-#: src/res/ui/preferences.ui:66
-msgid "History"
-msgstr "Cronologia"
-
-#: src/res/ui/preferences.ui:71
-msgid "Clear History on Startup"
-msgstr "Cancella cronologia all'avvio"
-
-#: src/res/ui/preferences.ui:84
-msgid "History Size"
-msgstr "Dimensione della cronologia"
-
-#: src/res/ui/preferences.ui:108
-msgid "Backup"
-msgstr "Backup"
-
-#: src/res/ui/preferences.ui:111
-msgid "Save data backup to Home folder"
-msgstr "Salva il backup dei dati nella cartella HOME"
-
-#: src/res/ui/preferences.ui:112
-msgid "File name is \"list_backup_data.json\""
-msgstr "Il nome del file è \"list_backup_data.json\""
 
 #: src/res/ui/sub_task.ui:56 src/res/ui/sub_task.ui:59 src/res/ui/task.ui:141
 #: src/res/ui/task.ui:144
@@ -145,3 +146,7 @@ msgstr "Aggiungi una nuova attività secondaria"
 #: src/res/ui/task.ui:373 src/res/ui/task.ui:377
 msgid "Delete Completed Sub-Tasks"
 msgstr "Elimina le attività secondarie completate"
+
+#: src/res/ui/trash_item.ui:17 src/res/ui/trash_item.ui:21
+msgid "Restore"
+msgstr ""

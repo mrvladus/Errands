@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: list\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-06 20:39+0300\n"
+"POT-Creation-Date: 2023-08-11 14:21+0300\n"
 "PO-Revision-Date: 2023-07-23 14:44-0300\n"
 "Last-Translator: Vitor Gabriel Gomes <vitorgabrielgomesro9090@gmail.com>\n"
 "Language-Team: \n"
@@ -17,56 +17,81 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.3.1\n"
 
-#: src/res/ui/window.ui:33
+#: src/res/ui/window.ui:34
+#, fuzzy
+msgid "Deleted Tasks"
+msgstr "Deletar tarefas concluídas"
+
+#: src/res/ui/window.ui:47
 msgid "Empty Trash"
 msgstr ""
 
-#: src/res/ui/window.ui:34
+#: src/res/ui/window.ui:48
 msgid "No deleted items"
 msgstr ""
 
-#: src/res/ui/window.ui:83
+#: src/res/ui/window.ui:105
 msgid "Clear"
 msgstr "Limpar estilo"
 
-#: src/res/ui/window.ui:97
+#: src/res/ui/window.ui:121
 msgid "Restore All"
 msgstr ""
 
-#: src/res/ui/window.ui:134 src/res/ui/window.ui:136
+#: src/res/ui/window.ui:158 src/res/ui/window.ui:160
 msgid "Show Deleted Tasks"
 msgstr ""
 
-#: src/res/ui/window.ui:157 src/res/ui/window.ui:160
+#: src/res/ui/window.ui:181 src/res/ui/window.ui:184
 msgid "Delete Completed Tasks"
 msgstr "Deletar tarefas concluídas"
 
-#: src/res/ui/window.ui:185 src/res/ui/window.ui:187
+#: src/res/ui/window.ui:209 src/res/ui/window.ui:211
 msgid "Main Menu"
 msgstr "Menu principal"
 
-#: src/res/ui/window.ui:201 src/res/ui/window.ui:204
+#: src/res/ui/window.ui:225 src/res/ui/window.ui:228
 msgid "Scroll Up"
 msgstr "Rolar para cima"
 
-#: src/res/ui/window.ui:237
+#: src/res/ui/window.ui:261
 msgid "Add new Task"
 msgstr "Adicionar nova tarefa"
 
-#: src/res/ui/window.ui:330
+#: src/res/ui/window.ui:354
+msgid "Export Tasks..."
+msgstr ""
+
+#: src/res/ui/window.ui:358
+msgid "Import Tasks..."
+msgstr ""
+
+#: src/res/ui/window.ui:364
 msgid "Preferences"
 msgstr "Preferências"
 
-#: src/res/ui/window.ui:334
+#: src/res/ui/window.ui:368
 msgid "About Errands"
 msgstr "Sobre Errands"
 
-#: src/res/ui/window.ui:347
+#: src/res/ui/window.ui:381
 msgid "translator-credits"
 msgstr "créditos-de-tradução"
 
-#: src/res/ui/window.ui:355
+#: src/res/ui/window.ui:415
 msgid "Copied to Clipboard"
+msgstr ""
+
+#: src/res/ui/window.ui:420
+msgid "Tasks Exported"
+msgstr ""
+
+#: src/res/ui/window.ui:425
+msgid "Tasks Imported"
+msgstr ""
+
+#: src/res/ui/window.ui:430
+msgid "Error. Open log for information."
 msgstr ""
 
 #: src/res/ui/preferences.ui:14
@@ -84,30 +109,6 @@ msgstr "Claro"
 #: src/res/ui/preferences.ui:48
 msgid "Dark"
 msgstr "Escuro"
-
-#: src/res/ui/preferences.ui:66
-msgid "History"
-msgstr "Histórico"
-
-#: src/res/ui/preferences.ui:71
-msgid "Clear History on Startup"
-msgstr "Limpar histórico no inicio"
-
-#: src/res/ui/preferences.ui:84
-msgid "History Size"
-msgstr "Tamanho do histórico"
-
-#: src/res/ui/preferences.ui:108
-msgid "Backup"
-msgstr "Backup"
-
-#: src/res/ui/preferences.ui:111
-msgid "Save data backup to Home folder"
-msgstr "Salvar dados de backup na Pasta Pessoal"
-
-#: src/res/ui/preferences.ui:112
-msgid "File name is \"list_backup_data.json\""
-msgstr "Nome de arquivo é \"list_backup_data.json\""
 
 #: src/res/ui/sub_task.ui:56 src/res/ui/sub_task.ui:59 src/res/ui/task.ui:141
 #: src/res/ui/task.ui:144
@@ -146,3 +147,7 @@ msgstr "Adicionar nova sub-tarefa"
 #: src/res/ui/task.ui:373 src/res/ui/task.ui:377
 msgid "Delete Completed Sub-Tasks"
 msgstr "Deletar sub-tarefas concluídas"
+
+#: src/res/ui/trash_item.ui:17 src/res/ui/trash_item.ui:21
+msgid "Restore"
+msgstr ""
