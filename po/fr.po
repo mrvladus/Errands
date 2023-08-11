@@ -18,9 +18,8 @@ msgstr ""
 "X-Generator: Poedit 3.1.1\n"
 
 #: src/res/ui/window.ui:34
-#, fuzzy
 msgid "Deleted Tasks"
-msgstr "Supprimer les sous-tâches terminées"
+msgstr "Sous-tâches terminées"
 
 #: src/res/ui/window.ui:47
 msgid "Empty Trash"

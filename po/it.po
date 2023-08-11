@@ -17,9 +17,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: src/res/ui/window.ui:34
-#, fuzzy
 msgid "Deleted Tasks"
-msgstr "Elimina le attività completate"
+msgstr "Attività completate"
 
 #: src/res/ui/window.ui:47
 msgid "Empty Trash"

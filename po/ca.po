@@ -18,9 +18,8 @@ msgstr ""
 "X-Generator: Poedit 3.3.1\n"
 
 #: src/res/ui/window.ui:34
-#, fuzzy
 msgid "Deleted Tasks"
-msgstr "Suprimeix les tasques completades"
+msgstr "Tasques completades"
 
 #: src/res/ui/window.ui:47
 msgid "Empty Trash"
@@ -71,7 +70,6 @@ msgid "Preferences"
 msgstr "Preferències"
 
 #: src/res/ui/window.ui:368
-#, fuzzy
 msgid "About Errands"
 msgstr "Quan a Errands"
 

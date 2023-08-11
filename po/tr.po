@@ -20,9 +20,8 @@ msgstr ""
 "X-Generator: Poedit 3.2.2\n"
 
 #: src/res/ui/window.ui:34
-#, fuzzy
 msgid "Deleted Tasks"
-msgstr "Tamamlanmış görevleri sil"
+msgstr "Tamamlanmış görevler"
 
 #: src/res/ui/window.ui:47
 msgid "Empty Trash"
