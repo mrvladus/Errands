@@ -25,9 +25,6 @@
   </menu>
 
   <template class="Task" parent="GtkRevealer">
-    <style>
-      <class name="fade" />
-    </style>
 
     <!-- Task card -->
     <child>
@@ -102,8 +99,6 @@
                     <property name="actions">move</property>
                     <signal name="prepare" handler="on_drag_prepare" />
                     <signal name="drag-begin" handler="on_drag_begin" />
-                    <signal name="drag-cancel" handler="on_drag_cancel" />
-                    <signal name="drag-end" handler="on_drag_end" />
                   </object>
                 </child>
 

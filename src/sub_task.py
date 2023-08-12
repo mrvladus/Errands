@@ -114,27 +114,17 @@ class SubTask(Gtk.Revealer):
 
     @Gtk.Template.Callback()
     def on_drag_begin(self, _source, drag) -> bool:
-        self.add_css_class("dim-label")
-        widget = Gtk.Button(
-            label=self.task["text"]
-            if len(self.task["text"]) < 20
-            else f"{self.task['text'][0:20]}..."
-        )
         icon = Gtk.DragIcon.get_for_drag(drag)
-        icon.set_child(widget)
+        icon.set_child(
+            Gtk.Button(
+                label=self.task["text"]
+                if len(self.task["text"]) < 20
+                else f"{self.task['text'][0:20]}..."
+            )
+        )
 
     @Gtk.Template.Callback()
-    def on_drag_cancel(self, *_) -> bool:
-        self.remove_css_class("dim-label")
-        return True
-
-    @Gtk.Template.Callback()
-    def on_drag_end(self, *_) -> bool:
-        self.remove_css_class("dim-label")
-        return True
-
-    @Gtk.Template.Callback()
-    def on_drag_prepare(self, _source, _x, _y) -> Gdk.ContentProvider:
+    def on_drag_prepare(self, *_) -> Gdk.ContentProvider:
         value = GObject.Value(SubTask)
         value.set_object(self)
         return Gdk.ContentProvider.new_for_value(value)

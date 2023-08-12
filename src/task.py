@@ -265,25 +265,15 @@ class Task(Gtk.Revealer):
         self.task["color"] = color
         self.update_data()
 
+    # --- Drag and Drop --- #
+
     @Gtk.Template.Callback()
     def on_drag_begin(self, _source, drag) -> bool:
-        self.add_css_class("dim-label")
-        widget = Gtk.Button(label=self.task["text"])
         icon = Gtk.DragIcon.get_for_drag(drag)
-        icon.set_child(widget)
+        icon.set_child(Gtk.Button(label=self.task["text"]))
 
     @Gtk.Template.Callback()
-    def on_drag_cancel(self, *_) -> bool:
-        self.remove_css_class("dim-label")
-        return True
-
-    @Gtk.Template.Callback()
-    def on_drag_end(self, *_) -> bool:
-        self.remove_css_class("dim-label")
-        return True
-
-    @Gtk.Template.Callback()
-    def on_drag_prepare(self, _source, _x, _y) -> Gdk.ContentProvider:
+    def on_drag_prepare(self, *_) -> Gdk.ContentProvider:
         value = GObject.Value(Task)
         value.set_object(self)
         return Gdk.ContentProvider.new_for_value(value)
@@ -331,3 +321,5 @@ class Task(Gtk.Revealer):
             self.update_statusbar()
             # Expand
             self.expand(True)
+
+        return True
