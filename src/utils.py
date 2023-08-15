@@ -140,38 +140,8 @@ class Markup:
     """Class for useful markup functions"""
 
     @classmethod
-    def is_escaped(self, text: str) -> bool:
-        if (
-            "&amp;" in text
-            or "&lt;" in text
-            or "&gt;" in text
-            or "&#39;" in text
-            or "&apos;" in text
-        ):
-            return True
-        else:
-            return False
-
-    @classmethod
     def escape(self, text: str) -> str:
         return GLib.markup_escape_text(text)
-
-    @classmethod
-    def unescape(self, text: str) -> str:
-        new_text = text
-        new_text = new_text.replace("&amp;", "&")
-        new_text = new_text.replace("&lt;", "<")
-        new_text = new_text.replace("&gt;", ">")
-        new_text = new_text.replace("&#39;", "'")
-        new_text = new_text.replace("&apos;", "'")
-        return new_text
-
-    @classmethod
-    def is_crosslined(self, text: str) -> bool:
-        if text.startswith("<s>") and text.endswith("</s>"):
-            return True
-        else:
-            return False
 
     @classmethod
     def add_crossline(self, text: str) -> str:
@@ -192,13 +162,6 @@ class Markup:
             else:
                 new_str.append(i)
         return " ".join(new_str)
-
-    @classmethod
-    def remove_url(self, text: str) -> str:
-        if "<a href=" in text:
-            return text.split('"')[1]
-        else:
-            return text
 
 
 class TaskUtils:
