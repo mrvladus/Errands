@@ -174,14 +174,20 @@ class TaskUtils:
 
     @classmethod
     def new_task(
-        self, text: str, id: str = None, pid: str = "", cmp: bool = False
+        self,
+        text: str,
+        id: str = None,
+        pid: str = "",
+        cmpd: bool = False,
+        dltd: bool = False,
     ) -> dict:
         return {
             "id": self.generate_id() if not id else id,
             "parent": pid,
             "text": text,
             "color": "",
-            "completed": cmp,
+            "completed": cmpd,
+            "deleted": dltd,
         }
 
 
@@ -189,11 +195,7 @@ class UserData:
     """Class for accessing data file with user tasks"""
 
     data_dir: str = GLib.get_user_data_dir() + "/list"
-    default_data = {
-        "version": VERSION,
-        "tasks": [],
-        "trash": [],
-    }
+    default_data = {"version": VERSION, "tasks": []}
 
     @classmethod
     def init(self) -> None:
@@ -240,13 +242,13 @@ class UserData:
                 return False
         valid: bool = True
         # Validate schema
-        for key in ["version", "tasks", "trash"]:
+        for key in ["version", "tasks"]:
             if not key in val_data:
                 valid = False
         # Validate tasks
         if val_data["tasks"] != []:
             for task in val_data["tasks"]:
-                for key in ["id", "parent", "text", "color", "completed"]:
+                for key in ["id", "parent", "text", "color", "completed", "deleted"]:
                     if not key in task:
                         valid = False
         if valid:

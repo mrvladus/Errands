@@ -49,9 +49,9 @@ class Task(Gtk.Revealer):
     def __init__(self, task: dict, window: Adw.ApplicationWindow):
         super().__init__()
         Log.info("Add task: " + task["text"])
-        self.window = window
-        self.parent = self.window.tasks_list
-        self.task = task
+        self.window: Adw.ApplicationWindow = window
+        self.parent: Gtk.Box = self.window.tasks_list
+        self.task: dict = task
         # Escape text and find URL's'
         self.text = Markup.escape(self.task["text"])
         self.text = Markup.find_url(self.text)
@@ -64,11 +64,7 @@ class Task(Gtk.Revealer):
         if self.task["color"] != "":
             self.main_box.add_css_class(f'task-{self.task["color"]}')
             self.task_status.add_css_class(f'progress-{self.task["color"]}')
-        # Expand sub tasks
-        self.expand(self.task["sub"] != [])
         self.add_sub_tasks()
-        self.update_statusbar()
-        self.window.update_status()
         self.add_actions()
 
     def add_actions(self):
@@ -85,14 +81,19 @@ class Task(Gtk.Revealer):
         add_action("copy", self.copy)
 
     def add_sub_tasks(self) -> None:
-        if self.task["sub"] == []:
-            return
-        history: list = UserData.get()["history"]
-        for task in self.task["sub"]:
-            sub_task = SubTask(task, self, self.window)
-            self.sub_tasks.append(sub_task)
-            if task["id"] not in history:
-                sub_task.toggle_visibility()
+        tasks: list[dict] = UserData.get()["tasks"]
+        sub_count: int = 0
+        for task in tasks:
+            if task["parent"] == self.task["id"]:
+                sub_task = SubTask(task, self, self.window)
+                self.sub_tasks.append(sub_task)
+                if not task["deleted"]:
+                    sub_task.toggle_visibility()
+                else:
+                    sub_count += 1
+        self.expand(sub_count > 0)
+        self.update_statusbar()
+        self.window.update_status()
 
     def copy(self, *_) -> None:
         Log.info("Copy to clipboard: " + self.task["text"])
