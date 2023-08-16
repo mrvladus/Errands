@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 from gi.repository import Gtk, Adw, Gdk, GObject, Gio, GLib
+from window import Window
 from .sub_task import SubTask
 from .utils import Animate, Log, Markup, TaskUtils, UserData
 
@@ -49,9 +50,10 @@ class Task(Gtk.Revealer):
     def __init__(self, task: dict, window: Adw.ApplicationWindow):
         super().__init__()
         Log.info("Add task: " + task["text"])
-        self.window: Adw.ApplicationWindow = window
+        self.window: Window = window
         self.parent: Gtk.Box = self.window.tasks_list
         self.task: dict = task
+        self.add_actions()
         # Escape text and find URL's'
         self.text = Markup.escape(self.task["text"])
         self.text = Markup.find_url(self.text)
@@ -65,7 +67,6 @@ class Task(Gtk.Revealer):
             self.main_box.add_css_class(f'task-{self.task["color"]}')
             self.task_status.add_css_class(f'progress-{self.task["color"]}')
         self.add_sub_tasks()
-        self.add_actions()
 
     def add_actions(self):
         group = Gio.SimpleActionGroup.new()
@@ -103,13 +104,20 @@ class Task(Gtk.Revealer):
 
     def delete(self, *_, update_sts: bool = True) -> None:
         Log.info(f"Delete task: {self.task['text']}")
+
         self.toggle_visibility()
-        new_data: dict = UserData.get()
-        new_data["history"].append(self.task["id"])
-        UserData.set(new_data)
+
+        data: dict = UserData.get()
+        for task in data["tasks"]:
+            if task["id"] == self.task["id"]:
+                task["deleted"] = self.task["deleted"] = True
+                break
+        UserData.set(data)
+
         # Don't update if called externally
         if update_sts:
             self.window.update_status()
+
         self.window.trash_add(self.task)
 
     def edit(self, *_) -> None:
@@ -140,11 +148,13 @@ class Task(Gtk.Revealer):
     def update_statusbar(self) -> None:
         n_completed = 0
         n_total = 0
-        for sub in self.task["sub"]:
-            if sub["id"] not in UserData.get()["history"]:
-                n_total += 1
-                if sub["completed"]:
-                    n_completed += 1
+        for task in UserData.get()["tasks"]:
+            if task["parent"] == self.task["id"]:
+                if not task["deleted"]:
+                    n_total += 1
+                    if task["completed"]:
+                        n_completed += 1
+
         Animate.property(
             self.task_status,
             "fraction",
@@ -152,6 +162,7 @@ class Task(Gtk.Revealer):
             n_completed / n_total if n_total > 0 else 0,
             250,
         )
+
         if self.expanded:
             self.task_status.props.visible = True
             self.task_status.add_css_class("task-progressbar")
@@ -159,16 +170,18 @@ class Task(Gtk.Revealer):
             self.task_status.remove_css_class("task-progressbar")
             if n_completed == 0:
                 self.task_status.props.visible = False
+
         # Show delete completed button
         self.delete_completed_btn_revealer.set_reveal_child(n_completed > 0)
 
     def update_data(self) -> None:
         """Sync self.task with user data.json"""
-        new_data: dict = UserData.get()
-        for i, task in enumerate(new_data["tasks"]):
+
+        data: dict = UserData.get()
+        for i, task in enumerate(data["tasks"]):
             if self.task["id"] == task["id"]:
-                new_data["tasks"][i] = self.task
-                UserData.set(new_data)
+                data["tasks"][i] = self.task
+                UserData.set(data)
                 return
 
     # --- Template handlers --- #
