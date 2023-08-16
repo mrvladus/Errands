@@ -173,21 +173,15 @@ class TaskUtils:
         return str(uuid.uuid4())
 
     @classmethod
-    def new_task(self, text: str) -> dict:
+    def new_task(
+        self, text: str, id: str = None, pid: str = "", cmp: bool = False
+    ) -> dict:
         return {
-            "id": self.generate_id(),
+            "id": self.generate_id() if not id else id,
+            "parent": pid,
             "text": text,
-            "sub": [],
             "color": "",
-            "completed": False,
-        }
-
-    @classmethod
-    def new_sub_task(self, text: str) -> dict:
-        return {
-            "id": self.generate_id(),
-            "text": text,
-            "completed": False,
+            "completed": cmp,
         }
 
 
@@ -198,7 +192,7 @@ class UserData:
     default_data = {
         "version": VERSION,
         "tasks": [],
-        "history": [],
+        "trash": [],
     }
 
     @classmethod
@@ -246,21 +240,15 @@ class UserData:
                 return False
         valid: bool = True
         # Validate schema
-        for key in ["version", "tasks", "history"]:
+        for key in ["version", "tasks", "trash"]:
             if not key in val_data:
                 valid = False
         # Validate tasks
         if val_data["tasks"] != []:
             for task in val_data["tasks"]:
-                for key in ["id", "text", "sub", "color", "completed"]:
+                for key in ["id", "parent", "text", "color", "completed"]:
                     if not key in task:
                         valid = False
-                # Validate sub-tasks
-                if task["sub"] != []:
-                    for sub in task["sub"]:
-                        for key in ["id", "text", "completed"]:
-                            if not key in sub:
-                                valid = False
         if valid:
             Log.debug("Data file is valid")
             return True
@@ -276,16 +264,9 @@ class UserData:
         data: dict = self.get()
         ver: str = data["version"]
 
-        # Versions 44.5.x
-        if ver.startswith("44.5") or ver == "":
-            new_data: dict = self.get()
-            new_data["version"] = VERSION
-            new_data["history"] = []
-            for task in new_data["tasks"]:
-                task["id"] = TaskUtils.generate_id()
-                for sub in task["sub"]:
-                    sub["id"] = TaskUtils.generate_id()
-            self.set(new_data)
+        # Versions 44.6.x
+        if ver.startswith("44.6"):
+            pass
 
         # Create new file if old is corrupted
         if not self.validate(self.get()):
