@@ -94,8 +94,11 @@ class SubTask(Gtk.Revealer):
             not self.sub_task_edit_box_rev.get_child_revealed()
         )
 
-    def toggle_visibility(self) -> None:
-        self.set_reveal_child(not self.get_child_revealed())
+    def toggle_visibility(self, on: bool = False) -> None:
+        if on:
+            self.set_reveal_child(True)
+        else:
+            self.set_reveal_child(not self.get_child_revealed())
 
     def update_data(self) -> None:
         """Sync self.task with user data.json"""

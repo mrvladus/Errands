@@ -342,13 +342,23 @@ class Window(Adw.ApplicationWindow):
         UserData.set(data)
 
         # Restore tasks
-        tasks = self.tasks_list.observe_children()
-        for i in range(tasks.get_n_items()):
-            task = tasks.get_item(i)
-            if not task.get_child_revealed():
-                task.toggle_visibility()
-            task.task["deleted"] = False
-            task.update_statusbar()
+        def restore_tasks(list: Gtk.Box):
+            """Recursive func for restoring tasks"""
+
+            tasks = list.observe_children()
+            for i in range(tasks.get_n_items()):
+                task = tasks.get_item(i)
+                if task.task["deleted"]:
+                    task.task["deleted"] = False
+                    task.toggle_visibility(True)
+                # If has sub-tasks: call restore_tasks
+                if hasattr(task, "sub_tasks"):
+                    restore_tasks(task.sub_tasks)
+                # Update statusbar if task is toplevel
+                if task.task["parent"] == "":
+                    task.update_statusbar()
+
+        restore_tasks(self.tasks_list)
 
         # Clear trash
         self.trash_clear()
@@ -383,7 +393,7 @@ class TrashItem(Gtk.Box):
                     for parent in data["tasks"]:
                         if parent["id"] == id:
                             parent["deleted"] = False
-                            ids.append(task["id"])
+                            ids.append(parent["id"])
                             if parent["parent"] != "":
                                 restore_parent(parent["parent"])
 
@@ -395,17 +405,23 @@ class TrashItem(Gtk.Box):
                 break
 
         # Update UI
-        tasks = self.window.tasks_list.observe_children()
-        for i in range(tasks.get_n_items()):
-            task = tasks.get_item(i)
-            if task.task["id"] in ids:
-                task.task["deleted"] = False
-                task.toggle_visibility()
+        def restore_tasks(list: Gtk.Box):
+            """Recursive func for restoring tasks"""
 
-        for i in range(tasks.get_n_items()):
-            task = tasks.get_item(i)
-            if task.task["parent"] != "":
-                task.update_statusbar()
+            tasks = list.observe_children()
+            for i in range(tasks.get_n_items()):
+                task = tasks.get_item(i)
+                if task.task["id"] in ids:
+                    task.task["deleted"] = False
+                    task.toggle_visibility(True)
+                # If has sub-tasks: call restore_tasks
+                if hasattr(task, "sub_tasks"):
+                    restore_tasks(task.sub_tasks)
+                # Update statusbar if task is toplevel
+                if task.task["parent"] == "":
+                    task.update_statusbar()
+
+        restore_tasks(self.window.tasks_list)
 
         self.window.update_status()
         self.window.trash_clear()
