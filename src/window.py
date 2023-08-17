@@ -170,6 +170,7 @@ class Window(Adw.ApplicationWindow):
 
     def trash_add(self, task: dict) -> None:
         self.trash_list.append(TrashItem(task, self))
+        self.trash_list_scrl.set_visible(True)
 
     def trash_add_items(self) -> None:
         """Populate trash on startup"""
@@ -320,7 +321,7 @@ class Window(Adw.ApplicationWindow):
 
         # Remove data
         data: dict = UserData.get()
-        data["tasks"] = [t for t in data["tasks"] if t["deleted"]]
+        data["tasks"] = [t for t in data["tasks"] if not t["deleted"]]
         UserData.set(data)
 
         # Remove trash items
