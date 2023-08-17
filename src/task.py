@@ -30,18 +30,17 @@ class Task(Gtk.Revealer):
     __gtype_name__ = "Task"
 
     # Template items
-    main_box = Gtk.Template.Child()
-    task_box_rev = Gtk.Template.Child()
-    task_text = Gtk.Template.Child()
-    task_status = Gtk.Template.Child()
-    expand_icon = Gtk.Template.Child()
-    task_completed_btn = Gtk.Template.Child()
-    task_edit_box_rev = Gtk.Template.Child()
-    task_edit_entry = Gtk.Template.Child()
-    sub_tasks_revealer = Gtk.Template.Child()
-    delete_completed_btn_revealer = Gtk.Template.Child()
-    sub_tasks = Gtk.Template.Child()
-    expand_icon = Gtk.Template.Child()
+    main_box: Gtk.Box = Gtk.Template.Child()
+    task_box_rev: Gtk.Revealer = Gtk.Template.Child()
+    task_text: Gtk.Label = Gtk.Template.Child()
+    task_status: Gtk.Statusbar = Gtk.Template.Child()
+    expand_icon: Gtk.Image = Gtk.Template.Child()
+    task_completed_btn: Gtk.Button = Gtk.Template.Child()
+    task_edit_box_rev: Gtk.Revealer = Gtk.Template.Child()
+    task_edit_entry: Gtk.Entry = Gtk.Template.Child()
+    sub_tasks_revealer: Gtk.Revealer = Gtk.Template.Child()
+    delete_completed_btn_revealer: Gtk.Revealer = Gtk.Template.Child()
+    sub_tasks: Gtk.Box = Gtk.Template.Child()
 
     # State
     expanded: bool = None

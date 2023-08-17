@@ -29,11 +29,11 @@ from .utils import Log, UserData, Markup
 class SubTask(Gtk.Revealer):
     __gtype_name__ = "SubTask"
 
-    sub_task_box_rev = Gtk.Template.Child()
-    sub_task_text = Gtk.Template.Child()
-    sub_task_completed_btn = Gtk.Template.Child()
-    sub_task_edit_box_rev = Gtk.Template.Child()
-    sub_task_edit_entry = Gtk.Template.Child()
+    sub_task_box_rev: Gtk.Revealer = Gtk.Template.Child()
+    sub_task_text: Gtk.Label = Gtk.Template.Child()
+    sub_task_completed_btn: Gtk.Button = Gtk.Template.Child()
+    sub_task_edit_box_rev: Gtk.Revealer = Gtk.Template.Child()
+    sub_task_edit_entry: Gtk.Entry = Gtk.Template.Child()
 
     def __init__(self, task: dict, parent: Gtk.Box, window):
         super().__init__()

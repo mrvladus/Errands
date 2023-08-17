@@ -19,17 +19,17 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-from gi.repository import Adw, Gtk, GLib
-from .utils import GSettings, UserData
+from gi.repository import Adw, Gtk
+from .utils import GSettings
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/List/preferences.ui")
 class PreferencesWindow(Adw.PreferencesWindow):
     __gtype_name__ = "PreferencesWindow"
 
-    system_theme = Gtk.Template.Child()
-    light_theme = Gtk.Template.Child()
-    dark_theme = Gtk.Template.Child()
+    system_theme: Gtk.CheckButton = Gtk.Template.Child()
+    light_theme: Gtk.CheckButton = Gtk.Template.Child()
+    dark_theme: Gtk.CheckButton = Gtk.Template.Child()
 
     def __init__(self, win: Adw.ApplicationWindow) -> None:
         super().__init__(transient_for=win)
