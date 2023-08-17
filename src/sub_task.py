@@ -21,7 +21,9 @@
 # SOFTWARE.
 
 # from gettext import gettext as _
-from gi.repository import Gtk, Adw, GObject, Gdk, Gio
+from gi.repository import Gtk, GObject, Gdk, Gio
+from task import Task
+from window import Window
 from .utils import Log, UserData, Markup
 
 
@@ -35,7 +37,7 @@ class SubTask(Gtk.Revealer):
     sub_task_edit_box_rev = Gtk.Template.Child()
     sub_task_edit_entry = Gtk.Template.Child()
 
-    def __init__(self, task: dict, parent: Gtk.Box, window: Adw.ApplicationWindow):
+    def __init__(self, task: dict, parent: Gtk.Box, window: Window):
         super().__init__()
         Log.info("Add sub-task: " + task["text"])
         self.parent = parent
@@ -72,9 +74,8 @@ class SubTask(Gtk.Revealer):
     def delete(self, *_, update_sts: bool = True) -> None:
         Log.info(f"Delete sub-task: {self.task['text']}")
         self.toggle_visibility()
-        new_data: dict = UserData.get()
-        new_data["history"].append(self.task["id"])
-        UserData.set(new_data)
+        self.task["deleted"] = True
+        self.update_data()
         # Don't update if called externally
         if update_sts:
             self.parent.update_statusbar()
@@ -99,21 +100,19 @@ class SubTask(Gtk.Revealer):
         self.set_reveal_child(not self.get_child_revealed())
 
     def update_data(self) -> None:
-        new_data: dict = UserData.get()
-        for task in new_data["tasks"]:
-            if task["id"] == self.parent.task["id"]:
-                for i, sub in enumerate(task["sub"]):
-                    if sub["id"] == self.task["id"]:
-                        task["sub"][i] = self.task
-                        UserData.set(new_data)
-                        # Update parent data
-                        self.parent.task["sub"] = task["sub"]
-                        return
+        """Sync self.task with user data.json"""
+
+        data: dict = UserData.get()
+        for i, task in enumerate(data["tasks"]):
+            if self.task["id"] == task["id"]:
+                data["tasks"][i] = self.task
+                UserData.set(data)
+                return
 
     # --- Template handlers --- #
 
     @Gtk.Template.Callback()
-    def on_drag_begin(self, _source, drag) -> bool:
+    def on_drag_begin(self, _source, drag: Gdk.Drag) -> bool:
         icon = Gtk.DragIcon.get_for_drag(drag)
         icon.set_child(
             Gtk.Button(
@@ -130,22 +129,26 @@ class SubTask(Gtk.Revealer):
         return Gdk.ContentProvider.new_for_value(value)
 
     @Gtk.Template.Callback()
-    def on_drop(self, _drop, sub_task, _x, _y) -> None:
-        if sub_task == self:
+    def on_drop(self, _drop, task, _x, _y) -> None:
+        if task == self:
             return
-        if sub_task.parent != self.parent:
+        # If task has different parent
+        if task.task["parent"] != self.task["parent"]:
+            # Set parent
+            data: dict = UserData.get()
+            for t in data["tasks"]:
+                if t["id"] == task.task["id"]:
+                    t["parent"] = self.task["parent"]
+                    break
+            UserData.set(data)
             # Remove sub-task
-            sub_task.parent.task["sub"].remove(sub_task.task)
-            sub_task.parent.sub_tasks.remove(sub_task)
-            sub_task.parent.update_data()
-            sub_task.parent.update_statusbar()
-            # Insert new sub-task
-            self.parent.task["sub"].insert(
-                self.parent.task["sub"].index(self.task), sub_task.task.copy()
-            )
+            task.parent.sub_tasks.remove(task)
+            task.parent.update_data()
+            task.parent.update_statusbar()
             self.parent.update_data()
             self.parent.update_statusbar()
-            new_sub_task = SubTask(sub_task.task.copy(), self.parent, self.window)
+            # Insert new sub-task
+            new_sub_task = SubTask(task.task.copy(), self.parent, self.window)
             self.parent.sub_tasks.insert_child_after(
                 new_sub_task,
                 self,
@@ -153,17 +156,15 @@ class SubTask(Gtk.Revealer):
             self.parent.sub_tasks.reorder_child_after(self, new_sub_task)
             new_sub_task.toggle_visibility()
         else:
-            # Get indexes
-            self_idx = self.parent.task["sub"].index(self.task)
-            sub_idx = self.parent.task["sub"].index(sub_task.task)
             # Move widget
-            self.parent.sub_tasks.reorder_child_after(sub_task, self)
-            self.parent.sub_tasks.reorder_child_after(self, sub_task)
+            self.parent.sub_tasks.reorder_child_after(task, self)
+            self.parent.sub_tasks.reorder_child_after(self, task)
             # Update data
-            self.parent.task["sub"].insert(
-                self_idx, self.parent.task["sub"].pop(sub_idx)
-            )
-            self.parent.update_data()
+            data: dict = UserData.get()
+            self_idx = data["tasks"].index(self.task)
+            sub_idx = data["tasks"].index(task.task)
+            data["tasks"].insert(self_idx, data["tasks"].pop(sub_idx))
+            UserData.set(data)
 
     @Gtk.Template.Callback()
     def on_completed_btn_toggled(self, btn: Gtk.Button) -> None:

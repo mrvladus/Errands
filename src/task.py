@@ -328,7 +328,7 @@ class Task(Gtk.Revealer):
             task.task["parent"] = self.task["id"]
             task.update_data()
             # Add sub-task
-            sub_task = SubTask(task.task, self, self.window)
+            sub_task = SubTask(task.task.copy(), self, self.window)
             self.sub_tasks.append(sub_task)
             sub_task.toggle_visibility()
             self.update_statusbar()
