@@ -21,7 +21,6 @@
 # SOFTWARE.
 
 from gi.repository import Gtk, Adw, Gdk, GObject, Gio, GLib
-from window import Window
 from .sub_task import SubTask
 from .utils import Animate, Log, Markup, TaskUtils, UserData
 
@@ -50,7 +49,7 @@ class Task(Gtk.Revealer):
     def __init__(self, task: dict, window: Adw.ApplicationWindow):
         super().__init__()
         Log.info("Add task: " + task["text"])
-        self.window: Window = window
+        self.window = window
         self.parent: Gtk.Box = self.window.tasks_list
         self.task: dict = task
         self.add_actions()
@@ -82,15 +81,13 @@ class Task(Gtk.Revealer):
         add_action("copy", self.copy)
 
     def add_sub_tasks(self) -> None:
-        tasks: list[dict] = UserData.get()["tasks"]
         sub_count: int = 0
-        for task in tasks:
+        for task in UserData.get()["tasks"]:
             if task["parent"] == self.task["id"]:
                 sub_task = SubTask(task, self, self.window)
                 self.sub_tasks.append(sub_task)
                 if not task["deleted"]:
                     sub_task.toggle_visibility()
-                else:
                     sub_count += 1
         self.expand(sub_count > 0)
         self.update_statusbar()
@@ -222,6 +219,7 @@ class Task(Gtk.Revealer):
         )
         data: dict = UserData.get()
         data["tasks"].append(new_sub_task)
+        UserData.set(data)
         # Add row
         sub_task = SubTask(new_sub_task, self, self.window)
         self.sub_tasks.append(sub_task)

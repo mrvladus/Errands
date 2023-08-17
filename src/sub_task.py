@@ -21,9 +21,7 @@
 # SOFTWARE.
 
 # from gettext import gettext as _
-from gi.repository import Gtk, GObject, Gdk, Gio
-from task import Task
-from window import Window
+from gi.repository import Gtk, GObject, Gdk, Gio, GLib
 from .utils import Log, UserData, Markup
 
 
@@ -37,7 +35,7 @@ class SubTask(Gtk.Revealer):
     sub_task_edit_box_rev = Gtk.Template.Child()
     sub_task_edit_entry = Gtk.Template.Child()
 
-    def __init__(self, task: dict, parent: Gtk.Box, window: Window):
+    def __init__(self, task: dict, parent: Gtk.Box, window):
         super().__init__()
         Log.info("Add sub-task: " + task["text"])
         self.parent = parent
@@ -138,13 +136,22 @@ class SubTask(Gtk.Revealer):
             data: dict = UserData.get()
             for t in data["tasks"]:
                 if t["id"] == task.task["id"]:
-                    t["parent"] = self.task["parent"]
+                    t["parent"] = task.task["parent"] = self.task["parent"]
                     break
             UserData.set(data)
-            # Remove sub-task
-            task.parent.sub_tasks.remove(task)
-            task.parent.update_data()
-            task.parent.update_statusbar()
+
+            def check_visible():
+                if task.get_child_revealed():
+                    return True
+                else:
+                    task.parent.sub_tasks.remove(task)
+                    task.parent.update_data()
+                    task.parent.update_statusbar()
+                    return False
+
+            # Hide task
+            task.toggle_visibility()
+            GLib.timeout_add(100, check_visible)
             self.parent.update_data()
             self.parent.update_statusbar()
             # Insert new sub-task
@@ -161,9 +168,9 @@ class SubTask(Gtk.Revealer):
             self.parent.sub_tasks.reorder_child_after(self, task)
             # Update data
             data: dict = UserData.get()
-            self_idx = data["tasks"].index(self.task)
-            sub_idx = data["tasks"].index(task.task)
-            data["tasks"].insert(self_idx, data["tasks"].pop(sub_idx))
+            old_task = data["tasks"].pop(data["tasks"].index(task.task))
+            old_task["parent"] = self.task["parent"]
+            data["tasks"].insert(data["tasks"].index(self.task), old_task)
             UserData.set(data)
 
     @Gtk.Template.Callback()

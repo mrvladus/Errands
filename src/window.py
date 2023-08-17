@@ -96,6 +96,8 @@ class Window(Adw.ApplicationWindow):
         Log.debug("Loading tasks")
         data: dict = UserData.get()
         for task in data["tasks"]:
+            if task["parent"] != "":
+                continue
             new_task = Task(task, self)
             self.tasks_list.append(new_task)
             if not task["deleted"]:
