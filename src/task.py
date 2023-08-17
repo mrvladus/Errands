@@ -188,11 +188,10 @@ class Task(Gtk.Revealer):
 
     @Gtk.Template.Callback()
     def on_delete_completed_btn_clicked(self, _) -> None:
-        history: list = UserData.get()["history"]
         sub_tasks = self.sub_tasks.observe_children()
         for i in range(sub_tasks.get_n_items()):
             sub: SubTask = sub_tasks.get_item(i)
-            if sub.task["completed"] and sub.task["id"] not in history:
+            if sub.task["completed"] and not sub.task["deleted"]:
                 sub.delete(update_sts=False)
         self.update_statusbar()
 
@@ -218,9 +217,11 @@ class Task(Gtk.Revealer):
         if entry.get_buffer().props.text == "":
             return
         # Add new sub-task
-        new_sub_task = TaskUtils.new_sub_task(entry.get_buffer().props.text)
-        self.task["sub"].append(new_sub_task)
-        self.update_data()
+        new_sub_task = TaskUtils.new_task(
+            entry.get_buffer().props.text, pid=self.task["id"]
+        )
+        data: dict = UserData.get()
+        data["tasks"].append(new_sub_task)
         # Add row
         sub_task = SubTask(new_sub_task, self, self.window)
         self.sub_tasks.append(sub_task)
@@ -241,7 +242,7 @@ class Task(Gtk.Revealer):
         if new_text == old_text or new_text == "":
             return
         # Change task
-        print(f"Change '{old_text}' to '{new_text}'")
+        Log.info(f"Change '{old_text}' to '{new_text}'")
         # Set new text
         self.task["text"] = new_text
         self.task["completed"] = False
@@ -320,18 +321,16 @@ class Task(Gtk.Revealer):
                     task.parent.update_statusbar()
                     return False
 
+            # Hide task
             task.toggle_visibility()
             GLib.timeout_add(100, check_visible)
-            # Remove sub-task
-            new_sub_task = task.parent.task["sub"].pop(
-                task.parent.task["sub"].index(task.task)
-            )
+            # Change parent id
+            task.task["parent"] = self.task["id"]
+            task.update_data()
             # Add sub-task
-            self.task["sub"].append(new_sub_task)
-            sub_task = SubTask(new_sub_task, self, self.window)
+            sub_task = SubTask(task.task, self, self.window)
             self.sub_tasks.append(sub_task)
             sub_task.toggle_visibility()
-            self.update_data()
             self.update_statusbar()
             # Expand
             self.expand(True)
