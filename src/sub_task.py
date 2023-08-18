@@ -30,8 +30,8 @@ class SubTask(Gtk.Revealer):
     __gtype_name__ = "SubTask"
 
     sub_task_box_rev: Gtk.Revealer = Gtk.Template.Child()
-    sub_task_text: Gtk.Label = Gtk.Template.Child()
-    sub_task_completed_btn: Gtk.Button = Gtk.Template.Child()
+    task_text: Gtk.Label = Gtk.Template.Child()
+    task_completed_btn: Gtk.Button = Gtk.Template.Child()
     sub_task_edit_box_rev: Gtk.Revealer = Gtk.Template.Child()
     sub_task_edit_entry: Gtk.Entry = Gtk.Template.Child()
 
@@ -45,9 +45,9 @@ class SubTask(Gtk.Revealer):
         self.text = Markup.escape(self.task["text"])
         self.text = Markup.find_url(self.text)
         # Check if sub-task completed and toggle checkbox
-        self.sub_task_completed_btn.props.active = self.task["completed"]
+        self.task_completed_btn.props.active = self.task["completed"]
         # Set text
-        self.sub_task_text.props.label = self.text
+        self.task_text.props.label = self.text
         self.add_actions()
 
     def add_actions(self):
@@ -186,7 +186,7 @@ class SubTask(Gtk.Revealer):
             self.text = Markup.add_crossline(self.text)
         else:
             self.text = Markup.rm_crossline(self.text)
-        self.sub_task_text.props.label = self.text
+        self.task_text.props.label = self.text
 
     @Gtk.Template.Callback()
     def on_sub_task_cancel_edit_btn_clicked(self, *_) -> None:
@@ -208,7 +208,7 @@ class SubTask(Gtk.Revealer):
         self.text = Markup.escape(self.task["text"])
         self.text = Markup.find_url(self.text)
         # Check if text crosslined and toggle checkbox
-        self.sub_task_completed_btn.props.active = False
+        self.task_completed_btn.props.active = False
         # Set text
-        self.sub_task_text.props.label = self.text
+        self.task_text.props.label = self.text
         self.toggle_edit_box()

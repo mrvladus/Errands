@@ -48,7 +48,7 @@
 
                 <!-- Mark as completed button -->
                 <child>
-                  <object class="GtkCheckButton" id="sub_task_completed_btn">
+                  <object class="GtkCheckButton" id="task_completed_btn">
                     <property name="margin-end">5</property>
                     <property name="valign">center</property>
                     <property name="tooltip-text" translatable="yes">Mark as Completed</property>
@@ -61,7 +61,7 @@
 
                 <!-- Sub-task text -->
                 <child>
-                  <object class="GtkLabel" id="sub_task_text">
+                  <object class="GtkLabel" id="task_text">
                     <property name="margin-top">5</property>
                     <property name="margin-bottom">5</property>
                     <property name="wrap">true</property>

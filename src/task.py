@@ -196,13 +196,40 @@ class Task(Gtk.Revealer):
 
     @Gtk.Template.Callback()
     def on_task_completed_btn_toggled(self, btn: Gtk.Button) -> None:
+        data: dict = UserData.get()
+        ids: list[str] = []
+
+        def toggle_task(id: str):
+            for task in data["tasks"]:
+                if task["id"] == id:
+                    task["completed"] = btn.props.active
+                    ids.append(id)
+                if task["parent"] == id:
+                    toggle_task(task["id"])
+
+        def toggle_crossline(task: Task | SubTask):
+            if btn.props.active:
+                task.text = Markup.add_crossline(task.text)
+            else:
+                task.text = Markup.rm_crossline(task.text)
+            task.task_text.props.label = task.text
+
         self.task["completed"] = btn.props.active
-        if btn.props.active:
-            self.text = Markup.add_crossline(self.text)
-        else:
-            self.text = Markup.rm_crossline(self.text)
-        self.task_text.props.label = self.text
-        self.update_data()
+        toggle_task(self.task["id"])
+
+        UserData.set(data)
+
+        def toggle_crosslines(tasks: Gtk.Box):
+            tasks = tasks.observe_children()
+            for i in range(tasks.get_n_items()):
+                task = tasks.get_item(i)
+                if task.task["id"] in ids:
+                    toggle_crossline(task)
+                    task.task_completed_btn.props.active = btn.props.active
+                if hasattr(task, "sub_tasks"):
+                    toggle_crosslines(task.sub_tasks)
+
+        toggle_crosslines(self.window.tasks_list)
         self.window.update_status()
 
     @Gtk.Template.Callback()
