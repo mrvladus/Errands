@@ -364,6 +364,10 @@ class Window(Adw.ApplicationWindow):
         self.trash_clear()
         self.update_status()
 
+    @Gtk.Template.Callback()
+    def on_trash_drop(self, _drop, task, _x, _y) -> None:
+        pass
+
 
 @Gtk.Template(resource_path="/io/github/mrvladus/List/trash_item.ui")
 class TrashItem(Gtk.Box):

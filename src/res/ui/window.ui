@@ -20,12 +20,8 @@
             <property name="flap">
               <object class="GtkBox">
                 <property name="orientation">vertical</property>
-                <property name="width-request">300</property>
-                <property name="hexpand">false</property>
-                <style>
-                  <class name="background" />
-                </style>
 
+                <!-- Title -->
                 <child>
                   <object class="AdwHeaderBar">
                     <property name="decoration-layout">null</property>
@@ -40,88 +36,139 @@
                   </object>
                 </child>
 
-                <!-- Status page -->
+                <!-- Overlay -->
                 <child>
-                  <object class="AdwStatusPage">
-                    <property name="icon-name">user-trash-symbolic</property>
-                    <property name="title" translatable="yes">Empty Trash</property>
-                    <property name="description" translatable="yes">No deleted items</property>
-                    <property name="vexpand">true</property>
-                    <property name="visible" bind-source="trash_list_scrl" bind-property="visible" bind-flags="sync-create|invert-boolean" />
-                    <style>
-                      <class name="compact" />
-                    </style>
-                  </object>
-                </child>
+                  <object class="GtkOverlay">
 
-                <child>
-                  <object class="GtkSeparator">
-                    <property name="visible" bind-source="trash_list_scrl" bind-property="visible" bind-flags="sync-create" />
-                  </object>
-                </child>
-
-                <!-- Trash list -->
-                <child>
-                  <object class="GtkScrolledWindow" id="trash_list_scrl">
+                    <!-- Drop target -->
                     <child>
-                      <object class="GtkBox" id="trash_list">
+                      <object class="GtkDropTarget">
+                        <property name="actions">move</property>
+                        <property name="formats">Task SubTask</property>
+                        <signal name="drop" handler="on_trash_drop" />
+                      </object>
+                    </child>
+
+                    <!-- Drop controller -->
+                    <child>
+                      <object class="GtkDropControllerMotion" id="trash_drop_ctrl">
+                      </object>
+                    </child>
+
+                    <!-- Content -->
+                    <child>
+                      <object class="GtkBox">
                         <property name="orientation">vertical</property>
-                        <property name="spacing">5</property>
+                        <property name="width-request">300</property>
                         <property name="hexpand">false</property>
+                        <style>
+                          <class name="background" />
+                        </style>
+
+
+                        <!-- Status page -->
+                        <child>
+                          <object class="AdwStatusPage">
+                            <property name="icon-name">user-trash-symbolic</property>
+                            <property name="title" translatable="yes">Empty Trash</property>
+                            <property name="description" translatable="yes">No deleted items</property>
+                            <property name="vexpand">true</property>
+                            <property name="visible" bind-source="trash_list_scrl" bind-property="visible" bind-flags="sync-create|invert-boolean" />
+                            <style>
+                              <class name="compact" />
+                            </style>
+                          </object>
+                        </child>
+
+                        <child>
+                          <object class="GtkSeparator">
+                            <property name="visible" bind-source="trash_list_scrl" bind-property="visible" bind-flags="sync-create" />
+                          </object>
+                        </child>
+
+                        <!-- Trash list -->
+                        <child>
+                          <object class="GtkScrolledWindow" id="trash_list_scrl">
+                            <child>
+                              <object class="GtkBox" id="trash_list">
+                                <property name="orientation">vertical</property>
+                                <property name="spacing">5</property>
+                                <property name="hexpand">false</property>
+                                <property name="vexpand">true</property>
+                                <property name="margin-start">12</property>
+                                <property name="margin-end">6</property>
+                                <property name="margin-top">6</property>
+                                <property name="margin-bottom">6</property>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+
+                        <child>
+                          <object class="GtkSeparator">
+                            <property name="visible" bind-source="trash_list_scrl" bind-property="visible" bind-flags="sync-create" />
+                          </object>
+                        </child>
+
+                        <!-- Buttons -->
+                        <child>
+                          <object class="GtkBox">
+                            <property name="hexpand">true</property>
+                            <property name="visible" bind-source="trash_list_scrl" bind-property="visible" bind-flags="sync-create" />
+                            <style>
+                              <class name="toolbar" />
+                            </style>
+
+                            <!-- Clear button -->
+                            <child>
+                              <object class="GtkButton">
+                                <property name="hexpand">true</property>
+                                <property name="halign">start</property>
+                                <property name="valign">center</property>
+                                <property name="child">
+                                  <object class="AdwButtonContent">
+                                    <property name="icon-name">edit-delete-symbolic</property>
+                                    <property name="label" translatable="yes">Clear</property>
+                                  </object>
+                                </property>
+                                <signal name="clicked" handler="on_trash_clear" />
+                              </object>
+                            </child>
+
+                            <!-- Restore all button -->
+                            <child>
+                              <object class="GtkButton">
+                                <property name="hexpand">true</property>
+                                <property name="halign">end</property>
+                                <property name="valign">center</property>
+                                <property name="child">
+                                  <object class="AdwButtonContent">
+                                    <property name="icon-name">emblem-ok-symbolic</property>
+                                    <property name="label" translatable="yes">Restore All</property>
+                                  </object>
+                                </property>
+                                <signal name="clicked" handler="on_trash_restore" />
+                              </object>
+                            </child>
+
+                          </object>
+                        </child>
+
+                      </object>
+                    </child>
+
+                    <!-- DND status page -->
+                    <child type="overlay">
+                      <object class="AdwStatusPage">
+                        <property name="icon-name">tab-new-symbolic</property>
+                        <property name="title" translatable="yes">Move to Trash</property>
                         <property name="vexpand">true</property>
-                        <property name="margin-start">12</property>
-                        <property name="margin-end">6</property>
-                        <property name="margin-top">6</property>
-                        <property name="margin-bottom">6</property>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-
-                <child>
-                  <object class="GtkSeparator">
-                    <property name="visible" bind-source="trash_list_scrl" bind-property="visible" bind-flags="sync-create" />
-                  </object>
-                </child>
-
-                <!-- Buttons -->
-                <child>
-                  <object class="GtkBox">
-                    <property name="hexpand">true</property>
-                    <property name="visible" bind-source="trash_list_scrl" bind-property="visible" bind-flags="sync-create" />
-                    <style>
-                      <class name="toolbar" />
-                    </style>
-
-                    <!-- Clear button -->
-                    <child>
-                      <object class="GtkButton">
-                        <property name="hexpand">true</property>
-                        <property name="halign">start</property>
-                        <property name="valign">center</property>
-                        <property name="child">
-                          <object class="AdwButtonContent">
-                            <property name="icon-name">edit-delete-symbolic</property>
-                            <property name="label" translatable="yes">Clear</property>
-                          </object>
-                        </property>
-                        <signal name="clicked" handler="on_trash_clear" />
-                      </object>
-                    </child>
-
-                    <!-- Restore all button -->
-                    <child>
-                      <object class="GtkButton">
-                        <property name="hexpand">true</property>
-                        <property name="halign">end</property>
-                        <property name="valign">center</property>
-                        <property name="child">
-                          <object class="AdwButtonContent">
-                            <property name="icon-name">emblem-ok-symbolic</property>
-                            <property name="label" translatable="yes">Restore All</property>
-                          </object>
-                        </property>
-                        <signal name="clicked" handler="on_trash_restore" />
+                        <property name="visible" bind-source="trash_drop_ctrl" bind-property="contains-pointer" bind-flags="sync-create" />
+                        <style>
+                          <class name="background" />
+                          <class name="compact" />
+                          <class name="move-to-trash" />
+                        </style>
                       </object>
                     </child>
 
@@ -129,6 +176,7 @@
                 </child>
 
               </object>
+
             </property>
 
             <property name="separator">
