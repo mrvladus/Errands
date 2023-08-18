@@ -199,37 +199,34 @@ class Task(Gtk.Revealer):
         data: dict = UserData.get()
         ids: list[str] = []
 
-        def toggle_task(id: str):
+        def toggle_tasks_data(id: str):
             for task in data["tasks"]:
                 if task["id"] == id:
                     task["completed"] = btn.props.active
                     ids.append(id)
                 if task["parent"] == id:
-                    toggle_task(task["id"])
+                    toggle_tasks_data(task["id"])
 
-        def toggle_crossline(task: Task | SubTask):
-            if btn.props.active:
-                task.text = Markup.add_crossline(task.text)
-            else:
-                task.text = Markup.rm_crossline(task.text)
-            task.task_text.props.label = task.text
-
-        self.task["completed"] = btn.props.active
-        toggle_task(self.task["id"])
-
-        UserData.set(data)
-
-        def toggle_crosslines(tasks: Gtk.Box):
-            tasks = tasks.observe_children()
-            for i in range(tasks.get_n_items()):
-                task = tasks.get_item(i)
+        def toggle_tasks(tasks_list: Gtk.Box):
+            tasks_list = tasks_list.observe_children()
+            for i in range(tasks_list.get_n_items()):
+                task = tasks_list.get_item(i)
                 if task.task["id"] in ids:
-                    toggle_crossline(task)
+                    if btn.props.active:
+                        task.text = Markup.add_crossline(task.text)
+                        task.task_text.add_css_class("dim-label")
+                    else:
+                        task.text = Markup.rm_crossline(task.text)
+                        task.task_text.remove_css_class("dim-label")
+                    task.task_text.props.label = task.text
                     task.task_completed_btn.props.active = btn.props.active
                 if hasattr(task, "sub_tasks"):
-                    toggle_crosslines(task.sub_tasks)
+                    toggle_tasks(task.sub_tasks)
 
-        toggle_crosslines(self.window.tasks_list)
+        self.task["completed"] = btn.props.active
+        toggle_tasks_data(self.task["id"])
+        UserData.set(data)
+        toggle_tasks(self.window.tasks_list)
         self.window.update_status()
 
     @Gtk.Template.Callback()

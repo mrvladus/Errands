@@ -182,10 +182,12 @@ class SubTask(Gtk.Revealer):
         self.update_data()
         self.parent.update_statusbar()
         # Set crosslined text
-        if self.task["completed"]:
+        if btn.props.active:
             self.text = Markup.add_crossline(self.text)
+            self.task_text.add_css_class("dim-label")
         else:
             self.text = Markup.rm_crossline(self.text)
+            self.task_text.remove_css_class("dim-label")
         self.task_text.props.label = self.text
 
     @Gtk.Template.Callback()
