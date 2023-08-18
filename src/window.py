@@ -23,6 +23,8 @@
 import json
 from gi.repository import Gio, Adw, Gtk, GLib
 from __main__ import VERSION
+
+from .sub_task import SubTask
 from .utils import Animate, GSettings, Log, TaskUtils, UserData
 from .task import Task
 from .preferences import PreferencesWindow
@@ -365,8 +367,12 @@ class Window(Adw.ApplicationWindow):
         self.update_status()
 
     @Gtk.Template.Callback()
-    def on_trash_drop(self, _drop, task, _x, _y) -> None:
-        pass
+    def on_trash_drop(self, _drop, task: Task | SubTask, _x, _y) -> None:
+        task.toggle_visibility()
+        task.task["deleted"] = True
+        task.update_data()
+        self.trash_add(task.task)
+        self.update_status()
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/List/trash_item.ui")
