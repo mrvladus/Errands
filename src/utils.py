@@ -275,7 +275,7 @@ class UserData:
                     "text": task["text"],
                     "color": task["color"],
                     "completed": task["completed"],
-                    "deleted": task["deleted"],
+                    "deleted": task["id"] in data["history"],
                 }
                 new_tasks.append(new_task)
                 if task["sub"] != []:
@@ -284,12 +284,13 @@ class UserData:
                             "id": sub["id"],
                             "parent": task["id"],
                             "text": sub["text"],
-                            "color": sub["color"],
+                            "color": "",
                             "completed": sub["completed"],
-                            "deleted": sub["deleted"],
+                            "deleted": sub["id"] in data["history"],
                         }
                         new_tasks.append(new_sub)
             ver = VERSION
+            del data["history"]
             UserData.set(data)
 
         # Create new file if old is corrupted
