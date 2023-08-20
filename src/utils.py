@@ -219,7 +219,6 @@ class UserData:
                 return data
         except json.JSONDecodeError:
             Log.error(f"Can't read data file at: {self.data_dir}/data.json")
-            exit(1)
 
     # Save user data to json
     @classmethod
@@ -268,7 +267,30 @@ class UserData:
 
         # Versions 44.6.x
         if ver.startswith("44.6"):
-            pass
+            new_tasks: list[dict] = []
+            for task in data["tasks"]:
+                new_task = {
+                    "id": task["id"],
+                    "parent": "",
+                    "text": task["text"],
+                    "color": task["color"],
+                    "completed": task["completed"],
+                    "deleted": task["deleted"],
+                }
+                new_tasks.append(new_task)
+                if task["sub"] != []:
+                    for sub in task["sub"]:
+                        new_sub = {
+                            "id": sub["id"],
+                            "parent": task["id"],
+                            "text": sub["text"],
+                            "color": sub["color"],
+                            "completed": sub["completed"],
+                            "deleted": sub["deleted"],
+                        }
+                        new_tasks.append(new_sub)
+            ver = VERSION
+            UserData.set(data)
 
         # Create new file if old is corrupted
         if not self.validate(self.get()):
