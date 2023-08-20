@@ -228,6 +228,7 @@
                     <child type="start">
                       <object class="GtkButton" id="delete_completed_tasks_btn">
                         <property name="valign">center</property>
+                        <property name="sensitive">false</property>
                         <property name="icon-name">edit-clear-all-symbolic</property>
                         <property name="tooltip-text" translatable="yes">Delete Completed Tasks</property>
                         <signal name="clicked" handler="on_delete_completed_tasks_btn_clicked" />
