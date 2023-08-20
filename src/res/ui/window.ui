@@ -20,6 +20,9 @@
             <property name="flap">
               <object class="GtkBox">
                 <property name="orientation">vertical</property>
+                <style>
+                  <class name="background" />
+                </style>
 
                 <!-- Title -->
                 <child>
