@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: io.github.mrvladus.List\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-11 14:21+0300\n"
+"POT-Creation-Date: 2023-08-20 15:37+0300\n"
 "PO-Revision-Date: 2023-06-17 23:28+0300\n"
 "Last-Translator: Sabri Ünal <libreajans@gmail.com>\n"
 "Language-Team: Turkish <takim@gnome.org.tr>\n"
@@ -19,79 +19,83 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Poedit 3.2.2\n"
 
-#: src/res/ui/window.ui:34
+#: src/res/ui/window.ui:30
 msgid "Deleted Tasks"
 msgstr "Tamamlanmış görevler"
 
-#: src/res/ui/window.ui:47
+#: src/res/ui/window.ui:77
 msgid "Empty Trash"
 msgstr ""
 
-#: src/res/ui/window.ui:48
+#: src/res/ui/window.ui:78
 msgid "No deleted items"
 msgstr ""
 
-#: src/res/ui/window.ui:105
+#: src/res/ui/window.ui:135
 msgid "Clear"
 msgstr "Biçemi temizle"
 
-#: src/res/ui/window.ui:121
+#: src/res/ui/window.ui:151
 msgid "Restore All"
 msgstr ""
 
-#: src/res/ui/window.ui:158 src/res/ui/window.ui:160
+#: src/res/ui/window.ui:168
+msgid "Move to Trash"
+msgstr ""
+
+#: src/res/ui/window.ui:209 src/res/ui/window.ui:211
 msgid "Show Deleted Tasks"
 msgstr ""
 
-#: src/res/ui/window.ui:181 src/res/ui/window.ui:184
+#: src/res/ui/window.ui:233 src/res/ui/window.ui:236
 msgid "Delete Completed Tasks"
 msgstr "Tamamlanmış görevleri sil"
 
-#: src/res/ui/window.ui:209 src/res/ui/window.ui:211
+#: src/res/ui/window.ui:261 src/res/ui/window.ui:263
 msgid "Main Menu"
 msgstr "Ana menü"
 
-#: src/res/ui/window.ui:225 src/res/ui/window.ui:228
+#: src/res/ui/window.ui:277 src/res/ui/window.ui:280
 msgid "Scroll Up"
 msgstr ""
 
-#: src/res/ui/window.ui:261
+#: src/res/ui/window.ui:313
 msgid "Add new Task"
 msgstr "Yeni görev ekle"
 
-#: src/res/ui/window.ui:354
+#: src/res/ui/window.ui:406
 msgid "Export Tasks..."
 msgstr ""
 
-#: src/res/ui/window.ui:358
+#: src/res/ui/window.ui:410
 msgid "Import Tasks..."
 msgstr ""
 
-#: src/res/ui/window.ui:364
+#: src/res/ui/window.ui:416
 msgid "Preferences"
 msgstr "Tercihler"
 
-#: src/res/ui/window.ui:368
+#: src/res/ui/window.ui:420
 msgid "About Errands"
 msgstr "List Errands"
 
-#: src/res/ui/window.ui:381
+#: src/res/ui/window.ui:433
 msgid "translator-credits"
 msgstr "Sabri Ünal <libreajans@gmail.com>"
 
-#: src/res/ui/window.ui:415
+#: src/res/ui/window.ui:467
 msgid "Copied to Clipboard"
 msgstr ""
 
-#: src/res/ui/window.ui:420
+#: src/res/ui/window.ui:472
 msgid "Tasks Exported"
 msgstr ""
 
-#: src/res/ui/window.ui:425
+#: src/res/ui/window.ui:477
 msgid "Tasks Imported"
 msgstr ""
 
-#: src/res/ui/window.ui:430
+#: src/res/ui/window.ui:482
 msgid "Error. Open log for information."
 msgstr ""
 
@@ -111,41 +115,41 @@ msgstr "Açık"
 msgid "Dark"
 msgstr "Koyu"
 
-#: src/res/ui/sub_task.ui:56 src/res/ui/sub_task.ui:59 src/res/ui/task.ui:141
-#: src/res/ui/task.ui:144
+#: src/res/ui/sub_task.ui:54 src/res/ui/sub_task.ui:57 src/res/ui/task.ui:136
+#: src/res/ui/task.ui:139
 msgid "Mark as Completed"
 msgstr "Tamamlanmadı olarak imle"
 
-#: src/res/ui/sub_task.ui:86 src/res/ui/sub_task.ui:88 src/res/ui/task.ui:287
-#: src/res/ui/task.ui:289
+#: src/res/ui/sub_task.ui:84 src/res/ui/sub_task.ui:86 src/res/ui/task.ui:282
+#: src/res/ui/task.ui:284
 msgid "Menu"
 msgstr ""
 
-#: src/res/ui/sub_task.ui:121 src/res/ui/task.ui:323
+#: src/res/ui/sub_task.ui:119 src/res/ui/task.ui:318
 msgid "Cancel"
 msgstr "İptal"
 
-#: src/res/ui/sub_task.ui:142 src/res/ui/task.ui:13
+#: src/res/ui/sub_task.ui:140 src/res/ui/task.ui:13
 msgid "Delete"
 msgstr "Sil"
 
-#: src/res/ui/sub_task.ui:146 src/res/ui/task.ui:17
+#: src/res/ui/sub_task.ui:144 src/res/ui/task.ui:17
 msgid "Edit"
 msgstr "Düzenle"
 
-#: src/res/ui/sub_task.ui:150 src/res/ui/task.ui:21
+#: src/res/ui/sub_task.ui:148 src/res/ui/task.ui:21
 msgid "Copy"
 msgstr ""
 
-#: src/res/ui/task.ui:187 src/res/ui/task.ui:190
+#: src/res/ui/task.ui:182 src/res/ui/task.ui:185
 msgid "Clear style"
 msgstr "Biçemi temizle"
 
-#: src/res/ui/task.ui:359
+#: src/res/ui/task.ui:354
 msgid "Add new Sub-Task"
 msgstr "Yeni alt görev ekle"
 
-#: src/res/ui/task.ui:373 src/res/ui/task.ui:377
+#: src/res/ui/task.ui:368 src/res/ui/task.ui:372
 msgid "Delete Completed Sub-Tasks"
 msgstr "Tamamlanmış alt görevleri sil"
 

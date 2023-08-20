@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: list\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-11 14:21+0300\n"
+"POT-Creation-Date: 2023-08-20 15:37+0300\n"
 "PO-Revision-Date: 2023-08-08 10:42+0200\n"
 "Last-Translator: Amerey.eu <info@amerey.eu>\n"
 "Language-Team: \n"
@@ -17,79 +17,83 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.3.1\n"
 
-#: src/res/ui/window.ui:34
+#: src/res/ui/window.ui:30
 msgid "Deleted Tasks"
 msgstr "Smazané úkoly"
 
-#: src/res/ui/window.ui:47
+#: src/res/ui/window.ui:77
 msgid "Empty Trash"
 msgstr "Vyprázdnit koš"
 
-#: src/res/ui/window.ui:48
+#: src/res/ui/window.ui:78
 msgid "No deleted items"
 msgstr "Žádné smazané položky"
 
-#: src/res/ui/window.ui:105
+#: src/res/ui/window.ui:135
 msgid "Clear"
 msgstr "Zrušit zvýraznění"
 
-#: src/res/ui/window.ui:121
+#: src/res/ui/window.ui:151
 msgid "Restore All"
 msgstr "Obnovit vše"
 
-#: src/res/ui/window.ui:158 src/res/ui/window.ui:160
+#: src/res/ui/window.ui:168
+msgid "Move to Trash"
+msgstr ""
+
+#: src/res/ui/window.ui:209 src/res/ui/window.ui:211
 msgid "Show Deleted Tasks"
 msgstr "Zobrazit smazané úkoly"
 
-#: src/res/ui/window.ui:181 src/res/ui/window.ui:184
+#: src/res/ui/window.ui:233 src/res/ui/window.ui:236
 msgid "Delete Completed Tasks"
 msgstr "Smazat hotové úkoly"
 
-#: src/res/ui/window.ui:209 src/res/ui/window.ui:211
+#: src/res/ui/window.ui:261 src/res/ui/window.ui:263
 msgid "Main Menu"
 msgstr "Hlavní menu"
 
-#: src/res/ui/window.ui:225 src/res/ui/window.ui:228
+#: src/res/ui/window.ui:277 src/res/ui/window.ui:280
 msgid "Scroll Up"
 msgstr "Posunout nahoru"
 
-#: src/res/ui/window.ui:261
+#: src/res/ui/window.ui:313
 msgid "Add new Task"
 msgstr "Přidat nový úkol"
 
-#: src/res/ui/window.ui:354
+#: src/res/ui/window.ui:406
 msgid "Export Tasks..."
 msgstr ""
 
-#: src/res/ui/window.ui:358
+#: src/res/ui/window.ui:410
 msgid "Import Tasks..."
 msgstr ""
 
-#: src/res/ui/window.ui:364
+#: src/res/ui/window.ui:416
 msgid "Preferences"
 msgstr "Předvolby"
 
-#: src/res/ui/window.ui:368
+#: src/res/ui/window.ui:420
 msgid "About Errands"
 msgstr "O aplikaci Errands"
 
-#: src/res/ui/window.ui:381
+#: src/res/ui/window.ui:433
 msgid "translator-credits"
 msgstr "Amerey.eu"
 
-#: src/res/ui/window.ui:415
+#: src/res/ui/window.ui:467
 msgid "Copied to Clipboard"
 msgstr "Zkopírováno do schránky"
 
-#: src/res/ui/window.ui:420
+#: src/res/ui/window.ui:472
 msgid "Tasks Exported"
 msgstr ""
 
-#: src/res/ui/window.ui:425
+#: src/res/ui/window.ui:477
 msgid "Tasks Imported"
 msgstr ""
 
-#: src/res/ui/window.ui:430
+#: src/res/ui/window.ui:482
 msgid "Error. Open log for information."
 msgstr ""
 
@@ -109,41 +113,41 @@ msgstr "Světlý"
 msgid "Dark"
 msgstr "Tmavý"
 
-#: src/res/ui/sub_task.ui:56 src/res/ui/sub_task.ui:59 src/res/ui/task.ui:141
-#: src/res/ui/task.ui:144
+#: src/res/ui/sub_task.ui:54 src/res/ui/sub_task.ui:57 src/res/ui/task.ui:136
+#: src/res/ui/task.ui:139
 msgid "Mark as Completed"
 msgstr "Označit jako dokončené"
 
-#: src/res/ui/sub_task.ui:86 src/res/ui/sub_task.ui:88 src/res/ui/task.ui:287
-#: src/res/ui/task.ui:289
+#: src/res/ui/sub_task.ui:84 src/res/ui/sub_task.ui:86 src/res/ui/task.ui:282
+#: src/res/ui/task.ui:284
 msgid "Menu"
 msgstr "Menu"
 
-#: src/res/ui/sub_task.ui:121 src/res/ui/task.ui:323
+#: src/res/ui/sub_task.ui:119 src/res/ui/task.ui:318
 msgid "Cancel"
 msgstr "Zrušit"
 
-#: src/res/ui/sub_task.ui:142 src/res/ui/task.ui:13
+#: src/res/ui/sub_task.ui:140 src/res/ui/task.ui:13
 msgid "Delete"
 msgstr "Smazat"
 
-#: src/res/ui/sub_task.ui:146 src/res/ui/task.ui:17
+#: src/res/ui/sub_task.ui:144 src/res/ui/task.ui:17
 msgid "Edit"
 msgstr "Editovat"
 
-#: src/res/ui/sub_task.ui:150 src/res/ui/task.ui:21
+#: src/res/ui/sub_task.ui:148 src/res/ui/task.ui:21
 msgid "Copy"
 msgstr "Kopírovat"
 
-#: src/res/ui/task.ui:187 src/res/ui/task.ui:190
+#: src/res/ui/task.ui:182 src/res/ui/task.ui:185
 msgid "Clear style"
 msgstr "Zrušit zvýraznění"
 
-#: src/res/ui/task.ui:359
+#: src/res/ui/task.ui:354
 msgid "Add new Sub-Task"
 msgstr "Přidat nový podúkol"
 
-#: src/res/ui/task.ui:373 src/res/ui/task.ui:377
+#: src/res/ui/task.ui:368 src/res/ui/task.ui:372
 msgid "Delete Completed Sub-Tasks"
 msgstr "Smazat dokončené podúkoly"
 
