@@ -379,6 +379,7 @@
                               <object class="GtkBox" id="tasks_list">
                                 <property name="orientation">vertical</property>
                                 <property name="hexpand">true</property>
+                                <property name="margin-bottom">18</property>
                               </object>
                             </child>
                           </object>
