@@ -275,7 +275,7 @@ class UserData:
                     "text": task["text"],
                     "color": task["color"],
                     "completed": task["completed"],
-                    "deleted": task["id"] in data["history"],
+                    "deleted": "history" in data and task["id"] in data["history"],
                 }
                 new_tasks.append(new_task)
                 if task["sub"] != []:
@@ -286,18 +286,21 @@ class UserData:
                             "text": sub["text"],
                             "color": "",
                             "completed": sub["completed"],
-                            "deleted": sub["id"] in data["history"],
+                            "deleted": "history" in data
+                            and sub["id"] in data["history"],
                         }
                         new_tasks.append(new_sub)
-            ver = VERSION
-            del data["history"]
+            data["version"] = VERSION
+            data["tasks"] = new_tasks
+            if "history" in data:
+                del data["history"]
             UserData.set(data)
 
         # Create new file if old is corrupted
         if not self.validate(self.get()):
             Log.error(
-                f"Data file is corrupted. Creating backup at {self.data_dir + '/data_old.json'}"
+                f"Data file is corrupted. Creating backup at {self.data_dir + '/data.old.json'}"
             )
-            shutil.copy(self.data_dir + "/data.json", self.data_dir + "/data_old.json")
+            shutil.copy(self.data_dir + "/data.json", self.data_dir + "/data.old.json")
             self.set(self.default_data)
             return
