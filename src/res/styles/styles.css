@@ -137,6 +137,14 @@ progress {
   background-color: @brown_2;
 }
 
+/* Sidebar */
+.dnd-sidebar {
+  border-width: 10px;
+  border-radius: 15px;
+  border-style: dotted;
+  border-color: @light_3;
+}
+
 /* Utils */
 .fade {
   transition: 0.2s;
