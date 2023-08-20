@@ -13,5 +13,8 @@
     <key name="theme" type="i">
       <default>0</default>
     </key>
+    <key name="sidebar-open" type="b">
+      <default>false</default>
+    </key>
   </schema>
 </schemalist>

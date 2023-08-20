@@ -49,6 +49,7 @@ class Window(Adw.ApplicationWindow):
     toast_err: Adw.Toast = Gtk.Template.Child()
     toast_exported: Adw.Toast = Gtk.Template.Child()
     toast_imported: Adw.Toast = Gtk.Template.Child()
+    toggle_trash_btn: Gtk.ToggleButton = Gtk.Template.Child()
     trash_list: Gtk.Box = Gtk.Template.Child()
     trash_list_scrl: Gtk.ScrolledWindow = Gtk.Template.Child()
 
@@ -61,6 +62,8 @@ class Window(Adw.ApplicationWindow):
         GSettings.bind("width", self, "default_width")
         GSettings.bind("height", self, "default_height")
         GSettings.bind("maximized", self, "maximized")
+        GSettings.bind("sidebar-open", self.toggle_trash_btn, "active")
+
         # Setup theme
         Adw.StyleManager.get_default().set_color_scheme(GSettings.get("theme"))
         self.get_settings().props.gtk_icon_theme_name = "Adwaita"
