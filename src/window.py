@@ -94,7 +94,7 @@ class Window(Adw.ApplicationWindow):
         create_action(
             "quit",
             lambda *_: self.props.application.quit(),
-            ["<primary>q"],
+            ["<primary>q", "<primary>w"],
         )
 
     def load_tasks(self) -> None:
