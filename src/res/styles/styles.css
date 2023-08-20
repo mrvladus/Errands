@@ -137,14 +137,6 @@ progress {
   background-color: @brown_2;
 }
 
-/* Trash */
-.move-to-trash {
-  border-radius: 10px;
-  border-width: 10px;
-  border-style: dashed;
-  border-color: alpha(@light_5, 0.5);
-}
-
 /* Utils */
 .fade {
   transition: 0.2s;

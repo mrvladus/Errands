@@ -39,6 +39,9 @@
                 <!-- Overlay -->
                 <child>
                   <object class="GtkOverlay">
+                    <property name="width-request">300</property>
+                    <property name="vexpand">true</property>
+
 
                     <!-- Drop target -->
                     <child>
@@ -61,6 +64,7 @@
                         <property name="orientation">vertical</property>
                         <property name="width-request">300</property>
                         <property name="hexpand">false</property>
+                        <property name="visible" bind-source="trash_drop_ctrl" bind-property="contains-pointer" bind-flags="sync-create|invert-boolean" />
                         <style>
                           <class name="background" />
                         </style>
@@ -159,7 +163,7 @@
 
                     <!-- DND status page -->
                     <child type="overlay">
-                      <object class="AdwStatusPage">
+                      <object class="AdwStatusPage" id="move_to_trash_status">
                         <property name="icon-name">tab-new-symbolic</property>
                         <property name="title" translatable="yes">Move to Trash</property>
                         <property name="vexpand">true</property>
@@ -167,7 +171,6 @@
                         <style>
                           <class name="background" />
                           <class name="compact" />
-                          <class name="move-to-trash" />
                         </style>
                       </object>
                     </child>
