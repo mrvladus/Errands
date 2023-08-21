@@ -10,8 +10,13 @@
     <key name="maximized" type="b">
       <default>false</default>
     </key>
-    <key name="theme" type="i">
-      <default>0</default>
+    <key type="s" name="theme">
+      <choices>
+        <choice value="auto" />
+        <choice value="light" />
+        <choice value="dark" />
+      </choices>
+      <default>"auto"</default>
     </key>
     <key name="sidebar-open" type="b">
       <default>false</default>

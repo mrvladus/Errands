@@ -230,7 +230,7 @@
 
                     <!-- Menu -->
                     <child type="end">
-                      <object class="GtkMenuButton">
+                      <object class="GtkMenuButton" id="main_menu_btn">
                         <property name="primary">true</property>
                         <property name="icon-name">open-menu-symbolic</property>
                         <property name="menu-model">primary_menu</property>
@@ -380,6 +380,11 @@
   <menu id="primary_menu">
     <section>
       <item>
+        <attribute name="custom">theme</attribute>
+      </item>
+    </section>
+    <section>
+      <item>
         <attribute name="label" translatable="yes">Export Tasks...</attribute>
         <attribute name="action">app.export</attribute>
       </item>
@@ -389,10 +394,10 @@
       </item>
     </section>
     <section>
-      <item>
+      <!-- <item>
         <attribute name="label" translatable="yes">Preferences</attribute>
         <attribute name="action">app.preferences</attribute>
-      </item>
+      </item> -->
       <item>
         <attribute name="label" translatable="yes">About Errands</attribute>
         <attribute name="action">app.about</attribute>

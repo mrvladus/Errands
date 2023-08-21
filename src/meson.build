@@ -26,6 +26,7 @@ list_sources = [
   'preferences.py',
   'sub_task.py',
   'task.py',
+  'theme_switcher.py',
   'utils.py',
   'window.py',
 ]

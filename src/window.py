@@ -24,6 +24,8 @@ import json
 from gi.repository import Gio, Adw, Gtk, GLib
 from __main__ import VERSION
 
+
+from .theme_switcher import ThemeSwitcher
 from .sub_task import SubTask
 from .utils import Animate, GSettings, Log, TaskUtils, UserData
 from .task import Task
@@ -39,6 +41,7 @@ class Window(Adw.ApplicationWindow):
     drop_motion_ctrl: Gtk.DropControllerMotion = Gtk.Template.Child()
     export_dialog: Gtk.FileDialog = Gtk.Template.Child()
     import_dialog: Gtk.FileDialog = Gtk.Template.Child()
+    main_menu_btn: Gtk.MenuButton = Gtk.Template.Child()
     scroll_up_btn_rev: Gtk.Revealer = Gtk.Template.Child()
     scrolled_window: Gtk.ScrolledWindow = Gtk.Template.Child()
     separator: Gtk.Box = Gtk.Template.Child()
@@ -63,9 +66,8 @@ class Window(Adw.ApplicationWindow):
         GSettings.bind("height", self, "default_height")
         GSettings.bind("maximized", self, "maximized")
         GSettings.bind("sidebar-open", self.toggle_trash_btn, "active")
-
-        # Setup theme
-        Adw.StyleManager.get_default().set_color_scheme(GSettings.get("theme"))
+        # Add theme switcher to menu
+        self.main_menu_btn.props.popover.add_child(ThemeSwitcher(), "theme")
         self.get_settings().props.gtk_icon_theme_name = "Adwaita"
         self.create_actions()
         self.load_tasks()
@@ -83,11 +85,11 @@ class Window(Adw.ApplicationWindow):
                 self.props.application.set_accels_for_action(f"app.{name}", shortcuts)
             self.props.application.add_action(action)
 
-        create_action(
-            "preferences",
-            lambda *_: PreferencesWindow(self).show(),
-            ["<primary>comma"],
-        )
+        # create_action(
+        #     "preferences",
+        #     lambda *_: PreferencesWindow(self).show(),
+        #     ["<primary>comma"],
+        # )
         create_action("export", self.export_tasks, ["<primary>e"])
         create_action("import", self.import_tasks, ["<primary>i"])
         create_action("about", self.about)
