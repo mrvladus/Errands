@@ -1,11 +1,14 @@
-<img width='128' src='https://raw.githubusercontent.com/mrvladus/List/main/data/icons/io.github.mrvladus.List.svg' align="left"/>
-
-# Errands
-
-Manage your tasks
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/mrvladus/List/main/screenshots/main.png" height="400"/>
+  <img src="data/icons/io.github.mrvladus.List.svg" width="128" height="128">
+
+  # Errands
+
+  Manage your tasks
+
+  ![CI](https://github.com/mrvladus/List/actions/workflows/CI.yml/badge.svg)
+
+  <img src="screenshots/main.png" width="360">
 </div>
 
 ## Features
@@ -13,14 +16,17 @@ Manage your tasks
 - Mark task and sub-tasks as completed
 - Add accent color for each task
 - Drag and Drop support
-- Deletion history
 
 ## Install
-Errands is only available as a Flatpak on Flathub:
+Errands is available as a Flatpak on Flathub:
 
 <a href="https://flathub.org/apps/details/io.github.mrvladus.List"><img width='240' alt='Download on Flathub' src='https://dl.flathub.org/assets/badges/flathub-badge-en.png'/></a>
+## Building using GNOME Builder
+1. Install [GNOME Builder](https://flathub.org/apps/org.gnome.Builder).
+2. Click "Clone Repository" with `https://github.com/mrvladus/List.git` as the URL.
+3. Click on the build button at the top.
 
-## Building flatpak from source
+## Building using build scripts
 Make sure you have `git` and `flatpak` installed and `Flathub` is setup
 1. Clone repo:
 ```sh
