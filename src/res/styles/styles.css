@@ -1,9 +1,11 @@
 /* Tasks list */
+
 .separator {
   background: linear-gradient(to bottom, @borders, transparent);
 }
 
 /* Task */
+
 .task {
   transition: 0.25s;
 }
@@ -81,6 +83,7 @@
 }
 
 /* Sub-task */
+
 .sub-task-rev {
   transition: opacity 0.25s;
 }
@@ -96,6 +99,7 @@
 }
 
 /* Progress bar */
+
 progressbar {
   transition: background-color 0.25s;
   opacity: 0.7;
@@ -138,6 +142,7 @@ progress {
 }
 
 /* Sidebar */
+
 .dnd-sidebar {
   border-width: 10px;
   border-radius: 15px;
@@ -146,6 +151,7 @@ progress {
 }
 
 /* Utils */
+
 .fade {
   transition: 0.2s;
 }
@@ -155,8 +161,9 @@ progress {
 }
 
 /* Theme Switcher */
-/* Base on gnome-text-editor */
-/* https://gitlab.gnome.org/GNOME/gnome-text-editor/ */
+/* Based on Dialect */
+/* https://github.com/dialect-app/dialect */
+
 .themeswitcher {
   margin: 9px;
 }
