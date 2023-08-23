@@ -14,7 +14,7 @@ profile = get_option('profile')
 if profile == 'development'
   app_id = 'io.github.mrvladus.List.Devel'
   prefix = '/io/github/mrvladus/List/Devel'
-elif profile ==  'release'
+elif profile == 'release'
   app_id = 'io.github.mrvladus.List'
   prefix = '/io/github/mrvladus/List'
 endif

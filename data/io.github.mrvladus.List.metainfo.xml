@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>io.github.mrvladus.List</id>
+  <id>@APP_ID@</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>MIT</project_license>
   <content_rating type="oars-1.1" />
   <developer_name>Vlad Krupinski</developer_name>
   <url type="homepage">https://github.com/mrvladus/Errands</url>
   <url type="bugtracker">https://github.com/mrvladus/Errands/issues</url>
-  <launchable type="desktop-id">io.github.mrvladus.List.desktop</launchable>
+  <launchable type="desktop-id">@APP_ID@.desktop</launchable>
   <custom>
     <value key="Purism::form_factor">workstation</value>
     <value key="Purism::form_factor">mobile</value>

@@ -8,19 +8,44 @@ install_data(
   install_dir: join_paths(get_option('datadir'), 'icons', join_paths('hicolor', 'symbolic', 'apps'))
 )
 
-install_data(
-  'io.github.mrvladus.List.desktop',
+desktop_file = i18n.merge_file(
+        input: configure_file(
+          input: 'io.github.mrvladus.List.desktop',
+          output: app_id + '.desktop.in',
+          configuration: conf
+        ),
+       output: app_id + '.desktop',
+         type: 'desktop',
+       po_dir: '../po',
+      install: true,
   install_dir: join_paths(get_option('datadir'), 'applications')
 )
 
-install_data(
-  'io.github.mrvladus.List.metainfo.xml',
+desktop_utils = find_program('desktop-file-validate', required: false)
+if desktop_utils.found()
+  test('Validate desktop file', desktop_utils, args: [desktop_file])
+endif
+
+appstream_file = i18n.merge_file(
+        input: configure_file(
+          input: 'io.github.mrvladus.List.metainfo.xml',
+          output: app_id + '.metainfo.xml.in',
+          configuration: conf
+        ),
+       output: app_id + '.metainfo.xml',
+       po_dir: '../po',
+      install: true,
   install_dir: join_paths(get_option('datadir'), 'metainfo')
 )
 
+appstream_util = find_program('appstream-util', required: false)
+if appstream_util.found()
+  test('Validate appstream file', appstream_util, args: ['validate', appstream_file])
+endif
+
 install_data(
   configure_file(
-    input: 'io.github.mrvladus.List.gschema.xml',
+    input: 'errands.gschema.xml',
     output: app_id + '.gschema.xml',
     configuration: conf
   ),
