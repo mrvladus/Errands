@@ -35,6 +35,7 @@ gi.require_version("Adw", "1")
 
 APP_ID = "@APP_ID@"
 VERSION = "@VERSION@"
+PREFIX = "@PREFIX@"
 pkgdatadir = "@pkgdatadir@"
 localedir = "@localedir@"
 

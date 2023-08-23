@@ -27,7 +27,7 @@ require_version("Adw", "1")
 
 from gi.repository import Gio, Adw, Gtk, Gdk
 
-from __main__ import APP_ID
+from __main__ import APP_ID, PREFIX
 
 from .utils import GSettings, UserData, Log
 from .window import Window

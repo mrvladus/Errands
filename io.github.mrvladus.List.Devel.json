@@ -1,5 +1,5 @@
 {
-    "app-id": "io.github.mrvladus.List",
+    "app-id": "io.github.mrvladus.List.Devel",
     "runtime": "org.gnome.Platform",
     "runtime-version": "44",
     "sdk": "org.gnome.Sdk",
@@ -15,6 +15,9 @@
         {
             "name": "errands",
             "buildsystem": "meson",
+            "config-opts": [
+                "-Dprofile=development"
+            ],
             "sources": [
                 {
                     "type": "dir",
