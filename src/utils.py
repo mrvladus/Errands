@@ -24,6 +24,7 @@ import os
 import json
 import shutil
 import uuid
+
 from gi.repository import GLib, Gio, Adw, Gtk
 from __main__ import VERSION, APP_ID
 
@@ -111,7 +112,7 @@ class Log:
         if os.path.exists(self.log_file):
             os.rename(self.log_file, self.log_old_file)
         # Start new log
-        self.log(self, f"Log for Errands {VERSION}")
+        self.debug("Starting Errands " + VERSION)
 
     @classmethod
     def debug(self, msg: str) -> None:
@@ -200,13 +201,27 @@ class UserData:
     @classmethod
     def init(self) -> None:
         Log.debug("Initialize user data")
+
         # Create data file if not exists
         if not os.path.exists(self.data_dir + "/data.json"):
             with open(self.data_dir + "/data.json", "w+") as f:
                 json.dump(self.default_data, f)
                 Log.debug(f"Create data file at: {self.data_dir}/data.json")
+
+        data: dict = self.get()
         # Convert old formats
-        self.convert()
+        if data["version"] != VERSION:
+            self.convert()
+        # Create new file if old is corrupted
+        else:
+            if not self.validate(data):
+                Log.error(
+                    f"Data file is corrupted. Creating backup at {self.data_dir + '/data.old.json'}"
+                )
+                shutil.copy(
+                    self.data_dir + "/data.json", self.data_dir + "/data.old.json"
+                )
+                self.set(self.default_data)
 
     # Load user data from json
     @classmethod
@@ -295,12 +310,3 @@ class UserData:
             if "history" in data:
                 del data["history"]
             UserData.set(data)
-
-        # Create new file if old is corrupted
-        if not self.validate(self.get()):
-            Log.error(
-                f"Data file is corrupted. Creating backup at {self.data_dir + '/data.old.json'}"
-            )
-            shutil.copy(self.data_dir + "/data.json", self.data_dir + "/data.old.json")
-            self.set(self.default_data)
-            return

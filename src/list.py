@@ -27,6 +27,11 @@ import sys
 import signal
 import locale
 import gettext
+import gi
+
+gi.require_version("Gtk", "4.0")
+gi.require_version("Adw", "1")
+
 
 APP_ID = "@APP_ID@"
 VERSION = "@VERSION@"
@@ -40,11 +45,14 @@ locale.bindtextdomain("list", localedir)
 locale.textdomain("list")
 
 if __name__ == "__main__":
-
     from gi.repository import Gio
 
     resource = Gio.Resource.load(os.path.join(pkgdatadir, f"{APP_ID}.gresource"))
     resource._register()
+
+    from list.utils import Log
+
+    Log.init()
 
     from list import application
 

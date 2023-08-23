@@ -27,7 +27,7 @@ require_version("Adw", "1")
 
 from gi.repository import Gio, Adw, Gtk, Gdk
 
-from __main__ import APP_ID, VERSION
+from __main__ import APP_ID
 
 from .utils import GSettings, UserData, Log
 from .window import Window
@@ -39,8 +39,6 @@ class Application(Adw.Application):
             application_id=APP_ID,
             flags=Gio.ApplicationFlags.DEFAULT_FLAGS,
         )
-        Log.init()
-        Log.debug("Starting Errands " + VERSION)
 
     def do_activate(self) -> None:
         GSettings.init()
