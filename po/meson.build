@@ -1,1 +1,1 @@
-i18n.gettext('list', preset: 'glib')
+i18n.gettext('errands', preset: 'glib')

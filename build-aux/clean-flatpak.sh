@@ -1,4 +1,4 @@
 #!/usr/bin/bash
 echo "---------- CLEANING... ----------"
-flatpak uninstall io.github.mrvladus.List//master -y
+flatpak uninstall io.github.mrvladus.List.Devel -y
 echo "---------- DONE! ----------"

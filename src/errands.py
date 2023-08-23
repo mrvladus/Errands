@@ -42,9 +42,9 @@ localedir = "@localedir@"
 
 sys.path.insert(1, pkgdatadir)
 signal.signal(signal.SIGINT, signal.SIG_DFL)
-gettext.install("list", localedir)
-locale.bindtextdomain("list", localedir)
-locale.textdomain("list")
+gettext.install("errands", localedir)
+locale.bindtextdomain("errands", localedir)
+locale.textdomain("errands")
 
 if __name__ == "__main__":
     from gi.repository import Gio

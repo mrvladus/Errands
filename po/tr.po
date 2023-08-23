@@ -6,9 +6,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: io.github.mrvladus.List\n"
+"Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-20 15:37+0300\n"
+"POT-Creation-Date: 2023-08-23 17:49+0300\n"
 "PO-Revision-Date: 2023-06-17 23:28+0300\n"
 "Last-Translator: Sabri Ünal <libreajans@gmail.com>\n"
 "Language-Team: Turkish <takim@gnome.org.tr>\n"
@@ -19,83 +19,79 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Poedit 3.2.2\n"
 
-#: src/res/ui/window.ui:30
-msgid "Deleted Tasks"
-msgstr "Tamamlanmış görevler"
-
-#: src/res/ui/window.ui:77
-msgid "Empty Trash"
-msgstr ""
-
-#: src/res/ui/window.ui:78
-msgid "No deleted items"
-msgstr ""
-
-#: src/res/ui/window.ui:135
-msgid "Clear"
-msgstr "Biçemi temizle"
-
-#: src/res/ui/window.ui:151
-msgid "Restore All"
-msgstr ""
-
-#: src/res/ui/window.ui:168
+#: src/res/ui/window.ui:42
 msgid "Move to Trash"
 msgstr ""
 
-#: src/res/ui/window.ui:209 src/res/ui/window.ui:211
+#: src/res/ui/window.ui:68
+msgid "Deleted Tasks"
+msgstr "Tamamlanmış görevler"
+
+#: src/res/ui/window.ui:80 src/res/ui/window.ui:83
+msgid "Clear"
+msgstr "Biçemi temizle"
+
+#: src/res/ui/window.ui:94 src/res/ui/window.ui:97
+msgid "Restore All"
+msgstr ""
+
+#: src/res/ui/window.ui:118
+msgid "Empty Trash"
+msgstr ""
+
+#: src/res/ui/window.ui:119
+msgid "No deleted items"
+msgstr ""
+
+#: src/res/ui/window.ui:185 src/res/ui/window.ui:187
 msgid "Show Deleted Tasks"
 msgstr ""
 
-#: src/res/ui/window.ui:233 src/res/ui/window.ui:236
+#: src/res/ui/window.ui:209 src/res/ui/window.ui:212
 msgid "Delete Completed Tasks"
 msgstr "Tamamlanmış görevleri sil"
 
-#: src/res/ui/window.ui:261 src/res/ui/window.ui:263
+#: src/res/ui/window.ui:237 src/res/ui/window.ui:239
 msgid "Main Menu"
 msgstr "Ana menü"
 
-#: src/res/ui/window.ui:277 src/res/ui/window.ui:280
+#: src/res/ui/window.ui:253 src/res/ui/window.ui:256
 msgid "Scroll Up"
 msgstr ""
 
-#: src/res/ui/window.ui:313
+#: src/res/ui/window.ui:289
 msgid "Add new Task"
 msgstr "Yeni görev ekle"
 
-#: src/res/ui/window.ui:406
+#: src/res/ui/window.ui:388
 msgid "Export Tasks..."
 msgstr ""
 
-#: src/res/ui/window.ui:410
+#: src/res/ui/window.ui:392
 msgid "Import Tasks..."
 msgstr ""
 
-#: src/res/ui/window.ui:416
-msgid "Preferences"
-msgstr "Tercihler"
-
-#: src/res/ui/window.ui:420
+#: src/res/ui/window.ui:402
 msgid "About Errands"
 msgstr "List Errands"
 
-#: src/res/ui/window.ui:433
+#: src/res/ui/window.ui:415
 msgid "translator-credits"
 msgstr "Sabri Ünal <libreajans@gmail.com>"
 
-#: src/res/ui/window.ui:467
+#: src/res/ui/window.ui:449
 msgid "Copied to Clipboard"
 msgstr ""
 
-#: src/res/ui/window.ui:472
+#: src/res/ui/window.ui:454
 msgid "Tasks Exported"
 msgstr ""
 
-#: src/res/ui/window.ui:477
+#: src/res/ui/window.ui:459
 msgid "Tasks Imported"
 msgstr ""
 
-#: src/res/ui/window.ui:482
+#: src/res/ui/window.ui:464
 msgid "Error. Open log for information."
 msgstr ""
 
@@ -156,3 +152,18 @@ msgstr "Tamamlanmış alt görevleri sil"
 #: src/res/ui/trash_item.ui:17 src/res/ui/trash_item.ui:21
 msgid "Restore"
 msgstr ""
+
+#: src/res/ui/theme_switcher.ui:22 src/res/ui/theme_switcher.ui:25
+msgid "Follow System Style"
+msgstr ""
+
+#: src/res/ui/theme_switcher.ui:40 src/res/ui/theme_switcher.ui:43
+msgid "Light Style"
+msgstr ""
+
+#: src/res/ui/theme_switcher.ui:58 src/res/ui/theme_switcher.ui:61
+msgid "Dark Style"
+msgstr ""
+
+#~ msgid "Preferences"
+#~ msgstr "Tercihler"
