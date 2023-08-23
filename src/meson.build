@@ -11,7 +11,8 @@ configure_file(
   install_mode: 'r-xr--r--'
 )
 
-list_sources = [
+install_data(
+  [
   'application.py',
   'preferences.py',
   'sub_task.py',
@@ -19,6 +20,6 @@ list_sources = [
   'theme_switcher.py',
   'utils.py',
   'window.py',
-]
-
-install_data(list_sources, install_dir: moduledir)
+  ], 
+  install_dir: moduledir
+)
