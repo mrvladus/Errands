@@ -1,5 +1,5 @@
 pkgdatadir = join_paths(get_option('prefix'), get_option('datadir'), meson.project_name())
-moduledir = join_paths(pkgdatadir, 'list')
+moduledir = join_paths(pkgdatadir, meson.project_name())
 
 subdir('res')
 
@@ -13,8 +13,8 @@ conf.set('localedir', join_paths(get_option('prefix'), get_option('localedir')))
 conf.set('pkgdatadir', pkgdatadir)
 
 configure_file(
-  input: 'list.py',
-  output: 'list',
+  input: 'errands.py',
+  output: 'errands',
   configuration: conf,
   install: true,
   install_dir: get_option('bindir'),

@@ -50,11 +50,11 @@ if __name__ == "__main__":
     resource = Gio.Resource.load(os.path.join(pkgdatadir, "errands.gresource"))
     resource._register()
 
-    from list.utils import Log
+    from errands.utils import Log
 
     Log.init()
 
-    from list import application
+    from errands import application
 
     app = application.Application()
     sys.exit(app.run(sys.argv))

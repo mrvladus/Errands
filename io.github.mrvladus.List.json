@@ -3,7 +3,7 @@
     "runtime": "org.gnome.Platform",
     "runtime-version": "44",
     "sdk": "org.gnome.Sdk",
-    "command": "list",
+    "command": "errands",
     "finish-args": [
         "--share=ipc",
         "--socket=fallback-x11",
@@ -13,7 +13,7 @@
     ],
     "modules": [
         {
-            "name": "list",
+            "name": "errands",
             "buildsystem": "meson",
             "sources": [
                 {

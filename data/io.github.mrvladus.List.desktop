@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=Errands
-Exec=list
+Exec=errands
 Icon=io.github.mrvladus.List
 Terminal=false
 Type=Application
