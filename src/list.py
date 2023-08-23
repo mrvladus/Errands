@@ -47,7 +47,7 @@ locale.textdomain("list")
 if __name__ == "__main__":
     from gi.repository import Gio
 
-    resource = Gio.Resource.load(os.path.join(pkgdatadir, f"{APP_ID}.gresource"))
+    resource = Gio.Resource.load(os.path.join(pkgdatadir, "errands.gresource"))
     resource._register()
 
     from list.utils import Log
