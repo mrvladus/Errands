@@ -22,7 +22,7 @@
 
 import json
 from gi.repository import Gio, Adw, Gtk, GLib
-from __main__ import VERSION, PROFILE
+from __main__ import VERSION, PROFILE, APP_ID
 
 
 from .theme_switcher import ThemeSwitcher
@@ -118,6 +118,7 @@ class Window(Adw.ApplicationWindow):
     def about(self, *args) -> None:
         """Show about window"""
         self.about_window.props.version = VERSION
+        self.about_window.props.application_icon = APP_ID
         self.about_window.show()
 
     def export_tasks(self, *_) -> None:

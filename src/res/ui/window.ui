@@ -410,7 +410,6 @@
     <property name="hide-on-close">true</property>
     <property name="transient-for">Window</property>
     <property name="application-name">Errands</property>
-    <property name="application-icon">io.github.mrvladus.List</property>
     <property name="developer-name">Vlad Krupinski</property>
     <property name="translator-credits" translatable="yes">translator-credits</property>
     <property name="copyright">© 2023 Vlad Krupinski</property>
