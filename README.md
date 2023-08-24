@@ -43,4 +43,4 @@ To translate Errands to your language you can use <a href="https://flathub.org/r
 
 ## Code of conduct
 
-List follows the GNOME project [Code of Conduct](https://wiki.gnome.org/Foundation/CodeOfConduct).
+Errands follows the GNOME project [Code of Conduct](https://wiki.gnome.org/Foundation/CodeOfConduct).
