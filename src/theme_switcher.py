@@ -37,7 +37,6 @@ class ThemeSwitcher(Gtk.Box):
     dark = Gtk.Template.Child()
 
     # Properties
-    show_system = GObject.property(type=bool, default=True)
     color_scheme = "light"
 
     def __init__(self, **kwargs):
@@ -45,12 +44,6 @@ class ThemeSwitcher(Gtk.Box):
         self.style_manager = Adw.StyleManager.get_default()
         self.color_scheme = GSettings.get("theme")
         GSettings.bind("theme", self, "selected_color_scheme")
-        self.style_manager.bind_property(
-            "system-supports-color-schemes",
-            self,
-            "show_system",
-            GObject.BindingFlags.SYNC_CREATE,
-        )
 
     @GObject.Property(type=str)
     def selected_color_scheme(self):
