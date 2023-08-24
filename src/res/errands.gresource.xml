@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
-  <gresource prefix="/io/github/mrvladus/List">
+  <gresource prefix="/io/github/mrvladus/Errands">
     <file preprocess="xml-stripblanks" compressed="true" alias="window.ui">ui/window.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="preferences.ui">ui/preferences.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="task.ui">ui/task.ui</file>

@@ -20,14 +20,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from gi import require_version
-
-require_version("Gtk", "4.0")
-require_version("Adw", "1")
-
 from gi.repository import Gio, Adw, Gtk, Gdk
 
-from __main__ import APP_ID, PREFIX
+from __main__ import APP_ID
 
 from .utils import GSettings, UserData, Log
 from .window import Window
@@ -50,7 +45,7 @@ class Application(Adw.Application):
     def load_css(self):
         Log.debug("Load CSS styles")
         css_provider = Gtk.CssProvider()
-        css_provider.load_from_resource("/io/github/mrvladus/List/styles.css")
+        css_provider.load_from_resource("/io/github/mrvladus/Errands/styles.css")
         Gtk.StyleContext.add_provider_for_display(
             Gdk.Display.get_default(),
             css_provider,

@@ -25,7 +25,7 @@ from gi.repository import Gtk, GObject, Gdk, Gio, GLib
 from .utils import Log, UserData, Markup
 
 
-@Gtk.Template(resource_path="/io/github/mrvladus/List/sub_task.ui")
+@Gtk.Template(resource_path="/io/github/mrvladus/Errands/sub_task.ui")
 class SubTask(Gtk.Revealer):
     __gtype_name__ = "SubTask"
 

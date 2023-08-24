@@ -32,7 +32,7 @@ from .task import Task
 from .preferences import PreferencesWindow
 
 
-@Gtk.Template(resource_path="/io/github/mrvladus/List/window.ui")
+@Gtk.Template(resource_path="/io/github/mrvladus/Errands/window.ui")
 class Window(Adw.ApplicationWindow):
     __gtype_name__ = "Window"
 
@@ -383,7 +383,7 @@ class Window(Adw.ApplicationWindow):
         self.update_status()
 
 
-@Gtk.Template(resource_path="/io/github/mrvladus/List/trash_item.ui")
+@Gtk.Template(resource_path="/io/github/mrvladus/Errands/trash_item.ui")
 class TrashItem(Gtk.Box):
     __gtype_name__ = "TrashItem"
 

@@ -27,7 +27,7 @@ from gi.repository import Adw, GObject, Gtk
 from .utils import GSettings
 
 
-@Gtk.Template(resource_path="/io/github/mrvladus/List/theme_switcher.ui")
+@Gtk.Template(resource_path="/io/github/mrvladus/Errands/theme_switcher.ui")
 class ThemeSwitcher(Gtk.Box):
     __gtype_name__ = "ThemeSwitcher"
 

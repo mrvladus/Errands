@@ -23,7 +23,7 @@ from gi.repository import Adw, Gtk
 from .utils import GSettings
 
 
-@Gtk.Template(resource_path="/io/github/mrvladus/List/preferences.ui")
+@Gtk.Template(resource_path="/io/github/mrvladus/Errands/preferences.ui")
 class PreferencesWindow(Adw.PreferencesWindow):
     __gtype_name__ = "PreferencesWindow"
 
