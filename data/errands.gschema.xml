@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist gettext-domain="list">
-  <schema id="@APP_ID@" path="/io/github/mrvladus/List/">
+  <schema id="@APP_ID@" path="@PREFIX@/">
     <key name="width" type="i">
       <default>500</default>
     </key>

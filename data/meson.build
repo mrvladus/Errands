@@ -1,11 +1,13 @@
+scalable_dir = join_paths('hicolor', 'scalable', 'apps')
 install_data(
-  join_paths('icons', 'io.github.mrvladus.List.svg'),
-  install_dir: join_paths(get_option('datadir'), 'icons', join_paths('hicolor', 'scalable', 'apps'))
+  join_paths('icons', ('@0@.svg').format(app_id)),
+  install_dir: join_paths(get_option('datadir'), 'icons', scalable_dir)
 )
 
+symbolic_dir = join_paths('hicolor', 'symbolic', 'apps')
 install_data(
-  join_paths('icons', 'io.github.mrvladus.List-symbolic.svg'),
-  install_dir: join_paths(get_option('datadir'), 'icons', join_paths('hicolor', 'symbolic', 'apps'))
+  join_paths('icons', ('@0@-symbolic.svg').format(app_id)),
+  install_dir: join_paths(get_option('datadir'), 'icons', symbolic_dir)
 )
 
 desktop_file = i18n.merge_file(
