@@ -15,5 +15,5 @@ jobs:
     - uses: bilelmoussaoui/flatpak-github-actions/flatpak-builder@v6
       with:
         bundle: "errands.flatpak"
-        manifest-path: "io.github.mrvladus.List.json"
+        manifest-path: "io.github.mrvladus.List.Devel.json"
         cache-key: flatpak-builder-${{ github.sha }}
