@@ -1,5 +1,3 @@
-moduledir = join_paths(pkgdatadir, meson.project_name())
-
 subdir('res')
 
 configure_file(
@@ -21,5 +19,5 @@ install_data(
   'utils.py',
   'window.py',
   ], 
-  install_dir: moduledir
+  install_dir: join_paths(pkgdatadir, meson.project_name())
 )
