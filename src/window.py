@@ -29,7 +29,8 @@ from .theme_switcher import ThemeSwitcher
 from .sub_task import SubTask
 from .utils import Animate, GSettings, Log, TaskUtils, UserData
 from .task import Task
-from .preferences import PreferencesWindow
+
+# from .preferences import PreferencesWindow
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/Errands/window.ui")
