@@ -18,7 +18,6 @@
             <property name="hexpand">true</property>
             <property name="halign">center</property>
             <property name="focus-on-click">false</property>
-            <property name="visible" bind-source="ThemeSwitcher" bind-property="show-system" bind-flags="sync-create" />
             <property name="tooltip-text" translatable="yes">Follow System Style</property>
             <signal name="toggled" handler="on_theme_change" />
             <accessibility>
