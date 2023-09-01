@@ -76,10 +76,10 @@ class Window(Adw.ApplicationWindow):
         self.create_actions()
         self.load_tasks()
 
-    def add_toast(self, toast: Adw.Toast):
+    def add_toast(self, toast: Adw.Toast) -> None:
         self.toast_overlay.add_toast(toast)
 
-    def create_actions(self):
+    def create_actions(self) -> None:
         """Create actions for main menu"""
 
         def create_action(name: str, callback: callable, shortcuts=None) -> None:
@@ -139,7 +139,7 @@ class Window(Adw.ApplicationWindow):
 
         self.export_dialog.save(self, None, finish_export, None)
 
-    def import_tasks(self, *_):
+    def import_tasks(self, *_) -> None:
         """Show import dialog"""
 
         def finish_import(_dial, res, _data):
@@ -269,7 +269,7 @@ class Window(Adw.ApplicationWindow):
             self.scrolling = False
 
     @Gtk.Template.Callback()
-    def on_scroll(self, adj):
+    def on_scroll(self, adj) -> None:
         """Show scroll up button"""
 
         self.scroll_up_btn_rev.set_reveal_child(adj.get_value() > 0)
@@ -279,7 +279,7 @@ class Window(Adw.ApplicationWindow):
             self.separator.remove_css_class("separator")
 
     @Gtk.Template.Callback()
-    def on_scroll_up_btn_clicked(self, _):
+    def on_scroll_up_btn_clicked(self, _) -> None:
         """Scroll up"""
 
         Animate.scroll(self.scrolled_window, False)
@@ -354,7 +354,7 @@ class Window(Adw.ApplicationWindow):
         UserData.set(data)
 
         # Restore tasks
-        def restore_tasks(list: Gtk.Box):
+        def restore_tasks(list: Gtk.Box) -> None:
             """Recursive func for restoring tasks"""
 
             tasks = list.observe_children()
@@ -391,14 +391,14 @@ class TrashItem(Gtk.Box):
 
     label = Gtk.Template.Child()
 
-    def __init__(self, task: dict, window: Window):
+    def __init__(self, task: dict, window: Window) -> None:
         super().__init__()
         self.window = window
         self.id = task["id"]
         self.label.props.label = task["text"]
 
     @Gtk.Template.Callback()
-    def on_restore(self, _):
+    def on_restore(self, _) -> None:
         """Restore task"""
 
         Log.info("Restore: " + self.label.props.label)
@@ -425,7 +425,7 @@ class TrashItem(Gtk.Box):
                 break
 
         # Update UI
-        def restore_tasks(list: Gtk.Box):
+        def restore_tasks(list: Gtk.Box) -> None:
             """Recursive func for restoring tasks"""
 
             tasks = list.observe_children()

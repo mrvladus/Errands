@@ -29,7 +29,7 @@ from .window import Window
 
 
 class Application(Adw.Application):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(
             application_id=APP_ID,
             flags=Gio.ApplicationFlags.DEFAULT_FLAGS,
@@ -42,7 +42,7 @@ class Application(Adw.Application):
         # Show window
         Window(application=self).present()
 
-    def load_css(self):
+    def load_css(self) -> None:
         Log.debug("Load CSS styles")
         css_provider = Gtk.CssProvider()
         css_provider.load_from_resource("/io/github/mrvladus/Errands/styles.css")

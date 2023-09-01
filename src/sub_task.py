@@ -50,7 +50,7 @@ class SubTask(Gtk.Revealer):
         self.task_text.props.label = self.text
         self.add_actions()
 
-    def add_actions(self):
+    def add_actions(self) -> None:
         group = Gio.SimpleActionGroup.new()
         self.insert_action_group("sub_task", group)
 
@@ -143,7 +143,7 @@ class SubTask(Gtk.Revealer):
                     break
             UserData.set(data)
 
-            def check_visible():
+            def check_visible() -> bool:
                 if task.get_child_revealed():
                     return True
                 else:
