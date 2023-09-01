@@ -52,7 +52,7 @@
         <p>UI/UX:</p>
         <ul>
           <li>App renamed to Errands</li>
-          <li>Added sidebar with history of deleted tasks. You can restore them individually or all at once.</li>
+          <li>Added sidebar with history of deleted tasks. You can restore them individually or all at once. Supports Drag and Drop.</li>
           <li>Cleaner UI with task menus</li>
           <li>Accent colors selector moved to task's menu</li>
           <li>Added menu item for quick text copy to clipboard</li>
