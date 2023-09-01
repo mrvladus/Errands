@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-23 17:49+0300\n"
+"POT-Creation-Date: 2023-09-01 12:02+0300\n"
 "PO-Revision-Date: 2023-07-23 14:44-0300\n"
 "Last-Translator: Vitor Gabriel Gomes <vitorgabrielgomesro9090@gmail.com>\n"
 "Language-Team: \n"
@@ -73,23 +73,23 @@ msgstr ""
 msgid "About Errands"
 msgstr "Sobre Errands"
 
-#: src/res/ui/window.ui:415
+#: src/res/ui/window.ui:414
 msgid "translator-credits"
 msgstr "créditos-de-tradução"
 
-#: src/res/ui/window.ui:449
+#: src/res/ui/window.ui:448
 msgid "Copied to Clipboard"
 msgstr ""
 
-#: src/res/ui/window.ui:454
+#: src/res/ui/window.ui:453
 msgid "Tasks Exported"
 msgstr ""
 
-#: src/res/ui/window.ui:459
+#: src/res/ui/window.ui:458
 msgid "Tasks Imported"
 msgstr ""
 
-#: src/res/ui/window.ui:464
+#: src/res/ui/window.ui:463
 msgid "Error. Open log for information."
 msgstr ""
 
@@ -151,15 +151,15 @@ msgstr "Deletar sub-tarefas concluídas"
 msgid "Restore"
 msgstr ""
 
-#: src/res/ui/theme_switcher.ui:22 src/res/ui/theme_switcher.ui:25
+#: src/res/ui/theme_switcher.ui:21 src/res/ui/theme_switcher.ui:24
 msgid "Follow System Style"
 msgstr ""
 
-#: src/res/ui/theme_switcher.ui:40 src/res/ui/theme_switcher.ui:43
+#: src/res/ui/theme_switcher.ui:39 src/res/ui/theme_switcher.ui:42
 msgid "Light Style"
 msgstr ""
 
-#: src/res/ui/theme_switcher.ui:58 src/res/ui/theme_switcher.ui:61
+#: src/res/ui/theme_switcher.ui:57 src/res/ui/theme_switcher.ui:60
 msgid "Dark Style"
 msgstr ""
 

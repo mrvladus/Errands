@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-23 17:49+0300\n"
+"POT-Creation-Date: 2023-09-01 12:02+0300\n"
 "PO-Revision-Date: 2023-07-07 16:56+0300\n"
 "Last-Translator: Vlad Krupinski <mrvladus@yandex.ru>\n"
 "Language-Team: \n"
@@ -75,23 +75,23 @@ msgstr "Импорт задач..."
 msgid "About Errands"
 msgstr "О приложении"
 
-#: src/res/ui/window.ui:415
+#: src/res/ui/window.ui:414
 msgid "translator-credits"
 msgstr "Vlad Krupinski <mrvladus@yandex.ru>"
 
-#: src/res/ui/window.ui:449
+#: src/res/ui/window.ui:448
 msgid "Copied to Clipboard"
 msgstr "Скопировано в буфер обмена"
 
-#: src/res/ui/window.ui:454
+#: src/res/ui/window.ui:453
 msgid "Tasks Exported"
 msgstr "Экспорт завершен"
 
-#: src/res/ui/window.ui:459
+#: src/res/ui/window.ui:458
 msgid "Tasks Imported"
 msgstr "Импорт завершен"
 
-#: src/res/ui/window.ui:464
+#: src/res/ui/window.ui:463
 msgid "Error. Open log for information."
 msgstr "Ошибка. Откройте лог для доп. информации"
 
@@ -153,15 +153,15 @@ msgstr "Удалить выполненные подзадачи"
 msgid "Restore"
 msgstr "Восстановить"
 
-#: src/res/ui/theme_switcher.ui:22 src/res/ui/theme_switcher.ui:25
+#: src/res/ui/theme_switcher.ui:21 src/res/ui/theme_switcher.ui:24
 msgid "Follow System Style"
 msgstr "Системный стиль"
 
-#: src/res/ui/theme_switcher.ui:40 src/res/ui/theme_switcher.ui:43
+#: src/res/ui/theme_switcher.ui:39 src/res/ui/theme_switcher.ui:42
 msgid "Light Style"
 msgstr "Светлый стиль"
 
-#: src/res/ui/theme_switcher.ui:58 src/res/ui/theme_switcher.ui:61
+#: src/res/ui/theme_switcher.ui:57 src/res/ui/theme_switcher.ui:60
 msgid "Dark Style"
 msgstr "Темный стиль"
 
