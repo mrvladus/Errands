@@ -7,9 +7,10 @@
   Manage your tasks
 
   ![CI](https://github.com/mrvladus/List/actions/workflows/CI.yml/badge.svg)
-
-  <img src="screenshots/main.png" width="360">
-  <img src="screenshots/secondary.png" width="360">
+<p align="center">
+  <img src="screenshots/main.png" width="360" align="center">
+  <img src="screenshots/secondary.png" width="360" align="center">
+</p>
 </div>
 
 ## Features
