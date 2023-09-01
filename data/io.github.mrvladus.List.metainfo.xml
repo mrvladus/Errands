@@ -45,6 +45,9 @@
     <screenshot type="default">
       <image>https://raw.githubusercontent.com/mrvladus/List/main/screenshots/main.png</image>
     </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/mrvladus/List/main/screenshots/secondary.png</image>
+    </screenshot>
   </screenshots>
   <releases>
     <release version="44.7" date="2023-09-01">
