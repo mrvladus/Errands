@@ -5,8 +5,8 @@
   <project_license>MIT</project_license>
   <content_rating type="oars-1.1" />
   <developer_name>Vlad Krupinski</developer_name>
-  <url type="homepage">https://github.com/mrvladus/Errands</url>
-  <url type="bugtracker">https://github.com/mrvladus/Errands/issues</url>
+  <url type="homepage">https://github.com/mrvladus/List</url>
+  <url type="bugtracker">https://github.com/mrvladus/List/issues</url>
   <launchable type="desktop-id">@APP_ID@.desktop</launchable>
   <custom>
     <value key="Purism::form_factor">workstation</value>
@@ -18,13 +18,14 @@
     <control>pointing</control>
   </recommends>
   <provides>
-    <binary>list</binary>
+    <binary>errands</binary>
   </provides>
   <categories>
     <category>Utility</category>
   </categories>
   <keywords>
     <keyword>Errands</keyword>
+    <keyword>List</keyword>
     <keyword>To Do</keyword>
     <keyword>Task manager</keyword>
   </keywords>
@@ -42,11 +43,11 @@
   </description>
   <screenshots>
     <screenshot type="default">
-      <image>https://raw.githubusercontent.com/mrvladus/Errands/main/screenshots/main.png</image>
+      <image>https://raw.githubusercontent.com/mrvladus/List/main/screenshots/main.png</image>
     </screenshot>
   </screenshots>
   <releases>
-    <release version="44.7" date="2023-08-10">
+    <release version="44.7" date="2023-09-01">
       <description>
         <p>UI/UX:</p>
         <ul>
@@ -58,15 +59,17 @@
           <li>Improved Drag and Drop experience. Now you don't need to click edit button to access it. Just drag tasks as you want!</li>
           <li>Removed expand button. Click everywhere on Task to expand it.</li>
           <li>Added expand indicator on mouseover</li>
-          <li>Moved "Delete completed tasks" button to the headerbar from entry</li>
+          <li>Moved "Delete completed tasks" button to the headerbar</li>
           <li>Removed unnecessary settings</li>
           <li>Added toast notifications</li>
           <li>Added "Export Tasks..." item to the main menu</li>
+          <li>Added "Import Tasks..." item to the main menu</li>
         </ul>
         <p>Translations:</p>
         <ul>
           <li>Added Czech translation (Amerey.eu)</li>
           <li>Added Portuguese translation (Vitor Gabriel Gomes)</li>
+          <li>Added German translation (Christoph Bähr)</li>
         </ul>
       </description>
     </release>
