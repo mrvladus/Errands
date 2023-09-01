@@ -45,7 +45,7 @@ class Task(Gtk.Revealer):
     # State
     expanded: bool = None
 
-    def __init__(self, task: dict, window: Adw.ApplicationWindow):
+    def __init__(self, task: dict, window: Adw.ApplicationWindow) -> None:
         super().__init__()
         Log.info("Add task: " + task["text"])
         self.window = window
@@ -66,7 +66,7 @@ class Task(Gtk.Revealer):
             self.task_status.add_css_class(f'progress-{self.task["color"]}')
         self.add_sub_tasks()
 
-    def add_actions(self):
+    def add_actions(self) -> None:
         group = Gio.SimpleActionGroup.new()
         self.insert_action_group("task", group)
 
@@ -207,7 +207,7 @@ class Task(Gtk.Revealer):
                 if task["parent"] == id:
                     toggle_tasks_data(task["id"])
 
-        def toggle_tasks(tasks_list: Gtk.Box):
+        def toggle_tasks(tasks_list: Gtk.Box) -> None:
             tasks_list = tasks_list.observe_children()
             for i in range(tasks_list.get_n_items()):
                 task = tasks_list.get_item(i)

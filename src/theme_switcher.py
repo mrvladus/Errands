@@ -46,11 +46,11 @@ class ThemeSwitcher(Gtk.Box):
         GSettings.bind("theme", self, "selected_color_scheme")
 
     @GObject.Property(type=str)
-    def selected_color_scheme(self):
+    def selected_color_scheme(self) -> str:
         return self.color_scheme
 
     @selected_color_scheme.setter
-    def selected_color_scheme(self, color_scheme):
+    def selected_color_scheme(self, color_scheme) -> None:
         self.color_scheme = color_scheme
 
         if color_scheme == "auto":
@@ -64,7 +64,7 @@ class ThemeSwitcher(Gtk.Box):
             self.style_manager.props.color_scheme = Adw.ColorScheme.FORCE_DARK
 
     @Gtk.Template.Callback()
-    def on_theme_change(self, _):
+    def on_theme_change(self, _) -> None:
         if self.system.props.active:
             self.selected_color_scheme = "auto"
         if self.light.props.active:
