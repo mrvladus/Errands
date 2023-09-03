@@ -24,7 +24,6 @@ import json
 from gi.repository import Gio, Adw, Gtk, GLib
 from __main__ import VERSION, PROFILE, APP_ID
 
-
 from .sub_task import SubTask
 from .utils import Animate, GSettings, Log, TaskUtils, UserData
 from .task import Task
@@ -45,6 +44,7 @@ class Window(Adw.ApplicationWindow):
     scroll_up_btn_rev: Gtk.Revealer = Gtk.Template.Child()
     scrolled_window: Gtk.ScrolledWindow = Gtk.Template.Child()
     separator: Gtk.Box = Gtk.Template.Child()
+    shortcuts_window: Gtk.ShortcutsWindow = Gtk.Template.Child()
     status: Gtk.Statusbar = Gtk.Template.Child()
     tasks_list: Gtk.Box = Gtk.Template.Child()
     toast_overlay: Adw.ToastOverlay = Gtk.Template.Child()
@@ -93,6 +93,7 @@ class Window(Adw.ApplicationWindow):
         # )
         create_action("export", self.export_tasks, ["<primary>e"])
         create_action("import", self.import_tasks, ["<primary>i"])
+        create_action("shortcuts", self.shortcuts, ["<primary>question"])
         create_action("about", self.about)
         create_action(
             "quit",
@@ -176,6 +177,10 @@ class Window(Adw.ApplicationWindow):
             Log.info("Tasks imported")
 
         self.import_dialog.open(self, None, finish_import, None)
+
+    def shortcuts(self, *_):
+        self.shortcuts_window.set_transient_for(self)
+        self.shortcuts_window.show()
 
     def trash_add(self, task: dict) -> None:
         self.trash_list.append(TrashItem(task, self))
