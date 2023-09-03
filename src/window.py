@@ -25,7 +25,6 @@ from gi.repository import Gio, Adw, Gtk, GLib
 from __main__ import VERSION, PROFILE, APP_ID
 
 
-from .theme_switcher import ThemeSwitcher
 from .sub_task import SubTask
 from .utils import Animate, GSettings, Log, TaskUtils, UserData
 from .task import Task
@@ -70,8 +69,6 @@ class Window(Adw.ApplicationWindow):
         # Add devel style if needed
         if PROFILE == "development":
             self.add_css_class("devel")
-        # Add theme switcher to menu
-        self.main_menu_btn.props.popover.add_child(ThemeSwitcher(), "theme")
         self.get_settings().props.gtk_icon_theme_name = "Adwaita"
         self.create_actions()
         self.load_tasks()

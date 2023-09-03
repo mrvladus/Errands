@@ -380,11 +380,6 @@
   <menu id="primary_menu">
     <section>
       <item>
-        <attribute name="custom">theme</attribute>
-      </item>
-    </section>
-    <section>
-      <item>
         <attribute name="label" translatable="yes">Export Tasks...</attribute>
         <attribute name="action">app.export</attribute>
       </item>
@@ -398,6 +393,7 @@
         <attribute name="label" translatable="yes">Preferences</attribute>
         <attribute name="action">app.preferences</attribute>
       </item> -->
+
       <item>
         <attribute name="label" translatable="yes">About Errands</attribute>
         <attribute name="action">app.about</attribute>
