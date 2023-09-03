@@ -316,7 +316,13 @@ class Task(Gtk.Revealer):
     @Gtk.Template.Callback()
     def on_drag_begin(self, _source, drag) -> bool:
         icon = Gtk.DragIcon.get_for_drag(drag)
-        icon.set_child(Gtk.Button(label=self.task["text"]))
+        icon.set_child(
+            Gtk.Button(
+                label=self.task["text"]
+                if len(self.task["text"]) < 20
+                else f"{self.task['text'][0:20]}..."
+            )
+        )
 
     @Gtk.Template.Callback()
     def on_drag_prepare(self, *_) -> Gdk.ContentProvider:
