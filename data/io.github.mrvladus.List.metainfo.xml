@@ -50,6 +50,13 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="44.7.1" date="2023-09-04">
+      <description>
+        <ul>
+          <li>Improved contrast and accessibility</li>
+        </ul>
+      </description>
+    </release>
     <release version="44.7" date="2023-09-01">
       <description>
         <p>UI/UX:</p>

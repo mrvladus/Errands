@@ -122,11 +122,11 @@ progress {
 }
 
 .progress-yellow progress {
-  background-color: @yellow_4;
+  background-color: @yellow_5;
 }
 
 .progress-orange progress {
-  background-color: @orange_2;
+  background-color: @orange_3;
 }
 
 .progress-red progress {
