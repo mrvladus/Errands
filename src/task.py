@@ -55,9 +55,8 @@ class Task(Gtk.Revealer):
         # Escape text and find URL's'
         self.text = Markup.escape(self.task["text"])
         self.text = Markup.find_url(self.text)
-        # Check if task completed and toggle checkbox
-        if self.task["completed"]:
-            self.task_completed_btn.props.active = True
+        # Check if sub-task completed and toggle checkbox
+        self.task_completed_btn.props.active = self.task["completed"]
         # Set text
         self.task_text.props.label = self.text
         # Set accent color
@@ -228,6 +227,14 @@ class Task(Gtk.Revealer):
         UserData.set(data)
         toggle_tasks(self.window.tasks_list)
         self.window.update_status()
+        # Set crosslined text
+        if btn.props.active:
+            self.text = Markup.add_crossline(self.text)
+            self.task_text.add_css_class("dim-label")
+        else:
+            self.text = Markup.rm_crossline(self.text)
+            self.task_text.remove_css_class("dim-label")
+        self.task_text.props.label = self.text
 
     @Gtk.Template.Callback()
     def on_expand(self, *_) -> None:
