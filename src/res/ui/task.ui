@@ -115,6 +115,9 @@
                         <property name="margin-start">10</property>
                         <property name="margin-end">10</property>
                         <property name="spacing">5</property>
+                        <accessibility>
+                          <relation name="labelled-by">task_text</relation>
+                        </accessibility>
 
                         <!-- Click controller -->
                         <child>
@@ -156,6 +159,7 @@
                             <property name="margin-top">5</property>
                             <property name="margin-bottom">5</property>
                             <property name="margin-end">20</property>
+                            <property name="focusable">true</property>
                           </object>
                         </child>
 

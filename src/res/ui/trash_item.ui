@@ -4,6 +4,9 @@
   <requires lib="Adw" version="1.0" />
   <template class="TrashItem" parent="GtkBox">
     <property name="spacing">5</property>
+    <accessibility>
+      <relation name="labelled-by">label</relation>
+    </accessibility>
     <child>
       <object class="GtkLabel" id="label">
         <property name="halign">start</property>
