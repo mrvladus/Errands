@@ -36,6 +36,7 @@ class Window(Adw.ApplicationWindow):
     __gtype_name__ = "Window"
 
     about_window: Adw.AboutWindow = Gtk.Template.Child()
+    clear_trash_btn: Gtk.Button = Gtk.Template.Child()
     delete_completed_tasks_btn: Gtk.Button = Gtk.Template.Child()
     drop_motion_ctrl: Gtk.DropControllerMotion = Gtk.Template.Child()
     export_dialog: Gtk.FileDialog = Gtk.Template.Child()
@@ -308,6 +309,13 @@ class Window(Adw.ApplicationWindow):
         # Scroll to the end
         Animate.scroll(self.scrolled_window, True)
         self.update_status()
+
+    @Gtk.Template.Callback()
+    def on_toggle_trash_btn(self, btn: Gtk.ToggleButton) -> None:
+        if btn.props.active:
+            self.clear_trash_btn.grab_focus()
+        else:
+            btn.grab_focus()
 
     @Gtk.Template.Callback()
     def on_delete_completed_tasks_btn_clicked(self, _) -> None:

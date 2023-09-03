@@ -74,7 +74,7 @@
 
                         <!-- Clear button -->
                         <child type="start">
-                          <object class="GtkButton">
+                          <object class="GtkButton" id="clear_trash_btn">
                             <property name="valign">center</property>
                             <property name="icon-name">edit-delete-symbolic</property>
                             <property name="tooltip-text" translatable="yes">Clear</property>
@@ -183,6 +183,7 @@
                         <property name="icon-name">sidebar-show-symbolic</property>
                         <property name="active">false</property>
                         <property name="tooltip-text" translatable="yes">Show Deleted Tasks</property>
+                        <signal name="toggled" handler="on_toggle_trash_btn" />
                         <accessibility>
                           <property name="label" translatable="yes">Show Deleted Tasks</property>
                         </accessibility>
