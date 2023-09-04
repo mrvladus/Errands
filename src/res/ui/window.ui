@@ -126,28 +126,47 @@
                         </child>
 
                         <child>
-                          <object class="GtkSeparator">
-                            <property name="visible" bind-source="trash_list_scrl" bind-property="visible" bind-flags="sync-create" />
+                          <object class="GtkOverlay">
+
+                            <!-- Separator -->
+                            <child type="overlay">
+                              <object class="GtkBox" id="trash_scroll_separator">
+                                <property name="valign">start</property>
+                                <property name="can-target">false</property>
+                                <property name="height-request">4</property>
+                                <style>
+                                  <class name="fade" />
+                                </style>
+                              </object>
+                            </child>
+
+                            <!-- Trash list -->
+                            <child>
+                              <object class="GtkScrolledWindow" id="trash_list_scrl">
+                                <property name="vadjustment">
+                                  <object class="GtkAdjustment">
+                                    <signal name="value-changed" handler="on_trash_scroll" />
+                                  </object>
+                                </property>
+                                <child>
+                                  <object class="GtkBox" id="trash_list">
+                                    <property name="orientation">vertical</property>
+                                    <property name="spacing">5</property>
+                                    <property name="hexpand">false</property>
+                                    <property name="vexpand">true</property>
+                                    <property name="margin-start">12</property>
+                                    <property name="margin-end">6</property>
+                                    <property name="margin-top">6</property>
+                                    <property name="margin-bottom">6</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+
+
                           </object>
                         </child>
 
-                        <!-- Trash list -->
-                        <child>
-                          <object class="GtkScrolledWindow" id="trash_list_scrl">
-                            <child>
-                              <object class="GtkBox" id="trash_list">
-                                <property name="orientation">vertical</property>
-                                <property name="spacing">5</property>
-                                <property name="hexpand">false</property>
-                                <property name="vexpand">true</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">6</property>
-                                <property name="margin-top">6</property>
-                                <property name="margin-bottom">6</property>
-                              </object>
-                            </child>
-                          </object>
-                        </child>
 
                       </object>
                     </child>

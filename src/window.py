@@ -56,6 +56,7 @@ class Window(Adw.ApplicationWindow):
     toggle_trash_btn: Gtk.ToggleButton = Gtk.Template.Child()
     trash_list: Gtk.Box = Gtk.Template.Child()
     trash_list_scrl: Gtk.ScrolledWindow = Gtk.Template.Child()
+    trash_scroll_separator: Gtk.Box = Gtk.Template.Child()
 
     # State
     scrolling: bool = False
@@ -316,6 +317,15 @@ class Window(Adw.ApplicationWindow):
             self.clear_trash_btn.grab_focus()
         else:
             btn.grab_focus()
+
+    @Gtk.Template.Callback()
+    def on_trash_scroll(self, adj) -> None:
+        """Show scroll up button"""
+
+        if adj.get_value() > 0:
+            self.trash_scroll_separator.add_css_class("separator")
+        else:
+            self.trash_scroll_separator.remove_css_class("separator")
 
     @Gtk.Template.Callback()
     def on_delete_completed_tasks_btn_clicked(self, _) -> None:
