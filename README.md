@@ -1,6 +1,6 @@
 
 <div align="center">
-  <img src="data/icons/io.github.mrvladus.List.svg" width="128" height="128">
+  <img src="data/icons/io.github.mrvladus.List.svg" width="200" height="200">
 
   # Errands
 
