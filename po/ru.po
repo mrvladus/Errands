@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-01 12:02+0300\n"
+"POT-Creation-Date: 2023-09-04 12:36+0300\n"
 "PO-Revision-Date: 2023-07-07 16:56+0300\n"
 "Last-Translator: Vlad Krupinski <mrvladus@yandex.ru>\n"
 "Language-Team: \n"
@@ -43,55 +43,87 @@ msgstr "Корзина пуста"
 msgid "No deleted items"
 msgstr "Нет удаленных задач"
 
-#: src/res/ui/window.ui:185 src/res/ui/window.ui:187
+#: src/res/ui/window.ui:204 src/res/ui/window.ui:207
 msgid "Show Deleted Tasks"
 msgstr "Показать удаленные задачи"
 
-#: src/res/ui/window.ui:209 src/res/ui/window.ui:212
+#: src/res/ui/window.ui:229 src/res/ui/window.ui:232
 msgid "Delete Completed Tasks"
 msgstr "Удалить выполненные задачи"
 
-#: src/res/ui/window.ui:237 src/res/ui/window.ui:239
+#: src/res/ui/window.ui:257 src/res/ui/window.ui:259
 msgid "Main Menu"
 msgstr "Главное меню"
 
-#: src/res/ui/window.ui:253 src/res/ui/window.ui:256
+#: src/res/ui/window.ui:273 src/res/ui/window.ui:276
 msgid "Scroll Up"
 msgstr "Прокрутить вверх"
 
-#: src/res/ui/window.ui:289
+#: src/res/ui/window.ui:309
 msgid "Add new Task"
 msgstr "Добавьте задачу"
 
-#: src/res/ui/window.ui:388
+#: src/res/ui/window.ui:403
 msgid "Export Tasks..."
 msgstr "Экспорт задач..."
 
-#: src/res/ui/window.ui:392
+#: src/res/ui/window.ui:407
 msgid "Import Tasks..."
 msgstr "Импорт задач..."
 
-#: src/res/ui/window.ui:402
+#: src/res/ui/window.ui:417
+msgid "Keyboard Shortcuts"
+msgstr "Комбинации клавиш"
+
+#: src/res/ui/window.ui:421
 msgid "About Errands"
 msgstr "О приложении"
 
-#: src/res/ui/window.ui:414
+#: src/res/ui/window.ui:435
+msgid "General"
+msgstr "Общие"
+
+#: src/res/ui/window.ui:438
+msgid "Show keyboard shortcuts"
+msgstr "Показать комбинации клавиш"
+
+#: src/res/ui/window.ui:444
+msgid "Toggle sidebar"
+msgstr "Переключить боковую панель"
+
+#: src/res/ui/window.ui:450
+msgid "Quit"
+msgstr "Выход"
+
+#: src/res/ui/window.ui:458
+msgid "Import and Export"
+msgstr "Импорт и экспорт"
+
+#: src/res/ui/window.ui:461
+msgid "Import tasks"
+msgstr "Импорт задач"
+
+#: src/res/ui/window.ui:467
+msgid "Export tasks"
+msgstr "Экспорт задач"
+
+#: src/res/ui/window.ui:484
 msgid "translator-credits"
 msgstr "Vlad Krupinski <mrvladus@yandex.ru>"
 
-#: src/res/ui/window.ui:448
+#: src/res/ui/window.ui:518
 msgid "Copied to Clipboard"
 msgstr "Скопировано в буфер обмена"
 
-#: src/res/ui/window.ui:453
+#: src/res/ui/window.ui:523
 msgid "Tasks Exported"
 msgstr "Экспорт завершен"
 
-#: src/res/ui/window.ui:458
+#: src/res/ui/window.ui:528
 msgid "Tasks Imported"
 msgstr "Импорт завершен"
 
-#: src/res/ui/window.ui:463
+#: src/res/ui/window.ui:533
 msgid "Error. Open log for information."
 msgstr "Ошибка. Откройте лог для доп. информации"
 
@@ -111,59 +143,47 @@ msgstr "Светлая"
 msgid "Dark"
 msgstr "Темная"
 
-#: src/res/ui/sub_task.ui:54 src/res/ui/sub_task.ui:57 src/res/ui/task.ui:136
-#: src/res/ui/task.ui:139
+#: src/res/ui/sub_task.ui:57 src/res/ui/sub_task.ui:60 src/res/ui/task.ui:139
+#: src/res/ui/task.ui:142
 msgid "Mark as Completed"
 msgstr "Пометить как выполненное"
 
-#: src/res/ui/sub_task.ui:84 src/res/ui/sub_task.ui:86 src/res/ui/task.ui:282
-#: src/res/ui/task.ui:284
+#: src/res/ui/sub_task.ui:87 src/res/ui/sub_task.ui:89 src/res/ui/task.ui:286
+#: src/res/ui/task.ui:288
 msgid "Menu"
 msgstr "Меню"
 
-#: src/res/ui/sub_task.ui:119 src/res/ui/task.ui:318
+#: src/res/ui/sub_task.ui:122 src/res/ui/task.ui:322
 msgid "Cancel"
 msgstr "Отмена"
 
-#: src/res/ui/sub_task.ui:140 src/res/ui/task.ui:13
+#: src/res/ui/sub_task.ui:143 src/res/ui/task.ui:13
 msgid "Delete"
 msgstr "Удалить"
 
-#: src/res/ui/sub_task.ui:144 src/res/ui/task.ui:17
+#: src/res/ui/sub_task.ui:147 src/res/ui/task.ui:17
 msgid "Edit"
 msgstr "Правка"
 
-#: src/res/ui/sub_task.ui:148 src/res/ui/task.ui:21
+#: src/res/ui/sub_task.ui:151 src/res/ui/task.ui:21
 msgid "Copy"
 msgstr "Копировать"
 
-#: src/res/ui/task.ui:182 src/res/ui/task.ui:185
+#: src/res/ui/task.ui:186 src/res/ui/task.ui:189
 msgid "Clear style"
 msgstr "Отчистить цвет"
 
-#: src/res/ui/task.ui:354
+#: src/res/ui/task.ui:358
 msgid "Add new Sub-Task"
 msgstr "Добавьте подзадачу"
 
-#: src/res/ui/task.ui:368 src/res/ui/task.ui:372
+#: src/res/ui/task.ui:372 src/res/ui/task.ui:376
 msgid "Delete Completed Sub-Tasks"
 msgstr "Удалить выполненные подзадачи"
 
-#: src/res/ui/trash_item.ui:17 src/res/ui/trash_item.ui:21
+#: src/res/ui/trash_item.ui:20 src/res/ui/trash_item.ui:24
 msgid "Restore"
 msgstr "Восстановить"
-
-#: src/res/ui/theme_switcher.ui:21 src/res/ui/theme_switcher.ui:24
-msgid "Follow System Style"
-msgstr "Системный стиль"
-
-#: src/res/ui/theme_switcher.ui:39 src/res/ui/theme_switcher.ui:42
-msgid "Light Style"
-msgstr "Светлый стиль"
-
-#: src/res/ui/theme_switcher.ui:57 src/res/ui/theme_switcher.ui:60
-msgid "Dark Style"
-msgstr "Темный стиль"
 
 #~ msgid "Preferences"
 #~ msgstr "Настройки"
