@@ -74,6 +74,7 @@ class Window(Adw.ApplicationWindow):
         self.get_settings().props.gtk_icon_theme_name = "Adwaita"
         self.create_actions()
         self.load_tasks()
+        self.add_toast(self.toast_err)
 
     def add_toast(self, toast: Adw.Toast) -> None:
         self.toast_overlay.add_toast(toast)
@@ -102,6 +103,7 @@ class Window(Adw.ApplicationWindow):
             lambda *_: self.props.application.quit(),
             ["<primary>q", "<primary>w"],
         )
+        create_action("open_log", self.open_log)
 
     def load_tasks(self) -> None:
         Log.debug("Loading tasks")
@@ -179,6 +181,11 @@ class Window(Adw.ApplicationWindow):
             Log.info("Tasks imported")
 
         self.import_dialog.open(self, None, finish_import, None)
+
+    def open_log(self, *_):
+        GLib.spawn_command_line_async(
+            f"xdg-open {GLib.get_user_data_dir()}/list/log.txt"
+        )
 
     def shortcuts(self, *_):
         self.shortcuts_window.set_transient_for(self)

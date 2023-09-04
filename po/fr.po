@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-04 12:36+0300\n"
+"POT-Creation-Date: 2023-09-04 12:46+0300\n"
 "PO-Revision-Date: 2023-05-25 11:05+0200\n"
 "Last-Translator: Jeremy Castel <jeremy.castel@protonmail.com>\n"
 "Language: fr\n"
@@ -122,7 +122,11 @@ msgid "Tasks Imported"
 msgstr ""
 
 #: src/res/ui/window.ui:533
-msgid "Error. Open log for information."
+msgid "Error occured"
+msgstr ""
+
+#: src/res/ui/window.ui:534
+msgid "Open log"
 msgstr ""
 
 #: src/res/ui/preferences.ui:14

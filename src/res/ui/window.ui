@@ -530,8 +530,10 @@
   </object>
 
   <object class="AdwToast" id="toast_err">
-    <property name="title" translatable="yes">Error. Open log for information.</property>
+    <property name="title" translatable="yes">Error occured</property>
+    <property name="button-label" translatable="yes">Open log</property>
     <property name="timeout">10</property>
+    <property name="action-name">app.open_log</property>
   </object>
 
 </interface>
