@@ -1,9 +1,11 @@
 [Desktop Entry]
 Name=Errands
+Comment=Manage your tasks
 Exec=errands
 Icon=@APP_ID@
 Terminal=false
 Type=Application
 Categories=GNOME;GTK;Utility;
+Keywords=errands;tasks;list;todo;todos;
 StartupNotify=true
 X-Purism-FormFactor=Workstation;Mobile;
