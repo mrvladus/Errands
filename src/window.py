@@ -74,7 +74,6 @@ class Window(Adw.ApplicationWindow):
         self.get_settings().props.gtk_icon_theme_name = "Adwaita"
         self.create_actions()
         self.load_tasks()
-        self.add_toast(self.toast_err)
 
     def add_toast(self, toast: Adw.Toast) -> None:
         self.toast_overlay.add_toast(toast)
