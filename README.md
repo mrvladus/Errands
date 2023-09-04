@@ -6,7 +6,7 @@
 
   Manage your tasks
 
-  ![CI](https://github.com/mrvladus/List/actions/workflows/CI.yml/badge.svg)
+  ![CI](https://github.com/mrvladus/Errands/actions/workflows/CI.yml/badge.svg)
 <p align="center">
   <img src="screenshots/main.png" width="360" align="center">
   <img src="screenshots/secondary.png" width="360" align="center">
@@ -26,7 +26,7 @@ Errands is available as a Flatpak on Flathub:
 
 ## Building using GNOME Builder
 1. Install [GNOME Builder](https://flathub.org/apps/org.gnome.Builder).
-2. Click "Clone Repository" with `https://github.com/mrvladus/List.git` as the URL.
+2. Click "Clone Repository" with `https://github.com/mrvladus/Errands.git` as the URL.
 3. Click on the build button at the top.
 
 ## Contribute

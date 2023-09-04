@@ -5,8 +5,8 @@
   <project_license>MIT</project_license>
   <content_rating type="oars-1.1" />
   <developer_name>Vlad Krupinski</developer_name>
-  <url type="homepage">https://github.com/mrvladus/List</url>
-  <url type="bugtracker">https://github.com/mrvladus/List/issues</url>
+  <url type="homepage">https://github.com/mrvladus/Errands</url>
+  <url type="bugtracker">https://github.com/mrvladus/Errands/issues</url>
   <launchable type="desktop-id">@APP_ID@.desktop</launchable>
   <custom>
     <value key="Purism::form_factor">workstation</value>
@@ -43,10 +43,10 @@
   </description>
   <screenshots>
     <screenshot type="default">
-      <image>https://raw.githubusercontent.com/mrvladus/List/main/screenshots/main.png</image>
+      <image>https://raw.githubusercontent.com/mrvladus/Errands/main/screenshots/main.png</image>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/mrvladus/List/main/screenshots/secondary.png</image>
+      <image>https://raw.githubusercontent.com/mrvladus/Errands/main/screenshots/secondary.png</image>
     </screenshot>
   </screenshots>
   <releases>
