@@ -198,7 +198,7 @@ class Task(Gtk.Revealer):
         data: dict = UserData.get()
         ids: list[str] = []
 
-        def toggle_tasks_data(id: str):
+        def toggle_tasks_data(id: str) -> None:
             for task in data["tasks"]:
                 if task["id"] == id:
                     task["completed"] = btn.props.active

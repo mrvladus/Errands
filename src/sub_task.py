@@ -35,7 +35,7 @@ class SubTask(Gtk.Revealer):
     sub_task_edit_box_rev: Gtk.Revealer = Gtk.Template.Child()
     sub_task_edit_entry: Gtk.Entry = Gtk.Template.Child()
 
-    def __init__(self, task: dict, parent: Gtk.Box, window):
+    def __init__(self, task: dict, parent: Gtk.Box, window) -> None:
         super().__init__()
         Log.info("Add sub-task: " + task["text"])
         self.parent = parent
@@ -54,7 +54,7 @@ class SubTask(Gtk.Revealer):
         group = Gio.SimpleActionGroup.new()
         self.insert_action_group("sub_task", group)
 
-        def add_action(name: str, callback):
+        def add_action(name: str, callback) -> None:
             action = Gio.SimpleAction.new(name, None)
             action.connect("activate", callback)
             group.add_action(action)

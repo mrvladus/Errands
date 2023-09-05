@@ -61,7 +61,7 @@ class Window(Adw.ApplicationWindow):
     # State
     scrolling: bool = False
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
         # Remember window size
         GSettings.bind("width", self, "default_width")
@@ -181,12 +181,12 @@ class Window(Adw.ApplicationWindow):
 
         self.import_dialog.open(self, None, finish_import, None)
 
-    def open_log(self, *_):
+    def open_log(self, *_) -> None:
         GLib.spawn_command_line_async(
             f"xdg-open {GLib.get_user_data_dir()}/list/log.txt"
         )
 
-    def shortcuts(self, *_):
+    def shortcuts(self, *_) -> None:
         self.shortcuts_window.set_transient_for(self)
         self.shortcuts_window.show()
 
