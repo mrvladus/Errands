@@ -52,11 +52,16 @@
   <releases>
     <release version="44.7.1" date="2023-09-04">
       <description>
+        <p>UI/UX:</p>
         <ul>
           <li>New cool app icon. Big thanks to Tobias Bernard!</li>
           <li>Added shortcuts window</li>
           <li>Improved contrast and accessibility</li>
           <li>UI improvements and bugfixes</li>
+        </ul>
+        <p>Translations:</p>
+        <ul>
+          <li>Updated Turkish translation (Sabri Ünal)</li>
         </ul>
       </description>
     </release>
