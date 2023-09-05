@@ -252,25 +252,24 @@ class UserData:
             try:
                 val_data = json.loads(data)
             except json.JSONDecodeError:
-                Log.error("Data file is not valid")
+                Log.error("Data file is not JSON")
                 return False
-        valid: bool = True
         # Validate schema
         for key in ["version", "tasks"]:
             if not key in val_data:
-                valid = False
+                Log.error(f"Data file is not valid. Key doesn't exists: '{key}'")
+                return False
         # Validate tasks
-        if val_data["tasks"] != []:
+        if val_data["tasks"]:
             for task in val_data["tasks"]:
                 for key in ["id", "parent", "text", "color", "completed", "deleted"]:
                     if not key in task:
-                        valid = False
-        if valid:
-            Log.debug("Data file is valid")
-            return True
-        else:
-            Log.error("Data file is not valid")
-            return False
+                        Log.error(
+                            f"Data file is not valid. Key doesn't exists: '{key}'"
+                        )
+                        return False
+        Log.debug("Data file is valid")
+        return True
 
     # Port tasks from older versions (for updates)
     @classmethod
