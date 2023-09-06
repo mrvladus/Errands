@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-05 13:49+0300\n"
-"PO-Revision-Date: 2023-06-27 08:34+0100\n"
+"PO-Revision-Date: 2023-09-06 19:34+0100\n"
 "Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
 "Language-Team: Italian <LL@li.org>\n"
 "Language: it\n"
@@ -18,7 +18,7 @@ msgstr ""
 
 #: src/res/ui/window.ui:42
 msgid "Move to Trash"
-msgstr ""
+msgstr "Sposta nel cestino"
 
 #: src/res/ui/window.ui:68
 msgid "Deleted Tasks"
@@ -30,19 +30,19 @@ msgstr "Stile chiaro"
 
 #: src/res/ui/window.ui:94 src/res/ui/window.ui:97
 msgid "Restore All"
-msgstr ""
+msgstr "Ripristina tutto"
 
 #: src/res/ui/window.ui:118
 msgid "Empty Trash"
-msgstr ""
+msgstr "Svuota cestino"
 
 #: src/res/ui/window.ui:119
 msgid "No deleted items"
-msgstr ""
+msgstr "Nessun elemento eliminato"
 
 #: src/res/ui/window.ui:204 src/res/ui/window.ui:207
 msgid "Show Deleted Tasks"
-msgstr ""
+msgstr "Mostra attività eliminate"
 
 #: src/res/ui/window.ui:229 src/res/ui/window.ui:232
 msgid "Delete Completed Tasks"
@@ -54,7 +54,7 @@ msgstr "Menu principale"
 
 #: src/res/ui/window.ui:273 src/res/ui/window.ui:276
 msgid "Scroll Up"
-msgstr ""
+msgstr "Scorri verso l'alto"
 
 #: src/res/ui/window.ui:309
 msgid "Add new Task"
@@ -62,15 +62,15 @@ msgstr "Aggiungi nuova attività"
 
 #: src/res/ui/window.ui:403
 msgid "Export Tasks..."
-msgstr ""
+msgstr "Esporta attività..."
 
 #: src/res/ui/window.ui:407
 msgid "Import Tasks..."
-msgstr ""
+msgstr "Importa attività..."
 
 #: src/res/ui/window.ui:417
 msgid "Keyboard Shortcuts"
-msgstr ""
+msgstr "Scorciatoie da tastiera"
 
 #: src/res/ui/window.ui:421
 msgid "About Errands"
@@ -78,31 +78,31 @@ msgstr "Informazioni su Errands"
 
 #: src/res/ui/window.ui:435
 msgid "General"
-msgstr ""
+msgstr "Generale"
 
 #: src/res/ui/window.ui:438
 msgid "Show keyboard shortcuts"
-msgstr ""
+msgstr "Mostra scorciatoie da tastiera"
 
 #: src/res/ui/window.ui:444
 msgid "Toggle sidebar"
-msgstr ""
+msgstr "Attiva barra laterale"
 
 #: src/res/ui/window.ui:450
 msgid "Quit"
-msgstr ""
+msgstr "Esci"
 
 #: src/res/ui/window.ui:458
 msgid "Import and Export"
-msgstr ""
+msgstr "Importazione ed esportazione"
 
 #: src/res/ui/window.ui:461
 msgid "Import tasks"
-msgstr ""
+msgstr "Importa attività"
 
 #: src/res/ui/window.ui:467
 msgid "Export tasks"
-msgstr ""
+msgstr "Esporta attività"
 
 #: src/res/ui/window.ui:484
 msgid "translator-credits"
@@ -110,23 +110,23 @@ msgstr "Albano Battistella <albanobattistella@gmail.com>"
 
 #: src/res/ui/window.ui:518
 msgid "Copied to Clipboard"
-msgstr ""
+msgstr "Copiato negli Appunti"
 
 #: src/res/ui/window.ui:523
 msgid "Tasks Exported"
-msgstr ""
+msgstr "Attività esportate"
 
 #: src/res/ui/window.ui:528
 msgid "Tasks Imported"
-msgstr ""
+msgstr "Attività importate"
 
 #: src/res/ui/window.ui:533
 msgid "Error occurred"
-msgstr ""
+msgstr "Si è verificato un errore"
 
 #: src/res/ui/window.ui:534
 msgid "Open log"
-msgstr ""
+msgstr "Apri log"
 
 #: src/res/ui/preferences.ui:14
 msgid "Application Theme"
@@ -152,7 +152,7 @@ msgstr "Contrassegna come completato"
 #: src/res/ui/sub_task.ui:87 src/res/ui/sub_task.ui:89 src/res/ui/task.ui:286
 #: src/res/ui/task.ui:288
 msgid "Menu"
-msgstr ""
+msgstr "Menù"
 
 #: src/res/ui/sub_task.ui:122 src/res/ui/task.ui:322
 msgid "Cancel"
@@ -168,7 +168,7 @@ msgstr "Modifica"
 
 #: src/res/ui/sub_task.ui:151 src/res/ui/task.ui:21
 msgid "Copy"
-msgstr ""
+msgstr "Copia"
 
 #: src/res/ui/task.ui:186 src/res/ui/task.ui:189
 msgid "Clear style"
@@ -184,7 +184,7 @@ msgstr "Elimina le attività secondarie completate"
 
 #: src/res/ui/trash_item.ui:20 src/res/ui/trash_item.ui:24
 msgid "Restore"
-msgstr ""
+msgstr "Ripristina"
 
 #~ msgid "Preferences"
 #~ msgstr "Preferenze"
