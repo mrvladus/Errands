@@ -94,7 +94,7 @@
     <release version="44.6.8" date="2023-07-10">
       <description>
         <ul>
-          <li>Improved text aligment</li>
+          <li>Improved text alignment</li>
           <li>Fixed Drag and Drop widget being too long</li>
           <li>UI improvements</li>
         </ul>

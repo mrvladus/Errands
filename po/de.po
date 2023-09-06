@@ -122,7 +122,7 @@ msgid "Tasks Imported"
 msgstr "Aufgaben importiert"
 
 #: src/res/ui/window.ui:533
-msgid "Error occured"
+msgid "Error occurred"
 msgstr "Fehler"
 
 #: src/res/ui/window.ui:534
