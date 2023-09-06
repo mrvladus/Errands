@@ -124,7 +124,7 @@ msgid "Tasks Imported"
 msgstr "Görevler İçe Aktarıldı"
 
 #: src/res/ui/window.ui:533
-msgid "Error occured"
+msgid "Error occurred"
 msgstr "Hata oluştu"
 
 #: src/res/ui/window.ui:534
