@@ -79,7 +79,9 @@ class Window(Adw.ApplicationWindow):
         self.toast_overlay.add_toast(toast)
 
     def create_actions(self) -> None:
-        """Create actions for main menu"""
+        """
+        Create actions for main menu
+        """
 
         def create_action(name: str, callback: callable, shortcuts=None) -> None:
             action = Gio.SimpleAction.new(name, None)
@@ -105,6 +107,10 @@ class Window(Adw.ApplicationWindow):
         create_action("open_log", self.open_log)
 
     def load_tasks(self) -> None:
+        """
+        Load tasks and sub-tasks
+        """
+
         Log.debug("Loading tasks")
         data: dict = UserData.get()
         for task in data["tasks"]:
@@ -118,13 +124,18 @@ class Window(Adw.ApplicationWindow):
         self.trash_add_items()
 
     def about(self, *args) -> None:
-        """Show about window"""
+        """
+        Show about window
+        """
+
         self.about_window.props.version = VERSION
         self.about_window.props.application_icon = APP_ID
         self.about_window.show()
 
     def export_tasks(self, *_) -> None:
-        """Show export dialog"""
+        """
+        Show export dialog
+        """
 
         def finish_export(_dial, res, _data):
             try:
@@ -141,7 +152,9 @@ class Window(Adw.ApplicationWindow):
         self.export_dialog.save(self, None, finish_export, None)
 
     def import_tasks(self, *_) -> None:
-        """Show import dialog"""
+        """
+        Show import dialog
+        """
 
         def finish_import(_dial, res, _data):
             Log.info("Importing tasks")
@@ -182,20 +195,34 @@ class Window(Adw.ApplicationWindow):
         self.import_dialog.open(self, None, finish_import, None)
 
     def open_log(self, *_) -> None:
+        """
+        Open log file with default text editor
+        """
+
         GLib.spawn_command_line_async(
             f"xdg-open {GLib.get_user_data_dir()}/list/log.txt"
         )
 
     def shortcuts(self, *_) -> None:
+        """
+        Show shortcuts window
+        """
+
         self.shortcuts_window.set_transient_for(self)
         self.shortcuts_window.show()
 
     def trash_add(self, task: dict) -> None:
+        """
+        Add item to trash
+        """
+
         self.trash_list.append(TrashItem(task, self))
         self.trash_list_scrl.set_visible(True)
 
     def trash_add_items(self) -> None:
-        """Populate trash on startup"""
+        """
+        Populate trash on startup
+        """
 
         tasks: list[dict] = UserData.get()["tasks"]
         deleted_count: int = 0
@@ -206,7 +233,9 @@ class Window(Adw.ApplicationWindow):
         self.trash_list_scrl.set_visible(deleted_count > 0)
 
     def trash_clear(self) -> None:
-        """Clear unneeded items from trash"""
+        """
+        Clear unneeded items from trash
+        """
 
         tasks: list[dict] = UserData.get()["tasks"]
         children = self.trash_list.observe_children()
@@ -222,6 +251,10 @@ class Window(Adw.ApplicationWindow):
         self.trash_list_scrl.set_visible(deleted_count > 0)
 
     def trash_update(self, tasks: list[dict] = UserData.get()["tasks"]) -> None:
+        """
+        Update trash visibility
+        """
+
         deleted_count: int = 0
         for task in tasks:
             if task["deleted"]:
@@ -229,7 +262,10 @@ class Window(Adw.ApplicationWindow):
         self.trash_list_scrl.set_visible(deleted_count > 0)
 
     def update_status(self) -> None:
-        """Update progress bar on the top"""
+        """
+        Update progress bar on the top
+        """
+
         n_total = 0
         n_completed = 0
         for task in UserData.get()["tasks"]:
@@ -253,7 +289,9 @@ class Window(Adw.ApplicationWindow):
 
     @Gtk.Template.Callback()
     def on_dnd_scroll(self, _motion, _x, y) -> bool:
-        """Autoscroll while dragging task"""
+        """
+        Autoscroll while dragging task
+        """
 
         def auto_scroll(scroll_up: bool) -> bool:
             """Scroll while drag is near the edge"""
@@ -280,7 +318,9 @@ class Window(Adw.ApplicationWindow):
 
     @Gtk.Template.Callback()
     def on_scroll(self, adj) -> None:
-        """Show scroll up button"""
+        """
+        Show scroll up button
+        """
 
         self.scroll_up_btn_rev.set_reveal_child(adj.get_value() > 0)
         if adj.get_value() > 0:
@@ -290,13 +330,17 @@ class Window(Adw.ApplicationWindow):
 
     @Gtk.Template.Callback()
     def on_scroll_up_btn_clicked(self, _) -> None:
-        """Scroll up"""
+        """
+        Scroll up
+        """
 
         Animate.scroll(self.scrolled_window, False)
 
     @Gtk.Template.Callback()
     def on_task_added(self, entry: Gtk.Entry) -> None:
-        """Add new task"""
+        """
+        Add new task
+        """
 
         text: str = entry.props.text
         # Check for empty string or task exists
@@ -319,6 +363,9 @@ class Window(Adw.ApplicationWindow):
 
     @Gtk.Template.Callback()
     def on_toggle_trash_btn(self, btn: Gtk.ToggleButton) -> None:
+        """
+        Move focus to sidebar
+        """
         if btn.props.active:
             self.clear_trash_btn.grab_focus()
         else:
@@ -326,7 +373,9 @@ class Window(Adw.ApplicationWindow):
 
     @Gtk.Template.Callback()
     def on_trash_scroll(self, adj) -> None:
-        """Show scroll up button"""
+        """
+        Show scroll up button
+        """
 
         if adj.get_value() > 0:
             self.trash_scroll_separator.add_css_class("separator")
@@ -335,7 +384,9 @@ class Window(Adw.ApplicationWindow):
 
     @Gtk.Template.Callback()
     def on_delete_completed_tasks_btn_clicked(self, _) -> None:
-        """Hide completed tasks"""
+        """
+        Hide completed tasks
+        """
 
         tasks = self.tasks_list.observe_children()
         for i in range(tasks.get_n_items()):
@@ -346,6 +397,10 @@ class Window(Adw.ApplicationWindow):
 
     @Gtk.Template.Callback()
     def on_trash_clear(self, _) -> None:
+        """
+        Remove all trash items and tasks
+        """
+
         Log.info("Clear Trash")
         children = self.tasks_list.observe_children()
         to_remove = [
@@ -372,6 +427,10 @@ class Window(Adw.ApplicationWindow):
 
     @Gtk.Template.Callback()
     def on_trash_restore(self, _) -> None:
+        """
+        Remove trash items and restore all tasks
+        """
+
         Log.info("Restore Trash")
 
         data: dict = UserData.get()
@@ -404,6 +463,10 @@ class Window(Adw.ApplicationWindow):
 
     @Gtk.Template.Callback()
     def on_trash_drop(self, _drop, task: Task | SubTask, _x, _y) -> None:
+        """
+        Move task to trash via dnd
+        """
+
         task.toggle_visibility()
         task.task["deleted"] = True
         task.update_data()

@@ -80,14 +80,15 @@ class Task(Gtk.Revealer):
 
     def add_sub_tasks(self) -> None:
         sub_count: int = 0
-        for task in UserData.get()["tasks"]:
+        tasks: list[dict] = UserData.get()["tasks"]
+        for task in tasks:
             if task["parent"] == self.task["id"]:
                 sub_task = SubTask(task, self, self.window)
                 self.sub_tasks.append(sub_task)
                 if not task["deleted"]:
                     sub_task.toggle_visibility()
                     sub_count += 1
-        self.expand(sub_count > 0)
+        self.expand(len(tasks) > 0)
         self.update_statusbar()
         self.window.update_status()
 
