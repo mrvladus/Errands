@@ -99,9 +99,9 @@ class GSettings:
 class Log:
     """Logging class"""
 
-    data_dir: str = GLib.get_user_data_dir() + "/list"
-    log_file: str = data_dir + "/log.txt"
-    log_old_file: str = data_dir + "/log.old.txt"
+    data_dir: str = os.path.join(GLib.get_user_data_dir(), "list")
+    log_file: str = os.path.join(data_dir, "log.txt")
+    log_old_file: str = os.path.join(data_dir, "log.old.txt")
 
     @classmethod
     def init(self):
@@ -195,7 +195,7 @@ class TaskUtils:
 class UserData:
     """Class for accessing data file with user tasks"""
 
-    data_dir: str = GLib.get_user_data_dir() + "/list"
+    data_dir: str = os.path.join(GLib.get_user_data_dir(), "list")
     default_data = {"version": VERSION, "tasks": []}
 
     @classmethod
@@ -203,10 +203,12 @@ class UserData:
         Log.debug("Initialize user data")
 
         # Create data file if not exists
-        if not os.path.exists(self.data_dir + "/data.json"):
-            with open(self.data_dir + "/data.json", "w+") as f:
+        if not os.path.exists(os.path.join(self.data_dir, "data.json")):
+            with open(os.path.join(self.data_dir, "data.json"), "w+") as f:
                 json.dump(self.default_data, f)
-                Log.debug(f"Create data file at: {self.data_dir}/data.json")
+                Log.debug(
+                    f"Create data file at: {os.path.join(self.data_dir, 'data.json')}"
+                )
 
         data: dict = self.get()
         # Convert old formats
@@ -216,29 +218,32 @@ class UserData:
         else:
             if not self.validate(data):
                 Log.error(
-                    f"Data file is corrupted. Creating backup at {self.data_dir + '/data.old.json'}"
+                    f"Data file is corrupted. Creating backup at {os.path.join(self.data_dir, 'data.old.json')}"
                 )
                 shutil.copy(
-                    self.data_dir + "/data.json", self.data_dir + "/data.old.json"
+                    os.path.join(self.data_dir, "data.json"),
+                    os.path.join(self.data_dir, "data.old.json"),
                 )
                 self.set(self.default_data)
 
     # Load user data from json
     @classmethod
     def get(self) -> dict:
-        if not os.path.exists(self.data_dir + "/data.json"):
+        if not os.path.exists(os.path.join(self.data_dir, "data.json")):
             self.init()
         try:
-            with open(self.data_dir + "/data.json", "r") as f:
+            with open(os.path.join(self.data_dir, "data.json"), "r") as f:
                 data: dict = json.load(f)
                 return data
         except json.JSONDecodeError:
-            Log.error(f"Can't read data file at: {self.data_dir}/data.json")
+            Log.error(
+                f"Can't read data file at: {os.path.join(self.data_dir, 'data.json')}"
+            )
 
     # Save user data to json
     @classmethod
     def set(self, data: dict) -> None:
-        with open(self.data_dir + "/data.json", "w") as f:
+        with open(os.path.join(self.data_dir, "data.json"), "w") as f:
             json.dump(data, f, indent=4)
 
     # Validate data json
