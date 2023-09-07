@@ -6,7 +6,6 @@
     "command": "errands",
     "finish-args": [
         "--device=dri",
-        "--filesystem=home",
         "--socket=wayland",
         "--socket=fallback-x11",
         "--share=ipc"
