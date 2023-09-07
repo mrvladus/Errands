@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-05 13:49+0300\n"
+"POT-Creation-Date: 2023-09-07 15:18+0300\n"
 "PO-Revision-Date: 2023-07-07 16:56+0300\n"
 "Last-Translator: Vlad Krupinski <mrvladus@yandex.ru>\n"
 "Language-Team: \n"
@@ -111,23 +111,39 @@ msgstr "Экспорт задач"
 msgid "translator-credits"
 msgstr "Vlad Krupinski <mrvladus@yandex.ru>"
 
-#: src/res/ui/window.ui:518
+#: src/res/ui/window.ui:519
+msgid "Are you sure?"
+msgstr "Вы увепены?"
+
+#: src/res/ui/window.ui:520
+msgid "Tasks will be permanently deleted"
+msgstr "Задачи будут безвозвратно удалены"
+
+#: src/res/ui/window.ui:525 src/res/ui/sub_task.ui:122 src/res/ui/task.ui:322
+msgid "Cancel"
+msgstr "Отмена"
+
+#: src/res/ui/window.ui:526 src/res/ui/sub_task.ui:143 src/res/ui/task.ui:13
+msgid "Delete"
+msgstr "Удалить"
+
+#: src/res/ui/window.ui:534
 msgid "Copied to Clipboard"
 msgstr "Скопировано в буфер обмена"
 
-#: src/res/ui/window.ui:523
+#: src/res/ui/window.ui:539
 msgid "Tasks Exported"
 msgstr "Экспорт завершен"
 
-#: src/res/ui/window.ui:528
+#: src/res/ui/window.ui:544
 msgid "Tasks Imported"
 msgstr "Импорт завершен"
 
-#: src/res/ui/window.ui:533
+#: src/res/ui/window.ui:549
 msgid "Error occurred"
 msgstr "Ошибка"
 
-#: src/res/ui/window.ui:534
+#: src/res/ui/window.ui:550
 msgid "Open log"
 msgstr "Открыть лог"
 
@@ -156,14 +172,6 @@ msgstr "Пометить как выполненное"
 #: src/res/ui/task.ui:288
 msgid "Menu"
 msgstr "Меню"
-
-#: src/res/ui/sub_task.ui:122 src/res/ui/task.ui:322
-msgid "Cancel"
-msgstr "Отмена"
-
-#: src/res/ui/sub_task.ui:143 src/res/ui/task.ui:13
-msgid "Delete"
-msgstr "Удалить"
 
 #: src/res/ui/sub_task.ui:147 src/res/ui/task.ui:17
 msgid "Edit"

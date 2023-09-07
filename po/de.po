@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-05 13:49+0300\n"
+"POT-Creation-Date: 2023-09-07 15:18+0300\n"
 "PO-Revision-Date: 2023-08-10 21:16+0200\n"
 "Last-Translator: Christoph Bähr\n"
 "Language-Team: \n"
@@ -109,23 +109,39 @@ msgstr "Aufgaben exportieren"
 msgid "translator-credits"
 msgstr "Christoph Bähr"
 
-#: src/res/ui/window.ui:518
+#: src/res/ui/window.ui:519
+msgid "Are you sure?"
+msgstr ""
+
+#: src/res/ui/window.ui:520
+msgid "Tasks will be permanently deleted"
+msgstr ""
+
+#: src/res/ui/window.ui:525 src/res/ui/sub_task.ui:122 src/res/ui/task.ui:322
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: src/res/ui/window.ui:526 src/res/ui/sub_task.ui:143 src/res/ui/task.ui:13
+msgid "Delete"
+msgstr "Löschen"
+
+#: src/res/ui/window.ui:534
 msgid "Copied to Clipboard"
 msgstr "Zur Zwischenablage kopiert"
 
-#: src/res/ui/window.ui:523
+#: src/res/ui/window.ui:539
 msgid "Tasks Exported"
 msgstr "Aufgaben exportiert"
 
-#: src/res/ui/window.ui:528
+#: src/res/ui/window.ui:544
 msgid "Tasks Imported"
 msgstr "Aufgaben importiert"
 
-#: src/res/ui/window.ui:533
+#: src/res/ui/window.ui:549
 msgid "Error occurred"
 msgstr "Fehler"
 
-#: src/res/ui/window.ui:534
+#: src/res/ui/window.ui:550
 msgid "Open log"
 msgstr "Öffne das Log"
 
@@ -154,14 +170,6 @@ msgstr "Als abgeschlossen markieren"
 #: src/res/ui/task.ui:288
 msgid "Menu"
 msgstr "Menü"
-
-#: src/res/ui/sub_task.ui:122 src/res/ui/task.ui:322
-msgid "Cancel"
-msgstr "Abbrechen"
-
-#: src/res/ui/sub_task.ui:143 src/res/ui/task.ui:13
-msgid "Delete"
-msgstr "Löschen"
 
 #: src/res/ui/sub_task.ui:147 src/res/ui/task.ui:17
 msgid "Edit"

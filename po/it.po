@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-05 13:49+0300\n"
+"POT-Creation-Date: 2023-09-07 15:18+0300\n"
 "PO-Revision-Date: 2023-09-06 19:34+0100\n"
 "Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
 "Language-Team: Italian <LL@li.org>\n"
@@ -108,23 +108,39 @@ msgstr "Esporta attività"
 msgid "translator-credits"
 msgstr "Albano Battistella <albanobattistella@gmail.com>"
 
-#: src/res/ui/window.ui:518
+#: src/res/ui/window.ui:519
+msgid "Are you sure?"
+msgstr ""
+
+#: src/res/ui/window.ui:520
+msgid "Tasks will be permanently deleted"
+msgstr ""
+
+#: src/res/ui/window.ui:525 src/res/ui/sub_task.ui:122 src/res/ui/task.ui:322
+msgid "Cancel"
+msgstr "Cancella"
+
+#: src/res/ui/window.ui:526 src/res/ui/sub_task.ui:143 src/res/ui/task.ui:13
+msgid "Delete"
+msgstr "Cancella"
+
+#: src/res/ui/window.ui:534
 msgid "Copied to Clipboard"
 msgstr "Copiato negli Appunti"
 
-#: src/res/ui/window.ui:523
+#: src/res/ui/window.ui:539
 msgid "Tasks Exported"
 msgstr "Attività esportate"
 
-#: src/res/ui/window.ui:528
+#: src/res/ui/window.ui:544
 msgid "Tasks Imported"
 msgstr "Attività importate"
 
-#: src/res/ui/window.ui:533
+#: src/res/ui/window.ui:549
 msgid "Error occurred"
 msgstr "Si è verificato un errore"
 
-#: src/res/ui/window.ui:534
+#: src/res/ui/window.ui:550
 msgid "Open log"
 msgstr "Apri log"
 
@@ -153,14 +169,6 @@ msgstr "Contrassegna come completato"
 #: src/res/ui/task.ui:288
 msgid "Menu"
 msgstr "Menù"
-
-#: src/res/ui/sub_task.ui:122 src/res/ui/task.ui:322
-msgid "Cancel"
-msgstr "Cancella"
-
-#: src/res/ui/sub_task.ui:143 src/res/ui/task.ui:13
-msgid "Delete"
-msgstr "Cancella"
 
 #: src/res/ui/sub_task.ui:147 src/res/ui/task.ui:17
 msgid "Edit"
