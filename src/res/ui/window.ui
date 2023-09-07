@@ -512,6 +512,22 @@
     </property>
   </object>
 
+  <!-- Confirmation dialog -->
+  <object class="AdwMessageDialog" id="confirm_dialog">
+    <property name="transient-for">Window</property>
+    <property name="hide-on-close">true</property>
+    <property name="heading" translatable="yes">Are you sure?</property>
+    <property name="body" translatable="yes">Tasks will be permanently deleted</property>
+    <property name="default-response">delete</property>
+    <property name="close-response">cancel</property>
+    <signal name="response" handler="on_trash_clear_confirm" />
+    <responses>
+      <response id="cancel" translatable="yes">Cancel</response>
+      <response id="delete" translatable="yes" appearance="destructive">Delete</response>
+    </responses>
+  </object>
+
+
   <!-- Toasts -->
 
   <object class="AdwToast" id="toast_copied">

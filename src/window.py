@@ -37,6 +37,7 @@ class Window(Adw.ApplicationWindow):
 
     about_window: Adw.AboutWindow = Gtk.Template.Child()
     clear_trash_btn: Gtk.Button = Gtk.Template.Child()
+    confirm_dialog: Adw.MessageDialog = Gtk.Template.Child()
     delete_completed_tasks_btn: Gtk.Button = Gtk.Template.Child()
     drop_motion_ctrl: Gtk.DropControllerMotion = Gtk.Template.Child()
     export_dialog: Gtk.FileDialog = Gtk.Template.Child()
@@ -397,9 +398,16 @@ class Window(Adw.ApplicationWindow):
 
     @Gtk.Template.Callback()
     def on_trash_clear(self, _) -> None:
+        self.confirm_dialog.show()
+
+    @Gtk.Template.Callback()
+    def on_trash_clear_confirm(self, _, res) -> None:
         """
         Remove all trash items and tasks
         """
+
+        if res == "cancel":
+            Log.debug("Clear Trash cancelled")
 
         Log.info("Clear Trash")
         children = self.tasks_list.observe_children()
