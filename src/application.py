@@ -20,11 +20,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from gi.repository import Gio, Adw, Gtk, Gdk
+from gi.repository import Gio, Adw
 
 from __main__ import APP_ID
 
-from .utils import GSettings, UserData, Log
+from .utils import GSettings, UserData
 from .window import Window
 
 
@@ -34,20 +34,10 @@ class Application(Adw.Application):
             application_id=APP_ID,
             flags=Gio.ApplicationFlags.DEFAULT_FLAGS,
         )
+        self.set_resource_base_path("/io/github/mrvladus/Errands/")
 
     def do_activate(self) -> None:
         GSettings.init()
         UserData.init()
-        self.load_css()
         # Show window
         Window(application=self).present()
-
-    def load_css(self) -> None:
-        Log.debug("Load CSS styles")
-        css_provider = Gtk.CssProvider()
-        css_provider.load_from_resource("/io/github/mrvladus/Errands/styles.css")
-        Gtk.StyleContext.add_provider_for_display(
-            Gdk.Display.get_default(),
-            css_provider,
-            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION,
-        )
