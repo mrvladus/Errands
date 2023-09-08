@@ -22,6 +22,7 @@
 
 import os
 import json
+import re
 import shutil
 import uuid
 
@@ -164,14 +165,12 @@ class Markup:
     @classmethod
     def find_url(self, text: str) -> str:
         """Convert urls to markup. Make sure to escape text before calling."""
-        arr: list = text.split(" ")
-        new_str = []
-        for i in arr:
-            if i.startswith("http://") or i.startswith("https://"):
-                new_str.append(f'<a href="{i}">{i}</a>')
-            else:
-                new_str.append(i)
-        return " ".join(new_str)
+
+        string = text
+        urls = re.findall(r"(https?://\S+)", string)
+        for url in urls:
+            string = string.replace(url, f'<a href="{url}">{url}</a>')
+        return string
 
 
 class TaskUtils:
