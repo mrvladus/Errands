@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-07 15:18+0300\n"
+"POT-Creation-Date: 2023-09-08 13:23+0300\n"
 "PO-Revision-Date: 2023-07-07 16:56+0300\n"
 "Last-Translator: Vlad Krupinski <mrvladus@yandex.ru>\n"
 "Language-Team: \n"
@@ -31,119 +31,123 @@ msgstr "Удаленные задачи"
 msgid "Clear"
 msgstr "Очистить"
 
-#: src/res/ui/window.ui:94 src/res/ui/window.ui:97
+#: src/res/ui/window.ui:98 src/res/ui/window.ui:101
 msgid "Restore All"
 msgstr "Восстановить всё"
 
-#: src/res/ui/window.ui:118
+#: src/res/ui/window.ui:117 src/res/ui/window.ui:119
+msgid "Close Trash"
+msgstr "Закрыть корзину"
+
+#: src/res/ui/window.ui:146
 msgid "Empty Trash"
 msgstr "Корзина пуста"
 
-#: src/res/ui/window.ui:119
+#: src/res/ui/window.ui:147
 msgid "No deleted items"
 msgstr "Нет удаленных задач"
 
-#: src/res/ui/window.ui:204 src/res/ui/window.ui:207
+#: src/res/ui/window.ui:232 src/res/ui/window.ui:235
 msgid "Show Deleted Tasks"
 msgstr "Показать удаленные задачи"
 
-#: src/res/ui/window.ui:229 src/res/ui/window.ui:232
+#: src/res/ui/window.ui:257 src/res/ui/window.ui:260
 msgid "Delete Completed Tasks"
 msgstr "Удалить выполненные задачи"
 
-#: src/res/ui/window.ui:257 src/res/ui/window.ui:259
+#: src/res/ui/window.ui:285 src/res/ui/window.ui:287
 msgid "Main Menu"
 msgstr "Главное меню"
 
-#: src/res/ui/window.ui:273 src/res/ui/window.ui:276
+#: src/res/ui/window.ui:301 src/res/ui/window.ui:304
 msgid "Scroll Up"
 msgstr "Прокрутить вверх"
 
-#: src/res/ui/window.ui:309
+#: src/res/ui/window.ui:337
 msgid "Add new Task"
 msgstr "Добавьте задачу"
 
-#: src/res/ui/window.ui:403
+#: src/res/ui/window.ui:431
 msgid "Export Tasks..."
 msgstr "Экспорт задач..."
 
-#: src/res/ui/window.ui:407
+#: src/res/ui/window.ui:435
 msgid "Import Tasks..."
 msgstr "Импорт задач..."
 
-#: src/res/ui/window.ui:417
+#: src/res/ui/window.ui:445
 msgid "Keyboard Shortcuts"
 msgstr "Комбинации клавиш"
 
-#: src/res/ui/window.ui:421
+#: src/res/ui/window.ui:449
 msgid "About Errands"
 msgstr "О приложении"
 
-#: src/res/ui/window.ui:435
+#: src/res/ui/window.ui:463
 msgid "General"
 msgstr "Общие"
 
-#: src/res/ui/window.ui:438
+#: src/res/ui/window.ui:466
 msgid "Show keyboard shortcuts"
 msgstr "Показать комбинации клавиш"
 
-#: src/res/ui/window.ui:444
+#: src/res/ui/window.ui:472
 msgid "Toggle sidebar"
 msgstr "Переключить боковую панель"
 
-#: src/res/ui/window.ui:450
+#: src/res/ui/window.ui:478
 msgid "Quit"
 msgstr "Выход"
 
-#: src/res/ui/window.ui:458
+#: src/res/ui/window.ui:486
 msgid "Import and Export"
 msgstr "Импорт и экспорт"
 
-#: src/res/ui/window.ui:461
+#: src/res/ui/window.ui:489
 msgid "Import tasks"
 msgstr "Импорт задач"
 
-#: src/res/ui/window.ui:467
+#: src/res/ui/window.ui:495
 msgid "Export tasks"
 msgstr "Экспорт задач"
 
-#: src/res/ui/window.ui:484
+#: src/res/ui/window.ui:512
 msgid "translator-credits"
 msgstr "Vlad Krupinski <mrvladus@yandex.ru>"
 
-#: src/res/ui/window.ui:519
+#: src/res/ui/window.ui:547
 msgid "Are you sure?"
 msgstr "Вы увепены?"
 
-#: src/res/ui/window.ui:520
+#: src/res/ui/window.ui:548
 msgid "Tasks will be permanently deleted"
 msgstr "Задачи будут безвозвратно удалены"
 
-#: src/res/ui/window.ui:525 src/res/ui/sub_task.ui:122 src/res/ui/task.ui:322
+#: src/res/ui/window.ui:553 src/res/ui/sub_task.ui:122 src/res/ui/task.ui:322
 msgid "Cancel"
 msgstr "Отмена"
 
-#: src/res/ui/window.ui:526 src/res/ui/sub_task.ui:143 src/res/ui/task.ui:13
+#: src/res/ui/window.ui:554 src/res/ui/sub_task.ui:143 src/res/ui/task.ui:13
 msgid "Delete"
 msgstr "Удалить"
 
-#: src/res/ui/window.ui:534
+#: src/res/ui/window.ui:562
 msgid "Copied to Clipboard"
 msgstr "Скопировано в буфер обмена"
 
-#: src/res/ui/window.ui:539
+#: src/res/ui/window.ui:567
 msgid "Tasks Exported"
 msgstr "Экспорт завершен"
 
-#: src/res/ui/window.ui:544
+#: src/res/ui/window.ui:572
 msgid "Tasks Imported"
 msgstr "Импорт завершен"
 
-#: src/res/ui/window.ui:549
+#: src/res/ui/window.ui:577
 msgid "Error occurred"
 msgstr "Ошибка"
 
-#: src/res/ui/window.ui:550
+#: src/res/ui/window.ui:578
 msgid "Open log"
 msgstr "Открыть лог"
 

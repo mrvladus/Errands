@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-07 15:18+0300\n"
+"POT-Creation-Date: 2023-09-08 13:23+0300\n"
 "PO-Revision-Date: 2023-06-19 14:30+0200\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: \n"
@@ -29,119 +29,123 @@ msgstr "Taken wissen"
 msgid "Clear"
 msgstr "Standaard"
 
-#: src/res/ui/window.ui:94 src/res/ui/window.ui:97
+#: src/res/ui/window.ui:98 src/res/ui/window.ui:101
 msgid "Restore All"
 msgstr ""
 
-#: src/res/ui/window.ui:118
+#: src/res/ui/window.ui:117 src/res/ui/window.ui:119
+msgid "Close Trash"
+msgstr ""
+
+#: src/res/ui/window.ui:146
 msgid "Empty Trash"
 msgstr ""
 
-#: src/res/ui/window.ui:119
+#: src/res/ui/window.ui:147
 msgid "No deleted items"
 msgstr ""
 
-#: src/res/ui/window.ui:204 src/res/ui/window.ui:207
+#: src/res/ui/window.ui:232 src/res/ui/window.ui:235
 msgid "Show Deleted Tasks"
 msgstr ""
 
-#: src/res/ui/window.ui:229 src/res/ui/window.ui:232
+#: src/res/ui/window.ui:257 src/res/ui/window.ui:260
 msgid "Delete Completed Tasks"
 msgstr "Afgeronde taken wissen"
 
-#: src/res/ui/window.ui:257 src/res/ui/window.ui:259
+#: src/res/ui/window.ui:285 src/res/ui/window.ui:287
 msgid "Main Menu"
 msgstr "Hoofdmenu"
 
-#: src/res/ui/window.ui:273 src/res/ui/window.ui:276
+#: src/res/ui/window.ui:301 src/res/ui/window.ui:304
 msgid "Scroll Up"
 msgstr ""
 
-#: src/res/ui/window.ui:309
+#: src/res/ui/window.ui:337
 msgid "Add new Task"
 msgstr "Taak toevoegen"
 
-#: src/res/ui/window.ui:403
+#: src/res/ui/window.ui:431
 msgid "Export Tasks..."
 msgstr ""
 
-#: src/res/ui/window.ui:407
+#: src/res/ui/window.ui:435
 msgid "Import Tasks..."
 msgstr ""
 
-#: src/res/ui/window.ui:417
+#: src/res/ui/window.ui:445
 msgid "Keyboard Shortcuts"
 msgstr ""
 
-#: src/res/ui/window.ui:421
+#: src/res/ui/window.ui:449
 msgid "About Errands"
 msgstr "Over Errands"
 
-#: src/res/ui/window.ui:435
+#: src/res/ui/window.ui:463
 msgid "General"
 msgstr ""
 
-#: src/res/ui/window.ui:438
+#: src/res/ui/window.ui:466
 msgid "Show keyboard shortcuts"
 msgstr ""
 
-#: src/res/ui/window.ui:444
+#: src/res/ui/window.ui:472
 msgid "Toggle sidebar"
 msgstr ""
 
-#: src/res/ui/window.ui:450
+#: src/res/ui/window.ui:478
 msgid "Quit"
 msgstr ""
 
-#: src/res/ui/window.ui:458
+#: src/res/ui/window.ui:486
 msgid "Import and Export"
 msgstr ""
 
-#: src/res/ui/window.ui:461
+#: src/res/ui/window.ui:489
 msgid "Import tasks"
 msgstr ""
 
-#: src/res/ui/window.ui:467
+#: src/res/ui/window.ui:495
 msgid "Export tasks"
 msgstr ""
 
-#: src/res/ui/window.ui:484
+#: src/res/ui/window.ui:512
 msgid "translator-credits"
 msgstr "Heimen Stoffels <vistausss@fastmail.com>"
 
-#: src/res/ui/window.ui:519
+#: src/res/ui/window.ui:547
 msgid "Are you sure?"
 msgstr ""
 
-#: src/res/ui/window.ui:520
+#: src/res/ui/window.ui:548
 msgid "Tasks will be permanently deleted"
 msgstr ""
 
-#: src/res/ui/window.ui:525 src/res/ui/sub_task.ui:122 src/res/ui/task.ui:322
+#: src/res/ui/window.ui:553 src/res/ui/sub_task.ui:122 src/res/ui/task.ui:322
 msgid "Cancel"
 msgstr "Annuleren"
 
-#: src/res/ui/window.ui:526 src/res/ui/sub_task.ui:143 src/res/ui/task.ui:13
+#: src/res/ui/window.ui:554 src/res/ui/sub_task.ui:143 src/res/ui/task.ui:13
 msgid "Delete"
 msgstr "Verwijderen"
 
-#: src/res/ui/window.ui:534
+#: src/res/ui/window.ui:562
 msgid "Copied to Clipboard"
 msgstr ""
 
-#: src/res/ui/window.ui:539
+#: src/res/ui/window.ui:567
 msgid "Tasks Exported"
 msgstr ""
 
-#: src/res/ui/window.ui:544
+#: src/res/ui/window.ui:572
 msgid "Tasks Imported"
 msgstr ""
 
-#: src/res/ui/window.ui:549
+#: src/res/ui/window.ui:577
 msgid "Error occurred"
 msgstr ""
 
-#: src/res/ui/window.ui:550
+#: src/res/ui/window.ui:578
 msgid "Open log"
 msgstr ""
 

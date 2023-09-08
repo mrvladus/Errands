@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-07 15:18+0300\n"
+"POT-Creation-Date: 2023-09-08 13:23+0300\n"
 "PO-Revision-Date: 2023-09-05 00:28+0300\n"
 "Last-Translator: Sabri Ünal <libreajans@gmail.com>\n"
 "Language-Team: Turkish <takim@gnome.org.tr>\n"
@@ -31,119 +31,123 @@ msgstr "Tamamlanmış görevler"
 msgid "Clear"
 msgstr "Biçemi temizle"
 
-#: src/res/ui/window.ui:94 src/res/ui/window.ui:97
+#: src/res/ui/window.ui:98 src/res/ui/window.ui:101
 msgid "Restore All"
 msgstr "Tümünü Geri Yükle"
 
-#: src/res/ui/window.ui:118
+#: src/res/ui/window.ui:117 src/res/ui/window.ui:119
+msgid "Close Trash"
+msgstr ""
+
+#: src/res/ui/window.ui:146
 msgid "Empty Trash"
 msgstr "Çöpü Boşalt"
 
-#: src/res/ui/window.ui:119
+#: src/res/ui/window.ui:147
 msgid "No deleted items"
 msgstr "Silinmiş öge yok"
 
-#: src/res/ui/window.ui:204 src/res/ui/window.ui:207
+#: src/res/ui/window.ui:232 src/res/ui/window.ui:235
 msgid "Show Deleted Tasks"
 msgstr "Silenen Görevleri Göster"
 
-#: src/res/ui/window.ui:229 src/res/ui/window.ui:232
+#: src/res/ui/window.ui:257 src/res/ui/window.ui:260
 msgid "Delete Completed Tasks"
 msgstr "Tamamlanmış görevleri sil"
 
-#: src/res/ui/window.ui:257 src/res/ui/window.ui:259
+#: src/res/ui/window.ui:285 src/res/ui/window.ui:287
 msgid "Main Menu"
 msgstr "Ana Menü"
 
-#: src/res/ui/window.ui:273 src/res/ui/window.ui:276
+#: src/res/ui/window.ui:301 src/res/ui/window.ui:304
 msgid "Scroll Up"
 msgstr "Yukarı Kaydır"
 
-#: src/res/ui/window.ui:309
+#: src/res/ui/window.ui:337
 msgid "Add new Task"
 msgstr "Yeni görev ekle"
 
-#: src/res/ui/window.ui:403
+#: src/res/ui/window.ui:431
 msgid "Export Tasks..."
 msgstr "Görevleri Dışa Aktar..."
 
-#: src/res/ui/window.ui:407
+#: src/res/ui/window.ui:435
 msgid "Import Tasks..."
 msgstr "Görevleri İçe Aktar..."
 
-#: src/res/ui/window.ui:417
+#: src/res/ui/window.ui:445
 msgid "Keyboard Shortcuts"
 msgstr "Klavye Kısayolları"
 
-#: src/res/ui/window.ui:421
+#: src/res/ui/window.ui:449
 msgid "About Errands"
 msgstr "Errands Hakkında"
 
-#: src/res/ui/window.ui:435
+#: src/res/ui/window.ui:463
 msgid "General"
 msgstr "Genel"
 
-#: src/res/ui/window.ui:438
+#: src/res/ui/window.ui:466
 msgid "Show keyboard shortcuts"
 msgstr "Klavye kısayollarını göster"
 
-#: src/res/ui/window.ui:444
+#: src/res/ui/window.ui:472
 msgid "Toggle sidebar"
 msgstr "Kenar çubuğu aç/kapat"
 
-#: src/res/ui/window.ui:450
+#: src/res/ui/window.ui:478
 msgid "Quit"
 msgstr "Çık"
 
-#: src/res/ui/window.ui:458
+#: src/res/ui/window.ui:486
 msgid "Import and Export"
 msgstr "Aktarma"
 
-#: src/res/ui/window.ui:461
+#: src/res/ui/window.ui:489
 msgid "Import tasks"
 msgstr "Görevleri içe aktar"
 
-#: src/res/ui/window.ui:467
+#: src/res/ui/window.ui:495
 msgid "Export tasks"
 msgstr "Görevleri dışa aktar"
 
-#: src/res/ui/window.ui:484
+#: src/res/ui/window.ui:512
 msgid "translator-credits"
 msgstr "Sabri Ünal <libreajans@gmail.com>"
 
-#: src/res/ui/window.ui:519
+#: src/res/ui/window.ui:547
 msgid "Are you sure?"
 msgstr ""
 
-#: src/res/ui/window.ui:520
+#: src/res/ui/window.ui:548
 msgid "Tasks will be permanently deleted"
 msgstr ""
 
-#: src/res/ui/window.ui:525 src/res/ui/sub_task.ui:122 src/res/ui/task.ui:322
+#: src/res/ui/window.ui:553 src/res/ui/sub_task.ui:122 src/res/ui/task.ui:322
 msgid "Cancel"
 msgstr "İptal"
 
-#: src/res/ui/window.ui:526 src/res/ui/sub_task.ui:143 src/res/ui/task.ui:13
+#: src/res/ui/window.ui:554 src/res/ui/sub_task.ui:143 src/res/ui/task.ui:13
 msgid "Delete"
 msgstr "Sil"
 
-#: src/res/ui/window.ui:534
+#: src/res/ui/window.ui:562
 msgid "Copied to Clipboard"
 msgstr "Panoya Kopyalandı"
 
-#: src/res/ui/window.ui:539
+#: src/res/ui/window.ui:567
 msgid "Tasks Exported"
 msgstr "Görevler Dışa Aktarıldı"
 
-#: src/res/ui/window.ui:544
+#: src/res/ui/window.ui:572
 msgid "Tasks Imported"
 msgstr "Görevler İçe Aktarıldı"
 
-#: src/res/ui/window.ui:549
+#: src/res/ui/window.ui:577
 msgid "Error occurred"
 msgstr "Hata oluştu"
 
-#: src/res/ui/window.ui:550
+#: src/res/ui/window.ui:578
 msgid "Open log"
 msgstr "Günlüğü aç"
 
