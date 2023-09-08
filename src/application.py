@@ -24,7 +24,6 @@ from gi.repository import Gio, Adw
 
 from __main__ import APP_ID
 
-from .utils import GSettings, UserData
 from .window import Window
 
 
