@@ -76,7 +76,7 @@
                         <child type="start">
                           <object class="GtkButton" id="clear_trash_btn">
                             <property name="valign">center</property>
-                            <property name="icon-name">edit-delete-symbolic</property>
+                            <property name="icon-name">user-trash-full-symbolic</property>
                             <property name="tooltip-text" translatable="yes">Clear</property>
                             <property name="visible" bind-source="trash_list_scrl" bind-property="visible" bind-flags="sync-create" />
                             <accessibility>
@@ -86,38 +86,47 @@
                           </object>
                         </child>
 
-                        <!-- Close sidebar button -->
+                        <!-- End buttons -->
                         <child type="end">
-                          <object class="GtkRevealer">
-                            <property name="reveal-child" bind-source="flap" bind-property="folded" bind-flags="sync-create" />
-                            <property name="transition-type">3</property>
+                          <object class="GtkBox">
+
+                            <!-- Restore all button -->
                             <child>
                               <object class="GtkButton">
                                 <property name="valign">center</property>
-                                <property name="icon-name">go-previous-symbolic</property>
-                                <property name="tooltip-text" translatable="yes">Close Trash</property>
+                                <property name="icon-name">edit-redo-symbolic</property>
+                                <property name="tooltip-text" translatable="yes">Restore All</property>
+                                <property name="visible" bind-source="trash_list_scrl" bind-property="visible" bind-flags="sync-create" />
                                 <accessibility>
-                                  <property name="label" translatable="yes">Close Trash</property>
+                                  <property name="label" translatable="yes">Restore All</property>
                                 </accessibility>
-                                <signal name="clicked" handler="on_trash_close" />
+                                <signal name="clicked" handler="on_trash_restore" />
                               </object>
                             </child>
+
+                            <!-- Close sidebar button -->
+                            <child>
+                              <object class="GtkRevealer">
+                                <property name="reveal-child" bind-source="flap" bind-property="folded" bind-flags="sync-create" />
+                                <property name="transition-type">7</property>
+                                <child>
+                                  <object class="GtkButton">
+                                    <property name="valign">center</property>
+                                    <property name="margin-start">5</property>
+                                    <property name="icon-name">go-previous-symbolic</property>
+                                    <property name="tooltip-text" translatable="yes">Close Trash</property>
+                                    <accessibility>
+                                      <property name="label" translatable="yes">Close Trash</property>
+                                    </accessibility>
+                                    <signal name="clicked" handler="on_trash_close" />
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+
                           </object>
                         </child>
 
-                        <!-- Restore all button -->
-                        <child type="end">
-                          <object class="GtkButton">
-                            <property name="valign">center</property>
-                            <property name="icon-name">selection-mode-symbolic</property>
-                            <property name="tooltip-text" translatable="yes">Restore All</property>
-                            <property name="visible" bind-source="trash_list_scrl" bind-property="visible" bind-flags="sync-create" />
-                            <accessibility>
-                              <property name="label" translatable="yes">Restore All</property>
-                            </accessibility>
-                            <signal name="clicked" handler="on_trash_restore" />
-                          </object>
-                        </child>
 
                       </object>
                     </child>
