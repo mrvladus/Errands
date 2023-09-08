@@ -50,6 +50,20 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="44.7.2" date="2023-09-08">
+      <description>
+        <p>UI/UX:</p>
+        <ul>
+          <li>Added confirmation dialog before clearing trash</li>
+          <li>Added button to close trash</li>
+          <li>UI improvements and bugfixes</li>
+        </ul>
+        <p>Translations:</p>
+        <ul>
+          <li>Updated Italian translation (Albano Battistella)</li>
+        </ul>
+      </description>
+    </release>
     <release version="44.7.1" date="2023-09-05">
       <description>
         <p>UI/UX:</p>
