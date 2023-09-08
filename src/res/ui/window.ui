@@ -11,7 +11,7 @@
 
         <!-- Flap -->
         <child>
-          <object class="AdwFlap">
+          <object class="AdwFlap" id="flap">
             <property name="locked">true</property>
             <property name="fold-policy">auto</property>
             <property name="reveal-flap" bind-source="toggle_trash_btn" bind-property="active" bind-flags="sync-create|bidirectional" />
@@ -53,7 +53,7 @@
                 <child>
                   <object class="GtkBox">
                     <property name="orientation">vertical</property>
-                    <property name="width-request">300</property>
+                    <property name="width-request">360</property>
                     <style>
                       <class name="background" />
                       <class name="sidebar" />
@@ -83,6 +83,25 @@
                               <property name="label" translatable="yes">Clear</property>
                             </accessibility>
                             <signal name="clicked" handler="on_trash_clear" />
+                          </object>
+                        </child>
+
+                        <!-- Close sidebar button -->
+                        <child type="end">
+                          <object class="GtkRevealer">
+                            <property name="reveal-child" bind-source="flap" bind-property="folded" bind-flags="sync-create" />
+                            <property name="transition-type">3</property>
+                            <child>
+                              <object class="GtkButton">
+                                <property name="valign">center</property>
+                                <property name="icon-name">go-previous-symbolic</property>
+                                <property name="tooltip-text" translatable="yes">Close Trash</property>
+                                <accessibility>
+                                  <property name="label" translatable="yes">Close Trash</property>
+                                </accessibility>
+                                <signal name="clicked" handler="on_trash_close" />
+                              </object>
+                            </child>
                           </object>
                         </child>
 

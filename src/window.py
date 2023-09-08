@@ -41,6 +41,7 @@ class Window(Adw.ApplicationWindow):
     delete_completed_tasks_btn: Gtk.Button = Gtk.Template.Child()
     drop_motion_ctrl: Gtk.DropControllerMotion = Gtk.Template.Child()
     export_dialog: Gtk.FileDialog = Gtk.Template.Child()
+    flap: Adw.Flap = Gtk.Template.Child()
     import_dialog: Gtk.FileDialog = Gtk.Template.Child()
     main_menu_btn: Gtk.MenuButton = Gtk.Template.Child()
     scroll_up_btn_rev: Gtk.Revealer = Gtk.Template.Child()
@@ -432,6 +433,10 @@ class Window(Adw.ApplicationWindow):
             self.trash_list.remove(item)
 
         self.trash_list_scrl.set_visible(False)
+
+    @Gtk.Template.Callback()
+    def on_trash_close(self, _) -> None:
+        self.flap.set_reveal_flap(False)
 
     @Gtk.Template.Callback()
     def on_trash_restore(self, _) -> None:
