@@ -76,23 +76,32 @@ class Animate:
 class GSettings:
     """Class for accessing gsettings"""
 
-    gsettings = None
+    gsettings: Gio.Settings = None
+    initialized: bool = False
+
+    def _check_init(self):
+        if not self.initialized:
+            self.init()
 
     @classmethod
-    def bind(self, setting, obj, prop) -> None:
+    def bind(self, setting: str, obj: Gtk.Widget, prop: str) -> None:
+        self._check_init(self)
         self.gsettings.bind(setting, obj, prop, 0)
 
     @classmethod
     def get(self, setting: str):
+        self._check_init(self)
         return self.gsettings.get_value(setting).unpack()
 
     @classmethod
     def set(self, setting: str, gvariant: str, value) -> None:
+        self._check_init(self)
         self.gsettings.set_value(setting, GLib.Variant(gvariant, value))
 
     @classmethod
     def init(self) -> None:
         Log.debug("Initialize GSettings")
+        self.initialized = True
         self.gsettings = Gio.Settings.new(APP_ID)
 
 
@@ -117,19 +126,19 @@ class Log:
     @classmethod
     def debug(self, msg: str) -> None:
         print(f"\033[33;1m[DEBUG]\033[0m {msg}")
-        self.log(self, f"[DEBUG] {msg}")
+        self._log(self, f"[DEBUG] {msg}")
 
     @classmethod
     def error(self, msg: str) -> None:
         print(f"\033[31;1m[ERROR]\033[0m {msg}")
-        self.log(self, f"[ERROR] {msg}")
+        self._log(self, f"[ERROR] {msg}")
 
     @classmethod
     def info(self, msg: str) -> None:
         print(f"\033[32;1m[INFO]\033[0m {msg}")
-        self.log(self, f"[INFO] {msg}")
+        self._log(self, f"[INFO] {msg}")
 
-    def log(self, msg: str) -> None:
+    def _log(self, msg: str) -> None:
         try:
             with open(self.log_file, "a") as f:
                 f.write(msg + "\n")
@@ -197,6 +206,7 @@ class UserData:
 
     data_dir: str = os.path.join(GLib.get_user_data_dir(), "list")
     default_data = {"version": VERSION, "tasks": []}
+    initialized: bool = False
 
     @classmethod
     def init(self) -> None:
@@ -209,27 +219,26 @@ class UserData:
                 Log.debug(
                     f"Create data file at: {os.path.join(self.data_dir, 'data.json')}"
                 )
+        self.initialized = True
 
-        data: dict = self.get()
         # Convert old formats
-        if data["version"] != VERSION:
+        if self.get()["version"] != VERSION:
             self.convert()
         # Create new file if old is corrupted
-        else:
-            if not self.validate(data):
-                Log.error(
-                    f"Data file is corrupted. Creating backup at {os.path.join(self.data_dir, 'data.old.json')}"
-                )
-                shutil.copy(
-                    os.path.join(self.data_dir, "data.json"),
-                    os.path.join(self.data_dir, "data.old.json"),
-                )
-                self.set(self.default_data)
+        if not self.validate(self.get()):
+            Log.error(
+                f"Data file is corrupted. Creating backup at {os.path.join(self.data_dir, 'data.old.json')}"
+            )
+            shutil.copy(
+                os.path.join(self.data_dir, "data.json"),
+                os.path.join(self.data_dir, "data.old.json"),
+            )
+            self.set(self.default_data)
 
     # Load user data from json
     @classmethod
     def get(self) -> dict:
-        if not os.path.exists(os.path.join(self.data_dir, "data.json")):
+        if not self.initialized:
             self.init()
         try:
             with open(os.path.join(self.data_dir, "data.json"), "r") as f:
@@ -309,8 +318,9 @@ class UserData:
                             and sub["id"] in data["history"],
                         }
                         new_tasks.append(new_sub)
-            data["version"] = VERSION
             data["tasks"] = new_tasks
             if "history" in data:
                 del data["history"]
-            UserData.set(data)
+
+        data["version"] = VERSION
+        UserData.set(data)

@@ -37,7 +37,4 @@ class Application(Adw.Application):
         self.set_resource_base_path("/io/github/mrvladus/Errands/")
 
     def do_activate(self) -> None:
-        GSettings.init()
-        UserData.init()
-        # Show window
         Window(application=self).present()
