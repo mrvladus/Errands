@@ -117,7 +117,7 @@ msgstr "Vlad Krupinski <mrvladus@yandex.ru>"
 
 #: src/res/ui/window.ui:547
 msgid "Are you sure?"
-msgstr "Вы увепены?"
+msgstr "Вы уверены?"
 
 #: src/res/ui/window.ui:548
 msgid "Tasks will be permanently deleted"
