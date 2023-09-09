@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-08 13:23+0300\n"
+"POT-Creation-Date: 2023-09-09 10:38+0300\n"
 "PO-Revision-Date: 2023-07-07 16:56+0300\n"
 "Last-Translator: Vlad Krupinski <mrvladus@yandex.ru>\n"
 "Language-Team: \n"
@@ -200,6 +200,20 @@ msgstr "Удалить выполненные подзадачи"
 #: src/res/ui/trash_item.ui:20 src/res/ui/trash_item.ui:24
 msgid "Restore"
 msgstr "Восстановить"
+
+#. TRANSLATORS: Don't translate
+#: data/io.github.mrvladus.List.desktop:4
+msgid "Errands"
+msgstr ""
+
+#: data/io.github.mrvladus.List.desktop:5
+msgid "Manage your tasks"
+msgstr "Управляйте своими задачами"
+
+#. TRANSLATORS: Don't translate
+#: data/io.github.mrvladus.List.desktop:12
+msgid "errands;tasks;list;todo;todos;"
+msgstr ""
 
 #~ msgid "Preferences"
 #~ msgstr "Настройки"
