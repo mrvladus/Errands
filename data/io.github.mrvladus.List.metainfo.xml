@@ -51,6 +51,13 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="44.7.3" date="2023-09-08">
+      <description translatable="no">
+        <ul>
+          <li>Fixed translations</li>
+        </ul>
+      </description>
+    </release>
     <release version="44.7.2" date="2023-09-08">
       <description translatable="no">
         <p>UI/UX:</p>
