@@ -5,12 +5,16 @@
   # Errands
 
   Manage your tasks
-
+  
+  <a href="https://circle.gnome.org/"><img src="https://circle.gnome.org/assets/button/badge.svg"></a>
+  
   ![CI](https://github.com/mrvladus/Errands/actions/workflows/CI.yml/badge.svg)
+  
 <p align="center">
   <img src="screenshots/main.png" width="360" align="center">
   <img src="screenshots/secondary.png" width="360" align="center">
 </p>
+
 </div>
 
 ## Features
