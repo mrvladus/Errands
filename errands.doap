@@ -7,8 +7,7 @@
   <name xml:lang="en">Errands</name>
   <shortdesc xml:lang="en">Manage your tasks</shortdesc>
   <homepage rdf:resource="https://github.com/mrvladus/Errands" />
-  <bug-database rdf:resource="https://github.com/mrvladus/Errands/issues/"/>
-
+  <bug-database rdf:resource="https://github.com/mrvladus/Errands/issues"/>
   <programming-language>Python</programming-language>
   <platform>GTK 4</platform>
   <platform>Libadwaita</platform>
@@ -19,11 +18,10 @@
       <foaf:mbox rdf:resource="mailto:mrvladus@yandex.ru" />
       <foaf:account>
         <foaf:OnlineAccount>
-          <foaf:accountServiceHomepage rdf:resource="https://github.com"/>
-          <foaf:accountName>mrvladus</foaf:accountName>
+            <foaf:accountServiceHomepage rdf:resource="https://github.com/"/>
+            <foaf:accountName>mrvladus</foaf:accountName>
         </foaf:OnlineAccount>
       </foaf:account>
     </foaf:Person>
   </maintainer>
 </Project>
-
