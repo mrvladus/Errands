@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-09 10:38+0300\n"
-"PO-Revision-Date: 2023-08-08 10:42+0200\n"
+"PO-Revision-Date: 2023-09-10 13:41+0200\n"
 "Last-Translator: Amerey.eu <info@amerey.eu>\n"
 "Language-Team: \n"
 "Language: cs\n"
@@ -19,7 +19,7 @@ msgstr ""
 
 #: src/res/ui/window.ui:42
 msgid "Move to Trash"
-msgstr ""
+msgstr "Přesunout do koše"
 
 #: src/res/ui/window.ui:68
 msgid "Deleted Tasks"
@@ -35,7 +35,7 @@ msgstr "Obnovit vše"
 
 #: src/res/ui/window.ui:117 src/res/ui/window.ui:119
 msgid "Close Trash"
-msgstr ""
+msgstr "Zavřít Koš"
 
 #: src/res/ui/window.ui:146
 msgid "Empty Trash"
@@ -67,15 +67,15 @@ msgstr "Přidat nový úkol"
 
 #: src/res/ui/window.ui:431
 msgid "Export Tasks..."
-msgstr ""
+msgstr "Exportovat úkoly..."
 
 #: src/res/ui/window.ui:435
 msgid "Import Tasks..."
-msgstr ""
+msgstr "Importovat úkoly..."
 
 #: src/res/ui/window.ui:445
 msgid "Keyboard Shortcuts"
-msgstr ""
+msgstr "Klávesové zkratky"
 
 #: src/res/ui/window.ui:449
 msgid "About Errands"
@@ -83,31 +83,31 @@ msgstr "O aplikaci Errands"
 
 #: src/res/ui/window.ui:463
 msgid "General"
-msgstr ""
+msgstr "Obecné"
 
 #: src/res/ui/window.ui:466
 msgid "Show keyboard shortcuts"
-msgstr ""
+msgstr "Zobrazit klávesové zkratky"
 
 #: src/res/ui/window.ui:472
 msgid "Toggle sidebar"
-msgstr ""
+msgstr "Přepnout postranní panel"
 
 #: src/res/ui/window.ui:478
 msgid "Quit"
-msgstr ""
+msgstr "Ukončit"
 
 #: src/res/ui/window.ui:486
 msgid "Import and Export"
-msgstr ""
+msgstr "Importovat a exportovat"
 
 #: src/res/ui/window.ui:489
 msgid "Import tasks"
-msgstr ""
+msgstr "Importovat úkoly"
 
 #: src/res/ui/window.ui:495
 msgid "Export tasks"
-msgstr ""
+msgstr "Exportovat úkoly"
 
 #: src/res/ui/window.ui:512
 msgid "translator-credits"
@@ -115,11 +115,11 @@ msgstr "Amerey.eu"
 
 #: src/res/ui/window.ui:547
 msgid "Are you sure?"
-msgstr ""
+msgstr "Doopravdy?"
 
 #: src/res/ui/window.ui:548
 msgid "Tasks will be permanently deleted"
-msgstr ""
+msgstr "Úkoly budou trvale smazány"
 
 #: src/res/ui/window.ui:553 src/res/ui/sub_task.ui:122 src/res/ui/task.ui:322
 msgid "Cancel"
@@ -135,19 +135,19 @@ msgstr "Zkopírováno do schránky"
 
 #: src/res/ui/window.ui:567
 msgid "Tasks Exported"
-msgstr ""
+msgstr "Úkoly byly exportovány"
 
 #: src/res/ui/window.ui:572
 msgid "Tasks Imported"
-msgstr ""
+msgstr "Úkoly byly importovány"
 
 #: src/res/ui/window.ui:577
 msgid "Error occurred"
-msgstr ""
+msgstr "Došlo k chybě"
 
 #: src/res/ui/window.ui:578
 msgid "Open log"
-msgstr ""
+msgstr "Otevřít log"
 
 #: src/res/ui/preferences.ui:14
 msgid "Application Theme"
@@ -202,16 +202,16 @@ msgstr "Obnovit"
 #. TRANSLATORS: Don't translate
 #: data/io.github.mrvladus.List.desktop:4
 msgid "Errands"
-msgstr ""
+msgstr "Úkoly"
 
 #: data/io.github.mrvladus.List.desktop:5
 msgid "Manage your tasks"
-msgstr ""
+msgstr "Spravujte své úkoly"
 
 #. TRANSLATORS: Don't translate
 #: data/io.github.mrvladus.List.desktop:12
 msgid "errands;tasks;list;todo;todos;"
-msgstr ""
+msgstr "errands;tasks;list;todo;todos;úkoly;seznam;"
 
 #~ msgid "Preferences"
 #~ msgstr "Předvolby"
