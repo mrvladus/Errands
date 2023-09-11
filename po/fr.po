@@ -8,50 +8,51 @@ msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-09 10:38+0300\n"
-"PO-Revision-Date: 2023-05-25 11:05+0200\n"
+"PO-Revision-Date: 2023-09-11 16:00+0200\n"
 "Last-Translator: Jeremy Castel <jeremy.castel@protonmail.com>\n"
+"Language-Team: \n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 3.1.1\n"
+"X-Generator: Poedit 3.3.1\n"
 
 #: src/res/ui/window.ui:42
 msgid "Move to Trash"
-msgstr ""
+msgstr "Mettre à la corbeille"
 
 #: src/res/ui/window.ui:68
 msgid "Deleted Tasks"
-msgstr "Sous-tâches terminées"
+msgstr "Tâches supprimées"
 
 #: src/res/ui/window.ui:80 src/res/ui/window.ui:83
 msgid "Clear"
-msgstr "Effacer le style"
+msgstr "Vider"
 
 #: src/res/ui/window.ui:98 src/res/ui/window.ui:101
 msgid "Restore All"
-msgstr ""
+msgstr "Tout restaurer"
 
 #: src/res/ui/window.ui:117 src/res/ui/window.ui:119
 msgid "Close Trash"
-msgstr ""
+msgstr "Fermer la corbeille"
 
 #: src/res/ui/window.ui:146
 msgid "Empty Trash"
-msgstr ""
+msgstr "Corbeille vide"
 
 #: src/res/ui/window.ui:147
 msgid "No deleted items"
-msgstr ""
+msgstr "Aucun élément supprimé"
 
 #: src/res/ui/window.ui:232 src/res/ui/window.ui:235
 msgid "Show Deleted Tasks"
-msgstr ""
+msgstr "Afficher les tâches supprimées"
 
 #: src/res/ui/window.ui:257 src/res/ui/window.ui:260
 msgid "Delete Completed Tasks"
-msgstr "Supprimer les sous-tâches terminées"
+msgstr "Supprimer les tâches terminées"
 
 #: src/res/ui/window.ui:285 src/res/ui/window.ui:287
 msgid "Main Menu"
@@ -59,7 +60,7 @@ msgstr "Menu principal"
 
 #: src/res/ui/window.ui:301 src/res/ui/window.ui:304
 msgid "Scroll Up"
-msgstr ""
+msgstr "Défiler vers le haut"
 
 #: src/res/ui/window.ui:337
 msgid "Add new Task"
@@ -67,15 +68,15 @@ msgstr "Ajouter une tâche"
 
 #: src/res/ui/window.ui:431
 msgid "Export Tasks..."
-msgstr ""
+msgstr "Exporter les tâches..."
 
 #: src/res/ui/window.ui:435
 msgid "Import Tasks..."
-msgstr ""
+msgstr "Importer les tâches..."
 
 #: src/res/ui/window.ui:445
 msgid "Keyboard Shortcuts"
-msgstr ""
+msgstr "Raccourcis clavier"
 
 #: src/res/ui/window.ui:449
 msgid "About Errands"
@@ -83,31 +84,31 @@ msgstr "À propos de Errands"
 
 #: src/res/ui/window.ui:463
 msgid "General"
-msgstr ""
+msgstr "Général"
 
 #: src/res/ui/window.ui:466
 msgid "Show keyboard shortcuts"
-msgstr ""
+msgstr "Afficher les raccourcis clavier"
 
 #: src/res/ui/window.ui:472
 msgid "Toggle sidebar"
-msgstr ""
+msgstr "Afficher ou masquer le panneau latérale"
 
 #: src/res/ui/window.ui:478
 msgid "Quit"
-msgstr ""
+msgstr "Quitter"
 
 #: src/res/ui/window.ui:486
 msgid "Import and Export"
-msgstr ""
+msgstr "Importer et exporter"
 
 #: src/res/ui/window.ui:489
 msgid "Import tasks"
-msgstr ""
+msgstr "Importer les tâches"
 
 #: src/res/ui/window.ui:495
 msgid "Export tasks"
-msgstr ""
+msgstr "Exporter les tâches"
 
 #: src/res/ui/window.ui:512
 msgid "translator-credits"
@@ -115,11 +116,11 @@ msgstr "Jeremy Castel <jeremy.castel@protonmail.com>"
 
 #: src/res/ui/window.ui:547
 msgid "Are you sure?"
-msgstr ""
+msgstr "Supprimer les éléments de la corbeille ?"
 
 #: src/res/ui/window.ui:548
 msgid "Tasks will be permanently deleted"
-msgstr ""
+msgstr "Tous les éléments seront définitivement supprimés"
 
 #: src/res/ui/window.ui:553 src/res/ui/sub_task.ui:122 src/res/ui/task.ui:322
 msgid "Cancel"
@@ -131,23 +132,23 @@ msgstr "Supprimer"
 
 #: src/res/ui/window.ui:562
 msgid "Copied to Clipboard"
-msgstr ""
+msgstr "Copié dans le presse-papier"
 
 #: src/res/ui/window.ui:567
 msgid "Tasks Exported"
-msgstr ""
+msgstr "Tâches exportées"
 
 #: src/res/ui/window.ui:572
 msgid "Tasks Imported"
-msgstr ""
+msgstr "Tâches importées"
 
 #: src/res/ui/window.ui:577
 msgid "Error occurred"
-msgstr ""
+msgstr "Une erreur est survenue"
 
 #: src/res/ui/window.ui:578
 msgid "Open log"
-msgstr ""
+msgstr "Ouvrir les logs"
 
 #: src/res/ui/preferences.ui:14
 msgid "Application Theme"
@@ -173,7 +174,7 @@ msgstr "Marquer comme terminée"
 #: src/res/ui/sub_task.ui:87 src/res/ui/sub_task.ui:89 src/res/ui/task.ui:286
 #: src/res/ui/task.ui:288
 msgid "Menu"
-msgstr ""
+msgstr "Menu"
 
 #: src/res/ui/sub_task.ui:147 src/res/ui/task.ui:17
 msgid "Edit"
@@ -181,7 +182,7 @@ msgstr "Modifier"
 
 #: src/res/ui/sub_task.ui:151 src/res/ui/task.ui:21
 msgid "Copy"
-msgstr ""
+msgstr "Copier"
 
 #: src/res/ui/task.ui:186 src/res/ui/task.ui:189
 msgid "Clear style"
@@ -197,7 +198,7 @@ msgstr "Supprimer les sous-tâches terminées"
 
 #: src/res/ui/trash_item.ui:20 src/res/ui/trash_item.ui:24
 msgid "Restore"
-msgstr ""
+msgstr "Restaurer"
 
 #. TRANSLATORS: Don't translate
 #: data/io.github.mrvladus.List.desktop:4
@@ -206,7 +207,7 @@ msgstr ""
 
 #: data/io.github.mrvladus.List.desktop:5
 msgid "Manage your tasks"
-msgstr ""
+msgstr "Gérer vos tâches"
 
 #. TRANSLATORS: Don't translate
 #: data/io.github.mrvladus.List.desktop:12
