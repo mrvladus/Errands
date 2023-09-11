@@ -49,7 +49,7 @@ class Task(Gtk.Revealer):
         super().__init__()
         Log.info("Add task: " + task["text"])
         self.window = window
-        self.parent: Gtk.Box = self.window.tasks_list
+        self.parent = self.window.tasks_list if not parent else parent
         self.task: dict = task
         self.add_actions()
         # Escape text and find URL's'
@@ -83,7 +83,7 @@ class Task(Gtk.Revealer):
         sub_count: int = 0
         for task in UserData.get()["tasks"]:
             if task["parent"] == self.task["id"]:
-                sub_task = Task(task, self.window)
+                sub_task = Task(task, self.window, self)
                 self.sub_tasks.append(sub_task)
                 if not task["deleted"]:
                     sub_task.toggle_visibility()
@@ -235,6 +235,8 @@ class Task(Gtk.Revealer):
         UserData.set(data)
         toggle_tasks(self.window.tasks_list)
         self.window.update_status()
+        if self.is_sub_task:
+            self.parent.update_statusbar()
         # Set crosslined text
         if btn.props.active:
             self.text = Markup.add_crossline(self.text)

@@ -10,10 +10,6 @@
   margin: 6px 12px 6px 12px;
 }
 
-.sub-tasks:last-child {
-  margin-bottom: 6px;
-}
-
 .task-expand-icon {
   transition: transform 0.25s;
 }
@@ -87,6 +83,11 @@
 }
 
 /* Sub-task */
+
+.sub-tasks:last-child {
+  margin-bottom: 6px;
+}
+
 .sub-task {
   margin: 6px 11px 6px 11px;
 }
