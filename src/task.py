@@ -267,9 +267,12 @@ class Task(Gtk.Revealer):
         sub_task = Task(new_sub_task, self.window, self)
         self.sub_tasks.append(sub_task)
         sub_task.toggle_visibility()
-        self.update_statusbar()
         # Clear entry
         entry.get_buffer().props.text = ""
+        # Update status
+        self.task_completed_btn.props.active = self.task["completed"] = False
+        self.update_data()
+        self.update_statusbar()
 
     @Gtk.Template.Callback()
     def on_task_cancel_edit_btn_clicked(self, *_) -> None:
