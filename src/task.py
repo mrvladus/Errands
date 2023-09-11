@@ -289,13 +289,12 @@ class Task(Gtk.Revealer):
         Log.info(f"Change '{old_text}' to '{new_text}'")
         # Set new text
         self.task["text"] = new_text
-        self.task["completed"] = False
-        self.update_data()
         # Escape text and find URL's'
         self.text = Markup.escape(self.task["text"])
         self.text = Markup.find_url(self.text)
         # Toggle checkbox
-        self.task_completed_btn.props.active = False
+        self.task_completed_btn.props.active = self.task["completed"] = False
+        self.update_data()
         # Set text
         self.task_text.props.label = self.text
         self.toggle_edit_mode()
