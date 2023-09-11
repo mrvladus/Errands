@@ -21,7 +21,6 @@
 # SOFTWARE.
 
 from gi.repository import Gtk, Adw, Gdk, GObject, Gio, GLib
-from .sub_task import SubTask
 from .utils import Animate, Log, Markup, TaskUtils, UserData
 
 
@@ -43,9 +42,10 @@ class Task(Gtk.Revealer):
     sub_tasks: Gtk.Box = Gtk.Template.Child()
 
     # State
-    expanded: bool = None
+    expanded: bool = False
+    is_sub_task: bool = False
 
-    def __init__(self, task: dict, window: Adw.ApplicationWindow) -> None:
+    def __init__(self, task: dict, window: Adw.ApplicationWindow, parent=None) -> None:
         super().__init__()
         Log.info("Add task: " + task["text"])
         self.window = window
@@ -64,6 +64,7 @@ class Task(Gtk.Revealer):
             self.main_box.add_css_class(f'task-{self.task["color"]}')
             self.task_status.add_css_class(f'progress-{self.task["color"]}')
         self.add_sub_tasks()
+        self.check_is_sub()
 
     def add_actions(self) -> None:
         group = Gio.SimpleActionGroup.new()
@@ -82,7 +83,7 @@ class Task(Gtk.Revealer):
         sub_count: int = 0
         for task in UserData.get()["tasks"]:
             if task["parent"] == self.task["id"]:
-                sub_task = SubTask(task, self, self.window)
+                sub_task = Task(task, self.window)
                 self.sub_tasks.append(sub_task)
                 if not task["deleted"]:
                     sub_task.toggle_visibility()
@@ -90,6 +91,13 @@ class Task(Gtk.Revealer):
         self.expand(sub_count > 0)
         self.update_statusbar()
         self.window.update_status()
+
+    def check_is_sub(self):
+        if self.task["parent"] != "":
+            self.is_sub_task = True
+            self.main_box.add_css_class("sub-task")
+        else:
+            self.main_box.add_css_class("task")
 
     def copy(self, *_) -> None:
         Log.info("Copy to clipboard: " + self.task["text"])
@@ -188,7 +196,7 @@ class Task(Gtk.Revealer):
     def on_delete_completed_btn_clicked(self, _) -> None:
         sub_tasks = self.sub_tasks.observe_children()
         for i in range(sub_tasks.get_n_items()):
-            sub: SubTask = sub_tasks.get_item(i)
+            sub: Task = sub_tasks.get_item(i)
             if sub.task["completed"] and not sub.task["deleted"]:
                 sub.delete(update_sts=False)
         self.update_statusbar()
@@ -254,7 +262,7 @@ class Task(Gtk.Revealer):
         data["tasks"].append(new_sub_task)
         UserData.set(data)
         # Add row
-        sub_task = SubTask(new_sub_task, self, self.window)
+        sub_task = Task(new_sub_task, self.window, self)
         self.sub_tasks.append(sub_task)
         sub_task.toggle_visibility()
         self.update_statusbar()
@@ -365,7 +373,7 @@ class Task(Gtk.Revealer):
             task.task["parent"] = self.task["id"]
             task.update_data()
             # Add sub-task
-            sub_task = SubTask(task.task.copy(), self, self.window)
+            sub_task = Task(task.task.copy(), self, self.window)
             self.sub_tasks.append(sub_task)
             sub_task.toggle_visibility()
             self.update_statusbar()

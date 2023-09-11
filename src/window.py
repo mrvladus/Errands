@@ -24,7 +24,6 @@ import json
 from gi.repository import Gio, Adw, Gtk, GLib
 from __main__ import VERSION, PROFILE, APP_ID
 
-from .sub_task import SubTask
 from .utils import Animate, GSettings, Log, TaskUtils, UserData
 from .task import Task
 
@@ -475,7 +474,7 @@ class Window(Adw.ApplicationWindow):
         self.update_status()
 
     @Gtk.Template.Callback()
-    def on_trash_drop(self, _drop, task: Task | SubTask, _x, _y) -> None:
+    def on_trash_drop(self, _drop, task: Task, _x, _y) -> None:
         """
         Move task to trash via dnd
         """

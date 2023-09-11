@@ -1,7 +1,6 @@
 # UI
 src/res/ui/window.ui
 src/res/ui/preferences.ui
-src/res/ui/sub_task.ui
 src/res/ui/task.ui
 src/res/ui/trash_item.ui
 # Data

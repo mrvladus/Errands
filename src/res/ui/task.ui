@@ -29,22 +29,18 @@
     <!-- Task card -->
     <child>
       <object class="GtkBox" id="main_box">
-        <property name="margin-top">6</property>
-        <property name="margin-bottom">6</property>
-        <property name="margin-start">12</property>
-        <property name="margin-end">12</property>
         <property name="orientation">vertical</property>
         <property name="hexpand">true</property>
         <style>
-          <class name="card" />
           <class name="fade" />
+          <class name="card" />
         </style>
 
         <!-- Drop target -->
         <child>
           <object class="GtkDropTarget">
             <property name="actions">move</property>
-            <property name="formats">Task SubTask</property>
+            <property name="formats">Task</property>
             <signal name="drop" handler="on_drop" />
           </object>
         </child>
@@ -348,7 +344,7 @@
                 <child>
                   <object class="GtkBox">
                     <property name="margin-top">10</property>
-                    <property name="margin-bottom">10</property>
+                    <property name="margin-bottom">6</property>
                     <property name="margin-start">10</property>
                     <property name="margin-end">10</property>
 
@@ -387,6 +383,9 @@
                 <child>
                   <object class="GtkBox" id="sub_tasks">
                     <property name="orientation">vertical</property>
+                    <style>
+                      <class name="sub-tasks" />
+                    </style>
                   </object>
                 </child>
 

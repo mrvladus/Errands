@@ -7,7 +7,11 @@
 /* Task */
 
 .task {
-  transition: 0.25s;
+  margin: 6px 12px 6px 12px;
+}
+
+.sub-tasks:last-child {
+  margin-bottom: 6px;
 }
 
 .task-expand-icon {
@@ -83,19 +87,8 @@
 }
 
 /* Sub-task */
-
-.sub-task-rev {
-  transition: opacity 0.25s;
-}
-
-.sub-task-rev:drop(active) {
-  border-radius: 10px;
-}
-
 .sub-task {
-  border-top-width: 1px;
-  border-style: solid;
-  border-color: @card_shade_color;
+  margin: 6px 11px 6px 11px;
 }
 
 /* Progress bar */
