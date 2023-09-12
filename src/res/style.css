@@ -14,14 +14,20 @@
   transition: transform 0.25s;
 }
 
-.sub-task-drop-area {
-  margin-right: 80px;
-  padding: 10px 50px;
+.task-drop-area {
+  padding: 5px;
+  margin: 5px 10px 4px 10px;
   border-radius: 10px;
   border-width: 5px;
   border-style: dotted;
   border-color: @light_3;
 }
+
+.task-drop-target:drop(active) {
+  border-radius: 10px;
+}
+
+/* Task accent colors */
 
 .task-blue {
   background: mix(@blue_1, @light_1, 0.6);

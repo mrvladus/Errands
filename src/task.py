@@ -352,8 +352,8 @@ class Task(Gtk.Revealer):
         return Gdk.ContentProvider.new_for_value(value)
 
     @Gtk.Template.Callback()
-    def on_drop(self, drop, task, _x, _y) -> None:
-        if task == self or self.get_prev_sibling() == task:
+    def on_task_top_drop(self, drop, task, _x, _y) -> None:
+        if task == self:
             return
 
         data = UserData.get()
@@ -361,36 +361,47 @@ class Task(Gtk.Revealer):
         tasks.insert(tasks.index(self.task), tasks.pop(tasks.index(task.task)))
         UserData.set(data)
 
-        # if self.is_sub_task:
-        #     if task.parent == self.parent:
-        #         self.parent.sub_tasks.reorder_child_after(task, self)
-        #         self.parent.sub_tasks.reorder_child_after(self, task)
-        #     else:
+        parent = self.parent if not self.is_sub_task else self.parent.sub_tasks
+        # If tasks have the same parent
+        if task.parent == self.parent:
+            parent.reorder_child_after(task, self)
+            parent.reorder_child_after(self, task)
+        else:
 
-        #         def check_visible():
-        #             if task.get_child_revealed():
-        #                 return True
-        #             else:
-        #                 task.parent.sub_tasks.remove(task)
-        #                 task.parent.update_data()
-        #                 task.parent.update_statusbar()
-        #                 return False
+            def check_visible():
+                if task.get_child_revealed():
+                    return True
+                else:
+                    if task.is_sub_task:
+                        task.parent.sub_tasks.remove(task)
+                        task.parent.update_data()
+                        task.parent.update_statusbar()
+                    else:
+                        task.parent.remove(task)
+                        task.window.update_status()
+                    return False
 
-        #         # Hide task
-        #         task.toggle_visibility(False)
-        #         GLib.timeout_add(100, check_visible)
-        #         # Change parent id
-        #         task.task["parent"] = self.task["id"]
-        #         task.update_data()
-        #         # Add sub-task
-        #         sub_task = Task(task.task.copy(), self.window, self)
-        #         self.sub_tasks.append(sub_task)
-        #         sub_task.toggle_visibility(True)
-        #         self.update_statusbar()
-        #         # Expand
-        #         self.expand(True)
-        # else:
-        #     self.parent.reorder_child_after(task, self)
-        #     self.parent.reorder_child_after(self, task)
+            # Hide task
+            task.toggle_visibility(False)
+            GLib.timeout_add(100, check_visible)
+            # Change parent id
+            task.task["parent"] = self.task["id"]
+            task.update_data()
+            # Add new Task
+            new_task = Task(task.task.copy(), self.window, self)
+            self.parent.append(new_task)
+            new_task.toggle_visibility(True)
+            self.update_statusbar()
+            # Expand
+            self.expand(True)
+
+        # parent = self.parent if not self.is_sub_task else self.parent.sub_tasks
+        # parent.reorder_child_after(task, self)
+        # parent.reorder_child_after(self, task)
+
+    @Gtk.Template.Callback()
+    def on_drop(self, drop, task, _x, _y) -> None:
+        if task == self or self.get_prev_sibling() == task:
+            return
 
         return True
