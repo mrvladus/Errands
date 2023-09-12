@@ -408,6 +408,7 @@ class Window(Adw.ApplicationWindow):
 
         if res == "cancel":
             Log.debug("Clear Trash cancelled")
+            return
 
         Log.info("Clear Trash")
         children = self.tasks_list.observe_children()

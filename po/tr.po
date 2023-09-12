@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-09 10:38+0300\n"
-"PO-Revision-Date: 2023-09-05 00:28+0300\n"
+"PO-Revision-Date: 2023-09-12 01:02+0300\n"
 "Last-Translator: Sabri Ünal <libreajans@gmail.com>\n"
 "Language-Team: Turkish <takim@gnome.org.tr>\n"
 "Language: tr\n"
@@ -25,11 +25,11 @@ msgstr "Çöpe Taşı"
 
 #: src/res/ui/window.ui:68
 msgid "Deleted Tasks"
-msgstr "Tamamlanmış görevler"
+msgstr "Silinmiş Görevler"
 
 #: src/res/ui/window.ui:80 src/res/ui/window.ui:83
 msgid "Clear"
-msgstr "Biçemi temizle"
+msgstr "Temizle"
 
 #: src/res/ui/window.ui:98 src/res/ui/window.ui:101
 msgid "Restore All"
@@ -37,7 +37,7 @@ msgstr "Tümünü Geri Yükle"
 
 #: src/res/ui/window.ui:117 src/res/ui/window.ui:119
 msgid "Close Trash"
-msgstr ""
+msgstr "Çöpü Kapat"
 
 #: src/res/ui/window.ui:146
 msgid "Empty Trash"
@@ -49,11 +49,11 @@ msgstr "Silinmiş öge yok"
 
 #: src/res/ui/window.ui:232 src/res/ui/window.ui:235
 msgid "Show Deleted Tasks"
-msgstr "Silenen Görevleri Göster"
+msgstr "Silinmiş Görevleri Göster"
 
 #: src/res/ui/window.ui:257 src/res/ui/window.ui:260
 msgid "Delete Completed Tasks"
-msgstr "Tamamlanmış görevleri sil"
+msgstr "Tamamlanmış Görevleri Sil"
 
 #: src/res/ui/window.ui:285 src/res/ui/window.ui:287
 msgid "Main Menu"
@@ -65,7 +65,7 @@ msgstr "Yukarı Kaydır"
 
 #: src/res/ui/window.ui:337
 msgid "Add new Task"
-msgstr "Yeni görev ekle"
+msgstr "Yeni Görev Ekle"
 
 #: src/res/ui/window.ui:431
 msgid "Export Tasks..."
@@ -117,11 +117,11 @@ msgstr "Sabri Ünal <libreajans@gmail.com>"
 
 #: src/res/ui/window.ui:547
 msgid "Are you sure?"
-msgstr ""
+msgstr "Emin misiniz?"
 
 #: src/res/ui/window.ui:548
 msgid "Tasks will be permanently deleted"
-msgstr ""
+msgstr "Görevler kalıcı olarak silinecek"
 
 #: src/res/ui/window.ui:553 src/res/ui/sub_task.ui:122 src/res/ui/task.ui:322
 msgid "Cancel"
@@ -153,7 +153,7 @@ msgstr "Günlüğü aç"
 
 #: src/res/ui/preferences.ui:14
 msgid "Application Theme"
-msgstr "Uygulama teması"
+msgstr "Uygulama Teması"
 
 #: src/res/ui/preferences.ui:19
 msgid "System"
@@ -170,7 +170,7 @@ msgstr "Koyu"
 #: src/res/ui/sub_task.ui:57 src/res/ui/sub_task.ui:60 src/res/ui/task.ui:139
 #: src/res/ui/task.ui:142
 msgid "Mark as Completed"
-msgstr "Tamamlanmadı olarak imle"
+msgstr "Tamamlanmadı Olarak İmle"
 
 #: src/res/ui/sub_task.ui:87 src/res/ui/sub_task.ui:89 src/res/ui/task.ui:286
 #: src/res/ui/task.ui:288
@@ -191,11 +191,11 @@ msgstr "Biçemi temizle"
 
 #: src/res/ui/task.ui:358
 msgid "Add new Sub-Task"
-msgstr "Yeni alt görev ekle"
+msgstr "Yeni Alt Görev Ekle"
 
 #: src/res/ui/task.ui:372 src/res/ui/task.ui:376
 msgid "Delete Completed Sub-Tasks"
-msgstr "Tamamlanmış alt görevleri sil"
+msgstr "Tamamlanmış Alt Görevleri Sil"
 
 #: src/res/ui/trash_item.ui:20 src/res/ui/trash_item.ui:24
 msgid "Restore"
@@ -204,13 +204,13 @@ msgstr "Geri Yükle"
 #. TRANSLATORS: Don't translate
 #: data/io.github.mrvladus.List.desktop:4
 msgid "Errands"
-msgstr ""
+msgstr "Errands"
 
 #: data/io.github.mrvladus.List.desktop:5
 msgid "Manage your tasks"
-msgstr ""
+msgstr "Görevlerinizi yönetin"
 
 #. TRANSLATORS: Don't translate
 #: data/io.github.mrvladus.List.desktop:12
 msgid "errands;tasks;list;todo;todos;"
-msgstr ""
+msgstr "errands;tasks;list;todo;todos;görevler;görev;yapılacak işler;"

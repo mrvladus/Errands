@@ -51,6 +51,21 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="44.7.4" date="2023-09-12">
+      <description translatable="no">
+        <p>UI/UX:</p>
+        <ul>
+          <li>Fixed cancel button not working on trash clear</li>
+        </ul>
+        <p>Translations:</p>
+        <ul>
+          <li>Updated Italian translation (Davide Ferracin)</li>
+          <li>Updated Turkish translation (Davide Ferracin)</li>
+          <li>Updated French translation (CastelJeremy)</li>
+          <li>Updated Czech translation (Amerey)</li>
+        </ul>
+      </description>
+    </release>
     <release version="44.7.3" date="2023-09-08">
       <description translatable="no">
         <ul>
