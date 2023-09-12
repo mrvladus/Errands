@@ -355,7 +355,7 @@ class Window(Adw.ApplicationWindow):
         UserData.set(new_data)
         task = Task(new_task, self)
         self.tasks_list.append(task)
-        task.toggle_visibility()
+        task.toggle_visibility(True)
         # Clear entry
         entry.props.text = ""
         # Scroll to the end

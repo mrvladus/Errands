@@ -14,6 +14,15 @@
   transition: transform 0.25s;
 }
 
+.sub-task-drop-area {
+  margin-right: 80px;
+  padding: 10px 50px;
+  border-radius: 10px;
+  border-width: 5px;
+  border-style: dotted;
+  border-color: @light_3;
+}
+
 .task-blue {
   background: mix(@blue_1, @light_1, 0.6);
 }

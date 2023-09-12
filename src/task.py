@@ -336,13 +336,12 @@ class Task(Gtk.Revealer):
         )
         drag_row.add_prefix(Gtk.CheckButton(active=self.task["completed"]))
         drag_row.set_size_request(
-            self.get_allocated_width(),
+            self.get_allocated_width() // 2,
             60,
         )
         drag_widget.append(drag_row)
         drag_widget.drag_highlight_row(drag_row)
         icon.set_child(drag_widget)
-        drag.set_hotspot(self.drag_x, self.drag_y)
 
     @Gtk.Template.Callback()
     def on_drag_prepare(self, _, x, y) -> Gdk.ContentProvider:
@@ -354,44 +353,44 @@ class Task(Gtk.Revealer):
 
     @Gtk.Template.Callback()
     def on_drop(self, drop, task, _x, _y) -> None:
-        # If drop is task
-        if task.__gtype_name__ == "Task":
-            if task == self or self.get_prev_sibling() == task:
-                return
+        if task == self or self.get_prev_sibling() == task:
+            return
 
-            data = UserData.get()
-            tasks = data["tasks"]
-            tasks.insert(tasks.index(self.task), tasks.pop(tasks.index(task.task)))
-            UserData.set(data)
-            self.parent.reorder_child_after(task, self)
-            self.parent.reorder_child_after(self, task)
+        data = UserData.get()
+        tasks = data["tasks"]
+        tasks.insert(tasks.index(self.task), tasks.pop(tasks.index(task.task)))
+        UserData.set(data)
 
-        # If drop is sub-task
-        elif task.__gtype_name__ == "SubTask":
-            if task.parent == self:
-                return
+        # if self.is_sub_task:
+        #     if task.parent == self.parent:
+        #         self.parent.sub_tasks.reorder_child_after(task, self)
+        #         self.parent.sub_tasks.reorder_child_after(self, task)
+        #     else:
 
-            def check_visible():
-                if task.get_child_revealed():
-                    return True
-                else:
-                    task.parent.sub_tasks.remove(task)
-                    task.parent.update_data()
-                    task.parent.update_statusbar()
-                    return False
+        #         def check_visible():
+        #             if task.get_child_revealed():
+        #                 return True
+        #             else:
+        #                 task.parent.sub_tasks.remove(task)
+        #                 task.parent.update_data()
+        #                 task.parent.update_statusbar()
+        #                 return False
 
-            # Hide task
-            task.toggle_visibility(False)
-            GLib.timeout_add(100, check_visible)
-            # Change parent id
-            task.task["parent"] = self.task["id"]
-            task.update_data()
-            # Add sub-task
-            sub_task = Task(task.task.copy(), self, self.window)
-            self.sub_tasks.append(sub_task)
-            sub_task.toggle_visibility(True)
-            self.update_statusbar()
-            # Expand
-            self.expand(True)
+        #         # Hide task
+        #         task.toggle_visibility(False)
+        #         GLib.timeout_add(100, check_visible)
+        #         # Change parent id
+        #         task.task["parent"] = self.task["id"]
+        #         task.update_data()
+        #         # Add sub-task
+        #         sub_task = Task(task.task.copy(), self.window, self)
+        #         self.sub_tasks.append(sub_task)
+        #         sub_task.toggle_visibility(True)
+        #         self.update_statusbar()
+        #         # Expand
+        #         self.expand(True)
+        # else:
+        #     self.parent.reorder_child_after(task, self)
+        #     self.parent.reorder_child_after(self, task)
 
         return True
