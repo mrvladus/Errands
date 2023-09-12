@@ -36,7 +36,7 @@ msgstr "Ripristina tutto"
 
 #: src/res/ui/window.ui:117 src/res/ui/window.ui:119
 msgid "Close Trash"
-msgstr ""
+msgstr "Chiudi cestino"
 
 #: src/res/ui/window.ui:146
 msgid "Empty Trash"
@@ -116,11 +116,11 @@ msgstr "Albano Battistella <albanobattistella@gmail.com>"
 
 #: src/res/ui/window.ui:547
 msgid "Are you sure?"
-msgstr ""
+msgstr "Sei sicuro?"
 
 #: src/res/ui/window.ui:548
 msgid "Tasks will be permanently deleted"
-msgstr ""
+msgstr "Le attività verranno eliminate definitivamente"
 
 #: src/res/ui/sub_task.ui:122 src/res/ui/task.ui:322 src/res/ui/window.ui:553
 msgid "Cancel"
@@ -207,7 +207,7 @@ msgstr ""
 
 #: data/io.github.mrvladus.List.desktop:5
 msgid "Manage your tasks"
-msgstr ""
+msgstr "Gestisci le tue attività"
 
 #. TRANSLATORS: Don't translate
 #: data/io.github.mrvladus.List.desktop:12
