@@ -5,16 +5,18 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: errands\n"
+"Project-Id-Version:  errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-09 10:38+0300\n"
-"PO-Revision-Date: 2023-09-06 19:34+0100\n"
+"PO-Revision-Date: 2023-09-12 00:44+0200\n"
 "Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
-"Language-Team: Italian <LL@li.org>\n"
 "Language: it\n"
+"Language-Team: Italian <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.12.1\n"
 
 #: src/res/ui/window.ui:42
 msgid "Move to Trash"
@@ -38,7 +40,7 @@ msgstr ""
 
 #: src/res/ui/window.ui:146
 msgid "Empty Trash"
-msgstr "Svuota cestino"
+msgstr "Cestino vuoto"
 
 #: src/res/ui/window.ui:147
 msgid "No deleted items"
@@ -54,7 +56,7 @@ msgstr "Elimina le attività completate"
 
 #: src/res/ui/window.ui:285 src/res/ui/window.ui:287
 msgid "Main Menu"
-msgstr "Menu principale"
+msgstr "Menù principale"
 
 #: src/res/ui/window.ui:301 src/res/ui/window.ui:304
 msgid "Scroll Up"
@@ -90,7 +92,7 @@ msgstr "Mostra scorciatoie da tastiera"
 
 #: src/res/ui/window.ui:472
 msgid "Toggle sidebar"
-msgstr "Attiva barra laterale"
+msgstr "Attiva/Disattiva barra laterale"
 
 #: src/res/ui/window.ui:478
 msgid "Quit"
@@ -120,17 +122,17 @@ msgstr ""
 msgid "Tasks will be permanently deleted"
 msgstr ""
 
-#: src/res/ui/window.ui:553 src/res/ui/sub_task.ui:122 src/res/ui/task.ui:322
+#: src/res/ui/sub_task.ui:122 src/res/ui/task.ui:322 src/res/ui/window.ui:553
 msgid "Cancel"
-msgstr "Cancella"
+msgstr "Annulla"
 
-#: src/res/ui/window.ui:554 src/res/ui/sub_task.ui:143 src/res/ui/task.ui:13
+#: src/res/ui/sub_task.ui:143 src/res/ui/task.ui:13 src/res/ui/window.ui:554
 msgid "Delete"
 msgstr "Cancella"
 
 #: src/res/ui/window.ui:562
 msgid "Copied to Clipboard"
-msgstr "Copiato negli Appunti"
+msgstr "Copiato negli appunti"
 
 #: src/res/ui/window.ui:567
 msgid "Tasks Exported"
@@ -184,7 +186,7 @@ msgstr "Copia"
 
 #: src/res/ui/task.ui:186 src/res/ui/task.ui:189
 msgid "Clear style"
-msgstr "Stile chiaro"
+msgstr "Azzera stile"
 
 #: src/res/ui/task.ui:358
 msgid "Add new Sub-Task"
@@ -214,3 +216,4 @@ msgstr ""
 
 #~ msgid "Preferences"
 #~ msgstr "Preferenze"
+
