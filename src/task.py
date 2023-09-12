@@ -86,7 +86,7 @@ class Task(Gtk.Revealer):
                 sub_task = Task(task, self.window, self)
                 self.sub_tasks.append(sub_task)
                 if not task["deleted"]:
-                    sub_task.toggle_visibility()
+                    sub_task.toggle_visibility(True)
                     sub_count += 1
         self.expand(sub_count > 0)
         self.update_statusbar()
@@ -108,15 +108,9 @@ class Task(Gtk.Revealer):
     def delete(self, *_, update_sts: bool = True) -> None:
         Log.info(f"Delete task: {self.task['text']}")
 
-        self.toggle_visibility()
-
-        data: dict = UserData.get()
-        for task in data["tasks"]:
-            if task["id"] == self.task["id"]:
-                task["deleted"] = self.task["deleted"] = True
-                break
-        UserData.set(data)
-
+        self.toggle_visibility(False)
+        self.task["deleted"] = True
+        self.update_data()
         # Don't update if called externally
         if update_sts:
             self.window.update_status()
@@ -145,11 +139,8 @@ class Task(Gtk.Revealer):
             not self.task_edit_box_rev.get_child_revealed()
         )
 
-    def toggle_visibility(self, on: bool = False) -> None:
-        if on:
-            self.set_reveal_child(True)
-        else:
-            self.set_reveal_child(not self.get_child_revealed())
+    def toggle_visibility(self, on: bool) -> None:
+        self.set_reveal_child(on)
 
     def update_statusbar(self) -> None:
         n_completed = 0
@@ -266,7 +257,7 @@ class Task(Gtk.Revealer):
         # Add row
         sub_task = Task(new_sub_task, self.window, self)
         self.sub_tasks.append(sub_task)
-        sub_task.toggle_visibility()
+        sub_task.toggle_visibility(True)
         # Clear entry
         entry.get_buffer().props.text = ""
         # Update status
@@ -371,7 +362,7 @@ class Task(Gtk.Revealer):
                     return False
 
             # Hide task
-            task.toggle_visibility()
+            task.toggle_visibility(False)
             GLib.timeout_add(100, check_visible)
             # Change parent id
             task.task["parent"] = self.task["id"]
@@ -379,7 +370,7 @@ class Task(Gtk.Revealer):
             # Add sub-task
             sub_task = Task(task.task.copy(), self, self.window)
             self.sub_tasks.append(sub_task)
-            sub_task.toggle_visibility()
+            sub_task.toggle_visibility(True)
             self.update_statusbar()
             # Expand
             self.expand(True)

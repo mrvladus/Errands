@@ -120,7 +120,7 @@ class Window(Adw.ApplicationWindow):
             new_task = Task(task, self)
             self.tasks_list.append(new_task)
             if not task["deleted"]:
-                new_task.toggle_visibility()
+                new_task.toggle_visibility(True)
         self.update_status()
         self.trash_add_items()
 
