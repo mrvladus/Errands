@@ -202,7 +202,7 @@ msgstr "Herstellen"
 #. TRANSLATORS: Don't translate
 #: data/io.github.mrvladus.List.desktop:4
 msgid "Errands"
-msgstr "Boodschappen"
+msgstr ""
 
 #: data/io.github.mrvladus.List.desktop:5
 msgid "Manage your tasks"
@@ -211,7 +211,7 @@ msgstr "Beheer uw taken"
 #. TRANSLATORS: Don't translate
 #: data/io.github.mrvladus.List.desktop:12
 msgid "errands;tasks;list;todo;todos;"
-msgstr "boodschappen;taken;lĳst;taak;todo;"
+msgstr "errands;taken;lĳst;taak;todo;"
 
 #~ msgid "Preferences"
 #~ msgstr "Voorkeuren"
