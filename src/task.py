@@ -389,6 +389,8 @@ class Task(Gtk.Revealer):
                     return False
 
             # Hide task
+            new_task_dict = task.task.copy()
+            new_task_dict["parent"] = self.task["id"]
             task.toggle_visibility(False)
             GLib.timeout_add(100, check_visible)
             # Change parent id
