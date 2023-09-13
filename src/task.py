@@ -38,7 +38,6 @@ class Task(Gtk.Revealer):
     task_edit_box_rev: Gtk.Revealer = Gtk.Template.Child()
     task_edit_entry: Gtk.Entry = Gtk.Template.Child()
     sub_tasks_revealer: Gtk.Revealer = Gtk.Template.Child()
-    delete_completed_btn_revealer: Gtk.Revealer = Gtk.Template.Child()
     sub_tasks: Gtk.Box = Gtk.Template.Child()
 
     # State
@@ -187,9 +186,6 @@ class Task(Gtk.Revealer):
             if n_completed == 0:
                 self.task_status.props.visible = False
 
-        # Show delete completed button
-        self.delete_completed_btn_revealer.set_reveal_child(n_completed > 0)
-
     def update_data(self) -> None:
         """Sync self.task with user data.json"""
 
@@ -201,17 +197,6 @@ class Task(Gtk.Revealer):
                 return
 
     # --- Template handlers --- #
-
-    @Gtk.Template.Callback()
-    def on_delete_completed_btn_clicked(self, _) -> None:
-        for task in self.window.tasks:
-            if (
-                task.task["parent"] == self.task["id"]
-                and task.task["completed"]
-                and not task.task["deleted"]
-            ):
-                task.delete(update_sts=False)
-        self.update_statusbar()
 
     @Gtk.Template.Callback()
     def on_task_completed_btn_toggled(self, btn: Gtk.Button) -> None:

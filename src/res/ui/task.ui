@@ -399,25 +399,6 @@
                           </object>
                         </child>
 
-                        <!-- Delete completed sub-tasks button -->
-                        <child>
-                          <object class="GtkRevealer" id="delete_completed_btn_revealer">
-                            <property name="transition-type">3</property>
-                            <child>
-                              <object class="GtkButton">
-                                <property name="margin-start">5</property>
-                                <property name="icon-name">edit-clear-all-symbolic</property>
-                                <property name="tooltip-text" translatable="yes">Delete Completed Sub-Tasks</property>
-                                <property name="valign">center</property>
-                                <signal name="clicked" handler="on_delete_completed_btn_clicked" />
-                                <accessibility>
-                                  <property name="label" translatable="yes">Delete Completed Sub-Tasks</property>
-                                </accessibility>
-                              </object>
-                            </child>
-                          </object>
-                        </child>
-
                       </object>
                     </child>
 

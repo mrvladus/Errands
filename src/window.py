@@ -255,12 +255,11 @@ class Window(Adw.ApplicationWindow):
 
         n_total = 0
         n_completed = 0
-        for task in UserData.get()["tasks"]:
-            if task["parent"] == "":
-                if not task["deleted"]:
-                    n_total += 1
-                    if task["completed"]:
-                        n_completed += 1
+        for task in self.tasks:
+            if not task.task["deleted"]:
+                n_total += 1
+                if task.task["completed"]:
+                    n_completed += 1
         # Update progress bar animation
         Animate.property(
             self.status,
