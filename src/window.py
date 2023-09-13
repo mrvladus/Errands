@@ -443,6 +443,12 @@ class Window(Adw.ApplicationWindow):
                 task.update_statusbar()
             else:
                 task.parent.update_statusbar()
+            # Expand if needed
+            for t in self.tasks:
+                if t.task["parent"] == task.task["id"]:
+                    task.expand(True)
+                    break
+
         self.trash_widgets_ptrs.clear()
         # Clear trash
         self.trash_clear()
