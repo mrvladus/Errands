@@ -72,6 +72,9 @@ class SubTask(Gtk.Revealer):
         clp.set(self.task["text"])
         self.window.add_toast(self.window.toast_copied)
 
+    def complete_task(self, update_sts=False):
+        pass
+
     def delete(self, *_, update_sts: bool = True) -> None:
         Log.info(f"Delete sub-task: {self.task['text']}")
         self.toggle_visibility(False)

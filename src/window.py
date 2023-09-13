@@ -67,6 +67,7 @@ class Window(Adw.ApplicationWindow):
     tasks: list[Task] = []
 
     # Trash widgets pointers
+    trash_items: list = []
     trash_widgets_ptrs: list[Task] = []
 
     def __init__(self, **kwargs) -> None:
@@ -98,21 +99,109 @@ class Window(Adw.ApplicationWindow):
                 self.props.application.set_accels_for_action(f"app.{name}", shortcuts)
             self.props.application.add_action(action)
 
+        def about(*_) -> None:
+            """
+            Show about window
+            """
+
+            self.about_window.props.version = VERSION
+            self.about_window.props.application_icon = APP_ID
+            self.about_window.show()
+
+        def export_tasks(*_) -> None:
+            """
+            Show export dialog
+            """
+
+            def finish_export(_dial, res, _data):
+                try:
+                    file: Gio.File = self.export_dialog.save_finish(res)
+                except GLib.GError:
+                    Log.debug("Export cancelled")
+                    return
+                path = file.get_path()
+                with open(path, "w+") as f:
+                    json.dump(UserData.get(), f, indent=4)
+                self.add_toast(self.toast_exported)
+                Log.info(f"Export tasks to: {path}")
+
+            self.export_dialog.save(self, None, finish_export, None)
+
+        def import_tasks(*_) -> None:
+            """
+            Show import dialog
+            """
+
+            def finish_import(_dial, res, _data):
+                Log.info("Importing tasks")
+
+                try:
+                    file: Gio.File = self.import_dialog.open_finish(res)
+                except GLib.GError:
+                    Log.debug("Import cancelled")
+                    return
+
+                with open(file.get_path(), "r") as f:
+                    text = f.read()
+                    if not UserData.validate(text):
+                        self.add_toast(self.toast_err)
+                        return
+                    UserData.set(json.loads(text))
+
+                # Reload tasks
+                children = self.tasks_list.observe_children()
+                to_remove: list = [
+                    children.get_item(i) for i in range(children.get_n_items())
+                ]
+                for task in to_remove:
+                    self.tasks_list.remove(task)
+                self.load_tasks()
+
+                # Reload trash
+                children = self.trash_list.observe_children()
+                to_remove: list = [
+                    children.get_item(i) for i in range(children.get_n_items())
+                ]
+                for task in to_remove:
+                    self.trash_list.remove(task)
+                self.trash_add_items()
+                self.add_toast(self.toast_imported)
+                Log.info("Tasks imported")
+
+            self.import_dialog.open(self, None, finish_import, None)
+
+        def open_log(*_) -> None:
+            """
+            Open log file with default text editor
+            """
+
+            GLib.spawn_command_line_async(
+                f"xdg-open {GLib.get_user_data_dir()}/list/log.txt"
+            )
+
+        def shortcuts(*_) -> None:
+            """
+            Show shortcuts window
+            """
+
+            self.shortcuts_window.set_transient_for(self)
+            self.shortcuts_window.show()
+
         # create_action(
         #     "preferences",
         #     lambda *_: PreferencesWindow(self).show(),
         #     ["<primary>comma"],
         # )
-        create_action("export", self.export_tasks, ["<primary>e"])
-        create_action("import", self.import_tasks, ["<primary>i"])
-        create_action("shortcuts", self.shortcuts, ["<primary>question"])
-        create_action("about", self.about)
+        create_action("export", export_tasks, ["<primary>e"])
+        create_action("import", import_tasks, ["<primary>i"])
+        create_action("shortcuts", shortcuts, ["<primary>question"])
+        create_action("about", about)
         create_action(
             "quit",
             lambda *_: self.props.application.quit(),
             ["<primary>q", "<primary>w"],
         )
-        create_action("open_log", self.open_log)
+        create_action("open_log", open_log)
 
     def load_tasks(self) -> None:
         """
@@ -130,94 +219,6 @@ class Window(Adw.ApplicationWindow):
                 new_task.toggle_visibility(True)
         self.update_status()
         self.trash_list_scrl.set_visible(len(self.trash_widgets_ptrs) > 0)
-
-    def about(self, *_) -> None:
-        """
-        Show about window
-        """
-
-        self.about_window.props.version = VERSION
-        self.about_window.props.application_icon = APP_ID
-        self.about_window.show()
-
-    def export_tasks(self, *_) -> None:
-        """
-        Show export dialog
-        """
-
-        def finish_export(_dial, res, _data):
-            try:
-                file: Gio.File = self.export_dialog.save_finish(res)
-            except GLib.GError:
-                Log.debug("Export cancelled")
-                return
-            path = file.get_path()
-            with open(path, "w+") as f:
-                json.dump(UserData.get(), f, indent=4)
-            self.add_toast(self.toast_exported)
-            Log.info(f"Export tasks to: {path}")
-
-        self.export_dialog.save(self, None, finish_export, None)
-
-    def import_tasks(self, *_) -> None:
-        """
-        Show import dialog
-        """
-
-        def finish_import(_dial, res, _data):
-            Log.info("Importing tasks")
-
-            try:
-                file: Gio.File = self.import_dialog.open_finish(res)
-            except GLib.GError:
-                Log.debug("Import cancelled")
-                return
-
-            with open(file.get_path(), "r") as f:
-                text = f.read()
-                if not UserData.validate(text):
-                    self.add_toast(self.toast_err)
-                    return
-                UserData.set(json.loads(text))
-
-            # Reload tasks
-            children = self.tasks_list.observe_children()
-            to_remove: list = [
-                children.get_item(i) for i in range(children.get_n_items())
-            ]
-            for task in to_remove:
-                self.tasks_list.remove(task)
-            self.load_tasks()
-
-            # Reload trash
-            children = self.trash_list.observe_children()
-            to_remove: list = [
-                children.get_item(i) for i in range(children.get_n_items())
-            ]
-            for task in to_remove:
-                self.trash_list.remove(task)
-            self.trash_add_items()
-            self.add_toast(self.toast_imported)
-            Log.info("Tasks imported")
-
-        self.import_dialog.open(self, None, finish_import, None)
-
-    def open_log(self, *_) -> None:
-        """
-        Open log file with default text editor
-        """
-
-        GLib.spawn_command_line_async(
-            f"xdg-open {GLib.get_user_data_dir()}/list/log.txt"
-        )
-
-    def shortcuts(self, *_) -> None:
-        """
-        Show shortcuts window
-        """
-
-        self.shortcuts_window.set_transient_for(self)
-        self.shortcuts_window.show()
 
     def trash_add(self, task: dict, task_widget: Task = None) -> None:
         """
