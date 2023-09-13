@@ -49,6 +49,8 @@ class SubTask(Gtk.Revealer):
         # Set text
         self.task_text.props.label = self.text
         self.add_actions()
+        if self.task["deleted"]:
+            self.window.trash_add(self.task, self)
 
     def add_actions(self) -> None:
         group = Gio.SimpleActionGroup.new()
@@ -77,7 +79,7 @@ class SubTask(Gtk.Revealer):
         # Don't update if called externally
         if update_sts:
             self.parent.update_statusbar()
-        self.window.trash_add(self.task)
+        self.window.trash_add(self.task, self)
 
     def edit(self, *_) -> None:
         self.toggle_edit_box()
