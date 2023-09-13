@@ -226,7 +226,9 @@ class Window(Adw.ApplicationWindow):
         """
 
         self.trash_widgets_ptrs.append(task_widget)
-        self.trash_list.append(TrashItem(task, self))
+        trash_item = TrashItem(task, self)
+        self.trash_list.append(trash_item)
+        self.trash_items.append(trash_item)
         self.trash_list_scrl.set_visible(True)
 
     def trash_clear(self) -> None:
@@ -235,17 +237,17 @@ class Window(Adw.ApplicationWindow):
         """
 
         tasks: list[dict] = UserData.get()["tasks"]
-        children = self.trash_list.observe_children()
-        items = [children.get_item(i) for i in range(children.get_n_items())]
-        deleted_count: int = 0
+        to_remove: list = []
         for task in tasks:
             if not task["deleted"]:
-                for item in items:
+                for item in self.trash_items:
                     if item.id == task["id"]:
-                        self.trash_list.remove(item)
-            else:
-                deleted_count += 1
-        self.trash_list_scrl.set_visible(deleted_count > 0)
+                        to_remove.append(item)
+        for item in to_remove:
+            self.trash_list.remove(item)
+            self.trash_items.remove(item)
+
+        self.trash_list_scrl.set_visible(len(self.trash_widgets_ptrs) > 0)
 
     def update_status(self) -> None:
         """
@@ -409,10 +411,9 @@ class Window(Adw.ApplicationWindow):
         self.trash_widgets_ptrs.clear()
 
         # Remove trash items widgets
-        children = self.trash_list.observe_children()
-        items = [children.get_item(i) for i in range(children.get_n_items())]
-        for item in items:
+        for item in self.trash_items:
             self.trash_list.remove(item)
+        self.trash_items.clear()
 
         self.trash_list_scrl.set_visible(False)
 
