@@ -140,6 +140,12 @@ class Task(Gtk.Revealer):
         if update_sts:
             self.window.update_status()
 
+        # if self.task["parent"] != "":
+        #     for task in self.window.tasks:
+        #         if task.task["id"] == self.task["parent"]:
+        #             task.update_statusbar()
+        #             break
+
         self.window.trash_add(self.task, self)
 
     def expand(self, expanded: bool) -> None:
