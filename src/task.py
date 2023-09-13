@@ -77,9 +77,22 @@ class Task(Gtk.Revealer):
             action.connect("activate", callback)
             group.add_action(action)
 
+        def copy(*_) -> None:
+            Log.info("Copy to clipboard: " + self.task["text"])
+            clp: Gdk.Clipboard = Gdk.Display.get_default().get_clipboard()
+            clp.set(self.task["text"])
+            self.window.add_toast(self.window.toast_copied)
+
+        def edit(*_) -> None:
+            self.toggle_edit_mode()
+            # Set entry text and select it
+            self.task_edit_entry.get_buffer().props.text = self.task["text"]
+            self.task_edit_entry.select_region(0, len(self.task["text"]))
+            self.task_edit_entry.grab_focus()
+
         add_action("delete", self.delete)
-        add_action("edit", self.edit)
-        add_action("copy", self.copy)
+        add_action("edit", edit)
+        add_action("copy", copy)
 
     def add_sub_tasks(self) -> None:
         sub_count: int = 0
@@ -93,12 +106,6 @@ class Task(Gtk.Revealer):
         self.expand(sub_count > 0)
         self.update_statusbar()
         self.window.update_status()
-
-    def copy(self, *_) -> None:
-        Log.info("Copy to clipboard: " + self.task["text"])
-        clp: Gdk.Clipboard = Gdk.Display.get_default().get_clipboard()
-        clp.set(self.task["text"])
-        self.window.add_toast(self.window.toast_copied)
 
     def delete(self, *_, update_sts: bool = True) -> None:
         Log.info(f"Delete task: {self.task['text']}")
@@ -117,13 +124,6 @@ class Task(Gtk.Revealer):
             self.window.update_status()
 
         self.window.trash_add(self.task, self)
-
-    def edit(self, *_) -> None:
-        self.toggle_edit_mode()
-        # Set entry text and select it
-        self.task_edit_entry.get_buffer().props.text = self.task["text"]
-        self.task_edit_entry.select_region(0, len(self.task["text"]))
-        self.task_edit_entry.grab_focus()
 
     def expand(self, expanded: bool) -> None:
         self.expanded = expanded
@@ -197,24 +197,38 @@ class Task(Gtk.Revealer):
 
     @Gtk.Template.Callback()
     def on_task_completed_btn_toggled(self, btn: Gtk.Button) -> None:
-        self.task["completed"] = btn.props.active
-        # Change data
         data: dict = UserData.get()
+        ids: list[str] = []
 
-        def change_data(id: str = self.task["id"]):
+        def toggle_tasks_data(id: str) -> None:
             for task in data["tasks"]:
                 if task["id"] == id:
                     task["completed"] = btn.props.active
-                    for t in self.window.tasks:
-                        if t.task["id"] == id:
-                            t.task_completed_btn.props.active = btn.props.active
+                    ids.append(id)
                 if task["parent"] == id:
-                    change_data(task["id"])
+                    toggle_tasks_data(task["id"])
 
-        change_data()
+        def toggle_tasks(tasks_list: Gtk.Box) -> None:
+            tasks_list = tasks_list.observe_children()
+            for i in range(tasks_list.get_n_items()):
+                task = tasks_list.get_item(i)
+                if task.task["id"] in ids:
+                    if btn.props.active:
+                        task.text = Markup.add_crossline(task.text)
+                        task.task_text.add_css_class("dim-label")
+                    else:
+                        task.text = Markup.rm_crossline(task.text)
+                        task.task_text.remove_css_class("dim-label")
+                    task.task_text.props.label = task.text
+                    task.task_completed_btn.props.active = btn.props.active
+                if hasattr(task, "sub_tasks"):
+                    toggle_tasks(task.sub_tasks)
+
+        self.task["completed"] = btn.props.active
+        toggle_tasks_data(self.task["id"])
         UserData.set(data)
+        toggle_tasks(self.window.tasks_list)
         self.window.update_status()
-
         # Set crosslined text
         if btn.props.active:
             self.text = Markup.add_crossline(self.text)
@@ -223,6 +237,33 @@ class Task(Gtk.Revealer):
             self.text = Markup.rm_crossline(self.text)
             self.task_text.remove_css_class("dim-label")
         self.task_text.props.label = self.text
+
+        # self.task["completed"] = btn.props.active
+        # # Change data
+        # data: dict = UserData.get()
+
+        # def change_data(id: str = self.task["id"]):
+        #     for task in data["tasks"]:
+        #         if task["id"] == id:
+        #             task["completed"] = btn.props.active
+        #             for t in self.window.tasks:
+        #                 if t.task["id"] == id:
+        #                     t.task_completed_btn.props.active = btn.props.active
+        #         if task["parent"] == id:
+        #             change_data(task["id"])
+
+        # change_data()
+        # UserData.set(data)
+        # self.window.update_status()
+
+        # # Set crosslined text
+        # if btn.props.active:
+        #     self.text = Markup.add_crossline(self.text)
+        #     self.task_text.add_css_class("dim-label")
+        # else:
+        #     self.text = Markup.rm_crossline(self.text)
+        #     self.task_text.remove_css_class("dim-label")
+        # self.task_text.props.label = self.text
 
     @Gtk.Template.Callback()
     def on_expand(self, *_) -> None:
