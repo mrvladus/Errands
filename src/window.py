@@ -438,13 +438,12 @@ class Window(Adw.ApplicationWindow):
         for task in self.trash_widgets_ptrs:
             task.task["deleted"] = False
             task.toggle_visibility(True)
-            # Update statusbar if task is toplevel
+            # Update statusbar
             if task.task["parent"] == "":
                 task.update_statusbar()
             else:
                 task.parent.update_statusbar()
         self.trash_widgets_ptrs.clear()
-
         # Clear trash
         self.trash_clear()
         self.update_status()
