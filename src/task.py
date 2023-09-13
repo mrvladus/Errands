@@ -208,26 +208,15 @@ class Task(Gtk.Revealer):
                 if task["parent"] == id:
                     toggle_tasks_data(task["id"])
 
-        def toggle_tasks(tasks_list: Gtk.Box) -> None:
-            tasks_list = tasks_list.observe_children()
-            for i in range(tasks_list.get_n_items()):
-                task = tasks_list.get_item(i)
+        def toggle_tasks():
+            for task in self.window.tasks:
                 if task.task["id"] in ids:
-                    if btn.props.active:
-                        task.text = Markup.add_crossline(task.text)
-                        task.task_text.add_css_class("dim-label")
-                    else:
-                        task.text = Markup.rm_crossline(task.text)
-                        task.task_text.remove_css_class("dim-label")
-                    task.task_text.props.label = task.text
                     task.task_completed_btn.props.active = btn.props.active
-                if hasattr(task, "sub_tasks"):
-                    toggle_tasks(task.sub_tasks)
 
         self.task["completed"] = btn.props.active
         toggle_tasks_data(self.task["id"])
         UserData.set(data)
-        toggle_tasks(self.window.tasks_list)
+        toggle_tasks()
         self.window.update_status()
         # Set crosslined text
         if btn.props.active:
@@ -237,33 +226,6 @@ class Task(Gtk.Revealer):
             self.text = Markup.rm_crossline(self.text)
             self.task_text.remove_css_class("dim-label")
         self.task_text.props.label = self.text
-
-        # self.task["completed"] = btn.props.active
-        # # Change data
-        # data: dict = UserData.get()
-
-        # def change_data(id: str = self.task["id"]):
-        #     for task in data["tasks"]:
-        #         if task["id"] == id:
-        #             task["completed"] = btn.props.active
-        #             for t in self.window.tasks:
-        #                 if t.task["id"] == id:
-        #                     t.task_completed_btn.props.active = btn.props.active
-        #         if task["parent"] == id:
-        #             change_data(task["id"])
-
-        # change_data()
-        # UserData.set(data)
-        # self.window.update_status()
-
-        # # Set crosslined text
-        # if btn.props.active:
-        #     self.text = Markup.add_crossline(self.text)
-        #     self.task_text.add_css_class("dim-label")
-        # else:
-        #     self.text = Markup.rm_crossline(self.text)
-        #     self.task_text.remove_css_class("dim-label")
-        # self.task_text.props.label = self.text
 
     @Gtk.Template.Callback()
     def on_expand(self, *_) -> None:
