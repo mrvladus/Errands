@@ -65,6 +65,7 @@ class Task(Gtk.Revealer):
             self.task_status.add_css_class(f'progress-{self.task["color"]}')
         if self.task["deleted"]:
             self.window.trash_add(self.task, self)
+        self.window.tasks.append(self)
         self.add_sub_tasks()
 
     def add_actions(self) -> None:
@@ -87,7 +88,7 @@ class Task(Gtk.Revealer):
                 sub_task = SubTask(task, self, self.window)
                 self.sub_tasks.append(sub_task)
                 if not task["deleted"]:
-                    sub_task.toggle_visibility()
+                    sub_task.toggle_visibility(True)
                     sub_count += 1
         self.expand(sub_count > 0)
         self.update_statusbar()
@@ -102,7 +103,7 @@ class Task(Gtk.Revealer):
     def delete(self, *_, update_sts: bool = True) -> None:
         Log.info(f"Delete task: {self.task['text']}")
 
-        self.toggle_visibility()
+        self.toggle_visibility(False)
 
         data: dict = UserData.get()
         for task in data["tasks"]:
@@ -139,11 +140,8 @@ class Task(Gtk.Revealer):
             not self.task_edit_box_rev.get_child_revealed()
         )
 
-    def toggle_visibility(self, on: bool = False) -> None:
-        if on:
-            self.set_reveal_child(True)
-        else:
-            self.set_reveal_child(not self.get_child_revealed())
+    def toggle_visibility(self, on: bool) -> None:
+        self.set_reveal_child(on)
 
     def update_statusbar(self) -> None:
         n_completed = 0
@@ -188,47 +186,35 @@ class Task(Gtk.Revealer):
 
     @Gtk.Template.Callback()
     def on_delete_completed_btn_clicked(self, _) -> None:
-        sub_tasks = self.sub_tasks.observe_children()
-        for i in range(sub_tasks.get_n_items()):
-            sub: SubTask = sub_tasks.get_item(i)
-            if sub.task["completed"] and not sub.task["deleted"]:
-                sub.delete(update_sts=False)
+        for task in self.window.tasks:
+            if (
+                task.task["parent"] == self.task["id"]
+                and task.task["completed"]
+                and not task.task["deleted"]
+            ):
+                task.delete(update_sts=False)
         self.update_statusbar()
 
     @Gtk.Template.Callback()
     def on_task_completed_btn_toggled(self, btn: Gtk.Button) -> None:
+        self.task["completed"] = btn.props.active
+        # Change data
         data: dict = UserData.get()
-        ids: list[str] = []
 
-        def toggle_tasks_data(id: str) -> None:
+        def change_data(id: str = self.task["id"]):
             for task in data["tasks"]:
                 if task["id"] == id:
                     task["completed"] = btn.props.active
-                    ids.append(id)
+                    for t in self.window.tasks:
+                        if t.task["id"] == id:
+                            t.task_completed_btn.props.active = btn.props.active
                 if task["parent"] == id:
-                    toggle_tasks_data(task["id"])
+                    change_data(task["id"])
 
-        def toggle_tasks(tasks_list: Gtk.Box) -> None:
-            tasks_list = tasks_list.observe_children()
-            for i in range(tasks_list.get_n_items()):
-                task = tasks_list.get_item(i)
-                if task.task["id"] in ids:
-                    if btn.props.active:
-                        task.text = Markup.add_crossline(task.text)
-                        task.task_text.add_css_class("dim-label")
-                    else:
-                        task.text = Markup.rm_crossline(task.text)
-                        task.task_text.remove_css_class("dim-label")
-                    task.task_text.props.label = task.text
-                    task.task_completed_btn.props.active = btn.props.active
-                if hasattr(task, "sub_tasks"):
-                    toggle_tasks(task.sub_tasks)
-
-        self.task["completed"] = btn.props.active
-        toggle_tasks_data(self.task["id"])
+        change_data()
         UserData.set(data)
-        toggle_tasks(self.window.tasks_list)
         self.window.update_status()
+
         # Set crosslined text
         if btn.props.active:
             self.text = Markup.add_crossline(self.text)
@@ -258,7 +244,7 @@ class Task(Gtk.Revealer):
         # Add row
         sub_task = SubTask(new_sub_task, self, self.window)
         self.sub_tasks.append(sub_task)
-        sub_task.toggle_visibility()
+        sub_task.toggle_visibility(True)
         self.update_statusbar()
         # Clear entry
         entry.get_buffer().props.text = ""
@@ -361,7 +347,7 @@ class Task(Gtk.Revealer):
                     return False
 
             # Hide task
-            task.toggle_visibility()
+            task.toggle_visibility(False)
             GLib.timeout_add(100, check_visible)
             # Change parent id
             task.task["parent"] = self.task["id"]
@@ -369,7 +355,7 @@ class Task(Gtk.Revealer):
             # Add sub-task
             sub_task = SubTask(task.task.copy(), self, self.window)
             self.sub_tasks.append(sub_task)
-            sub_task.toggle_visibility()
+            sub_task.toggle_visibility(True)
             self.update_statusbar()
             # Expand
             self.expand(True)

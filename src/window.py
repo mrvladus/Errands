@@ -63,6 +63,9 @@ class Window(Adw.ApplicationWindow):
     # State
     scrolling: bool = False
 
+    # Tasks list
+    tasks: list[Task] = []
+
     # Trash widgets pointers
     trash_widgets_ptrs: list[Task] = []
 
@@ -124,11 +127,11 @@ class Window(Adw.ApplicationWindow):
             new_task = Task(task, self)
             self.tasks_list.append(new_task)
             if not task["deleted"]:
-                new_task.toggle_visibility()
+                new_task.toggle_visibility(True)
         self.update_status()
         self.trash_list_scrl.set_visible(len(self.trash_widgets_ptrs) > 0)
 
-    def about(self, *args) -> None:
+    def about(self, *_) -> None:
         """
         Show about window
         """
@@ -240,17 +243,6 @@ class Window(Adw.ApplicationWindow):
                     if item.id == task["id"]:
                         self.trash_list.remove(item)
             else:
-                deleted_count += 1
-        self.trash_list_scrl.set_visible(deleted_count > 0)
-
-    def trash_update(self, tasks: list[dict] = UserData.get()["tasks"]) -> None:
-        """
-        Update trash visibility
-        """
-
-        deleted_count: int = 0
-        for task in tasks:
-            if task["deleted"]:
                 deleted_count += 1
         self.trash_list_scrl.set_visible(deleted_count > 0)
 
@@ -381,9 +373,7 @@ class Window(Adw.ApplicationWindow):
         Hide completed tasks
         """
 
-        tasks = self.tasks_list.observe_children()
-        for i in range(tasks.get_n_items()):
-            task = tasks.get_item(i)
+        for task in self.tasks:
             if task.task["completed"] and not task.task["deleted"]:
                 task.delete(update_sts=False)
         self.update_status()
@@ -463,10 +453,10 @@ class Window(Adw.ApplicationWindow):
         Move task to trash via dnd
         """
 
-        task.toggle_visibility()
+        task.toggle_visibility(False)
         task.task["deleted"] = True
         task.update_data()
-        self.trash_add(task.task)
+        self.trash_add(task.task, task)
         self.update_status()
 
 

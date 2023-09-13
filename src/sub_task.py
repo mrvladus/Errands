@@ -51,6 +51,7 @@ class SubTask(Gtk.Revealer):
         self.add_actions()
         if self.task["deleted"]:
             self.window.trash_add(self.task, self)
+        self.window.tasks.append(self)
 
     def add_actions(self) -> None:
         group = Gio.SimpleActionGroup.new()
@@ -73,7 +74,7 @@ class SubTask(Gtk.Revealer):
 
     def delete(self, *_, update_sts: bool = True) -> None:
         Log.info(f"Delete sub-task: {self.task['text']}")
-        self.toggle_visibility()
+        self.toggle_visibility(False)
         self.task["deleted"] = True
         self.update_data()
         # Don't update if called externally
@@ -96,11 +97,8 @@ class SubTask(Gtk.Revealer):
             not self.sub_task_edit_box_rev.get_child_revealed()
         )
 
-    def toggle_visibility(self, on: bool = False) -> None:
-        if on:
-            self.set_reveal_child(True)
-        else:
-            self.set_reveal_child(not self.get_child_revealed())
+    def toggle_visibility(self, on: bool) -> None:
+        self.set_reveal_child(on)
 
     def update_data(self) -> None:
         """Sync self.task with user data.json"""
@@ -155,7 +153,7 @@ class SubTask(Gtk.Revealer):
                     return False
 
             # Hide task
-            task.toggle_visibility()
+            task.toggle_visibility(False)
             GLib.timeout_add(100, check_visible)
             self.parent.update_data()
             self.parent.update_statusbar()
@@ -166,7 +164,7 @@ class SubTask(Gtk.Revealer):
                 self,
             )
             self.parent.sub_tasks.reorder_child_after(self, new_sub_task)
-            new_sub_task.toggle_visibility()
+            new_sub_task.toggle_visibility(True)
         else:
             # Move widget
             self.parent.sub_tasks.reorder_child_after(task, self)
