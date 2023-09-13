@@ -344,19 +344,19 @@ class Task(Gtk.Revealer):
                 if task.get_child_revealed():
                     return True
                 else:
+                    self.window.tasks.remove(task)
                     task.parent.sub_tasks.remove(task)
                     task.parent.update_data()
                     task.parent.update_statusbar()
                     return False
 
             # Hide task
+            new_task_dict = task.task.copy()
+            new_task_dict["parent"] = self.task["id"]
             task.toggle_visibility(False)
             GLib.timeout_add(100, check_visible)
-            # Change parent id
-            task.task["parent"] = self.task["id"]
-            task.update_data()
             # Add sub-task
-            sub_task = SubTask(task.task.copy(), self, self.window)
+            sub_task = SubTask(new_task_dict, self, self.window)
             self.sub_tasks.append(sub_task)
             sub_task.toggle_visibility(True)
             self.update_statusbar()

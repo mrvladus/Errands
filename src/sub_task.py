@@ -150,6 +150,7 @@ class SubTask(Gtk.Revealer):
                 if task.get_child_revealed():
                     return True
                 else:
+                    self.window.tasks.remove(task)
                     task.parent.sub_tasks.remove(task)
                     task.parent.update_data()
                     task.parent.update_statusbar()
