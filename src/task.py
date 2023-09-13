@@ -67,6 +67,8 @@ class Task(Gtk.Revealer):
         if self.task["color"] != "":
             self.main_box.add_css_class(f'task-{self.task["color"]}')
             self.task_status.add_css_class(f'progress-{self.task["color"]}')
+        if self.task["deleted"]:
+            self.window.trash_add(self.task, self)
         self.add_sub_tasks()
         self.check_is_sub()
 
@@ -119,7 +121,7 @@ class Task(Gtk.Revealer):
         if update_sts:
             self.window.update_status()
 
-        self.window.trash_add(self.task)
+        self.window.trash_add(self.task, self)
 
     def edit(self, *_) -> None:
         self.toggle_edit_mode()

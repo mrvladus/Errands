@@ -62,6 +62,9 @@ class Window(Adw.ApplicationWindow):
     # State
     scrolling: bool = False
 
+    # Trash widgets pointers
+    trash_widgets_ptrs: list[Task] = []
+
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
         # Remember window size
@@ -122,7 +125,7 @@ class Window(Adw.ApplicationWindow):
             if not task["deleted"]:
                 new_task.toggle_visibility(True)
         self.update_status()
-        self.trash_add_items()
+        self.trash_list_scrl.set_visible(len(self.trash_widgets_ptrs) > 0)
 
     def about(self, *args) -> None:
         """
@@ -212,26 +215,14 @@ class Window(Adw.ApplicationWindow):
         self.shortcuts_window.set_transient_for(self)
         self.shortcuts_window.show()
 
-    def trash_add(self, task: dict) -> None:
+    def trash_add(self, task: dict, task_widget: Task = None) -> None:
         """
         Add item to trash
         """
 
+        self.trash_widgets_ptrs.append(task_widget)
         self.trash_list.append(TrashItem(task, self))
         self.trash_list_scrl.set_visible(True)
-
-    def trash_add_items(self) -> None:
-        """
-        Populate trash on startup
-        """
-
-        tasks: list[dict] = UserData.get()["tasks"]
-        deleted_count: int = 0
-        for task in tasks:
-            if task["deleted"]:
-                deleted_count += 1
-                self.trash_add(task)
-        self.trash_list_scrl.set_visible(deleted_count > 0)
 
     def trash_clear(self) -> None:
         """
@@ -411,22 +402,21 @@ class Window(Adw.ApplicationWindow):
             return
 
         Log.info("Clear Trash")
-        children = self.tasks_list.observe_children()
-        to_remove = [
-            children.get_item(i)
-            for i in range(children.get_n_items())
-            if children.get_item(i).task["deleted"]
-        ]
-        # Remove tasks
-        for task in to_remove:
-            self.tasks_list.remove(task)
 
         # Remove data
         data: dict = UserData.get()
         data["tasks"] = [t for t in data["tasks"] if not t["deleted"]]
         UserData.set(data)
 
-        # Remove trash items
+        # Remove widgets
+        for task in self.trash_widgets_ptrs:
+            if task.task["parent"] != "":
+                task.parent.sub_tasks.remove(task)
+            else:
+                self.tasks_list.remove(task)
+        self.trash_widgets_ptrs.clear()
+
+        # Remove trash items widgets
         children = self.trash_list.observe_children()
         items = [children.get_item(i) for i in range(children.get_n_items())]
         for item in items:
@@ -452,23 +442,15 @@ class Window(Adw.ApplicationWindow):
         UserData.set(data)
 
         # Restore tasks
-        def restore_tasks(list: Gtk.Box) -> None:
-            """Recursive func for restoring tasks"""
-
-            tasks = list.observe_children()
-            for i in range(tasks.get_n_items()):
-                task = tasks.get_item(i)
-                if task.task["deleted"]:
-                    task.task["deleted"] = False
-                    task.toggle_visibility(True)
-                # If has sub-tasks: call restore_tasks
-                if hasattr(task, "sub_tasks"):
-                    restore_tasks(task.sub_tasks)
-                # Update statusbar if task is toplevel
-                if task.task["parent"] == "":
-                    task.update_statusbar()
-
-        restore_tasks(self.tasks_list)
+        for task in self.trash_widgets_ptrs:
+            task.task["deleted"] = False
+            task.toggle_visibility(True)
+            # Update statusbar if task is toplevel
+            if task.task["parent"] == "":
+                task.update_statusbar()
+            else:
+                task.parent.update_statusbar()
+        self.trash_widgets_ptrs.clear()
 
         # Clear trash
         self.trash_clear()

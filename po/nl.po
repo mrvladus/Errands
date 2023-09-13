@@ -8,18 +8,18 @@ msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-09 10:38+0300\n"
-"PO-Revision-Date: 2023-06-19 14:30+0200\n"
+"PO-Revision-Date: 2023-09-12 11:17+0200\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: \n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.3.1\n"
+"X-Generator: Poedit 3.3.2\n"
 
 #: src/res/ui/window.ui:42
 msgid "Move to Trash"
-msgstr ""
+msgstr "Verplaatsen naar prullenbak"
 
 #: src/res/ui/window.ui:68
 msgid "Deleted Tasks"
@@ -31,23 +31,23 @@ msgstr "Standaard"
 
 #: src/res/ui/window.ui:98 src/res/ui/window.ui:101
 msgid "Restore All"
-msgstr ""
+msgstr "Alles herstellen"
 
 #: src/res/ui/window.ui:117 src/res/ui/window.ui:119
 msgid "Close Trash"
-msgstr ""
+msgstr "Prullenbak sluiten"
 
 #: src/res/ui/window.ui:146
 msgid "Empty Trash"
-msgstr ""
+msgstr "Prullenbak legen"
 
 #: src/res/ui/window.ui:147
 msgid "No deleted items"
-msgstr ""
+msgstr "Er zĳn geen verwĳderde items"
 
 #: src/res/ui/window.ui:232 src/res/ui/window.ui:235
 msgid "Show Deleted Tasks"
-msgstr ""
+msgstr "Verwĳderde taken tonen"
 
 #: src/res/ui/window.ui:257 src/res/ui/window.ui:260
 msgid "Delete Completed Tasks"
@@ -59,7 +59,7 @@ msgstr "Hoofdmenu"
 
 #: src/res/ui/window.ui:301 src/res/ui/window.ui:304
 msgid "Scroll Up"
-msgstr ""
+msgstr "Omhoog schuiven"
 
 #: src/res/ui/window.ui:337
 msgid "Add new Task"
@@ -67,15 +67,15 @@ msgstr "Taak toevoegen"
 
 #: src/res/ui/window.ui:431
 msgid "Export Tasks..."
-msgstr ""
+msgstr "Taken exporteren…"
 
 #: src/res/ui/window.ui:435
 msgid "Import Tasks..."
-msgstr ""
+msgstr "Taken importeren…"
 
 #: src/res/ui/window.ui:445
 msgid "Keyboard Shortcuts"
-msgstr ""
+msgstr "Sneltoetsen"
 
 #: src/res/ui/window.ui:449
 msgid "About Errands"
@@ -83,31 +83,31 @@ msgstr "Over Errands"
 
 #: src/res/ui/window.ui:463
 msgid "General"
-msgstr ""
+msgstr "Algemeen"
 
 #: src/res/ui/window.ui:466
 msgid "Show keyboard shortcuts"
-msgstr ""
+msgstr "Sneltoetsen tonen"
 
 #: src/res/ui/window.ui:472
 msgid "Toggle sidebar"
-msgstr ""
+msgstr "Zĳbalk tonen/verbergen"
 
 #: src/res/ui/window.ui:478
 msgid "Quit"
-msgstr ""
+msgstr "Afsluiten"
 
 #: src/res/ui/window.ui:486
 msgid "Import and Export"
-msgstr ""
+msgstr "Im- en exporteren"
 
 #: src/res/ui/window.ui:489
 msgid "Import tasks"
-msgstr ""
+msgstr "Taken importeren"
 
 #: src/res/ui/window.ui:495
 msgid "Export tasks"
-msgstr ""
+msgstr "Taken exporteren"
 
 #: src/res/ui/window.ui:512
 msgid "translator-credits"
@@ -115,11 +115,11 @@ msgstr "Heimen Stoffels <vistausss@fastmail.com>"
 
 #: src/res/ui/window.ui:547
 msgid "Are you sure?"
-msgstr ""
+msgstr "Weet u het zeker?"
 
 #: src/res/ui/window.ui:548
 msgid "Tasks will be permanently deleted"
-msgstr ""
+msgstr "De taken worden permanent verwĳderd."
 
 #: src/res/ui/window.ui:553 src/res/ui/sub_task.ui:122 src/res/ui/task.ui:322
 msgid "Cancel"
@@ -127,27 +127,27 @@ msgstr "Annuleren"
 
 #: src/res/ui/window.ui:554 src/res/ui/sub_task.ui:143 src/res/ui/task.ui:13
 msgid "Delete"
-msgstr "Verwijderen"
+msgstr "Verwĳderen"
 
 #: src/res/ui/window.ui:562
 msgid "Copied to Clipboard"
-msgstr ""
+msgstr "Gekopieerd naar het klembord"
 
 #: src/res/ui/window.ui:567
 msgid "Tasks Exported"
-msgstr ""
+msgstr "Exporteren voltooid"
 
 #: src/res/ui/window.ui:572
 msgid "Tasks Imported"
-msgstr ""
+msgstr "Importeren voltooid"
 
 #: src/res/ui/window.ui:577
 msgid "Error occurred"
-msgstr ""
+msgstr "Er is een fout opgetreden"
 
 #: src/res/ui/window.ui:578
 msgid "Open log"
-msgstr ""
+msgstr "Logboek openen"
 
 #: src/res/ui/preferences.ui:14
 msgid "Application Theme"
@@ -173,7 +173,7 @@ msgstr "Markeren als afgerond"
 #: src/res/ui/sub_task.ui:87 src/res/ui/sub_task.ui:89 src/res/ui/task.ui:286
 #: src/res/ui/task.ui:288
 msgid "Menu"
-msgstr ""
+msgstr "Menu"
 
 #: src/res/ui/sub_task.ui:147 src/res/ui/task.ui:17
 msgid "Edit"
@@ -181,7 +181,7 @@ msgstr "Bewerken"
 
 #: src/res/ui/sub_task.ui:151 src/res/ui/task.ui:21
 msgid "Copy"
-msgstr ""
+msgstr "Kopiëren"
 
 #: src/res/ui/task.ui:186 src/res/ui/task.ui:189
 msgid "Clear style"
@@ -189,15 +189,15 @@ msgstr "Standaard"
 
 #: src/res/ui/task.ui:358
 msgid "Add new Sub-Task"
-msgstr "Bijkomende taak toevoegen"
+msgstr "Bĳkomende taak toevoegen"
 
 #: src/res/ui/task.ui:372 src/res/ui/task.ui:376
 msgid "Delete Completed Sub-Tasks"
-msgstr "Afgeronde bijkomende taken wissen"
+msgstr "Afgeronde bĳkomende taken wissen"
 
 #: src/res/ui/trash_item.ui:20 src/res/ui/trash_item.ui:24
 msgid "Restore"
-msgstr ""
+msgstr "Herstellen"
 
 #. TRANSLATORS: Don't translate
 #: data/io.github.mrvladus.List.desktop:4
@@ -206,12 +206,12 @@ msgstr ""
 
 #: data/io.github.mrvladus.List.desktop:5
 msgid "Manage your tasks"
-msgstr ""
+msgstr "Beheer uw taken"
 
 #. TRANSLATORS: Don't translate
 #: data/io.github.mrvladus.List.desktop:12
 msgid "errands;tasks;list;todo;todos;"
-msgstr ""
+msgstr "errands;taken;lĳst;taak;todo;"
 
 #~ msgid "Preferences"
 #~ msgstr "Voorkeuren"
