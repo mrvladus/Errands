@@ -373,7 +373,7 @@ class Window(Adw.ApplicationWindow):
         """
         Hide completed tasks
         """
-        to_update = []
+        to_update: list[Task] = []
         for task in self.tasks:
             if task.task["completed"] and not task.task["deleted"]:
                 task.delete(update_sts=False)
@@ -381,6 +381,7 @@ class Window(Adw.ApplicationWindow):
                     for t in self.tasks:
                         if t.task["id"] == task.task["parent"] and t not in to_update:
                             to_update.append(t)
+                            break
         for task in to_update:
             task.update_statusbar()
         self.update_status()
