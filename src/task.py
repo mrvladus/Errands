@@ -44,10 +44,6 @@ class Task(Gtk.Revealer):
     expanded: bool = False
     is_sub_task: bool = False
 
-    # Drag state
-    drag_x: int
-    drag_y: int
-
     def __init__(self, task: dict, window: Adw.ApplicationWindow, parent=None) -> None:
         super().__init__()
         Log.info("Add task: " + task["text"])
@@ -139,12 +135,6 @@ class Task(Gtk.Revealer):
         # Don't update if called externally
         if update_sts:
             self.window.update_status()
-
-        # if self.task["parent"] != "":
-        #     for task in self.window.tasks:
-        #         if task.task["id"] == self.task["parent"]:
-        #             task.update_statusbar()
-        #             break
 
         self.window.trash_add(self.task, self)
 
@@ -321,30 +311,16 @@ class Task(Gtk.Revealer):
     @Gtk.Template.Callback()
     def on_drag_begin(self, _source, drag) -> bool:
         icon = Gtk.DragIcon.get_for_drag(drag)
-        drag_widget = Gtk.ListBox(
-            css_classes=["boxed-list"],
-        )
-        drag_row = Adw.ActionRow(title=self.text)
-        drag_row.add_suffix(
+        icon.set_child(
             Gtk.Button(
-                icon_name="view-more-symbolic",
-                valign="center",
-                css_classes=["flat"],
+                label=self.task["text"]
+                if len(self.task["text"]) < 20
+                else f"{self.task['text'][0:20]}..."
             )
         )
-        drag_row.add_prefix(Gtk.CheckButton(active=self.task["completed"]))
-        drag_row.set_size_request(
-            self.get_allocated_width() // 2,
-            60,
-        )
-        drag_widget.append(drag_row)
-        drag_widget.drag_highlight_row(drag_row)
-        icon.set_child(drag_widget)
 
     @Gtk.Template.Callback()
     def on_drag_prepare(self, _, x, y) -> Gdk.ContentProvider:
-        self.drag_x = x
-        self.drag_y = y
         value = GObject.Value(Task)
         value.set_object(self)
         return Gdk.ContentProvider.new_for_value(value)
