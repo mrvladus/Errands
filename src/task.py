@@ -172,7 +172,9 @@ class Task(Gtk.Revealer):
                 self.task_status.props.visible = False
 
     def update_data(self) -> None:
-        """Sync self.task with user data.json"""
+        """
+        Sync self.task with user data.json
+        """
 
         data: dict = UserData.get()
         for i, task in enumerate(data["tasks"]):
@@ -185,6 +187,10 @@ class Task(Gtk.Revealer):
 
     @Gtk.Template.Callback()
     def on_task_completed_btn_toggled(self, btn: Gtk.Button) -> None:
+        """
+        Toggle check button and add style to the text
+        """
+
         self.task["completed"] = btn.props.active
         self.update_data()
         # Update status
@@ -202,11 +208,18 @@ class Task(Gtk.Revealer):
 
     @Gtk.Template.Callback()
     def on_expand(self, *_) -> None:
-        """Expand task row"""
+        """
+        Expand task row
+        """
+
         self.expand(not self.sub_tasks_revealer.get_child_revealed())
 
     @Gtk.Template.Callback()
     def on_sub_task_added(self, entry: Gtk.Entry) -> None:
+        """
+        Add new Sub-Task
+        """
+
         # Return if entry is empty
         if entry.get_buffer().props.text == "":
             return
@@ -236,6 +249,10 @@ class Task(Gtk.Revealer):
 
     @Gtk.Template.Callback()
     def on_task_edit(self, entry: Gtk.Entry) -> None:
+        """
+        Edit task text
+        """
+
         old_text: str = self.task["text"]
         new_text: str = entry.get_buffer().props.text
         # Return if text the same or empty
@@ -256,7 +273,10 @@ class Task(Gtk.Revealer):
 
     @Gtk.Template.Callback()
     def on_style_selected(self, btn: Gtk.Button) -> None:
-        """Apply accent color"""
+        """
+        Apply accent color
+        """
+
         for i in btn.get_css_classes():
             color = ""
             if i.startswith("btn-"):
