@@ -389,14 +389,20 @@ class Task(Gtk.Revealer):
         # Change parent
         task.task["parent"] = self.task["id"]
         task.update_data()
-        data = task.task.copy()
+        # Get data
+        data = UserData.get()
+        tasks = data["tasks"]
+        # Move data
+        tasks.insert(tasks.index(self.task) + 1, tasks.pop(tasks.index(task.task)))
+        UserData.set(data)
+
         task_parent = task.parent
         task.purge()
         task_parent.update_status()
 
         # Add sub-task
         self.expand(True)
-        sub_task = Task(data, self.window, self)
+        sub_task = Task(task.task, self.window, self)
         self.tasks_list.append(sub_task)
         sub_task.toggle_visibility(True)
 
