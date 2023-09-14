@@ -410,7 +410,7 @@ class Window(Adw.ApplicationWindow):
         # Remove widgets
         for task in self.trash_widgets_ptrs:
             if task.task["parent"] != "":
-                task.parent.sub_tasks.remove(task)
+                task.parent.tasks.remove(task)
             else:
                 self.tasks_list.remove(task)
         self.trash_widgets_ptrs.clear()

@@ -162,11 +162,12 @@ class Task(Gtk.Revealer):
     def update_status(self) -> None:
         n_completed = 0
         n_total = 0
-        for task in self.tasks:
-            if not task.task["deleted"]:
-                n_total += 1
-                if task.task["completed"]:
-                    n_completed += 1
+        for task in UserData.get()["tasks"]:
+            if task["parent"] == self.task["id"]:
+                if not task["deleted"]:
+                    n_total += 1
+                    if task["completed"]:
+                        n_completed += 1
 
         Animate.property(
             self.task_status,
@@ -313,6 +314,10 @@ class Task(Gtk.Revealer):
     # --- Drag and Drop --- #
 
     @Gtk.Template.Callback()
+    def on_drag_end(self, *_) -> bool:
+        self.set_sensitive(True)
+
+    @Gtk.Template.Callback()
     def on_drag_begin(self, _, drag) -> bool:
         icon = Gtk.DragIcon.get_for_drag(drag)
         icon.set_child(
@@ -325,6 +330,7 @@ class Task(Gtk.Revealer):
 
     @Gtk.Template.Callback()
     def on_drag_prepare(self, *_) -> Gdk.ContentProvider:
+        self.set_sensitive(False)
         value = GObject.Value(Task)
         value.set_object(self)
         return Gdk.ContentProvider.new_for_value(value)
@@ -357,7 +363,9 @@ class Task(Gtk.Revealer):
         task.task["parent"] = self.task["parent"]
         task.update_data()
         data = task.task.copy()
+        task_parent = task.parent
         task.purge()
+        task_parent.update_status()
 
         # Add new task widget
         new_task = Task(data, self.window, self.parent)
@@ -365,6 +373,7 @@ class Task(Gtk.Revealer):
         self.parent.tasks_list.reorder_child_after(new_task, self)
         self.parent.tasks_list.reorder_child_after(self, new_task)
         new_task.toggle_visibility(True)
+        self.parent.update_status()
 
     @Gtk.Template.Callback()
     def on_drop(self, drop, task, _x, _y) -> None:
