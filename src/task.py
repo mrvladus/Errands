@@ -299,49 +299,69 @@ class Task(Gtk.Revealer):
         When task is dropped on "+" area on top of task
         """
 
+        # Return if task is itself
         if task == self:
             return
 
+        # Update data
         data = UserData.get()
         tasks = data["tasks"]
         tasks.insert(tasks.index(self.task), tasks.pop(tasks.index(task.task)))
         UserData.set(data)
 
-        parent = self.parent if not self.is_sub_task else self.parent.sub_tasks
-        # If tasks have the same parent
-        if task.parent == self.parent:
-            parent.reorder_child_after(task, self)
-            parent.reorder_child_after(self, task)
-        else:
+        def animate(tasks_list: Gtk.Box):
+            if task.get_reveal_child():
+                return True
+            else:
+                tasks_list.reorder_child_after(task, self)
+                tasks_list.reorder_child_after(self, task)
+                task.toggle_visibility(True)
 
-            def check_visible():
-                if task.get_child_revealed():
-                    return True
-                else:
-                    if task.is_sub_task:
-                        task.parent.sub_tasks.remove(task)
-                        task.parent.update_data()
-                        task.parent.update_status()
-                    else:
-                        task.parent.remove(task)
-                        task.window.update_status()
-                    return False
-
-            # Hide task
-            new_task_dict = task.task.copy()
-            new_task_dict["parent"] = self.task["id"]
+        # If task is toplevel
+        if not self.is_sub_task:
             task.toggle_visibility(False)
-            GLib.timeout_add(100, check_visible)
-            # Change parent id
-            task.task["parent"] = self.task["id"]
-            task.update_data()
-            # Add new Task
-            new_task = Task(task.task.copy(), self.window, self)
-            self.parent.append(new_task)
-            new_task.toggle_visibility(True)
-            self.update_status()
-            # Expand
-            self.expand(True)
+            GLib.timeout_add(100, animate, self.window.tasks_list)
+
+        # If task is sub-task and has the same parent
+        elif task.parent == self.parent:
+            task.toggle_visibility(False)
+            GLib.timeout_add(100, animate, self.parent.sub_tasks)
+
+        # parent = self.parent if not self.is_sub_task else self.parent.sub_tasks
+        # # If tasks have the same parent
+        # if task.parent == self.parent:
+        #     parent.reorder_child_after(task, self)
+        #     parent.reorder_child_after(self, task)
+        # else:
+
+        #     def check_visible():
+        #         if task.get_child_revealed():
+        #             return True
+        #         else:
+        #             if task.is_sub_task:
+        #                 task.parent.sub_tasks.remove(task)
+        #                 task.parent.update_data()
+        #                 task.parent.update_status()
+        #             else:
+        #                 task.parent.remove(task)
+        #                 task.window.update_status()
+        #             return False
+
+        #     # Hide task
+        #     new_task_dict = task.task.copy()
+        #     new_task_dict["parent"] = self.task["id"]
+        #     task.toggle_visibility(False)
+        #     GLib.timeout_add(100, check_visible)
+        #     # Change parent id
+        #     task.task["parent"] = self.task["id"]
+        #     task.update_data()
+        #     # Add new Task
+        #     new_task = Task(task.task.copy(), self.window, self)
+        #     self.parent.append(new_task)
+        #     new_task.toggle_visibility(True)
+        #     self.update_status()
+        #     # Expand
+        #     self.expand(True)
 
         # parent = self.parent if not self.is_sub_task else self.parent.sub_tasks
         # parent.reorder_child_after(task, self)
