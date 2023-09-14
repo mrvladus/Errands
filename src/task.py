@@ -46,7 +46,7 @@ class Task(Gtk.Revealer):
 
     def __init__(self, task: dict, window: Adw.ApplicationWindow, parent=None) -> None:
         super().__init__()
-        Log.info("Add task: " + task["text"])
+        Log.info(f"Add {'task' if not task['parent'] else 'sub-task'}: " + task["text"])
         self.window = window
         self.parent = self.window.tasks_list if not parent else parent
         self.task: dict = task
@@ -93,13 +93,16 @@ class Task(Gtk.Revealer):
         add_action("copy", copy)
 
     def add_sub_tasks(self) -> None:
+        sub_count = 0
         for task in UserData.get()["tasks"]:
             if task["parent"] == self.task["id"]:
+                sub_count += 1
                 sub_task = Task(task, self.window, self)
                 self.sub_tasks.append(sub_task)
                 self.sub_tasks_widgets.append(sub_task)
                 sub_task.toggle_visibility(not task["deleted"])
-        self.expand(len(self.sub_tasks_widgets) > 0)
+
+        self.expand(sub_count > 0)
         self.update_status()
         self.window.update_status()
 
