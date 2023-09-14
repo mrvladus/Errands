@@ -43,6 +43,7 @@ class Task(Gtk.Revealer):
     # State
     expanded: bool = False
     is_sub_task: bool = False
+    sub_tasks_widgets: list = []
 
     def __init__(self, task: dict, window: Adw.ApplicationWindow, parent=None) -> None:
         super().__init__()
@@ -51,13 +52,11 @@ class Task(Gtk.Revealer):
         self.parent = self.window.tasks_list if not parent else parent
         self.task: dict = task
         self.add_actions()
-        # Escape text and find URL's'
-        self.text = Markup.escape(self.task["text"])
-        self.text = Markup.find_url(self.text)
+        # Set text
+        self.text = Markup.find_url(Markup.escape(self.task["text"]))
+        self.task_text.props.label = self.text
         # Check if sub-task completed and toggle checkbox
         self.task_completed_btn.props.active = self.task["completed"]
-        # Set text
-        self.task_text.props.label = self.text
         # Set accent color
         if self.task["color"] != "":
             self.main_box.add_css_class(f'task-{self.task["color"]}')
@@ -95,16 +94,15 @@ class Task(Gtk.Revealer):
         add_action("copy", copy)
 
     def add_sub_tasks(self) -> None:
-        sub_count: int = 0
         for task in UserData.get()["tasks"]:
             if task["parent"] == self.task["id"]:
                 sub_task = Task(task, self.window, self)
                 self.sub_tasks.append(sub_task)
+                self.sub_tasks_widgets.append(sub_task)
                 if not task["deleted"]:
                     sub_task.toggle_visibility(True)
-                    sub_count += 1
-        self.expand(sub_count > 0)
-        self.update_statusbar()
+        self.expand(len(self.sub_tasks_widgets) > 0)
+        self.update_status()
         self.window.update_status()
 
     def check_is_sub(self):
@@ -113,12 +111,6 @@ class Task(Gtk.Revealer):
             self.main_box.add_css_class("sub-task")
         else:
             self.main_box.add_css_class("task")
-
-    def copy(self, *_) -> None:
-        Log.info("Copy to clipboard: " + self.task["text"])
-        clp: Gdk.Clipboard = Gdk.Display.get_default().get_clipboard()
-        clp.set(self.task["text"])
-        self.window.add_toast(self.window.toast_copied)
 
     def delete(self, *_, update_sts: bool = True) -> None:
         Log.info(f"Delete task: {self.task['text']}")
@@ -145,7 +137,7 @@ class Task(Gtk.Revealer):
             self.expand_icon.add_css_class("rotate")
         else:
             self.expand_icon.remove_css_class("rotate")
-        self.update_statusbar()
+        self.update_status()
 
     def toggle_edit_mode(self) -> None:
         self.task_box_rev.set_reveal_child(not self.task_box_rev.get_child_revealed())
@@ -156,15 +148,14 @@ class Task(Gtk.Revealer):
     def toggle_visibility(self, on: bool) -> None:
         self.set_reveal_child(on)
 
-    def update_statusbar(self) -> None:
+    def update_status(self) -> None:
         n_completed = 0
         n_total = 0
-        for task in UserData.get()["tasks"]:
-            if task["parent"] == self.task["id"]:
-                if not task["deleted"]:
-                    n_total += 1
-                    if task["completed"]:
-                        n_completed += 1
+        for task in self.sub_tasks_widgets:
+            if not task.task["deleted"]:
+                n_total += 1
+                if task.task["completed"]:
+                    n_completed += 1
 
         Animate.property(
             self.task_status,
@@ -196,29 +187,11 @@ class Task(Gtk.Revealer):
 
     @Gtk.Template.Callback()
     def on_task_completed_btn_toggled(self, btn: Gtk.Button) -> None:
-        data: dict = UserData.get()
-        ids: list[str] = []
-
-        def toggle_tasks_data(id: str) -> None:
-            for task in data["tasks"]:
-                if task["id"] == id:
-                    task["completed"] = btn.props.active
-                    ids.append(id)
-                if task["parent"] == id:
-                    toggle_tasks_data(task["id"])
-
-        def toggle_tasks():
-            for task in self.window.tasks:
-                if task.task["id"] in ids:
-                    task.task_completed_btn.props.active = btn.props.active
-
         self.task["completed"] = btn.props.active
-        toggle_tasks_data(self.task["id"])
-        UserData.set(data)
-        toggle_tasks()
-        self.window.update_status()
+        self.update_data()
         if self.is_sub_task:
-            self.parent.update_statusbar()
+            self.parent.update_status()
+        self.window.update_status()
         # Set crosslined text
         if btn.props.active:
             self.text = Markup.add_crossline(self.text)
@@ -245,16 +218,17 @@ class Task(Gtk.Revealer):
         data: dict = UserData.get()
         data["tasks"].append(new_sub_task)
         UserData.set(data)
-        # Add row
+        # Add sub-task
         sub_task = Task(new_sub_task, self.window, self)
         self.sub_tasks.append(sub_task)
+        self.sub_tasks_widgets.append(sub_task)
         sub_task.toggle_visibility(True)
         # Clear entry
         entry.get_buffer().props.text = ""
         # Update status
         self.task_completed_btn.props.active = self.task["completed"] = False
         self.update_data()
-        self.update_statusbar()
+        self.update_status()
         self.window.update_status()
 
     @Gtk.Template.Callback()
@@ -273,13 +247,12 @@ class Task(Gtk.Revealer):
         # Set new text
         self.task["text"] = new_text
         # Escape text and find URL's'
-        self.text = Markup.escape(self.task["text"])
-        self.text = Markup.find_url(self.text)
+        self.text = Markup.find_url(Markup.escape(self.task["text"]))
+        self.task_text.props.label = self.text
         # Toggle checkbox
         self.task_completed_btn.props.active = self.task["completed"] = False
         self.update_data()
-        # Set text
-        self.task_text.props.label = self.text
+        # Exit edit mode
         self.toggle_edit_mode()
 
     @Gtk.Template.Callback()
@@ -309,7 +282,7 @@ class Task(Gtk.Revealer):
     # --- Drag and Drop --- #
 
     @Gtk.Template.Callback()
-    def on_drag_begin(self, _source, drag) -> bool:
+    def on_drag_begin(self, _, drag) -> bool:
         icon = Gtk.DragIcon.get_for_drag(drag)
         icon.set_child(
             Gtk.Button(
@@ -320,13 +293,17 @@ class Task(Gtk.Revealer):
         )
 
     @Gtk.Template.Callback()
-    def on_drag_prepare(self, _, x, y) -> Gdk.ContentProvider:
+    def on_drag_prepare(self, *_) -> Gdk.ContentProvider:
         value = GObject.Value(Task)
         value.set_object(self)
         return Gdk.ContentProvider.new_for_value(value)
 
     @Gtk.Template.Callback()
     def on_task_top_drop(self, drop, task, _x, _y) -> None:
+        """
+        When task is dropped on "+" area on top of task
+        """
+
         if task == self:
             return
 
@@ -349,7 +326,7 @@ class Task(Gtk.Revealer):
                     if task.is_sub_task:
                         task.parent.sub_tasks.remove(task)
                         task.parent.update_data()
-                        task.parent.update_statusbar()
+                        task.parent.update_status()
                     else:
                         task.parent.remove(task)
                         task.window.update_status()
@@ -367,7 +344,7 @@ class Task(Gtk.Revealer):
             new_task = Task(task.task.copy(), self.window, self)
             self.parent.append(new_task)
             new_task.toggle_visibility(True)
-            self.update_statusbar()
+            self.update_status()
             # Expand
             self.expand(True)
 
@@ -377,6 +354,10 @@ class Task(Gtk.Revealer):
 
     @Gtk.Template.Callback()
     def on_drop(self, drop, task, _x, _y) -> None:
+        """
+        When task is dropped on task
+        """
+
         if task == self or self.get_prev_sibling() == task:
             return
 
