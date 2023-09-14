@@ -336,14 +336,14 @@ class Task(Gtk.Revealer):
         return Gdk.ContentProvider.new_for_value(value)
 
     @Gtk.Template.Callback()
-    def on_task_top_drop(self, drop, task, _x, _y) -> None:
+    def on_task_top_drop(self, drop, task, _x, _y) -> bool:
         """
         When task is dropped on "+" area on top of task
         """
 
         # Return if task is itself
         if task == self:
-            return
+            return False
 
         # Get data
         data = UserData.get()
@@ -357,7 +357,7 @@ class Task(Gtk.Revealer):
             # Move widget
             self.parent.tasks_list.reorder_child_after(task, self)
             self.parent.tasks_list.reorder_child_after(self, task)
-            return
+            return True
 
         # Change parent if different parents
         task.task["parent"] = self.task["parent"]
@@ -375,13 +375,29 @@ class Task(Gtk.Revealer):
         new_task.toggle_visibility(True)
         self.parent.update_status()
 
+        return True
+
     @Gtk.Template.Callback()
     def on_drop(self, drop, task, _x, _y) -> None:
         """
-        When task is dropped on task
+        When task is dropped on task and becomes sub-task
         """
 
-        if task == self or self.get_prev_sibling() == task:
+        if task == self:
             return
+
+        # Change parent
+        task.task["parent"] = self.task["id"]
+        task.update_data()
+        data = task.task.copy()
+        task_parent = task.parent
+        task.purge()
+        task_parent.update_status()
+
+        # Add sub-task
+        self.expand(True)
+        sub_task = Task(data, self.window, self)
+        self.tasks_list.append(sub_task)
+        sub_task.toggle_visibility(True)
 
         return True
