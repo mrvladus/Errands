@@ -37,7 +37,7 @@ class Task(Gtk.Revealer):
     task_completed_btn: Gtk.Button = Gtk.Template.Child()
     task_edit_entry: Gtk.Entry = Gtk.Template.Child()
     sub_tasks_revealer: Gtk.Revealer = Gtk.Template.Child()
-    sub_tasks: Gtk.Box = Gtk.Template.Child()
+    tasks_list: Gtk.Box = Gtk.Template.Child()
 
     # State
     expanded: bool = False
@@ -48,9 +48,8 @@ class Task(Gtk.Revealer):
         super().__init__()
         Log.info(f"Add {'task' if not task['parent'] else 'sub-task'}: " + task["text"])
         self.window = window
-        self.parent = self.window.tasks_list if not parent else parent
+        self.parent = self.window if not parent else parent
         self.task: dict = task
-        self.add_actions()
         # Set text
         self.text = Markup.find_url(Markup.escape(self.task["text"]))
         self.task_text.props.label = self.text
@@ -65,6 +64,7 @@ class Task(Gtk.Revealer):
         self.window.tasks.append(self)
         self.add_sub_tasks()
         self.check_is_sub()
+        self.add_actions()
 
     def add_actions(self) -> None:
         group = Gio.SimpleActionGroup.new()
@@ -98,7 +98,7 @@ class Task(Gtk.Revealer):
             if task["parent"] == self.task["id"]:
                 sub_count += 1
                 sub_task = Task(task, self.window, self)
-                self.sub_tasks.append(sub_task)
+                self.tasks_list.append(sub_task)
                 self.sub_tasks_widgets.append(sub_task)
                 sub_task.toggle_visibility(not task["deleted"])
 
@@ -107,7 +107,7 @@ class Task(Gtk.Revealer):
         self.window.update_status()
 
     def check_is_sub(self):
-        if self.task["parent"] != "":
+        if not self.task["parent"]:
             self.is_sub_task = True
             self.main_box.add_css_class("sub-task")
         else:
@@ -187,6 +187,7 @@ class Task(Gtk.Revealer):
     def on_task_completed_btn_toggled(self, btn: Gtk.Button) -> None:
         self.task["completed"] = btn.props.active
         self.update_data()
+        # Update status
         if self.is_sub_task:
             self.parent.update_status()
         self.window.update_status()
@@ -218,7 +219,7 @@ class Task(Gtk.Revealer):
         UserData.set(data)
         # Add sub-task
         sub_task = Task(new_sub_task, self.window, self)
-        self.sub_tasks.append(sub_task)
+        self.tasks_list.append(sub_task)
         self.sub_tasks_widgets.append(sub_task)
         sub_task.toggle_visibility(True)
         # Clear entry
@@ -312,63 +313,36 @@ class Task(Gtk.Revealer):
         tasks.insert(tasks.index(self.task), tasks.pop(tasks.index(task.task)))
         UserData.set(data)
 
-        def animate(tasks_list: Gtk.Box):
-            if task.get_reveal_child():
-                return True
+        # If task has the same parent
+        if task.parent == self.parent:
+            self.parent.tasks_list.reorder_child_after(task, self)
+            self.parent.tasks_list.reorder_child_after(self, task)
+
+        # If task parents not the same
+        else:
+            # Change parent
+            task.task["parent"] = self.task["parent"]
+            task.update_data()
+            # Add new task widget
+            new_sub_task = Task(task.task.copy(), self.window, self)
+            self.sub_tasks_widgets.append(new_sub_task)
+            self.tasks_list.append(new_sub_task)
+            self.tasks_list.reorder_child_after(task, self)
+            self.tasks_list.reorder_child_after(self, task)
+            new_sub_task.toggle_visibility(True)
+
+            # Remove old widget
+            # If task is sub-task that changes parent
+            if task.is_sub_task:
+                task.toggle_visibility(False)
+                task.parent.sub_tasks_widgets.remove(task)
+                task.parent.tasks_list.remove(task)
+
+            # If task is toplevel becomes a sub-task
             else:
-                tasks_list.reorder_child_after(task, self)
-                tasks_list.reorder_child_after(self, task)
-                task.toggle_visibility(True)
-
-        # If task is toplevel
-        if not self.is_sub_task:
-            task.toggle_visibility(False)
-            GLib.timeout_add(100, animate, self.window.tasks_list)
-
-        # If task is sub-task and has the same parent
-        elif task.parent == self.parent:
-            task.toggle_visibility(False)
-            GLib.timeout_add(100, animate, self.parent.sub_tasks)
-
-        # parent = self.parent if not self.is_sub_task else self.parent.sub_tasks
-        # # If tasks have the same parent
-        # if task.parent == self.parent:
-        #     parent.reorder_child_after(task, self)
-        #     parent.reorder_child_after(self, task)
-        # else:
-
-        #     def check_visible():
-        #         if task.get_child_revealed():
-        #             return True
-        #         else:
-        #             if task.is_sub_task:
-        #                 task.parent.sub_tasks.remove(task)
-        #                 task.parent.update_data()
-        #                 task.parent.update_status()
-        #             else:
-        #                 task.parent.remove(task)
-        #                 task.window.update_status()
-        #             return False
-
-        #     # Hide task
-        #     new_task_dict = task.task.copy()
-        #     new_task_dict["parent"] = self.task["id"]
-        #     task.toggle_visibility(False)
-        #     GLib.timeout_add(100, check_visible)
-        #     # Change parent id
-        #     task.task["parent"] = self.task["id"]
-        #     task.update_data()
-        #     # Add new Task
-        #     new_task = Task(task.task.copy(), self.window, self)
-        #     self.parent.append(new_task)
-        #     new_task.toggle_visibility(True)
-        #     self.update_status()
-        #     # Expand
-        #     self.expand(True)
-
-        # parent = self.parent if not self.is_sub_task else self.parent.sub_tasks
-        # parent.reorder_child_after(task, self)
-        # parent.reorder_child_after(self, task)
+                task.toggle_visibility(False)
+                task.window.tasks.remove(task)
+                task.window.tasks_list.remove(task)
 
     @Gtk.Template.Callback()
     def on_drop(self, drop, task, _x, _y) -> None:

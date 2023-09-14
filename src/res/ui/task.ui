@@ -405,7 +405,7 @@
 
                     <!-- Sub tasks -->
                     <child>
-                      <object class="GtkBox" id="sub_tasks">
+                      <object class="GtkBox" id="tasks_list">
                         <property name="orientation">vertical</property>
                         <style>
                           <class name="sub-tasks" />
