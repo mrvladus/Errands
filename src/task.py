@@ -35,7 +35,6 @@ class Task(Gtk.Revealer):
     task_status: Gtk.Statusbar = Gtk.Template.Child()
     expand_icon: Gtk.Image = Gtk.Template.Child()
     task_completed_btn: Gtk.Button = Gtk.Template.Child()
-    task_edit_box_rev: Gtk.Revealer = Gtk.Template.Child()
     task_edit_entry: Gtk.Entry = Gtk.Template.Child()
     sub_tasks_revealer: Gtk.Revealer = Gtk.Template.Child()
     sub_tasks: Gtk.Box = Gtk.Template.Child()
@@ -141,9 +140,6 @@ class Task(Gtk.Revealer):
 
     def toggle_edit_mode(self) -> None:
         self.task_box_rev.set_reveal_child(not self.task_box_rev.get_child_revealed())
-        self.task_edit_box_rev.set_reveal_child(
-            not self.task_edit_box_rev.get_child_revealed()
-        )
 
     def toggle_visibility(self, on: bool) -> None:
         self.set_reveal_child(on)

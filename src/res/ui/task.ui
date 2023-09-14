@@ -338,8 +338,9 @@
 
                     <!-- Task edit box revealer -->
                     <child>
-                      <object class="GtkRevealer" id="task_edit_box_rev">
+                      <object class="GtkRevealer">
                         <property name="transition-type">8</property>
+                        <property name="reveal-child" bind-source="task_box_rev" bind-property="reveal-child" bind-flags="sync-create|invert-boolean" />
 
                         <!-- Task edit box -->
                         <child>
