@@ -383,7 +383,7 @@ class Window(Adw.ApplicationWindow):
                             to_update.append(t)
                             break
         for task in to_update:
-            task.update_statusbar()
+            task.update_status()
         self.update_status()
 
     @Gtk.Template.Callback()
@@ -445,9 +445,9 @@ class Window(Adw.ApplicationWindow):
             task.toggle_visibility(True)
             # Update statusbar
             if task.task["parent"] == "":
-                task.update_statusbar()
+                task.update_status()
             else:
-                task.parent.update_statusbar()
+                task.parent.update_status()
             # Expand if needed
             for t in self.tasks:
                 if t.task["parent"] == task.task["id"]:
@@ -526,7 +526,7 @@ class TrashItem(Gtk.Box):
                     restore_tasks(task.sub_tasks)
                 # Update statusbar if task is toplevel
                 if task.task["parent"] == "":
-                    task.update_statusbar()
+                    task.update_status()
 
         restore_tasks(self.window.tasks_list)
 

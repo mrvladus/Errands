@@ -98,8 +98,7 @@ class Task(Gtk.Revealer):
                 sub_task = Task(task, self.window, self)
                 self.sub_tasks.append(sub_task)
                 self.sub_tasks_widgets.append(sub_task)
-                if not task["deleted"]:
-                    sub_task.toggle_visibility(True)
+                sub_task.toggle_visibility(not task["deleted"])
         self.expand(len(self.sub_tasks_widgets) > 0)
         self.update_status()
         self.window.update_status()
