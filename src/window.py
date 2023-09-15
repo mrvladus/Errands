@@ -490,45 +490,15 @@ class TrashItem(Gtk.Box):
 
         Log.info("Restore: " + self.label.props.label)
 
-        # Update data
-        data: dict = UserData.get()
-        ids: list[str] = []
-        for task in data["tasks"]:
-            if task["id"] == self.id:
-
-                def restore_parent(id: str):
-                    for parent in data["tasks"]:
-                        if parent["id"] == id:
-                            parent["deleted"] = False
-                            ids.append(parent["id"])
-                            if parent["parent"] != "":
-                                restore_parent(parent["parent"])
-
-                task["deleted"] = False
-                ids.append(task["id"])
-                if task["parent"] != "":
-                    restore_parent(task["parent"])
-                UserData.set(data)
-                break
-
-        # Update UI
-        def restore_tasks(list: Gtk.Box) -> None:
-            """Recursive func for restoring tasks"""
-
-            tasks = list.observe_children()
-            for i in range(tasks.get_n_items()):
-                task = tasks.get_item(i)
-                if task.task["id"] in ids:
+        def restore_task(id: str = self.id):
+            for task in self.window.tasks:
+                if task.task["id"] == id:
                     task.task["deleted"] = False
+                    task.update_data()
                     task.toggle_visibility(True)
-                # If has sub-tasks: call restore_tasks
-                if hasattr(task, "sub_tasks"):
-                    restore_tasks(task.sub_tasks)
-                # Update statusbar if task is toplevel
-                if task.task["parent"] == "":
-                    task.update_status()
+                    if task.task["parent"]:
+                        restore_task(task.task["parent"])
 
-        restore_tasks(self.window.tasks_list)
-
+        restore_task()
         self.window.update_status()
         self.window.trash_clear()
