@@ -169,13 +169,14 @@ class Task(Gtk.Revealer):
                     if task["completed"]:
                         n_completed += 1
 
-        Animate.property(
-            self.task_status,
-            "fraction",
-            self.task_status.props.fraction,
-            n_completed / n_total if n_total > 0 else 0,
-            250,
-        )
+        # Animate.property(
+        #     self.task_status,
+        #     "fraction",
+        #     self.task_status.props.fraction,
+        #     n_completed / n_total if n_total > 0 else 0,
+        #     250,
+        # )
+        self.task_status.props.fraction = n_completed / n_total if n_total > 0 else 0
 
         if self.expanded:
             self.task_status.props.visible = True
@@ -365,13 +366,11 @@ class Task(Gtk.Revealer):
         # Change parent if different parents
         task.task["parent"] = self.task["parent"]
         task.update_data()
-        data = task.task.copy()
-        task_parent = task.parent
         task.purge()
-        task_parent.update_status()
+        task.parent.update_status()
 
         # Add new task widget
-        new_task = Task(data, self.window, self.parent)
+        new_task = Task(task.task, self.window, self.parent)
         self.parent.tasks_list.append(new_task)
         self.parent.tasks_list.reorder_child_after(new_task, self)
         self.parent.tasks_list.reorder_child_after(self, new_task)

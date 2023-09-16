@@ -255,13 +255,15 @@ class Window(Adw.ApplicationWindow):
             else:
                 n_deleted += 1
         # Update progress bar animation
-        Animate.property(
-            self.status,
-            "fraction",
-            self.status.props.fraction,
-            n_completed / n_total if n_total > 0 else 0,
-            250,
-        )
+        # Animate.property(
+        #     self.status,
+        #     "fraction",
+        #     self.status.props.fraction,
+        #     n_completed / n_total if n_total > 0 else 0,
+        #     250,
+        # )
+        self.status.props.fraction = n_completed / n_total if n_total > 0 else 0
+
         # Show delete completed button
         self.delete_completed_tasks_btn.set_sensitive(n_completed > 0)
         self.trash_list_scrl.set_visible(n_deleted > 0)
@@ -455,11 +457,7 @@ class Window(Adw.ApplicationWindow):
         Move task to trash via dnd
         """
 
-        task.toggle_visibility(False)
-        task.task["deleted"] = True
-        task.update_data()
-        self.trash_add(task.task)
-        self.update_status()
+        task.delete()
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/Errands/trash_item.ui")
