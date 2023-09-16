@@ -497,6 +497,7 @@ class TrashItem(Gtk.Box):
                     task.update_data()
                     task.toggle_visibility(True)
                     if task.task["parent"]:
+                        task.parent.expand(True)
                         restore_task(task.task["parent"])
 
         restore_task()
