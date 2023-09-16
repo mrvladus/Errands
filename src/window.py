@@ -24,7 +24,7 @@ import json
 from gi.repository import Gio, Adw, Gtk, GLib
 from __main__ import VERSION, PROFILE, APP_ID
 
-from .utils import Animate, GSettings, Log, TaskUtils, UserData
+from .utils import Animate, GSettings, Log, TaskUtils, UserData, get_children
 from .task import Task
 
 # from .preferences import PreferencesWindow
@@ -61,13 +61,7 @@ class Window(Adw.ApplicationWindow):
 
     # State
     scrolling: bool = False
-
-    # Tasks list
-    tasks: list[Task] = []
-
-    # Trash widgets pointers
-    trash_items: list = []
-    trash_widgets_ptrs: list[Task] = []
+    tasks: list = []
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
@@ -79,9 +73,16 @@ class Window(Adw.ApplicationWindow):
         # Add devel style if needed
         if PROFILE == "development":
             self.add_css_class("devel")
-        self.get_settings().props.gtk_icon_theme_name = "Adwaita"
         self.create_actions()
         self.load_tasks()
+
+    def add_task(self, task: dict):
+        if task["parent"]:
+            return
+        new_task = Task(task, self)
+        self.tasks_list.append(new_task)
+        if not task["deleted"]:
+            new_task.toggle_visibility(True)
 
     def add_toast(self, toast: Adw.Toast) -> None:
         self.toast_overlay.add_toast(toast)
@@ -203,31 +204,22 @@ class Window(Adw.ApplicationWindow):
         create_action("open_log", open_log)
 
     def load_tasks(self) -> None:
-        """
-        Load tasks and sub-tasks
-        """
-
         Log.debug("Loading tasks")
+
+        count: int = 0
         data: dict = UserData.get()
         for task in data["tasks"]:
-            if task["parent"] != "":
-                continue
-            new_task = Task(task, self)
-            self.tasks_list.append(new_task)
+            self.add_task(task)
             if not task["deleted"]:
-                new_task.toggle_visibility(True)
+                count += 1
         self.update_status()
-        self.trash_list_scrl.set_visible(len(self.trash_widgets_ptrs) > 0)
 
-    def trash_add(self, task: dict, task_widget: Task = None) -> None:
+    def trash_add(self, task: dict) -> None:
         """
         Add item to trash
         """
 
-        self.trash_widgets_ptrs.append(task_widget)
-        trash_item = TrashItem(task, self)
-        self.trash_list.append(trash_item)
-        self.trash_items.append(trash_item)
+        self.trash_list.append(TrashItem(task, self))
         self.trash_list_scrl.set_visible(True)
 
     def trash_clear(self) -> None:
@@ -239,14 +231,13 @@ class Window(Adw.ApplicationWindow):
         to_remove: list = []
         for task in tasks:
             if not task["deleted"]:
-                for item in self.trash_items:
+                for item in get_children(self.trash_list):
                     if item.id == task["id"]:
                         to_remove.append(item)
         for item in to_remove:
             self.trash_list.remove(item)
-            self.trash_items.remove(item)
 
-        self.trash_list_scrl.set_visible(len(self.trash_widgets_ptrs) > 0)
+        self.trash_list_scrl.set_visible(len(get_children(self.trash_list)) > 0)
 
     def update_status(self) -> None:
         """
@@ -255,11 +246,14 @@ class Window(Adw.ApplicationWindow):
 
         n_total = 0
         n_completed = 0
+        n_deleted = 0
         for task in self.tasks:
             if not task.task["deleted"]:
                 n_total += 1
                 if task.task["completed"]:
                     n_completed += 1
+            else:
+                n_deleted += 1
         # Update progress bar animation
         Animate.property(
             self.status,
@@ -270,6 +264,7 @@ class Window(Adw.ApplicationWindow):
         )
         # Show delete completed button
         self.delete_completed_tasks_btn.set_sensitive(n_completed > 0)
+        self.trash_list_scrl.set_visible(n_deleted > 0)
 
     # --- Template handlers --- #
 
@@ -338,9 +333,7 @@ class Window(Adw.ApplicationWindow):
         new_task: dict = TaskUtils.new_task(text)
         new_data["tasks"].append(new_task)
         UserData.set(new_data)
-        task = Task(new_task, self)
-        self.tasks_list.append(task)
-        task.toggle_visibility(True)
+        self.add_task(new_task)
         # Clear entry
         entry.props.text = ""
         # Scroll to the end
@@ -408,17 +401,13 @@ class Window(Adw.ApplicationWindow):
         UserData.set(data)
 
         # Remove widgets
-        for task in self.trash_widgets_ptrs:
-            if task.task["parent"] != "":
-                task.parent.tasks.remove(task)
-            else:
-                self.tasks_list.remove(task)
-        self.trash_widgets_ptrs.clear()
+        for task in self.tasks:
+            if task.task["deleted"]:
+                task.purge()
 
         # Remove trash items widgets
-        for item in self.trash_items:
+        for item in get_children(self.trash_list):
             self.trash_list.remove(item)
-        self.trash_items.clear()
 
         self.trash_list_scrl.set_visible(False)
 
@@ -440,21 +429,22 @@ class Window(Adw.ApplicationWindow):
         UserData.set(data)
 
         # Restore tasks
-        for task in self.trash_widgets_ptrs:
-            task.task["deleted"] = False
-            task.toggle_visibility(True)
-            # Update statusbar
-            if task.task["parent"] == "":
-                task.update_status()
-            else:
-                task.parent.update_status()
-            # Expand if needed
-            for t in self.tasks:
-                if t.task["parent"] == task.task["id"]:
-                    task.expand(True)
-                    break
+        for task in self.tasks:
+            if task.task["deleted"]:
+                task.task["deleted"] = False
+                task.update_data()
+                task.toggle_visibility(True)
+                # Update statusbar
+                if not task.task["parent"]:
+                    task.update_status()
+                else:
+                    task.parent.update_status()
+                # Expand if needed
+                for t in self.tasks:
+                    if t.task["parent"] == task.task["id"]:
+                        task.expand(True)
+                        break
 
-        self.trash_widgets_ptrs.clear()
         # Clear trash
         self.trash_clear()
         self.update_status()
@@ -468,7 +458,7 @@ class Window(Adw.ApplicationWindow):
         task.toggle_visibility(False)
         task.task["deleted"] = True
         task.update_data()
-        self.trash_add(task.task, task)
+        self.trash_add(task.task)
         self.update_status()
 
 
@@ -483,6 +473,9 @@ class TrashItem(Gtk.Box):
         self.window = window
         self.id = task["id"]
         self.label.props.label = task["text"]
+
+    def __repr__(self) -> str:
+        return f"<TrashItem> {self.id}"
 
     @Gtk.Template.Callback()
     def on_restore(self, _) -> None:

@@ -30,6 +30,15 @@ from gi.repository import GLib, Gio, Adw, Gtk
 from __main__ import VERSION, APP_ID
 
 
+def get_children(obj: Gtk.Widget) -> list[Gtk.Widget]:
+    children: list[Gtk.Widget] = []
+    child: Gtk.Widget = obj.get_first_child()
+    while child:
+        children.append(child)
+        child = child.get_next_sibling()
+    return children
+
+
 class Animate:
     """Class for creating UI animations using Adw.Animation"""
 

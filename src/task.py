@@ -42,7 +42,7 @@ class Task(Gtk.Revealer):
     # State
     expanded: bool = False
     is_sub_task: bool = False
-    tasks: list = []
+    can_update_parent: bool = True
 
     def __init__(self, task: dict, window: Adw.ApplicationWindow, parent=None) -> None:
         super().__init__()
@@ -60,11 +60,14 @@ class Task(Gtk.Revealer):
             self.main_box.add_css_class(f'task-{self.task["color"]}')
             self.task_status.add_css_class(f'progress-{self.task["color"]}')
         if self.task["deleted"]:
-            self.window.trash_add(self.task, self)
+            self.window.trash_add(self.task)
         self.window.tasks.append(self)
         self.add_sub_tasks()
         self.check_is_sub()
         self.add_actions()
+
+    def __repr__(self):
+        return f"{self.task['id']}"
 
     def add_actions(self) -> None:
         group = Gio.SimpleActionGroup.new()
@@ -92,14 +95,17 @@ class Task(Gtk.Revealer):
         add_action("edit", edit)
         add_action("copy", copy)
 
+    def add_sub_task(self, task: dict):
+        sub_task = Task(task, self.window, self)
+        self.tasks_list.append(sub_task)
+        sub_task.toggle_visibility(not task["deleted"])
+
     def add_sub_tasks(self) -> None:
         sub_count = 0
         for task in UserData.get()["tasks"]:
             if task["parent"] == self.task["id"]:
                 sub_count += 1
-                sub_task = Task(task, self.window, self)
-                self.tasks_list.append(sub_task)
-                sub_task.toggle_visibility(not task["deleted"])
+                self.add_sub_task(task)
 
         self.expand(sub_count > 0)
         self.update_status()
@@ -109,10 +115,6 @@ class Task(Gtk.Revealer):
         if self.task["parent"]:
             self.is_sub_task = True
             self.main_box.add_css_class("sub-task")
-            for task in self.window.tasks:
-                if task.task["id"] == self.task["parent"]:
-                    task.tasks.append(self)
-                    break
         else:
             self.main_box.add_css_class("task")
 
@@ -132,7 +134,7 @@ class Task(Gtk.Revealer):
         if update_sts:
             self.window.update_status()
 
-        self.window.trash_add(self.task, self)
+        self.window.trash_add(self.task)
 
     def expand(self, expanded: bool) -> None:
         self.expanded = expanded
@@ -150,8 +152,6 @@ class Task(Gtk.Revealer):
 
         self.window.tasks.remove(self)
         self.parent.tasks_list.remove(self)
-        if self.is_sub_task:
-            self.parent.tasks.remove(self)
 
     def toggle_edit_mode(self) -> None:
         self.task_box_rev.set_reveal_child(not self.task_box_rev.get_child_revealed())
@@ -204,13 +204,18 @@ class Task(Gtk.Revealer):
         """
         Toggle check button and add style to the text
         """
+        for task in self.window.tasks:
+            if task.task["parent"] == self.task["id"]:
+                task.task_completed_btn.props.active = btn.props.active
 
         self.task["completed"] = btn.props.active
         self.update_data()
+
         # Update status
         if self.is_sub_task:
             self.parent.update_status()
         self.window.update_status()
+
         # Set crosslined text
         if btn.props.active:
             self.text = Markup.add_crossline(self.text)
@@ -245,9 +250,7 @@ class Task(Gtk.Revealer):
         data["tasks"].append(new_sub_task)
         UserData.set(data)
         # Add sub-task
-        sub_task = Task(new_sub_task, self.window, self)
-        self.tasks_list.append(sub_task)
-        sub_task.toggle_visibility(True)
+        self.add_sub_task(new_sub_task)
         # Clear entry
         entry.get_buffer().props.text = ""
         # Update status
@@ -395,7 +398,6 @@ class Task(Gtk.Revealer):
         # Move data
         tasks.insert(tasks.index(self.task) + 1, tasks.pop(tasks.index(task.task)))
         UserData.set(data)
-
         task_parent = task.parent
         task.purge()
         task_parent.update_status()
