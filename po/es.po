@@ -39,7 +39,7 @@ msgstr "Cerrar Papelera"
 
 #: src/res/ui/window.ui:146
 msgid "Empty Trash"
-msgstr "Vaciar Papelera"
+msgstr "Papelera Vacía"
 
 #: src/res/ui/window.ui:147
 msgid "No deleted items"
