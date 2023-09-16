@@ -1,3 +1,57 @@
 .task-blue {
-    background: mix(@blue_5, @light_4, 0.6);
+    background: #7692b4;
+}
+
+.task-green {
+    background: #6fb37e;
+}
+
+.task-yellow {
+    background: #b9b356;
+}
+
+.task-orange {
+    background: #bd9058;
+}
+
+.task-red {
+    background: #b74f43;
+}
+
+.task-purple {
+    background: #a56ba5;
+}
+
+.task-brown {
+    background: #9a826f;
+}
+
+/* Progressbar */
+
+.progress-blue progress {
+    background-color: @blue_1;
+}
+
+.progress-green progress {
+    background-color: @green_1;
+}
+
+.progress-yellow progress {
+    background-color: @yellow_1;
+}
+
+.progress-orange progress {
+    background-color: @orange_1;
+}
+
+.progress-red progress {
+    background-color: @red_1;
+}
+
+.progress-purple progress {
+    background-color: @purple_1;
+}
+
+.progress-brown progress {
+    background-color: @brown_1;
 }

@@ -120,6 +120,7 @@
                     <style>
                       <class name="task-drop-target" />
                     </style>
+
                     <!-- Drag source -->
                     <child>
                       <object class="GtkDragSource">
