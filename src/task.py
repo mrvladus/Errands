@@ -57,7 +57,6 @@ class Task(Gtk.Revealer):
         # Set accent color
         if self.task["color"] != "":
             self.main_box.add_css_class(f'task-{self.task["color"]}')
-            self.task_status.add_css_class(f'progress-{self.task["color"]}')
         if self.task["deleted"]:
             self.window.trash_add(self.task)
         self.window.tasks.append(self)
@@ -193,6 +192,9 @@ class Task(Gtk.Revealer):
         self.task["completed"] = btn.props.active
         self.update_data()
 
+        for task in get_children(self.tasks_list):
+            task.task_completed_btn.set_active(btn.props.active)
+
         # Update status
         if self.is_sub_task:
             self.parent.update_status()
@@ -201,10 +203,10 @@ class Task(Gtk.Revealer):
         # Set crosslined text
         if btn.props.active:
             self.text = Markup.add_crossline(self.text)
-            # self.task_text.add_css_class("dim-label")
+            self.add_css_class("task-completed")
         else:
             self.text = Markup.rm_crossline(self.text)
-            # self.task_text.remove_css_class("dim-label")
+            self.remove_css_class("task-completed")
         self.task_row.props.title = self.text
 
     @Gtk.Template.Callback()
