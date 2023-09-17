@@ -49,7 +49,7 @@ class Window(Adw.ApplicationWindow):
     separator: Gtk.Box = Gtk.Template.Child()
     shortcuts_window: Gtk.ShortcutsWindow = Gtk.Template.Child()
     tasks_list: Gtk.Box = Gtk.Template.Child()
-    title: Gtk.Box = Gtk.Template.Child()
+    title: Adw.WindowTitle = Gtk.Template.Child()
     toast_overlay: Adw.ToastOverlay = Gtk.Template.Child()
     toast_copied: Adw.Toast = Gtk.Template.Child()
     toast_err: Adw.Toast = Gtk.Template.Child()
@@ -246,21 +246,29 @@ class Window(Adw.ApplicationWindow):
         Update progress bar on the top
         """
 
+        # Set status
         n_total = 0
         n_completed = 0
-        n_deleted = 0
         for task in get_children(self.tasks_list):
             if not task.task["deleted"]:
                 n_total += 1
                 if task.task["completed"]:
                     n_completed += 1
-            else:
-                n_deleted += 1
         self.title.set_subtitle(
             f"Completed: {n_completed} / {n_total}" if n_total > 0 else ""
         )
-        # Show delete completed button
+
+        # Set state for delete completed button
+        n_completed = 0
+        n_deleted = 0
+        for task in self.tasks:
+            if not task.task["deleted"]:
+                if task.task["completed"]:
+                    n_completed += 1
+            else:
+                n_deleted += 1
         self.delete_completed_tasks_btn.set_sensitive(n_completed > 0)
+        # Show trash
         self.trash_list_scrl.set_visible(n_deleted > 0)
 
     # --- Template handlers --- #
