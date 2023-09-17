@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-17 18:50+0300\n"
+"POT-Creation-Date: 2023-09-17 18:53+0300\n"
 "PO-Revision-Date: 2023-09-11 16:00+0200\n"
 "Last-Translator: Jeremy Castel <jeremy.castel@protonmail.com>\n"
 "Language-Team: \n"
@@ -17,6 +17,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Poedit 3.3.1\n"
+
+#: src/window.py:258 src/task.py:167 src/res/ui/window.ui:225
+#: src/res/ui/task.ui:118
+#, fuzzy
+msgid "Completed:"
+msgstr "Marquer comme terminée"
 
 #: src/res/ui/window.ui:41
 msgid "Move to Trash"
@@ -45,11 +51,6 @@ msgstr "Corbeille vide"
 #: src/res/ui/window.ui:146
 msgid "No deleted items"
 msgstr "Aucun élément supprimé"
-
-#: src/res/ui/window.ui:225 src/res/ui/task.ui:118
-#, fuzzy
-msgid "Completed:"
-msgstr "Marquer comme terminée"
 
 #: src/res/ui/window.ui:237 src/res/ui/window.ui:240
 msgid "Show Deleted Tasks"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-17 18:50+0300\n"
+"POT-Creation-Date: 2023-09-17 18:53+0300\n"
 "PO-Revision-Date: 2023-09-12 01:02+0300\n"
 "Last-Translator: Sabri Ünal <libreajans@gmail.com>\n"
 "Language-Team: Turkish <takim@gnome.org.tr>\n"
@@ -18,6 +18,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Poedit 3.2.2\n"
+
+#: src/window.py:258 src/task.py:167 src/res/ui/window.ui:225
+#: src/res/ui/task.ui:118
+#, fuzzy
+msgid "Completed:"
+msgstr "Tamamlanmadı Olarak İmle"
 
 #: src/res/ui/window.ui:41
 msgid "Move to Trash"
@@ -46,11 +52,6 @@ msgstr "Çöpü Boşalt"
 #: src/res/ui/window.ui:146
 msgid "No deleted items"
 msgstr "Silinmiş öge yok"
-
-#: src/res/ui/window.ui:225 src/res/ui/task.ui:118
-#, fuzzy
-msgid "Completed:"
-msgstr "Tamamlanmadı Olarak İmle"
 
 #: src/res/ui/window.ui:237 src/res/ui/window.ui:240
 msgid "Show Deleted Tasks"

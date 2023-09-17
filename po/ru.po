@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-17 18:50+0300\n"
+"POT-Creation-Date: 2023-09-17 18:53+0300\n"
 "PO-Revision-Date: 2023-07-07 16:56+0300\n"
 "Last-Translator: Vlad Krupinski <mrvladus@yandex.ru>\n"
 "Language-Team: \n"
@@ -18,6 +18,11 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Generator: Poedit 3.3.1\n"
+
+#: src/window.py:258 src/task.py:167 src/res/ui/window.ui:225
+#: src/res/ui/task.ui:118
+msgid "Completed:"
+msgstr "Выполнено:"
 
 #: src/res/ui/window.ui:41
 msgid "Move to Trash"
@@ -46,10 +51,6 @@ msgstr "Корзина пуста"
 #: src/res/ui/window.ui:146
 msgid "No deleted items"
 msgstr "Нет удаленных задач"
-
-#: src/res/ui/window.ui:225 src/res/ui/task.ui:118
-msgid "Completed:"
-msgstr "Выполнено:"
 
 #: src/res/ui/window.ui:237 src/res/ui/window.ui:240
 msgid "Show Deleted Tasks"

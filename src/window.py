@@ -255,7 +255,7 @@ class Window(Adw.ApplicationWindow):
                 if task.task["completed"]:
                     n_completed += 1
         self.title.set_subtitle(
-            f"{_('Completed:')} {n_completed} / {n_total}" if n_total > 0 else ""
+            _("Completed:") + f" {n_completed} / {n_total}" if n_total > 0 else ""
         )
 
         # Set state for delete completed button

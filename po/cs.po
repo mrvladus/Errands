@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-17 18:50+0300\n"
+"POT-Creation-Date: 2023-09-17 18:53+0300\n"
 "PO-Revision-Date: 2023-09-10 13:41+0200\n"
 "Last-Translator: Amerey.eu <info@amerey.eu>\n"
 "Language-Team: \n"
@@ -16,6 +16,12 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.3.1\n"
+
+#: src/window.py:258 src/task.py:167 src/res/ui/window.ui:225
+#: src/res/ui/task.ui:118
+#, fuzzy
+msgid "Completed:"
+msgstr "Označit jako dokončené"
 
 #: src/res/ui/window.ui:41
 msgid "Move to Trash"
@@ -44,11 +50,6 @@ msgstr "Vyprázdnit koš"
 #: src/res/ui/window.ui:146
 msgid "No deleted items"
 msgstr "Žádné smazané položky"
-
-#: src/res/ui/window.ui:225 src/res/ui/task.ui:118
-#, fuzzy
-msgid "Completed:"
-msgstr "Označit jako dokončené"
 
 #: src/res/ui/window.ui:237 src/res/ui/window.ui:240
 msgid "Show Deleted Tasks"
