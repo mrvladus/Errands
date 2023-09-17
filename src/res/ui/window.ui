@@ -222,7 +222,7 @@
                     <property name="title-widget">
                       <object class="AdwWindowTitle" id="title">
                         <property name="title">Errands</property>
-                        <property name="subtitle">Completed:</property>
+                        <property name="subtitle" translatable="yes">Completed:</property>
                       </object>
                     </property>
                     <style>

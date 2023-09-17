@@ -164,7 +164,7 @@ class Task(Gtk.Revealer):
                     n_completed += 1
 
         self.task_row.set_subtitle(
-            f"Completed: {n_completed} / {n_total}" if n_total > 0 else ""
+            f"{_('Completed:')} {n_completed} / {n_total}" if n_total > 0 else ""
         )
 
     def update_data(self) -> None:
