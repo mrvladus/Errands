@@ -111,41 +111,6 @@
   margin: 6px 11px 6px 11px;
 }
 
-/* Progress bar */
-
-.task-progressbar {
-  transition: background-color 0.25s;
-  background-color: @card_shade_color;
-}
-
-.progress-blue progress {
-  background-color: @blue_2;
-}
-
-.progress-green progress {
-  background-color: @green_3;
-}
-
-.progress-yellow progress {
-  background-color: @yellow_5;
-}
-
-.progress-orange progress {
-  background-color: @orange_3;
-}
-
-.progress-red progress {
-  background-color: @red_2;
-}
-
-.progress-purple progress {
-  background-color: @purple_2;
-}
-
-.progress-brown progress {
-  background-color: @brown_2;
-}
-
 /* Sidebar */
 
 .dnd-sidebar {

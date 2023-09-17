@@ -78,26 +78,13 @@
             <child>
               <object class="GtkOverlay">
 
-                <!-- Status bar -->
-                <child type="overlay">
-                  <object class="GtkProgressBar" id="task_status">
-                    <property name="margin-start">10</property>
-                    <property name="margin-end">10</property>
-                    <property name="valign">end</property>
-                    <style>
-                      <class name="osd" />
-                      <class name="task-progressbar" />
-                    </style>
-                  </object>
-                </child>
-
                 <!-- Expand icon -->
                 <child type="overlay">
                   <object class="GtkRevealer">
                     <property name="transition-type">1</property>
                     <property name="valign">center</property>
                     <property name="halign">end</property>
-                    <property name="margin-end">50</property>
+                    <property name="margin-end">55</property>
                     <property name="can-target">false</property>
                     <property name="reveal-child" bind-source="hover_ctrl" bind-property="contains-pointer" bind-flags="sync-create" />
                     <child>
@@ -147,16 +134,11 @@
                         <property name="reveal-child">true</property>
                         <property name="transition-type">9</property>
 
-                        <!-- Task box -->
                         <child>
-                          <object class="GtkBox">
+                          <object class="AdwActionRow" id="task_row">
+                            <property name="use-markup">true</property>
                             <property name="height-request">60</property>
-                            <property name="margin-start">10</property>
-                            <property name="margin-end">10</property>
-                            <property name="spacing">5</property>
-                            <accessibility>
-                              <relation name="labelled-by">task_text</relation>
-                            </accessibility>
+                            <property name="subtitle">Completed:</property>
 
                             <!-- Click controller -->
                             <child>
@@ -170,11 +152,9 @@
                               <object class="GtkEventControllerMotion" id="hover_ctrl" />
                             </child>
 
-
                             <!-- Mark as completed button -->
-                            <child>
+                            <child type="prefix">
                               <object class="GtkCheckButton" id="task_completed_btn">
-                                <property name="margin-end">5</property>
                                 <property name="valign">center</property>
                                 <property name="tooltip-text" translatable="yes">Mark as Completed</property>
                                 <signal name="toggled" handler="on_task_completed_btn_toggled" />
@@ -184,33 +164,15 @@
                               </object>
                             </child>
 
-                            <!-- Task text -->
-                            <child>
-                              <object class="GtkLabel" id="task_text">
-                                <property name="wrap">true</property>
-                                <property name="use-markup">true</property>
-                                <property name="valign">center</property>
-                                <property name="halign">start</property>
-                                <property name="hexpand">true</property>
-                                <property name="vexpand">true</property>
-                                <property name="ellipsize">none</property>
-                                <property name="wrap-mode">2</property>
-                                <property name="xalign">0</property>
-                                <property name="margin-top">5</property>
-                                <property name="margin-bottom">5</property>
-                                <property name="margin-end">20</property>
-                                <property name="focusable">true</property>
-                              </object>
-                            </child>
-
                             <!-- Menu -->
-                            <child type="end">
+                            <child type="suffix">
                               <object class="GtkMenuButton">
                                 <property name="icon-name">view-more-symbolic</property>
                                 <property name="valign">center</property>
                                 <property name="popover">
                                   <object class="GtkPopoverMenu">
                                     <property name="menu-model">task_menu</property>
+
                                     <child type="accent">
                                       <object class="GtkBox">
                                         <property name="spacing">5</property>
@@ -321,6 +283,7 @@
 
                                       </object>
                                     </child>
+
                                   </object>
                                 </property>
                                 <property name="tooltip-text" translatable="yes">Menu</property>
@@ -389,7 +352,6 @@
                     <!-- Entry box -->
                     <child>
                       <object class="GtkBox">
-                        <property name="margin-top">10</property>
                         <property name="margin-bottom">6</property>
                         <property name="margin-start">10</property>
                         <property name="margin-end">10</property>

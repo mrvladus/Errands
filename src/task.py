@@ -31,8 +31,7 @@ class Task(Gtk.Revealer):
     # Template items
     main_box: Gtk.Box = Gtk.Template.Child()
     task_box_rev: Gtk.Revealer = Gtk.Template.Child()
-    task_text: Gtk.Label = Gtk.Template.Child()
-    task_status: Gtk.Statusbar = Gtk.Template.Child()
+    task_row: Adw.ActionRow = Gtk.Template.Child()
     expand_icon: Gtk.Image = Gtk.Template.Child()
     task_completed_btn: Gtk.Button = Gtk.Template.Child()
     task_edit_entry: Gtk.Entry = Gtk.Template.Child()
@@ -52,7 +51,7 @@ class Task(Gtk.Revealer):
         self.task: dict = task
         # Set text
         self.text = Markup.find_url(Markup.escape(self.task["text"]))
-        self.task_text.props.label = self.text
+        self.task_row.props.title = self.text
         # Check if sub-task completed and toggle checkbox
         self.task_completed_btn.props.active = self.task["completed"]
         # Set accent color
@@ -162,29 +161,15 @@ class Task(Gtk.Revealer):
     def update_status(self) -> None:
         n_completed = 0
         n_total = 0
-        for task in UserData.get()["tasks"]:
-            if task["parent"] == self.task["id"]:
-                if not task["deleted"]:
-                    n_total += 1
-                    if task["completed"]:
-                        n_completed += 1
+        for task in get_children(self.tasks_list):
+            if not task.task["deleted"]:
+                n_total += 1
+                if task.task["completed"]:
+                    n_completed += 1
 
-        Animate.property(
-            self.task_status,
-            "fraction",
-            self.task_status.props.fraction,
-            n_completed / n_total if n_total > 0 else 0,
-            250,
+        self.task_row.set_subtitle(
+            f"Completed: {n_completed} / {n_total}" if n_total > 0 else ""
         )
-        # self.task_status.props.fraction = n_completed / n_total if n_total > 0 else 0
-
-        if self.expanded:
-            self.task_status.props.visible = True
-            self.task_status.add_css_class("task-progressbar")
-        else:
-            self.task_status.remove_css_class("task-progressbar")
-            if n_completed == 0:
-                self.task_status.props.visible = False
 
     def update_data(self) -> None:
         """
@@ -216,11 +201,11 @@ class Task(Gtk.Revealer):
         # Set crosslined text
         if btn.props.active:
             self.text = Markup.add_crossline(self.text)
-            self.task_text.add_css_class("dim-label")
+            # self.task_text.add_css_class("dim-label")
         else:
             self.text = Markup.rm_crossline(self.text)
-            self.task_text.remove_css_class("dim-label")
-        self.task_text.props.label = self.text
+            # self.task_text.remove_css_class("dim-label")
+        self.task_row.props.title = self.text
 
     @Gtk.Template.Callback()
     def on_expand(self, *_) -> None:
@@ -277,7 +262,7 @@ class Task(Gtk.Revealer):
         self.task["text"] = new_text
         # Escape text and find URL's'
         self.text = Markup.find_url(Markup.escape(self.task["text"]))
-        self.task_text.props.label = self.text
+        self.task_row.props.title = self.text
         # Toggle checkbox
         self.task_completed_btn.props.active = self.task["completed"] = False
         self.update_data()
@@ -301,12 +286,6 @@ class Task(Gtk.Revealer):
                 self.main_box.remove_css_class(c)
                 break
         self.main_box.add_css_class(f"task-{color}")
-        # Color statusbar
-        for c in self.task_status.get_css_classes():
-            if "progress-" in c:
-                self.task_status.remove_css_class(c)
-        if color != "":
-            self.task_status.add_css_class(f"progress-{color}")
         # Set new color
         self.task["color"] = color
         self.update_data()

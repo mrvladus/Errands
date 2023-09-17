@@ -48,7 +48,6 @@ class Window(Adw.ApplicationWindow):
     scrolled_window: Gtk.ScrolledWindow = Gtk.Template.Child()
     separator: Gtk.Box = Gtk.Template.Child()
     shortcuts_window: Gtk.ShortcutsWindow = Gtk.Template.Child()
-    status: Gtk.Statusbar = Gtk.Template.Child()
     tasks_list: Gtk.Box = Gtk.Template.Child()
     title: Gtk.Box = Gtk.Template.Child()
     toast_overlay: Adw.ToastOverlay = Gtk.Template.Child()

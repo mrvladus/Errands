@@ -25,33 +25,3 @@
 .task-brown {
     background: #9a826f;
 }
-
-/* Progressbar */
-
-.progress-blue progress {
-    background-color: @blue_1;
-}
-
-.progress-green progress {
-    background-color: @green_1;
-}
-
-.progress-yellow progress {
-    background-color: @yellow_1;
-}
-
-.progress-orange progress {
-    background-color: @orange_1;
-}
-
-.progress-red progress {
-    background-color: @red_1;
-}
-
-.progress-purple progress {
-    background-color: @purple_1;
-}
-
-.progress-brown progress {
-    background-color: @brown_1;
-}
