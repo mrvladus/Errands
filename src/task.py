@@ -20,8 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from gi.repository import Gtk, Adw, Gdk, GObject, Gio, GLib
-from .utils import Animate, Log, Markup, TaskUtils, UserData, get_children
+from gi.repository import Gtk, Adw, Gdk, GObject, Gio
+from .utils import Log, Markup, TaskUtils, UserData, get_children
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/Errands/task.ui")
