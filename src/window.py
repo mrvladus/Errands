@@ -34,6 +34,7 @@ from .task import Task
 class Window(Adw.ApplicationWindow):
     __gtype_name__ = "Window"
 
+    # - Template children - #
     about_window: Adw.AboutWindow = Gtk.Template.Child()
     clear_trash_btn: Gtk.Button = Gtk.Template.Child()
     confirm_dialog: Adw.MessageDialog = Gtk.Template.Child()
@@ -59,24 +60,24 @@ class Window(Adw.ApplicationWindow):
     trash_list_scrl: Gtk.ScrolledWindow = Gtk.Template.Child()
     trash_scroll_separator: Gtk.Box = Gtk.Template.Child()
 
-    # State
-    scrolling: bool = False
-    tasks: list = []
+    # - State - #
+    scrolling: bool = False  # Is window scrolling
+    tasks: list[Task] = []  # Task widgets list
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
-        # Remember window size
+        # Remember window state
         GSettings.bind("width", self, "default_width")
         GSettings.bind("height", self, "default_height")
         GSettings.bind("maximized", self, "maximized")
         GSettings.bind("sidebar-open", self.toggle_trash_btn, "active")
-        # Add devel style if needed
+        # Add "devel" style if needed
         if PROFILE == "development":
             self.add_css_class("devel")
         self.create_actions()
         self.load_tasks()
 
-    def add_task(self, task: dict):
+    def add_task(self, task: dict) -> None:
         if task["parent"]:
             return
         new_task = Task(task, self)
@@ -212,6 +213,7 @@ class Window(Adw.ApplicationWindow):
             self.add_task(task)
             if not task["deleted"]:
                 count += 1
+
         self.update_status()
 
     def trash_add(self, task: dict) -> None:

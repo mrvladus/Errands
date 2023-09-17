@@ -42,8 +42,15 @@ def get_children(obj: Gtk.Widget) -> list[Gtk.Widget]:
 class Animate:
     """Class for creating UI animations using Adw.Animation"""
 
-    @staticmethod
-    def property(obj: Gtk.Widget, prop: str, val_from, val_to, time_ms: int) -> None:
+    @classmethod
+    def property(
+        self,
+        obj: Gtk.Widget,
+        prop: str,
+        val_from,
+        val_to,
+        time_ms: int,
+    ) -> None:
         """Animate widget property"""
 
         def callback(value, _) -> None:
@@ -58,8 +65,10 @@ class Animate:
         )
         animation.play()
 
-    @staticmethod
-    def scroll(win: Gtk.ScrolledWindow, scroll_down: bool = True, widget=None) -> None:
+    @classmethod
+    def scroll(
+        self, win: Gtk.ScrolledWindow, scroll_down: bool = True, widget=None
+    ) -> None:
         """Animate scrolling"""
 
         adj = win.get_vadjustment()

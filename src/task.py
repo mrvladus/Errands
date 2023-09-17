@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 from gi.repository import Gtk, Adw, Gdk, GObject, Gio, GLib
-from .utils import Animate, Log, Markup, TaskUtils, UserData
+from .utils import Animate, Log, Markup, TaskUtils, UserData, get_children
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/Errands/task.ui")
@@ -205,12 +205,11 @@ class Task(Gtk.Revealer):
         """
         Toggle check button and add style to the text
         """
-        for task in self.window.tasks:
-            if task.task["parent"] == self.task["id"]:
-                task.task_completed_btn.props.active = btn.props.active
-
         self.task["completed"] = btn.props.active
         self.update_data()
+
+        for task in get_children(self.tasks_list):
+            task.task_completed_btn.props.active = btn.props.active
 
         # Update status
         if self.is_sub_task:
