@@ -169,14 +169,14 @@ class Task(Gtk.Revealer):
                     if task["completed"]:
                         n_completed += 1
 
-        # Animate.property(
-        #     self.task_status,
-        #     "fraction",
-        #     self.task_status.props.fraction,
-        #     n_completed / n_total if n_total > 0 else 0,
-        #     250,
-        # )
-        self.task_status.props.fraction = n_completed / n_total if n_total > 0 else 0
+        Animate.property(
+            self.task_status,
+            "fraction",
+            self.task_status.props.fraction,
+            n_completed / n_total if n_total > 0 else 0,
+            250,
+        )
+        # self.task_status.props.fraction = n_completed / n_total if n_total > 0 else 0
 
         if self.expanded:
             self.task_status.props.visible = True
@@ -207,9 +207,6 @@ class Task(Gtk.Revealer):
         """
         self.task["completed"] = btn.props.active
         self.update_data()
-
-        for task in get_children(self.tasks_list):
-            task.task_completed_btn.props.active = btn.props.active
 
         # Update status
         if self.is_sub_task:
@@ -366,7 +363,6 @@ class Task(Gtk.Revealer):
         task.task["parent"] = self.task["parent"]
         task.update_data()
         task.purge()
-        task.parent.update_status()
 
         # Add new task widget
         new_task = Task(task.task, self.window, self.parent)
@@ -375,6 +371,7 @@ class Task(Gtk.Revealer):
         self.parent.tasks_list.reorder_child_after(self, new_task)
         new_task.toggle_visibility(True)
         self.parent.update_status()
+        task.parent.update_status()
 
         return True
 

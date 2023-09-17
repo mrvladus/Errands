@@ -5,7 +5,6 @@
   <template class="Window" parent="AdwApplicationWindow">
     <property name="width-request">360</property>
     <property name="height-request">296</property>
-    <property name="title">Errands</property>
     <property name="content">
       <object class="AdwToastOverlay" id="toast_overlay">
 
@@ -220,6 +219,12 @@
                 <!-- Header bar -->
                 <child>
                   <object class="AdwHeaderBar">
+                    <property name="title-widget">
+                      <object class="AdwWindowTitle" id="title">
+                        <property name="title">Errands</property>
+                        <property name="subtitle">Completed:</property>
+                      </object>
+                    </property>
                     <style>
                       <class name="flat" />
                     </style>

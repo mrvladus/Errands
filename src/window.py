@@ -50,6 +50,7 @@ class Window(Adw.ApplicationWindow):
     shortcuts_window: Gtk.ShortcutsWindow = Gtk.Template.Child()
     status: Gtk.Statusbar = Gtk.Template.Child()
     tasks_list: Gtk.Box = Gtk.Template.Child()
+    title: Gtk.Box = Gtk.Template.Child()
     toast_overlay: Adw.ToastOverlay = Gtk.Template.Child()
     toast_copied: Adw.Toast = Gtk.Template.Child()
     toast_err: Adw.Toast = Gtk.Template.Child()
@@ -249,23 +250,16 @@ class Window(Adw.ApplicationWindow):
         n_total = 0
         n_completed = 0
         n_deleted = 0
-        for task in self.tasks:
+        for task in get_children(self.tasks_list):
             if not task.task["deleted"]:
                 n_total += 1
                 if task.task["completed"]:
                     n_completed += 1
             else:
                 n_deleted += 1
-        # Update progress bar animation
-        # Animate.property(
-        #     self.status,
-        #     "fraction",
-        #     self.status.props.fraction,
-        #     n_completed / n_total if n_total > 0 else 0,
-        #     250,
-        # )
-        self.status.props.fraction = n_completed / n_total if n_total > 0 else 0
-
+        self.title.set_subtitle(
+            f"Completed: {n_completed} / {n_total}" if n_total > 0 else ""
+        )
         # Show delete completed button
         self.delete_completed_tasks_btn.set_sensitive(n_completed > 0)
         self.trash_list_scrl.set_visible(n_deleted > 0)
