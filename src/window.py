@@ -371,18 +371,9 @@ class Window(Adw.ApplicationWindow):
         """
         Hide completed tasks
         """
-        to_update: list[Task] = []
         for task in self.tasks:
             if task.task["completed"] and not task.task["deleted"]:
-                task.delete(update_sts=False)
-                if task.task["parent"] != "":
-                    for t in self.tasks:
-                        if t.task["id"] == task.task["parent"] and t not in to_update:
-                            to_update.append(t)
-                            break
-        for task in to_update:
-            task.update_status()
-        self.update_status()
+                task.delete()
 
     @Gtk.Template.Callback()
     def on_trash_clear(self, _) -> None:
@@ -400,15 +391,10 @@ class Window(Adw.ApplicationWindow):
 
         Log.info("Clear Trash")
 
-        # Remove data
-        data: dict = UserData.get()
-        data["tasks"] = [t for t in data["tasks"] if not t["deleted"]]
-        UserData.set(data)
-
         # Remove widgets
-        for task in self.tasks:
-            if task.task["deleted"]:
-                task.purge()
+        to_remove = [task for task in self.tasks if task.task["deleted"]]
+        for task in to_remove:
+            task.purge()
 
         # Remove trash items widgets
         for item in get_children(self.trash_list):

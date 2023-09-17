@@ -116,22 +116,15 @@ class Task(Gtk.Revealer):
         else:
             self.main_box.add_css_class("task")
 
-    def delete(self, *_, update_sts: bool = True) -> None:
+    def delete(self, *_) -> None:
         Log.info(f"Delete task: {self.task['text']}")
 
         self.toggle_visibility(False)
-
-        data: dict = UserData.get()
-        for task in data["tasks"]:
-            if task["id"] == self.task["id"]:
-                task["deleted"] = self.task["deleted"] = True
-                break
-        UserData.set(data)
-
-        # Don't update if called externally
-        if update_sts:
-            self.window.update_status()
-
+        self.task["deleted"] = True
+        self.update_data()
+        if self.is_sub_task:
+            self.parent.update_status()
+        self.window.update_status()
         self.window.trash_add(self.task)
 
     def expand(self, expanded: bool) -> None:
@@ -147,7 +140,11 @@ class Task(Gtk.Revealer):
         """
         Completely remove widget
         """
-
+        data: dict = UserData.get()
+        data["tasks"] = [
+            task for task in data["tasks"] if task["id"] != self.task["id"]
+        ]
+        UserData.set(data)
         self.window.tasks.remove(self)
         self.parent.tasks_list.remove(self)
 
