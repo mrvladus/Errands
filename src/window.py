@@ -25,9 +25,8 @@ from gi.repository import Gio, Adw, Gtk, GLib
 from __main__ import VERSION, PROFILE, APP_ID
 
 from .utils import Animate, GSettings, Log, TaskUtils, UserData, get_children
+from .preferences import PreferencesWindow
 from .task import Task
-
-# from .preferences import PreferencesWindow
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/Errands/window.ui")
@@ -71,6 +70,8 @@ class Window(Adw.ApplicationWindow):
         GSettings.bind("height", self, "default_height")
         GSettings.bind("maximized", self, "maximized")
         GSettings.bind("sidebar-open", self.toggle_trash_btn, "active")
+        # Setup theme
+        Adw.StyleManager.get_default().set_color_scheme(GSettings.get("theme"))
         # Add "devel" style if needed
         if PROFILE == "development":
             self.add_css_class("devel")
@@ -188,11 +189,11 @@ class Window(Adw.ApplicationWindow):
             self.shortcuts_window.set_transient_for(self)
             self.shortcuts_window.show()
 
-        # create_action(
-        #     "preferences",
-        #     lambda *_: PreferencesWindow(self).show(),
-        #     ["<primary>comma"],
-        # )
+        create_action(
+            "preferences",
+            lambda *_: PreferencesWindow(self).show(),
+            ["<primary>comma"],
+        )
         create_action("export", export_tasks, ["<primary>e"])
         create_action("import", import_tasks, ["<primary>i"])
         create_action("shortcuts", shortcuts, ["<primary>question"])
