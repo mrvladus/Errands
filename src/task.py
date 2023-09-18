@@ -28,7 +28,7 @@ from .utils import Log, Markup, TaskUtils, UserData, get_children
 class Task(Gtk.Revealer):
     __gtype_name__ = "Task"
 
-    # Template items
+    # - Template children - #
     main_box: Gtk.Box = Gtk.Template.Child()
     task_box_rev: Gtk.Revealer = Gtk.Template.Child()
     task_row: Adw.ActionRow = Gtk.Template.Child()
@@ -38,7 +38,7 @@ class Task(Gtk.Revealer):
     sub_tasks_revealer: Gtk.Revealer = Gtk.Template.Child()
     tasks_list: Gtk.Box = Gtk.Template.Child()
 
-    # State
+    # - State - #
     expanded: bool = False
     is_sub_task: bool = False
 
@@ -66,7 +66,7 @@ class Task(Gtk.Revealer):
         self.add_actions()
 
     def __repr__(self):
-        return f"{self.task['id']}"
+        return f"<Task> {self.task['id']}"
 
     def add_actions(self) -> None:
         group = Gio.SimpleActionGroup.new()
@@ -105,7 +105,6 @@ class Task(Gtk.Revealer):
             if task["parent"] == self.task["id"]:
                 sub_count += 1
                 self.add_sub_task(task)
-
         self.expand(sub_count > 0)
         self.update_status()
         self.window.update_status()
