@@ -8,18 +8,18 @@ msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-09 10:38+0300\n"
-"PO-Revision-Date: 2023-07-23 14:44-0300\n"
+"PO-Revision-Date: 2023-09-18 04:32-0300\n"
 "Last-Translator: Vitor Gabriel Gomes <vitorgabrielgomesro9090@gmail.com>\n"
 "Language-Team: \n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.3.1\n"
+"X-Generator: Poedit 3.3.2\n"
 
 #: src/res/ui/window.ui:42
 msgid "Move to Trash"
-msgstr ""
+msgstr "Mover para lixeira"
 
 #: src/res/ui/window.ui:68
 msgid "Deleted Tasks"
@@ -27,27 +27,27 @@ msgstr "Tarefas apagadas"
 
 #: src/res/ui/window.ui:80 src/res/ui/window.ui:83
 msgid "Clear"
-msgstr "Limpar estilo"
+msgstr "Limpar"
 
 #: src/res/ui/window.ui:98 src/res/ui/window.ui:101
 msgid "Restore All"
-msgstr ""
+msgstr "Restaurar tudo"
 
 #: src/res/ui/window.ui:117 src/res/ui/window.ui:119
 msgid "Close Trash"
-msgstr ""
+msgstr "Fechar lixeira"
 
 #: src/res/ui/window.ui:146
 msgid "Empty Trash"
-msgstr ""
+msgstr "Lixeira vazia"
 
 #: src/res/ui/window.ui:147
 msgid "No deleted items"
-msgstr ""
+msgstr "Não há itens deletados"
 
 #: src/res/ui/window.ui:232 src/res/ui/window.ui:235
 msgid "Show Deleted Tasks"
-msgstr ""
+msgstr "Mostrar itens deletados"
 
 #: src/res/ui/window.ui:257 src/res/ui/window.ui:260
 msgid "Delete Completed Tasks"
@@ -67,47 +67,47 @@ msgstr "Adicionar nova tarefa"
 
 #: src/res/ui/window.ui:431
 msgid "Export Tasks..."
-msgstr ""
+msgstr "Exportar Tarefas..."
 
 #: src/res/ui/window.ui:435
 msgid "Import Tasks..."
-msgstr ""
+msgstr "Importar Tarefas..."
 
 #: src/res/ui/window.ui:445
 msgid "Keyboard Shortcuts"
-msgstr ""
+msgstr "Atalhos do teclado"
 
 #: src/res/ui/window.ui:449
 msgid "About Errands"
-msgstr "Sobre Errands"
+msgstr "Sobre o Errands"
 
 #: src/res/ui/window.ui:463
 msgid "General"
-msgstr ""
+msgstr "Geral"
 
 #: src/res/ui/window.ui:466
 msgid "Show keyboard shortcuts"
-msgstr ""
+msgstr "Mostrar atalhos do teclado"
 
 #: src/res/ui/window.ui:472
 msgid "Toggle sidebar"
-msgstr ""
+msgstr "Alternar barra lateral"
 
 #: src/res/ui/window.ui:478
 msgid "Quit"
-msgstr ""
+msgstr "Sair"
 
 #: src/res/ui/window.ui:486
 msgid "Import and Export"
-msgstr ""
+msgstr "Importar e exportar"
 
 #: src/res/ui/window.ui:489
 msgid "Import tasks"
-msgstr ""
+msgstr "Importar tasks"
 
 #: src/res/ui/window.ui:495
 msgid "Export tasks"
-msgstr ""
+msgstr "Exportar tasks"
 
 #: src/res/ui/window.ui:512
 msgid "translator-credits"
@@ -115,11 +115,11 @@ msgstr "créditos-de-tradução"
 
 #: src/res/ui/window.ui:547
 msgid "Are you sure?"
-msgstr ""
+msgstr "Tem certeza?"
 
 #: src/res/ui/window.ui:548
 msgid "Tasks will be permanently deleted"
-msgstr ""
+msgstr "As tarefas serão excluídas permanentemente"
 
 #: src/res/ui/window.ui:553 src/res/ui/sub_task.ui:122 src/res/ui/task.ui:322
 msgid "Cancel"
@@ -131,23 +131,23 @@ msgstr "Deletar"
 
 #: src/res/ui/window.ui:562
 msgid "Copied to Clipboard"
-msgstr ""
+msgstr "Copiado para a área de transferência"
 
 #: src/res/ui/window.ui:567
 msgid "Tasks Exported"
-msgstr ""
+msgstr "Tarefas exportadas"
 
 #: src/res/ui/window.ui:572
 msgid "Tasks Imported"
-msgstr ""
+msgstr "Tarefas importadas"
 
 #: src/res/ui/window.ui:577
 msgid "Error occurred"
-msgstr ""
+msgstr "Ocorreu um erro"
 
 #: src/res/ui/window.ui:578
 msgid "Open log"
-msgstr ""
+msgstr "Abrir log"
 
 #: src/res/ui/preferences.ui:14
 msgid "Application Theme"
@@ -173,7 +173,7 @@ msgstr "Marcar como concluído"
 #: src/res/ui/sub_task.ui:87 src/res/ui/sub_task.ui:89 src/res/ui/task.ui:286
 #: src/res/ui/task.ui:288
 msgid "Menu"
-msgstr ""
+msgstr "Menu"
 
 #: src/res/ui/sub_task.ui:147 src/res/ui/task.ui:17
 msgid "Edit"
@@ -181,7 +181,7 @@ msgstr "Editar"
 
 #: src/res/ui/sub_task.ui:151 src/res/ui/task.ui:21
 msgid "Copy"
-msgstr ""
+msgstr "Copiar"
 
 #: src/res/ui/task.ui:186 src/res/ui/task.ui:189
 msgid "Clear style"
@@ -197,21 +197,21 @@ msgstr "Deletar sub-tarefas concluídas"
 
 #: src/res/ui/trash_item.ui:20 src/res/ui/trash_item.ui:24
 msgid "Restore"
-msgstr ""
+msgstr "Restaurar"
 
 #. TRANSLATORS: Don't translate
 #: data/io.github.mrvladus.List.desktop:4
 msgid "Errands"
-msgstr ""
+msgstr "Afazeres"
 
 #: data/io.github.mrvladus.List.desktop:5
 msgid "Manage your tasks"
-msgstr ""
+msgstr "Gerencie suas tarefas"
 
 #. TRANSLATORS: Don't translate
 #: data/io.github.mrvladus.List.desktop:12
 msgid "errands;tasks;list;todo;todos;"
-msgstr ""
+msgstr "afazeres;tarefas;lista;a fazer;pendências;"
 
 #~ msgid "Preferences"
 #~ msgstr "Preferências"
