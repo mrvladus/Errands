@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 13:28+0300\n"
+"POT-Creation-Date: 2023-09-18 13:37+0300\n"
 "PO-Revision-Date: 2023-09-16 14:03-0300\n"
 "Last-Translator: Ian Jose Ferrero <ferreroianjose@outlook.com.ar>\n"
 "Language-Team: \n"
@@ -90,71 +90,79 @@ msgstr "Atajos de Teclado"
 msgid "About Errands"
 msgstr "Sobre Errands"
 
-#: src/res/ui/window.ui:452
+#: src/res/ui/window.ui:454
 msgid "General"
 msgstr "General"
 
-#: src/res/ui/window.ui:455
+#: src/res/ui/window.ui:457
 msgid "Show keyboard shortcuts"
 msgstr "Mostrar atajos de teclado"
 
-#: src/res/ui/window.ui:461
+#: src/res/ui/window.ui:463
 msgid "Toggle sidebar"
 msgstr "Alternar barra lateral"
 
-#: src/res/ui/window.ui:467
+#: src/res/ui/window.ui:469
 msgid "Quit"
 msgstr "Salir"
 
-#: src/res/ui/window.ui:475
+#: src/res/ui/window.ui:479
 msgid "Import and Export"
 msgstr "Importar y Exportar"
 
-#: src/res/ui/window.ui:478
+#: src/res/ui/window.ui:482
 msgid "Import tasks"
 msgstr "Importar tareas"
 
-#: src/res/ui/window.ui:484
+#: src/res/ui/window.ui:488
 msgid "Export tasks"
 msgstr "Exportar tareas"
 
+#: src/res/ui/window.ui:498
+msgid "Tasks"
+msgstr ""
+
 #: src/res/ui/window.ui:501
+msgid "Delete completed tasks"
+msgstr "Eliminar Tareas Completadas"
+
+#: src/res/ui/window.ui:519
 msgid "translator-credits"
 msgstr "translator-credits"
 
-#: src/res/ui/window.ui:536
+#: src/res/ui/window.ui:554
 msgid "Are you sure?"
 msgstr "¿Estás seguro?"
 
-#: src/res/ui/window.ui:537
+#: src/res/ui/window.ui:555
 msgid "Tasks will be permanently deleted"
 msgstr "Las tareas serán eliminadas de forma permanente"
 
-#: src/res/ui/window.ui:542 src/res/ui/task.ui:327
+#: src/res/ui/window.ui:560 src/res/ui/task.ui:327
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: src/res/ui/window.ui:543 src/res/ui/task.ui:13
+#: src/res/ui/window.ui:561 src/res/ui/task.ui:13
 msgid "Delete"
 msgstr "Eliminar"
 
-#: src/res/ui/window.ui:551
+#: src/res/ui/window.ui:569
 msgid "Copied to Clipboard"
 msgstr "Copiado al Portapapeles"
 
-#: src/res/ui/window.ui:556
+#: src/res/ui/window.ui:574
 msgid "Tasks Exported"
 msgstr "Tareas Exportadas"
 
-#: src/res/ui/window.ui:561
+#: src/res/ui/window.ui:579
 msgid "Tasks Imported"
 msgstr "Tareas Importadas"
 
-#: src/res/ui/window.ui:566
+#: src/res/ui/window.ui:584
 msgid "Error occurred"
 msgstr "Ocurrió un error"
 
-#: src/res/ui/window.ui:567
+#: src/res/ui/window.ui:585
 msgid "Open log"
 msgstr "Abrir registros"
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 13:28+0300\n"
+"POT-Creation-Date: 2023-09-18 13:37+0300\n"
 "PO-Revision-Date: 2023-09-12 01:02+0300\n"
 "Last-Translator: Sabri Ünal <libreajans@gmail.com>\n"
 "Language-Team: Turkish <takim@gnome.org.tr>\n"
@@ -92,71 +92,79 @@ msgstr "Klavye Kısayolları"
 msgid "About Errands"
 msgstr "Errands Hakkında"
 
-#: src/res/ui/window.ui:452
+#: src/res/ui/window.ui:454
 msgid "General"
 msgstr "Genel"
 
-#: src/res/ui/window.ui:455
+#: src/res/ui/window.ui:457
 msgid "Show keyboard shortcuts"
 msgstr "Klavye kısayollarını göster"
 
-#: src/res/ui/window.ui:461
+#: src/res/ui/window.ui:463
 msgid "Toggle sidebar"
 msgstr "Kenar çubuğu aç/kapat"
 
-#: src/res/ui/window.ui:467
+#: src/res/ui/window.ui:469
 msgid "Quit"
 msgstr "Çık"
 
-#: src/res/ui/window.ui:475
+#: src/res/ui/window.ui:479
 msgid "Import and Export"
 msgstr "Aktarma"
 
-#: src/res/ui/window.ui:478
+#: src/res/ui/window.ui:482
 msgid "Import tasks"
 msgstr "Görevleri içe aktar"
 
-#: src/res/ui/window.ui:484
+#: src/res/ui/window.ui:488
 msgid "Export tasks"
 msgstr "Görevleri dışa aktar"
 
+#: src/res/ui/window.ui:498
+msgid "Tasks"
+msgstr ""
+
 #: src/res/ui/window.ui:501
+msgid "Delete completed tasks"
+msgstr "Tamamlanmış Görevleri Sil"
+
+#: src/res/ui/window.ui:519
 msgid "translator-credits"
 msgstr "Sabri Ünal <libreajans@gmail.com>"
 
-#: src/res/ui/window.ui:536
+#: src/res/ui/window.ui:554
 msgid "Are you sure?"
 msgstr "Emin misiniz?"
 
-#: src/res/ui/window.ui:537
+#: src/res/ui/window.ui:555
 msgid "Tasks will be permanently deleted"
 msgstr "Görevler kalıcı olarak silinecek"
 
-#: src/res/ui/window.ui:542 src/res/ui/task.ui:327
+#: src/res/ui/window.ui:560 src/res/ui/task.ui:327
 msgid "Cancel"
 msgstr "İptal"
 
-#: src/res/ui/window.ui:543 src/res/ui/task.ui:13
+#: src/res/ui/window.ui:561 src/res/ui/task.ui:13
 msgid "Delete"
 msgstr "Sil"
 
-#: src/res/ui/window.ui:551
+#: src/res/ui/window.ui:569
 msgid "Copied to Clipboard"
 msgstr "Panoya Kopyalandı"
 
-#: src/res/ui/window.ui:556
+#: src/res/ui/window.ui:574
 msgid "Tasks Exported"
 msgstr "Görevler Dışa Aktarıldı"
 
-#: src/res/ui/window.ui:561
+#: src/res/ui/window.ui:579
 msgid "Tasks Imported"
 msgstr "Görevler İçe Aktarıldı"
 
-#: src/res/ui/window.ui:566
+#: src/res/ui/window.ui:584
 msgid "Error occurred"
 msgstr "Hata oluştu"
 
-#: src/res/ui/window.ui:567
+#: src/res/ui/window.ui:585
 msgid "Open log"
 msgstr "Günlüğü aç"
 

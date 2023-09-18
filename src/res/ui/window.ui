@@ -447,13 +447,15 @@
     <property name="modal">true</property>
     <child>
       <object class="GtkShortcutsSection">
+
+        <!-- General -->
         <child>
           <object class="GtkShortcutsGroup">
             <property name="title" translatable="yes">General</property>
             <child>
               <object class="GtkShortcutsShortcut">
                 <property name="title" translatable="yes">Show keyboard shortcuts</property>
-                <property name="accelerator">&lt;ctrl&gt;question</property>
+                <property name="accelerator">&lt;Control&gt;question</property>
               </object>
             </child>
             <child>
@@ -465,28 +467,44 @@
             <child>
               <object class="GtkShortcutsShortcut">
                 <property name="title" translatable="yes">Quit</property>
-                <property name="accelerator">&lt;ctrl&gt;q &lt;ctrl&gt;w</property>
+                <property name="accelerator">&lt;Control&gt;q &lt;Control&gt;w</property>
               </object>
             </child>
           </object>
         </child>
+
+        <!-- Import / Export -->
         <child>
           <object class="GtkShortcutsGroup">
             <property name="title" translatable="yes">Import and Export</property>
             <child>
               <object class="GtkShortcutsShortcut">
                 <property name="title" translatable="yes">Import tasks</property>
-                <property name="accelerator">&lt;ctrl&gt;i</property>
+                <property name="accelerator">&lt;Control&gt;i</property>
               </object>
             </child>
             <child>
               <object class="GtkShortcutsShortcut">
                 <property name="title" translatable="yes">Export tasks</property>
-                <property name="accelerator">&lt;ctrl&gt;e</property>
+                <property name="accelerator">&lt;Control&gt;e</property>
               </object>
             </child>
           </object>
         </child>
+
+        <!-- Tasks -->
+        <child>
+          <object class="GtkShortcutsGroup">
+            <property name="title" translatable="yes">Tasks</property>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Delete completed tasks</property>
+                <property name="accelerator">&lt;Control&gt;Delete</property>
+              </object>
+            </child>
+          </object>
+        </child>
+
       </object>
     </child>
   </object>

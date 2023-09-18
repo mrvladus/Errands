@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 13:28+0300\n"
+"POT-Creation-Date: 2023-09-18 13:37+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -90,71 +90,79 @@ msgstr ""
 msgid "About Errands"
 msgstr ""
 
-#: src/res/ui/window.ui:452
+#: src/res/ui/window.ui:454
 msgid "General"
 msgstr ""
 
-#: src/res/ui/window.ui:455
+#: src/res/ui/window.ui:457
 msgid "Show keyboard shortcuts"
 msgstr ""
 
-#: src/res/ui/window.ui:461
+#: src/res/ui/window.ui:463
 msgid "Toggle sidebar"
 msgstr ""
 
-#: src/res/ui/window.ui:467
+#: src/res/ui/window.ui:469
 msgid "Quit"
 msgstr ""
 
-#: src/res/ui/window.ui:475
+#: src/res/ui/window.ui:479
 msgid "Import and Export"
 msgstr ""
 
-#: src/res/ui/window.ui:478
+#: src/res/ui/window.ui:482
 msgid "Import tasks"
 msgstr ""
 
-#: src/res/ui/window.ui:484
+#: src/res/ui/window.ui:488
 msgid "Export tasks"
 msgstr ""
 
+#: src/res/ui/window.ui:498
+msgid "Tasks"
+msgstr ""
+
 #: src/res/ui/window.ui:501
+msgid "Delete completed tasks"
+msgstr ""
+
+#: src/res/ui/window.ui:519
 msgid "translator-credits"
 msgstr ""
 
-#: src/res/ui/window.ui:536
+#: src/res/ui/window.ui:554
 msgid "Are you sure?"
 msgstr ""
 
-#: src/res/ui/window.ui:537
+#: src/res/ui/window.ui:555
 msgid "Tasks will be permanently deleted"
 msgstr ""
 
-#: src/res/ui/window.ui:542 src/res/ui/task.ui:327
+#: src/res/ui/window.ui:560 src/res/ui/task.ui:327
 msgid "Cancel"
 msgstr ""
 
-#: src/res/ui/window.ui:543 src/res/ui/task.ui:13
+#: src/res/ui/window.ui:561 src/res/ui/task.ui:13
 msgid "Delete"
 msgstr ""
 
-#: src/res/ui/window.ui:551
+#: src/res/ui/window.ui:569
 msgid "Copied to Clipboard"
 msgstr ""
 
-#: src/res/ui/window.ui:556
+#: src/res/ui/window.ui:574
 msgid "Tasks Exported"
 msgstr ""
 
-#: src/res/ui/window.ui:561
+#: src/res/ui/window.ui:579
 msgid "Tasks Imported"
 msgstr ""
 
-#: src/res/ui/window.ui:566
+#: src/res/ui/window.ui:584
 msgid "Error occurred"
 msgstr ""
 
-#: src/res/ui/window.ui:567
+#: src/res/ui/window.ui:585
 msgid "Open log"
 msgstr ""
 
