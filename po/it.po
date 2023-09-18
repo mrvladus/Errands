@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-17 18:53+0300\n"
+"POT-Creation-Date: 2023-09-18 12:18+0300\n"
 "PO-Revision-Date: 2023-09-12 00:44+0200\n"
 "Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
 "Language-Team: Italian <LL@li.org>\n"
@@ -18,11 +18,10 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.12.1\n"
 
-#: src/window.py:258 src/task.py:167 src/res/ui/window.ui:225
+#: src/window.py:259 src/task.py:167 src/res/ui/window.ui:225
 #: src/res/ui/task.ui:118
-#, fuzzy
 msgid "Completed:"
-msgstr "Contrassegna come completato"
+msgstr ""
 
 #: src/res/ui/window.ui:41
 msgid "Move to Trash"
@@ -79,6 +78,10 @@ msgstr "Esporta attività..."
 #: src/res/ui/window.ui:440
 msgid "Import Tasks..."
 msgstr "Importa attività..."
+
+#: src/res/ui/window.ui:446
+msgid "Preferences"
+msgstr "Preferenze"
 
 #: src/res/ui/window.ui:450
 msgid "Keyboard Shortcuts"
@@ -213,9 +216,3 @@ msgstr "Gestisci le tue attività"
 #: data/io.github.mrvladus.List.desktop:12
 msgid "errands;tasks;list;todo;todos;"
 msgstr ""
-
-#~ msgid "Delete Completed Sub-Tasks"
-#~ msgstr "Elimina le attività secondarie completate"
-
-#~ msgid "Preferences"
-#~ msgstr "Preferenze"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-17 18:53+0300\n"
+"POT-Creation-Date: 2023-09-18 12:18+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/window.py:258 src/task.py:167 src/res/ui/window.ui:225
+#: src/window.py:259 src/task.py:167 src/res/ui/window.ui:225
 #: src/res/ui/task.ui:118
 msgid "Completed:"
 msgstr ""
@@ -76,6 +76,10 @@ msgstr ""
 
 #: src/res/ui/window.ui:440
 msgid "Import Tasks..."
+msgstr ""
+
+#: src/res/ui/window.ui:446
+msgid "Preferences"
 msgstr ""
 
 #: src/res/ui/window.ui:450

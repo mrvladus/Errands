@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-17 18:53+0300\n"
+"POT-Creation-Date: 2023-09-18 12:18+0300\n"
 "PO-Revision-Date: 2023-09-11 16:00+0200\n"
 "Last-Translator: Jeremy Castel <jeremy.castel@protonmail.com>\n"
 "Language-Team: \n"
@@ -18,11 +18,10 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Poedit 3.3.1\n"
 
-#: src/window.py:258 src/task.py:167 src/res/ui/window.ui:225
+#: src/window.py:259 src/task.py:167 src/res/ui/window.ui:225
 #: src/res/ui/task.ui:118
-#, fuzzy
 msgid "Completed:"
-msgstr "Marquer comme terminée"
+msgstr ""
 
 #: src/res/ui/window.ui:41
 msgid "Move to Trash"
@@ -79,6 +78,10 @@ msgstr "Exporter les tâches..."
 #: src/res/ui/window.ui:440
 msgid "Import Tasks..."
 msgstr "Importer les tâches..."
+
+#: src/res/ui/window.ui:446
+msgid "Preferences"
+msgstr "Préférences"
 
 #: src/res/ui/window.ui:450
 msgid "Keyboard Shortcuts"
@@ -213,9 +216,3 @@ msgstr "Gérer vos tâches"
 #: data/io.github.mrvladus.List.desktop:12
 msgid "errands;tasks;list;todo;todos;"
 msgstr ""
-
-#~ msgid "Delete Completed Sub-Tasks"
-#~ msgstr "Supprimer les sous-tâches terminées"
-
-#~ msgid "Preferences"
-#~ msgstr "Préférences"

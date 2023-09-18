@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-17 18:53+0300\n"
+"POT-Creation-Date: 2023-09-18 12:18+0300\n"
 "PO-Revision-Date: 2023-09-12 01:02+0300\n"
 "Last-Translator: Sabri Ünal <libreajans@gmail.com>\n"
 "Language-Team: Turkish <takim@gnome.org.tr>\n"
@@ -19,11 +19,10 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Poedit 3.2.2\n"
 
-#: src/window.py:258 src/task.py:167 src/res/ui/window.ui:225
+#: src/window.py:259 src/task.py:167 src/res/ui/window.ui:225
 #: src/res/ui/task.ui:118
-#, fuzzy
 msgid "Completed:"
-msgstr "Tamamlanmadı Olarak İmle"
+msgstr ""
 
 #: src/res/ui/window.ui:41
 msgid "Move to Trash"
@@ -80,6 +79,10 @@ msgstr "Görevleri Dışa Aktar..."
 #: src/res/ui/window.ui:440
 msgid "Import Tasks..."
 msgstr "Görevleri İçe Aktar..."
+
+#: src/res/ui/window.ui:446
+msgid "Preferences"
+msgstr ""
 
 #: src/res/ui/window.ui:450
 msgid "Keyboard Shortcuts"
@@ -214,6 +217,3 @@ msgstr "Görevlerinizi yönetin"
 #: data/io.github.mrvladus.List.desktop:12
 msgid "errands;tasks;list;todo;todos;"
 msgstr "errands;tasks;list;todo;todos;görevler;görev;yapılacak işler;"
-
-#~ msgid "Delete Completed Sub-Tasks"
-#~ msgstr "Tamamlanmış Alt Görevleri Sil"

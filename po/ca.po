@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-17 18:53+0300\n"
+"POT-Creation-Date: 2023-09-18 12:18+0300\n"
 "PO-Revision-Date: 2023-06-25 08:14+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -17,11 +17,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.3.1\n"
 
-#: src/window.py:258 src/task.py:167 src/res/ui/window.ui:225
+#: src/window.py:259 src/task.py:167 src/res/ui/window.ui:225
 #: src/res/ui/task.ui:118
-#, fuzzy
 msgid "Completed:"
-msgstr "Marca com a completada"
+msgstr ""
 
 #: src/res/ui/window.ui:41
 msgid "Move to Trash"
@@ -78,6 +77,10 @@ msgstr ""
 #: src/res/ui/window.ui:440
 msgid "Import Tasks..."
 msgstr ""
+
+#: src/res/ui/window.ui:446
+msgid "Preferences"
+msgstr "Preferències"
 
 #: src/res/ui/window.ui:450
 msgid "Keyboard Shortcuts"
@@ -212,9 +215,3 @@ msgstr ""
 #: data/io.github.mrvladus.List.desktop:12
 msgid "errands;tasks;list;todo;todos;"
 msgstr ""
-
-#~ msgid "Delete Completed Sub-Tasks"
-#~ msgstr "Suprimeix les subtasques completades"
-
-#~ msgid "Preferences"
-#~ msgstr "Preferències"
