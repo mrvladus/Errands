@@ -82,7 +82,7 @@ msgstr "Импорт задач..."
 
 #: src/res/ui/window.ui:430
 msgid "Preferences"
-msgstr "Настройки"
+msgstr "Параметры"
 
 #: src/res/ui/window.ui:434
 msgid "Keyboard Shortcuts"
@@ -122,7 +122,7 @@ msgstr "Экспорт задач"
 
 #: src/res/ui/window.ui:498
 msgid "Tasks"
-msgstr ""
+msgstr "Задачи"
 
 #: src/res/ui/window.ui:501
 msgid "Delete completed tasks"
