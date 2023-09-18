@@ -56,8 +56,9 @@
         <p>UI/UX:</p>
         <ul>
           <li>Now you can add sub-tasks to sub-tasks! As a result of that, it is possible to add accent colors to sub-tasks now.</li>
+          <li>Remove statusbars and replaced width subtitles.</li>
           <li>Removed "Delete Completed Sub-Tasks" button. Now it's only one button inside of headerbar to delete any completed tasks. New shortcut for this: "Ctrl+Delete"</li>
-          <li>Big improvements to drag and drop. Now it's possible to move tasks as you want, including moving tasks to sub-tasks and back.</li>
+          <li>Improvements to drag and drop. Now it's possible to move tasks as you want, including moving tasks inside sub-tasks and back.</li>
           <li>Improve contrast with accent colors</li>
           <li>Added theme switcher to preferences window for those who use window managers.</li>
           <li>Fixed couple of bugs with UI</li>
