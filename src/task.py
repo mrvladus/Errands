@@ -140,11 +140,11 @@ class Task(Gtk.Revealer):
         """
         Completely remove widget
         """
-        data: dict = UserData.get()
-        data["tasks"] = [
-            task for task in data["tasks"] if task["id"] != self.task["id"]
-        ]
-        UserData.set(data)
+        # data: dict = UserData.get()
+        # data["tasks"] = [
+        #     task for task in data["tasks"] if task["id"] != self.task["id"]
+        # ]
+        # UserData.set(data)
         self.window.tasks.remove(self)
         self.parent.tasks_list.remove(self)
 
@@ -365,19 +365,23 @@ class Task(Gtk.Revealer):
         # Change parent
         task.task["parent"] = self.task["id"]
         task.update_data()
-        # Get data
+        # Move data
         data = UserData.get()
         tasks = data["tasks"]
-        # Move data
-        tasks.insert(tasks.index(self.task) + 1, tasks.pop(tasks.index(task.task)))
+        last_sub_idx: int = 0
+        for t in tasks:
+            if t["parent"] == self.task["id"]:
+                last_sub_idx = tasks.index(t)
+        tasks.insert(
+            tasks.index(self.task) + last_sub_idx, tasks.pop(tasks.index(task.task))
+        )
         UserData.set(data)
-        task_parent = task.parent
+        # Remove old task
         task.purge()
-        task_parent.update_status()
-
-        # Add sub-task
+        task.parent.update_status()
+        # Add new sub-task
         self.expand(True)
-        sub_task = Task(task.task, self.window, self)
+        sub_task = Task(task.task.copy(), self.window, self)
         self.tasks_list.append(sub_task)
         sub_task.toggle_visibility(True)
 
