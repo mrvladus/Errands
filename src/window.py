@@ -453,8 +453,8 @@ class TrashItem(Gtk.Box):
 
     def __init__(self, task: dict, window: Window) -> None:
         super().__init__()
-        self.window = window
-        self.id = task["id"]
+        self.window: Window = window
+        self.id: str = task["id"]
         self.label.props.label = task["text"]
 
     def __repr__(self) -> str:
