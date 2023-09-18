@@ -162,8 +162,8 @@ class Task(Gtk.Revealer):
 
         self.task_row.set_subtitle(
             _("Completed:") + f" {n_completed} / {n_total}"  # pyright: ignore
-            if n_total > 0  # pyright: ignore
-            else ""  # pyright: ignore
+            if n_total > 0
+            else ""
         )
 
     def update_data(self) -> None:

@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 import json
+import os
 from gi.repository import Gio, Adw, Gtk, GLib
 from __main__ import VERSION, PROFILE, APP_ID
 
@@ -95,7 +96,7 @@ class Window(Adw.ApplicationWindow):
         """
 
         def create_action(name: str, callback: callable, shortcuts=None) -> None:
-            action = Gio.SimpleAction.new(name, None)
+            action: Gio.SimpleAction = Gio.SimpleAction.new(name, None)
             action.connect("activate", callback)
             if shortcuts:
                 self.props.application.set_accels_for_action(f"app.{name}", shortcuts)
@@ -121,7 +122,7 @@ class Window(Adw.ApplicationWindow):
                 except GLib.GError:
                     Log.debug("Export cancelled")
                     return
-                path = file.get_path()
+                path: str = file.get_path()
                 with open(path, "w+") as f:
                     json.dump(UserData.get(), f, indent=4)
                 self.add_toast(self.toast_exported)
@@ -144,29 +145,20 @@ class Window(Adw.ApplicationWindow):
                     return
 
                 with open(file.get_path(), "r") as f:
-                    text = f.read()
+                    text: str = f.read()
                     if not UserData.validate(text):
                         self.add_toast(self.toast_err)
                         return
                     UserData.set(json.loads(text))
 
-                # Reload tasks
-                children = self.tasks_list.observe_children()
-                to_remove: list = [
-                    children.get_item(i) for i in range(children.get_n_items())
-                ]
-                for task in to_remove:
+                # Remove old tasks
+                for task in self.tasks:
                     self.tasks_list.remove(task)
-                self.load_tasks()
-
-                # Reload trash
-                children = self.trash_list.observe_children()
-                to_remove: list = [
-                    children.get_item(i) for i in range(children.get_n_items())
-                ]
-                for task in to_remove:
+                self.tasks.clear()
+                # Remove old trash
+                for task in get_children(self.trash_list):
                     self.trash_list.remove(task)
-                self.trash_add_items()
+                self.load_tasks()
                 self.add_toast(self.toast_imported)
                 Log.info("Tasks imported")
 
@@ -176,10 +168,8 @@ class Window(Adw.ApplicationWindow):
             """
             Open log file with default text editor
             """
-
-            GLib.spawn_command_line_async(
-                f"xdg-open {GLib.get_user_data_dir()}/list/log.txt"
-            )
+            path = os.path.join(GLib.get_user_data_dir(), "list", "log.txt")
+            GLib.spawn_command_line_async(f"xdg-open {path}")
 
         def shortcuts(*_) -> None:
             """
@@ -256,7 +246,9 @@ class Window(Adw.ApplicationWindow):
                 if task.task["completed"]:
                     n_completed += 1
         self.title.set_subtitle(
-            _("Completed:") + f" {n_completed} / {n_total}" if n_total > 0 else ""
+            _("Completed:") + f" {n_completed} / {n_total}"  # pyright: ignore
+            if n_total > 0
+            else ""
         )
 
         # Set state for delete completed button
@@ -483,6 +475,7 @@ class TrashItem(Gtk.Box):
                     if task.task["parent"]:
                         task.parent.expand(True)
                         restore_task(task.task["parent"])
+                    break
 
         restore_task()
         self.window.update_status()
