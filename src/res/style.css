@@ -20,11 +20,11 @@
 
 .task-drop-area {
   padding: 5px;
-  margin: 5px 10px 4px 10px;
+  margin: 5px 12px 4px 12px;
   border-radius: 10px;
-  border-width: 5px;
+  border-width: 3px;
   border-style: dotted;
-  border-color: @light_3;
+  border-color: @light_4;
 }
 
 .task-drop-target:drop(active) {
