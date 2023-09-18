@@ -466,6 +466,12 @@
             </child>
             <child>
               <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Preferences</property>
+                <property name="accelerator">&lt;Control&gt;comma</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
                 <property name="title" translatable="yes">Quit</property>
                 <property name="accelerator">&lt;Control&gt;q &lt;Control&gt;w</property>
               </object>
