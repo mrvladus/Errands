@@ -59,6 +59,7 @@
           <li>Removed "Delete Completed Sub-Tasks" button. Now it's only one button inside of headerbar to delete any completed tasks. New shortcut for this: "Ctrl+Delete"</li>
           <li>Big improvements to drag and drop. Now it's possible to move tasks as you want, including moving tasks to sub-tasks and back.</li>
           <li>Improve contrast with accent colors</li>
+          <li>Added theme switcher to preferences window for those who use window managers.</li>
           <li>Fixed couple of bugs with UI</li>
         </ul>
         <p>Translations:</p>
