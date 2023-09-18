@@ -51,35 +51,26 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="44.7.5" date="2023-09-16">
+    <release version="44.7.4" date="2023-09-16">
       <description translatable="no">
         <p>UI/UX:</p>
         <ul>
           <li>Now you can add sub-tasks to sub-tasks! As a result of that, it is possible to add accent colors to sub-tasks now.</li>
-          <li>Big improvements to drag and drop. Now it's possible to move tasks as you want, including moving tasks to sub-tasks.</li>
+          <li>Big improvements to drag and drop. Now it's possible to move tasks as you want, including moving tasks to sub-tasks and back.</li>
           <li>Improve contrast with accent colors</li>
           <li>Fixed couple of bugs with UI</li>
           <li>Big code optimizations, now it much simpler and faster with less disk usage.</li>
         </ul>
         <p>Translations:</p>
         <ul>
+          <li>Added Spanish translation (Ian Jose Ferrero)</li>
           <li>Updated Italian translation (Albano Battistella)</li>
           <li>Updated Dutch translation (Heimen Stoffels)</li>
-        </ul>
-      </description>
-    </release>
-    <release version="44.7.4" date="2023-09-12">
-      <description translatable="no">
-        <p>UI/UX:</p>
-        <ul>
-          <li>Fixed cancel button not working on trash clear</li>
-        </ul>
-        <p>Translations:</p>
-        <ul>
           <li>Updated Italian translation (Davide Ferracin)</li>
           <li>Updated Turkish translation (Sabri Ünal)</li>
           <li>Updated French translation (CastelJeremy)</li>
           <li>Updated Czech translation (Amerey)</li>
+          <li>Updated Brazilian Portuguese translation (Leandro Cunha)</li>
         </ul>
       </description>
     </release>
