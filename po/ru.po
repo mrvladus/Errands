@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 12:18+0300\n"
+"POT-Creation-Date: 2023-09-18 13:28+0300\n"
 "PO-Revision-Date: 2023-07-07 16:56+0300\n"
 "Last-Translator: Vlad Krupinski <mrvladus@yandex.ru>\n"
 "Language-Team: \n"
@@ -57,8 +57,8 @@ msgid "Show Deleted Tasks"
 msgstr "Показать удаленные задачи"
 
 #: src/res/ui/window.ui:262 src/res/ui/window.ui:265
-msgid "Delete Completed Tasks"
-msgstr "Удалить выполненные задачи"
+msgid "Delete Completed Tasks (Ctrl+Delete)"
+msgstr "Удалить выполненные задачи (Ctrl+Delete)"
 
 #: src/res/ui/window.ui:290 src/res/ui/window.ui:292
 msgid "Main Menu"
@@ -68,95 +68,95 @@ msgstr "Главное меню"
 msgid "Scroll Up"
 msgstr "Прокрутить вверх"
 
-#: src/res/ui/window.ui:342
+#: src/res/ui/window.ui:340
 msgid "Add new Task"
 msgstr "Добавьте задачу"
 
-#: src/res/ui/window.ui:436
+#: src/res/ui/window.ui:420
 msgid "Export Tasks..."
 msgstr "Экспорт задач..."
 
-#: src/res/ui/window.ui:440
+#: src/res/ui/window.ui:424
 msgid "Import Tasks..."
 msgstr "Импорт задач..."
 
-#: src/res/ui/window.ui:446
+#: src/res/ui/window.ui:430
 msgid "Preferences"
 msgstr "Настройки"
 
-#: src/res/ui/window.ui:450
+#: src/res/ui/window.ui:434
 msgid "Keyboard Shortcuts"
 msgstr "Комбинации клавиш"
 
-#: src/res/ui/window.ui:454
+#: src/res/ui/window.ui:438
 msgid "About Errands"
 msgstr "О приложении"
 
-#: src/res/ui/window.ui:468
+#: src/res/ui/window.ui:452
 msgid "General"
 msgstr "Общие"
 
-#: src/res/ui/window.ui:471
+#: src/res/ui/window.ui:455
 msgid "Show keyboard shortcuts"
 msgstr "Показать комбинации клавиш"
 
-#: src/res/ui/window.ui:477
+#: src/res/ui/window.ui:461
 msgid "Toggle sidebar"
 msgstr "Переключить боковую панель"
 
-#: src/res/ui/window.ui:483
+#: src/res/ui/window.ui:467
 msgid "Quit"
 msgstr "Выход"
 
-#: src/res/ui/window.ui:491
+#: src/res/ui/window.ui:475
 msgid "Import and Export"
 msgstr "Импорт и экспорт"
 
-#: src/res/ui/window.ui:494
+#: src/res/ui/window.ui:478
 msgid "Import tasks"
 msgstr "Импорт задач"
 
-#: src/res/ui/window.ui:500
+#: src/res/ui/window.ui:484
 msgid "Export tasks"
 msgstr "Экспорт задач"
 
-#: src/res/ui/window.ui:517
+#: src/res/ui/window.ui:501
 msgid "translator-credits"
 msgstr "Vlad Krupinski <mrvladus@yandex.ru>"
 
-#: src/res/ui/window.ui:552
+#: src/res/ui/window.ui:536
 msgid "Are you sure?"
 msgstr "Вы уверены?"
 
-#: src/res/ui/window.ui:553
+#: src/res/ui/window.ui:537
 msgid "Tasks will be permanently deleted"
 msgstr "Задачи будут безвозвратно удалены"
 
-#: src/res/ui/window.ui:558 src/res/ui/task.ui:327
+#: src/res/ui/window.ui:542 src/res/ui/task.ui:327
 msgid "Cancel"
 msgstr "Отмена"
 
-#: src/res/ui/window.ui:559 src/res/ui/task.ui:13
+#: src/res/ui/window.ui:543 src/res/ui/task.ui:13
 msgid "Delete"
 msgstr "Удалить"
 
-#: src/res/ui/window.ui:567
+#: src/res/ui/window.ui:551
 msgid "Copied to Clipboard"
 msgstr "Скопировано в буфер обмена"
 
-#: src/res/ui/window.ui:572
+#: src/res/ui/window.ui:556
 msgid "Tasks Exported"
 msgstr "Экспорт завершен"
 
-#: src/res/ui/window.ui:577
+#: src/res/ui/window.ui:561
 msgid "Tasks Imported"
 msgstr "Импорт завершен"
 
-#: src/res/ui/window.ui:582
+#: src/res/ui/window.ui:566
 msgid "Error occurred"
 msgstr "Ошибка"
 
-#: src/res/ui/window.ui:583
+#: src/res/ui/window.ui:567
 msgid "Open log"
 msgstr "Открыть лог"
 

@@ -259,10 +259,10 @@
                         <property name="valign">center</property>
                         <property name="sensitive">false</property>
                         <property name="icon-name">edit-clear-all-symbolic</property>
-                        <property name="tooltip-text" translatable="yes">Delete Completed Tasks</property>
+                        <property name="tooltip-text" translatable="yes">Delete Completed Tasks (Ctrl+Delete)</property>
                         <signal name="clicked" handler="on_delete_completed_tasks_btn_clicked" />
                         <accessibility>
-                          <property name="label" translatable="yes">Delete Completed Tasks</property>
+                          <property name="label" translatable="yes">Delete Completed Tasks (Ctrl+Delete)</property>
                         </accessibility>
                         <child>
                           <object class="GtkShortcutController">
@@ -321,46 +321,29 @@
                   <object class="AdwClamp">
                     <property name="maximum-size">850</property>
                     <property name="tightening-threshold">300</property>
+
+                    <!-- Entry -->
                     <child>
-                      <object class="GtkOverlay">
-
-                        <!-- Entry -->
+                      <object class="GtkListBox">
+                        <property name="margin-top">10</property>
+                        <property name="margin-bottom">12</property>
+                        <property name="margin-start">12</property>
+                        <property name="margin-end">12</property>
+                        <property name="selection-mode">0</property>
+                        <style>
+                          <class name="boxed-list" />
+                        </style>
                         <child>
-                          <object class="GtkListBox">
-                            <property name="margin-top">10</property>
-                            <property name="margin-bottom">12</property>
-                            <property name="margin-start">12</property>
-                            <property name="margin-end">12</property>
-                            <property name="selection-mode">0</property>
-                            <style>
-                              <class name="boxed-list" />
-                            </style>
-                            <child>
-                              <object class="AdwEntryRow" id="task_entry_row">
-                                <property name="activatable">false</property>
-                                <property name="height-request">60</property>
-                                <property name="title" translatable="yes">Add new Task</property>
-                                <signal name="entry-activated" handler="on_task_added" />
-                              </object>
-                            </child>
+                          <object class="AdwEntryRow" id="task_entry_row">
+                            <property name="activatable">false</property>
+                            <property name="height-request">60</property>
+                            <property name="title" translatable="yes">Add new Task</property>
+                            <signal name="entry-activated" handler="on_task_added" />
                           </object>
                         </child>
-
-                        <!-- Status bar -->
-                        <child type="overlay">
-                          <object class="GtkProgressBar" id="status">
-                            <property name="valign">end</property>
-                            <property name="margin-bottom">12</property>
-                            <property name="margin-start">22</property>
-                            <property name="margin-end">22</property>
-                            <style>
-                              <class name="osd" />
-                            </style>
-                          </object>
-                        </child>
-
                       </object>
                     </child>
+
                   </object>
                 </child>
 
@@ -416,6 +399,7 @@
 
                       </object>
                     </child>
+
                   </object>
                 </child>
 
