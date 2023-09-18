@@ -359,7 +359,7 @@ class Task(Gtk.Revealer):
         When task is dropped on task and becomes sub-task
         """
 
-        if task == self:
+        if task == self or task.parent == self:
             return
 
         # Change parent
@@ -384,5 +384,6 @@ class Task(Gtk.Revealer):
         sub_task = Task(task.task.copy(), self.window, self)
         self.tasks_list.append(sub_task)
         sub_task.toggle_visibility(True)
+        self.update_status()
 
         return True

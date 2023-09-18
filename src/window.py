@@ -392,7 +392,10 @@ class Window(Adw.ApplicationWindow):
 
         Log.info("Clear Trash")
 
-        # Remove widgets
+        # Remove widgets and data
+        data: dict = UserData.get()
+        data["tasks"] = [task for task in data["tasks"] if not task["deleted"]]
+        UserData.set(data)
         to_remove = [task for task in self.tasks if task.task["deleted"]]
         for task in to_remove:
             task.purge()
