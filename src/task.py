@@ -41,7 +41,6 @@ class Task(Gtk.Revealer):
     # State
     expanded: bool = False
     is_sub_task: bool = False
-    can_update_parent: bool = True
 
     def __init__(self, task: dict, window: Adw.ApplicationWindow, parent=None) -> None:
         super().__init__()
@@ -57,11 +56,13 @@ class Task(Gtk.Revealer):
         # Set accent color
         if self.task["color"] != "":
             self.main_box.add_css_class(f'task-{self.task["color"]}')
+        # Add to trash if needed
         if self.task["deleted"]:
             self.window.trash_add(self.task)
+        # Add to main task list
         self.window.tasks.append(self)
-        self.add_sub_tasks()
         self.check_is_sub()
+        self.add_sub_tasks()
         self.add_actions()
 
     def __repr__(self):
@@ -140,11 +141,7 @@ class Task(Gtk.Revealer):
         """
         Completely remove widget
         """
-        # data: dict = UserData.get()
-        # data["tasks"] = [
-        #     task for task in data["tasks"] if task["id"] != self.task["id"]
-        # ]
-        # UserData.set(data)
+
         self.window.tasks.remove(self)
         self.parent.tasks_list.remove(self)
 
@@ -164,7 +161,9 @@ class Task(Gtk.Revealer):
                     n_completed += 1
 
         self.task_row.set_subtitle(
-            _("Completed:") + f" {n_completed} / {n_total}" if n_total > 0 else ""
+            _("Completed:") + f" {n_completed} / {n_total}"  # pyright: ignore
+            if n_total > 0  # pyright: ignore
+            else ""  # pyright: ignore
         )
 
     def update_data(self) -> None:
@@ -186,6 +185,7 @@ class Task(Gtk.Revealer):
         """
         Toggle check button and add style to the text
         """
+
         self.task["completed"] = btn.props.active
         self.update_data()
 
@@ -196,7 +196,6 @@ class Task(Gtk.Revealer):
         if self.is_sub_task:
             self.parent.update_status()
         self.window.update_status()
-
         # Set crosslined text
         if btn.props.active:
             self.text = Markup.add_crossline(self.text)
@@ -323,10 +322,9 @@ class Task(Gtk.Revealer):
         if task == self:
             return False
 
-        # Get data
+        # Move data
         data = UserData.get()
         tasks = data["tasks"]
-        # Move data
         tasks.insert(tasks.index(self.task), tasks.pop(tasks.index(task.task)))
         UserData.set(data)
 
@@ -341,13 +339,13 @@ class Task(Gtk.Revealer):
         task.task["parent"] = self.task["parent"]
         task.update_data()
         task.purge()
-
         # Add new task widget
         new_task = Task(task.task, self.window, self.parent)
         self.parent.tasks_list.append(new_task)
         self.parent.tasks_list.reorder_child_after(new_task, self)
         self.parent.tasks_list.reorder_child_after(self, new_task)
         new_task.toggle_visibility(True)
+        # Update status
         self.parent.update_status()
         task.parent.update_status()
 
@@ -378,12 +376,13 @@ class Task(Gtk.Revealer):
         UserData.set(data)
         # Remove old task
         task.purge()
-        task.parent.update_status()
         # Add new sub-task
         self.expand(True)
         sub_task = Task(task.task.copy(), self.window, self)
         self.tasks_list.append(sub_task)
         sub_task.toggle_visibility(True)
+        # Update status
+        task.parent.update_status()
         self.update_status()
 
         return True
