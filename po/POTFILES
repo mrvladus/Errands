@@ -1,6 +1,7 @@
 # Python
 src/window.py
 src/task.py
+
 # UI
 src/res/ui/window.ui
 src/res/ui/preferences.ui
@@ -8,5 +9,4 @@ src/res/ui/task.ui
 src/res/ui/trash_item.ui
 
 # Data
-# data/io.github.mrvladus.List.metainfo.xml
 data/io.github.mrvladus.List.desktop
