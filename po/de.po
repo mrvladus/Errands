@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 13:37+0300\n"
+"POT-Creation-Date: 2023-09-19 19:01+0300\n"
 "PO-Revision-Date: 2023-08-10 21:16+0200\n"
 "Last-Translator: Christoph Bähr\n"
 "Language-Team: \n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.3.2\n"
 
-#: src/window.py:259 src/task.py:167 src/res/ui/window.ui:225
+#: src/window.py:249 src/task.py:163 src/res/ui/window.ui:225
 #: src/res/ui/task.ui:118
 msgid "Completed:"
 msgstr ""
@@ -78,7 +78,7 @@ msgstr "Aufgaben exportieren..."
 msgid "Import Tasks..."
 msgstr "Aufgaben importieren..."
 
-#: src/res/ui/window.ui:430
+#: src/res/ui/window.ui:430 src/res/ui/window.ui:469
 msgid "Preferences"
 msgstr "Einstellungen"
 
@@ -102,67 +102,67 @@ msgstr ""
 msgid "Toggle sidebar"
 msgstr ""
 
-#: src/res/ui/window.ui:469
+#: src/res/ui/window.ui:475
 msgid "Quit"
 msgstr ""
 
-#: src/res/ui/window.ui:479
+#: src/res/ui/window.ui:485
 msgid "Import and Export"
 msgstr ""
 
-#: src/res/ui/window.ui:482
+#: src/res/ui/window.ui:488
 msgid "Import tasks"
 msgstr "Aufgaben importieren"
 
-#: src/res/ui/window.ui:488
+#: src/res/ui/window.ui:494
 msgid "Export tasks"
 msgstr "Aufgaben exportieren"
 
-#: src/res/ui/window.ui:498
+#: src/res/ui/window.ui:504 src/res/ui/preferences.ui:66
 msgid "Tasks"
 msgstr ""
 
-#: src/res/ui/window.ui:501
+#: src/res/ui/window.ui:507
 msgid "Delete completed tasks"
 msgstr "Lösche abgeschlossene Aufgaben"
 
-#: src/res/ui/window.ui:519
+#: src/res/ui/window.ui:525
 msgid "translator-credits"
 msgstr "Christoph Bähr"
 
-#: src/res/ui/window.ui:554
+#: src/res/ui/window.ui:560
 msgid "Are you sure?"
 msgstr ""
 
-#: src/res/ui/window.ui:555
+#: src/res/ui/window.ui:561
 msgid "Tasks will be permanently deleted"
 msgstr ""
 
-#: src/res/ui/window.ui:560 src/res/ui/task.ui:327
+#: src/res/ui/window.ui:566 src/res/ui/task.ui:327
 msgid "Cancel"
 msgstr "Abbrechen"
 
-#: src/res/ui/window.ui:561 src/res/ui/task.ui:13
+#: src/res/ui/window.ui:567 src/res/ui/task.ui:13
 msgid "Delete"
 msgstr "Löschen"
 
-#: src/res/ui/window.ui:569
+#: src/res/ui/window.ui:575
 msgid "Copied to Clipboard"
 msgstr "Zur Zwischenablage kopiert"
 
-#: src/res/ui/window.ui:574
+#: src/res/ui/window.ui:580
 msgid "Tasks Exported"
 msgstr "Aufgaben exportiert"
 
-#: src/res/ui/window.ui:579
+#: src/res/ui/window.ui:585
 msgid "Tasks Imported"
 msgstr "Aufgaben importiert"
 
-#: src/res/ui/window.ui:584
+#: src/res/ui/window.ui:590
 msgid "Error occurred"
 msgstr "Fehler"
 
-#: src/res/ui/window.ui:585
+#: src/res/ui/window.ui:591
 msgid "Open log"
 msgstr "Öffne das Log"
 
@@ -181,6 +181,10 @@ msgstr "Hell"
 #: src/res/ui/preferences.ui:48
 msgid "Dark"
 msgstr "Dunkel"
+
+#: src/res/ui/preferences.ui:71
+msgid "Expand Sub-Tasks on Startup"
+msgstr ""
 
 #: src/res/ui/task.ui:17
 msgid "Edit"

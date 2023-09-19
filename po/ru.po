@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 13:37+0300\n"
+"POT-Creation-Date: 2023-09-19 19:01+0300\n"
 "PO-Revision-Date: 2023-07-07 16:56+0300\n"
 "Last-Translator: Vlad Krupinski <mrvladus@yandex.ru>\n"
 "Language-Team: \n"
@@ -19,7 +19,7 @@ msgstr ""
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Generator: Poedit 3.3.1\n"
 
-#: src/window.py:259 src/task.py:167 src/res/ui/window.ui:225
+#: src/window.py:249 src/task.py:163 src/res/ui/window.ui:225
 #: src/res/ui/task.ui:118
 msgid "Completed:"
 msgstr "Выполнено:"
@@ -80,7 +80,7 @@ msgstr "Экспорт задач..."
 msgid "Import Tasks..."
 msgstr "Импорт задач..."
 
-#: src/res/ui/window.ui:430
+#: src/res/ui/window.ui:430 src/res/ui/window.ui:469
 msgid "Preferences"
 msgstr "Параметры"
 
@@ -104,67 +104,67 @@ msgstr "Показать комбинации клавиш"
 msgid "Toggle sidebar"
 msgstr "Переключить боковую панель"
 
-#: src/res/ui/window.ui:469
+#: src/res/ui/window.ui:475
 msgid "Quit"
 msgstr "Выход"
 
-#: src/res/ui/window.ui:479
+#: src/res/ui/window.ui:485
 msgid "Import and Export"
 msgstr "Импорт и экспорт"
 
-#: src/res/ui/window.ui:482
+#: src/res/ui/window.ui:488
 msgid "Import tasks"
 msgstr "Импорт задач"
 
-#: src/res/ui/window.ui:488
+#: src/res/ui/window.ui:494
 msgid "Export tasks"
 msgstr "Экспорт задач"
 
-#: src/res/ui/window.ui:498
+#: src/res/ui/window.ui:504 src/res/ui/preferences.ui:66
 msgid "Tasks"
 msgstr "Задачи"
 
-#: src/res/ui/window.ui:501
+#: src/res/ui/window.ui:507
 msgid "Delete completed tasks"
 msgstr "Удалить выполненные задачи"
 
-#: src/res/ui/window.ui:519
+#: src/res/ui/window.ui:525
 msgid "translator-credits"
 msgstr "Vlad Krupinski <mrvladus@yandex.ru>"
 
-#: src/res/ui/window.ui:554
+#: src/res/ui/window.ui:560
 msgid "Are you sure?"
 msgstr "Вы уверены?"
 
-#: src/res/ui/window.ui:555
+#: src/res/ui/window.ui:561
 msgid "Tasks will be permanently deleted"
 msgstr "Задачи будут безвозвратно удалены"
 
-#: src/res/ui/window.ui:560 src/res/ui/task.ui:327
+#: src/res/ui/window.ui:566 src/res/ui/task.ui:327
 msgid "Cancel"
 msgstr "Отмена"
 
-#: src/res/ui/window.ui:561 src/res/ui/task.ui:13
+#: src/res/ui/window.ui:567 src/res/ui/task.ui:13
 msgid "Delete"
 msgstr "Удалить"
 
-#: src/res/ui/window.ui:569
+#: src/res/ui/window.ui:575
 msgid "Copied to Clipboard"
 msgstr "Скопировано в буфер обмена"
 
-#: src/res/ui/window.ui:574
+#: src/res/ui/window.ui:580
 msgid "Tasks Exported"
 msgstr "Экспорт завершен"
 
-#: src/res/ui/window.ui:579
+#: src/res/ui/window.ui:585
 msgid "Tasks Imported"
 msgstr "Импорт завершен"
 
-#: src/res/ui/window.ui:584
+#: src/res/ui/window.ui:590
 msgid "Error occurred"
 msgstr "Ошибка"
 
-#: src/res/ui/window.ui:585
+#: src/res/ui/window.ui:591
 msgid "Open log"
 msgstr "Открыть лог"
 
@@ -183,6 +183,10 @@ msgstr "Светлая"
 #: src/res/ui/preferences.ui:48
 msgid "Dark"
 msgstr "Темная"
+
+#: src/res/ui/preferences.ui:71
+msgid "Expand Sub-Tasks on Startup"
+msgstr "Раскрывать подзадачи при старте"
 
 #: src/res/ui/task.ui:17
 msgid "Edit"
@@ -225,3 +229,6 @@ msgstr "Управляйте своими задачами"
 #: data/io.github.mrvladus.List.desktop:12
 msgid "errands;tasks;list;todo;todos;"
 msgstr ""
+
+#~ msgid "Expand tasks that have sub-tasks"
+#~ msgstr "Раскрывать задачи, имеющие подзадачи"

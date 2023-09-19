@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 13:37+0300\n"
+"POT-Creation-Date: 2023-09-19 19:01+0300\n"
 "PO-Revision-Date: 2023-09-19 16:44+0200\n"
 "Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
 "Language-Team: Italian <LL@li.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.12.1\n"
 
-#: src/window.py:259 src/task.py:167 src/res/ui/window.ui:225
+#: src/window.py:249 src/task.py:163 src/res/ui/window.ui:225
 #: src/res/ui/task.ui:118
 msgid "Completed:"
 msgstr "Completato:"
@@ -79,7 +79,7 @@ msgstr "Esporta attività..."
 msgid "Import Tasks..."
 msgstr "Importa attività..."
 
-#: src/res/ui/window.ui:430
+#: src/res/ui/window.ui:430 src/res/ui/window.ui:469
 msgid "Preferences"
 msgstr "Preferenze"
 
@@ -103,67 +103,67 @@ msgstr "Mostra scorciatoie da tastiera"
 msgid "Toggle sidebar"
 msgstr "Attiva/Disattiva barra laterale"
 
-#: src/res/ui/window.ui:469
+#: src/res/ui/window.ui:475
 msgid "Quit"
 msgstr "Esci"
 
-#: src/res/ui/window.ui:479
+#: src/res/ui/window.ui:485
 msgid "Import and Export"
 msgstr "Importazione ed esportazione"
 
-#: src/res/ui/window.ui:482
+#: src/res/ui/window.ui:488
 msgid "Import tasks"
 msgstr "Importa attività"
 
-#: src/res/ui/window.ui:488
+#: src/res/ui/window.ui:494
 msgid "Export tasks"
 msgstr "Esporta attività"
 
-#: src/res/ui/window.ui:498
+#: src/res/ui/window.ui:504 src/res/ui/preferences.ui:66
 msgid "Tasks"
 msgstr "Attività"
 
-#: src/res/ui/window.ui:501
+#: src/res/ui/window.ui:507
 msgid "Delete completed tasks"
 msgstr "Elimina le attività completate"
 
-#: src/res/ui/window.ui:519
+#: src/res/ui/window.ui:525
 msgid "translator-credits"
 msgstr "Albano Battistella <albanobattistella@gmail.com>"
 
-#: src/res/ui/window.ui:554
+#: src/res/ui/window.ui:560
 msgid "Are you sure?"
 msgstr "Sei sicuro?"
 
-#: src/res/ui/window.ui:555
+#: src/res/ui/window.ui:561
 msgid "Tasks will be permanently deleted"
 msgstr "Le attività verranno eliminate definitivamente"
 
-#: src/res/ui/window.ui:560 src/res/ui/task.ui:327
+#: src/res/ui/window.ui:566 src/res/ui/task.ui:327
 msgid "Cancel"
 msgstr "Annulla"
 
-#: src/res/ui/window.ui:561 src/res/ui/task.ui:13
+#: src/res/ui/window.ui:567 src/res/ui/task.ui:13
 msgid "Delete"
 msgstr "Cancella"
 
-#: src/res/ui/window.ui:569
+#: src/res/ui/window.ui:575
 msgid "Copied to Clipboard"
 msgstr "Copiato negli appunti"
 
-#: src/res/ui/window.ui:574
+#: src/res/ui/window.ui:580
 msgid "Tasks Exported"
 msgstr "Attività esportate"
 
-#: src/res/ui/window.ui:579
+#: src/res/ui/window.ui:585
 msgid "Tasks Imported"
 msgstr "Attività importate"
 
-#: src/res/ui/window.ui:584
+#: src/res/ui/window.ui:590
 msgid "Error occurred"
 msgstr "Si è verificato un errore"
 
-#: src/res/ui/window.ui:585
+#: src/res/ui/window.ui:591
 msgid "Open log"
 msgstr "Apri log"
 
@@ -182,6 +182,10 @@ msgstr "Chiaro"
 #: src/res/ui/preferences.ui:48
 msgid "Dark"
 msgstr "Scuro"
+
+#: src/res/ui/preferences.ui:71
+msgid "Expand Sub-Tasks on Startup"
+msgstr ""
 
 #: src/res/ui/task.ui:17
 msgid "Edit"
