@@ -229,6 +229,3 @@ msgstr "Управляйте своими задачами"
 #: data/io.github.mrvladus.List.desktop:12
 msgid "errands;tasks;list;todo;todos;"
 msgstr ""
-
-#~ msgid "Expand tasks that have sub-tasks"
-#~ msgstr "Раскрывать задачи, имеющие подзадачи"
