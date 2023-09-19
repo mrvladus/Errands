@@ -13,6 +13,7 @@ install_data(
   [
   'application.py',
   'preferences.py',
+  'sync.py',
   'task.py',
   'utils.py',
   'window.py',
