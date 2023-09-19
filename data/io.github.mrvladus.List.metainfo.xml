@@ -51,6 +51,18 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="44.7.6" date="2023-09-21">
+      <description translatable="no">
+        <p>UI/UX:</p>
+        <ul>
+          <li>Added setting to expand Tasks on startup</li>
+        </ul>
+        <p>Translations:</p>
+        <ul>
+          <li>Updated Italian translation (Albano Battistella)</li>
+        </ul>
+      </description>
+    </release>
     <release version="44.7.5" date="2023-09-19">
       <description translatable="no">
         <p>UI/UX:</p>

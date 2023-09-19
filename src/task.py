@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 from gi.repository import Gtk, Adw, Gdk, GObject, Gio
-from .utils import Log, Markup, TaskUtils, UserData, get_children
+from .utils import GSettings, Log, Markup, TaskUtils, UserData, get_children
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/Errands/task.ui")
@@ -105,7 +105,7 @@ class Task(Gtk.Revealer):
             if task["parent"] == self.task["id"]:
                 sub_count += 1
                 self.add_sub_task(task)
-        self.expand(sub_count > 0)
+        self.expand(sub_count > 0 and GSettings.get("expand-on-startup"))
         self.update_status()
         self.window.update_status()
 

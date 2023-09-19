@@ -60,6 +60,28 @@
           </object>
         </child>
 
+        <!-- Tasks -->
+        <child>
+          <object class="AdwPreferencesGroup">
+            <property name="title" translatable="yes">Tasks</property>
+
+            <!-- Expand on startup -->
+            <child>
+              <object class="AdwActionRow">
+                <property name="title" translatable="yes">Expanded on Startup</property>
+                <property name="subtitle" translatable="yes">Expand tasks that have sub-tasks</property>
+                <property name="activatable-widget">expand_on_startup</property>
+                <child type="suffix">
+                  <object class="GtkSwitch" id="expand_on_startup">
+                    <property name="valign">center</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+
+          </object>
+        </child>
+
       </object>
     </child>
   </template>

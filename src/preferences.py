@@ -30,9 +30,12 @@ class PreferencesWindow(Adw.PreferencesWindow):
     system_theme: Gtk.CheckButton = Gtk.Template.Child()
     light_theme: Gtk.CheckButton = Gtk.Template.Child()
     dark_theme: Gtk.CheckButton = Gtk.Template.Child()
+    expand_on_startup: Gtk.Switch = Gtk.Template.Child()
 
     def __init__(self, win: Adw.ApplicationWindow) -> None:
         super().__init__(transient_for=win)
+        # Setup expand
+        GSettings.bind("expand-on-startup", self.expand_on_startup, "active")
         # Setup theme
         theme: int = GSettings.get("theme")
         if theme == 0:
