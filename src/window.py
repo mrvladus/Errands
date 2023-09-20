@@ -79,7 +79,6 @@ class Window(Adw.ApplicationWindow):
         if PROFILE == "development":
             self.add_css_class("devel")
         self.create_actions()
-        Sync.init()
         self.load_tasks()
 
     def add_task(self, task: dict) -> None:
@@ -200,14 +199,14 @@ class Window(Adw.ApplicationWindow):
 
     def load_tasks(self) -> None:
         Log.debug("Loading tasks")
-
+        Sync.init()
+        Sync.sync()
         count: int = 0
         data: dict = UserData.get()
         for task in data["tasks"]:
             self.add_task(task)
             if not task["deleted"]:
                 count += 1
-
         self.update_status()
 
     def trash_add(self, task: dict) -> None:
