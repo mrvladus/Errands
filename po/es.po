@@ -1,34 +1,37 @@
-# SOME DESCRIPTIVE TITLE.
+# Spanish translation for Errands.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the errands package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+# Sergio Varela <sergiovg01@outlook.com>, 2023.
+# Ian Jose Ferrero <ferreroianjose@outlook.com.ar>, 2023
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-19 19:01+0300\n"
-"PO-Revision-Date: 2023-09-16 14:03-0300\n"
-"Last-Translator: Ian Jose Ferrero <ferreroianjose@outlook.com.ar>\n"
-"Language-Team: \n"
-"Language: es\n"
+"PO-Revision-Date: 2023-09-19 21:07+0200\n"
+"Last-Translator: Sergio Varela <sergiovg01@outlook.com>\n"
+"Language-Team: Spanish - Spain <sergiovg01@outlook.com>\n"
+"Language: es_ES\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.3.1\n"
+"X-Generator: Gtranslator 42.0\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: src/window.py:249 src/task.py:163 src/res/ui/window.ui:225
 #: src/res/ui/task.ui:118
 msgid "Completed:"
-msgstr ""
+msgstr "Completado:"
 
 #: src/res/ui/window.ui:41
 msgid "Move to Trash"
-msgstr "Mover a la Papelera"
+msgstr "Mover a la papelera"
 
 #: src/res/ui/window.ui:67
 msgid "Deleted Tasks"
-msgstr "Tareas Eliminadas"
+msgstr "Tareas eliminadas"
 
 #: src/res/ui/window.ui:79 src/res/ui/window.ui:82
 msgid "Clear"
@@ -40,27 +43,27 @@ msgstr "Restaurar todas"
 
 #: src/res/ui/window.ui:116 src/res/ui/window.ui:118
 msgid "Close Trash"
-msgstr "Cerrar Papelera"
+msgstr "Cerrar papelera"
 
 #: src/res/ui/window.ui:145
 msgid "Empty Trash"
-msgstr "Papelera Vacía"
+msgstr "Papelera vacía"
 
 #: src/res/ui/window.ui:146
 msgid "No deleted items"
-msgstr "No hay ítems eliminados"
+msgstr "No hay elementos eliminados"
 
 #: src/res/ui/window.ui:237 src/res/ui/window.ui:240
 msgid "Show Deleted Tasks"
-msgstr "Mostrar Tareas Eliminadas"
+msgstr "Mostrar tareas eliminadas"
 
 #: src/res/ui/window.ui:262 src/res/ui/window.ui:265
 msgid "Delete Completed Tasks (Ctrl+Delete)"
-msgstr "Eliminar Tareas Completadas (Ctrl+Delete)"
+msgstr "Eliminar tareas completadas (Ctrl+Delete)"
 
 #: src/res/ui/window.ui:290 src/res/ui/window.ui:292
 msgid "Main Menu"
-msgstr "Menú Principal"
+msgstr "Menú principal"
 
 #: src/res/ui/window.ui:306 src/res/ui/window.ui:309
 msgid "Scroll Up"
@@ -68,15 +71,15 @@ msgstr "Desplazarse hacia arriba"
 
 #: src/res/ui/window.ui:340
 msgid "Add new Task"
-msgstr "Añadir Nueva Tarea"
+msgstr "Añadir nueva tarea"
 
 #: src/res/ui/window.ui:420
 msgid "Export Tasks..."
-msgstr "Exportar Tareas..."
+msgstr "Exportar tareas..."
 
 #: src/res/ui/window.ui:424
 msgid "Import Tasks..."
-msgstr "Importar Tareas..."
+msgstr "Importar tareas..."
 
 #: src/res/ui/window.ui:430 src/res/ui/window.ui:469
 msgid "Preferences"
@@ -84,11 +87,11 @@ msgstr "Preferencias"
 
 #: src/res/ui/window.ui:434
 msgid "Keyboard Shortcuts"
-msgstr "Atajos de Teclado"
+msgstr "Atajos del teclado"
 
 #: src/res/ui/window.ui:438
 msgid "About Errands"
-msgstr "Sobre Errands"
+msgstr "Acerca de Errands"
 
 #: src/res/ui/window.ui:454
 msgid "General"
@@ -96,7 +99,7 @@ msgstr "General"
 
 #: src/res/ui/window.ui:457
 msgid "Show keyboard shortcuts"
-msgstr "Mostrar atajos de teclado"
+msgstr "Mostrar atajos del teclado"
 
 #: src/res/ui/window.ui:463
 msgid "Toggle sidebar"
@@ -108,7 +111,7 @@ msgstr "Salir"
 
 #: src/res/ui/window.ui:485
 msgid "Import and Export"
-msgstr "Importar y Exportar"
+msgstr "Importar y exportar"
 
 #: src/res/ui/window.ui:488
 msgid "Import tasks"
@@ -120,15 +123,15 @@ msgstr "Exportar tareas"
 
 #: src/res/ui/window.ui:504 src/res/ui/preferences.ui:66
 msgid "Tasks"
-msgstr ""
+msgstr "Tareas"
 
 #: src/res/ui/window.ui:507
 msgid "Delete completed tasks"
-msgstr "Eliminar Tareas Completadas"
+msgstr "Eliminar tareas completadas"
 
 #: src/res/ui/window.ui:525
 msgid "translator-credits"
-msgstr "translator-credits"
+msgstr "Sergio Varela"
 
 #: src/res/ui/window.ui:560
 msgid "Are you sure?"
@@ -148,19 +151,19 @@ msgstr "Eliminar"
 
 #: src/res/ui/window.ui:575
 msgid "Copied to Clipboard"
-msgstr "Copiado al Portapapeles"
+msgstr "Copiado al portapapeles"
 
 #: src/res/ui/window.ui:580
 msgid "Tasks Exported"
-msgstr "Tareas Exportadas"
+msgstr "Tareas exportadas"
 
 #: src/res/ui/window.ui:585
 msgid "Tasks Imported"
-msgstr "Tareas Importadas"
+msgstr "Tareas importadas"
 
 #: src/res/ui/window.ui:590
 msgid "Error occurred"
-msgstr "Ocurrió un error"
+msgstr "Se ha producido un error"
 
 #: src/res/ui/window.ui:591
 msgid "Open log"
@@ -168,7 +171,7 @@ msgstr "Abrir registros"
 
 #: src/res/ui/preferences.ui:14
 msgid "Application Theme"
-msgstr "Tema de la Aplicación"
+msgstr "Tema de la aplicación"
 
 #: src/res/ui/preferences.ui:19
 msgid "System"
@@ -184,7 +187,7 @@ msgstr "Oscuro"
 
 #: src/res/ui/preferences.ui:71
 msgid "Expand Sub-Tasks on Startup"
-msgstr ""
+msgstr "Expandir subtareas al inicio"
 
 #: src/res/ui/task.ui:17
 msgid "Edit"
@@ -196,11 +199,11 @@ msgstr "Copiar"
 
 #: src/res/ui/task.ui:136 src/res/ui/task.ui:139
 msgid "Mark as Completed"
-msgstr "Marcar como Completada"
+msgstr "Marcar como completada"
 
 #: src/res/ui/task.ui:186 src/res/ui/task.ui:189
 msgid "Clear style"
-msgstr "Limpiar Estilos"
+msgstr "Limpiar estilos"
 
 #: src/res/ui/task.ui:287 src/res/ui/task.ui:289
 msgid "Menu"
@@ -208,7 +211,7 @@ msgstr "Menú"
 
 #: src/res/ui/task.ui:360
 msgid "Add new Sub-Task"
-msgstr "Añadir Sub-Tarea"
+msgstr "Añadir subtarea"
 
 #: src/res/ui/trash_item.ui:20 src/res/ui/trash_item.ui:24
 msgid "Restore"
