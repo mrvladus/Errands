@@ -25,9 +25,11 @@ import os
 from gi.repository import Gio, Adw, Gtk, GLib
 from __main__ import VERSION, PROFILE, APP_ID
 
-from .utils import Animate, GSettings, Log, TaskUtils, UserData, get_children
+
 from .preferences import PreferencesWindow
+from .sync import Sync
 from .task import Task
+from .utils import Animate, GSettings, Log, TaskUtils, UserData, get_children
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/Errands/window.ui")
@@ -77,6 +79,7 @@ class Window(Adw.ApplicationWindow):
         if PROFILE == "development":
             self.add_css_class("devel")
         self.create_actions()
+        Sync.init()
         self.load_tasks()
 
     def add_task(self, task: dict) -> None:

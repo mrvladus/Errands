@@ -31,19 +31,32 @@ class PreferencesWindow(Adw.PreferencesWindow):
     light_theme: Gtk.CheckButton = Gtk.Template.Child()
     dark_theme: Gtk.CheckButton = Gtk.Template.Child()
     expand_on_startup: Gtk.Switch = Gtk.Template.Child()
+    nc_enabled: Adw.ExpanderRow = Gtk.Template.Child()
+    nc_url: Adw.EntryRow = Gtk.Template.Child()
+    nc_username: Adw.EntryRow = Gtk.Template.Child()
+    nc_password: Adw.PasswordEntryRow = Gtk.Template.Child()
+    td_enabled: Adw.ExpanderRow = Gtk.Template.Child()
+    td_token: Adw.PasswordEntryRow = Gtk.Template.Child()
 
     def __init__(self, win: Adw.ApplicationWindow) -> None:
         super().__init__(transient_for=win)
-        # Setup expand
-        GSettings.bind("expand-on-startup", self.expand_on_startup, "active")
         # Setup theme
         theme: int = GSettings.get("theme")
         if theme == 0:
             self.system_theme.props.active = True
-        if theme == 1:
+        elif theme == 1:
             self.light_theme.props.active = True
-        if theme == 4:
+        elif theme == 4:
             self.dark_theme.props.active = True
+        # Setup expand
+        GSettings.bind("expand-on-startup", self.expand_on_startup, "active")
+        # Setup sync
+        GSettings.bind("nc-enabled", self.nc_enabled, "enable-expansion")
+        GSettings.bind("nc-url", self.nc_url, "text")
+        GSettings.bind("nc-username", self.nc_username, "text")
+        GSettings.bind("nc-password", self.nc_password, "text")
+        GSettings.bind("td-enabled", self.td_enabled, "enable-expansion")
+        GSettings.bind("td-token", self.td_token, "text")
 
     # --- Template handlers --- #
 

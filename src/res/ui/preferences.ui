@@ -81,6 +81,64 @@
           </object>
         </child>
 
+        <!-- Sync -->
+        <child>
+          <object class="AdwPreferencesGroup">
+            <property name="title" translatable="yes">Sync</property>
+
+            <!-- Nextcloud -->
+            <child>
+              <object class="AdwExpanderRow" id="nc_enabled">
+                <property name="title" translatable="yes">Nextcloud</property>
+                <property name="show-enable-switch">true</property>
+
+                <!-- URL -->
+                <child>
+                  <object class="AdwEntryRow" id="nc_url">
+                    <property name="title" translatable="yes">Server URL</property>
+
+                  </object>
+                </child>
+
+                <!-- Username -->
+                <child>
+                  <object class="AdwEntryRow" id="nc_username">
+                    <property name="title" translatable="yes">Username</property>
+
+                  </object>
+                </child>
+
+                <!-- Password -->
+                <child>
+                  <object class="AdwPasswordEntryRow" id="nc_password">
+                    <property name="title" translatable="yes">Password</property>
+
+                  </object>
+                </child>
+
+              </object>
+            </child>
+
+            <!-- Todoist -->
+            <child>
+              <object class="AdwExpanderRow" id="td_enabled">
+                <property name="title" translatable="yes">Todoist</property>
+                <property name="show-enable-switch">true</property>
+
+                <!-- Token -->
+                <child>
+                  <object class="AdwPasswordEntryRow" id="td_token">
+                    <property name="title" translatable="yes">Token</property>
+
+                  </object>
+                </child>
+
+              </object>
+            </child>
+
+          </object>
+        </child>
+
       </object>
     </child>
   </template>

@@ -19,5 +19,23 @@
     <key name="expand-on-startup" type="b">
       <default>true</default>
     </key>
+    <key name="nc-enabled" type="b">
+      <default>false</default>
+    </key>
+    <key name="nc-url" type="s">
+      <default>""</default>
+    </key>
+    <key name="nc-username" type="s">
+      <default>""</default>
+    </key>
+    <key name="nc-password" type="s">
+      <default>""</default>
+    </key>
+    <key name="td-enabled" type="b">
+      <default>false</default>
+    </key>
+    <key name="td-token" type="s">
+      <default>""</default>
+    </key>
   </schema>
 </schemalist>
