@@ -1,0 +1,229 @@
+# Occitan translation.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the errands package.
+# Quentin PAGÈS, 2023.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: errands\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-09-19 19:01+0300\n"
+"PO-Revision-Date: 2023-09-21 20:23+0200\n"
+"Last-Translator: Quentin PAGÈS\n"
+"Language-Team: \n"
+"Language: oc\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.3.2\n"
+
+#: src/window.py:249 src/task.py:163 src/res/ui/window.ui:225
+#: src/res/ui/task.ui:118
+msgid "Completed:"
+msgstr "Acabat :"
+
+#: src/res/ui/window.ui:41
+msgid "Move to Trash"
+msgstr "Desplaçar al bordilhièr"
+
+#: src/res/ui/window.ui:67
+msgid "Deleted Tasks"
+msgstr "Prètzfaches suprimits"
+
+#: src/res/ui/window.ui:79 src/res/ui/window.ui:82
+msgid "Clear"
+msgstr "Escafar"
+
+#: src/res/ui/window.ui:97 src/res/ui/window.ui:100
+msgid "Restore All"
+msgstr "Tot restaurar"
+
+#: src/res/ui/window.ui:116 src/res/ui/window.ui:118
+msgid "Close Trash"
+msgstr "Barrar lo bordilhièr"
+
+#: src/res/ui/window.ui:145
+msgid "Empty Trash"
+msgstr "Voidar lo bordilhièr"
+
+#: src/res/ui/window.ui:146
+msgid "No deleted items"
+msgstr "Cap d’element pas suprimit"
+
+#: src/res/ui/window.ui:237 src/res/ui/window.ui:240
+msgid "Show Deleted Tasks"
+msgstr "Mostrar los prètzfaches suprimits"
+
+#: src/res/ui/window.ui:262 src/res/ui/window.ui:265
+msgid "Delete Completed Tasks (Ctrl+Delete)"
+msgstr "Suprimir los prètzfaches acabats (Ctrl+Sup.)"
+
+#: src/res/ui/window.ui:290 src/res/ui/window.ui:292
+msgid "Main Menu"
+msgstr "Menú principal"
+
+#: src/res/ui/window.ui:306 src/res/ui/window.ui:309
+msgid "Scroll Up"
+msgstr "Desfilar cap amont"
+
+#: src/res/ui/window.ui:340
+msgid "Add new Task"
+msgstr "Apondre un prètzfach novèl"
+
+#: src/res/ui/window.ui:420
+msgid "Export Tasks..."
+msgstr "Exportar los prètzfaches"
+
+#: src/res/ui/window.ui:424
+msgid "Import Tasks..."
+msgstr "Importar los prètzfaches..."
+
+#: src/res/ui/window.ui:430 src/res/ui/window.ui:469
+msgid "Preferences"
+msgstr "Preferéncias"
+
+#: src/res/ui/window.ui:434
+msgid "Keyboard Shortcuts"
+msgstr "Acorchis de clavièr"
+
+#: src/res/ui/window.ui:438
+msgid "About Errands"
+msgstr "A prepaus d’Errands"
+
+#: src/res/ui/window.ui:454
+msgid "General"
+msgstr "General"
+
+#: src/res/ui/window.ui:457
+msgid "Show keyboard shortcuts"
+msgstr "Mostrar los acorchis clavièr"
+
+#: src/res/ui/window.ui:463
+msgid "Toggle sidebar"
+msgstr "Afichar o amagar lo panèl lateral"
+
+#: src/res/ui/window.ui:475
+msgid "Quit"
+msgstr "Quitar"
+
+#: src/res/ui/window.ui:485
+msgid "Import and Export"
+msgstr "Impòrt e Expòrt"
+
+#: src/res/ui/window.ui:488
+msgid "Import tasks"
+msgstr "Importar prètzfaches"
+
+#: src/res/ui/window.ui:494
+msgid "Export tasks"
+msgstr "Exportar prètzfaches"
+
+#: src/res/ui/window.ui:504 src/res/ui/preferences.ui:66
+msgid "Tasks"
+msgstr "Prètzfaches"
+
+#: src/res/ui/window.ui:507
+msgid "Delete completed tasks"
+msgstr "Suprimir los prètzfaches acabats"
+
+#: src/res/ui/window.ui:525
+msgid "translator-credits"
+msgstr "Quentin PAGÈS"
+
+#: src/res/ui/window.ui:560
+msgid "Are you sure?"
+msgstr "Ne sètz segur ?"
+
+#: src/res/ui/window.ui:561
+msgid "Tasks will be permanently deleted"
+msgstr "Los prètzfaches seràn definitivament suprimits"
+
+#: src/res/ui/window.ui:566 src/res/ui/task.ui:327
+msgid "Cancel"
+msgstr "Anullar"
+
+#: src/res/ui/window.ui:567 src/res/ui/task.ui:13
+msgid "Delete"
+msgstr "Suprimir"
+
+#: src/res/ui/window.ui:575
+msgid "Copied to Clipboard"
+msgstr "Copiat al quichapapièrs"
+
+#: src/res/ui/window.ui:580
+msgid "Tasks Exported"
+msgstr "Prètzfaches exportats"
+
+#: src/res/ui/window.ui:585
+msgid "Tasks Imported"
+msgstr "Prètzfaches importats"
+
+#: src/res/ui/window.ui:590
+msgid "Error occurred"
+msgstr "Una error s'es producha"
+
+#: src/res/ui/window.ui:591
+msgid "Open log"
+msgstr "Dobrir los jornals d’audit"
+
+#: src/res/ui/preferences.ui:14
+msgid "Application Theme"
+msgstr "Tèma de l’aplicacion"
+
+#: src/res/ui/preferences.ui:19
+msgid "System"
+msgstr "Sistèma"
+
+#: src/res/ui/preferences.ui:33
+msgid "Light"
+msgstr "Clar"
+
+#: src/res/ui/preferences.ui:48
+msgid "Dark"
+msgstr "Fosc"
+
+#: src/res/ui/preferences.ui:71
+msgid "Expand Sub-Tasks on Startup"
+msgstr "Espandir la lista dels prètzfaches a l’aviada"
+
+#: src/res/ui/task.ui:17
+msgid "Edit"
+msgstr "Modificar"
+
+#: src/res/ui/task.ui:21
+msgid "Copy"
+msgstr "Copiar"
+
+#: src/res/ui/task.ui:136 src/res/ui/task.ui:139
+msgid "Mark as Completed"
+msgstr "Marcar coma acabat"
+
+#: src/res/ui/task.ui:186 src/res/ui/task.ui:189
+msgid "Clear style"
+msgstr "Estil clar"
+
+#: src/res/ui/task.ui:287 src/res/ui/task.ui:289
+msgid "Menu"
+msgstr "Menú"
+
+#: src/res/ui/task.ui:360
+msgid "Add new Sub-Task"
+msgstr "Apondre un jos prètzfach"
+
+#: src/res/ui/trash_item.ui:20 src/res/ui/trash_item.ui:24
+msgid "Restore"
+msgstr "Restablir"
+
+#. TRANSLATORS: Don't translate
+#: data/io.github.mrvladus.List.desktop:4
+msgid "Errands"
+msgstr "Errands"
+
+#: data/io.github.mrvladus.List.desktop:5
+msgid "Manage your tasks"
+msgstr "Gerir vòstres prètzfaches"
+
+#. TRANSLATORS: Don't translate
+#: data/io.github.mrvladus.List.desktop:12
+msgid "errands;tasks;list;todo;todos;"
+msgstr "errands;tasks;list;todo;todos;prètzfaches;prètzfait;lista;tièra;"
