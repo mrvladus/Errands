@@ -39,65 +39,94 @@ class SyncProviderNextcloud:
             return
 
         self.connect()
-        self.get_tasks()
 
     def connect(self) -> None:
-        Log.debug(f"Connecting to Nextcloud at '{self.url}' as user '{self.username}'")
+        Log.info(f"Connecting to Nextcloud at '{self.url}' as user '{self.username}'")
         self.api: NextcloudTasksApi = get_nextcloud_tasks_api(
             self.url, self.username, self.password
         )
+        try:
+            self.errands_task_list = None
+            for task_list in self.api.get_lists():
+                if task_list.name == "Errands":
+                    self.errands_task_list = task_list
+
+            if not self.errands_task_list:
+                Log.debug("Creating new list 'Errands'")
+                self.errands_task_list = self.api.create_list("Errands")
+
+            Log.info("Connected to Nextcloud")
+        except:
+            Log.error("Can't connect to Nextcloud server")
+            return None
 
     def get_tasks(self) -> list[TaskFile] | None:
         try:
-            tasks: list[TaskFile] = []
-            for task_list in self.api.get_lists():
-                for task in self.api.get_list(task_list):
-                    tasks.append(task)
-                    # data = Task(task.content).data
-                    # print(data.find_value("STATUS"))
-                    print(task.content)
-            return tasks
+            return [task for task in self.api.get_list(self.errands_task_list)]
         except:
             Log.error("Can't connect to Nextcloud server")
             return None
 
     def sync(self) -> None:
-        # Get local tasks
-        data: dict = UserData.get()
-        # Get local tasks ids
-        l_ids: list = [task["id"] for task in data["tasks"]]
-        # Get server tasks
-        for task in self.get_tasks():
-            task_obj: Task = Task(task.content)
-            # Add new task to local tasks
-            if task_obj.uid not in l_ids:
-                new_task: dict = TaskUtils.new_task(
-                    task_obj.summary,
-                    task_obj.uid,
-                    task_obj.related_to if task_obj.related_to else "",
-                    True
-                    if task_obj.data.find_value("STATUS") == "COMPLETED"
-                    else False,
-                )
-                data["tasks"].append(new_task)
-            # Update existing task
-            else:
-                # Get local task with same id
-                task_to_upd: dict
-                for t in data["tasks"]:
-                    if t["id"] == task_obj.uid:
-                        task_to_upd = t
-                        break
-                # Sync its values
-                task_to_upd["text"] = task_obj.summary
-                task_to_upd["completed"] = (
-                    True if task_obj.data.find_value("STATUS") == "COMPLETED" else False
-                )
-                task_to_upd["parent"] = (
-                    task_obj.related_to if task_obj.related_to else ""
-                )
+        Log.info("Sync tasks with Nextcloud")
 
-        UserData.set(data)
+        def from_user_to_nc():
+            # Get local tasks
+            data: dict = UserData.get()
+            # Get NC tasks ids
+            nc_ids: list[str] = [Task(t.content).uid for t in self.get_tasks()]
+            for task in data["tasks"]:
+                # Create new task
+                if task["id"] not in nc_ids:
+                    new_task = Task()
+                    new_task.uid = task["id"]
+                    new_task.summary = task["text"]
+                    new_task.related_to = task["parent"]
+                    if task["completed"]:
+                        new_task.data.upsert_value("STATUS", "COMPLETED")
+                    self.api.create(self.errands_task_list, new_task.to_string())
+
+        def from_nc_to_user():
+            # Get local tasks
+            data: dict = UserData.get()
+            # Get local tasks ids
+            l_ids: list[str] = [task["id"] for task in data["tasks"]]
+            # Get server tasks
+            for task in self.get_tasks():
+                task_obj: Task = Task(task.content)
+                # Add new task to local tasks
+                if task_obj.uid not in l_ids:
+                    new_task: dict = TaskUtils.new_task(
+                        task_obj.summary,
+                        task_obj.uid,
+                        task_obj.related_to if task_obj.related_to else "",
+                        True
+                        if task_obj.data.find_value("STATUS") == "COMPLETED"
+                        else False,
+                    )
+                    data["tasks"].append(new_task)
+                # Update existing task
+                else:
+                    # Get local task with same id
+                    task_to_upd: dict
+                    for t in data["tasks"]:
+                        if t["id"] == task_obj.uid:
+                            task_to_upd = t
+                            break
+                    # Sync its values
+                    task_to_upd["text"] = task_obj.summary
+                    task_to_upd["completed"] = (
+                        True
+                        if task_obj.data.find_value("STATUS") == "COMPLETED"
+                        else False
+                    )
+                    task_to_upd["parent"] = (
+                        task_obj.related_to if task_obj.related_to else ""
+                    )
+            UserData.set(data)
+
+        from_nc_to_user()
+        from_user_to_nc()
 
 
 class SyncProviderTodoist:
