@@ -51,7 +51,7 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="44.7.6" date="2023-09-21">
+    <release version="44.7.6" date="2023-09-22">
       <description translatable="no">
         <p>UI/UX:</p>
         <ul>
@@ -59,7 +59,11 @@
         </ul>
         <p>Translations:</p>
         <ul>
+          <li>Added Polish translation (Szymon Zielonka)</li>
+          <li>Added Occitan translation (Quentin PAGÈS)</li>
           <li>Updated Italian translation (Albano Battistella)</li>
+          <li>Updated Dutch translation (Heimen Stoffels)</li>
+          <li>Updated Spanish translation (Ian Jose Ferrero)</li>
         </ul>
       </description>
     </release>
