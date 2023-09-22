@@ -2,8 +2,6 @@ from .utils import GSettings, Log, TaskUtils, UserData
 from nextcloud_tasks_api import NextcloudTasksApi, TaskFile, get_nextcloud_tasks_api
 from nextcloud_tasks_api.ical import Task
 
-from nextcloud_tasks_api.ical.ical import ICal
-
 
 class Sync:
     providers: list = []
@@ -73,18 +71,36 @@ class SyncProviderNextcloud:
         def from_user_to_nc():
             # Get local tasks
             data: dict = UserData.get()
+            # Get NC tasks
+            nc_tasks: list[TaskFile] = self.get_tasks()
             # Get NC tasks ids
-            nc_ids: list[str] = [Task(t.content).uid for t in self.get_tasks()]
+            nc_ids: list[str] = [Task(t.content).uid for t in nc_tasks]
+            print(nc_ids)
             for task in data["tasks"]:
                 # Create new task
                 if task["id"] not in nc_ids:
                     new_task = Task()
-                    new_task.uid = task["id"]
                     new_task.summary = task["text"]
                     new_task.related_to = task["parent"]
                     if task["completed"]:
                         new_task.data.upsert_value("STATUS", "COMPLETED")
-                    self.api.create(self.errands_task_list, new_task.to_string())
+                    created_task = self.api.create(
+                        self.errands_task_list, new_task.to_string()
+                    )
+                    task["id"] = Task(created_task.content).uid
+                # Update task data
+                # else:
+                #     updated_task = Task()
+                #     updated_task.summary = task["text"]
+                #     updated_task.related_to = task["parent"]
+                #     if task["completed"]:
+                #         updated_task.data.upsert_value("STATUS", "COMPLETED")
+                #     for nc_task in nc_tasks:
+                #         if Task(nc_task.content).uid == task["id"]:
+                #             nc_task.content = updated_task.to_string()
+                #             self.api.update(nc_task)
+                #             break
+            UserData.set(data)
 
         def from_nc_to_user():
             # Get local tasks
@@ -125,7 +141,7 @@ class SyncProviderNextcloud:
                     )
             UserData.set(data)
 
-        from_nc_to_user()
+        # from_nc_to_user()
         from_user_to_nc()
 
 

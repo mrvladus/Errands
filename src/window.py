@@ -339,6 +339,7 @@ class Window(Adw.ApplicationWindow):
         # Scroll to the end
         Animate.scroll(self.scrolled_window, True)
         self.update_status()
+        Sync.sync()
 
     @Gtk.Template.Callback()
     def on_toggle_trash_btn(self, btn: Gtk.ToggleButton) -> None:

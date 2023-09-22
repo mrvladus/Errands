@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 from gi.repository import Gtk, Adw, Gdk, GObject, Gio
+from .sync import Sync
 from .utils import GSettings, Log, Markup, TaskUtils, UserData, get_children
 
 
@@ -44,7 +45,7 @@ class Task(Gtk.Revealer):
 
     def __init__(self, task: dict, window: Adw.ApplicationWindow, parent=None) -> None:
         super().__init__()
-        Log.info(f"Add {'task' if not task['parent'] else 'sub-task'}: " + task["text"])
+        Log.info(f"Add {'task' if not task['parent'] else 'sub-task'}: " + task["id"])
         self.window = window
         self.parent = self.window if not parent else parent
         self.task: dict = task
@@ -117,7 +118,7 @@ class Task(Gtk.Revealer):
             self.main_box.add_css_class("task")
 
     def delete(self, *_) -> None:
-        Log.info(f"Delete task: {self.task['text']}")
+        Log.info(f"Delete task: {self.task['id']}")
 
         self.toggle_visibility(False)
         self.task["deleted"] = True
@@ -237,6 +238,7 @@ class Task(Gtk.Revealer):
         self.update_data()
         self.update_status()
         self.window.update_status()
+        Sync.sync()
 
     @Gtk.Template.Callback()
     def on_task_cancel_edit_btn_clicked(self, *_) -> None:
@@ -254,7 +256,7 @@ class Task(Gtk.Revealer):
         if new_text == old_text or new_text == "":
             return
         # Change task
-        Log.info(f"Change '{old_text}' to '{new_text}'")
+        Log.info(f"Edit: {self.task['id']}")
         # Set new text
         self.task["text"] = new_text
         # Escape text and find URL's'
@@ -265,6 +267,7 @@ class Task(Gtk.Revealer):
         self.update_data()
         # Exit edit mode
         self.toggle_edit_mode()
+        Sync.sync()
 
     @Gtk.Template.Callback()
     def on_style_selected(self, btn: Gtk.Button) -> None:
