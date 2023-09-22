@@ -1,0 +1,230 @@
+# Errands - Polish translate
+# Copyright (C) 2023
+# This file is distributed under the same license as the errands package.
+# Szymon Zielonka <szymon@zsdev.eu>, 2023.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: errands\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-09-19 19:01+0300\n"
+"PO-Revision-Date: 2023-09-21 22:01+0200\n"
+"Last-Translator: Szymon Zielonka <szymon@zsdev.eu>\n"
+"Language-Team: \n"
+"Language: pl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
+"X-Generator: Poedit 3.3.2\n"
+
+#: src/window.py:249 src/task.py:163 src/res/ui/window.ui:225
+#: src/res/ui/task.ui:118
+msgid "Completed:"
+msgstr "Ukończone:"
+
+#: src/res/ui/window.ui:41
+msgid "Move to Trash"
+msgstr "Przenieś do kosza"
+
+#: src/res/ui/window.ui:67
+msgid "Deleted Tasks"
+msgstr "Usunięte zadania"
+
+#: src/res/ui/window.ui:79 src/res/ui/window.ui:82
+msgid "Clear"
+msgstr "Wyczyść"
+
+#: src/res/ui/window.ui:97 src/res/ui/window.ui:100
+msgid "Restore All"
+msgstr "Odzyskaj wszystkie"
+
+#: src/res/ui/window.ui:116 src/res/ui/window.ui:118
+msgid "Close Trash"
+msgstr "Zamknij kosz"
+
+#: src/res/ui/window.ui:145
+msgid "Empty Trash"
+msgstr "Opróżnij kosz"
+
+#: src/res/ui/window.ui:146
+msgid "No deleted items"
+msgstr "Nie ma usuniętych zadań"
+
+#: src/res/ui/window.ui:237 src/res/ui/window.ui:240
+msgid "Show Deleted Tasks"
+msgstr "Pokaż usunięte zadania"
+
+#: src/res/ui/window.ui:262 src/res/ui/window.ui:265
+msgid "Delete Completed Tasks (Ctrl+Delete)"
+msgstr "Usuń zakończone zadania (Ctrl+Delete)"
+
+#: src/res/ui/window.ui:290 src/res/ui/window.ui:292
+msgid "Main Menu"
+msgstr "Menu główne"
+
+#: src/res/ui/window.ui:306 src/res/ui/window.ui:309
+msgid "Scroll Up"
+msgstr "Przenieś do góry"
+
+#: src/res/ui/window.ui:340
+msgid "Add new Task"
+msgstr "Dodaj nowe zadanie"
+
+#: src/res/ui/window.ui:420
+msgid "Export Tasks..."
+msgstr "Eksport zadań…"
+
+#: src/res/ui/window.ui:424
+msgid "Import Tasks..."
+msgstr "Import zadań…"
+
+#: src/res/ui/window.ui:430 src/res/ui/window.ui:469
+msgid "Preferences"
+msgstr "Ustawienia"
+
+#: src/res/ui/window.ui:434
+msgid "Keyboard Shortcuts"
+msgstr "Skróty klawiaturowe"
+
+#: src/res/ui/window.ui:438
+msgid "About Errands"
+msgstr "O Errands"
+
+#: src/res/ui/window.ui:454
+msgid "General"
+msgstr "Ogólne"
+
+#: src/res/ui/window.ui:457
+msgid "Show keyboard shortcuts"
+msgstr "Pokarz skróty klawiaturowe"
+
+#: src/res/ui/window.ui:463
+msgid "Toggle sidebar"
+msgstr "Przełącz pasek boczny"
+
+#: src/res/ui/window.ui:475
+msgid "Quit"
+msgstr "Zamknij"
+
+#: src/res/ui/window.ui:485
+msgid "Import and Export"
+msgstr "Import i eksport"
+
+#: src/res/ui/window.ui:488
+msgid "Import tasks"
+msgstr "Import zadań"
+
+#: src/res/ui/window.ui:494
+msgid "Export tasks"
+msgstr "Eksport zadań"
+
+#: src/res/ui/window.ui:504 src/res/ui/preferences.ui:66
+msgid "Tasks"
+msgstr "Zadania"
+
+#: src/res/ui/window.ui:507
+msgid "Delete completed tasks"
+msgstr "Usuń zakończone zadania"
+
+#: src/res/ui/window.ui:525
+msgid "translator-credits"
+msgstr "Szymon Zielonka <szymon@zsdev.eu>"
+
+#: src/res/ui/window.ui:560
+msgid "Are you sure?"
+msgstr "Jesteś pewien?"
+
+#: src/res/ui/window.ui:561
+msgid "Tasks will be permanently deleted"
+msgstr "Zadania zostaną usunięte"
+
+#: src/res/ui/window.ui:566 src/res/ui/task.ui:327
+msgid "Cancel"
+msgstr "Anuluj"
+
+#: src/res/ui/window.ui:567 src/res/ui/task.ui:13
+msgid "Delete"
+msgstr "Usuń"
+
+#: src/res/ui/window.ui:575
+msgid "Copied to Clipboard"
+msgstr "Skopiowano do schowka"
+
+#: src/res/ui/window.ui:580
+msgid "Tasks Exported"
+msgstr "Zadania wyeksportowane"
+
+#: src/res/ui/window.ui:585
+msgid "Tasks Imported"
+msgstr "Zadania zaimportowane"
+
+#: src/res/ui/window.ui:590
+msgid "Error occurred"
+msgstr "Wystąpił błąd"
+
+#: src/res/ui/window.ui:591
+msgid "Open log"
+msgstr "Otwórz log"
+
+#: src/res/ui/preferences.ui:14
+msgid "Application Theme"
+msgstr "Motyw aplikacji"
+
+#: src/res/ui/preferences.ui:19
+msgid "System"
+msgstr "System"
+
+#: src/res/ui/preferences.ui:33
+msgid "Light"
+msgstr "Jasny"
+
+#: src/res/ui/preferences.ui:48
+msgid "Dark"
+msgstr "Ciemny"
+
+#: src/res/ui/preferences.ui:71
+msgid "Expand Sub-Tasks on Startup"
+msgstr "Rozwiń podzadania przy uruchamianiu"
+
+#: src/res/ui/task.ui:17
+msgid "Edit"
+msgstr "Edytuj"
+
+#: src/res/ui/task.ui:21
+msgid "Copy"
+msgstr "Kopiuj"
+
+#: src/res/ui/task.ui:136 src/res/ui/task.ui:139
+msgid "Mark as Completed"
+msgstr "Oznacz jako ukończone"
+
+#: src/res/ui/task.ui:186 src/res/ui/task.ui:189
+msgid "Clear style"
+msgstr "Wyczyść styl"
+
+#: src/res/ui/task.ui:287 src/res/ui/task.ui:289
+msgid "Menu"
+msgstr "Menu"
+
+#: src/res/ui/task.ui:360
+msgid "Add new Sub-Task"
+msgstr "Dodaj nowe podzadanie"
+
+#: src/res/ui/trash_item.ui:20 src/res/ui/trash_item.ui:24
+msgid "Restore"
+msgstr "Przywróć"
+
+#. TRANSLATORS: Don't translate
+#: data/io.github.mrvladus.List.desktop:4
+msgid "Errands"
+msgstr ""
+
+#: data/io.github.mrvladus.List.desktop:5
+msgid "Manage your tasks"
+msgstr "Zarządzaj swoimi zadaniami"
+
+#. TRANSLATORS: Don't translate
+#: data/io.github.mrvladus.List.desktop:12
+msgid "errands;tasks;list;todo;todos;"
+msgstr ""
