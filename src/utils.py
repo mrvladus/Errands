@@ -238,6 +238,13 @@ class UserData:
                     f"Create data file at: {os.path.join(self.data_dir, 'data.json')}"
                 )
 
+    def _create_copy(self):
+        shutil.copy(
+            os.path.join(self.data_dir, "data.json"),
+            os.path.join(self.data_dir, "data.old.json"),
+        )
+        self.set(self.default_data)
+
     # Load user data from json
     @classmethod
     def get(self) -> dict:
@@ -254,11 +261,7 @@ class UserData:
             Log.error(
                 f"Data file is corrupted. Creating backup at {os.path.join(self.data_dir, 'data.old.json')}"
             )
-            shutil.copy(
-                os.path.join(self.data_dir, "data.json"),
-                os.path.join(self.data_dir, "data.old.json"),
-            )
-            self.set(self.default_data)
+            self._create_copy(self)
 
     # Save user data to json
     @classmethod
