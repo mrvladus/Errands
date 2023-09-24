@@ -13,6 +13,7 @@ class Sync:
 
     @classmethod
     def sync(self) -> None:
+        return
         for provider in self.providers:
             provider.sync()
 
