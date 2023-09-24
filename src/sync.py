@@ -69,13 +69,11 @@ class SyncProviderNextcloud:
         Log.info("Sync tasks with Nextcloud")
 
         def from_user_to_nc():
-            # Get local tasks
             data: dict = UserData.get()
-            # Get NC tasks
-            nc_tasks: list[TaskFile] = self.get_tasks()
-            # Get NC tasks ids
-            nc_ids: list[str] = [Task(t.content).uid for t in nc_tasks]
+            ids = [x["id"] for x in data["tasks"]]
+            nc_ids: list[str] = [Task(t.content).uid for t in self.get_tasks()]
             print(nc_ids)
+            print(ids)
             for task in data["tasks"]:
                 # Create new task
                 if task["id"] not in nc_ids:
@@ -84,22 +82,27 @@ class SyncProviderNextcloud:
                     new_task.related_to = task["parent"]
                     if task["completed"]:
                         new_task.data.upsert_value("STATUS", "COMPLETED")
+                    new_task.data.upsert_value("ERRANDS-COLOR", task["color"])
                     created_task = self.api.create(
                         self.errands_task_list, new_task.to_string()
                     )
                     task["id"] = Task(created_task.content).uid
-                # Update task data
-                # else:
-                #     updated_task = Task()
-                #     updated_task.summary = task["text"]
-                #     updated_task.related_to = task["parent"]
-                #     if task["completed"]:
-                #         updated_task.data.upsert_value("STATUS", "COMPLETED")
-                #     for nc_task in nc_tasks:
-                #         if Task(nc_task.content).uid == task["id"]:
-                #             nc_task.content = updated_task.to_string()
-                #             self.api.update(nc_task)
-                #             break
+                    nc_ids.append(task["id"])
+                # Udpdate existing task
+                else:
+                    updated_task = Task()
+                    updated_task.summary = task["text"]
+                    updated_task.related_to = task["parent"]
+                    if task["completed"]:
+                        updated_task.data.upsert_value("STATUS", "COMPLETED")
+                    updated_task.data.upsert_value("ERRANDS-COLOR", task["color"])
+                    for nc_task in self.get_tasks():
+                        if Task(nc_task.content).uid == task["id"]:
+                            print("Update", task["id"])
+                            nc_task.content = updated_task.to_string()
+                            self.api.update(nc_task)
+                            break
+
             UserData.set(data)
 
         def from_nc_to_user():
@@ -122,27 +125,27 @@ class SyncProviderNextcloud:
                     )
                     data["tasks"].append(new_task)
                 # Update existing task
-                else:
-                    # Get local task with same id
-                    task_to_upd: dict
-                    for t in data["tasks"]:
-                        if t["id"] == task_obj.uid:
-                            task_to_upd = t
-                            break
-                    # Sync its values
-                    task_to_upd["text"] = task_obj.summary
-                    task_to_upd["completed"] = (
-                        True
-                        if task_obj.data.find_value("STATUS") == "COMPLETED"
-                        else False
-                    )
-                    task_to_upd["parent"] = (
-                        task_obj.related_to if task_obj.related_to else ""
-                    )
+                # else:
+                #     # Get local task with same id
+                #     task_to_upd: dict
+                #     for t in data["tasks"]:
+                #         if t["id"] == task_obj.uid:
+                #             task_to_upd = t
+                #             break
+                #     # Sync its values
+                #     task_to_upd["text"] = task_obj.summary
+                #     task_to_upd["completed"] = (
+                #         True
+                #         if task_obj.data.find_value("STATUS") == "COMPLETED"
+                #         else False
+                #     )
+                #     task_to_upd["parent"] = (
+                #         task_obj.related_to if task_obj.related_to else ""
+                #     )
             UserData.set(data)
 
-        # from_nc_to_user()
-        from_user_to_nc()
+        from_nc_to_user()
+        # from_user_to_nc()
 
 
 class SyncProviderTodoist:

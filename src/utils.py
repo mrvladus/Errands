@@ -215,6 +215,7 @@ class TaskUtils:
             "color": "",
             "completed": cmpd,
             "deleted": dltd,
+            "synced": False,
         }
 
 
@@ -223,26 +224,33 @@ class UserData:
 
     data_dir: str = os.path.join(GLib.get_user_data_dir(), "list")
     default_data = {"version": VERSION, "tasks": []}
-    initialized: bool = False
+    validated: bool = False
 
-    @classmethod
-    def init(self) -> None:
-        Log.debug("Initialize user data")
+    def _create_file(self):
+        """
+        Create data file if not exists
+        """
 
-        # Create data file if not exists
         if not os.path.exists(os.path.join(self.data_dir, "data.json")):
             with open(os.path.join(self.data_dir, "data.json"), "w+") as f:
                 json.dump(self.default_data, f)
                 Log.debug(
                     f"Create data file at: {os.path.join(self.data_dir, 'data.json')}"
                 )
-        self.initialized = True
 
-        # Convert old formats
-        if self.get()["version"] != VERSION:
-            self.convert()
-        # Create new file if old is corrupted
-        if not self.validate(self.get()):
+    # Load user data from json
+    @classmethod
+    def get(self) -> dict:
+        self._create_file(self)
+        try:
+            with open(os.path.join(self.data_dir, "data.json"), "r") as f:
+                data: dict = json.load(f)
+                if data["version"] != VERSION:
+                    return self._convert(self, data)
+                if not self.validate(data):
+                    raise
+                return data
+        except:
             Log.error(
                 f"Data file is corrupted. Creating backup at {os.path.join(self.data_dir, 'data.old.json')}"
             )
@@ -251,20 +259,6 @@ class UserData:
                 os.path.join(self.data_dir, "data.old.json"),
             )
             self.set(self.default_data)
-
-    # Load user data from json
-    @classmethod
-    def get(self) -> dict:
-        if not self.initialized:
-            self.init()
-        try:
-            with open(os.path.join(self.data_dir, "data.json"), "r") as f:
-                data: dict = json.load(f)
-                return data
-        except json.JSONDecodeError:
-            Log.error(
-                f"Can't read data file at: {os.path.join(self.data_dir, 'data.json')}"
-            )
 
     # Save user data to json
     @classmethod
@@ -275,7 +269,11 @@ class UserData:
     # Validate data json
     @classmethod
     def validate(self, data: str | dict) -> bool:
+        if self.validated:
+            return True
+
         Log.debug("Validating data file")
+
         if type(data) == dict:
             val_data = data
         # Validate JSON
@@ -293,21 +291,31 @@ class UserData:
         # Validate tasks
         if val_data["tasks"]:
             for task in val_data["tasks"]:
-                for key in ["id", "parent", "text", "color", "completed", "deleted"]:
+                for key in [
+                    "id",
+                    "parent",
+                    "text",
+                    "color",
+                    "completed",
+                    "deleted",
+                    "synced",
+                ]:
                     if not key in task:
                         Log.error(
                             f"Data file is not valid. Key doesn't exists: '{key}'"
                         )
                         return False
         Log.debug("Data file is valid")
+        self.validated = True
         return True
 
-    # Port tasks from older versions (for updates)
-    @classmethod
-    def convert(self) -> None:
+    def _convert(self, data: dict) -> dict:
+        """
+        Port tasks from older versions (for updates)
+        """
+
         Log.debug("Converting data file")
 
-        data: dict = self.get()
         ver: str = data["version"]
 
         # Versions 44.6.x
@@ -321,6 +329,7 @@ class UserData:
                     "color": task["color"],
                     "completed": task["completed"],
                     "deleted": "history" in data and task["id"] in data["history"],
+                    "synced": False,
                 }
                 new_tasks.append(new_task)
                 if task["sub"] != []:
@@ -333,11 +342,17 @@ class UserData:
                             "completed": sub["completed"],
                             "deleted": "history" in data
                             and sub["id"] in data["history"],
+                            "synced": False,
                         }
                         new_tasks.append(new_sub)
             data["tasks"] = new_tasks
             if "history" in data:
                 del data["history"]
 
+        elif ver.startswith("44.7"):
+            for task in data["tasks"]:
+                task["synced"] = False
+
         data["version"] = VERSION
         UserData.set(data)
+        return data
