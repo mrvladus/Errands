@@ -70,6 +70,8 @@ class SyncProviderNextcloud:
 
         data: dict = UserData.get()
         nc_ids: list[str] = [Task(t.content).uid for t in self.get_tasks()]
+        to_delete: list[dict] = []
+
         for task in data["tasks"]:
             # Create new task on NC that was created offline
             if task["id"] not in nc_ids and not task["synced_nc"]:
@@ -87,7 +89,7 @@ class SyncProviderNextcloud:
 
             # Delete local task that was deleted on NC
             elif task["id"] not in nc_ids and task["synced_nc"]:
-                pass
+                to_delete.append(task)
 
             # Update task that was changed locally
             elif task["id"] in nc_ids and not task["synced_nc"]:
@@ -102,12 +104,39 @@ class SyncProviderNextcloud:
                         nc_task.content = updated_task.to_string()
                         self.api.update(nc_task)
                         break
+                task["synced_nc"] = True
 
             # Update task that was changed on NC
             elif task["id"] in nc_ids and task["synced_nc"]:
-                pass
+                for nc_task in self.get_tasks():
+                    task_obj = Task(nc_task.content)
+                    if task_obj.uid == task["id"]:
+                        task["text"] = task_obj.summary
+                        task["parent"] = task_obj.related_to
+                        task["completed"] = (
+                            task_obj.data.find_value("STATUS") == "COMPLETED"
+                        )
+                        task["color"] = task_obj.data.find_value("ERRANDS-COLOR")
+                        break
 
-            UserData.set(data)
+        # Remove deleted tasks from data
+        for task in to_delete:
+            data["tasks"].remove(task)
+
+        # Create new local task that was created on NC
+        l_ids: list = [t["id"] for t in data["tasks"]]
+        for task in nc_task:
+            task_obj = Task(nc_task.content)
+            if task_obj.uid not in l_ids:
+                new_task = TaskUtils.new_task(
+                    task_obj.summary,
+                    task_obj.uid,
+                    task_obj.related_to,
+                    task_obj.data.find_value("STATUS") == "COMPLETED",
+                )
+                data["tasks"].append(new_task)
+
+        UserData.set(data)
 
 
 class SyncProviderTodoist:
