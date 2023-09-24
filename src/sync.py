@@ -84,9 +84,11 @@ class SyncProviderNextcloud:
                 )
                 task["id"] = Task(created_task.content).uid
                 task["synced"] = True
+
             # Delete local task that was deleted on NC
             elif task["id"] not in nc_ids and task["synced_nc"]:
                 pass
+
             # Update task that was changed locally
             elif task["id"] in nc_ids and not task["synced_nc"]:
                 updated_task = Task()
@@ -100,6 +102,7 @@ class SyncProviderNextcloud:
                         nc_task.content = updated_task.to_string()
                         self.api.update(nc_task)
                         break
+
             # Update task that was changed on NC
             elif task["id"] in nc_ids and task["synced_nc"]:
                 pass
