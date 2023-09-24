@@ -21,6 +21,8 @@ class Sync:
 
 
 class SyncProviderNextcloud:
+    can_sync: bool = False
+
     def __init__(self) -> None:
         if not GSettings.get("nc-enabled"):
             Log.debug("Nextcloud sync disabled")
@@ -66,6 +68,7 @@ class SyncProviderNextcloud:
             return None
 
     def sync(self) -> None:
+        # TODO: can_sync property
         Log.info("Sync tasks with Nextcloud")
 
         data: dict = UserData.get()
