@@ -34,7 +34,7 @@ class Task(Gtk.Revealer):
     task_box_rev: Gtk.Revealer = Gtk.Template.Child()
     task_row: Adw.ActionRow = Gtk.Template.Child()
     expand_icon: Gtk.Image = Gtk.Template.Child()
-    task_completed_btn: Gtk.Button = Gtk.Template.Child()
+    completed_btn: Gtk.Button = Gtk.Template.Child()
     task_edit_entry: Gtk.Entry = Gtk.Template.Child()
     sub_tasks_revealer: Gtk.Revealer = Gtk.Template.Child()
     tasks_list: Gtk.Box = Gtk.Template.Child()
@@ -53,7 +53,7 @@ class Task(Gtk.Revealer):
         self.text = Markup.find_url(Markup.escape(self.task["text"]))
         self.task_row.props.title = self.text
         # Check if sub-task completed and toggle checkbox
-        self.task_completed_btn.props.active = self.task["completed"]
+        self.completed_btn.props.active = self.task["completed"]
         # Set accent color
         if self.task["color"] != "":
             self.main_box.add_css_class(f'task-{self.task["color"]}')
@@ -122,10 +122,7 @@ class Task(Gtk.Revealer):
 
         self.toggle_visibility(False)
         self.task["deleted"] = True
-        self.update_data()
-        if self.is_sub_task:
-            self.parent.update_status()
-        self.window.update_status()
+        self.completed_btn.props.active = True
         self.window.trash_add(self.task)
 
     def expand(self, expanded: bool) -> None:
@@ -181,7 +178,7 @@ class Task(Gtk.Revealer):
     # --- Template handlers --- #
 
     @Gtk.Template.Callback()
-    def on_task_completed_btn_toggled(self, btn: Gtk.Button) -> None:
+    def on_completed_btn_toggled(self, btn: Gtk.Button) -> None:
         """
         Toggle check button and add style to the text
         """
@@ -190,7 +187,7 @@ class Task(Gtk.Revealer):
         self.update_data()
 
         for task in get_children(self.tasks_list):
-            task.task_completed_btn.set_active(btn.props.active)
+            task.completed_btn.set_active(btn.props.active)
 
         # Update status
         if self.is_sub_task:
@@ -234,7 +231,7 @@ class Task(Gtk.Revealer):
         # Clear entry
         entry.get_buffer().props.text = ""
         # Update status
-        self.task_completed_btn.props.active = self.task["completed"] = False
+        self.completed_btn.props.active = self.task["completed"] = False
         self.update_data()
         self.update_status()
         self.window.update_status()
@@ -263,7 +260,7 @@ class Task(Gtk.Revealer):
         self.text = Markup.find_url(Markup.escape(self.task["text"]))
         self.task_row.props.title = self.text
         # Toggle checkbox
-        self.task_completed_btn.props.active = self.task["completed"] = False
+        self.completed_btn.props.active = self.task["completed"] = False
         self.update_data()
         # Exit edit mode
         self.toggle_edit_mode()

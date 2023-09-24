@@ -131,10 +131,10 @@
 
                         <!-- Mark as completed button -->
                         <child type="prefix">
-                          <object class="GtkCheckButton" id="task_completed_btn">
+                          <object class="GtkCheckButton" id="completed_btn">
                             <property name="valign">center</property>
                             <property name="tooltip-text" translatable="yes">Mark as Completed</property>
-                            <signal name="toggled" handler="on_task_completed_btn_toggled" />
+                            <signal name="toggled" handler="on_completed_btn_toggled" />
                             <accessibility>
                               <property name="label" translatable="yes">Mark as Completed</property>
                             </accessibility>

@@ -207,6 +207,7 @@ class TaskUtils:
         pid: str = "",
         cmpd: bool = False,
         dltd: bool = False,
+        synced: bool = False,
     ) -> dict:
         return {
             "id": self.generate_id() if not id else id,
@@ -215,7 +216,8 @@ class TaskUtils:
             "color": "",
             "completed": cmpd,
             "deleted": dltd,
-            "synced": False,
+            "synced_nc": synced,
+            "synced_td": synced,
         }
 
 
@@ -301,7 +303,8 @@ class UserData:
                     "color",
                     "completed",
                     "deleted",
-                    "synced",
+                    "synced_nc",
+                    "synced_td",
                 ]:
                     if not key in task:
                         Log.error(
@@ -332,7 +335,8 @@ class UserData:
                     "color": task["color"],
                     "completed": task["completed"],
                     "deleted": "history" in data and task["id"] in data["history"],
-                    "synced": False,
+                    "synced_nc": False,
+                    "synced_td": False,
                 }
                 new_tasks.append(new_task)
                 if task["sub"] != []:
@@ -345,7 +349,8 @@ class UserData:
                             "completed": sub["completed"],
                             "deleted": "history" in data
                             and sub["id"] in data["history"],
-                            "synced": False,
+                            "synced_nc": False,
+                            "synced_td": False,
                         }
                         new_tasks.append(new_sub)
             data["tasks"] = new_tasks
@@ -354,7 +359,8 @@ class UserData:
 
         elif ver.startswith("44.7"):
             for task in data["tasks"]:
-                task["synced"] = False
+                task["synced_nc"] = False
+                task["synced_td"] = False
 
         data["version"] = VERSION
         UserData.set(data)
