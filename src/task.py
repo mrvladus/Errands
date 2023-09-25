@@ -60,7 +60,7 @@ class Task(Gtk.Revealer):
         # Add to trash if needed
         if self.task["deleted"]:
             self.window.trash_add(self.task)
-        # Add to main task list
+        # Add self to main task list
         self.window.tasks.append(self)
         self.check_is_sub()
         self.add_sub_tasks()
@@ -122,8 +122,11 @@ class Task(Gtk.Revealer):
 
         self.toggle_visibility(False)
         self.task["deleted"] = True
+        self.update_data()
         self.completed_btn.props.active = True
         self.window.trash_add(self.task)
+        for task in get_children(self.tasks_list):
+            task.delete()
 
     def expand(self, expanded: bool) -> None:
         self.expanded = expanded
@@ -139,8 +142,8 @@ class Task(Gtk.Revealer):
         Completely remove widget
         """
 
-        self.window.tasks.remove(self)
         self.parent.tasks_list.remove(self)
+        self.window.tasks.remove(self)
 
     def toggle_edit_mode(self) -> None:
         self.task_box_rev.set_reveal_child(not self.task_box_rev.get_child_revealed())
@@ -183,17 +186,17 @@ class Task(Gtk.Revealer):
         Toggle check button and add style to the text
         """
 
+        # Update data
         self.task["completed"] = btn.props.active
         self.update_data()
-
+        # Update children
         for task in get_children(self.tasks_list):
             task.completed_btn.set_active(btn.props.active)
-
         # Update status
         if self.is_sub_task:
             self.parent.update_status()
         self.window.update_status()
-        # Set crosslined text
+        # Set text
         if btn.props.active:
             self.text = Markup.add_crossline(self.text)
             self.add_css_class("task-completed")
@@ -247,6 +250,7 @@ class Task(Gtk.Revealer):
         Edit task text
         """
 
+        # Get text
         old_text: str = self.task["text"]
         new_text: str = entry.get_buffer().props.text
         # Return if text the same or empty
@@ -312,7 +316,7 @@ class Task(Gtk.Revealer):
         return Gdk.ContentProvider.new_for_value(value)
 
     @Gtk.Template.Callback()
-    def on_task_top_drop(self, drop, task, _x, _y) -> bool:
+    def on_task_top_drop(self, _drop, task, _x, _y) -> bool:
         """
         When task is dropped on "+" area on top of task
         """
@@ -351,7 +355,7 @@ class Task(Gtk.Revealer):
         return True
 
     @Gtk.Template.Callback()
-    def on_drop(self, drop, task, _x, _y) -> None:
+    def on_drop(self, _drop, task, _x, _y) -> None:
         """
         When task is dropped on task and becomes sub-task
         """
@@ -380,6 +384,7 @@ class Task(Gtk.Revealer):
         sub_task = Task(task.task.copy(), self.window, self)
         self.tasks_list.append(sub_task)
         sub_task.toggle_visibility(True)
+        self.completed_btn.props.active = False
         # Update status
         task.parent.update_status()
         self.update_status()

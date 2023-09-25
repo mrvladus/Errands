@@ -193,9 +193,9 @@ class Window(Adw.ApplicationWindow):
         create_action("open_log", open_log)
 
     def load_tasks(self) -> None:
-        Log.debug("Loading tasks")
         Sync.init()
         Sync.sync()
+        Log.debug("Loading tasks")
         count: int = 0
         data: dict = UserData.get()
         for task in data["tasks"]:
