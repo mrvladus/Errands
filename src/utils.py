@@ -26,17 +26,34 @@ import re
 import shutil
 import uuid
 
+from typing import Callable
+from threading import Thread
 from gi.repository import GLib, Gio, Adw, Gtk
 from __main__ import VERSION, APP_ID
 
 
 def get_children(obj: Gtk.Widget) -> list[Gtk.Widget]:
+    """
+    Get list of widget's children
+    """
+
     children: list[Gtk.Widget] = []
     child: Gtk.Widget = obj.get_first_child()
     while child:
         children.append(child)
         child = child.get_next_sibling()
     return children
+
+
+def threaded(function: Callable):
+    """
+    Decorator to run function in thread.
+    """
+
+    def wrapper(*args, **kwargs):
+        Thread(target=function, args=args, kwargs=kwargs).start()
+
+    return wrapper
 
 
 class Animate:
