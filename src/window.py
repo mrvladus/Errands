@@ -63,6 +63,7 @@ class Window(Adw.ApplicationWindow):
     # - State - #
     scrolling: bool = False  # Is window scrolling
     tasks: list[Task] = []  # Task widgets list
+    can_sync: bool = True  # Can perform sync operations
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
@@ -193,7 +194,7 @@ class Window(Adw.ApplicationWindow):
         create_action("open_log", open_log)
 
     def load_tasks(self) -> None:
-        Sync.init()
+        Sync.init(self)
         Sync.sync()
         Log.debug("Loading tasks")
         count: int = 0

@@ -1,19 +1,25 @@
-from .utils import GSettings, Log, TaskUtils, UserData
+from gi.repository import Adw
+
+from .utils import GSettings, Log, TaskUtils, UserData, threaded
 from nextcloud_tasks_api import NextcloudTasksApi, TaskFile, get_nextcloud_tasks_api
 from nextcloud_tasks_api.ical import Task
 
 
 class Sync:
     providers: list = []
+    window: Adw.ApplicationWindow = None
 
     @classmethod
-    def init(self) -> None:
+    def init(self, window: Adw.ApplicationWindow) -> None:
+        self.window = window
         self.providers.append(SyncProviderNextcloud())
         # self.providers.append(SyncProviderTodoist())
 
+    # @threaded
     @classmethod
     def sync(self) -> None:
-        return
+        if not self.window.can_sync:
+            return
         for provider in self.providers:
             provider.sync()
 
@@ -22,7 +28,7 @@ class Sync:
 
 
 class SyncProviderNextcloud:
-    can_sync: bool = False
+    connected: bool = False
 
     def __init__(self) -> None:
         if not GSettings.get("nc-enabled"):
@@ -62,14 +68,19 @@ class SyncProviderNextcloud:
             return None
 
     def get_tasks(self) -> list[TaskFile] | None:
+        if not GSettings.get("nc-enabled"):
+            return
         try:
-            return [task for task in self.api.get_list(self.errands_task_list)]
+            Log.debug("Getting tasks from Nextcloud")
+            tasks = self.api.get_list(self.errands_task_list)
+            return [task for task in tasks]
         except:
             Log.error("Can't connect to Nextcloud server")
             return None
 
     def sync(self) -> None:
-        # TODO: can_sync property
+        if not GSettings.get("nc-enabled"):
+            return
         Log.info("Sync tasks with Nextcloud")
 
         data: dict = UserData.get()
@@ -129,7 +140,7 @@ class SyncProviderNextcloud:
 
         # Create new local task that was created on NC
         l_ids: list = [t["id"] for t in data["tasks"]]
-        for task in nc_task:
+        for nc_task in self.get_tasks():
             task_obj = Task(nc_task.content)
             if task_obj.uid not in l_ids:
                 new_task = TaskUtils.new_task(
