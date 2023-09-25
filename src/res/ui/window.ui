@@ -19,6 +19,7 @@
         <property name="show-sidebar" bind-source="toggle_trash_btn" bind-property="active" bind-flags="sync-create|bidirectional" />
         <property name="min-sidebar-width">330</property>
         <property name="max-sidebar-width">330</property>
+        <property name="sidebar-width-unit">px</property>
 
         <!-- Sidebar -->
         <property name="sidebar">
