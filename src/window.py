@@ -73,9 +73,6 @@ class Window(Adw.ApplicationWindow):
         GSettings.bind("sidebar-open", self.toggle_trash_btn, "active")
         # Setup theme
         Adw.StyleManager.get_default().set_color_scheme(GSettings.get("theme"))
-        # Add "devel" style if needed
-        if PROFILE == "development":
-            self.add_css_class("devel")
         self.create_actions()
         self.load_tasks()
 
