@@ -17,6 +17,8 @@
     <property name="content">
       <object class="AdwOverlaySplitView" id="split_view">
         <property name="show-sidebar" bind-source="toggle_trash_btn" bind-property="active" bind-flags="sync-create|bidirectional" />
+        <property name="min-sidebar-width">330</property>
+        <property name="max-sidebar-width">330</property>
 
         <!-- Sidebar -->
         <property name="sidebar">
@@ -123,7 +125,6 @@
                 <child>
                   <object class="GtkBox">
                     <property name="orientation">vertical</property>
-                    <property name="width-request">330</property>
 
                     <!-- Content -->
                     <child>
@@ -146,31 +147,23 @@
                           </object>
                         </child>
 
+                        <!-- Trash list -->
                         <child>
-                          <object class="GtkOverlay">
-
-                            <!-- Trash list -->
+                          <object class="GtkScrolledWindow" id="trash_list_scrl">
                             <child>
-                              <object class="GtkScrolledWindow" id="trash_list_scrl">
-                                <child>
-                                  <object class="GtkBox" id="trash_list">
-                                    <property name="orientation">vertical</property>
-                                    <property name="spacing">5</property>
-                                    <property name="hexpand">false</property>
-                                    <property name="vexpand">true</property>
-                                    <property name="margin-start">12</property>
-                                    <property name="margin-end">6</property>
-                                    <property name="margin-top">6</property>
-                                    <property name="margin-bottom">6</property>
-                                  </object>
-                                </child>
+                              <object class="GtkBox" id="trash_list">
+                                <property name="orientation">vertical</property>
+                                <property name="spacing">5</property>
+                                <property name="hexpand">false</property>
+                                <property name="vexpand">true</property>
+                                <property name="margin-start">12</property>
+                                <property name="margin-end">6</property>
+                                <property name="margin-top">6</property>
+                                <property name="margin-bottom">6</property>
                               </object>
                             </child>
-
-
                           </object>
                         </child>
-
 
                       </object>
                     </child>
@@ -187,7 +180,6 @@
         <!-- Main Content -->
         <property name="content">
           <object class="AdwToolbarView">
-
 
             <child type="top">
               <object class="GtkBox">
