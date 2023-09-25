@@ -43,13 +43,12 @@ class Window(Adw.ApplicationWindow):
     delete_completed_tasks_btn: Gtk.Button = Gtk.Template.Child()
     drop_motion_ctrl: Gtk.DropControllerMotion = Gtk.Template.Child()
     export_dialog: Gtk.FileDialog = Gtk.Template.Child()
-    flap: Adw.Flap = Gtk.Template.Child()
     import_dialog: Gtk.FileDialog = Gtk.Template.Child()
     main_menu_btn: Gtk.MenuButton = Gtk.Template.Child()
     scroll_up_btn_rev: Gtk.Revealer = Gtk.Template.Child()
     scrolled_window: Gtk.ScrolledWindow = Gtk.Template.Child()
-    separator: Gtk.Box = Gtk.Template.Child()
     shortcuts_window: Gtk.ShortcutsWindow = Gtk.Template.Child()
+    split_view: Adw.OverlaySplitView = Gtk.Template.Child()
     tasks_list: Gtk.Box = Gtk.Template.Child()
     title: Adw.WindowTitle = Gtk.Template.Child()
     toast_overlay: Adw.ToastOverlay = Gtk.Template.Child()
@@ -60,7 +59,6 @@ class Window(Adw.ApplicationWindow):
     toggle_trash_btn: Gtk.ToggleButton = Gtk.Template.Child()
     trash_list: Gtk.Box = Gtk.Template.Child()
     trash_list_scrl: Gtk.ScrolledWindow = Gtk.Template.Child()
-    trash_scroll_separator: Gtk.Box = Gtk.Template.Child()
 
     # - State - #
     scrolling: bool = False  # Is window scrolling
@@ -304,10 +302,6 @@ class Window(Adw.ApplicationWindow):
         """
 
         self.scroll_up_btn_rev.set_reveal_child(adj.get_value() > 0)
-        if adj.get_value() > 0:
-            self.separator.add_css_class("separator")
-        else:
-            self.separator.remove_css_class("separator")
 
     @Gtk.Template.Callback()
     def on_scroll_up_btn_clicked(self, _) -> None:
@@ -352,17 +346,6 @@ class Window(Adw.ApplicationWindow):
             btn.grab_focus()
 
     @Gtk.Template.Callback()
-    def on_trash_scroll(self, adj) -> None:
-        """
-        Show scroll up button
-        """
-
-        if adj.get_value() > 0:
-            self.trash_scroll_separator.add_css_class("separator")
-        else:
-            self.trash_scroll_separator.remove_css_class("separator")
-
-    @Gtk.Template.Callback()
     def on_delete_completed_tasks_btn_clicked(self, _) -> None:
         """
         Hide completed tasks
@@ -403,7 +386,7 @@ class Window(Adw.ApplicationWindow):
 
     @Gtk.Template.Callback()
     def on_trash_close(self, _) -> None:
-        self.flap.set_reveal_flap(False)
+        self.split_view.set_show_sidebar(False)
 
     @Gtk.Template.Callback()
     def on_trash_restore(self, _) -> None:

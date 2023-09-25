@@ -1,9 +1,3 @@
-/* Tasks list */
-
-.separator {
-  background: linear-gradient(to bottom, @borders, transparent);
-}
-
 /* Task */
 
 .card {
@@ -113,15 +107,6 @@
 
 .sub-task {
   margin: 6px 11px 6px 11px;
-}
-
-/* Sidebar */
-
-.dnd-sidebar {
-  border-width: 10px;
-  border-radius: 15px;
-  border-style: dotted;
-  border-color: @light_3;
 }
 
 /* Utils */

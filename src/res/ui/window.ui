@@ -5,18 +5,92 @@
   <template class="Window" parent="AdwApplicationWindow">
     <property name="width-request">360</property>
     <property name="height-request">296</property>
+
+    <child>
+      <object class="AdwBreakpoint">
+        <condition>max-width: 720sp</condition>
+        <setter object="split_view" property="collapsed">true</setter>
+        <setter object="close_sidebar_btn" property="reveal-child">true</setter>
+      </object>
+    </child>
+
     <property name="content">
-      <object class="AdwToastOverlay" id="toast_overlay">
+      <object class="AdwOverlaySplitView" id="split_view">
+        <property name="show-sidebar" bind-source="toggle_trash_btn" bind-property="active" bind-flags="sync-create|bidirectional" />
 
-        <!-- Flap -->
-        <child>
-          <object class="AdwFlap" id="flap">
-            <property name="locked">true</property>
-            <property name="fold-policy">auto</property>
-            <property name="reveal-flap" bind-source="toggle_trash_btn" bind-property="active" bind-flags="sync-create|bidirectional" />
+        <!-- Sidebar -->
+        <property name="sidebar">
+          <object class="AdwToolbarView">
 
-            <!-- Trash panel -->
-            <property name="flap">
+            <!-- Title -->
+            <child type="top">
+              <object class="AdwHeaderBar">
+                <property name="title-widget">
+                  <object class="AdwWindowTitle">
+                    <property name="title" translatable="yes">Deleted Tasks</property>
+                  </object>
+                </property>
+
+                <!-- Clear button -->
+                <child type="start">
+                  <object class="GtkButton" id="clear_trash_btn">
+                    <property name="valign">center</property>
+                    <property name="icon-name">user-trash-full-symbolic</property>
+                    <property name="tooltip-text" translatable="yes">Clear</property>
+                    <property name="visible" bind-source="trash_list_scrl" bind-property="visible" bind-flags="sync-create" />
+                    <accessibility>
+                      <property name="label" translatable="yes">Clear</property>
+                    </accessibility>
+                    <signal name="clicked" handler="on_trash_clear" />
+                  </object>
+                </child>
+
+                <!-- End buttons -->
+                <child type="end">
+                  <object class="GtkBox">
+
+                    <!-- Restore all button -->
+                    <child>
+                      <object class="GtkButton">
+                        <property name="valign">center</property>
+                        <property name="icon-name">edit-redo-symbolic</property>
+                        <property name="tooltip-text" translatable="yes">Restore All</property>
+                        <property name="visible" bind-source="trash_list_scrl" bind-property="visible" bind-flags="sync-create" />
+                        <accessibility>
+                          <property name="label" translatable="yes">Restore All</property>
+                        </accessibility>
+                        <signal name="clicked" handler="on_trash_restore" />
+                      </object>
+                    </child>
+
+                    <!-- Close sidebar button -->
+                    <child>
+                      <object class="GtkRevealer" id="close_sidebar_btn">
+                        <!-- <property name="reveal-child" bind-source="flap" bind-property="folded" bind-flags="sync-create" /> -->
+                        <property name="transition-type">7</property>
+                        <child>
+                          <object class="GtkButton">
+                            <property name="valign">center</property>
+                            <property name="margin-start">5</property>
+                            <property name="icon-name">go-previous-symbolic</property>
+                            <property name="tooltip-text" translatable="yes">Close Trash</property>
+                            <accessibility>
+                              <property name="label" translatable="yes">Close Trash</property>
+                            </accessibility>
+                            <signal name="clicked" handler="on_trash_close" />
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+
+                  </object>
+                </child>
+
+              </object>
+            </child>
+
+            <!-- Trash list -->
+            <property name="content">
               <object class="GtkOverlay">
 
                 <!-- Drop target -->
@@ -42,9 +116,7 @@
                     <property name="vexpand">true</property>
                     <property name="visible" bind-source="trash_drop_ctrl" bind-property="contains-pointer" bind-flags="sync-create" />
                     <style>
-                      <class name="background" />
                       <class name="compact" />
-                      <class name="dnd-sidebar" />
                     </style>
                   </object>
                 </child>
@@ -53,83 +125,6 @@
                   <object class="GtkBox">
                     <property name="orientation">vertical</property>
                     <property name="width-request">330</property>
-                    <style>
-                      <class name="background" />
-                      <class name="sidebar" />
-                    </style>
-
-                    <!-- Title -->
-                    <child>
-                      <object class="AdwHeaderBar">
-                        <property name="decoration-layout">null</property>
-                        <property name="title-widget">
-                          <object class="AdwWindowTitle">
-                            <property name="title" translatable="yes">Deleted Tasks</property>
-                          </object>
-                        </property>
-                        <style>
-                          <class name="flat" />
-                        </style>
-
-                        <!-- Clear button -->
-                        <child type="start">
-                          <object class="GtkButton" id="clear_trash_btn">
-                            <property name="valign">center</property>
-                            <property name="icon-name">user-trash-full-symbolic</property>
-                            <property name="tooltip-text" translatable="yes">Clear</property>
-                            <property name="visible" bind-source="trash_list_scrl" bind-property="visible" bind-flags="sync-create" />
-                            <accessibility>
-                              <property name="label" translatable="yes">Clear</property>
-                            </accessibility>
-                            <signal name="clicked" handler="on_trash_clear" />
-                          </object>
-                        </child>
-
-                        <!-- End buttons -->
-                        <child type="end">
-                          <object class="GtkBox">
-
-                            <!-- Restore all button -->
-                            <child>
-                              <object class="GtkButton">
-                                <property name="valign">center</property>
-                                <property name="icon-name">edit-redo-symbolic</property>
-                                <property name="tooltip-text" translatable="yes">Restore All</property>
-                                <property name="visible" bind-source="trash_list_scrl" bind-property="visible" bind-flags="sync-create" />
-                                <accessibility>
-                                  <property name="label" translatable="yes">Restore All</property>
-                                </accessibility>
-                                <signal name="clicked" handler="on_trash_restore" />
-                              </object>
-                            </child>
-
-                            <!-- Close sidebar button -->
-                            <child>
-                              <object class="GtkRevealer">
-                                <property name="reveal-child" bind-source="flap" bind-property="folded" bind-flags="sync-create" />
-                                <property name="transition-type">7</property>
-                                <child>
-                                  <object class="GtkButton">
-                                    <property name="valign">center</property>
-                                    <property name="margin-start">5</property>
-                                    <property name="icon-name">go-previous-symbolic</property>
-                                    <property name="tooltip-text" translatable="yes">Close Trash</property>
-                                    <accessibility>
-                                      <property name="label" translatable="yes">Close Trash</property>
-                                    </accessibility>
-                                    <signal name="clicked" handler="on_trash_close" />
-                                  </object>
-                                </child>
-                              </object>
-                            </child>
-
-                          </object>
-                        </child>
-
-
-                      </object>
-                    </child>
-
 
                     <!-- Content -->
                     <child>
@@ -155,26 +150,9 @@
                         <child>
                           <object class="GtkOverlay">
 
-                            <!-- Separator -->
-                            <child type="overlay">
-                              <object class="GtkBox" id="trash_scroll_separator">
-                                <property name="valign">start</property>
-                                <property name="can-target">false</property>
-                                <property name="height-request">4</property>
-                                <style>
-                                  <class name="fade" />
-                                </style>
-                              </object>
-                            </child>
-
                             <!-- Trash list -->
                             <child>
                               <object class="GtkScrolledWindow" id="trash_list_scrl">
-                                <property name="vadjustment">
-                                  <object class="GtkAdjustment">
-                                    <signal name="value-changed" handler="on_trash_scroll" />
-                                  </object>
-                                </property>
                                 <child>
                                   <object class="GtkBox" id="trash_list">
                                     <property name="orientation">vertical</property>
@@ -204,30 +182,26 @@
               </object>
             </property>
 
-            <property name="separator">
-              <object class="GtkSeparator">
-                <property name="orientation">vertical</property>
-              </object>
-            </property>
+          </object>
+        </property>
 
-            <!-- Main content box -->
-            <property name="content">
+        <!-- Main Content -->
+        <property name="content">
+          <object class="AdwToolbarView">
+
+
+            <child type="top">
               <object class="GtkBox">
                 <property name="orientation">vertical</property>
-                <property name="width-request">360</property>
 
-                <!-- Header bar -->
+                <!-- Headerbar -->
                 <child>
                   <object class="AdwHeaderBar">
                     <property name="title-widget">
                       <object class="AdwWindowTitle" id="title">
                         <property name="title">Errands</property>
-                        <property name="subtitle" translatable="yes">Completed:</property>
                       </object>
                     </property>
-                    <style>
-                      <class name="flat" />
-                    </style>
 
                     <!-- Toggle trash button -->
                     <child type="start">
@@ -316,7 +290,7 @@
                   </object>
                 </child>
 
-                <!-- Entry section -->
+                <!-- Entry -->
                 <child>
                   <object class="AdwClamp">
                     <property name="maximum-size">850</property>
@@ -347,21 +321,15 @@
                   </object>
                 </child>
 
-                <!-- Todo list -->
-                <child>
-                  <object class="GtkOverlay">
+              </object>
+            </child>
 
-                    <!-- Separator on top -->
-                    <child type="overlay">
-                      <object class="GtkBox" id="separator">
-                        <property name="valign">start</property>
-                        <property name="can-target">false</property>
-                        <property name="height-request">4</property>
-                        <style>
-                          <class name="fade" />
-                        </style>
-                      </object>
-                    </child>
+            <!-- Tasks list -->
+            <property name="content">
+              <object class="AdwToastOverlay" id="toast_overlay">
+                <child>
+                  <object class="GtkBox">
+                    <property name="orientation">vertical</property>
 
                     <!-- Scrolled window -->
                     <child>
@@ -402,15 +370,15 @@
 
                   </object>
                 </child>
-
               </object>
             </property>
 
           </object>
-        </child>
+        </property>
 
       </object>
     </property>
+
   </template>
 
   <!-- Main menu -->
@@ -514,7 +482,6 @@
       </object>
     </child>
   </object>
-
 
   <!-- About window -->
   <object class="AdwAboutWindow" id="about_window">
