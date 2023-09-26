@@ -1,5 +1,5 @@
 from gi.repository import Adw
-from caldav import Calendar, DAVClient
+from caldav import Calendar, DAVClient, Todo
 from .utils import GSettings, Log, TaskUtils, UserData, threaded
 
 # from nextcloud_tasks_api import (
@@ -36,7 +36,7 @@ class Sync:
 
 class SyncProviderNextcloud:
     can_sync: bool = False
-    tasks_list: list[Calendar] = []
+    calendar: Calendar = None
 
     def __init__(self):
         if not GSettings.get("nc-enabled"):
@@ -53,27 +53,77 @@ class SyncProviderNextcloud:
 
         self.url = f"{self.url}/remote.php/dav/"
 
-        client = DAVClient(url=self.url, username=self.username, password=self.password)
-        try:
-            principal = client.principal()
-            Log.debug(f"Connected to Nextcloud DAV server at '{self.url}'")
-            self.can_sync = True
-        except:
-            Log.error(f"Can't connect to Nextcloud DAV server at '{self.url}'")
-            self.can_sync = False
-            return
+        with DAVClient(
+            url=self.url, username=self.username, password=self.password
+        ) as client:
+            try:
+                principal = client.principal()
+                Log.debug(f"Connected to Nextcloud DAV server at '{self.url}'")
+                self.can_sync = True
+            except:
+                Log.error(f"Can't connect to Nextcloud DAV server at '{self.url}'")
+                self.can_sync = False
+                return
 
-        calendars = principal.calendars()
-        errands_cal_exists: bool = False
-        for cal in calendars:
-            if cal.name == "Errands":
-                self.tasks_list = cal
-                errands_cal_exists = True
-        if not errands_cal_exists:
-            Log.debug("Create new calendar 'Errands' on Nextcloud")
-            self.tasks_list = principal.make_calendar(
-                "Errands", supported_calendar_component_set=["VTODO"]
-            )
+            calendars = principal.calendars()
+            errands_cal_exists: bool = False
+            for cal in calendars:
+                if cal.name == "Errands":
+                    self.calendar = cal
+                    errands_cal_exists = True
+            if not errands_cal_exists:
+                Log.debug("Create new calendar 'Errands' on Nextcloud")
+                self.calendar = principal.make_calendar(
+                    "Errands", supported_calendar_component_set=["VTODO"]
+                )
+
+    def get_tasks(self):
+        todos = self.calendar.todos(include_completed=True)
+        tasks: list[tuple[Todo, dict]] = []
+        for todo in todos:
+            data: dict = {
+                "id": str(todo.icalendar_component.get("uid", "")),
+                "parent": str(todo.icalendar_component.get("related-to", "")),
+                "text": str(todo.icalendar_component.get("summary", "")),
+                "completed": str(todo.icalendar_component.get("status", False)),
+                "color": str(todo.icalendar_component.get("x-errands-color", "")),
+            }
+            tasks.append((todo, data))
+
+        return tasks
+
+    def sync(self):
+        Log.info("Sync tasks with Nextcloud")
+
+        data: dict = UserData.get()
+        nc_ids: list[str] = [t[1]["id"] for t in self.get_tasks()]
+        # to_delete: list[dict] = []
+
+        for task in data["tasks"]:
+            # Create new task on NC that was created offline
+            if task["id"] not in nc_ids and not task["synced_nc"]:
+                Log.debug(f"Create new task on Nextcloud: {task['id']}")
+                self.calendar.save_todo(
+                    uid=task["id"],
+                    summary=task["text"],
+                    related_to=task["parent"],
+                    status="COMPLETED" if task["completed"] else None,
+                    x_errands_color=task["color"],
+                )
+                task["synced"] = True
+
+            # Update task that was changed locally
+            elif task["id"] in nc_ids and not task["synced_nc"]:
+                Log.debug(f"Update task on Nextcloud: {task['id']}")
+                todo = self.calendar.todo_by_uid(task["id"])
+                todo.icalendar_component["summary"] = task["text"]
+                todo.icalendar_component["related-to"] = task["parent"]
+                todo.icalendar_component["status"] = (
+                    "COMPLETED" if task["parent"] else "NEEDS-ACTION"
+                )
+                todo.icalendar_component["x-errands-color"] = task["color"]
+                todo.save()
+                task["synced_nc"] = True
 
 
 # class SyncProviderNextcloud:
