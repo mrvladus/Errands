@@ -12,7 +12,7 @@
         "--share=network"
     ],
     "modules": [
-        "build-aux/python3-nextcloud-tasks-api.json",
+        "build-aux/python3-modules.json",
         {
             "name": "errands",
             "buildsystem": "meson",

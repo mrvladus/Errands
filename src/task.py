@@ -188,6 +188,7 @@ class Task(Gtk.Revealer):
 
         # Update data
         self.task["completed"] = btn.props.active
+        self.task["synced_nc"] = False
         self.update_data()
         # Update children
         for task in get_children(self.tasks_list):
@@ -204,6 +205,7 @@ class Task(Gtk.Revealer):
             self.text = Markup.rm_crossline(self.text)
             self.remove_css_class("task-completed")
         self.task_row.props.title = self.text
+        Sync.sync()
 
     @Gtk.Template.Callback()
     def on_expand(self, *_) -> None:
@@ -265,6 +267,7 @@ class Task(Gtk.Revealer):
         self.task_row.props.title = self.text
         # Toggle checkbox
         self.completed_btn.props.active = self.task["completed"] = False
+        self.task["synced_nc"] = False
         self.update_data()
         # Exit edit mode
         self.toggle_edit_mode()
@@ -289,7 +292,9 @@ class Task(Gtk.Revealer):
         self.main_box.add_css_class(f"task-{color}")
         # Set new color
         self.task["color"] = color
+        self.task["synced_nc"] = False
         self.update_data()
+        Sync.sync()
 
     # --- Drag and Drop --- #
 
@@ -340,6 +345,7 @@ class Task(Gtk.Revealer):
 
         # Change parent if different parents
         task.task["parent"] = self.task["parent"]
+        task.task["synced_nc"] = False
         task.update_data()
         task.purge()
         # Add new task widget
@@ -351,6 +357,7 @@ class Task(Gtk.Revealer):
         # Update status
         self.parent.update_status()
         task.parent.update_status()
+        Sync.sync()
 
         return True
 
@@ -365,6 +372,7 @@ class Task(Gtk.Revealer):
 
         # Change parent
         task.task["parent"] = self.task["id"]
+        task.task["synced_nc"] = False
         task.update_data()
         # Move data
         data = UserData.get()
@@ -388,5 +396,6 @@ class Task(Gtk.Revealer):
         # Update status
         task.parent.update_status()
         self.update_status()
+        Sync.sync()
 
         return True

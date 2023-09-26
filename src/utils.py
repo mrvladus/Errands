@@ -224,7 +224,8 @@ class TaskUtils:
         pid: str = "",
         cmpd: bool = False,
         dltd: bool = False,
-        synced: bool = False,
+        synced_nc: bool = False,
+        synced_td: bool = False,
     ) -> dict:
         return {
             "id": self.generate_id() if not id else id,
@@ -233,8 +234,8 @@ class TaskUtils:
             "color": "",
             "completed": cmpd,
             "deleted": dltd,
-            "synced_nc": synced,
-            "synced_td": synced,
+            "synced_nc": synced_nc,
+            "synced_td": synced_td,
         }
 
 
