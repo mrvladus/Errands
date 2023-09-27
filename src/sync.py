@@ -85,7 +85,9 @@ class SyncProviderNextcloud:
                 "id": str(todo.icalendar_component.get("uid", "")),
                 "parent": str(todo.icalendar_component.get("related-to", "")),
                 "text": str(todo.icalendar_component.get("summary", "")),
-                "completed": str(todo.icalendar_component.get("status", False)),
+                "completed": True
+                if str(todo.icalendar_component.get("status", False)) == "COMPLETED"
+                else False,
                 "color": str(todo.icalendar_component.get("x-errands-color", "")),
             }
             tasks.append((todo, data))
@@ -103,13 +105,14 @@ class SyncProviderNextcloud:
             # Create new task on NC that was created offline
             if task["id"] not in nc_ids and not task["synced_nc"]:
                 Log.debug(f"Create new task on Nextcloud: {task['id']}")
-                self.calendar.save_todo(
+                new_todo = self.calendar.save_todo(
                     uid=task["id"],
                     summary=task["text"],
                     related_to=task["parent"],
-                    status="COMPLETED" if task["completed"] else None,
                     x_errands_color=task["color"],
                 )
+                if task["completed"]:
+                    new_todo.complete()
                 task["synced"] = True
 
             # Update task that was changed locally
@@ -118,11 +121,12 @@ class SyncProviderNextcloud:
                 todo = self.calendar.todo_by_uid(task["id"])
                 todo.icalendar_component["summary"] = task["text"]
                 todo.icalendar_component["related-to"] = task["parent"]
-                todo.icalendar_component["status"] = (
-                    "COMPLETED" if task["parent"] else "NEEDS-ACTION"
-                )
                 todo.icalendar_component["x-errands-color"] = task["color"]
                 todo.save()
+                if task["completed"]:
+                    todo.complete()
+                else:
+                    todo.uncomplete()
                 task["synced_nc"] = True
 
         UserData.set(data)

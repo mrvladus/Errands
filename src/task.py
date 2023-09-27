@@ -40,6 +40,7 @@ class Task(Gtk.Revealer):
     tasks_list: Gtk.Box = Gtk.Template.Child()
 
     # - State - #
+    just_added: bool = True
     expanded: bool = False
     is_sub_task: bool = False
 
@@ -65,6 +66,7 @@ class Task(Gtk.Revealer):
         self.check_is_sub()
         self.add_sub_tasks()
         self.add_actions()
+        self.is_startup = False
 
     def __repr__(self):
         return f"<Task> {self.task['id']}"
@@ -186,6 +188,19 @@ class Task(Gtk.Revealer):
         Toggle check button and add style to the text
         """
 
+        def set_text():
+            if btn.props.active:
+                self.text = Markup.add_crossline(self.text)
+                self.add_css_class("task-completed")
+            else:
+                self.text = Markup.rm_crossline(self.text)
+                self.remove_css_class("task-completed")
+            self.task_row.props.title = self.text
+
+        if self.just_added:
+            set_text()
+            return
+
         # Update data
         self.task["completed"] = btn.props.active
         self.task["synced_nc"] = False
@@ -197,14 +212,8 @@ class Task(Gtk.Revealer):
         if self.is_sub_task:
             self.parent.update_status()
         self.window.update_status()
-        # Set text
-        if btn.props.active:
-            self.text = Markup.add_crossline(self.text)
-            self.add_css_class("task-completed")
-        else:
-            self.text = Markup.rm_crossline(self.text)
-            self.remove_css_class("task-completed")
-        self.task_row.props.title = self.text
+        set_text()
+
         Sync.sync()
 
     @Gtk.Template.Callback()
