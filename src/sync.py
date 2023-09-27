@@ -125,6 +125,8 @@ class SyncProviderNextcloud:
                 todo.save()
                 task["synced_nc"] = True
 
+        UserData.set(data)
+
 
 # class SyncProviderNextcloud:
 #     connected: bool = False
