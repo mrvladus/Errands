@@ -113,7 +113,7 @@ class SyncProviderNextcloud:
                 )
                 if task["completed"]:
                     new_todo.complete()
-                task["synced"] = True
+                task["synced_nc"] = True
 
             # Update task that was changed locally
             elif task["id"] in nc_ids and not task["synced_nc"]:
