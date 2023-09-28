@@ -245,8 +245,8 @@ class Task(Gtk.Revealer):
         # Clear entry
         entry.get_buffer().props.text = ""
         # Update status
-        self.completed_btn.props.active = self.task["completed"] = False
-        self.update_data()
+        self.completed_btn.props.active = False
+        # self.update_data()
         self.update_status()
         self.window.update_status()
         Sync.sync()
