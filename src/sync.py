@@ -154,6 +154,7 @@ class SyncProviderNextcloud:
                 todo.delete()
             except:
                 pass
+        data["deleted"] = []
 
         # Create new local task that was created on NC
         l_ids: list = [t["id"] for t in data["tasks"]]
