@@ -224,6 +224,7 @@ class TaskUtils:
         pid: str = "",
         cmpd: bool = False,
         dltd: bool = False,
+        color: str = "",
         synced_nc: bool = False,
         synced_td: bool = False,
     ) -> dict:
@@ -231,7 +232,7 @@ class TaskUtils:
             "id": self.generate_id() if not id else id,
             "parent": pid,
             "text": text,
-            "color": "",
+            "color": color,
             "completed": cmpd,
             "deleted": dltd,
             "synced_nc": synced_nc,
@@ -243,7 +244,7 @@ class UserData:
     """Class for accessing data file with user tasks"""
 
     data_dir: str = os.path.join(GLib.get_user_data_dir(), "list")
-    default_data = {"version": VERSION, "tasks": []}
+    default_data = {"version": VERSION, "tasks": [], "deleted": []}
     validated: bool = False
 
     def _create_file(self):
@@ -374,8 +375,10 @@ class UserData:
             data["tasks"] = new_tasks
             if "history" in data:
                 del data["history"]
+            data["deleted"] = []
 
         elif ver.startswith("44.7"):
+            data["deleted"] = []
             for task in data["tasks"]:
                 task["synced_nc"] = False
                 task["synced_td"] = False

@@ -79,7 +79,7 @@ class SyncProviderNextcloud:
 
     def get_tasks(self):
         todos = self.calendar.todos(include_completed=True)
-        tasks: list[tuple[Todo, dict]] = []
+        tasks: list[dict] = []
         for todo in todos:
             data: dict = {
                 "id": str(todo.icalendar_component.get("uid", "")),
@@ -90,7 +90,7 @@ class SyncProviderNextcloud:
                 else False,
                 "color": str(todo.icalendar_component.get("x-errands-color", "")),
             }
-            tasks.append((todo, data))
+            tasks.append(data)
 
         return tasks
 
@@ -98,8 +98,8 @@ class SyncProviderNextcloud:
         Log.info("Sync tasks with Nextcloud")
 
         data: dict = UserData.get()
-        nc_ids: list[str] = [t[1]["id"] for t in self.get_tasks()]
-        # to_delete: list[dict] = []
+        nc_ids: list[str] = [task["id"] for task in self.get_tasks()]
+        to_delete: list[dict] = []
 
         for task in data["tasks"]:
             # Create new task on NC that was created offline
@@ -119,150 +119,60 @@ class SyncProviderNextcloud:
             elif task["id"] in nc_ids and not task["synced_nc"]:
                 Log.debug(f"Update task on Nextcloud: {task['id']}")
                 todo = self.calendar.todo_by_uid(task["id"])
+                todo.uncomplete()
                 todo.icalendar_component["summary"] = task["text"]
                 todo.icalendar_component["related-to"] = task["parent"]
                 todo.icalendar_component["x-errands-color"] = task["color"]
                 todo.save()
                 if task["completed"]:
                     todo.complete()
-                else:
-                    todo.uncomplete()
                 task["synced_nc"] = True
 
+            # Update task that was changed on NC
+            elif task["id"] in nc_ids and task["synced_nc"]:
+                for nc_task in self.get_tasks():
+                    if nc_task["id"] == task["id"]:
+                        task["text"] = nc_task["text"]
+                        task["parent"] = nc_task["parent"]
+                        task["completed"] = nc_task["completed"]
+                        task["color"] = nc_task["color"]
+                        break
+
+            # Delete local task that was deleted on NC
+            elif task["id"] not in nc_ids and task["synced_nc"]:
+                to_delete.append(task)
+
+        # Remove deleted on NC tasks from data
+        for task in to_delete:
+            data["tasks"].remove(task)
+
+        # Delete tasks on NC if they were deleted locally
+        for task_id in data["deleted"]:
+            try:
+                Log.debug(f"Delete task from Nextcloud: {task_id}")
+                todo = self.calendar.todo_by_uid(task_id)
+                todo.delete()
+            except:
+                pass
+
+        # Create new local task that was created on NC
+        l_ids: list = [t["id"] for t in data["tasks"]]
+        for task in self.get_tasks():
+            if task["id"] not in l_ids:
+                Log.debug(f"Copy new task from Nextcloud: {task['id']}")
+                new_task: dict = TaskUtils.new_task(
+                    task["text"],
+                    task["id"],
+                    task["parent"],
+                    task["completed"],
+                    False,
+                    task["color"],
+                    True,
+                    False,
+                )
+                data["tasks"].append(new_task)
+
         UserData.set(data)
-
-
-# class SyncProviderNextcloud:
-#     connected: bool = False
-#     disabled: bool = False
-
-#     def __init__(self) -> None:
-#         if not GSettings.get("nc-enabled"):
-#             Log.debug("Nextcloud sync disabled")
-#             return
-
-#         Log.debug("Initialize Nextcloud sync provider")
-
-#         self.url = GSettings.get("nc-url")
-#         self.username = GSettings.get("nc-username")
-#         self.password = GSettings.get("nc-password")
-
-#         if self.url == "" or self.username == "" or self.password == "":
-#             Log.error("Not all Nextcloud credentials provided")
-#             return
-
-#         self.connect()
-
-#     def connect(self) -> None:
-#         Log.info(f"Connecting to Nextcloud at '{self.url}' as user '{self.username}'")
-#         self.api: NextcloudTasksApi = get_nextcloud_tasks_api(
-#             self.url, self.username, self.password
-#         )
-#         try:
-#             self.errands_task_list: TaskList = None
-#             for task_list in self.api.get_lists():
-#                 if task_list.name == "Errands":
-#                     self.errands_task_list = task_list
-
-#             if not self.errands_task_list:
-#                 Log.debug("Creating new list 'Errands'")
-#                 self.errands_task_list = self.api.create_list("Errands")
-
-#             self.connected = True
-#             Log.info("Connected to Nextcloud")
-#         except:
-#             Log.error("Can't connect to Nextcloud server")
-#             return None
-
-#     def get_tasks(self) -> list[TaskFile] | None:
-#         if self.disabled or not self.connected:
-#             return
-
-#         try:
-#             Log.debug("Getting tasks from Nextcloud")
-#             tasks = self.api.get_list(self.errands_task_list)
-#             return [task for task in tasks]
-#         except:
-#             Log.error("Can't connect to Nextcloud server")
-#             return None
-
-#     def sync(self) -> None:
-#         if self.disabled or not self.connected:
-#             return
-
-#         Log.info("Sync tasks with Nextcloud")
-
-#         data: dict = UserData.get()
-#         nc_ids: list[str] = [Task(t.content).uid for t in self.get_tasks()]
-#         to_delete: list[dict] = []
-
-#         for task in data["tasks"]:
-#             # Create new task on NC that was created offline
-#             if task["id"] not in nc_ids and not task["synced_nc"]:
-#                 new_task = Task()
-#                 new_task.summary = task["text"]
-#                 new_task.related_to = task["parent"]
-#                 if task["completed"]:
-#                     new_task.data.upsert_value("STATUS", "COMPLETED")
-#                 new_task.data.upsert_value("ERRANDS-COLOR", task["color"])
-#                 created_task = self.api.create(
-#                     self.errands_task_list, new_task.to_string()
-#                 )
-#                 task["id"] = Task(created_task.content).uid
-#                 task["synced"] = True
-
-#             # Delete local task that was deleted on NC
-#             elif task["id"] not in nc_ids and task["synced_nc"]:
-#                 to_delete.append(task)
-
-#             # Update task that was changed locally
-#             elif task["id"] in nc_ids and not task["synced_nc"]:
-#                 updated_task = Task()
-#                 updated_task.summary = task["text"]
-#                 updated_task.related_to = task["parent"]
-#                 if task["completed"]:
-#                     updated_task.data.upsert_value("STATUS", "COMPLETED")
-#                 updated_task.data.upsert_value("ERRANDS-COLOR", task["color"])
-#                 for nc_task in self.get_tasks():
-#                     if Task(nc_task.content).uid == task["id"]:
-#                         nc_task.content = updated_task.to_string()
-#                         self.api.update(nc_task)
-#                         break
-#                 task["synced_nc"] = True
-
-#             # Update task that was changed on NC
-#             elif task["id"] in nc_ids and task["synced_nc"]:
-#                 for nc_task in self.get_tasks():
-#                     task_obj = Task(nc_task.content)
-#                     if task_obj.uid == task["id"]:
-#                         task["text"] = task_obj.summary
-#                         task["parent"] = task_obj.related_to
-#                         task["completed"] = (
-#                             task_obj.data.find_value("STATUS") == "COMPLETED"
-#                         )
-#                         task["color"] = task_obj.data.find_value("ERRANDS-COLOR")
-#                         break
-
-#         # Remove deleted tasks from data
-#         for task in to_delete:
-#             data["tasks"].remove(task)
-
-#         # Create new local task that was created on NC
-#         l_ids: list = [t["id"] for t in data["tasks"]]
-#         for nc_task in self.get_tasks():
-#             task_obj = Task(nc_task.content)
-#             if task_obj.uid not in l_ids:
-#                 new_task = TaskUtils.new_task(
-#                     task_obj.summary,
-#                     task_obj.uid,
-#                     task_obj.related_to or "",
-#                     task_obj.data.find_value("STATUS") == "COMPLETED",
-#                     False,
-#                     True,
-#                 )
-#                 data["tasks"].append(new_task)
-
-#         UserData.set(data)
 
 
 class SyncProviderTodoist:

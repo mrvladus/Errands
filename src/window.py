@@ -370,6 +370,7 @@ class Window(Adw.ApplicationWindow):
 
         # Remove widgets and data
         data: dict = UserData.get()
+        data["deleted"] = [task["id"] for task in data["tasks"] if task["deleted"]]
         data["tasks"] = [task for task in data["tasks"] if not task["deleted"]]
         UserData.set(data)
         to_remove = [task for task in self.tasks if task.task["deleted"]]
@@ -381,6 +382,7 @@ class Window(Adw.ApplicationWindow):
             self.trash_list.remove(item)
 
         self.trash_list_scrl.set_visible(False)
+        Sync.sync()
 
     @Gtk.Template.Callback()
     def on_trash_close(self, _) -> None:

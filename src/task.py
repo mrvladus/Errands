@@ -66,7 +66,7 @@ class Task(Gtk.Revealer):
         self.check_is_sub()
         self.add_sub_tasks()
         self.add_actions()
-        self.is_startup = False
+        self.just_added = False
 
     def __repr__(self):
         return f"<Task> {self.task['id']}"
