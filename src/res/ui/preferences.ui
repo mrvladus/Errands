@@ -124,6 +124,7 @@
               <object class="AdwExpanderRow" id="td_enabled">
                 <property name="title" translatable="yes">Todoist</property>
                 <property name="show-enable-switch">true</property>
+                <property name="visible">false</property>
 
                 <!-- Token -->
                 <child>

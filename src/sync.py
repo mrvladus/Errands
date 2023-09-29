@@ -130,6 +130,7 @@ class SyncProviderNextcloud:
 
             # Update task that was changed on NC
             elif task["id"] in nc_ids and task["synced_nc"]:
+                Log.debug(f"Update local task changed on Nextcloud: {task['id']}")
                 for nc_task in self.get_tasks():
                     if nc_task["id"] == task["id"]:
                         task["text"] = nc_task["text"]
@@ -140,6 +141,7 @@ class SyncProviderNextcloud:
 
             # Delete local task that was deleted on NC
             elif task["id"] not in nc_ids and task["synced_nc"]:
+                Log.debug(f"Delete local task deleted on Nextcloud: {task['id']}")
                 to_delete.append(task)
 
         # Remove deleted on NC tasks from data
