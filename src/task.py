@@ -343,10 +343,10 @@ class Task(Gtk.Revealer):
         tasks = data["tasks"]
         for i, t in enumerate(tasks):
             if t["id"] == self.task["id"]:
-                self_id = i
+                self_idx = i
             elif t["id"] == task.task["id"]:
-                task_id = i
-        tasks.insert(self_id, tasks.pop(task_id))
+                task_idx = i
+        tasks.insert(self_idx, tasks.pop(task_idx))
         UserData.set(data)
 
         # If task has the same parent
