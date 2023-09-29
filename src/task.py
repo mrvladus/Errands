@@ -246,7 +246,6 @@ class Task(Gtk.Revealer):
         entry.get_buffer().props.text = ""
         # Update status
         self.completed_btn.props.active = False
-        # self.update_data()
         self.update_status()
         self.window.update_status()
         Sync.sync()
@@ -342,7 +341,12 @@ class Task(Gtk.Revealer):
         # Move data
         data = UserData.get()
         tasks = data["tasks"]
-        tasks.insert(tasks.index(self.task), tasks.pop(tasks.index(task.task)))
+        for i, t in enumerate(tasks):
+            if t["id"] == self.task["id"]:
+                self_id = i
+            elif t["id"] == task.task["id"]:
+                task_id = i
+        tasks.insert(self_id, tasks.pop(task_id))
         UserData.set(data)
 
         # If task has the same parent
@@ -387,12 +391,14 @@ class Task(Gtk.Revealer):
         data = UserData.get()
         tasks = data["tasks"]
         last_sub_idx: int = 0
-        for t in tasks:
+        for i, t in enumerate(tasks):
             if t["parent"] == self.task["id"]:
                 last_sub_idx = tasks.index(t)
-        tasks.insert(
-            tasks.index(self.task) + last_sub_idx, tasks.pop(tasks.index(task.task))
-        )
+            if t["id"] == self.task["id"]:
+                self_idx = i
+            if t["id"] == task.task["id"]:
+                task_idx = i
+        tasks.insert(self_idx + last_sub_idx, tasks.pop(task_idx))
         UserData.set(data)
         # Remove old task
         task.purge()
