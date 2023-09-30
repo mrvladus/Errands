@@ -231,7 +231,7 @@ class Window(Adw.ApplicationWindow):
 
     def update_status(self) -> None:
         """
-        Update progress bar on the top
+        Update status bar on the top
         """
 
         # Set status
@@ -429,6 +429,7 @@ class Window(Adw.ApplicationWindow):
         """
 
         task.delete()
+        self.update_status()
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/Errands/trash_item.ui")
