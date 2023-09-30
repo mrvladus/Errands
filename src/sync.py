@@ -1,14 +1,6 @@
-from gi.repository import Adw
-from caldav import Calendar, DAVClient, Todo
+from gi.repository import Adw, GLib
+from caldav import Calendar, DAVClient
 from .utils import GSettings, Log, TaskUtils, UserData, threaded
-
-# from nextcloud_tasks_api import (
-#     NextcloudTasksApi,
-#     TaskFile,
-#     TaskList,
-#     get_nextcloud_tasks_api,
-# )
-# from nextcloud_tasks_api.ical import Task
 
 
 class Sync:
@@ -17,30 +9,32 @@ class Sync:
 
     @classmethod
     def init(self, window: Adw.ApplicationWindow) -> None:
+        Log.info("Initialize sync providers")
         self.window = window
         self.providers.append(SyncProviderNextcloud())
         # self.providers.append(SyncProviderTodoist())
 
-    # @threaded
     @classmethod
+    @threaded
     def sync(self) -> None:
-        if not self.window.can_sync:
-            return
         for provider in self.providers:
             if provider.can_sync:
                 provider.sync()
 
-    def _setup_providers(self) -> None:
-        pass
+    @classmethod
+    def sync_blocking(self):
+        for provider in self.providers:
+            if provider.can_sync:
+                provider.sync()
 
 
 class SyncProviderNextcloud:
     can_sync: bool = False
     calendar: Calendar = None
 
-    def __init__(self):
+    def __init__(self) -> None:
         if not GSettings.get("nc-enabled"):
-            Log.debug("Nextcloud sync disabled")
+            Log.info("Nextcloud sync disabled")
             return
 
         self.url = GSettings.get("nc-url")
@@ -58,7 +52,7 @@ class SyncProviderNextcloud:
         ) as client:
             try:
                 principal = client.principal()
-                Log.debug(f"Connected to Nextcloud DAV server at '{self.url}'")
+                Log.info(f"Connected to Nextcloud DAV server at '{self.url}'")
                 self.can_sync = True
             except:
                 Log.error(f"Can't connect to Nextcloud DAV server at '{self.url}'")
@@ -77,7 +71,7 @@ class SyncProviderNextcloud:
                     "Errands", supported_calendar_component_set=["VTODO"]
                 )
 
-    def get_tasks(self):
+    def _get_tasks(self) -> list[dict]:
         todos = self.calendar.todos(include_completed=True)
         tasks: list[dict] = []
         for todo in todos:
@@ -94,11 +88,11 @@ class SyncProviderNextcloud:
 
         return tasks
 
-    def sync(self):
+    def sync(self) -> None:
         Log.info("Sync tasks with Nextcloud")
 
         data: dict = UserData.get()
-        nc_ids: list[str] = [task["id"] for task in self.get_tasks()]
+        nc_ids: list[str] = [task["id"] for task in self._get_tasks()]
         to_delete: list[dict] = []
 
         for task in data["tasks"]:
@@ -128,10 +122,10 @@ class SyncProviderNextcloud:
                     todo.complete()
                 task["synced_nc"] = True
 
-            # Update task that was changed on NC
+            # Update local task that was changed on NC
             elif task["id"] in nc_ids and task["synced_nc"]:
-                Log.debug(f"Update local task changed on Nextcloud: {task['id']}")
-                for nc_task in self.get_tasks():
+                Log.debug(f"Update local task from Nextcloud: {task['id']}")
+                for nc_task in self._get_tasks():
                     if nc_task["id"] == task["id"]:
                         task["text"] = nc_task["text"]
                         task["parent"] = nc_task["parent"]
@@ -160,7 +154,7 @@ class SyncProviderNextcloud:
 
         # Create new local task that was created on NC
         l_ids: list = [t["id"] for t in data["tasks"]]
-        for task in self.get_tasks():
+        for task in self._get_tasks():
             if task["id"] not in l_ids:
                 Log.debug(f"Copy new task from Nextcloud: {task['id']}")
                 new_task: dict = TaskUtils.new_task(

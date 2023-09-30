@@ -43,6 +43,7 @@ class Task(Gtk.Revealer):
     just_added: bool = True
     expanded: bool = False
     is_sub_task: bool = False
+    can_sync: bool = True
 
     def __init__(self, task: dict, window: Adw.ApplicationWindow, parent=None) -> None:
         super().__init__()
@@ -69,7 +70,7 @@ class Task(Gtk.Revealer):
         self.just_added = False
 
     def __repr__(self):
-        return f"<Task> {self.task['id']}"
+        return f"Task({self.task['id']})"
 
     def add_actions(self) -> None:
         group = Gio.SimpleActionGroup.new()
@@ -120,7 +121,7 @@ class Task(Gtk.Revealer):
             self.main_box.add_css_class("task")
 
     def delete(self, *_) -> None:
-        Log.info(f"Delete task: {self.task['id']}")
+        Log.info(f"Move task to trash: {self.task['id']}")
 
         self.toggle_visibility(False)
         self.task["deleted"] = True
@@ -197,6 +198,7 @@ class Task(Gtk.Revealer):
                 self.remove_css_class("task-completed")
             self.task_row.props.title = self.text
 
+        # If task is just added set text and return to avoid useless sync
         if self.just_added:
             set_text()
             return
@@ -206,15 +208,21 @@ class Task(Gtk.Revealer):
         self.task["synced_nc"] = False
         self.update_data()
         # Update children
-        for task in get_children(self.tasks_list):
+        children = get_children(self.tasks_list)
+        for task in children:
+            task.can_sync = False
             task.completed_btn.set_active(btn.props.active)
         # Update status
         if self.is_sub_task:
             self.parent.update_status()
-        self.window.update_status()
+        # Set text
         set_text()
-
-        Sync.sync()
+        # Sync
+        if self.can_sync:
+            self.window.update_status()
+            Sync.sync()
+            for task in children:
+                task.can_sync = True
 
     @Gtk.Template.Callback()
     def on_expand(self, *_) -> None:
@@ -248,6 +256,7 @@ class Task(Gtk.Revealer):
         self.completed_btn.props.active = False
         self.update_status()
         self.window.update_status()
+        # Sync
         Sync.sync()
 
     @Gtk.Template.Callback()
@@ -274,11 +283,12 @@ class Task(Gtk.Revealer):
         self.text = Markup.find_url(Markup.escape(self.task["text"]))
         self.task_row.props.title = self.text
         # Toggle checkbox
-        self.completed_btn.props.active = self.task["completed"] = False
-        self.task["synced_nc"] = False
-        self.update_data()
+        self.completed_btn.props.active = False
         # Exit edit mode
         self.toggle_edit_mode()
+        # Sync
+        self.task["synced_nc"] = False
+        self.update_data()
         Sync.sync()
 
     @Gtk.Template.Callback()
@@ -300,6 +310,7 @@ class Task(Gtk.Revealer):
         self.main_box.add_css_class(f"task-{color}")
         # Set new color
         self.task["color"] = color
+        # Sync
         self.task["synced_nc"] = False
         self.update_data()
         Sync.sync()
@@ -370,6 +381,8 @@ class Task(Gtk.Revealer):
         # Update status
         self.parent.update_status()
         task.parent.update_status()
+
+        # Sync
         Sync.sync()
 
         return True
@@ -411,6 +424,8 @@ class Task(Gtk.Revealer):
         # Update status
         task.parent.update_status()
         self.update_status()
+
+        # Sync
         Sync.sync()
 
         return True

@@ -63,7 +63,6 @@ class Window(Adw.ApplicationWindow):
     # - State - #
     scrolling: bool = False  # Is window scrolling
     tasks: list[Task] = []  # Task widgets list
-    can_sync: bool = True  # Can perform sync operations
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
@@ -195,7 +194,7 @@ class Window(Adw.ApplicationWindow):
 
     def load_tasks(self) -> None:
         Sync.init(self)
-        Sync.sync()
+        Sync.sync_blocking()
         Log.debug("Loading tasks")
         count: int = 0
         data: dict = UserData.get()
@@ -331,6 +330,7 @@ class Window(Adw.ApplicationWindow):
         # Scroll to the end
         Animate.scroll(self.scrolled_window, True)
         self.update_status()
+        # Sync
         Sync.sync()
 
     @Gtk.Template.Callback()
@@ -376,12 +376,11 @@ class Window(Adw.ApplicationWindow):
         to_remove = [task for task in self.tasks if task.task["deleted"]]
         for task in to_remove:
             task.purge()
-
         # Remove trash items widgets
         for item in get_children(self.trash_list):
             self.trash_list.remove(item)
-
         self.trash_list_scrl.set_visible(False)
+        # Sync
         Sync.sync()
 
     @Gtk.Template.Callback()
@@ -444,7 +443,7 @@ class TrashItem(Gtk.Box):
         self.label.props.label = task["text"]
 
     def __repr__(self) -> str:
-        return f"<TrashItem> {self.id}"
+        return f"TrashItem({self.id})"
 
     @Gtk.Template.Callback()
     def on_restore(self, _) -> None:
