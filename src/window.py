@@ -194,7 +194,7 @@ class Window(Adw.ApplicationWindow):
 
     def load_tasks(self) -> None:
         Sync.init(self)
-        Sync.sync_blocking()
+        Sync.sync_blocking(True)
         Log.debug("Loading tasks")
         count: int = 0
         data: dict = UserData.get()
@@ -351,6 +351,7 @@ class Window(Adw.ApplicationWindow):
         for task in self.tasks:
             if task.task["completed"] and not task.task["deleted"]:
                 task.delete()
+        self.update_status()
 
     @Gtk.Template.Callback()
     def on_trash_clear(self, _) -> None:
@@ -449,7 +450,7 @@ class TrashItem(Gtk.Box):
     def on_restore(self, _) -> None:
         """Restore task"""
 
-        Log.info("Restore: " + self.label.props.label)
+        Log.info(f"Restore task: {self.id}")
 
         def restore_task(id: str = self.id):
             for task in self.window.tasks:

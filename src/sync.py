@@ -1,4 +1,4 @@
-from gi.repository import Adw, GLib
+from gi.repository import Adw
 from caldav import Calendar, DAVClient
 from .utils import GSettings, Log, TaskUtils, UserData, threaded
 
@@ -16,16 +16,24 @@ class Sync:
 
     @classmethod
     @threaded
-    def sync(self) -> None:
+    def sync(self, fetch: bool = False, window=None) -> None:
+        """
+        Sync tasks without blocking the UI
+        """
+
         for provider in self.providers:
             if provider.can_sync:
-                provider.sync()
+                provider.sync(fetch, window)
 
     @classmethod
-    def sync_blocking(self):
+    def sync_blocking(self, fetch: bool = False, window=None):
+        """
+        Sync tasks while blocking the UI
+        """
+
         for provider in self.providers:
             if provider.can_sync:
-                provider.sync()
+                provider.sync(fetch, window)
 
 
 class SyncProviderNextcloud:
@@ -88,12 +96,35 @@ class SyncProviderNextcloud:
 
         return tasks
 
-    def sync(self) -> None:
-        Log.info("Sync tasks with Nextcloud")
+    def sync(self, fetch: bool, window) -> None:
+        """
+        Sync tasks with provider
+        """
 
+        Log.info("Sync tasks with Nextcloud")
         data: dict = UserData.get()
         nc_ids: list[str] = [task["id"] for task in self._get_tasks()]
         to_delete: list[dict] = []
+
+        def _fetch():
+            """
+            Update local tasks that was changed on NC
+            """
+
+            Log.debug("Fetch tasks from Nextcloud")
+            for task in data["tasks"]:
+                if task["id"] in nc_ids and task["synced_nc"]:
+                    for nc_task in self._get_tasks():
+                        if nc_task["id"] == task["id"]:
+                            task["text"] = nc_task["text"]
+                            task["parent"] = nc_task["parent"]
+                            task["completed"] = nc_task["completed"]
+                            task["color"] = nc_task["color"]
+                            break
+            UserData.set(data)
+
+        if fetch:
+            _fetch()
 
         for task in data["tasks"]:
             # Create new task on NC that was created offline
@@ -121,17 +152,6 @@ class SyncProviderNextcloud:
                 if task["completed"]:
                     todo.complete()
                 task["synced_nc"] = True
-
-            # Update local task that was changed on NC
-            elif task["id"] in nc_ids and task["synced_nc"]:
-                Log.debug(f"Update local task from Nextcloud: {task['id']}")
-                for nc_task in self._get_tasks():
-                    if nc_task["id"] == task["id"]:
-                        task["text"] = nc_task["text"]
-                        task["parent"] = nc_task["parent"]
-                        task["completed"] = nc_task["completed"]
-                        task["color"] = nc_task["color"]
-                        break
 
             # Delete local task that was deleted on NC
             elif task["id"] not in nc_ids and task["synced_nc"]:
