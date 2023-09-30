@@ -103,7 +103,8 @@ class SyncProviderNextcloud:
 
         Log.info("Sync tasks with Nextcloud")
         data: dict = UserData.get()
-        nc_ids: list[str] = [task["id"] for task in self._get_tasks()]
+        nc_tasks: list = self._get_tasks()
+        nc_ids: list[str] = [task["id"] for task in nc_tasks]
         to_delete: list[dict] = []
 
         def _fetch():
@@ -114,7 +115,7 @@ class SyncProviderNextcloud:
             Log.debug("Fetch tasks from Nextcloud")
             for task in data["tasks"]:
                 if task["id"] in nc_ids and task["synced_nc"]:
-                    for nc_task in self._get_tasks():
+                    for nc_task in nc_tasks:
                         if nc_task["id"] == task["id"]:
                             task["text"] = nc_task["text"]
                             task["parent"] = nc_task["parent"]
@@ -174,7 +175,7 @@ class SyncProviderNextcloud:
 
         # Create new local task that was created on NC
         l_ids: list = [t["id"] for t in data["tasks"]]
-        for task in self._get_tasks():
+        for task in nc_tasks:
             if task["id"] not in l_ids:
                 Log.debug(f"Copy new task from Nextcloud: {task['id']}")
                 new_task: dict = TaskUtils.new_task(
