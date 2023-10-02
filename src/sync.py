@@ -1,4 +1,4 @@
-from gi.repository import Adw
+from gi.repository import Adw, GLib
 from caldav import Calendar, DAVClient
 from .utils import GSettings, Log, TaskUtils, UserData, threaded
 
@@ -11,40 +11,41 @@ class Sync:
     def init(self, window: Adw.ApplicationWindow) -> None:
         Log.info("Initialize sync providers")
         self.window = window
-        self.providers.append(SyncProviderNextcloud())
-        # self.providers.append(SyncProviderTodoist())
+        self.providers.append(SyncProviderNextcloud(self.window))
 
     @classmethod
     @threaded
-    def sync(self, fetch: bool = False, window=None) -> None:
+    def sync(self, fetch: bool = False) -> None:
         """
         Sync tasks without blocking the UI
         """
 
         for provider in self.providers:
             if provider.can_sync:
-                provider.sync(fetch, window)
+                provider.sync(fetch)
 
     @classmethod
-    def sync_blocking(self, fetch: bool = False, window=None):
+    def sync_blocking(self, fetch: bool = False):
         """
         Sync tasks while blocking the UI
         """
 
         for provider in self.providers:
             if provider.can_sync:
-                provider.sync(fetch, window)
+                provider.sync(fetch)
 
 
 class SyncProviderNextcloud:
     can_sync: bool = False
     calendar: Calendar = None
+    window = None
 
-    def __init__(self) -> None:
+    def __init__(self, window) -> None:
         if not GSettings.get("nc-enabled"):
             Log.info("Nextcloud sync disabled")
             return
 
+        self.window = window
         self.url = GSettings.get("nc-url")
         self.username = GSettings.get("nc-username")
         self.password = GSettings.get("nc-password")
@@ -96,12 +97,13 @@ class SyncProviderNextcloud:
 
         return tasks
 
-    def sync(self, fetch: bool, window) -> None:
+    def sync(self, fetch: bool) -> None:
         """
         Sync tasks with provider
         """
 
         Log.info("Sync tasks with Nextcloud")
+
         data: dict = UserData.get()
         nc_tasks: list = self._get_tasks()
         nc_ids: list[str] = [task["id"] for task in nc_tasks]
@@ -122,7 +124,6 @@ class SyncProviderNextcloud:
                             task["completed"] = nc_task["completed"]
                             task["color"] = nc_task["color"]
                             break
-            UserData.set(data)
 
         if fetch:
             _fetch()
@@ -159,6 +160,23 @@ class SyncProviderNextcloud:
                 Log.debug(f"Delete local task deleted on Nextcloud: {task['id']}")
                 to_delete.append(task)
 
+        # Create new local task that was created on NC
+        l_ids: list = [t["id"] for t in data["tasks"]]
+        for task in nc_tasks:
+            if task["id"] not in l_ids and task["id"] not in data["deleted"]:
+                Log.debug(f"Copy new task from Nextcloud: {task['id']}")
+                new_task: dict = TaskUtils.new_task(
+                    task["text"],
+                    task["id"],
+                    task["parent"],
+                    task["completed"],
+                    False,
+                    task["color"],
+                    True,
+                    False,
+                )
+                data["tasks"].append(new_task)
+
         # Remove deleted on NC tasks from data
         for task in to_delete:
             data["tasks"].remove(task)
@@ -173,24 +191,8 @@ class SyncProviderNextcloud:
                 pass
         data["deleted"] = []
 
-        # Create new local task that was created on NC
-        l_ids: list = [t["id"] for t in data["tasks"]]
-        for task in nc_tasks:
-            if task["id"] not in l_ids:
-                Log.debug(f"Copy new task from Nextcloud: {task['id']}")
-                new_task: dict = TaskUtils.new_task(
-                    task["text"],
-                    task["id"],
-                    task["parent"],
-                    task["completed"],
-                    False,
-                    task["color"],
-                    True,
-                    False,
-                )
-                data["tasks"].append(new_task)
-
         UserData.set(data)
+        # GLib.idle_add(self.window.update_tasks)
 
 
 class SyncProviderTodoist:

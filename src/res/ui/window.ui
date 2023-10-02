@@ -259,6 +259,18 @@
 
                     <!-- Scroll up button -->
                     <child type="end">
+                      <object class="GtkButton">
+                        <property name="icon-name">emblem-synchronizing-symbolic</property>
+                        <property name="tooltip-text" translatable="yes">Sync/Fetch Tasks</property>
+                        <signal name="clicked" handler="on_sync_btn_clicked" />
+                        <accessibility>
+                          <property name="label" translatable="yes">Sync/Fetch Tasks</property>
+                        </accessibility>
+                      </object>
+                    </child>
+
+                    <!-- Scroll up button -->
+                    <child type="end">
                       <object class="GtkRevealer" id="scroll_up_btn_rev">
                         <property name="valign">end</property>
                         <property name="halign">end</property>

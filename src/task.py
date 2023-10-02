@@ -62,8 +62,6 @@ class Task(Gtk.Revealer):
         # Add to trash if needed
         if self.task["deleted"]:
             self.window.trash_add(self.task)
-        # Add self to main task list
-        self.window.tasks.append(self)
         self.check_is_sub()
         self.add_sub_tasks()
         self.add_actions()
@@ -98,7 +96,7 @@ class Task(Gtk.Revealer):
         add_action("edit", edit)
         add_action("copy", copy)
 
-    def add_sub_task(self, task: dict):
+    def add_task(self, task: dict):
         sub_task = Task(task, self.window, self)
         self.tasks_list.append(sub_task)
         sub_task.toggle_visibility(not task["deleted"])
@@ -108,7 +106,7 @@ class Task(Gtk.Revealer):
         for task in UserData.get()["tasks"]:
             if task["parent"] == self.task["id"]:
                 sub_count += 1
-                self.add_sub_task(task)
+                self.add_task(task)
         self.expand(sub_count > 0 and GSettings.get("expand-on-startup"))
         self.update_status()
         self.window.update_status()
@@ -129,7 +127,8 @@ class Task(Gtk.Revealer):
         self.completed_btn.props.active = True
         self.window.trash_add(self.task)
         for task in get_children(self.tasks_list):
-            task.delete()
+            if not task.task["deleted"]:
+                task.delete()
 
     def expand(self, expanded: bool) -> None:
         self.expanded = expanded
@@ -138,7 +137,6 @@ class Task(Gtk.Revealer):
             self.expand_icon.add_css_class("rotate")
         else:
             self.expand_icon.remove_css_class("rotate")
-        self.update_status()
 
     def purge(self):
         """
@@ -146,7 +144,8 @@ class Task(Gtk.Revealer):
         """
 
         self.parent.tasks_list.remove(self)
-        self.window.tasks.remove(self)
+        self.parent.update_status()
+        self.run_dispose()
 
     def toggle_edit_mode(self) -> None:
         self.task_box_rev.set_reveal_child(not self.task_box_rev.get_child_revealed())
@@ -219,8 +218,8 @@ class Task(Gtk.Revealer):
         set_text()
         # Sync
         if self.can_sync:
-            self.window.update_status()
             Sync.sync()
+            self.window.update_status()
             for task in children:
                 task.can_sync = True
 
@@ -249,7 +248,7 @@ class Task(Gtk.Revealer):
         data["tasks"].append(new_sub_task)
         UserData.set(data)
         # Add sub-task
-        self.add_sub_task(new_sub_task)
+        self.add_task(new_sub_task)
         # Clear entry
         entry.get_buffer().props.text = ""
         # Update status

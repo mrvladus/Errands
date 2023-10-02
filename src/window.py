@@ -29,7 +29,7 @@ from __main__ import VERSION, PROFILE, APP_ID
 from .preferences import PreferencesWindow
 from .sync import Sync
 from .task import Task
-from .utils import Animate, GSettings, Log, TaskUtils, UserData, get_children
+from .utils import Animate, GSettings, Log, TaskUtils, UserData, get_children, Markup
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/Errands/window.ui")
@@ -62,7 +62,6 @@ class Window(Adw.ApplicationWindow):
 
     # - State - #
     scrolling: bool = False  # Is window scrolling
-    tasks: list[Task] = []  # Task widgets list
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
@@ -74,6 +73,8 @@ class Window(Adw.ApplicationWindow):
         # Setup theme
         Adw.StyleManager.get_default().set_color_scheme(GSettings.get("theme"))
         self.create_actions()
+        Sync.init(self)
+        Sync.sync_blocking(True)
         self.load_tasks()
 
     def add_task(self, task: dict) -> None:
@@ -149,9 +150,8 @@ class Window(Adw.ApplicationWindow):
                     UserData.set(json.loads(text))
 
                 # Remove old tasks
-                for task in self.tasks:
+                for task in self.get_toplevel_tasks():
                     self.tasks_list.remove(task)
-                self.tasks.clear()
                 # Remove old trash
                 for task in get_children(self.trash_list):
                     self.trash_list.remove(task)
@@ -192,17 +192,63 @@ class Window(Adw.ApplicationWindow):
         )
         create_action("open_log", open_log)
 
+    def get_all_tasks(self) -> list[Task]:
+        """
+        Get list of all tasks widgets including sub-tasks
+        """
+
+        tasks: list[Task] = []
+
+        def append_tasks(items: list[Task]):
+            for task in items:
+                tasks.append(task)
+                children: list[Task] = get_children(task.tasks_list)
+                if len(children) > 0:
+                    append_tasks(children)
+
+        append_tasks(get_children(self.tasks_list))
+        return tasks
+
+    def get_toplevel_tasks(self) -> list[Task]:
+        return get_children(self.tasks_list)
+
     def load_tasks(self) -> None:
-        Sync.init(self)
-        Sync.sync_blocking(True)
         Log.debug("Loading tasks")
-        count: int = 0
-        data: dict = UserData.get()
-        for task in data["tasks"]:
+        for task in UserData.get()["tasks"]:
             self.add_task(task)
-            if not task["deleted"]:
-                count += 1
         self.update_status()
+
+    # def update_tasks(self):
+    #     Log.debug("Updating tasks")
+    #     tasks = UserData.get()["tasks"]
+    #     to_create = []
+    #     to_remove = []
+    #     for task in tasks:
+    #         for t in self.tasks:
+    #             if t.task["id"] == task["id"]:
+    #                 if task["parent"] != t.task["parent"]:
+    #                     to_remove.append(t)
+    #                     if task["parent"] == "":
+    #                         to_create.append((self, task))
+    #                     else:
+    #                         for tsk in self.tasks:
+    #                             if tsk.task["id"] == task["parent"]:
+    #                                 to_create.append((tsk, task))
+    #                                 tsk.expand(True)
+    #                                 break
+    #                 if task["text"] != t.task["text"]:
+    #                     t.task["text"] = task["text"]
+    #                     t.update_data()
+    #                     t.text = Markup.find_url(Markup.escape(t.task["text"]))
+    #                     t.task_row.props.title = t.text
+    #                 if task["completed"] != t.task["completed"]:
+    #                     t.completed_btn.set_active(task["completed"])
+
+    #     for task in to_remove:
+    #         task.purge()
+
+    #     for task in to_create:
+    #         task[0].add_task(task[1])
 
     def trash_add(self, task: dict) -> None:
         """
@@ -237,11 +283,13 @@ class Window(Adw.ApplicationWindow):
         # Set status
         n_total = 0
         n_completed = 0
-        for task in get_children(self.tasks_list):
-            if not task.task["deleted"]:
-                n_total += 1
-                if task.task["completed"]:
-                    n_completed += 1
+        tasks: list[Task] = self.get_all_tasks()
+        for task in tasks:
+            if task.task["parent"] == "":
+                if not task.task["deleted"]:
+                    n_total += 1
+                    if task.task["completed"]:
+                        n_completed += 1
         self.title.set_subtitle(
             _("Completed:") + f" {n_completed} / {n_total}"  # pyright: ignore
             if n_total > 0
@@ -251,7 +299,7 @@ class Window(Adw.ApplicationWindow):
         # Set state for delete completed button
         n_completed = 0
         n_deleted = 0
-        for task in self.tasks:
+        for task in tasks:
             if not task.task["deleted"]:
                 if task.task["completed"]:
                     n_completed += 1
@@ -348,10 +396,14 @@ class Window(Adw.ApplicationWindow):
         """
         Hide completed tasks
         """
-        for task in self.tasks:
+        for task in self.get_all_tasks():
             if task.task["completed"] and not task.task["deleted"]:
                 task.delete()
         self.update_status()
+
+    @Gtk.Template.Callback()
+    def on_sync_btn_clicked(self, btn) -> None:
+        Sync.sync(True)
 
     @Gtk.Template.Callback()
     def on_trash_clear(self, _) -> None:
@@ -374,7 +426,7 @@ class Window(Adw.ApplicationWindow):
         data["deleted"] = [task["id"] for task in data["tasks"] if task["deleted"]]
         data["tasks"] = [task for task in data["tasks"] if not task["deleted"]]
         UserData.set(data)
-        to_remove = [task for task in self.tasks if task.task["deleted"]]
+        to_remove = [task for task in self.get_all_tasks() if task.task["deleted"]]
         for task in to_remove:
             task.purge()
         # Remove trash items widgets
@@ -402,7 +454,8 @@ class Window(Adw.ApplicationWindow):
         UserData.set(data)
 
         # Restore tasks
-        for task in self.tasks:
+        tasks: list[Task] = self.get_all_tasks()
+        for task in tasks:
             if task.task["deleted"]:
                 task.task["deleted"] = False
                 task.update_data()
@@ -413,7 +466,7 @@ class Window(Adw.ApplicationWindow):
                 else:
                     task.parent.update_status()
                 # Expand if needed
-                for t in self.tasks:
+                for t in tasks:
                     if t.task["parent"] == task.task["id"]:
                         task.expand(True)
                         break
@@ -454,7 +507,7 @@ class TrashItem(Gtk.Box):
         Log.info(f"Restore task: {self.id}")
 
         def restore_task(id: str = self.id):
-            for task in self.window.tasks:
+            for task in self.window.get_all_tasks():
                 if task.task["id"] == id:
                     task.task["deleted"] = False
                     task.update_data()
