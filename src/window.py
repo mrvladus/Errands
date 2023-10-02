@@ -217,6 +217,11 @@ class Window(Adw.ApplicationWindow):
         for task in UserData.get()["tasks"]:
             self.add_task(task)
         self.update_status()
+        # Expand tasks if needed
+        if GSettings.get("expand-on-startup"):
+            for task in self.get_all_tasks():
+                if len(get_children(task.tasks_list)) > 0:
+                    task.expand(True)
 
     def update_ui(self) -> None:
         Log.debug("Updating UI")

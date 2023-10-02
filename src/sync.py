@@ -107,7 +107,6 @@ class SyncProviderNextcloud:
         data: dict = UserData.get()
         nc_tasks: list = self._get_tasks()
         nc_ids: list[str] = [task["id"] for task in nc_tasks]
-        to_delete: list[dict] = []
 
         def _fetch():
             """
@@ -115,7 +114,10 @@ class SyncProviderNextcloud:
             """
 
             Log.debug("Fetch tasks from Nextcloud")
+
+            to_delete: list[dict] = []
             for task in data["tasks"]:
+                # Update local task that changed on NC
                 if task["id"] in nc_ids and task["synced_nc"]:
                     for nc_task in nc_tasks:
                         if nc_task["id"] == task["id"]:
@@ -124,6 +126,34 @@ class SyncProviderNextcloud:
                             task["completed"] = nc_task["completed"]
                             task["color"] = nc_task["color"]
                             break
+                # Delete local task that was deleted on NC
+                if task["id"] not in nc_ids and task["synced_nc"]:
+                    Log.debug(f"Delete local task deleted on Nextcloud: {task['id']}")
+                    to_delete.append(task)
+
+            # Remove deleted on NC tasks from data
+            for task in to_delete:
+                data["tasks"].remove(task)
+
+            # Create new local task that was created on NC
+            l_ids: list = [t["id"] for t in data["tasks"]]
+            for task in nc_tasks:
+                if task["id"] not in l_ids and task["id"] not in data["deleted"]:
+                    Log.debug(f"Copy new task from Nextcloud: {task['id']}")
+                    new_task: dict = TaskUtils.new_task(
+                        task["text"],
+                        task["id"],
+                        task["parent"],
+                        task["completed"],
+                        False,
+                        task["color"],
+                        True,
+                        False,
+                    )
+                    data["tasks"].append(new_task)
+
+            UserData.set(data)
+            GLib.idle_add(self.window.update_ui)
 
         if fetch:
             _fetch()
@@ -142,7 +172,7 @@ class SyncProviderNextcloud:
                     new_todo.complete()
                 task["synced_nc"] = True
 
-            # Update task that was changed locally
+            # Update task on NC that was changed locally
             elif task["id"] in nc_ids and not task["synced_nc"]:
                 Log.debug(f"Update task on Nextcloud: {task['id']}")
                 todo = self.calendar.todo_by_uid(task["id"])
@@ -155,32 +185,6 @@ class SyncProviderNextcloud:
                     todo.complete()
                 task["synced_nc"] = True
 
-            # Delete local task that was deleted on NC
-            elif task["id"] not in nc_ids and task["synced_nc"]:
-                Log.debug(f"Delete local task deleted on Nextcloud: {task['id']}")
-                to_delete.append(task)
-
-        # Create new local task that was created on NC
-        l_ids: list = [t["id"] for t in data["tasks"]]
-        for task in nc_tasks:
-            if task["id"] not in l_ids and task["id"] not in data["deleted"]:
-                Log.debug(f"Copy new task from Nextcloud: {task['id']}")
-                new_task: dict = TaskUtils.new_task(
-                    task["text"],
-                    task["id"],
-                    task["parent"],
-                    task["completed"],
-                    False,
-                    task["color"],
-                    True,
-                    False,
-                )
-                data["tasks"].append(new_task)
-
-        # Remove deleted on NC tasks from data
-        for task in to_delete:
-            data["tasks"].remove(task)
-
         # Delete tasks on NC if they were deleted locally
         for task_id in data["deleted"]:
             try:
@@ -192,8 +196,6 @@ class SyncProviderNextcloud:
         data["deleted"] = []
 
         UserData.set(data)
-        if fetch:
-            GLib.idle_add(self.window.update_ui)
 
 
 class SyncProviderTodoist:

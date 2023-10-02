@@ -110,13 +110,11 @@ class Task(Gtk.Revealer):
         self.window.update_status()
 
     def check_is_sub(self):
-        if self.task["parent"]:
+        if self.task["parent"] != "":
             self.is_sub_task = True
             self.main_box.add_css_class("sub-task")
             if not self.window.startup:
                 self.parent.expand(True)
-            else:
-                self.parent.expand(GSettings.get("expand-on-startup"))
         else:
             self.main_box.add_css_class("task")
 
