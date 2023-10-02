@@ -265,9 +265,10 @@ class Window(Adw.ApplicationWindow):
 
         tasks: list[dict] = UserData.get()["tasks"]
         to_remove: list = []
+        trash_children: list[TrashItem] = get_children(self.trash_list)
         for task in tasks:
             if not task["deleted"]:
-                for item in get_children(self.trash_list):
+                for item in trash_children:
                     if item.id == task["id"]:
                         to_remove.append(item)
         for item in to_remove:
