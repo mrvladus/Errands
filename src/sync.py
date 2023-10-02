@@ -192,7 +192,8 @@ class SyncProviderNextcloud:
         data["deleted"] = []
 
         UserData.set(data)
-        # GLib.idle_add(self.window.update_tasks)
+        if fetch:
+            GLib.idle_add(self.window.update_ui)
 
 
 class SyncProviderTodoist:

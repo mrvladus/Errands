@@ -41,7 +41,6 @@ class Task(Gtk.Revealer):
 
     # - State - #
     just_added: bool = True
-    expanded: bool = False
     is_sub_task: bool = False
     can_sync: bool = True
 
@@ -107,7 +106,6 @@ class Task(Gtk.Revealer):
             if task["parent"] == self.task["id"]:
                 sub_count += 1
                 self.add_task(task)
-        self.expand(sub_count > 0 and GSettings.get("expand-on-startup"))
         self.update_status()
         self.window.update_status()
 
@@ -115,6 +113,10 @@ class Task(Gtk.Revealer):
         if self.task["parent"]:
             self.is_sub_task = True
             self.main_box.add_css_class("sub-task")
+            if not self.window.startup:
+                self.parent.expand(True)
+            else:
+                self.parent.expand(GSettings.get("expand-on-startup"))
         else:
             self.main_box.add_css_class("task")
 
@@ -131,7 +133,6 @@ class Task(Gtk.Revealer):
                 task.delete()
 
     def expand(self, expanded: bool) -> None:
-        self.expanded = expanded
         self.sub_tasks_revealer.set_reveal_child(expanded)
         if expanded:
             self.expand_icon.add_css_class("rotate")
@@ -415,10 +416,7 @@ class Task(Gtk.Revealer):
         # Remove old task
         task.purge()
         # Add new sub-task
-        self.expand(True)
-        sub_task = Task(task.task.copy(), self.window, self)
-        self.tasks_list.append(sub_task)
-        sub_task.toggle_visibility(True)
+        self.add_task(task.task.copy())
         self.completed_btn.props.active = False
         # Update status
         task.parent.update_status()

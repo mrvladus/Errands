@@ -62,6 +62,7 @@ class Window(Adw.ApplicationWindow):
 
     # - State - #
     scrolling: bool = False  # Is window scrolling
+    startup: bool = True
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
@@ -76,10 +77,9 @@ class Window(Adw.ApplicationWindow):
         Sync.init(self)
         Sync.sync_blocking(True)
         self.load_tasks()
+        self.startup = False
 
     def add_task(self, task: dict) -> None:
-        if task["parent"]:
-            return
         new_task = Task(task, self)
         self.tasks_list.append(new_task)
         if not task["deleted"]:
@@ -218,37 +218,52 @@ class Window(Adw.ApplicationWindow):
             self.add_task(task)
         self.update_status()
 
-    # def update_tasks(self):
-    #     Log.debug("Updating tasks")
-    #     tasks = UserData.get()["tasks"]
-    #     to_create = []
-    #     to_remove = []
-    #     for task in tasks:
-    #         for t in self.tasks:
-    #             if t.task["id"] == task["id"]:
-    #                 if task["parent"] != t.task["parent"]:
-    #                     to_remove.append(t)
-    #                     if task["parent"] == "":
-    #                         to_create.append((self, task))
-    #                     else:
-    #                         for tsk in self.tasks:
-    #                             if tsk.task["id"] == task["parent"]:
-    #                                 to_create.append((tsk, task))
-    #                                 tsk.expand(True)
-    #                                 break
-    #                 if task["text"] != t.task["text"]:
-    #                     t.task["text"] = task["text"]
-    #                     t.update_data()
-    #                     t.text = Markup.find_url(Markup.escape(t.task["text"]))
-    #                     t.task_row.props.title = t.text
-    #                 if task["completed"] != t.task["completed"]:
-    #                     t.completed_btn.set_active(task["completed"])
+    def update_ui(self) -> None:
+        Log.debug("Updating UI")
 
-    #     for task in to_remove:
-    #         task.purge()
+        # Update existing tasks
+        tasks: list[Task] = self.get_all_tasks()
+        data_tasks: list[dict] = UserData.get()["tasks"]
+        to_change_parent: list[dict] = []
+        to_remove: list[Task] = []
+        for task in tasks:
+            for t in data_tasks:
+                if task.task["id"] == t["id"]:
+                    # If parent is changed
+                    if task.task["parent"] != t["parent"]:
+                        to_change_parent.append(t)
+                        to_remove.append(task)
+                        break
+                    # If text changed
+                    if task.task["text"] != t["text"]:
+                        task.task["text"] = t["text"]
+                        task.text = Markup.find_url(Markup.escape(task.task["text"]))
+                        task.task_row.props.title = task.text
+                    # If completion changed
+                    if task.task["completed"] != t["completed"]:
+                        task.completed_btn.props.active = t["completed"]
 
-    #     for task in to_create:
-    #         task[0].add_task(task[1])
+        # Remove old tasks
+        for task in to_remove:
+            task.purge()
+
+        # Change parents
+        for task in to_change_parent:
+            if task["parent"] == "":
+                self.add_task(task)
+            else:
+                for t in tasks:
+                    if t.task["id"] == task["parent"]:
+                        t.add_task(task)
+                        break
+
+        # Create new tasks
+        tasks_ids: list[str] = [task.task["id"] for task in self.get_all_tasks()]
+        for task in data_tasks:
+            if task["id"] not in tasks_ids:
+                if task["parent"] == "":
+                    self.add_task(task)
+                    tasks_ids = [task.task["id"] for task in self.get_all_tasks()]
 
     def trash_add(self, task: dict) -> None:
         """
@@ -367,7 +382,6 @@ class Window(Adw.ApplicationWindow):
         # Check for empty string or task exists
         if text == "":
             return
-
         # Add new task
         new_data: dict = UserData.get()
         new_task: dict = TaskUtils.new_task(text)
@@ -507,8 +521,10 @@ class TrashItem(Gtk.Box):
 
         Log.info(f"Restore task: {self.id}")
 
+        tasks: list[Task] = self.window.get_all_tasks()
+
         def restore_task(id: str = self.id):
-            for task in self.window.get_all_tasks():
+            for task in tasks:
                 if task.task["id"] == id:
                     task.task["deleted"] = False
                     task.update_data()
