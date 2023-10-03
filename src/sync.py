@@ -61,10 +61,10 @@ class SyncProviderNextcloud:
         ) as client:
             try:
                 principal = client.principal()
-                Log.info(f"Connected to Nextcloud DAV server at '{self.url}'")
+                Log.info(f"Connected to Nextcloud CalDAV server at '{self.url}'")
                 self.can_sync = True
             except:
-                Log.error(f"Can't connect to Nextcloud DAV server at '{self.url}'")
+                Log.error(f"Can't connect to Nextcloud CalDAV server at '{self.url}'")
                 self.can_sync = False
                 return
 
@@ -81,31 +81,36 @@ class SyncProviderNextcloud:
                 )
 
     def _get_tasks(self) -> list[dict]:
-        todos = self.calendar.todos(include_completed=True)
-        tasks: list[dict] = []
-        for todo in todos:
-            data: dict = {
-                "id": str(todo.icalendar_component.get("uid", "")),
-                "parent": str(todo.icalendar_component.get("related-to", "")),
-                "text": str(todo.icalendar_component.get("summary", "")),
-                "completed": True
-                if str(todo.icalendar_component.get("status", False)) == "COMPLETED"
-                else False,
-                "color": str(todo.icalendar_component.get("x-errands-color", "")),
-            }
-            tasks.append(data)
-
-        return tasks
+        try:
+            todos = self.calendar.todos(include_completed=True)
+            tasks: list[dict] = []
+            for todo in todos:
+                data: dict = {
+                    "id": str(todo.icalendar_component.get("uid", "")),
+                    "parent": str(todo.icalendar_component.get("related-to", "")),
+                    "text": str(todo.icalendar_component.get("summary", "")),
+                    "completed": True
+                    if str(todo.icalendar_component.get("status", False)) == "COMPLETED"
+                    else False,
+                    "color": str(todo.icalendar_component.get("x-errands-color", "")),
+                }
+                tasks.append(data)
+            return tasks
+        except:
+            return None
 
     def _fetch(self):
         """
         Update local tasks that was changed on provider
         """
+        nc_tasks: list[dict] | None = self._get_tasks()
+        if not nc_tasks:
+            Log.error("Can't connect to Nextcloud")
+            return
 
         Log.debug("Fetch tasks from Nextcloud")
 
         data: dict = UserData.get()
-        nc_tasks: list = self._get_tasks()
         nc_ids: list[str] = [task["id"] for task in nc_tasks]
 
         to_delete: list[dict] = []
@@ -130,7 +135,7 @@ class SyncProviderNextcloud:
             data["tasks"].remove(task)
 
         # Create new local task that was created on NC
-        l_ids: list = [t["id"] for t in data["tasks"]]
+        l_ids: list[str] = [t["id"] for t in data["tasks"]]
         for task in nc_tasks:
             if task["id"] not in l_ids and task["id"] not in data["deleted"]:
                 Log.debug(f"Copy new task from Nextcloud: {task['id']}")
@@ -153,10 +158,14 @@ class SyncProviderNextcloud:
         Sync local tasks with provider
         """
 
+        nc_tasks: list[dict] | None = self._get_tasks()
+        if not nc_tasks:
+            Log.error("Can't connect to Nextcloud")
+            return
+
         Log.info("Sync tasks with Nextcloud")
 
         data: dict = UserData.get()
-        nc_tasks: list = self._get_tasks()
         nc_ids: list[str] = [task["id"] for task in nc_tasks]
 
         for task in data["tasks"]:
