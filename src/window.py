@@ -263,7 +263,7 @@ class Window(Adw.ApplicationWindow):
                         t.add_task(task)
                         break
 
-        # FIX: Create new tasks
+        # Create new tasks
         tasks_ids: list[str] = [task.task["id"] for task in self.get_all_tasks()]
         for task in data_tasks:
             if task["id"] not in tasks_ids:

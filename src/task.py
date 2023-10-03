@@ -108,7 +108,6 @@ class Task(Gtk.Revealer):
             if task["parent"] == self.task["id"]:
                 sub_count += 1
                 self.add_task(task)
-        self.update_status()
         self.window.update_status()
 
     def check_is_sub(self):
