@@ -65,6 +65,7 @@ class Task(Gtk.Revealer):
         self.add_sub_tasks()
         self.add_actions()
         self.just_added = False
+        self.parent.update_status()
 
     def __repr__(self):
         return f"Task({self.task['id']})"
@@ -99,6 +100,7 @@ class Task(Gtk.Revealer):
         sub_task = Task(task, self.window, self)
         self.tasks_list.append(sub_task)
         sub_task.toggle_visibility(not task["deleted"])
+        self.update_status()
 
     def add_sub_tasks(self) -> None:
         sub_count = 0

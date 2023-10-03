@@ -263,13 +263,19 @@ class Window(Adw.ApplicationWindow):
                         t.add_task(task)
                         break
 
-        # Create new tasks
+        # FIX: Create new tasks
         tasks_ids: list[str] = [task.task["id"] for task in self.get_all_tasks()]
         for task in data_tasks:
             if task["id"] not in tasks_ids:
+                # Add toplevel task and its sub-tasks
                 if task["parent"] == "":
                     self.add_task(task)
-                    tasks_ids = [task.task["id"] for task in self.get_all_tasks()]
+                # Add sub-task and its sub-tasks
+                else:
+                    for t in self.get_all_tasks():
+                        if t.task["id"] == task["parent"]:
+                            t.add_task(task)
+                tasks_ids = [task.task["id"] for task in self.get_all_tasks()]
 
     def trash_add(self, task: dict) -> None:
         """
