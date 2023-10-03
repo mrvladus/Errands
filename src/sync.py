@@ -202,7 +202,7 @@ class SyncProviderNextcloud:
                 todo = self.calendar.todo_by_uid(task_id)
                 todo.delete()
             except:
-                pass
+                Log.error(f"Can't delete task from Nextcloud: {task_id}")
         data["deleted"] = []
 
         UserData.set(data)
