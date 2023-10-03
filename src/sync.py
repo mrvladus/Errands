@@ -97,9 +97,60 @@ class SyncProviderNextcloud:
 
         return tasks
 
+    def _fetch(self):
+        """
+        Update local tasks that was changed on provider
+        """
+
+        Log.debug("Fetch tasks from Nextcloud")
+
+        data: dict = UserData.get()
+        nc_tasks: list = self._get_tasks()
+        nc_ids: list[str] = [task["id"] for task in nc_tasks]
+
+        to_delete: list[dict] = []
+        for task in data["tasks"]:
+            # Update local task that was changed on NC
+            if task["id"] in nc_ids and task["synced_nc"]:
+                for nc_task in nc_tasks:
+                    if nc_task["id"] == task["id"]:
+                        Log.debug(f"Update local task from Nextcloud: {task['id']}")
+                        task["text"] = nc_task["text"]
+                        task["parent"] = nc_task["parent"]
+                        task["completed"] = nc_task["completed"]
+                        task["color"] = nc_task["color"]
+                        break
+            # Delete local task that was deleted on NC
+            if task["id"] not in nc_ids and task["synced_nc"]:
+                Log.debug(f"Delete local task deleted on Nextcloud: {task['id']}")
+                to_delete.append(task)
+
+        # Remove deleted on NC tasks from data
+        for task in to_delete:
+            data["tasks"].remove(task)
+
+        # Create new local task that was created on NC
+        l_ids: list = [t["id"] for t in data["tasks"]]
+        for task in nc_tasks:
+            if task["id"] not in l_ids and task["id"] not in data["deleted"]:
+                Log.debug(f"Copy new task from Nextcloud: {task['id']}")
+                new_task: dict = TaskUtils.new_task(
+                    task["text"],
+                    task["id"],
+                    task["parent"],
+                    task["completed"],
+                    False,
+                    task["color"],
+                    True,
+                    False,
+                )
+                data["tasks"].append(new_task)
+
+        UserData.set(data)
+
     def sync(self, fetch: bool) -> None:
         """
-        Sync tasks with provider
+        Sync local tasks with provider
         """
 
         Log.info("Sync tasks with Nextcloud")
@@ -107,56 +158,6 @@ class SyncProviderNextcloud:
         data: dict = UserData.get()
         nc_tasks: list = self._get_tasks()
         nc_ids: list[str] = [task["id"] for task in nc_tasks]
-
-        def _fetch():
-            """
-            Update local tasks that was changed on NC
-            """
-
-            Log.debug("Fetch tasks from Nextcloud")
-
-            to_delete: list[dict] = []
-            for task in data["tasks"]:
-                # Update local task that changed on NC
-                if task["id"] in nc_ids and task["synced_nc"]:
-                    for nc_task in nc_tasks:
-                        if nc_task["id"] == task["id"]:
-                            task["text"] = nc_task["text"]
-                            task["parent"] = nc_task["parent"]
-                            task["completed"] = nc_task["completed"]
-                            task["color"] = nc_task["color"]
-                            break
-                # Delete local task that was deleted on NC
-                if task["id"] not in nc_ids and task["synced_nc"]:
-                    Log.debug(f"Delete local task deleted on Nextcloud: {task['id']}")
-                    to_delete.append(task)
-
-            # Remove deleted on NC tasks from data
-            for task in to_delete:
-                data["tasks"].remove(task)
-
-            # Create new local task that was created on NC
-            l_ids: list = [t["id"] for t in data["tasks"]]
-            for task in nc_tasks:
-                if task["id"] not in l_ids and task["id"] not in data["deleted"]:
-                    Log.debug(f"Copy new task from Nextcloud: {task['id']}")
-                    new_task: dict = TaskUtils.new_task(
-                        task["text"],
-                        task["id"],
-                        task["parent"],
-                        task["completed"],
-                        False,
-                        task["color"],
-                        True,
-                        False,
-                    )
-                    data["tasks"].append(new_task)
-
-            UserData.set(data)
-            GLib.idle_add(self.window.update_ui)
-
-        if fetch:
-            _fetch()
 
         for task in data["tasks"]:
             # Create new task on NC that was created offline
@@ -196,6 +197,10 @@ class SyncProviderNextcloud:
         data["deleted"] = []
 
         UserData.set(data)
+
+        if fetch:
+            self._fetch()
+            GLib.idle_add(self.window.update_ui)
 
 
 class SyncProviderTodoist:

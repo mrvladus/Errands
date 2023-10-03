@@ -215,7 +215,8 @@ class Window(Adw.ApplicationWindow):
     def load_tasks(self) -> None:
         Log.debug("Loading tasks")
         for task in UserData.get()["tasks"]:
-            self.add_task(task)
+            if not task["parent"]:
+                self.add_task(task)
         self.update_status()
         # Expand tasks if needed
         if GSettings.get("expand-on-startup"):
