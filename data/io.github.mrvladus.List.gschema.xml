@@ -19,22 +19,19 @@
     <key name="expand-on-startup" type="b">
       <default>true</default>
     </key>
-    <key name="nc-enabled" type="b">
-      <default>false</default>
+    <key name="sync-provider" type="i">
+      <default>0</default>
     </key>
-    <key name="nc-url" type="s">
+    <key name="sync-url" type="s">
       <default>""</default>
     </key>
-    <key name="nc-username" type="s">
+    <key name="sync-username" type="s">
       <default>""</default>
     </key>
-    <key name="nc-password" type="s">
+    <key name="sync-password" type="s">
       <default>""</default>
     </key>
-    <key name="td-enabled" type="b">
-      <default>false</default>
-    </key>
-    <key name="td-token" type="s">
+    <key name="sync-token" type="s">
       <default>""</default>
     </key>
   </schema>

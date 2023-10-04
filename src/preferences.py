@@ -31,12 +31,13 @@ class PreferencesWindow(Adw.PreferencesWindow):
     light_theme: Gtk.CheckButton = Gtk.Template.Child()
     dark_theme: Gtk.CheckButton = Gtk.Template.Child()
     expand_on_startup: Gtk.Switch = Gtk.Template.Child()
-    nc_enabled: Adw.ExpanderRow = Gtk.Template.Child()
-    nc_url: Adw.EntryRow = Gtk.Template.Child()
-    nc_username: Adw.EntryRow = Gtk.Template.Child()
-    nc_password: Adw.PasswordEntryRow = Gtk.Template.Child()
-    td_enabled: Adw.ExpanderRow = Gtk.Template.Child()
-    td_token: Adw.PasswordEntryRow = Gtk.Template.Child()
+    sync_providers: Adw.ComboRow = Gtk.Template.Child()
+    sync_url: Adw.EntryRow = Gtk.Template.Child()
+    sync_username: Adw.EntryRow = Gtk.Template.Child()
+    sync_password: Adw.EntryRow = Gtk.Template.Child()
+    sync_token: Adw.EntryRow = Gtk.Template.Child()
+
+    selected_provider = 0
 
     def __init__(self, win: Adw.ApplicationWindow) -> None:
         super().__init__(transient_for=win)
@@ -51,12 +52,15 @@ class PreferencesWindow(Adw.PreferencesWindow):
         # Setup expand
         GSettings.bind("expand-on-startup", self.expand_on_startup, "active")
         # Setup sync
-        GSettings.bind("nc-enabled", self.nc_enabled, "enable-expansion")
-        GSettings.bind("nc-url", self.nc_url, "text")
-        GSettings.bind("nc-username", self.nc_username, "text")
-        GSettings.bind("nc-password", self.nc_password, "text")
-        GSettings.bind("td-enabled", self.td_enabled, "enable-expansion")
-        GSettings.bind("td-token", self.td_token, "text")
+        GSettings.bind("sync-provider", self.sync_providers, "selected")
+        self.setup_sync()
+
+    def setup_sync(self):
+        self.sync_token.set_visible(self.sync_providers.props.selected == 3)
+
+    @Gtk.Template.Callback()
+    def on_sync_provider_selected(self, *_) -> None:
+        self.setup_sync()
 
     # --- Template handlers --- #
 

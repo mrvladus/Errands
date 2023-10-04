@@ -86,54 +86,50 @@
           <object class="AdwPreferencesGroup">
             <property name="title" translatable="yes">Sync</property>
 
-            <!-- Nextcloud -->
+            <!-- Providers -->
             <child>
-              <object class="AdwExpanderRow" id="nc_enabled">
-                <property name="title" translatable="yes">Nextcloud</property>
-                <property name="show-enable-switch">true</property>
-
-                <!-- URL -->
-                <child>
-                  <object class="AdwEntryRow" id="nc_url">
-                    <property name="title" translatable="yes">Server URL</property>
-
+              <object class="AdwComboRow" id="sync_providers">
+                <property name="title">Sync Provider</property>
+                <property name="model">
+                  <object class="GtkStringList">
+                    <items>
+                      <item translatable="yes">Disabled</item>
+                      <item>Nextcloud</item>
+                      <item>OwnCloud</item>
+                      <item>Todoist</item>
+                      <item>Google Keep</item>
+                    </items>
                   </object>
-                </child>
-
-                <!-- Username -->
-                <child>
-                  <object class="AdwEntryRow" id="nc_username">
-                    <property name="title" translatable="yes">Username</property>
-
-                  </object>
-                </child>
-
-                <!-- Password -->
-                <child>
-                  <object class="AdwPasswordEntryRow" id="nc_password">
-                    <property name="title" translatable="yes">Password</property>
-
-                  </object>
-                </child>
-
+                </property>
+                <signal name="notify::selected" handler="on_sync_provider_selected" />
               </object>
             </child>
 
-            <!-- Todoist -->
+            <!-- URL -->
             <child>
-              <object class="AdwExpanderRow" id="td_enabled">
-                <property name="title" translatable="yes">Todoist</property>
-                <property name="show-enable-switch">true</property>
-                <property name="visible">false</property>
+              <object class="AdwEntryRow" id="sync_url">
+                <property name="title" translatable="yes">Server URL</property>
+              </object>
+            </child>
 
-                <!-- Token -->
-                <child>
-                  <object class="AdwPasswordEntryRow" id="td_token">
-                    <property name="title" translatable="yes">Token</property>
+            <!-- Username -->
+            <child>
+              <object class="AdwEntryRow" id="sync_username">
+                <property name="title" translatable="yes">Username</property>
+              </object>
+            </child>
 
-                  </object>
-                </child>
+            <!-- Password -->
+            <child>
+              <object class="AdwPasswordEntryRow" id="sync_password">
+                <property name="title" translatable="yes">Password</property>
+              </object>
+            </child>
 
+            <!-- Token -->
+            <child>
+              <object class="AdwPasswordEntryRow" id="sync_token">
+                <property name="title" translatable="yes">Token</property>
               </object>
             </child>
 
