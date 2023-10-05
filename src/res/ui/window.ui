@@ -257,9 +257,9 @@
                       </object>
                     </child>
 
-                    <!-- Scroll up button -->
+                    <!-- Sync button -->
                     <child type="end">
-                      <object class="GtkButton">
+                      <object class="GtkButton" id="sync_btn">
                         <property name="icon-name">emblem-synchronizing-symbolic</property>
                         <property name="tooltip-text" translatable="yes">Sync/Fetch Tasks</property>
                         <signal name="clicked" handler="on_sync_btn_clicked" />

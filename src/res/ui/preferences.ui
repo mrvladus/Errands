@@ -95,9 +95,9 @@
                     <items>
                       <item translatable="yes">Disabled</item>
                       <item>Nextcloud</item>
-                      <item>OwnCloud</item>
-                      <item>Todoist</item>
-                      <item>Google Keep</item>
+                      <!-- <item>OwnCloud</item> -->
+                      <!-- <item>Todoist</item> -->
+                      <!-- <item>Google Keep</item> -->
                     </items>
                   </object>
                 </property>

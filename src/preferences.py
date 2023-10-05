@@ -41,6 +41,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
 
     def __init__(self, win: Adw.ApplicationWindow) -> None:
         super().__init__(transient_for=win)
+        self.window = win
         # Setup theme
         theme: int = GSettings.get("theme")
         if theme == 0:
@@ -53,10 +54,18 @@ class PreferencesWindow(Adw.PreferencesWindow):
         GSettings.bind("expand-on-startup", self.expand_on_startup, "active")
         # Setup sync
         GSettings.bind("sync-provider", self.sync_providers, "selected")
+        GSettings.bind("sync-url", self.sync_url, "text")
+        GSettings.bind("sync-username", self.sync_username, "text")
+        GSettings.bind("sync-password", self.sync_password, "text")
         self.setup_sync()
 
     def setup_sync(self):
-        self.sync_token.set_visible(self.sync_providers.props.selected == 3)
+        selected = self.sync_providers.props.selected
+        self.sync_token.set_visible(selected == 3 and selected != 0)
+        self.sync_url.set_visible(selected != 3 and selected != 0)
+        self.sync_username.set_visible(selected != 3 and selected != 0)
+        self.sync_password.set_visible(selected != 3 and selected != 0)
+        self.window.sync_btn.set_visible(selected > 0)
 
     @Gtk.Template.Callback()
     def on_sync_provider_selected(self, *_) -> None:

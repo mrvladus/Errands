@@ -4,14 +4,21 @@ from .utils import GSettings, Log, TaskUtils, UserData, threaded
 
 
 class Sync:
-    providers: list = []
+    provider = None
     window: Adw.ApplicationWindow = None
 
     @classmethod
-    def init(self, window: Adw.ApplicationWindow) -> None:
-        Log.info("Initialize sync providers")
-        self.window = window
-        # self.providers.append(SyncProviderCalDAV("Nextcloud", self.window))
+    def init(self, window: Adw.ApplicationWindow = None) -> None:
+        if window:
+            self.window = window
+        match GSettings.get("sync-provider"):
+            case 0:
+                Log.debug("Sync disabled")
+                self.window.sync_btn.set_visible(False)
+                return
+            case 1:
+                self.provider = SyncProviderCalDAV("Nextcloud", self.window)
+                self.window.sync_btn.set_visible(True)
 
     @classmethod
     @threaded
@@ -19,20 +26,24 @@ class Sync:
         """
         Sync tasks without blocking the UI
         """
-
-        for provider in self.providers:
-            if provider.can_sync:
-                provider.sync(fetch)
+        if GSettings.get("sync-provider") == 0:
+            return
+        if not self.provider:
+            self.init()
+        if self.provider and self.provider.can_sync:
+            self.provider.sync(fetch)
 
     @classmethod
     def sync_blocking(self, fetch: bool = False):
         """
         Sync tasks while blocking the UI
         """
-
-        for provider in self.providers:
-            if provider.can_sync:
-                provider.sync(fetch)
+        if GSettings.get("sync-provider") == 0:
+            return
+        if not self.provider:
+            self.init()
+        if self.provider and self.provider.can_sync:
+            self.provider.sync(fetch)
 
 
 class SyncProviderCalDAV:
@@ -41,16 +52,11 @@ class SyncProviderCalDAV:
     window = None
 
     def __init__(self, name: str, window) -> None:
-        if not GSettings.get("caldav-enabled"):
-            Log.debug("CalDAV sync disabled")
-            return
-
         self.name = name
         self.window = window
-
-        self.url = GSettings.get("caldav-url")
-        self.username = GSettings.get("caldav-username")
-        self.password = GSettings.get("caldav-password")
+        self.url = GSettings.get("sync-url")
+        self.username = GSettings.get("sync-username")
+        self.password = GSettings.get("sync-password")
 
         if self.url == "" or self.username == "" or self.password == "":
             Log.error(f"Not all {self.name} credentials provided")
@@ -62,6 +68,7 @@ class SyncProviderCalDAV:
             url=self.url, username=self.username, password=self.password
         ) as client:
             try:
+                # client.check_cdav_support()
                 principal = client.principal()
                 Log.info(f"Connected to {self.name} CalDAV server at '{self.url}'")
                 self.can_sync = True
