@@ -160,7 +160,6 @@ class SyncProviderCalDAV:
                     False,
                     task["color"],
                     True,
-                    False,
                 )
                 data["tasks"].append(new_task)
 
