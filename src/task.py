@@ -204,7 +204,7 @@ class Task(Gtk.Revealer):
 
         # Update data
         self.task["completed"] = btn.props.active
-        self.task["synced_nc"] = False
+        self.task["synced_caldav"] = False
         self.update_data()
         # Update children
         children = get_children(self.tasks_list)
@@ -286,7 +286,7 @@ class Task(Gtk.Revealer):
         # Exit edit mode
         self.toggle_edit_mode()
         # Sync
-        self.task["synced_nc"] = False
+        self.task["synced_caldav"] = False
         self.update_data()
         Sync.sync()
 
@@ -310,7 +310,7 @@ class Task(Gtk.Revealer):
         # Set new color
         self.task["color"] = color
         # Sync
-        self.task["synced_nc"] = False
+        self.task["synced_caldav"] = False
         self.update_data()
         Sync.sync()
 
@@ -368,7 +368,7 @@ class Task(Gtk.Revealer):
 
         # Change parent if different parents
         task.task["parent"] = self.task["parent"]
-        task.task["synced_nc"] = False
+        task.task["synced_caldav"] = False
         task.update_data()
         task.purge()
         # Add new task widget
@@ -397,7 +397,7 @@ class Task(Gtk.Revealer):
 
         # Change parent
         task.task["parent"] = self.task["id"]
-        task.task["synced_nc"] = False
+        task.task["synced_caldav"] = False
         task.update_data()
         # Move data
         data = UserData.get()

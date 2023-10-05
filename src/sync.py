@@ -114,42 +114,42 @@ class SyncProviderCalDAV:
 
     def _fetch(self):
         """
-        Update local tasks that was changed on provider
+        Update local tasks that was changed on CalDAV
         """
-        nc_tasks: list[dict] | None = self._get_tasks()
-        if not nc_tasks:
+        caldav_tasks: list[dict] | None = self._get_tasks()
+        if not caldav_tasks:
             Log.error(f"Can't connect to {self.name}")
             return
 
         Log.debug(f"Fetch tasks from {self.name}")
 
         data: dict = UserData.get()
-        nc_ids: list[str] = [task["id"] for task in nc_tasks]
+        caldav_ids: list[str] = [task["id"] for task in caldav_tasks]
 
         to_delete: list[dict] = []
         for task in data["tasks"]:
-            # Update local task that was changed on NC
-            if task["id"] in nc_ids and task["synced_nc"]:
-                for nc_task in nc_tasks:
-                    if nc_task["id"] == task["id"]:
+            # Update local task that was changed on CalDAV
+            if task["id"] in caldav_ids and task["synced_caldav"]:
+                for caldav_task in caldav_tasks:
+                    if caldav_task["id"] == task["id"]:
                         Log.debug(f"Update local task from {self.name}: {task['id']}")
-                        task["text"] = nc_task["text"]
-                        task["parent"] = nc_task["parent"]
-                        task["completed"] = nc_task["completed"]
-                        task["color"] = nc_task["color"]
+                        task["text"] = caldav_task["text"]
+                        task["parent"] = caldav_task["parent"]
+                        task["completed"] = caldav_task["completed"]
+                        task["color"] = caldav_task["color"]
                         break
-            # Delete local task that was deleted on NC
-            if task["id"] not in nc_ids and task["synced_nc"]:
+            # Delete local task that was deleted on CalDAV
+            if task["id"] not in caldav_ids and task["synced_caldav"]:
                 Log.debug(f"Delete local task deleted on {self.name}: {task['id']}")
                 to_delete.append(task)
 
-        # Remove deleted on NC tasks from data
+        # Remove deleted on CalDAV tasks from data
         for task in to_delete:
             data["tasks"].remove(task)
 
-        # Create new local task that was created on NC
+        # Create new local task that was created on CalDAV
         l_ids: list[str] = [t["id"] for t in data["tasks"]]
-        for task in nc_tasks:
+        for task in caldav_tasks:
             if task["id"] not in l_ids and task["id"] not in data["deleted"]:
                 Log.debug(f"Copy new task from {self.name}: {task['id']}")
                 new_task: dict = TaskUtils.new_task(
@@ -171,19 +171,19 @@ class SyncProviderCalDAV:
         Sync local tasks with provider
         """
 
-        nc_tasks: list[dict] | None = self._get_tasks()
-        if not nc_tasks:
+        caldav_tasks: list[dict] | None = self._get_tasks()
+        if not caldav_tasks:
             Log.error(f"Can't connect to {self.name}")
             return
 
         Log.info(f"Sync tasks with {self.name}")
 
         data: dict = UserData.get()
-        nc_ids: list[str] = [task["id"] for task in nc_tasks]
+        caldav_ids: list[str] = [task["id"] for task in caldav_tasks]
 
         for task in data["tasks"]:
-            # Create new task on NC that was created offline
-            if task["id"] not in nc_ids and not task["synced_nc"]:
+            # Create new task on CalDAV that was created offline
+            if task["id"] not in caldav_ids and not task["synced_caldav"]:
                 Log.debug(f"Create new task on {self.name}: {task['id']}")
                 new_todo = self.calendar.save_todo(
                     uid=task["id"],
@@ -193,10 +193,10 @@ class SyncProviderCalDAV:
                 )
                 if task["completed"]:
                     new_todo.complete()
-                task["synced_nc"] = True
+                task["synced_caldav"] = True
 
-            # Update task on NC that was changed locally
-            elif task["id"] in nc_ids and not task["synced_nc"]:
+            # Update task on CalDAV that was changed locally
+            elif task["id"] in caldav_ids and not task["synced_caldav"]:
                 Log.debug(f"Update task on {self.name}: {task['id']}")
                 todo = self.calendar.todo_by_uid(task["id"])
                 todo.uncomplete()
@@ -206,9 +206,9 @@ class SyncProviderCalDAV:
                 todo.save()
                 if task["completed"]:
                     todo.complete()
-                task["synced_nc"] = True
+                task["synced_caldav"] = True
 
-        # Delete tasks on NC if they were deleted locally
+        # Delete tasks on CalDAV if they were deleted locally
         for task_id in data["deleted"]:
             try:
                 Log.debug(f"Delete task from {self.name}: {task_id}")

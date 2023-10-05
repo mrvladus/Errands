@@ -228,8 +228,8 @@ class TaskUtils:
         cmpd: bool = False,
         dltd: bool = False,
         color: str = "",
-        synced_nc: bool = False,
-        synced_td: bool = False,
+        synced_caldav: bool = False,
+        # synced_todoist: bool = False,
     ) -> dict:
         return {
             "id": self.generate_id() if not id else id,
@@ -238,8 +238,8 @@ class TaskUtils:
             "color": color,
             "completed": cmpd,
             "deleted": dltd,
-            "synced_nc": synced_nc,
-            "synced_td": synced_td,
+            "synced_caldav": synced_caldav,
+            # "synced_todoist": synced_todoist,
         }
 
 
@@ -325,8 +325,8 @@ class UserData:
                     "color",
                     "completed",
                     "deleted",
-                    "synced_nc",
-                    "synced_td",
+                    "synced_caldav",
+                    # "synced_todoist",
                 ]:
                     if not key in task:
                         Log.error(
@@ -357,8 +357,8 @@ class UserData:
                     "color": task["color"],
                     "completed": task["completed"],
                     "deleted": "history" in data and task["id"] in data["history"],
-                    "synced_nc": False,
-                    "synced_td": False,
+                    "synced_caldav": False,
+                    # "synced_todoist": False,
                 }
                 new_tasks.append(new_task)
                 if task["sub"] != []:
@@ -371,8 +371,8 @@ class UserData:
                             "completed": sub["completed"],
                             "deleted": "history" in data
                             and sub["id"] in data["history"],
-                            "synced_nc": False,
-                            "synced_td": False,
+                            "synced_caldav": False,
+                            # "synced_todoist": False,
                         }
                         new_tasks.append(new_sub)
             data["tasks"] = new_tasks
@@ -383,8 +383,8 @@ class UserData:
         elif ver.startswith("44.7"):
             data["deleted"] = []
             for task in data["tasks"]:
-                task["synced_nc"] = False
-                task["synced_td"] = False
+                task["synced_caldav"] = False
+                # task["synced_todoist"] = False
 
         data["version"] = VERSION
         UserData.set(data)
