@@ -74,10 +74,16 @@ class Window(Adw.ApplicationWindow):
         GSettings.bind("sidebar-open", self.toggle_trash_btn, "active")
         # Setup theme
         Adw.StyleManager.get_default().set_color_scheme(GSettings.get("theme"))
-        self.create_actions()
+        self.present()
+
+    def perform_startup(self):
+        """
+        Startup func. Call after window presented
+        """
+        self._create_actions()
         Sync.init(self)
         Sync.sync_blocking(True)
-        self.load_tasks()
+        self._load_tasks()
         self.startup = False
 
     def add_task(self, task: dict) -> None:
@@ -89,7 +95,7 @@ class Window(Adw.ApplicationWindow):
     def add_toast(self, toast: Adw.Toast) -> None:
         self.toast_overlay.add_toast(toast)
 
-    def create_actions(self) -> None:
+    def _create_actions(self) -> None:
         """
         Create actions for main menu
         """
@@ -213,7 +219,7 @@ class Window(Adw.ApplicationWindow):
     def get_toplevel_tasks(self) -> list[Task]:
         return get_children(self.tasks_list)
 
-    def load_tasks(self) -> None:
+    def _load_tasks(self) -> None:
         Log.debug("Loading tasks")
         for task in UserData.get()["tasks"]:
             if not task["parent"]:
@@ -343,7 +349,7 @@ class Window(Adw.ApplicationWindow):
         Autoscroll while dragging task
         """
 
-        def auto_scroll(scroll_up: bool) -> bool:
+        def _auto_scroll(scroll_up: bool) -> bool:
             """Scroll while drag is near the edge"""
             if not self.scrolling or not self.drop_motion_ctrl.contains_pointer():
                 return False
@@ -359,10 +365,10 @@ class Window(Adw.ApplicationWindow):
         height = self.scrolled_window.get_allocation().height
         if y < MARGIN:
             self.scrolling = True
-            GLib.timeout_add(100, auto_scroll, True)
+            GLib.timeout_add(100, _auto_scroll, True)
         elif y > height - MARGIN:
             self.scrolling = True
-            GLib.timeout_add(100, auto_scroll, False)
+            GLib.timeout_add(100, _auto_scroll, False)
         else:
             self.scrolling = False
 
@@ -410,7 +416,7 @@ class Window(Adw.ApplicationWindow):
         """
         Move focus to sidebar
         """
-        if btn.props.active:
+        if btn.get_active():
             self.clear_trash_btn.grab_focus()
         else:
             btn.grab_focus()
@@ -418,7 +424,7 @@ class Window(Adw.ApplicationWindow):
     @Gtk.Template.Callback()
     def on_delete_completed_tasks_btn_clicked(self, _) -> None:
         """
-        Hide completed tasks
+        Hide completed tasks and move them to trash
         """
         for task in self.get_all_tasks():
             if task.task["completed"] and not task.task["deleted"]:
@@ -471,11 +477,6 @@ class Window(Adw.ApplicationWindow):
         """
 
         Log.info("Restore Trash")
-
-        data: dict = UserData.get()
-        for task in data["tasks"]:
-            task["deleted"] = False
-        UserData.set(data)
 
         # Restore tasks
         tasks: list[Task] = self.get_all_tasks()

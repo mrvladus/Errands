@@ -36,4 +36,5 @@ class Application(Adw.Application):
         self.set_resource_base_path("/io/github/mrvladus/Errands/")
 
     def do_activate(self) -> None:
-        Window(application=self).present()
+        win = Window(application=self)
+        win.perform_startup()
