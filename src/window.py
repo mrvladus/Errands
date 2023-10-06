@@ -309,34 +309,31 @@ class Window(Adw.ApplicationWindow):
         Update status bar on the top
         """
 
-        # Set status
-        n_total = 0
-        n_completed = 0
-        tasks: list[Task] = self.get_all_tasks()
+        tasks: list[dict] = UserData.get()["tasks"]
+        n_total: int = 0
+        n_completed: int = 0
+        n_all_deleted: int = 0
+        n_all_completed: int = 0
+
         for task in tasks:
-            if task.task["parent"] == "":
-                if not task.task["deleted"]:
+            if task["parent"] == "":
+                if not task["deleted"]:
                     n_total += 1
-                    if task.task["completed"]:
+                    if task["completed"]:
                         n_completed += 1
+            if not task["deleted"]:
+                if task["completed"]:
+                    n_all_completed += 1
+            else:
+                n_all_deleted += 1
+
         self.title.set_subtitle(
             _("Completed:") + f" {n_completed} / {n_total}"  # pyright: ignore
             if n_total > 0
             else ""
         )
-
-        # Set state for delete completed button
-        n_completed = 0
-        n_deleted = 0
-        for task in tasks:
-            if not task.task["deleted"]:
-                if task.task["completed"]:
-                    n_completed += 1
-            else:
-                n_deleted += 1
-        self.delete_completed_tasks_btn.set_sensitive(n_completed > 0)
-        # Show trash
-        self.trash_list_scrl.set_visible(n_deleted > 0)
+        self.delete_completed_tasks_btn.set_sensitive(n_all_completed > 0)
+        self.trash_list_scrl.set_visible(n_all_deleted > 0)
 
     # --- Template handlers --- #
 
@@ -405,7 +402,6 @@ class Window(Adw.ApplicationWindow):
         entry.props.text = ""
         # Scroll to the end
         Animate.scroll(self.scrolled_window, True)
-        self.update_status()
         # Sync
         Sync.sync()
 

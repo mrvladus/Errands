@@ -115,7 +115,6 @@
                       <object class="AdwActionRow" id="task_row">
                         <property name="use-markup">true</property>
                         <property name="height-request">60</property>
-                        <property name="subtitle" translatable="yes">Completed:</property>
 
                         <!-- Click controller -->
                         <child>

@@ -20,9 +20,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from typing import Self
 from gi.repository import Gtk, Adw, Gdk, GObject, Gio
 from .sync import Sync
-from .utils import GSettings, Log, Markup, TaskUtils, UserData, get_children
+from .utils import Log, Markup, TaskUtils, UserData, get_children
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/Errands/task.ui")
@@ -52,7 +53,7 @@ class Task(Gtk.Revealer):
         self.task: dict = task
         # Set text
         self.text = Markup.find_url(Markup.escape(self.task["text"]))
-        self.task_row.props.title = self.text
+        self.task_row.set_title(self.text)
         # Check if sub-task completed and toggle checkbox
         self.completed_btn.props.active = self.task["completed"]
         # Set accent color
@@ -125,7 +126,7 @@ class Task(Gtk.Revealer):
         self.toggle_visibility(False)
         self.task["deleted"] = True
         self.update_data()
-        self.completed_btn.props.active = True
+        self.completed_btn.set_active(True)
         self.window.trash_add(self.task)
         for task in get_children(self.tasks_list):
             if not task.task["deleted"]:
@@ -144,7 +145,6 @@ class Task(Gtk.Revealer):
         """
 
         self.parent.tasks_list.remove(self)
-        self.parent.update_status()
         self.run_dispose()
 
     def toggle_edit_mode(self) -> None:
@@ -156,11 +156,12 @@ class Task(Gtk.Revealer):
     def update_status(self) -> None:
         n_completed = 0
         n_total = 0
-        for task in get_children(self.tasks_list):
-            if not task.task["deleted"]:
-                n_total += 1
-                if task.task["completed"]:
-                    n_completed += 1
+        for task in UserData.get()["tasks"]:
+            if task["parent"] == self.task["id"]:
+                if not task["deleted"]:
+                    n_total += 1
+                    if task["completed"]:
+                        n_completed += 1
 
         self.task_row.set_subtitle(
             _("Completed:") + f" {n_completed} / {n_total}"  # pyright: ignore
@@ -189,13 +190,13 @@ class Task(Gtk.Revealer):
         """
 
         def set_text():
-            if btn.props.active:
+            if btn.get_active():
                 self.text = Markup.add_crossline(self.text)
                 self.add_css_class("task-completed")
             else:
                 self.text = Markup.rm_crossline(self.text)
                 self.remove_css_class("task-completed")
-            self.task_row.props.title = self.text
+            self.task_row.set_title(self.text)
 
         # If task is just added set text and return to avoid useless sync
         if self.just_added:
@@ -203,14 +204,14 @@ class Task(Gtk.Revealer):
             return
 
         # Update data
-        self.task["completed"] = btn.props.active
+        self.task["completed"] = btn.get_active()
         self.task["synced_caldav"] = False
         self.update_data()
         # Update children
         children = get_children(self.tasks_list)
         for task in children:
             task.can_sync = False
-            task.completed_btn.set_active(btn.props.active)
+            task.completed_btn.set_active(btn.get_active())
         # Update status
         if self.is_sub_task:
             self.parent.update_status()
@@ -252,7 +253,7 @@ class Task(Gtk.Revealer):
         # Clear entry
         entry.get_buffer().props.text = ""
         # Update status
-        self.completed_btn.props.active = False
+        self.completed_btn.set_active(False)
         self.update_status()
         self.window.update_status()
         # Sync
@@ -282,7 +283,7 @@ class Task(Gtk.Revealer):
         self.text = Markup.find_url(Markup.escape(self.task["text"]))
         self.task_row.props.title = self.text
         # Toggle checkbox
-        self.completed_btn.props.active = False
+        self.completed_btn.set_active(False)
         # Exit edit mode
         self.toggle_edit_mode()
         # Sync
@@ -387,7 +388,7 @@ class Task(Gtk.Revealer):
         return True
 
     @Gtk.Template.Callback()
-    def on_drop(self, _drop, task, _x, _y) -> None:
+    def on_drop(self, _drop, task: Self, _x, _y) -> None:
         """
         When task is dropped on task and becomes sub-task
         """
@@ -416,7 +417,7 @@ class Task(Gtk.Revealer):
         task.purge()
         # Add new sub-task
         self.add_task(task.task.copy())
-        self.completed_btn.props.active = False
+        self.completed_btn.set_active(False)
         # Update status
         task.parent.update_status()
         self.update_status()

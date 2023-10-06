@@ -68,13 +68,16 @@ class SyncProviderCalDAV:
             url=self.url, username=self.username, password=self.password
         ) as client:
             try:
-                # client.check_cdav_support()
+                supports_caldav = client.check_cdav_support()
+                if not supports_caldav:
+                    Log.error(f"Server doesn't support CalDAV. Maybe wrong adress?")
+                    return
+
                 principal = client.principal()
                 Log.info(f"Connected to {self.name} CalDAV server at '{self.url}'")
                 self.can_sync = True
             except:
                 Log.error(f"Can't connect to {self.name} CalDAV server at '{self.url}'")
-                self.can_sync = False
                 return
 
             calendars = principal.calendars()
@@ -90,6 +93,7 @@ class SyncProviderCalDAV:
                 )
 
     def _set_url(self):
+        # TODO: check url start
         if self.name == "Nextcloud":
             self.url = f"{self.url}/remote.php/dav/"
 
@@ -222,16 +226,3 @@ class SyncProviderCalDAV:
         if fetch:
             self._fetch()
             GLib.idle_add(self.window.update_ui)
-
-
-class SyncProviderTodoist:
-    token: str
-
-    def __init__(self) -> None:
-        pass
-
-    def connect(self) -> None:
-        pass
-
-    def sync(self) -> None:
-        pass
