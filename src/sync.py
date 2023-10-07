@@ -9,6 +9,7 @@ class Sync:
 
     @classmethod
     def init(self, window: Adw.ApplicationWindow = None) -> None:
+        Log.debug("Initialize sync provider")
         if window:
             self.window = window
         match GSettings.get("sync-provider"):
@@ -51,6 +52,8 @@ class SyncProviderCalDAV:
     window = None
 
     def __init__(self, name: str, window) -> None:
+        Log.info(f"Initialize {name} sync provider")
+
         self.name = name
         self.window = window
         self.url = GSettings.get("sync-url")
@@ -77,6 +80,7 @@ class SyncProviderCalDAV:
                 self.can_sync = True
             except:
                 Log.error(f"Can't connect to {self.name} CalDAV server at '{self.url}'")
+                self.window.add_toast(self.window.toast_err)
                 return
 
             calendars = principal.calendars()
@@ -112,6 +116,7 @@ class SyncProviderCalDAV:
                 tasks.append(data)
             return tasks
         except:
+            Log.error(f"Can't get tasks from {self.name}")
             return None
 
     def _fetch(self):
@@ -174,7 +179,9 @@ class SyncProviderCalDAV:
 
         caldav_tasks: list[dict] | None = self._get_tasks()
         if not caldav_tasks:
-            Log.error(f"Can't connect to {self.name}")
+            Log.debug(
+                f"Can't connect to {self.name} or there is no tasks on the server"
+            )
             return
 
         Log.info(f"Sync tasks with {self.name}")
