@@ -13,9 +13,8 @@ class Sync:
             self.window = window
         match GSettings.get("sync-provider"):
             case 0:
-                Log.debug("Sync disabled")
+                Log.info("Sync disabled")
                 self.window.sync_btn.set_visible(False)
-                return
             case 1:
                 self.provider = SyncProviderCalDAV("Nextcloud", self.window)
                 self.window.sync_btn.set_visible(True)
@@ -93,7 +92,6 @@ class SyncProviderCalDAV:
                 )
 
     def _set_url(self):
-        # TODO: check url start
         if self.name == "Nextcloud":
             self.url = f"{self.url}/remote.php/dav/"
 
@@ -187,29 +185,35 @@ class SyncProviderCalDAV:
         for task in data["tasks"]:
             # Create new task on CalDAV that was created offline
             if task["id"] not in caldav_ids and not task["synced_caldav"]:
-                Log.debug(f"Create new task on {self.name}: {task['id']}")
-                new_todo = self.calendar.save_todo(
-                    uid=task["id"],
-                    summary=task["text"],
-                    related_to=task["parent"],
-                    x_errands_color=task["color"],
-                )
-                if task["completed"]:
-                    new_todo.complete()
-                task["synced_caldav"] = True
+                try:
+                    Log.debug(f"Create new task on {self.name}: {task['id']}")
+                    new_todo = self.calendar.save_todo(
+                        uid=task["id"],
+                        summary=task["text"],
+                        related_to=task["parent"],
+                        x_errands_color=task["color"],
+                    )
+                    if task["completed"]:
+                        new_todo.complete()
+                    task["synced_caldav"] = True
+                except:
+                    Log.error(f"Error creating new task on {self.name}: {task['id']}")
 
             # Update task on CalDAV that was changed locally
             elif task["id"] in caldav_ids and not task["synced_caldav"]:
-                Log.debug(f"Update task on {self.name}: {task['id']}")
-                todo = self.calendar.todo_by_uid(task["id"])
-                todo.uncomplete()
-                todo.icalendar_component["summary"] = task["text"]
-                todo.icalendar_component["related-to"] = task["parent"]
-                todo.icalendar_component["x-errands-color"] = task["color"]
-                todo.save()
-                if task["completed"]:
-                    todo.complete()
-                task["synced_caldav"] = True
+                try:
+                    Log.debug(f"Update task on {self.name}: {task['id']}")
+                    todo = self.calendar.todo_by_uid(task["id"])
+                    todo.uncomplete()
+                    todo.icalendar_component["summary"] = task["text"]
+                    todo.icalendar_component["related-to"] = task["parent"]
+                    todo.icalendar_component["x-errands-color"] = task["color"]
+                    todo.save()
+                    if task["completed"]:
+                        todo.complete()
+                    task["synced_caldav"] = True
+                except:
+                    Log.error(f"Error updating task on {self.name}: {task['id']}")
 
         # Delete tasks on CalDAV if they were deleted locally
         for task_id in data["deleted"]:
