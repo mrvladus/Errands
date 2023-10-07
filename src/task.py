@@ -62,56 +62,58 @@ class Task(Gtk.Revealer):
         # Add to trash if needed
         if self.task["deleted"]:
             self.window.trash_add(self.task)
-        self.check_is_sub()
-        self.add_sub_tasks()
-        self.add_actions()
+        self._check_is_sub()
+        self._add_sub_tasks()
+        self._add_actions()
         self.just_added = False
         self.parent.update_status()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Task({self.task['id']})"
 
-    def add_actions(self) -> None:
+    def _add_actions(self) -> None:
         group = Gio.SimpleActionGroup.new()
         self.insert_action_group("task", group)
 
-        def add_action(name: str, callback):
+        def _add_action(name: str, callback) -> None:
             action = Gio.SimpleAction.new(name, None)
             action.connect("activate", callback)
             group.add_action(action)
 
-        def copy(*_) -> None:
+        def _copy(*_) -> None:
             Log.info("Copy to clipboard: " + self.task["text"])
             clp: Gdk.Clipboard = Gdk.Display.get_default().get_clipboard()
             clp.set(self.task["text"])
             self.window.add_toast(self.window.toast_copied)
 
-        def edit(*_) -> None:
+        def _edit(*_) -> None:
             self.toggle_edit_mode()
             # Set entry text and select it
             self.task_edit_entry.get_buffer().props.text = self.task["text"]
             self.task_edit_entry.select_region(0, len(self.task["text"]))
             self.task_edit_entry.grab_focus()
 
-        add_action("delete", self.delete)
-        add_action("edit", edit)
-        add_action("copy", copy)
+        _add_action("delete", self.delete)
+        _add_action("edit", _edit)
+        _add_action("copy", _copy)
 
     def add_task(self, task: dict):
         sub_task = Task(task, self.window, self)
         self.tasks_list.append(sub_task)
         sub_task.toggle_visibility(not task["deleted"])
-        self.update_status()
+        if not self.just_added:
+            self.update_status()
 
-    def add_sub_tasks(self) -> None:
+    def _add_sub_tasks(self) -> None:
         sub_count = 0
         for task in UserData.get()["tasks"]:
             if task["parent"] == self.task["id"]:
                 sub_count += 1
                 self.add_task(task)
+        self.update_status()
         self.window.update_status()
 
-    def check_is_sub(self):
+    def _check_is_sub(self):
         if self.task["parent"] != "":
             self.is_sub_task = True
             self.main_box.add_css_class("sub-task")
@@ -189,7 +191,7 @@ class Task(Gtk.Revealer):
         Toggle check button and add style to the text
         """
 
-        def set_text():
+        def _set_text():
             if btn.get_active():
                 self.text = Markup.add_crossline(self.text)
                 self.add_css_class("task-completed")
@@ -200,7 +202,7 @@ class Task(Gtk.Revealer):
 
         # If task is just added set text and return to avoid useless sync
         if self.just_added:
-            set_text()
+            _set_text()
             return
 
         # Update data
@@ -216,7 +218,7 @@ class Task(Gtk.Revealer):
         if self.is_sub_task:
             self.parent.update_status()
         # Set text
-        set_text()
+        _set_text()
         # Sync
         if self.can_sync:
             Sync.sync()

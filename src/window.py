@@ -40,7 +40,7 @@ class Window(Adw.ApplicationWindow):
     about_window: Adw.AboutWindow = Gtk.Template.Child()
     clear_trash_btn: Gtk.Button = Gtk.Template.Child()
     confirm_dialog: Adw.MessageDialog = Gtk.Template.Child()
-    delete_completed_tasks_btn: Gtk.Button = Gtk.Template.Child()
+    delete_completed_tasks_btn_rev: Gtk.Revealer = Gtk.Template.Child()
     drop_motion_ctrl: Gtk.DropControllerMotion = Gtk.Template.Child()
     export_dialog: Gtk.FileDialog = Gtk.Template.Child()
     import_dialog: Gtk.FileDialog = Gtk.Template.Child()
@@ -76,7 +76,7 @@ class Window(Adw.ApplicationWindow):
         Adw.StyleManager.get_default().set_color_scheme(GSettings.get("theme"))
         self.present()
 
-    def perform_startup(self):
+    def perform_startup(self) -> None:
         """
         Startup func. Call after window presented
         """
@@ -100,14 +100,14 @@ class Window(Adw.ApplicationWindow):
         Create actions for main menu
         """
 
-        def create_action(name: str, callback: callable, shortcuts=None) -> None:
+        def _create_action(name: str, callback: callable, shortcuts=None) -> None:
             action: Gio.SimpleAction = Gio.SimpleAction.new(name, None)
             action.connect("activate", callback)
             if shortcuts:
                 self.props.application.set_accels_for_action(f"app.{name}", shortcuts)
             self.props.application.add_action(action)
 
-        def about(*_) -> None:
+        def _about(*_) -> None:
             """
             Show about window
             """
@@ -116,12 +116,12 @@ class Window(Adw.ApplicationWindow):
             self.about_window.props.application_icon = APP_ID
             self.about_window.show()
 
-        def export_tasks(*_) -> None:
+        def _export_tasks(*_) -> None:
             """
             Show export dialog
             """
 
-            def finish_export(_dial, res, _data):
+            def _finish_export(_dial, res, _data) -> None:
                 try:
                     file: Gio.File = self.export_dialog.save_finish(res)
                 except GLib.GError:
@@ -133,14 +133,14 @@ class Window(Adw.ApplicationWindow):
                 self.add_toast(self.toast_exported)
                 Log.info(f"Export tasks to: {path}")
 
-            self.export_dialog.save(self, None, finish_export, None)
+            self.export_dialog.save(self, None, _finish_export, None)
 
-        def import_tasks(*_) -> None:
+        def _import_tasks(*_) -> None:
             """
             Show import dialog
             """
 
-            def finish_import(_dial, res, _data):
+            def finish_import(_dial, res, _data) -> None:
                 Log.info("Importing tasks")
 
                 try:
@@ -168,14 +168,14 @@ class Window(Adw.ApplicationWindow):
 
             self.import_dialog.open(self, None, finish_import, None)
 
-        def open_log(*_) -> None:
+        def _open_log(*_) -> None:
             """
             Open log file with default text editor
             """
             path = os.path.join(GLib.get_user_data_dir(), "list", "log.txt")
             GLib.spawn_command_line_async(f"xdg-open {path}")
 
-        def shortcuts(*_) -> None:
+        def _shortcuts(*_) -> None:
             """
             Show shortcuts window
             """
@@ -183,21 +183,21 @@ class Window(Adw.ApplicationWindow):
             self.shortcuts_window.set_transient_for(self)
             self.shortcuts_window.show()
 
-        create_action(
+        _create_action(
             "preferences",
             lambda *_: PreferencesWindow(self).show(),
             ["<primary>comma"],
         )
-        create_action("export", export_tasks, ["<primary>e"])
-        create_action("import", import_tasks, ["<primary>i"])
-        create_action("shortcuts", shortcuts, ["<primary>question"])
-        create_action("about", about)
-        create_action(
+        _create_action("export", _export_tasks, ["<primary>e"])
+        _create_action("import", _import_tasks, ["<primary>i"])
+        _create_action("shortcuts", _shortcuts, ["<primary>question"])
+        _create_action("about", _about)
+        _create_action(
             "quit",
             lambda *_: self.props.application.quit(),
             ["<primary>q", "<primary>w"],
         )
-        create_action("open_log", open_log)
+        _create_action("open_log", _open_log)
 
     def get_all_tasks(self) -> list[Task]:
         """
@@ -206,7 +206,7 @@ class Window(Adw.ApplicationWindow):
 
         tasks: list[Task] = []
 
-        def append_tasks(items: list[Task]):
+        def append_tasks(items: list[Task]) -> None:
             for task in items:
                 tasks.append(task)
                 children: list[Task] = get_children(task.tasks_list)
@@ -338,7 +338,7 @@ class Window(Adw.ApplicationWindow):
             if n_total > 0
             else ""
         )
-        self.delete_completed_tasks_btn.set_sensitive(n_all_completed > 0)
+        self.delete_completed_tasks_btn_rev.set_reveal_child(n_all_completed > 0)
         self.trash_list_scrl.set_visible(n_all_deleted > 0)
 
     # --- Template handlers --- #
@@ -509,6 +509,15 @@ class Window(Adw.ApplicationWindow):
         task.delete()
         self.update_status()
 
+    @Gtk.Template.Callback()
+    def on_width_changed(self, *_):
+        """
+        Breakpoints simulator. Because I can't have multiple AdwBreakpoints.
+        """
+        width = self.props.default_width
+        self.scroll_up_btn_rev.set_visible(width > 360)
+        self.split_view.set_collapsed(width < 720)
+
 
 @Gtk.Template(resource_path="/io/github/mrvladus/Errands/trash_item.ui")
 class TrashItem(Gtk.Box):
@@ -533,7 +542,7 @@ class TrashItem(Gtk.Box):
 
         tasks: list[Task] = self.window.get_all_tasks()
 
-        def restore_task(id: str = self.id):
+        def restore_task(id: str = self.id) -> None:
             for task in tasks:
                 if task.task["id"] == id:
                     task.task["deleted"] = False

@@ -5,14 +5,7 @@
   <template class="Window" parent="AdwApplicationWindow">
     <property name="width-request">360</property>
     <property name="height-request">296</property>
-
-    <child>
-      <object class="AdwBreakpoint">
-        <condition>max-width: 720sp</condition>
-        <setter object="split_view" property="collapsed">true</setter>
-        <setter object="close_sidebar_btn" property="reveal-child">true</setter>
-      </object>
-    </child>
+    <signal name="notify::default-width" handler="on_width_changed" />
 
     <property name="content">
       <object class="AdwOverlaySplitView" id="split_view">
@@ -68,20 +61,16 @@
 
                     <!-- Close sidebar button -->
                     <child>
-                      <object class="GtkRevealer" id="close_sidebar_btn">
-                        <property name="transition-type">7</property>
-                        <child>
-                          <object class="GtkButton">
-                            <property name="valign">center</property>
-                            <property name="margin-start">5</property>
-                            <property name="icon-name">go-previous-symbolic</property>
-                            <property name="tooltip-text" translatable="yes">Close Trash</property>
-                            <accessibility>
-                              <property name="label" translatable="yes">Close Trash</property>
-                            </accessibility>
-                            <signal name="clicked" handler="on_trash_close" />
-                          </object>
-                        </child>
+                      <object class="GtkButton">
+                        <property name="valign">center</property>
+                        <property name="margin-start">5</property>
+                        <property name="icon-name">go-previous-symbolic</property>
+                        <property name="tooltip-text" translatable="yes">Close Trash</property>
+                        <property name="visible" bind-source="split_view" bind-property="collapsed" bind-flags="sync-create" />
+                        <accessibility>
+                          <property name="label" translatable="yes">Close Trash</property>
+                        </accessibility>
+                        <signal name="clicked" handler="on_trash_close" />
                       </object>
                     </child>
 
@@ -221,28 +210,36 @@
 
                     <!-- Delete completed tasks button -->
                     <child type="start">
-                      <object class="GtkButton" id="delete_completed_tasks_btn">
-                        <property name="valign">center</property>
-                        <property name="sensitive">false</property>
-                        <property name="icon-name">edit-clear-all-symbolic</property>
-                        <property name="tooltip-text" translatable="yes">Delete Completed Tasks (Ctrl+Delete)</property>
-                        <signal name="clicked" handler="on_delete_completed_tasks_btn_clicked" />
-                        <accessibility>
-                          <property name="label" translatable="yes">Delete Completed Tasks (Ctrl+Delete)</property>
-                        </accessibility>
+                      <object class="GtkRevealer" id="delete_completed_tasks_btn_rev">
+                        <property name="valign">end</property>
+                        <property name="halign">end</property>
+                        <property name="transition-type">2</property>
                         <child>
-                          <object class="GtkShortcutController">
-                            <property name="scope">managed</property>
+                          <object class="GtkButton">
+                            <property name="valign">center</property>
+                            <property name="sensitive">false</property>
+                            <property name="icon-name">edit-clear-all-symbolic</property>
+                            <property name="tooltip-text" translatable="yes">Delete Completed Tasks (Ctrl+Delete)</property>
+                            <signal name="clicked" handler="on_delete_completed_tasks_btn_clicked" />
+                            <accessibility>
+                              <property name="label" translatable="yes">Delete Completed Tasks (Ctrl+Delete)</property>
+                            </accessibility>
                             <child>
-                              <object class="GtkShortcut">
-                                <property name="trigger">&lt;Control&gt;Delete</property>
-                                <property name="action">activate</property>
+                              <object class="GtkShortcutController">
+                                <property name="scope">managed</property>
+                                <child>
+                                  <object class="GtkShortcut">
+                                    <property name="trigger">&lt;Control&gt;Delete</property>
+                                    <property name="action">activate</property>
+                                  </object>
+                                </child>
                               </object>
                             </child>
                           </object>
                         </child>
                       </object>
                     </child>
+
 
                     <!-- Menu -->
                     <child type="end">
@@ -272,11 +269,10 @@
                     <!-- Scroll up button -->
                     <child type="end">
                       <object class="GtkRevealer" id="scroll_up_btn_rev">
-                        <property name="valign">end</property>
-                        <property name="halign">end</property>
-                        <property name="transition-type">1</property>
+                        <property name="transition-type">3</property>
                         <child>
                           <object class="GtkButton">
+                            <property name="valign">end</property>
                             <property name="icon-name">go-up-symbolic</property>
                             <property name="tooltip-text" translatable="yes">Scroll Up</property>
                             <signal name="clicked" handler="on_scroll_up_btn_clicked" />
@@ -329,43 +325,74 @@
             <property name="content">
               <object class="AdwToastOverlay" id="toast_overlay">
                 <child>
-                  <object class="GtkBox">
-                    <property name="orientation">vertical</property>
+                  <object class="GtkOverlay">
 
-                    <!-- Scrolled window -->
                     <child>
-                      <object class="GtkScrolledWindow" id="scrolled_window">
-                        <property name="propagate-natural-height">true</property>
-                        <property name="propagate-natural-width">true</property>
-                        <property name="vadjustment">
-                          <object class="GtkAdjustment">
-                            <signal name="value_changed" handler="on_scroll" />
-                          </object>
-                        </property>
+                      <object class="GtkBox">
+                        <property name="orientation">vertical</property>
 
-                        <!-- Drag and Drop scroll controller -->
+                        <!-- Scrolled window -->
                         <child>
-                          <object class="GtkDropControllerMotion" id="drop_motion_ctrl">
-                            <signal name="motion" handler="on_dnd_scroll" />
-                          </object>
-                        </child>
+                          <object class="GtkScrolledWindow" id="scrolled_window">
+                            <property name="propagate-natural-height">true</property>
+                            <property name="propagate-natural-width">true</property>
+                            <property name="vadjustment">
+                              <object class="GtkAdjustment">
+                                <signal name="value_changed" handler="on_scroll" />
+                              </object>
+                            </property>
 
-                        <!-- Tasks list -->
-                        <child>
-                          <object class="AdwClamp">
-                            <property name="maximum-size">850</property>
-                            <property name="tightening-threshold">300</property>
-                            <property name="vexpand">true</property>
+                            <!-- Drag and Drop scroll controller -->
                             <child>
-                              <object class="GtkBox" id="tasks_list">
-                                <property name="orientation">vertical</property>
-                                <property name="hexpand">true</property>
-                                <property name="margin-bottom">18</property>
+                              <object class="GtkDropControllerMotion" id="drop_motion_ctrl">
+                                <signal name="motion" handler="on_dnd_scroll" />
                               </object>
                             </child>
+
+                            <!-- Tasks list -->
+                            <child>
+                              <object class="AdwClamp">
+                                <property name="maximum-size">850</property>
+                                <property name="tightening-threshold">300</property>
+                                <property name="vexpand">true</property>
+                                <child>
+                                  <object class="GtkBox" id="tasks_list">
+                                    <property name="orientation">vertical</property>
+                                    <property name="hexpand">true</property>
+                                    <property name="margin-bottom">18</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+
                           </object>
                         </child>
 
+                      </object>
+                    </child>
+
+                    <!-- Scroll up button overlay -->
+                    <child type="overlay">
+                      <object class="GtkRevealer" id="scroll_up_btn_ovl_rev">
+                        <property name="valign">end</property>
+                        <property name="halign">center</property>
+                        <property name="transition-type">1</property>
+                        <property name="reveal-child" bind-source="scroll_up_btn_rev" bind-property="reveal-child" bind-flags="sync-create" />
+                        <property name="visible" bind-source="scroll_up_btn_rev" bind-property="visible" bind-flags="sync-create|invert-boolean" />
+                        <property name="margin-bottom">12</property>
+                        <child>
+                          <object class="GtkButton">
+                            <property name="icon-name">go-up-symbolic</property>
+                            <property name="tooltip-text" translatable="yes">Scroll Up</property>
+                            <signal name="clicked" handler="on_scroll_up_btn_clicked" />
+                            <accessibility>
+                              <property name="label" translatable="yes">Scroll Up</property>
+                            </accessibility>
+                            <style>
+                              <class name="circular" />
+                            </style>
+                          </object>
+                        </child>
                       </object>
                     </child>
 
