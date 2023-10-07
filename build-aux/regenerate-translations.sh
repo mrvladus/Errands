@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-flatpak run --filesystem=home org.gnome.Sdk//44 <<EOF
+flatpak run --filesystem=home org.gnome.Sdk//45 <<EOF
 echo -e "\n\033[32;1m---------- UPDATING TRANSLATIONS ----------\033[0m\n"
 meson setup _build
 cd _build

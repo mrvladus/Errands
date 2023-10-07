@@ -23,12 +23,13 @@
 import json
 import os
 from gi.repository import Gio, Adw, Gtk, GLib
-from __main__ import VERSION, PROFILE, APP_ID
+from __main__ import VERSION, APP_ID
 
-
+# Import modules
 from .preferences import PreferencesWindow
 from .sync import Sync
 from .task import Task
+from .trash_item import TrashItem
 from .utils import Animate, GSettings, Log, TaskUtils, UserData, get_children, Markup
 
 
@@ -515,44 +516,5 @@ class Window(Adw.ApplicationWindow):
         Breakpoints simulator. Because I can't have multiple AdwBreakpoint.
         """
         width = self.props.default_width
-        self.scroll_up_btn_rev.set_visible(width > 360)
+        self.scroll_up_btn_rev.set_visible(width > 400)
         self.split_view.set_collapsed(width < 720)
-
-
-@Gtk.Template(resource_path="/io/github/mrvladus/Errands/trash_item.ui")
-class TrashItem(Gtk.Box):
-    __gtype_name__ = "TrashItem"
-
-    label = Gtk.Template.Child()
-
-    def __init__(self, task: dict, window: Window) -> None:
-        super().__init__()
-        self.window: Window = window
-        self.id: str = task["id"]
-        self.label.props.label: str = task["text"]
-
-    def __repr__(self) -> str:
-        return f"TrashItem({self.id})"
-
-    @Gtk.Template.Callback()
-    def on_restore(self, _) -> None:
-        """Restore task"""
-
-        Log.info(f"Restore task: {self.id}")
-
-        tasks: list[Task] = self.window.get_all_tasks()
-
-        def restore_task(id: str = self.id) -> None:
-            for task in tasks:
-                if task.task["id"] == id:
-                    task.task["deleted"] = False
-                    task.update_data()
-                    task.toggle_visibility(True)
-                    if task.task["parent"]:
-                        task.parent.expand(True)
-                        restore_task(task.task["parent"])
-                    break
-
-        restore_task()
-        self.window.update_status()
-        self.window.trash_clear()
