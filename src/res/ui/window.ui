@@ -359,6 +359,9 @@
                                     <property name="orientation">vertical</property>
                                     <property name="hexpand">true</property>
                                     <property name="margin-bottom">18</property>
+                                    <style>
+                                      <class name="tasks-list" />
+                                    </style>
                                   </object>
                                 </child>
                               </object>
