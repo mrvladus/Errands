@@ -512,7 +512,7 @@ class Window(Adw.ApplicationWindow):
     @Gtk.Template.Callback()
     def on_width_changed(self, *_):
         """
-        Breakpoints simulator. Because I can't have multiple AdwBreakpoints.
+        Breakpoints simulator. Because I can't have multiple AdwBreakpoint.
         """
         width = self.props.default_width
         self.scroll_up_btn_rev.set_visible(width > 360)
@@ -529,7 +529,7 @@ class TrashItem(Gtk.Box):
         super().__init__()
         self.window: Window = window
         self.id: str = task["id"]
-        self.label.props.label = task["text"]
+        self.label.props.label: str = task["text"]
 
     def __repr__(self) -> str:
         return f"TrashItem({self.id})"
