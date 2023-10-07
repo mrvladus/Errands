@@ -1,219 +1,218 @@
-# LIST.
-# Copyright (C) 2023
-# This file is distributed under the same license as the list package.
-# ALBANO BATTISTELLA <ALBANOBATTISTELLA@GMAIL.COM>, 2023.
+# Ukrainian translation for Errands.
+# Copyright (C) 2023 THE Errands'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the Errands package.
+# volkov <volkovissocool@gmail.com>, 2023.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version:  errands\n"
+"Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-19 19:01+0300\n"
-"PO-Revision-Date: 2023-09-23 16:44+0200\n"
-"Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
-"Language-Team: Italian <LL@li.org>\n"
-"Language: it\n"
+"PO-Revision-Date: 2023-09-23 21:24+0300\n"
+"Last-Translator: volkov <volkovissocool@gmail.com>\n"
+"Language-Team: \n"
+"Language: uk\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Generated-By: Babel 2.12.1\n"
+"X-Generator: Poedit 3.3.1\n"
 
 #: src/window.py:249 src/task.py:163 src/res/ui/window.ui:225
 #: src/res/ui/task.ui:118
 msgid "Completed:"
-msgstr "Completato:"
+msgstr "Завершено:"
 
 #: src/res/ui/window.ui:41
 msgid "Move to Trash"
-msgstr "Sposta nel cestino"
+msgstr "Пересунути у смітник"
 
 #: src/res/ui/window.ui:67
 msgid "Deleted Tasks"
-msgstr "Attività completate"
+msgstr "Видалені задачі"
 
 #: src/res/ui/window.ui:79 src/res/ui/window.ui:82
 msgid "Clear"
-msgstr "Stile chiaro"
+msgstr "Очистити"
 
 #: src/res/ui/window.ui:97 src/res/ui/window.ui:100
 msgid "Restore All"
-msgstr "Ripristina tutto"
+msgstr "Відновити усі"
 
 #: src/res/ui/window.ui:116 src/res/ui/window.ui:118
 msgid "Close Trash"
-msgstr "Chiudi cestino"
+msgstr "Зачинити смітник"
 
 #: src/res/ui/window.ui:145
 msgid "Empty Trash"
-msgstr "Cestino vuoto"
+msgstr "Смітник порожній"
 
 #: src/res/ui/window.ui:146
 msgid "No deleted items"
-msgstr "Nessun elemento eliminato"
+msgstr "Немає видалених задач"
 
 #: src/res/ui/window.ui:237 src/res/ui/window.ui:240
 msgid "Show Deleted Tasks"
-msgstr "Mostra attività eliminate"
+msgstr "Показати видалені задачі"
 
 #: src/res/ui/window.ui:262 src/res/ui/window.ui:265
 msgid "Delete Completed Tasks (Ctrl+Delete)"
-msgstr "Elimina le attività completate (Ctrl+Delete)"
+msgstr "Видалити завершені задачі (Ctrl+Delete)"
 
 #: src/res/ui/window.ui:290 src/res/ui/window.ui:292
 msgid "Main Menu"
-msgstr "Menù principale"
+msgstr "Головне меню"
 
 #: src/res/ui/window.ui:306 src/res/ui/window.ui:309
 msgid "Scroll Up"
-msgstr "Scorri verso l'alto"
+msgstr "Прокрутити вгору"
 
 #: src/res/ui/window.ui:340
 msgid "Add new Task"
-msgstr "Aggiungi nuova attività"
+msgstr "Додати нову задачу"
 
 #: src/res/ui/window.ui:420
 msgid "Export Tasks..."
-msgstr "Esporta attività..."
+msgstr "Експортувати задачі..."
 
 #: src/res/ui/window.ui:424
 msgid "Import Tasks..."
-msgstr "Importa attività..."
+msgstr "Імпортувати задачі..."
 
 #: src/res/ui/window.ui:430 src/res/ui/window.ui:469
 msgid "Preferences"
-msgstr "Preferenze"
+msgstr "Налаштування"
 
 #: src/res/ui/window.ui:434
 msgid "Keyboard Shortcuts"
-msgstr "Scorciatoie da tastiera"
+msgstr "Клавіатурні скорочення"
 
 #: src/res/ui/window.ui:438
 msgid "About Errands"
-msgstr "Informazioni su Errands"
+msgstr "Про Errands"
 
 #: src/res/ui/window.ui:454
 msgid "General"
-msgstr "Generale"
+msgstr "Загальні"
 
 #: src/res/ui/window.ui:457
 msgid "Show keyboard shortcuts"
-msgstr "Mostra scorciatoie da tastiera"
+msgstr "Показати клавіатурні скорочення"
 
 #: src/res/ui/window.ui:463
 msgid "Toggle sidebar"
-msgstr "Attiva/Disattiva barra laterale"
+msgstr "Показати/сховати смітник"
 
 #: src/res/ui/window.ui:475
 msgid "Quit"
-msgstr "Esci"
+msgstr "Вийти"
 
 #: src/res/ui/window.ui:485
 msgid "Import and Export"
-msgstr "Importazione ed esportazione"
+msgstr "Імпорт і експорт"
 
 #: src/res/ui/window.ui:488
 msgid "Import tasks"
-msgstr "Importa attività"
+msgstr "Імпортувати задачі"
 
 #: src/res/ui/window.ui:494
 msgid "Export tasks"
-msgstr "Esporta attività"
+msgstr "Експортувати задачі"
 
 #: src/res/ui/window.ui:504 src/res/ui/preferences.ui:66
 msgid "Tasks"
-msgstr "Attività"
+msgstr "Задачі"
 
 #: src/res/ui/window.ui:507
 msgid "Delete completed tasks"
-msgstr "Elimina le attività completate"
+msgstr "Видалити завершені задачі"
 
 #: src/res/ui/window.ui:525
 msgid "translator-credits"
-msgstr "Albano Battistella <albanobattistella@gmail.com>"
+msgstr "volkov <volkovissocool@gmail.com>"
 
 #: src/res/ui/window.ui:560
 msgid "Are you sure?"
-msgstr "Sei sicuro?"
+msgstr "Ви впевнені?"
 
 #: src/res/ui/window.ui:561
 msgid "Tasks will be permanently deleted"
-msgstr "Le attività verranno eliminate definitivamente"
+msgstr "Задачі будуть видалені назавжди"
 
 #: src/res/ui/window.ui:566 src/res/ui/task.ui:327
 msgid "Cancel"
-msgstr "Annulla"
+msgstr "Скасувати"
 
 #: src/res/ui/window.ui:567 src/res/ui/task.ui:13
 msgid "Delete"
-msgstr "Cancella"
+msgstr "Видалити"
 
 #: src/res/ui/window.ui:575
 msgid "Copied to Clipboard"
-msgstr "Copiato negli appunti"
+msgstr "Скопійовано в буфер обміну"
 
 #: src/res/ui/window.ui:580
 msgid "Tasks Exported"
-msgstr "Attività esportate"
+msgstr "Задачі експортовані"
 
 #: src/res/ui/window.ui:585
 msgid "Tasks Imported"
-msgstr "Attività importate"
+msgstr "Задачі імпортовані"
 
 #: src/res/ui/window.ui:590
 msgid "Error occurred"
-msgstr "Si è verificato un errore"
+msgstr "Сталася помилка"
 
 #: src/res/ui/window.ui:591
 msgid "Open log"
-msgstr "Apri log"
+msgstr "Відкрити журнал"
 
 #: src/res/ui/preferences.ui:14
 msgid "Application Theme"
-msgstr "Tema applicazione"
+msgstr "Тема додатку"
 
 #: src/res/ui/preferences.ui:19
 msgid "System"
-msgstr "Sistema"
+msgstr "Системна"
 
 #: src/res/ui/preferences.ui:33
 msgid "Light"
-msgstr "Chiaro"
+msgstr "Світла"
 
 #: src/res/ui/preferences.ui:48
 msgid "Dark"
-msgstr "Scuro"
+msgstr "Темна"
 
 #: src/res/ui/preferences.ui:71
 msgid "Expand Sub-Tasks on Startup"
-msgstr "Espandi le attività secondarie all'avvio"
+msgstr "Розгортати підзавдання при запуску додатку"
 
 #: src/res/ui/task.ui:17
 msgid "Edit"
-msgstr "Modifica"
+msgstr "Редагувати"
 
 #: src/res/ui/task.ui:21
 msgid "Copy"
-msgstr "Copia"
+msgstr "Скопіювати"
 
 #: src/res/ui/task.ui:136 src/res/ui/task.ui:139
 msgid "Mark as Completed"
-msgstr "Contrassegna come completato"
+msgstr "Позначити як завершене"
 
 #: src/res/ui/task.ui:186 src/res/ui/task.ui:189
 msgid "Clear style"
-msgstr "Azzera stile"
+msgstr "Скинути стиль"
 
 #: src/res/ui/task.ui:287 src/res/ui/task.ui:289
 msgid "Menu"
-msgstr "Menù"
+msgstr "Меню"
 
 #: src/res/ui/task.ui:360
 msgid "Add new Sub-Task"
-msgstr "Aggiungi una nuova attività secondaria"
+msgstr "Додати нове підзавдання"
 
 #: src/res/ui/trash_item.ui:20 src/res/ui/trash_item.ui:24
 msgid "Restore"
-msgstr "Ripristina"
+msgstr "Відновити"
 
 #. TRANSLATORS: Don't translate
 #: data/io.github.mrvladus.List.desktop:4
@@ -222,9 +221,9 @@ msgstr ""
 
 #: data/io.github.mrvladus.List.desktop:5
 msgid "Manage your tasks"
-msgstr "Gestisci le tue attività"
+msgstr "Керуйте вашими задачами"
 
 #. TRANSLATORS: Don't translate
 #: data/io.github.mrvladus.List.desktop:12
 msgid "errands;tasks;list;todo;todos;"
-msgstr ""
+msgstr "errands;tasks;list;todo;todos;справи;туду;список;записати;"

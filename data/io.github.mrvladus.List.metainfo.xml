@@ -114,7 +114,7 @@
       </description>
     </release>
     <release version="44.7.1" date="2023-09-05">
-      <description>
+      <description translatable="no">
         <p>UI/UX:</p>
         <ul>
           <li>New cool app icon. Big thanks to Tobias Bernard!</li>
@@ -129,7 +129,7 @@
       </description>
     </release>
     <release version="44.7" date="2023-09-01">
-      <description>
+      <description translatable="no">
         <p>UI/UX:</p>
         <ul>
           <li>App renamed to Errands</li>
@@ -155,7 +155,7 @@
       </description>
     </release>
     <release version="44.6.8" date="2023-07-10">
-      <description>
+      <description translatable="no">
         <ul>
           <li>Improved text alignment</li>
           <li>Fixed Drag and Drop widget being too long</li>
@@ -164,7 +164,7 @@
       </description>
     </release>
     <release version="44.6.7" date="2023-07-07">
-      <description>
+      <description translatable="no">
         <ul>
           <li>Added support for Drag and Drop operations. Now you can easily move tasks around.
             Moving sub-tasks between tasks now works too.</li>
@@ -178,7 +178,7 @@
       </description>
     </release>
     <release version="44.6.6" date="2023-06-25">
-      <description>
+      <description translatable="no">
         <p>UI/UX:</p>
         <ul>
           <li>Updated .desktop file for better mobile support</li>
@@ -190,7 +190,7 @@
       </description>
     </release>
     <release version="44.6.5" date="2023-06-24">
-      <description>
+      <description translatable="no">
         <p>UI/UX:</p>
         <ul>
           <li>Set minimum window size to 250px for better phone screen support</li>
@@ -199,7 +199,7 @@
       </description>
     </release>
     <release version="44.6.4" date="2023-06-23">
-      <description>
+      <description translatable="no">
         <p>UI/UX:</p>
         <ul>
           <li>Added animation for task and sub-task edit mode switching</li>
@@ -210,7 +210,7 @@
       </description>
     </release>
     <release version="44.6.3" date="2023-06-19">
-      <description>
+      <description translatable="no">
         <p>UI/UX:</p>
         <ul>
           <li>Added task add/remove animations</li>
@@ -224,7 +224,7 @@
       </description>
     </release>
     <release version="44.6.2" date="2023-06-18">
-      <description>
+      <description translatable="no">
         <p>UI/UX:</p>
         <ul>
           <li>Added animations for progress bars</li>
@@ -237,7 +237,7 @@
       </description>
     </release>
     <release version="44.6.1" date="2023-06-17">
-      <description>
+      <description translatable="no">
         <ul>
           <li>Fixed bug with app not opening</li>
           <li>Added animations for accent color switching</li>
@@ -245,7 +245,7 @@
       </description>
     </release>
     <release version="44.6" date="2023-06-16">
-      <description>
+      <description translatable="no">
         <p>UI/UX:</p>
         <ul>
           <li>Added undo button for restoring deleted tasks and sub-tasks</li>
@@ -262,7 +262,7 @@
       </description>
     </release>
     <release version="44.5.4" date="2023-06-12">
-      <description>
+      <description translatable="no">
         <ul>
           <li>Add progress bar for completed tasks and sub-tasks</li>
           <li>Add button for deleting completed tasks</li>
@@ -274,7 +274,7 @@
       </description>
     </release>
     <release version="44.5.3" date="2023-05-28">
-      <description>
+      <description translatable="no">
         <ul>
           <li>Added Italian translation. Thanks to Albano Battistella.</li>
           <li>Bug fixes.</li>
@@ -282,14 +282,14 @@
       </description>
     </release>
     <release version="44.5.2" date="2023-05-27">
-      <description>
+      <description translatable="no">
         <ul>
           <li>Bug fixes.</li>
         </ul>
       </description>
     </release>
     <release version="44.5.1" date="2023-05-25">
-      <description>
+      <description translatable="no">
         <p>UI/UX:</p>
         <ul>
           <li>Added buttons for moving tasks and sub-tasks up and down in list. To show them just
@@ -303,7 +303,7 @@
       </description>
     </release>
     <release version="44.5" date="2023-05-23">
-      <description>
+      <description translatable="no">
         <p>UI/UX:</p>
         <ul>
           <li>New custom widgets for tasks</li>
@@ -332,7 +332,7 @@
       </description>
     </release>
     <release version="44.4.3" date="2023-05-13">
-      <description>
+      <description translatable="no">
         <ul>
           <li>Fixed bug with apostrophe character being displayed incorrectly (Thanks to
             CastelJeremy)</li>
@@ -340,21 +340,21 @@
       </description>
     </release>
     <release version="44.4.2" date="2023-05-10">
-      <description>
+      <description translatable="no">
         <ul>
           <li>Fixed another one bug with URL's</li>
         </ul>
       </description>
     </release>
     <release version="44.4.1" date="2023-05-08">
-      <description>
+      <description translatable="no">
         <ul>
           <li>Fixed bug with URL's not being visible (Thanks to fastrizwaan)</li>
         </ul>
       </description>
     </release>
     <release version="44.4" date="2023-05-06">
-      <description>
+      <description translatable="no">
         <ul>
           <li>Checkbox to mark sub-task as completed</li>
           <li>UI improvements</li>
@@ -362,7 +362,7 @@
       </description>
     </release>
     <release version="44.3" date="2023-04-26">
-      <description>
+      <description translatable="no">
         <ul>
           <li>Color tags</li>
           <li>Tasks and sub-task editing</li>
@@ -370,14 +370,14 @@
       </description>
     </release>
     <release version="44.2.1" date="2023-04-18">
-      <description>
+      <description translatable="no">
         <ul>
           <li>UI improvements.</li>
         </ul>
       </description>
     </release>
     <release version="44.2" date="2023-04-18">
-      <description>
+      <description translatable="no">
         <ul>
           <li>You can now add sub-tasks!</li>
           <li>Redesigned interface for better visibility and contrast</li>
@@ -385,35 +385,35 @@
       </description>
     </release>
     <release version="44.1.1" date="2023-04-09">
-      <description>
+      <description translatable="no">
         <p>
           Fixed add task button not being clickable.
         </p>
       </description>
     </release>
     <release version="44.1" date="2023-04-08">
-      <description>
+      <description translatable="no">
         <p>
           Added menu with theme switcher.
         </p>
       </description>
     </release>
     <release version="44.0.2" date="2023-04-06">
-      <description>
+      <description translatable="no">
         <p>
           Bug fixes.
         </p>
       </description>
     </release>
     <release version="44.0.1" date="2023-04-05">
-      <description>
+      <description translatable="no">
         <p>
           Bug fixes.
         </p>
       </description>
     </release>
     <release version="44.0" date="2023-04-04">
-      <description>
+      <description translatable="no">
         <p>
           First release.
         </p>
