@@ -565,29 +565,4 @@
     </responses>
   </object>
 
-
-  <!-- Toasts -->
-
-  <object class="AdwToast" id="toast_copied">
-    <property name="title" translatable="yes">Copied to Clipboard</property>
-    <property name="timeout">3</property>
-  </object>
-
-  <object class="AdwToast" id="toast_exported">
-    <property name="title" translatable="yes">Tasks Exported</property>
-    <property name="timeout">3</property>
-  </object>
-
-  <object class="AdwToast" id="toast_imported">
-    <property name="title" translatable="yes">Tasks Imported</property>
-    <property name="timeout">3</property>
-  </object>
-
-  <object class="AdwToast" id="toast_err">
-    <property name="title" translatable="yes">Error occurred</property>
-    <property name="button-label" translatable="yes">Open log</property>
-    <property name="timeout">10</property>
-    <property name="action-name">app.open_log</property>
-  </object>
-
 </interface>

@@ -80,11 +80,11 @@ class Task(Gtk.Revealer):
             action.connect("activate", callback)
             group.add_action(action)
 
-        def _copy(*_) -> None:
+        def _copy(*args) -> None:
             Log.info("Copy to clipboard: " + self.task["text"])
             clp: Gdk.Clipboard = Gdk.Display.get_default().get_clipboard()
             clp.set(self.task["text"])
-            self.window.add_toast(self.window.toast_copied)
+            self.window.add_toast(_("Copied"))  # pyright:ignore
 
         def _edit(*_) -> None:
             self.toggle_edit_mode()

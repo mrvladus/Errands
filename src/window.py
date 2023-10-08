@@ -54,10 +54,6 @@ class Window(Adw.ApplicationWindow):
     tasks_list: Gtk.Box = Gtk.Template.Child()
     title: Adw.WindowTitle = Gtk.Template.Child()
     toast_overlay: Adw.ToastOverlay = Gtk.Template.Child()
-    toast_copied: Adw.Toast = Gtk.Template.Child()
-    toast_err: Adw.Toast = Gtk.Template.Child()
-    toast_exported: Adw.Toast = Gtk.Template.Child()
-    toast_imported: Adw.Toast = Gtk.Template.Child()
     toggle_trash_btn: Gtk.ToggleButton = Gtk.Template.Child()
     trash_list: Gtk.Box = Gtk.Template.Child()
     trash_list_scrl: Gtk.ScrolledWindow = Gtk.Template.Child()
@@ -93,8 +89,8 @@ class Window(Adw.ApplicationWindow):
         if not task["deleted"]:
             new_task.toggle_visibility(True)
 
-    def add_toast(self, toast: Adw.Toast) -> None:
-        self.toast_overlay.add_toast(toast)
+    def add_toast(self, text: str = None) -> None:
+        self.toast_overlay.add_toast(Adw.Toast.new(title=text))
 
     def _create_actions(self) -> None:
         """
@@ -131,7 +127,7 @@ class Window(Adw.ApplicationWindow):
                 path: str = file.get_path()
                 with open(path, "w+") as f:
                     json.dump(UserData.get(), f, indent=4)
-                self.add_toast(self.toast_exported)
+                self.add_toast(_("Tasks Exported"))  # pyright:ignore
                 Log.info(f"Export tasks to: {path}")
 
             self.export_dialog.save(self, None, _finish_export, None)
@@ -164,17 +160,10 @@ class Window(Adw.ApplicationWindow):
                 for task in get_children(self.trash_list):
                     self.trash_list.remove(task)
                 self.load_tasks()
-                self.add_toast(self.toast_imported)
+                self.add_toast(_("Tasks Imported"))  # pyright:ignore
                 Log.info("Tasks imported")
 
             self.import_dialog.open(self, None, finish_import, None)
-
-        def _open_log(*_) -> None:
-            """
-            Open log file with default text editor
-            """
-            path = os.path.join(GLib.get_user_data_dir(), "list", "log.txt")
-            GLib.spawn_command_line_async(f"xdg-open {path}")
 
         def _shortcuts(*_) -> None:
             """
@@ -198,7 +187,6 @@ class Window(Adw.ApplicationWindow):
             lambda *_: self.props.application.quit(),
             ["<primary>q", "<primary>w"],
         )
-        _create_action("open_log", _open_log)
 
     def get_all_tasks(self) -> list[Task]:
         """

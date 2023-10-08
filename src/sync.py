@@ -80,7 +80,9 @@ class SyncProviderCalDAV:
                 self.can_sync = True
             except:
                 Log.error(f"Can't connect to {self.name} CalDAV server at '{self.url}'")
-                self.window.add_toast(self.window.toast_err)
+                self.window.add_toast(
+                    text=_("Sync is disabled"),  # pyright:ignore
+                )
                 return
 
             calendars = principal.calendars()
