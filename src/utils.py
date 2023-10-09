@@ -304,7 +304,7 @@ class UserData:
     @classmethod
     def set(self, data: dict) -> None:
         with open(os.path.join(self.data_dir, "data.json"), "w") as f:
-            json.dump(data, f, indent=4)
+            json.dump(data, f, indent=4, ensure_ascii=False)
 
     # Validate data json
     @classmethod
