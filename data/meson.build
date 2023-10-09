@@ -2,7 +2,7 @@ subdir('icons')
 
 desktop_file = i18n.merge_file(
         input: configure_file(
-          input: 'io.github.mrvladus.List.desktop',
+          input: 'io.github.mrvladus.List.desktop.in.in',
           output: app_id + '.desktop.in',
           configuration: conf
         ),
@@ -20,7 +20,7 @@ endif
 
 appstream_file = i18n.merge_file(
         input: configure_file(
-          input: 'io.github.mrvladus.List.metainfo.xml',
+          input: 'io.github.mrvladus.List.metainfo.xml.in.in',
           output: app_id + '.metainfo.xml.in',
           configuration: conf
         ),
