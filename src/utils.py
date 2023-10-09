@@ -262,7 +262,18 @@ class UserData:
                     f"Create data file at: {os.path.join(self.data_dir, 'data.json')}"
                 )
 
-    def _create_copy(self):
+    @classmethod
+    def clean_orphans(self, data: dict) -> dict:
+        ids: list[str] = [t["id"] for t in data["tasks"]]
+        orphans: list[str] = [
+            t for t in data["tasks"] if t["parent"] not in ids and t["parent"] != ""
+        ]
+        for id in orphans:
+            data["tasks"].remove(id)
+        return data
+
+    @classmethod
+    def create_copy(self):
         shutil.copy(
             os.path.join(self.data_dir, "data.json"),
             os.path.join(self.data_dir, "data.old.json"),
@@ -277,7 +288,9 @@ class UserData:
             with open(os.path.join(self.data_dir, "data.json"), "r") as f:
                 data: dict = json.load(f)
                 if data["version"] != VERSION:
-                    return self._convert(self, data)
+                    converted_data: dict = self.convert(self, data)
+                    self.set(converted_data)
+                    return converted_data
                 if not self.validate(data):
                     raise
                 return data
@@ -285,7 +298,7 @@ class UserData:
             Log.error(
                 f"Data file is corrupted. Creating backup at {os.path.join(self.data_dir, 'data.old.json')}"
             )
-            self._create_copy(self)
+            self.create_copy(self)
 
     # Save user data to json
     @classmethod
@@ -337,7 +350,8 @@ class UserData:
         self.validated = True
         return True
 
-    def _convert(self, data: dict) -> dict:
+    @classmethod
+    def convert(self, data: dict) -> dict:
         """
         Port tasks from older versions (for updates)
         """
@@ -387,5 +401,4 @@ class UserData:
                 # task["synced_todoist"] = False
 
         data["version"] = VERSION
-        UserData.set(data)
         return data

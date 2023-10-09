@@ -522,6 +522,7 @@
     <property name="translator-credits" translatable="yes">translator-credits</property>
     <property name="copyright">© 2023 Vlad Krupinski</property>
     <property name="website">https://github.com/mrvladus/Errands</property>
+    <property name="issue-url">https://github.com/mrvladus/Errands/issues</property>
     <property name="license-type">7</property>
   </object>
 

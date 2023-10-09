@@ -113,7 +113,7 @@ class Window(Adw.ApplicationWindow):
             self.about_window.props.application_icon = APP_ID
             self.about_window.show()
 
-        def _export_tasks(*_) -> None:
+        def _export_tasks(*args) -> None:
             """
             Show export dialog
             """
@@ -122,7 +122,8 @@ class Window(Adw.ApplicationWindow):
                 try:
                     file: Gio.File = self.export_dialog.save_finish(res)
                 except GLib.GError:
-                    Log.debug("Export cancelled")
+                    Log.info("Export cancelled")
+                    self.add_toast(_("Export Cancelled"))  # pyright:ignore
                     return
                 path: str = file.get_path()
                 with open(path, "w+") as f:
@@ -132,7 +133,7 @@ class Window(Adw.ApplicationWindow):
 
             self.export_dialog.save(self, None, _finish_export, None)
 
-        def _import_tasks(*_) -> None:
+        def _import_tasks(*args) -> None:
             """
             Show import dialog
             """
@@ -143,25 +144,36 @@ class Window(Adw.ApplicationWindow):
                 try:
                     file: Gio.File = self.import_dialog.open_finish(res)
                 except GLib.GError:
-                    Log.debug("Import cancelled")
+                    Log.info("Import cancelled")
+                    self.add_toast(_("Import Cancelled"))  # pyright:ignore
                     return
 
                 with open(file.get_path(), "r") as f:
                     text: str = f.read()
-                    if not UserData.validate(text):
-                        self.add_toast(self.toast_err)
+                    try:
+                        text = UserData.convert(json.loads(text))
+                    except:
+                        Log.error("Invalid file")
+                        self.add_toast(_("Invalid File"))  # pyright:ignore
                         return
-                    UserData.set(json.loads(text))
+                    data: dict = UserData.get()
+                    ids = [t["id"] for t in data["tasks"]]
+                    for task in text["tasks"]:
+                        if task["id"] not in ids:
+                            data["tasks"].append(task)
+                    data = UserData.clean_orphans(data)
+                    UserData.set(data)
 
                 # Remove old tasks
-                for task in self.get_toplevel_tasks():
+                for task in get_children(self.tasks_list):
                     self.tasks_list.remove(task)
                 # Remove old trash
                 for task in get_children(self.trash_list):
                     self.trash_list.remove(task)
-                self.load_tasks()
-                self.add_toast(_("Tasks Imported"))  # pyright:ignore
+                self._load_tasks()
                 Log.info("Tasks imported")
+                self.add_toast(_("Tasks Imported"))  # pyright:ignore
+                Sync.sync()
 
             self.import_dialog.open(self, None, finish_import, None)
 

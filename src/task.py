@@ -84,7 +84,7 @@ class Task(Gtk.Revealer):
             Log.info("Copy to clipboard: " + self.task["text"])
             clp: Gdk.Clipboard = Gdk.Display.get_default().get_clipboard()
             clp.set(self.task["text"])
-            self.window.add_toast(_("Copied"))  # pyright:ignore
+            self.window.add_toast(_("Copied to Clipboard"))  # pyright:ignore
 
         def _edit(*_) -> None:
             self.toggle_edit_mode()
@@ -117,7 +117,7 @@ class Task(Gtk.Revealer):
         if self.task["parent"] != "":
             self.is_sub_task = True
             self.main_box.add_css_class("sub-task")
-            if not self.window.startup:
+            if not self.window.startup and self.parent != self.window:
                 self.parent.expand(True)
         else:
             self.main_box.add_css_class("task")

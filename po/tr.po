@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-19 19:01+0300\n"
+"POT-Creation-Date: 2023-10-09 20:32+0300\n"
 "PO-Revision-Date: 2023-09-12 01:02+0300\n"
 "Last-Translator: Sabri Ünal <libreajans@gmail.com>\n"
 "Language-Team: Turkish <takim@gnome.org.tr>\n"
@@ -19,154 +19,167 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Poedit 3.2.2\n"
 
-#: src/window.py:249 src/task.py:163 src/res/ui/window.ui:225
-#: src/res/ui/task.ui:118
-msgid "Completed:"
+#: src/window.py:126
+msgid "Export Cancelled"
 msgstr ""
 
-#: src/res/ui/window.ui:41
-msgid "Move to Trash"
-msgstr "Çöpe Taşı"
-
-#: src/res/ui/window.ui:67
-msgid "Deleted Tasks"
-msgstr "Silinmiş Görevler"
-
-#: src/res/ui/window.ui:79 src/res/ui/window.ui:82
-msgid "Clear"
-msgstr "Temizle"
-
-#: src/res/ui/window.ui:97 src/res/ui/window.ui:100
-msgid "Restore All"
-msgstr "Tümünü Geri Yükle"
-
-#: src/res/ui/window.ui:116 src/res/ui/window.ui:118
-msgid "Close Trash"
-msgstr "Çöpü Kapat"
-
-#: src/res/ui/window.ui:145
-msgid "Empty Trash"
-msgstr "Çöpü Boşalt"
-
-#: src/res/ui/window.ui:146
-msgid "No deleted items"
-msgstr "Silinmiş öge yok"
-
-#: src/res/ui/window.ui:237 src/res/ui/window.ui:240
-msgid "Show Deleted Tasks"
-msgstr "Silinmiş Görevleri Göster"
-
-#: src/res/ui/window.ui:262 src/res/ui/window.ui:265
-msgid "Delete Completed Tasks (Ctrl+Delete)"
-msgstr "Tamamlanmış Görevleri Sil (Ctrl+Delete)"
-
-#: src/res/ui/window.ui:290 src/res/ui/window.ui:292
-msgid "Main Menu"
-msgstr "Ana Menü"
-
-#: src/res/ui/window.ui:306 src/res/ui/window.ui:309
-msgid "Scroll Up"
-msgstr "Yukarı Kaydır"
-
-#: src/res/ui/window.ui:340
-msgid "Add new Task"
-msgstr "Yeni Görev Ekle"
-
-#: src/res/ui/window.ui:420
-msgid "Export Tasks..."
-msgstr "Görevleri Dışa Aktar..."
-
-#: src/res/ui/window.ui:424
-msgid "Import Tasks..."
-msgstr "Görevleri İçe Aktar..."
-
-#: src/res/ui/window.ui:430 src/res/ui/window.ui:469
-msgid "Preferences"
-msgstr ""
-
-#: src/res/ui/window.ui:434
-msgid "Keyboard Shortcuts"
-msgstr "Klavye Kısayolları"
-
-#: src/res/ui/window.ui:438
-msgid "About Errands"
-msgstr "Errands Hakkında"
-
-#: src/res/ui/window.ui:454
-msgid "General"
-msgstr "Genel"
-
-#: src/res/ui/window.ui:457
-msgid "Show keyboard shortcuts"
-msgstr "Klavye kısayollarını göster"
-
-#: src/res/ui/window.ui:463
-msgid "Toggle sidebar"
-msgstr "Kenar çubuğu aç/kapat"
-
-#: src/res/ui/window.ui:475
-msgid "Quit"
-msgstr "Çık"
-
-#: src/res/ui/window.ui:485
-msgid "Import and Export"
-msgstr "Aktarma"
-
-#: src/res/ui/window.ui:488
-msgid "Import tasks"
-msgstr "Görevleri içe aktar"
-
-#: src/res/ui/window.ui:494
-msgid "Export tasks"
-msgstr "Görevleri dışa aktar"
-
-#: src/res/ui/window.ui:504 src/res/ui/preferences.ui:66
-msgid "Tasks"
-msgstr ""
-
-#: src/res/ui/window.ui:507
-msgid "Delete completed tasks"
-msgstr "Tamamlanmış Görevleri Sil"
-
-#: src/res/ui/window.ui:525
-msgid "translator-credits"
-msgstr "Sabri Ünal <libreajans@gmail.com>"
-
-#: src/res/ui/window.ui:560
-msgid "Are you sure?"
-msgstr "Emin misiniz?"
-
-#: src/res/ui/window.ui:561
-msgid "Tasks will be permanently deleted"
-msgstr "Görevler kalıcı olarak silinecek"
-
-#: src/res/ui/window.ui:566 src/res/ui/task.ui:327
-msgid "Cancel"
-msgstr "İptal"
-
-#: src/res/ui/window.ui:567 src/res/ui/task.ui:13
-msgid "Delete"
-msgstr "Sil"
-
-#: src/res/ui/window.ui:575
-msgid "Copied to Clipboard"
-msgstr "Panoya Kopyalandı"
-
-#: src/res/ui/window.ui:580
+#: src/window.py:131
 msgid "Tasks Exported"
 msgstr "Görevler Dışa Aktarıldı"
 
-#: src/res/ui/window.ui:585
+#: src/window.py:148
+#, fuzzy
+msgid "Import Cancelled"
+msgstr "Aktarma"
+
+#: src/window.py:157
+msgid "Invalid File"
+msgstr ""
+
+#: src/window.py:175
 msgid "Tasks Imported"
 msgstr "Görevler İçe Aktarıldı"
 
-#: src/res/ui/window.ui:590
-msgid "Error occurred"
-msgstr "Hata oluştu"
+#: src/window.py:338 src/task.py:169
+msgid "Completed:"
+msgstr ""
 
-#: src/res/ui/window.ui:591
-msgid "Open log"
-msgstr "Günlüğü aç"
+#: src/task.py:87
+msgid "Copied to Clipboard"
+msgstr "Panoya Kopyalandı"
+
+#: src/sync.py:84
+msgid "Sync is disabled"
+msgstr ""
+
+#: src/res/ui/window.ui:26
+msgid "Deleted Tasks"
+msgstr "Silinmiş Görevler"
+
+#: src/res/ui/window.ui:35 src/res/ui/window.ui:38
+msgid "Clear"
+msgstr "Temizle"
+
+#: src/res/ui/window.ui:53 src/res/ui/window.ui:56
+msgid "Restore All"
+msgstr "Tümünü Geri Yükle"
+
+#: src/res/ui/window.ui:68 src/res/ui/window.ui:71
+msgid "Close Trash"
+msgstr "Çöpü Kapat"
+
+#: src/res/ui/window.ui:106
+msgid "Move to Trash"
+msgstr "Çöpe Taşı"
+
+#: src/res/ui/window.ui:130
+msgid "Empty Trash"
+msgstr "Çöpü Boşalt"
+
+#: src/res/ui/window.ui:131
+msgid "No deleted items"
+msgstr "Silinmiş öge yok"
+
+#: src/res/ui/window.ui:192 src/res/ui/window.ui:195
+msgid "Show Deleted Tasks"
+msgstr "Silinmiş Görevleri Göster"
+
+#: src/res/ui/window.ui:221 src/res/ui/window.ui:224
+msgid "Delete Completed Tasks (Ctrl+Delete)"
+msgstr "Tamamlanmış Görevleri Sil (Ctrl+Delete)"
+
+#: src/res/ui/window.ui:249 src/res/ui/window.ui:251
+msgid "Main Menu"
+msgstr "Ana Menü"
+
+#: src/res/ui/window.ui:260 src/res/ui/window.ui:263
+msgid "Sync/Fetch Tasks"
+msgstr ""
+
+#: src/res/ui/window.ui:276 src/res/ui/window.ui:279 src/res/ui/window.ui:388
+#: src/res/ui/window.ui:391
+msgid "Scroll Up"
+msgstr "Yukarı Kaydır"
+
+#: src/res/ui/window.ui:310
+msgid "Add new Task"
+msgstr "Yeni Görev Ekle"
+
+#: src/res/ui/window.ui:418
+msgid "Export Tasks..."
+msgstr "Görevleri Dışa Aktar..."
+
+#: src/res/ui/window.ui:422
+msgid "Import Tasks..."
+msgstr "Görevleri İçe Aktar..."
+
+#: src/res/ui/window.ui:428 src/res/ui/window.ui:467
+msgid "Preferences"
+msgstr ""
+
+#: src/res/ui/window.ui:432
+msgid "Keyboard Shortcuts"
+msgstr "Klavye Kısayolları"
+
+#: src/res/ui/window.ui:436
+msgid "About Errands"
+msgstr "Errands Hakkında"
+
+#: src/res/ui/window.ui:452
+msgid "General"
+msgstr "Genel"
+
+#: src/res/ui/window.ui:455
+msgid "Show keyboard shortcuts"
+msgstr "Klavye kısayollarını göster"
+
+#: src/res/ui/window.ui:461
+msgid "Toggle sidebar"
+msgstr "Kenar çubuğu aç/kapat"
+
+#: src/res/ui/window.ui:473
+msgid "Quit"
+msgstr "Çık"
+
+#: src/res/ui/window.ui:483
+msgid "Import and Export"
+msgstr "Aktarma"
+
+#: src/res/ui/window.ui:486
+msgid "Import tasks"
+msgstr "Görevleri içe aktar"
+
+#: src/res/ui/window.ui:492
+msgid "Export tasks"
+msgstr "Görevleri dışa aktar"
+
+#: src/res/ui/window.ui:502 src/res/ui/preferences.ui:66
+msgid "Tasks"
+msgstr ""
+
+#: src/res/ui/window.ui:505
+msgid "Delete completed tasks"
+msgstr "Tamamlanmış Görevleri Sil"
+
+#: src/res/ui/window.ui:522
+msgid "translator-credits"
+msgstr "Sabri Ünal <libreajans@gmail.com>"
+
+#: src/res/ui/window.ui:558
+msgid "Are you sure?"
+msgstr "Emin misiniz?"
+
+#: src/res/ui/window.ui:559
+msgid "Tasks will be permanently deleted"
+msgstr "Görevler kalıcı olarak silinecek"
+
+#: src/res/ui/window.ui:564 src/res/ui/task.ui:326
+msgid "Cancel"
+msgstr "İptal"
+
+#: src/res/ui/window.ui:565 src/res/ui/task.ui:13
+msgid "Delete"
+msgstr "Sil"
 
 #: src/res/ui/preferences.ui:14
 msgid "Application Theme"
@@ -188,6 +201,30 @@ msgstr "Koyu"
 msgid "Expand Sub-Tasks on Startup"
 msgstr ""
 
+#: src/res/ui/preferences.ui:87
+msgid "Sync"
+msgstr ""
+
+#: src/res/ui/preferences.ui:96
+msgid "Disabled"
+msgstr ""
+
+#: src/res/ui/preferences.ui:111
+msgid "Server URL"
+msgstr ""
+
+#: src/res/ui/preferences.ui:118
+msgid "Username"
+msgstr ""
+
+#: src/res/ui/preferences.ui:125
+msgid "Password"
+msgstr ""
+
+#: src/res/ui/preferences.ui:132
+msgid "Token"
+msgstr ""
+
 #: src/res/ui/task.ui:17
 msgid "Edit"
 msgstr "Düzenle"
@@ -196,19 +233,19 @@ msgstr "Düzenle"
 msgid "Copy"
 msgstr "Kopyala"
 
-#: src/res/ui/task.ui:136 src/res/ui/task.ui:139
+#: src/res/ui/task.ui:135 src/res/ui/task.ui:138
 msgid "Mark as Completed"
 msgstr "Tamamlanmadı Olarak İmle"
 
-#: src/res/ui/task.ui:186 src/res/ui/task.ui:189
+#: src/res/ui/task.ui:185 src/res/ui/task.ui:188
 msgid "Clear style"
 msgstr "Biçemi temizle"
 
-#: src/res/ui/task.ui:287 src/res/ui/task.ui:289
+#: src/res/ui/task.ui:286 src/res/ui/task.ui:288
 msgid "Menu"
 msgstr "Menü"
 
-#: src/res/ui/task.ui:360
+#: src/res/ui/task.ui:359
 msgid "Add new Sub-Task"
 msgstr "Yeni Alt Görev Ekle"
 
@@ -229,3 +266,9 @@ msgstr "Görevlerinizi yönetin"
 #: data/io.github.mrvladus.List.desktop:12
 msgid "errands;tasks;list;todo;todos;"
 msgstr "errands;tasks;list;todo;todos;görevler;görev;yapılacak işler;"
+
+#~ msgid "Error occurred"
+#~ msgstr "Hata oluştu"
+
+#~ msgid "Open log"
+#~ msgstr "Günlüğü aç"
