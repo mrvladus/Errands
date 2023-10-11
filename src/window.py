@@ -79,7 +79,6 @@ class Window(Adw.ApplicationWindow):
         """
         self._create_actions()
         Sync.init(self)
-        Sync.sync_blocking(True)
         self._load_tasks()
         self.startup = False
 
@@ -89,7 +88,7 @@ class Window(Adw.ApplicationWindow):
         if not task["deleted"]:
             new_task.toggle_visibility(True)
 
-    def add_toast(self, text: str = None) -> None:
+    def add_toast(self, text: str) -> None:
         self.toast_overlay.add_toast(Adw.Toast.new(title=text))
 
     def _create_actions(self) -> None:
@@ -235,6 +234,7 @@ class Window(Adw.ApplicationWindow):
             for task in self.get_all_tasks():
                 if len(get_children(task.tasks_list)) > 0:
                     task.expand(True)
+        Sync.sync(True)
 
     def update_ui(self) -> None:
         Log.debug("Updating UI")
