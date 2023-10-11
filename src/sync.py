@@ -39,7 +39,7 @@ class SyncProviderCalDAV:
     calendar: Calendar = None
     window = None
 
-    def __init__(self, name: str, window) -> None:
+    def __init__(self, name: str, window: Adw.ApplicationWindow) -> None:
         Log.info(f"Initialize {name} sync provider")
 
         self.name = name
@@ -82,13 +82,15 @@ class SyncProviderCalDAV:
                 self.window.add_toast(_("Sync is Disabled"))  # pyright:ignore
                 self.window.sync_btn.set_visible(False)
                 return
-
+            # Get calendars
             calendars = principal.calendars()
+            # Check if Errands calendar exists
             errands_cal_exists: bool = False
             for cal in calendars:
                 if cal.name == "Errands":
                     self.calendar = cal
                     errands_cal_exists = True
+            # Create one if not
             if not errands_cal_exists:
                 Log.debug(f"Create new calendar 'Errands' on {self.name}")
                 self.calendar = principal.make_calendar(
@@ -96,10 +98,16 @@ class SyncProviderCalDAV:
                 )
 
     def _set_url(self):
+        if not self.url.startswith("http"):
+            self.url = "http://" + self.url
         if self.name == "Nextcloud":
             self.url = f"{self.url}/remote.php/dav/"
 
     def _get_tasks(self) -> list[dict]:
+        """
+        Get todos from calendar and convert them to dict
+        """
+
         try:
             todos = self.calendar.todos(include_completed=True)
             tasks: list[dict] = []
@@ -123,12 +131,13 @@ class SyncProviderCalDAV:
         """
         Update local tasks that was changed on CalDAV
         """
+
+        Log.debug(f"Fetch tasks from {self.name}")
+
         caldav_tasks: list[dict] | None = self._get_tasks()
         if not caldav_tasks:
             Log.debug(f"No tasks on server")
             return
-
-        Log.debug(f"Fetch tasks from {self.name}")
 
         data: dict = UserData.get()
         caldav_ids: list[str] = [task["id"] for task in caldav_tasks]
