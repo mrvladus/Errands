@@ -81,7 +81,7 @@ class Task(Gtk.Revealer):
             group.add_action(action)
 
         def _copy(*args) -> None:
-            Log.info("Copy to clipboard: " + self.task["text"])
+            Log.info("Copy to clipboard")
             clp: Gdk.Clipboard = Gdk.Display.get_default().get_clipboard()
             clp.set(self.task["text"])
             self.window.add_toast(_("Copied to Clipboard"))  # pyright:ignore
