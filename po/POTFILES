@@ -10,4 +10,4 @@ src/res/ui/task.ui
 src/res/ui/trash_item.ui
 
 # Data
-data/io.github.mrvladus.List.desktop
+data/io.github.mrvladus.List.desktop.in.in

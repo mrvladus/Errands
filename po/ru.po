@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-09 20:32+0300\n"
+"POT-Creation-Date: 2023-10-11 12:55+0300\n"
 "PO-Revision-Date: 2023-07-07 16:56+0300\n"
 "Last-Translator: Vlad Krupinski <mrvladus@yandex.ru>\n"
 "Language-Team: \n"
@@ -19,28 +19,31 @@ msgstr ""
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Generator: Poedit 3.3.1\n"
 
-#: src/window.py:126
+#: src/window.py:125
 msgid "Export Cancelled"
-msgstr ""
+msgstr "Экспорт отменен"
 
 #: src/window.py:131
 msgid "Tasks Exported"
 msgstr "Экспорт завершен"
 
-#: src/window.py:148
-#, fuzzy
+#: src/window.py:134
+msgid "Error"
+msgstr "Ошибка"
+
+#: src/window.py:151
 msgid "Import Cancelled"
-msgstr "Импорт и экспорт"
+msgstr "Импорт отменен"
 
-#: src/window.py:157
+#: src/window.py:160
 msgid "Invalid File"
-msgstr ""
+msgstr "Файл с ошибкой"
 
-#: src/window.py:175
+#: src/window.py:178
 msgid "Tasks Imported"
 msgstr "Импорт завершен"
 
-#: src/window.py:338 src/task.py:169
+#: src/window.py:342 src/task.py:169
 msgid "Completed:"
 msgstr "Выполнено:"
 
@@ -48,8 +51,18 @@ msgstr "Выполнено:"
 msgid "Copied to Clipboard"
 msgstr "Скопировано в буфер обмена"
 
-#: src/sync.py:84
-msgid "Sync is disabled"
+#. pyright:ignore
+#: src/sync.py:55
+msgid "Not all sync credentials provided. Please check settings."
+msgstr "Не все данные для синхронизации предоставлены. Проверьте настройки."
+
+#. pyright:ignore
+#: src/sync.py:72
+msgid "Server doesn't support CalDAV. Maybe wrong adress?"
+msgstr "Сервер не поддерживает CalDAV. Проверьте адрес."
+
+#: src/sync.py:82
+msgid "Sync is Disabled"
 msgstr "Синхронизация отключена"
 
 #: src/res/ui/window.ui:26
@@ -94,7 +107,7 @@ msgstr "Главное меню"
 
 #: src/res/ui/window.ui:260 src/res/ui/window.ui:263
 msgid "Sync/Fetch Tasks"
-msgstr ""
+msgstr "Синхронизировать задачи"
 
 #: src/res/ui/window.ui:276 src/res/ui/window.ui:279 src/res/ui/window.ui:388
 #: src/res/ui/window.ui:391
@@ -205,9 +218,13 @@ msgstr "Раскрывать подзадачи при старте"
 msgid "Sync"
 msgstr "Синхронизация"
 
+#: src/res/ui/preferences.ui:92
+msgid "Sync Provider"
+msgstr "Способ синхронизации"
+
 #: src/res/ui/preferences.ui:96
 msgid "Disabled"
-msgstr "Отключена"
+msgstr "Отключено"
 
 #: src/res/ui/preferences.ui:111
 msgid "Server URL"
@@ -254,21 +271,15 @@ msgid "Restore"
 msgstr "Восстановить"
 
 #. TRANSLATORS: Don't translate
-#: data/io.github.mrvladus.List.desktop:4
+#: data/io.github.mrvladus.List.desktop.in.in:4
 msgid "Errands"
 msgstr ""
 
-#: data/io.github.mrvladus.List.desktop:5
+#: data/io.github.mrvladus.List.desktop.in.in:5
 msgid "Manage your tasks"
 msgstr "Управляйте своими задачами"
 
 #. TRANSLATORS: Don't translate
-#: data/io.github.mrvladus.List.desktop:12
+#: data/io.github.mrvladus.List.desktop.in.in:12
 msgid "errands;tasks;list;todo;todos;"
 msgstr ""
-
-#~ msgid "Error occurred"
-#~ msgstr "Ошибка"
-
-#~ msgid "Open log"
-#~ msgstr "Открыть лог"

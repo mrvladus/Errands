@@ -89,7 +89,7 @@
             <!-- Providers -->
             <child>
               <object class="AdwComboRow" id="sync_providers">
-                <property name="title">Sync Provider</property>
+                <property name="title" translatable="yes">Sync Provider</property>
                 <property name="model">
                   <object class="GtkStringList">
                     <items>

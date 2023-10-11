@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-09 20:32+0300\n"
+"POT-Creation-Date: 2023-10-11 12:55+0300\n"
 "PO-Revision-Date: 2023-09-23 21:24+0300\n"
 "Last-Translator: volkov <volkovissocool@gmail.com>\n"
 "Language-Team: \n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.3.1\n"
 
-#: src/window.py:126
+#: src/window.py:125
 msgid "Export Cancelled"
 msgstr ""
 
@@ -25,20 +25,24 @@ msgstr ""
 msgid "Tasks Exported"
 msgstr "Задачі експортовані"
 
-#: src/window.py:148
+#: src/window.py:134
+msgid "Error"
+msgstr ""
+
+#: src/window.py:151
 #, fuzzy
 msgid "Import Cancelled"
 msgstr "Імпорт і експорт"
 
-#: src/window.py:157
+#: src/window.py:160
 msgid "Invalid File"
 msgstr ""
 
-#: src/window.py:175
+#: src/window.py:178
 msgid "Tasks Imported"
 msgstr "Задачі імпортовані"
 
-#: src/window.py:338 src/task.py:169
+#: src/window.py:342 src/task.py:169
 msgid "Completed:"
 msgstr "Завершено:"
 
@@ -46,8 +50,18 @@ msgstr "Завершено:"
 msgid "Copied to Clipboard"
 msgstr "Скопійовано в буфер обміну"
 
-#: src/sync.py:84
-msgid "Sync is disabled"
+#. pyright:ignore
+#: src/sync.py:55
+msgid "Not all sync credentials provided. Please check settings."
+msgstr ""
+
+#. pyright:ignore
+#: src/sync.py:72
+msgid "Server doesn't support CalDAV. Maybe wrong adress?"
+msgstr ""
+
+#: src/sync.py:82
+msgid "Sync is Disabled"
 msgstr ""
 
 #: src/res/ui/window.ui:26
@@ -203,6 +217,10 @@ msgstr "Розгортати підзавдання при запуску дод
 msgid "Sync"
 msgstr ""
 
+#: src/res/ui/preferences.ui:92
+msgid "Sync Provider"
+msgstr ""
+
 #: src/res/ui/preferences.ui:96
 msgid "Disabled"
 msgstr ""
@@ -252,16 +270,16 @@ msgid "Restore"
 msgstr "Відновити"
 
 #. TRANSLATORS: Don't translate
-#: data/io.github.mrvladus.List.desktop:4
+#: data/io.github.mrvladus.List.desktop.in.in:4
 msgid "Errands"
 msgstr ""
 
-#: data/io.github.mrvladus.List.desktop:5
+#: data/io.github.mrvladus.List.desktop.in.in:5
 msgid "Manage your tasks"
 msgstr "Керуйте вашими задачами"
 
 #. TRANSLATORS: Don't translate
-#: data/io.github.mrvladus.List.desktop:12
+#: data/io.github.mrvladus.List.desktop.in.in:12
 msgid "errands;tasks;list;todo;todos;"
 msgstr "errands;tasks;list;todo;todos;справи;туду;список;записати;"
 

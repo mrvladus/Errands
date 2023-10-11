@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-09 20:32+0300\n"
+"POT-Creation-Date: 2023-10-11 12:55+0300\n"
 "PO-Revision-Date: 2023-09-19 21:07+0200\n"
 "Last-Translator: Sergio Varela <sergiovg01@outlook.com>\n"
 "Language-Team: Spanish - Spain <sergiovg01@outlook.com>\n"
@@ -20,7 +20,7 @@ msgstr ""
 "X-Generator: Gtranslator 42.0\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: src/window.py:126
+#: src/window.py:125
 msgid "Export Cancelled"
 msgstr ""
 
@@ -28,20 +28,24 @@ msgstr ""
 msgid "Tasks Exported"
 msgstr "Tareas exportadas"
 
-#: src/window.py:148
+#: src/window.py:134
+msgid "Error"
+msgstr ""
+
+#: src/window.py:151
 #, fuzzy
 msgid "Import Cancelled"
 msgstr "Importar y exportar"
 
-#: src/window.py:157
+#: src/window.py:160
 msgid "Invalid File"
 msgstr ""
 
-#: src/window.py:175
+#: src/window.py:178
 msgid "Tasks Imported"
 msgstr "Tareas importadas"
 
-#: src/window.py:338 src/task.py:169
+#: src/window.py:342 src/task.py:169
 msgid "Completed:"
 msgstr "Completado:"
 
@@ -49,8 +53,18 @@ msgstr "Completado:"
 msgid "Copied to Clipboard"
 msgstr "Copiado al portapapeles"
 
-#: src/sync.py:84
-msgid "Sync is disabled"
+#. pyright:ignore
+#: src/sync.py:55
+msgid "Not all sync credentials provided. Please check settings."
+msgstr ""
+
+#. pyright:ignore
+#: src/sync.py:72
+msgid "Server doesn't support CalDAV. Maybe wrong adress?"
+msgstr ""
+
+#: src/sync.py:82
+msgid "Sync is Disabled"
 msgstr ""
 
 #: src/res/ui/window.ui:26
@@ -206,6 +220,10 @@ msgstr "Expandir subtareas al inicio"
 msgid "Sync"
 msgstr ""
 
+#: src/res/ui/preferences.ui:92
+msgid "Sync Provider"
+msgstr ""
+
 #: src/res/ui/preferences.ui:96
 msgid "Disabled"
 msgstr ""
@@ -255,16 +273,16 @@ msgid "Restore"
 msgstr "Restaurar"
 
 #. TRANSLATORS: Don't translate
-#: data/io.github.mrvladus.List.desktop:4
+#: data/io.github.mrvladus.List.desktop.in.in:4
 msgid "Errands"
 msgstr ""
 
-#: data/io.github.mrvladus.List.desktop:5
+#: data/io.github.mrvladus.List.desktop.in.in:5
 msgid "Manage your tasks"
 msgstr "Administrar tareas"
 
 #. TRANSLATORS: Don't translate
-#: data/io.github.mrvladus.List.desktop:12
+#: data/io.github.mrvladus.List.desktop.in.in:12
 msgid "errands;tasks;list;todo;todos;"
 msgstr ""
 
