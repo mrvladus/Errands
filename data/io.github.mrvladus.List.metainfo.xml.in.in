@@ -7,6 +7,8 @@
   <developer_name translatable="no">Vlad Krupinski</developer_name>
   <url type="homepage">https://github.com/mrvladus/Errands</url>
   <url type="bugtracker">https://github.com/mrvladus/Errands/issues</url>
+  <url type="vcs-browser">https://github.com/mrvladus/Errands/</url>
+  <url type="translate">https://github.com/mrvladus/Errands#translations</url>
   <launchable type="desktop-id">@APP_ID@.desktop</launchable>
   <translation type="gettext">errands</translation>
   <custom>
