@@ -125,11 +125,15 @@ class Window(Adw.ApplicationWindow):
                     Log.info("Export cancelled")
                     self.add_toast(_("Export Cancelled"))  # pyright:ignore
                     return
-                path: str = file.get_path()
-                with open(path, "w+") as f:
-                    json.dump(UserData.get(), f, indent=4)
-                self.add_toast(_("Tasks Exported"))  # pyright:ignore
-                Log.info(f"Export tasks to: {path}")
+                try:
+                    path: str = file.get_path()
+                    with open(path, "w+") as f:
+                        json.dump(UserData.get(), f, indent=4, ensure_ascii=False)
+                    self.add_toast(_("Tasks Exported"))  # pyright:ignore
+                    Log.info(f"Export tasks to: {path}")
+                except:
+                    self.add_toast(_("Error"))  # pyright:ignore
+                    Log.info(f"Can't export tasks to: {path}")
 
             self.export_dialog.save(self, None, _finish_export, None)
 

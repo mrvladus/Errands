@@ -127,7 +127,7 @@ class SyncProviderCalDAV:
         """
         caldav_tasks: list[dict] | None = self._get_tasks()
         if not caldav_tasks:
-            Log.error(f"Can't connect to {self.name}")
+            Log.debug(f"No tasks on server")
             return
 
         Log.debug(f"Fetch tasks from {self.name}")
@@ -180,11 +180,6 @@ class SyncProviderCalDAV:
         """
 
         caldav_tasks: list[dict] | None = self._get_tasks()
-        if not caldav_tasks:
-            Log.debug(
-                f"Can't connect to {self.name} or there is no tasks on the server"
-            )
-            return
 
         Log.info(f"Sync tasks with {self.name}")
 
