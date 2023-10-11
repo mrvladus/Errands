@@ -33,18 +33,6 @@ class Sync:
         if self.provider and self.provider.can_sync:
             self.provider.sync(fetch)
 
-    @classmethod
-    def sync_blocking(self, fetch: bool = False):
-        """
-        Sync tasks while blocking the UI
-        """
-        if GSettings.get("sync-provider") == 0:
-            return
-        if not self.provider:
-            self.init()
-        if self.provider and self.provider.can_sync:
-            self.provider.sync(fetch)
-
 
 class SyncProviderCalDAV:
     can_sync: bool = False
@@ -62,6 +50,12 @@ class SyncProviderCalDAV:
 
         if self.url == "" or self.username == "" or self.password == "":
             Log.error(f"Not all {self.name} credentials provided")
+            self.window.add_toast(
+                _(  # pyright:ignore
+                    "Not all sync credentials provided. Please check settings."
+                )
+            )
+            self.window.sync_btn.set_visible(False)
             return
 
         self._set_url()
@@ -73,6 +67,11 @@ class SyncProviderCalDAV:
                 supports_caldav = client.check_cdav_support()
                 if not supports_caldav:
                     Log.error(f"Server doesn't support CalDAV. Maybe wrong adress?")
+                    self.window.add_toast(
+                        _(  # pyright:ignore
+                            "Server doesn't support CalDAV. Maybe wrong adress?"
+                        )
+                    )
                     return
 
                 principal = client.principal()
@@ -80,9 +79,8 @@ class SyncProviderCalDAV:
                 self.can_sync = True
             except:
                 Log.error(f"Can't connect to {self.name} CalDAV server at '{self.url}'")
-                self.window.add_toast(
-                    text=_("Sync is disabled"),  # pyright:ignore
-                )
+                self.window.add_toast(_("Sync is Disabled"))  # pyright:ignore
+                self.window.sync_btn.set_visible(False)
                 return
 
             calendars = principal.calendars()
