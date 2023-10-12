@@ -21,7 +21,7 @@
 # SOFTWARE.
 from gi.repository import Adw, Gtk
 from .sync import Sync
-from .utils import GSettings
+from .utils import GSettings, UserData
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/Errands/preferences.ui")
@@ -75,11 +75,18 @@ class PreferencesWindow(Adw.PreferencesWindow):
     # --- Template handlers --- #
 
     @Gtk.Template.Callback()
+    def on_cal_name_changed(self, *args):
+        data: dict = UserData.get()
+        for task in data["tasks"]:
+            task["synced_caldav"] = False
+        UserData.set(data)
+
+    @Gtk.Template.Callback()
     def on_sync_provider_selected(self, *_) -> None:
         self.setup_sync()
 
     @Gtk.Template.Callback()
-    def on_test_connection_btn_clicked(self, btn):
+    def on_test_connection_btn_clicked(self, _btn):
         res: bool = Sync.test_connection()
         msg = _("Connected") if res else _("Can't connect")  # pyright:ignore
         toast: Adw.Toast = Adw.Toast(title=msg, timeout=2)

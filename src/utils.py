@@ -26,10 +26,26 @@ import re
 import shutil
 import uuid
 
-from typing import Callable
+from typing import Callable, TypedDict
 from threading import Thread
 from gi.repository import GLib, Gio, Adw, Gtk
 from __main__ import VERSION, APP_ID
+
+
+class UserDataTask(TypedDict):
+    id: str
+    text: str
+    pid: str
+    cmpd: bool
+    dltd: bool
+    color: str
+    synced_caldav: bool
+
+
+class UserDataDict(TypedDict):
+    version: str
+    tasks: list[UserDataTask]
+    deleted: list[str]
 
 
 def get_children(obj: Gtk.Widget) -> list[Gtk.Widget]:
@@ -230,7 +246,7 @@ class TaskUtils:
         color: str = "",
         synced_caldav: bool = False,
         # synced_todoist: bool = False,
-    ) -> dict:
+    ) -> UserDataTask:
         return {
             "id": self.generate_id() if not id else id,
             "parent": pid,
@@ -247,7 +263,7 @@ class UserData:
     """Class for accessing data file with user tasks"""
 
     data_dir: str = os.path.join(GLib.get_user_data_dir(), "list")
-    default_data = {"version": VERSION, "tasks": [], "deleted": []}
+    default_data: UserDataDict = {"version": VERSION, "tasks": [], "deleted": []}
     validated: bool = False
 
     def _create_file(self):
@@ -263,7 +279,7 @@ class UserData:
                 )
 
     @classmethod
-    def clean_orphans(self, data: dict) -> dict:
+    def clean_orphans(self, data: UserDataDict) -> UserDataDict:
         ids: list[str] = [t["id"] for t in data["tasks"]]
         orphans: list[str] = [
             t for t in data["tasks"] if t["parent"] not in ids and t["parent"] != ""
@@ -282,13 +298,13 @@ class UserData:
 
     # Load user data from json
     @classmethod
-    def get(self) -> dict:
+    def get(self) -> UserDataDict:
         self._create_file(self)
         try:
             with open(os.path.join(self.data_dir, "data.json"), "r") as f:
-                data: dict = json.load(f)
+                data: UserDataDict = json.load(f)
                 if data["version"] != VERSION:
-                    converted_data: dict = self.convert(self, data)
+                    converted_data: UserDataDict = self.convert(self, data)
                     self.set(converted_data)
                     return converted_data
                 if not self.validate(data):
@@ -302,13 +318,13 @@ class UserData:
 
     # Save user data to json
     @classmethod
-    def set(self, data: dict) -> None:
+    def set(self, data: UserDataDict) -> None:
         with open(os.path.join(self.data_dir, "data.json"), "w") as f:
             json.dump(data, f, indent=4, ensure_ascii=False)
 
     # Validate data json
     @classmethod
-    def validate(self, data: str | dict) -> bool:
+    def validate(self, data: str | UserDataDict) -> bool:
         if self.validated:
             return True
 
@@ -351,7 +367,7 @@ class UserData:
         return True
 
     @classmethod
-    def convert(self, data: dict) -> dict:
+    def convert(self, data: UserDataDict) -> UserDataDict:
         """
         Port tasks from older versions (for updates)
         """

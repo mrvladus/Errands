@@ -23,7 +23,15 @@
 from typing import Self
 from gi.repository import Gtk, Adw, Gdk, GObject, Gio
 from .sync import Sync
-from .utils import Log, Markup, TaskUtils, UserData, get_children
+from .utils import (
+    Log,
+    Markup,
+    TaskUtils,
+    UserData,
+    UserDataDict,
+    UserDataTask,
+    get_children,
+)
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/Errands/task.ui")
@@ -48,11 +56,13 @@ class Task(Gtk.Revealer):
     def __init__(self, task: dict, window: Adw.ApplicationWindow, parent=None) -> None:
         super().__init__()
         Log.info(f"Add {'task' if not task['parent'] else 'sub-task'}: " + task["id"])
-        self.window = window
-        self.parent = self.window if not parent else parent
-        self.task: dict = task
+        self.window: Adw.ApplicationWindow = window
+        self.parent: Adw.ApplicationWindow | Task = (
+            self.window if not parent else parent
+        )
+        self.task: UserDataTask = task
         # Set text
-        self.text = Markup.find_url(Markup.escape(self.task["text"]))
+        self.text: str = Markup.find_url(Markup.escape(self.task["text"]))
         self.task_row.set_title(self.text)
         # Check if sub-task completed and toggle checkbox
         self.completed_btn.props.active = self.task["completed"]
@@ -72,11 +82,11 @@ class Task(Gtk.Revealer):
         return f"Task({self.task['id']})"
 
     def _add_actions(self) -> None:
-        group = Gio.SimpleActionGroup.new()
+        group: Gio.SimpleActionGroup = Gio.SimpleActionGroup.new()
         self.insert_action_group("task", group)
 
         def _add_action(name: str, callback) -> None:
-            action = Gio.SimpleAction.new(name, None)
+            action: Gio.SimpleAction = Gio.SimpleAction.new(name, None)
             action.connect("activate", callback)
             group.add_action(action)
 
@@ -105,7 +115,7 @@ class Task(Gtk.Revealer):
             self.update_status()
 
     def _add_sub_tasks(self) -> None:
-        sub_count = 0
+        sub_count: int = 0
         for task in UserData.get()["tasks"]:
             if task["parent"] == self.task["id"]:
                 sub_count += 1
@@ -156,8 +166,8 @@ class Task(Gtk.Revealer):
         self.set_reveal_child(on)
 
     def update_status(self) -> None:
-        n_completed = 0
-        n_total = 0
+        n_completed: int = 0
+        n_total: int = 0
         for task in UserData.get()["tasks"]:
             if task["parent"] == self.task["id"]:
                 if not task["deleted"]:
@@ -176,7 +186,7 @@ class Task(Gtk.Revealer):
         Sync self.task with user data.json
         """
 
-        data: dict = UserData.get()
+        data: UserDataDict = UserData.get()
         for i, task in enumerate(data["tasks"]):
             if self.task["id"] == task["id"]:
                 data["tasks"][i] = self.task
@@ -210,7 +220,7 @@ class Task(Gtk.Revealer):
         self.task["synced_caldav"] = False
         self.update_data()
         # Update children
-        children = get_children(self.tasks_list)
+        children: list[Task] = get_children(self.tasks_list)
         for task in children:
             task.can_sync = False
             task.completed_btn.set_active(btn.get_active())
@@ -244,10 +254,10 @@ class Task(Gtk.Revealer):
         if entry.get_buffer().props.text == "":
             return
         # Add new sub-task
-        new_sub_task = TaskUtils.new_task(
+        new_sub_task: UserDataTask = TaskUtils.new_task(
             entry.get_buffer().props.text, pid=self.task["id"]
         )
-        data: dict = UserData.get()
+        data: UserDataDict = UserData.get()
         data["tasks"].append(new_sub_task)
         UserData.set(data)
         # Add sub-task
@@ -325,7 +335,7 @@ class Task(Gtk.Revealer):
 
     @Gtk.Template.Callback()
     def on_drag_begin(self, _, drag) -> bool:
-        icon = Gtk.DragIcon.get_for_drag(drag)
+        icon: Gtk.DragIcon = Gtk.DragIcon.get_for_drag(drag)
         icon.set_child(
             Gtk.Button(
                 label=self.task["text"]
@@ -352,7 +362,7 @@ class Task(Gtk.Revealer):
             return False
 
         # Move data
-        data = UserData.get()
+        data: UserDataDict = UserData.get()
         tasks = data["tasks"]
         for i, t in enumerate(tasks):
             if t["id"] == self.task["id"]:
@@ -403,7 +413,7 @@ class Task(Gtk.Revealer):
         task.task["synced_caldav"] = False
         task.update_data()
         # Move data
-        data = UserData.get()
+        data: UserDataDict = UserData.get()
         tasks = data["tasks"]
         last_sub_idx: int = 0
         for i, t in enumerate(tasks):

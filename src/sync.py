@@ -1,6 +1,6 @@
 from gi.repository import Adw, GLib
-from caldav import Calendar, DAVClient, Principal
-from .utils import GSettings, Log, TaskUtils, UserData, threaded
+from caldav import Calendar, CalendarObjectResource, DAVClient, Principal, Todo
+from .utils import GSettings, Log, TaskUtils, UserData, UserDataDict, threaded
 
 
 class Sync:
@@ -11,7 +11,7 @@ class Sync:
     def init(self, window: Adw.ApplicationWindow = None, testing: bool = False) -> None:
         Log.debug("Initialize sync provider")
         if window:
-            self.window = window
+            self.window: Adw.ApplicationWindow = window
         match GSettings.get("sync-provider"):
             case 0:
                 Log.info("Sync disabled")
@@ -46,9 +46,9 @@ class SyncProviderCalDAV:
     def __init__(self, name: str, window: Adw.ApplicationWindow, testing: bool) -> None:
         Log.info(f"Initialize {name} sync provider")
 
-        self.name = name
-        self.window = window
-        self.testing = testing  # Only for connection test
+        self.name: str = name
+        self.window: Adw.ApplicationWindow = window
+        self.testing: bool = testing  # Only for connection test
 
         if not self._check_credentials():
             return
@@ -57,9 +57,9 @@ class SyncProviderCalDAV:
         return self._connect()
 
     def _check_credentials(self) -> bool:
-        self.url = GSettings.get("sync-url")
-        self.username = GSettings.get("sync-username")
-        self.password = GSettings.get("sync-password")
+        self.url: str = GSettings.get("sync-url")
+        self.username: str = GSettings.get("sync-username")
+        self.password: str = GSettings.get("sync-password")
 
         if self.url == "" or self.username == "" or self.password == "":
             Log.error(f"Not all {self.name} credentials provided")
@@ -87,7 +87,7 @@ class SyncProviderCalDAV:
             url=self.url, username=self.username, password=self.password
         ) as client:
             try:
-                principal = client.principal()
+                principal: Principal = client.principal()
                 Log.info(f"Connected to {self.name} CalDAV server at '{self.url}'")
                 self.can_sync = True
                 self._setup_calendar(principal)
@@ -108,7 +108,7 @@ class SyncProviderCalDAV:
         """
 
         try:
-            todos = self.calendar.todos(include_completed=True)
+            todos: list[Todo] = self.calendar.todos(include_completed=True)
             tasks: list[dict] = []
             for todo in todos:
                 data: dict = {
@@ -182,7 +182,7 @@ class SyncProviderCalDAV:
 
     def _setup_calendar(self, principal: Principal) -> None:
         calendars: list[Calendar] = principal.calendars()
-        cal_name = GSettings.get("sync-cal-name")
+        cal_name: str = GSettings.get("sync-cal-name")
         cal_exists: bool = False
         errands_cal_exists: bool = False
         for cal in calendars:
@@ -212,7 +212,7 @@ class SyncProviderCalDAV:
 
         Log.info(f"Sync tasks with {self.name}")
 
-        data: dict = UserData.get()
+        data: UserDataDict = UserData.get()
         caldav_ids: list[str] = [task["id"] for task in caldav_tasks]
 
         for task in data["tasks"]:
@@ -236,7 +236,7 @@ class SyncProviderCalDAV:
             elif task["id"] in caldav_ids and not task["synced_caldav"]:
                 try:
                     Log.debug(f"Update task on {self.name}: {task['id']}")
-                    todo = self.calendar.todo_by_uid(task["id"])
+                    todo: CalendarObjectResource = self.calendar.todo_by_uid(task["id"])
                     todo.uncomplete()
                     todo.icalendar_component["summary"] = task["text"]
                     todo.icalendar_component["related-to"] = task["parent"]
@@ -252,7 +252,7 @@ class SyncProviderCalDAV:
         for task_id in data["deleted"]:
             try:
                 Log.debug(f"Delete task from {self.name}: {task_id}")
-                todo = self.calendar.todo_by_uid(task_id)
+                todo: CalendarObjectResource = self.calendar.todo_by_uid(task_id)
                 todo.delete()
             except:
                 Log.error(f"Can't delete task from {self.name}: {task_id}")

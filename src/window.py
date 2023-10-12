@@ -30,7 +30,17 @@ from .preferences import PreferencesWindow
 from .sync import Sync
 from .task import Task
 from .trash_item import TrashItem
-from .utils import Animate, GSettings, Log, TaskUtils, UserData, get_children, Markup
+from .utils import (
+    Animate,
+    GSettings,
+    Log,
+    TaskUtils,
+    UserData,
+    UserDataDict,
+    UserDataTask,
+    get_children,
+    Markup,
+)
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/Errands/window.ui")
@@ -241,8 +251,8 @@ class Window(Adw.ApplicationWindow):
 
         # Update existing tasks
         tasks: list[Task] = self.get_all_tasks()
-        data_tasks: list[dict] = UserData.get()["tasks"]
-        to_change_parent: list[dict] = []
+        data_tasks: list[UserDataTask] = UserData.get()["tasks"]
+        to_change_parent: list[UserDataTask] = []
         to_remove: list[Task] = []
         for task in tasks:
             for t in data_tasks:
@@ -302,8 +312,8 @@ class Window(Adw.ApplicationWindow):
         Clear unneeded items from trash
         """
 
-        tasks: list[dict] = UserData.get()["tasks"]
-        to_remove: list = []
+        tasks: list[UserDataTask] = UserData.get()["tasks"]
+        to_remove: list[TrashItem] = []
         trash_children: list[TrashItem] = get_children(self.trash_list)
         for task in tasks:
             if not task["deleted"]:
@@ -320,7 +330,7 @@ class Window(Adw.ApplicationWindow):
         Update status bar on the top
         """
 
-        tasks: list[dict] = UserData.get()["tasks"]
+        tasks: list[UserDataTask] = UserData.get()["tasks"]
         n_total: int = 0
         n_completed: int = 0
         n_all_deleted: int = 0
@@ -366,8 +376,8 @@ class Window(Adw.ApplicationWindow):
                 adj.set_value(adj.get_value() + 2)
                 return True
 
-        MARGIN = 50
-        height = self.scrolled_window.get_allocation().height
+        MARGIN: int = 50
+        height: int = self.scrolled_window.get_allocation().height
         if y < MARGIN:
             self.scrolling = True
             GLib.timeout_add(100, _auto_scroll, True)
@@ -404,8 +414,8 @@ class Window(Adw.ApplicationWindow):
         if text == "":
             return
         # Add new task
-        new_data: dict = UserData.get()
-        new_task: dict = TaskUtils.new_task(text)
+        new_data: UserDataDict = UserData.get()
+        new_task: UserDataTask = TaskUtils.new_task(text)
         new_data["tasks"].append(new_task)
         UserData.set(new_data)
         self.add_task(new_task)
@@ -457,7 +467,7 @@ class Window(Adw.ApplicationWindow):
         Log.info("Clear Trash")
 
         # Remove widgets and data
-        data: dict = UserData.get()
+        data: UserDataDict = UserData.get()
         data["deleted"] = [task["id"] for task in data["tasks"] if task["deleted"]]
         data["tasks"] = [task for task in data["tasks"] if not task["deleted"]]
         UserData.set(data)
@@ -515,10 +525,10 @@ class Window(Adw.ApplicationWindow):
         self.update_status()
 
     @Gtk.Template.Callback()
-    def on_width_changed(self, *_):
+    def on_width_changed(self, *_) -> None:
         """
         Breakpoints simulator. Because I can't have multiple AdwBreakpoint.
         """
-        width = self.props.default_width
+        width: int = self.props.default_width
         self.scroll_up_btn_rev.set_visible(width > 400)
         self.split_view.set_collapsed(width < 720)
