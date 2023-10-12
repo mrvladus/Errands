@@ -1,5 +1,5 @@
 from gi.repository import Adw, GLib
-from caldav import Calendar, DAVClient
+from caldav import Calendar, DAVClient, Principal
 from .utils import GSettings, Log, TaskUtils, UserData, threaded
 
 
@@ -8,7 +8,7 @@ class Sync:
     window: Adw.ApplicationWindow = None
 
     @classmethod
-    def init(self, window: Adw.ApplicationWindow = None) -> None:
+    def init(self, window: Adw.ApplicationWindow = None, testing: bool = False) -> None:
         Log.debug("Initialize sync provider")
         if window:
             self.window = window
@@ -17,8 +17,7 @@ class Sync:
                 Log.info("Sync disabled")
                 self.window.sync_btn.set_visible(False)
             case 1:
-                self.provider = SyncProviderCalDAV("Nextcloud", self.window)
-                self.window.sync_btn.set_visible(True)
+                self.provider = SyncProviderCalDAV("Nextcloud", self.window, testing)
 
     @classmethod
     @threaded
@@ -33,76 +32,75 @@ class Sync:
         if self.provider and self.provider.can_sync:
             self.provider.sync(fetch)
 
+    @classmethod
+    def test_connection(self) -> bool:
+        self.init(testing=True)
+        return self.provider.can_sync
+
 
 class SyncProviderCalDAV:
     can_sync: bool = False
     calendar: Calendar = None
     window = None
 
-    def __init__(self, name: str, window: Adw.ApplicationWindow) -> None:
+    def __init__(self, name: str, window: Adw.ApplicationWindow, testing: bool) -> None:
         Log.info(f"Initialize {name} sync provider")
 
         self.name = name
         self.window = window
+        self.testing = testing  # Only for connection test
+
+        if not self._check_credentials():
+            return
+
+        self._check_url()
+        return self._connect()
+
+    def _check_credentials(self) -> bool:
         self.url = GSettings.get("sync-url")
         self.username = GSettings.get("sync-username")
         self.password = GSettings.get("sync-password")
 
         if self.url == "" or self.username == "" or self.password == "":
             Log.error(f"Not all {self.name} credentials provided")
-            self.window.add_toast(
-                _(  # pyright:ignore
-                    "Not all sync credentials provided. Please check settings."
-                )
-            )
-            self.window.sync_btn.set_visible(False)
-            return
-
-        self._set_url()
-
-        with DAVClient(
-            url=self.url, username=self.username, password=self.password
-        ) as client:
-            try:
-                supports_caldav = client.check_cdav_support()
-                if not supports_caldav:
-                    Log.error(f"Server doesn't support CalDAV. Maybe wrong adress?")
-                    self.window.add_toast(
-                        _(  # pyright:ignore
-                            "Server doesn't support CalDAV. Maybe wrong adress?"
-                        )
+            if not self.testing:
+                self.window.add_toast(
+                    _(  # pyright:ignore
+                        "Not all sync credentials provided. Please check settings."
                     )
-                    return
-
-                principal = client.principal()
-                Log.info(f"Connected to {self.name} CalDAV server at '{self.url}'")
-                self.can_sync = True
-            except:
-                Log.error(f"Can't connect to {self.name} CalDAV server at '{self.url}'")
-                self.window.add_toast(_("Sync is Disabled"))  # pyright:ignore
-                self.window.sync_btn.set_visible(False)
-                return
-            # Get calendars
-            calendars = principal.calendars()
-            # Check if Errands calendar exists
-            errands_cal_exists: bool = False
-            for cal in calendars:
-                if cal.name == "Errands":
-                    self.calendar = cal
-                    errands_cal_exists = True
-            # Create one if not
-            if not errands_cal_exists:
-                Log.debug(f"Create new calendar 'Errands' on {self.name}")
-                self.calendar = principal.make_calendar(
-                    "Errands", supported_calendar_component_set=["VTODO"]
                 )
+            self.window.sync_btn.set_visible(False)
+            return False
 
-    def _set_url(self):
+        self.window.sync_btn.set_visible(True)
+        return True
+
+    def _check_url(self) -> None:
         if not self.url.startswith("http"):
             self.url = "http://" + self.url
             GSettings.set("sync-url", "s", self.url)
         if self.name == "Nextcloud":
             self.url = f"{self.url}/remote.php/dav/"
+
+    def _connect(self) -> bool:
+        with DAVClient(
+            url=self.url, username=self.username, password=self.password
+        ) as client:
+            try:
+                principal = client.principal()
+                Log.info(f"Connected to {self.name} CalDAV server at '{self.url}'")
+                self.can_sync = True
+                self._setup_calendar(principal)
+                self.window.sync_btn.set_visible(True)
+            except:
+                Log.error(f"Can't connect to {self.name} CalDAV server at '{self.url}'")
+                if not self.testing:
+                    self.window.add_toast(
+                        _("Can't connect to CalDAV server at:")  # pyright:ignore
+                        + " "
+                        + self.url
+                    )
+                self.window.sync_btn.set_visible(False)
 
     def _get_tasks(self) -> list[dict]:
         """
@@ -181,6 +179,22 @@ class SyncProviderCalDAV:
                 data["tasks"].append(new_task)
 
         UserData.set(data)
+
+    def _setup_calendar(self, principal: Principal) -> None:
+        # Get calendars
+        calendars: list[Calendar] = principal.calendars()
+        # Check if Errands calendar exists
+        errands_cal_exists: bool = False
+        for cal in calendars:
+            if cal.name == "Errands":
+                self.calendar = cal
+                errands_cal_exists = True
+        # Create one if not
+        if not errands_cal_exists:
+            Log.debug(f"Create new calendar 'Errands' on {self.name}")
+            self.calendar = principal.make_calendar(
+                "Errands", supported_calendar_component_set=["VTODO"]
+            )
 
     def sync(self, fetch: bool) -> None:
         """

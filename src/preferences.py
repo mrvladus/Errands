@@ -20,6 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 from gi.repository import Adw, Gtk
+from .sync import Sync
 from .utils import GSettings
 
 
@@ -36,6 +37,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
     sync_username: Adw.EntryRow = Gtk.Template.Child()
     sync_password: Adw.EntryRow = Gtk.Template.Child()
     sync_token: Adw.EntryRow = Gtk.Template.Child()
+    test_connection_row: Adw.ActionRow = Gtk.Template.Child()
 
     selected_provider = 0
 
@@ -65,13 +67,22 @@ class PreferencesWindow(Adw.PreferencesWindow):
         self.sync_url.set_visible(selected != 3 and selected != 0)
         self.sync_username.set_visible(selected != 3 and selected != 0)
         self.sync_password.set_visible(selected != 3 and selected != 0)
-        self.window.sync_btn.set_visible(selected > 0)
+
+        self.test_connection_row.set_visible(selected > 0)
+
+    # --- Template handlers --- #
 
     @Gtk.Template.Callback()
     def on_sync_provider_selected(self, *_) -> None:
         self.setup_sync()
 
-    # --- Template handlers --- #
+    @Gtk.Template.Callback()
+    def on_test_connection_btn_clicked(self, btn):
+        res: bool = Sync.test_connection()
+        msg = _("Connected") if res else _("Can't connect")  # pyright:ignore
+        toast: Adw.Toast = Adw.Toast(title=msg, timeout=2)
+        self.add_toast(toast)
+        self.window.sync_btn.set_visible(res)
 
     @Gtk.Template.Callback()
     def on_theme_change(self, btn: Gtk.Button) -> None:

@@ -133,6 +133,20 @@
               </object>
             </child>
 
+            <!-- Test connection -->
+            <child>
+              <object class="AdwActionRow" id="test_connection_row">
+                <property name="title" translatable="yes">Test Connection</property>
+                <child>
+                  <object class="GtkButton" id="test_connection_btn">
+                    <property name="label" translatable="yes">Test</property>
+                    <property name="valign">center</property>
+                    <signal name="clicked" handler="on_test_connection_btn_clicked" />
+                  </object>
+                </child>
+              </object>
+            </child>
+
           </object>
         </child>
 
