@@ -1,3 +1,6 @@
+# Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
+# SPDX-License-Identifier: MIT
+
 from gi.repository import Adw, GLib
 from caldav import Calendar, CalendarObjectResource, DAVClient, Principal, Todo
 from .utils import GSettings, Log, TaskUtils, UserData, UserDataDict, threaded

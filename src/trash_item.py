@@ -1,3 +1,6 @@
+# Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
+# SPDX-License-Identifier: MIT
+
 from gi.repository import Adw, Gtk
 from .utils import Log
 from .task import Task
@@ -7,13 +10,13 @@ from .task import Task
 class TrashItem(Gtk.Box):
     __gtype_name__ = "TrashItem"
 
-    label = Gtk.Template.Child()
+    label: Gtk.Label = Gtk.Template.Child()
 
     def __init__(self, task: dict, window: Adw.ApplicationWindow) -> None:
         super().__init__()
         self.window: Adw.ApplicationWindow = window
         self.id: str = task["id"]
-        self.label.props.label: str = task["text"]
+        self.label.set_label(task["text"])
 
     def __repr__(self) -> str:
         return f"TrashItem({self.id})"
