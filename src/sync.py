@@ -181,16 +181,23 @@ class SyncProviderCalDAV:
         UserData.set(data)
 
     def _setup_calendar(self, principal: Principal) -> None:
-        # Get calendars
         calendars: list[Calendar] = principal.calendars()
-        # Check if Errands calendar exists
+        cal_name = GSettings.get("sync-cal-name")
+        cal_exists: bool = False
         errands_cal_exists: bool = False
         for cal in calendars:
-            if cal.name == "Errands":
+            if cal.name == cal_name:
+                self.calendar = cal
+                cal_exists = True
+            elif cal.name == "Errands" and cal_name == "":
                 self.calendar = cal
                 errands_cal_exists = True
-        # Create one if not
-        if not errands_cal_exists:
+        if not cal_exists and cal_name != "":
+            Log.debug(f"Create new calendar '{cal_name}' on {self.name}")
+            self.calendar = principal.make_calendar(
+                cal_name, supported_calendar_component_set=["VTODO"]
+            )
+        if not errands_cal_exists and cal_name == "":
             Log.debug(f"Create new calendar 'Errands' on {self.name}")
             self.calendar = principal.make_calendar(
                 "Errands", supported_calendar_component_set=["VTODO"]

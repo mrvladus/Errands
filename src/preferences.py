@@ -32,11 +32,12 @@ class PreferencesWindow(Adw.PreferencesWindow):
     light_theme: Gtk.CheckButton = Gtk.Template.Child()
     dark_theme: Gtk.CheckButton = Gtk.Template.Child()
     expand_on_startup: Gtk.Switch = Gtk.Template.Child()
+    sync_cal_name: Adw.EntryRow = Gtk.Template.Child()
     sync_providers: Adw.ComboRow = Gtk.Template.Child()
-    sync_url: Adw.EntryRow = Gtk.Template.Child()
-    sync_username: Adw.EntryRow = Gtk.Template.Child()
     sync_password: Adw.EntryRow = Gtk.Template.Child()
     sync_token: Adw.EntryRow = Gtk.Template.Child()
+    sync_url: Adw.EntryRow = Gtk.Template.Child()
+    sync_username: Adw.EntryRow = Gtk.Template.Child()
     test_connection_row: Adw.ActionRow = Gtk.Template.Child()
 
     selected_provider = 0
@@ -59,6 +60,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
         GSettings.bind("sync-url", self.sync_url, "text")
         GSettings.bind("sync-username", self.sync_username, "text")
         GSettings.bind("sync-password", self.sync_password, "text")
+        GSettings.bind("sync-cal-name", self.sync_cal_name, "text")
         self.setup_sync()
 
     def setup_sync(self):
@@ -67,7 +69,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
         self.sync_url.set_visible(selected != 3 and selected != 0)
         self.sync_username.set_visible(selected != 3 and selected != 0)
         self.sync_password.set_visible(selected != 3 and selected != 0)
-
+        self.sync_cal_name.set_visible(selected != 3 and selected != 0)
         self.test_connection_row.set_visible(selected > 0)
 
     # --- Template handlers --- #

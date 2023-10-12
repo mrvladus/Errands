@@ -126,6 +126,13 @@
               </object>
             </child>
 
+            <!-- Calendar name -->
+            <child>
+              <object class="AdwEntryRow" id="sync_cal_name">
+                <property name="title" translatable="yes">Calendar Name ("Errands" by Default)</property>
+              </object>
+            </child>
+
             <!-- Token -->
             <child>
               <object class="AdwPasswordEntryRow" id="sync_token">
