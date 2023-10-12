@@ -75,7 +75,7 @@ class Window(Adw.ApplicationWindow):
 
     def perform_startup(self) -> None:
         """
-        Startup func. Call after window presented
+        Startup func. Call after window is presented.
         """
         self._create_actions()
         Sync.init(self)

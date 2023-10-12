@@ -100,6 +100,7 @@ class SyncProviderCalDAV:
     def _set_url(self):
         if not self.url.startswith("http"):
             self.url = "http://" + self.url
+            GSettings.set("sync-url", "s", self.url)
         if self.name == "Nextcloud":
             self.url = f"{self.url}/remote.php/dav/"
 
