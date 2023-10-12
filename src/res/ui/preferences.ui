@@ -130,7 +130,8 @@
             <child>
               <object class="AdwEntryRow" id="sync_cal_name">
                 <property name="title" translatable="yes">Calendar Name ("Errands" by Default)</property>
-                <signal name="changed" handler="on_cal_name_changed" />
+                <property name="show-apply-button">true</property>
+                <signal name="apply" handler="on_cal_name_changed" />
               </object>
             </child>
 
