@@ -147,11 +147,15 @@ class SyncProviderCalDAV:
             if task["id"] in caldav_ids and task["synced_caldav"]:
                 for caldav_task in caldav_tasks:
                     if caldav_task["id"] == task["id"]:
-                        Log.debug(f"Update local task from {self.name}: {task['id']}")
-                        task["text"] = caldav_task["text"]
-                        task["parent"] = caldav_task["parent"]
-                        task["completed"] = caldav_task["completed"]
-                        task["color"] = caldav_task["color"]
+                        updated: bool = False
+                        for key in ["text", "parent", "completed", "color"]:
+                            if task[key] != caldav_task[key]:
+                                task[key] = caldav_task[key]
+                                updated = True
+                        if updated:
+                            Log.debug(
+                                f"Update local task from {self.name}: {task['id']}"
+                            )
                         break
             # Delete local task that was deleted on CalDAV
             if task["id"] not in caldav_ids and task["synced_caldav"]:
