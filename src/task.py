@@ -263,10 +263,9 @@ class Task(Gtk.Revealer):
         """
 
         # Get text
-        old_text: str = self.task["text"]
         new_text: str = entry.get_buffer().props.text
-        # Return if text the same or empty
-        if new_text == old_text or new_text == "":
+        # Return if text empty
+        if new_text.replace(" ", "") == "":
             return
         # Change task
         Log.info(f"Edit: {self.task['id']}")
