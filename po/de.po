@@ -233,7 +233,7 @@ msgstr "Passwort"
 
 #: src/res/ui/preferences.ui:132
 msgid "Calendar Name (\"Errands\" by Default)"
-msgstr "Kalendername (Standardmässig \"Errands\")"
+msgstr "Kalendername (stan­dard­mä­ßig \"Errands\")"
 
 #: src/res/ui/preferences.ui:140
 msgid "Token"
