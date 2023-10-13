@@ -21,6 +21,8 @@ class Sync:
                 self.window.sync_btn.set_visible(False)
             case 1:
                 self.provider = SyncProviderCalDAV("Nextcloud", self.window, testing)
+            case 2:
+                self.provider = SyncProviderCalDAV("CalDAV", self.window, testing)
 
     @classmethod
     @threaded
@@ -79,11 +81,21 @@ class SyncProviderCalDAV:
         return True
 
     def _check_url(self) -> None:
+        # Add prefix if needed
         if not self.url.startswith("http"):
             self.url = "http://" + self.url
             GSettings.set("sync-url", "s", self.url)
+        # For Nextcloud provider
         if self.name == "Nextcloud":
-            self.url = f"{self.url}/remote.php/dav/"
+            # Add suffix if needed
+            if not GSettings.get("sync-url").endswith("/remote.php/dav/"):
+                self.url = f"{self.url}/remote.php/dav/"
+                GSettings.set("sync-url", "s", self.url)
+            else:
+                self.url = GSettings.get("sync-url")
+        # For other CalDAV providers
+        if self.name == "CalDAV":
+            self.url = GSettings.get("sync-url")
 
     def _connect(self) -> bool:
         with DAVClient(
@@ -91,12 +103,12 @@ class SyncProviderCalDAV:
         ) as client:
             try:
                 principal: Principal = client.principal()
-                Log.info(f"Connected to {self.name} CalDAV server at '{self.url}'")
+                Log.info(f"Connected to {self.name} server at '{self.url}'")
                 self.can_sync = True
                 self._setup_calendar(principal)
                 self.window.sync_btn.set_visible(True)
             except:
-                Log.error(f"Can't connect to {self.name} CalDAV server at '{self.url}'")
+                Log.error(f"Can't connect to {self.name} server at '{self.url}'")
                 if not self.testing:
                     self.window.add_toast(
                         _("Can't connect to CalDAV server at:")  # pyright:ignore

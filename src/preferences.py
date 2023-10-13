@@ -47,11 +47,11 @@ class PreferencesWindow(Adw.PreferencesWindow):
 
     def setup_sync(self):
         selected = self.sync_providers.props.selected
-        self.sync_token.set_visible(selected == 3 and selected != 0)
-        self.sync_url.set_visible(selected != 3 and selected != 0)
-        self.sync_username.set_visible(selected != 3 and selected != 0)
-        self.sync_password.set_visible(selected != 3 and selected != 0)
-        self.sync_cal_name.set_visible(selected != 3 and selected != 0)
+        self.sync_url.set_visible(0 < selected < 3)
+        self.sync_username.set_visible(0 < selected < 3)
+        self.sync_password.set_visible(0 < selected < 3)
+        self.sync_cal_name.set_visible(0 < selected < 3)
+        self.sync_token.set_visible(0 < selected > 3)
         self.test_connection_row.set_visible(selected > 0)
 
     # --- Template handlers --- #
