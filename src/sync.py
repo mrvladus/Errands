@@ -93,7 +93,7 @@ class SyncProviderCalDAV:
                 GSettings.set("sync-url", "s", self.url)
             else:
                 self.url = GSettings.get("sync-url")
-        # For other CalDAV providers
+        # For other CalDAV providers do not modify url
         if self.name == "CalDAV":
             self.url = GSettings.get("sync-url")
 
