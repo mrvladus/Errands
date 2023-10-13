@@ -322,10 +322,31 @@
                           <object class="GtkEntry" id="task_edit_entry">
                             <property name="valign">center</property>
                             <property name="hexpand">true</property>
-                            <property name="secondary-icon-name">edit-delete-symbolic</property>
-                            <property name="secondary-icon-tooltip-text" translatable="yes">Cancel</property>
                             <signal name="activate" handler="on_task_edit" />
-                            <signal name="icon-release" handler="on_task_cancel_edit_btn_clicked" />
+                          </object>
+                        </child>
+
+                        <!-- Cancel button -->
+                        <child>
+                          <object class="GtkButton">
+                            <property name="valign">center</property>
+                            <property name="icon-name">edit-delete-symbolic</property>
+                            <property name="tooltip-text" translatable="yes">Cancel</property>
+                            <signal name="clicked" handler="on_task_cancel_edit_btn_clicked" />
+                            <style>
+                              <class name="flat" />
+                            </style>
+                            <child>
+                              <object class="GtkShortcutController">
+                                <property name="scope">managed</property>
+                                <child>
+                                  <object class="GtkShortcut">
+                                    <property name="trigger">Escape</property>
+                                    <property name="action">activate</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
                           </object>
                         </child>
 
