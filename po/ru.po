@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-12 15:48+0300\n"
+"POT-Creation-Date: 2023-10-13 12:59+0300\n"
 "PO-Revision-Date: 2023-07-07 16:56+0300\n"
-"Last-Translator: Vlad Krupinski <mrvladus@yandex.ru>\n"
+"Last-Translator: Vlad Krupinskii <mrvladus@yandex.ru>\n"
 "Language-Team: \n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -19,46 +19,46 @@ msgstr ""
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Generator: Poedit 3.3.1\n"
 
-#: src/window.py:125
+#: src/window.py:115
 msgid "Export Cancelled"
 msgstr "Экспорт отменен"
 
-#: src/window.py:131
+#: src/window.py:121
 msgid "Tasks Exported"
 msgstr "Экспорт завершен"
 
-#: src/window.py:134
+#: src/window.py:124
 msgid "Error"
 msgstr "Ошибка"
 
-#: src/window.py:151
+#: src/window.py:141
 msgid "Import Cancelled"
 msgstr "Импорт отменен"
 
-#: src/window.py:160
+#: src/window.py:150
 msgid "Invalid File"
 msgstr "Файл с ошибкой"
 
-#: src/window.py:178
+#: src/window.py:168
 msgid "Tasks Imported"
 msgstr "Импорт завершен"
 
-#: src/window.py:342 src/task.py:169
+#: src/window.py:332 src/task.py:160
 msgid "Completed:"
 msgstr "Выполнено:"
 
-#: src/task.py:87
+#: src/task.py:78
 msgid "Copied to Clipboard"
 msgstr "Скопировано в буфер обмена"
 
 #. pyright:ignore
-#: src/sync.py:69
+#: src/sync.py:72
 msgid "Not all sync credentials provided. Please check settings."
 msgstr "Не все данные для синхронизации предоставлены. Проверьте настройки."
 
-#: src/sync.py:99
+#: src/sync.py:102
 msgid "Can't connect to CalDAV server at:"
-msgstr ""
+msgstr "Невозможно подключиться к серверу по адресу:"
 
 #: src/res/ui/window.ui:26
 msgid "Deleted Tasks"
@@ -101,91 +101,99 @@ msgid "Main Menu"
 msgstr "Главное меню"
 
 #: src/res/ui/window.ui:261 src/res/ui/window.ui:264
-msgid "Sync/Fetch Tasks"
-msgstr "Синхронизировать задачи"
+msgid "Sync/Fetch Tasks (Ctrl+S)"
+msgstr "Синхронизировать задачи (Ctrl+S)"
 
-#: src/res/ui/window.ui:277 src/res/ui/window.ui:280 src/res/ui/window.ui:389
-#: src/res/ui/window.ui:392
+#: src/res/ui/window.ui:288 src/res/ui/window.ui:291 src/res/ui/window.ui:400
+#: src/res/ui/window.ui:403
 msgid "Scroll Up"
 msgstr "Прокрутить вверх"
 
-#: src/res/ui/window.ui:311
+#: src/res/ui/window.ui:322
 msgid "Add new Task"
 msgstr "Добавьте задачу"
 
-#: src/res/ui/window.ui:419
+#: src/res/ui/window.ui:430
 msgid "Export Tasks..."
 msgstr "Экспорт задач..."
 
-#: src/res/ui/window.ui:423
+#: src/res/ui/window.ui:434
 msgid "Import Tasks..."
 msgstr "Импорт задач..."
 
-#: src/res/ui/window.ui:429 src/res/ui/window.ui:468
+#: src/res/ui/window.ui:440 src/res/ui/window.ui:479
 msgid "Preferences"
 msgstr "Параметры"
 
-#: src/res/ui/window.ui:433
+#: src/res/ui/window.ui:444
 msgid "Keyboard Shortcuts"
 msgstr "Комбинации клавиш"
 
-#: src/res/ui/window.ui:437
+#: src/res/ui/window.ui:448
 msgid "About Errands"
 msgstr "О приложении"
 
-#: src/res/ui/window.ui:453
+#: src/res/ui/window.ui:464
 msgid "General"
 msgstr "Общие"
 
-#: src/res/ui/window.ui:456
+#: src/res/ui/window.ui:467
 msgid "Show keyboard shortcuts"
 msgstr "Показать комбинации клавиш"
 
-#: src/res/ui/window.ui:462
+#: src/res/ui/window.ui:473
 msgid "Toggle sidebar"
 msgstr "Переключить боковую панель"
 
-#: src/res/ui/window.ui:474
+#: src/res/ui/window.ui:485
 msgid "Quit"
 msgstr "Выход"
 
-#: src/res/ui/window.ui:484
+#: src/res/ui/window.ui:495
 msgid "Import and Export"
 msgstr "Импорт и экспорт"
 
-#: src/res/ui/window.ui:487
+#: src/res/ui/window.ui:498
 msgid "Import tasks"
 msgstr "Импорт задач"
 
-#: src/res/ui/window.ui:493
+#: src/res/ui/window.ui:504
 msgid "Export tasks"
 msgstr "Экспорт задач"
 
-#: src/res/ui/window.ui:503 src/res/ui/preferences.ui:66
+#: src/res/ui/window.ui:514 src/res/ui/preferences.ui:66
 msgid "Tasks"
 msgstr "Задачи"
 
-#: src/res/ui/window.ui:506
+#: src/res/ui/window.ui:517
 msgid "Delete completed tasks"
 msgstr "Удалить выполненные задачи"
 
 #: src/res/ui/window.ui:523
+msgid "Exit edit mode"
+msgstr "Выйти из режима редактирования"
+
+#: src/res/ui/window.ui:529
+msgid "Sync/Fetch Tasks"
+msgstr "Синхронизировать задачи"
+
+#: src/res/ui/window.ui:546
 msgid "translator-credits"
 msgstr "Vlad Krupinski <mrvladus@yandex.ru>"
 
-#: src/res/ui/window.ui:559
+#: src/res/ui/window.ui:582
 msgid "Are you sure?"
 msgstr "Вы уверены?"
 
-#: src/res/ui/window.ui:560
+#: src/res/ui/window.ui:583
 msgid "Tasks will be permanently deleted"
 msgstr "Задачи будут безвозвратно удалены"
 
-#: src/res/ui/window.ui:565 src/res/ui/task.ui:326
+#: src/res/ui/window.ui:588
 msgid "Cancel"
 msgstr "Отмена"
 
-#: src/res/ui/window.ui:566 src/res/ui/task.ui:13
+#: src/res/ui/window.ui:589 src/res/ui/task.ui:13
 msgid "Delete"
 msgstr "Удалить"
 
@@ -235,19 +243,19 @@ msgstr "Пароль"
 
 #: src/res/ui/preferences.ui:132
 msgid "Calendar Name (\"Errands\" by Default)"
-msgstr ""
+msgstr "Имя календаря (\"Errands\" по умолчанию)"
 
-#: src/res/ui/preferences.ui:140
+#: src/res/ui/preferences.ui:141
 msgid "Token"
 msgstr "Токен"
 
-#: src/res/ui/preferences.ui:147
+#: src/res/ui/preferences.ui:148
 msgid "Test Connection"
-msgstr ""
+msgstr "Тест соединения"
 
-#: src/res/ui/preferences.ui:150
+#: src/res/ui/preferences.ui:151
 msgid "Test"
-msgstr ""
+msgstr "Тест"
 
 #: src/res/ui/task.ui:17
 msgid "Edit"
@@ -269,7 +277,11 @@ msgstr "Отчистить цвет"
 msgid "Menu"
 msgstr "Меню"
 
-#: src/res/ui/task.ui:359
+#: src/res/ui/task.ui:334 src/res/ui/task.ui:337
+msgid "Cancel (Escape)"
+msgstr "Отмена (Escape)"
+
+#: src/res/ui/task.ui:383
 msgid "Add new Sub-Task"
 msgstr "Добавьте подзадачу"
 
@@ -290,9 +302,3 @@ msgstr "Управляйте своими задачами"
 #: data/io.github.mrvladus.List.desktop.in.in:12
 msgid "errands;tasks;list;todo;todos;"
 msgstr ""
-
-#~ msgid "Server doesn't support CalDAV. Maybe wrong adress?"
-#~ msgstr "Сервер не поддерживает CalDAV. Проверьте адрес."
-
-#~ msgid "Sync is Disabled"
-#~ msgstr "Синхронизация отключена"

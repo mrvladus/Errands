@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-12 15:48+0300\n"
+"POT-Creation-Date: 2023-10-13 12:59+0300\n"
 "PO-Revision-Date: 2023-08-10 21:16+0200\n"
 "Last-Translator: Christoph Bähr\n"
 "Language-Team: \n"
@@ -17,44 +17,44 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.3.2\n"
 
-#: src/window.py:125
+#: src/window.py:115
 msgid "Export Cancelled"
 msgstr "Export abgebrochen"
 
-#: src/window.py:131
+#: src/window.py:121
 msgid "Tasks Exported"
 msgstr "Aufgaben exportiert"
 
-#: src/window.py:134
+#: src/window.py:124
 msgid "Error"
 msgstr "Fehler"
 
-#: src/window.py:151
+#: src/window.py:141
 msgid "Import Cancelled"
 msgstr "Import abgebrochen"
 
-#: src/window.py:160
+#: src/window.py:150
 msgid "Invalid File"
 msgstr "Ungültige Datei"
 
-#: src/window.py:178
+#: src/window.py:168
 msgid "Tasks Imported"
 msgstr "Aufgaben importiert"
 
-#: src/window.py:342 src/task.py:169
+#: src/window.py:332 src/task.py:160
 msgid "Completed:"
 msgstr "Erledigt:"
 
-#: src/task.py:87
+#: src/task.py:78
 msgid "Copied to Clipboard"
 msgstr "Zur Zwischenablage kopiert"
 
 #. pyright:ignore
-#: src/sync.py:69
+#: src/sync.py:72
 msgid "Not all sync credentials provided. Please check settings."
 msgstr "Einige Zugangsdaten fehlen. Bitte überprüfen Sie die Einstellungen."
 
-#: src/sync.py:99
+#: src/sync.py:102
 msgid "Can't connect to CalDAV server at:"
 msgstr "Verbindung mit CalDAV Server kann nicht hergestellt werden:"
 
@@ -99,91 +99,99 @@ msgid "Main Menu"
 msgstr "Hauptmenü"
 
 #: src/res/ui/window.ui:261 src/res/ui/window.ui:264
-msgid "Sync/Fetch Tasks"
-msgstr "Aufgaben synchronisieren"
+msgid "Sync/Fetch Tasks (Ctrl+S)"
+msgstr "Aufgaben synchronisieren (Ctrl+S)"
 
-#: src/res/ui/window.ui:277 src/res/ui/window.ui:280 src/res/ui/window.ui:389
-#: src/res/ui/window.ui:392
+#: src/res/ui/window.ui:288 src/res/ui/window.ui:291 src/res/ui/window.ui:400
+#: src/res/ui/window.ui:403
 msgid "Scroll Up"
 msgstr "Nach oben scrollen"
 
-#: src/res/ui/window.ui:311
+#: src/res/ui/window.ui:322
 msgid "Add new Task"
 msgstr "Neue Aufgabe hinzufügen"
 
-#: src/res/ui/window.ui:419
+#: src/res/ui/window.ui:430
 msgid "Export Tasks..."
 msgstr "Aufgaben exportieren..."
 
-#: src/res/ui/window.ui:423
+#: src/res/ui/window.ui:434
 msgid "Import Tasks..."
 msgstr "Aufgaben importieren..."
 
-#: src/res/ui/window.ui:429 src/res/ui/window.ui:468
+#: src/res/ui/window.ui:440 src/res/ui/window.ui:479
 msgid "Preferences"
 msgstr "Einstellungen"
 
-#: src/res/ui/window.ui:433
+#: src/res/ui/window.ui:444
 msgid "Keyboard Shortcuts"
 msgstr "Tastenkürzel"
 
-#: src/res/ui/window.ui:437
+#: src/res/ui/window.ui:448
 msgid "About Errands"
 msgstr "Über Errands"
 
-#: src/res/ui/window.ui:453
+#: src/res/ui/window.ui:464
 msgid "General"
 msgstr "Allgemein"
 
-#: src/res/ui/window.ui:456
+#: src/res/ui/window.ui:467
 msgid "Show keyboard shortcuts"
 msgstr "Tastenkürzel anzeigen"
 
-#: src/res/ui/window.ui:462
+#: src/res/ui/window.ui:473
 msgid "Toggle sidebar"
 msgstr "Seitenleiste anzeigen"
 
-#: src/res/ui/window.ui:474
+#: src/res/ui/window.ui:485
 msgid "Quit"
 msgstr "Beenden"
 
-#: src/res/ui/window.ui:484
+#: src/res/ui/window.ui:495
 msgid "Import and Export"
 msgstr "Import und Export"
 
-#: src/res/ui/window.ui:487
+#: src/res/ui/window.ui:498
 msgid "Import tasks"
 msgstr "Aufgaben importieren"
 
-#: src/res/ui/window.ui:493
+#: src/res/ui/window.ui:504
 msgid "Export tasks"
 msgstr "Aufgaben exportieren"
 
-#: src/res/ui/window.ui:503 src/res/ui/preferences.ui:66
+#: src/res/ui/window.ui:514 src/res/ui/preferences.ui:66
 msgid "Tasks"
 msgstr "Aufgaben"
 
-#: src/res/ui/window.ui:506
+#: src/res/ui/window.ui:517
 msgid "Delete completed tasks"
 msgstr "Lösche abgeschlossene Aufgaben"
 
 #: src/res/ui/window.ui:523
+msgid "Exit edit mode"
+msgstr ""
+
+#: src/res/ui/window.ui:529
+msgid "Sync/Fetch Tasks"
+msgstr "Aufgaben synchronisieren"
+
+#: src/res/ui/window.ui:546
 msgid "translator-credits"
 msgstr "Christoph Bähr"
 
-#: src/res/ui/window.ui:559
+#: src/res/ui/window.ui:582
 msgid "Are you sure?"
 msgstr "Sind Sie sicher?"
 
-#: src/res/ui/window.ui:560
+#: src/res/ui/window.ui:583
 msgid "Tasks will be permanently deleted"
 msgstr "Die Aufgaben werden un­wi­der­ruf­lich gelöscht"
 
-#: src/res/ui/window.ui:565 src/res/ui/task.ui:326
+#: src/res/ui/window.ui:588
 msgid "Cancel"
 msgstr "Abbrechen"
 
-#: src/res/ui/window.ui:566 src/res/ui/task.ui:13
+#: src/res/ui/window.ui:589 src/res/ui/task.ui:13
 msgid "Delete"
 msgstr "Löschen"
 
@@ -235,15 +243,15 @@ msgstr "Passwort"
 msgid "Calendar Name (\"Errands\" by Default)"
 msgstr "Kalendername (stan­dard­mä­ßig \"Errands\")"
 
-#: src/res/ui/preferences.ui:140
+#: src/res/ui/preferences.ui:141
 msgid "Token"
 msgstr "Token"
 
-#: src/res/ui/preferences.ui:147
+#: src/res/ui/preferences.ui:148
 msgid "Test Connection"
 msgstr "Verbindung überprüfen"
 
-#: src/res/ui/preferences.ui:150
+#: src/res/ui/preferences.ui:151
 msgid "Test"
 msgstr "Überprüfung"
 
@@ -267,7 +275,11 @@ msgstr "Style entfernen"
 msgid "Menu"
 msgstr "Menü"
 
-#: src/res/ui/task.ui:359
+#: src/res/ui/task.ui:334 src/res/ui/task.ui:337
+msgid "Cancel (Escape)"
+msgstr ""
+
+#: src/res/ui/task.ui:383
 msgid "Add new Sub-Task"
 msgstr "Neue Unteraufgabe anlegen"
 
@@ -288,9 +300,3 @@ msgstr "Verwalten Sie Ihre Aufgaben"
 #: data/io.github.mrvladus.List.desktop.in.in:12
 msgid "errands;tasks;list;todo;todos;"
 msgstr ""
-
-#~ msgid "Error occurred"
-#~ msgstr "Fehler"
-
-#~ msgid "Open log"
-#~ msgstr "Protokoll öffnen"
