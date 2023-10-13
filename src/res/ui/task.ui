@@ -331,8 +331,11 @@
                           <object class="GtkButton">
                             <property name="valign">center</property>
                             <property name="icon-name">edit-delete-symbolic</property>
-                            <property name="tooltip-text" translatable="yes">Cancel</property>
+                            <property name="tooltip-text" translatable="yes">Cancel (Escape)</property>
                             <signal name="clicked" handler="on_task_cancel_edit_btn_clicked" />
+                            <accessibility>
+                              <property name="label" translatable="yes">Cancel (Escape)</property>
+                            </accessibility>
                             <style>
                               <class name="flat" />
                             </style>

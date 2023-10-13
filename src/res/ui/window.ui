@@ -258,11 +258,22 @@
                       <object class="GtkButton" id="sync_btn">
                         <property name="icon-name">emblem-synchronizing-symbolic</property>
                         <property name="visible">false</property>
-                        <property name="tooltip-text" translatable="yes">Sync/Fetch Tasks</property>
+                        <property name="tooltip-text" translatable="yes">Sync/Fetch Tasks (Ctrl+S)</property>
                         <signal name="clicked" handler="on_sync_btn_clicked" />
                         <accessibility>
-                          <property name="label" translatable="yes">Sync/Fetch Tasks</property>
+                          <property name="label" translatable="yes">Sync/Fetch Tasks (Ctrl+S)</property>
                         </accessibility>
+                        <child>
+                          <object class="GtkShortcutController">
+                            <property name="scope">managed</property>
+                            <child>
+                              <object class="GtkShortcut">
+                                <property name="trigger">&lt;Control&gt;s</property>
+                                <property name="action">activate</property>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
                       </object>
                     </child>
 
@@ -505,6 +516,18 @@
               <object class="GtkShortcutsShortcut">
                 <property name="title" translatable="yes">Delete completed tasks</property>
                 <property name="accelerator">&lt;Control&gt;Delete</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Exit edit mode</property>
+                <property name="accelerator">Escape</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Sync/Fetch Tasks</property>
+                <property name="accelerator">&lt;Control&gt;s</property>
               </object>
             </child>
           </object>
