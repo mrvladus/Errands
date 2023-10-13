@@ -19,7 +19,7 @@ msgstr ""
 
 #: src/window.py:125
 msgid "Export Cancelled"
-msgstr ""
+msgstr "Export abgebrochen"
 
 #: src/window.py:131
 msgid "Tasks Exported"
@@ -27,15 +27,15 @@ msgstr "Aufgaben exportiert"
 
 #: src/window.py:134
 msgid "Error"
-msgstr ""
+msgstr "Fehler"
 
 #: src/window.py:151
 msgid "Import Cancelled"
-msgstr ""
+msgstr "Import abgebrochen"
 
 #: src/window.py:160
 msgid "Invalid File"
-msgstr ""
+msgstr "Ungültige Datei"
 
 #: src/window.py:178
 msgid "Tasks Imported"
@@ -43,7 +43,7 @@ msgstr "Aufgaben importiert"
 
 #: src/window.py:342 src/task.py:169
 msgid "Completed:"
-msgstr ""
+msgstr "Erledigt:"
 
 #: src/task.py:87
 msgid "Copied to Clipboard"
@@ -52,11 +52,11 @@ msgstr "Zur Zwischenablage kopiert"
 #. pyright:ignore
 #: src/sync.py:69
 msgid "Not all sync credentials provided. Please check settings."
-msgstr ""
+msgstr "Einige Zugangsdaten fehlen. Bitte überprüfen Sie die Einstellungen."
 
 #: src/sync.py:99
 msgid "Can't connect to CalDAV server at:"
-msgstr ""
+msgstr "Verbindung mit CalDAV Server kann nicht hergestellt werden:"
 
 #: src/res/ui/window.ui:26
 msgid "Deleted Tasks"
@@ -72,11 +72,11 @@ msgstr "Alles wiederherstellen"
 
 #: src/res/ui/window.ui:68 src/res/ui/window.ui:71
 msgid "Close Trash"
-msgstr ""
+msgstr "Papierkorb schließen"
 
 #: src/res/ui/window.ui:106
 msgid "Move to Trash"
-msgstr ""
+msgstr "In den Papierkorb verschieben"
 
 #: src/res/ui/window.ui:130
 msgid "Empty Trash"
@@ -100,7 +100,7 @@ msgstr "Hauptmenü"
 
 #: src/res/ui/window.ui:261 src/res/ui/window.ui:264
 msgid "Sync/Fetch Tasks"
-msgstr ""
+msgstr "Aufgaben synchronisieren"
 
 #: src/res/ui/window.ui:277 src/res/ui/window.ui:280 src/res/ui/window.ui:389
 #: src/res/ui/window.ui:392
@@ -125,7 +125,7 @@ msgstr "Einstellungen"
 
 #: src/res/ui/window.ui:433
 msgid "Keyboard Shortcuts"
-msgstr ""
+msgstr "Tastenkürzel"
 
 #: src/res/ui/window.ui:437
 msgid "About Errands"
@@ -133,23 +133,23 @@ msgstr "Über Errands"
 
 #: src/res/ui/window.ui:453
 msgid "General"
-msgstr ""
+msgstr "Allgemein"
 
 #: src/res/ui/window.ui:456
 msgid "Show keyboard shortcuts"
-msgstr ""
+msgstr "Tastenkürzel anzeigen"
 
 #: src/res/ui/window.ui:462
 msgid "Toggle sidebar"
-msgstr ""
+msgstr "Seitenleiste anzeigen"
 
 #: src/res/ui/window.ui:474
 msgid "Quit"
-msgstr ""
+msgstr "Beenden"
 
 #: src/res/ui/window.ui:484
 msgid "Import and Export"
-msgstr ""
+msgstr "Import und Export"
 
 #: src/res/ui/window.ui:487
 msgid "Import tasks"
@@ -161,7 +161,7 @@ msgstr "Aufgaben exportieren"
 
 #: src/res/ui/window.ui:503 src/res/ui/preferences.ui:66
 msgid "Tasks"
-msgstr ""
+msgstr "Aufgaben"
 
 #: src/res/ui/window.ui:506
 msgid "Delete completed tasks"
@@ -173,11 +173,11 @@ msgstr "Christoph Bähr"
 
 #: src/res/ui/window.ui:559
 msgid "Are you sure?"
-msgstr ""
+msgstr "Sind Sie sicher?"
 
 #: src/res/ui/window.ui:560
 msgid "Tasks will be permanently deleted"
-msgstr ""
+msgstr "Die Aufgaben werden un­wi­der­ruf­lich gelöscht"
 
 #: src/res/ui/window.ui:565 src/res/ui/task.ui:326
 msgid "Cancel"
@@ -205,47 +205,47 @@ msgstr "Dunkel"
 
 #: src/res/ui/preferences.ui:71
 msgid "Expand Sub-Tasks on Startup"
-msgstr ""
+msgstr "Unteraufgaben beim Start ausfahren"
 
 #: src/res/ui/preferences.ui:87
 msgid "Sync"
-msgstr ""
+msgstr "Sync"
 
 #: src/res/ui/preferences.ui:92
 msgid "Sync Provider"
-msgstr ""
+msgstr "Sync Anbieter"
 
 #: src/res/ui/preferences.ui:96
 msgid "Disabled"
-msgstr ""
+msgstr "Deaktiviert"
 
 #: src/res/ui/preferences.ui:111
 msgid "Server URL"
-msgstr ""
+msgstr "Serveradresse"
 
 #: src/res/ui/preferences.ui:118
 msgid "Username"
-msgstr ""
+msgstr "Benutzername"
 
 #: src/res/ui/preferences.ui:125
 msgid "Password"
-msgstr ""
+msgstr "Passwort"
 
 #: src/res/ui/preferences.ui:132
 msgid "Calendar Name (\"Errands\" by Default)"
-msgstr ""
+msgstr "Kalendername (Standardmässig \"Errands\")"
 
 #: src/res/ui/preferences.ui:140
 msgid "Token"
-msgstr ""
+msgstr "Token"
 
 #: src/res/ui/preferences.ui:147
 msgid "Test Connection"
-msgstr ""
+msgstr "Verbindung überprüfen"
 
 #: src/res/ui/preferences.ui:150
 msgid "Test"
-msgstr ""
+msgstr "Überprüfung"
 
 #: src/res/ui/task.ui:17
 msgid "Edit"
@@ -282,7 +282,7 @@ msgstr ""
 
 #: data/io.github.mrvladus.List.desktop.in.in:5
 msgid "Manage your tasks"
-msgstr ""
+msgstr "Verwalten Sie Ihre Aufgaben"
 
 #. TRANSLATORS: Don't translate
 #: data/io.github.mrvladus.List.desktop.in.in:12
@@ -293,4 +293,4 @@ msgstr ""
 #~ msgstr "Fehler"
 
 #~ msgid "Open log"
-#~ msgstr "Öffne das Log"
+#~ msgstr "Protokoll öffnen"
