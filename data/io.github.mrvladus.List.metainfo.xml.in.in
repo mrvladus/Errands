@@ -41,6 +41,7 @@
       <li>Add, remove, edit tasks and sub-tasks</li>
       <li>Mark task and sub-tasks as completed</li>
       <li>Add accent color for each task</li>
+      <li>Sync tasks with Nextcloud or other CalDAV providers</li>
       <li>Drag and Drop support</li>
     </ul>
   </description>
@@ -55,9 +56,9 @@
   <releases>
     <release version="45.0" date="2023-10-16">
       <description translatable="no">
-        <p>Nextcloud sync is here!</p>
-        <p>If you have a Nextcloud server you can go to settings and enter your server credentials, including URL, username, password and name of the calendar you wish to sync ("Errands" by default). Then test your connection and you are ready to sync!</p>
-        <p>It's using CalDAV protocol and python3-caldav library, hence you can expect more options for synchronization in the future.</p>
+        <p>Sync is here!</p>
+        <p>If you have a Nextcloud or any CalDAV server you can go to settings and enter your server credentials, including URL, username, password and name of the calendar you wish to sync ("Errands" by default). Then test your connection and you are ready to sync!</p>
+        <p>It's using CalDAV protocol and python3-caldav library.</p>
         <p>Other updates:</p>
         <ul>
           <li>New libadwaita-1.4 look, including new sidebar widget</li>

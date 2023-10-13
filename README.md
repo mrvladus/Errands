@@ -21,6 +21,7 @@
 - Add, remove, edit tasks and sub-tasks
 - Mark task and sub-tasks as completed
 - Add accent color for each task
+- Sync tasks with Nextcloud or other CalDAV providers
 - Drag and Drop support
 
 ## Install
@@ -36,7 +37,7 @@ Errands is available as a Flatpak on Flathub:
 ## Contribute
 
 ### Translations
-To translate Errands to your language you can use <a href="https://flathub.org/ru/apps/net.poedit.Poedit">Poedit</a>
+To translate Errands to your language you can use [Poedit]("https://flathub.org/ru/apps/net.poedit.Poedit")
 1. Fork and clone repo.
 2. Open Poedit.
 - Open `po/errands.pot` file.
