@@ -239,7 +239,6 @@
                       </object>
                     </child>
 
-
                     <!-- Menu -->
                     <child type="end">
                       <object class="GtkMenuButton" id="main_menu_btn">
