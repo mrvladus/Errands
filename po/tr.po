@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-13 12:59+0300\n"
-"PO-Revision-Date: 2023-09-12 01:02+0300\n"
+"PO-Revision-Date: 2023-10-14 23:31+0300\n"
 "Last-Translator: Sabri Ünal <libreajans@gmail.com>\n"
 "Language-Team: Turkish <takim@gnome.org.tr>\n"
 "Language: tr\n"
@@ -17,11 +17,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Poedit 3.2.2\n"
+"X-Generator: Poedit 3.4\n"
 
 #: src/window.py:115
 msgid "Export Cancelled"
-msgstr ""
+msgstr "Dışa Aktarma İptal Edildi"
 
 #: src/window.py:121
 msgid "Tasks Exported"
@@ -29,15 +29,15 @@ msgstr "Görevler Dışa Aktarıldı"
 
 #: src/window.py:124
 msgid "Error"
-msgstr ""
+msgstr "Hata"
 
 #: src/window.py:141
 msgid "Import Cancelled"
-msgstr ""
+msgstr "İçe Aktarma İptal Edildi"
 
 #: src/window.py:150
 msgid "Invalid File"
-msgstr ""
+msgstr "Geçersiz Dosya"
 
 #: src/window.py:168
 msgid "Tasks Imported"
@@ -45,7 +45,7 @@ msgstr "Görevler İçe Aktarıldı"
 
 #: src/window.py:332 src/task.py:160
 msgid "Completed:"
-msgstr ""
+msgstr "Tamamlandı:"
 
 #: src/task.py:78
 msgid "Copied to Clipboard"
@@ -54,11 +54,11 @@ msgstr "Panoya Kopyalandı"
 #. pyright:ignore
 #: src/sync.py:72
 msgid "Not all sync credentials provided. Please check settings."
-msgstr ""
+msgstr "Tüm eşzamanlama kimlik bilgileri sağlanmadı. Lütfen ayarları denetleyin."
 
 #: src/sync.py:102
 msgid "Can't connect to CalDAV server at:"
-msgstr ""
+msgstr "CalDAV sunucusuna bağlanılamıyor:"
 
 #: src/res/ui/window.ui:26
 msgid "Deleted Tasks"
@@ -102,7 +102,7 @@ msgstr "Ana Menü"
 
 #: src/res/ui/window.ui:261 src/res/ui/window.ui:264
 msgid "Sync/Fetch Tasks (Ctrl+S)"
-msgstr ""
+msgstr "Görevleri Eşzamanla/Getir (Ctrl+S)"
 
 #: src/res/ui/window.ui:288 src/res/ui/window.ui:291 src/res/ui/window.ui:400
 #: src/res/ui/window.ui:403
@@ -123,7 +123,7 @@ msgstr "Görevleri İçe Aktar..."
 
 #: src/res/ui/window.ui:440 src/res/ui/window.ui:479
 msgid "Preferences"
-msgstr ""
+msgstr "Tercihler"
 
 #: src/res/ui/window.ui:444
 msgid "Keyboard Shortcuts"
@@ -163,19 +163,19 @@ msgstr "Görevleri dışa aktar"
 
 #: src/res/ui/window.ui:514 src/res/ui/preferences.ui:66
 msgid "Tasks"
-msgstr ""
+msgstr "Görevler"
 
 #: src/res/ui/window.ui:517
 msgid "Delete completed tasks"
-msgstr "Tamamlanmış Görevleri Sil"
+msgstr "Tamamlanmış görevleri sil"
 
 #: src/res/ui/window.ui:523
 msgid "Exit edit mode"
-msgstr ""
+msgstr "Düzenleme kipinden çık"
 
 #: src/res/ui/window.ui:529
 msgid "Sync/Fetch Tasks"
-msgstr ""
+msgstr "Görevleri Eşzamanla/Getir"
 
 #: src/res/ui/window.ui:546
 msgid "translator-credits"
@@ -215,47 +215,47 @@ msgstr "Koyu"
 
 #: src/res/ui/preferences.ui:71
 msgid "Expand Sub-Tasks on Startup"
-msgstr ""
+msgstr "Başlangıçta Alt Görevleri Genişlet"
 
 #: src/res/ui/preferences.ui:87
 msgid "Sync"
-msgstr ""
+msgstr "Eşzamanla"
 
 #: src/res/ui/preferences.ui:92
 msgid "Sync Provider"
-msgstr ""
+msgstr "Eşzamanlama Sağlayıcı"
 
 #: src/res/ui/preferences.ui:96
 msgid "Disabled"
-msgstr ""
+msgstr "Devre dışı"
 
 #: src/res/ui/preferences.ui:111
 msgid "Server URL"
-msgstr ""
+msgstr "Sunucu URL"
 
 #: src/res/ui/preferences.ui:118
 msgid "Username"
-msgstr ""
+msgstr "Kullanıcı adı"
 
 #: src/res/ui/preferences.ui:125
 msgid "Password"
-msgstr ""
+msgstr "Parola"
 
 #: src/res/ui/preferences.ui:132
 msgid "Calendar Name (\"Errands\" by Default)"
-msgstr ""
+msgstr "Takvim Adı (\"Errands\" Öntanımlı)"
 
 #: src/res/ui/preferences.ui:141
 msgid "Token"
-msgstr ""
+msgstr "Jeton"
 
 #: src/res/ui/preferences.ui:148
 msgid "Test Connection"
-msgstr ""
+msgstr "Bağlantıyı Sına"
 
 #: src/res/ui/preferences.ui:151
 msgid "Test"
-msgstr ""
+msgstr "Sına"
 
 #: src/res/ui/task.ui:17
 msgid "Edit"
@@ -279,7 +279,7 @@ msgstr "Menü"
 
 #: src/res/ui/task.ui:334 src/res/ui/task.ui:337
 msgid "Cancel (Escape)"
-msgstr ""
+msgstr "İptal (Esc)"
 
 #: src/res/ui/task.ui:383
 msgid "Add new Sub-Task"
@@ -292,7 +292,7 @@ msgstr "Geri Yükle"
 #. TRANSLATORS: Don't translate
 #: data/io.github.mrvladus.List.desktop.in.in:4
 msgid "Errands"
-msgstr ""
+msgstr "Errands"
 
 #: data/io.github.mrvladus.List.desktop.in.in:5
 msgid "Manage your tasks"

@@ -1,6 +1,6 @@
 # Translation
 
-To translate Errands to your language you can use [Poedit]("https://flathub.org/ru/apps/net.poedit.Poedit")
+To translate Errands to your language you can use [Poedit]("https://flathub.org/apps/net.poedit.Poedit")
 1. Fork and clone repo.
 2. Open Poedit.
 - Open `po/errands.pot` file.
