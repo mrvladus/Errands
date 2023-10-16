@@ -66,7 +66,7 @@
         <p>It's using CalDAV protocol and python3-caldav library.</p>
         <p>Other updates:</p>
         <ul>
-          <li>New libadwaita-1.4 look, including new sidebar widget</li>
+          <li>New libadwaita-1.4 look, including new sidebar</li>
           <li>Using new GNOME 45 flatpak runtime</li>
           <li>More adaptive controls</li>
           <li>Improved Import/Export for non-latin languages</li>
