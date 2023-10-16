@@ -29,13 +29,15 @@
     <category>Utility</category>
   </categories>
   <keywords>
-    <keyword>Errands</keyword>
-    <keyword>List</keyword>
-    <keyword>To Do</keyword>
-    <keyword>Task manager</keyword>
-    <keyword>Sync</keyword>
-    <keyword>Nextcloud</keyword>
-    <keyword>Caldav</keyword>
+    <keyword>errands</keyword>
+    <keyword>list</keyword>
+    <keyword>to do</keyword>
+    <keyword>todos</keyword>
+    <keyword>task manager</keyword>
+    <keyword>sync</keyword>
+    <keyword>synchronization</keyword>
+    <keyword>nextcloud</keyword>
+    <keyword>caldav</keyword>
   </keywords>
   <name translatable="no">Errands</name>
   <summary>Manage your tasks</summary>
