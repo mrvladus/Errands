@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-13 12:59+0300\n"
+"POT-Creation-Date: 2023-10-16 14:37+0300\n"
 "PO-Revision-Date: 2023-07-07 16:56+0300\n"
 "Last-Translator: Vlad Krupinskii <mrvladus@yandex.ru>\n"
 "Language-Team: \n"
@@ -52,11 +52,11 @@ msgid "Copied to Clipboard"
 msgstr "Скопировано в буфер обмена"
 
 #. pyright:ignore
-#: src/sync.py:72
+#: src/sync.py:74
 msgid "Not all sync credentials provided. Please check settings."
 msgstr "Не все данные для синхронизации предоставлены. Проверьте настройки."
 
-#: src/sync.py:102
+#: src/sync.py:114
 msgid "Can't connect to CalDAV server at:"
 msgstr "Невозможно подключиться к серверу по адресу:"
 
@@ -96,104 +96,104 @@ msgstr "Показать удаленные задачи"
 msgid "Delete Completed Tasks (Ctrl+Delete)"
 msgstr "Удалить выполненные задачи (Ctrl+Delete)"
 
-#: src/res/ui/window.ui:249 src/res/ui/window.ui:251
+#: src/res/ui/window.ui:248 src/res/ui/window.ui:250
 msgid "Main Menu"
 msgstr "Главное меню"
 
-#: src/res/ui/window.ui:261 src/res/ui/window.ui:264
+#: src/res/ui/window.ui:260 src/res/ui/window.ui:263
 msgid "Sync/Fetch Tasks (Ctrl+S)"
 msgstr "Синхронизировать задачи (Ctrl+S)"
 
-#: src/res/ui/window.ui:288 src/res/ui/window.ui:291 src/res/ui/window.ui:400
-#: src/res/ui/window.ui:403
+#: src/res/ui/window.ui:287 src/res/ui/window.ui:290 src/res/ui/window.ui:399
+#: src/res/ui/window.ui:402
 msgid "Scroll Up"
 msgstr "Прокрутить вверх"
 
-#: src/res/ui/window.ui:322
+#: src/res/ui/window.ui:321
 msgid "Add new Task"
 msgstr "Добавьте задачу"
 
-#: src/res/ui/window.ui:430
+#: src/res/ui/window.ui:429
 msgid "Export Tasks..."
 msgstr "Экспорт задач..."
 
-#: src/res/ui/window.ui:434
+#: src/res/ui/window.ui:433
 msgid "Import Tasks..."
 msgstr "Импорт задач..."
 
-#: src/res/ui/window.ui:440 src/res/ui/window.ui:479
+#: src/res/ui/window.ui:439 src/res/ui/window.ui:478
 msgid "Preferences"
 msgstr "Параметры"
 
-#: src/res/ui/window.ui:444
+#: src/res/ui/window.ui:443
 msgid "Keyboard Shortcuts"
 msgstr "Комбинации клавиш"
 
-#: src/res/ui/window.ui:448
+#: src/res/ui/window.ui:447
 msgid "About Errands"
 msgstr "О приложении"
 
-#: src/res/ui/window.ui:464
+#: src/res/ui/window.ui:463
 msgid "General"
 msgstr "Общие"
 
-#: src/res/ui/window.ui:467
+#: src/res/ui/window.ui:466
 msgid "Show keyboard shortcuts"
 msgstr "Показать комбинации клавиш"
 
-#: src/res/ui/window.ui:473
+#: src/res/ui/window.ui:472
 msgid "Toggle sidebar"
 msgstr "Переключить боковую панель"
 
-#: src/res/ui/window.ui:485
+#: src/res/ui/window.ui:484
 msgid "Quit"
 msgstr "Выход"
 
-#: src/res/ui/window.ui:495
+#: src/res/ui/window.ui:494
 msgid "Import and Export"
 msgstr "Импорт и экспорт"
 
-#: src/res/ui/window.ui:498
+#: src/res/ui/window.ui:497
 msgid "Import tasks"
 msgstr "Импорт задач"
 
-#: src/res/ui/window.ui:504
+#: src/res/ui/window.ui:503
 msgid "Export tasks"
 msgstr "Экспорт задач"
 
-#: src/res/ui/window.ui:514 src/res/ui/preferences.ui:66
+#: src/res/ui/window.ui:513 src/res/ui/preferences.ui:66
 msgid "Tasks"
 msgstr "Задачи"
 
-#: src/res/ui/window.ui:517
+#: src/res/ui/window.ui:516
 msgid "Delete completed tasks"
 msgstr "Удалить выполненные задачи"
 
-#: src/res/ui/window.ui:523
+#: src/res/ui/window.ui:522
 msgid "Exit edit mode"
 msgstr "Выйти из режима редактирования"
 
-#: src/res/ui/window.ui:529
+#: src/res/ui/window.ui:528
 msgid "Sync/Fetch Tasks"
 msgstr "Синхронизировать задачи"
 
-#: src/res/ui/window.ui:546
+#: src/res/ui/window.ui:545
 msgid "translator-credits"
 msgstr "Vlad Krupinski <mrvladus@yandex.ru>"
 
-#: src/res/ui/window.ui:582
+#: src/res/ui/window.ui:581
 msgid "Are you sure?"
 msgstr "Вы уверены?"
 
-#: src/res/ui/window.ui:583
+#: src/res/ui/window.ui:582
 msgid "Tasks will be permanently deleted"
 msgstr "Задачи будут безвозвратно удалены"
 
-#: src/res/ui/window.ui:588
+#: src/res/ui/window.ui:587
 msgid "Cancel"
 msgstr "Отмена"
 
-#: src/res/ui/window.ui:589 src/res/ui/task.ui:13
+#: src/res/ui/window.ui:588 src/res/ui/task.ui:13
 msgid "Delete"
 msgstr "Удалить"
 

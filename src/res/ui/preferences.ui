@@ -95,7 +95,7 @@
                     <items>
                       <item translatable="yes">Disabled</item>
                       <item>Nextcloud</item>
-                      <item>Other CalDAV Provider</item>
+                      <item>CalDAV</item>
                       <!-- <item>Todoist</item> -->
                       <!-- <item>Google Keep</item> -->
                     </items>

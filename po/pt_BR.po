@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-13 12:59+0300\n"
+"POT-Creation-Date: 2023-10-16 14:37+0300\n"
 "PO-Revision-Date: 2023-09-18 04:32-0300\n"
 "Last-Translator: Vitor Gabriel Gomes <vitorgabrielgomesro9090@gmail.com>\n"
 "Language-Team: \n"
@@ -50,11 +50,11 @@ msgid "Copied to Clipboard"
 msgstr "Copiado para a área de transferência"
 
 #. pyright:ignore
-#: src/sync.py:72
+#: src/sync.py:74
 msgid "Not all sync credentials provided. Please check settings."
 msgstr ""
 
-#: src/sync.py:102
+#: src/sync.py:114
 msgid "Can't connect to CalDAV server at:"
 msgstr ""
 
@@ -94,104 +94,104 @@ msgstr "Mostrar itens deletados"
 msgid "Delete Completed Tasks (Ctrl+Delete)"
 msgstr "Deletar tarefas concluídas (Ctrl+Delete)"
 
-#: src/res/ui/window.ui:249 src/res/ui/window.ui:251
+#: src/res/ui/window.ui:248 src/res/ui/window.ui:250
 msgid "Main Menu"
 msgstr "Menu principal"
 
-#: src/res/ui/window.ui:261 src/res/ui/window.ui:264
+#: src/res/ui/window.ui:260 src/res/ui/window.ui:263
 msgid "Sync/Fetch Tasks (Ctrl+S)"
 msgstr ""
 
-#: src/res/ui/window.ui:288 src/res/ui/window.ui:291 src/res/ui/window.ui:400
-#: src/res/ui/window.ui:403
+#: src/res/ui/window.ui:287 src/res/ui/window.ui:290 src/res/ui/window.ui:399
+#: src/res/ui/window.ui:402
 msgid "Scroll Up"
 msgstr "Rolar para cima"
 
-#: src/res/ui/window.ui:322
+#: src/res/ui/window.ui:321
 msgid "Add new Task"
 msgstr "Adicionar nova tarefa"
 
-#: src/res/ui/window.ui:430
+#: src/res/ui/window.ui:429
 msgid "Export Tasks..."
 msgstr "Exportar Tarefas..."
 
-#: src/res/ui/window.ui:434
+#: src/res/ui/window.ui:433
 msgid "Import Tasks..."
 msgstr "Importar Tarefas..."
 
-#: src/res/ui/window.ui:440 src/res/ui/window.ui:479
+#: src/res/ui/window.ui:439 src/res/ui/window.ui:478
 msgid "Preferences"
 msgstr "Preferências"
 
-#: src/res/ui/window.ui:444
+#: src/res/ui/window.ui:443
 msgid "Keyboard Shortcuts"
 msgstr "Atalhos do teclado"
 
-#: src/res/ui/window.ui:448
+#: src/res/ui/window.ui:447
 msgid "About Errands"
 msgstr "Sobre o Errands"
 
-#: src/res/ui/window.ui:464
+#: src/res/ui/window.ui:463
 msgid "General"
 msgstr "Geral"
 
-#: src/res/ui/window.ui:467
+#: src/res/ui/window.ui:466
 msgid "Show keyboard shortcuts"
 msgstr "Mostrar atalhos do teclado"
 
-#: src/res/ui/window.ui:473
+#: src/res/ui/window.ui:472
 msgid "Toggle sidebar"
 msgstr "Alternar barra lateral"
 
-#: src/res/ui/window.ui:485
+#: src/res/ui/window.ui:484
 msgid "Quit"
 msgstr "Sair"
 
-#: src/res/ui/window.ui:495
+#: src/res/ui/window.ui:494
 msgid "Import and Export"
 msgstr "Importar e exportar"
 
-#: src/res/ui/window.ui:498
+#: src/res/ui/window.ui:497
 msgid "Import tasks"
 msgstr "Importar tasks"
 
-#: src/res/ui/window.ui:504
+#: src/res/ui/window.ui:503
 msgid "Export tasks"
 msgstr "Exportar tasks"
 
-#: src/res/ui/window.ui:514 src/res/ui/preferences.ui:66
+#: src/res/ui/window.ui:513 src/res/ui/preferences.ui:66
 msgid "Tasks"
 msgstr ""
 
-#: src/res/ui/window.ui:517
+#: src/res/ui/window.ui:516
 msgid "Delete completed tasks"
 msgstr "Deletar tarefas concluídas"
 
-#: src/res/ui/window.ui:523
+#: src/res/ui/window.ui:522
 msgid "Exit edit mode"
 msgstr ""
 
-#: src/res/ui/window.ui:529
+#: src/res/ui/window.ui:528
 msgid "Sync/Fetch Tasks"
 msgstr ""
 
-#: src/res/ui/window.ui:546
+#: src/res/ui/window.ui:545
 msgid "translator-credits"
 msgstr "créditos-de-tradução"
 
-#: src/res/ui/window.ui:582
+#: src/res/ui/window.ui:581
 msgid "Are you sure?"
 msgstr "Tem certeza?"
 
-#: src/res/ui/window.ui:583
+#: src/res/ui/window.ui:582
 msgid "Tasks will be permanently deleted"
 msgstr "As tarefas serão excluídas permanentemente"
 
-#: src/res/ui/window.ui:588
+#: src/res/ui/window.ui:587
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: src/res/ui/window.ui:589 src/res/ui/task.ui:13
+#: src/res/ui/window.ui:588 src/res/ui/task.ui:13
 msgid "Delete"
 msgstr "Deletar"
 

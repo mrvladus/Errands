@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-13 12:59+0300\n"
+"POT-Creation-Date: 2023-10-16 14:37+0300\n"
 "PO-Revision-Date: 2023-09-10 13:41+0200\n"
 "Last-Translator: Amerey.eu <info@amerey.eu>\n"
 "Language-Team: \n"
@@ -50,11 +50,11 @@ msgid "Copied to Clipboard"
 msgstr "Zkopírováno do schránky"
 
 #. pyright:ignore
-#: src/sync.py:72
+#: src/sync.py:74
 msgid "Not all sync credentials provided. Please check settings."
 msgstr ""
 
-#: src/sync.py:102
+#: src/sync.py:114
 msgid "Can't connect to CalDAV server at:"
 msgstr ""
 
@@ -94,104 +94,104 @@ msgstr "Zobrazit smazané úkoly"
 msgid "Delete Completed Tasks (Ctrl+Delete)"
 msgstr "Smazat hotové úkoly (Ctrl+Delete)"
 
-#: src/res/ui/window.ui:249 src/res/ui/window.ui:251
+#: src/res/ui/window.ui:248 src/res/ui/window.ui:250
 msgid "Main Menu"
 msgstr "Hlavní menu"
 
-#: src/res/ui/window.ui:261 src/res/ui/window.ui:264
+#: src/res/ui/window.ui:260 src/res/ui/window.ui:263
 msgid "Sync/Fetch Tasks (Ctrl+S)"
 msgstr ""
 
-#: src/res/ui/window.ui:288 src/res/ui/window.ui:291 src/res/ui/window.ui:400
-#: src/res/ui/window.ui:403
+#: src/res/ui/window.ui:287 src/res/ui/window.ui:290 src/res/ui/window.ui:399
+#: src/res/ui/window.ui:402
 msgid "Scroll Up"
 msgstr "Posunout nahoru"
 
-#: src/res/ui/window.ui:322
+#: src/res/ui/window.ui:321
 msgid "Add new Task"
 msgstr "Přidat nový úkol"
 
-#: src/res/ui/window.ui:430
+#: src/res/ui/window.ui:429
 msgid "Export Tasks..."
 msgstr "Exportovat úkoly..."
 
-#: src/res/ui/window.ui:434
+#: src/res/ui/window.ui:433
 msgid "Import Tasks..."
 msgstr "Importovat úkoly..."
 
-#: src/res/ui/window.ui:440 src/res/ui/window.ui:479
+#: src/res/ui/window.ui:439 src/res/ui/window.ui:478
 msgid "Preferences"
 msgstr "Předvolby"
 
-#: src/res/ui/window.ui:444
+#: src/res/ui/window.ui:443
 msgid "Keyboard Shortcuts"
 msgstr "Klávesové zkratky"
 
-#: src/res/ui/window.ui:448
+#: src/res/ui/window.ui:447
 msgid "About Errands"
 msgstr "O aplikaci Errands"
 
-#: src/res/ui/window.ui:464
+#: src/res/ui/window.ui:463
 msgid "General"
 msgstr "Obecné"
 
-#: src/res/ui/window.ui:467
+#: src/res/ui/window.ui:466
 msgid "Show keyboard shortcuts"
 msgstr "Zobrazit klávesové zkratky"
 
-#: src/res/ui/window.ui:473
+#: src/res/ui/window.ui:472
 msgid "Toggle sidebar"
 msgstr "Přepnout postranní panel"
 
-#: src/res/ui/window.ui:485
+#: src/res/ui/window.ui:484
 msgid "Quit"
 msgstr "Ukončit"
 
-#: src/res/ui/window.ui:495
+#: src/res/ui/window.ui:494
 msgid "Import and Export"
 msgstr "Importovat a exportovat"
 
-#: src/res/ui/window.ui:498
+#: src/res/ui/window.ui:497
 msgid "Import tasks"
 msgstr "Importovat úkoly"
 
-#: src/res/ui/window.ui:504
+#: src/res/ui/window.ui:503
 msgid "Export tasks"
 msgstr "Exportovat úkoly"
 
-#: src/res/ui/window.ui:514 src/res/ui/preferences.ui:66
+#: src/res/ui/window.ui:513 src/res/ui/preferences.ui:66
 msgid "Tasks"
 msgstr ""
 
-#: src/res/ui/window.ui:517
+#: src/res/ui/window.ui:516
 msgid "Delete completed tasks"
 msgstr "Smazat hotové úkoly"
 
-#: src/res/ui/window.ui:523
+#: src/res/ui/window.ui:522
 msgid "Exit edit mode"
 msgstr ""
 
-#: src/res/ui/window.ui:529
+#: src/res/ui/window.ui:528
 msgid "Sync/Fetch Tasks"
 msgstr ""
 
-#: src/res/ui/window.ui:546
+#: src/res/ui/window.ui:545
 msgid "translator-credits"
 msgstr "Amerey.eu"
 
-#: src/res/ui/window.ui:582
+#: src/res/ui/window.ui:581
 msgid "Are you sure?"
 msgstr "Doopravdy?"
 
-#: src/res/ui/window.ui:583
+#: src/res/ui/window.ui:582
 msgid "Tasks will be permanently deleted"
 msgstr "Úkoly budou trvale smazány"
 
-#: src/res/ui/window.ui:588
+#: src/res/ui/window.ui:587
 msgid "Cancel"
 msgstr "Zrušit"
 
-#: src/res/ui/window.ui:589 src/res/ui/task.ui:13
+#: src/res/ui/window.ui:588 src/res/ui/task.ui:13
 msgid "Delete"
 msgstr "Smazat"
 
