@@ -15,6 +15,7 @@ install_data(
   'preferences.py',
   'sync.py',
   'task.py',
+  'task_details.py',
   'trash_item.py',
   'utils.py',
   'window.py',

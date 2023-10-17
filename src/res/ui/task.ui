@@ -21,6 +21,10 @@
         <attribute name="label" translatable="yes">Copy</attribute>
         <attribute name="action">task.copy</attribute>
       </item>
+      <item>
+        <attribute name="label" translatable="yes">Details</attribute>
+        <attribute name="action">task.details</attribute>
+      </item>
     </section>
   </menu>
 
@@ -409,7 +413,6 @@
 
       </object>
     </child>
-
 
   </template>
 </interface>
