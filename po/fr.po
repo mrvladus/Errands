@@ -2,25 +2,26 @@
 # Copyright (C) 2023
 # This file is distributed under the same license as the list package.
 # Jeremy Castel <jeremy.castel@protonmail.com>, 2023.
+# Irénée THIRION <irenee.thirion@e.email>, 2023.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-16 14:37+0300\n"
-"PO-Revision-Date: 2023-09-11 16:00+0200\n"
-"Last-Translator: Jeremy Castel <jeremy.castel@protonmail.com>\n"
-"Language-Team: \n"
+"PO-Revision-Date: 2023-10-17 17:49+0200\n"
+"Last-Translator: Irénée THIRION <irenee.thirion@e.email>\n"
+"Language-Team: French <gnomefr@traduc.org>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 3.3.1\n"
+"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+"X-Generator: Gtranslator 45.2\n"
 
 #: src/window.py:115
 msgid "Export Cancelled"
-msgstr ""
+msgstr "Exportation annulée"
 
 #: src/window.py:121
 msgid "Tasks Exported"
@@ -28,15 +29,15 @@ msgstr "Tâches exportées"
 
 #: src/window.py:124
 msgid "Error"
-msgstr ""
+msgstr "Erreur"
 
 #: src/window.py:141
 msgid "Import Cancelled"
-msgstr ""
+msgstr "Importation annulée"
 
 #: src/window.py:150
 msgid "Invalid File"
-msgstr ""
+msgstr "Fichier invalide"
 
 #: src/window.py:168
 msgid "Tasks Imported"
@@ -44,7 +45,7 @@ msgstr "Tâches importées"
 
 #: src/window.py:332 src/task.py:160
 msgid "Completed:"
-msgstr ""
+msgstr "Terminé :"
 
 #: src/task.py:78
 msgid "Copied to Clipboard"
@@ -54,10 +55,11 @@ msgstr "Copié dans le presse-papier"
 #: src/sync.py:74
 msgid "Not all sync credentials provided. Please check settings."
 msgstr ""
+"Identifiants de synchronisation manquants. Veuillez vérifier les paramètres."
 
 #: src/sync.py:114
 msgid "Can't connect to CalDAV server at:"
-msgstr ""
+msgstr "Impossible de se connecter au serveur CalDAV à l’adresse suivante :"
 
 #: src/res/ui/window.ui:26
 msgid "Deleted Tasks"
@@ -101,7 +103,7 @@ msgstr "Menu principal"
 
 #: src/res/ui/window.ui:260 src/res/ui/window.ui:263
 msgid "Sync/Fetch Tasks (Ctrl+S)"
-msgstr ""
+msgstr "Synchroniser / Récupérer les tâches (Ctrl+S)"
 
 #: src/res/ui/window.ui:287 src/res/ui/window.ui:290 src/res/ui/window.ui:399
 #: src/res/ui/window.ui:402
@@ -162,7 +164,7 @@ msgstr "Exporter les tâches"
 
 #: src/res/ui/window.ui:513 src/res/ui/preferences.ui:66
 msgid "Tasks"
-msgstr ""
+msgstr "Tâches"
 
 #: src/res/ui/window.ui:516
 msgid "Delete completed tasks"
@@ -170,11 +172,11 @@ msgstr "Supprimer les tâches terminées"
 
 #: src/res/ui/window.ui:522
 msgid "Exit edit mode"
-msgstr ""
+msgstr "Quitter le mode édition"
 
 #: src/res/ui/window.ui:528
 msgid "Sync/Fetch Tasks"
-msgstr ""
+msgstr "Synchroniser / Récupérer les tâches"
 
 #: src/res/ui/window.ui:545
 msgid "translator-credits"
@@ -214,47 +216,47 @@ msgstr "Sombre"
 
 #: src/res/ui/preferences.ui:71
 msgid "Expand Sub-Tasks on Startup"
-msgstr ""
+msgstr "Dérouler les sous-tâches au démarrage"
 
 #: src/res/ui/preferences.ui:87
 msgid "Sync"
-msgstr ""
+msgstr "Synchronisation"
 
 #: src/res/ui/preferences.ui:92
 msgid "Sync Provider"
-msgstr ""
+msgstr "Fournisseur de synchronisation"
 
 #: src/res/ui/preferences.ui:96
 msgid "Disabled"
-msgstr ""
+msgstr "Désactivé"
 
 #: src/res/ui/preferences.ui:111
 msgid "Server URL"
-msgstr ""
+msgstr "URL du serveur"
 
 #: src/res/ui/preferences.ui:118
 msgid "Username"
-msgstr ""
+msgstr "Nom d’utilisateur"
 
 #: src/res/ui/preferences.ui:125
 msgid "Password"
-msgstr ""
+msgstr "Mot de passe"
 
 #: src/res/ui/preferences.ui:132
 msgid "Calendar Name (\"Errands\" by Default)"
-msgstr ""
+msgstr "Nom du calendrier (« Errands » par défaut)"
 
 #: src/res/ui/preferences.ui:141
 msgid "Token"
-msgstr ""
+msgstr "Jeton"
 
 #: src/res/ui/preferences.ui:148
 msgid "Test Connection"
-msgstr ""
+msgstr "Tester la connexion"
 
 #: src/res/ui/preferences.ui:151
 msgid "Test"
-msgstr ""
+msgstr "Tester"
 
 #: src/res/ui/task.ui:17
 msgid "Edit"
@@ -278,7 +280,7 @@ msgstr "Menu"
 
 #: src/res/ui/task.ui:334 src/res/ui/task.ui:337
 msgid "Cancel (Escape)"
-msgstr ""
+msgstr "Annuler (Échap)"
 
 #: src/res/ui/task.ui:383
 msgid "Add new Sub-Task"
@@ -291,7 +293,7 @@ msgstr "Restaurer"
 #. TRANSLATORS: Don't translate
 #: data/io.github.mrvladus.List.desktop.in.in:4
 msgid "Errands"
-msgstr ""
+msgstr "Errands"
 
 #: data/io.github.mrvladus.List.desktop.in.in:5
 msgid "Manage your tasks"
@@ -300,4 +302,4 @@ msgstr "Gérer vos tâches"
 #. TRANSLATORS: Don't translate
 #: data/io.github.mrvladus.List.desktop.in.in:12
 msgid "errands;tasks;list;todo;todos;"
-msgstr ""
+msgstr "errands;tâches;task;liste;todos;à faire;post-it;"
