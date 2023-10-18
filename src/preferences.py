@@ -61,7 +61,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
         data: dict = UserData.get()
         data["tasks"] = [task for task in data["tasks"] if not task["synced_caldav"]]
         UserData.set(data)
-        Sync.init(self.window)
+        Sync.init()
         Sync.sync(True)
 
     @Gtk.Template.Callback()
