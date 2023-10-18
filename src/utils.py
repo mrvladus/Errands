@@ -397,5 +397,10 @@ class UserData:
                 task["synced_caldav"] = False
                 # task["synced_todoist"] = False
 
+        elif ver == "45.0" and os.path.exists(
+            os.path.join(self.data_dir, "data.old.json")
+        ):
+            pass
+
         data["version"] = VERSION
         return data
