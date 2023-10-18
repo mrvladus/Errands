@@ -8,18 +8,18 @@ msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-16 14:37+0300\n"
-"PO-Revision-Date: 2023-09-23 21:24+0300\n"
+"PO-Revision-Date: 2023-10-18 12:48+0300\n"
 "Last-Translator: volkov <volkovissocool@gmail.com>\n"
 "Language-Team: \n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.3.1\n"
+"X-Generator: Poedit 3.4\n"
 
 #: src/window.py:115
 msgid "Export Cancelled"
-msgstr ""
+msgstr "Експорт скасовано"
 
 #: src/window.py:121
 msgid "Tasks Exported"
@@ -27,15 +27,15 @@ msgstr "Задачі експортовані"
 
 #: src/window.py:124
 msgid "Error"
-msgstr ""
+msgstr "Помилка"
 
 #: src/window.py:141
 msgid "Import Cancelled"
-msgstr ""
+msgstr "Імпорт скасовано"
 
 #: src/window.py:150
 msgid "Invalid File"
-msgstr ""
+msgstr "Не правильний файл"
 
 #: src/window.py:168
 msgid "Tasks Imported"
@@ -52,11 +52,11 @@ msgstr "Скопійовано в буфер обміну"
 #. pyright:ignore
 #: src/sync.py:74
 msgid "Not all sync credentials provided. Please check settings."
-msgstr ""
+msgstr "Надано не всі облікові дані синхронізації. Будь ласка, перевірте налаштування."
 
 #: src/sync.py:114
 msgid "Can't connect to CalDAV server at:"
-msgstr ""
+msgstr "Не вдалося з'єднатися з CalDAV сервером за адресою:"
 
 #: src/res/ui/window.ui:26
 msgid "Deleted Tasks"
@@ -100,7 +100,7 @@ msgstr "Головне меню"
 
 #: src/res/ui/window.ui:260 src/res/ui/window.ui:263
 msgid "Sync/Fetch Tasks (Ctrl+S)"
-msgstr ""
+msgstr "Синхронізувати/Отримати задачі (Ctrl+S)"
 
 #: src/res/ui/window.ui:287 src/res/ui/window.ui:290 src/res/ui/window.ui:399
 #: src/res/ui/window.ui:402
@@ -169,11 +169,11 @@ msgstr "Видалити завершені задачі"
 
 #: src/res/ui/window.ui:522
 msgid "Exit edit mode"
-msgstr ""
+msgstr "Вийти із режиму редагування"
 
 #: src/res/ui/window.ui:528
 msgid "Sync/Fetch Tasks"
-msgstr ""
+msgstr "Синхронізувати/Отримати задачі"
 
 #: src/res/ui/window.ui:545
 msgid "translator-credits"
@@ -197,7 +197,7 @@ msgstr "Видалити"
 
 #: src/res/ui/preferences.ui:14
 msgid "Application Theme"
-msgstr "Тема додатку"
+msgstr "Стиль додатку"
 
 #: src/res/ui/preferences.ui:19
 msgid "System"
@@ -205,11 +205,11 @@ msgstr "Системна"
 
 #: src/res/ui/preferences.ui:33
 msgid "Light"
-msgstr "Світла"
+msgstr "Світлий стиль"
 
 #: src/res/ui/preferences.ui:48
 msgid "Dark"
-msgstr "Темна"
+msgstr "Темний стиль"
 
 #: src/res/ui/preferences.ui:71
 msgid "Expand Sub-Tasks on Startup"
@@ -217,43 +217,43 @@ msgstr "Розгортати підзавдання при запуску дод
 
 #: src/res/ui/preferences.ui:87
 msgid "Sync"
-msgstr ""
+msgstr "Сінхронізувати"
 
 #: src/res/ui/preferences.ui:92
 msgid "Sync Provider"
-msgstr ""
+msgstr "Постачальник синхронізації"
 
 #: src/res/ui/preferences.ui:96
 msgid "Disabled"
-msgstr ""
+msgstr "Вимкнено"
 
 #: src/res/ui/preferences.ui:111
 msgid "Server URL"
-msgstr ""
+msgstr "URL-адреса сервера"
 
 #: src/res/ui/preferences.ui:118
 msgid "Username"
-msgstr ""
+msgstr "Ім'я користувача"
 
 #: src/res/ui/preferences.ui:125
 msgid "Password"
-msgstr ""
+msgstr "Пароль"
 
 #: src/res/ui/preferences.ui:132
 msgid "Calendar Name (\"Errands\" by Default)"
-msgstr ""
+msgstr "Назва календарю ('Errands' за замовчуванням)"
 
 #: src/res/ui/preferences.ui:141
 msgid "Token"
-msgstr ""
+msgstr "Токен"
 
 #: src/res/ui/preferences.ui:148
 msgid "Test Connection"
-msgstr ""
+msgstr "Протестувати з'єднання"
 
 #: src/res/ui/preferences.ui:151
 msgid "Test"
-msgstr ""
+msgstr "Протестувати"
 
 #: src/res/ui/task.ui:17
 msgid "Edit"
@@ -269,7 +269,7 @@ msgstr "Позначити як завершене"
 
 #: src/res/ui/task.ui:185 src/res/ui/task.ui:188
 msgid "Clear style"
-msgstr "Скинути стиль"
+msgstr "Очистити стиль"
 
 #: src/res/ui/task.ui:286 src/res/ui/task.ui:288
 msgid "Menu"
@@ -277,7 +277,7 @@ msgstr "Меню"
 
 #: src/res/ui/task.ui:334 src/res/ui/task.ui:337
 msgid "Cancel (Escape)"
-msgstr ""
+msgstr "Скасувати (Escape)"
 
 #: src/res/ui/task.ui:383
 msgid "Add new Sub-Task"
@@ -290,7 +290,7 @@ msgstr "Відновити"
 #. TRANSLATORS: Don't translate
 #: data/io.github.mrvladus.List.desktop.in.in:4
 msgid "Errands"
-msgstr ""
+msgstr "Errands"
 
 #: data/io.github.mrvladus.List.desktop.in.in:5
 msgid "Manage your tasks"
