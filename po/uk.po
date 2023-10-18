@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-16 14:37+0300\n"
-"PO-Revision-Date: 2023-10-18 12:53+0300\n"
+"PO-Revision-Date: 2023-10-18 13:05+0300\n"
 "Last-Translator: volkov <volkovissocool@gmail.com>\n"
 "Language-Team: \n"
 "Language: uk\n"
@@ -290,7 +290,7 @@ msgstr "Відновити"
 #. TRANSLATORS: Don't translate
 #: data/io.github.mrvladus.List.desktop.in.in:4
 msgid "Errands"
-msgstr "Errands"
+msgstr ""
 
 #: data/io.github.mrvladus.List.desktop.in.in:5
 msgid "Manage your tasks"
