@@ -3,7 +3,7 @@
 
 from gi.repository import Adw, Gtk
 from .sync import Sync
-from .utils import GSettings, UserData, UserDataTask
+from .utils import GSettings, UserData, UserDataDict, UserDataTask
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/Errands/preferences.ui")
@@ -58,7 +58,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
 
     @Gtk.Template.Callback()
     def on_cal_name_changed(self, *args):
-        data: dict = UserData.get()
+        data: UserDataDict = UserData.get()
         data["tasks"] = [task for task in data["tasks"] if not task["synced_caldav"]]
         UserData.set(data)
         Sync.init()
