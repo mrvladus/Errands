@@ -285,7 +285,7 @@ class UserData:
             with open(os.path.join(self.data_dir, "data.json"), "r") as f:
                 data: UserDataDict = json.load(f)
                 if data["version"] != VERSION:
-                    converted_data: UserDataDict = self.convert(self, data)
+                    converted_data: UserDataDict = self.convert(data)
                     self.set(converted_data)
                     return converted_data
                 if not self.validate(data):
@@ -295,7 +295,7 @@ class UserData:
             Log.error(
                 f"Data file is corrupted. Creating backup at {os.path.join(self.data_dir, 'data.old.json')}"
             )
-            self.create_copy(self)
+            self.create_copy()
 
     # Save user data to json
     @classmethod
