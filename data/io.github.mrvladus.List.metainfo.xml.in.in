@@ -61,6 +61,11 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="45.0.1" date="2023-10-18">
+      <description translatable="no">
+        <p>Fixed bug with empty list</p>
+      </description>
+    </release>
     <release version="45.0" date="2023-10-16">
       <description translatable="no">
         <p>Sync is here!</p>
