@@ -279,6 +279,12 @@ class Window(Adw.ApplicationWindow):
                             t.add_task(task)
                 tasks_ids = [task.task["id"] for task in self.get_all_tasks()]
 
+        # Remove tasks
+        ids = [t["id"] for t in UserData.get()["tasks"]]
+        for task in self.get_all_tasks():
+            if task.task["id"] not in ids:
+                task.purge()
+
     def trash_add(self, task: dict) -> None:
         """
         Add item to trash
