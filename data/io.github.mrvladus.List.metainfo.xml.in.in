@@ -61,6 +61,20 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="45.0.2" date="2023-10-19">
+      <description translatable="no">
+        <p>Fixed:</p>
+        <ul>
+          <li>CalDAV: changing calendar name does not updates UI</li>
+        </ul>
+        <p>Translations:</p>
+        <ul>
+          <li>Updated Ukranian translation (Volkov)</li>
+          <li>Updated French translation (Irénée THIRION)</li>
+          <li>Updated Italian translation (Albano Battistella)</li>
+        </ul>
+      </description>
+    </release>
     <release version="45.0.1" date="2023-10-18">
       <description translatable="no">
         <p>Fixed bug with empty list</p>
