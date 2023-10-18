@@ -4,6 +4,7 @@
 from typing import Self
 from gi.repository import Gtk, Adw, Gdk, GObject, Gio
 from .sync import Sync
+from .task_details import TaskDetails
 from .utils import (
     Log,
     Markup,
@@ -77,6 +78,9 @@ class Task(Gtk.Revealer):
             clp.set(self.task["text"])
             self.window.add_toast(_("Copied to Clipboard"))  # pyright:ignore
 
+        def _details(*args) -> None:
+            TaskDetails(self)
+
         def _edit(*_) -> None:
             self.toggle_edit_mode()
             # Set entry text and select it
@@ -87,6 +91,7 @@ class Task(Gtk.Revealer):
         _add_action("delete", self.delete)
         _add_action("edit", _edit)
         _add_action("copy", _copy)
+        _add_action("details", _details)
 
     def add_task(self, task: dict):
         sub_task = Task(task, self.window, self)

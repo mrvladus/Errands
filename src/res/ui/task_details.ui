@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0" />
+  <requires lib="Adw" version="1.0" />
+  <template class="TaskDetails" parent="AdwPreferencesWindow">
+    <property name="modal">true</property>
+    <property name="title">Details</property>
+    <child>
+      <object class="AdwPreferencesPage">
+        <child>
+          <object class="AdwPreferencesGroup">
+            <child>
+              <object class="AdwActionRow">
+                <property name="title">Open in Calendar</property>
+                <property name="activatable-widget">open_calendar_btn</property>
+                <child type="suffix">
+                  <object class="GtkButton" id="open_calendar_btn">
+                    <property name="valign">center</property>
+                    <property name="icon-name">x-office-calendar-symbolic</property>
+                    <signal name="clicked" handler="on_calendar_open" />
+                    <style>
+                      <class name="flat" />
+                    </style>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </template>
+</interface>
