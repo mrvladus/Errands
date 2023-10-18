@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version:  errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-16 14:37+0300\n"
-"PO-Revision-Date: 2023-09-23 16:44+0200\n"
+"PO-Revision-Date: 2023-10-17 21:44+0200\n"
 "Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
 "Language-Team: Italian <LL@li.org>\n"
 "Language: it\n"
@@ -20,7 +20,7 @@ msgstr ""
 
 #: src/window.py:115
 msgid "Export Cancelled"
-msgstr ""
+msgstr "Esportazione cancellata"
 
 #: src/window.py:121
 msgid "Tasks Exported"
@@ -28,15 +28,15 @@ msgstr "Attività esportate"
 
 #: src/window.py:124
 msgid "Error"
-msgstr ""
+msgstr "Errore"
 
 #: src/window.py:141
 msgid "Import Cancelled"
-msgstr ""
+msgstr "Importazione cancellata"
 
 #: src/window.py:150
 msgid "Invalid File"
-msgstr ""
+msgstr "File non valido"
 
 #: src/window.py:168
 msgid "Tasks Imported"
@@ -53,11 +53,11 @@ msgstr "Copiato negli appunti"
 #. pyright:ignore
 #: src/sync.py:74
 msgid "Not all sync credentials provided. Please check settings."
-msgstr ""
+msgstr "Non tutte le credenziali di sincronizzazione fornite. Si prega di verificare le impostazioni."
 
 #: src/sync.py:114
 msgid "Can't connect to CalDAV server at:"
-msgstr ""
+msgstr "Impossibile connettersi al server CalDAV su:"
 
 #: src/res/ui/window.ui:26
 msgid "Deleted Tasks"
@@ -101,7 +101,7 @@ msgstr "Menù principale"
 
 #: src/res/ui/window.ui:260 src/res/ui/window.ui:263
 msgid "Sync/Fetch Tasks (Ctrl+S)"
-msgstr ""
+msgstr "Attività di sincronizzazione/recupero (Ctrl+S)"
 
 #: src/res/ui/window.ui:287 src/res/ui/window.ui:290 src/res/ui/window.ui:399
 #: src/res/ui/window.ui:402
@@ -170,11 +170,11 @@ msgstr "Elimina le attività completate"
 
 #: src/res/ui/window.ui:522
 msgid "Exit edit mode"
-msgstr ""
+msgstr "Uscire dalla modalità di modifica"
 
 #: src/res/ui/window.ui:528
 msgid "Sync/Fetch Tasks"
-msgstr ""
+msgstr "Attività di sincronizzazione/recupero"
 
 #: src/res/ui/window.ui:545
 msgid "translator-credits"
@@ -218,43 +218,43 @@ msgstr "Espandi le attività secondarie all'avvio"
 
 #: src/res/ui/preferences.ui:87
 msgid "Sync"
-msgstr ""
+msgstr "Sincronizzazione"
 
 #: src/res/ui/preferences.ui:92
 msgid "Sync Provider"
-msgstr ""
+msgstr "Provider di sincronizzazione"
 
 #: src/res/ui/preferences.ui:96
 msgid "Disabled"
-msgstr ""
+msgstr "Disabilitato"
 
 #: src/res/ui/preferences.ui:111
 msgid "Server URL"
-msgstr ""
+msgstr "URL Server"
 
 #: src/res/ui/preferences.ui:118
 msgid "Username"
-msgstr ""
+msgstr "Nome utente"
 
 #: src/res/ui/preferences.ui:125
 msgid "Password"
-msgstr ""
+msgstr "Password"
 
 #: src/res/ui/preferences.ui:132
 msgid "Calendar Name (\"Errands\" by Default)"
-msgstr ""
+msgstr "Nome del calendario (\""Errands\" per impostazione predefinita)"
 
 #: src/res/ui/preferences.ui:141
 msgid "Token"
-msgstr ""
+msgstr "Token"
 
 #: src/res/ui/preferences.ui:148
 msgid "Test Connection"
-msgstr ""
+msgstr "Test di connessione"
 
 #: src/res/ui/preferences.ui:151
 msgid "Test"
-msgstr ""
+msgstr "Test"
 
 #: src/res/ui/task.ui:17
 msgid "Edit"
@@ -278,7 +278,7 @@ msgstr "Menù"
 
 #: src/res/ui/task.ui:334 src/res/ui/task.ui:337
 msgid "Cancel (Escape)"
-msgstr ""
+msgstr "Annulla (Esc)"
 
 #: src/res/ui/task.ui:383
 msgid "Add new Sub-Task"
@@ -300,4 +300,4 @@ msgstr "Gestisci le tue attività"
 #. TRANSLATORS: Don't translate
 #: data/io.github.mrvladus.List.desktop.in.in:12
 msgid "errands;tasks;list;todo;todos;"
-msgstr ""
+msgstr "commissioni;attività;elenco;cosa da fare;cose da fare;"
