@@ -2,8 +2,11 @@
 # SPDX-License-Identifier: MIT
 
 from gi.repository import Adw, Gtk
-from .sync import Sync
-from .utils import GSettings, UserData, UserDataDict, UserDataTask
+
+# Import modules
+from errands.utils.sync import Sync
+from errands.utils.gsettings import GSettings
+from errands.utils.data import UserData, UserDataDict
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/Errands/preferences.ui")

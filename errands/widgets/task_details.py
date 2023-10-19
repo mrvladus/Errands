@@ -3,7 +3,7 @@
 
 import os
 from gi.repository import Adw, Gtk, GLib, Gio
-from .utils import Log
+from errands.utils.logging import Log
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/Errands/task_details.ui")

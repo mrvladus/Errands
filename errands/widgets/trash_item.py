@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: MIT
 
 from gi.repository import Adw, Gtk
-from .utils import Log
-from .task import Task
+from errands.utils.logging import Log
+from errands.widgets.task import Task
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/Errands/trash_item.ui")

@@ -1,9 +1,15 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-from gi.repository import Adw, GLib
 from caldav import Calendar, CalendarObjectResource, DAVClient, Principal, Todo
-from .utils import GSettings, Log, TaskUtils, UserData, UserDataDict, threaded
+from gi.repository import Adw, GLib
+
+# Import modules
+import errands.utils.tasks as TaskUtils
+from errands.utils.gsettings import GSettings
+from errands.utils.logging import Log
+from errands.utils.data import UserData, UserDataDict
+from errands.utils.functions import threaded
 
 
 class Sync:

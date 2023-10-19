@@ -1,6 +1,6 @@
 project(
   'errands',
-  version: '45.0',
+  version: '45.0.2',
   meson_version: '>= 0.62.0',
 )
 
@@ -9,6 +9,7 @@ gnome = import('gnome')
 python = import('python')
 
 pkgdatadir = join_paths(get_option('prefix'), get_option('datadir'), meson.project_name())
+moduledir = join_paths(pkgdatadir, 'errands')
 
 profile = get_option('profile')
 if profile == 'development'
@@ -30,7 +31,7 @@ conf.set('localedir', join_paths(get_option('prefix'), get_option('localedir')))
 conf.set('pkgdatadir', pkgdatadir)
 
 subdir('data')
-subdir('src')
+subdir('errands')
 subdir('po')
 
 gnome.post_install(

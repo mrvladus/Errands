@@ -13,6 +13,7 @@ import gi
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 
+from gi.repository import Adw, Gio
 
 APP_ID = "@APP_ID@"
 VERSION = "@VERSION@"
@@ -27,17 +28,32 @@ gettext.install("errands", localedir)
 locale.bindtextdomain("errands", localedir)
 locale.textdomain("errands")
 
-if __name__ == "__main__":
-    from gi.repository import Gio
 
+def main() -> None:
     resource = Gio.Resource.load(os.path.join(pkgdatadir, "errands.gresource"))
     resource._register()
 
-    from errands.utils import Log
+    from errands.utils.logging import Log
 
     Log.init()
-
-    from errands import application
-
-    app = application.Application()
+    app = Application()
     sys.exit(app.run(sys.argv))
+
+
+class Application(Adw.Application):
+    def __init__(self) -> None:
+        super().__init__(
+            application_id=APP_ID,
+            flags=Gio.ApplicationFlags.DEFAULT_FLAGS,
+        )
+        self.set_resource_base_path("/io/github/mrvladus/Errands/")
+
+    def do_activate(self) -> None:
+        from errands.widgets.window import Window
+
+        win: Window = Window(application=self)
+        win.perform_startup()
+
+
+if __name__ == "__main__":
+    main()

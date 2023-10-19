@@ -6,21 +6,17 @@ from gi.repository import Gio, Adw, Gtk, GLib
 from __main__ import VERSION, APP_ID
 
 # Import modules
-from .preferences import PreferencesWindow
-from .sync import Sync
-from .task import Task
-from .trash_item import TrashItem
-from .utils import (
-    Animate,
-    GSettings,
-    Log,
-    TaskUtils,
-    UserData,
-    UserDataDict,
-    UserDataTask,
-    get_children,
-    Markup,
-)
+import errands.utils.tasks as TaskUtils
+from errands.widgets.preferences import PreferencesWindow
+from errands.widgets.task import Task
+from errands.widgets.trash_item import TrashItem
+from errands.utils.sync import Sync
+from errands.utils.animation import scroll
+from errands.utils.gsettings import GSettings
+from errands.utils.logging import Log
+from errands.utils.data import UserData, UserDataDict, UserDataTask
+from errands.utils.functions import get_children
+from errands.utils.markup import Markup
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/Errands/window.ui")
@@ -387,7 +383,7 @@ class Window(Adw.ApplicationWindow):
         Scroll up
         """
 
-        Animate.scroll(self.scrolled_window, False)
+        scroll(self.scrolled_window, False)
 
     @Gtk.Template.Callback()
     def on_task_added(self, entry: Gtk.Entry) -> None:
@@ -408,7 +404,7 @@ class Window(Adw.ApplicationWindow):
         # Clear entry
         entry.props.text = ""
         # Scroll to the end
-        Animate.scroll(self.scrolled_window, True)
+        scroll(self.scrolled_window, True)
         # Sync
         Sync.sync()
 
@@ -457,7 +453,9 @@ class Window(Adw.ApplicationWindow):
         data["deleted"] = [task["id"] for task in data["tasks"] if task["deleted"]]
         data["tasks"] = [task for task in data["tasks"] if not task["deleted"]]
         UserData.set(data)
-        to_remove = [task for task in self.get_all_tasks() if task.task["deleted"]]
+        to_remove: list[Task] = [
+            task for task in self.get_all_tasks() if task.task["deleted"]
+        ]
         for task in to_remove:
             task.purge()
         # Remove trash items widgets

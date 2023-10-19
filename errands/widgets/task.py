@@ -3,17 +3,15 @@
 
 from typing import Self
 from gi.repository import Gtk, Adw, Gdk, GObject, Gio
-from .sync import Sync
-from .task_details import TaskDetails
-from .utils import (
-    Log,
-    Markup,
-    TaskUtils,
-    UserData,
-    UserDataDict,
-    UserDataTask,
-    get_children,
-)
+
+# Import modules
+import errands.utils.tasks as TaskUtils
+from errands.utils.sync import Sync
+from errands.widgets.task_details import TaskDetails
+from errands.utils.logging import Log
+from errands.utils.data import UserData, UserDataDict, UserDataTask
+from errands.utils.markup import Markup
+from errands.utils.functions import get_children
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/Errands/task.ui")
