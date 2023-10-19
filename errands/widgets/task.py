@@ -1,17 +1,17 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
-
+import os
 from typing import Self
-from gi.repository import Gtk, Adw, Gdk, GObject, Gio
+from gi.repository import Gtk, Adw, Gdk, GObject, Gio, GLib
 
 # Import modules
 import errands.utils.tasks as TaskUtils
 from errands.utils.sync import Sync
-from errands.widgets.task_details import TaskDetails
 from errands.utils.logging import Log
 from errands.utils.data import UserData, UserDataDict, UserDataTask
 from errands.utils.markup import Markup
 from errands.utils.functions import get_children
+from errands.utils.tasks import task_to_ics
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/Errands/task.ui")
@@ -57,6 +57,7 @@ class Task(Gtk.Revealer):
         self._add_actions()
         self.just_added = False
         self.parent.update_status()
+        # task_to_ics(self.task)
 
     def __repr__(self) -> str:
         return f"Task({self.task['id']})"
@@ -76,8 +77,15 @@ class Task(Gtk.Revealer):
             clp.set(self.task["text"])
             self.window.add_toast(_("Copied to Clipboard"))  # pyright:ignore
 
-        def _details(*args) -> None:
-            TaskDetails(self)
+        def _open_with(*args) -> None:
+            cache_dir: str = os.path.join(GLib.get_user_cache_dir(), "list")
+            if not os.path.exists(cache_dir):
+                os.mkdir(cache_dir)
+            file_path = os.path.join(cache_dir, f"{self.task['id']}.ics")
+            with open(file_path, "w") as f:
+                f.write(self.task["ics"])
+            file: Gio.File = Gio.File.new_for_path(file_path)
+            Gtk.FileLauncher.new(file).launch()
 
         def _edit(*_) -> None:
             self.toggle_edit_mode()
@@ -89,7 +97,7 @@ class Task(Gtk.Revealer):
         _add_action("delete", self.delete)
         _add_action("edit", _edit)
         _add_action("copy", _copy)
-        _add_action("details", _details)
+        _add_action("open_with", _open_with)
 
     def add_task(self, task: dict):
         sub_task = Task(task, self.window, self)

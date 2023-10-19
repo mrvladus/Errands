@@ -1,4 +1,4 @@
-subdir('res')
+subdir('resources')
 
 configure_file(
   input: 'errands.py',

@@ -4,7 +4,6 @@
     <file preprocess="xml-stripblanks" compressed="true" alias="window.ui">ui/window.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="preferences.ui">ui/preferences.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="task.ui">ui/task.ui</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="task_details.ui">ui/task_details.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="trash_item.ui">ui/trash_item.ui</file>
     <file>style.css</file>
     <file>style-dark.css</file>
