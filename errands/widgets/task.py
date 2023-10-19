@@ -57,7 +57,6 @@ class Task(Gtk.Revealer):
         self._add_actions()
         self.just_added = False
         self.parent.update_status()
-        # task_to_ics(self.task)
 
     def __repr__(self) -> str:
         return f"Task({self.task['id']})"
@@ -83,7 +82,7 @@ class Task(Gtk.Revealer):
                 os.mkdir(cache_dir)
             file_path = os.path.join(cache_dir, f"{self.task['id']}.ics")
             with open(file_path, "w") as f:
-                f.write(self.task["ics"])
+                f.write(task_to_ics(self.task))
             file: Gio.File = Gio.File.new_for_path(file_path)
             Gtk.FileLauncher.new(file).launch()
 

@@ -15,7 +15,6 @@ def new_task(
     deleted: bool = False,
     color: str = "",
     synced_caldav: bool = False,
-    ics: str = "",
 ) -> UserDataTask:
     task = {
         "id": str(uuid.uuid4()) if not id else id,
@@ -26,7 +25,6 @@ def new_task(
         "deleted": deleted,
         "synced_caldav": synced_caldav,
     }
-    task["ics"] = task_to_ics(task) if not ics else ics
     return task
 
 
