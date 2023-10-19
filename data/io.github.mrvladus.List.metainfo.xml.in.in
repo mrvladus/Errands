@@ -65,7 +65,7 @@
       <description translatable="no">
         <p>Fixed:</p>
         <ul>
-          <li>CalDAV: changing calendar name does not updates UI</li>
+          <li>CalDAV: changing calendar name now updates UI</li>
         </ul>
         <p>Translations:</p>
         <ul>
