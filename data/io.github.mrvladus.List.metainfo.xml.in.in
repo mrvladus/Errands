@@ -12,10 +12,6 @@
   <url type="donation">https://github.com/mrvladus/Errands/blob/main/DONATIONS.md</url>
   <launchable type="desktop-id">@APP_ID@.desktop</launchable>
   <translation type="gettext">errands</translation>
-  <custom>
-    <value key="Purism::form_factor">workstation</value>
-    <value key="Purism::form_factor">mobile</value>
-  </custom>
   <recommends>
     <control>touch</control>
     <control>keyboard</control>
