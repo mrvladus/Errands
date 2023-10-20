@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-16 14:37+0300\n"
+"POT-Creation-Date: 2023-10-20 13:24+0300\n"
 "PO-Revision-Date: 2023-10-17 17:49+0200\n"
 "Last-Translator: Irénée THIRION <irenee.thirion@e.email>\n"
 "Language-Team: French <gnomefr@traduc.org>\n"
@@ -19,274 +19,274 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1)\n"
 "X-Generator: Gtranslator 45.2\n"
 
-#: src/window.py:115
+#: errands/widgets/window.py:111
 msgid "Export Cancelled"
 msgstr "Exportation annulée"
 
-#: src/window.py:121
+#: errands/widgets/window.py:117
 msgid "Tasks Exported"
 msgstr "Tâches exportées"
 
-#: src/window.py:124
+#: errands/widgets/window.py:120
 msgid "Error"
 msgstr "Erreur"
 
-#: src/window.py:141
+#: errands/widgets/window.py:137
 msgid "Import Cancelled"
 msgstr "Importation annulée"
 
-#: src/window.py:150
+#: errands/widgets/window.py:146
 msgid "Invalid File"
 msgstr "Fichier invalide"
 
-#: src/window.py:168
+#: errands/widgets/window.py:164
 msgid "Tasks Imported"
 msgstr "Tâches importées"
 
-#: src/window.py:332 src/task.py:160
+#: errands/widgets/window.py:334 errands/widgets/task.py:170
 msgid "Completed:"
 msgstr "Terminé :"
 
-#: src/task.py:78
+#: errands/widgets/task.py:77
 msgid "Copied to Clipboard"
 msgstr "Copié dans le presse-papier"
 
 #. pyright:ignore
-#: src/sync.py:74
+#: errands/utils/sync.py:80
 msgid "Not all sync credentials provided. Please check settings."
 msgstr ""
 "Identifiants de synchronisation manquants. Veuillez vérifier les paramètres."
 
-#: src/sync.py:114
+#: errands/utils/sync.py:120
 msgid "Can't connect to CalDAV server at:"
 msgstr "Impossible de se connecter au serveur CalDAV à l’adresse suivante :"
 
-#: src/res/ui/window.ui:26
+#: errands/resources/ui/window.ui:26
 msgid "Deleted Tasks"
 msgstr "Tâches supprimées"
 
-#: src/res/ui/window.ui:35 src/res/ui/window.ui:38
+#: errands/resources/ui/window.ui:35 errands/resources/ui/window.ui:38
 msgid "Clear"
 msgstr "Vider"
 
-#: src/res/ui/window.ui:53 src/res/ui/window.ui:56
+#: errands/resources/ui/window.ui:53 errands/resources/ui/window.ui:56
 msgid "Restore All"
 msgstr "Tout restaurer"
 
-#: src/res/ui/window.ui:68 src/res/ui/window.ui:71
+#: errands/resources/ui/window.ui:68 errands/resources/ui/window.ui:71
 msgid "Close Trash"
 msgstr "Fermer la corbeille"
 
-#: src/res/ui/window.ui:106
+#: errands/resources/ui/window.ui:106
 msgid "Move to Trash"
 msgstr "Mettre à la corbeille"
 
-#: src/res/ui/window.ui:130
+#: errands/resources/ui/window.ui:130
 msgid "Empty Trash"
 msgstr "Corbeille vide"
 
-#: src/res/ui/window.ui:131
+#: errands/resources/ui/window.ui:131
 msgid "No deleted items"
 msgstr "Aucun élément supprimé"
 
-#: src/res/ui/window.ui:192 src/res/ui/window.ui:195
+#: errands/resources/ui/window.ui:192 errands/resources/ui/window.ui:195
 msgid "Show Deleted Tasks"
 msgstr "Afficher les tâches supprimées"
 
-#: src/res/ui/window.ui:221 src/res/ui/window.ui:224
+#: errands/resources/ui/window.ui:221 errands/resources/ui/window.ui:224
 msgid "Delete Completed Tasks (Ctrl+Delete)"
 msgstr "Supprimer les tâches terminées (Ctrl+Delete)"
 
-#: src/res/ui/window.ui:248 src/res/ui/window.ui:250
+#: errands/resources/ui/window.ui:248 errands/resources/ui/window.ui:250
 msgid "Main Menu"
 msgstr "Menu principal"
 
-#: src/res/ui/window.ui:260 src/res/ui/window.ui:263
+#: errands/resources/ui/window.ui:260 errands/resources/ui/window.ui:263
 msgid "Sync/Fetch Tasks (Ctrl+S)"
 msgstr "Synchroniser / Récupérer les tâches (Ctrl+S)"
 
-#: src/res/ui/window.ui:287 src/res/ui/window.ui:290 src/res/ui/window.ui:399
-#: src/res/ui/window.ui:402
+#: errands/resources/ui/window.ui:287 errands/resources/ui/window.ui:290
+#: errands/resources/ui/window.ui:399 errands/resources/ui/window.ui:402
 msgid "Scroll Up"
 msgstr "Défiler vers le haut"
 
-#: src/res/ui/window.ui:321
+#: errands/resources/ui/window.ui:321
 msgid "Add new Task"
 msgstr "Ajouter une tâche"
 
-#: src/res/ui/window.ui:429
+#: errands/resources/ui/window.ui:429
 msgid "Export Tasks..."
 msgstr "Exporter les tâches..."
 
-#: src/res/ui/window.ui:433
+#: errands/resources/ui/window.ui:433
 msgid "Import Tasks..."
 msgstr "Importer les tâches..."
 
-#: src/res/ui/window.ui:439 src/res/ui/window.ui:478
+#: errands/resources/ui/window.ui:439 errands/resources/ui/window.ui:478
 msgid "Preferences"
 msgstr "Préférences"
 
-#: src/res/ui/window.ui:443
+#: errands/resources/ui/window.ui:443
 msgid "Keyboard Shortcuts"
 msgstr "Raccourcis clavier"
 
-#: src/res/ui/window.ui:447
+#: errands/resources/ui/window.ui:447
 msgid "About Errands"
 msgstr "À propos de Errands"
 
-#: src/res/ui/window.ui:463
+#: errands/resources/ui/window.ui:463
 msgid "General"
 msgstr "Général"
 
-#: src/res/ui/window.ui:466
+#: errands/resources/ui/window.ui:466
 msgid "Show keyboard shortcuts"
 msgstr "Afficher les raccourcis clavier"
 
-#: src/res/ui/window.ui:472
+#: errands/resources/ui/window.ui:472
 msgid "Toggle sidebar"
 msgstr "Afficher ou masquer le panneau latérale"
 
-#: src/res/ui/window.ui:484
+#: errands/resources/ui/window.ui:484
 msgid "Quit"
 msgstr "Quitter"
 
-#: src/res/ui/window.ui:494
+#: errands/resources/ui/window.ui:494
 msgid "Import and Export"
 msgstr "Importer et exporter"
 
-#: src/res/ui/window.ui:497
+#: errands/resources/ui/window.ui:497
 msgid "Import tasks"
 msgstr "Importer les tâches"
 
-#: src/res/ui/window.ui:503
+#: errands/resources/ui/window.ui:503
 msgid "Export tasks"
 msgstr "Exporter les tâches"
 
-#: src/res/ui/window.ui:513 src/res/ui/preferences.ui:66
+#: errands/resources/ui/window.ui:513 errands/resources/ui/preferences.ui:66
 msgid "Tasks"
 msgstr "Tâches"
 
-#: src/res/ui/window.ui:516
+#: errands/resources/ui/window.ui:516
 msgid "Delete completed tasks"
 msgstr "Supprimer les tâches terminées"
 
-#: src/res/ui/window.ui:522
+#: errands/resources/ui/window.ui:522
 msgid "Exit edit mode"
 msgstr "Quitter le mode édition"
 
-#: src/res/ui/window.ui:528
+#: errands/resources/ui/window.ui:528
 msgid "Sync/Fetch Tasks"
 msgstr "Synchroniser / Récupérer les tâches"
 
-#: src/res/ui/window.ui:545
+#: errands/resources/ui/window.ui:545
 msgid "translator-credits"
 msgstr "Jeremy Castel <jeremy.castel@protonmail.com>"
 
-#: src/res/ui/window.ui:581
+#: errands/resources/ui/window.ui:581
 msgid "Are you sure?"
 msgstr "Supprimer les éléments de la corbeille ?"
 
-#: src/res/ui/window.ui:582
+#: errands/resources/ui/window.ui:582
 msgid "Tasks will be permanently deleted"
 msgstr "Tous les éléments seront définitivement supprimés"
 
-#: src/res/ui/window.ui:587
+#: errands/resources/ui/window.ui:587
 msgid "Cancel"
 msgstr "Annuler"
 
-#: src/res/ui/window.ui:588 src/res/ui/task.ui:13
+#: errands/resources/ui/window.ui:588 errands/resources/ui/task.ui:13
 msgid "Delete"
 msgstr "Supprimer"
 
-#: src/res/ui/preferences.ui:14
+#: errands/resources/ui/preferences.ui:14
 msgid "Application Theme"
 msgstr "Thème de l'application"
 
-#: src/res/ui/preferences.ui:19
+#: errands/resources/ui/preferences.ui:19
 msgid "System"
 msgstr "Système"
 
-#: src/res/ui/preferences.ui:33
+#: errands/resources/ui/preferences.ui:33
 msgid "Light"
 msgstr "Clair"
 
-#: src/res/ui/preferences.ui:48
+#: errands/resources/ui/preferences.ui:48
 msgid "Dark"
 msgstr "Sombre"
 
-#: src/res/ui/preferences.ui:71
+#: errands/resources/ui/preferences.ui:71
 msgid "Expand Sub-Tasks on Startup"
 msgstr "Dérouler les sous-tâches au démarrage"
 
-#: src/res/ui/preferences.ui:87
+#: errands/resources/ui/preferences.ui:87
 msgid "Sync"
 msgstr "Synchronisation"
 
-#: src/res/ui/preferences.ui:92
+#: errands/resources/ui/preferences.ui:92
 msgid "Sync Provider"
 msgstr "Fournisseur de synchronisation"
 
-#: src/res/ui/preferences.ui:96
+#: errands/resources/ui/preferences.ui:96
 msgid "Disabled"
 msgstr "Désactivé"
 
-#: src/res/ui/preferences.ui:111
+#: errands/resources/ui/preferences.ui:111
 msgid "Server URL"
 msgstr "URL du serveur"
 
-#: src/res/ui/preferences.ui:118
+#: errands/resources/ui/preferences.ui:118
 msgid "Username"
 msgstr "Nom d’utilisateur"
 
-#: src/res/ui/preferences.ui:125
+#: errands/resources/ui/preferences.ui:125
 msgid "Password"
 msgstr "Mot de passe"
 
-#: src/res/ui/preferences.ui:132
+#: errands/resources/ui/preferences.ui:132
 msgid "Calendar Name (\"Errands\" by Default)"
 msgstr "Nom du calendrier (« Errands » par défaut)"
 
-#: src/res/ui/preferences.ui:141
+#: errands/resources/ui/preferences.ui:141
 msgid "Token"
 msgstr "Jeton"
 
-#: src/res/ui/preferences.ui:148
+#: errands/resources/ui/preferences.ui:148
 msgid "Test Connection"
 msgstr "Tester la connexion"
 
-#: src/res/ui/preferences.ui:151
+#: errands/resources/ui/preferences.ui:151
 msgid "Test"
 msgstr "Tester"
 
-#: src/res/ui/task.ui:17
+#: errands/resources/ui/task.ui:17
 msgid "Edit"
 msgstr "Modifier"
 
-#: src/res/ui/task.ui:21
+#: errands/resources/ui/task.ui:21
 msgid "Copy"
 msgstr "Copier"
 
-#: src/res/ui/task.ui:135 src/res/ui/task.ui:138
+#: errands/resources/ui/task.ui:139 errands/resources/ui/task.ui:142
 msgid "Mark as Completed"
 msgstr "Marquer comme terminée"
 
-#: src/res/ui/task.ui:185 src/res/ui/task.ui:188
+#: errands/resources/ui/task.ui:189 errands/resources/ui/task.ui:192
 msgid "Clear style"
 msgstr "Effacer le style"
 
-#: src/res/ui/task.ui:286 src/res/ui/task.ui:288
+#: errands/resources/ui/task.ui:290 errands/resources/ui/task.ui:292
 msgid "Menu"
 msgstr "Menu"
 
-#: src/res/ui/task.ui:334 src/res/ui/task.ui:337
+#: errands/resources/ui/task.ui:338 errands/resources/ui/task.ui:341
 msgid "Cancel (Escape)"
 msgstr "Annuler (Échap)"
 
-#: src/res/ui/task.ui:383
+#: errands/resources/ui/task.ui:387
 msgid "Add new Sub-Task"
 msgstr "Ajouter une sous-tâche"
 
-#: src/res/ui/trash_item.ui:20 src/res/ui/trash_item.ui:24
+#: errands/resources/ui/trash_item.ui:20 errands/resources/ui/trash_item.ui:24
 msgid "Restore"
 msgstr "Restaurer"
 

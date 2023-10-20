@@ -1,13 +1,13 @@
 # .py
-src/window.py
-src/task.py
-src/sync.py
+errands/widgets/window.py
+errands/widgets/task.py
+errands/utils/sync.py
 
 # .ui
-src/res/ui/window.ui
-src/res/ui/preferences.ui
-src/res/ui/task.ui
-src/res/ui/trash_item.ui
+errands/resources/ui/window.ui
+errands/resources/ui/preferences.ui
+errands/resources/ui/task.ui
+errands/resources/ui/trash_item.ui
 
 # Data
 data/io.github.mrvladus.List.desktop.in.in

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-16 14:37+0300\n"
+"POT-Creation-Date: 2023-10-20 13:24+0300\n"
 "PO-Revision-Date: 2023-07-07 16:56+0300\n"
 "Last-Translator: Vlad Krupinskii <mrvladus@yandex.ru>\n"
 "Language-Team: \n"
@@ -19,273 +19,273 @@ msgstr ""
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Generator: Poedit 3.3.1\n"
 
-#: src/window.py:115
+#: errands/widgets/window.py:111
 msgid "Export Cancelled"
 msgstr "Экспорт отменен"
 
-#: src/window.py:121
+#: errands/widgets/window.py:117
 msgid "Tasks Exported"
 msgstr "Экспорт завершен"
 
-#: src/window.py:124
+#: errands/widgets/window.py:120
 msgid "Error"
 msgstr "Ошибка"
 
-#: src/window.py:141
+#: errands/widgets/window.py:137
 msgid "Import Cancelled"
 msgstr "Импорт отменен"
 
-#: src/window.py:150
+#: errands/widgets/window.py:146
 msgid "Invalid File"
 msgstr "Файл с ошибкой"
 
-#: src/window.py:168
+#: errands/widgets/window.py:164
 msgid "Tasks Imported"
 msgstr "Импорт завершен"
 
-#: src/window.py:332 src/task.py:160
+#: errands/widgets/window.py:334 errands/widgets/task.py:170
 msgid "Completed:"
 msgstr "Выполнено:"
 
-#: src/task.py:78
+#: errands/widgets/task.py:77
 msgid "Copied to Clipboard"
 msgstr "Скопировано в буфер обмена"
 
 #. pyright:ignore
-#: src/sync.py:74
+#: errands/utils/sync.py:80
 msgid "Not all sync credentials provided. Please check settings."
 msgstr "Не все данные для синхронизации предоставлены. Проверьте настройки."
 
-#: src/sync.py:114
+#: errands/utils/sync.py:120
 msgid "Can't connect to CalDAV server at:"
 msgstr "Невозможно подключиться к серверу по адресу:"
 
-#: src/res/ui/window.ui:26
+#: errands/resources/ui/window.ui:26
 msgid "Deleted Tasks"
 msgstr "Удаленные задачи"
 
-#: src/res/ui/window.ui:35 src/res/ui/window.ui:38
+#: errands/resources/ui/window.ui:35 errands/resources/ui/window.ui:38
 msgid "Clear"
 msgstr "Очистить"
 
-#: src/res/ui/window.ui:53 src/res/ui/window.ui:56
+#: errands/resources/ui/window.ui:53 errands/resources/ui/window.ui:56
 msgid "Restore All"
 msgstr "Восстановить всё"
 
-#: src/res/ui/window.ui:68 src/res/ui/window.ui:71
+#: errands/resources/ui/window.ui:68 errands/resources/ui/window.ui:71
 msgid "Close Trash"
 msgstr "Закрыть корзину"
 
-#: src/res/ui/window.ui:106
+#: errands/resources/ui/window.ui:106
 msgid "Move to Trash"
 msgstr "Переместить в корзину"
 
-#: src/res/ui/window.ui:130
+#: errands/resources/ui/window.ui:130
 msgid "Empty Trash"
 msgstr "Корзина пуста"
 
-#: src/res/ui/window.ui:131
+#: errands/resources/ui/window.ui:131
 msgid "No deleted items"
 msgstr "Нет удаленных задач"
 
-#: src/res/ui/window.ui:192 src/res/ui/window.ui:195
+#: errands/resources/ui/window.ui:192 errands/resources/ui/window.ui:195
 msgid "Show Deleted Tasks"
 msgstr "Показать удаленные задачи"
 
-#: src/res/ui/window.ui:221 src/res/ui/window.ui:224
+#: errands/resources/ui/window.ui:221 errands/resources/ui/window.ui:224
 msgid "Delete Completed Tasks (Ctrl+Delete)"
 msgstr "Удалить выполненные задачи (Ctrl+Delete)"
 
-#: src/res/ui/window.ui:248 src/res/ui/window.ui:250
+#: errands/resources/ui/window.ui:248 errands/resources/ui/window.ui:250
 msgid "Main Menu"
 msgstr "Главное меню"
 
-#: src/res/ui/window.ui:260 src/res/ui/window.ui:263
+#: errands/resources/ui/window.ui:260 errands/resources/ui/window.ui:263
 msgid "Sync/Fetch Tasks (Ctrl+S)"
 msgstr "Синхронизировать задачи (Ctrl+S)"
 
-#: src/res/ui/window.ui:287 src/res/ui/window.ui:290 src/res/ui/window.ui:399
-#: src/res/ui/window.ui:402
+#: errands/resources/ui/window.ui:287 errands/resources/ui/window.ui:290
+#: errands/resources/ui/window.ui:399 errands/resources/ui/window.ui:402
 msgid "Scroll Up"
 msgstr "Прокрутить вверх"
 
-#: src/res/ui/window.ui:321
+#: errands/resources/ui/window.ui:321
 msgid "Add new Task"
 msgstr "Добавьте задачу"
 
-#: src/res/ui/window.ui:429
+#: errands/resources/ui/window.ui:429
 msgid "Export Tasks..."
 msgstr "Экспорт задач..."
 
-#: src/res/ui/window.ui:433
+#: errands/resources/ui/window.ui:433
 msgid "Import Tasks..."
 msgstr "Импорт задач..."
 
-#: src/res/ui/window.ui:439 src/res/ui/window.ui:478
+#: errands/resources/ui/window.ui:439 errands/resources/ui/window.ui:478
 msgid "Preferences"
 msgstr "Параметры"
 
-#: src/res/ui/window.ui:443
+#: errands/resources/ui/window.ui:443
 msgid "Keyboard Shortcuts"
 msgstr "Комбинации клавиш"
 
-#: src/res/ui/window.ui:447
+#: errands/resources/ui/window.ui:447
 msgid "About Errands"
 msgstr "О приложении"
 
-#: src/res/ui/window.ui:463
+#: errands/resources/ui/window.ui:463
 msgid "General"
 msgstr "Общие"
 
-#: src/res/ui/window.ui:466
+#: errands/resources/ui/window.ui:466
 msgid "Show keyboard shortcuts"
 msgstr "Показать комбинации клавиш"
 
-#: src/res/ui/window.ui:472
+#: errands/resources/ui/window.ui:472
 msgid "Toggle sidebar"
 msgstr "Переключить боковую панель"
 
-#: src/res/ui/window.ui:484
+#: errands/resources/ui/window.ui:484
 msgid "Quit"
 msgstr "Выход"
 
-#: src/res/ui/window.ui:494
+#: errands/resources/ui/window.ui:494
 msgid "Import and Export"
 msgstr "Импорт и экспорт"
 
-#: src/res/ui/window.ui:497
+#: errands/resources/ui/window.ui:497
 msgid "Import tasks"
 msgstr "Импорт задач"
 
-#: src/res/ui/window.ui:503
+#: errands/resources/ui/window.ui:503
 msgid "Export tasks"
 msgstr "Экспорт задач"
 
-#: src/res/ui/window.ui:513 src/res/ui/preferences.ui:66
+#: errands/resources/ui/window.ui:513 errands/resources/ui/preferences.ui:66
 msgid "Tasks"
 msgstr "Задачи"
 
-#: src/res/ui/window.ui:516
+#: errands/resources/ui/window.ui:516
 msgid "Delete completed tasks"
 msgstr "Удалить выполненные задачи"
 
-#: src/res/ui/window.ui:522
+#: errands/resources/ui/window.ui:522
 msgid "Exit edit mode"
 msgstr "Выйти из режима редактирования"
 
-#: src/res/ui/window.ui:528
+#: errands/resources/ui/window.ui:528
 msgid "Sync/Fetch Tasks"
 msgstr "Синхронизировать задачи"
 
-#: src/res/ui/window.ui:545
+#: errands/resources/ui/window.ui:545
 msgid "translator-credits"
 msgstr "Vlad Krupinski <mrvladus@yandex.ru>"
 
-#: src/res/ui/window.ui:581
+#: errands/resources/ui/window.ui:581
 msgid "Are you sure?"
 msgstr "Вы уверены?"
 
-#: src/res/ui/window.ui:582
+#: errands/resources/ui/window.ui:582
 msgid "Tasks will be permanently deleted"
 msgstr "Задачи будут безвозвратно удалены"
 
-#: src/res/ui/window.ui:587
+#: errands/resources/ui/window.ui:587
 msgid "Cancel"
 msgstr "Отмена"
 
-#: src/res/ui/window.ui:588 src/res/ui/task.ui:13
+#: errands/resources/ui/window.ui:588 errands/resources/ui/task.ui:13
 msgid "Delete"
 msgstr "Удалить"
 
-#: src/res/ui/preferences.ui:14
+#: errands/resources/ui/preferences.ui:14
 msgid "Application Theme"
 msgstr "Тема"
 
-#: src/res/ui/preferences.ui:19
+#: errands/resources/ui/preferences.ui:19
 msgid "System"
 msgstr "Системная"
 
-#: src/res/ui/preferences.ui:33
+#: errands/resources/ui/preferences.ui:33
 msgid "Light"
 msgstr "Светлая"
 
-#: src/res/ui/preferences.ui:48
+#: errands/resources/ui/preferences.ui:48
 msgid "Dark"
 msgstr "Темная"
 
-#: src/res/ui/preferences.ui:71
+#: errands/resources/ui/preferences.ui:71
 msgid "Expand Sub-Tasks on Startup"
 msgstr "Раскрывать подзадачи при старте"
 
-#: src/res/ui/preferences.ui:87
+#: errands/resources/ui/preferences.ui:87
 msgid "Sync"
 msgstr "Синхронизация"
 
-#: src/res/ui/preferences.ui:92
+#: errands/resources/ui/preferences.ui:92
 msgid "Sync Provider"
 msgstr "Способ синхронизации"
 
-#: src/res/ui/preferences.ui:96
+#: errands/resources/ui/preferences.ui:96
 msgid "Disabled"
 msgstr "Отключено"
 
-#: src/res/ui/preferences.ui:111
+#: errands/resources/ui/preferences.ui:111
 msgid "Server URL"
 msgstr "URL сервера"
 
-#: src/res/ui/preferences.ui:118
+#: errands/resources/ui/preferences.ui:118
 msgid "Username"
 msgstr "Имя пользователя"
 
-#: src/res/ui/preferences.ui:125
+#: errands/resources/ui/preferences.ui:125
 msgid "Password"
 msgstr "Пароль"
 
-#: src/res/ui/preferences.ui:132
+#: errands/resources/ui/preferences.ui:132
 msgid "Calendar Name (\"Errands\" by Default)"
 msgstr "Имя календаря (\"Errands\" по умолчанию)"
 
-#: src/res/ui/preferences.ui:141
+#: errands/resources/ui/preferences.ui:141
 msgid "Token"
 msgstr "Токен"
 
-#: src/res/ui/preferences.ui:148
+#: errands/resources/ui/preferences.ui:148
 msgid "Test Connection"
 msgstr "Тест соединения"
 
-#: src/res/ui/preferences.ui:151
+#: errands/resources/ui/preferences.ui:151
 msgid "Test"
 msgstr "Тест"
 
-#: src/res/ui/task.ui:17
+#: errands/resources/ui/task.ui:17
 msgid "Edit"
 msgstr "Правка"
 
-#: src/res/ui/task.ui:21
+#: errands/resources/ui/task.ui:21
 msgid "Copy"
 msgstr "Копировать"
 
-#: src/res/ui/task.ui:135 src/res/ui/task.ui:138
+#: errands/resources/ui/task.ui:139 errands/resources/ui/task.ui:142
 msgid "Mark as Completed"
 msgstr "Пометить как выполненное"
 
-#: src/res/ui/task.ui:185 src/res/ui/task.ui:188
+#: errands/resources/ui/task.ui:189 errands/resources/ui/task.ui:192
 msgid "Clear style"
 msgstr "Отчистить цвет"
 
-#: src/res/ui/task.ui:286 src/res/ui/task.ui:288
+#: errands/resources/ui/task.ui:290 errands/resources/ui/task.ui:292
 msgid "Menu"
 msgstr "Меню"
 
-#: src/res/ui/task.ui:334 src/res/ui/task.ui:337
+#: errands/resources/ui/task.ui:338 errands/resources/ui/task.ui:341
 msgid "Cancel (Escape)"
 msgstr "Отмена (Escape)"
 
-#: src/res/ui/task.ui:383
+#: errands/resources/ui/task.ui:387
 msgid "Add new Sub-Task"
 msgstr "Добавьте подзадачу"
 
-#: src/res/ui/trash_item.ui:20 src/res/ui/trash_item.ui:24
+#: errands/resources/ui/trash_item.ui:20 errands/resources/ui/trash_item.ui:24
 msgid "Restore"
 msgstr "Восстановить"
 
