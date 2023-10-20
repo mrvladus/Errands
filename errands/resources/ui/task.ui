@@ -21,10 +21,10 @@
         <attribute name="label" translatable="yes">Copy</attribute>
         <attribute name="action">task.copy</attribute>
       </item>
-      <item>
-        <attribute name="label" translatable="yes">Open With...</attribute>
+      <!-- <item>
+        <attribute name="label" translatable="yes">Open as ics</attribute>
         <attribute name="action">task.open_with</attribute>
-      </item>
+      </item> -->
     </section>
   </menu>
 
