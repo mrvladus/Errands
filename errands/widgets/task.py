@@ -33,7 +33,9 @@ class Task(Gtk.Revealer):
     is_sub_task: bool = False
     can_sync: bool = True
 
-    def __init__(self, task: dict, window: Adw.ApplicationWindow, parent=None) -> None:
+    def __init__(
+        self, task: UserDataTask, window: Adw.ApplicationWindow, parent=None
+    ) -> None:
         super().__init__()
         Log.info(f"Add {'task' if not task['parent'] else 'sub-task'}: " + task["id"])
         self.window: Adw.ApplicationWindow = window
@@ -98,8 +100,8 @@ class Task(Gtk.Revealer):
         _add_action("copy", _copy)
         _add_action("open_with", _open_with)
 
-    def add_task(self, task: dict):
-        sub_task = Task(task, self.window, self)
+    def add_task(self, task: dict) -> None:
+        sub_task: Task = Task(task, self.window, self)
         self.tasks_list.append(sub_task)
         sub_task.toggle_visibility(not task["deleted"])
         if not self.just_added:
@@ -114,7 +116,7 @@ class Task(Gtk.Revealer):
         self.update_status()
         self.window.update_status()
 
-    def _check_is_sub(self):
+    def _check_is_sub(self) -> None:
         if self.task["parent"] != "":
             self.is_sub_task = True
             self.main_box.add_css_class("sub-task")
@@ -142,7 +144,7 @@ class Task(Gtk.Revealer):
         else:
             self.expand_icon.remove_css_class("rotate")
 
-    def purge(self):
+    def purge(self) -> None:
         """
         Completely remove widget
         """
@@ -246,7 +248,7 @@ class Task(Gtk.Revealer):
             return
         # Add new sub-task
         new_sub_task: UserDataTask = TaskUtils.new_task(
-            entry.get_buffer().props.text, pid=self.task["id"]
+            entry.get_buffer().props.text, parent=self.task["id"]
         )
         data: UserDataDict = UserData.get()
         data["tasks"].append(new_sub_task)
@@ -256,7 +258,11 @@ class Task(Gtk.Revealer):
         # Clear entry
         entry.get_buffer().props.text = ""
         # Update status
+        self.just_added = True
+        self.task["completed"] = False
+        self.update_data()
         self.completed_btn.set_active(False)
+        self.just_added = False
         self.update_status()
         self.window.update_status()
         # Sync
@@ -285,12 +291,16 @@ class Task(Gtk.Revealer):
         self.text = Markup.find_url(Markup.escape(self.task["text"]))
         self.task_row.props.title = self.text
         # Toggle checkbox
+        self.just_added = True
+        self.task["completed"] = False
+        self.task["synced_caldav"] = False
+        self.update_data()
         self.completed_btn.set_active(False)
+        self.just_added = False
+        self.update_status()
         # Exit edit mode
         self.toggle_edit_mode()
         # Sync
-        self.task["synced_caldav"] = False
-        self.update_data()
         Sync.sync()
 
     @Gtk.Template.Callback()
@@ -419,6 +429,9 @@ class Task(Gtk.Revealer):
         task.purge()
         # Add new sub-task
         self.add_task(task.task.copy())
+        self.just_added = True
+        self.task["completed"] = False
+        self.update_data()
         self.completed_btn.set_active(False)
         # Update status
         task.parent.update_status()

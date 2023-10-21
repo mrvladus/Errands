@@ -14,9 +14,9 @@ from errands.utils.logging import Log
 class UserDataTask(TypedDict):
     id: str
     text: str
-    pid: str
-    cmpd: bool
-    dltd: bool
+    parent: str
+    completed: bool
+    deleted: bool
     color: str
     synced_caldav: bool
 
