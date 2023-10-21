@@ -8,6 +8,7 @@ import shutil
 from typing import TypedDict
 from gi.repository import GLib
 from __main__ import VERSION
+from errands.utils.gsettings import GSettings
 from errands.utils.logging import Log
 
 
@@ -54,6 +55,8 @@ class UserData:
         ]
         for id in orphans:
             data["tasks"].remove(id)
+        if GSettings.get("sync-provider") == 0:
+            data["deleted"].clear()
         return data
 
     @classmethod
@@ -88,6 +91,7 @@ class UserData:
     @classmethod
     def set(self, data: UserDataDict) -> None:
         with open(os.path.join(self.data_dir, "data.json"), "w") as f:
+            self.clean_orphans(data)
             json.dump(data, f, indent=4, ensure_ascii=False)
 
     # Validate data json

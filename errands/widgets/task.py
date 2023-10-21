@@ -1,5 +1,6 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
+
 import os
 from typing import Self
 from gi.repository import Gtk, Adw, Gdk, GObject, Gio, GLib
@@ -258,9 +259,9 @@ class Task(Gtk.Revealer):
         # Clear entry
         entry.get_buffer().props.text = ""
         # Update status
-        self.just_added = True
         self.task["completed"] = False
         self.update_data()
+        self.just_added = True
         self.completed_btn.set_active(False)
         self.just_added = False
         self.update_status()
@@ -291,10 +292,10 @@ class Task(Gtk.Revealer):
         self.text = Markup.find_url(Markup.escape(self.task["text"]))
         self.task_row.props.title = self.text
         # Toggle checkbox
-        self.just_added = True
         self.task["completed"] = False
         self.task["synced_caldav"] = False
         self.update_data()
+        self.just_added = True
         self.completed_btn.set_active(False)
         self.just_added = False
         self.update_status()
@@ -429,13 +430,15 @@ class Task(Gtk.Revealer):
         task.purge()
         # Add new sub-task
         self.add_task(task.task.copy())
-        self.just_added = True
         self.task["completed"] = False
         self.update_data()
+        self.just_added = True
         self.completed_btn.set_active(False)
+        self.just_added = False
         # Update status
         task.parent.update_status()
         self.update_status()
+        self.parent.update_status()
 
         # Sync
         Sync.sync()
