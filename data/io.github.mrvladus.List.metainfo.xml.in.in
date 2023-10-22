@@ -62,6 +62,7 @@
         <p>Fixed:</p>
         <ul>
           <li>Bug when all sub-tasks becomes unfinished when new sub-task added or moved.</li>
+          <li>Some sync errors</li>
         </ul>
       </description>
     </release>
