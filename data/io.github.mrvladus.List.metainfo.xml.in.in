@@ -57,6 +57,14 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="45.0.3" date="2023-10-22">
+      <description translatable="no">
+        <p>Fixed:</p>
+        <ul>
+          <li>Bug when all sub-tasks becomes unfinished when new sub-task added or moved.</li>
+        </ul>
+      </description>
+    </release>
     <release version="45.0.2" date="2023-10-19">
       <description translatable="no">
         <p>Fixed:</p>
