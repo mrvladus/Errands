@@ -108,10 +108,10 @@ class SyncProviderCalDAV:
             url=self.url, username=self.username, password=self.password
         ) as client:
             try:
-                self.principal: Principal = client.principal()
+                principal: Principal = client.principal()
                 Log.info(f"Connected to {self.name} server at '{self.url}'")
                 self.can_sync = True
-                self._setup_calendar(self.principal)
+                self._setup_calendar(principal)
                 self.window.sync_btn.set_visible(True)
             except:
                 Log.error(f"Can't connect to {self.name} server at '{self.url}'")
@@ -205,8 +205,8 @@ class SyncProviderCalDAV:
 
         UserData.set(data)
 
-    def _setup_calendar(self) -> None:
-        calendars: list[Calendar] = self.principal.calendars()
+    def _setup_calendar(self, principal: Principal) -> None:
+        calendars: list[Calendar] = principal.calendars()
         cal_name: str = GSettings.get("sync-cal-name")
         cal_exists: bool = False
         errands_cal_exists: bool = False
@@ -219,12 +219,12 @@ class SyncProviderCalDAV:
                 errands_cal_exists = True
         if not cal_exists and cal_name != "":
             Log.debug(f"Create new calendar '{cal_name}' on {self.name}")
-            self.calendar = self.principal.make_calendar(
+            self.calendar = principal.make_calendar(
                 cal_name, supported_calendar_component_set=["VTODO"]
             )
         if not errands_cal_exists and cal_name == "":
             Log.debug(f"Create new calendar 'Errands' on {self.name}")
-            self.calendar = self.principal.make_calendar(
+            self.calendar = principal.make_calendar(
                 "Errands", supported_calendar_component_set=["VTODO"]
             )
 
