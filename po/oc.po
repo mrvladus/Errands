@@ -19,7 +19,7 @@ msgstr ""
 
 #: errands/widgets/window.py:111
 msgid "Export Cancelled"
-msgstr ""
+msgstr "Exportacion anullada"
 
 #: errands/widgets/window.py:117
 msgid "Tasks Exported"
@@ -27,15 +27,15 @@ msgstr "Prètzfaches exportats"
 
 #: errands/widgets/window.py:120
 msgid "Error"
-msgstr ""
+msgstr "Error"
 
 #: errands/widgets/window.py:137
 msgid "Import Cancelled"
-msgstr ""
+msgstr "Importacion anullada"
 
 #: errands/widgets/window.py:146
 msgid "Invalid File"
-msgstr ""
+msgstr "Fichièr invalid"
 
 #: errands/widgets/window.py:164
 msgid "Tasks Imported"
@@ -52,11 +52,11 @@ msgstr "Copiat al quichapapièrs"
 #. pyright:ignore
 #: errands/utils/sync.py:80
 msgid "Not all sync credentials provided. Please check settings."
-msgstr ""
+msgstr "Totes los identificants son pas provesits. Verificatz los paramètres se vos plai."
 
 #: errands/utils/sync.py:120
 msgid "Can't connect to CalDAV server at:"
-msgstr ""
+msgstr "Connexion impossibla al servidor CalDAV de :"
 
 #: errands/resources/ui/window.ui:26
 msgid "Deleted Tasks"
@@ -169,11 +169,11 @@ msgstr "Suprimir los prètzfaches acabats"
 
 #: errands/resources/ui/window.ui:522
 msgid "Exit edit mode"
-msgstr ""
+msgstr "Sortir del mòde edicion"
 
 #: errands/resources/ui/window.ui:528
 msgid "Sync/Fetch Tasks"
-msgstr ""
+msgstr "Sincro/Recuperacion prètzfaches"
 
 #: errands/resources/ui/window.ui:545
 msgid "translator-credits"
@@ -217,43 +217,43 @@ msgstr "Espandir la lista dels prètzfaches a l’aviada"
 
 #: errands/resources/ui/preferences.ui:87
 msgid "Sync"
-msgstr ""
+msgstr "Sincro."
 
 #: errands/resources/ui/preferences.ui:92
 msgid "Sync Provider"
-msgstr ""
+msgstr "Provesidor de sincro."
 
 #: errands/resources/ui/preferences.ui:96
 msgid "Disabled"
-msgstr ""
+msgstr "Desactivat"
 
 #: errands/resources/ui/preferences.ui:111
 msgid "Server URL"
-msgstr ""
+msgstr "URL servidor"
 
 #: errands/resources/ui/preferences.ui:118
 msgid "Username"
-msgstr ""
+msgstr "Nom d'utilizaire"
 
 #: errands/resources/ui/preferences.ui:125
 msgid "Password"
-msgstr ""
+msgstr "Senhal"
 
 #: errands/resources/ui/preferences.ui:132
 msgid "Calendar Name (\"Errands\" by Default)"
-msgstr ""
+msgstr "Nom del calendièr"
 
 #: errands/resources/ui/preferences.ui:141
 msgid "Token"
-msgstr ""
+msgstr "Geton"
 
 #: errands/resources/ui/preferences.ui:148
 msgid "Test Connection"
-msgstr ""
+msgstr "Ensajar connexion"
 
 #: errands/resources/ui/preferences.ui:151
 msgid "Test"
-msgstr ""
+msgstr "Ensag"
 
 #: errands/resources/ui/task.ui:17
 msgid "Edit"
@@ -277,7 +277,7 @@ msgstr "Menú"
 
 #: errands/resources/ui/task.ui:338 errands/resources/ui/task.ui:341
 msgid "Cancel (Escape)"
-msgstr ""
+msgstr "Anullar (Escape)"
 
 #: errands/resources/ui/task.ui:387
 msgid "Add new Sub-Task"
