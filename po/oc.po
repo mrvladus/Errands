@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-20 13:24+0300\n"
+"POT-Creation-Date: 2023-10-23 19:48+0300\n"
 "PO-Revision-Date: 2023-09-21 20:23+0200\n"
 "Last-Translator: Quentin PAGÈS\n"
 "Language-Team: \n"
@@ -41,18 +41,20 @@ msgstr "Fichièr invalid"
 msgid "Tasks Imported"
 msgstr "Prètzfaches importats"
 
-#: errands/widgets/window.py:334 errands/widgets/task.py:170
+#: errands/widgets/window.py:334 errands/widgets/task.py:173
 msgid "Completed:"
 msgstr "Acabat :"
 
-#: errands/widgets/task.py:77
+#: errands/widgets/task.py:80
 msgid "Copied to Clipboard"
 msgstr "Copiat al quichapapièrs"
 
 #. pyright:ignore
 #: errands/utils/sync.py:80
 msgid "Not all sync credentials provided. Please check settings."
-msgstr "Totes los identificants son pas provesits. Verificatz los paramètres se vos plai."
+msgstr ""
+"Totes los identificants son pas provesits. Verificatz los paramètres se vos "
+"plai."
 
 #: errands/utils/sync.py:120
 msgid "Can't connect to CalDAV server at:"
@@ -293,6 +295,7 @@ msgid "Errands"
 msgstr "Errands"
 
 #: data/io.github.mrvladus.List.desktop.in.in:5
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:39
 msgid "Manage your tasks"
 msgstr "Gerir vòstres prètzfaches"
 
@@ -300,3 +303,32 @@ msgstr "Gerir vòstres prètzfaches"
 #: data/io.github.mrvladus.List.desktop.in.in:12
 msgid "errands;tasks;list;todo;todos;"
 msgstr "errands;tasks;list;todo;todos;prètzfaches;prètzfait;lista;tièra;"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:41
+msgid "Todo application for those who prefer simplicity."
+msgstr ""
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:42
+msgid "Features:"
+msgstr ""
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:44
+msgid "Add, remove, edit tasks and sub-tasks"
+msgstr ""
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:45
+#, fuzzy
+msgid "Mark task and sub-tasks as completed"
+msgstr "Marcar coma acabat"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:46
+msgid "Add accent color for each task"
+msgstr ""
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:47
+msgid "Sync tasks with Nextcloud or other CalDAV providers"
+msgstr ""
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:48
+msgid "Drag and Drop support"
+msgstr ""
