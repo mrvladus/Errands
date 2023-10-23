@@ -1,0 +1,71 @@
+Check list for new releases
+
+- Add task:
+	- Window is scrolled to the bottom of the page
+- Add sub-task:
+	- Task becomes un-completed but not its sub-tasks
+- Edit task:
+	- Task text is changed
+- Apply accent colors
+- Complete task:
+	- Check button toggles
+	- Text becomes strikethrough
+	- Completing task completes all sub-tasks
+	- Un-completing task un-completes all sub-tasks
+	- Status changing correctly
+- Delete task:
+	- Task becomes completed
+	- Task becomes hidden
+	- Task appears in trash
+	- Status changing correctly
+- Copy task text:
+	- Text copied
+	- Show toast
+- Drag and Drop:
+	- Move to siblings "+" area:
+		- Task changing position
+		- Task state is unchanged
+	- Move to sub-task "+" area:
+		- Task deletes itself
+		- New sub-task is created with same state
+		- New parent becomes un-completed
+		- Status of the old parent is updated
+		- Status of the new parent is updated
+- "Delete completed tasks" button:
+	- Shows when completed and un-deleted tasks exists
+- "Scroll up" button:
+	- Shows when window is scrolled
+	- Overlay button shows on small screen sizes instead of headerbar
+- Trash:
+	- Filled on startup
+	- Status page shows if epmty
+	- "Clear trash" button shows when not empty:
+		- Trash is cleared
+		- All widgets are deleted
+		- "deleted" array in user data are extended with new items or cleared if sync is disabled
+	- "Restore all" button restores all tasks and removes all trash items
+- Window:
+	- Size is remembered
+	- Theme is remembered
+	- Sidebar is remembered
+- About window:
+	- Version is correct
+- Sync:
+	- Preferences fields is showing correctly for each provider
+	- Test button works
+	- Toasts working
+	- "Sync/Fetch" button is showing when sync available
+	- URL is changed for Nextcloud
+	- Calendar is created if needed and used if exists
+	- Tasks fetched on startup and "Sync/Fetch" button click
+	- Tasks synced when:
+		- Added
+		- Changed text
+		- Changed color
+		- Completed/un-completed
+		- Moved
+		- Deleted completely
+		- Connection is restored
+	
+	
+		
