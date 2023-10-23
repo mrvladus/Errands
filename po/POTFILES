@@ -11,3 +11,4 @@ errands/resources/ui/trash_item.ui
 
 # Data
 data/io.github.mrvladus.List.desktop.in.in
+data/io.github.mrvladus.List.metainfo.xml.in.in
