@@ -37,7 +37,7 @@ endif
 
 install_data(
   configure_file(
-    input: 'io.github.mrvladus.List.gschema.xml',
+    input: 'io.github.mrvladus.List.gschema.xml.in',
     output: app_id + '.gschema.xml',
     configuration: conf
   ),
