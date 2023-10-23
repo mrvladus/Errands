@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-20 13:24+0300\n"
-"PO-Revision-Date: 2023-08-10 21:16+0200\n"
-"Last-Translator: Christoph Bähr\n"
+"PO-Revision-Date: 2023-10-23 11:03+0200\n"
+"Last-Translator: Philipp Kiemle <philipp.kiemle@gmail.com>\n"
 "Language-Team: \n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.3.2\n"
+"X-Generator: Poedit 3.4\n"
 
 #: errands/widgets/window.py:111
 msgid "Export Cancelled"
@@ -47,16 +47,18 @@ msgstr "Erledigt:"
 
 #: errands/widgets/task.py:77
 msgid "Copied to Clipboard"
-msgstr "Zur Zwischenablage kopiert"
+msgstr "In Zwischenablage kopiert"
 
 #. pyright:ignore
 #: errands/utils/sync.py:80
 msgid "Not all sync credentials provided. Please check settings."
-msgstr "Einige Zugangsdaten fehlen. Bitte überprüfen Sie die Einstellungen."
+msgstr ""
+"Einige Synchonisations-Zugangsdaten fehlen. Bitte überprüfen Sie die "
+"Einstellungen."
 
 #: errands/utils/sync.py:120
 msgid "Can't connect to CalDAV server at:"
-msgstr "Verbindung mit CalDAV Server kann nicht hergestellt werden:"
+msgstr "Verbindung folgendem CalDAV-Server kann nicht hergestellt werden:"
 
 #: errands/resources/ui/window.ui:26
 msgid "Deleted Tasks"
@@ -80,7 +82,7 @@ msgstr "In den Papierkorb verschieben"
 
 #: errands/resources/ui/window.ui:130
 msgid "Empty Trash"
-msgstr "Papierkorb löschen"
+msgstr "Papierkorb leeren"
 
 #: errands/resources/ui/window.ui:131
 msgid "No deleted items"
@@ -88,11 +90,11 @@ msgstr "Keine gelöschten Aufgaben"
 
 #: errands/resources/ui/window.ui:192 errands/resources/ui/window.ui:195
 msgid "Show Deleted Tasks"
-msgstr "Zeige gelöschte Aufgaben"
+msgstr "Gelöschte Aufgaben anzeigen"
 
 #: errands/resources/ui/window.ui:221 errands/resources/ui/window.ui:224
 msgid "Delete Completed Tasks (Ctrl+Delete)"
-msgstr "Lösche abgeschlossene Aufgaben (Ctrl+Delete)"
+msgstr "Abgeschlossene Aufgaben löschen (Strg + Entf)"
 
 #: errands/resources/ui/window.ui:248 errands/resources/ui/window.ui:250
 msgid "Main Menu"
@@ -100,7 +102,7 @@ msgstr "Hauptmenü"
 
 #: errands/resources/ui/window.ui:260 errands/resources/ui/window.ui:263
 msgid "Sync/Fetch Tasks (Ctrl+S)"
-msgstr "Aufgaben synchronisieren (Ctrl+S)"
+msgstr "Aufgaben synchronisieren/holen (Strg + S)"
 
 #: errands/resources/ui/window.ui:287 errands/resources/ui/window.ui:290
 #: errands/resources/ui/window.ui:399 errands/resources/ui/window.ui:402
@@ -113,11 +115,11 @@ msgstr "Neue Aufgabe hinzufügen"
 
 #: errands/resources/ui/window.ui:429
 msgid "Export Tasks..."
-msgstr "Aufgaben exportieren..."
+msgstr "Aufgaben exportieren …"
 
 #: errands/resources/ui/window.ui:433
 msgid "Import Tasks..."
-msgstr "Aufgaben importieren..."
+msgstr "Aufgaben importieren …"
 
 #: errands/resources/ui/window.ui:439 errands/resources/ui/window.ui:478
 msgid "Preferences"
@@ -129,7 +131,7 @@ msgstr "Tastenkürzel"
 
 #: errands/resources/ui/window.ui:447
 msgid "About Errands"
-msgstr "Über Errands"
+msgstr "Info zu Errands"
 
 #: errands/resources/ui/window.ui:463
 msgid "General"
@@ -141,7 +143,7 @@ msgstr "Tastenkürzel anzeigen"
 
 #: errands/resources/ui/window.ui:472
 msgid "Toggle sidebar"
-msgstr "Seitenleiste anzeigen"
+msgstr "Seitenleiste ein-/ausblenden"
 
 #: errands/resources/ui/window.ui:484
 msgid "Quit"
@@ -165,19 +167,21 @@ msgstr "Aufgaben"
 
 #: errands/resources/ui/window.ui:516
 msgid "Delete completed tasks"
-msgstr "Lösche abgeschlossene Aufgaben"
+msgstr "Abgeschlossene Aufgaben löschen"
 
 #: errands/resources/ui/window.ui:522
 msgid "Exit edit mode"
-msgstr ""
+msgstr "Bearbeitungsmodus verlassen"
 
 #: errands/resources/ui/window.ui:528
 msgid "Sync/Fetch Tasks"
-msgstr "Aufgaben synchronisieren"
+msgstr "Aufgaben synchronisieren/holen"
 
 #: errands/resources/ui/window.ui:545
 msgid "translator-credits"
-msgstr "Christoph Bähr"
+msgstr ""
+"Christoph Bähr\n"
+"Philipp Kiemle <philipp.kiemle@gmail.com>"
 
 #: errands/resources/ui/window.ui:581
 msgid "Are you sure?"
@@ -185,7 +189,7 @@ msgstr "Sind Sie sicher?"
 
 #: errands/resources/ui/window.ui:582
 msgid "Tasks will be permanently deleted"
-msgstr "Die Aufgaben werden un­wi­der­ruf­lich gelöscht"
+msgstr "Aufgaben werden un­wi­der­ruf­lich gelöscht"
 
 #: errands/resources/ui/window.ui:587
 msgid "Cancel"
@@ -197,7 +201,7 @@ msgstr "Löschen"
 
 #: errands/resources/ui/preferences.ui:14
 msgid "Application Theme"
-msgstr "Darstellung"
+msgstr "Anwendungsthema"
 
 #: errands/resources/ui/preferences.ui:19
 msgid "System"
@@ -213,15 +217,15 @@ msgstr "Dunkel"
 
 #: errands/resources/ui/preferences.ui:71
 msgid "Expand Sub-Tasks on Startup"
-msgstr "Unteraufgaben beim Start ausfahren"
+msgstr "Unteraufgaben beim Start ausklappen"
 
 #: errands/resources/ui/preferences.ui:87
 msgid "Sync"
-msgstr "Sync"
+msgstr "Synchronisierung"
 
 #: errands/resources/ui/preferences.ui:92
 msgid "Sync Provider"
-msgstr "Sync Anbieter"
+msgstr "Synchronisierungsanbieter"
 
 #: errands/resources/ui/preferences.ui:96
 msgid "Disabled"
@@ -241,7 +245,7 @@ msgstr "Passwort"
 
 #: errands/resources/ui/preferences.ui:132
 msgid "Calendar Name (\"Errands\" by Default)"
-msgstr "Kalendername (stan­dard­mä­ßig \"Errands\")"
+msgstr "Kalendername (Vorgabe: »Errands«)"
 
 #: errands/resources/ui/preferences.ui:141
 msgid "Token"
@@ -253,7 +257,7 @@ msgstr "Verbindung überprüfen"
 
 #: errands/resources/ui/preferences.ui:151
 msgid "Test"
-msgstr "Überprüfung"
+msgstr "Überprüfen"
 
 #: errands/resources/ui/task.ui:17
 msgid "Edit"
@@ -269,7 +273,7 @@ msgstr "Als abgeschlossen markieren"
 
 #: errands/resources/ui/task.ui:189 errands/resources/ui/task.ui:192
 msgid "Clear style"
-msgstr "Style entfernen"
+msgstr "Stil entfernen"
 
 #: errands/resources/ui/task.ui:290 errands/resources/ui/task.ui:292
 msgid "Menu"
@@ -277,11 +281,11 @@ msgstr "Menü"
 
 #: errands/resources/ui/task.ui:338 errands/resources/ui/task.ui:341
 msgid "Cancel (Escape)"
-msgstr ""
+msgstr "Abbrechen (Esc)"
 
 #: errands/resources/ui/task.ui:387
 msgid "Add new Sub-Task"
-msgstr "Neue Unteraufgabe anlegen"
+msgstr "Neue Unteraufgabe hinzufügen"
 
 #: errands/resources/ui/trash_item.ui:20 errands/resources/ui/trash_item.ui:24
 msgid "Restore"
@@ -290,7 +294,7 @@ msgstr "Wiederherstellen"
 #. TRANSLATORS: Don't translate
 #: data/io.github.mrvladus.List.desktop.in.in:4
 msgid "Errands"
-msgstr ""
+msgstr "Errands"
 
 #: data/io.github.mrvladus.List.desktop.in.in:5
 msgid "Manage your tasks"
@@ -299,4 +303,4 @@ msgstr "Verwalten Sie Ihre Aufgaben"
 #. TRANSLATORS: Don't translate
 #: data/io.github.mrvladus.List.desktop.in.in:12
 msgid "errands;tasks;list;todo;todos;"
-msgstr ""
+msgstr "errands;tasks;list;todo;todos;Aufgaben;Liste;"
