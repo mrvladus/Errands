@@ -56,6 +56,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
         self.sync_cal_name.set_visible(0 < selected < 3)
         self.sync_token.set_visible(0 < selected > 3)
         self.test_connection_row.set_visible(selected > 0)
+        self.window.sync_btn.set_visible(selected > 0)
 
     # --- Template handlers --- #
 
