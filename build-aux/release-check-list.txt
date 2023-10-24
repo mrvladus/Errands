@@ -66,6 +66,10 @@ Check list for new releases
 		- Moved
 		- Deleted completely
 		- Connection is restored
-	
+	- Correct error handling for:
+		- No connection
+		- No calendar
+		- No tasks
+		- No credentials
 	
 		
