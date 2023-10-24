@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-23 19:48+0300\n"
-"PO-Revision-Date: 2023-10-17 17:49+0200\n"
+"PO-Revision-Date: 2023-10-24 17:56+0200\n"
 "Last-Translator: Irénée THIRION <irenee.thirion@e.email>\n"
 "Language-Team: French <gnomefr@traduc.org>\n"
 "Language: fr\n"
@@ -307,29 +307,29 @@ msgstr "errands;tâches;task;liste;todos;à faire;post-it;"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:41
 msgid "Todo application for those who prefer simplicity."
-msgstr ""
+msgstr "Application de tâches pour ceux appréciant la simplicité."
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:42
 msgid "Features:"
-msgstr ""
+msgstr "Fonctionnalités :"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:44
 msgid "Add, remove, edit tasks and sub-tasks"
-msgstr ""
+msgstr "Ajouter, supprimer, éditer des tâches et sous-tâches"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:45
-#, fuzzy
 msgid "Mark task and sub-tasks as completed"
-msgstr "Marquer comme terminée"
+msgstr "Marquer les tâches et sous-tâches comme terminées"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:46
 msgid "Add accent color for each task"
-msgstr ""
+msgstr "Thème de couleurs pour chaque tâche"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:47
 msgid "Sync tasks with Nextcloud or other CalDAV providers"
 msgstr ""
+"Synchronisation des tâches avec Nextcloud ou d’autres fournisseur CalDAV"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:48
 msgid "Drag and Drop support"
-msgstr ""
+msgstr "Prise en charge du glisser-déposer"
