@@ -25,11 +25,12 @@
 - Drag and Drop support
 
 ## Install
+### Flatpak
 Errands is available as a Flatpak on Flathub:
 
 <a href="https://flathub.org/apps/details/io.github.mrvladus.List"><img width='240' alt='Download on Flathub' src='https://dl.flathub.org/assets/badges/flathub-badge-en.png'/></a>
 
-## Building using GNOME Builder
+### Building using GNOME Builder
 1. Install [GNOME Builder](https://flathub.org/apps/org.gnome.Builder).
 2. Click "Clone Repository" with `https://github.com/mrvladus/Errands.git` as the URL.
 3. Click on the build button at the top.
