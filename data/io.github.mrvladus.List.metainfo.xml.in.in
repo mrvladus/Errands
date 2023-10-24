@@ -57,6 +57,23 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="45.0.5" date="2023-10-25">
+      <description translatable="no">
+        <p>Improved:</p>
+        <ul>
+          <li>Startup with sync enabled is now async and faster</li>
+          <li>Sync button appears when sync provider is selected now</li>
+        </ul>
+        <p>Fixed:</p>
+        <ul>
+          <li>Contrast for links in dark mode</li>
+        </ul>
+        <p>Translations:</p>
+        <ul>
+          <li></li>
+        </ul>
+      </description>
+    </release>
     <release version="45.0.4" date="2023-10-23">
       <description translatable="no">
         <p>Fixed:</p>
