@@ -51,20 +51,24 @@ class Window(Adw.ApplicationWindow):
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
         # Remember window state
+        Log.debug("Getting window settings")
         GSettings.bind("width", self, "default_width")
         GSettings.bind("height", self, "default_height")
         GSettings.bind("maximized", self, "maximized")
         GSettings.bind("sidebar-open", self.toggle_trash_btn, "active")
         # Setup theme
+        Log.debug("Setting theme")
         Adw.StyleManager.get_default().set_color_scheme(GSettings.get("theme"))
+        Log.debug("Present window")
         self.present()
 
     def perform_startup(self) -> None:
         """
         Startup func. Call after window is presented.
         """
+        Log.debug("Window startup")
+        Sync.window = self
         self._create_actions()
-        Sync.init(self)
         self._load_tasks()
         self.startup = False
 
@@ -81,6 +85,7 @@ class Window(Adw.ApplicationWindow):
         """
         Create actions for main menu
         """
+        Log.debug("Creating actions")
 
         def _create_action(name: str, callback: callable, shortcuts=None) -> None:
             action: Gio.SimpleAction = Gio.SimpleAction.new(name, None)
@@ -211,6 +216,7 @@ class Window(Adw.ApplicationWindow):
 
     def _load_tasks(self) -> None:
         Log.debug("Loading tasks")
+
         for task in UserData.get()["tasks"]:
             if not task["parent"]:
                 self.add_task(task)
@@ -423,6 +429,8 @@ class Window(Adw.ApplicationWindow):
         """
         Hide completed tasks and move them to trash
         """
+        Log.info("Delete completed tasks")
+
         for task in self.get_all_tasks():
             if task.task["completed"] and not task.task["deleted"]:
                 task.delete()
@@ -434,6 +442,7 @@ class Window(Adw.ApplicationWindow):
 
     @Gtk.Template.Callback()
     def on_trash_clear(self, _) -> None:
+        Log.debug("Show confirm dialog")
         self.confirm_dialog.show()
 
     @Gtk.Template.Callback()
@@ -467,6 +476,7 @@ class Window(Adw.ApplicationWindow):
 
     @Gtk.Template.Callback()
     def on_trash_close(self, _) -> None:
+        Log.debug("Close sidebar")
         self.split_view.set_show_sidebar(False)
 
     @Gtk.Template.Callback()
@@ -504,6 +514,7 @@ class Window(Adw.ApplicationWindow):
         """
         Move task to trash via dnd
         """
+        Log.debug(f"Drop task to trash: {task.task['id']}")
 
         task.delete()
         self.update_status()
@@ -511,7 +522,7 @@ class Window(Adw.ApplicationWindow):
     @Gtk.Template.Callback()
     def on_width_changed(self, *_) -> None:
         """
-        Breakpoints simulator. Because I can't have multiple AdwBreakpoint.
+        Breakpoints simulator
         """
         width: int = self.props.default_width
         self.scroll_up_btn_rev.set_visible(width > 400)
