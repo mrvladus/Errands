@@ -1,6 +1,6 @@
 project(
   'errands',
-  version: '45.0.4',
+  version: '45.0.5',
   meson_version: '>= 0.62.0',
 )
 

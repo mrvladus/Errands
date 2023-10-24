@@ -18,7 +18,7 @@ class Sync:
 
     @classmethod
     def init(self, testing: bool = False) -> None:
-        Log.debug("Initialize sync provider")
+        Log.debug("Sync: Initialize sync provider")
         match GSettings.get("sync-provider"):
             case 0:
                 Log.info("Sync disabled")
@@ -53,7 +53,7 @@ class SyncProviderCalDAV:
     window = None
 
     def __init__(self, name: str, window: Adw.ApplicationWindow, testing: bool) -> None:
-        Log.info(f"Initialize {name} sync provider")
+        Log.info(f"Sync: Initialize {name} sync provider")
 
         self.name: str = name
         self.window: Adw.ApplicationWindow = window
@@ -66,14 +66,14 @@ class SyncProviderCalDAV:
         return self._connect()
 
     def _check_credentials(self) -> bool:
-        Log.debug("Checking credentials")
+        Log.debug("Sync: Checking credentials")
 
         self.url: str = GSettings.get("sync-url")
         self.username: str = GSettings.get("sync-username")
         self.password: str = GSettings.get("sync-password")
 
         if self.url == "" or self.username == "" or self.password == "":
-            Log.error(f"Not all {self.name} credentials provided")
+            Log.error(f"Sync: Not all {self.name} credentials provided")
             if not self.testing:
                 self.window.add_toast(
                     _(  # pyright:ignore
@@ -87,7 +87,7 @@ class SyncProviderCalDAV:
         return True
 
     def _check_url(self) -> None:
-        Log.debug("Checking URL")
+        Log.debug("Sync: Checking URL")
 
         # Add prefix if needed
         if not self.url.startswith("http"):
@@ -105,22 +105,22 @@ class SyncProviderCalDAV:
         if self.name == "CalDAV":
             self.url = GSettings.get("sync-url")
 
-        Log.debug(f"URL is set to {self.url}")
+        Log.debug(f"Sync: URL is set to {self.url}")
 
     def _connect(self) -> bool:
-        Log.debug(f"Attempting connection")
+        Log.debug(f"Sync: Attempting connection")
 
         with DAVClient(
             url=self.url, username=self.username, password=self.password
         ) as client:
             try:
                 principal: Principal = client.principal()
-                Log.info(f"Connected to {self.name} server at '{self.url}'")
+                Log.info(f"Sync: Connected to {self.name} server at '{self.url}'")
                 self.can_sync = True
                 self._setup_calendar(principal)
                 self.window.sync_btn.set_visible(True)
             except:
-                Log.error(f"Can't connect to {self.name} server at '{self.url}'")
+                Log.error(f"Sync: Can't connect to {self.name} server at '{self.url}'")
                 if not self.testing:
                     self.window.add_toast(
                         _("Can't connect to CalDAV server at:")  # pyright:ignore
@@ -151,7 +151,7 @@ class SyncProviderCalDAV:
                 tasks.append(data)
             return tasks
         except:
-            Log.error(f"Can't get tasks from CalDAV")
+            Log.error(f"Sync: Can't get tasks from CalDAV")
             return []
 
     def _fetch(self):
@@ -159,7 +159,7 @@ class SyncProviderCalDAV:
         Update local tasks that was changed on CalDAV
         """
 
-        Log.debug(f"Fetch tasks from {self.name}")
+        Log.debug(f"Sync: Fetch tasks from {self.name}")
 
         caldav_tasks: list[dict] | None = self._get_tasks()
         if not caldav_tasks:
@@ -181,11 +181,13 @@ class SyncProviderCalDAV:
                                 task[key] = caldav_task[key]
                                 updated = True
                         if updated:
-                            Log.debug(f"Update local task from CalDAV: {task['id']}")
+                            Log.debug(
+                                f"Sync: Update local task from CalDAV: {task['id']}"
+                            )
                         break
             # Delete local task that was deleted on CalDAV
             if task["id"] not in caldav_ids and task["synced_caldav"]:
-                Log.debug(f"Delete local task deleted on CalDAV: {task['id']}")
+                Log.debug(f"Sync: Delete local task deleted on CalDAV: {task['id']}")
                 to_delete.append(task)
 
         # Remove deleted on CalDAV tasks from data
@@ -196,7 +198,7 @@ class SyncProviderCalDAV:
         l_ids: list[str] = [t["id"] for t in data["tasks"]]
         for task in caldav_tasks:
             if task["id"] not in l_ids and task["id"] not in data["deleted"]:
-                Log.debug(f"Copy new task from CalDAV: {task['id']}")
+                Log.debug(f"Sync: Copy new task from CalDAV: {task['id']}")
                 new_task: dict = TaskUtils.new_task(
                     task["text"],
                     task["id"],
@@ -211,7 +213,7 @@ class SyncProviderCalDAV:
         UserData.set(data)
 
     def _setup_calendar(self, principal: Principal) -> None:
-        Log.debug(f"Setting up calendars")
+        Log.debug(f"Sync: Setting up calendars")
 
         calendars: list[Calendar] = principal.calendars()
         cal_name: str = GSettings.get("sync-cal-name")
@@ -219,20 +221,20 @@ class SyncProviderCalDAV:
         errands_cal_exists: bool = False
         for cal in calendars:
             if cal.name == cal_name:
-                Log.debug(f"Found calendar '{cal_name}'")
+                Log.debug(f"Sync: Found calendar '{cal_name}'")
                 self.calendar = cal
                 cal_exists = True
             elif cal.name == "Errands" and cal_name == "":
-                Log.debug(f"Found calendar Errands")
+                Log.debug(f"Sync: Found calendar Errands")
                 self.calendar = cal
                 errands_cal_exists = True
         if not cal_exists and cal_name != "":
-            Log.debug(f"Create new calendar '{cal_name}' on {self.name}")
+            Log.debug(f"Sync: Create new calendar '{cal_name}' on {self.name}")
             self.calendar = principal.make_calendar(
                 cal_name, supported_calendar_component_set=["VTODO"]
             )
         if not errands_cal_exists and cal_name == "":
-            Log.debug(f"Create new calendar 'Errands' on {self.name}")
+            Log.debug(f"Sync: Create new calendar 'Errands' on {self.name}")
             self.calendar = principal.make_calendar(
                 "Errands", supported_calendar_component_set=["VTODO"]
             )
@@ -244,7 +246,7 @@ class SyncProviderCalDAV:
         # self._setup_calendar()
         caldav_tasks: list[dict] = self._get_tasks()
 
-        Log.info(f"Sync tasks with {self.name}")
+        Log.info(f"Sync: Sync tasks with {self.name}")
 
         data: UserDataDict = UserData.get()
         caldav_ids: list[str] = [task["id"] for task in caldav_tasks]
@@ -253,7 +255,7 @@ class SyncProviderCalDAV:
             # Create new task on CalDAV that was created offline
             if task["id"] not in caldav_ids and not task["synced_caldav"]:
                 try:
-                    Log.debug(f"Create new task on CalDAV: {task['id']}")
+                    Log.debug(f"Sync: Create new task on CalDAV: {task['id']}")
                     new_todo = self.calendar.save_todo(
                         uid=task["id"],
                         summary=task["text"],
@@ -264,12 +266,12 @@ class SyncProviderCalDAV:
                         new_todo.complete()
                     task["synced_caldav"] = True
                 except:
-                    Log.error(f"Error creating new task on CalDAV: {task['id']}")
+                    Log.error(f"Sync: Error creating new task on CalDAV: {task['id']}")
 
             # Update task on CalDAV that was changed locally
             elif task["id"] in caldav_ids and not task["synced_caldav"]:
                 try:
-                    Log.debug(f"Update task on CalDAV: {task['id']}")
+                    Log.debug(f"Sync: Update task on CalDAV: {task['id']}")
                     todo: CalendarObjectResource = self.calendar.todo_by_uid(task["id"])
                     todo.uncomplete()
                     todo.icalendar_component["summary"] = task["text"]
@@ -280,16 +282,16 @@ class SyncProviderCalDAV:
                         todo.complete()
                     task["synced_caldav"] = True
                 except:
-                    Log.error(f"Error updating task on CalDAV: {task['id']}")
+                    Log.error(f"Sync: Error updating task on CalDAV: {task['id']}")
 
         # Delete tasks on CalDAV if they were deleted locally
         for task_id in data["deleted"]:
             try:
-                Log.debug(f"Delete task from CalDAV: {task_id}")
+                Log.debug(f"Sync: Delete task from CalDAV: {task_id}")
                 todo: CalendarObjectResource = self.calendar.todo_by_uid(task_id)
                 todo.delete()
             except:
-                Log.error(f"Can't delete task from CalDAV: {task_id}")
+                Log.error(f"Sync: Can't delete task from CalDAV: {task_id}")
         data["deleted"] = []
 
         UserData.set(data)
