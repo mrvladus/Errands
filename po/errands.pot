@@ -10,44 +10,44 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-23 19:48+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Last-Translator: Chung-Wei Chung <webb790709@proton.me>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"Language: zh_tw\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: errands/widgets/window.py:111
 msgid "Export Cancelled"
-msgstr ""
+msgstr "匯出已取消"
 
 #: errands/widgets/window.py:117
 msgid "Tasks Exported"
-msgstr ""
+msgstr "待辦事項已匯入"
 
 #: errands/widgets/window.py:120
 msgid "Error"
-msgstr ""
+msgstr "發生錯誤"
 
 #: errands/widgets/window.py:137
 msgid "Import Cancelled"
-msgstr ""
+msgstr "匯入已取消"
 
 #: errands/widgets/window.py:146
 msgid "Invalid File"
-msgstr ""
+msgstr "不支援的檔案"
 
 #: errands/widgets/window.py:164
 msgid "Tasks Imported"
-msgstr ""
+msgstr "待辦事項已匯入"
 
 #: errands/widgets/window.py:334 errands/widgets/task.py:173
 msgid "Completed:"
-msgstr ""
+msgstr "已完成："
 
 #: errands/widgets/task.py:80
 msgid "Copied to Clipboard"
-msgstr ""
+msgstr "已複製到剪貼簿"
 
 #. pyright:ignore
 #: errands/utils/sync.py:80
@@ -56,11 +56,11 @@ msgstr ""
 
 #: errands/utils/sync.py:120
 msgid "Can't connect to CalDAV server at:"
-msgstr ""
+msgstr "無法連線到以下的 CalDAV 伺服器："
 
 #: errands/resources/ui/window.ui:26
 msgid "Deleted Tasks"
-msgstr ""
+msgstr "已刪除的待辦事項"
 
 #: errands/resources/ui/window.ui:35 errands/resources/ui/window.ui:38
 msgid "Clear"
