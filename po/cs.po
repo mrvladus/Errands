@@ -8,18 +8,18 @@ msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-23 19:48+0300\n"
-"PO-Revision-Date: 2023-09-10 13:41+0200\n"
+"PO-Revision-Date: 2023-10-25 09:09+0200\n"
 "Last-Translator: Amerey.eu <info@amerey.eu>\n"
 "Language-Team: \n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.3.1\n"
+"X-Generator: Poedit 3.4\n"
 
 #: errands/widgets/window.py:111
 msgid "Export Cancelled"
-msgstr ""
+msgstr "Export byl zrušen"
 
 #: errands/widgets/window.py:117
 msgid "Tasks Exported"
@@ -27,15 +27,15 @@ msgstr "Úkoly byly exportovány"
 
 #: errands/widgets/window.py:120
 msgid "Error"
-msgstr ""
+msgstr "Chyba"
 
 #: errands/widgets/window.py:137
 msgid "Import Cancelled"
-msgstr ""
+msgstr "Import byl zrušen"
 
 #: errands/widgets/window.py:146
 msgid "Invalid File"
-msgstr ""
+msgstr "Neplatný soubor"
 
 #: errands/widgets/window.py:164
 msgid "Tasks Imported"
@@ -43,7 +43,7 @@ msgstr "Úkoly byly importovány"
 
 #: errands/widgets/window.py:334 errands/widgets/task.py:173
 msgid "Completed:"
-msgstr ""
+msgstr "Dokončeno:"
 
 #: errands/widgets/task.py:80
 msgid "Copied to Clipboard"
@@ -52,11 +52,11 @@ msgstr "Zkopírováno do schránky"
 #. pyright:ignore
 #: errands/utils/sync.py:80
 msgid "Not all sync credentials provided. Please check settings."
-msgstr ""
+msgstr "Nebyly poskytnuty všechny přihlašovací údaje pro synchronizaci. Zkontrolujte prosím nastavení."
 
 #: errands/utils/sync.py:120
 msgid "Can't connect to CalDAV server at:"
-msgstr ""
+msgstr "Nelze se připojit k serveru CalDAV na adrese:"
 
 #: errands/resources/ui/window.ui:26
 msgid "Deleted Tasks"
@@ -100,7 +100,7 @@ msgstr "Hlavní menu"
 
 #: errands/resources/ui/window.ui:260 errands/resources/ui/window.ui:263
 msgid "Sync/Fetch Tasks (Ctrl+S)"
-msgstr ""
+msgstr "Úlohy synchronizace/načítání (Ctrl+S)"
 
 #: errands/resources/ui/window.ui:287 errands/resources/ui/window.ui:290
 #: errands/resources/ui/window.ui:399 errands/resources/ui/window.ui:402
@@ -161,7 +161,7 @@ msgstr "Exportovat úkoly"
 
 #: errands/resources/ui/window.ui:513 errands/resources/ui/preferences.ui:66
 msgid "Tasks"
-msgstr ""
+msgstr "Úkoly"
 
 #: errands/resources/ui/window.ui:516
 msgid "Delete completed tasks"
@@ -169,11 +169,11 @@ msgstr "Smazat hotové úkoly"
 
 #: errands/resources/ui/window.ui:522
 msgid "Exit edit mode"
-msgstr ""
+msgstr "Opustit režim úprav"
 
 #: errands/resources/ui/window.ui:528
 msgid "Sync/Fetch Tasks"
-msgstr ""
+msgstr "Úlohy synchronizace/načítání"
 
 #: errands/resources/ui/window.ui:545
 msgid "translator-credits"
@@ -213,47 +213,47 @@ msgstr "Tmavý"
 
 #: errands/resources/ui/preferences.ui:71
 msgid "Expand Sub-Tasks on Startup"
-msgstr ""
+msgstr "Rozbalit podúkoly při spuštění"
 
 #: errands/resources/ui/preferences.ui:87
 msgid "Sync"
-msgstr ""
+msgstr "Synchronizace"
 
 #: errands/resources/ui/preferences.ui:92
 msgid "Sync Provider"
-msgstr ""
+msgstr "Poskytovatel synchronizace"
 
 #: errands/resources/ui/preferences.ui:96
 msgid "Disabled"
-msgstr ""
+msgstr "Zakázáno"
 
 #: errands/resources/ui/preferences.ui:111
 msgid "Server URL"
-msgstr ""
+msgstr "Adresa URL serveru"
 
 #: errands/resources/ui/preferences.ui:118
 msgid "Username"
-msgstr ""
+msgstr "Uživatelské jméno"
 
 #: errands/resources/ui/preferences.ui:125
 msgid "Password"
-msgstr ""
+msgstr "Heslo"
 
 #: errands/resources/ui/preferences.ui:132
 msgid "Calendar Name (\"Errands\" by Default)"
-msgstr ""
+msgstr "Název kalendáře (ve výchozím nastavení „Pochůzky“)"
 
 #: errands/resources/ui/preferences.ui:141
 msgid "Token"
-msgstr ""
+msgstr "Token"
 
 #: errands/resources/ui/preferences.ui:148
 msgid "Test Connection"
-msgstr ""
+msgstr "Test připojení"
 
 #: errands/resources/ui/preferences.ui:151
 msgid "Test"
-msgstr ""
+msgstr "Test"
 
 #: errands/resources/ui/task.ui:17
 msgid "Edit"
@@ -277,7 +277,7 @@ msgstr "Menu"
 
 #: errands/resources/ui/task.ui:338 errands/resources/ui/task.ui:341
 msgid "Cancel (Escape)"
-msgstr ""
+msgstr "Zrušit (ESC)"
 
 #: errands/resources/ui/task.ui:387
 msgid "Add new Sub-Task"
@@ -290,7 +290,7 @@ msgstr "Obnovit"
 #. TRANSLATORS: Don't translate
 #: data/io.github.mrvladus.List.desktop.in.in:4
 msgid "Errands"
-msgstr ""
+msgstr "Pochůzky"
 
 #: data/io.github.mrvladus.List.desktop.in.in:5
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:39
@@ -304,29 +304,28 @@ msgstr "errands;tasks;list;todo;todos;úkoly;seznam;"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:41
 msgid "Todo application for those who prefer simplicity."
-msgstr ""
+msgstr "Aplikace pro ty, kteří preferují jednoduchost."
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:42
 msgid "Features:"
-msgstr ""
+msgstr "Funkce:"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:44
 msgid "Add, remove, edit tasks and sub-tasks"
-msgstr ""
+msgstr "Přidávat, odebírat, upravovat úkoly a podúkoly"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:45
-#, fuzzy
 msgid "Mark task and sub-tasks as completed"
-msgstr "Označit jako dokončené"
+msgstr "Označit úkol a podúkoly jako dokončené"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:46
 msgid "Add accent color for each task"
-msgstr ""
+msgstr "Přidání zvýrazňující barvy pro každý úkol"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:47
 msgid "Sync tasks with Nextcloud or other CalDAV providers"
-msgstr ""
+msgstr "Synchronizace úloh s Nextcloud nebo jinými poskytovateli CalDAV"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:48
 msgid "Drag and Drop support"
-msgstr ""
+msgstr "Podpora drag and drop"
