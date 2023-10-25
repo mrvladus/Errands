@@ -133,7 +133,7 @@ msgstr "關於 Errands"
 
 #: errands/resources/ui/window.ui:463
 msgid "General"
-msgstr "一般項目"
+msgstr "一般功能"
 
 #: errands/resources/ui/window.ui:466
 msgid "Show keyboard shortcuts"
@@ -165,7 +165,7 @@ msgstr "待辦事項"
 
 #: errands/resources/ui/window.ui:516
 msgid "Delete completed tasks"
-msgstr "刪除已完成項目"
+msgstr "刪除已完成事項"
 
 #: errands/resources/ui/window.ui:522
 msgid "Exit edit mode"
@@ -189,7 +189,7 @@ msgstr "待辦事項將會永久刪除"
 
 #: errands/resources/ui/window.ui:587
 msgid "Cancel"
-msgstr ""
+msgstr "取消"
 
 #: errands/resources/ui/window.ui:588 errands/resources/ui/task.ui:13
 msgid "Delete"
@@ -304,7 +304,7 @@ msgstr "errands;待辦事項;清單;工作項目;todos;"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:41
 msgid "Todo application for those who prefer simplicity."
-msgstr "為喜愛簡單風格的人而設計的待辦事項軟體"
+msgstr "為簡潔而生的待辦事項軟體"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:42
 msgid "Features:"
