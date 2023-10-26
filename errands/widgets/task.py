@@ -3,6 +3,7 @@
 
 import os
 from typing import Self
+from errands.widgets.task_details import TaskDetails
 from gi.repository import Gtk, Adw, Gdk, GObject, Gio, GLib
 
 # Import modules
@@ -21,11 +22,9 @@ class Task(Gtk.Revealer):
 
     # - Template children - #
     main_box: Gtk.Box = Gtk.Template.Child()
-    task_box_rev: Gtk.Revealer = Gtk.Template.Child()
     task_row: Adw.ActionRow = Gtk.Template.Child()
     expand_icon: Gtk.Image = Gtk.Template.Child()
     completed_btn: Gtk.Button = Gtk.Template.Child()
-    task_edit_entry: Gtk.Entry = Gtk.Template.Child()
     sub_tasks_revealer: Gtk.Revealer = Gtk.Template.Child()
     tasks_list: Gtk.Box = Gtk.Template.Child()
 
@@ -45,8 +44,7 @@ class Task(Gtk.Revealer):
         )
         self.task: UserDataTask = task
         # Set text
-        self.text: str = Markup.find_url(Markup.escape(self.task["text"]))
-        self.task_row.set_title(self.text)
+        self.task_row.set_title(Markup.find_url(Markup.escape(self.task["text"])))
         # Check if sub-task completed and toggle checkbox
         self.completed_btn.props.active = self.task["completed"]
         # Set accent color
@@ -57,49 +55,11 @@ class Task(Gtk.Revealer):
             self.window.trash_add(self.task)
         self._check_is_sub()
         self._add_sub_tasks()
-        self._add_actions()
         self.just_added = False
         self.parent.update_status()
 
     def __repr__(self) -> str:
         return f"Task({self.task['id']})"
-
-    def _add_actions(self) -> None:
-        group: Gio.SimpleActionGroup = Gio.SimpleActionGroup.new()
-        self.insert_action_group("task", group)
-
-        def _add_action(name: str, callback) -> None:
-            action: Gio.SimpleAction = Gio.SimpleAction.new(name, None)
-            action.connect("activate", callback)
-            group.add_action(action)
-
-        def _copy(*args) -> None:
-            Log.info("Copy to clipboard")
-            clp: Gdk.Clipboard = Gdk.Display.get_default().get_clipboard()
-            clp.set(self.task["text"])
-            self.window.add_toast(_("Copied to Clipboard"))  # pyright:ignore
-
-        def _open_with(*args) -> None:
-            cache_dir: str = os.path.join(GLib.get_user_cache_dir(), "list")
-            if not os.path.exists(cache_dir):
-                os.mkdir(cache_dir)
-            file_path = os.path.join(cache_dir, f"{self.task['id']}.ics")
-            with open(file_path, "w") as f:
-                f.write(task_to_ics(self.task))
-            file: Gio.File = Gio.File.new_for_path(file_path)
-            Gtk.FileLauncher.new(file).launch()
-
-        def _edit(*_) -> None:
-            self.toggle_edit_mode()
-            # Set entry text and select it
-            self.task_edit_entry.get_buffer().props.text = self.task["text"]
-            self.task_edit_entry.select_region(0, len(self.task["text"]))
-            self.task_edit_entry.grab_focus()
-
-        _add_action("delete", self.delete)
-        _add_action("edit", _edit)
-        _add_action("copy", _copy)
-        _add_action("open_with", _open_with)
 
     def add_task(self, task: dict) -> None:
         sub_task: Task = Task(task, self.window, self)
@@ -153,9 +113,6 @@ class Task(Gtk.Revealer):
         self.parent.tasks_list.remove(self)
         self.run_dispose()
 
-    def toggle_edit_mode(self) -> None:
-        self.task_box_rev.set_reveal_child(not self.task_box_rev.get_child_revealed())
-
     def toggle_visibility(self, on: bool) -> None:
         self.set_reveal_child(on)
 
@@ -197,12 +154,12 @@ class Task(Gtk.Revealer):
 
         def _set_text():
             if btn.get_active():
-                self.text = Markup.add_crossline(self.text)
+                text = Markup.add_crossline(self.task["text"])
                 self.add_css_class("task-completed")
             else:
-                self.text = Markup.rm_crossline(self.text)
+                text = Markup.rm_crossline(self.text)
                 self.remove_css_class("task-completed")
-            self.task_row.set_title(self.text)
+            self.task_row.set_title(text)
 
         # If task is just added set text and return to avoid useless sync
         if self.just_added:
@@ -239,6 +196,10 @@ class Task(Gtk.Revealer):
         self.expand(not self.sub_tasks_revealer.get_child_revealed())
 
     @Gtk.Template.Callback()
+    def on_details_btn_clicked(self, _btn):
+        TaskDetails(self)
+
+    @Gtk.Template.Callback()
     def on_sub_task_added(self, entry: Gtk.Entry) -> None:
         """
         Add new Sub-Task
@@ -267,65 +228,6 @@ class Task(Gtk.Revealer):
         self.update_status()
         self.window.update_status()
         # Sync
-        Sync.sync()
-
-    @Gtk.Template.Callback()
-    def on_task_cancel_edit_btn_clicked(self, *_) -> None:
-        self.toggle_edit_mode()
-
-    @Gtk.Template.Callback()
-    def on_task_edit(self, entry: Gtk.Entry) -> None:
-        """
-        Edit task text
-        """
-
-        # Get text
-        new_text: str = entry.get_buffer().props.text
-        # Return if text empty
-        if new_text.replace(" ", "") == "":
-            return
-        # Change task
-        Log.info(f"Edit: {self.task['id']}")
-        # Set new text
-        self.task["text"] = new_text
-        # Escape text and find URL's'
-        self.text = Markup.find_url(Markup.escape(self.task["text"]))
-        self.task_row.props.title = self.text
-        # Toggle checkbox
-        self.task["completed"] = False
-        self.task["synced_caldav"] = False
-        self.update_data()
-        self.just_added = True
-        self.completed_btn.set_active(False)
-        self.just_added = False
-        self.update_status()
-        # Exit edit mode
-        self.toggle_edit_mode()
-        # Sync
-        Sync.sync()
-
-    @Gtk.Template.Callback()
-    def on_style_selected(self, btn: Gtk.Button) -> None:
-        """
-        Apply accent color
-        """
-
-        for i in btn.get_css_classes():
-            color = ""
-            if i.startswith("btn-"):
-                color = i.split("-")[1]
-                break
-        # Color card
-        for c in self.main_box.get_css_classes():
-            if "task-" in c:
-                self.main_box.remove_css_class(c)
-                break
-        self.main_box.add_css_class(f"task-{color}")
-        # Set new color
-        self.task["color"] = color
-        # Sync
-        self.task["synced_caldav"] = False
-        self.update_data()
         Sync.sync()
 
     # --- Drag and Drop --- #

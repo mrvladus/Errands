@@ -67,8 +67,6 @@
 
 .accent-color-btn {
   transition: 0.25s;
-  min-width: 30px;
-  min-height: 30px;
 }
 
 .accent-color-btn:hover {
@@ -114,6 +112,10 @@
 }
 
 /* Utils */
+
+.rounded-corners {
+  border-radius: 15px;
+}
 
 .fade {
   transition: 0.2s;

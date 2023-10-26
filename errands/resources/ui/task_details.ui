@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0" />
+  <requires lib="Adw" version="1.0" />
+  <template class="TaskDetails" parent="AdwWindow">
+    <property name="modal">true</property>
+    <property name="width-request">360</property>
+    <property name="height-request">300</property>
+    <property name="default-height">500</property>
+    <property name="default-width">500</property>
+    <property name="content">
+      <object class="AdwToolbarView">
+
+        <!-- Title -->
+        <child type="top">
+          <object class="AdwHeaderBar">
+            <property name="title-widget">
+              <object class="GtkLabel">
+                <property name="label" translatable="yes">Details</property>
+                <style>
+                  <class name="heading" />
+                </style>
+              </object>
+            </property>
+
+            <!-- Copy text -->
+            <child type="start">
+              <object class="GtkButton">
+                <property name="icon-name">edit-copy-symbolic</property>
+                <property name="tooltip-text" translatable="yes">Copy Text</property>
+                <accessibility>
+                  <property name="label" translatable="yes">Copy Text</property>
+                </accessibility>
+                <signal name="clicked" handler="on_copy_text_clicked" />
+              </object>
+            </child>
+
+            <!-- Move to trash -->
+            <child type="end">
+              <object class="GtkButton">
+                <property name="icon-name">user-trash-symbolic</property>
+                <property name="tooltip-text" translatable="yes">Move to Trash</property>
+                <accessibility>
+                  <property name="label" translatable="yes">Move to Trash</property>
+                </accessibility>
+                <signal name="clicked" handler="on_move_to_trash_clicked" />
+              </object>
+            </child>
+
+          </object>
+        </child>
+
+        <!-- Content -->
+        <property name="content">
+          <object class="GtkScrolledWindow">
+            <child>
+              <object class="AdwClamp">
+                <property name="margin-start">12</property>
+                <property name="margin-end">12</property>
+                <property name="margin-top">6</property>
+                <property name="margin-bottom">24</property>
+                <child>
+                  <object class="GtkBox">
+                    <property name="orientation">vertical</property>
+                    <property name="spacing">12</property>
+
+                    <!-- Edit -->
+                    <child>
+                      <object class="AdwEntryRow" id="edit_entry">
+                        <property name="height-request">60</property>
+                        <property name="show-apply-button">true</property>
+                        <property name="enable-emoji-completion">true</property>
+                        <property name="title" translatable="yes">Edit Task</property>
+                        <style>
+                          <class name="card" />
+                        </style>
+                        <signal name="apply" handler="on_text_edited" />
+                      </object>
+                    </child>
+
+                    <!-- Colors -->
+                    <child>
+                      <object class="GtkBox">
+                        <property name="halign">center</property>
+                        <style>
+                          <class name="toolbar" />
+                        </style>
+                        <!-- Clear style button -->
+                        <child>
+                          <object class="GtkButton">
+                            <property name="icon-name">window-close-symbolic</property>
+                            <property name="tooltip-text" translatable="yes">Clear Style</property>
+                            <signal name="clicked" handler="on_style_selected" />
+                            <accessibility>
+                              <property name="label" translatable="yes">Clear Style</property>
+                            </accessibility>
+                            <style>
+                              <class name="circular" />
+                            </style>
+                          </object>
+                        </child>
+                        <!-- Blue style button -->
+                        <child>
+                          <object class="GtkButton">
+                            <style>
+                              <class name="accent-color-btn" />
+                              <class name="btn-blue" />
+                              <class name="circular" />
+                            </style>
+                            <signal name="clicked" handler="on_style_selected" />
+                          </object>
+                        </child>
+                        <!-- Green style button -->
+                        <child>
+                          <object class="GtkButton">
+                            <style>
+                              <class name="accent-color-btn" />
+                              <class name="btn-green" />
+                              <class name="circular" />
+                            </style>
+                            <signal name="clicked" handler="on_style_selected" />
+                          </object>
+                        </child>
+                        <!-- Yellow style button -->
+                        <child>
+                          <object class="GtkButton">
+                            <style>
+                              <class name="accent-color-btn" />
+                              <class name="btn-yellow" />
+                              <class name="circular" />
+                            </style>
+                            <signal name="clicked" handler="on_style_selected" />
+                          </object>
+                        </child>
+                        <!-- Orange style button -->
+                        <child>
+                          <object class="GtkButton">
+                            <style>
+                              <class name="accent-color-btn" />
+                              <class name="btn-orange" />
+                              <class name="circular" />
+                            </style>
+                            <signal name="clicked" handler="on_style_selected" />
+                          </object>
+                        </child>
+                        <!-- Red style button -->
+                        <child>
+                          <object class="GtkButton">
+                            <style>
+                              <class name="accent-color-btn" />
+                              <class name="btn-red" />
+                              <class name="circular" />
+                            </style>
+                            <signal name="clicked" handler="on_style_selected" />
+                          </object>
+                        </child>
+                        <!-- Purple style button -->
+                        <child>
+                          <object class="GtkButton">
+                            <style>
+                              <class name="accent-color-btn" />
+                              <class name="btn-purple" />
+                              <class name="circular" />
+                            </style>
+                            <signal name="clicked" handler="on_style_selected" />
+                          </object>
+                        </child>
+                        <!-- Brown style button -->
+                        <child>
+                          <object class="GtkButton">
+                            <style>
+                              <class name="accent-color-btn" />
+                              <class name="btn-brown" />
+                              <class name="circular" />
+                            </style>
+                            <signal name="clicked" handler="on_style_selected" />
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+
+                    <!-- Notes -->
+                    <child>
+                      <object class="AdwPreferencesGroup">
+                        <property name="title" translatable="yes">Notes</property>
+                        <child>
+                          <object class="GtkTextView">
+                            <property name="height-request">70</property>
+                            <property name="top-margin">12</property>
+                            <property name="bottom-margin">12</property>
+                            <property name="left-margin">12</property>
+                            <property name="right-margin">12</property>
+                            <style>
+                              <class name="card" />
+                            </style>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+
+                    <!-- Props -->
+                    <child>
+                      <object class="AdwPreferencesGroup">
+                        <property name="title" translatable="yes">Properties</property>
+                        <child>
+                          <object class="AdwActionRow">
+                            <property name="title" translatable="yes">Start Date</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="AdwActionRow">
+                            <property name="title" translatable="yes">Due Date</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+
+                    <!-- Props -->
+                    <child>
+                      <object class="AdwPreferencesGroup">
+                        <property name="title" translatable="yes">Misc</property>
+                        <child>
+                          <object class="AdwActionRow">
+                            <property name="title" translatable="yes">Open in Calendar</property>
+                            <property name="subtitle" translatable="yes">Open task as ".isc" file</property>
+                            <property name="activatable-widget">open_as_ics</property>
+                            <child type="suffix">
+                              <object class="GtkButton" id="open_as_ics">
+                                <property name="icon-name">x-office-calendar-symbolic</property>
+                                <property name="valign">center</property>
+                                <style>
+                                  <class name="flat" />
+                                </style>
+                                <signal name="clicked" handler="on_open_as_ics_clicked" />
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+
+                  </object>
+                </child>
+              </object>
+            </child>
+
+          </object>
+
+        </property>
+      </object>
+
+    </property>
+  </template>
+</interface>

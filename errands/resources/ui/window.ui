@@ -6,7 +6,6 @@
     <property name="width-request">360</property>
     <property name="height-request">296</property>
     <signal name="notify::default-width" handler="on_width_changed" />
-
     <property name="content">
       <object class="AdwOverlaySplitView" id="split_view">
         <property name="show-sidebar" bind-source="toggle_trash_btn" bind-property="active" bind-flags="sync-create|bidirectional" />
@@ -169,6 +168,7 @@
 
         <!-- Main Content -->
         <property name="content">
+
           <object class="AdwToolbarView">
 
             <child type="top">
@@ -302,8 +302,6 @@
                   <object class="AdwClamp">
                     <property name="maximum-size">850</property>
                     <property name="tightening-threshold">300</property>
-
-                    <!-- Entry -->
                     <child>
                       <object class="GtkListBox">
                         <property name="margin-top">10</property>
@@ -419,7 +417,6 @@
 
       </object>
     </property>
-
   </template>
 
   <!-- Main menu -->
