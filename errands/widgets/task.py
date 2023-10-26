@@ -3,7 +3,6 @@
 
 import os
 from typing import Self
-from errands.widgets.task_details import TaskDetails
 from gi.repository import Gtk, Adw, Gdk, GObject, Gio, GLib
 
 # Import modules
@@ -157,7 +156,7 @@ class Task(Gtk.Revealer):
                 text = Markup.add_crossline(self.task["text"])
                 self.add_css_class("task-completed")
             else:
-                text = Markup.rm_crossline(self.text)
+                text = Markup.rm_crossline(self.task["text"])
                 self.remove_css_class("task-completed")
             self.task_row.set_title(text)
 
@@ -197,6 +196,8 @@ class Task(Gtk.Revealer):
 
     @Gtk.Template.Callback()
     def on_details_btn_clicked(self, _btn):
+        from errands.widgets.task_details import TaskDetails
+
         TaskDetails(self)
 
     @Gtk.Template.Callback()

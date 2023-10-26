@@ -2,9 +2,10 @@
 # SPDX-License-Identifier: MIT
 
 import os
+from errands.widgets.task import Task
 from errands.utils.markup import Markup
 from errands.utils.sync import Sync
-from gi.repository import Adw, Gtk, Gio, GLib
+from gi.repository import Adw, Gtk, Gio, GLib, Gdk
 from errands.utils.logging import Log
 from errands.utils.tasks import task_to_ics
 
@@ -15,22 +16,27 @@ class TaskDetails(Adw.Window):
 
     edit_entry: Adw.EntryRow = Gtk.Template.Child()
 
-    def __init__(self, parent) -> None:
+    def __init__(self, parent: Task) -> None:
         super().__init__(transient_for=parent.window)
         self.parent = parent
-        self._fill_fields()
+        self._fill_info()
         self.present()
 
-    def _fill_fields(self):
+    def _fill_info(self):
         self.edit_entry.set_text(self.parent.task["text"])
 
     @Gtk.Template.Callback()
     def on_copy_text_clicked(self, _btn):
-        pass
+        Log.info("Copy to clipboard")
+        clp: Gdk.Clipboard = Gdk.Display.get_default().get_clipboard()
+        clp.set(self.parent.task["text"])
+        self.parent.window.add_toast(_("Copied to Clipboard"))  # pyright:ignore
+        self.close()
 
     @Gtk.Template.Callback()
     def on_move_to_trash_clicked(self, _btn):
-        pass
+        self.parent.delete()
+        self.close()
 
     @Gtk.Template.Callback()
     def on_open_as_ics_clicked(self, _btn):
