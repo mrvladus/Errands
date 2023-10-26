@@ -24,6 +24,8 @@ def new_task(
         "completed": completed,
         "deleted": deleted,
         "synced_caldav": synced_caldav,
+        "start_date": datetime.datetime.now().strftime("%Y%m%dT%H%M%S"),
+        "end_date": "",
     }
     return task
 

@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 import os
+import calendar
 from errands.widgets.task import Task
 from errands.utils.markup import Markup
 from errands.utils.sync import Sync
@@ -15,6 +16,7 @@ class TaskDetails(Adw.Window):
     __gtype_name__ = "TaskDetails"
 
     edit_entry: Adw.EntryRow = Gtk.Template.Child()
+    start_date: Adw.ActionRow = Gtk.Template.Child()
 
     def __init__(self, parent: Task) -> None:
         super().__init__(transient_for=parent.window)
@@ -24,6 +26,15 @@ class TaskDetails(Adw.Window):
 
     def _fill_info(self):
         self.edit_entry.set_text(self.parent.task["text"])
+        # Start date
+        sd = self.parent.task.get("start_date", None)
+        if sd:
+            year = sd[0:4]
+            day = sd[6:8]
+            month = sd[4:6]
+            self.start_date.set_title(
+                f"{day} {calendar.month_name[int(month)]}, {year}"
+            )
 
     @Gtk.Template.Callback()
     def on_copy_text_clicked(self, _btn):
@@ -48,6 +59,11 @@ class TaskDetails(Adw.Window):
             f.write(task_to_ics(self.parent.task))
         file: Gio.File = Gio.File.new_for_path(file_path)
         Gtk.FileLauncher.new(file).launch()
+
+    @Gtk.Template.Callback()
+    def on_start_date_selected(self, cal: Gtk.Calendar):
+        self.start_date.set_title(cal.get_date().format("%d %B, %Y"))
+        time: str = cal.get_date().format("%Y%m%dT000000")
 
     @Gtk.Template.Callback()
     def on_style_selected(self, btn: Gtk.Button) -> None:

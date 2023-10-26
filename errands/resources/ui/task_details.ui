@@ -203,8 +203,22 @@
                       <object class="AdwPreferencesGroup">
                         <property name="title" translatable="yes">Properties</property>
                         <child>
-                          <object class="AdwActionRow">
-                            <property name="title" translatable="yes">Start Date</property>
+                          <object class="AdwActionRow" id="start_date">
+                            <property name="subtitle" translatable="yes">Start Date</property>
+                            <child>
+                              <object class="GtkMenuButton">
+                                <property name="icon-name">x-office-calendar-symbolic</property>
+                                <property name="popover">
+                                  <object class="GtkPopover">
+                                    <child>
+                                      <object class="GtkCalendar">
+                                        <signal name="day-selected" handler="on_start_date_selected" />
+                                      </object>
+                                    </child>
+                                  </object>
+                                </property>
+                              </object>
+                            </child>
                           </object>
                         </child>
                         <child>
