@@ -20,6 +20,9 @@ class UserDataTask(TypedDict):
     deleted: bool
     color: str
     synced_caldav: bool
+    start_date: str
+    end_date: str
+    notes: str
 
 
 class UserDataDict(TypedDict):
