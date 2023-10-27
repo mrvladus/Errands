@@ -25,7 +25,10 @@ def new_task(
         "deleted": deleted,
         "synced_caldav": synced_caldav,
         "start_date": datetime.datetime.now().strftime("%Y%m%dT%H%M%S"),
-        "end_date": "",
+        "end_date": format(
+            datetime.datetime.now() + datetime.timedelta(hours=1), "%Y%m%dT%H%M%S"
+        ),
+        "notes": "",
     }
     return task
 
@@ -38,9 +41,8 @@ def task_to_ics(task: UserDataTask) -> str:
     todo.add("uid", task["id"])
     todo.add("summary", task["text"])
     dt = datetime.datetime.now()
-    todo.add("dtstamp", dt)
-    todo.add("dtstart", dt)
-    todo.add("created", dt)
-    todo.add("last-modified", dt)
+    todo.add("dtstamp", datetime.datetime.fromisoformat(task["start_date"]))
+    todo.add("dtstart", datetime.datetime.fromisoformat(task["start_date"]))
+    todo.add("created", datetime.datetime.fromisoformat(task["start_date"]))
     cal.add_component(todo)
     return cal.to_ical().decode("utf-8")
