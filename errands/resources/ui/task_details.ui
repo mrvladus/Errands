@@ -211,9 +211,8 @@
                         <child>
                           <object class="AdwActionRow" id="start_date">
                             <property name="subtitle" translatable="yes">Start</property>
-                            <property name="activatable-widget">start_menu</property>
                             <child>
-                              <object class="GtkMenuButton" id="start_menu">
+                              <object class="GtkMenuButton">
                                 <property name="icon-name">x-office-calendar-symbolic</property>
                                 <property name="valign">center</property>
                                 <property name="popover">
@@ -286,9 +285,8 @@
                         <child>
                           <object class="AdwActionRow" id="end_date">
                             <property name="subtitle" translatable="yes">End</property>
-                            <property name="activatable-widget">end_menu</property>
                             <child>
-                              <object class="GtkMenuButton" id="end_menu">
+                              <object class="GtkMenuButton">
                                 <property name="icon-name">x-office-calendar-symbolic</property>
                                 <property name="valign">center</property>
                                 <property name="popover">

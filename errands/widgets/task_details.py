@@ -56,15 +56,15 @@ class TaskDetails(Adw.Window):
         self.notes.set_text(self.parent.task["notes"])
         # Set date in calendars
         sd = self.start_datetime = self.parent.task["start_date"]
+        ed = self.end_datetime = self.parent.task["end_date"]
         self.start_hour.set_value(int(sd[9:11]))
         self.start_min.set_value(int(sd[11:13]))
-        dt = GLib.DateTime.new_local(int(sd[0:4]), int(sd[4:6]), int(sd[6:8]), 0, 0, 0)
-        self.start_cal.select_day(dt)
-        ed = self.end_datetime = self.parent.task["end_date"]
+        sdt = GLib.DateTime.new_local(int(sd[0:4]), int(sd[4:6]), int(sd[6:8]), 0, 0, 0)
+        self.start_cal.select_day(sdt)
         self.end_hour.set_value(int(ed[9:11]))
         self.end_min.set_value(int(ed[11:13]))
-        dt = GLib.DateTime.new_local(int(ed[0:4]), int(ed[4:6]), int(ed[6:8]), 0, 0, 0)
-        self.end_cal.select_day(dt)
+        edt = GLib.DateTime.new_local(int(ed[0:4]), int(ed[4:6]), int(ed[6:8]), 0, 0, 0)
+        self.end_cal.select_day(edt)
 
     @Gtk.Template.Callback()
     def on_notes_text_changed(self, buffer: Gtk.TextBuffer):
@@ -76,18 +76,35 @@ class TaskDetails(Adw.Window):
 
     @Gtk.Template.Callback()
     def on_start_time_changed(self, _):
+        # Get time
         hour = str(self.start_hour.get_value_as_int())
-        if len(hour) == 1:
-            hour = f"0{hour}"
+        hour = f"0{hour}" if len(hour) == 1 else hour
         min = str(self.start_min.get_value_as_int())
-        if len(min) == 1:
-            min = f"0{min}"
+        min = f"0{min}" if len(min) == 1 else min
+        # Set start text
         self.start_date.set_title(
             f"{hour}:{min}, {self.start_cal.get_date().format('%d %B, %Y')}"
         )
         self.start_datetime = (
             f"{self.start_cal.get_date().format('%Y%m%d')}T{hour}{min}00"
         )
+        # Check if start bigger than end
+        start_timeint: int = int(self.start_datetime[0:8] + self.start_datetime[9:])
+        end_timeint: int = int(self.end_datetime[0:8] + self.end_datetime[9:])
+        if start_timeint > end_timeint:
+            self.end_date.set_title(
+                f"{hour}:{min}, {self.start_cal.get_date().format('%d %B, %Y')}"
+            )
+            self.end_datetime = (
+                f"{self.start_cal.get_date().format('%Y%m%d')}T{hour}{min}00"
+            )
+            ed = self.end_datetime
+            self.end_hour.set_value(int(ed[9:11]))
+            self.end_min.set_value(int(ed[11:13]))
+            dt = GLib.DateTime.new_local(
+                int(ed[0:4]), int(ed[4:6]), int(ed[6:8]), 0, 0, 0
+            )
+            self.end_cal.select_day(dt)
 
     @Gtk.Template.Callback()
     def on_end_time_changed(self, _):
