@@ -111,6 +111,10 @@
   margin: 6px 11px 6px 11px;
 }
 
+calendar {
+  border: none;
+}
+
 /* Utils */
 
 .rounded-corners {

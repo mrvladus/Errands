@@ -17,7 +17,7 @@ class TaskDetails(Adw.Window):
     __gtype_name__ = "TaskDetails"
 
     edit_entry: Adw.EntryRow = Gtk.Template.Child()
-    notes: Gtk.TextView = Gtk.Template.Child()
+    notes: Gtk.TextBuffer = Gtk.Template.Child()
     start_hour: Gtk.SpinButton = Gtk.Template.Child()
     start_min: Gtk.SpinButton = Gtk.Template.Child()
     start_date: Adw.ActionRow = Gtk.Template.Child()
@@ -27,26 +27,45 @@ class TaskDetails(Adw.Window):
     end_date: Adw.ActionRow = Gtk.Template.Child()
     end_cal: Gtk.Calendar = Gtk.Template.Child()
 
+    # State
+    start_datetime: str = ""
+    end_datetime: str = ""
+
     def __init__(self, parent: Task) -> None:
         super().__init__(transient_for=parent.window)
         self.parent = parent
         self._fill_info()
         self.present()
 
+    def do_close_request(self, *_):
+        # Set new props
+        self.parent.task["start_date"] = self.start_datetime
+        self.parent.task["end_date"] = self.end_datetime
+        self.parent.task["notes"] = self.notes.props.text
+        self.parent.task["text"] = self.edit_entry.get_text()
+
+        # Update data and sync
+        self.parent.update_data()
+        Sync.sync()
+
     def _fill_info(self):
         self.edit_entry.set_text(self.parent.task["text"])
-        self.notes.get_buffer().set_text(self.parent.task["notes"])
-        # Set date
-        sd = self.parent.task["start_date"]
+        self.notes.set_text(self.parent.task["notes"])
+        # Set date in calendars
+        sd = self.start_datetime = self.parent.task["start_date"]
         self.start_hour.set_value(int(sd[9:11]))
         self.start_min.set_value(int(sd[11:13]))
         dt = GLib.DateTime.new_local(int(sd[0:4]), int(sd[4:6]), int(sd[6:8]), 0, 0, 0)
         self.start_cal.select_day(dt)
-        ed = self.parent.task["end_date"]
+        ed = self.end_datetime = self.parent.task["end_date"]
         self.end_hour.set_value(int(ed[9:11]))
         self.end_min.set_value(int(ed[11:13]))
         dt = GLib.DateTime.new_local(int(ed[0:4]), int(ed[4:6]), int(ed[6:8]), 0, 0, 0)
         self.end_cal.select_day(dt)
+
+    @Gtk.Template.Callback()
+    def on_notes_text_changed(self, buffer: Gtk.TextBuffer):
+        pass
 
     @Gtk.Template.Callback()
     def on_start_time_changed(self, _):
@@ -59,6 +78,9 @@ class TaskDetails(Adw.Window):
         self.start_date.set_title(
             f"{hour}:{min}, {self.start_cal.get_date().format('%d %B, %Y')}"
         )
+        self.start_datetime = (
+            f"{self.start_cal.get_date().format('%Y%m%d')}T{hour}{min}00"
+        )
 
     @Gtk.Template.Callback()
     def on_end_time_changed(self, _):
@@ -68,9 +90,19 @@ class TaskDetails(Adw.Window):
         min = str(self.end_min.get_value_as_int())
         if len(min) == 1:
             min = f"0{min}"
-        self.end_date.set_title(
-            f"{hour}:{min}, {self.end_cal.get_date().format('%d %B, %Y')}"
+        # Check if end bigger than start
+        start_timeint: int = int(self.start_datetime[0:8] + self.start_datetime[9:])
+        end_timeint: int = int(
+            f"{self.end_cal.get_date().format('%Y%m%d')}{hour}{min}00"
         )
+        if end_timeint >= start_timeint:
+            print(end_timeint, start_timeint)
+            self.end_date.set_title(
+                f"{hour}:{min}, {self.end_cal.get_date().format('%d %B, %Y')}"
+            )
+            self.end_datetime = (
+                f"{self.end_cal.get_date().format('%Y%m%d')}T{hour}{min}00"
+            )
 
     @Gtk.Template.Callback()
     def on_copy_text_clicked(self, _btn):
