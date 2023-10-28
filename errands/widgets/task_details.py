@@ -28,6 +28,7 @@ class TaskDetails(Adw.Window):
     # State
     start_datetime: str = ""
     end_datetime: str = ""
+    text: str = ""
 
     def __init__(self, parent: Task) -> None:
         super().__init__(transient_for=parent.window)
@@ -40,8 +41,12 @@ class TaskDetails(Adw.Window):
         self.parent.task["start_date"] = self.start_datetime
         self.parent.task["end_date"] = self.end_datetime
         self.parent.task["notes"] = self.notes.props.text
-        self.parent.task["text"] = self.edit_entry.get_text()
-
+        # Set text
+        if self.text.strip(" \n\t") != "":
+            self.parent.task["text"] = self.text
+            self.parent.task_row.set_title(Markup.find_url(Markup.escape(self.text)))
+        else:
+            self.edit_entry.set_text(self.parent.task["text"])
         # Update data and sync
         self.parent.update_data()
         Sync.sync()
@@ -64,6 +69,10 @@ class TaskDetails(Adw.Window):
     @Gtk.Template.Callback()
     def on_notes_text_changed(self, buffer: Gtk.TextBuffer):
         pass
+
+    @Gtk.Template.Callback()
+    def on_text_changed(self, entry: Adw.EntryRow):
+        self.text = entry.get_text()
 
     @Gtk.Template.Callback()
     def on_start_time_changed(self, _):
@@ -143,19 +152,6 @@ class TaskDetails(Adw.Window):
                 break
         self.parent.main_box.add_css_class(f"task-{color}")
         self.parent.task["color"] = color
-        self.parent.task["synced_caldav"] = False
-        self.parent.update_data()
-        Sync.sync()
-
-    @Gtk.Template.Callback()
-    def on_text_edited(self, entry: Adw.EntryRow):
-        new_text: str = entry.get_text()
-        if new_text.strip(" \n\t") == "" or new_text == self.parent.task["text"]:
-            entry.set_text(self.parent.task["text"])
-            return
-        Log.info(f"Edit: {self.parent.task['id']}")
-        self.parent.task_row.set_title(Markup.find_url(Markup.escape(new_text)))
-        self.parent.task["text"] = new_text
         self.parent.task["synced_caldav"] = False
         self.parent.update_data()
         Sync.sync()

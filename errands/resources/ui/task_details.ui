@@ -68,13 +68,12 @@
                     <child>
                       <object class="AdwEntryRow" id="edit_entry">
                         <property name="height-request">60</property>
-                        <property name="show-apply-button">true</property>
                         <property name="enable-emoji-completion">true</property>
                         <property name="title" translatable="yes">Edit Task</property>
                         <style>
                           <class name="card" />
                         </style>
-                        <signal name="apply" handler="on_text_edited" />
+                        <signal name="changed" handler="on_text_changed" />
                       </object>
                     </child>
 
