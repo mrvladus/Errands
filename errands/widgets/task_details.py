@@ -1,13 +1,11 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-from email.policy import default
 import os
-import calendar
+from gi.repository import Adw, Gtk, Gio, GLib, Gdk
 from errands.widgets.task import Task
 from errands.utils.markup import Markup
 from errands.utils.sync import Sync
-from gi.repository import Adw, Gtk, Gio, GLib, Gdk, GObject
 from errands.utils.logging import Log
 from errands.utils.tasks import task_to_ics
 
@@ -96,7 +94,6 @@ class TaskDetails(Adw.Window):
             f"{self.end_cal.get_date().format('%Y%m%d')}{hour}{min}00"
         )
         if end_timeint >= start_timeint:
-            print(end_timeint, start_timeint)
             self.end_date.set_title(
                 f"{hour}:{min}, {self.end_cal.get_date().format('%d %B, %Y')}"
             )

@@ -1,4 +1,10 @@
-subdir('resources')
+gnome.compile_resources('errands',
+  join_paths('resources', 'errands.gresource.xml'),
+  gresource_bundle: true,
+  install: true,
+  install_dir: pkgdatadir,
+)
+
 
 configure_file(
   input: 'errands.py',
