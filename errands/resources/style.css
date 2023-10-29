@@ -111,7 +111,8 @@
   margin: 6px 11px 6px 11px;
 }
 
-calendar {
+calendar,
+calendar header {
   border: none;
 }
 

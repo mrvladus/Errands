@@ -24,11 +24,12 @@ class TaskDetails(Adw.Window):
     end_min: Gtk.SpinButton = Gtk.Template.Child()
     end_date: Adw.ActionRow = Gtk.Template.Child()
     end_cal: Gtk.Calendar = Gtk.Template.Child()
+    percent_complete: Adw.SpinRow = Gtk.Template.Child()
+    priority: Adw.SpinRow = Gtk.Template.Child()
 
     # State
     start_datetime: str = ""
     end_datetime: str = ""
-    text: str = ""
 
     def __init__(self, parent: Task) -> None:
         super().__init__(transient_for=parent.window)
@@ -41,18 +42,24 @@ class TaskDetails(Adw.Window):
         self.parent.task["start_date"] = self.start_datetime
         self.parent.task["end_date"] = self.end_datetime
         self.parent.task["notes"] = self.notes.props.text
+        self.parent.task["percent_complete"] = int(self.percent_complete.get_value())
+        self.parent.task["priority"] = int(self.priority.get_value())
         # Set text
-        if self.text.strip(" \n\t") != "":
-            self.parent.task["text"] = self.text
-            self.parent.task_row.set_title(Markup.find_url(Markup.escape(self.text)))
+        text = self.edit_entry.get_text()
+        if text.strip(" \n\t") != "":
+            self.parent.task["text"] = text
+            self.parent.task_row.set_title(Markup.find_url(Markup.escape(text)))
         else:
             self.edit_entry.set_text(self.parent.task["text"])
+
         # Update data and sync
         self.parent.update_data()
         Sync.sync()
 
     def _fill_info(self):
+        # Edit text
         self.edit_entry.set_text(self.parent.task["text"])
+        # Notes
         self.notes.set_text(self.parent.task["notes"])
         # Set date in calendars
         sd = self.start_datetime = self.parent.task["start_date"]
@@ -65,6 +72,10 @@ class TaskDetails(Adw.Window):
         self.end_min.set_value(int(ed[11:13]))
         edt = GLib.DateTime.new_local(int(ed[0:4]), int(ed[4:6]), int(ed[6:8]), 0, 0, 0)
         self.end_cal.select_day(edt)
+        # Percent complete
+        self.percent_complete.set_value(self.parent.task["percent_complete"])
+        # Priority
+        self.priority.set_value(self.parent.task["priority"])
 
     @Gtk.Template.Callback()
     def on_notes_text_changed(self, buffer: Gtk.TextBuffer):
@@ -150,6 +161,14 @@ class TaskDetails(Adw.Window):
             f.write(task_to_ics(self.parent.task))
         file: Gio.File = Gio.File.new_for_path(file_path)
         Gtk.FileLauncher.new(file).launch()
+
+    @Gtk.Template.Callback()
+    def on_percent_complete_changed(self, adj):
+        pass
+
+    @Gtk.Template.Callback()
+    def on_priority_changed(self, adj):
+        pass
 
     @Gtk.Template.Callback()
     def on_style_selected(self, btn: Gtk.Button) -> None:

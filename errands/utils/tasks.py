@@ -9,26 +9,33 @@ from errands.utils.data import UserDataTask
 
 def new_task(
     text: str,
-    id: str = None,
+    id: str = str(uuid.uuid4()),
     parent: str = "",
     completed: bool = False,
     deleted: bool = False,
     color: str = "",
     synced_caldav: bool = False,
+    start_date: str = datetime.datetime.now().strftime("%Y%m%dT%H%M%S"),
+    end_date: str = format(
+        datetime.datetime.now() + datetime.timedelta(days=1), "%Y%m%dT%H%M%S"
+    ),
+    notes: str = "",
+    percent_complete: int = 0,
+    priority: int = 0,
 ) -> UserDataTask:
     task = {
-        "id": str(uuid.uuid4()) if not id else id,
+        "id": id,
         "parent": parent,
         "text": text,
         "color": color,
         "completed": completed,
         "deleted": deleted,
         "synced_caldav": synced_caldav,
-        "start_date": datetime.datetime.now().strftime("%Y%m%dT%H%M%S"),
-        "end_date": format(
-            datetime.datetime.now() + datetime.timedelta(hours=1), "%Y%m%dT%H%M%S"
-        ),
-        "notes": "",
+        "start_date": start_date,
+        "end_date": end_date,
+        "notes": notes,
+        "percent_complete": percent_complete,
+        "priority": priority,
     }
     return task
 
@@ -43,5 +50,7 @@ def task_to_ics(task: UserDataTask) -> str:
     todo.add("dtstart", datetime.datetime.fromisoformat(task["start_date"]))
     todo.add("dtend", datetime.datetime.fromisoformat(task["end_date"]))
     todo.add("description", task["notes"])
+    todo.add("percent-complete", task["percent_complete"])
+    todo.add("priority", task["priority"])
     cal.add_component(todo)
     return cal.to_ical().decode("utf-8")

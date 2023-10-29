@@ -23,6 +23,8 @@ class UserDataTask(TypedDict):
     start_date: str
     end_date: str
     notes: str
+    percent_complete: int
+    priority: int
 
 
 class UserDataDict(TypedDict):
