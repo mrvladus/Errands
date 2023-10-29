@@ -4,6 +4,10 @@
   background-color: alpha(@card_bg_color, 0.5);
 }
 
+.task-title:drop(active) {
+  border-radius: 10px;
+}
+
 .tasks-list:last-child {
   margin-bottom: 36px;
 }
@@ -119,8 +123,9 @@ calendar header {
 /* Utils */
 
 .rounded-corners {
-  border-radius: 15px;
+  border-radius: 10px;
 }
+
 
 .fade {
   transition: 0.2s;
