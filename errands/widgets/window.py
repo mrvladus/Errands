@@ -2,12 +2,13 @@
 # SPDX-License-Identifier: MIT
 
 import json
-from gi.repository import Gio, Adw, Gtk, GLib
+from gi.repository import Gio, Adw, Gtk, GLib, GObject
 from __main__ import VERSION, APP_ID
 
 # Import modules
 import errands.utils.tasks as TaskUtils
 from errands.widgets.preferences import PreferencesWindow
+from errands.widgets.task_details import TaskDetails
 from errands.widgets.task import Task
 from errands.widgets.trash_item import TrashItem
 from errands.utils.sync import Sync
@@ -22,6 +23,8 @@ from errands.utils.markup import Markup
 @Gtk.Template(resource_path="/io/github/mrvladus/Errands/window.ui")
 class Window(Adw.ApplicationWindow):
     __gtype_name__ = "Window"
+
+    GObject.type_ensure(TaskDetails)
 
     # - Template children - #
     about_window: Adw.AboutWindow = Gtk.Template.Child()
@@ -43,6 +46,7 @@ class Window(Adw.ApplicationWindow):
     toggle_trash_btn: Gtk.ToggleButton = Gtk.Template.Child()
     trash_list: Gtk.Box = Gtk.Template.Child()
     trash_list_scrl: Gtk.ScrolledWindow = Gtk.Template.Child()
+    sidebar = Gtk.Template.Child()
 
     # - State - #
     scrolling: bool = False  # Is window scrolling

@@ -11,7 +11,7 @@ from errands.utils.tasks import task_to_ics
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/Errands/task_details.ui")
-class TaskDetails(Adw.Window):
+class TaskDetails(Adw.Bin):
     __gtype_name__ = "TaskDetails"
 
     edit_entry: Adw.EntryRow = Gtk.Template.Child()
@@ -31,11 +31,10 @@ class TaskDetails(Adw.Window):
     start_datetime: str = ""
     end_datetime: str = ""
 
-    def __init__(self, parent: Task) -> None:
-        super().__init__(transient_for=parent.window)
+    def __init__(self, parent) -> None:
+        super().__init__()
         self.parent = parent
-        self._fill_info()
-        self.present()
+        self.fill_info()
 
     def do_close_request(self, *_):
         # Set new props
@@ -56,7 +55,7 @@ class TaskDetails(Adw.Window):
         self.parent.update_data()
         Sync.sync()
 
-    def _fill_info(self):
+    def fill_info(self):
         # Edit text
         self.edit_entry.set_text(self.parent.task["text"])
         # Notes

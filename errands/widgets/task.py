@@ -198,7 +198,7 @@ class Task(Gtk.Revealer):
     def on_details_btn_clicked(self, _btn):
         from errands.widgets.task_details import TaskDetails
 
-        TaskDetails(self)
+        self.window.sidebar.set_sidebar(TaskDetails(self))
 
     @Gtk.Template.Callback()
     def on_sub_task_added(self, entry: Gtk.Entry) -> None:
