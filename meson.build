@@ -4,6 +4,9 @@ project(
   meson_version: '>= 0.62.0',
 )
 
+dependency('libadwaita-1', version: '>= 1.4')
+dependency('pygobject-3.0', version: '>= 3.46')
+
 i18n = import('i18n')
 gnome = import('gnome')
 python = import('python')
