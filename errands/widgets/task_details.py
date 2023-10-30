@@ -14,8 +14,10 @@ from errands.utils.tasks import task_to_ics
 class TaskDetails(Adw.Bin):
     __gtype_name__ = "TaskDetails"
 
-    edit_entry: Adw.EntryRow = Gtk.Template.Child()
+    details_status: Adw.StatusPage = Gtk.Template.Child()
+    edit_entry: Gtk.TextBuffer = Gtk.Template.Child()
     notes: Gtk.TextBuffer = Gtk.Template.Child()
+    save_btn: Gtk.Button = Gtk.Template.Child()
     start_hour: Gtk.SpinButton = Gtk.Template.Child()
     start_min: Gtk.SpinButton = Gtk.Template.Child()
     start_date: Adw.ActionRow = Gtk.Template.Child()
@@ -31,31 +33,11 @@ class TaskDetails(Adw.Bin):
     start_datetime: str = ""
     end_datetime: str = ""
 
-    def __init__(self, parent) -> None:
+    def __init__(self) -> None:
         super().__init__()
+
+    def update_info(self, parent):
         self.parent = parent
-        self.fill_info()
-
-    def do_close_request(self, *_):
-        # Set new props
-        self.parent.task["start_date"] = self.start_datetime
-        self.parent.task["end_date"] = self.end_datetime
-        self.parent.task["notes"] = self.notes.props.text
-        self.parent.task["percent_complete"] = int(self.percent_complete.get_value())
-        self.parent.task["priority"] = int(self.priority.get_value())
-        # Set text
-        text = self.edit_entry.get_text()
-        if text.strip(" \n\t") != "":
-            self.parent.task["text"] = text
-            self.parent.task_row.set_title(Markup.find_url(Markup.escape(text)))
-        else:
-            self.edit_entry.set_text(self.parent.task["text"])
-
-        # Update data and sync
-        self.parent.update_data()
-        Sync.sync()
-
-    def fill_info(self):
         # Edit text
         self.edit_entry.set_text(self.parent.task["text"])
         # Notes
@@ -75,18 +57,36 @@ class TaskDetails(Adw.Bin):
         self.percent_complete.set_value(self.parent.task["percent_complete"])
         # Priority
         self.priority.set_value(self.parent.task["priority"])
+        self.save_btn.set_sensitive(False)
+        self.details_status.set_visible(False)
 
     @Gtk.Template.Callback()
     def on_notes_text_changed(self, buffer: Gtk.TextBuffer):
-        pass
+        self.save_btn.set_sensitive(True)
 
     @Gtk.Template.Callback()
     def on_text_changed(self, entry: Adw.EntryRow):
-        self.text = entry.get_text()
+        self.save_btn.set_sensitive(True)
 
     @Gtk.Template.Callback()
     def on_save_btn_clicked(self, btn):
-        pass
+        # Set new props
+        self.parent.task["start_date"] = self.start_datetime
+        self.parent.task["end_date"] = self.end_datetime
+        self.parent.task["notes"] = self.notes.props.text
+        self.parent.task["percent_complete"] = int(self.percent_complete.get_value())
+        self.parent.task["priority"] = int(self.priority.get_value())
+        # Set text
+        text = self.edit_entry.props.text
+        if text.strip(" \n\t") != "":
+            self.parent.task["text"] = text
+            self.parent.task_row.set_title(Markup.find_url(Markup.escape(text)))
+        else:
+            self.edit_entry.set_text(self.parent.task["text"])
+        # Update data and sync
+        self.parent.update_data()
+        Sync.sync()
+        self.save_btn.set_sensitive(False)
 
     @Gtk.Template.Callback()
     def on_start_time_changed(self, _):
@@ -119,6 +119,7 @@ class TaskDetails(Adw.Bin):
                 int(ed[0:4]), int(ed[4:6]), int(ed[6:8]), 0, 0, 0
             )
             self.end_cal.select_day(dt)
+        self.save_btn.set_sensitive(True)
 
     @Gtk.Template.Callback()
     def on_end_time_changed(self, _):
@@ -140,6 +141,7 @@ class TaskDetails(Adw.Bin):
             self.end_datetime = (
                 f"{self.end_cal.get_date().format('%Y%m%d')}T{hour}{min}00"
             )
+        self.save_btn.set_sensitive(True)
 
     @Gtk.Template.Callback()
     def on_copy_text_clicked(self, _btn):
@@ -152,7 +154,7 @@ class TaskDetails(Adw.Bin):
     @Gtk.Template.Callback()
     def on_move_to_trash_clicked(self, _btn):
         self.parent.delete()
-        self.close()
+        self.details_status.set_visible(True)
 
     @Gtk.Template.Callback()
     def on_open_as_ics_clicked(self, _btn):
@@ -167,11 +169,11 @@ class TaskDetails(Adw.Bin):
 
     @Gtk.Template.Callback()
     def on_percent_complete_changed(self, adj):
-        pass
+        self.save_btn.set_sensitive(True)
 
     @Gtk.Template.Callback()
     def on_priority_changed(self, adj):
-        pass
+        self.save_btn.set_sensitive(True)
 
     @Gtk.Template.Callback()
     def on_style_selected(self, btn: Gtk.Button) -> None:

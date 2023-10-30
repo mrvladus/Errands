@@ -96,6 +96,8 @@ class Task(Gtk.Revealer):
         for task in get_children(self.tasks_list):
             if not task.task["deleted"]:
                 task.delete()
+        if self.window.task_details.parent == self:
+            self.window.task_details.details_status.set_visible(True)
 
     def expand(self, expanded: bool) -> None:
         self.sub_tasks_revealer.set_reveal_child(expanded)
@@ -196,9 +198,7 @@ class Task(Gtk.Revealer):
 
     @Gtk.Template.Callback()
     def on_details_btn_clicked(self, _btn):
-        from errands.widgets.task_details import TaskDetails
-
-        self.window.sidebar.set_sidebar(TaskDetails(self))
+        self.window.task_details.update_info(self)
 
     @Gtk.Template.Callback()
     def on_sub_task_added(self, entry: Gtk.Entry) -> None:

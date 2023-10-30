@@ -166,21 +166,15 @@
           </object>
         </property>
 
-        <!-- Sidebar -->
         <property name="content">
           <object class="AdwOverlaySplitView" id="sidebar">
             <property name="min-sidebar-width">360</property>
             <property name="max-sidebar-width">360</property>
             <property name="sidebar-width-unit">px</property>
-
-            <!-- Task details panel -->
-            <property name="sidebar">
-              <object class="TaskDetails" />
-            </property>
+            <property name="sidebar-position">start</property>
 
             <!-- Main Content -->
             <property name="content">
-
               <object class="AdwToolbarView">
 
                 <!-- Headerbar -->

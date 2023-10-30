@@ -18,6 +18,19 @@
               </object>
             </property>
 
+            <!-- Move to trash -->
+            <child type="start">
+              <object class="GtkButton">
+                <property name="icon-name">user-trash-symbolic</property>
+                <property name="tooltip-text" translatable="yes">Move to Trash</property>
+                <property name="visible" bind-source="details_status" bind-property="visible" bind-flags="sync-create|invert-boolean" />
+                <accessibility>
+                  <property name="label" translatable="yes">Move to Trash</property>
+                </accessibility>
+                <signal name="clicked" handler="on_move_to_trash_clicked" />
+              </object>
+            </child>
+
             <!-- Save button -->
             <child type="end">
               <object class="GtkButton" id="save_btn">
@@ -32,19 +45,6 @@
                 <style>
                   <class name="suggested-action" />
                 </style>
-              </object>
-            </child>
-
-            <!-- Move to trash -->
-            <child type="end">
-              <object class="GtkButton">
-                <property name="icon-name">user-trash-symbolic</property>
-                <property name="tooltip-text" translatable="yes">Move to Trash</property>
-                <property name="visible" bind-source="details_status" bind-property="visible" bind-flags="sync-create|invert-boolean" />
-                <accessibility>
-                  <property name="label" translatable="yes">Move to Trash</property>
-                </accessibility>
-                <signal name="clicked" handler="on_move_to_trash_clicked" />
               </object>
             </child>
 
@@ -68,9 +68,9 @@
                     <child>
                       <object class="AdwStatusPage" id="details_status">
                         <property name="title" translatable="yes">No Details</property>
-                        <property name="description" translatable="yes">Select task to show them</property>
+                        <property name="description" translatable="yes">Click on task to show more info</property>
                         <property name="icon-name">help-about-symbolic</property>
-                        <property name="visible">false</property>
+                        <property name="visible">true</property>
                         <property name="vexpand">true</property>
                         <style>
                           <class name="compact" />
@@ -188,17 +188,11 @@
 
                         <!-- Edit -->
                         <child>
-                          <object class="AdwEntryRow" id="edit_entry">
-                            <property name="height-request">60</property>
-                            <property name="enable-emoji-completion">true</property>
-                            <property name="title" translatable="yes">Edit Task</property>
-                            <style>
-                              <class name="card" />
-                            </style>
-                            <signal name="changed" handler="on_text_changed" />
+                          <object class="AdwPreferencesGroup">
+                            <property name="title" translatable="yes">Edit</property>
 
                             <!-- Copy text -->
-                            <child type="suffix">
+                            <child type="header-suffix">
                               <object class="GtkButton">
                                 <property name="icon-name">edit-copy-symbolic</property>
                                 <property name="valign">center</property>
@@ -213,6 +207,25 @@
                               </object>
                             </child>
 
+                            <!-- Edit entry -->
+                            <child>
+                              <object class="GtkTextView">
+                                <property name="height-request">55</property>
+                                <property name="top-margin">12</property>
+                                <property name="bottom-margin">12</property>
+                                <property name="left-margin">12</property>
+                                <property name="right-margin">12</property>
+                                <property name="buffer">
+                                  <object class="GtkTextBuffer" id="edit_entry">
+                                    <signal name="changed" handler="on_text_changed" />
+                                  </object>
+                                </property>
+                                <style>
+                                  <class name="card" />
+                                </style>
+                              </object>
+                            </child>
+
                           </object>
                         </child>
 
@@ -222,7 +235,7 @@
                             <property name="title" translatable="yes">Notes</property>
                             <child>
                               <object class="GtkTextView">
-                                <property name="height-request">100</property>
+                                <property name="height-request">55</property>
                                 <property name="top-margin">12</property>
                                 <property name="bottom-margin">12</property>
                                 <property name="left-margin">12</property>

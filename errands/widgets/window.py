@@ -24,8 +24,6 @@ from errands.utils.markup import Markup
 class Window(Adw.ApplicationWindow):
     __gtype_name__ = "Window"
 
-    GObject.type_ensure(TaskDetails)
-
     # - Template children - #
     about_window: Adw.AboutWindow = Gtk.Template.Child()
     clear_trash_btn: Gtk.Button = Gtk.Template.Child()
@@ -63,8 +61,15 @@ class Window(Adw.ApplicationWindow):
         # Setup theme
         Log.debug("Setting theme")
         Adw.StyleManager.get_default().set_color_scheme(GSettings.get("theme"))
+        self.build_ui()
         Log.debug("Present window")
         self.present()
+
+    def build_ui(self):
+        Log.debug("Build window UI template")
+        # Add details panel
+        self.task_details = TaskDetails()
+        self.sidebar.set_sidebar(self.task_details)
 
     def perform_startup(self) -> None:
         """
@@ -530,4 +535,6 @@ class Window(Adw.ApplicationWindow):
         """
         width: int = self.props.default_width
         self.scroll_up_btn_rev.set_visible(width > 400)
-        self.split_view.set_collapsed(width < 720)
+        self.split_view.set_collapsed(width < 1030)
+        self.sidebar.set_collapsed(width < 730)
+        print(width)
