@@ -174,9 +174,9 @@
             <property name="sidebar-width-unit">px</property>
 
             <!-- Task details panel -->
-            <!-- <property name="content">
-              <object class="TaskDetails" id="task_details" />
-            </property> -->
+            <property name="sidebar">
+              <object class="TaskDetails" />
+            </property>
 
             <!-- Main Content -->
             <property name="content">

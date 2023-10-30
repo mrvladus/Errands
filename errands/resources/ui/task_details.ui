@@ -18,15 +18,20 @@
               </object>
             </property>
 
-            <!-- Copy text -->
-            <child type="start">
-              <object class="GtkButton">
-                <property name="icon-name">edit-copy-symbolic</property>
-                <property name="tooltip-text" translatable="yes">Copy Text</property>
+            <!-- Save button -->
+            <child type="end">
+              <object class="GtkButton" id="save_btn">
+                <property name="label" translatable="yes">Save</property>
+                <property name="sensitive">false</property>
+                <property name="can-shrink">true</property>
+                <property name="visible" bind-source="details_status" bind-property="visible" bind-flags="sync-create|invert-boolean" />
                 <accessibility>
-                  <property name="label" translatable="yes">Copy Text</property>
+                  <property name="label" translatable="yes">Save</property>
                 </accessibility>
-                <signal name="clicked" handler="on_copy_text_clicked" />
+                <signal name="clicked" handler="on_save_btn_clicked" />
+                <style>
+                  <class name="suggested-action" />
+                </style>
               </object>
             </child>
 
@@ -35,6 +40,7 @@
               <object class="GtkButton">
                 <property name="icon-name">user-trash-symbolic</property>
                 <property name="tooltip-text" translatable="yes">Move to Trash</property>
+                <property name="visible" bind-source="details_status" bind-property="visible" bind-flags="sync-create|invert-boolean" />
                 <accessibility>
                   <property name="label" translatable="yes">Move to Trash</property>
                 </accessibility>
@@ -57,355 +63,395 @@
                 <child>
                   <object class="GtkBox">
                     <property name="orientation">vertical</property>
-                    <property name="spacing">12</property>
 
-                    <!-- Edit -->
+                    <!-- Status -->
                     <child>
-                      <object class="AdwEntryRow" id="edit_entry">
-                        <property name="height-request">60</property>
-                        <property name="enable-emoji-completion">true</property>
-                        <property name="title" translatable="yes">Edit Task</property>
+                      <object class="AdwStatusPage" id="details_status">
+                        <property name="title" translatable="yes">No Details</property>
+                        <property name="description" translatable="yes">Select task to show them</property>
+                        <property name="icon-name">help-about-symbolic</property>
+                        <property name="visible">false</property>
+                        <property name="vexpand">true</property>
                         <style>
-                          <class name="card" />
+                          <class name="compact" />
                         </style>
-                        <signal name="changed" handler="on_text_changed" />
                       </object>
                     </child>
 
-                    <!-- Colors -->
+                    <!-- Items box -->
                     <child>
-                      <object class="GtkBox">
-                        <property name="halign">center</property>
-                        <style>
-                          <class name="toolbar" />
-                        </style>
-                        <!-- Clear style button -->
-                        <child>
-                          <object class="GtkButton">
-                            <property name="icon-name">window-close-symbolic</property>
-                            <property name="tooltip-text" translatable="yes">Clear Style</property>
-                            <signal name="clicked" handler="on_style_selected" />
-                            <accessibility>
-                              <property name="label" translatable="yes">Clear Style</property>
-                            </accessibility>
-                            <style>
-                              <class name="circular" />
-                            </style>
-                          </object>
-                        </child>
-                        <!-- Blue style button -->
-                        <child>
-                          <object class="GtkButton">
-                            <style>
-                              <class name="accent-color-btn" />
-                              <class name="btn-blue" />
-                              <class name="circular" />
-                            </style>
-                            <signal name="clicked" handler="on_style_selected" />
-                          </object>
-                        </child>
-                        <!-- Green style button -->
-                        <child>
-                          <object class="GtkButton">
-                            <style>
-                              <class name="accent-color-btn" />
-                              <class name="btn-green" />
-                              <class name="circular" />
-                            </style>
-                            <signal name="clicked" handler="on_style_selected" />
-                          </object>
-                        </child>
-                        <!-- Yellow style button -->
-                        <child>
-                          <object class="GtkButton">
-                            <style>
-                              <class name="accent-color-btn" />
-                              <class name="btn-yellow" />
-                              <class name="circular" />
-                            </style>
-                            <signal name="clicked" handler="on_style_selected" />
-                          </object>
-                        </child>
-                        <!-- Orange style button -->
-                        <child>
-                          <object class="GtkButton">
-                            <style>
-                              <class name="accent-color-btn" />
-                              <class name="btn-orange" />
-                              <class name="circular" />
-                            </style>
-                            <signal name="clicked" handler="on_style_selected" />
-                          </object>
-                        </child>
-                        <!-- Red style button -->
-                        <child>
-                          <object class="GtkButton">
-                            <style>
-                              <class name="accent-color-btn" />
-                              <class name="btn-red" />
-                              <class name="circular" />
-                            </style>
-                            <signal name="clicked" handler="on_style_selected" />
-                          </object>
-                        </child>
-                        <!-- Purple style button -->
-                        <child>
-                          <object class="GtkButton">
-                            <style>
-                              <class name="accent-color-btn" />
-                              <class name="btn-purple" />
-                              <class name="circular" />
-                            </style>
-                            <signal name="clicked" handler="on_style_selected" />
-                          </object>
-                        </child>
-                        <!-- Brown style button -->
-                        <child>
-                          <object class="GtkButton">
-                            <style>
-                              <class name="accent-color-btn" />
-                              <class name="btn-brown" />
-                              <class name="circular" />
-                            </style>
-                            <signal name="clicked" handler="on_style_selected" />
-                          </object>
-                        </child>
-                      </object>
-                    </child>
+                      <object class="GtkBox" id="details_box">
+                        <property name="orientation">vertical</property>
+                        <property name="spacing">12</property>
+                        <property name="visible" bind-source="details_status" bind-property="visible" bind-flags="sync-create|invert-boolean|bidirectional" />
 
-                    <!-- Notes -->
-                    <child>
-                      <object class="AdwPreferencesGroup">
-                        <property name="title" translatable="yes">Notes</property>
+                        <!-- Colors -->
                         <child>
-                          <object class="GtkTextView">
-                            <property name="height-request">100</property>
-                            <property name="top-margin">12</property>
-                            <property name="bottom-margin">12</property>
-                            <property name="left-margin">12</property>
-                            <property name="right-margin">12</property>
-                            <property name="buffer">
-                              <object class="GtkTextBuffer" id="notes">
-                                <signal name="changed" handler="on_notes_text_changed" />
+                          <object class="GtkBox">
+                            <property name="halign">center</property>
+                            <style>
+                              <class name="toolbar" />
+                            </style>
+                            <!-- Clear style button -->
+                            <child>
+                              <object class="GtkButton">
+                                <property name="icon-name">window-close-symbolic</property>
+                                <property name="tooltip-text" translatable="yes">Clear Style</property>
+                                <signal name="clicked" handler="on_style_selected" />
+                                <accessibility>
+                                  <property name="label" translatable="yes">Clear Style</property>
+                                </accessibility>
+                                <style>
+                                  <class name="circular" />
+                                </style>
                               </object>
-                            </property>
+                            </child>
+                            <!-- Blue style button -->
+                            <child>
+                              <object class="GtkButton">
+                                <style>
+                                  <class name="accent-color-btn" />
+                                  <class name="btn-blue" />
+                                  <class name="circular" />
+                                </style>
+                                <signal name="clicked" handler="on_style_selected" />
+                              </object>
+                            </child>
+                            <!-- Green style button -->
+                            <child>
+                              <object class="GtkButton">
+                                <style>
+                                  <class name="accent-color-btn" />
+                                  <class name="btn-green" />
+                                  <class name="circular" />
+                                </style>
+                                <signal name="clicked" handler="on_style_selected" />
+                              </object>
+                            </child>
+                            <!-- Yellow style button -->
+                            <child>
+                              <object class="GtkButton">
+                                <style>
+                                  <class name="accent-color-btn" />
+                                  <class name="btn-yellow" />
+                                  <class name="circular" />
+                                </style>
+                                <signal name="clicked" handler="on_style_selected" />
+                              </object>
+                            </child>
+                            <!-- Orange style button -->
+                            <child>
+                              <object class="GtkButton">
+                                <style>
+                                  <class name="accent-color-btn" />
+                                  <class name="btn-orange" />
+                                  <class name="circular" />
+                                </style>
+                                <signal name="clicked" handler="on_style_selected" />
+                              </object>
+                            </child>
+                            <!-- Red style button -->
+                            <child>
+                              <object class="GtkButton">
+                                <style>
+                                  <class name="accent-color-btn" />
+                                  <class name="btn-red" />
+                                  <class name="circular" />
+                                </style>
+                                <signal name="clicked" handler="on_style_selected" />
+                              </object>
+                            </child>
+                            <!-- Purple style button -->
+                            <child>
+                              <object class="GtkButton">
+                                <style>
+                                  <class name="accent-color-btn" />
+                                  <class name="btn-purple" />
+                                  <class name="circular" />
+                                </style>
+                                <signal name="clicked" handler="on_style_selected" />
+                              </object>
+                            </child>
+                            <!-- Brown style button -->
+                            <child>
+                              <object class="GtkButton">
+                                <style>
+                                  <class name="accent-color-btn" />
+                                  <class name="btn-brown" />
+                                  <class name="circular" />
+                                </style>
+                                <signal name="clicked" handler="on_style_selected" />
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+
+                        <!-- Edit -->
+                        <child>
+                          <object class="AdwEntryRow" id="edit_entry">
+                            <property name="height-request">60</property>
+                            <property name="enable-emoji-completion">true</property>
+                            <property name="title" translatable="yes">Edit Task</property>
                             <style>
                               <class name="card" />
                             </style>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
+                            <signal name="changed" handler="on_text_changed" />
 
-                    <!-- Props -->
-                    <child>
-                      <object class="AdwPreferencesGroup">
-                        <property name="title" translatable="yes">Properties</property>
-
-                        <!-- Start date -->
-                        <child>
-                          <object class="AdwActionRow" id="start_date">
-                            <property name="subtitle" translatable="yes">Start</property>
-                            <child>
-                              <object class="GtkMenuButton">
-                                <property name="icon-name">x-office-calendar-symbolic</property>
-                                <property name="valign">center</property>
-                                <property name="popover">
-                                  <object class="GtkPopover">
-                                    <child>
-                                      <object class="GtkBox">
-                                        <property name="orientation">vertical</property>
-
-                                        <!-- Time -->
-                                        <child>
-                                          <object class="GtkBox">
-                                            <property name="halign">center</property>
-                                            <style>
-                                              <class name="toolbar" />
-                                            </style>
-                                            <child>
-                                              <object class="GtkSpinButton" id="start_hour">
-                                                <property name="wrap">true</property>
-                                                <property name="adjustment">
-                                                  <object class="GtkAdjustment">
-                                                    <property name="lower">0</property>
-                                                    <property name="upper">23</property>
-                                                    <property name="step-increment">1</property>
-                                                  </object>
-                                                </property>
-                                                <signal name="value-changed" handler="on_start_time_changed" />
-                                              </object>
-                                            </child>
-                                            <child>
-                                              <object class="GtkLabel">
-                                                <property name="label">:</property>
-                                              </object>
-                                            </child>
-                                            <child>
-                                              <object class="GtkSpinButton" id="start_min">
-                                                <property name="wrap">true</property>
-                                                <property name="adjustment">
-                                                  <object class="GtkAdjustment">
-                                                    <property name="lower">0</property>
-                                                    <property name="upper">59</property>
-                                                    <property name="step-increment">1</property>
-                                                  </object>
-                                                </property>
-                                                <signal name="value-changed" handler="on_start_time_changed" />
-                                              </object>
-                                            </child>
-                                          </object>
-                                        </child>
-
-                                        <!-- Date -->
-                                        <child>
-                                          <object class="GtkCalendar" id="start_cal">
-                                            <signal name="day-selected" handler="on_start_time_changed" />
-                                          </object>
-                                        </child>
-
-                                      </object>
-                                    </child>
-                                  </object>
-                                </property>
-                                <style>
-                                  <class name="flat" />
-                                </style>
-                              </object>
-                            </child>
-                          </object>
-                        </child>
-
-                        <!-- End Date -->
-                        <child>
-                          <object class="AdwActionRow" id="end_date">
-                            <property name="subtitle" translatable="yes">End</property>
-                            <child>
-                              <object class="GtkMenuButton">
-                                <property name="icon-name">x-office-calendar-symbolic</property>
-                                <property name="valign">center</property>
-                                <property name="popover">
-                                  <object class="GtkPopover">
-                                    <child>
-                                      <object class="GtkBox">
-                                        <property name="orientation">vertical</property>
-
-                                        <!-- Time -->
-                                        <child>
-                                          <object class="GtkBox">
-                                            <property name="halign">center</property>
-                                            <style>
-                                              <class name="toolbar" />
-                                            </style>
-                                            <child>
-                                              <object class="GtkSpinButton" id="end_hour">
-                                                <property name="wrap">true</property>
-                                                <property name="adjustment">
-                                                  <object class="GtkAdjustment">
-                                                    <property name="lower">0</property>
-                                                    <property name="upper">23</property>
-                                                    <property name="step-increment">1</property>
-                                                  </object>
-                                                </property>
-                                                <signal name="value-changed" handler="on_end_time_changed" />
-                                              </object>
-                                            </child>
-                                            <child>
-                                              <object class="GtkLabel">
-                                                <property name="label">:</property>
-                                              </object>
-                                            </child>
-                                            <child>
-                                              <object class="GtkSpinButton" id="end_min">
-                                                <property name="wrap">true</property>
-                                                <property name="adjustment">
-                                                  <object class="GtkAdjustment">
-                                                    <property name="lower">0</property>
-                                                    <property name="upper">59</property>
-                                                    <property name="step-increment">1</property>
-                                                  </object>
-                                                </property>
-                                                <signal name="value-changed" handler="on_end_time_changed" />
-                                              </object>
-                                            </child>
-                                          </object>
-                                        </child>
-
-                                        <!-- Date -->
-                                        <child>
-                                          <object class="GtkCalendar" id="end_cal">
-                                            <signal name="day-selected" handler="on_end_time_changed" />
-                                          </object>
-                                        </child>
-
-                                      </object>
-                                    </child>
-                                  </object>
-                                </property>
-                                <style>
-                                  <class name="flat" />
-                                </style>
-                              </object>
-                            </child>
-                          </object>
-                        </child>
-
-                        <!-- Complete % -->
-                        <child>
-                          <object class="AdwSpinRow" id="percent_complete">
-                            <property name="title" translatable="yes">Complete %</property>
-                            <property name="adjustment">
-                              <object class="GtkAdjustment">
-                                <property name="lower">0</property>
-                                <property name="upper">100</property>
-                                <property name="value">0</property>
-                                <property name="step-increment">1</property>
-                                <signal name="value-changed" handler="on_percent_complete_changed" />
-                              </object>
-                            </property>
-                          </object>
-                        </child>
-
-                        <!-- Priority -->
-                        <child>
-                          <object class="AdwSpinRow" id="priority">
-                            <property name="title" translatable="yes">Priority</property>
-                            <property name="adjustment">
-                              <object class="GtkAdjustment">
-                                <property name="lower">0</property>
-                                <property name="upper">9</property>
-                                <property name="value">0</property>
-                                <property name="step-increment">1</property>
-                                <signal name="value-changed" handler="on_priority_changed" />
-                              </object>
-                            </property>
-                          </object>
-                        </child>
-
-                      </object>
-                    </child>
-
-                    <!-- Misc -->
-                    <child>
-                      <object class="AdwPreferencesGroup">
-                        <property name="title" translatable="yes">Misc</property>
-                        <child>
-                          <object class="AdwActionRow">
-                            <property name="title" translatable="yes">Open in Calendar</property>
-                            <property name="subtitle" translatable="yes">Open task as ".isc" file</property>
-                            <property name="activatable-widget">open_as_ics</property>
+                            <!-- Copy text -->
                             <child type="suffix">
-                              <object class="GtkButton" id="open_as_ics">
-                                <property name="icon-name">x-office-calendar-symbolic</property>
+                              <object class="GtkButton">
+                                <property name="icon-name">edit-copy-symbolic</property>
                                 <property name="valign">center</property>
+                                <property name="tooltip-text" translatable="yes">Copy Text</property>
+                                <accessibility>
+                                  <property name="label" translatable="yes">Copy Text</property>
+                                </accessibility>
+                                <signal name="clicked" handler="on_copy_text_clicked" />
                                 <style>
                                   <class name="flat" />
                                 </style>
-                                <signal name="clicked" handler="on_open_as_ics_clicked" />
+                              </object>
+                            </child>
+
+                          </object>
+                        </child>
+
+                        <!-- Notes -->
+                        <child>
+                          <object class="AdwPreferencesGroup">
+                            <property name="title" translatable="yes">Notes</property>
+                            <child>
+                              <object class="GtkTextView">
+                                <property name="height-request">100</property>
+                                <property name="top-margin">12</property>
+                                <property name="bottom-margin">12</property>
+                                <property name="left-margin">12</property>
+                                <property name="right-margin">12</property>
+                                <property name="buffer">
+                                  <object class="GtkTextBuffer" id="notes">
+                                    <signal name="changed" handler="on_notes_text_changed" />
+                                  </object>
+                                </property>
+                                <style>
+                                  <class name="card" />
+                                </style>
                               </object>
                             </child>
                           </object>
                         </child>
+
+                        <!-- Props -->
+                        <child>
+                          <object class="AdwPreferencesGroup">
+                            <property name="title" translatable="yes">Properties</property>
+
+                            <!-- Start date -->
+                            <child>
+                              <object class="AdwActionRow" id="start_date">
+                                <property name="subtitle" translatable="yes">Start</property>
+                                <child>
+                                  <object class="GtkMenuButton">
+                                    <property name="icon-name">x-office-calendar-symbolic</property>
+                                    <property name="valign">center</property>
+                                    <property name="popover">
+                                      <object class="GtkPopover">
+                                        <child>
+                                          <object class="GtkBox">
+                                            <property name="orientation">vertical</property>
+
+                                            <!-- Time -->
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="halign">center</property>
+                                                <style>
+                                                  <class name="toolbar" />
+                                                </style>
+                                                <child>
+                                                  <object class="GtkSpinButton" id="start_hour">
+                                                    <property name="wrap">true</property>
+                                                    <property name="adjustment">
+                                                      <object class="GtkAdjustment">
+                                                        <property name="lower">0</property>
+                                                        <property name="upper">23</property>
+                                                        <property name="step-increment">1</property>
+                                                      </object>
+                                                    </property>
+                                                    <signal name="value-changed" handler="on_start_time_changed" />
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="label">:</property>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="GtkSpinButton" id="start_min">
+                                                    <property name="wrap">true</property>
+                                                    <property name="adjustment">
+                                                      <object class="GtkAdjustment">
+                                                        <property name="lower">0</property>
+                                                        <property name="upper">59</property>
+                                                        <property name="step-increment">1</property>
+                                                      </object>
+                                                    </property>
+                                                    <signal name="value-changed" handler="on_start_time_changed" />
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+
+                                            <!-- Date -->
+                                            <child>
+                                              <object class="GtkCalendar" id="start_cal">
+                                                <signal name="day-selected" handler="on_start_time_changed" />
+                                              </object>
+                                            </child>
+
+                                          </object>
+                                        </child>
+                                      </object>
+                                    </property>
+                                    <style>
+                                      <class name="flat" />
+                                    </style>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+
+                            <!-- End Date -->
+                            <child>
+                              <object class="AdwActionRow" id="end_date">
+                                <property name="subtitle" translatable="yes">End</property>
+                                <child>
+                                  <object class="GtkMenuButton">
+                                    <property name="icon-name">x-office-calendar-symbolic</property>
+                                    <property name="valign">center</property>
+                                    <property name="popover">
+                                      <object class="GtkPopover">
+                                        <child>
+                                          <object class="GtkBox">
+                                            <property name="orientation">vertical</property>
+
+                                            <!-- Time -->
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="halign">center</property>
+                                                <style>
+                                                  <class name="toolbar" />
+                                                </style>
+                                                <child>
+                                                  <object class="GtkSpinButton" id="end_hour">
+                                                    <property name="wrap">true</property>
+                                                    <property name="adjustment">
+                                                      <object class="GtkAdjustment">
+                                                        <property name="lower">0</property>
+                                                        <property name="upper">23</property>
+                                                        <property name="step-increment">1</property>
+                                                      </object>
+                                                    </property>
+                                                    <signal name="value-changed" handler="on_end_time_changed" />
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="label">:</property>
+                                                  </object>
+                                                </child>
+                                                <child>
+                                                  <object class="GtkSpinButton" id="end_min">
+                                                    <property name="wrap">true</property>
+                                                    <property name="adjustment">
+                                                      <object class="GtkAdjustment">
+                                                        <property name="lower">0</property>
+                                                        <property name="upper">59</property>
+                                                        <property name="step-increment">1</property>
+                                                      </object>
+                                                    </property>
+                                                    <signal name="value-changed" handler="on_end_time_changed" />
+                                                  </object>
+                                                </child>
+                                              </object>
+                                            </child>
+
+                                            <!-- Date -->
+                                            <child>
+                                              <object class="GtkCalendar" id="end_cal">
+                                                <signal name="day-selected" handler="on_end_time_changed" />
+                                              </object>
+                                            </child>
+
+                                          </object>
+                                        </child>
+                                      </object>
+                                    </property>
+                                    <style>
+                                      <class name="flat" />
+                                    </style>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+
+                            <!-- Complete % -->
+                            <child>
+                              <object class="AdwSpinRow" id="percent_complete">
+                                <property name="title" translatable="yes">Complete %</property>
+                                <property name="adjustment">
+                                  <object class="GtkAdjustment">
+                                    <property name="lower">0</property>
+                                    <property name="upper">100</property>
+                                    <property name="value">0</property>
+                                    <property name="step-increment">1</property>
+                                    <signal name="value-changed" handler="on_percent_complete_changed" />
+                                  </object>
+                                </property>
+                              </object>
+                            </child>
+
+                            <!-- Priority -->
+                            <child>
+                              <object class="AdwSpinRow" id="priority">
+                                <property name="title" translatable="yes">Priority</property>
+                                <property name="adjustment">
+                                  <object class="GtkAdjustment">
+                                    <property name="lower">0</property>
+                                    <property name="upper">9</property>
+                                    <property name="value">0</property>
+                                    <property name="step-increment">1</property>
+                                    <signal name="value-changed" handler="on_priority_changed" />
+                                  </object>
+                                </property>
+                              </object>
+                            </child>
+
+                          </object>
+                        </child>
+
+                        <!-- Misc -->
+                        <child>
+                          <object class="AdwPreferencesGroup">
+                            <property name="title" translatable="yes">Misc</property>
+                            <child>
+                              <object class="AdwActionRow">
+                                <property name="title" translatable="yes">Open in Calendar</property>
+                                <property name="subtitle" translatable="yes">Open task as ".isc" file</property>
+                                <property name="activatable-widget">open_as_ics</property>
+                                <child type="suffix">
+                                  <object class="GtkButton" id="open_as_ics">
+                                    <property name="icon-name">x-office-calendar-symbolic</property>
+                                    <property name="valign">center</property>
+                                    <style>
+                                      <class name="flat" />
+                                    </style>
+                                    <signal name="clicked" handler="on_open_as_ics_clicked" />
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+
                       </object>
                     </child>
 

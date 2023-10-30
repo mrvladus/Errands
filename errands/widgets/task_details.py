@@ -85,6 +85,10 @@ class TaskDetails(Adw.Bin):
         self.text = entry.get_text()
 
     @Gtk.Template.Callback()
+    def on_save_btn_clicked(self, btn):
+        pass
+
+    @Gtk.Template.Callback()
     def on_start_time_changed(self, _):
         # Get time
         hour = str(self.start_hour.get_value_as_int())
