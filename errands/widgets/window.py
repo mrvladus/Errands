@@ -537,4 +537,3 @@ class Window(Adw.ApplicationWindow):
         self.scroll_up_btn_rev.set_visible(width > 400)
         self.split_view.set_collapsed(width < 1030)
         self.sidebar.set_collapsed(width < 730)
-        print(width)

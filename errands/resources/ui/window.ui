@@ -172,6 +172,7 @@
             <property name="max-sidebar-width">360</property>
             <property name="sidebar-width-unit">px</property>
             <property name="sidebar-position">start</property>
+            <property name="show-sidebar">false</property>
 
             <!-- Main Content -->
             <property name="content">

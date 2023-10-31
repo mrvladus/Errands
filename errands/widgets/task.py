@@ -198,6 +198,7 @@ class Task(Gtk.Revealer):
 
     @Gtk.Template.Callback()
     def on_details_btn_clicked(self, _btn):
+        self.window.sidebar.set_show_sidebar(True)
         self.window.task_details.update_info(self)
 
     @Gtk.Template.Callback()
