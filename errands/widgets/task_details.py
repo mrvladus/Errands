@@ -1,7 +1,9 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
+import gettext
 import os
+from errands.utils.functions import get_children
 from gi.repository import Adw, Gtk, Gio, GLib, Gdk
 from errands.widgets.task import Task
 from errands.utils.markup import Markup
@@ -22,6 +24,8 @@ class TaskDetails(Adw.Bin):
     start_min: Gtk.SpinButton = Gtk.Template.Child()
     start_date: Adw.ActionRow = Gtk.Template.Child()
     start_cal: Gtk.Calendar = Gtk.Template.Child()
+    tag_entry: Adw.EntryRow = Gtk.Template.Child()
+    tags: Adw.PreferencesGroup = Gtk.Template.Child()
     end_hour: Gtk.SpinButton = Gtk.Template.Child()
     end_min: Gtk.SpinButton = Gtk.Template.Child()
     end_date: Adw.ActionRow = Gtk.Template.Child()
@@ -35,6 +39,19 @@ class TaskDetails(Adw.Bin):
 
     def __init__(self) -> None:
         super().__init__()
+
+    def add_tag(self, text: str) -> None:
+        if text == "":
+            return
+        tag = Adw.ActionRow(title=text)
+        delete_btn = Gtk.Button(
+            icon_name="window-close-symbolic",
+            valign="center",
+            css_classes=["flat", "circular"],
+        )
+        delete_btn.connect("clicked", self.on_tag_deleted, tag)
+        tag.add_suffix(delete_btn)
+        self.tags.add(tag)
 
     def update_info(self, parent):
         self.parent = parent
@@ -59,6 +76,16 @@ class TaskDetails(Adw.Bin):
         self.priority.set_value(self.parent.task["priority"])
         self.save_btn.set_sensitive(False)
         self.details_status.set_visible(False)
+        # Tags
+        # Remove old
+        for i, tag in enumerate(get_children(self.tag_entry.get_parent())):
+            # Skip entry
+            if i == 0:
+                continue
+            self.tags.remove(tag)
+        # Add new
+        for tag in self.parent.task["tags"].split(","):
+            self.add_tag(tag)
 
     @Gtk.Template.Callback()
     def on_notes_text_changed(self, buffer: Gtk.TextBuffer):
@@ -70,6 +97,7 @@ class TaskDetails(Adw.Bin):
 
     @Gtk.Template.Callback()
     def on_save_btn_clicked(self, btn):
+        Log.debug("Save details")
         # Set new props
         self.parent.task["start_date"] = self.start_datetime
         self.parent.task["end_date"] = self.end_datetime
@@ -83,6 +111,14 @@ class TaskDetails(Adw.Bin):
             self.parent.task_row.set_title(Markup.find_url(Markup.escape(text)))
         else:
             self.edit_entry.set_text(self.parent.task["text"])
+        # Set tags
+        tag_arr: list[str] = []
+        for i, row in enumerate(get_children(self.tag_entry.get_parent())):
+            # Skip entry
+            if i == 0:
+                continue
+            tag_arr.append(row.get_title())
+        self.parent.task["tags"] = ",".join(tag_arr)
         # Update data and sync
         self.parent.update_data()
         Sync.sync()
@@ -196,3 +232,18 @@ class TaskDetails(Adw.Bin):
         self.parent.task["synced_caldav"] = False
         self.parent.update_data()
         Sync.sync()
+
+    @Gtk.Template.Callback()
+    def on_tag_added(self, entry: Adw.EntryRow) -> None:
+        text = entry.get_text().strip(" \n\t")
+        if text == "":
+            return
+        Log.debug("Add tag")
+        self.add_tag(entry.get_text())
+        entry.set_text("")
+        self.save_btn.set_sensitive(True)
+
+    def on_tag_deleted(self, btn, tag):
+        Log.debug("Remove tag")
+        self.tags.remove(tag)
+        self.save_btn.set_sensitive(True)

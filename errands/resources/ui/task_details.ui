@@ -441,6 +441,19 @@
                           </object>
                         </child>
 
+                        <!-- Tags -->
+                        <child>
+                          <object class="AdwPreferencesGroup" id="tags">
+                            <property name="title" translatable="yes">Tags</property>
+                            <child>
+                              <object class="AdwEntryRow" id="tag_entry">
+                                <property name="title" translatable="yes">Add Tag</property>
+                                <signal name="entry-activated" handler="on_tag_added" />
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+
                         <!-- Misc -->
                         <child>
                           <object class="AdwPreferencesGroup">

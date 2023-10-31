@@ -20,6 +20,7 @@ def new_task(
     notes: str = "",
     percent_complete: int = 0,
     priority: int = 0,
+    tags: str = "",
 ) -> UserDataTask:
     task = {
         "id": id if id else str(uuid.uuid4()),
@@ -40,6 +41,7 @@ def new_task(
         "notes": notes,
         "percent_complete": percent_complete,
         "priority": priority,
+        "tags": tags,
     }
     return task
 
