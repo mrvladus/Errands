@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 import json
+from errands.widgets.trash_panel import TrashPanel
 from gi.repository import Gio, Adw, Gtk, GLib, GObject
 from __main__ import VERSION, APP_ID
 
@@ -26,8 +27,6 @@ class Window(Adw.ApplicationWindow):
 
     # - Template children - #
     about_window: Adw.AboutWindow = Gtk.Template.Child()
-    clear_trash_btn: Gtk.Button = Gtk.Template.Child()
-    confirm_dialog: Adw.MessageDialog = Gtk.Template.Child()
     delete_completed_tasks_btn_rev: Gtk.Revealer = Gtk.Template.Child()
     drop_motion_ctrl: Gtk.DropControllerMotion = Gtk.Template.Child()
     export_dialog: Gtk.FileDialog = Gtk.Template.Child()
@@ -42,8 +41,6 @@ class Window(Adw.ApplicationWindow):
     title: Adw.WindowTitle = Gtk.Template.Child()
     toast_overlay: Adw.ToastOverlay = Gtk.Template.Child()
     toggle_trash_btn: Gtk.ToggleButton = Gtk.Template.Child()
-    trash_list: Gtk.Box = Gtk.Template.Child()
-    trash_list_scrl: Gtk.ScrolledWindow = Gtk.Template.Child()
     sidebar = Gtk.Template.Child()
 
     # - State - #
@@ -67,6 +64,9 @@ class Window(Adw.ApplicationWindow):
 
     def build_ui(self):
         Log.debug("Build window UI template")
+        # Add trash panel
+        self.trash_panel = TrashPanel(self)
+        self.split_view.set_sidebar(self.trash_panel)
         # Add details panel
         self.task_details = TaskDetails()
         self.sidebar.set_sidebar(self.task_details)
@@ -296,32 +296,6 @@ class Window(Adw.ApplicationWindow):
             if task.task["id"] not in ids:
                 task.purge()
 
-    def trash_add(self, task: dict) -> None:
-        """
-        Add item to trash
-        """
-
-        self.trash_list.append(TrashItem(task, self))
-        self.trash_list_scrl.set_visible(True)
-
-    def trash_clear(self) -> None:
-        """
-        Clear unneeded items from trash
-        """
-
-        tasks: list[UserDataTask] = UserData.get()["tasks"]
-        to_remove: list[TrashItem] = []
-        trash_children: list[TrashItem] = get_children(self.trash_list)
-        for task in tasks:
-            if not task["deleted"]:
-                for item in trash_children:
-                    if item.id == task["id"]:
-                        to_remove.append(item)
-        for item in to_remove:
-            self.trash_list.remove(item)
-
-        self.trash_list_scrl.set_visible(len(get_children(self.trash_list)) > 0)
-
     def update_status(self) -> None:
         """
         Update status bar on the top
@@ -351,7 +325,7 @@ class Window(Adw.ApplicationWindow):
             else ""
         )
         self.delete_completed_tasks_btn_rev.set_reveal_child(n_all_completed > 0)
-        self.trash_list_scrl.set_visible(n_all_deleted > 0)
+        self.trash_panel.trash_list_scrl.set_visible(n_all_deleted > 0)
 
     # --- Template handlers --- #
 
@@ -429,7 +403,10 @@ class Window(Adw.ApplicationWindow):
         Move focus to sidebar
         """
         if btn.get_active():
-            self.clear_trash_btn.grab_focus()
+            try:
+                self.trash_panel.clear_trash_btn.grab_focus()
+            except:
+                pass
         else:
             btn.grab_focus()
 
@@ -448,85 +425,6 @@ class Window(Adw.ApplicationWindow):
     @Gtk.Template.Callback()
     def on_sync_btn_clicked(self, btn) -> None:
         Sync.sync(True)
-
-    @Gtk.Template.Callback()
-    def on_trash_clear(self, _) -> None:
-        Log.debug("Show confirm dialog")
-        self.confirm_dialog.show()
-
-    @Gtk.Template.Callback()
-    def on_trash_clear_confirm(self, _, res) -> None:
-        """
-        Remove all trash items and tasks
-        """
-
-        if res == "cancel":
-            Log.debug("Clear Trash cancelled")
-            return
-
-        Log.info("Clear Trash")
-
-        # Remove widgets and data
-        data: UserDataDict = UserData.get()
-        data["deleted"] = [task["id"] for task in data["tasks"] if task["deleted"]]
-        data["tasks"] = [task for task in data["tasks"] if not task["deleted"]]
-        UserData.set(data)
-        to_remove: list[Task] = [
-            task for task in self.get_all_tasks() if task.task["deleted"]
-        ]
-        for task in to_remove:
-            task.purge()
-        # Remove trash items widgets
-        for item in get_children(self.trash_list):
-            self.trash_list.remove(item)
-        self.trash_list_scrl.set_visible(False)
-        # Sync
-        Sync.sync()
-
-    @Gtk.Template.Callback()
-    def on_trash_close(self, _) -> None:
-        Log.debug("Close sidebar")
-        self.split_view.set_show_sidebar(False)
-
-    @Gtk.Template.Callback()
-    def on_trash_restore(self, _) -> None:
-        """
-        Remove trash items and restore all tasks
-        """
-
-        Log.info("Restore Trash")
-
-        # Restore tasks
-        tasks: list[Task] = self.get_all_tasks()
-        for task in tasks:
-            if task.task["deleted"]:
-                task.task["deleted"] = False
-                task.update_data()
-                task.toggle_visibility(True)
-                # Update statusbar
-                if not task.task["parent"]:
-                    task.update_status()
-                else:
-                    task.parent.update_status()
-                # Expand if needed
-                for t in tasks:
-                    if t.task["parent"] == task.task["id"]:
-                        task.expand(True)
-                        break
-
-        # Clear trash
-        self.trash_clear()
-        self.update_status()
-
-    @Gtk.Template.Callback()
-    def on_trash_drop(self, _drop, task: Task, _x, _y) -> None:
-        """
-        Move task to trash via dnd
-        """
-        Log.debug(f"Drop task to trash: {task.task['id']}")
-
-        task.delete()
-        self.update_status()
 
     @Gtk.Template.Callback()
     def on_width_changed(self, *_) -> None:

@@ -42,4 +42,4 @@ class TrashItem(Gtk.Box):
 
         restore_task()
         self.window.update_status()
-        self.window.trash_clear()
+        self.window.trash_panel.trash_clear()

@@ -1,7 +1,6 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-import gettext
 import os
 from errands.utils.functions import get_children
 from gi.repository import Adw, Gtk, Gio, GLib, Gdk
@@ -34,6 +33,7 @@ class TaskDetails(Adw.Bin):
     priority: Adw.SpinRow = Gtk.Template.Child()
 
     # State
+    parent = None
     start_datetime: str = ""
     end_datetime: str = ""
 

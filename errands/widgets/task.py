@@ -51,7 +51,7 @@ class Task(Gtk.Revealer):
             self.main_box.add_css_class(f'task-{self.task["color"]}')
         # Add to trash if needed
         if self.task["deleted"]:
-            self.window.trash_add(self.task)
+            self.window.trash_panel.trash_add(self.task)
         self._check_is_sub()
         self._add_sub_tasks()
         self.just_added = False
@@ -92,7 +92,7 @@ class Task(Gtk.Revealer):
         self.task["deleted"] = True
         self.update_data()
         self.completed_btn.set_active(True)
-        self.window.trash_add(self.task)
+        self.window.trash_panel.trash_add(self.task)
         for task in get_children(self.tasks_list):
             if not task.task["deleted"]:
                 task.delete()
