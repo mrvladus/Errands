@@ -27,6 +27,10 @@
             <property name="sidebar-position">start</property>
             <property name="show-sidebar">false</property>
 
+            <property name="sidebar">
+              <object class="TaskDetails" id="task_details" />
+            </property>
+
             <!-- Main Content -->
             <property name="content">
               <object class="AdwToolbarView">

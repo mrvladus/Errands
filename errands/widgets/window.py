@@ -11,7 +11,6 @@ import errands.utils.tasks as TaskUtils
 from errands.widgets.preferences import PreferencesWindow
 from errands.widgets.task_details import TaskDetails
 from errands.widgets.task import Task
-from errands.widgets.trash_item import TrashItem
 from errands.utils.sync import Sync
 from errands.utils.animation import scroll
 from errands.utils.gsettings import GSettings
@@ -25,7 +24,9 @@ from errands.utils.markup import Markup
 class Window(Adw.ApplicationWindow):
     __gtype_name__ = "Window"
 
+    # Composite template children
     GObject.type_ensure(TrashPanel)
+    GObject.type_ensure(TaskDetails)
 
     # - Template children - #
     about_window: Adw.AboutWindow = Gtk.Template.Child()
@@ -46,6 +47,7 @@ class Window(Adw.ApplicationWindow):
     sidebar = Gtk.Template.Child()
 
     trash_panel = Gtk.Template.Child()
+    task_details = Gtk.Template.Child()
 
     # - State - #
     scrolling: bool = False  # Is window scrolling
@@ -58,19 +60,12 @@ class Window(Adw.ApplicationWindow):
         GSettings.bind("width", self, "default_width")
         GSettings.bind("height", self, "default_height")
         GSettings.bind("maximized", self, "maximized")
-        GSettings.bind("sidebar-open", self.toggle_trash_btn, "active")
+        # GSettings.bind("sidebar-open", self.toggle_trash_btn, "active")
         # Setup theme
         Log.debug("Setting theme")
         Adw.StyleManager.get_default().set_color_scheme(GSettings.get("theme"))
-        self.build_ui()
         Log.debug("Present window")
         self.present()
-
-    def build_ui(self):
-        Log.debug("Build window UI template")
-        # Add details panel
-        self.task_details = TaskDetails()
-        self.sidebar.set_sidebar(self.task_details)
 
     def perform_startup(self) -> None:
         """
