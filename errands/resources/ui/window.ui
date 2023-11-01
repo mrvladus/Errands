@@ -12,6 +12,13 @@
         <property name="min-sidebar-width">300</property>
         <property name="max-sidebar-width">300</property>
         <property name="sidebar-width-unit">px</property>
+
+        <property name="sidebar">
+          <object class="TrashPanel" id="trash_panel">
+            <property name="window">Window</property>
+          </object>
+        </property>
+
         <property name="content">
           <object class="AdwOverlaySplitView" id="sidebar">
             <property name="min-sidebar-width">360</property>

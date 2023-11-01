@@ -25,6 +25,8 @@ from errands.utils.markup import Markup
 class Window(Adw.ApplicationWindow):
     __gtype_name__ = "Window"
 
+    GObject.type_ensure(TrashPanel)
+
     # - Template children - #
     about_window: Adw.AboutWindow = Gtk.Template.Child()
     delete_completed_tasks_btn_rev: Gtk.Revealer = Gtk.Template.Child()
@@ -42,6 +44,8 @@ class Window(Adw.ApplicationWindow):
     toast_overlay: Adw.ToastOverlay = Gtk.Template.Child()
     toggle_trash_btn: Gtk.ToggleButton = Gtk.Template.Child()
     sidebar = Gtk.Template.Child()
+
+    trash_panel = Gtk.Template.Child()
 
     # - State - #
     scrolling: bool = False  # Is window scrolling
@@ -64,9 +68,6 @@ class Window(Adw.ApplicationWindow):
 
     def build_ui(self):
         Log.debug("Build window UI template")
-        # Add trash panel
-        self.trash_panel = TrashPanel(self)
-        self.split_view.set_sidebar(self.trash_panel)
         # Add details panel
         self.task_details = TaskDetails()
         self.sidebar.set_sidebar(self.task_details)

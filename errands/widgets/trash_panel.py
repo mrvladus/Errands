@@ -4,7 +4,7 @@
 from errands.utils.data import UserData, UserDataDict, UserDataTask
 from errands.utils.functions import get_children
 from errands.widgets.trash_item import TrashItem
-from gi.repository import Adw, Gtk, Gio, GLib, Gdk
+from gi.repository import Adw, Gtk, GObject, Gio, GLib, Gdk
 from errands.widgets.task import Task
 from errands.utils.markup import Markup
 from errands.utils.sync import Sync
@@ -16,14 +16,17 @@ from errands.utils.tasks import task_to_ics
 class TrashPanel(Adw.Bin):
     __gtype_name__ = "TrashPanel"
 
+    # Set props
+    window = GObject.Property(type=Adw.ApplicationWindow)
+
+    # Template children
     confirm_dialog: Adw.MessageDialog = Gtk.Template.Child()
     clear_trash_btn: Gtk.Button = Gtk.Template.Child()
     trash_list: Gtk.Box = Gtk.Template.Child()
     trash_list_scrl: Gtk.ScrolledWindow = Gtk.Template.Child()
 
-    def __init__(self, window):
+    def __init__(self):
         super().__init__()
-        self.window = window
 
     def trash_add(self, task: dict) -> None:
         """
