@@ -129,3 +129,7 @@ class TasksList(Adw.Bin):
         scroll(self.scrolled_window, True)
         # Sync
         Sync.sync()
+
+    @Gtk.Template.Callback()
+    def on_scroll_up_btn_clicked(self, _) -> None:
+        scroll(self.scrolled_window, False)
