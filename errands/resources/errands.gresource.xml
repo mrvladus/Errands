@@ -4,6 +4,7 @@
     <file preprocess="xml-stripblanks" compressed="true" alias="window.ui">resources/ui/window.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="preferences.ui">resources/ui/preferences.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="task.ui">resources/ui/task.ui</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="tasks_list.ui">resources/ui/tasks_list.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="task_details.ui">resources/ui/task_details.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="trash_panel.ui">resources/ui/trash_panel.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="trash_item.ui">resources/ui/trash_item.ui</file>

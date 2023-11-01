@@ -2,12 +2,12 @@
 # SPDX-License-Identifier: MIT
 
 import json
+from errands.widgets.tasks_list import TasksList
 from errands.widgets.trash_panel import TrashPanel
 from gi.repository import Gio, Adw, Gtk, GLib, GObject
 from __main__ import VERSION, APP_ID
 
 # Import modules
-import errands.utils.tasks as TaskUtils
 from errands.widgets.preferences import PreferencesWindow
 from errands.widgets.task_details import TaskDetails
 from errands.widgets.task import Task
@@ -27,20 +27,18 @@ class Window(Adw.ApplicationWindow):
     # Composite template children
     GObject.type_ensure(TrashPanel)
     GObject.type_ensure(TaskDetails)
+    GObject.type_ensure(TasksList)
 
     # - Template children - #
     about_window: Adw.AboutWindow = Gtk.Template.Child()
     delete_completed_tasks_btn_rev: Gtk.Revealer = Gtk.Template.Child()
-    drop_motion_ctrl: Gtk.DropControllerMotion = Gtk.Template.Child()
     export_dialog: Gtk.FileDialog = Gtk.Template.Child()
     import_dialog: Gtk.FileDialog = Gtk.Template.Child()
     main_menu_btn: Gtk.MenuButton = Gtk.Template.Child()
     scroll_up_btn_rev: Gtk.Revealer = Gtk.Template.Child()
-    scrolled_window: Gtk.ScrolledWindow = Gtk.Template.Child()
     shortcuts_window: Gtk.ShortcutsWindow = Gtk.Template.Child()
     split_view: Adw.OverlaySplitView = Gtk.Template.Child()
     sync_btn: Gtk.Button = Gtk.Template.Child()
-    tasks_list: Gtk.Box = Gtk.Template.Child()
     title: Adw.WindowTitle = Gtk.Template.Child()
     toast_overlay: Adw.ToastOverlay = Gtk.Template.Child()
     toggle_trash_btn: Gtk.ToggleButton = Gtk.Template.Child()
@@ -48,6 +46,7 @@ class Window(Adw.ApplicationWindow):
 
     trash_panel = Gtk.Template.Child()
     task_details = Gtk.Template.Child()
+    tasks_list = Gtk.Template.Child()
 
     # - State - #
     scrolling: bool = False  # Is window scrolling
@@ -60,7 +59,7 @@ class Window(Adw.ApplicationWindow):
         GSettings.bind("width", self, "default_width")
         GSettings.bind("height", self, "default_height")
         GSettings.bind("maximized", self, "maximized")
-        # GSettings.bind("sidebar-open", self.toggle_trash_btn, "active")
+        GSettings.bind("sidebar-open", self.toggle_trash_btn, "active")
         # Setup theme
         Log.debug("Setting theme")
         Adw.StyleManager.get_default().set_color_scheme(GSettings.get("theme"))
@@ -74,14 +73,8 @@ class Window(Adw.ApplicationWindow):
         Log.debug("Window startup")
         Sync.window = self
         self._create_actions()
-        self._load_tasks()
+        self.tasks_list.load_tasks()
         self.startup = False
-
-    def add_task(self, task: dict) -> None:
-        new_task = Task(task, self)
-        self.tasks_list.append(new_task)
-        if not task["deleted"]:
-            new_task.toggle_visibility(True)
 
     def add_toast(self, text: str) -> None:
         self.toast_overlay.add_toast(Adw.Toast.new(title=text))
@@ -164,11 +157,11 @@ class Window(Adw.ApplicationWindow):
                     UserData.set(data)
 
                 # Remove old tasks
-                for task in get_children(self.tasks_list):
-                    self.tasks_list.remove(task)
+                for task in get_children(self.tasks_list.tasks_list):
+                    self.tasks_list.tasks_list.remove(task)
                 # Remove old trash
-                for task in get_children(self.trash_list):
-                    self.trash_list.remove(task)
+                for task in get_children(self.trash_panel.trash_list):
+                    self.trash_panel.trash_list.remove(task)
                 self._load_tasks()
                 Log.info("Tasks imported")
                 self.add_toast(_("Tasks Imported"))  # pyright:ignore
@@ -199,45 +192,11 @@ class Window(Adw.ApplicationWindow):
             ["<primary>q", "<primary>w"],
         )
 
-    def get_all_tasks(self) -> list[Task]:
-        """
-        Get list of all tasks widgets including sub-tasks
-        """
-
-        tasks: list[Task] = []
-
-        def append_tasks(items: list[Task]) -> None:
-            for task in items:
-                tasks.append(task)
-                children: list[Task] = get_children(task.tasks_list)
-                if len(children) > 0:
-                    append_tasks(children)
-
-        append_tasks(get_children(self.tasks_list))
-        return tasks
-
-    def get_toplevel_tasks(self) -> list[Task]:
-        return get_children(self.tasks_list)
-
-    def _load_tasks(self) -> None:
-        Log.debug("Loading tasks")
-
-        for task in UserData.get()["tasks"]:
-            if not task["parent"]:
-                self.add_task(task)
-        self.update_status()
-        # Expand tasks if needed
-        if GSettings.get("expand-on-startup"):
-            for task in self.get_all_tasks():
-                if len(get_children(task.tasks_list)) > 0:
-                    task.expand(True)
-        Sync.sync(True)
-
     def update_ui(self) -> None:
         Log.debug("Updating UI")
 
         # Update existing tasks
-        tasks: list[Task] = self.get_all_tasks()
+        tasks: list[Task] = self.tasks_list.get_all_tasks()
         data_tasks: list[UserDataTask] = UserData.get()["tasks"]
         to_change_parent: list[UserDataTask] = []
         to_remove: list[Task] = []
@@ -265,7 +224,7 @@ class Window(Adw.ApplicationWindow):
         # Change parents
         for task in to_change_parent:
             if task["parent"] == "":
-                self.add_task(task)
+                self.tasks_list.add_task(task)
             else:
                 for t in tasks:
                     if t.task["id"] == task["parent"]:
@@ -273,22 +232,26 @@ class Window(Adw.ApplicationWindow):
                         break
 
         # Create new tasks
-        tasks_ids: list[str] = [task.task["id"] for task in self.get_all_tasks()]
+        tasks_ids: list[str] = [
+            task.task["id"] for task in self.tasks_list.get_all_tasks()
+        ]
         for task in data_tasks:
             if task["id"] not in tasks_ids:
                 # Add toplevel task and its sub-tasks
                 if task["parent"] == "":
-                    self.add_task(task)
+                    self.tasks_list.add_task(task)
                 # Add sub-task and its sub-tasks
                 else:
-                    for t in self.get_all_tasks():
+                    for t in self.tasks_list.get_all_tasks():
                         if t.task["id"] == task["parent"]:
                             t.add_task(task)
-                tasks_ids = [task.task["id"] for task in self.get_all_tasks()]
+                tasks_ids = [
+                    task.task["id"] for task in self.tasks_list.get_all_tasks()
+                ]
 
         # Remove tasks
         ids = [t["id"] for t in UserData.get()["tasks"]]
-        for task in self.get_all_tasks():
+        for task in self.tasks_list.get_all_tasks():
             if task.task["id"] not in ids:
                 task.purge()
 
@@ -326,74 +289,6 @@ class Window(Adw.ApplicationWindow):
     # --- Template handlers --- #
 
     @Gtk.Template.Callback()
-    def on_dnd_scroll(self, _motion, _x, y) -> bool:
-        """
-        Autoscroll while dragging task
-        """
-
-        def _auto_scroll(scroll_up: bool) -> bool:
-            """Scroll while drag is near the edge"""
-            if not self.scrolling or not self.drop_motion_ctrl.contains_pointer():
-                return False
-            adj = self.scrolled_window.get_vadjustment()
-            if scroll_up:
-                adj.set_value(adj.get_value() - 2)
-                return True
-            else:
-                adj.set_value(adj.get_value() + 2)
-                return True
-
-        MARGIN: int = 50
-        height: int = self.scrolled_window.get_allocation().height
-        if y < MARGIN:
-            self.scrolling = True
-            GLib.timeout_add(100, _auto_scroll, True)
-        elif y > height - MARGIN:
-            self.scrolling = True
-            GLib.timeout_add(100, _auto_scroll, False)
-        else:
-            self.scrolling = False
-
-    @Gtk.Template.Callback()
-    def on_scroll(self, adj) -> None:
-        """
-        Show scroll up button
-        """
-
-        self.scroll_up_btn_rev.set_reveal_child(adj.get_value() > 0)
-
-    @Gtk.Template.Callback()
-    def on_scroll_up_btn_clicked(self, _) -> None:
-        """
-        Scroll up
-        """
-
-        scroll(self.scrolled_window, False)
-
-    @Gtk.Template.Callback()
-    def on_task_added(self, entry: Gtk.Entry) -> None:
-        """
-        Add new task
-        """
-
-        text: str = entry.props.text
-        # Check for empty string or task exists
-        if text == "":
-            return
-        # Add new task
-        new_data: UserDataDict = UserData.get()
-        new_task: UserDataTask = TaskUtils.new_task(text)
-        new_data["tasks"].append(new_task)
-        UserData.set(new_data)
-        self.add_task(new_task)
-        # Clear entry
-        entry.props.text = ""
-        # Scroll to the end
-        scroll(self.scrolled_window, True)
-        # Sync
-        Sync.sync()
-
-    @Gtk.Template.Callback()
     def on_toggle_trash_btn(self, btn: Gtk.ToggleButton) -> None:
         """
         Move focus to sidebar
@@ -413,10 +308,18 @@ class Window(Adw.ApplicationWindow):
         """
         Log.info("Delete completed tasks")
 
-        for task in self.get_all_tasks():
+        for task in self.tasks_list.get_all_tasks():
             if task.task["completed"] and not task.task["deleted"]:
                 task.delete()
         self.update_status()
+
+    @Gtk.Template.Callback()
+    def on_scroll_up_btn_clicked(self, _) -> None:
+        """
+        Scroll up
+        """
+
+        scroll(self.tasks_list.scrolled_window, False)
 
     @Gtk.Template.Callback()
     def on_sync_btn_clicked(self, btn) -> None:

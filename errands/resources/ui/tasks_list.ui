@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0" />
+  <requires lib="Adw" version="1.0" />
+  <template class="TasksList" parent="AdwBin">
+    <child>
+      <object class="GtkOverlay">
+        <child>
+          <object class="GtkBox">
+            <property name="orientation">vertical</property>
+
+            <!-- Entry -->
+            <child>
+              <object class="AdwClamp">
+                <property name="maximum-size">850</property>
+                <property name="tightening-threshold">300</property>
+                <child>
+                  <object class="GtkListBox">
+                    <property name="margin-top">10</property>
+                    <property name="margin-bottom">12</property>
+                    <property name="margin-start">12</property>
+                    <property name="margin-end">12</property>
+                    <property name="selection-mode">0</property>
+                    <style>
+                      <class name="boxed-list" />
+                    </style>
+                    <child>
+                      <object class="AdwEntryRow" id="task_entry_row">
+                        <property name="activatable">false</property>
+                        <property name="height-request">60</property>
+                        <property name="title" translatable="yes">Add new Task</property>
+                        <signal name="entry-activated" handler="on_task_added" />
+                      </object>
+                    </child>
+                  </object>
+                </child>
+
+              </object>
+            </child>
+
+            <!-- Scrolled window -->
+            <child>
+              <object class="GtkScrolledWindow" id="scrolled_window">
+                <property name="propagate-natural-height">true</property>
+                <property name="propagate-natural-width">true</property>
+                <property name="vadjustment">
+                  <object class="GtkAdjustment">
+                    <signal name="value_changed" handler="on_scroll" />
+                  </object>
+                </property>
+
+                <!-- Drag and Drop scroll controller -->
+                <child>
+                  <object class="GtkDropControllerMotion" id="drop_motion_ctrl">
+                    <signal name="motion" handler="on_dnd_scroll" />
+                  </object>
+                </child>
+
+                <!-- Tasks list -->
+                <child>
+                  <object class="AdwClamp">
+                    <property name="maximum-size">850</property>
+                    <property name="tightening-threshold">300</property>
+                    <property name="vexpand">true</property>
+                    <child>
+                      <object class="GtkBox" id="tasks_list">
+                        <property name="orientation">vertical</property>
+                        <property name="hexpand">true</property>
+                        <property name="margin-bottom">18</property>
+                        <style>
+                          <class name="tasks-list" />
+                        </style>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+
+              </object>
+            </child>
+
+          </object>
+        </child>
+
+        <!-- Scroll up button overlay -->
+        <!-- <child type="overlay">
+          <object class="GtkRevealer" id="scroll_up_btn_ovl_rev">
+            <property name="valign">end</property>
+            <property name="halign">center</property>
+            <property name="transition-type">1</property> -->
+        <!-- <property name="reveal-child" bind-source="scroll_up_btn_rev" bind-property="reveal-child" bind-flags="sync-create" /> -->
+        <!-- <property name="visible" bind-source="scroll_up_btn_rev" bind-property="visible" bind-flags="sync-create|invert-boolean" /> -->
+        <!-- <property name="margin-bottom">12</property>
+            <child>
+              <object class="GtkButton">
+                <property name="icon-name">go-up-symbolic</property>
+                <property name="tooltip-text" translatable="yes">Scroll Up</property>
+                <signal name="clicked" handler="on_scroll_up_btn_clicked" />
+                <accessibility>
+                  <property name="label" translatable="yes">Scroll Up</property>
+                </accessibility>
+                <style>
+                  <class name="circular" />
+                </style>
+              </object>
+            </child>
+          </object>
+        </child> -->
+
+      </object>
+    </child>
+  </template>
+</interface>
