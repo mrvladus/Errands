@@ -15,6 +15,7 @@
         </child>
         <child>
           <object class="AdwOverlaySplitView" id="split_view">
+            <property name="show-sidebar">false</property>
 
             <!-- Task details panel -->
             <property name="sidebar">

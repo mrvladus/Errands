@@ -30,6 +30,7 @@
                         <property name="icon-name">view-list-bullet-rtl-symbolic</property>
                         <property name="child">
                           <object class="ListsPanel" id="lists_panel">
+                            <property name="window">Window</property>
                           </object>
                         </property>
                       </object>
