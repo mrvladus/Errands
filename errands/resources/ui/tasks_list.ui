@@ -90,19 +90,6 @@
                       </object>
                     </child>
 
-                    <!-- Menu -->
-                    <child type="end">
-                      <object class="GtkMenuButton" id="main_menu_btn">
-                        <property name="primary">true</property>
-                        <property name="icon-name">open-menu-symbolic</property>
-                        <property name="menu-model">primary_menu</property>
-                        <property name="tooltip-text" translatable="yes">Main Menu</property>
-                        <accessibility>
-                          <property name="label" translatable="yes">Main Menu</property>
-                        </accessibility>
-                      </object>
-                    </child>
-
                     <!-- Sync button -->
                     <child type="end">
                       <object class="GtkButton" id="sync_btn">
@@ -238,32 +225,5 @@
 
   </template>
 
-  <!-- Main menu -->
-  <menu id="primary_menu">
-    <section>
-      <item>
-        <attribute name="label" translatable="yes">Export Tasks...</attribute>
-        <attribute name="action">app.export</attribute>
-      </item>
-      <item>
-        <attribute name="label" translatable="yes">Import Tasks...</attribute>
-        <attribute name="action">app.import</attribute>
-      </item>
-    </section>
-    <section>
-      <item>
-        <attribute name="label" translatable="yes">Preferences</attribute>
-        <attribute name="action">app.preferences</attribute>
-      </item>
-      <item>
-        <attribute name="label" translatable="yes">Keyboard Shortcuts</attribute>
-        <attribute name="action">app.shortcuts</attribute>
-      </item>
-      <item>
-        <attribute name="label" translatable="yes">About Errands</attribute>
-        <attribute name="action">app.about</attribute>
-      </item>
-    </section>
-  </menu>
 
 </interface>
