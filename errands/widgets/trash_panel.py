@@ -90,10 +90,6 @@ class TrashPanel(Adw.Bin):
         Sync.sync()
 
     @Gtk.Template.Callback()
-    def on_trash_close(self, _) -> None:
-        self.window.split_view.set_show_sidebar(False)
-
-    @Gtk.Template.Callback()
     def on_trash_restore(self, _) -> None:
         """
         Remove trash items and restore all tasks
