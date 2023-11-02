@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 import json
+from errands.widgets.lists_panel import ListsPanel
 from errands.widgets.tasks_list import TasksList
 from errands.widgets.trash_panel import TrashPanel
 from gi.repository import Gio, Adw, Gtk, GLib, GObject
@@ -26,6 +27,7 @@ class Window(Adw.ApplicationWindow):
 
     # Composite template children
     GObject.type_ensure(TrashPanel)
+    GObject.type_ensure(ListsPanel)
     GObject.type_ensure(TasksList)
 
     # - Template children - #
@@ -36,6 +38,7 @@ class Window(Adw.ApplicationWindow):
     toast_overlay: Adw.ToastOverlay = Gtk.Template.Child()
 
     trash_panel = Gtk.Template.Child()
+    lists_panel = Gtk.Template.Child()
     tasks_list = Gtk.Template.Child()
 
     def __init__(self, **kwargs) -> None:

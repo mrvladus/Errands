@@ -29,8 +29,7 @@
                         <property name="title">Lists</property>
                         <property name="icon-name">view-list-bullet-rtl-symbolic</property>
                         <property name="child">
-                          <object class="AdwStatusPage">
-                            <property name="title">Lists</property>
+                          <object class="ListsPanel" id="lists_panel">
                           </object>
                         </property>
                       </object>
@@ -53,12 +52,14 @@
                   </object>
                 </property>
 
+                <!-- View switcher -->
                 <child type="bottom">
                   <object class="AdwViewSwitcherBar">
                     <property name="stack">stack</property>
                     <property name="reveal">true</property>
                   </object>
                 </child>
+
               </object>
             </property>
 
