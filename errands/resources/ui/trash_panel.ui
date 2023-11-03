@@ -46,7 +46,9 @@
 
         <!-- Trash list -->
         <property name="content">
-          <object class="GtkOverlay">
+          <object class="GtkBox" id="sidebar_content">
+            <property name="orientation">vertical</property>
+            <property name="hexpand">false</property>
 
             <!-- Drop target -->
             <child>
@@ -57,71 +59,35 @@
               </object>
             </child>
 
-            <!-- Drop controller -->
+            <!-- Status page -->
             <child>
-              <object class="GtkDropControllerMotion" id="trash_drop_ctrl">
-              </object>
-            </child>
-
-            <!-- DND status page -->
-            <child type="overlay">
-              <object class="AdwStatusPage" id="dnd_status">
-                <property name="icon-name">tab-new-symbolic</property>
-                <property name="title" translatable="yes">Move to Trash</property>
+              <object class="AdwStatusPage">
+                <property name="icon-name">user-trash-symbolic</property>
+                <property name="title" translatable="yes">Empty Trash</property>
+                <property name="description" translatable="yes">No deleted items</property>
                 <property name="vexpand">true</property>
-                <property name="visible" bind-source="trash_drop_ctrl" bind-property="contains-pointer" bind-flags="sync-create" />
+                <property name="visible" bind-source="trash_list_scrl" bind-property="visible" bind-flags="sync-create|invert-boolean" />
                 <style>
                   <class name="compact" />
                 </style>
               </object>
             </child>
 
+            <!-- Trash list -->
             <child>
-              <object class="GtkBox">
-                <property name="orientation">vertical</property>
-
-                <!-- Content -->
+              <object class="GtkScrolledWindow" id="trash_list_scrl">
                 <child>
-                  <object class="GtkBox" id="sidebar_content">
+                  <object class="GtkBox" id="trash_list">
                     <property name="orientation">vertical</property>
+                    <property name="spacing">5</property>
                     <property name="hexpand">false</property>
-                    <property name="visible" bind-source="dnd_status" bind-property="visible" bind-flags="sync-create|invert-boolean" />
-
-                    <!-- Status page -->
-                    <child>
-                      <object class="AdwStatusPage">
-                        <property name="icon-name">user-trash-symbolic</property>
-                        <property name="title" translatable="yes">Empty Trash</property>
-                        <property name="description" translatable="yes">No deleted items</property>
-                        <property name="vexpand">true</property>
-                        <property name="visible" bind-source="trash_list_scrl" bind-property="visible" bind-flags="sync-create|invert-boolean" />
-                        <style>
-                          <class name="compact" />
-                        </style>
-                      </object>
-                    </child>
-
-                    <!-- Trash list -->
-                    <child>
-                      <object class="GtkScrolledWindow" id="trash_list_scrl">
-                        <child>
-                          <object class="GtkBox" id="trash_list">
-                            <property name="orientation">vertical</property>
-                            <property name="spacing">5</property>
-                            <property name="hexpand">false</property>
-                            <property name="vexpand">true</property>
-                            <property name="margin-start">12</property>
-                            <property name="margin-end">6</property>
-                            <property name="margin-top">6</property>
-                            <property name="margin-bottom">6</property>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
-
+                    <property name="vexpand">true</property>
+                    <property name="margin-start">12</property>
+                    <property name="margin-end">6</property>
+                    <property name="margin-top">6</property>
+                    <property name="margin-bottom">6</property>
                   </object>
                 </child>
-
               </object>
             </child>
 
