@@ -33,7 +33,8 @@
                         <property name="title">Trash</property>
                         <property name="icon-name">user-trash-symbolic</property>
                         <property name="child">
-                          <object class="TrashPanel" id="trash_panel" />
+                          <object class="TrashPanel" id="trash_panel">
+                          </object>
                         </property>
                       </object>
                     </child>

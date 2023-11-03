@@ -1,9 +1,8 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-import os
 from typing import Self
-from gi.repository import Gtk, Adw, Gdk, GObject, Gio, GLib
+from gi.repository import Gtk, Adw, Gdk, GObject
 
 # Import modules
 import errands.utils.tasks as TaskUtils
@@ -12,7 +11,6 @@ from errands.utils.logging import Log
 from errands.utils.data import UserData, UserDataDict, UserDataTask
 from errands.utils.markup import Markup
 from errands.utils.functions import get_children
-from errands.utils.tasks import task_to_ics
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/Errands/task.ui")

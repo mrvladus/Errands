@@ -4,32 +4,27 @@
 import json
 from errands.widgets.lists_panel import ListsPanel
 from errands.widgets.shortcuts_window import ShortcutsWindow
+from errands.widgets.task_details import TaskDetails
 from errands.widgets.tasks_list import TasksList
-from errands.widgets.trash_panel import TrashPanel
+from errands.widgets.trash import TrashPanel
 from gi.repository import Gio, Adw, Gtk, GLib, GObject
 from __main__ import VERSION, APP_ID
-
-# Import modules
 from errands.widgets.preferences import PreferencesWindow
-from errands.widgets.task_details import TaskDetails
-from errands.widgets.task import Task
 from errands.utils.sync import Sync
-from errands.utils.animation import scroll
 from errands.utils.gsettings import GSettings
 from errands.utils.logging import Log
-from errands.utils.data import UserData, UserDataDict, UserDataTask
+from errands.utils.data import UserData
 from errands.utils.functions import get_children
-from errands.utils.markup import Markup
+
+GObject.type_ensure(TrashPanel)
+GObject.type_ensure(TaskDetails)
+GObject.type_ensure(ListsPanel)
+GObject.type_ensure(TasksList)
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/Errands/window.ui")
 class Window(Adw.ApplicationWindow):
     __gtype_name__ = "Window"
-
-    # Composite template children
-    GObject.type_ensure(TrashPanel)
-    GObject.type_ensure(ListsPanel)
-    GObject.type_ensure(TasksList)
 
     # - Template children - #
     about_window: Adw.AboutWindow = Gtk.Template.Child()

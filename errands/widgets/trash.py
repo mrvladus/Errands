@@ -3,27 +3,59 @@
 
 from errands.utils.data import UserData, UserDataDict, UserDataTask
 from errands.utils.functions import get_children
-from errands.widgets.trash_item import TrashItem
-from gi.repository import Adw, Gtk, GObject, Gio, GLib, Gdk
+from gi.repository import Adw, Gtk
 from errands.widgets.task import Task
-from errands.utils.markup import Markup
 from errands.utils.sync import Sync
 from errands.utils.logging import Log
-from errands.utils.tasks import task_to_ics
+
+
+@Gtk.Template(resource_path="/io/github/mrvladus/Errands/trash_item.ui")
+class TrashItem(Gtk.Box):
+    __gtype_name__ = "TrashItem"
+
+    label: Gtk.Label = Gtk.Template.Child()
+
+    def __init__(self, task: dict, tasks_list) -> None:
+        super().__init__()
+        self.tasks_list = tasks_list
+        self.id: str = task["id"]
+        self.label.set_label(task["text"])
+
+    @Gtk.Template.Callback()
+    def on_restore(self, _) -> None:
+        """Restore task"""
+
+        Log.info(f"Restore task: {self.id}")
+
+        tasks: list[Task] = self.tasks_list.get_all_tasks()
+
+        def restore_task(id: str = self.id) -> None:
+            for task in tasks:
+                if task.task["id"] == id:
+                    task.task["deleted"] = False
+                    task.update_data()
+                    task.toggle_visibility(True)
+                    if task.task["parent"]:
+                        task.parent.expand(True)
+                        restore_task(task.task["parent"])
+                    break
+
+        restore_task()
+        self.tasks_list.update_status()
+        self.tasks_list.trash_panel.trash_clear()
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/Errands/trash_panel.ui")
 class TrashPanel(Adw.Bin):
     __gtype_name__ = "TrashPanel"
 
-    # Set props
-    window = GObject.Property(type=Adw.ApplicationWindow)
-
     # Template children
     confirm_dialog: Adw.MessageDialog = Gtk.Template.Child()
     clear_trash_btn: Gtk.Button = Gtk.Template.Child()
     trash_list: Gtk.Box = Gtk.Template.Child()
     trash_list_scrl: Gtk.ScrolledWindow = Gtk.Template.Child()
+
+    tasks_list = None
 
     def __init__(self):
         super().__init__()
@@ -33,7 +65,7 @@ class TrashPanel(Adw.Bin):
         Add item to trash
         """
 
-        self.trash_list.append(TrashItem(task, self.window))
+        self.trash_list.append(TrashItem(task, self.tasks_list))
         self.trash_list_scrl.set_visible(True)
 
     def trash_clear(self) -> None:
@@ -57,7 +89,7 @@ class TrashPanel(Adw.Bin):
     @Gtk.Template.Callback()
     def on_trash_clear(self, _) -> None:
         Log.debug("Show confirm dialog")
-        self.confirm_dialog.set_transient_for(self.window)
+        # self.confirm_dialog.set_transient_for(self.window)
         self.confirm_dialog.show()
 
     @Gtk.Template.Callback()
