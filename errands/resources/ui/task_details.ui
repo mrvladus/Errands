@@ -3,12 +3,6 @@
   <requires lib="gtk" version="4.0" />
   <requires lib="Adw" version="1.0" />
   <template class="TaskDetails" parent="AdwBin">
-    <property name="width-request">360</property>
-    <property name="height-request">296</property>
-    <!-- <style>
-      <class name="background" />
-    </style> -->
-
     <child>
       <object class="AdwToolbarView">
 
@@ -16,7 +10,6 @@
         <child type="top">
           <object class="AdwHeaderBar">
             <property name="show-title">false</property>
-            <property name="show-back-button">false</property>
 
             <!-- Move to trash -->
             <child>

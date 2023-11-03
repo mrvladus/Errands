@@ -3,8 +3,7 @@
 
 import os
 from errands.utils.functions import get_children
-from gi.repository import Adw, Gtk, Gio, GLib, Gdk
-from errands.widgets.task import Task
+from gi.repository import Adw, Gtk, Gio, GLib, Gdk, GObject
 from errands.utils.markup import Markup
 from errands.utils.sync import Sync
 from errands.utils.logging import Log
@@ -14,6 +13,8 @@ from errands.utils.tasks import task_to_ics
 @Gtk.Template(resource_path="/io/github/mrvladus/Errands/task_details.ui")
 class TaskDetails(Adw.Bin):
     __gtype_name__ = "TaskDetails"
+
+    stack: Adw.ViewStack = GObject.Property(type=Adw.ViewStack)
 
     details_status: Adw.StatusPage = Gtk.Template.Child()
     edit_entry: Gtk.TextBuffer = Gtk.Template.Child()
@@ -191,6 +192,7 @@ class TaskDetails(Adw.Bin):
     def on_move_to_trash_clicked(self, _btn):
         self.parent.delete()
         self.details_status.set_visible(True)
+        self.stack.set_visible_child_name("tasks")
 
     @Gtk.Template.Callback()
     def on_open_as_ics_clicked(self, _btn):

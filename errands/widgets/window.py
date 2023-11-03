@@ -4,6 +4,7 @@
 import json
 from errands.widgets.lists_panel import ListsPanel
 from errands.widgets.shortcuts_window import ShortcutsWindow
+from errands.widgets.sidebar import Sidebar
 from errands.widgets.task_details import TaskDetails
 from errands.widgets.tasks_list import TasksList
 from errands.widgets.trash import TrashPanel
@@ -20,6 +21,7 @@ GObject.type_ensure(TrashPanel)
 GObject.type_ensure(TaskDetails)
 GObject.type_ensure(ListsPanel)
 GObject.type_ensure(TasksList)
+GObject.type_ensure(Sidebar)
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/Errands/window.ui")
@@ -32,7 +34,6 @@ class Window(Adw.ApplicationWindow):
     import_dialog: Gtk.FileDialog = Gtk.Template.Child()
     toast_overlay: Adw.ToastOverlay = Gtk.Template.Child()
 
-    lists_panel = Gtk.Template.Child()
     tasks_list = Gtk.Template.Child()
 
     def __init__(self, **kwargs) -> None:

@@ -30,10 +30,6 @@ class TasksList(Adw.Bin):
     title: Adw.WindowTitle = Gtk.Template.Child()
     scroll_up_btn_rev = Gtk.Template.Child()
     sync_btn: Gtk.Button = Gtk.Template.Child()
-    split_view = Gtk.Template.Child()
-    task_details = Gtk.Template.Child()
-    trash_panel = Gtk.Template.Child()
-    stack = Gtk.Template.Child()
 
     # State
     scrolling: bool = False  # Is window scrolling
@@ -41,7 +37,7 @@ class TasksList(Adw.Bin):
 
     def __init__(self):
         super().__init__()
-        self.trash_panel.tasks_list = self
+        # self.trash_panel.tasks_list = self
 
     def add_task(self, task: dict) -> None:
         new_task = Task(task, self)
@@ -112,7 +108,7 @@ class TasksList(Adw.Bin):
             else ""
         )
         self.delete_completed_tasks_btn.set_reveal_child(n_all_completed > 0)
-        self.trash_panel.trash_list_scrl.set_visible(n_all_deleted > 0)
+        # self.trash_panel.trash_list_scrl.set_visible(n_all_deleted > 0)
 
     def update_ui(self) -> None:
         Log.debug("Updating UI")

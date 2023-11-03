@@ -196,7 +196,6 @@ class Task(Gtk.Revealer):
 
     @Gtk.Template.Callback()
     def on_details_btn_clicked(self, _btn):
-        self.window.split_view.set_show_sidebar(True)
         self.window.stack.set_visible_child_name("details")
         self.window.task_details.update_info(self)
 

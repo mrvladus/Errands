@@ -10,16 +10,14 @@ from errands.utils.logging import Log
 
 
 @Gtk.Template(resource_path="/io/github/mrvladus/Errands/trash_item.ui")
-class TrashItem(Gtk.Box):
+class TrashItem(Adw.ActionRow):
     __gtype_name__ = "TrashItem"
-
-    label: Gtk.Label = Gtk.Template.Child()
 
     def __init__(self, task: dict, tasks_list) -> None:
         super().__init__()
         self.tasks_list = tasks_list
         self.id: str = task["id"]
-        self.label.set_label(task["text"])
+        self.set_title(task["text"])
 
     @Gtk.Template.Callback()
     def on_restore(self, _) -> None:
@@ -65,7 +63,7 @@ class TrashPanel(Adw.Bin):
         Add item to trash
         """
 
-        self.trash_list.append(TrashItem(task, self.tasks_list))
+        self.trash_list.add(TrashItem(task, self.tasks_list))
         self.trash_list_scrl.set_visible(True)
 
     def trash_clear(self) -> None:
@@ -149,14 +147,4 @@ class TrashPanel(Adw.Bin):
 
         # Clear trash
         self.trash_clear()
-        self.window.update_status()
-
-    @Gtk.Template.Callback()
-    def on_trash_drop(self, _drop, task: Task, _x, _y) -> None:
-        """
-        Move task to trash via dnd
-        """
-        Log.debug(f"Drop task to trash: {task.task['id']}")
-
-        task.delete()
         self.window.update_status()

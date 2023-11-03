@@ -3,8 +3,6 @@
   <requires lib="gtk" version="4.0" />
   <requires lib="Adw" version="1.0" />
   <template class="TrashPanel" parent="AdwBin">
-    <property name="width-request">300</property>
-    <property name="height-request">296</property>
     <child>
       <object class="AdwToolbarView">
 
@@ -46,18 +44,9 @@
 
         <!-- Trash list -->
         <property name="content">
-          <object class="GtkBox" id="sidebar_content">
+          <object class="GtkBox">
             <property name="orientation">vertical</property>
             <property name="hexpand">false</property>
-
-            <!-- Drop target -->
-            <child>
-              <object class="GtkDropTarget">
-                <property name="actions">move</property>
-                <property name="formats">Task</property>
-                <signal name="drop" handler="on_trash_drop" />
-              </object>
-            </child>
 
             <!-- Status page -->
             <child>
@@ -76,18 +65,21 @@
             <!-- Trash list -->
             <child>
               <object class="GtkScrolledWindow" id="trash_list_scrl">
+                <property name="vexpand">true</property>
                 <child>
-                  <object class="GtkBox" id="trash_list">
-                    <property name="orientation">vertical</property>
-                    <property name="spacing">5</property>
-                    <property name="hexpand">false</property>
-                    <property name="vexpand">true</property>
-                    <property name="margin-start">12</property>
-                    <property name="margin-end">6</property>
-                    <property name="margin-top">6</property>
-                    <property name="margin-bottom">6</property>
+                  <object class="AdwClamp">
+                    <child>
+                      <object class="AdwPreferencesGroup" id="trash_list">
+                        <property name="margin-top">12</property>
+                        <property name="margin-bottom">12</property>
+                        <property name="margin-start">12</property>
+                        <property name="margin-end">6</property>
+
+                      </object>
+                    </child>
                   </object>
                 </child>
+
               </object>
             </child>
 
