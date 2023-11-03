@@ -11,15 +11,57 @@
           <object class="AdwBreakpoint">
             <condition>max-width: 720px</condition>
             <setter object="split_view" property="collapsed">true</setter>
+            <setter object="split_view" property="sidebar-position">end</setter>
           </object>
         </child>
         <child>
           <object class="AdwOverlaySplitView" id="split_view">
-            <property name="show-sidebar">false</property>
+            <property name="show-sidebar" bind-source="toggle_details_btn" bind-property="active" bind-flags="sync-create|bidirectional" />
 
             <!-- Task details panel -->
             <property name="sidebar">
-              <object class="TaskDetails" id="task_details" />
+              <object class="AdwToolbarView">
+
+                <!-- Stack -->
+                <property name="content">
+                  <object class="AdwViewStack" id="stack">
+
+                    <!-- Trash panel -->
+                    <child>
+                      <object class="AdwViewStackPage">
+                        <property name="name">trash</property>
+                        <property name="title">Trash</property>
+                        <property name="icon-name">user-trash-symbolic</property>
+                        <property name="child">
+                          <object class="TrashPanel" id="trash_panel" />
+                        </property>
+                      </object>
+                    </child>
+
+                    <!-- Details panel -->
+                    <child>
+                      <object class="AdwViewStackPage">
+                        <property name="name">details</property>
+                        <property name="title">Details</property>
+                        <property name="icon-name">help-about-symbolic</property>
+                        <property name="child">
+                          <object class="TaskDetails" id="task_details" />
+                        </property>
+                      </object>
+                    </child>
+
+                  </object>
+                </property>
+
+                <!-- Stack switcher -->
+                <child type="bottom">
+                  <object class="AdwViewSwitcherBar">
+                    <property name="stack">stack</property>
+                    <property name="reveal">true</property>
+                  </object>
+                </child>
+              </object>
+
             </property>
 
             <!-- Tasks list content panel -->
@@ -35,29 +77,17 @@
                       </object>
                     </property>
 
-                    <!-- Toggle trash button -->
-                    <!-- <child type="start">
-                      <object class="GtkToggleButton" id="toggle_trash_btn">
-                        <property name="icon-name">sidebar-show-symbolic</property>
-                        <property name="active">false</property>
-                        <property name="tooltip-text" translatable="yes">Show Deleted Tasks</property>
-                        <signal name="toggled" handler="on_toggle_trash_btn" />
+                    <!-- Toggle details button-->
+                    <child type="end">
+                      <object class="GtkToggleButton" id="toggle_details_btn">
+                        <property name="visible" bind-source="split_view" bind-property="collapsed" bind-flags="sync-create" />
+                        <property name="icon-name">sidebar-show-right-symbolic</property>
+                        <property name="tooltip-text" translatable="yes">Toggle Details</property>
                         <accessibility>
-                          <property name="label" translatable="yes">Show Deleted Tasks</property>
+                          <property name="label" translatable="yes">Toggle Details</property>
                         </accessibility>
-                        <child>
-                          <object class="GtkShortcutController">
-                            <property name="scope">managed</property>
-                            <child>
-                              <object class="GtkShortcut">
-                                <property name="trigger">F9</property>
-                                <property name="action">activate</property>
-                              </object>
-                            </child>
-                          </object>
-                        </child>
                       </object>
-                    </child> -->
+                    </child>
 
                     <!-- Delete completed tasks button -->
                     <child type="start">
@@ -224,6 +254,4 @@
     </child>
 
   </template>
-
-
 </interface>

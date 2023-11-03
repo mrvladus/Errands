@@ -7,68 +7,38 @@
     <property name="height-request">200</property>
     <child>
       <object class="AdwBreakpoint">
-        <condition>max-width: 1080px</condition>
+        <condition>max-width: 660px</condition>
         <setter object="split_view" property="collapsed">true</setter>
+        <setter object="split_view" property="show-content">true</setter>
       </object>
     </child>
     <property name="content">
       <object class="AdwToastOverlay" id="toast_overlay">
         <child>
-          <object class="AdwOverlaySplitView" id="split_view">
+          <object class="AdwNavigationSplitView" id="split_view">
+            <property name="show-content">true</property>
 
             <!-- Sidebar -->
             <property name="sidebar">
-              <object class="AdwToolbarView">
-                <property name="content">
-                  <object class="AdwViewStack" id="stack">
-
-                    <!-- Lists panel -->
-                    <child>
-                      <object class="AdwViewStackPage">
-                        <property name="name">lists</property>
-                        <property name="title">Lists</property>
-                        <property name="icon-name">view-list-bullet-rtl-symbolic</property>
-                        <property name="child">
-                          <object class="ListsPanel" id="lists_panel">
-                            <property name="window">Window</property>
-                          </object>
-                        </property>
-                      </object>
-                    </child>
-
-                    <!-- Trash panel -->
-                    <child>
-                      <object class="AdwViewStackPage">
-                        <property name="name">trash</property>
-                        <property name="title">Trash</property>
-                        <property name="icon-name">user-trash-symbolic</property>
-                        <property name="child">
-                          <object class="TrashPanel" id="trash_panel">
-                            <property name="window">Window</property>
-                          </object>
-                        </property>
-                      </object>
-                    </child>
-
+              <object class="AdwNavigationPage">
+                <property name="title">Sidebar</property>
+                <property name="child">
+                  <object class="ListsPanel" id="lists_panel">
+                    <property name="window">Window</property>
                   </object>
                 </property>
-
-                <!-- View switcher -->
-                <child type="bottom">
-                  <object class="AdwViewSwitcherBar">
-                    <property name="stack">stack</property>
-                    <property name="reveal">true</property>
-                  </object>
-                </child>
-
               </object>
             </property>
 
             <!-- Content -->
             <property name="content">
-              <object class="TasksList" id="tasks_list">
-                <property name="window">Window</property>
-                <property name="trash_panel">trash_panel</property>
+              <object class="AdwNavigationPage">
+                <property name="title">Content</property>
+                <property name="child">
+                  <object class="TasksList" id="tasks_list">
+                    <property name="window">Window</property>
+                  </object>
+                </property>
               </object>
             </property>
 

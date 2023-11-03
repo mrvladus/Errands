@@ -37,7 +37,6 @@ class Window(Adw.ApplicationWindow):
     import_dialog: Gtk.FileDialog = Gtk.Template.Child()
     toast_overlay: Adw.ToastOverlay = Gtk.Template.Child()
 
-    trash_panel = Gtk.Template.Child()
     lists_panel = Gtk.Template.Child()
     tasks_list = Gtk.Template.Child()
 

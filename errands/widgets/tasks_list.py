@@ -37,6 +37,8 @@ class TasksList(Adw.Bin):
     sync_btn: Gtk.Button = Gtk.Template.Child()
     split_view = Gtk.Template.Child()
     task_details = Gtk.Template.Child()
+    trash_panel = Gtk.Template.Child()
+    stack = Gtk.Template.Child()
 
     # State
     scrolling: bool = False  # Is window scrolling
@@ -186,7 +188,7 @@ class TasksList(Adw.Bin):
         """
         Log.info("Delete completed tasks")
 
-        for task in self.tasks_list.get_all_tasks():
+        for task in self.get_all_tasks():
             if task.task["completed"] and not task.task["deleted"]:
                 task.delete()
         self.update_status()
