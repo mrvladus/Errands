@@ -3,6 +3,7 @@
 
 import json
 from errands.widgets.lists_panel import ListsPanel
+from errands.widgets.shortcuts_window import ShortcutsWindow
 from errands.widgets.tasks_list import TasksList
 from errands.widgets.trash_panel import TrashPanel
 from gi.repository import Gio, Adw, Gtk, GLib, GObject
@@ -34,7 +35,6 @@ class Window(Adw.ApplicationWindow):
     about_window: Adw.AboutWindow = Gtk.Template.Child()
     export_dialog: Gtk.FileDialog = Gtk.Template.Child()
     import_dialog: Gtk.FileDialog = Gtk.Template.Child()
-    shortcuts_window: Gtk.ShortcutsWindow = Gtk.Template.Child()
     toast_overlay: Adw.ToastOverlay = Gtk.Template.Child()
 
     trash_panel = Gtk.Template.Child()
@@ -162,8 +162,7 @@ class Window(Adw.ApplicationWindow):
             Show shortcuts window
             """
 
-            self.shortcuts_window.set_transient_for(self)
-            self.shortcuts_window.show()
+            ShortcutsWindow(self)
 
         _create_action(
             "preferences",

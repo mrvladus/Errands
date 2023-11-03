@@ -28,7 +28,7 @@
             </child>
 
             <!-- Restore all button -->
-            <child>
+            <child type="end">
               <object class="GtkButton">
                 <property name="valign">center</property>
                 <property name="icon-name">edit-redo-symbolic</property>
