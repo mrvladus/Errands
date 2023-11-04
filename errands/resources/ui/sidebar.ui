@@ -20,21 +20,6 @@
                 <property name="icon-name">view-list-bullet-symbolic</property>
                 <property name="child">
                   <object class="ListsPanel">
-                    <!-- <property name="stack">stack</property> -->
-                  </object>
-                </property>
-              </object>
-            </child>
-
-            <!-- Details panel -->
-            <child>
-              <object class="AdwViewStackPage">
-                <property name="name">details</property>
-                <property name="title">Details</property>
-                <property name="icon-name">help-about-symbolic</property>
-                <property name="child">
-                  <object class="TaskDetails" id="task_details">
-                    <property name="stack">stack</property>
                   </object>
                 </property>
               </object>
@@ -48,6 +33,19 @@
                 <property name="icon-name">user-trash-symbolic</property>
                 <property name="child">
                   <object class="TrashPanel" id="trash_panel">
+                  </object>
+                </property>
+              </object>
+            </child>
+
+            <!-- Details panel -->
+            <child>
+              <object class="AdwViewStackPage">
+                <property name="name">details</property>
+                <property name="title">Details</property>
+                <property name="icon-name">help-about-symbolic</property>
+                <property name="child">
+                  <object class="DetailsPanel" id="details_panel">
                   </object>
                 </property>
               </object>

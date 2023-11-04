@@ -2,12 +2,9 @@
 # SPDX-License-Identifier: MIT
 
 import json
-from errands.widgets.lists_panel import ListsPanel
+from errands.widgets.lists import Lists
 from errands.widgets.shortcuts_window import ShortcutsWindow
-from errands.widgets.sidebar import Sidebar
-from errands.widgets.task_details import TaskDetails
 from errands.widgets.tasks_list import TasksList
-from errands.widgets.trash import TrashPanel
 from gi.repository import Gio, Adw, Gtk, GLib, GObject
 from __main__ import VERSION, APP_ID
 from errands.widgets.preferences import PreferencesWindow
@@ -17,25 +14,8 @@ from errands.utils.logging import Log
 from errands.utils.data import UserData
 from errands.utils.functions import get_children
 
-GObject.type_ensure(TrashPanel)
-GObject.type_ensure(TaskDetails)
-GObject.type_ensure(ListsPanel)
-GObject.type_ensure(TasksList)
-GObject.type_ensure(Sidebar)
 
-
-@Gtk.Template(resource_path="/io/github/mrvladus/Errands/window.ui")
 class Window(Adw.ApplicationWindow):
-    __gtype_name__ = "Window"
-
-    # - Template children - #
-    about_window: Adw.AboutWindow = Gtk.Template.Child()
-    export_dialog: Gtk.FileDialog = Gtk.Template.Child()
-    import_dialog: Gtk.FileDialog = Gtk.Template.Child()
-    toast_overlay: Adw.ToastOverlay = Gtk.Template.Child()
-
-    tasks_list = Gtk.Template.Child()
-
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
         # Remember window state
@@ -48,6 +28,22 @@ class Window(Adw.ApplicationWindow):
         Adw.StyleManager.get_default().set_color_scheme(GSettings.get("theme"))
         Log.debug("Present window")
         self.present()
+
+    def build_ui(self):
+        self.props.width_request = 300
+        self.props.height_request = 200
+        self.connect("notify::default-width", self.on_width_changed)
+        # Split view
+        self.split_view = Adw.OverlaySplitView()
+        self.split_view.set_sidebar(Lists())
+        self.split_view.set_content(TasksList())
+        # Toast overlay
+        self.toast_overlay = Adw.ToastOverlay(child=self.split_view)
+        self.set_content(self.toast_overlay)
+
+    def on_width_changed(self, *_):
+        width = self.props.default_width
+        self.split_view.set_collapsed(width < 720)
 
     def perform_startup(self) -> None:
         """
@@ -75,82 +71,23 @@ class Window(Adw.ApplicationWindow):
                 self.props.application.set_accels_for_action(f"app.{name}", shortcuts)
             self.props.application.add_action(action)
 
-        def _about(*_) -> None:
+        def _about(*args) -> None:
             """
             Show about window
             """
-
-            self.about_window.props.version = VERSION
-            self.about_window.props.application_icon = APP_ID
-            self.about_window.show()
-
-        def _export_tasks(*args) -> None:
-            """
-            Show export dialog
-            """
-
-            def _finish_export(_dial, res, _data) -> None:
-                try:
-                    file: Gio.File = self.export_dialog.save_finish(res)
-                except GLib.GError:
-                    Log.info("Export cancelled")
-                    self.add_toast(_("Export Cancelled"))  # pyright:ignore
-                    return
-                try:
-                    path: str = file.get_path()
-                    with open(path, "w+") as f:
-                        json.dump(UserData.get(), f, indent=4, ensure_ascii=False)
-                    self.add_toast(_("Tasks Exported"))  # pyright:ignore
-                    Log.info(f"Export tasks to: {path}")
-                except:
-                    self.add_toast(_("Error"))  # pyright:ignore
-                    Log.info(f"Can't export tasks to: {path}")
-
-            self.export_dialog.save(self, None, _finish_export, None)
-
-        def _import_tasks(*args) -> None:
-            """
-            Show import dialog
-            """
-
-            def finish_import(_dial, res, _data) -> None:
-                Log.info("Importing tasks")
-
-                try:
-                    file: Gio.File = self.import_dialog.open_finish(res)
-                except GLib.GError:
-                    Log.info("Import cancelled")
-                    self.add_toast(_("Import Cancelled"))  # pyright:ignore
-                    return
-
-                with open(file.get_path(), "r") as f:
-                    text: str = f.read()
-                    try:
-                        text = UserData.convert(json.loads(text))
-                    except:
-                        Log.error("Invalid file")
-                        self.add_toast(_("Invalid File"))  # pyright:ignore
-                        return
-                    data: dict = UserData.get()
-                    ids = [t["id"] for t in data["tasks"]]
-                    for task in text["tasks"]:
-                        if task["id"] not in ids:
-                            data["tasks"].append(task)
-                    data = UserData.clean_orphans(data)
-                    UserData.set(data)
-
-                # Remove old tasks
-                for task in get_children(self.tasks_list.tasks_list):
-                    self.tasks_list.tasks_list.remove(task)
-                # Remove old trash
-                for task in get_children(self.trash_panel.trash_list):
-                    self.trash_panel.trash_list.remove(task)
-                self._load_tasks()
-                Log.info("Tasks imported")
-                self.add_toast(_("Tasks Imported"))  # pyright:ignore
-                Sync.sync()
-
-            self.import_dialog.open(self, None, finish_import, None)
+            about = Adw.AboutWindow(
+                transient_for=self,
+                version=VERSION,
+                application_icon=APP_ID,
+                application_name="Errands",
+                copyright="© 2023 Vlad Krupinski",
+                website="https://github.com/mrvladus/Errands",
+                issue_url="https://github.com/mrvladus/Errands/issues",
+                lisence_type=7,
+                translator_credits=_("translator-credits"),  # type:ignore
+                modal=True,
+            )
+            about.show()
 
         def _shortcuts(*_) -> None:
             """
@@ -164,8 +101,6 @@ class Window(Adw.ApplicationWindow):
             lambda *_: PreferencesWindow(self).show(),
             ["<primary>comma"],
         )
-        _create_action("export", _export_tasks, ["<primary>e"])
-        _create_action("import", _import_tasks, ["<primary>i"])
         _create_action("shortcuts", _shortcuts, ["<primary>question"])
         _create_action("about", _about)
         _create_action(

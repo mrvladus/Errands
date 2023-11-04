@@ -10,11 +10,9 @@ from errands.utils.logging import Log
 from errands.utils.tasks import task_to_ics
 
 
-@Gtk.Template(resource_path="/io/github/mrvladus/Errands/task_details.ui")
-class TaskDetails(Adw.Bin):
-    __gtype_name__ = "TaskDetails"
-
-    stack: Adw.ViewStack = GObject.Property(type=Adw.ViewStack)
+@Gtk.Template(resource_path="/io/github/mrvladus/Errands/details_panel.ui")
+class DetailsPanel(Adw.Bin):
+    __gtype_name__ = "DetailsPanel"
 
     details_status: Adw.StatusPage = Gtk.Template.Child()
     edit_entry: Gtk.TextBuffer = Gtk.Template.Child()

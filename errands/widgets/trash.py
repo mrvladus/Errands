@@ -3,60 +3,77 @@
 
 from errands.utils.data import UserData, UserDataDict, UserDataTask
 from errands.utils.functions import get_children
-from gi.repository import Adw, Gtk
+from errands.widgets.trash_item import TrashItem
+from gi.repository import Adw, Gtk, GObject
 from errands.widgets.task import Task
 from errands.utils.sync import Sync
 from errands.utils.logging import Log
 
 
-@Gtk.Template(resource_path="/io/github/mrvladus/Errands/trash_item.ui")
-class TrashItem(Adw.ActionRow):
-    __gtype_name__ = "TrashItem"
-
-    def __init__(self, task: dict, tasks_list) -> None:
+class Trash(Adw.Bin):
+    def __init__(self, window):
         super().__init__()
-        self.tasks_list = tasks_list
-        self.id: str = task["id"]
-        self.set_title(task["text"])
+        self.window = window
+        self.build_ui()
 
-    @Gtk.Template.Callback()
-    def on_restore(self, _) -> None:
-        """Restore task"""
-
-        Log.info(f"Restore task: {self.id}")
-
-        tasks: list[Task] = self.tasks_list.get_all_tasks()
-
-        def restore_task(id: str = self.id) -> None:
-            for task in tasks:
-                if task.task["id"] == id:
-                    task.task["deleted"] = False
-                    task.update_data()
-                    task.toggle_visibility(True)
-                    if task.task["parent"]:
-                        task.parent.expand(True)
-                        restore_task(task.task["parent"])
-                    break
-
-        restore_task()
-        self.tasks_list.update_status()
-        self.tasks_list.trash_panel.trash_clear()
-
-
-@Gtk.Template(resource_path="/io/github/mrvladus/Errands/trash_panel.ui")
-class TrashPanel(Adw.Bin):
-    __gtype_name__ = "TrashPanel"
-
-    # Template children
-    confirm_dialog: Adw.MessageDialog = Gtk.Template.Child()
-    clear_trash_btn: Gtk.Button = Gtk.Template.Child()
-    trash_list: Gtk.Box = Gtk.Template.Child()
-    trash_list_scrl: Gtk.ScrolledWindow = Gtk.Template.Child()
-
-    tasks_list = None
-
-    def __init__(self):
-        super().__init__()
+    def build_ui(self):
+        # Headerbar
+        hb = Adw.HeaderBar(show_title=False)
+        # Clear button
+        clear_btn = Gtk.Button(
+            icon_name="user-trash-full-symbolic",
+            valign="center",
+            tooltip_text=_("Clear"),  # type:ignore
+        )
+        clear_btn.connect("clicked", self.on_trash_clear)
+        hb.pack_start(clear_btn)
+        # Restore button
+        restore_btn = Gtk.Button(
+            icon_name="edit-redo-symbolic",
+            valign="center",
+            tooltip_text=_("Restore All"),  # type:ignore
+        )
+        restore_btn.connect("clicked", self.on_trash_restore)
+        hb.pack_end(restore_btn)
+        # Status
+        status = Adw.StatusPage(
+            icon_name="user-trash-symbolic",
+            title=_("Empty Trash"),  # type:ignore
+            description=_("No deleted items"),  # type:ignore
+            vexpand=True,
+        )
+        status.add_css_class("compact")
+        # Trash list
+        self.trash_list = Adw.PreferencesGroup(
+            margin_top=12,
+            margin_bottom=12,
+            margin_start=12,
+            margin_end=12,
+        )
+        self.scrl = Gtk.ScrolledWindow(
+            vexpand=True,
+            child=Adw.Clamp(child=self.trash_list),
+        )
+        self.scrl.bind_property(
+            "visible",
+            status,
+            "visible",
+            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.INVERT_BOOLEAN,
+        )
+        self.scrl.bind_property(
+            "visible", clear_btn, "visible", GObject.BindingFlags.SYNC_CREATE
+        )
+        self.scrl.bind_property(
+            "visible", restore_btn, "visible", GObject.BindingFlags.SYNC_CREATE
+        )
+        # Box
+        box = Gtk.Box(orientation="vertical")
+        box.append(status)
+        box.append(self.scrl)
+        # Toolbar View
+        toolbar_view = Adw.ToolbarView(content=box)
+        toolbar_view.add_top_bar(hb)
+        self.set_child(toolbar_view)
 
     def trash_add(self, task: dict) -> None:
         """
@@ -64,7 +81,7 @@ class TrashPanel(Adw.Bin):
         """
 
         self.trash_list.add(TrashItem(task, self.tasks_list))
-        self.trash_list_scrl.set_visible(True)
+        self.scrl.set_visible(True)
 
     def trash_clear(self) -> None:
         """
@@ -82,15 +99,24 @@ class TrashPanel(Adw.Bin):
         for item in to_remove:
             self.trash_list.remove(item)
 
-        self.trash_list_scrl.set_visible(len(get_children(self.trash_list)) > 0)
+        self.scrl.set_visible(len(get_children(self.trash_list)) > 0)
 
-    @Gtk.Template.Callback()
-    def on_trash_clear(self, _) -> None:
+    def on_trash_clear(self, btn) -> None:
         Log.debug("Show confirm dialog")
-        # self.confirm_dialog.set_transient_for(self.window)
-        self.confirm_dialog.show()
+        dialog = Adw.MessageDialog(
+            transient_for=self.window,
+            hide_on_close=True,
+            heading=_("Are you sure?"),  # type:ignore
+            body=_("Tasks will be permanently deleted"),  # type:ignore
+            default_response="delete",
+            close_response="cancel",
+        )
+        dialog.add_response("delete", _("Delete"))  # type:ignore
+        dialog.set_response_appearance("delete", Adw.ResponseAppearance.DESTRUCTIVE)
+        dialog.add_response("cancel", _("Cancel"))  # type:ignore
+        dialog.connect("response", self.on_trash_clear_confirm)
+        dialog.show()
 
-    @Gtk.Template.Callback()
     def on_trash_clear_confirm(self, _, res) -> None:
         """
         Remove all trash items and tasks
@@ -115,7 +141,7 @@ class TrashPanel(Adw.Bin):
         # Remove trash items widgets
         for item in get_children(self.trash_list):
             self.trash_list.remove(item)
-        self.trash_list_scrl.set_visible(False)
+        self.scrl.set_visible(False)
         # Sync
         Sync.sync()
 

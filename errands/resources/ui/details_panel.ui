@@ -2,7 +2,7 @@
 <interface>
   <requires lib="gtk" version="4.0" />
   <requires lib="Adw" version="1.0" />
-  <template class="TaskDetails" parent="AdwBin">
+  <template class="DetailsPanel" parent="AdwBin">
     <child>
       <object class="AdwToolbarView">
 
