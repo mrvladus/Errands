@@ -145,7 +145,6 @@ class Trash(Adw.Bin):
         # Sync
         Sync.sync()
 
-    @Gtk.Template.Callback()
     def on_trash_restore(self, _) -> None:
         """
         Remove trash items and restore all tasks

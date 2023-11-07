@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
   <gresource prefix="/io/github/mrvladus/Errands">
-    <file preprocess="xml-stripblanks" compressed="true" alias="window.ui">resources/ui/window.ui</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="preferences.ui">resources/ui/preferences.ui</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="sidebar.ui">resources/ui/sidebar.ui</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="task.ui">resources/ui/task.ui</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="tasks_list.ui">resources/ui/tasks_list.ui</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="details_panel.ui">resources/ui/details_panel.ui</file>
     <file alias="style.css">resources/style.css</file>
     <file alias="style-dark.css">resources/style-dark.css</file>
   </gresource>

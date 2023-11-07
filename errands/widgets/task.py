@@ -13,10 +13,7 @@ from errands.utils.markup import Markup
 from errands.utils.functions import get_children
 
 
-@Gtk.Template(resource_path="/io/github/mrvladus/Errands/task.ui")
 class Task(Gtk.Revealer):
-    __gtype_name__ = "Task"
-
     # - Template children - #
     main_box: Gtk.Box = Gtk.Template.Child()
     task_row: Adw.ActionRow = Gtk.Template.Child()
@@ -55,8 +52,96 @@ class Task(Gtk.Revealer):
         self.just_added = False
         self.parent.update_status()
 
-    def __repr__(self) -> str:
-        return f"Task({self.task['id']})"
+    def build_ui(self):
+        # Drop controller
+        drop_ctrl = Gtk.DropControllerMotion()
+        self.add_controller(drop_ctrl)
+        # Top drop area
+        top_drop_img = Gtk.Image(icon_name="list-add-symbolic", hexpand=True)
+        top_drop_img.add_css_class("dim-label")
+        top_drop_img.add_css_class("task-drop-area")
+        top_drop_img_target = Gtk.DropTarget(actions=2, formats=Task)
+        top_drop_img_target.connect("drop", self.on_task_top_drop)
+        top_drop_img.add_controller(top_drop_img_target)
+        top_drop_area = Gtk.Revealer(child=top_drop_img, transition_type=5)
+        top_drop_area.bind_property(
+            "reveal-child",
+            drop_ctrl,
+            "contains-property",
+            GObject.BindingFlags.SYNC_CREATE,
+        )
+        # Task row
+        self.task_row = Adw.ActionRow(height_request=60, use_markup=True)
+        self.task_row.add_css_class("task-title")
+        # Task row controllers
+        task_row_drag_source = Gtk.DragSource()
+        self.task_row.add_controller(task_row_drag_source)
+        task_row_drop_target = Gtk.DropTarget(actions=2, formats=Task)
+        task_row_drop_target.connect("drop", self.on_drop)
+        self.task_row.add_controller(task_row_drop_target)
+        task_row_click_ctrl = Gtk.GestureClick()
+        task_row_click_ctrl.connect("released", self.on_expand)
+        self.task_row.add_controller(task_row_click_ctrl)
+        task_row_hover_ctrl = Gtk.EventControllerMotion()
+        self.task_row.add_controller(task_row_hover_ctrl)
+        # Mark as completed button
+        self.completed_btn = Gtk.CheckButton(
+            valign="center",
+            tooltip_text=_("Mark as Completed"),  # type:ignore
+        )
+        self.completed_btn.connect("toggled", self.on_completed_btn_toggled)
+        self.task_row.add_prefix(self.completed_btn)
+        # Expand icon
+        self.expand_icon = Gtk.Image(icon_name="go-down-symbolic")
+        self.expand_icon.add_css_class("fade")
+        expand_icon_rev = Gtk.Revealer(transition_type=1, margin_end=5)
+        expand_icon_rev.bind_property(
+            "reveal-child",
+            task_row_hover_ctrl,
+            "contains-pointer",
+            GObject.BindingFlags.SYNC_CREATE,
+        )
+        # Details button
+        details_btn = Gtk.Button(
+            icon_name="view-more-symbolic",
+            valign="center",
+            tooltip_text=_("Details"),  # type:ignore
+        )
+        details_btn.add_css_class("flat")
+        details_btn.connect("clicked", self.on_details_btn_clicked)
+        # Task row suffix box
+        task_row_suffix_box = Gtk.Box()
+        task_row_suffix_box.append(expand_icon_rev)
+        task_row_suffix_box.append(details_btn)
+        self.task_row.add_suffix(task_row_suffix_box)
+        # Sub-tasks entry
+        sub_tasks_entry = Gtk.Entry(
+            hexpand=True,
+            margin_bottom=6,
+            margin_start=12,
+            margin_end=12,
+            placeholder_text=_("Add new Sub-Task"),  # type:ignore
+        )
+        sub_tasks_entry.connect("activate", self.on_sub_task_added)
+        # Sub-tasks
+        self.tasks_list = Gtk.Box(orientation="vertical")
+        self.tasks_list.add_css_class("sub-tasks")
+        # Sub-tasks box
+        sub_tasks_box = Gtk.Box(orientation="vertical")
+        sub_tasks_box.append(sub_tasks_entry)
+        sub_tasks_box.append(self.tasks_list)
+        # Sub-tasks box revealer
+        self.sub_tasks_revealer = Gtk.Revealer(child=sub_tasks_box)
+        # Task card
+        self.main_box = Gtk.Box(orientation="vertical", hexpand=True)
+        self.main_box.add_css_class("fade")
+        self.main_box.add_css_class("card")
+        self.main_box.add_child(self.task_row)
+        # Box
+        box = Gtk.Box(orientation="vertical")
+        box.add_child(top_drop_area)
+        box.add_child(self.main_box)
+        self.add_child(box)
 
     def add_task(self, task: dict) -> None:
         sub_task: Task = Task(task, self.window, self)

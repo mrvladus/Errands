@@ -30,7 +30,7 @@ class Window(Adw.ApplicationWindow):
         self.present()
 
     def build_ui(self):
-        self.props.width_request = 300
+        self.props.width_request = 360
         self.props.height_request = 200
         self.connect("notify::default-width", self.on_width_changed)
         # Split view

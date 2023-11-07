@@ -6,7 +6,6 @@ from errands.utils.gsettings import GSettings
 import errands.utils.tasks as TaskUtils
 from errands.utils.data import UserData, UserDataDict, UserDataTask
 from errands.utils.functions import get_children
-from errands.widgets.trash import TrashPanel
 from gi.repository import Adw, Gtk, GObject, GLib
 from errands.widgets.task import Task
 from errands.utils.markup import Markup
@@ -14,30 +13,79 @@ from errands.utils.sync import Sync
 from errands.utils.logging import Log
 
 
-@Gtk.Template(resource_path="/io/github/mrvladus/Errands/tasks_list.ui")
 class TasksList(Adw.Bin):
-    __gtype_name__ = "TasksList"
-
-    # Set props
-    window = GObject.Property(type=Adw.ApplicationWindow)
-    trash_panel = GObject.Property(type=TrashPanel)
-
-    # Template children
-    drop_motion_ctrl: Gtk.DropControllerMotion = Gtk.Template.Child()
-    scrolled_window: Gtk.ScrolledWindow = Gtk.Template.Child()
-    tasks_list: Gtk.Box = Gtk.Template.Child()
-    delete_completed_tasks_btn = Gtk.Template.Child()
-    title: Adw.WindowTitle = Gtk.Template.Child()
-    scroll_up_btn_rev = Gtk.Template.Child()
-    sync_btn: Gtk.Button = Gtk.Template.Child()
-
     # State
     scrolling: bool = False  # Is window scrolling
     startup: bool = True
 
     def __init__(self):
         super().__init__()
-        # self.trash_panel.tasks_list = self
+
+    def build_ui(self):
+        # Title
+        self.title = Adw.WindowTitle()
+        # Delete completed button
+        delete_completed_btn = Gtk.Button(
+            valign="center",
+            icon_name="edit-clear-all-symbolic",
+            tooltip_text=_("Delete Completed Tasks"),  # type:ignore
+        )
+        delete_completed_btn.connect("clicked", self.on_delete_completed_btn_clicked())
+        self.delete_completed_btn_rev = Gtk.Revealer(
+            child=delete_completed_btn, transition_type=2
+        )
+        # Sync button
+        self.sync_btn = Gtk.Button(
+            valign="center",
+            icon_name="emblem-synchronizing-symbolic",
+            tooltip_text=_("Sync/Fetch Tasks"),  # type:ignore
+        )
+        self.sync_btn.connect("clicked", self.on_sync_btn_clicked)
+        # Scroll up btn
+        scroll_up_btn = Gtk.Button(
+            valign="center",
+            icon_name="go-up-symbolic",
+            tooltip_text=_("Scroll Up"),  # type:ignore
+        )
+        scroll_up_btn.connect("clicked", self.on_scroll_up_btn_clicked)
+        self.scroll_up_btn_rev = Gtk.Revealer(child=scroll_up_btn, transition_type=3)
+        # Header Bar
+        hb = Adw.HeaderBar(title_widget=self.title)
+        hb.pack_start(self.delete_completed_btn_rev)
+        hb.pack_end(self.sync_btn)
+        hb.pack_end(self.scroll_up_btn_rev)
+        # Entry
+        entry = Adw.EntryRow(
+            activatable=False,
+            height_request=60,
+            title=_("Add new Task"),  # type:ignore
+        )
+        entry.connect("entry-activated", self.on_task_added)
+        group = Adw.PreferencesGroup()
+        group.add(entry)
+        # Srolled window
+        adj = Gtk.Adjustment()
+        adj.connect("value-changed", self.on_scroll)
+        self.scrl = Gtk.ScrolledWindow(
+            propagate_natural_height=True, propagate_natural_width=True, vadjustment=adj
+        )
+        dnd_ctrl = Gtk.DropControllerMotion()
+        dnd_ctrl.connect("motion", self.on_dnd_scroll)
+        # Tasks list
+        self.tasks_list = Gtk.Box(
+            orientation="vertical", hexpand=True, margin_bottom=18
+        )
+        self.tasks_list.add_css_class("tasks-list")
+        # Box
+        box = Gtk.Box(orientation="vertical")
+        box.append(Adw.Clamp(maximum_size=850, tightening_threshold=300, child=group))
+        box.append(self.scrl)
+        box.append(
+            Adw.Clamp(maximum_size=850, tightening_threshold=300, child=self.tasks_list)
+        )
+        # Toolbar view
+        toolbar_view = Adw.ToolbarView(content=box)
+        toolbar_view.add_top_bar(hb)
 
     def add_task(self, task: dict) -> None:
         new_task = Task(task, self)
@@ -173,8 +221,7 @@ class TasksList(Adw.Bin):
             if task.task["id"] not in ids:
                 task.purge()
 
-    @Gtk.Template.Callback()
-    def on_delete_completed_tasks_btn_clicked(self, _) -> None:
+    def on_delete_completed_btn_clicked(self, _) -> None:
         """
         Hide completed tasks and move them to trash
         """
@@ -185,7 +232,6 @@ class TasksList(Adw.Bin):
                 task.delete()
         self.update_status()
 
-    @Gtk.Template.Callback()
     def on_dnd_scroll(self, _motion, _x, y) -> bool:
         """
         Autoscroll while dragging task
@@ -214,7 +260,6 @@ class TasksList(Adw.Bin):
         else:
             self.scrolling = False
 
-    @Gtk.Template.Callback()
     def on_scroll(self, adj) -> None:
         """
         Show scroll up button
@@ -222,7 +267,6 @@ class TasksList(Adw.Bin):
 
         self.scroll_up_btn_rev.set_reveal_child(adj.get_value() > 0)
 
-    @Gtk.Template.Callback()
     def on_scroll_up_btn_clicked(self, _) -> None:
         """
         Scroll up
@@ -230,11 +274,9 @@ class TasksList(Adw.Bin):
 
         scroll(self.tasks_list.scrolled_window, False)
 
-    @Gtk.Template.Callback()
     def on_sync_btn_clicked(self, btn) -> None:
         Sync.sync(True)
 
-    @Gtk.Template.Callback()
     def on_task_added(self, entry: Gtk.Entry) -> None:
         """
         Add new task
@@ -257,6 +299,5 @@ class TasksList(Adw.Bin):
         # Sync
         Sync.sync()
 
-    @Gtk.Template.Callback()
     def on_scroll_up_btn_clicked(self, _) -> None:
         scroll(self.scrolled_window, False)
