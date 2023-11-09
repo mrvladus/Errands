@@ -20,17 +20,19 @@ class TasksList(Adw.Bin):
 
     def __init__(self):
         super().__init__()
+        self.build_ui()
+        self.load_tasks()
 
     def build_ui(self):
         # Title
-        self.title = Adw.WindowTitle()
+        self.title = Adw.WindowTitle(title="Errands")
         # Delete completed button
         delete_completed_btn = Gtk.Button(
             valign="center",
             icon_name="edit-clear-all-symbolic",
             tooltip_text=_("Delete Completed Tasks"),  # type:ignore
         )
-        delete_completed_btn.connect("clicked", self.on_delete_completed_btn_clicked())
+        delete_completed_btn.connect("clicked", self.on_delete_completed_btn_clicked)
         self.delete_completed_btn_rev = Gtk.Revealer(
             child=delete_completed_btn, transition_type=2
         )
@@ -61,8 +63,15 @@ class TasksList(Adw.Bin):
             title=_("Add new Task"),  # type:ignore
         )
         entry.connect("entry-activated", self.on_task_added)
-        group = Adw.PreferencesGroup()
-        group.add(entry)
+        entry_box = Gtk.ListBox(
+            selection_mode=0,
+            css_classes=["boxed-list"],
+            margin_start=12,
+            margin_end=12,
+            margin_top=12,
+            margin_bottom=12,
+        )
+        entry_box.append(entry)
         # Srolled window
         adj = Gtk.Adjustment()
         adj.connect("value-changed", self.on_scroll)
@@ -71,21 +80,29 @@ class TasksList(Adw.Bin):
         )
         dnd_ctrl = Gtk.DropControllerMotion()
         dnd_ctrl.connect("motion", self.on_dnd_scroll)
+        self.scrl.add_controller(dnd_ctrl)
         # Tasks list
         self.tasks_list = Gtk.Box(
             orientation="vertical", hexpand=True, margin_bottom=18
         )
         self.tasks_list.add_css_class("tasks-list")
-        # Box
-        box = Gtk.Box(orientation="vertical")
-        box.append(Adw.Clamp(maximum_size=850, tightening_threshold=300, child=group))
-        box.append(self.scrl)
-        box.append(
+        self.scrl.set_child(
             Adw.Clamp(maximum_size=850, tightening_threshold=300, child=self.tasks_list)
         )
+        # Box
+        box = Gtk.Box(orientation="vertical")
+        box.append(
+            Adw.Clamp(
+                maximum_size=850,
+                tightening_threshold=300,
+                child=entry_box,
+            )
+        )
+        box.append(self.scrl)
         # Toolbar view
         toolbar_view = Adw.ToolbarView(content=box)
         toolbar_view.add_top_bar(hb)
+        self.set_child(toolbar_view)
 
     def add_task(self, task: dict) -> None:
         new_task = Task(task, self)
@@ -155,7 +172,7 @@ class TasksList(Adw.Bin):
             if n_total > 0
             else ""
         )
-        self.delete_completed_tasks_btn.set_reveal_child(n_all_completed > 0)
+        self.delete_completed_btn_rev.set_reveal_child(n_all_completed > 0)
         # self.trash_panel.trash_list_scrl.set_visible(n_all_deleted > 0)
 
     def update_ui(self) -> None:

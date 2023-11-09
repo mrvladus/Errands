@@ -13,16 +13,17 @@ class PreferencesWindow(Adw.PreferencesWindow):
     selected_provider = 0
 
     def __init__(self, win: Adw.ApplicationWindow) -> None:
-        super().__init__(transient_for=win)
+        super().__init__()
         self.window = win
+        self.build_ui()
         # Setup theme
         theme: int = GSettings.get("theme")
         if theme == 0:
-            self.system_theme.props.active = True
+            self.theme_system_btn.props.active = True
         elif theme == 1:
-            self.light_theme.props.active = True
+            self.theme_light_btn.props.active = True
         elif theme == 4:
-            self.dark_theme.props.active = True
+            self.theme_dark_btn.props.active = True
         # Setup expand
         GSettings.bind("expand-on-startup", self.expand_on_startup, "active")
         # Setup sync
@@ -30,45 +31,45 @@ class PreferencesWindow(Adw.PreferencesWindow):
         GSettings.bind("sync-url", self.sync_url, "text")
         GSettings.bind("sync-username", self.sync_username, "text")
         GSettings.bind("sync-password", self.sync_password, "text")
-        GSettings.bind("sync-cal-name", self.sync_cal_name, "text")
         self.setup_sync()
 
     def build_ui(self):
-        self.set_hide_on_close(True)
+        self.set_transient_for(self.window)
+        # self.set_hide_on_close(True)
         self.set_search_enabled(False)
         # Theme group
         theme_group = Adw.PreferencesGroup(
             title=_("Application Theme"),  # type:ignore
         )
         # System theme
-        theme_system_btn = Gtk.CheckButton()
-        theme_system_btn.connect("toggled", self.on_theme_change, 0)
+        self.theme_system_btn = Gtk.CheckButton()
+        self.theme_system_btn.connect("toggled", self.on_theme_change, 0)
         theme_system_row = Adw.ActionRow(
             title=_("System"),  # type:ignore
             icon_name="applications-system-symbolic",
         )
-        theme_system_row.add_suffix(theme_system_btn)
-        theme_system_row.set_activatable_widget(theme_system_btn)
+        theme_system_row.add_suffix(self.theme_system_btn)
+        theme_system_row.set_activatable_widget(self.theme_system_btn)
         theme_group.add(theme_system_row)
         # Light theme
-        theme_light_btn = Gtk.CheckButton(group=theme_system_btn)
-        theme_light_btn.connect("toggled", self.on_theme_change, 1)
+        self.theme_light_btn = Gtk.CheckButton(group=self.theme_system_btn)
+        self.theme_light_btn.connect("toggled", self.on_theme_change, 1)
         theme_light_row = Adw.ActionRow(
             title=_("Light"),  # type:ignore
             icon_name="display-brightness-symbolic",
         )
-        theme_light_row.add_suffix(theme_light_btn)
-        theme_light_row.set_activatable_widget(theme_light_btn)
+        theme_light_row.add_suffix(self.theme_light_btn)
+        theme_light_row.set_activatable_widget(self.theme_light_btn)
         theme_group.add(theme_light_row)
         # Dark theme
-        theme_dark_btn = Gtk.CheckButton(group=theme_system_btn)
-        theme_light_btn.connect("toggled", self.on_theme_change, 4)
+        self.theme_dark_btn = Gtk.CheckButton(group=self.theme_system_btn)
+        self.theme_dark_btn.connect("toggled", self.on_theme_change, 4)
         theme_dark_row = Adw.ActionRow(
             title=_("Dark"),  # type:ignore
             icon_name="weather-clear-night-symbolic",
         )
-        theme_dark_row.add_suffix(theme_dark_btn)
-        theme_dark_row.set_activatable_widget(theme_dark_btn)
+        theme_dark_row.add_suffix(self.theme_dark_btn)
+        theme_dark_row.set_activatable_widget(self.theme_dark_btn)
         theme_group.add(theme_dark_row)
         # Tasks group
         tasks_group = Adw.PreferencesGroup(
@@ -86,24 +87,30 @@ class PreferencesWindow(Adw.PreferencesWindow):
             title=_("Sync"),  # type:ignore
         )
         # Provider
-        model = Gtk.StringList([_("Disabled"), "Nextcloud", "CalDAV"])  # type:ignore
+        model = Gtk.StringList.new(
+            [_("Disabled"), "Nextcloud", "CalDAV"]  # type:ignore
+        )
         self.sync_providers = Adw.ComboRow(
             title=_("Sync Provider"),  # type:ignore
             model=model,
         )
         self.sync_providers.connect("notify::selected", self.on_sync_provider_selected)
+        sync_group.add(self.sync_providers)
         # URL
         self.sync_url = Adw.EntryRow(
             title=_("Server URL"),  # type:ignore
         )
+        sync_group.add(self.sync_url)
         # Username
         self.sync_username = Adw.EntryRow(
             title=_("Username"),  # type:ignore
         )
+        sync_group.add(self.sync_username)
         # Password
-        self.sync_url = Adw.PasswordEntryRow(
+        self.sync_password = Adw.PasswordEntryRow(
             title=_("Password"),  # type:ignore
         )
+        sync_group.add(self.sync_password)
         # Test connection
         test_btn = Gtk.Button(
             label=_("Test"),  # type:ignore
@@ -115,21 +122,21 @@ class PreferencesWindow(Adw.PreferencesWindow):
         )
         self.test_connection_row.add_suffix(test_btn)
         self.test_connection_row.set_activatable_widget(test_btn)
+        sync_group.add(self.test_connection_row)
         # Page
         page = Adw.PreferencesPage()
         page.add(theme_group)
         page.add(tasks_group)
         page.add(sync_group)
+        self.add(page)
 
     def setup_sync(self):
         selected = self.sync_providers.props.selected
         self.sync_url.set_visible(0 < selected < 3)
         self.sync_username.set_visible(0 < selected < 3)
         self.sync_password.set_visible(0 < selected < 3)
-        self.sync_cal_name.set_visible(0 < selected < 3)
-        self.sync_token.set_visible(0 < selected > 3)
         self.test_connection_row.set_visible(selected > 0)
-        self.window.sync_btn.set_visible(selected > 0)
+        # self.window.sync_btn.set_visible(selected > 0)
 
     def on_cal_name_changed(self, *args):
         data: UserDataDict = UserData.get()
@@ -146,7 +153,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
         msg = _("Connected") if res else _("Can't connect")  # pyright:ignore
         toast: Adw.Toast = Adw.Toast(title=msg, timeout=2)
         self.add_toast(toast)
-        self.window.sync_btn.set_visible(res)
+        # self.window.sync_btn.set_visible(res)
 
     def on_theme_change(self, btn: Gtk.Button, theme: int) -> None:
         Adw.StyleManager.get_default().set_color_scheme(theme)

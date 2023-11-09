@@ -43,6 +43,7 @@ class Lists(Adw.Bin):
         # Toolbar view
         toolbar_view = Adw.ToolbarView(content=box)
         toolbar_view.add_top_bar(hb)
+        self.set_child(toolbar_view)
 
     def add_list(self):
         pass

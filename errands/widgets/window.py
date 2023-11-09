@@ -26,6 +26,8 @@ class Window(Adw.ApplicationWindow):
         # Setup theme
         Log.debug("Setting theme")
         Adw.StyleManager.get_default().set_color_scheme(GSettings.get("theme"))
+        self.build_ui()
+        self._create_actions()
         Log.debug("Present window")
         self.present()
 
@@ -51,8 +53,6 @@ class Window(Adw.ApplicationWindow):
         """
         Log.debug("Window startup")
         Sync.window = self
-        self._create_actions()
-        self.tasks_list.load_tasks()
         self.startup = False
 
     def add_toast(self, text: str) -> None:
@@ -83,7 +83,7 @@ class Window(Adw.ApplicationWindow):
                 copyright="© 2023 Vlad Krupinski",
                 website="https://github.com/mrvladus/Errands",
                 issue_url="https://github.com/mrvladus/Errands/issues",
-                lisence_type=7,
+                license_type=7,
                 translator_credits=_("translator-credits"),  # type:ignore
                 modal=True,
             )

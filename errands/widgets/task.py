@@ -39,44 +39,42 @@ class Task(Gtk.Revealer):
         if self.task["color"] != "":
             self.main_box.add_css_class(f'task-{self.task["color"]}')
         # Add to trash if needed
-        if self.task["deleted"]:
-            self.window.trash_panel.trash_add(self.task)
+        # if self.task["deleted"]:
+        #     self.window.trash_panel.trash_add(self.task)
         self._check_is_sub()
         self._add_sub_tasks()
         self.just_added = False
         self.parent.update_status()
 
     def build_ui(self):
-        # Drop controller
-        drop_ctrl = Gtk.DropControllerMotion()
-        self.add_controller(drop_ctrl)
         # Top drop area
         top_drop_img = Gtk.Image(icon_name="list-add-symbolic", hexpand=True)
         GtkUtils.add_css(top_drop_img, ["dim-label", "task-drop-area"])
-        top_drop_img_target = Gtk.DropTarget(actions=2, formats=Task)
-        top_drop_img_target.connect("drop", self.on_task_top_drop)
-        top_drop_img.add_controller(top_drop_img_target)
+        # top_drop_img_target = Gtk.DropTarget.new(actions=Gdk.DragAction.MOVE, type=Task)
+        # top_drop_img_target.connect("drop", self.on_task_top_drop)
+        # top_drop_img.add_controller(top_drop_img_target)
         top_drop_area = Gtk.Revealer(child=top_drop_img, transition_type=5)
-        top_drop_area.bind_property(
+        # Drop controller
+        drop_ctrl = Gtk.DropControllerMotion.new()
+        drop_ctrl.bind_property(
+            "contains-pointer",
+            top_drop_area,
             "reveal-child",
-            drop_ctrl,
-            "contains-property",
             GObject.BindingFlags.SYNC_CREATE,
         )
+        self.add_controller(drop_ctrl)
         # Task row
         self.task_row = Adw.ActionRow(height_request=60, use_markup=True)
         self.task_row.add_css_class("task-title")
         # Task row controllers
         task_row_drag_source = Gtk.DragSource()
         self.task_row.add_controller(task_row_drag_source)
-        task_row_drop_target = Gtk.DropTarget(actions=2, formats=Task)
-        task_row_drop_target.connect("drop", self.on_drop)
-        self.task_row.add_controller(task_row_drop_target)
-        task_row_click_ctrl = Gtk.GestureClick()
+        # task_row_drop_target = Gtk.DropTarget(actions=2, formats=Task)
+        # task_row_drop_target.connect("drop", self.on_drop)
+        # self.task_row.add_controller(task_row_drop_target)
+        task_row_click_ctrl = Gtk.GestureClick.new()
         task_row_click_ctrl.connect("released", self.on_expand)
         self.task_row.add_controller(task_row_click_ctrl)
-        task_row_hover_ctrl = Gtk.EventControllerMotion()
-        self.task_row.add_controller(task_row_hover_ctrl)
         # Mark as completed button
         self.completed_btn = Gtk.CheckButton(
             valign="center",
@@ -88,12 +86,14 @@ class Task(Gtk.Revealer):
         self.expand_icon = Gtk.Image(icon_name="go-down-symbolic")
         self.expand_icon.add_css_class("fade")
         expand_icon_rev = Gtk.Revealer(transition_type=1, margin_end=5)
-        expand_icon_rev.bind_property(
-            "reveal-child",
-            task_row_hover_ctrl,
+        task_row_hover_ctrl = Gtk.EventControllerMotion.new()
+        task_row_hover_ctrl.bind_property(
             "contains-pointer",
+            expand_icon_rev,
+            "reveal-child",
             GObject.BindingFlags.SYNC_CREATE,
         )
+        self.task_row.add_controller(task_row_hover_ctrl)
         # Details button
         details_btn = Gtk.Button(
             icon_name="view-more-symbolic",
@@ -126,14 +126,15 @@ class Task(Gtk.Revealer):
         # Sub-tasks box revealer
         self.sub_tasks_revealer = Gtk.Revealer(child=sub_tasks_box)
         # Task card
-        self.main_box = Gtk.Box(orientation="vertical", hexpand=True)
-        GtkUtils.add_css(self.main_box, ["fade", "card"])
-        self.main_box.add_child(self.task_row)
+        self.main_box = Gtk.Box(
+            orientation="vertical", hexpand=True, css_classes=["fade", "card"]
+        )
+        self.main_box.append(self.task_row)
         # Box
         box = Gtk.Box(orientation="vertical")
-        box.add_child(top_drop_area)
-        box.add_child(self.main_box)
-        self.add_child(box)
+        box.append(top_drop_area)
+        box.append(self.main_box)
+        self.set_child(box)
 
     def add_task(self, task: dict) -> None:
         sub_task: Task = Task(task, self.window, self)
@@ -222,7 +223,6 @@ class Task(Gtk.Revealer):
 
     # --- Template handlers --- #
 
-    @Gtk.Template.Callback()
     def on_completed_btn_toggled(self, btn: Gtk.Button) -> None:
         """
         Toggle check button and add style to the text
@@ -263,7 +263,6 @@ class Task(Gtk.Revealer):
             for task in children:
                 task.can_sync = True
 
-    @Gtk.Template.Callback()
     def on_expand(self, *_) -> None:
         """
         Expand task row
@@ -271,12 +270,10 @@ class Task(Gtk.Revealer):
 
         self.expand(not self.sub_tasks_revealer.get_child_revealed())
 
-    @Gtk.Template.Callback()
     def on_details_btn_clicked(self, _btn):
         self.window.stack.set_visible_child_name("details")
         self.window.task_details.update_info(self)
 
-    @Gtk.Template.Callback()
     def on_sub_task_added(self, entry: Gtk.Entry) -> None:
         """
         Add new Sub-Task
@@ -309,11 +306,9 @@ class Task(Gtk.Revealer):
 
     # --- Drag and Drop --- #
 
-    @Gtk.Template.Callback()
     def on_drag_end(self, *_) -> bool:
         self.set_sensitive(True)
 
-    @Gtk.Template.Callback()
     def on_drag_begin(self, _, drag) -> bool:
         icon: Gtk.DragIcon = Gtk.DragIcon.get_for_drag(drag)
         icon.set_child(
@@ -324,14 +319,12 @@ class Task(Gtk.Revealer):
             )
         )
 
-    @Gtk.Template.Callback()
     def on_drag_prepare(self, *_) -> Gdk.ContentProvider:
         self.set_sensitive(False)
         value = GObject.Value(Task)
         value.set_object(self)
         return Gdk.ContentProvider.new_for_value(value)
 
-    @Gtk.Template.Callback()
     def on_task_top_drop(self, _drop, task, _x, _y) -> bool:
         """
         When task is dropped on "+" area on top of task
@@ -379,7 +372,6 @@ class Task(Gtk.Revealer):
 
         return True
 
-    @Gtk.Template.Callback()
     def on_drop(self, _drop, task: Self, _x, _y) -> None:
         """
         When task is dropped on task and becomes sub-task
