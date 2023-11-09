@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 from typing import Self
+from errands.utils.gtk import GtkUtils
 from gi.repository import Gtk, Adw, Gdk, GObject
 
 # Import modules
@@ -14,14 +15,6 @@ from errands.utils.functions import get_children
 
 
 class Task(Gtk.Revealer):
-    # - Template children - #
-    main_box: Gtk.Box = Gtk.Template.Child()
-    task_row: Adw.ActionRow = Gtk.Template.Child()
-    expand_icon: Gtk.Image = Gtk.Template.Child()
-    completed_btn: Gtk.Button = Gtk.Template.Child()
-    sub_tasks_revealer: Gtk.Revealer = Gtk.Template.Child()
-    tasks_list: Gtk.Box = Gtk.Template.Child()
-
     # - State - #
     just_added: bool = True
     is_sub_task: bool = False
@@ -37,6 +30,7 @@ class Task(Gtk.Revealer):
             self.window if not parent else parent
         )
         self.task: UserDataTask = task
+        self.build_ui()
         # Set text
         self.task_row.set_title(Markup.find_url(Markup.escape(self.task["text"])))
         # Check if sub-task completed and toggle checkbox
@@ -58,8 +52,7 @@ class Task(Gtk.Revealer):
         self.add_controller(drop_ctrl)
         # Top drop area
         top_drop_img = Gtk.Image(icon_name="list-add-symbolic", hexpand=True)
-        top_drop_img.add_css_class("dim-label")
-        top_drop_img.add_css_class("task-drop-area")
+        GtkUtils.add_css(top_drop_img, ["dim-label", "task-drop-area"])
         top_drop_img_target = Gtk.DropTarget(actions=2, formats=Task)
         top_drop_img_target.connect("drop", self.on_task_top_drop)
         top_drop_img.add_controller(top_drop_img_target)
@@ -134,8 +127,7 @@ class Task(Gtk.Revealer):
         self.sub_tasks_revealer = Gtk.Revealer(child=sub_tasks_box)
         # Task card
         self.main_box = Gtk.Box(orientation="vertical", hexpand=True)
-        self.main_box.add_css_class("fade")
-        self.main_box.add_css_class("card")
+        GtkUtils.add_css(self.main_box, ["fade", "card"])
         self.main_box.add_child(self.task_row)
         # Box
         box = Gtk.Box(orientation="vertical")
