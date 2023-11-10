@@ -38,7 +38,7 @@ class Window(Adw.ApplicationWindow):
         # Split view
         self.split_view = Adw.OverlaySplitView()
         self.split_view.set_sidebar(Lists())
-        self.split_view.set_content(TasksList())
+        self.split_view.set_content(TasksList(self))
         # Toast overlay
         self.toast_overlay = Adw.ToastOverlay(child=self.split_view)
         self.set_content(self.toast_overlay)

@@ -24,8 +24,8 @@ class Details(Adw.Bin):
         hb = Adw.HeaderBar(show_title=False)
         # Delete button
         delete_btn = Gtk.Button(
-            label=_("Delete"),  # type:ignore
-            css_classes=["destructive-action"],
+            icon_name="user-trash-symbolic",
+            tooltip_text=_("Delete"),  # type:ignore
         )
         delete_btn.connect("clicked", self.on_delete_btn_clicked)
         hb.pack_start(delete_btn)
@@ -35,25 +35,25 @@ class Details(Adw.Bin):
             css_classes=["suggested-action"],
         )
         self.save_btn.connect("clicked", self.on_save_btn_clicked)
-        self.save_btn.bind_property(
-            "visible",
-            delete_btn,
-            "visible",
-            GObject.BindingFlags.SYNC_CREATE,
-        )
         hb.pack_end(self.save_btn)
         # Status
-        status = Adw.StatusPage(
+        self.status = Adw.StatusPage(
             icon_name="help-about-symbolic",
             visible=True,
             vexpand=True,
             title=_("No Details"),  # type:ignore
             description=_("Click on task to show more info"),  # type:ignore
         )
-        status.add_css_class("compact")
-        status.bind_property(
+        self.status.add_css_class("compact")
+        self.status.bind_property(
             "visible",
             delete_btn,
+            "visible",
+            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.INVERT_BOOLEAN,
+        )
+        self.status.bind_property(
+            "visible",
+            self.save_btn,
             "visible",
             GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.INVERT_BOOLEAN,
         )
@@ -77,10 +77,11 @@ class Details(Adw.Bin):
         copy_btn = Gtk.Button(
             icon_name="edit-copy-symbolic",
             valign="center",
+            css_classes=["flat"],
             tooltip_text=_("Copy Text"),  # type:ignore
         )
         copy_btn.connect("clicked", self.on_copy_text_clicked)
-        edit_group.add_header_suffix(copy_btn)
+        edit_group.set_header_suffix(copy_btn)
         # Edit entry
         self.edit_entry = Gtk.TextBuffer()
         self.edit_entry.connect("changed", self.on_text_changed)
@@ -208,7 +209,9 @@ class Details(Adw.Bin):
         misc_group = Adw.PreferencesGroup(title=_("Misc"))  # type:ignore
         # Open in calendar button
         open_cal_btn = Gtk.Button(
-            icon_name="x-office-calendar-symbolic", valign="center", css_styles=["flat"]
+            icon_name="x-office-calendar-symbolic",
+            valign="center",
+            css_classes=["flat"],
         )
         open_cal_btn.connect("clicked", self.on_open_as_ics_clicked)
         open_cal_row = Adw.ActionRow(
@@ -220,10 +223,10 @@ class Details(Adw.Bin):
         misc_group.add(open_cal_row)
 
         # Groups box
-        p_box = Gtk.Box(orientation="vertical", spacing=12)
+        p_box = Gtk.Box(orientation="vertical", spacing=12, visible=False)
         p_box.bind_property(
             "visible",
-            status,
+            self.status,
             "visible",
             GObject.BindingFlags.SYNC_CREATE
             | GObject.BindingFlags.INVERT_BOOLEAN
@@ -236,7 +239,7 @@ class Details(Adw.Bin):
         p_box.append(misc_group)
         # Box
         box = Gtk.Box(orientation="vertical")
-        box.append(status)
+        box.append(self.status)
         box.append(p_box)
         # Toolbar View
         toolbar_view = Adw.ToolbarView(
@@ -288,7 +291,7 @@ class Details(Adw.Bin):
         # Priority
         self.priority.set_value(self.parent.task["priority"])
         self.save_btn.set_sensitive(False)
-        self.details_status.set_visible(False)
+        self.status.set_visible(False)
         # Tags
         # Remove old
         for i, tag in enumerate(get_children(self.tag_entry.get_parent())):
@@ -396,7 +399,7 @@ class Details(Adw.Bin):
 
     def on_delete_btn_clicked(self, _btn):
         self.parent.delete()
-        self.details_status.set_visible(True)
+        self.status.set_visible(True)
         self.stack.set_visible_child_name("tasks")
 
     def on_open_as_ics_clicked(self, _btn):

@@ -85,7 +85,9 @@ class Task(Gtk.Revealer):
         # Expand icon
         self.expand_icon = Gtk.Image(icon_name="go-down-symbolic")
         self.expand_icon.add_css_class("fade")
-        expand_icon_rev = Gtk.Revealer(transition_type=1, margin_end=5)
+        expand_icon_rev = Gtk.Revealer(
+            transition_type=1, margin_end=5, child=self.expand_icon
+        )
         task_row_hover_ctrl = Gtk.EventControllerMotion.new()
         task_row_hover_ctrl.bind_property(
             "contains-pointer",
@@ -130,6 +132,7 @@ class Task(Gtk.Revealer):
             orientation="vertical", hexpand=True, css_classes=["fade", "card"]
         )
         self.main_box.append(self.task_row)
+        self.main_box.append(self.sub_tasks_revealer)
         # Box
         box = Gtk.Box(orientation="vertical")
         box.append(top_drop_area)
@@ -221,8 +224,6 @@ class Task(Gtk.Revealer):
                 UserData.set(data)
                 return
 
-    # --- Template handlers --- #
-
     def on_completed_btn_toggled(self, btn: Gtk.Button) -> None:
         """
         Toggle check button and add style to the text
@@ -271,8 +272,8 @@ class Task(Gtk.Revealer):
         self.expand(not self.sub_tasks_revealer.get_child_revealed())
 
     def on_details_btn_clicked(self, _btn):
-        self.window.stack.set_visible_child_name("details")
-        self.window.task_details.update_info(self)
+        self.parent.sidebar.set_visible_child_name("details")
+        self.parent.details_panel.update_info(self)
 
     def on_sub_task_added(self, entry: Gtk.Entry) -> None:
         """

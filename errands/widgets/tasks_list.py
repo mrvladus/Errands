@@ -6,6 +6,8 @@ from errands.utils.gsettings import GSettings
 import errands.utils.tasks as TaskUtils
 from errands.utils.data import UserData, UserDataDict, UserDataTask
 from errands.utils.functions import get_children
+from errands.widgets.details import Details
+from errands.widgets.trash import Trash
 from gi.repository import Adw, Gtk, GObject, GLib
 from errands.widgets.task import Task
 from errands.utils.markup import Markup
@@ -18,8 +20,9 @@ class TasksList(Adw.Bin):
     scrolling: bool = False  # Is window scrolling
     startup: bool = True
 
-    def __init__(self):
+    def __init__(self, window):
         super().__init__()
+        self.window = window
         self.build_ui()
         self.load_tasks()
 
@@ -56,6 +59,7 @@ class TasksList(Adw.Bin):
         hb.pack_start(self.delete_completed_btn_rev)
         hb.pack_end(self.sync_btn)
         hb.pack_end(self.scroll_up_btn_rev)
+
         # Entry
         entry = Adw.EntryRow(
             activatable=False,
@@ -72,6 +76,7 @@ class TasksList(Adw.Bin):
             margin_bottom=12,
         )
         entry_box.append(entry)
+
         # Srolled window
         adj = Gtk.Adjustment()
         adj.connect("value-changed", self.on_scroll)
@@ -81,6 +86,7 @@ class TasksList(Adw.Bin):
         dnd_ctrl = Gtk.DropControllerMotion()
         dnd_ctrl.connect("motion", self.on_dnd_scroll)
         self.scrl.add_controller(dnd_ctrl)
+
         # Tasks list
         self.tasks_list = Gtk.Box(
             orientation="vertical", hexpand=True, margin_bottom=18
@@ -89,7 +95,7 @@ class TasksList(Adw.Bin):
         self.scrl.set_child(
             Adw.Clamp(maximum_size=850, tightening_threshold=300, child=self.tasks_list)
         )
-        # Box
+        # Tasks list box
         box = Gtk.Box(orientation="vertical")
         box.append(
             Adw.Clamp(
@@ -99,10 +105,43 @@ class TasksList(Adw.Bin):
             )
         )
         box.append(self.scrl)
-        # Toolbar view
-        toolbar_view = Adw.ToolbarView(content=box)
-        toolbar_view.add_top_bar(hb)
-        self.set_child(toolbar_view)
+        # Tasks list toolbar view
+        tasks_toolbar_view = Adw.ToolbarView(
+            content=box, width_request=360, height_request=200
+        )
+        tasks_toolbar_view.add_top_bar(hb)
+
+        # Sidebar
+        self.trash_panel = Trash(self.window)
+        self.details_panel = Details()
+        self.sidebar = Adw.ViewStack()
+        self.sidebar.add_titled_with_icon(
+            self.trash_panel,
+            "trash",
+            _("Trash"),  # type:ignore
+            "user-trash-symbolic",
+        )
+        self.sidebar.add_titled_with_icon(
+            self.details_panel,
+            "details",
+            _("Details"),  # type:ignore
+            "help-about-symbolic",
+        )
+        # Sidebar toolbar view
+        sidebar_toolbar_view = Adw.ToolbarView(
+            content=self.sidebar, width_request=360, height_request=200
+        )
+        sidebar_toolbar_view.add_bottom_bar(
+            Adw.ViewSwitcherBar(stack=self.sidebar, reveal=True)
+        )
+
+        # Split view
+        split_view = Adw.OverlaySplitView(
+            content=tasks_toolbar_view,
+            sidebar=sidebar_toolbar_view,
+            sidebar_position="end",
+        )
+        self.set_child(split_view)
 
     def add_task(self, task: dict) -> None:
         new_task = Task(task, self)
@@ -312,9 +351,9 @@ class TasksList(Adw.Bin):
         # Clear entry
         entry.props.text = ""
         # Scroll to the end
-        scroll(self.scrolled_window, True)
+        scroll(self.scrl, True)
         # Sync
         Sync.sync()
 
     def on_scroll_up_btn_clicked(self, _) -> None:
-        scroll(self.scrolled_window, False)
+        scroll(self.scrl, False)

@@ -51,8 +51,7 @@ class Trash(Adw.Bin):
             margin_end=12,
         )
         self.scrl = Gtk.ScrolledWindow(
-            vexpand=True,
-            child=Adw.Clamp(child=self.trash_list),
+            vexpand=True, child=Adw.Clamp(child=self.trash_list), visible=False
         )
         self.scrl.bind_property(
             "visible",

@@ -41,7 +41,9 @@ class Lists(Adw.Bin):
         box.append(entry)
         box.append(scrl)
         # Toolbar view
-        toolbar_view = Adw.ToolbarView(content=box)
+        toolbar_view = Adw.ToolbarView(
+            content=box, width_request=360, height_request=200
+        )
         toolbar_view.add_top_bar(hb)
         self.set_child(toolbar_view)
 
