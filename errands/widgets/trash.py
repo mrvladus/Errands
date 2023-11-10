@@ -11,9 +11,10 @@ from errands.utils.logging import Log
 
 
 class Trash(Adw.Bin):
-    def __init__(self, window):
+    def __init__(self, window, tasks_panel):
         super().__init__()
         self.window = window
+        self.tasks_panel = tasks_panel
         self.build_ui()
 
     def build_ui(self):
@@ -44,14 +45,19 @@ class Trash(Adw.Bin):
         )
         status.add_css_class("compact")
         # Trash list
-        self.trash_list = Adw.PreferencesGroup(
+        self.trash_list = Gtk.ListBox(
             margin_top=12,
             margin_bottom=12,
             margin_start=12,
             margin_end=12,
+            selection_mode=0,
+            css_classes=["boxed-list"],
+            vexpand=False,
         )
         self.scrl = Gtk.ScrolledWindow(
-            vexpand=True, child=Adw.Clamp(child=self.trash_list), visible=False
+            child=Adw.Clamp(child=self.trash_list),
+            visible=False,
+            propagate_natural_height=True,
         )
         self.scrl.bind_property(
             "visible",
@@ -79,7 +85,7 @@ class Trash(Adw.Bin):
         Add item to trash
         """
 
-        self.trash_list.add(TrashItem(task, self.tasks_list))
+        self.trash_list.append(TrashItem(task, self.tasks_panel, self.trash_list))
         self.scrl.set_visible(True)
 
     def trash_clear(self) -> None:
@@ -133,13 +139,12 @@ class Trash(Adw.Bin):
         data["tasks"] = [task for task in data["tasks"] if not task["deleted"]]
         UserData.set(data)
         to_remove: list[Task] = [
-            task for task in self.window.get_all_tasks() if task.task["deleted"]
+            task for task in self.tasks_panel.get_all_tasks() if task.task["deleted"]
         ]
         for task in to_remove:
             task.purge()
         # Remove trash items widgets
-        for item in get_children(self.trash_list):
-            self.trash_list.remove(item)
+        self.trash_list.remove_all()
         self.scrl.set_visible(False)
         # Sync
         Sync.sync()
@@ -152,7 +157,7 @@ class Trash(Adw.Bin):
         Log.info("Restore Trash")
 
         # Restore tasks
-        tasks: list[Task] = self.window.get_all_tasks()
+        tasks: list[Task] = self.tasks_panel.get_all_tasks()
         for task in tasks:
             if task.task["deleted"]:
                 task.task["deleted"] = False
@@ -171,4 +176,4 @@ class Trash(Adw.Bin):
 
         # Clear trash
         self.trash_clear()
-        self.window.update_status()
+        self.tasks_panel.update_status()

@@ -112,7 +112,7 @@ class TasksList(Adw.Bin):
         tasks_toolbar_view.add_top_bar(hb)
 
         # Sidebar
-        self.trash_panel = Trash(self.window)
+        self.trash_panel = Trash(self.window, self)
         self.details_panel = Details()
         self.sidebar = Adw.ViewStack()
         self.sidebar.add_titled_with_icon(
