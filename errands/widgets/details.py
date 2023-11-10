@@ -15,8 +15,10 @@ class Details(Adw.Bin):
     start_datetime: str = ""
     end_datetime: str = ""
 
-    def __init__(self) -> None:
+    def __init__(self, window, task_panel) -> None:
         super().__init__()
+        self.window = window
+        self.task_panel = task_panel
         self.build_ui()
 
     def build_ui(self):
@@ -394,13 +396,12 @@ class Details(Adw.Bin):
         Log.info("Copy to clipboard")
         clp: Gdk.Clipboard = Gdk.Display.get_default().get_clipboard()
         clp.set(self.parent.task["text"])
-        self.parent.window.add_toast(_("Copied to Clipboard"))  # pyright:ignore
-        self.close()
+        self.window.add_toast(_("Copied to Clipboard"))  # pyright:ignore
 
     def on_delete_btn_clicked(self, _btn):
         self.parent.delete()
         self.status.set_visible(True)
-        self.stack.set_visible_child_name("tasks")
+        self.task_panel.sidebar.set_visible_child_name("trash")
 
     def on_open_as_ics_clicked(self, _btn):
         cache_dir: str = os.path.join(GLib.get_user_cache_dir(), "tmp")

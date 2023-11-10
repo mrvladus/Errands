@@ -113,7 +113,7 @@ class TasksList(Adw.Bin):
 
         # Sidebar
         self.trash_panel = Trash(self.window, self)
-        self.details_panel = Details()
+        self.details_panel = Details(self.window, self)
         self.sidebar = Adw.ViewStack()
         self.sidebar.add_titled_with_icon(
             self.trash_panel,
