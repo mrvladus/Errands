@@ -51,8 +51,7 @@ class Application(Adw.Application):
     def do_activate(self) -> None:
         from errands.widgets.window import Window
 
-        win: Window = Window(application=self)
-        win.perform_startup()
+        Window(application=self)
 
 
 if __name__ == "__main__":

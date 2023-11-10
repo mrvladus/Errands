@@ -144,7 +144,7 @@ class TasksList(Adw.Bin):
         self.set_child(split_view)
 
     def add_task(self, task: dict) -> None:
-        new_task = Task(task, self)
+        new_task = Task(task, self.window, self)
         self.tasks_list.append(new_task)
         if not task["deleted"]:
             new_task.toggle_visibility(True)

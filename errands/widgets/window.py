@@ -16,6 +16,8 @@ from errands.utils.functions import get_children
 
 
 class Window(Adw.ApplicationWindow):
+    startup = True
+
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
         # Remember window state
@@ -26,10 +28,12 @@ class Window(Adw.ApplicationWindow):
         # Setup theme
         Log.debug("Setting theme")
         Adw.StyleManager.get_default().set_color_scheme(GSettings.get("theme"))
-        self.build_ui()
         self._create_actions()
+        self.build_ui()
         Log.debug("Present window")
         self.present()
+        Sync.window = self
+        self.startup = False
 
     def build_ui(self):
         self.props.width_request = 360
@@ -46,14 +50,6 @@ class Window(Adw.ApplicationWindow):
     def on_width_changed(self, *_):
         width = self.props.default_width
         self.split_view.set_collapsed(width < 720)
-
-    def perform_startup(self) -> None:
-        """
-        Startup func. Call after window is presented.
-        """
-        Log.debug("Window startup")
-        Sync.window = self
-        self.startup = False
 
     def add_toast(self, text: str) -> None:
         self.toast_overlay.add_toast(Adw.Toast.new(title=text))

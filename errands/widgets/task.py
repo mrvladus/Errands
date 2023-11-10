@@ -15,34 +15,30 @@ from errands.utils.functions import get_children
 
 class Task(Gtk.Revealer):
     # - State - #
-    just_added: bool = True
     is_sub_task: bool = False
     can_sync: bool = True
 
     def __init__(
-        self, task: UserDataTask, window: Adw.ApplicationWindow, parent=None
+        self,
+        task: UserDataTask,
+        window: Adw.ApplicationWindow,
+        tasks_panel,
+        parent=None,
     ) -> None:
         super().__init__()
         Log.info(f"Add {'task' if not task['parent'] else 'sub-task'}: " + task["id"])
-        self.window: Adw.ApplicationWindow = window
-        self.parent: Adw.ApplicationWindow | Task = (
-            self.window if not parent else parent
-        )
+
         self.task: UserDataTask = task
+        self.window: Adw.ApplicationWindow = window
+        self.tasks_panel = tasks_panel
+        self.parent = tasks_panel if not parent else parent
+
         self.build_ui()
-        # Set text
-        self.task_row.set_title(Markup.find_url(Markup.escape(self.task["text"])))
-        # Check if sub-task completed and toggle checkbox
-        self.completed_btn.props.active = self.task["completed"]
-        # Set accent color
-        if self.task["color"] != "":
-            self.main_box.add_css_class(f'task-{self.task["color"]}')
         # Add to trash if needed
         if self.task["deleted"]:
-            self.window.trash_panel.trash_add(self.task)
-        self._check_is_sub()
-        self._add_sub_tasks()
-        self.just_added = False
+            self.tasks_panel.trash_panel.trash_add(self.task)
+        self.check_is_sub()
+        self.add_sub_tasks()
         self.parent.update_status()
 
     def build_ui(self):
@@ -69,6 +65,7 @@ class Task(Gtk.Revealer):
         self.task_row = Adw.ActionRow(
             height_request=60, use_markup=True, css_classes=["task-title"]
         )
+        self.task_row.set_title(Markup.find_url(Markup.escape(self.task["text"])))
         # Task row controllers
         task_row_drag_source = Gtk.DragSource.new()
         task_row_drag_source.set_actions(Gdk.DragAction.MOVE)
@@ -89,6 +86,7 @@ class Task(Gtk.Revealer):
         self.completed_btn = Gtk.CheckButton(
             valign="center",
             tooltip_text=_("Mark as Completed"),  # type:ignore
+            active=self.task["completed"],
         )
         self.completed_btn.connect("toggled", self.on_completed_btn_toggled)
         self.task_row.add_prefix(self.completed_btn)
@@ -141,6 +139,8 @@ class Task(Gtk.Revealer):
         )
         self.main_box.append(self.task_row)
         self.main_box.append(self.sub_tasks_revealer)
+        if self.task["color"] != "":
+            self.main_box.add_css_class(f'task-{self.task["color"]}')
         # Box
         box = Gtk.Box(orientation="vertical")
         box.append(top_drop_area)
@@ -148,26 +148,24 @@ class Task(Gtk.Revealer):
         self.set_child(box)
 
     def add_task(self, task: dict) -> None:
-        sub_task: Task = Task(task, self.window, self)
+        sub_task: Task = Task(task, self.window, self.tasks_panel, self)
         self.tasks_list.append(sub_task)
         sub_task.toggle_visibility(not task["deleted"])
-        if not self.just_added:
-            self.update_status()
 
-    def _add_sub_tasks(self) -> None:
+    def add_sub_tasks(self) -> None:
         sub_count: int = 0
         for task in UserData.get()["tasks"]:
             if task["parent"] == self.task["id"]:
                 sub_count += 1
                 self.add_task(task)
         self.update_status()
-        self.window.update_status()
+        self.tasks_panel.update_status()
 
-    def _check_is_sub(self) -> None:
+    def check_is_sub(self) -> None:
         if self.task["parent"] != "":
             self.is_sub_task = True
             self.main_box.add_css_class("sub-task")
-            if not self.window.startup and self.parent != self.window:
+            if not self.window.startup and self.parent != self.tasks_panel:
                 self.parent.expand(True)
         else:
             self.main_box.add_css_class("task")
@@ -179,11 +177,11 @@ class Task(Gtk.Revealer):
         self.task["deleted"] = True
         self.update_data()
         self.completed_btn.set_active(True)
-        self.window.trash_panel.trash_add(self.task)
+        self.tasks_panel.trash_panel.trash_add(self.task)
         for task in get_children(self.tasks_list):
             if not task.task["deleted"]:
                 task.delete()
-        self.window.details_panel.status.set_visible(True)
+        self.tasks_panel.details_panel.status.set_visible(True)
 
     def expand(self, expanded: bool) -> None:
         self.sub_tasks_revealer.set_reveal_child(expanded)
@@ -236,7 +234,7 @@ class Task(Gtk.Revealer):
         Toggle check button and add style to the text
         """
 
-        def _set_text():
+        def set_text():
             if btn.get_active():
                 text = Markup.add_crossline(self.task["text"])
                 self.add_css_class("task-completed")
@@ -247,7 +245,7 @@ class Task(Gtk.Revealer):
 
         # If task is just added set text and return to avoid useless sync
         if self.just_added:
-            _set_text()
+            set_text()
             return
 
         # Update data
@@ -263,11 +261,11 @@ class Task(Gtk.Revealer):
         if self.is_sub_task:
             self.parent.update_status()
         # Set text
-        _set_text()
+        set_text()
         # Sync
         if self.can_sync:
             Sync.sync()
-            self.window.update_status()
+            self.tasks_panel.update_status()
             for task in children:
                 task.can_sync = True
 
@@ -279,8 +277,8 @@ class Task(Gtk.Revealer):
         self.expand(not self.sub_tasks_revealer.get_child_revealed())
 
     def on_details_btn_clicked(self, _btn):
-        self.parent.sidebar.set_visible_child_name("details")
-        self.parent.details_panel.update_info(self)
+        self.tasks_panel.sidebar.set_visible_child_name("details")
+        self.tasks_panel.details_panel.update_info(self)
 
     def on_sub_task_added(self, entry: Gtk.Entry) -> None:
         """
@@ -308,7 +306,6 @@ class Task(Gtk.Revealer):
         self.completed_btn.set_active(False)
         self.just_added = False
         self.update_status()
-        self.window.update_status()
         # Sync
         Sync.sync()
 
