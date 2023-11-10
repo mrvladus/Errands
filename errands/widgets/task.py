@@ -15,6 +15,7 @@ from errands.utils.functions import get_children
 
 class Task(Gtk.Revealer):
     # - State - #
+    just_added: bool = True
     is_sub_task: bool = False
     can_sync: bool = True
 
@@ -39,6 +40,7 @@ class Task(Gtk.Revealer):
             self.tasks_panel.trash_panel.trash_add(self.task)
         self.check_is_sub()
         self.add_sub_tasks()
+        self.just_added = False
         self.parent.update_status()
 
     def build_ui(self):
