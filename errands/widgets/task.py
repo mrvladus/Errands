@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: MIT
 
 from typing import Self
-from errands.utils.gtk import GtkUtils
 from gi.repository import Gtk, Adw, Gdk, GObject
 
 # Import modules
@@ -48,11 +47,14 @@ class Task(Gtk.Revealer):
 
     def build_ui(self):
         # Top drop area
-        top_drop_img = Gtk.Image(icon_name="list-add-symbolic", hexpand=True)
-        GtkUtils.add_css(top_drop_img, ["dim-label", "task-drop-area"])
-        # top_drop_img_target = Gtk.DropTarget.new(actions=Gdk.DragAction.MOVE, type=Task)
-        # top_drop_img_target.connect("drop", self.on_task_top_drop)
-        # top_drop_img.add_controller(top_drop_img_target)
+        top_drop_img = Gtk.Image(
+            icon_name="list-add-symbolic",
+            hexpand=True,
+            css_classes=["dim-label", "task-drop-area"],
+        )
+        top_drop_img_target = Gtk.DropTarget.new(actions=Gdk.DragAction.MOVE, type=Task)
+        top_drop_img_target.connect("drop", self.on_task_top_drop)
+        top_drop_img.add_controller(top_drop_img_target)
         top_drop_area = Gtk.Revealer(child=top_drop_img, transition_type=5)
         # Drop controller
         drop_ctrl = Gtk.DropControllerMotion.new()
@@ -64,14 +66,22 @@ class Task(Gtk.Revealer):
         )
         self.add_controller(drop_ctrl)
         # Task row
-        self.task_row = Adw.ActionRow(height_request=60, use_markup=True)
-        self.task_row.add_css_class("task-title")
+        self.task_row = Adw.ActionRow(
+            height_request=60, use_markup=True, css_classes=["task-title"]
+        )
         # Task row controllers
-        task_row_drag_source = Gtk.DragSource()
+        task_row_drag_source = Gtk.DragSource.new()
+        task_row_drag_source.set_actions(Gdk.DragAction.MOVE)
+        task_row_drag_source.connect("prepare", self.on_drag_prepare)
+        task_row_drag_source.connect("drag-begin", self.on_drag_begin)
+        task_row_drag_source.connect("drag-cancel", self.on_drag_end)
+        task_row_drag_source.connect("drag-end", self.on_drag_end)
         self.task_row.add_controller(task_row_drag_source)
-        # task_row_drop_target = Gtk.DropTarget(actions=2, formats=Task)
-        # task_row_drop_target.connect("drop", self.on_drop)
-        # self.task_row.add_controller(task_row_drop_target)
+        task_row_drop_target = Gtk.DropTarget.new(
+            actions=Gdk.DragAction.MOVE, type=Task
+        )
+        task_row_drop_target.connect("drop", self.on_drop)
+        self.task_row.add_controller(task_row_drop_target)
         task_row_click_ctrl = Gtk.GestureClick.new()
         task_row_click_ctrl.connect("released", self.on_expand)
         self.task_row.add_controller(task_row_click_ctrl)
@@ -83,8 +93,7 @@ class Task(Gtk.Revealer):
         self.completed_btn.connect("toggled", self.on_completed_btn_toggled)
         self.task_row.add_prefix(self.completed_btn)
         # Expand icon
-        self.expand_icon = Gtk.Image(icon_name="go-down-symbolic")
-        self.expand_icon.add_css_class("fade")
+        self.expand_icon = Gtk.Image(icon_name="go-down-symbolic", css_classes=["fade"])
         expand_icon_rev = Gtk.Revealer(
             transition_type=1, margin_end=5, child=self.expand_icon
         )
@@ -101,8 +110,8 @@ class Task(Gtk.Revealer):
             icon_name="view-more-symbolic",
             valign="center",
             tooltip_text=_("Details"),  # type:ignore
+            css_classes=["flat"],
         )
-        details_btn.add_css_class("flat")
         details_btn.connect("clicked", self.on_details_btn_clicked)
         # Task row suffix box
         task_row_suffix_box = Gtk.Box()
@@ -119,8 +128,7 @@ class Task(Gtk.Revealer):
         )
         sub_tasks_entry.connect("activate", self.on_sub_task_added)
         # Sub-tasks
-        self.tasks_list = Gtk.Box(orientation="vertical")
-        self.tasks_list.add_css_class("sub-tasks")
+        self.tasks_list = Gtk.Box(orientation="vertical", css_classes=["sub-tasks"])
         # Sub-tasks box
         sub_tasks_box = Gtk.Box(orientation="vertical")
         sub_tasks_box.append(sub_tasks_entry)

@@ -83,9 +83,9 @@ class TasksList(Adw.Bin):
         self.scrl = Gtk.ScrolledWindow(
             propagate_natural_height=True, propagate_natural_width=True, vadjustment=adj
         )
-        dnd_ctrl = Gtk.DropControllerMotion()
-        dnd_ctrl.connect("motion", self.on_dnd_scroll)
-        self.scrl.add_controller(dnd_ctrl)
+        self.dnd_ctrl = Gtk.DropControllerMotion()
+        self.dnd_ctrl.connect("motion", self.on_dnd_scroll)
+        self.scrl.add_controller(self.dnd_ctrl)
 
         # Tasks list
         self.tasks_list = Gtk.Box(
@@ -295,9 +295,9 @@ class TasksList(Adw.Bin):
 
         def _auto_scroll(scroll_up: bool) -> bool:
             """Scroll while drag is near the edge"""
-            if not self.scrolling or not self.drop_motion_ctrl.contains_pointer():
+            if not self.scrolling or not self.dnd_ctrl.contains_pointer():
                 return False
-            adj = self.scrolled_window.get_vadjustment()
+            adj = self.scrl.get_vadjustment()
             if scroll_up:
                 adj.set_value(adj.get_value() - 2)
                 return True
@@ -306,7 +306,7 @@ class TasksList(Adw.Bin):
                 return True
 
         MARGIN: int = 50
-        height: int = self.scrolled_window.get_allocation().height
+        height: int = self.scrl.get_allocation().height
         if y < MARGIN:
             self.scrolling = True
             GLib.timeout_add(100, _auto_scroll, True)
@@ -328,7 +328,7 @@ class TasksList(Adw.Bin):
         Scroll up
         """
 
-        scroll(self.tasks_list.scrolled_window, False)
+        scroll(self.scrl, False)
 
     def on_sync_btn_clicked(self, btn) -> None:
         Sync.sync(True)
