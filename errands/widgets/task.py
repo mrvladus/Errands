@@ -41,7 +41,7 @@ class Task(Gtk.Revealer):
         # if UserData.get_task_prop(self.list_name, self.uid, "deleted"):
         #     self.tasks_panel.trash_panel.trash_add(self.uid)
         # self.check_is_sub()
-        # self.add_sub_tasks()
+        self.add_sub_tasks()
         self.just_added = False
         # self.parent.update_status()
 
@@ -163,19 +163,16 @@ class Task(Gtk.Revealer):
         box.append(self.main_box)
         self.set_child(box)
 
-    def add_task(self, task: dict) -> None:
-        sub_task: Task = Task(task, self.window, self.tasks_panel, self)
-        self.tasks_list.append(sub_task)
-        sub_task.toggle_visibility(not task["deleted"])
+    def add_task(self, uid: str) -> None:
+        new_task = Task(uid, self.list_name, self.window, self.tasks_panel)
+        self.tasks_list.append(new_task)
+        new_task.toggle_visibility(not new_task.get_prop("deleted"))
 
     def add_sub_tasks(self) -> None:
-        sub_count: int = 0
-        for task in UserData.get()["tasks"]:
-            if task["parent"] == self.task["id"]:
-                sub_count += 1
-                self.add_task(task)
-        self.update_status()
-        self.tasks_panel.update_status()
+        for uid in UserData.get_sub_tasks(self.list_name, self.uid):
+            self.add_task(uid)
+        # self.update_status()
+        # self.tasks_panel.update_status()
 
     def check_is_sub(self) -> None:
         if self.task["parent"] != "":
@@ -252,10 +249,10 @@ class Task(Gtk.Revealer):
 
         def set_text():
             if btn.get_active():
-                text = Markup.add_crossline(self.task["text"])
+                text = Markup.add_crossline(self.get_prop("text"))
                 self.add_css_class("task-completed")
             else:
-                text = Markup.rm_crossline(self.task["text"])
+                text = Markup.rm_crossline(self.get_prop("text"))
                 self.remove_css_class("task-completed")
             self.task_row.set_title(text)
 
@@ -265,25 +262,25 @@ class Task(Gtk.Revealer):
             return
 
         # Update data
-        self.task["completed"] = btn.get_active()
-        self.task["synced_caldav"] = False
-        self.update_data()
-        # Update children
-        children: list[Task] = get_children(self.tasks_list)
-        for task in children:
-            task.can_sync = False
-            task.completed_btn.set_active(btn.get_active())
-        # Update status
-        if self.is_sub_task:
-            self.parent.update_status()
-        # Set text
-        set_text()
-        # Sync
-        if self.can_sync:
-            Sync.sync()
-            self.tasks_panel.update_status()
-            for task in children:
-                task.can_sync = True
+        # self.task["completed"] = btn.get_active()
+        # self.task["synced_caldav"] = False
+        # self.update_data()
+        # # Update children
+        # children: list[Task] = get_children(self.tasks_list)
+        # for task in children:
+        #     task.can_sync = False
+        #     task.completed_btn.set_active(btn.get_active())
+        # # Update status
+        # if self.is_sub_task:
+        #     self.parent.update_status()
+        # # Set text
+        # set_text()
+        # # Sync
+        # if self.can_sync:
+        #     Sync.sync()
+        #     self.tasks_panel.update_status()
+        #     for task in children:
+        #         task.can_sync = True
 
     def on_expand(self, *_) -> None:
         """
@@ -300,31 +297,25 @@ class Task(Gtk.Revealer):
         """
         Add new Sub-Task
         """
-        return
-
+        text: str = entry.get_buffer().props.text
         # Return if entry is empty
-        if entry.get_buffer().props.text == "":
+        if text.strip(" \n\t") == "":
             return
         # Add new sub-task
-        new_sub_task: UserDataTask = TaskUtils.new_task(
-            entry.get_buffer().props.text, parent=self.task["id"]
-        )
-        data: UserDataDict = UserData.get()
-        data["tasks"].append(new_sub_task)
-        UserData.set(data)
+        new_sub_task = UserData.add_task(self.list_name, text, parent=self.uid)
         # Add sub-task
         self.add_task(new_sub_task)
         # Clear entry
         entry.get_buffer().props.text = ""
         # Update status
-        self.task["completed"] = False
-        self.update_data()
+        # self.task["completed"] = False
+        # self.update_data()
         self.just_added = True
         self.completed_btn.set_active(False)
         self.just_added = False
-        self.update_status()
+        # self.update_status()
         # Sync
-        Sync.sync()
+        # Sync.sync()
 
     # --- Drag and Drop --- #
 

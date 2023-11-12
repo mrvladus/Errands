@@ -79,18 +79,28 @@ priority INTEGER
         return task
 
     @classmethod
-    def get_toplevel_tasks(cls, list_name: str):
+    def get_sub_tasks(cls, list_name: str, parent_uid: str):
+        cls.cursor.execute(
+            f"SELECT uid FROM '{list_name}' WHERE parent = '{parent_uid}'"
+        )
+        res = cls.cursor.fetchall()
+        return [f[0] for f in res]
+
+    @classmethod
+    def get_toplevel_tasks(cls, list_name: str) -> list[str]:
         cls.cursor.execute(f"SELECT uid FROM '{list_name}' WHERE parent IS NULL")
         res = cls.cursor.fetchall()
         return [f[0] for f in res]
 
     @classmethod
-    def add_task(cls, list_name: str, text: str, uid: str = None):
+    def add_task(
+        cls, list_name: str, text: str, uid: str = None, parent: str = None
+    ) -> str:
         if not uid:
             uid = str(uuid4())
         cls.cursor.execute(
             f"INSERT INTO '{list_name}' (uid, text, parent, completed, deleted) VALUES (?, ?, ?, ?, ?)",
-            (uid, text, None, False, False),
+            (uid, text, parent, False, False),
         )
         cls.connection.commit()
         return uid
