@@ -3,12 +3,11 @@
 
 from errands.utils.animation import scroll
 from errands.utils.gsettings import GSettings
-import errands.utils.tasks as TaskUtils
-from errands.utils.data import UserData, UserDataDict, UserDataTask
+from errands.utils.data import UserData, UserDataTask
 from errands.utils.functions import get_children
 from errands.widgets.details import Details
 from errands.widgets.trash import Trash
-from gi.repository import Adw, Gtk, GObject, GLib
+from gi.repository import Adw, Gtk, GLib
 from errands.widgets.task import Task
 from errands.utils.markup import Markup
 from errands.utils.sync import Sync
@@ -144,11 +143,10 @@ class TasksList(Adw.Bin):
         )
         self.set_child(split_view)
 
-    def add_task(self, task: dict) -> None:
-        new_task = Task(task, self.window, self)
+    def add_task(self, uid: str) -> None:
+        new_task = Task(uid, self.name, self.window, self)
         self.tasks_list.append(new_task)
-        if not task["deleted"]:
-            new_task.toggle_visibility(True)
+        new_task.toggle_visibility(not new_task.get_prop("deleted"))
 
     def get_all_tasks(self) -> list[Task]:
         """
@@ -171,12 +169,9 @@ class TasksList(Adw.Bin):
         return get_children(self.tasks_list)
 
     def load_tasks(self) -> None:
-        Log.debug("Loading tasks")
-        return
-
-        for task in UserData.get_tasks():
-            if not task["parent"]:
-                self.add_task(task)
+        Log.debug(f"Loading tasks for '{self.name}'")
+        for uid in UserData.get_toplevel_tasks(self.name):
+            self.add_task(uid)
         self.update_status()
         # Expand tasks if needed
         if GSettings.get("expand-on-startup"):
@@ -190,30 +185,30 @@ class TasksList(Adw.Bin):
         Update status bar on the top
         """
 
-        tasks: list[UserDataTask] = UserData.get()["tasks"]
-        n_total: int = 0
-        n_completed: int = 0
-        n_all_deleted: int = 0
-        n_all_completed: int = 0
+        # tasks: list[UserDataTask] = UserData.get()["tasks"]
+        # n_total: int = 0
+        # n_completed: int = 0
+        # n_all_deleted: int = 0
+        # n_all_completed: int = 0
 
-        for task in tasks:
-            if task["parent"] == "":
-                if not task["deleted"]:
-                    n_total += 1
-                    if task["completed"]:
-                        n_completed += 1
-            if not task["deleted"]:
-                if task["completed"]:
-                    n_all_completed += 1
-            else:
-                n_all_deleted += 1
+        # for task in tasks:
+        #     if task["parent"] == "":
+        #         if not task["deleted"]:
+        #             n_total += 1
+        #             if task["completed"]:
+        #                 n_completed += 1
+        #     if not task["deleted"]:
+        #         if task["completed"]:
+        #             n_all_completed += 1
+        #     else:
+        #         n_all_deleted += 1
 
-        self.title.set_subtitle(
-            _("Completed:") + f" {n_completed} / {n_total}"  # pyright: ignore
-            if n_total > 0
-            else ""
-        )
-        self.delete_completed_btn_rev.set_reveal_child(n_all_completed > 0)
+        # self.title.set_subtitle(
+        #     _("Completed:") + f" {n_completed} / {n_total}"  # pyright: ignore
+        #     if n_total > 0
+        #     else ""
+        # )
+        # self.delete_completed_btn_rev.set_reveal_child(n_all_completed > 0)
         # self.trash_panel.trash_list_scrl.set_visible(n_all_deleted > 0)
 
     def update_ui(self) -> None:
@@ -345,11 +340,8 @@ class TasksList(Adw.Bin):
         if text.strip(" \n\t") == "":
             return
         # Add new task
-        new_data: UserDataDict = UserData.get()
-        new_task: UserDataTask = TaskUtils.new_task(text)
-        new_data["tasks"].append(new_task)
-        UserData.set(new_data)
-        self.add_task(new_task)
+        uid = UserData.add_task(self.name, text)
+        self.add_task(uid)
         # Clear entry
         entry.props.text = ""
         # Scroll to the end

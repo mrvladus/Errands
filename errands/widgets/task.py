@@ -8,7 +8,7 @@ from gi.repository import Gtk, Adw, Gdk, GObject
 import errands.utils.tasks as TaskUtils
 from errands.utils.sync import Sync
 from errands.utils.logging import Log
-from errands.utils.data import UserData, UserDataDict, UserDataTask
+from errands.utils.data import UserData, UserDataTask
 from errands.utils.markup import Markup
 from errands.utils.functions import get_children
 
@@ -21,27 +21,35 @@ class Task(Gtk.Revealer):
 
     def __init__(
         self,
-        task: UserDataTask,
+        uid: str,
+        list_name: str,
         window: Adw.ApplicationWindow,
         tasks_panel,
         parent=None,
     ) -> None:
         super().__init__()
-        Log.info(f"Add {'task' if not task['parent'] else 'sub-task'}: " + task["id"])
+        Log.info(f"Add task: {uid}")
 
-        self.task: UserDataTask = task
-        self.window: Adw.ApplicationWindow = window
+        self.uid = uid
+        self.list_name = list_name
+        self.window = window
         self.tasks_panel = tasks_panel
         self.parent = tasks_panel if not parent else parent
 
         self.build_ui()
         # Add to trash if needed
-        if self.task["deleted"]:
-            self.tasks_panel.trash_panel.trash_add(self.task)
-        self.check_is_sub()
-        self.add_sub_tasks()
+        # if UserData.get_task_prop(self.list_name, self.uid, "deleted"):
+        #     self.tasks_panel.trash_panel.trash_add(self.uid)
+        # self.check_is_sub()
+        # self.add_sub_tasks()
         self.just_added = False
-        self.parent.update_status()
+        # self.parent.update_status()
+
+    def get_prop(self, prop: str):
+        res = UserData.get_prop(self.list_name, self.uid, prop)
+        if prop in "deleted completed":
+            res = bool(res)
+        return res
 
     def build_ui(self):
         # Top drop area
@@ -67,7 +75,7 @@ class Task(Gtk.Revealer):
         self.task_row = Adw.ActionRow(
             height_request=60, use_markup=True, css_classes=["task-title"]
         )
-        self.task_row.set_title(Markup.find_url(Markup.escape(self.task["text"])))
+        self.task_row.set_title(Markup.find_url(Markup.escape(self.get_prop("text"))))
         # Task row controllers
         task_row_drag_source = Gtk.DragSource.new()
         task_row_drag_source.set_actions(Gdk.DragAction.MOVE)
@@ -88,7 +96,7 @@ class Task(Gtk.Revealer):
         self.completed_btn = Gtk.CheckButton(
             valign="center",
             tooltip_text=_("Mark as Completed"),  # type:ignore
-            active=self.task["completed"],
+            active=self.get_prop("completed"),
         )
         self.completed_btn.connect("toggled", self.on_completed_btn_toggled)
         self.task_row.add_prefix(self.completed_btn)
@@ -141,10 +149,16 @@ class Task(Gtk.Revealer):
         )
         self.main_box.append(self.task_row)
         self.main_box.append(self.sub_tasks_revealer)
-        if self.task["color"] != "":
-            self.main_box.add_css_class(f'task-{self.task["color"]}')
+        if self.get_prop("color") != "":
+            self.main_box.add_css_class(f'task-{self.get_prop("color")}')
         # Box
-        box = Gtk.Box(orientation="vertical")
+        box = Gtk.Box(
+            orientation="vertical",
+            margin_start=12,
+            margin_end=12,
+            margin_bottom=6,
+            margin_top=6,
+        )
         box.append(top_drop_area)
         box.append(self.main_box)
         self.set_child(box)
@@ -224,12 +238,12 @@ class Task(Gtk.Revealer):
         Sync self.task with user data.json
         """
 
-        data: UserDataDict = UserData.get()
-        for i, task in enumerate(data["tasks"]):
-            if self.task["id"] == task["id"]:
-                data["tasks"][i] = self.task
-                UserData.set(data)
-                return
+        # data: UserDataDict = UserData.get()
+        # for i, task in enumerate(data["tasks"]):
+        #     if self.task["id"] == task["id"]:
+        #         data["tasks"][i] = self.task
+        #         UserData.set(data)
+        #         return
 
     def on_completed_btn_toggled(self, btn: Gtk.Button) -> None:
         """
@@ -286,6 +300,7 @@ class Task(Gtk.Revealer):
         """
         Add new Sub-Task
         """
+        return
 
         # Return if entry is empty
         if entry.get_buffer().props.text == "":
@@ -336,6 +351,7 @@ class Task(Gtk.Revealer):
         """
         When task is dropped on "+" area on top of task
         """
+        return
 
         # Return if task is itself
         if task == self:
@@ -383,6 +399,7 @@ class Task(Gtk.Revealer):
         """
         When task is dropped on task and becomes sub-task
         """
+        return
 
         if task == self or task.parent == self:
             return

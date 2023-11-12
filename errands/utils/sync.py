@@ -8,7 +8,7 @@ from gi.repository import Adw, GLib
 import errands.utils.tasks as TaskUtils
 from errands.utils.gsettings import GSettings
 from errands.utils.logging import Log
-from errands.utils.data import UserData, UserDataDict
+from errands.utils.data import UserData
 from errands.utils.functions import threaded
 
 
@@ -248,7 +248,7 @@ class SyncProviderCalDAV:
 
         Log.info(f"Sync: Sync tasks with {self.name}")
 
-        data: UserDataDict = UserData.get()
+        data = UserData.get()
         caldav_ids: list[str] = [task["id"] for task in caldav_tasks]
 
         for task in data["tasks"]:

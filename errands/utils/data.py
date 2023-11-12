@@ -2,19 +2,16 @@
 # SPDX-License-Identifier: MIT
 
 import os
-import json
-import shutil
 import sqlite3
 
 from typing import TypedDict
+from uuid import uuid4
 from gi.repository import GLib
-from __main__ import VERSION
-from errands.utils.gsettings import GSettings
 from errands.utils.logging import Log
 
 
 class UserDataTask(TypedDict):
-    id: str
+    uid: str
     text: str
     parent: str
     completed: bool
@@ -26,12 +23,6 @@ class UserDataTask(TypedDict):
     notes: str
     percent_complete: int
     priority: int
-
-
-class UserDataDict(TypedDict):
-    version: str
-    tasks: list[UserDataTask]
-    deleted: list[str]
 
 
 class UserData:
@@ -76,26 +67,33 @@ priority INTEGER
         return [l[0] for l in res]
 
     @classmethod
-    def get_task(cls, list_name: str, uid: str):
-        cls.cursor.execute(f"SELECT * FROM '{list_name}' WHERE uid = {uid}")
-        task = cls.cursor.fetchone()
-        print(task)
-        return task
+    def get_prop(cls, list_name: str, uid: str, prop: str):
+        cls.cursor.execute(f"SELECT {prop} FROM '{list_name}' WHERE uid = '{uid}'")
+        res = cls.cursor.fetchone()
+        return res[0]
 
     @classmethod
     def get_tasks(cls, list_name: str):
         cls.cursor.execute(f"SELECT * FROM '{list_name}'")
         task = cls.cursor.fetchall()
-        print(task)
         return task
 
     @classmethod
-    def add_task(cls, list_name: str, text: str, uid: str):
+    def get_toplevel_tasks(cls, list_name: str):
+        cls.cursor.execute(f"SELECT uid FROM '{list_name}' WHERE parent IS NULL")
+        res = cls.cursor.fetchall()
+        return [f[0] for f in res]
+
+    @classmethod
+    def add_task(cls, list_name: str, text: str, uid: str = None):
+        if not uid:
+            uid = str(uuid4())
         cls.cursor.execute(
-            f"INSERT INTO '{list_name}' (uid, text, completed, deleted) VALUES (?, ?, ?, ?)",
-            (text, uid, 0, 0),
+            f"INSERT INTO '{list_name}' (uid, text, parent, completed, deleted) VALUES (?, ?, ?, ?, ?)",
+            (uid, text, None, False, False),
         )
         cls.connection.commit()
+        return uid
 
     @classmethod
     def update_task(cls, uid: str):

@@ -6,7 +6,7 @@ from gi.repository import Adw, Gtk
 # Import modules
 from errands.utils.sync import Sync
 from errands.utils.gsettings import GSettings
-from errands.utils.data import UserData, UserDataDict
+from errands.utils.data import UserData
 
 
 class PreferencesWindow(Adw.PreferencesWindow):
@@ -139,7 +139,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
         # self.window.sync_btn.set_visible(selected > 0)
 
     def on_cal_name_changed(self, *args):
-        data: UserDataDict = UserData.get()
+        data = UserData.get()
         data["tasks"] = [task for task in data["tasks"] if not task["synced_caldav"]]
         UserData.set(data)
         Sync.init()

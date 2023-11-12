@@ -1,7 +1,7 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-from errands.utils.data import UserData, UserDataDict, UserDataTask
+from errands.utils.data import UserData, UserDataTask
 from errands.utils.functions import get_children
 from errands.widgets.trash_item import TrashItem
 from gi.repository import Adw, Gtk, GObject
@@ -134,7 +134,7 @@ class Trash(Adw.Bin):
         Log.info("Clear Trash")
 
         # Remove widgets and data
-        data: UserDataDict = UserData.get()
+        data = UserData.get()
         data["deleted"] = [task["id"] for task in data["tasks"] if task["deleted"]]
         data["tasks"] = [task for task in data["tasks"] if not task["deleted"]]
         UserData.set(data)
