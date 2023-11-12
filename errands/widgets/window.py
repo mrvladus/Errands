@@ -39,10 +39,12 @@ class Window(Adw.ApplicationWindow):
         self.props.width_request = 360
         self.props.height_request = 200
         self.connect("notify::default-width", self.on_width_changed)
+        # Stack
+        stack = Gtk.Stack()
         # Split view
         self.split_view = Adw.OverlaySplitView()
-        self.split_view.set_sidebar(Lists())
-        self.split_view.set_content(TasksList(self))
+        self.split_view.set_sidebar(Lists(self, stack))
+        self.split_view.set_content(stack)
         # Toast overlay
         self.toast_overlay = Adw.ToastOverlay(child=self.split_view)
         self.set_content(self.toast_overlay)

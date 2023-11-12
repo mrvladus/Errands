@@ -1,20 +1,32 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-from gi.repository import Adw, Gtk, Gio
+from errands.utils.data import UserData
+from errands.widgets.tasks_list import TasksList
+from gi.repository import Adw, Gtk, Gio, GObject
 
 
 class Lists(Adw.Bin):
-    def __init__(self):
+    def __init__(self, window, stack: Gtk.Stack):
         super().__init__()
+        self.stack: Gtk.Stack = stack
+        self.window = window
         self.build_ui()
+        self.load_lists()
 
     def build_ui(self):
-        self.props.width_request = 300
+        self.props.width_request = 260
         self.props.height_request = 200
         hb = Adw.HeaderBar(
             title_widget=Gtk.Label(label="Errands", css_classes=["heading"])
         )
+        # Add list button
+        self.add_btn = Gtk.ToggleButton(
+            icon_name="list-add-symbolic",
+            tooltip_text=_("Add List"),  # type:ignore
+        )
+        hb.pack_start(self.add_btn)
+        # Main menu
         menu: Gio.Menu = Gio.Menu.new()
         menu.append(_("Preferences"), "app.preferences")  # type:ignore
         menu.append(_("Keyboard Shortcuts"), "app.shortcuts")  # type:ignore
@@ -30,31 +42,53 @@ class Lists(Adw.Bin):
         entry = Gtk.Entry(
             margin_start=12,
             margin_end=12,
+            margin_top=12,
             placeholder_text=_("Add new List"),  # type:ignore
         )
+        entry.connect("activate", self.on_list_added)
+        entry_rev = Gtk.Revealer(child=entry)
+        entry_rev.bind_property(
+            "reveal-child",
+            self.add_btn,
+            "active",
+            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
+        )
         # Lists
-        self.lists = Gtk.ListBox(selection_mode=0)
-        self.lists.add_css_class("navigation-sidebar")
-        scrl = Gtk.ScrolledWindow(child=self.lists)
+        self.lists = Gtk.StackSidebar(
+            stack=self.stack,
+            vexpand=True,
+            margin_start=6,
+            margin_end=6,
+        )
         # Box
         box = Gtk.Box(orientation="vertical", spacing=12)
-        box.append(entry)
-        box.append(scrl)
+        box.append(entry_rev)
+        box.append(Gtk.ScrolledWindow(child=self.lists, propagate_natural_height=True))
         # Toolbar view
-        toolbar_view = Adw.ToolbarView(
-            content=box, width_request=360, height_request=200
-        )
+        toolbar_view = Adw.ToolbarView(content=box)
         toolbar_view.add_top_bar(hb)
         self.set_child(toolbar_view)
 
-    def add_list(self):
-        pass
+    def on_list_added(self, entry):
+        text: str = entry.props.text
+        if text.strip(" \n\t") == "":
+            return
+        UserData.create_list(text)
+        self.stack.add_titled(child=TasksList(self.window, text), name=text, title=text)
+        entry.props.text = ""
 
     def load_lists(self):
-        pass
+        for list in UserData.get_lists():
+            self.stack.add_titled(
+                child=TasksList(self.window, list), name=list, title=list
+            )
 
     def delete_list(self):
         pass
 
     def rename_list(self):
         pass
+
+    def change_list(self, name: str):
+        print("asdasd")
+        self.stack.set_visible_child_name(name)

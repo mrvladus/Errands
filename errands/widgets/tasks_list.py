@@ -20,15 +20,16 @@ class TasksList(Adw.Bin):
     scrolling: bool = False  # Is window scrolling
     startup: bool = True
 
-    def __init__(self, window):
+    def __init__(self, window, name: str):
         super().__init__()
         self.window = window
+        self.name = name
         self.build_ui()
         self.load_tasks()
 
     def build_ui(self):
         # Title
-        self.title = Adw.WindowTitle(title="Errands")
+        self.title = Adw.WindowTitle(title=self.name)
         # Delete completed button
         delete_completed_btn = Gtk.Button(
             valign="center",
@@ -139,7 +140,7 @@ class TasksList(Adw.Bin):
         split_view = Adw.OverlaySplitView(
             content=tasks_toolbar_view,
             sidebar=sidebar_toolbar_view,
-            sidebar_position="end",
+            sidebar_position="start",
         )
         self.set_child(split_view)
 
@@ -171,8 +172,9 @@ class TasksList(Adw.Bin):
 
     def load_tasks(self) -> None:
         Log.debug("Loading tasks")
+        return
 
-        for task in UserData.get()["tasks"]:
+        for task in UserData.get_tasks():
             if not task["parent"]:
                 self.add_task(task)
         self.update_status()

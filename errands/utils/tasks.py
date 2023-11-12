@@ -9,6 +9,7 @@ from errands.utils.data import UserDataTask
 
 def new_task(
     text: str,
+    list_name: str,
     id: str = "",
     parent: str = "",
     completed: bool = False,
@@ -42,6 +43,7 @@ def new_task(
         "percent_complete": percent_complete,
         "priority": priority,
         "tags": tags,
+        "list_name": list_name,
     }
     return task
 

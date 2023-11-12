@@ -34,10 +34,12 @@ def main() -> None:
     resource._register()
 
     from errands.utils.logging import Log
+    from errands.utils.data import UserData
 
     Log.init()
-    app = Application()
-    sys.exit(app.run(sys.argv))
+    UserData.init()
+
+    sys.exit(Application().run(sys.argv))
 
 
 class Application(Adw.Application):

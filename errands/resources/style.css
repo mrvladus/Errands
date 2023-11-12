@@ -122,6 +122,10 @@ calendar header {
   border: none;
 }
 
+stacksidebar {
+  border: none;
+}
+
 /* Utils */
 
 .rounded-corners {
