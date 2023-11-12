@@ -2,24 +2,24 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the list package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
+# Vitor Gabriel Gomes <vitorgabrielgomesro9090@gmail.com>, 2023
 msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-23 19:48+0300\n"
-"PO-Revision-Date: 2023-09-18 04:32-0300\n"
-"Last-Translator: Vitor Gabriel Gomes <vitorgabrielgomesro9090@gmail.com>\n"
+"PO-Revision-Date: 2023-11-12 01:20-0300\n"
+"Last-Translator: Leandro Cunha <leandrocunha016@gmail.com>\n"
 "Language-Team: \n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.3.2\n"
+"X-Generator: Poedit 3.4.1\n"
 
 #: errands/widgets/window.py:111
 msgid "Export Cancelled"
-msgstr ""
+msgstr "Exportação cancelada"
 
 #: errands/widgets/window.py:117
 msgid "Tasks Exported"
@@ -27,15 +27,15 @@ msgstr "Tarefas exportadas"
 
 #: errands/widgets/window.py:120
 msgid "Error"
-msgstr ""
+msgstr "Erro"
 
 #: errands/widgets/window.py:137
 msgid "Import Cancelled"
-msgstr ""
+msgstr "Importação cancelada"
 
 #: errands/widgets/window.py:146
 msgid "Invalid File"
-msgstr ""
+msgstr "Arquivo inválido"
 
 #: errands/widgets/window.py:164
 msgid "Tasks Imported"
@@ -43,7 +43,7 @@ msgstr "Tarefas importadas"
 
 #: errands/widgets/window.py:334 errands/widgets/task.py:173
 msgid "Completed:"
-msgstr ""
+msgstr "Completado:"
 
 #: errands/widgets/task.py:80
 msgid "Copied to Clipboard"
@@ -52,11 +52,11 @@ msgstr "Copiado para a área de transferência"
 #. pyright:ignore
 #: errands/utils/sync.py:80
 msgid "Not all sync credentials provided. Please check settings."
-msgstr ""
+msgstr "Nem todas as credenciais de sincronização são fornecidas. Por favor, verifique as configurações."
 
 #: errands/utils/sync.py:120
 msgid "Can't connect to CalDAV server at:"
-msgstr ""
+msgstr "Não é possível conectar-se ao servidor CalDAV em:"
 
 #: errands/resources/ui/window.ui:26
 msgid "Deleted Tasks"
@@ -100,7 +100,7 @@ msgstr "Menu principal"
 
 #: errands/resources/ui/window.ui:260 errands/resources/ui/window.ui:263
 msgid "Sync/Fetch Tasks (Ctrl+S)"
-msgstr ""
+msgstr "Sincronização/busca de tarefas (Ctrl+S)"
 
 #: errands/resources/ui/window.ui:287 errands/resources/ui/window.ui:290
 #: errands/resources/ui/window.ui:399 errands/resources/ui/window.ui:402
@@ -161,7 +161,7 @@ msgstr "Exportar tasks"
 
 #: errands/resources/ui/window.ui:513 errands/resources/ui/preferences.ui:66
 msgid "Tasks"
-msgstr ""
+msgstr "Tarefas"
 
 #: errands/resources/ui/window.ui:516
 msgid "Delete completed tasks"
@@ -169,11 +169,11 @@ msgstr "Deletar tarefas concluídas"
 
 #: errands/resources/ui/window.ui:522
 msgid "Exit edit mode"
-msgstr ""
+msgstr "Sair do modo de edição"
 
 #: errands/resources/ui/window.ui:528
 msgid "Sync/Fetch Tasks"
-msgstr ""
+msgstr "Sincronizar/buscar tarefas"
 
 #: errands/resources/ui/window.ui:545
 msgid "translator-credits"
@@ -213,47 +213,47 @@ msgstr "Escuro"
 
 #: errands/resources/ui/preferences.ui:71
 msgid "Expand Sub-Tasks on Startup"
-msgstr ""
+msgstr "Expandir subtarefas na inicialização"
 
 #: errands/resources/ui/preferences.ui:87
 msgid "Sync"
-msgstr ""
+msgstr "Sincronizar"
 
 #: errands/resources/ui/preferences.ui:92
 msgid "Sync Provider"
-msgstr ""
+msgstr "Provedor de sincronização"
 
 #: errands/resources/ui/preferences.ui:96
 msgid "Disabled"
-msgstr ""
+msgstr "Desabilitado"
 
 #: errands/resources/ui/preferences.ui:111
 msgid "Server URL"
-msgstr ""
+msgstr "URL do servidor"
 
 #: errands/resources/ui/preferences.ui:118
 msgid "Username"
-msgstr ""
+msgstr "Nome de usuário"
 
 #: errands/resources/ui/preferences.ui:125
 msgid "Password"
-msgstr ""
+msgstr "Senha"
 
 #: errands/resources/ui/preferences.ui:132
 msgid "Calendar Name (\"Errands\" by Default)"
-msgstr ""
+msgstr "Nome do calendário (\"Errands\" por padrão)"
 
 #: errands/resources/ui/preferences.ui:141
 msgid "Token"
-msgstr ""
+msgstr "Token"
 
 #: errands/resources/ui/preferences.ui:148
 msgid "Test Connection"
-msgstr ""
+msgstr "Teste de conexão"
 
 #: errands/resources/ui/preferences.ui:151
 msgid "Test"
-msgstr ""
+msgstr "Teste"
 
 #: errands/resources/ui/task.ui:17
 msgid "Edit"
@@ -277,7 +277,7 @@ msgstr "Menu"
 
 #: errands/resources/ui/task.ui:338 errands/resources/ui/task.ui:341
 msgid "Cancel (Escape)"
-msgstr ""
+msgstr "Cancelar (Escapar)"
 
 #: errands/resources/ui/task.ui:387
 msgid "Add new Sub-Task"
@@ -290,7 +290,7 @@ msgstr "Restaurar"
 #. TRANSLATORS: Don't translate
 #: data/io.github.mrvladus.List.desktop.in.in:4
 msgid "Errands"
-msgstr ""
+msgstr "Errands"
 
 #: data/io.github.mrvladus.List.desktop.in.in:5
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:39
@@ -304,29 +304,28 @@ msgstr "errands;afazeres;tarefas;lista;a fazer;pendências;"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:41
 msgid "Todo application for those who prefer simplicity."
-msgstr ""
+msgstr "Aplicativo Todo para quem prefere simplicidade."
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:42
 msgid "Features:"
-msgstr ""
+msgstr "Características:"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:44
 msgid "Add, remove, edit tasks and sub-tasks"
-msgstr ""
+msgstr "Adicione, remova, edite tarefas e subtarefas"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:45
-#, fuzzy
 msgid "Mark task and sub-tasks as completed"
-msgstr "Marcar como concluído"
+msgstr "Marcar tarefas e subtarefas como concluídas"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:46
 msgid "Add accent color for each task"
-msgstr ""
+msgstr "Adicione cores de destaque para cada tarefa"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:47
 msgid "Sync tasks with Nextcloud or other CalDAV providers"
-msgstr ""
+msgstr "Sincronize tarefas com Nextcloud ou outros provedores CalDAV"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:48
 msgid "Drag and Drop support"
-msgstr ""
+msgstr "Suporte para arrastar e soltar"
