@@ -144,7 +144,7 @@ class TasksList(Adw.Bin):
         self.set_child(split_view)
 
     def add_task(self, uid: str) -> None:
-        new_task = Task(uid, self.name, self.window, self)
+        new_task = Task(uid, self.name, self.window, self, self, False)
         self.tasks_list.append(new_task)
         new_task.toggle_visibility(not new_task.get_prop("deleted"))
 
@@ -185,31 +185,31 @@ class TasksList(Adw.Bin):
         Update status bar on the top
         """
 
-        # tasks: list[UserDataTask] = UserData.get()["tasks"]
-        # n_total: int = 0
-        # n_completed: int = 0
-        # n_all_deleted: int = 0
-        # n_all_completed: int = 0
+        n_total: int = UserData.run_sql(
+            f"""SELECT COUNT(*) FROM {self.name} 
+            WHERE parent IS NULL 
+            AND deleted = 0"""
+        )[0][0]
+        n_completed: int = UserData.run_sql(
+            f"""SELECT COUNT(*) FROM {self.name} 
+            WHERE parent IS NULL 
+            AND completed = 1
+            AND deleted = 0"""
+        )[0][0]
+        n_all_deleted: int = UserData.run_sql(
+            f"""SELECT COUNT(*) FROM {self.name} WHERE deleted = 1"""
+        )[0][0]
+        n_all_completed: int = UserData.run_sql(
+            f"""SELECT COUNT(*) FROM {self.name} WHERE completed = 1"""
+        )[0][0]
 
-        # for task in tasks:
-        #     if task["parent"] == "":
-        #         if not task["deleted"]:
-        #             n_total += 1
-        #             if task["completed"]:
-        #                 n_completed += 1
-        #     if not task["deleted"]:
-        #         if task["completed"]:
-        #             n_all_completed += 1
-        #     else:
-        #         n_all_deleted += 1
-
-        # self.title.set_subtitle(
-        #     _("Completed:") + f" {n_completed} / {n_total}"  # pyright: ignore
-        #     if n_total > 0
-        #     else ""
-        # )
-        # self.delete_completed_btn_rev.set_reveal_child(n_all_completed > 0)
-        # self.trash_panel.trash_list_scrl.set_visible(n_all_deleted > 0)
+        self.title.set_subtitle(
+            _("Completed:") + f" {n_completed} / {n_total}"  # pyright: ignore
+            if n_total > 0
+            else ""
+        )
+        self.delete_completed_btn_rev.set_reveal_child(n_all_completed > 0)
+        self.trash_panel.scrl.set_visible(n_all_deleted > 0)
 
     def update_ui(self) -> None:
         Log.debug("Updating UI")

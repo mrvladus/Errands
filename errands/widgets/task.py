@@ -16,7 +16,6 @@ from errands.utils.functions import get_children
 class Task(Gtk.Revealer):
     # - State - #
     just_added: bool = True
-    is_sub_task: bool = False
     can_sync: bool = True
 
     def __init__(
@@ -25,7 +24,8 @@ class Task(Gtk.Revealer):
         list_name: str,
         window: Adw.ApplicationWindow,
         tasks_panel,
-        parent=None,
+        parent,
+        is_sub_task: bool,
     ) -> None:
         super().__init__()
         Log.info(f"Add task: {uid}")
@@ -34,16 +34,17 @@ class Task(Gtk.Revealer):
         self.list_name = list_name
         self.window = window
         self.tasks_panel = tasks_panel
-        self.parent = tasks_panel if not parent else parent
+        self.parent = parent
+        self.is_sub_task = is_sub_task
 
         self.build_ui()
         # Add to trash if needed
         # if UserData.get_task_prop(self.list_name, self.uid, "deleted"):
         #     self.tasks_panel.trash_panel.trash_add(self.uid)
-        self.check_is_sub()
+        if not self.window.startup and self.parent != self.tasks_panel:
+            self.parent.expand(True)
         self.add_sub_tasks()
-        self.just_added = False
-        # self.parent.update_status()
+        self.parent.update_status()
 
     def get_prop(self, prop: str):
         res = UserData.get_prop(self.list_name, self.uid, prop)
@@ -167,24 +168,19 @@ class Task(Gtk.Revealer):
         self.set_child(box)
 
     def add_task(self, uid: str) -> None:
-        new_task = Task(uid, self.list_name, self.window, self.tasks_panel)
+        new_task = Task(uid, self.list_name, self.window, self.tasks_panel, self, True)
         self.tasks_list.append(new_task)
         new_task.toggle_visibility(not new_task.get_prop("deleted"))
 
     def add_sub_tasks(self) -> None:
         for uid in UserData.get_sub_tasks(self.list_name, self.uid):
             self.add_task(uid)
-        # self.update_status()
-        # self.tasks_panel.update_status()
-
-    def check_is_sub(self) -> None:
-        if not self.get_prop("parent"):
-            self.is_sub_task = True
-            if not self.window.startup and self.parent != self.tasks_panel:
-                self.parent.expand(True)
+        self.update_status()
+        self.tasks_panel.update_status()
+        self.just_added = False
 
     def delete(self, *_) -> None:
-        Log.info(f"Move task to trash: {self.task['id']}")
+        Log.info(f"Move task to trash: {self.get_prop('uid')}")
 
         self.toggle_visibility(False)
         self.update_prop("deleted", True)
@@ -214,15 +210,17 @@ class Task(Gtk.Revealer):
         self.set_reveal_child(on)
 
     def update_status(self) -> None:
-        n_completed: int = 0
-        n_total: int = 0
-        for task in UserData.get()["tasks"]:
-            if task["parent"] == self.task["id"]:
-                if not task["deleted"]:
-                    n_total += 1
-                    if task["completed"]:
-                        n_completed += 1
-
+        n_total: int = UserData.run_sql(
+            f"""SELECT COUNT(*) FROM {self.list_name} 
+            WHERE parent = '{self.uid}' 
+            AND deleted = 0"""
+        )[0][0]
+        n_completed: int = UserData.run_sql(
+            f"""SELECT COUNT(*) FROM {self.list_name} 
+            WHERE parent = '{self.uid}' 
+            AND completed = 1 
+            AND deleted = 0"""
+        )[0][0]
         self.task_row.set_subtitle(
             _("Completed:") + f" {n_completed} / {n_total}"  # pyright: ignore
             if n_total > 0
@@ -257,16 +255,16 @@ class Task(Gtk.Revealer):
             task.can_sync = False
             task.completed_btn.set_active(btn.get_active())
         # Update status
-        # if self.is_sub_task:
-        #     self.parent.update_status()
+        if self.is_sub_task:
+            self.parent.update_status()
         # Set text
         set_text()
         # Sync
-        # if self.can_sync:
-        #     Sync.sync()
-        #     self.tasks_panel.update_status()
-        #     for task in children:
-        #         task.can_sync = True
+        if self.can_sync:
+            Sync.sync()
+            self.tasks_panel.update_status()
+            for task in children:
+                task.can_sync = True
 
     def on_expand(self, *_) -> None:
         """
@@ -298,9 +296,9 @@ class Task(Gtk.Revealer):
         self.just_added = True
         self.completed_btn.set_active(False)
         self.just_added = False
-        # self.update_status()
+        self.update_status()
         # Sync
-        # Sync.sync()
+        Sync.sync()
 
     # --- Drag and Drop --- #
 

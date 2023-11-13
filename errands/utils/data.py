@@ -4,7 +4,7 @@
 import os
 import sqlite3
 
-from typing import TypedDict
+from typing import Any, TypedDict
 from uuid import uuid4
 from gi.repository import GLib
 from errands.utils.logging import Log
@@ -54,7 +54,8 @@ end_date TEXT,
 notes TEXT,
 tags TEXT,
 percent_complete INTEGER,
-priority INTEGER
+priority INTEGER,
+synced INTEGER
 )
 """
         )
@@ -67,26 +68,29 @@ priority INTEGER
         return [l[0] for l in res]
 
     @classmethod
-    def get_prop(cls, list_name: str, uid: str, prop: str):
+    def get_prop(cls, list_name: str, uid: str, prop: str) -> Any:
         cls.cursor.execute(f"SELECT {prop} FROM '{list_name}' WHERE uid = '{uid}'")
         res = cls.cursor.fetchone()
         return res[0]
 
     @classmethod
-    def update_prop(cls, list_name: str, uid: str, prop: str, value):
+    def update_prop(cls, list_name: str, uid: str, prop: str, value) -> None:
         cls.cursor.execute(
             f"UPDATE '{list_name}' SET {prop} = ? WHERE uid = '{uid}'", (value,)
         )
         cls.connection.commit()
 
     @classmethod
-    def get_tasks(cls, list_name: str):
-        cls.cursor.execute(f"SELECT * FROM '{list_name}'")
-        task = cls.cursor.fetchall()
-        return task
+    def run_sql(cls, sql: str):
+        cls.cursor.execute(sql)
+        return cls.cursor.fetchall()
 
     @classmethod
-    def get_sub_tasks(cls, list_name: str, parent_uid: str):
+    def count(self):
+        pass
+
+    @classmethod
+    def get_sub_tasks(cls, list_name: str, parent_uid: str) -> list[str]:
         cls.cursor.execute(
             f"SELECT uid FROM '{list_name}' WHERE parent = '{parent_uid}'"
         )
@@ -111,10 +115,6 @@ priority INTEGER
         )
         cls.connection.commit()
         return uid
-
-    @classmethod
-    def update_task(cls, uid: str):
-        pass
 
     @classmethod
     def delete_task(cls, uid: str):
