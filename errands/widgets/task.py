@@ -39,8 +39,9 @@ class Task(Gtk.Revealer):
 
         self.build_ui()
         # Add to trash if needed
-        # if UserData.get_task_prop(self.list_name, self.uid, "deleted"):
-        #     self.tasks_panel.trash_panel.trash_add(self.uid)
+        if self.get_prop("deleted"):
+            self.tasks_panel.trash_panel.trash_add(self.uid)
+        # Expand when added by entry
         if not self.window.startup and self.parent != self.tasks_panel:
             self.parent.expand(True)
         self.add_sub_tasks()
@@ -185,7 +186,7 @@ class Task(Gtk.Revealer):
         self.toggle_visibility(False)
         self.update_prop("deleted", True)
         self.completed_btn.set_active(True)
-        # self.tasks_panel.trash_panel.trash_add(self.task)
+        self.tasks_panel.trash_panel.trash_add(self.uid)
         for task in get_children(self.tasks_list):
             if not task.get_prop("deleted"):
                 task.delete()

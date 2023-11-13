@@ -281,7 +281,7 @@ class TasksList(Adw.Bin):
         Log.info("Delete completed tasks")
 
         for task in self.get_all_tasks():
-            if task.task["completed"] and not task.task["deleted"]:
+            if task.get_prop("completed") and not task.get_prop("deleted"):
                 task.delete()
         self.update_status()
 

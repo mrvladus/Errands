@@ -83,11 +83,16 @@ synced INTEGER
     @classmethod
     def run_sql(cls, sql: str):
         cls.cursor.execute(sql)
+        cls.connection.commit()
         return cls.cursor.fetchall()
 
     @classmethod
     def count(self):
         pass
+
+    @classmethod
+    def remove_deleted(cls, list_name: str):
+        cls.cursor.execute()
 
     @classmethod
     def get_sub_tasks(cls, list_name: str, parent_uid: str) -> list[str]:

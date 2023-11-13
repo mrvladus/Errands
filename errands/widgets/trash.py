@@ -80,12 +80,12 @@ class Trash(Adw.Bin):
         toolbar_view.add_top_bar(hb)
         self.set_child(toolbar_view)
 
-    def trash_add(self, task: dict) -> None:
+    def trash_add(self, uid: str) -> None:
         """
         Add item to trash
         """
 
-        self.trash_list.append(TrashItem(task, self.tasks_panel, self.trash_list))
+        self.trash_list.append(TrashItem(uid, self.tasks_panel, self.trash_list))
         self.scrl.set_visible(True)
 
     def trash_clear(self) -> None:
@@ -93,17 +93,16 @@ class Trash(Adw.Bin):
         Clear unneeded items from trash
         """
 
-        tasks: list[UserDataTask] = UserData.get()["tasks"]
+        res = UserData.run_sql(
+            f"""SELECT uid FROM {self.tasks_panel.name} WHERE deleted = 0"""
+        )
+        ids = [i[0] for i in res]
         to_remove: list[TrashItem] = []
-        trash_children: list[TrashItem] = get_children(self.trash_list)
-        for task in tasks:
-            if not task["deleted"]:
-                for item in trash_children:
-                    if item.id == task["id"]:
-                        to_remove.append(item)
+        for item in get_children(self.trash_list):
+            if item.uid in ids:
+                to_remove.append(item)
         for item in to_remove:
             self.trash_list.remove(item)
-
         self.scrl.set_visible(len(get_children(self.trash_list)) > 0)
 
     def on_trash_clear(self, btn) -> None:
@@ -132,17 +131,15 @@ class Trash(Adw.Bin):
             return
 
         Log.info("Clear Trash")
-
         # Remove widgets and data
-        data = UserData.get()
-        data["deleted"] = [task["id"] for task in data["tasks"] if task["deleted"]]
-        data["tasks"] = [task for task in data["tasks"] if not task["deleted"]]
-        UserData.set(data)
         to_remove: list[Task] = [
-            task for task in self.tasks_panel.get_all_tasks() if task.task["deleted"]
+            task
+            for task in self.tasks_panel.get_all_tasks()
+            if task.get_prop("deleted")
         ]
         for task in to_remove:
             task.purge()
+        UserData.run_sql(f"DELETE FROM '{self.tasks_panel.name}' WHERE deleted = 1")
         # Remove trash items widgets
         self.trash_list.remove_all()
         self.scrl.set_visible(False)
@@ -159,20 +156,18 @@ class Trash(Adw.Bin):
         # Restore tasks
         tasks: list[Task] = self.tasks_panel.get_all_tasks()
         for task in tasks:
-            if task.task["deleted"]:
-                task.task["deleted"] = False
-                task.update_data()
-                task.toggle_visibility(True)
-                # Update statusbar
-                if not task.task["parent"]:
-                    task.update_status()
-                else:
-                    task.parent.update_status()
-                # Expand if needed
-                for t in tasks:
-                    if t.task["parent"] == task.task["id"]:
-                        task.expand(True)
-                        break
+            task.update_prop("deleted", False)
+            task.toggle_visibility(True)
+            # Update statusbar
+            if not task.is_sub_task:
+                task.update_status()
+            else:
+                task.parent.update_status()
+            # Expand if needed
+            for t in tasks:
+                if t.get_prop("parent") == task.uid:
+                    task.expand(True)
+                    break
 
         # Clear trash
         self.trash_clear()
