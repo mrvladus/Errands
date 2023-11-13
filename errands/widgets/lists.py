@@ -40,10 +40,10 @@ class Lists(Adw.Bin):
         hb.pack_end(menu_btn)
         # Entry
         entry = Gtk.Entry(
-            margin_start=12,
-            margin_end=12,
-            margin_top=12,
             placeholder_text=_("Add new List"),  # type:ignore
+            margin_start=6,
+            margin_end=6,
+            margin_top=5,
         )
         entry.connect("activate", self.on_list_added)
         entry_rev = Gtk.Revealer(child=entry)
@@ -54,19 +54,13 @@ class Lists(Adw.Bin):
             GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
         )
         # Lists
-        self.lists = Gtk.StackSidebar(
-            stack=self.stack,
-            vexpand=True,
-            margin_start=6,
-            margin_end=6,
-        )
-        # Box
-        box = Gtk.Box(orientation="vertical", spacing=12)
-        box.append(entry_rev)
-        box.append(Gtk.ScrolledWindow(child=self.lists, propagate_natural_height=True))
+        self.lists = Gtk.StackSidebar(stack=self.stack, vexpand=True)
         # Toolbar view
-        toolbar_view = Adw.ToolbarView(content=box)
+        toolbar_view = Adw.ToolbarView(
+            content=Gtk.ScrolledWindow(child=self.lists, propagate_natural_height=True)
+        )
         toolbar_view.add_top_bar(hb)
+        toolbar_view.add_top_bar(entry_rev)
         self.set_child(toolbar_view)
 
     def on_list_added(self, entry):
@@ -88,7 +82,3 @@ class Lists(Adw.Bin):
 
     def rename_list(self):
         pass
-
-    def change_list(self, name: str):
-        print("asdasd")
-        self.stack.set_visible_child_name(name)

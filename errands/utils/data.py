@@ -73,6 +73,13 @@ priority INTEGER
         return res[0]
 
     @classmethod
+    def update_prop(cls, list_name: str, uid: str, prop: str, value):
+        cls.cursor.execute(
+            f"UPDATE '{list_name}' SET {prop} = ? WHERE uid = '{uid}'", (value,)
+        )
+        cls.connection.commit()
+
+    @classmethod
     def get_tasks(cls, list_name: str):
         cls.cursor.execute(f"SELECT * FROM '{list_name}'")
         task = cls.cursor.fetchall()

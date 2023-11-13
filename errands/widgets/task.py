@@ -40,7 +40,7 @@ class Task(Gtk.Revealer):
         # Add to trash if needed
         # if UserData.get_task_prop(self.list_name, self.uid, "deleted"):
         #     self.tasks_panel.trash_panel.trash_add(self.uid)
-        # self.check_is_sub()
+        self.check_is_sub()
         self.add_sub_tasks()
         self.just_added = False
         # self.parent.update_status()
@@ -50,6 +50,9 @@ class Task(Gtk.Revealer):
         if prop in "deleted completed":
             res = bool(res)
         return res
+
+    def update_prop(self, prop: str, value):
+        UserData.update_prop(self.list_name, self.uid, prop, value)
 
     def build_ui(self):
         # Top drop area
@@ -96,9 +99,9 @@ class Task(Gtk.Revealer):
         self.completed_btn = Gtk.CheckButton(
             valign="center",
             tooltip_text=_("Mark as Completed"),  # type:ignore
-            active=self.get_prop("completed"),
         )
         self.completed_btn.connect("toggled", self.on_completed_btn_toggled)
+        self.completed_btn.set_active(self.get_prop("completed"))
         self.task_row.add_prefix(self.completed_btn)
         # Expand icon
         self.expand_icon = Gtk.Image(icon_name="go-down-symbolic", css_classes=["fade"])
@@ -175,24 +178,20 @@ class Task(Gtk.Revealer):
         # self.tasks_panel.update_status()
 
     def check_is_sub(self) -> None:
-        if self.task["parent"] != "":
+        if not self.get_prop("parent"):
             self.is_sub_task = True
-            self.main_box.add_css_class("sub-task")
             if not self.window.startup and self.parent != self.tasks_panel:
                 self.parent.expand(True)
-        else:
-            self.main_box.add_css_class("task")
 
     def delete(self, *_) -> None:
         Log.info(f"Move task to trash: {self.task['id']}")
 
         self.toggle_visibility(False)
-        self.task["deleted"] = True
-        self.update_data()
+        self.update_prop("deleted", True)
         self.completed_btn.set_active(True)
-        self.tasks_panel.trash_panel.trash_add(self.task)
+        # self.tasks_panel.trash_panel.trash_add(self.task)
         for task in get_children(self.tasks_list):
-            if not task.task["deleted"]:
+            if not task.get_prop("deleted"):
                 task.delete()
         self.tasks_panel.details_panel.status.set_visible(True)
 
@@ -230,18 +229,6 @@ class Task(Gtk.Revealer):
             else ""
         )
 
-    def update_data(self) -> None:
-        """
-        Sync self.task with user data.json
-        """
-
-        # data: UserDataDict = UserData.get()
-        # for i, task in enumerate(data["tasks"]):
-        #     if self.task["id"] == task["id"]:
-        #         data["tasks"][i] = self.task
-        #         UserData.set(data)
-        #         return
-
     def on_completed_btn_toggled(self, btn: Gtk.Button) -> None:
         """
         Toggle check button and add style to the text
@@ -262,20 +249,19 @@ class Task(Gtk.Revealer):
             return
 
         # Update data
-        # self.task["completed"] = btn.get_active()
+        self.update_prop("completed", btn.get_active())
         # self.task["synced_caldav"] = False
-        # self.update_data()
-        # # Update children
-        # children: list[Task] = get_children(self.tasks_list)
-        # for task in children:
-        #     task.can_sync = False
-        #     task.completed_btn.set_active(btn.get_active())
-        # # Update status
+        # Update children
+        children: list[Task] = get_children(self.tasks_list)
+        for task in children:
+            task.can_sync = False
+            task.completed_btn.set_active(btn.get_active())
+        # Update status
         # if self.is_sub_task:
         #     self.parent.update_status()
-        # # Set text
-        # set_text()
-        # # Sync
+        # Set text
+        set_text()
+        # Sync
         # if self.can_sync:
         #     Sync.sync()
         #     self.tasks_panel.update_status()
@@ -308,8 +294,7 @@ class Task(Gtk.Revealer):
         # Clear entry
         entry.get_buffer().props.text = ""
         # Update status
-        # self.task["completed"] = False
-        # self.update_data()
+        self.update_prop("completed", False)
         self.just_added = True
         self.completed_btn.set_active(False)
         self.just_added = False
@@ -323,14 +308,9 @@ class Task(Gtk.Revealer):
         self.set_sensitive(True)
 
     def on_drag_begin(self, _, drag) -> bool:
+        text = self.get_prop("text")
         icon: Gtk.DragIcon = Gtk.DragIcon.get_for_drag(drag)
-        icon.set_child(
-            Gtk.Button(
-                label=self.task["text"]
-                if len(self.task["text"]) < 20
-                else f"{self.task['text'][0:20]}..."
-            )
-        )
+        icon.set_child(Gtk.Button(label=text if len(text) < 20 else f"{text[0:20]}..."))
 
     def on_drag_prepare(self, *_) -> Gdk.ContentProvider:
         self.set_sensitive(False)
