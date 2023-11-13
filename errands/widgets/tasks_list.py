@@ -3,7 +3,7 @@
 
 from errands.utils.animation import scroll
 from errands.utils.gsettings import GSettings
-from errands.utils.data import UserData, UserDataTask
+from errands.utils.data import UserData
 from errands.utils.functions import get_children
 from errands.widgets.details import Details
 from errands.widgets.trash import Trash
@@ -216,8 +216,8 @@ class TasksList(Adw.Bin):
 
         # Update existing tasks
         tasks: list[Task] = self.get_all_tasks()
-        data_tasks: list[UserDataTask] = UserData.get()["tasks"]
-        to_change_parent: list[UserDataTask] = []
+        data_tasks = UserData.get()["tasks"]
+        to_change_parent = []
         to_remove: list[Task] = []
         for task in tasks:
             for t in data_tasks:

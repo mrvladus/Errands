@@ -1,18 +1,14 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-import json
 from errands.widgets.lists import Lists
 from errands.widgets.shortcuts_window import ShortcutsWindow
-from errands.widgets.tasks_list import TasksList
-from gi.repository import Gio, Adw, Gtk, GLib, GObject
+from gi.repository import Gio, Adw, Gtk
 from __main__ import VERSION, APP_ID
 from errands.widgets.preferences import PreferencesWindow
 from errands.utils.sync import Sync
 from errands.utils.gsettings import GSettings
 from errands.utils.logging import Log
-from errands.utils.data import UserData
-from errands.utils.functions import get_children
 
 
 class Window(Adw.ApplicationWindow):

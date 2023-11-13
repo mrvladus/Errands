@@ -1,7 +1,7 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-from errands.utils.data import UserData, UserDataTask
+from errands.utils.data import UserData
 from errands.utils.functions import get_children
 from errands.widgets.trash_item import TrashItem
 from gi.repository import Adw, Gtk, GObject
@@ -139,7 +139,7 @@ class Trash(Adw.Bin):
         ]
         for task in to_remove:
             task.purge()
-        UserData.run_sql(f"DELETE FROM '{self.tasks_panel.name}' WHERE deleted = 1")
+        UserData.remove_deleted(self.tasks_panel.name)
         # Remove trash items widgets
         self.trash_list.remove_all()
         self.scrl.set_visible(False)

@@ -5,10 +5,9 @@ from typing import Self
 from gi.repository import Gtk, Adw, Gdk, GObject
 
 # Import modules
-import errands.utils.tasks as TaskUtils
 from errands.utils.sync import Sync
 from errands.utils.logging import Log
-from errands.utils.data import UserData, UserDataTask
+from errands.utils.data import UserData
 from errands.utils.markup import Markup
 from errands.utils.functions import get_children
 

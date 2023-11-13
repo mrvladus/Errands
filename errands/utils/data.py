@@ -4,25 +4,10 @@
 import os
 import sqlite3
 
-from typing import Any, TypedDict
+from typing import Any
 from uuid import uuid4
 from gi.repository import GLib
 from errands.utils.logging import Log
-
-
-class UserDataTask(TypedDict):
-    uid: str
-    text: str
-    parent: str
-    completed: bool
-    deleted: bool
-    color: str
-    synced_caldav: bool
-    start_date: str
-    end_date: str
-    notes: str
-    percent_complete: int
-    priority: int
 
 
 class UserData:
@@ -87,12 +72,12 @@ synced INTEGER
         return cls.cursor.fetchall()
 
     @classmethod
-    def count(self):
+    def count(cls):
         pass
 
     @classmethod
     def remove_deleted(cls, list_name: str):
-        cls.cursor.execute()
+        cls.cursor.execute(f"DELETE FROM '{list_name}' WHERE deleted = 1")
 
     @classmethod
     def get_sub_tasks(cls, list_name: str, parent_uid: str) -> list[str]:
@@ -115,7 +100,9 @@ synced INTEGER
         if not uid:
             uid = str(uuid4())
         cls.cursor.execute(
-            f"INSERT INTO '{list_name}' (uid, text, parent, completed, deleted) VALUES (?, ?, ?, ?, ?)",
+            f"""INSERT INTO '{list_name}' 
+            (uid, text, parent, completed, deleted) 
+            VALUES (?, ?, ?, ?, ?)""",
             (uid, text, parent, False, False),
         )
         cls.connection.commit()

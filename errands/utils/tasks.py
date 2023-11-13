@@ -4,7 +4,6 @@
 import uuid
 import datetime
 from icalendar import Event, Calendar
-from errands.utils.data import UserDataTask
 
 
 def new_task(
@@ -22,7 +21,7 @@ def new_task(
     percent_complete: int = 0,
     priority: int = 0,
     tags: str = "",
-) -> UserDataTask:
+):
     task = {
         "id": id if id else str(uuid.uuid4()),
         "parent": parent,
@@ -48,7 +47,7 @@ def new_task(
     return task
 
 
-def task_to_ics(task: UserDataTask) -> str:
+def task_to_ics(task) -> str:
     cal = Calendar()
     cal.add("version", "2.0")
     cal.add("prodid", "-//Errands")

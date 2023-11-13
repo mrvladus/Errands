@@ -6,7 +6,7 @@ from __main__ import VERSION
 class Log:
     """Logging class"""
 
-    data_dir: str = os.path.join(GLib.get_user_data_dir(), "list")
+    data_dir: str = os.path.join(GLib.get_user_data_dir(), "errands")
     log_file: str = os.path.join(data_dir, "log.txt")
     log_old_file: str = os.path.join(data_dir, "log.old.txt")
 
