@@ -274,12 +274,12 @@ class Details(Adw.Bin):
     def update_info(self, parent):
         self.parent = parent
         # Edit text
-        self.edit_entry.set_text(self.parent.task["text"])
+        self.edit_entry.set_text(self.parent.get_prop("text"))
         # Notes
-        self.notes.set_text(self.parent.task["notes"])
+        self.notes.set_text(self.parent.get_prop("notes"))
         # Set date in calendars
-        sd = self.start_datetime = self.parent.task["start_date"]
-        ed = self.end_datetime = self.parent.task["end_date"]
+        sd = self.start_datetime = self.parent.get_prop("start_date")
+        ed = self.end_datetime = self.parent.get_prop("end_date")
         self.start_hour.set_value(int(sd[9:11]))
         self.start_min.set_value(int(sd[11:13]))
         sdt = GLib.DateTime.new_local(int(sd[0:4]), int(sd[4:6]), int(sd[6:8]), 0, 0, 0)
@@ -289,9 +289,9 @@ class Details(Adw.Bin):
         edt = GLib.DateTime.new_local(int(ed[0:4]), int(ed[4:6]), int(ed[6:8]), 0, 0, 0)
         self.end_cal.select_day(edt)
         # Percent complete
-        self.percent_complete.set_value(self.parent.task["percent_complete"])
+        self.percent_complete.set_value(self.parent.get_prop("percent_complete"))
         # Priority
-        self.priority.set_value(self.parent.task["priority"])
+        self.priority.set_value(self.parent.get_prop("priority"))
         self.save_btn.set_sensitive(False)
         self.status.set_visible(False)
         # Tags
@@ -302,7 +302,7 @@ class Details(Adw.Bin):
                 continue
             self.tags.remove(tag)
         # Add new
-        for tag in self.parent.task["tags"].split(","):
+        for tag in self.parent.get_prop("tags").split(","):
             self.add_tag(tag)
 
     def on_notes_text_changed(self, buffer: Gtk.TextBuffer):
@@ -314,18 +314,20 @@ class Details(Adw.Bin):
     def on_save_btn_clicked(self, btn):
         Log.debug("Save details")
         # Set new props
-        self.parent.task["start_date"] = self.start_datetime
-        self.parent.task["end_date"] = self.end_datetime
-        self.parent.task["notes"] = self.notes.props.text
-        self.parent.task["percent_complete"] = int(self.percent_complete.get_value())
-        self.parent.task["priority"] = int(self.priority.get_value())
+        self.parent.update_prop("start_date", self.start_datetime)
+        self.parent.update_prop("end_date", self.end_datetime)
+        self.parent.update_prop("note", self.notes.props.text)
+        self.parent.update_prop(
+            "percent_complete", int(self.percent_complete.get_value())
+        )
+        self.parent.update_prop("priority", int(self.priority.get_value()))
         # Set text
         text = self.edit_entry.props.text
         if text.strip(" \n\t") != "":
-            self.parent.task["text"] = text
+            self.parent.update_prop("text", text)
             self.parent.task_row.set_title(Markup.find_url(Markup.escape(text)))
         else:
-            self.edit_entry.set_text(self.parent.task["text"])
+            self.edit_entry.set_text(self.parent.get_prop("text"))
         # Set tags
         tag_arr: list[str] = []
         for i, row in enumerate(get_children(self.tag_entry.get_parent())):
@@ -333,9 +335,8 @@ class Details(Adw.Bin):
             if i == 0:
                 continue
             tag_arr.append(row.get_title())
-        self.parent.task["tags"] = ",".join(tag_arr)
+        self.parent.update_prop("tags", ",".join(tag_arr))
         # Update data and sync
-        self.parent.update_data()
         Sync.sync()
         self.save_btn.set_sensitive(False)
 
@@ -395,7 +396,7 @@ class Details(Adw.Bin):
     def on_copy_text_clicked(self, _btn):
         Log.info("Copy to clipboard")
         clp: Gdk.Clipboard = Gdk.Display.get_default().get_clipboard()
-        clp.set(self.parent.task["text"])
+        clp.set(self.parent.get_prop("text"))
         self.window.add_toast(_("Copied to Clipboard"))  # pyright:ignore
 
     def on_delete_btn_clicked(self, _btn):
@@ -404,12 +405,13 @@ class Details(Adw.Bin):
         self.task_panel.sidebar.set_visible_child_name("trash")
 
     def on_open_as_ics_clicked(self, _btn):
+        # TODO
         cache_dir: str = os.path.join(GLib.get_user_cache_dir(), "tmp")
         if not os.path.exists(cache_dir):
             os.mkdir(cache_dir)
-        file_path = os.path.join(cache_dir, f"{self.parent.task['id']}.ics")
+        file_path = os.path.join(cache_dir, f"{self.parent.uid}.ics")
         with open(file_path, "w") as f:
-            f.write(task_to_ics(self.parent.task))
+            f.write(task_to_ics(self.parent.uid))
         file: Gio.File = Gio.File.new_for_path(file_path)
         Gtk.FileLauncher.new(file).launch()
 
@@ -429,9 +431,8 @@ class Details(Adw.Bin):
                 break
         if color != "":
             self.parent.main_box.add_css_class(f"task-{color}")
-        self.parent.task["color"] = color
-        self.parent.task["synced_caldav"] = False
-        self.parent.update_data()
+        self.parent.update_prop("color", color)
+        self.parent.update_prop("synced", False)
         Sync.sync()
 
     def on_tag_added(self, entry: Adw.EntryRow) -> None:

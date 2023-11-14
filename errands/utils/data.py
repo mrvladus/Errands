@@ -1,6 +1,7 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
+import datetime
 import os
 import sqlite3
 
@@ -21,47 +22,66 @@ class UserData:
             os.mkdir(cls.data_dir)
         cls.connection = sqlite3.connect(cls.db_path, check_same_thread=False)
         cls.cursor = cls.connection.cursor()
-
-    @classmethod
-    def create_list(cls, name: str):
-        Log.info(f"Create '{name}' list")
+        # Create lists table
         cls.cursor.execute(
-            f"""
-CREATE TABLE IF NOT EXISTS "{name}" (
-uid TEXT NOT NULL,
-text TEXT NOT NULL,
-parent TEXT,
-completed INTEGER NOT NULL,
-deleted INTEGER NOT NULL,
-color TEXT,
-start_date TEXT,
-end_date TEXT,
-notes TEXT,
-tags TEXT,
-percent_complete INTEGER,
-priority INTEGER,
-synced INTEGER
-)
-"""
+            """CREATE TABLE IF NOT EXISTS lists (
+            uid TEXT NOT NULL,
+            name TEXT NOT NULL
+            )"""
+        )
+        # Create tasks table
+        cls.cursor.execute(
+            """CREATE TABLE IF NOT EXISTS tasks (
+            uid TEXT NOT NULL,
+            list_uid TEXT NOT NULL,
+            text TEXT NOT NULL,
+            parent TEXT,
+            completed INTEGER NOT NULL,
+            deleted INTEGER NOT NULL,
+            color TEXT,
+            start_date TEXT,
+            end_date TEXT,
+            notes TEXT,
+            tags TEXT,
+            percent_complete INTEGER NOT NULL,
+            priority INTEGER NOT NULL,
+            synced INTEGER
+            )"""
         )
         cls.connection.commit()
 
     @classmethod
-    def get_lists(cls) -> list[str]:
-        cls.cursor.execute('SELECT name FROM sqlite_master WHERE type = "table"')
-        res = cls.cursor.fetchall()
-        return [l[0] for l in res]
-
-    @classmethod
-    def get_prop(cls, list_name: str, uid: str, prop: str) -> Any:
-        cls.cursor.execute(f"SELECT {prop} FROM '{list_name}' WHERE uid = '{uid}'")
-        res = cls.cursor.fetchone()
-        return res[0]
-
-    @classmethod
-    def update_prop(cls, list_name: str, uid: str, prop: str, value) -> None:
+    def add_list(cls, name: str):
+        Log.info(f"Create '{name}' list")
+        uid = str(uuid4())
         cls.cursor.execute(
-            f"UPDATE '{list_name}' SET {prop} = ? WHERE uid = '{uid}'", (value,)
+            "INSERT INTO lists (uid, name) VALUES (?, ?)",
+            (uid, name),
+        )
+        cls.connection.commit()
+        return uid
+
+    @classmethod
+    def get_lists(cls) -> tuple[str, str]:
+        cls.cursor.execute("SELECT uid, name FROM lists")
+        return cls.cursor.fetchall()
+
+    @classmethod
+    def get_prop(cls, list_uid: str, uid: str, prop: str) -> Any:
+        cls.cursor.execute(
+            f"""SELECT {prop} FROM tasks 
+            WHERE uid = '{uid}'
+            AND list_uid = '{list_uid}'"""
+        )
+        return cls.cursor.fetchone()[0]
+
+    @classmethod
+    def update_prop(cls, list_uid: str, uid: str, prop: str, value) -> None:
+        cls.cursor.execute(
+            f"""UPDATE tasks SET {prop} = ? 
+            WHERE uid = '{uid}'
+            AND list_uid = '{list_uid}'""",
+            (value,),
         )
         cls.connection.commit()
 
@@ -76,34 +96,79 @@ synced INTEGER
         pass
 
     @classmethod
-    def remove_deleted(cls, list_name: str):
-        cls.cursor.execute(f"DELETE FROM '{list_name}' WHERE deleted = 1")
+    def remove_deleted(cls, list_uid: str):
+        cls.cursor.execute(
+            f"""DELETE FROM tasks 
+            WHERE deleted = 1
+            AND list_uid = '{list_uid}'"""
+        )
 
     @classmethod
-    def get_sub_tasks(cls, list_name: str, parent_uid: str) -> list[str]:
+    def get_sub_tasks(cls, list_uid: str, parent_uid: str) -> list[str]:
         cls.cursor.execute(
-            f"SELECT uid FROM '{list_name}' WHERE parent = '{parent_uid}'"
+            f"""SELECT uid FROM tasks 
+            WHERE parent = '{parent_uid}'
+            AND list_uid = '{list_uid}'"""
         )
         res = cls.cursor.fetchall()
         return [f[0] for f in res]
 
     @classmethod
-    def get_toplevel_tasks(cls, list_name: str) -> list[str]:
-        cls.cursor.execute(f"SELECT uid FROM '{list_name}' WHERE parent IS NULL")
+    def get_toplevel_tasks(cls, list_uid: str) -> list[str]:
+        cls.cursor.execute(
+            f"""SELECT uid FROM tasks 
+            WHERE parent IS NULL
+            AND list_uid = '{list_uid}'"""
+        )
         res = cls.cursor.fetchall()
         return [f[0] for f in res]
 
     @classmethod
     def add_task(
-        cls, list_name: str, text: str, uid: str = None, parent: str = None
+        cls,
+        list_uid: str,
+        text: str,
+        uid: str = None,
+        parent: str = None,
+        completed: bool = False,
+        deleted: bool = False,
+        color: str = "",
+        start_date: str = None,
+        end_date: str = None,
+        notes: str = "",
+        percent_complete: int = 0,
+        priority: int = 0,
+        tags: str = "",
+        synced: bool = False,
     ) -> str:
         if not uid:
             uid = str(uuid4())
+        if not start_date:
+            start_date = datetime.datetime.now().strftime("%Y%m%dT%H%M%S")
+        if not end_date:
+            end_date = format(
+                datetime.datetime.now() + datetime.timedelta(days=1), "%Y%m%dT%H%M%S"
+            )
         cls.cursor.execute(
-            f"""INSERT INTO '{list_name}' 
-            (uid, text, parent, completed, deleted) 
-            VALUES (?, ?, ?, ?, ?)""",
-            (uid, text, parent, False, False),
+            f"""INSERT INTO tasks 
+            (uid, list_uid, text, parent, completed, deleted, color, notes, percent_complete, priority, start_date, end_date, tags, synced) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (
+                uid,
+                list_uid,
+                text,
+                parent,
+                completed,
+                deleted,
+                color,
+                notes,
+                percent_complete,
+                priority,
+                start_date,
+                end_date,
+                tags,
+                synced,
+            ),
         )
         cls.connection.commit()
         return uid

@@ -67,14 +67,14 @@ class Lists(Adw.Bin):
         text: str = entry.props.text
         if text.strip(" \n\t") == "":
             return
-        UserData.create_list(text)
-        self.stack.add_titled(child=TasksList(self.window, text), name=text, title=text)
+        uid = UserData.add_list(text)
+        self.stack.add_titled(child=TasksList(self.window, uid), name=text, title=text)
         entry.props.text = ""
 
     def load_lists(self):
         for list in UserData.get_lists():
             self.stack.add_titled(
-                child=TasksList(self.window, list), name=list, title=list
+                child=TasksList(self.window, list[0]), name=list[1], title=list[1]
             )
 
     def delete_list(self):

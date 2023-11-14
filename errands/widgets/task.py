@@ -20,7 +20,7 @@ class Task(Gtk.Revealer):
     def __init__(
         self,
         uid: str,
-        list_name: str,
+        list_uid: str,
         window: Adw.ApplicationWindow,
         tasks_panel,
         parent,
@@ -30,7 +30,7 @@ class Task(Gtk.Revealer):
         Log.info(f"Add task: {uid}")
 
         self.uid = uid
-        self.list_name = list_name
+        self.list_uid = list_uid
         self.window = window
         self.tasks_panel = tasks_panel
         self.parent = parent
@@ -47,13 +47,13 @@ class Task(Gtk.Revealer):
         self.parent.update_status()
 
     def get_prop(self, prop: str):
-        res = UserData.get_prop(self.list_name, self.uid, prop)
+        res = UserData.get_prop(self.list_uid, self.uid, prop)
         if prop in "deleted completed":
             res = bool(res)
         return res
 
     def update_prop(self, prop: str, value):
-        UserData.update_prop(self.list_name, self.uid, prop, value)
+        UserData.update_prop(self.list_uid, self.uid, prop, value)
 
     def build_ui(self):
         # Top drop area
@@ -168,19 +168,19 @@ class Task(Gtk.Revealer):
         self.set_child(box)
 
     def add_task(self, uid: str) -> None:
-        new_task = Task(uid, self.list_name, self.window, self.tasks_panel, self, True)
+        new_task = Task(uid, self.list_uid, self.window, self.tasks_panel, self, True)
         self.tasks_list.append(new_task)
         new_task.toggle_visibility(not new_task.get_prop("deleted"))
 
     def add_sub_tasks(self) -> None:
-        for uid in UserData.get_sub_tasks(self.list_name, self.uid):
+        for uid in UserData.get_sub_tasks(self.list_uid, self.uid):
             self.add_task(uid)
         self.update_status()
         self.tasks_panel.update_status()
         self.just_added = False
 
     def delete(self, *_) -> None:
-        Log.info(f"Move task to trash: {self.get_prop('uid')}")
+        Log.info(f"Move task to trash: {self.uid}")
 
         self.toggle_visibility(False)
         self.update_prop("deleted", True)
@@ -211,15 +211,17 @@ class Task(Gtk.Revealer):
 
     def update_status(self) -> None:
         n_total: int = UserData.run_sql(
-            f"""SELECT COUNT(*) FROM {self.list_name} 
+            f"""SELECT COUNT(*) FROM tasks 
             WHERE parent = '{self.uid}' 
-            AND deleted = 0"""
+            AND deleted = 0
+            AND list_uid = '{self.list_uid}'"""
         )[0][0]
         n_completed: int = UserData.run_sql(
-            f"""SELECT COUNT(*) FROM {self.list_name} 
+            f"""SELECT COUNT(*) FROM tasks 
             WHERE parent = '{self.uid}' 
             AND completed = 1 
-            AND deleted = 0"""
+            AND deleted = 0
+            AND list_uid = '{self.list_uid}'"""
         )[0][0]
         self.task_row.set_subtitle(
             _("Completed:") + f" {n_completed} / {n_total}"  # pyright: ignore
@@ -286,7 +288,7 @@ class Task(Gtk.Revealer):
         if text.strip(" \n\t") == "":
             return
         # Add new sub-task
-        new_sub_task = UserData.add_task(self.list_name, text, parent=self.uid)
+        new_sub_task = UserData.add_task(self.list_uid, text, parent=self.uid)
         # Add sub-task
         self.add_task(new_sub_task)
         # Clear entry

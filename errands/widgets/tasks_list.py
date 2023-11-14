@@ -19,16 +19,20 @@ class TasksList(Adw.Bin):
     scrolling: bool = False  # Is window scrolling
     startup: bool = True
 
-    def __init__(self, window, name: str):
+    def __init__(self, window, list_uid: str):
         super().__init__()
         self.window = window
-        self.name = name
+        self.list_uid = list_uid
         self.build_ui()
         self.load_tasks()
 
     def build_ui(self):
         # Title
-        self.title = Adw.WindowTitle(title=self.name)
+        self.title = Adw.WindowTitle(
+            title=UserData.run_sql(
+                f"SELECT name FROM lists WHERE uid = '{self.list_uid}'"
+            )[0][0]
+        )
         # Delete completed button
         delete_completed_btn = Gtk.Button(
             valign="center",
@@ -144,7 +148,7 @@ class TasksList(Adw.Bin):
         self.set_child(split_view)
 
     def add_task(self, uid: str) -> None:
-        new_task = Task(uid, self.name, self.window, self, self, False)
+        new_task = Task(uid, self.list_uid, self.window, self, self, False)
         self.tasks_list.append(new_task)
         new_task.toggle_visibility(not new_task.get_prop("deleted"))
 
@@ -169,8 +173,8 @@ class TasksList(Adw.Bin):
         return get_children(self.tasks_list)
 
     def load_tasks(self) -> None:
-        Log.debug(f"Loading tasks for '{self.name}'")
-        for uid in UserData.get_toplevel_tasks(self.name):
+        Log.debug(f"Loading tasks for '{self.list_uid}'")
+        for uid in UserData.get_toplevel_tasks(self.list_uid):
             self.add_task(uid)
         self.update_status()
         # Expand tasks if needed
@@ -186,21 +190,27 @@ class TasksList(Adw.Bin):
         """
 
         n_total: int = UserData.run_sql(
-            f"""SELECT COUNT(*) FROM {self.name} 
+            f"""SELECT COUNT(*) FROM tasks
             WHERE parent IS NULL 
-            AND deleted = 0"""
+            AND deleted = 0
+            AND list_uid = '{self.list_uid}'"""
         )[0][0]
         n_completed: int = UserData.run_sql(
-            f"""SELECT COUNT(*) FROM {self.name} 
+            f"""SELECT COUNT(*) FROM tasks 
             WHERE parent IS NULL 
             AND completed = 1
-            AND deleted = 0"""
+            AND deleted = 0
+            AND list_uid = '{self.list_uid}'"""
         )[0][0]
         n_all_deleted: int = UserData.run_sql(
-            f"""SELECT COUNT(*) FROM {self.name} WHERE deleted = 1"""
+            f"""SELECT COUNT(*) FROM tasks 
+            WHERE deleted = 1 
+            AND list_uid = '{self.list_uid}'"""
         )[0][0]
         n_all_completed: int = UserData.run_sql(
-            f"""SELECT COUNT(*) FROM {self.name} WHERE completed = 1"""
+            f"""SELECT COUNT(*) FROM tasks 
+            WHERE completed = 1 
+            AND list_uid = '{self.list_uid}'"""
         )[0][0]
 
         self.title.set_subtitle(
@@ -340,7 +350,7 @@ class TasksList(Adw.Bin):
         if text.strip(" \n\t") == "":
             return
         # Add new task
-        uid = UserData.add_task(self.name, text)
+        uid = UserData.add_task(self.list_uid, text)
         self.add_task(uid)
         # Clear entry
         entry.props.text = ""
