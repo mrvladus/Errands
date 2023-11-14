@@ -96,6 +96,19 @@ class UserData:
         pass
 
     @classmethod
+    def move_before(cls, list_uid: str, task_to_move_uid: str, before_uid: str):
+        cls.cursor.execute("CREATE TABLE tmp AS SELECT * FROM tasks WHERE 0")
+        ids = cls.get_tasks(list_uid)
+        ids.insert(ids.index(before_uid), ids.pop(ids.index(task_to_move_uid)))
+        for id in ids:
+            cls.cursor.execute(
+                f"INSERT INTO tmp SELECT * FROM tasks WHERE uid = '{id}'"
+            )
+        cls.cursor.execute("DROP TABLE tasks")
+        cls.cursor.execute("ALTER TABLE tmp RENAME TO tasks")
+        cls.connection.commit()
+
+    @classmethod
     def remove_deleted(cls, list_uid: str):
         cls.cursor.execute(
             f"""DELETE FROM tasks 
@@ -122,6 +135,15 @@ class UserData:
         )
         res = cls.cursor.fetchall()
         return [f[0] for f in res]
+
+    @classmethod
+    def get_tasks(cls, list_uid: str) -> list[str]:
+        cls.cursor.execute(
+            f"""SELECT uid FROM tasks 
+            WHERE list_uid = '{list_uid}'"""
+        )
+        res = cls.cursor.fetchall()
+        return [i[0] for i in res]
 
     @classmethod
     def add_task(

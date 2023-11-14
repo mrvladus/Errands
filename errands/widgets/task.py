@@ -322,23 +322,19 @@ class Task(Gtk.Revealer):
         """
         When task is dropped on "+" area on top of task
         """
-        return
 
         # Return if task is itself
         if task == self:
             return False
 
         # Move data
-        data: UserDataDict = UserData.get()
-        tasks = data["tasks"]
-        for i, t in enumerate(tasks):
-            if t["id"] == self.task["id"]:
-                self_idx = i
-            elif t["id"] == task.task["id"]:
-                task_idx = i
-        tasks.insert(self_idx, tasks.pop(task_idx))
-        UserData.set(data)
-
+        UserData.run_sql("CREATE TABLE tmp AS SELECT * FROM tasks WHERE 0")
+        ids = UserData.get_tasks(self.list_uid)
+        ids.insert(ids.index(self.uid), ids.pop(ids.index(task.uid)))
+        for id in ids:
+            UserData.run_sql(f"INSERT INTO tmp SELECT * FROM tasks WHERE uid = '{id}'")
+        UserData.run_sql("DROP TABLE tasks")
+        UserData.run_sql("ALTER TABLE tmp RENAME TO tasks")
         # If task has the same parent
         if task.parent == self.parent:
             # Move widget
@@ -347,12 +343,18 @@ class Task(Gtk.Revealer):
             return True
 
         # Change parent if different parents
-        task.task["parent"] = self.task["parent"]
-        task.task["synced_caldav"] = False
-        task.update_data()
+        task.update_prop("parent", self.get_prop("parent"))
+        task.update_prop("synced", False)
         task.purge()
         # Add new task widget
-        new_task = Task(task.task, self.window, self.parent)
+        new_task = Task(
+            task.uid,
+            self.list_uid,
+            self.window,
+            self.tasks_panel,
+            self.parent,
+            self.get_prop("parent") != None,
+        )
         self.parent.tasks_list.append(new_task)
         self.parent.tasks_list.reorder_child_after(new_task, self)
         self.parent.tasks_list.reorder_child_after(self, new_task)
@@ -370,34 +372,31 @@ class Task(Gtk.Revealer):
         """
         When task is dropped on task and becomes sub-task
         """
-        return
 
         if task == self or task.parent == self:
             return
 
         # Change parent
-        task.task["parent"] = self.task["id"]
-        task.task["synced_caldav"] = False
-        task.update_data()
+        task.update_prop("parent", self.get_prop("uid"))
+        task.update_prop("synced", False)
+
         # Move data
-        data: UserDataDict = UserData.get()
-        tasks = data["tasks"]
-        last_sub_idx: int = 0
-        for i, t in enumerate(tasks):
-            if t["parent"] == self.task["id"]:
-                last_sub_idx = tasks.index(t)
-            if t["id"] == self.task["id"]:
-                self_idx = i
-            if t["id"] == task.task["id"]:
-                task_idx = i
-        tasks.insert(self_idx + last_sub_idx, tasks.pop(task_idx))
-        UserData.set(data)
+        uids = UserData.get_tasks(self.list_uid)
+        last_sub_uid = UserData.get_sub_tasks(self.list_uid, self.uid)[-1]
+        uids.insert(
+            uids.index(self.uid) + uids.index(last_sub_uid),
+            uids.pop(uids.index(task.uid)),
+        )
+        UserData.run_sql("CREATE TABLE tmp AS SELECT * FROM tasks WHERE 0")
+        for id in uids:
+            UserData.run_sql(f"INSERT INTO tmp SELECT * FROM tasks WHERE uid = '{id}'")
+        UserData.run_sql("DROP TABLE tasks")
+        UserData.run_sql("ALTER TABLE tmp RENAME TO tasks")
         # Remove old task
         task.purge()
         # Add new sub-task
-        self.add_task(task.task.copy())
-        self.task["completed"] = False
-        self.update_data()
+        self.add_task(task.uid)
+        self.update_prop("completed", False)
         self.just_added = True
         self.completed_btn.set_active(False)
         self.just_added = False
