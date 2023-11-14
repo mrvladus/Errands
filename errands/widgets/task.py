@@ -119,10 +119,10 @@ class Task(Gtk.Revealer):
         self.task_row.add_controller(task_row_hover_ctrl)
         # Details button
         details_btn = Gtk.Button(
-            icon_name="view-more-symbolic",
+            icon_name="help-about-symbolic",
             valign="center",
             tooltip_text=_("Details"),  # type:ignore
-            css_classes=["flat"],
+            css_classes=["flat", "circular"],
         )
         details_btn.connect("clicked", self.on_details_btn_clicked)
         # Task row suffix box

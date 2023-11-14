@@ -94,7 +94,9 @@ class Trash(Adw.Bin):
         """
 
         res = UserData.run_sql(
-            f"""SELECT uid FROM {self.tasks_panel.name} WHERE deleted = 0"""
+            f"""SELECT uid FROM tasks
+            WHERE deleted = 0
+            AND list_uid = '{self.tasks_panel.list_uid}'"""
         )
         ids = [i[0] for i in res]
         to_remove: list[TrashItem] = []
@@ -139,7 +141,7 @@ class Trash(Adw.Bin):
         ]
         for task in to_remove:
             task.purge()
-        UserData.remove_deleted(self.tasks_panel.name)
+        UserData.remove_deleted(self.tasks_panel.list_uid)
         # Remove trash items widgets
         self.trash_list.remove_all()
         self.scrl.set_visible(False)

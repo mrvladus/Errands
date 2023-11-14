@@ -16,7 +16,7 @@ class TrashItem(Adw.ActionRow):
         self.build_ui()
 
     def build_ui(self):
-        self.set_title(UserData.get_prop(self.tasks_panel.name, self.uid, "text"))
+        self.set_title(UserData.get_prop(self.tasks_panel.list_uid, self.uid, "text"))
         restore_btn = Gtk.Button(
             tooltip_text=_("Restore"),  # type:ignore
             icon_name="emblem-ok-symbolic",
