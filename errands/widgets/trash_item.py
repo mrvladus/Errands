@@ -21,7 +21,7 @@ class TrashItem(Adw.ActionRow):
             tooltip_text=_("Restore"),  # type:ignore
             icon_name="emblem-ok-symbolic",
             valign="center",
-            css_classes=["flat"],
+            css_classes=["flat", "circular"],
         )
         # restore_btn.update_property([4], [_("Restore")])  # type:ignore
         restore_btn.connect("clicked", self.on_restore)
