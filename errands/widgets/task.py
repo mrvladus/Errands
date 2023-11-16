@@ -326,7 +326,6 @@ class Task(Gtk.Revealer):
         # Return if task is itself
         if task == self:
             return False
-
         # Move data
         UserData.run_sql("CREATE TABLE tmp AS SELECT * FROM tasks WHERE 0")
         ids = UserData.get_tasks(self.list_uid)
@@ -341,7 +340,6 @@ class Task(Gtk.Revealer):
             self.parent.tasks_list.reorder_child_after(task, self)
             self.parent.tasks_list.reorder_child_after(self, task)
             return True
-
         # Change parent if different parents
         task.update_prop("parent", self.get_prop("parent"))
         task.update_prop("synced", False)
@@ -362,7 +360,6 @@ class Task(Gtk.Revealer):
         # Update status
         self.parent.update_status()
         task.parent.update_status()
-
         # Sync
         Sync.sync()
 
@@ -379,7 +376,6 @@ class Task(Gtk.Revealer):
         # Change parent
         task.update_prop("parent", self.get_prop("uid"))
         task.update_prop("synced", False)
-
         # Move data
         uids = UserData.get_tasks(self.list_uid)
         last_sub_uid = UserData.get_sub_tasks(self.list_uid, self.uid)[-1]
@@ -404,7 +400,6 @@ class Task(Gtk.Revealer):
         task.parent.update_status()
         self.update_status()
         self.parent.update_status()
-
         # Sync
         Sync.sync()
 

@@ -209,12 +209,13 @@ class TasksList(Adw.Bin):
         )[0][0]
         n_all_completed: int = UserData.run_sql(
             f"""SELECT COUNT(*) FROM tasks 
-            WHERE completed = 1 
+            WHERE completed = 1
+            AND deleted = 0 
             AND list_uid = '{self.list_uid}'"""
         )[0][0]
 
         self.title.set_subtitle(
-            _("Completed:") + f" {n_completed} / {n_total}"  # pyright: ignore
+            _("Completed:") + f" {n_completed} / {n_total}"  # type:ignore
             if n_total > 0
             else ""
         )

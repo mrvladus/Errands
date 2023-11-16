@@ -7,7 +7,7 @@ import sqlite3
 
 from typing import Any
 from uuid import uuid4
-from gi.repository import GLib
+from gi.repository import GLib, Secret
 from errands.utils.logging import Log
 
 
@@ -94,19 +94,6 @@ class UserData:
     @classmethod
     def count(cls):
         pass
-
-    @classmethod
-    def move_before(cls, list_uid: str, task_to_move_uid: str, before_uid: str):
-        cls.cursor.execute("CREATE TABLE tmp AS SELECT * FROM tasks WHERE 0")
-        ids = cls.get_tasks(list_uid)
-        ids.insert(ids.index(before_uid), ids.pop(ids.index(task_to_move_uid)))
-        for id in ids:
-            cls.cursor.execute(
-                f"INSERT INTO tmp SELECT * FROM tasks WHERE uid = '{id}'"
-            )
-        cls.cursor.execute("DROP TABLE tasks")
-        cls.cursor.execute("ALTER TABLE tmp RENAME TO tasks")
-        cls.connection.commit()
 
     @classmethod
     def remove_deleted(cls, list_uid: str):
@@ -200,116 +187,6 @@ class UserData:
         pass
 
 
-# class UserData:
-#     """Class for accessing data file with user tasks"""
-
-#     data_dir: str = os.path.join(GLib.get_user_data_dir(), "list")
-#     default_data: UserDataDict = {"version": VERSION, "tasks": [], "deleted": []}
-#     validated: bool = False
-
-#     def _create_file(self):
-#         """
-#         Create data file if not exists
-#         """
-
-#         if not os.path.exists(os.path.join(self.data_dir, "data.json")):
-#             with open(os.path.join(self.data_dir, "data.json"), "w+") as f:
-#                 json.dump(self.default_data, f)
-#                 Log.debug(
-#                     f"Create data file at: {os.path.join(self.data_dir, 'data.json')}"
-#                 )
-
-#     @classmethod
-#     def clean_orphans(self, data: UserDataDict) -> UserDataDict:
-#         ids: list[str] = [t["id"] for t in data["tasks"]]
-#         orphans: list[str] = [
-#             t for t in data["tasks"] if t["parent"] not in ids and t["parent"] != ""
-#         ]
-#         for id in orphans:
-#             data["tasks"].remove(id)
-#         if GSettings.get("sync-provider") == 0:
-#             data["deleted"].clear()
-#         return data
-
-#     @classmethod
-#     def create_copy(self):
-#         shutil.copy(
-#             os.path.join(self.data_dir, "data.json"),
-#             os.path.join(self.data_dir, "data.old.json"),
-#         )
-#         self.set(self.default_data)
-
-#     # Load user data from json
-#     @classmethod
-#     def get(self) -> UserDataDict:
-#         self._create_file(self)
-#         try:
-#             with open(os.path.join(self.data_dir, "data.json"), "r") as f:
-#                 data: UserDataDict = json.load(f)
-#                 if data["version"] != VERSION:
-#                     converted_data: UserDataDict = self.convert(data)
-#                     self.set(converted_data)
-#                     return converted_data
-#                 if not self.validate(data):
-#                     raise
-#                 return data
-#         except:
-#             Log.error(
-#                 f"Data file is corrupted. Creating backup at {os.path.join(self.data_dir, 'data.old.json')}"
-#             )
-#             self.create_copy()
-
-#     # Save user data to json
-#     @classmethod
-#     def set(self, data: UserDataDict) -> None:
-#         with open(os.path.join(self.data_dir, "data.json"), "w") as f:
-#             self.clean_orphans(data)
-#             json.dump(data, f, indent=4, ensure_ascii=False)
-
-#     # Validate data json
-#     @classmethod
-#     def validate(self, data: str | UserDataDict) -> bool:
-#         if self.validated:
-#             return True
-
-#         Log.debug("Validating data file")
-
-#         if type(data) == dict:
-#             val_data = data
-#         # Validate JSON
-#         else:
-#             try:
-#                 val_data = json.loads(data)
-#             except json.JSONDecodeError:
-#                 Log.error("Data file is not JSON")
-#                 return False
-#         # Validate schema
-#         for key in ["version", "tasks"]:
-#             if not key in val_data:
-#                 Log.error(f"Data file is not valid. Key doesn't exists: '{key}'")
-#                 return False
-#         # Validate tasks
-#         if val_data["tasks"]:
-#             for task in val_data["tasks"]:
-#                 for key in [
-#                     "id",
-#                     "parent",
-#                     "text",
-#                     "color",
-#                     "completed",
-#                     "deleted",
-#                     "synced_caldav",
-#                     # "synced_todoist",
-#                 ]:
-#                     if not key in task:
-#                         Log.error(
-#                             f"Data file is not valid. Key doesn't exists: '{key}'"
-#                         )
-#                         return False
-#         Log.debug("Data file is valid")
-#         self.validated = True
-#         return True
-
 #     @classmethod
 #     def convert(self, data: UserDataDict) -> UserDataDict:
 #         """
@@ -359,11 +236,3 @@ class UserData:
 #             for task in data["tasks"]:
 #                 task["synced_caldav"] = False
 #                 # task["synced_todoist"] = False
-
-#         elif ver == "45.0" and os.path.exists(
-#             os.path.join(self.data_dir, "data.old.json")
-#         ):
-#             pass
-
-#         data["version"] = VERSION
-#         return data
