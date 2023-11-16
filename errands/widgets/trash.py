@@ -96,7 +96,8 @@ class Trash(Adw.Bin):
         res = UserData.run_sql(
             f"""SELECT uid FROM tasks
             WHERE deleted = 0
-            AND list_uid = '{self.tasks_panel.list_uid}'"""
+            AND list_uid = '{self.tasks_panel.list_uid}'""",
+            fetch=True,
         )
         ids = [i[0] for i in res]
         to_remove: list[TrashItem] = []

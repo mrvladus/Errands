@@ -316,7 +316,7 @@ class Details(Adw.Bin):
         # Set new props
         self.parent.update_prop("start_date", self.start_datetime)
         self.parent.update_prop("end_date", self.end_datetime)
-        self.parent.update_prop("note", self.notes.props.text)
+        self.parent.update_prop("notes", self.notes.props.text)
         self.parent.update_prop(
             "percent_complete", int(self.percent_complete.get_value())
         )

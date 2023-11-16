@@ -214,14 +214,16 @@ class Task(Gtk.Revealer):
             f"""SELECT COUNT(*) FROM tasks 
             WHERE parent = '{self.uid}' 
             AND deleted = 0
-            AND list_uid = '{self.list_uid}'"""
+            AND list_uid = '{self.list_uid}'""",
+            fetch=True,
         )[0][0]
         n_completed: int = UserData.run_sql(
             f"""SELECT COUNT(*) FROM tasks 
             WHERE parent = '{self.uid}' 
             AND completed = 1 
             AND deleted = 0
-            AND list_uid = '{self.list_uid}'"""
+            AND list_uid = '{self.list_uid}'""",
+            fetch=True,
         )[0][0]
         self.task_row.set_subtitle(
             _("Completed:") + f" {n_completed} / {n_total}"  # pyright: ignore

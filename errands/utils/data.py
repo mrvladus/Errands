@@ -86,10 +86,11 @@ class UserData:
         cls.connection.commit()
 
     @classmethod
-    def run_sql(cls, sql: str):
-        cls.cursor.execute(sql)
+    def run_sql(cls, *cmds: list[str], fetch: bool = False) -> list[tuple] | None:
+        for cmd in cmds:
+            cls.cursor.execute(cmd)
         cls.connection.commit()
-        return cls.cursor.fetchall()
+        return cls.cursor.fetchall() if fetch else None
 
     @classmethod
     def count(cls):

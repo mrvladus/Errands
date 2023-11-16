@@ -30,7 +30,8 @@ class TasksList(Adw.Bin):
         # Title
         self.title = Adw.WindowTitle(
             title=UserData.run_sql(
-                f"SELECT name FROM lists WHERE uid = '{self.list_uid}'"
+                f"SELECT name FROM lists WHERE uid = '{self.list_uid}'",
+                fetch=True,
             )[0][0]
         )
         # Delete completed button
@@ -193,25 +194,29 @@ class TasksList(Adw.Bin):
             f"""SELECT COUNT(*) FROM tasks
             WHERE parent IS NULL 
             AND deleted = 0
-            AND list_uid = '{self.list_uid}'"""
+            AND list_uid = '{self.list_uid}'""",
+            fetch=True,
         )[0][0]
         n_completed: int = UserData.run_sql(
             f"""SELECT COUNT(*) FROM tasks 
             WHERE parent IS NULL 
             AND completed = 1
             AND deleted = 0
-            AND list_uid = '{self.list_uid}'"""
+            AND list_uid = '{self.list_uid}'""",
+            fetch=True,
         )[0][0]
         n_all_deleted: int = UserData.run_sql(
             f"""SELECT COUNT(*) FROM tasks 
             WHERE deleted = 1 
-            AND list_uid = '{self.list_uid}'"""
+            AND list_uid = '{self.list_uid}'""",
+            fetch=True,
         )[0][0]
         n_all_completed: int = UserData.run_sql(
             f"""SELECT COUNT(*) FROM tasks 
             WHERE completed = 1
             AND deleted = 0 
-            AND list_uid = '{self.list_uid}'"""
+            AND list_uid = '{self.list_uid}'""",
+            fetch=True,
         )[0][0]
 
         self.title.set_subtitle(
