@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 from errands.utils.data import UserData
+from errands.utils.logging import Log
 from errands.widgets.tasks_list import TasksList
 from gi.repository import Adw, Gtk, Gio, GObject
 
@@ -68,17 +69,33 @@ class Lists(Adw.Bin):
         if text.strip(" \n\t") == "":
             return
         uid = UserData.add_list(text)
-        self.stack.add_titled(child=TasksList(self.window, uid), name=text, title=text)
+        self.stack.add_titled(
+            child=TasksList(self.window, uid, self), name=text, title=text
+        )
         entry.props.text = ""
 
     def load_lists(self):
         for list in UserData.get_lists():
             self.stack.add_titled(
-                child=TasksList(self.window, list[0]), name=list[1], title=list[1]
+                child=TasksList(self.window, list[0], self),
+                name=list[1],
+                title=list[1],
             )
 
-    def delete_list(self):
-        pass
+    def delete_list(self, widget: Gtk.Widget):
+        Log.info(f"Delete list {widget.list_uid}")
+        UserData.run_sql(
+            f"DELETE FROM lists WHERE uid = '{widget.list_uid}'",
+            f"DELETE FROM tasks WHERE list_uid = '{widget.list_uid}'",
+        )
+        Log.debug("Remove page")
+        self.stack.remove(widget)
 
-    def rename_list(self):
-        pass
+    def rename_list(self, widget, name):
+        page: Gtk.StackPage = self.stack.get_page(widget)
+        page.set_title(name)
+        widget.title.set_title(
+            UserData.run_sql(
+                f"UPDATE lists SET name = '{name}' WHERE uid = '{widget.list_uid}'",
+            )
+        )

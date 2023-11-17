@@ -7,7 +7,7 @@ from errands.utils.data import UserData
 from errands.utils.functions import get_children
 from errands.widgets.details import Details
 from errands.widgets.trash import Trash
-from gi.repository import Adw, Gtk, GLib
+from gi.repository import Adw, Gtk, GLib, Gio
 from errands.widgets.task import Task
 from errands.utils.markup import Markup
 from errands.utils.sync import Sync
@@ -19,11 +19,13 @@ class TasksList(Adw.Bin):
     scrolling: bool = False  # Is window scrolling
     startup: bool = True
 
-    def __init__(self, window, list_uid: str):
+    def __init__(self, window, list_uid: str, parent):
         super().__init__()
         self.window = window
         self.list_uid = list_uid
+        self.parent = parent
         self.build_ui()
+        self.add_actions()
         self.load_tasks()
 
     def build_ui(self):
@@ -44,13 +46,6 @@ class TasksList(Adw.Bin):
         self.delete_completed_btn_rev = Gtk.Revealer(
             child=delete_completed_btn, transition_type=2
         )
-        # Sync button
-        self.sync_btn = Gtk.Button(
-            valign="center",
-            icon_name="emblem-synchronizing-symbolic",
-            tooltip_text=_("Sync/Fetch Tasks"),  # type:ignore
-        )
-        self.sync_btn.connect("clicked", self.on_sync_btn_clicked)
         # Scroll up btn
         scroll_up_btn = Gtk.Button(
             valign="center",
@@ -59,11 +54,22 @@ class TasksList(Adw.Bin):
         )
         scroll_up_btn.connect("clicked", self.on_scroll_up_btn_clicked)
         self.scroll_up_btn_rev = Gtk.Revealer(child=scroll_up_btn, transition_type=3)
+        # Menu
+        menu: Gio.Menu = Gio.Menu.new()
+        menu.append(_("Edit"), "tasks_list.edit")  # type:ignore
+        menu.append(_("Sync/Fetch Tasks"), "tasks_list.sync")  # type:ignore
+        menu.append(_("Delete"), "tasks_list.delete")  # type:ignore
         # Header Bar
         hb = Adw.HeaderBar(title_widget=self.title)
         hb.pack_start(self.delete_completed_btn_rev)
-        hb.pack_end(self.sync_btn)
         hb.pack_end(self.scroll_up_btn_rev)
+        hb.pack_end(
+            Gtk.MenuButton(
+                menu_model=menu,
+                icon_name="view-more-symbolic",
+                tooltip_text=_("Menu"),  # type:ignore
+            )
+        )
 
         # Entry
         entry = Adw.EntryRow(
@@ -147,6 +153,46 @@ class TasksList(Adw.Bin):
             sidebar_position="start",
         )
         self.set_child(split_view)
+
+    def add_actions(self):
+        group = Gio.SimpleActionGroup()
+        self.insert_action_group(name="tasks_list", group=group)
+
+        def _create_action(name: str, callback: callable, shortcuts=None) -> None:
+            action: Gio.SimpleAction = Gio.SimpleAction.new(name, None)
+            action.connect("activate", callback)
+            if shortcuts:
+                group.set_accels_for_action(f"tasks_list.{name}", shortcuts)
+            group.add_action(action)
+
+        def _edit(*args):
+            def _confirm():
+                self.parent.rename_list(self)
+
+        def _delete(*args):
+            def _confirm(_, res):
+                if res == "cancel":
+                    Log.debug("Deleting list is cancelled")
+                    return
+                self.parent.delete_list(self)
+
+            dialog = Adw.MessageDialog(
+                transient_for=self.window,
+                hide_on_close=True,
+                heading=_("Are you sure?"),  # type:ignore
+                body=_("List will be permanently deleted"),  # type:ignore
+                default_response="delete",
+                close_response="cancel",
+            )
+            dialog.add_response("delete", _("Delete"))  # type:ignore
+            dialog.set_response_appearance("delete", Adw.ResponseAppearance.DESTRUCTIVE)
+            dialog.add_response("cancel", _("Cancel"))  # type:ignore
+            dialog.connect("response", _confirm)
+            dialog.present()
+
+        _create_action("edit", _edit)
+        _create_action("delete", _delete)
+        _create_action("sync", lambda *_: Sync.sync(True))
 
     def add_task(self, uid: str) -> None:
         new_task = Task(uid, self.list_uid, self.window, self, self, False)
@@ -342,9 +388,6 @@ class TasksList(Adw.Bin):
         """
 
         scroll(self.scrl, False)
-
-    def on_sync_btn_clicked(self, btn) -> None:
-        Sync.sync(True)
 
     def on_task_added(self, entry: Gtk.Entry) -> None:
         """

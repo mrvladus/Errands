@@ -334,8 +334,7 @@ class Task(Gtk.Revealer):
         ids.insert(ids.index(self.uid), ids.pop(ids.index(task.uid)))
         for id in ids:
             UserData.run_sql(f"INSERT INTO tmp SELECT * FROM tasks WHERE uid = '{id}'")
-        UserData.run_sql("DROP TABLE tasks")
-        UserData.run_sql("ALTER TABLE tmp RENAME TO tasks")
+        UserData.run_sql("DROP TABLE tasks", "ALTER TABLE tmp RENAME TO tasks")
         # If task has the same parent
         if task.parent == self.parent:
             # Move widget
@@ -388,8 +387,7 @@ class Task(Gtk.Revealer):
         UserData.run_sql("CREATE TABLE tmp AS SELECT * FROM tasks WHERE 0")
         for id in uids:
             UserData.run_sql(f"INSERT INTO tmp SELECT * FROM tasks WHERE uid = '{id}'")
-        UserData.run_sql("DROP TABLE tasks")
-        UserData.run_sql("ALTER TABLE tmp RENAME TO tasks")
+        UserData.run_sql("DROP TABLE tasks", "ALTER TABLE tmp RENAME TO tasks")
         # Remove old task
         task.purge()
         # Add new sub-task
