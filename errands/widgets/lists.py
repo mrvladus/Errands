@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 from errands.utils.data import UserData
+from errands.utils.functions import get_children
 from errands.utils.logging import Log
 from errands.widgets.tasks_list import TasksList
 from gi.repository import Adw, Gtk, Gio, GObject
@@ -55,7 +56,8 @@ class Lists(Adw.Bin):
             GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
         )
         # Lists
-        self.lists = Gtk.StackSidebar(stack=self.stack, vexpand=True)
+        self.lists = Gtk.ListBox(css_classes=["navigation-sidebar"])
+        self.lists.connect("row-selected", self.switch_list)
         # Toolbar view
         toolbar_view = Adw.ToolbarView(
             content=Gtk.ScrolledWindow(child=self.lists, propagate_natural_height=True)
@@ -69,18 +71,45 @@ class Lists(Adw.Bin):
         if text.strip(" \n\t") == "":
             return
         uid = UserData.add_list(text)
+        row = Gtk.ListBoxRow(
+            child=Gtk.Label(
+                label=text,
+                halign="start",
+                margin_start=6,
+                margin_end=6,
+                hexpand=True,
+            )
+        )
+        row.name = text
         self.stack.add_titled(
             child=TasksList(self.window, uid, self), name=text, title=text
         )
+        self.lists.append(row)
+        self.lists.select_row(row)
         entry.props.text = ""
 
     def load_lists(self):
         for list in UserData.get_lists():
+            row = Gtk.ListBoxRow(
+                child=Gtk.Label(
+                    label=list[1],
+                    halign="start",
+                    margin_start=6,
+                    margin_end=6,
+                    hexpand=True,
+                )
+            )
+            row.name = list[1]
+            self.lists.append(row)
             self.stack.add_titled(
                 child=TasksList(self.window, list[0], self),
                 name=list[1],
                 title=list[1],
             )
+            self.lists.select_row(row)
+
+    def switch_list(self, _, row):
+        self.stack.set_visible_child_name(row.name)
 
     def delete_list(self, widget: Gtk.Widget):
         Log.info(f"Delete list {widget.list_uid}")
@@ -88,14 +117,20 @@ class Lists(Adw.Bin):
             f"DELETE FROM lists WHERE uid = '{widget.list_uid}'",
             f"DELETE FROM tasks WHERE list_uid = '{widget.list_uid}'",
         )
-        Log.debug("Remove page")
         self.stack.remove(widget)
+        # Switch row
+        rows = get_children(self.lists)
+        row = self.lists.get_selected_row()
+        idx = rows.index(row)
+        self.lists.select_row(rows[idx - 1])
+        self.lists.remove(row)
 
     def rename_list(self, widget, name):
-        page: Gtk.StackPage = self.stack.get_page(widget)
-        page.set_title(name)
-        widget.title.set_title(
-            UserData.run_sql(
-                f"UPDATE lists SET name = '{name}' WHERE uid = '{widget.list_uid}'",
-            )
+        Log.info(f"Rename list {widget.list_uid}")
+        UserData.run_sql(
+            f"UPDATE lists SET name = '{name}' WHERE uid = '{widget.list_uid}'",
         )
+        page: Gtk.StackPage = self.stack.get_page(widget)
+        page.set_name(name)
+        page.set_title(name)
+        self.lists.get_selected_row().get_child().set_label(name)

@@ -36,7 +36,7 @@ class Window(Adw.ApplicationWindow):
         self.props.height_request = 200
         self.connect("notify::default-width", self.on_width_changed)
         # Stack
-        stack = Gtk.Stack()
+        stack = Adw.ViewStack()
         # Split view
         self.split_view = Adw.OverlaySplitView()
         self.split_view.set_sidebar(Lists(self, stack))

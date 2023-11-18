@@ -166,8 +166,34 @@ class TasksList(Adw.Bin):
             group.add_action(action)
 
         def _edit(*args):
-            def _confirm():
-                self.parent.rename_list(self)
+            def entry_changed(entry, _, dialog):
+                empty = entry.props.text.strip(" \n\t") == ""
+                dialog.set_response_enabled("accept", not empty)
+
+            def _confirm(_, res, entry):
+                if res == "cancel":
+                    Log.debug("Editing list name is cancelled")
+                    return
+                text = entry.props.text.rstrip().lstrip()
+                self.title.set_title(text)
+                self.parent.rename_list(self, text)
+
+            entry = Gtk.Entry(placeholder_text=_("New Name"))  # type:ignore
+            dialog = Adw.MessageDialog(
+                transient_for=self.window,
+                hide_on_close=True,
+                heading=_("Rename List"),  # type:ignore
+                default_response="accept",
+                close_response="cancel",
+                extra_child=entry,
+            )
+            dialog.add_response("cancel", _("Cancel"))  # type:ignore
+            dialog.add_response("accept", _("Accept"))  # type:ignore
+            dialog.set_response_enabled("accept", False)
+            dialog.set_response_appearance("accept", Adw.ResponseAppearance.SUGGESTED)
+            dialog.connect("response", _confirm, entry)
+            entry.connect("notify::text", entry_changed, dialog)
+            dialog.present()
 
         def _delete(*args):
             def _confirm(_, res):
@@ -184,9 +210,9 @@ class TasksList(Adw.Bin):
                 default_response="delete",
                 close_response="cancel",
             )
+            dialog.add_response("cancel", _("Cancel"))  # type:ignore
             dialog.add_response("delete", _("Delete"))  # type:ignore
             dialog.set_response_appearance("delete", Adw.ResponseAppearance.DESTRUCTIVE)
-            dialog.add_response("cancel", _("Cancel"))  # type:ignore
             dialog.connect("response", _confirm)
             dialog.present()
 
