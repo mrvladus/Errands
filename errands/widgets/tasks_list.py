@@ -56,7 +56,7 @@ class TasksList(Adw.Bin):
         self.scroll_up_btn_rev = Gtk.Revealer(child=scroll_up_btn, transition_type=3)
         # Menu
         menu: Gio.Menu = Gio.Menu.new()
-        menu.append(_("Edit"), "tasks_list.edit")  # type:ignore
+        menu.append(_("Rename"), "tasks_list.rename")  # type:ignore
         menu.append(_("Sync/Fetch Tasks"), "tasks_list.sync")  # type:ignore
         menu.append(_("Delete"), "tasks_list.delete")  # type:ignore
         # Header Bar
@@ -165,10 +165,10 @@ class TasksList(Adw.Bin):
                 group.set_accels_for_action(f"tasks_list.{name}", shortcuts)
             group.add_action(action)
 
-        def _edit(*args):
+        def _rename(*args):
             def entry_changed(entry, _, dialog):
                 empty = entry.props.text.strip(" \n\t") == ""
-                dialog.set_response_enabled("accept", not empty)
+                dialog.set_response_enabled("save", not empty)
 
             def _confirm(_, res, entry):
                 if res == "cancel":
@@ -183,14 +183,14 @@ class TasksList(Adw.Bin):
                 transient_for=self.window,
                 hide_on_close=True,
                 heading=_("Rename List"),  # type:ignore
-                default_response="accept",
+                default_response="save",
                 close_response="cancel",
                 extra_child=entry,
             )
             dialog.add_response("cancel", _("Cancel"))  # type:ignore
-            dialog.add_response("accept", _("Accept"))  # type:ignore
-            dialog.set_response_enabled("accept", False)
-            dialog.set_response_appearance("accept", Adw.ResponseAppearance.SUGGESTED)
+            dialog.add_response("save", _("Save"))  # type:ignore
+            dialog.set_response_enabled("save", False)
+            dialog.set_response_appearance("save", Adw.ResponseAppearance.SUGGESTED)
             dialog.connect("response", _confirm, entry)
             entry.connect("notify::text", entry_changed, dialog)
             dialog.present()
@@ -216,7 +216,7 @@ class TasksList(Adw.Bin):
             dialog.connect("response", _confirm)
             dialog.present()
 
-        _create_action("edit", _edit)
+        _create_action("rename", _rename)
         _create_action("delete", _delete)
         _create_action("sync", lambda *_: Sync.sync(True))
 
