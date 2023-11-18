@@ -23,10 +23,11 @@ class Lists(Adw.Bin):
             title_widget=Gtk.Label(label="Errands", css_classes=["heading"])
         )
         # Add list button
-        self.add_btn = Gtk.ToggleButton(
+        self.add_btn = Gtk.Button(
             icon_name="list-add-symbolic",
             tooltip_text=_("Add List"),  # type:ignore
         )
+        self.add_btn.connect("clicked", self.on_add_btn_clicked)
         hb.pack_start(self.add_btn)
         # Main menu
         menu: Gio.Menu = Gio.Menu.new()
@@ -40,21 +41,6 @@ class Lists(Adw.Bin):
             tooltip_text=_("Main Menu"),  # type:ignore
         )
         hb.pack_end(menu_btn)
-        # Entry
-        entry = Gtk.Entry(
-            placeholder_text=_("Add new List"),  # type:ignore
-            margin_start=6,
-            margin_end=6,
-            margin_top=5,
-        )
-        entry.connect("activate", self.on_list_added)
-        entry_rev = Gtk.Revealer(child=entry)
-        entry_rev.bind_property(
-            "reveal-child",
-            self.add_btn,
-            "active",
-            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
-        )
         # Lists
         self.lists = Gtk.ListBox(css_classes=["navigation-sidebar"])
         self.lists.connect("row-selected", self.switch_list)
@@ -63,30 +49,51 @@ class Lists(Adw.Bin):
             content=Gtk.ScrolledWindow(child=self.lists, propagate_natural_height=True)
         )
         toolbar_view.add_top_bar(hb)
-        toolbar_view.add_top_bar(entry_rev)
         self.set_child(toolbar_view)
 
-    def on_list_added(self, entry):
-        text: str = entry.props.text
-        if text.strip(" \n\t") == "":
-            return
-        uid = UserData.add_list(text)
-        row = Gtk.ListBoxRow(
-            child=Gtk.Label(
-                label=text,
-                halign="start",
-                margin_start=6,
-                margin_end=6,
-                hexpand=True,
+    def on_add_btn_clicked(self, btn):
+        def entry_changed(entry, _, dialog):
+            empty = entry.props.text.strip(" \n\t") == ""
+            dialog.set_response_enabled("add", not empty)
+
+        def _confirm(_, res, entry):
+            if res == "cancel":
+                Log.debug("Adding new list is cancelled")
+                return
+            text = entry.props.text.rstrip().lstrip()
+            uid = UserData.add_list(text)
+            row = Gtk.ListBoxRow(
+                child=Gtk.Label(
+                    label=text,
+                    halign="start",
+                    margin_start=6,
+                    margin_end=6,
+                    hexpand=True,
+                )
             )
+            row.name = text
+            self.stack.add_titled(
+                child=TasksList(self.window, uid, self), name=text, title=text
+            )
+            self.lists.append(row)
+            self.lists.select_row(row)
+
+        entry = Gtk.Entry(placeholder_text=_("New List Name"))  # type:ignore
+        dialog = Adw.MessageDialog(
+            transient_for=self.window,
+            hide_on_close=True,
+            heading=_("Add List"),  # type:ignore
+            default_response="add",
+            close_response="cancel",
+            extra_child=entry,
         )
-        row.name = text
-        self.stack.add_titled(
-            child=TasksList(self.window, uid, self), name=text, title=text
-        )
-        self.lists.append(row)
-        self.lists.select_row(row)
-        entry.props.text = ""
+        dialog.add_response("cancel", _("Cancel"))  # type:ignore
+        dialog.add_response("add", _("Add"))  # type:ignore
+        dialog.set_response_enabled("add", False)
+        dialog.set_response_appearance("add", Adw.ResponseAppearance.SUGGESTED)
+        dialog.connect("response", _confirm, entry)
+        entry.connect("notify::text", entry_changed, dialog)
+        dialog.present()
 
     def load_lists(self):
         for list in UserData.get_lists():
