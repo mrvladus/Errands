@@ -133,4 +133,6 @@ class Lists(Adw.Bin):
         page: Gtk.StackPage = self.stack.get_page(widget)
         page.set_name(name)
         page.set_title(name)
-        self.lists.get_selected_row().get_child().set_label(name)
+        row = self.lists.get_selected_row()
+        row.get_child().set_label(name)
+        row.name = name
