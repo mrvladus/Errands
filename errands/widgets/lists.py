@@ -17,8 +17,6 @@ class Lists(Adw.Bin):
         self.load_lists()
 
     def build_ui(self):
-        self.props.width_request = 260
-        self.props.height_request = 200
         hb = Adw.HeaderBar(
             title_widget=Gtk.Label(label="Errands", css_classes=["heading"])
         )
@@ -60,6 +58,7 @@ class Lists(Adw.Bin):
             if res == "cancel":
                 Log.debug("Adding new list is cancelled")
                 return
+
             text = entry.props.text.rstrip().lstrip()
             uid = UserData.add_list(text)
             row = Gtk.ListBoxRow(

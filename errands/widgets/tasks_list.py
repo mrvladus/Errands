@@ -117,9 +117,7 @@ class TasksList(Adw.Bin):
         )
         box.append(self.scrl)
         # Tasks list toolbar view
-        tasks_toolbar_view = Adw.ToolbarView(
-            content=box, width_request=360, height_request=200
-        )
+        tasks_toolbar_view = Adw.ToolbarView(content=box)
         tasks_toolbar_view.add_top_bar(hb)
 
         # Sidebar
@@ -139,20 +137,25 @@ class TasksList(Adw.Bin):
             "help-about-symbolic",
         )
         # Sidebar toolbar view
-        sidebar_toolbar_view = Adw.ToolbarView(
-            content=self.sidebar, width_request=360, height_request=200
-        )
+        sidebar_toolbar_view = Adw.ToolbarView(content=self.sidebar)
         sidebar_toolbar_view.add_bottom_bar(
             Adw.ViewSwitcherBar(stack=self.sidebar, reveal=True)
         )
-
         # Split view
         split_view = Adw.OverlaySplitView(
             content=tasks_toolbar_view,
             sidebar=sidebar_toolbar_view,
             sidebar_position="start",
+            min_sidebar_width=330,
+            max_sidebar_width=330,
         )
-        self.set_child(split_view)
+
+        brb = Adw.BreakpointBin(width_request=360, height_request=360, child=split_view)
+        bp = Adw.Breakpoint.new(Adw.breakpoint_condition_parse("max-width: 690px"))
+        bp.add_setter(split_view, "collapsed", True)
+        brb.add_breakpoint(bp)
+
+        self.set_child(brb)
 
     def add_actions(self):
         group = Gio.SimpleActionGroup()

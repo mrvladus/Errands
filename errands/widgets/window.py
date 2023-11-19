@@ -34,20 +34,22 @@ class Window(Adw.ApplicationWindow):
     def build_ui(self):
         self.props.width_request = 360
         self.props.height_request = 200
-        self.connect("notify::default-width", self.on_width_changed)
         # Stack
         stack = Adw.ViewStack()
         # Split view
-        self.split_view = Adw.OverlaySplitView()
+        self.split_view = Adw.OverlaySplitView(
+            max_sidebar_width=240, min_sidebar_width=240
+        )
         self.split_view.set_sidebar(Lists(self, stack))
         self.split_view.set_content(stack)
         # Toast overlay
         self.toast_overlay = Adw.ToastOverlay(child=self.split_view)
-        self.set_content(self.toast_overlay)
 
-    def on_width_changed(self, *_):
-        width = self.props.default_width
-        self.split_view.set_collapsed(width < 720)
+        bp = Adw.Breakpoint.new(Adw.breakpoint_condition_parse("max-width: 930px"))
+        bp.add_setter(self.split_view, "collapsed", True)
+        self.add_breakpoint(bp)
+
+        self.set_content(self.toast_overlay)
 
     def add_toast(self, text: str) -> None:
         self.toast_overlay.add_toast(Adw.Toast.new(title=text))
