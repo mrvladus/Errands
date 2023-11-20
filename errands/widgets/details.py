@@ -23,7 +23,19 @@ class Details(Adw.Bin):
 
     def build_ui(self):
         # Header Bar
-        hb = Adw.HeaderBar(show_title=False)
+        hb = Adw.HeaderBar(show_title=False, show_back_button=False)
+        # Back button
+        back_btn = Gtk.Button(icon_name="go-previous-symbolic", visible=False)
+        back_btn.bind_property(
+            "visible",
+            self.task_panel.split_view,
+            "collapsed",
+            GObject.BindingFlags.BIDIRECTIONAL,
+        )
+        back_btn.connect(
+            "clicked", lambda *_: self.task_panel.split_view.set_show_sidebar(False)
+        )
+        hb.pack_start(back_btn)
         # Delete button
         delete_btn = Gtk.Button(
             icon_name="user-trash-symbolic",

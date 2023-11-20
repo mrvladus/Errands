@@ -195,22 +195,7 @@ class TasksList(Adw.Bin):
             self.tasks_brb.add_breakpoint(bp)
 
         def build_sidebar():
-            # Sidebar
-            self.trash_panel = Trash(self.window, self)
-            self.details_panel = Details(self.window, self)
             self.sidebar = Adw.ViewStack()
-            self.sidebar.add_titled_with_icon(
-                self.trash_panel,
-                "trash",
-                _("Trash"),  # type:ignore
-                "user-trash-symbolic",
-            )
-            self.sidebar.add_titled_with_icon(
-                self.details_panel,
-                "details",
-                _("Details"),  # type:ignore
-                "help-about-symbolic",
-            )
             # Sidebar toolbar view
             sidebar_toolbar_view = Adw.ToolbarView(content=self.sidebar)
             sidebar_toolbar_view.add_bottom_bar(
@@ -231,6 +216,21 @@ class TasksList(Adw.Bin):
                 GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
             )
             GSettings.bind("sidebar-open", self.split_view, "show-sidebar")
+            # Sidebar
+            self.trash_panel = Trash(self.window, self)
+            self.details_panel = Details(self.window, self)
+            self.sidebar.add_titled_with_icon(
+                self.trash_panel,
+                "trash",
+                _("Trash"),  # type:ignore
+                "user-trash-symbolic",
+            )
+            self.sidebar.add_titled_with_icon(
+                self.details_panel,
+                "details",
+                _("Details"),  # type:ignore
+                "help-about-symbolic",
+            )
 
         build_headerbar()
         build_bottombar()

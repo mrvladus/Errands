@@ -20,6 +20,18 @@ class Trash(Adw.Bin):
     def build_ui(self):
         # Headerbar
         hb = Adw.HeaderBar(show_title=False, show_back_button=False)
+        # Back button
+        back_btn = Gtk.Button(icon_name="go-previous-symbolic", visible=False)
+        back_btn.bind_property(
+            "visible",
+            self.tasks_panel.split_view,
+            "collapsed",
+            GObject.BindingFlags.BIDIRECTIONAL,
+        )
+        back_btn.connect(
+            "clicked", lambda *_: self.tasks_panel.split_view.set_show_sidebar(False)
+        )
+        hb.pack_start(back_btn)
         # Clear button
         clear_btn = Gtk.Button(
             icon_name="user-trash-full-symbolic",
