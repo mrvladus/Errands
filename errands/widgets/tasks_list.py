@@ -6,9 +6,9 @@ from errands.utils.gsettings import GSettings
 from errands.utils.data import UserData
 from errands.utils.functions import get_children
 from errands.widgets.details import Details
-from errands.widgets.trash import Trash
-from gi.repository import Adw, Gtk, GLib, Gio
 from errands.widgets.task import Task
+from errands.widgets.trash import Trash
+from gi.repository import Adw, Gtk, GLib, Gio, GObject
 from errands.utils.markup import Markup
 from errands.utils.sync import Sync
 from errands.utils.logging import Log
@@ -29,130 +29,219 @@ class TasksList(Adw.Bin):
         self.load_tasks()
 
     def build_ui(self):
-        # Title
-        self.title = Adw.WindowTitle(
-            title=UserData.run_sql(
-                f"SELECT name FROM lists WHERE uid = '{self.list_uid}'",
-                fetch=True,
-            )[0][0]
-        )
-        # Delete completed button
-        delete_completed_btn = Gtk.Button(
-            valign="center",
-            icon_name="edit-clear-all-symbolic",
-            tooltip_text=_("Delete Completed Tasks"),  # type:ignore
-        )
-        delete_completed_btn.connect("clicked", self.on_delete_completed_btn_clicked)
-        self.delete_completed_btn_rev = Gtk.Revealer(
-            child=delete_completed_btn, transition_type=2
-        )
-        # Scroll up btn
-        scroll_up_btn = Gtk.Button(
-            valign="center",
-            icon_name="go-up-symbolic",
-            tooltip_text=_("Scroll Up"),  # type:ignore
-        )
-        scroll_up_btn.connect("clicked", self.on_scroll_up_btn_clicked)
-        self.scroll_up_btn_rev = Gtk.Revealer(child=scroll_up_btn, transition_type=3)
-        # Menu
-        menu: Gio.Menu = Gio.Menu.new()
-        menu.append(_("Rename"), "tasks_list.rename")  # type:ignore
-        menu.append(_("Sync/Fetch Tasks"), "tasks_list.sync")  # type:ignore
-        menu.append(_("Delete"), "tasks_list.delete")  # type:ignore
-        # Header Bar
-        hb = Adw.HeaderBar(title_widget=self.title)
-        hb.pack_start(self.delete_completed_btn_rev)
-        hb.pack_end(self.scroll_up_btn_rev)
-        hb.pack_end(
-            Gtk.MenuButton(
-                menu_model=menu,
-                icon_name="view-more-symbolic",
-                tooltip_text=_("Menu"),  # type:ignore
+        def build_headerbar():
+            # Title
+            self.title = Adw.WindowTitle(
+                title=UserData.run_sql(
+                    f"SELECT name FROM lists WHERE uid = '{self.list_uid}'",
+                    fetch=True,
+                )[0][0]
             )
-        )
-
-        # Entry
-        entry = Adw.EntryRow(
-            activatable=False,
-            height_request=60,
-            title=_("Add new Task"),  # type:ignore
-        )
-        entry.connect("entry-activated", self.on_task_added)
-        entry_box = Gtk.ListBox(
-            selection_mode=0,
-            css_classes=["boxed-list"],
-            margin_start=12,
-            margin_end=12,
-            margin_top=12,
-            margin_bottom=12,
-        )
-        entry_box.append(entry)
-
-        # Srolled window
-        adj = Gtk.Adjustment()
-        adj.connect("value-changed", self.on_scroll)
-        self.scrl = Gtk.ScrolledWindow(
-            propagate_natural_height=True, propagate_natural_width=True, vadjustment=adj
-        )
-        self.dnd_ctrl = Gtk.DropControllerMotion()
-        self.dnd_ctrl.connect("motion", self.on_dnd_scroll)
-        self.scrl.add_controller(self.dnd_ctrl)
-
-        # Tasks list
-        self.tasks_list = Gtk.Box(
-            orientation="vertical", hexpand=True, margin_bottom=18
-        )
-        self.tasks_list.add_css_class("tasks-list")
-        self.scrl.set_child(
-            Adw.Clamp(maximum_size=850, tightening_threshold=300, child=self.tasks_list)
-        )
-        # Tasks list box
-        box = Gtk.Box(orientation="vertical")
-        box.append(
-            Adw.Clamp(
-                maximum_size=850,
-                tightening_threshold=300,
-                child=entry_box,
+            # Toggle sidebar button
+            self.toggle_sidebar_btn = Gtk.ToggleButton(
+                icon_name="sidebar-show-symbolic",
+                tooltip_text=_("Toggle Sidebar"),  # type:ignore
             )
-        )
-        box.append(self.scrl)
-        # Tasks list toolbar view
-        tasks_toolbar_view = Adw.ToolbarView(content=box)
-        tasks_toolbar_view.add_top_bar(hb)
+            # Delete completed button
+            self.delete_completed_btn = Gtk.Button(
+                valign="center",
+                icon_name="edit-clear-all-symbolic",
+                tooltip_text=_("Delete Completed Tasks"),  # type:ignore
+                sensitive=False,
+            )
+            self.delete_completed_btn.connect(
+                "clicked", self.on_delete_completed_btn_clicked
+            )
+            # Scroll up btn
+            self.scroll_up_btn = Gtk.Button(
+                valign="center",
+                icon_name="go-up-symbolic",
+                tooltip_text=_("Scroll Up"),  # type:ignore
+                sensitive=False,
+            )
+            self.scroll_up_btn.connect("clicked", self.on_scroll_up_btn_clicked)
+            # Menu
+            menu: Gio.Menu = Gio.Menu.new()
+            menu.append(_("Rename"), "tasks_list.rename")  # type:ignore
+            menu.append(_("Sync/Fetch Tasks"), "tasks_list.sync")  # type:ignore
+            menu.append(_("Delete"), "tasks_list.delete")  # type:ignore
+            # Header Bar
+            self.hb = Adw.HeaderBar(title_widget=self.title)
+            self.hb.pack_start(self.toggle_sidebar_btn)
+            self.hb.pack_start(self.delete_completed_btn)
+            self.hb.pack_end(
+                Gtk.MenuButton(
+                    menu_model=menu,
+                    icon_name="view-more-symbolic",
+                    tooltip_text=_("Menu"),  # type:ignore
+                )
+            )
+            self.hb.pack_end(self.scroll_up_btn)
 
-        # Sidebar
-        self.trash_panel = Trash(self.window, self)
-        self.details_panel = Details(self.window, self)
-        self.sidebar = Adw.ViewStack()
-        self.sidebar.add_titled_with_icon(
-            self.trash_panel,
-            "trash",
-            _("Trash"),  # type:ignore
-            "user-trash-symbolic",
-        )
-        self.sidebar.add_titled_with_icon(
-            self.details_panel,
-            "details",
-            _("Details"),  # type:ignore
-            "help-about-symbolic",
-        )
-        # Sidebar toolbar view
-        sidebar_toolbar_view = Adw.ToolbarView(content=self.sidebar)
-        sidebar_toolbar_view.add_bottom_bar(
-            Adw.ViewSwitcherBar(stack=self.sidebar, reveal=True)
-        )
-        # Split view
-        split_view = Adw.OverlaySplitView(
-            content=tasks_toolbar_view,
-            sidebar=sidebar_toolbar_view,
-            sidebar_position="start",
-            min_sidebar_width=330,
-            max_sidebar_width=330,
-        )
+        def build_bottombar():
+            toggle_sidebar_btn = Gtk.ToggleButton(
+                icon_name="sidebar-show-symbolic",
+                tooltip_text=_("Toggle Sidebar"),  # type:ignore
+            )
+            toggle_sidebar_btn.bind_property(
+                "active",
+                self.toggle_sidebar_btn,
+                "active",
+                GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
+            )
 
-        brb = Adw.BreakpointBin(width_request=360, height_request=360, child=split_view)
-        bp = Adw.Breakpoint.new(Adw.breakpoint_condition_parse("max-width: 690px"))
-        bp.add_setter(split_view, "collapsed", True)
+            delete_completed_btn = Gtk.Button(
+                valign="center",
+                icon_name="edit-clear-all-symbolic",
+                tooltip_text=_("Delete Completed Tasks"),  # type:ignore
+                sensitive=False,
+            )
+            delete_completed_btn.bind_property(
+                "sensitive",
+                self.delete_completed_btn,
+                "sensitive",
+                GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
+            )
+            delete_completed_btn.connect(
+                "clicked", self.on_delete_completed_btn_clicked
+            )
+
+            scroll_up_btn = Gtk.Button(
+                valign="center",
+                icon_name="go-up-symbolic",
+                tooltip_text=_("Scroll Up"),  # type:ignore
+                sensitive=False,
+            )
+            scroll_up_btn.bind_property(
+                "sensitive",
+                self.scroll_up_btn,
+                "sensitive",
+                GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
+            )
+            scroll_up_btn.connect("clicked", self.on_scroll_up_btn_clicked)
+
+            self.bottom_bar = Gtk.Box(css_classes=["toolbar"])
+            self.bottom_bar.append(toggle_sidebar_btn)
+            self.bottom_bar.append(delete_completed_btn)
+            self.bottom_bar.append(Gtk.Separator(hexpand=True, css_classes=["spacer"]))
+            self.bottom_bar.append(scroll_up_btn)
+
+        def build_tasks_list():
+            # Entry
+            entry = Adw.EntryRow(
+                activatable=False,
+                height_request=60,
+                title=_("Add new Task"),  # type:ignore
+            )
+            entry.connect("entry-activated", self.on_task_added)
+            entry_box = Gtk.ListBox(
+                selection_mode=0,
+                css_classes=["boxed-list"],
+                margin_start=12,
+                margin_end=12,
+                margin_top=12,
+                margin_bottom=12,
+            )
+            entry_box.append(entry)
+
+            # Srolled window
+            adj = Gtk.Adjustment()
+            adj.connect("value-changed", self.on_scroll)
+            self.scrl = Gtk.ScrolledWindow(
+                propagate_natural_height=True,
+                propagate_natural_width=True,
+                vadjustment=adj,
+            )
+            self.dnd_ctrl = Gtk.DropControllerMotion()
+            self.dnd_ctrl.connect("motion", self.on_dnd_scroll)
+            self.scrl.add_controller(self.dnd_ctrl)
+
+            # Tasks list
+            self.tasks_list = Gtk.Box(
+                orientation="vertical", hexpand=True, margin_bottom=18
+            )
+            self.tasks_list.add_css_class("tasks-list")
+            self.scrl.set_child(
+                Adw.Clamp(
+                    maximum_size=850, tightening_threshold=300, child=self.tasks_list
+                )
+            )
+            # Tasks list box
+            box = Gtk.Box(orientation="vertical", vexpand=True)
+            box.append(
+                Adw.Clamp(
+                    maximum_size=850,
+                    tightening_threshold=300,
+                    child=entry_box,
+                )
+            )
+            box.append(self.scrl)
+            # Tasks list toolbar view
+            tasks_toolbar_view = Adw.ToolbarView(
+                content=box,
+                reveal_bottom_bars=False,
+            )
+            tasks_toolbar_view.add_top_bar(self.hb)
+            tasks_toolbar_view.add_bottom_bar(self.bottom_bar)
+            # Breakpoint
+            self.tasks_brb = Adw.BreakpointBin(
+                width_request=360, height_request=360, child=tasks_toolbar_view
+            )
+            bp = Adw.Breakpoint.new(Adw.breakpoint_condition_parse("max-width: 400px"))
+            bp.add_setter(self.toggle_sidebar_btn, "visible", False)
+            bp.add_setter(self.delete_completed_btn, "visible", False)
+            bp.add_setter(self.scroll_up_btn, "visible", False)
+            bp.add_setter(tasks_toolbar_view, "reveal-bottom-bars", True)
+            self.tasks_brb.add_breakpoint(bp)
+
+        def build_sidebar():
+            # Sidebar
+            self.trash_panel = Trash(self.window, self)
+            self.details_panel = Details(self.window, self)
+            self.sidebar = Adw.ViewStack()
+            self.sidebar.add_titled_with_icon(
+                self.trash_panel,
+                "trash",
+                _("Trash"),  # type:ignore
+                "user-trash-symbolic",
+            )
+            self.sidebar.add_titled_with_icon(
+                self.details_panel,
+                "details",
+                _("Details"),  # type:ignore
+                "help-about-symbolic",
+            )
+            # Sidebar toolbar view
+            sidebar_toolbar_view = Adw.ToolbarView(content=self.sidebar)
+            sidebar_toolbar_view.add_bottom_bar(
+                Adw.ViewSwitcherBar(stack=self.sidebar, reveal=True)
+            )
+            # Split view
+            self.split_view = Adw.OverlaySplitView(
+                content=self.tasks_brb,
+                sidebar=sidebar_toolbar_view,
+                sidebar_position="start",
+                min_sidebar_width=300,
+                max_sidebar_width=360,
+            )
+            self.split_view.bind_property(
+                "show-sidebar",
+                self.toggle_sidebar_btn,
+                "active",
+                GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
+            )
+            GSettings.bind("sidebar-open", self.split_view, "show-sidebar")
+
+        build_headerbar()
+        build_bottombar()
+        build_tasks_list()
+        build_sidebar()
+
+        brb = Adw.BreakpointBin(
+            width_request=360, height_request=360, child=self.split_view
+        )
+        bp = Adw.Breakpoint.new(Adw.breakpoint_condition_parse("max-width: 660px"))
+        bp.add_setter(self.split_view, "collapsed", True)
         brb.add_breakpoint(bp)
 
         self.set_child(brb)
@@ -299,7 +388,7 @@ class TasksList(Adw.Bin):
             if n_total > 0
             else ""
         )
-        self.delete_completed_btn_rev.set_reveal_child(n_all_completed > 0)
+        self.delete_completed_btn.set_sensitive(n_all_completed > 0)
         self.trash_panel.scrl.set_visible(n_all_deleted > 0)
 
     def update_ui(self) -> None:
@@ -409,7 +498,7 @@ class TasksList(Adw.Bin):
         Show scroll up button
         """
 
-        self.scroll_up_btn_rev.set_reveal_child(adj.get_value() > 0)
+        self.scroll_up_btn.set_sensitive(adj.get_value() > 0)
 
     def on_scroll_up_btn_clicked(self, _) -> None:
         """

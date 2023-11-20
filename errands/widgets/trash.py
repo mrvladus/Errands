@@ -19,7 +19,7 @@ class Trash(Adw.Bin):
 
     def build_ui(self):
         # Headerbar
-        hb = Adw.HeaderBar(show_title=False)
+        hb = Adw.HeaderBar(show_title=False, show_back_button=False)
         # Clear button
         clear_btn = Gtk.Button(
             icon_name="user-trash-full-symbolic",

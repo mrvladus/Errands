@@ -37,16 +37,17 @@ class Window(Adw.ApplicationWindow):
         # Stack
         stack = Adw.ViewStack()
         # Split view
-        self.split_view = Adw.OverlaySplitView(
-            max_sidebar_width=240, min_sidebar_width=240
+        self.split_view = Adw.NavigationSplitView(
+            max_sidebar_width=240, min_sidebar_width=240, show_content=True
         )
-        self.split_view.set_sidebar(Lists(self, stack))
-        self.split_view.set_content(stack)
+        self.split_view.set_sidebar(Adw.NavigationPage.new(Lists(self, stack), "Lists"))
+        self.split_view.set_content(Adw.NavigationPage.new(stack, "Tasks"))
         # Toast overlay
         self.toast_overlay = Adw.ToastOverlay(child=self.split_view)
 
-        bp = Adw.Breakpoint.new(Adw.breakpoint_condition_parse("max-width: 930px"))
+        bp = Adw.Breakpoint.new(Adw.breakpoint_condition_parse("max-width: 1000px"))
         bp.add_setter(self.split_view, "collapsed", True)
+        bp.add_setter(self.split_view, "show-content", True)
         self.add_breakpoint(bp)
 
         self.set_content(self.toast_overlay)

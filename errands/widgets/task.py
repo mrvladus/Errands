@@ -280,6 +280,7 @@ class Task(Gtk.Revealer):
     def on_details_btn_clicked(self, _btn):
         self.tasks_panel.sidebar.set_visible_child_name("details")
         self.tasks_panel.details_panel.update_info(self)
+        self.tasks_panel.split_view.set_show_sidebar(True)
 
     def on_sub_task_added(self, entry: Gtk.Entry) -> None:
         """

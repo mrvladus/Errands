@@ -116,6 +116,7 @@ class Lists(Adw.Bin):
 
     def switch_list(self, _, row):
         self.stack.set_visible_child_name(row.name)
+        self.window.split_view.set_show_content(True)
 
     def delete_list(self, widget: Gtk.Widget):
         Log.info(f"Delete list {widget.list_uid}")
