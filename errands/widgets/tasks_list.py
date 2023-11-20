@@ -59,7 +59,7 @@ class TasksList(Adw.Bin):
             tooltip_text=_("Scroll Up"),  # type:ignore
             sensitive=False,
         )
-        self.scroll_up_btn.connect("clicked", self.on_scroll_up_btn_clicked)
+        self.scroll_up_btn.connect("clicked", lambda *_: scroll(self.scrl, False))
         # Menu
         menu: Gio.Menu = Gio.Menu.new()
         menu.append(_("Rename"), "tasks_list.rename")  # type:ignore
@@ -117,7 +117,7 @@ class TasksList(Adw.Bin):
             "sensitive",
             GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
         )
-        scroll_up_btn.connect("clicked", self.on_scroll_up_btn_clicked)
+        scroll_up_btn.connect("clicked", lambda *_: scroll(self.scrl, False))
 
         self.bottom_bar = Gtk.Box(css_classes=["toolbar"])
         self.bottom_bar.append(toggle_sidebar_btn)
@@ -146,7 +146,10 @@ class TasksList(Adw.Bin):
 
         # Srolled window
         adj = Gtk.Adjustment()
-        adj.connect("value-changed", self.on_scroll)
+        adj.connect(
+            "value-changed",
+            lambda *_: self.scroll_up_btn.set_sensitive(adj.get_value() > 0),
+        )
         self.scrl = Gtk.ScrolledWindow(
             propagate_natural_height=True,
             propagate_natural_width=True,
@@ -471,56 +474,24 @@ class TasksList(Adw.Bin):
             if not self.scrolling or not self.dnd_ctrl.contains_pointer():
                 return False
             adj = self.scrl.get_vadjustment()
-            if scroll_up:
-                adj.set_value(adj.get_value() - 2)
-                return True
-            else:
-                adj.set_value(adj.get_value() + 2)
-                return True
+            adj.set_value(adj.get_value() + (2 if scroll_up else -2))
+            return True
 
         MARGIN: int = 50
-        height: int = self.scrl.get_allocation().height
         if y < MARGIN:
             self.scrolling = True
             GLib.timeout_add(100, _auto_scroll, True)
-        elif y > height - MARGIN:
+        elif y > self.scrl.get_allocation().height - MARGIN:
             self.scrolling = True
             GLib.timeout_add(100, _auto_scroll, False)
         else:
             self.scrolling = False
 
-    def on_scroll(self, adj) -> None:
-        """
-        Show scroll up button
-        """
-
-        self.scroll_up_btn.set_sensitive(adj.get_value() > 0)
-
-    def on_scroll_up_btn_clicked(self, _) -> None:
-        """
-        Scroll up
-        """
-
-        scroll(self.scrl, False)
-
     def on_task_added(self, entry: Gtk.Entry) -> None:
-        """
-        Add new task
-        """
-
         text: str = entry.props.text
-        # Check for empty string or task exists
         if text.strip(" \n\t") == "":
             return
-        # Add new task
-        uid = UserData.add_task(self.list_uid, text)
-        self.add_task(uid)
-        # Clear entry
+        self.add_task(UserData.add_task(self.list_uid, text))
         entry.props.text = ""
-        # Scroll to the end
         scroll(self.scrl, True)
-        # Sync
         Sync.sync()
-
-    def on_scroll_up_btn_clicked(self, _) -> None:
-        scroll(self.scrl, False)
