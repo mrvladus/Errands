@@ -129,7 +129,7 @@ class Details(Adw.Bin):
         props_group = Adw.PreferencesGroup(title=_("Properties"))  # type:ignore
 
         # Start date row
-        self.start_date = Adw.ActionRow(title=_("Start"))  # type:ignore
+        self.start_date = Adw.ActionRow(subtitle=_("Start"))  # type:ignore
         # Start hour
         self.start_hour = Gtk.SpinButton(
             adjustment=Gtk.Adjustment(lower=0, upper=23, step_increment=1)
@@ -162,7 +162,7 @@ class Details(Adw.Bin):
         props_group.add(self.start_date)
 
         # End date row
-        self.end_date = Adw.ActionRow(title=_("End"))  # type:ignore
+        self.end_date = Adw.ActionRow(subtitle=_("End"))  # type:ignore
         # End hour
         self.end_hour = Gtk.SpinButton(
             adjustment=Gtk.Adjustment(lower=0, upper=23, step_increment=1)
