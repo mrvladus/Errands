@@ -19,6 +19,9 @@
     <key name="expand-on-startup" type="b">
       <default>true</default>
     </key>
+    <key name="last-open-list" type="s">
+      <default>""</default>
+    </key>
     <key name="sync-provider" type="i">
       <default>0</default>
     </key>

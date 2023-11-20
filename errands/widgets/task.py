@@ -13,7 +13,6 @@ from errands.utils.functions import get_children
 
 
 class Task(Gtk.Revealer):
-    # - State - #
     just_added: bool = True
     can_sync: bool = True
 
@@ -94,7 +93,10 @@ class Task(Gtk.Revealer):
         task_row_drop_target.connect("drop", self.on_drop)
         self.task_row.add_controller(task_row_drop_target)
         task_row_click_ctrl = Gtk.GestureClick.new()
-        task_row_click_ctrl.connect("released", self.on_expand)
+        task_row_click_ctrl.connect(
+            "released",
+            lambda *_: self.expand(not self.sub_tasks_revealer.get_child_revealed()),
+        )
         self.task_row.add_controller(task_row_click_ctrl)
         # Mark as completed button
         self.completed_btn = Gtk.CheckButton(
@@ -270,13 +272,6 @@ class Task(Gtk.Revealer):
             for task in children:
                 task.can_sync = True
 
-    def on_expand(self, *_) -> None:
-        """
-        Expand task row
-        """
-
-        self.expand(not self.sub_tasks_revealer.get_child_revealed())
-
     def on_details_btn_clicked(self, _btn):
         self.tasks_panel.sidebar.set_visible_child_name("details")
         self.tasks_panel.details_panel.update_info(self)
@@ -290,10 +285,8 @@ class Task(Gtk.Revealer):
         # Return if entry is empty
         if text.strip(" \n\t") == "":
             return
-        # Add new sub-task
-        new_sub_task = UserData.add_task(self.list_uid, text, parent=self.uid)
         # Add sub-task
-        self.add_task(new_sub_task)
+        self.add_task(UserData.add_task(self.list_uid, text, parent=self.uid))
         # Clear entry
         entry.get_buffer().props.text = ""
         # Update status

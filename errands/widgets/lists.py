@@ -3,6 +3,7 @@
 
 from errands.utils.data import UserData
 from errands.utils.functions import get_children
+from errands.utils.gsettings import GSettings
 from errands.utils.logging import Log
 from errands.widgets.tasks_list import TasksList
 from gi.repository import Adw, Gtk, Gio, GObject
@@ -95,6 +96,7 @@ class Lists(Adw.Bin):
         dialog.present()
 
     def load_lists(self):
+        rows = []
         for list in UserData.get_lists():
             row = Gtk.ListBoxRow(
                 child=Gtk.Label(
@@ -112,11 +114,14 @@ class Lists(Adw.Bin):
                 name=list[1],
                 title=list[1],
             )
-            self.lists.select_row(row)
+            rows.append(row)
+            if GSettings.get("last-open-list") == row.name:
+                self.lists.select_row(row)
 
     def switch_list(self, _, row):
         self.stack.set_visible_child_name(row.name)
         self.window.split_view.set_show_content(True)
+        GSettings.set("last-open-list", "s", row.name)
 
     def delete_list(self, widget: Gtk.Widget):
         Log.info(f"Delete list {widget.list_uid}")
