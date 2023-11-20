@@ -96,7 +96,6 @@ class Lists(Adw.Bin):
         dialog.present()
 
     def load_lists(self):
-        rows = []
         for list in UserData.get_lists():
             row = Gtk.ListBoxRow(
                 child=Gtk.Label(
@@ -114,7 +113,6 @@ class Lists(Adw.Bin):
                 name=list[1],
                 title=list[1],
             )
-            rows.append(row)
             if GSettings.get("last-open-list") == row.name:
                 self.lists.select_row(row)
 
