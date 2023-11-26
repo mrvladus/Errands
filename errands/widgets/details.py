@@ -2,12 +2,14 @@
 # SPDX-License-Identifier: MIT
 
 import os
+import tempfile
+from errands.utils.data import UserData
+
 from errands.utils.functions import get_children
 from gi.repository import Adw, Gtk, Gio, GLib, Gdk, GObject
 from errands.utils.markup import Markup
 from errands.utils.sync import Sync
 from errands.utils.logging import Log
-from errands.utils.tasks import task_to_ics
 
 
 class Details(Adw.Bin):
@@ -98,7 +100,7 @@ class Details(Adw.Bin):
         edit_group.set_header_suffix(copy_btn)
         # Edit entry
         self.edit_entry = Gtk.TextBuffer()
-        self.edit_entry.connect("changed", self.on_text_changed)
+        self.edit_entry.connect("changed", lambda *_: self.save_btn.set_sensitive(True))
         edit_view = Gtk.TextView(
             height_request=55,
             top_margin=12,
@@ -113,7 +115,7 @@ class Details(Adw.Bin):
         notes_group = Adw.PreferencesGroup(title=_("Notes"))  # type:ignore
         # Notes entry
         self.notes = Gtk.TextBuffer()
-        self.notes.connect("changed", self.on_notes_text_changed)
+        self.notes.connect("changed", lambda *_: self.save_btn.set_sensitive(True))
         notes_view = Gtk.TextView(
             height_request=55,
             top_margin=12,
@@ -196,7 +198,9 @@ class Details(Adw.Bin):
 
         # Complete % row
         percent_complete_adj = Gtk.Adjustment(lower=0, upper=100, step_increment=1)
-        percent_complete_adj.connect("value-changed", self.on_percent_complete_changed)
+        percent_complete_adj.connect(
+            "value-changed", lambda *_: self.save_btn.set_sensitive(True)
+        )
         self.percent_complete = Adw.SpinRow(
             title=_("Complete %"),  # type:ignore
             adjustment=percent_complete_adj,
@@ -205,7 +209,9 @@ class Details(Adw.Bin):
 
         # Priority row
         priority_adj = Gtk.Adjustment(lower=0, upper=9, step_increment=1)
-        priority_adj.connect("value-changed", self.on_priority_changed)
+        priority_adj.connect(
+            "value-changed", lambda *_: self.save_btn.set_sensitive(True)
+        )
         self.priority = Adw.SpinRow(
             title=_("Priority"),  # type:ignore
             adjustment=priority_adj,
@@ -246,6 +252,7 @@ class Details(Adw.Bin):
             | GObject.BindingFlags.INVERT_BOOLEAN
             | GObject.BindingFlags.BIDIRECTIONAL,
         )
+        p_box.append(colors_box)
         p_box.append(edit_group)
         p_box.append(notes_group)
         p_box.append(props_group)
@@ -316,12 +323,6 @@ class Details(Adw.Bin):
         # Add new
         for tag in self.parent.get_prop("tags").split(","):
             self.add_tag(tag)
-
-    def on_notes_text_changed(self, buffer: Gtk.TextBuffer):
-        self.save_btn.set_sensitive(True)
-
-    def on_text_changed(self, entry: Adw.EntryRow):
-        self.save_btn.set_sensitive(True)
 
     def on_save_btn_clicked(self, btn):
         Log.debug("Save details")
@@ -417,21 +418,13 @@ class Details(Adw.Bin):
         self.task_panel.sidebar.set_visible_child_name("trash")
 
     def on_open_as_ics_clicked(self, _btn):
-        # TODO
-        cache_dir: str = os.path.join(GLib.get_user_cache_dir(), "tmp")
-        if not os.path.exists(cache_dir):
-            os.mkdir(cache_dir)
-        file_path = os.path.join(cache_dir, f"{self.parent.uid}.ics")
-        with open(file_path, "w") as f:
-            f.write(task_to_ics(self.parent.uid))
-        file: Gio.File = Gio.File.new_for_path(file_path)
+        path = os.path.join(
+            GLib.get_user_data_dir(), "errands", self.parent.uid + ".ics"
+        )
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(UserData.to_ics(self.parent.uid))
+        file: Gio.File = Gio.File.new_for_path(path)
         Gtk.FileLauncher.new(file).launch()
-
-    def on_percent_complete_changed(self, adj):
-        self.save_btn.set_sensitive(True)
-
-    def on_priority_changed(self, adj):
-        self.save_btn.set_sensitive(True)
 
     def on_style_selected(self, btn: Gtk.Button, color: str) -> None:
         """

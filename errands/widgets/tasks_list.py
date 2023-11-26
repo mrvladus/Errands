@@ -210,7 +210,7 @@ class TasksList(Adw.Bin):
             content=tasks_brb,
             sidebar=sidebar_toolbar_view,
             sidebar_position="start",
-            min_sidebar_width=300,
+            min_sidebar_width=360,
             max_sidebar_width=360,
         )
         self.split_view.bind_property(
@@ -239,7 +239,7 @@ class TasksList(Adw.Bin):
         brb = Adw.BreakpointBin(
             width_request=360, height_request=360, child=self.split_view
         )
-        bp = Adw.Breakpoint.new(Adw.breakpoint_condition_parse("max-width: 660px"))
+        bp = Adw.Breakpoint.new(Adw.breakpoint_condition_parse("max-width: 720px"))
         bp.add_setter(self.split_view, "collapsed", True)
         brb.add_breakpoint(bp)
 

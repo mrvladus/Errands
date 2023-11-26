@@ -130,9 +130,9 @@ class Trash(Adw.Bin):
             default_response="delete",
             close_response="cancel",
         )
+        dialog.add_response("cancel", _("Cancel"))  # type:ignore
         dialog.add_response("delete", _("Delete"))  # type:ignore
         dialog.set_response_appearance("delete", Adw.ResponseAppearance.DESTRUCTIVE)
-        dialog.add_response("cancel", _("Cancel"))  # type:ignore
         dialog.connect("response", self.on_trash_clear_confirm)
         dialog.show()
 
@@ -154,7 +154,11 @@ class Trash(Adw.Bin):
         ]
         for task in to_remove:
             task.purge()
-        UserData.remove_deleted(self.tasks_panel.list_uid)
+        UserData.run_sql(
+            f"""DELETE FROM tasks 
+            WHERE deleted = 1
+            AND list_uid = '{self.tasks_panel.list_uid}'"""
+            )
         # Remove trash items widgets
         self.trash_list.remove_all()
         self.scrl.set_visible(False)

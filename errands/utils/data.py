@@ -7,6 +7,7 @@ import sqlite3
 
 from typing import Any
 from uuid import uuid4
+from icalendar import Event, Calendar
 from gi.repository import GLib, Secret
 from errands.utils.logging import Log
 
@@ -20,6 +21,8 @@ class UserData:
         # Create data dir if needed
         if not os.path.exists(cls.data_dir):
             os.mkdir(cls.data_dir)
+        # Clear cache
+        # os.remove(os.path.join(cls.data_dir, "*.ics"))
         cls.connection = sqlite3.connect(cls.db_path, check_same_thread=False)
         cls.cursor = cls.connection.cursor()
         # Create lists table
@@ -93,16 +96,22 @@ class UserData:
         return cls.cursor.fetchall() if fetch else None
 
     @classmethod
-    def count(cls):
-        pass
-
-    @classmethod
-    def remove_deleted(cls, list_uid: str):
-        cls.cursor.execute(
-            f"""DELETE FROM tasks 
-            WHERE deleted = 1
-            AND list_uid = '{list_uid}'"""
-        )
+    def to_ics(cls, uid) -> str:
+        cls.cursor.execute(f"SELECT * FROM tasks WHERE uid = '{uid}'")
+        res = cls.cursor.fetchone()
+        cal = Calendar()
+        cal.add("version", "2.0")
+        cal.add("prodid", "-//Errands")
+        todo = Event()
+        todo.add("uid", res[0])
+        todo.add("summary", res[2])
+        todo.add("dtstart", datetime.datetime.fromisoformat(res[7]))
+        todo.add("dtend", datetime.datetime.fromisoformat(res[8]))
+        todo.add("description", res[9])
+        todo.add("percent-complete", res[12])
+        todo.add("priority", res[13])
+        cal.add_component(todo)
+        return cal.to_ical().decode("utf-8")
 
     @classmethod
     def get_sub_tasks(cls, list_uid: str, parent_uid: str) -> list[str]:
