@@ -70,7 +70,7 @@ class SyncProviderCalDAV:
 
         self.url: str = GSettings.get("sync-url")
         self.username: str = GSettings.get("sync-username")
-        self.password: str = GSettings.get("sync-password")
+        self.password: str = GSettings.get_secret(self.name)
 
         if self.url == "" or self.username == "" or self.password == "":
             Log.error(f"Sync: Not all {self.name} credentials provided")

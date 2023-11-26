@@ -123,6 +123,7 @@
             <child>
               <object class="AdwPasswordEntryRow" id="sync_password">
                 <property name="title" translatable="yes">Password</property>
+                <signal name="changed" handler="on_sync_pass_changed" />
               </object>
             </child>
 
