@@ -30,7 +30,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
         GSettings.bind("sync-provider", self.sync_providers, "selected")
         GSettings.bind("sync-url", self.sync_url, "text")
         GSettings.bind("sync-username", self.sync_username, "text")
-        GSettings.bind("sync-password", self.sync_password, "text")
+        GSettings.bind("sync-cal-name", self.sync_cal_name, "text")
         self.setup_sync()
 
     def build_ui(self):
@@ -138,6 +138,15 @@ class PreferencesWindow(Adw.PreferencesWindow):
         self.test_connection_row.set_visible(selected > 0)
         # self.window.sync_btn.set_visible(selected > 0)
 
+        if self.sync_password.props.visible:
+            account = self.sync_providers.props.selected_item.props.string
+            password = GSettings.get_secret(account)
+            with self.sync_password.freeze_notify():
+                self.sync_password.props.text = password if password else ""
+
+    # --- Template handlers --- #
+
+    @Gtk.Template.Callback()
     def on_cal_name_changed(self, *args):
         data = UserData.get()
         data["tasks"] = [task for task in data["tasks"] if not task["synced_caldav"]]
@@ -148,6 +157,13 @@ class PreferencesWindow(Adw.PreferencesWindow):
     def on_sync_provider_selected(self, *_) -> None:
         self.setup_sync()
 
+    @Gtk.Template.Callback()
+    def on_sync_pass_changed(self, _entry):
+        if 0 < self.sync_providers.props.selected < 3:
+            account = self.sync_providers.props.selected_item.props.string
+            GSettings.set_secret(account, self.sync_password.props.text)
+
+    @Gtk.Template.Callback()
     def on_test_connection_btn_clicked(self, _btn):
         res: bool = Sync.test_connection()
         msg = _("Connected") if res else _("Can't connect")  # pyright:ignore
