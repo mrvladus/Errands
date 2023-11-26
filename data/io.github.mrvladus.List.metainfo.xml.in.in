@@ -57,10 +57,12 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="45.0.5" date="2023-10-25">
+    <release version="45.0.5" date="2023-11-26">
       <description translatable="no">
         <p>Improved:</p>
         <ul>
+          <li>Store password safely using libsecret (Thanks to
+            Rafael Mardojai CM)</li>
           <li>Startup with sync enabled is now async and faster</li>
           <li>Sync button appears when sync provider is selected now</li>
         </ul>
@@ -70,9 +72,12 @@
         </ul>
         <p>Translations:</p>
         <ul>
+          <li>Added Chinese Traditional translation</li>
           <li>Updated German translation (Philipp Kiemle)</li>
           <li>Updated Occitan translation (ensag-dev)</li>
           <li>Updated French translation (Irénée THIRION)</li>
+          <li>Updated Italian translation (Albano Battistella)</li>
+          <li>Updated Brazilian Portuguese translation (Leandro Cunha)</li>
         </ul>
       </description>
     </release>
