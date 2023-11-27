@@ -338,7 +338,7 @@ class Details(Adw.Bin):
         text = self.edit_entry.props.text
         if text.strip(" \n\t") != "":
             self.parent.update_prop("text", text)
-            self.parent.task_row.set_title(Markup.find_url(Markup.escape(text)))
+            self.parent.task_title.set_label(Markup.find_url(Markup.escape(text)))
         else:
             self.edit_entry.set_text(self.parent.get_prop("text"))
         # Set tags

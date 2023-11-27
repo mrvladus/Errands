@@ -75,10 +75,37 @@ class Task(Gtk.Revealer):
         )
         self.add_controller(drop_ctrl)
         # Task row
-        self.task_row = Adw.ActionRow(
-            height_request=60, use_markup=True, css_classes=["task-title"]
+        task_row = Gtk.Box(
+            height_request=60,
+            css_classes=["task-title"],
+            vexpand=False,
+            hexpand=False,
+            spacing=12,
+            margin_start=12,
+            margin_end=12,
+            tooltip_text=_("Click for details"),  # type:ignore
         )
-        self.task_row.set_title(Markup.find_url(Markup.escape(self.get_prop("text"))))
+        self.task_title = Gtk.Label(
+            label=Markup.find_url(Markup.escape(self.get_prop("text"))),
+            xalign=0,
+            wrap=True,
+            wrap_mode=2,
+            lines=0,
+            ellipsize=0,
+            use_markup=True,
+        )
+        self.task_subtitle = Gtk.Label(
+            halign="start", xalign=0, css_classes=["dim-label", "caption"], margin_top=4
+        )
+        task_title_box = Gtk.Box(
+            orientation="vertical",
+            hexpand=True,
+            valign="center",
+            margin_top=4,
+            margin_bottom=4,
+        )
+        task_title_box.append(self.task_title)
+        task_title_box.append(self.task_subtitle)
         # Task row controllers
         task_row_drag_source = Gtk.DragSource.new()
         task_row_drag_source.set_actions(Gdk.DragAction.MOVE)
@@ -86,18 +113,15 @@ class Task(Gtk.Revealer):
         task_row_drag_source.connect("drag-begin", self.on_drag_begin)
         task_row_drag_source.connect("drag-cancel", self.on_drag_end)
         task_row_drag_source.connect("drag-end", self.on_drag_end)
-        self.task_row.add_controller(task_row_drag_source)
+        task_row.add_controller(task_row_drag_source)
         task_row_drop_target = Gtk.DropTarget.new(
             actions=Gdk.DragAction.MOVE, type=Task
         )
         task_row_drop_target.connect("drop", self.on_drop)
-        self.task_row.add_controller(task_row_drop_target)
+        task_row.add_controller(task_row_drop_target)
         task_row_click_ctrl = Gtk.GestureClick.new()
-        task_row_click_ctrl.connect(
-            "released",
-            lambda *_: self.expand(not self.sub_tasks_revealer.get_child_revealed()),
-        )
-        self.task_row.add_controller(task_row_click_ctrl)
+        task_row_click_ctrl.connect("released", self.on_details_clicked)
+        task_row.add_controller(task_row_click_ctrl)
         # Mark as completed button
         self.completed_btn = Gtk.CheckButton(
             valign="center",
@@ -105,33 +129,20 @@ class Task(Gtk.Revealer):
         )
         self.completed_btn.connect("toggled", self.on_completed_btn_toggled)
         self.completed_btn.set_active(self.get_prop("completed"))
-        self.task_row.add_prefix(self.completed_btn)
-        # Expand icon
-        self.expand_icon = Gtk.Image(icon_name="go-down-symbolic", css_classes=["fade"])
-        expand_icon_rev = Gtk.Revealer(
-            transition_type=1, margin_end=5, child=self.expand_icon
-        )
-        task_row_hover_ctrl = Gtk.EventControllerMotion.new()
-        task_row_hover_ctrl.bind_property(
-            "contains-pointer",
-            expand_icon_rev,
-            "reveal-child",
-            GObject.BindingFlags.SYNC_CREATE,
-        )
-        self.task_row.add_controller(task_row_hover_ctrl)
+        task_row.append(self.completed_btn)
+        task_row.append(task_title_box)
         # Details button
-        details_btn = Gtk.Button(
-            icon_name="help-about-symbolic",
+        self.expand_btn = Gtk.Button(
+            icon_name="up-small-symbolic",
             valign="center",
-            tooltip_text=_("Details"),  # type:ignore
-            css_classes=["flat", "circular"],
+            tooltip_text=_("Expand / Fold"),  # type:ignore
+            css_classes=["flat", "circular", "fade"],
         )
-        details_btn.connect("clicked", self.on_details_btn_clicked)
-        # Task row suffix box
-        task_row_suffix_box = Gtk.Box()
-        task_row_suffix_box.append(expand_icon_rev)
-        task_row_suffix_box.append(details_btn)
-        self.task_row.add_suffix(task_row_suffix_box)
+        self.expand_btn.connect(
+            "clicked",
+            lambda *_: self.expand(not self.sub_tasks_revealer.get_child_revealed()),
+        )
+        task_row.append(self.expand_btn)
         # Sub-tasks entry
         sub_tasks_entry = Gtk.Entry(
             hexpand=True,
@@ -153,7 +164,7 @@ class Task(Gtk.Revealer):
         self.main_box = Gtk.Box(
             orientation="vertical", hexpand=True, css_classes=["fade", "card"]
         )
-        self.main_box.append(self.task_row)
+        self.main_box.append(task_row)
         self.main_box.append(self.sub_tasks_revealer)
         if self.get_prop("color") != "":
             self.main_box.add_css_class(f'task-{self.get_prop("color")}')
@@ -196,9 +207,9 @@ class Task(Gtk.Revealer):
     def expand(self, expanded: bool) -> None:
         self.sub_tasks_revealer.set_reveal_child(expanded)
         if expanded:
-            self.expand_icon.add_css_class("rotate")
+            self.expand_btn.remove_css_class("rotate")
         else:
-            self.expand_icon.remove_css_class("rotate")
+            self.expand_btn.add_css_class("rotate")
 
     def purge(self) -> None:
         """
@@ -227,11 +238,11 @@ class Task(Gtk.Revealer):
             AND list_uid = '{self.list_uid}'""",
             fetch=True,
         )[0][0]
-        self.task_row.set_subtitle(
-            _("Completed:") + f" {n_completed} / {n_total}"  # pyright: ignore
-            if n_total > 0
-            else ""
-        )
+        self.task_subtitle.set_visible(n_total > 0)
+        if n_total > 0:
+            self.task_subtitle.set_label(
+                _("Completed:") + f" {n_completed} / {n_total}"  # pyright: ignore
+            )
 
     def on_completed_btn_toggled(self, btn: Gtk.Button) -> None:
         """
@@ -245,7 +256,7 @@ class Task(Gtk.Revealer):
             else:
                 text = Markup.rm_crossline(self.get_prop("text"))
                 self.remove_css_class("task-completed")
-            self.task_row.set_title(text)
+            self.task_title.set_label(text)
 
         # If task is just added set text and return to avoid useless sync
         if self.just_added:
@@ -272,7 +283,7 @@ class Task(Gtk.Revealer):
             for task in children:
                 task.can_sync = True
 
-    def on_details_btn_clicked(self, _btn):
+    def on_details_clicked(self, *args):
         self.tasks_panel.sidebar.set_visible_child_name("details")
         self.tasks_panel.details_panel.update_info(self)
         self.tasks_panel.split_view.set_show_sidebar(True)
