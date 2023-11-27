@@ -5,7 +5,6 @@ from caldav import Calendar, CalendarObjectResource, DAVClient, Principal, Todo
 from gi.repository import Adw, GLib
 
 # Import modules
-import errands.utils.tasks as TaskUtils
 from errands.utils.gsettings import GSettings
 from errands.utils.logging import Log
 from errands.utils.data import UserData
@@ -18,6 +17,7 @@ class Sync:
 
     @classmethod
     def init(self, testing: bool = False) -> None:
+        return
         Log.debug("Sync: Initialize sync provider")
         match GSettings.get("sync-provider"):
             case 0:
@@ -195,20 +195,20 @@ class SyncProviderCalDAV:
             data["tasks"].remove(task)
 
         # Create new local task that was created on CalDAV
-        l_ids: list[str] = [t["id"] for t in data["tasks"]]
-        for task in caldav_tasks:
-            if task["id"] not in l_ids and task["id"] not in data["deleted"]:
-                Log.debug(f"Sync: Copy new task from CalDAV: {task['id']}")
-                new_task: dict = TaskUtils.new_task(
-                    task["text"],
-                    task["id"],
-                    task["parent"],
-                    task["completed"],
-                    False,
-                    task["color"],
-                    True,
-                )
-                data["tasks"].append(new_task)
+        # l_ids: list[str] = [t["id"] for t in data["tasks"]]
+        # for task in caldav_tasks:
+        #     if task["id"] not in l_ids and task["id"] not in data["deleted"]:
+        #         Log.debug(f"Sync: Copy new task from CalDAV: {task['id']}")
+        #         new_task: dict = TaskUtils.new_task(
+        #             task["text"],
+        #             task["id"],
+        #             task["parent"],
+        #             task["completed"],
+        #             False,
+        #             task["color"],
+        #             True,
+        #         )
+        #         data["tasks"].append(new_task)
 
         UserData.set(data)
 
