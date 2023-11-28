@@ -177,7 +177,9 @@ msgstr "Sincronitzar/Recuperar les Tasques"
 
 #: errands/resources/ui/window.ui:545
 msgid "translator-credits"
-msgstr "cubells <vicent@vcubells.net> arnau ferreres <arnauarquer@gmail.com>"
+msgstr ""
+"cubells <vicent@vcubells.net>\n"
+"arnau ferreres <arnauarquer@gmail.com>"
 
 #: errands/resources/ui/window.ui:581
 msgid "Are you sure?"
