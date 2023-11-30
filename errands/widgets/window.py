@@ -434,7 +434,6 @@ class Window(Adw.ApplicationWindow):
         for task in self.get_all_tasks():
             if task.task["completed"] and not task.task["deleted"]:
                 task.delete()
-        self.update_status()
 
     @Gtk.Template.Callback()
     def on_sync_btn_clicked(self, btn) -> None:
