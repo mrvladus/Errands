@@ -1,0 +1,336 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the list package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: errands\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-10-23 19:48+0300\n"
+"PO-Revision-Date: 2023-11-30 13:49+0100\n"
+"Last-Translator: Milo Ivir <mail@milotype.de>\n"
+"Language-Team: \n"
+"Language: hr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.0\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
+
+#: errands/widgets/window.py:111
+msgid "Export Cancelled"
+msgstr "Izvoz je prekinut"
+
+#: errands/widgets/window.py:117
+msgid "Tasks Exported"
+msgstr "Zadaci su izvezeni"
+
+#: errands/widgets/window.py:120
+msgid "Error"
+msgstr "Greška"
+
+#: errands/widgets/window.py:137
+msgid "Import Cancelled"
+msgstr "Uvoz je prekinut"
+
+#: errands/widgets/window.py:146
+msgid "Invalid File"
+msgstr "Neispravna datoteka"
+
+#: errands/widgets/window.py:164
+msgid "Tasks Imported"
+msgstr "Zadaci su uvezeni"
+
+#: errands/widgets/window.py:334 errands/widgets/task.py:173
+msgid "Completed:"
+msgstr "Dovršeno:"
+
+#: errands/widgets/task.py:80
+msgid "Copied to Clipboard"
+msgstr "Kopirano u međuspremnik"
+
+#. pyright:ignore
+#: errands/utils/sync.py:80
+msgid "Not all sync credentials provided. Please check settings."
+msgstr ""
+"Nisu navedeni svi podaci za pristup sinkronizacije. Provjeri postavke."
+
+#: errands/utils/sync.py:120
+msgid "Can't connect to CalDAV server at:"
+msgstr "Neuspjelo povezivanje s CalDAV serverom pri:"
+
+#: errands/resources/ui/window.ui:26
+msgid "Deleted Tasks"
+msgstr "Izbrisani zadaci"
+
+#: errands/resources/ui/window.ui:35 errands/resources/ui/window.ui:38
+msgid "Clear"
+msgstr "Izbriši"
+
+#: errands/resources/ui/window.ui:53 errands/resources/ui/window.ui:56
+msgid "Restore All"
+msgstr "Obnovi sve"
+
+#: errands/resources/ui/window.ui:68 errands/resources/ui/window.ui:71
+msgid "Close Trash"
+msgstr "Zatvori smeće"
+
+#: errands/resources/ui/window.ui:106
+msgid "Move to Trash"
+msgstr "Premjesti u smeće"
+
+#: errands/resources/ui/window.ui:130
+msgid "Empty Trash"
+msgstr "Isprazni smeće"
+
+#: errands/resources/ui/window.ui:131
+msgid "No deleted items"
+msgstr "Nema izbrisanih stavki"
+
+#: errands/resources/ui/window.ui:192 errands/resources/ui/window.ui:195
+msgid "Show Deleted Tasks"
+msgstr "Prikaži izbrisane zadatke"
+
+#: errands/resources/ui/window.ui:221 errands/resources/ui/window.ui:224
+msgid "Delete Completed Tasks (Ctrl+Delete)"
+msgstr "Izbriši dovršene zadatke (Ctrl+Delete)"
+
+#: errands/resources/ui/window.ui:248 errands/resources/ui/window.ui:250
+msgid "Main Menu"
+msgstr "Glavni izbornik"
+
+#: errands/resources/ui/window.ui:260 errands/resources/ui/window.ui:263
+msgid "Sync/Fetch Tasks (Ctrl+S)"
+msgstr "Sinkroniziraj/Preuzmi zadatke (Ctrl+S)"
+
+#: errands/resources/ui/window.ui:287 errands/resources/ui/window.ui:290
+#: errands/resources/ui/window.ui:399 errands/resources/ui/window.ui:402
+msgid "Scroll Up"
+msgstr "Klizni gore"
+
+#: errands/resources/ui/window.ui:321
+msgid "Add new Task"
+msgstr "Dodaj novi zadatak"
+
+#: errands/resources/ui/window.ui:429
+msgid "Export Tasks..."
+msgstr "Izvoz zadataka …"
+
+#: errands/resources/ui/window.ui:433
+msgid "Import Tasks..."
+msgstr "Uvoz zadataka …"
+
+#: errands/resources/ui/window.ui:439 errands/resources/ui/window.ui:478
+msgid "Preferences"
+msgstr "Postavke"
+
+#: errands/resources/ui/window.ui:443
+msgid "Keyboard Shortcuts"
+msgstr "Tipkovnički prečaci"
+
+#: errands/resources/ui/window.ui:447
+msgid "About Errands"
+msgstr "Informacije o Errands"
+
+#: errands/resources/ui/window.ui:463
+msgid "General"
+msgstr "Opće"
+
+#: errands/resources/ui/window.ui:466
+msgid "Show keyboard shortcuts"
+msgstr "Prikaži tipkovničke prečace"
+
+#: errands/resources/ui/window.ui:472
+msgid "Toggle sidebar"
+msgstr "Uključi/Isključi bočnu traku"
+
+#: errands/resources/ui/window.ui:484
+msgid "Quit"
+msgstr "Zatvori aplikaciju"
+
+#: errands/resources/ui/window.ui:494
+msgid "Import and Export"
+msgstr "Uvozi i izvoz"
+
+#: errands/resources/ui/window.ui:497
+msgid "Import tasks"
+msgstr "Uvezi zadatke"
+
+#: errands/resources/ui/window.ui:503
+msgid "Export tasks"
+msgstr "Izvezi zadatke"
+
+#: errands/resources/ui/window.ui:513 errands/resources/ui/preferences.ui:66
+msgid "Tasks"
+msgstr "Zadaci"
+
+#: errands/resources/ui/window.ui:516
+msgid "Delete completed tasks"
+msgstr "Izbriši dovršene zadatke"
+
+#: errands/resources/ui/window.ui:522
+msgid "Exit edit mode"
+msgstr "Izađi iz modusa uređivanja"
+
+#: errands/resources/ui/window.ui:528
+msgid "Sync/Fetch Tasks"
+msgstr "Sinkroniziraj/Preuzmi zadatke"
+
+#: errands/resources/ui/window.ui:545
+msgid "translator-credits"
+msgstr "Milo Ivir <mail@milotype.de>"
+
+#: errands/resources/ui/window.ui:581
+msgid "Are you sure?"
+msgstr "Jesi li siguran/na?"
+
+#: errands/resources/ui/window.ui:582
+msgid "Tasks will be permanently deleted"
+msgstr "Zadaci će se zauvijek izbrisati"
+
+#: errands/resources/ui/window.ui:587
+msgid "Cancel"
+msgstr "Odustani"
+
+#: errands/resources/ui/window.ui:588 errands/resources/ui/task.ui:13
+msgid "Delete"
+msgstr "Izbriši"
+
+#: errands/resources/ui/preferences.ui:14
+msgid "Application Theme"
+msgstr "Tema aplikacije"
+
+#: errands/resources/ui/preferences.ui:19
+msgid "System"
+msgstr "Sustav"
+
+#: errands/resources/ui/preferences.ui:33
+msgid "Light"
+msgstr "Svijetla"
+
+#: errands/resources/ui/preferences.ui:48
+msgid "Dark"
+msgstr "Tamna"
+
+#: errands/resources/ui/preferences.ui:71
+msgid "Expand Sub-Tasks on Startup"
+msgstr "Prikaži podzadatke nakon pokretanja "
+
+#: errands/resources/ui/preferences.ui:87
+msgid "Sync"
+msgstr "Sinkronizacija"
+
+#: errands/resources/ui/preferences.ui:92
+msgid "Sync Provider"
+msgstr "Pružatelj usluge sinkronizacije"
+
+#: errands/resources/ui/preferences.ui:96
+msgid "Disabled"
+msgstr "Isključeno"
+
+#: errands/resources/ui/preferences.ui:111
+msgid "Server URL"
+msgstr "URL servera"
+
+#: errands/resources/ui/preferences.ui:118
+msgid "Username"
+msgstr "Korisničko ime"
+
+#: errands/resources/ui/preferences.ui:125
+msgid "Password"
+msgstr "Lozinka"
+
+#: errands/resources/ui/preferences.ui:132
+msgid "Calendar Name (\"Errands\" by Default)"
+msgstr "Ime kalendara (zadano je „Errands”)"
+
+#: errands/resources/ui/preferences.ui:141
+msgid "Token"
+msgstr "Token"
+
+#: errands/resources/ui/preferences.ui:148
+msgid "Test Connection"
+msgstr "Provjeri vezu"
+
+#: errands/resources/ui/preferences.ui:151
+msgid "Test"
+msgstr "Provjeri"
+
+#: errands/resources/ui/task.ui:17
+msgid "Edit"
+msgstr "Uredi"
+
+#: errands/resources/ui/task.ui:21
+msgid "Copy"
+msgstr "Kopiraj"
+
+#: errands/resources/ui/task.ui:139 errands/resources/ui/task.ui:142
+msgid "Mark as Completed"
+msgstr "Označi kao dovršeno"
+
+#: errands/resources/ui/task.ui:189 errands/resources/ui/task.ui:192
+msgid "Clear style"
+msgstr "Izbriši stil"
+
+#: errands/resources/ui/task.ui:290 errands/resources/ui/task.ui:292
+msgid "Menu"
+msgstr "Izbornik"
+
+#: errands/resources/ui/task.ui:338 errands/resources/ui/task.ui:341
+msgid "Cancel (Escape)"
+msgstr "Odustani (Escape)"
+
+#: errands/resources/ui/task.ui:387
+msgid "Add new Sub-Task"
+msgstr "Dodaj novi podzadatak"
+
+#: errands/resources/ui/trash_item.ui:20 errands/resources/ui/trash_item.ui:24
+msgid "Restore"
+msgstr "Obnovi"
+
+#. TRANSLATORS: Don't translate
+#: data/io.github.mrvladus.List.desktop.in.in:4
+msgid "Errands"
+msgstr "Errands"
+
+#: data/io.github.mrvladus.List.desktop.in.in:5
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:39
+msgid "Manage your tasks"
+msgstr "Upravljaj svojim zadacima"
+
+#. TRANSLATORS: Don't translate
+#: data/io.github.mrvladus.List.desktop.in.in:12
+msgid "errands;tasks;list;todo;todos;"
+msgstr "errands;zadaci;popis;popis zadataka;popisi zadataka;"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:41
+msgid "Todo application for those who prefer simplicity."
+msgstr "Aplikacija za zadatke za one koji vole jednostavnost."
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:42
+msgid "Features:"
+msgstr "Značajke:"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:44
+msgid "Add, remove, edit tasks and sub-tasks"
+msgstr "Dodaj, ukloni, uredi zadatke i podzadatke"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:45
+msgid "Mark task and sub-tasks as completed"
+msgstr "Označi zadatke i podzadatke kao dovršene"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:46
+msgid "Add accent color for each task"
+msgstr "Dodaj boju za svaki zadatak"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:47
+msgid "Sync tasks with Nextcloud or other CalDAV providers"
+msgstr ""
+"Sinkroniziraj zadatke s Nextcloudom ili s drugim pružateljima usluge za "
+"CalDAV"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:48
+msgid "Drag and Drop support"
+msgstr "Podrška za povuci i ispusti"
