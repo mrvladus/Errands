@@ -87,7 +87,6 @@ class Task(Gtk.Revealer):
             valign="center",
             tooltip_text=_("Mark as Completed"),  # type:ignore
         )
-
         self.completed_btn.connect("toggled", self.on_completed_btn_toggled)
         self.completed_btn.set_active(self.get_prop("completed"))
         self.task_row.add_prefix(self.completed_btn)
@@ -109,7 +108,6 @@ class Task(Gtk.Revealer):
             accessible_role=Gtk.AccessibleRole.PRESENTATION,
         )
         task_row_box.append(self.task_row)
-
         # Task row controllers
         task_row_drag_source = Gtk.DragSource.new()
         task_row_drag_source.set_actions(Gdk.DragAction.MOVE)
@@ -126,7 +124,6 @@ class Task(Gtk.Revealer):
         task_row_click_ctrl = Gtk.GestureClick.new()
         task_row_click_ctrl.connect("released", self.on_details_clicked)
         self.task_row.add_controller(task_row_click_ctrl)
-
         # Sub-tasks entry
         sub_tasks_entry = Gtk.Entry(
             hexpand=True,

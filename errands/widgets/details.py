@@ -227,7 +227,7 @@ class Details(Adw.Bin):
 
         # Misc group
         misc_group = Adw.PreferencesGroup(title=_("Misc"))  # type:ignore
-        # Open in calendar button
+        # Export to calendar button
         open_cal_btn = Gtk.Button(
             icon_name="x-office-calendar-symbolic",
             valign="center",
@@ -235,8 +235,8 @@ class Details(Adw.Bin):
         )
         open_cal_btn.connect("clicked", self.on_open_as_ics_clicked)
         open_cal_row = Adw.ActionRow(
-            title=_("Open in Calendar"),  # type:ignore
-            subtitle=_("Add new event to calendar"),  # type:ignore
+            title=_("Export to Calendar"),  # type:ignore
+            subtitle=_("Open task as .ics file"),  # type:ignore
             activatable_widget=open_cal_btn,
         )
         open_cal_row.add_suffix(open_cal_btn)
@@ -418,9 +418,10 @@ class Details(Adw.Bin):
         self.task_panel.sidebar.set_visible_child_name("trash")
 
     def on_open_as_ics_clicked(self, _btn):
-        path = os.path.join(
-            GLib.get_user_data_dir(), "errands", self.parent.uid + ".ics"
-        )
+        export_dir = os.path.join(GLib.get_user_data_dir(), "errands", "exported")
+        if not os.path.exists(export_dir):
+            os.mkdir(export_dir)
+        path = os.path.join(export_dir, self.parent.uid + ".tmp.ics")
         with open(path, "w", encoding="utf-8") as f:
             f.write(UserData.to_ics(self.parent.uid))
         file: Gio.File = Gio.File.new_for_path(path)
