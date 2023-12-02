@@ -79,8 +79,7 @@ class Task(Gtk.Revealer):
             title=Markup.find_url(Markup.escape(self.get_prop("text"))),
             css_classes=["rounded-corners"],
             height_request=60,
-            selectable=False,
-            activatable=True,
+            tooltip_text=_("Click for Details"),  # type:ignore
             accessible_role=Gtk.AccessibleRole.ROW,
         )
         # Mark as completed button
@@ -243,7 +242,7 @@ class Task(Gtk.Revealer):
             else:
                 text = Markup.rm_crossline(self.get_prop("text"))
                 self.remove_css_class("task-completed")
-            self.task_title.set_label(text)
+            self.task_row.set_title(text)
 
         # If task is just added set text and return to avoid useless sync
         if self.just_added:
