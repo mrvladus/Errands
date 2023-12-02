@@ -65,6 +65,7 @@ class TasksList(Adw.Bin):
         menu.append(_("Rename"), "tasks_list.rename")  # type:ignore
         menu.append(_("Sync/Fetch Tasks"), "tasks_list.sync")  # type:ignore
         menu.append(_("Delete"), "tasks_list.delete")  # type:ignore
+        menu.append(_("Export"), "tasks_list.export")  # type:ignore
         # Header Bar
         self.hb = Adw.HeaderBar(title_widget=self.title)
         self.hb.pack_start(self.toggle_sidebar_btn)
@@ -307,8 +308,12 @@ class TasksList(Adw.Bin):
             dialog.connect("response", _confirm)
             dialog.present()
 
+        def _export():
+            pass
+
         _create_action("rename", _rename)
         _create_action("delete", _delete)
+        _create_action("export", _export)
         _create_action("sync", lambda *_: Sync.sync(True))
 
     def add_task(self, uid: str) -> None:

@@ -158,7 +158,7 @@ class Trash(Adw.Bin):
             f"""DELETE FROM tasks 
             WHERE deleted = 1
             AND list_uid = '{self.tasks_panel.list_uid}'"""
-            )
+        )
         # Remove trash items widgets
         self.trash_list.remove_all()
         self.scrl.set_visible(False)
