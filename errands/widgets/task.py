@@ -107,7 +107,7 @@ class Task(Gtk.Revealer):
         task_row_box = Gtk.ListBox(
             selection_mode=0,
             css_classes=["rounded-corners"],
-            accessible_role=Gtk.AccessibleRole.NONE,
+            accessible_role=Gtk.AccessibleRole.PRESENTATION,
         )
         task_row_box.append(self.task_row)
 
