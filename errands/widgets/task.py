@@ -75,62 +75,23 @@ class Task(Gtk.Revealer):
         )
         self.add_controller(drop_ctrl)
         # Task row
-        task_row = Gtk.Box(
+        self.task_row = Adw.ActionRow(
+            title=Markup.find_url(Markup.escape(self.get_prop("text"))),
+            css_classes=["rounded-corners"],
             height_request=60,
-            css_classes=["task-title"],
-            vexpand=False,
-            hexpand=False,
-            spacing=12,
-            margin_start=12,
-            margin_end=12,
-            tooltip_text=_("Click for details"),  # type:ignore
+            selectable=False,
+            activatable=True,
+            accessible_role=Gtk.AccessibleRole.ROW,
         )
-        self.task_title = Gtk.Label(
-            label=Markup.find_url(Markup.escape(self.get_prop("text"))),
-            xalign=0,
-            wrap=True,
-            wrap_mode=2,
-            lines=0,
-            ellipsize=0,
-            use_markup=True,
-        )
-        self.task_subtitle = Gtk.Label(
-            halign="start", xalign=0, css_classes=["dim-label", "caption"], margin_top=4
-        )
-        task_title_box = Gtk.Box(
-            orientation="vertical",
-            hexpand=True,
-            valign="center",
-            margin_top=4,
-            margin_bottom=4,
-        )
-        task_title_box.append(self.task_title)
-        task_title_box.append(self.task_subtitle)
-        # Task row controllers
-        task_row_drag_source = Gtk.DragSource.new()
-        task_row_drag_source.set_actions(Gdk.DragAction.MOVE)
-        task_row_drag_source.connect("prepare", self.on_drag_prepare)
-        task_row_drag_source.connect("drag-begin", self.on_drag_begin)
-        task_row_drag_source.connect("drag-cancel", self.on_drag_end)
-        task_row_drag_source.connect("drag-end", self.on_drag_end)
-        task_row.add_controller(task_row_drag_source)
-        task_row_drop_target = Gtk.DropTarget.new(
-            actions=Gdk.DragAction.MOVE, type=Task
-        )
-        task_row_drop_target.connect("drop", self.on_drop)
-        task_row.add_controller(task_row_drop_target)
-        task_row_click_ctrl = Gtk.GestureClick.new()
-        task_row_click_ctrl.connect("released", self.on_details_clicked)
-        task_row.add_controller(task_row_click_ctrl)
         # Mark as completed button
         self.completed_btn = Gtk.CheckButton(
             valign="center",
             tooltip_text=_("Mark as Completed"),  # type:ignore
         )
+
         self.completed_btn.connect("toggled", self.on_completed_btn_toggled)
         self.completed_btn.set_active(self.get_prop("completed"))
-        task_row.append(self.completed_btn)
-        task_row.append(task_title_box)
+        self.task_row.add_prefix(self.completed_btn)
         # Details button
         self.expand_btn = Gtk.Button(
             icon_name="up-small-symbolic",
@@ -142,7 +103,31 @@ class Task(Gtk.Revealer):
             "clicked",
             lambda *_: self.expand(not self.sub_tasks_revealer.get_child_revealed()),
         )
-        task_row.append(self.expand_btn)
+        self.task_row.add_suffix(self.expand_btn)
+        task_row_box = Gtk.ListBox(
+            selection_mode=0,
+            css_classes=["rounded-corners"],
+            accessible_role=Gtk.AccessibleRole.NONE,
+        )
+        task_row_box.append(self.task_row)
+
+        # Task row controllers
+        task_row_drag_source = Gtk.DragSource.new()
+        task_row_drag_source.set_actions(Gdk.DragAction.MOVE)
+        task_row_drag_source.connect("prepare", self.on_drag_prepare)
+        task_row_drag_source.connect("drag-begin", self.on_drag_begin)
+        task_row_drag_source.connect("drag-cancel", self.on_drag_end)
+        task_row_drag_source.connect("drag-end", self.on_drag_end)
+        self.task_row.add_controller(task_row_drag_source)
+        task_row_drop_target = Gtk.DropTarget.new(
+            actions=Gdk.DragAction.MOVE, type=Task
+        )
+        task_row_drop_target.connect("drop", self.on_drop)
+        self.task_row.add_controller(task_row_drop_target)
+        task_row_click_ctrl = Gtk.GestureClick.new()
+        task_row_click_ctrl.connect("released", self.on_details_clicked)
+        self.task_row.add_controller(task_row_click_ctrl)
+
         # Sub-tasks entry
         sub_tasks_entry = Gtk.Entry(
             hexpand=True,
@@ -162,9 +147,11 @@ class Task(Gtk.Revealer):
         self.sub_tasks_revealer = Gtk.Revealer(child=sub_tasks_box)
         # Task card
         self.main_box = Gtk.Box(
-            orientation="vertical", hexpand=True, css_classes=["fade", "card"]
+            orientation="vertical",
+            hexpand=True,
+            css_classes=["fade", "card"],
         )
-        self.main_box.append(task_row)
+        self.main_box.append(task_row_box)
         self.main_box.append(self.sub_tasks_revealer)
         if self.get_prop("color") != "":
             self.main_box.add_css_class(f'task-{self.get_prop("color")}')
@@ -238,11 +225,11 @@ class Task(Gtk.Revealer):
             AND list_uid = '{self.list_uid}'""",
             fetch=True,
         )[0][0]
-        self.task_subtitle.set_visible(n_total > 0)
-        if n_total > 0:
-            self.task_subtitle.set_label(
-                _("Completed:") + f" {n_completed} / {n_total}"  # pyright: ignore
-            )
+        self.task_row.set_subtitle(
+            _("Completed:") + f" {n_completed} / {n_total}"  # pyright: ignore
+            if n_total > 0
+            else ""
+        )
 
     def on_completed_btn_toggled(self, btn: Gtk.Button) -> None:
         """
