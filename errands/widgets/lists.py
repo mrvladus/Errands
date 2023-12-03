@@ -5,6 +5,7 @@ from errands.utils.data import UserData
 from errands.utils.functions import get_children
 from errands.utils.gsettings import GSettings
 from errands.utils.logging import Log
+from errands.utils.sync import Sync
 from errands.widgets.tasks_list import TasksList
 from gi.repository import Adw, Gtk, Gio, GObject
 
@@ -50,6 +51,24 @@ class Lists(Adw.Bin):
         toolbar_view.add_top_bar(hb)
         self.set_child(toolbar_view)
 
+    def add_list(self, name):
+        uid = UserData.add_list(name)
+        row = Gtk.ListBoxRow(
+            child=Gtk.Label(
+                label=name,
+                halign="start",
+                margin_start=6,
+                margin_end=6,
+                hexpand=True,
+            )
+        )
+        row.name = name
+        self.stack.add_titled(
+            child=TasksList(self.window, uid, self), name=name, title=name
+        )
+        self.lists.append(row)
+        self.lists.select_row(row)
+
     def on_add_btn_clicked(self, btn):
         def entry_changed(entry, _, dialog):
             empty = entry.props.text.strip(" \n\t") == ""
@@ -60,23 +79,7 @@ class Lists(Adw.Bin):
                 Log.debug("Adding new list is cancelled")
                 return
 
-            text = entry.props.text.rstrip().lstrip()
-            uid = UserData.add_list(text)
-            row = Gtk.ListBoxRow(
-                child=Gtk.Label(
-                    label=text,
-                    halign="start",
-                    margin_start=6,
-                    margin_end=6,
-                    hexpand=True,
-                )
-            )
-            row.name = text
-            self.stack.add_titled(
-                child=TasksList(self.window, uid, self), name=text, title=text
-            )
-            self.lists.append(row)
-            self.lists.select_row(row)
+            self.add_list(entry.props.text.rstrip().lstrip())
 
         entry = Gtk.Entry(placeholder_text=_("New List Name"))  # type:ignore
         dialog = Adw.MessageDialog(

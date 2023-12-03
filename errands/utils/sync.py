@@ -16,13 +16,13 @@ class Sync:
     window: Adw.ApplicationWindow = None
 
     @classmethod
-    def init(self, testing: bool = False) -> None:
-        return
+    def init(self, window, testing: bool = False) -> None:
+        self.window = window
         Log.debug("Sync: Initialize sync provider")
         match GSettings.get("sync-provider"):
             case 0:
                 Log.info("Sync disabled")
-                self.window.sync_btn.set_visible(False)
+                # self.window.sync_btn.set_visible(False)
             case 1:
                 self.provider = SyncProviderCalDAV("Nextcloud", self.window, testing)
             case 2:
@@ -49,7 +49,7 @@ class Sync:
 
 class SyncProviderCalDAV:
     can_sync: bool = False
-    calendar: Calendar = None
+    calendars: list[Calendar] = None
     window = None
 
     def __init__(self, name: str, window: Adw.ApplicationWindow, testing: bool) -> None:
@@ -80,10 +80,10 @@ class SyncProviderCalDAV:
                         "Not all sync credentials provided. Please check settings."
                     )
                 )
-            self.window.sync_btn.set_visible(False)
+            # self.window.sync_btn.set_visible(False)
             return False
 
-        self.window.sync_btn.set_visible(True)
+        # self.window.sync_btn.set_visible(True)
         return True
 
     def _check_url(self) -> None:
@@ -117,8 +117,8 @@ class SyncProviderCalDAV:
                 principal: Principal = client.principal()
                 Log.info(f"Sync: Connected to {self.name} server at '{self.url}'")
                 self.can_sync = True
-                self._setup_calendar(principal)
-                self.window.sync_btn.set_visible(True)
+                self.calendars = principal.calendars()
+                # self.window.sync_btn.set_visible(True)
             except:
                 Log.error(f"Sync: Can't connect to {self.name} server at '{self.url}'")
                 if not self.testing:
@@ -129,24 +129,20 @@ class SyncProviderCalDAV:
                     )
                 self.window.sync_btn.set_visible(False)
 
-    def _get_tasks(self) -> list[dict]:
+    def _get_tasks(self, calendar) -> list[dict]:
         """
         Get todos from calendar and convert them to dict
         """
 
         try:
             Log.debug(f"Getting tasks from CalDAV")
-            todos: list[Todo] = self.calendar.todos(include_completed=True)
+            todos: list[Todo] = calendar.todos(include_completed=True)
             tasks: list[dict] = []
             for todo in todos:
                 data: dict = {
-                    "id": str(todo.icalendar_component.get("uid", "")),
+                    "uid": str(todo.icalendar_component.get("uid", "")),
                     "parent": str(todo.icalendar_component.get("related-to", "")),
                     "text": str(todo.icalendar_component.get("summary", "")),
-                    "completed": True
-                    if str(todo.icalendar_component.get("status", False)) == "COMPLETED"
-                    else False,
-                    "color": str(todo.icalendar_component.get("x-errands-color", "")),
                 }
                 tasks.append(data)
             return tasks
@@ -212,90 +208,75 @@ class SyncProviderCalDAV:
 
         UserData.set(data)
 
-    def _setup_calendar(self, principal: Principal) -> None:
-        Log.debug(f"Sync: Setting up calendars")
-
-        calendars: list[Calendar] = principal.calendars()
-        cal_name: str = GSettings.get("sync-cal-name")
-        cal_exists: bool = False
-        errands_cal_exists: bool = False
-        for cal in calendars:
-            if cal.name == cal_name:
-                Log.debug(f"Sync: Found calendar '{cal_name}'")
-                self.calendar = cal
-                cal_exists = True
-            elif cal.name == "Errands" and cal_name == "":
-                Log.debug(f"Sync: Found calendar Errands")
-                self.calendar = cal
-                errands_cal_exists = True
-        if not cal_exists and cal_name != "":
-            Log.debug(f"Sync: Create new calendar '{cal_name}' on {self.name}")
-            self.calendar = principal.make_calendar(
-                cal_name, supported_calendar_component_set=["VTODO"]
-            )
-        if not errands_cal_exists and cal_name == "":
-            Log.debug(f"Sync: Create new calendar 'Errands' on {self.name}")
-            self.calendar = principal.make_calendar(
-                "Errands", supported_calendar_component_set=["VTODO"]
-            )
-
     def sync(self, fetch: bool) -> None:
         """
         Sync local tasks with provider
         """
-        # self._setup_calendar()
-        caldav_tasks: list[dict] = self._get_tasks()
-
-        Log.info(f"Sync: Sync tasks with {self.name}")
-
-        data = UserData.get()
-        caldav_ids: list[str] = [task["id"] for task in caldav_tasks]
-
-        for task in data["tasks"]:
-            # Create new task on CalDAV that was created offline
-            if task["id"] not in caldav_ids and not task["synced_caldav"]:
-                try:
-                    Log.debug(f"Sync: Create new task on CalDAV: {task['id']}")
-                    new_todo = self.calendar.save_todo(
-                        uid=task["id"],
-                        summary=task["text"],
-                        related_to=task["parent"],
-                        x_errands_color=task["color"],
+        # Get new calendars
+        user_lists_names = [i[1] for i in UserData.get_lists()]
+        for calendar in self.calendars:
+            # Add new if not exists
+            if calendar.name not in user_lists_names:
+                list_uid = UserData.add_list(calendar.name)
+                # Fetch tasks for the new list
+                for task in self._get_tasks(calendar):
+                    UserData.add_task(
+                        list_uid, task["text"], task["uid"], task["parent"]
                     )
-                    if task["completed"]:
-                        new_todo.complete()
-                    task["synced_caldav"] = True
-                except:
-                    Log.error(f"Sync: Error creating new task on CalDAV: {task['id']}")
 
-            # Update task on CalDAV that was changed locally
-            elif task["id"] in caldav_ids and not task["synced_caldav"]:
-                try:
-                    Log.debug(f"Sync: Update task on CalDAV: {task['id']}")
-                    todo: CalendarObjectResource = self.calendar.todo_by_uid(task["id"])
-                    todo.uncomplete()
-                    todo.icalendar_component["summary"] = task["text"]
-                    todo.icalendar_component["related-to"] = task["parent"]
-                    todo.icalendar_component["x-errands-color"] = task["color"]
-                    todo.save()
-                    if task["completed"]:
-                        todo.complete()
-                    task["synced_caldav"] = True
-                except:
-                    Log.error(f"Sync: Error updating task on CalDAV: {task['id']}")
+        # self._setup_calendar()
+        # caldav_tasks: list[dict] = self._get_tasks()
 
-        # Delete tasks on CalDAV if they were deleted locally
-        for task_id in data["deleted"]:
-            try:
-                Log.debug(f"Sync: Delete task from CalDAV: {task_id}")
-                todo: CalendarObjectResource = self.calendar.todo_by_uid(task_id)
-                todo.delete()
-            except:
-                Log.error(f"Sync: Can't delete task from CalDAV: {task_id}")
-        data["deleted"] = []
+        # Log.info(f"Sync: Sync tasks with {self.name}")
 
-        UserData.set(data)
+        # data = UserData.get()
+        # caldav_ids: list[str] = [task["id"] for task in caldav_tasks]
 
-        if fetch:
-            self._fetch()
-            GLib.idle_add(self.window.update_ui)
+        # for task in data["tasks"]:
+        #     # Create new task on CalDAV that was created offline
+        #     if task["id"] not in caldav_ids and not task["synced_caldav"]:
+        #         try:
+        #             Log.debug(f"Sync: Create new task on CalDAV: {task['id']}")
+        #             new_todo = self.calendar.save_todo(
+        #                 uid=task["id"],
+        #                 summary=task["text"],
+        #                 related_to=task["parent"],
+        #                 x_errands_color=task["color"],
+        #             )
+        #             if task["completed"]:
+        #                 new_todo.complete()
+        #             task["synced_caldav"] = True
+        #         except:
+        #             Log.error(f"Sync: Error creating new task on CalDAV: {task['id']}")
+
+        #     # Update task on CalDAV that was changed locally
+        #     elif task["id"] in caldav_ids and not task["synced_caldav"]:
+        #         try:
+        #             Log.debug(f"Sync: Update task on CalDAV: {task['id']}")
+        #             todo: CalendarObjectResource = self.calendar.todo_by_uid(task["id"])
+        #             todo.uncomplete()
+        #             todo.icalendar_component["summary"] = task["text"]
+        #             todo.icalendar_component["related-to"] = task["parent"]
+        #             todo.icalendar_component["x-errands-color"] = task["color"]
+        #             todo.save()
+        #             if task["completed"]:
+        #                 todo.complete()
+        #             task["synced_caldav"] = True
+        #         except:
+        #             Log.error(f"Sync: Error updating task on CalDAV: {task['id']}")
+
+        # # Delete tasks on CalDAV if they were deleted locally
+        # for task_id in data["deleted"]:
+        #     try:
+        #         Log.debug(f"Sync: Delete task from CalDAV: {task_id}")
+        #         todo: CalendarObjectResource = self.calendar.todo_by_uid(task_id)
+        #         todo.delete()
+        #     except:
+        #         Log.error(f"Sync: Can't delete task from CalDAV: {task_id}")
+        # data["deleted"] = []
+
+        # UserData.set(data)
+
+        # if fetch:
+        #     self._fetch()
+        #     GLib.idle_add(self.window.update_ui)

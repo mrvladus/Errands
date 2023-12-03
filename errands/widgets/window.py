@@ -28,8 +28,9 @@ class Window(Adw.ApplicationWindow):
         self.build_ui()
         Log.debug("Present window")
         self.present()
-        Sync.window = self
         self.startup = False
+        Sync.init(window=self)
+        Sync.sync()
 
     def build_ui(self):
         self.props.width_request = 360
@@ -40,7 +41,8 @@ class Window(Adw.ApplicationWindow):
         self.split_view = Adw.NavigationSplitView(
             max_sidebar_width=240, min_sidebar_width=240, show_content=True
         )
-        self.split_view.set_sidebar(Adw.NavigationPage.new(Lists(self, stack), "Lists"))
+        self.lists = Lists(self, stack)
+        self.split_view.set_sidebar(Adw.NavigationPage.new(self.lists, "Lists"))
         self.split_view.set_content(Adw.NavigationPage.new(stack, "Tasks"))
         # Toast overlay
         self.toast_overlay = Adw.ToastOverlay(child=self.split_view)

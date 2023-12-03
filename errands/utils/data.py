@@ -127,7 +127,7 @@ class UserData:
     def get_toplevel_tasks(cls, list_uid: str) -> list[str]:
         cls.cursor.execute(
             f"""SELECT uid FROM tasks 
-            WHERE parent IS NULL
+            WHERE parent IS ''
             AND list_uid = '{list_uid}'"""
         )
         res = cls.cursor.fetchall()
@@ -147,13 +147,13 @@ class UserData:
         cls,
         list_uid: str,
         text: str,
-        uid: str = None,
-        parent: str = None,
+        uid: str = "",
+        parent: str = "",
         completed: bool = False,
         deleted: bool = False,
         color: str = "",
-        start_date: str = None,
-        end_date: str = None,
+        start_date: str = "",
+        end_date: str = "",
         notes: str = "",
         percent_complete: int = 0,
         priority: int = 0,

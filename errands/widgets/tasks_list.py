@@ -351,7 +351,7 @@ class TasksList(Adw.Bin):
             for task in self.get_all_tasks():
                 if len(get_children(task.tasks_list)) > 0:
                     task.expand(True)
-        Sync.sync(True)
+        # Sync.sync(True)
 
     def update_status(self) -> None:
         """

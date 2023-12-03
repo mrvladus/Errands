@@ -34,8 +34,5 @@
     <key name="sync-password" type="s">
       <default>""</default>
     </key>
-    <key name="sync-cal-name" type="s">
-      <default>""</default>
-    </key>
   </schema>
 </schemalist>

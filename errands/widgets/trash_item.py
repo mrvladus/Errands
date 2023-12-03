@@ -23,7 +23,6 @@ class TrashItem(Adw.ActionRow):
             valign="center",
             css_classes=["flat", "circular"],
         )
-        # restore_btn.update_property([4], [_("Restore")])  # type:ignore
         restore_btn.connect("clicked", self.on_restore)
         self.add_suffix(restore_btn)
 
