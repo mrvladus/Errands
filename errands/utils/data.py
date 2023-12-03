@@ -35,28 +35,28 @@ class UserData:
         # Create tasks table
         cls.cursor.execute(
             """CREATE TABLE IF NOT EXISTS tasks (
-            uid TEXT NOT NULL,
-            list_uid TEXT NOT NULL,
-            text TEXT NOT NULL,
-            parent TEXT,
+            color TEXT NOT NULL,
             completed INTEGER NOT NULL,
             deleted INTEGER NOT NULL,
-            color TEXT,
-            start_date TEXT,
-            end_date TEXT,
-            notes TEXT,
-            tags TEXT,
+            end_date TEXT NOT NULL,
+            list_uid TEXT NOT NULL,
+            notes TEXT NOT NULL,
+            parent TEXT NOT NULL,
             percent_complete INTEGER NOT NULL,
             priority INTEGER NOT NULL,
-            synced INTEGER
+            start_date TEXT NOT NULL,
+            synced INTEGER NOT NULL,
+            tags TEXT NOT NULL,
+            text TEXT NOT NULL,
+            uid TEXT NOT NULL
             )"""
         )
         cls.connection.commit()
 
     @classmethod
-    def add_list(cls, name: str):
+    def add_list(cls, name: str, uuid: str = None):
         Log.info(f"Create '{name}' list")
-        uid = str(uuid4())
+        uid = str(uuid4()) if not uuid else uuid
         cls.cursor.execute(
             "INSERT INTO lists (uid, name) VALUES (?, ?)",
             (uid, name),
@@ -141,6 +141,24 @@ class UserData:
         )
         res = cls.cursor.fetchall()
         return [i[0] for i in res]
+
+    @classmethod
+    def get_tasks_as_dicts(cls, list_uid: str) -> list[dict]:
+        cls.cursor.execute(
+            f"""SELECT * FROM tasks 
+            WHERE list_uid = '{list_uid}'"""
+        )
+        res = cls.cursor.fetchall()
+        tasks = []
+        for task in res:
+            new_task = {
+                "parent": task[6],
+                "synced": task[10],
+                "text": task[12],
+                "uid": task[13],
+            }
+            tasks.append(new_task)
+        return tasks
 
     @classmethod
     def add_task(

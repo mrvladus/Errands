@@ -51,8 +51,7 @@ class Lists(Adw.Bin):
         toolbar_view.add_top_bar(hb)
         self.set_child(toolbar_view)
 
-    def add_list(self, name):
-        uid = UserData.add_list(name)
+    def add_list(self, name, uid):
         row = Gtk.ListBoxRow(
             child=Gtk.Label(
                 label=name,
@@ -62,6 +61,7 @@ class Lists(Adw.Bin):
                 hexpand=True,
             )
         )
+        row.uid = uid
         row.name = name
         self.stack.add_titled(
             child=TasksList(self.window, uid, self), name=name, title=name
@@ -79,7 +79,24 @@ class Lists(Adw.Bin):
                 Log.debug("Adding new list is cancelled")
                 return
 
-            self.add_list(entry.props.text.rstrip().lstrip())
+            name = entry.props.text.rstrip().lstrip()
+            uid = UserData.add_list(name)
+            row = Gtk.ListBoxRow(
+                child=Gtk.Label(
+                    label=name,
+                    halign="start",
+                    margin_start=6,
+                    margin_end=6,
+                    hexpand=True,
+                )
+            )
+            row.uid = uid
+            row.name = name
+            self.stack.add_titled(
+                child=TasksList(self.window, uid, self), name=name, title=name
+            )
+            self.lists.append(row)
+            self.lists.select_row(row)
 
         entry = Gtk.Entry(placeholder_text=_("New List Name"))  # type:ignore
         dialog = Adw.MessageDialog(
@@ -109,6 +126,7 @@ class Lists(Adw.Bin):
                     hexpand=True,
                 )
             )
+            row.uid = list[0]
             row.name = list[1]
             self.lists.append(row)
             self.stack.add_titled(
@@ -149,3 +167,28 @@ class Lists(Adw.Bin):
         row = self.lists.get_selected_row()
         row.get_child().set_label(name)
         row.name = name
+
+    def update_ui(self):
+        Log.debug("Lists: updating ui")
+        old_uids = [row.uid for row in get_children(self.lists)]
+        new_lists = UserData.get_lists()
+        for list in new_lists:
+            if list[0] not in old_uids:
+                row = Gtk.ListBoxRow(
+                    child=Gtk.Label(
+                        label=list[1],
+                        halign="start",
+                        margin_start=6,
+                        margin_end=6,
+                        hexpand=True,
+                    )
+                )
+                row.uid = list[0]
+                row.name = list[1]
+                self.stack.add_titled(
+                    child=TasksList(self.window, list[0], self),
+                    name=list[1],
+                    title=list[1],
+                )
+                self.lists.append(row)
+                self.lists.select_row(row)

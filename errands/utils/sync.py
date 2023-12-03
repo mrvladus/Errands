@@ -117,7 +117,11 @@ class SyncProviderCalDAV:
                 principal: Principal = client.principal()
                 Log.info(f"Sync: Connected to {self.name} server at '{self.url}'")
                 self.can_sync = True
-                self.calendars = principal.calendars()
+                self.calendars = [
+                    cal
+                    for cal in principal.calendars()
+                    if "VTODO" in cal.get_supported_components()
+                ]
                 # self.window.sync_btn.set_visible(True)
             except:
                 Log.error(f"Sync: Can't connect to {self.name} server at '{self.url}'")
@@ -212,58 +216,58 @@ class SyncProviderCalDAV:
         """
         Sync local tasks with provider
         """
+        Log.info(f"Sync: Sync tasks with remote")
+
         # Get new calendars
-        user_lists_names = [i[1] for i in UserData.get_lists()]
+        user_lists_uids = [i[0] for i in UserData.get_lists()]
         for calendar in self.calendars:
-            # Add new if not exists
-            if calendar.name not in user_lists_names:
-                list_uid = UserData.add_list(calendar.name)
+            # Add new lists
+            if calendar.id not in user_lists_uids:
+                UserData.add_list(name=calendar.name, uuid=calendar.id)
                 # Fetch tasks for the new list
                 for task in self._get_tasks(calendar):
                     UserData.add_task(
-                        list_uid, task["text"], task["uid"], task["parent"]
+                        calendar.id, task["text"], task["uid"], task["parent"]
                     )
+            # Get tasks
+            local_tasks = UserData.get_tasks_as_dicts(calendar.id)
+            remote_tasks = self._get_tasks(calendar)
+            remote_ids = [task["uid"] for task in remote_tasks]
 
-        # self._setup_calendar()
-        # caldav_tasks: list[dict] = self._get_tasks()
+            for task in local_tasks:
+                # Create new task on CalDAV that was created offline
+                if task["uid"] not in remote_ids and not task["synced"]:
+                    try:
+                        Log.debug(f"Sync: Create new task on remote: {task['uid']}")
+                        new_todo = calendar.save_todo(
+                            uid=task["uid"],
+                            summary=task["text"],
+                            related_to=task["parent"],
+                            # x_errands_color=task["color"],
+                        )
+                        # if task["completed"]:
+                        #     new_todo.complete()
+                        UserData.update_prop(calendar.id, task["uid"], "synced", True)
+                    except:
+                        Log.error(
+                            f"Sync: Can't create new task on remote: {task['uid']}"
+                        )
 
-        # Log.info(f"Sync: Sync tasks with {self.name}")
-
-        # data = UserData.get()
-        # caldav_ids: list[str] = [task["id"] for task in caldav_tasks]
-
-        # for task in data["tasks"]:
-        #     # Create new task on CalDAV that was created offline
-        #     if task["id"] not in caldav_ids and not task["synced_caldav"]:
-        #         try:
-        #             Log.debug(f"Sync: Create new task on CalDAV: {task['id']}")
-        #             new_todo = self.calendar.save_todo(
-        #                 uid=task["id"],
-        #                 summary=task["text"],
-        #                 related_to=task["parent"],
-        #                 x_errands_color=task["color"],
-        #             )
-        #             if task["completed"]:
-        #                 new_todo.complete()
-        #             task["synced_caldav"] = True
-        #         except:
-        #             Log.error(f"Sync: Error creating new task on CalDAV: {task['id']}")
-
-        #     # Update task on CalDAV that was changed locally
-        #     elif task["id"] in caldav_ids and not task["synced_caldav"]:
-        #         try:
-        #             Log.debug(f"Sync: Update task on CalDAV: {task['id']}")
-        #             todo: CalendarObjectResource = self.calendar.todo_by_uid(task["id"])
-        #             todo.uncomplete()
-        #             todo.icalendar_component["summary"] = task["text"]
-        #             todo.icalendar_component["related-to"] = task["parent"]
-        #             todo.icalendar_component["x-errands-color"] = task["color"]
-        #             todo.save()
-        #             if task["completed"]:
-        #                 todo.complete()
-        #             task["synced_caldav"] = True
-        #         except:
-        #             Log.error(f"Sync: Error updating task on CalDAV: {task['id']}")
+                # Update task on CalDAV that was changed locally
+                # elif task["uid"] in remote_ids and not task["synced"]:
+                #     try:
+                #         Log.debug(f"Sync: Update task on remote: {task['uid']}")
+                #         todo: CalendarObjectResource = calendar.todo_by_uid(task["uid"])
+                #         todo.uncomplete()
+                #         todo.icalendar_component["summary"] = task["text"]
+                #         todo.icalendar_component["related-to"] = task["parent"]
+                #         # todo.icalendar_component["x-errands-color"] = task["color"]
+                #         todo.save()
+                #         if task["completed"]:
+                #             todo.complete()
+                #         UserData.update_prop(calendar.id, task["uid"], "synced", True)
+                #     except:
+                #         Log.error(f"Sync: Can't update task on remote: {task['uid']}")
 
         # # Delete tasks on CalDAV if they were deleted locally
         # for task_id in data["deleted"]:
@@ -275,7 +279,7 @@ class SyncProviderCalDAV:
         #         Log.error(f"Sync: Can't delete task from CalDAV: {task_id}")
         # data["deleted"] = []
 
-        # UserData.set(data)
+        GLib.idle_add(self.window.lists.update_ui)
 
         # if fetch:
         #     self._fetch()
