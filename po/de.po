@@ -1,21 +1,21 @@
-# SOME DESCRIPTIVE TITLE.
+# German translation for Errands.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the list package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# This file is distributed under the same license as the errands package.
+# Philipp Kiemle <philipp.kiemle@gmail.com>, 2023.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-23 19:48+0300\n"
-"PO-Revision-Date: 2023-10-23 11:03+0200\n"
+"PO-Revision-Date: 2023-12-03 21:48+0100\n"
 "Last-Translator: Philipp Kiemle <philipp.kiemle@gmail.com>\n"
 "Language-Team: \n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.4\n"
+"X-Generator: Poedit 3.4.1\n"
 
 #: errands/widgets/window.py:111
 msgid "Export Cancelled"
@@ -308,29 +308,28 @@ msgstr "errands;tasks;list;todo;todos;Aufgaben;Liste;"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:41
 msgid "Todo application for those who prefer simplicity."
-msgstr ""
+msgstr "Todo-Anwendung für Menschen, die Einfachheit schätzen."
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:42
 msgid "Features:"
-msgstr ""
+msgstr "Funktionen:"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:44
 msgid "Add, remove, edit tasks and sub-tasks"
-msgstr ""
+msgstr "Aufgaben und Unteraufgaben hinzufügen, entfernen und bearbeiten"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:45
-#, fuzzy
 msgid "Mark task and sub-tasks as completed"
-msgstr "Als abgeschlossen markieren"
+msgstr "Aufgaben und Unteraufgaben als abgeschlossen markieren"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:46
 msgid "Add accent color for each task"
-msgstr ""
+msgstr "Akzentfarbe für jede Aufgabe hinzufügen"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:47
 msgid "Sync tasks with Nextcloud or other CalDAV providers"
-msgstr ""
+msgstr "Aufgaben mit Nextcloud oder anderen CalDAV-Anbietern synchronisieren"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:48
 msgid "Drag and Drop support"
-msgstr ""
+msgstr "Drag-and-Drop-Unterstützung"
