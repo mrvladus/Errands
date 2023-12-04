@@ -44,9 +44,20 @@ class Lists(Adw.Bin):
         # Lists
         self.lists = Gtk.ListBox(css_classes=["navigation-sidebar"])
         self.lists.connect("row-selected", self.switch_list)
+        # Status page
+        self.status_page = Adw.StatusPage(
+            title=_("Add new List"),  # type:ignore
+            description=_('Click "+" button'),  # type:ignore
+            icon_name="view-list-bullet-rtl-symbolic",
+            css_classes=["compact"],
+            vexpand=True,
+        )
+        box = Gtk.Box(orientation="vertical")
+        box.append(self.lists)
+        box.append(self.status_page)
         # Toolbar view
         toolbar_view = Adw.ToolbarView(
-            content=Gtk.ScrolledWindow(child=self.lists, propagate_natural_height=True)
+            content=Gtk.ScrolledWindow(child=box, propagate_natural_height=True)
         )
         toolbar_view.add_top_bar(hb)
         self.set_child(toolbar_view)
@@ -142,8 +153,10 @@ class Lists(Adw.Bin):
             self.stack.set_visible_child_name(row.name)
             self.window.split_view.set_show_content(True)
             GSettings.set("last-open-list", "s", row.name)
+            self.status_page.set_visible(False)
         else:
             self.stack.set_visible_child_name("status")
+            self.status_page.set_visible(True)
 
     def delete_list(self, widget: Gtk.Widget):
         Log.info(f"Delete list {widget.list_uid}")

@@ -41,10 +41,10 @@ class Window(Adw.ApplicationWindow):
         # Status page
         status_page = Adw.StatusPage(
             title=_("No Task Lists"),  # type:ignore
-            icon_name="checkbox-checked-symbolic",
+            icon_name=APP_ID,
         )
         add_list_btn = Gtk.Button(
-            label="Add List",
+            label="Create List",
             halign="center",
             css_classes=["pill", "suggested-action"],
         )
