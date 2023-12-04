@@ -138,9 +138,12 @@ class Lists(Adw.Bin):
                 self.lists.select_row(row)
 
     def switch_list(self, _, row):
-        self.stack.set_visible_child_name(row.name)
-        self.window.split_view.set_show_content(True)
-        GSettings.set("last-open-list", "s", row.name)
+        if row:
+            self.stack.set_visible_child_name(row.name)
+            self.window.split_view.set_show_content(True)
+            GSettings.set("last-open-list", "s", row.name)
+        else:
+            self.stack.set_visible_child_name("status")
 
     def delete_list(self, widget: Gtk.Widget):
         Log.info(f"Delete list {widget.list_uid}")

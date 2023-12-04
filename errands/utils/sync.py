@@ -131,7 +131,7 @@ class SyncProviderCalDAV:
                         + " "
                         + self.url
                     )
-                self.window.sync_btn.set_visible(False)
+                # self.window.sync_btn.set_visible(False)
 
     def _get_tasks(self, calendar) -> list[dict]:
         """

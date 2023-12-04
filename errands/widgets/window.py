@@ -37,16 +37,33 @@ class Window(Adw.ApplicationWindow):
         self.props.height_request = 200
         # Stack
         stack = Adw.ViewStack()
+        self.lists = Lists(self, stack)
+        # Status page
+        status_page = Adw.StatusPage(
+            title=_("No Task Lists"),  # type:ignore
+            icon_name="checkbox-checked-symbolic",
+        )
+        add_list_btn = Gtk.Button(
+            label="Add List",
+            halign="center",
+            css_classes=["pill", "suggested-action"],
+        )
+        add_list_btn.connect("clicked", self.lists.on_add_btn_clicked)
+        box = Gtk.Box(orientation="vertical", vexpand=True, valign="center")
+        box.append(status_page)
+        box.append(add_list_btn)
+        status_toolbar_view = Adw.ToolbarView(content=box)
+        status_toolbar_view.add_top_bar(Adw.HeaderBar(show_title=False))
+        stack.add_titled(child=status_toolbar_view, name="status", title="Status")
         # Split view
         self.split_view = Adw.NavigationSplitView(
             max_sidebar_width=240, min_sidebar_width=240, show_content=True
         )
-        self.lists = Lists(self, stack)
         self.split_view.set_sidebar(Adw.NavigationPage.new(self.lists, "Lists"))
         self.split_view.set_content(Adw.NavigationPage.new(stack, "Tasks"))
         # Toast overlay
         self.toast_overlay = Adw.ToastOverlay(child=self.split_view)
-
+        # Breakpoints
         bp = Adw.Breakpoint.new(Adw.breakpoint_condition_parse("max-width: 1080px"))
         bp.add_setter(self.split_view, "collapsed", True)
         bp.add_setter(self.split_view, "show-content", True)
