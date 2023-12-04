@@ -289,24 +289,22 @@ msgstr "Добавьте подзадачу"
 msgid "Restore"
 msgstr "Восстановить"
 
-#. TRANSLATORS: Don't translate
 #: data/io.github.mrvladus.List.desktop.in.in:4
 msgid "Errands"
-msgstr ""
+msgstr "Дела"
 
 #: data/io.github.mrvladus.List.desktop.in.in:5
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:39
 msgid "Manage your tasks"
 msgstr "Управляйте своими задачами"
 
-#. TRANSLATORS: Don't translate
 #: data/io.github.mrvladus.List.desktop.in.in:12
 msgid "errands;tasks;list;todo;todos;"
-msgstr ""
+msgstr "дела;задачи;лист;"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:41
 msgid "Todo application for those who prefer simplicity."
-msgstr "Todo приложение для тех, кто предпочитает простоту"
+msgstr "Список задач для тех, кто предпочитает простоту"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:42
 msgid "Features:"
