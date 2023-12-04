@@ -1,337 +1,338 @@
-# Spanish translation for Errands.
+# Basque (eu.po) translation of Errands.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the errands package.
-#
-# Ian Jose Ferrero <ferreroianjose@outlook.com.ar>, 2023
 # Sergio Varela <sergiovg01@outlook.com>, 2023.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: sergiovg01@outlook.com\n"
 "POT-Creation-Date: 2023-10-23 19:48+0300\n"
-"PO-Revision-Date: 2023-12-01 00:29+0100\n"
+"PO-Revision-Date: 2023-12-02 00:14+0100\n"
 "Last-Translator: Sergio Varela <sergiovg01@outlook.com>\n"
 "Language-Team: Spanish - Spain <sergiovg01@outlook.com>\n"
 "Language: es_ES\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Gtranslator 45.3\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"X-Generator: Gtranslator 45.3\n"
 
 #: errands/widgets/window.py:111
 msgid "Export Cancelled"
-msgstr "Exportación cancelada"
+msgstr "Esportazioa ezeztatu da"
 
 #: errands/widgets/window.py:117
 msgid "Tasks Exported"
-msgstr "Tareas exportadas"
+msgstr "Atazak esportatu egin dira"
 
 #: errands/widgets/window.py:120
 msgid "Error"
-msgstr "Error"
+msgstr "Errorea"
 
 #: errands/widgets/window.py:137
 msgid "Import Cancelled"
-msgstr "Importación cancelada"
+msgstr "Inportazioa ezeztatu da"
 
 #: errands/widgets/window.py:146
 msgid "Invalid File"
-msgstr "Archivo no válido"
+msgstr "Fitxategia ez da baliozkoa"
 
 #: errands/widgets/window.py:164
 msgid "Tasks Imported"
-msgstr "Tareas importadas"
+msgstr "Atazak inportatu egin dira"
 
 #: errands/widgets/window.py:334 errands/widgets/task.py:173
 msgid "Completed:"
-msgstr "Completado:"
+msgstr "Eginda:"
 
 #: errands/widgets/task.py:80
 msgid "Copied to Clipboard"
-msgstr "Copiado al portapapeles"
+msgstr "Arbelean kopiatuta"
 
 #. pyright:ignore
 #: errands/utils/sync.py:80
 msgid "Not all sync credentials provided. Please check settings."
-msgstr ""
-"No se han proporcionado todas las credenciales de sincronización. Comprueba "
-"la configuración."
+msgstr "Ez dira eman sinkronizazio-kredentzial guztiak. Egiaztatu hobespenak."
 
 #: errands/utils/sync.py:120
 msgid "Can't connect to CalDAV server at:"
-msgstr "No se puede conectar al servidor CalDAV en:"
+msgstr "Ezin da CalDAV zerbitzariarekin konektatu:"
 
 #: errands/resources/ui/window.ui:26
 msgid "Deleted Tasks"
-msgstr "Tareas eliminadas"
+msgstr "Ezabatutako atazak"
 
 #: errands/resources/ui/window.ui:35 errands/resources/ui/window.ui:38
 msgid "Clear"
-msgstr "Limpiar"
+msgstr "Ezabatu"
 
 #: errands/resources/ui/window.ui:53 errands/resources/ui/window.ui:56
 msgid "Restore All"
-msgstr "Restaurar todas"
+msgstr "Dena leheneratu"
 
 #: errands/resources/ui/window.ui:68 errands/resources/ui/window.ui:71
 msgid "Close Trash"
-msgstr "Cerrar papelera"
+msgstr "Zakarrontzia itxi"
 
 #: errands/resources/ui/window.ui:106
 msgid "Move to Trash"
-msgstr "Mover a la papelera"
+msgstr "Zakarrontzira mugitu"
 
 #: errands/resources/ui/window.ui:130
 msgid "Empty Trash"
-msgstr "Papelera vacía"
+msgstr "Zakarrontzia hustu"
 
 #: errands/resources/ui/window.ui:131
 msgid "No deleted items"
-msgstr "No hay elementos eliminados"
+msgstr "Ez dago elementurik ezabatuta"
 
 #: errands/resources/ui/window.ui:192 errands/resources/ui/window.ui:195
 msgid "Show Deleted Tasks"
-msgstr "Mostrar tareas eliminadas"
+msgstr "Erakutsi ezabatutako atazak"
 
 #: errands/resources/ui/window.ui:221 errands/resources/ui/window.ui:224
 msgid "Delete Completed Tasks (Ctrl+Delete)"
-msgstr "Eliminar tareas completadas (Ctrl+Delete)"
+msgstr "Ezabatu betetako atazak (Ctrl+Supr)"
 
 #: errands/resources/ui/window.ui:248 errands/resources/ui/window.ui:250
 msgid "Main Menu"
-msgstr "Menú principal"
+msgstr "Menu nagusia"
 
 #: errands/resources/ui/window.ui:260 errands/resources/ui/window.ui:263
 msgid "Sync/Fetch Tasks (Ctrl+S)"
-msgstr "Sincronizar/recuperar tareas (Ctrl+S)"
+msgstr "Atazak sinkronizatu/lortu (Ctrl+S)"
 
 #: errands/resources/ui/window.ui:287 errands/resources/ui/window.ui:290
 #: errands/resources/ui/window.ui:399 errands/resources/ui/window.ui:402
 msgid "Scroll Up"
-msgstr "Desplazarse hacia arriba"
+msgstr "Gorantz egin"
 
 #: errands/resources/ui/window.ui:321
 msgid "Add new Task"
-msgstr "Añadir nueva tarea"
+msgstr "Gehitu ataza berria"
 
 #: errands/resources/ui/window.ui:429
 msgid "Export Tasks..."
-msgstr "Exportar tareas..."
+msgstr "Esportatu atazak..."
 
 #: errands/resources/ui/window.ui:433
 msgid "Import Tasks..."
-msgstr "Importar tareas..."
+msgstr "Inportatu atazak..."
 
 #: errands/resources/ui/window.ui:439 errands/resources/ui/window.ui:478
 msgid "Preferences"
-msgstr "Preferencias"
+msgstr "Hobespenak"
 
 #: errands/resources/ui/window.ui:443
 msgid "Keyboard Shortcuts"
-msgstr "Atajos del teclado"
+msgstr "Teklatuko lasterbideak"
 
 #: errands/resources/ui/window.ui:447
 msgid "About Errands"
-msgstr "Acerca de Recados"
+msgstr "Errands-i buruz"
 
 #: errands/resources/ui/window.ui:463
 msgid "General"
-msgstr "General"
+msgstr "Orokorra"
 
 #: errands/resources/ui/window.ui:466
 msgid "Show keyboard shortcuts"
-msgstr "Mostrar atajos del teclado"
+msgstr "Erakutsi teklatuko lasterbideak"
 
 #: errands/resources/ui/window.ui:472
 msgid "Toggle sidebar"
-msgstr "Alternar barra lateral"
+msgstr "Txandakatu alboko barra"
 
 #: errands/resources/ui/window.ui:484
 msgid "Quit"
-msgstr "Salir"
+msgstr "Irten"
 
 #: errands/resources/ui/window.ui:494
 msgid "Import and Export"
-msgstr "Importar y exportar"
+msgstr "Inportazioa eta esportazioa"
 
 #: errands/resources/ui/window.ui:497
 msgid "Import tasks"
-msgstr "Importar tareas"
+msgstr "Inportatu atazak"
 
 #: errands/resources/ui/window.ui:503
 msgid "Export tasks"
-msgstr "Exportar tareas"
+msgstr "Esportatu atazak"
 
+# ES_EU: Use "Atazak" instead of "Zereginak".
+# https://hiztegiak.elhuyar.eus/es/tarea#
 #: errands/resources/ui/window.ui:513 errands/resources/ui/preferences.ui:66
 msgid "Tasks"
-msgstr "Tareas"
+msgstr "Atazak"
 
 #: errands/resources/ui/window.ui:516
 msgid "Delete completed tasks"
-msgstr "Eliminar tareas completadas"
+msgstr "Ezabatu betetako atazak"
 
 #: errands/resources/ui/window.ui:522
 msgid "Exit edit mode"
-msgstr "Salir del modo de edición"
+msgstr "Edizio modutik atera"
 
 #: errands/resources/ui/window.ui:528
 msgid "Sync/Fetch Tasks"
-msgstr "Sincronizar/recuperar tareas"
+msgstr "Atazak sinkronizatu/lortu"
 
 #: errands/resources/ui/window.ui:545
 msgid "translator-credits"
-msgstr "Sergio Varela"
+msgstr ""
+"Sergio Varela\n"
+"https://ingrownmink4.codeberg.page"
 
 #: errands/resources/ui/window.ui:581
 msgid "Are you sure?"
-msgstr "¿Estás seguro?"
+msgstr "Ziur zaude?"
 
 #: errands/resources/ui/window.ui:582
 msgid "Tasks will be permanently deleted"
-msgstr "Las tareas serán eliminadas de forma permanente"
+msgstr "Atazak etengabe ezabatuko dira"
 
 #: errands/resources/ui/window.ui:587
 msgid "Cancel"
-msgstr "Cancelar"
+msgstr "Ezeztatu"
 
 #: errands/resources/ui/window.ui:588 errands/resources/ui/task.ui:13
 msgid "Delete"
-msgstr "Eliminar"
+msgstr "Ezabatu"
 
 #: errands/resources/ui/preferences.ui:14
 msgid "Application Theme"
-msgstr "Tema de la aplicación"
+msgstr "Aplikazioaren gaia"
 
 #: errands/resources/ui/preferences.ui:19
 msgid "System"
-msgstr "Sistema"
+msgstr "Sistemarena"
 
 #: errands/resources/ui/preferences.ui:33
 msgid "Light"
-msgstr "Claro"
+msgstr "Argia"
 
 #: errands/resources/ui/preferences.ui:48
 msgid "Dark"
-msgstr "Oscuro"
+msgstr "Iluna"
 
 #: errands/resources/ui/preferences.ui:71
 msgid "Expand Sub-Tasks on Startup"
-msgstr "Expandir subtareas al inicio"
+msgstr "Azpiatazak hasieran zabaldu"
 
 #: errands/resources/ui/preferences.ui:87
 msgid "Sync"
-msgstr "Sincronización"
+msgstr "Sinkronizatu"
 
 #: errands/resources/ui/preferences.ui:92
 msgid "Sync Provider"
-msgstr "Proveedor de sincronización"
+msgstr "Sinkronizazio-hornitzailea"
 
 #: errands/resources/ui/preferences.ui:96
 msgid "Disabled"
-msgstr "Deshabilitado"
+msgstr "Desgaitua"
 
 #: errands/resources/ui/preferences.ui:111
 msgid "Server URL"
-msgstr "URL del servidor"
+msgstr "Zerbitzariaren URLa"
 
 #: errands/resources/ui/preferences.ui:118
 msgid "Username"
-msgstr "Nombre de usuario"
+msgstr "Erabiltzailearen izena"
 
 #: errands/resources/ui/preferences.ui:125
 msgid "Password"
-msgstr "Contraseña"
+msgstr "Pasahitza"
 
 #: errands/resources/ui/preferences.ui:132
 msgid "Calendar Name (\"Errands\" by Default)"
-msgstr "Nombre del calendario (\"Recados\" por defecto)"
+msgstr "Egutegiaren izena (\"Errands\" aukera lehenetsita da)"
 
 #: errands/resources/ui/preferences.ui:141
 msgid "Token"
-msgstr "Token"
+msgstr "Autentifikatzailea"
 
 #: errands/resources/ui/preferences.ui:148
 msgid "Test Connection"
-msgstr "Prueba de conexión"
+msgstr "Konexio-proba"
 
 #: errands/resources/ui/preferences.ui:151
 msgid "Test"
-msgstr "Prueba"
+msgstr "Proba"
 
 #: errands/resources/ui/task.ui:17
 msgid "Edit"
-msgstr "Editar"
+msgstr "Editatu"
 
 #: errands/resources/ui/task.ui:21
 msgid "Copy"
-msgstr "Copiar"
+msgstr "Kopiatu"
 
 #: errands/resources/ui/task.ui:139 errands/resources/ui/task.ui:142
 msgid "Mark as Completed"
-msgstr "Marcar como completada"
+msgstr "Markatu eginda bezala"
 
 #: errands/resources/ui/task.ui:189 errands/resources/ui/task.ui:192
 msgid "Clear style"
-msgstr "Limpiar estilos"
+msgstr "Estiloa garbitu"
 
 #: errands/resources/ui/task.ui:290 errands/resources/ui/task.ui:292
 msgid "Menu"
-msgstr "Menú"
+msgstr "Menua"
 
 #: errands/resources/ui/task.ui:338 errands/resources/ui/task.ui:341
 msgid "Cancel (Escape)"
-msgstr "Cancelar (Esc)"
+msgstr "Ezeztatu (Esc)"
 
 #: errands/resources/ui/task.ui:387
 msgid "Add new Sub-Task"
-msgstr "Añadir subtarea"
+msgstr "Erantsi azpiataza berri bat"
 
 #: errands/resources/ui/trash_item.ui:20 errands/resources/ui/trash_item.ui:24
 msgid "Restore"
-msgstr "Restaurar"
+msgstr "Leheneratu"
 
 #. TRANSLATORS: Don't translate
 #: data/io.github.mrvladus.List.desktop.in.in:4
 msgid "Errands"
-msgstr "Recados"
+msgstr "Errands"
 
 #: data/io.github.mrvladus.List.desktop.in.in:5
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:39
 msgid "Manage your tasks"
-msgstr "Administrar tareas"
+msgstr "Kudeatu zure zereginak"
 
 #. TRANSLATORS: Don't translate
 #: data/io.github.mrvladus.List.desktop.in.in:12
 msgid "errands;tasks;list;todo;todos;"
-msgstr "recados;tareas;lista;todo;todos;"
+msgstr ""
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:41
 msgid "Todo application for those who prefer simplicity."
-msgstr ""
-"Una aplicación de listas de tareas, para los que prefieren la sencillez."
+msgstr "Sinpletasuna nahiago dutenentzat, atazak kudeatzeko aplikazioa."
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:42
 msgid "Features:"
-msgstr "Características"
+msgstr "Ezaugarriak:"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:44
 msgid "Add, remove, edit tasks and sub-tasks"
-msgstr "Añadir, eliminar, editar tareas y subtareas"
+msgstr "Atazak eta azpiatazak gehitu, ezabatu, edo editatu"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:45
 msgid "Mark task and sub-tasks as completed"
-msgstr "Marcar la tarea y las subtareas como completadas"
+msgstr "Ataza eta azpiatazak eginda bezala markatu"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:46
 msgid "Add accent color for each task"
-msgstr "Añadir un color de acento para cada tarea"
+msgstr "Erantsi azentu-kolore bat ataza bakoitzerako"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:47
 msgid "Sync tasks with Nextcloud or other CalDAV providers"
-msgstr "Sincronización de tareas con Nextcloud u otros proveedores de CalDAV"
+msgstr ""
+"Atazen sinkronizazioa Nextcloud-ekin edo CalDAV-en beste hornitzaile "
+"batzuekin"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:48
 msgid "Drag and Drop support"
-msgstr "Compatibilidad con la opción de arrastrar y soltar"
+msgstr "Arrastatzeko eta askatzeko euskarria"

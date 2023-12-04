@@ -57,6 +57,18 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="45.0.6" date="2023-11-30">
+      <description translatable="no">
+        <p>Fixed:</p>
+        <ul>
+          <li>Task status not being updated when deleting completed tasks button is clicked</li>
+        </ul>
+        <p>Translations:</p>
+        <ul>
+          <li>Updated Catalan translation (Arnau Ferreres)</li>
+        </ul>
+      </description>
+    </release>
     <release version="45.0.5" date="2023-11-26">
       <description translatable="no">
         <p>Improved:</p>
