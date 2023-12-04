@@ -289,10 +289,9 @@ msgstr "Добавьте подзадачу"
 msgid "Restore"
 msgstr "Восстановить"
 
-#. TRANSLATORS: Don't translate
 #: data/io.github.mrvladus.List.desktop.in.in:4
 msgid "Errands"
-msgstr ""
+msgstr "Дела"
 
 #: data/io.github.mrvladus.List.desktop.in.in:5
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:39
