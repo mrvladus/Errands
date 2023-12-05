@@ -152,8 +152,18 @@ class UserData:
         tasks = []
         for task in res:
             new_task = {
+                "color": task[0],
+                "completed": task[1],
+                "deleted": task[2],
+                "end_date": task[3],
+                "list_uid": task[4],
+                "notes": task[5],
                 "parent": task[6],
+                "percent_complete": task[7],
+                "priority": task[8],
+                "start_date": task[9],
                 "synced": task[10],
+                "tags": task[11],
                 "text": task[12],
                 "uid": task[13],
             }
@@ -163,20 +173,20 @@ class UserData:
     @classmethod
     def add_task(
         cls,
-        list_uid: str,
-        text: str,
-        uid: str = "",
-        parent: str = "",
+        color: str = "",
         completed: bool = False,
         deleted: bool = False,
-        color: str = "",
-        start_date: str = "",
         end_date: str = "",
+        list_uid: str = "",
         notes: str = "",
+        parent: str = "",
         percent_complete: int = 0,
         priority: int = 0,
-        tags: str = "",
+        start_date: str = "",
         synced: bool = False,
+        tags: str = "",
+        text: str = "",
+        uid: str = "",
     ) -> str:
         if not uid:
             uid = str(uuid4())

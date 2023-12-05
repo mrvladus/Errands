@@ -349,9 +349,10 @@ class Details(Adw.Bin):
                 continue
             tag_arr.append(row.get_title())
         self.parent.update_prop("tags", ",".join(tag_arr))
-        # Update data and sync
-        Sync.sync()
         self.save_btn.set_sensitive(False)
+        # Sync
+        self.parent.update_prop("synced", False)
+        Sync.sync()
 
     def on_start_time_changed(self, _):
         # Get time
