@@ -55,8 +55,8 @@ class Task(Gtk.Revealer):
             res = bool(res)
         return res
 
-    def update_prop(self, prop: str, value):
-        UserData.update_prop(self.list_uid, self.uid, prop, value)
+    def update_props(self, props: list[str], values: list):
+        UserData.update_props(self.list_uid, self.uid, props, values)
 
     def build_ui(self):
         # Top drop area
@@ -181,7 +181,7 @@ class Task(Gtk.Revealer):
         Log.info(f"Move task to trash: {self.uid}")
 
         self.toggle_visibility(False)
-        self.update_prop("deleted", True)
+        self.update_prop(["deleted"], [True])
         self.completed_btn.set_active(True)
         self.tasks_panel.trash_panel.trash_add(self.uid)
         for task in get_children(self.tasks_list):
@@ -253,25 +253,22 @@ class Task(Gtk.Revealer):
             return
 
         # Update data
-        self.update_prop("completed", btn.get_active())
-        # self.update_prop("synced", False)
+        self.update_props(["completed", "synced"], [btn.get_active(), False])
         # Update children
-        # children: list[Task] = get_children(self.tasks_list)
-        # for task in children:
-        #     task.can_sync = False
-        #     task.completed_btn.set_active(btn.get_active())
+        children: list[Task] = get_children(self.tasks_list)
+        for task in children:
+            task.can_sync = False
+            task.completed_btn.set_active(btn.get_active())
         # Update status
-        if self.is_sub_task:
-            self.parent.update_status()
+        self.parent.update_status()
         # Set text
         set_text()
         # Sync
-        Sync.sync()
-        # if self.can_sync:
-        #     Sync.sync()
-        #     self.tasks_panel.update_status()
-        #     for task in children:
-        #         task.can_sync = True
+        if self.can_sync:
+            Sync.sync()
+            self.tasks_panel.update_status()
+            for task in children:
+                task.can_sync = True
 
     def on_details_clicked(self, *args):
         self.tasks_panel.sidebar.set_visible_child_name("details")
@@ -293,7 +290,7 @@ class Task(Gtk.Revealer):
         # Clear entry
         entry.get_buffer().props.text = ""
         # Update status
-        self.update_prop("completed", False)
+        self.update_props(["completed"], [False])
         self.just_added = True
         self.completed_btn.set_active(False)
         self.just_added = False
