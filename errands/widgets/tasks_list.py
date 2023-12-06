@@ -347,10 +347,10 @@ class TasksList(Adw.Bin):
             self.add_task(uid)
         self.update_status()
         # Expand tasks if needed
-        if GSettings.get("expand-on-startup"):
-            for task in self.get_all_tasks():
-                if len(get_children(task.tasks_list)) > 0:
-                    task.expand(True)
+        # if GSettings.get("expand-on-startup"):
+        #     for task in self.get_all_tasks():
+        #         if len(get_children(task.tasks_list)) > 0:
+        #             task.expand(True)
         # Sync.sync(True)
 
     def update_status(self) -> None:
@@ -496,7 +496,7 @@ class TasksList(Adw.Bin):
         text: str = entry.props.text
         if text.strip(" \n\t") == "":
             return
-        self.add_task(UserData.add_task(self.list_uid, text))
+        self.add_task(UserData.add_task(list_uid=self.list_uid, text=text))
         entry.props.text = ""
         scroll(self.scrl, True)
         Sync.sync()

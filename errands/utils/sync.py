@@ -1,6 +1,7 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
+import datetime
 from caldav import Calendar, CalendarObjectResource, DAVClient, Principal, Todo
 from gi.repository import Adw, GLib
 
@@ -138,32 +139,60 @@ class SyncProviderCalDAV:
         Get todos from calendar and convert them to dict
         """
 
-        try:
-            Log.debug(f"Getting tasks from CalDAV")
-            todos: list[Todo] = calendar.todos(include_completed=True)
-            tasks: list[dict] = []
-            for todo in todos:
-                data: dict = {
-                    "color": str(todo.icalendar_component.get("x-errands-color", "")),
-                    "completed": str(todo.icalendar_component.get("status", ""))
-                    == "COMPLETED",
-                    "end_date": str(todo.icalendar_component.get("due", "")),
-                    "notes": str(todo.icalendar_component.get("description", "")),
-                    "parent": str(todo.icalendar_component.get("related-to", "")),
-                    "percent_complete": int(
-                        todo.icalendar_component.get("percent-complete", 0)
-                    ),
-                    "priority": int(todo.icalendar_component.get("priority", 0)),
-                    "start_date": str(todo.icalendar_component.get("dtstart", "")),
-                    "tags": str(todo.icalendar_component.get("categories", "")),
-                    "text": str(todo.icalendar_component.get("summary", "")),
-                    "uid": str(todo.icalendar_component.get("uid", "")),
-                }
-                tasks.append(data)
-            return tasks
-        except:
-            Log.error(f"Sync: Can't get tasks from CalDAV")
-            return []
+        # try:
+        Log.debug(f"Getting tasks from CalDAV")
+        todos: list[Todo] = calendar.todos(include_completed=True)
+        tasks: list[dict] = []
+        for todo in todos:
+            data: dict = {
+                "color": str(todo.icalendar_component.get("x-errands-color", "")),
+                "completed": str(todo.icalendar_component.get("status", ""))
+                == "COMPLETED",
+                "notes": str(todo.icalendar_component.get("description", "")),
+                "parent": str(todo.icalendar_component.get("related-to", "")),
+                "percent_complete": int(
+                    todo.icalendar_component.get("percent-complete", 0)
+                ),
+                "priority": int(todo.icalendar_component.get("priority", 0)),
+                "text": str(todo.icalendar_component.get("summary", "")),
+                "uid": str(todo.icalendar_component.get("uid", "")),
+            }
+            # Set tags
+            if todo.icalendar_component.get("categories", "") != "":
+                data["tags"] = ",".join(
+                    [
+                        i.to_ical().decode("utf-8")
+                        for i in todo.icalendar_component["categories"]
+                    ]
+                )
+            else:
+                data["tags"] = ""
+            # Set date
+            if todo.icalendar_component.get("due", "") != "":
+                data["end_date"] = (
+                    todo.icalendar_component.get("due", "")
+                    .to_ical()
+                    .decode("utf-8")
+                    .strip("Z")
+                )
+            else:
+                data["end_date"] = ""
+
+            if todo.icalendar_component.get("dtstart", "") != "":
+                data["start_date"] = (
+                    todo.icalendar_component.get("dtstart", "")
+                    .to_ical()
+                    .decode("utf-8")
+                    .strip("Z")
+                )
+            else:
+                data["start_date"] = ""
+
+            tasks.append(data)
+        return tasks
+        # except Exception as e:
+        #     Log.error(f"Sync: Can't get tasks from CalDAV\n{e}")
+        #     return []
 
     def _fetch(self):
         """
@@ -264,14 +293,13 @@ class SyncProviderCalDAV:
                     try:
                         Log.debug(f"Sync: Create new task on remote: {task['uid']}")
                         new_todo = calendar.save_todo(
-                            categories=task["tags"],
+                            categories=task["tags"] if task["tags"] != "" else None,
                             description=task["notes"],
-                            dtstart=task["start_date"],
-                            due=task["end_date"],
+                            dtstart=datetime.datetime.fromisoformat(task["start_date"]),
+                            due=datetime.datetime.fromisoformat(task["end_date"]),
                             priority=task["priority"],
                             percent_complete=task["percent_complete"],
                             related_to=task["parent"],
-                            status="COMPLETED" if task["completed"] else "IN-PROGRESS",
                             summary=task["text"],
                             uid=task["uid"],
                             x_errands_color=task["color"],
@@ -279,37 +307,37 @@ class SyncProviderCalDAV:
                         if task["completed"]:
                             new_todo.complete()
                         UserData.update_prop(calendar.id, task["uid"], "synced", True)
-                    except:
+                    except Exception as e:
                         Log.error(
-                            f"Sync: Can't create new task on remote: {task['uid']}"
+                            f"Sync: Can't create new task on remote: {task['uid']}\n{e}"
                         )
 
                 # Update task on CalDAV that was changed locally
                 elif task["uid"] in remote_ids and not task["synced"]:
-                    try:
-                        Log.debug(f"Sync: Update task on remote: {task['uid']}")
-                        todo: CalendarObjectResource = calendar.todo_by_uid(task["uid"])
-                        todo.uncomplete()
-                        todo.icalendar_component["summary"] = task["text"]
-                        todo.icalendar_component["due"] = task["end_date"]
-                        todo.icalendar_component["dtstart"] = task["start_date"]
-                        todo.icalendar_component["percent-complete"] = task[
-                            "percent_complete"
-                        ]
-                        todo.icalendar_component["description"] = task["notes"]
-                        todo.icalendar_component["priority"] = task["priority"]
-                        todo.icalendar_component["categories"] = task["tags"]
-                        todo.icalendar_component["related-to"] = task["parent"]
-                        todo.icalendar_component["x-errands-color"] = task["color"]
-                        todo.icalendar_component["status"] = (
-                            "COMPLETED" if task["completed"] else "IN-PROGRESS"
-                        )
-                        todo.save()
-                        if task["completed"]:
-                            todo.complete()
-                        UserData.update_prop(calendar.id, task["uid"], "synced", True)
-                    except:
-                        Log.error(f"Sync: Can't update task on remote: {task['uid']}")
+                    # try:
+                    Log.debug(f"Sync: Update task on remote: {task['uid']}")
+                    todo = calendar.todo_by_uid(task["uid"])
+                    todo.uncomplete()
+                    todo.icalendar_component["summary"] = task["text"]
+                    todo.icalendar_component["due"] = task["end_date"]
+                    todo.icalendar_component["dtstart"] = task["start_date"]
+                    todo.icalendar_component["percent-complete"] = task[
+                        "percent_complete"
+                    ]
+                    todo.icalendar_component["description"] = task["notes"]
+                    todo.icalendar_component["priority"] = task["priority"]
+                    if task["tags"] != "":
+                        todo.icalendar_component["categories"] = task["tags"].split(",")
+                    todo.icalendar_component["related-to"] = task["parent"]
+                    todo.icalendar_component["x-errands-color"] = task["color"]
+                    todo.save()
+                    if task["completed"]:
+                        todo.complete()
+                    UserData.update_prop(calendar.id, task["uid"], "synced", True)
+                    # except Exception as e:
+                    #     Log.error(
+                    #         f"Sync: Can't update task on remote: {task['uid']}\n{e}"
+                    #     )
 
         # # Delete tasks on CalDAV if they were deleted locally
         # for task_id in data["deleted"]:

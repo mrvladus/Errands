@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 from typing import Self
+from errands.utils.gsettings import GSettings
 from gi.repository import Gtk, Adw, Gdk, GObject
 
 # Import modules
@@ -36,14 +37,17 @@ class Task(Gtk.Revealer):
         self.is_sub_task = is_sub_task
 
         self.build_ui()
+        self.add_sub_tasks()
         # Add to trash if needed
         if self.get_prop("deleted"):
             self.tasks_panel.trash_panel.trash_add(self.uid)
-        # Expand when added by entry
-        if not self.window.startup and self.parent != self.tasks_panel:
-            self.parent.expand(True)
-        self.add_sub_tasks()
-        self.parent.update_status()
+        # Expand
+        if (
+            GSettings.get("expand-on-startup")
+            and self.window.startup
+            and len(get_children(self.tasks_list)) > 0
+        ):
+            self.expand(True)
 
     def get_prop(self, prop: str):
         res = UserData.get_prop(self.list_uid, self.uid, prop)
@@ -77,7 +81,7 @@ class Task(Gtk.Revealer):
         # Task row
         self.task_row = Adw.ActionRow(
             title=Markup.find_url(Markup.escape(self.get_prop("text"))),
-            css_classes=["rounded-corners"],
+            css_classes=["rounded-corners", "transparent"],
             height_request=60,
             tooltip_text=_("Click for Details"),  # type:ignore
             accessible_role=Gtk.AccessibleRole.ROW,
@@ -95,16 +99,13 @@ class Task(Gtk.Revealer):
             icon_name="up-small-symbolic",
             valign="center",
             tooltip_text=_("Expand / Fold"),  # type:ignore
-            css_classes=["flat", "circular", "fade"],
+            css_classes=["flat", "circular", "fade", "rotate"],
         )
-        self.expand_btn.connect(
-            "clicked",
-            lambda *_: self.expand(not self.sub_tasks_revealer.get_child_revealed()),
-        )
+        self.expand_btn.connect("clicked", self.on_expand_btn)
         self.task_row.add_suffix(self.expand_btn)
         task_row_box = Gtk.ListBox(
             selection_mode=0,
-            css_classes=["rounded-corners"],
+            css_classes=["rounded-corners", "transparent"],
             accessible_role=Gtk.AccessibleRole.PRESENTATION,
         )
         task_row_box.append(self.task_row)
@@ -172,6 +173,7 @@ class Task(Gtk.Revealer):
         for uid in UserData.get_sub_tasks(self.list_uid, self.uid):
             self.add_task(uid)
         self.update_status()
+        self.parent.update_status()
         self.tasks_panel.update_status()
         self.just_added = False
 
@@ -188,11 +190,15 @@ class Task(Gtk.Revealer):
         self.tasks_panel.details_panel.status.set_visible(True)
 
     def expand(self, expanded: bool) -> None:
+        Log.debug(f"Task: {'Expand' if expanded else 'Fold'}")
         self.sub_tasks_revealer.set_reveal_child(expanded)
         if expanded:
             self.expand_btn.remove_css_class("rotate")
         else:
             self.expand_btn.add_css_class("rotate")
+
+    def on_expand_btn(self, btn):
+        self.expand(not self.sub_tasks_revealer.get_child_revealed())
 
     def purge(self) -> None:
         """
@@ -248,23 +254,24 @@ class Task(Gtk.Revealer):
 
         # Update data
         self.update_prop("completed", btn.get_active())
-        # self.task["synced_caldav"] = False
+        # self.update_prop("synced", False)
         # Update children
-        children: list[Task] = get_children(self.tasks_list)
-        for task in children:
-            task.can_sync = False
-            task.completed_btn.set_active(btn.get_active())
+        # children: list[Task] = get_children(self.tasks_list)
+        # for task in children:
+        #     task.can_sync = False
+        #     task.completed_btn.set_active(btn.get_active())
         # Update status
         if self.is_sub_task:
             self.parent.update_status()
         # Set text
         set_text()
         # Sync
-        if self.can_sync:
-            Sync.sync()
-            self.tasks_panel.update_status()
-            for task in children:
-                task.can_sync = True
+        Sync.sync()
+        # if self.can_sync:
+        #     Sync.sync()
+        #     self.tasks_panel.update_status()
+        #     for task in children:
+        #         task.can_sync = True
 
     def on_details_clicked(self, *args):
         self.tasks_panel.sidebar.set_visible_child_name("details")
@@ -280,7 +287,9 @@ class Task(Gtk.Revealer):
         if text.strip(" \n\t") == "":
             return
         # Add sub-task
-        self.add_task(UserData.add_task(self.list_uid, text, parent=self.uid))
+        self.add_task(
+            UserData.add_task(list_uid=self.list_uid, text=text, parent=self.uid)
+        )
         # Clear entry
         entry.get_buffer().props.text = ""
         # Update status

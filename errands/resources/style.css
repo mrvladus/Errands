@@ -132,6 +132,9 @@ stacksidebar {
   border-radius: 12px;
 }
 
+.transparent {
+  background-color: transparent;
+}
 
 .fade {
   transition: 0.2s;
