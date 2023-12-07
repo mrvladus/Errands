@@ -139,68 +139,68 @@ class SyncProviderCalDAV:
         Get todos from calendar and convert them to dict
         """
 
-        # try:
-        Log.debug(f"Getting tasks from CalDAV")
-        todos: list[Todo] = calendar.todos(include_completed=True)
-        tasks: list[dict] = []
-        for todo in todos:
-            data: dict = {
-                "color": str(todo.icalendar_component.get("x-errands-color", "")),
-                "completed": str(todo.icalendar_component.get("status", ""))
-                == "COMPLETED",
-                "notes": str(todo.icalendar_component.get("description", "")),
-                "parent": str(todo.icalendar_component.get("related-to", "")),
-                "percent_complete": int(
-                    todo.icalendar_component.get("percent-complete", 0)
-                ),
-                "priority": int(todo.icalendar_component.get("priority", 0)),
-                "text": str(todo.icalendar_component.get("summary", "")),
-                "uid": str(todo.icalendar_component.get("uid", "")),
-            }
-            # Set tags
-            if todo.icalendar_component.get("categories", "") != "":
-                data["tags"] = ",".join(
-                    [
-                        i.to_ical().decode("utf-8")
-                        for i in todo.icalendar_component["categories"]
-                    ]
-                )
-            else:
-                data["tags"] = ""
-            # Set date
-            if todo.icalendar_component.get("due", "") != "":
-                data["end_date"] = (
-                    todo.icalendar_component.get("due", "")
-                    .to_ical()
-                    .decode("utf-8")
-                    .strip("Z")
-                )
-            else:
-                data["end_date"] = ""
+        try:
+            Log.debug(f"Getting tasks from CalDAV")
+            todos: list[Todo] = calendar.todos(include_completed=True)
+            tasks: list[dict] = []
+            for todo in todos:
+                data: dict = {
+                    "color": str(todo.icalendar_component.get("x-errands-color", "")),
+                    "completed": str(todo.icalendar_component.get("status", ""))
+                    == "COMPLETED",
+                    "notes": str(todo.icalendar_component.get("description", "")),
+                    "parent": str(todo.icalendar_component.get("related-to", "")),
+                    "percent_complete": int(
+                        todo.icalendar_component.get("percent-complete", 0)
+                    ),
+                    "priority": int(todo.icalendar_component.get("priority", 0)),
+                    "text": str(todo.icalendar_component.get("summary", "")),
+                    "uid": str(todo.icalendar_component.get("uid", "")),
+                }
+                # Set tags
+                if todo.icalendar_component.get("categories", "") != "":
+                    data["tags"] = ",".join(
+                        [
+                            i.to_ical().decode("utf-8")
+                            for i in todo.icalendar_component["categories"]
+                        ]
+                    )
+                else:
+                    data["tags"] = ""
+                # Set date
+                if todo.icalendar_component.get("due", "") != "":
+                    data["end_date"] = (
+                        todo.icalendar_component.get("due", "")
+                        .to_ical()
+                        .decode("utf-8")
+                        .strip("Z")
+                    )
+                else:
+                    data["end_date"] = ""
 
-            if todo.icalendar_component.get("dtstart", "") != "":
-                data["start_date"] = (
-                    todo.icalendar_component.get("dtstart", "")
-                    .to_ical()
-                    .decode("utf-8")
-                    .strip("Z")
-                )
-            else:
-                data["start_date"] = ""
-            tasks.append(data)
+                if todo.icalendar_component.get("dtstart", "") != "":
+                    data["start_date"] = (
+                        todo.icalendar_component.get("dtstart", "")
+                        .to_ical()
+                        .decode("utf-8")
+                        .strip("Z")
+                    )
+                else:
+                    data["start_date"] = ""
+                tasks.append(data)
 
-        # Delete orphaned sub-tasks
-        ids = [task["uid"] for task in tasks]
-        par = [task["parent"] for task in tasks if task["parent"] != ""]
-        orph = [t for t in par if t not in ids]
-        for o in orph:
-            Log.debug(f"Sync: Delete orphaned task: {o}")
-            calendar.todo_by_uid(o).delete()
+            # Delete orphaned sub-tasks
+            ids = [task["uid"] for task in tasks]
+            par = [task["parent"] for task in tasks if task["parent"] != ""]
+            orph = [t for t in par if t not in ids]
+            for o in orph:
+                Log.debug(f"Sync: Delete orphaned task: {o}")
+                calendar.todo_by_uid(o).delete()
 
-        return [task for task in tasks if task["uid"] not in orph]
-        # except Exception as e:
-        #     Log.error(f"Sync: Can't get tasks from CalDAV\n{e}")
-        #     return []
+            return [task for task in tasks if task["uid"] not in orph]
+        except Exception as e:
+            Log.error(f"Sync: Can't get tasks from CalDAV\n{e}")
+            return []
 
     def _fetch(self):
         """

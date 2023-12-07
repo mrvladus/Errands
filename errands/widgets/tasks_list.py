@@ -346,12 +346,6 @@ class TasksList(Adw.Bin):
         for uid in UserData.get_toplevel_tasks(self.list_uid):
             self.add_task(uid)
         self.update_status()
-        # Expand tasks if needed
-        # if GSettings.get("expand-on-startup"):
-        #     for task in self.get_all_tasks():
-        #         if len(get_children(task.tasks_list)) > 0:
-        #             task.expand(True)
-        # Sync.sync(True)
 
     def update_status(self) -> None:
         """
@@ -394,7 +388,6 @@ class TasksList(Adw.Bin):
         )
         self.delete_completed_btn.set_sensitive(n_all_completed > 0)
         self.trash_panel.scrl.set_visible(n_all_deleted > 0)
-        print(n_total, n_completed)
 
     def update_ui(self) -> None:
         Log.debug("Updating UI")
