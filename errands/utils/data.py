@@ -24,19 +24,12 @@ class UserData:
         # Create data dir if needed
         if not os.path.exists(cls.data_dir):
             os.mkdir(cls.data_dir)
-        # Clear cache
-        # os.remove(os.path.join(cls.data_dir, "*.ics"))
         cls.connection = sqlite3.connect(cls.db_path, check_same_thread=False)
-        cls.cursor = cls.connection.cursor()
-        # Create lists table
-        cls.cursor.execute(
+        cls.run_sql(
             """CREATE TABLE IF NOT EXISTS lists (
             uid TEXT NOT NULL,
             name TEXT NOT NULL
-            )"""
-        )
-        # Create tasks table
-        cls.cursor.execute(
+            )""",
             """CREATE TABLE IF NOT EXISTS tasks (
             color TEXT NOT NULL,
             completed INTEGER NOT NULL,
@@ -52,9 +45,8 @@ class UserData:
             tags TEXT NOT NULL,
             text TEXT NOT NULL,
             uid TEXT NOT NULL
-            )"""
+            )""",
         )
-        cls.connection.commit()
 
     @classmethod
     def add_list(cls, name: str, uuid: str = None):

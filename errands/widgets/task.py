@@ -168,6 +168,8 @@ class Task(Gtk.Revealer):
         new_task = Task(uid, self.list_uid, self.window, self.tasks_panel, self, True)
         self.tasks_list.append(new_task)
         new_task.toggle_visibility(not new_task.get_prop("deleted"))
+        if not self.window.startup:
+            self.expand(True)
 
     def add_sub_tasks(self) -> None:
         for uid in UserData.get_sub_tasks(self.list_uid, self.uid):
@@ -181,7 +183,7 @@ class Task(Gtk.Revealer):
         Log.info(f"Move task to trash: {self.uid}")
 
         self.toggle_visibility(False)
-        self.update_prop(["deleted"], [True])
+        self.update_props(["deleted"], [True])
         self.completed_btn.set_active(True)
         self.tasks_panel.trash_panel.trash_add(self.uid)
         for task in get_children(self.tasks_list):
@@ -336,8 +338,7 @@ class Task(Gtk.Revealer):
             self.parent.tasks_list.reorder_child_after(self, task)
             return True
         # Change parent if different parents
-        task.update_prop("parent", self.get_prop("parent"))
-        task.update_prop("synced", False)
+        task.update_props(["parent", "synced"], [self.get_prop("parent"), False])
         task.purge()
         # Add new task widget
         new_task = Task(
@@ -369,8 +370,7 @@ class Task(Gtk.Revealer):
             return
 
         # Change parent
-        task.update_prop("parent", self.get_prop("uid"))
-        task.update_prop("synced", False)
+        task.update_props(["parent", "synced"], [self.get_prop("uid"), False])
         # Move data
         uids = UserData.get_tasks(self.list_uid)
         last_sub_uid = UserData.get_sub_tasks(self.list_uid, self.uid)[-1]
@@ -386,7 +386,7 @@ class Task(Gtk.Revealer):
         task.purge()
         # Add new sub-task
         self.add_task(task.uid)
-        self.update_prop("completed", False)
+        self.update_props(["completed"], [False])
         self.just_added = True
         self.completed_btn.set_active(False)
         self.just_added = False

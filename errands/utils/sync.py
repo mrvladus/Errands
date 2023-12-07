@@ -134,7 +134,7 @@ class SyncProviderCalDAV:
                     )
                 # self.window.sync_btn.set_visible(False)
 
-    def _get_tasks(self, calendar) -> list[dict]:
+    def _get_tasks(self, calendar: Calendar) -> list[dict]:
         """
         Get todos from calendar and convert them to dict
         """
@@ -187,9 +187,17 @@ class SyncProviderCalDAV:
                 )
             else:
                 data["start_date"] = ""
-
             tasks.append(data)
-        return tasks
+
+        # Delete orphaned sub-tasks
+        ids = [task["uid"] for task in tasks]
+        par = [task["parent"] for task in tasks if task["parent"] != ""]
+        orph = [t for t in par if t not in ids]
+        for o in orph:
+            Log.debug(f"Sync: Delete orphaned task: {o}")
+            calendar.todo_by_uid(o).delete()
+
+        return [task for task in tasks if task["uid"] not in orph]
         # except Exception as e:
         #     Log.error(f"Sync: Can't get tasks from CalDAV\n{e}")
         #     return []
