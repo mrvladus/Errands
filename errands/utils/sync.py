@@ -267,10 +267,12 @@ class SyncProviderCalDAV:
         Log.info(f"Sync: Sync tasks with remote")
 
         # Get new calendars
+        new_cals_created: bool = False
         user_lists_uids = [i[0] for i in UserData.get_lists()]
         for calendar in self.calendars:
             # Add new lists
             if calendar.id not in user_lists_uids:
+                new_cals_created = True
                 UserData.add_list(name=calendar.name, uuid=calendar.id)
                 # Fetch tasks for the new list
                 for task in self._get_tasks(calendar):
@@ -322,42 +324,44 @@ class SyncProviderCalDAV:
 
                 # Update task on CalDAV that was changed locally
                 elif task["uid"] in remote_ids and not task["synced"]:
-                    # try:
-                    Log.debug(f"Sync: Update task on remote: {task['uid']}")
-                    todo = calendar.todo_by_uid(task["uid"])
-                    todo.uncomplete()
-                    todo.icalendar_component["summary"] = task["text"]
-                    todo.icalendar_component["due"] = task["end_date"]
-                    todo.icalendar_component["dtstart"] = task["start_date"]
-                    todo.icalendar_component["percent-complete"] = task[
-                        "percent_complete"
-                    ]
-                    todo.icalendar_component["description"] = task["notes"]
-                    todo.icalendar_component["priority"] = task["priority"]
-                    if task["tags"] != "":
-                        todo.icalendar_component["categories"] = task["tags"].split(",")
-                    todo.icalendar_component["related-to"] = task["parent"]
-                    todo.icalendar_component["x-errands-color"] = task["color"]
-                    todo.save()
-                    if task["completed"]:
-                        todo.complete()
-                    UserData.update_prop(calendar.id, task["uid"], "synced", True)
-                    # except Exception as e:
-                    #     Log.error(
-                    #         f"Sync: Can't update task on remote: {task['uid']}\n{e}"
-                    #     )
+                    try:
+                        Log.debug(f"Sync: Update task on remote: {task['uid']}")
+                        todo = calendar.todo_by_uid(task["uid"])
+                        todo.uncomplete()
+                        todo.icalendar_component["summary"] = task["text"]
+                        todo.icalendar_component["due"] = task["end_date"]
+                        todo.icalendar_component["dtstart"] = task["start_date"]
+                        todo.icalendar_component["percent-complete"] = task[
+                            "percent_complete"
+                        ]
+                        todo.icalendar_component["description"] = task["notes"]
+                        todo.icalendar_component["priority"] = task["priority"]
+                        if task["tags"] != "":
+                            todo.icalendar_component["categories"] = task["tags"].split(
+                                ","
+                            )
+                        todo.icalendar_component["related-to"] = task["parent"]
+                        todo.icalendar_component["x-errands-color"] = task["color"]
+                        todo.save()
+                        if task["completed"]:
+                            todo.complete()
+                        UserData.update_prop(calendar.id, task["uid"], "synced", True)
+                    except Exception as e:
+                        Log.error(
+                            f"Sync: Can't update task on remote: {task['uid']}\n{e}"
+                        )
 
-        # # Delete tasks on CalDAV if they were deleted locally
-        # for task_id in data["deleted"]:
-        #     try:
-        #         Log.debug(f"Sync: Delete task from CalDAV: {task_id}")
-        #         todo: CalendarObjectResource = self.calendar.todo_by_uid(task_id)
-        #         todo.delete()
-        #     except:
-        #         Log.error(f"Sync: Can't delete task from CalDAV: {task_id}")
-        # data["deleted"] = []
+        # Delete tasks on remote if they were deleted locally
+        for task in UserData.run_sql("SELECT uid FROM deleted", fetch=True):
+            try:
+                Log.debug(f"Sync: Delete task from CalDAV: {task[0]}")
+                calendar.todo_by_uid(task[0]).delete()
+            except Exception as e:
+                Log.error(f"Sync: Can't delete task from CalDAV: {task[0]}\n{e}")
+        UserData.run_sql("DELETE FROM deleted")
 
-        GLib.idle_add(self.window.lists.update_ui)
+        if new_cals_created:
+            GLib.idle_add(self.window.lists.update_ui)
 
         # if fetch:
         #     self._fetch()

@@ -155,9 +155,13 @@ class Trash(Adw.Bin):
         for task in to_remove:
             task.purge()
         UserData.run_sql(
+            f"""INSERT INTO deleted 
+            SELECT uid FROM tasks 
+            WHERE deleted = 1 
+            AND list_uid = '{self.tasks_panel.list_uid}'""",
             f"""DELETE FROM tasks 
             WHERE deleted = 1
-            AND list_uid = '{self.tasks_panel.list_uid}'"""
+            AND list_uid = '{self.tasks_panel.list_uid}'""",
         )
         # Remove trash items widgets
         self.trash_list.remove_all()
@@ -175,7 +179,7 @@ class Trash(Adw.Bin):
         # Restore tasks
         tasks: list[Task] = self.tasks_panel.get_all_tasks()
         for task in tasks:
-            task.update_prop("deleted", False)
+            task.update_props(["deleted"], [False])
             task.toggle_visibility(True)
             # Update statusbar
             if not task.is_sub_task:

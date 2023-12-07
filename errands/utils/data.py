@@ -46,6 +46,9 @@ class UserData:
             text TEXT NOT NULL,
             uid TEXT NOT NULL
             )""",
+            """CREATE TABLE IF NOT EXISTS deleted (
+            uid TEXT NOT NULL
+            )""",
         )
 
     @classmethod
