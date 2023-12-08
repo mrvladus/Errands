@@ -125,3 +125,6 @@ class Window(Adw.ApplicationWindow):
             lambda *_: self.props.application.quit(),
             ["<primary>q", "<primary>w"],
         )
+
+    def update_ui(self):
+        self.lists.update_ui()
