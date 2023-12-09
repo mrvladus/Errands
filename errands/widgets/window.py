@@ -30,7 +30,7 @@ class Window(Adw.ApplicationWindow):
         self.present()
         self.startup = False
         Sync.init(window=self)
-        Sync.sync()
+        Sync.sync(fetch=True)
 
     def build_ui(self):
         self.props.width_request = 360
@@ -106,25 +106,18 @@ class Window(Adw.ApplicationWindow):
             )
             about.show()
 
-        def _shortcuts(*_) -> None:
-            """
-            Show shortcuts window
-            """
-
-            ShortcutsWindow(self)
-
         _create_action(
             "preferences",
             lambda *_: PreferencesWindow(self).show(),
             ["<primary>comma"],
         )
-        _create_action("shortcuts", _shortcuts, ["<primary>question"])
+        _create_action(
+            "shortcuts", lambda *_: ShortcutsWindow(self), ["<primary>question"]
+        )
         _create_action("about", _about)
+        _create_action("sync", lambda *_: Sync.sync(True), ["<primary>s"])
         _create_action(
             "quit",
             lambda *_: self.props.application.quit(),
             ["<primary>q", "<primary>w"],
         )
-
-    def update_ui(self):
-        self.lists.update_ui()

@@ -326,18 +326,10 @@ class Details(Adw.Bin):
 
     def on_save_btn_clicked(self, btn):
         Log.debug("Save details")
-        # Set new props
-        self.parent.update_prop("start_date", self.start_datetime)
-        self.parent.update_prop("end_date", self.end_datetime)
-        self.parent.update_prop("notes", self.notes.props.text)
-        self.parent.update_prop(
-            "percent_complete", int(self.percent_complete.get_value())
-        )
-        self.parent.update_prop("priority", int(self.priority.get_value()))
         # Set text
         text = self.edit_entry.props.text
         if text.strip(" \n\t") != "":
-            self.parent.update_prop("text", text)
+            self.parent.update_props(["text"], [text])
             self.parent.task_row.set_title(Markup.find_url(Markup.escape(text)))
         else:
             self.edit_entry.set_text(self.parent.get_prop("text"))
@@ -348,10 +340,29 @@ class Details(Adw.Bin):
             if i == 0:
                 continue
             tag_arr.append(row.get_title())
-        self.parent.update_prop("tags", ",".join(tag_arr))
+        # Set new props
+        self.parent.update_props(
+            [
+                "start_date",
+                "end_date",
+                "notes",
+                "percent_complete",
+                "priority",
+                "tags",
+                "synced",
+            ],
+            [
+                self.start_datetime,
+                self.end_datetime,
+                self.notes.props.text,
+                int(self.percent_complete.get_value()),
+                int(self.priority.get_value()),
+                ",".join(tag_arr),
+                False,
+            ],
+        )
         self.save_btn.set_sensitive(False)
         # Sync
-        self.parent.update_prop("synced", False)
         Sync.sync()
 
     def on_start_time_changed(self, _):
@@ -438,8 +449,7 @@ class Details(Adw.Bin):
                 break
         if color != "":
             self.parent.main_box.add_css_class(f"task-{color}")
-        self.parent.update_prop("color", color)
-        self.parent.update_prop("synced", False)
+        self.parent.update_props(["color", "synced"], [color, False])
         Sync.sync()
 
     def on_tag_added(self, entry: Adw.EntryRow) -> None:

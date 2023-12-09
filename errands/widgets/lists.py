@@ -33,6 +33,7 @@ class Lists(Adw.Bin):
         menu: Gio.Menu = Gio.Menu.new()
         menu.append(_("Preferences"), "app.preferences")  # type:ignore
         menu.append(_("Keyboard Shortcuts"), "app.shortcuts")  # type:ignore
+        menu.append(_("Sync / Fetch Tasks"), "app.sync")  # type:ignore
         menu.append(_("About Errands"), "app.about")  # type:ignore
         menu_btn = Gtk.MenuButton(
             menu_model=menu,
@@ -108,6 +109,7 @@ class Lists(Adw.Bin):
             )
             self.lists.append(row)
             self.lists.select_row(row)
+            Sync.sync()
 
         entry = Gtk.Entry(placeholder_text=_("New List Name"))  # type:ignore
         dialog = Adw.MessageDialog(
@@ -125,6 +127,15 @@ class Lists(Adw.Bin):
         dialog.connect("response", _confirm, entry)
         entry.connect("notify::text", entry_changed, dialog)
         dialog.present()
+
+    def get_lists(self) -> list[TasksList]:
+        lists: list[TasksList] = []
+        pages: Adw.ViewStackPages = self.stack.get_pages()
+        for i in range(pages.get_n_items()):
+            child = pages.get_item(i).get_child()
+            if isinstance(child, TasksList):
+                lists.append(child)
+        return lists
 
     def load_lists(self):
         for list in UserData.get_lists():
@@ -185,7 +196,11 @@ class Lists(Adw.Bin):
         row.name = name
 
     def update_ui(self):
-        Log.debug("Lists: updating ui")
+        Log.debug("Lists: Update UI")
+        # Update old lists
+        for list in self.get_lists():
+            list.update_ui()
+        # Create new lists
         old_uids = [row.uid for row in get_children(self.lists)]
         new_lists = UserData.get_lists()
         for list in new_lists:

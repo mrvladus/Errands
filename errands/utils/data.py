@@ -160,13 +160,13 @@ class UserData:
 
     @classmethod
     def get_tasks(cls, list_uid: str) -> list[str]:
-        with cls.connection:
-            cur = cls.connection.cursor()
-            cur.execute(
-                f"""SELECT uid FROM tasks 
-                WHERE list_uid = '{list_uid}'"""
-            )
-            return [i[0] for i in cur.fetchall()]
+        """Get uid list for list_uid"""
+        res = cls.run_sql(
+            f"""SELECT uid FROM tasks 
+            WHERE list_uid = '{list_uid}'""",
+            fetch=True,
+        )
+        return [i[0] for i in res]
 
     @classmethod
     def get_tasks_as_dicts(cls, list_uid: str) -> list[dict]:
@@ -181,16 +181,16 @@ class UserData:
             for task in res:
                 new_task = {
                     "color": task[0],
-                    "completed": task[1],
-                    "deleted": task[2],
+                    "completed": bool(task[1]),
+                    "deleted": bool(task[2]),
                     "end_date": task[3],
                     "list_uid": task[4],
                     "notes": task[5],
                     "parent": task[6],
-                    "percent_complete": task[7],
-                    "priority": task[8],
+                    "percent_complete": int(task[7]),
+                    "priority": int(task[8]),
                     "start_date": task[9],
-                    "synced": task[10],
+                    "synced": bool(task[10]),
                     "tags": task[11],
                     "text": task[12],
                     "uid": task[13],

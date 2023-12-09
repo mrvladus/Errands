@@ -63,7 +63,6 @@ class TasksList(Adw.Bin):
         # Menu
         menu: Gio.Menu = Gio.Menu.new()
         menu.append(_("Rename"), "tasks_list.rename")  # type:ignore
-        menu.append(_("Sync/Fetch Tasks"), "tasks_list.sync")  # type:ignore
         menu.append(_("Delete"), "tasks_list.delete")  # type:ignore
         menu.append(_("Export"), "tasks_list.export")  # type:ignore
         # Header Bar
@@ -314,7 +313,6 @@ class TasksList(Adw.Bin):
         _create_action("rename", _rename)
         _create_action("delete", _delete)
         _create_action("export", _export)
-        _create_action("sync", lambda *_: Sync.sync(True))
 
     def add_task(self, uid: str) -> None:
         new_task = Task(uid, self.list_uid, self.window, self, self, False)
@@ -393,64 +391,58 @@ class TasksList(Adw.Bin):
         Log.debug("Updating UI")
 
         # Update existing tasks
-        tasks: list[Task] = self.get_all_tasks()
-        data_tasks = UserData.get()["tasks"]
-        to_change_parent = []
-        to_remove: list[Task] = []
-        for task in tasks:
-            for t in data_tasks:
-                if task.task["id"] == t["id"]:
-                    # If parent is changed
-                    if task.task["parent"] != t["parent"]:
-                        to_change_parent.append(t)
-                        to_remove.append(task)
-                        break
-                    # If text changed
-                    if task.task["text"] != t["text"]:
-                        task.task["text"] = t["text"]
-                        task.text = Markup.find_url(Markup.escape(task.task["text"]))
-                        task.task_row.props.title = task.text
-                    # If completion changed
-                    if task.task["completed"] != t["completed"]:
-                        task.completed_btn.props.active = t["completed"]
+        tasks_widgets: list[Task] = self.get_all_tasks()
+        tasks_list_dicts = UserData.get_tasks_as_dicts(self.list_uid)
 
-        # Remove old tasks
-        for task in to_remove:
-            task.purge()
+        # Update widget rows
+        for task in tasks_widgets:
+            task.task_row.set_title(
+                Markup.find_url(Markup.escape(task.get_prop("text")))
+            )
+            if task.completed_btn.get_active() != task.get_prop("completed"):
+                task.just_added = True
+                task.completed_btn.set_active(task.get_prop("completed"))
+                task.just_added = False
 
-        # Change parents
-        for task in to_change_parent:
-            if task["parent"] == "":
-                self.tasks_list.add_task(task)
-            else:
-                for t in tasks:
-                    if t.task["id"] == task["parent"]:
-                        t.add_task(task)
-                        break
+        # Change parent
+        for task in tasks_widgets:
+            if isinstance(task.parent, Task) and task.parent.uid != task.get_prop(
+                "parent"
+            ):
+                Log.debug(f"Task list: change parent for {task.uid}")
+                task.purge()
+                if task.get_prop("parent") == "":
+                    self.add_task(task.uid)
+                else:
+                    for t in tasks_widgets:
+                        if t.uid == task.get_prop("parent"):
+                            t.add_task(task.uid)
+                            break
 
         # Create new tasks
-        tasks_ids: list[str] = [
-            task.task["id"] for task in self.tasks_list.get_all_tasks()
-        ]
-        for task in data_tasks:
-            if task["id"] not in tasks_ids:
+        tasks_ids: list[str] = [task.uid for task in self.get_all_tasks()]
+        for task_dict in tasks_list_dicts:
+            if task_dict["uid"] not in tasks_ids:
                 # Add toplevel task and its sub-tasks
-                if task["parent"] == "":
-                    self.tasks_list.add_task(task)
+                if task_dict["parent"] == "":
+                    self.add_task(task_dict["uid"])
                 # Add sub-task and its sub-tasks
                 else:
-                    for t in self.tasks_list.get_all_tasks():
-                        if t.task["id"] == task["parent"]:
-                            t.add_task(task)
-                tasks_ids = [
-                    task.task["id"] for task in self.tasks_list.get_all_tasks()
-                ]
+                    for t in self.get_all_tasks():
+                        if t.uid == task_dict["parent"]:
+                            t.add_task(task_dict["uid"])
+                tasks_ids = [task.uid for task in self.get_all_tasks()]
 
         # Remove tasks
-        ids = [t["id"] for t in UserData.get()["tasks"]]
-        for task in self.tasks_list.get_all_tasks():
-            if task.task["id"] not in ids:
+        ids = UserData.get_tasks(self.list_uid)
+        for task in self.get_all_tasks():
+            if task.uid not in ids:
                 task.purge()
+
+        # Update details
+        for task in self.get_all_tasks():
+            if self.details_panel.parent == task:
+                self.details_panel.update_info(task)
 
     def on_delete_completed_btn_clicked(self, _) -> None:
         """

@@ -239,6 +239,7 @@ class Task(Gtk.Revealer):
         """
         Toggle check button and add style to the text
         """
+        Log.info(f"Task: Set completed to {btn.get_active()}")
 
         def set_text():
             if btn.get_active():
@@ -255,7 +256,10 @@ class Task(Gtk.Revealer):
             return
 
         # Update data
-        self.update_props(["completed", "synced"], [btn.get_active(), False])
+        self.update_props(
+            ["completed", "synced", "percent_complete"],
+            [btn.get_active(), False, 100 if btn.get_active() else 0],
+        )
         # Update children
         children: list[Task] = get_children(self.tasks_list)
         for task in children:
