@@ -274,7 +274,7 @@ class SyncProviderCalDAV:
         Sync local tasks with provider
         """
 
-        Log.debug(f"Sync: Sync tasks with remote")
+        Log.info(f"Sync: Sync tasks with remote")
 
         # Get new calendars
         self.calendars = [
@@ -383,11 +383,11 @@ class SyncProviderCalDAV:
             for task in UserData.run_sql(f"SELECT uid FROM deleted", fetch=True):
                 try:
                     Log.debug(f"Sync: Delete task from remote: {task[0]}")
-                    calendar.todo_by_uid(task[0]).delete()
+                    if todo := calendar.todo_by_uid(task[0]):
+                        todo.delete()
                 except Exception as e:
                     Log.error(f"Sync: Can't delete task from remote: {task[0]}. {e}")
             UserData.run_sql(
-                f"DELETE FROM tasks WHERE uid = '{calendar.id}'",
                 "DELETE FROM deleted",
             )
 

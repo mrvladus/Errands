@@ -388,24 +388,24 @@ class TasksList(Adw.Bin):
         self.trash_panel.scrl.set_visible(n_all_deleted > 0)
 
     def update_ui(self) -> None:
-        Log.debug("Updating UI")
+        Log.debug(f"Task list {self.list_uid}: Update UI")
+
+        # Remove deleted tasks
+        ids = UserData.get_tasks(self.list_uid)
+        for task in self.get_all_tasks():
+            if task.uid not in ids:
+                task.purge()
 
         # Update existing tasks
         tasks_widgets: list[Task] = self.get_all_tasks()
-        tasks_list_dicts = UserData.get_tasks_as_dicts(self.list_uid)
-
-        # Update widget rows
         for task in tasks_widgets:
-            task.task_row.set_title(
-                Markup.find_url(Markup.escape(task.get_prop("text")))
-            )
+            # Update widget title and completed toggle
             if task.completed_btn.get_active() != task.get_prop("completed"):
                 task.just_added = True
                 task.completed_btn.set_active(task.get_prop("completed"))
                 task.just_added = False
 
-        # Change parent
-        for task in tasks_widgets:
+            # Change parent
             if isinstance(task.parent, Task) and task.parent.uid != task.get_prop(
                 "parent"
             ):
@@ -420,9 +420,8 @@ class TasksList(Adw.Bin):
                             break
 
         # Create new tasks
-        tasks_ids: list[str] = [task.uid for task in self.get_all_tasks()]
-        for task_dict in tasks_list_dicts:
-            if task_dict["uid"] not in tasks_ids:
+        for task_dict in UserData.get_tasks_as_dicts(self.list_uid):
+            if task_dict["uid"] not in [task.uid for task in self.get_all_tasks()]:
                 # Add toplevel task and its sub-tasks
                 if task_dict["parent"] == "":
                     self.add_task(task_dict["uid"])
@@ -431,18 +430,13 @@ class TasksList(Adw.Bin):
                     for t in self.get_all_tasks():
                         if t.uid == task_dict["parent"]:
                             t.add_task(task_dict["uid"])
-                tasks_ids = [task.uid for task in self.get_all_tasks()]
-
-        # Remove tasks
-        ids = UserData.get_tasks(self.list_uid)
-        for task in self.get_all_tasks():
-            if task.uid not in ids:
-                task.purge()
 
         # Update details
         for task in self.get_all_tasks():
             if self.details_panel.parent == task:
                 self.details_panel.update_info(task)
+            else:
+                self.details_panel.status.set_visible(True)
 
     def on_delete_completed_btn_clicked(self, _) -> None:
         """
