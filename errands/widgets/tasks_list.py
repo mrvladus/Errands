@@ -432,11 +432,10 @@ class TasksList(Adw.Bin):
                             t.add_task(task_dict["uid"])
 
         # Update details
-        for task in self.get_all_tasks():
-            if self.details_panel.parent == task:
-                self.details_panel.update_info(task)
-            else:
-                self.details_panel.status.set_visible(True)
+        if self.details_panel.parent not in self.get_all_tasks():
+            self.details_panel.status.set_visible(True)
+        else:
+            self.details_panel.update_info(self.details_panel.parent)
 
     def on_delete_completed_btn_clicked(self, _) -> None:
         """
