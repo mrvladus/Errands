@@ -1,6 +1,8 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
+from datetime import datetime
+from glob import glob
 import os
 import tempfile
 from errands.utils.data import UserData
@@ -131,7 +133,9 @@ class Details(Adw.Bin):
         props_group = Adw.PreferencesGroup(title=_("Properties"))  # type:ignore
 
         # Start date row
-        self.start_date = Adw.ActionRow(subtitle=_("Start"))  # type:ignore
+        self.start_date = Adw.ActionRow(
+            title=_("Not Set"), subtitle=_("Start")  # type:ignore
+        )
         # Start hour
         self.start_hour = Gtk.SpinButton(
             adjustment=Gtk.Adjustment(lower=0, upper=23, step_increment=1)
@@ -164,7 +168,9 @@ class Details(Adw.Bin):
         props_group.add(self.start_date)
 
         # End date row
-        self.end_date = Adw.ActionRow(subtitle=_("End"))  # type:ignore
+        self.end_date = Adw.ActionRow(
+            title=_("Not Set"), subtitle=_("End")  # type:ignore
+        )
         # End hour
         self.end_hour = Gtk.SpinButton(
             adjustment=Gtk.Adjustment(lower=0, upper=23, step_increment=1)
@@ -297,16 +303,38 @@ class Details(Adw.Bin):
         # Notes
         self.notes.set_text(self.parent.get_prop("notes"))
         # Set date in calendars
-        sd = self.start_datetime = self.parent.get_prop("start_date")
-        ed = self.end_datetime = self.parent.get_prop("end_date")
-        self.start_hour.set_value(int(sd[9:11]))
-        self.start_min.set_value(int(sd[11:13]))
-        sdt = GLib.DateTime.new_local(int(sd[0:4]), int(sd[4:6]), int(sd[6:8]), 0, 0, 0)
-        self.start_cal.select_day(sdt)
-        self.end_hour.set_value(int(ed[9:11]))
-        self.end_min.set_value(int(ed[11:13]))
-        edt = GLib.DateTime.new_local(int(ed[0:4]), int(ed[4:6]), int(ed[6:8]), 0, 0, 0)
-        self.end_cal.select_day(edt)
+        self.start_datetime = self.parent.get_prop("start_date")
+        self.end_datetime = self.parent.get_prop("end_date")
+        if self.start_datetime:
+            self.start_hour.set_value(int(self.start_datetime[9:11]))
+            self.start_min.set_value(int(self.start_datetime[11:13]))
+            self.start_cal.select_day(
+                GLib.DateTime.new_local(
+                    int(self.start_datetime[0:4]),
+                    int(self.start_datetime[4:6]),
+                    int(self.start_datetime[6:8]),
+                    0,
+                    0,
+                    0,
+                )
+            )
+        else:
+            self.start_date.set_title(_("Not Set"))  # type:ignore
+        if self.end_datetime:
+            self.end_hour.set_value(int(self.end_datetime[9:11]))
+            self.end_min.set_value(int(self.end_datetime[11:13]))
+            self.end_cal.select_day(
+                GLib.DateTime.new_local(
+                    int(self.end_datetime[0:4]),
+                    int(self.end_datetime[4:6]),
+                    int(self.end_datetime[6:8]),
+                    0,
+                    0,
+                    0,
+                )
+            )
+        else:
+            self.end_date.set_title(_("Not Set"))  # type:ignore
         # Percent complete
         self.percent_complete.set_value(self.parent.get_prop("percent_complete"))
         # Priority
@@ -325,7 +353,7 @@ class Details(Adw.Bin):
             self.add_tag(tag)
 
     def on_save_btn_clicked(self, btn):
-        Log.debug("Save details")
+        Log.info("Details: Save")
         # Set text
         text = self.edit_entry.props.text
         if text.strip(" \n\t") != "":
@@ -365,7 +393,11 @@ class Details(Adw.Bin):
         # Sync
         Sync.sync()
 
+    def on_datetime_changed(self):
+        pass
+
     def on_start_time_changed(self, _):
+        Log.debug("Details: change start time")
         # Get time
         hour = str(self.start_hour.get_value_as_int())
         hour = f"0{hour}" if len(hour) == 1 else hour
@@ -379,37 +411,47 @@ class Details(Adw.Bin):
             f"{self.start_cal.get_date().format('%Y%m%d')}T{hour}{min}00"
         )
         # Check if start bigger than end
-        start_timeint: int = int(self.start_datetime[0:8] + self.start_datetime[9:])
-        end_timeint: int = int(self.end_datetime[0:8] + self.end_datetime[9:])
-        if start_timeint > end_timeint:
+        st = datetime.fromisoformat(self.start_datetime)
+        try:
+            et = datetime.fromisoformat(self.end_datetime)
+        except ValueError:
+            return
+        if st > et:
             self.end_date.set_title(
                 f"{hour}:{min}, {self.start_cal.get_date().format('%d %B, %Y')}"
             )
             self.end_datetime = (
                 f"{self.start_cal.get_date().format('%Y%m%d')}T{hour}{min}00"
             )
-            ed = self.end_datetime
-            self.end_hour.set_value(int(ed[9:11]))
-            self.end_min.set_value(int(ed[11:13]))
-            dt = GLib.DateTime.new_local(
-                int(ed[0:4]), int(ed[4:6]), int(ed[6:8]), 0, 0, 0
+            self.end_hour.set_value(int(self.end_datetime[9:11]))
+            self.end_min.set_value(int(self.end_datetime[11:13]))
+            self.end_cal.select_day(
+                GLib.DateTime.new_local(
+                    int(self.end_datetime[0:4]),
+                    int(self.end_datetime[4:6]),
+                    int(self.end_datetime[6:8]),
+                    0,
+                    0,
+                    0,
+                )
             )
-            self.end_cal.select_day(dt)
         self.save_btn.set_sensitive(True)
 
     def on_end_time_changed(self, _):
+        Log.debug("Details: change end time")
         hour = str(self.end_hour.get_value_as_int())
-        if len(hour) == 1:
-            hour = f"0{hour}"
+        hour = f"0{hour}" if len(hour) == 1 else hour
         min = str(self.end_min.get_value_as_int())
-        if len(min) == 1:
-            min = f"0{min}"
+        min = f"0{min}" if len(min) == 1 else min
         # Check if end bigger than start
-        start_timeint: int = int(self.start_datetime[0:8] + self.start_datetime[9:])
-        end_timeint: int = int(
+        try:
+            st = datetime.fromisoformat(self.start_datetime)
+        except ValueError:
+            return
+        et = datetime.fromisoformat(
             f"{self.end_cal.get_date().format('%Y%m%d')}{hour}{min}00"
         )
-        if end_timeint >= start_timeint:
+        if et >= st:
             self.end_date.set_title(
                 f"{hour}:{min}, {self.end_cal.get_date().format('%d %B, %Y')}"
             )
@@ -419,7 +461,7 @@ class Details(Adw.Bin):
         self.save_btn.set_sensitive(True)
 
     def on_copy_text_clicked(self, _btn):
-        Log.info("Copy to clipboard")
+        Log.info("Details: Copy to clipboard")
         clp: Gdk.Clipboard = Gdk.Display.get_default().get_clipboard()
         clp.set(self.parent.get_prop("text"))
         self.window.add_toast(_("Copied to Clipboard"))  # pyright:ignore
@@ -433,6 +475,9 @@ class Details(Adw.Bin):
         export_dir = os.path.join(GLib.get_user_data_dir(), "errands", "exported")
         if not os.path.exists(export_dir):
             os.mkdir(export_dir)
+        # Clear old files
+        for file in glob(os.path.join(export_dir, "*.tmp.ics")):
+            os.remove(file)
         path = os.path.join(export_dir, self.parent.uid + ".tmp.ics")
         with open(path, "w", encoding="utf-8") as f:
             f.write(UserData.to_ics(self.parent.uid))
