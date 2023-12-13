@@ -24,8 +24,6 @@ class PreferencesWindow(Adw.PreferencesWindow):
             self.theme_light_btn.props.active = True
         elif theme == 4:
             self.theme_dark_btn.props.active = True
-        # Setup expand
-        GSettings.bind("expand-on-startup", self.expand_on_startup, "active")
         # Setup sync
         GSettings.bind("sync-provider", self.sync_providers, "selected")
         GSettings.bind("sync-url", self.sync_url, "text")
@@ -70,17 +68,6 @@ class PreferencesWindow(Adw.PreferencesWindow):
         theme_dark_row.add_suffix(self.theme_dark_btn)
         theme_dark_row.set_activatable_widget(self.theme_dark_btn)
         theme_group.add(theme_dark_row)
-        # Tasks group
-        tasks_group = Adw.PreferencesGroup(
-            title=_("Tasks"),  # type:ignore
-        )
-        tasks_expand_row = Adw.ActionRow(
-            title=_("Expand Sub-Tasks on Startup"),  # type:ignore
-        )
-        self.expand_on_startup = Gtk.Switch(valign="center")
-        tasks_expand_row.add_suffix(self.expand_on_startup)
-        tasks_expand_row.set_activatable_widget(self.expand_on_startup)
-        tasks_group.add(tasks_expand_row)
         # Sync group
         sync_group = Adw.PreferencesGroup(
             title=_("Sync"),  # type:ignore
@@ -125,7 +112,6 @@ class PreferencesWindow(Adw.PreferencesWindow):
         # Page
         page = Adw.PreferencesPage()
         page.add(theme_group)
-        page.add(tasks_group)
         page.add(sync_group)
         self.add(page)
 

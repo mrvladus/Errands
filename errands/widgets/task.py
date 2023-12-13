@@ -42,12 +42,7 @@ class Task(Gtk.Revealer):
         if self.get_prop("deleted"):
             self.tasks_panel.trash_panel.trash_add(self.uid)
         # Expand
-        if (
-            GSettings.get("expand-on-startup")
-            and self.window.startup
-            and len(get_children(self.tasks_list)) > 0
-        ):
-            self.expand(True)
+        self.expand(self.get_prop("expanded"))
 
     def get_prop(self, prop: str):
         res = UserData.get_prop(self.list_uid, self.uid, prop)
@@ -168,8 +163,6 @@ class Task(Gtk.Revealer):
         new_task = Task(uid, self.list_uid, self.window, self.tasks_panel, self, True)
         self.tasks_list.append(new_task)
         new_task.toggle_visibility(not new_task.get_prop("deleted"))
-        if not self.window.startup:
-            self.expand(True)
 
     def add_sub_tasks(self) -> None:
         for uid in UserData.get_sub_tasks(self.list_uid, self.uid):
@@ -194,6 +187,7 @@ class Task(Gtk.Revealer):
     def expand(self, expanded: bool) -> None:
         Log.debug(f"Task: {'Expand' if expanded else 'Fold'}")
         self.sub_tasks_revealer.set_reveal_child(expanded)
+        self.update_props(["expanded"], [expanded])
         if expanded:
             self.expand_btn.remove_css_class("rotate")
         else:

@@ -17,7 +17,6 @@ from errands.utils.logging import Log
 class TasksList(Adw.Bin):
     # State
     scrolling: bool = False  # Is window scrolling
-    startup: bool = True
 
     def __init__(self, window, list_uid: str, parent):
         super().__init__()

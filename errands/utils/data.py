@@ -35,6 +35,7 @@ class UserData:
             completed INTEGER NOT NULL,
             deleted INTEGER NOT NULL,
             end_date TEXT NOT NULL,
+            expanded INTEGER NOT NULL,
             list_uid TEXT NOT NULL,
             notes TEXT NOT NULL,
             parent TEXT NOT NULL,
@@ -52,7 +53,7 @@ class UserData:
         )
 
     @classmethod
-    def add_list(cls, name: str, uuid: str = None):
+    def add_list(cls, name: str, uuid: str = None) -> str:
         Log.info(f"Create '{name}' list")
         uid = str(uuid4()) if not uuid else uuid
         with cls.connection:
@@ -65,11 +66,8 @@ class UserData:
             return uid
 
     @classmethod
-    def get_lists(cls) -> tuple[str, str]:
-        with cls.connection:
-            cur = cls.connection.cursor()
-            cur.execute("SELECT uid, name FROM lists")
-            return cur.fetchall()
+    def get_lists(cls) -> list[tuple[str, str]]:
+        return cls.run_sql("SELECT uid, name FROM lists", fetch=True)
 
     @classmethod
     def get_prop(cls, list_uid: str, uid: str, prop: str) -> Any:
@@ -84,6 +82,7 @@ class UserData:
 
     @classmethod
     def update_prop(cls, list_uid: str, uid: str, prop: str, value) -> None:
+        cls.run_sql()
         with cls.connection:
             cur = cls.connection.cursor()
             cur.execute(
@@ -118,6 +117,7 @@ class UserData:
             cls.connection.commit()
             return cur.fetchall() if fetch else None
 
+    # TODO
     @classmethod
     def to_ics(cls, uid) -> str:
         cls.cursor.execute(f"SELECT * FROM tasks WHERE uid = '{uid}'")
@@ -138,25 +138,23 @@ class UserData:
 
     @classmethod
     def get_sub_tasks(cls, list_uid: str, parent_uid: str) -> list[str]:
-        with cls.connection:
-            cur = cls.connection.cursor()
-            cur.execute(
-                f"""SELECT uid FROM tasks 
+        res = cls.run_sql(
+            f"""SELECT uid FROM tasks 
                 WHERE parent = '{parent_uid}'
-                AND list_uid = '{list_uid}'"""
-            )
-            return [f[0] for f in cur.fetchall()]
+                AND list_uid = '{list_uid}'""",
+            fetch=True,
+        )
+        return [i[0] for i in res]
 
     @classmethod
     def get_toplevel_tasks(cls, list_uid: str) -> list[str]:
-        with cls.connection:
-            cur = cls.connection.cursor()
-            cur.execute(
-                f"""SELECT uid FROM tasks 
+        res = cls.run_sql(
+            f"""SELECT uid FROM tasks 
                 WHERE parent IS ''
-                AND list_uid = '{list_uid}'"""
-            )
-            return [f[0] for f in cur.fetchall()]
+                AND list_uid = '{list_uid}'""",
+            fetch=True,
+        )
+        return [i[0] for i in res]
 
     @classmethod
     def get_tasks(cls, list_uid: str) -> list[str]:
@@ -205,6 +203,7 @@ class UserData:
         completed: bool = False,
         deleted: bool = False,
         end_date: str = "",
+        expanded: bool = False,
         list_uid: str = "",
         notes: str = "",
         parent: str = "",
@@ -218,18 +217,12 @@ class UserData:
     ) -> str:
         if not uid:
             uid = str(uuid4())
-        if not start_date:
-            start_date = datetime.datetime.now().strftime("%Y%m%dT%H%M%S")
-        if not end_date:
-            end_date = format(
-                datetime.datetime.now() + datetime.timedelta(days=1), "%Y%m%dT%H%M%S"
-            )
         with cls.connection:
             cur = cls.connection.cursor()
             cur.execute(
                 f"""INSERT INTO tasks 
-                (uid, list_uid, text, parent, completed, deleted, color, notes, percent_complete, priority, start_date, end_date, tags, synced) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (uid, list_uid, text, parent, completed, deleted, color, notes, percent_complete, priority, start_date, end_date, tags, synced, expanded) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                 (
                     uid,
                     list_uid,
@@ -245,6 +238,7 @@ class UserData:
                     end_date,
                     tags,
                     synced,
+                    expanded,
                 ),
             )
             cls.connection.commit()
@@ -252,7 +246,7 @@ class UserData:
 
     @classmethod
     def delete_task(cls, uid: str):
-        pass
+        raise NotImplementedError
 
 
 #     @classmethod
