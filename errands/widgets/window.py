@@ -96,15 +96,20 @@ class Window(Adw.ApplicationWindow):
                 transient_for=self,
                 version=VERSION,
                 application_icon=APP_ID,
-                application_name="Errands",
+                application_name=_("Errands"),  # type:ignore
                 copyright="© 2023 Vlad Krupinski",
                 website="https://github.com/mrvladus/Errands",
                 issue_url="https://github.com/mrvladus/Errands/issues",
-                license_type=7,
+                license_type=Gtk.License.MIT_X11,
                 translator_credits=_("translator-credits"),  # type:ignore
                 modal=True,
             )
             about.show()
+
+        def _sync(*args):
+            Sync.sync(True)
+            if GSettings.get("sync-provider") == 0:
+                self.add_toast(_("Sync disabled"))  # type:ignore
 
         _create_action(
             "preferences",
@@ -115,7 +120,7 @@ class Window(Adw.ApplicationWindow):
             "shortcuts", lambda *_: ShortcutsWindow(self), ["<primary>question"]
         )
         _create_action("about", _about)
-        _create_action("sync", lambda *_: Sync.sync(True), ["<primary>s"])
+        _create_action("sync", _sync, ["<primary>s"])
         _create_action(
             "quit",
             lambda *_: self.props.application.quit(),

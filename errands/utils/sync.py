@@ -19,11 +19,10 @@ class Sync:
     @classmethod
     def init(self, window, testing: bool = False) -> None:
         self.window = window
-        Log.debug("Sync: Initialize sync provider")
+        Log.info("Sync: Initialize sync provider")
         match GSettings.get("sync-provider"):
             case 0:
-                Log.info("Sync disabled")
-                # self.window.sync_btn.set_visible(False)
+                Log.info("Sync: Sync disabled")
             case 1:
                 self.provider = SyncProviderCalDAV("Nextcloud", self.window, testing)
             case 2:
