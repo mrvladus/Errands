@@ -32,7 +32,6 @@ class PreferencesWindow(Adw.PreferencesWindow):
 
     def build_ui(self):
         self.set_transient_for(self.window)
-        # self.set_hide_on_close(True)
         self.set_search_enabled(False)
         # Theme group
         theme_group = Adw.PreferencesGroup(
@@ -131,13 +130,6 @@ class PreferencesWindow(Adw.PreferencesWindow):
 
     # --- Template handlers --- #
 
-    def on_cal_name_changed(self, *args):
-        data = UserData.get()
-        data["tasks"] = [task for task in data["tasks"] if not task["synced_caldav"]]
-        UserData.set(data)
-        Sync.init()
-        Sync.sync(True)
-
     def on_sync_provider_selected(self, *_) -> None:
         self.setup_sync()
 
@@ -148,7 +140,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
 
     def on_test_connection_btn_clicked(self, _btn):
         res: bool = Sync.test_connection()
-        msg = _("Connected") if res else _("Can't connect")  # pyright:ignore
+        msg: str = _("Connected") if res else _("Can't connect")  # pyright:ignore
         toast: Adw.Toast = Adw.Toast(title=msg, timeout=2)
         self.add_toast(toast)
         # self.window.sync_btn.set_visible(res)
