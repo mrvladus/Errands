@@ -185,7 +185,6 @@ class Task(Gtk.Revealer):
         self.tasks_panel.details_panel.status.set_visible(True)
 
     def expand(self, expanded: bool) -> None:
-        Log.debug(f"Task: {'Expand' if expanded else 'Fold'}")
         self.sub_tasks_revealer.set_reveal_child(expanded)
         self.update_props(["expanded"], [expanded])
         if expanded:

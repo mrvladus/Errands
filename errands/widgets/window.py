@@ -12,29 +12,25 @@ from errands.utils.logging import Log
 
 
 class Window(Adw.ApplicationWindow):
-    startup = True
-
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
         # Remember window state
-        Log.debug("Getting window settings")
         GSettings.bind("width", self, "default_width")
         GSettings.bind("height", self, "default_height")
         GSettings.bind("maximized", self, "maximized")
         # Setup theme
-        Log.debug("Setting theme")
         Adw.StyleManager.get_default().set_color_scheme(GSettings.get("theme"))
         self._create_actions()
-        self.build_ui()
-        Log.debug("Present window")
+        self._build_ui()
         self.present()
-        self.startup = False
+        # Setup sync
         Sync.init(window=self)
-        Sync.sync(fetch=True)
+        Sync.sync()
 
-    def build_ui(self):
+    def _build_ui(self):
         self.props.width_request = 360
         self.props.height_request = 200
+        self.set_default_size(1100, 700)
         # Split view
         self.split_view = Adw.NavigationSplitView(
             max_sidebar_width=240, min_sidebar_width=240, show_content=True
@@ -107,7 +103,7 @@ class Window(Adw.ApplicationWindow):
             about.show()
 
         def _sync(*args):
-            Sync.sync(True)
+            Sync.sync()
             if GSettings.get("sync-provider") == 0:
                 self.add_toast(_("Sync disabled"))  # type:ignore
 

@@ -27,8 +27,10 @@ class UserData:
         cls.connection = sqlite3.connect(cls.db_path, check_same_thread=False)
         cls.run_sql(
             """CREATE TABLE IF NOT EXISTS lists (
-            uid TEXT NOT NULL,
-            name TEXT NOT NULL
+            deleted INTEGER NOT NULL,
+            name TEXT NOT NULL,
+            synced INTEGER NOT NULL,
+            uid TEXT NOT NULL
             )""",
             """CREATE TABLE IF NOT EXISTS tasks (
             color TEXT NOT NULL,
@@ -53,21 +55,32 @@ class UserData:
         )
 
     @classmethod
-    def add_list(cls, name: str, uuid: str = None) -> str:
-        Log.info(f"Create '{name}' list")
+    def add_list(cls, name: str, uuid: str = None, synced: bool = False) -> str:
         uid = str(uuid4()) if not uuid else uuid
-        with cls.connection:
-            cur = cls.connection.cursor()
-            cur.execute(
-                "INSERT INTO lists (uid, name) VALUES (?, ?)",
-                (uid, name),
-            )
-            cls.connection.commit()
-            return uid
+        Log.info(f"Data: Create '{uid}' list")
+        cls.run_sql(
+            f"""INSERT INTO lists (deleted, name, synced, uid) 
+            VALUES (0, '{name}', {synced}, '{uid}')"""
+        )
+        return uid
 
     @classmethod
     def get_lists(cls) -> list[tuple[str, str]]:
-        return cls.run_sql("SELECT uid, name FROM lists", fetch=True)
+        return cls.run_sql("SELECT * FROM lists", fetch=True)
+
+    @classmethod
+    def get_lists_as_dicts(cls) -> dict:
+        res = cls.run_sql("SELECT * FROM lists", fetch=True)
+        lists = []
+        for i in res:
+            data = {
+                "deleted": bool(i[0]),
+                "name": i[1],
+                "synced": bool(i[2]),
+                "uid": i[3],
+            }
+            lists.append(data)
+        return lists
 
     @classmethod
     def get_prop(cls, list_uid: str, uid: str, prop: str) -> Any:
@@ -182,16 +195,17 @@ class UserData:
                     "completed": bool(task[1]),
                     "deleted": bool(task[2]),
                     "end_date": task[3],
-                    "list_uid": task[4],
-                    "notes": task[5],
-                    "parent": task[6],
-                    "percent_complete": int(task[7]),
-                    "priority": int(task[8]),
-                    "start_date": task[9],
-                    "synced": bool(task[10]),
-                    "tags": task[11],
-                    "text": task[12],
-                    "uid": task[13],
+                    "expanded": task[4],
+                    "list_uid": task[5],
+                    "notes": task[6],
+                    "parent": task[7],
+                    "percent_complete": int(task[8]),
+                    "priority": int(task[9]),
+                    "start_date": task[10],
+                    "synced": bool(task[11]),
+                    "tags": task[12],
+                    "text": task[13],
+                    "uid": task[14],
                 }
                 tasks.append(new_task)
             return tasks

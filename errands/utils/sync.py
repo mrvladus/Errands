@@ -30,7 +30,7 @@ class Sync:
 
     @classmethod
     @threaded
-    def sync(self, fetch: bool = False) -> None:
+    def sync(self) -> None:
         """
         Sync tasks without blocking the UI
         """
@@ -39,7 +39,7 @@ class Sync:
         if not self.provider:
             self.init()
         if self.provider and self.provider.can_sync:
-            self.provider.sync(fetch)
+            self.provider.sync()
 
     @classmethod
     def test_connection(self) -> bool:
@@ -202,55 +202,115 @@ class SyncProviderCalDAV:
             Log.error(f"Sync: Can't get tasks from remote. {e}")
             return []
 
-    def _fetch(self):
+    def _update_calendars(self) -> bool:
+        try:
+            self.calendars = [
+                cal
+                for cal in self.principal.calendars()
+                if "VTODO" in cal.get_supported_components()
+            ]
+            return True
+        except:
+            Log.error(f"Sync: Can't get caldendars from remote")
+            return False
+
+    def sync(self) -> None:
         """
-        Update local tasks that was changed on remote
+        Sync local tasks with provider
         """
 
-        Log.debug("Sync: Fetch tasks from remote")
+        Log.info(f"Sync: Sync tasks with remote")
+
+        if not self._update_calendars():
+            return
+
+        remote_lists_uids = [c.id for c in self.calendars]
+        for list in UserData.get_lists_as_dicts():
+            # Rename list on remote
+            for cal in self.calendars:
+                if cal.id == list["uid"] and cal.name != list["name"]:
+                    Log.debug(f"Sync: Rename remote list '{list['uid']}'")
+                    cal.name = list["name"]
+                    cal.save()
+
+            # Delete local list deleted on remote
+            if (
+                list["uid"] not in remote_lists_uids
+                and list["synced"]
+                and not list["deleted"]
+            ):
+                Log.debug(f"Sync: Delete local list deleted on remote '{list['uid']}'")
+                UserData.run_sql(f"""DELETE FROM lists WHERE uid = '{list["uid"]}'""")
+
+            # Delete remote list deleted locally
+            elif (
+                list["uid"] in remote_lists_uids and list["deleted"] and list["synced"]
+            ):
+                for cal in self.calendars:
+                    if cal.id == list["uid"]:
+                        Log.debug(f"Sync: Delete list on remote {cal.id}")
+                        cal.delete()
+                        UserData.run_sql(f"DELETE FROM lists WHERE uid = '{cal.id}'")
+                        break
+
+            # Create new remote list
+            elif (
+                list["uid"] not in remote_lists_uids
+                and not list["synced"]
+                and not list["deleted"]
+            ):
+                Log.debug(f"Sync: Create list on remote {list['uid']}")
+                self.principal.make_calendar(
+                    cal_id=list["uid"],
+                    supported_calendar_component_set=["VTODO"],
+                    name=list["name"],
+                )
+                UserData.run_sql(
+                    f"""UPDATE lists SET synced = 1
+                    WHERE uid = '{list['uid']}'"""
+                )
+
+        if not self._update_calendars():
+            return
+
+        user_lists_uids = [i["uid"] for i in UserData.get_lists_as_dicts()]
+        remote_lists_uids = [c.id for c in self.calendars]
 
         for calendar in self.calendars:
+            # Get tasks
             local_tasks = UserData.get_tasks_as_dicts(calendar.id)
             local_ids = UserData.get_tasks(calendar.id)
             remote_tasks = self._get_tasks(calendar)
             remote_ids = [task["uid"] for task in remote_tasks]
+            deleted_uids = [
+                i[0] for i in UserData.run_sql("SELECT uid FROM deleted", fetch=True)
+            ]
 
-            for task in local_tasks:
-                # Update local task that was changed on remote
-                if task["uid"] in remote_ids and task["synced"]:
-                    for remote_task in remote_tasks:
-                        if remote_task["uid"] == task["uid"]:
-                            updated: bool = False
-                            for key in task.keys():
-                                if (
-                                    key not in "deleted list_uid synced"
-                                    and task[key] != remote_task[key]
-                                ):
-                                    UserData.update_prop(
-                                        calendar.id, task["uid"], key, remote_task[key]
-                                    )
-                                    updated = True
-                            if updated:
-                                Log.debug(
-                                    f"Sync: Update local task from remote: {task['uid']}"
-                                )
-                            break
-
-                # Delete local task that was deleted on remote
-                if task["uid"] not in remote_ids and task["synced"]:
-                    Log.debug(
-                        f"Sync: Delete local task deleted on remote: {task['uid']}"
-                    )
-                    UserData.run_sql(
-                        f"""DELETE FROM tasks WHERE uid = '{task["uid"]}'"""
+            # Add new local lists
+            if calendar.id not in user_lists_uids:
+                Log.debug(f"Sync: Copy list from remote {calendar.id}")
+                UserData.add_list(name=calendar.name, uuid=calendar.id, synced=True)
+                # Fetch tasks for the new list
+                for task in remote_tasks:
+                    UserData.add_task(
+                        color=task["color"],
+                        completed=task["completed"],
+                        end_date=task["end_date"],
+                        list_uid=calendar.id,
+                        notes=task["notes"],
+                        parent=task["parent"],
+                        percent_complete=task["percent_complete"],
+                        priority=task["priority"],
+                        start_date=task["start_date"],
+                        synced=True,
+                        tags=task["tags"],
+                        text=task["text"],
+                        uid=task["uid"],
                     )
 
             # Create new local task that was created on CalDAV
             for task in remote_tasks:
-                if task["uid"] not in local_ids and task["uid"] not in [
-                    i[0]
-                    for i in UserData.run_sql("SELECT uid FROM deleted", fetch=True)
-                ]:
+                if task["uid"] not in local_ids and task["uid"] not in deleted_uids:
                     Log.debug(f"Sync: Copy new task from remote: {task['uid']}")
                     UserData.add_task(
                         color=task["color"],
@@ -268,63 +328,27 @@ class SyncProviderCalDAV:
                         uid=task["uid"],
                     )
 
-    def sync(self, fetch: bool) -> None:
-        """
-        Sync local tasks with provider
-        """
-
-        Log.info(f"Sync: Sync tasks with remote")
-
-        # Get new calendars
-        self.calendars = [
-            cal
-            for cal in self.principal.calendars()
-            if "VTODO" in cal.get_supported_components()
-        ]
-        user_lists_uids = [i[0] for i in UserData.get_lists()]
-
-        # Create new remote calendars
-        remote_cal_uids = [c.id for c in self.calendars]
-        for id in user_lists_uids:
-            if id not in remote_cal_uids:
-                Log.debug(f"Sync: Create list on remote {id}")
-                self.principal.make_calendar(
-                    cal_id=id,
-                    supported_calendar_component_set=["VTODO"],
-                    name=UserData.run_sql(
-                        f"SELECT name FROM lists WHERE uid = '{id}'", fetch=True
-                    )[0][0],
-                )
-
-        for calendar in self.calendars:
-            # Add new local lists
-            if calendar.id not in user_lists_uids:
-                Log.debug(f"Sync: Copy list from remote {calendar.id}")
-                UserData.add_list(name=calendar.name, uuid=calendar.id)
-                # Fetch tasks for the new list
-                for task in self._get_tasks(calendar):
-                    UserData.add_task(
-                        color=task["color"],
-                        completed=task["completed"],
-                        end_date=task["end_date"],
-                        list_uid=calendar.id,
-                        notes=task["notes"],
-                        parent=task["parent"],
-                        percent_complete=task["percent_complete"],
-                        priority=task["priority"],
-                        start_date=task["start_date"],
-                        synced=True,
-                        tags=task["tags"],
-                        text=task["text"],
-                        uid=task["uid"],
-                    )
-
-            # Get tasks
-            local_tasks = UserData.get_tasks_as_dicts(calendar.id)
-            remote_tasks = self._get_tasks(calendar)
-            remote_ids = [task["uid"] for task in remote_tasks]
-
             for task in local_tasks:
+                # Update local task that was changed on remote
+                if task["uid"] in remote_ids and task["synced"]:
+                    for remote_task in remote_tasks:
+                        if remote_task["uid"] == task["uid"]:
+                            updated: bool = False
+                            for key in task.keys():
+                                if (
+                                    key not in "deleted list_uid synced expanded"
+                                    and task[key] != remote_task[key]
+                                ):
+                                    UserData.update_prop(
+                                        calendar.id, task["uid"], key, remote_task[key]
+                                    )
+                                    updated = True
+                            if updated:
+                                Log.debug(
+                                    f"Sync: Update local task from remote: {task['uid']}"
+                                )
+                            break
+
                 # Create new task on remote that was created offline
                 if task["uid"] not in remote_ids and not task["synced"]:
                     try:
@@ -332,8 +356,12 @@ class SyncProviderCalDAV:
                         new_todo = calendar.save_todo(
                             categories=task["tags"] if task["tags"] != "" else None,
                             description=task["notes"],
-                            dtstart=datetime.datetime.fromisoformat(task["start_date"]),
-                            due=datetime.datetime.fromisoformat(task["end_date"]),
+                            dtstart=datetime.datetime.fromisoformat(task["start_date"])
+                            if task["start_date"]
+                            else None,
+                            due=datetime.datetime.fromisoformat(task["end_date"])
+                            if task["end_date"]
+                            else None,
                             priority=task["priority"],
                             percent_complete=task["percent_complete"],
                             related_to=task["parent"],
@@ -378,6 +406,15 @@ class SyncProviderCalDAV:
                             f"Sync: Can't update task on remote: {task['uid']}\n{e}"
                         )
 
+                # Delete local task that was deleted on remote
+                elif task["uid"] not in remote_ids and task["synced"]:
+                    Log.debug(
+                        f"Sync: Delete local task deleted on remote: {task['uid']}"
+                    )
+                    UserData.run_sql(
+                        f"""DELETE FROM tasks WHERE uid = '{task["uid"]}'"""
+                    )
+
             # Delete tasks on remote if they were deleted locally
             for task in UserData.run_sql(f"SELECT uid FROM deleted", fetch=True):
                 try:
@@ -389,8 +426,5 @@ class SyncProviderCalDAV:
             UserData.run_sql(
                 "DELETE FROM deleted",
             )
-
-        if fetch:
-            self._fetch()
 
         GLib.idle_add(self.window.lists.update_ui)

@@ -15,10 +15,10 @@ class Lists(Adw.Bin):
         super().__init__()
         self.stack: Gtk.Stack = stack
         self.window = window
-        self.build_ui()
+        self._build_ui()
         self.load_lists()
 
-    def build_ui(self):
+    def _build_ui(self):
         hb = Adw.HeaderBar(
             title_widget=Gtk.Label(label="Errands", css_classes=["heading"])
         )
@@ -83,8 +83,9 @@ class Lists(Adw.Bin):
 
     def on_add_btn_clicked(self, btn):
         def entry_changed(entry, _, dialog):
-            empty = entry.props.text.strip(" \n\t") == ""
-            dialog.set_response_enabled("add", not empty)
+            text = entry.props.text.strip(" \n\t")
+            names = [i["uid"] for i in UserData.get_lists_as_dicts()]
+            dialog.set_response_enabled("add", not text == "" and text not in names)
 
         def _confirm(_, res, entry):
             if res == "cancel":
@@ -138,23 +139,23 @@ class Lists(Adw.Bin):
         return lists
 
     def load_lists(self):
-        for list in UserData.get_lists():
+        for list in UserData.get_lists_as_dicts():
             row = Gtk.ListBoxRow(
                 child=Gtk.Label(
-                    label=list[1],
+                    label=list["name"],
                     halign="start",
                     margin_start=6,
                     margin_end=6,
                     hexpand=True,
                 )
             )
-            row.uid = list[0]
-            row.name = list[1]
+            row.uid = list["uid"]
+            row.name = list["name"]
             self.lists.append(row)
             self.stack.add_titled(
-                child=TasksList(self.window, list[0], self),
-                name=list[1],
-                title=list[1],
+                child=TasksList(self.window, list["uid"], self),
+                name=list["name"],
+                title=list["name"],
             )
             if GSettings.get("last-open-list") == row.name:
                 self.lists.select_row(row)
@@ -172,7 +173,7 @@ class Lists(Adw.Bin):
     def delete_list(self, widget: Gtk.Widget):
         Log.info(f"Delete list {widget.list_uid}")
         UserData.run_sql(
-            f"DELETE FROM lists WHERE uid = '{widget.list_uid}'",
+            f"UPDATE lists SET deleted = 1 WHERE uid = '{widget.list_uid}'",
             f"DELETE FROM tasks WHERE list_uid = '{widget.list_uid}'",
         )
         self.stack.remove(widget)
@@ -182,6 +183,7 @@ class Lists(Adw.Bin):
         idx = rows.index(row)
         self.lists.select_row(rows[idx - 1])
         self.lists.remove(row)
+        Sync.sync()
 
     def rename_list(self, widget, name):
         Log.info(f"Rename list {widget.list_uid}")
@@ -197,29 +199,40 @@ class Lists(Adw.Bin):
 
     def update_ui(self):
         Log.debug("Lists: Update UI")
+        # Delete lists
+        lists_uids = [i["uid"] for i in UserData.get_lists_as_dicts()]
+        for list in self.get_lists():
+            if list.list_uid not in lists_uids:
+                self.stack.remove(list)
+                rows = get_children(self.lists)
+                row = self.lists.get_selected_row()
+                idx = rows.index(row)
+                self.lists.select_row(rows[idx - 1])
+                self.lists.remove(row)
+
         # Update old lists
         for list in self.get_lists():
             list.update_ui()
         # Create new lists
         old_uids = [row.uid for row in get_children(self.lists)]
-        new_lists = UserData.get_lists()
+        new_lists = UserData.get_lists_as_dicts()
         for list in new_lists:
-            if list[0] not in old_uids:
+            if list["uid"] not in old_uids:
                 row = Gtk.ListBoxRow(
                     child=Gtk.Label(
-                        label=list[1],
+                        label=list["name"],
                         halign="start",
                         margin_start=6,
                         margin_end=6,
                         hexpand=True,
                     )
                 )
-                row.uid = list[0]
-                row.name = list[1]
+                row.uid = list["uid"]
+                row.name = list["name"]
                 self.stack.add_titled(
-                    child=TasksList(self.window, list[0], self),
-                    name=list[1],
-                    title=list[1],
+                    child=TasksList(self.window, list["uid"], self),
+                    name=list["name"],
+                    title=list["name"],
                 )
                 self.lists.append(row)
                 self.lists.select_row(row)
