@@ -7,7 +7,7 @@ from errands.utils.gsettings import GSettings
 from errands.utils.logging import Log
 from errands.utils.sync import Sync
 from errands.widgets.tasks_list import TasksList
-from gi.repository import Adw, Gtk, Gio, GObject
+from gi.repository import Adw, Gtk, Gio
 
 
 class Lists(Adw.Bin):
@@ -16,7 +16,7 @@ class Lists(Adw.Bin):
         self.stack: Gtk.Stack = stack
         self.window = window
         self._build_ui()
-        self.load_lists()
+        self._load_lists()
 
     def _build_ui(self):
         hb = Adw.HeaderBar(
@@ -139,7 +139,7 @@ class Lists(Adw.Bin):
                 lists.append(child)
         return lists
 
-    def load_lists(self):
+    def _load_lists(self):
         for list in UserData.get_lists_as_dicts():
             if list["deleted"]:
                 continue
