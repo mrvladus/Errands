@@ -150,6 +150,7 @@ class Lists(Adw.Bin):
                     margin_start=6,
                     margin_end=6,
                     hexpand=True,
+                    ellipsize=3,
                 )
             )
             row.uid = list["uid"]
