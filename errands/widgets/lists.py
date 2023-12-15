@@ -45,6 +45,7 @@ class Lists(Adw.Bin):
         # Lists
         self.lists = Gtk.ListBox(css_classes=["navigation-sidebar"])
         self.lists.connect("row-selected", self.switch_list)
+        self.lists.connect("row-activated", self.switch_list)
         # Status page
         self.status_page = Adw.StatusPage(
             title=_("Add new List"),  # type:ignore
@@ -140,6 +141,8 @@ class Lists(Adw.Bin):
 
     def load_lists(self):
         for list in UserData.get_lists_as_dicts():
+            if list["deleted"]:
+                continue
             row = Gtk.ListBoxRow(
                 child=Gtk.Label(
                     label=list["name"],
@@ -162,6 +165,7 @@ class Lists(Adw.Bin):
 
     def switch_list(self, _, row):
         if row:
+            Log.debug(f"Lists: Switch list to '{row.uid}'")
             self.stack.set_visible_child_name(row.name)
             self.window.split_view.set_show_content(True)
             GSettings.set("last-open-list", "s", row.name)
@@ -171,7 +175,7 @@ class Lists(Adw.Bin):
             self.status_page.set_visible(True)
 
     def delete_list(self, widget: Gtk.Widget):
-        Log.info(f"Delete list {widget.list_uid}")
+        Log.info(f"Lists: Delete list '{widget.list_uid}'")
         UserData.run_sql(
             f"UPDATE lists SET deleted = 1 WHERE uid = '{widget.list_uid}'",
             f"DELETE FROM tasks WHERE list_uid = '{widget.list_uid}'",
@@ -186,7 +190,7 @@ class Lists(Adw.Bin):
         Sync.sync()
 
     def rename_list(self, widget, name):
-        Log.info(f"Rename list {widget.list_uid}")
+        Log.info(f"Lists: Rename list {widget.list_uid}")
         UserData.run_sql(
             f"UPDATE lists SET name = '{name}' WHERE uid = '{widget.list_uid}'",
         )
@@ -196,6 +200,7 @@ class Lists(Adw.Bin):
         row = self.lists.get_selected_row()
         row.get_child().set_label(name)
         row.name = name
+        Sync.sync()
 
     def update_ui(self):
         Log.debug("Lists: Update UI")
