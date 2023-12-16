@@ -1,10 +1,10 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
+from __main__ import VERSION, APP_ID
+from gi.repository import Gio, Adw, Gtk
 from errands.widgets.lists import Lists
 from errands.widgets.shortcuts_window import ShortcutsWindow
-from gi.repository import Gio, Adw, Gtk
-from __main__ import VERSION, APP_ID
 from errands.widgets.preferences import PreferencesWindow
 from errands.utils.sync import Sync
 from errands.utils.gsettings import GSettings
@@ -93,7 +93,7 @@ class Window(Adw.ApplicationWindow):
                 version=VERSION,
                 application_icon=APP_ID,
                 application_name=_("Errands"),  # type:ignore
-                copyright="© 2023 Vlad Krupinski",
+                copyright="© 2023 Vlad Krupinskii",
                 website="https://github.com/mrvladus/Errands",
                 issue_url="https://github.com/mrvladus/Errands/issues",
                 license_type=Gtk.License.MIT_X11,
@@ -105,7 +105,7 @@ class Window(Adw.ApplicationWindow):
         def _sync(*args):
             Sync.sync()
             if GSettings.get("sync-provider") == 0:
-                self.add_toast(_("Sync disabled"))  # type:ignore
+                self.add_toast(_("Sync is disabled"))  # type:ignore
 
         _create_action(
             "preferences",

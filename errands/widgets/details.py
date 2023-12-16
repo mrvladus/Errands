@@ -90,7 +90,7 @@ class Details(Adw.Bin):
             btn.connect("clicked", self.on_style_selected, color)
             colors_box.append(btn)
         # Edit group
-        edit_group = Adw.PreferencesGroup(title=_("Edit"))  # type:ignore
+        edit_group = Adw.PreferencesGroup(title=_("Text"))  # type:ignore
         # Copy button
         copy_btn = Gtk.Button(
             icon_name="edit-copy-symbolic",

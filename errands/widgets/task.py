@@ -39,14 +39,14 @@ class Task(Gtk.Revealer):
         self.build_ui()
         self.add_sub_tasks()
         # Add to trash if needed
-        if self.get_prop("deleted"):
+        if self.get_prop("trash"):
             self.tasks_panel.trash_panel.trash_add(self.uid)
         # Expand
         self.expand(self.get_prop("expanded"))
 
     def get_prop(self, prop: str):
         res = UserData.get_prop(self.list_uid, self.uid, prop)
-        if prop in "deleted completed":
+        if prop in "deleted completed expanded trash":
             res = bool(res)
         return res
 
@@ -80,6 +80,7 @@ class Task(Gtk.Revealer):
             height_request=60,
             tooltip_text=_("Click for Details"),  # type:ignore
             accessible_role=Gtk.AccessibleRole.ROW,
+            cursor=Gdk.Cursor.new_from_name("pointer"),
         )
         # Mark as completed button
         self.completed_btn = Gtk.CheckButton(
@@ -162,10 +163,10 @@ class Task(Gtk.Revealer):
     def add_task(self, uid: str) -> None:
         new_task = Task(uid, self.list_uid, self.window, self.tasks_panel, self, True)
         self.tasks_list.append(new_task)
-        new_task.toggle_visibility(not new_task.get_prop("deleted"))
+        new_task.toggle_visibility(not new_task.get_prop("trash"))
 
     def add_sub_tasks(self) -> None:
-        for uid in UserData.get_sub_tasks(self.list_uid, self.uid):
+        for uid in UserData.get_tasks_uids(self.list_uid, self.uid):
             self.add_task(uid)
         self.update_status()
         self.parent.update_status()
@@ -173,14 +174,14 @@ class Task(Gtk.Revealer):
         self.just_added = False
 
     def delete(self, *_) -> None:
-        Log.info(f"Move task to trash: {self.uid}")
+        Log.info(f"Task: Move to trash: '{self.uid}'")
 
         self.toggle_visibility(False)
-        self.update_props(["deleted"], [True])
+        self.update_props(["trash"], [True])
         self.completed_btn.set_active(True)
         self.tasks_panel.trash_panel.trash_add(self.uid)
         for task in get_children(self.tasks_list):
-            if not task.get_prop("deleted"):
+            if not task.get_prop("trash"):
                 task.delete()
         self.tasks_panel.details_panel.status.set_visible(True)
 
@@ -210,7 +211,7 @@ class Task(Gtk.Revealer):
         n_total: int = UserData.run_sql(
             f"""SELECT COUNT(*) FROM tasks 
             WHERE parent = '{self.uid}' 
-            AND deleted = 0
+            AND trash = 0
             AND list_uid = '{self.list_uid}'""",
             fetch=True,
         )[0][0]
@@ -218,7 +219,7 @@ class Task(Gtk.Revealer):
             f"""SELECT COUNT(*) FROM tasks 
             WHERE parent = '{self.uid}' 
             AND completed = 1 
-            AND deleted = 0
+            AND trash = 0
             AND list_uid = '{self.list_uid}'""",
             fetch=True,
         )[0][0]
@@ -232,7 +233,7 @@ class Task(Gtk.Revealer):
         """
         Toggle check button and add style to the text
         """
-        Log.info(f"Task: Set completed to {btn.get_active()}")
+        Log.info(f"Task: Set completed to '{btn.get_active()}'")
 
         def set_text():
             if btn.get_active():
@@ -323,7 +324,7 @@ class Task(Gtk.Revealer):
             return False
         # Move data
         UserData.run_sql("CREATE TABLE tmp AS SELECT * FROM tasks WHERE 0")
-        ids = UserData.get_tasks(self.list_uid)
+        ids = UserData.get_tasks_uids(self.list_uid)
         ids.insert(ids.index(self.uid), ids.pop(ids.index(task.uid)))
         for id in ids:
             UserData.run_sql(f"INSERT INTO tmp SELECT * FROM tasks WHERE uid = '{id}'")
@@ -369,8 +370,8 @@ class Task(Gtk.Revealer):
         # Change parent
         task.update_props(["parent", "synced"], [self.get_prop("uid"), False])
         # Move data
-        uids = UserData.get_tasks(self.list_uid)
-        last_sub_uid = UserData.get_sub_tasks(self.list_uid, self.uid)[-1]
+        uids = UserData.get_tasks_uids(self.list_uid)
+        last_sub_uid = UserData.get_tasks_uids(self.list_uid, self.uid)[-1]
         uids.insert(
             uids.index(self.uid) + uids.index(last_sub_uid),
             uids.pop(uids.index(task.uid)),

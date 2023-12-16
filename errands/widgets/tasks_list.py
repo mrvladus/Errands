@@ -1,17 +1,16 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
+from gi.repository import Adw, Gtk, GLib, Gio, GObject
 from errands.utils.animation import scroll
 from errands.utils.gsettings import GSettings
 from errands.utils.data import UserData
 from errands.utils.functions import get_children
+from errands.utils.sync import Sync
+from errands.utils.logging import Log
 from errands.widgets.details import Details
 from errands.widgets.task import Task
 from errands.widgets.trash import Trash
-from gi.repository import Adw, Gtk, GLib, Gio, GObject
-from errands.utils.markup import Markup
-from errands.utils.sync import Sync
-from errands.utils.logging import Log
 
 
 class TasksList(Adw.Bin):
@@ -316,7 +315,7 @@ class TasksList(Adw.Bin):
     def add_task(self, uid: str) -> None:
         new_task = Task(uid, self.list_uid, self.window, self, self, False)
         self.tasks_list.append(new_task)
-        new_task.toggle_visibility(not new_task.get_prop("deleted"))
+        new_task.toggle_visibility(not new_task.get_prop("trash"))
 
     def get_all_tasks(self) -> list[Task]:
         """
@@ -340,7 +339,7 @@ class TasksList(Adw.Bin):
 
     def load_tasks(self) -> None:
         Log.debug(f"Loading tasks for '{self.list_uid}'")
-        for uid in UserData.get_toplevel_tasks(self.list_uid):
+        for uid in UserData.get_tasks_uids(self.list_uid):
             self.add_task(uid)
         self.update_status()
 
@@ -352,7 +351,7 @@ class TasksList(Adw.Bin):
         n_total: int = UserData.run_sql(
             f"""SELECT COUNT(*) FROM tasks
             WHERE parent IS '' 
-            AND deleted = 0
+            AND trash = 0
             AND list_uid = '{self.list_uid}'""",
             fetch=True,
         )[0][0]
@@ -360,20 +359,20 @@ class TasksList(Adw.Bin):
             f"""SELECT COUNT(*) FROM tasks 
             WHERE parent IS '' 
             AND completed = 1
-            AND deleted = 0
+            AND trash = 0
             AND list_uid = '{self.list_uid}'""",
             fetch=True,
         )[0][0]
         n_all_deleted: int = UserData.run_sql(
             f"""SELECT COUNT(*) FROM tasks 
-            WHERE deleted = 1 
+            WHERE trash = 1 
             AND list_uid = '{self.list_uid}'""",
             fetch=True,
         )[0][0]
         n_all_completed: int = UserData.run_sql(
             f"""SELECT COUNT(*) FROM tasks 
             WHERE completed = 1
-            AND deleted = 0 
+            AND trash = 0 
             AND list_uid = '{self.list_uid}'""",
             fetch=True,
         )[0][0]
@@ -390,7 +389,7 @@ class TasksList(Adw.Bin):
         Log.debug(f"Task list {self.list_uid}: Update UI")
 
         # Remove deleted tasks
-        ids = UserData.get_tasks(self.list_uid)
+        ids = UserData.get_tasks_uids(self.list_uid)
         for task in self.get_all_tasks():
             if task.uid not in ids:
                 task.purge()
@@ -443,7 +442,7 @@ class TasksList(Adw.Bin):
         Log.info("Delete completed tasks")
 
         for task in self.get_all_tasks():
-            if task.get_prop("completed") and not task.get_prop("deleted"):
+            if task.get_prop("completed") and not task.get_prop("trash"):
                 task.delete()
         self.update_status()
 

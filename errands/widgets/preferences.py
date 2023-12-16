@@ -2,11 +2,8 @@
 # SPDX-License-Identifier: MIT
 
 from gi.repository import Adw, Gtk
-
-# Import modules
 from errands.utils.sync import Sync
 from errands.utils.gsettings import GSettings
-from errands.utils.data import UserData
 
 
 class PreferencesWindow(Adw.PreferencesWindow):

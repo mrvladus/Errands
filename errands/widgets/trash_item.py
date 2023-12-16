@@ -36,7 +36,7 @@ class TrashItem(Adw.ActionRow):
         def restore_task(uid: str = self.uid) -> None:
             for task in tasks:
                 if task.get_prop("uid") == uid:
-                    task.update_prop("deleted", False)
+                    task.update_props(["trash"], [False])
                     task.toggle_visibility(True)
                     if task.get_prop("parent"):
                         task.parent.expand(True)

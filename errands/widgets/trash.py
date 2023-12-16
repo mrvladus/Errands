@@ -107,21 +107,20 @@ class Trash(Adw.Bin):
 
         res = UserData.run_sql(
             f"""SELECT uid FROM tasks
-            WHERE deleted = 0
+            WHERE trash = 0
             AND list_uid = '{self.tasks_panel.list_uid}'""",
             fetch=True,
         )
-        ids = [i[0] for i in res]
-        to_remove: list[TrashItem] = []
-        for item in get_children(self.trash_list):
-            if item.uid in ids:
-                to_remove.append(item)
+        ids: list[str] = [i[0] for i in res]
+        to_remove: list[TrashItem] = [
+            i for i in get_children(self.trash_list) if i.uid in ids
+        ]
         for item in to_remove:
             self.trash_list.remove(item)
         self.scrl.set_visible(len(get_children(self.trash_list)) > 0)
 
     def on_trash_clear(self, btn) -> None:
-        Log.debug("Show confirm dialog")
+        Log.debug("Trash: Show confirm dialog")
         dialog = Adw.MessageDialog(
             transient_for=self.window,
             hide_on_close=True,
@@ -145,23 +144,18 @@ class Trash(Adw.Bin):
             Log.debug("Clear Trash cancelled")
             return
 
-        Log.info("Clear Trash")
+        Log.info("Trash: Clear")
         # Remove widgets and data
         to_remove: list[Task] = [
-            task
-            for task in self.tasks_panel.get_all_tasks()
-            if task.get_prop("deleted")
+            task for task in self.tasks_panel.get_all_tasks() if task.get_prop("trash")
         ]
         for task in to_remove:
             task.purge()
         UserData.run_sql(
-            f"""INSERT INTO deleted 
-            SELECT uid FROM tasks 
-            WHERE deleted = 1 
-            AND list_uid = '{self.tasks_panel.list_uid}'""",
-            f"""DELETE FROM tasks 
-            WHERE deleted = 1
-            AND list_uid = '{self.tasks_panel.list_uid}'""",
+            f"""UPDATE tasks
+            SET deleted = 1
+            WHERE list_uid = '{self.tasks_panel.list_uid}'
+            AND trash = 1""",
         )
         # Remove trash items widgets
         self.trash_list.remove_all()
@@ -174,12 +168,12 @@ class Trash(Adw.Bin):
         Remove trash items and restore all tasks
         """
 
-        Log.info("Restore Trash")
+        Log.info("Trash: Restore")
 
         # Restore tasks
         tasks: list[Task] = self.tasks_panel.get_all_tasks()
         for task in tasks:
-            task.update_props(["deleted"], [False])
+            task.update_props(["trash"], [False])
             task.toggle_visibility(True)
             # Update statusbar
             if not task.is_sub_task:

@@ -140,6 +140,13 @@ class Lists(Adw.Bin):
         return lists
 
     def _load_lists(self):
+        # Clear deleted tasks and lists
+        if GSettings.get("sync-provider") == 0:
+            UserData.run_sql(
+                "DELETE FROM lists WHERE deleted = 1",
+                "DELETE FROM tasks WHERE deleted = 1",
+            )
+        # Add lists
         for list in UserData.get_lists_as_dicts():
             if list["deleted"]:
                 continue
@@ -161,7 +168,8 @@ class Lists(Adw.Bin):
                 name=list["name"],
                 title=list["name"],
             )
-            if GSettings.get("last-open-list") == row.name:
+            # Select last opened list
+            if GSettings.get("last-open-list") == list["name"]:
                 self.lists.select_row(row)
 
     def switch_list(self, _, row):
