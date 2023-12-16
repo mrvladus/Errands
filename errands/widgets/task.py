@@ -166,7 +166,7 @@ class Task(Gtk.Revealer):
         new_task.toggle_visibility(not new_task.get_prop("trash"))
 
     def add_sub_tasks(self) -> None:
-        for uid in UserData.get_tasks_uids(self.list_uid, self.uid):
+        for uid in UserData.get_sub_tasks_uids(self.list_uid, self.uid):
             self.add_task(uid)
         self.update_status()
         self.parent.update_status()
@@ -212,6 +212,7 @@ class Task(Gtk.Revealer):
             f"""SELECT COUNT(*) FROM tasks 
             WHERE parent = '{self.uid}' 
             AND trash = 0
+            AND deleted = 0
             AND list_uid = '{self.list_uid}'""",
             fetch=True,
         )[0][0]
@@ -219,6 +220,7 @@ class Task(Gtk.Revealer):
             f"""SELECT COUNT(*) FROM tasks 
             WHERE parent = '{self.uid}' 
             AND completed = 1 
+            AND deleted = 0
             AND trash = 0
             AND list_uid = '{self.list_uid}'""",
             fetch=True,
@@ -371,7 +373,7 @@ class Task(Gtk.Revealer):
         task.update_props(["parent", "synced"], [self.get_prop("uid"), False])
         # Move data
         uids = UserData.get_tasks_uids(self.list_uid)
-        last_sub_uid = UserData.get_tasks_uids(self.list_uid, self.uid)[-1]
+        last_sub_uid = UserData.get_sub_tasks_uids(self.list_uid, self.uid)[-1]
         uids.insert(
             uids.index(self.uid) + uids.index(last_sub_uid),
             uids.pop(uids.index(task.uid)),

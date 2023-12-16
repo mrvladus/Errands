@@ -125,27 +125,30 @@ class UserData:
         return cal.to_ical().decode("utf-8")
 
     @classmethod
-    def get_tasks_uids(
-        cls, list_uid: str, parent: str = "", deleted: bool = False
-    ) -> list[str]:
+    def get_tasks_uids(cls, list_uid: str) -> list[str]:
         res = cls.run_sql(
             f"""SELECT uid FROM tasks 
-                WHERE parent IS '{parent}'
-                AND list_uid = '{list_uid}'
-                AND deleted = {int(deleted)}""",
+                WHERE list_uid = '{list_uid}'
+                AND deleted = 0""",
             fetch=True,
         )
         return [i[0] for i in res]
 
     @classmethod
-    def get_tasks_as_dicts(
-        cls, list_uid: str, parent: str = "", deleted: bool = False
-    ) -> list[dict]:
+    def get_sub_tasks_uids(cls, list_uid: str, parent: str) -> list[str]:
         res = cls.run_sql(
-            f"""SELECT * FROM tasks 
+            f"""SELECT uid FROM tasks 
                 WHERE list_uid = '{list_uid}'
                 AND parent = '{parent}'
-                AND deleted = {int(deleted)}""",
+                AND deleted = 0""",
+            fetch=True,
+        )
+        return [i[0] for i in res]
+
+    @classmethod
+    def get_tasks_as_dicts(cls, list_uid: str) -> list[dict]:
+        res = cls.run_sql(
+            f"""SELECT * FROM tasks WHERE list_uid = '{list_uid}'""",
             fetch=True,
         )
         tasks = []

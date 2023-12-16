@@ -339,7 +339,7 @@ class TasksList(Adw.Bin):
 
     def load_tasks(self) -> None:
         Log.debug(f"Loading tasks for '{self.list_uid}'")
-        for uid in UserData.get_tasks_uids(self.list_uid):
+        for uid in UserData.get_sub_tasks_uids(self.list_uid, ""):
             self.add_task(uid)
         self.update_status()
 
