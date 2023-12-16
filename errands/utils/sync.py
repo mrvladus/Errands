@@ -109,7 +109,6 @@ class SyncProviderCalDAV:
 
     def _connect(self) -> bool:
         Log.debug(f"Sync: Attempting connection")
-        print(self.url, self.username, self.password)
 
         with DAVClient(
             url=self.url, username=self.username, password=self.password
@@ -123,7 +122,6 @@ class SyncProviderCalDAV:
                     for cal in self.principal.calendars()
                     if "VTODO" in cal.get_supported_components()
                 ]
-                # self.window.sync_btn.set_visible(True)
             except Exception as e:
                 Log.error(
                     f"Sync: Can't connect to {self.name} server at '{self.url}'. {e}"
@@ -134,7 +132,6 @@ class SyncProviderCalDAV:
                         + " "
                         + self.url
                     )
-                # self.window.sync_btn.set_visible(False)
 
     def _get_tasks(self, calendar: Calendar) -> list[dict]:
         """
@@ -278,11 +275,14 @@ class SyncProviderCalDAV:
         for calendar in self.calendars:
             # Get tasks
             local_tasks = UserData.get_tasks_as_dicts(calendar.id)
-            local_ids = UserData.get_tasks(calendar.id)
+            local_ids = UserData.get_tasks_uids(calendar.id)
             remote_tasks = self._get_tasks(calendar)
             remote_ids = [task["uid"] for task in remote_tasks]
             deleted_uids = [
-                i[0] for i in UserData.run_sql("SELECT uid FROM deleted", fetch=True)
+                i[0]
+                for i in UserData.run_sql(
+                    "SELECT uid FROM tasks WHERE deleted = 1", fetch=True
+                )
             ]
 
             # Add new local lists
@@ -335,11 +335,14 @@ class SyncProviderCalDAV:
                             updated: bool = False
                             for key in task.keys():
                                 if (
-                                    key not in "deleted list_uid synced expanded"
+                                    key not in "deleted list_uid synced expanded trash"
                                     and task[key] != remote_task[key]
                                 ):
-                                    UserData.update_prop(
-                                        calendar.id, task["uid"], key, remote_task[key]
+                                    UserData.update_props(
+                                        calendar.id,
+                                        task["uid"],
+                                        [key],
+                                        [remote_task[key]],
                                     )
                                     updated = True
                             if updated:
@@ -370,7 +373,9 @@ class SyncProviderCalDAV:
                         )
                         if task["completed"]:
                             new_todo.complete()
-                        UserData.update_prop(calendar.id, task["uid"], "synced", True)
+                        UserData.update_props(
+                            calendar.id, task["uid"], ["synced"], [True]
+                        )
                     except Exception as e:
                         Log.error(
                             f"Sync: Can't create new task on remote: {task['uid']}\n{e}"
@@ -383,8 +388,14 @@ class SyncProviderCalDAV:
                         todo = calendar.todo_by_uid(task["uid"])
                         todo.uncomplete()
                         todo.icalendar_component["summary"] = task["text"]
-                        todo.icalendar_component["due"] = task["end_date"]
-                        todo.icalendar_component["dtstart"] = task["start_date"]
+                        if task["end_date"]:
+                            todo.icalendar_component[
+                                "due"
+                            ] = datetime.datetime.fromisoformat(task["end_date"])
+                        if task["start_date"]:
+                            todo.icalendar_component[
+                                "dtstart"
+                            ] = datetime.datetime.fromisoformat(task["start_date"])
                         todo.icalendar_component["percent-complete"] = task[
                             "percent_complete"
                         ]
@@ -399,7 +410,9 @@ class SyncProviderCalDAV:
                         todo.save()
                         if task["completed"]:
                             todo.complete()
-                        UserData.update_prop(calendar.id, task["uid"], "synced", True)
+                        UserData.update_props(
+                            calendar.id, task["uid"], ["synced"], [True]
+                        )
                     except Exception as e:
                         Log.error(
                             f"Sync: Can't update task on remote: {task['uid']}\n{e}"
