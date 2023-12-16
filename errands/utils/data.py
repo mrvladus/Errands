@@ -4,15 +4,11 @@
 import datetime
 import os
 import sqlite3
-import threading
-
 from typing import Any
 from uuid import uuid4
 from icalendar import Event, Calendar
 from gi.repository import GLib
 from errands.utils.logging import Log
-
-lock = threading.Lock()
 
 
 class UserData:
@@ -88,19 +84,6 @@ class UserData:
             return cur.fetchone()[0]
 
     @classmethod
-    def update_prop(cls, list_uid: str, uid: str, prop: str, value) -> None:
-        cls.run_sql()
-        with cls.connection:
-            cur = cls.connection.cursor()
-            cur.execute(
-                f"""UPDATE tasks SET {prop} = ? 
-                WHERE uid = '{uid}'
-                AND list_uid = '{list_uid}'""",
-                (value,),
-            )
-            cls.connection.commit()
-
-    @classmethod
     def update_props(
         cls, list_uid: str, uid: str, props: list[str], values: list
     ) -> None:
@@ -124,22 +107,20 @@ class UserData:
             cls.connection.commit()
             return cur.fetchall() if fetch else None
 
-    # TODO
     @classmethod
     def to_ics(cls, uid) -> str:
-        cls.cursor.execute(f"SELECT * FROM tasks WHERE uid = '{uid}'")
-        res = cls.cursor.fetchone()
+        res = cls.run_sql(f"SELECT * FROM tasks WHERE uid = '{uid}'", fetch=True)[0]
         cal = Calendar()
         cal.add("version", "2.0")
         cal.add("prodid", "-//Errands")
         todo = Event()
-        todo.add("uid", res[0])
-        todo.add("summary", res[2])
-        todo.add("dtstart", datetime.datetime.fromisoformat(res[7]))
-        todo.add("dtend", datetime.datetime.fromisoformat(res[8]))
-        todo.add("description", res[9])
-        todo.add("percent-complete", res[12])
-        todo.add("priority", res[13])
+        todo.add("uid", res[15])
+        todo.add("summary", res[13])
+        todo.add("dtstart", datetime.datetime.fromisoformat(res[10]))
+        todo.add("dtend", datetime.datetime.fromisoformat(res[3]))
+        todo.add("description", res[6])
+        todo.add("percent-complete", res[8])
+        todo.add("priority", res[9])
         cal.add_component(todo)
         return cal.to_ical().decode("utf-8")
 
@@ -239,10 +220,6 @@ class UserData:
             )
             cls.connection.commit()
             return uid
-
-    @classmethod
-    def delete_task(cls, uid: str):
-        raise NotImplementedError
 
 
 #     @classmethod

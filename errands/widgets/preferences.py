@@ -92,6 +92,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
         self.sync_password = Adw.PasswordEntryRow(
             title=_("Password"),  # type:ignore
         )
+        self.sync_password.connect("changed", self.on_sync_pass_changed)
         sync_group.add(self.sync_password)
         # Test connection
         test_btn = Gtk.Button(
@@ -117,7 +118,6 @@ class PreferencesWindow(Adw.PreferencesWindow):
         self.sync_username.set_visible(0 < selected < 3)
         self.sync_password.set_visible(0 < selected < 3)
         self.test_connection_row.set_visible(selected > 0)
-        # self.window.sync_btn.set_visible(selected > 0)
 
         if self.sync_password.props.visible:
             account = self.sync_providers.props.selected_item.props.string
@@ -140,7 +140,6 @@ class PreferencesWindow(Adw.PreferencesWindow):
         msg: str = _("Connected") if res else _("Can't connect")  # pyright:ignore
         toast: Adw.Toast = Adw.Toast(title=msg, timeout=2)
         self.add_toast(toast)
-        # self.window.sync_btn.set_visible(res)
 
     def on_theme_change(self, btn: Gtk.Button, theme: int) -> None:
         Adw.StyleManager.get_default().set_color_scheme(theme)

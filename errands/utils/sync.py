@@ -109,6 +109,7 @@ class SyncProviderCalDAV:
 
     def _connect(self) -> bool:
         Log.debug(f"Sync: Attempting connection")
+        print(self.url, self.username, self.password)
 
         with DAVClient(
             url=self.url, username=self.username, password=self.password
@@ -123,8 +124,10 @@ class SyncProviderCalDAV:
                     if "VTODO" in cal.get_supported_components()
                 ]
                 # self.window.sync_btn.set_visible(True)
-            except:
-                Log.error(f"Sync: Can't connect to {self.name} server at '{self.url}'")
+            except Exception as e:
+                Log.error(
+                    f"Sync: Can't connect to {self.name} server at '{self.url}'. {e}"
+                )
                 if not self.testing:
                     self.window.add_toast(
                         _("Can't connect to CalDAV server at:")  # pyright:ignore
@@ -215,10 +218,6 @@ class SyncProviderCalDAV:
             return False
 
     def sync(self) -> None:
-        """
-        Sync local tasks with provider
-        """
-
         Log.info(f"Sync: Sync tasks with remote")
 
         if not self._update_calendars():
@@ -290,23 +289,23 @@ class SyncProviderCalDAV:
             if calendar.id not in user_lists_uids:
                 Log.debug(f"Sync: Copy list from remote {calendar.id}")
                 UserData.add_list(name=calendar.name, uuid=calendar.id, synced=True)
-                # Fetch tasks for the new list
-                for task in remote_tasks:
-                    UserData.add_task(
-                        color=task["color"],
-                        completed=task["completed"],
-                        end_date=task["end_date"],
-                        list_uid=calendar.id,
-                        notes=task["notes"],
-                        parent=task["parent"],
-                        percent_complete=task["percent_complete"],
-                        priority=task["priority"],
-                        start_date=task["start_date"],
-                        synced=True,
-                        tags=task["tags"],
-                        text=task["text"],
-                        uid=task["uid"],
-                    )
+                # # Fetch tasks for the new list
+                # for task in remote_tasks:
+                #     UserData.add_task(
+                #         color=task["color"],
+                #         completed=task["completed"],
+                #         end_date=task["end_date"],
+                #         list_uid=calendar.id,
+                #         notes=task["notes"],
+                #         parent=task["parent"],
+                #         percent_complete=task["percent_complete"],
+                #         priority=task["priority"],
+                #         start_date=task["start_date"],
+                #         synced=True,
+                #         tags=task["tags"],
+                #         text=task["text"],
+                #         uid=task["uid"],
+                #     )
 
             # Create new local task that was created on CalDAV
             for task in remote_tasks:
@@ -416,15 +415,17 @@ class SyncProviderCalDAV:
                     )
 
             # Delete tasks on remote if they were deleted locally
-            for task in UserData.run_sql(f"SELECT uid FROM deleted", fetch=True):
+            for task in UserData.run_sql(
+                f"SELECT uid FROM tasks WHERE deleted = 1", fetch=True
+            ):
                 try:
-                    Log.debug(f"Sync: Delete task from remote: {task[0]}")
+                    Log.debug(f"Sync: Delete task from remote: '{task[0]}'")
                     if todo := calendar.todo_by_uid(task[0]):
                         todo.delete()
                 except Exception as e:
-                    Log.error(f"Sync: Can't delete task from remote: {task[0]}. {e}")
+                    Log.error(f"Sync: Can't delete task from remote: '{task[0]}'. {e}")
             UserData.run_sql(
-                "DELETE FROM deleted",
+                "DELETE FROM tasks WHERE deleted = 1",
             )
 
         GLib.idle_add(self.window.lists.update_ui)
