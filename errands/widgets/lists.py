@@ -201,7 +201,8 @@ class Lists(Adw.Bin):
     def rename_list(self, widget, name):
         Log.info(f"Lists: Rename list {widget.list_uid}")
         UserData.run_sql(
-            f"UPDATE lists SET name = '{name}' WHERE uid = '{widget.list_uid}'",
+            f"""UPDATE lists SET name = '{name}', synced = 0
+            WHERE uid = '{widget.list_uid}'""",
         )
         page: Gtk.StackPage = self.stack.get_page(widget)
         page.set_name(name)
@@ -224,9 +225,12 @@ class Lists(Adw.Bin):
                 self.lists.select_row(rows[idx - 1])
                 self.lists.remove(row)
 
+        # Rename lists TODO
+
         # Update old lists
         for list in self.get_lists():
             list.update_ui()
+
         # Create new lists
         old_uids = [row.uid for row in get_children(self.lists)]
         new_lists = UserData.get_lists_as_dicts()

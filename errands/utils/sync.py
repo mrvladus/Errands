@@ -3,6 +3,7 @@
 
 import datetime
 from caldav import Calendar, DAVClient, Principal, Todo
+from caldav.elements import dav
 from gi.repository import Adw, GLib
 
 # Import modules
@@ -222,12 +223,28 @@ class SyncProviderCalDAV:
 
         remote_lists_uids = [c.id for c in self.calendars]
         for list in UserData.get_lists_as_dicts():
-            # Rename list on remote
             for cal in self.calendars:
-                if cal.id == list["uid"] and cal.name != list["name"]:
+                # Rename list on remote
+                if (
+                    cal.id == list["uid"]
+                    and cal.name != list["name"]
+                    and not list["synced"]
+                ):
                     Log.debug(f"Sync: Rename remote list '{list['uid']}'")
-                    cal.name = list["name"]
-                    cal.save()
+                    cal.set_properties([dav.DisplayName(list["name"])])
+                    UserData.run_sql(
+                        f"UPDATE lists SET synced = 1 WHERE uid = '{cal.id}'"
+                    )
+                # Rename local list
+                elif (
+                    cal.id == list["uid"]
+                    and cal.name != list["name"]
+                    and list["synced"]
+                ):
+                    Log.debug(f"Sync: Rename local list '{list['uid']}'")
+                    UserData.run_sql(
+                        f"UPDATE lists SET name = '{cal.name}', synced = 1 WHERE uid = '{cal.id}'"
+                    )
 
             # Delete local list deleted on remote
             if (
@@ -289,23 +306,6 @@ class SyncProviderCalDAV:
             if calendar.id not in user_lists_uids:
                 Log.debug(f"Sync: Copy list from remote {calendar.id}")
                 UserData.add_list(name=calendar.name, uuid=calendar.id, synced=True)
-                # # Fetch tasks for the new list
-                # for task in remote_tasks:
-                #     UserData.add_task(
-                #         color=task["color"],
-                #         completed=task["completed"],
-                #         end_date=task["end_date"],
-                #         list_uid=calendar.id,
-                #         notes=task["notes"],
-                #         parent=task["parent"],
-                #         percent_complete=task["percent_complete"],
-                #         priority=task["priority"],
-                #         start_date=task["start_date"],
-                #         synced=True,
-                #         tags=task["tags"],
-                #         text=task["text"],
-                #         uid=task["uid"],
-                #     )
 
             # Create new local task that was created on CalDAV
             for task in remote_tasks:
