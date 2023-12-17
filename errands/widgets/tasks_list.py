@@ -23,7 +23,6 @@ class TasksList(Adw.Bin):
         self.list_uid = list_uid
         self.parent = parent
         self.build_ui()
-        self.add_actions()
         self.load_tasks()
 
     def build_ui(self):
@@ -58,22 +57,10 @@ class TasksList(Adw.Bin):
             sensitive=False,
         )
         self.scroll_up_btn.connect("clicked", lambda *_: scroll(self.scrl, False))
-        # Menu
-        menu: Gio.Menu = Gio.Menu.new()
-        menu.append(_("Rename"), "tasks_list.rename")  # type:ignore
-        menu.append(_("Delete"), "tasks_list.delete")  # type:ignore
-        menu.append(_("Export"), "tasks_list.export")  # type:ignore
         # Header Bar
         self.hb = Adw.HeaderBar(title_widget=self.title)
         self.hb.pack_start(self.toggle_sidebar_btn)
         self.hb.pack_start(self.delete_completed_btn)
-        self.hb.pack_end(
-            Gtk.MenuButton(
-                menu_model=menu,
-                icon_name="view-more-symbolic",
-                tooltip_text=_("Menu"),  # type:ignore
-            )
-        )
         self.hb.pack_end(self.scroll_up_btn)
 
         # ---------- BOTTOMBAR ---------- #
@@ -243,75 +230,6 @@ class TasksList(Adw.Bin):
 
         self.set_child(brb)
 
-    def add_actions(self):
-        group = Gio.SimpleActionGroup()
-        self.insert_action_group(name="tasks_list", group=group)
-
-        def _create_action(name: str, callback: callable, shortcuts=None) -> None:
-            action: Gio.SimpleAction = Gio.SimpleAction.new(name, None)
-            action.connect("activate", callback)
-            if shortcuts:
-                group.set_accels_for_action(f"tasks_list.{name}", shortcuts)
-            group.add_action(action)
-
-        def _rename(*args):
-            def entry_changed(entry, _, dialog):
-                empty = entry.props.text.strip(" \n\t") == ""
-                dialog.set_response_enabled("save", not empty)
-
-            def _confirm(_, res, entry):
-                if res == "cancel":
-                    Log.debug("Editing list name is cancelled")
-                    return
-                text = entry.props.text.rstrip().lstrip()
-                self.title.set_title(text)
-                self.parent.rename_list(self, text)
-
-            entry = Gtk.Entry(placeholder_text=_("New Name"))  # type:ignore
-            dialog = Adw.MessageDialog(
-                transient_for=self.window,
-                hide_on_close=True,
-                heading=_("Rename List"),  # type:ignore
-                default_response="save",
-                close_response="cancel",
-                extra_child=entry,
-            )
-            dialog.add_response("cancel", _("Cancel"))  # type:ignore
-            dialog.add_response("save", _("Save"))  # type:ignore
-            dialog.set_response_enabled("save", False)
-            dialog.set_response_appearance("save", Adw.ResponseAppearance.SUGGESTED)
-            dialog.connect("response", _confirm, entry)
-            entry.connect("notify::text", entry_changed, dialog)
-            dialog.present()
-
-        def _delete(*args):
-            def _confirm(_, res):
-                if res == "cancel":
-                    Log.debug("Deleting list is cancelled")
-                    return
-                self.parent.delete_list(self)
-
-            dialog = Adw.MessageDialog(
-                transient_for=self.window,
-                hide_on_close=True,
-                heading=_("Are you sure?"),  # type:ignore
-                body=_("List will be permanently deleted"),  # type:ignore
-                default_response="delete",
-                close_response="cancel",
-            )
-            dialog.add_response("cancel", _("Cancel"))  # type:ignore
-            dialog.add_response("delete", _("Delete"))  # type:ignore
-            dialog.set_response_appearance("delete", Adw.ResponseAppearance.DESTRUCTIVE)
-            dialog.connect("response", _confirm)
-            dialog.present()
-
-        def _export():
-            pass
-
-        _create_action("rename", _rename)
-        _create_action("delete", _delete)
-        _create_action("export", _export)
-
     def add_task(self, uid: str) -> None:
         new_task = Task(uid, self.list_uid, self.window, self, self, False)
         self.tasks_list.append(new_task)
@@ -387,6 +305,15 @@ class TasksList(Adw.Bin):
 
     def update_ui(self) -> None:
         Log.debug(f"Task list {self.list_uid}: Update UI")
+
+        # Rename list
+        self.title.set_title(
+            UserData.run_sql(
+                f"""SELECT name FROM lists 
+                WHERE uid = '{self.list_uid}'""",
+                fetch=True,
+            )[0][0]
+        )
 
         # Remove deleted tasks
         ids = UserData.get_tasks_uids(self.list_uid)
