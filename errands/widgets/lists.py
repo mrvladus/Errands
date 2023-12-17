@@ -45,8 +45,7 @@ class Lists(Adw.Bin):
         hb.pack_end(menu_btn)
         # Lists
         self.lists = Gtk.ListBox(css_classes=["navigation-sidebar"])
-        self.lists.connect("row-selected", self.switch_list)
-        self.lists.connect("row-activated", self.switch_list)
+        self.lists.connect("row-selected", self.on_list_swiched)
         # Status page
         self.status_page = Adw.StatusPage(
             title=_("Add new List"),  # type:ignore
@@ -86,7 +85,7 @@ class Lists(Adw.Bin):
             name = entry.props.text.rstrip().lstrip()
             uid = UserData.add_list(name)
             row = self.add_list(name, uid)
-            self.lists.select_row(row)
+            row.activate()
             Sync.sync()
 
         entry = Gtk.Entry(placeholder_text=_("New List Name"))  # type:ignore
@@ -106,6 +105,13 @@ class Lists(Adw.Bin):
         entry.connect("notify::text", entry_changed, dialog)
         dialog.present()
 
+    def on_list_swiched(self, _, row: Gtk.ListBoxRow):
+        if row:
+            self.stack.set_visible_child_name(row.name)
+            self.window.split_view.set_show_content(True)
+            GSettings.set("last-open-list", "s", row.name)
+            self.status_page.set_visible(False)
+
     def get_lists(self) -> list[TasksList]:
         lists: list[TasksList] = []
         pages: Adw.ViewStackPages = self.stack.get_pages()
@@ -124,24 +130,12 @@ class Lists(Adw.Bin):
             )
 
         # Add lists
-        for list in UserData.get_lists_as_dicts():
-            if list["deleted"]:
-                continue
+        lists = [i for i in UserData.get_lists_as_dicts() if not i["deleted"]]
+        for list in lists:
             row = self.add_list(list["name"], list["uid"])
-            # Select last opened list
-            if list["name"] == GSettings.get("last-open-list"):
+            if GSettings.get("last-open-list") == list["name"]:
                 self.lists.select_row(row)
-
-    def switch_list(self, _, row):
-        if row:
-            Log.debug(f"Lists: Switch list to '{row.uid}'")
-            self.stack.set_visible_child_name(row.name)
-            self.window.split_view.set_show_content(True)
-            GSettings.set("last-open-list", "s", row.name)
-            self.status_page.set_visible(False)
-        else:
-            self.stack.set_visible_child_name("status")
-            self.status_page.set_visible(True)
+        self.status_page.set_visible(len(lists) == 0)
 
     def update_ui(self):
         Log.debug("Lists: Update UI")

@@ -1,6 +1,7 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
+from errands.utils.gsettings import GSettings
 from gi.repository import Adw, Gtk, Gio
 from errands.utils.data import UserData
 from errands.utils.functions import get_children
@@ -24,7 +25,7 @@ class ListItem(Gtk.ListBoxRow):
         group = Gio.SimpleActionGroup()
         self.insert_action_group(name="list_item", group=group)
 
-        def _create_action(name: str, callback: callable, shortcuts=None) -> None:
+        def _create_action(name: str, callback: callable) -> None:
             action: Gio.SimpleAction = Gio.SimpleAction.new(name, None)
             action.connect("activate", callback)
             group.add_action(action)
@@ -34,6 +35,7 @@ class ListItem(Gtk.ListBoxRow):
                 if res == "cancel":
                     Log.debug("ListItem: Deleting list is cancelled")
                     return
+
                 Log.info(f"Lists: Delete list '{self.uid}'")
                 UserData.run_sql(
                     f"UPDATE lists SET deleted = 1 WHERE uid = '{self.uid}'",
@@ -41,11 +43,14 @@ class ListItem(Gtk.ListBoxRow):
                 )
                 self.lists.stack.remove(self.task_list)
                 # Switch row
-                rows = get_children(self.list_box)
-                row = self.list_box.get_selected_row()
-                idx = rows.index(row)
-                self.list_box.select_row(rows[idx - 1])
-                self.list_box.remove(row)
+                next_row = self.get_next_sibling()
+                prev_row = self.get_prev_sibling()
+                self.list_box.remove(self)
+                if next_row or prev_row:
+                    self.list_box.select_row(next_row or prev_row)
+                else:
+                    self.lists.stack.set_visible_child_name("status")
+                    self.lists.status_page.set_visible(True)
                 Sync.sync()
 
             dialog = Adw.MessageDialog(
@@ -80,6 +85,7 @@ class ListItem(Gtk.ListBoxRow):
                     WHERE uid = '{self.uid}'"""
                 )
                 self.task_list.title.set_title(text)
+                self.name = text
                 Sync.sync()
 
             entry = Gtk.Entry(placeholder_text=_("New Name"))  # type:ignore
@@ -134,3 +140,6 @@ class ListItem(Gtk.ListBoxRow):
             )
         )
         self.set_child(box)
+        # Add controllers
+        # click = Gtk.GestureClick()
+        # click.connect("released", lambda *_: self.lists.)
