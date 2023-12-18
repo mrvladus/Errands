@@ -248,22 +248,16 @@ class TaskList(Adw.Bin):
 
         n_total: int = UserData.run_sql(
             f"""SELECT COUNT(*) FROM tasks
-            WHERE parent IS '' 
+            WHERE parent = '' 
             AND trash = 0
             AND list_uid = '{self.list_uid}'""",
             fetch=True,
         )[0][0]
         n_completed: int = UserData.run_sql(
             f"""SELECT COUNT(*) FROM tasks 
-            WHERE parent IS '' 
+            WHERE parent = '' 
             AND completed = 1
             AND trash = 0
-            AND list_uid = '{self.list_uid}'""",
-            fetch=True,
-        )[0][0]
-        n_all_deleted: int = UserData.run_sql(
-            f"""SELECT COUNT(*) FROM tasks 
-            WHERE trash = 1 
             AND list_uid = '{self.list_uid}'""",
             fetch=True,
         )[0][0]
@@ -281,7 +275,6 @@ class TaskList(Adw.Bin):
             else ""
         )
         self.delete_completed_btn.set_sensitive(n_all_completed > 0)
-        # self.trash_panel.scrl.set_visible(n_all_deleted > 0)
 
     def update_ui(self) -> None:
         Log.debug(f"Task list {self.list_uid}: Update UI")
@@ -337,10 +330,10 @@ class TaskList(Adw.Bin):
                             t.add_task(task_dict["uid"])
 
         # Update details
-        if self.details_panel.parent not in self.get_all_tasks():
-            self.details_panel.status.set_visible(True)
+        if self.details.parent not in self.get_all_tasks():
+            self.details.status.set_visible(True)
         else:
-            self.details_panel.update_info(self.details_panel.parent)
+            self.details.update_info(self.details.parent)
 
     def on_delete_completed_btn_clicked(self, _) -> None:
         """
