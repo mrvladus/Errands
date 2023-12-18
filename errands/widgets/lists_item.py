@@ -85,6 +85,9 @@ class ListItem(Gtk.ListBoxRow):
                     WHERE uid = '{self.uid}'"""
                 )
                 self.task_list.title.set_title(text)
+                page: Adw.ViewStackPage = self.lists.stack.get_page(self.task_list)
+                page.set_name(text)
+                page.set_title(text)
                 self.name = text
                 Sync.sync()
 
