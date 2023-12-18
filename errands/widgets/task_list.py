@@ -1,7 +1,7 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-from gi.repository import Adw, Gtk, GLib, Gio, GObject
+from gi.repository import Adw, Gtk, GLib, GObject
 from errands.utils.animation import scroll
 from errands.utils.gsettings import GSettings
 from errands.utils.data import UserData
@@ -10,10 +10,9 @@ from errands.utils.sync import Sync
 from errands.utils.logging import Log
 from errands.widgets.details import Details
 from errands.widgets.task import Task
-from errands.widgets.trash import Trash
 
 
-class TasksList(Adw.Bin):
+class TaskList(Adw.Bin):
     # State
     scrolling: bool = False  # Is window scrolling
 
@@ -27,6 +26,7 @@ class TasksList(Adw.Bin):
 
     def build_ui(self):
         # ---------- HEADERBAR ---------- #
+
         # Title
         self.title = Adw.WindowTitle(
             title=UserData.run_sql(
@@ -57,6 +57,7 @@ class TasksList(Adw.Bin):
             sensitive=False,
         )
         self.scroll_up_btn.connect("clicked", lambda *_: scroll(self.scrl, False))
+
         # Header Bar
         self.hb = Adw.HeaderBar(title_widget=self.title)
         self.hb.pack_start(self.toggle_sidebar_btn)
@@ -182,18 +183,9 @@ class TasksList(Adw.Bin):
         tasks_brb_bp.add_setter(tasks_toolbar_view, "reveal-bottom-bars", True)
         tasks_brb.add_breakpoint(tasks_brb_bp)
 
-        # ---------- SIDEBAR ---------- #
-
-        self.sidebar = Adw.ViewStack()
-        # Sidebar toolbar view
-        sidebar_toolbar_view = Adw.ToolbarView(content=self.sidebar)
-        sidebar_toolbar_view.add_bottom_bar(
-            Adw.ViewSwitcherBar(stack=self.sidebar, reveal=True)
-        )
         # Split view
         self.split_view = Adw.OverlaySplitView(
             content=tasks_brb,
-            sidebar=sidebar_toolbar_view,
             sidebar_position="start",
             min_sidebar_width=360,
             max_sidebar_width=360,
@@ -202,24 +194,12 @@ class TasksList(Adw.Bin):
             "show-sidebar",
             self.toggle_sidebar_btn,
             "active",
-            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
+            GObject.BindingFlags.BIDIRECTIONAL,
         )
         GSettings.bind("sidebar-open", self.split_view, "show-sidebar")
-        # Sidebar
-        self.trash_panel = Trash(self.window, self)
-        self.details_panel = Details(self.window, self)
-        self.sidebar.add_titled_with_icon(
-            self.trash_panel,
-            "trash",
-            _("Trash"),  # type:ignore
-            "user-trash-symbolic",
-        )
-        self.sidebar.add_titled_with_icon(
-            self.details_panel,
-            "details",
-            _("Details"),  # type:ignore
-            "help-about-symbolic",
-        )
+        # Details
+        self.details = Details(self.window, self)
+        self.split_view.set_sidebar(self.details)
         # Breakpoint
         brb = Adw.BreakpointBin(
             width_request=360, height_request=360, child=self.split_view
@@ -301,7 +281,7 @@ class TasksList(Adw.Bin):
             else ""
         )
         self.delete_completed_btn.set_sensitive(n_all_completed > 0)
-        self.trash_panel.scrl.set_visible(n_all_deleted > 0)
+        # self.trash_panel.scrl.set_visible(n_all_deleted > 0)
 
     def update_ui(self) -> None:
         Log.debug(f"Task list {self.list_uid}: Update UI")

@@ -22,7 +22,7 @@ class Task(Gtk.Revealer):
         uid: str,
         list_uid: str,
         window: Adw.ApplicationWindow,
-        tasks_panel,
+        task_list,
         parent,
         is_sub_task: bool,
     ) -> None:
@@ -32,20 +32,21 @@ class Task(Gtk.Revealer):
         self.uid = uid
         self.list_uid = list_uid
         self.window = window
-        self.tasks_panel = tasks_panel
+        self.task_list = task_list
         self.parent = parent
         self.is_sub_task = is_sub_task
+        self.trash = window.trash
 
         self.build_ui()
         self.add_sub_tasks()
         # Add to trash if needed
         if self.get_prop("trash"):
-            self.tasks_panel.trash_panel.trash_add(self.uid)
+            self.trash.trash_add(self.uid)
         # Expand
         self.expand(self.get_prop("expanded"))
 
     def get_prop(self, prop: str):
-        res = UserData.get_prop(self.list_uid, self.uid, prop)
+        res = UserData.get_prop(self.uid, prop)
         if prop in "deleted completed expanded trash":
             res = bool(res)
         return res
@@ -161,7 +162,7 @@ class Task(Gtk.Revealer):
         self.set_child(box)
 
     def add_task(self, uid: str) -> None:
-        new_task = Task(uid, self.list_uid, self.window, self.tasks_panel, self, True)
+        new_task = Task(uid, self.list_uid, self.window, self.task_list, self, True)
         self.tasks_list.append(new_task)
         new_task.toggle_visibility(not new_task.get_prop("trash"))
 
@@ -170,7 +171,7 @@ class Task(Gtk.Revealer):
             self.add_task(uid)
         self.update_status()
         self.parent.update_status()
-        self.tasks_panel.update_status()
+        self.task_list.update_status()
         self.just_added = False
 
     def delete(self, *_) -> None:
@@ -179,11 +180,11 @@ class Task(Gtk.Revealer):
         self.toggle_visibility(False)
         self.update_props(["trash"], [True])
         self.completed_btn.set_active(True)
-        self.tasks_panel.trash_panel.trash_add(self.uid)
+        self.trash.trash_add(self.uid)
         for task in get_children(self.tasks_list):
             if not task.get_prop("trash"):
                 task.delete()
-        self.tasks_panel.details_panel.status.set_visible(True)
+        self.task_list.details.status.set_visible(True)
 
     def expand(self, expanded: bool) -> None:
         self.sub_tasks_revealer.set_reveal_child(expanded)
@@ -268,14 +269,13 @@ class Task(Gtk.Revealer):
         # Sync
         if self.can_sync:
             Sync.sync()
-            self.tasks_panel.update_status()
+            self.task_list.update_status()
             for task in children:
                 task.can_sync = True
 
     def on_details_clicked(self, *args):
-        self.tasks_panel.sidebar.set_visible_child_name("details")
-        self.tasks_panel.details_panel.update_info(self)
-        self.tasks_panel.split_view.set_show_sidebar(True)
+        self.task_list.details.update_info(self)
+        self.task_list.split_view.set_show_sidebar(True)
 
     def on_sub_task_added(self, entry: Gtk.Entry) -> None:
         """

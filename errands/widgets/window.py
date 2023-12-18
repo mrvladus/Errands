@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 from __main__ import VERSION, APP_ID
+from errands.widgets.trash import Trash
 from gi.repository import Gio, Adw, Gtk
 from errands.widgets.lists import Lists
 from errands.widgets.shortcuts_window import ShortcutsWindow
@@ -31,15 +32,21 @@ class Window(Adw.ApplicationWindow):
         self.props.width_request = 360
         self.props.height_request = 200
         self.set_default_size(1100, 700)
+
         # Split view
         self.split_view = Adw.NavigationSplitView(
             max_sidebar_width=240, min_sidebar_width=240, show_content=True
         )
+
         # Stack
-        stack = Adw.ViewStack()
-        self.split_view.set_content(Adw.NavigationPage.new(stack, "Tasks"))
-        self.lists = Lists(self, stack)
+        self.stack = Adw.ViewStack()
+        # Trash
+        self.trash = Trash(self)
+        self.stack.add_titled(self.trash, name="trash", title="Trash")
+        self.split_view.set_content(Adw.NavigationPage.new(self.stack, "Tasks"))
+        self.lists = Lists(self, self.stack)
         self.split_view.set_sidebar(Adw.NavigationPage.new(self.lists, "Lists"))
+
         # Status page
         status_page = Adw.StatusPage(
             title=_("No Task Lists"),  # type:ignore
@@ -56,7 +63,11 @@ class Window(Adw.ApplicationWindow):
         box.append(add_list_btn)
         status_toolbar_view = Adw.ToolbarView(content=box)
         status_toolbar_view.add_top_bar(Adw.HeaderBar(show_title=False))
-        stack.add_titled(child=status_toolbar_view, name="status", title="Status")
+        self.stack.add_titled(
+            child=status_toolbar_view,
+            name="status",
+            title=_("No Task Lists"),  # type:ignore
+        )
 
         # Toast overlay
         self.toast_overlay = Adw.ToastOverlay(child=self.split_view)

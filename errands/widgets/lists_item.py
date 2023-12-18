@@ -143,3 +143,11 @@ class ListItem(Gtk.ListBoxRow):
             )
         )
         self.set_child(box)
+        # Click controller
+        ctrl = Gtk.GestureClick()
+        ctrl.connect("released", self.on_click)
+        self.add_controller(ctrl)
+
+    def on_click(self, *args):
+        self.window.stack.set_visible_child_name(self.name)
+        self.window.split_view.set_show_content(True)

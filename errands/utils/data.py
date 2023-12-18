@@ -73,15 +73,12 @@ class UserData:
         return lists
 
     @classmethod
-    def get_prop(cls, list_uid: str, uid: str, prop: str) -> Any:
-        with cls.connection:
-            cur = cls.connection.cursor()
-            cur.execute(
-                f"""SELECT {prop} FROM tasks 
-                WHERE uid = '{uid}'
-                AND list_uid = '{list_uid}'"""
-            )
-            return cur.fetchone()[0]
+    def get_prop(cls, uid: str, prop: str) -> Any:
+        return cls.run_sql(
+            f"""SELECT {prop} FROM tasks 
+                WHERE uid = '{uid}'""",
+            fetch=True,
+        )[0][0]
 
     @classmethod
     def update_props(

@@ -7,7 +7,7 @@ from errands.utils.gsettings import GSettings
 from errands.utils.logging import Log
 from errands.utils.sync import Sync
 from errands.widgets.lists_item import ListItem
-from errands.widgets.tasks_list import TasksList
+from errands.widgets.task_list import TaskList
 from gi.repository import Adw, Gtk, Gio, GObject
 
 
@@ -70,6 +70,7 @@ class Lists(Adw.Bin):
             margin_end=6,
             margin_start=6,
         )
+        trash_btn.connect("clicked", self.on_trash_btn_clicked)
         # Toolbar view
         toolbar_view = Adw.ToolbarView(
             content=Gtk.ScrolledWindow(child=box, propagate_natural_height=True)
@@ -79,7 +80,7 @@ class Lists(Adw.Bin):
         self.set_child(toolbar_view)
 
     def add_list(self, name, uid) -> Gtk.ListBoxRow:
-        task_list = TasksList(self.window, uid, self)
+        task_list = TaskList(self.window, uid, self)
         self.stack.add_titled(child=task_list, name=name, title=name)
         row = ListItem(name, uid, task_list, self.lists, self, self.window)
         self.lists.append(row)
@@ -119,6 +120,10 @@ class Lists(Adw.Bin):
         entry.connect("notify::text", entry_changed, dialog)
         dialog.present()
 
+    def on_trash_btn_clicked(self, _btn):
+        self.stack.set_visible_child_name("trash")
+        self.window.split_view.set_show_content(True)
+
     def on_list_swiched(self, _, row: Gtk.ListBoxRow):
         if row:
             self.stack.set_visible_child_name(row.name)
@@ -126,12 +131,12 @@ class Lists(Adw.Bin):
             GSettings.set("last-open-list", "s", row.name)
             self.status_page.set_visible(False)
 
-    def get_lists(self) -> list[TasksList]:
-        lists: list[TasksList] = []
+    def get_lists(self) -> list[TaskList]:
+        lists: list[TaskList] = []
         pages: Adw.ViewStackPages = self.stack.get_pages()
         for i in range(pages.get_n_items()):
             child = pages.get_item(i).get_child()
-            if isinstance(child, TasksList):
+            if isinstance(child, TaskList):
                 lists.append(child)
         return lists
 

@@ -11,27 +11,17 @@ from errands.utils.logging import Log
 
 
 class Trash(Adw.Bin):
-    def __init__(self, window, tasks_panel):
+    def __init__(self, window):
         super().__init__()
         self.window = window
-        self.tasks_panel = tasks_panel
+        self.stack: Adw.ViewStack = window.stack
         self.build_ui()
+        self.update_status()
 
     def build_ui(self):
         # Headerbar
-        hb = Adw.HeaderBar(show_title=False, show_back_button=False)
-        # Back button
-        back_btn = Gtk.Button(icon_name="go-previous-symbolic", visible=False)
-        back_btn.bind_property(
-            "visible",
-            self.tasks_panel.split_view,
-            "collapsed",
-            GObject.BindingFlags.BIDIRECTIONAL,
-        )
-        back_btn.connect(
-            "clicked", lambda *_: self.tasks_panel.split_view.set_show_sidebar(False)
-        )
-        hb.pack_start(back_btn)
+        hb = Adw.HeaderBar()
+        hb.set_title_widget(Adw.WindowTitle(title=_("Trash")))  # type:ignore
         # Clear button
         clear_btn = Gtk.Button(
             icon_name="user-trash-full-symbolic",
@@ -49,20 +39,21 @@ class Trash(Adw.Bin):
         restore_btn.connect("clicked", self.on_trash_restore)
         hb.pack_end(restore_btn)
         # Status
-        status = Adw.StatusPage(
+        self.status = Adw.StatusPage(
             icon_name="user-trash-symbolic",
             title=_("Empty Trash"),  # type:ignore
             description=_("No deleted items"),  # type:ignore
             vexpand=True,
         )
-        status.add_css_class("compact")
+        self.status.add_css_class("compact")
         # Trash list
-        self.trash_list = Gtk.ListBox(
+        self.trash_list = Gtk.Box(
+            orientation="vertical",
             margin_top=12,
             margin_bottom=12,
             margin_start=12,
             margin_end=12,
-            selection_mode=0,
+            spacing=12,
             css_classes=["boxed-list"],
             vexpand=False,
         )
@@ -73,9 +64,9 @@ class Trash(Adw.Bin):
         )
         self.scrl.bind_property(
             "visible",
-            status,
+            self.status,
             "visible",
-            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.INVERT_BOOLEAN,
+            GObject.BindingFlags.INVERT_BOOLEAN | GObject.BindingFlags.BIDIRECTIONAL,
         )
         self.scrl.bind_property(
             "visible", clear_btn, "visible", GObject.BindingFlags.SYNC_CREATE
@@ -85,7 +76,7 @@ class Trash(Adw.Bin):
         )
         # Box
         box = Gtk.Box(orientation="vertical")
-        box.append(status)
+        box.append(self.status)
         box.append(self.scrl)
         # Toolbar View
         toolbar_view = Adw.ToolbarView(content=box)
@@ -97,30 +88,47 @@ class Trash(Adw.Bin):
         Add item to trash
         """
 
-        self.trash_list.append(TrashItem(uid, self.tasks_panel, self.trash_list))
+        self.trash_list.append(TrashItem(uid, self))
         self.scrl.set_visible(True)
 
-    def trash_clear(self) -> None:
-        """
-        Clear unneeded items from trash
-        """
-
-        res = UserData.run_sql(
-            f"""SELECT uid FROM tasks
-            WHERE trash = 0
-            AND list_uid = '{self.tasks_panel.list_uid}'""",
-            fetch=True,
-        )
-        ids: list[str] = [i[0] for i in res]
-        to_remove: list[TrashItem] = [
-            i for i in get_children(self.trash_list) if i.uid in ids
+    def update_status(self):
+        deleted_uids = [
+            i[0]
+            for i in UserData.run_sql(
+                "SELECT uid FROM tasks WHERE trash = 1", fetch=True
+            )
         ]
-        for item in to_remove:
-            self.trash_list.remove(item)
-        self.scrl.set_visible(len(get_children(self.trash_list)) > 0)
+        self.status.set_visible(len(deleted_uids) == 0)
 
     def on_trash_clear(self, btn) -> None:
+        def _confirm(_, res):
+            if res == "cancel":
+                Log.debug("Clear Trash cancelled")
+                return
+
+            Log.info("Trash: Clear")
+            # Remove widgets and data
+            to_remove: list[Task] = [
+                task
+                for task in self.tasks_panel.get_all_tasks()
+                if task.get_prop("trash")
+            ]
+            for task in to_remove:
+                task.purge()
+            UserData.run_sql(
+                f"""UPDATE tasks
+                SET deleted = 1
+                WHERE list_uid = '{self.tasks_panel.list_uid}'
+                AND trash = 1""",
+            )
+            # Remove trash items widgets
+            self.trash_list.remove_all()
+            self.scrl.set_visible(False)
+            # Sync
+            Sync.sync()
+
         Log.debug("Trash: Show confirm dialog")
+
         dialog = Adw.MessageDialog(
             transient_for=self.window,
             hide_on_close=True,
@@ -132,36 +140,8 @@ class Trash(Adw.Bin):
         dialog.add_response("cancel", _("Cancel"))  # type:ignore
         dialog.add_response("delete", _("Delete"))  # type:ignore
         dialog.set_response_appearance("delete", Adw.ResponseAppearance.DESTRUCTIVE)
-        dialog.connect("response", self.on_trash_clear_confirm)
+        dialog.connect("response", _confirm)
         dialog.show()
-
-    def on_trash_clear_confirm(self, _, res) -> None:
-        """
-        Remove all trash items and tasks
-        """
-
-        if res == "cancel":
-            Log.debug("Clear Trash cancelled")
-            return
-
-        Log.info("Trash: Clear")
-        # Remove widgets and data
-        to_remove: list[Task] = [
-            task for task in self.tasks_panel.get_all_tasks() if task.get_prop("trash")
-        ]
-        for task in to_remove:
-            task.purge()
-        UserData.run_sql(
-            f"""UPDATE tasks
-            SET deleted = 1
-            WHERE list_uid = '{self.tasks_panel.list_uid}'
-            AND trash = 1""",
-        )
-        # Remove trash items widgets
-        self.trash_list.remove_all()
-        self.scrl.set_visible(False)
-        # Sync
-        Sync.sync()
 
     def on_trash_restore(self, _) -> None:
         """
@@ -170,8 +150,16 @@ class Trash(Adw.Bin):
 
         Log.info("Trash: Restore")
 
-        # Restore tasks
-        tasks: list[Task] = self.tasks_panel.get_all_tasks()
+        # Get all tasks
+        tasks: list[Task] = []
+        task_lists: list = []
+        pages = self.stack.get_pages()
+        for i in range(pages.get_n_items()):
+            child = pages.get_item(i).get_child()
+            if hasattr(child, "get_all_tasks"):
+                task_lists.append(child)
+                tasks.extend(child.get_all_tasks())
+
         for task in tasks:
             task.update_props(["trash"], [False])
             task.toggle_visibility(True)
@@ -186,6 +174,10 @@ class Trash(Adw.Bin):
                     task.expand(True)
                     break
 
-        # Clear trash
-        self.trash_clear()
-        self.tasks_panel.update_status()
+        for list in task_lists:
+            list.update_status()
+
+        for row in get_children(self.trash_list):
+            self.trash_list.remove(row)
+
+        self.update_status()

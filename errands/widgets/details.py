@@ -19,10 +19,10 @@ class Details(Adw.Bin):
     start_datetime: str = ""
     end_datetime: str = ""
 
-    def __init__(self, window, task_panel) -> None:
+    def __init__(self, window, task_list) -> None:
         super().__init__()
         self.window = window
-        self.task_panel = task_panel
+        self.task_list = task_list
         self.build_ui()
 
     def build_ui(self):
@@ -32,7 +32,7 @@ class Details(Adw.Bin):
         back_btn = Gtk.Button(icon_name="go-previous-symbolic", visible=False)
         back_btn.bind_property(
             "visible",
-            self.task_panel.split_view,
+            self.task_list.split_view,
             "collapsed",
             GObject.BindingFlags.BIDIRECTIONAL,
         )
@@ -469,7 +469,6 @@ class Details(Adw.Bin):
     def on_delete_btn_clicked(self, _btn):
         self.parent.delete()
         self.status.set_visible(True)
-        self.task_panel.sidebar.set_visible_child_name("trash")
 
     def on_open_as_ics_clicked(self, _btn):
         export_dir = os.path.join(GLib.get_user_data_dir(), "errands", "exported")
