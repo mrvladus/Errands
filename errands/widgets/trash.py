@@ -95,7 +95,7 @@ class Trash(Adw.Bin):
         deleted_uids = [
             i[0]
             for i in UserData.run_sql(
-                "SELECT uid FROM tasks WHERE trash = 1", fetch=True
+                "SELECT uid FROM tasks WHERE trash = 1 AND deleted = 0", fetch=True
             )
         ]
         self.status.set_visible(len(deleted_uids) == 0)
@@ -107,23 +107,30 @@ class Trash(Adw.Bin):
                 return
 
             Log.info("Trash: Clear")
-            # Remove widgets and data
-            to_remove: list[Task] = [
-                task
-                for task in self.tasks_panel.get_all_tasks()
-                if task.get_prop("trash")
-            ]
-            for task in to_remove:
-                task.purge()
+
             UserData.run_sql(
                 f"""UPDATE tasks
                 SET deleted = 1
-                WHERE list_uid = '{self.tasks_panel.list_uid}'
-                AND trash = 1""",
+                WHERE trash = 1""",
             )
-            # Remove trash items widgets
-            self.trash_list.remove_all()
-            self.scrl.set_visible(False)
+
+            # Remove tasks
+            task_lists: list = []
+            pages = self.stack.get_pages()
+            for i in range(pages.get_n_items()):
+                child = pages.get_item(i).get_child()
+                if hasattr(child, "get_all_tasks"):
+                    task_lists.append(child)
+                    tasks = child.get_all_tasks()
+                    for task in tasks:
+                        if task.get_prop("trash"):
+                            task.purge()
+
+            for row in get_children(self.trash_list):
+                self.trash_list.remove(row)
+
+            self.status.set_visible(True)
+            self.update_status()
             # Sync
             Sync.sync()
 
