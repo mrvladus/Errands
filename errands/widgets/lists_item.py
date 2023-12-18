@@ -41,7 +41,7 @@ class ListItem(Gtk.ListBoxRow):
                     f"UPDATE lists SET deleted = 1 WHERE uid = '{self.uid}'",
                     f"DELETE FROM tasks WHERE list_uid = '{self.uid}'",
                 )
-                self.lists.stack.remove(self.task_list)
+                self.window.stack.remove(self.task_list)
                 # Switch row
                 next_row = self.get_next_sibling()
                 prev_row = self.get_prev_sibling()
@@ -49,7 +49,7 @@ class ListItem(Gtk.ListBoxRow):
                 if next_row or prev_row:
                     self.list_box.select_row(next_row or prev_row)
                 else:
-                    self.lists.stack.set_visible_child_name("status")
+                    self.window.stack.set_visible_child_name("status")
                     self.lists.status_page.set_visible(True)
                 Sync.sync()
 
@@ -85,7 +85,7 @@ class ListItem(Gtk.ListBoxRow):
                     WHERE uid = '{self.uid}'"""
                 )
                 self.task_list.title.set_title(text)
-                page: Adw.ViewStackPage = self.lists.stack.get_page(self.task_list)
+                page: Adw.ViewStackPage = self.window.stack.get_page(self.task_list)
                 page.set_name(text)
                 page.set_title(text)
                 self.name = text

@@ -98,7 +98,10 @@ class Task(Gtk.Revealer):
             tooltip_text=_("Expand / Fold"),  # type:ignore
             css_classes=["flat", "circular", "fade", "rotate"],
         )
-        self.expand_btn.connect("clicked", self.on_expand_btn)
+        self.expand_btn.connect(
+            "clicked",
+            lambda *_: self.expand(not self.sub_tasks_revealer.get_child_revealed()),
+        )
         self.task_row.add_suffix(self.expand_btn)
         task_row_box = Gtk.ListBox(
             selection_mode=0,
@@ -193,9 +196,6 @@ class Task(Gtk.Revealer):
             self.expand_btn.remove_css_class("rotate")
         else:
             self.expand_btn.add_css_class("rotate")
-
-    def on_expand_btn(self, btn):
-        self.expand(not self.sub_tasks_revealer.get_child_revealed())
 
     def purge(self) -> None:
         """
@@ -345,7 +345,7 @@ class Task(Gtk.Revealer):
             task.uid,
             self.list_uid,
             self.window,
-            self.tasks_panel,
+            self.task_list,
             self.parent,
             self.get_prop("parent") != None,
         )
