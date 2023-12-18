@@ -143,6 +143,3 @@ class ListItem(Gtk.ListBoxRow):
             )
         )
         self.set_child(box)
-        # Add controllers
-        # click = Gtk.GestureClick()
-        # click.connect("released", lambda *_: self.lists.)

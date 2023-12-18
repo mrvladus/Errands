@@ -57,11 +57,25 @@ class Lists(Adw.Bin):
         box = Gtk.Box(orientation="vertical")
         box.append(self.lists)
         box.append(self.status_page)
+        # Trash button
+        trash_btn = Gtk.Button(
+            child=Adw.ButtonContent(
+                icon_name="user-trash-symbolic",
+                label=_("Trash"),  # type:ignore
+                halign="center",
+            ),
+            css_classes=["flat"],
+            margin_top=6,
+            margin_bottom=6,
+            margin_end=6,
+            margin_start=6,
+        )
         # Toolbar view
         toolbar_view = Adw.ToolbarView(
             content=Gtk.ScrolledWindow(child=box, propagate_natural_height=True)
         )
         toolbar_view.add_top_bar(hb)
+        toolbar_view.add_bottom_bar(trash_btn)
         self.set_child(toolbar_view)
 
     def add_list(self, name, uid) -> Gtk.ListBoxRow:
