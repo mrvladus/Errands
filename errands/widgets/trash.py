@@ -57,27 +57,31 @@ class Trash(Adw.Bin):
             css_classes=["boxed-list"],
             vexpand=False,
         )
-        self.scrl = Gtk.ScrolledWindow(
-            child=Adw.Clamp(child=self.trash_list),
+        scrl = Gtk.ScrolledWindow(
+            child=Adw.Clamp(
+                child=self.trash_list,
+                maximum_size=850,
+                tightening_threshold=300,
+            ),
             visible=False,
             propagate_natural_height=True,
         )
-        self.scrl.bind_property(
+        scrl.bind_property(
             "visible",
             self.status,
             "visible",
             GObject.BindingFlags.INVERT_BOOLEAN | GObject.BindingFlags.BIDIRECTIONAL,
         )
-        self.scrl.bind_property(
+        scrl.bind_property(
             "visible", clear_btn, "visible", GObject.BindingFlags.SYNC_CREATE
         )
-        self.scrl.bind_property(
+        scrl.bind_property(
             "visible", restore_btn, "visible", GObject.BindingFlags.SYNC_CREATE
         )
         # Box
         box = Gtk.Box(orientation="vertical")
         box.append(self.status)
-        box.append(self.scrl)
+        box.append(scrl)
         # Toolbar View
         toolbar_view = Adw.ToolbarView(content=box)
         toolbar_view.add_top_bar(hb)
@@ -89,7 +93,7 @@ class Trash(Adw.Bin):
         """
 
         self.trash_list.append(TrashItem(uid, self))
-        self.scrl.set_visible(True)
+        self.status.set_visible(False)
 
     def update_status(self):
         deleted_uids = [

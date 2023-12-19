@@ -232,6 +232,7 @@ class Task(Gtk.Revealer):
             else ""
         )
 
+    # TODO
     def on_completed_btn_toggled(self, btn: Gtk.Button) -> None:
         """
         Toggle check button and add style to the text

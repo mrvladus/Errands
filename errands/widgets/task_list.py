@@ -25,8 +25,6 @@ class TaskList(Adw.Bin):
         self.load_tasks()
 
     def build_ui(self):
-        # ---------- HEADERBAR ---------- #
-
         # Title
         self.title = Adw.WindowTitle(
             title=UserData.run_sql(
@@ -194,7 +192,7 @@ class TaskList(Adw.Bin):
             "show-sidebar",
             self.toggle_sidebar_btn,
             "active",
-            GObject.BindingFlags.BIDIRECTIONAL,
+            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
         )
         GSettings.bind("sidebar-open", self.split_view, "show-sidebar")
         # Details
