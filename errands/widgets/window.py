@@ -37,16 +37,15 @@ class Window(Adw.ApplicationWindow):
         self.split_view = Adw.NavigationSplitView(
             max_sidebar_width=240, min_sidebar_width=240, show_content=True
         )
-
         # Stack
         self.stack = Adw.ViewStack()
+        self.split_view.set_content(Adw.NavigationPage.new(self.stack, "Tasks"))
         # Trash
         self.trash = Trash(self)
         self.stack.add_titled(self.trash, name="trash", title="Trash")
-        self.split_view.set_content(Adw.NavigationPage.new(self.stack, "Tasks"))
+        # Sidebar
         self.lists = Lists(self, self.stack)
         self.split_view.set_sidebar(Adw.NavigationPage.new(self.lists, "Lists"))
-
         # Status page
         status_page = Adw.StatusPage(
             title=_("No Task Lists"),  # type:ignore
@@ -57,7 +56,7 @@ class Window(Adw.ApplicationWindow):
             halign="center",
             css_classes=["pill", "suggested-action"],
         )
-        add_list_btn.connect("clicked", self.lists.on_add_btn_clicked)
+        add_list_btn.connect("clicked", self.lists.add_btn.activate)
         box = Gtk.Box(orientation="vertical", vexpand=True, valign="center")
         box.append(status_page)
         box.append(add_list_btn)
@@ -68,6 +67,7 @@ class Window(Adw.ApplicationWindow):
             name="status",
             title=_("No Task Lists"),  # type:ignore
         )
+        self.stack.set_visible_child_name("status")
 
         # Toast overlay
         self.toast_overlay = Adw.ToastOverlay(child=self.split_view)

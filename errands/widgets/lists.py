@@ -155,6 +155,8 @@ class Lists(Adw.Bin):
             if GSettings.get("last-open-list") == list["name"]:
                 self.lists.select_row(row)
         self.status_page.set_visible(len(lists) == 0)
+        # if len(lists) == 0:
+        #     self.stack.set_visible_child_name("status")
 
     def update_ui(self):
         Log.debug("Lists: Update UI")
