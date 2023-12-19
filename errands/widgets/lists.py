@@ -8,7 +8,7 @@ from errands.utils.logging import Log
 from errands.utils.sync import Sync
 from errands.widgets.lists_item import ListItem
 from errands.widgets.task_list import TaskList
-from gi.repository import Adw, Gtk, Gio, GObject
+from gi.repository import Adw, Gtk, Gio
 
 
 class Lists(Adw.Bin):
@@ -157,17 +157,18 @@ class Lists(Adw.Bin):
         self.status_page.set_visible(len(lists) == 0)
 
     def update_ui(self):
-        Log.debug("Lists: Update UI")
+        Log.debug("Lists: Update UI...")
 
         # Delete lists
-        lists_uids = [i["uid"] for i in UserData.get_lists_as_dicts()]
-        for list in self.get_lists():
-            if list.list_uid not in lists_uids:
+        uids = [i["uid"] for i in UserData.get_lists_as_dicts()]
+        for row in get_children(self.lists):
+            if row.uid not in uids:
+                prev_child = row.get_prev_sibling()
+                next_child = row.get_next_sibling()
+                list = row.task_list
                 self.stack.remove(list)
-                rows = get_children(self.lists)
-                row = self.lists.get_selected_row()
-                idx = rows.index(row)
-                self.lists.select_row(rows[idx - 1])
+                if prev_child or next_child:
+                    self.lists.select_row(prev_child or next_child)
                 self.lists.remove(row)
 
         # Update old lists
@@ -179,7 +180,14 @@ class Lists(Adw.Bin):
         new_lists = UserData.get_lists_as_dicts()
         for list in new_lists:
             if list["uid"] not in old_uids:
+                Log.debug(f"Lists: Add list '{list['uid']}'")
                 row = self.add_list(list["name"], list["uid"])
                 self.lists.select_row(row)
                 self.stack.set_visible_child_name(list["name"])
                 self.status_page.set_visible(False)
+
+        # Show status
+        lists = get_children(self.lists)
+        self.status_page.set_visible(len(lists) == 0)
+        if len(lists) == 0:
+            self.stack.set_visible_child_name("status")
