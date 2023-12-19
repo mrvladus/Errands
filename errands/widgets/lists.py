@@ -155,8 +155,6 @@ class Lists(Adw.Bin):
             if GSettings.get("last-open-list") == list["name"]:
                 self.lists.select_row(row)
         self.status_page.set_visible(len(lists) == 0)
-        # if len(lists) == 0:
-        #     self.stack.set_visible_child_name("status")
 
     def update_ui(self):
         Log.debug("Lists: Update UI")
@@ -181,4 +179,7 @@ class Lists(Adw.Bin):
         new_lists = UserData.get_lists_as_dicts()
         for list in new_lists:
             if list["uid"] not in old_uids:
-                self.add_list(list["name"], list["uid"])
+                row = self.add_list(list["name"], list["uid"])
+                self.lists.select_row(row)
+                self.stack.set_visible_child_name(list["name"])
+                self.status_page.set_visible(False)
