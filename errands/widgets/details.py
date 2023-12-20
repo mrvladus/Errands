@@ -2,10 +2,8 @@
 # SPDX-License-Identifier: MIT
 
 from datetime import datetime
-from glob import glob
-import os
-import tempfile
 from errands.utils.data import UserData
+from icalendar import Calendar, Event
 
 from errands.utils.functions import get_children
 from gi.repository import Adw, Gtk, Gio, GLib, Gdk, GObject
@@ -233,16 +231,17 @@ class Details(Adw.Bin):
 
         # Misc group
         misc_group = Adw.PreferencesGroup(title=_("Misc"))  # type:ignore
+
         # Export to calendar button
         open_cal_btn = Gtk.Button(
-            icon_name="x-office-calendar-symbolic",
+            icon_name="emblem-shared-symbolic",
             valign="center",
             css_classes=["flat"],
         )
-        open_cal_btn.connect("clicked", self.on_open_as_ics_clicked)
+        open_cal_btn.connect("clicked", self.on_export)
         open_cal_row = Adw.ActionRow(
-            title=_("Export to Calendar"),  # type:ignore
-            subtitle=_("Open task as .ics file"),  # type:ignore
+            title=_("Export"),  # type:ignore
+            subtitle=_("Save Task as .ics file"),  # type:ignore
             activatable_widget=open_cal_btn,
         )
         open_cal_row.add_suffix(open_cal_btn)
@@ -470,18 +469,49 @@ class Details(Adw.Bin):
         self.parent.delete()
         self.status.set_visible(True)
 
-    def on_open_as_ics_clicked(self, _btn):
-        export_dir = os.path.join(GLib.get_user_data_dir(), "errands", "exported")
-        if not os.path.exists(export_dir):
-            os.mkdir(export_dir)
-        # Clear old files
-        for file in glob(os.path.join(export_dir, "*.tmp.ics")):
-            os.remove(file)
-        path = os.path.join(export_dir, self.parent.uid + ".tmp.ics")
-        with open(path, "w", encoding="utf-8") as f:
-            f.write(UserData.to_ics(self.parent.uid))
-        file: Gio.File = Gio.File.new_for_path(path)
-        Gtk.FileLauncher.new(file).launch()
+    def on_export(self, _btn):
+        def _confirm(dialog, res):
+            try:
+                file = dialog.save_finish(res)
+            except:
+                Log.debug("List: Export cancelled")
+                return
+
+            Log.info(f"Task: Export '{self.parent.uid}'")
+
+            task = [
+                i
+                for i in UserData.get_tasks_as_dicts(self.parent.list_uid)
+                if i["uid"] == self.parent.uid
+            ][0]
+            calendar = Calendar()
+            event = Event()
+            event.add("uid", task["uid"])
+            event.add("summary", task["text"])
+            if task["notes"]:
+                event.add("description", task["notes"])
+            event.add("priority", task["priority"])
+            if task["tags"]:
+                event.add("categories", task["tags"])
+            event.add("percent-complete", task["percent_complete"])
+            if task["color"]:
+                event.add("x-errands-color", task["color"])
+            event.add(
+                "dtstart",
+                datetime.fromisoformat(task["start_date"])
+                if task["start_date"]
+                else datetime.now(),
+            )
+            if task["end_date"]:
+                event.add("dtend", datetime.fromisoformat(task["end_date"]))
+            calendar.add_component(event)
+
+            with open(file.get_path(), "wb") as f:
+                f.write(calendar.to_ical())
+            self.window.add_toast(_("Exported"))  # type:ignore
+
+        dialog = Gtk.FileDialog(initial_name=f"{self.parent.uid}.ics")
+        dialog.save(self.window, None, _confirm)
 
     def on_style_selected(self, btn: Gtk.Button, color: str) -> None:
         """

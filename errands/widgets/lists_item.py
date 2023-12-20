@@ -129,10 +129,14 @@ class ListItem(Gtk.ListBoxRow):
                     event = Event()
                     event.add("uid", task["uid"])
                     event.add("summary", task["text"])
-                    event.add("description", task["notes"])
+                    if task["notes"]:
+                        event.add("description", task["notes"])
                     event.add("priority", task["priority"])
-                    event.add("categoties", task["tags"] if task["tags"] else None)
+                    if task["tags"]:
+                        event.add("categories", task["tags"])
                     event.add("percent-complete", task["percent_complete"])
+                    if task["color"]:
+                        event.add("x-errands-color", task["color"])
                     event.add(
                         "dtstart",
                         datetime.fromisoformat(task["start_date"])
