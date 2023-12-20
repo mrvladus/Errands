@@ -58,7 +58,7 @@ class Lists(Adw.Bin):
         box.append(self.lists)
         box.append(self.status_page)
         # Trash button
-        trash_btn = Gtk.Button(
+        self.trash_btn = Gtk.ToggleButton(
             child=Adw.ButtonContent(
                 icon_name="user-trash-symbolic",
                 label=_("Trash"),  # type:ignore
@@ -70,13 +70,13 @@ class Lists(Adw.Bin):
             margin_end=6,
             margin_start=6,
         )
-        trash_btn.connect("clicked", self.on_trash_btn_clicked)
+        self.trash_btn.connect("clicked", self.on_trash_btn_clicked)
         # Toolbar view
         toolbar_view = Adw.ToolbarView(
             content=Gtk.ScrolledWindow(child=box, propagate_natural_height=True)
         )
         toolbar_view.add_top_bar(hb)
-        toolbar_view.add_bottom_bar(trash_btn)
+        toolbar_view.add_bottom_bar(self.trash_btn)
         self.set_child(toolbar_view)
 
     def add_list(self, name, uid) -> Gtk.ListBoxRow:
@@ -121,6 +121,7 @@ class Lists(Adw.Bin):
         dialog.present()
 
     def on_trash_btn_clicked(self, _btn):
+        self.lists.unselect_all()
         self.stack.set_visible_child_name("trash")
         self.window.split_view.set_show_content(True)
 
@@ -191,3 +192,4 @@ class Lists(Adw.Bin):
         self.status_page.set_visible(len(lists) == 0)
         if len(lists) == 0:
             self.stack.set_visible_child_name("status")
+            self.trash_btn.set_active(False)
