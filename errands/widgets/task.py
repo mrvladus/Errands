@@ -170,7 +170,11 @@ class Task(Gtk.Revealer):
         new_task.toggle_visibility(not new_task.get_prop("trash"))
 
     def add_sub_tasks(self) -> None:
-        for uid in UserData.get_sub_tasks_uids(self.list_uid, self.uid):
+        subs = UserData.get_sub_tasks_uids(self.list_uid, self.uid)
+        if len(subs) == 0:
+            self.just_added = False
+            return
+        for uid in subs:
             self.add_task(uid)
         self.update_status()
         self.parent.update_status()
