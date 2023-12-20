@@ -51,7 +51,6 @@ class ListItem(Gtk.ListBoxRow):
                 else:
                     self.window.stack.set_visible_child_name("status")
                     self.lists.status_page.set_visible(True)
-                    self.lists.trash_btn.set_active(False)
 
                 Sync.sync()
 
@@ -153,4 +152,3 @@ class ListItem(Gtk.ListBoxRow):
     def on_click(self, *args):
         self.window.stack.set_visible_child_name(self.name)
         self.window.split_view.set_show_content(True)
-        self.lists.trash_btn.set_active(False)

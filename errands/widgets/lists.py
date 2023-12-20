@@ -58,7 +58,7 @@ class Lists(Adw.Bin):
         box.append(self.lists)
         box.append(self.status_page)
         # Trash button
-        self.trash_btn = Gtk.ToggleButton(
+        self.trash_btn = Gtk.Button(
             child=Adw.ButtonContent(
                 icon_name="user-trash-symbolic",
                 label=_("Trash"),  # type:ignore
@@ -192,4 +192,3 @@ class Lists(Adw.Bin):
         self.status_page.set_visible(len(lists) == 0)
         if len(lists) == 0:
             self.stack.set_visible_child_name("status")
-            self.trash_btn.set_active(False)

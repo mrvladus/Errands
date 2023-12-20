@@ -1,9 +1,5 @@
 /* Task */
 
-.card {
-  background-color: alpha(@card_bg_color, 0.5);
-}
-
 .task-title:drop(active) {
   border-radius: 10px;
 }
@@ -14,6 +10,7 @@
 
 .task {
   margin: 6px 12px 6px 12px;
+  background-color: alpha(@card_bg_color, 0.5);
 }
 
 .task-expand-icon {
@@ -113,16 +110,13 @@
 
 .sub-task {
   margin: 6px 11px 6px 11px;
+  background-color: alpha(@card_bg_color, 0.5);
 }
 
 /* Calendar */
 
 calendar,
 calendar header {
-  border: none;
-}
-
-stacksidebar {
   border: none;
 }
 
