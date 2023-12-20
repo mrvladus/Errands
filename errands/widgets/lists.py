@@ -142,13 +142,6 @@ class Lists(Adw.Bin):
         return lists
 
     def _load_lists(self):
-        # Clear deleted tasks and lists
-        if GSettings.get("sync-provider") == 0:
-            UserData.run_sql(
-                "DELETE FROM lists WHERE deleted = 1",
-                "DELETE FROM tasks WHERE deleted = 1",
-            )
-
         # Add lists
         lists = [i for i in UserData.get_lists_as_dicts() if not i["deleted"]]
         for list in lists:

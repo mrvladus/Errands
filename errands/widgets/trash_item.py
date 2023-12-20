@@ -21,6 +21,10 @@ class TrashItem(Adw.Bin):
         self.add_css_class("card")
         row = Adw.ActionRow(
             title=UserData.get_prop(self.uid, "text"),
+            subtitle=UserData.run_sql(
+                f"SELECT name FROM lists WHERE uid = '{self.task_widget.list_uid}'",
+                fetch=True,
+            )[0][0],
             css_classes=["rounded-corners"],
             height_request=60,
         )
