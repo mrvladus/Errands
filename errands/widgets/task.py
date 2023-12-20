@@ -267,9 +267,11 @@ class Task(Gtk.Revealer):
         children: list[Task] = get_children(self.tasks_list)
         for task in children:
             task.can_sync = False
-            task.completed_btn.set_active(btn.get_active())
+            if btn.get_active():
+                task.completed_btn.set_active(True)
         # Update status
         self.parent.update_status()
+        self.task_list.details.update_info(self)
         # Set text
         set_text()
         # Sync
