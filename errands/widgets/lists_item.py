@@ -1,8 +1,12 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
+from datetime import datetime
+import os
+
+from icalendar import Calendar, Event
 from errands.utils.gsettings import GSettings
-from gi.repository import Adw, Gtk, Gio
+from gi.repository import Adw, Gtk, Gio, GLib
 from errands.utils.data import UserData
 from errands.utils.functions import get_children
 from errands.utils.logging import Log
@@ -109,8 +113,47 @@ class ListItem(Gtk.ListBoxRow):
             entry.connect("notify::text", entry_changed, dialog)
             dialog.present()
 
-        def _export():
-            pass
+        def _export(*args):
+            def _confirm(dialog, res):
+                try:
+                    file = dialog.save_finish(res)
+                except:
+                    Log.debug("List: Export cancelled")
+                    return
+
+                Log.info(f"List: Export '{self.uid}'")
+
+                tasks = UserData.get_tasks_as_dicts(self.uid)
+                calendar = Calendar()
+                for task in tasks:
+                    event = Event()
+                    event.add("uid", task["uid"])
+                    event.add("summary", task["text"])
+                    event.add("description", task["notes"])
+                    event.add("priority", task["priority"])
+                    event.add("categoties", task["tags"] if task["tags"] else None)
+                    event.add("percent-complete", task["percent_complete"])
+                    event.add(
+                        "dtstart",
+                        datetime.fromisoformat(task["start_date"])
+                        if task["start_date"]
+                        else datetime.now(),
+                    )
+                    if task["end_date"]:
+                        event.add(
+                            "dtend",
+                            datetime.fromisoformat(task["end_date"])
+                            if task["end_date"]
+                            else datetime.now(),
+                        )
+                    calendar.add_component(event)
+
+                with open(file.get_path(), "wb") as f:
+                    f.write(calendar.to_ical())
+                self.window.add_toast(_("Exported"))  # type:ignore
+
+            dialog = Gtk.FileDialog(initial_name=f"{self.uid}.ics")
+            dialog.save(self.window, None, _confirm)
 
         _create_action("delete", _delete)
         _create_action("rename", _rename)

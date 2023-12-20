@@ -449,7 +449,7 @@ class Details(Adw.Bin):
         except ValueError:
             return
         et = datetime.fromisoformat(
-            f"{self.end_cal.get_date().format('%Y%m%d')}{hour}{min}00"
+            f"{self.end_cal.get_date().format('%Y%m%d')}T{hour}{min}00"
         )
         if et >= st:
             self.end_date.set_title(

@@ -17,7 +17,6 @@ class UserData:
 
     @classmethod
     def init(cls):
-        # Create data dir if needed
         if not os.path.exists(cls.data_dir):
             os.mkdir(cls.data_dir)
         cls.connection = sqlite3.connect(cls.db_path, check_same_thread=False)
@@ -103,23 +102,6 @@ class UserData:
                 cur.execute(cmd)
             cls.connection.commit()
             return cur.fetchall() if fetch else None
-
-    @classmethod
-    def to_ics(cls, uid) -> str:
-        res = cls.run_sql(f"SELECT * FROM tasks WHERE uid = '{uid}'", fetch=True)[0]
-        cal = Calendar()
-        cal.add("version", "2.0")
-        cal.add("prodid", "-//Errands")
-        todo = Event()
-        todo.add("uid", res[15])
-        todo.add("summary", res[13])
-        todo.add("dtstart", datetime.datetime.fromisoformat(res[10]))
-        todo.add("dtend", datetime.datetime.fromisoformat(res[3]))
-        todo.add("description", res[6])
-        todo.add("percent-complete", res[8])
-        todo.add("priority", res[9])
-        cal.add_component(todo)
-        return cal.to_ical().decode("utf-8")
 
     @classmethod
     def get_tasks_uids(cls, list_uid: str) -> list[str]:
