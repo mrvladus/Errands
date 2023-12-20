@@ -41,7 +41,7 @@ class Task(Gtk.Revealer):
         self.add_sub_tasks()
         # Add to trash if needed
         if self.get_prop("trash"):
-            self.trash.trash_add(self.uid)
+            self.trash.trash_add(self)
         # Expand
         self.expand(self.get_prop("expanded"))
 
@@ -183,11 +183,12 @@ class Task(Gtk.Revealer):
         self.toggle_visibility(False)
         self.update_props(["trash"], [True])
         self.completed_btn.set_active(True)
-        self.trash.trash_add(self.uid)
+        self.trash.trash_add(self)
         for task in get_children(self.tasks_list):
             if not task.get_prop("trash"):
                 task.delete()
         self.task_list.details.status.set_visible(True)
+        self.parent.update_status()
 
     def expand(self, expanded: bool) -> None:
         self.sub_tasks_revealer.set_reveal_child(expanded)

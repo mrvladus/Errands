@@ -87,12 +87,12 @@ class Trash(Adw.Bin):
         toolbar_view.add_top_bar(hb)
         self.set_child(toolbar_view)
 
-    def trash_add(self, uid: str) -> None:
+    def trash_add(self, task_widget) -> None:
         """
         Add item to trash
         """
 
-        self.trash_list.append(TrashItem(uid, self))
+        self.trash_list.append(TrashItem(task_widget, self))
         self.status.set_visible(False)
 
     def update_status(self):

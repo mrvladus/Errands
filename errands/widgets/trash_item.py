@@ -2,16 +2,17 @@
 # SPDX-License-Identifier: MIT
 
 from errands.utils.data import UserData
+from errands.utils.functions import get_children
 from errands.utils.logging import Log
 from errands.widgets.task import Task
-from errands.widgets.task_list import TaskList
 from gi.repository import Adw, Gtk
 
 
 class TrashItem(Adw.Bin):
-    def __init__(self, uid: str, trash) -> None:
+    def __init__(self, task_widget, trash) -> None:
         super().__init__()
-        self.uid = uid
+        self.task_widget = task_widget
+        self.uid = task_widget.uid
         self.trash = trash
         self.trash_list = trash.trash_list
         self.build_ui()
@@ -44,30 +45,25 @@ class TrashItem(Adw.Bin):
 
         Log.info(f"Restore task: {self.uid}")
 
-        # Get all tasks
-        tasks: list[Task] = []
-        task_lists = []
-        pages = self.trash.stack.get_pages()
-        for i in range(pages.get_n_items()):
-            child = pages.get_item(i).get_child()
-            if hasattr(child, "get_all_tasks"):
-                task_lists.append(child)
-                tasks.extend(child.get_all_tasks())
+        to_remove = []
 
         def restore_task(uid: str = self.uid) -> None:
-            for task in tasks:
-                if task.get_prop("uid") == uid:
-                    task.update_props(["trash"], [False])
-                    task.toggle_visibility(True)
-                    if task.get_prop("parent"):
-                        task.parent.expand(True)
-                        restore_task(task.get_prop("parent"))
+            for item in get_children(self.trash_list):
+                if item.task_widget.get_prop("uid") == uid:
+                    item.task_widget.update_props(["trash"], [False])
+                    item.task_widget.toggle_visibility(True)
+                    to_remove.append(uid)
+                    if puid := item.task_widget.get_prop("parent"):
+                        item.task_widget.parent.expand(True)
+                        item.task_widget.parent.update_status()
+                        restore_task(puid)
                     break
 
         restore_task()
 
-        for list in task_lists:
-            list.update_status()
+        for item in get_children(self.trash_list):
+            if item.uid in to_remove:
+                self.trash_list.remove(item)
 
-        self.trash.trash_list.remove(self)
+        self.task_widget.task_list.update_status()
         self.trash.update_status()
