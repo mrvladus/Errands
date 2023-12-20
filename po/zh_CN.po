@@ -1,0 +1,331 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the errands package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: errands\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-10-23 19:48+0300\n"
+"PO-Revision-Date: 2023-12-20 16:05+0800\n"
+"Last-Translator: Petalzu <Petalzu@outlook.com>\n"
+"Language-Team: \n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.4.1\n"
+
+#: errands/widgets/window.py:111
+msgid "Export Cancelled"
+msgstr "导出取消"
+
+#: errands/widgets/window.py:117
+msgid "Tasks Exported"
+msgstr "任务导出"
+
+#: errands/widgets/window.py:120
+msgid "Error"
+msgstr "错误"
+
+#: errands/widgets/window.py:137
+msgid "Import Cancelled"
+msgstr "导入取消"
+
+#: errands/widgets/window.py:146
+msgid "Invalid File"
+msgstr "无效文件"
+
+#: errands/widgets/window.py:164
+msgid "Tasks Imported"
+msgstr "任务导入"
+
+#: errands/widgets/window.py:334 errands/widgets/task.py:173
+msgid "Completed:"
+msgstr "已完成："
+
+#: errands/widgets/task.py:80
+msgid "Copied to Clipboard"
+msgstr "复制到剪贴板"
+
+#. pyright:ignore
+#: errands/utils/sync.py:80
+msgid "Not all sync credentials provided. Please check settings."
+msgstr "未提供所有同步凭据。请检查设置。"
+
+#: errands/utils/sync.py:120
+msgid "Can't connect to CalDAV server at:"
+msgstr "无法连接以下 CalDAV 服务器："
+
+#: errands/resources/ui/window.ui:26
+msgid "Deleted Tasks"
+msgstr "删除的任务"
+
+#: errands/resources/ui/window.ui:35 errands/resources/ui/window.ui:38
+msgid "Clear"
+msgstr "清除"
+
+#: errands/resources/ui/window.ui:53 errands/resources/ui/window.ui:56
+msgid "Restore All"
+msgstr "全部恢复"
+
+#: errands/resources/ui/window.ui:68 errands/resources/ui/window.ui:71
+msgid "Close Trash"
+msgstr "关闭垃圾桶"
+
+#: errands/resources/ui/window.ui:106
+msgid "Move to Trash"
+msgstr "移至垃圾桶"
+
+#: errands/resources/ui/window.ui:130
+msgid "Empty Trash"
+msgstr "清空垃圾桶"
+
+#: errands/resources/ui/window.ui:131
+msgid "No deleted items"
+msgstr "没有删除的任务"
+
+#: errands/resources/ui/window.ui:192 errands/resources/ui/window.ui:195
+msgid "Show Deleted Tasks"
+msgstr "显示删除的任务"
+
+#: errands/resources/ui/window.ui:221 errands/resources/ui/window.ui:224
+msgid "Delete Completed Tasks (Ctrl+Delete)"
+msgstr "删除已完成任务（Ctrl+Delete）"
+
+#: errands/resources/ui/window.ui:248 errands/resources/ui/window.ui:250
+msgid "Main Menu"
+msgstr "主菜单"
+
+#: errands/resources/ui/window.ui:260 errands/resources/ui/window.ui:263
+msgid "Sync/Fetch Tasks (Ctrl+S)"
+msgstr "同步/抓取任务（Ctrl+S）"
+
+#: errands/resources/ui/window.ui:287 errands/resources/ui/window.ui:290
+#: errands/resources/ui/window.ui:399 errands/resources/ui/window.ui:402
+msgid "Scroll Up"
+msgstr "向上滚动"
+
+#: errands/resources/ui/window.ui:321
+msgid "Add new Task"
+msgstr "添加新任务"
+
+#: errands/resources/ui/window.ui:429
+msgid "Export Tasks..."
+msgstr "导出任务…"
+
+#: errands/resources/ui/window.ui:433
+msgid "Import Tasks..."
+msgstr "导入任务…"
+
+#: errands/resources/ui/window.ui:439 errands/resources/ui/window.ui:478
+msgid "Preferences"
+msgstr "偏好设置"
+
+#: errands/resources/ui/window.ui:443
+msgid "Keyboard Shortcuts"
+msgstr "键盘快捷键"
+
+#: errands/resources/ui/window.ui:447
+msgid "About Errands"
+msgstr "关于 Errands"
+
+#: errands/resources/ui/window.ui:463
+msgid "General"
+msgstr "一般选项"
+
+#: errands/resources/ui/window.ui:466
+msgid "Show keyboard shortcuts"
+msgstr "显示键盘快捷键"
+
+#: errands/resources/ui/window.ui:472
+msgid "Toggle sidebar"
+msgstr "侧边栏"
+
+#: errands/resources/ui/window.ui:484
+msgid "Quit"
+msgstr "退出"
+
+#: errands/resources/ui/window.ui:494
+msgid "Import and Export"
+msgstr "导入和导出"
+
+#: errands/resources/ui/window.ui:497
+msgid "Import tasks"
+msgstr "导入任务"
+
+#: errands/resources/ui/window.ui:503
+msgid "Export tasks"
+msgstr "导出任务"
+
+#: errands/resources/ui/window.ui:513 errands/resources/ui/preferences.ui:66
+msgid "Tasks"
+msgstr "任务"
+
+#: errands/resources/ui/window.ui:516
+msgid "Delete completed tasks"
+msgstr "删除已完成任务"
+
+#: errands/resources/ui/window.ui:522
+msgid "Exit edit mode"
+msgstr "退出编辑模式"
+
+#: errands/resources/ui/window.ui:528
+msgid "Sync/Fetch Tasks"
+msgstr "同步/抓取任务"
+
+#: errands/resources/ui/window.ui:545
+msgid "translator-credits"
+msgstr "翻译者名单"
+
+#: errands/resources/ui/window.ui:581
+msgid "Are you sure?"
+msgstr "您确定吗？"
+
+#: errands/resources/ui/window.ui:582
+msgid "Tasks will be permanently deleted"
+msgstr "待办任务将会被永久删除"
+
+#: errands/resources/ui/window.ui:587
+msgid "Cancel"
+msgstr "取消"
+
+#: errands/resources/ui/window.ui:588 errands/resources/ui/task.ui:13
+msgid "Delete"
+msgstr "删除"
+
+#: errands/resources/ui/preferences.ui:14
+msgid "Application Theme"
+msgstr "主题"
+
+#: errands/resources/ui/preferences.ui:19
+msgid "System"
+msgstr "系统配色"
+
+#: errands/resources/ui/preferences.ui:33
+msgid "Light"
+msgstr "亮配色"
+
+#: errands/resources/ui/preferences.ui:48
+msgid "Dark"
+msgstr "暗配色"
+
+#: errands/resources/ui/preferences.ui:71
+msgid "Expand Sub-Tasks on Startup"
+msgstr "启动时展开子任务"
+
+#: errands/resources/ui/preferences.ui:87
+msgid "Sync"
+msgstr "同步"
+
+#: errands/resources/ui/preferences.ui:92
+msgid "Sync Provider"
+msgstr "同步服务"
+
+#: errands/resources/ui/preferences.ui:96
+msgid "Disabled"
+msgstr "关闭"
+
+#: errands/resources/ui/preferences.ui:111
+msgid "Server URL"
+msgstr "服务器链接"
+
+#: errands/resources/ui/preferences.ui:118
+msgid "Username"
+msgstr "用户名"
+
+#: errands/resources/ui/preferences.ui:125
+msgid "Password"
+msgstr "密码"
+
+#: errands/resources/ui/preferences.ui:132
+msgid "Calendar Name (\"Errands\" by Default)"
+msgstr "日历名（默认为”Errands“）"
+
+#: errands/resources/ui/preferences.ui:141
+msgid "Token"
+msgstr "标志"
+
+#: errands/resources/ui/preferences.ui:148
+msgid "Test Connection"
+msgstr "测试连接"
+
+#: errands/resources/ui/preferences.ui:151
+msgid "Test"
+msgstr "测试"
+
+#: errands/resources/ui/task.ui:17
+msgid "Edit"
+msgstr "编译"
+
+#: errands/resources/ui/task.ui:21
+msgid "Copy"
+msgstr "复制"
+
+#: errands/resources/ui/task.ui:139 errands/resources/ui/task.ui:142
+msgid "Mark as Completed"
+msgstr "标注为已完成"
+
+#: errands/resources/ui/task.ui:189 errands/resources/ui/task.ui:192
+msgid "Clear style"
+msgstr "清空格式"
+
+#: errands/resources/ui/task.ui:290 errands/resources/ui/task.ui:292
+msgid "Menu"
+msgstr "菜单"
+
+#: errands/resources/ui/task.ui:338 errands/resources/ui/task.ui:341
+msgid "Cancel (Escape)"
+msgstr "取消（ESC）"
+
+#: errands/resources/ui/task.ui:387
+msgid "Add new Sub-Task"
+msgstr "添加新子项目"
+
+#: errands/resources/ui/trash_item.ui:20 errands/resources/ui/trash_item.ui:24
+msgid "Restore"
+msgstr "还原"
+
+#. TRANSLATORS: Don't translate
+#: data/io.github.mrvladus.List.desktop.in.in:4
+msgid "Errands"
+msgstr "Errands"
+
+#: data/io.github.mrvladus.List.desktop.in.in:5
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:39
+msgid "Manage your tasks"
+msgstr "管理任务"
+
+#. TRANSLATORS: Don't translate
+#: data/io.github.mrvladus.List.desktop.in.in:12
+msgid "errands;tasks;list;todo;todos;"
+msgstr "errands;任务;列表;待办;todos;"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:41
+msgid "Todo application for those who prefer simplicity."
+msgstr "代办软件适用于喜欢简单的人。"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:42
+msgid "Features:"
+msgstr "特性："
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:44
+msgid "Add, remove, edit tasks and sub-tasks"
+msgstr "添加，移除，编辑任务和子任务"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:45
+msgid "Mark task and sub-tasks as completed"
+msgstr "标注任务和子任务为已完成"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:46
+msgid "Add accent color for each task"
+msgstr "为每个任务添加强调色"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:47
+msgid "Sync tasks with Nextcloud or other CalDAV providers"
+msgstr "通过 Nextcloud 或其他 CalDAV 服务同步任务"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:48
+msgid "Drag and Drop support"
+msgstr "支持拖放"
