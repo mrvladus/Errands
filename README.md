@@ -18,6 +18,7 @@
 </div>
 
 ## Features
+- Multiple task lists support
 - Add, remove, edit tasks and sub-tasks
 - Mark task and sub-tasks as completed
 - Add accent color for each task

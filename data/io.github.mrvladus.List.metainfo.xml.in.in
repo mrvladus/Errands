@@ -41,7 +41,7 @@
     <p>Todo application for those who prefer simplicity.</p>
     <p>Features:</p>
     <ul>
-      <li>Multiple task lists</li>
+      <li>Multiple task lists support</li>
       <li>Add, remove, edit tasks and sub-tasks</li>
       <li>Mark task and sub-tasks as completed</li>
       <li>Add accent color for each task</li>
