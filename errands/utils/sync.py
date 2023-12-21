@@ -5,8 +5,6 @@ import datetime
 from caldav import Calendar, DAVClient, Principal, Todo
 from caldav.elements import dav
 from gi.repository import Adw, GLib
-
-# Import modules
 from errands.utils.gsettings import GSettings
 from errands.utils.logging import Log
 from errands.utils.data import UserData

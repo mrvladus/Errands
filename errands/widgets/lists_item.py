@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 from datetime import datetime
-from icalendar import Calendar, Event
+from icalendar import Calendar, Todo
 from gi.repository import Adw, Gtk, Gio
 from errands.utils.data import UserData
 from errands.utils.logging import Log
@@ -122,7 +122,7 @@ class ListItem(Gtk.ListBoxRow):
                 tasks = UserData.get_tasks_as_dicts(self.uid)
                 calendar = Calendar()
                 for task in tasks:
-                    event = Event()
+                    event = Todo()
                     event.add("uid", task["uid"])
                     event.add("summary", task["text"])
                     if task["notes"]:
