@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-23 19:48+0300\n"
+"POT-Creation-Date: 2023-12-21 20:03+0300\n"
 "PO-Revision-Date: 2023-10-18 13:05+0300\n"
 "Last-Translator: volkov <volkovissocool@gmail.com>\n"
 "Language-Team: \n"
@@ -17,290 +17,354 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.4\n"
 
-#: errands/widgets/window.py:111
-msgid "Export Cancelled"
-msgstr "Експорт скасовано"
+#. type:ignore
+#: errands/widgets/details.py:44 errands/widgets/lists_item.py:70
+#: errands/widgets/lists_item.py:188 errands/widgets/trash.py:152
+msgid "Delete"
+msgstr "Видалити"
 
-#: errands/widgets/window.py:117
-msgid "Tasks Exported"
-msgstr "Задачі експортовані"
+#. type:ignore
+#: errands/widgets/details.py:50 errands/widgets/lists_item.py:109
+msgid "Save"
+msgstr ""
 
-#: errands/widgets/window.py:120
-msgid "Error"
-msgstr "Помилка"
+#: errands/widgets/details.py:60
+msgid "No Details"
+msgstr ""
 
-#: errands/widgets/window.py:137
-msgid "Import Cancelled"
-msgstr "Імпорт скасовано"
+#. type:ignore
+#: errands/widgets/details.py:61
+msgid "Click on task to show more info"
+msgstr ""
 
-#: errands/widgets/window.py:146
-msgid "Invalid File"
-msgstr "Не правильний файл"
+#: errands/widgets/details.py:83
+#, fuzzy
+msgid "Clear Style"
+msgstr "Очистити стиль"
 
-#: errands/widgets/window.py:164
-msgid "Tasks Imported"
-msgstr "Задачі імпортовані"
+#. Edit group
+#: errands/widgets/details.py:91
+msgid "Text"
+msgstr ""
 
-#: errands/widgets/window.py:334 errands/widgets/task.py:173
-msgid "Completed:"
+#: errands/widgets/details.py:97
+#, fuzzy
+msgid "Copy Text"
+msgstr "Скопіювати"
+
+#. Notes group
+#: errands/widgets/details.py:115
+msgid "Notes"
+msgstr ""
+
+#. Properties group
+#: errands/widgets/details.py:131
+msgid "Properties"
+msgstr ""
+
+#: errands/widgets/details.py:135 errands/widgets/details.py:170
+#: errands/widgets/details.py:319 errands/widgets/details.py:334
+msgid "Not Set"
+msgstr ""
+
+#: errands/widgets/details.py:135
+msgid "Start"
+msgstr ""
+
+#: errands/widgets/details.py:170
+msgid "End"
+msgstr ""
+
+#: errands/widgets/details.py:209
+#, fuzzy
+msgid "Complete %"
 msgstr "Завершено:"
 
-#: errands/widgets/task.py:80
+#: errands/widgets/details.py:220
+msgid "Priority"
+msgstr ""
+
+#. Tags group
+#: errands/widgets/details.py:226
+msgid "Tags"
+msgstr ""
+
+#. type:ignore
+#. Tags entry
+#: errands/widgets/details.py:228
+#, fuzzy
+msgid "Add Tag"
+msgstr "Додати нову задачу"
+
+#. Export group
+#. type:ignore
+#: errands/widgets/details.py:233 errands/widgets/details.py:241
+#: errands/widgets/lists_item.py:189
+#, fuzzy
+msgid "Export"
+msgstr "Експортувати задачі"
+
+#. type:ignore
+#: errands/widgets/details.py:242
+msgid "Save Task as .ics file"
+msgstr ""
+
+#: errands/widgets/details.py:464
 msgid "Copied to Clipboard"
 msgstr "Скопійовано в буфер обміну"
 
+#: errands/widgets/details.py:509 errands/widgets/lists_item.py:157
+#, fuzzy
+msgid "Exported"
+msgstr "Задачі експортовані"
+
+#: errands/widgets/lists_item.py:64 errands/widgets/trash.py:146
+msgid "Are you sure?"
+msgstr "Ви впевнені?"
+
+#. type:ignore
+#: errands/widgets/lists_item.py:65
+#, fuzzy
+msgid "List will be permanently deleted"
+msgstr "Задачі будуть видалені назавжди"
+
+#: errands/widgets/lists_item.py:69 errands/widgets/lists_item.py:108
+#: errands/widgets/lists.py:212 errands/widgets/trash.py:151
+msgid "Cancel"
+msgstr "Скасувати"
+
+#: errands/widgets/lists_item.py:99
+msgid "New Name"
+msgstr ""
+
+#: errands/widgets/lists_item.py:103
+msgid "Rename List"
+msgstr ""
+
+#: errands/widgets/lists_item.py:187
+#, fuzzy
+msgid "Rename"
+msgstr "Ім'я користувача"
+
+#: errands/widgets/lists_item.py:194
+msgid "Menu"
+msgstr "Меню"
+
+#: errands/widgets/lists.py:104
+#, fuzzy
+msgid "Imported"
+msgstr "Задачі імпортовані"
+
+#: errands/widgets/lists.py:121
+#, fuzzy
+msgid "Import List"
+msgstr "Імпортувати задачі"
+
+#: errands/widgets/lists.py:125 errands/widgets/lists.py:207
+msgid "Add List"
+msgstr ""
+
+#: errands/widgets/lists.py:132
+msgid "Preferences"
+msgstr "Налаштування"
+
+#. type:ignore
+#: errands/widgets/lists.py:133
+msgid "Keyboard Shortcuts"
+msgstr "Клавіатурні скорочення"
+
+#. type:ignore
+#: errands/widgets/lists.py:134
+#, fuzzy
+msgid "Sync / Fetch Tasks"
+msgstr "Синхронізувати/Отримати задачі"
+
+#. type:ignore
+#: errands/widgets/lists.py:135
+msgid "About Errands"
+msgstr "Про Errands"
+
+#: errands/widgets/lists.py:140
+msgid "Main Menu"
+msgstr "Головне меню"
+
+#: errands/widgets/lists.py:148
+#, fuzzy
+msgid "Add new List"
+msgstr "Додати нову задачу"
+
+#. type:ignore
+#: errands/widgets/lists.py:149
+msgid "Click \"+\" button"
+msgstr ""
+
+#: errands/widgets/lists.py:161 errands/widgets/trash.py:24
+#, fuzzy
+msgid "Trash"
+msgstr "Зачинити смітник"
+
+#: errands/widgets/lists.py:203
+msgid "New List Name"
+msgstr ""
+
+#. type:ignore
+#: errands/widgets/lists.py:213
+msgid "Add"
+msgstr ""
+
+#: errands/widgets/preferences.py:35
+msgid "Application Theme"
+msgstr "Стиль додатку"
+
+#: errands/widgets/preferences.py:41
+msgid "System"
+msgstr "Системна"
+
+#: errands/widgets/preferences.py:51
+msgid "Light"
+msgstr "Світлий стиль"
+
+#: errands/widgets/preferences.py:61
+msgid "Dark"
+msgstr "Темний стиль"
+
+#: errands/widgets/preferences.py:69
+msgid "Sync"
+msgstr "Сінхронізувати"
+
+#: errands/widgets/preferences.py:73
+msgid "Disabled"
+msgstr "Вимкнено"
+
+#: errands/widgets/preferences.py:76
+msgid "Sync Provider"
+msgstr "Постачальник синхронізації"
+
+#: errands/widgets/preferences.py:83
+msgid "Server URL"
+msgstr "URL-адреса сервера"
+
+#: errands/widgets/preferences.py:88
+msgid "Username"
+msgstr "Ім'я користувача"
+
+#: errands/widgets/preferences.py:93
+msgid "Password"
+msgstr "Пароль"
+
+#: errands/widgets/preferences.py:99
+msgid "Test"
+msgstr "Протестувати"
+
+#: errands/widgets/preferences.py:104
+msgid "Test Connection"
+msgstr "Протестувати з'єднання"
+
+#: errands/widgets/preferences.py:140
+msgid "Connected"
+msgstr ""
+
+#: errands/widgets/preferences.py:140
+msgid "Can't connect"
+msgstr ""
+
+#: errands/widgets/task_list.py:38 errands/widgets/task_list.py:69
+#, fuzzy
+msgid "Toggle Sidebar"
+msgstr "Показати/сховати смітник"
+
+#: errands/widgets/task_list.py:44 errands/widgets/task_list.py:81
+#, fuzzy
+msgid "Delete Completed Tasks"
+msgstr "Видалити завершені задачі"
+
+#: errands/widgets/task_list.py:54 errands/widgets/task_list.py:95
+msgid "Scroll Up"
+msgstr "Прокрутити вгору"
+
+#: errands/widgets/task_list.py:118
+msgid "Add new Task"
+msgstr "Додати нову задачу"
+
+#: errands/widgets/task_list.py:271 errands/widgets/task.py:235
+msgid "Completed:"
+msgstr "Завершено:"
+
+#: errands/widgets/task.py:82
+msgid "Click for Details"
+msgstr ""
+
+#: errands/widgets/task.py:89
+msgid "Mark as Completed"
+msgstr "Позначити як завершене"
+
+#: errands/widgets/task.py:98
+msgid "Expand / Fold"
+msgstr ""
+
+#: errands/widgets/task.py:134
+msgid "Add new Sub-Task"
+msgstr "Додати нове підзавдання"
+
+#: errands/widgets/trash_item.py:32
+msgid "Restore"
+msgstr "Відновити"
+
+#: errands/widgets/trash.py:29
+msgid "Clear"
+msgstr "Очистити"
+
+#: errands/widgets/trash.py:37
+msgid "Restore All"
+msgstr "Відновити усі"
+
+#: errands/widgets/trash.py:44
+msgid "Empty Trash"
+msgstr "Смітник порожній"
+
+#. type:ignore
+#: errands/widgets/trash.py:45
+msgid "No deleted items"
+msgstr "Немає видалених задач"
+
+#. type:ignore
+#: errands/widgets/trash.py:147
+msgid "Tasks will be permanently deleted"
+msgstr "Задачі будуть видалені назавжди"
+
+#: errands/widgets/window.py:49 errands/widgets/window.py:66
+msgid "No Task Lists"
+msgstr ""
+
+#: errands/widgets/window.py:104 data/io.github.mrvladus.List.desktop.in.in:3
+msgid "Errands"
+msgstr ""
+
+#: errands/widgets/window.py:109
+msgid "translator-credits"
+msgstr "volkov <volkovissocool@gmail.com>"
+
+#: errands/widgets/window.py:117
+msgid "Sync is disabled"
+msgstr ""
+
 #. pyright:ignore
-#: errands/utils/sync.py:80
+#: errands/utils/sync.py:91
 msgid "Not all sync credentials provided. Please check settings."
 msgstr ""
 "Надано не всі облікові дані синхронізації. Будь ласка, перевірте "
 "налаштування."
 
-#: errands/utils/sync.py:120
+#: errands/utils/sync.py:142
 msgid "Can't connect to CalDAV server at:"
 msgstr "Не вдалося з'єднатися з CalDAV сервером за адресою:"
 
-#: errands/resources/ui/window.ui:26
-msgid "Deleted Tasks"
-msgstr "Видалені задачі"
-
-#: errands/resources/ui/window.ui:35 errands/resources/ui/window.ui:38
-msgid "Clear"
-msgstr "Очистити"
-
-#: errands/resources/ui/window.ui:53 errands/resources/ui/window.ui:56
-msgid "Restore All"
-msgstr "Відновити усі"
-
-#: errands/resources/ui/window.ui:68 errands/resources/ui/window.ui:71
-msgid "Close Trash"
-msgstr "Зачинити смітник"
-
-#: errands/resources/ui/window.ui:106
-msgid "Move to Trash"
-msgstr "Пересунути у смітник"
-
-#: errands/resources/ui/window.ui:130
-msgid "Empty Trash"
-msgstr "Смітник порожній"
-
-#: errands/resources/ui/window.ui:131
-msgid "No deleted items"
-msgstr "Немає видалених задач"
-
-#: errands/resources/ui/window.ui:192 errands/resources/ui/window.ui:195
-msgid "Show Deleted Tasks"
-msgstr "Показати видалені задачі"
-
-#: errands/resources/ui/window.ui:221 errands/resources/ui/window.ui:224
-msgid "Delete Completed Tasks (Ctrl+Delete)"
-msgstr "Видалити завершені задачі (Ctrl+Delete)"
-
-#: errands/resources/ui/window.ui:248 errands/resources/ui/window.ui:250
-msgid "Main Menu"
-msgstr "Головне меню"
-
-#: errands/resources/ui/window.ui:260 errands/resources/ui/window.ui:263
-msgid "Sync/Fetch Tasks (Ctrl+S)"
-msgstr "Синхронізувати/Отримати задачі (Ctrl+S)"
-
-#: errands/resources/ui/window.ui:287 errands/resources/ui/window.ui:290
-#: errands/resources/ui/window.ui:399 errands/resources/ui/window.ui:402
-msgid "Scroll Up"
-msgstr "Прокрутити вгору"
-
-#: errands/resources/ui/window.ui:321
-msgid "Add new Task"
-msgstr "Додати нову задачу"
-
-#: errands/resources/ui/window.ui:429
-msgid "Export Tasks..."
-msgstr "Експортувати задачі..."
-
-#: errands/resources/ui/window.ui:433
-msgid "Import Tasks..."
-msgstr "Імпортувати задачі..."
-
-#: errands/resources/ui/window.ui:439 errands/resources/ui/window.ui:478
-msgid "Preferences"
-msgstr "Налаштування"
-
-#: errands/resources/ui/window.ui:443
-msgid "Keyboard Shortcuts"
-msgstr "Клавіатурні скорочення"
-
-#: errands/resources/ui/window.ui:447
-msgid "About Errands"
-msgstr "Про Errands"
-
-#: errands/resources/ui/window.ui:463
-msgid "General"
-msgstr "Загальні"
-
-#: errands/resources/ui/window.ui:466
-msgid "Show keyboard shortcuts"
-msgstr "Показати клавіатурні скорочення"
-
-#: errands/resources/ui/window.ui:472
-msgid "Toggle sidebar"
-msgstr "Показати/сховати смітник"
-
-#: errands/resources/ui/window.ui:484
-msgid "Quit"
-msgstr "Вийти"
-
-#: errands/resources/ui/window.ui:494
-msgid "Import and Export"
-msgstr "Імпорт і експорт"
-
-#: errands/resources/ui/window.ui:497
-msgid "Import tasks"
-msgstr "Імпортувати задачі"
-
-#: errands/resources/ui/window.ui:503
-msgid "Export tasks"
-msgstr "Експортувати задачі"
-
-#: errands/resources/ui/window.ui:513 errands/resources/ui/preferences.ui:66
-msgid "Tasks"
-msgstr "Задачі"
-
-#: errands/resources/ui/window.ui:516
-msgid "Delete completed tasks"
-msgstr "Видалити завершені задачі"
-
-#: errands/resources/ui/window.ui:522
-msgid "Exit edit mode"
-msgstr "Вийти із режиму редагування"
-
-#: errands/resources/ui/window.ui:528
-msgid "Sync/Fetch Tasks"
-msgstr "Синхронізувати/Отримати задачі"
-
-#: errands/resources/ui/window.ui:545
-msgid "translator-credits"
-msgstr "volkov <volkovissocool@gmail.com>"
-
-#: errands/resources/ui/window.ui:581
-msgid "Are you sure?"
-msgstr "Ви впевнені?"
-
-#: errands/resources/ui/window.ui:582
-msgid "Tasks will be permanently deleted"
-msgstr "Задачі будуть видалені назавжди"
-
-#: errands/resources/ui/window.ui:587
-msgid "Cancel"
-msgstr "Скасувати"
-
-#: errands/resources/ui/window.ui:588 errands/resources/ui/task.ui:13
-msgid "Delete"
-msgstr "Видалити"
-
-#: errands/resources/ui/preferences.ui:14
-msgid "Application Theme"
-msgstr "Стиль додатку"
-
-#: errands/resources/ui/preferences.ui:19
-msgid "System"
-msgstr "Системна"
-
-#: errands/resources/ui/preferences.ui:33
-msgid "Light"
-msgstr "Світлий стиль"
-
-#: errands/resources/ui/preferences.ui:48
-msgid "Dark"
-msgstr "Темний стиль"
-
-#: errands/resources/ui/preferences.ui:71
-msgid "Expand Sub-Tasks on Startup"
-msgstr "Розгортати підзавдання при запуску додатку"
-
-#: errands/resources/ui/preferences.ui:87
-msgid "Sync"
-msgstr "Сінхронізувати"
-
-#: errands/resources/ui/preferences.ui:92
-msgid "Sync Provider"
-msgstr "Постачальник синхронізації"
-
-#: errands/resources/ui/preferences.ui:96
-msgid "Disabled"
-msgstr "Вимкнено"
-
-#: errands/resources/ui/preferences.ui:111
-msgid "Server URL"
-msgstr "URL-адреса сервера"
-
-#: errands/resources/ui/preferences.ui:118
-msgid "Username"
-msgstr "Ім'я користувача"
-
-#: errands/resources/ui/preferences.ui:125
-msgid "Password"
-msgstr "Пароль"
-
-#: errands/resources/ui/preferences.ui:132
-msgid "Calendar Name (\"Errands\" by Default)"
-msgstr "Назва календарю ('Errands' за замовчуванням)"
-
-#: errands/resources/ui/preferences.ui:141
-msgid "Token"
-msgstr "Токен"
-
-#: errands/resources/ui/preferences.ui:148
-msgid "Test Connection"
-msgstr "Протестувати з'єднання"
-
-#: errands/resources/ui/preferences.ui:151
-msgid "Test"
-msgstr "Протестувати"
-
-#: errands/resources/ui/task.ui:17
-msgid "Edit"
-msgstr "Редагувати"
-
-#: errands/resources/ui/task.ui:21
-msgid "Copy"
-msgstr "Скопіювати"
-
-#: errands/resources/ui/task.ui:139 errands/resources/ui/task.ui:142
-msgid "Mark as Completed"
-msgstr "Позначити як завершене"
-
-#: errands/resources/ui/task.ui:189 errands/resources/ui/task.ui:192
-msgid "Clear style"
-msgstr "Очистити стиль"
-
-#: errands/resources/ui/task.ui:290 errands/resources/ui/task.ui:292
-msgid "Menu"
-msgstr "Меню"
-
-#: errands/resources/ui/task.ui:338 errands/resources/ui/task.ui:341
-msgid "Cancel (Escape)"
-msgstr "Скасувати (Escape)"
-
-#: errands/resources/ui/task.ui:387
-msgid "Add new Sub-Task"
-msgstr "Додати нове підзавдання"
-
-#: errands/resources/ui/trash_item.ui:20 errands/resources/ui/trash_item.ui:24
-msgid "Restore"
-msgstr "Відновити"
-
-#. TRANSLATORS: Don't translate
 #: data/io.github.mrvladus.List.desktop.in.in:4
-msgid "Errands"
-msgstr ""
-
-#: data/io.github.mrvladus.List.desktop.in.in:5
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:39
 msgid "Manage your tasks"
 msgstr "Керуйте вашими задачами"
 
-#. TRANSLATORS: Don't translate
-#: data/io.github.mrvladus.List.desktop.in.in:12
+#: data/io.github.mrvladus.List.desktop.in.in:10
 msgid "errands;tasks;list;todo;todos;"
 msgstr "errands;tasks;list;todo;todos;справи;туду;список;записати;задачі;"
 
@@ -332,3 +396,69 @@ msgstr ""
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:48
 msgid "Drag and Drop support"
 msgstr ""
+
+#~ msgid "Export Cancelled"
+#~ msgstr "Експорт скасовано"
+
+#~ msgid "Error"
+#~ msgstr "Помилка"
+
+#~ msgid "Import Cancelled"
+#~ msgstr "Імпорт скасовано"
+
+#~ msgid "Invalid File"
+#~ msgstr "Не правильний файл"
+
+#~ msgid "Deleted Tasks"
+#~ msgstr "Видалені задачі"
+
+#~ msgid "Move to Trash"
+#~ msgstr "Пересунути у смітник"
+
+#~ msgid "Show Deleted Tasks"
+#~ msgstr "Показати видалені задачі"
+
+#~ msgid "Delete Completed Tasks (Ctrl+Delete)"
+#~ msgstr "Видалити завершені задачі (Ctrl+Delete)"
+
+#~ msgid "Sync/Fetch Tasks (Ctrl+S)"
+#~ msgstr "Синхронізувати/Отримати задачі (Ctrl+S)"
+
+#~ msgid "Export Tasks..."
+#~ msgstr "Експортувати задачі..."
+
+#~ msgid "Import Tasks..."
+#~ msgstr "Імпортувати задачі..."
+
+#~ msgid "General"
+#~ msgstr "Загальні"
+
+#~ msgid "Show keyboard shortcuts"
+#~ msgstr "Показати клавіатурні скорочення"
+
+#~ msgid "Quit"
+#~ msgstr "Вийти"
+
+#~ msgid "Import and Export"
+#~ msgstr "Імпорт і експорт"
+
+#~ msgid "Tasks"
+#~ msgstr "Задачі"
+
+#~ msgid "Exit edit mode"
+#~ msgstr "Вийти із режиму редагування"
+
+#~ msgid "Expand Sub-Tasks on Startup"
+#~ msgstr "Розгортати підзавдання при запуску додатку"
+
+#~ msgid "Calendar Name (\"Errands\" by Default)"
+#~ msgstr "Назва календарю ('Errands' за замовчуванням)"
+
+#~ msgid "Token"
+#~ msgstr "Токен"
+
+#~ msgid "Edit"
+#~ msgstr "Редагувати"
+
+#~ msgid "Cancel (Escape)"
+#~ msgstr "Скасувати (Escape)"
