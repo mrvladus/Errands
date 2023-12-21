@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-21 20:03+0300\n"
+"POT-Creation-Date: 2023-12-21 20:41+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Chung-Wei Chung <webb790709@proton.me>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -375,24 +375,33 @@ msgid "Features:"
 msgstr "功能："
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:44
+msgid "Multiple task lists support"
+msgstr ""
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:45
 msgid "Add, remove, edit tasks and sub-tasks"
 msgstr "新增、移除、編輯待辦事項和子項目"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:45
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:46
 msgid "Mark task and sub-tasks as completed"
 msgstr "把待辦事項和子項目標記爲已完成"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:46
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:47
 msgid "Add accent color for each task"
 msgstr "為每個待辦事項新增強調色"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:47
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:48
 msgid "Sync tasks with Nextcloud or other CalDAV providers"
 msgstr "透過 Nextcloud 或其他 CalDAV 服務同步待辦事項"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:48
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:49
 msgid "Drag and Drop support"
 msgstr "支援拖拉"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:50
+#, fuzzy
+msgid "Import .ics files"
+msgstr "匯入待辦事項"
 
 #~ msgid "Export Cancelled"
 #~ msgstr "匯出已取消"

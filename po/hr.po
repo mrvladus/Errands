@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-21 20:03+0300\n"
+"POT-Creation-Date: 2023-12-21 20:41+0300\n"
 "PO-Revision-Date: 2023-11-30 13:49+0100\n"
 "Last-Translator: Milo Ivir <mail@milotype.de>\n"
 "Language-Team: \n"
@@ -378,26 +378,35 @@ msgid "Features:"
 msgstr "Značajke:"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:44
+msgid "Multiple task lists support"
+msgstr ""
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:45
 msgid "Add, remove, edit tasks and sub-tasks"
 msgstr "Dodaj, ukloni, uredi zadatke i podzadatke"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:45
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:46
 msgid "Mark task and sub-tasks as completed"
 msgstr "Označi zadatke i podzadatke kao dovršene"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:46
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:47
 msgid "Add accent color for each task"
 msgstr "Dodaj boju za svaki zadatak"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:47
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:48
 msgid "Sync tasks with Nextcloud or other CalDAV providers"
 msgstr ""
 "Sinkroniziraj zadatke s Nextcloudom ili s drugim pružateljima usluge za "
 "CalDAV"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:48
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:49
 msgid "Drag and Drop support"
 msgstr "Podrška za povuci i ispusti"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:50
+#, fuzzy
+msgid "Import .ics files"
+msgstr "Uvezi zadatke"
 
 #~ msgid "Export Cancelled"
 #~ msgstr "Izvoz je prekinut"

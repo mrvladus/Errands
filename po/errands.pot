@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-21 20:03+0300\n"
+"POT-Creation-Date: 2023-12-21 20:41+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -360,21 +360,29 @@ msgid "Features:"
 msgstr ""
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:44
-msgid "Add, remove, edit tasks and sub-tasks"
+msgid "Multiple task lists support"
 msgstr ""
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:45
-msgid "Mark task and sub-tasks as completed"
+msgid "Add, remove, edit tasks and sub-tasks"
 msgstr ""
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:46
-msgid "Add accent color for each task"
+msgid "Mark task and sub-tasks as completed"
 msgstr ""
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:47
-msgid "Sync tasks with Nextcloud or other CalDAV providers"
+msgid "Add accent color for each task"
 msgstr ""
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:48
+msgid "Sync tasks with Nextcloud or other CalDAV providers"
+msgstr ""
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:49
 msgid "Drag and Drop support"
+msgstr ""
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:50
+msgid "Import .ics files"
 msgstr ""

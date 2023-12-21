@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-21 20:03+0300\n"
+"POT-Creation-Date: 2023-12-21 20:41+0300\n"
 "PO-Revision-Date: 2023-11-13 12:44+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -382,26 +382,35 @@ msgid "Features:"
 msgstr "Característiques:"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:44
+msgid "Multiple task lists support"
+msgstr ""
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:45
 msgid "Add, remove, edit tasks and sub-tasks"
 msgstr "Afegeix, esborra, edita tasques i subtasques"
 
 # Potser "Marca com  a feta" no es una mala opció. -arnau
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:45
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:46
 msgid "Mark task and sub-tasks as completed"
 msgstr "Marca com a completades tasques i subtasques"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:46
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:47
 msgid "Add accent color for each task"
 msgstr "Afegeix un accent de color per a cada tasca"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:47
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:48
 msgid "Sync tasks with Nextcloud or other CalDAV providers"
 msgstr "Sincronitza les tasques amb Nexcloud o altres proveïdors CalDAV"
 
 # Tot i que la traducció literal és "Suport per arrosegar i deixar anar"; "Suport Drag and Drop" és una versió més curta i trobo que és igual d'entenedora.
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:48
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:49
 msgid "Drag and Drop support"
 msgstr "Suport Drag and Drop"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:50
+#, fuzzy
+msgid "Import .ics files"
+msgstr "Importar tasques"
 
 #~ msgid "Export Cancelled"
 #~ msgstr "Exportació cancel·lada"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-21 20:03+0300\n"
+"POT-Creation-Date: 2023-12-21 20:41+0300\n"
 "PO-Revision-Date: 2023-07-07 16:56+0300\n"
 "Last-Translator: Vlad Krupinskii <mrvladus@yandex.ru>\n"
 "Language-Team: \n"
@@ -362,21 +362,29 @@ msgid "Features:"
 msgstr "Главные функции:"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:44
+msgid "Multiple task lists support"
+msgstr "Поддержка нескольких списков"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:45
 msgid "Add, remove, edit tasks and sub-tasks"
 msgstr "Добавляйте, удаляйте, редактируйте задачи и подзадачи"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:45
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:46
 msgid "Mark task and sub-tasks as completed"
 msgstr "Помечайте задачи как выполненные"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:46
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:47
 msgid "Add accent color for each task"
 msgstr "Добавляйте цвета к задачам"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:47
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:48
 msgid "Sync tasks with Nextcloud or other CalDAV providers"
 msgstr "Синхронизируйте задачи с Nextcloud или другими CalDAV провайдерами"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:48
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:49
 msgid "Drag and Drop support"
 msgstr "Поддержка Drag and Drop"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:50
+msgid "Import .ics files"
+msgstr "Импорт .ics файлов"
