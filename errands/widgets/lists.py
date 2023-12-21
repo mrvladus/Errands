@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 from uuid import uuid4
-from icalendar import Calendar, Event, Todo
+from icalendar import Calendar
 from errands.utils.data import UserData
 from errands.utils.functions import get_children
 from errands.utils.gsettings import GSettings

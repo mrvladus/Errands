@@ -4,7 +4,6 @@
 from errands.utils.data import UserData
 from errands.utils.functions import get_children
 from errands.utils.logging import Log
-from errands.widgets.task import Task
 from gi.repository import Adw, Gtk
 
 

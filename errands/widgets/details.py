@@ -6,7 +6,7 @@ from errands.utils.data import UserData
 from icalendar import Calendar, Event
 
 from errands.utils.functions import get_children
-from gi.repository import Adw, Gtk, Gio, GLib, Gdk, GObject
+from gi.repository import Adw, Gtk, GLib, Gdk, GObject
 from errands.utils.markup import Markup
 from errands.utils.sync import Sync
 from errands.utils.logging import Log

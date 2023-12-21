@@ -1,12 +1,10 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-import datetime
 import os
 import sqlite3
 from typing import Any
 from uuid import uuid4
-from icalendar import Event, Calendar
 from gi.repository import GLib
 from errands.utils.logging import Log
 

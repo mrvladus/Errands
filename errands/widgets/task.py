@@ -2,10 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 from typing import Self
-from errands.utils.gsettings import GSettings
 from gi.repository import Gtk, Adw, Gdk, GObject
-
-# Import modules
 from errands.utils.sync import Sync
 from errands.utils.logging import Log
 from errands.utils.data import UserData

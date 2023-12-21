@@ -2,13 +2,9 @@
 # SPDX-License-Identifier: MIT
 
 from datetime import datetime
-import os
-
 from icalendar import Calendar, Event
-from errands.utils.gsettings import GSettings
-from gi.repository import Adw, Gtk, Gio, GLib
+from gi.repository import Adw, Gtk, Gio
 from errands.utils.data import UserData
-from errands.utils.functions import get_children
 from errands.utils.logging import Log
 from errands.utils.sync import Sync
 
