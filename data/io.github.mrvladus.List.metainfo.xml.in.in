@@ -41,11 +41,13 @@
     <p>Todo application for those who prefer simplicity.</p>
     <p>Features:</p>
     <ul>
+      <li>Multiple task lists</li>
       <li>Add, remove, edit tasks and sub-tasks</li>
       <li>Mark task and sub-tasks as completed</li>
       <li>Add accent color for each task</li>
       <li>Sync tasks with Nextcloud or other CalDAV providers</li>
       <li>Drag and Drop support</li>
+      <li>Import .ics files</li>
     </ul>
   </description>
   <screenshots>
@@ -57,6 +59,22 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="45.1" date="2023-12-30">
+      <description translatable="no">
+        <p>It's a BIG update!</p>
+        <p>New features:</p>
+        <ul>
+          <li>Multiple task lists</li>
+          <li>Improved Nextcloud Tasks and CalDAV sync with support for multiple calendars and task properties</li>
+          <li>Import and Export lists and tasks in universal .ics format</li>
+          <li>Task properies panel: Notes, Start Date, End Date, Priority, Complete %, Tags</li>
+          <li>Tasks remembers their "expanded" / "folded" state</li>
+          <li>Better adaptivity for mobile screens</li>
+          <li>Accessebility improvements</li>
+          <li>Tweaked accent colors for better contrast with dark mode</li>
+        </ul>
+      </description>
+    </release>
     <release version="45.0.6" date="2023-11-30">
       <description translatable="no">
         <p>Fixed:</p>
