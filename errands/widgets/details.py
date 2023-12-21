@@ -229,10 +229,8 @@ class Details(Adw.Bin):
         self.tag_entry.connect("entry-activated", self.on_tag_added)
         self.tags.add(self.tag_entry)
 
-        # Misc group
-        misc_group = Adw.PreferencesGroup(title=_("Misc"))  # type:ignore
-
-        # Export to calendar button
+        # Export group
+        misc_group = Adw.PreferencesGroup(title=_("Export"))  # type:ignore
         open_cal_btn = Gtk.Button(
             icon_name="emblem-shared-symbolic",
             valign="center",

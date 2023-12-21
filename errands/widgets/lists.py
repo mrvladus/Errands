@@ -1,6 +1,8 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
+from uuid import uuid4
+from icalendar import Calendar, Event, Todo
 from errands.utils.data import UserData
 from errands.utils.functions import get_children
 from errands.utils.gsettings import GSettings
@@ -17,19 +19,114 @@ class Lists(Adw.Bin):
         self.stack: Gtk.Stack = stack
         self.window = window
         self._build_ui()
+        self._add_actions()
         self._load_lists()
+
+    def _add_actions(self):
+        group = Gio.SimpleActionGroup()
+        self.insert_action_group(name="lists", group=group)
+
+        def _create_action(name: str, callback: callable) -> None:
+            action: Gio.SimpleAction = Gio.SimpleAction.new(name, None)
+            action.connect("activate", callback)
+            group.add_action(action)
+
+        def _add(*args):
+            pass
+
+        def _import(*args):
+            def _confirm(dialog: Gtk.FileDialog, res):
+                try:
+                    file = dialog.open_finish(res)
+                except:
+                    Log.debug("Lists: Import cancelled")
+                    return
+                with open(file.get_path(), "r") as f:
+                    calendar = Calendar.from_ical(f.read())
+                    # List name
+                    name = calendar.get(
+                        "X-WR-CALNAME", file.get_basename().rstrip(".ics")
+                    )
+                    if name in [
+                        i[0]
+                        for i in UserData.run_sql("SELECT name FROM lists", fetch=True)
+                    ]:
+                        name = f"{name}_{uuid4()}"
+                    # Create list
+                    uid = UserData.add_list(name)
+                    # Add tasks
+                    for todo in calendar.walk("VTODO"):
+                        # Tags
+                        if (tags := todo.get("CATEGORIES", "")) != "":
+                            tags = ",".join(
+                                [
+                                    i.to_ical().decode("utf-8")
+                                    for i in (
+                                        tags if isinstance(tags, list) else tags.cats
+                                    )
+                                ]
+                            )
+                        # Start
+                        if (start := todo.get("DTSTART", "")) != "":
+                            start = (
+                                todo.get("DTSTART", "")
+                                .to_ical()
+                                .decode("utf-8")
+                                .strip("Z")
+                            )
+                        else:
+                            start = ""
+                        # End
+                        if (end := todo.get("DUE", todo.get("DTEND", ""))) != "":
+                            end = (
+                                todo.get("DUE", todo.get("DTEND", ""))
+                                .to_ical()
+                                .decode("utf-8")
+                                .strip("Z")
+                            )
+                        else:
+                            end = ""
+                        UserData.add_task(
+                            color=todo.get("X-ERRANDS-COLOR", ""),
+                            completed=str(todo.get("STATUS", "")) == "COMPLETED",
+                            end_date=end,
+                            list_uid=uid,
+                            notes=str(todo.get("DESCRIPTION", "")),
+                            parent=str(todo.get("RELATED-TO", "")),
+                            percent_complete=int(todo.get("PERCENT-COMPLETE", 0)),
+                            priority=int(todo.get("PRIORITY", 0)),
+                            start_date=start,
+                            tags=tags,
+                            text=str(todo.get("SUMMARY", "")),
+                            uid=todo.get("UID", None),
+                        )
+                self.update_ui()
+                self.window.add_toast(_("Imported"))  # type:ignore
+                Sync.sync()
+
+            filter = Gtk.FileFilter()
+            filter.add_pattern("*.ics")
+            dialog = Gtk.FileDialog(default_filter=filter)
+            dialog.open(self.window, None, _confirm)
+
+        _create_action("add", _add)
+        _create_action("import", _import)
 
     def _build_ui(self):
         hb = Adw.HeaderBar(
             title_widget=Gtk.Label(label="Errands", css_classes=["heading"])
         )
+        # Import menu
+        import_menu: Gio.Menu = Gio.Menu.new()
+        import_menu.append(_("Import List"), "lists.import")  # type:ignore
         # Add list button
-        self.add_btn = Gtk.Button(
+        self.add_list_btn = Adw.SplitButton(
             icon_name="list-add-symbolic",
             tooltip_text=_("Add List"),  # type:ignore
+            menu_model=import_menu,
         )
-        self.add_btn.connect("clicked", self.on_add_btn_clicked)
-        hb.pack_start(self.add_btn)
+        self.add_list_btn.connect("clicked", self.on_add_btn_clicked)
+        hb.pack_start(self.add_list_btn)
         # Main menu
         menu: Gio.Menu = Gio.Menu.new()
         menu.append(_("Preferences"), "app.preferences")  # type:ignore

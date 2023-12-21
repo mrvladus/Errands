@@ -56,7 +56,7 @@ class Window(Adw.ApplicationWindow):
             halign="center",
             css_classes=["pill", "suggested-action"],
         )
-        add_list_btn.connect("clicked", lambda *_: self.lists.add_btn.activate())
+        add_list_btn.connect("clicked", lambda *_: self.lists.add_list_btn.activate())
         box = Gtk.Box(orientation="vertical", vexpand=True, valign="center")
         box.append(status_page)
         box.append(add_list_btn)

@@ -156,7 +156,11 @@ class ListItem(Gtk.ListBoxRow):
                     f.write(calendar.to_ical())
                 self.window.add_toast(_("Exported"))  # type:ignore
 
-            dialog = Gtk.FileDialog(initial_name=f"{self.uid}.ics")
+            filter = Gtk.FileFilter()
+            filter.add_pattern("*.ics")
+            dialog = Gtk.FileDialog(
+                initial_name=f"{self.uid}.ics", default_filter=filter
+            )
             dialog.save(self.window, None, _confirm)
 
         _create_action("delete", _delete)

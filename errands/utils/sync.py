@@ -42,6 +42,10 @@ class Sync:
         Sync tasks without blocking the UI
         """
         if GSettings.get("sync-provider") == 0:
+            UserData.run_sql(
+                "DELETE FROM lists WHERE deleted = 1",
+                "DELETE FROM tasks WHERE deleted = 1",
+            )
             return
         if not self.provider:
             self.init(self.window)
