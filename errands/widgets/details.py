@@ -32,7 +32,7 @@ class Details(Adw.Bin):
             "visible",
             self.task_list.split_view,
             "collapsed",
-            GObject.BindingFlags.BIDIRECTIONAL,
+            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
         )
         back_btn.connect(
             "clicked", lambda *_: self.task_list.split_view.set_show_sidebar(False)
