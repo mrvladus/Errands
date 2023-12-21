@@ -35,7 +35,7 @@ class Details(Adw.Bin):
             GObject.BindingFlags.BIDIRECTIONAL,
         )
         back_btn.connect(
-            "clicked", lambda *_: self.task_panel.split_view.set_show_sidebar(False)
+            "clicked", lambda *_: self.task_list.split_view.set_show_sidebar(False)
         )
         hb.pack_start(back_btn)
         # Delete button

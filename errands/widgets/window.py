@@ -31,8 +31,6 @@ class Window(Adw.ApplicationWindow):
     def _build_ui(self):
         self.props.width_request = 360
         self.props.height_request = 200
-        self.set_default_size(1100, 700)
-
         # Split view
         self.split_view = Adw.NavigationSplitView(
             max_sidebar_width=240, min_sidebar_width=240, show_content=True
