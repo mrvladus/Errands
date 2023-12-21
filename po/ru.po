@@ -28,98 +28,91 @@ msgstr "Удалить"
 #. type:ignore
 #: errands/widgets/details.py:50 errands/widgets/lists_item.py:109
 msgid "Save"
-msgstr ""
+msgstr "Сохранить"
 
 #: errands/widgets/details.py:60
 msgid "No Details"
-msgstr ""
+msgstr "Нет подробностей"
 
 #. type:ignore
 #: errands/widgets/details.py:61
 msgid "Click on task to show more info"
-msgstr ""
+msgstr "Кликните на задачу чтобы показать больше информации"
 
 #: errands/widgets/details.py:83
-#, fuzzy
 msgid "Clear Style"
 msgstr "Отчистить цвет"
 
 #. Edit group
 #: errands/widgets/details.py:91
 msgid "Text"
-msgstr ""
+msgstr "Текст"
 
 #: errands/widgets/details.py:97
-#, fuzzy
 msgid "Copy Text"
 msgstr "Копировать"
 
 #. Notes group
 #: errands/widgets/details.py:115
 msgid "Notes"
-msgstr ""
+msgstr "Заметки"
 
 #. Properties group
 #: errands/widgets/details.py:131
 msgid "Properties"
-msgstr ""
+msgstr "Свойства"
 
 #: errands/widgets/details.py:135 errands/widgets/details.py:170
 #: errands/widgets/details.py:319 errands/widgets/details.py:334
 msgid "Not Set"
-msgstr ""
+msgstr "Не задано"
 
 #: errands/widgets/details.py:135
 msgid "Start"
-msgstr ""
+msgstr "Начало"
 
 #: errands/widgets/details.py:170
-#, fuzzy
 msgid "End"
-msgstr "Дела"
+msgstr "Конец"
 
 #: errands/widgets/details.py:209
-#, fuzzy
 msgid "Complete %"
-msgstr "Выполнено:"
+msgstr "Выполнено %"
 
 #: errands/widgets/details.py:220
 msgid "Priority"
-msgstr ""
+msgstr "Приоритет"
 
 #. Tags group
 #: errands/widgets/details.py:226
 msgid "Tags"
-msgstr ""
+msgstr "Метки"
 
 #. type:ignore
 #. Tags entry
 #: errands/widgets/details.py:228
-#, fuzzy
 msgid "Add Tag"
-msgstr "Добавьте задачу"
+msgstr "Добавить метку"
 
 #. Export group
 #. type:ignore
 #: errands/widgets/details.py:233 errands/widgets/details.py:241
 #: errands/widgets/lists_item.py:189
-#, fuzzy
 msgid "Export"
-msgstr "Экспорт задач"
+msgstr "Экспорт"
 
 #. type:ignore
 #: errands/widgets/details.py:242
 msgid "Save Task as .ics file"
-msgstr ""
+msgstr "Сохранить задачу как .ics файл"
 
 #: errands/widgets/details.py:464
 msgid "Copied to Clipboard"
 msgstr "Скопировано в буфер обмена"
 
 #: errands/widgets/details.py:509 errands/widgets/lists_item.py:157
-#, fuzzy
 msgid "Exported"
-msgstr "Экспорт завершен"
+msgstr "Экспортировано"
 
 #: errands/widgets/lists_item.py:64 errands/widgets/trash.py:146
 msgid "Are you sure?"
@@ -127,9 +120,8 @@ msgstr "Вы уверены?"
 
 #. type:ignore
 #: errands/widgets/lists_item.py:65
-#, fuzzy
 msgid "List will be permanently deleted"
-msgstr "Задачи будут безвозвратно удалены"
+msgstr "Список будет безвозвратно удален"
 
 #: errands/widgets/lists_item.py:69 errands/widgets/lists_item.py:108
 #: errands/widgets/lists.py:212 errands/widgets/trash.py:151
@@ -138,34 +130,31 @@ msgstr "Отмена"
 
 #: errands/widgets/lists_item.py:99
 msgid "New Name"
-msgstr ""
+msgstr "Новое имя"
 
 #: errands/widgets/lists_item.py:103
 msgid "Rename List"
-msgstr ""
+msgstr "Переименовать список"
 
 #: errands/widgets/lists_item.py:187
-#, fuzzy
 msgid "Rename"
-msgstr "Имя пользователя"
+msgstr "Переименовать"
 
 #: errands/widgets/lists_item.py:194
 msgid "Menu"
 msgstr "Меню"
 
 #: errands/widgets/lists.py:104
-#, fuzzy
 msgid "Imported"
-msgstr "Импорт завершен"
+msgstr "Импортировано"
 
 #: errands/widgets/lists.py:121
-#, fuzzy
 msgid "Import List"
-msgstr "Импорт задач"
+msgstr "Импортировать список"
 
 #: errands/widgets/lists.py:125 errands/widgets/lists.py:207
 msgid "Add List"
-msgstr ""
+msgstr "Добавить список"
 
 #: errands/widgets/lists.py:132
 msgid "Preferences"
@@ -178,7 +167,6 @@ msgstr "Комбинации клавиш"
 
 #. type:ignore
 #: errands/widgets/lists.py:134
-#, fuzzy
 msgid "Sync / Fetch Tasks"
 msgstr "Синхронизировать задачи"
 
@@ -192,28 +180,26 @@ msgid "Main Menu"
 msgstr "Главное меню"
 
 #: errands/widgets/lists.py:148
-#, fuzzy
 msgid "Add new List"
-msgstr "Добавьте задачу"
+msgstr "Добавить новый список"
 
 #. type:ignore
 #: errands/widgets/lists.py:149
 msgid "Click \"+\" button"
-msgstr ""
+msgstr "Нажмите на кнопку \"+\""
 
 #: errands/widgets/lists.py:161 errands/widgets/trash.py:24
-#, fuzzy
 msgid "Trash"
-msgstr "Закрыть корзину"
+msgstr "Корзина"
 
 #: errands/widgets/lists.py:203
 msgid "New List Name"
-msgstr ""
+msgstr "Новое имя списка"
 
 #. type:ignore
 #: errands/widgets/lists.py:213
 msgid "Add"
-msgstr ""
+msgstr "Довавить"
 
 #: errands/widgets/preferences.py:35
 msgid "Application Theme"
@@ -265,19 +251,17 @@ msgstr "Тест соединения"
 
 #: errands/widgets/preferences.py:140
 msgid "Connected"
-msgstr ""
+msgstr "Соединено"
 
 #: errands/widgets/preferences.py:140
 msgid "Can't connect"
-msgstr ""
+msgstr "Соединение не удалось"
 
 #: errands/widgets/task_list.py:38 errands/widgets/task_list.py:69
-#, fuzzy
 msgid "Toggle Sidebar"
 msgstr "Переключить боковую панель"
 
 #: errands/widgets/task_list.py:44 errands/widgets/task_list.py:81
-#, fuzzy
 msgid "Delete Completed Tasks"
 msgstr "Удалить выполненные задачи"
 
@@ -295,7 +279,7 @@ msgstr "Выполнено:"
 
 #: errands/widgets/task.py:82
 msgid "Click for Details"
-msgstr ""
+msgstr "Нажмите для подробностей"
 
 #: errands/widgets/task.py:89
 msgid "Mark as Completed"
@@ -303,7 +287,7 @@ msgstr "Пометить как выполненное"
 
 #: errands/widgets/task.py:98
 msgid "Expand / Fold"
-msgstr ""
+msgstr "Раскрыть / Свернуть"
 
 #: errands/widgets/task.py:134
 msgid "Add new Sub-Task"
@@ -337,7 +321,7 @@ msgstr "Задачи будут безвозвратно удалены"
 
 #: errands/widgets/window.py:49 errands/widgets/window.py:66
 msgid "No Task Lists"
-msgstr ""
+msgstr "Нет списков задач"
 
 #: errands/widgets/window.py:104 data/io.github.mrvladus.List.desktop.in.in:3
 msgid "Errands"
@@ -349,7 +333,7 @@ msgstr "Vlad Krupinski <mrvladus@yandex.ru>"
 
 #: errands/widgets/window.py:117
 msgid "Sync is disabled"
-msgstr ""
+msgstr "Синхронизация отключена"
 
 #. pyright:ignore
 #: errands/utils/sync.py:91
@@ -358,7 +342,7 @@ msgstr "Не все данные для синхронизации предос�
 
 #: errands/utils/sync.py:142
 msgid "Can't connect to CalDAV server at:"
-msgstr "Невозможно подключиться к серверу по адресу:"
+msgstr "Невозможно подключиться к CalDAV серверу по адресу:"
 
 #: data/io.github.mrvladus.List.desktop.in.in:4
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:39
@@ -367,11 +351,11 @@ msgstr "Управляйте своими задачами"
 
 #: data/io.github.mrvladus.List.desktop.in.in:10
 msgid "errands;tasks;list;todo;todos;"
-msgstr "дела;задачи;лист;"
+msgstr "errands;дела;задачи;лист;"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:41
 msgid "Todo application for those who prefer simplicity."
-msgstr "Список задач для тех, кто предпочитает простоту"
+msgstr "Список задач для тех, кто предпочитает простоту."
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:42
 msgid "Features:"
@@ -396,69 +380,3 @@ msgstr "Синхронизируйте задачи с Nextcloud или друг
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:48
 msgid "Drag and Drop support"
 msgstr "Поддержка Drag and Drop"
-
-#~ msgid "Export Cancelled"
-#~ msgstr "Экспорт отменен"
-
-#~ msgid "Error"
-#~ msgstr "Ошибка"
-
-#~ msgid "Import Cancelled"
-#~ msgstr "Импорт отменен"
-
-#~ msgid "Invalid File"
-#~ msgstr "Файл с ошибкой"
-
-#~ msgid "Deleted Tasks"
-#~ msgstr "Удаленные задачи"
-
-#~ msgid "Move to Trash"
-#~ msgstr "Переместить в корзину"
-
-#~ msgid "Show Deleted Tasks"
-#~ msgstr "Показать удаленные задачи"
-
-#~ msgid "Delete Completed Tasks (Ctrl+Delete)"
-#~ msgstr "Удалить выполненные задачи (Ctrl+Delete)"
-
-#~ msgid "Sync/Fetch Tasks (Ctrl+S)"
-#~ msgstr "Синхронизировать задачи (Ctrl+S)"
-
-#~ msgid "Export Tasks..."
-#~ msgstr "Экспорт задач..."
-
-#~ msgid "Import Tasks..."
-#~ msgstr "Импорт задач..."
-
-#~ msgid "General"
-#~ msgstr "Общие"
-
-#~ msgid "Show keyboard shortcuts"
-#~ msgstr "Показать комбинации клавиш"
-
-#~ msgid "Quit"
-#~ msgstr "Выход"
-
-#~ msgid "Import and Export"
-#~ msgstr "Импорт и экспорт"
-
-#~ msgid "Tasks"
-#~ msgstr "Задачи"
-
-#~ msgid "Exit edit mode"
-#~ msgstr "Выйти из режима редактирования"
-
-#~ msgid "Expand Sub-Tasks on Startup"
-#~ msgstr "Раскрывать подзадачи при старте"
-
-#~ msgid "Calendar Name (\"Errands\" by Default)"
-#~ msgstr "Имя календаря (\"Errands\" по умолчанию)"
-
-#~ msgid "Token"
-#~ msgstr "Токен"
-
-#~ msgid "Edit"
-#~ msgstr "Правка"
-
-#~ msgid "Cancel (Escape)"
-#~ msgstr "Отмена (Escape)"
