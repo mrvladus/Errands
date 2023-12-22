@@ -90,7 +90,7 @@ class Task(Gtk.Revealer):
         self.task_row.add_prefix(self.completed_btn)
         # Details button
         self.expand_btn = Gtk.Button(
-            icon_name="up-small-symbolic",
+            icon_name="errands-up",
             valign="center",
             tooltip_text=_("Expand / Fold"),  # type:ignore
             css_classes=["flat", "circular", "fade", "rotate"],

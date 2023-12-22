@@ -91,7 +91,7 @@ class Details(Adw.Bin):
         edit_group = Adw.PreferencesGroup(title=_("Text"))  # type:ignore
         # Copy button
         copy_btn = Gtk.Button(
-            icon_name="edit-copy-symbolic",
+            icon_name="errands-copy",
             valign="center",
             css_classes=["flat"],
             tooltip_text=_("Copy Text"),  # type:ignore
@@ -159,7 +159,8 @@ class Details(Adw.Bin):
         # Start menu button
         start_menu_btn = Gtk.MenuButton(
             valign="center",
-            icon_name="x-office-calendar-symbolic",
+            icon_name="errands-calendar",
+            tooltip_text=_("Set Date"),  # type:ignore
             popover=Gtk.Popover(child=start_menu_box),
             css_classes=["flat"],
         )
@@ -194,7 +195,8 @@ class Details(Adw.Bin):
         # End menu button
         end_menu_btn = Gtk.MenuButton(
             valign="center",
-            icon_name="x-office-calendar-symbolic",
+            icon_name="errands-calendar",
+            tooltip_text=_("Set Date"),  # type:ignore
             popover=Gtk.Popover(child=end_menu_box),
             css_classes=["flat"],
         )
@@ -233,7 +235,7 @@ class Details(Adw.Bin):
         # Export group
         misc_group = Adw.PreferencesGroup(title=_("Export"))  # type:ignore
         open_cal_btn = Gtk.Button(
-            icon_name="emblem-shared-symbolic",
+            icon_name="errands-share",
             valign="center",
             css_classes=["flat"],
         )

@@ -5,6 +5,9 @@
     <file alias="style-dark.css">resources/style-dark.css</file>
   </gresource>
   <gresource prefix="/io/github/mrvladus/Errands/icons/scalable/actions/">
-    <file preprocess="xml-stripblanks" alias="up-small-symbolic.svg">resources/icons/up-small-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-up.svg">resources/icons/errands-up.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-calendar.svg">resources/icons/errands-calendar.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-copy.svg">resources/icons/errands-copy.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-share.svg">resources/icons/errands-share.svg</file>
   </gresource>
 </gresources>
