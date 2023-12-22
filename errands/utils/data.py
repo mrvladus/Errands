@@ -46,7 +46,7 @@ class UserData:
             uid TEXT NOT NULL
             )""",
         )
-        cls._convert()
+        cls._convert(cls)
 
     @classmethod
     def add_list(cls, name: str, uuid: str = None, synced: bool = False) -> str:
@@ -218,7 +218,7 @@ class UserData:
             Log.error("Data: can't read data file")
             return
         # Remove old data folder
-        os.remove(old_path)
+        os.rmdir(old_path)
         # If sync is enabled
         if GSettings.get("sync-provider") != 0:
             uid = cls.add_list(GSettings.get("sync-cal-name"))
