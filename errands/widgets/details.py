@@ -77,7 +77,7 @@ class Details(Adw.Bin):
         colors_box = Gtk.Box(halign="center", css_classes=["toolbar"])
         colors = ["", "blue", "green", "yellow", "orange", "red", "purple", "brown"]
         for color in colors:
-            btn = Gtk.Button()
+            btn = Gtk.Button(can_shrink=True)
             if color == "":
                 btn.set_icon_name("window-close-symbolic")
                 btn.set_tooltip_text(_("Clear Style"))  # type:ignore
@@ -117,12 +117,13 @@ class Details(Adw.Bin):
         self.notes = Gtk.TextBuffer()
         self.notes.connect("changed", lambda *_: self.save_btn.set_sensitive(True))
         notes_view = Gtk.TextView(
-            height_request=55,
+            height_request=60,
             top_margin=12,
             bottom_margin=12,
             left_margin=12,
             right_margin=12,
             buffer=self.notes,
+            wrap_mode=3,
         )
         notes_view.add_css_class("card")
         notes_group.add(notes_view)
