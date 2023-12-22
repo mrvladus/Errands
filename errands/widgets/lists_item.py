@@ -124,6 +124,7 @@ class ListItem(Gtk.ListBoxRow):
                 for task in tasks:
                     event = Todo()
                     event.add("uid", task["uid"])
+                    event.add("related-to", task["parent"])
                     event.add("summary", task["text"])
                     if task["notes"]:
                         event.add("description", task["notes"])
