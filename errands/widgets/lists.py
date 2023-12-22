@@ -131,7 +131,7 @@ class Lists(Adw.Bin):
         menu: Gio.Menu = Gio.Menu.new()
         menu.append(_("Sync / Fetch Tasks"), "app.sync")  # type:ignore
         menu.append(_("Preferences"), "app.preferences")  # type:ignore
-        menu.append(_("Keyboard Shortcuts"), "app.shortcuts")  # type:ignore
+        menu.append(_("Keyboard Shortcuts"), "win.show-help-overlay")  # type:ignore
         menu.append(_("About Errands"), "app.about")  # type:ignore
         menu_btn = Gtk.MenuButton(
             menu_model=menu,

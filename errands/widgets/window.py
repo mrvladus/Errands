@@ -5,7 +5,6 @@ from __main__ import VERSION, APP_ID
 from errands.widgets.trash import Trash
 from gi.repository import Gio, Adw, Gtk
 from errands.widgets.lists import Lists
-from errands.widgets.shortcuts_window import ShortcutsWindow
 from errands.widgets.preferences import PreferencesWindow
 from errands.utils.sync import Sync
 from errands.utils.gsettings import GSettings
@@ -120,9 +119,6 @@ class Window(Adw.ApplicationWindow):
             "preferences",
             lambda *_: PreferencesWindow(self).show(),
             ["<primary>comma"],
-        )
-        _create_action(
-            "shortcuts", lambda *_: ShortcutsWindow(self), ["<primary>question"]
         )
         _create_action("about", _about)
         _create_action("sync", _sync, ["<primary>s"])

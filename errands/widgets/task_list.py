@@ -37,6 +37,14 @@ class TaskList(Adw.Bin):
             icon_name="sidebar-show-symbolic",
             tooltip_text=_("Toggle Sidebar"),  # type:ignore
         )
+        toggle_ctrl = Gtk.ShortcutController(scope=1)
+        toggle_ctrl.add_shortcut(
+            Gtk.Shortcut(
+                trigger=Gtk.ShortcutTrigger.parse_string("F9"),
+                action=Gtk.ShortcutAction.parse_string("activate"),
+            )
+        )
+        self.toggle_sidebar_btn.add_controller(toggle_ctrl)
         # Delete completed button
         self.delete_completed_btn = Gtk.Button(
             valign="center",
