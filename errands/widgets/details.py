@@ -117,7 +117,7 @@ class Details(Adw.Bin):
         self.notes = Gtk.TextBuffer()
         self.notes.connect("changed", lambda *_: self.save_btn.set_sensitive(True))
         notes_view = Gtk.TextView(
-            height_request=60,
+            height_request=100,
             top_margin=12,
             bottom_margin=12,
             left_margin=12,
