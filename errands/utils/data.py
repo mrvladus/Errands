@@ -1,10 +1,12 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
+import json
 import os
 import sqlite3
 from typing import Any
 from uuid import uuid4
+from errands.utils.gsettings import GSettings
 from gi.repository import GLib
 from errands.utils.logging import Log
 
@@ -44,6 +46,7 @@ class UserData:
             uid TEXT NOT NULL
             )""",
         )
+        cls._convert()
 
     @classmethod
     def add_list(cls, name: str, uuid: str = None, synced: bool = False) -> str:
@@ -201,53 +204,38 @@ class UserData:
             cls.connection.commit()
             return uid
 
-
-#     @classmethod
-#     def convert(self, data: UserDataDict) -> UserDataDict:
-#         """
-#         Port tasks from older versions (for updates)
-#         """
-
-#         Log.debug("Converting data file")
-
-#         ver: str = data["version"]
-
-#         # Versions 44.6.x
-#         if ver.startswith("44.6"):
-#             new_tasks: list[dict] = []
-#             for task in data["tasks"]:
-#                 new_task = {
-#                     "id": task["id"],
-#                     "parent": "",
-#                     "text": task["text"],
-#                     "color": task["color"],
-#                     "completed": task["completed"],
-#                     "deleted": "history" in data and task["id"] in data["history"],
-#                     "synced_caldav": False,
-#                     # "synced_todoist": False,
-#                 }
-#                 new_tasks.append(new_task)
-#                 if task["sub"] != []:
-#                     for sub in task["sub"]:
-#                         new_sub = {
-#                             "id": sub["id"],
-#                             "parent": task["id"],
-#                             "text": sub["text"],
-#                             "color": "",
-#                             "completed": sub["completed"],
-#                             "deleted": "history" in data
-#                             and sub["id"] in data["history"],
-#                             "synced_caldav": False,
-#                             # "synced_todoist": False,
-#                         }
-#                         new_tasks.append(new_sub)
-#             data["tasks"] = new_tasks
-#             if "history" in data:
-#                 del data["history"]
-#             data["deleted"] = []
-
-#         elif ver.startswith("44.7"):
-#             data["deleted"] = []
-#             for task in data["tasks"]:
-#                 task["synced_caldav"] = False
-#                 # task["synced_todoist"] = False
+    def _convert(cls):
+        old_path = os.path.join(GLib.get_user_data_dir(), "list")
+        old_data_file = os.path.join(old_path, "data.json")
+        if not os.path.exists(old_data_file):
+            return
+        Log.debug("Data: convert data file")
+        # Get tasks
+        try:
+            with open(old_data_file, "r") as f:
+                data: dict = json.loads(f.read())
+        except:
+            Log.error("Data: can't read data file")
+            return
+        # Remove old data folder
+        os.remove(old_path)
+        # If sync is enabled
+        if GSettings.get("sync-provider") != 0:
+            uid = cls.add_list(GSettings.get("sync-cal-name"))
+            GSettings.set("sync-cal-name", "s", "")
+        # If sync is disabled
+        else:
+            uid = cls.add_list("Errands")
+        # Add tasks
+        for task in data["tasks"]:
+            cls.add_task(
+                color=task["color"],
+                completed=task["completed"],
+                deleted=task["id"] in data["deleted"],
+                list_uid=uid,
+                parent=task["parent"],
+                synced=task["synced_caldav"],
+                text=task["text"],
+                trash=task["deleted"],
+                uid=task["id"],
+            )
