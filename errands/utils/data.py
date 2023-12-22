@@ -3,6 +3,7 @@
 
 import json
 import os
+import shutil
 import sqlite3
 from typing import Any
 from uuid import uuid4
@@ -218,7 +219,7 @@ class UserData:
             Log.error("Data: can't read data file")
             return
         # Remove old data folder
-        os.rmdir(old_path)
+        shutil.rmtree(old_path, True)
         # If sync is enabled
         if GSettings.get("sync-provider") != 0:
             uid = cls.add_list(GSettings.get("sync-cal-name"))
