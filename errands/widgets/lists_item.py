@@ -149,8 +149,13 @@ class ListItem(Gtk.ListBoxRow):
                         )
                     calendar.add_component(event)
 
-                with open(file.get_path(), "wb") as f:
-                    f.write(calendar.to_ical())
+                try:
+                    with open(file.get_path(), "wb") as f:
+                        f.write(calendar.to_ical())
+                except Exception as e:
+                    Log.error(f"List: Export failed. {e}")
+                    self.window.add_toast(_("Export failed"))  # type:ignore
+
                 self.window.add_toast(_("Exported"))  # type:ignore
 
             filter = Gtk.FileFilter()

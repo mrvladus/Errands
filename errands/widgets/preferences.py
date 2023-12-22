@@ -125,8 +125,6 @@ class PreferencesWindow(Adw.PreferencesWindow):
             with self.sync_password.freeze_notify():
                 self.sync_password.props.text = password if password else ""
 
-    # --- Template handlers --- #
-
     def on_sync_provider_selected(self, *_) -> None:
         self.setup_sync()
 
