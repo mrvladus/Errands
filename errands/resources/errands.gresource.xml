@@ -10,5 +10,6 @@
     <file preprocess="xml-stripblanks" alias="errands-calendar.svg">resources/icons/errands-calendar.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-copy.svg">resources/icons/errands-copy.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-share.svg">resources/icons/errands-share.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-today.svg">resources/icons/errands-today.svg</file>
   </gresource>
 </gresources>

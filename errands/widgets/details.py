@@ -6,6 +6,7 @@ from errands.utils.data import UserData
 from icalendar import Calendar, Event
 
 from errands.utils.functions import get_children
+from errands.widgets.components.datetime import DateTime
 from gi.repository import Adw, Gtk, GLib, Gdk, GObject
 from errands.utils.markup import Markup
 from errands.utils.sync import Sync
@@ -14,8 +15,6 @@ from errands.utils.logging import Log
 
 class Details(Adw.Bin):
     parent = None
-    start_datetime: str = ""
-    end_datetime: str = ""
 
     def __init__(self, window, task_list) -> None:
         super().__init__()
@@ -132,97 +131,55 @@ class Details(Adw.Bin):
         props_group = Adw.PreferencesGroup(title=_("Properties"))  # type:ignore
 
         # Start date row
-        self.start_date = Adw.ActionRow(
+        self.start_datetime_row = Adw.ActionRow(
             title=_("Not Set"), subtitle=_("Start")  # type:ignore
         )
-        # Start hour
-        self.start_hour = Gtk.SpinButton(
-            adjustment=Gtk.Adjustment(lower=0, upper=23, step_increment=1)
+        self.start_datetime = DateTime()
+        self.start_datetime.connect("changed", self.on_start_time_changed)
+        self.start_datetime_row.add_suffix(
+            Gtk.MenuButton(
+                valign="center",
+                icon_name="errands-calendar",
+                tooltip_text=_("Set Date"),  # type:ignore
+                popover=Gtk.Popover(child=self.start_datetime),
+                css_classes=["flat"],
+            )
         )
-        self.start_hour.connect("value-changed", self.on_start_time_changed)
-        # Start min
-        self.start_min = Gtk.SpinButton(
-            adjustment=Gtk.Adjustment(lower=0, upper=59, step_increment=1)
-        )
-        self.start_min.connect("value-changed", self.on_start_time_changed)
-        start_time_box = Gtk.Box(css_classes=["toolbar"], halign="center")
-        start_time_box.append(self.start_hour)
-        start_time_box.append(Gtk.Label(label=":"))
-        start_time_box.append(self.start_min)
-        # Start date
-        self.start_cal = Gtk.Calendar()
-        self.start_cal.connect("day-selected", self.on_start_time_changed)
-        # Start menu box
-        start_menu_box = Gtk.Box(orientation="vertical")
-        start_menu_box.append(start_time_box)
-        start_menu_box.append(self.start_cal)
-        # Start menu button
-        start_menu_btn = Gtk.MenuButton(
-            valign="center",
-            icon_name="errands-calendar",
-            tooltip_text=_("Set Date"),  # type:ignore
-            popover=Gtk.Popover(child=start_menu_box),
-            css_classes=["flat"],
-        )
-        self.start_date.add_suffix(start_menu_btn)
-        props_group.add(self.start_date)
+        props_group.add(self.start_datetime_row)
 
         # End date row
-        self.end_date = Adw.ActionRow(
-            title=_("Not Set"), subtitle=_("End")  # type:ignore
+        self.end_datetime_row = Adw.ActionRow(
+            title=_("Not Set"), subtitle=_("Start")  # type:ignore
         )
-        # End hour
-        self.end_hour = Gtk.SpinButton(
-            adjustment=Gtk.Adjustment(lower=0, upper=23, step_increment=1)
+        self.end_datetime = DateTime()
+        self.end_datetime.connect("changed", self.on_end_time_changed)
+        self.end_datetime_row.add_suffix(
+            Gtk.MenuButton(
+                valign="center",
+                icon_name="errands-calendar",
+                tooltip_text=_("Set Date"),  # type:ignore
+                popover=Gtk.Popover(child=self.end_datetime),
+                css_classes=["flat"],
+            )
         )
-        self.end_hour.connect("value-changed", self.on_end_time_changed)
-        # End min
-        self.end_min = Gtk.SpinButton(
-            adjustment=Gtk.Adjustment(lower=0, upper=59, step_increment=1)
-        )
-        self.end_min.connect("value-changed", self.on_end_time_changed)
-        end_time_box = Gtk.Box(css_classes=["toolbar"], halign="center")
-        end_time_box.append(self.end_hour)
-        end_time_box.append(Gtk.Label(label=":"))
-        end_time_box.append(self.end_min)
-        # End date
-        self.end_cal = Gtk.Calendar()
-        self.end_cal.connect("day-selected", self.on_end_time_changed)
-        # End menu box
-        end_menu_box = Gtk.Box(orientation="vertical")
-        end_menu_box.append(end_time_box)
-        end_menu_box.append(self.end_cal)
-        # End menu button
-        end_menu_btn = Gtk.MenuButton(
-            valign="center",
-            icon_name="errands-calendar",
-            tooltip_text=_("Set Date"),  # type:ignore
-            popover=Gtk.Popover(child=end_menu_box),
-            css_classes=["flat"],
-        )
-        self.end_date.add_suffix(end_menu_btn)
-        props_group.add(self.end_date)
+        props_group.add(self.end_datetime_row)
 
         # Complete % row
-        percent_complete_adj = Gtk.Adjustment(lower=0, upper=100, step_increment=1)
-        percent_complete_adj.connect(
-            "value-changed", lambda *_: self.save_btn.set_sensitive(True)
-        )
         self.percent_complete = Adw.SpinRow(
             title=_("Complete %"),  # type:ignore
-            adjustment=percent_complete_adj,
+            adjustment=Gtk.Adjustment(lower=0, upper=100, step_increment=1),
+        )
+        self.percent_complete.connect(
+            "changed", lambda *_: self.save_btn.set_sensitive(True)
         )
         props_group.add(self.percent_complete)
 
         # Priority row
-        priority_adj = Gtk.Adjustment(lower=0, upper=9, step_increment=1)
-        priority_adj.connect(
-            "value-changed", lambda *_: self.save_btn.set_sensitive(True)
-        )
         self.priority = Adw.SpinRow(
             title=_("Priority"),  # type:ignore
-            adjustment=priority_adj,
+            adjustment=Gtk.Adjustment(lower=0, upper=9, step_increment=1),
         )
+        self.priority.connect("changed", lambda *_: self.save_btn.set_sensitive(True))
         props_group.add(self.priority)
 
         # Tags group
@@ -297,44 +254,18 @@ class Details(Adw.Bin):
         self.tags.add(tag)
 
     def update_info(self, parent):
+        Log.debug("Details: Update info")
+
         self.parent = parent
         # Edit text
         self.edit_entry.set_text(self.parent.get_prop("text"))
         # Notes
         self.notes.set_text(self.parent.get_prop("notes"))
-        # Set date in calendars
-        self.start_datetime = self.parent.get_prop("start_date")
-        self.end_datetime = self.parent.get_prop("end_date")
-        if self.start_datetime:
-            self.start_hour.set_value(int(self.start_datetime[9:11]))
-            self.start_min.set_value(int(self.start_datetime[11:13]))
-            self.start_cal.select_day(
-                GLib.DateTime.new_local(
-                    int(self.start_datetime[0:4]),
-                    int(self.start_datetime[4:6]),
-                    int(self.start_datetime[6:8]),
-                    0,
-                    0,
-                    0,
-                )
-            )
-        else:
-            self.start_date.set_title(_("Not Set"))  # type:ignore
-        if self.end_datetime:
-            self.end_hour.set_value(int(self.end_datetime[9:11]))
-            self.end_min.set_value(int(self.end_datetime[11:13]))
-            self.end_cal.select_day(
-                GLib.DateTime.new_local(
-                    int(self.end_datetime[0:4]),
-                    int(self.end_datetime[4:6]),
-                    int(self.end_datetime[6:8]),
-                    0,
-                    0,
-                    0,
-                )
-            )
-        else:
-            self.end_date.set_title(_("Not Set"))  # type:ignore
+        # Datetime
+        self.start_datetime.set_datetime(self.parent.get_prop("start_date"))
+        self.start_datetime_row.set_title(self.start_datetime.get_human_datetime())
+        self.end_datetime.set_datetime(self.parent.get_prop("end_date"))
+        self.end_datetime_row.set_title(self.end_datetime.get_human_datetime())
         # Percent complete
         self.percent_complete.set_value(self.parent.get_prop("percent_complete"))
         # Priority
@@ -361,6 +292,11 @@ class Details(Adw.Bin):
             self.parent.task_row.set_title(Markup.find_url(Markup.escape(text)))
         else:
             self.edit_entry.set_text(self.parent.get_prop("text"))
+        # Set completion
+        pc = self.percent_complete.get_value()
+        self.parent.completed_btn.set_active(pc == 100)
+        self.parent.update_props(["percent_complete"], [pc])
+        self.percent_complete.set_value(pc)
         # Set tags
         tag_arr: list[str] = []
         for i, row in enumerate(get_children(self.tag_entry.get_parent())):
@@ -380,8 +316,8 @@ class Details(Adw.Bin):
                 "synced",
             ],
             [
-                self.start_datetime,
-                self.end_datetime,
+                self.start_datetime.get_datetime(),
+                self.end_datetime.get_datetime(),
                 self.notes.props.text,
                 int(self.percent_complete.get_value()),
                 int(self.priority.get_value()),
@@ -393,77 +329,22 @@ class Details(Adw.Bin):
         # Sync
         Sync.sync()
 
-    def on_datetime_changed(self):
+    def on_datetime_changed(self, dt):
         pass
 
-    def on_start_time_changed(self, _):
+    def on_start_time_changed(self, *args):
         Log.debug("Details: change start time")
-        # Get time
-        hour = str(self.start_hour.get_value_as_int())
-        hour = f"0{hour}" if len(hour) == 1 else hour
-        min = str(self.start_min.get_value_as_int())
-        min = f"0{min}" if len(min) == 1 else min
-        # Set start text
-        self.start_date.set_title(
-            f"{hour}:{min}, {self.start_cal.get_date().format('%d %B, %Y')}"
-        )
-        self.start_datetime = (
-            f"{self.start_cal.get_date().format('%Y%m%d')}T{hour}{min}00"
-        )
-        # Check if start bigger than end
-        st = datetime.fromisoformat(self.start_datetime)
-        try:
-            et = datetime.fromisoformat(self.end_datetime)
-        except ValueError:
-            return
-        if st > et:
-            self.end_date.set_title(
-                f"{hour}:{min}, {self.start_cal.get_date().format('%d %B, %Y')}"
-            )
-            self.end_datetime = (
-                f"{self.start_cal.get_date().format('%Y%m%d')}T{hour}{min}00"
-            )
-            self.end_hour.set_value(int(self.end_datetime[9:11]))
-            self.end_min.set_value(int(self.end_datetime[11:13]))
-            self.end_cal.select_day(
-                GLib.DateTime.new_local(
-                    int(self.end_datetime[0:4]),
-                    int(self.end_datetime[4:6]),
-                    int(self.end_datetime[6:8]),
-                    0,
-                    0,
-                    0,
-                )
-            )
+        self.start_datetime_row.set_title(self.start_datetime.get_human_datetime())
         self.save_btn.set_sensitive(True)
 
-    def on_end_time_changed(self, _):
+    def on_end_time_changed(self, *args):
         Log.debug("Details: change end time")
-        hour = str(self.end_hour.get_value_as_int())
-        hour = f"0{hour}" if len(hour) == 1 else hour
-        min = str(self.end_min.get_value_as_int())
-        min = f"0{min}" if len(min) == 1 else min
-        # Check if end bigger than start
-        try:
-            st = datetime.fromisoformat(self.start_datetime)
-        except ValueError:
-            return
-        et = datetime.fromisoformat(
-            f"{self.end_cal.get_date().format('%Y%m%d')}T{hour}{min}00"
-        )
-        if et >= st:
-            self.end_date.set_title(
-                f"{hour}:{min}, {self.end_cal.get_date().format('%d %B, %Y')}"
-            )
-            self.end_datetime = (
-                f"{self.end_cal.get_date().format('%Y%m%d')}T{hour}{min}00"
-            )
+        self.end_datetime_row.set_title(self.end_datetime.get_human_datetime())
         self.save_btn.set_sensitive(True)
 
     def on_copy_text_clicked(self, _btn):
         Log.info("Details: Copy to clipboard")
-        clp: Gdk.Clipboard = Gdk.Display.get_default().get_clipboard()
-        clp.set(self.parent.get_prop("text"))
+        Gdk.Display.get_default().get_clipboard().set(self.parent.get_prop("text"))
         self.window.add_toast(_("Copied to Clipboard"))  # pyright:ignore
 
     def on_delete_btn_clicked(self, _btn):
