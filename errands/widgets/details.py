@@ -6,6 +6,7 @@ from errands.utils.data import UserData
 from icalendar import Calendar, Event
 
 from errands.utils.functions import get_children
+from errands.widgets.components.box import Box
 from errands.widgets.components.datetime import DateTime
 from gi.repository import Adw, Gtk, GLib, Gdk, GObject
 from errands.utils.markup import Markup
@@ -51,6 +52,7 @@ class Details(Adw.Bin):
         )
         self.save_btn.connect("clicked", self.on_save_btn_clicked)
         hb.pack_end(self.save_btn)
+
         # Status
         self.status = Adw.StatusPage(
             icon_name="help-about-symbolic",
@@ -72,6 +74,7 @@ class Details(Adw.Bin):
             "visible",
             GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.INVERT_BOOLEAN,
         )
+
         # Colors
         colors_box = Gtk.Box(halign="center", css_classes=["toolbar"])
         colors = ["", "blue", "green", "yellow", "orange", "red", "purple", "brown"]
@@ -86,6 +89,7 @@ class Details(Adw.Bin):
             btn.add_css_class("circular")
             btn.connect("clicked", self.on_style_selected, color)
             colors_box.append(btn)
+
         # Edit group
         edit_group = Adw.PreferencesGroup(title=_("Text"))  # type:ignore
         # Copy button
@@ -110,6 +114,7 @@ class Details(Adw.Bin):
         )
         edit_view.add_css_class("card")
         edit_group.add(edit_view)
+
         # Notes group
         notes_group = Adw.PreferencesGroup(title=_("Notes"))  # type:ignore
         # Notes entry
@@ -206,7 +211,19 @@ class Details(Adw.Bin):
         misc_group.add(open_cal_row)
 
         # Groups box
-        p_box = Gtk.Box(orientation="vertical", spacing=12, visible=False)
+        p_box = Box(
+            children=[
+                colors_box,
+                edit_group,
+                notes_group,
+                props_group,
+                self.tags,
+                misc_group,
+            ],
+            orientation="vertical",
+            spacing=12,
+            visible=False,
+        )
         p_box.bind_property(
             "visible",
             self.status,
@@ -215,21 +232,11 @@ class Details(Adw.Bin):
             | GObject.BindingFlags.INVERT_BOOLEAN
             | GObject.BindingFlags.BIDIRECTIONAL,
         )
-        p_box.append(colors_box)
-        p_box.append(edit_group)
-        p_box.append(notes_group)
-        p_box.append(props_group)
-        p_box.append(self.tags)
-        p_box.append(misc_group)
-        # Box
-        box = Gtk.Box(orientation="vertical")
-        box.append(self.status)
-        box.append(p_box)
         # Toolbar View
         toolbar_view = Adw.ToolbarView(
             content=Gtk.ScrolledWindow(
                 child=Adw.Clamp(
-                    child=box,
+                    child=Box(children=[self.status, p_box], orientation="vertical"),
                     margin_start=12,
                     margin_end=12,
                     margin_top=6,
