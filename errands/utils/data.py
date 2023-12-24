@@ -60,6 +60,14 @@ class UserData:
         return uid
 
     @classmethod
+    def clean_deleted(cls):
+        Log.info("Data: Clean deleted")
+        cls.run_sql(
+            "DELETE FROM lists WHERE deleted = 1",
+            "DELETE FROM tasks WHERE deleted = 1",
+        )
+
+    @classmethod
     def get_lists_as_dicts(cls) -> dict:
         res = cls.run_sql("SELECT * FROM lists", fetch=True)
         lists = []

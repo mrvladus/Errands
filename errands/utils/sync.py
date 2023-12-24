@@ -40,10 +40,7 @@ class Sync:
         Sync tasks without blocking the UI
         """
         if GSettings.get("sync-provider") == 0:
-            UserData.run_sql(
-                "DELETE FROM lists WHERE deleted = 1",
-                "DELETE FROM tasks WHERE deleted = 1",
-            )
+            UserData.clean_deleted()
             return
         if not self.provider:
             self.init(self.window)
@@ -423,7 +420,7 @@ class SyncProviderCalDAV:
                         )
                     except Exception as e:
                         Log.error(
-                            f"Sync: Can't update task on remote: {task['uid']}\n{e}"
+                            f"Sync: Can't update task on remote: {task['uid']}. {e}"
                         )
 
                 # Delete local task that was deleted on remote
