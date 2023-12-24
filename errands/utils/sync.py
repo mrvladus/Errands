@@ -86,10 +86,8 @@ class SyncProviderCalDAV:
                         "Not all sync credentials provided. Please check settings."
                     )
                 )
-            # self.window.sync_btn.set_visible(False)
             return False
 
-        # self.window.sync_btn.set_visible(True)
         return True
 
     def _check_url(self) -> None:
