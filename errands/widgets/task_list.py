@@ -1,6 +1,7 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
+from errands.widgets.components.box import Box
 from gi.repository import Adw, Gtk, GLib, GObject
 from errands.utils.animation import scroll
 from errands.utils.gsettings import GSettings
@@ -111,11 +112,15 @@ class TaskList(Adw.Bin):
         )
         scroll_up_btn.connect("clicked", lambda *_: scroll(self.scrl, False))
 
-        self.bottom_bar = Gtk.Box(css_classes=["toolbar"])
-        self.bottom_bar.append(toggle_sidebar_btn)
-        self.bottom_bar.append(delete_completed_btn)
-        self.bottom_bar.append(Gtk.Separator(hexpand=True, css_classes=["spacer"]))
-        self.bottom_bar.append(scroll_up_btn)
+        self.bottom_bar = Box(
+            children=[
+                toggle_sidebar_btn,
+                delete_completed_btn,
+                Gtk.Separator(hexpand=True, css_classes=["spacer"]),
+                scroll_up_btn,
+            ],
+            css_classes=["toolbar"],
+        )
 
         # ---------- TASKS LIST ---------- #
 
@@ -159,19 +164,20 @@ class TaskList(Adw.Bin):
         self.scrl.set_child(
             Adw.Clamp(maximum_size=850, tightening_threshold=300, child=self.tasks_list)
         )
-        # Tasks list box
-        box = Gtk.Box(orientation="vertical", vexpand=True)
-        box.append(
-            Adw.Clamp(
-                maximum_size=850,
-                tightening_threshold=300,
-                child=entry_box,
-            )
-        )
-        box.append(self.scrl)
         # Tasks list toolbar view
         tasks_toolbar_view = Adw.ToolbarView(
-            content=box,
+            content=Box(
+                children=[
+                    Adw.Clamp(
+                        maximum_size=850,
+                        tightening_threshold=300,
+                        child=entry_box,
+                    ),
+                    self.scrl,
+                ],
+                orientation="vertical",
+                vexpand=True,
+            ),
             reveal_bottom_bars=False,
         )
         tasks_toolbar_view.add_top_bar(self.hb)

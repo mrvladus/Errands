@@ -8,6 +8,7 @@ from errands.utils.functions import get_children
 from errands.utils.gsettings import GSettings
 from errands.utils.logging import Log
 from errands.utils.sync import Sync
+from errands.widgets.components.box import Box
 from errands.widgets.lists_item import ListItem
 from errands.widgets.task_list import TaskList
 from gi.repository import Adw, Gtk, Gio
@@ -151,9 +152,6 @@ class Lists(Adw.Bin):
             css_classes=["compact"],
             vexpand=True,
         )
-        box = Gtk.Box(orientation="vertical")
-        box.append(self.lists)
-        box.append(self.status_page)
         # Trash button
         self.trash_btn = Gtk.Button(
             child=Adw.ButtonContent(
@@ -170,7 +168,12 @@ class Lists(Adw.Bin):
         self.trash_btn.connect("clicked", self.on_trash_btn_clicked)
         # Toolbar view
         toolbar_view = Adw.ToolbarView(
-            content=Gtk.ScrolledWindow(child=box, propagate_natural_height=True)
+            content=Gtk.ScrolledWindow(
+                child=Box(
+                    children=[self.lists, self.status_page], orientation="vertical"
+                ),
+                propagate_natural_height=True,
+            )
         )
         toolbar_view.add_top_bar(hb)
         toolbar_view.add_bottom_bar(self.trash_btn)

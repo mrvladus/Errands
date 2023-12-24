@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 from typing import Self
+from errands.widgets.components.box import Box
 from gi.repository import Gtk, Adw, Gdk, GObject
 from errands.utils.sync import Sync
 from errands.utils.logging import Log
@@ -133,33 +134,32 @@ class Task(Gtk.Revealer):
         sub_tasks_entry.connect("activate", self.on_sub_task_added)
         # Sub-tasks
         self.tasks_list = Gtk.Box(orientation="vertical", css_classes=["sub-tasks"])
-        # Sub-tasks box
-        sub_tasks_box = Gtk.Box(orientation="vertical")
-        sub_tasks_box.append(sub_tasks_entry)
-        sub_tasks_box.append(self.tasks_list)
-        # Sub-tasks box revealer
-        self.sub_tasks_revealer = Gtk.Revealer(child=sub_tasks_box)
+        # Sub-tasks revealer
+        self.sub_tasks_revealer = Gtk.Revealer(
+            child=Box(
+                children=[sub_tasks_entry, self.tasks_list], orientation="vertical"
+            )
+        )
         # Task card
-        self.main_box = Gtk.Box(
+        self.main_box = Box(
+            children=[task_row_box, self.sub_tasks_revealer],
             orientation="vertical",
             hexpand=True,
             css_classes=["fade", "card"],
         )
-        self.main_box.append(task_row_box)
-        self.main_box.append(self.sub_tasks_revealer)
         if self.get_prop("color") != "":
             self.main_box.add_css_class(f'task-{self.get_prop("color")}')
-        # Box
-        box = Gtk.Box(
-            orientation="vertical",
-            margin_start=12,
-            margin_end=12,
-            margin_bottom=6,
-            margin_top=6,
+
+        self.set_child(
+            Box(
+                children=[top_drop_area, self.main_box],
+                orientation="vertical",
+                margin_start=12,
+                margin_end=12,
+                margin_bottom=6,
+                margin_top=6,
+            )
         )
-        box.append(top_drop_area)
-        box.append(self.main_box)
-        self.set_child(box)
 
     def add_task(self, uid: str) -> None:
         new_task = Task(uid, self.list_uid, self.window, self.task_list, self, True)

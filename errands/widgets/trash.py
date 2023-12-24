@@ -3,6 +3,7 @@
 
 from errands.utils.data import UserData
 from errands.utils.functions import get_children
+from errands.widgets.components.box import Box
 from errands.widgets.trash_item import TrashItem
 from gi.repository import Adw, Gtk, GObject
 from errands.widgets.task import Task
@@ -78,12 +79,10 @@ class Trash(Adw.Bin):
         scrl.bind_property(
             "visible", restore_btn, "visible", GObject.BindingFlags.SYNC_CREATE
         )
-        # Box
-        box = Gtk.Box(orientation="vertical")
-        box.append(self.status)
-        box.append(scrl)
         # Toolbar View
-        toolbar_view = Adw.ToolbarView(content=box)
+        toolbar_view = Adw.ToolbarView(
+            content=Box(children=[self.status, scrl], orientation="vertical")
+        )
         toolbar_view.add_top_bar(hb)
         self.set_child(toolbar_view)
 

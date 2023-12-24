@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 from __main__ import VERSION, APP_ID
+from errands.widgets.components.box import Box
 from errands.widgets.trash import Trash
 from gi.repository import Gio, Adw, Gtk
 from errands.widgets.lists import Lists
@@ -54,10 +55,14 @@ class Window(Adw.ApplicationWindow):
             css_classes=["pill", "suggested-action"],
         )
         add_list_btn.connect("clicked", lambda *_: self.lists.add_list_btn.activate())
-        box = Gtk.Box(orientation="vertical", vexpand=True, valign="center")
-        box.append(status_page)
-        box.append(add_list_btn)
-        status_toolbar_view = Adw.ToolbarView(content=box)
+        status_toolbar_view = Adw.ToolbarView(
+            content=Box(
+                children=[status_page, add_list_btn],
+                orientation="vertical",
+                vexpand=True,
+                valign="center",
+            )
+        )
         status_toolbar_view.add_top_bar(Adw.HeaderBar(show_title=False))
         self.stack.add_titled(
             child=status_toolbar_view,

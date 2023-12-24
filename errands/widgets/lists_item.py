@@ -3,6 +3,7 @@
 
 from datetime import datetime
 from icalendar import Calendar, Todo
+from errands.widgets.components.box import Box
 from gi.repository import Adw, Gtk, Gio
 from errands.utils.data import UserData
 from errands.utils.logging import Log
@@ -170,8 +171,6 @@ class ListItem(Gtk.ListBoxRow):
         _create_action("export", _export)
 
     def _build_ui(self):
-        # Box
-        box = Gtk.Box(css_classes=["toolbar"])
         # Label
         label = Gtk.Label(
             label=self.name,
@@ -183,24 +182,28 @@ class ListItem(Gtk.ListBoxRow):
             "notify::title",
             lambda *_: label.set_label(self.task_list.title.get_title()),
         )
-        box.append(label)
         # Menu
         menu: Gio.Menu = Gio.Menu.new()
         menu.append(_("Rename"), "list_item.rename")  # type:ignore
         menu.append(_("Delete"), "list_item.delete")  # type:ignore
         menu.append(_("Export"), "list_item.export")  # type:ignore
-        box.append(
-            Gtk.MenuButton(
-                menu_model=menu,
-                icon_name="view-more-symbolic",
-                tooltip_text=_("Menu"),  # type:ignore
-            )
-        )
-        self.set_child(box)
         # Click controller
         ctrl = Gtk.GestureClick()
         ctrl.connect("released", self.on_click)
         self.add_controller(ctrl)
+        self.set_child(
+            Box(
+                children=[
+                    label,
+                    Gtk.MenuButton(
+                        menu_model=menu,
+                        icon_name="view-more-symbolic",
+                        tooltip_text=_("Menu"),  # type:ignore
+                    ),
+                ],
+                css_classes=["toolbar"],
+            )
+        )
 
     def on_click(self, *args):
         self.window.stack.set_visible_child_name(self.name)
