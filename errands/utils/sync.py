@@ -397,13 +397,13 @@ class SyncProviderCalDAV:
                         todo.uncomplete()
                         todo.icalendar_component["summary"] = task["text"]
                         if task["end_date"]:
-                            todo.icalendar_component[
-                                "due"
-                            ] = datetime.datetime.fromisoformat(task["end_date"])
+                            todo.icalendar_component["due"] = task["end_date"]
+                        else:
+                            todo.icalendar_component.pop("DUE", None)
                         if task["start_date"]:
-                            todo.icalendar_component[
-                                "dtstart"
-                            ] = datetime.datetime.fromisoformat(task["start_date"])
+                            todo.icalendar_component["dtstart"] = task["start_date"]
+                        else:
+                            todo.icalendar_component.pop("DTSTART", None)
                         todo.icalendar_component["percent-complete"] = task[
                             "percent_complete"
                         ]

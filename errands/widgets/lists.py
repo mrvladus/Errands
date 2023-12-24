@@ -130,10 +130,16 @@ class Lists(Adw.Bin):
         hb.pack_start(self.add_list_btn)
         # Main menu
         menu: Gio.Menu = Gio.Menu.new()
-        menu.append(_("Sync / Fetch Tasks"), "app.sync")  # type:ignore
-        menu.append(_("Preferences"), "app.preferences")  # type:ignore
-        menu.append(_("Keyboard Shortcuts"), "win.show-help-overlay")  # type:ignore
-        menu.append(_("About Errands"), "app.about")  # type:ignore
+        top_section = Gio.Menu.new()
+        top_section.append(_("Sync / Fetch Tasks"), "app.sync")  # type:ignore
+        menu.append_section(None, top_section)
+        bottom_section = Gio.Menu.new()
+        bottom_section.append(_("Preferences"), "app.preferences")  # type:ignore
+        bottom_section.append(
+            _("Keyboard Shortcuts"), "win.show-help-overlay"  # type:ignore
+        )
+        bottom_section.append(_("About Errands"), "app.about")  # type:ignore
+        menu.append_section(None, bottom_section)
         menu_btn = Gtk.MenuButton(
             menu_model=menu,
             primary=True,

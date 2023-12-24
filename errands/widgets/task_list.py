@@ -66,10 +66,10 @@ class TaskList(Adw.Bin):
         self.scroll_up_btn.connect("clicked", lambda *_: scroll(self.scrl, False))
 
         # Header Bar
-        self.hb = Adw.HeaderBar(title_widget=self.title)
-        self.hb.pack_start(self.toggle_sidebar_btn)
-        self.hb.pack_start(self.delete_completed_btn)
-        self.hb.pack_end(self.scroll_up_btn)
+        hb = Adw.HeaderBar(title_widget=self.title)
+        hb.pack_start(self.toggle_sidebar_btn)
+        hb.pack_start(self.delete_completed_btn)
+        hb.pack_end(self.scroll_up_btn)
 
         # ---------- BOTTOMBAR ---------- #
 
@@ -111,16 +111,6 @@ class TaskList(Adw.Bin):
             GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
         )
         scroll_up_btn.connect("clicked", lambda *_: scroll(self.scrl, False))
-
-        self.bottom_bar = Box(
-            children=[
-                toggle_sidebar_btn,
-                delete_completed_btn,
-                Gtk.Separator(hexpand=True, css_classes=["spacer"]),
-                scroll_up_btn,
-            ],
-            css_classes=["toolbar"],
-        )
 
         # ---------- TASKS LIST ---------- #
 
@@ -180,8 +170,18 @@ class TaskList(Adw.Bin):
             ),
             reveal_bottom_bars=False,
         )
-        tasks_toolbar_view.add_top_bar(self.hb)
-        tasks_toolbar_view.add_bottom_bar(self.bottom_bar)
+        tasks_toolbar_view.add_top_bar(hb)
+        tasks_toolbar_view.add_bottom_bar(
+            Box(
+                children=[
+                    toggle_sidebar_btn,
+                    delete_completed_btn,
+                    Gtk.Separator(hexpand=True, css_classes=["spacer"]),
+                    scroll_up_btn,
+                ],
+                css_classes=["toolbar"],
+            )
+        )
         # Breakpoint
         tasks_brb = Adw.BreakpointBin(
             width_request=360, height_request=360, child=tasks_toolbar_view
