@@ -329,16 +329,23 @@ class Details(Adw.Bin):
         # Sync
         Sync.sync()
 
-    def on_datetime_changed(self, dt):
-        pass
-
     def on_start_time_changed(self, *args):
         Log.debug("Details: change start time")
+        sdt = self.start_datetime.get_datetime_as_int()
+        edt = self.end_datetime.get_datetime_as_int()
+        if sdt > edt and edt != 0:
+            self.end_datetime.set_datetime(self.start_datetime.get_datetime())
+            self.end_datetime_row.set_title(self.end_datetime.get_human_datetime())
         self.start_datetime_row.set_title(self.start_datetime.get_human_datetime())
         self.save_btn.set_sensitive(True)
 
     def on_end_time_changed(self, *args):
         Log.debug("Details: change end time")
+        sdt = self.start_datetime.get_datetime_as_int()
+        edt = self.end_datetime.get_datetime_as_int()
+        if edt < sdt and sdt != 0 and edt != 0:
+            self.start_datetime.set_datetime(self.end_datetime.get_datetime())
+            self.start_datetime_row.set_title(self.start_datetime.get_human_datetime())
         self.end_datetime_row.set_title(self.end_datetime.get_human_datetime())
         self.save_btn.set_sensitive(True)
 

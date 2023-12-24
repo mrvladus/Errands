@@ -99,6 +99,9 @@ class DateTime(Gtk.Box):
             out: str = _("Not Set")  # type:ignore
         return out
 
+    def get_datetime_as_int(self) -> int:
+        return int(f"{self.datetime[:8]}{self.datetime[9:]}") if self.datetime else 0
+
     def set_datetime(self, dt: str):
         self.lock_signals = True
         if dt:
