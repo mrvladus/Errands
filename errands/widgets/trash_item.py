@@ -4,7 +4,8 @@
 from errands.utils.data import UserData
 from errands.utils.functions import get_children
 from errands.utils.logging import Log
-from gi.repository import Adw, Gtk
+from errands.widgets.components.button import Button
+from gi.repository import Adw, Gtk, GObject
 
 
 class TrashItem(Adw.Bin):
@@ -20,21 +21,31 @@ class TrashItem(Adw.Bin):
         self.add_css_class("card")
         row = Adw.ActionRow(
             title=UserData.get_prop(self.uid, "text"),
-            subtitle=UserData.run_sql(
-                f"SELECT name FROM lists WHERE uid = '{self.task_widget.list_uid}'",
-                fetch=True,
-            )[0][0],
             css_classes=["rounded-corners"],
             height_request=60,
+            use_markup=True,
         )
-        restore_btn = Gtk.Button(
-            tooltip_text=_("Restore"),  # type:ignore
-            icon_name="emblem-ok-symbolic",
-            valign="center",
-            css_classes=["flat", "circular"],
+        # row.bind_property(
+        #     "title",
+        #     self.task_widget.task_row,
+        #     "title",
+        #     GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
+        # )
+        row.bind_property(
+            "subtitle",
+            self.task_widget.task_list.title,
+            "title",
+            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
         )
-        restore_btn.connect("clicked", self.on_restore)
-        row.add_suffix(restore_btn)
+        row.add_suffix(
+            Button(
+                icon_name="emblem-ok-symbolic",
+                on_click=self.on_restore,
+                tooltip_text=_("Restore"),  # type:ignore
+                valign="center",
+                css_classes=["flat", "circular"],
+            )
+        )
         box = Gtk.ListBox(
             selection_mode=0,
             css_classes=["rounded-corners"],

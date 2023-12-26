@@ -3,6 +3,7 @@
 
 from typing import Self
 from errands.widgets.components.box import Box
+from errands.widgets.components.button import Button
 from gi.repository import Gtk, Adw, Gdk, GObject
 from errands.utils.sync import Sync
 from errands.utils.logging import Log
@@ -80,6 +81,7 @@ class Task(Gtk.Revealer):
             tooltip_text=_("Click for Details"),  # type:ignore
             accessible_role=Gtk.AccessibleRole.ROW,
             cursor=Gdk.Cursor.new_from_name("pointer"),
+            use_markup=True,
         )
         # Mark as completed button
         self.completed_btn = Gtk.CheckButton(
@@ -90,15 +92,14 @@ class Task(Gtk.Revealer):
         self.completed_btn.set_active(self.get_prop("completed"))
         self.task_row.add_prefix(self.completed_btn)
         # Details button
-        self.expand_btn = Gtk.Button(
+        self.expand_btn = Button(
             icon_name="errands-up",
+            on_click=lambda *_: self.expand(
+                not self.sub_tasks_revealer.get_child_revealed()
+            ),
             valign="center",
             tooltip_text=_("Expand / Fold"),  # type:ignore
             css_classes=["flat", "circular", "fade", "rotate"],
-        )
-        self.expand_btn.connect(
-            "clicked",
-            lambda *_: self.expand(not self.sub_tasks_revealer.get_child_revealed()),
         )
         self.task_row.add_suffix(self.expand_btn)
         task_row_box = Gtk.ListBox(

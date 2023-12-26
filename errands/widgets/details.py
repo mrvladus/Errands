@@ -7,6 +7,7 @@ from icalendar import Calendar, Event
 
 from errands.utils.functions import get_children
 from errands.widgets.components.box import Box
+from errands.widgets.components.button import Button
 from errands.widgets.components.datetime import DateTime
 from gi.repository import Adw, Gtk, GLib, Gdk, GObject
 from errands.utils.markup import Markup
@@ -27,30 +28,31 @@ class Details(Adw.Bin):
         # Header Bar
         hb = Adw.HeaderBar(show_title=False, show_back_button=False)
         # Back button
-        back_btn = Gtk.Button(icon_name="go-previous-symbolic", visible=False)
+        back_btn = Button(
+            icon_name="go-previous-symbolic",
+            on_click=lambda *_: self.task_list.split_view.set_show_sidebar(False),
+            visible=False,
+        )
         back_btn.bind_property(
             "visible",
             self.task_list.split_view,
             "collapsed",
             GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
         )
-        back_btn.connect(
-            "clicked", lambda *_: self.task_list.split_view.set_show_sidebar(False)
-        )
         hb.pack_start(back_btn)
         # Delete button
-        delete_btn = Gtk.Button(
+        delete_btn = Button(
             icon_name="user-trash-symbolic",
+            on_click=self.on_delete_btn_clicked,
             tooltip_text=_("Delete"),  # type:ignore
         )
-        delete_btn.connect("clicked", self.on_delete_btn_clicked)
         hb.pack_start(delete_btn)
         # Save button
-        self.save_btn = Gtk.Button(
+        self.save_btn = Button(
             label=_("Save"),  # type:ignore
+            on_click=self.on_save_btn_clicked,
             css_classes=["suggested-action"],
         )
-        self.save_btn.connect("clicked", self.on_save_btn_clicked)
         hb.pack_end(self.save_btn)
 
         # Status
@@ -93,14 +95,15 @@ class Details(Adw.Bin):
         # Edit group
         edit_group = Adw.PreferencesGroup(title=_("Text"))  # type:ignore
         # Copy button
-        copy_btn = Gtk.Button(
-            icon_name="errands-copy",
-            valign="center",
-            css_classes=["flat"],
-            tooltip_text=_("Copy Text"),  # type:ignore
+        edit_group.set_header_suffix(
+            Button(
+                icon_name="errands-copy",
+                on_click=self.on_copy_text_clicked,
+                valign="center",
+                css_classes=["flat"],
+                tooltip_text=_("Copy Text"),  # type:ignore
+            )
         )
-        copy_btn.connect("clicked", self.on_copy_text_clicked)
-        edit_group.set_header_suffix(copy_btn)
         # Edit entry
         self.edit_entry = Gtk.TextBuffer()
         self.edit_entry.connect("changed", lambda *_: self.save_btn.set_sensitive(True))
@@ -196,12 +199,12 @@ class Details(Adw.Bin):
 
         # Export group
         misc_group = Adw.PreferencesGroup(title=_("Export"))  # type:ignore
-        open_cal_btn = Gtk.Button(
+        open_cal_btn = Button(
             icon_name="errands-share",
+            on_click=self.on_export,
             valign="center",
             css_classes=["flat"],
         )
-        open_cal_btn.connect("clicked", self.on_export)
         open_cal_row = Adw.ActionRow(
             title=_("Export"),  # type:ignore
             subtitle=_("Save Task as .ics file"),  # type:ignore
