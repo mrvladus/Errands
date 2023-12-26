@@ -1,7 +1,6 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-from errands.utils.data import UserData
 from errands.utils.functions import get_children
 from errands.utils.logging import Log
 from errands.widgets.components.button import Button
