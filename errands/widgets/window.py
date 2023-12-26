@@ -2,7 +2,8 @@
 # SPDX-License-Identifier: MIT
 
 from __main__ import VERSION, APP_ID
-from errands.widgets.components import Box
+from errands.widgets.components import Box, Button
+from errands.widgets.details import Details
 from errands.widgets.trash import Trash
 from gi.repository import Gio, Adw, Gtk
 from errands.widgets.lists import Lists
@@ -31,33 +32,47 @@ class Window(Adw.ApplicationWindow):
     def _build_ui(self):
         self.props.width_request = 360
         self.props.height_request = 200
-        # Split view
+        # Split view inner
+        self.split_view_inner = Adw.OverlaySplitView(
+            sidebar_position="start",
+            min_sidebar_width=360,
+            max_sidebar_width=360,
+        )
+        # Split view outer
         self.split_view = Adw.NavigationSplitView(
             max_sidebar_width=240, min_sidebar_width=240, show_content=True
         )
         # Stack
         self.stack = Adw.ViewStack()
-        self.split_view.set_content(Adw.NavigationPage.new(self.stack, "Tasks"))
         # Trash
         self.trash = Trash(self)
         self.stack.add_titled(self.trash, name="trash", title="Trash")
-        # Sidebar
+        # Details
+        self.details = Details(self)
+        GSettings.bind("sidebar-open", self.split_view_inner, "show-sidebar")
+        self.split_view_inner.set_sidebar(self.details)
+        self.split_view_inner.set_content(self.stack)
+        # Lists
         self.lists = Lists(self, self.stack)
         self.split_view.set_sidebar(Adw.NavigationPage.new(self.lists, "Lists"))
-        # Status page
-        status_page = Adw.StatusPage(
-            title=_("No Task Lists"),  # type:ignore
-            icon_name=APP_ID,
+        self.split_view.set_content(
+            Adw.NavigationPage.new(self.split_view_inner, "Tasks")
         )
-        add_list_btn = Gtk.Button(
-            label="Create List",
-            halign="center",
-            css_classes=["pill", "suggested-action"],
-        )
-        add_list_btn.connect("clicked", lambda *_: self.lists.add_list_btn.activate())
+        # Status page Toolbar View
         status_toolbar_view = Adw.ToolbarView(
             content=Box(
-                children=[status_page, add_list_btn],
+                children=[
+                    Adw.StatusPage(
+                        title=_("No Task Lists"),  # type:ignore
+                        icon_name=APP_ID,
+                    ),
+                    Button(
+                        label="Create List",
+                        on_click=lambda *_: self.lists.add_list_btn.activate(),
+                        halign="center",
+                        css_classes=["pill", "suggested-action"],
+                    ),
+                ],
                 orientation="vertical",
                 vexpand=True,
                 valign="center",
@@ -74,10 +89,10 @@ class Window(Adw.ApplicationWindow):
         # Toast overlay
         self.toast_overlay = Adw.ToastOverlay(child=self.split_view)
         # Breakpoints
-        bp = Adw.Breakpoint.new(Adw.breakpoint_condition_parse("max-width: 990px"))
-        bp.add_setter(self.split_view, "collapsed", True)
-        bp.add_setter(self.split_view, "show-content", True)
-        self.add_breakpoint(bp)
+        # bp = Adw.Breakpoint.new(Adw.breakpoint_condition_parse("max-width: 990px"))
+        # bp.add_setter(self.split_view, "collapsed", True)
+        # bp.add_setter(self.split_view, "show-content", True)
+        # self.add_breakpoint(bp)
 
         self.set_content(self.toast_overlay)
 

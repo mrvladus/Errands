@@ -15,10 +15,10 @@ from errands.utils.logging import Log
 class Details(Adw.Bin):
     parent = None
 
-    def __init__(self, window, task_list) -> None:
+    def __init__(self, window) -> None:
         super().__init__()
         self.window = window
-        self.task_list = task_list
+        self.split_view = window.split_view_inner
         self.build_ui()
 
     def build_ui(self):
@@ -27,12 +27,12 @@ class Details(Adw.Bin):
         # Back button
         back_btn = Button(
             icon_name="go-previous-symbolic",
-            on_click=lambda *_: self.task_list.split_view.set_show_sidebar(False),
+            on_click=lambda *_: self.split_view.set_show_sidebar(False),
             visible=False,
         )
         back_btn.bind_property(
             "visible",
-            self.task_list.split_view,
+            self.split_view,
             "collapsed",
             GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
         )

@@ -34,6 +34,7 @@ class Task(Gtk.Revealer):
         self.parent = parent
         self.is_sub_task = is_sub_task
         self.trash = window.trash
+        self.details = window.details
 
         self.build_ui()
         self.add_sub_tasks()
@@ -90,7 +91,7 @@ class Task(Gtk.Revealer):
         self.completed_btn.connect("toggled", self.on_completed_btn_toggled)
         self.completed_btn.set_active(self.get_prop("completed"))
         self.task_row.add_prefix(self.completed_btn)
-        # Details button
+        # Expand button
         self.expand_btn = Button(
             icon_name="errands-up",
             on_click=lambda *_: self.expand(
@@ -188,7 +189,7 @@ class Task(Gtk.Revealer):
         for task in get_children(self.tasks_list):
             if not task.get_prop("trash"):
                 task.delete()
-        self.task_list.details.status.set_visible(True)
+        self.details.status.set_visible(True)
         self.parent.update_status()
 
     def expand(self, expanded: bool) -> None:
@@ -260,7 +261,7 @@ class Task(Gtk.Revealer):
             ["completed", "synced", "percent_complete"],
             [btn.get_active(), False, 100 if btn.get_active() else 0],
         )
-        self.task_list.details.update_info(self)
+        self.details.update_info(self)
 
         if isinstance(self.parent, Task):
             self.parent.update_status()
@@ -282,8 +283,8 @@ class Task(Gtk.Revealer):
             Sync.sync()
 
     def on_details_clicked(self, *args):
-        self.task_list.details.update_info(self)
-        self.task_list.split_view.set_show_sidebar(True)
+        self.details.update_info(self)
+        self.window.split_view_inner.set_show_sidebar(True)
 
     def on_sub_task_added(self, entry: Gtk.Entry) -> None:
         """

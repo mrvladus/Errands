@@ -4,12 +4,10 @@
 from errands.widgets.components import Box
 from gi.repository import Adw, Gtk, GLib, GObject
 from errands.utils.animation import scroll
-from errands.utils.gsettings import GSettings
 from errands.utils.data import UserData
 from errands.utils.functions import get_children
 from errands.utils.sync import Sync
 from errands.utils.logging import Log
-from errands.widgets.details import Details
 from errands.widgets.task import Task
 
 
@@ -22,6 +20,7 @@ class TaskList(Adw.Bin):
         self.window = window
         self.list_uid = list_uid
         self.parent = parent
+        self.details = window.details
         self.build_ui()
         self.load_tasks()
 
@@ -196,31 +195,21 @@ class TaskList(Adw.Bin):
         tasks_brb.add_breakpoint(tasks_brb_bp)
 
         # Split view
-        self.split_view = Adw.OverlaySplitView(
-            content=tasks_brb,
-            sidebar_position="start",
-            min_sidebar_width=360,
-            max_sidebar_width=360,
-        )
-        self.split_view.bind_property(
+        self.window.split_view_inner.bind_property(
             "show-sidebar",
             self.toggle_sidebar_btn,
             "active",
             GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
         )
-        GSettings.bind("sidebar-open", self.split_view, "show-sidebar")
-        # Details
-        self.details = Details(self.window, self)
-        self.split_view.set_sidebar(self.details)
         # Breakpoint
-        brb = Adw.BreakpointBin(
-            width_request=360, height_request=360, child=self.split_view
-        )
-        bp = Adw.Breakpoint.new(Adw.breakpoint_condition_parse("max-width: 720px"))
-        bp.add_setter(self.split_view, "collapsed", True)
-        brb.add_breakpoint(bp)
+        # brb = Adw.BreakpointBin(
+        #     width_request=360, height_request=360, child=self.split_view
+        # )
+        # bp = Adw.Breakpoint.new(Adw.breakpoint_condition_parse("max-width: 720px"))
+        # bp.add_setter(self.split_view, "collapsed", True)
+        # brb.add_breakpoint(bp)
 
-        self.set_child(brb)
+        self.set_child(tasks_brb)
 
     def add_task(self, uid: str) -> None:
         new_task = Task(uid, self.list_uid, self.window, self, self, False)
