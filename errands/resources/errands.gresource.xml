@@ -11,5 +11,9 @@
     <file preprocess="xml-stripblanks" alias="errands-copy.svg">resources/icons/errands-copy.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-share.svg">resources/icons/errands-share.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-today.svg">resources/icons/errands-today.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-theme-system.svg">resources/icons/errands-theme-system.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-theme-light.svg">resources/icons/errands-theme-light.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-theme-dark.svg">resources/icons/errands-theme-dark.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-sync.svg">resources/icons/errands-sync.svg</file>
   </gresource>
 </gresources>
