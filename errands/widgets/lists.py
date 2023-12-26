@@ -35,6 +35,12 @@ class Lists(Adw.Bin):
         def _add(*args):
             pass
 
+        def _backup_create(*args):
+            pass
+
+        def _backup_load(*args):
+            pass
+
         def _import(*args):
             def _confirm(dialog: Gtk.FileDialog, res):
                 try:
@@ -111,6 +117,8 @@ class Lists(Adw.Bin):
             dialog.open(self.window, None, _confirm)
 
         _create_action("add", _add)
+        _create_action("backup_create", _backup_create)
+        _create_action("backup_load", _backup_load)
         _create_action("import", _import)
 
     def _build_ui(self):
@@ -132,6 +140,10 @@ class Lists(Adw.Bin):
         menu: Gio.Menu = Gio.Menu.new()
         top_section = Gio.Menu.new()
         top_section.append(_("Sync / Fetch Tasks"), "app.sync")  # type:ignore
+        backup_submenu = Gio.Menu.new()
+        backup_submenu.append(_("Create"), "lists.backup_create")  # type:ignore
+        backup_submenu.append(_("Load"), "lists.backup_load")  # type:ignore
+        # top_section.append_submenu(_("Backup"), backup_submenu)  # type:ignore
         menu.append_section(None, top_section)
         bottom_section = Gio.Menu.new()
         bottom_section.append(_("Preferences"), "app.preferences")  # type:ignore

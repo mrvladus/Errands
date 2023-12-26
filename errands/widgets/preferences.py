@@ -107,6 +107,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
         self.test_connection_row.add_suffix(test_btn)
         self.test_connection_row.set_activatable_widget(test_btn)
         sync_group.add(self.test_connection_row)
+
         # Page
         page = Adw.PreferencesPage()
         page.add(theme_group)
