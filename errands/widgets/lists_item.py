@@ -3,6 +3,7 @@
 
 from datetime import datetime
 from icalendar import Calendar, Todo
+from errands.utils.functions import get_children
 from errands.widgets.components.box import Box
 from gi.repository import Adw, Gtk, Gio, GObject
 from errands.utils.data import UserData
@@ -51,6 +52,11 @@ class ListItem(Gtk.ListBoxRow):
                 else:
                     self.window.stack.set_visible_child_name("status")
                     self.lists.status_page.set_visible(True)
+
+                # Remove items from trash
+                for item in get_children(self.window.trash.trash_list):
+                    if item.task_widget.list_uid == self.uid:
+                        self.window.trash.trash_list.remove(item)
 
                 Sync.sync()
 
