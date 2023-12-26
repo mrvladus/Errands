@@ -2,7 +2,45 @@
 # SPDX-License-Identifier: MIT
 
 import datetime
-from gi.repository import Adw, Gtk, GLib, Gdk, GObject
+from typing import Callable
+from gi.repository import Gtk, Adw, GObject, GLib
+
+
+class Box(Gtk.Box):
+    """
+    Gtk.Box with multiple children provided in list.
+    """
+
+    def __init__(self, children: list[Gtk.Widget], **kwargs):
+        super().__init__(**kwargs)
+        for child in children:
+            self.append(child)
+
+
+class Button(Gtk.Button):
+    """
+    Gtk.Button which takes arguments: label, icon and callback for "clicked" signal.
+    """
+
+    def __init__(
+        self,
+        label: str = None,
+        icon_name: str = None,
+        on_click: Callable = None,
+        **kwargs,
+    ):
+        super().__init__(**kwargs)
+        content = Adw.ButtonContent()
+        if icon_name:
+            content.set_icon_name(icon_name)
+        if label:
+            content.set_label(label)
+        if on_click:
+            self.connect("clicked", on_click)
+        if icon_name:
+            self.set_child(content)
+        else:
+            self.set_label(label)
 
 
 class DateTime(Gtk.Box):

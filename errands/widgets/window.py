@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 from __main__ import VERSION, APP_ID
-from errands.widgets.components.box import Box
+from errands.widgets.components import Box
 from errands.widgets.trash import Trash
 from gi.repository import Gio, Adw, Gtk
 from errands.widgets.lists import Lists

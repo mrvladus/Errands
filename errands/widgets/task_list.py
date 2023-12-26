@@ -1,7 +1,7 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-from errands.widgets.components.box import Box
+from errands.widgets.components import Box
 from gi.repository import Adw, Gtk, GLib, GObject
 from errands.utils.animation import scroll
 from errands.utils.gsettings import GSettings

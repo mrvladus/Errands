@@ -2,8 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 from typing import Self
-from errands.widgets.components.box import Box
-from errands.widgets.components.button import Button
+from errands.widgets.components import Box, Button
 from gi.repository import Gtk, Adw, Gdk, GObject
 from errands.utils.sync import Sync
 from errands.utils.logging import Log

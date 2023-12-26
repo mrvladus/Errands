@@ -4,12 +4,9 @@
 from datetime import datetime
 from errands.utils.data import UserData
 from icalendar import Calendar, Event
-
 from errands.utils.functions import get_children
-from errands.widgets.components.box import Box
-from errands.widgets.components.button import Button
-from errands.widgets.components.datetime import DateTime
-from gi.repository import Adw, Gtk, GLib, Gdk, GObject
+from errands.widgets.components import Box, Button, DateTime
+from gi.repository import Adw, Gtk, Gdk, GObject
 from errands.utils.markup import Markup
 from errands.utils.sync import Sync
 from errands.utils.logging import Log
