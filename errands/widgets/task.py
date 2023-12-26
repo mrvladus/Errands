@@ -234,10 +234,11 @@ class Task(Gtk.Revealer):
             else ""
         )
 
-    def on_completed_btn_toggled(self, btn: Gtk.Button) -> None:
+    def on_completed_btn_toggled(self, btn: Gtk.ToggleButton) -> None:
         """
         Toggle check button and add style to the text
         """
+
         Log.info(f"Task: Set completed to '{btn.get_active()}'")
 
         def set_text():
@@ -249,7 +250,7 @@ class Task(Gtk.Revealer):
                 self.remove_css_class("task-completed")
             self.task_row.set_title(text)
 
-        # If task is just added set text and return to avoid useless sync
+        # If task is just added set text and return to avoid sync loop
         if self.just_added:
             set_text()
             return
@@ -259,23 +260,26 @@ class Task(Gtk.Revealer):
             ["completed", "synced", "percent_complete"],
             [btn.get_active(), False, 100 if btn.get_active() else 0],
         )
+        self.task_list.details.update_info(self)
+
+        if isinstance(self.parent, Task):
+            self.parent.update_status()
+
         # Update children
         children: list[Task] = get_children(self.tasks_list)
         for task in children:
             task.can_sync = False
             if btn.get_active():
                 task.completed_btn.set_active(True)
-        # Update status
-        self.parent.update_status()
-        self.task_list.details.update_info(self)
+            task.can_sync = True
+
         # Set text
         set_text()
+
         # Sync
         if self.can_sync:
-            Sync.sync()
             self.task_list.update_status()
-            for task in children:
-                task.can_sync = True
+            Sync.sync()
 
     def on_details_clicked(self, *args):
         self.task_list.details.update_info(self)

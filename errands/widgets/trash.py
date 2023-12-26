@@ -3,8 +3,7 @@
 
 from errands.utils.data import UserData
 from errands.utils.functions import get_children
-from errands.widgets.components.box import Box
-from errands.widgets.components.button import Button
+from errands.widgets.components import Box, Button
 from gi.repository import Adw, Gtk, GObject
 from errands.widgets.task import Task
 from errands.utils.sync import Sync

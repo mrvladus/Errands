@@ -22,12 +22,7 @@ class Sync:
         match GSettings.get("sync-provider"):
             case 0:
                 Log.info("Sync: Sync disabled")
-                # Clear deleted tasks and lists
-                if GSettings.get("sync-provider") == 0:
-                    UserData.run_sql(
-                        "DELETE FROM lists WHERE deleted = 1",
-                        "DELETE FROM tasks WHERE deleted = 1",
-                    )
+                UserData.clean_deleted()
             case 1:
                 self.provider = SyncProviderCalDAV("Nextcloud", self.window, testing)
             case 2:

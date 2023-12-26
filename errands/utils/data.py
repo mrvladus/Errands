@@ -106,15 +106,15 @@ class UserData:
 
     @classmethod
     def run_sql(cls, *cmds: list[str], fetch: bool = False) -> list[tuple] | None:
-        try:
-            with cls.connection:
-                cur = cls.connection.cursor()
-                for cmd in cmds:
-                    cur.execute(cmd)
-                cls.connection.commit()
-                return cur.fetchall() if fetch else None
-        except Exception as e:
-            Log.error(f"Data: {e}")
+        # try:
+        with cls.connection:
+            cur = cls.connection.cursor()
+            for cmd in cmds:
+                cur.execute(cmd)
+            cls.connection.commit()
+            return cur.fetchall() if fetch else None
+        # except Exception as e:
+        #     Log.error(f"Data: {e}")
 
     @classmethod
     def get_tasks_uids(cls, list_uid: str) -> list[str]:
