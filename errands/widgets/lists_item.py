@@ -126,6 +126,7 @@ class ListItem(Gtk.ListBoxRow):
 
                 tasks = UserData.get_tasks_as_dicts(self.uid)
                 calendar = Calendar()
+                calendar.add("x-wr-calname", self.label.get_label())
                 for task in tasks:
                     event = Todo()
                     event.add("uid", task["uid"])
@@ -147,7 +148,7 @@ class ListItem(Gtk.ListBoxRow):
                     )
                     if task["end_date"]:
                         event.add(
-                            "dtend",
+                            "due",
                             datetime.fromisoformat(task["end_date"])
                             if task["end_date"]
                             else datetime.now(),
