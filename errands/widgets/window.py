@@ -26,7 +26,7 @@ class Window(Adw.ApplicationWindow):
         self._build_ui()
         self.present()
         # Setup sync
-        Sync.init(window=self)
+        Sync.window = self
         Sync.sync()
 
     def _build_ui(self):
