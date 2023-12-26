@@ -199,7 +199,15 @@ class Lists(Adw.Bin):
 
     def add_list(self, name, uid) -> Gtk.ListBoxRow:
         task_list = TaskList(self.window, uid, self)
-        self.stack.add_titled(child=task_list, name=name, title=name)
+        page: Adw.ViewStackPage = self.stack.add_titled(
+            child=task_list, name=name, title=name
+        )
+        task_list.title.bind_property(
+            "title", page, "title", GObject.BindingFlags.SYNC_CREATE
+        )
+        task_list.title.bind_property(
+            "title", page, "name", GObject.BindingFlags.SYNC_CREATE
+        )
         row = ListItem(task_list, self.lists, self, self.window)
         self.lists.append(row)
         return row
@@ -248,6 +256,7 @@ class Lists(Adw.Bin):
         self.lists.unselect_all()
         self.stack.set_visible_child_name("trash")
         self.window.split_view.set_show_content(True)
+        self.window.split_view_inner.set_collapsed(True)
 
     def on_list_swiched(self, _, row: Gtk.ListBoxRow):
         if row:
@@ -256,6 +265,7 @@ class Lists(Adw.Bin):
             self.window.split_view.set_show_content(True)
             GSettings.set("last-open-list", "s", name)
             self.status_page.set_visible(False)
+        self.window.details.status.set_visible(True)
 
     def get_lists(self) -> list[TaskList]:
         lists: list[TaskList] = []
