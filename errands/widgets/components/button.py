@@ -7,7 +7,7 @@ from gi.repository import Gtk, Adw
 
 class Button(Gtk.Button):
     """
-    Button which takes as arguments: label, icon and callback for "clicked" signal.
+    Gtk.Button which takes arguments: label, icon and callback for "clicked" signal.
     """
 
     def __init__(
@@ -25,4 +25,7 @@ class Button(Gtk.Button):
             content.set_label(label)
         if on_click:
             self.connect("clicked", on_click)
-        self.set_child(content)
+        if icon_name:
+            self.set_child(content)
+        else:
+            self.set_label(label)

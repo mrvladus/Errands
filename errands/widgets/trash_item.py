@@ -20,22 +20,19 @@ class TrashItem(Adw.Bin):
     def build_ui(self):
         self.add_css_class("card")
         row = Adw.ActionRow(
-            title=UserData.get_prop(self.uid, "text"),
+            title=self.task_widget.get_prop("text"),
             css_classes=["rounded-corners"],
             height_request=60,
-            use_markup=True,
+            title_selectable=True,
         )
-        # row.bind_property(
-        #     "title",
-        #     self.task_widget.task_row,
-        #     "title",
-        #     GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
-        # )
-        row.bind_property(
-            "subtitle",
-            self.task_widget.task_list.title,
+        self.task_widget.task_row.connect(
+            "notify::title", lambda *_: row.set_title(self.task_widget.get_prop("text"))
+        )
+        self.task_widget.task_list.title.bind_property(
             "title",
-            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
+            row,
+            "subtitle",
+            GObject.BindingFlags.SYNC_CREATE,
         )
         row.add_suffix(
             Button(

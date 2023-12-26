@@ -188,7 +188,7 @@ class Lists(Adw.Bin):
     def add_list(self, name, uid) -> Gtk.ListBoxRow:
         task_list = TaskList(self.window, uid, self)
         self.stack.add_titled(child=task_list, name=name, title=name)
-        row = ListItem(name, uid, task_list, self.lists, self, self.window)
+        row = ListItem(task_list, self.lists, self, self.window)
         self.lists.append(row)
         return row
 
@@ -233,9 +233,10 @@ class Lists(Adw.Bin):
 
     def on_list_swiched(self, _, row: Gtk.ListBoxRow):
         if row:
-            self.stack.set_visible_child_name(row.name)
+            name = row.label.get_label()
+            self.stack.set_visible_child_name(name)
             self.window.split_view.set_show_content(True)
-            GSettings.set("last-open-list", "s", row.name)
+            GSettings.set("last-open-list", "s", name)
             self.status_page.set_visible(False)
 
     def get_lists(self) -> list[TaskList]:

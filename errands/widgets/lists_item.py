@@ -4,18 +4,17 @@
 from datetime import datetime
 from icalendar import Calendar, Todo
 from errands.widgets.components.box import Box
-from gi.repository import Adw, Gtk, Gio
+from gi.repository import Adw, Gtk, Gio, GObject
 from errands.utils.data import UserData
 from errands.utils.logging import Log
 from errands.utils.sync import Sync
 
 
 class ListItem(Gtk.ListBoxRow):
-    def __init__(self, name, uid, task_list, list_box, lists, window) -> None:
+    def __init__(self, task_list, list_box, lists, window) -> None:
         super().__init__()
-        self.name = name
-        self.uid = uid
         self.task_list = task_list
+        self.uid = task_list.list_uid
         self.window = window
         self.list_box = list_box
         self.lists = lists
@@ -90,7 +89,6 @@ class ListItem(Gtk.ListBoxRow):
                 page: Adw.ViewStackPage = self.window.stack.get_page(self.task_list)
                 page.set_name(text)
                 page.set_title(text)
-                self.name = text
                 Sync.sync()
 
             entry = Gtk.Entry(placeholder_text=_("New Name"))  # type:ignore
@@ -172,15 +170,16 @@ class ListItem(Gtk.ListBoxRow):
 
     def _build_ui(self):
         # Label
-        label = Gtk.Label(
-            label=self.name,
+        self.label = Gtk.Label(
             halign="start",
             hexpand=True,
             ellipsize=3,
         )
-        self.task_list.title.connect(
-            "notify::title",
-            lambda *_: label.set_label(self.task_list.title.get_title()),
+        self.task_list.title.bind_property(
+            "title",
+            self.label,
+            "label",
+            GObject.BindingFlags.SYNC_CREATE,
         )
         # Menu
         menu: Gio.Menu = Gio.Menu.new()
@@ -194,7 +193,7 @@ class ListItem(Gtk.ListBoxRow):
         self.set_child(
             Box(
                 children=[
-                    label,
+                    self.label,
                     Gtk.MenuButton(
                         menu_model=menu,
                         icon_name="view-more-symbolic",
@@ -206,5 +205,5 @@ class ListItem(Gtk.ListBoxRow):
         )
 
     def on_click(self, *args):
-        self.window.stack.set_visible_child_name(self.name)
+        self.window.stack.set_visible_child_name(self.label.get_label())
         self.window.split_view.set_show_content(True)
