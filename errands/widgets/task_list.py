@@ -368,7 +368,7 @@ class TaskList(Adw.Bin):
             if not self.scrolling or not self.dnd_ctrl.contains_pointer():
                 return False
             adj = self.scrl.get_vadjustment()
-            adj.set_value(adj.get_value() + (2 if scroll_up else -2))
+            adj.set_value(adj.get_value() - (2 if scroll_up else -2))
             return True
 
         MARGIN: int = 50
