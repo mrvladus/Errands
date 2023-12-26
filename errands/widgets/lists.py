@@ -205,7 +205,12 @@ class Lists(Adw.Bin):
         return row
 
     def on_add_btn_clicked(self, btn):
-        def entry_changed(entry, _, dialog):
+        def _entry_activated(_, dialog):
+            if dialog.get_response_enabled("add"):
+                dialog.response("add")
+                dialog.close()
+
+        def _entry_changed(entry, _, dialog):
             text = entry.props.text.strip(" \n\t")
             names = [i["name"] for i in UserData.get_lists_as_dicts()]
             dialog.set_response_enabled("add", text and text not in names)
@@ -235,7 +240,8 @@ class Lists(Adw.Bin):
         dialog.set_response_enabled("add", False)
         dialog.set_response_appearance("add", Adw.ResponseAppearance.SUGGESTED)
         dialog.connect("response", _confirm, entry)
-        entry.connect("notify::text", entry_changed, dialog)
+        entry.connect("activate", _entry_activated, dialog)
+        entry.connect("notify::text", _entry_changed, dialog)
         dialog.present()
 
     def on_trash_btn_clicked(self, _btn):
@@ -370,7 +376,12 @@ class ListItem(Gtk.ListBoxRow):
             dialog.present()
 
         def _rename(*args):
-            def entry_changed(entry, _, dialog):
+            def _entry_activated(_, dialog):
+                if dialog.get_response_enabled("save"):
+                    dialog.response("save")
+                    dialog.close()
+
+            def _entry_changed(entry, _, dialog):
                 text = entry.props.text.strip(" \n\t")
                 names = [i["name"] for i in UserData.get_lists_as_dicts()]
                 dialog.set_response_enabled("save", text and text not in names)
@@ -406,7 +417,8 @@ class ListItem(Gtk.ListBoxRow):
             dialog.set_response_enabled("save", False)
             dialog.set_response_appearance("save", Adw.ResponseAppearance.SUGGESTED)
             dialog.connect("response", _confirm, entry)
-            entry.connect("notify::text", entry_changed, dialog)
+            entry.connect("activate", _entry_activated, dialog)
+            entry.connect("notify::text", _entry_changed, dialog)
             dialog.present()
 
         def _export(*args):
