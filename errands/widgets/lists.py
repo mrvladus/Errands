@@ -414,6 +414,7 @@ class ListItem(Gtk.ListBoxRow):
                 Sync.sync()
 
             entry = Gtk.Entry(placeholder_text=_("New Name"))  # type:ignore
+            entry.get_buffer().props.text = self.label.get_label()
             dialog = Adw.MessageDialog(
                 transient_for=self.window,
                 hide_on_close=True,
