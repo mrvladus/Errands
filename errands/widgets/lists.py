@@ -256,7 +256,7 @@ class Lists(Adw.Bin):
         self.lists.unselect_all()
         self.stack.set_visible_child_name("trash")
         self.window.split_view.set_show_content(True)
-        self.window.split_view_inner.set_collapsed(True)
+        self.window.split_view_inner.set_show_sidebar(False)
 
     def on_list_swiched(self, _, row: Gtk.ListBoxRow):
         if row:
