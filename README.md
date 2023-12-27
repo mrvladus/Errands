@@ -40,7 +40,7 @@ Errands is available as a Flatpak on Flathub:
 
 ### Report a bug
 - Make sure you are using latest version from [flathub](https://flathub.org/apps/details/io.github.mrvladus.List).
-- See the log file at `~/.var/app/io.github.mrvladus.List/data/list/log.txt` if it has any errors.
+- See the log file at `~/.var/app/io.github.mrvladus.List/data/errands/log.txt` if it has any errors.
 - If there is no errors in log file, then launch app from terminal with `flatpak run io.github.mrvladus.List` and copy the output.
 - Create new issue.
 - Add steps to reproduce the bug if needed.
