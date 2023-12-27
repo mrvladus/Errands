@@ -73,6 +73,13 @@
           <li>Accessebility improvements</li>
           <li>Tweaked accent colors for better contrast with dark mode</li>
         </ul>
+        <p>Translations:</p>
+        <ul>
+          <li>Added Simplified Chinese translation (Petalzu)</li>
+          <li>Updated German translation (Milo Ivir, Philipp Kiemle)</li>
+          <li>Updated Croatian translation (Milo Ivir)</li>
+          <li>Updated Spanish translation (Sergio Varela)</li>
+        </ul>
       </description>
     </release>
     <release version="45.0.6" date="2023-11-30">
