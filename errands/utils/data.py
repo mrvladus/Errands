@@ -233,7 +233,7 @@ class UserData:
         shutil.rmtree(old_path, True)
         # If sync is enabled
         if GSettings.get("sync-provider") != 0:
-            uid = cls.add_list(GSettings.get("sync-cal-name"))
+            uid = cls.add_list(GSettings.get("sync-cal-name"), synced=True)
             GSettings.set("sync-cal-name", "s", "")
         # If sync is disabled
         else:
