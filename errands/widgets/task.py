@@ -162,10 +162,11 @@ class Task(Gtk.Revealer):
             )
         )
 
-    def add_task(self, uid: str) -> None:
+    def add_task(self, uid: str) -> Self:
         new_task = Task(uid, self.list_uid, self.window, self.task_list, self, True)
         self.tasks_list.append(new_task)
         new_task.toggle_visibility(not new_task.get_prop("trash"))
+        return new_task
 
     def add_sub_tasks(self) -> None:
         subs = UserData.get_sub_tasks_uids(self.list_uid, self.uid)
@@ -362,6 +363,7 @@ class Task(Gtk.Revealer):
         self.parent.tasks_list.reorder_child_after(new_task, self)
         self.parent.tasks_list.reorder_child_after(self, new_task)
         new_task.toggle_visibility(True)
+        self.details.update_info(new_task)
         # Update status
         self.parent.update_status()
         task.parent.update_status()
@@ -394,7 +396,8 @@ class Task(Gtk.Revealer):
         # Remove old task
         task.purge()
         # Add new sub-task
-        self.add_task(task.uid)
+        new_task = self.add_task(task.uid)
+        self.details.update_info(new_task)
         self.update_props(["completed"], [False])
         self.just_added = True
         self.completed_btn.set_active(False)
