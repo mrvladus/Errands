@@ -94,7 +94,7 @@ class Details(Adw.Bin):
         # Copy button
         edit_group.set_header_suffix(
             Button(
-                icon_name="errands-copy",
+                icon_name="errands-copy-symbolic",
                 on_click=self.on_copy_text_clicked,
                 valign="center",
                 css_classes=["flat"],
@@ -144,7 +144,7 @@ class Details(Adw.Bin):
         self.start_datetime_row.add_suffix(
             Gtk.MenuButton(
                 valign="center",
-                icon_name="errands-calendar",
+                icon_name="errands-calendar-symbolic",
                 tooltip_text=_("Set Date"),  # type:ignore
                 popover=Gtk.Popover(child=self.start_datetime),
                 css_classes=["flat"],
@@ -161,7 +161,7 @@ class Details(Adw.Bin):
         self.end_datetime_row.add_suffix(
             Gtk.MenuButton(
                 valign="center",
-                icon_name="errands-calendar",
+                icon_name="errands-calendar-symbolic",
                 tooltip_text=_("Set Date"),  # type:ignore
                 popover=Gtk.Popover(child=self.end_datetime),
                 css_classes=["flat"],
@@ -197,7 +197,7 @@ class Details(Adw.Bin):
         # Export group
         misc_group = Adw.PreferencesGroup(title=_("Export"))  # type:ignore
         open_cal_btn = Button(
-            icon_name="errands-share",
+            icon_name="errands-share-symbolic",
             on_click=self.on_export,
             valign="center",
             css_classes=["flat"],

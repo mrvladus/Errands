@@ -93,7 +93,7 @@ class Task(Gtk.Revealer):
         self.task_row.add_prefix(self.completed_btn)
         # Expand button
         self.expand_btn = Button(
-            icon_name="errands-up",
+            icon_name="errands-up-symbolic",
             on_click=lambda *_: self.expand(
                 not self.sub_tasks_revealer.get_child_revealed()
             ),
@@ -134,7 +134,7 @@ class Task(Gtk.Revealer):
         )
         sub_tasks_entry.connect("activate", self.on_sub_task_added)
         # Sub-tasks
-        self.tasks_list = Gtk.Box(orientation="vertical", css_classes=["sub-tasks"])
+        self.tasks_list = Box(orientation="vertical", css_classes=["sub-tasks"])
         # Sub-tasks revealer
         self.sub_tasks_revealer = Gtk.Revealer(
             child=Box(

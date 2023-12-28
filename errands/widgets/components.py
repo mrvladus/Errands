@@ -3,6 +3,7 @@
 
 import datetime
 from typing import Callable
+from errands.utils.functions import get_children
 from gi.repository import Gtk, Adw, GObject, GLib
 
 
@@ -11,10 +12,15 @@ class Box(Gtk.Box):
     Gtk.Box with multiple children provided in list.
     """
 
-    def __init__(self, children: list[Gtk.Widget], **kwargs):
+    def __init__(self, children: list[Gtk.Widget] = [], **kwargs):
         super().__init__(**kwargs)
         for child in children:
             self.append(child)
+
+    def for_each(self, callback: Callable):
+        """Call function for each child as argument"""
+        for child in get_children(self):
+            callback(child)
 
 
 class Button(Gtk.Button):

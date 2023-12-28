@@ -39,7 +39,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
         self.theme_system_btn.connect("toggled", self.on_theme_change, 0)
         theme_system_row = Adw.ActionRow(
             title=_("System"),  # type:ignore
-            icon_name="errands-theme-system",
+            icon_name="errands-theme-system-symbolic",
         )
         theme_system_row.add_suffix(self.theme_system_btn)
         theme_system_row.set_activatable_widget(self.theme_system_btn)
@@ -49,7 +49,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
         self.theme_light_btn.connect("toggled", self.on_theme_change, 1)
         theme_light_row = Adw.ActionRow(
             title=_("Light"),  # type:ignore
-            icon_name="errands-theme-light",
+            icon_name="errands-theme-light-symbolic",
         )
         theme_light_row.add_suffix(self.theme_light_btn)
         theme_light_row.set_activatable_widget(self.theme_light_btn)
@@ -59,7 +59,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
         self.theme_dark_btn.connect("toggled", self.on_theme_change, 4)
         theme_dark_row = Adw.ActionRow(
             title=_("Dark"),  # type:ignore
-            icon_name="errands-theme-dark",
+            icon_name="errands-theme-dark-symbolic",
         )
         theme_dark_row.add_suffix(self.theme_dark_btn)
         theme_dark_row.set_activatable_widget(self.theme_dark_btn)
@@ -75,7 +75,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
         self.sync_providers = Adw.ComboRow(
             title=_("Sync Provider"),  # type:ignore
             model=model,
-            icon_name="errands-sync",
+            icon_name="errands-sync-symbolic",
         )
         self.sync_providers.connect("notify::selected", self.on_sync_provider_selected)
         sync_group.add(self.sync_providers)
