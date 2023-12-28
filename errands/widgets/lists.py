@@ -173,7 +173,7 @@ class Lists(Adw.Bin):
         # Trash button
         self.trash_btn = Gtk.Button(
             child=Adw.ButtonContent(
-                icon_name="user-trash-symbolic",
+                icon_name="errands-trash-symbolic",
                 label=_("Trash"),  # type:ignore
                 halign="center",
             ),

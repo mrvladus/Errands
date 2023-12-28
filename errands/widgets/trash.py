@@ -25,7 +25,7 @@ class Trash(Adw.Bin):
         )
         # Clear button
         clear_btn = Button(
-            icon_name="user-trash-full-symbolic",
+            icon_name="errands-trash-symbolic",
             on_click=self.on_trash_clear,
             valign="center",
             tooltip_text=_("Clear"),  # type:ignore
@@ -41,7 +41,7 @@ class Trash(Adw.Bin):
         hb.pack_end(restore_btn)
         # Status
         self.status = Adw.StatusPage(
-            icon_name="user-trash-symbolic",
+            icon_name="errands-trash-symbolic",
             title=_("Empty Trash"),  # type:ignore
             description=_("No deleted items"),  # type:ignore
             vexpand=True,

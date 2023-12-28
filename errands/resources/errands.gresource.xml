@@ -15,5 +15,7 @@
     <file preprocess="xml-stripblanks" alias="errands-theme-light.svg">resources/icons/errands-theme-light.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-theme-dark.svg">resources/icons/errands-theme-dark.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-sync.svg">resources/icons/errands-sync.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-info-symbolic.svg">resources/icons/errands-info-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-trash-symbolic.svg">resources/icons/errands-trash-symbolic.svg</file>
   </gresource>
 </gresources>

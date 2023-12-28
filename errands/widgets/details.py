@@ -39,7 +39,7 @@ class Details(Adw.Bin):
         hb.pack_start(back_btn)
         # Delete button
         delete_btn = Button(
-            icon_name="user-trash-symbolic",
+            icon_name="errands-trash-symbolic",
             on_click=self.on_delete_btn_clicked,
             tooltip_text=_("Delete"),  # type:ignore
         )
@@ -54,7 +54,7 @@ class Details(Adw.Bin):
 
         # Status
         self.status = Adw.StatusPage(
-            icon_name="help-about-symbolic",
+            icon_name="errands-info-symbolic",
             visible=True,
             vexpand=True,
             title=_("No Details"),  # type:ignore
