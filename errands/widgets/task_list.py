@@ -330,12 +330,6 @@ class TaskList(Adw.Bin):
                         if t.uid == task_dict["parent"]:
                             t.add_task(task_dict["uid"])
 
-        # Update details
-        if self.details.parent not in self.get_all_tasks():
-            self.details.status.set_visible(True)
-        else:
-            self.details.update_info(self.details.parent)
-
     def on_delete_completed_btn_clicked(self, _) -> None:
         """
         Hide completed tasks and move them to trash

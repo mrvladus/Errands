@@ -321,6 +321,18 @@ class Lists(Adw.Bin):
         if len(lists) == 0:
             self.stack.set_visible_child_name("status")
 
+        # Update details
+        tasks = []
+        for list in self.get_lists():
+            tasks.extend(list.get_all_tasks())
+        if (
+            self.window.details.parent in tasks
+            and not self.window.details.parent.get_prop("trash")
+        ):
+            self.window.details.update_info(self.window.details.parent)
+        else:
+            self.window.details.status.set_visible(True)
+
 
 class ListItem(Gtk.ListBoxRow):
     def __init__(self, task_list, list_box, lists, window) -> None:

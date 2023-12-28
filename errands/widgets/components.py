@@ -106,7 +106,7 @@ class DateTime(Gtk.Box):
         )  # type:ignore
         clear_btn.connect("clicked", self._on_clear_btn_clicked)
         # Buttons box
-        btns_box = Gtk.Box(css_classes=["toolbar"], hexpand=True)
+        btns_box = Box(children=[], css_classes=["toolbar"], hexpand=True)
         btns_box.append(now_btn)
         btns_box.append(clear_btn)
         self.append(btns_box)
