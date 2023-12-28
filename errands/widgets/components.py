@@ -76,40 +76,58 @@ class DateTime(Gtk.Box):
         )
         self.minutes.connect("value-changed", self._on_date_time_changed)
         # Time box
-        time_box = Gtk.Box(css_classes=["toolbar"], halign="center")
-        time_box.append(self.hour)
-        time_box.append(Gtk.Label(label=":"))
-        time_box.append(self.minutes)
-        self.append(time_box)
+        self.append(
+            Box(
+                children=[
+                    self.hour,
+                    Gtk.Label(label=":"),
+                    self.minutes,
+                    Button(
+                        label=_("Now"),  # type:ignore
+                        on_click=self._on_now_btn_clicked,
+                        hexpand=True,
+                    ),
+                ],
+                css_classes=["toolbar"],
+                halign="center",
+            )
+        )
         # Calendar
         self.calendar = Gtk.Calendar()
         self.calendar.connect("day-selected", self._on_date_time_changed)
         self.append(self.calendar)
-        # Now button
-        now_btn = Gtk.Button(
-            child=Adw.ButtonContent(
-                icon_name="errands-today",
-                label=_("Now"),  # type:ignore
-            ),
-            css_classes=["flat"],
-            hexpand=True,
-        )
-        now_btn.connect("clicked", self._on_now_btn_clicked)
-        # Reset button
-        clear_btn = Gtk.Button(
-            child=Adw.ButtonContent(
-                icon_name="edit-clear-all-symbolic",
-                label=_("Clear"),  # type:ignore
-            ),
-            css_classes=["flat"],
-            hexpand=True,
-        )  # type:ignore
-        clear_btn.connect("clicked", self._on_clear_btn_clicked)
         # Buttons box
-        btns_box = Box(children=[], css_classes=["toolbar"], hexpand=True)
-        btns_box.append(now_btn)
-        btns_box.append(clear_btn)
-        self.append(btns_box)
+        self.append(
+            Box(
+                children=[
+                    Button(
+                        label=_("Today"),  # type:ignore
+                        on_click=self._on_today_btn_clicked,
+                        hexpand=True,
+                    ),
+                    Button(
+                        label=_("Tomorrow"),  # type:ignore
+                        on_click=self._on_tomorrow_btn_clicked,
+                        hexpand=True,
+                    ),
+                ],
+                css_classes=["toolbar"],
+                hexpand=True,
+            )
+        )
+        self.append(
+            Box(
+                children=[
+                    Button(
+                        label=_("Clear"),  # type:ignore
+                        on_click=self._on_clear_btn_clicked,
+                        hexpand=True,
+                    )
+                ],
+                css_classes=["toolbar"],
+                hexpand=True,
+            )
+        )
 
     def _on_date_time_changed(self, *_args):
         # Get hour
@@ -127,6 +145,16 @@ class DateTime(Gtk.Box):
 
     def _on_now_btn_clicked(self, _btn):
         self.set_datetime(datetime.datetime.now().strftime("%Y%m%dT%H%M00"))
+        self.emit("changed")
+
+    def _on_today_btn_clicked(self, _btn):
+        self.set_datetime(datetime.datetime.now().strftime("%Y%m%dT000000"))
+        self.emit("changed")
+
+    def _on_tomorrow_btn_clicked(self, _btn):
+        self.set_datetime(
+            (datetime.datetime.now() + datetime.timedelta(1)).strftime("%Y%m%dT000000")
+        )
         self.emit("changed")
 
     def _on_clear_btn_clicked(self, _btn):
