@@ -104,33 +104,35 @@ class Details(Adw.Bin):
         # Edit entry
         self.edit_entry = Gtk.TextBuffer()
         self.edit_entry.connect("changed", lambda *_: self.save_btn.set_sensitive(True))
-        edit_view = Gtk.TextView(
-            height_request=55,
-            top_margin=12,
-            bottom_margin=12,
-            left_margin=12,
-            right_margin=12,
-            buffer=self.edit_entry,
+        edit_group.add(
+            Gtk.TextView(
+                height_request=55,
+                top_margin=12,
+                bottom_margin=12,
+                left_margin=12,
+                right_margin=12,
+                buffer=self.edit_entry,
+                css_classes=["card"],
+            )
         )
-        edit_view.add_css_class("card")
-        edit_group.add(edit_view)
 
         # Notes group
         notes_group = Adw.PreferencesGroup(title=_("Notes"))  # type:ignore
         # Notes entry
         self.notes = Gtk.TextBuffer()
         self.notes.connect("changed", lambda *_: self.save_btn.set_sensitive(True))
-        notes_view = Gtk.TextView(
-            height_request=100,
-            top_margin=12,
-            bottom_margin=12,
-            left_margin=12,
-            right_margin=12,
-            buffer=self.notes,
-            wrap_mode=3,
+        notes_group.add(
+            Gtk.TextView(
+                height_request=100,
+                top_margin=12,
+                bottom_margin=12,
+                left_margin=12,
+                right_margin=12,
+                buffer=self.notes,
+                wrap_mode=3,
+                css_classes=["card"],
+            )
         )
-        notes_view.add_css_class("card")
-        notes_group.add(notes_view)
 
         # Properties group
         props_group = Adw.PreferencesGroup(title=_("Properties"))  # type:ignore
