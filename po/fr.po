@@ -37,7 +37,7 @@ msgstr "Aucun détail"
 #. type:ignore
 #: errands/widgets/details.py:61
 msgid "Click on task to show more info"
-msgstr "Cliquez sur la tâche pour afficher plus d’informations"
+msgstr "Cliquez sur une tâche pour afficher plus d’informations"
 
 #: errands/widgets/details.py:84
 msgid "Clear Style"
@@ -125,7 +125,7 @@ msgstr "Maintenant"
 
 #: errands/widgets/components.py:96 errands/widgets/trash.py:31
 msgid "Clear"
-msgstr "Vider"
+msgstr "Effacer"
 
 #: errands/widgets/lists.py:111
 msgid "Imported"
