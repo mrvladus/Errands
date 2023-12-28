@@ -59,6 +59,20 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="45.1.1" date="2023-12-28">
+      <description translatable="no">
+        <p>Fixed:</p>
+        <ul>
+          <li>Typos</li>
+          <li>Icons in dark style</li>
+          <li>Tags sync</li>
+        </ul>
+        <p>Translations:</p>
+        <ul>
+          <li>Updated Italian translation (Albano Battistella)</li>
+        </ul>
+      </description>
+    </release>
     <release version="45.1" date="2023-12-27">
       <description translatable="no">
         <p>It's a BIG update!</p>
