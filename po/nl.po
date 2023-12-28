@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-27 15:32+0300\n"
+"POT-Creation-Date: 2023-12-28 11:15+0300\n"
 "PO-Revision-Date: 2023-09-19 17:14+0200\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: \n"
@@ -19,12 +19,12 @@ msgstr ""
 
 #. type:ignore
 #: errands/widgets/details.py:44 errands/widgets/lists.py:383
-#: errands/widgets/lists.py:511 errands/widgets/trash.py:147
+#: errands/widgets/lists.py:512 errands/widgets/trash.py:147
 msgid "Delete"
 msgstr "Verwĳderen"
 
 #. type:ignore
-#: errands/widgets/details.py:49 errands/widgets/lists.py:426
+#: errands/widgets/details.py:49 errands/widgets/lists.py:427
 msgid "Save"
 msgstr ""
 
@@ -67,12 +67,16 @@ msgstr ""
 msgid "Not Set"
 msgstr ""
 
-#: errands/widgets/details.py:140 errands/widgets/details.py:157
+#: errands/widgets/details.py:140
 msgid "Start"
 msgstr ""
 
 #: errands/widgets/details.py:148 errands/widgets/details.py:165
 msgid "Set Date"
+msgstr ""
+
+#: errands/widgets/details.py:157
+msgid "Due"
 msgstr ""
 
 #: errands/widgets/details.py:174
@@ -99,7 +103,7 @@ msgstr "Taak toevoegen"
 #. Export group
 #. type:ignore
 #: errands/widgets/details.py:198 errands/widgets/details.py:206
-#: errands/widgets/lists.py:512
+#: errands/widgets/lists.py:513
 #, fuzzy
 msgid "Export"
 msgstr "Taken exporteren"
@@ -114,7 +118,7 @@ msgid "Copied to Clipboard"
 msgstr "Gekopieerd naar het klembord"
 
 #. type:ignore
-#: errands/widgets/details.py:407 errands/widgets/lists.py:482
+#: errands/widgets/details.py:407 errands/widgets/lists.py:483
 #, fuzzy
 msgid "Exported"
 msgstr "Exporteren voltooid"
@@ -190,7 +194,7 @@ msgid "New List Name"
 msgstr ""
 
 #: errands/widgets/lists.py:246 errands/widgets/lists.py:382
-#: errands/widgets/lists.py:425 errands/widgets/trash.py:146
+#: errands/widgets/lists.py:426 errands/widgets/trash.py:146
 msgid "Cancel"
 msgstr "Annuleren"
 
@@ -213,20 +217,20 @@ msgstr "De taken worden permanent verwĳderd."
 msgid "New Name"
 msgstr ""
 
-#: errands/widgets/lists.py:420
+#: errands/widgets/lists.py:421
 msgid "Rename List"
 msgstr ""
 
-#: errands/widgets/lists.py:480
+#: errands/widgets/lists.py:481
 #, fuzzy
 msgid "Export failed"
 msgstr "Exporteren voltooid"
 
-#: errands/widgets/lists.py:510
+#: errands/widgets/lists.py:511
 msgid "Rename"
 msgstr ""
 
-#: errands/widgets/lists.py:524
+#: errands/widgets/lists.py:525
 msgid "Menu"
 msgstr "Menu"
 
@@ -304,7 +308,7 @@ msgstr "Omhoog schuiven"
 msgid "Add new Task"
 msgstr "Taak toevoegen"
 
-#: errands/widgets/task_list.py:274 errands/widgets/task.py:233
+#: errands/widgets/task_list.py:274 errands/widgets/task.py:234
 msgid "Completed:"
 msgstr "Afgerond:"
 
@@ -346,19 +350,21 @@ msgstr "De taken worden permanent verwĳderd."
 msgid "Restore"
 msgstr "Herstellen"
 
-#: errands/widgets/window.py:66 errands/widgets/window.py:85
-msgid "No Task Lists"
-msgstr ""
-
-#: errands/widgets/window.py:128 data/io.github.mrvladus.List.desktop.in.in:3
+#: errands/widgets/window.py:19 errands/widgets/window.py:129
+#: data/io.github.mrvladus.List.desktop.in.in:3
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:38
 msgid "Errands"
 msgstr "Boodschappen"
 
-#: errands/widgets/window.py:133
+#: errands/widgets/window.py:67 errands/widgets/window.py:86
+msgid "No Task Lists"
+msgstr ""
+
+#: errands/widgets/window.py:134
 msgid "translator-credits"
 msgstr "Heimen Stoffels <vistausss@fastmail.com>"
 
-#: errands/widgets/window.py:141
+#: errands/widgets/window.py:142
 msgid "Sync is disabled"
 msgstr ""
 

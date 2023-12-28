@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-27 15:32+0300\n"
+"POT-Creation-Date: 2023-12-28 11:15+0300\n"
 "PO-Revision-Date: 2023-07-07 16:56+0300\n"
 "Last-Translator: Vlad Krupinskii <mrvladus@yandex.ru>\n"
 "Language-Team: \n"
@@ -21,12 +21,12 @@ msgstr ""
 
 #. type:ignore
 #: errands/widgets/details.py:44 errands/widgets/lists.py:383
-#: errands/widgets/lists.py:511 errands/widgets/trash.py:147
+#: errands/widgets/lists.py:512 errands/widgets/trash.py:147
 msgid "Delete"
 msgstr "Удалить"
 
 #. type:ignore
-#: errands/widgets/details.py:49 errands/widgets/lists.py:426
+#: errands/widgets/details.py:49 errands/widgets/lists.py:427
 msgid "Save"
 msgstr "Сохранить"
 
@@ -37,7 +37,7 @@ msgstr "Нет подробностей"
 #. type:ignore
 #: errands/widgets/details.py:61
 msgid "Click on task to show more info"
-msgstr "Кликните на задачу чтобы показать больше информации"
+msgstr "Кликните на задачу, чтобы показать больше информации"
 
 #: errands/widgets/details.py:84
 msgid "Clear Style"
@@ -67,13 +67,17 @@ msgstr "Свойства"
 msgid "Not Set"
 msgstr "Не задано"
 
-#: errands/widgets/details.py:140 errands/widgets/details.py:157
+#: errands/widgets/details.py:140
 msgid "Start"
 msgstr "Начало"
 
 #: errands/widgets/details.py:148 errands/widgets/details.py:165
 msgid "Set Date"
 msgstr "Задать дату"
+
+#: errands/widgets/details.py:157
+msgid "Due"
+msgstr ""
 
 #: errands/widgets/details.py:174
 msgid "Complete %"
@@ -97,7 +101,7 @@ msgstr "Добавить метку"
 #. Export group
 #. type:ignore
 #: errands/widgets/details.py:198 errands/widgets/details.py:206
-#: errands/widgets/lists.py:512
+#: errands/widgets/lists.py:513
 msgid "Export"
 msgstr "Экспорт"
 
@@ -111,7 +115,7 @@ msgid "Copied to Clipboard"
 msgstr "Скопировано в буфер обмена"
 
 #. type:ignore
-#: errands/widgets/details.py:407 errands/widgets/lists.py:482
+#: errands/widgets/details.py:407 errands/widgets/lists.py:483
 msgid "Exported"
 msgstr "Экспортировано"
 
@@ -182,7 +186,7 @@ msgid "New List Name"
 msgstr "Новое имя списка"
 
 #: errands/widgets/lists.py:246 errands/widgets/lists.py:382
-#: errands/widgets/lists.py:425 errands/widgets/trash.py:146
+#: errands/widgets/lists.py:426 errands/widgets/trash.py:146
 msgid "Cancel"
 msgstr "Отмена"
 
@@ -204,19 +208,19 @@ msgstr "Список будет безвозвратно удален"
 msgid "New Name"
 msgstr "Новое имя"
 
-#: errands/widgets/lists.py:420
+#: errands/widgets/lists.py:421
 msgid "Rename List"
 msgstr "Переименовать список"
 
-#: errands/widgets/lists.py:480
+#: errands/widgets/lists.py:481
 msgid "Export failed"
 msgstr "Экспорт не удался"
 
-#: errands/widgets/lists.py:510
+#: errands/widgets/lists.py:511
 msgid "Rename"
 msgstr "Переименовать"
 
-#: errands/widgets/lists.py:524
+#: errands/widgets/lists.py:525
 msgid "Menu"
 msgstr "Меню"
 
@@ -292,7 +296,7 @@ msgstr "Прокрутить вверх"
 msgid "Add new Task"
 msgstr "Добавьте задачу"
 
-#: errands/widgets/task_list.py:274 errands/widgets/task.py:233
+#: errands/widgets/task_list.py:274 errands/widgets/task.py:234
 msgid "Completed:"
 msgstr "Выполнено:"
 
@@ -334,19 +338,21 @@ msgstr "Задачи будут безвозвратно удалены"
 msgid "Restore"
 msgstr "Восстановить"
 
-#: errands/widgets/window.py:66 errands/widgets/window.py:85
-msgid "No Task Lists"
-msgstr "Нет списков задач"
-
-#: errands/widgets/window.py:128 data/io.github.mrvladus.List.desktop.in.in:3
+#: errands/widgets/window.py:19 errands/widgets/window.py:129
+#: data/io.github.mrvladus.List.desktop.in.in:3
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:38
 msgid "Errands"
 msgstr "Дела"
 
-#: errands/widgets/window.py:133
+#: errands/widgets/window.py:67 errands/widgets/window.py:86
+msgid "No Task Lists"
+msgstr "Нет списков задач"
+
+#: errands/widgets/window.py:134
 msgid "translator-credits"
 msgstr "Vlad Krupinski <mrvladus@yandex.ru>"
 
-#: errands/widgets/window.py:141
+#: errands/widgets/window.py:142
 msgid "Sync is disabled"
 msgstr "Синхронизация отключена"
 
@@ -419,4 +425,3 @@ msgstr "Поддержка Drag and Drop"
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:50
 msgid "Import .ics files"
 msgstr "Импорт .ics файлов"
-

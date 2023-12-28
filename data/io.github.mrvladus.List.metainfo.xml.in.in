@@ -35,7 +35,7 @@
     <keyword>nextcloud</keyword>
     <keyword>caldav</keyword>
   </keywords>
-  <name translatable="no">Errands</name>
+  <name>Errands</name>
   <summary>Manage your tasks</summary>
   <description>
     <p>Todo application for those who prefer simplicity.</p>

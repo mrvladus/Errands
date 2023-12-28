@@ -16,6 +16,7 @@ from errands.utils.logging import Log
 class Window(Adw.ApplicationWindow):
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
+        self.set_title(_("Errands"))  # type:ignore
         # Remember window state
         GSettings.bind("width", self, "default_width")
         GSettings.bind("height", self, "default_height")

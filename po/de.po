@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-27 15:32+0300\n"
+"POT-Creation-Date: 2023-12-28 11:15+0300\n"
 "PO-Revision-Date: 2023-12-26 15:15+0100\n"
 "Last-Translator: Milo Ivir <mail@milotype.de>\n"
 "Language-Team: \n"
@@ -22,12 +22,12 @@ msgstr ""
 
 #. type:ignore
 #: errands/widgets/details.py:44 errands/widgets/lists.py:383
-#: errands/widgets/lists.py:511 errands/widgets/trash.py:147
+#: errands/widgets/lists.py:512 errands/widgets/trash.py:147
 msgid "Delete"
 msgstr "Löschen"
 
 #. type:ignore
-#: errands/widgets/details.py:49 errands/widgets/lists.py:426
+#: errands/widgets/details.py:49 errands/widgets/lists.py:427
 msgid "Save"
 msgstr "Speichern"
 
@@ -68,12 +68,16 @@ msgstr "Eigenschaften"
 msgid "Not Set"
 msgstr "Nicht gesetzt"
 
-#: errands/widgets/details.py:140 errands/widgets/details.py:157
+#: errands/widgets/details.py:140
 msgid "Start"
 msgstr "Start"
 
 #: errands/widgets/details.py:148 errands/widgets/details.py:165
 msgid "Set Date"
+msgstr ""
+
+#: errands/widgets/details.py:157
+msgid "Due"
 msgstr ""
 
 #: errands/widgets/details.py:174
@@ -98,7 +102,7 @@ msgstr "Markierung hinzufügen"
 #. Export group
 #. type:ignore
 #: errands/widgets/details.py:198 errands/widgets/details.py:206
-#: errands/widgets/lists.py:512
+#: errands/widgets/lists.py:513
 msgid "Export"
 msgstr "Exportieren"
 
@@ -112,7 +116,7 @@ msgid "Copied to Clipboard"
 msgstr "In Zwischenablage kopiert"
 
 #. type:ignore
-#: errands/widgets/details.py:407 errands/widgets/lists.py:482
+#: errands/widgets/details.py:407 errands/widgets/lists.py:483
 msgid "Exported"
 msgstr "Exportiert"
 
@@ -183,7 +187,7 @@ msgid "New List Name"
 msgstr "Name der neuen Liste"
 
 #: errands/widgets/lists.py:246 errands/widgets/lists.py:382
-#: errands/widgets/lists.py:425 errands/widgets/trash.py:146
+#: errands/widgets/lists.py:426 errands/widgets/trash.py:146
 msgid "Cancel"
 msgstr "Abbrechen"
 
@@ -205,20 +209,20 @@ msgstr "Die Liste wird un­wi­der­ruf­lich gelöscht"
 msgid "New Name"
 msgstr "Neuer Name"
 
-#: errands/widgets/lists.py:420
+#: errands/widgets/lists.py:421
 msgid "Rename List"
 msgstr "Liste umbenennen"
 
-#: errands/widgets/lists.py:480
+#: errands/widgets/lists.py:481
 #, fuzzy
 msgid "Export failed"
 msgstr "Exportiert"
 
-#: errands/widgets/lists.py:510
+#: errands/widgets/lists.py:511
 msgid "Rename"
 msgstr "Umbenennen"
 
-#: errands/widgets/lists.py:524
+#: errands/widgets/lists.py:525
 msgid "Menu"
 msgstr "Menü"
 
@@ -294,7 +298,7 @@ msgstr "Nach oben scrollen"
 msgid "Add new Task"
 msgstr "Neue Aufgabe hinzufügen"
 
-#: errands/widgets/task_list.py:274 errands/widgets/task.py:233
+#: errands/widgets/task_list.py:274 errands/widgets/task.py:234
 msgid "Completed:"
 msgstr "Abgeschlossen:"
 
@@ -336,22 +340,24 @@ msgstr "Aufgaben werden un­wi­der­ruf­lich gelöscht"
 msgid "Restore"
 msgstr "Wiederherstellen"
 
-#: errands/widgets/window.py:66 errands/widgets/window.py:85
-msgid "No Task Lists"
-msgstr "Keine Aufgabenlisten"
-
-#: errands/widgets/window.py:128 data/io.github.mrvladus.List.desktop.in.in:3
+#: errands/widgets/window.py:19 errands/widgets/window.py:129
+#: data/io.github.mrvladus.List.desktop.in.in:3
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:38
 msgid "Errands"
 msgstr "Errands"
 
-#: errands/widgets/window.py:133
+#: errands/widgets/window.py:67 errands/widgets/window.py:86
+msgid "No Task Lists"
+msgstr "Keine Aufgabenlisten"
+
+#: errands/widgets/window.py:134
 msgid "translator-credits"
 msgstr ""
 "Christoph Bähr\n"
 "Philipp Kiemle <philipp.kiemle@gmail.com>\n"
 "Milo Ivir <mail@milotype.de>"
 
-#: errands/widgets/window.py:141
+#: errands/widgets/window.py:142
 msgid "Sync is disabled"
 msgstr "Synchronisation ist deaktiviert"
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-27 15:32+0300\n"
+"POT-Creation-Date: 2023-12-28 11:15+0300\n"
 "PO-Revision-Date: 2023-12-25 22:29+0100\n"
 "Last-Translator: Milo Ivir <mail@milotype.de>\n"
 "Language-Team: \n"
@@ -21,12 +21,12 @@ msgstr ""
 
 #. type:ignore
 #: errands/widgets/details.py:44 errands/widgets/lists.py:383
-#: errands/widgets/lists.py:511 errands/widgets/trash.py:147
+#: errands/widgets/lists.py:512 errands/widgets/trash.py:147
 msgid "Delete"
 msgstr "Izbriši"
 
 #. type:ignore
-#: errands/widgets/details.py:49 errands/widgets/lists.py:426
+#: errands/widgets/details.py:49 errands/widgets/lists.py:427
 msgid "Save"
 msgstr "Spremi"
 
@@ -67,12 +67,16 @@ msgstr "Svojstva"
 msgid "Not Set"
 msgstr "Nije postavljeno"
 
-#: errands/widgets/details.py:140 errands/widgets/details.py:157
+#: errands/widgets/details.py:140
 msgid "Start"
 msgstr "Početak"
 
 #: errands/widgets/details.py:148 errands/widgets/details.py:165
 msgid "Set Date"
+msgstr ""
+
+#: errands/widgets/details.py:157
+msgid "Due"
 msgstr ""
 
 #: errands/widgets/details.py:174
@@ -97,7 +101,7 @@ msgstr "Dodaj oznaku"
 #. Export group
 #. type:ignore
 #: errands/widgets/details.py:198 errands/widgets/details.py:206
-#: errands/widgets/lists.py:512
+#: errands/widgets/lists.py:513
 msgid "Export"
 msgstr "Izvezi"
 
@@ -111,7 +115,7 @@ msgid "Copied to Clipboard"
 msgstr "Kopirano u međuspremnik"
 
 #. type:ignore
-#: errands/widgets/details.py:407 errands/widgets/lists.py:482
+#: errands/widgets/details.py:407 errands/widgets/lists.py:483
 msgid "Exported"
 msgstr "Izvezeno"
 
@@ -182,7 +186,7 @@ msgid "New List Name"
 msgstr "Ime novog popisa"
 
 #: errands/widgets/lists.py:246 errands/widgets/lists.py:382
-#: errands/widgets/lists.py:425 errands/widgets/trash.py:146
+#: errands/widgets/lists.py:426 errands/widgets/trash.py:146
 msgid "Cancel"
 msgstr "Odustani"
 
@@ -204,20 +208,20 @@ msgstr "Popis će se zauvijek izbrisati"
 msgid "New Name"
 msgstr "Novo ime"
 
-#: errands/widgets/lists.py:420
+#: errands/widgets/lists.py:421
 msgid "Rename List"
 msgstr "Preimenuj popis"
 
-#: errands/widgets/lists.py:480
+#: errands/widgets/lists.py:481
 #, fuzzy
 msgid "Export failed"
 msgstr "Izvezeno"
 
-#: errands/widgets/lists.py:510
+#: errands/widgets/lists.py:511
 msgid "Rename"
 msgstr "Preimenuj"
 
-#: errands/widgets/lists.py:524
+#: errands/widgets/lists.py:525
 msgid "Menu"
 msgstr "Izbornik"
 
@@ -293,7 +297,7 @@ msgstr "Klizni gore"
 msgid "Add new Task"
 msgstr "Dodaj novi zadatak"
 
-#: errands/widgets/task_list.py:274 errands/widgets/task.py:233
+#: errands/widgets/task_list.py:274 errands/widgets/task.py:234
 msgid "Completed:"
 msgstr "Dovršeno:"
 
@@ -335,19 +339,21 @@ msgstr "Zadaci će se zauvijek izbrisati"
 msgid "Restore"
 msgstr "Obnovi"
 
-#: errands/widgets/window.py:66 errands/widgets/window.py:85
-msgid "No Task Lists"
-msgstr "Nema popisa zadataka"
-
-#: errands/widgets/window.py:128 data/io.github.mrvladus.List.desktop.in.in:3
+#: errands/widgets/window.py:19 errands/widgets/window.py:129
+#: data/io.github.mrvladus.List.desktop.in.in:3
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:38
 msgid "Errands"
 msgstr "Errands"
 
-#: errands/widgets/window.py:133
+#: errands/widgets/window.py:67 errands/widgets/window.py:86
+msgid "No Task Lists"
+msgstr "Nema popisa zadataka"
+
+#: errands/widgets/window.py:134
 msgid "translator-credits"
 msgstr "Milo Ivir <mail@milotype.de>"
 
-#: errands/widgets/window.py:141
+#: errands/widgets/window.py:142
 msgid "Sync is disabled"
 msgstr "Sinkronizacija je deaktivirana"
 
