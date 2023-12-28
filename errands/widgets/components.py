@@ -82,11 +82,6 @@ class DateTime(Gtk.Box):
                     self.hour,
                     Gtk.Label(label=":"),
                     self.minutes,
-                    Button(
-                        label=_("Now"),  # type:ignore
-                        on_click=self._on_now_btn_clicked,
-                        hexpand=True,
-                    ),
                 ],
                 css_classes=["toolbar"],
                 halign="center",
@@ -112,20 +107,25 @@ class DateTime(Gtk.Box):
                     ),
                 ],
                 css_classes=["toolbar"],
-                hexpand=True,
+                homogeneous=True,
             )
         )
         self.append(
             Box(
                 children=[
                     Button(
+                        label=_("Now"),  # type:ignore
+                        on_click=self._on_now_btn_clicked,
+                        hexpand=True,
+                    ),
+                    Button(
                         label=_("Clear"),  # type:ignore
                         on_click=self._on_clear_btn_clicked,
                         hexpand=True,
-                    )
+                    ),
                 ],
                 css_classes=["toolbar"],
-                hexpand=True,
+                homogeneous=True,
             )
         )
 
