@@ -133,6 +133,7 @@ class Lists(Adw.Bin):
             icon_name="list-add-symbolic",
             tooltip_text=_("Add List"),  # type:ignore
             menu_model=import_menu,
+            dropdown_tooltip=_("More Options"),  # type:ignore
         )
         self.add_list_btn.connect("clicked", self.on_add_btn_clicked)
         hb.pack_start(self.add_list_btn)
