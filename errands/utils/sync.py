@@ -403,6 +403,8 @@ class SyncProviderCalDAV:
                             todo.icalendar_component["categories"] = task["tags"].split(
                                 ","
                             )
+                        else:
+                            todo.icalendar_component["categories"] = []
                         todo.icalendar_component["related-to"] = task["parent"]
                         todo.icalendar_component["x-errands-color"] = task["color"]
                         todo.save()
