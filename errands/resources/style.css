@@ -114,6 +114,9 @@
 }
 
 /* Calendar */
+calendar {
+  background: @background;
+}
 
 calendar,
 calendar header {
