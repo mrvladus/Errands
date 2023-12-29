@@ -1,9 +1,10 @@
 # .py
+errands/resources/gtk/help-overlay.ui
+errands/widgets/components/datetime.py
 errands/widgets/details.py
 errands/widgets/lists_item.py
 errands/widgets/lists.py
 errands/widgets/preferences.py
-errands/widgets/shortcuts_window.py
 errands/widgets/task_list.py
 errands/widgets/task.py
 errands/widgets/trash_item.py
