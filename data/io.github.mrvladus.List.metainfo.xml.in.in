@@ -4,7 +4,12 @@
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>MIT</project_license>
   <content_rating type="oars-1.1" />
+  <!-- developer_name tag deprecated with Appstream 1.0 -->
   <developer_name translatable="no">Vlad Krupinski</developer_name>
+  <developer id="github.com">
+    <name translatable="no">Vlad Krupinski</name>
+  </developer>
+
   <url type="homepage">https://github.com/mrvladus/Errands</url>
   <url type="bugtracker">https://github.com/mrvladus/Errands/issues</url>
   <url type="vcs-browser">https://github.com/mrvladus/Errands/</url>
