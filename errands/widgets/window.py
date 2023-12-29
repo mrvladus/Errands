@@ -49,7 +49,7 @@ class Window(Adw.ApplicationWindow):
             icon_name=APP_ID,
         )
         add_list_btn = Gtk.Button(
-            label="Create List",
+            label=_("Create List"),
             halign="center",
             css_classes=["pill", "suggested-action"],
         )
