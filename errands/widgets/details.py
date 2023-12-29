@@ -149,7 +149,7 @@ class Details(Adw.Bin):
 
         # End date row
         self.end_datetime_row = Adw.ActionRow(
-            title=_("Not Set"), subtitle=_("Start")  # type:ignore
+            title=_("Not Set"), subtitle=_("End")  # type:ignore
         )
         self.end_datetime = DateTime()
         self.end_datetime.connect("changed", self.on_end_time_changed)
