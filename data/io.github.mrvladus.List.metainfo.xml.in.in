@@ -26,7 +26,7 @@
   <provides>
     <binary>errands</binary>
   </provides>
-  <name translatable="no">Errands</name>
+  <name>Errands</name>
   <summary>Manage your tasks</summary>
   <description>
     <p>Todo application for those who prefer simplicity.</p>
@@ -50,7 +50,22 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="45.1" date="2023-12-30">
+    <release version="45.1.1" date="2023-12-28">
+      <description translatable="no">
+        <p>Fixed:</p>
+        <ul>
+          <li>Typos</li>
+          <li>Icons in dark style</li>
+          <li>Tags sync</li>
+        </ul>
+        <p>Translations:</p>
+        <ul>
+          <li>Updated Russian translation</li>
+          <li>Updated Italian translation (Albano Battistella)</li>
+        </ul>
+      </description>
+    </release>
+    <release version="45.1" date="2023-12-27">
       <description translatable="no">
         <p>It's a BIG update!</p>
         <p>New features:</p>
@@ -63,6 +78,13 @@
           <li>Better adaptivity for mobile screens</li>
           <li>Accessebility improvements</li>
           <li>Tweaked accent colors for better contrast with dark mode</li>
+        </ul>
+        <p>Translations:</p>
+        <ul>
+          <li>Added Simplified Chinese translation (Petalzu)</li>
+          <li>Updated German translation (Milo Ivir, Philipp Kiemle)</li>
+          <li>Updated Croatian translation (Milo Ivir)</li>
+          <li>Updated Spanish translation (Sergio Varela)</li>
         </ul>
       </description>
     </release>

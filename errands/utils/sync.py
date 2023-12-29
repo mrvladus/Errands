@@ -22,12 +22,7 @@ class Sync:
         match GSettings.get("sync-provider"):
             case 0:
                 Log.info("Sync: Sync disabled")
-                # Clear deleted tasks and lists
-                if GSettings.get("sync-provider") == 0:
-                    UserData.run_sql(
-                        "DELETE FROM lists WHERE deleted = 1",
-                        "DELETE FROM tasks WHERE deleted = 1",
-                    )
+                UserData.clean_deleted()
             case 1:
                 self.provider = SyncProviderCalDAV("Nextcloud", self.window, testing)
             case 2:
@@ -40,10 +35,7 @@ class Sync:
         Sync tasks without blocking the UI
         """
         if GSettings.get("sync-provider") == 0:
-            UserData.run_sql(
-                "DELETE FROM lists WHERE deleted = 1",
-                "DELETE FROM tasks WHERE deleted = 1",
-            )
+            UserData.clean_deleted()
             return
         if not self.provider:
             self.init(self.window)
@@ -89,10 +81,8 @@ class SyncProviderCalDAV:
                         "Not all sync credentials provided. Please check settings."
                     )
                 )
-            # self.window.sync_btn.set_visible(False)
             return False
 
-        # self.window.sync_btn.set_visible(True)
         return True
 
     def _check_url(self) -> None:
@@ -397,13 +387,13 @@ class SyncProviderCalDAV:
                         todo.uncomplete()
                         todo.icalendar_component["summary"] = task["text"]
                         if task["end_date"]:
-                            todo.icalendar_component[
-                                "due"
-                            ] = datetime.datetime.fromisoformat(task["end_date"])
+                            todo.icalendar_component["due"] = task["end_date"]
+                        else:
+                            todo.icalendar_component.pop("DUE", None)
                         if task["start_date"]:
-                            todo.icalendar_component[
-                                "dtstart"
-                            ] = datetime.datetime.fromisoformat(task["start_date"])
+                            todo.icalendar_component["dtstart"] = task["start_date"]
+                        else:
+                            todo.icalendar_component.pop("DTSTART", None)
                         todo.icalendar_component["percent-complete"] = task[
                             "percent_complete"
                         ]
@@ -413,6 +403,8 @@ class SyncProviderCalDAV:
                             todo.icalendar_component["categories"] = task["tags"].split(
                                 ","
                             )
+                        else:
+                            todo.icalendar_component["categories"] = []
                         todo.icalendar_component["related-to"] = task["parent"]
                         todo.icalendar_component["x-errands-color"] = task["color"]
                         todo.save()
@@ -423,7 +415,7 @@ class SyncProviderCalDAV:
                         )
                     except Exception as e:
                         Log.error(
-                            f"Sync: Can't update task on remote: {task['uid']}\n{e}"
+                            f"Sync: Can't update task on remote: {task['uid']}. {e}"
                         )
 
                 # Delete local task that was deleted on remote

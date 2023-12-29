@@ -6,10 +6,16 @@
     <file preprocess="xml-stripblanks" alias="gtk/help-overlay.ui">resources/gtk/help-overlay.ui</file>
   </gresource>
   <gresource prefix="/io/github/mrvladus/Errands/icons/scalable/actions/">
-    <file preprocess="xml-stripblanks" alias="errands-up.svg">resources/icons/errands-up.svg</file>
-    <file preprocess="xml-stripblanks" alias="errands-calendar.svg">resources/icons/errands-calendar.svg</file>
-    <file preprocess="xml-stripblanks" alias="errands-copy.svg">resources/icons/errands-copy.svg</file>
-    <file preprocess="xml-stripblanks" alias="errands-share.svg">resources/icons/errands-share.svg</file>
-    <file preprocess="xml-stripblanks" alias="errands-today.svg">resources/icons/errands-today.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-up-symbolic.svg">resources/icons/errands-up-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-calendar-symbolic.svg">resources/icons/errands-calendar-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-copy-symbolic.svg">resources/icons/errands-copy-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-share-symbolic.svg">resources/icons/errands-share-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-today-symbolic.svg">resources/icons/errands-today-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-theme-system-symbolic.svg">resources/icons/errands-theme-system-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-theme-light-symbolic.svg">resources/icons/errands-theme-light-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-theme-dark-symbolic.svg">resources/icons/errands-theme-dark-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-sync-symbolic.svg">resources/icons/errands-sync-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-info-symbolic.svg">resources/icons/errands-info-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-trash-symbolic.svg">resources/icons/errands-trash-symbolic.svg</file>
   </gresource>
 </gresources>

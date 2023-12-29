@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-21 20:41+0300\n"
-"PO-Revision-Date: 2023-11-30 13:49+0100\n"
+"POT-Creation-Date: 2023-12-28 11:15+0300\n"
+"PO-Revision-Date: 2023-12-25 22:29+0100\n"
 "Last-Translator: Milo Ivir <mail@milotype.de>\n"
 "Language-Team: \n"
 "Language: hr\n"
@@ -20,200 +20,210 @@ msgstr ""
 "n%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
 
 #. type:ignore
-#: errands/widgets/details.py:44 errands/widgets/lists_item.py:70
-#: errands/widgets/lists_item.py:188 errands/widgets/trash.py:152
+#: errands/widgets/details.py:44 errands/widgets/lists.py:383
+#: errands/widgets/lists.py:512 errands/widgets/trash.py:147
 msgid "Delete"
 msgstr "Izbriši"
 
 #. type:ignore
-#: errands/widgets/details.py:50 errands/widgets/lists_item.py:109
+#: errands/widgets/details.py:49 errands/widgets/lists.py:427
 msgid "Save"
-msgstr ""
+msgstr "Spremi"
 
 #: errands/widgets/details.py:60
 msgid "No Details"
-msgstr ""
+msgstr "Nema detalja"
 
 #. type:ignore
 #: errands/widgets/details.py:61
 msgid "Click on task to show more info"
-msgstr ""
+msgstr "Pritisni zadatak za prikaz više informacija"
 
-#: errands/widgets/details.py:83
-#, fuzzy
+#: errands/widgets/details.py:84
 msgid "Clear Style"
 msgstr "Izbriši stil"
 
 #. Edit group
-#: errands/widgets/details.py:91
+#: errands/widgets/details.py:93
 msgid "Text"
-msgstr ""
+msgstr "Tekst"
 
-#: errands/widgets/details.py:97
-#, fuzzy
+#: errands/widgets/details.py:101
 msgid "Copy Text"
-msgstr "Kopiraj"
+msgstr "Kopiraj tekst"
 
 #. Notes group
-#: errands/widgets/details.py:115
+#: errands/widgets/details.py:119
 msgid "Notes"
-msgstr ""
+msgstr "Bilješke"
 
 #. Properties group
-#: errands/widgets/details.py:131
+#: errands/widgets/details.py:136
 msgid "Properties"
-msgstr ""
+msgstr "Svojstva"
 
-#: errands/widgets/details.py:135 errands/widgets/details.py:170
-#: errands/widgets/details.py:319 errands/widgets/details.py:334
+#: errands/widgets/details.py:140 errands/widgets/details.py:157
+#: errands/widgets/components.py:137
 msgid "Not Set"
-msgstr ""
+msgstr "Nije postavljeno"
 
-#: errands/widgets/details.py:135
+#: errands/widgets/details.py:140
 msgid "Start"
+msgstr "Početak"
+
+#: errands/widgets/details.py:148 errands/widgets/details.py:165
+msgid "Set Date"
 msgstr ""
 
-#: errands/widgets/details.py:170
-#, fuzzy
-msgid "End"
-msgstr "Errands"
+#: errands/widgets/details.py:157
+msgid "Due"
+msgstr ""
 
-#: errands/widgets/details.py:209
-#, fuzzy
+#: errands/widgets/details.py:174
 msgid "Complete %"
-msgstr "Dovršeno:"
+msgstr "Dovršeno (u postocima)"
 
-#: errands/widgets/details.py:220
+#: errands/widgets/details.py:184
 msgid "Priority"
-msgstr ""
+msgstr "Prioritet"
 
 #. Tags group
-#: errands/widgets/details.py:226
+#: errands/widgets/details.py:191
 msgid "Tags"
-msgstr ""
+msgstr "Oznake"
 
 #. type:ignore
 #. Tags entry
-#: errands/widgets/details.py:228
-#, fuzzy
+#: errands/widgets/details.py:193
 msgid "Add Tag"
-msgstr "Dodaj novi zadatak"
+msgstr "Dodaj oznaku"
 
 #. Export group
 #. type:ignore
-#: errands/widgets/details.py:233 errands/widgets/details.py:241
-#: errands/widgets/lists_item.py:189
-#, fuzzy
+#: errands/widgets/details.py:198 errands/widgets/details.py:206
+#: errands/widgets/lists.py:513
 msgid "Export"
-msgstr "Izvezi zadatke"
+msgstr "Izvezi"
 
 #. type:ignore
-#: errands/widgets/details.py:242
+#: errands/widgets/details.py:207
 msgid "Save Task as .ics file"
-msgstr ""
+msgstr "Spremi zadatak kao .ics datoteku"
 
-#: errands/widgets/details.py:464
+#: errands/widgets/details.py:362
 msgid "Copied to Clipboard"
 msgstr "Kopirano u međuspremnik"
 
-#: errands/widgets/details.py:509 errands/widgets/lists_item.py:157
-#, fuzzy
+#. type:ignore
+#: errands/widgets/details.py:407 errands/widgets/lists.py:483
 msgid "Exported"
-msgstr "Zadaci su izvezeni"
+msgstr "Izvezeno"
 
-#: errands/widgets/lists_item.py:64 errands/widgets/trash.py:146
+#: errands/widgets/components.py:86
+msgid "Now"
+msgstr ""
+
+#: errands/widgets/components.py:96 errands/widgets/trash.py:31
+msgid "Clear"
+msgstr "Izbriši"
+
+#: errands/widgets/lists.py:111
+msgid "Imported"
+msgstr "Uvezeno"
+
+#: errands/widgets/lists.py:130
+msgid "Import List"
+msgstr "Uvezi popis"
+
+#: errands/widgets/lists.py:134 errands/widgets/lists.py:241
+msgid "Add List"
+msgstr "Dodaj popis"
+
+#: errands/widgets/lists.py:142
+msgid "Sync / Fetch Tasks"
+msgstr "Sinkroniziraj/Preuzmi zadatke"
+
+#: errands/widgets/lists.py:144
+msgid "Create"
+msgstr ""
+
+#. type:ignore
+#: errands/widgets/lists.py:145
+msgid "Load"
+msgstr ""
+
+#: errands/widgets/lists.py:149 errands/resources/gtk/help-overlay.ui:27
+msgid "Preferences"
+msgstr "Postavke"
+
+#: errands/widgets/lists.py:151
+msgid "Keyboard Shortcuts"
+msgstr "Tipkovnički prečaci"
+
+#: errands/widgets/lists.py:153
+msgid "About Errands"
+msgstr "O aplikaciji Errands"
+
+#: errands/widgets/lists.py:159
+msgid "Main Menu"
+msgstr "Glavni izbornik"
+
+#: errands/widgets/lists.py:167
+msgid "Add new List"
+msgstr "Dodaj novi popis"
+
+#. type:ignore
+#: errands/widgets/lists.py:168
+msgid "Click \"+\" button"
+msgstr "Pritisni gumb „+”"
+
+#: errands/widgets/lists.py:177 errands/widgets/trash.py:24
+msgid "Trash"
+msgstr "Smeće"
+
+#: errands/widgets/lists.py:237
+msgid "New List Name"
+msgstr "Ime novog popisa"
+
+#: errands/widgets/lists.py:246 errands/widgets/lists.py:382
+#: errands/widgets/lists.py:426 errands/widgets/trash.py:146
+msgid "Cancel"
+msgstr "Odustani"
+
+#. type:ignore
+#: errands/widgets/lists.py:247
+msgid "Add"
+msgstr "Dodaj"
+
+#: errands/widgets/lists.py:377 errands/widgets/trash.py:141
 msgid "Are you sure?"
 msgstr "Jesi li siguran/na?"
 
 #. type:ignore
-#: errands/widgets/lists_item.py:65
-#, fuzzy
+#: errands/widgets/lists.py:378
 msgid "List will be permanently deleted"
-msgstr "Zadaci će se zauvijek izbrisati"
+msgstr "Popis će se zauvijek izbrisati"
 
-#: errands/widgets/lists_item.py:69 errands/widgets/lists_item.py:108
-#: errands/widgets/lists.py:212 errands/widgets/trash.py:151
-msgid "Cancel"
-msgstr "Odustani"
-
-#: errands/widgets/lists_item.py:99
+#: errands/widgets/lists.py:416
 msgid "New Name"
-msgstr ""
+msgstr "Novo ime"
 
-#: errands/widgets/lists_item.py:103
+#: errands/widgets/lists.py:421
 msgid "Rename List"
-msgstr ""
+msgstr "Preimenuj popis"
 
-#: errands/widgets/lists_item.py:187
+#: errands/widgets/lists.py:481
 #, fuzzy
-msgid "Rename"
-msgstr "Korisničko ime"
+msgid "Export failed"
+msgstr "Izvezeno"
 
-#: errands/widgets/lists_item.py:194
+#: errands/widgets/lists.py:511
+msgid "Rename"
+msgstr "Preimenuj"
+
+#: errands/widgets/lists.py:525
 msgid "Menu"
 msgstr "Izbornik"
-
-#: errands/widgets/lists.py:104
-#, fuzzy
-msgid "Imported"
-msgstr "Zadaci su uvezeni"
-
-#: errands/widgets/lists.py:121
-#, fuzzy
-msgid "Import List"
-msgstr "Uvezi zadatke"
-
-#: errands/widgets/lists.py:125 errands/widgets/lists.py:207
-msgid "Add List"
-msgstr ""
-
-#: errands/widgets/lists.py:132
-msgid "Preferences"
-msgstr "Postavke"
-
-#. type:ignore
-#: errands/widgets/lists.py:133
-msgid "Keyboard Shortcuts"
-msgstr "Tipkovnički prečaci"
-
-#. type:ignore
-#: errands/widgets/lists.py:134
-#, fuzzy
-msgid "Sync / Fetch Tasks"
-msgstr "Sinkroniziraj/Preuzmi zadatke"
-
-#. type:ignore
-#: errands/widgets/lists.py:135
-msgid "About Errands"
-msgstr "Informacije o Errands"
-
-#: errands/widgets/lists.py:140
-msgid "Main Menu"
-msgstr "Glavni izbornik"
-
-#: errands/widgets/lists.py:148
-#, fuzzy
-msgid "Add new List"
-msgstr "Dodaj novi zadatak"
-
-#. type:ignore
-#: errands/widgets/lists.py:149
-msgid "Click \"+\" button"
-msgstr ""
-
-#: errands/widgets/lists.py:161 errands/widgets/trash.py:24
-#, fuzzy
-msgid "Trash"
-msgstr "Zatvori smeće"
-
-#: errands/widgets/lists.py:203
-msgid "New List Name"
-msgstr ""
-
-#. type:ignore
-#: errands/widgets/lists.py:213
-msgid "Add"
-msgstr ""
 
 #: errands/widgets/preferences.py:35
 msgid "Application Theme"
@@ -243,122 +253,136 @@ msgstr "Isključeno"
 msgid "Sync Provider"
 msgstr "Pružatelj usluge sinkronizacije"
 
-#: errands/widgets/preferences.py:83
+#: errands/widgets/preferences.py:84
 msgid "Server URL"
 msgstr "URL servera"
 
-#: errands/widgets/preferences.py:88
+#: errands/widgets/preferences.py:89
 msgid "Username"
 msgstr "Korisničko ime"
 
-#: errands/widgets/preferences.py:93
+#: errands/widgets/preferences.py:94
 msgid "Password"
 msgstr "Lozinka"
 
-#: errands/widgets/preferences.py:99
+#: errands/widgets/preferences.py:100
 msgid "Test"
 msgstr "Provjeri"
 
-#: errands/widgets/preferences.py:104
+#: errands/widgets/preferences.py:105
 msgid "Test Connection"
-msgstr "Provjeri vezu"
+msgstr "Testiraj vezu"
 
 #: errands/widgets/preferences.py:140
 msgid "Connected"
-msgstr ""
+msgstr "Povezano"
 
 #: errands/widgets/preferences.py:140
 msgid "Can't connect"
-msgstr ""
+msgstr "Povezivanje nije moguće"
 
-#: errands/widgets/task_list.py:38 errands/widgets/task_list.py:69
-#, fuzzy
+#: errands/widgets/task_list.py:38 errands/widgets/task_list.py:77
 msgid "Toggle Sidebar"
 msgstr "Uključi/Isključi bočnu traku"
 
-#: errands/widgets/task_list.py:44 errands/widgets/task_list.py:81
-#, fuzzy
+#: errands/widgets/task_list.py:52 errands/widgets/task_list.py:89
 msgid "Delete Completed Tasks"
 msgstr "Izbriši dovršene zadatke"
 
-#: errands/widgets/task_list.py:54 errands/widgets/task_list.py:95
+#: errands/widgets/task_list.py:62 errands/widgets/task_list.py:103
 msgid "Scroll Up"
 msgstr "Klizni gore"
 
-#: errands/widgets/task_list.py:118
+#: errands/widgets/task_list.py:120
 msgid "Add new Task"
 msgstr "Dodaj novi zadatak"
 
-#: errands/widgets/task_list.py:271 errands/widgets/task.py:235
+#: errands/widgets/task_list.py:274 errands/widgets/task.py:234
 msgid "Completed:"
 msgstr "Dovršeno:"
 
-#: errands/widgets/task.py:82
+#: errands/widgets/task.py:81
 msgid "Click for Details"
-msgstr ""
+msgstr "Pritisni za prikaz detalja"
 
 #: errands/widgets/task.py:89
 msgid "Mark as Completed"
 msgstr "Označi kao dovršeno"
 
-#: errands/widgets/task.py:98
+#: errands/widgets/task.py:101
 msgid "Expand / Fold"
-msgstr ""
+msgstr "Rasklopi/Sklopi"
 
-#: errands/widgets/task.py:134
+#: errands/widgets/task.py:133
 msgid "Add new Sub-Task"
 msgstr "Dodaj novi podzadatak"
 
-#: errands/widgets/trash_item.py:32
-msgid "Restore"
-msgstr "Obnovi"
-
-#: errands/widgets/trash.py:29
-msgid "Clear"
-msgstr "Izbriši"
-
-#: errands/widgets/trash.py:37
+#: errands/widgets/trash.py:39
 msgid "Restore All"
 msgstr "Obnovi sve"
 
-#: errands/widgets/trash.py:44
+#: errands/widgets/trash.py:45
 msgid "Empty Trash"
 msgstr "Isprazni smeće"
 
 #. type:ignore
-#: errands/widgets/trash.py:45
+#: errands/widgets/trash.py:46
 msgid "No deleted items"
 msgstr "Nema izbrisanih stavki"
 
 #. type:ignore
-#: errands/widgets/trash.py:147
+#: errands/widgets/trash.py:142
 msgid "Tasks will be permanently deleted"
 msgstr "Zadaci će se zauvijek izbrisati"
 
-#: errands/widgets/window.py:49 errands/widgets/window.py:66
-msgid "No Task Lists"
-msgstr ""
+#: errands/widgets/trash.py:222
+msgid "Restore"
+msgstr "Obnovi"
 
-#: errands/widgets/window.py:104 data/io.github.mrvladus.List.desktop.in.in:3
+#: errands/widgets/window.py:19 errands/widgets/window.py:129
+#: data/io.github.mrvladus.List.desktop.in.in:3
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:38
 msgid "Errands"
 msgstr "Errands"
 
-#: errands/widgets/window.py:109
+#: errands/widgets/window.py:67 errands/widgets/window.py:86
+msgid "No Task Lists"
+msgstr "Nema popisa zadataka"
+
+#: errands/widgets/window.py:134
 msgid "translator-credits"
 msgstr "Milo Ivir <mail@milotype.de>"
 
-#: errands/widgets/window.py:117
+#: errands/widgets/window.py:142
 msgid "Sync is disabled"
-msgstr ""
+msgstr "Sinkronizacija je deaktivirana"
 
 #. pyright:ignore
-#: errands/utils/sync.py:91
+#: errands/utils/sync.py:81
 msgid "Not all sync credentials provided. Please check settings."
 msgstr "Nisu navedeni svi podaci za pristup sinkronizacije. Provjeri postavke."
 
-#: errands/utils/sync.py:142
+#: errands/utils/sync.py:130
 msgid "Can't connect to CalDAV server at:"
 msgstr "Neuspjelo povezivanje s CalDAV serverom pri:"
+
+#: errands/resources/gtk/help-overlay.ui:9
+msgid "General"
+msgstr ""
+
+#: errands/resources/gtk/help-overlay.ui:13
+#, fuzzy
+msgid "Show keyboard shortcuts"
+msgstr "Tipkovnički prečaci"
+
+#: errands/resources/gtk/help-overlay.ui:20
+#, fuzzy
+msgid "Toggle sidebar"
+msgstr "Uključi/Isključi bočnu traku"
+
+#: errands/resources/gtk/help-overlay.ui:34
+msgid "Quit"
+msgstr ""
 
 #: data/io.github.mrvladus.List.desktop.in.in:4
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:39
@@ -379,7 +403,7 @@ msgstr "Značajke:"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:44
 msgid "Multiple task lists support"
-msgstr ""
+msgstr "Podrška za višestruke popise zadataka"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:45
 msgid "Add, remove, edit tasks and sub-tasks"
@@ -387,7 +411,7 @@ msgstr "Dodaj, ukloni, uredi zadatke i podzadatke"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:46
 msgid "Mark task and sub-tasks as completed"
-msgstr "Označi zadatke i podzadatke kao dovršene"
+msgstr "Označi zadatak i podzadatke kao dovršene"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:47
 msgid "Add accent color for each task"
@@ -404,72 +428,8 @@ msgid "Drag and Drop support"
 msgstr "Podrška za povuci i ispusti"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:50
-#, fuzzy
 msgid "Import .ics files"
-msgstr "Uvezi zadatke"
+msgstr "Uvezi .ics datoteke"
 
-#~ msgid "Export Cancelled"
-#~ msgstr "Izvoz je prekinut"
-
-#~ msgid "Error"
-#~ msgstr "Greška"
-
-#~ msgid "Import Cancelled"
-#~ msgstr "Uvoz je prekinut"
-
-#~ msgid "Invalid File"
-#~ msgstr "Neispravna datoteka"
-
-#~ msgid "Deleted Tasks"
-#~ msgstr "Izbrisani zadaci"
-
-#~ msgid "Move to Trash"
-#~ msgstr "Premjesti u smeće"
-
-#~ msgid "Show Deleted Tasks"
-#~ msgstr "Prikaži izbrisane zadatke"
-
-#~ msgid "Delete Completed Tasks (Ctrl+Delete)"
-#~ msgstr "Izbriši dovršene zadatke (Ctrl+Delete)"
-
-#~ msgid "Sync/Fetch Tasks (Ctrl+S)"
-#~ msgstr "Sinkroniziraj/Preuzmi zadatke (Ctrl+S)"
-
-#~ msgid "Export Tasks..."
-#~ msgstr "Izvoz zadataka …"
-
-#~ msgid "Import Tasks..."
-#~ msgstr "Uvoz zadataka …"
-
-#~ msgid "General"
-#~ msgstr "Opće"
-
-#~ msgid "Show keyboard shortcuts"
-#~ msgstr "Prikaži tipkovničke prečace"
-
-#~ msgid "Quit"
-#~ msgstr "Zatvori aplikaciju"
-
-#~ msgid "Import and Export"
-#~ msgstr "Uvozi i izvoz"
-
-#~ msgid "Tasks"
-#~ msgstr "Zadaci"
-
-#~ msgid "Exit edit mode"
-#~ msgstr "Izađi iz modusa uređivanja"
-
-#~ msgid "Expand Sub-Tasks on Startup"
-#~ msgstr "Prikaži podzadatke nakon pokretanja "
-
-#~ msgid "Calendar Name (\"Errands\" by Default)"
-#~ msgstr "Ime kalendara (zadano je „Errands”)"
-
-#~ msgid "Token"
-#~ msgstr "Token"
-
-#~ msgid "Edit"
-#~ msgstr "Uredi"
-
-#~ msgid "Cancel (Escape)"
-#~ msgstr "Odustani (Escape)"
+#~ msgid "End"
+#~ msgstr "Kraj"

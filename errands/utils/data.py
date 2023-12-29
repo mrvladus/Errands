@@ -60,6 +60,14 @@ class UserData:
         return uid
 
     @classmethod
+    def clean_deleted(cls):
+        Log.info("Data: Clean deleted")
+        cls.run_sql(
+            "DELETE FROM lists WHERE deleted = 1",
+            "DELETE FROM tasks WHERE deleted = 1",
+        )
+
+    @classmethod
     def get_lists_as_dicts(cls) -> dict:
         res = cls.run_sql("SELECT * FROM lists", fetch=True)
         lists = []
@@ -225,7 +233,7 @@ class UserData:
         shutil.rmtree(old_path, True)
         # If sync is enabled
         if GSettings.get("sync-provider") != 0:
-            uid = cls.add_list(GSettings.get("sync-cal-name"))
+            uid = cls.add_list(GSettings.get("sync-cal-name"), synced=True)
             GSettings.set("sync-cal-name", "s", "")
         # If sync is disabled
         else:

@@ -1,14 +1,13 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
+from errands.widgets.components import Box
 from gi.repository import Adw, Gtk, GLib, GObject
 from errands.utils.animation import scroll
-from errands.utils.gsettings import GSettings
 from errands.utils.data import UserData
 from errands.utils.functions import get_children
 from errands.utils.sync import Sync
 from errands.utils.logging import Log
-from errands.widgets.details import Details
 from errands.widgets.task import Task
 
 
@@ -21,6 +20,7 @@ class TaskList(Adw.Bin):
         self.window = window
         self.list_uid = list_uid
         self.parent = parent
+        self.details = window.details
         self.build_ui()
         self.load_tasks()
 
@@ -65,10 +65,10 @@ class TaskList(Adw.Bin):
         self.scroll_up_btn.connect("clicked", lambda *_: scroll(self.scrl, False))
 
         # Header Bar
-        self.hb = Adw.HeaderBar(title_widget=self.title)
-        self.hb.pack_start(self.toggle_sidebar_btn)
-        self.hb.pack_start(self.delete_completed_btn)
-        self.hb.pack_end(self.scroll_up_btn)
+        hb = Adw.HeaderBar(title_widget=self.title)
+        hb.pack_start(self.toggle_sidebar_btn)
+        hb.pack_start(self.delete_completed_btn)
+        hb.pack_end(self.scroll_up_btn)
 
         # ---------- BOTTOMBAR ---------- #
 
@@ -110,12 +110,6 @@ class TaskList(Adw.Bin):
             GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
         )
         scroll_up_btn.connect("clicked", lambda *_: scroll(self.scrl, False))
-
-        self.bottom_bar = Gtk.Box(css_classes=["toolbar"])
-        self.bottom_bar.append(toggle_sidebar_btn)
-        self.bottom_bar.append(delete_completed_btn)
-        self.bottom_bar.append(Gtk.Separator(hexpand=True, css_classes=["spacer"]))
-        self.bottom_bar.append(scroll_up_btn)
 
         # ---------- TASKS LIST ---------- #
 
@@ -159,23 +153,34 @@ class TaskList(Adw.Bin):
         self.scrl.set_child(
             Adw.Clamp(maximum_size=850, tightening_threshold=300, child=self.tasks_list)
         )
-        # Tasks list box
-        box = Gtk.Box(orientation="vertical", vexpand=True)
-        box.append(
-            Adw.Clamp(
-                maximum_size=850,
-                tightening_threshold=300,
-                child=entry_box,
-            )
-        )
-        box.append(self.scrl)
         # Tasks list toolbar view
         tasks_toolbar_view = Adw.ToolbarView(
-            content=box,
+            content=Box(
+                children=[
+                    Adw.Clamp(
+                        maximum_size=850,
+                        tightening_threshold=300,
+                        child=entry_box,
+                    ),
+                    self.scrl,
+                ],
+                orientation="vertical",
+                vexpand=True,
+            ),
             reveal_bottom_bars=False,
         )
-        tasks_toolbar_view.add_top_bar(self.hb)
-        tasks_toolbar_view.add_bottom_bar(self.bottom_bar)
+        tasks_toolbar_view.add_top_bar(hb)
+        tasks_toolbar_view.add_bottom_bar(
+            Box(
+                children=[
+                    toggle_sidebar_btn,
+                    delete_completed_btn,
+                    Gtk.Separator(hexpand=True, css_classes=["spacer"]),
+                    scroll_up_btn,
+                ],
+                css_classes=["toolbar"],
+            )
+        )
         # Breakpoint
         tasks_brb = Adw.BreakpointBin(
             width_request=360, height_request=360, child=tasks_toolbar_view
@@ -190,31 +195,21 @@ class TaskList(Adw.Bin):
         tasks_brb.add_breakpoint(tasks_brb_bp)
 
         # Split view
-        self.split_view = Adw.OverlaySplitView(
-            content=tasks_brb,
-            sidebar_position="start",
-            min_sidebar_width=360,
-            max_sidebar_width=360,
-        )
-        self.split_view.bind_property(
+        self.window.split_view_inner.bind_property(
             "show-sidebar",
             self.toggle_sidebar_btn,
             "active",
             GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
         )
-        GSettings.bind("sidebar-open", self.split_view, "show-sidebar")
-        # Details
-        self.details = Details(self.window, self)
-        self.split_view.set_sidebar(self.details)
         # Breakpoint
-        brb = Adw.BreakpointBin(
-            width_request=360, height_request=360, child=self.split_view
-        )
-        bp = Adw.Breakpoint.new(Adw.breakpoint_condition_parse("max-width: 720px"))
-        bp.add_setter(self.split_view, "collapsed", True)
-        brb.add_breakpoint(bp)
+        # brb = Adw.BreakpointBin(
+        #     width_request=360, height_request=360, child=self.split_view
+        # )
+        # bp = Adw.Breakpoint.new(Adw.breakpoint_condition_parse("max-width: 720px"))
+        # bp.add_setter(self.split_view, "collapsed", True)
+        # brb.add_breakpoint(bp)
 
-        self.set_child(brb)
+        self.set_child(tasks_brb)
 
     def add_task(self, uid: str) -> None:
         new_task = Task(uid, self.list_uid, self.window, self, self, False)
@@ -335,12 +330,6 @@ class TaskList(Adw.Bin):
                         if t.uid == task_dict["parent"]:
                             t.add_task(task_dict["uid"])
 
-        # Update details
-        if self.details.parent not in self.get_all_tasks():
-            self.details.status.set_visible(True)
-        else:
-            self.details.update_info(self.details.parent)
-
     def on_delete_completed_btn_clicked(self, _) -> None:
         """
         Hide completed tasks and move them to trash
@@ -362,7 +351,7 @@ class TaskList(Adw.Bin):
             if not self.scrolling or not self.dnd_ctrl.contains_pointer():
                 return False
             adj = self.scrl.get_vadjustment()
-            adj.set_value(adj.get_value() + (2 if scroll_up else -2))
+            adj.set_value(adj.get_value() - (2 if scroll_up else -2))
             return True
 
         MARGIN: int = 50

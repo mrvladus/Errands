@@ -4,10 +4,9 @@
 from datetime import datetime
 from errands.utils.data import UserData
 from icalendar import Calendar, Event
-
 from errands.utils.functions import get_children
-from errands.widgets.components.datetime import DateTime
-from gi.repository import Adw, Gtk, GLib, Gdk, GObject
+from errands.widgets.components import Box, Button, DateTime
+from gi.repository import Adw, Gtk, Gdk, GObject
 from errands.utils.markup import Markup
 from errands.utils.sync import Sync
 from errands.utils.logging import Log
@@ -16,44 +15,46 @@ from errands.utils.logging import Log
 class Details(Adw.Bin):
     parent = None
 
-    def __init__(self, window, task_list) -> None:
+    def __init__(self, window) -> None:
         super().__init__()
         self.window = window
-        self.task_list = task_list
+        self.split_view = window.split_view_inner
         self.build_ui()
 
     def build_ui(self):
         # Header Bar
         hb = Adw.HeaderBar(show_title=False, show_back_button=False)
         # Back button
-        back_btn = Gtk.Button(icon_name="go-previous-symbolic", visible=False)
+        back_btn = Button(
+            icon_name="go-previous-symbolic",
+            on_click=lambda *_: self.split_view.set_show_sidebar(False),
+            visible=False,
+        )
         back_btn.bind_property(
             "visible",
-            self.task_list.split_view,
+            self.split_view,
             "collapsed",
             GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
         )
-        back_btn.connect(
-            "clicked", lambda *_: self.task_list.split_view.set_show_sidebar(False)
-        )
         hb.pack_start(back_btn)
         # Delete button
-        delete_btn = Gtk.Button(
-            icon_name="user-trash-symbolic",
+        delete_btn = Button(
+            icon_name="errands-trash-symbolic",
+            on_click=self.on_delete_btn_clicked,
             tooltip_text=_("Delete"),  # type:ignore
         )
-        delete_btn.connect("clicked", self.on_delete_btn_clicked)
         hb.pack_start(delete_btn)
         # Save button
-        self.save_btn = Gtk.Button(
+        self.save_btn = Button(
             label=_("Save"),  # type:ignore
+            on_click=self.on_save_btn_clicked,
             css_classes=["suggested-action"],
         )
-        self.save_btn.connect("clicked", self.on_save_btn_clicked)
         hb.pack_end(self.save_btn)
+
         # Status
         self.status = Adw.StatusPage(
-            icon_name="help-about-symbolic",
+            icon_name="errands-info-symbolic",
             visible=True,
             vexpand=True,
             title=_("No Details"),  # type:ignore
@@ -72,6 +73,7 @@ class Details(Adw.Bin):
             "visible",
             GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.INVERT_BOOLEAN,
         )
+
         # Colors
         colors_box = Gtk.Box(halign="center", css_classes=["toolbar"])
         colors = ["", "blue", "green", "yellow", "orange", "red", "purple", "brown"]
@@ -86,46 +88,51 @@ class Details(Adw.Bin):
             btn.add_css_class("circular")
             btn.connect("clicked", self.on_style_selected, color)
             colors_box.append(btn)
+
         # Edit group
         edit_group = Adw.PreferencesGroup(title=_("Text"))  # type:ignore
         # Copy button
-        copy_btn = Gtk.Button(
-            icon_name="errands-copy",
-            valign="center",
-            css_classes=["flat"],
-            tooltip_text=_("Copy Text"),  # type:ignore
+        edit_group.set_header_suffix(
+            Button(
+                icon_name="errands-copy-symbolic",
+                on_click=self.on_copy_text_clicked,
+                valign="center",
+                css_classes=["flat"],
+                tooltip_text=_("Copy Text"),  # type:ignore
+            )
         )
-        copy_btn.connect("clicked", self.on_copy_text_clicked)
-        edit_group.set_header_suffix(copy_btn)
         # Edit entry
         self.edit_entry = Gtk.TextBuffer()
         self.edit_entry.connect("changed", lambda *_: self.save_btn.set_sensitive(True))
-        edit_view = Gtk.TextView(
-            height_request=55,
-            top_margin=12,
-            bottom_margin=12,
-            left_margin=12,
-            right_margin=12,
-            buffer=self.edit_entry,
+        edit_group.add(
+            Gtk.TextView(
+                height_request=55,
+                top_margin=12,
+                bottom_margin=12,
+                left_margin=12,
+                right_margin=12,
+                buffer=self.edit_entry,
+                css_classes=["card"],
+            )
         )
-        edit_view.add_css_class("card")
-        edit_group.add(edit_view)
+
         # Notes group
         notes_group = Adw.PreferencesGroup(title=_("Notes"))  # type:ignore
         # Notes entry
         self.notes = Gtk.TextBuffer()
         self.notes.connect("changed", lambda *_: self.save_btn.set_sensitive(True))
-        notes_view = Gtk.TextView(
-            height_request=100,
-            top_margin=12,
-            bottom_margin=12,
-            left_margin=12,
-            right_margin=12,
-            buffer=self.notes,
-            wrap_mode=3,
+        notes_group.add(
+            Gtk.TextView(
+                height_request=100,
+                top_margin=12,
+                bottom_margin=12,
+                left_margin=12,
+                right_margin=12,
+                buffer=self.notes,
+                wrap_mode=3,
+                css_classes=["card"],
+            )
         )
-        notes_view.add_css_class("card")
-        notes_group.add(notes_view)
 
         # Properties group
         props_group = Adw.PreferencesGroup(title=_("Properties"))  # type:ignore
@@ -139,7 +146,7 @@ class Details(Adw.Bin):
         self.start_datetime_row.add_suffix(
             Gtk.MenuButton(
                 valign="center",
-                icon_name="errands-calendar",
+                icon_name="errands-calendar-symbolic",
                 tooltip_text=_("Set Date"),  # type:ignore
                 popover=Gtk.Popover(child=self.start_datetime),
                 css_classes=["flat"],
@@ -149,14 +156,14 @@ class Details(Adw.Bin):
 
         # End date row
         self.end_datetime_row = Adw.ActionRow(
-            title=_("Not Set"), subtitle=_("Start")  # type:ignore
+            title=_("Not Set"), subtitle=_("Due")  # type:ignore
         )
         self.end_datetime = DateTime()
         self.end_datetime.connect("changed", self.on_end_time_changed)
         self.end_datetime_row.add_suffix(
             Gtk.MenuButton(
                 valign="center",
-                icon_name="errands-calendar",
+                icon_name="errands-calendar-symbolic",
                 tooltip_text=_("Set Date"),  # type:ignore
                 popover=Gtk.Popover(child=self.end_datetime),
                 css_classes=["flat"],
@@ -191,12 +198,12 @@ class Details(Adw.Bin):
 
         # Export group
         misc_group = Adw.PreferencesGroup(title=_("Export"))  # type:ignore
-        open_cal_btn = Gtk.Button(
-            icon_name="errands-share",
+        open_cal_btn = Button(
+            icon_name="errands-share-symbolic",
+            on_click=self.on_export,
             valign="center",
             css_classes=["flat"],
         )
-        open_cal_btn.connect("clicked", self.on_export)
         open_cal_row = Adw.ActionRow(
             title=_("Export"),  # type:ignore
             subtitle=_("Save Task as .ics file"),  # type:ignore
@@ -206,7 +213,19 @@ class Details(Adw.Bin):
         misc_group.add(open_cal_row)
 
         # Groups box
-        p_box = Gtk.Box(orientation="vertical", spacing=12, visible=False)
+        p_box = Box(
+            children=[
+                colors_box,
+                edit_group,
+                notes_group,
+                props_group,
+                self.tags,
+                misc_group,
+            ],
+            orientation="vertical",
+            spacing=12,
+            visible=False,
+        )
         p_box.bind_property(
             "visible",
             self.status,
@@ -215,21 +234,11 @@ class Details(Adw.Bin):
             | GObject.BindingFlags.INVERT_BOOLEAN
             | GObject.BindingFlags.BIDIRECTIONAL,
         )
-        p_box.append(colors_box)
-        p_box.append(edit_group)
-        p_box.append(notes_group)
-        p_box.append(props_group)
-        p_box.append(self.tags)
-        p_box.append(misc_group)
-        # Box
-        box = Gtk.Box(orientation="vertical")
-        box.append(self.status)
-        box.append(p_box)
         # Toolbar View
         toolbar_view = Adw.ToolbarView(
             content=Gtk.ScrolledWindow(
                 child=Adw.Clamp(
-                    child=box,
+                    child=Box(children=[self.status, p_box], orientation="vertical"),
                     margin_start=12,
                     margin_end=12,
                     margin_top=6,
@@ -329,16 +338,23 @@ class Details(Adw.Bin):
         # Sync
         Sync.sync()
 
-    def on_datetime_changed(self, dt):
-        pass
-
     def on_start_time_changed(self, *args):
         Log.debug("Details: change start time")
+        sdt = self.start_datetime.get_datetime_as_int()
+        edt = self.end_datetime.get_datetime_as_int()
+        if sdt > edt and edt != 0:
+            self.end_datetime.set_datetime(self.start_datetime.get_datetime())
+            self.end_datetime_row.set_title(self.end_datetime.get_human_datetime())
         self.start_datetime_row.set_title(self.start_datetime.get_human_datetime())
         self.save_btn.set_sensitive(True)
 
     def on_end_time_changed(self, *args):
         Log.debug("Details: change end time")
+        sdt = self.start_datetime.get_datetime_as_int()
+        edt = self.end_datetime.get_datetime_as_int()
+        if edt < sdt and sdt != 0 and edt != 0:
+            self.start_datetime.set_datetime(self.end_datetime.get_datetime())
+            self.start_datetime_row.set_title(self.start_datetime.get_human_datetime())
         self.end_datetime_row.set_title(self.end_datetime.get_human_datetime())
         self.save_btn.set_sensitive(True)
 
