@@ -21,20 +21,6 @@
   <provides>
     <binary>errands</binary>
   </provides>
-  <categories>
-    <category>Utility</category>
-  </categories>
-  <keywords>
-    <keyword>errands</keyword>
-    <keyword>list</keyword>
-    <keyword>to do</keyword>
-    <keyword>todos</keyword>
-    <keyword>task manager</keyword>
-    <keyword>sync</keyword>
-    <keyword>synchronization</keyword>
-    <keyword>nextcloud</keyword>
-    <keyword>caldav</keyword>
-  </keywords>
   <name translatable="no">Errands</name>
   <summary>Manage your tasks</summary>
   <description>
