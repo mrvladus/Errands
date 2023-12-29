@@ -68,7 +68,7 @@ class Window(Adw.ApplicationWindow):
                         icon_name=APP_ID,
                     ),
                     Button(
-                        label="Create List",
+                        label=_("Create List"),
                         on_click=lambda *_: self.lists.add_list_btn.activate(),
                         halign="center",
                         css_classes=["pill", "suggested-action"],
