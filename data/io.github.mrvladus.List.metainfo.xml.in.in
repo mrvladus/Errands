@@ -4,7 +4,12 @@
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>MIT</project_license>
   <content_rating type="oars-1.1" />
+  <!-- developer_name tag deprecated with Appstream 1.0 -->
   <developer_name translatable="no">Vlad Krupinski</developer_name>
+  <developer id="github.com">
+    <name translatable="no">Vlad Krupinski</name>
+  </developer>
+
   <url type="homepage">https://github.com/mrvladus/Errands</url>
   <url type="bugtracker">https://github.com/mrvladus/Errands/issues</url>
   <url type="vcs-browser">https://github.com/mrvladus/Errands/</url>
@@ -21,20 +26,6 @@
   <provides>
     <binary>errands</binary>
   </provides>
-  <categories>
-    <category>Utility</category>
-  </categories>
-  <keywords>
-    <keyword>errands</keyword>
-    <keyword>list</keyword>
-    <keyword>to do</keyword>
-    <keyword>todos</keyword>
-    <keyword>task manager</keyword>
-    <keyword>sync</keyword>
-    <keyword>synchronization</keyword>
-    <keyword>nextcloud</keyword>
-    <keyword>caldav</keyword>
-  </keywords>
   <name>Errands</name>
   <summary>Manage your tasks</summary>
   <description>
