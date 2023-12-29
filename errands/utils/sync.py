@@ -85,9 +85,7 @@ class SyncProviderCalDAV:
             Log.error(f"Sync: Not all {self.name} credentials provided")
             if not self.testing:
                 self.window.add_toast(
-                    _(  # pyright:ignore
-                        "Not all sync credentials provided. Please check settings."
-                    )
+                    _("Not all sync credentials provided. Please check settings.")
                 )
             # self.window.sync_btn.set_visible(False)
             return False
@@ -137,9 +135,7 @@ class SyncProviderCalDAV:
                 )
                 if not self.testing:
                     self.window.add_toast(
-                        _("Can't connect to CalDAV server at:")  # pyright:ignore
-                        + " "
-                        + self.url
+                        _("Can't connect to CalDAV server at {0}".format(self.url))
                     )
 
     def _get_tasks(self, calendar: Calendar) -> list[dict]:
