@@ -123,7 +123,10 @@ class Lists(Adw.Bin):
 
     def _build_ui(self):
         hb = Adw.HeaderBar(
-            title_widget=Gtk.Label(label="Errands", css_classes=["heading"])
+            title_widget=Gtk.Label(
+                label=_("Errands"),  # type:ignore
+                css_classes=["heading"],
+            )
         )
         # Import menu
         import_menu: Gio.Menu = Gio.Menu.new()
