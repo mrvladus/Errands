@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-28 11:15+0300\n"
+"POT-Creation-Date: 2023-12-29 15:34+0300\n"
 "PO-Revision-Date: 2023-12-26 15:15+0100\n"
 "Last-Translator: Milo Ivir <mail@milotype.de>\n"
 "Language-Team: \n"
@@ -21,13 +21,13 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. type:ignore
-#: errands/widgets/details.py:44 errands/widgets/lists.py:383
-#: errands/widgets/lists.py:512 errands/widgets/trash.py:147
+#: errands/widgets/details.py:44 errands/widgets/lists.py:399
+#: errands/widgets/lists.py:528 errands/widgets/trash.py:147
 msgid "Delete"
 msgstr "Löschen"
 
 #. type:ignore
-#: errands/widgets/details.py:49 errands/widgets/lists.py:427
+#: errands/widgets/details.py:49 errands/widgets/lists.py:443
 msgid "Save"
 msgstr "Speichern"
 
@@ -54,77 +54,85 @@ msgid "Copy Text"
 msgstr "Text kopieren"
 
 #. Notes group
-#: errands/widgets/details.py:119
+#: errands/widgets/details.py:120
 msgid "Notes"
 msgstr "Anmerkungen"
 
 #. Properties group
-#: errands/widgets/details.py:136
+#: errands/widgets/details.py:138
 msgid "Properties"
 msgstr "Eigenschaften"
 
-#: errands/widgets/details.py:140 errands/widgets/details.py:157
-#: errands/widgets/components.py:137
+#: errands/widgets/details.py:142 errands/widgets/details.py:159
+#: errands/widgets/components.py:171
 msgid "Not Set"
 msgstr "Nicht gesetzt"
 
-#: errands/widgets/details.py:140
+#: errands/widgets/details.py:142
 msgid "Start"
 msgstr "Start"
 
-#: errands/widgets/details.py:148 errands/widgets/details.py:165
+#: errands/widgets/details.py:150 errands/widgets/details.py:167
 msgid "Set Date"
 msgstr ""
 
-#: errands/widgets/details.py:157
+#: errands/widgets/details.py:159
 msgid "Due"
 msgstr ""
 
-#: errands/widgets/details.py:174
+#: errands/widgets/details.py:176
 msgid "Complete %"
 msgstr "Abgeschlossen %"
 
-#: errands/widgets/details.py:184
+#: errands/widgets/details.py:186
 msgid "Priority"
 msgstr "Priorität"
 
 #. Tags group
-#: errands/widgets/details.py:191
+#: errands/widgets/details.py:193
 msgid "Tags"
 msgstr "Markierungen"
 
 #. type:ignore
 #. Tags entry
-#: errands/widgets/details.py:193
+#: errands/widgets/details.py:195
 msgid "Add Tag"
 msgstr "Markierung hinzufügen"
 
 #. Export group
 #. type:ignore
-#: errands/widgets/details.py:198 errands/widgets/details.py:206
-#: errands/widgets/lists.py:513
+#: errands/widgets/details.py:200 errands/widgets/details.py:208
+#: errands/widgets/lists.py:529
 msgid "Export"
 msgstr "Exportieren"
 
 #. type:ignore
-#: errands/widgets/details.py:207
+#: errands/widgets/details.py:209
 msgid "Save Task as .ics file"
 msgstr "Aufgabe als .ics Datei speichern"
 
-#: errands/widgets/details.py:362
+#: errands/widgets/details.py:364
 msgid "Copied to Clipboard"
 msgstr "In Zwischenablage kopiert"
 
 #. type:ignore
-#: errands/widgets/details.py:407 errands/widgets/lists.py:483
+#: errands/widgets/details.py:409 errands/widgets/lists.py:499
 msgid "Exported"
 msgstr "Exportiert"
 
-#: errands/widgets/components.py:86
+#: errands/widgets/components.py:99
+msgid "Today"
+msgstr ""
+
+#: errands/widgets/components.py:104
+msgid "Tomorrow"
+msgstr ""
+
+#: errands/widgets/components.py:117
 msgid "Now"
 msgstr ""
 
-#: errands/widgets/components.py:96 errands/widgets/trash.py:31
+#: errands/widgets/components.py:122 errands/widgets/trash.py:31
 msgid "Clear"
 msgstr "Leeren"
 
@@ -132,97 +140,107 @@ msgstr "Leeren"
 msgid "Imported"
 msgstr "Importiert"
 
-#: errands/widgets/lists.py:130
+#: errands/widgets/lists.py:127 errands/widgets/window.py:19
+#: errands/widgets/window.py:129 data/io.github.mrvladus.List.desktop.in.in:3
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:29
+msgid "Errands"
+msgstr "Errands"
+
+#: errands/widgets/lists.py:133
 msgid "Import List"
 msgstr "Liste importieren"
 
-#: errands/widgets/lists.py:134 errands/widgets/lists.py:241
+#: errands/widgets/lists.py:137 errands/widgets/lists.py:245
 msgid "Add List"
 msgstr "Liste hinzufügen"
 
-#: errands/widgets/lists.py:142
+#: errands/widgets/lists.py:139
+msgid "More Options"
+msgstr ""
+
+#: errands/widgets/lists.py:146
 msgid "Sync / Fetch Tasks"
 msgstr "Aufgaben synchronisieren/holen"
 
-#: errands/widgets/lists.py:144
+#: errands/widgets/lists.py:148
 msgid "Create"
 msgstr ""
 
 #. type:ignore
-#: errands/widgets/lists.py:145
+#: errands/widgets/lists.py:149
 msgid "Load"
 msgstr ""
 
-#: errands/widgets/lists.py:149 errands/resources/gtk/help-overlay.ui:27
+#: errands/widgets/lists.py:153 errands/resources/gtk/help-overlay.ui:27
 msgid "Preferences"
 msgstr "Einstellungen"
 
-#: errands/widgets/lists.py:151
+#: errands/widgets/lists.py:155
 msgid "Keyboard Shortcuts"
 msgstr "Tastenkürzel"
 
-#: errands/widgets/lists.py:153
+#: errands/widgets/lists.py:157
 msgid "About Errands"
 msgstr "Info zu Errands"
 
-#: errands/widgets/lists.py:159
+#: errands/widgets/lists.py:163
 msgid "Main Menu"
 msgstr "Hauptmenü"
 
-#: errands/widgets/lists.py:167
+#: errands/widgets/lists.py:171
 msgid "Add new List"
 msgstr "Neue Liste hinzufügen"
 
 #. type:ignore
-#: errands/widgets/lists.py:168
+#: errands/widgets/lists.py:172
 msgid "Click \"+\" button"
 msgstr "Knopf \"+\" klicken"
 
-#: errands/widgets/lists.py:177 errands/widgets/trash.py:24
+#: errands/widgets/lists.py:181 errands/widgets/trash.py:24
 msgid "Trash"
 msgstr "Papierkorb"
 
-#: errands/widgets/lists.py:237
+#: errands/widgets/lists.py:241
 msgid "New List Name"
 msgstr "Name der neuen Liste"
 
-#: errands/widgets/lists.py:246 errands/widgets/lists.py:382
-#: errands/widgets/lists.py:426 errands/widgets/trash.py:146
+#: errands/widgets/lists.py:250 errands/widgets/lists.py:398
+#: errands/widgets/lists.py:442 errands/widgets/trash.py:146
 msgid "Cancel"
 msgstr "Abbrechen"
 
 #. type:ignore
-#: errands/widgets/lists.py:247
+#: errands/widgets/lists.py:251
 msgid "Add"
 msgstr "Hinzufügen"
 
-#: errands/widgets/lists.py:377 errands/widgets/trash.py:141
+#: errands/widgets/lists.py:393 errands/widgets/trash.py:141
 msgid "Are you sure?"
 msgstr "Sind Sie sicher?"
 
 #. type:ignore
-#: errands/widgets/lists.py:378
+#: errands/widgets/lists.py:394
 msgid "List will be permanently deleted"
 msgstr "Die Liste wird un­wi­der­ruf­lich gelöscht"
 
-#: errands/widgets/lists.py:416
+#: errands/widgets/lists.py:432
 msgid "New Name"
 msgstr "Neuer Name"
 
-#: errands/widgets/lists.py:421
+#: errands/widgets/lists.py:437
 msgid "Rename List"
 msgstr "Liste umbenennen"
 
-#: errands/widgets/lists.py:481
+#: errands/widgets/lists.py:497
 #, fuzzy
 msgid "Export failed"
 msgstr "Exportiert"
 
-#: errands/widgets/lists.py:511
+#: errands/widgets/lists.py:527
 msgid "Rename"
 msgstr "Umbenennen"
 
-#: errands/widgets/lists.py:525
+#: errands/widgets/lists.py:541
 msgid "Menu"
 msgstr "Menü"
 
@@ -340,12 +358,6 @@ msgstr "Aufgaben werden un­wi­der­ruf­lich gelöscht"
 msgid "Restore"
 msgstr "Wiederherstellen"
 
-#: errands/widgets/window.py:19 errands/widgets/window.py:129
-#: data/io.github.mrvladus.List.desktop.in.in:3
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:38
-msgid "Errands"
-msgstr "Errands"
-
 #: errands/widgets/window.py:67 errands/widgets/window.py:86
 msgid "No Task Lists"
 msgstr "Keine Aufgabenlisten"
@@ -391,47 +403,48 @@ msgid "Quit"
 msgstr ""
 
 #: data/io.github.mrvladus.List.desktop.in.in:4
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:39
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:30
 msgid "Manage your tasks"
 msgstr "Verwalten Sie Ihre Aufgaben"
 
 #: data/io.github.mrvladus.List.desktop.in.in:10
-msgid "errands;tasks;list;todo;todos;"
+#, fuzzy
+msgid "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
 msgstr "errands;tasks;list;todo;todos;Aufgaben;Liste;"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:41
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:32
 msgid "Todo application for those who prefer simplicity."
 msgstr "Aufgaben-Anwendung für Menschen die Einfachheit schätzen."
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:42
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:33
 msgid "Features:"
 msgstr "Funktionen:"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:44
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:35
 msgid "Multiple task lists support"
 msgstr "Unterstützung für mehrerer Aufgabenlisten"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:45
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:36
 msgid "Add, remove, edit tasks and sub-tasks"
 msgstr "Aufgaben und Unteraufgaben hinzufügen, entfernen und bearbeiten"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:46
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:37
 msgid "Mark task and sub-tasks as completed"
 msgstr "Aufgaben und Unteraufgaben als abgeschlossen markieren"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:47
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:38
 msgid "Add accent color for each task"
 msgstr "Akzentfarbe für jede Aufgabe hinzufügen"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:48
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:39
 msgid "Sync tasks with Nextcloud or other CalDAV providers"
 msgstr "Aufgaben mit Nextcloud oder anderen CalDAV-Anbietern synchronisieren"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:49
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:40
 msgid "Drag and Drop support"
 msgstr "Drag-and-Drop-Unterstützung"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:50
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:41
 msgid "Import .ics files"
 msgstr ".ics Dateien importieren"
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-28 11:15+0300\n"
+"POT-Creation-Date: 2023-12-29 15:34+0300\n"
 "PO-Revision-Date: 2023-09-19 17:14+0200\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: \n"
@@ -18,13 +18,13 @@ msgstr ""
 "X-Generator: Poedit 3.3.2\n"
 
 #. type:ignore
-#: errands/widgets/details.py:44 errands/widgets/lists.py:383
-#: errands/widgets/lists.py:512 errands/widgets/trash.py:147
+#: errands/widgets/details.py:44 errands/widgets/lists.py:399
+#: errands/widgets/lists.py:528 errands/widgets/trash.py:147
 msgid "Delete"
 msgstr "Verwĳderen"
 
 #. type:ignore
-#: errands/widgets/details.py:49 errands/widgets/lists.py:427
+#: errands/widgets/details.py:49 errands/widgets/lists.py:443
 msgid "Save"
 msgstr ""
 
@@ -53,81 +53,89 @@ msgid "Copy Text"
 msgstr "Kopiëren"
 
 #. Notes group
-#: errands/widgets/details.py:119
+#: errands/widgets/details.py:120
 msgid "Notes"
 msgstr ""
 
 #. Properties group
-#: errands/widgets/details.py:136
+#: errands/widgets/details.py:138
 msgid "Properties"
 msgstr ""
 
-#: errands/widgets/details.py:140 errands/widgets/details.py:157
-#: errands/widgets/components.py:137
+#: errands/widgets/details.py:142 errands/widgets/details.py:159
+#: errands/widgets/components.py:171
 msgid "Not Set"
 msgstr ""
 
-#: errands/widgets/details.py:140
+#: errands/widgets/details.py:142
 msgid "Start"
 msgstr ""
 
-#: errands/widgets/details.py:148 errands/widgets/details.py:165
+#: errands/widgets/details.py:150 errands/widgets/details.py:167
 msgid "Set Date"
 msgstr ""
 
-#: errands/widgets/details.py:157
+#: errands/widgets/details.py:159
 msgid "Due"
 msgstr ""
 
-#: errands/widgets/details.py:174
+#: errands/widgets/details.py:176
 #, fuzzy
 msgid "Complete %"
 msgstr "Afgerond:"
 
-#: errands/widgets/details.py:184
+#: errands/widgets/details.py:186
 msgid "Priority"
 msgstr ""
 
 #. Tags group
-#: errands/widgets/details.py:191
+#: errands/widgets/details.py:193
 msgid "Tags"
 msgstr ""
 
 #. type:ignore
 #. Tags entry
-#: errands/widgets/details.py:193
+#: errands/widgets/details.py:195
 #, fuzzy
 msgid "Add Tag"
 msgstr "Taak toevoegen"
 
 #. Export group
 #. type:ignore
-#: errands/widgets/details.py:198 errands/widgets/details.py:206
-#: errands/widgets/lists.py:513
+#: errands/widgets/details.py:200 errands/widgets/details.py:208
+#: errands/widgets/lists.py:529
 #, fuzzy
 msgid "Export"
 msgstr "Taken exporteren"
 
 #. type:ignore
-#: errands/widgets/details.py:207
+#: errands/widgets/details.py:209
 msgid "Save Task as .ics file"
 msgstr ""
 
-#: errands/widgets/details.py:362
+#: errands/widgets/details.py:364
 msgid "Copied to Clipboard"
 msgstr "Gekopieerd naar het klembord"
 
 #. type:ignore
-#: errands/widgets/details.py:407 errands/widgets/lists.py:483
+#: errands/widgets/details.py:409 errands/widgets/lists.py:499
 #, fuzzy
 msgid "Exported"
 msgstr "Exporteren voltooid"
 
-#: errands/widgets/components.py:86
+#: errands/widgets/components.py:99
+msgid "Today"
+msgstr ""
+
+#: errands/widgets/components.py:104
+msgid "Tomorrow"
+msgstr ""
+
+#: errands/widgets/components.py:117
 msgid "Now"
 msgstr ""
 
-#: errands/widgets/components.py:96 errands/widgets/trash.py:31
+#: errands/widgets/components.py:122 errands/widgets/trash.py:31
 msgid "Clear"
 msgstr "Standaard"
 
@@ -136,101 +144,111 @@ msgstr "Standaard"
 msgid "Imported"
 msgstr "Importeren voltooid"
 
-#: errands/widgets/lists.py:130
+#: errands/widgets/lists.py:127 errands/widgets/window.py:19
+#: errands/widgets/window.py:129 data/io.github.mrvladus.List.desktop.in.in:3
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:29
+msgid "Errands"
+msgstr "Boodschappen"
+
+#: errands/widgets/lists.py:133
 #, fuzzy
 msgid "Import List"
 msgstr "Taken importeren"
 
-#: errands/widgets/lists.py:134 errands/widgets/lists.py:241
+#: errands/widgets/lists.py:137 errands/widgets/lists.py:245
 msgid "Add List"
 msgstr ""
 
-#: errands/widgets/lists.py:142
+#: errands/widgets/lists.py:139
+msgid "More Options"
+msgstr ""
+
+#: errands/widgets/lists.py:146
 msgid "Sync / Fetch Tasks"
 msgstr ""
 
-#: errands/widgets/lists.py:144
+#: errands/widgets/lists.py:148
 msgid "Create"
 msgstr ""
 
 #. type:ignore
-#: errands/widgets/lists.py:145
+#: errands/widgets/lists.py:149
 msgid "Load"
 msgstr ""
 
-#: errands/widgets/lists.py:149 errands/resources/gtk/help-overlay.ui:27
+#: errands/widgets/lists.py:153 errands/resources/gtk/help-overlay.ui:27
 msgid "Preferences"
 msgstr "Voorkeuren"
 
-#: errands/widgets/lists.py:151
+#: errands/widgets/lists.py:155
 msgid "Keyboard Shortcuts"
 msgstr "Sneltoetsen"
 
-#: errands/widgets/lists.py:153
+#: errands/widgets/lists.py:157
 msgid "About Errands"
 msgstr "Over Errands"
 
-#: errands/widgets/lists.py:159
+#: errands/widgets/lists.py:163
 msgid "Main Menu"
 msgstr "Hoofdmenu"
 
-#: errands/widgets/lists.py:167
+#: errands/widgets/lists.py:171
 #, fuzzy
 msgid "Add new List"
 msgstr "Taak toevoegen"
 
 #. type:ignore
-#: errands/widgets/lists.py:168
+#: errands/widgets/lists.py:172
 msgid "Click \"+\" button"
 msgstr ""
 
-#: errands/widgets/lists.py:177 errands/widgets/trash.py:24
+#: errands/widgets/lists.py:181 errands/widgets/trash.py:24
 #, fuzzy
 msgid "Trash"
 msgstr "Prullenbak sluiten"
 
-#: errands/widgets/lists.py:237
+#: errands/widgets/lists.py:241
 msgid "New List Name"
 msgstr ""
 
-#: errands/widgets/lists.py:246 errands/widgets/lists.py:382
-#: errands/widgets/lists.py:426 errands/widgets/trash.py:146
+#: errands/widgets/lists.py:250 errands/widgets/lists.py:398
+#: errands/widgets/lists.py:442 errands/widgets/trash.py:146
 msgid "Cancel"
 msgstr "Annuleren"
 
 #. type:ignore
-#: errands/widgets/lists.py:247
+#: errands/widgets/lists.py:251
 msgid "Add"
 msgstr ""
 
-#: errands/widgets/lists.py:377 errands/widgets/trash.py:141
+#: errands/widgets/lists.py:393 errands/widgets/trash.py:141
 msgid "Are you sure?"
 msgstr "Weet u het zeker?"
 
 #. type:ignore
-#: errands/widgets/lists.py:378
+#: errands/widgets/lists.py:394
 #, fuzzy
 msgid "List will be permanently deleted"
 msgstr "De taken worden permanent verwĳderd."
 
-#: errands/widgets/lists.py:416
+#: errands/widgets/lists.py:432
 msgid "New Name"
 msgstr ""
 
-#: errands/widgets/lists.py:421
+#: errands/widgets/lists.py:437
 msgid "Rename List"
 msgstr ""
 
-#: errands/widgets/lists.py:481
+#: errands/widgets/lists.py:497
 #, fuzzy
 msgid "Export failed"
 msgstr "Exporteren voltooid"
 
-#: errands/widgets/lists.py:511
+#: errands/widgets/lists.py:527
 msgid "Rename"
 msgstr ""
 
-#: errands/widgets/lists.py:525
+#: errands/widgets/lists.py:541
 msgid "Menu"
 msgstr "Menu"
 
@@ -350,12 +368,6 @@ msgstr "De taken worden permanent verwĳderd."
 msgid "Restore"
 msgstr "Herstellen"
 
-#: errands/widgets/window.py:19 errands/widgets/window.py:129
-#: data/io.github.mrvladus.List.desktop.in.in:3
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:38
-msgid "Errands"
-msgstr "Boodschappen"
-
 #: errands/widgets/window.py:67 errands/widgets/window.py:86
 msgid "No Task Lists"
 msgstr ""
@@ -395,48 +407,49 @@ msgid "Quit"
 msgstr "Afsluiten"
 
 #: data/io.github.mrvladus.List.desktop.in.in:4
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:39
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:30
 msgid "Manage your tasks"
 msgstr "Beheer uw taken"
 
 #: data/io.github.mrvladus.List.desktop.in.in:10
-msgid "errands;tasks;list;todo;todos;"
+#, fuzzy
+msgid "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
 msgstr "errands;taken;lĳst;taak;todo;"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:41
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:32
 msgid "Todo application for those who prefer simplicity."
 msgstr ""
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:42
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:33
 msgid "Features:"
 msgstr ""
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:44
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:35
 msgid "Multiple task lists support"
 msgstr ""
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:45
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:36
 msgid "Add, remove, edit tasks and sub-tasks"
 msgstr ""
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:46
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:37
 #, fuzzy
 msgid "Mark task and sub-tasks as completed"
 msgstr "Markeren als afgerond"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:47
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:38
 msgid "Add accent color for each task"
 msgstr ""
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:48
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:39
 msgid "Sync tasks with Nextcloud or other CalDAV providers"
 msgstr ""
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:49
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:40
 msgid "Drag and Drop support"
 msgstr ""
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:50
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:41
 #, fuzzy
 msgid "Import .ics files"
 msgstr "Taken importeren"
