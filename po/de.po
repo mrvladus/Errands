@@ -10,15 +10,15 @@ msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-29 15:34+0300\n"
-"PO-Revision-Date: 2023-12-26 15:15+0100\n"
-"Last-Translator: Milo Ivir <mail@milotype.de>\n"
+"PO-Revision-Date: 2023-12-29 22:54+0100\n"
+"Last-Translator: Philipp Kiemle <philipp.kiemle@gmail.com>\n"
 "Language-Team: \n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.0\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.4.2\n"
 
 #. type:ignore
 #: errands/widgets/details.py:44 errands/widgets/lists.py:399
@@ -38,7 +38,7 @@ msgstr "Keine Details"
 #. type:ignore
 #: errands/widgets/details.py:61
 msgid "Click on task to show more info"
-msgstr "Klicken Sie auf die Aufgabe um weitere Informationen anzuzeigen"
+msgstr "Klicken Sie auf die Aufgabe, um weitere Informationen anzuzeigen"
 
 #: errands/widgets/details.py:84
 msgid "Clear Style"
@@ -74,11 +74,11 @@ msgstr "Start"
 
 #: errands/widgets/details.py:150 errands/widgets/details.py:167
 msgid "Set Date"
-msgstr ""
+msgstr "Datum wählen"
 
 #: errands/widgets/details.py:159
 msgid "Due"
-msgstr ""
+msgstr "Fällig"
 
 #: errands/widgets/details.py:176
 msgid "Complete %"
@@ -91,13 +91,13 @@ msgstr "Priorität"
 #. Tags group
 #: errands/widgets/details.py:193
 msgid "Tags"
-msgstr "Markierungen"
+msgstr "Schlagworte"
 
 #. type:ignore
 #. Tags entry
 #: errands/widgets/details.py:195
 msgid "Add Tag"
-msgstr "Markierung hinzufügen"
+msgstr "Schlagwort hinzufügen"
 
 #. Export group
 #. type:ignore
@@ -109,7 +109,7 @@ msgstr "Exportieren"
 #. type:ignore
 #: errands/widgets/details.py:209
 msgid "Save Task as .ics file"
-msgstr "Aufgabe als .ics Datei speichern"
+msgstr "Aufgabe als .ics-Datei speichern"
 
 #: errands/widgets/details.py:364
 msgid "Copied to Clipboard"
@@ -122,15 +122,15 @@ msgstr "Exportiert"
 
 #: errands/widgets/components.py:99
 msgid "Today"
-msgstr ""
+msgstr "Heute"
 
 #: errands/widgets/components.py:104
 msgid "Tomorrow"
-msgstr ""
+msgstr "Morgen"
 
 #: errands/widgets/components.py:117
 msgid "Now"
-msgstr ""
+msgstr "Jetzt"
 
 #: errands/widgets/components.py:122 errands/widgets/trash.py:31
 msgid "Clear"
@@ -156,7 +156,7 @@ msgstr "Liste hinzufügen"
 
 #: errands/widgets/lists.py:139
 msgid "More Options"
-msgstr ""
+msgstr "Mehr Optionen"
 
 #: errands/widgets/lists.py:146
 msgid "Sync / Fetch Tasks"
@@ -164,12 +164,12 @@ msgstr "Aufgaben synchronisieren/holen"
 
 #: errands/widgets/lists.py:148
 msgid "Create"
-msgstr ""
+msgstr "Erstellen"
 
 #. type:ignore
 #: errands/widgets/lists.py:149
 msgid "Load"
-msgstr ""
+msgstr "Laden"
 
 #: errands/widgets/lists.py:153 errands/resources/gtk/help-overlay.ui:27
 msgid "Preferences"
@@ -194,7 +194,7 @@ msgstr "Neue Liste hinzufügen"
 #. type:ignore
 #: errands/widgets/lists.py:172
 msgid "Click \"+\" button"
-msgstr "Knopf \"+\" klicken"
+msgstr "Den »+«-Knopf drücken"
 
 #: errands/widgets/lists.py:181 errands/widgets/trash.py:24
 msgid "Trash"
@@ -232,9 +232,8 @@ msgid "Rename List"
 msgstr "Liste umbenennen"
 
 #: errands/widgets/lists.py:497
-#, fuzzy
 msgid "Export failed"
-msgstr "Exportiert"
+msgstr "Export fehlgeschlagen"
 
 #: errands/widgets/lists.py:527
 msgid "Rename"
@@ -298,7 +297,7 @@ msgstr "Verbunden"
 
 #: errands/widgets/preferences.py:140
 msgid "Can't connect"
-msgstr "Kann Verbindung nicht herstellen"
+msgstr "Herstellen einer Verbindung fehlgeschlagen"
 
 #: errands/widgets/task_list.py:38 errands/widgets/task_list.py:77
 msgid "Toggle Sidebar"
@@ -322,7 +321,7 @@ msgstr "Abgeschlossen:"
 
 #: errands/widgets/task.py:81
 msgid "Click for Details"
-msgstr "Klicken um Details anzuzeigen"
+msgstr "Für Details klicken"
 
 #: errands/widgets/task.py:89
 msgid "Mark as Completed"
@@ -386,21 +385,19 @@ msgstr "Verbindung folgendem CalDAV-Server kann nicht hergestellt werden:"
 
 #: errands/resources/gtk/help-overlay.ui:9
 msgid "General"
-msgstr ""
+msgstr "Allgemein"
 
 #: errands/resources/gtk/help-overlay.ui:13
-#, fuzzy
 msgid "Show keyboard shortcuts"
-msgstr "Tastenkürzel"
+msgstr "Tastenkürzel anzeigen"
 
 #: errands/resources/gtk/help-overlay.ui:20
-#, fuzzy
 msgid "Toggle sidebar"
 msgstr "Seitenleiste ein-/ausblenden"
 
 #: errands/resources/gtk/help-overlay.ui:34
 msgid "Quit"
-msgstr ""
+msgstr "Beenden"
 
 #: data/io.github.mrvladus.List.desktop.in.in:4
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:30
@@ -408,9 +405,8 @@ msgid "Manage your tasks"
 msgstr "Verwalten Sie Ihre Aufgaben"
 
 #: data/io.github.mrvladus.List.desktop.in.in:10
-#, fuzzy
 msgid "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
-msgstr "errands;tasks;list;todo;todos;Aufgaben;Liste;"
+msgstr "errands;tasks;list;todo;todos;Erledigungen;Aufgaben;Listen;"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:32
 msgid "Todo application for those who prefer simplicity."
