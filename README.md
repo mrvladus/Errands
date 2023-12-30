@@ -37,7 +37,7 @@ Errands is available as a Flatpak on Flathub:
 
 <a href="https://flathub.org/apps/details/io.github.mrvladus.List"><img width='240' alt='Download on Flathub' src='https://dl.flathub.org/assets/badges/flathub-badge-en.png'/></a>
 
-### Building using GNOME Builder
+### Build flatpak using GNOME Builder
 1. Install [GNOME Builder](https://flathub.org/apps/org.gnome.Builder).
 2. Click "Clone Repository" with `https://github.com/mrvladus/Errands.git` as the URL.
 3. Click on the build button at the top.
@@ -53,6 +53,13 @@ Errands is available as a Flatpak on Flathub:
 
 ### Translate
 To translate **Errands** to your language see **[TRANSLATIONS.md](TRANSLATIONS.md)**
+
+### Package
+The only officially supported format is **flatpak** on [Flathub](https://flathub.org/apps/details/io.github.mrvladus.List)!
+Please, **do not package** it in other formats, but if you do, these are dependencies:
+- `libadwaita >= 1.4`
+- `PyGObject`
+- `python3-caldav`
 
 ### Donate
 If you like this app, you can support its development. See **[DONATIONS.md](DONATIONS.md)**
