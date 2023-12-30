@@ -25,6 +25,12 @@
 - Sync tasks with Nextcloud or other CalDAV providers
 - Drag and Drop support
 
+## Sync
+Errands is using [python-caldav](https://github.com/python-caldav/caldav) library for syncing with Nextcloud Tasks and other CalDAV providers.
+
+For now, only **Nextcloud** is supported and known to work well.
+Other providers **may not work**. See [python-caldav  documentation](https://caldav.readthedocs.io/en/latest/#compatibility) for more info on compatibility.
+
 ## Install
 ### Flatpak
 Errands is available as a Flatpak on Flathub:
