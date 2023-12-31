@@ -63,10 +63,7 @@ class Window(Adw.ApplicationWindow):
         status_toolbar_view = Adw.ToolbarView(
             content=Box(
                 children=[
-                    Adw.StatusPage(
-                        title=_("No Task Lists"),
-                        icon_name=APP_ID,
-                    ),
+                    Adw.StatusPage(title=_("No Task Lists"), icon_name=APP_ID),
                     Button(
                         label=_("Create List"),
                         on_click=lambda *_: self.lists.add_list_btn.activate(),
