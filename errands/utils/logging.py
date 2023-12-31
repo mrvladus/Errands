@@ -1,3 +1,6 @@
+# Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
+# SPDX-License-Identifier: MIT
+
 import os
 from gi.repository import GLib
 from __main__ import VERSION

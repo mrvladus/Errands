@@ -17,5 +17,6 @@
     <file preprocess="xml-stripblanks" alias="errands-sync-symbolic.svg">resources/icons/errands-sync-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-info-symbolic.svg">resources/icons/errands-info-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-trash-symbolic.svg">resources/icons/errands-trash-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-lists-symbolic.svg">resources/icons/errands-lists-symbolic.svg</file>
   </gresource>
 </gresources>

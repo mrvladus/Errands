@@ -168,7 +168,7 @@ class Lists(Adw.Bin):
         self.status_page = Adw.StatusPage(
             title=_("Add new List"),
             description=_('Click "+" button'),
-            icon_name="view-list-bullet-rtl-symbolic",
+            icon_name="errands-lists-symbolic",
             css_classes=["compact"],
             vexpand=True,
         )
