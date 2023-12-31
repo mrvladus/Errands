@@ -352,9 +352,8 @@ msgid "No Task Lists"
 msgstr "Нет списков задач"
 
 #: errands/widgets/window.py:68
-#, fuzzy
 msgid "Create List"
-msgstr "Переименовать список"
+msgstr "Создать список"
 
 #: errands/widgets/window.py:131
 msgid "translator-credits"
