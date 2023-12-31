@@ -16,7 +16,7 @@ from errands.utils.logging import Log
 class Window(Adw.ApplicationWindow):
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
-        self.set_title(_("Errands"))  # type:ignore
+        self.set_title(_("Errands"))
         # Remember window state
         GSettings.bind("width", self, "default_width")
         GSettings.bind("height", self, "default_height")
@@ -64,7 +64,7 @@ class Window(Adw.ApplicationWindow):
             content=Box(
                 children=[
                     Adw.StatusPage(
-                        title=_("No Task Lists"),  # type:ignore
+                        title=_("No Task Lists"),
                         icon_name=APP_ID,
                     ),
                     Button(
@@ -83,7 +83,7 @@ class Window(Adw.ApplicationWindow):
         self.stack.add_titled(
             child=status_toolbar_view,
             name="status",
-            title=_("No Task Lists"),  # type:ignore
+            title=_("No Task Lists"),
         )
         self.stack.set_visible_child_name("status")
 
@@ -126,12 +126,12 @@ class Window(Adw.ApplicationWindow):
                 transient_for=self,
                 version=VERSION,
                 application_icon=APP_ID,
-                application_name=_("Errands"),  # type:ignore
+                application_name=_("Errands"),
                 copyright="© 2023 Vlad Krupinskii",
                 website="https://github.com/mrvladus/Errands",
                 issue_url="https://github.com/mrvladus/Errands/issues",
                 license_type=Gtk.License.MIT_X11,
-                translator_credits=_("translator-credits"),  # type:ignore
+                translator_credits=_("translator-credits"),
                 modal=True,
             )
             about.show()
@@ -139,7 +139,7 @@ class Window(Adw.ApplicationWindow):
         def _sync(*args):
             Sync.sync()
             if GSettings.get("sync-provider") == 0:
-                self.add_toast(_("Sync is disabled"))  # type:ignore
+                self.add_toast(_("Sync is disabled"))
 
         _create_action(
             "preferences",

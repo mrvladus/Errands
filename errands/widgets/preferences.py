@@ -32,13 +32,13 @@ class PreferencesWindow(Adw.PreferencesWindow):
         self.set_search_enabled(False)
         # Theme group
         theme_group = Adw.PreferencesGroup(
-            title=_("Application Theme"),  # type:ignore
+            title=_("Application Theme"),
         )
         # System theme
         self.theme_system_btn = Gtk.CheckButton()
         self.theme_system_btn.connect("toggled", self.on_theme_change, 0)
         theme_system_row = Adw.ActionRow(
-            title=_("System"),  # type:ignore
+            title=_("System"),
             icon_name="errands-theme-system-symbolic",
         )
         theme_system_row.add_suffix(self.theme_system_btn)
@@ -48,7 +48,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
         self.theme_light_btn = Gtk.CheckButton(group=self.theme_system_btn)
         self.theme_light_btn.connect("toggled", self.on_theme_change, 1)
         theme_light_row = Adw.ActionRow(
-            title=_("Light"),  # type:ignore
+            title=_("Light"),
             icon_name="errands-theme-light-symbolic",
         )
         theme_light_row.add_suffix(self.theme_light_btn)
@@ -58,7 +58,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
         self.theme_dark_btn = Gtk.CheckButton(group=self.theme_system_btn)
         self.theme_dark_btn.connect("toggled", self.on_theme_change, 4)
         theme_dark_row = Adw.ActionRow(
-            title=_("Dark"),  # type:ignore
+            title=_("Dark"),
             icon_name="errands-theme-dark-symbolic",
         )
         theme_dark_row.add_suffix(self.theme_dark_btn)
@@ -66,14 +66,12 @@ class PreferencesWindow(Adw.PreferencesWindow):
         theme_group.add(theme_dark_row)
         # Sync group
         sync_group = Adw.PreferencesGroup(
-            title=_("Sync"),  # type:ignore
+            title=_("Sync"),
         )
         # Provider
-        model = Gtk.StringList.new(
-            [_("Disabled"), "Nextcloud", "CalDAV"]  # type:ignore
-        )
+        model = Gtk.StringList.new([_("Disabled"), "Nextcloud", "CalDAV"])
         self.sync_providers = Adw.ComboRow(
-            title=_("Sync Provider"),  # type:ignore
+            title=_("Sync Provider"),
             model=model,
             icon_name="errands-sync-symbolic",
         )
@@ -81,28 +79,28 @@ class PreferencesWindow(Adw.PreferencesWindow):
         sync_group.add(self.sync_providers)
         # URL
         self.sync_url = Adw.EntryRow(
-            title=_("Server URL"),  # type:ignore
+            title=_("Server URL"),
         )
         sync_group.add(self.sync_url)
         # Username
         self.sync_username = Adw.EntryRow(
-            title=_("Username"),  # type:ignore
+            title=_("Username"),
         )
         sync_group.add(self.sync_username)
         # Password
         self.sync_password = Adw.PasswordEntryRow(
-            title=_("Password"),  # type:ignore
+            title=_("Password"),
         )
         self.sync_password.connect("changed", self.on_sync_pass_changed)
         sync_group.add(self.sync_password)
         # Test connection
         test_btn = Gtk.Button(
-            label=_("Test"),  # type:ignore
+            label=_("Test"),
             valign="center",
         )
         test_btn.connect("clicked", self.on_test_connection_btn_clicked)
         self.test_connection_row = Adw.ActionRow(
-            title=_("Test Connection"),  # type:ignore
+            title=_("Test Connection"),
         )
         self.test_connection_row.add_suffix(test_btn)
         self.test_connection_row.set_activatable_widget(test_btn)

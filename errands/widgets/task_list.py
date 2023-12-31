@@ -35,7 +35,7 @@ class TaskList(Adw.Bin):
         # Toggle sidebar button
         self.toggle_sidebar_btn = Gtk.ToggleButton(
             icon_name="sidebar-show-symbolic",
-            tooltip_text=_("Toggle Sidebar"),  # type:ignore
+            tooltip_text=_("Toggle Sidebar"),
         )
         toggle_ctrl = Gtk.ShortcutController(scope=1)
         toggle_ctrl.add_shortcut(
@@ -49,7 +49,7 @@ class TaskList(Adw.Bin):
         self.delete_completed_btn = Gtk.Button(
             valign="center",
             icon_name="edit-clear-all-symbolic",
-            tooltip_text=_("Delete Completed Tasks"),  # type:ignore
+            tooltip_text=_("Delete Completed Tasks"),
             sensitive=False,
         )
         self.delete_completed_btn.connect(
@@ -59,7 +59,7 @@ class TaskList(Adw.Bin):
         self.scroll_up_btn = Gtk.Button(
             valign="center",
             icon_name="go-up-symbolic",
-            tooltip_text=_("Scroll Up"),  # type:ignore
+            tooltip_text=_("Scroll Up"),
             sensitive=False,
         )
         self.scroll_up_btn.connect("clicked", lambda *_: scroll(self.scrl, False))
@@ -74,7 +74,7 @@ class TaskList(Adw.Bin):
 
         toggle_sidebar_btn = Gtk.ToggleButton(
             icon_name="sidebar-show-symbolic",
-            tooltip_text=_("Toggle Sidebar"),  # type:ignore
+            tooltip_text=_("Toggle Sidebar"),
         )
         toggle_sidebar_btn.bind_property(
             "active",
@@ -86,7 +86,7 @@ class TaskList(Adw.Bin):
         delete_completed_btn = Gtk.Button(
             valign="center",
             icon_name="edit-clear-all-symbolic",
-            tooltip_text=_("Delete Completed Tasks"),  # type:ignore
+            tooltip_text=_("Delete Completed Tasks"),
             sensitive=False,
         )
         delete_completed_btn.bind_property(
@@ -100,7 +100,7 @@ class TaskList(Adw.Bin):
         scroll_up_btn = Gtk.Button(
             valign="center",
             icon_name="go-up-symbolic",
-            tooltip_text=_("Scroll Up"),  # type:ignore
+            tooltip_text=_("Scroll Up"),
             sensitive=False,
         )
         scroll_up_btn.bind_property(
@@ -117,7 +117,7 @@ class TaskList(Adw.Bin):
         entry = Adw.EntryRow(
             activatable=False,
             height_request=60,
-            title=_("Add new Task"),  # type:ignore
+            title=_("Add new Task"),
         )
         entry.connect("entry-activated", self.on_task_added)
         entry_box = Gtk.ListBox(
@@ -271,9 +271,7 @@ class TaskList(Adw.Bin):
         )[0][0]
 
         self.title.set_subtitle(
-            _("Completed:") + f" {n_completed} / {n_total}"  # type:ignore
-            if n_total > 0
-            else ""
+            _("Completed:") + f" {n_completed} / {n_total}" if n_total > 0 else ""
         )
         self.delete_completed_btn.set_sensitive(n_all_completed > 0)
 

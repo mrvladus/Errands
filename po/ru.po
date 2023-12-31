@@ -77,7 +77,7 @@ msgstr "Задать дату"
 
 #: errands/widgets/details.py:159
 msgid "Due"
-msgstr ""
+msgstr "Конец"
 
 #: errands/widgets/details.py:176
 msgid "Complete %"
@@ -121,11 +121,11 @@ msgstr "Экспортировано"
 
 #: errands/widgets/components.py:99
 msgid "Today"
-msgstr ""
+msgstr "Сегодня"
 
 #: errands/widgets/components.py:104
 msgid "Tomorrow"
-msgstr ""
+msgstr "Завтра"
 
 #: errands/widgets/components.py:117
 msgid "Now"
@@ -155,7 +155,7 @@ msgstr "Добавить список"
 
 #: errands/widgets/lists.py:139
 msgid "More Options"
-msgstr ""
+msgstr "Больше опций"
 
 #: errands/widgets/lists.py:146
 msgid "Sync / Fetch Tasks"
@@ -399,9 +399,8 @@ msgid "Manage your tasks"
 msgstr "Управляйте своими задачами"
 
 #: data/io.github.mrvladus.List.desktop.in.in:10
-#, fuzzy
 msgid "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
-msgstr "errands;дела;задачи;лист;"
+msgstr "errands;дела;задачи;лист;caldav;nextcloud;sync"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:32
 msgid "Todo application for those who prefer simplicity."

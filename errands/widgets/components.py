@@ -96,12 +96,12 @@ class DateTime(Gtk.Box):
             Box(
                 children=[
                     Button(
-                        label=_("Today"),  # type:ignore
+                        label=_("Today"),
                         on_click=self._on_today_btn_clicked,
                         hexpand=True,
                     ),
                     Button(
-                        label=_("Tomorrow"),  # type:ignore
+                        label=_("Tomorrow"),
                         on_click=self._on_tomorrow_btn_clicked,
                         hexpand=True,
                     ),
@@ -114,12 +114,12 @@ class DateTime(Gtk.Box):
             Box(
                 children=[
                     Button(
-                        label=_("Now"),  # type:ignore
+                        label=_("Now"),
                         on_click=self._on_now_btn_clicked,
                         hexpand=True,
                     ),
                     Button(
-                        label=_("Clear"),  # type:ignore
+                        label=_("Clear"),
                         on_click=self._on_clear_btn_clicked,
                         hexpand=True,
                     ),
@@ -168,7 +168,7 @@ class DateTime(Gtk.Box):
         if self.datetime:
             out: str = f"{self.datetime[9:11]}:{self.datetime[11:13]}, {self.calendar.get_date().format('%d %B, %Y')}"
         else:
-            out: str = _("Not Set")  # type:ignore
+            out: str = _("Not Set")
         return out
 
     def get_datetime_as_int(self) -> int:

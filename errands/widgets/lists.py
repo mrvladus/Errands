@@ -108,7 +108,7 @@ class Lists(Adw.Bin):
                             uid=todo.get("UID", None),
                         )
                 self.update_ui()
-                self.window.add_toast(_("Imported"))  # type:ignore
+                self.window.add_toast(_("Imported"))
                 Sync.sync()
 
             filter = Gtk.FileFilter()
@@ -124,43 +124,41 @@ class Lists(Adw.Bin):
     def _build_ui(self):
         hb = Adw.HeaderBar(
             title_widget=Gtk.Label(
-                label=_("Errands"),  # type:ignore
+                label=_("Errands"),
                 css_classes=["heading"],
             )
         )
         # Import menu
         import_menu: Gio.Menu = Gio.Menu.new()
-        import_menu.append(_("Import List"), "lists.import")  # type:ignore
+        import_menu.append(_("Import List"), "lists.import")
         # Add list button
         self.add_list_btn = Adw.SplitButton(
             icon_name="list-add-symbolic",
-            tooltip_text=_("Add List"),  # type:ignore
+            tooltip_text=_("Add List"),
             menu_model=import_menu,
-            dropdown_tooltip=_("More Options"),  # type:ignore
+            dropdown_tooltip=_("More Options"),
         )
         self.add_list_btn.connect("clicked", self.on_add_btn_clicked)
         hb.pack_start(self.add_list_btn)
         # Main menu
         menu: Gio.Menu = Gio.Menu.new()
         top_section = Gio.Menu.new()
-        top_section.append(_("Sync / Fetch Tasks"), "app.sync")  # type:ignore
+        top_section.append(_("Sync / Fetch Tasks"), "app.sync")
         backup_submenu = Gio.Menu.new()
-        backup_submenu.append(_("Create"), "lists.backup_create")  # type:ignore
-        backup_submenu.append(_("Load"), "lists.backup_load")  # type:ignore
-        # top_section.append_submenu(_("Backup"), backup_submenu)  # type:ignore
+        backup_submenu.append(_("Create"), "lists.backup_create")
+        backup_submenu.append(_("Load"), "lists.backup_load")
+        # top_section.append_submenu(_("Backup"), backup_submenu)
         menu.append_section(None, top_section)
         bottom_section = Gio.Menu.new()
-        bottom_section.append(_("Preferences"), "app.preferences")  # type:ignore
-        bottom_section.append(
-            _("Keyboard Shortcuts"), "win.show-help-overlay"  # type:ignore
-        )
-        bottom_section.append(_("About Errands"), "app.about")  # type:ignore
+        bottom_section.append(_("Preferences"), "app.preferences")
+        bottom_section.append(_("Keyboard Shortcuts"), "win.show-help-overlay")
+        bottom_section.append(_("About Errands"), "app.about")
         menu.append_section(None, bottom_section)
         menu_btn = Gtk.MenuButton(
             menu_model=menu,
             primary=True,
             icon_name="open-menu-symbolic",
-            tooltip_text=_("Main Menu"),  # type:ignore
+            tooltip_text=_("Main Menu"),
         )
         hb.pack_end(menu_btn)
         # Lists
@@ -168,8 +166,8 @@ class Lists(Adw.Bin):
         self.lists.connect("row-selected", self.on_list_swiched)
         # Status page
         self.status_page = Adw.StatusPage(
-            title=_("Add new List"),  # type:ignore
-            description=_('Click "+" button'),  # type:ignore
+            title=_("Add new List"),
+            description=_('Click "+" button'),
             icon_name="view-list-bullet-rtl-symbolic",
             css_classes=["compact"],
             vexpand=True,
@@ -178,7 +176,7 @@ class Lists(Adw.Bin):
         self.trash_btn = Gtk.Button(
             child=Adw.ButtonContent(
                 icon_name="errands-trash-symbolic",
-                label=_("Trash"),  # type:ignore
+                label=_("Trash"),
                 halign="center",
             ),
             css_classes=["flat"],
@@ -238,17 +236,17 @@ class Lists(Adw.Bin):
             row.activate()
             Sync.sync()
 
-        entry = Gtk.Entry(placeholder_text=_("New List Name"))  # type:ignore
+        entry = Gtk.Entry(placeholder_text=_("New List Name"))
         dialog = Adw.MessageDialog(
             transient_for=self.window,
             hide_on_close=True,
-            heading=_("Add List"),  # type:ignore
+            heading=_("Add List"),
             default_response="add",
             close_response="cancel",
             extra_child=entry,
         )
-        dialog.add_response("cancel", _("Cancel"))  # type:ignore
-        dialog.add_response("add", _("Add"))  # type:ignore
+        dialog.add_response("cancel", _("Cancel"))
+        dialog.add_response("add", _("Add"))
         dialog.set_response_enabled("add", False)
         dialog.set_response_appearance("add", Adw.ResponseAppearance.SUGGESTED)
         dialog.connect("response", _confirm, entry)
@@ -390,13 +388,13 @@ class ListItem(Gtk.ListBoxRow):
             dialog = Adw.MessageDialog(
                 transient_for=self.window,
                 hide_on_close=True,
-                heading=_("Are you sure?"),  # type:ignore
-                body=_("List will be permanently deleted"),  # type:ignore
+                heading=_("Are you sure?"),
+                body=_("List will be permanently deleted"),
                 default_response="delete",
                 close_response="cancel",
             )
-            dialog.add_response("cancel", _("Cancel"))  # type:ignore
-            dialog.add_response("delete", _("Delete"))  # type:ignore
+            dialog.add_response("cancel", _("Cancel"))
+            dialog.add_response("delete", _("Delete"))
             dialog.set_response_appearance("delete", Adw.ResponseAppearance.DESTRUCTIVE)
             dialog.connect("response", _confirm)
             dialog.present()
@@ -429,18 +427,18 @@ class ListItem(Gtk.ListBoxRow):
                 page.set_title(text)
                 Sync.sync()
 
-            entry = Gtk.Entry(placeholder_text=_("New Name"))  # type:ignore
+            entry = Gtk.Entry(placeholder_text=_("New Name"))
             entry.get_buffer().props.text = self.label.get_label()
             dialog = Adw.MessageDialog(
                 transient_for=self.window,
                 hide_on_close=True,
-                heading=_("Rename List"),  # type:ignore
+                heading=_("Rename List"),
                 default_response="save",
                 close_response="cancel",
                 extra_child=entry,
             )
-            dialog.add_response("cancel", _("Cancel"))  # type:ignore
-            dialog.add_response("save", _("Save"))  # type:ignore
+            dialog.add_response("cancel", _("Cancel"))
+            dialog.add_response("save", _("Save"))
             dialog.set_response_enabled("save", False)
             dialog.set_response_appearance("save", Adw.ResponseAppearance.SUGGESTED)
             dialog.connect("response", _confirm, entry)
@@ -494,9 +492,9 @@ class ListItem(Gtk.ListBoxRow):
                         f.write(calendar.to_ical())
                 except Exception as e:
                     Log.error(f"List: Export failed. {e}")
-                    self.window.add_toast(_("Export failed"))  # type:ignore
+                    self.window.add_toast(_("Export failed"))
 
-                self.window.add_toast(_("Exported"))  # type:ignore
+                self.window.add_toast(_("Exported"))
 
             filter = Gtk.FileFilter()
             filter.add_pattern("*.ics")
@@ -524,9 +522,9 @@ class ListItem(Gtk.ListBoxRow):
         )
         # Menu
         menu: Gio.Menu = Gio.Menu.new()
-        menu.append(_("Rename"), "list_item.rename")  # type:ignore
-        menu.append(_("Delete"), "list_item.delete")  # type:ignore
-        menu.append(_("Export"), "list_item.export")  # type:ignore
+        menu.append(_("Rename"), "list_item.rename")
+        menu.append(_("Delete"), "list_item.delete")
+        menu.append(_("Export"), "list_item.export")
         # Click controller
         ctrl = Gtk.GestureClick()
         ctrl.connect("released", self._on_click)
@@ -538,7 +536,7 @@ class ListItem(Gtk.ListBoxRow):
                     Gtk.MenuButton(
                         menu_model=menu,
                         icon_name="view-more-symbolic",
-                        tooltip_text=_("Menu"),  # type:ignore
+                        tooltip_text=_("Menu"),
                     ),
                 ],
                 css_classes=["toolbar"],

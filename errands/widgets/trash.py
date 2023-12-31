@@ -20,15 +20,13 @@ class Trash(Adw.Bin):
 
     def build_ui(self):
         # Headerbar
-        hb = Adw.HeaderBar(
-            title_widget=Adw.WindowTitle(title=_("Trash"))  # type:ignore
-        )
+        hb = Adw.HeaderBar(title_widget=Adw.WindowTitle(title=_("Trash")))
         # Clear button
         clear_btn = Button(
             icon_name="errands-trash-symbolic",
             on_click=self.on_trash_clear,
             valign="center",
-            tooltip_text=_("Clear"),  # type:ignore
+            tooltip_text=_("Clear"),
         )
         hb.pack_start(clear_btn)
         # Restore button
@@ -36,14 +34,14 @@ class Trash(Adw.Bin):
             icon_name="edit-redo-symbolic",
             on_click=self.on_trash_restore,
             valign="center",
-            tooltip_text=_("Restore All"),  # type:ignore
+            tooltip_text=_("Restore All"),
         )
         hb.pack_end(restore_btn)
         # Status
         self.status = Adw.StatusPage(
             icon_name="errands-trash-symbolic",
-            title=_("Empty Trash"),  # type:ignore
-            description=_("No deleted items"),  # type:ignore
+            title=_("Empty Trash"),
+            description=_("No deleted items"),
             vexpand=True,
         )
         self.status.add_css_class("compact")
@@ -138,13 +136,13 @@ class Trash(Adw.Bin):
         dialog = Adw.MessageDialog(
             transient_for=self.window,
             hide_on_close=True,
-            heading=_("Are you sure?"),  # type:ignore
-            body=_("Tasks will be permanently deleted"),  # type:ignore
+            heading=_("Are you sure?"),
+            body=_("Tasks will be permanently deleted"),
             default_response="delete",
             close_response="cancel",
         )
-        dialog.add_response("cancel", _("Cancel"))  # type:ignore
-        dialog.add_response("delete", _("Delete"))  # type:ignore
+        dialog.add_response("cancel", _("Cancel"))
+        dialog.add_response("delete", _("Delete"))
         dialog.set_response_appearance("delete", Adw.ResponseAppearance.DESTRUCTIVE)
         dialog.connect("response", _confirm)
         dialog.show()
@@ -219,7 +217,7 @@ class TrashItem(Adw.Bin):
             Button(
                 icon_name="emblem-ok-symbolic",
                 on_click=self.on_restore,
-                tooltip_text=_("Restore"),  # type:ignore
+                tooltip_text=_("Restore"),
                 valign="center",
                 css_classes=["flat", "circular"],
             )

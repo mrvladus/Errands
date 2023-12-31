@@ -78,7 +78,7 @@ class Task(Gtk.Revealer):
             title=Markup.find_url(Markup.escape(self.get_prop("text"))),
             css_classes=["rounded-corners", "transparent"],
             height_request=60,
-            tooltip_text=_("Click for Details"),  # type:ignore
+            tooltip_text=_("Click for Details"),
             accessible_role=Gtk.AccessibleRole.ROW,
             cursor=Gdk.Cursor.new_from_name("pointer"),
             use_markup=True,
@@ -86,7 +86,7 @@ class Task(Gtk.Revealer):
         # Mark as completed button
         self.completed_btn = Gtk.CheckButton(
             valign="center",
-            tooltip_text=_("Mark as Completed"),  # type:ignore
+            tooltip_text=_("Mark as Completed"),
         )
         self.completed_btn.connect("toggled", self.on_completed_btn_toggled)
         self.completed_btn.set_active(self.get_prop("completed"))
@@ -98,7 +98,7 @@ class Task(Gtk.Revealer):
                 not self.sub_tasks_revealer.get_child_revealed()
             ),
             valign="center",
-            tooltip_text=_("Expand / Fold"),  # type:ignore
+            tooltip_text=_("Expand / Fold"),
             css_classes=["flat", "circular", "fade", "rotate"],
         )
         self.task_row.add_suffix(self.expand_btn)
@@ -130,7 +130,7 @@ class Task(Gtk.Revealer):
             margin_bottom=6,
             margin_start=12,
             margin_end=12,
-            placeholder_text=_("Add new Sub-Task"),  # type:ignore
+            placeholder_text=_("Add new Sub-Task"),
         )
         sub_tasks_entry.connect("activate", self.on_sub_task_added)
         # Sub-tasks

@@ -41,12 +41,12 @@ class Details(Adw.Bin):
         delete_btn = Button(
             icon_name="errands-trash-symbolic",
             on_click=self.on_delete_btn_clicked,
-            tooltip_text=_("Delete"),  # type:ignore
+            tooltip_text=_("Delete"),
         )
         hb.pack_start(delete_btn)
         # Save button
         self.save_btn = Button(
-            label=_("Save"),  # type:ignore
+            label=_("Save"),
             on_click=self.on_save_btn_clicked,
             css_classes=["suggested-action"],
         )
@@ -57,8 +57,8 @@ class Details(Adw.Bin):
             icon_name="errands-info-symbolic",
             visible=True,
             vexpand=True,
-            title=_("No Details"),  # type:ignore
-            description=_("Click on task to show more info"),  # type:ignore
+            title=_("No Details"),
+            description=_("Click on task to show more info"),
         )
         self.status.add_css_class("compact")
         self.status.bind_property(
@@ -81,7 +81,7 @@ class Details(Adw.Bin):
             btn = Gtk.Button(can_shrink=True)
             if color == "":
                 btn.set_icon_name("window-close-symbolic")
-                btn.set_tooltip_text(_("Clear Style"))  # type:ignore
+                btn.set_tooltip_text(_("Clear Style"))
             else:
                 btn.add_css_class("accent-color-btn")
                 btn.add_css_class(f"btn-{color}")
@@ -90,7 +90,7 @@ class Details(Adw.Bin):
             colors_box.append(btn)
 
         # Edit group
-        edit_group = Adw.PreferencesGroup(title=_("Text"))  # type:ignore
+        edit_group = Adw.PreferencesGroup(title=_("Text"))
         # Copy button
         edit_group.set_header_suffix(
             Button(
@@ -98,7 +98,7 @@ class Details(Adw.Bin):
                 on_click=self.on_copy_text_clicked,
                 valign="center",
                 css_classes=["flat"],
-                tooltip_text=_("Copy Text"),  # type:ignore
+                tooltip_text=_("Copy Text"),
             )
         )
         # Edit entry
@@ -117,7 +117,7 @@ class Details(Adw.Bin):
         )
 
         # Notes group
-        notes_group = Adw.PreferencesGroup(title=_("Notes"))  # type:ignore
+        notes_group = Adw.PreferencesGroup(title=_("Notes"))
         # Notes entry
         self.notes = Gtk.TextBuffer()
         self.notes.connect("changed", lambda *_: self.save_btn.set_sensitive(True))
@@ -135,19 +135,17 @@ class Details(Adw.Bin):
         )
 
         # Properties group
-        props_group = Adw.PreferencesGroup(title=_("Properties"))  # type:ignore
+        props_group = Adw.PreferencesGroup(title=_("Properties"))
 
         # Start date row
-        self.start_datetime_row = Adw.ActionRow(
-            title=_("Not Set"), subtitle=_("Start")  # type:ignore
-        )
+        self.start_datetime_row = Adw.ActionRow(title=_("Not Set"), subtitle=_("Start"))
         self.start_datetime = DateTime()
         self.start_datetime.connect("changed", self.on_start_time_changed)
         self.start_datetime_row.add_suffix(
             Gtk.MenuButton(
                 valign="center",
                 icon_name="errands-calendar-symbolic",
-                tooltip_text=_("Set Date"),  # type:ignore
+                tooltip_text=_("Set Date"),
                 popover=Gtk.Popover(child=self.start_datetime),
                 css_classes=["flat"],
             )
@@ -155,16 +153,14 @@ class Details(Adw.Bin):
         props_group.add(self.start_datetime_row)
 
         # End date row
-        self.end_datetime_row = Adw.ActionRow(
-            title=_("Not Set"), subtitle=_("Due")  # type:ignore
-        )
+        self.end_datetime_row = Adw.ActionRow(title=_("Not Set"), subtitle=_("Due"))
         self.end_datetime = DateTime()
         self.end_datetime.connect("changed", self.on_end_time_changed)
         self.end_datetime_row.add_suffix(
             Gtk.MenuButton(
                 valign="center",
                 icon_name="errands-calendar-symbolic",
-                tooltip_text=_("Set Date"),  # type:ignore
+                tooltip_text=_("Set Date"),
                 popover=Gtk.Popover(child=self.end_datetime),
                 css_classes=["flat"],
             )
@@ -173,7 +169,7 @@ class Details(Adw.Bin):
 
         # Complete % row
         self.percent_complete = Adw.SpinRow(
-            title=_("Complete %"),  # type:ignore
+            title=_("Complete %"),
             adjustment=Gtk.Adjustment(lower=0, upper=100, step_increment=1),
         )
         self.percent_complete.connect(
@@ -183,21 +179,21 @@ class Details(Adw.Bin):
 
         # Priority row
         self.priority = Adw.SpinRow(
-            title=_("Priority"),  # type:ignore
+            title=_("Priority"),
             adjustment=Gtk.Adjustment(lower=0, upper=9, step_increment=1),
         )
         self.priority.connect("changed", lambda *_: self.save_btn.set_sensitive(True))
         props_group.add(self.priority)
 
         # Tags group
-        self.tags = Adw.PreferencesGroup(title=_("Tags"))  # type:ignore
+        self.tags = Adw.PreferencesGroup(title=_("Tags"))
         # Tags entry
-        self.tag_entry = Adw.EntryRow(title=_("Add Tag"))  # type:ignore
+        self.tag_entry = Adw.EntryRow(title=_("Add Tag"))
         self.tag_entry.connect("entry-activated", self.on_tag_added)
         self.tags.add(self.tag_entry)
 
         # Export group
-        misc_group = Adw.PreferencesGroup(title=_("Export"))  # type:ignore
+        misc_group = Adw.PreferencesGroup(title=_("Export"))
         open_cal_btn = Button(
             icon_name="errands-share-symbolic",
             on_click=self.on_export,
@@ -205,8 +201,8 @@ class Details(Adw.Bin):
             css_classes=["flat"],
         )
         open_cal_row = Adw.ActionRow(
-            title=_("Export"),  # type:ignore
-            subtitle=_("Save Task as .ics file"),  # type:ignore
+            title=_("Export"),
+            subtitle=_("Save Task as .ics file"),
             activatable_widget=open_cal_btn,
         )
         open_cal_row.add_suffix(open_cal_btn)
@@ -406,7 +402,7 @@ class Details(Adw.Bin):
 
             with open(file.get_path(), "wb") as f:
                 f.write(calendar.to_ical())
-            self.window.add_toast(_("Exported"))  # type:ignore
+            self.window.add_toast(_("Exported"))
 
         dialog = Gtk.FileDialog(initial_name=f"{self.parent.uid}.ics")
         dialog.save(self.window, None, _confirm)
