@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-29 15:34+0300\n"
+"POT-Creation-Date: 2023-12-31 14:41+0300\n"
 "PO-Revision-Date: 2023-12-31 14:13+0900\n"
 "Last-Translator: Gnuey56 <gnuey56@proton.me>\n"
 "Language-Team: \n"
@@ -17,14 +17,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.4.1\n"
 
-#. type:ignore
-#: errands/widgets/details.py:44 errands/widgets/lists.py:399
-#: errands/widgets/lists.py:528 errands/widgets/trash.py:147
+#: errands/widgets/details.py:44 errands/widgets/lists.py:397
+#: errands/widgets/lists.py:526 errands/widgets/trash.py:145
 msgid "Delete"
 msgstr "削除"
 
-#. type:ignore
-#: errands/widgets/details.py:49 errands/widgets/lists.py:443
+#: errands/widgets/details.py:49 errands/widgets/lists.py:441
 msgid "Save"
 msgstr "保存"
 
@@ -32,7 +30,6 @@ msgstr "保存"
 msgid "No Details"
 msgstr "詳細なし"
 
-#. type:ignore
 #: errands/widgets/details.py:61
 msgid "Click on task to show more info"
 msgstr "タスクをクリックして詳細を表示"
@@ -60,60 +57,58 @@ msgstr "メモ"
 msgid "Properties"
 msgstr "プロパティ"
 
-#: errands/widgets/details.py:142 errands/widgets/details.py:159
+#. Start date row
+#. End date row
+#: errands/widgets/details.py:141 errands/widgets/details.py:156
 #: errands/widgets/components.py:171
 msgid "Not Set"
 msgstr "未設定"
 
-#: errands/widgets/details.py:142
+#: errands/widgets/details.py:141
 msgid "Start"
 msgstr "開始日"
 
-#: errands/widgets/details.py:150 errands/widgets/details.py:167
+#: errands/widgets/details.py:148 errands/widgets/details.py:163
 msgid "Set Date"
 msgstr "日付を設定"
 
-#: errands/widgets/details.py:159
+#: errands/widgets/details.py:156
 msgid "Due"
 msgstr "終了日"
 
-#: errands/widgets/details.py:176
+#: errands/widgets/details.py:172
 msgid "Complete %"
 msgstr "完了度 (パーセンテージ)"
 
-#: errands/widgets/details.py:186
+#: errands/widgets/details.py:182
 msgid "Priority"
 msgstr "優先度"
 
 #. Tags group
-#: errands/widgets/details.py:193
+#: errands/widgets/details.py:189
 msgid "Tags"
 msgstr "タグ"
 
-#. type:ignore
 #. Tags entry
-#: errands/widgets/details.py:195
+#: errands/widgets/details.py:191
 msgid "Add Tag"
 msgstr "タグを追加"
 
 #. Export group
-#. type:ignore
-#: errands/widgets/details.py:200 errands/widgets/details.py:208
-#: errands/widgets/lists.py:529
+#: errands/widgets/details.py:196 errands/widgets/details.py:204
+#: errands/widgets/lists.py:527
 msgid "Export"
 msgstr "エクスポート"
 
-#. type:ignore
-#: errands/widgets/details.py:209
+#: errands/widgets/details.py:205
 msgid "Save Task as .ics file"
 msgstr "タスクを .ics ファイルとして保存"
 
-#: errands/widgets/details.py:364
+#: errands/widgets/details.py:360
 msgid "Copied to Clipboard"
 msgstr "クリップボードにコピーされました"
 
-#. type:ignore
-#: errands/widgets/details.py:409 errands/widgets/lists.py:499
+#: errands/widgets/details.py:405 errands/widgets/lists.py:497
 msgid "Exported"
 msgstr "エクスポートされました"
 
@@ -129,7 +124,7 @@ msgstr "明日"
 msgid "Now"
 msgstr "現在"
 
-#: errands/widgets/components.py:122 errands/widgets/trash.py:31
+#: errands/widgets/components.py:122 errands/widgets/trash.py:29
 msgid "Clear"
 msgstr "クリア"
 
@@ -138,7 +133,7 @@ msgid "Imported"
 msgstr "インポートしました"
 
 #: errands/widgets/lists.py:127 errands/widgets/window.py:19
-#: errands/widgets/window.py:129 data/io.github.mrvladus.List.desktop.in.in:3
+#: errands/widgets/window.py:126 data/io.github.mrvladus.List.desktop.in.in:3
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:29
 msgid "Errands"
 msgstr "Errands"
@@ -147,7 +142,7 @@ msgstr "Errands"
 msgid "Import List"
 msgstr "リストをインポート"
 
-#: errands/widgets/lists.py:137 errands/widgets/lists.py:245
+#: errands/widgets/lists.py:137 errands/widgets/lists.py:243
 msgid "Add List"
 msgstr "リストを追加"
 
@@ -163,7 +158,6 @@ msgstr "タスクを同期"
 msgid "Create"
 msgstr "作成"
 
-#. type:ignore
 #: errands/widgets/lists.py:149
 msgid "Load"
 msgstr "読み込み"
@@ -172,71 +166,69 @@ msgstr "読み込み"
 msgid "Preferences"
 msgstr "設定"
 
-#: errands/widgets/lists.py:155
+#: errands/widgets/lists.py:154
 msgid "Keyboard Shortcuts"
 msgstr "キーボード・ショートカット"
 
-#: errands/widgets/lists.py:157
+#: errands/widgets/lists.py:155
 msgid "About Errands"
 msgstr "Errands について"
 
-#: errands/widgets/lists.py:163
+#: errands/widgets/lists.py:161
 msgid "Main Menu"
 msgstr "メインメニュー"
 
-#: errands/widgets/lists.py:171
+#: errands/widgets/lists.py:169
 msgid "Add new List"
 msgstr "新しいリストを追加"
 
-#. type:ignore
-#: errands/widgets/lists.py:172
+#: errands/widgets/lists.py:170
 msgid "Click \"+\" button"
 msgstr "\"+\" ボタンをクリック"
 
-#: errands/widgets/lists.py:181 errands/widgets/trash.py:24
+#. Headerbar
+#: errands/widgets/lists.py:179 errands/widgets/trash.py:23
 msgid "Trash"
 msgstr "ゴミ箱"
 
-#: errands/widgets/lists.py:241
+#: errands/widgets/lists.py:239
 msgid "New List Name"
 msgstr "新しいリストの名前"
 
-#: errands/widgets/lists.py:250 errands/widgets/lists.py:398
-#: errands/widgets/lists.py:442 errands/widgets/trash.py:146
+#: errands/widgets/lists.py:248 errands/widgets/lists.py:396
+#: errands/widgets/lists.py:440 errands/widgets/trash.py:144
 msgid "Cancel"
 msgstr "キャンセル"
 
-#. type:ignore
-#: errands/widgets/lists.py:251
+#: errands/widgets/lists.py:249
 msgid "Add"
 msgstr "追加"
 
-#: errands/widgets/lists.py:393 errands/widgets/trash.py:141
+#: errands/widgets/lists.py:391 errands/widgets/trash.py:139
 msgid "Are you sure?"
 msgstr "本当に削除しますか？"
 
-#. type:ignore
-#: errands/widgets/lists.py:394
+#: errands/widgets/lists.py:392
 msgid "List will be permanently deleted"
 msgstr "削除されたリストは元に戻せません"
 
-#: errands/widgets/lists.py:432
+#: errands/widgets/lists.py:430
 msgid "New Name"
 msgstr "新しい名前"
 
-#: errands/widgets/lists.py:437
+#: errands/widgets/lists.py:435
 msgid "Rename List"
 msgstr "リストの名前を変更"
 
-#: errands/widgets/lists.py:497
+#: errands/widgets/lists.py:495
 msgid "Export failed"
 msgstr "エクスポートに失敗しました"
 
-#: errands/widgets/lists.py:527
+#: errands/widgets/lists.py:525
 msgid "Rename"
 msgstr "名前を変更"
 
-#: errands/widgets/lists.py:541
+#: errands/widgets/lists.py:539
 msgid "Menu"
 msgstr "メニュー"
 
@@ -260,39 +252,40 @@ msgstr "ダーク"
 msgid "Sync"
 msgstr "同期"
 
-#: errands/widgets/preferences.py:73
+#. Provider
+#: errands/widgets/preferences.py:72
 msgid "Disabled"
 msgstr "無効"
 
-#: errands/widgets/preferences.py:76
+#: errands/widgets/preferences.py:74
 msgid "Sync Provider"
 msgstr "同期プロバイダー"
 
-#: errands/widgets/preferences.py:84
+#: errands/widgets/preferences.py:82
 msgid "Server URL"
 msgstr "サーバーURL"
 
-#: errands/widgets/preferences.py:89
+#: errands/widgets/preferences.py:87
 msgid "Username"
 msgstr "ユーザー名"
 
-#: errands/widgets/preferences.py:94
+#: errands/widgets/preferences.py:92
 msgid "Password"
 msgstr "パスワード"
 
-#: errands/widgets/preferences.py:100
+#: errands/widgets/preferences.py:98
 msgid "Test"
 msgstr "テスト"
 
-#: errands/widgets/preferences.py:105
+#: errands/widgets/preferences.py:103
 msgid "Test Connection"
 msgstr "接続をテスト"
 
-#: errands/widgets/preferences.py:140
+#: errands/widgets/preferences.py:138
 msgid "Connected"
 msgstr "接続されています"
 
-#: errands/widgets/preferences.py:140
+#: errands/widgets/preferences.py:138
 msgid "Can't connect"
 msgstr "接続できません"
 
@@ -332,37 +325,40 @@ msgstr "展開／折りたたみ"
 msgid "Add new Sub-Task"
 msgstr "新しいサブタスクを追加"
 
-#: errands/widgets/trash.py:39
+#: errands/widgets/trash.py:37
 msgid "Restore All"
 msgstr "すべて復元"
 
-#: errands/widgets/trash.py:45
+#: errands/widgets/trash.py:43
 msgid "Empty Trash"
 msgstr "空のゴミ箱"
 
-#. type:ignore
-#: errands/widgets/trash.py:46
+#: errands/widgets/trash.py:44
 msgid "No deleted items"
 msgstr "削除されたアイテムはありません"
 
-#. type:ignore
-#: errands/widgets/trash.py:142
+#: errands/widgets/trash.py:140
 msgid "Tasks will be permanently deleted"
 msgstr "削除されたタスクは元に戻せません"
 
-#: errands/widgets/trash.py:222
+#: errands/widgets/trash.py:220
 msgid "Restore"
 msgstr "復元"
 
-#: errands/widgets/window.py:67 errands/widgets/window.py:86
+#: errands/widgets/window.py:66 errands/widgets/window.py:83
 msgid "No Task Lists"
 msgstr "タスクのリストはありません"
 
-#: errands/widgets/window.py:134
+#: errands/widgets/window.py:68
+#, fuzzy
+msgid "Create List"
+msgstr "リストの名前を変更"
+
+#: errands/widgets/window.py:131
 msgid "translator-credits"
 msgstr "Gnuey56"
 
-#: errands/widgets/window.py:142
+#: errands/widgets/window.py:139
 msgid "Sync is disabled"
 msgstr "同期は無効です"
 
@@ -398,7 +394,9 @@ msgstr "タスクを管理"
 
 #: data/io.github.mrvladus.List.desktop.in.in:10
 msgid "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
-msgstr "errands;tasks;list;todo;todos;caldav;nextcloud;sync;用事;タスク;リスト;やることリスト;同期;"
+msgstr ""
+"errands;tasks;list;todo;todos;caldav;nextcloud;sync;用事;タスク;リスト;やるこ"
+"とリスト;同期;"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:32
 msgid "Todo application for those who prefer simplicity."

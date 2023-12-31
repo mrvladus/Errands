@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-29 15:34+0300\n"
+"POT-Creation-Date: 2023-12-31 14:41+0300\n"
 "PO-Revision-Date: 2023-12-29 18:59+0300\n"
 "Last-Translator: Sabri Ünal <libreajans@gmail.com>\n"
 "Language-Team: Turkish <takim@gnome.org.tr>\n"
@@ -19,14 +19,12 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Poedit 3.4.2\n"
 
-#. type:ignore
-#: errands/widgets/details.py:44 errands/widgets/lists.py:399
-#: errands/widgets/lists.py:528 errands/widgets/trash.py:147
+#: errands/widgets/details.py:44 errands/widgets/lists.py:397
+#: errands/widgets/lists.py:526 errands/widgets/trash.py:145
 msgid "Delete"
 msgstr "Sil"
 
-#. type:ignore
-#: errands/widgets/details.py:49 errands/widgets/lists.py:443
+#: errands/widgets/details.py:49 errands/widgets/lists.py:441
 msgid "Save"
 msgstr "Kaydet"
 
@@ -34,7 +32,6 @@ msgstr "Kaydet"
 msgid "No Details"
 msgstr "Ayrıntı Yok"
 
-#. type:ignore
 #: errands/widgets/details.py:61
 msgid "Click on task to show more info"
 msgstr "Daha fazla bilgi için göreve tıklayın"
@@ -62,60 +59,58 @@ msgstr "Notlar"
 msgid "Properties"
 msgstr "Özellikler"
 
-#: errands/widgets/details.py:142 errands/widgets/details.py:159
+#. Start date row
+#. End date row
+#: errands/widgets/details.py:141 errands/widgets/details.py:156
 #: errands/widgets/components.py:171
 msgid "Not Set"
 msgstr "Ayarlanmadı"
 
-#: errands/widgets/details.py:142
+#: errands/widgets/details.py:141
 msgid "Start"
 msgstr "Başlangıç"
 
-#: errands/widgets/details.py:150 errands/widgets/details.py:167
+#: errands/widgets/details.py:148 errands/widgets/details.py:163
 msgid "Set Date"
 msgstr "Tarih Ayarla"
 
-#: errands/widgets/details.py:159
+#: errands/widgets/details.py:156
 msgid "Due"
 msgstr "Tamamlanma"
 
-#: errands/widgets/details.py:176
+#: errands/widgets/details.py:172
 msgid "Complete %"
 msgstr "Tamamlanma Yüzdesi"
 
-#: errands/widgets/details.py:186
+#: errands/widgets/details.py:182
 msgid "Priority"
 msgstr "Öncelik"
 
 #. Tags group
-#: errands/widgets/details.py:193
+#: errands/widgets/details.py:189
 msgid "Tags"
 msgstr "Etiketler"
 
-#. type:ignore
 #. Tags entry
-#: errands/widgets/details.py:195
+#: errands/widgets/details.py:191
 msgid "Add Tag"
 msgstr "Etiket Ekle"
 
 #. Export group
-#. type:ignore
-#: errands/widgets/details.py:200 errands/widgets/details.py:208
-#: errands/widgets/lists.py:529
+#: errands/widgets/details.py:196 errands/widgets/details.py:204
+#: errands/widgets/lists.py:527
 msgid "Export"
 msgstr "Dışa Aktar"
 
-#. type:ignore
-#: errands/widgets/details.py:209
+#: errands/widgets/details.py:205
 msgid "Save Task as .ics file"
 msgstr "Görevi .ics dosyası olarak kaydet"
 
-#: errands/widgets/details.py:364
+#: errands/widgets/details.py:360
 msgid "Copied to Clipboard"
 msgstr "Panoya Kopyalandı"
 
-#. type:ignore
-#: errands/widgets/details.py:409 errands/widgets/lists.py:499
+#: errands/widgets/details.py:405 errands/widgets/lists.py:497
 msgid "Exported"
 msgstr "Dışa Aktarıldı"
 
@@ -131,7 +126,7 @@ msgstr "Yarın"
 msgid "Now"
 msgstr "Şimdi"
 
-#: errands/widgets/components.py:122 errands/widgets/trash.py:31
+#: errands/widgets/components.py:122 errands/widgets/trash.py:29
 msgid "Clear"
 msgstr "Temizle"
 
@@ -140,7 +135,7 @@ msgid "Imported"
 msgstr "İçe Aktarıldı"
 
 #: errands/widgets/lists.py:127 errands/widgets/window.py:19
-#: errands/widgets/window.py:129 data/io.github.mrvladus.List.desktop.in.in:3
+#: errands/widgets/window.py:126 data/io.github.mrvladus.List.desktop.in.in:3
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:29
 msgid "Errands"
 msgstr "Errands"
@@ -149,7 +144,7 @@ msgstr "Errands"
 msgid "Import List"
 msgstr "Listeyi İçe Aktar"
 
-#: errands/widgets/lists.py:137 errands/widgets/lists.py:245
+#: errands/widgets/lists.py:137 errands/widgets/lists.py:243
 msgid "Add List"
 msgstr "Liste Ekle"
 
@@ -165,7 +160,6 @@ msgstr "Görevleri Eşzamanla/Getir"
 msgid "Create"
 msgstr "Oluştur"
 
-#. type:ignore
 #: errands/widgets/lists.py:149
 msgid "Load"
 msgstr "Yükle"
@@ -174,71 +168,69 @@ msgstr "Yükle"
 msgid "Preferences"
 msgstr "Tercihler"
 
-#: errands/widgets/lists.py:155
+#: errands/widgets/lists.py:154
 msgid "Keyboard Shortcuts"
 msgstr "Klavye Kısayolları"
 
-#: errands/widgets/lists.py:157
+#: errands/widgets/lists.py:155
 msgid "About Errands"
 msgstr "Errands Hakkında"
 
-#: errands/widgets/lists.py:163
+#: errands/widgets/lists.py:161
 msgid "Main Menu"
 msgstr "Ana Menü"
 
-#: errands/widgets/lists.py:171
+#: errands/widgets/lists.py:169
 msgid "Add new List"
 msgstr "Yeni Liste Ekle"
 
-#. type:ignore
-#: errands/widgets/lists.py:172
+#: errands/widgets/lists.py:170
 msgid "Click \"+\" button"
 msgstr "\"+\" düğmesine tıklayın"
 
-#: errands/widgets/lists.py:181 errands/widgets/trash.py:24
+#. Headerbar
+#: errands/widgets/lists.py:179 errands/widgets/trash.py:23
 msgid "Trash"
 msgstr "Çöpe Taşı"
 
-#: errands/widgets/lists.py:241
+#: errands/widgets/lists.py:239
 msgid "New List Name"
 msgstr "Yeni Liste Adı"
 
-#: errands/widgets/lists.py:250 errands/widgets/lists.py:398
-#: errands/widgets/lists.py:442 errands/widgets/trash.py:146
+#: errands/widgets/lists.py:248 errands/widgets/lists.py:396
+#: errands/widgets/lists.py:440 errands/widgets/trash.py:144
 msgid "Cancel"
 msgstr "İptal"
 
-#. type:ignore
-#: errands/widgets/lists.py:251
+#: errands/widgets/lists.py:249
 msgid "Add"
 msgstr "Ekle"
 
-#: errands/widgets/lists.py:393 errands/widgets/trash.py:141
+#: errands/widgets/lists.py:391 errands/widgets/trash.py:139
 msgid "Are you sure?"
 msgstr "Emin misiniz?"
 
-#. type:ignore
-#: errands/widgets/lists.py:394
+#: errands/widgets/lists.py:392
 msgid "List will be permanently deleted"
 msgstr "Liste kalıcı olarak silinecek"
 
-#: errands/widgets/lists.py:432
+#: errands/widgets/lists.py:430
 msgid "New Name"
 msgstr "Yeni Ad"
 
-#: errands/widgets/lists.py:437
+#: errands/widgets/lists.py:435
 msgid "Rename List"
 msgstr "Listeyi Yeniden Adlandır"
 
-#: errands/widgets/lists.py:497
+#: errands/widgets/lists.py:495
 msgid "Export failed"
 msgstr "Dışa aktarılamadı"
 
-#: errands/widgets/lists.py:527
+#: errands/widgets/lists.py:525
 msgid "Rename"
 msgstr "Yeniden Adlandır"
 
-#: errands/widgets/lists.py:541
+#: errands/widgets/lists.py:539
 msgid "Menu"
 msgstr "Menü"
 
@@ -262,39 +254,40 @@ msgstr "Koyu"
 msgid "Sync"
 msgstr "Eşzamanla"
 
-#: errands/widgets/preferences.py:73
+#. Provider
+#: errands/widgets/preferences.py:72
 msgid "Disabled"
 msgstr "Devre dışı"
 
-#: errands/widgets/preferences.py:76
+#: errands/widgets/preferences.py:74
 msgid "Sync Provider"
 msgstr "Eşzamanlama Sağlayıcı"
 
-#: errands/widgets/preferences.py:84
+#: errands/widgets/preferences.py:82
 msgid "Server URL"
 msgstr "Sunucu URL"
 
-#: errands/widgets/preferences.py:89
+#: errands/widgets/preferences.py:87
 msgid "Username"
 msgstr "Kullanıcı adı"
 
-#: errands/widgets/preferences.py:94
+#: errands/widgets/preferences.py:92
 msgid "Password"
 msgstr "Parola"
 
-#: errands/widgets/preferences.py:100
+#: errands/widgets/preferences.py:98
 msgid "Test"
 msgstr "Sına"
 
-#: errands/widgets/preferences.py:105
+#: errands/widgets/preferences.py:103
 msgid "Test Connection"
 msgstr "Bağlantıyı Sına"
 
-#: errands/widgets/preferences.py:140
+#: errands/widgets/preferences.py:138
 msgid "Connected"
 msgstr "Bağlandı"
 
-#: errands/widgets/preferences.py:140
+#: errands/widgets/preferences.py:138
 msgid "Can't connect"
 msgstr "Bağlanamadı"
 
@@ -334,44 +327,48 @@ msgstr "Genişlet / Katla"
 msgid "Add new Sub-Task"
 msgstr "Yeni Alt Görev Ekle"
 
-#: errands/widgets/trash.py:39
+#: errands/widgets/trash.py:37
 msgid "Restore All"
 msgstr "Tümünü Geri Yükle"
 
-#: errands/widgets/trash.py:45
+#: errands/widgets/trash.py:43
 msgid "Empty Trash"
 msgstr "Çöpü Boşalt"
 
-#. type:ignore
-#: errands/widgets/trash.py:46
+#: errands/widgets/trash.py:44
 msgid "No deleted items"
 msgstr "Silinmiş öge yok"
 
-#. type:ignore
-#: errands/widgets/trash.py:142
+#: errands/widgets/trash.py:140
 msgid "Tasks will be permanently deleted"
 msgstr "Görevler kalıcı olarak silinecek"
 
-#: errands/widgets/trash.py:222
+#: errands/widgets/trash.py:220
 msgid "Restore"
 msgstr "Geri Yükle"
 
-#: errands/widgets/window.py:67 errands/widgets/window.py:86
+#: errands/widgets/window.py:66 errands/widgets/window.py:83
 msgid "No Task Lists"
 msgstr "Görev Listesi Yok"
 
-#: errands/widgets/window.py:134
+#: errands/widgets/window.py:68
+#, fuzzy
+msgid "Create List"
+msgstr "Listeyi Yeniden Adlandır"
+
+#: errands/widgets/window.py:131
 msgid "translator-credits"
 msgstr "Sabri Ünal <libreajans@gmail.com>"
 
-#: errands/widgets/window.py:142
+#: errands/widgets/window.py:139
 msgid "Sync is disabled"
 msgstr "Eşzamanlama devre dışı"
 
 #. pyright:ignore
 #: errands/utils/sync.py:81
 msgid "Not all sync credentials provided. Please check settings."
-msgstr "Tüm eşzamanlama kimlik bilgileri sağlanmadı. Lütfen ayarları denetleyin."
+msgstr ""
+"Tüm eşzamanlama kimlik bilgileri sağlanmadı. Lütfen ayarları denetleyin."
 
 #: errands/utils/sync.py:130
 msgid "Can't connect to CalDAV server at:"
