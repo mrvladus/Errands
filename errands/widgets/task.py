@@ -284,6 +284,14 @@ class Task(Gtk.Revealer):
             Sync.sync()
 
     def on_details_clicked(self, *args):
+        # Close details on second click
+        if (
+            self.details.parent == self
+            and self.window.split_view_inner.get_show_sidebar()
+        ):
+            self.window.split_view_inner.set_show_sidebar(False)
+            return
+        # Update details and show sidebar
         self.details.update_info(self)
         self.window.split_view_inner.set_show_sidebar(True)
 
