@@ -36,11 +36,13 @@ class Sync:
         """
         if GSettings.get("sync-provider") == 0:
             UserData.clean_deleted()
+            GLib.idle_add(self.window.lists.update_ui)
             return
         if not self.provider:
             self.init(self.window)
         if self.provider and self.provider.can_sync:
             self.provider.sync()
+            GLib.idle_add(self.window.lists.update_ui)
 
     @classmethod
     def test_connection(self) -> bool:
@@ -443,5 +445,3 @@ class SyncProviderCalDAV:
             UserData.run_sql(
                 "DELETE FROM tasks WHERE deleted = 1",
             )
-
-        GLib.idle_add(self.window.lists.update_ui)

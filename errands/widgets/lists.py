@@ -322,6 +322,7 @@ class Lists(Adw.Bin):
         self.status_page.set_visible(len(lists) == 0)
         if len(lists) == 0:
             self.stack.set_visible_child_name("status")
+            self.window.split_view_inner.set_show_sidebar(False)
 
         # Update details
         tasks = []
@@ -422,9 +423,6 @@ class ListItem(Gtk.ListBoxRow):
                     WHERE uid = '{self.uid}'"""
                 )
                 self.task_list.title.set_title(text)
-                page: Adw.ViewStackPage = self.window.stack.get_page(self.task_list)
-                page.set_name(text)
-                page.set_title(text)
                 Sync.sync()
 
             entry = Gtk.Entry(placeholder_text=_("New Name"))
