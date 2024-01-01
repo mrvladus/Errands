@@ -37,11 +37,11 @@ class Window(Adw.ApplicationWindow):
         self.split_view_inner = Adw.OverlaySplitView(
             sidebar_position="start",
             min_sidebar_width=360,
-            max_sidebar_width=360,
+            max_sidebar_width=400,
         )
         # Split view outer
         self.split_view = Adw.NavigationSplitView(
-            max_sidebar_width=240, min_sidebar_width=240, show_content=True
+            max_sidebar_width=300, min_sidebar_width=240, show_content=True
         )
         # Stack
         self.stack = Adw.ViewStack()
