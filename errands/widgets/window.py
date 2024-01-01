@@ -144,7 +144,7 @@ class Window(Adw.ApplicationWindow):
             ["<primary>comma"],
         )
         _create_action("about", _about)
-        _create_action("sync", _sync, ["<primary>s"])
+        _create_action("sync", _sync, ["<primary>f"])
         _create_action(
             "quit",
             lambda *_: self.props.application.quit(),

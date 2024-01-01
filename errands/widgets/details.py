@@ -48,8 +48,11 @@ class Details(Adw.Bin):
         self.save_btn = Button(
             label=_("Save"),
             on_click=self.on_save_btn_clicked,
+            shortcut="<primary>s",
+            tooltip_text=_("Save (Ctrl+S)"),
             css_classes=["suggested-action"],
         )
+
         hb.pack_end(self.save_btn)
 
         # Status

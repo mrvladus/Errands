@@ -25,7 +25,11 @@ class Box(Gtk.Box):
 
 class Button(Gtk.Button):
     """
-    Gtk.Button which takes arguments: label, icon and callback for "clicked" signal.
+    Gtk.Button which takes arguments:
+    - label
+    - icon
+    - callback for "clicked" signal
+    - shortcut.
     """
 
     def __init__(
@@ -33,6 +37,7 @@ class Button(Gtk.Button):
         label: str = None,
         icon_name: str = None,
         on_click: Callable = None,
+        shortcut: str = None,
         **kwargs,
     ):
         super().__init__(**kwargs)
@@ -47,6 +52,15 @@ class Button(Gtk.Button):
             self.set_child(content)
         else:
             self.set_label(label)
+        if shortcut:
+            ctrl = Gtk.ShortcutController(scope=1)
+            ctrl.add_shortcut(
+                Gtk.Shortcut(
+                    trigger=Gtk.ShortcutTrigger.parse_string(shortcut),
+                    action=Gtk.ShortcutAction.parse_string("activate"),
+                )
+            )
+            self.add_controller(ctrl)
 
 
 class DateTime(Gtk.Box):
