@@ -110,7 +110,10 @@ class SyncProviderCalDAV:
         Log.debug(f"Sync: Attempting connection")
 
         with DAVClient(
-            url=self.url, username=self.username, password=self.password
+            url=self.url,
+            username=self.username,
+            password=self.password,
+            ssl_verify_cert=False,
         ) as client:
             try:
                 self.principal: Principal = client.principal()
