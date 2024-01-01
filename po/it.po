@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version:  errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-31 14:41+0300\n"
-"PO-Revision-Date: 2023-12-29 09:46+0200\n"
+"PO-Revision-Date: 2024-01-01 18:31+0100\n"
 "Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
 "Language-Team: Italian <LL@li.org>\n"
 "Language: it\n"
@@ -75,7 +75,7 @@ msgstr "Imposta data"
 
 #: errands/widgets/details.py:156
 msgid "Due"
-msgstr ""
+msgstr "Scadenza"
 
 #: errands/widgets/details.py:172
 msgid "Complete %"
@@ -115,11 +115,11 @@ msgstr "Esportato"
 
 #: errands/widgets/components.py:99
 msgid "Today"
-msgstr ""
+msgstr "Oggi"
 
 #: errands/widgets/components.py:104
 msgid "Tomorrow"
-msgstr ""
+msgstr "Domani"
 
 #: errands/widgets/components.py:117
 msgid "Now"
@@ -149,7 +149,7 @@ msgstr "Aggiungi lista"
 
 #: errands/widgets/lists.py:139
 msgid "More Options"
-msgstr ""
+msgstr "Altre opzioni"
 
 #: errands/widgets/lists.py:146
 msgid "Sync / Fetch Tasks"
@@ -351,9 +351,8 @@ msgid "No Task Lists"
 msgstr "Nessun elenco di attività"
 
 #: errands/widgets/window.py:68
-#, fuzzy
 msgid "Create List"
-msgstr "Rinomina lista"
+msgstr "Crea lista"
 
 #: errands/widgets/window.py:131
 msgid "translator-credits"
@@ -396,9 +395,8 @@ msgid "Manage your tasks"
 msgstr "Gestisci le tue attività"
 
 #: data/io.github.mrvladus.List.desktop.in.in:10
-#, fuzzy
 msgid "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
-msgstr "commissioni;attività;elenco;cosa da fare;cose da fare;"
+msgstr "commissioni;attività;elenco;cosa da fare;cose da fare;caldav;nextcloud;sincronizzazione;"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:32
 msgid "Todo application for those who prefer simplicity."
