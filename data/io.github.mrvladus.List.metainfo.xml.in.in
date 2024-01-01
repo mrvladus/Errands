@@ -50,6 +50,32 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="45.1.2" date="2024-01-01">
+      <description translatable="no">
+        <p>Added:</p>
+        <ul>
+          <li>More options in the date picker</li>
+          <li>Ctrl+S shortcut to save changed details</li>
+          <li>Ctrl+F shortcut to sync</li>
+          <li>Increased max sidebar sizes</li>
+          <li>Second click on task will close details panel now</li>
+        </ul>
+        <p>Fixed:</p>
+        <ul>
+          <li>Some icons not being shown</li>
+          <li>SSL error when connecting to Nextcloud with self-signed certificate</li>
+          <li>Calendar widget background on dark theme</li>
+        </ul>
+        <p>Translations:</p>
+        <ul>
+          <li>Added Japanese translation (Gnuey56)</li>
+          <li>Updated French translation (Irénée THIRION)</li>
+          <li>Updated Turkish translation (Sabri Ünal)</li>
+          <li>Updated German translation (Philipp Kiemle)</li>
+          <li>Updated Ukrainian translation (volkov)</li>
+        </ul>
+      </description>
+    </release>
     <release version="45.1.1" date="2023-12-28">
       <description translatable="no">
         <p>Fixed:</p>
