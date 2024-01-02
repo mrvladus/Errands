@@ -55,7 +55,7 @@
         <p>Fixed:</p>
         <ul>
           <li>App icon having black background on KDE</li>
-          <li>Drag and Drop bug on KDE where "+" drop area stays shown</li>
+          <li>Drag and Drop bug on KDE, where "+" drop area stays shown</li>
         </ul>
         <p>Translations:</p>
         <ul>
