@@ -63,12 +63,12 @@ class Task(Gtk.Revealer):
         top_drop_img_target = Gtk.DropTarget.new(actions=Gdk.DragAction.MOVE, type=Task)
         top_drop_img_target.connect("drop", self.on_task_top_drop)
         top_drop_img.add_controller(top_drop_img_target)
-        top_drop_area = Gtk.Revealer(child=top_drop_img, transition_type=5)
+        self.top_drop_area = Gtk.Revealer(child=top_drop_img, transition_type=5)
         # Drop controller
         drop_ctrl = Gtk.DropControllerMotion.new()
         drop_ctrl.bind_property(
             "contains-pointer",
-            top_drop_area,
+            self.top_drop_area,
             "reveal-child",
             GObject.BindingFlags.SYNC_CREATE,
         )
@@ -153,7 +153,7 @@ class Task(Gtk.Revealer):
 
         self.set_child(
             Box(
-                children=[top_drop_area, self.main_box],
+                children=[self.top_drop_area, self.main_box],
                 orientation="vertical",
                 margin_start=12,
                 margin_end=12,
@@ -322,6 +322,8 @@ class Task(Gtk.Revealer):
 
     def on_drag_end(self, *_) -> bool:
         self.set_sensitive(True)
+        for task in self.task_list.get_all_tasks():
+            task.top_drop_area.set_reveal_child(False)
 
     def on_drag_begin(self, _, drag) -> bool:
         text = self.get_prop("text")
