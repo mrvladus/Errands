@@ -10,8 +10,9 @@ from errands.utils.gsettings import GSettings
 from errands.utils.logging import Log
 from errands.utils.sync import Sync
 from errands.widgets.components import Box
+from errands.widgets.task import Task
 from errands.widgets.task_list import TaskList
-from gi.repository import Adw, Gtk, Gio, GObject
+from gi.repository import Adw, Gtk, Gio, GObject, Gdk
 
 
 class Lists(Adw.Bin):
@@ -186,6 +187,9 @@ class Lists(Adw.Bin):
             margin_start=6,
         )
         self.trash_btn.connect("clicked", self.on_trash_btn_clicked)
+        trash_drop_ctrl = Gtk.DropTarget.new(actions=Gdk.DragAction.MOVE, type=Task)
+        trash_drop_ctrl.connect("drop", lambda _d, t, _x, _y: t.delete())
+        self.trash_btn.add_controller(trash_drop_ctrl)
         # Toolbar view
         toolbar_view = Adw.ToolbarView(
             content=Gtk.ScrolledWindow(

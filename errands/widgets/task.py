@@ -322,6 +322,7 @@ class Task(Gtk.Revealer):
 
     def on_drag_end(self, *_) -> bool:
         self.set_sensitive(True)
+        # KDE dnd bug workaround for issue #111
         for task in self.task_list.get_all_tasks():
             task.top_drop_area.set_reveal_child(False)
 

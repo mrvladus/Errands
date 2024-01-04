@@ -1,7 +1,7 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-import datetime
+import datetime, urllib3
 from caldav import Calendar, DAVClient, Principal, Todo
 from caldav.elements import dav
 from gi.repository import Adw, GLib
@@ -111,6 +111,8 @@ class SyncProviderCalDAV:
     def _connect(self) -> bool:
         Log.debug(f"Sync: Attempting connection")
 
+        urllib3.disable_warnings()
+
         with DAVClient(
             url=self.url,
             username=self.username,
@@ -143,7 +145,7 @@ class SyncProviderCalDAV:
         """
 
         try:
-            Log.debug(f"Sync: Getting tasks from remote")
+            Log.debug(f"Sync: Getting tasks for {calendar.id}")
             todos: list[Todo] = calendar.todos(include_completed=True)
             tasks: list[dict] = []
             for todo in todos:
