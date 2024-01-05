@@ -60,6 +60,7 @@
         <ul>
           <li>App icon having black background on KDE</li>
           <li>Drag and Drop bug on KDE, where task's "+" drop area stays shown</li>
+          <li>Some strange Details behaviour</li>
         </ul>
         <p>Translations:</p>
         <ul>
