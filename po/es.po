@@ -373,9 +373,7 @@ msgstr "La sincronización está desactivada"
 #. pyright:ignore
 #: errands/utils/sync.py:83
 msgid "Not all sync credentials provided. Please check settings."
-msgstr ""
-"No se han proporcionado todas las credenciales de sincronización. Comprueba "
-"la configuración."
+msgstr "No se han proporcionado todas las credenciales de sincronización. Comprueba la configuración."
 
 #: errands/utils/sync.py:137
 msgid "Can't connect to CalDAV server at:"
@@ -416,8 +414,7 @@ msgstr "recados;tareas;lista;todo;todos;"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:32
 msgid "Todo application for those who prefer simplicity."
-msgstr ""
-"Una aplicación de listas de tareas, para los que prefieren la sencillez."
+msgstr "Una aplicación de listas de tareas, para los que prefieren la sencillez."
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:33
 msgid "Features:"
