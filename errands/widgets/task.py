@@ -287,6 +287,7 @@ class Task(Gtk.Revealer):
         # Close details on second click
         if (
             self.details.parent == self
+            and not self.details.status.get_visible()
             and self.window.split_view_inner.get_show_sidebar()
         ):
             self.window.split_view_inner.set_show_sidebar(False)

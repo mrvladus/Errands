@@ -19,9 +19,9 @@ class Details(Adw.Bin):
         super().__init__()
         self.window = window
         self.split_view = window.split_view_inner
-        self.build_ui()
+        self._build_ui()
 
-    def build_ui(self):
+    def _build_ui(self):
         # Header Bar
         hb = Adw.HeaderBar(show_title=False, show_back_button=False)
         # Back button
@@ -262,9 +262,14 @@ class Details(Adw.Bin):
         self.tags.add(tag)
 
     def update_info(self, parent):
+        self.parent = parent
+
+        if parent == None:
+            self.status.set_visible(True)
+            return
+
         Log.debug("Details: Update info")
 
-        self.parent = parent
         # Edit text
         self.edit_entry.set_text(self.parent.get_prop("text"))
         # Notes

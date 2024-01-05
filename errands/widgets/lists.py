@@ -231,13 +231,12 @@ class Lists(Adw.Bin):
 
         def _confirm(_, res, entry):
             if res == "cancel":
-                Log.debug("Adding new list is cancelled")
                 return
 
             name = entry.props.text.rstrip().lstrip()
             uid = UserData.add_list(name)
             row = self.add_list(name, uid)
-            row.activate()
+            self.lists.select_row(row)
             Sync.sync()
 
         entry = Gtk.Entry(placeholder_text=_("New List Name"))
@@ -265,13 +264,14 @@ class Lists(Adw.Bin):
         self.window.split_view_inner.set_show_sidebar(False)
 
     def on_list_swiched(self, _, row: Gtk.ListBoxRow):
+        Log.debug("Lists: Switch list")
         if row:
             name = row.label.get_label()
             self.stack.set_visible_child_name(name)
             self.window.split_view.set_show_content(True)
             GSettings.set("last-open-list", "s", name)
             self.status_page.set_visible(False)
-        self.window.details.status.set_visible(True)
+        self.window.details.update_info(None)
 
     def get_lists(self) -> list[TaskList]:
         lists: list[TaskList] = []
@@ -338,7 +338,7 @@ class Lists(Adw.Bin):
         ):
             self.window.details.update_info(self.window.details.parent)
         else:
-            self.window.details.status.set_visible(True)
+            self.window.details.update_info(None)
 
 
 class ListItem(Gtk.ListBoxRow):
