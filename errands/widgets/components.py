@@ -41,6 +41,7 @@ class Button(Gtk.Button):
         **kwargs,
     ):
         super().__init__(**kwargs)
+        self.label = label
         content = Adw.ButtonContent()
         if icon_name:
             content.set_icon_name(icon_name)
@@ -93,12 +94,49 @@ class DateTime(Gtk.Box):
         self.append(
             Box(
                 children=[
-                    self.hour,
-                    Gtk.Label(label=":"),
-                    self.minutes,
+                    Box(
+                        children=[
+                            self.hour,
+                            Gtk.Label(label=":"),
+                            self.minutes,
+                        ],
+                        css_classes=["toolbar"],
+                        halign="center",
+                    ),
+                    Box(
+                        children=[
+                            Button(
+                                "09:00",
+                                "errands-daytime-morning-symbolic",
+                                on_click=self._on_time_preset_clicked,
+                            ),
+                            Button(
+                                "13:00",
+                                "errands-theme-light-symbolic",
+                                on_click=self._on_time_preset_clicked,
+                            ),
+                        ],
+                        css_classes=["toolbar"],
+                        homogeneous=True,
+                    ),
+                    Box(
+                        children=[
+                            Button(
+                                "17:00",
+                                "errands-daytime-sunset-symbolic",
+                                on_click=self._on_time_preset_clicked,
+                            ),
+                            Button(
+                                "20:00",
+                                "errands-theme-dark-symbolic",
+                                on_click=self._on_time_preset_clicked,
+                            ),
+                        ],
+                        css_classes=["toolbar"],
+                        homogeneous=True,
+                    ),
                 ],
-                css_classes=["toolbar"],
-                halign="center",
+                orientation="vertical",
             )
         )
         # Calendar
@@ -109,37 +147,38 @@ class DateTime(Gtk.Box):
         self.append(
             Box(
                 children=[
-                    Button(
-                        label=_("Today"),
-                        on_click=self._on_today_btn_clicked,
-                        hexpand=True,
+                    Box(
+                        children=[
+                            Button(
+                                label=_("Today"),
+                                on_click=self._on_today_btn_clicked,
+                            ),
+                            Button(
+                                label=_("Tomorrow"),
+                                on_click=self._on_tomorrow_btn_clicked,
+                            ),
+                        ],
+                        css_classes=["toolbar"],
+                        homogeneous=True,
                     ),
-                    Button(
-                        label=_("Tomorrow"),
-                        on_click=self._on_tomorrow_btn_clicked,
-                        hexpand=True,
+                    Box(
+                        children=[
+                            Button(
+                                label=_("Now"),
+                                on_click=self._on_now_btn_clicked,
+                                hexpand=True,
+                            ),
+                            Button(
+                                label=_("Clear"),
+                                on_click=self._on_clear_btn_clicked,
+                                hexpand=True,
+                            ),
+                        ],
+                        css_classes=["toolbar"],
+                        homogeneous=True,
                     ),
                 ],
-                css_classes=["toolbar"],
-                homogeneous=True,
-            )
-        )
-        self.append(
-            Box(
-                children=[
-                    Button(
-                        label=_("Now"),
-                        on_click=self._on_now_btn_clicked,
-                        hexpand=True,
-                    ),
-                    Button(
-                        label=_("Clear"),
-                        on_click=self._on_clear_btn_clicked,
-                        hexpand=True,
-                    ),
-                ],
-                css_classes=["toolbar"],
-                homogeneous=True,
+                orientation="vertical",
             )
         )
 
@@ -156,6 +195,11 @@ class DateTime(Gtk.Box):
         self.datetime = f"{date}T{hour}{min}00"
         if not self.lock_signals:
             self.emit("changed")
+
+    def _on_time_preset_clicked(self, btn: Button):
+        hour, min = btn.label.split(":")
+        self.hour.set_value(int(hour))
+        self.minutes.set_value(int(min))
 
     def _on_now_btn_clicked(self, _btn):
         self.set_datetime(datetime.datetime.now().strftime("%Y%m%dT%H%M00"))

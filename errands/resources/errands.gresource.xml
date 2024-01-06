@@ -10,7 +10,6 @@
     <file preprocess="xml-stripblanks" alias="errands-calendar-symbolic.svg">resources/icons/errands-calendar-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-copy-symbolic.svg">resources/icons/errands-copy-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-share-symbolic.svg">resources/icons/errands-share-symbolic.svg</file>
-    <file preprocess="xml-stripblanks" alias="errands-today-symbolic.svg">resources/icons/errands-today-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-theme-system-symbolic.svg">resources/icons/errands-theme-system-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-theme-light-symbolic.svg">resources/icons/errands-theme-light-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-theme-dark-symbolic.svg">resources/icons/errands-theme-dark-symbolic.svg</file>
@@ -18,5 +17,7 @@
     <file preprocess="xml-stripblanks" alias="errands-info-symbolic.svg">resources/icons/errands-info-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-trash-symbolic.svg">resources/icons/errands-trash-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-lists-symbolic.svg">resources/icons/errands-lists-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-daytime-morning-symbolic.svg">resources/icons/errands-daytime-morning-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-daytime-sunset-symbolic.svg">resources/icons/errands-daytime-sunset-symbolic.svg</file>
   </gresource>
 </gresources>
