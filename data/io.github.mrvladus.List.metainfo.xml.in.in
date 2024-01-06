@@ -52,10 +52,15 @@
   <releases>
     <release version="45.1.4" date="2024-01-06">
       <description translatable="no">
+        <p>Added:</p>
+        <ul>
+          <li>Time presets for date and time picker</li>
+        </ul>
         <p>Fixed:</p>
         <ul>
-          <li>Details not showing</li>
           <li>Lists export</li>
+          <li>Details not showing</li>
+          <li>Flatpak permissions</li>
         </ul>
       </description>
     </release>
