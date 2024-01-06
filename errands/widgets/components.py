@@ -189,6 +189,7 @@ class DateTime(Gtk.Box):
         return int(f"{self.datetime[:8]}{self.datetime[9:]}") if self.datetime else 0
 
     def set_datetime(self, dt: str):
+        dt = datetime.datetime.fromisoformat(dt).strftime("%Y%m%dT%H%M00")
         self.lock_signals = True
         if dt:
             self.hour.set_value(int(dt[9:11]))
