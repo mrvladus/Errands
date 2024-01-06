@@ -1,0 +1,433 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the errands package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: errands\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-12-31 14:41+0300\n"
+"PO-Revision-Date: 2024-01-06 14:35+0100\n"
+"Last-Translator: Peter Normann <peter@normann.dev>\n"
+"Language-Team: \n"
+"Language: da_DK\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.4.2\n"
+
+#: errands/widgets/details.py:44 errands/widgets/lists.py:397
+#: errands/widgets/lists.py:526 errands/widgets/trash.py:145
+msgid "Delete"
+msgstr "Slet"
+
+#: errands/widgets/details.py:49 errands/widgets/lists.py:441
+msgid "Save"
+msgstr "Gem"
+
+#: errands/widgets/details.py:60
+msgid "No Details"
+msgstr "Ingen oplysninger"
+
+#: errands/widgets/details.py:61
+msgid "Click on task to show more info"
+msgstr "Klik på opgave for at se flere detaljer"
+
+#: errands/widgets/details.py:84
+msgid "Clear Style"
+msgstr "Ryd formattering"
+
+#. Edit group
+#: errands/widgets/details.py:93
+msgid "Text"
+msgstr "Tekst"
+
+#: errands/widgets/details.py:101
+msgid "Copy Text"
+msgstr "Kopier tekst"
+
+#. Notes group
+#: errands/widgets/details.py:120
+msgid "Notes"
+msgstr "Noter"
+
+#. Properties group
+#: errands/widgets/details.py:138
+msgid "Properties"
+msgstr "Egenskaber"
+
+#. Start date row
+#. End date row
+#: errands/widgets/details.py:141 errands/widgets/details.py:156
+#: errands/widgets/components.py:171
+msgid "Not Set"
+msgstr "Ikke angivet"
+
+#: errands/widgets/details.py:141
+msgid "Start"
+msgstr "Start"
+
+#: errands/widgets/details.py:148 errands/widgets/details.py:163
+msgid "Set Date"
+msgstr "Angiv dato"
+
+#: errands/widgets/details.py:156
+msgid "Due"
+msgstr "Slutdato"
+
+#: errands/widgets/details.py:172
+msgid "Complete %"
+msgstr "Afsluttet %"
+
+#: errands/widgets/details.py:182
+msgid "Priority"
+msgstr "Prioritet"
+
+#. Tags group
+#: errands/widgets/details.py:189
+msgid "Tags"
+msgstr "Mærkat"
+
+#. Tags entry
+#: errands/widgets/details.py:191
+msgid "Add Tag"
+msgstr "Tilføj Mærkat"
+
+#. Export group
+#: errands/widgets/details.py:196 errands/widgets/details.py:204
+#: errands/widgets/lists.py:527
+msgid "Export"
+msgstr "Eksportér"
+
+#: errands/widgets/details.py:205
+msgid "Save Task as .ics file"
+msgstr "Gem opgave som .ics fil"
+
+#: errands/widgets/details.py:360
+msgid "Copied to Clipboard"
+msgstr "Kopieret til udklipsholder"
+
+#: errands/widgets/details.py:405 errands/widgets/lists.py:497
+msgid "Exported"
+msgstr "Eksporteret"
+
+#: errands/widgets/components.py:99
+msgid "Today"
+msgstr "I dag"
+
+#: errands/widgets/components.py:104
+msgid "Tomorrow"
+msgstr "I morgen"
+
+#: errands/widgets/components.py:117
+msgid "Now"
+msgstr "Nu"
+
+#: errands/widgets/components.py:122 errands/widgets/trash.py:29
+msgid "Clear"
+msgstr "Ryd"
+
+#: errands/widgets/lists.py:111
+msgid "Imported"
+msgstr "Importeret"
+
+#: errands/widgets/lists.py:127 errands/widgets/window.py:19
+#: errands/widgets/window.py:126 data/io.github.mrvladus.List.desktop.in.in:3
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:29
+msgid "Errands"
+msgstr ""
+
+#: errands/widgets/lists.py:133
+msgid "Import List"
+msgstr "Importér liste"
+
+#: errands/widgets/lists.py:137 errands/widgets/lists.py:243
+msgid "Add List"
+msgstr "Tilføj liste"
+
+#: errands/widgets/lists.py:139
+msgid "More Options"
+msgstr "Flere valg"
+
+#: errands/widgets/lists.py:146
+msgid "Sync / Fetch Tasks"
+msgstr "Hent og synkronisér opgaver"
+
+#: errands/widgets/lists.py:148
+msgid "Create"
+msgstr "Opret"
+
+#: errands/widgets/lists.py:149
+msgid "Load"
+msgstr "Hent"
+
+#: errands/widgets/lists.py:153 errands/resources/gtk/help-overlay.ui:27
+msgid "Preferences"
+msgstr "Indstillinger"
+
+#: errands/widgets/lists.py:154
+msgid "Keyboard Shortcuts"
+msgstr "Tastaturgenveje"
+
+#: errands/widgets/lists.py:155
+msgid "About Errands"
+msgstr "Om Errands"
+
+#: errands/widgets/lists.py:161
+msgid "Main Menu"
+msgstr "Hovedmenu"
+
+#: errands/widgets/lists.py:169
+msgid "Add new List"
+msgstr "Tilføj ny liste"
+
+#: errands/widgets/lists.py:170
+msgid "Click \"+\" button"
+msgstr "Tryk på \"+\" knappen"
+
+#. Headerbar
+#: errands/widgets/lists.py:179 errands/widgets/trash.py:23
+msgid "Trash"
+msgstr "Papirkurv"
+
+#: errands/widgets/lists.py:239
+msgid "New List Name"
+msgstr "Nyt listenavn"
+
+#: errands/widgets/lists.py:248 errands/widgets/lists.py:396
+#: errands/widgets/lists.py:440 errands/widgets/trash.py:144
+msgid "Cancel"
+msgstr "Fortryd"
+
+#: errands/widgets/lists.py:249
+msgid "Add"
+msgstr "Tilføj"
+
+#: errands/widgets/lists.py:391 errands/widgets/trash.py:139
+msgid "Are you sure?"
+msgstr "Er du sikker?"
+
+#: errands/widgets/lists.py:392
+msgid "List will be permanently deleted"
+msgstr "Listen vil blive slettet permanent"
+
+#: errands/widgets/lists.py:430
+msgid "New Name"
+msgstr "Nyt navn"
+
+#: errands/widgets/lists.py:435
+msgid "Rename List"
+msgstr "Omdøb liste"
+
+#: errands/widgets/lists.py:495
+msgid "Export failed"
+msgstr "Eksporting mislykkedes"
+
+#: errands/widgets/lists.py:525
+msgid "Rename"
+msgstr "Omdøb"
+
+#: errands/widgets/lists.py:539
+msgid "Menu"
+msgstr "Menu"
+
+#: errands/widgets/preferences.py:35
+msgid "Application Theme"
+msgstr "Farvetema"
+
+#: errands/widgets/preferences.py:41
+msgid "System"
+msgstr "System"
+
+#: errands/widgets/preferences.py:51
+msgid "Light"
+msgstr "Lyst"
+
+#: errands/widgets/preferences.py:61
+msgid "Dark"
+msgstr "Mørkt"
+
+#: errands/widgets/preferences.py:69
+msgid "Sync"
+msgstr "Synkronisér"
+
+#. Provider
+#: errands/widgets/preferences.py:72
+msgid "Disabled"
+msgstr "Deaktiveret"
+
+#: errands/widgets/preferences.py:74
+msgid "Sync Provider"
+msgstr "Synkroniseringsvært"
+
+#: errands/widgets/preferences.py:82
+msgid "Server URL"
+msgstr "Server URL"
+
+#: errands/widgets/preferences.py:87
+msgid "Username"
+msgstr "Brugernavn"
+
+#: errands/widgets/preferences.py:92
+msgid "Password"
+msgstr "Kodeord"
+
+#: errands/widgets/preferences.py:98
+msgid "Test"
+msgstr "Test"
+
+#: errands/widgets/preferences.py:103
+msgid "Test Connection"
+msgstr "Test forbindelse"
+
+#: errands/widgets/preferences.py:138
+msgid "Connected"
+msgstr "Forbundet"
+
+#: errands/widgets/preferences.py:138
+msgid "Can't connect"
+msgstr "Kan ikke tilslutte"
+
+#: errands/widgets/task_list.py:38 errands/widgets/task_list.py:77
+msgid "Toggle Sidebar"
+msgstr "Skift sidebar"
+
+#: errands/widgets/task_list.py:52 errands/widgets/task_list.py:89
+msgid "Delete Completed Tasks"
+msgstr "Slet afsluttede opgaver"
+
+#: errands/widgets/task_list.py:62 errands/widgets/task_list.py:103
+msgid "Scroll Up"
+msgstr "Rul op"
+
+#: errands/widgets/task_list.py:120
+msgid "Add new Task"
+msgstr "Tilføj ny opgave"
+
+#: errands/widgets/task_list.py:274 errands/widgets/task.py:234
+msgid "Completed:"
+msgstr "Afsluttet:"
+
+#: errands/widgets/task.py:81
+msgid "Click for Details"
+msgstr "Klik for detaljer"
+
+#: errands/widgets/task.py:89
+msgid "Mark as Completed"
+msgstr "Markér som afsluttet"
+
+#: errands/widgets/task.py:101
+msgid "Expand / Fold"
+msgstr "Fold ud / Fold ind"
+
+#: errands/widgets/task.py:133
+msgid "Add new Sub-Task"
+msgstr "Tilføj ny under-opgave"
+
+#: errands/widgets/trash.py:37
+msgid "Restore All"
+msgstr "Genskab alle"
+
+#: errands/widgets/trash.py:43
+msgid "Empty Trash"
+msgstr "Tøm papirkurv"
+
+#: errands/widgets/trash.py:44
+msgid "No deleted items"
+msgstr "Ingen slettede elementer"
+
+#: errands/widgets/trash.py:140
+msgid "Tasks will be permanently deleted"
+msgstr "Opgaver vil blive slettet permanent"
+
+#: errands/widgets/trash.py:220
+msgid "Restore"
+msgstr "Genskab"
+
+#: errands/widgets/window.py:66 errands/widgets/window.py:83
+msgid "No Task Lists"
+msgstr "Ingen opgavelister"
+
+#: errands/widgets/window.py:68
+msgid "Create List"
+msgstr "Opret liste"
+
+#: errands/widgets/window.py:131
+msgid "translator-credits"
+msgstr "oversættelses-akkrediteringer"
+
+#: errands/widgets/window.py:139
+msgid "Sync is disabled"
+msgstr "Synkronisering er slået fra"
+
+#. pyright:ignore
+#: errands/utils/sync.py:81
+msgid "Not all sync credentials provided. Please check settings."
+msgstr "Ikke alle synkroniseringsoplysninger er angivet. Tjek dine indstillinger."
+
+#: errands/utils/sync.py:130
+msgid "Can't connect to CalDAV server at:"
+msgstr "Kan ikke få en forbindelse til følgende CalDAV vært:"
+
+#: errands/resources/gtk/help-overlay.ui:9
+msgid "General"
+msgstr "Generel"
+
+#: errands/resources/gtk/help-overlay.ui:13
+msgid "Show keyboard shortcuts"
+msgstr "Vis tastaturgenveje"
+
+#: errands/resources/gtk/help-overlay.ui:20
+msgid "Toggle sidebar"
+msgstr "Skift sidebar"
+
+#: errands/resources/gtk/help-overlay.ui:34
+msgid "Quit"
+msgstr "Afslut"
+
+#: data/io.github.mrvladus.List.desktop.in.in:4
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:30
+msgid "Manage your tasks"
+msgstr "Hav styr på dine opgaver"
+
+#: data/io.github.mrvladus.List.desktop.in.in:10
+msgid "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
+msgstr ""
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:32
+msgid "Todo application for those who prefer simplicity."
+msgstr "Huskeliste til dem, der foretrækker det enkelt og nemt."
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:33
+msgid "Features:"
+msgstr "Features:"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:35
+msgid "Multiple task lists support"
+msgstr "Understøtter flere opgavelister"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:36
+msgid "Add, remove, edit tasks and sub-tasks"
+msgstr "Tilføj, fjern og redigér opgaver og under-opgaver"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:37
+msgid "Mark task and sub-tasks as completed"
+msgstr "Markér opgave og under-opgave som afsluttet"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:38
+msgid "Add accent color for each task"
+msgstr "Tilføj accentfarve til hver opgave"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:39
+msgid "Sync tasks with Nextcloud or other CalDAV providers"
+msgstr "Synkronisér opgaver med Nextcloud eller andre CalDAV kilder"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:40
+msgid "Drag and Drop support"
+msgstr "Understøtter Træk og Slip"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:41
+msgid "Import .ics files"
+msgstr "Importér .ics filer"
