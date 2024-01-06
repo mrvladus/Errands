@@ -1,7 +1,7 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-import datetime
+from datetime import datetime
 from uuid import uuid4
 from icalendar import Calendar, Todo
 from errands.utils.data import UserData
