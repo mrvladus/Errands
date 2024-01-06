@@ -151,14 +151,16 @@ class TaskList(Adw.Bin):
         )
         self.tasks_list.add_css_class("tasks-list")
         self.scrl.set_child(
-            Adw.Clamp(maximum_size=850, tightening_threshold=300, child=self.tasks_list)
+            Adw.Clamp(
+                maximum_size=1000, tightening_threshold=300, child=self.tasks_list
+            )
         )
         # Tasks list toolbar view
         tasks_toolbar_view = Adw.ToolbarView(
             content=Box(
                 children=[
                     Adw.Clamp(
-                        maximum_size=850,
+                        maximum_size=1000,
                         tightening_threshold=300,
                         child=entry_box,
                     ),
