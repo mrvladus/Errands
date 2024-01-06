@@ -50,6 +50,14 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="45.1.5" date="2024-01-08">
+      <description translatable="no">
+        <p>Translations:</p>
+        <ul>
+          <li>Added Danish translation (Peter Normann)</li>
+        </ul>
+      </description>
+    </release>
     <release version="45.1.4" date="2024-01-06">
       <description translatable="no">
         <p>Added:</p>
