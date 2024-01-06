@@ -245,12 +245,11 @@ class Task(Gtk.Revealer):
 
         def set_text():
             if btn.get_active():
-                text = Markup.add_crossline(self.get_prop("text"))
+                self.task_row.add_css_class("task-completed")
                 self.add_css_class("task-completed")
             else:
-                text = Markup.rm_crossline(self.get_prop("text"))
+                self.task_row.remove_css_class("task-completed")
                 self.remove_css_class("task-completed")
-            self.task_row.set_title(text)
 
         # If task is just added set text and return to avoid sync loop
         if self.just_added:

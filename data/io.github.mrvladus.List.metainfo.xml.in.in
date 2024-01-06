@@ -50,6 +50,15 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="45.1.4" date="2024-01-06">
+      <description translatable="no">
+        <p>Fixed:</p>
+        <ul>
+          <li>Details not showing</li>
+          <li>Lists export</li>
+        </ul>
+      </description>
+    </release>
     <release version="45.1.3" date="2024-01-05">
       <description translatable="no">
         <p>Added:</p>
