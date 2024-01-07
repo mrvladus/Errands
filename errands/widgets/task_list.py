@@ -100,12 +100,6 @@ class TaskList(Adw.Bin):
             icon_name="sidebar-show-right-symbolic",
             tooltip_text=_("Toggle Sidebar"),
         )
-        left_toggle_sidebar_bin = Adw.Bin(
-            child=left_toggle_sidebar_btn
-        )
-        right_toggle_sidebar_bin = Adw.Bin(
-            child=right_toggle_sidebar_btn
-        )
         left_toggle_sidebar_btn.bind_property(
             "active",
             self.left_toggle_sidebar_btn,
@@ -209,11 +203,11 @@ class TaskList(Adw.Bin):
         tasks_toolbar_view.add_bottom_bar(
             Box(
                 children=[
-                    left_toggle_sidebar_bin,
+                    left_toggle_sidebar_btn,
                     delete_completed_btn,
                     Gtk.Separator(hexpand=True, css_classes=["spacer"]),
                     scroll_up_btn,
-                    right_toggle_sidebar_bin
+                    right_toggle_sidebar_btn
                 ],
                 css_classes=["toolbar"],
             )
@@ -226,9 +220,9 @@ class TaskList(Adw.Bin):
             Adw.breakpoint_condition_parse("max-width: 400px")
         )
         GSettings.bind("right-sidebar", self.left_toggle_sidebar_bin, "visible", True)
-        GSettings.bind("right-sidebar", left_toggle_sidebar_bin, "visible", True)
+        GSettings.bind("right-sidebar", left_toggle_sidebar_btn, "visible", True)
         GSettings.bind("right-sidebar", self.right_toggle_sidebar_bin, "visible")
-        GSettings.bind("right-sidebar", right_toggle_sidebar_bin, "visible")
+        GSettings.bind("right-sidebar", right_toggle_sidebar_btn, "visible")
         tasks_brb_bp.add_setter(self.left_toggle_sidebar_btn, "visible", False)
         tasks_brb_bp.add_setter(self.right_toggle_sidebar_btn, "visible", False)
         tasks_brb_bp.add_setter(self.delete_completed_btn, "visible", False)
