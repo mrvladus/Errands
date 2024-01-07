@@ -246,10 +246,8 @@ class Task(Gtk.Revealer):
         def set_text():
             if btn.get_active():
                 self.task_row.add_css_class("task-completed")
-                self.add_css_class("task-completed")
             else:
                 self.task_row.remove_css_class("task-completed")
-                self.remove_css_class("task-completed")
 
         # If task is just added set text and return to avoid sync loop
         if self.just_added:

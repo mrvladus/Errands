@@ -30,11 +30,8 @@
   border-radius: 10px;
 }
 
-.task-completed {
-  opacity: 0.7;
-}
-
-.task-completed row box.title label.title {
+.task-completed label.title {
+  opacity: 0.5;
   text-decoration: line-through;
 }
 
