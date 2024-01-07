@@ -9,6 +9,7 @@ from errands.utils.functions import get_children
 from errands.utils.sync import Sync
 from errands.utils.logging import Log
 from errands.widgets.task import Task
+from errands.utils.gsettings import GSettings
 
 
 class TaskList(Adw.Bin):
@@ -21,6 +22,8 @@ class TaskList(Adw.Bin):
         self.list_uid = list_uid
         self.parent = parent
         self.details = window.details
+        # Store details panel information
+        self.right_sidebar: bool = GSettings.get("right-sidebar")
         self.build_ui()
         self.load_tasks()
 
@@ -34,7 +37,7 @@ class TaskList(Adw.Bin):
         )
         # Toggle sidebar button
         self.toggle_sidebar_btn = Gtk.ToggleButton(
-            icon_name="sidebar-show-right-symbolic",
+            icon_name="sidebar-show-right-symbolic" if self.right_sidebar else "sidebar-show-symbolic",
             tooltip_text=_("Toggle Sidebar"),
         )
         toggle_ctrl = Gtk.ShortcutController(scope=1)
@@ -66,14 +69,17 @@ class TaskList(Adw.Bin):
 
         # Header Bar
         hb = Adw.HeaderBar(title_widget=self.title)
+        if not self.right_sidebar:
+            hb.pack_start(self.toggle_sidebar_btn)
         hb.pack_start(self.delete_completed_btn)
-        hb.pack_end(self.toggle_sidebar_btn)
+        if self.right_sidebar:
+            hb.pack_end(self.toggle_sidebar_btn)
         hb.pack_end(self.scroll_up_btn)
 
         # ---------- BOTTOMBAR ---------- #
 
         toggle_sidebar_btn = Gtk.ToggleButton(
-            icon_name="sidebar-show-right-symbolic",
+            icon_name="sidebar-show-right-symbolic" if self.right_sidebar else "sidebar-show-symbolic",
             tooltip_text=_("Toggle Sidebar"),
         )
         toggle_sidebar_btn.bind_property(
@@ -170,14 +176,18 @@ class TaskList(Adw.Bin):
             reveal_bottom_bars=False,
         )
         tasks_toolbar_view.add_top_bar(hb)
+        children=[
+            delete_completed_btn,
+            Gtk.Separator(hexpand=True, css_classes=["spacer"]),
+            scroll_up_btn
+        ]
+        if self.right_sidebar:
+            children.append(toggle_sidebar_btn)
+        else:
+            children.insert(0, toggle_sidebar_btn)
         tasks_toolbar_view.add_bottom_bar(
             Box(
-                children=[
-                    delete_completed_btn,
-                    Gtk.Separator(hexpand=True, css_classes=["spacer"]),
-                    scroll_up_btn,
-                    toggle_sidebar_btn
-                ],
+                children=children,
                 css_classes=["toolbar"],
             )
         )

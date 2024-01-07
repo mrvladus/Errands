@@ -39,6 +39,7 @@ class Window(Adw.ApplicationWindow):
             min_sidebar_width=360,
             max_sidebar_width=400,
         )
+        self.update_details(GSettings.get("right-sidebar"))
         # Split view outer
         self.split_view = Adw.NavigationSplitView(
             max_sidebar_width=300, min_sidebar_width=240, show_content=True
@@ -150,3 +151,6 @@ class Window(Adw.ApplicationWindow):
             lambda *_: self.props.application.quit(),
             ["<primary>q", "<primary>w"],
         )
+
+    def update_details(self, right: bool) -> None:
+        self.split_view_inner.props.sidebar_position = "end" if right else "start"
