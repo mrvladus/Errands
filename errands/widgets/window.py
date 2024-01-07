@@ -36,7 +36,6 @@ class Window(Adw.ApplicationWindow):
         self.props.height_request = 200
         # Split view inner
         self.split_view_inner = Adw.OverlaySplitView(
-            sidebar_position="end",
             min_sidebar_width=360,
             max_sidebar_width=400,
         )
