@@ -34,7 +34,7 @@ class TaskList(Adw.Bin):
         )
         # Toggle sidebar button
         self.toggle_sidebar_btn = Gtk.ToggleButton(
-            icon_name="sidebar-show-symbolic",
+            icon_name="sidebar-show-right-symbolic",
             tooltip_text=_("Toggle Sidebar"),
         )
         toggle_ctrl = Gtk.ShortcutController(scope=1)
@@ -66,14 +66,14 @@ class TaskList(Adw.Bin):
 
         # Header Bar
         hb = Adw.HeaderBar(title_widget=self.title)
-        hb.pack_start(self.toggle_sidebar_btn)
         hb.pack_start(self.delete_completed_btn)
+        hb.pack_end(self.toggle_sidebar_btn)
         hb.pack_end(self.scroll_up_btn)
 
         # ---------- BOTTOMBAR ---------- #
 
         toggle_sidebar_btn = Gtk.ToggleButton(
-            icon_name="sidebar-show-symbolic",
+            icon_name="sidebar-show-right-symbolic",
             tooltip_text=_("Toggle Sidebar"),
         )
         toggle_sidebar_btn.bind_property(
@@ -173,10 +173,10 @@ class TaskList(Adw.Bin):
         tasks_toolbar_view.add_bottom_bar(
             Box(
                 children=[
-                    toggle_sidebar_btn,
                     delete_completed_btn,
                     Gtk.Separator(hexpand=True, css_classes=["spacer"]),
                     scroll_up_btn,
+                    toggle_sidebar_btn
                 ],
                 css_classes=["toolbar"],
             )
