@@ -26,6 +26,12 @@ class PreferencesWindow(Adw.PreferencesWindow):
         GSettings.bind("sync-url", self.sync_url, "text")
         GSettings.bind("sync-username", self.sync_username, "text")
         self.setup_sync()
+        # Setup details panel
+        right_sidebar: bool = GSettings.get("right-sidebar")
+        if right_sidebar:
+            self.right_sidebar_btn.props.active = True
+        else:
+            self.left_sidebar_btn.props.active = True
 
     def build_ui(self):
         self.set_transient_for(self.window)
@@ -105,11 +111,36 @@ class PreferencesWindow(Adw.PreferencesWindow):
         self.test_connection_row.add_suffix(test_btn)
         self.test_connection_row.set_activatable_widget(test_btn)
         sync_group.add(self.test_connection_row)
+        # Details group
+        details_group = Adw.PreferencesGroup(
+            title=_("Details Panel"),
+        )
+        # Left Sidebar
+        self.left_sidebar_btn = Gtk.CheckButton()
+        self.left_sidebar_btn.connect("toggled", self.on_details_change, False)
+        left_sidebar_row = Adw.ActionRow(
+            title=_("Left Sidebar"),
+            icon_name="sidebar-show-symbolic",
+        )
+        left_sidebar_row.add_suffix(self.left_sidebar_btn)
+        left_sidebar_row.set_activatable_widget(self.left_sidebar_btn)
+        details_group.add(left_sidebar_row)
+        # Right Sidebar
+        self.right_sidebar_btn = Gtk.CheckButton(group=self.left_sidebar_btn)
+        self.right_sidebar_btn.connect("toggled", self.on_details_change, True)
+        right_sidebar_row = Adw.ActionRow(
+            title=_("Right Sidebar"),
+            icon_name="sidebar-show-right-symbolic",
+        )
+        right_sidebar_row.add_suffix(self.right_sidebar_btn)
+        right_sidebar_row.set_activatable_widget(self.right_sidebar_btn)
+        details_group.add(right_sidebar_row)
 
         # Page
         page = Adw.PreferencesPage()
         page.add(theme_group)
         page.add(sync_group)
+        page.add(details_group)
         self.add(page)
 
     def setup_sync(self):
@@ -142,3 +173,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
     def on_theme_change(self, btn: Gtk.Button, theme: int) -> None:
         Adw.StyleManager.get_default().set_color_scheme(theme)
         GSettings.set("theme", "i", theme)
+
+    def on_details_change(self, btn: Gtk.Button, right: bool) -> None:
+        self.window.update_details(right)
+        GSettings.set("right-sidebar", "b", right)
