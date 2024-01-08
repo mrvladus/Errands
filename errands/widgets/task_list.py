@@ -352,6 +352,8 @@ class TaskList(Adw.Bin):
                         if t.uid == task_dict["parent"]:
                             t.add_task(task_dict["uid"])
 
+        self.update_status()
+
     def on_delete_completed_btn_clicked(self, _) -> None:
         """
         Hide completed tasks and move them to trash
