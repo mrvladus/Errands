@@ -69,8 +69,8 @@ class PreferencesWindow(Adw.PreferencesWindow):
             model=model,
             icon_name="errands-sync-symbolic",
         )
-        self.sync_providers.connect("notify::selected", self.on_sync_provider_selected)
         GSettings.bind("sync-provider", self.sync_providers, "selected")
+        self.sync_providers.connect("notify::selected", self.on_sync_provider_selected)
         sync_group.add(self.sync_providers)
         # URL
         self.sync_url = Adw.EntryRow(
