@@ -25,9 +25,9 @@ class GSettings:
             self.init()
 
     @classmethod
-    def bind(self, setting: str, obj: Gtk.Widget, prop: str) -> None:
+    def bind(self, setting: str, obj: Gtk.Widget, prop: str, invert: bool = False) -> None:
         self._check_init(self)
-        self.gsettings.bind(setting, obj, prop, 0)
+        self.gsettings.bind(setting, obj, prop, Gio.SettingsBindFlags.INVERT_BOOLEAN if invert else Gio.SettingsBindFlags.DEFAULT)
 
     @classmethod
     def get(self, setting: str):

@@ -11,6 +11,7 @@ from errands.widgets.preferences import PreferencesWindow
 from errands.utils.sync import Sync
 from errands.utils.gsettings import GSettings
 from errands.utils.logging import Log
+from errands.widgets.task_list import TaskList
 
 
 class Window(Adw.ApplicationWindow):
@@ -35,7 +36,6 @@ class Window(Adw.ApplicationWindow):
         self.props.height_request = 200
         # Split view inner
         self.split_view_inner = Adw.OverlaySplitView(
-            sidebar_position="start",
             min_sidebar_width=360,
             max_sidebar_width=400,
         )
@@ -83,6 +83,7 @@ class Window(Adw.ApplicationWindow):
             title=_("No Task Lists"),
         )
         self.stack.set_visible_child_name("status")
+        self.update_details(GSettings.get("right-sidebar"))
 
         # Toast overlay
         self.toast_overlay = Adw.ToastOverlay(child=self.split_view)
@@ -150,3 +151,6 @@ class Window(Adw.ApplicationWindow):
             lambda *_: self.props.application.quit(),
             ["<primary>q", "<primary>w"],
         )
+
+    def update_details(self, right: bool) -> None:
+        self.split_view_inner.props.sidebar_position = "end" if right else "start"
