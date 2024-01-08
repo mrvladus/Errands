@@ -22,8 +22,6 @@ class TaskList(Adw.Bin):
         self.list_uid = list_uid
         self.parent = parent
         self.details = window.details
-        # Store details panel information
-        self.right_sidebar: bool = GSettings.get("right-sidebar")
         self.build_ui()
         self.load_tasks()
 
@@ -76,12 +74,8 @@ class TaskList(Adw.Bin):
             sensitive=False,
         )
         self.scroll_up_btn.connect("clicked", lambda *_: scroll(self.scrl, False))
-        self.left_toggle_sidebar_bin = Adw.Bin(
-            child=self.left_toggle_sidebar_btn
-        )
-        self.right_toggle_sidebar_bin = Adw.Bin(
-            child=self.right_toggle_sidebar_btn
-        )
+        self.left_toggle_sidebar_bin = Adw.Bin(child=self.left_toggle_sidebar_btn)
+        self.right_toggle_sidebar_bin = Adw.Bin(child=self.right_toggle_sidebar_btn)
 
         # Header Bar
         hb = Adw.HeaderBar(title_widget=self.title)
@@ -209,7 +203,7 @@ class TaskList(Adw.Bin):
                     delete_completed_btn,
                     Gtk.Separator(hexpand=True, css_classes=["spacer"]),
                     scroll_up_btn,
-                    right_toggle_sidebar_btn
+                    right_toggle_sidebar_btn,
                 ],
                 css_classes=["toolbar"],
             )
@@ -239,14 +233,6 @@ class TaskList(Adw.Bin):
             "active",
             GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
         )
-        # Breakpoint
-        # brb = Adw.BreakpointBin(
-        #     width_request=360, height_request=360, child=self.split_view
-        # )
-        # bp = Adw.Breakpoint.new(Adw.breakpoint_condition_parse("max-width: 720px"))
-        # bp.add_setter(self.split_view, "collapsed", True)
-        # brb.add_breakpoint(bp)
-
         self.set_child(tasks_brb)
 
     def add_task(self, uid: str) -> None:

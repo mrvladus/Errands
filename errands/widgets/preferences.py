@@ -14,24 +14,17 @@ class PreferencesWindow(Adw.PreferencesWindow):
         self.window = win
         self.build_ui()
         # Setup theme
-        theme: int = GSettings.get("theme")
-        if theme == 0:
-            self.theme_system_btn.props.active = True
-        elif theme == 1:
-            self.theme_light_btn.props.active = True
-        elif theme == 4:
-            self.theme_dark_btn.props.active = True
+        self.theme_system_btn.set_active(GSettings.get("theme") == 0)
+        self.theme_light_btn.set_active(GSettings.get("theme") == 1)
+        self.theme_dark_btn.set_active(GSettings.get("theme") == 4)
         # Setup sync
         GSettings.bind("sync-provider", self.sync_providers, "selected")
         GSettings.bind("sync-url", self.sync_url, "text")
         GSettings.bind("sync-username", self.sync_username, "text")
         self.setup_sync()
         # Setup details panel
-        right_sidebar: bool = GSettings.get("right-sidebar")
-        if right_sidebar:
-            self.right_sidebar_btn.props.active = True
-        else:
-            self.left_sidebar_btn.props.active = True
+        self.right_sidebar_btn.set_active(GSettings.get("right-sidebar"))
+        self.left_sidebar_btn.set_active(not GSettings.get("right-sidebar"))
 
     def build_ui(self):
         self.set_transient_for(self.window)

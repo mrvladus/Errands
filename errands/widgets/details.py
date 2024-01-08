@@ -116,6 +116,7 @@ class Details(Adw.Bin):
                 right_margin=12,
                 buffer=self.edit_entry,
                 css_classes=["card"],
+                wrap_mode=3,
             )
         )
 
