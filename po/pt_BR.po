@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-31 14:41+0300\n"
-"PO-Revision-Date: 2023-11-12 01:20-0300\n"
-"Last-Translator: Leandro Cunha <leandrocunha016@gmail.com>\n"
+"PO-Revision-Date: 2024-01-09 09:36-0300\n"
+"Last-Translator: Guilherme Berbet <guilhermeberbet@icloud.com>\n"
 "Language-Team: \n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.4.1\n"
+"X-Generator: Poedit 3.4\n"
 
 #: errands/widgets/details.py:44 errands/widgets/lists.py:397
 #: errands/widgets/lists.py:526 errands/widgets/trash.py:145
@@ -24,120 +24,113 @@ msgstr "Deletar"
 
 #: errands/widgets/details.py:49 errands/widgets/lists.py:441
 msgid "Save"
-msgstr ""
+msgstr "Salvar"
 
 #: errands/widgets/details.py:60
 msgid "No Details"
-msgstr ""
+msgstr "Nenhum Detalhe"
 
 #: errands/widgets/details.py:61
 msgid "Click on task to show more info"
-msgstr ""
+msgstr "Clique na tarefa para mostrar mais informações"
 
 #: errands/widgets/details.py:84
-#, fuzzy
 msgid "Clear Style"
-msgstr "Limpar estilo"
+msgstr "Estilo claro"
 
 #. Edit group
 #: errands/widgets/details.py:93
 msgid "Text"
-msgstr ""
+msgstr "Texto"
 
 #: errands/widgets/details.py:101
-#, fuzzy
 msgid "Copy Text"
-msgstr "Copiar"
+msgstr "Copiar Texto"
 
 #. Notes group
 #: errands/widgets/details.py:120
 msgid "Notes"
-msgstr ""
+msgstr "Notas"
 
 #. Properties group
 #: errands/widgets/details.py:138
 msgid "Properties"
-msgstr ""
+msgstr "Propriedades"
 
 #. Start date row
 #. End date row
 #: errands/widgets/details.py:141 errands/widgets/details.py:156
 #: errands/widgets/components.py:171
 msgid "Not Set"
-msgstr ""
+msgstr "Não configurado"
 
 #: errands/widgets/details.py:141
 msgid "Start"
-msgstr ""
+msgstr "Iniciar"
 
 #: errands/widgets/details.py:148 errands/widgets/details.py:163
 msgid "Set Date"
-msgstr ""
+msgstr "Definir Data"
 
 #: errands/widgets/details.py:156
 msgid "Due"
-msgstr ""
+msgstr "Devido"
 
 #: errands/widgets/details.py:172
-#, fuzzy
 msgid "Complete %"
-msgstr "Completado:"
+msgstr "Completado %"
 
 #: errands/widgets/details.py:182
 msgid "Priority"
-msgstr ""
+msgstr "Prioridade"
 
 #. Tags group
 #: errands/widgets/details.py:189
 msgid "Tags"
-msgstr ""
+msgstr "Etiquetas"
 
 #. Tags entry
 #: errands/widgets/details.py:191
-#, fuzzy
 msgid "Add Tag"
-msgstr "Adicionar nova tarefa"
+msgstr "Adicionar Etiquetas"
 
 #. Export group
 #: errands/widgets/details.py:196 errands/widgets/details.py:204
 #: errands/widgets/lists.py:527
-#, fuzzy
 msgid "Export"
-msgstr "Exportar tasks"
+msgstr "Exportar"
 
 #: errands/widgets/details.py:205
 msgid "Save Task as .ics file"
-msgstr ""
+msgstr "Salvar tarefa como arquivo .ics"
 
 #: errands/widgets/details.py:360
 msgid "Copied to Clipboard"
 msgstr "Copiado para a área de transferência"
 
 #: errands/widgets/details.py:405 errands/widgets/lists.py:497
-#, fuzzy
 msgid "Exported"
-msgstr "Tarefas exportadas"
+msgstr "Exportado"
 
 #: errands/widgets/components.py:99
 msgid "Today"
-msgstr ""
+msgstr "Hoje"
 
 #: errands/widgets/components.py:104
 msgid "Tomorrow"
-msgstr ""
+msgstr "Amanhã"
 
 #: errands/widgets/components.py:117
 msgid "Now"
-msgstr ""
+msgstr "Agora"
 
 #: errands/widgets/components.py:122 errands/widgets/trash.py:29
 msgid "Clear"
 msgstr "Limpar"
 
 #: errands/widgets/lists.py:111
-#, fuzzy
 msgid "Imported"
-msgstr "Tarefas importadas"
+msgstr "Importado"
 
 #: errands/widgets/lists.py:127 errands/widgets/window.py:19
 #: errands/widgets/window.py:126 data/io.github.mrvladus.List.desktop.in.in:3
@@ -146,30 +139,28 @@ msgid "Errands"
 msgstr "Errands"
 
 #: errands/widgets/lists.py:133
-#, fuzzy
 msgid "Import List"
-msgstr "Importar tasks"
+msgstr "Importar Listas"
 
 #: errands/widgets/lists.py:137 errands/widgets/lists.py:243
 msgid "Add List"
-msgstr ""
+msgstr "Adicionar listas"
 
 #: errands/widgets/lists.py:139
 msgid "More Options"
-msgstr ""
+msgstr "Mais opções"
 
 #: errands/widgets/lists.py:146
-#, fuzzy
 msgid "Sync / Fetch Tasks"
-msgstr "Sincronizar/buscar tarefas"
+msgstr "Sincronizar / Buscar tarefas"
 
 #: errands/widgets/lists.py:148
 msgid "Create"
-msgstr ""
+msgstr "Criar"
 
 #: errands/widgets/lists.py:149
 msgid "Load"
-msgstr ""
+msgstr "Carregar"
 
 #: errands/widgets/lists.py:153 errands/resources/gtk/help-overlay.ui:27
 msgid "Preferences"
@@ -188,23 +179,21 @@ msgid "Main Menu"
 msgstr "Menu principal"
 
 #: errands/widgets/lists.py:169
-#, fuzzy
 msgid "Add new List"
-msgstr "Adicionar nova tarefa"
+msgstr "Adicionar nova lista"
 
 #: errands/widgets/lists.py:170
 msgid "Click \"+\" button"
-msgstr ""
+msgstr "Clique no botão \"+\""
 
 #. Headerbar
 #: errands/widgets/lists.py:179 errands/widgets/trash.py:23
-#, fuzzy
 msgid "Trash"
-msgstr "Fechar lixeira"
+msgstr "Lixeira"
 
 #: errands/widgets/lists.py:239
 msgid "New List Name"
-msgstr ""
+msgstr "Novo nome da lista"
 
 #: errands/widgets/lists.py:248 errands/widgets/lists.py:396
 #: errands/widgets/lists.py:440 errands/widgets/trash.py:144
@@ -213,34 +202,31 @@ msgstr "Cancelar"
 
 #: errands/widgets/lists.py:249
 msgid "Add"
-msgstr ""
+msgstr "Adicionar"
 
 #: errands/widgets/lists.py:391 errands/widgets/trash.py:139
 msgid "Are you sure?"
 msgstr "Tem certeza?"
 
 #: errands/widgets/lists.py:392
-#, fuzzy
 msgid "List will be permanently deleted"
-msgstr "As tarefas serão excluídas permanentemente"
+msgstr "A lista será excluída permanentemente"
 
 #: errands/widgets/lists.py:430
 msgid "New Name"
-msgstr ""
+msgstr "Novo nome"
 
 #: errands/widgets/lists.py:435
 msgid "Rename List"
-msgstr ""
+msgstr "Renomear lista"
 
 #: errands/widgets/lists.py:495
-#, fuzzy
 msgid "Export failed"
-msgstr "Tarefas exportadas"
+msgstr "Falha na exportação"
 
 #: errands/widgets/lists.py:525
-#, fuzzy
 msgid "Rename"
-msgstr "Nome de usuário"
+msgstr "Renomear"
 
 #: errands/widgets/lists.py:539
 msgid "Menu"
@@ -297,19 +283,17 @@ msgstr "Teste de conexão"
 
 #: errands/widgets/preferences.py:138
 msgid "Connected"
-msgstr ""
+msgstr "Conectado"
 
 #: errands/widgets/preferences.py:138
 msgid "Can't connect"
-msgstr ""
+msgstr "Não é possível conectar"
 
 #: errands/widgets/task_list.py:38 errands/widgets/task_list.py:77
-#, fuzzy
 msgid "Toggle Sidebar"
 msgstr "Alternar barra lateral"
 
 #: errands/widgets/task_list.py:52 errands/widgets/task_list.py:89
-#, fuzzy
 msgid "Delete Completed Tasks"
 msgstr "Deletar tarefas concluídas"
 
@@ -327,7 +311,7 @@ msgstr "Completado:"
 
 #: errands/widgets/task.py:81
 msgid "Click for Details"
-msgstr ""
+msgstr "Clique para detalhes"
 
 #: errands/widgets/task.py:89
 msgid "Mark as Completed"
@@ -335,7 +319,7 @@ msgstr "Marcar como concluído"
 
 #: errands/widgets/task.py:101
 msgid "Expand / Fold"
-msgstr ""
+msgstr "Expandir / Dobrar"
 
 #: errands/widgets/task.py:133
 msgid "Add new Sub-Task"
@@ -363,12 +347,11 @@ msgstr "Restaurar"
 
 #: errands/widgets/window.py:66 errands/widgets/window.py:83
 msgid "No Task Lists"
-msgstr ""
+msgstr "Sem listas de tarefas"
 
 #: errands/widgets/window.py:68
-#, fuzzy
 msgid "Create List"
-msgstr "Importar tasks"
+msgstr "Criar lista"
 
 #: errands/widgets/window.py:131
 msgid "translator-credits"
@@ -376,7 +359,7 @@ msgstr "créditos-de-tradução"
 
 #: errands/widgets/window.py:139
 msgid "Sync is disabled"
-msgstr ""
+msgstr "A sincronização está desativada"
 
 #. pyright:ignore
 #: errands/utils/sync.py:81
@@ -398,7 +381,6 @@ msgid "Show keyboard shortcuts"
 msgstr "Mostrar atalhos do teclado"
 
 #: errands/resources/gtk/help-overlay.ui:20
-#, fuzzy
 msgid "Toggle sidebar"
 msgstr "Alternar barra lateral"
 
@@ -412,9 +394,8 @@ msgid "Manage your tasks"
 msgstr "Gerencie suas tarefas"
 
 #: data/io.github.mrvladus.List.desktop.in.in:10
-#, fuzzy
 msgid "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
-msgstr "errands;afazeres;tarefas;lista;a fazer;pendências;"
+msgstr "recados;tarefas;lista;fazer;todos;caldav;nextcloud;sincronizar;"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:32
 msgid "Todo application for those who prefer simplicity."
@@ -426,7 +407,7 @@ msgstr "Características:"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:35
 msgid "Multiple task lists support"
-msgstr ""
+msgstr "Suporte para múltiplas listas de tarefas"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:36
 msgid "Add, remove, edit tasks and sub-tasks"
@@ -449,9 +430,8 @@ msgid "Drag and Drop support"
 msgstr "Suporte para arrastar e soltar"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:41
-#, fuzzy
 msgid "Import .ics files"
-msgstr "Importar tasks"
+msgstr "Importar arquivo .ics"
 
 #, fuzzy
 #~ msgid "End"
