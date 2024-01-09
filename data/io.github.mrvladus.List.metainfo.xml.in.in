@@ -50,11 +50,23 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="45.1.5" date="2024-01-08">
+    <release version="45.1.5" date="2024-01-10">
       <description translatable="no">
+        <p>Added:</p>
+        <ul>
+          <li>Preference for side of the Details panel (Big Thanks to
+            david-swift for implementation)</li>
+          <li>Sync indicator</li>
+          <li>Increased max width of tasks</li>
+        </ul>
+        <p>Fixed:</p>
+        <ul>
+          <li>Delete completed tasks button not activating</li>
+        </ul>
         <p>Translations:</p>
         <ul>
           <li>Added Danish translation (Peter Normann)</li>
+          <li>Updated Brazilian Portuguese translation (Guilherme Berbet)</li>
         </ul>
       </description>
     </release>
