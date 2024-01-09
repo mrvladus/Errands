@@ -37,5 +37,8 @@
     <key name="sync-cal-name" type="s">
       <default>""</default>
     </key>
+    <key name="primary-action-show-sub-tasks" type="b">
+      <default>false</default>
+    </key>
   </schema>
 </schemalist>

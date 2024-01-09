@@ -9,6 +9,7 @@ from errands.utils.logging import Log
 from errands.utils.data import UserData
 from errands.utils.markup import Markup
 from errands.utils.functions import get_children
+from errands.utils.gsettings import GSettings
 
 
 class Task(Gtk.Revealer):
@@ -122,23 +123,36 @@ class Task(Gtk.Revealer):
         task_row_drop_target.connect("drop", self.on_drop)
         self.task_row.add_controller(task_row_drop_target)
         task_row_click_ctrl = Gtk.GestureClick.new()
-        task_row_click_ctrl.connect("released", self.on_details_clicked)
+        task_row_click_ctrl.connect("released", self.on_row_clicked)
         self.task_row.add_controller(task_row_click_ctrl)
         # Sub-tasks entry
         sub_tasks_entry = Gtk.Entry(
             hexpand=True,
-            margin_bottom=6,
-            margin_start=12,
-            margin_end=12,
             placeholder_text=_("Add new Sub-Task"),
         )
         sub_tasks_entry.connect("activate", self.on_sub_task_added)
+        # Details panel button
+        details_btn = Gtk.Button(
+            icon_name="errands-info-symbolic",
+            tooltip_text=_("Details"),
+            margin_start=12
+        )
+        details_btn.connect("clicked", self.on_details_clicked)
+        GSettings.bind("primary-action-show-sub-tasks", details_btn, "visible")
+        sub_tasks_entry_box = Gtk.Box(
+            orientation="horizontal",
+             margin_bottom=6,
+             margin_start=12,
+             margin_end=12,
+        )
+        sub_tasks_entry_box.append(sub_tasks_entry)
+        sub_tasks_entry_box.append(details_btn)
         # Sub-tasks
         self.tasks_list = Box(orientation="vertical", css_classes=["sub-tasks"])
         # Sub-tasks revealer
         self.sub_tasks_revealer = Gtk.Revealer(
             child=Box(
-                children=[sub_tasks_entry, self.tasks_list], orientation="vertical"
+                children=[sub_tasks_entry_box, self.tasks_list], orientation="vertical"
             )
         )
         # Task card
@@ -279,6 +293,15 @@ class Task(Gtk.Revealer):
         if self.can_sync:
             self.task_list.update_status()
             Sync.sync()
+
+    def on_row_clicked(self, *args):
+        # Show sub-tasks if this is primary action
+        if GSettings.get("primary-action-show-sub-tasks"):
+            self.expand(
+                not self.sub_tasks_revealer.get_child_revealed()
+            )
+        else:
+            self.on_details_clicked()
 
     def on_details_clicked(self, *args):
         # Close details on second click
