@@ -355,7 +355,9 @@ msgstr "Criar lista"
 
 #: errands/widgets/window.py:131
 msgid "translator-credits"
-msgstr "créditos-de-tradução"
+msgstr ""
+"Leandro Cunha <leandrocunha016@gmail.com>\n"
+"Guilherme Berbet <guilhermeberbet@icloud.com>"
 
 #: errands/widgets/window.py:139
 msgid "Sync is disabled"
