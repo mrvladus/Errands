@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 import datetime, urllib3
+from typing import Callable
 from caldav import Calendar, DAVClient, Principal, Todo
 from caldav.elements import dav
 from gi.repository import Adw, GLib
@@ -39,10 +40,14 @@ class Sync:
             GLib.idle_add(self.window.lists.update_ui)
             return
         if not self.provider:
+            GLib.idle_add(self.window.lists.sync_indicator.set_visible, True)
             self.init(self.window)
+            GLib.idle_add(self.window.lists.sync_indicator.set_visible, False)
         if self.provider and self.provider.can_sync:
+            GLib.idle_add(self.window.lists.sync_indicator.set_visible, True)
             self.provider.sync()
             GLib.idle_add(self.window.lists.update_ui)
+            GLib.idle_add(self.window.lists.sync_indicator.set_visible, False)
 
     @classmethod
     def test_connection(self) -> bool:

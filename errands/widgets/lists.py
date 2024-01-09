@@ -141,6 +141,7 @@ class Lists(Adw.Bin):
         )
         self.add_list_btn.connect("clicked", self.on_add_btn_clicked)
         hb.pack_start(self.add_list_btn)
+
         # Main menu
         menu: Gio.Menu = Gio.Menu.new()
         top_section = Gio.Menu.new()
@@ -162,6 +163,13 @@ class Lists(Adw.Bin):
             tooltip_text=_("Main Menu"),
         )
         hb.pack_end(menu_btn)
+
+        # Sync indicator
+        self.sync_indicator = Gtk.Spinner(
+            tooltip_text=_("Syncing..."), visible=False, spinning=True
+        )
+        hb.pack_end(self.sync_indicator)
+
         # Lists
         self.lists = Gtk.ListBox(css_classes=["navigation-sidebar"])
         self.lists.connect("row-selected", self.on_list_swiched)
