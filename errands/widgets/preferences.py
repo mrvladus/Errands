@@ -132,11 +132,41 @@ class PreferencesWindow(Adw.PreferencesWindow):
         right_sidebar_row.set_activatable_widget(self.right_sidebar_btn)
         details_group.add(right_sidebar_row)
 
+        # Primary action group
+        primary_action_group = Adw.PreferencesGroup(
+            title=_("Primary Action"),
+        )
+        # Open Details Panel
+        self.open_details_panel_btn = Gtk.CheckButton(
+            active=not GSettings.get("primary-action-show-sub-tasks")
+        )
+        self.open_details_panel_btn.connect("toggled", self.on_primary_action_change, False)
+        open_details_panel_row = Adw.ActionRow(
+            title=_("Open Details Panel"),
+            icon_name="errands-info-symbolic",
+        )
+        open_details_panel_row.add_suffix(self.open_details_panel_btn)
+        open_details_panel_row.set_activatable_widget(self.open_details_panel_btn)
+        primary_action_group.add(open_details_panel_row)
+        # Show Sub-Tasks Row
+        self.show_sub_tasks_btn = Gtk.CheckButton(
+            group=self.open_details_panel_btn, active=GSettings.get("primary-action-show-sub-tasks")
+        )
+        self.show_sub_tasks_btn.connect("toggled", self.on_primary_action_change, True)
+        show_sub_tasks_row = Adw.ActionRow(
+            title=_("Show Sub-Tasks"),
+            icon_name="view-list-bullet-symbolic",
+        )
+        show_sub_tasks_row.add_suffix(self.show_sub_tasks_btn)
+        show_sub_tasks_row.set_activatable_widget(self.show_sub_tasks_btn)
+        primary_action_group.add(show_sub_tasks_row)
+
         # Page
         page = Adw.PreferencesPage()
         page.add(theme_group)
         page.add(sync_group)
         page.add(details_group)
+        page.add(primary_action_group)
         self.add(page)
 
     def _setup_sync(self):
@@ -173,3 +203,6 @@ class PreferencesWindow(Adw.PreferencesWindow):
     def on_details_change(self, btn: Gtk.Button, right: bool) -> None:
         self.window.update_details(right)
         GSettings.set("right-sidebar", "b", right)
+
+    def on_primary_action_change(self, btn: Gtk.Button, show_subtasks: bool) -> None:
+        GSettings.set("primary-action-show-sub-tasks", "b", show_subtasks)
