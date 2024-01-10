@@ -15,10 +15,10 @@ class Trash(Adw.Bin):
         super().__init__()
         self.window = window
         self.stack: Adw.ViewStack = window.stack
-        self.build_ui()
+        self._build_ui()
         self.update_status()
 
-    def build_ui(self):
+    def _build_ui(self) -> None:
         # Headerbar
         hb = Adw.HeaderBar(title_widget=Adw.WindowTitle(title=_("Trash")))
         # Clear button
@@ -88,7 +88,7 @@ class Trash(Adw.Bin):
         self.trash_list.append(TrashItem(task_widget, self))
         self.status.set_visible(False)
 
-    def update_status(self):
+    def update_status(self) -> None:
         deleted_uids = [
             i[0]
             for i in UserData.run_sql(
@@ -98,7 +98,7 @@ class Trash(Adw.Bin):
         self.status.set_visible(len(deleted_uids) == 0)
 
     def on_trash_clear(self, btn) -> None:
-        def _confirm(_, res):
+        def _confirm(_, res) -> None:
             if res == "cancel":
                 Log.debug("Clear Trash cancelled")
                 return
@@ -194,9 +194,9 @@ class TrashItem(Adw.Bin):
         self.uid = task_widget.uid
         self.trash = trash
         self.trash_list = trash.trash_list
-        self.build_ui()
+        self._build_ui()
 
-    def build_ui(self):
+    def _build_ui(self) -> None:
         self.add_css_class("card")
         row = Adw.ActionRow(
             title=self.task_widget.get_prop("text"),

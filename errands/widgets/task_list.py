@@ -25,7 +25,7 @@ class TaskList(Adw.Bin):
         self._build_ui()
         self._load_tasks()
 
-    def _build_ui(self):
+    def _build_ui(self) -> None:
         # Title
         self.title = Adw.WindowTitle(
             title=UserData.run_sql(
@@ -317,7 +317,7 @@ class TaskList(Adw.Bin):
         )
 
         # Remove deleted tasks
-        ids = UserData.get_tasks_uids(self.list_uid)
+        ids: list[str] = UserData.get_tasks_uids(self.list_uid)
         for task in self.get_all_tasks():
             if task.uid not in ids:
                 task.purge()
@@ -379,7 +379,7 @@ class TaskList(Adw.Bin):
             """Scroll while drag is near the edge"""
             if not self.scrolling or not self.dnd_ctrl.contains_pointer():
                 return False
-            adj = self.scrl.get_vadjustment()
+            adj: Gtk.Adjustment = self.scrl.get_vadjustment()
             adj.set_value(adj.get_value() - (2 if scroll_up else -2))
             return True
 

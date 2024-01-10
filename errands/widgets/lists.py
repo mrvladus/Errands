@@ -24,7 +24,7 @@ class Lists(Adw.Bin):
         self._add_actions()
         self._load_lists()
 
-    def _add_actions(self):
+    def _add_actions(self) -> None:
         group = Gio.SimpleActionGroup()
         self.insert_action_group(name="lists", group=group)
 
@@ -33,24 +33,24 @@ class Lists(Adw.Bin):
             action.connect("activate", callback)
             group.add_action(action)
 
-        def _add(*args):
+        def _add(*args) -> None:
             pass
 
-        def _backup_create(*args):
+        def _backup_create(*args) -> None:
             pass
 
-        def _backup_load(*args):
+        def _backup_load(*args) -> None:
             pass
 
-        def _import(*args):
-            def _confirm(dialog: Gtk.FileDialog, res):
+        def _import(*args) -> None:
+            def _confirm(dialog: Gtk.FileDialog, res) -> None:
                 try:
-                    file = dialog.open_finish(res)
+                    file: Gio.File = dialog.open_finish(res)
                 except:
                     Log.debug("Lists: Import cancelled")
                     return
                 with open(file.get_path(), "r") as f:
-                    calendar = Calendar.from_ical(f.read())
+                    calendar: Calendar = Calendar.from_ical(f.read())
                     # List name
                     name = calendar.get(
                         "X-WR-CALNAME", file.get_basename().rstrip(".ics")
@@ -61,7 +61,7 @@ class Lists(Adw.Bin):
                     ]:
                         name = f"{name}_{uuid4()}"
                     # Create list
-                    uid = UserData.add_list(name)
+                    uid: str = UserData.add_list(name)
                     # Add tasks
                     for todo in calendar.walk("VTODO"):
                         # Tags
@@ -122,7 +122,7 @@ class Lists(Adw.Bin):
         _create_action("backup_load", _backup_load)
         _create_action("import", _import)
 
-    def _build_ui(self):
+    def _build_ui(self) -> None:
         hb = Adw.HeaderBar(
             title_widget=Gtk.Label(
                 label=_("Errands"),
@@ -226,7 +226,7 @@ class Lists(Adw.Bin):
         self.lists.append(row)
         return row
 
-    def on_add_btn_clicked(self, btn):
+    def on_add_btn_clicked(self, btn) -> None:
         def _entry_activated(_, dialog):
             if dialog.get_response_enabled("add"):
                 dialog.response("add")
@@ -265,13 +265,13 @@ class Lists(Adw.Bin):
         entry.connect("notify::text", _entry_changed, dialog)
         dialog.present()
 
-    def on_trash_btn_clicked(self, _btn):
+    def on_trash_btn_clicked(self, _btn) -> None:
         self.lists.unselect_all()
         self.stack.set_visible_child_name("trash")
         self.window.split_view.set_show_content(True)
         self.window.split_view_inner.set_show_sidebar(False)
 
-    def on_list_swiched(self, _, row: Gtk.ListBoxRow):
+    def on_list_swiched(self, _, row: Gtk.ListBoxRow) -> None:
         Log.debug("Lists: Switch list")
         if row:
             name = row.label.get_label()
@@ -290,7 +290,7 @@ class Lists(Adw.Bin):
                 lists.append(child)
         return lists
 
-    def _load_lists(self):
+    def _load_lists(self) -> None:
         # Add lists
         lists = [i for i in UserData.get_lists_as_dicts() if not i["deleted"]]
         for list in lists:
@@ -299,7 +299,7 @@ class Lists(Adw.Bin):
                 self.lists.select_row(row)
         self.status_page.set_visible(len(lists) == 0)
 
-    def update_ui(self):
+    def update_ui(self) -> None:
         Log.debug("Lists: Update UI...")
 
         # Delete lists
@@ -360,7 +360,7 @@ class ListItem(Gtk.ListBoxRow):
         self._build_ui()
         self._add_actions()
 
-    def _add_actions(self):
+    def _add_actions(self) -> None:
         group = Gio.SimpleActionGroup()
         self.insert_action_group(name="list_item", group=group)
 
@@ -517,7 +517,7 @@ class ListItem(Gtk.ListBoxRow):
         _create_action("rename", _rename)
         _create_action("export", _export)
 
-    def _build_ui(self):
+    def _build_ui(self) -> None:
         # Label
         self.label = Gtk.Label(
             halign="start",
@@ -553,6 +553,6 @@ class ListItem(Gtk.ListBoxRow):
             )
         )
 
-    def _on_click(self, *args):
+    def _on_click(self, *args) -> None:
         self.window.stack.set_visible_child_name(self.label.get_label())
         self.window.split_view.set_show_content(True)

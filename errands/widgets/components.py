@@ -41,7 +41,7 @@ class Button(Gtk.Button):
         **kwargs,
     ):
         super().__init__(**kwargs)
-        self.label = label
+        self.label: str = label
         content = Adw.ButtonContent()
         if icon_name:
             content.set_icon_name(icon_name)
@@ -184,13 +184,13 @@ class DateTime(Gtk.Box):
 
     def _on_date_time_changed(self, *_args):
         # Get hour
-        hour = str(self.hour.get_value_as_int())
-        hour = f"0{hour}" if len(hour) == 1 else hour
+        hour: str = str(self.hour.get_value_as_int())
+        hour: str = f"0{hour}" if len(hour) == 1 else hour
         # Get min
-        min = str(self.minutes.get_value_as_int())
-        min = f"0{min}" if len(min) == 1 else min
+        min: str = str(self.minutes.get_value_as_int())
+        min: str = f"0{min}" if len(min) == 1 else min
         # Get date
-        date = self.calendar.get_date().format("%Y%m%d")
+        date: str = self.calendar.get_date().format("%Y%m%d")
         # Set date
         self.datetime = f"{date}T{hour}{min}00"
         if not self.lock_signals:

@@ -300,14 +300,14 @@ class Task(Gtk.Revealer):
             self.task_list.update_status()
             Sync.sync()
 
-    def on_row_clicked(self, *args):
+    def on_row_clicked(self, *args) -> None:
         # Show sub-tasks if this is primary action
         if GSettings.get("primary-action-show-sub-tasks"):
             self.expand(not self.sub_tasks_revealer.get_child_revealed())
         else:
             self.on_details_clicked()
 
-    def on_details_clicked(self, *args):
+    def on_details_clicked(self, *args) -> None:
         # Close details on second click
         if (
             self.details.parent == self
