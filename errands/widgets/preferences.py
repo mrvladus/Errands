@@ -15,7 +15,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
         self._build_ui()
         self._setup_sync()
 
-    def _build_ui(self):
+    def _build_ui(self) -> None:
         self.set_transient_for(self.window)
         self.set_search_enabled(False)
 
@@ -140,7 +140,10 @@ class PreferencesWindow(Adw.PreferencesWindow):
         self.open_details_panel_btn = Gtk.CheckButton(
             active=not GSettings.get("primary-action-show-sub-tasks")
         )
-        self.open_details_panel_btn.connect("toggled", self.on_primary_action_change, False)
+        self.open_details_panel_btn.connect(
+            "toggled",
+            lambda *_: GSettings.set("primary-action-show-sub-tasks", "b", False),
+        )
         open_details_panel_row = Adw.ActionRow(
             title=_("Open Details Panel"),
             icon_name="errands-info-symbolic",
@@ -150,9 +153,13 @@ class PreferencesWindow(Adw.PreferencesWindow):
         primary_action_group.add(open_details_panel_row)
         # Show Sub-Tasks Row
         self.show_sub_tasks_btn = Gtk.CheckButton(
-            group=self.open_details_panel_btn, active=GSettings.get("primary-action-show-sub-tasks")
+            group=self.open_details_panel_btn,
+            active=GSettings.get("primary-action-show-sub-tasks"),
         )
-        self.show_sub_tasks_btn.connect("toggled", self.on_primary_action_change, True)
+        self.show_sub_tasks_btn.connect(
+            "toggled",
+            lambda *_: GSettings.set("primary-action-show-sub-tasks", "b", True),
+        )
         show_sub_tasks_row = Adw.ActionRow(
             title=_("Show Sub-Tasks"),
             icon_name="view-list-bullet-symbolic",
@@ -169,7 +176,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
         page.add(primary_action_group)
         self.add(page)
 
-    def _setup_sync(self):
+    def _setup_sync(self) -> None:
         selected = self.sync_providers.props.selected
         self.sync_url.set_visible(0 < selected < 3)
         self.sync_username.set_visible(0 < selected < 3)
@@ -185,12 +192,12 @@ class PreferencesWindow(Adw.PreferencesWindow):
     def on_sync_provider_selected(self, *_) -> None:
         self._setup_sync()
 
-    def on_sync_pass_changed(self, _entry):
+    def on_sync_pass_changed(self, _entry) -> None:
         if 0 < self.sync_providers.props.selected < 3:
             account = self.sync_providers.props.selected_item.props.string
             GSettings.set_secret(account, self.sync_password.props.text)
 
-    def on_test_connection_btn_clicked(self, _btn):
+    def on_test_connection_btn_clicked(self, _btn) -> None:
         res: bool = Sync.test_connection()
         msg: str = _("Connected") if res else _("Can't connect")
         toast: Adw.Toast = Adw.Toast(title=msg, timeout=2)
@@ -203,6 +210,3 @@ class PreferencesWindow(Adw.PreferencesWindow):
     def on_details_change(self, btn: Gtk.Button, right: bool) -> None:
         self.window.update_details(right)
         GSettings.set("right-sidebar", "b", right)
-
-    def on_primary_action_change(self, btn: Gtk.Button, show_subtasks: bool) -> None:
-        GSettings.set("primary-action-show-sub-tasks", "b", show_subtasks)

@@ -74,6 +74,7 @@ class Task(Gtk.Revealer):
             GObject.BindingFlags.SYNC_CREATE,
         )
         self.add_controller(drop_ctrl)
+
         # Task row
         self.task_row = Adw.ActionRow(
             title=Markup.find_url(Markup.escape(self.get_prop("text"))),
@@ -84,6 +85,7 @@ class Task(Gtk.Revealer):
             cursor=Gdk.Cursor.new_from_name("pointer"),
             use_markup=True,
         )
+
         # Mark as completed button
         self.completed_btn = Gtk.CheckButton(
             valign="center",
@@ -92,6 +94,7 @@ class Task(Gtk.Revealer):
         self.completed_btn.connect("toggled", self.on_completed_btn_toggled)
         self.completed_btn.set_active(self.get_prop("completed"))
         self.task_row.add_prefix(self.completed_btn)
+
         # Expand button
         self.expand_btn = Button(
             icon_name="errands-up-symbolic",
@@ -109,6 +112,7 @@ class Task(Gtk.Revealer):
             accessible_role=Gtk.AccessibleRole.PRESENTATION,
         )
         task_row_box.append(self.task_row)
+
         # Task row controllers
         task_row_drag_source = Gtk.DragSource.new()
         task_row_drag_source.set_actions(Gdk.DragAction.MOVE)
@@ -125,45 +129,47 @@ class Task(Gtk.Revealer):
         task_row_click_ctrl = Gtk.GestureClick.new()
         task_row_click_ctrl.connect("released", self.on_row_clicked)
         self.task_row.add_controller(task_row_click_ctrl)
+
         # Sub-tasks entry
         sub_tasks_entry = Gtk.Entry(
             hexpand=True,
             placeholder_text=_("Add new Sub-Task"),
         )
         sub_tasks_entry.connect("activate", self.on_sub_task_added)
+
         # Details panel button
-        details_btn = Gtk.Button(
+        details_btn = Button(
             icon_name="errands-info-symbolic",
+            on_click=self.on_details_clicked,
             tooltip_text=_("Details"),
-            margin_start=12
         )
-        details_btn.connect("clicked", self.on_details_clicked)
         GSettings.bind("primary-action-show-sub-tasks", details_btn, "visible")
-        sub_tasks_entry_box = Gtk.Box(
+        sub_tasks_entry_box = Box(
+            children=[sub_tasks_entry, details_btn],
             orientation="horizontal",
-             margin_bottom=6,
-             margin_start=12,
-             margin_end=12,
+            margin_bottom=6,
+            margin_start=12,
+            margin_end=12,
+            spacing=6,
         )
-        sub_tasks_entry_box.append(sub_tasks_entry)
-        sub_tasks_entry_box.append(details_btn)
+
         # Sub-tasks
         self.tasks_list = Box(orientation="vertical", css_classes=["sub-tasks"])
+
         # Sub-tasks revealer
         self.sub_tasks_revealer = Gtk.Revealer(
             child=Box(
                 children=[sub_tasks_entry_box, self.tasks_list], orientation="vertical"
             )
         )
+
         # Task card
         self.main_box = Box(
             children=[task_row_box, self.sub_tasks_revealer],
             orientation="vertical",
             hexpand=True,
-            css_classes=["fade", "card"],
+            css_classes=["fade", "card", f'task-{self.get_prop("color")}'],
         )
-        if self.get_prop("color") != "":
-            self.main_box.add_css_class(f'task-{self.get_prop("color")}')
 
         self.set_child(
             Box(
@@ -297,9 +303,7 @@ class Task(Gtk.Revealer):
     def on_row_clicked(self, *args):
         # Show sub-tasks if this is primary action
         if GSettings.get("primary-action-show-sub-tasks"):
-            self.expand(
-                not self.sub_tasks_revealer.get_child_revealed()
-            )
+            self.expand(not self.sub_tasks_revealer.get_child_revealed())
         else:
             self.on_details_clicked()
 
