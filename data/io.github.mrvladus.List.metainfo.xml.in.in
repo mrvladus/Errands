@@ -52,10 +52,13 @@
   <releases>
     <release version="45.1.5" date="2024-01-10">
       <description translatable="no">
-        <p>Added:</p>
+        <p>Thanks to the work of <b>@david-swift</b> Errands now has:</p>
         <ul>
-          <li>Preference for side of the Details panel (Big Thanks to
-            david-swift for implementation)</li>
+          <li>Preference for side of the Details panel</li>
+          <li>Preference for task click primary action. Now you can either expand task (and show details button) or open details panel.</li>
+        </ul>
+        <p>Also added:</p>
+        <ul>
           <li>Sync indicator</li>
           <li>Increased max width of tasks</li>
         </ul>
