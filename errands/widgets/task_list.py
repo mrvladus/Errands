@@ -179,24 +179,29 @@ class TaskList(Adw.Bin):
                 maximum_size=1000, tightening_threshold=300, child=self.tasks_list
             )
         )
+        # Content box
+        content_box = Box(
+            children=[
+                Adw.Clamp(
+                    maximum_size=1000,
+                    tightening_threshold=300,
+                    child=entry_box,
+                ),
+                self.scrl,
+            ],
+            orientation="vertical",
+            vexpand=True,
+        )
+        content_box_click_ctrl = Gtk.GestureClick()
+        content_box_click_ctrl.connect("released", self._on_empty_area_click)
+        content_box.add_controller(content_box_click_ctrl)
         # Tasks list toolbar view
-        tasks_toolbar_view = Adw.ToolbarView(
-            content=Box(
-                children=[
-                    Adw.Clamp(
-                        maximum_size=1000,
-                        tightening_threshold=300,
-                        child=entry_box,
-                    ),
-                    self.scrl,
-                ],
-                orientation="vertical",
-                vexpand=True,
-            ),
+        self.tasks_toolbar_view = Adw.ToolbarView(
+            content=content_box,
             reveal_bottom_bars=False,
         )
-        tasks_toolbar_view.add_top_bar(hb)
-        tasks_toolbar_view.add_bottom_bar(
+        self.tasks_toolbar_view.add_top_bar(hb)
+        self.tasks_toolbar_view.add_bottom_bar(
             Box(
                 children=[
                     left_toggle_sidebar_btn,
@@ -210,7 +215,7 @@ class TaskList(Adw.Bin):
         )
         # Breakpoint
         tasks_brb = Adw.BreakpointBin(
-            width_request=360, height_request=360, child=tasks_toolbar_view
+            width_request=360, height_request=360, child=self.tasks_toolbar_view
         )
         tasks_brb_bp = Adw.Breakpoint.new(
             Adw.breakpoint_condition_parse("max-width: 400px")
@@ -223,7 +228,7 @@ class TaskList(Adw.Bin):
         tasks_brb_bp.add_setter(self.right_toggle_sidebar_btn, "visible", False)
         tasks_brb_bp.add_setter(self.delete_completed_btn, "visible", False)
         tasks_brb_bp.add_setter(self.scroll_up_btn, "visible", False)
-        tasks_brb_bp.add_setter(tasks_toolbar_view, "reveal-bottom-bars", True)
+        tasks_brb_bp.add_setter(self.tasks_toolbar_view, "reveal-bottom-bars", True)
         tasks_brb.add_breakpoint(tasks_brb_bp)
 
         # Split view
@@ -396,3 +401,16 @@ class TaskList(Adw.Bin):
         entry.props.text = ""
         scroll(self.scrl, True)
         Sync.sync()
+
+    def _on_empty_area_click(self, _gesture, _n, x, _y) -> None:
+        """Close Details panel on click on empty space"""
+        # Get window width
+        ww: int = self.tasks_toolbar_view.get_width()
+        # Get task list width
+        tlw: int = self.tasks_list.get_width()
+        # Get empty sides
+        left_side_end: int = (ww - tlw) / 2
+        rigth_side_start: int = ww - left_side_end
+        # Close panel if clicked on empty sides
+        if x < left_side_end or x > rigth_side_start:
+            self.window.split_view_inner.set_show_sidebar(False)
