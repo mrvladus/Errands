@@ -56,7 +56,6 @@
         <ul>
           <li>Closing details panel by clicking on empty space on the sides of tasks</li>
         </ul>
-        <p>Fixed:</p>
       </description>
     </release>
     <release version="45.1.5" date="2024-01-10">
