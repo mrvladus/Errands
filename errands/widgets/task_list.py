@@ -22,10 +22,10 @@ class TaskList(Adw.Bin):
         self.list_uid = list_uid
         self.parent = parent
         self.details = window.details
-        self.build_ui()
-        self.load_tasks()
+        self._build_ui()
+        self._load_tasks()
 
-    def build_ui(self):
+    def _build_ui(self):
         # Title
         self.title = Adw.WindowTitle(
             title=UserData.run_sql(
@@ -64,7 +64,7 @@ class TaskList(Adw.Bin):
             sensitive=False,
         )
         self.delete_completed_btn.connect(
-            "clicked", self.on_delete_completed_btn_clicked
+            "clicked", self._on_delete_completed_btn_clicked
         )
         # Scroll up btn
         self.scroll_up_btn = Gtk.Button(
@@ -119,7 +119,7 @@ class TaskList(Adw.Bin):
             "sensitive",
             GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
         )
-        delete_completed_btn.connect("clicked", self.on_delete_completed_btn_clicked)
+        delete_completed_btn.connect("clicked", self._on_delete_completed_btn_clicked)
 
         scroll_up_btn = Gtk.Button(
             valign="center",
@@ -143,7 +143,7 @@ class TaskList(Adw.Bin):
             height_request=60,
             title=_("Add new Task"),
         )
-        entry.connect("entry-activated", self.on_task_added)
+        entry.connect("entry-activated", self._on_task_added)
         entry_box = Gtk.ListBox(
             selection_mode=0,
             css_classes=["boxed-list"],
@@ -166,7 +166,7 @@ class TaskList(Adw.Bin):
             vadjustment=adj,
         )
         self.dnd_ctrl = Gtk.DropControllerMotion()
-        self.dnd_ctrl.connect("motion", self.on_dnd_scroll)
+        self.dnd_ctrl.connect("motion", self._on_dnd_scroll)
         self.scrl.add_controller(self.dnd_ctrl)
 
         # Tasks list
@@ -193,7 +193,7 @@ class TaskList(Adw.Bin):
             vexpand=True,
         )
         content_box_click_ctrl = Gtk.GestureClick()
-        content_box_click_ctrl.connect("released", self._on_empty_area_click)
+        content_box_click_ctrl.connect("released", self._on_empty_area_clicked)
         content_box.add_controller(content_box_click_ctrl)
         # Tasks list toolbar view
         self.tasks_toolbar_view = Adw.ToolbarView(
@@ -265,7 +265,7 @@ class TaskList(Adw.Bin):
     def get_toplevel_tasks(self) -> list[Task]:
         return get_children(self.tasks_list)
 
-    def load_tasks(self) -> None:
+    def _load_tasks(self) -> None:
         Log.debug(f"Loading tasks for '{self.list_uid}'")
         for uid in UserData.get_sub_tasks_uids(self.list_uid, ""):
             self.add_task(uid)
@@ -359,7 +359,7 @@ class TaskList(Adw.Bin):
 
         self.update_status()
 
-    def on_delete_completed_btn_clicked(self, _) -> None:
+    def _on_delete_completed_btn_clicked(self, _) -> None:
         """
         Hide completed tasks and move them to trash
         """
@@ -370,7 +370,7 @@ class TaskList(Adw.Bin):
                 task.delete()
         self.update_status()
 
-    def on_dnd_scroll(self, _motion, _x, y) -> bool:
+    def _on_dnd_scroll(self, _motion, _x, y: float) -> bool:
         """
         Autoscroll while dragging task
         """
@@ -393,16 +393,7 @@ class TaskList(Adw.Bin):
         else:
             self.scrolling = False
 
-    def on_task_added(self, entry: Gtk.Entry) -> None:
-        text: str = entry.props.text
-        if text.strip(" \n\t") == "":
-            return
-        self.add_task(UserData.add_task(list_uid=self.list_uid, text=text))
-        entry.props.text = ""
-        scroll(self.scrl, True)
-        Sync.sync()
-
-    def _on_empty_area_click(self, _gesture, _n, x, _y) -> None:
+    def _on_empty_area_clicked(self, _gesture, _n, x: float, _y) -> None:
         """Close Details panel on click on empty space"""
         # Get window width
         ww: int = self.tasks_toolbar_view.get_width()
@@ -414,3 +405,12 @@ class TaskList(Adw.Bin):
         # Close panel if clicked on empty sides
         if x < left_side_end or x > rigth_side_start:
             self.window.split_view_inner.set_show_sidebar(False)
+
+    def _on_task_added(self, entry: Gtk.Entry) -> None:
+        text: str = entry.props.text
+        if text.strip(" \n\t") == "":
+            return
+        self.add_task(UserData.add_task(list_uid=self.list_uid, text=text))
+        entry.props.text = ""
+        scroll(self.scrl, True)
+        Sync.sync()
