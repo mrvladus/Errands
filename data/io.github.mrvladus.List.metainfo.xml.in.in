@@ -50,6 +50,15 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="45.1.6" date="2024-01-20">
+      <description translatable="no">
+        <p>Added:</p>
+        <ul>
+          <li>Closing details panel by clicking on empty space on the sides of tasks</li>
+        </ul>
+        <p>Fixed:</p>
+      </description>
+    </release>
     <release version="45.1.5" date="2024-01-10">
       <description translatable="no">
         <p>Thanks to the work of <b>@david-swift</b> Errands now has:</p>
