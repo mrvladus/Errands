@@ -150,7 +150,13 @@ class Details(Adw.Bin):
                 valign="center",
                 icon_name="errands-calendar-symbolic",
                 tooltip_text=_("Set Date"),
-                popover=Gtk.Popover(child=self.start_datetime),
+                popover=Gtk.Popover(
+                    child=Gtk.ScrolledWindow(
+                        propagate_natural_height=True,
+                        propagate_natural_width=True,
+                        child=self.start_datetime,
+                    )
+                ),
                 css_classes=["flat"],
             )
         )
