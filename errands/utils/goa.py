@@ -26,16 +26,37 @@ def get_goa_credentials(acc_name: str) -> dict[str, str] | None:
         name: str = acc.get_cached_property("ProviderName").get_string()
         if name == acc_name:
             Log.debug(f"GOA: Getting data for {acc_name}")
-            username, url = (
-                acc.get_cached_property("PresentationIdentity").get_string().split("@")
+            username = (
+                acc.get_cached_property("PresentationIdentity")
+                .get_string()
+                .split("@")[0]
             )
             password = account.get_password_based().call_get_password_sync(
                 arg_id=acc.get_cached_property("Id").get_string()
             )
-            result: dict[str, str] = {
+            # Get url
+            try:
+                url: str = (
+                    account.get_calendar()
+                    .get_cached_property("Uri")
+                    .get_string()
+                    .replace(username + "@", "")
+                )
+            except:
+                url: str = (
+                    "https://"
+                    + (
+                        acc.get_cached_property("PresentationIdentity")
+                        .get_string()
+                        .split("@")[1]
+                    )
+                    + "/remote.php/dav/"
+                )
+
+            return {
                 "url": url,
                 "username": username,
                 "password": password,
             }
-            return result
+
     return None
