@@ -64,7 +64,7 @@ class Button(Gtk.Button):
             self.add_controller(ctrl)
 
 
-class DateTime(Gtk.Box):
+class DateTime(Gtk.ScrolledWindow):
     """
     Date and time picker widget.
     Datetime returned in yyyymmddThhmmss format.
@@ -79,7 +79,8 @@ class DateTime(Gtk.Box):
         self._build_ui()
 
     def _build_ui(self):
-        self.set_orientation(Gtk.Orientation.VERTICAL)
+        self.set_propagate_natural_height(True)
+        self.set_propagate_natural_width(True)
         # Hour button
         self.hour = Gtk.SpinButton(
             adjustment=Gtk.Adjustment(lower=0, upper=23, step_increment=1)
@@ -91,93 +92,101 @@ class DateTime(Gtk.Box):
         )
         self.minutes.connect("value-changed", self._on_date_time_changed)
         # Time box
-        self.append(
-            Box(
-                children=[
-                    Box(
-                        children=[
-                            self.hour,
-                            Gtk.Label(label=":"),
-                            self.minutes,
-                        ],
-                        css_classes=["toolbar"],
-                        halign="center",
-                    ),
-                    Box(
-                        children=[
-                            Button(
-                                "09:00",
-                                "errands-daytime-morning-symbolic",
-                                on_click=self._on_time_preset_clicked,
-                            ),
-                            Button(
-                                "13:00",
-                                "errands-theme-light-symbolic",
-                                on_click=self._on_time_preset_clicked,
-                            ),
-                        ],
-                        css_classes=["toolbar"],
-                        homogeneous=True,
-                    ),
-                    Box(
-                        children=[
-                            Button(
-                                "17:00",
-                                "errands-daytime-sunset-symbolic",
-                                on_click=self._on_time_preset_clicked,
-                            ),
-                            Button(
-                                "20:00",
-                                "errands-theme-dark-symbolic",
-                                on_click=self._on_time_preset_clicked,
-                            ),
-                        ],
-                        css_classes=["toolbar"],
-                        homogeneous=True,
-                    ),
-                ],
-                orientation="vertical",
-            )
+        time_box = Box(
+            children=[
+                Box(
+                    children=[
+                        self.hour,
+                        Gtk.Label(label=":"),
+                        self.minutes,
+                    ],
+                    css_classes=["toolbar"],
+                    halign="center",
+                ),
+                Box(
+                    children=[
+                        Button(
+                            "09:00",
+                            "errands-daytime-morning-symbolic",
+                            on_click=self._on_time_preset_clicked,
+                        ),
+                        Button(
+                            "13:00",
+                            "errands-theme-light-symbolic",
+                            on_click=self._on_time_preset_clicked,
+                        ),
+                    ],
+                    css_classes=["toolbar"],
+                    homogeneous=True,
+                ),
+                Box(
+                    children=[
+                        Button(
+                            "17:00",
+                            "errands-daytime-sunset-symbolic",
+                            on_click=self._on_time_preset_clicked,
+                        ),
+                        Button(
+                            "20:00",
+                            "errands-theme-dark-symbolic",
+                            on_click=self._on_time_preset_clicked,
+                        ),
+                    ],
+                    css_classes=["toolbar"],
+                    homogeneous=True,
+                ),
+            ],
+            orientation="vertical",
         )
         # Calendar
         self.calendar = Gtk.Calendar()
         self.calendar.connect("day-selected", self._on_date_time_changed)
-        self.append(self.calendar)
-        # Buttons box
-        self.append(
+        # Scroll
+        Gtk.ScrolledWindow(
+            propagate_natural_height=True,
+            propagate_natural_width=True,
+        )
+        # Bottom buttons box
+        bottom_box = Box(
+            children=[
+                Box(
+                    children=[
+                        Button(
+                            label=_("Today"),
+                            on_click=self._on_today_btn_clicked,
+                        ),
+                        Button(
+                            label=_("Tomorrow"),
+                            on_click=self._on_tomorrow_btn_clicked,
+                        ),
+                    ],
+                    css_classes=["toolbar"],
+                    homogeneous=True,
+                ),
+                Box(
+                    children=[
+                        Button(
+                            label=_("Now"),
+                            on_click=self._on_now_btn_clicked,
+                            hexpand=True,
+                        ),
+                        Button(
+                            label=_("Clear"),
+                            on_click=self._on_clear_btn_clicked,
+                            hexpand=True,
+                        ),
+                    ],
+                    css_classes=["toolbar"],
+                    homogeneous=True,
+                ),
+            ],
+            orientation="vertical",
+        )
+
+        # Content box
+        self.set_child(
             Box(
-                children=[
-                    Box(
-                        children=[
-                            Button(
-                                label=_("Today"),
-                                on_click=self._on_today_btn_clicked,
-                            ),
-                            Button(
-                                label=_("Tomorrow"),
-                                on_click=self._on_tomorrow_btn_clicked,
-                            ),
-                        ],
-                        css_classes=["toolbar"],
-                        homogeneous=True,
-                    ),
-                    Box(
-                        children=[
-                            Button(
-                                label=_("Now"),
-                                on_click=self._on_now_btn_clicked,
-                                hexpand=True,
-                            ),
-                            Button(
-                                label=_("Clear"),
-                                on_click=self._on_clear_btn_clicked,
-                                hexpand=True,
-                            ),
-                        ],
-                        css_classes=["toolbar"],
-                        homogeneous=True,
-                    ),
-                ],
+                children=[time_box, self.calendar, bottom_box],
                 orientation="vertical",
             )
         )
