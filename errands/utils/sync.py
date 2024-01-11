@@ -96,7 +96,7 @@ class SyncProviderCalDAV:
 
         # Add prefix if needed
         if not self.url.startswith("http"):
-            self.url = "http://" + self.url
+            self.url = "https://" + self.url
             GSettings.set("sync-url", "s", self.url)
         # For Nextcloud provider
         if self.name == "Nextcloud":
