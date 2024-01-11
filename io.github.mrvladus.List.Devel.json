@@ -1,5 +1,5 @@
 {
-    "app-id": "io.github.mrvladus.List.Devel",
+    "id": "io.github.mrvladus.List.Devel",
     "runtime": "org.gnome.Platform",
     "runtime-version": "45",
     "sdk": "org.gnome.Sdk",
@@ -10,12 +10,44 @@
         "--socket=fallback-x11",
         "--share=ipc",
         "--share=network",
-        "--talk-name=org.freedesktop.secrets"
+        "--talk-name=org.freedesktop.secrets",
+        "--talk-name=org.gnome.OnlineAccounts"
     ],
     "cleanup": [
-        "/lib/debug"
+        "/lib/debug",
+        "/include",
+        "/lib/pkgconfig",
+        "/man",
+        "/share/aclocal",
+        "/share/gtk-doc",
+        "/share/man",
+        "/share/pkgconfig",
+        "/share/vala",
+        "*.la",
+        "*.a"
     ],
     "modules": [
+        {
+            "name": "gnome-online-accounts",
+            "buildsystem": "meson",
+            "config-opts": [
+                "-Dgoabackend=false",
+                "-Dexchange=false",
+                "-Dgoogle=false",
+                "-Dimap_smtp=false",
+                "-Dwebdav=false",
+                "-Dkerberos=false",
+                "-Dwindows_live=false",
+                "-Dvapi=false"
+            ],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "https://gitlab.gnome.org/GNOME/gnome-online-accounts.git",
+                    "branch": "master"
+                }
+            ]
+        },
         "build-aux/python3-modules.json",
         {
             "name": "errands",

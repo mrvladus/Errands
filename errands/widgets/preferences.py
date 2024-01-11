@@ -1,6 +1,7 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
+from errands.utils.goa import get_goa_credentials
 from gi.repository import Adw, Gtk
 from errands.utils.sync import Sync
 from errands.utils.gsettings import GSettings
@@ -188,6 +189,17 @@ class PreferencesWindow(Adw.PreferencesWindow):
             password = GSettings.get_secret(account)
             with self.sync_password.freeze_notify():
                 self.sync_password.props.text = password if password else ""
+
+        # Fill out forms from Gnome Online Accounts if needed
+        acc_name: str = self.sync_providers.props.selected_item.props.string
+        data: dict[str, str] | None = get_goa_credentials(acc_name)
+        if data:
+            if not GSettings.get("sync-url"):
+                self.sync_url.set_text(data["url"])
+            if not GSettings.get("sync-username"):
+                self.sync_username.set_text(data["username"])
+            if not GSettings.get_secret(acc_name):
+                self.sync_password.set_text(data["password"])
 
     def on_sync_provider_selected(self, *_) -> None:
         self._setup_sync()

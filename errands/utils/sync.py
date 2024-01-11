@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: MIT
 
 import datetime, urllib3
-from typing import Callable
 from caldav import Calendar, DAVClient, Principal, Todo
 from caldav.elements import dav
 from gi.repository import Adw, GLib
