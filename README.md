@@ -60,6 +60,7 @@ Please, **do not package** it in other formats, but if you do, these are depende
 - `libadwaita >= 1.4`
 - `PyGObject`
 - `python3-caldav`
+- `gnome-online-accounts (optional)`
 
 ### Donate
 If you like this app, you can support its development. See **[DONATIONS.md](DONATIONS.md)**
