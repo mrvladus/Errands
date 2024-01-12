@@ -173,7 +173,6 @@ class TaskList(Adw.Bin):
         self.tasks_list = Gtk.Box(
             orientation="vertical",
             hexpand=True,
-            css_classes=["task-red"],
         )
         self.tasks_list.add_css_class("tasks-list")
         self.scrl.set_child(
@@ -400,11 +399,19 @@ class TaskList(Adw.Bin):
     def _on_empty_area_clicked(self, _gesture, _n, x: float, y: float) -> None:
         """Close Details panel on click on empty space"""
 
+        height = 0
+        for task in self.get_toplevel_tasks():
+            if task.get_child_revealed():
+                height = (
+                    task.compute_bounds(self.tasks_toolbar_view.get_content())
+                    .out_bounds.get_bottom_right()
+                    .y
+                )
         left_area_end: int = self.tasks_list.get_allocation().x
         right_area_start: int = left_area_end + self.tasks_list.get_width()
-        bottom_area_start: int = self.scrl.get_vadjustment().get_value()
+
         on_sides: bool = x < left_area_end or x > right_area_start
-        on_bottom: bool = y > self.tasks_toolbar_view.get_height() - bottom_area_start
+        on_bottom: bool = y > height
         if on_sides or on_bottom:
             self.window.split_view_inner.set_show_sidebar(False)
 

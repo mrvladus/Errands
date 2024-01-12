@@ -64,7 +64,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
         add_tasks_position = Adw.ComboRow(
             title=_("Add new Tasks"),
             model=Gtk.StringList.new([_("At the Top"), _("At the Bottom")]),
-            icon_name="list-add-symbolic",
+            icon_name="errands-add-symbolic",
         )
         task_list_group.add(add_tasks_position)
 
