@@ -54,6 +54,7 @@
           <li>Closing details panel by clicking on empty space on the sides of tasks</li>
           <li>If Gnome Online Accounts is installed, Nextcloud credentials will be pulled from it</li>
           <li>Nextcloud url prefix will autocomplete to "https://" instead of "http://"</li>
+          <li>Sidebar can be closed with click on empty space in the task list</li>
         </ul>
       </description>
     </release>

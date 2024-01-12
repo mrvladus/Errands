@@ -73,6 +73,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
         task_primary_action = Adw.ComboRow(
             title=_("Click Action"),
             model=Gtk.StringList.new([_("Open Details Panel"), _("Show Sub-Tasks")]),
+            icon_name="errands-click-symbolic",
         )
         task_primary_action.set_selected(
             int(GSettings.get("primary-action-show-sub-tasks"))
@@ -137,6 +138,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
         details_position = Adw.ComboRow(
             title=_("Position"),
             model=Gtk.StringList.new([_("Left"), _("Right")]),
+            icon_name="errands-sidebar-left-symbolic",
         )
         details_position.set_selected(int(GSettings.get("right-sidebar")))
         details_position.connect("notify::selected", self._on_details_position_changed)

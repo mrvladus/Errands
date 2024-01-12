@@ -35,11 +35,11 @@ class TaskList(Adw.Bin):
         )
         # Toggle sidebar button
         self.left_toggle_sidebar_btn = Gtk.ToggleButton(
-            icon_name="sidebar-show-symbolic",
+            icon_name="errands-sidebar-left-symbolic",
             tooltip_text=_("Toggle Sidebar"),
         )
         self.right_toggle_sidebar_btn = Gtk.ToggleButton(
-            icon_name="sidebar-show-right-symbolic",
+            icon_name="errands-sidebar-right-symbolic",
             tooltip_text=_("Toggle Sidebar"),
         )
         self.right_toggle_sidebar_btn.bind_property(
@@ -87,11 +87,11 @@ class TaskList(Adw.Bin):
         # ---------- BOTTOMBAR ---------- #
 
         left_toggle_sidebar_btn = Gtk.ToggleButton(
-            icon_name="sidebar-show-symbolic",
+            icon_name="errands-sidebar-left-symbolic",
             tooltip_text=_("Toggle Sidebar"),
         )
         right_toggle_sidebar_btn = Gtk.ToggleButton(
-            icon_name="sidebar-show-right-symbolic",
+            icon_name="errands-sidebar-right-symbolic",
             tooltip_text=_("Toggle Sidebar"),
         )
         left_toggle_sidebar_btn.bind_property(
