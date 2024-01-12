@@ -38,6 +38,7 @@ class Window(Adw.ApplicationWindow):
         self.split_view_inner = Adw.OverlaySplitView(
             min_sidebar_width=360,
             max_sidebar_width=400,
+            sidebar_position=int(GSettings.get("right-sidebar")),
         )
         # Split view outer
         self.split_view = Adw.NavigationSplitView(
@@ -83,7 +84,6 @@ class Window(Adw.ApplicationWindow):
             title=_("No Task Lists"),
         )
         self.stack.set_visible_child_name("status")
-        self.update_details(GSettings.get("right-sidebar"))
 
         # Toast overlay
         self.toast_overlay = Adw.ToastOverlay(child=self.split_view)
@@ -151,6 +151,3 @@ class Window(Adw.ApplicationWindow):
             lambda *_: self.props.application.quit(),
             ["<primary>q", "<primary>w"],
         )
-
-    def update_details(self, right: bool) -> None:
-        self.split_view_inner.props.sidebar_position = "end" if right else "start"

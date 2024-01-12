@@ -59,6 +59,32 @@ class PreferencesWindow(Adw.PreferencesWindow):
         theme_dark_row.set_activatable_widget(self.theme_dark_btn)
         theme_group.add(theme_dark_row)
 
+        # Task lists group
+        task_list_group = Adw.PreferencesGroup(title=_("Task Lists"))
+        add_tasks_position = Adw.ComboRow(
+            title=_("Add new Tasks"),
+            model=Gtk.StringList.new([_("At the Top"), _("At the Bottom")]),
+            icon_name="list-add-symbolic",
+        )
+        task_list_group.add(add_tasks_position)
+
+        # Tasks group
+        tasks_group = Adw.PreferencesGroup(title=_("Tasks"))
+        task_primary_action = Adw.ComboRow(
+            title=_("Click Action"),
+            model=Gtk.StringList.new([_("Open Details Panel"), _("Show Sub-Tasks")]),
+        )
+        task_primary_action.set_selected(
+            int(GSettings.get("primary-action-show-sub-tasks"))
+        )
+        task_primary_action.connect(
+            "notify::selected",
+            lambda row, *_: GSettings.set(
+                "primary-action-show-sub-tasks", "b", bool(row.get_selected())
+            ),
+        )
+        tasks_group.add(task_primary_action)
+
         # Sync group
         sync_group = Adw.PreferencesGroup(
             title=_("Sync"),
@@ -71,7 +97,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
             icon_name="errands-sync-symbolic",
         )
         GSettings.bind("sync-provider", self.sync_providers, "selected")
-        self.sync_providers.connect("notify::selected", self.on_sync_provider_selected)
+        self.sync_providers.connect("notify::selected", lambda *_: self._setup_sync())
         sync_group.add(self.sync_providers)
         # URL
         self.sync_url = Adw.EntryRow(
@@ -108,73 +134,21 @@ class PreferencesWindow(Adw.PreferencesWindow):
         details_group = Adw.PreferencesGroup(
             title=_("Details Panel"),
         )
-        # Left Sidebar
-        self.left_sidebar_btn = Gtk.CheckButton(
-            active=not GSettings.get("right-sidebar")
+        details_position = Adw.ComboRow(
+            title=_("Position"),
+            model=Gtk.StringList.new([_("Left"), _("Right")]),
         )
-        self.left_sidebar_btn.connect("toggled", self.on_details_change, False)
-        left_sidebar_row = Adw.ActionRow(
-            title=_("Left Sidebar"),
-            icon_name="sidebar-show-symbolic",
-        )
-        left_sidebar_row.add_suffix(self.left_sidebar_btn)
-        left_sidebar_row.set_activatable_widget(self.left_sidebar_btn)
-        details_group.add(left_sidebar_row)
-        # Right Sidebar
-        self.right_sidebar_btn = Gtk.CheckButton(
-            group=self.left_sidebar_btn, active=GSettings.get("right-sidebar")
-        )
-        self.right_sidebar_btn.connect("toggled", self.on_details_change, True)
-        right_sidebar_row = Adw.ActionRow(
-            title=_("Right Sidebar"),
-            icon_name="sidebar-show-right-symbolic",
-        )
-        right_sidebar_row.add_suffix(self.right_sidebar_btn)
-        right_sidebar_row.set_activatable_widget(self.right_sidebar_btn)
-        details_group.add(right_sidebar_row)
-
-        # Primary action group
-        primary_action_group = Adw.PreferencesGroup(
-            title=_("Primary Action"),
-        )
-        # Open Details Panel
-        self.open_details_panel_btn = Gtk.CheckButton(
-            active=not GSettings.get("primary-action-show-sub-tasks")
-        )
-        self.open_details_panel_btn.connect(
-            "toggled",
-            lambda *_: GSettings.set("primary-action-show-sub-tasks", "b", False),
-        )
-        open_details_panel_row = Adw.ActionRow(
-            title=_("Open Details Panel"),
-            icon_name="errands-info-symbolic",
-        )
-        open_details_panel_row.add_suffix(self.open_details_panel_btn)
-        open_details_panel_row.set_activatable_widget(self.open_details_panel_btn)
-        primary_action_group.add(open_details_panel_row)
-        # Show Sub-Tasks Row
-        self.show_sub_tasks_btn = Gtk.CheckButton(
-            group=self.open_details_panel_btn,
-            active=GSettings.get("primary-action-show-sub-tasks"),
-        )
-        self.show_sub_tasks_btn.connect(
-            "toggled",
-            lambda *_: GSettings.set("primary-action-show-sub-tasks", "b", True),
-        )
-        show_sub_tasks_row = Adw.ActionRow(
-            title=_("Show Sub-Tasks"),
-            icon_name="view-list-bullet-symbolic",
-        )
-        show_sub_tasks_row.add_suffix(self.show_sub_tasks_btn)
-        show_sub_tasks_row.set_activatable_widget(self.show_sub_tasks_btn)
-        primary_action_group.add(show_sub_tasks_row)
+        details_position.set_selected(int(GSettings.get("right-sidebar")))
+        details_position.connect("notify::selected", self._on_details_position_changed)
+        details_group.add(details_position)
 
         # Page
         page = Adw.PreferencesPage()
         page.add(theme_group)
+        page.add(task_list_group)
+        page.add(tasks_group)
         page.add(sync_group)
         page.add(details_group)
-        page.add(primary_action_group)
         self.add(page)
 
     def _setup_sync(self) -> None:
@@ -201,9 +175,6 @@ class PreferencesWindow(Adw.PreferencesWindow):
             if not GSettings.get_secret(acc_name):
                 self.sync_password.set_text(data["password"])
 
-    def on_sync_provider_selected(self, *_) -> None:
-        self._setup_sync()
-
     def on_sync_pass_changed(self, _entry) -> None:
         if 0 < self.sync_providers.props.selected < 3:
             account = self.sync_providers.props.selected_item.props.string
@@ -219,6 +190,6 @@ class PreferencesWindow(Adw.PreferencesWindow):
         Adw.StyleManager.get_default().set_color_scheme(theme)
         GSettings.set("theme", "i", theme)
 
-    def on_details_change(self, btn: Gtk.Button, right: bool) -> None:
-        self.window.update_details(right)
-        GSettings.set("right-sidebar", "b", right)
+    def _on_details_position_changed(self, row: Adw.ComboRow, *_) -> None:
+        self.window.split_view_inner.set_sidebar_position(row.get_selected())
+        GSettings.set("right-sidebar", "b", bool(row.get_selected())),

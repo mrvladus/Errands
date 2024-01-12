@@ -142,6 +142,7 @@ class Task(Gtk.Revealer):
             icon_name="errands-info-symbolic",
             on_click=self.on_details_clicked,
             tooltip_text=_("Details"),
+            css_classes=["flat"],
         )
         GSettings.bind("primary-action-show-sub-tasks", details_btn, "visible")
         sub_tasks_entry_box = Box(
