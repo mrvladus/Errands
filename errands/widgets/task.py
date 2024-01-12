@@ -3,7 +3,7 @@
 
 from typing import Self
 from errands.widgets.components import Box, Button
-from gi.repository import Gtk, Adw, Gdk, GObject
+from gi.repository import Gtk, Adw, Gdk, GObject, GLib
 from errands.utils.sync import Sync
 from errands.utils.logging import Log
 from errands.utils.data import UserData
@@ -227,8 +227,17 @@ class Task(Gtk.Revealer):
         Completely remove widget
         """
 
-        self.parent.tasks_list.remove(self)
-        self.run_dispose()
+        def _wait_invisible():
+            """Ensure animation completes"""
+            if not self.get_child_revealed():
+                self.parent.tasks_list.remove(self)
+                self.run_dispose()
+                return False
+            else:
+                return True
+
+        self.toggle_visibility(False)
+        GLib.timeout_add(100, _wait_invisible)
 
     def toggle_visibility(self, on: bool) -> None:
         self.set_reveal_child(on)

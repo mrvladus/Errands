@@ -518,6 +518,7 @@ class ListItem(Gtk.ListBoxRow):
         _create_action("export", _export)
 
     def _build_ui(self) -> None:
+        self.add_css_class("task-lists-item")
         # Label
         self.label = Gtk.Label(
             halign="start",
@@ -539,6 +540,10 @@ class ListItem(Gtk.ListBoxRow):
         ctrl = Gtk.GestureClick()
         ctrl.connect("released", self._on_click)
         self.add_controller(ctrl)
+        # Drop controller
+        drop_ctrl = Gtk.DropTarget.new(actions=Gdk.DragAction.MOVE, type=Task)
+        drop_ctrl.connect("drop", self._on_task_drop)
+        self.add_controller(drop_ctrl)
         self.set_child(
             Box(
                 children=[
@@ -556,3 +561,9 @@ class ListItem(Gtk.ListBoxRow):
     def _on_click(self, *args) -> None:
         self.window.stack.set_visible_child_name(self.label.get_label())
         self.window.split_view.set_show_content(True)
+
+    def _on_task_drop(self, _drop, task: Task, _x, _y):
+        if task.list_uid == self.uid:
+            return
+        task.update_props(["list_uid", "parent"], [self.uid, ""])
+        Sync.sync()

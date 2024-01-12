@@ -1,3 +1,8 @@
+/* Task lists item */
+.task-lists-item:drop(active) {
+    background-color: @blue_2;
+}
+
 .task-blue {
     background: #7692b4;
 }
