@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 from errands.widgets.components import Box
-from gi.repository import Adw, Gtk, GLib, GObject
+from gi.repository import Adw, Gtk, GLib, GObject, Graphene
 from errands.utils.animation import scroll
 from errands.utils.data import UserData
 from errands.utils.functions import get_children
@@ -171,12 +171,16 @@ class TaskList(Adw.Bin):
 
         # Tasks list
         self.tasks_list = Gtk.Box(
-            orientation="vertical", hexpand=True, margin_bottom=18
+            orientation="vertical",
+            hexpand=True,
+            css_classes=["task-red"],
         )
         self.tasks_list.add_css_class("tasks-list")
         self.scrl.set_child(
             Adw.Clamp(
-                maximum_size=1000, tightening_threshold=300, child=self.tasks_list
+                maximum_size=1000,
+                tightening_threshold=300,
+                child=self.tasks_list,
             )
         )
         # Content box
@@ -393,17 +397,15 @@ class TaskList(Adw.Bin):
         else:
             self.scrolling = False
 
-    def _on_empty_area_clicked(self, _gesture, _n, x: float, _y) -> None:
+    def _on_empty_area_clicked(self, _gesture, _n, x: float, y: float) -> None:
         """Close Details panel on click on empty space"""
-        # Get window width
-        ww: int = self.tasks_toolbar_view.get_width()
-        # Get task list width
-        tlw: int = self.tasks_list.get_width()
-        # Get empty sides
-        left_side_end: int = (ww - tlw) / 2
-        rigth_side_start: int = ww - left_side_end
-        # Close panel if clicked on empty sides
-        if x < left_side_end or x > rigth_side_start:
+
+        left_area_end: int = self.tasks_list.get_allocation().x
+        right_area_start: int = left_area_end + self.tasks_list.get_width()
+        bottom_area_start: int = self.scrl.get_vadjustment().get_value()
+        on_sides: bool = x < left_area_end or x > right_area_start
+        on_bottom: bool = y > self.tasks_toolbar_view.get_height() - bottom_area_start
+        if on_sides or on_bottom:
             self.window.split_view_inner.set_show_sidebar(False)
 
     def _on_task_added(self, entry: Gtk.Entry) -> None:
