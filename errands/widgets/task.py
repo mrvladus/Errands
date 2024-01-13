@@ -227,17 +227,8 @@ class Task(Gtk.Revealer):
         Completely remove widget
         """
 
-        def _wait_invisible():
-            """Ensure animation completes"""
-            if not self.get_child_revealed():
-                self.parent.tasks_list.remove(self)
-                self.run_dispose()
-                return False
-            else:
-                return True
-
-        self.toggle_visibility(False)
-        GLib.timeout_add(100, _wait_invisible)
+        self.parent.tasks_list.remove(self)
+        self.run_dispose()
 
     def toggle_visibility(self, on: bool) -> None:
         self.set_reveal_child(on)
