@@ -60,13 +60,13 @@ class PreferencesWindow(Adw.PreferencesWindow):
         theme_group.add(theme_dark_row)
 
         # Task lists group
-        task_list_group = Adw.PreferencesGroup(title=_("Task Lists"))
-        add_tasks_position = Adw.ComboRow(
-            title=_("Add new Tasks"),
-            model=Gtk.StringList.new([_("At the Top"), _("At the Bottom")]),
-            icon_name="errands-add-symbolic",
-        )
-        task_list_group.add(add_tasks_position)
+        # task_list_group = Adw.PreferencesGroup(title=_("Task Lists"))
+        # add_tasks_position = Adw.ComboRow(
+        #     title=_("Add new Tasks"),
+        #     model=Gtk.StringList.new([_("At the Top"), _("At the Bottom")]),
+        #     icon_name="errands-add-symbolic",
+        # )
+        # task_list_group.add(add_tasks_position)
 
         # Tasks group
         tasks_group = Adw.PreferencesGroup(title=_("Tasks"))
@@ -147,7 +147,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
         # Page
         page = Adw.PreferencesPage()
         page.add(theme_group)
-        page.add(task_list_group)
+        # page.add(task_list_group)
         page.add(tasks_group)
         page.add(sync_group)
         page.add(details_group)
