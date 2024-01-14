@@ -257,10 +257,10 @@ class Task(Gtk.Revealer):
             if n_total > 0
             else ""
         )
-        # # Update percent of completion
-        # if n_total > 0:
-        #     percent = n_completed / n_total * 100
-        #     self.update_props(["percent_complete"], [percent])
+        # Update percent of completion
+        if n_total > 0:
+            percent = n_completed / n_total * 100
+            self.update_props(["percent_complete"], [percent])
 
     def on_completed_btn_toggled(self, btn: Gtk.ToggleButton) -> None:
         """
@@ -280,13 +280,21 @@ class Task(Gtk.Revealer):
             set_text()
             return
 
+        # Set completion percent
+        cmp_per = 100 if btn.get_active() else 0
+        if len(get_children(self.tasks_list)) > 0:
+            cmp_per = self.get_prop("percent_complete")
+
         # Update data
         self.update_props(
             ["completed", "synced", "percent_complete"],
-            [btn.get_active(), False, 100 if btn.get_active() else 0],
+            [btn.get_active(), False, cmp_per],
         )
 
         if isinstance(self.parent, Task):
+            # Uncomplete parent if sub-task is uncompletes
+            if not btn.get_active():
+                self.parent.completed_btn.set_active(False)
             self.parent.update_status()
 
         # Update children
