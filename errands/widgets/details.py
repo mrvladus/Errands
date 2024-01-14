@@ -8,8 +8,8 @@ from errands.utils.functions import get_children
 from errands.widgets.components import Box, Button, DateTime
 from gi.repository import Adw, Gtk, Gdk, GObject
 from errands.utils.markup import Markup
-from errands.utils.sync import Sync
-from errands.utils.logging import Log
+from errands.lib.sync.sync import Sync
+from errands.lib.logging import Log
 
 
 class Details(Adw.Bin):

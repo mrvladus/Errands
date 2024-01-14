@@ -34,7 +34,7 @@ def main() -> None:
     resource = Gio.Resource.load(os.path.join(pkgdatadir, "errands.gresource"))
     resource._register()
 
-    from errands.utils.logging import Log
+    from errands.lib.logging import Log
     from errands.utils.data import UserData
 
     Log.init()

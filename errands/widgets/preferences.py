@@ -1,10 +1,10 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-from errands.utils.goa import get_goa_credentials
+from errands.lib.goa import get_goa_credentials
 from gi.repository import Adw, Gtk
-from errands.utils.sync import Sync
-from errands.utils.gsettings import GSettings
+from errands.lib.sync.sync import Sync
+from errands.lib.gsettings import GSettings
 
 
 class PreferencesWindow(Adw.PreferencesWindow):
@@ -144,14 +144,22 @@ class PreferencesWindow(Adw.PreferencesWindow):
         details_position.connect("notify::selected", self._on_details_position_changed)
         details_group.add(details_position)
 
-        # Page
-        page = Adw.PreferencesPage()
-        page.add(theme_group)
+        # Appearance Page
+        appearance_page = Adw.PreferencesPage(
+            title=_("Appearance"), icon_name="errands-appearance-symbolic"
+        )
+        appearance_page.add(theme_group)
+        appearance_page.add(tasks_group)
+        appearance_page.add(details_group)
         # page.add(task_list_group)
-        page.add(tasks_group)
-        page.add(sync_group)
-        page.add(details_group)
-        self.add(page)
+        self.add(appearance_page)
+
+        # Sync Page
+        sync_page = Adw.PreferencesPage(
+            title=_("Sync"), icon_name="errands-sync-symbolic"
+        )
+        sync_page.add(sync_group)
+        self.add(sync_page)
 
     def _setup_sync(self) -> None:
         selected = self.sync_providers.props.selected

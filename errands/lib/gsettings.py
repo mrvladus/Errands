@@ -3,7 +3,7 @@
 
 from gi.repository import GLib, Gio, Gtk, Secret
 from __main__ import APP_ID
-from errands.utils.logging import Log
+from errands.lib.logging import Log
 
 SECRETS_SCHEMA = Secret.Schema.new(
     APP_ID,
@@ -25,9 +25,18 @@ class GSettings:
             self.init()
 
     @classmethod
-    def bind(self, setting: str, obj: Gtk.Widget, prop: str, invert: bool = False) -> None:
+    def bind(
+        self, setting: str, obj: Gtk.Widget, prop: str, invert: bool = False
+    ) -> None:
         self._check_init(self)
-        self.gsettings.bind(setting, obj, prop, Gio.SettingsBindFlags.INVERT_BOOLEAN if invert else Gio.SettingsBindFlags.DEFAULT)
+        self.gsettings.bind(
+            setting,
+            obj,
+            prop,
+            Gio.SettingsBindFlags.INVERT_BOOLEAN
+            if invert
+            else Gio.SettingsBindFlags.DEFAULT,
+        )
 
     @classmethod
     def get(self, setting: str):
@@ -66,10 +75,12 @@ class GSettings:
         self.gsettings = Gio.Settings.new(APP_ID)
 
         # Migrate old password
-        account = self.gsettings.get_int("sync-provider")
-        password = self.gsettings.get_string("sync-password")
-        if 0 < account < 3 and password:
-            account = "Nextcloud" if account == 1 else "CalDAV"
-            self.set_secret(account, password)
-            self.gsettings.set_string("sync-password", "")  # Clean pass
-
+        try:
+            account = self.gsettings.get_int("sync-provider")
+            password = self.gsettings.get_string("sync-password")
+            if 0 < account < 3 and password:
+                account = "Nextcloud" if account == 1 else "CalDAV"
+                self.set_secret(account, password)
+                self.gsettings.set_string("sync-password", "")  # Clean pass
+        except:
+            pass

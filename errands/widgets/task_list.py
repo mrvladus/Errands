@@ -6,10 +6,10 @@ from gi.repository import Adw, Gtk, GLib, GObject, Graphene
 from errands.utils.animation import scroll
 from errands.utils.data import UserData
 from errands.utils.functions import get_children
-from errands.utils.sync import Sync
-from errands.utils.logging import Log
+from errands.lib.sync.sync import Sync
+from errands.lib.logging import Log
 from errands.widgets.task import Task
-from errands.utils.gsettings import GSettings
+from errands.lib.gsettings import GSettings
 
 
 class TaskList(Adw.Bin):

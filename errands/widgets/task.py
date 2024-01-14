@@ -4,12 +4,12 @@
 from typing import Self
 from errands.widgets.components import Box, Button
 from gi.repository import Gtk, Adw, Gdk, GObject, GLib
-from errands.utils.sync import Sync
-from errands.utils.logging import Log
+from errands.lib.sync.sync import Sync
+from errands.lib.logging import Log
 from errands.utils.data import UserData
 from errands.utils.markup import Markup
 from errands.utils.functions import get_children
-from errands.utils.gsettings import GSettings
+from errands.lib.gsettings import GSettings
 
 
 class Task(Gtk.Revealer):

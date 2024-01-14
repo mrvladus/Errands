@@ -16,4 +16,5 @@ configure_file(
 )
 
 install_subdir('utils', install_dir: moduledir)
+install_subdir('lib', install_dir: moduledir)
 install_subdir('widgets', install_dir: moduledir)

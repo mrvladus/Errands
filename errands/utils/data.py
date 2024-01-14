@@ -7,9 +7,9 @@ import shutil
 import sqlite3
 from typing import Any
 from uuid import uuid4
-from errands.utils.gsettings import GSettings
+from errands.lib.gsettings import GSettings
 from gi.repository import GLib
-from errands.utils.logging import Log
+from errands.lib.logging import Log
 
 
 class UserData:

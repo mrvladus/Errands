@@ -6,9 +6,9 @@ from uuid import uuid4
 from icalendar import Calendar, Todo
 from errands.utils.data import UserData
 from errands.utils.functions import get_children
-from errands.utils.gsettings import GSettings
-from errands.utils.logging import Log
-from errands.utils.sync import Sync
+from errands.lib.gsettings import GSettings
+from errands.lib.logging import Log
+from errands.lib.sync.sync import Sync
 from errands.widgets.components import Box
 from errands.widgets.task import Task
 from errands.widgets.task_list import TaskList

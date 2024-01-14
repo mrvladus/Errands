@@ -8,10 +8,9 @@ from errands.widgets.trash import Trash
 from gi.repository import Gio, Adw, Gtk
 from errands.widgets.lists import Lists
 from errands.widgets.preferences import PreferencesWindow
-from errands.utils.sync import Sync
-from errands.utils.gsettings import GSettings
-from errands.utils.logging import Log
-from errands.widgets.task_list import TaskList
+from errands.lib.sync.sync import Sync
+from errands.lib.gsettings import GSettings
+from errands.lib.logging import Log
 
 
 class Window(Adw.ApplicationWindow):

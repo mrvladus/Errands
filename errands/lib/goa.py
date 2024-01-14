@@ -1,10 +1,17 @@
 # Copyright 2023-2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-from errands.utils.logging import Log
+from typing import TypedDict
+from errands.lib.logging import Log
 
 
-def get_goa_credentials(acc_name: str) -> dict[str, str] | None:
+class GoaCredentials(TypedDict):
+    url: str
+    username: str
+    password: str
+
+
+def get_goa_credentials(acc_name: str) -> GoaCredentials | None:
     """
     If Gnome Online Accounts is installed, try to get account info.
     Only for password based account yet.
@@ -53,10 +60,6 @@ def get_goa_credentials(acc_name: str) -> dict[str, str] | None:
                     + "/remote.php/dav/"
                 )
 
-            return {
-                "url": url,
-                "username": username,
-                "password": password,
-            }
+            return GoaCredentials(url=url, username=username, password=password)
 
     return None

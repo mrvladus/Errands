@@ -6,8 +6,8 @@ from errands.utils.functions import get_children
 from errands.widgets.components import Box, Button
 from gi.repository import Adw, Gtk, GObject
 from errands.widgets.task import Task
-from errands.utils.sync import Sync
-from errands.utils.logging import Log
+from errands.lib.sync.sync import Sync
+from errands.lib.logging import Log
 
 
 class Trash(Adw.Bin):
