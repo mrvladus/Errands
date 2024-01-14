@@ -126,6 +126,7 @@ class Task(Gtk.Revealer):
         )
         task_row_drop_target.connect("drop", self.on_drop)
         self.task_row.add_controller(task_row_drop_target)
+
         task_row_click_ctrl = Gtk.GestureClick.new()
         task_row_click_ctrl.connect("released", self.on_row_clicked)
         self.task_row.add_controller(task_row_click_ctrl)
@@ -256,6 +257,10 @@ class Task(Gtk.Revealer):
             if n_total > 0
             else ""
         )
+        # # Update percent of completion
+        # if n_total > 0:
+        #     percent = n_completed / n_total * 100
+        #     self.update_props(["percent_complete"], [percent])
 
     def on_completed_btn_toggled(self, btn: Gtk.ToggleButton) -> None:
         """

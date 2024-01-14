@@ -337,11 +337,12 @@ class Lists(Adw.Bin):
             self.window.split_view_inner.set_show_sidebar(False)
 
         # Update details
-        tasks = []
+        tasks: list[Task] = []
         for list in self.get_lists():
             tasks.extend(list.get_all_tasks())
         if (
             self.window.details.parent in tasks
+            and not self.window.details.status.get_visible()
             and not self.window.details.parent.get_prop("trash")
         ):
             self.window.details.update_info(self.window.details.parent)
