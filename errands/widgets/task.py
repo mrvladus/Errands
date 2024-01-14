@@ -285,7 +285,6 @@ class Task(Gtk.Revealer):
             ["completed", "synced", "percent_complete"],
             [btn.get_active(), False, 100 if btn.get_active() else 0],
         )
-        self.details.update_info(self)
 
         if isinstance(self.parent, Task):
             self.parent.update_status()
