@@ -81,7 +81,7 @@ class Details(Adw.Bin):
         colors_box = Gtk.Box(halign="center", css_classes=["toolbar"])
         colors = ["", "blue", "green", "yellow", "orange", "red", "purple", "brown"]
         for color in colors:
-            btn = Gtk.Button(can_shrink=True)
+            btn = Gtk.Button()
             if color == "":
                 btn.set_icon_name("window-close-symbolic")
                 btn.set_tooltip_text(_("Clear Style"))
