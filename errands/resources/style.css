@@ -39,7 +39,7 @@
   border-radius: 10px;
 }
 
-.task-completed {
+.task-completed box.title {
   opacity: 0.5;
 }
 

@@ -257,10 +257,8 @@ class Task(Gtk.Revealer):
             if n_total > 0
             else ""
         )
-        # Update percent of completion
         if n_total > 0:
-            percent = n_completed / n_total * 100
-            self.update_props(["percent_complete"], [percent])
+            self.update_props(["percent_complete"], [n_completed / n_total * 100])
 
     def on_completed_btn_toggled(self, btn: Gtk.ToggleButton) -> None:
         """
@@ -269,33 +267,19 @@ class Task(Gtk.Revealer):
 
         Log.info(f"Task: Set completed to '{btn.get_active()}'")
 
-        def set_text():
+        def _set_crossline():
             if btn.get_active():
                 self.task_row.add_css_class("task-completed")
             else:
                 self.task_row.remove_css_class("task-completed")
 
-        # If task is just added set text and return to avoid sync loop
+        # If task is just added set crossline and return to avoid sync loop
         if self.just_added:
-            set_text()
+            _set_crossline()
             return
 
-        # Set completion percent
-        cmp_per = 100 if btn.get_active() else 0
-        if len(get_children(self.tasks_list)) > 0:
-            cmp_per = self.get_prop("percent_complete")
-
-        # Update data
-        self.update_props(
-            ["completed", "synced", "percent_complete"],
-            [btn.get_active(), False, cmp_per],
-        )
-
-        if isinstance(self.parent, Task):
-            # Uncomplete parent if sub-task is uncompletes
-            if not btn.get_active():
-                self.parent.completed_btn.set_active(False)
-            self.parent.update_status()
+        # Set crossline
+        _set_crossline()
 
         # Update children
         children: list[Task] = get_children(self.tasks_list)
@@ -305,8 +289,16 @@ class Task(Gtk.Revealer):
                 task.completed_btn.set_active(True)
             task.can_sync = True
 
-        # Set text
-        set_text()
+        # Update data
+        self.update_props(
+            ["completed", "synced", "percent_complete"],
+            [btn.get_active(), False, 100 if btn.get_active() else 0],
+        )
+
+        # Uncomplete parent if sub-task is uncompleted
+        if self.get_prop("parent") and not btn.get_active():
+            self.parent.completed_btn.set_active(False)
+        self.parent.update_status()
 
         # Sync
         if self.can_sync:
