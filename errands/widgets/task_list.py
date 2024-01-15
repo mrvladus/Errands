@@ -137,23 +137,6 @@ class TaskList(Adw.Bin):
 
         # ---------- TASKS LIST ---------- #
 
-        # Entry
-        entry = Adw.EntryRow(
-            activatable=False,
-            height_request=60,
-            title=_("Add new Task"),
-        )
-        entry.connect("entry-activated", self._on_task_added)
-        entry_box = Gtk.ListBox(
-            selection_mode=0,
-            css_classes=["boxed-list"],
-            margin_start=12,
-            margin_end=12,
-            margin_top=12,
-            margin_bottom=12,
-        )
-        entry_box.append(entry)
-
         # Srolled window
         adj = Gtk.Adjustment()
         adj.connect(
@@ -184,14 +167,7 @@ class TaskList(Adw.Bin):
         )
         # Content box
         content_box = Box(
-            children=[
-                Adw.Clamp(
-                    maximum_size=1000,
-                    tightening_threshold=300,
-                    child=entry_box,
-                ),
-                self.scrl,
-            ],
+            children=[TaskListEntry(self), self.scrl],
             orientation="vertical",
             vexpand=True,
         )
@@ -415,11 +391,47 @@ class TaskList(Adw.Bin):
         if on_sides or on_bottom:
             self.window.split_view_inner.set_show_sidebar(False)
 
-    def _on_task_added(self, entry: Gtk.Entry) -> None:
+
+class TaskListEntry(Adw.Bin):
+    def __init__(self, task_list: TaskList) -> None:
+        super().__init__()
+        self.task_list = task_list
+        self._build_ui()
+
+    def _build_ui(self):
+        # Entry
+        entry = Adw.EntryRow(
+            activatable=False,
+            height_request=60,
+            title=_("Add new Task"),
+        )
+        entry.connect("entry-activated", self._on_task_added)
+        # Box
+        box = Gtk.ListBox(
+            css_classes=["boxed-list"],
+            selection_mode=Gtk.SelectionMode.NONE,
+            margin_top=12,
+            margin_bottom=12,
+            margin_start=12,
+            margin_end=12,
+        )
+        box.append(entry)
+        # Clamp
+        self.set_child(
+            Adw.Clamp(
+                maximum_size=1000,
+                tightening_threshold=300,
+                child=box,
+            )
+        )
+
+    def _on_task_added(self, entry: Adw.EntryRow):
         text: str = entry.props.text
         if text.strip(" \n\t") == "":
             return
-        self.add_task(UserData.add_task(list_uid=self.list_uid, text=text))
+        self.task_list.add_task(
+            UserData.add_task(list_uid=self.task_list.list_uid, text=text)
+        )
         entry.props.text = ""
-        scroll(self.scrl, True)
+        scroll(self.task_list.scrl, True)
         Sync.sync()
