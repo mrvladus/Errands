@@ -4,6 +4,7 @@
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>MIT</project_license>
   <content_rating type="oars-1.1" />
+  <developer_name translatable="no">Vlad Krupinski</developer_name>
   <developer id="github.com">
     <name translatable="no">Vlad Krupinski</name>
   </developer>
