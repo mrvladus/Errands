@@ -314,6 +314,7 @@ class Task(Gtk.Revealer):
         # Sync
         if self.can_sync:
             self.task_list.update_status()
+            self.details.update_info(self.details.parent)
             Sync.sync()
 
     def on_row_clicked(self, *args) -> None:
