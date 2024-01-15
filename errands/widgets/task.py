@@ -46,7 +46,7 @@ class Task(Gtk.Revealer):
         self.expand(self.get_prop("expanded"))
 
     def get_prop(self, prop: str):
-        res = UserData.get_prop(self.uid, prop)
+        res = UserData.get_prop(self.list_uid, self.uid, prop)
         if prop in "deleted completed expanded trash":
             res = bool(res)
         return res
@@ -235,30 +235,39 @@ class Task(Gtk.Revealer):
         self.set_reveal_child(on)
 
     def update_status(self) -> None:
-        n_total: int = UserData.run_sql(
-            f"""SELECT COUNT(*) FROM tasks 
-            WHERE parent = '{self.uid}' 
-            AND trash = 0
-            AND deleted = 0
-            AND list_uid = '{self.list_uid}'""",
-            fetch=True,
-        )[0][0]
-        n_completed: int = UserData.run_sql(
-            f"""SELECT COUNT(*) FROM tasks 
-            WHERE parent = '{self.uid}' 
-            AND completed = 1 
-            AND deleted = 0
-            AND trash = 0
-            AND list_uid = '{self.list_uid}'""",
-            fetch=True,
-        )[0][0]
-        self.task_row.set_subtitle(
-            _("Completed:") + f" {n_completed} / {n_total}"  # pyright: ignore
-            if n_total > 0
-            else ""
+        # n_total: int = UserData.run_sql(
+        #     f"""SELECT COUNT(*) FROM tasks
+        #     WHERE parent = '{self.uid}'
+        #     AND trash = 0
+        #     AND deleted = 0
+        #     AND list_uid = '{self.list_uid}'""",
+        #     fetch=True,
+        # )[0][0]
+        # n_completed: int = UserData.run_sql(
+        #     f"""SELECT COUNT(*) FROM tasks
+        #     WHERE parent = '{self.uid}'
+        #     AND completed = 1
+        #     AND deleted = 0
+        #     AND trash = 0
+        #     AND list_uid = '{self.list_uid}'""",
+        #     fetch=True,
+        # )[0][0]
+        # self.task_row.set_subtitle(
+        #     _("Completed:") + f" {n_completed} / {n_total}"  # pyright: ignore
+        #     if n_total > 0
+        #     else ""
+        # )
+        sub_tasks: list[Task] = [
+            t for t in get_children(self.tasks_list) if t.get_reveal_child()
+        ]
+        n_total: int = len(sub_tasks)
+        n_completed: int = len([t for t in sub_tasks if t.completed_btn.get_active()])
+        self.update_props(
+            ["percent_complete"], [n_completed / n_total * 100 if n_total > 0 else 0]
         )
-        if n_total > 0:
-            self.update_props(["percent_complete"], [n_completed / n_total * 100])
+        self.task_row.set_subtitle(
+            _("Completed:") + f" {n_completed} / {n_total}" if n_total > 0 else ""
+        )
 
     def on_completed_btn_toggled(self, btn: Gtk.ToggleButton) -> None:
         """
@@ -274,31 +283,31 @@ class Task(Gtk.Revealer):
                 self.task_row.remove_css_class("task-completed")
 
         # If task is just added set crossline and return to avoid sync loop
+        _set_crossline()
         if self.just_added:
-            _set_crossline()
             return
 
-        # Set crossline
-        _set_crossline()
+        # Get visible sub-tasks
+        sub_tasks: list[Task] = [
+            t for t in get_children(self.tasks_list) if t.get_reveal_child()
+        ]
 
-        # Update children
-        children: list[Task] = get_children(self.tasks_list)
-        for task in children:
-            task.can_sync = False
-            if btn.get_active():
+        # Complete sub-tasks, but not uncomplete
+        if btn.get_active():
+            for task in sub_tasks:
+                task.can_sync = False
                 task.completed_btn.set_active(True)
-            task.can_sync = True
-
-        # Update data
-        self.update_props(
-            ["completed", "synced", "percent_complete"],
-            [btn.get_active(), False, 100 if btn.get_active() else 0],
-        )
+                task.can_sync = True
+            self.update_status()
 
         # Uncomplete parent if sub-task is uncompleted
-        if self.get_prop("parent") and not btn.get_active():
-            self.parent.completed_btn.set_active(False)
-        self.parent.update_status()
+        if self.get_prop("parent"):
+            if not btn.get_active():
+                self.parent.completed_btn.set_active(False)
+            self.parent.update_status()
+
+        # Update data
+        self.update_props(["completed", "synced"], [btn.get_active(), False])
 
         # Sync
         if self.can_sync:
@@ -377,7 +386,7 @@ class Task(Gtk.Revealer):
             return False
         # Move data
         UserData.run_sql("CREATE TABLE tmp AS SELECT * FROM tasks WHERE 0")
-        ids = UserData.get_tasks_uids(self.list_uid)
+        ids = UserData.get_tasks()
         ids.insert(ids.index(self.uid), ids.pop(ids.index(task.uid)))
         for id in ids:
             UserData.run_sql(f"INSERT INTO tmp SELECT * FROM tasks WHERE uid = '{id}'")
@@ -424,7 +433,7 @@ class Task(Gtk.Revealer):
         # Change parent
         task.update_props(["parent", "synced"], [self.get_prop("uid"), False])
         # Move data
-        uids = UserData.get_tasks_uids(self.list_uid)
+        uids = UserData.get_tasks()
         last_sub_uid = UserData.get_sub_tasks_uids(self.list_uid, self.uid)[-1]
         uids.insert(
             uids.index(self.uid) + uids.index(last_sub_uid),

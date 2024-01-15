@@ -60,6 +60,11 @@ class UserData:
         return uid
 
     @classmethod
+    def get_tasks(cls) -> list[str]:
+        res = cls.run_sql("SELECT uid FROM tasks", fetch=True)
+        return [i[0] for i in res]
+
+    @classmethod
     def clean_deleted(cls):
         Log.info("Data: Clean deleted")
         cls.run_sql(
@@ -82,10 +87,11 @@ class UserData:
         return lists
 
     @classmethod
-    def get_prop(cls, uid: str, prop: str) -> Any:
+    def get_prop(cls, list_uid: str, uid: str, prop: str) -> Any:
         return cls.run_sql(
             f"""SELECT {prop} FROM tasks 
-                WHERE uid = '{uid}'""",
+                WHERE uid = '{uid}'
+                AND list_uid = '{list_uid}'""",
             fetch=True,
         )[0][0]
 
