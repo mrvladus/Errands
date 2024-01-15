@@ -52,7 +52,7 @@
         <p>Added:</p>
         <ul>
           <li>If Gnome Online Accounts is installed, Nextcloud credentials will be pulled from it</li>
-          <li>Nextcloud url prefix will autocomplete to "https://" instead of "http://"</li>
+          <li>Nextcloud url prefix will autocomplete to "https" instead of "http"</li>
           <li>Sidebar can be closed with click on empty space in the task list</li>
           <li>Completion percent changes with completion of sub-tasks</li>
         </ul>
