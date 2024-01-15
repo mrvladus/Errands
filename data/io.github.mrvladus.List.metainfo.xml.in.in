@@ -60,6 +60,7 @@
         <p>Fixed:</p>
         <ul>
           <li>Drag and drop deleting tasks</li>
+          <li>Dark theme contrast</li>
         </ul>
       </description>
     </release>
