@@ -303,7 +303,9 @@ class Task(Gtk.Revealer):
         # Uncomplete parent if sub-task is uncompleted
         if self.get_prop("parent"):
             if not btn.get_active():
+                self.parent.can_sync = False
                 self.parent.completed_btn.set_active(False)
+                self.parent.can_sync = True
             self.parent.update_status()
 
         # Update data
