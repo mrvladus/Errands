@@ -37,11 +37,15 @@ class Window(Adw.ApplicationWindow):
         self.split_view_inner = Adw.OverlaySplitView(
             min_sidebar_width=360,
             max_sidebar_width=400,
+            sidebar_width_fraction=0.40,
             sidebar_position=int(GSettings.get("right-sidebar")),
         )
         # Split view outer
         self.split_view = Adw.NavigationSplitView(
-            max_sidebar_width=260, min_sidebar_width=240, show_content=True
+            max_sidebar_width=300,
+            min_sidebar_width=240,
+            show_content=True,
+            sidebar_width_fraction=0.25,
         )
         # Stack
         self.stack = Adw.ViewStack()
