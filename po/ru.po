@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-31 14:41+0300\n"
+"POT-Creation-Date: 2024-01-16 18:39+0300\n"
 "PO-Revision-Date: 2023-07-07 16:56+0300\n"
 "Last-Translator: Vlad Krupinskii <mrvladus@yandex.ru>\n"
 "Language-Team: \n"
@@ -19,313 +19,372 @@ msgstr ""
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Generator: Poedit 3.3.1\n"
 
-#: errands/widgets/details.py:44 errands/widgets/lists.py:397
-#: errands/widgets/lists.py:526 errands/widgets/trash.py:145
+#: errands/widgets/details.py:44 errands/widgets/lists.py:411
+#: errands/widgets/lists.py:538 errands/widgets/trash.py:145
 msgid "Delete"
 msgstr "Удалить"
 
-#: errands/widgets/details.py:49 errands/widgets/lists.py:441
+#: errands/widgets/details.py:49 errands/widgets/lists.py:452
 msgid "Save"
 msgstr "Сохранить"
 
-#: errands/widgets/details.py:60
+#: errands/widgets/details.py:52
+msgid "Save (Ctrl+S)"
+msgstr "Сохранить (Ctrl+S)"
+
+#: errands/widgets/details.py:63
 msgid "No Details"
 msgstr "Нет подробностей"
 
-#: errands/widgets/details.py:61
+#: errands/widgets/details.py:64
 msgid "Click on task to show more info"
 msgstr "Кликните на задачу, чтобы показать больше информации"
 
-#: errands/widgets/details.py:84
+#: errands/widgets/details.py:87
 msgid "Clear Style"
 msgstr "Отчистить цвет"
 
 #. Edit group
-#: errands/widgets/details.py:93
+#: errands/widgets/details.py:96
 msgid "Text"
 msgstr "Текст"
 
-#: errands/widgets/details.py:101
+#: errands/widgets/details.py:104
 msgid "Copy Text"
 msgstr "Копировать"
 
 #. Notes group
-#: errands/widgets/details.py:120
+#: errands/widgets/details.py:124
 msgid "Notes"
 msgstr "Заметки"
 
 #. Properties group
-#: errands/widgets/details.py:138
+#: errands/widgets/details.py:142
 msgid "Properties"
 msgstr "Свойства"
 
 #. Start date row
 #. End date row
-#: errands/widgets/details.py:141 errands/widgets/details.py:156
-#: errands/widgets/components.py:171
+#: errands/widgets/details.py:145 errands/widgets/details.py:166
+#: errands/widgets/components.py:229
 msgid "Not Set"
 msgstr "Не задано"
 
-#: errands/widgets/details.py:141
+#: errands/widgets/details.py:145
 msgid "Start"
 msgstr "Начало"
 
-#: errands/widgets/details.py:148 errands/widgets/details.py:163
+#: errands/widgets/details.py:152 errands/widgets/details.py:173
 msgid "Set Date"
 msgstr "Задать дату"
 
-#: errands/widgets/details.py:156
+#: errands/widgets/details.py:166
 msgid "Due"
 msgstr "Конец"
 
-#: errands/widgets/details.py:172
-msgid "Complete %"
-msgstr "Выполнено %"
-
 #: errands/widgets/details.py:182
+msgid "Complete %"
+msgstr "Процент выполнения"
+
+#: errands/widgets/details.py:192
 msgid "Priority"
 msgstr "Приоритет"
 
 #. Tags group
-#: errands/widgets/details.py:189
+#: errands/widgets/details.py:199
 msgid "Tags"
 msgstr "Метки"
 
 #. Tags entry
-#: errands/widgets/details.py:191
+#: errands/widgets/details.py:201
 msgid "Add Tag"
 msgstr "Добавить метку"
 
 #. Export group
-#: errands/widgets/details.py:196 errands/widgets/details.py:204
-#: errands/widgets/lists.py:527
+#: errands/widgets/details.py:206 errands/widgets/details.py:214
+#: errands/widgets/lists.py:539
 msgid "Export"
 msgstr "Экспорт"
 
-#: errands/widgets/details.py:205
+#: errands/widgets/details.py:215
 msgid "Save Task as .ics file"
 msgstr "Сохранить задачу как .ics файл"
 
-#: errands/widgets/details.py:360
+#: errands/widgets/details.py:375
 msgid "Copied to Clipboard"
 msgstr "Скопировано в буфер обмена"
 
-#: errands/widgets/details.py:405 errands/widgets/lists.py:497
+#: errands/widgets/details.py:420 errands/widgets/lists.py:508
 msgid "Exported"
 msgstr "Экспортировано"
 
-#: errands/widgets/components.py:99
+#: errands/widgets/components.py:153
 msgid "Today"
 msgstr "Сегодня"
 
-#: errands/widgets/components.py:104
+#: errands/widgets/components.py:157
 msgid "Tomorrow"
 msgstr "Завтра"
 
-#: errands/widgets/components.py:117
+#: errands/widgets/components.py:167
 msgid "Now"
 msgstr "Сейчас"
 
-#: errands/widgets/components.py:122 errands/widgets/trash.py:29
+#: errands/widgets/components.py:172 errands/widgets/trash.py:29
 msgid "Clear"
 msgstr "Очистить"
 
-#: errands/widgets/lists.py:111
+#: errands/widgets/lists.py:112
 msgid "Imported"
 msgstr "Импортировано"
 
-#: errands/widgets/lists.py:127 errands/widgets/window.py:19
+#: errands/widgets/lists.py:128 errands/widgets/window.py:19
 #: errands/widgets/window.py:126 data/io.github.mrvladus.List.desktop.in.in:3
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:29
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:27
 msgid "Errands"
 msgstr "Дела"
 
-#: errands/widgets/lists.py:133
+#: errands/widgets/lists.py:134
 msgid "Import List"
 msgstr "Импортировать список"
 
-#: errands/widgets/lists.py:137 errands/widgets/lists.py:243
+#: errands/widgets/lists.py:138 errands/widgets/lists.py:254
 msgid "Add List"
 msgstr "Добавить список"
 
-#: errands/widgets/lists.py:139
+#: errands/widgets/lists.py:140
 msgid "More Options"
 msgstr "Больше опций"
 
-#: errands/widgets/lists.py:146
+#: errands/widgets/lists.py:148 errands/resources/gtk/help-overlay.ui:42
 msgid "Sync / Fetch Tasks"
 msgstr "Синхронизировать задачи"
 
-#: errands/widgets/lists.py:148
+#: errands/widgets/lists.py:150
 msgid "Create"
 msgstr "Создать"
 
-#: errands/widgets/lists.py:149
+#: errands/widgets/lists.py:151
 msgid "Load"
 msgstr "Загрузить"
 
-#: errands/widgets/lists.py:153 errands/resources/gtk/help-overlay.ui:27
+#: errands/widgets/lists.py:155 errands/resources/gtk/help-overlay.ui:20
 msgid "Preferences"
 msgstr "Параметры"
 
-#: errands/widgets/lists.py:154
+#: errands/widgets/lists.py:156
 msgid "Keyboard Shortcuts"
 msgstr "Комбинации клавиш"
 
-#: errands/widgets/lists.py:155
+#: errands/widgets/lists.py:157
 msgid "About Errands"
 msgstr "О приложении"
 
-#: errands/widgets/lists.py:161
+#: errands/widgets/lists.py:163
 msgid "Main Menu"
 msgstr "Главное меню"
 
 #: errands/widgets/lists.py:169
+msgid "Syncing..."
+msgstr "Синхронизация..."
+
+#: errands/widgets/lists.py:178
 msgid "Add new List"
 msgstr "Добавить новый список"
 
-#: errands/widgets/lists.py:170
+#: errands/widgets/lists.py:179
 msgid "Click \"+\" button"
 msgstr "Нажмите на кнопку \"+\""
 
 #. Headerbar
-#: errands/widgets/lists.py:179 errands/widgets/trash.py:23
+#: errands/widgets/lists.py:188 errands/widgets/trash.py:23
 msgid "Trash"
 msgstr "Корзина"
 
-#: errands/widgets/lists.py:239
+#: errands/widgets/lists.py:250
 msgid "New List Name"
 msgstr "Новое имя списка"
 
-#: errands/widgets/lists.py:248 errands/widgets/lists.py:396
-#: errands/widgets/lists.py:440 errands/widgets/trash.py:144
+#: errands/widgets/lists.py:259 errands/widgets/lists.py:410
+#: errands/widgets/lists.py:451 errands/widgets/trash.py:144
 msgid "Cancel"
 msgstr "Отмена"
 
-#: errands/widgets/lists.py:249
+#: errands/widgets/lists.py:260
 msgid "Add"
 msgstr "Довавить"
 
-#: errands/widgets/lists.py:391 errands/widgets/trash.py:139
+#: errands/widgets/lists.py:405 errands/widgets/trash.py:139
 msgid "Are you sure?"
 msgstr "Вы уверены?"
 
-#: errands/widgets/lists.py:392
+#: errands/widgets/lists.py:406
 msgid "List will be permanently deleted"
 msgstr "Список будет безвозвратно удален"
 
-#: errands/widgets/lists.py:430
+#: errands/widgets/lists.py:441
 msgid "New Name"
 msgstr "Новое имя"
 
-#: errands/widgets/lists.py:435
+#: errands/widgets/lists.py:446
 msgid "Rename List"
 msgstr "Переименовать список"
 
-#: errands/widgets/lists.py:495
+#: errands/widgets/lists.py:506
 msgid "Export failed"
 msgstr "Экспорт не удался"
 
-#: errands/widgets/lists.py:525
+#: errands/widgets/lists.py:537
 msgid "Rename"
 msgstr "Переименовать"
 
-#: errands/widgets/lists.py:539
+#: errands/widgets/lists.py:555
 msgid "Menu"
 msgstr "Меню"
 
-#: errands/widgets/preferences.py:35
+#: errands/widgets/preferences.py:25
 msgid "Application Theme"
 msgstr "Тема"
 
-#: errands/widgets/preferences.py:41
+#: errands/widgets/preferences.py:31
 msgid "System"
 msgstr "Системная"
 
-#: errands/widgets/preferences.py:51
+#: errands/widgets/preferences.py:43
 msgid "Light"
 msgstr "Светлая"
 
-#: errands/widgets/preferences.py:61
+#: errands/widgets/preferences.py:55
 msgid "Dark"
 msgstr "Темная"
 
-#: errands/widgets/preferences.py:69
+#. Task lists group
+#. task_list_group = Adw.PreferencesGroup(title=_("Task Lists"))
+#. add_tasks_position = Adw.ComboRow(
+#. title=_("Add new Tasks"),
+#. model=Gtk.StringList.new([_("At the Top"), _("At the Bottom")]),
+#. icon_name="errands-add-symbolic",
+#. )
+#. task_list_group.add(add_tasks_position)
+#. Tasks group
+#: errands/widgets/preferences.py:72
+msgid "Tasks"
+msgstr "Задачи"
+
+#: errands/widgets/preferences.py:74
+msgid "Click Action"
+msgstr "Действие при клике"
+
+#: errands/widgets/preferences.py:75
+msgid "Open Details Panel"
+msgstr "Показать подробности"
+
+#: errands/widgets/preferences.py:75
+msgid "Show Sub-Tasks"
+msgstr "Показать подзадачи"
+
+#: errands/widgets/preferences.py:91 errands/widgets/preferences.py:159
+#: errands/resources/gtk/help-overlay.ui:38
 msgid "Sync"
 msgstr "Синхронизация"
 
 #. Provider
-#: errands/widgets/preferences.py:72
+#: errands/widgets/preferences.py:94
 msgid "Disabled"
 msgstr "Отключено"
 
-#: errands/widgets/preferences.py:74
+#: errands/widgets/preferences.py:96
 msgid "Sync Provider"
 msgstr "Способ синхронизации"
 
-#: errands/widgets/preferences.py:82
+#: errands/widgets/preferences.py:105
 msgid "Server URL"
 msgstr "URL сервера"
 
-#: errands/widgets/preferences.py:87
+#: errands/widgets/preferences.py:111
 msgid "Username"
 msgstr "Имя пользователя"
 
-#: errands/widgets/preferences.py:92
+#: errands/widgets/preferences.py:117
 msgid "Password"
 msgstr "Пароль"
 
-#: errands/widgets/preferences.py:98
+#: errands/widgets/preferences.py:123
 msgid "Test"
 msgstr "Тест"
 
-#: errands/widgets/preferences.py:103
+#: errands/widgets/preferences.py:128
 msgid "Test Connection"
 msgstr "Тест соединения"
 
-#: errands/widgets/preferences.py:138
+#: errands/widgets/preferences.py:136
+msgid "Details Panel"
+msgstr "Панель подробностей"
+
+#: errands/widgets/preferences.py:139
+msgid "Position"
+msgstr "Позиция"
+
+#: errands/widgets/preferences.py:140
+msgid "Left"
+msgstr "Слева"
+
+#: errands/widgets/preferences.py:140
+msgid "Right"
+msgstr "Справа"
+
+#: errands/widgets/preferences.py:149
+msgid "Appearance"
+msgstr "Внешний вид"
+
+#: errands/widgets/preferences.py:195
 msgid "Connected"
 msgstr "Соединено"
 
-#: errands/widgets/preferences.py:138
+#: errands/widgets/preferences.py:195
 msgid "Can't connect"
 msgstr "Соединение не удалось"
 
-#: errands/widgets/task_list.py:38 errands/widgets/task_list.py:77
+#: errands/widgets/task_list.py:39 errands/widgets/task_list.py:43
+#: errands/widgets/task_list.py:91 errands/widgets/task_list.py:95
 msgid "Toggle Sidebar"
 msgstr "Переключить боковую панель"
 
-#: errands/widgets/task_list.py:52 errands/widgets/task_list.py:89
+#: errands/widgets/task_list.py:63 errands/widgets/task_list.py:113
 msgid "Delete Completed Tasks"
 msgstr "Удалить выполненные задачи"
 
-#: errands/widgets/task_list.py:62 errands/widgets/task_list.py:103
+#: errands/widgets/task_list.py:73 errands/widgets/task_list.py:127
 msgid "Scroll Up"
 msgstr "Прокрутить вверх"
 
-#: errands/widgets/task_list.py:120
-msgid "Add new Task"
-msgstr "Добавьте задачу"
-
-#: errands/widgets/task_list.py:274 errands/widgets/task.py:234
+#: errands/widgets/task_list.py:263 errands/widgets/task.py:249
 msgid "Completed:"
 msgstr "Выполнено:"
 
-#: errands/widgets/task.py:81
+#: errands/widgets/task_list.py:389
+msgid "Add new Task"
+msgstr "Добавьте задачу"
+
+#: errands/widgets/task.py:83
 msgid "Click for Details"
 msgstr "Нажмите для подробностей"
 
-#: errands/widgets/task.py:89
+#: errands/widgets/task.py:92
 msgid "Mark as Completed"
 msgstr "Пометить как выполненное"
 
-#: errands/widgets/task.py:101
+#: errands/widgets/task.py:106
 msgid "Expand / Fold"
 msgstr "Раскрыть / Свернуть"
 
-#: errands/widgets/task.py:133
+#: errands/widgets/task.py:138
 msgid "Add new Sub-Task"
 msgstr "Добавьте подзадачу"
+
+#: errands/widgets/task.py:146 errands/resources/gtk/help-overlay.ui:53
+msgid "Details"
+msgstr "Подробности"
 
 #: errands/widgets/trash.py:37
 msgid "Restore All"
@@ -363,12 +422,11 @@ msgstr "Vlad Krupinski <mrvladus@yandex.ru>"
 msgid "Sync is disabled"
 msgstr "Синхронизация отключена"
 
-#. pyright:ignore
-#: errands/utils/sync.py:81
+#: errands/lib/sync/providers/caldav.py:42
 msgid "Not all sync credentials provided. Please check settings."
 msgstr "Не все данные для синхронизации предоставлены. Проверьте настройки."
 
-#: errands/utils/sync.py:130
+#: errands/lib/sync/providers/caldav.py:81
 msgid "Can't connect to CalDAV server at:"
 msgstr "Невозможно подключиться к CalDAV серверу по адресу:"
 
@@ -380,16 +438,20 @@ msgstr "Основные"
 msgid "Show keyboard shortcuts"
 msgstr "Комбинации клавиш"
 
-#: errands/resources/gtk/help-overlay.ui:20
-msgid "Toggle sidebar"
-msgstr "Переключить боковую панель"
-
-#: errands/resources/gtk/help-overlay.ui:34
+#: errands/resources/gtk/help-overlay.ui:27
 msgid "Quit"
 msgstr "Выйти"
 
+#: errands/resources/gtk/help-overlay.ui:57
+msgid "Toggle Details"
+msgstr "Показать/Скрыть подробности"
+
+#: errands/resources/gtk/help-overlay.ui:64
+msgid "Save changed details"
+msgstr "Сохранить изменения подробностей"
+
 #: data/io.github.mrvladus.List.desktop.in.in:4
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:30
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:28
 msgid "Manage your tasks"
 msgstr "Управляйте своими задачами"
 
@@ -397,38 +459,38 @@ msgstr "Управляйте своими задачами"
 msgid "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
 msgstr "errands;дела;задачи;лист;caldav;nextcloud;sync"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:32
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:30
 msgid "Todo application for those who prefer simplicity."
 msgstr "Список задач для тех, кто предпочитает простоту."
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:33
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:31
 msgid "Features:"
 msgstr "Главные функции:"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:35
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:33
 msgid "Multiple task lists support"
 msgstr "Поддержка нескольких списков"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:36
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:34
 msgid "Add, remove, edit tasks and sub-tasks"
 msgstr "Добавляйте, удаляйте, редактируйте задачи и подзадачи"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:37
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:35
 msgid "Mark task and sub-tasks as completed"
 msgstr "Помечайте задачи как выполненные"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:38
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:36
 msgid "Add accent color for each task"
 msgstr "Добавляйте цвета к задачам"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:39
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:37
 msgid "Sync tasks with Nextcloud or other CalDAV providers"
 msgstr "Синхронизируйте задачи с Nextcloud или другими CalDAV провайдерами"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:40
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:38
 msgid "Drag and Drop support"
 msgstr "Поддержка Drag and Drop"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:41
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:39
 msgid "Import .ics files"
 msgstr "Импорт .ics файлов"
