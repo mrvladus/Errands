@@ -2,14 +2,14 @@
 # Copyright (C) 2023
 # This file is distributed under the same license as the list package.
 # Jeremy Castel <jeremy.castel@protonmail.com>, 2023.
-# Irénée THIRION <irenee.thirion@e.email>, 2023.
+# Irénée THIRION <irenee.thirion@e.email>, 2023-2024.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-16 18:39+0300\n"
-"PO-Revision-Date: 2023-12-28 21:38+0100\n"
+"PO-Revision-Date: 2024-01-16 17:50+0100\n"
 "Last-Translator: Irénée THIRION <irenee.thirion@e.email>\n"
 "Language-Team: French <gnomefr@traduc.org>\n"
 "Language: fr\n"
@@ -30,7 +30,7 @@ msgstr "Enregistrer"
 
 #: errands/widgets/details.py:52
 msgid "Save (Ctrl+S)"
-msgstr ""
+msgstr "Enregistrer (Ctrl+S)"
 
 #: errands/widgets/details.py:63
 msgid "No Details"
@@ -120,11 +120,11 @@ msgstr "Tâches exportée"
 
 #: errands/widgets/components.py:153
 msgid "Today"
-msgstr ""
+msgstr "Aujourd’hui"
 
 #: errands/widgets/components.py:157
 msgid "Tomorrow"
-msgstr ""
+msgstr "Demain"
 
 #: errands/widgets/components.py:167
 msgid "Now"
@@ -154,7 +154,7 @@ msgstr "Ajouter une liste"
 
 #: errands/widgets/lists.py:140
 msgid "More Options"
-msgstr ""
+msgstr "Plus d’options"
 
 #: errands/widgets/lists.py:148 errands/resources/gtk/help-overlay.ui:42
 msgid "Sync / Fetch Tasks"
@@ -186,7 +186,7 @@ msgstr "Menu principal"
 
 #: errands/widgets/lists.py:169
 msgid "Syncing..."
-msgstr ""
+msgstr "Synchronisation…"
 
 #: errands/widgets/lists.py:178
 msgid "Add new List"
@@ -269,21 +269,19 @@ msgstr "Sombre"
 #. Tasks group
 #: errands/widgets/preferences.py:72
 msgid "Tasks"
-msgstr ""
+msgstr "Tâches"
 
 #: errands/widgets/preferences.py:74
-#, fuzzy
 msgid "Click Action"
-msgstr "Cliquez sur le bouton +"
+msgstr "Action du clic"
 
 #: errands/widgets/preferences.py:75
 msgid "Open Details Panel"
-msgstr ""
+msgstr "Ouvre le panneau des détails"
 
 #: errands/widgets/preferences.py:75
-#, fuzzy
 msgid "Show Sub-Tasks"
-msgstr "Ajouter une sous-tâche"
+msgstr "Affiche les sous-tâches"
 
 #: errands/widgets/preferences.py:91 errands/widgets/preferences.py:159
 #: errands/resources/gtk/help-overlay.ui:38
@@ -320,26 +318,24 @@ msgid "Test Connection"
 msgstr "Tester la connexion"
 
 #: errands/widgets/preferences.py:136
-#, fuzzy
 msgid "Details Panel"
-msgstr "Aucun détail"
+msgstr "Panneau des détails"
 
 #: errands/widgets/preferences.py:139
 msgid "Position"
-msgstr ""
+msgstr "Position"
 
 #: errands/widgets/preferences.py:140
 msgid "Left"
-msgstr ""
+msgstr "Gauche"
 
 #: errands/widgets/preferences.py:140
-#, fuzzy
 msgid "Right"
-msgstr "Clair"
+msgstr "Droite"
 
 #: errands/widgets/preferences.py:149
 msgid "Appearance"
-msgstr ""
+msgstr "Apparence"
 
 #: errands/widgets/preferences.py:195
 msgid "Connected"
@@ -387,9 +383,8 @@ msgid "Add new Sub-Task"
 msgstr "Ajouter une sous-tâche"
 
 #: errands/widgets/task.py:146 errands/resources/gtk/help-overlay.ui:53
-#, fuzzy
 msgid "Details"
-msgstr "Aucun détail"
+msgstr "Détails"
 
 #: errands/widgets/trash.py:37
 msgid "Restore All"
@@ -416,9 +411,8 @@ msgid "No Task Lists"
 msgstr "Aucune liste de tâches"
 
 #: errands/widgets/window.py:68
-#, fuzzy
 msgid "Create List"
-msgstr "Renommer la liste"
+msgstr "Créer une liste"
 
 #: errands/widgets/window.py:131
 msgid "translator-credits"
@@ -450,13 +444,12 @@ msgid "Quit"
 msgstr "Quitter"
 
 #: errands/resources/gtk/help-overlay.ui:57
-#, fuzzy
 msgid "Toggle Details"
-msgstr "Aucun détail"
+msgstr "Basculer les détails"
 
 #: errands/resources/gtk/help-overlay.ui:64
 msgid "Save changed details"
-msgstr ""
+msgstr "Enregistrer les modifications des détails"
 
 #: data/io.github.mrvladus.List.desktop.in.in:4
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:28
@@ -464,9 +457,10 @@ msgid "Manage your tasks"
 msgstr "Gérer vos tâches"
 
 #: data/io.github.mrvladus.List.desktop.in.in:10
-#, fuzzy
 msgid "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
-msgstr "errands;tâches;task;liste;todos;à faire;post-it;"
+msgstr ""
+"errands;tâches;task;liste;todos;à faire;caldav;nextcloud;synchronisation;"
+"post it;"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:30
 msgid "Todo application for those who prefer simplicity."
@@ -504,6 +498,3 @@ msgstr "Prise en charge du glisser-déposer"
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:39
 msgid "Import .ics files"
 msgstr "Import de fichiers .ics"
-
-#~ msgid "Toggle sidebar"
-#~ msgstr "Afficher ou masquer le panneau latéral"
