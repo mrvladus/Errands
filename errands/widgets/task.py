@@ -90,6 +90,7 @@ class Task(Gtk.Revealer):
         self.completed_btn = Gtk.CheckButton(
             valign="center",
             tooltip_text=_("Mark as Completed"),
+            css_classes=["selection-mode"],
         )
         self.completed_btn.connect("toggled", self.on_completed_btn_toggled)
         self.completed_btn.set_active(self.get_prop("completed"))
