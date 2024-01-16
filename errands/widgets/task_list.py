@@ -255,33 +255,16 @@ class TaskList(Adw.Bin):
         Update status bar on the top
         """
 
-        n_total: int = UserData.run_sql(
-            f"""SELECT COUNT(*) FROM tasks
-            WHERE parent = '' 
-            AND trash = 0
-            AND list_uid = '{self.list_uid}'""",
-            fetch=True,
-        )[0][0]
-        n_completed: int = UserData.run_sql(
-            f"""SELECT COUNT(*) FROM tasks 
-            WHERE parent = '' 
-            AND completed = 1
-            AND trash = 0
-            AND list_uid = '{self.list_uid}'""",
-            fetch=True,
-        )[0][0]
-        n_all_completed: int = UserData.run_sql(
-            f"""SELECT COUNT(*) FROM tasks 
-            WHERE completed = 1
-            AND trash = 0 
-            AND list_uid = '{self.list_uid}'""",
-            fetch=True,
-        )[0][0]
+        tasks: list[Task] = self.get_toplevel_tasks()
+        n_total: int = len([t for t in tasks if t.get_reveal_child()])
+        n_completed: int = len([t for t in tasks if t.completed_btn.get_active()])
 
         self.title.set_subtitle(
             _("Completed:") + f" {n_completed} / {n_total}" if n_total > 0 else ""
         )
-        self.delete_completed_btn.set_sensitive(n_all_completed > 0)
+        self.delete_completed_btn.set_sensitive(
+            len([t for t in self.get_all_tasks() if t.completed_btn.get_active()]) > 0
+        )
 
     def update_ui(self) -> None:
         Log.debug(f"Task list {self.list_uid}: Update UI")

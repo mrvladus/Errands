@@ -30,7 +30,6 @@ class SyncProviderCalDAV:
 
     def _check_credentials(self) -> bool:
         Log.debug("Sync: Checking credentials")
-        print(self.name)
 
         self.url: str = GSettings.get("sync-url")
         self.username: str = GSettings.get("sync-username")
@@ -140,15 +139,22 @@ class SyncProviderCalDAV:
                     data["start_date"] = ""
                 tasks.append(data)
 
-            # Delete orphaned sub-tasks
-            ids = [task["uid"] for task in tasks]
-            par = [task["parent"] for task in tasks if task["parent"] != ""]
-            orph = [t for t in par if t not in ids]
-            for o in orph:
+            # Clear parent of the orphaned tasks
+            ids: list[str] = [task["uid"] for task in tasks]
+            par_ids: list[str] = [
+                task["parent"] for task in tasks if task["parent"] != ""
+            ]
+            orph_ids: list[str] = [t for t in par_ids if t not in ids]
+            for o in orph_ids:
                 Log.debug(f"Sync: Delete orphaned task: {o}")
-                calendar.todo_by_uid(o).delete()
+                todo = calendar.todo_by_uid(o)
+                todo.icalendar_component["RELATED-TO"] = ""
+                todo.save()
+            for task in tasks:
+                if task["parent"] in orph_ids:
+                    task["parent"] = ""
 
-            return [task for task in tasks if task["uid"] not in orph]
+            return [task for task in tasks if task["uid"] not in orph_ids]
         except Exception as e:
             Log.error(f"Sync: Can't get tasks from remote. {e}")
             return []
