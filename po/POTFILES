@@ -7,7 +7,10 @@ errands/widgets/task_list.py
 errands/widgets/task.py
 errands/widgets/trash.py
 errands/widgets/window.py
-errands/utils/sync.py
+errands/lib/sync/sync.py
+errands/lib/sync/providers/caldav.py
+errands/lib/sync/providers/nextcloud.py
+errands/lib/sync/providers/todoist.py
 
 # .ui
 errands/resources/gtk/help-overlay.ui

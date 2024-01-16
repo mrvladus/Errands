@@ -239,35 +239,14 @@ class Task(Gtk.Revealer):
         self.set_reveal_child(on)
 
     def update_status(self) -> None:
-        # n_total: int = UserData.run_sql(
-        #     f"""SELECT COUNT(*) FROM tasks
-        #     WHERE parent = '{self.uid}'
-        #     AND trash = 0
-        #     AND deleted = 0
-        #     AND list_uid = '{self.list_uid}'""",
-        #     fetch=True,
-        # )[0][0]
-        # n_completed: int = UserData.run_sql(
-        #     f"""SELECT COUNT(*) FROM tasks
-        #     WHERE parent = '{self.uid}'
-        #     AND completed = 1
-        #     AND deleted = 0
-        #     AND trash = 0
-        #     AND list_uid = '{self.list_uid}'""",
-        #     fetch=True,
-        # )[0][0]
-        # self.task_row.set_subtitle(
-        #     _("Completed:") + f" {n_completed} / {n_total}"  # pyright: ignore
-        #     if n_total > 0
-        #     else ""
-        # )
         sub_tasks: list[Task] = [
             t for t in get_children(self.tasks_list) if t.get_reveal_child()
         ]
         n_total: int = len(sub_tasks)
         n_completed: int = len([t for t in sub_tasks if t.completed_btn.get_active()])
         self.update_props(
-            ["percent_complete"], [n_completed / n_total * 100 if n_total > 0 else 0]
+            ["percent_complete"],
+            [int(n_completed / n_total * 100) if n_total > 0 else 0],
         )
         self.task_row.set_subtitle(
             _("Completed:") + f" {n_completed} / {n_total}" if n_total > 0 else ""
@@ -277,8 +256,9 @@ class Task(Gtk.Revealer):
         """
         Toggle check button and add style to the text
         """
+        # I hate this func, it's not working properly with sync.
 
-        Log.info(f"Task: Set completed to '{btn.get_active()}'")
+        Log.debug(f"Task '{self.uid}': Set completed to '{btn.get_active()}'")
 
         def _set_crossline():
             if btn.get_active():
@@ -291,31 +271,34 @@ class Task(Gtk.Revealer):
         if self.just_added:
             return
 
+        # Update data
+        self.update_props(["completed", "synced"], [btn.get_active(), False])
+
+        # Uncomplete parent if sub-task is uncompleted
+        if self.get_prop("parent"):
+            if not btn.get_active():
+                self.parent.can_sync = False
+                self.parent.completed_btn.set_active(False)
+                self.parent.can_sync = True
+            self.parent.update_status()
+
         # Get visible sub-tasks
         sub_tasks: list[Task] = [
             t for t in get_children(self.tasks_list) if t.get_reveal_child()
         ]
 
-        # Complete sub-tasks, but not uncomplete
+        # Complete sub-tasks if self is completed, but not uncomplete
         if btn.get_active():
             for task in sub_tasks:
                 task.can_sync = False
                 task.completed_btn.set_active(True)
                 task.can_sync = True
-            self.update_status()
-
-        # Uncomplete parent if sub-task is uncompleted
-        if self.get_prop("parent"):
-            if not btn.get_active():
-                self.parent.completed_btn.set_active(False)
-            self.parent.update_status()
-
-        # Update data
-        self.update_props(["completed", "synced"], [btn.get_active(), False])
 
         # Sync
         if self.can_sync:
+            self.update_status()
             self.task_list.update_status()
+            self.details.update_info(self.details.parent)
             Sync.sync()
 
     def on_row_clicked(self, *args) -> None:
@@ -368,6 +351,7 @@ class Task(Gtk.Revealer):
         # KDE dnd bug workaround for issue #111
         for task in self.task_list.get_all_tasks():
             task.top_drop_area.set_reveal_child(False)
+            task.set_sensitive(True)
 
     def on_drag_begin(self, _, drag) -> bool:
         text = self.get_prop("text")
@@ -375,6 +359,9 @@ class Task(Gtk.Revealer):
         icon.set_child(Gtk.Button(label=text if len(text) < 20 else f"{text[0:20]}..."))
 
     def on_drag_prepare(self, *_) -> Gdk.ContentProvider:
+        # Bug workaround when task is not sensitive after short dnd
+        for task in self.task_list.get_all_tasks():
+            task.set_sensitive(True)
         self.set_sensitive(False)
         value = GObject.Value(Task)
         value.set_object(self)

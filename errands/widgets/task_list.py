@@ -137,23 +137,6 @@ class TaskList(Adw.Bin):
 
         # ---------- TASKS LIST ---------- #
 
-        # Entry
-        entry = Adw.EntryRow(
-            activatable=False,
-            height_request=60,
-            title=_("Add new Task"),
-        )
-        entry.connect("entry-activated", self._on_task_added)
-        entry_box = Gtk.ListBox(
-            selection_mode=0,
-            css_classes=["boxed-list"],
-            margin_start=12,
-            margin_end=12,
-            margin_top=12,
-            margin_bottom=12,
-        )
-        entry_box.append(entry)
-
         # Srolled window
         adj = Gtk.Adjustment()
         adj.connect(
@@ -184,14 +167,7 @@ class TaskList(Adw.Bin):
         )
         # Content box
         content_box = Box(
-            children=[
-                Adw.Clamp(
-                    maximum_size=1000,
-                    tightening_threshold=300,
-                    child=entry_box,
-                ),
-                self.scrl,
-            ],
+            children=[TaskListEntry(self), self.scrl],
             orientation="vertical",
             vexpand=True,
         )
@@ -279,33 +255,16 @@ class TaskList(Adw.Bin):
         Update status bar on the top
         """
 
-        n_total: int = UserData.run_sql(
-            f"""SELECT COUNT(*) FROM tasks
-            WHERE parent = '' 
-            AND trash = 0
-            AND list_uid = '{self.list_uid}'""",
-            fetch=True,
-        )[0][0]
-        n_completed: int = UserData.run_sql(
-            f"""SELECT COUNT(*) FROM tasks 
-            WHERE parent = '' 
-            AND completed = 1
-            AND trash = 0
-            AND list_uid = '{self.list_uid}'""",
-            fetch=True,
-        )[0][0]
-        n_all_completed: int = UserData.run_sql(
-            f"""SELECT COUNT(*) FROM tasks 
-            WHERE completed = 1
-            AND trash = 0 
-            AND list_uid = '{self.list_uid}'""",
-            fetch=True,
-        )[0][0]
+        tasks: list[Task] = self.get_toplevel_tasks()
+        n_total: int = len([t for t in tasks if t.get_reveal_child()])
+        n_completed: int = len([t for t in tasks if t.completed_btn.get_active()])
 
         self.title.set_subtitle(
             _("Completed:") + f" {n_completed} / {n_total}" if n_total > 0 else ""
         )
-        self.delete_completed_btn.set_sensitive(n_all_completed > 0)
+        self.delete_completed_btn.set_sensitive(
+            len([t for t in self.get_all_tasks() if t.completed_btn.get_active()]) > 0
+        )
 
     def update_ui(self) -> None:
         Log.debug(f"Task list {self.list_uid}: Update UI")
@@ -415,11 +374,47 @@ class TaskList(Adw.Bin):
         if on_sides or on_bottom:
             self.window.split_view_inner.set_show_sidebar(False)
 
-    def _on_task_added(self, entry: Gtk.Entry) -> None:
+
+class TaskListEntry(Adw.Bin):
+    def __init__(self, task_list: TaskList) -> None:
+        super().__init__()
+        self.task_list = task_list
+        self._build_ui()
+
+    def _build_ui(self):
+        # Entry
+        entry = Adw.EntryRow(
+            activatable=False,
+            height_request=60,
+            title=_("Add new Task"),
+        )
+        entry.connect("entry-activated", self._on_task_added)
+        # Box
+        box = Gtk.ListBox(
+            css_classes=["boxed-list"],
+            selection_mode=Gtk.SelectionMode.NONE,
+            margin_top=12,
+            margin_bottom=12,
+            margin_start=12,
+            margin_end=12,
+        )
+        box.append(entry)
+        # Clamp
+        self.set_child(
+            Adw.Clamp(
+                maximum_size=1000,
+                tightening_threshold=300,
+                child=box,
+            )
+        )
+
+    def _on_task_added(self, entry: Adw.EntryRow):
         text: str = entry.props.text
         if text.strip(" \n\t") == "":
             return
-        self.add_task(UserData.add_task(list_uid=self.list_uid, text=text))
+        self.task_list.add_task(
+            UserData.add_task(list_uid=self.task_list.list_uid, text=text)
+        )
         entry.props.text = ""
-        scroll(self.scrl, True)
+        scroll(self.task_list.scrl, True)
         Sync.sync()

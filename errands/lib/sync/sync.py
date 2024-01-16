@@ -1,9 +1,6 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-import datetime, urllib3
-from caldav import Calendar, DAVClient, Principal, Todo
-from caldav.elements import dav
 from errands.lib.sync.providers.caldav import SyncProviderCalDAV
 from errands.lib.sync.providers.nextcloud import SyncProviderNextcloud
 from gi.repository import Adw, GLib
