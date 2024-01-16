@@ -106,7 +106,24 @@ class Task(Gtk.Revealer):
             tooltip_text=_("Expand / Fold"),
             css_classes=["flat", "circular", "fade", "rotate"],
         )
-        self.task_row.add_suffix(self.expand_btn)
+
+        # Details panel button
+        details_btn = Button(
+            icon_name="errands-info-symbolic",
+            on_click=self.on_details_clicked,
+            tooltip_text=_("Details"),
+            css_classes=["flat"],
+            valign="center",
+        )
+
+        GSettings.bind("primary-action-show-sub-tasks", details_btn, "visible")
+        GSettings.bind("primary-action-show-sub-tasks", self.expand_btn, "visible", GObject.BindingFlags.INVERT_BOOLEAN)
+
+        suffix_box = Box(
+            children=[self.expand_btn, details_btn],
+        )
+
+        self.task_row.add_suffix(suffix_box)
         task_row_box = Gtk.ListBox(
             selection_mode=0,
             css_classes=["rounded-corners", "transparent"],
@@ -136,25 +153,11 @@ class Task(Gtk.Revealer):
         sub_tasks_entry = Gtk.Entry(
             hexpand=True,
             placeholder_text=_("Add new Sub-Task"),
-        )
-        sub_tasks_entry.connect("activate", self.on_sub_task_added)
-
-        # Details panel button
-        details_btn = Button(
-            icon_name="errands-info-symbolic",
-            on_click=self.on_details_clicked,
-            tooltip_text=_("Details"),
-            css_classes=["flat"],
-        )
-        GSettings.bind("primary-action-show-sub-tasks", details_btn, "visible")
-        sub_tasks_entry_box = Box(
-            children=[sub_tasks_entry, details_btn],
-            orientation="horizontal",
             margin_bottom=6,
             margin_start=12,
             margin_end=12,
-            spacing=6,
         )
+        sub_tasks_entry.connect("activate", self.on_sub_task_added)
 
         # Sub-tasks
         self.tasks_list = Box(orientation="vertical", css_classes=["sub-tasks"])
@@ -162,7 +165,7 @@ class Task(Gtk.Revealer):
         # Sub-tasks revealer
         self.sub_tasks_revealer = Gtk.Revealer(
             child=Box(
-                children=[sub_tasks_entry_box, self.tasks_list], orientation="vertical"
+                children=[sub_tasks_entry, self.tasks_list], orientation="vertical"
             )
         )
 
