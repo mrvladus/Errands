@@ -1,9 +1,15 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-from typing import Self
+from __future__ import annotations
+from typing import Self, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from errands.widgets.task_list.task_list import TaskList
+    from errands.widgets.window import Window
+
 from errands.widgets.components import Box, Button
-from gi.repository import Gtk, Adw, Gdk, GObject, GLib
+from gi.repository import Gtk, Adw, Gdk, GObject
 from errands.lib.sync.sync import Sync
 from errands.lib.logging import Log
 from errands.utils.data import UserData
@@ -20,9 +26,9 @@ class Task(Gtk.Revealer):
         self,
         uid: str,
         list_uid: str,
-        window: Adw.ApplicationWindow,
-        task_list,
-        parent,
+        window: Window,
+        task_list: TaskList,
+        parent: TaskList | Task,
         is_sub_task: bool,
     ) -> None:
         super().__init__()
@@ -35,7 +41,7 @@ class Task(Gtk.Revealer):
         self.parent = parent
         self.is_sub_task = is_sub_task
         self.trash = window.trash
-        self.details = window.details
+        self.details = task_list.details
 
         self.build_ui()
         self.add_sub_tasks()
@@ -310,13 +316,13 @@ class Task(Gtk.Revealer):
         if (
             self.details.parent == self
             and not self.details.status.get_visible()
-            and self.window.split_view_inner.get_show_sidebar()
+            and self.task_list.split_view.get_show_sidebar()
         ):
-            self.window.split_view_inner.set_show_sidebar(False)
+            self.task_list.split_view.set_show_sidebar(False)
             return
         # Update details and show sidebar
         self.details.update_info(self)
-        self.window.split_view_inner.set_show_sidebar(True)
+        self.task_list.split_view.set_show_sidebar(True)
 
     def on_sub_task_added(self, entry: Gtk.Entry) -> None:
         """

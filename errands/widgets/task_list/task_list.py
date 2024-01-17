@@ -2,11 +2,12 @@
 # SPDX-License-Identifier: MIT
 
 from errands.widgets.components import Box
-from gi.repository import Adw, Gtk, GLib, GObject, Graphene
+from errands.widgets.task_list.task_list_details import Details
+from errands.widgets.task_list.task_list_entry import TaskListEntry
+from gi.repository import Adw, Gtk, GLib, GObject
 from errands.utils.animation import scroll
 from errands.utils.data import UserData
 from errands.utils.functions import get_children
-from errands.lib.sync.sync import Sync
 from errands.lib.logging import Log
 from errands.widgets.task import Task
 from errands.lib.gsettings import GSettings
@@ -21,7 +22,6 @@ class TaskList(Adw.Bin):
         self.window = window
         self.list_uid = list_uid
         self.parent = parent
-        self.details = window.details
         self._build_ui()
         self._load_tasks()
 
@@ -165,6 +165,7 @@ class TaskList(Adw.Bin):
                 child=self.tasks_list,
             )
         )
+
         # Content box
         content_box = Box(
             children=[TaskListEntry(self), self.scrl],
@@ -174,6 +175,26 @@ class TaskList(Adw.Bin):
         content_box_click_ctrl = Gtk.GestureClick()
         content_box_click_ctrl.connect("released", self._on_empty_area_clicked)
         content_box.add_controller(content_box_click_ctrl)
+
+        # Split View
+        self.split_view = Adw.OverlaySplitView(
+            min_sidebar_width=360,
+            max_sidebar_width=400,
+            sidebar_width_fraction=0.40,
+            sidebar_position=int(GSettings.get("right-sidebar")),
+        )
+        self.split_view.bind_property(
+            "show-sidebar",
+            self.left_toggle_sidebar_btn,
+            "active",
+            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
+        )
+        GSettings.bind("sidebar-open", self.split_view, "show-sidebar")
+
+        # Details
+        self.details = Details(self)
+        self.split_view.set_sidebar(self.details)
+
         # Tasks list toolbar view
         self.tasks_toolbar_view = Adw.ToolbarView(
             content=content_box,
@@ -192,9 +213,11 @@ class TaskList(Adw.Bin):
                 css_classes=["toolbar"],
             )
         )
+        self.split_view.set_content(self.tasks_toolbar_view)
+
         # Breakpoint
         tasks_brb = Adw.BreakpointBin(
-            width_request=360, height_request=360, child=self.tasks_toolbar_view
+            width_request=360, height_request=360, child=self.split_view
         )
         tasks_brb_bp = Adw.Breakpoint.new(
             Adw.breakpoint_condition_parse("max-width: 400px")
@@ -209,14 +232,6 @@ class TaskList(Adw.Bin):
         tasks_brb_bp.add_setter(self.scroll_up_btn, "visible", False)
         tasks_brb_bp.add_setter(self.tasks_toolbar_view, "reveal-bottom-bars", True)
         tasks_brb.add_breakpoint(tasks_brb_bp)
-
-        # Split view
-        self.window.split_view_inner.bind_property(
-            "show-sidebar",
-            self.left_toggle_sidebar_btn,
-            "active",
-            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
-        )
         self.set_child(tasks_brb)
 
     def add_task(self, uid: str) -> None:
@@ -257,13 +272,22 @@ class TaskList(Adw.Bin):
 
         tasks: list[Task] = self.get_toplevel_tasks()
         n_total: int = len([t for t in tasks if t.get_reveal_child()])
-        n_completed: int = len([t for t in tasks if t.completed_btn.get_active()])
+        n_completed: int = len(
+            [t for t in tasks if t.completed_btn.get_active() and t.get_reveal_child()]
+        )
 
         self.title.set_subtitle(
             _("Completed:") + f" {n_completed} / {n_total}" if n_total > 0 else ""
         )
         self.delete_completed_btn.set_sensitive(
-            len([t for t in self.get_all_tasks() if t.completed_btn.get_active()]) > 0
+            len(
+                [
+                    t
+                    for t in self.get_all_tasks()
+                    if t.completed_btn.get_active() and t.get_reveal_child()
+                ]
+            )
+            > 0
         )
 
     def update_ui(self) -> None:
@@ -372,49 +396,4 @@ class TaskList(Adw.Bin):
         on_sides: bool = x < left_area_end or x > right_area_start
         on_bottom: bool = y > height
         if on_sides or on_bottom:
-            self.window.split_view_inner.set_show_sidebar(False)
-
-
-class TaskListEntry(Adw.Bin):
-    def __init__(self, task_list: TaskList) -> None:
-        super().__init__()
-        self.task_list = task_list
-        self._build_ui()
-
-    def _build_ui(self):
-        # Entry
-        entry = Adw.EntryRow(
-            activatable=False,
-            height_request=60,
-            title=_("Add new Task"),
-        )
-        entry.connect("entry-activated", self._on_task_added)
-        # Box
-        box = Gtk.ListBox(
-            css_classes=["boxed-list"],
-            selection_mode=Gtk.SelectionMode.NONE,
-            margin_top=12,
-            margin_bottom=12,
-            margin_start=12,
-            margin_end=12,
-        )
-        box.append(entry)
-        # Clamp
-        self.set_child(
-            Adw.Clamp(
-                maximum_size=1000,
-                tightening_threshold=300,
-                child=box,
-            )
-        )
-
-    def _on_task_added(self, entry: Adw.EntryRow):
-        text: str = entry.props.text
-        if text.strip(" \n\t") == "":
-            return
-        self.task_list.add_task(
-            UserData.add_task(list_uid=self.task_list.list_uid, text=text)
-        )
-        entry.props.text = ""
-        scroll(self.task_list.scrl, True)
-        Sync.sync()
+            self.split_view.set_show_sidebar(False)

@@ -1,6 +1,13 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from errands.widgets.task_list.task_list import TaskList
+    from errands.widgets.task import Task
+
 from datetime import datetime
 from errands.utils.data import UserData
 from icalendar import Calendar, Event
@@ -13,12 +20,12 @@ from errands.lib.logging import Log
 
 
 class Details(Adw.Bin):
-    parent = None
+    parent: Task = None
 
-    def __init__(self, window) -> None:
+    def __init__(self, task_list: TaskList) -> None:
         super().__init__()
-        self.window = window
-        self.split_view = window.split_view_inner
+        self.task_list: TaskList = task_list
+        self.split_view: Adw.OverlaySplitView = task_list.split_view
         self._build_ui()
 
     def _build_ui(self):
@@ -268,7 +275,7 @@ class Details(Adw.Bin):
         tag.add_suffix(delete_btn)
         self.tags.add(tag)
 
-    def update_info(self, parent):
+    def update_info(self, parent: Task):
         self.parent = parent
 
         if parent == None:

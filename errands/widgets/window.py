@@ -3,10 +3,9 @@
 
 from __main__ import VERSION, APP_ID
 from errands.widgets.components import Box, Button
-from errands.widgets.details import Details
 from errands.widgets.trash import Trash
 from gi.repository import Gio, Adw, Gtk
-from errands.widgets.lists import Lists
+from errands.widgets.sidebar.task_lists import TaskLists
 from errands.widgets.preferences import PreferencesWindow
 from errands.lib.sync.sync import Sync
 from errands.lib.gsettings import GSettings
@@ -33,36 +32,27 @@ class Window(Adw.ApplicationWindow):
     def _build_ui(self):
         self.props.width_request = 360
         self.props.height_request = 200
-        # Split view inner
-        self.split_view_inner = Adw.OverlaySplitView(
-            min_sidebar_width=360,
-            max_sidebar_width=400,
-            sidebar_width_fraction=0.40,
-            sidebar_position=int(GSettings.get("right-sidebar")),
-        )
-        # Split view outer
+
+        # Split View
         self.split_view = Adw.NavigationSplitView(
             max_sidebar_width=300,
             min_sidebar_width=240,
             show_content=True,
             sidebar_width_fraction=0.25,
         )
+
         # Stack
         self.stack = Adw.ViewStack()
+
         # Trash
         self.trash = Trash(self)
         self.stack.add_titled(self.trash, name="trash", title="Trash")
-        # Details
-        self.details = Details(self)
-        GSettings.bind("sidebar-open", self.split_view_inner, "show-sidebar")
-        self.split_view_inner.set_sidebar(self.details)
-        self.split_view_inner.set_content(self.stack)
+
         # Lists
-        self.lists = Lists(self, self.stack)
+        self.lists = TaskLists(self, self.stack)
         self.split_view.set_sidebar(Adw.NavigationPage.new(self.lists, "Lists"))
-        self.split_view.set_content(
-            Adw.NavigationPage.new(self.split_view_inner, "Tasks")
-        )
+        self.split_view.set_content(Adw.NavigationPage.new(self.stack, "Tasks"))
+
         # Status page Toolbar View
         status_toolbar_view = Adw.ToolbarView(
             content=Box(
@@ -90,12 +80,13 @@ class Window(Adw.ApplicationWindow):
 
         # Toast overlay
         self.toast_overlay = Adw.ToastOverlay(child=self.split_view)
+
         # Breakpoints
         bp = Adw.Breakpoint.new(Adw.breakpoint_condition_parse("max-width: 990px"))
         bp.add_setter(self.split_view, "collapsed", True)
         bp.add_setter(self.split_view, "show-content", True)
         bp1 = Adw.Breakpoint.new(Adw.breakpoint_condition_parse("max-width: 720px"))
-        bp1.add_setter(self.split_view_inner, "collapsed", True)
+        # bp1.add_setter(self.split_view_inner, "collapsed", True)
         bp1.add_setter(self.split_view, "collapsed", True)
         bp1.add_setter(self.split_view, "show-content", True)
         self.add_breakpoint(bp)
