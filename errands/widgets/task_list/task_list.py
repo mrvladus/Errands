@@ -343,6 +343,14 @@ class TaskList(Adw.Bin):
                         if t.uid == task_dict["parent"]:
                             t.add_task(task_dict["uid"])
 
+        # Update details
+        if not self.details.status.get_visible() and not self.details.parent.get_prop(
+            "trash"
+        ):
+            self.details.update_info(self.details.parent)
+        else:
+            self.details.update_info(None)
+
         self.update_status()
 
     def _on_delete_completed_btn_clicked(self, _) -> None:
@@ -354,7 +362,7 @@ class TaskList(Adw.Bin):
         for task in self.get_all_tasks():
             if task.get_prop("completed") and not task.get_prop("trash"):
                 task.delete()
-        self.update_status()
+        self.update_ui()
 
     def _on_dnd_scroll(self, _motion, _x, y: float) -> bool:
         """

@@ -339,11 +339,3 @@ class TaskLists(Adw.Bin):
         # tasks: list[Task] = []
         # for list in self.get_lists():
         #     tasks.extend(list.get_all_tasks())
-        # if (
-        #     self.window.details.parent in tasks
-        #     and not self.window.details.status.get_visible()
-        #     and not self.window.details.parent.get_prop("trash")
-        # ):
-        #     self.window.details.update_info(self.window.details.parent)
-        # else:
-        #     self.window.details.update_info(None)

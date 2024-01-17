@@ -219,7 +219,6 @@ class Task(Gtk.Revealer):
         for task in get_children(self.tasks_list):
             if not task.get_prop("trash"):
                 task.delete()
-        self.details.status.set_visible(True)
         self.parent.update_status()
 
     def expand(self, expanded: bool) -> None:
