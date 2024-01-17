@@ -58,6 +58,7 @@ To translate **Errands** to your language see **[TRANSLATIONS.md](TRANSLATIONS.m
 The only officially supported format is **flatpak** on [Flathub](https://flathub.org/apps/details/io.github.mrvladus.List)!
 Please, **do not package** it in other formats, but if you do, these are dependencies:
 - `libadwaita >= 1.4`
+- `libsecret`
 - `PyGObject`
 - `python3-caldav`
 - `gnome-online-accounts (optional)`
