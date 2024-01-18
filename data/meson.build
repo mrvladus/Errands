@@ -1,3 +1,4 @@
+subdir('resources')
 subdir('icons')
 
 desktop_file = i18n.merge_file(

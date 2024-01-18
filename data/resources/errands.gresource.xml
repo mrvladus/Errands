@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/io/github/mrvladus/Errands">
+    <file alias="style.css">style.css</file>
+    <file alias="style-dark.css">style-dark.css</file>
+    <file preprocess="xml-stripblanks" alias="gtk/help-overlay.ui">gtk/help-overlay.ui</file>
+  </gresource>
+  <gresource prefix="/io/github/mrvladus/Errands/icons/scalable/actions/">
+    <file preprocess="xml-stripblanks" alias="errands-up-symbolic.svg">icons/errands-up-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-calendar-symbolic.svg">icons/errands-calendar-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-copy-symbolic.svg">icons/errands-copy-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-share-symbolic.svg">icons/errands-share-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-theme-system-symbolic.svg">icons/errands-theme-system-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-theme-light-symbolic.svg">icons/errands-theme-light-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-theme-dark-symbolic.svg">icons/errands-theme-dark-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-sync-symbolic.svg">icons/errands-sync-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-info-symbolic.svg">icons/errands-info-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-trash-symbolic.svg">icons/errands-trash-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-lists-symbolic.svg">icons/errands-lists-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-daytime-morning-symbolic.svg">icons/errands-daytime-morning-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-daytime-sunset-symbolic.svg">icons/errands-daytime-sunset-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-add-symbolic.svg">icons/errands-add-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-click-symbolic.svg">icons/errands-click-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-sidebar-left-symbolic.svg">icons/errands-sidebar-left-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-sidebar-right-symbolic.svg">icons/errands-sidebar-right-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-appearance-symbolic.svg">icons/errands-appearance-symbolic.svg</file>
+  </gresource>
+</gresources>
