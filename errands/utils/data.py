@@ -53,14 +53,12 @@ class UserData:
     def add_list(cls, name: str, uuid: str = None, synced: bool = False) -> str:
         uid = str(uuid4()) if not uuid else uuid
         Log.info(f"Data: Create '{uid}' list")
-        with cls.connection:
-            cur = cls.connection.cursor()
-            cur.execute(
-                """INSERT INTO lists (deleted, name, synced, uid) 
-                VALUES (?, ?, ?, ?)""",
+        cls.run_sql(
+            (
+                "INSERT INTO lists (deleted, name, synced, uid) VALUES (?, ?, ?, ?)",
                 (False, name, synced, uid),
             )
-            cls.connection.commit()
+        )
         return uid
 
     @classmethod
@@ -101,7 +99,7 @@ class UserData:
 
     @classmethod
     def update_props(
-        cls, list_uid: str, uid: str, props: list[str], values: list
+        cls, list_uid: str, uid: str, props: list[str], values: list[Any]
     ) -> None:
         with cls.connection:
             cur = cls.connection.cursor()
@@ -115,12 +113,17 @@ class UserData:
             cls.connection.commit()
 
     @classmethod
-    def run_sql(cls, *cmds: list[str], fetch: bool = False) -> list[tuple] | None:
+    def run_sql(
+        cls, *cmds: list[str | tuple], fetch: bool = False
+    ) -> list[tuple] | None:
         try:
             with cls.connection:
                 cur = cls.connection.cursor()
                 for cmd in cmds:
-                    cur.execute(cmd)
+                    if isinstance(cmd, tuple):
+                        cur.execute(cmd[0], cmd[1])
+                    else:
+                        cur.execute(cmd)
                 cls.connection.commit()
                 return cur.fetchall() if fetch else None
         except Exception as e:
@@ -198,12 +201,11 @@ class UserData:
     ) -> str:
         if not uid:
             uid = str(uuid4())
-        with cls.connection:
-            cur = cls.connection.cursor()
-            cur.execute(
-                f"""INSERT INTO tasks 
-                (uid, list_uid, text, parent, completed, deleted, color, notes, percent_complete, priority, start_date, end_date, tags, synced, expanded, trash) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+        cls.run_sql(
+            (
+                """INSERT INTO tasks 
+            (uid, list_uid, text, parent, completed, deleted, color, notes, percent_complete, priority, start_date, end_date, tags, synced, expanded, trash) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                 (
                     uid,
                     list_uid,
@@ -223,8 +225,8 @@ class UserData:
                     trash,
                 ),
             )
-            cls.connection.commit()
-            return uid
+        )
+        return uid
 
     def _convert(cls):
         old_path = os.path.join(GLib.get_user_data_dir(), "list")

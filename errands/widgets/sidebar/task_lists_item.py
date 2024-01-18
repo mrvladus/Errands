@@ -105,8 +105,10 @@ class TaskListsItem(Gtk.ListBoxRow):
 
                 text = entry.props.text.rstrip().lstrip()
                 UserData.run_sql(
-                    f"""UPDATE lists SET name = '{text}', synced = 0
-                    WHERE uid = '{self.uid}'"""
+                    (
+                        "UPDATE lists SET name = ?, synced = 0 WHERE uid = ?",
+                        (text, self.uid),
+                    )
                 )
                 self.task_list.title.set_title(text)
                 Sync.sync()
