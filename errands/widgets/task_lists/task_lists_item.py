@@ -5,9 +5,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from errands.widgets.task_lists.task_lists import TaskLists
     from errands.widgets.task_list.task_list import TaskList
     from errands.widgets.task import Task
-    from errands.widgets.sidebar.task_lists import TaskLists
     from errands.widgets.window import Window
 
 from datetime import datetime

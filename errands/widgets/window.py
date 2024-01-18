@@ -5,7 +5,7 @@ from __main__ import VERSION, APP_ID
 from errands.widgets.components import Box, Button
 from errands.widgets.trash import Trash
 from gi.repository import Gio, Adw, Gtk
-from errands.widgets.sidebar.task_lists import TaskLists
+from errands.widgets.task_lists.task_lists import TaskLists
 from errands.widgets.preferences import PreferencesWindow
 from errands.lib.sync.sync import Sync
 from errands.lib.gsettings import GSettings
