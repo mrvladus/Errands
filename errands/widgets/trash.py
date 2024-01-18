@@ -1,5 +1,10 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from errands.widgets.window import Window
 
 from errands.utils.data import UserData
 from errands.utils.functions import get_children
@@ -11,16 +16,18 @@ from errands.lib.logging import Log
 
 
 class Trash(Adw.Bin):
-    def __init__(self, window):
+    def __init__(self, window: Window):
         super().__init__()
-        self.window = window
+        self.window: Window = window
         self.stack: Adw.ViewStack = window.stack
         self._build_ui()
         self.update_status()
 
     def _build_ui(self) -> None:
         # Headerbar
-        hb = Adw.HeaderBar(title_widget=Adw.WindowTitle(title=_("Trash")))
+        hb: Adw.HeaderBar = Adw.HeaderBar(
+            title_widget=Adw.WindowTitle(title=_("Trash"))
+        )
         # Clear button
         clear_btn = Button(
             icon_name="errands-trash-symbolic",
@@ -89,13 +96,7 @@ class Trash(Adw.Bin):
         self.status.set_visible(False)
 
     def update_status(self) -> None:
-        deleted_uids = [
-            i[0]
-            for i in UserData.run_sql(
-                "SELECT uid FROM tasks WHERE trash = 1 AND deleted = 0", fetch=True
-            )
-        ]
-        self.status.set_visible(len(deleted_uids) == 0)
+        self.status.set_visible(len([t for t in get_children(self.trash_list)]) == 0)
 
     def on_trash_clear(self, btn) -> None:
         def _confirm(_, res) -> None:
@@ -188,17 +189,17 @@ class Trash(Adw.Bin):
 
 
 class TrashItem(Adw.Bin):
-    def __init__(self, task_widget, trash) -> None:
+    def __init__(self, task_widget: Task, trash: Trash) -> None:
         super().__init__()
-        self.task_widget = task_widget
-        self.uid = task_widget.uid
-        self.trash = trash
-        self.trash_list = trash.trash_list
+        self.task_widget: Task = task_widget
+        self.uid: str = task_widget.uid
+        self.trash: Trash = trash
+        self.trash_list: Gtk.Box = trash.trash_list
         self._build_ui()
 
     def _build_ui(self) -> None:
         self.add_css_class("card")
-        row = Adw.ActionRow(
+        row: Adw.ActionRow = Adw.ActionRow(
             title=self.task_widget.get_prop("text"),
             css_classes=["rounded-corners"],
             height_request=60,
@@ -222,7 +223,7 @@ class TrashItem(Adw.Bin):
                 css_classes=["flat", "circular"],
             )
         )
-        box = Gtk.ListBox(
+        box: Gtk.ListBox = Gtk.ListBox(
             selection_mode=0,
             css_classes=["rounded-corners"],
             accessible_role=Gtk.AccessibleRole.PRESENTATION,
@@ -235,7 +236,7 @@ class TrashItem(Adw.Bin):
 
         Log.info(f"Restore task: {self.uid}")
 
-        to_remove = []
+        to_remove: list[str] = []
 
         def restore_task(uid: str = self.uid) -> None:
             for item in get_children(self.trash_list):

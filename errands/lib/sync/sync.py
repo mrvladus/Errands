@@ -1,18 +1,24 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from errands.widgets.window import Window
+
 from errands.lib.sync.providers.caldav import SyncProviderCalDAV
 from errands.lib.sync.providers.nextcloud import SyncProviderNextcloud
-from gi.repository import Adw, GLib
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.utils.data import UserData
 from errands.utils.functions import threaded
+from gi.repository import GLib
 
 
 class Sync:
     provider = None
-    window: Adw.ApplicationWindow = None
+    window: Window = None
 
     @classmethod
     def init(self, window, testing: bool = False) -> None:
@@ -37,17 +43,25 @@ class Sync:
         """
         if GSettings.get("sync-provider") == 0:
             UserData.clean_deleted()
-            GLib.idle_add(self.window.lists.update_ui)
+            GLib.idle_add(self.window.sidebar.task_lists.update_ui)
             return
         if not self.provider:
-            GLib.idle_add(self.window.lists.sync_indicator.set_visible, True)
+            GLib.idle_add(
+                self.window.sidebar.header_bar.sync_indicator.set_visible, True
+            )
             self.init(self.window)
-            GLib.idle_add(self.window.lists.sync_indicator.set_visible, False)
+            GLib.idle_add(
+                self.window.sidebar.header_bar.sync_indicator.set_visible, False
+            )
         if self.provider and self.provider.can_sync:
-            GLib.idle_add(self.window.lists.sync_indicator.set_visible, True)
+            GLib.idle_add(
+                self.window.sidebar.header_bar.sync_indicator.set_visible, True
+            )
             self.provider.sync()
-            GLib.idle_add(self.window.lists.update_ui)
-            GLib.idle_add(self.window.lists.sync_indicator.set_visible, False)
+            GLib.idle_add(self.window.sidebar.task_lists.update_ui)
+            GLib.idle_add(
+                self.window.sidebar.header_bar.sync_indicator.set_visible, False
+            )
 
     @classmethod
     def test_connection(self) -> bool:

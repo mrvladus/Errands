@@ -75,7 +75,7 @@ class UserData:
         )
 
     @classmethod
-    def get_lists_as_dicts(cls) -> dict:
+    def get_lists_as_dicts(cls) -> list[dict]:
         res = cls.run_sql("SELECT * FROM lists", fetch=True)
         lists = []
         for i in res:

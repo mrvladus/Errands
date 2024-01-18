@@ -5,7 +5,7 @@ from __main__ import VERSION, APP_ID
 from errands.widgets.components import Box, Button
 from errands.widgets.trash import Trash
 from gi.repository import Gio, Adw, Gtk
-from errands.widgets.task_lists.task_lists import TaskLists
+from errands.widgets.sidebar import Sidebar
 from errands.widgets.preferences import PreferencesWindow
 from errands.lib.sync.sync import Sync
 from errands.lib.gsettings import GSettings
@@ -49,8 +49,8 @@ class Window(Adw.ApplicationWindow):
         self.stack.add_titled(self.trash, name="trash", title="Trash")
 
         # Lists
-        self.lists = TaskLists(self, self.stack)
-        self.split_view.set_sidebar(Adw.NavigationPage.new(self.lists, "Lists"))
+        self.sidebar = Sidebar(self)
+        self.split_view.set_sidebar(Adw.NavigationPage.new(self.sidebar, "Lists"))
         self.split_view.set_content(Adw.NavigationPage.new(self.stack, "Tasks"))
 
         # Status page Toolbar View
@@ -60,7 +60,7 @@ class Window(Adw.ApplicationWindow):
                     Adw.StatusPage(title=_("No Task Lists"), icon_name=APP_ID),
                     Button(
                         label=_("Create List"),
-                        on_click=lambda *_: self.lists.add_list_btn.activate(),
+                        on_click=lambda *_: self.sidebar.header_bar.add_list_btn.activate(),
                         halign="center",
                         css_classes=["pill", "suggested-action"],
                     ),
