@@ -1,8 +1,7 @@
 # .py
 errands/widgets/components.py
 errands/widgets/preferences.py
-errands/widgets/task_list/task_lists.py
-errands/widgets/task_list/task_lists_item.py
+errands/widgets/sidebar.py
 errands/widgets/task_list/task_list.py
 errands/widgets/task_list/task_list_entry.py
 errands/widgets/task_list/task_list_details.py
