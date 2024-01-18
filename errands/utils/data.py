@@ -53,10 +53,14 @@ class UserData:
     def add_list(cls, name: str, uuid: str = None, synced: bool = False) -> str:
         uid = str(uuid4()) if not uuid else uuid
         Log.info(f"Data: Create '{uid}' list")
-        cls.run_sql(
-            f"""INSERT INTO lists (deleted, name, synced, uid) 
-            VALUES (0, '{name}', {synced}, '{uid}')"""
-        )
+        with cls.connection:
+            cur = cls.connection.cursor()
+            cur.execute(
+                """INSERT INTO lists (deleted, name, synced, uid) 
+                VALUES (?, ?, ?, ?)""",
+                (False, name, synced, uid),
+            )
+            cls.connection.commit()
         return uid
 
     @classmethod
