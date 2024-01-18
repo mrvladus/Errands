@@ -1,9 +1,11 @@
 # .py
-errands/widgets/details.py
 errands/widgets/components.py
-errands/widgets/lists.py
 errands/widgets/preferences.py
-errands/widgets/task_list.py
+errands/widgets/task_list/task_lists.py
+errands/widgets/task_list/task_lists_item.py
+errands/widgets/task_list/task_list.py
+errands/widgets/task_list/task_list_entry.py
+errands/widgets/task_list/task_list_details.py
 errands/widgets/task.py
 errands/widgets/trash.py
 errands/widgets/window.py
