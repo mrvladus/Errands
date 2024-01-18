@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-16 18:39+0300\n"
-"PO-Revision-Date: 2023-12-29 22:54+0100\n"
+"PO-Revision-Date: 2024-01-18 15:44+0100\n"
 "Last-Translator: Philipp Kiemle <philipp.kiemle@gmail.com>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -31,7 +31,7 @@ msgstr "Speichern"
 
 #: errands/widgets/details.py:52
 msgid "Save (Ctrl+S)"
-msgstr ""
+msgstr "Speichern (Strg+S)"
 
 #: errands/widgets/details.py:63
 msgid "No Details"
@@ -187,7 +187,7 @@ msgstr "Hauptmenü"
 
 #: errands/widgets/lists.py:169
 msgid "Syncing..."
-msgstr ""
+msgstr "Synchronisierung läuft …"
 
 #: errands/widgets/lists.py:178
 msgid "Add new List"
@@ -270,21 +270,19 @@ msgstr "Dunkel"
 #. Tasks group
 #: errands/widgets/preferences.py:72
 msgid "Tasks"
-msgstr ""
+msgstr "Aufgaben"
 
 #: errands/widgets/preferences.py:74
-#, fuzzy
 msgid "Click Action"
-msgstr "Den »+«-Knopf drücken"
+msgstr "Klick-Aktion"
 
 #: errands/widgets/preferences.py:75
 msgid "Open Details Panel"
-msgstr ""
+msgstr "Details-Panel öffnen"
 
 #: errands/widgets/preferences.py:75
-#, fuzzy
 msgid "Show Sub-Tasks"
-msgstr "Neue Unteraufgabe hinzufügen"
+msgstr "Unteraufgaben anzeigen"
 
 #: errands/widgets/preferences.py:91 errands/widgets/preferences.py:159
 #: errands/resources/gtk/help-overlay.ui:38
@@ -321,26 +319,24 @@ msgid "Test Connection"
 msgstr "Verbindung überprüfen"
 
 #: errands/widgets/preferences.py:136
-#, fuzzy
 msgid "Details Panel"
-msgstr "Keine Details"
+msgstr "Details-Panel"
 
 #: errands/widgets/preferences.py:139
 msgid "Position"
-msgstr ""
+msgstr "Position"
 
 #: errands/widgets/preferences.py:140
 msgid "Left"
-msgstr ""
+msgstr "Links"
 
 #: errands/widgets/preferences.py:140
-#, fuzzy
 msgid "Right"
-msgstr "Hell"
+msgstr "Rechts"
 
 #: errands/widgets/preferences.py:149
 msgid "Appearance"
-msgstr ""
+msgstr "Erscheinungsbild"
 
 #: errands/widgets/preferences.py:195
 msgid "Connected"
@@ -388,9 +384,8 @@ msgid "Add new Sub-Task"
 msgstr "Neue Unteraufgabe hinzufügen"
 
 #: errands/widgets/task.py:146 errands/resources/gtk/help-overlay.ui:53
-#, fuzzy
 msgid "Details"
-msgstr "Keine Details"
+msgstr "Details"
 
 #: errands/widgets/trash.py:37
 msgid "Restore All"
@@ -417,9 +412,8 @@ msgid "No Task Lists"
 msgstr "Keine Aufgabenlisten"
 
 #: errands/widgets/window.py:68
-#, fuzzy
 msgid "Create List"
-msgstr "Liste umbenennen"
+msgstr "Liste erstellen"
 
 #: errands/widgets/window.py:131
 msgid "translator-credits"
@@ -455,13 +449,12 @@ msgid "Quit"
 msgstr "Beenden"
 
 #: errands/resources/gtk/help-overlay.ui:57
-#, fuzzy
 msgid "Toggle Details"
-msgstr "Keine Details"
+msgstr "Details umschalten"
 
 #: errands/resources/gtk/help-overlay.ui:64
 msgid "Save changed details"
-msgstr ""
+msgstr "Geänderte Details speichern"
 
 #: data/io.github.mrvladus.List.desktop.in.in:4
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:28
