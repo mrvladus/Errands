@@ -273,7 +273,11 @@ class TaskList(Adw.Bin):
         tasks: list[Task] = self.get_toplevel_tasks()
         n_total: int = len([t for t in tasks if t.get_reveal_child()])
         n_completed: int = len(
-            [t for t in tasks if t.completed_btn.get_active() and t.get_reveal_child()]
+            [
+                t
+                for t in tasks
+                if t.task_row.complete_btn.get_active() and t.get_reveal_child()
+            ]
         )
 
         self.title.set_subtitle(
@@ -284,7 +288,7 @@ class TaskList(Adw.Bin):
                 [
                     t
                     for t in self.get_all_tasks()
-                    if t.completed_btn.get_active() and t.get_reveal_child()
+                    if t.task_row.complete_btn.get_active() and t.get_reveal_child()
                 ]
             )
             > 0
@@ -312,9 +316,9 @@ class TaskList(Adw.Bin):
         tasks_widgets: list[Task] = self.get_all_tasks()
         for task in tasks_widgets:
             # Update widget title and completed toggle
-            if task.completed_btn.get_active() != task.get_prop("completed"):
+            if task.task_row.complete_btn.get_active() != task.get_prop("completed"):
                 task.just_added = True
-                task.completed_btn.set_active(task.get_prop("completed"))
+                task.task_row.complete_btn.set_active(task.get_prop("completed"))
                 task.just_added = False
 
             # Change parent

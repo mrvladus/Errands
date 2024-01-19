@@ -55,7 +55,7 @@ def get_goa_credentials(acc_name: str) -> GoaCredentials | None:
                     + (
                         acc.get_cached_property("PresentationIdentity")
                         .get_string()
-                        .split("@")[1]
+                        .split("@")[-1]
                     )
                     + "/remote.php/dav/"
                 )

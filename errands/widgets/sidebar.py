@@ -583,7 +583,18 @@ class SidebarTaskListsItem(Gtk.ListBoxRow):
     def _on_task_drop(self, _drop, task: Task, _x, _y):
         if task.list_uid == self.uid:
             return
-        task.update_props(["list_uid", "parent"], [self.uid, ""])
+
+        def update_parent(t: Task, delete_parent: bool = False):
+            t.update_props(["list_uid"], [self.uid])
+            if delete_parent:
+                t.update_props(["parent"], [""])
+            subs = t.tasks_list.get_sub_tasks()
+            if len(subs) > 0:
+                for s in subs:
+                    update_parent(s)
+
+        update_parent(task)
+
         Sync.sync()
 
 
