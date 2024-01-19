@@ -1,7 +1,7 @@
 # LIST.
 # Copyright (C) 2023
 # This file is distributed under the same license as the list package.
-# ALBANO BATTISTELLA <ALBANOBATTISTELLA@GMAIL.COM>, 2023.
+# ALBANO BATTISTELLA <ALBANOBATTISTELLA@GMAIL.COM>, 2023,2024.
 #
 msgid ""
 msgstr ""
@@ -29,7 +29,7 @@ msgstr "Salva"
 
 #: errands/widgets/details.py:52
 msgid "Save (Ctrl+S)"
-msgstr ""
+msgstr "Salva(Ctrl+S)"
 
 #: errands/widgets/details.py:63
 msgid "No Details"
@@ -185,7 +185,7 @@ msgstr "Menù principale"
 
 #: errands/widgets/lists.py:169
 msgid "Syncing..."
-msgstr ""
+msgstr "Sincronizzazione..."
 
 #: errands/widgets/lists.py:178
 msgid "Add new List"
@@ -271,18 +271,16 @@ msgid "Tasks"
 msgstr "Attività"
 
 #: errands/widgets/preferences.py:74
-#, fuzzy
 msgid "Click Action"
-msgstr "Fare clic sul pulsante \"+\"."
+msgstr "Premere il tasto »+«"
 
 #: errands/widgets/preferences.py:75
 msgid "Open Details Panel"
-msgstr ""
+msgstr "Apri il pannello dei dettagli"
 
 #: errands/widgets/preferences.py:75
-#, fuzzy
 msgid "Show Sub-Tasks"
-msgstr "Aggiungi una nuova attività secondaria"
+msgstr "Mostra attività secondarie"
 
 #: errands/widgets/preferences.py:91 errands/widgets/preferences.py:159
 #: errands/resources/gtk/help-overlay.ui:38
@@ -319,26 +317,24 @@ msgid "Test Connection"
 msgstr "Test di connessione"
 
 #: errands/widgets/preferences.py:136
-#, fuzzy
 msgid "Details Panel"
-msgstr "Nessun dettaglio"
+msgstr "Pannello dei dettagli"
 
 #: errands/widgets/preferences.py:139
 msgid "Position"
-msgstr ""
+msgstr "Posizione"
 
 #: errands/widgets/preferences.py:140
 msgid "Left"
-msgstr ""
+msgstr "Sinistra"
 
 #: errands/widgets/preferences.py:140
-#, fuzzy
 msgid "Right"
-msgstr "Chiaro"
+msgstr "Destra"
 
 #: errands/widgets/preferences.py:149
 msgid "Appearance"
-msgstr ""
+msgstr "Aspetto"
 
 #: errands/widgets/preferences.py:195
 msgid "Connected"
@@ -386,9 +382,8 @@ msgid "Add new Sub-Task"
 msgstr "Aggiungi una nuova attività secondaria"
 
 #: errands/widgets/task.py:146 errands/resources/gtk/help-overlay.ui:53
-#, fuzzy
 msgid "Details"
-msgstr "Nessun dettaglio"
+msgstr "Dettaglio"
 
 #: errands/widgets/trash.py:37
 msgid "Restore All"
@@ -449,13 +444,12 @@ msgid "Quit"
 msgstr "Esci"
 
 #: errands/resources/gtk/help-overlay.ui:57
-#, fuzzy
 msgid "Toggle Details"
-msgstr "Nessun dettaglio"
+msgstr "Attiva/disattiva i dettagli"
 
 #: errands/resources/gtk/help-overlay.ui:64
 msgid "Save changed details"
-msgstr ""
+msgstr "Salva i dettagli modificati"
 
 #: data/io.github.mrvladus.List.desktop.in.in:4
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:28
