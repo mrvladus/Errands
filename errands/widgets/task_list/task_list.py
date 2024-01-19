@@ -348,8 +348,9 @@ class TaskList(Adw.Bin):
                             t.add_task(task_dict["uid"])
 
         # Update details
-        if not self.details.status.get_visible() and not self.details.parent.get_prop(
-            "trash"
+        if (
+            not self.details.status.get_visible()
+            and not self.details.parent.get_reveal_child()
         ):
             self.details.update_info(self.details.parent)
         else:

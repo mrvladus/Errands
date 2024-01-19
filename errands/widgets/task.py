@@ -156,7 +156,7 @@ class TaskTitleRow(Gtk.ListBox):
         if GSettings.get("primary-action-show-sub-tasks"):
             self.task.expand(not self.task.sub_tasks_revealer.get_child_revealed())
         else:
-            self.task.task_row.details_btn.activate()
+            self.task.task_row.details_btn.do_clicked()
 
     def _on_drag_prepare(self, *_) -> Gdk.ContentProvider:
         # Bug workaround when task is not sensitive after short dnd
