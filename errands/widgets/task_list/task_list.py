@@ -363,9 +363,8 @@ class TaskList(Adw.Bin):
         Hide completed tasks and move them to trash
         """
         Log.info("Delete completed tasks")
-
         for task in self.get_all_tasks():
-            if task.get_prop("completed") and not task.get_prop("trash"):
+            if task.task_row.complete_btn.get_active() and not task.get_reveal_child():
                 task.delete()
         self.update_ui()
 
