@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-16 18:39+0300\n"
-"PO-Revision-Date: 2024-01-03 20:15+0100\n"
+"PO-Revision-Date: 2024-01-19 13:00+0100\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: \n"
 "Language: nl\n"
@@ -28,7 +28,7 @@ msgstr "Opslaan"
 
 #: errands/widgets/details.py:52
 msgid "Save (Ctrl+S)"
-msgstr ""
+msgstr "Opslaan (Ctrl+S)"
 
 #: errands/widgets/details.py:63
 msgid "No Details"
@@ -184,7 +184,7 @@ msgstr "Hoofdmenu"
 
 #: errands/widgets/lists.py:169
 msgid "Syncing..."
-msgstr ""
+msgstr "Bezig met synchroniseren…"
 
 #: errands/widgets/lists.py:178
 msgid "Add new List"
@@ -270,18 +270,16 @@ msgid "Tasks"
 msgstr "Taken"
 
 #: errands/widgets/preferences.py:74
-#, fuzzy
 msgid "Click Action"
-msgstr "Klik op de ‘+’-knop"
+msgstr "Klikactie"
 
 #: errands/widgets/preferences.py:75
 msgid "Open Details Panel"
-msgstr ""
+msgstr "Details tonen"
 
 #: errands/widgets/preferences.py:75
-#, fuzzy
 msgid "Show Sub-Tasks"
-msgstr "Bĳkomende taak toevoegen"
+msgstr "Bĳkomende taken tonen"
 
 #: errands/widgets/preferences.py:91 errands/widgets/preferences.py:159
 #: errands/resources/gtk/help-overlay.ui:38
@@ -318,26 +316,24 @@ msgid "Test Connection"
 msgstr "Verbinding testen"
 
 #: errands/widgets/preferences.py:136
-#, fuzzy
 msgid "Details Panel"
-msgstr "Geen omschrijving"
+msgstr "Detailpaneel"
 
 #: errands/widgets/preferences.py:139
 msgid "Position"
-msgstr ""
+msgstr "Locatie"
 
 #: errands/widgets/preferences.py:140
 msgid "Left"
-msgstr ""
+msgstr "Links"
 
 #: errands/widgets/preferences.py:140
-#, fuzzy
 msgid "Right"
-msgstr "Licht thema"
+msgstr "Rechts"
 
 #: errands/widgets/preferences.py:149
 msgid "Appearance"
-msgstr ""
+msgstr "Vormgeving"
 
 #: errands/widgets/preferences.py:195
 msgid "Connected"
@@ -385,9 +381,8 @@ msgid "Add new Sub-Task"
 msgstr "Bĳkomende taak toevoegen"
 
 #: errands/widgets/task.py:146 errands/resources/gtk/help-overlay.ui:53
-#, fuzzy
 msgid "Details"
-msgstr "Geen omschrijving"
+msgstr "Details"
 
 #: errands/widgets/trash.py:37
 msgid "Restore All"
@@ -446,13 +441,12 @@ msgid "Quit"
 msgstr "Afsluiten"
 
 #: errands/resources/gtk/help-overlay.ui:57
-#, fuzzy
 msgid "Toggle Details"
-msgstr "Geen omschrijving"
+msgstr "Details tonen/verbergen"
 
 #: errands/resources/gtk/help-overlay.ui:64
 msgid "Save changed details"
-msgstr ""
+msgstr "Wijzigingen opslaan"
 
 #: data/io.github.mrvladus.List.desktop.in.in:4
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:28
@@ -461,8 +455,7 @@ msgstr "Beheer uw taken"
 
 #: data/io.github.mrvladus.List.desktop.in.in:10
 msgid "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
-msgstr ""
-"errands;taken;lĳst;taak;todo;caldav;nextcloud;synchronisatie;synchroniseren;"
+msgstr "errands;taken;lĳst;taak;todo;caldav;nextcloud;synchronisatie;synchroniseren;"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:30
 msgid "Todo application for those who prefer simplicity."
