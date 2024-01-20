@@ -248,7 +248,7 @@ class SyncProviderCalDAV:
         for calendar in self.calendars:
             # Get tasks
             local_tasks = UserData.get_tasks_as_dicts(calendar.id)
-            local_ids = UserData.get_tasks_uids(calendar.id)
+            local_ids = [t["uid"] for t in local_tasks]
             remote_tasks = self._get_tasks(calendar)
             remote_ids = [task["uid"] for task in remote_tasks]
             deleted_uids = [
@@ -262,26 +262,6 @@ class SyncProviderCalDAV:
             if calendar.id not in user_lists_uids:
                 Log.debug(f"Sync: Copy list from remote {calendar.id}")
                 UserData.add_list(name=calendar.name, uuid=calendar.id, synced=True)
-
-            # Create new local task that was created on CalDAV
-            for task in remote_tasks:
-                if task["uid"] not in local_ids and task["uid"] not in deleted_uids:
-                    Log.debug(f"Sync: Copy new task from remote: {task['uid']}")
-                    UserData.add_task(
-                        color=task["color"],
-                        completed=task["completed"],
-                        end_date=task["end_date"],
-                        list_uid=calendar.id,
-                        notes=task["notes"],
-                        parent=task["parent"],
-                        percent_complete=task["percent_complete"],
-                        priority=task["priority"],
-                        start_date=task["start_date"],
-                        synced=True,
-                        tags=task["tags"],
-                        text=task["text"],
-                        uid=task["uid"],
-                    )
 
             for task in local_tasks:
                 # Update local task that was changed on remote
@@ -385,16 +365,37 @@ class SyncProviderCalDAV:
                         f"""DELETE FROM tasks WHERE uid = '{task["uid"]}'"""
                     )
 
-            # Delete tasks on remote if they were deleted locally
-            for task in UserData.run_sql(
-                f"SELECT uid FROM tasks WHERE deleted = 1", fetch=True
-            ):
-                try:
-                    Log.debug(f"Sync: Delete task from remote: '{task[0]}'")
-                    if todo := calendar.todo_by_uid(task[0]):
-                        todo.delete()
-                except Exception as e:
-                    Log.error(f"Sync: Can't delete task from remote: '{task[0]}'. {e}")
-            UserData.run_sql(
-                "DELETE FROM tasks WHERE deleted = 1",
-            )
+                # Delete tasks on remote if they were deleted locally
+                elif task["uid"] in remote_ids and task["deleted"]:
+                    try:
+                        Log.debug(f"Sync: Delete task from remote: '{task['uid']}'")
+                        if todo := calendar.todo_by_uid(task["uid"]):
+                            todo.delete()
+                    except Exception as e:
+                        Log.error(
+                            f"Sync: Can't delete task from remote: '{task['uid']}'. {e}"
+                        )
+
+            # Delete remote task it it was moved to different list
+
+            # Create new local task that was created on CalDAV
+            for task in remote_tasks:
+                if task["uid"] not in local_ids and task["uid"] not in deleted_uids:
+                    Log.debug(
+                        f"Sync: Copy new task from remote to list '{calendar.id}': {task['uid']}"
+                    )
+                    UserData.add_task(
+                        color=task["color"],
+                        completed=task["completed"],
+                        end_date=task["end_date"],
+                        list_uid=calendar.id,
+                        notes=task["notes"],
+                        parent=task["parent"],
+                        percent_complete=task["percent_complete"],
+                        priority=task["priority"],
+                        start_date=task["start_date"],
+                        synced=True,
+                        tags=task["tags"],
+                        text=task["text"],
+                        uid=task["uid"],
+                    )

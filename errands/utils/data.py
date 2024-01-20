@@ -52,56 +52,72 @@ class UserData:
     @classmethod
     def add_list(cls, name: str, uuid: str = None, synced: bool = False) -> str:
         uid = str(uuid4()) if not uuid else uuid
-        Log.info(f"Data: Create '{uid}' list")
-        cls.run_sql(
-            (
+        Log.debug(f"Data: Create '{uid}' list")
+        with cls.connection:
+            cur = cls.connection.cursor()
+            cur.execute(
                 "INSERT INTO lists (deleted, name, synced, uid) VALUES (?, ?, ?, ?)",
                 (False, name, synced, uid),
             )
-        )
-        return uid
+            cls.connection.commit()
+            return uid
 
     @classmethod
     def get_tasks(cls) -> list[str]:
-        res = cls.run_sql("SELECT uid FROM tasks", fetch=True)
-        return [i[0] for i in res]
+        # Log.debug(f"Data: Get tasks uids")
+
+        with cls.connection:
+            cur = cls.connection.cursor()
+            cur.execute("SELECT uid FROM tasks")
+            return [i[0] for i in cur.fetchall()]
 
     @classmethod
     def clean_deleted(cls):
-        Log.info("Data: Clean deleted")
-        cls.run_sql(
-            "DELETE FROM lists WHERE deleted = 1",
-            "DELETE FROM tasks WHERE deleted = 1",
-        )
+        Log.debug("Data: Clean deleted")
+
+        with cls.connection:
+            cur = cls.connection.cursor()
+            cur.execute("DELETE FROM lists WHERE deleted = 1")
+            cur.execute("DELETE FROM tasks WHERE deleted = 1")
+            cls.connection.commit()
 
     @classmethod
     def get_lists_as_dicts(cls) -> list[dict]:
-        res = cls.run_sql("SELECT * FROM lists", fetch=True)
-        lists = []
-        for i in res:
-            data = {
-                "deleted": bool(i[0]),
-                "name": i[1],
-                "synced": bool(i[2]),
-                "uid": i[3],
-            }
-            lists.append(data)
-        return lists
+        # Log.debug("Data: Get lists as dicts")
+
+        with cls.connection:
+            cur = cls.connection.cursor()
+            cur.execute("SELECT * FROM lists")
+            res: list[tuple] = cur.fetchall()
+            lists = []
+            for i in res:
+                data = {
+                    "deleted": bool(i[0]),
+                    "name": i[1],
+                    "synced": bool(i[2]),
+                    "uid": i[3],
+                }
+                lists.append(data)
+            return lists
 
     @classmethod
     def get_prop(cls, list_uid: str, uid: str, prop: str) -> Any:
-        res = cls.run_sql(
-            f"""SELECT {prop} FROM tasks 
-                WHERE uid = '{uid}'
-                AND list_uid = '{list_uid}'""",
-            fetch=True,
-        )
-        return res[0][0]
+        # Log.debug(f"Data: Get '{prop}' for '{uid}'")
+
+        with cls.connection:
+            cur = cls.connection.cursor()
+            cur.execute(
+                f"SELECT {prop} FROM tasks WHERE uid = ? AND list_uid = ?",
+                (uid, list_uid),
+            )
+            return cur.fetchone()[0]
 
     @classmethod
     def update_props(
         cls, list_uid: str, uid: str, props: list[str], values: list[Any]
     ) -> None:
+        # Log.debug(f"Data: Update props for '{uid}'")
+
         with cls.connection:
             cur = cls.connection.cursor()
             for i, prop in enumerate(props):
@@ -131,69 +147,69 @@ class UserData:
             Log.error(f"Data: {e}")
 
     @classmethod
-    def get_tasks_uids(cls, list_uid: str) -> list[str]:
-        res = cls.run_sql(
-            f"""SELECT uid FROM tasks 
-                WHERE list_uid = '{list_uid}'
-                AND deleted = 0""",
-            fetch=True,
-        )
-        return [i[0] for i in res]
+    def get_tasks_uids(cls, list_uid: str, parent: str = None) -> list[str]:
+        # Log.debug(f"Data: Get tasks uids {f'for {parent}' if parent else ''}")
+
+        with cls.connection:
+            cur = cls.connection.cursor()
+            cur.execute(
+                f"""SELECT uid FROM tasks
+                WHERE list_uid = ?
+                AND deleted = 0
+                {f"AND parent = '{parent}'" if parent != None else ''}""",
+                (list_uid,),
+            )
+            return [i[0] for i in cur.fetchall()]
 
     @classmethod
-    def get_sub_tasks_uids(cls, list_uid: str, parent: str) -> list[str]:
-        res = cls.run_sql(
-            f"""SELECT uid FROM tasks 
-                WHERE list_uid = '{list_uid}'
-                AND parent = '{parent}'
-                AND deleted = 0""",
-            fetch=True,
-        )
-        return [i[0] for i in res]
+    def get_tasks_uids_tree(cls, list_uid: str, parent: str) -> list[str]:
+        # Log.debug(f"Data: Get tasks uids tree for '{parent}'")
 
-    @classmethod
-    def get_sub_tasks_uids_tree(cls, list_uid: str, parent: str) -> list[str]:
         uids: list[str] = []
 
         def _add(sub_uids: list[str]) -> None:
             for uid in sub_uids:
                 uids.append(uid)
-                if len(cls.get_sub_tasks_uids(list_uid, uid)) > 0:
-                    _add(cls.get_sub_tasks_uids(list_uid, uid))
+                if len(cls.get_tasks_uids(list_uid, uid)) > 0:
+                    _add(cls.get_tasks_uids(list_uid, uid))
 
-        _add(cls.get_sub_tasks_uids(list_uid, parent))
+        _add(cls.get_tasks_uids(list_uid, parent))
 
         return uids
 
     @classmethod
     def get_tasks_as_dicts(cls, list_uid: str, parent: str = None) -> list[dict]:
-        res = cls.run_sql(
-            f"""SELECT * FROM tasks WHERE list_uid = '{list_uid}'
-            {f"AND parent = '{parent}'" if parent else ""}""",
-            fetch=True,
-        )
-        tasks = []
-        for task in res:
-            new_task = {
-                "color": task[0],
-                "completed": bool(task[1]),
-                "deleted": bool(task[2]),
-                "end_date": task[3],
-                "expanded": bool(task[4]),
-                "list_uid": task[5],
-                "notes": task[6],
-                "parent": task[7],
-                "percent_complete": int(task[8]),
-                "priority": int(task[9]),
-                "start_date": task[10],
-                "synced": bool(task[11]),
-                "tags": task[12],
-                "text": task[13],
-                "trash": bool(task[14]),
-                "uid": task[15],
-            }
-            tasks.append(new_task)
-        return tasks
+        # Log.debug(f"Data: Get tasks as dicts")
+
+        with cls.connection:
+            cur = cls.connection.cursor()
+            cur.execute(
+                f"""SELECT * FROM tasks WHERE list_uid = ?
+                {f"AND parent = '{parent}'" if parent else ""}""",
+                (list_uid,),
+            )
+            tasks = []
+            for task in cur.fetchall():
+                new_task = {
+                    "color": task[0],
+                    "completed": bool(task[1]),
+                    "deleted": bool(task[2]),
+                    "end_date": task[3],
+                    "expanded": bool(task[4]),
+                    "list_uid": task[5],
+                    "notes": task[6],
+                    "parent": task[7],
+                    "percent_complete": int(task[8]),
+                    "priority": int(task[9]),
+                    "start_date": task[10],
+                    "synced": bool(task[11]),
+                    "tags": task[12],
+                    "text": task[13],
+                    "trash": bool(task[14]),
+                    "uid": task[15],
+                }
+                tasks.append(new_task)
+            return tasks
 
     @classmethod
     def add_task(
@@ -217,11 +233,15 @@ class UserData:
     ) -> str:
         if not uid:
             uid = str(uuid4())
-        cls.run_sql(
-            (
+
+        Log.debug(f"Data: Add task {uid}")
+
+        with cls.connection:
+            cur = cls.connection.cursor()
+            cur.execute(
                 """INSERT INTO tasks 
-            (uid, list_uid, text, parent, completed, deleted, color, notes, percent_complete, priority, start_date, end_date, tags, synced, expanded, trash) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (uid, list_uid, text, parent, completed, deleted, color, notes, percent_complete, priority, start_date, end_date, tags, synced, expanded, trash) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                 (
                     uid,
                     list_uid,
@@ -241,8 +261,9 @@ class UserData:
                     trash,
                 ),
             )
-        )
-        return uid
+            cls.connection.commit()
+
+            return uid
 
     def _convert(cls):
         old_path = os.path.join(GLib.get_user_data_dir(), "list")

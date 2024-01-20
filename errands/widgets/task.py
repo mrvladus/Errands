@@ -191,9 +191,9 @@ class TaskTitleRow(Gtk.ListBox):
         task.update_props(["parent", "synced"], [self.task.get_prop("uid"), False])
         # Move data
         uids: list[str] = UserData.get_tasks()
-        last_sub_uid: str = UserData.get_sub_tasks_uids(
-            self.task.list_uid, self.task.uid
-        )[-1]
+        last_sub_uid: str = UserData.get_tasks_uids(self.task.list_uid, self.task.uid)[
+            -1
+        ]
         uids.insert(
             uids.index(self.task.uid) + uids.index(last_sub_uid),
             uids.pop(uids.index(task.uid)),
@@ -393,7 +393,7 @@ class TaskSubTasks(Gtk.Box):
         self.add_css_class("sub-tasks")
 
     def _add_sub_tasks(self) -> None:
-        subs: list[str] = UserData.get_sub_tasks_uids(self.task.list_uid, self.task.uid)
+        subs: list[str] = UserData.get_tasks_uids(self.task.list_uid, self.task.uid)
         if len(subs) == 0:
             self.task.just_added = False
             return

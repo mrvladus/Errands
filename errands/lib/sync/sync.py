@@ -59,6 +59,7 @@ class Sync:
             )
             self.provider.sync()
             GLib.idle_add(self.window.sidebar.task_lists.update_ui)
+            UserData.clean_deleted()
             GLib.idle_add(
                 self.window.sidebar.header_bar.sync_indicator.set_visible, False
             )

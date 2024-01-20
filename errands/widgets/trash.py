@@ -113,18 +113,8 @@ class Trash(Adw.Bin):
             )
 
             # Remove tasks
-            task_lists: list = []
-            pages = self.stack.get_pages()
-            for i in range(pages.get_n_items()):
-                child = pages.get_item(i).get_child()
-                if hasattr(child, "get_all_tasks"):
-                    task_lists.append(child)
-                    tasks = child.get_all_tasks()
-                    for task in tasks:
-                        if task.get_prop("trash"):
-                            task.purge()
-
             for row in get_children(self.trash_list):
+                row.task_widget.purge()
                 self.trash_list.remove(row)
 
             self.status.set_visible(True)

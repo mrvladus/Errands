@@ -73,10 +73,18 @@ class SidebarHeaderBar(Adw.Bin):
         # Add list button
         self.add_list_btn: Adw.SplitButton = Adw.SplitButton(
             icon_name="list-add-symbolic",
-            tooltip_text=_("Add List"),
+            tooltip_text=_("Add List (Ctrl+A)"),
             menu_model=import_menu,
             dropdown_tooltip=_("More Options"),
         )
+        ctrl = Gtk.ShortcutController(scope=1)
+        ctrl.add_shortcut(
+            Gtk.Shortcut(
+                trigger=Gtk.ShortcutTrigger.parse_string("<Primary>A"),
+                action=Gtk.ShortcutAction.parse_string("activate"),
+            )
+        )
+        self.add_list_btn.add_controller(ctrl)
         self.add_list_btn.connect("clicked", self._on_add_btn_clicked)
         hb.pack_start(self.add_list_btn)
 
@@ -585,7 +593,7 @@ class SidebarTaskListsItem(Gtk.ListBoxRow):
         if task.list_uid == self.uid:
             return
 
-        sub_tasks = UserData.get_sub_tasks_uids_tree(task.list_uid, task.uid)
+        sub_tasks = UserData.get_tasks_uids_tree(task.list_uid, task.uid)
         for uid in sub_tasks:
             UserData.update_props(
                 task.list_uid, uid, ["list_uid", "synced"], [self.uid, False]

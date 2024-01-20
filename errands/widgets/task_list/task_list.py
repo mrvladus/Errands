@@ -23,7 +23,6 @@ class TaskList(Adw.Bin):
         self.list_uid = list_uid
         self.parent = parent
         self._build_ui()
-        self._load_tasks()
 
     def _build_ui(self) -> None:
         # Title
@@ -246,24 +245,14 @@ class TaskList(Adw.Bin):
 
         tasks: list[Task] = []
 
-        def append_tasks(items: list[Task]) -> None:
-            for task in items:
-                tasks.append(task)
-                children: list[Task] = get_children(task.tasks_list)
-                if len(children) > 0:
-                    append_tasks(children)
+        for task in self.get_toplevel_tasks():
+            tasks.append(task)
+            tasks.extend(task.tasks_list.get_all_sub_tasks())
 
-        append_tasks(get_children(self.tasks_list))
         return tasks
 
     def get_toplevel_tasks(self) -> list[Task]:
         return get_children(self.tasks_list)
-
-    def _load_tasks(self) -> None:
-        Log.debug(f"Loading tasks for '{self.list_uid}'")
-        for uid in UserData.get_sub_tasks_uids(self.list_uid, ""):
-            self.add_task(uid)
-        self.update_status()
 
     def update_status(self) -> None:
         """
@@ -345,7 +334,7 @@ class TaskList(Adw.Bin):
                 else:
                     for t in self.get_all_tasks():
                         if t.uid == task_dict["parent"]:
-                            t.add_task(task_dict["uid"])
+                            t.tasks_list.add_sub_task(task_dict["uid"])
 
         # Update details
         if (
@@ -364,7 +353,7 @@ class TaskList(Adw.Bin):
         """
         Log.info("Delete completed tasks")
         for task in self.get_all_tasks():
-            if task.task_row.complete_btn.get_active() and not task.get_reveal_child():
+            if not task.get_prop("trash") and task.get_prop("completed"):
                 task.delete()
         self.update_ui()
 
