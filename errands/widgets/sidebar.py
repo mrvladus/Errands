@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 from __future__ import annotations
+from re import sub
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -584,16 +585,19 @@ class SidebarTaskListsItem(Gtk.ListBoxRow):
         if task.list_uid == self.uid:
             return
 
-        def update_parent(t: Task, delete_parent: bool = False):
-            t.update_props(["list_uid"], [self.uid])
-            if delete_parent:
-                t.update_props(["parent"], [""])
-            subs = t.tasks_list.get_sub_tasks()
-            if len(subs) > 0:
-                for s in subs:
-                    update_parent(s)
-
-        update_parent(task)
+        sub_tasks = UserData.get_sub_tasks_uids_tree(task.list_uid, task.uid)
+        for uid in sub_tasks:
+            UserData.update_props(
+                task.list_uid, uid, ["list_uid", "synced"], [self.uid, False]
+            )
+        UserData.update_props(
+            task.list_uid,
+            task.uid,
+            ["list_uid", "parent", "synced"],
+            [self.uid, "", False],
+        )
+        self.task_list.add_task(task.uid)
+        task.purge()
 
         Sync.sync()
 

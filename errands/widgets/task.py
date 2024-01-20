@@ -120,7 +120,7 @@ class TaskTitleRow(Gtk.ListBox):
         )
 
         # Drag controller
-        task_row_drag_source = Gtk.DragSource.new()
+        task_row_drag_source: Gtk.DragSource = Gtk.DragSource.new()
         task_row_drag_source.set_actions(Gdk.DragAction.MOVE)
         task_row_drag_source.connect("prepare", self._on_drag_prepare)
         task_row_drag_source.connect("drag-begin", self._on_drag_begin)
@@ -419,6 +419,23 @@ class TaskSubTasks(Gtk.Box):
     def get_sub_tasks(self) -> list[Task]:
         return get_children(self)
 
+    def get_all_sub_tasks(self) -> list[Task]:
+        """
+        Get list of all tasks widgets including sub-tasks
+        """
+
+        tasks: list[Task] = []
+
+        def append_tasks(sub_tasks: list[Task]) -> None:
+            for task in sub_tasks:
+                tasks.append(task)
+                children: list[Task] = task.tasks_list.get_sub_tasks()
+                if len(children) > 0:
+                    append_tasks(children)
+
+        append_tasks(self.get_sub_tasks())
+        return tasks
+
 
 class Task(Gtk.Revealer):
     just_added: bool = True
@@ -453,7 +470,7 @@ class Task(Gtk.Revealer):
         self.expand(self.get_prop("expanded"))
         self.update_status()
 
-    def _build_ui(self):
+    def _build_ui(self) -> None:
         # Top drop area
         self.top_drop_area = TaskTopDropArea(self)
 
@@ -496,9 +513,6 @@ class Task(Gtk.Revealer):
             res = bool(res)
         return res
 
-    def update_props(self, props: list[str], values: list):
-        UserData.update_props(self.list_uid, self.uid, props, values)
-
     def delete(self, *_) -> None:
         """Move task to trash"""
 
@@ -530,13 +544,18 @@ class Task(Gtk.Revealer):
     def toggle_visibility(self, on: bool) -> None:
         self.set_reveal_child(on)
 
+    def update_props(self, props: list[str], values: list[Any]) -> None:
+        UserData.update_props(self.list_uid, self.uid, props, values)
+
     def update_status(self) -> None:
-        sub_tasks: list[Task] = [
-            t for t in self.tasks_list.get_sub_tasks() if t.get_reveal_child()
+        sub_tasks: list[dict] = [
+            t
+            for t in UserData.get_tasks_as_dicts(self.list_uid, self.uid)
+            if not t["deleted"]
         ]
-        n_total: int = len(sub_tasks)
+        n_total: int = len([t for t in sub_tasks if not t["trash"]])
         n_completed: int = len(
-            [t for t in sub_tasks if t.task_row.complete_btn.get_active()]
+            [t for t in sub_tasks if not t["trash"] and t["completed"]]
         )
         self.update_props(
             ["percent_complete"],
