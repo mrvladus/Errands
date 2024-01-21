@@ -130,17 +130,12 @@ class UserData:
             cls.connection.commit()
 
     @classmethod
-    def run_sql(
-        cls, *cmds: list[str | tuple], fetch: bool = False
-    ) -> list[tuple] | None:
+    def run_sql(cls, *cmds: list, fetch: bool = False) -> list[tuple] | None:
         try:
             with cls.connection:
                 cur = cls.connection.cursor()
                 for cmd in cmds:
-                    if isinstance(cmd, tuple):
-                        cur.execute(cmd[0], cmd[1])
-                    else:
-                        cur.execute(cmd)
+                    cur.execute(cmd)
                 cls.connection.commit()
                 return cur.fetchall() if fetch else None
         except Exception as e:

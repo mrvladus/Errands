@@ -589,25 +589,17 @@ class SidebarTaskListsItem(Gtk.ListBoxRow):
         self.window.stack.set_visible_child_name(self.label.get_label())
         self.window.split_view.set_show_content(True)
 
+    # TODO
     def _on_task_drop(self, _drop, task: Task, _x, _y):
+        return
         if task.list_uid == self.uid:
             return
-
-        sub_tasks = UserData.get_tasks_uids_tree(task.list_uid, task.uid)
-        for uid in sub_tasks:
-            UserData.update_props(
-                task.list_uid, uid, ["list_uid", "synced"], [self.uid, False]
-            )
-        UserData.update_props(
-            task.list_uid,
-            task.uid,
-            ["list_uid", "parent", "synced"],
-            [self.uid, "", False],
-        )
-        self.task_list.add_task(task.uid)
+        print(task.get_prop("parent"), "=>", self.uid, "=>", task.uid)
+        uid = task.uid
+        task.update_props(["parent", "list_uid"], ["", self.uid])
         task.purge()
-
-        Sync.sync()
+        self.task_list.add_task(uid)
+        # Sync.sync()
 
 
 class SidebarTrashButton(Gtk.Button):
