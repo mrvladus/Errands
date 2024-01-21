@@ -6,7 +6,7 @@ from re import T
 from typing import Any, Self, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from errands.widgets.task_list.task_list import TaskList
+    from errands.widgets.task_list import TaskList
     from errands.widgets.window import Window
 
 from errands.widgets.components import Box, Button
