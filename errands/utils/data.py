@@ -20,8 +20,9 @@ class UserData:
     def init(cls):
         if not os.path.exists(cls.data_dir):
             os.mkdir(cls.data_dir)
-        cls.connection = sqlite3.connect(cls.db_path, check_same_thread=False)
-        cls.connection.isolation_level = None
+        cls.connection = sqlite3.connect(
+            cls.db_path, check_same_thread=False, isolation_level=None
+        )
         cls.run_sql(
             """CREATE TABLE IF NOT EXISTS lists (
             deleted INTEGER NOT NULL,
@@ -60,7 +61,6 @@ class UserData:
                 "INSERT INTO lists (deleted, name, synced, uid) VALUES (?, ?, ?, ?)",
                 (False, name, synced, uid),
             )
-            cls.connection.commit()
             return uid
 
     @classmethod
@@ -80,7 +80,6 @@ class UserData:
             cur = cls.connection.cursor()
             cur.execute("DELETE FROM lists WHERE deleted = 1")
             cur.execute("DELETE FROM tasks WHERE deleted = 1")
-            cls.connection.commit()
 
     @classmethod
     def get_lists_as_dicts(cls) -> list[dict]:
@@ -128,7 +127,6 @@ class UserData:
                     AND list_uid = '{list_uid}'""",
                     (values[i],),
                 )
-            cls.connection.commit()
 
     @classmethod
     def run_sql(cls, *cmds: list, fetch: bool = False) -> list[tuple] | None:
@@ -137,7 +135,6 @@ class UserData:
                 cur = cls.connection.cursor()
                 for cmd in cmds:
                     cur.execute(cmd)
-                cls.connection.commit()
                 return cur.fetchall() if fetch else None
         except Exception as e:
             Log.error(f"Data: {e}")
@@ -257,7 +254,6 @@ class UserData:
                     trash,
                 ),
             )
-            cls.connection.commit()
 
             return uid
 
