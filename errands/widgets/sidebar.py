@@ -564,12 +564,12 @@ class SidebarTaskListsItem(Gtk.ListBoxRow):
         ctrl.connect("released", self._on_click)
         self.add_controller(ctrl)
 
-        # Drop controller
-        drop_ctrl: Gtk.DropTarget = Gtk.DropTarget.new(
-            actions=Gdk.DragAction.MOVE, type=Task
-        )
-        drop_ctrl.connect("drop", self._on_task_drop)
-        self.add_controller(drop_ctrl)
+        # TODO Drop controller
+        # drop_ctrl: Gtk.DropTarget = Gtk.DropTarget.new(
+        #     actions=Gdk.DragAction.MOVE, type=Task
+        # )
+        # drop_ctrl.connect("drop", self._on_task_drop)
+        # self.add_controller(drop_ctrl)
 
         self.set_child(
             Box(
@@ -590,16 +590,16 @@ class SidebarTaskListsItem(Gtk.ListBoxRow):
         self.window.split_view.set_show_content(True)
 
     # TODO
-    def _on_task_drop(self, _drop, task: Task, _x, _y):
-        return
-        if task.list_uid == self.uid:
-            return
-        print(task.get_prop("parent"), "=>", self.uid, "=>", task.uid)
-        uid = task.uid
-        task.update_props(["parent", "list_uid"], ["", self.uid])
-        task.purge()
-        self.task_list.add_task(uid)
-        # Sync.sync()
+    # def _on_task_drop(self, _drop, task: Task, _x, _y):
+    #     return
+    # if task.list_uid == self.uid:
+    #     return
+    # print(task.get_prop("parent"), "=>", self.uid, "=>", task.uid)
+    # uid = task.uid
+    # task.update_props(["parent", "list_uid"], ["", self.uid])
+    # task.purge()
+    # self.task_list.add_task(uid)
+    # Sync.sync()
 
 
 class SidebarTrashButton(Gtk.Button):
