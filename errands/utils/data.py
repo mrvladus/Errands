@@ -21,6 +21,7 @@ class UserData:
         if not os.path.exists(cls.data_dir):
             os.mkdir(cls.data_dir)
         cls.connection = sqlite3.connect(cls.db_path, check_same_thread=False)
+        cls.connection.isolation_level = None
         cls.run_sql(
             """CREATE TABLE IF NOT EXISTS lists (
             deleted INTEGER NOT NULL,

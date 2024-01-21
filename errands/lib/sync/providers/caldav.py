@@ -4,7 +4,7 @@ from caldav import Calendar, DAVClient, Principal, Todo
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.utils.data import UserData
-from gi.repository import Adw
+from gi.repository import Adw, GLib
 from caldav.elements import dav
 
 
@@ -188,8 +188,9 @@ class SyncProviderCalDAV:
                 ):
                     Log.debug(f"Sync: Rename remote list '{list['uid']}'")
                     cal.set_properties([dav.DisplayName(list["name"])])
-                    UserData.run_sql(
-                        f"UPDATE lists SET synced = 1 WHERE uid = '{cal.id}'"
+                    GLib.idle_add(
+                        UserData.run_sql,
+                        f"UPDATE lists SET synced = 1 WHERE uid = '{cal.id}'",
                     )
                 # Rename local list
                 elif (
@@ -198,8 +199,9 @@ class SyncProviderCalDAV:
                     and list["synced"]
                 ):
                     Log.debug(f"Sync: Rename local list '{list['uid']}'")
-                    UserData.run_sql(
-                        f"UPDATE lists SET name = '{cal.name}', synced = 1 WHERE uid = '{cal.id}'"
+                    GLib.idle_add(
+                        UserData.run_sql,
+                        f"UPDATE lists SET name = '{cal.name}', synced = 1 WHERE uid = '{cal.id}'",
                     )
 
             # Delete local list deleted on remote
@@ -209,7 +211,10 @@ class SyncProviderCalDAV:
                 and not list["deleted"]
             ):
                 Log.debug(f"Sync: Delete local list deleted on remote '{list['uid']}'")
-                UserData.run_sql(f"""DELETE FROM lists WHERE uid = '{list["uid"]}'""")
+                GLib.idle_add(
+                    UserData.run_sql,
+                    f"""DELETE FROM lists WHERE uid = '{list["uid"]}'""",
+                )
 
             # Delete remote list deleted locally
             elif (
@@ -219,7 +224,10 @@ class SyncProviderCalDAV:
                     if cal.id == list["uid"]:
                         Log.debug(f"Sync: Delete list on remote {cal.id}")
                         cal.delete()
-                        UserData.run_sql(f"DELETE FROM lists WHERE uid = '{cal.id}'")
+                        GLib.idle_add(
+                            UserData.run_sql,
+                            f"DELETE FROM lists WHERE uid = '{cal.id}'",
+                        )
                         break
 
             # Create new remote list
@@ -234,9 +242,10 @@ class SyncProviderCalDAV:
                     supported_calendar_component_set=["VTODO"],
                     name=list["name"],
                 )
-                UserData.run_sql(
+                GLib.idle_add(
+                    UserData.run_sql,
                     f"""UPDATE lists SET synced = 1
-                    WHERE uid = '{list['uid']}'"""
+                    WHERE uid = '{list['uid']}'""",
                 )
 
         if not self._update_calendars():
