@@ -151,7 +151,7 @@ class Details(Adw.Bin):
         # Start date row
         self.start_datetime_row = Adw.ActionRow(title=_("Not Set"), subtitle=_("Start"))
         self.start_datetime = DateTime()
-        self.start_datetime.connect("changed", self.on_start_time_changed)
+        self.start_datetime.connect("changed", self._on_start_time_changed)
         self.start_datetime_row.add_suffix(
             Gtk.MenuButton(
                 valign="center",
@@ -172,7 +172,7 @@ class Details(Adw.Bin):
         # End date row
         self.end_datetime_row = Adw.ActionRow(title=_("Not Set"), subtitle=_("Due"))
         self.end_datetime = DateTime()
-        self.end_datetime.connect("changed", self.on_end_time_changed)
+        self.end_datetime.connect("changed", self._on_end_time_changed)
         self.end_datetime_row.add_suffix(
             Gtk.MenuButton(
                 valign="center",
@@ -189,9 +189,7 @@ class Details(Adw.Bin):
             title=_("Complete %"),
             adjustment=Gtk.Adjustment(lower=0, upper=100, step_increment=1),
         )
-        self.percent_complete.connect(
-            "changed", lambda *_: self.save_btn.set_sensitive(True)
-        )
+        self.percent_complete.connect("changed", self._on_percent_complete_changed)
         props_group.add(self.percent_complete)
 
         # Priority row
@@ -199,7 +197,7 @@ class Details(Adw.Bin):
             title=_("Priority"),
             adjustment=Gtk.Adjustment(lower=0, upper=9, step_increment=1),
         )
-        self.priority.connect("changed", lambda *_: self.save_btn.set_sensitive(True))
+        self.priority.connect("changed", self._on_priority_changed)
         props_group.add(self.priority)
 
         # Tags group
@@ -316,12 +314,14 @@ class Details(Adw.Bin):
         text = self.edit_entry.props.text
         if text.strip(" \n\t") != "":
             self.parent.update_props(["text"], [text])
-            self.parent.task_row.set_title(Markup.find_url(Markup.escape(text)))
+            self.parent.task_row.task_row.set_title(
+                Markup.find_url(Markup.escape(text))
+            )
         else:
             self.edit_entry.set_text(self.parent.get_prop("text"))
         # Set completion
         pc = self.percent_complete.get_value()
-        self.parent.completed_btn.set_active(pc == 100)
+        self.parent.task_row.complete_btn.set_active(pc == 100)
         self.parent.update_props(["percent_complete"], [pc])
         self.percent_complete.set_value(pc)
         # Set tags
@@ -334,20 +334,12 @@ class Details(Adw.Bin):
         # Set new props
         self.parent.update_props(
             [
-                "start_date",
-                "end_date",
                 "notes",
-                "percent_complete",
-                "priority",
                 "tags",
                 "synced",
             ],
             [
-                self.start_datetime.get_datetime(),
-                self.end_datetime.get_datetime(),
                 self.notes.props.text,
-                int(self.percent_complete.get_value()),
-                int(self.priority.get_value()),
                 ",".join(tag_arr),
                 False,
             ],
@@ -356,30 +348,52 @@ class Details(Adw.Bin):
         # Sync
         Sync.sync()
 
-    def on_start_time_changed(self, *args):
+    def _on_percent_complete_changed(self, *args):
+        self.parent.update_props(
+            ["percent_complete", "synced"],
+            [int(self.percent_complete.get_value()), False],
+        )
+        Sync.sync()
+
+    def _on_priority_changed(self, *args):
+        self.parent.update_props(
+            ["priority", "synced"],
+            [int(self.priority.get_value()), False],
+        )
+        Sync.sync()
+
+    def _on_start_time_changed(self, *args):
         Log.debug("Details: change start time")
-        sdt = self.start_datetime.get_datetime_as_int()
-        edt = self.end_datetime.get_datetime_as_int()
+
+        sdt: int = self.start_datetime.get_datetime_as_int()
+        edt: int = self.end_datetime.get_datetime_as_int()
         if sdt > edt and edt != 0:
             self.end_datetime.set_datetime(self.start_datetime.get_datetime())
             self.end_datetime_row.set_title(self.end_datetime.get_human_datetime())
         self.start_datetime_row.set_title(self.start_datetime.get_human_datetime())
-        self.save_btn.set_sensitive(True)
+        self.parent.update_props(
+            ["start_date", "synced"], [self.start_datetime.get_datetime(), False]
+        )
+        Sync.sync()
 
-    def on_end_time_changed(self, *args):
+    def _on_end_time_changed(self, *args):
         Log.debug("Details: change end time")
-        sdt = self.start_datetime.get_datetime_as_int()
-        edt = self.end_datetime.get_datetime_as_int()
+
+        sdt: int = self.start_datetime.get_datetime_as_int()
+        edt: int = self.end_datetime.get_datetime_as_int()
         if edt < sdt and sdt != 0 and edt != 0:
             self.start_datetime.set_datetime(self.end_datetime.get_datetime())
             self.start_datetime_row.set_title(self.start_datetime.get_human_datetime())
         self.end_datetime_row.set_title(self.end_datetime.get_human_datetime())
-        self.save_btn.set_sensitive(True)
+        self.parent.update_props(
+            ["end_date", "synced"], [self.end_datetime.get_datetime(), False]
+        )
+        Sync.sync()
 
     def on_copy_text_clicked(self, _btn):
         Log.info("Details: Copy to clipboard")
         Gdk.Display.get_default().get_clipboard().set(self.parent.get_prop("text"))
-        self.window.add_toast(_("Copied to Clipboard"))  # pyright:ignore
+        self.task_list.window.add_toast(_("Copied to Clipboard"))  # pyright:ignore
 
     def on_delete_btn_clicked(self, _btn):
         self.parent.delete()
@@ -427,7 +441,7 @@ class Details(Adw.Bin):
             self.window.add_toast(_("Exported"))
 
         dialog = Gtk.FileDialog(initial_name=f"{self.parent.uid}.ics")
-        dialog.save(self.window, None, _confirm)
+        dialog.save(self.task_list.window, None, _confirm)
 
     def on_style_selected(self, btn: Gtk.Button, color: str) -> None:
         """
