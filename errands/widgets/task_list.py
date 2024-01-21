@@ -337,9 +337,8 @@ class TaskList(Adw.Bin):
                             t.tasks_list.add_sub_task(task_dict["uid"])
 
         # Update details
-        if (
-            not self.details.status.get_visible()
-            and not self.details.parent.get_reveal_child()
+        if self.details.parent and self.details.parent.uid in UserData.get_tasks_uids(
+            self.list_uid
         ):
             self.details.update_info(self.details.parent)
         else:
