@@ -40,5 +40,8 @@
     <key name="primary-action-show-sub-tasks" type="b">
       <default>false</default>
     </key>
+    <key name="task-big-toggle" type="b">
+      <default>true</default>
+    </key>
   </schema>
 </schemalist>

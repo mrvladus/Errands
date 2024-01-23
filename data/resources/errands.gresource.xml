@@ -24,5 +24,6 @@
     <file preprocess="xml-stripblanks" alias="errands-sidebar-left-symbolic.svg">icons/errands-sidebar-left-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-sidebar-right-symbolic.svg">icons/errands-sidebar-right-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-appearance-symbolic.svg">icons/errands-appearance-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-check-toggle-symbolic.svg">icons/errands-check-toggle-symbolic.svg</file>
   </gresource>
 </gresources>
