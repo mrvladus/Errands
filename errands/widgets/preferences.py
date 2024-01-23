@@ -1,6 +1,12 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from errands.widgets.window import Window
+
 from errands.lib.goa import get_goa_credentials
 from gi.repository import Adw, Gtk
 from errands.lib.sync.sync import Sync
@@ -8,11 +14,11 @@ from errands.lib.gsettings import GSettings
 
 
 class PreferencesWindow(Adw.PreferencesWindow):
-    selected_provider = 0
+    selected_provider: int = 0
 
-    def __init__(self, win: Adw.ApplicationWindow) -> None:
+    def __init__(self, win: Window) -> None:
         super().__init__()
-        self.window = win
+        self.window: Window = win
         self._build_ui()
         self._setup_sync()
 
@@ -21,13 +27,15 @@ class PreferencesWindow(Adw.PreferencesWindow):
         self.set_search_enabled(False)
 
         # Theme group
-        theme_group = Adw.PreferencesGroup(
+        theme_group: Adw.PreferencesGroup = Adw.PreferencesGroup(
             title=_("Application Theme"),
         )
         # System theme
-        self.theme_system_btn = Gtk.CheckButton(active=GSettings.get("theme") == 0)
+        self.theme_system_btn: Gtk.CheckButton = Gtk.CheckButton(
+            active=GSettings.get("theme") == 0
+        )
         self.theme_system_btn.connect("toggled", self.on_theme_change, 0)
-        theme_system_row = Adw.ActionRow(
+        theme_system_row: Adw.ActionRow = Adw.ActionRow(
             title=_("System"),
             icon_name="errands-theme-system-symbolic",
         )
@@ -35,11 +43,11 @@ class PreferencesWindow(Adw.PreferencesWindow):
         theme_system_row.set_activatable_widget(self.theme_system_btn)
         theme_group.add(theme_system_row)
         # Light theme
-        self.theme_light_btn = Gtk.CheckButton(
+        self.theme_light_btn: Gtk.CheckButton = Gtk.CheckButton(
             group=self.theme_system_btn, active=GSettings.get("theme") == 1
         )
         self.theme_light_btn.connect("toggled", self.on_theme_change, 1)
-        theme_light_row = Adw.ActionRow(
+        theme_light_row: Adw.ActionRow = Adw.ActionRow(
             title=_("Light"),
             icon_name="errands-theme-light-symbolic",
         )
@@ -51,7 +59,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
             group=self.theme_system_btn, active=GSettings.get("theme") == 4
         )
         self.theme_dark_btn.connect("toggled", self.on_theme_change, 4)
-        theme_dark_row = Adw.ActionRow(
+        theme_dark_row: Adw.ActionRow = Adw.ActionRow(
             title=_("Dark"),
             icon_name="errands-theme-dark-symbolic",
         )
@@ -176,15 +184,15 @@ class PreferencesWindow(Adw.PreferencesWindow):
         self.add(sync_page)
 
     def _setup_sync(self) -> None:
-        selected = self.sync_providers.props.selected
+        selected: int = self.sync_providers.props.selected
         self.sync_url.set_visible(0 < selected < 3)
         self.sync_username.set_visible(0 < selected < 3)
         self.sync_password.set_visible(0 < selected < 3)
         self.test_connection_row.set_visible(selected > 0)
 
         if self.sync_password.props.visible:
-            account = self.sync_providers.props.selected_item.props.string
-            password = GSettings.get_secret(account)
+            account: str = self.sync_providers.props.selected_item.props.string
+            password: str = GSettings.get_secret(account)
             with self.sync_password.freeze_notify():
                 self.sync_password.props.text = password if password else ""
 
@@ -215,5 +223,6 @@ class PreferencesWindow(Adw.PreferencesWindow):
         GSettings.set("theme", "i", theme)
 
     def _on_details_position_changed(self, row: Adw.ComboRow, *_) -> None:
-        self.window.split_view_inner.set_sidebar_position(row.get_selected())
+        for list in self.window.sidebar.task_lists._get_task_lists():
+            list.split_view.set_sidebar_position(row.get_selected())
         GSettings.set("right-sidebar", "b", bool(row.get_selected())),

@@ -110,7 +110,7 @@ class Details(Adw.Bin):
         text_copy_btn.connect("clicked", self._on_copy_clicked, self.edit_entry)
         # Save button
         self.text_save_btn = Gtk.Button(
-            icon_name="document-save-symbolic",
+            icon_name="errands-select-symbolic",
             tooltip_text=_("Save"),
             sensitive=False,
             css_classes=["suggested-action"],
@@ -146,7 +146,7 @@ class Details(Adw.Bin):
         notes_copy_btn.connect("clicked", self._on_copy_clicked, self.notes)
         # Save button
         self.notes_save_btn = Gtk.Button(
-            icon_name="document-save-symbolic",
+            icon_name="errands-select-symbolic",
             tooltip_text=_("Save"),
             sensitive=False,
             css_classes=["suggested-action"],
@@ -203,7 +203,7 @@ class Details(Adw.Bin):
         )
         self.percent_complete.connect("changed", self._on_percent_complete_changed)
         self.percent_complete_save_btn = Gtk.Button(
-            icon_name="object-select-symbolic",
+            icon_name="errands-select-symbolic",
             tooltip_text=_("Save"),
             sensitive=False,
             valign="center",
@@ -228,7 +228,7 @@ class Details(Adw.Bin):
         )
         self.priority.connect("changed", self._on_priority_changed)
         self.priority_save_btn = Gtk.Button(
-            icon_name="object-select-symbolic",
+            icon_name="errands-select-symbolic",
             tooltip_text=_("Save"),
             sensitive=False,
             valign="center",
