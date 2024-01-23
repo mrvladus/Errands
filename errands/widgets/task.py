@@ -96,24 +96,18 @@ class TaskTopDropArea(Gtk.Revealer):
         return True
 
 
-class TaskTitleRow(Gtk.ListBox):
+class TaskTitleRow(Gtk.Overlay):
     def __init__(self, task: Task):
         super().__init__()
         self.task: Task = task
         self._build_ui()
 
     def _build_ui(self):
-        self.set_selection_mode(Gtk.SelectionMode.NONE)
-        self.add_css_class("rounded-corners")
-        self.add_css_class("transparent")
-        self.set_accessible_role(Gtk.AccessibleRole.PRESENTATION)
-
         # Task Title Row
         self.task_row = Adw.ActionRow(
             title=Markup.find_url(Markup.escape(self.task.get_prop("text"))),
             css_classes=["rounded-corners", "transparent"],
             height_request=60,
-            tooltip_text=_("Click for Details"),
             accessible_role=Gtk.AccessibleRole.ROW,
             cursor=Gdk.Cursor.new_from_name("pointer"),
             use_markup=True,
@@ -145,11 +139,43 @@ class TaskTitleRow(Gtk.ListBox):
         self.task_row.add_prefix(self.complete_btn)
 
         # Suffix
-        self.expand_btn = TaskExpandButton(self.task)
         self.details_btn = TaskDetailsButton(self.task)
+        self.expand_btn = TaskExpandButton(self.task)
         self.task_row.add_suffix(Box(children=[self.expand_btn, self.details_btn]))
 
-        self.append(self.task_row)
+        self.expand_indicator = Gtk.Image(
+            icon_name="errands-up-symbolic",
+            css_classes=["expand-indicator"],
+            halign=Gtk.Align.END,
+            margin_end=55,
+        )
+        expand_indicator_rev = Gtk.Revealer(
+            child=self.expand_indicator,
+            transition_type=1,
+            reveal_child=False,
+            can_target=False,
+        )
+        GSettings.bind("primary-action-show-sub-tasks", expand_indicator_rev, "visible")
+        self.add_overlay(expand_indicator_rev)
+
+        # Expand indicator hover controller
+        hover_ctrl = Gtk.EventControllerMotion()
+        hover_ctrl.bind_property(
+            "contains-pointer",
+            expand_indicator_rev,
+            "reveal-child",
+            GObject.BindingFlags.SYNC_CREATE,
+        )
+        self.task_row.add_controller(hover_ctrl)
+
+        box = Gtk.ListBox(
+            selection_mode=Gtk.SelectionMode.NONE,
+            css_classes=["rounded-corners", "transparent"],
+            accessible_role=Gtk.AccessibleRole.PRESENTATION,
+        )
+        box.append(self.task_row)
+
+        self.set_child(box)
 
     def _on_row_clicked(self, *args) -> None:
         # Show sub-tasks if this is primary action
@@ -532,8 +558,10 @@ class Task(Gtk.Revealer):
         self.update_props(["expanded"], [expanded])
         if expanded:
             self.task_row.expand_btn.remove_css_class("rotate")
+            self.task_row.expand_indicator.remove_css_class("expand-indicator-expanded")
         else:
             self.task_row.expand_btn.add_css_class("rotate")
+            self.task_row.expand_indicator.add_css_class("expand-indicator-expanded")
 
     def purge(self) -> None:
         """Completely remove widget"""

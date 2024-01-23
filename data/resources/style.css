@@ -153,3 +153,13 @@ calendar header {
 .rotate {
   transform: rotate(180deg);
 }
+
+/* Expand indicator */
+
+.expand-indicator {
+  transition: 0.2s;
+}
+
+.expand-indicator-expanded {
+  transform: rotate(180deg);
+}
