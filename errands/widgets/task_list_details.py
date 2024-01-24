@@ -91,7 +91,7 @@ class Details(Adw.Bin):
         self.edit_entry.connect("changed", self._on_text_changed)
         edit_group.add(
             Gtk.TextView(
-                height_request=55,
+                height_request=100,
                 top_margin=12,
                 bottom_margin=12,
                 left_margin=12,

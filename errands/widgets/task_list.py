@@ -152,10 +152,7 @@ class TaskList(Adw.Bin):
         self.scrl.add_controller(self.dnd_ctrl)
 
         # Tasks list
-        self.tasks_list = Gtk.Box(
-            orientation="vertical",
-            hexpand=True,
-        )
+        self.tasks_list = Gtk.Box(orientation="vertical", hexpand=True, vexpand=True)
         self.tasks_list.add_css_class("tasks-list")
         self.scrl.set_child(
             Adw.Clamp(

@@ -147,7 +147,8 @@ class TaskTitleRow(Gtk.Overlay):
             icon_name="errands-up-symbolic",
             css_classes=["expand-indicator"],
             halign=Gtk.Align.END,
-            margin_end=55,
+            margin_end=23,
+            margin_top=45,
         )
         expand_indicator_rev = Gtk.Revealer(
             child=self.expand_indicator,
