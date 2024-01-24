@@ -106,19 +106,10 @@ class Details(Adw.Bin):
             icon_name="errands-copy-symbolic",
             valign="center",
             tooltip_text=_("Copy Text"),
+            css_classes=["flat"],
         )
         text_copy_btn.connect("clicked", self._on_copy_clicked, self.edit_entry)
-        # Save button
-        self.text_save_btn = Gtk.Button(
-            icon_name="errands-select-symbolic",
-            tooltip_text=_("Save"),
-            sensitive=False,
-            css_classes=["suggested-action"],
-        )
-        self.text_save_btn.connect("clicked", self._on_text_saved)
-        edit_group.set_header_suffix(
-            Box(children=[self.text_save_btn, text_copy_btn], css_classes=["linked"])
-        )
+        edit_group.set_header_suffix(text_copy_btn)
 
         # Notes group
         notes_group = Adw.PreferencesGroup(title=_("Notes"))
@@ -142,19 +133,10 @@ class Details(Adw.Bin):
             icon_name="errands-copy-symbolic",
             valign="center",
             tooltip_text=_("Copy Text"),
+            css_classes=["flat"],
         )
         notes_copy_btn.connect("clicked", self._on_copy_clicked, self.notes)
-        # Save button
-        self.notes_save_btn = Gtk.Button(
-            icon_name="errands-select-symbolic",
-            tooltip_text=_("Save"),
-            sensitive=False,
-            css_classes=["suggested-action"],
-        )
-        self.notes_save_btn.connect("clicked", self._on_notes_saved)
-        notes_group.set_header_suffix(
-            Box(children=[self.notes_save_btn, notes_copy_btn], css_classes=["linked"])
-        )
+        notes_group.set_header_suffix(notes_copy_btn)
 
         # Properties group
         props_group = Adw.PreferencesGroup(title=_("Properties"))
@@ -202,22 +184,7 @@ class Details(Adw.Bin):
             adjustment=Gtk.Adjustment(lower=0, upper=100, step_increment=1),
         )
         self.percent_complete.connect("changed", self._on_percent_complete_changed)
-        self.percent_complete_save_btn = Gtk.Button(
-            icon_name="errands-select-symbolic",
-            tooltip_text=_("Save"),
-            sensitive=False,
-            valign="center",
-            css_classes=["suggested-action", "circular"],
-        )
-        self.percent_complete_save_btn.connect(
-            "clicked", self._on_percent_complete_saved
-        )
-        percent_complete_row.add_suffix(
-            Box(
-                children=[self.percent_complete, self.percent_complete_save_btn],
-                spacing=12,
-            )
-        )
+        percent_complete_row.add_suffix(self.percent_complete)
         props_group.add(percent_complete_row)
 
         # Priority row
@@ -227,20 +194,7 @@ class Details(Adw.Bin):
             adjustment=Gtk.Adjustment(lower=0, upper=9, step_increment=1),
         )
         self.priority.connect("changed", self._on_priority_changed)
-        self.priority_save_btn = Gtk.Button(
-            icon_name="errands-select-symbolic",
-            tooltip_text=_("Save"),
-            sensitive=False,
-            valign="center",
-            css_classes=["suggested-action", "circular"],
-        )
-        self.priority_save_btn.connect("clicked", self._on_priority_saved)
-        priority_row.add_suffix(
-            Box(
-                children=[self.priority, self.priority_save_btn],
-                spacing=12,
-            )
-        )
+        priority_row.add_suffix(self.priority)
         props_group.add(priority_row)
 
         # Tags group
@@ -316,13 +270,63 @@ class Details(Adw.Bin):
         tag.add_suffix(delete_btn)
         self.tags.add(tag)
 
-    def update_info(self, parent: Task):
-        self.can_sync = False
-        self.parent = parent
+    def save(self):
+        # Text
+        old_text: str = self.parent.get_prop("text")
+        text: str = self.edit_entry.props.text
+        if text.strip(" \n\t") and text != old_text:
+            self.parent.task_row.task_row.set_title(
+                Markup.find_url(Markup.escape(text))
+            )
 
+        # Notes
+        old_notes: str = self.parent.get_prop("notes")
+        notes: str = self.notes.props.text
+
+        # Percent complete
+        pc = self.percent_complete.get_value_as_int()
+        self.parent.can_sync = False
+        self.parent.task_row.complete_btn.set_active(pc == 100)
+        self.parent.can_sync = True
+
+        # Save props
+        self.parent.update_props(
+            [
+                "text",
+                "notes",
+                "completed",
+                "start_date",
+                "end_date",
+                "percent_complete",
+                "priority",
+                "synced",
+            ],
+            [
+                text if text.strip(" \n\t") and text != old_text else old_text,
+                notes if notes.strip(" \n\t") and notes != old_notes else old_notes,
+                self.parent.task_row.complete_btn.get_active(),
+                self.start_datetime.get_datetime(),
+                self.end_datetime.get_datetime(),
+                pc,
+                self.priority.get_value_as_int(),
+                False,
+            ],
+        )
+
+        Sync.sync()
+
+    def update_info(self, parent: Task):
+        # Show status on empty task
         if parent == None:
             self.status.set_visible(True)
             return
+
+        # Save data on task change
+        if self.parent != None:
+            self.save()
+
+        self.can_sync = False
+        self.parent = parent
 
         Log.debug("Details: Update info")
 
@@ -336,10 +340,8 @@ class Details(Adw.Bin):
         self.end_datetime.set_datetime(self.parent.get_prop("end_date"))
         self.end_datetime_row.set_title(self.end_datetime.get_human_datetime())
         # Percent complete
-        self.percent_complete_save_btn.set_sensitive(False)
         self.percent_complete.set_value(self.parent.get_prop("percent_complete"))
         # Priority
-        self.priority_save_btn.set_sensitive(False)
         self.priority.set_value(self.parent.get_prop("priority"))
         self.status.set_visible(False)
         # Tags
@@ -357,59 +359,22 @@ class Details(Adw.Bin):
     def _on_text_changed(self, buffer: Gtk.TextBuffer):
         if not self.can_sync:
             return
-        text = buffer.props.text.strip(" \n\t")
-        self.text_save_btn.set_sensitive(
-            text != "" and text != self.parent.get_prop("text")
-        )
-
-    def _on_text_saved(self, btn: Gtk.Button):
-        btn.set_sensitive(False)
-        text: str = self.edit_entry.props.text
-        self.parent.update_props(["text", "synced"], [text, False])
-        self.parent.task_row.task_row.set_title(Markup.find_url(Markup.escape(text)))
-        Sync.sync()
+        self.save()
 
     def _on_notes_changed(self, buffer: Gtk.TextBuffer):
         if not self.can_sync:
             return
-        text = buffer.props.text.strip(" \n\t")
-        self.notes_save_btn.set_sensitive(
-            text != "" and text != self.parent.get_prop("notes")
-        )
-
-    def _on_notes_saved(self, btn: Gtk.Button):
-        btn.set_sensitive(False)
-        self.parent.update_props(["notes", "synced"], [self.notes.props.text, False])
-        Sync.sync()
+        self.save()
 
     def _on_percent_complete_changed(self, _):
         if not self.can_sync:
             return
-        self.percent_complete_save_btn.set_sensitive(
-            int(self.percent_complete.get_value())
-            != self.parent.get_prop("percent_complete")
-        )
-
-    def _on_percent_complete_saved(self, btn: Gtk.Button):
-        self.percent_complete_save_btn.set_sensitive(False)
-        pc = int(self.percent_complete.get_value())
-        self.parent.task_row.complete_btn.set_active(pc == 100)
-        self.parent.update_props(["percent_complete", "synced"], [pc, False])
-        Sync.sync()
+        self.save()
 
     def _on_priority_changed(self, row: Adw.SpinRow):
         if not self.can_sync:
             return
-        self.priority_save_btn.set_sensitive(
-            int(self.priority.get_value()) != self.parent.get_prop("priority")
-        )
-
-    def _on_priority_saved(self, btn: Gtk.Button):
-        self.priority_save_btn.set_sensitive(False)
-        self.parent.update_props(
-            ["priority", "synced"], [int(self.priority.get_value()), False]
-        )
-        Sync.sync()
+        self.save()
 
     def _on_start_time_changed(self, *args):
         if not self.can_sync:
@@ -423,10 +388,7 @@ class Details(Adw.Bin):
             self.end_datetime.set_datetime(self.start_datetime.get_datetime())
             self.end_datetime_row.set_title(self.end_datetime.get_human_datetime())
         self.start_datetime_row.set_title(self.start_datetime.get_human_datetime())
-        self.parent.update_props(
-            ["start_date", "synced"], [self.start_datetime.get_datetime(), False]
-        )
-        Sync.sync()
+        self.save()
 
     def _on_end_time_changed(self, *args):
         if not self.can_sync:
@@ -440,15 +402,12 @@ class Details(Adw.Bin):
             self.start_datetime.set_datetime(self.end_datetime.get_datetime())
             self.start_datetime_row.set_title(self.start_datetime.get_human_datetime())
         self.end_datetime_row.set_title(self.end_datetime.get_human_datetime())
-        self.parent.update_props(
-            ["end_date", "synced"], [self.end_datetime.get_datetime(), False]
-        )
-        Sync.sync()
+        self.save()
 
     def _on_copy_clicked(self, _btn, buffer: Gtk.TextBuffer):
         Log.info("Details: Copy to clipboard")
         Gdk.Display.get_default().get_clipboard().set(buffer.props.text)
-        self.task_list.window.add_toast(_("Copied to Clipboard"))  # pyright:ignore
+        self.task_list.window.add_toast(_("Copied to Clipboard"))
 
     def _on_delete_btn_clicked(self, _btn):
         self.parent.delete()
@@ -511,26 +470,32 @@ class Details(Adw.Bin):
         self.parent.update_props(["color", "synced"], [color, False])
         Sync.sync()
 
+    # --- Tags --- #
+
     def _on_tag_added(self, entry: Adw.EntryRow) -> None:
         text = entry.get_text().strip(" \n\t")
         if text == "":
             return
-        Log.debug("Add tag")
+        Log.debug("Details: Add tag")
         self.add_tag(entry.get_text())
         entry.set_text("")
         self._save_tags()
 
     def _on_tag_deleted(self, btn, tag):
-        Log.debug("Remove tag")
+        Log.debug("Details: Remove tag")
         self.tags.remove(tag)
         self._save_tags()
 
     def _save_tags(self):
-        tag_arr: list[str] = []
-        for i, row in enumerate(get_children(self.tag_entry.get_parent())):
-            # Skip entry
-            if i == 0:
-                continue
-            tag_arr.append(row.get_title())
-        # Set new props
-        self.parent.update_props(["tags", "synced"], [",".join(tag_arr), False])
+        self.parent.update_props(
+            ["tags", "synced"],
+            [
+                ",".join(
+                    [
+                        r.get_title()
+                        for r in get_children(self.tag_entry.get_parent())[1:]
+                    ]
+                ),
+                False,
+            ],
+        )
