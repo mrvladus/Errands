@@ -281,10 +281,6 @@ class Details(Adw.Bin):
                 Markup.find_url(Markup.escape(text))
             )
 
-        # Notes
-        old_notes: str = self.parent.get_prop("notes")
-        notes: str = self.notes.props.text
-
         # Percent complete
         pc = self.percent_complete.get_value_as_int()
         self.parent.can_sync = False
@@ -305,7 +301,7 @@ class Details(Adw.Bin):
             ],
             [
                 text if text.strip(" \n\t") and text != old_text else old_text,
-                notes if notes.strip(" \n\t") and notes != old_notes else old_notes,
+                self.notes.props.text,
                 self.parent.task_row.complete_btn.get_active(),
                 self.start_datetime.get_datetime(),
                 self.end_datetime.get_datetime(),

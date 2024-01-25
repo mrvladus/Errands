@@ -134,7 +134,10 @@ class UserData:
             with cls.connection:
                 cur = cls.connection.cursor()
                 for cmd in cmds:
-                    cur.execute(cmd)
+                    if isinstance(cmd, tuple):
+                        cur.execute(cmd[0], cmd[1])
+                    else:
+                        cur.execute(cmd)
                 return cur.fetchall() if fetch else None
         except Exception as e:
             Log.error(f"Data: {e}")
