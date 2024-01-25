@@ -272,6 +272,7 @@ class Details(Adw.Bin):
 
     def save(self):
         Log.debug("Details: Save")
+
         # Text
         old_text: str = self.parent.get_prop("text")
         text: str = self.edit_entry.props.text
@@ -496,3 +497,4 @@ class Details(Adw.Bin):
                 False,
             ],
         )
+        Sync.sync()
