@@ -164,6 +164,7 @@ class SidebarTaskLists(Adw.Bin):
         self._build_ui()
         self._add_actions()
         self._load_lists()
+        self.update_ui()
 
     def _add_actions(self) -> None:
         group = Gio.SimpleActionGroup()
