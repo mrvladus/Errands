@@ -271,6 +271,7 @@ class Details(Adw.Bin):
         self.tags.add(tag)
 
     def save(self):
+        Log.debug("Details: Save")
         # Text
         old_text: str = self.parent.get_prop("text")
         text: str = self.edit_entry.props.text
@@ -320,10 +321,6 @@ class Details(Adw.Bin):
         if parent == None:
             self.status.set_visible(True)
             return
-
-        # Save data on task change
-        if self.parent != None:
-            self.save()
 
         self.can_sync = False
         self.parent = parent

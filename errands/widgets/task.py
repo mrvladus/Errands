@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from errands.widgets.task_list import TaskList
     from errands.widgets.window import Window
 
-from errands.widgets.components import Box, Button
+from errands.widgets.components import Box
 from gi.repository import Gtk, Adw, Gdk, GObject
 from errands.lib.sync.sync import Sync
 from errands.lib.logging import Log
@@ -613,10 +613,15 @@ class Task(Gtk.Revealer):
         n_completed: int = len(
             [t for t in sub_tasks if not t["trash"] and t["completed"]]
         )
-        self.update_props(
-            ["percent_complete"],
-            [int(n_completed / n_total * 100) if n_total > 0 else 0],
-        )
         self.task_row.task_row.set_subtitle(
             _("Completed:") + f" {n_completed} / {n_total}" if n_total > 0 else ""
+        )
+        self.update_props(
+            ["percent_complete", "synced"],
+            [
+                int(n_completed / n_total * 100)
+                if n_total > 0
+                else self.get_prop("percent_complete"),
+                False,
+            ],
         )

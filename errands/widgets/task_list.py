@@ -3,7 +3,7 @@
 
 from errands.lib.sync.sync import Sync
 from errands.widgets.components import Box
-from errands.widgets.task_list_details import Details
+from errands.widgets.details import Details
 from gi.repository import Adw, Gtk, GLib, GObject
 from errands.utils.animation import scroll
 from errands.utils.data import UserData

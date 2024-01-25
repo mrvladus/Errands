@@ -19,10 +19,12 @@ from gi.repository import GLib
 class Sync:
     provider = None
     window: Window = None
+    syncing: bool = False
+    sync_again: bool = False
 
     @classmethod
-    def init(self, window, testing: bool = False) -> None:
-        self.window = window
+    def init(self, window: Window, testing: bool = False) -> None:
+        self.window: Window = window
         Log.info("Sync: Initialize sync provider")
         match GSettings.get("sync-provider"):
             case 0:
@@ -54,15 +56,25 @@ class Sync:
                 self.window.sidebar.header_bar.sync_indicator.set_visible, False
             )
         if self.provider and self.provider.can_sync:
+            if self.syncing:
+                self.sync_again = True
+                return
+            self.syncing = True
             GLib.idle_add(
                 self.window.sidebar.header_bar.sync_indicator.set_visible, True
             )
+            if self.syncing:
+                self.sync_again = True
             self.provider.sync()
-            GLib.idle_add(self.window.sidebar.task_lists.update_ui)
             UserData.clean_deleted()
+            if self.sync_again:
+                self.provider.sync()
+                self.sync_again = False
+            GLib.idle_add(self.window.sidebar.task_lists.update_ui)
             GLib.idle_add(
                 self.window.sidebar.header_bar.sync_indicator.set_visible, False
             )
+            self.syncing = False
 
     @classmethod
     def test_connection(self) -> bool:
