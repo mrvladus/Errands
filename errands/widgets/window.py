@@ -46,12 +46,7 @@ class Window(Adw.ApplicationWindow):
 
         # Trash
         self.trash = Trash(self)
-        self.stack.add_titled(self.trash, name="trash", title="Trash")
-
-        # Lists
-        self.sidebar = Sidebar(self)
-        self.split_view.set_sidebar(Adw.NavigationPage.new(self.sidebar, "Lists"))
-        self.split_view.set_content(Adw.NavigationPage.new(self.stack, "Tasks"))
+        self.stack.add_titled(self.trash, name="trash", title=_("Trash"))
 
         # Status page Toolbar View
         status_toolbar_view = Adw.ToolbarView(
@@ -77,6 +72,11 @@ class Window(Adw.ApplicationWindow):
             title=_("No Task Lists"),
         )
         self.stack.set_visible_child_name("status")
+
+        # Lists
+        self.sidebar = Sidebar(self)
+        self.split_view.set_sidebar(Adw.NavigationPage.new(self.sidebar, _("Lists")))
+        self.split_view.set_content(Adw.NavigationPage.new(self.stack, _("Tasks")))
 
         # Toast overlay
         self.toast_overlay = Adw.ToastOverlay(child=self.split_view)

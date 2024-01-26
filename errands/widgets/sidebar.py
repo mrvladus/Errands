@@ -31,7 +31,8 @@ class Sidebar(Adw.Bin):
 
     def _build_ui(self):
         # Components
-        self.task_lists: SidebarTaskLists = SidebarTaskLists(self.window)
+        self.status_page: SidebarStatusPage = SidebarStatusPage(self)
+        self.task_lists: SidebarTaskLists = SidebarTaskLists(self)
         self.header_bar: SidebarHeaderBar = SidebarHeaderBar(
             self.task_lists, self.window
         )
@@ -40,12 +41,16 @@ class Sidebar(Adw.Bin):
         )
         # Toolbar view
         toolbar_view: Adw.ToolbarView = Adw.ToolbarView(
-            content=Gtk.ScrolledWindow(
-                child=self.task_lists, propagate_natural_height=True
+            content=Box(
+                children=[
+                    self.status_page,
+                    self.task_lists,
+                    self.trash_button,
+                ],
+                orientation=Gtk.Orientation.VERTICAL,
             )
         )
         toolbar_view.add_top_bar(self.header_bar)
-        toolbar_view.add_bottom_bar(self.trash_button)
         self.set_child(toolbar_view)
 
 
@@ -157,10 +162,28 @@ class SidebarHeaderBar(Adw.Bin):
         dialog.present()
 
 
-class SidebarTaskLists(Adw.Bin):
-    def __init__(self, window: Window):
+class SidebarStatusPage(Adw.Bin):
+    def __init__(self, sidebar: Sidebar):
         super().__init__()
-        self.window: Window = window
+        self.sidebar: Sidebar = sidebar
+        self._build_ui()
+
+    def _build_ui(self) -> None:
+        status_page: Adw.StatusPage = Adw.StatusPage(
+            title=_("Add new List"),
+            description=_('Click "+" button'),
+            icon_name="errands-lists-symbolic",
+            css_classes=["compact"],
+            vexpand=True,
+        )
+        self.set_child(status_page)
+
+
+class SidebarTaskLists(Gtk.ScrolledWindow):
+    def __init__(self, sidebar: Sidebar):
+        super().__init__()
+        self.sidebar: Sidebar = sidebar
+        self.window: Window = sidebar.window
         self._build_ui()
         self._add_actions()
         self._load_lists()
@@ -265,25 +288,20 @@ class SidebarTaskLists(Adw.Bin):
         _create_action("import", _import)
 
     def _build_ui(self) -> None:
+        self.set_propagate_natural_height(True)
+        self.set_vexpand(True)
         # Lists
         self.lists: Gtk.ListBox = Gtk.ListBox(css_classes=["navigation-sidebar"])
-        self.lists.connect("row-selected", self.on_list_swiched)
-
-        # Status page
-        self.status_page: Adw.StatusPage = Adw.StatusPage(
-            title=_("Add new List"),
-            description=_('Click "+" button'),
-            icon_name="errands-lists-symbolic",
-            css_classes=["compact"],
-            vexpand=True,
+        self.lists.connect("row-selected", self._on_row_selected)
+        self.bind_property(
+            "visible",
+            self.sidebar.status_page,
+            "visible",
+            GObject.BindingFlags.SYNC_CREATE
+            | GObject.BindingFlags.INVERT_BOOLEAN
+            | GObject.BindingFlags.BIDIRECTIONAL,
         )
-
-        self.set_child(
-            Box(
-                children=[self.lists, self.status_page],
-                orientation=Gtk.Orientation.VERTICAL,
-            )
-        )
+        self.set_child(self.lists)
 
     def add_list(self, name, uid) -> SidebarTaskListsItem:
         task_list: TaskList = TaskList(self.window, uid, self)
@@ -300,14 +318,14 @@ class SidebarTaskLists(Adw.Bin):
         self.lists.append(row)
         return row
 
-    def on_list_swiched(self, _, row: Gtk.ListBoxRow) -> None:
+    def _on_row_selected(self, _, row: Gtk.ListBoxRow) -> None:
         Log.debug("Lists: Switch list")
         if row:
             name = row.label.get_label()
             self.window.stack.set_visible_child_name(name)
             self.window.split_view.set_show_content(True)
             GSettings.set("last-open-list", "s", name)
-            self.status_page.set_visible(False)
+            self.sidebar.status_page.set_visible(False)
 
     def _get_task_lists(self) -> list[TaskList]:
         lists: list[TaskList] = []
@@ -329,7 +347,7 @@ class SidebarTaskLists(Adw.Bin):
             row: SidebarTaskListsItem = self.add_list(l["name"], l["uid"])
             if GSettings.get("last-open-list") == l["name"]:
                 self.lists.select_row(row)
-        self.status_page.set_visible(len(lists) == 0)
+        self.sidebar.status_page.set_visible(len(lists) == 0)
 
     def update_ui(self) -> None:
         Log.debug("Lists: Update UI...")
@@ -359,11 +377,11 @@ class SidebarTaskLists(Adw.Bin):
                 row: SidebarTaskListsItem = self.add_list(l["name"], l["uid"])
                 self.lists.select_row(row)
                 self.window.stack.set_visible_child_name(l["name"])
-                self.status_page.set_visible(False)
+                self.sidebar.status_page.set_visible(False)
 
         # Show status
         length: int = len(self._get_task_lists_items())
-        self.status_page.set_visible(length == 0)
+        self.sidebar.status_page.set_visible(length == 0)
         if length == 0:
             self.window.stack.set_visible_child_name("status")
 
@@ -408,7 +426,7 @@ class SidebarTaskListsItem(Gtk.ListBoxRow):
                     self.list_box.select_row(next_row or prev_row)
                 else:
                     self.window.stack.set_visible_child_name("status")
-                    self.task_lists.status_page.set_visible(True)
+                    self.task_lists.sidebar.status_page.set_visible(True)
 
                 # Remove items from trash
                 for item in get_children(self.window.trash.trash_list):
@@ -623,6 +641,12 @@ class SidebarTrashButton(Gtk.Button):
         self.set_margin_bottom(6)
         self.set_margin_start(6)
         self.set_margin_end(6)
+        self.task_lists.bind_property(
+            "visible",
+            self,
+            "visible",
+            GObject.BindingFlags.SYNC_CREATE,
+        )
 
         # Drop controller
         trash_drop_ctrl = Gtk.DropTarget.new(actions=Gdk.DragAction.MOVE, type=Task)
