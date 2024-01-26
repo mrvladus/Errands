@@ -63,14 +63,12 @@ class Sync:
             GLib.idle_add(
                 self.window.sidebar.header_bar.sync_indicator.set_visible, True
             )
-            if self.syncing:
-                self.sync_again = True
             self.provider.sync()
             UserData.clean_deleted()
-            if self.sync_again:
-                self.provider.sync()
-                self.sync_again = False
             GLib.idle_add(self.window.sidebar.task_lists.update_ui)
+            if self.sync_again:
+                self.sync()
+                self.sync_again = False
             GLib.idle_add(
                 self.window.sidebar.header_bar.sync_indicator.set_visible, False
             )
