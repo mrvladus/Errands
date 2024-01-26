@@ -301,6 +301,7 @@ class TaskList(Adw.Bin):
         # Update existing tasks
         tasks_widgets: list[Task] = self.get_all_tasks()
         for task in tasks_widgets:
+            task.task_row.add_rm_crossline(task.get_prop("completed"))
             # Update widget title and completed toggle
             if task.task_row.complete_btn.get_active() != task.get_prop("completed"):
                 task.just_added = True

@@ -159,6 +159,9 @@ class UserData:
 
     @classmethod
     def get_tasks_uids_tree(cls, list_uid: str, parent: str) -> list[str]:
+        """
+        Get all sub-task recursively
+        """
         # Log.debug(f"Data: Get tasks uids tree for '{parent}'")
 
         uids: list[str] = []

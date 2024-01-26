@@ -102,6 +102,12 @@ class TaskTitleRow(Gtk.Overlay):
         self.task: Task = task
         self._build_ui()
 
+    def add_rm_crossline(self, add: bool) -> None:
+        if add:
+            self.task_row.add_css_class("task-completed")
+        else:
+            self.task_row.remove_css_class("task-completed")
+
     def _build_ui(self):
         # Task Title Row
         self.task_row = Adw.ActionRow(
@@ -112,6 +118,7 @@ class TaskTitleRow(Gtk.Overlay):
             cursor=Gdk.Cursor.new_from_name("pointer"),
             use_markup=True,
         )
+        self.add_rm_crossline(self.task.get_prop("completed"))
 
         # Drag controller
         task_row_drag_source: Gtk.DragSource = Gtk.DragSource.new()
@@ -270,7 +277,7 @@ class TaskCompleteButton(Gtk.Box):
             css_classes=["selection-mode"],
         )
         GSettings.bind("task-big-toggle", self.big_btn, "visible")
-        self.big_btn.connect("toggled", self.on_toggle)
+        self.big_btn.connect("toggled", self._on_toggle)
         self.append(self.big_btn)
 
         # Small button
@@ -288,49 +295,67 @@ class TaskCompleteButton(Gtk.Box):
         GSettings.bind("task-big-toggle", small_btn, "visible", True)
         self.append(small_btn)
 
-    def on_toggle(self, btn: Gtk.CheckButton) -> None:
+    def _on_toggle(self, btn: Gtk.CheckButton) -> None:
         Log.debug(f"Task '{self.task.uid}': Set completed to '{self.get_active()}'")
 
-        def _set_crossline():
-            if self.get_active():
-                self.parent.add_css_class("task-completed")
-            else:
-                self.parent.remove_css_class("task-completed")
-
         # If task is just added set crossline and return to avoid sync loop
-        _set_crossline()
+        self.task.task_row.add_rm_crossline(self.get_active())
         if self.task.just_added:
             return
 
-        # Update data
         self.task.update_props(["completed", "synced"], [self.get_active(), False])
+        sub_tasks: list[Task] = self.task.tasks_list.get_all_sub_tasks()
 
-        # Uncomplete parent if sub-task is uncompleted
-        if self.task.get_prop("parent"):
-            if not self.get_active():
-                self.task.parent.can_sync = False
-                self.task.parent.task_row.complete_btn.set_active(False)
-                self.task.parent.can_sync = True
-            self.task.parent.update_status()
-
-        # Get visible sub-tasks
-        sub_tasks: list[Task] = [
-            t for t in self.task.tasks_list.get_sub_tasks() if t.get_reveal_child()
-        ]
-
-        # Complete sub-tasks if self is completed, but not uncomplete
         if self.get_active():
-            for task in sub_tasks:
-                task.can_sync = False
-                task.task_row.complete_btn.set_active(True)
-                task.can_sync = True
+            # Complete all sub-tasks
+            for sub in sub_tasks:
+                sub.just_added = True
+                sub.task_row.complete_btn.set_active(True)
+                sub.task_row.add_rm_crossline(True)
+                sub.just_added = False
+                sub.update_props(["completed", "synced"], [True, False])
+        else:
+            # Uncomplete parent if sub-task is uncompleted
+            if isinstance(self.task.parent, Task):
+                self.task.parent.just_added = True
+                self.task.parent.task_row.complete_btn.set_active(False)
+                self.task.parent.task_row.add_rm_crossline(False)
+                self.task.parent.just_added = False
+                self.task.parent.update_props(["completed", "synced"], [False, False])
 
-        # Sync
-        if self.task.can_sync:
-            self.task.update_status()
-            self.task.task_list.update_status()
-            self.task.details.update_info(self.task.details.parent)
-            Sync.sync()
+        # Calculate completion percent for parent
+        if isinstance(self.task.parent, Task):
+            total, completed = self.task.parent.get_status()
+            pc: int = (
+                completed / total * 100
+                if total > 0
+                else self.task.parent.get_prop("percent_complete")
+            )
+            self.task.parent.update_props(["percent_complete", "synced"], [pc, False])
+
+        # Calculate completion percent for self
+        total, completed = self.task.get_status()
+        pc: int = (
+            completed / total * 100
+            if total > 0
+            else (100 if self.task.get_prop("completed") else 0)
+        )
+        self.task.update_props(["percent_complete", "synced"], [pc, False])
+
+        # Calculate completion percent for sub-tasks
+        for sub in sub_tasks:
+            total, completed = sub.get_status()
+            pc: int = (
+                completed / total * 100
+                if total > 0
+                else (100 if self.task.get_prop("completed") else 0)
+            )
+            sub.update_props(["percent_complete", "synced"], [pc, False])
+
+        self.task.details.update_info(self.task.details.parent)
+        self.task.parent.update_status()
+        self.task.update_status()
+        Sync.sync()
 
 
 class TaskExpandButton(Gtk.Button):
@@ -567,6 +592,39 @@ class Task(Gtk.Revealer):
             res = bool(res)
         return res
 
+    def get_status(self) -> tuple[int, int]:
+        """Get total tasks and completed tasks tuple"""
+
+        # sub_tasks: list[dict] = [
+        #     t
+        #     for t in UserData.get_tasks_as_dicts(self.list_uid, self.uid)
+        #     if not t["deleted"]
+        # ]
+        # total: int = len([t for t in sub_tasks if not t["trash"]])
+        # completed: int = len(
+        #     [t for t in sub_tasks if not t["trash"] and t["completed"]]
+        # )
+
+        total: int = UserData.run_sql(
+            f"""SELECT COUNT(*) FROM tasks
+            WHERE list_uid = '{self.list_uid}'
+            AND parent = '{self.uid}'
+            AND trash = 0
+            AND deleted = 0""",
+            fetch=True,
+        )[0][0]
+        completed: int = UserData.run_sql(
+            f"""SELECT COUNT(*) FROM tasks
+            WHERE list_uid = '{self.list_uid}'
+            AND parent = '{self.uid}'
+            AND trash = 0
+            AND deleted = 0
+            AND completed = 1""",
+            fetch=True,
+        )[0][0]
+
+        return total, completed
+
     def delete(self, *_) -> None:
         """Move task to trash"""
 
@@ -604,24 +662,7 @@ class Task(Gtk.Revealer):
         UserData.update_props(self.list_uid, self.uid, props, values)
 
     def update_status(self) -> None:
-        sub_tasks: list[dict] = [
-            t
-            for t in UserData.get_tasks_as_dicts(self.list_uid, self.uid)
-            if not t["deleted"]
-        ]
-        n_total: int = len([t for t in sub_tasks if not t["trash"]])
-        n_completed: int = len(
-            [t for t in sub_tasks if not t["trash"] and t["completed"]]
-        )
+        total, completed = self.get_status()
         self.task_row.task_row.set_subtitle(
-            _("Completed:") + f" {n_completed} / {n_total}" if n_total > 0 else ""
-        )
-        self.update_props(
-            ["percent_complete", "synced"],
-            [
-                int(n_completed / n_total * 100)
-                if n_total > 0
-                else self.get_prop("percent_complete"),
-                False,
-            ],
+            _("Completed:") + f" {completed} / {total}" if total > 0 else ""
         )
