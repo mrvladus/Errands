@@ -305,6 +305,7 @@ class TaskCompleteButton(Gtk.Box):
 
         self.task.update_props(["completed", "synced"], [self.get_active(), False])
         sub_tasks: list[Task] = self.task.tasks_list.get_all_sub_tasks()
+        parents: list[Task] = self.task.get_parents_tree()
 
         if self.get_active():
             # Complete all sub-tasks
@@ -316,22 +317,23 @@ class TaskCompleteButton(Gtk.Box):
                 sub.update_props(["completed", "synced"], [True, False])
         else:
             # Uncomplete parent if sub-task is uncompleted
-            if isinstance(self.task.parent, Task):
-                self.task.parent.just_added = True
-                self.task.parent.task_row.complete_btn.set_active(False)
-                self.task.parent.task_row.add_rm_crossline(False)
-                self.task.parent.just_added = False
-                self.task.parent.update_props(["completed", "synced"], [False, False])
+            for parent in parents:
+                parent.just_added = True
+                parent.task_row.complete_btn.set_active(False)
+                parent.task_row.add_rm_crossline(False)
+                parent.just_added = False
+                parent.update_props(["completed", "synced"], [False, False])
 
-        # Calculate completion percent for parent
-        if isinstance(self.task.parent, Task):
-            total, completed = self.task.parent.get_status()
+        # Calculate completion percent for parents
+        for parent in parents:
+            total, completed = parent.get_status()
             pc: int = (
                 completed / total * 100
                 if total > 0
-                else self.task.parent.get_prop("percent_complete")
+                else parent.get_prop("percent_complete")
             )
-            self.task.parent.update_props(["percent_complete", "synced"], [pc, False])
+            parent.update_props(["percent_complete", "synced"], [pc, False])
+            parent.update_status()
 
         # Calculate completion percent for self
         total, completed = self.task.get_status()
@@ -586,6 +588,20 @@ class Task(Gtk.Revealer):
             )
         )
 
+    def get_parents_tree(self) -> list[Task]:
+        """Get parent tasks chain"""
+
+        parents: list[Task] = []
+
+        def _add(task: Task):
+            if isinstance(task.parent, Task):
+                parents.append(task.parent)
+                _add(task.parent)
+
+        _add(self)
+
+        return parents
+
     def get_prop(self, prop: str) -> Any:
         res: Any = UserData.get_prop(self.list_uid, self.uid, prop)
         if prop in "deleted completed expanded trash":
@@ -594,16 +610,6 @@ class Task(Gtk.Revealer):
 
     def get_status(self) -> tuple[int, int]:
         """Get total tasks and completed tasks tuple"""
-
-        # sub_tasks: list[dict] = [
-        #     t
-        #     for t in UserData.get_tasks_as_dicts(self.list_uid, self.uid)
-        #     if not t["deleted"]
-        # ]
-        # total: int = len([t for t in sub_tasks if not t["trash"]])
-        # completed: int = len(
-        #     [t for t in sub_tasks if not t["trash"] and t["completed"]]
-        # )
 
         total: int = UserData.run_sql(
             f"""SELECT COUNT(*) FROM tasks
