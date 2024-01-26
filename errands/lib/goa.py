@@ -26,40 +26,45 @@ def get_goa_credentials(acc_name: str) -> GoaCredentials | None:
         Log.debug("Gnome Online Accounts is not installed. Skipping...")
         return None
 
-    client: Goa.Client = Goa.Client.new_sync(None)
-    accounts: list[Goa.ObjectProxy] = client.get_accounts()
-    for account in accounts:
-        acc: Goa.AccountProxy = account.get_account()
-        name: str = acc.get_cached_property("ProviderName").get_string()
-        if name == acc_name:
-            Log.debug(f"GOA: Getting data for {acc_name}")
-            username = (
-                acc.get_cached_property("PresentationIdentity")
-                .get_string()
-                .split("@")[0]
-            )
-            password = account.get_password_based().call_get_password_sync(
-                arg_id=acc.get_cached_property("Id").get_string()
-            )
-            # Get url
-            try:
-                url: str = (
-                    account.get_calendar()
-                    .get_cached_property("Uri")
+    try:
+        client: Goa.Client = Goa.Client.new_sync(None)
+        accounts: list[Goa.ObjectProxy] = client.get_accounts()
+        for account in accounts:
+            acc: Goa.AccountProxy = account.get_account()
+            name: str = acc.get_cached_property("ProviderName").get_string()
+            if name == acc_name:
+                Log.debug(f"GOA: Getting data for {acc_name}")
+                username: str = (
+                    acc.get_cached_property("PresentationIdentity")
                     .get_string()
-                    .replace(username + "@", "")
+                    .split("@")[:-1]
                 )
-            except:
-                url: str = (
-                    "https://"
-                    + (
-                        acc.get_cached_property("PresentationIdentity")
+                username = "".join(username)
+                password = account.get_password_based().call_get_password_sync(
+                    arg_id=acc.get_cached_property("Id").get_string()
+                )
+                # Get url
+                try:
+                    url: str = (
+                        account.get_calendar()
+                        .get_cached_property("Uri")
                         .get_string()
-                        .split("@")[-1]
+                        .replace(username + "@", "")
                     )
-                    + "/remote.php/dav/"
-                )
+                except:
+                    url: str = (
+                        "https://"
+                        + (
+                            acc.get_cached_property("PresentationIdentity")
+                            .get_string()
+                            .split("@")[-1]
+                        )
+                        + "/remote.php/dav/"
+                    )
 
-            return GoaCredentials(url=url, username=username, password=password)
+                return GoaCredentials(url=url, username=username, password=password)
+    except Exception as e:
+        Log.error(f"GOA: Can't get credentials. {e}")
+        return None
 
     return None
