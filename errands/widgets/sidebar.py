@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: MIT
 
 from __future__ import annotations
-from re import sub
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -10,7 +9,6 @@ if TYPE_CHECKING:
 
 from caldav import Todo
 from datetime import datetime
-from uuid import uuid4
 from icalendar import Calendar
 from errands.utils.data import UserData
 from errands.utils.functions import get_children
@@ -73,7 +71,7 @@ class SidebarHeaderBar(Adw.Bin):
 
         # Import menu
         import_menu: Gio.Menu = Gio.Menu.new()
-        import_menu.append(_("Import List"), "lists.import")
+        import_menu.append(_("Import List"), "app.import")
 
         # Add list button
         self.add_list_btn: Adw.SplitButton = Adw.SplitButton(
@@ -97,11 +95,6 @@ class SidebarHeaderBar(Adw.Bin):
         menu: Gio.Menu = Gio.Menu.new()
         top_section: Gio.Menu = Gio.Menu.new()
         top_section.append(_("Sync / Fetch Tasks"), "app.sync")
-        # Backups
-        # backup_submenu: Gio.Menu = Gio.Menu.new()
-        # backup_submenu.append(_("Create"), "lists.backup_create")
-        # backup_submenu.append(_("Load"), "lists.backup_load")
-        # top_section.append_submenu(_("Backup"), backup_submenu)
         menu.append_section(None, top_section)
         bottom_section: Gio.Menu = Gio.Menu.new()
         bottom_section.append(_("Preferences"), "app.preferences")
@@ -185,107 +178,8 @@ class SidebarTaskLists(Gtk.ScrolledWindow):
         self.sidebar: Sidebar = sidebar
         self.window: Window = sidebar.window
         self._build_ui()
-        self._add_actions()
         self._load_lists()
         self.update_ui()
-
-    def _add_actions(self) -> None:
-        group = Gio.SimpleActionGroup()
-        self.insert_action_group(name="lists", group=group)
-
-        def _create_action(name: str, callback: callable) -> None:
-            action: Gio.SimpleAction = Gio.SimpleAction.new(name, None)
-            action.connect("activate", callback)
-            group.add_action(action)
-
-        def _add(*args) -> None:
-            pass
-
-        def _backup_create(*args) -> None:
-            pass
-
-        def _backup_load(*args) -> None:
-            pass
-
-        def _import(*args) -> None:
-            def _confirm(dialog: Gtk.FileDialog, res) -> None:
-                try:
-                    file: Gio.File = dialog.open_finish(res)
-                except:
-                    Log.debug("Lists: Import cancelled")
-                    return
-                with open(file.get_path(), "r") as f:
-                    calendar: Calendar = Calendar.from_ical(f.read())
-                    # List name
-                    name = calendar.get(
-                        "X-WR-CALNAME", file.get_basename().rstrip(".ics")
-                    )
-                    if name in [
-                        i[0]
-                        for i in UserData.run_sql("SELECT name FROM lists", fetch=True)
-                    ]:
-                        name = f"{name}_{uuid4()}"
-                    # Create list
-                    uid: str = UserData.add_list(name)
-                    # Add tasks
-                    for todo in calendar.walk("VTODO"):
-                        # Tags
-                        if (tags := todo.get("CATEGORIES", "")) != "":
-                            tags = ",".join(
-                                [
-                                    i.to_ical().decode("utf-8")
-                                    for i in (
-                                        tags if isinstance(tags, list) else tags.cats
-                                    )
-                                ]
-                            )
-                        # Start
-                        if (start := todo.get("DTSTART", "")) != "":
-                            start = (
-                                todo.get("DTSTART", "")
-                                .to_ical()
-                                .decode("utf-8")
-                                .strip("Z")
-                            )
-                        else:
-                            start = ""
-                        # End
-                        if (end := todo.get("DUE", todo.get("DTEND", ""))) != "":
-                            end = (
-                                todo.get("DUE", todo.get("DTEND", ""))
-                                .to_ical()
-                                .decode("utf-8")
-                                .strip("Z")
-                            )
-                        else:
-                            end = ""
-                        UserData.add_task(
-                            color=todo.get("X-ERRANDS-COLOR", ""),
-                            completed=str(todo.get("STATUS", "")) == "COMPLETED",
-                            end_date=end,
-                            list_uid=uid,
-                            notes=str(todo.get("DESCRIPTION", "")),
-                            parent=str(todo.get("RELATED-TO", "")),
-                            percent_complete=int(todo.get("PERCENT-COMPLETE", 0)),
-                            priority=int(todo.get("PRIORITY", 0)),
-                            start_date=start,
-                            tags=tags,
-                            text=str(todo.get("SUMMARY", "")),
-                            uid=todo.get("UID", None),
-                        )
-                self.update_ui()
-                self.window.add_toast(_("Imported"))
-                Sync.sync()
-
-            filter = Gtk.FileFilter()
-            filter.add_pattern("*.ics")
-            dialog = Gtk.FileDialog(default_filter=filter)
-            dialog.open(self.window, None, _confirm)
-
-        _create_action("add", _add)
-        _create_action("backup_create", _backup_create)
-        _create_action("backup_load", _backup_load)
-        _create_action("import", _import)
 
     def _build_ui(self) -> None:
         self.set_propagate_natural_height(True)

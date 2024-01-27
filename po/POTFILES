@@ -2,9 +2,8 @@
 errands/widgets/components.py
 errands/widgets/preferences.py
 errands/widgets/sidebar.py
-errands/widgets/task_list/task_list.py
-errands/widgets/task_list/task_list_entry.py
-errands/widgets/task_list/task_list_details.py
+errands/widgets/task_list.py
+errands/widgets/details.py
 errands/widgets/task.py
 errands/widgets/trash.py
 errands/widgets/window.py
@@ -14,7 +13,7 @@ errands/lib/sync/providers/nextcloud.py
 errands/lib/sync/providers/todoist.py
 
 # .ui
-errands/resources/gtk/help-overlay.ui
+data/resources/gtk/help-overlay.ui
 
 # Data
 data/io.github.mrvladus.List.desktop.in.in

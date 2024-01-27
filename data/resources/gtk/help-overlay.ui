@@ -47,6 +47,21 @@
           </object>
         </child>
 
+        <!-- Lists -->
+        <child>
+          <object class="GtkShortcutsGroup">
+            <property name="title" translatable="yes">Lists</property>
+
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Add List</property>
+                <property name="accelerator">&lt;Control&gt;A</property>
+              </object>
+            </child>
+
+          </object>
+        </child>
+
         <!-- Details -->
         <child>
           <object class="GtkShortcutsGroup">
@@ -56,13 +71,6 @@
               <object class="GtkShortcutsShortcut">
                 <property name="title" translatable="yes">Toggle Details</property>
                 <property name="accelerator">F9</property>
-              </object>
-            </child>
-
-            <child>
-              <object class="GtkShortcutsShortcut">
-                <property name="title" translatable="yes">Save changed details</property>
-                <property name="accelerator">&lt;Control&gt;S</property>
               </object>
             </child>
 

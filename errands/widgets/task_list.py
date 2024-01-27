@@ -23,6 +23,7 @@ class TaskList(Adw.Bin):
         self.list_uid = list_uid
         self.parent = parent
         self._build_ui()
+        self.update_ui()
 
     def _build_ui(self) -> None:
         # Title
