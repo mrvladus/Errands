@@ -33,11 +33,23 @@ class TaskList(Adw.Bin):
                 fetch=True,
             )[0][0]
         )
+
         # Toggle sidebar button
         self.left_toggle_sidebar_btn = Gtk.ToggleButton(
             icon_name="errands-sidebar-left-symbolic",
             tooltip_text=_("Toggle Sidebar"),
         )
+        toggle_ctrl = Gtk.ShortcutController(scope=1)
+        toggle_ctrl.add_shortcut(
+            Gtk.Shortcut(
+                trigger=Gtk.ShortcutTrigger.parse_string("F9"),
+                action=Gtk.ShortcutAction.parse_string("activate"),
+            )
+        )
+        self.left_toggle_sidebar_btn.add_controller(toggle_ctrl)
+        self.left_toggle_sidebar_bin = Adw.Bin(child=self.left_toggle_sidebar_btn)
+        GSettings.bind("right-sidebar", self.left_toggle_sidebar_btn, "visible", True)
+
         self.right_toggle_sidebar_btn = Gtk.ToggleButton(
             icon_name="errands-sidebar-right-symbolic",
             tooltip_text=_("Toggle Sidebar"),
@@ -48,14 +60,9 @@ class TaskList(Adw.Bin):
             "active",
             GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
         )
-        toggle_ctrl = Gtk.ShortcutController(scope=1)
-        toggle_ctrl.add_shortcut(
-            Gtk.Shortcut(
-                trigger=Gtk.ShortcutTrigger.parse_string("F9"),
-                action=Gtk.ShortcutAction.parse_string("activate"),
-            )
-        )
-        self.left_toggle_sidebar_btn.add_controller(toggle_ctrl)
+        self.right_toggle_sidebar_bin = Adw.Bin(child=self.right_toggle_sidebar_btn)
+        GSettings.bind("right-sidebar", self.right_toggle_sidebar_btn, "visible")
+
         # Delete completed button
         self.delete_completed_btn = Gtk.Button(
             valign="center",
@@ -74,8 +81,6 @@ class TaskList(Adw.Bin):
             sensitive=False,
         )
         self.scroll_up_btn.connect("clicked", lambda *_: scroll(self.scrl, False))
-        self.left_toggle_sidebar_bin = Adw.Bin(child=self.left_toggle_sidebar_btn)
-        self.right_toggle_sidebar_bin = Adw.Bin(child=self.right_toggle_sidebar_btn)
 
         # Header Bar
         hb = Adw.HeaderBar(title_widget=self.title)
@@ -90,15 +95,16 @@ class TaskList(Adw.Bin):
             icon_name="errands-sidebar-left-symbolic",
             tooltip_text=_("Toggle Sidebar"),
         )
-        right_toggle_sidebar_btn = Gtk.ToggleButton(
-            icon_name="errands-sidebar-right-symbolic",
-            tooltip_text=_("Toggle Sidebar"),
-        )
         left_toggle_sidebar_btn.bind_property(
             "active",
             self.left_toggle_sidebar_btn,
             "active",
             GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
+        )
+        GSettings.bind("right-sidebar", left_toggle_sidebar_btn, "visible", True)
+        right_toggle_sidebar_btn = Gtk.ToggleButton(
+            icon_name="errands-sidebar-right-symbolic",
+            tooltip_text=_("Toggle Sidebar"),
         )
         right_toggle_sidebar_btn.bind_property(
             "active",
@@ -106,6 +112,7 @@ class TaskList(Adw.Bin):
             "active",
             GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
         )
+        GSettings.bind("right-sidebar", right_toggle_sidebar_btn, "visible")
 
         delete_completed_btn = Gtk.Button(
             valign="center",
@@ -212,23 +219,22 @@ class TaskList(Adw.Bin):
         )
         self.split_view.set_content(self.tasks_toolbar_view)
 
-        # Breakpoint
+        # Breakpoints
         tasks_brb = Adw.BreakpointBin(
             width_request=360, height_request=360, child=self.split_view
         )
-        tasks_brb_bp = Adw.Breakpoint.new(
-            Adw.breakpoint_condition_parse("max-width: 400px")
-        )
-        GSettings.bind("right-sidebar", self.left_toggle_sidebar_bin, "visible", True)
-        GSettings.bind("right-sidebar", left_toggle_sidebar_btn, "visible", True)
-        GSettings.bind("right-sidebar", self.right_toggle_sidebar_bin, "visible")
-        GSettings.bind("right-sidebar", right_toggle_sidebar_btn, "visible")
-        tasks_brb_bp.add_setter(self.left_toggle_sidebar_btn, "visible", False)
-        tasks_brb_bp.add_setter(self.right_toggle_sidebar_btn, "visible", False)
-        tasks_brb_bp.add_setter(self.delete_completed_btn, "visible", False)
-        tasks_brb_bp.add_setter(self.scroll_up_btn, "visible", False)
-        tasks_brb_bp.add_setter(self.tasks_toolbar_view, "reveal-bottom-bars", True)
-        tasks_brb.add_breakpoint(tasks_brb_bp)
+        bp = Adw.Breakpoint.new(Adw.breakpoint_condition_parse("max-width: 720px"))
+        bp.add_setter(self.split_view, "collapsed", True)
+        tasks_brb.add_breakpoint(bp)
+        bp1 = Adw.Breakpoint.new(Adw.breakpoint_condition_parse("max-width: 370px"))
+        bp1.add_setter(self.split_view, "collapsed", True)
+        bp1.add_setter(self.left_toggle_sidebar_bin, "visible", False)
+        bp1.add_setter(self.right_toggle_sidebar_bin, "visible", False)
+        bp1.add_setter(self.delete_completed_btn, "visible", False)
+        bp1.add_setter(self.scroll_up_btn, "visible", False)
+        bp1.add_setter(self.tasks_toolbar_view, "reveal-bottom-bars", True)
+        tasks_brb.add_breakpoint(bp1)
+
         self.set_child(tasks_brb)
 
     def add_task(self, uid: str) -> None:

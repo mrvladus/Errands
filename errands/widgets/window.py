@@ -86,15 +86,10 @@ class Window(Adw.ApplicationWindow):
         self.toast_overlay = Adw.ToastOverlay(child=self.split_view)
 
         # Breakpoints
-        bp = Adw.Breakpoint.new(Adw.breakpoint_condition_parse("max-width: 990px"))
+        bp = Adw.Breakpoint.new(Adw.breakpoint_condition_parse("max-width: 980px"))
         bp.add_setter(self.split_view, "collapsed", True)
         bp.add_setter(self.split_view, "show-content", True)
-        bp1 = Adw.Breakpoint.new(Adw.breakpoint_condition_parse("max-width: 720px"))
-        # bp1.add_setter(self.split_view_inner, "collapsed", True)
-        bp1.add_setter(self.split_view, "collapsed", True)
-        bp1.add_setter(self.split_view, "show-content", True)
         self.add_breakpoint(bp)
-        self.add_breakpoint(bp1)
 
         self.set_content(self.toast_overlay)
 
