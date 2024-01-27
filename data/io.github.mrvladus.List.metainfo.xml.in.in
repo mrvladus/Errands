@@ -48,6 +48,32 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="45.1.7" date="2024-01-27">
+      <description translatable="no">
+        <p>Added:</p>
+        <ul>
+          <li>Preference for complete button size</li>
+          <li>Details now saved automatically</li>
+          <li>Copy text button for notes</li>
+          <li>UI improvements</li>
+        </ul>
+        <p>Fixed:</p>
+        <ul>
+          <li>Gnome Online Accounts usernames containing '@' symbol</li>
+          <li>Apostrophs in CalDav calendar names</li>
+          <li>Completion percent with sync enabled</li>
+        </ul>
+        <p>Translations:</p>
+        <ul>
+          <li>Added French translation (Irénée THIRION)</li>
+          <li>Updated Occitan translation (ensag-dev)</li>
+          <li>Updated German translation (Philipp Kiemle)</li>
+          <li>Updated Dutch translation (Heimen Stoffels)</li>
+          <li>Updated Italian translation (Albano Battistella)</li>
+          <li>Updated Japanese translation (Gnuey56)</li>
+        </ul>
+      </description>
+    </release>
     <release version="45.1.6" date="2024-01-15">
       <description translatable="no">
         <p>Added:</p>
