@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-16 18:39+0300\n"
-"PO-Revision-Date: 2023-12-31 14:13+0900\n"
+"PO-Revision-Date: 2024-01-27 21:12+0900\n"
 "Last-Translator: Gnuey56 <gnuey56@proton.me>\n"
 "Language-Team: \n"
 "Language: ja\n"
@@ -28,7 +28,7 @@ msgstr "保存"
 
 #: errands/widgets/details.py:52
 msgid "Save (Ctrl+S)"
-msgstr ""
+msgstr "保存 (Ctrl+S)"
 
 #: errands/widgets/details.py:63
 msgid "No Details"
@@ -82,7 +82,7 @@ msgstr "終了日"
 
 #: errands/widgets/details.py:182
 msgid "Complete %"
-msgstr "完了度 (パーセンテージ)"
+msgstr "完了度 (パーセント)"
 
 #: errands/widgets/details.py:192
 msgid "Priority"
@@ -184,7 +184,7 @@ msgstr "メインメニュー"
 
 #: errands/widgets/lists.py:169
 msgid "Syncing..."
-msgstr ""
+msgstr "同期中..."
 
 #: errands/widgets/lists.py:178
 msgid "Add new List"
@@ -267,21 +267,19 @@ msgstr "ダーク"
 #. Tasks group
 #: errands/widgets/preferences.py:72
 msgid "Tasks"
-msgstr ""
+msgstr "タスク"
 
 #: errands/widgets/preferences.py:74
-#, fuzzy
 msgid "Click Action"
-msgstr "\"+\" ボタンをクリック"
+msgstr "クリック時のアクション"
 
 #: errands/widgets/preferences.py:75
 msgid "Open Details Panel"
-msgstr ""
+msgstr "詳細パネルを開く"
 
 #: errands/widgets/preferences.py:75
-#, fuzzy
 msgid "Show Sub-Tasks"
-msgstr "新しいサブタスクを追加"
+msgstr "サブタスクを表示"
 
 #: errands/widgets/preferences.py:91 errands/widgets/preferences.py:159
 #: errands/resources/gtk/help-overlay.ui:38
@@ -318,26 +316,24 @@ msgid "Test Connection"
 msgstr "接続をテスト"
 
 #: errands/widgets/preferences.py:136
-#, fuzzy
 msgid "Details Panel"
-msgstr "詳細なし"
+msgstr "詳細パネル"
 
 #: errands/widgets/preferences.py:139
 msgid "Position"
-msgstr ""
+msgstr "位置"
 
 #: errands/widgets/preferences.py:140
 msgid "Left"
-msgstr ""
+msgstr "左"
 
 #: errands/widgets/preferences.py:140
-#, fuzzy
 msgid "Right"
-msgstr "ライト"
+msgstr "右"
 
 #: errands/widgets/preferences.py:149
 msgid "Appearance"
-msgstr ""
+msgstr "外観"
 
 #: errands/widgets/preferences.py:195
 msgid "Connected"
@@ -370,7 +366,7 @@ msgstr "新しいタスクを追加"
 
 #: errands/widgets/task.py:83
 msgid "Click for Details"
-msgstr "クリックして詳細を表示"
+msgstr "クリックしてタスクの詳細を表示"
 
 #: errands/widgets/task.py:92
 msgid "Mark as Completed"
@@ -385,9 +381,8 @@ msgid "Add new Sub-Task"
 msgstr "新しいサブタスクを追加"
 
 #: errands/widgets/task.py:146 errands/resources/gtk/help-overlay.ui:53
-#, fuzzy
 msgid "Details"
-msgstr "詳細なし"
+msgstr "詳細"
 
 #: errands/widgets/trash.py:37
 msgid "Restore All"
@@ -414,9 +409,8 @@ msgid "No Task Lists"
 msgstr "タスクのリストはありません"
 
 #: errands/widgets/window.py:68
-#, fuzzy
 msgid "Create List"
-msgstr "リストの名前を変更"
+msgstr "リストを作成"
 
 #: errands/widgets/window.py:131
 msgid "translator-credits"
@@ -447,13 +441,12 @@ msgid "Quit"
 msgstr "終了"
 
 #: errands/resources/gtk/help-overlay.ui:57
-#, fuzzy
 msgid "Toggle Details"
-msgstr "詳細なし"
+msgstr "詳細を切り替え"
 
 #: errands/resources/gtk/help-overlay.ui:64
 msgid "Save changed details"
-msgstr ""
+msgstr "変更された詳細を保存"
 
 #: data/io.github.mrvladus.List.desktop.in.in:4
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:28
@@ -463,8 +456,8 @@ msgstr "タスクを管理"
 #: data/io.github.mrvladus.List.desktop.in.in:10
 msgid "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
 msgstr ""
-"errands;tasks;list;todo;todos;caldav;nextcloud;sync;用事;タスク;リスト;やるこ"
-"とリスト;同期;"
+"errands;tasks;list;todo;todos;caldav;nextcloud;sync;用事;タスク;リスト;やる"
+"ことリスト;同期;"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:30
 msgid "Todo application for those who prefer simplicity."
@@ -484,7 +477,7 @@ msgstr "タスク／サブタスクを、追加、削除、編集"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:35
 msgid "Mark task and sub-tasks as completed"
-msgstr "タスク／サブタスクを完了済みに指定"
+msgstr "タスク／サブタスクを完了済みにチェック"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:36
 msgid "Add accent color for each task"
