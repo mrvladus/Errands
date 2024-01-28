@@ -478,11 +478,11 @@ class SidebarTaskListsItem(Gtk.ListBoxRow):
         self.add_controller(ctrl)
 
         # TODO Drop controller
-        # drop_ctrl: Gtk.DropTarget = Gtk.DropTarget.new(
-        #     actions=Gdk.DragAction.MOVE, type=Task
-        # )
-        # drop_ctrl.connect("drop", self._on_task_drop)
-        # self.add_controller(drop_ctrl)
+        drop_ctrl: Gtk.DropTarget = Gtk.DropTarget.new(
+            actions=Gdk.DragAction.MOVE, type=Task
+        )
+        drop_ctrl.connect("drop", self._on_task_drop)
+        self.add_controller(drop_ctrl)
 
         self.set_child(
             Box(
@@ -502,17 +502,25 @@ class SidebarTaskListsItem(Gtk.ListBoxRow):
         self.window.stack.set_visible_child_name(self.label.get_label())
         self.window.split_view.set_show_content(True)
 
-    # TODO
-    # def _on_task_drop(self, _drop, task: Task, _x, _y):
-    #     return
-    # if task.list_uid == self.uid:
-    #     return
-    # print(task.get_prop("parent"), "=>", self.uid, "=>", task.uid)
-    # uid = task.uid
-    # task.update_props(["parent", "list_uid"], ["", self.uid])
-    # task.purge()
-    # self.task_list.add_task(uid)
-    # Sync.sync()
+    def _on_task_drop(self, _drop, task: Task, _x, _y):
+        if task.list_uid == self.uid:
+            return
+        UserData.run_sql(
+            f"""UPDATE tasks
+            SET list_uid = '{self.uid}', parent = '', synced = 0
+            WHERE list_uid = '{task.list_uid}'
+            AND uid = '{task.uid}'
+            """
+        )
+        for uid in UserData.get_tasks_uids_tree(task.list_uid, task.uid):
+            UserData.run_sql(
+                f"""UPDATE tasks
+                SET list_uid = '{self.uid}', synced = 0
+                WHERE list_uid = '{task.list_uid}'
+                AND uid = '{uid}'
+                """
+            )
+        Sync.sync()
 
 
 class SidebarTrashButton(Gtk.Button):
