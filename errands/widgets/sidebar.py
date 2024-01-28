@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 from __future__ import annotations
+import time
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -18,7 +19,7 @@ from errands.lib.sync.sync import Sync
 from errands.widgets.components import Box
 from errands.widgets.task import Task
 from errands.widgets.task_list import TaskList
-from gi.repository import Adw, Gtk, Gio, GObject, Gdk
+from gi.repository import Adw, Gtk, Gio, GObject, Gdk, GLib
 
 
 class Sidebar(Adw.Bin):
@@ -477,12 +478,17 @@ class SidebarTaskListsItem(Gtk.ListBoxRow):
         ctrl.connect("released", self._on_click)
         self.add_controller(ctrl)
 
-        # TODO Drop controller
+        # Drop controller
         drop_ctrl: Gtk.DropTarget = Gtk.DropTarget.new(
             actions=Gdk.DragAction.MOVE, type=Task
         )
         drop_ctrl.connect("drop", self._on_task_drop)
         self.add_controller(drop_ctrl)
+
+        # Drop hover controller
+        drop_hover_ctrl: Gtk.DropControllerMotion = Gtk.DropControllerMotion()
+        drop_hover_ctrl.connect("enter", self._on_drop_hover)
+        self.add_controller(drop_hover_ctrl)
 
         self.set_child(
             Box(
@@ -502,9 +508,36 @@ class SidebarTaskListsItem(Gtk.ListBoxRow):
         self.window.stack.set_visible_child_name(self.label.get_label())
         self.window.split_view.set_show_content(True)
 
+    def _on_drop_hover(self, ctrl: Gtk.DropControllerMotion, _x, _y):
+        """
+        Switch list on dnd hover after DELAY_SECONDS
+        """
+
+        DELAY_SECONDS: float = 0.7
+        entered_at: float = time.time()
+
+        def _switch_delay():
+            if ctrl.contains_pointer():
+                if time.time() - entered_at >= DELAY_SECONDS:
+                    self.activate()
+                    return False
+                else:
+                    return True
+            else:
+                return False
+
+        GLib.timeout_add(100, _switch_delay)
+
     def _on_task_drop(self, _drop, task: Task, _x, _y):
+        """
+        Move task and sub-tasks to new list
+        """
+
         if task.list_uid == self.uid:
             return
+
+        Log.info(f"Lists: Move '{task.uid}' to '{self.uid}' list")
+
         UserData.run_sql(
             f"""UPDATE tasks
             SET list_uid = '{self.uid}', parent = '', synced = 0
@@ -520,6 +553,7 @@ class SidebarTaskListsItem(Gtk.ListBoxRow):
                 AND uid = '{uid}'
                 """
             )
+
         Sync.sync()
 
 
