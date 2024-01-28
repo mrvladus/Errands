@@ -1,7 +1,7 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# For the people that want it in greek for some reason like why would you do that are you some kind of du-
+# Copyright (C) 2024 itsnotAZ
 # This file is distributed under the same license as the errands package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# itsnotAZ, 2024.
 #
 #, fuzzy
 msgid ""
