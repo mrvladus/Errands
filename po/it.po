@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version:  errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-27 15:42+0300\n"
-"PO-Revision-Date: 2024-01-01 18:31+0100\n"
+"PO-Revision-Date: 2024-01-28 14:31+0100\n"
 "Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
 "Language-Team: Italian <LL@li.org>\n"
 "Language: it\n"
@@ -83,17 +83,16 @@ msgid "Show Sub-Tasks"
 msgstr "Mostra attività secondarie"
 
 #: errands/widgets/preferences.py:98
-#, fuzzy
 msgid "Complete Button Size"
-msgstr "Completo %:"
+msgstr "Dimensione pulsante completa"
 
 #: errands/widgets/preferences.py:99
 msgid "Small"
-msgstr ""
+msgstr "Piccolo"
 
 #: errands/widgets/preferences.py:99
 msgid "Big"
-msgstr ""
+msgstr "Grande"
 
 #: errands/widgets/preferences.py:113 errands/widgets/preferences.py:181
 #: data/resources/gtk/help-overlay.ui:38
@@ -168,9 +167,8 @@ msgid "Import List"
 msgstr "Importa lista"
 
 #: errands/widgets/sidebar.py:81
-#, fuzzy
 msgid "Add List (Ctrl+A)"
-msgstr "Aggiungi lista"
+msgstr "Aggiungi lista (Ctrl+A)"
 
 #: errands/widgets/sidebar.py:83
 msgid "More Options"
@@ -418,9 +416,8 @@ msgid "Create List"
 msgstr "Crea lista"
 
 #: errands/widgets/window.py:78
-#, fuzzy
 msgid "Lists"
-msgstr "Aggiungi lista"
+msgstr "Liste"
 
 #: errands/widgets/window.py:126
 msgid "translator-credits"
