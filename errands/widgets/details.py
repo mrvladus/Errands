@@ -311,7 +311,7 @@ class Details(Adw.Bin):
             ],
         )
 
-        Sync.sync()
+        Sync.sync(False)
 
     def update_info(self, parent: Task):
         # Show status on empty task

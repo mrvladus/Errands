@@ -222,7 +222,10 @@ class TaskTitleRow(Gtk.Overlay):
             return
 
         # Change parent
-        task.update_props(["parent", "synced"], [self.task.get_prop("uid"), False])
+        task.update_props(
+            ["parent", "synced", "list_uid"],
+            [self.task.get_prop("uid"), False, self.task.list_uid],
+        )
         # Move data
         uids: list[str] = UserData.get_tasks()
         last_sub_uid: str = UserData.get_tasks_uids(self.task.list_uid, self.task.uid)[
