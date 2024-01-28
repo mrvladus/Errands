@@ -421,7 +421,7 @@ msgstr "Λίστες"
 
 #: errands/widgets/window.py:126
 msgid "translator-credits"
-msgstr "τεστ"
+msgstr "itsnotAZ"
 
 #: errands/widgets/window.py:134
 msgid "Sync is disabled"
