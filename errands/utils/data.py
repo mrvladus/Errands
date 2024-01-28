@@ -5,11 +5,37 @@ import json
 import os
 import shutil
 import sqlite3
-from typing import Any
+from typing import Any, TypedDict
 from uuid import uuid4
 from errands.lib.gsettings import GSettings
 from gi.repository import GLib
 from errands.lib.logging import Log
+
+
+class TaskListData(TypedDict):
+    deleted: bool
+    name: str
+    synced: bool
+    uid: str
+
+
+class TaskData(TypedDict):
+    color: str
+    completed: bool
+    deleted: bool
+    end_date: str
+    expanded: bool
+    list_uid: str
+    notes: str
+    parent: str
+    percent_complete: int
+    priority: int
+    start_date: str
+    synced: bool
+    tags: str
+    text: str
+    trash: bool
+    uid: str
 
 
 class UserData:
@@ -53,7 +79,7 @@ class UserData:
 
     @classmethod
     def add_list(cls, name: str, uuid: str = None, synced: bool = False) -> str:
-        uid = str(uuid4()) if not uuid else uuid
+        uid: str = str(uuid4()) if not uuid else uuid
         Log.debug(f"Data: Create '{uid}' list")
         with cls.connection:
             cur = cls.connection.cursor()
@@ -82,22 +108,24 @@ class UserData:
             cur.execute("DELETE FROM tasks WHERE deleted = 1")
 
     @classmethod
-    def get_lists_as_dicts(cls) -> list[dict]:
+    def get_lists_as_dicts(cls) -> list[TaskListData]:
         # Log.debug("Data: Get lists as dicts")
 
         with cls.connection:
             cur = cls.connection.cursor()
             cur.execute("SELECT * FROM lists")
             res: list[tuple] = cur.fetchall()
-            lists = []
+            lists: list[TaskListData] = []
             for i in res:
-                data = {
-                    "deleted": bool(i[0]),
-                    "name": i[1],
-                    "synced": bool(i[2]),
-                    "uid": i[3],
-                }
-                lists.append(data)
+                lists.append(
+                    TaskListData(
+                        deleted=bool(i[0]),
+                        name=i[1],
+                        synced=bool(i[2]),
+                        uid=i[3],
+                    )
+                )
+
             return lists
 
     @classmethod
@@ -160,7 +188,7 @@ class UserData:
     @classmethod
     def get_tasks_uids_tree(cls, list_uid: str, parent: str) -> list[str]:
         """
-        Get all sub-task recursively
+        Get all sub-task uids recursively
         """
         # Log.debug(f"Data: Get tasks uids tree for '{parent}'")
 
@@ -177,7 +205,7 @@ class UserData:
         return uids
 
     @classmethod
-    def get_tasks_as_dicts(cls, list_uid: str, parent: str = None) -> list[dict]:
+    def get_tasks_as_dicts(cls, list_uid: str, parent: str = None) -> list[TaskData]:
         # Log.debug(f"Data: Get tasks as dicts")
 
         with cls.connection:
@@ -187,27 +215,29 @@ class UserData:
                 {f"AND parent = '{parent}'" if parent else ""}""",
                 (list_uid,),
             )
-            tasks = []
+            tasks: list[TaskData] = []
             for task in cur.fetchall():
-                new_task = {
-                    "color": task[0],
-                    "completed": bool(task[1]),
-                    "deleted": bool(task[2]),
-                    "end_date": task[3],
-                    "expanded": bool(task[4]),
-                    "list_uid": task[5],
-                    "notes": task[6],
-                    "parent": task[7],
-                    "percent_complete": int(task[8]),
-                    "priority": int(task[9]),
-                    "start_date": task[10],
-                    "synced": bool(task[11]),
-                    "tags": task[12],
-                    "text": task[13],
-                    "trash": bool(task[14]),
-                    "uid": task[15],
-                }
-                tasks.append(new_task)
+                tasks.append(
+                    TaskData(
+                        color=task[0],
+                        completed=bool(task[1]),
+                        deleted=bool(task[2]),
+                        end_date=task[3],
+                        expanded=bool(task[4]),
+                        list_uid=task[5],
+                        notes=task[6],
+                        parent=task[7],
+                        percent_complete=int(task[8]),
+                        priority=int(task[9]),
+                        start_date=task[10],
+                        synced=bool(task[11]),
+                        tags=task[12],
+                        text=task[13],
+                        trash=bool(task[14]),
+                        uid=task[15],
+                    )
+                )
+
             return tasks
 
     @classmethod
@@ -231,7 +261,7 @@ class UserData:
         uid: str = "",
     ) -> str:
         if not uid:
-            uid = str(uuid4())
+            uid: str = str(uuid4())
 
         Log.debug(f"Data: Add task {uid}")
 
