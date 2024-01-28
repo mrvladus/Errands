@@ -168,7 +168,7 @@ msgstr "Εισαγωγή Λίστας"
 
 #: errands/widgets/sidebar.py:81
 msgid "Add List (Ctrl+A)"
-msgstr "Προσθήκη Λίστας"
+msgstr "Προσθήκη Λίστας (Ctrl+A)"
 
 #: errands/widgets/sidebar.py:83
 msgid "More Options"
