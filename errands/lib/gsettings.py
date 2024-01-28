@@ -5,7 +5,7 @@ from gi.repository import GLib, Gio, Gtk, Secret
 from __main__ import APP_ID
 from errands.lib.logging import Log
 
-SECRETS_SCHEMA = Secret.Schema.new(
+SECRETS_SCHEMA: Secret.Schema = Secret.Schema.new(
     APP_ID,
     Secret.SchemaFlags.NONE,
     {
@@ -76,8 +76,8 @@ class GSettings:
 
         # Migrate old password
         try:
-            account = self.gsettings.get_int("sync-provider")
-            password = self.gsettings.get_string("sync-password")
+            account: int = self.gsettings.get_int("sync-provider")
+            password: str = self.gsettings.get_string("sync-password")
             if 0 < account < 3 and password:
                 account = "Nextcloud" if account == 1 else "CalDAV"
                 self.set_secret(account, password)
