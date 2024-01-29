@@ -1,9 +1,9 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
+from __future__ import annotations
 from __main__ import VERSION, APP_ID
 from uuid import uuid4
-
 from icalendar import Calendar
 from errands.utils.data import UserData
 from errands.widgets.components import Box, Button
@@ -15,17 +15,14 @@ from errands.lib.sync.sync import Sync
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 
+WINDOW: Window = None
+
 
 class Window(Adw.ApplicationWindow):
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
-        self.set_title(_("Errands"))
-        # Remember window state
-        GSettings.bind("width", self, "default_width")
-        GSettings.bind("height", self, "default_height")
-        GSettings.bind("maximized", self, "maximized")
-        # Setup theme
-        Adw.StyleManager.get_default().set_color_scheme(GSettings.get("theme"))
+        global WINDOW
+        WINDOW = self
         self._create_actions()
         self._build_ui()
         self.present()
@@ -34,8 +31,15 @@ class Window(Adw.ApplicationWindow):
         Sync.sync()
 
     def _build_ui(self):
+        self.set_title(_("Errands"))
         self.props.width_request = 360
         self.props.height_request = 200
+        # Remember window state
+        GSettings.bind("width", self, "default_width")
+        GSettings.bind("height", self, "default_height")
+        GSettings.bind("maximized", self, "maximized")
+        # Setup theme
+        Adw.StyleManager.get_default().set_color_scheme(GSettings.get("theme"))
 
         # Split View
         self.split_view = Adw.NavigationSplitView(

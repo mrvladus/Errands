@@ -56,6 +56,12 @@ class Application(Adw.Application):
 
         Window(application=self)
 
+        # Run tests
+        if PROFILE == "development":
+            from errands.tests.tests import run_tests
+
+            run_tests()
+
 
 if __name__ == "__main__":
     main()
