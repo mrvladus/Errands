@@ -19,6 +19,8 @@ WINDOW: Window = None
 
 
 class Window(Adw.ApplicationWindow):
+    about_window: Adw.AboutWindow = None
+
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
         global WINDOW
@@ -117,19 +119,21 @@ class Window(Adw.ApplicationWindow):
             """
             Show about window
             """
-            about = Adw.AboutWindow(
-                transient_for=self,
-                version=VERSION,
-                application_icon=APP_ID,
-                application_name=_("Errands"),
-                copyright="© 2023 Vlad Krupinskii",
-                website="https://github.com/mrvladus/Errands",
-                issue_url="https://github.com/mrvladus/Errands/issues",
-                license_type=Gtk.License.MIT_X11,
-                translator_credits=_("translator-credits"),
-                modal=True,
-            )
-            about.show()
+            if not self.about_window:
+                self.about_window = Adw.AboutWindow(
+                    transient_for=self,
+                    version=VERSION,
+                    application_icon=APP_ID,
+                    application_name=_("Errands"),
+                    copyright="© 2023 Vlad Krupinskii",
+                    website="https://github.com/mrvladus/Errands",
+                    issue_url="https://github.com/mrvladus/Errands/issues",
+                    license_type=Gtk.License.MIT_X11,
+                    translator_credits=_("translator-credits"),
+                    modal=True,
+                    hide_on_close=True,
+                )
+            self.about_window.present()
 
         def _sync(*args):
             Sync.sync()

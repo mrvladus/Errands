@@ -40,3 +40,10 @@ class TestWindow(TestCase):
             "quit",
         ]
         self.assertEqual(actions, expected_actions)
+
+    def test_about_window(self):
+        app: Adw.Application = self.window.get_application()
+        app.activate_action("about")
+        self.assertTrue(self.window.about_window.get_visible())
+        self.window.about_window.close()
+        self.assertFalse(self.window.about_window.get_visible())
