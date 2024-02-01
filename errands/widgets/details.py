@@ -115,7 +115,7 @@ class Details(Adw.Bin):
         notes_group = Adw.PreferencesGroup(title=_("Notes"))
         # Notes entry
         notes_source_view = GtkSource.View(
-            height_request=100,
+            height_request=200,
             top_margin=12,
             bottom_margin=12,
             left_margin=12,
@@ -128,6 +128,7 @@ class Details(Adw.Bin):
         self.notes.set_language(lm.get_language("markdown"))
         self.notes.connect("changed", self._on_notes_changed)
         notes_group.add(notes_source_view)
+
         # Copy button
         notes_copy_btn = Gtk.Button(
             icon_name="errands-copy-symbolic",
@@ -282,7 +283,7 @@ class Details(Adw.Bin):
             )
 
         # Percent complete
-        pc = self.percent_complete.get_value_as_int()
+        pc: int = self.percent_complete.get_value_as_int()
         self.parent.can_sync = False
         self.parent.task_row.complete_btn.set_active(pc == 100)
         self.parent.can_sync = True
