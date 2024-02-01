@@ -13,7 +13,7 @@ from errands.utils.data import UserData
 from icalendar import Calendar, Event
 from errands.utils.functions import get_children
 from errands.widgets.components import Box, Button, DateTime
-from gi.repository import Adw, Gtk, Gdk, GObject
+from gi.repository import Adw, Gtk, Gdk, GObject, GtkSource  # type:ignore
 from errands.utils.markup import Markup
 from errands.lib.sync.sync import Sync
 from errands.lib.logging import Log
@@ -114,20 +114,20 @@ class Details(Adw.Bin):
         # Notes group
         notes_group = Adw.PreferencesGroup(title=_("Notes"))
         # Notes entry
-        self.notes = Gtk.TextBuffer()
-        self.notes.connect("changed", self._on_notes_changed)
-        notes_group.add(
-            Gtk.TextView(
-                height_request=100,
-                top_margin=12,
-                bottom_margin=12,
-                left_margin=12,
-                right_margin=12,
-                buffer=self.notes,
-                wrap_mode=3,
-                css_classes=["card"],
-            )
+        notes_source_view = GtkSource.View(
+            height_request=100,
+            top_margin=12,
+            bottom_margin=12,
+            left_margin=12,
+            right_margin=12,
+            wrap_mode=3,
+            css_classes=["card"],
         )
+        self.notes = notes_source_view.get_buffer()
+        lm: GtkSource.LanguageManager = GtkSource.LanguageManager.get_default()
+        self.notes.set_language(lm.get_language("markdown"))
+        self.notes.connect("changed", self._on_notes_changed)
+        notes_group.add(notes_source_view)
         # Copy button
         notes_copy_btn = Gtk.Button(
             icon_name="errands-copy-symbolic",

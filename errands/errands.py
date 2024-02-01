@@ -8,13 +8,14 @@ import sys
 import signal
 import locale
 import gettext
-import gi
+import gi  # type:ignore
 
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 gi.require_version("Secret", "1")
+gi.require_version("GtkSource", "5")
 
-from gi.repository import Adw, Gio
+from gi.repository import Adw, Gio  # type:ignore
 
 APP_ID = "@APP_ID@"
 VERSION = "@VERSION@"
