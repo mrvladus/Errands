@@ -4,7 +4,7 @@ from caldav import Calendar, DAVClient, Principal, Todo
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.utils.data import UserData
-from gi.repository import Adw, GLib
+from gi.repository import Adw, GLib  # type:ignore
 from caldav.elements import dav
 
 
@@ -384,8 +384,6 @@ class SyncProviderCalDAV:
                         Log.error(
                             f"Sync: Can't delete task from remote: '{task['uid']}'. {e}"
                         )
-
-            # Delete remote task it it was moved to different list
 
             # Create new local task that was created on CalDAV
             for task in remote_tasks:

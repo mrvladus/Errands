@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from errands.widgets.task_list import TaskList
     from errands.widgets.window import Window
 
-from errands.widgets.components import Box
+from errands.widgets.components import Box, Button
 from gi.repository import Gtk, Adw, Gdk, GObject  # type:ignore
 from errands.lib.sync.sync import Sync
 from errands.lib.logging import Log
@@ -156,7 +156,7 @@ class TaskTitleRow(Gtk.Overlay):
             css_classes=["expand-indicator"],
             halign=Gtk.Align.END,
             margin_end=23,
-            margin_top=45,
+            margin_top=36,
         )
         expand_indicator_rev = Gtk.Revealer(
             child=self.expand_indicator,
@@ -177,12 +177,15 @@ class TaskTitleRow(Gtk.Overlay):
         )
         self.task_row.add_controller(hover_ctrl)
 
+        self.info_row = TaskInfoBar(self.task)
+
         box = Gtk.ListBox(
             selection_mode=Gtk.SelectionMode.NONE,
             css_classes=["rounded-corners", "transparent"],
             accessible_role=Gtk.AccessibleRole.PRESENTATION,
         )
         box.append(self.task_row)
+        box.append(Gtk.ListBoxRow(child=self.info_row, activatable=False))
 
         self.set_child(box)
 
@@ -404,14 +407,50 @@ class TaskDetailsButton(Gtk.Button):
         self.task.task_list.split_view.set_show_sidebar(True)
 
 
-class TaskStatusBar(Gtk.Box):
+class TaskInfoBar(Gtk.Box):
     def __init__(self, task: Task):
         super().__init__()
         self.task: Task = task
         self._build_ui()
+        self.update_ui()
 
     def _build_ui(self):
-        pass
+        self.set_orientation(Gtk.Orientation.VERTICAL)
+        self.set_margin_start(12)
+        self.set_margin_end(12)
+        self.set_margin_bottom(6)
+        self.progress_bar = Gtk.ProgressBar()
+        self.progress_bar.add_css_class("osd")
+        self.progress_bar.add_css_class("dim-label")
+        self.due_date = Gtk.Label(label=_("Due"), css_classes=("caption", "dim-label"))
+        self.tags = Gtk.Box(hexpand=True)
+        self.notes_icon = Gtk.Image(
+            icon_name="errands-notes-symbolic",
+            halign="end",
+            tooltip_text=_("Task has Notes"),
+            css_classes=["dim-label"],
+        )
+        self.append(self.progress_bar)
+        self.status_box = Box(
+            children=[
+                self.due_date,
+                self.tags,
+                self.notes_icon,
+            ],
+            margin_top=8,
+        )
+        self.append(self.status_box)
+
+    def update_ui(self):
+        end_date = self.task.get_prop("end_date")
+        notes = self.task.get_prop("notes")
+        pc = self.task.get_prop("percent_complete")
+        # self.due_date.set_visible(end_date)
+        # self.notes_icon.set_visible(notes)
+        self.progress_bar.set_fraction(pc / 100)
+        # self.status_box.set_visible(end_date and notes)
+        # if self.get_parent():
+        #     self.get_parent().set_visible(pc > 0 or (end_date and notes))
 
 
 class TaskSubTasksEntry(Gtk.Entry):
@@ -668,3 +707,4 @@ class Task(Gtk.Revealer):
         self.task_row.task_row.set_subtitle(
             _("Completed:") + f" {completed} / {total}" if total > 0 else ""
         )
+        self.task_row.info_row.update_ui()

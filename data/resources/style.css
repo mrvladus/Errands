@@ -163,3 +163,7 @@ calendar header {
 .expand-indicator-expanded {
   transform: rotate(180deg);
 }
+
+progressbar.osd {
+  background-color: @shade_color;
+}
