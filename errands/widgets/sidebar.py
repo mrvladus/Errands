@@ -537,23 +537,7 @@ class SidebarTaskListsItem(Gtk.ListBoxRow):
             return
 
         Log.info(f"Lists: Move '{task.uid}' to '{self.uid}' list")
-
-        UserData.run_sql(
-            f"""UPDATE tasks
-            SET list_uid = '{self.uid}', parent = '', synced = 0
-            WHERE list_uid = '{task.list_uid}'
-            AND uid = '{task.uid}'
-            """
-        )
-        for uid in UserData.get_tasks_uids_tree(task.list_uid, task.uid):
-            UserData.run_sql(
-                f"""UPDATE tasks
-                SET list_uid = '{self.uid}', synced = 0
-                WHERE list_uid = '{task.list_uid}'
-                AND uid = '{uid}'
-                """
-            )
-
+        UserData.move_task_to_list(task.uid, task.list_uid, self.uid, "", False)
         Sync.sync()
 
 

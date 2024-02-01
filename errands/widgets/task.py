@@ -3,14 +3,14 @@
 
 from __future__ import annotations
 from re import T
-from typing import Any, Self, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from errands.widgets.task_list import TaskList
     from errands.widgets.window import Window
 
 from errands.widgets.components import Box
-from gi.repository import Gtk, Adw, Gdk, GObject
+from gi.repository import Gtk, Adw, Gdk, GObject  # type:ignore
 from errands.lib.sync.sync import Sync
 from errands.lib.logging import Log
 from errands.utils.data import UserData
@@ -53,17 +53,14 @@ class TaskTopDropArea(Gtk.Revealer):
         When task is dropped on "+" area on top of task
         """
 
-        # Return if task is itself
-        if task == self.task:
-            return False
-
-        # Move data
-        UserData.run_sql("CREATE TABLE tmp AS SELECT * FROM tasks WHERE 0")
-        ids: list[str] = UserData.get_tasks()
-        ids.insert(ids.index(self.task.uid), ids.pop(ids.index(task.uid)))
-        for id in ids:
-            UserData.run_sql(f"INSERT INTO tmp SELECT * FROM tasks WHERE uid = '{id}'")
-        UserData.run_sql("DROP TABLE tasks", "ALTER TABLE tmp RENAME TO tasks")
+        UserData.move_task_to_list(
+            task.uid,
+            task.list_uid,
+            self.task.list_uid,
+            self.task.parent.uid if isinstance(self.task.parent, Task) else "",
+            False,
+        )
+        UserData.move_task_before(self.task.list_uid, task.uid, self.task.uid)
         # If task has the same parent
         if task.parent == self.task.parent:
             # Move widget
@@ -71,8 +68,12 @@ class TaskTopDropArea(Gtk.Revealer):
             self.task.parent.tasks_list.reorder_child_after(self.task, task)
             return True
         # Change parent if different parents
-        task.update_props(["parent", "synced"], [self.task.get_prop("parent"), False])
-        task.purge()
+        UserData.update_props(
+            self.task.list_uid,
+            task.uid,
+            ["parent", "synced"],
+            [self.task.parent.uid if isinstance(self.task.parent, Task) else "", False],
+        )
         # Add new task widget
         new_task: Task = Task(
             task.uid,
@@ -86,10 +87,10 @@ class TaskTopDropArea(Gtk.Revealer):
         self.task.parent.tasks_list.reorder_child_after(new_task, self.task)
         self.task.parent.tasks_list.reorder_child_after(self.task, new_task)
         new_task.toggle_visibility(True)
-        self.task.details.update_info(new_task)
         # Update status
         self.task.parent.update_status()
         task.parent.update_status()
+        task.purge()
         # Sync
         Sync.sync()
 
@@ -222,32 +223,24 @@ class TaskTitleRow(Gtk.Overlay):
             return
 
         # Change parent
-        task.update_props(
-            ["parent", "synced", "list_uid"],
-            [self.task.get_prop("uid"), False, self.task.list_uid],
+        UserData.move_task_to_list(
+            task.uid,
+            task.list_uid,
+            self.task.list_uid,
+            self.task.get_prop("uid"),
+            False,
         )
-        # Move data
-        uids: list[str] = UserData.get_tasks()
-        last_sub_uid: str = UserData.get_tasks_uids(self.task.list_uid, self.task.uid)[
-            -1
-        ]
-        uids.insert(
-            uids.index(self.task.uid) + uids.index(last_sub_uid),
-            uids.pop(uids.index(task.uid)),
-        )
-        UserData.run_sql("CREATE TABLE tmp AS SELECT * FROM tasks WHERE 0")
-        for id in uids:
-            UserData.run_sql(f"INSERT INTO tmp SELECT * FROM tasks WHERE uid = '{id}'")
-        UserData.run_sql("DROP TABLE tasks", "ALTER TABLE tmp RENAME TO tasks")
         # Remove old task
+        uid: str = task.uid
         task.purge()
         # Add new sub-task
-        new_task: Task = self.task.tasks_list.add_sub_task(task.uid)
-        self.task.details.update_info(new_task)
+        self.task.tasks_list.add_sub_task(uid)
         self.task.update_props(["completed"], [False])
-        self.just_added = True
+        self.task.just_added = True
         self.task.task_row.complete_btn.set_active(False)
         self.task.just_added = False
+        if not self.task.get_prop("expanded"):
+            self.task.expand(True)
         # Update status
         task.parent.update_status()
         self.task.update_status()

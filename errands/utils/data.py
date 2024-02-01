@@ -1,4 +1,4 @@
-# Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
+# Copyright 2023-2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
 import json
@@ -8,7 +8,7 @@ import sqlite3
 from typing import Any, TypedDict
 from uuid import uuid4
 from errands.lib.gsettings import GSettings
-from gi.repository import GLib
+from gi.repository import GLib  # type:ignore
 from errands.lib.logging import Log
 
 
@@ -129,6 +129,76 @@ class UserData:
             return lists
 
     @classmethod
+    def move_task_before(cls, list_uid: str, task_uid: str, before_uid: str) -> None:
+        tasks: list[TaskData] = UserData.get_tasks_as_dicts()
+
+        # Find tasks to move
+        task_to_move_down: TaskData = None
+        task_to_move_up: TaskData = None
+        for task in tasks:
+            if task["list_uid"] == list_uid and task["uid"] == before_uid:
+                task_to_move_down = task
+            elif task["list_uid"] == list_uid and task["uid"] == task_uid:
+                task_to_move_up = task
+
+        # Move task up
+        task_to_move_up = tasks.pop(tasks.index(task_to_move_up))
+        tasks.insert(tasks.index(task_to_move_down), task_to_move_up)
+
+        # Run SQL
+        values: list[tuple[str, str]] = ((t["list_uid"], t["uid"]) for t in tasks)
+        with cls.connection:
+            cur = cls.connection.cursor()
+            cur.execute("CREATE TABLE IF NOT EXISTS tmp AS SELECT * FROM tasks WHERE 0")
+            cur.executemany(
+                f"""INSERT INTO tmp SELECT * FROM tasks
+                    WHERE list_uid = ? AND uid = ?""",
+                values,
+            )
+            cur.execute("DROP TABLE tasks")
+            cur.execute("ALTER TABLE tmp RENAME TO tasks")
+
+    @classmethod
+    def move_task_to_list(
+        cls,
+        task_uid: str,
+        old_list_uid: str,
+        new_list_uid: str,
+        parent: str,
+        synced: bool,
+    ) -> None:
+        sub_tasks_uids: list[str] = cls.get_tasks_uids_tree(old_list_uid, task_uid)
+        tasks: list[TaskData] = cls.get_tasks_as_dicts(old_list_uid)
+        task_dict: TaskData = [i for i in tasks if i["uid"] == task_uid][0]
+        sub_tasks_dicts: list[TaskData] = [
+            i for i in tasks if i["uid"] in sub_tasks_uids
+        ]
+        # Move task
+        if old_list_uid == new_list_uid:
+            cls.run_sql(
+                f"DELETE FROM tasks WHERE list_uid = '{old_list_uid}' AND uid = '{task_uid}'"
+            )
+        else:
+            cls.update_props(old_list_uid, task_uid, ["deleted"], [True])
+        task_dict["list_uid"] = new_list_uid
+        task_dict["parent"] = parent
+        task_dict["synced"] = synced
+        cls.add_task(**task_dict)
+        # Move sub-tasks
+        for sub_dict in sub_tasks_dicts:
+            if old_list_uid == new_list_uid:
+                cls.run_sql(
+                    f"""DELETE FROM tasks
+                    WHERE list_uid = '{old_list_uid}'
+                    AND uid = '{sub_dict['uid']}'"""
+                )
+            else:
+                cls.update_props(old_list_uid, sub_dict["uid"], ["deleted"], [True])
+            sub_dict["list_uid"] = new_list_uid
+            sub_dict["synced"] = synced
+            cls.add_task(**sub_dict)
+
+    @classmethod
     def get_prop(cls, list_uid: str, uid: str, prop: str) -> Any:
         # Log.debug(f"Data: Get '{prop}' for '{uid}'")
 
@@ -205,16 +275,21 @@ class UserData:
         return uids
 
     @classmethod
-    def get_tasks_as_dicts(cls, list_uid: str, parent: str = None) -> list[TaskData]:
+    def get_tasks_as_dicts(
+        cls, list_uid: str = None, parent: str = None
+    ) -> list[TaskData]:
         # Log.debug(f"Data: Get tasks as dicts")
 
         with cls.connection:
             cur = cls.connection.cursor()
-            cur.execute(
-                f"""SELECT * FROM tasks WHERE list_uid = ?
-                {f"AND parent = '{parent}'" if parent else ""}""",
-                (list_uid,),
-            )
+            if not list_uid and not parent:
+                cur.execute("SELECT * FROM tasks")
+            else:
+                cur.execute(
+                    f"""SELECT * FROM tasks WHERE list_uid = ?
+                    {f"AND parent = '{parent}'" if parent else ""}""",
+                    (list_uid,),
+                )
             tasks: list[TaskData] = []
             for task in cur.fetchall():
                 tasks.append(
