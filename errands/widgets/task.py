@@ -156,7 +156,7 @@ class TaskTitleRow(Gtk.Overlay):
             css_classes=["expand-indicator"],
             halign=Gtk.Align.END,
             margin_end=23,
-            margin_top=36,
+            margin_top=45,
         )
         expand_indicator_rev = Gtk.Revealer(
             child=self.expand_indicator,
@@ -177,15 +177,12 @@ class TaskTitleRow(Gtk.Overlay):
         )
         self.task_row.add_controller(hover_ctrl)
 
-        self.info_row = TaskInfoBar(self.task)
-
         box = Gtk.ListBox(
             selection_mode=Gtk.SelectionMode.NONE,
             css_classes=["rounded-corners", "transparent"],
             accessible_role=Gtk.AccessibleRole.PRESENTATION,
         )
         box.append(self.task_row)
-        box.append(Gtk.ListBoxRow(child=self.info_row, activatable=False))
 
         self.set_child(box)
 
@@ -445,10 +442,10 @@ class TaskInfoBar(Gtk.Box):
         end_date = self.task.get_prop("end_date")
         notes = self.task.get_prop("notes")
         pc = self.task.get_prop("percent_complete")
-        # self.due_date.set_visible(end_date)
-        # self.notes_icon.set_visible(notes)
+        self.due_date.set_visible(end_date)
+        self.notes_icon.set_visible(notes)
         self.progress_bar.set_fraction(pc / 100)
-        # self.status_box.set_visible(end_date and notes)
+        self.status_box.set_visible(end_date and notes)
         # if self.get_parent():
         #     self.get_parent().set_visible(pc > 0 or (end_date and notes))
 
@@ -464,6 +461,7 @@ class TaskSubTasksEntry(Gtk.Entry):
         self.set_placeholder_text(_("Add new Sub-Task"))
         self.set_margin_start(12)
         self.set_margin_end(12)
+        self.set_margin_top(4)
         self.set_margin_bottom(6)
 
     def do_activate(self) -> None:
@@ -593,6 +591,9 @@ class Task(Gtk.Revealer):
         # Task row
         self.task_row = TaskTitleRow(self)
 
+        # Info bar
+        self.info_bar = TaskInfoBar(self)
+
         # Sub-tasks
         self.tasks_list = TaskSubTasks(self)
 
@@ -606,7 +607,7 @@ class Task(Gtk.Revealer):
 
         # Task card
         self.main_box = Box(
-            children=[self.task_row, self.sub_tasks_revealer],
+            children=[self.task_row, self.info_bar, self.sub_tasks_revealer],
             orientation="vertical",
             hexpand=True,
             css_classes=["fade", "card", f'task-{self.get_prop("color")}'],
@@ -707,4 +708,4 @@ class Task(Gtk.Revealer):
         self.task_row.task_row.set_subtitle(
             _("Completed:") + f" {completed} / {total}" if total > 0 else ""
         )
-        self.task_row.info_row.update_ui()
+        self.info_bar.update_ui()
