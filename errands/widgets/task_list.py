@@ -349,6 +349,9 @@ class TaskList(Adw.Bin):
         else:
             self.details.update_info(None)
 
+        for task in self.get_toplevel_tasks():
+            task.update_ui()
+
         self.update_status()
 
     def _on_delete_completed_btn_clicked(self, _) -> None:

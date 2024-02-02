@@ -2,8 +2,6 @@
 # SPDX-License-Identifier: MIT
 
 from __future__ import annotations
-from curses.ascii import GS
-from re import T
 from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -89,9 +87,8 @@ class TaskTopDropArea(Gtk.Revealer):
         self.task.parent.tasks_list.reorder_child_after(self.task, new_task)
         new_task.toggle_visibility(True)
         # Update status
-        self.task.parent.update_status()
-        task.parent.update_status()
         task.purge()
+        self.task.task_list.update_ui()
         # Sync
         Sync.sync()
 
@@ -193,6 +190,14 @@ class TaskTitleRow(Gtk.Overlay):
         else:
             self.task.task_row.details_btn.do_clicked()
 
+    def update_ui(self):
+        total, completed = self.task.get_status()
+        self.task_row.set_subtitle(
+            _("Completed:") + f" {completed} / {total}" if total > 0 else ""
+        )
+
+    # --- DND --- #
+
     def _on_drag_prepare(self, *_) -> Gdk.ContentProvider:
         # Bug workaround when task is not sensitive after short dnd
         for task in self.task.task_list.get_all_tasks():
@@ -230,21 +235,19 @@ class TaskTitleRow(Gtk.Overlay):
             self.task.get_prop("uid"),
             False,
         )
-        # Remove old task
-        uid: str = task.uid
-        task.purge()
         # Add new sub-task
-        self.task.tasks_list.add_sub_task(uid)
-        self.task.update_props(["completed"], [False])
-        self.task.just_added = True
-        self.task.task_row.complete_btn.set_active(False)
-        self.task.just_added = False
+        self.task.tasks_list.add_sub_task(task.uid)
+        # Toggle completion
+        if not task.task_row.complete_btn.get_active():
+            self.task.update_props(["completed", "synced"], [False, False])
+            self.task.just_added = True
+            self.task.task_row.complete_btn.set_active(False)
+            self.task.just_added = False
         if not self.task.get_prop("expanded"):
             self.task.expand(True)
-        # Update status
-        task.parent.update_status()
-        self.task.update_status()
-        self.task.parent.update_status()
+        # Remove old task
+        task.purge()
+        self.task.task_list.update_ui()
         # Sync
         Sync.sync()
 
@@ -291,6 +294,7 @@ class TaskCompleteButton(Gtk.Box):
         GSettings.bind("task-big-toggle", small_btn, "visible", True)
         self.append(small_btn)
 
+    # TODO: refactor again
     def _on_toggle(self, btn: Gtk.CheckButton) -> None:
         Log.debug(f"Task '{self.task.uid}': Set completed to '{self.get_active()}'")
 
@@ -306,19 +310,19 @@ class TaskCompleteButton(Gtk.Box):
         if self.get_active():
             # Complete all sub-tasks
             for sub in sub_tasks:
-                sub.just_added = True
-                sub.task_row.complete_btn.set_active(True)
-                sub.task_row.add_rm_crossline(True)
-                sub.just_added = False
-                sub.update_props(["completed", "synced"], [True, False])
+                if not sub.task_row.complete_btn.get_active():
+                    sub.just_added = True
+                    sub.task_row.complete_btn.set_active(True)
+                    sub.just_added = False
+                    sub.update_props(["completed", "synced"], [True, False])
         else:
             # Uncomplete parent if sub-task is uncompleted
             for parent in parents:
-                parent.just_added = True
-                parent.task_row.complete_btn.set_active(False)
-                parent.task_row.add_rm_crossline(False)
-                parent.just_added = False
-                parent.update_props(["completed", "synced"], [False, False])
+                if parent.task_row.complete_btn.get_active():
+                    parent.just_added = True
+                    parent.task_row.complete_btn.set_active(False)
+                    parent.just_added = False
+                    parent.update_props(["completed", "synced"], [False, False])
 
         # Calculate completion percent for parents
         for parent in parents:
@@ -329,7 +333,7 @@ class TaskCompleteButton(Gtk.Box):
                 else parent.get_prop("percent_complete")
             )
             parent.update_props(["percent_complete", "synced"], [pc, False])
-            parent.update_status()
+            parent.update_ui()
 
         # Calculate completion percent for self
         total, completed = self.task.get_status()
@@ -351,8 +355,8 @@ class TaskCompleteButton(Gtk.Box):
             sub.update_props(["percent_complete", "synced"], [pc, False])
 
         self.task.details.update_info(self.task.details.parent)
-        self.task.parent.update_status()
-        self.task.update_status()
+        self.task.parent.update_ui()
+        self.task.update_ui()
         Sync.sync()
 
 
@@ -409,7 +413,6 @@ class TaskInfoBar(Gtk.Box):
         super().__init__()
         self.task: Task = task
         self._build_ui()
-        self.update_ui()
 
     def _build_ui(self):
         self.set_orientation(Gtk.Orientation.VERTICAL)
@@ -488,7 +491,7 @@ class TaskSubTasksEntry(Gtk.Entry):
         self.set_placeholder_text(_("Add new Sub-Task"))
         self.set_margin_start(12)
         self.set_margin_end(12)
-        self.set_margin_bottom(3)
+        self.set_margin_bottom(2)
 
     def do_activate(self) -> None:
         """
@@ -515,7 +518,7 @@ class TaskSubTasksEntry(Gtk.Entry):
         self.task.just_added = True
         self.task.task_row.complete_btn.set_active(False)
         self.task.just_added = False
-        self.task.update_status()
+        self.task.update_ui()
 
         # Sync
         Sync.sync()
@@ -539,7 +542,7 @@ class TaskSubTasks(Gtk.Box):
             return
         for uid in subs:
             self.add_sub_task(uid)
-        self.task.parent.update_status()
+        # self.task.parent.update_ui()
         self.task.task_list.update_status()
         self.task.just_added = False
 
@@ -608,7 +611,7 @@ class Task(Gtk.Revealer):
             self.trash.trash_add(self)
         # Expand
         self.expand(self.get_prop("expanded"))
-        self.update_status()
+        self.update_ui()
 
     def _build_ui(self) -> None:
         # Top drop area
@@ -673,23 +676,14 @@ class Task(Gtk.Revealer):
     def get_status(self) -> tuple[int, int]:
         """Get total tasks and completed tasks tuple"""
 
-        total: int = UserData.run_sql(
-            f"""SELECT COUNT(*) FROM tasks
-            WHERE list_uid = '{self.list_uid}'
-            AND parent = '{self.uid}'
-            AND trash = 0
-            AND deleted = 0""",
-            fetch=True,
-        )[0][0]
-        completed: int = UserData.run_sql(
-            f"""SELECT COUNT(*) FROM tasks
-            WHERE list_uid = '{self.list_uid}'
-            AND parent = '{self.uid}'
-            AND trash = 0
-            AND deleted = 0
-            AND completed = 1""",
-            fetch=True,
-        )[0][0]
+        total: int = 0
+        completed: int = 0
+        sub_tasks: list[Task] = self.tasks_list.get_sub_tasks()
+        for task in sub_tasks:
+            if task.get_reveal_child():
+                total += 1
+                if task.task_row.complete_btn.get_active():
+                    completed += 1
 
         return total, completed
 
@@ -729,9 +723,8 @@ class Task(Gtk.Revealer):
     def update_props(self, props: list[str], values: list[Any]) -> None:
         UserData.update_props(self.list_uid, self.uid, props, values)
 
-    def update_status(self) -> None:
-        total, completed = self.get_status()
-        self.task_row.task_row.set_subtitle(
-            _("Completed:") + f" {completed} / {total}" if total > 0 else ""
-        )
+    def update_ui(self) -> None:
+        self.task_row.update_ui()
         self.info_bar.update_ui()
+        for task in self.tasks_list.get_sub_tasks():
+            task.update_ui()
