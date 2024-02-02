@@ -332,7 +332,8 @@ class TaskCompleteButton(Gtk.Box):
                 if total > 0
                 else parent.get_prop("percent_complete")
             )
-            parent.update_props(["percent_complete", "synced"], [pc, False])
+            if parent.get_prop("percent_complete") != pc:
+                parent.update_props(["percent_complete", "synced"], [pc, False])
             parent.update_ui()
 
         # Calculate completion percent for self
