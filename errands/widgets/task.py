@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 from __future__ import annotations
+from curses.ascii import GS
 from re import T
 from typing import Any, TYPE_CHECKING
 
@@ -155,8 +156,7 @@ class TaskTitleRow(Gtk.Overlay):
             icon_name="errands-up-symbolic",
             css_classes=["expand-indicator"],
             halign=Gtk.Align.END,
-            margin_end=23,
-            margin_top=45,
+            margin_end=50,
         )
         expand_indicator_rev = Gtk.Revealer(
             child=self.expand_indicator,
@@ -413,41 +413,68 @@ class TaskInfoBar(Gtk.Box):
 
     def _build_ui(self):
         self.set_orientation(Gtk.Orientation.VERTICAL)
-        self.set_margin_start(12)
-        self.set_margin_end(12)
-        self.set_margin_bottom(6)
-        self.progress_bar = Gtk.ProgressBar()
+
+        # Progress bar
+        self.progress_bar = Gtk.ProgressBar(
+            margin_end=12,
+            margin_start=12,
+            margin_bottom=6,
+        )
         self.progress_bar.add_css_class("osd")
         self.progress_bar.add_css_class("dim-label")
-        self.due_date = Gtk.Label(label=_("Due"), css_classes=("caption", "dim-label"))
-        self.tags = Gtk.Box(hexpand=True)
-        self.notes_icon = Gtk.Image(
-            icon_name="errands-notes-symbolic",
-            halign="end",
-            tooltip_text=_("Task has Notes"),
-            css_classes=["dim-label"],
+        GSettings.bind("task-show-progressbar", self.progress_bar, "visible")
+        self.progress_bar_bin = Adw.Bin(child=self.progress_bar)
+        self.append(self.progress_bar_bin)
+
+        # Info
+        self.due_date = Button(
+            icon_name="errands-calendar-symbolic",
+            label=_("Due"),
+            css_classes=["task-toolbar-btn"],
+            cursor=Gdk.Cursor(name="pointer"),
         )
-        self.append(self.progress_bar)
+        self.priority = Button(
+            icon_name="errands-priority-symbolic",
+            label=_("Priority"),
+            css_classes=["task-toolbar-btn"],
+            cursor=Gdk.Cursor(name="pointer"),
+        )
+        self.notes = Button(
+            icon_name="errands-notes-symbolic",
+            label=_("Notes"),
+            css_classes=["task-toolbar-btn"],
+            cursor=Gdk.Cursor(name="pointer"),
+        )
+        self.color = Button(
+            icon_name="errands-color-symbolic",
+            label=_("Color"),
+            css_classes=["task-toolbar-btn"],
+            cursor=Gdk.Cursor(name="pointer"),
+        )
+        self.tags = Gtk.Box(hexpand=True)
         self.status_box = Box(
             children=[
                 self.due_date,
+                self.priority,
                 self.tags,
-                self.notes_icon,
+                self.notes,
+                self.color,
             ],
-            margin_top=8,
+            margin_end=12,
+            margin_start=12,
+            margin_bottom=3,
         )
-        self.append(self.status_box)
+        GSettings.bind("task-show-toolbar", self.status_box, "visible")
+        # self.append(self.status_box)
 
     def update_ui(self):
-        end_date = self.task.get_prop("end_date")
-        notes = self.task.get_prop("notes")
-        pc = self.task.get_prop("percent_complete")
-        self.due_date.set_visible(end_date)
-        self.notes_icon.set_visible(notes)
-        self.progress_bar.set_fraction(pc / 100)
-        self.status_box.set_visible(end_date and notes)
-        # if self.get_parent():
-        #     self.get_parent().set_visible(pc > 0 or (end_date and notes))
+        # end_date = self.task.get_prop("end_date")
+        # start_date = self.task.get_prop("start_date")
+        # notes = self.task.get_prop("notes")
+        if GSettings.get("task-show-progressbar"):
+            pc = self.task.get_prop("percent_complete")
+            self.progress_bar.set_fraction(pc / 100)
+            self.progress_bar_bin.set_visible(self.task.get_status()[0] > 0)
 
 
 class TaskSubTasksEntry(Gtk.Entry):
@@ -461,8 +488,7 @@ class TaskSubTasksEntry(Gtk.Entry):
         self.set_placeholder_text(_("Add new Sub-Task"))
         self.set_margin_start(12)
         self.set_margin_end(12)
-        self.set_margin_top(4)
-        self.set_margin_bottom(6)
+        self.set_margin_bottom(3)
 
     def do_activate(self) -> None:
         """

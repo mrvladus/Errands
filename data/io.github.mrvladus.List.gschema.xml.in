@@ -43,5 +43,11 @@
     <key name="task-big-toggle" type="b">
       <default>true</default>
     </key>
+    <key name="task-show-progressbar" type="b">
+      <default>true</default>
+    </key>
+    <key name="task-show-toolbar" type="b">
+      <default>true</default>
+    </key>
   </schema>
 </schemalist>
