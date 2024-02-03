@@ -314,12 +314,6 @@ class Details(Adw.Bin):
                 Markup.find_url(Markup.escape(text))
             )
 
-        # Percent complete
-        pc: int = self.percent_complete.get_value_as_int()
-        self.parent.can_sync = False
-        self.parent.task_row.complete_btn.set_active(pc == 100)
-        self.parent.can_sync = True
-
         # Save props
         self.parent.update_props(
             [
@@ -338,7 +332,7 @@ class Details(Adw.Bin):
                 self.parent.task_row.complete_btn.get_active(),
                 self.start_datetime.get_datetime(),
                 self.end_datetime.get_datetime(),
-                pc,
+                self.percent_complete.get_value_as_int(),
                 self.priority.get_value_as_int(),
                 False,
             ],

@@ -453,8 +453,10 @@ class TaskInfoBar(Gtk.Box):
         self.progress_bar.add_css_class("osd")
         self.progress_bar.add_css_class("dim-label")
         GSettings.bind("task-show-progressbar", self.progress_bar, "visible")
-        self.progress_bar_bin = Adw.Bin(child=self.progress_bar)
-        self.append(self.progress_bar_bin)
+        self.progress_bar_rev = Gtk.Revealer(
+            child=self.progress_bar, transition_duration=100
+        )
+        self.append(self.progress_bar_rev)
 
         # Info
         # self.due_date = Button(
@@ -508,13 +510,19 @@ class TaskInfoBar(Gtk.Box):
             pc: int = (
                 completed / total * 100
                 if total > 0
-                else (100 if self.task.get_prop("completed") else 0)
+                else (
+                    100
+                    if self.task.get_prop("completed")
+                    else self.task.get_prop("percent_complete")
+                )
             )
             if self.task.get_prop("percent_complete") != pc:
                 self.task.update_props(["percent_complete", "synced"], [pc, False])
 
             self.progress_bar.set_fraction(pc / 100)
-            self.progress_bar_bin.set_visible(self.task.get_status()[0] > 0)
+            self.progress_bar_rev.set_reveal_child(
+                self.task.get_status()[0] > 0 or pc > 0
+            )
 
 
 class TaskSubTasksEntry(Gtk.Entry):
