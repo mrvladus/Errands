@@ -86,6 +86,18 @@ class TaskTopDropArea(Gtk.Revealer):
         self.task.parent.tasks_list.reorder_child_after(new_task, self.task)
         self.task.parent.tasks_list.reorder_child_after(self.task, new_task)
         new_task.toggle_visibility(True)
+        # Toggle completion
+        if not task.task_row.complete_btn.get_active():
+            self.task.update_props(["completed", "synced"], [False, False])
+            self.task.just_added = True
+            self.task.task_row.complete_btn.set_active(False)
+            self.task.just_added = False
+            for parent in self.task.get_parents_tree():
+                if parent.task_row.complete_btn.get_active():
+                    parent.update_props(["completed", "synced"], [False, False])
+                    parent.just_added = True
+                    parent.task_row.complete_btn.set_active(False)
+                    parent.just_added = False
         # Update status
         task.purge()
         self.task.task_list.update_ui()
@@ -191,6 +203,15 @@ class TaskTitleRow(Gtk.Overlay):
             self.task.task_row.details_btn.do_clicked()
 
     def update_ui(self):
+        # Update widget title crossline and completed toggle
+        completed: bool = self.task.get_prop("completed")
+        self.add_rm_crossline(completed)
+        if self.complete_btn.get_active() != completed:
+            self.task.just_added = True
+            self.complete_btn.set_active(completed)
+            self.task.just_added = False
+
+        # Update subtitle
         total, completed = self.task.get_status()
         self.task_row.set_subtitle(
             _("Completed:") + f" {completed} / {total}" if total > 0 else ""
@@ -243,6 +264,12 @@ class TaskTitleRow(Gtk.Overlay):
             self.task.just_added = True
             self.task.task_row.complete_btn.set_active(False)
             self.task.just_added = False
+            for parent in self.task.get_parents_tree():
+                if parent.task_row.complete_btn.get_active():
+                    parent.update_props(["completed", "synced"], [False, False])
+                    parent.just_added = True
+                    parent.task_row.complete_btn.set_active(False)
+                    parent.just_added = False
         if not self.task.get_prop("expanded"):
             self.task.expand(True)
         # Remove old task
@@ -294,7 +321,6 @@ class TaskCompleteButton(Gtk.Box):
         GSettings.bind("task-big-toggle", small_btn, "visible", True)
         self.append(small_btn)
 
-    # TODO: refactor again
     def _on_toggle(self, btn: Gtk.CheckButton) -> None:
         Log.debug(f"Task '{self.task.uid}': Set completed to '{self.get_active()}'")
 
@@ -325,39 +351,39 @@ class TaskCompleteButton(Gtk.Box):
                     parent.update_props(["completed", "synced"], [False, False])
 
         # Calculate completion percent for parents
-        for parent in parents:
-            total, completed = parent.get_status()
-            pc: int = (
-                completed / total * 100
-                if total > 0
-                else parent.get_prop("percent_complete")
-            )
-            if parent.get_prop("percent_complete") != pc:
-                parent.update_props(["percent_complete", "synced"], [pc, False])
-            parent.update_ui()
+        # for parent in parents:
+        #     total, completed = parent.get_status()
+        #     pc: int = (
+        #         completed / total * 100
+        #         if total > 0
+        #         else parent.get_prop("percent_complete")
+        #     )
+        #     if parent.get_prop("percent_complete") != pc:
+        #         parent.update_props(["percent_complete", "synced"], [pc, False])
+        #     parent.update_ui()
 
         # Calculate completion percent for self
-        total, completed = self.task.get_status()
-        pc: int = (
-            completed / total * 100
-            if total > 0
-            else (100 if self.task.get_prop("completed") else 0)
-        )
-        if self.task.get_prop("percent_complete") != pc:
-            self.task.update_props(["percent_complete", "synced"], [pc, False])
+        # total, completed = self.task.get_status()
+        # pc: int = (
+        #     completed / total * 100
+        #     if total > 0
+        #     else (100 if self.task.get_prop("completed") else 0)
+        # )
+        # if self.task.get_prop("percent_complete") != pc:
+        #     self.task.update_props(["percent_complete", "synced"], [pc, False])
 
-        # Calculate completion percent for sub-tasks
-        for sub in sub_tasks:
-            total, completed = sub.get_status()
-            pc: int = (
-                completed / total * 100
-                if total > 0
-                else (100 if self.task.get_prop("completed") else 0)
-            )
-            if sub.get_prop("percent_complete") != pc:
-                sub.update_props(["percent_complete", "synced"], [pc, False])
+        # # Calculate completion percent for sub-tasks
+        # for sub in sub_tasks:
+        #     total, completed = sub.get_status()
+        #     pc: int = (
+        #         completed / total * 100
+        #         if total > 0
+        #         else (100 if self.task.get_prop("completed") else 0)
+        #     )
+        #     if sub.get_prop("percent_complete") != pc:
+        #         sub.update_props(["percent_complete", "synced"], [pc, False])
 
-        self.task.parent.update_ui()
+        self.task.task_list.update_ui()
         Sync.sync()
 
 
@@ -431,52 +457,62 @@ class TaskInfoBar(Gtk.Box):
         self.append(self.progress_bar_bin)
 
         # Info
-        self.due_date = Button(
-            icon_name="errands-calendar-symbolic",
-            label=_("Due"),
-            css_classes=["task-toolbar-btn"],
-            cursor=Gdk.Cursor(name="pointer"),
-        )
-        self.priority = Button(
-            icon_name="errands-priority-symbolic",
-            label=_("Priority"),
-            css_classes=["task-toolbar-btn"],
-            cursor=Gdk.Cursor(name="pointer"),
-        )
-        self.notes = Button(
-            icon_name="errands-notes-symbolic",
-            label=_("Notes"),
-            css_classes=["task-toolbar-btn"],
-            cursor=Gdk.Cursor(name="pointer"),
-        )
-        self.color = Button(
-            icon_name="errands-color-symbolic",
-            label=_("Color"),
-            css_classes=["task-toolbar-btn"],
-            cursor=Gdk.Cursor(name="pointer"),
-        )
-        self.tags = Gtk.Box(hexpand=True)
-        self.status_box = Box(
-            children=[
-                self.due_date,
-                self.priority,
-                self.tags,
-                self.notes,
-                self.color,
-            ],
-            margin_end=12,
-            margin_start=12,
-            margin_bottom=3,
-        )
-        GSettings.bind("task-show-toolbar", self.status_box, "visible")
+        # self.due_date = Button(
+        #     icon_name="errands-calendar-symbolic",
+        #     label=_("Due"),
+        #     css_classes=["task-toolbar-btn"],
+        #     cursor=Gdk.Cursor(name="pointer"),
+        # )
+        # self.priority = Button(
+        #     icon_name="errands-priority-symbolic",
+        #     label=_("Priority"),
+        #     css_classes=["task-toolbar-btn"],
+        #     cursor=Gdk.Cursor(name="pointer"),
+        # )
+        # self.notes = Button(
+        #     icon_name="errands-notes-symbolic",
+        #     label=_("Notes"),
+        #     css_classes=["task-toolbar-btn"],
+        #     cursor=Gdk.Cursor(name="pointer"),
+        # )
+        # self.color = Button(
+        #     icon_name="errands-color-symbolic",
+        #     label=_("Color"),
+        #     css_classes=["task-toolbar-btn"],
+        #     cursor=Gdk.Cursor(name="pointer"),
+        # )
+        # self.tags = Gtk.Box(hexpand=True)
+        # self.status_box = Box(
+        #     children=[
+        #         self.due_date,
+        #         self.priority,
+        #         self.tags,
+        #         self.notes,
+        #         self.color,
+        #     ],
+        #     margin_end=12,
+        #     margin_start=12,
+        #     margin_bottom=3,
+        # )
+        # GSettings.bind("task-show-toolbar", self.status_box, "visible")
         # self.append(self.status_box)
 
     def update_ui(self):
         # end_date = self.task.get_prop("end_date")
         # start_date = self.task.get_prop("start_date")
         # notes = self.task.get_prop("notes")
+
+        # Update percrent complete
         if GSettings.get("task-show-progressbar"):
-            pc = self.task.get_prop("percent_complete")
+            total, completed = self.task.get_status()
+            pc: int = (
+                completed / total * 100
+                if total > 0
+                else (100 if self.task.get_prop("completed") else 0)
+            )
+            if self.task.get_prop("percent_complete") != pc:
+                self.task.update_props(["percent_complete", "synced"], [pc, False])
+
             self.progress_bar.set_fraction(pc / 100)
             self.progress_bar_bin.set_visible(self.task.get_status()[0] > 0)
 
@@ -725,7 +761,22 @@ class Task(Gtk.Revealer):
         UserData.update_props(self.list_uid, self.uid, props, values)
 
     def update_ui(self) -> None:
+        # Change parent
+        parent: str = self.get_prop("parent")
+        uid: str = self.uid
+        if isinstance(self.parent, Task) and self.parent.uid != parent:
+            self.purge()
+            if not parent:
+                self.task_list.add_task(uid)
+                return
+            else:
+                for task in self.task_list.get_all_tasks():
+                    if task.uid == parent:
+                        task.add_task(uid)
+                        return
+
         self.task_row.update_ui()
         self.info_bar.update_ui()
+
         for task in self.tasks_list.get_sub_tasks():
             task.update_ui()
