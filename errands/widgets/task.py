@@ -343,7 +343,8 @@ class TaskCompleteButton(Gtk.Box):
             if total > 0
             else (100 if self.task.get_prop("completed") else 0)
         )
-        self.task.update_props(["percent_complete", "synced"], [pc, False])
+        if self.task.get_prop("percent_complete") != pc:
+            self.task.update_props(["percent_complete", "synced"], [pc, False])
 
         # Calculate completion percent for sub-tasks
         for sub in sub_tasks:
@@ -569,14 +570,14 @@ class TaskSubTasks(Gtk.Box):
 
         tasks: list[Task] = []
 
-        def append_tasks(sub_tasks: list[Task]) -> None:
+        def _append_tasks(sub_tasks: list[Task]) -> None:
             for task in sub_tasks:
                 tasks.append(task)
                 children: list[Task] = task.tasks_list.get_sub_tasks()
                 if len(children) > 0:
-                    append_tasks(children)
+                    _append_tasks(children)
 
-        append_tasks(self.get_sub_tasks())
+        _append_tasks(self.get_sub_tasks())
         return tasks
 
 
