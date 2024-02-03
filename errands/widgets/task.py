@@ -510,11 +510,7 @@ class TaskInfoBar(Gtk.Box):
             pc: int = (
                 completed / total * 100
                 if total > 0
-                else (
-                    100
-                    if self.task.get_prop("completed")
-                    else self.task.get_prop("percent_complete")
-                )
+                else self.task.get_prop("percent_complete")
             )
             if self.task.get_prop("percent_complete") != pc:
                 self.task.update_props(["percent_complete", "synced"], [pc, False])
@@ -744,7 +740,7 @@ class Task(Gtk.Revealer):
         for task in self.tasks_list.get_sub_tasks():
             if not task.get_prop("trash"):
                 task.delete()
-        self.parent.update_status()
+        self.parent.update_ui()
 
     def expand(self, expanded: bool) -> None:
         self.sub_tasks_revealer.set_reveal_child(expanded)
