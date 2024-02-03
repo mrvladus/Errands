@@ -312,6 +312,7 @@ class Details(Adw.Bin):
             ],
         )
 
+        self.parent.update_ui()
         Sync.sync(False)
 
     def update_info(self, parent: Task):
@@ -437,9 +438,11 @@ class Details(Adw.Bin):
                 event.add("x-errands-color", task["color"])
             event.add(
                 "dtstart",
-                datetime.fromisoformat(task["start_date"])
-                if task["start_date"]
-                else datetime.now(),
+                (
+                    datetime.fromisoformat(task["start_date"])
+                    if task["start_date"]
+                    else datetime.now()
+                ),
             )
             if task["end_date"]:
                 event.add("dtend", datetime.fromisoformat(task["end_date"]))
