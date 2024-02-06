@@ -777,6 +777,9 @@ class Task(Gtk.Revealer):
                         task.add_task(uid)
                         return
 
+        # Change visibility
+        self.toggle_visibility(not self.get_prop("trash"))
+
         self.task_row.update_ui()
         self.info_bar.update_ui()
 
