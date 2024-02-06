@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-27 15:42+0300\n"
+"POT-Creation-Date: 2024-02-06 17:55+0300\n"
 "PO-Revision-Date: 2024-01-06 14:35+0100\n"
 "Last-Translator: Peter Normann <peter@normann.dev>\n"
 "Language-Team: \n"
@@ -30,14 +30,14 @@ msgstr "I morgen"
 msgid "Now"
 msgstr "Nu"
 
-#: errands/widgets/components.py:172 errands/widgets/trash.py:36
+#: errands/widgets/components.py:172 errands/widgets/trash.py:37
 msgid "Clear"
 msgstr "Ryd"
 
 #. Start date row
 #. End date row
-#: errands/widgets/components.py:229 errands/widgets/details.py:145
-#: errands/widgets/details.py:166
+#: errands/widgets/components.py:231 errands/widgets/details.py:176
+#: errands/widgets/details.py:197
 msgid "Not Set"
 msgstr "Ikke angivet"
 
@@ -66,374 +66,384 @@ msgstr "Mørkt"
 #. )
 #. task_list_group.add(add_tasks_position)
 #. Tasks group
-#: errands/widgets/preferences.py:80 errands/widgets/window.py:79
+#: errands/widgets/preferences.py:80 errands/widgets/window.py:91
 msgid "Tasks"
 msgstr ""
 
-#: errands/widgets/preferences.py:82
+#: errands/widgets/preferences.py:83
 #, fuzzy
 msgid "Click Action"
 msgstr "Tryk på \"+\" knappen"
 
-#: errands/widgets/preferences.py:83
+#: errands/widgets/preferences.py:84
 msgid "Open Details Panel"
 msgstr ""
 
-#: errands/widgets/preferences.py:83
+#: errands/widgets/preferences.py:84
 #, fuzzy
 msgid "Show Sub-Tasks"
 msgstr "Tilføj ny under-opgave"
 
-#: errands/widgets/preferences.py:98
+#: errands/widgets/preferences.py:99
 #, fuzzy
 msgid "Complete Button Size"
 msgstr "Afsluttet %"
 
-#: errands/widgets/preferences.py:99
+#: errands/widgets/preferences.py:100
 msgid "Small"
 msgstr ""
 
-#: errands/widgets/preferences.py:99
+#: errands/widgets/preferences.py:100
 msgid "Big"
 msgstr ""
 
-#: errands/widgets/preferences.py:113 errands/widgets/preferences.py:181
+#: errands/widgets/preferences.py:113
+msgid "Progress Bar"
+msgstr ""
+
+#: errands/widgets/preferences.py:119
+msgid "Tool Bar"
+msgstr ""
+
+#: errands/widgets/preferences.py:126 errands/widgets/preferences.py:194
 #: data/resources/gtk/help-overlay.ui:38
 msgid "Sync"
 msgstr "Synkronisér"
 
 #. Provider
-#: errands/widgets/preferences.py:116
+#: errands/widgets/preferences.py:129
 msgid "Disabled"
 msgstr "Deaktiveret"
 
-#: errands/widgets/preferences.py:118
+#: errands/widgets/preferences.py:131
 msgid "Sync Provider"
 msgstr "Synkroniseringsvært"
 
-#: errands/widgets/preferences.py:127
+#: errands/widgets/preferences.py:140
 msgid "Server URL"
 msgstr "Server URL"
 
-#: errands/widgets/preferences.py:133
+#: errands/widgets/preferences.py:146
 msgid "Username"
 msgstr "Brugernavn"
 
-#: errands/widgets/preferences.py:139
+#: errands/widgets/preferences.py:152
 msgid "Password"
 msgstr "Kodeord"
 
-#: errands/widgets/preferences.py:145
+#: errands/widgets/preferences.py:158
 msgid "Test"
 msgstr "Test"
 
-#: errands/widgets/preferences.py:150
+#: errands/widgets/preferences.py:163
 msgid "Test Connection"
 msgstr "Test forbindelse"
 
-#: errands/widgets/preferences.py:158
+#: errands/widgets/preferences.py:171
 #, fuzzy
 msgid "Details Panel"
 msgstr "Ingen oplysninger"
 
-#: errands/widgets/preferences.py:161
+#: errands/widgets/preferences.py:174
 msgid "Position"
 msgstr ""
 
-#: errands/widgets/preferences.py:162
+#: errands/widgets/preferences.py:175
 msgid "Left"
 msgstr ""
 
-#: errands/widgets/preferences.py:162
+#: errands/widgets/preferences.py:175
 #, fuzzy
 msgid "Right"
 msgstr "Lyst"
 
-#: errands/widgets/preferences.py:171
+#: errands/widgets/preferences.py:184
 msgid "Appearance"
 msgstr ""
 
-#: errands/widgets/preferences.py:217
+#: errands/widgets/preferences.py:230
 msgid "Connected"
 msgstr "Forbundet"
 
-#: errands/widgets/preferences.py:217
+#: errands/widgets/preferences.py:230
 msgid "Can't connect"
 msgstr "Kan ikke tilslutte"
 
-#: errands/widgets/sidebar.py:68 errands/widgets/window.py:18
-#: errands/widgets/window.py:121 data/io.github.mrvladus.List.desktop.in.in:3
+#: errands/widgets/sidebar.py:67 errands/widgets/window.py:38
+#: errands/widgets/window.py:129 data/io.github.mrvladus.List.desktop.in.in:3
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:27
 msgid "Errands"
 msgstr ""
 
-#: errands/widgets/sidebar.py:76
+#: errands/widgets/sidebar.py:75
 msgid "Import List"
 msgstr "Importér liste"
 
-#: errands/widgets/sidebar.py:81
+#: errands/widgets/sidebar.py:80
 #, fuzzy
 msgid "Add List (Ctrl+A)"
 msgstr "Tilføj liste"
 
-#: errands/widgets/sidebar.py:83
+#: errands/widgets/sidebar.py:82
 msgid "More Options"
 msgstr "Flere valg"
 
+#. top_section.append(_("Secret Notes"), "app.secret_notes")
 #: errands/widgets/sidebar.py:99 data/resources/gtk/help-overlay.ui:42
 msgid "Sync / Fetch Tasks"
 msgstr "Hent og synkronisér opgaver"
 
-#: errands/widgets/sidebar.py:107 data/resources/gtk/help-overlay.ui:20
+#: errands/widgets/sidebar.py:102 data/resources/gtk/help-overlay.ui:20
 msgid "Preferences"
 msgstr "Indstillinger"
 
-#: errands/widgets/sidebar.py:108
+#: errands/widgets/sidebar.py:103
 msgid "Keyboard Shortcuts"
 msgstr "Tastaturgenveje"
 
-#: errands/widgets/sidebar.py:109
+#: errands/widgets/sidebar.py:104
 msgid "About Errands"
 msgstr "Om Errands"
 
-#: errands/widgets/sidebar.py:115
+#: errands/widgets/sidebar.py:110
 msgid "Main Menu"
 msgstr "Hovedmenu"
 
-#: errands/widgets/sidebar.py:121
+#: errands/widgets/sidebar.py:116
 msgid "Syncing..."
 msgstr ""
 
-#: errands/widgets/sidebar.py:146
+#: errands/widgets/sidebar.py:141
 msgid "New List Name"
 msgstr "Nyt listenavn"
 
-#: errands/widgets/sidebar.py:150
+#: errands/widgets/sidebar.py:145 data/resources/gtk/help-overlay.ui:57
 msgid "Add List"
 msgstr "Tilføj liste"
 
-#: errands/widgets/sidebar.py:155 errands/widgets/sidebar.py:446
-#: errands/widgets/sidebar.py:489 errands/widgets/trash.py:135
+#: errands/widgets/sidebar.py:150 errands/widgets/sidebar.py:342
+#: errands/widgets/sidebar.py:385 errands/widgets/trash.py:136
 msgid "Cancel"
 msgstr "Fortryd"
 
-#: errands/widgets/sidebar.py:156
+#: errands/widgets/sidebar.py:151
 msgid "Add"
 msgstr "Tilføj"
 
-#: errands/widgets/sidebar.py:173
+#: errands/widgets/sidebar.py:168
 msgid "Add new List"
 msgstr "Tilføj ny liste"
 
-#: errands/widgets/sidebar.py:174
+#: errands/widgets/sidebar.py:169
 msgid "Click \"+\" button"
 msgstr "Tryk på \"+\" knappen"
 
-#: errands/widgets/sidebar.py:277
-msgid "Imported"
-msgstr "Importeret"
-
-#: errands/widgets/sidebar.py:441 errands/widgets/trash.py:130
+#: errands/widgets/sidebar.py:337 errands/widgets/trash.py:131
 msgid "Are you sure?"
 msgstr "Er du sikker?"
 
-#: errands/widgets/sidebar.py:442
+#: errands/widgets/sidebar.py:338
 msgid "List will be permanently deleted"
 msgstr "Listen vil blive slettet permanent"
 
-#: errands/widgets/sidebar.py:447 errands/widgets/sidebar.py:578
-#: errands/widgets/details.py:52 errands/widgets/trash.py:136
+#: errands/widgets/sidebar.py:343 errands/widgets/sidebar.py:478
+#: errands/widgets/details.py:54 errands/widgets/trash.py:137
 msgid "Delete"
 msgstr "Slet"
 
-#: errands/widgets/sidebar.py:479
+#: errands/widgets/sidebar.py:375
 msgid "New Name"
 msgstr "Nyt navn"
 
-#: errands/widgets/sidebar.py:484
+#: errands/widgets/sidebar.py:380
 msgid "Rename List"
 msgstr "Omdøb liste"
 
-#: errands/widgets/sidebar.py:490
+#: errands/widgets/sidebar.py:386 errands/widgets/details.py:114
+#: errands/widgets/details.py:155
 msgid "Save"
 msgstr "Gem"
 
-#: errands/widgets/sidebar.py:544
+#: errands/widgets/sidebar.py:444
 msgid "Export failed"
 msgstr "Eksporting mislykkedes"
 
-#: errands/widgets/sidebar.py:546 errands/widgets/details.py:449
+#: errands/widgets/sidebar.py:446 errands/widgets/details.py:487
 msgid "Exported"
 msgstr "Eksporteret"
 
-#: errands/widgets/sidebar.py:577
+#: errands/widgets/sidebar.py:477
 msgid "Rename"
 msgstr "Omdøb"
 
 #. Export group
-#: errands/widgets/sidebar.py:579 errands/widgets/details.py:208
-#: errands/widgets/details.py:216
+#: errands/widgets/sidebar.py:479 errands/widgets/details.py:239
+#: errands/widgets/details.py:247
 msgid "Export"
 msgstr "Eksportér"
 
-#: errands/widgets/sidebar.py:600
+#: errands/widgets/sidebar.py:505
 msgid "Menu"
 msgstr "Menu"
 
-#: errands/widgets/sidebar.py:635 errands/widgets/trash.py:29
-#: errands/widgets/window.py:49
+#: errands/widgets/sidebar.py:563 errands/widgets/trash.py:30
+#: errands/widgets/window.py:61
 msgid "Trash"
 msgstr "Papirkurv"
 
-#: errands/widgets/task_list.py:38 errands/widgets/task_list.py:42
-#: errands/widgets/task_list.py:90 errands/widgets/task_list.py:94
+#: errands/widgets/task_list.py:40 errands/widgets/task_list.py:55
+#: errands/widgets/task_list.py:96 errands/widgets/task_list.py:107
 msgid "Toggle Sidebar"
 msgstr "Skift sidebar"
 
-#: errands/widgets/task_list.py:62 errands/widgets/task_list.py:112
+#: errands/widgets/task_list.py:70 errands/widgets/task_list.py:120
 msgid "Delete Completed Tasks"
 msgstr "Slet afsluttede opgaver"
 
-#: errands/widgets/task_list.py:72 errands/widgets/task_list.py:126
+#: errands/widgets/task_list.py:80 errands/widgets/task_list.py:134
 msgid "Scroll Up"
 msgstr "Rul op"
 
-#: errands/widgets/task_list.py:270 errands/widgets/task.py:673
+#: errands/widgets/task_list.py:277 errands/widgets/task.py:217
 msgid "Completed:"
 msgstr "Afsluttet:"
 
-#: errands/widgets/task_list.py:411
+#: errands/widgets/task_list.py:401
 msgid "Add new Task"
 msgstr "Tilføj ny opgave"
 
-#: errands/widgets/details.py:61
+#: errands/widgets/details.py:63
 msgid "No Details"
 msgstr "Ingen oplysninger"
 
-#: errands/widgets/details.py:62
+#: errands/widgets/details.py:64
 msgid "Click on task to show more info"
 msgstr "Klik på opgave for at se flere detaljer"
 
-#: errands/widgets/details.py:79
+#: errands/widgets/details.py:81
 msgid "Clear Style"
 msgstr "Ryd formattering"
 
 #. Edit group
-#: errands/widgets/details.py:88
+#: errands/widgets/details.py:90
 msgid "Text"
 msgstr "Tekst"
 
-#: errands/widgets/details.py:108 errands/widgets/details.py:135
+#: errands/widgets/details.py:124 errands/widgets/details.py:166
 msgid "Copy Text"
 msgstr "Kopier tekst"
 
 #. Notes group
-#: errands/widgets/details.py:115
+#: errands/widgets/details.py:131
 msgid "Notes"
 msgstr "Noter"
 
 #. Properties group
-#: errands/widgets/details.py:142
+#: errands/widgets/details.py:173
 msgid "Properties"
 msgstr "Egenskaber"
 
-#: errands/widgets/details.py:145
+#: errands/widgets/details.py:176
 msgid "Start"
 msgstr "Start"
 
-#: errands/widgets/details.py:152 errands/widgets/details.py:173
+#: errands/widgets/details.py:183 errands/widgets/details.py:204
 msgid "Set Date"
 msgstr "Angiv dato"
 
-#: errands/widgets/details.py:166
+#: errands/widgets/details.py:197
 msgid "Due"
 msgstr "Slutdato"
 
 #. Complete % row
-#: errands/widgets/details.py:181
+#: errands/widgets/details.py:212
 msgid "Complete %"
 msgstr "Afsluttet %"
 
 #. Priority row
-#: errands/widgets/details.py:191
+#: errands/widgets/details.py:222
 msgid "Priority"
 msgstr "Prioritet"
 
 #. Tags group
-#: errands/widgets/details.py:201
+#: errands/widgets/details.py:232
 msgid "Tags"
 msgstr "Mærkat"
 
 #. Tags entry
-#: errands/widgets/details.py:203
+#: errands/widgets/details.py:234
 msgid "Add Tag"
 msgstr "Tilføj Mærkat"
 
-#: errands/widgets/details.py:217
+#: errands/widgets/details.py:248
 msgid "Save Task as .ics file"
 msgstr "Gem opgave som .ics fil"
 
-#: errands/widgets/details.py:404
+#: errands/widgets/details.py:440
 msgid "Copied to Clipboard"
 msgstr "Kopieret til udklipsholder"
 
-#: errands/widgets/task.py:275 errands/widgets/task.py:286
+#: errands/widgets/task.py:301 errands/widgets/task.py:312
 msgid "Mark as Completed"
 msgstr "Markér som afsluttet"
 
-#: errands/widgets/task.py:372
+#: errands/widgets/task.py:399
 msgid "Expand / Fold"
 msgstr "Fold ud / Fold ind"
 
-#: errands/widgets/task.py:392 data/resources/gtk/help-overlay.ui:53
+#: errands/widgets/task.py:419 data/resources/gtk/help-overlay.ui:68
 #, fuzzy
 msgid "Details"
 msgstr "Ingen oplysninger"
 
-#: errands/widgets/task.py:429
+#: errands/widgets/task.py:530
 msgid "Add new Sub-Task"
 msgstr "Tilføj ny under-opgave"
 
-#: errands/widgets/trash.py:44
+#: errands/widgets/trash.py:45
 msgid "Restore All"
 msgstr "Genskab alle"
 
-#: errands/widgets/trash.py:50
+#: errands/widgets/trash.py:51
 msgid "Empty Trash"
 msgstr "Tøm papirkurv"
 
-#: errands/widgets/trash.py:51
+#: errands/widgets/trash.py:52
 msgid "No deleted items"
 msgstr "Ingen slettede elementer"
 
-#: errands/widgets/trash.py:131
+#: errands/widgets/trash.py:132
 msgid "Tasks will be permanently deleted"
 msgstr "Opgaver vil blive slettet permanent"
 
-#: errands/widgets/trash.py:211
+#: errands/widgets/trash.py:212
 msgid "Restore"
 msgstr "Genskab"
 
-#: errands/widgets/window.py:55 errands/widgets/window.py:72
+#: errands/widgets/window.py:67 errands/widgets/window.py:84
 msgid "No Task Lists"
 msgstr "Ingen opgavelister"
 
-#: errands/widgets/window.py:57
+#: errands/widgets/window.py:69
 msgid "Create List"
 msgstr "Opret liste"
 
-#: errands/widgets/window.py:78
+#: errands/widgets/window.py:90 data/resources/gtk/help-overlay.ui:53
 #, fuzzy
 msgid "Lists"
 msgstr "Tilføj liste"
 
-#: errands/widgets/window.py:126
+#: errands/widgets/window.py:134
 msgid "translator-credits"
 msgstr "oversættelses-akkrediteringer"
 
-#: errands/widgets/window.py:134
+#: errands/widgets/window.py:143
 msgid "Sync is disabled"
 msgstr "Synkronisering er slået fra"
+
+#: errands/widgets/window.py:212
+msgid "Imported"
+msgstr "Importeret"
 
 #: errands/lib/sync/providers/caldav.py:42
 msgid "Not all sync credentials provided. Please check settings."
@@ -456,14 +466,10 @@ msgstr "Vis tastaturgenveje"
 msgid "Quit"
 msgstr "Afslut"
 
-#: data/resources/gtk/help-overlay.ui:57
+#: data/resources/gtk/help-overlay.ui:72
 #, fuzzy
 msgid "Toggle Details"
 msgstr "Ingen oplysninger"
-
-#: data/resources/gtk/help-overlay.ui:64
-msgid "Save changed details"
-msgstr ""
 
 #: data/io.github.mrvladus.List.desktop.in.in:4
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:28
