@@ -180,3 +180,16 @@ calendar header {
 progressbar.osd {
   background-color: @shade_color;
 }
+
+.secret-notes-progressbar progressbar {
+  background-color: @shade_color;
+}
+
+.secret-notes-progressbar progress {
+  background-image: none;
+  background-color: @red_1;
+}
+
+.secret-note {
+  background-color: @card_bg_color;
+}

@@ -59,6 +59,7 @@ The only officially supported format is **flatpak** on [Flathub](https://flathub
 Please, **do not package** it in other formats, but if you do, these are dependencies:
 - `libadwaita >= 1.4`
 - `libsecret`
+- `gtksourceview5`
 - `PyGObject`
 - `python3-caldav`
 - `gnome-online-accounts (optional)`

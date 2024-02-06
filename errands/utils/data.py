@@ -159,6 +159,19 @@ class UserData:
             cur.execute("ALTER TABLE tmp RENAME TO tasks")
 
     @classmethod
+    def execute(
+        cls, cmd: str, values: tuple = (), fetch: bool = False
+    ) -> list[tuple] | None:
+        try:
+            with cls.connection:
+                cur = cls.connection.cursor()
+                cur.execute(cmd, values)
+                if fetch:
+                    return cur.fetchall()
+        except Exception as e:
+            Log.error(f"Data: {e}")
+
+    @classmethod
     def move_task_to_list(
         cls,
         task_uid: str,

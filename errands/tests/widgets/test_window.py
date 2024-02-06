@@ -40,6 +40,7 @@ class TestWindow(TestCase):
             "import",
             "about",
             "quit",
+            "secret_notes",
         ]
         self.assertEqual(actions, expected_actions)
 

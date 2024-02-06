@@ -1,7 +1,7 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-from gi.repository import GLib, Gio, Gtk, Secret
+from gi.repository import GLib, Gio, Gtk, Secret  # type:ignore
 from __main__ import APP_ID
 from errands.lib.logging import Log
 
@@ -33,9 +33,11 @@ class GSettings:
             setting,
             obj,
             prop,
-            Gio.SettingsBindFlags.INVERT_BOOLEAN
-            if invert
-            else Gio.SettingsBindFlags.DEFAULT,
+            (
+                Gio.SettingsBindFlags.INVERT_BOOLEAN
+                if invert
+                else Gio.SettingsBindFlags.DEFAULT
+            ),
         )
 
     @classmethod
@@ -67,6 +69,10 @@ class GSettings:
             secret,
             None,
         )
+
+    @classmethod
+    def delete_secret(self, account: str) -> bool:
+        return Secret.password_clear_sync(SECRETS_SCHEMA, {"account": account}, None)
 
     @classmethod
     def init(self) -> None:

@@ -19,7 +19,7 @@ from errands.lib.sync.sync import Sync
 from errands.widgets.components import Box
 from errands.widgets.task import Task
 from errands.widgets.task_list import TaskList
-from gi.repository import Adw, Gtk, Gio, GObject, Gdk, GLib
+from gi.repository import Adw, Gtk, Gio, GObject, Gdk, GLib  # type:ignore
 
 
 class Sidebar(Adw.Bin):
@@ -95,6 +95,7 @@ class SidebarHeaderBar(Adw.Bin):
         # Main menu
         menu: Gio.Menu = Gio.Menu.new()
         top_section: Gio.Menu = Gio.Menu.new()
+        top_section.append(_("Secret Notes"), "app.secret_notes")
         top_section.append(_("Sync / Fetch Tasks"), "app.sync")
         menu.append_section(None, top_section)
         bottom_section: Gio.Menu = Gio.Menu.new()
@@ -418,16 +419,20 @@ class SidebarTaskListsItem(Gtk.ListBoxRow):
                         event.add("x-errands-color", task["color"])
                     event.add(
                         "dtstart",
-                        datetime.fromisoformat(task["start_date"])
-                        if task["start_date"]
-                        else datetime.now(),
+                        (
+                            datetime.fromisoformat(task["start_date"])
+                            if task["start_date"]
+                            else datetime.now()
+                        ),
                     )
                     if task["end_date"]:
                         event.add(
                             "due",
-                            datetime.fromisoformat(task["end_date"])
-                            if task["end_date"]
-                            else datetime.now(),
+                            (
+                                datetime.fromisoformat(task["end_date"])
+                                if task["end_date"]
+                                else datetime.now()
+                            ),
                         )
                     calendar.add_component(event)
 

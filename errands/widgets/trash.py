@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 from errands.utils.data import UserData
 from errands.utils.functions import get_children
 from errands.widgets.components import Box, Button
-from gi.repository import Adw, Gtk, GObject
+from gi.repository import Adw, Gtk, GObject  # type:ignore
 from errands.widgets.task import Task
 from errands.lib.sync.sync import Sync
 from errands.lib.logging import Log

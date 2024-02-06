@@ -7,8 +7,9 @@ from uuid import uuid4
 from icalendar import Calendar
 from errands.utils.data import UserData
 from errands.widgets.components import Box, Button
+from errands.widgets.secret_notes import SecretNotesWindow
 from errands.widgets.trash import Trash
-from gi.repository import Gio, Adw, Gtk
+from gi.repository import Gio, Adw, Gtk  # type:ignore
 from errands.widgets.sidebar import Sidebar
 from errands.widgets.preferences import PreferencesWindow
 from errands.lib.sync.sync import Sync
@@ -20,6 +21,7 @@ WINDOW: Window = None
 
 class Window(Adw.ApplicationWindow):
     about_window: Adw.AboutWindow = None
+    secret_notes: SecretNotesWindow = None
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
@@ -215,6 +217,13 @@ class Window(Adw.ApplicationWindow):
             dialog = Gtk.FileDialog(default_filter=filter)
             dialog.open(self, None, _confirm)
 
+        def _secret_notes(*args):
+            if not self.secret_notes:
+                self.secret_notes: SecretNotesWindow = SecretNotesWindow(self)
+                self.secret_notes.present()
+            else:
+                self.secret_notes.present()
+
         _create_action(
             "preferences",
             lambda *_: PreferencesWindow(self).show(),
@@ -222,6 +231,7 @@ class Window(Adw.ApplicationWindow):
         )
         _create_action("about", _about)
         _create_action("import", _import)
+        _create_action("secret_notes", _secret_notes)
         _create_action("sync", _sync, ["<primary>f"])
         _create_action(
             "quit",

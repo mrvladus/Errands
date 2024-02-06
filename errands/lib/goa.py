@@ -18,10 +18,10 @@ def get_goa_credentials(acc_name: str) -> GoaCredentials | None:
     """
 
     try:
-        import gi
+        import gi  # type:ignore
 
         gi.require_version("Goa", "1.0")
-        from gi.repository import Goa
+        from gi.repository import Goa  # type:ignore
     except (ValueError, ModuleNotFoundError):
         Log.debug("Gnome Online Accounts is not installed. Skipping...")
         return None

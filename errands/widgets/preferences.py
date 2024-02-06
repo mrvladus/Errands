@@ -1,4 +1,4 @@
-# Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
+# Copyright 2023-2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
 from __future__ import annotations

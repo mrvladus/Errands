@@ -5,7 +5,10 @@ project(
 )
 
 dependency('libadwaita-1', version: '>= 1.4')
-dependency('pygobject-3.0', version: '>= 3.46')
+dependency('libsecret-1')
+dependency('gtksourceview-5')
+dependency('goa-1.0', required: false)
+dependency('pygobject-3.0')
 
 i18n = import('i18n')
 gnome = import('gnome')

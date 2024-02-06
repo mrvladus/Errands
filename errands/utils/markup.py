@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 import re
-from gi.repository import GLib
+from gi.repository import GLib  # type:ignore
 
 
 class Markup:
