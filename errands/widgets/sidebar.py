@@ -11,8 +11,8 @@ if TYPE_CHECKING:
 from caldav import Todo
 from datetime import datetime
 from icalendar import Calendar
-from errands.utils.data import UserData
-from errands.utils.functions import get_children
+from errands.lib.data import UserData
+from errands.lib.functions import get_children
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync

@@ -5,7 +5,7 @@ from __future__ import annotations
 from __main__ import VERSION, APP_ID
 from uuid import uuid4
 from icalendar import Calendar
-from errands.utils.data import UserData
+from errands.lib.data import UserData
 from errands.widgets.components import Box, Button
 from errands.widgets.secret_notes import SecretNotesWindow
 from errands.widgets.trash import Trash

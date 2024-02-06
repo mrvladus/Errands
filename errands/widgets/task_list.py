@@ -5,9 +5,9 @@ from errands.lib.sync.sync import Sync
 from errands.widgets.components import Box
 from errands.widgets.details import Details
 from gi.repository import Adw, Gtk, GLib, GObject  # type:ignore
-from errands.utils.animation import scroll
-from errands.utils.data import UserData
-from errands.utils.functions import get_children
+from errands.lib.animation import scroll
+from errands.lib.data import UserData
+from errands.lib.functions import get_children
 from errands.lib.logging import Log
 from errands.widgets.task import Task
 from errands.lib.gsettings import GSettings

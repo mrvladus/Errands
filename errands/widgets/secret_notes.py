@@ -4,14 +4,14 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, TypedDict
 
-from errands.utils.functions import get_children
+from errands.lib.functions import get_children
 
 if TYPE_CHECKING:
     from errands.widgets.window import Window
 
 from uuid import uuid4
 from errands.lib.gsettings import GSettings
-from errands.utils.data import UserData
+from errands.lib.data import UserData
 from errands.widgets.components import Box
 from errands.lib.encryption import encrypt, decrypt
 from gi.repository import Adw, Gtk, GtkSource, GObject  # type:ignore

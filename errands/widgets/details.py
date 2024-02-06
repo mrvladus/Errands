@@ -11,12 +11,12 @@ if TYPE_CHECKING:
     from errands.widgets.task import Task
 
 from datetime import datetime
-from errands.utils.data import UserData
+from errands.lib.data import UserData
 from icalendar import Calendar, Event
-from errands.utils.functions import get_children
+from errands.lib.functions import get_children
 from errands.widgets.components import Box, Button, DateTime
 from gi.repository import Adw, Gtk, Gdk, GObject, GtkSource  # type:ignore
-from errands.utils.markup import Markup
+from errands.lib.markup import Markup
 from errands.lib.sync.sync import Sync
 from errands.lib.logging import Log
 

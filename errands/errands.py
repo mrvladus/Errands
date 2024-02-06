@@ -36,7 +36,7 @@ def main() -> None:
     resource._register()
 
     from errands.lib.logging import Log
-    from errands.utils.data import UserData
+    from errands.lib.data import UserData
 
     Log.init()
     UserData.init()

@@ -1,13 +1,14 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from errands.widgets.window import Window
 
-from errands.utils.data import UserData
-from errands.utils.functions import get_children
+from errands.lib.data import UserData
+from errands.lib.functions import get_children
 from errands.widgets.components import Box, Button
 from gi.repository import Adw, Gtk, GObject  # type:ignore
 from errands.widgets.task import Task

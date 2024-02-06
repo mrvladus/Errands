@@ -11,9 +11,9 @@ from errands.lib.sync.providers.caldav import SyncProviderCalDAV
 from errands.lib.sync.providers.nextcloud import SyncProviderNextcloud
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
-from errands.utils.data import UserData
-from errands.utils.functions import threaded
-from gi.repository import GLib
+from errands.lib.data import UserData
+from errands.lib.functions import threaded
+from gi.repository import GLib  # type:ignore
 
 
 class Sync:

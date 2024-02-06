@@ -3,7 +3,7 @@ import urllib3
 from caldav import Calendar, DAVClient, Principal, Todo
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
-from errands.utils.data import UserData
+from errands.lib.data import UserData
 from gi.repository import Adw, GLib  # type:ignore
 from caldav.elements import dav
 
@@ -303,12 +303,16 @@ class SyncProviderCalDAV:
                         new_todo = calendar.save_todo(
                             categories=task["tags"] if task["tags"] != "" else None,
                             description=task["notes"],
-                            dtstart=datetime.datetime.fromisoformat(task["start_date"])
-                            if task["start_date"]
-                            else None,
-                            due=datetime.datetime.fromisoformat(task["end_date"])
-                            if task["end_date"]
-                            else None,
+                            dtstart=(
+                                datetime.datetime.fromisoformat(task["start_date"])
+                                if task["start_date"]
+                                else None
+                            ),
+                            due=(
+                                datetime.datetime.fromisoformat(task["end_date"])
+                                if task["end_date"]
+                                else None
+                            ),
                             priority=task["priority"],
                             percent_complete=task["percent_complete"],
                             related_to=task["parent"],

@@ -12,9 +12,9 @@ from errands.widgets.components import Box, Button
 from gi.repository import Gtk, Adw, Gdk, GObject  # type:ignore
 from errands.lib.sync.sync import Sync
 from errands.lib.logging import Log
-from errands.utils.data import UserData
-from errands.utils.markup import Markup
-from errands.utils.functions import get_children
+from errands.lib.data import UserData
+from errands.lib.markup import Markup
+from errands.lib.functions import get_children
 from errands.lib.gsettings import GSettings
 
 

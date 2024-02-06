@@ -3,7 +3,7 @@
 
 import datetime
 from typing import Callable
-from errands.utils.functions import get_children
+from errands.lib.functions import get_children
 from gi.repository import Gtk, Adw, GObject, GLib  # type:ignore
 
 
