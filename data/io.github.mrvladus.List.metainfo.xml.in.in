@@ -63,12 +63,13 @@
         </ul>
         <p>Translations:</p>
         <ul>
-          <li>Added French translation (Irénée THIRION)</li>
-          <li>Updated Occitan translation (ensag-dev)</li>
-          <li>Updated German translation (Philipp Kiemle)</li>
-          <li>Updated Dutch translation (Heimen Stoffels)</li>
+          <li>Added Greek translation (itsnotAZ)</li>
+          <li>Added Hungarian translation (zoli111)</li>
+          <li>Added Persian translation (Danial Behzadi)</li>
           <li>Updated Italian translation (Albano Battistella)</li>
-          <li>Updated Japanese translation (Gnuey56)</li>
+          <li>Updated Spanish translation (Vicente015)</li>
+          <li>Updated Occitan translation (ensag-dev)</li>
+          <li>Updated Dutch translation (Heimen Stoffels)</li>
         </ul>
       </description>
     </release>
