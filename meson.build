@@ -1,11 +1,14 @@
 project(
   'errands',
-  version: '45.1.7',
+  version: '45.1.8',
   meson_version: '>= 0.62.0',
 )
 
 dependency('libadwaita-1', version: '>= 1.4')
-dependency('pygobject-3.0', version: '>= 3.46')
+dependency('libsecret-1')
+dependency('gtksourceview-5')
+dependency('pygobject-3.0')
+dependency('goa-1.0', required: false)
 
 i18n = import('i18n')
 gnome = import('gnome')

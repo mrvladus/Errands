@@ -18,12 +18,12 @@
 </div>
 
 ## Features
-- Multiple task lists support
-- Add, remove, edit tasks and sub-tasks
-- Mark task and sub-tasks as completed
-- Add accent color for each task
+- Add, remove, edit, complete tasks and sub-tasks
 - Sync tasks with Nextcloud or other CalDAV providers
+- Multiple task lists support
+- Add accent color for each task
 - Drag and Drop support
+- Customizable UI
 
 ## Sync
 Errands is using [python-caldav](https://github.com/python-caldav/caldav) library for syncing with Nextcloud Tasks and other CalDAV providers.
@@ -36,6 +36,8 @@ Other providers **may not work**. See [python-caldav  documentation](https://cal
 Errands is available as a Flatpak on Flathub:
 
 <a href="https://flathub.org/apps/details/io.github.mrvladus.List"><img width='240' alt='Download on Flathub' src='https://dl.flathub.org/assets/badges/flathub-badge-en.png'/></a>
+
+It's the **only** supported verion.
 
 ### Build flatpak using GNOME Builder
 1. Install [GNOME Builder](https://flathub.org/apps/org.gnome.Builder).
@@ -59,6 +61,7 @@ The only officially supported format is **flatpak** on [Flathub](https://flathub
 Please, **do not package** it in other formats, but if you do, these are dependencies:
 - `libadwaita >= 1.4`
 - `libsecret`
+- `gtksourceview5`
 - `PyGObject`
 - `python3-caldav`
 - `gnome-online-accounts (optional)`

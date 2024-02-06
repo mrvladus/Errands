@@ -10,3 +10,7 @@ configure_file(
 install_subdir('utils', install_dir: moduledir)
 install_subdir('lib', install_dir: moduledir)
 install_subdir('widgets', install_dir: moduledir)
+
+if profile == 'development'
+  install_subdir('tests', install_dir: moduledir)
+endif

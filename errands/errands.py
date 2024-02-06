@@ -8,13 +8,14 @@ import sys
 import signal
 import locale
 import gettext
-import gi
+import gi  # type:ignore
 
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 gi.require_version("Secret", "1")
+gi.require_version("GtkSource", "5")
 
-from gi.repository import Adw, Gio
+from gi.repository import Adw, Gio  # type:ignore
 
 APP_ID = "@APP_ID@"
 VERSION = "@VERSION@"
@@ -35,7 +36,7 @@ def main() -> None:
     resource._register()
 
     from errands.lib.logging import Log
-    from errands.utils.data import UserData
+    from errands.lib.data import UserData
 
     Log.init()
     UserData.init()
@@ -55,6 +56,12 @@ class Application(Adw.Application):
         from errands.widgets.window import Window
 
         Window(application=self)
+
+        # Run tests
+        if PROFILE == "development":
+            from errands.tests.tests import run_tests
+
+            run_tests()
 
 
 if __name__ == "__main__":

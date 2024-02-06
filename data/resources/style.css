@@ -47,6 +47,19 @@
   text-decoration: line-through;
 }
 
+.task-toolbar-btn {
+  all: unset;
+  opacity: 0.7;
+  font-size: 12px;
+  padding: 4px;
+  border-radius: 6px;
+  transition: 0.2s;
+}
+
+.task-toolbar-btn:hover {
+  background-color: @shade_color;
+}
+
 /* Task accent colors */
 
 .task-blue {
@@ -162,4 +175,21 @@ calendar header {
 
 .expand-indicator-expanded {
   transform: rotate(180deg);
+}
+
+progressbar.osd {
+  background-color: @shade_color;
+}
+
+.secret-notes-progressbar progressbar {
+  background-color: @shade_color;
+}
+
+.secret-notes-progressbar progress {
+  background-image: none;
+  background-color: @red_1;
+}
+
+.secret-note {
+  background-color: @card_bg_color;
 }

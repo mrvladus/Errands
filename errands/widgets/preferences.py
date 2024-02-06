@@ -1,4 +1,4 @@
-# Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
+# Copyright 2023-2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
 from __future__ import annotations
@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from errands.widgets.window import Window
 
 from errands.lib.goa import get_goa_credentials
-from gi.repository import Adw, Gtk
+from gi.repository import Adw, Gtk  # type:ignore
 from errands.lib.sync.sync import Sync
 from errands.lib.gsettings import GSettings
 
@@ -78,6 +78,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
 
         # Tasks group
         tasks_group = Adw.PreferencesGroup(title=_("Tasks"))
+        # Primary action
         task_primary_action = Adw.ComboRow(
             title=_("Click Action"),
             model=Gtk.StringList.new([_("Open Details Panel"), _("Show Sub-Tasks")]),
@@ -93,7 +94,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
             ),
         )
         tasks_group.add(task_primary_action)
-
+        # Toggle size
         task_big_toggle = Adw.ComboRow(
             title=_("Complete Button Size"),
             model=Gtk.StringList.new([_("Small"), _("Big")]),
@@ -107,6 +108,18 @@ class PreferencesWindow(Adw.PreferencesWindow):
             ),
         )
         tasks_group.add(task_big_toggle)
+        # Progress bar
+        task_progress_bar = Adw.SwitchRow(
+            title=_("Progress Bar"), icon_name="errands-progressbar-symbolic"
+        )
+        GSettings.bind("task-show-progressbar", task_progress_bar, "active")
+        tasks_group.add(task_progress_bar)
+        # Toolbar
+        task_toolbar = Adw.SwitchRow(
+            title=_("Tool Bar"), icon_name="errands-toolbar-symbolic"
+        )
+        GSettings.bind("task-show-toolbar", task_toolbar, "active")
+        # tasks_group.add(task_toolbar)
 
         # Sync group
         sync_group = Adw.PreferencesGroup(

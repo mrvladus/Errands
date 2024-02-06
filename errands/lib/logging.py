@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 import os
-from gi.repository import GLib
+from gi.repository import GLib  # type:ignore
 from __main__ import VERSION
 
 

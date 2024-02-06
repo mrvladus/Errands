@@ -1,20 +1,22 @@
-# Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
+# Copyright 2023-2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 from typing import TYPE_CHECKING
+
+from errands.lib.gsettings import GSettings
 
 if TYPE_CHECKING:
     from errands.widgets.task_list import TaskList
     from errands.widgets.task import Task
 
 from datetime import datetime
-from errands.utils.data import UserData
+from errands.lib.data import UserData
 from icalendar import Calendar, Event
-from errands.utils.functions import get_children
+from errands.lib.functions import get_children
 from errands.widgets.components import Box, Button, DateTime
-from gi.repository import Adw, Gtk, Gdk, GObject
-from errands.utils.markup import Markup
+from gi.repository import Adw, Gtk, Gdk, GObject, GtkSource  # type:ignore
+from errands.lib.markup import Markup
 from errands.lib.sync.sync import Sync
 from errands.lib.logging import Log
 
@@ -89,8 +91,8 @@ class Details(Adw.Bin):
         # Edit entry
         self.edit_entry = Gtk.TextBuffer()
         self.edit_entry.connect("changed", self._on_text_changed)
-        edit_group.add(
-            Gtk.TextView(
+        edit_entry_text_ovrl = Gtk.Overlay(
+            child=Gtk.TextView(
                 height_request=100,
                 top_margin=12,
                 bottom_margin=12,
@@ -101,6 +103,20 @@ class Details(Adw.Bin):
                 wrap_mode=3,
             )
         )
+        # Save button
+        self.edit_entry_save_btn: Gtk.Button = Gtk.Button(
+            icon_name="errands-select-symbolic",
+            css_classes=["circular", "suggested-action"],
+            halign=Gtk.Align.END,
+            valign=Gtk.Align.END,
+            margin_bottom=6,
+            margin_end=6,
+            tooltip_text=_("Save"),
+            visible=False,
+        )
+        self.edit_entry_save_btn.connect("clicked", lambda *_: self.save())
+        edit_entry_text_ovrl.add_overlay(self.edit_entry_save_btn)
+        edit_group.add(edit_entry_text_ovrl)
         # Copy button
         text_copy_btn = Gtk.Button(
             icon_name="errands-copy-symbolic",
@@ -114,20 +130,35 @@ class Details(Adw.Bin):
         # Notes group
         notes_group = Adw.PreferencesGroup(title=_("Notes"))
         # Notes entry
-        self.notes = Gtk.TextBuffer()
-        self.notes.connect("changed", self._on_notes_changed)
-        notes_group.add(
-            Gtk.TextView(
-                height_request=100,
-                top_margin=12,
-                bottom_margin=12,
-                left_margin=12,
-                right_margin=12,
-                buffer=self.notes,
-                wrap_mode=3,
-                css_classes=["card"],
-            )
+        notes_source_view = GtkSource.View(
+            height_request=200,
+            top_margin=12,
+            bottom_margin=12,
+            left_margin=12,
+            right_margin=12,
+            wrap_mode=3,
+            css_classes=["card"],
         )
+        self.notes = notes_source_view.get_buffer()
+        lm: GtkSource.LanguageManager = GtkSource.LanguageManager.get_default()
+        self.notes.set_language(lm.get_language("markdown"))
+        self.notes.connect("changed", self._on_notes_changed)
+        notes_ovrl = Gtk.Overlay(child=notes_source_view)
+        # Save button
+        self.notes_save_btn: Gtk.Button = Gtk.Button(
+            icon_name="errands-select-symbolic",
+            css_classes=["circular", "suggested-action"],
+            halign=Gtk.Align.END,
+            valign=Gtk.Align.END,
+            margin_bottom=6,
+            margin_end=6,
+            tooltip_text=_("Save"),
+            visible=False,
+        )
+        self.notes_save_btn.connect("clicked", lambda *_: self.save())
+        notes_ovrl.add_overlay(self.notes_save_btn)
+        notes_group.add(notes_ovrl)
+
         # Copy button
         notes_copy_btn = Gtk.Button(
             icon_name="errands-copy-symbolic",
@@ -272,6 +303,8 @@ class Details(Adw.Bin):
 
     def save(self):
         Log.debug("Details: Save")
+        self.edit_entry_save_btn.set_visible(False)
+        self.notes_save_btn.set_visible(False)
 
         # Text
         old_text: str = self.parent.get_prop("text")
@@ -280,12 +313,6 @@ class Details(Adw.Bin):
             self.parent.task_row.task_row.set_title(
                 Markup.find_url(Markup.escape(text))
             )
-
-        # Percent complete
-        pc = self.percent_complete.get_value_as_int()
-        self.parent.can_sync = False
-        self.parent.task_row.complete_btn.set_active(pc == 100)
-        self.parent.can_sync = True
 
         # Save props
         self.parent.update_props(
@@ -305,13 +332,14 @@ class Details(Adw.Bin):
                 self.parent.task_row.complete_btn.get_active(),
                 self.start_datetime.get_datetime(),
                 self.end_datetime.get_datetime(),
-                pc,
+                self.percent_complete.get_value_as_int(),
                 self.priority.get_value_as_int(),
                 False,
             ],
         )
 
-        Sync.sync()
+        self.parent.update_ui()
+        Sync.sync(False)
 
     def update_info(self, parent: Task):
         # Show status on empty task
@@ -353,12 +381,20 @@ class Details(Adw.Bin):
     def _on_text_changed(self, buffer: Gtk.TextBuffer):
         if not self.can_sync:
             return
-        self.save()
+        if buffer.props.text != self.parent.get_prop("text"):
+            if GSettings.get("sync-provider") != 0:
+                self.edit_entry_save_btn.set_visible(True)
+            else:
+                self.save()
 
-    def _on_notes_changed(self, buffer: Gtk.TextBuffer):
+    def _on_notes_changed(self, buffer: GtkSource.Buffer):
         if not self.can_sync:
             return
-        self.save()
+        if buffer.props.text != self.parent.get_prop("notes"):
+            if GSettings.get("sync-provider") != 0:
+                self.notes_save_btn.set_visible(True)
+            else:
+                self.save()
 
     def _on_percent_complete_changed(self, _):
         if not self.can_sync:
@@ -436,9 +472,11 @@ class Details(Adw.Bin):
                 event.add("x-errands-color", task["color"])
             event.add(
                 "dtstart",
-                datetime.fromisoformat(task["start_date"])
-                if task["start_date"]
-                else datetime.now(),
+                (
+                    datetime.fromisoformat(task["start_date"])
+                    if task["start_date"]
+                    else datetime.now()
+                ),
             )
             if task["end_date"]:
                 event.add("dtend", datetime.fromisoformat(task["end_date"]))

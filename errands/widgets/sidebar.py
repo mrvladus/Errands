@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 from __future__ import annotations
+import time
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -10,15 +11,15 @@ if TYPE_CHECKING:
 from caldav import Todo
 from datetime import datetime
 from icalendar import Calendar
-from errands.utils.data import UserData
-from errands.utils.functions import get_children
+from errands.lib.data import UserData
+from errands.lib.functions import get_children
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
 from errands.widgets.components import Box
 from errands.widgets.task import Task
 from errands.widgets.task_list import TaskList
-from gi.repository import Adw, Gtk, Gio, GObject, Gdk
+from gi.repository import Adw, Gtk, Gio, GObject, Gdk, GLib  # type:ignore
 
 
 class Sidebar(Adw.Bin):
@@ -94,6 +95,7 @@ class SidebarHeaderBar(Adw.Bin):
         # Main menu
         menu: Gio.Menu = Gio.Menu.new()
         top_section: Gio.Menu = Gio.Menu.new()
+        # top_section.append(_("Secret Notes"), "app.secret_notes")
         top_section.append(_("Sync / Fetch Tasks"), "app.sync")
         menu.append_section(None, top_section)
         bottom_section: Gio.Menu = Gio.Menu.new()
@@ -417,16 +419,20 @@ class SidebarTaskListsItem(Gtk.ListBoxRow):
                         event.add("x-errands-color", task["color"])
                     event.add(
                         "dtstart",
-                        datetime.fromisoformat(task["start_date"])
-                        if task["start_date"]
-                        else datetime.now(),
+                        (
+                            datetime.fromisoformat(task["start_date"])
+                            if task["start_date"]
+                            else datetime.now()
+                        ),
                     )
                     if task["end_date"]:
                         event.add(
                             "due",
-                            datetime.fromisoformat(task["end_date"])
-                            if task["end_date"]
-                            else datetime.now(),
+                            (
+                                datetime.fromisoformat(task["end_date"])
+                                if task["end_date"]
+                                else datetime.now()
+                            ),
                         )
                     calendar.add_component(event)
 
@@ -477,12 +483,17 @@ class SidebarTaskListsItem(Gtk.ListBoxRow):
         ctrl.connect("released", self._on_click)
         self.add_controller(ctrl)
 
-        # TODO Drop controller
-        # drop_ctrl: Gtk.DropTarget = Gtk.DropTarget.new(
-        #     actions=Gdk.DragAction.MOVE, type=Task
-        # )
-        # drop_ctrl.connect("drop", self._on_task_drop)
-        # self.add_controller(drop_ctrl)
+        # Drop controller
+        drop_ctrl: Gtk.DropTarget = Gtk.DropTarget.new(
+            actions=Gdk.DragAction.MOVE, type=Task
+        )
+        drop_ctrl.connect("drop", self._on_task_drop)
+        self.add_controller(drop_ctrl)
+
+        # Drop hover controller
+        drop_hover_ctrl: Gtk.DropControllerMotion = Gtk.DropControllerMotion()
+        drop_hover_ctrl.connect("enter", self._on_drop_hover)
+        self.add_controller(drop_hover_ctrl)
 
         self.set_child(
             Box(
@@ -502,17 +513,40 @@ class SidebarTaskListsItem(Gtk.ListBoxRow):
         self.window.stack.set_visible_child_name(self.label.get_label())
         self.window.split_view.set_show_content(True)
 
-    # TODO
-    # def _on_task_drop(self, _drop, task: Task, _x, _y):
-    #     return
-    # if task.list_uid == self.uid:
-    #     return
-    # print(task.get_prop("parent"), "=>", self.uid, "=>", task.uid)
-    # uid = task.uid
-    # task.update_props(["parent", "list_uid"], ["", self.uid])
-    # task.purge()
-    # self.task_list.add_task(uid)
-    # Sync.sync()
+    def _on_drop_hover(self, ctrl: Gtk.DropControllerMotion, _x, _y):
+        """
+        Switch list on dnd hover after DELAY_SECONDS
+        """
+
+        DELAY_SECONDS: float = 0.7
+        entered_at: float = time.time()
+
+        def _switch_delay():
+            if ctrl.contains_pointer():
+                if time.time() - entered_at >= DELAY_SECONDS:
+                    self.activate()
+                    return False
+                else:
+                    return True
+            else:
+                return False
+
+        GLib.timeout_add(100, _switch_delay)
+
+    def _on_task_drop(self, _drop, task: Task, _x, _y):
+        """
+        Move task and sub-tasks to new list
+        """
+
+        if task.list_uid == self.uid:
+            return
+
+        Log.info(f"Lists: Move '{task.uid}' to '{self.uid}' list")
+        UserData.move_task_to_list(task.uid, task.list_uid, self.uid, "", False)
+        uid: str = task.uid
+        task.purge()
+        self.task_list.add_task(uid)
+        Sync.sync()
 
 
 class SidebarTrashButton(Gtk.Button):

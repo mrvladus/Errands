@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 import re
-from gi.repository import GLib
+from gi.repository import GLib  # type:ignore
 
 
 class Markup:
@@ -14,8 +14,8 @@ class Markup:
     def find_url(self, text: str) -> str:
         """Convert urls to markup. Make sure to escape text before calling."""
 
-        string = text
-        urls = re.findall(r"(https?://\S+)", string)
+        string: str = text
+        urls: list[str] = re.findall(r"(https?://\S+)", string)
         for url in urls:
             string = string.replace(url, f'<a href="{url}">{url}</a>')
         return string

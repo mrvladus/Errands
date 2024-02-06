@@ -3,7 +3,7 @@
 
 from typing import Callable
 from threading import Thread
-from gi.repository import Gtk
+from gi.repository import Gtk  # type:ignore
 
 
 def get_children(obj: Gtk.Widget) -> list[Gtk.Widget]:

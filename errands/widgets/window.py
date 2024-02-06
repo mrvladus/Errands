@@ -1,31 +1,32 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
+from __future__ import annotations
 from __main__ import VERSION, APP_ID
 from uuid import uuid4
-
 from icalendar import Calendar
-from errands.utils.data import UserData
+from errands.lib.data import UserData
 from errands.widgets.components import Box, Button
+from errands.widgets.secret_notes import SecretNotesWindow
 from errands.widgets.trash import Trash
-from gi.repository import Gio, Adw, Gtk
+from gi.repository import Gio, Adw, Gtk  # type:ignore
 from errands.widgets.sidebar import Sidebar
 from errands.widgets.preferences import PreferencesWindow
 from errands.lib.sync.sync import Sync
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 
+WINDOW: Window = None
+
 
 class Window(Adw.ApplicationWindow):
+    about_window: Adw.AboutWindow = None
+    secret_notes: SecretNotesWindow = None
+
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
-        self.set_title(_("Errands"))
-        # Remember window state
-        GSettings.bind("width", self, "default_width")
-        GSettings.bind("height", self, "default_height")
-        GSettings.bind("maximized", self, "maximized")
-        # Setup theme
-        Adw.StyleManager.get_default().set_color_scheme(GSettings.get("theme"))
+        global WINDOW
+        WINDOW = self
         self._create_actions()
         self._build_ui()
         self.present()
@@ -34,8 +35,15 @@ class Window(Adw.ApplicationWindow):
         Sync.sync()
 
     def _build_ui(self):
+        self.set_title(_("Errands"))
         self.props.width_request = 360
         self.props.height_request = 200
+        # Remember window state
+        GSettings.bind("width", self, "default_width")
+        GSettings.bind("height", self, "default_height")
+        GSettings.bind("maximized", self, "maximized")
+        # Setup theme
+        Adw.StyleManager.get_default().set_color_scheme(GSettings.get("theme"))
 
         # Split View
         self.split_view = Adw.NavigationSplitView(
@@ -113,19 +121,21 @@ class Window(Adw.ApplicationWindow):
             """
             Show about window
             """
-            about = Adw.AboutWindow(
-                transient_for=self,
-                version=VERSION,
-                application_icon=APP_ID,
-                application_name=_("Errands"),
-                copyright="© 2023 Vlad Krupinskii",
-                website="https://github.com/mrvladus/Errands",
-                issue_url="https://github.com/mrvladus/Errands/issues",
-                license_type=Gtk.License.MIT_X11,
-                translator_credits=_("translator-credits"),
-                modal=True,
-            )
-            about.show()
+            if not self.about_window:
+                self.about_window = Adw.AboutWindow(
+                    transient_for=self,
+                    version=VERSION,
+                    application_icon=APP_ID,
+                    application_name=_("Errands"),
+                    copyright="© 2023 Vlad Krupinskii",
+                    website="https://github.com/mrvladus/Errands",
+                    issue_url="https://github.com/mrvladus/Errands/issues",
+                    license_type=Gtk.License.MIT_X11,
+                    translator_credits=_("translator-credits"),
+                    modal=True,
+                    hide_on_close=True,
+                )
+            self.about_window.present()
 
         def _sync(*args):
             Sync.sync()
@@ -207,6 +217,13 @@ class Window(Adw.ApplicationWindow):
             dialog = Gtk.FileDialog(default_filter=filter)
             dialog.open(self, None, _confirm)
 
+        def _secret_notes(*args):
+            if not self.secret_notes:
+                self.secret_notes: SecretNotesWindow = SecretNotesWindow(self)
+                self.secret_notes.present()
+            else:
+                self.secret_notes.present()
+
         _create_action(
             "preferences",
             lambda *_: PreferencesWindow(self).show(),
@@ -214,6 +231,7 @@ class Window(Adw.ApplicationWindow):
         )
         _create_action("about", _about)
         _create_action("import", _import)
+        _create_action("secret_notes", _secret_notes)
         _create_action("sync", _sync, ["<primary>f"])
         _create_action(
             "quit",

@@ -1,13 +1,13 @@
-# Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
+# Copyright 2023-2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
 from errands.lib.sync.sync import Sync
 from errands.widgets.components import Box
 from errands.widgets.details import Details
-from gi.repository import Adw, Gtk, GLib, GObject
-from errands.utils.animation import scroll
-from errands.utils.data import UserData
-from errands.utils.functions import get_children
+from gi.repository import Adw, Gtk, GLib, GObject  # type:ignore
+from errands.lib.animation import scroll
+from errands.lib.data import UserData
+from errands.lib.functions import get_children
 from errands.lib.logging import Log
 from errands.widgets.task import Task
 from errands.lib.gsettings import GSettings
@@ -299,35 +299,13 @@ class TaskList(Adw.Bin):
             )[0][0]
         )
 
+        all_tasks: list[Task] = self.get_all_tasks()
         # Remove deleted tasks
         ids: list[str] = UserData.get_tasks_uids(self.list_uid)
-        for task in self.get_all_tasks():
+        for task in all_tasks:
             if task.uid not in ids:
                 task.purge()
-
-        # Update existing tasks
-        tasks_widgets: list[Task] = self.get_all_tasks()
-        for task in tasks_widgets:
-            task.task_row.add_rm_crossline(task.get_prop("completed"))
-            # Update widget title and completed toggle
-            if task.task_row.complete_btn.get_active() != task.get_prop("completed"):
-                task.just_added = True
-                task.task_row.complete_btn.set_active(task.get_prop("completed"))
-                task.just_added = False
-
-            # Change parent
-            if isinstance(task.parent, Task) and task.parent.uid != task.get_prop(
-                "parent"
-            ):
-                Log.debug(f"Task list: change parent for {task.uid}")
-                task.purge()
-                if task.get_prop("parent") == "":
-                    self.add_task(task.uid)
-                else:
-                    for t in tasks_widgets:
-                        if t.uid == task.get_prop("parent"):
-                            t.add_task(task.uid)
-                            break
+                all_tasks.remove(task)
 
         # Create new tasks
         for task_dict in UserData.get_tasks_as_dicts(self.list_uid):
@@ -342,12 +320,17 @@ class TaskList(Adw.Bin):
                             t.tasks_list.add_sub_task(task_dict["uid"])
 
         # Update details
-        if self.details.parent and self.details.parent.uid in UserData.get_tasks_uids(
-            self.list_uid
+        if (
+            self.details.parent
+            and self.details.parent.uid in UserData.get_tasks_uids(self.list_uid)
+            and not self.details.parent.get_prop("trash")
         ):
             self.details.update_info(self.details.parent)
         else:
             self.details.update_info(None)
+
+        for task in self.get_toplevel_tasks():
+            task.update_ui()
 
         self.update_status()
 

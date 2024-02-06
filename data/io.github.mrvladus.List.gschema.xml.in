@@ -43,5 +43,17 @@
     <key name="task-big-toggle" type="b">
       <default>true</default>
     </key>
+    <key name="task-show-progressbar" type="b">
+      <default>true</default>
+    </key>
+    <key name="task-show-toolbar" type="b">
+      <default>true</default>
+    </key>
+    <key name="secret-notes-width" type="i">
+      <default>1000</default>
+    </key>
+    <key name="secret-notes-height" type="i">
+      <default>700</default>
+    </key>
   </schema>
 </schemalist>

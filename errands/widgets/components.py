@@ -1,10 +1,10 @@
-# Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
+# Copyright 2023-2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
 import datetime
 from typing import Callable
-from errands.utils.functions import get_children
-from gi.repository import Gtk, Adw, GObject, GLib
+from errands.lib.functions import get_children
+from gi.repository import Gtk, Adw, GObject, GLib  # type:ignore
 
 
 class Box(Gtk.Box):
@@ -224,7 +224,9 @@ class DateTime(Gtk.Box):
 
     def get_human_datetime(self) -> str:
         if self.datetime:
-            out: str = f"{self.datetime[9:11]}:{self.datetime[11:13]}, {self.calendar.get_date().format('%d %B, %Y')}"
+            out: str = (
+                f"{self.datetime[9:11]}:{self.datetime[11:13]}, {self.calendar.get_date().format('%d %B, %Y')}"
+            )
         else:
             out: str = _("Not Set")
         return out
