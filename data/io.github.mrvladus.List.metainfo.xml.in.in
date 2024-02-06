@@ -48,6 +48,30 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="45.1.8" date="2024-02-07">
+      <description translatable="no">
+        <p>Added:</p>
+        <ul>
+          <li>Moving tasks to different lists with Drag and Drop</li>
+          <li>Markdown syntax highlighting in the task notes (using gtksourceview5)</li>
+          <li>Progress bar that shows completion percent. It can be disabled in settings.</li>
+        </ul>
+        <p>Fixed:</p>
+        <ul>
+          <li>Reduced sync requests resulting in faster sync</li>
+          <li>Editing notes or task text with sync enabled. Now if sync is enabled and text or notes are changed Save button appears for confirmation to avoid cursor jumping and text not saving properly.</li>
+        </ul>
+        <p>Translations:</p>
+        <ul>
+          <li>Added French translation (Irénée THIRION)</li>
+          <li>Updated Occitan translation (ensag-dev)</li>
+          <li>Updated German translation (Philipp Kiemle)</li>
+          <li>Updated Dutch translation (Heimen Stoffels)</li>
+          <li>Updated Italian translation (Albano Battistella)</li>
+          <li>Updated Japanese translation (Gnuey56)</li>
+        </ul>
+      </description>
+    </release>
     <release version="45.1.7" date="2024-01-27">
       <description translatable="no">
         <p>Added:</p>
