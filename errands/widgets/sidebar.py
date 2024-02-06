@@ -95,7 +95,7 @@ class SidebarHeaderBar(Adw.Bin):
         # Main menu
         menu: Gio.Menu = Gio.Menu.new()
         top_section: Gio.Menu = Gio.Menu.new()
-        top_section.append(_("Secret Notes"), "app.secret_notes")
+        # top_section.append(_("Secret Notes"), "app.secret_notes")
         top_section.append(_("Sync / Fetch Tasks"), "app.sync")
         menu.append_section(None, top_section)
         bottom_section: Gio.Menu = Gio.Menu.new()
