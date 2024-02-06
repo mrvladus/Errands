@@ -543,6 +543,9 @@ class SidebarTaskListsItem(Gtk.ListBoxRow):
 
         Log.info(f"Lists: Move '{task.uid}' to '{self.uid}' list")
         UserData.move_task_to_list(task.uid, task.list_uid, self.uid, "", False)
+        uid: str = task.uid
+        task.purge()
+        self.task_list.add_task(uid)
         Sync.sync()
 
 

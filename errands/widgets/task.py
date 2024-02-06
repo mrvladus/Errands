@@ -516,9 +516,7 @@ class TaskInfoBar(Gtk.Box):
                 self.task.update_props(["percent_complete", "synced"], [pc, False])
 
             self.progress_bar.set_fraction(pc / 100)
-            self.progress_bar_rev.set_reveal_child(
-                self.task.get_status()[0] > 0 or pc > 0
-            )
+            self.progress_bar_rev.set_reveal_child(self.task.get_status()[0] > 0)
 
 
 class TaskSubTasksEntry(Gtk.Entry):
