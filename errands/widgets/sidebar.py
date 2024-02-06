@@ -8,9 +8,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from errands.widgets.window import Window
 
-from caldav import Todo
 from datetime import datetime
-from icalendar import Calendar
+from icalendar import Calendar, Todo
 from errands.lib.data import UserData
 from errands.lib.functions import get_children
 from errands.lib.gsettings import GSettings
