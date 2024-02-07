@@ -193,3 +193,7 @@ progressbar.osd {
 .secret-note {
   background-color: @card_bg_color;
 }
+
+textview text {
+  background-color: @card_bg_color;
+}

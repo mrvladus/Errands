@@ -15,7 +15,7 @@ from errands.lib.data import UserData
 from icalendar import Calendar, Event
 from errands.lib.functions import get_children
 from errands.widgets.components import Box, Button, DateTime
-from gi.repository import Adw, Gtk, Gdk, GObject, GtkSource  # type:ignore
+from gi.repository import Adw, Gtk, Gdk, GObject, GtkSource, Gio  # type:ignore
 from errands.lib.markup import Markup
 from errands.lib.sync.sync import Sync
 from errands.lib.logging import Log
@@ -89,10 +89,21 @@ class Details(Adw.Bin):
         # Edit group
         edit_group = Adw.PreferencesGroup(title=_("Text"))
         # Edit entry
-        self.edit_entry = Gtk.TextBuffer()
+        self.edit_entry = GtkSource.Buffer()
+        Adw.StyleManager.get_default().bind_property(
+            "dark",
+            self.edit_entry,
+            "style-scheme",
+            GObject.BindingFlags.SYNC_CREATE,
+            lambda _, is_dark: self.edit_entry.set_style_scheme(
+                GtkSource.StyleSchemeManager.get_default().get_scheme(
+                    "Adwaita-dark" if is_dark else "Adwaita"
+                )
+            ),
+        )
         self.edit_entry.connect("changed", self._on_text_changed)
         edit_entry_text_ovrl = Gtk.Overlay(
-            child=Gtk.TextView(
+            child=GtkSource.View(
                 height_request=100,
                 top_margin=12,
                 bottom_margin=12,
@@ -140,6 +151,17 @@ class Details(Adw.Bin):
             css_classes=["card"],
         )
         self.notes = notes_source_view.get_buffer()
+        Adw.StyleManager.get_default().bind_property(
+            "dark",
+            self.notes,
+            "style-scheme",
+            GObject.BindingFlags.SYNC_CREATE,
+            lambda _, is_dark: self.notes.set_style_scheme(
+                GtkSource.StyleSchemeManager.get_default().get_scheme(
+                    "Adwaita-dark" if is_dark else "Adwaita"
+                )
+            ),
+        )
         lm: GtkSource.LanguageManager = GtkSource.LanguageManager.get_default()
         self.notes.set_language(lm.get_language("markdown"))
         self.notes.connect("changed", self._on_notes_changed)
@@ -157,8 +179,6 @@ class Details(Adw.Bin):
         )
         self.notes_save_btn.connect("clicked", lambda *_: self.save())
         notes_ovrl.add_overlay(self.notes_save_btn)
-        notes_group.add(notes_ovrl)
-
         # Copy button
         notes_copy_btn = Gtk.Button(
             icon_name="errands-copy-symbolic",
@@ -168,6 +188,7 @@ class Details(Adw.Bin):
         )
         notes_copy_btn.connect("clicked", self._on_copy_clicked, self.notes)
         notes_group.set_header_suffix(notes_copy_btn)
+        notes_group.add(notes_ovrl)
 
         # Properties group
         props_group = Adw.PreferencesGroup(title=_("Properties"))
