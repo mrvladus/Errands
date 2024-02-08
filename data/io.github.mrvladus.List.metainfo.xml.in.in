@@ -48,6 +48,18 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="45.1.9" date="2024-02-08">
+      <description translatable="no">
+        <p>Fixed:</p>
+        <ul>
+          <li>Notes white background with dark theme</li>
+        </ul>
+        <p>Translations:</p>
+        <ul>
+          <li>Updated Ukranian translation (Volkov)</li>
+        </ul>
+      </description>
+    </release>
     <release version="45.1.8" date="2024-02-07">
       <description translatable="no">
         <p>Added:</p>
@@ -63,12 +75,13 @@
         </ul>
         <p>Translations:</p>
         <ul>
-          <li>Added French translation (Irénée THIRION)</li>
-          <li>Updated Occitan translation (ensag-dev)</li>
-          <li>Updated German translation (Philipp Kiemle)</li>
-          <li>Updated Dutch translation (Heimen Stoffels)</li>
+          <li>Added Greek translation (itsnotAZ)</li>
+          <li>Added Hungarian translation (zoli111)</li>
+          <li>Added Persian translation (Danial Behzadi)</li>
           <li>Updated Italian translation (Albano Battistella)</li>
-          <li>Updated Japanese translation (Gnuey56)</li>
+          <li>Updated Spanish translation (Vicente015)</li>
+          <li>Updated Occitan translation (ensag-dev)</li>
+          <li>Updated Dutch translation (Heimen Stoffels)</li>
         </ul>
       </description>
     </release>

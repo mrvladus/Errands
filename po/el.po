@@ -1,60 +1,61 @@
-# Occitan translation.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# For the people that want it in greek for some reason like why would you do that are you some kind of du-
+# Copyright (C) 2024 itsnotAZ
 # This file is distributed under the same license as the errands package.
-# Quentin PAGÈS, 2023.
+# itsnotAZ, 2024.
 #
+#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-06 17:58+0300\n"
-"PO-Revision-Date: 2023-09-21 20:23+0200\n"
-"Last-Translator: Quentin PAGÈS\n"
+"PO-Revision-Date: 2024-01-28 13:51+0200\n"
+"Last-Translator: \n"
 "Language-Team: \n"
-"Language: oc\n"
+"Language: el\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.3.2\n"
+"X-Generator: Poedit 3.4.2\n"
 
 #: errands/widgets/components.py:153
 msgid "Today"
-msgstr "Uèi"
+msgstr "Σήμερα"
 
 #: errands/widgets/components.py:157
 msgid "Tomorrow"
-msgstr "Deman"
+msgstr "Αύριο"
 
 #: errands/widgets/components.py:167
 msgid "Now"
-msgstr "Ara"
+msgstr "Τώρα"
 
 #: errands/widgets/components.py:172 errands/widgets/trash.py:37
 msgid "Clear"
-msgstr "Escafar"
+msgstr "Εκκαθάριση"
 
 #. Start date row
 #. End date row
 #: errands/widgets/components.py:231 errands/widgets/details.py:176
 #: errands/widgets/details.py:197
 msgid "Not Set"
-msgstr "Non definida"
+msgstr "Μη Ρυθμισμένο"
 
 #: errands/widgets/preferences.py:31
 msgid "Application Theme"
-msgstr "Tèma de l’aplicacion"
+msgstr "Θέμα Εφαρμογής"
 
 #: errands/widgets/preferences.py:39
 msgid "System"
-msgstr "Sistèma"
+msgstr "Σύστημα"
 
 #: errands/widgets/preferences.py:51
 msgid "Light"
-msgstr "Clar"
+msgstr "Φωτεινό"
 
 #: errands/widgets/preferences.py:63
 msgid "Dark"
-msgstr "Fosc"
+msgstr "Σκοτεινό"
 
 #. Task lists group
 #. task_list_group = Adw.PreferencesGroup(title=_("Task Lists"))
@@ -67,31 +68,31 @@ msgstr "Fosc"
 #. Tasks group
 #: errands/widgets/preferences.py:80 errands/widgets/window.py:91
 msgid "Tasks"
-msgstr "Prètzfaches"
+msgstr "Δουλείες"
 
 #: errands/widgets/preferences.py:83
 msgid "Click Action"
-msgstr "Accion del clic"
+msgstr "Δράση Κλικ"
 
 #: errands/widgets/preferences.py:84
 msgid "Open Details Panel"
-msgstr "Dobrir lo panèl de detalhs"
+msgstr "Άνοιγμα Πίνακα Λεπομερειών"
 
 #: errands/widgets/preferences.py:84
 msgid "Show Sub-Tasks"
-msgstr "Mostrar jos prètzfaches"
+msgstr "Εμφάνιση Υπο-Δουλειών"
 
 #: errands/widgets/preferences.py:99
 msgid "Complete Button Size"
-msgstr "Talha del boton Acabat"
+msgstr "Ολοκληρωμένο  Μέγεθος Κουμπιού"
 
 #: errands/widgets/preferences.py:100
 msgid "Small"
-msgstr "Pichona"
+msgstr "Μικρό"
 
 #: errands/widgets/preferences.py:100
 msgid "Big"
-msgstr "Granda"
+msgstr "Μεγάλο"
 
 #: errands/widgets/preferences.py:113
 msgid "Progress Bar"
@@ -104,481 +105,406 @@ msgstr ""
 #: errands/widgets/preferences.py:126 errands/widgets/preferences.py:194
 #: data/resources/gtk/help-overlay.ui:38
 msgid "Sync"
-msgstr "Sincronizacion"
+msgstr "Συγχρονισμός"
 
 #. Provider
 #: errands/widgets/preferences.py:129
 msgid "Disabled"
-msgstr "Desactivada"
+msgstr "Απενεργοποιημένο"
 
 #: errands/widgets/preferences.py:131
 msgid "Sync Provider"
-msgstr "Provesidor de sincro."
+msgstr "Παροχέας Συγχρονισμού"
 
 #: errands/widgets/preferences.py:140
 msgid "Server URL"
-msgstr "URL servidor"
+msgstr "URL Σέρβερ"
 
 #: errands/widgets/preferences.py:146
 msgid "Username"
-msgstr "Nom d'utilizaire"
+msgstr "Όνομα Χρήστη"
 
 #: errands/widgets/preferences.py:152
 msgid "Password"
-msgstr "Senhal"
+msgstr "Συνθηματικό"
 
 #: errands/widgets/preferences.py:158
 msgid "Test"
-msgstr "Ensag"
+msgstr "Δοκιμή"
 
 #: errands/widgets/preferences.py:163
 msgid "Test Connection"
-msgstr "Ensajar connexion"
+msgstr "Δοκιμή Σύνδεσης"
 
 #: errands/widgets/preferences.py:171
 msgid "Details Panel"
-msgstr "Panèl de detalh"
+msgstr "Πίνακας Λεπτομερειών"
 
 #: errands/widgets/preferences.py:174
 msgid "Position"
-msgstr "Posicion"
+msgstr "Θέση"
 
 #: errands/widgets/preferences.py:175
 msgid "Left"
-msgstr "Esquèrra"
+msgstr "Αριστερά"
 
 #: errands/widgets/preferences.py:175
 msgid "Right"
-msgstr "Drecha"
+msgstr "Δεξιά"
 
 #: errands/widgets/preferences.py:184
 msgid "Appearance"
-msgstr "Aparéncia"
+msgstr "Εμφάνιση"
 
 #: errands/widgets/preferences.py:230
 msgid "Connected"
-msgstr "Connectat"
+msgstr "Συνδεδεμένο"
 
 #: errands/widgets/preferences.py:230
 msgid "Can't connect"
-msgstr "Connexion impossibla"
+msgstr "Αδυναμία Σύνδεσης"
 
 #: errands/widgets/sidebar.py:67 errands/widgets/window.py:38
 #: errands/widgets/window.py:129 data/io.github.mrvladus.List.desktop.in.in:3
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:27
 msgid "Errands"
-msgstr "Errands"
+msgstr "Εrrands"
 
 #: errands/widgets/sidebar.py:75
 msgid "Import List"
-msgstr "Importar lista"
+msgstr "Εισαγωγή Λίστας"
 
 #: errands/widgets/sidebar.py:80
 msgid "Add List (Ctrl+A)"
-msgstr "Apondre una lista (Ctrl+A)"
+msgstr "Προσθήκη Λίστας (Ctrl+A)"
 
 #: errands/widgets/sidebar.py:82
 msgid "More Options"
-msgstr "Mai d'opcions"
+msgstr "Περισσότερες Επιλογές"
 
 #. top_section.append(_("Secret Notes"), "app.secret_notes")
 #: errands/widgets/sidebar.py:99 data/resources/gtk/help-overlay.ui:42
 msgid "Sync / Fetch Tasks"
-msgstr "Sincro / Recuperacion prètzfaches"
+msgstr "Συγχρονισμός/ Εύρεση Δουλειών"
 
 #: errands/widgets/sidebar.py:102 data/resources/gtk/help-overlay.ui:20
 msgid "Preferences"
-msgstr "Preferéncias"
+msgstr "Προτιμήσεις"
 
 #: errands/widgets/sidebar.py:103
 msgid "Keyboard Shortcuts"
-msgstr "Acorchis de clavièr"
+msgstr "Συντομεύσεις Πληκτρολογίου"
 
 #: errands/widgets/sidebar.py:104
 msgid "About Errands"
-msgstr "A prepaus d’Errands"
+msgstr "Περί Errands"
 
 #: errands/widgets/sidebar.py:110
 msgid "Main Menu"
-msgstr "Menú principal"
+msgstr "Κεντρικό Μενού"
 
 #: errands/widgets/sidebar.py:116
 msgid "Syncing..."
-msgstr "Sincronizacion..."
+msgstr "Συγχρονισμός..."
 
 #: errands/widgets/sidebar.py:141
 msgid "New List Name"
-msgstr "Nom de la lista novèla"
+msgstr "Όνομα Νέας Λίστας"
 
 #: errands/widgets/sidebar.py:145 data/resources/gtk/help-overlay.ui:57
 msgid "Add List"
-msgstr "Apondre una lista"
+msgstr "Προσθήκη Λίστας"
 
 #: errands/widgets/sidebar.py:150 errands/widgets/sidebar.py:342
 #: errands/widgets/sidebar.py:385 errands/widgets/trash.py:136
 msgid "Cancel"
-msgstr "Anullar"
+msgstr "Ακύρωση"
 
 #: errands/widgets/sidebar.py:151
 msgid "Add"
-msgstr "Apondre"
+msgstr "Προσθήκη"
 
 #: errands/widgets/sidebar.py:168
 msgid "Add new List"
-msgstr "Apondre una lista novèla"
+msgstr "Προσθήκη νέας Λίστας"
 
 #: errands/widgets/sidebar.py:169
 msgid "Click \"+\" button"
-msgstr "Clicar lo boton « + »"
+msgstr "Πατήστε το κουμπί \"+\""
 
 #: errands/widgets/sidebar.py:337 errands/widgets/trash.py:131
 msgid "Are you sure?"
-msgstr "O confirmatz ?"
+msgstr "Είστε σίγουροι;"
 
 #: errands/widgets/sidebar.py:338
 msgid "List will be permanently deleted"
-msgstr "La lista serà definitivament suprimida"
+msgstr "Η Λίστα θα διαγραφεί διαπαντός"
 
 #: errands/widgets/sidebar.py:343 errands/widgets/sidebar.py:478
 #: errands/widgets/details.py:54 errands/widgets/trash.py:137
 msgid "Delete"
-msgstr "Suprimir"
+msgstr "Διαγραφή"
 
 #: errands/widgets/sidebar.py:375
 msgid "New Name"
-msgstr "Nom novèl"
+msgstr "Νέο Όνομα"
 
 #: errands/widgets/sidebar.py:380
 msgid "Rename List"
-msgstr "Renonemar la lista"
+msgstr "Μετονομασία Λίστας"
 
 #: errands/widgets/sidebar.py:386 errands/widgets/details.py:114
 #: errands/widgets/details.py:155
 msgid "Save"
-msgstr "Enregistrar"
+msgstr "Αποθήκευση"
 
 #: errands/widgets/sidebar.py:444
 msgid "Export failed"
-msgstr "Expòrt non reüssit"
+msgstr "Εξαγωγή απέτυχε"
 
 #: errands/widgets/sidebar.py:446 errands/widgets/details.py:487
 msgid "Exported"
-msgstr "Exportat"
+msgstr "Εξαγωγή ολοκληρώθηκε"
 
 #: errands/widgets/sidebar.py:477
 msgid "Rename"
-msgstr "Renomenar"
+msgstr "Μετονομασία"
 
 #. Export group
 #: errands/widgets/sidebar.py:479 errands/widgets/details.py:239
 #: errands/widgets/details.py:247
 msgid "Export"
-msgstr "Exportar"
+msgstr "Εξαγωγή"
 
 #: errands/widgets/sidebar.py:505
 msgid "Menu"
-msgstr "Menú"
+msgstr "Μενού"
 
 #: errands/widgets/sidebar.py:563 errands/widgets/trash.py:30
 #: errands/widgets/window.py:61
 msgid "Trash"
-msgstr "Bordilhièr"
+msgstr "Απορρίμματα"
 
 #: errands/widgets/task_list.py:40 errands/widgets/task_list.py:55
 #: errands/widgets/task_list.py:96 errands/widgets/task_list.py:107
 msgid "Toggle Sidebar"
-msgstr "Afichar o amagar lo panèl lateral"
+msgstr "Εναλλαγή Πλευρικής Εργαλειοθήκης"
 
 #: errands/widgets/task_list.py:70 errands/widgets/task_list.py:120
 msgid "Delete Completed Tasks"
-msgstr "Suprimir los prètzfaches acabats"
+msgstr "Διαγραφή Ολοκληρωμένων Δουλειών"
 
 #: errands/widgets/task_list.py:80 errands/widgets/task_list.py:134
 msgid "Scroll Up"
-msgstr "Desfilar cap amont"
+msgstr "Κύλιση προς τ' απάνω"
 
 #: errands/widgets/task_list.py:277 errands/widgets/task.py:217
 msgid "Completed:"
-msgstr "Acabat :"
+msgstr "Ολοκληρωμένα:"
 
 #: errands/widgets/task_list.py:401
 msgid "Add new Task"
-msgstr "Apondre un prètzfach novèl"
+msgstr "Προσθήκη νέας Δουλειάς"
 
 #: errands/widgets/details.py:63
 msgid "No Details"
-msgstr "Cap de detalh"
+msgstr "Χωρίς Λεπτομέρειες"
 
 #: errands/widgets/details.py:64
 msgid "Click on task to show more info"
-msgstr "Clicar un prètzfach per afichar mai d'informacions"
+msgstr "Κάντε κλικ πάνω στην Δουλεία για περισσότερες πληροφορίες"
 
 #: errands/widgets/details.py:81
 msgid "Clear Style"
-msgstr "Estil clar"
+msgstr "Καθαρό Στυλ"
 
 #. Edit group
 #: errands/widgets/details.py:90
 msgid "Text"
-msgstr "Tèxte"
+msgstr "Κείμενο"
 
 #: errands/widgets/details.py:124 errands/widgets/details.py:166
 msgid "Copy Text"
-msgstr "Copiar lo tèxte"
+msgstr "Αντιγραφή Κειμένου"
 
 #. Notes group
 #: errands/widgets/details.py:131
 msgid "Notes"
-msgstr "Nòtas"
+msgstr "Σημειώσεις"
 
 #. Properties group
 #: errands/widgets/details.py:173
 msgid "Properties"
-msgstr "Proprietats"
+msgstr "Ιδιότητες"
 
 #: errands/widgets/details.py:176
 msgid "Start"
-msgstr "Debuta"
+msgstr "Αρχή"
 
 #: errands/widgets/details.py:183 errands/widgets/details.py:204
 msgid "Set Date"
-msgstr "Definir la data"
+msgstr "Ρύθμιση Ημερομηνίας"
 
 #: errands/widgets/details.py:197
 msgid "Due"
-msgstr "Tèrme"
+msgstr "Τέλος"
 
 #. Complete % row
 #: errands/widgets/details.py:212
 msgid "Complete %"
-msgstr "Acabar %"
+msgstr "Ολοκλήρωση %"
 
 #. Priority row
 #: errands/widgets/details.py:222
 msgid "Priority"
-msgstr "Prioritat"
+msgstr "Προτεραιότητα"
 
 #. Tags group
 #: errands/widgets/details.py:232
 msgid "Tags"
-msgstr "Etiquetas"
+msgstr "Ετικέτες"
 
 #. Tags entry
 #: errands/widgets/details.py:234
 msgid "Add Tag"
-msgstr "Apondre una etiqueta"
+msgstr "Προσθήκη Ετικέτας"
 
 #: errands/widgets/details.py:248
 msgid "Save Task as .ics file"
-msgstr "Enregistrar lo prètzfach coma fichièr .ics"
+msgstr "Αποθήκευση ως αρχείο .ics"
 
 #: errands/widgets/details.py:440
 msgid "Copied to Clipboard"
-msgstr "Copiat al quichapapièrs"
+msgstr "Αντιγράφηκε στο Πρόχειρο"
 
 #: errands/widgets/task.py:301 errands/widgets/task.py:312
 msgid "Mark as Completed"
-msgstr "Marcar coma acabat"
+msgstr "Σημείωση ως Ολοκληρωμένο"
 
 #: errands/widgets/task.py:399
 msgid "Expand / Fold"
-msgstr "Desplegar / Plegar"
+msgstr "Ανάπτυξη / Δίπλωμα"
 
 #: errands/widgets/task.py:419 data/resources/gtk/help-overlay.ui:68
 msgid "Details"
-msgstr "Detalhs"
+msgstr "Λεπτομέρειες"
 
 #: errands/widgets/task.py:530
 msgid "Add new Sub-Task"
-msgstr "Apondre un jos prètzfach"
+msgstr "Προσθήκη νέας υπο-δουλειάς"
 
 #: errands/widgets/trash.py:45
 msgid "Restore All"
-msgstr "Tot restaurar"
+msgstr "Επαναφορά όλων"
 
 #: errands/widgets/trash.py:51
 msgid "Empty Trash"
-msgstr "Voidar lo bordilhièr"
+msgstr "Άδειασμα Απορριμάτων"
 
 #: errands/widgets/trash.py:52
 msgid "No deleted items"
-msgstr "Cap d’element pas suprimit"
+msgstr "Δεν υπάρχουν διαγραμμένα αντικείμενα"
 
 #: errands/widgets/trash.py:132
 msgid "Tasks will be permanently deleted"
-msgstr "Los prètzfaches seràn definitivament suprimits"
+msgstr "Οι δουλειές θα διαγραφούν διαπαντός"
 
 #: errands/widgets/trash.py:212
 msgid "Restore"
-msgstr "Restablir"
+msgstr "Επαναφορά"
 
 #: errands/widgets/window.py:67 errands/widgets/window.py:84
 msgid "No Task Lists"
-msgstr "Cap de lista de prètzfaches"
+msgstr "Δεν υπάρχουν λίστες"
 
 #: errands/widgets/window.py:69
 msgid "Create List"
-msgstr "Crear una lista"
+msgstr "Δημιουργία Λίστας"
 
 #: errands/widgets/window.py:90 data/resources/gtk/help-overlay.ui:53
 msgid "Lists"
-msgstr "Listas"
+msgstr "Λίστες"
 
 #: errands/widgets/window.py:134
 msgid "translator-credits"
-msgstr "Quentin PAGÈS"
+msgstr "itsnotAZ"
 
 #: errands/widgets/window.py:143
 msgid "Sync is disabled"
-msgstr "La sincronizacion es desactivada"
+msgstr "Ο Συγχρονισμός είναι απενεργοποιημένος"
 
 #: errands/widgets/window.py:212
 msgid "Imported"
-msgstr "Importat"
+msgstr "Εισαγωγές"
 
 #: errands/lib/sync/providers/caldav.py:42
 msgid "Not all sync credentials provided. Please check settings."
-msgstr ""
-"Totes los identificants son pas provesits. Verificatz los paramètres se vos "
-"plai."
+msgstr "Λείπουν στοιχεία για τον συγχρονισμό. Παρακαλώ ελέγξτε τις ρυθμίσεις."
 
 #: errands/lib/sync/providers/caldav.py:81
 msgid "Can't connect to CalDAV server at:"
-msgstr "Connexion impossibla al servidor CalDAV de :"
+msgstr "Αδυναμία σύνδεσης σε σέρβερ CalDAV στο:"
 
 #: data/resources/gtk/help-overlay.ui:9
 msgid "General"
-msgstr "General"
+msgstr "Γενικά"
 
 #: data/resources/gtk/help-overlay.ui:13
 msgid "Show keyboard shortcuts"
-msgstr "Mostrar los acorchis clavièr"
+msgstr "Προβολή συντομεύσεων πληκτρολογίου"
 
 #: data/resources/gtk/help-overlay.ui:27
 msgid "Quit"
-msgstr "Quitar"
+msgstr "Έξοδος"
 
 #: data/resources/gtk/help-overlay.ui:72
 msgid "Toggle Details"
-msgstr "Afichar o amagar los detalhs"
+msgstr "Εναλλαγή Λεπτομερειών"
 
 #: data/io.github.mrvladus.List.desktop.in.in:4
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:28
 msgid "Manage your tasks"
-msgstr "Gerir vòstres prètzfaches"
+msgstr "Διαχειριστείτε τις δουλειές σας"
 
 #: data/io.github.mrvladus.List.desktop.in.in:10
 msgid "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
-msgstr ""
-"errands;tasks;list;todo;todos;prètzfaches;prètzfait;lista;tièra;caldav;"
-"nextcloud;sincro;sync;"
+msgstr "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:30
 msgid "Todo application for those who prefer simplicity."
-msgstr "Alicacion de lista de prètzfaches pel monde qu'estima la simplicitat"
+msgstr "Εφαρμογή to-do για εκείνους  που προτιμούν την απλότητα."
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:31
 msgid "Features:"
-msgstr "Foncionalitats :"
+msgstr "Χαρακτηριστικά:"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:33
 msgid "Multiple task lists support"
-msgstr "Presa en carga de mantuna lista de prètzfaches"
+msgstr "Υποστήριξη για πολλαπλές λίστες από δουλείες"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:34
 msgid "Add, remove, edit tasks and sub-tasks"
-msgstr "Apondre, suprimir, modificar los prètzfaches e los jos prètzfaches"
+msgstr "Προσθήκη, Αφαίρεση και επεξεργασία δουλειών και υπο-δουλειών"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:35
 msgid "Mark task and sub-tasks as completed"
-msgstr "Marcar lo prètzfach e jos prètzfaches coma acabats"
+msgstr "Σημείωση δουλειών και υπο-δουλειών σαν ολοκληρωμένα"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:36
 msgid "Add accent color for each task"
-msgstr "Apondre una color dominanta per cada prètzfach"
+msgstr "Προσθήκη χρώματος έμφασης για κάθε δουλειά"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:37
 msgid "Sync tasks with Nextcloud or other CalDAV providers"
-msgstr "Sincronizar los prètzfaches amb Nextcloud o d'autres provesidor CalDAV"
+msgstr "Συγχρονισμός δουλειών με Nextcloud ή άλλους παροχείς CalDAV"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:38
 msgid "Drag and Drop support"
-msgstr "Presa en carga del lisar e depausar"
+msgstr "Υποστήριξη για Τράβηγμα και Απόθεση"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:39
 msgid "Import .ics files"
-msgstr "Importar fichièrs .ics"
+msgstr "Εισαγωγή αρχείων .ics"
 
 #~ msgid "Save changed details"
-#~ msgstr "Enregistrar los details modificats"
-
-#~ msgid "Save (Ctrl+S)"
-#~ msgstr "Enregistrar (Ctrl+S)"
-
-#~ msgid "Create"
-#~ msgstr "Crear"
-
-#~ msgid "Load"
-#~ msgstr "Cargar"
-
-#~ msgid "Click for Details"
-#~ msgstr "Clicar pels detalhs"
-
-#, fuzzy
-#~ msgid "Toggle sidebar"
-#~ msgstr "Afichar o amagar lo panèl lateral"
-
-#, fuzzy
-#~ msgid "End"
-#~ msgstr "Errands"
-
-#~ msgid "Export Cancelled"
-#~ msgstr "Exportacion anullada"
-
-#~ msgid "Error"
-#~ msgstr "Error"
-
-#~ msgid "Import Cancelled"
-#~ msgstr "Importacion anullada"
-
-#~ msgid "Invalid File"
-#~ msgstr "Fichièr invalid"
-
-#~ msgid "Deleted Tasks"
-#~ msgstr "Prètzfaches suprimits"
-
-#~ msgid "Move to Trash"
-#~ msgstr "Desplaçar al bordilhièr"
-
-#~ msgid "Show Deleted Tasks"
-#~ msgstr "Mostrar los prètzfaches suprimits"
-
-#~ msgid "Delete Completed Tasks (Ctrl+Delete)"
-#~ msgstr "Suprimir los prètzfaches acabats (Ctrl+Sup.)"
-
-#~ msgid "Export Tasks..."
-#~ msgstr "Exportar los prètzfaches"
-
-#~ msgid "Import Tasks..."
-#~ msgstr "Importar los prètzfaches..."
-
-#~ msgid "Import and Export"
-#~ msgstr "Impòrt e Expòrt"
-
-#~ msgid "Exit edit mode"
-#~ msgstr "Sortir del mòde edicion"
-
-#~ msgid "Expand Sub-Tasks on Startup"
-#~ msgstr "Espandir la lista dels prètzfaches a l’aviada"
-
-#~ msgid "Calendar Name (\"Errands\" by Default)"
-#~ msgstr "Nom del calendièr"
-
-#~ msgid "Token"
-#~ msgstr "Geton"
-
-#~ msgid "Edit"
-#~ msgstr "Modificar"
-
-#~ msgid "Cancel (Escape)"
-#~ msgstr "Anullar (Escape)"
+#~ msgstr "Αποθήκευση αλλαγών"

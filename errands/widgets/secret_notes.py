@@ -51,7 +51,6 @@ class SecretNote(Gtk.ListBoxRow):
         )
         self.buffer = self.text_view.get_buffer()
         self.buffer.props.text = self.text
-        self.buffer.set_style_scheme()
         lm: GtkSource.LanguageManager = GtkSource.LanguageManager.get_default()
         self.buffer.set_language(lm.get_language("markdown"))
         self.buffer.connect("changed", self._on_text_changed)

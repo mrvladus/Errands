@@ -299,8 +299,8 @@ class TaskList(Adw.Bin):
             )[0][0]
         )
 
-        all_tasks: list[Task] = self.get_all_tasks()
         # Remove deleted tasks
+        all_tasks: list[Task] = self.get_all_tasks()
         ids: list[str] = UserData.get_tasks_uids(self.list_uid)
         for task in all_tasks:
             if task.uid not in ids:

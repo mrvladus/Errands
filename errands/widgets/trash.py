@@ -4,6 +4,8 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
+from errands.widgets.task_list import TaskList
+
 if TYPE_CHECKING:
     from errands.widgets.window import Window
 
@@ -148,7 +150,7 @@ class Trash(Adw.Bin):
 
         # Get all tasks
         tasks: list[Task] = []
-        task_lists: list = []
+        task_lists: list[TaskList] = []
         pages = self.stack.get_pages()
         for i in range(pages.get_n_items()):
             child = pages.get_item(i).get_child()
@@ -158,20 +160,8 @@ class Trash(Adw.Bin):
 
         for task in tasks:
             task.update_props(["trash"], [False])
-            task.toggle_visibility(True)
-            # Update statusbar
-            if not task.is_sub_task:
-                task.update_status()
-            else:
-                task.parent.update_status()
-            # Expand if needed
-            for t in tasks:
-                if t.get_prop("parent") == task.uid:
-                    task.expand(True)
-                    break
 
-        for list in task_lists:
-            list.update_status()
+        self.window.sidebar.task_lists.update_ui()
 
         for row in get_children(self.trash_list):
             self.trash_list.remove(row)
@@ -223,29 +213,21 @@ class TrashItem(Adw.Bin):
         self.set_child(box)
 
     def on_restore(self, _) -> None:
-        """Restore task"""
+        """Restore task and its parents"""
 
         Log.info(f"Restore task: {self.uid}")
 
-        to_remove: list[str] = []
+        tasks: list[Task] = []
+        tasks.append(self.task_widget)
+        tasks.extend(self.task_widget.get_parents_tree())
+        for task in tasks:
+            task.update_props(["trash"], [False])
 
-        def restore_task(uid: str = self.uid) -> None:
-            for item in get_children(self.trash_list):
-                if item.task_widget.get_prop("uid") == uid:
-                    item.task_widget.update_props(["trash"], [False])
-                    item.task_widget.toggle_visibility(True)
-                    to_remove.append(uid)
-                    if puid := item.task_widget.get_prop("parent"):
-                        item.task_widget.parent.expand(True)
-                        item.task_widget.parent.update_status()
-                        restore_task(puid)
-                    break
-
-        restore_task()
+        tasks_uids: list[str] = [t.uid for t in tasks]
 
         for item in get_children(self.trash_list):
-            if item.uid in to_remove:
+            if item.uid in tasks_uids:
                 self.trash_list.remove(item)
 
-        self.task_widget.task_list.update_status()
+        self.task_widget.task_list.update_ui()
         self.trash.update_status()
