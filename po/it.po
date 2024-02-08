@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version:  errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-06 17:58+0300\n"
-"PO-Revision-Date: 2024-01-28 14:31+0100\n"
+"PO-Revision-Date: 2024-02-07 14:31+0100\n"
 "Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
 "Language-Team: Italian <LL@li.org>\n"
 "Language: it\n"
@@ -96,11 +96,11 @@ msgstr "Grande"
 
 #: errands/widgets/preferences.py:113
 msgid "Progress Bar"
-msgstr ""
+msgstr "Barra di avanzamento"
 
 #: errands/widgets/preferences.py:119
 msgid "Tool Bar"
-msgstr ""
+msgstr "Barra degli strumenti"
 
 #: errands/widgets/preferences.py:126 errands/widgets/preferences.py:194
 #: data/resources/gtk/help-overlay.ui:38
