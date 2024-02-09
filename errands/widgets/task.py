@@ -148,7 +148,14 @@ class TaskTitleRow(Gtk.Overlay):
 
         # Click controller
         task_row_click_ctrl = Gtk.GestureClick.new()
-        task_row_click_ctrl.connect("released", self._on_row_clicked)
+        task_row_click_ctrl.connect(
+            "released",
+            lambda *_: (
+                self.task.expand(not self.task.sub_tasks_revealer.get_child_revealed())
+                if GSettings.get("primary-action-show-sub-tasks")
+                else self.task.task_row.details_btn.do_clicked()
+            ),
+        )
         self.task_row.add_controller(task_row_click_ctrl)
 
         # Prefix
@@ -193,13 +200,6 @@ class TaskTitleRow(Gtk.Overlay):
         box.append(self.task_row)
 
         self.set_child(box)
-
-    def _on_row_clicked(self, *args) -> None:
-        # Show sub-tasks if this is primary action
-        if GSettings.get("primary-action-show-sub-tasks"):
-            self.task.expand(not self.task.sub_tasks_revealer.get_child_revealed())
-        else:
-            self.task.task_row.details_btn.do_clicked()
 
     def update_ui(self):
         # Update widget title crossline and completed toggle
