@@ -1,6 +1,12 @@
 # Copyright 2023-2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from errands.widgets.window import Window
+
 from errands.lib.sync.sync import Sync
 from errands.widgets.components import Box
 from errands.widgets.details import Details
@@ -17,7 +23,7 @@ class TaskList(Adw.Bin):
     # State
     scrolling: bool = False  # Is window scrolling
 
-    def __init__(self, window, list_uid: str, parent):
+    def __init__(self, window: Window, list_uid: str, parent):
         super().__init__()
         self.window = window
         self.list_uid = list_uid
@@ -238,7 +244,7 @@ class TaskList(Adw.Bin):
         self.set_child(tasks_brb)
 
     def add_task(self, uid: str) -> None:
-        new_task = Task(uid, self.list_uid, self.window, self, self, False)
+        new_task = Task(uid, self, self, False)
         self.tasks_list.append(new_task)
         new_task.toggle_visibility(not new_task.get_prop("trash"))
 
@@ -388,45 +394,42 @@ class TaskList(Adw.Bin):
 
 
 class TaskListEntry(Adw.Bin):
+
+    # Public elements
+    entry: Adw.EntryRow
+
     def __init__(self, task_list: TaskList) -> None:
         super().__init__()
         self.task_list = task_list
         self._build_ui()
 
-    def _build_ui(self):
-        # Entry
-        entry = Adw.EntryRow(
-            activatable=False,
+    def _build_ui(self) -> None:
+        self.entry = Adw.EntryRow(
             height_request=60,
             title=_("Add new Task"),
-        )
-        entry.connect("entry-activated", self._on_task_added)
-        # Box
-        box = Gtk.ListBox(
-            css_classes=["boxed-list"],
-            selection_mode=Gtk.SelectionMode.NONE,
-            margin_top=12,
-            margin_bottom=12,
-            margin_start=12,
+            css_classes=["card"],
+            margin_top=6,
+            margin_bottom=6,
             margin_end=12,
+            margin_start=12,
         )
-        box.append(entry)
-        # Clamp
+        self.entry.connect("entry-activated", self._on_task_added)
+
         self.set_child(
             Adw.Clamp(
                 maximum_size=1000,
                 tightening_threshold=300,
-                child=box,
+                child=self.entry,
             )
         )
 
-    def _on_task_added(self, entry: Adw.EntryRow):
-        text: str = entry.props.text
+    def _on_task_added(self, entry: Adw.EntryRow | Gtk.Entry) -> None:
+        text: str = entry.get_text()
         if text.strip(" \n\t") == "":
             return
         self.task_list.add_task(
             UserData.add_task(list_uid=self.task_list.list_uid, text=text)
         )
-        entry.props.text = ""
+        entry.set_text("")
         scroll(self.task_list.scrl, True)
         Sync.sync()

@@ -6,10 +6,9 @@ from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from errands.widgets.task_list import TaskList
-    from errands.widgets.window import Window
 
-from errands.widgets.components import Box, Button
-from gi.repository import Gtk, Adw, Gdk, GObject  # type:ignore
+from errands.widgets.components import Box
+from gi.repository import Gtk, Adw, Gdk, GObject, GLib  # type:ignore
 from errands.lib.sync.sync import Sync
 from errands.lib.logging import Log
 from errands.lib.data import UserData
@@ -350,39 +349,6 @@ class TaskCompleteButton(Gtk.Box):
                     parent.just_added = False
                     parent.update_props(["completed", "synced"], [False, False])
 
-        # Calculate completion percent for parents
-        # for parent in parents:
-        #     total, completed = parent.get_status()
-        #     pc: int = (
-        #         completed / total * 100
-        #         if total > 0
-        #         else parent.get_prop("percent_complete")
-        #     )
-        #     if parent.get_prop("percent_complete") != pc:
-        #         parent.update_props(["percent_complete", "synced"], [pc, False])
-        #     parent.update_ui()
-
-        # Calculate completion percent for self
-        # total, completed = self.task.get_status()
-        # pc: int = (
-        #     completed / total * 100
-        #     if total > 0
-        #     else (100 if self.task.get_prop("completed") else 0)
-        # )
-        # if self.task.get_prop("percent_complete") != pc:
-        #     self.task.update_props(["percent_complete", "synced"], [pc, False])
-
-        # # Calculate completion percent for sub-tasks
-        # for sub in sub_tasks:
-        #     total, completed = sub.get_status()
-        #     pc: int = (
-        #         completed / total * 100
-        #         if total > 0
-        #         else (100 if self.task.get_prop("completed") else 0)
-        #     )
-        #     if sub.get_prop("percent_complete") != pc:
-        #         sub.update_props(["percent_complete", "synced"], [pc, False])
-
         self.task.task_list.update_ui()
         Sync.sync()
 
@@ -519,51 +485,13 @@ class TaskInfoBar(Gtk.Box):
             self.progress_bar_rev.set_reveal_child(self.task.get_status()[0] > 0)
 
 
-class TaskSubTasksEntry(Gtk.Entry):
-    def __init__(self, task: Task):
-        super().__init__()
-        self.task: Task = task
-        self._build_ui()
+class TaskSubTasks(Adw.Bin):
 
-    def _build_ui(self):
-        self.set_hexpand(True)
-        self.set_placeholder_text(_("Add new Sub-Task"))
-        self.set_margin_start(12)
-        self.set_margin_end(12)
-        self.set_margin_bottom(2)
+    # Public UI elements
+    entry: Gtk.Entry
+    sub_tasks: Gtk.Box
+    vbox: Gtk.Box
 
-    def do_activate(self) -> None:
-        """
-        Add new Sub-Task
-        """
-        text: str = self.get_text()
-
-        # Return if entry is empty
-        if text.strip(" \n\t") == "":
-            return
-
-        # Add sub-task
-        self.task.tasks_list.add_sub_task(
-            UserData.add_task(
-                list_uid=self.task.list_uid, text=text, parent=self.task.uid
-            )
-        )
-
-        # Clear entry
-        self.set_text("")
-
-        # Update status
-        self.task.update_props(["completed"], [False])
-        self.task.just_added = True
-        self.task.task_row.complete_btn.set_active(False)
-        self.task.just_added = False
-        self.task.update_ui()
-
-        # Sync
-        Sync.sync()
-
-
-class TaskSubTasks(Gtk.Box):
     def __init__(self, task: Task):
         super().__init__()
         self.task: Task = task
@@ -571,35 +499,43 @@ class TaskSubTasks(Gtk.Box):
         self._add_sub_tasks()
 
     def _build_ui(self):
-        self.set_orientation(Gtk.Orientation.VERTICAL)
-        self.add_css_class("sub-tasks")
+        # Entry
+        self.entry = Gtk.Entry(
+            placeholder_text=_("Add new Sub-Task"),
+            hexpand=True,
+            margin_bottom=2,
+            margin_end=12,
+            margin_start=12,
+        )
+
+        # Sub-tasks
+        self.sub_tasks = Gtk.Box(
+            orientation=Gtk.Orientation.VERTICAL, css_classes=["sub-tasks"]
+        )
+
+        # VBox
+        self.vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.vbox.append(self.entry)
+        self.vbox.append(self.sub_tasks)
+        self.set_child(self.vbox)
+
+    def add_sub_task(self, uid: str) -> Task:
+        new_task: Task = Task(uid, self.task.task_list, self.task, True)
+        self.sub_tasks.append(new_task)
+        new_task.toggle_visibility(not new_task.get_prop("trash"))
+        return new_task
 
     def _add_sub_tasks(self) -> None:
+        """Load sub-tasks and add them to sub_tasks box"""
+
         subs: list[str] = UserData.get_tasks_uids(self.task.list_uid, self.task.uid)
         if len(subs) == 0:
             self.task.just_added = False
             return
         for uid in subs:
             self.add_sub_task(uid)
-        # self.task.parent.update_ui()
         self.task.task_list.update_status()
         self.task.just_added = False
-
-    def add_sub_task(self, uid: str) -> Task:
-        new_task: Task = Task(
-            uid,
-            self.task.list_uid,
-            self.task.window,
-            self.task.task_list,
-            self.task,
-            True,
-        )
-        self.append(new_task)
-        new_task.toggle_visibility(not new_task.get_prop("trash"))
-        return new_task
-
-    def get_sub_tasks(self) -> list[Task]:
-        return get_children(self)
 
     def get_all_sub_tasks(self) -> list[Task]:
         """
@@ -618,6 +554,44 @@ class TaskSubTasks(Gtk.Box):
         _append_tasks(self.get_sub_tasks())
         return tasks
 
+    def get_sub_tasks(self) -> list[Task]:
+        """Get toplevel sub-tasks"""
+        return get_children(self.sub_tasks)
+
+    def _on_task_added(self, entry: Gtk.Entry):
+        """
+        Add new Sub-Task
+        """
+        text: str = entry.get_text()
+
+        # Return if entry is empty
+        if text.strip(" \n\t") == "":
+            return
+
+        # Add sub-task
+        self.add_sub_task(
+            UserData.add_task(
+                list_uid=self.task.list_uid, text=text, parent=self.task.uid
+            )
+        )
+
+        # Clear entry
+        entry.set_text("")
+
+        # Update status
+        self.task.update_props(["completed"], [False])
+        self.task.just_added = True
+        self.task.task_row.complete_btn.set_active(False)
+        self.task.just_added = False
+        self.task.update_ui()
+
+        # Sync
+        Sync.sync()
+
+    def update_ui(self):
+        for task in self.get_sub_tasks():
+            task.update_ui()
+
 
 class Task(Gtk.Revealer):
     just_added: bool = True
@@ -626,8 +600,6 @@ class Task(Gtk.Revealer):
     def __init__(
         self,
         uid: str,
-        list_uid: str,
-        window: Window,
         task_list: TaskList,
         parent: TaskList | Task,
         is_sub_task: bool,
@@ -636,20 +608,20 @@ class Task(Gtk.Revealer):
         Log.info(f"Add task: {uid}")
 
         self.uid = uid
-        self.list_uid = list_uid
-        self.window = window
         self.task_list = task_list
+        self.list_uid = task_list.list_uid
+        self.window = task_list.window
         self.parent = parent
         self.is_sub_task = is_sub_task
-        self.trash = window.trash
+        self.trash = task_list.window.trash
         self.details = task_list.details
 
         self._build_ui()
+
         # Add to trash if needed
         if self.get_prop("trash"):
             self.trash.trash_add(self)
-        # Expand
-        self.expand(self.get_prop("expanded"))
+
         self.update_ui()
 
     def _build_ui(self) -> None:
@@ -666,12 +638,7 @@ class Task(Gtk.Revealer):
         self.tasks_list = TaskSubTasks(self)
 
         # Sub-tasks revealer
-        self.sub_tasks_revealer = Gtk.Revealer(
-            child=Box(
-                children=[TaskSubTasksEntry(self), self.tasks_list],
-                orientation="vertical",
-            )
-        )
+        self.sub_tasks_revealer = Gtk.Revealer(child=self.tasks_list)
 
         # Task card
         self.main_box = Box(
@@ -757,7 +724,7 @@ class Task(Gtk.Revealer):
         self.run_dispose()
 
     def toggle_visibility(self, on: bool) -> None:
-        self.set_reveal_child(on)
+        GLib.idle_add(self.set_reveal_child, on)
 
     def update_props(self, props: list[str], values: list[Any]) -> None:
         UserData.update_props(self.list_uid, self.uid, props, values)
@@ -780,8 +747,9 @@ class Task(Gtk.Revealer):
         # Change visibility
         self.toggle_visibility(not self.get_prop("trash"))
 
+        # Expand
+        self.expand(self.get_prop("expanded"))
+
         self.task_row.update_ui()
         self.info_bar.update_ui()
-
-        for task in self.tasks_list.get_sub_tasks():
-            task.update_ui()
+        self.tasks_list.update_ui()
