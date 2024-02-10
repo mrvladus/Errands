@@ -1,8 +1,9 @@
 # German translation for Errands.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the errands package.
+#
 # Christoph Bähr
-# Philipp Kiemle <philipp.kiemle@gmail.com>, 2023.
+# Philipp Kiemle <philipp.kiemle@gmail.com>, 2023-2024.
 # Milo Ivir <mail@milotype.de>, 2023.
 #
 msgid ""
@@ -10,7 +11,7 @@ msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-06 17:58+0300\n"
-"PO-Revision-Date: 2024-01-18 15:44+0100\n"
+"PO-Revision-Date: 2024-02-10 16:57+0100\n"
 "Last-Translator: Philipp Kiemle <philipp.kiemle@gmail.com>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -85,25 +86,24 @@ msgid "Show Sub-Tasks"
 msgstr "Unteraufgaben anzeigen"
 
 #: errands/widgets/preferences.py:99
-#, fuzzy
 msgid "Complete Button Size"
-msgstr "Abgeschlossen %"
+msgstr "Größe des \"Abgeschlossen\"-Knopfs"
 
 #: errands/widgets/preferences.py:100
 msgid "Small"
-msgstr ""
+msgstr "Klein"
 
 #: errands/widgets/preferences.py:100
 msgid "Big"
-msgstr ""
+msgstr "Groß"
 
 #: errands/widgets/preferences.py:113
 msgid "Progress Bar"
-msgstr ""
+msgstr "Fortschrittsbalken"
 
 #: errands/widgets/preferences.py:119
 msgid "Tool Bar"
-msgstr ""
+msgstr "Werkzeugleiste"
 
 #: errands/widgets/preferences.py:126 errands/widgets/preferences.py:194
 #: data/resources/gtk/help-overlay.ui:38
@@ -178,9 +178,8 @@ msgid "Import List"
 msgstr "Liste importieren"
 
 #: errands/widgets/sidebar.py:80
-#, fuzzy
 msgid "Add List (Ctrl+A)"
-msgstr "Liste hinzufügen"
+msgstr "Liste hinzufügen (Strg+A)"
 
 #: errands/widgets/sidebar.py:82
 msgid "More Options"
@@ -426,9 +425,8 @@ msgid "Create List"
 msgstr "Liste erstellen"
 
 #: errands/widgets/window.py:90 data/resources/gtk/help-overlay.ui:53
-#, fuzzy
 msgid "Lists"
-msgstr "Liste hinzufügen"
+msgstr "Listen"
 
 #: errands/widgets/window.py:134
 msgid "translator-credits"
