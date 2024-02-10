@@ -23,7 +23,7 @@ class SyncProviderVikunja(SyncProviderCalDAV):
                 calendar_uid = str(uuid.uuid5(uuid.NAMESPACE_DNS, calendar_namespace))
                 calendar.id = calendar_uid
                 for todo in calendar.todos(include_completed=True):
-                    todo.icalendar_component["uid"] = calendar_uid
+                    todo.icalendar_component["related-to"] = calendar_uid
 
                 remote_calendars.append(calendar)
 
