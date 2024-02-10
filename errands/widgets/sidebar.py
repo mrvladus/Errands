@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 from datetime import datetime
 from icalendar import Calendar, Todo
 from errands.lib.data import UserData
-from errands.lib.functions import get_children
+from errands.lib.utils import get_children
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
@@ -93,10 +93,10 @@ class SidebarHeaderBar(Adw.Bin):
 
         # Main menu
         menu: Gio.Menu = Gio.Menu.new()
-        top_section: Gio.Menu = Gio.Menu.new()
+        self.top_section: Gio.Menu = Gio.Menu.new()
         # top_section.append(_("Secret Notes"), "app.secret_notes")
-        top_section.append(_("Sync / Fetch Tasks"), "app.sync")
-        menu.append_section(None, top_section)
+        self.top_section.append(_("Sync / Fetch Tasks"), "app.sync")
+        menu.append_section(None, self.top_section)
         bottom_section: Gio.Menu = Gio.Menu.new()
         bottom_section.append(_("Preferences"), "app.preferences")
         bottom_section.append(_("Keyboard Shortcuts"), "win.show-help-overlay")

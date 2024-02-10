@@ -95,20 +95,6 @@
                     "sha256": "3eea6ed6e6c918e468e693c41ef07f3c3acc310b70ddd9cc72d9ef84bc9564ca"
                 }
             ]
-        },
-        {
-            "name": "python3-pycryptodomex",
-            "buildsystem": "simple",
-            "build-commands": [
-                "pip3 install --verbose --exists-action=i --no-index --find-links=\"file://${PWD}\" --prefix=${FLATPAK_DEST} \"pycryptodomex\" --no-build-isolation"
-            ],
-            "sources": [
-                {
-                    "type": "file",
-                    "url": "https://files.pythonhosted.org/packages/31/a4/b03a16637574312c1b54c55aedeed8a4cb7d101d44058d46a0e5706c63e1/pycryptodomex-3.20.0.tar.gz",
-                    "sha256": "7a710b79baddd65b806402e14766c721aee8fb83381769c27920f26476276c1e"
-                }
-            ]
         }
     ]
 }

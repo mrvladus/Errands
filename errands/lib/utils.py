@@ -1,9 +1,10 @@
-# Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
+# Copyright 2023-2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
 from typing import Callable
 from threading import Thread
 from gi.repository import Gtk  # type:ignore
+from errands.lib.logging import Log
 
 
 def get_children(obj: Gtk.Widget) -> list[Gtk.Widget]:
@@ -31,3 +32,13 @@ def threaded(function: Callable):
         Thread(target=function, args=args, kwargs=kwargs, daemon=True).start()
 
     return wrapper
+
+
+def catch_errors(function: Callable):
+    """Catch errors and log them"""
+
+    def wrapper(*args, **kwargs):
+        try:
+            function(*args, **kwargs)
+        except Exception as e:
+            Log.error(e)

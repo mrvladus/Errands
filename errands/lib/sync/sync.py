@@ -12,7 +12,7 @@ from errands.lib.sync.providers.nextcloud import SyncProviderNextcloud
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.data import UserData
-from errands.lib.functions import threaded
+from errands.lib.utils import threaded
 from gi.repository import GLib  # type:ignore
 
 

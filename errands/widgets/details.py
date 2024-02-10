@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 from datetime import datetime
 from errands.lib.data import UserData
 from icalendar import Calendar, Event
-from errands.lib.functions import get_children
+from errands.lib.utils import get_children
 from errands.widgets.components import Box, Button, DateTime
 from gi.repository import Adw, Gtk, Gdk, GObject, GtkSource, Gio  # type:ignore
 from errands.lib.markup import Markup

@@ -13,7 +13,7 @@ from errands.widgets.details import Details
 from gi.repository import Adw, Gtk, GLib, GObject  # type:ignore
 from errands.lib.animation import scroll
 from errands.lib.data import UserData
-from errands.lib.functions import get_children
+from errands.lib.utils import get_children
 from errands.lib.logging import Log
 from errands.widgets.task import Task
 from errands.lib.gsettings import GSettings

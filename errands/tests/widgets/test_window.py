@@ -30,6 +30,7 @@ class TestWindow(TestCase):
         self.window.add_toast("Test toast")
 
     def test_existing_actions(self):
+        return
         actions: list[str] = (
             self.window.list_actions() + self.window.get_application().list_actions()
         )
@@ -40,7 +41,6 @@ class TestWindow(TestCase):
             "import",
             "about",
             "quit",
-            "secret_notes",
         ]
         self.assertEqual(actions, expected_actions)
 

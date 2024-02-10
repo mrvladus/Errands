@@ -13,7 +13,7 @@ from errands.lib.sync.sync import Sync
 from errands.lib.logging import Log
 from errands.lib.data import UserData
 from errands.lib.markup import Markup
-from errands.lib.functions import get_children
+from errands.lib.utils import get_children
 from errands.lib.gsettings import GSettings
 
 

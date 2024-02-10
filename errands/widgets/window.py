@@ -7,7 +7,8 @@ from uuid import uuid4
 from icalendar import Calendar
 from errands.lib.data import UserData
 from errands.widgets.components import Box, Button
-from errands.widgets.secret_notes import SecretNotesWindow
+
+# from errands.plugins.secret_notes import SecretNotesWindow
 from errands.widgets.trash import Trash
 from gi.repository import Gio, Adw, Gtk  # type:ignore
 from errands.widgets.sidebar import Sidebar
@@ -21,7 +22,7 @@ WINDOW: Window = None
 
 class Window(Adw.ApplicationWindow):
     about_window: Adw.AboutWindow = None
-    secret_notes: SecretNotesWindow = None
+    # secret_notes: SecretNotesWindow = None
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
@@ -104,18 +105,18 @@ class Window(Adw.ApplicationWindow):
     def add_toast(self, text: str) -> None:
         self.toast_overlay.add_toast(Adw.Toast.new(title=text))
 
+    def _create_action(self, name: str, callback: callable, shortcuts=None) -> None:
+        action: Gio.SimpleAction = Gio.SimpleAction.new(name, None)
+        action.connect("activate", callback)
+        if shortcuts:
+            self.props.application.set_accels_for_action(f"app.{name}", shortcuts)
+        self.props.application.add_action(action)
+
     def _create_actions(self) -> None:
         """
         Create actions for main menu
         """
         Log.debug("Creating actions")
-
-        def _create_action(name: str, callback: callable, shortcuts=None) -> None:
-            action: Gio.SimpleAction = Gio.SimpleAction.new(name, None)
-            action.connect("activate", callback)
-            if shortcuts:
-                self.props.application.set_accels_for_action(f"app.{name}", shortcuts)
-            self.props.application.add_action(action)
 
         def _about(*args) -> None:
             """
@@ -217,23 +218,15 @@ class Window(Adw.ApplicationWindow):
             dialog = Gtk.FileDialog(default_filter=filter)
             dialog.open(self, None, _confirm)
 
-        def _secret_notes(*args):
-            if not self.secret_notes:
-                self.secret_notes: SecretNotesWindow = SecretNotesWindow(self)
-                self.secret_notes.present()
-            else:
-                self.secret_notes.present()
-
-        _create_action(
+        self._create_action(
             "preferences",
             lambda *_: PreferencesWindow(self).show(),
             ["<primary>comma"],
         )
-        _create_action("about", _about)
-        _create_action("import", _import)
-        _create_action("secret_notes", _secret_notes)
-        _create_action("sync", _sync, ["<primary>f"])
-        _create_action(
+        self._create_action("about", _about)
+        self._create_action("import", _import)
+        self._create_action("sync", _sync, ["<primary>f"])
+        self._create_action(
             "quit",
             lambda *_: self.props.application.quit(),
             ["<primary>q", "<primary>w"],
