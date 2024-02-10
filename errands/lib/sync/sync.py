@@ -9,6 +9,7 @@ if TYPE_CHECKING:
 
 from errands.lib.sync.providers.caldav import SyncProviderCalDAV
 from errands.lib.sync.providers.nextcloud import SyncProviderNextcloud
+from errands.lib.sync.providers.vikunja import SyncProviderVikunja
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.data import UserData
@@ -35,7 +36,13 @@ class Sync:
                     window=self.window, testing=testing
                 )
             case 2:
-                self.provider = SyncProviderCalDAV(window=self.window, testing=testing)
+                self.provider = SyncProviderCalDAV(
+                    window=self.window, testing=testing
+                )
+            case 3:
+                self.provider = SyncProviderVikunja(
+                    window=self.window, testing=testing
+                )
 
     @classmethod
     @threaded
