@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from errands.application import ErrandsApplication
 
-
 from abc import ABC, abstractmethod
 import os
 import subprocess
@@ -13,10 +12,9 @@ import importlib
 
 from gi.repository import GLib  # type:ignore
 from errands.lib.logging import Log
-from errands.lib.utils import catch_errors
 
 
-class ErrandsPluginBase(ABC):
+class PluginBase(ABC):
 
     @abstractmethod
     def initialize(self, app: ErrandsApplication) -> None: ...
@@ -55,8 +53,7 @@ class PluginsLoader:
 
     def _install_plugin_deps(self, plugin_dir: str):
         """
-        If dir contains 'requirements.txt'
-        run pip to install deps to 'dependencies' dir.
+        If dir contains 'requirements.txt' run pip to install deps to 'dependencies' dir.
         """
 
         requirements_path: str = os.path.join(plugin_dir, "requirements.txt")

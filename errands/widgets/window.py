@@ -22,7 +22,6 @@ WINDOW: Window = None
 
 class Window(Adw.ApplicationWindow):
     about_window: Adw.AboutWindow = None
-    # secret_notes: SecretNotesWindow = None
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)

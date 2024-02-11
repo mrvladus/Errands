@@ -5,6 +5,10 @@ from errands.lib.plugins import PluginsLoader
 
 
 class ErrandsApplication(Adw.Application):
+
+    # Public elements
+    window: Window
+
     def __init__(self) -> None:
         super().__init__(
             application_id=APP_ID,
@@ -14,7 +18,7 @@ class ErrandsApplication(Adw.Application):
 
     def do_activate(self) -> None:
         self.window = Window(application=self)
-        self.plugins_loader = PluginsLoader(self)
+        plugins_loader = PluginsLoader(self)
         self.run_tests_suite()
 
     def run_tests_suite(self):

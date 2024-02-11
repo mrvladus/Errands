@@ -102,13 +102,13 @@ class SidebarHeaderBar(Adw.Bin):
         bottom_section.append(_("Keyboard Shortcuts"), "win.show-help-overlay")
         bottom_section.append(_("About Errands"), "app.about")
         menu.append_section(None, bottom_section)
-        menu_btn: Gtk.MenuButton = Gtk.MenuButton(
+        self.menu_btn: Gtk.MenuButton = Gtk.MenuButton(
             menu_model=menu,
             primary=True,
             icon_name="open-menu-symbolic",
             tooltip_text=_("Main Menu"),
         )
-        hb.pack_end(menu_btn)
+        hb.pack_end(self.menu_btn)
 
         # Sync indicator
         self.sync_indicator: Gtk.Spinner = Gtk.Spinner(
