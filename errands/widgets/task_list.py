@@ -243,10 +243,12 @@ class TaskList(Adw.Bin):
 
         self.set_child(tasks_brb)
 
-    def add_task(self, uid: str) -> None:
+    def add_task(self, uid: str, on_top: bool = False) -> None:
         new_task = Task(uid, self, self, False)
-        self.tasks_list.append(new_task)
-        new_task.toggle_visibility(not new_task.get_prop("trash"))
+        if on_top:
+            self.tasks_list.prepend(new_task)
+        else:
+            self.tasks_list.append(new_task)
 
     def get_all_tasks(self) -> list[Task]:
         """
@@ -427,9 +429,16 @@ class TaskListEntry(Adw.Bin):
         text: str = entry.get_text()
         if text.strip(" \n\t") == "":
             return
+        on_top: bool = GSettings.get("task-list-new-task-position-top")
         self.task_list.add_task(
-            UserData.add_task(list_uid=self.task_list.list_uid, text=text)
+            UserData.add_task(
+                list_uid=self.task_list.list_uid,
+                text=text,
+                insert_at_the_top=on_top,
+            ),
+            on_top,
         )
         entry.set_text("")
-        scroll(self.task_list.scrl, True)
+        if not on_top:
+            scroll(self.task_list.scrl, True)
         Sync.sync()

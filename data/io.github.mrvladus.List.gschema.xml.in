@@ -49,5 +49,8 @@
     <key name="task-show-toolbar" type="b">
       <default>true</default>
     </key>
+    <key name="task-list-new-task-position-top" type="b">
+      <default>false</default>
+    </key>
   </schema>
 </schemalist>

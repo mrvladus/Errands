@@ -347,6 +347,7 @@ class UserData:
         text: str = "",
         trash: bool = False,
         uid: str = "",
+        insert_at_the_top: bool = False,
     ) -> str:
         if not uid:
             uid: str = str(uuid4())
@@ -355,29 +356,60 @@ class UserData:
 
         with cls.connection:
             cur = cls.connection.cursor()
-            cur.execute(
-                """INSERT INTO tasks 
+            if not insert_at_the_top:
+                cur.execute(
+                    """INSERT INTO tasks 
+                    (uid, list_uid, text, parent, completed, deleted, color, notes, percent_complete, priority, start_date, end_date, tags, synced, expanded, trash) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                    (
+                        uid,
+                        list_uid,
+                        text,
+                        parent,
+                        completed,
+                        deleted,
+                        color,
+                        notes,
+                        percent_complete,
+                        priority,
+                        start_date,
+                        end_date,
+                        tags,
+                        synced,
+                        expanded,
+                        trash,
+                    ),
+                )
+            else:
+                cur.execute(
+                    "CREATE TABLE IF NOT EXISTS tmp AS SELECT * FROM tasks WHERE 0"
+                )
+                cur.execute(
+                    """INSERT INTO tmp 
                 (uid, list_uid, text, parent, completed, deleted, color, notes, percent_complete, priority, start_date, end_date, tags, synced, expanded, trash) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                (
-                    uid,
-                    list_uid,
-                    text,
-                    parent,
-                    completed,
-                    deleted,
-                    color,
-                    notes,
-                    percent_complete,
-                    priority,
-                    start_date,
-                    end_date,
-                    tags,
-                    synced,
-                    expanded,
-                    trash,
-                ),
-            )
+                    (
+                        uid,
+                        list_uid,
+                        text,
+                        parent,
+                        completed,
+                        deleted,
+                        color,
+                        notes,
+                        percent_complete,
+                        priority,
+                        start_date,
+                        end_date,
+                        tags,
+                        synced,
+                        expanded,
+                        trash,
+                    ),
+                )
+                cur.execute("INSERT INTO tmp SELECT * FROM tasks")
+                cur.execute("DROP TABLE tasks")
+                cur.execute("ALTER TABLE tmp RENAME TO tasks")
 
             return uid
 

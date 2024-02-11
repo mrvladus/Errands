@@ -68,13 +68,22 @@ class PreferencesWindow(Adw.PreferencesWindow):
         theme_group.add(theme_dark_row)
 
         # Task lists group
-        # task_list_group = Adw.PreferencesGroup(title=_("Task Lists"))
-        # add_tasks_position = Adw.ComboRow(
-        #     title=_("Add new Tasks"),
-        #     model=Gtk.StringList.new([_("At the Top"), _("At the Bottom")]),
-        #     icon_name="errands-add-symbolic",
-        # )
-        # task_list_group.add(add_tasks_position)
+        task_list_group = Adw.PreferencesGroup(title=_("Task Lists"))
+        new_task_position = Adw.ComboRow(
+            title=_("Add new Tasks"),
+            model=Gtk.StringList.new([_("At the Bottom"), _("At the Top")]),
+            icon_name="errands-add-symbolic",
+        )
+        new_task_position.set_selected(
+            int(GSettings.get("task-list-new-task-position-top"))
+        )
+        new_task_position.connect(
+            "notify::selected",
+            lambda row, *_: GSettings.set(
+                "task-list-new-task-position-top", "b", bool(row.get_selected())
+            ),
+        )
+        task_list_group.add(new_task_position)
 
         # Tasks group
         tasks_group = Adw.PreferencesGroup(title=_("Tasks"))
@@ -184,9 +193,9 @@ class PreferencesWindow(Adw.PreferencesWindow):
             title=_("Appearance"), icon_name="errands-appearance-symbolic"
         )
         appearance_page.add(theme_group)
+        appearance_page.add(task_list_group)
         appearance_page.add(tasks_group)
         appearance_page.add(details_group)
-        # page.add(task_list_group)
         self.add(appearance_page)
 
         # Sync Page

@@ -507,6 +507,7 @@ class TaskSubTasks(Adw.Bin):
             margin_end=12,
             margin_start=12,
         )
+        self.entry.connect("activate", self._on_task_added)
 
         # Sub-tasks
         self.sub_tasks = Gtk.Box(
@@ -519,10 +520,12 @@ class TaskSubTasks(Adw.Bin):
         self.vbox.append(self.sub_tasks)
         self.set_child(self.vbox)
 
-    def add_sub_task(self, uid: str) -> Task:
+    def add_sub_task(self, uid: str, on_top: bool = False) -> Task:
         new_task: Task = Task(uid, self.task.task_list, self.task, True)
-        self.sub_tasks.append(new_task)
-        new_task.toggle_visibility(not new_task.get_prop("trash"))
+        if on_top:
+            self.sub_tasks.prepend(new_task)
+        else:
+            self.sub_tasks.append(new_task)
         return new_task
 
     def _add_sub_tasks(self) -> None:
@@ -569,10 +572,15 @@ class TaskSubTasks(Adw.Bin):
             return
 
         # Add sub-task
+        on_top: bool = GSettings.get("task-list-new-task-position-top")
         self.add_sub_task(
             UserData.add_task(
-                list_uid=self.task.list_uid, text=text, parent=self.task.uid
-            )
+                list_uid=self.task.list_uid,
+                text=text,
+                parent=self.task.uid,
+                insert_at_the_top=on_top,
+            ),
+            on_top,
         )
 
         # Clear entry
