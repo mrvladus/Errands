@@ -1,4 +1,4 @@
-# Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
+# Copyright 2023-2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
 from __future__ import annotations
@@ -602,6 +602,16 @@ class TaskSubTasks(Adw.Bin):
 
 
 class Task(Gtk.Revealer):
+
+    # Public elements
+    top_drop_area: TaskTopDropArea
+    task_row: TaskTitleRow
+    info_bar: TaskInfoBar
+    tasks_list: TaskSubTasks
+    sub_tasks_revealer: Gtk.Revealer
+    main_box: Gtk.Box
+
+    # State
     just_added: bool = True
     can_sync: bool = True
 

@@ -29,6 +29,7 @@ class Sidebar(Adw.Bin):
 
     def _build_ui(self):
         # Components
+        self.plugins_list: SidebarPluginsList = SidebarPluginsList(self)
         self.status_page: SidebarStatusPage = SidebarStatusPage(self)
         self.task_lists: SidebarTaskLists = SidebarTaskLists(self)
         self.header_bar: SidebarHeaderBar = SidebarHeaderBar(
@@ -41,6 +42,7 @@ class Sidebar(Adw.Bin):
         toolbar_view: Adw.ToolbarView = Adw.ToolbarView(
             content=Box(
                 children=[
+                    self.plugins_list,
                     self.status_page,
                     self.task_lists,
                     self.trash_button,
@@ -173,7 +175,54 @@ class SidebarStatusPage(Adw.Bin):
         self.set_child(status_page)
 
 
-class SidebarTaskLists(Gtk.ScrolledWindow):
+class SidebarListTitle(Gtk.Box):
+    """Label on top of the list"""
+
+    def __init__(self, title: str):
+        super().__init__()
+        self.title: str = title
+        self._build_ui()
+
+    def _build_ui(self) -> None:
+        self.set_margin_start(8)
+        self.set_margin_end(8)
+        self.add_css_class("dim-label")
+        self.append(
+            Gtk.Label(
+                label=self.title,
+                css_classes=["caption-heading"],
+                halign=Gtk.Align.START,
+                valign=Gtk.Align.CENTER,
+                margin_end=6,
+            )
+        )
+        self.append(Gtk.Separator(hexpand=True, valign=Gtk.Align.CENTER))
+
+
+class SidebarPluginsList(Adw.Bin):
+    def __init__(self, sidebar: Sidebar):
+        super().__init__()
+        self.sidebar: Sidebar = sidebar
+        self._build_ui()
+
+    def _build_ui(self) -> None:
+        self.plugins_list: Gtk.ListBox = Gtk.ListBox(css_classes=["navigation-sidebar"])
+        self.plugins_list.connect("row-selected", self._on_row_selected)
+        self.set_child(
+            Box(children=[SidebarListTitle(_("Plugins")), self.plugins_list])
+        )
+
+    def add_plugin(self, plugin_row: Gtk.ListBoxRow):
+        self.plugins_list.append(plugin_row)
+
+    def get_plugins(self) -> list[Gtk.ListBoxRow]:
+        return get_children(self.plugins_list)
+
+    def _on_row_selected(self, _, row: Gtk.ListBoxRow):
+        pass
+
+
+class SidebarTaskLists(Adw.Bin):
     def __init__(self, sidebar: Sidebar):
         super().__init__()
         self.sidebar: Sidebar = sidebar
@@ -183,8 +232,7 @@ class SidebarTaskLists(Gtk.ScrolledWindow):
         self.update_ui()
 
     def _build_ui(self) -> None:
-        self.set_propagate_natural_height(True)
-        self.set_vexpand(True)
+        self.label = SidebarListTitle(_("Task Lists"))
         # Lists
         self.lists: Gtk.ListBox = Gtk.ListBox(css_classes=["navigation-sidebar"])
         self.lists.connect("row-selected", self._on_row_selected)
@@ -196,7 +244,17 @@ class SidebarTaskLists(Gtk.ScrolledWindow):
             | GObject.BindingFlags.INVERT_BOOLEAN
             | GObject.BindingFlags.BIDIRECTIONAL,
         )
-        self.set_child(self.lists)
+
+        self.set_child(
+            Gtk.ScrolledWindow(
+                vexpand=True,
+                propagate_natural_height=True,
+                child=Box(
+                    children=[self.label, self.lists],
+                    orientation=Gtk.Orientation.VERTICAL,
+                ),
+            )
+        )
 
     def add_list(self, name, uid) -> SidebarTaskListsItem:
         task_list: TaskList = TaskList(self.window, uid, self)
