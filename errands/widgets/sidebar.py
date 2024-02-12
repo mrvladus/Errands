@@ -2,12 +2,15 @@
 # SPDX-License-Identifier: MIT
 
 from __future__ import annotations
-import time
 from typing import TYPE_CHECKING
+
 
 if TYPE_CHECKING:
     from errands.widgets.window import Window
+    from errands.application import ErrandsApplication
+    from errands.lib.plugins import PluginBase
 
+import time
 from datetime import datetime
 from icalendar import Calendar, Todo
 from errands.lib.data import UserData
@@ -204,22 +207,63 @@ class SidebarPluginsList(Adw.Bin):
         super().__init__()
         self.sidebar: Sidebar = sidebar
         self._build_ui()
+        self.load_plugins()
 
     def _build_ui(self) -> None:
         self.plugins_list: Gtk.ListBox = Gtk.ListBox(css_classes=["navigation-sidebar"])
         self.plugins_list.connect("row-selected", self._on_row_selected)
         self.set_child(
-            Box(children=[SidebarListTitle(_("Plugins")), self.plugins_list])
+            Box(
+                children=[SidebarListTitle(_("Plugins")), self.plugins_list],
+                orientation="vertical",
+            )
         )
 
-    def add_plugin(self, plugin_row: Gtk.ListBoxRow):
+    def add_plugin(self, plugin_row: SidebarPluginListItem):
         self.plugins_list.append(plugin_row)
 
     def get_plugins(self) -> list[Gtk.ListBoxRow]:
         return get_children(self.plugins_list)
 
+    def load_plugins(self):
+        app: ErrandsApplication = self.sidebar.window.get_application()
+        for plugin in app.plugins_loader.plugins:
+            self.add_plugin(SidebarPluginListItem(plugin, self.sidebar))
+
     def _on_row_selected(self, _, row: Gtk.ListBoxRow):
-        pass
+        if row:
+            row.activate()
+
+
+class SidebarPluginListItem(Gtk.ListBoxRow):
+    def __init__(self, plugin: PluginBase, sidebar: Sidebar):
+        super().__init__()
+        self.name = plugin.name
+        self.icon = plugin.icon
+        self.main_view = plugin.main_view
+        self.description = plugin.description
+        self.sidebar = sidebar
+        self._build_ui()
+
+    def _build_ui(self) -> None:
+        self.set_child(
+            Box(
+                children=[
+                    Gtk.Image(icon_name=self.icon),
+                    Gtk.Label(label=self.name, halign=Gtk.Align.START),
+                ],
+                css_classes=["toolbar"],
+            )
+        )
+        ctrl: Gtk.GestureClick = Gtk.GestureClick()
+        ctrl.connect("released", self.do_activate)
+        self.add_controller(ctrl)
+
+        self.sidebar.window.stack.add_titled(self.main_view, self.name, self.name)
+
+    def do_activate(self, *args) -> None:
+        self.sidebar.window.stack.set_visible_child_name(self.name)
+        self.sidebar.task_lists.lists.unselect_all()
 
 
 class SidebarTaskLists(Adw.Bin):
@@ -279,6 +323,7 @@ class SidebarTaskLists(Adw.Bin):
             self.window.split_view.set_show_content(True)
             GSettings.set("last-open-list", "s", name)
             self.sidebar.status_page.set_visible(False)
+            self.sidebar.plugins_list.plugins_list.unselect_all()
 
     def _get_task_lists(self) -> list[TaskList]:
         lists: list[TaskList] = []

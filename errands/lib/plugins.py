@@ -1,33 +1,42 @@
 from __future__ import annotations
+from abc import ABC
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from errands.application import ErrandsApplication
 
-from abc import ABC, abstractmethod
 import os
 import subprocess
 import sys
 import importlib
 
-from gi.repository import GLib  # type:ignore
+from gi.repository import Gtk, GLib, Gdk  # type:ignore
 from errands.lib.logging import Log
 
 
 class PluginBase(ABC):
-
-    @abstractmethod
-    def initialize(self, app: ErrandsApplication) -> None: ...
-
-    def run_tests(self): ...
+    author: str
+    description: str
+    icon: Gtk.Image
+    name: str
+    main_view: Gtk.Widget
+    url: str
 
 
 class PluginsLoader:
+    plugins: list[PluginBase] = []
+
     def __init__(self, app: ErrandsApplication) -> None:
         self.app = app
-        Log.info(f"Plugins: Loading plugins...")
-
         self._load_plugins()
+
+    def _add_resources_path(self, dir):
+        res_path: str = os.path.join(dir, "resources")
+        if os.path.exists(res_path):
+            # Icons
+            icon_theme = Gtk.IconTheme.get_for_display(Gdk.Display.get_default())
+            icon_theme.add_search_path(os.path.join(res_path, "icons"))
 
     def _get_user_plugins_dir(self) -> str:
         """Get plugins directory. Create if needed."""
@@ -49,6 +58,7 @@ class PluginsLoader:
             if os.path.exists(os.path.join(dir, "plugin.py")):
                 plugins_dirs.append({"name": name, "dir": dir})
                 sys.path.insert(1, dir)
+
         return plugins_dirs
 
     def _install_plugin_deps(self, plugin_dir: str):
@@ -82,10 +92,11 @@ class PluginsLoader:
     def _load_plugin(self, name: str, path: str) -> None:
         Log.info(f"Plugins: Loading {name}")
         self._install_plugin_deps(path)
-        plugin = importlib.import_module("plugin", path).Plugin
-        plugin.initialize(self.app)
+        plugin: PluginBase = importlib.import_module("plugin", path).Plugin()
+        self.plugins.append(plugin)
 
     def _load_plugins(self):
         sys.dont_write_bytecode = True
         for i in self._get_plugins_dirs(self._get_user_plugins_dir()):
+            self._add_resources_path(i["dir"])
             self._load_plugin(i["name"], i["dir"])

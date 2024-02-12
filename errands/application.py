@@ -17,9 +17,9 @@ class ErrandsApplication(Adw.Application):
         self.set_resource_base_path("/io/github/mrvladus/Errands/")
 
     def do_activate(self) -> None:
+        self.plugins_loader = PluginsLoader(self)
         self.window = Window(application=self)
-        plugins_loader = PluginsLoader(self)
-        self.run_tests_suite()
+        # self.run_tests_suite()
 
     def run_tests_suite(self):
         if PROFILE == "development":
