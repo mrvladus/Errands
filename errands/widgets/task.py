@@ -476,7 +476,7 @@ class TaskInfoBar(Gtk.Box):
             pc: int = (
                 completed / total * 100
                 if total > 0
-                else self.task.get_prop("percent_complete")
+                else (100 if self.task.task_row.complete_btn.get_active() else 0)
             )
             if self.task.get_prop("percent_complete") != pc:
                 self.task.update_props(["percent_complete", "synced"], [pc, False])
