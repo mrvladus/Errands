@@ -335,16 +335,22 @@ class TaskCompleteButton(Gtk.Box):
             last_sibling: Task = None
             while next_sibling and not next_sibling.task_row.complete_btn.get_active():
                 parent.reorder_child_after(self.task, next_sibling)
+                last_sibling = next_sibling
                 next_sibling = self.task.get_next_sibling()
-                last_sibling=next_sibling if next_sibling
+            if last_sibling:
+                # TODO: Move data
+                pass
         # Move self up if uncompleted
         else:
             parent: Gtk.Box = self.task.get_parent()
             prev_sibling: Task = self.task.get_prev_sibling()
             while prev_sibling and prev_sibling.task_row.complete_btn.get_active():
                 parent.reorder_child_after(prev_sibling, self.task)
+                last_sibling = prev_sibling
                 prev_sibling = self.task.get_prev_sibling()
-
+            if prev_sibling:
+                # TODO: Move data
+                pass
         self.task.update_props(["completed", "synced"], [self.get_active(), False])
         sub_tasks: list[Task] = self.task.tasks_list.get_all_sub_tasks()
         parents: list[Task] = self.task.get_parents_tree()
