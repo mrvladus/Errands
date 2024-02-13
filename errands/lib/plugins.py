@@ -1,6 +1,5 @@
 from __future__ import annotations
 from abc import ABC
-from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -16,12 +15,12 @@ from errands.lib.logging import Log
 
 
 class PluginBase(ABC):
-    author: str
-    description: str
-    icon: Gtk.Image
-    name: str
-    main_view: Gtk.Widget
-    url: str
+    author: str  # Name of the author
+    description: str  # Short description
+    icon_name: str  # Icon that shows beside name
+    main_view: Gtk.Widget  # Main widget to put inside Errands view stack
+    name: str  # Name of the plugin
+    url: str  # Repo url
 
 
 class PluginsLoader:
