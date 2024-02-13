@@ -57,3 +57,11 @@ if compile_schemas.found()
        compile_schemas,
        args: ['--strict', '--dry-run', meson.current_source_dir()])
 endif
+
+configure_file(
+  input: 'io.github.mrvladus.List.service.in',
+  output: '@0@.service'.format(app_id),
+  configuration: conf,
+  install: true,
+  install_dir: get_option('datadir') / 'dbus-1/services',
+)

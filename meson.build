@@ -35,6 +35,8 @@ conf.set('VERSION', meson.project_version())
 conf.set('PROFILE', profile)
 conf.set('localedir', join_paths(get_option('prefix'), get_option('localedir')))
 conf.set('pkgdatadir', pkgdatadir)
+conf.set('bindir', get_option('prefix') / get_option('bindir'))
+
 
 subdir('data')
 subdir('errands')
