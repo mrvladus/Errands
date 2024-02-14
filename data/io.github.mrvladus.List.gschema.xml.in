@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist gettext-domain="list">
   <schema id="@APP_ID@" path="@PREFIX@/">
+    <key name="run-in-background" type="b">
+      <default>false</default>
+    </key>
     <key name="width" type="i">
       <default>1000</default>
     </key>
@@ -29,12 +32,6 @@
       <default>""</default>
     </key>
     <key name="sync-username" type="s">
-      <default>""</default>
-    </key>
-    <key name="sync-password" type="s">
-      <default>""</default>
-    </key>
-    <key name="sync-cal-name" type="s">
       <default>""</default>
     </key>
     <key name="primary-action-show-sub-tasks" type="b">

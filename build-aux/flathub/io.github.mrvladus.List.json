@@ -51,11 +51,14 @@
         {
             "name": "errands",
             "buildsystem": "meson",
+            "config-opts": [
+                "-Dflatpak=true"
+            ],
             "sources": [
                 {
                     "type": "git",
                     "url": "https://github.com/mrvladus/Errands.git",
-                    "tag": "45.1.9"
+                    "tag": "45.1.10"
                 }
             ]
         }

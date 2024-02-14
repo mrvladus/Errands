@@ -11,13 +11,13 @@ gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 gi.require_version("Secret", "1")
 gi.require_version("GtkSource", "5")
-gi.require_version("Xdp", "1.0")
 
 
 APP_ID = "@APP_ID@"
 VERSION = "@VERSION@"
 PREFIX = "@PREFIX@"
 PROFILE = "@PROFILE@"
+IS_FLATPAK = bool("@IS_FLATPAK@")
 pkgdatadir = "@pkgdatadir@"
 localedir = "@localedir@"
 
