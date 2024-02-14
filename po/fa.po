@@ -312,7 +312,7 @@ msgstr "بدون جزییات"
 
 #: errands/widgets/details.py:64
 msgid "Click on task to show more info"
-msgstr "کیکل رو ی تکلیف برای نمایش اطّلاعات بیش‌تر"
+msgstr "کلیک روی تکلیف برای نمایش اطّلاعات بیش‌تر"
 
 #: errands/widgets/details.py:81
 msgid "Clear Style"
