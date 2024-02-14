@@ -4,15 +4,14 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-
 if TYPE_CHECKING:
     from errands.widgets.window import Window
-    from errands.application import ErrandsApplication
     from errands.lib.plugins import PluginBase
 
 import time
 from datetime import datetime
 from icalendar import Calendar, Todo
+from errands.lib.plugins import PluginsLoader
 from errands.lib.data import UserData
 from errands.lib.utils import get_children
 from errands.lib.gsettings import GSettings
@@ -226,8 +225,13 @@ class SidebarPluginsList(Adw.Bin):
         return get_children(self.plugins_list)
 
     def load_plugins(self):
-        app: ErrandsApplication = self.sidebar.window.get_application()
-        for plugin in app.plugins_loader.plugins:
+        plugin_loader: PluginsLoader = (
+            self.sidebar.window.get_application().plugins_loader
+        )
+        if not plugin_loader or not plugin_loader.plugins:
+            self.set_visible(False)
+            return
+        for plugin in plugin_loader.plugins:
             self.add_plugin(SidebarPluginListItem(plugin, self.sidebar))
 
     def _on_row_selected(self, _, row: Gtk.ListBoxRow):

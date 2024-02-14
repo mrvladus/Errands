@@ -9,3 +9,4 @@ Categories=GNOME;GTK;Utility;
 Keywords=errands;tasks;list;todo;todos;caldav;nextcloud;sync;
 StartupNotify=true
 X-Purism-FormFactor=Workstation;Mobile;
+DBusActivatable=true

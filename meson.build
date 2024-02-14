@@ -6,6 +6,7 @@ project(
 
 dependency('libadwaita-1', version: '>= 1.4')
 dependency('libsecret-1')
+dependency('libportal')
 dependency('gtksourceview-5')
 dependency('pygobject-3.0')
 dependency('goa-1.0', required: false)

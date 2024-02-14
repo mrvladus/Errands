@@ -1,13 +1,16 @@
 from __main__ import APP_ID, PROFILE
-from gi.repository import Adw, Gio  # type:ignore
+from gi.repository import Adw, Gio, Xdp  # type:ignore
 from errands.widgets.window import Window
 from errands.lib.plugins import PluginsLoader
+from errands.lib.logging import Log
+from errands.lib.data import UserData
 
 
 class ErrandsApplication(Adw.Application):
 
     # Public elements
     window: Window
+    plugins_loader: PluginsLoader = None
 
     def __init__(self) -> None:
         super().__init__(
@@ -16,8 +19,23 @@ class ErrandsApplication(Adw.Application):
         )
         self.set_resource_base_path("/io/github/mrvladus/Errands/")
 
+    def do_startup(self) -> None:
+        Log.init()
+        UserData.init()
+        Adw.Application.do_startup(self)
+        portal = Xdp.Portal.new()
+        portal.request_background(
+            None,
+            "Errands need to run in the background",
+            ["errands", "--gapplication-service"],
+            Xdp.BackgroundFlags.AUTOSTART,
+            None,
+            None,
+            None,
+        )
+
     def do_activate(self) -> None:
-        self.plugins_loader = PluginsLoader(self)
+        # self.plugins_loader = PluginsLoader(self)
         self.window = Window(application=self)
         # self.run_tests_suite()
 
