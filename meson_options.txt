@@ -7,4 +7,3 @@ option(
   ],
   value: 'release'
 )
-option('flatpak', type : 'boolean', value : false)
