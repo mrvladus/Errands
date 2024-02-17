@@ -189,7 +189,7 @@ class TrashItem(Adw.Bin):
         self.task_widget.task_row.connect(
             "notify::title", lambda *_: row.set_title(self.task_widget.get_prop("text"))
         )
-        self.task_widget.task_list.title.bind_property(
+        self.task_widget.task_list.headerbar.title.bind_property(
             "title",
             row,
             "subtitle",

@@ -112,12 +112,6 @@ class TaskTitleRow(Gtk.Overlay):
         self.task: Task = task
         self._build_ui()
 
-    def add_rm_crossline(self, add: bool) -> None:
-        if add:
-            self.task_row.add_css_class("task-completed")
-        else:
-            self.task_row.remove_css_class("task-completed")
-
     def _build_ui(self):
         # Task Title Row
         self.task_row = Adw.ActionRow(
@@ -146,26 +140,13 @@ class TaskTitleRow(Gtk.Overlay):
         task_row_drop_target.connect("drop", self._on_drop)
         self.task_row.add_controller(task_row_drop_target)
 
-        # Click controller
-        task_row_click_ctrl = Gtk.GestureClick.new()
-        task_row_click_ctrl.connect(
-            "released",
-            lambda *_: (
-                self.task.expand(not self.task.sub_tasks_revealer.get_child_revealed())
-                if GSettings.get("primary-action-show-sub-tasks")
-                else self.task.task_row.details_btn.do_clicked()
-            ),
-        )
-        self.task_row.add_controller(task_row_click_ctrl)
-
         # Prefix
         self.complete_btn = TaskCompleteButton(self.task, self.task_row)
         self.task_row.add_prefix(self.complete_btn)
 
         # Suffix
-        self.details_btn = TaskDetailsButton(self.task)
-        self.expand_btn = TaskExpandButton(self.task)
-        self.task_row.add_suffix(Box(children=[self.expand_btn, self.details_btn]))
+        self.suffix = TaskTitleRowSuffix(self.task)
+        self.task_row.add_suffix(self.suffix)
 
         self.expand_indicator = Gtk.Image(
             icon_name="errands-up-symbolic",
@@ -192,6 +173,18 @@ class TaskTitleRow(Gtk.Overlay):
         )
         self.task_row.add_controller(hover_ctrl)
 
+        # Click controller
+        task_row_click_ctrl = Gtk.GestureClick.new()
+        task_row_click_ctrl.connect(
+            "released",
+            lambda *_: (
+                self.task.expand(not self.task.sub_tasks_revealer.get_child_revealed())
+                if GSettings.get("primary-action-show-sub-tasks")
+                else self.task.task_row.suffix.show_details()
+            ),
+        )
+        self.task_row.add_controller(task_row_click_ctrl)
+
         box = Gtk.ListBox(
             selection_mode=Gtk.SelectionMode.NONE,
             css_classes=["rounded-corners", "transparent"],
@@ -200,6 +193,12 @@ class TaskTitleRow(Gtk.Overlay):
         box.append(self.task_row)
 
         self.set_child(box)
+
+    def add_rm_crossline(self, add: bool) -> None:
+        if add:
+            self.task_row.add_css_class("task-completed")
+        else:
+            self.task_row.remove_css_class("task-completed")
 
     def update_ui(self):
         # Update widget title crossline and completed toggle
@@ -323,46 +322,21 @@ class TaskCompleteButton(Gtk.Box):
     def _on_toggle(self, btn: Gtk.CheckButton) -> None:
         Log.debug(f"Task '{self.task.uid}': Set completed to '{self.get_active()}'")
 
-        # If task is just added set crossline and return to avoid sync loop
         self.task.task_row.add_rm_crossline(self.get_active())
         if self.task.just_added:
             return
 
-        # Move self down if completed
-        if self.get_active():
-            parent: Gtk.Box = self.task.get_parent()
-            next_sibling: Task = self.task.get_next_sibling()
-            last_sibling: Task = None
-            while next_sibling and not next_sibling.task_row.complete_btn.get_active():
-                parent.reorder_child_after(self.task, next_sibling)
-                last_sibling = next_sibling
-                next_sibling = self.task.get_next_sibling()
-            if last_sibling:
-                # TODO: Move data
-                pass
-        # Move self up if uncompleted
-        else:
-            parent: Gtk.Box = self.task.get_parent()
-            prev_sibling: Task = self.task.get_prev_sibling()
-            while prev_sibling and prev_sibling.task_row.complete_btn.get_active():
-                parent.reorder_child_after(prev_sibling, self.task)
-                last_sibling = prev_sibling
-                prev_sibling = self.task.get_prev_sibling()
-            if prev_sibling:
-                # TODO: Move data
-                pass
         self.task.update_props(["completed", "synced"], [self.get_active(), False])
-        sub_tasks: list[Task] = self.task.tasks_list.get_all_sub_tasks()
+        sub_tasks: list[Task] = self.task.uncompleted_tasks.tasks
         parents: list[Task] = self.task.get_parents_tree()
 
         if self.get_active():
             # Complete all sub-tasks
             for sub in sub_tasks:
-                if not sub.task_row.complete_btn.get_active():
-                    sub.just_added = True
-                    sub.task_row.complete_btn.set_active(True)
-                    sub.just_added = False
-                    sub.update_props(["completed", "synced"], [True, False])
+                sub.just_added = True
+                sub.task_row.complete_btn.set_active(True)
+                sub.just_added = False
+                sub.update_props(["completed", "synced"], [True, False])
         else:
             # Uncomplete parent if sub-task is uncompleted
             for parent in parents:
@@ -376,41 +350,46 @@ class TaskCompleteButton(Gtk.Box):
         Sync.sync()
 
 
-class TaskExpandButton(Gtk.Button):
+class TaskTitleRowSuffix(Gtk.Box):
+
+    # Public elements
+    expand_btn: Gtk.Button
+    details_btn: Gtk.Button
+
     def __init__(self, task: Task):
         super().__init__()
         self.task: Task = task
-        self._build_ui()
+        self.__build_ui()
 
-    def _build_ui(self):
-        self.set_icon_name("errands-up-symbolic")
-        self.set_valign(Gtk.Align.CENTER)
-        self.set_tooltip_text(_("Expand / Fold"))
-        self.add_css_class("flat")
-        self.add_css_class("circular")
-        self.add_css_class("fade")
-        self.add_css_class("rotate")
-        GSettings.bind("primary-action-show-sub-tasks", self, "visible", True)
+    def __build_ui(self):
+        # Expand button
+        self.expand_btn = Gtk.Button(
+            icon_name="errands-up-symbolic",
+            valign=Gtk.Align.CENTER,
+            tooltip_text=_("Expand / Fold"),
+            css_classes=["flat", "circular", "fade", "rotate"],
+        )
+        self.expand_btn.connect("clicked", self.__on_expand)
+        GSettings.bind(
+            "primary-action-show-sub-tasks", self.expand_btn, "visible", True
+        )
+        self.append(self.expand_btn)
 
-    def do_clicked(self):
+        # Details button
+        self.details_btn = Gtk.Button(
+            icon_name="errands-info-symbolic",
+            valign=Gtk.Align.CENTER,
+            tooltip_text=_("Details"),
+            css_classes=["flat", "circular"],
+        )
+        self.details_btn.connect("clicked", self.show_details)
+        GSettings.bind("primary-action-show-sub-tasks", self.details_btn, "visible")
+        self.append(self.details_btn)
+
+    def __on_expand(self, *args):
         self.task.expand(not self.task.sub_tasks_revealer.get_child_revealed())
 
-
-class TaskDetailsButton(Gtk.Button):
-    def __init__(self, task: Task):
-        super().__init__()
-        self.task: Task = task
-        self._build_ui()
-
-    def _build_ui(self):
-        self.set_icon_name("errands-info-symbolic")
-        self.set_valign(Gtk.Align.CENTER)
-        self.set_tooltip_text(_("Details"))
-        self.add_css_class("flat")
-        self.add_css_class("circular")
-        GSettings.bind("primary-action-show-sub-tasks", self, "visible")
-
-    def do_clicked(self):
+    def show_details(self, *args):
         # Close details on second click
         if (
             self.task.details.parent == self.task
@@ -508,109 +487,39 @@ class TaskInfoBar(Gtk.Box):
             self.progress_bar_rev.set_reveal_child(self.task.get_status()[0] > 0)
 
 
-class TaskSubTasks(Adw.Bin):
-
-    # Public UI elements
-    entry: Gtk.Entry
-    sub_tasks: Gtk.Box
-    vbox: Gtk.Box
-
+class TaskSubTasksEntry(Gtk.Entry):
     def __init__(self, task: Task):
         super().__init__()
         self.task: Task = task
         self._build_ui()
-        self._add_sub_tasks()
 
-    def _build_ui(self):
-        # Entry
-        self.entry = Gtk.Entry(
-            placeholder_text=_("Add new Sub-Task"),
-            hexpand=True,
-            margin_bottom=2,
-            margin_end=12,
-            margin_start=12,
-        )
-        self.entry.connect("activate", self._on_task_added)
+    def _build_ui(self) -> None:
+        self.set_placeholder_text(_("Add new Sub-Task"))
+        self.set_hexpand(True)
+        self.set_margin_bottom(2)
+        self.set_margin_end(12)
+        self.set_margin_start(12)
 
-        # Sub-tasks
-        self.sub_tasks = Gtk.Box(
-            orientation=Gtk.Orientation.VERTICAL, css_classes=["sub-tasks"]
-        )
-
-        # VBox
-        self.vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        self.vbox.append(self.entry)
-        self.vbox.append(self.sub_tasks)
-        self.set_child(self.vbox)
-
-    def add_sub_task(self, uid: str, on_top: bool = False) -> Task:
-        new_task: Task = Task(uid, self.task.task_list, self.task, True)
-        if on_top:
-            self.sub_tasks.prepend(new_task)
-        else:
-            self.sub_tasks.append(new_task)
-        return new_task
-
-    def _add_sub_tasks(self) -> None:
-        """Load sub-tasks and add them to sub_tasks box"""
-
-        subs: list[str] = UserData.get_tasks_uids(self.task.list_uid, self.task.uid)
-        if len(subs) == 0:
-            self.task.just_added = False
-            return
-        for uid in subs:
-            self.add_sub_task(uid)
-        self.task.task_list.update_status()
-        self.task.just_added = False
-
-    def get_all_sub_tasks(self) -> list[Task]:
-        """
-        Get list of all tasks widgets including sub-tasks
-        """
-
-        tasks: list[Task] = []
-
-        def _append_tasks(sub_tasks: list[Task]) -> None:
-            for task in sub_tasks:
-                tasks.append(task)
-                children: list[Task] = task.tasks_list.get_sub_tasks()
-                if len(children) > 0:
-                    _append_tasks(children)
-
-        _append_tasks(self.get_sub_tasks())
-        return tasks
-
-    def get_sub_tasks(self) -> list[Task]:
-        """Get toplevel sub-tasks"""
-        return get_children(self.sub_tasks)
-
-    def _on_task_added(self, entry: Gtk.Entry):
-        """
-        Add new Sub-Task
-        """
-        text: str = entry.get_text()
+    def do_activate(self) -> None:
+        text: str = self.get_text()
 
         # Return if entry is empty
         if text.strip(" \n\t") == "":
             return
 
         # Add sub-task
-        on_top: bool = GSettings.get("task-list-new-task-position-top")
-        self.add_sub_task(
-            UserData.add_task(
-                list_uid=self.task.list_uid,
-                text=text,
-                parent=self.task.uid,
-                insert_at_the_top=on_top,
-            ),
-            on_top,
+        UserData.add_task(
+            list_uid=self.task.list_uid,
+            text=text,
+            parent=self.task.uid,
+            insert_at_the_top=GSettings.get("task-list-new-task-position-top"),
         )
 
         # Clear entry
-        entry.set_text("")
+        self.set_text("")
 
         # Update status
-        self.task.update_props(["completed"], [False])
+        self.task.update_props(["completed", "synced"], [False, False])
         self.task.just_added = True
         self.task.task_row.complete_btn.set_active(False)
         self.task.just_added = False
@@ -619,9 +528,121 @@ class TaskSubTasks(Adw.Bin):
         # Sync
         Sync.sync()
 
+
+class TaskSubUncompletedTasks(Gtk.Box):
+    def __init__(self, task: Task):
+        super().__init__()
+        self.task: Task = task
+        self._build_ui()
+
+    def _build_ui(self):
+        self.set_orientation(Gtk.Orientation.VERTICAL)
+
+    @property
+    def tasks(self) -> list[Task]:
+        return get_children(self)
+
     def update_ui(self):
-        for task in self.get_sub_tasks():
+        data_uids: list[str] = [
+            t["uid"]
+            for t in UserData.get_tasks_as_dicts(self.task.list_uid, self.task.uid)
+            if not t["deleted"]
+            and not t["trash"]
+            and not t["completed"]
+            and t["parent"] == self.task.uid
+        ]
+        widgets_uids: list[str] = [t.uid for t in self.tasks]
+
+        # Add sub-tasks
+        on_top: bool = GSettings.get("task-list-new-task-position-top")
+        for uid in data_uids:
+            if uid not in widgets_uids:
+                task: Task = Task(uid, self.task.task_list, self.task, True)
+                if on_top:
+                    self.prepend(task)
+                else:
+                    self.append(task)
+
+        # Remove sub-tasks
+        for task in self.tasks:
+            if task.uid not in data_uids:
+                self.remove(task)
+
+        # Update sub-tasks
+        for task in self.tasks:
             task.update_ui()
+
+
+class TaskSubCompletedTasks(Gtk.Box):
+    def __init__(self, task: Task):
+        super().__init__()
+        self.task: Task = task
+        self._build_ui()
+
+    def _build_ui(self):
+        self.set_orientation(Gtk.Orientation.VERTICAL)
+
+        # Separator
+        separator = Gtk.Box(css_classes=["dim-label"], margin_start=20, margin_end=20)
+        separator.append(Gtk.Separator(valign=Gtk.Align.CENTER, hexpand=True))
+        separator.append(
+            Gtk.Label(
+                label=_("Completed Tasks"),
+                css_classes=["caption-heading"],
+                halign=Gtk.Align.CENTER,
+                hexpand=False,
+                margin_start=12,
+                margin_end=12,
+            )
+        )
+        separator.append(Gtk.Separator(valign=Gtk.Align.CENTER, hexpand=True))
+        self.separator_rev: Gtk.Revealer = Gtk.Revealer(
+            child=separator, transition_type=Gtk.RevealerTransitionType.SWING_DOWN
+        )
+        self.append(self.separator_rev)
+
+        # Completed tasks list
+        self.completed_list = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.append(self.completed_list)
+
+    @property
+    def tasks(self) -> list[Task]:
+        return get_children(self.completed_list)
+
+    def update_ui(self):
+        data_uids: list[str] = [
+            t["uid"]
+            for t in UserData.get_tasks_as_dicts(self.task.list_uid)
+            if not t["deleted"]
+            and not t["trash"]
+            and t["completed"]
+            and t["parent"] == self.task.uid
+        ]
+        widgets_uids: list[str] = [t.uid for t in self.tasks]
+
+        # Add sub-tasks
+        on_top: bool = GSettings.get("task-list-new-task-position-top")
+        for uid in data_uids:
+            if uid not in widgets_uids:
+                task: Task = Task(uid, self.task.task_list, self.task, True)
+                if on_top:
+                    self.completed_list.prepend(task)
+                else:
+                    self.completed_list.append(task)
+
+        # Remove sub-tasks
+        for task in self.tasks:
+            if task.uid not in data_uids:
+                self.completed_list.remove(task)
+
+        # Update sub-tasks
+        for task in self.tasks:
+            task.update_ui()
+
+        # Show separator
+        self.separator_rev.set_reveal_child(
+            len(self.tasks) > 0 and len(self.task.uncompleted_tasks.tasks) > 0
+        )
 
 
 class Task(Gtk.Revealer):
@@ -630,13 +651,16 @@ class Task(Gtk.Revealer):
     top_drop_area: TaskTopDropArea
     task_row: TaskTitleRow
     info_bar: TaskInfoBar
-    tasks_list: TaskSubTasks
+    sub_tasks_entry: TaskSubTasksEntry
+    uncompleted_tasks: TaskSubUncompletedTasks
+    completed_tasks: TaskSubCompletedTasks
     sub_tasks_revealer: Gtk.Revealer
     main_box: Gtk.Box
 
     # State
     just_added: bool = True
     can_sync: bool = True
+    purging: bool = False
 
     def __init__(
         self,
@@ -663,7 +687,7 @@ class Task(Gtk.Revealer):
         if self.get_prop("trash"):
             self.trash.trash_add(self)
 
-        self.update_ui()
+        self.just_added = False
 
     def _build_ui(self) -> None:
         # Top drop area
@@ -676,10 +700,26 @@ class Task(Gtk.Revealer):
         self.info_bar = TaskInfoBar(self)
 
         # Sub-tasks
-        self.tasks_list = TaskSubTasks(self)
+        self.sub_tasks_entry = TaskSubTasksEntry(self)
+
+        # Uncompleted tasks
+        self.uncompleted_tasks = TaskSubUncompletedTasks(self)
+
+        # Completed tasks
+        self.completed_tasks = TaskSubCompletedTasks(self)
 
         # Sub-tasks revealer
-        self.sub_tasks_revealer = Gtk.Revealer(child=self.tasks_list)
+        self.sub_tasks_revealer = Gtk.Revealer(
+            child=Box(
+                children=[
+                    self.sub_tasks_entry,
+                    self.uncompleted_tasks,
+                    self.completed_tasks,
+                ],
+                orientation=Gtk.Orientation.VERTICAL,
+                css_classes=["sub-tasks"],
+            )
+        )
 
         # Task card
         self.main_box = Box(
@@ -723,14 +763,8 @@ class Task(Gtk.Revealer):
     def get_status(self) -> tuple[int, int]:
         """Get total tasks and completed tasks tuple"""
 
-        total: int = 0
-        completed: int = 0
-        sub_tasks: list[Task] = self.tasks_list.get_sub_tasks()
-        for task in sub_tasks:
-            if task.get_reveal_child():
-                total += 1
-                if task.task_row.complete_btn.get_active():
-                    completed += 1
+        completed: int = len(self.completed_tasks.tasks)
+        total: int = len(self.completed_tasks.tasks) + completed
 
         return total, completed
 
@@ -752,17 +786,25 @@ class Task(Gtk.Revealer):
         self.sub_tasks_revealer.set_reveal_child(expanded)
         self.update_props(["expanded"], [expanded])
         if expanded:
-            self.task_row.expand_btn.remove_css_class("rotate")
+            self.task_row.suffix.expand_btn.remove_css_class("rotate")
             self.task_row.expand_indicator.remove_css_class("expand-indicator-expanded")
         else:
-            self.task_row.expand_btn.add_css_class("rotate")
+            self.task_row.suffix.expand_btn.add_css_class("rotate")
             self.task_row.expand_indicator.add_css_class("expand-indicator-expanded")
 
     def purge(self) -> None:
         """Completely remove widget"""
+        self.purging = True
 
-        self.parent.tasks_list.remove(self)
-        self.run_dispose()
+        def __finish_remove():
+            if self.get_child_revealed():
+                return True
+            else:
+                self.parent.remove_task(self)
+                return False
+
+        self.toggle_visibility(False)
+        GLib.timeout_add(250, __finish_remove)
 
     def toggle_visibility(self, on: bool) -> None:
         GLib.idle_add(self.set_reveal_child, on)
@@ -771,26 +813,14 @@ class Task(Gtk.Revealer):
         UserData.update_props(self.list_uid, self.uid, props, values)
 
     def update_ui(self) -> None:
-        # Change parent
-        parent: str = self.get_prop("parent")
-        uid: str = self.uid
-        if isinstance(self.parent, Task) and self.parent.uid != parent:
-            self.purge()
-            if not parent:
-                self.task_list.add_task(uid)
-                return
-            else:
-                for task in self.task_list.get_all_tasks():
-                    if task.uid == parent:
-                        task.add_task(uid)
-                        return
-
         # Change visibility
-        self.toggle_visibility(not self.get_prop("trash"))
+        if not self.purging:
+            self.toggle_visibility(not self.get_prop("trash"))
 
         # Expand
         self.expand(self.get_prop("expanded"))
 
         self.task_row.update_ui()
         self.info_bar.update_ui()
-        self.tasks_list.update_ui()
+        self.completed_tasks.update_ui()
+        self.uncompleted_tasks.update_ui()

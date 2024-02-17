@@ -309,10 +309,10 @@ class SidebarTaskLists(Adw.Bin):
         page: Adw.ViewStackPage = self.window.stack.add_titled(
             child=task_list, name=name, title=name
         )
-        task_list.title.bind_property(
+        task_list.headerbar.title.bind_property(
             "title", page, "title", GObject.BindingFlags.SYNC_CREATE
         )
-        task_list.title.bind_property(
+        task_list.headerbar.title.bind_property(
             "title", page, "name", GObject.BindingFlags.SYNC_CREATE
         )
         row: SidebarTaskListsItem = SidebarTaskListsItem(task_list, self)
@@ -571,7 +571,7 @@ class SidebarTaskListsItem(Gtk.ListBoxRow):
             hexpand=True,
             ellipsize=3,
         )
-        self.task_list.title.bind_property(
+        self.task_list.headerbar.title.bind_property(
             "title",
             self.label,
             "label",

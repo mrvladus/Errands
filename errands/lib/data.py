@@ -129,6 +129,36 @@ class UserData:
             return lists
 
     @classmethod
+    def move_task_after(cls, list_uid: str, task_uid: str, after_uid: str) -> None:
+        tasks: list[TaskData] = UserData.get_tasks_as_dicts()
+
+        # Find tasks to move
+        task_to_move: TaskData = None
+        task_to_move_before: TaskData = None
+        for task in tasks:
+            if task["list_uid"] == list_uid and task["uid"] == task_uid:
+                task_to_move = task
+            elif task["list_uid"] == list_uid and task["uid"] == after_uid:
+                task_to_move_before = task
+
+        # Move task up
+        task_to_move = tasks.pop(tasks.index(task_to_move))
+        tasks.insert(tasks.index(task_to_move_before) + 1, task_to_move)
+
+        # Run SQL
+        values: list[tuple[str, str]] = ((t["list_uid"], t["uid"]) for t in tasks)
+        with cls.connection:
+            cur = cls.connection.cursor()
+            cur.execute("CREATE TABLE IF NOT EXISTS tmp AS SELECT * FROM tasks WHERE 0")
+            cur.executemany(
+                f"""INSERT INTO tmp SELECT * FROM tasks
+                    WHERE list_uid = ? AND uid = ?""",
+                values,
+            )
+            cur.execute("DROP TABLE tasks")
+            cur.execute("ALTER TABLE tmp RENAME TO tasks")
+
+    @classmethod
     def move_task_before(cls, list_uid: str, task_uid: str, before_uid: str) -> None:
         tasks: list[TaskData] = UserData.get_tasks_as_dicts()
 
