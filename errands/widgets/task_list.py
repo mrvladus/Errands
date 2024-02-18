@@ -253,14 +253,12 @@ class TaskListEntry(Adw.Bin):
         if text.strip(" \n\t") == "":
             return
         on_top: bool = GSettings.get("task-list-new-task-position-top")
-        self.task_list.uncompleted_list.add_task(
-            UserData.add_task(
-                list_uid=self.task_list.list_uid,
-                text=text,
-                insert_at_the_top=on_top,
-            ),
-            on_top,
+        UserData.add_task(
+            list_uid=self.task_list.list_uid,
+            text=text,
+            insert_at_the_top=on_top,
         )
+
         entry.set_text("")
         if not on_top:
             scroll(self.task_list.scrl, True)
