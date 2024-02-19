@@ -221,7 +221,7 @@ class TaskTitleRow(Gtk.Overlay):
 
     def _on_drag_prepare(self, *_) -> Gdk.ContentProvider:
         # Bug workaround when task is not sensitive after short dnd
-        for task in self.task.task_list.get_all_tasks():
+        for task in self.task.task_list.all_tasks:
             task.set_sensitive(True)
         self.task.set_sensitive(False)
         value: GObject.Value = GObject.Value(Task)
@@ -236,7 +236,7 @@ class TaskTitleRow(Gtk.Overlay):
     def _on_drag_end(self, *_) -> bool:
         self.task.set_sensitive(True)
         # KDE dnd bug workaround for issue #111
-        for task in self.task.task_list.get_all_tasks():
+        for task in self.task.task_list.all_tasks:
             task.top_drop_area.set_reveal_child(False)
             task.set_sensitive(True)
 
@@ -256,24 +256,22 @@ class TaskTitleRow(Gtk.Overlay):
             self.task.get_prop("uid"),
             False,
         )
-        # Add new sub-task
-        self.task.tasks_list.add_sub_task(task.uid)
         # Toggle completion
         if not task.task_row.complete_btn.get_active():
             self.task.update_props(["completed", "synced"], [False, False])
-            self.task.just_added = True
-            self.task.task_row.complete_btn.set_active(False)
-            self.task.just_added = False
+            # self.task.just_added = True
+            # self.task.task_row.complete_btn.set_active(False)
+            # self.task.just_added = False
             for parent in self.task.get_parents_tree():
                 if parent.task_row.complete_btn.get_active():
                     parent.update_props(["completed", "synced"], [False, False])
-                    parent.just_added = True
-                    parent.task_row.complete_btn.set_active(False)
-                    parent.just_added = False
+                    # parent.just_added = True
+                    # parent.task_row.complete_btn.set_active(False)
+                    # parent.just_added = False
         if not self.task.get_prop("expanded"):
             self.task.expand(True)
         # Remove old task
-        task.purge()
+        task.purged = True
         self.task.task_list.update_ui()
         # Sync
         Sync.sync()
@@ -667,9 +665,9 @@ class TaskCompletedSubTasks(Gtk.Box):
             task.update_ui()
 
         # Show separator
-        self.separator_rev.set_reveal_child(len(self.tasks_dicts) > 0)
-        self.separator_rev.get_child().set_margin_top(
-            3 if len(self.task.uncompleted_tasks.tasks_dicts) == 0 else 0
+        self.separator_rev.set_reveal_child(
+            len(self.tasks_dicts) > 0
+            and len(self.task.uncompleted_tasks.tasks_dicts) > 0
         )
 
 
@@ -808,10 +806,15 @@ class Task(Gtk.Revealer):
     def get_status(self) -> tuple[int, int]:
         """Get total tasks and completed tasks tuple"""
 
-        completed: int = len(self.completed_tasks.tasks_dicts)
-        total: int = len(self.completed_tasks.tasks_dicts) + completed
+        tasks: list[TaskData] = [
+            t
+            for t in UserData.get_tasks_as_dicts(self.task_list.list_uid)
+            if t["parent"] == self.uid and not t["deleted"] and not t["trash"]
+        ]
+        n_total: int = len(tasks)
+        n_completed: int = len([t for t in tasks if t["completed"]])
 
-        return total, completed
+        return n_total, n_completed
 
     def delete(self, *_) -> None:
         """Move task to trash"""
