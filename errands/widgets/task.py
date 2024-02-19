@@ -607,6 +607,7 @@ class TaskCompletedSubTasks(Gtk.Box):
 
     def _build_ui(self):
         self.set_orientation(Gtk.Orientation.VERTICAL)
+        GSettings.bind("show-completed-tasks", self, "visible")
 
         # Separator
         separator = Gtk.Box(css_classes=["dim-label"], margin_start=20, margin_end=20)

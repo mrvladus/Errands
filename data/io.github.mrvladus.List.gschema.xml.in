@@ -49,5 +49,8 @@
     <key name="task-list-new-task-position-top" type="b">
       <default>false</default>
     </key>
+    <key name="show-completed-tasks" type="b">
+      <default>true</default>
+    </key>
   </schema>
 </schemalist>

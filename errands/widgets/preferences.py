@@ -69,6 +69,8 @@ class PreferencesWindow(Adw.PreferencesWindow):
 
         # Task lists group
         task_list_group = Adw.PreferencesGroup(title=_("Task Lists"))
+
+        # New task position
         new_task_position = Adw.ComboRow(
             title=_("Add new Tasks"),
             model=Gtk.StringList.new([_("At the Bottom"), _("At the Top")]),
@@ -84,6 +86,11 @@ class PreferencesWindow(Adw.PreferencesWindow):
             ),
         )
         task_list_group.add(new_task_position)
+
+        # Show completed tasks
+        show_completed_tasks = Adw.SwitchRow(title=_("Show Completed Tasks"))
+        GSettings.bind("show-completed-tasks", show_completed_tasks, "active")
+        task_list_group.add(show_completed_tasks)
 
         # Tasks group
         tasks_group = Adw.PreferencesGroup(title=_("Tasks"))

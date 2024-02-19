@@ -125,8 +125,8 @@ class TaskListHeaderBar(Adw.Bin):
             )[0][0]
         )
 
-        n_completed: int = len(self.task_list.completed_list.tasks)
-        n_total: int = len(self.task_list.uncompleted_list.tasks) + n_completed
+        n_completed: int = len(self.task_list.completed_list.tasks_dicts)
+        n_total: int = len(self.task_list.uncompleted_list.tasks_dicts) + n_completed
 
         # Update status
         self.title.set_subtitle(
@@ -458,6 +458,18 @@ class TaskListUncompletedList(Gtk.Box):
         self.set_orientation(Gtk.Orientation.VERTICAL)
 
     @property
+    def tasks_dicts(self) -> list[TaskData]:
+        return [
+            t
+            for t in UserData.get_tasks_as_dicts(self.list_uid)
+            if not t["trash"]
+            and not t["deleted"]
+            and not t["completed"]
+            and t["list_uid"] == self.list_uid
+            and t["parent"] == ""
+        ]
+
+    @property
     def tasks(self) -> list[Task]:
         return get_children(self)
 
@@ -516,6 +528,7 @@ class TaskListCompletedList(Gtk.Box):
 
     def __build_ui(self) -> None:
         self.set_orientation(Gtk.Orientation.VERTICAL)
+        GSettings.bind("show-completed-tasks", self, "visible")
 
         # Separator
         separator = Gtk.Box(
@@ -545,6 +558,18 @@ class TaskListCompletedList(Gtk.Box):
         # Completed tasks list
         self.completed_list = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.append(self.completed_list)
+
+    @property
+    def tasks_dicts(self) -> list[TaskData]:
+        return [
+            t
+            for t in UserData.get_tasks_as_dicts(self.list_uid)
+            if not t["trash"]
+            and not t["deleted"]
+            and t["completed"]
+            and t["list_uid"] == self.list_uid
+            and t["parent"] == ""
+        ]
 
     @property
     def tasks(self) -> list[Task]:
