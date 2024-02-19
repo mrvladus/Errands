@@ -110,7 +110,7 @@ class TaskListHeaderBar(Adw.Bin):
         """Hide completed tasks and move them to trash"""
 
         Log.info("Delete completed tasks")
-        for task in self.task_list.completed_list.all_tasks:
+        for task in self.task_list.all_tasks:
             if not task.get_prop("trash") and task.get_prop("completed"):
                 task.delete()
         self.update_ui()
@@ -125,8 +125,14 @@ class TaskListHeaderBar(Adw.Bin):
             )[0][0]
         )
 
-        n_completed: int = len(self.task_list.completed_list.tasks_dicts)
-        n_total: int = len(self.task_list.uncompleted_list.tasks_dicts) + n_completed
+        n_total: int = 0
+        n_completed: int = 0
+        tasks: list[TaskData] = UserData.get_tasks_as_dicts(self.task_list.list_uid)
+        for task in tasks:
+            if not task["deleted"]:
+                n_total += 1
+                if task["completed"] and not task["trash"]:
+                    n_completed += 1
 
         # Update status
         self.title.set_subtitle(
@@ -138,9 +144,6 @@ class TaskListHeaderBar(Adw.Bin):
 
 
 class TaskListBottomBar(Gtk.Box):
-
-    # Public items
-
     def __init__(self, task_list: TaskList):
         super().__init__()
         self.task_list: TaskList = task_list
@@ -407,6 +410,10 @@ class TaskList(Adw.Bin):
         tasks_brb.add_breakpoint(bp1)
 
         self.set_child(tasks_brb)
+
+    @property
+    def all_tasks(self) -> list[Task]:
+        return self.uncompleted_list.all_tasks + self.completed_list.all_tasks
 
     def update_ui(self) -> None:
         Log.debug(f"Task list {self.list_uid}: Update UI")
