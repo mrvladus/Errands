@@ -413,7 +413,18 @@ class TaskList(Adw.Bin):
 
     @property
     def all_tasks(self) -> list[Task]:
-        return self.uncompleted_list.all_tasks + self.completed_list.all_tasks
+        all_tasks: list[Task] = []
+
+        def __add_task(tasks: list[Task]) -> None:
+            for task in tasks:
+                all_tasks.append(task)
+                __add_task(task.completed_tasks.tasks)
+                __add_task(task.uncompleted_tasks.tasks)
+
+        __add_task(self.completed_list.tasks)
+        __add_task(self.uncompleted_list.tasks)
+
+        return all_tasks
 
     def update_ui(self) -> None:
         Log.debug(f"Task list {self.list_uid}: Update UI")
@@ -479,18 +490,6 @@ class TaskListUncompletedList(Gtk.Box):
     @property
     def tasks(self) -> list[Task]:
         return get_children(self)
-
-    @property
-    def all_tasks(self) -> list[Task]:
-        all_tasks: list[Task] = []
-
-        def __add_tasks(tasks: list[Task]):
-            for task in tasks:
-                all_tasks.append(task)
-                __add_tasks(task.uncompleted_tasks.tasks)
-
-        __add_tasks(self.tasks)
-        return all_tasks
 
     def update_ui(self):
         data_uids: list[str] = [
@@ -581,18 +580,6 @@ class TaskListCompletedList(Gtk.Box):
     @property
     def tasks(self) -> list[Task]:
         return get_children(self.completed_list)
-
-    @property
-    def all_tasks(self) -> list[Task]:
-        all_tasks: list[Task] = []
-
-        def __add_tasks(tasks: list[Task]):
-            for task in tasks:
-                all_tasks.append(task)
-                __add_tasks(task.completed_tasks.tasks)
-
-        __add_tasks(self.tasks)
-        return all_tasks
 
     def update_ui(self) -> None:
         data_uids: list[str] = [

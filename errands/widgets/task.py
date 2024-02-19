@@ -545,18 +545,6 @@ class TaskUncompletedSubTasks(Gtk.Box):
         return get_children(self)
 
     @property
-    def all_tasks(self) -> list[Task]:
-        all_tasks: list[Task] = []
-
-        def __add_tasks(tasks: list[Task]):
-            for task in tasks:
-                all_tasks.append(task)
-                __add_tasks(task.uncompleted_tasks.tasks)
-
-        __add_tasks(self.tasks)
-        return all_tasks
-
-    @property
     def tasks_dicts(self) -> list[TaskData]:
         return [
             t
@@ -637,18 +625,6 @@ class TaskCompletedSubTasks(Gtk.Box):
         return get_children(self.completed_list)
 
     @property
-    def all_tasks(self) -> list[Task]:
-        all_tasks: list[Task] = []
-
-        def __add_tasks(tasks: list[Task]):
-            for task in tasks:
-                all_tasks.append(task)
-                __add_tasks(task.completed_tasks.tasks)
-
-        __add_tasks(self.tasks)
-        return all_tasks
-
-    @property
     def tasks_dicts(self) -> list[TaskData]:
         return [
             t
@@ -691,9 +667,9 @@ class TaskCompletedSubTasks(Gtk.Box):
             task.update_ui()
 
         # Show separator
-        self.separator_rev.set_reveal_child(
-            len(self.tasks_dicts) > 0
-            and len(self.task.uncompleted_tasks.tasks_dicts) > 0
+        self.separator_rev.set_reveal_child(len(self.tasks_dicts) > 0)
+        self.separator_rev.get_child().set_margin_top(
+            3 if len(self.task.uncompleted_tasks.tasks_dicts) == 0 else 0
         )
 
 
@@ -743,7 +719,7 @@ class Task(Gtk.Revealer):
         self.just_added = False
 
     def _build_ui(self) -> None:
-        self.set_transition_type(Gtk.RevealerTransitionType.SWING_DOWN)
+        self.set_transition_type(Gtk.RevealerTransitionType.SLIDE_DOWN)
         self.set_transition_duration(200)
         # Top drop area
         self.top_drop_area = TaskTopDropArea(self)
@@ -795,6 +771,20 @@ class Task(Gtk.Revealer):
             )
         )
 
+    @property
+    def all_tasks(self) -> list[Task]:
+        all_tasks: list[Task] = []
+
+        def __add_task(tasks: list[Task]) -> None:
+            for task in tasks:
+                all_tasks.append(task)
+                __add_task(task.completed_tasks.tasks)
+                __add_task(task.uncompleted_tasks.tasks)
+
+        __add_task(self.completed_tasks.tasks)
+        __add_task(self.uncompleted_tasks.tasks)
+        return all_tasks
+
     def get_parents_tree(self) -> list[Task]:
         """Get parent tasks chain"""
 
@@ -829,12 +819,12 @@ class Task(Gtk.Revealer):
         Log.info(f"Task: Move to trash: '{self.uid}'")
 
         self.toggle_visibility(False)
-        self.update_props(["trash"], [True])
         self.task_row.complete_btn.set_active(True)
+        self.update_props(["trash", "synced"], [True, False])
         self.trash.trash_add(self)
-        for task in self.completed_tasks.all_tasks + self.uncompleted_tasks.all_tasks:
-            if not task.get_prop("trash"):
-                task.delete()
+        for task in self.all_tasks:
+            # if not task.get_prop("trash"):
+            task.delete()
         self.parent.update_ui()
 
     def expand(self, expanded: bool) -> None:
