@@ -12,7 +12,7 @@ from errands.widgets.components import Box
 from errands.widgets.details import Details
 from gi.repository import Adw, Gtk, GLib, GObject  # type:ignore
 from errands.lib.animation import scroll
-from errands.lib.data import UserData
+from errands.lib.data import TaskData, UserData
 from errands.lib.utils import get_children
 from errands.lib.logging import Log
 from errands.widgets.task import Task
@@ -110,7 +110,7 @@ class TaskListHeaderBar(Adw.Bin):
         """Hide completed tasks and move them to trash"""
 
         Log.info("Delete completed tasks")
-        for task in self.get_all_tasks():
+        for task in self.task_list.completed_list.all_tasks:
             if not task.get_prop("trash") and task.get_prop("completed"):
                 task.delete()
         self.update_ui()
@@ -125,10 +125,8 @@ class TaskListHeaderBar(Adw.Bin):
             )[0][0]
         )
 
-        n_completed: int = len(self.task_list.completed_list.completed_tasks)
-        n_total: int = (
-            len(self.task_list.uncompleted_list.uncompleted_tasks) + n_completed
-        )
+        n_completed: int = len(self.task_list.completed_list.tasks)
+        n_total: int = len(self.task_list.uncompleted_list.tasks) + n_completed
 
         # Update status
         self.title.set_subtitle(
@@ -429,10 +427,7 @@ class TaskList(Adw.Bin):
 
     def _on_empty_area_clicked(self, _gesture, _n, x: float, y: float) -> None:
         """Close Details panel on click on empty space"""
-        all_tasks: list[Task] = (
-            self.completed_list.completed_tasks
-            + self.uncompleted_list.uncompleted_tasks
-        )
+        all_tasks: list[Task] = self.completed_list.tasks + self.uncompleted_list.tasks
         height = 0
         for task in all_tasks:
             if task.get_child_revealed():
@@ -463,8 +458,20 @@ class TaskListUncompletedList(Gtk.Box):
         self.set_orientation(Gtk.Orientation.VERTICAL)
 
     @property
-    def uncompleted_tasks(self) -> list[Task]:
+    def tasks(self) -> list[Task]:
         return get_children(self)
+
+    @property
+    def all_tasks(self) -> list[Task]:
+        all_tasks: list[Task] = []
+
+        def __add_tasks(tasks: list[Task]):
+            for task in tasks:
+                all_tasks.append(task)
+                __add_tasks(task.uncompleted_tasks.tasks)
+
+        __add_tasks(self.tasks)
+        return all_tasks
 
     def update_ui(self):
         data_uids: list[str] = [
@@ -472,7 +479,7 @@ class TaskListUncompletedList(Gtk.Box):
             for t in UserData.get_tasks_as_dicts(self.list_uid)
             if t["parent"] == "" and not t["completed"] and not t["deleted"]
         ]
-        widgets_uids: list[str] = [t.uid for t in self.uncompleted_tasks]
+        widgets_uids: list[str] = [t.uid for t in self.tasks]
 
         # Add tasks
         on_top: bool = GSettings.get("task-list-new-task-position-top")
@@ -485,12 +492,12 @@ class TaskListUncompletedList(Gtk.Box):
                     self.append(new_task)
 
         # Remove tasks
-        for task in self.uncompleted_tasks:
+        for task in self.tasks:
             if task.uid not in data_uids:
-                self.remove(task)
+                task.purged = True
 
         # Update tasks
-        for task in self.uncompleted_tasks:
+        for task in self.tasks:
             task.update_ui()
 
 
@@ -511,7 +518,13 @@ class TaskListCompletedList(Gtk.Box):
         self.set_orientation(Gtk.Orientation.VERTICAL)
 
         # Separator
-        separator = Gtk.Box(css_classes=["dim-label"], margin_start=24, margin_end=24)
+        separator = Gtk.Box(
+            css_classes=["dim-label"],
+            margin_start=24,
+            margin_end=24,
+            margin_top=6,
+            margin_bottom=6,
+        )
         separator.append(Gtk.Separator(valign=Gtk.Align.CENTER, hexpand=True))
         separator.append(
             Gtk.Label(
@@ -534,8 +547,20 @@ class TaskListCompletedList(Gtk.Box):
         self.append(self.completed_list)
 
     @property
-    def completed_tasks(self) -> list[Task]:
+    def tasks(self) -> list[Task]:
         return get_children(self.completed_list)
+
+    @property
+    def all_tasks(self) -> list[Task]:
+        all_tasks: list[Task] = []
+
+        def __add_tasks(tasks: list[Task]):
+            for task in tasks:
+                all_tasks.append(task)
+                __add_tasks(task.completed_tasks.tasks)
+
+        __add_tasks(self.tasks)
+        return all_tasks
 
     def update_ui(self) -> None:
         data_uids: list[str] = [
@@ -543,7 +568,7 @@ class TaskListCompletedList(Gtk.Box):
             for t in UserData.get_tasks_as_dicts(self.list_uid, "")
             if t["parent"] == "" and t["completed"] and not t["deleted"]
         ]
-        widgets_uids: list[str] = [t.uid for t in self.completed_tasks]
+        widgets_uids: list[str] = [t.uid for t in self.tasks]
 
         # Add tasks
         for uid in data_uids:
@@ -551,13 +576,22 @@ class TaskListCompletedList(Gtk.Box):
                 self.completed_list.prepend(Task(uid, self.task_list, self, False))
 
         # Remove tasks
-        for task in self.completed_tasks:
+        for task in self.tasks:
             if task.uid not in data_uids:
-                self.completed_list.remove(task)
+                task.purged = True
 
         # Update tasks
-        for task in self.completed_tasks:
+        for task in self.tasks:
             task.update_ui()
 
         # Show separator
-        self.separator_rev.set_reveal_child(len(self.completed_tasks) > 0)
+        data: list[TaskData] = [
+            t
+            for t in UserData.get_tasks_as_dicts(self.list_uid)
+            if not t["trash"]
+            and not t["deleted"]
+            and t["completed"]
+            and t["list_uid"] == self.list_uid
+            and t["parent"] == ""
+        ]
+        self.separator_rev.set_reveal_child(len(data) > 0)

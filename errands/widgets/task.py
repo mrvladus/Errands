@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 from __future__ import annotations
+import time
 from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -11,12 +12,13 @@ from errands.widgets.components import Box
 from gi.repository import Gtk, Adw, Gdk, GObject, GLib  # type:ignore
 from errands.lib.sync.sync import Sync
 from errands.lib.logging import Log
-from errands.lib.data import UserData
+from errands.lib.data import TaskData, UserData
 from errands.lib.markup import Markup
-from errands.lib.utils import get_children
+from errands.lib.utils import get_children, threaded
 from errands.lib.gsettings import GSettings
 
 
+# TODO
 class TaskTopDropArea(Gtk.Revealer):
     def __init__(self, task: Task):
         super().__init__()
@@ -422,7 +424,7 @@ class TaskInfoBar(Gtk.Box):
         self.progress_bar.add_css_class("dim-label")
         GSettings.bind("task-show-progressbar", self.progress_bar, "visible")
         self.progress_bar_rev = Gtk.Revealer(
-            child=self.progress_bar, transition_duration=100
+            child=self.progress_bar, transition_duration=250
         )
         self.append(self.progress_bar_rev)
 
@@ -529,7 +531,7 @@ class TaskSubTasksEntry(Gtk.Entry):
         Sync.sync()
 
 
-class TaskSubUncompletedTasks(Gtk.Box):
+class TaskUncompletedSubTasks(Gtk.Box):
     def __init__(self, task: Task):
         super().__init__()
         self.task: Task = task
@@ -541,6 +543,30 @@ class TaskSubUncompletedTasks(Gtk.Box):
     @property
     def tasks(self) -> list[Task]:
         return get_children(self)
+
+    @property
+    def all_tasks(self) -> list[Task]:
+        all_tasks: list[Task] = []
+
+        def __add_tasks(tasks: list[Task]):
+            for task in tasks:
+                all_tasks.append(task)
+                __add_tasks(task.uncompleted_tasks.tasks)
+
+        __add_tasks(self.tasks)
+        return all_tasks
+
+    @property
+    def tasks_dicts(self) -> list[TaskData]:
+        return [
+            t
+            for t in UserData.get_tasks_as_dicts(self.task.list_uid)
+            if not t["trash"]
+            and not t["deleted"]
+            and not t["completed"]
+            and t["list_uid"] == self.task.list_uid
+            and t["parent"] == self.task.uid
+        ]
 
     def update_ui(self):
         data_uids: list[str] = [
@@ -566,14 +592,14 @@ class TaskSubUncompletedTasks(Gtk.Box):
         # Remove sub-tasks
         for task in self.tasks:
             if task.uid not in data_uids:
-                self.remove(task)
+                task.purged = True
 
         # Update sub-tasks
         for task in self.tasks:
             task.update_ui()
 
 
-class TaskSubCompletedTasks(Gtk.Box):
+class TaskCompletedSubTasks(Gtk.Box):
     def __init__(self, task: Task):
         super().__init__()
         self.task: Task = task
@@ -588,7 +614,7 @@ class TaskSubCompletedTasks(Gtk.Box):
         separator.append(
             Gtk.Label(
                 label=_("Completed Tasks"),
-                css_classes=["caption-heading"],
+                css_classes=["caption"],
                 halign=Gtk.Align.CENTER,
                 hexpand=False,
                 margin_start=12,
@@ -608,6 +634,30 @@ class TaskSubCompletedTasks(Gtk.Box):
     @property
     def tasks(self) -> list[Task]:
         return get_children(self.completed_list)
+
+    @property
+    def all_tasks(self) -> list[Task]:
+        all_tasks: list[Task] = []
+
+        def __add_tasks(tasks: list[Task]):
+            for task in tasks:
+                all_tasks.append(task)
+                __add_tasks(task.completed_tasks.tasks)
+
+        __add_tasks(self.tasks)
+        return all_tasks
+
+    @property
+    def tasks_dicts(self) -> list[TaskData]:
+        return [
+            t
+            for t in UserData.get_tasks_as_dicts(self.task.list_uid)
+            if not t["trash"]
+            and not t["deleted"]
+            and t["completed"]
+            and t["list_uid"] == self.task.list_uid
+            and t["parent"] == self.task.uid
+        ]
 
     def update_ui(self):
         data_uids: list[str] = [
@@ -633,7 +683,7 @@ class TaskSubCompletedTasks(Gtk.Box):
         # Remove sub-tasks
         for task in self.tasks:
             if task.uid not in data_uids:
-                self.completed_list.remove(task)
+                task.purged = True
 
         # Update sub-tasks
         for task in self.tasks:
@@ -641,7 +691,8 @@ class TaskSubCompletedTasks(Gtk.Box):
 
         # Show separator
         self.separator_rev.set_reveal_child(
-            len(self.tasks) > 0 and len(self.task.uncompleted_tasks.tasks) > 0
+            len(self.tasks_dicts) > 0
+            and len(self.task.uncompleted_tasks.tasks_dicts) > 0
         )
 
 
@@ -652,14 +703,15 @@ class Task(Gtk.Revealer):
     task_row: TaskTitleRow
     info_bar: TaskInfoBar
     sub_tasks_entry: TaskSubTasksEntry
-    uncompleted_tasks: TaskSubUncompletedTasks
-    completed_tasks: TaskSubCompletedTasks
+    uncompleted_tasks: TaskUncompletedSubTasks
+    completed_tasks: TaskCompletedSubTasks
     sub_tasks_revealer: Gtk.Revealer
     main_box: Gtk.Box
 
     # State
     just_added: bool = True
     can_sync: bool = True
+    purged: bool = False
     purging: bool = False
 
     def __init__(
@@ -690,6 +742,8 @@ class Task(Gtk.Revealer):
         self.just_added = False
 
     def _build_ui(self) -> None:
+        self.set_transition_type(Gtk.RevealerTransitionType.SWING_DOWN)
+        self.set_transition_duration(200)
         # Top drop area
         self.top_drop_area = TaskTopDropArea(self)
 
@@ -703,10 +757,10 @@ class Task(Gtk.Revealer):
         self.sub_tasks_entry = TaskSubTasksEntry(self)
 
         # Uncompleted tasks
-        self.uncompleted_tasks = TaskSubUncompletedTasks(self)
+        self.uncompleted_tasks = TaskUncompletedSubTasks(self)
 
         # Completed tasks
-        self.completed_tasks = TaskSubCompletedTasks(self)
+        self.completed_tasks = TaskCompletedSubTasks(self)
 
         # Sub-tasks revealer
         self.sub_tasks_revealer = Gtk.Revealer(
@@ -763,8 +817,8 @@ class Task(Gtk.Revealer):
     def get_status(self) -> tuple[int, int]:
         """Get total tasks and completed tasks tuple"""
 
-        completed: int = len(self.completed_tasks.tasks)
-        total: int = len(self.completed_tasks.tasks) + completed
+        completed: int = len(self.completed_tasks.tasks_dicts)
+        total: int = len(self.completed_tasks.tasks_dicts) + completed
 
         return total, completed
 
@@ -777,7 +831,7 @@ class Task(Gtk.Revealer):
         self.update_props(["trash"], [True])
         self.task_row.complete_btn.set_active(True)
         self.trash.trash_add(self)
-        for task in self.tasks_list.get_sub_tasks():
+        for task in self.completed_tasks.all_tasks + self.uncompleted_tasks.all_tasks:
             if not task.get_prop("trash"):
                 task.delete()
         self.parent.update_ui()
@@ -794,17 +848,17 @@ class Task(Gtk.Revealer):
 
     def purge(self) -> None:
         """Completely remove widget"""
-        self.purging = True
+
+        if self.purging:
+            return
 
         def __finish_remove():
-            if self.get_child_revealed():
-                return True
-            else:
-                self.parent.remove_task(self)
-                return False
+            GLib.idle_add(self.get_parent().remove, self)
+            return False
 
+        self.purging = True
         self.toggle_visibility(False)
-        GLib.timeout_add(250, __finish_remove)
+        GLib.timeout_add(200, __finish_remove)
 
     def toggle_visibility(self, on: bool) -> None:
         GLib.idle_add(self.set_reveal_child, on)
@@ -813,9 +867,12 @@ class Task(Gtk.Revealer):
         UserData.update_props(self.list_uid, self.uid, props, values)
 
     def update_ui(self) -> None:
+        if self.purged:
+            self.purge()
+            return
+
         # Change visibility
-        if not self.purging:
-            self.toggle_visibility(not self.get_prop("trash"))
+        self.toggle_visibility(not self.get_prop("trash"))
 
         # Expand
         self.expand(self.get_prop("expanded"))
