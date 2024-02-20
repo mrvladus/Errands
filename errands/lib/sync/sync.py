@@ -46,7 +46,7 @@ class Sync:
         if GSettings.get("sync-provider") == 0:
             UserData.clean_deleted()
             if update_ui:
-                GLib.idle_add(self.window.sidebar.task_lists.update_ui)
+                GLib.idle_add(self.window.sidebar.update_ui)
             return
         if not self.provider:
             GLib.idle_add(
@@ -67,7 +67,7 @@ class Sync:
             self.provider.sync()
             UserData.clean_deleted()
             if update_ui:
-                GLib.idle_add(self.window.sidebar.task_lists.update_ui)
+                GLib.idle_add(self.window.sidebar.update_ui)
             if self.sync_again:
                 self.sync()
                 self.sync_again = False

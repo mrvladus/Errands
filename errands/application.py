@@ -68,4 +68,4 @@ class ErrandsApplication(Adw.Application):
     def do_activate(self) -> None:
         Log.debug("Application: Activate")
         self.window.present()
-        self.run_tests_suite()
+        # self.run_tests_suite()
