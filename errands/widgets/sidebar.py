@@ -609,9 +609,11 @@ class SidebarTaskListsItem(Gtk.ListBoxRow):
                         menu_model=menu,
                         icon_name="view-more-symbolic",
                         tooltip_text=_("Menu"),
+                        css_classes=["flat"],
                     ),
                 ],
-                css_classes=["toolbar"],
+                margin_top=7,
+                margin_bottom=7,
             )
         )
 
