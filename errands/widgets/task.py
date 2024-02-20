@@ -279,47 +279,21 @@ class TaskTitleRow(Gtk.Overlay):
         return True
 
 
-class TaskCompleteButton(Gtk.Box):
+class TaskCompleteButton(Gtk.CheckButton):
     def __init__(self, task: Task, parent: Adw.ActionRow) -> None:
         super().__init__()
         self.task: Task = task
         self.parent: Adw.ActionRow = parent
-        self._build_ui()
+        self.__build_ui()
 
-    def get_active(self) -> bool:
-        return self.big_btn.get_active()
+    def __build_ui(self) -> None:
+        self.set_tooltip_text(_("Mark as Completed"))
+        self.set_active(self.task.get_prop("completed"))
+        self.set_valign(Gtk.Align.CENTER)
+        self.add_css_class("selection-mode")
+        self.connect("toggled", self.__on_toggle)
 
-    def set_active(self, active: bool) -> None:
-        self.big_btn.set_active(active)
-
-    def _build_ui(self) -> None:
-        # Big button
-        self.big_btn = Gtk.CheckButton(
-            valign=Gtk.Align.CENTER,
-            tooltip_text=_("Mark as Completed"),
-            active=self.task.get_prop("completed"),
-            css_classes=["selection-mode"],
-        )
-        GSettings.bind("task-big-toggle", self.big_btn, "visible")
-        self.big_btn.connect("toggled", self._on_toggle)
-        self.append(self.big_btn)
-
-        # Small button
-        small_btn = Gtk.CheckButton(
-            valign=Gtk.Align.CENTER,
-            tooltip_text=_("Mark as Completed"),
-            active=self.task.get_prop("completed"),
-        )
-        small_btn.bind_property(
-            "active",
-            self.big_btn,
-            "active",
-            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
-        )
-        GSettings.bind("task-big-toggle", small_btn, "visible", True)
-        self.append(small_btn)
-
-    def _on_toggle(self, btn: Gtk.CheckButton) -> None:
+    def __on_toggle(self, btn: Gtk.CheckButton) -> None:
         Log.debug(f"Task '{self.task.uid}': Set completed to '{self.get_active()}'")
 
         self.task.task_row.add_rm_crossline(self.get_active())

@@ -110,20 +110,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
             ),
         )
         tasks_group.add(task_primary_action)
-        # Toggle size
-        task_big_toggle = Adw.ComboRow(
-            title=_("Complete Button Size"),
-            model=Gtk.StringList.new([_("Small"), _("Big")]),
-            icon_name="errands-check-toggle-symbolic",
-        )
-        task_big_toggle.set_selected(int(GSettings.get("task-big-toggle")))
-        task_big_toggle.connect(
-            "notify::selected",
-            lambda row, *_: GSettings.set(
-                "task-big-toggle", "b", bool(row.get_selected())
-            ),
-        )
-        tasks_group.add(task_big_toggle)
+
         # Progress bar
         task_progress_bar = Adw.SwitchRow(
             title=_("Progress Bar"), icon_name="errands-progressbar-symbolic"
