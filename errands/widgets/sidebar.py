@@ -4,6 +4,8 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
+from errands.widgets.trash import Trash
+
 if TYPE_CHECKING:
     from errands.widgets.window import Window
     from errands.lib.plugins import PluginBase
@@ -213,49 +215,15 @@ class Sidebar(Adw.Bin):
 
         # --- List Box --- #
 
-        self.list_box = Gtk.ListBox(css_classes=["navigation-sidebar"])
+        self.list_box = Gtk.ListBox(
+            css_classes=["navigation-sidebar"], activate_on_single_click=False
+        )
         self.list_box.connect("row-selected", self.__on_row_changed)
 
         # --- Categories --- #
 
-        # -- Today -- #
-        today = Gtk.Box(
-            margin_start=3,
-            spacing=12,
-            height_request=50,
-        )
-        today.append(Gtk.Image(icon_name="errands-calendar-symbolic"))
-        today.append(Gtk.Label(label=_("Today"), hexpand=True, halign=Gtk.Align.START))
-        self.list_box.append(today)
-
-        # -- Trash -- #
-        trash = Gtk.Box(
-            margin_start=3,
-            spacing=12,
-            height_request=50,
-        )
-        trash.append(Gtk.Image(icon_name="errands-trash-symbolic"))
-        trash.append(Gtk.Label(label=_("Trash"), hexpand=True, halign=Gtk.Align.START))
-
-        # Trash Menu
-        trash_menu: Gio.Menu = Gio.Menu.new()
-        trash_menu.append(_("Restore"), "trash.restore")
-        trash_menu.append(_("Clear"), "trash.clear")
-        trash.append(
-            Gtk.MenuButton(
-                menu_model=trash_menu,
-                icon_name="view-more-symbolic",
-                valign=Gtk.Align.CENTER,
-                css_classes=["flat"],
-            )
-        )
-
-        # Trash drop controller
-        trash_drop_ctrl = Gtk.DropTarget.new(actions=Gdk.DragAction.MOVE, type=Task)
-        trash_drop_ctrl.connect("drop", lambda _d, task, _x, _y: task.delete())
-        trash.add_controller(trash_drop_ctrl)
-
-        self.list_box.append(trash)
+        self.list_box.append(SidebarTodayItem(self.window))
+        self.list_box.append(SidebarTrashItem(self.window))
 
         # --- Separator --- #
         separator = Gtk.Box(spacing=6, css_classes=["dim-label"])
@@ -286,7 +254,7 @@ class Sidebar(Adw.Bin):
 
         self.set_child(toolbar_view)
 
-    def add_task_list(self, name: str, uid: str) -> SidebarTaskListsItem:
+    def add_task_list(self, name: str, uid: str) -> SidebarTaskListItem:
         task_list: TaskList = TaskList(self.window, uid, self)
         page: Adw.ViewStackPage = self.window.stack.add_titled(
             child=task_list, name=name, title=name
@@ -294,15 +262,15 @@ class Sidebar(Adw.Bin):
         task_list.headerbar.title.bind_property(
             "title", page, "title", GObject.BindingFlags.SYNC_CREATE
         )
-        row: SidebarTaskListsItem = SidebarTaskListsItem(task_list, self.list_box)
+        row: SidebarTaskListItem = SidebarTaskListItem(task_list, self.list_box)
         self.list_box.append(row)
         return row
 
     @property
-    def task_lists_rows(self) -> list[SidebarTaskListsItem]:
-        task_lists: list[SidebarTaskListsItem] = []
+    def task_lists_rows(self) -> list[SidebarTaskListItem]:
+        task_lists: list[SidebarTaskListItem] = []
         for row in get_children(self.list_box):
-            if isinstance(row, SidebarTaskListsItem):
+            if isinstance(row, SidebarTaskListItem):
                 task_lists.append(row)
         return task_lists
 
@@ -315,19 +283,23 @@ class Sidebar(Adw.Bin):
             i for i in UserData.get_lists_as_dicts() if not i["deleted"]
         ]
         for l in lists:
-            row: SidebarTaskListsItem = self.add_task_list(l["name"], l["uid"])
+            row: SidebarTaskListItem = self.add_task_list(l["name"], l["uid"])
             if GSettings.get("last-open-list") == l["name"]:
                 self.list_box.select_row(row)
         self.status_page.set_visible(len(lists) == 0)
 
     def __on_row_changed(self, _, row: Gtk.ListBoxRow):
-        if isinstance(row, SidebarTaskListsItem):
+        if isinstance(row, SidebarTaskListItem):
             name = row.label.get_label()
             self.window.stack.set_visible_child_name(name)
             self.window.split_view.set_show_content(True)
             GSettings.set("last-open-list", "s", name)
-            # self.sidebar.set_visible(False)
-        # elif isinstance(row, SidebarTaskListsItem)
+        elif isinstance(row, SidebarTrashItem):
+            self.window.stack.set_visible_child_name("errands_trash_page")
+            self.window.split_view.set_show_content(True)
+        elif isinstance(row, SidebarTodayItem):
+            self.window.stack.set_visible_child_name("errands_today_page")
+            self.window.split_view.set_show_content(True)
 
     def update_ui(self) -> None:
         Log.debug("Sidebar: Update UI")
@@ -368,7 +340,70 @@ class Sidebar(Adw.Bin):
         #     self.window.stack.set_visible_child_name("status")
 
 
-class SidebarTaskListsItem(Gtk.ListBoxRow):
+class SidebarTodayItem(Gtk.ListBoxRow):
+    def __init__(self, window: Window) -> None:
+        super().__init__()
+        self.window: Window = window
+        self.__build_ui()
+
+    def __build_ui(self) -> None:
+        self.window.stack.add_titled(
+            Adw.StatusPage(title=_("No Tasks for Today")),
+            "errands_today_page",
+            _("Today"),
+        )
+
+        hbox = Gtk.Box(
+            margin_start=3,
+            spacing=12,
+            height_request=50,
+        )
+        hbox.append(Gtk.Image(icon_name="errands-calendar-symbolic"))
+        hbox.append(Gtk.Label(label=_("Today"), hexpand=True, halign=Gtk.Align.START))
+
+        self.set_child(hbox)
+
+
+class SidebarTrashItem(Gtk.ListBoxRow):
+    def __init__(self, window: Window) -> None:
+        super().__init__()
+        self.window: Window = window
+        self.__build_ui()
+
+    def __build_ui(self) -> None:
+        trash = self.window.trash = Trash(self.window)
+        self.window.stack.add_titled(trash, "errands_trash_page", _("Trash"))
+
+        hbox = Gtk.Box(
+            margin_start=3,
+            spacing=12,
+            height_request=50,
+        )
+        hbox.append(Gtk.Image(icon_name="errands-trash-symbolic"))
+        hbox.append(Gtk.Label(label=_("Trash"), hexpand=True, halign=Gtk.Align.START))
+
+        # Trash Menu
+        trash_menu: Gio.Menu = Gio.Menu.new()
+        trash_menu.append(_("Restore"), "trash.restore")
+        trash_menu.append(_("Clear"), "trash.clear")
+        hbox.append(
+            Gtk.MenuButton(
+                menu_model=trash_menu,
+                icon_name="view-more-symbolic",
+                valign=Gtk.Align.CENTER,
+                css_classes=["flat"],
+            )
+        )
+
+        # Trash drop controller
+        trash_drop_ctrl = Gtk.DropTarget.new(actions=Gdk.DragAction.MOVE, type=Task)
+        trash_drop_ctrl.connect("drop", lambda _d, task, _x, _y: task.delete())
+        self.add_controller(trash_drop_ctrl)
+
+        self.set_child(hbox)
+
+
+class SidebarTaskListItem(Gtk.ListBoxRow):
     def __init__(self, task_list: TaskList, task_lists: Gtk.ListBox) -> None:
         super().__init__()
         self.task_lists: Gtk.ListBox = task_lists
@@ -400,8 +435,8 @@ class SidebarTaskListsItem(Gtk.ListBoxRow):
                 )
                 self.window.stack.remove(self.task_list)
                 # Switch row
-                next_row: SidebarTaskListsItem = self.get_next_sibling()
-                prev_row: SidebarTaskListsItem = self.get_prev_sibling()
+                next_row: SidebarTaskListItem = self.get_next_sibling()
+                prev_row: SidebarTaskListItem = self.get_prev_sibling()
                 self.list_box.remove(self)
                 if next_row or prev_row:
                     self.list_box.select_row(next_row or prev_row)

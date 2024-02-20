@@ -55,10 +55,6 @@ class Window(Adw.ApplicationWindow):
         # Stack
         self.stack = Adw.ViewStack()
 
-        # Trash
-        self.trash = Trash(self)
-        self.stack.add_titled(self.trash, name="trash", title=_("Trash"))
-
         # Status page Toolbar View
         status_toolbar_view = Adw.ToolbarView(
             content=Box(
@@ -84,7 +80,7 @@ class Window(Adw.ApplicationWindow):
         )
         self.stack.set_visible_child_name("status")
 
-        # Lists
+        # Sidebar
         self.sidebar = Sidebar(self)
         self.split_view.set_sidebar(Adw.NavigationPage.new(self.sidebar, _("Lists")))
         self.split_view.set_content(Adw.NavigationPage.new(self.stack, _("Tasks")))
