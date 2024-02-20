@@ -16,9 +16,6 @@
     <key name="sidebar-open" type="b">
       <default>false</default>
     </key>
-    <key name="right-sidebar" type="b">
-      <default>false</default>
-    </key>
     <key name="theme" type="i">
       <default>0</default>
     </key>

@@ -182,19 +182,6 @@ class PreferencesWindow(Adw.PreferencesWindow):
         self.test_connection_row.set_activatable_widget(test_btn)
         sync_group.add(self.test_connection_row)
 
-        # Details group
-        details_group = Adw.PreferencesGroup(
-            title=_("Details Panel"),
-        )
-        details_position = Adw.ComboRow(
-            title=_("Position"),
-            model=Gtk.StringList.new([_("Left"), _("Right")]),
-            icon_name="errands-sidebar-left-symbolic",
-        )
-        details_position.set_selected(int(GSettings.get("right-sidebar")))
-        details_position.connect("notify::selected", self._on_details_position_changed)
-        details_group.add(details_position)
-
         # Appearance Page
         appearance_page = Adw.PreferencesPage(
             title=_("Appearance"), icon_name="errands-appearance-symbolic"
@@ -202,7 +189,6 @@ class PreferencesWindow(Adw.PreferencesWindow):
         appearance_page.add(theme_group)
         appearance_page.add(task_list_group)
         appearance_page.add(tasks_group)
-        appearance_page.add(details_group)
         self.add(appearance_page)
 
         # Sync Page
@@ -250,8 +236,3 @@ class PreferencesWindow(Adw.PreferencesWindow):
     def on_theme_change(self, btn: Gtk.Button, theme: int) -> None:
         Adw.StyleManager.get_default().set_color_scheme(theme)
         GSettings.set("theme", "i", theme)
-
-    def _on_details_position_changed(self, row: Adw.ComboRow, *_) -> None:
-        for list in self.window.sidebar.task_lists._get_task_lists():
-            list.split_view.set_sidebar_position(row.get_selected())
-        GSettings.set("right-sidebar", "b", bool(row.get_selected())),

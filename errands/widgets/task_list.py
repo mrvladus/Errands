@@ -38,10 +38,16 @@ class TaskListHeaderBar(Adw.Bin):
             )[0][0]
         )
 
-        # Toggle sidebar button left
-        self.left_toggle_sidebar_btn = Gtk.ToggleButton(
-            icon_name="errands-sidebar-left-symbolic",
+        # Toggle sidebar button
+        self.toggle_sidebar_btn = Gtk.ToggleButton(
+            icon_name="errands-sidebar-right-symbolic",
             tooltip_text=_("Toggle Sidebar"),
+        )
+        self.toggle_sidebar_btn.bind_property(
+            "active",
+            self.task_list.split_view,
+            "show-sidebar",
+            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
         )
         toggle_ctrl = Gtk.ShortcutController(scope=1)
         toggle_ctrl.add_shortcut(
@@ -50,29 +56,7 @@ class TaskListHeaderBar(Adw.Bin):
                 action=Gtk.ShortcutAction.parse_string("activate"),
             )
         )
-        self.left_toggle_sidebar_btn.add_controller(toggle_ctrl)
-        self.left_toggle_sidebar_bin = Adw.Bin(child=self.left_toggle_sidebar_btn)
-        GSettings.bind("right-sidebar", self.left_toggle_sidebar_btn, "visible", True)
-        self.left_toggle_sidebar_btn.bind_property(
-            "active",
-            self.task_list.split_view,
-            "show-sidebar",
-            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
-        )
-
-        # Toggle sidebar button right
-        self.right_toggle_sidebar_btn = Gtk.ToggleButton(
-            icon_name="errands-sidebar-right-symbolic",
-            tooltip_text=_("Toggle Sidebar"),
-        )
-        self.right_toggle_sidebar_btn.bind_property(
-            "active",
-            self.left_toggle_sidebar_btn,
-            "active",
-            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
-        )
-        self.right_toggle_sidebar_bin = Adw.Bin(child=self.right_toggle_sidebar_btn)
-        GSettings.bind("right-sidebar", self.right_toggle_sidebar_btn, "visible")
+        self.toggle_sidebar_btn.add_controller(toggle_ctrl)
 
         # Delete completed button
         self.delete_completed_btn = Gtk.Button(
@@ -90,7 +74,7 @@ class TaskListHeaderBar(Adw.Bin):
             valign="center",
             icon_name="go-up-symbolic",
             tooltip_text=_("Scroll Up"),
-            sensitive=False,
+            visible=False,
         )
         self.scroll_up_btn.connect(
             "clicked", lambda *_: scroll(self.task_list.scrl, False)
@@ -99,9 +83,8 @@ class TaskListHeaderBar(Adw.Bin):
         # Headerbar
         hb: Adw.HeaderBar = Adw.HeaderBar()
         hb.set_title_widget(self.title)
-        hb.pack_start(self.left_toggle_sidebar_bin)
         hb.pack_start(self.delete_completed_btn)
-        hb.pack_end(self.right_toggle_sidebar_bin)
+        hb.pack_end(self.toggle_sidebar_btn)
         hb.pack_end(self.scroll_up_btn)
 
         self.set_child(hb)
@@ -153,20 +136,6 @@ class TaskListBottomBar(Gtk.Box):
     def __build_ui(self) -> None:
         self.add_css_class("toolbar")
 
-        # Toggle sidebar button left
-        left_toggle_sidebar_btn = Gtk.ToggleButton(
-            icon_name="errands-sidebar-left-symbolic",
-            tooltip_text=_("Toggle Sidebar"),
-        )
-        left_toggle_sidebar_btn.bind_property(
-            "active",
-            self.headerbar.left_toggle_sidebar_btn,
-            "active",
-            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
-        )
-        GSettings.bind("right-sidebar", left_toggle_sidebar_btn, "visible", True)
-        self.append(left_toggle_sidebar_btn)
-
         # Delete completed button
         delete_completed_btn = Gtk.Button(
             valign="center",
@@ -188,35 +157,34 @@ class TaskListBottomBar(Gtk.Box):
         # Spacer
         self.append(Gtk.Separator(hexpand=True, css_classes=["spacer"]))
 
-        # Toggle sidebar button right
-        right_toggle_sidebar_btn = Gtk.ToggleButton(
-            icon_name="errands-sidebar-right-symbolic",
-            tooltip_text=_("Toggle Sidebar"),
-        )
-        right_toggle_sidebar_btn.bind_property(
-            "active",
-            self.headerbar.left_toggle_sidebar_btn,
-            "active",
-            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
-        )
-        GSettings.bind("right-sidebar", right_toggle_sidebar_btn, "visible")
-        self.append(right_toggle_sidebar_btn)
-
         # Scroll up button
         scroll_up_btn = Gtk.Button(
             valign="center",
             icon_name="go-up-symbolic",
             tooltip_text=_("Scroll Up"),
-            sensitive=False,
+            visible=False,
         )
         scroll_up_btn.bind_property(
-            "sensitive",
+            "visible",
             self.headerbar.scroll_up_btn,
-            "sensitive",
+            "visible",
             GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
         )
         scroll_up_btn.connect("clicked", lambda *_: scroll(self.task_list.scrl, False))
         self.append(scroll_up_btn)
+
+        # Toggle sidebar button right
+        toggle_sidebar_btn = Gtk.ToggleButton(
+            icon_name="errands-sidebar-right-symbolic",
+            tooltip_text=_("Toggle Sidebar"),
+        )
+        toggle_sidebar_btn.bind_property(
+            "active",
+            self.headerbar.toggle_sidebar_btn,
+            "active",
+            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
+        )
+        self.append(toggle_sidebar_btn)
 
 
 class TaskListEntry(Adw.Bin):
@@ -284,7 +252,7 @@ class TaskListScrolledWindow(Gtk.ScrolledWindow):
         self.adj = Gtk.Adjustment()
         self.adj.connect(
             "value-changed",
-            lambda *_: self.task_list.headerbar.scroll_up_btn.set_sensitive(
+            lambda *_: self.task_list.headerbar.scroll_up_btn.set_visible(
                 self.adj.get_value() > 0
             ),
         )
@@ -338,7 +306,7 @@ class TaskList(Adw.Bin):
             min_sidebar_width=360,
             max_sidebar_width=400,
             sidebar_width_fraction=0.40,
-            sidebar_position=int(GSettings.get("right-sidebar")),
+            sidebar_position=Gtk.PackType.END,
         )
         GSettings.bind("sidebar-open", self.split_view, "show-sidebar")
 
@@ -402,9 +370,8 @@ class TaskList(Adw.Bin):
         tasks_brb.add_breakpoint(bp)
         bp1 = Adw.Breakpoint.new(Adw.breakpoint_condition_parse("max-width: 370px"))
         bp1.add_setter(self.split_view, "collapsed", True)
-        bp1.add_setter(self.headerbar.left_toggle_sidebar_bin, "visible", False)
-        bp1.add_setter(self.headerbar.right_toggle_sidebar_bin, "visible", False)
         bp1.add_setter(self.headerbar.delete_completed_btn, "visible", False)
+        bp1.add_setter(self.headerbar.toggle_sidebar_btn, "visible", False)
         bp1.add_setter(self.headerbar.scroll_up_btn, "visible", False)
         bp1.add_setter(self.tasks_toolbar_view, "reveal-bottom-bars", True)
         tasks_brb.add_breakpoint(bp1)
