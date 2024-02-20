@@ -614,6 +614,7 @@ class SidebarTaskListsItem(Gtk.ListBoxRow):
                 ],
                 margin_top=7,
                 margin_bottom=7,
+                margin_start=3,
             )
         )
 
