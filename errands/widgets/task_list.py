@@ -22,7 +22,7 @@ from errands.lib.gsettings import GSettings
 class TaskListHeaderBar(Adw.Bin):
 
     # Public items
-    title: Adw.WindowTitle
+    title: Adw.WindowTitle = Adw.WindowTitle()
 
     def __init__(self, task_list: TaskList):
         super().__init__()
@@ -30,14 +30,6 @@ class TaskListHeaderBar(Adw.Bin):
         self.__build_ui()
 
     def __build_ui(self) -> None:
-        # Title
-        self.title = Adw.WindowTitle(
-            title=UserData.run_sql(
-                f"SELECT name FROM lists WHERE uid = '{self.task_list.list_uid}'",
-                fetch=True,
-            )[0][0]
-        )
-
         # Toggle sidebar button
         self.toggle_sidebar_btn = Gtk.ToggleButton(
             icon_name="errands-sidebar-right-symbolic",
@@ -294,11 +286,10 @@ class TaskList(Adw.Bin):
     uncompleted_list: TaskListUncompletedList
     completed_list: TaskListCompletedList
 
-    def __init__(self, window: Window, list_uid: str, parent):
+    def __init__(self, window: Window, list_uid: str):
         super().__init__()
         self.window: Window = window
         self.list_uid: str = list_uid
-        self.parent = parent
         self.__build_ui()
         self.update_ui()
 

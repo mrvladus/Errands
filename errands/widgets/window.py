@@ -31,7 +31,7 @@ class Window(Adw.ApplicationWindow):
         self._build_ui()
         # Setup sync
         Sync.window = self
-        Sync.sync()
+        # Sync.sync()
 
     def _build_ui(self):
         self.set_title(_("Errands"))
@@ -82,8 +82,8 @@ class Window(Adw.ApplicationWindow):
 
         # Sidebar
         self.sidebar = Sidebar(self)
-        self.split_view.set_sidebar(Adw.NavigationPage.new(self.sidebar, _("Lists")))
-        self.split_view.set_content(Adw.NavigationPage.new(self.stack, _("Tasks")))
+        self.split_view.set_sidebar(Adw.NavigationPage.new(self.sidebar, _("Sidebar")))
+        self.split_view.set_content(Adw.NavigationPage.new(self.stack, _("Content")))
 
         # Toast overlay
         self.toast_overlay = Adw.ToastOverlay(child=self.split_view)
