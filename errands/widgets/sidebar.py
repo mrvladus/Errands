@@ -390,7 +390,7 @@ class SidebarTrashItem(Gtk.ListBoxRow):
         __create_action("restore", self.trash.on_trash_restore)
 
     def __build_ui(self) -> None:
-        self.trash = Trash(self.window)
+        self.trash = Trash()
         self.window.stack.add_titled(self.trash, "errands_trash_page", _("Trash"))
 
         hbox = Gtk.Box(

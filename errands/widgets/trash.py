@@ -11,16 +11,16 @@ if TYPE_CHECKING:
 from errands.lib.data import TaskData, TaskListData, UserData
 from errands.lib.utils import get_children
 from errands.widgets.components import Box, Button, ConfirmDialog
-from gi.repository import Adw, Gtk, GObject  # type:ignore
+from gi.repository import Adw, Gtk, GObject, Gio  # type:ignore
 from errands.lib.sync.sync import Sync
 from errands.lib.logging import Log
 
 
 class Trash(Adw.Bin):
-    def __init__(self, window: Window):
+    def __init__(self):
         super().__init__()
-        self.window: Window = window
-        self.stack: Adw.ViewStack = window.stack
+        self.window: Window = Gio.Application.get_default().get_active_window()
+        self.stack: Adw.ViewStack = self.window.stack
         self._build_ui()
 
     def _build_ui(self) -> None:
@@ -112,8 +112,7 @@ class Trash(Adw.Bin):
                 SET deleted = 1
                 WHERE trash = 1""",
             )
-
-            self.update_ui()
+            self.window.sidebar.trash_item.update_ui()
             # Sync
             Sync.sync()
 
@@ -139,7 +138,7 @@ class Trash(Adw.Bin):
         for task in trash_dicts:
             UserData.update_props(task["list_uid"], task["uid"], ["trash"], [False])
 
-        self.update_ui()
+        self.window.sidebar.update_ui()
 
     def update_ui(self):
         tasks_dicts: list[TaskData] = [
