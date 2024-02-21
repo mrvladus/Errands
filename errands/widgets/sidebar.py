@@ -14,22 +14,23 @@ import time
 from datetime import datetime
 from icalendar import Calendar, Todo
 from errands.lib.plugins import PluginsLoader
-from errands.lib.data import UserData
+from errands.lib.data import TaskListData, UserData
 from errands.lib.utils import get_children
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
-from errands.widgets.components import Box
+from errands.widgets.components import Box, ConfirmDialog
 from errands.widgets.task import Task
 from errands.widgets.task_list import TaskList
 from gi.repository import Adw, Gtk, Gio, GObject, Gdk, GLib  # type:ignore
 
 
 class SidebarHeaderBar(Adw.Bin):
-    def __init__(self, list_box: Gtk.ListBox, window: Window):
+    def __init__(self, sidebar: Sidebar):
         super().__init__()
-        self.list_box = list_box
-        self.window: Window = window
+        self.sidebar = sidebar
+        self.list_box = sidebar.list_box
+        self.window: Window = sidebar.window
         self._build_ui()
 
     def _build_ui(self):
@@ -105,7 +106,7 @@ class SidebarHeaderBar(Adw.Bin):
 
             name = entry.props.text.rstrip().lstrip()
             uid = UserData.add_list(name)
-            row = self.list_box.add_list(name, uid)
+            row = self.sidebar.add_task_list(name, uid)
             self.list_box.select_row(row)
             Sync.sync()
 
@@ -204,6 +205,7 @@ class Sidebar(Adw.Bin):
         self.__build_ui()
 
     def __build_ui(self) -> None:
+
         # --- Status Page --- #
         self.status_page: Adw.StatusPage = Adw.StatusPage(
             title=_("Add new List"),
@@ -221,9 +223,10 @@ class Sidebar(Adw.Bin):
         self.list_box.connect("row-selected", self.__on_row_changed)
 
         # --- Categories --- #
+        self.trash_item = SidebarTrashItem(self.window)
 
         self.list_box.append(SidebarTodayItem(self.window))
-        self.list_box.append(SidebarTrashItem(self.window))
+        self.list_box.append(self.trash_item)
 
         # --- Separator --- #
         separator = Gtk.Box(spacing=6, css_classes=["dim-label"])
@@ -250,19 +253,14 @@ class Sidebar(Adw.Bin):
 
         # Toolbar view
         toolbar_view: Adw.ToolbarView = Adw.ToolbarView(content=vbox)
-        toolbar_view.add_top_bar(SidebarHeaderBar(self.list_box, self.window))
+
+        self.hb = SidebarHeaderBar(self)
+        toolbar_view.add_top_bar(self.hb)
 
         self.set_child(toolbar_view)
 
     def add_task_list(self, name: str, uid: str) -> SidebarTaskListItem:
-        task_list: TaskList = TaskList(self.window, uid, self)
-        page: Adw.ViewStackPage = self.window.stack.add_titled(
-            child=task_list, name=name, title=name
-        )
-        task_list.headerbar.title.bind_property(
-            "title", page, "title", GObject.BindingFlags.SYNC_CREATE
-        )
-        row: SidebarTaskListItem = SidebarTaskListItem(task_list, self.list_box)
+        row: SidebarTaskListItem = SidebarTaskListItem(uid, name, self)
         self.list_box.append(row)
         return row
 
@@ -304,9 +302,31 @@ class Sidebar(Adw.Bin):
     def update_ui(self) -> None:
         Log.debug("Sidebar: Update UI")
 
+        lists: list[TaskListData] = UserData.get_lists_as_dicts()
+        uids: list[str] = [l["uid"] for l in lists]
+
+        for l in self.task_lists_rows:
+            # Delete lists
+            if l.uid not in uids:
+                self.window.stack.remove(l.task_list)
+                self.list_box.remove(l)
+                continue
+
+            # Update list ui
+            l.task_list.update_ui()
+
+        # Create lists
+        lists_uids = [l.list_uid for l in self.task_lists]
+        for l in lists:
+            if l["uid"] not in lists_uids:
+                row = self.add_task_list(l["name"], l["uid"])
+                self.list_box.select_row(row)
+
+        self.trash_item.update_ui()
+        # Create new lists
+
         # self.sidebar.plugins_list.plugins_list.unselect_all()
 
-        # # Delete lists
         # uids: list[str] = [i["uid"] for i in UserData.get_lists_as_dicts()]
         # for row in self._get_task_lists_items():
         #     if row.uid not in uids:
@@ -318,11 +338,6 @@ class Sidebar(Adw.Bin):
         #             self.lists.select_row(prev_child or next_child)
         #         self.lists.remove(row)
 
-        # # Update old lists
-        # for l in self._get_task_lists():
-        #     l.update_ui()
-
-        # # Create new lists
         # old_uids: list[str] = [row.uid for row in self._get_task_lists_items()]
         # new_lists: list[dict] = UserData.get_lists_as_dicts()
         # for l in new_lists:
@@ -333,11 +348,11 @@ class Sidebar(Adw.Bin):
         #         self.window.stack.set_visible_child_name(l["name"])
         #         self.sidebar.status_page.set_visible(False)
 
-        # # Show status
-        # length: int = len(self._get_task_lists_items())
-        # self.sidebar.status_page.set_visible(length == 0)
-        # if length == 0:
-        #     self.window.stack.set_visible_child_name("status")
+        # Show status
+        length: int = len(self.task_lists)
+        self.status_page.set_visible(length == 0)
+        if length == 0:
+            self.window.stack.set_visible_child_name("status")
 
 
 class SidebarTodayItem(Gtk.ListBoxRow):
@@ -384,7 +399,7 @@ class SidebarTrashItem(Gtk.ListBoxRow):
         __create_action("restore", self.trash.on_trash_restore)
 
     def __build_ui(self) -> None:
-        self.trash = self.window.trash = Trash(self.window)
+        self.trash = Trash(self.window)
         self.window.stack.add_titled(self.trash, "errands_trash_page", _("Trash"))
 
         hbox = Gtk.Box(
@@ -392,7 +407,8 @@ class SidebarTrashItem(Gtk.ListBoxRow):
             spacing=12,
             height_request=50,
         )
-        hbox.append(Gtk.Image(icon_name="errands-trash-symbolic"))
+        self.icon: Gtk.Image = Gtk.Image(icon_name="errands-trash-symbolic")
+        hbox.append(self.icon)
         hbox.append(Gtk.Label(label=_("Trash"), hexpand=True, halign=Gtk.Align.START))
 
         # Trash Menu
@@ -415,14 +431,25 @@ class SidebarTrashItem(Gtk.ListBoxRow):
 
         self.set_child(hbox)
 
+    def update_ui(self):
+        # Update trash
+        self.trash.update_ui()
+
+        # Update icon
+        if len(self.trash.trash_items) == 0:
+            self.icon.props.icon_name = "errands-trash-symbolic"
+        else:
+            self.icon.props.icon_name = "errands-trash-full-symbolic"
+
 
 class SidebarTaskListItem(Gtk.ListBoxRow):
-    def __init__(self, task_list: TaskList, task_lists: Gtk.ListBox) -> None:
+    def __init__(self, uid: str, name: str, sidebar: Sidebar) -> None:
         super().__init__()
-        self.task_lists: Gtk.ListBox = task_lists
-        self.task_list: TaskList = task_list
-        self.uid: str = task_list.list_uid
-        self.window: Window = task_list.window
+        self.sidebar: Sidebar = sidebar
+        self.list_box: Gtk.ListBox = sidebar.list_box
+        self.uid: str = uid
+        self.name: str = name
+        self.window: Window = sidebar.window
         self._build_ui()
         self._add_actions()
 
@@ -436,7 +463,7 @@ class SidebarTaskListItem(Gtk.ListBoxRow):
             group.add_action(action)
 
         def _delete(*args):
-            def _confirm(_, res):
+            def __confirm(_, res):
                 if res == "cancel":
                     Log.debug("ListItem: Deleting list is cancelled")
                     return
@@ -446,37 +473,15 @@ class SidebarTaskListItem(Gtk.ListBoxRow):
                     f"UPDATE lists SET deleted = 1 WHERE uid = '{self.uid}'",
                     f"DELETE FROM tasks WHERE list_uid = '{self.uid}'",
                 )
-                self.window.stack.remove(self.task_list)
-                # Switch row
-                next_row: SidebarTaskListItem = self.get_next_sibling()
-                prev_row: SidebarTaskListItem = self.get_prev_sibling()
-                self.list_box.remove(self)
-                if next_row or prev_row:
-                    self.list_box.select_row(next_row or prev_row)
-                else:
-                    self.window.stack.set_visible_child_name("status")
-                    self.task_lists.sidebar.status_page.set_visible(True)
-
-                # Remove items from trash
-                for item in get_children(self.window.trash.trash_list):
-                    if item.task_widget.list_uid == self.uid:
-                        self.window.trash.trash_list.remove(item)
-
+                self.sidebar.update_ui()
                 Sync.sync()
 
-            dialog: Adw.MessageDialog = Adw.MessageDialog(
-                transient_for=self.window,
-                hide_on_close=True,
-                heading=_("Are you sure?"),
-                body=_("List will be permanently deleted"),
-                default_response="delete",
-                close_response="cancel",
+            ConfirmDialog(
+                _("List will be permanently deleted"),
+                _("Delete"),
+                Adw.ResponseAppearance.DESTRUCTIVE,
+                __confirm,
             )
-            dialog.add_response("cancel", _("Cancel"))
-            dialog.add_response("delete", _("Delete"))
-            dialog.set_response_appearance("delete", Adw.ResponseAppearance.DESTRUCTIVE)
-            dialog.connect("response", _confirm)
-            dialog.present()
 
         def _rename(*args):
             def _entry_activated(_, dialog: Adw.MessageDialog):
@@ -502,7 +507,7 @@ class SidebarTaskListItem(Gtk.ListBoxRow):
                         (text, self.uid),
                     )
                 )
-                self.task_list.title.set_title(text)
+                self.sidebar.update_ui()
                 Sync.sync()
 
             entry: Gtk.Entry = Gtk.Entry(placeholder_text=_("New Name"))
@@ -593,17 +598,29 @@ class SidebarTaskListItem(Gtk.ListBoxRow):
         self.add_css_class("task-lists-item")
         self.props.height_request = 50
 
+        # Task list
+        self.task_list: TaskList = TaskList(self.window, self.uid, self)
+        stack_page: Adw.ViewStackPage = self.window.stack.add_titled(
+            child=self.task_list, name=self.name, title=self.name
+        )
+        self.task_list.headerbar.title.bind_property(
+            "title",
+            stack_page,
+            "title",
+            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
+        )
+
         # Label
         self.label: Gtk.Label = Gtk.Label(
             halign="start",
             hexpand=True,
             ellipsize=3,
         )
-        self.task_list.headerbar.title.bind_property(
-            "title",
-            self.label,
+        self.label.bind_property(
             "label",
-            GObject.BindingFlags.SYNC_CREATE,
+            self.task_list.headerbar.title,
+            "title",
+            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
         )
 
         # Menu
@@ -683,6 +700,3 @@ class SidebarTaskListItem(Gtk.ListBoxRow):
         task.purge()
         self.task_list.add_task(uid)
         Sync.sync()
-
-    def update_ui(self):
-        pass

@@ -318,6 +318,15 @@ class UserData:
         return uids
 
     @classmethod
+    def get_task_parents_uids_tree(cls, list_uid: str, task_uid: str) -> list[str]:
+        parents_uids: list[str] = []
+        parent: str = cls.get_prop(list_uid, task_uid, "parent")
+        while parent != "":
+            parents_uids.append(parent)
+            parent = cls.get_prop(list_uid, parent, "parent")
+        return parents_uids
+
+    @classmethod
     def get_tasks_as_dicts(
         cls, list_uid: str = None, parent: str = None
     ) -> list[TaskData]:

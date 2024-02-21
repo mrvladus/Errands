@@ -62,7 +62,7 @@ class Window(Adw.ApplicationWindow):
                     Adw.StatusPage(title=_("No Task Lists"), icon_name=APP_ID),
                     Button(
                         label=_("Create List"),
-                        on_click=lambda *_: self.sidebar.header_bar.add_list_btn.activate(),
+                        on_click=lambda *_: self.sidebar.hb.add_list_btn.activate(),
                         halign="center",
                         css_classes=["pill", "suggested-action"],
                     ),

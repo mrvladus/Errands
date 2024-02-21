@@ -4,16 +4,14 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-from errands.widgets.task_list import TaskList
 
 if TYPE_CHECKING:
     from errands.widgets.window import Window
 
-from errands.lib.data import UserData
+from errands.lib.data import TaskData, TaskListData, UserData
 from errands.lib.utils import get_children
-from errands.widgets.components import Box, Button
+from errands.widgets.components import Box, Button, ConfirmDialog
 from gi.repository import Adw, Gtk, GObject  # type:ignore
-from errands.widgets.task import Task
 from errands.lib.sync.sync import Sync
 from errands.lib.logging import Log
 
@@ -24,7 +22,6 @@ class Trash(Adw.Bin):
         self.window: Window = window
         self.stack: Adw.ViewStack = window.stack
         self._build_ui()
-        self.update_status()
 
     def _build_ui(self) -> None:
         # Headerbar
@@ -94,17 +91,18 @@ class Trash(Adw.Bin):
         toolbar_view.add_top_bar(hb)
         self.set_child(toolbar_view)
 
-    def trash_add(self, task_widget) -> None:
-        self.trash_list.append(TrashItem(task_widget, self))
+    @property
+    def trash_items(self) -> list[TrashItem]:
+        return get_children(self.trash_list)
+
+    def add_trash_item(self, uid: str) -> None:
+        self.trash_list.append(TrashItem(uid, self))
         self.status.set_visible(False)
 
-    def update_status(self) -> None:
-        self.status.set_visible(len([t for t in get_children(self.trash_list)]) == 0)
-
     def on_trash_clear(self, *args) -> None:
-        def _confirm(_, res) -> None:
+        def __confirm(_, res) -> None:
             if res == "cancel":
-                Log.debug("Clear Trash cancelled")
+                Log.debug("Trash: Clear cancelled")
                 return
 
             Log.info("Trash: Clear")
@@ -115,31 +113,18 @@ class Trash(Adw.Bin):
                 WHERE trash = 1""",
             )
 
-            # Remove tasks
-            for row in get_children(self.trash_list):
-                row.task_widget.purge()
-                self.trash_list.remove(row)
-
-            self.status.set_visible(True)
-            self.update_status()
+            self.update_ui()
             # Sync
             Sync.sync()
 
         Log.debug("Trash: Show confirm dialog")
 
-        dialog = Adw.MessageDialog(
-            transient_for=self.window,
-            hide_on_close=True,
-            heading=_("Are you sure?"),
-            body=_("Tasks will be permanently deleted"),
-            default_response="delete",
-            close_response="cancel",
+        ConfirmDialog(
+            _("Tasks will be permanently deleted"),
+            _("Delete"),
+            Adw.ResponseAppearance.DESTRUCTIVE,
+            __confirm,
         )
-        dialog.add_response("cancel", _("Cancel"))
-        dialog.add_response("delete", _("Delete"))
-        dialog.set_response_appearance("delete", Adw.ResponseAppearance.DESTRUCTIVE)
-        dialog.connect("response", _confirm)
-        dialog.show()
 
     def on_trash_restore(self, *args) -> None:
         """
@@ -148,54 +133,63 @@ class Trash(Adw.Bin):
 
         Log.info("Trash: Restore")
 
-        # Get all tasks
-        tasks: list[Task] = []
-        task_lists: list[TaskList] = []
-        pages = self.stack.get_pages()
-        for i in range(pages.get_n_items()):
-            child = pages.get_item(i).get_child()
-            if hasattr(child, "get_all_tasks"):
-                task_lists.append(child)
-                tasks.extend(child.get_all_tasks())
+        trash_dicts: list[TaskData] = [
+            t for t in UserData.get_tasks_as_dicts() if t["trash"] and not t["deleted"]
+        ]
+        for task in trash_dicts:
+            UserData.update_props(task["list_uid"], task["uid"], ["trash"], [False])
 
-        for task in tasks:
-            task.update_props(["trash"], [False])
+        self.update_ui()
 
-        self.window.sidebar.task_lists.update_ui()
+    def update_ui(self):
+        tasks_dicts: list[TaskData] = [
+            t for t in UserData.get_tasks_as_dicts() if t["trash"] and not t["deleted"]
+        ]
+        tasks_uids: list[str] = [t["uid"] for t in tasks_dicts]
+        lists_dicts: list[TaskListData] = UserData.get_lists_as_dicts()
 
-        for row in get_children(self.trash_list):
-            self.trash_list.remove(row)
+        # Add items
+        items_uids = [t.uid for t in self.trash_items]
+        for t in tasks_dicts:
+            if t["uid"] not in items_uids:
+                self.add_trash_item(t)
 
-        self.update_status()
+        for item in self.trash_items:
+            # Remove items
+            if item.uid not in tasks_uids:
+                self.trash_list.remove(item)
+                continue
+
+            # Update title and subtitle
+            task_dict = [t for t in tasks_dicts if t["uid"] == item.uid][0]
+            list_dict = [l for l in lists_dicts if l["uid"] == task_dict["list_uid"]][0]
+            if item.row.get_title() != task_dict["text"]:
+                item.row.set_title(task_dict["text"])
+            if item.row.get_subtitle() != list_dict["name"]:
+                item.row.set_subtitle(list_dict["name"])
+
+        # Show status
+        self.status.set_visible(len(items_uids) == 0)
 
 
 class TrashItem(Adw.Bin):
-    def __init__(self, task_widget: Task, trash: Trash) -> None:
+    def __init__(self, task: TaskData, trash: Trash) -> None:
         super().__init__()
-        self.task_widget: Task = task_widget
-        self.uid: str = task_widget.uid
+        self.task = task
+        self.uid = task["uid"]
         self.trash: Trash = trash
         self.trash_list: Gtk.Box = trash.trash_list
         self._build_ui()
 
     def _build_ui(self) -> None:
         self.add_css_class("card")
-        row: Adw.ActionRow = Adw.ActionRow(
-            title=self.task_widget.get_prop("text"),
+        self.row: Adw.ActionRow = Adw.ActionRow(
+            title=self.task["text"],
             css_classes=["rounded-corners"],
             height_request=60,
             title_selectable=True,
         )
-        self.task_widget.task_row.connect(
-            "notify::title", lambda *_: row.set_title(self.task_widget.get_prop("text"))
-        )
-        self.task_widget.task_list.headerbar.title.bind_property(
-            "title",
-            row,
-            "subtitle",
-            GObject.BindingFlags.SYNC_CREATE,
-        )
-        row.add_suffix(
+        self.row.add_suffix(
             Button(
                 icon_name="emblem-ok-symbolic",
                 on_click=self.on_restore,
@@ -209,7 +203,7 @@ class TrashItem(Adw.Bin):
             css_classes=["rounded-corners"],
             accessible_role=Gtk.AccessibleRole.PRESENTATION,
         )
-        box.append(row)
+        box.append(self.row)
         self.set_child(box)
 
     def on_restore(self, _) -> None:
@@ -217,17 +211,11 @@ class TrashItem(Adw.Bin):
 
         Log.info(f"Restore task: {self.uid}")
 
-        tasks: list[Task] = []
-        tasks.append(self.task_widget)
-        tasks.extend(self.task_widget.get_parents_tree())
-        for task in tasks:
-            task.update_props(["trash"], [False])
+        parents_uids: list[str] = UserData.get_task_parents_uids_tree(
+            self.task["list_uid"], self.task["uid"]
+        )
+        parents_uids.append(self.task["uid"])
+        for uid in parents_uids:
+            UserData.update_props(self.task["list_uid"], uid, ["trash"], [False])
 
-        tasks_uids: list[str] = [t.uid for t in tasks]
-
-        for item in get_children(self.trash_list):
-            if item.uid in tasks_uids:
-                self.trash_list.remove(item)
-
-        self.task_widget.task_list.update_ui()
-        self.trash.update_status()
+        self.trash.update_ui()

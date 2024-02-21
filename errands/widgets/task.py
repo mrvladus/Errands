@@ -679,15 +679,9 @@ class Task(Gtk.Revealer):
         self.window = task_list.window
         self.parent = parent
         self.is_sub_task = is_sub_task
-        self.trash = task_list.window.trash
         self.details = task_list.details
 
         self._build_ui()
-
-        # Add to trash if needed
-        if self.get_prop("trash"):
-            self.trash.trash_add(self)
-
         self.just_added = False
 
     def _build_ui(self) -> None:
@@ -798,11 +792,10 @@ class Task(Gtk.Revealer):
         self.toggle_visibility(False)
         self.task_row.complete_btn.set_active(True)
         self.update_props(["trash", "synced"], [True, False])
-        self.trash.trash_add(self)
         for task in self.all_tasks:
-            # if not task.get_prop("trash"):
             task.delete()
         self.parent.update_ui()
+        self.window.sidebar.trash_item.update_ui()
 
     def expand(self, expanded: bool) -> None:
         self.sub_tasks_revealer.set_reveal_child(expanded)

@@ -16,6 +16,7 @@
     <file preprocess="xml-stripblanks" alias="errands-sync-symbolic.svg">icons/errands-sync-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-info-symbolic.svg">icons/errands-info-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-trash-symbolic.svg">icons/errands-trash-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-trash-full-symbolic.svg">icons/errands-trash-full-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-lists-symbolic.svg">icons/errands-lists-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-daytime-morning-symbolic.svg">icons/errands-daytime-morning-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-daytime-sunset-symbolic.svg">icons/errands-daytime-sunset-symbolic.svg</file>
