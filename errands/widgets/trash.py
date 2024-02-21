@@ -101,7 +101,7 @@ class Trash(Adw.Bin):
     def update_status(self) -> None:
         self.status.set_visible(len([t for t in get_children(self.trash_list)]) == 0)
 
-    def on_trash_clear(self, btn) -> None:
+    def on_trash_clear(self, *args) -> None:
         def _confirm(_, res) -> None:
             if res == "cancel":
                 Log.debug("Clear Trash cancelled")
@@ -141,7 +141,7 @@ class Trash(Adw.Bin):
         dialog.connect("response", _confirm)
         dialog.show()
 
-    def on_trash_restore(self, _) -> None:
+    def on_trash_restore(self, *args) -> None:
         """
         Remove trash items and restore all tasks
         """

@@ -369,10 +369,23 @@ class SidebarTrashItem(Gtk.ListBoxRow):
         super().__init__()
         self.window: Window = window
         self.__build_ui()
+        self.__create_actions()
+
+    def __create_actions(self) -> None:
+        group: Gio.SimpleActionGroup = Gio.SimpleActionGroup()
+        self.insert_action_group(name="trash_item", group=group)
+
+        def __create_action(name: str, callback: callable) -> None:
+            action: Gio.SimpleAction = Gio.SimpleAction.new(name, None)
+            action.connect("activate", callback)
+            group.add_action(action)
+
+        __create_action("clear", self.trash.on_trash_clear)
+        __create_action("restore", self.trash.on_trash_restore)
 
     def __build_ui(self) -> None:
-        trash = self.window.trash = Trash(self.window)
-        self.window.stack.add_titled(trash, "errands_trash_page", _("Trash"))
+        self.trash = self.window.trash = Trash(self.window)
+        self.window.stack.add_titled(self.trash, "errands_trash_page", _("Trash"))
 
         hbox = Gtk.Box(
             margin_start=3,
@@ -384,8 +397,8 @@ class SidebarTrashItem(Gtk.ListBoxRow):
 
         # Trash Menu
         trash_menu: Gio.Menu = Gio.Menu.new()
-        trash_menu.append(_("Restore"), "trash.restore")
-        trash_menu.append(_("Clear"), "trash.clear")
+        trash_menu.append(_("Restore"), "trash_item.restore")
+        trash_menu.append(_("Clear"), "trash_item.clear")
         hbox.append(
             Gtk.MenuButton(
                 menu_model=trash_menu,
@@ -577,6 +590,7 @@ class SidebarTaskListItem(Gtk.ListBoxRow):
         _create_action("export", _export)
 
     def _build_ui(self) -> None:
+        self.add_css_class("task-lists-item")
         self.props.height_request = 50
 
         # Label

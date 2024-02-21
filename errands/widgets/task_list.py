@@ -231,6 +231,8 @@ class TaskListEntry(Adw.Bin):
         entry.set_text("")
         if not on_top:
             scroll(self.task_list.scrl, True)
+
+        self.task_list.update_ui()
         Sync.sync()
 
 
