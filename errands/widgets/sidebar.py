@@ -302,13 +302,6 @@ class Sidebar(Adw.Bin):
         lists: list[TaskListData] = UserData.get_lists_as_dicts()
         uids: list[str] = [l["uid"] for l in lists]
 
-        # Select last list
-        for row in self.rows:
-            if hasattr(row, "name") and row.name == GSettings.get("last-open-list"):
-                Log.debug(f"Sidebar: Select last open row {row}")
-                self.list_box.select_row(row)
-                break
-
         # Delete lists
         for l in self.task_lists_rows:
             if l.uid not in uids:
@@ -327,6 +320,13 @@ class Sidebar(Adw.Bin):
         for row in self.rows:
             if hasattr(row, "update_ui"):
                 row.update_ui()
+
+        # Select last list
+        for row in self.rows:
+            if hasattr(row, "name") and row.name == GSettings.get("last-open-list"):
+                Log.debug(f"Sidebar: Select last open row {row}")
+                self.list_box.select_row(row)
+                break
 
         # Show status
         length: int = len(self.task_lists)
