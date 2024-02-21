@@ -249,11 +249,11 @@ class Sidebar(Adw.Bin):
 
         # --- Task Lists --- #
 
-        lists: list[dict] = [
-            i for i in UserData.get_lists_as_dicts() if not i["deleted"]
-        ]
-        for l in lists:
-            self.add_task_list(l["name"], l["uid"])
+        # lists: list[dict] = [
+        #     i for i in UserData.get_lists_as_dicts() if not i["deleted"]
+        # ]
+        # for l in lists:
+        #     self.add_task_list(l["name"], l["uid"])
 
         self.list_box.connect(
             "row-selected", lambda _, row: row.activate() if row else ...
@@ -304,7 +304,8 @@ class Sidebar(Adw.Bin):
 
         # Select last list
         for row in self.rows:
-            if row.name == GSettings.get("last-open-list"):
+            if hasattr(row, "name") and row.name == GSettings.get("last-open-list"):
+                Log.debug(f"Sidebar: Select last open row {row}")
                 self.list_box.select_row(row)
                 break
 
@@ -316,17 +317,16 @@ class Sidebar(Adw.Bin):
                 self.window.stack.remove(l.task_list)
                 self.list_box.remove(l)
 
-        # Update rows
-        for row in self.rows:
-            if hasattr(row, "update_ui"):
-                row.update_ui()
-
         # Add lists
         lists_uids = [l.list_uid for l in self.task_lists]
         for l in lists:
             if l["uid"] not in lists_uids:
-                print(l["name"])
                 self.add_task_list(l["name"], l["uid"])
+
+        # Update rows
+        for row in self.rows:
+            if hasattr(row, "update_ui"):
+                row.update_ui()
 
         # Show status
         length: int = len(self.task_lists)

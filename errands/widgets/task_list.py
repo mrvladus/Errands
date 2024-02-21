@@ -291,7 +291,6 @@ class TaskList(Adw.Bin):
         self.window: Window = window
         self.list_uid: str = list_uid
         self.__build_ui()
-        self.update_ui()
 
     def __build_ui(self) -> None:
         # Split View
