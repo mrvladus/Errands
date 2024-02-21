@@ -1,17 +1,16 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# Copyright (C) 2024 THE errands COPYRIGHT HOLDER
 # This file is distributed under the same license as the errands package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Bruce Cowan <bruce@bcowan.me.uk>
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-06 17:58+0300\n"
-"PO-Revision-Date: 2024-02-20 14:49+0100\n"
-"Last-Translator: acszoltan111@gmail.com\n"
-"Language-Team: \n"
-"Language: hu\n"
+"POT-Creation-Date: 2024-02-13 13:56+0000\n"
+"PO-Revision-Date: 2024-02-13 14:00+0000\n"
+"Last-Translator: Bruce Cowan <bruce@bcowan.me.uk>\n"
+"Language-Team: English - United Kingdom <en@li.org>\n"
+"Language: en_GB\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -19,42 +18,42 @@ msgstr ""
 
 #: errands/widgets/components.py:153
 msgid "Today"
-msgstr "Ma"
+msgstr "Today"
 
 #: errands/widgets/components.py:157
 msgid "Tomorrow"
-msgstr "Holnap"
+msgstr "Tomorrow"
 
 #: errands/widgets/components.py:167
 msgid "Now"
-msgstr "Most"
+msgstr "Now"
 
 #: errands/widgets/components.py:172 errands/widgets/trash.py:37
 msgid "Clear"
-msgstr "Ürítés"
+msgstr "Clear"
 
 #. Start date row
 #. End date row
 #: errands/widgets/components.py:231 errands/widgets/details.py:176
 #: errands/widgets/details.py:197
 msgid "Not Set"
-msgstr "Nincs beállítva"
+msgstr "Not Set"
 
 #: errands/widgets/preferences.py:31
 msgid "Application Theme"
-msgstr "Alkalmazástéma"
+msgstr "Application Theme"
 
 #: errands/widgets/preferences.py:39
 msgid "System"
-msgstr "Rendszer"
+msgstr "System"
 
 #: errands/widgets/preferences.py:51
 msgid "Light"
-msgstr "Világos"
+msgstr "Light"
 
 #: errands/widgets/preferences.py:63
 msgid "Dark"
-msgstr "Sötét"
+msgstr "Dark"
 
 #. Task lists group
 #. task_list_group = Adw.PreferencesGroup(title=_("Task Lists"))
@@ -67,446 +66,440 @@ msgstr "Sötét"
 #. Tasks group
 #: errands/widgets/preferences.py:80 errands/widgets/window.py:91
 msgid "Tasks"
-msgstr "Feladatok"
+msgstr "Tasks"
 
 #: errands/widgets/preferences.py:83
 msgid "Click Action"
-msgstr "Kattintás művelete"
+msgstr "Click Action"
 
 #: errands/widgets/preferences.py:84
 msgid "Open Details Panel"
-msgstr "Részletek panel megnyitása"
+msgstr "Open Details Panel"
 
 #: errands/widgets/preferences.py:84
 msgid "Show Sub-Tasks"
-msgstr "Alfeladatok megjelenítése"
+msgstr "Show Sub-Tasks"
 
 #: errands/widgets/preferences.py:99
 msgid "Complete Button Size"
-msgstr "Befejezés gomb mérete"
+msgstr "Complete Button Size"
 
 #: errands/widgets/preferences.py:100
 msgid "Small"
-msgstr "Kicsi"
+msgstr "Small"
 
 #: errands/widgets/preferences.py:100
 msgid "Big"
-msgstr "Nagy"
+msgstr "Big"
 
 #: errands/widgets/preferences.py:113
 msgid "Progress Bar"
-msgstr "Folyamatsáv"
+msgstr "Progress Bar"
 
 #: errands/widgets/preferences.py:119
 msgid "Tool Bar"
-msgstr "Eszköztár"
+msgstr "Tool Bar"
 
 #: errands/widgets/preferences.py:126 errands/widgets/preferences.py:194
 #: data/resources/gtk/help-overlay.ui:38
 msgid "Sync"
-msgstr "Szinkronizáció"
+msgstr "Sync"
 
 #. Provider
 #: errands/widgets/preferences.py:129
 msgid "Disabled"
-msgstr "Letiltva"
+msgstr "Disabled"
 
 #: errands/widgets/preferences.py:131
 msgid "Sync Provider"
-msgstr "Szinkronizáció szolgáltató"
+msgstr "Sync Provider"
 
 #: errands/widgets/preferences.py:140
 msgid "Server URL"
-msgstr "Szerver URL"
+msgstr "Server URL"
 
 #: errands/widgets/preferences.py:146
 msgid "Username"
-msgstr "Felhasználónév"
+msgstr "Username"
 
 #: errands/widgets/preferences.py:152
 msgid "Password"
-msgstr "Jelszó"
+msgstr "Password"
 
 #: errands/widgets/preferences.py:158
 msgid "Test"
-msgstr "Teszt"
+msgstr "Test"
 
 #: errands/widgets/preferences.py:163
 msgid "Test Connection"
-msgstr "Kapcsolat tesztelése"
+msgstr "Test Connection"
 
 #: errands/widgets/preferences.py:171
 msgid "Details Panel"
-msgstr "Részletek panel"
+msgstr "Details Panel"
 
 #: errands/widgets/preferences.py:174
 msgid "Position"
-msgstr "Pozíció"
+msgstr "Position"
 
 #: errands/widgets/preferences.py:175
 msgid "Left"
-msgstr "Bal"
+msgstr "Left"
 
 #: errands/widgets/preferences.py:175
 msgid "Right"
-msgstr "Jobb"
+msgstr "Right"
 
 #: errands/widgets/preferences.py:184
 msgid "Appearance"
-msgstr "Megjelenés"
+msgstr "Appearance"
 
 #: errands/widgets/preferences.py:230
 msgid "Connected"
-msgstr "Csatlakozva"
+msgstr "Connected"
 
 #: errands/widgets/preferences.py:230
 msgid "Can't connect"
-msgstr "Nem lehet csatlakozni"
+msgstr "Can't connect"
 
 #: errands/widgets/sidebar.py:67 errands/widgets/window.py:38
 #: errands/widgets/window.py:129 data/io.github.mrvladus.List.desktop.in.in:3
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:27
 msgid "Errands"
-msgstr "Tennivalók"
+msgstr "Errands"
 
 #: errands/widgets/sidebar.py:75
 msgid "Import List"
-msgstr "Lista importálása"
+msgstr "Import List"
 
 #: errands/widgets/sidebar.py:80
 msgid "Add List (Ctrl+A)"
-msgstr "Lista hozzáadása (Ctrl+A)"
+msgstr "Add List (Ctrl+A)"
 
 #: errands/widgets/sidebar.py:82
 msgid "More Options"
-msgstr "További lehetőségek"
+msgstr "More Options"
 
 #. top_section.append(_("Secret Notes"), "app.secret_notes")
 #: errands/widgets/sidebar.py:99 data/resources/gtk/help-overlay.ui:42
 msgid "Sync / Fetch Tasks"
-msgstr "Feladatok szinkronizálása / lekérése"
+msgstr "Sync / Fetch Tasks"
 
 #: errands/widgets/sidebar.py:102 data/resources/gtk/help-overlay.ui:20
 msgid "Preferences"
-msgstr "Beállítások"
+msgstr "Preferences"
 
 #: errands/widgets/sidebar.py:103
 msgid "Keyboard Shortcuts"
-msgstr "Gyorsbillentyűk"
+msgstr "Keyboard Shortcuts"
 
 #: errands/widgets/sidebar.py:104
 msgid "About Errands"
-msgstr "A Tennivalók névjegye"
+msgstr "About Errands"
 
 #: errands/widgets/sidebar.py:110
 msgid "Main Menu"
-msgstr "Főmenü"
+msgstr "Main Menu"
 
 #: errands/widgets/sidebar.py:116
 msgid "Syncing..."
-msgstr "Szinkronizálás..."
+msgstr "Syncing..."
 
 #: errands/widgets/sidebar.py:141
 msgid "New List Name"
-msgstr "Új listanév"
+msgstr "New List Name"
 
 #: errands/widgets/sidebar.py:145 data/resources/gtk/help-overlay.ui:57
 msgid "Add List"
-msgstr "Lista hozzáadása"
+msgstr "Add List"
 
 #: errands/widgets/sidebar.py:150 errands/widgets/sidebar.py:342
 #: errands/widgets/sidebar.py:385 errands/widgets/trash.py:136
 msgid "Cancel"
-msgstr "Mégse"
+msgstr "Cancel"
 
 #: errands/widgets/sidebar.py:151
 msgid "Add"
-msgstr "Hozzáadás"
+msgstr "Add"
 
 #: errands/widgets/sidebar.py:168
 msgid "Add new List"
-msgstr "Új lista hozzáadása"
+msgstr "Add new List"
 
 #: errands/widgets/sidebar.py:169
 msgid "Click \"+\" button"
-msgstr "Kattintson a \"+\" gombra"
+msgstr "Click \"+\" button"
 
 #: errands/widgets/sidebar.py:337 errands/widgets/trash.py:131
 msgid "Are you sure?"
-msgstr "Biztos benne?"
+msgstr "Are you sure?"
 
 #: errands/widgets/sidebar.py:338
 msgid "List will be permanently deleted"
-msgstr "A lista véglegesen törölve lesz"
+msgstr "List will be permanently deleted"
 
 #: errands/widgets/sidebar.py:343 errands/widgets/sidebar.py:478
 #: errands/widgets/details.py:54 errands/widgets/trash.py:137
 msgid "Delete"
-msgstr "Törlés"
+msgstr "Delete"
 
 #: errands/widgets/sidebar.py:375
 msgid "New Name"
-msgstr "Új név"
+msgstr "New Name"
 
 #: errands/widgets/sidebar.py:380
 msgid "Rename List"
-msgstr "Lista átnevezése"
+msgstr "Rename List"
 
 #: errands/widgets/sidebar.py:386 errands/widgets/details.py:114
 #: errands/widgets/details.py:155
 msgid "Save"
-msgstr "Mentés"
+msgstr "Save"
 
 #: errands/widgets/sidebar.py:444
 msgid "Export failed"
-msgstr "Az exportálás sikertelen"
+msgstr "Export failed"
 
 #: errands/widgets/sidebar.py:446 errands/widgets/details.py:487
 msgid "Exported"
-msgstr "Exportálva"
+msgstr "Exported"
 
 #: errands/widgets/sidebar.py:477
 msgid "Rename"
-msgstr "Átnevezés"
+msgstr "Rename"
 
 #. Export group
 #: errands/widgets/sidebar.py:479 errands/widgets/details.py:239
 #: errands/widgets/details.py:247
 msgid "Export"
-msgstr "Exportálás"
+msgstr "Export"
 
 #: errands/widgets/sidebar.py:505
 msgid "Menu"
-msgstr "Menü"
+msgstr "Menu"
 
 #: errands/widgets/sidebar.py:563 errands/widgets/trash.py:30
 #: errands/widgets/window.py:61
 msgid "Trash"
-msgstr "Kuka"
+msgstr "Wastebasket"
 
 #: errands/widgets/task_list.py:40 errands/widgets/task_list.py:55
 #: errands/widgets/task_list.py:96 errands/widgets/task_list.py:107
 msgid "Toggle Sidebar"
-msgstr "Oldalsáv megjelenítése / elrejtése"
+msgstr "Toggle Sidebar"
 
 #: errands/widgets/task_list.py:70 errands/widgets/task_list.py:120
 msgid "Delete Completed Tasks"
-msgstr "Befejezett feladatok törlése"
+msgstr "Delete Completed Tasks"
 
 #: errands/widgets/task_list.py:80 errands/widgets/task_list.py:134
 msgid "Scroll Up"
-msgstr "A tetejére"
+msgstr "Scroll Up"
 
 #: errands/widgets/task_list.py:277 errands/widgets/task.py:217
 msgid "Completed:"
-msgstr "Befejezett:"
+msgstr "Completed:"
 
 #: errands/widgets/task_list.py:401
 msgid "Add new Task"
-msgstr "Új feladat hozzáadása"
+msgstr "Add new Task"
 
 #: errands/widgets/details.py:63
 msgid "No Details"
-msgstr "Nincsenek részletek"
+msgstr "No Details"
 
 #: errands/widgets/details.py:64
 msgid "Click on task to show more info"
-msgstr "Kattintson a feladatra a további információ megjelenítéséhez"
+msgstr "Click on task to show more info"
 
 #: errands/widgets/details.py:81
 msgid "Clear Style"
-msgstr "Stílus törlése"
+msgstr "Clear Style"
 
 #. Edit group
 #: errands/widgets/details.py:90
 msgid "Text"
-msgstr "Szöveg"
+msgstr "Text"
 
 #: errands/widgets/details.py:124 errands/widgets/details.py:166
 msgid "Copy Text"
-msgstr "Szöveg másolása"
+msgstr "Copy Text"
 
 #. Notes group
 #: errands/widgets/details.py:131
 msgid "Notes"
-msgstr "Jegyzetek"
+msgstr "Notes"
 
 #. Properties group
 #: errands/widgets/details.py:173
 msgid "Properties"
-msgstr "Tulajdonságok"
+msgstr "Properties"
 
 #: errands/widgets/details.py:176
 msgid "Start"
-msgstr "Kezdet"
+msgstr "Start"
 
 #: errands/widgets/details.py:183 errands/widgets/details.py:204
 msgid "Set Date"
-msgstr "Dátum beállítása"
+msgstr "Set Date"
 
 #: errands/widgets/details.py:197
 msgid "Due"
-msgstr "Lejárat"
+msgstr "Due"
 
 #. Complete % row
 #: errands/widgets/details.py:212
 msgid "Complete %"
-msgstr "Befejezett %"
+msgstr "Complete %"
 
 #. Priority row
 #: errands/widgets/details.py:222
 msgid "Priority"
-msgstr "Prioritás"
+msgstr "Priority"
 
 #. Tags group
 #: errands/widgets/details.py:232
 msgid "Tags"
-msgstr "Címkék"
+msgstr "Tags"
 
 #. Tags entry
 #: errands/widgets/details.py:234
 msgid "Add Tag"
-msgstr "Címke hozzáadása"
+msgstr "Add Tag"
 
 #: errands/widgets/details.py:248
 msgid "Save Task as .ics file"
-msgstr "Feladat mentése .ics fájlként"
+msgstr "Save Task as .ics file"
 
 #: errands/widgets/details.py:440
 msgid "Copied to Clipboard"
-msgstr "Vágólapra másolva"
+msgstr "Copied to Clipboard"
 
 #: errands/widgets/task.py:301 errands/widgets/task.py:312
 msgid "Mark as Completed"
-msgstr "Befejezettként jelölés"
+msgstr "Mark as Completed"
 
 #: errands/widgets/task.py:399
 msgid "Expand / Fold"
-msgstr "Kinyitás / becsukás"
+msgstr "Expand / Fold"
 
 #: errands/widgets/task.py:419 data/resources/gtk/help-overlay.ui:68
 msgid "Details"
-msgstr "Részletek"
+msgstr "Details"
 
 #: errands/widgets/task.py:530
 msgid "Add new Sub-Task"
-msgstr "Új alfeladat hozzáadása"
+msgstr "Add new Sub-Task"
 
 #: errands/widgets/trash.py:45
 msgid "Restore All"
-msgstr "Összes visszaállítása"
+msgstr "Restore All"
 
 #: errands/widgets/trash.py:51
 msgid "Empty Trash"
-msgstr "Kuka ürítése"
+msgstr "Empty Wastebasket"
 
 #: errands/widgets/trash.py:52
 msgid "No deleted items"
-msgstr "Nincsenek törölt elemek"
+msgstr "No deleted items"
 
 #: errands/widgets/trash.py:132
 msgid "Tasks will be permanently deleted"
-msgstr "A feladatok véglegesen törölve lesznek"
+msgstr "Tasks will be permanently deleted"
 
 #: errands/widgets/trash.py:212
 msgid "Restore"
-msgstr "Visszaállítás"
+msgstr "Restore"
 
 #: errands/widgets/window.py:67 errands/widgets/window.py:84
 msgid "No Task Lists"
-msgstr "Nincsenek feladatlisták"
+msgstr "No Task Lists"
 
 #: errands/widgets/window.py:69
 msgid "Create List"
-msgstr "Lista létrehozása"
+msgstr "Create List"
 
 #: errands/widgets/window.py:90 data/resources/gtk/help-overlay.ui:53
 msgid "Lists"
-msgstr "Listák"
+msgstr "Lists"
 
 #: errands/widgets/window.py:134
 msgid "translator-credits"
-msgstr "zoli111"
+msgstr "Bruce Cowan <bruce@bcowan.me.uk>"
 
 #: errands/widgets/window.py:143
 msgid "Sync is disabled"
-msgstr "A szinkronizáció letiltva"
+msgstr "Sync is disabled"
 
 #: errands/widgets/window.py:212
 msgid "Imported"
-msgstr "Importálva"
+msgstr "Imported"
 
 #: errands/lib/sync/providers/caldav.py:42
 msgid "Not all sync credentials provided. Please check settings."
-msgstr ""
-"Nincs minden szinkronizálási adat megadva. Kérjük, ellenőrizze a "
-"beállításokat."
+msgstr "Not all sync credentials provided. Please check settings."
 
 #: errands/lib/sync/providers/caldav.py:81
 msgid "Can't connect to CalDAV server at:"
-msgstr "Nem lehet csatlakozni a CalDAV szerverhez itt:"
+msgstr "Can't connect to CalDAV server at:"
 
 #: data/resources/gtk/help-overlay.ui:9
 msgid "General"
-msgstr "Általános"
+msgstr "General"
 
 #: data/resources/gtk/help-overlay.ui:13
 msgid "Show keyboard shortcuts"
-msgstr "Gyorsbillentyűk megjelenítése"
+msgstr "Show keyboard shortcuts"
 
 #: data/resources/gtk/help-overlay.ui:27
 msgid "Quit"
-msgstr "Kilépés"
+msgstr "Quit"
 
 #: data/resources/gtk/help-overlay.ui:72
 msgid "Toggle Details"
-msgstr "Részletek megjelenítése / elrejtése"
+msgstr "Toggle Details"
 
 #: data/io.github.mrvladus.List.desktop.in.in:4
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:28
 msgid "Manage your tasks"
-msgstr "Kezelje a feladatait"
+msgstr "Manage your tasks"
 
 #: data/io.github.mrvladus.List.desktop.in.in:10
 msgid "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
-msgstr ""
-"errands;tasks;list;todo;caldav;nextcloud;feladatok;tennivalók;szinkronizáció;"
+msgstr "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:30
 msgid "Todo application for those who prefer simplicity."
-msgstr "Egy teendők alkalmazás az egyszerűséget kedvelőknek."
+msgstr "Todo application for those who prefer simplicity."
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:31
 msgid "Features:"
-msgstr "Funkciók:"
+msgstr "Features:"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:33
 msgid "Multiple task lists support"
-msgstr "Több feladatlista támogatása"
+msgstr "Multiple task lists support"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:34
 msgid "Add, remove, edit tasks and sub-tasks"
-msgstr "Feladatok és alfeladatok hozzáadása, eltávolítása, szerkesztése"
+msgstr "Add, remove, edit tasks and sub-tasks"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:35
 msgid "Mark task and sub-tasks as completed"
-msgstr "Feladatok és alfeladatok befejezettként jelölése"
+msgstr "Mark task and sub-tasks as completed"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:36
 msgid "Add accent color for each task"
-msgstr "Kiemelőszín hozzáadása minden egyes feladathoz"
+msgstr "Add accent colour for each task"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:37
 msgid "Sync tasks with Nextcloud or other CalDAV providers"
-msgstr "Feladatok szinkronizálása Nextcloud vagy CalDAV szolgáltatókkal"
+msgstr "Sync tasks with Nextcloud or other CalDAV providers"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:38
 msgid "Drag and Drop support"
-msgstr "Húzd és ejtsd támogatás"
+msgstr "Drag and Drop support"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:39
 msgid "Import .ics files"
-msgstr ".ics fájlok importálása"
-
-#~ msgid "Save changed details"
-#~ msgstr "Megváltoztatott részletek mentése"
+msgstr "Import .ics files"
