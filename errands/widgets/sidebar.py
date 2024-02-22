@@ -315,7 +315,7 @@ class Sidebar(Adw.Bin):
         # Select last list
         for row in self.rows:
             if hasattr(row, "name") and row.name == GSettings.get("last-open-list"):
-                Log.debug(f"Sidebar: Select last open row {row}")
+                Log.debug("Sidebar: Select last opened item")
                 self.list_box.select_row(row)
                 break
 
