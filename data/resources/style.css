@@ -7,6 +7,10 @@
   background-color: @blue_1;
 }
 
+.sidebar-item-trash:drop(active) {
+  background-color: @orange_1;
+}
+
 /* Task */
 
 .task-title:drop(active) {

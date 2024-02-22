@@ -107,7 +107,7 @@ class SidebarHeaderBar(Adw.Bin):
             name = entry.props.text.rstrip().lstrip()
             list_dict = UserData.add_list(name)
             row = self.sidebar.add_task_list(list_dict)
-            row.do_activate()
+            row.activate()
             Sync.sync()
 
         entry = Gtk.Entry(placeholder_text=_("New List Name"))
@@ -401,6 +401,7 @@ class SidebarTrashItem(Adw.ActionRow):
         self.set_icon_name("errands-trash-symbolic")
         self.set_activatable(True)
         self.add_css_class("sidebar-item")
+        self.add_css_class("sidebar-item-trash")
         self.connect("activated", self.__activated)
 
         # Size counter
@@ -454,7 +455,7 @@ class SidebarTrashItem(Adw.ActionRow):
         self.size_counter.set_label("" if size == 0 else str(size))
 
 
-class SidebarTaskListItem(Gtk.ListBoxRow):
+class SidebarTaskListItem(Adw.ActionRow):
     def __init__(self, list_dict: TaskListData, sidebar: Sidebar) -> None:
         super().__init__()
         self.window: Window = sidebar.window
@@ -609,27 +610,38 @@ class SidebarTaskListItem(Gtk.ListBoxRow):
         _create_action("export", _export)
 
     def __build_ui(self) -> None:
-        self.add_css_class("task-lists-item")
-        self.props.height_request = 50
 
-        # Task list
+        # Add Task List page
         self.task_list: TaskList = TaskList(self.window, self.uid)
         self.stack_page: Adw.ViewStackPage = self.window.stack.add_titled(
             child=self.task_list, name=self.name, title=self.name
         )
 
-        # Label
-        self.label: Gtk.Label = Gtk.Label(
-            halign="start",
-            hexpand=True,
-            ellipsize=3,
-        )
+        # Customize internal AdwActionRow styles
+        internal_box: Gtk.Box = self.get_child()
+        internal_box.remove_css_class("header")
+        internal_box.set_margin_start(6)
+        internal_box.set_spacing(12)
 
-        # Menu
+        self.props.height_request = 50
+        self.set_title(self.name)
+        self.set_activatable(True)
+        self.add_css_class("sidebar-item")
+        self.connect("activated", self.__activated)
+
         menu: Gio.Menu = Gio.Menu.new()
         menu.append(_("Rename"), "list_item.rename")
         menu.append(_("Delete"), "list_item.delete")
         menu.append(_("Export"), "list_item.export")
+        self.add_suffix(
+            Gtk.MenuButton(
+                menu_model=menu,
+                icon_name="view-more-symbolic",
+                tooltip_text=_("Menu"),
+                css_classes=["flat"],
+                valign=Gtk.Align.CENTER,
+            )
+        )
 
         # Drop controller
         drop_ctrl: Gtk.DropTarget = Gtk.DropTarget.new(
@@ -642,21 +654,6 @@ class SidebarTaskListItem(Gtk.ListBoxRow):
         drop_hover_ctrl: Gtk.DropControllerMotion = Gtk.DropControllerMotion()
         drop_hover_ctrl.connect("enter", self._on_drop_hover)
         self.add_controller(drop_hover_ctrl)
-
-        # HBOX
-        hbox: Gtk.Box = Gtk.Box(margin_start=3)
-        hbox.append(self.label)
-        hbox.append(
-            Gtk.MenuButton(
-                menu_model=menu,
-                icon_name="view-more-symbolic",
-                tooltip_text=_("Menu"),
-                css_classes=["flat"],
-                valign=Gtk.Align.CENTER,
-            )
-        )
-
-        self.set_child(hbox)
 
     def _on_drop_hover(self, ctrl: Gtk.DropControllerMotion, _x, _y):
         """
@@ -693,10 +690,10 @@ class SidebarTaskListItem(Gtk.ListBoxRow):
         # self.task_list.add_task(uid)
         Sync.sync()
 
-    def do_activate(self) -> None:
+    def __activated(self, *args) -> None:
         Log.debug(f"Sidebar: Switch to list '{self.uid}'")
 
-        self.window.stack.set_visible_child_name(self.label.get_label())
+        self.window.stack.set_visible_child_name(self.get_title())
         self.window.split_view.set_show_content(True)
         GSettings.set("last-open-list", "s", self.name)
 
@@ -705,7 +702,7 @@ class SidebarTaskListItem(Gtk.ListBoxRow):
         self.name = [
             i["name"] for i in UserData.get_lists_as_dicts() if i["uid"] == self.uid
         ][0]
-        self.label.set_text(self.name)
+        self.set_title(self.name)
         self.stack_page.set_name(self.name)
         self.stack_page.set_title(self.name)
         self.task_list.update_ui()

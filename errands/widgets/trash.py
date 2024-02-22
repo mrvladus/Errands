@@ -96,7 +96,7 @@ class Trash(Adw.Bin):
         return get_children(self.trash_list)
 
     def add_trash_item(self, uid: str) -> None:
-        self.trash_list.append(TrashItem(uid, self))
+        self.trash_list.append(TrashItem(uid))
         self.status.set_visible(False)
 
     def on_trash_clear(self, *args) -> None:
@@ -148,19 +148,19 @@ class Trash(Adw.Bin):
         lists_dicts: list[TaskListData] = UserData.get_lists_as_dicts()
 
         # Add items
-        items_uids = [t.uid for t in self.trash_items]
+        items_uids = [t.task_dict["uid"] for t in self.trash_items]
         for t in tasks_dicts:
             if t["uid"] not in items_uids:
                 self.add_trash_item(t)
 
         for item in self.trash_items:
             # Remove items
-            if item.uid not in tasks_uids:
+            if item.task_dict["uid"] not in tasks_uids:
                 self.trash_list.remove(item)
                 continue
 
             # Update title and subtitle
-            task_dict = [t for t in tasks_dicts if t["uid"] == item.uid][0]
+            task_dict = [t for t in tasks_dicts if t["uid"] == item.task_dict["uid"]][0]
             list_dict = [l for l in lists_dicts if l["uid"] == task_dict["list_uid"]][0]
             if item.row.get_title() != task_dict["text"]:
                 item.row.set_title(task_dict["text"])
@@ -172,18 +172,16 @@ class Trash(Adw.Bin):
 
 
 class TrashItem(Adw.Bin):
-    def __init__(self, task: TaskData, trash: Trash) -> None:
+    def __init__(self, task: TaskData) -> None:
         super().__init__()
-        self.task = task
-        self.uid = task["uid"]
-        self.trash: Trash = trash
-        self.trash_list: Gtk.Box = trash.trash_list
-        self._build_ui()
+        self.task_dict: TaskData = task
+        self.window: Window = Gio.Application.get_default().get_active_window()
+        self.__build_ui()
 
-    def _build_ui(self) -> None:
+    def __build_ui(self) -> None:
         self.add_css_class("card")
         self.row: Adw.ActionRow = Adw.ActionRow(
-            title=self.task["text"],
+            title=self.task_dict["text"],
             css_classes=["rounded-corners"],
             height_request=60,
             title_selectable=True,
@@ -208,13 +206,13 @@ class TrashItem(Adw.Bin):
     def on_restore(self, _) -> None:
         """Restore task and its parents"""
 
-        Log.info(f"Restore task: {self.uid}")
+        Log.info(f"Restore task: {self.task_dict['uid']}")
 
         parents_uids: list[str] = UserData.get_task_parents_uids_tree(
-            self.task["list_uid"], self.task["uid"]
+            self.task_dict["list_uid"], self.task_dict["uid"]
         )
-        parents_uids.append(self.task["uid"])
+        parents_uids.append(self.task_dict["uid"])
         for uid in parents_uids:
-            UserData.update_props(self.task["list_uid"], uid, ["trash"], [False])
+            UserData.update_props(self.task_dict["list_uid"], uid, ["trash"], [False])
 
-        self.trash.update_ui()
+        self.window.sidebar.update_ui()
