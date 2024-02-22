@@ -168,7 +168,7 @@ class Trash(Adw.Bin):
                 item.row.set_subtitle(list_dict["name"])
 
         # Show status
-        self.status.set_visible(len(items_uids) == 0)
+        self.status.set_visible(len(self.trash_items) == 0)
 
 
 class TrashItem(Adw.Bin):

@@ -326,7 +326,7 @@ class Sidebar(Adw.Bin):
             self.window.stack.set_visible_child_name("status")
 
 
-class SidebarTodayItem(Gtk.ListBoxRow):
+class SidebarTodayItem(Adw.ActionRow):
     def __init__(self, window: Window) -> None:
         super().__init__()
         self.window: Window = window
@@ -334,24 +334,29 @@ class SidebarTodayItem(Gtk.ListBoxRow):
         self.__build_ui()
 
     def __build_ui(self) -> None:
+        # Add Today page
         self.window.stack.add_titled(
             Adw.StatusPage(title=_("No Tasks for Today")),
             "errands_today_page",
             _("Today"),
         )
 
-        hbox = Gtk.Box(
-            margin_start=3,
-            spacing=12,
-            height_request=50,
-        )
-        hbox.append(Gtk.Image(icon_name="errands-calendar-symbolic"))
-        hbox.append(Gtk.Label(label=_("Today"), hexpand=True, halign=Gtk.Align.START))
+        # Customize internal AdwActionRow styles
+        internal_box: Gtk.Box = self.get_child()
+        internal_box.remove_css_class("header")
+        internal_box.set_margin_start(6)
+        internal_box.set_spacing(12)
 
-        self.set_child(hbox)
+        self.props.height_request = 50
+        self.set_title(_("Today"))
+        self.set_icon_name("errands-calendar-symbolic")
+        self.set_activatable(True)
+        self.add_css_class("sidebar-item")
+        self.connect("activated", self.__activated)
 
-    def do_activate(self) -> None:
+    def __activated(self, *args) -> None:
         Log.debug(f"Sidebar: Open Today")
+
         self.window.stack.set_visible_child_name(self.name)
         self.window.split_view.set_show_content(True)
         GSettings.set("last-open-list", "s", self.name)
@@ -360,7 +365,7 @@ class SidebarTodayItem(Gtk.ListBoxRow):
         pass
 
 
-class SidebarTrashItem(Gtk.ListBoxRow):
+class SidebarTrashItem(Adw.ActionRow):
     def __init__(self, window: Window) -> None:
         super().__init__()
         self.window: Window = window
@@ -381,23 +386,35 @@ class SidebarTrashItem(Gtk.ListBoxRow):
         __create_action("restore", self.trash.on_trash_restore)
 
     def __build_ui(self) -> None:
+        # Create trash page
         self.trash = Trash()
         self.window.stack.add_titled(self.trash, "errands_trash_page", _("Trash"))
 
-        hbox = Gtk.Box(
-            margin_start=3,
-            spacing=12,
-            height_request=50,
-        )
-        self.icon: Gtk.Image = Gtk.Image(icon_name="errands-trash-symbolic")
-        hbox.append(self.icon)
-        hbox.append(Gtk.Label(label=_("Trash"), hexpand=True, halign=Gtk.Align.START))
+        # Customize internal AdwActionRow styles
+        internal_box: Gtk.Box = self.get_child()
+        internal_box.remove_css_class("header")
+        internal_box.set_margin_start(6)
+        internal_box.set_spacing(12)
+
+        self.props.height_request = 50
+        self.set_title(_("Trash"))
+        self.set_icon_name("errands-trash-symbolic")
+        self.set_activatable(True)
+        self.add_css_class("sidebar-item")
+        self.connect("activated", self.__activated)
+
+        # Size counter
+        self.size_counter: Gtk.Label = Gtk.Label(css_classes=["dim-label", "caption"])
 
         # Trash Menu
         trash_menu: Gio.Menu = Gio.Menu.new()
         trash_menu.append(_("Restore"), "trash_item.restore")
         trash_menu.append(_("Clear"), "trash_item.clear")
-        hbox.append(
+
+        # Suffix box
+        suffix_box: Gtk.Box = Gtk.Box(spacing=12)
+        suffix_box.append(self.size_counter)
+        suffix_box.append(
             Gtk.MenuButton(
                 menu_model=trash_menu,
                 icon_name="view-more-symbolic",
@@ -405,15 +422,14 @@ class SidebarTrashItem(Gtk.ListBoxRow):
                 css_classes=["flat"],
             )
         )
+        self.add_suffix(suffix_box)
 
         # Trash drop controller
         trash_drop_ctrl = Gtk.DropTarget.new(actions=Gdk.DragAction.MOVE, type=Task)
         trash_drop_ctrl.connect("drop", lambda _d, task, _x, _y: task.delete())
         self.add_controller(trash_drop_ctrl)
 
-        self.set_child(hbox)
-
-    def do_activate(self) -> None:
+    def __activated(self, *args) -> None:
         Log.debug(f"Sidebar: Open Trash")
 
         self.window.stack.set_visible_child_name(self.name)
@@ -424,15 +440,18 @@ class SidebarTrashItem(Gtk.ListBoxRow):
         # Update trash
         self.trash.update_ui()
 
-        # Update actions state
-        self.group.lookup_action("clear").set_enabled(len(self.trash.trash_items) > 0)
-        self.group.lookup_action("restore").set_enabled(len(self.trash.trash_items) > 0)
+        # Get trash size
+        size: int = len(self.trash.trash_items)
 
-        # Update icon
-        if len(self.trash.trash_items) == 0:
-            self.icon.props.icon_name = "errands-trash-symbolic"
-        else:
-            self.icon.props.icon_name = "errands-trash-full-symbolic"
+        # Update actions state
+        self.group.lookup_action("clear").set_enabled(size > 0)
+        self.group.lookup_action("restore").set_enabled(size > 0)
+
+        # Update icon name
+        self.set_icon_name(f"errands-trash{'-full' if size > 0 else ''}-symbolic")
+
+        # Update subtitle
+        self.size_counter.set_label("" if size == 0 else str(size))
 
 
 class SidebarTaskListItem(Gtk.ListBoxRow):

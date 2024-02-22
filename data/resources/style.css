@@ -1,9 +1,9 @@
 /* Task lists item */
-.task-lists-item {
+.sidebar-item {
   transition: background-color 0.2s;
 }
 
-.task-lists-item:drop(active) {
+.sidebar-item:drop(active) {
   background-color: @blue_1;
 }
 
