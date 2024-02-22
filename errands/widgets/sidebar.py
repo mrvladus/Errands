@@ -496,7 +496,9 @@ class SidebarTaskListItem(Gtk.ListBoxRow):
                         (text, self.uid),
                     )
                 )
-                self.sidebar.update_ui()
+                self.update_ui()
+                self.sidebar.trash_item.update_ui()
+                self.sidebar.today_item.update_ui()
                 Sync.sync()
 
             entry: Gtk.Entry = Gtk.Entry(placeholder_text=_("New Name"))
