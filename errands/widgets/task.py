@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: MIT
 
 from __future__ import annotations
-import time
 from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -18,7 +17,6 @@ from errands.lib.utils import get_children, threaded
 from errands.lib.gsettings import GSettings
 
 
-# TODO
 class TaskTopDropArea(Gtk.Revealer):
     def __init__(self, task: Task):
         super().__init__()
@@ -64,8 +62,8 @@ class TaskTopDropArea(Gtk.Revealer):
         # If task has the same parent
         if task.parent == self.task.parent:
             # Move widget
-            self.task.parent.tasks_list.reorder_child_after(task, self.task)
-            self.task.parent.tasks_list.reorder_child_after(self.task, task)
+            self.task.get_parent().reorder_child_after(task, self.task)
+            self.task.get_parent().reorder_child_after(self.task, task)
             return True
         # Change parent if different parents
         UserData.update_props(
@@ -77,15 +75,13 @@ class TaskTopDropArea(Gtk.Revealer):
         # Add new task widget
         new_task: Task = Task(
             task.uid,
-            self.task.list_uid,
-            self.task.window,
             self.task.task_list,
             self.task.parent,
             self.task.get_prop("parent") != None,
         )
-        self.task.parent.tasks_list.append(new_task)
-        self.task.parent.tasks_list.reorder_child_after(new_task, self.task)
-        self.task.parent.tasks_list.reorder_child_after(self.task, new_task)
+        self.task.get_parent().append(new_task)
+        self.task.get_parent().reorder_child_after(new_task, self.task)
+        self.task.get_parent().reorder_child_after(self.task, new_task)
         new_task.toggle_visibility(True)
         # Toggle completion
         if not task.task_row.complete_btn.get_active():
