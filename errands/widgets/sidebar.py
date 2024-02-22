@@ -369,13 +369,13 @@ class SidebarTrashItem(Gtk.ListBoxRow):
         self.__create_actions()
 
     def __create_actions(self) -> None:
-        group: Gio.SimpleActionGroup = Gio.SimpleActionGroup()
-        self.insert_action_group(name="trash_item", group=group)
+        self.group: Gio.SimpleActionGroup = Gio.SimpleActionGroup()
+        self.insert_action_group(name="trash_item", group=self.group)
 
         def __create_action(name: str, callback: callable) -> None:
             action: Gio.SimpleAction = Gio.SimpleAction.new(name, None)
             action.connect("activate", callback)
-            group.add_action(action)
+            self.group.add_action(action)
 
         __create_action("clear", self.trash.on_trash_clear)
         __create_action("restore", self.trash.on_trash_restore)
@@ -423,6 +423,10 @@ class SidebarTrashItem(Gtk.ListBoxRow):
     def update_ui(self):
         # Update trash
         self.trash.update_ui()
+
+        # Update actions state
+        self.group.lookup_action("clear").set_enabled(len(self.trash.trash_items) > 0)
+        self.group.lookup_action("restore").set_enabled(len(self.trash.trash_items) > 0)
 
         # Update icon
         if len(self.trash.trash_items) == 0:
