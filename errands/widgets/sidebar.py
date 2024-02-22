@@ -105,9 +105,9 @@ class SidebarHeaderBar(Adw.Bin):
                 return
 
             name = entry.props.text.rstrip().lstrip()
-            uid = UserData.add_list(name)
-            row = self.sidebar.add_task_list(name, uid)
-            self.list_box.select_row(row)
+            list_dict = UserData.add_list(name)
+            row = self.sidebar.add_task_list(list_dict)
+            row.do_activate()
             Sync.sync()
 
         entry = Gtk.Entry(placeholder_text=_("New List Name"))
@@ -221,6 +221,9 @@ class Sidebar(Adw.Bin):
         self.list_box = Gtk.ListBox(
             css_classes=["navigation-sidebar"], activate_on_single_click=False
         )
+        self.list_box.connect(
+            "row-selected", lambda _, row: row.activate() if row else ...
+        )
 
         # --- Categories --- #
 
@@ -247,18 +250,6 @@ class Sidebar(Adw.Bin):
             )
         )
 
-        # --- Task Lists --- #
-
-        # lists: list[dict] = [
-        #     i for i in UserData.get_lists_as_dicts() if not i["deleted"]
-        # ]
-        # for l in lists:
-        #     self.add_task_list(l["name"], l["uid"])
-
-        self.list_box.connect(
-            "row-selected", lambda _, row: row.activate() if row else ...
-        )
-
         # --- Content box --- #
 
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
@@ -274,9 +265,9 @@ class Sidebar(Adw.Bin):
 
         self.set_child(toolbar_view)
 
-    def add_task_list(self, name: str, uid: str) -> SidebarTaskListItem:
-        Log.debug(f"Sidebar: Add Task List '{name}'")
-        row: SidebarTaskListItem = SidebarTaskListItem(uid, name, self)
+    def add_task_list(self, list_dict: TaskListData) -> SidebarTaskListItem:
+        Log.debug(f"Sidebar: Add Task List '{list_dict['uid']}'")
+        row: SidebarTaskListItem = SidebarTaskListItem(list_dict, self)
         self.list_box.append(row)
         return row
 
@@ -314,7 +305,7 @@ class Sidebar(Adw.Bin):
         lists_uids = [l.list_uid for l in self.task_lists]
         for l in lists:
             if l["uid"] not in lists_uids:
-                self.add_task_list(l["name"], l["uid"])
+                self.add_task_list(l)
 
         # Update rows
         for row in self.rows:
@@ -441,13 +432,13 @@ class SidebarTrashItem(Gtk.ListBoxRow):
 
 
 class SidebarTaskListItem(Gtk.ListBoxRow):
-    def __init__(self, uid: str, name: str, sidebar: Sidebar) -> None:
+    def __init__(self, list_dict: TaskListData, sidebar: Sidebar) -> None:
         super().__init__()
+        self.window: Window = sidebar.window
         self.sidebar: Sidebar = sidebar
         self.list_box: Gtk.ListBox = sidebar.list_box
-        self.uid: str = uid
-        self.name: str = name
-        self.window: Window = sidebar.window
+        self.uid: str = list_dict["uid"]
+        self.name: str = list_dict["name"]
         self.__build_ui()
         self.__add_actions()
 
@@ -627,21 +618,20 @@ class SidebarTaskListItem(Gtk.ListBoxRow):
         drop_hover_ctrl.connect("enter", self._on_drop_hover)
         self.add_controller(drop_hover_ctrl)
 
-        self.set_child(
-            Box(
-                children=[
-                    self.label,
-                    Gtk.MenuButton(
-                        menu_model=menu,
-                        icon_name="view-more-symbolic",
-                        tooltip_text=_("Menu"),
-                        css_classes=["flat"],
-                        valign=Gtk.Align.CENTER,
-                    ),
-                ],
-                margin_start=3,
+        # HBOX
+        hbox: Gtk.Box = Gtk.Box(margin_start=3)
+        hbox.append(self.label)
+        hbox.append(
+            Gtk.MenuButton(
+                menu_model=menu,
+                icon_name="view-more-symbolic",
+                tooltip_text=_("Menu"),
+                css_classes=["flat"],
+                valign=Gtk.Align.CENTER,
             )
         )
+
+        self.set_child(hbox)
 
     def _on_drop_hover(self, ctrl: Gtk.DropControllerMotion, _x, _y):
         """
@@ -686,8 +676,11 @@ class SidebarTaskListItem(Gtk.ListBoxRow):
         GSettings.set("last-open-list", "s", self.name)
 
     def update_ui(self):
-        Log.debug(f"Sidebar: List Item: Update UI '{self.name}'")
+        Log.debug(f"Sidebar: List Item: Update UI '{self.uid}'")
+        self.name = [
+            i["name"] for i in UserData.get_lists_as_dicts() if i["uid"] == self.uid
+        ][0]
+        self.label.set_text(self.name)
+        self.stack_page.set_name(self.name)
+        self.stack_page.set_title(self.name)
         self.task_list.update_ui()
-        self.label.set_label(self.task_list.headerbar.title.get_title())
-        self.stack_page.set_name(self.task_list.headerbar.title.get_title())
-        self.stack_page.set_title(self.task_list.headerbar.title.get_title())

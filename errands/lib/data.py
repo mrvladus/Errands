@@ -78,7 +78,9 @@ class UserData:
         cls._convert(cls)
 
     @classmethod
-    def add_list(cls, name: str, uuid: str = None, synced: bool = False) -> str:
+    def add_list(
+        cls, name: str, uuid: str = None, synced: bool = False
+    ) -> TaskListData:
         uid: str = str(uuid4()) if not uuid else uuid
         Log.debug(f"Data: Create '{uid}' list")
         with cls.connection:
@@ -87,7 +89,7 @@ class UserData:
                 "INSERT INTO lists (deleted, name, synced, uid) VALUES (?, ?, ?, ?)",
                 (False, name, synced, uid),
             )
-            return uid
+            return TaskListData(uid=uid, name=name, deleted=False, synced=synced)
 
     @classmethod
     def get_tasks(cls) -> list[str]:

@@ -22,7 +22,7 @@ from errands.lib.gsettings import GSettings
 class TaskListHeaderBar(Adw.Bin):
 
     # Public items
-    title: Adw.WindowTitle = Adw.WindowTitle()
+    title: Adw.WindowTitle
 
     def __init__(self, task_list: TaskList):
         super().__init__()
@@ -30,6 +30,7 @@ class TaskListHeaderBar(Adw.Bin):
         self.__build_ui()
 
     def __build_ui(self) -> None:
+        self.title = Adw.WindowTitle()
         # Toggle sidebar button
         self.toggle_sidebar_btn = Gtk.ToggleButton(
             icon_name="errands-sidebar-right-symbolic",
