@@ -30,26 +30,8 @@ class TaskListHeaderBar(Adw.Bin):
         self.__build_ui()
 
     def __build_ui(self) -> None:
+        # Title
         self.title = Adw.WindowTitle()
-        # Toggle sidebar button
-        self.toggle_sidebar_btn = Gtk.ToggleButton(
-            icon_name="errands-sidebar-right-symbolic",
-            tooltip_text=_("Toggle Sidebar"),
-        )
-        self.toggle_sidebar_btn.bind_property(
-            "active",
-            self.task_list.split_view,
-            "show-sidebar",
-            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
-        )
-        toggle_ctrl = Gtk.ShortcutController(scope=1)
-        toggle_ctrl.add_shortcut(
-            Gtk.Shortcut(
-                trigger=Gtk.ShortcutTrigger.parse_string("F9"),
-                action=Gtk.ShortcutAction.parse_string("activate"),
-            )
-        )
-        self.toggle_sidebar_btn.add_controller(toggle_ctrl)
 
         # Delete completed button
         self.delete_completed_btn = Gtk.Button(
@@ -77,7 +59,6 @@ class TaskListHeaderBar(Adw.Bin):
         hb: Adw.HeaderBar = Adw.HeaderBar()
         hb.set_title_widget(self.title)
         hb.pack_start(self.delete_completed_btn)
-        hb.pack_end(self.toggle_sidebar_btn)
         hb.pack_end(self.scroll_up_btn)
 
         self.set_child(hb)
@@ -117,67 +98,6 @@ class TaskListHeaderBar(Adw.Bin):
 
         # Update delete completed button
         self.delete_completed_btn.set_sensitive(n_completed > 0)
-
-
-class TaskListBottomBar(Gtk.Box):
-    def __init__(self, task_list: TaskList):
-        super().__init__()
-        self.task_list: TaskList = task_list
-        self.headerbar = task_list.headerbar
-        self.__build_ui()
-
-    def __build_ui(self) -> None:
-        self.add_css_class("toolbar")
-
-        # Delete completed button
-        delete_completed_btn = Gtk.Button(
-            valign="center",
-            icon_name="edit-clear-all-symbolic",
-            tooltip_text=_("Delete Completed Tasks"),
-            sensitive=False,
-        )
-        delete_completed_btn.bind_property(
-            "sensitive",
-            self.headerbar.delete_completed_btn,
-            "sensitive",
-            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
-        )
-        delete_completed_btn.connect(
-            "clicked", self.task_list.headerbar.on_delete_completed_btn_clicked
-        )
-        self.append(delete_completed_btn)
-
-        # Spacer
-        self.append(Gtk.Separator(hexpand=True, css_classes=["spacer"]))
-
-        # Scroll up button
-        scroll_up_btn = Gtk.Button(
-            valign="center",
-            icon_name="go-up-symbolic",
-            tooltip_text=_("Scroll Up"),
-            visible=False,
-        )
-        scroll_up_btn.bind_property(
-            "visible",
-            self.headerbar.scroll_up_btn,
-            "visible",
-            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
-        )
-        scroll_up_btn.connect("clicked", lambda *_: scroll(self.task_list.scrl, False))
-        self.append(scroll_up_btn)
-
-        # Toggle sidebar button right
-        toggle_sidebar_btn = Gtk.ToggleButton(
-            icon_name="errands-sidebar-right-symbolic",
-            tooltip_text=_("Toggle Sidebar"),
-        )
-        toggle_sidebar_btn.bind_property(
-            "active",
-            self.headerbar.toggle_sidebar_btn,
-            "active",
-            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
-        )
-        self.append(toggle_sidebar_btn)
 
 
 class TaskListEntry(Adw.Bin):
@@ -282,7 +202,6 @@ class TaskList(Adw.Bin):
 
     # Public elements
     headerbar: TaskListHeaderBar
-    bottombar: TaskListBottomBar
     scrl: TaskListScrolledWindow
     uncompleted_list: TaskListUncompletedList
     completed_list: TaskListCompletedList
@@ -294,23 +213,8 @@ class TaskList(Adw.Bin):
         self.__build_ui()
 
     def __build_ui(self) -> None:
-        # Split View
-        self.split_view = Adw.OverlaySplitView(
-            min_sidebar_width=360,
-            max_sidebar_width=400,
-            sidebar_width_fraction=0.40,
-            sidebar_position=Gtk.PackType.END,
-        )
-        GSettings.bind("sidebar-open", self.split_view, "show-sidebar")
-
         # Header Bar
         self.headerbar = TaskListHeaderBar(self)
-
-        # Bottom Bar
-        self.bottombar = TaskListBottomBar(self)
-
-        # Details
-        self.details = Details(self)
 
         # Un-Completed Tasks list
         self.uncompleted_list = TaskListUncompletedList(self)
@@ -339,11 +243,6 @@ class TaskList(Adw.Bin):
             orientation="vertical",
             vexpand=True,
         )
-        content_box_click_ctrl = Gtk.GestureClick()
-        content_box_click_ctrl.connect("released", self._on_empty_area_clicked)
-        content_box.add_controller(content_box_click_ctrl)
-
-        self.split_view.set_sidebar(self.details)
 
         # Tasks list toolbar view
         self.tasks_toolbar_view = Adw.ToolbarView(
@@ -351,25 +250,7 @@ class TaskList(Adw.Bin):
             reveal_bottom_bars=False,
         )
         self.tasks_toolbar_view.add_top_bar(self.headerbar)
-        self.tasks_toolbar_view.add_bottom_bar(self.bottombar)
-        self.split_view.set_content(self.tasks_toolbar_view)
-
-        # Breakpoints
-        tasks_brb = Adw.BreakpointBin(
-            width_request=360, height_request=360, child=self.split_view
-        )
-        bp = Adw.Breakpoint.new(Adw.breakpoint_condition_parse("max-width: 720px"))
-        bp.add_setter(self.split_view, "collapsed", True)
-        tasks_brb.add_breakpoint(bp)
-        bp1 = Adw.Breakpoint.new(Adw.breakpoint_condition_parse("max-width: 370px"))
-        bp1.add_setter(self.split_view, "collapsed", True)
-        bp1.add_setter(self.headerbar.delete_completed_btn, "visible", False)
-        bp1.add_setter(self.headerbar.toggle_sidebar_btn, "visible", False)
-        bp1.add_setter(self.headerbar.scroll_up_btn, "visible", False)
-        bp1.add_setter(self.tasks_toolbar_view, "reveal-bottom-bars", True)
-        tasks_brb.add_breakpoint(bp1)
-
-        self.set_child(tasks_brb)
+        self.set_child(self.tasks_toolbar_view)
 
     @property
     def all_tasks(self) -> list[Task]:
@@ -389,38 +270,9 @@ class TaskList(Adw.Bin):
     def update_ui(self) -> None:
         Log.debug(f"Task list {self.list_uid}: Update UI")
 
-        # Update details
-        if (
-            self.details.parent
-            and self.details.parent.uid in UserData.get_tasks_uids(self.list_uid)
-            and not self.details.parent.get_prop("trash")
-        ):
-            self.details.update_info(self.details.parent)
-        else:
-            self.details.update_info(None)
-
         self.uncompleted_list.update_ui()
         self.completed_list.update_ui()
         self.headerbar.update_ui()
-
-    def _on_empty_area_clicked(self, _gesture, _n, x: float, y: float) -> None:
-        """Close Details panel on click on empty space"""
-        all_tasks: list[Task] = self.completed_list.tasks + self.uncompleted_list.tasks
-        height = 0
-        for task in all_tasks:
-            if task.get_child_revealed():
-                height = (
-                    task.compute_bounds(self.tasks_toolbar_view.get_content())
-                    .out_bounds.get_bottom_right()
-                    .y
-                )
-        left_area_end: int = self.uncompleted_list.get_allocation().x
-        right_area_start: int = left_area_end + self.uncompleted_list.get_width()
-
-        on_sides: bool = x < left_area_end or x > right_area_start
-        on_bottom: bool = y > height
-        if on_sides or on_bottom:
-            self.split_view.set_show_sidebar(False)
 
 
 class TaskListUncompletedList(Gtk.Box):
@@ -429,7 +281,6 @@ class TaskListUncompletedList(Gtk.Box):
         self.task_list: TaskList = task_list
         self.list_uid: str = task_list.list_uid
         self.window: Window = task_list.window
-        self.details: Details = task_list.details
         self.__build_ui()
 
     def __build_ui(self) -> None:
@@ -489,7 +340,6 @@ class TaskListCompletedList(Gtk.Box):
         self.task_list: TaskList = task_list
         self.list_uid: str = task_list.list_uid
         self.window: Window = task_list.window
-        self.details: Details = task_list.details
         self.__build_ui()
 
     def __build_ui(self) -> None:

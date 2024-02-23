@@ -659,8 +659,6 @@ class Task(Gtk.Revealer):
         self.window = task_list.window
         self.parent = parent
         self.is_sub_task = is_sub_task
-        self.details = task_list.details
-
         self._build_ui()
         self.just_added = False
 

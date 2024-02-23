@@ -629,19 +629,14 @@ class SidebarTaskListItem(Adw.ActionRow):
         self.add_css_class("sidebar-item")
         self.connect("activated", self.__activated)
 
+        # Counter
+        self.__counter = Gtk.Label(css_classes=["dim-label", "caption"])
+
+        # Menu
         menu: Gio.Menu = Gio.Menu.new()
         menu.append(_("Rename"), "list_item.rename")
         menu.append(_("Delete"), "list_item.delete")
         menu.append(_("Export"), "list_item.export")
-        self.add_suffix(
-            Gtk.MenuButton(
-                menu_model=menu,
-                icon_name="view-more-symbolic",
-                tooltip_text=_("Menu"),
-                css_classes=["flat"],
-                valign=Gtk.Align.CENTER,
-            )
-        )
 
         # Drop controller
         drop_ctrl: Gtk.DropTarget = Gtk.DropTarget.new(
@@ -654,6 +649,20 @@ class SidebarTaskListItem(Adw.ActionRow):
         drop_hover_ctrl: Gtk.DropControllerMotion = Gtk.DropControllerMotion()
         drop_hover_ctrl.connect("enter", self._on_drop_hover)
         self.add_controller(drop_hover_ctrl)
+
+        # Suffix
+        suffix_box: Gtk.Box = Gtk.Box(spacing=12)
+        suffix_box.append(self.__counter)
+        suffix_box.append(
+            Gtk.MenuButton(
+                menu_model=menu,
+                icon_name="view-more-symbolic",
+                tooltip_text=_("Menu"),
+                css_classes=["flat"],
+                valign=Gtk.Align.CENTER,
+            )
+        )
+        self.add_suffix(suffix_box)
 
     def _on_drop_hover(self, ctrl: Gtk.DropControllerMotion, _x, _y):
         """
@@ -699,10 +708,18 @@ class SidebarTaskListItem(Adw.ActionRow):
 
     def update_ui(self):
         Log.debug(f"Sidebar: List Item: Update UI '{self.uid}'")
+
+        # Update title
         self.name = [
             i["name"] for i in UserData.get_lists_as_dicts() if i["uid"] == self.uid
         ][0]
         self.set_title(self.name)
         self.stack_page.set_name(self.name)
         self.stack_page.set_title(self.name)
+
+        # Update counter
+        size: int = len(UserData.get_tasks_as_dicts(self.uid))
+        self.__counter.set_label(str(size) if size > 0 else "")
+
+        # Update list
         self.task_list.update_ui()
