@@ -718,7 +718,13 @@ class SidebarTaskListItem(Adw.ActionRow):
         self.stack_page.set_title(self.name)
 
         # Update counter
-        size: int = len(UserData.get_tasks_as_dicts(self.uid))
+        size: int = len(
+            [
+                t
+                for t in UserData.get_tasks_as_dicts(self.uid)
+                if not t["trash"] and not t["deleted"]
+            ]
+        )
         self.__counter.set_label(str(size) if size > 0 else "")
 
         # Update list

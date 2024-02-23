@@ -70,7 +70,7 @@ class TaskListHeaderBar(Adw.Bin):
         for task in self.task_list.all_tasks:
             if not task.get_prop("trash") and task.get_prop("completed"):
                 task.delete()
-        self.update_ui()
+        self.task_list.window.sidebar.update_ui()
 
     def update_ui(self):
         # Rename list
@@ -82,14 +82,13 @@ class TaskListHeaderBar(Adw.Bin):
             )[0][0]
         )
 
-        n_total: int = 0
-        n_completed: int = 0
-        tasks: list[TaskData] = UserData.get_tasks_as_dicts(self.task_list.list_uid)
-        for task in tasks:
-            if not task["deleted"]:
-                n_total += 1
-                if task["completed"] and not task["trash"]:
-                    n_completed += 1
+        tasks: list[TaskData] = [
+            t
+            for t in UserData.get_tasks_as_dicts(self.task_list.list_uid)
+            if not t["trash"] and not t["deleted"]
+        ]
+        n_total: int = len(tasks)
+        n_completed: int = len([t for t in tasks if t["completed"]])
 
         # Update status
         self.title.set_subtitle(
