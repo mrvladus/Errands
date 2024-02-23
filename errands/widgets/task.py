@@ -7,13 +7,13 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from errands.widgets.task_list import TaskList
 
-from errands.widgets.components import Box, Button, DateTime
+from errands.widgets.components import Box, DateTime
 from gi.repository import Gtk, Adw, Gdk, GObject, GLib, GtkSource, Gio  # type:ignore
 from errands.lib.sync.sync import Sync
 from errands.lib.logging import Log
 from errands.lib.data import TaskData, UserData
 from errands.lib.markup import Markup
-from errands.lib.utils import get_children, threaded
+from errands.lib.utils import get_children
 from errands.lib.gsettings import GSettings
 
 
@@ -341,7 +341,7 @@ class TaskTitleRowSuffix(Gtk.Box):
         self.append(self.toolbar_toggle)
 
 
-class TaskInfoBar(Gtk.Box):
+class TaskProgressBar(Gtk.Box):
     def __init__(self, task: Task):
         super().__init__()
         self.task: Task = task
@@ -389,7 +389,6 @@ class TaskSubTaskEntry(Gtk.Entry):
     def __build_ui(self) -> None:
         self.set_margin_start(12)
         self.set_margin_end(12)
-        # self.set_margin_top(3)
         self.set_margin_bottom(4)
         self.set_placeholder_text(_("Add new Sub-Task"))
 
@@ -632,7 +631,7 @@ class Task(Gtk.Revealer):
     # Public elements
     top_drop_area: TaskTopDropArea
     task_row: TaskTitleRow
-    info_bar: TaskInfoBar
+    progress_bar: TaskProgressBar
     uncompleted_tasks: TaskUncompletedSubTasks
     completed_tasks: TaskCompletedSubTasks
     sub_tasks_revealer: Gtk.Revealer
@@ -675,7 +674,7 @@ class Task(Gtk.Revealer):
         self.task_row = TaskTitleRow(self)
 
         # Info bar
-        self.info_bar = TaskInfoBar(self)
+        self.progress_bar = TaskProgressBar(self)
 
         # Sub-tasks
         self.sub_tasks_entry = TaskSubTaskEntry(self)
@@ -706,7 +705,7 @@ class Task(Gtk.Revealer):
         self.main_box = Box(
             children=[
                 self.task_row,
-                self.info_bar,
+                self.progress_bar,
                 self.toolbar,
                 self.sub_tasks_revealer,
             ],
@@ -830,7 +829,7 @@ class Task(Gtk.Revealer):
         self.expand(self.get_prop("expanded"))
 
         self.task_row.update_ui()
-        self.info_bar.update_ui()
+        self.progress_bar.update_ui()
         self.toolbar.update_ui()
         self.completed_tasks.update_ui()
         self.uncompleted_tasks.update_ui()
