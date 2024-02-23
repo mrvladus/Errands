@@ -7,8 +7,8 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from errands.widgets.task_list import TaskList
 
-from errands.widgets.components import Box
-from gi.repository import Gtk, Adw, Gdk, GObject, GLib  # type:ignore
+from errands.widgets.components import Box, Button, DateTime
+from gi.repository import Gtk, Adw, Gdk, GObject, GLib, GtkSource, Gio  # type:ignore
 from errands.lib.sync.sync import Sync
 from errands.lib.logging import Log
 from errands.lib.data import TaskData, UserData
@@ -119,6 +119,7 @@ class TaskTitleRow(Gtk.Overlay):
             accessible_role=Gtk.AccessibleRole.ROW,
             cursor=Gdk.Cursor.new_from_name("pointer"),
             use_markup=True,
+            tooltip_text=_("Toggle Sub-Tasks"),
         )
         self.add_rm_crossline(self.task.get_prop("completed"))
 
@@ -143,33 +144,8 @@ class TaskTitleRow(Gtk.Overlay):
         self.task_row.add_prefix(self.complete_btn)
 
         # Suffix
-        self.suffix = TaskTitleRowSuffix(self.task)
+        self.suffix = TaskTitleRowSuffix(self.task, self.task_row)
         self.task_row.add_suffix(self.suffix)
-
-        self.expand_indicator = Gtk.Image(
-            icon_name="errands-up-symbolic",
-            css_classes=["expand-indicator"],
-            halign=Gtk.Align.END,
-            margin_end=50,
-        )
-        expand_indicator_rev = Gtk.Revealer(
-            child=self.expand_indicator,
-            transition_type=1,
-            reveal_child=False,
-            can_target=False,
-        )
-        GSettings.bind("primary-action-show-sub-tasks", expand_indicator_rev, "visible")
-        self.add_overlay(expand_indicator_rev)
-
-        # Expand indicator hover controller
-        hover_ctrl = Gtk.EventControllerMotion()
-        hover_ctrl.bind_property(
-            "contains-pointer",
-            expand_indicator_rev,
-            "reveal-child",
-            GObject.BindingFlags.SYNC_CREATE,
-        )
-        self.task_row.add_controller(hover_ctrl)
 
         # Click controller
         task_row_click_ctrl = Gtk.GestureClick.new()
@@ -177,8 +153,6 @@ class TaskTitleRow(Gtk.Overlay):
             "released",
             lambda *_: (
                 self.task.expand(not self.task.sub_tasks_revealer.get_child_revealed())
-                if GSettings.get("primary-action-show-sub-tasks")
-                else self.task.task_row.suffix.show_details()
             ),
         )
         self.task_row.add_controller(task_row_click_ctrl)
@@ -326,51 +300,45 @@ class TaskTitleRowSuffix(Gtk.Box):
     expand_btn: Gtk.Button
     details_btn: Gtk.Button
 
-    def __init__(self, task: Task):
+    def __init__(self, task: Task, title_row: TaskTitleRow):
         super().__init__()
         self.task: Task = task
+        self.title_row: TaskTitleRow = title_row
         self.__build_ui()
 
     def __build_ui(self):
-        # Expand button
-        self.expand_btn = Gtk.Button(
-            icon_name="errands-up-symbolic",
-            valign=Gtk.Align.CENTER,
-            tooltip_text=_("Expand / Fold"),
-            css_classes=["flat", "circular", "fade", "rotate"],
+        # Expand indicator
+        self.expand_indicator = Gtk.Revealer(
+            child=Gtk.Image(
+                icon_name="errands-up-symbolic",
+                css_classes=["expand-indicator"],
+            ),
+            transition_type=1,
         )
-        self.expand_btn.connect("clicked", self.__on_expand)
-        GSettings.bind(
-            "primary-action-show-sub-tasks", self.expand_btn, "visible", True
+        # Expand indicator hover controller
+        hover_ctrl = Gtk.EventControllerMotion()
+        hover_ctrl.bind_property(
+            "contains-pointer",
+            self.expand_indicator,
+            "reveal-child",
+            GObject.BindingFlags.SYNC_CREATE,
         )
-        self.append(self.expand_btn)
+        self.title_row.add_controller(hover_ctrl)
+        self.append(self.expand_indicator)
 
-        # Details button
-        self.details_btn = Gtk.Button(
-            icon_name="errands-info-symbolic",
+        # Toolbar toggle
+        self.toolbar_toggle = Gtk.ToggleButton(
+            icon_name="errands-toolbar-symbolic",
             valign=Gtk.Align.CENTER,
-            tooltip_text=_("Details"),
             css_classes=["flat", "circular"],
+            tooltip_text=_("Toggle Toolbar"),
+            margin_start=6,
         )
-        self.details_btn.connect("clicked", self.show_details)
-        GSettings.bind("primary-action-show-sub-tasks", self.details_btn, "visible")
-        self.append(self.details_btn)
-
-    def __on_expand(self, *args):
-        self.task.expand(not self.task.sub_tasks_revealer.get_child_revealed())
-
-    def show_details(self, *args):
-        # Close details on second click
-        if (
-            self.task.details.parent == self.task
-            and not self.task.details.status.get_visible()
-            and self.task.task_list.split_view.get_show_sidebar()
-        ):
-            self.task.task_list.split_view.set_show_sidebar(False)
-            return
-        # Update details and show sidebar
-        self.task.details.update_info(self.task)
-        self.task.task_list.split_view.set_show_sidebar(True)
+        self.toolbar_toggle.connect(
+            "toggled",
+            lambda btn: self.task.update_props(["toolbar_shown"], [btn.get_active()]),
+        )
+        self.append(self.toolbar_toggle)
 
 
 class TaskInfoBar(Gtk.Box):
@@ -396,52 +364,7 @@ class TaskInfoBar(Gtk.Box):
         )
         self.append(self.progress_bar_rev)
 
-        # Info
-        # self.due_date = Button(
-        #     icon_name="errands-calendar-symbolic",
-        #     label=_("Due"),
-        #     css_classes=["task-toolbar-btn"],
-        #     cursor=Gdk.Cursor(name="pointer"),
-        # )
-        # self.priority = Button(
-        #     icon_name="errands-priority-symbolic",
-        #     label=_("Priority"),
-        #     css_classes=["task-toolbar-btn"],
-        #     cursor=Gdk.Cursor(name="pointer"),
-        # )
-        # self.notes = Button(
-        #     icon_name="errands-notes-symbolic",
-        #     label=_("Notes"),
-        #     css_classes=["task-toolbar-btn"],
-        #     cursor=Gdk.Cursor(name="pointer"),
-        # )
-        # self.color = Button(
-        #     icon_name="errands-color-symbolic",
-        #     label=_("Color"),
-        #     css_classes=["task-toolbar-btn"],
-        #     cursor=Gdk.Cursor(name="pointer"),
-        # )
-        # self.tags = Gtk.Box(hexpand=True)
-        # self.status_box = Box(
-        #     children=[
-        #         self.due_date,
-        #         self.priority,
-        #         self.tags,
-        #         self.notes,
-        #         self.color,
-        #     ],
-        #     margin_end=12,
-        #     margin_start=12,
-        #     margin_bottom=3,
-        # )
-        # GSettings.bind("task-show-toolbar", self.status_box, "visible")
-        # self.append(self.status_box)
-
     def update_ui(self):
-        # end_date = self.task.get_prop("end_date")
-        # start_date = self.task.get_prop("start_date")
-        # notes = self.task.get_prop("notes")
-
         # Update percrent complete
         if GSettings.get("task-show-progressbar"):
             total, completed = self.task.get_status()
@@ -457,18 +380,18 @@ class TaskInfoBar(Gtk.Box):
             self.progress_bar_rev.set_reveal_child(self.task.get_status()[0] > 0)
 
 
-class TaskSubTasksEntry(Gtk.Entry):
+class TaskSubTaskEntry(Gtk.Entry):
     def __init__(self, task: Task):
         super().__init__()
         self.task: Task = task
-        self._build_ui()
+        self.__build_ui()
 
-    def _build_ui(self) -> None:
-        self.set_placeholder_text(_("Add new Sub-Task"))
-        self.set_hexpand(True)
-        self.set_margin_bottom(2)
-        self.set_margin_end(12)
+    def __build_ui(self) -> None:
         self.set_margin_start(12)
+        self.set_margin_end(12)
+        # self.set_margin_top(3)
+        self.set_margin_bottom(4)
+        self.set_placeholder_text(_("Add new Sub-Task"))
 
     def do_activate(self) -> None:
         text: str = self.get_text()
@@ -497,6 +420,69 @@ class TaskSubTasksEntry(Gtk.Entry):
 
         # Sync
         Sync.sync()
+
+
+class TaskToolBar(Gtk.Revealer):
+    def __init__(self, task: Task):
+        super().__init__()
+        self.task: Task = task
+        self.__build_ui()
+
+    def __build_ui(self) -> None:
+        self.bind_property(
+            "reveal-child",
+            self.task.task_row.suffix.toolbar_toggle,
+            "active",
+            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
+        )
+
+        # Date
+        date_btn = Gtk.MenuButton(
+            child=Adw.ButtonContent(
+                icon_name="errands-calendar-symbolic", label=_("Date")
+            ),
+            popover=Gtk.Popover(child=DateTime()),
+            css_classes=["flat"],
+        )
+
+        # Notes
+        notes_btn = Gtk.MenuButton(
+            popover=Gtk.Popover(
+                child=Gtk.ScrolledWindow(
+                    child=GtkSource.View(), height_request=300, width_request=300
+                )
+            ),
+            icon_name="errands-notes-symbolic",
+            css_classes=["flat"],
+        )
+
+        # Priority
+        priority_btn = Gtk.MenuButton(
+            popover=Gtk.Popover(child=GtkSource.View()),
+            icon_name="errands-priority-symbolic",
+            css_classes=["flat"],
+        )
+
+        # More
+        more_menu = Gio.Menu()
+        more_menu.append("Copy to Clipboard")
+        more_btn = Gtk.MenuButton(
+            icon_name="view-more-symbolic", menu_model=more_menu, css_classes=["flat"]
+        )
+
+        hbox: Gtk.Box = Gtk.Box(
+            margin_start=12, margin_end=12, margin_bottom=6, spacing=5
+        )
+        hbox.append(date_btn)
+        hbox.append(Gtk.Separator(css_classes=["spacer"], hexpand=True))
+        hbox.append(priority_btn)
+        hbox.append(notes_btn)
+        hbox.append(more_btn)
+
+        self.set_child(hbox)
+
+    def update_ui(self):
+        self.set_reveal_child(self.task.get_prop("toolbar_shown"))
 
 
 class TaskUncompletedSubTasks(Gtk.Box):
@@ -647,7 +633,6 @@ class Task(Gtk.Revealer):
     top_drop_area: TaskTopDropArea
     task_row: TaskTitleRow
     info_bar: TaskInfoBar
-    sub_tasks_entry: TaskSubTasksEntry
     uncompleted_tasks: TaskUncompletedSubTasks
     completed_tasks: TaskCompletedSubTasks
     sub_tasks_revealer: Gtk.Revealer
@@ -693,7 +678,10 @@ class Task(Gtk.Revealer):
         self.info_bar = TaskInfoBar(self)
 
         # Sub-tasks
-        self.sub_tasks_entry = TaskSubTasksEntry(self)
+        self.sub_tasks_entry = TaskSubTaskEntry(self)
+
+        # Toolbar
+        self.toolbar = TaskToolBar(self)
 
         # Uncompleted tasks
         self.uncompleted_tasks = TaskUncompletedSubTasks(self)
@@ -716,7 +704,12 @@ class Task(Gtk.Revealer):
 
         # Task card
         self.main_box = Box(
-            children=[self.task_row, self.info_bar, self.sub_tasks_revealer],
+            children=[
+                self.task_row,
+                self.info_bar,
+                self.toolbar,
+                self.sub_tasks_revealer,
+            ],
             orientation="vertical",
             hexpand=True,
             css_classes=["fade", "card", f'task-{self.get_prop("color")}'],
@@ -763,7 +756,7 @@ class Task(Gtk.Revealer):
 
     def get_prop(self, prop: str) -> Any:
         res: Any = UserData.get_prop(self.list_uid, self.uid, prop)
-        if prop in "deleted completed expanded trash":
+        if prop in "deleted completed expanded trash toolbar_shown":
             res = bool(res)
         return res
 
@@ -797,11 +790,13 @@ class Task(Gtk.Revealer):
         self.sub_tasks_revealer.set_reveal_child(expanded)
         self.update_props(["expanded"], [expanded])
         if expanded:
-            self.task_row.suffix.expand_btn.remove_css_class("rotate")
-            self.task_row.expand_indicator.remove_css_class("expand-indicator-expanded")
+            self.task_row.suffix.expand_indicator.get_child().remove_css_class(
+                "expand-indicator-expanded"
+            )
         else:
-            self.task_row.suffix.expand_btn.add_css_class("rotate")
-            self.task_row.expand_indicator.add_css_class("expand-indicator-expanded")
+            self.task_row.suffix.expand_indicator.get_child().add_css_class(
+                "expand-indicator-expanded"
+            )
 
     def purge(self) -> None:
         """Completely remove widget"""
@@ -836,5 +831,6 @@ class Task(Gtk.Revealer):
 
         self.task_row.update_ui()
         self.info_bar.update_ui()
+        self.toolbar.update_ui()
         self.completed_tasks.update_ui()
         self.uncompleted_tasks.update_ui()

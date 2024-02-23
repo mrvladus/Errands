@@ -34,6 +34,7 @@ class TaskData(TypedDict):
     synced: bool
     tags: str
     text: str
+    toolbar_shown: str
     trash: bool
     uid: str
 
@@ -71,6 +72,7 @@ class UserData:
             synced INTEGER NOT NULL,
             tags TEXT NOT NULL,
             text TEXT NOT NULL,
+            toolbar_shown INTEGER NOT NULL,
             trash INTEGER NOT NULL,
             uid TEXT NOT NULL
             )""",
@@ -362,8 +364,9 @@ class UserData:
                         synced=bool(task[11]),
                         tags=task[12],
                         text=task[13],
-                        trash=bool(task[14]),
-                        uid=task[15],
+                        toolbar_shown=task[14],
+                        trash=bool(task[15]),
+                        uid=task[16],
                     )
                 )
 
@@ -386,6 +389,7 @@ class UserData:
         synced: bool = False,
         tags: str = "",
         text: str = "",
+        toolbar_shown: bool = False,
         trash: bool = False,
         uid: str = "",
         insert_at_the_top: bool = False,
@@ -400,8 +404,8 @@ class UserData:
             if not insert_at_the_top:
                 cur.execute(
                     """INSERT INTO tasks 
-                    (uid, list_uid, text, parent, completed, deleted, color, notes, percent_complete, priority, start_date, end_date, tags, synced, expanded, trash) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                    (uid, list_uid, text, parent, completed, deleted, color, notes, percent_complete, priority, start_date, end_date, tags, synced, expanded, trash, toolbar_shown) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                     (
                         uid,
                         list_uid,
@@ -419,6 +423,7 @@ class UserData:
                         synced,
                         expanded,
                         trash,
+                        toolbar_shown,
                     ),
                 )
             else:
@@ -427,8 +432,8 @@ class UserData:
                 )
                 cur.execute(
                     """INSERT INTO tmp 
-                (uid, list_uid, text, parent, completed, deleted, color, notes, percent_complete, priority, start_date, end_date, tags, synced, expanded, trash) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (uid, list_uid, text, parent, completed, deleted, color, notes, percent_complete, priority, start_date, end_date, tags, synced, expanded, trash, toolbar_shown) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                     (
                         uid,
                         list_uid,
@@ -446,6 +451,7 @@ class UserData:
                         synced,
                         expanded,
                         trash,
+                        toolbar_shown,
                     ),
                 )
                 cur.execute("INSERT INTO tmp SELECT * FROM tasks")

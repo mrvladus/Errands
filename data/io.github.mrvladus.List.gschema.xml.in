@@ -31,9 +31,6 @@
     <key name="sync-username" type="s">
       <default>""</default>
     </key>
-    <key name="primary-action-show-sub-tasks" type="b">
-      <default>false</default>
-    </key>
     <key name="task-show-progressbar" type="b">
       <default>true</default>
     </key>

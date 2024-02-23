@@ -165,6 +165,7 @@ class DateTime(Gtk.Box):
                         css_classes=["toolbar"],
                         homogeneous=True,
                     ),
+                    Gtk.Separator(margin_bottom=6),
                 ],
                 orientation="vertical",
             )

@@ -94,22 +94,6 @@ class PreferencesWindow(Adw.PreferencesWindow):
 
         # Tasks group
         tasks_group = Adw.PreferencesGroup(title=_("Tasks"))
-        # Primary action
-        task_primary_action = Adw.ComboRow(
-            title=_("Click Action"),
-            model=Gtk.StringList.new([_("Open Details Panel"), _("Show Sub-Tasks")]),
-            icon_name="errands-click-symbolic",
-        )
-        task_primary_action.set_selected(
-            int(GSettings.get("primary-action-show-sub-tasks"))
-        )
-        task_primary_action.connect(
-            "notify::selected",
-            lambda row, *_: GSettings.set(
-                "primary-action-show-sub-tasks", "b", bool(row.get_selected())
-            ),
-        )
-        tasks_group.add(task_primary_action)
 
         # Progress bar
         task_progress_bar = Adw.SwitchRow(
@@ -117,12 +101,6 @@ class PreferencesWindow(Adw.PreferencesWindow):
         )
         GSettings.bind("task-show-progressbar", task_progress_bar, "active")
         tasks_group.add(task_progress_bar)
-        # Toolbar
-        task_toolbar = Adw.SwitchRow(
-            title=_("Tool Bar"), icon_name="errands-toolbar-symbolic"
-        )
-        GSettings.bind("task-show-toolbar", task_toolbar, "active")
-        # tasks_group.add(task_toolbar)
 
         # Sync group
         sync_group = Adw.PreferencesGroup(
