@@ -453,35 +453,95 @@ class TaskToolBar(Gtk.Revealer):
             ),
             icon_name="errands-notes-symbolic",
             css_classes=["flat"],
+            tooltip_text=_("Notes"),
         )
 
         # Priority
         priority_btn = Gtk.MenuButton(
-            popover=Gtk.Popover(child=GtkSource.View()),
+            popover=Gtk.Popover(child=Gtk.Label(label="Priority")),
             icon_name="errands-priority-symbolic",
+            css_classes=["flat"],
+            tooltip_text=_("Priority"),
+        )
+
+        # Copy text button
+        copy_text_btn = Gtk.Button(
+            icon_name="errands-copy-symbolic",
+            tooltip_text=_("Copy Text"),
             css_classes=["flat"],
         )
 
-        # More
+        # More menu
         more_menu = Gio.Menu()
-        more_menu.append("Copy to Clipboard")
-        more_btn = Gtk.MenuButton(
-            icon_name="view-more-symbolic", menu_model=more_menu, css_classes=["flat"]
+
+        # Actions section
+        more_menu.append("Edit")
+
+        # Custom section
+        more_menu_custom = Gio.Menu()
+        more_menu.append_section(None, more_menu_custom)
+
+        # Created date
+        created = Gio.MenuItem()
+        created.set_attribute([("custom", "s", "created")])
+        more_menu_custom.append_item(created)
+        self.menu_created_label = Gtk.Label(
+            label=_("Created:"),
+            halign=Gtk.Align.START,
+            css_classes=["caption"],
+            margin_start=3,
+            margin_end=3,
+            margin_bottom=6,
         )
 
+        # Changed date
+        changed = Gio.MenuItem()
+        changed.set_attribute([("custom", "s", "changed")])
+        more_menu_custom.append_item(changed)
+        self.menu_changed_label = Gtk.Label(
+            label=_("Changed:"),
+            halign=Gtk.Align.START,
+            css_classes=["caption"],
+            margin_start=3,
+            margin_end=3,
+            margin_bottom=3,
+        )
+
+        # Popover
+        menu_popover = Gtk.PopoverMenu(
+            menu_model=more_menu,
+        )
+        menu_popover.add_child(self.menu_created_label, "created")
+        menu_popover.add_child(self.menu_changed_label, "changed")
+
+        # More menu button
+        more_btn = Gtk.MenuButton(
+            icon_name="view-more-symbolic",
+            popover=menu_popover,
+            css_classes=["flat"],
+            tooltip_text=_("More"),
+        )
+
+        # HBOX
         hbox: Gtk.Box = Gtk.Box(
             margin_start=12, margin_end=12, margin_bottom=6, spacing=5
         )
         hbox.append(date_btn)
+        hbox.append(notes_btn)
         hbox.append(Gtk.Separator(css_classes=["spacer"], hexpand=True))
         hbox.append(priority_btn)
-        hbox.append(notes_btn)
+        hbox.append(copy_text_btn)
         hbox.append(more_btn)
 
         self.set_child(hbox)
 
     def update_ui(self):
         self.set_reveal_child(self.task.get_prop("toolbar_shown"))
+
+    # ------ SIGNAL HANDLERS ------ #
+
+    def __on_copy_text_btn_clicked(self, _btn):
+        pass
 
 
 class TaskUncompletedSubTasks(Gtk.Box):
