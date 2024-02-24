@@ -509,13 +509,15 @@ class TaskToolBar(Gtk.Revealer):
                 child=notes_text_view, height_request=300, width_request=300
             )
         )
-        notes_btn = Gtk.MenuButton(
+        self.notes_btn = Gtk.MenuButton(
             popover=notes_popover,
             icon_name="errands-notes-symbolic",
             css_classes=["flat"],
             tooltip_text=_("Notes"),
         )
-        notes_btn.connect("notify::active", self.__on_notes_toggled, notes_text_view)
+        self.notes_btn.connect(
+            "notify::active", self.__on_notes_toggled, notes_text_view
+        )
 
         # Priority
         priority_btn = Gtk.MenuButton(
@@ -584,14 +586,21 @@ class TaskToolBar(Gtk.Revealer):
         )
         hbox.append(date_btn)
         hbox.append(Gtk.Separator(css_classes=["spacer"], hexpand=True))
-        hbox.append(notes_btn)
+        hbox.append(self.notes_btn)
         hbox.append(priority_btn)
         hbox.append(more_btn)
 
         self.set_child(hbox)
 
     def update_ui(self):
+        # Show toolbar
         self.set_reveal_child(self.task.get_prop("toolbar_shown"))
+
+        # Update notes btn
+        if self.task.get_prop("notes"):
+            self.notes_btn.add_css_class("accent")
+        else:
+            self.notes_btn.remove_css_class("accent")
 
     # ------ SIGNAL HANDLERS ------ #
 
@@ -599,12 +608,14 @@ class TaskToolBar(Gtk.Revealer):
         notes: str = self.task.get_prop("notes")
         if btn.get_active():
             text_view.get_buffer().set_text(notes)
+            self.update_ui()
         else:
             text: str = text_view.get_buffer().props.text
             if text == notes:
                 return
             Log.info("Task: Change notes")
             self.task.update_props(["notes", "synced"], [text, False])
+            self.update_ui()
             Sync.sync(False)
 
 
