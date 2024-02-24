@@ -461,11 +461,6 @@ class Details(Adw.Bin):
         self.end_datetime_row.set_title(self.end_datetime.get_human_datetime())
         self.save()
 
-    def _on_copy_clicked(self, _btn, buffer: Gtk.TextBuffer):
-        Log.info("Details: Copy to clipboard")
-        Gdk.Display.get_default().get_clipboard().set(buffer.props.text)
-        self.task_list.window.add_toast(_("Copied to Clipboard"))
-
     def _on_delete_btn_clicked(self, _btn):
         self.parent.delete()
         self.status.set_visible(True)

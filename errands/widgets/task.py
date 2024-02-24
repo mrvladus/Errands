@@ -123,6 +123,33 @@ class TaskTitleRow(Gtk.Overlay):
         )
         self.add_rm_crossline(self.task.get_prop("completed"))
 
+        # Task Edit Row
+        task_edit_row = Adw.EntryRow(
+            title=_("Edit Text"),
+            css_classes=["rounded-corners", "transparent"],
+            height_request=60,
+            accessible_role=Gtk.AccessibleRole.ROW,
+            visible=False,
+            show_apply_button=True,
+            margin_end=6,
+            margin_start=6,
+        )
+        task_edit_row.connect("apply", self.__on_edit_entry_applied)
+        task_edit_row.bind_property(
+            "visible",
+            self.task_row,
+            "visible",
+            GObject.BindingFlags.SYNC_CREATE
+            | GObject.BindingFlags.INVERT_BOOLEAN
+            | GObject.BindingFlags.BIDIRECTIONAL,
+        )
+        self.task_row.bind_property(
+            "title",
+            task_edit_row,
+            "text",
+            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
+        )
+
         # Drag controller
         task_row_drag_source: Gtk.DragSource = Gtk.DragSource.new()
         task_row_drag_source.set_actions(Gdk.DragAction.MOVE)
@@ -157,12 +184,14 @@ class TaskTitleRow(Gtk.Overlay):
         )
         self.task_row.add_controller(task_row_click_ctrl)
 
+        # BOX
         box = Gtk.ListBox(
             selection_mode=Gtk.SelectionMode.NONE,
             css_classes=["rounded-corners", "transparent"],
             accessible_role=Gtk.AccessibleRole.PRESENTATION,
         )
         box.append(self.task_row)
+        box.append(task_edit_row)
 
         self.set_child(box)
 
@@ -186,6 +215,14 @@ class TaskTitleRow(Gtk.Overlay):
         self.task_row.set_subtitle(
             _("Completed:") + f" {completed} / {total}" if total > 0 else ""
         )
+
+    def __on_edit_entry_applied(self, entry: Adw.EntryRow):
+        text: str = entry.props.text.strip()
+        entry.set_visible(False)
+        if not text or text == self.task.get_prop("text"):
+            return
+        self.task.update_props(["text", "synced"], [text, False])
+        Sync.sync(False)
 
     # --- DND --- #
 
@@ -426,6 +463,27 @@ class TaskToolBar(Gtk.Revealer):
         super().__init__()
         self.task: Task = task
         self.__build_ui()
+        self.__add_actions()
+
+    def __add_actions(self) -> None:
+        group: Gio.SimpleActionGroup = Gio.SimpleActionGroup()
+        self.insert_action_group(name="task_toolbar", group=group)
+
+        def __create_action(name: str, callback: callable) -> None:
+            action: Gio.SimpleAction = Gio.SimpleAction.new(name, None)
+            action.connect("activate", callback)
+            group.add_action(action)
+
+        def __copy_to_clipboard(*args):
+            Log.info("Task: Copy text to clipboard")
+            Gdk.Display.get_default().get_clipboard().set(self.task.get_prop("text"))
+            self.task.window.add_toast(_("Copied to Clipboard"))
+
+        __create_action(
+            "edit", lambda *_: self.task.task_row.task_row.set_visible(False)
+        )
+        __create_action("copy_to_clipboard", __copy_to_clipboard)
+        __create_action("move_to_trash", lambda *_: self.task.delete())
 
     def __build_ui(self) -> None:
         self.bind_property(
@@ -445,16 +503,19 @@ class TaskToolBar(Gtk.Revealer):
         )
 
         # Notes
+        notes_text_view = GtkSource.View()
+        notes_popover = Gtk.Popover(
+            child=Gtk.ScrolledWindow(
+                child=notes_text_view, height_request=300, width_request=300
+            )
+        )
         notes_btn = Gtk.MenuButton(
-            popover=Gtk.Popover(
-                child=Gtk.ScrolledWindow(
-                    child=GtkSource.View(), height_request=300, width_request=300
-                )
-            ),
+            popover=notes_popover,
             icon_name="errands-notes-symbolic",
             css_classes=["flat"],
             tooltip_text=_("Notes"),
         )
+        notes_btn.connect("notify::active", self.__on_notes_toggled, notes_text_view)
 
         # Priority
         priority_btn = Gtk.MenuButton(
@@ -464,18 +525,13 @@ class TaskToolBar(Gtk.Revealer):
             tooltip_text=_("Priority"),
         )
 
-        # Copy text button
-        copy_text_btn = Gtk.Button(
-            icon_name="errands-copy-symbolic",
-            tooltip_text=_("Copy Text"),
-            css_classes=["flat"],
-        )
-
         # More menu
         more_menu = Gio.Menu()
 
         # Actions section
-        more_menu.append("Edit")
+        more_menu.append("Edit", "task_toolbar.edit")
+        more_menu.append("Copy to Clipboard", "task_toolbar.copy_to_clipboard")
+        more_menu.append("Move to Trash", "task_toolbar.move_to_trash")
 
         # Custom section
         more_menu_custom = Gio.Menu()
@@ -489,8 +545,8 @@ class TaskToolBar(Gtk.Revealer):
             label=_("Created:"),
             halign=Gtk.Align.START,
             css_classes=["caption"],
-            margin_start=3,
-            margin_end=3,
+            margin_start=12,
+            margin_end=12,
             margin_bottom=6,
         )
 
@@ -499,11 +555,11 @@ class TaskToolBar(Gtk.Revealer):
         changed.set_attribute([("custom", "s", "changed")])
         more_menu_custom.append_item(changed)
         self.menu_changed_label = Gtk.Label(
-            label=_("Changed:"),
+            label=_("Changed: 12.05.2024 16:00"),
             halign=Gtk.Align.START,
             css_classes=["caption"],
-            margin_start=3,
-            margin_end=3,
+            margin_start=12,
+            margin_end=12,
             margin_bottom=3,
         )
 
@@ -527,10 +583,9 @@ class TaskToolBar(Gtk.Revealer):
             margin_start=12, margin_end=12, margin_bottom=6, spacing=5
         )
         hbox.append(date_btn)
-        hbox.append(notes_btn)
         hbox.append(Gtk.Separator(css_classes=["spacer"], hexpand=True))
+        hbox.append(notes_btn)
         hbox.append(priority_btn)
-        hbox.append(copy_text_btn)
         hbox.append(more_btn)
 
         self.set_child(hbox)
@@ -540,8 +595,17 @@ class TaskToolBar(Gtk.Revealer):
 
     # ------ SIGNAL HANDLERS ------ #
 
-    def __on_copy_text_btn_clicked(self, _btn):
-        pass
+    def __on_notes_toggled(self, btn: Gtk.MenuButton, _, text_view: GtkSource.View):
+        notes: str = self.task.get_prop("notes")
+        if btn.get_active():
+            text_view.get_buffer().set_text(notes)
+        else:
+            text: str = text_view.get_buffer().props.text
+            if text == notes:
+                return
+            Log.info("Task: Change notes")
+            self.task.update_props(["notes", "synced"], [text, False])
+            Sync.sync(False)
 
 
 class TaskUncompletedSubTasks(Gtk.Box):
