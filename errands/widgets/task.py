@@ -503,10 +503,28 @@ class TaskToolBar(Gtk.Revealer):
         )
 
         # Notes
-        notes_text_view = GtkSource.View()
+        notes_text_view = GtkSource.View(
+            height_request=300, width_request=300, wrap_mode=3
+        )
+        notes_text_view_buffer: GtkSource.Buffer = notes_text_view.get_buffer()
+        Adw.StyleManager.get_default().bind_property(
+            "dark",
+            notes_text_view_buffer,
+            "style-scheme",
+            GObject.BindingFlags.SYNC_CREATE,
+            lambda _, is_dark: notes_text_view_buffer.set_style_scheme(
+                GtkSource.StyleSchemeManager.get_default().get_scheme(
+                    "Adwaita-dark" if is_dark else "Adwaita"
+                )
+            ),
+        )
+        lm: GtkSource.LanguageManager = GtkSource.LanguageManager.get_default()
+        notes_text_view_buffer.set_language(lm.get_language("markdown"))
         notes_popover = Gtk.Popover(
             child=Gtk.ScrolledWindow(
-                child=notes_text_view, height_request=300, width_request=300
+                child=notes_text_view,
+                propagate_natural_height=True,
+                propagate_natural_width=True,
             )
         )
         self.notes_btn = Gtk.MenuButton(
@@ -516,7 +534,7 @@ class TaskToolBar(Gtk.Revealer):
             tooltip_text=_("Notes"),
         )
         self.notes_btn.connect(
-            "notify::active", self.__on_notes_toggled, notes_text_view
+            "notify::active", self.__on_notes_toggled, notes_text_view_buffer
         )
 
         # Priority
@@ -604,13 +622,13 @@ class TaskToolBar(Gtk.Revealer):
 
     # ------ SIGNAL HANDLERS ------ #
 
-    def __on_notes_toggled(self, btn: Gtk.MenuButton, _, text_view: GtkSource.View):
+    def __on_notes_toggled(self, btn: Gtk.MenuButton, _, buffer: GtkSource.Buffer):
         notes: str = self.task.get_prop("notes")
         if btn.get_active():
-            text_view.get_buffer().set_text(notes)
+            buffer.set_text(notes)
             self.update_ui()
         else:
-            text: str = text_view.get_buffer().props.text
+            text: str = buffer.props.text
             if text == notes:
                 return
             Log.info("Task: Change notes")

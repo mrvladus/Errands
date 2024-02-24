@@ -142,28 +142,9 @@ class Details(Adw.Bin):
         notes_group = Adw.PreferencesGroup(title=_("Notes"))
         # Notes entry
         notes_source_view = GtkSource.View(
-            height_request=200,
-            top_margin=12,
-            bottom_margin=12,
-            left_margin=12,
-            right_margin=12,
-            wrap_mode=3,
             css_classes=["card"],
         )
-        self.notes = notes_source_view.get_buffer()
-        Adw.StyleManager.get_default().bind_property(
-            "dark",
-            self.notes,
-            "style-scheme",
-            GObject.BindingFlags.SYNC_CREATE,
-            lambda _, is_dark: self.notes.set_style_scheme(
-                GtkSource.StyleSchemeManager.get_default().get_scheme(
-                    "Adwaita-dark" if is_dark else "Adwaita"
-                )
-            ),
-        )
-        lm: GtkSource.LanguageManager = GtkSource.LanguageManager.get_default()
-        self.notes.set_language(lm.get_language("markdown"))
+
         self.notes.connect("changed", self._on_notes_changed)
         notes_ovrl = Gtk.Overlay(child=notes_source_view)
         # Save button
@@ -381,8 +362,6 @@ class Details(Adw.Bin):
 
         # Edit text
         self.edit_entry.set_text(self.parent.get_prop("text"))
-        # Notes
-        self.notes.set_text(self.parent.get_prop("notes"))
         # Datetime
         self.start_datetime.set_datetime(self.parent.get_prop("start_date"))
         self.start_datetime_row.set_title(self.start_datetime.get_human_datetime())
@@ -404,24 +383,6 @@ class Details(Adw.Bin):
         for tag in self.parent.get_prop("tags").split(","):
             self.add_tag(tag)
         self.can_sync = True
-
-    def _on_text_changed(self, buffer: Gtk.TextBuffer):
-        if not self.can_sync:
-            return
-        if buffer.props.text != self.parent.get_prop("text"):
-            if GSettings.get("sync-provider") != 0:
-                self.edit_entry_save_btn.set_visible(True)
-            else:
-                self.save()
-
-    def _on_notes_changed(self, buffer: GtkSource.Buffer):
-        if not self.can_sync:
-            return
-        if buffer.props.text != self.parent.get_prop("notes"):
-            if GSettings.get("sync-provider") != 0:
-                self.notes_save_btn.set_visible(True)
-            else:
-                self.save()
 
     def _on_percent_complete_changed(self, _):
         if not self.can_sync:
