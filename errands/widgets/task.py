@@ -545,6 +545,71 @@ class TaskToolBar(Gtk.Revealer):
             tooltip_text=_("Priority"),
         )
 
+        # Accent Color
+        clear_color_btn = Gtk.CheckButton(
+            tooltip_text=_("None"),
+            css_classes=["accent-color-btn", "accent-color-btn-none"],
+        )
+
+        blue_color_btn = Gtk.CheckButton(
+            tooltip_text=_("Blue"),
+            group=clear_color_btn,
+            css_classes=["accent-color-btn", "accent-color-btn-blue"],
+        )
+
+        green_color_btn = Gtk.CheckButton(
+            tooltip_text=_("Green"),
+            group=clear_color_btn,
+            css_classes=["accent-color-btn", "accent-color-btn-green"],
+        )
+
+        yellow_color_btn = Gtk.CheckButton(
+            tooltip_text=_("Yellow"),
+            group=clear_color_btn,
+            css_classes=["accent-color-btn", "accent-color-btn-yellow"],
+        )
+
+        orange_color_btn = Gtk.CheckButton(
+            tooltip_text=_("Orange"),
+            group=clear_color_btn,
+            css_classes=["accent-color-btn", "accent-color-btn-orange"],
+        )
+
+        red_color_btn = Gtk.CheckButton(
+            tooltip_text=_("Red"),
+            group=clear_color_btn,
+            css_classes=["accent-color-btn", "accent-color-btn-red"],
+        )
+
+        purple_color_btn = Gtk.CheckButton(
+            tooltip_text=_("Purple"),
+            group=clear_color_btn,
+            css_classes=["accent-color-btn", "accent-color-btn-purple"],
+        )
+
+        brown_color_btn = Gtk.CheckButton(
+            tooltip_text=_("Brown"),
+            group=clear_color_btn,
+            css_classes=["accent-color-btn", "accent-color-btn-brown"],
+        )
+
+        color_box: Gtk.Box = Gtk.Box(css_classes=["themeswither"])
+        color_box.append(clear_color_btn)
+        color_box.append(blue_color_btn)
+        color_box.append(green_color_btn)
+        color_box.append(yellow_color_btn)
+        color_box.append(orange_color_btn)
+        color_box.append(red_color_btn)
+        color_box.append(purple_color_btn)
+        color_box.append(brown_color_btn)
+
+        color_btn = Gtk.MenuButton(
+            popover=Gtk.Popover(child=color_box),
+            icon_name="errands-color-symbolic",
+            css_classes=["flat"],
+            tooltip_text=_("Accent Color"),
+        )
+
         # More menu
         more_menu = Gio.Menu()
 
@@ -606,6 +671,7 @@ class TaskToolBar(Gtk.Revealer):
         hbox.append(Gtk.Separator(css_classes=["spacer"], hexpand=True))
         hbox.append(self.notes_btn)
         hbox.append(priority_btn)
+        hbox.append(color_btn)
         hbox.append(more_btn)
 
         self.set_child(hbox)

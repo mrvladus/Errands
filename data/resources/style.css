@@ -94,42 +94,62 @@
   background: #ece2da;
 }
 
-/* Accent colors buttons */
+/* Accent color buttons */
 
-.accent-color-btn {
-  transition: 0.25s;
+.accent-color-btn radio {
+  all: unset;
+  border: 2px solid transparent;
+  border-radius: 9999px;
+  min-width: 24px;
+  min-height: 24px;
+  color: @light_1;
+  transition: 0.2s;
 }
 
-.accent-color-btn:hover {
+.accent-color-btn radio:hover {
   filter: brightness(1.2);
 }
 
-.btn-blue {
-  background: @blue_1;
+.accent-color-btn radio:checked {
+  -gtk-icon-transform: scale(0.7);
+  -gtk-icon-source: -gtk-icontheme("errands-select-symbolic");
 }
 
-.btn-green {
-  background: @green_1;
+.accent-color-btn-none radio {
+  border-color: @shade_color;
 }
 
-.btn-yellow {
-  background: @yellow_1;
+.accent-color-btn-none radio:checked {
+  color: @window_fg_color;
 }
 
-.btn-orange {
-  background: @orange_1;
+.accent-color-btn-blue radio {
+  background-color: @blue_2;
 }
 
-.btn-red {
-  background: @red_1;
+.accent-color-btn-green radio {
+  background-color: @green_2;
 }
 
-.btn-purple {
-  background: @purple_1;
+.accent-color-btn-yellow radio {
+  background-color: @yellow_2;
+  color: @window_fg_color;
 }
 
-.btn-brown {
-  background: @brown_1;
+.accent-color-btn-orange radio {
+  background-color: @orange_2;
+}
+
+.accent-color-btn-red radio {
+  background-color: @red_2;
+}
+
+.accent-color-btn-purple radio {
+  background-color: @purple_2;
+}
+
+.accent-color-btn-brown radio {
+  background-color: @brown_2;
 }
 
 /* Sub-task */
@@ -143,15 +163,6 @@
   background-color: alpha(@card_bg_color, 0.5);
 }
 
-/* Calendar */
-calendar {
-  background: @background;
-}
-
-calendar,
-calendar header {
-  border: none;
-}
 
 /* Utils */
 
@@ -167,10 +178,6 @@ calendar header {
   transition: 0.2s;
 }
 
-.rotate {
-  transform: rotate(180deg);
-}
-
 /* Expand indicator */
 
 .expand-indicator {
@@ -181,23 +188,21 @@ calendar header {
   transform: rotate(180deg);
 }
 
+/* Overrides */
+
 progressbar.osd {
   background-color: @shade_color;
 }
 
-.secret-notes-progressbar progressbar {
-  background-color: @shade_color;
-}
-
-.secret-notes-progressbar progress {
-  background-image: none;
-  background-color: @red_1;
-}
-
-.secret-note {
-  background-color: @card_bg_color;
-}
-
 textview text {
   background-color: @card_bg_color;
+}
+
+calendar {
+  background: @background;
+}
+
+calendar,
+calendar header {
+  border: none;
 }
