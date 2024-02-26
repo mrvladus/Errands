@@ -471,6 +471,10 @@ class TaskSubTaskEntry(Gtk.Entry):
 
 
 class TaskToolBar(Gtk.Revealer):
+
+    # State
+    can_sync: bool = True
+
     def __init__(self, task: Task):
         super().__init__()
         self.task: Task = task
@@ -560,62 +564,16 @@ class TaskToolBar(Gtk.Revealer):
         )
 
         # Accent Color
-        clear_color_btn = Gtk.CheckButton(
-            tooltip_text=_("None"),
-            css_classes=["accent-color-btn", "accent-color-btn-none"],
-        )
-
-        blue_color_btn = Gtk.CheckButton(
-            tooltip_text=_("Blue"),
-            group=clear_color_btn,
-            css_classes=["accent-color-btn", "accent-color-btn-blue"],
-        )
-
-        green_color_btn = Gtk.CheckButton(
-            tooltip_text=_("Green"),
-            group=clear_color_btn,
-            css_classes=["accent-color-btn", "accent-color-btn-green"],
-        )
-
-        yellow_color_btn = Gtk.CheckButton(
-            tooltip_text=_("Yellow"),
-            group=clear_color_btn,
-            css_classes=["accent-color-btn", "accent-color-btn-yellow"],
-        )
-
-        orange_color_btn = Gtk.CheckButton(
-            tooltip_text=_("Orange"),
-            group=clear_color_btn,
-            css_classes=["accent-color-btn", "accent-color-btn-orange"],
-        )
-
-        red_color_btn = Gtk.CheckButton(
-            tooltip_text=_("Red"),
-            group=clear_color_btn,
-            css_classes=["accent-color-btn", "accent-color-btn-red"],
-        )
-
-        purple_color_btn = Gtk.CheckButton(
-            tooltip_text=_("Purple"),
-            group=clear_color_btn,
-            css_classes=["accent-color-btn", "accent-color-btn-purple"],
-        )
-
-        brown_color_btn = Gtk.CheckButton(
-            tooltip_text=_("Brown"),
-            group=clear_color_btn,
-            css_classes=["accent-color-btn", "accent-color-btn-brown"],
-        )
-
-        color_box: Gtk.Box = Gtk.Box(css_classes=["themeswither"])
-        color_box.append(clear_color_btn)
-        color_box.append(blue_color_btn)
-        color_box.append(green_color_btn)
-        color_box.append(yellow_color_btn)
-        color_box.append(orange_color_btn)
-        color_box.append(red_color_btn)
-        color_box.append(purple_color_btn)
-        color_box.append(brown_color_btn)
+        color_box: Gtk.Box = Gtk.Box()
+        colors = ["none", "blue", "green", "yellow", "orange", "red", "purple", "brown"]
+        for color in colors:
+            btn = Gtk.CheckButton(
+                css_classes=["accent-color-btn", f"accent-color-btn-{color}"]
+            )
+            if first_btn := color_box.get_first_child():
+                btn.set_group(first_btn)
+            btn.connect("toggled", self.__on_accent_color_selected, color)
+            color_box.append(btn)
 
         color_btn = Gtk.MenuButton(
             popover=Gtk.Popover(child=color_box),
@@ -623,6 +581,7 @@ class TaskToolBar(Gtk.Revealer):
             css_classes=["flat"],
             tooltip_text=_("Accent Color"),
         )
+        color_btn.connect("notify::active", self.__on_accent_color_menu_open, color_box)
 
         # More menu
         more_menu = Gio.Menu()
@@ -701,6 +660,28 @@ class TaskToolBar(Gtk.Revealer):
             self.notes_btn.remove_css_class("accent")
 
     # ------ SIGNAL HANDLERS ------ #
+
+    def __on_accent_color_menu_open(self, _, btn: Gtk.MenuButton, color_box: Gtk.Box):
+        self.can_sync = False
+        color: str = self.task.get_prop("color")
+        if color:
+            for btn in get_children(color_box):
+                for css_class in btn.get_css_classes():
+                    if color in css_class:
+                        btn.set_active(True)
+        else:
+            color_box.get_first_child().set_active(True)
+        self.can_sync = True
+
+    def __on_accent_color_selected(self, btn: Gtk.CheckButton, color: str):
+        if not btn.get_active() or not self.can_sync:
+            return
+        Log.info(f"Task: change color to '{color}'")
+        self.task.update_props(
+            ["color", "synced"], [color if color != "none" else "", False]
+        )
+        self.task.update_ui()
+        Sync.sync(False)
 
     def __on_notes_toggled(self, btn: Gtk.MenuButton, _, buffer: GtkSource.Buffer):
         notes: str = self.task.get_prop("notes")
@@ -1059,6 +1040,15 @@ class Task(Gtk.Revealer):
         # Expand
         self.expand(self.get_prop("expanded"))
 
+        # Update color
+        for c in self.main_box.get_css_classes():
+            if "task-" in c:
+                self.main_box.remove_css_class(c)
+                break
+        if color := self.get_prop("color"):
+            self.main_box.add_css_class(f"task-{color}")
+
+        # Update sub-widgets
         self.task_row.update_ui()
         self.progress_bar.update_ui()
         self.toolbar.update_ui()
