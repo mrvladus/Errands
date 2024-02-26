@@ -124,7 +124,7 @@ class TaskTitleRow(Gtk.Overlay):
         self.add_rm_crossline(self.task.get_prop("completed"))
 
         # Task Edit Row
-        task_edit_row = Adw.EntryRow(
+        self.task_edit_row = Adw.EntryRow(
             title=_("Edit Text"),
             css_classes=["rounded-corners", "transparent"],
             height_request=60,
@@ -134,8 +134,8 @@ class TaskTitleRow(Gtk.Overlay):
             margin_end=6,
             margin_start=6,
         )
-        task_edit_row.connect("apply", self.__on_edit_entry_applied)
-        task_edit_row.bind_property(
+        self.task_edit_row.connect("apply", self.__on_edit_entry_applied)
+        self.task_edit_row.bind_property(
             "visible",
             self.task_row,
             "visible",
@@ -143,12 +143,14 @@ class TaskTitleRow(Gtk.Overlay):
             | GObject.BindingFlags.INVERT_BOOLEAN
             | GObject.BindingFlags.BIDIRECTIONAL,
         )
-        self.task_row.bind_property(
-            "title",
-            task_edit_row,
-            "text",
-            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
+        cancel_edit_btn = Gtk.Button(
+            css_classes=["circular"],
+            icon_name="window-close-symbolic",
+            tooltip_text=_("Cancel"),
+            valign=Gtk.Align.CENTER,
         )
+        cancel_edit_btn.connect("clicked", self.__on_edit_cancelled)
+        self.task_edit_row.add_suffix(cancel_edit_btn)
 
         # Drag controller
         task_row_drag_source: Gtk.DragSource = Gtk.DragSource.new()
@@ -191,7 +193,7 @@ class TaskTitleRow(Gtk.Overlay):
             accessible_role=Gtk.AccessibleRole.PRESENTATION,
         )
         box.append(self.task_row)
-        box.append(task_edit_row)
+        box.append(self.task_edit_row)
 
         self.set_child(box)
 
@@ -202,7 +204,12 @@ class TaskTitleRow(Gtk.Overlay):
             self.task_row.remove_css_class("task-completed")
 
     def update_ui(self):
-        # Update widget title crossline and completed toggle
+        # Update title
+        self.task_row.set_title(
+            Markup.find_url(Markup.escape(self.task.get_prop("text")))
+        )
+
+        # Update crossline and completed toggle
         completed: bool = self.task.get_prop("completed")
         self.add_rm_crossline(completed)
         if self.complete_btn.get_active() != completed:
@@ -222,7 +229,12 @@ class TaskTitleRow(Gtk.Overlay):
         if not text or text == self.task.get_prop("text"):
             return
         self.task.update_props(["text", "synced"], [text, False])
+        self.update_ui()
         Sync.sync(False)
+
+    def __on_edit_cancelled(self, btn):
+        self.task_edit_row.props.text = ""
+        self.task_edit_row.emit("apply")
 
     # --- DND --- #
 
@@ -474,14 +486,16 @@ class TaskToolBar(Gtk.Revealer):
             action.connect("activate", callback)
             group.add_action(action)
 
+        def __edit(*args):
+            self.task.task_row.task_edit_row.set_text(self.task.get_prop("text"))
+            self.task.task_row.task_edit_row.set_visible(True)
+
         def __copy_to_clipboard(*args):
             Log.info("Task: Copy text to clipboard")
             Gdk.Display.get_default().get_clipboard().set(self.task.get_prop("text"))
             self.task.window.add_toast(_("Copied to Clipboard"))
 
-        __create_action(
-            "edit", lambda *_: self.task.task_row.task_row.set_visible(False)
-        )
+        __create_action("edit", __edit)
         __create_action("copy_to_clipboard", __copy_to_clipboard)
         __create_action("move_to_trash", lambda *_: self.task.delete())
 
