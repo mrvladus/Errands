@@ -103,7 +103,6 @@
   min-width: 24px;
   min-height: 24px;
   color: @light_1;
-  transition: 0.2s;
 }
 
 .accent-color-btn radio:hover {
@@ -116,7 +115,7 @@
 }
 
 .accent-color-btn-none radio {
-  border-color: @shade_color;
+  border-color: @borders;
 }
 
 .accent-color-btn-none radio:checked {
