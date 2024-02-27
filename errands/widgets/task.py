@@ -2,7 +2,9 @@
 # SPDX-License-Identifier: MIT
 
 from __future__ import annotations
+from datetime import datetime
 from typing import Any, TYPE_CHECKING
+from icalendar import Calendar, Event
 
 if TYPE_CHECKING:
     from errands.widgets.task_list import TaskList
@@ -494,12 +496,59 @@ class TaskToolBar(Gtk.Revealer):
             self.task.task_row.task_edit_row.set_text(self.task.get_prop("text"))
             self.task.task_row.task_edit_row.set_visible(True)
 
+        def __export(*args):
+            def __confirm(dialog, res):
+                try:
+                    file = dialog.save_finish(res)
+                except:
+                    Log.debug("List: Export cancelled")
+                    return
+
+                Log.info(f"Task: Export '{self.task.uid}'")
+
+                task = [
+                    i
+                    for i in UserData.get_tasks_as_dicts(self.task.list_uid)
+                    if i["uid"] == self.task.uid
+                ][0]
+                calendar = Calendar()
+                event = Event()
+                event.add("uid", task["uid"])
+                event.add("summary", task["text"])
+                if task["notes"]:
+                    event.add("description", task["notes"])
+                event.add("priority", task["priority"])
+                if task["tags"]:
+                    event.add("categories", task["tags"])
+                event.add("percent-complete", task["percent_complete"])
+                if task["color"]:
+                    event.add("x-errands-color", task["color"])
+                event.add(
+                    "dtstart",
+                    (
+                        datetime.fromisoformat(task["start_date"])
+                        if task["start_date"]
+                        else datetime.now()
+                    ),
+                )
+                if task["end_date"]:
+                    event.add("dtend", datetime.fromisoformat(task["end_date"]))
+                calendar.add_component(event)
+
+                with open(file.get_path(), "wb") as f:
+                    f.write(calendar.to_ical())
+                self.task.window.add_toast(_("Exported"))
+
+            dialog = Gtk.FileDialog(initial_name=f"{self.task.uid}.ics")
+            dialog.save(self.task.window, None, __confirm)
+
         def __copy_to_clipboard(*args):
             Log.info("Task: Copy text to clipboard")
             Gdk.Display.get_default().get_clipboard().set(self.task.get_prop("text"))
             self.task.window.add_toast(_("Copied to Clipboard"))
 
         __create_action("edit", __edit)
+        __create_action("export", __export)
         __create_action("copy_to_clipboard", __copy_to_clipboard)
         __create_action("move_to_trash", lambda *_: self.task.delete())
 
@@ -590,6 +639,7 @@ class TaskToolBar(Gtk.Revealer):
         more_menu.append("Edit", "task_toolbar.edit")
         more_menu.append("Copy to Clipboard", "task_toolbar.copy_to_clipboard")
         more_menu.append("Move to Trash", "task_toolbar.move_to_trash")
+        more_menu.append("Export", "task_toolbar.export")
 
         # Custom section
         more_menu_custom = Gio.Menu()
@@ -676,6 +726,7 @@ class TaskToolBar(Gtk.Revealer):
     def __on_accent_color_selected(self, btn: Gtk.CheckButton, color: str):
         if not btn.get_active() or not self.can_sync:
             return
+
         Log.info(f"Task: change color to '{color}'")
         self.task.update_props(
             ["color", "synced"], [color if color != "none" else "", False]
