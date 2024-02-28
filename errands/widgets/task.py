@@ -605,11 +605,34 @@ class TaskToolBar(Gtk.Revealer):
         )
 
         # Priority
-        priority_btn = Gtk.MenuButton(
-            popover=Gtk.Popover(child=Gtk.Label(label="Priority")),
+        priority_box: Gtk.Box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=3)
+        items: tuple[tuple[str, str, int]] = (
+            (_("None"), "", 0),
+            (_("High"), "error", 1),
+            (_("Medium"), "warning", 5),
+            (_("Low"), "accent", 9),
+        )
+        for item in items:
+            btn = Gtk.ToggleButton(
+                child=Adw.ButtonContent(
+                    label=item[0], icon_name="errands-priority-symbolic", halign="start"
+                ),
+                css_classes=["flat"],
+            )
+            btn.priority = item[2]
+            if item[1]:
+                btn.add_css_class(item[1])
+            btn.connect("clicked", self.__on_priority_selected, btn.priority)
+            priority_box.append(btn)
+
+        self.priority_btn = Gtk.MenuButton(
+            popover=Gtk.Popover(child=priority_box),
             icon_name="errands-priority-symbolic",
             css_classes=["flat"],
             tooltip_text=_("Priority"),
+        )
+        self.priority_btn.connect(
+            "notify::active", self.__on_priority_open, priority_box
         )
 
         # Accent Color
@@ -663,7 +686,7 @@ class TaskToolBar(Gtk.Revealer):
         changed.set_attribute([("custom", "s", "changed")])
         more_menu_custom.append_item(changed)
         self.menu_changed_label = Gtk.Label(
-            label=_("Changed: 12.05.2024 16:00"),
+            label=_("Changed:"),
             halign=Gtk.Align.START,
             css_classes=["caption"],
             margin_start=12,
@@ -693,7 +716,7 @@ class TaskToolBar(Gtk.Revealer):
         hbox.append(date_btn)
         hbox.append(Gtk.Separator(css_classes=["spacer"], hexpand=True))
         hbox.append(self.notes_btn)
-        hbox.append(priority_btn)
+        hbox.append(self.priority_btn)
         hbox.append(color_btn)
         hbox.append(more_btn)
 
@@ -703,11 +726,21 @@ class TaskToolBar(Gtk.Revealer):
         # Show toolbar
         self.set_reveal_child(self.task.get_prop("toolbar_shown"))
 
-        # Update notes btn
+        # Update notes button css
         if self.task.get_prop("notes"):
             self.notes_btn.add_css_class("accent")
         else:
             self.notes_btn.remove_css_class("accent")
+
+        # Update priority button css
+        priority: int = self.task.get_prop("priority")
+        self.priority_btn.props.css_classes = ["flat"]
+        if 0 < priority < 5:
+            self.priority_btn.add_css_class("error")
+        elif 4 < priority < 9:
+            self.priority_btn.add_css_class("warning")
+        elif priority == 9:
+            self.priority_btn.add_css_class("accent")
 
     # ------ SIGNAL HANDLERS ------ #
 
@@ -747,6 +780,29 @@ class TaskToolBar(Gtk.Revealer):
             self.task.update_props(["notes", "synced"], [text, False])
             self.update_ui()
             Sync.sync(False)
+
+    def __on_priority_open(self, btn, _, priority_box: Gtk.Box):
+        if not btn.get_active():
+            return
+        priority: int = self.task.get_prop("priority")
+        for btn in get_children(priority_box):
+            if btn.priority == 0 == priority:
+                btn.set_active(True)
+            elif btn.priority == 1 and 0 < priority < 5:
+                btn.set_active(True)
+            elif btn.priority == 5 and 4 < priority < 9:
+                btn.set_active(True)
+            elif btn.priority == 9 and 8 < priority:
+                btn.set_active(True)
+
+    def __on_priority_selected(self, btn: Gtk.ToggleButton, priority: int):
+        box: Gtk.Box = btn.get_parent()
+        for button in get_children(box):
+            if button != btn:
+                button.set_active(False)
+        self.task.update_props(["priority", "synced"], [priority, False])
+        self.update_ui()
+        Sync.sync(False)
 
 
 class TaskUncompletedSubTasks(Gtk.Box):
