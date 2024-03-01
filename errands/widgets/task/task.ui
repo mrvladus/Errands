@@ -214,8 +214,8 @@
 
             <!-- Toolbar -->
             <child>
-              <object class="GtkRevealer">
-                <property name="reveal-child" bind-source="toolbar_btn" bind-property="active" bind-flags="sync-create" />
+              <object id="toolbar_rev" class="GtkRevealer">
+                <property name="reveal-child" bind-source="toolbar_btn" bind-property="active" bind-flags="sync-create | bidirectional" />
 
                 <child>
                   <object class="GtkBox">
@@ -228,14 +228,13 @@
                     <child>
                       <object class="GtkMenuButton">
                         <property name="valign">center</property>
-                        <style>
-                          <class name="flat" />
-                        </style>
-
                         <property name="popover">
                           <object class="GtkPopover">
                           </object>
                         </property>
+                        <style>
+                          <class name="flat" />
+                        </style>
 
                         <child>
                           <object class="AdwButtonContent">
@@ -244,6 +243,130 @@
                           </object>
                         </child>
 
+                      </object>
+                    </child>
+
+                    <!-- Notes btn -->
+                    <child>
+                      <object id="notes_btn" class="GtkMenuButton">
+                        <property name="valign">center</property>
+                        <property name="icon-name">errands-notes-symbolic</property>
+                        <property name="tooltip-text" translatable="yes">Notes</property>
+                        <property name="popover">
+                          <object class="GtkPopover">
+                            <child>
+                              <object class="GtkScrolledWindow">
+                                <property name="propagate-natural-height">true</property>
+                                <property name="propagate-natural-width">true</property>
+                                <child>
+                                  <object class="GtkSourceView">
+                                    <property name="width-request">300</property>
+                                    <property name="height-request">300</property>
+                                    <property name="wrap-mode">3</property>
+                                    <property name="buffer">
+                                      <object id="notes_buffer" class="GtkSourceBuffer" />
+                                    </property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </property>
+                        <style>
+                          <class name="flat" />
+                        </style>
+                        <signal name="notify::active" handler="_on_notes_toggled" />
+                      </object>
+                    </child>
+
+                    <!-- Priority btn -->
+                    <child>
+                      <object id="priority_btn" class="GtkMenuButton">
+                        <property name="valign">center</property>
+                        <property name="icon-name">errands-priority-symbolic</property>
+                        <property name="tooltip-text" translatable="yes">Priority</property>
+                        <property name="popover">
+                          <object class="GtkPopover">
+                            <child>
+                              <object class="GtkBox">
+                                <property name="orientation">vertical</property>
+                                <property name="spacing">3</property>
+
+                                <!-- None -->
+                                <child>
+                                  <object class="GtkToggleButton">
+                                    <style>
+                                      <class name="flat" />
+                                    </style>
+                                    <child>
+                                      <object class="AdwButtonContent">
+                                        <property name="label" translatable="yes">None</property>
+                                        <property name="icon-name">errands-priority-symbolic</property>
+                                        <property name="halign">start</property>
+                                      </object>
+                                    </child>
+                                  </object>
+                                </child>
+
+                                <!-- High -->
+                                <child>
+                                  <object class="GtkToggleButton">
+                                    <style>
+                                      <class name="flat" />
+                                      <class name="error" />
+                                    </style>
+                                    <child>
+                                      <object class="AdwButtonContent">
+                                        <property name="label" translatable="yes">High</property>
+                                        <property name="icon-name">errands-priority-symbolic</property>
+                                        <property name="halign">start</property>
+                                      </object>
+                                    </child>
+                                  </object>
+                                </child>
+
+                                <!-- Medium -->
+                                <child>
+                                  <object class="GtkToggleButton">
+                                    <style>
+                                      <class name="flat" />
+                                      <class name="warning" />
+                                    </style>
+                                    <child>
+                                      <object class="AdwButtonContent">
+                                        <property name="label" translatable="yes">Medium</property>
+                                        <property name="icon-name">errands-priority-symbolic</property>
+                                        <property name="halign">start</property>
+                                      </object>
+                                    </child>
+                                  </object>
+                                </child>
+
+                                <!-- Low -->
+                                <child>
+                                  <object class="GtkToggleButton">
+                                    <style>
+                                      <class name="flat" />
+                                      <class name="accent" />
+                                    </style>
+                                    <child>
+                                      <object class="AdwButtonContent">
+                                        <property name="label" translatable="yes">Low</property>
+                                        <property name="icon-name">errands-priority-symbolic</property>
+                                        <property name="halign">start</property>
+                                      </object>
+                                    </child>
+                                  </object>
+                                </child>
+
+                              </object>
+                            </child>
+                          </object>
+                        </property>
+                        <style>
+                          <class name="flat" />
+                        </style>
+                        <signal name="notify::active" handler="_on_priority_toggled" />
                       </object>
                     </child>
 

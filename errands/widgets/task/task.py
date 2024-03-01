@@ -102,50 +102,6 @@ class TaskToolBar(Gtk.Revealer):
 
     def __build_ui(self) -> None:
 
-        # Date
-        date_btn = Gtk.MenuButton(
-            child=Adw.ButtonContent(
-                icon_name="errands-calendar-symbolic", label=_("Date")
-            ),
-            popover=Gtk.Popover(child=DateTime()),
-            css_classes=["flat"],
-        )
-
-        # Notes
-        notes_text_view = GtkSource.View(
-            height_request=300, width_request=300, wrap_mode=3
-        )
-        notes_text_view_buffer: GtkSource.Buffer = notes_text_view.get_buffer()
-        Adw.StyleManager.get_default().bind_property(
-            "dark",
-            notes_text_view_buffer,
-            "style-scheme",
-            GObject.BindingFlags.SYNC_CREATE,
-            lambda _, is_dark: notes_text_view_buffer.set_style_scheme(
-                GtkSource.StyleSchemeManager.get_default().get_scheme(
-                    "Adwaita-dark" if is_dark else "Adwaita"
-                )
-            ),
-        )
-        lm: GtkSource.LanguageManager = GtkSource.LanguageManager.get_default()
-        notes_text_view_buffer.set_language(lm.get_language("markdown"))
-        notes_popover = Gtk.Popover(
-            child=Gtk.ScrolledWindow(
-                child=notes_text_view,
-                propagate_natural_height=True,
-                propagate_natural_width=True,
-            )
-        )
-        self.notes_btn = Gtk.MenuButton(
-            popover=notes_popover,
-            icon_name="errands-notes-symbolic",
-            css_classes=["flat"],
-            tooltip_text=_("Notes"),
-        )
-        self.notes_btn.connect(
-            "notify::active", self.__on_notes_toggled, notes_text_view_buffer
-        )
-
         # Priority
         priority_box: Gtk.Box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=3)
         items: tuple[tuple[str, str, int]] = (
@@ -166,16 +122,6 @@ class TaskToolBar(Gtk.Revealer):
                 btn.add_css_class(item[1])
             btn.connect("clicked", self.__on_priority_selected, btn.priority)
             priority_box.append(btn)
-
-        self.priority_btn = Gtk.MenuButton(
-            popover=Gtk.Popover(child=priority_box),
-            icon_name="errands-priority-symbolic",
-            css_classes=["flat"],
-            tooltip_text=_("Priority"),
-        )
-        self.priority_btn.connect(
-            "notify::active", self.__on_priority_open, priority_box
-        )
 
         # Accent Color
         color_box: Gtk.Box = Gtk.Box()
@@ -255,34 +201,12 @@ class TaskToolBar(Gtk.Revealer):
         hbox: Gtk.Box = Gtk.Box(
             margin_start=12, margin_end=12, margin_bottom=6, spacing=5
         )
-        hbox.append(date_btn)
         hbox.append(Gtk.Separator(css_classes=["spacer"], hexpand=True))
-        hbox.append(self.notes_btn)
         hbox.append(self.priority_btn)
         hbox.append(color_btn)
         hbox.append(more_btn)
 
         self.set_child(hbox)
-
-    def update_ui(self):
-        # Show toolbar
-        self.set_reveal_child(self.task.get_prop("toolbar_shown"))
-
-        # Update notes button css
-        if self.task.get_prop("notes"):
-            self.notes_btn.add_css_class("accent")
-        else:
-            self.notes_btn.remove_css_class("accent")
-
-        # Update priority button css
-        priority: int = self.task.get_prop("priority")
-        self.priority_btn.props.css_classes = ["flat"]
-        if 0 < priority < 5:
-            self.priority_btn.add_css_class("error")
-        elif 4 < priority < 9:
-            self.priority_btn.add_css_class("warning")
-        elif priority == 9:
-            self.priority_btn.add_css_class("accent")
 
     # ------ SIGNAL HANDLERS ------ #
 
@@ -307,43 +231,6 @@ class TaskToolBar(Gtk.Revealer):
             ["color", "synced"], [color if color != "none" else "", False]
         )
         self.task.update_ui()
-        Sync.sync(False)
-
-    def __on_notes_toggled(self, btn: Gtk.MenuButton, _, buffer: GtkSource.Buffer):
-        notes: str = self.task.get_prop("notes")
-        if btn.get_active():
-            buffer.set_text(notes)
-            self.update_ui()
-        else:
-            text: str = buffer.props.text
-            if text == notes:
-                return
-            Log.info("Task: Change notes")
-            self.task.update_props(["notes", "synced"], [text, False])
-            self.update_ui()
-            Sync.sync(False)
-
-    def __on_priority_open(self, btn, _, priority_box: Gtk.Box):
-        if not btn.get_active():
-            return
-        priority: int = self.task.get_prop("priority")
-        for btn in get_children(priority_box):
-            if btn.priority == 0 == priority:
-                btn.set_active(True)
-            elif btn.priority == 1 and 0 < priority < 5:
-                btn.set_active(True)
-            elif btn.priority == 5 and 4 < priority < 9:
-                btn.set_active(True)
-            elif btn.priority == 9 and 8 < priority:
-                btn.set_active(True)
-
-    def __on_priority_selected(self, btn: Gtk.ToggleButton, priority: int):
-        box: Gtk.Box = btn.get_parent()
-        for button in get_children(box):
-            if button != btn:
-                button.set_active(False)
-        self.task.update_props(["priority", "synced"], [priority, False])
-        self.update_ui()
         Sync.sync(False)
 
 
@@ -493,6 +380,9 @@ class TaskCompletedSubTasks(Gtk.Box):
 class Task(Gtk.Revealer):
     __gtype_name__ = "Task"
 
+    GObject.type_register(GtkSource.View)
+    GObject.type_register(GtkSource.Buffer)
+
     top_drop_area: Gtk.Revealer = Gtk.Template.Child()
     main_box: Gtk.Box = Gtk.Template.Child()
     progress_bar_rev: Gtk.Revealer = Gtk.Template.Child()
@@ -503,7 +393,10 @@ class Task(Gtk.Revealer):
     complete_btn: Gtk.CheckButton = Gtk.Template.Child()
     expand_indicator: Gtk.Image = Gtk.Template.Child()
     entry_row: Adw.EntryRow = Gtk.Template.Child()
-    # toolbar: Gtk.Revealer = Gtk.Template.Child()
+    toolbar_rev: Gtk.Revealer = Gtk.Template.Child()
+    notes_btn: Gtk.MenuButton = Gtk.Template.Child()
+    notes_buffer: GtkSource.Buffer = Gtk.Template.Child()
+    priority_btn: Gtk.MenuButton = Gtk.Template.Child()
 
     # uncompleted_tasks: TaskUncompletedSubTasks
     # completed_tasks: TaskCompletedSubTasks
@@ -540,7 +433,19 @@ class Task(Gtk.Revealer):
         self.title_row.set_title(Markup.find_url(Markup.escape(self.get_prop("text"))))
 
         # Toolbar
-        # self.toolbar = TaskToolBar(self)
+        Adw.StyleManager.get_default().bind_property(
+            "dark",
+            self.notes_buffer,
+            "style-scheme",
+            GObject.BindingFlags.SYNC_CREATE,
+            lambda _, is_dark: self.notes_buffer.set_style_scheme(
+                GtkSource.StyleSchemeManager.get_default().get_scheme(
+                    "Adwaita-dark" if is_dark else "Adwaita"
+                )
+            ),
+        )
+        lm: GtkSource.LanguageManager = GtkSource.LanguageManager.get_default()
+        self.notes_buffer.set_language(lm.get_language("markdown"))
 
         # Sub-tasks
         self.__load_sub_tasks()
@@ -742,7 +647,25 @@ class Task(Gtk.Revealer):
         self.title_row.set_subtitle(
             _("Completed:") + f" {completed} / {total}" if total > 0 else ""
         )
-        # self.toolbar.update_ui()
+
+        # Show toolbar
+        self.toolbar_rev.set_reveal_child(self.get_prop("toolbar_shown"))
+
+        # Update notes button css
+        if self.get_prop("notes"):
+            self.notes_btn.add_css_class("accent")
+        else:
+            self.notes_btn.remove_css_class("accent")
+
+        # Update priority button css
+        priority: int = self.get_prop("priority")
+        self.priority_btn.props.css_classes = ["flat"]
+        if 0 < priority < 5:
+            self.priority_btn.add_css_class("error")
+        elif 4 < priority < 9:
+            self.priority_btn.add_css_class("warning")
+        elif priority == 9:
+            self.priority_btn.add_css_class("accent")
         # self.completed_tasks.update_ui()
         # self.uncompleted_tasks.update_ui()
 
@@ -888,6 +811,46 @@ class Task(Gtk.Revealer):
     def _on_cancel_edit_btn_clicked(self, _btn: Gtk.Button) -> None:
         self.entry_row.props.text = ""
         self.entry_row.emit("apply")
+
+    @Gtk.Template.Callback()
+    def _on_notes_toggled(self, btn: Gtk.MenuButton, *_):
+        notes: str = self.get_prop("notes")
+        if btn.get_active():
+            self.notes_buffer.set_text(notes)
+            self.update_ui()
+        else:
+            text: str = self.notes_buffer.props.text
+            if text == notes:
+                return
+            Log.info("Task: Change notes")
+            self.update_props(["notes", "synced"], [text, False])
+            self.update_ui()
+            Sync.sync(False)
+
+    @Gtk.Template.Callback()
+    def _on_priority_toggled(self, btn: Gtk.MenuButton, *_):
+        if not btn.get_active():
+            return
+        # priority: int = self.get_prop("priority")
+        # for btn in get_children(priority_box):
+        #     if btn.priority == 0 == priority:
+        #         btn.set_active(True)
+        #     elif btn.priority == 1 and 0 < priority < 5:
+        #         btn.set_active(True)
+        #     elif btn.priority == 5 and 4 < priority < 9:
+        #         btn.set_active(True)
+        #     elif btn.priority == 9 and 8 < priority:
+        #         btn.set_active(True)
+
+    # @Gtk.Template.Callback()
+    # def _on_priority_selected(self, btn: Gtk.ToggleButton, priority: int):
+    #     box: Gtk.Box = btn.get_parent()
+    #     for button in get_children(box):
+    #         if button != btn:
+    #             button.set_active(False)
+    #     self.update_props(["priority", "synced"], [priority, False])
+    #     self.update_ui()
+    #     Sync.sync(False)
 
     # --- DND --- #
 
