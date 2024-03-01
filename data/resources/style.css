@@ -11,6 +11,7 @@
   background-color: @orange_1;
 }
 
+
 /* Task */
 
 .task-title:drop(active) {
@@ -22,8 +23,8 @@
 }
 
 .task {
-  margin: 6px 12px 6px 12px;
-  background-color: alpha(@card_bg_color, 0.5);
+  padding: 0px;
+  border-radius: 12px;
 }
 
 .task-expand-icon {
@@ -157,10 +158,10 @@
   margin-bottom: 6px;
 }
 
-.sub-task {
+/* .sub-task {
   margin: 6px 11px 6px 11px;
   background-color: alpha(@card_bg_color, 0.5);
-}
+} */
 
 
 /* Utils */

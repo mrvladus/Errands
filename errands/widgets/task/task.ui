@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="Task" parent="GtkRevealer">
+
+    <child>
+      <object id="drop_motion_ctrl" class="GtkDropControllerMotion" />
+    </child>
+
+    <child>
+      <object class="GtkBox">
+        <property name="orientation">vertical</property>
+        <property name="margin-start">12</property>
+        <property name="margin-end">12</property>
+        <property name="margin-bottom">6</property>
+        <property name="margin-top">6</property>
+
+        <!-- Top Drop area -->
+        <child>
+          <object id="top_drop_area" class="GtkRevealer">
+            <property name="reveal-child" bind-source="drop_motion_ctrl" bind-property="contains-pointer" bind-flags="sync-create" />
+
+            <child>
+              <object class="GtkImage">
+                <property name="icon-name">list-add-symbolic</property>
+                <style>
+                  <class name="dim-label" />
+                  <class name="task-drop-area" />
+                </style>
+
+                <child>
+                  <object class="GtkDropTarget">
+                    <property name="actions">move</property>
+                    <property name="formats">Task</property>
+                    <signal name="drop" handler="_on_top_area_drop" />
+                  </object>
+                </child>
+
+              </object>
+            </child>
+          </object>
+        </child>
+
+        <!-- Main Box -->
+        <child>
+          <object id="main_box" class="GtkBox">
+            <property name="orientation">vertical</property>
+            <style>
+              <class name="card" />
+              <class name="fade" />
+            </style>
+
+            <!-- Task Row -->
+            <child>
+              <object class="GtkListBox">
+                <style>
+                  <class name="transparent" />
+                  <class name="rounded-corners" />
+                </style>
+
+                <!-- Title row -->
+                <child>
+                  <object id="title_row" class="AdwActionRow">
+                    <property name="height-request">60</property>
+                    <property name="use-markup">True</property>
+                    <property name="tooltip-text" translatable="yes">Toggle Sub-Tasks</property>
+                    <property name="cursor">
+                      <object class="GdkCursor">
+                        <property name="name">pointer</property>
+                      </object>
+                    </property>
+                    <style>
+                      <class name="transparent" />
+                      <class name="rounded-corners" />
+                    </style>
+
+                    <!-- Complete toggle -->
+                    <child type="prefix">
+                      <object id="complete_btn" class="GtkCheckButton">
+                        <property name="tooltip-text" translatable="yes">Toggle Completion</property>
+                        <property name="valign">center</property>
+                        <style>
+                          <class name="selection-mode" />
+                        </style>
+                        <signal name="activate" handler="_on_complete_btn_toggle" />
+                      </object>
+                    </child>
+
+                    <!-- Suffix -->
+                    <child type="suffix">
+                      <object class="GtkBox">
+                        <property name="spacing">6</property>
+
+                        <!-- Expand indicator -->
+                        <child>
+                          <object class="GtkRevealer">
+                            <property name="transition-type">1</property>
+                            <property name="reveal-child" bind-source="hover_ctrl" bind-property="contains-pointer" bind-flags="sync-create" />
+                            <child>
+                              <object id="expand_indicator" class="GtkImage">
+                                <property name="icon-name">errands-up-symbolic</property>
+                                <style>
+                                  <class name="expand-indicator" />
+                                </style>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+
+                        <!-- Toolbar toggle -->
+                        <child>
+                          <object id="toolbar_btn" class="GtkToggleButton">
+                            <property name="tooltip-text" translatable="yes">Toggle Toolbar</property>
+                            <property name="icon-name">errands-toolbar-symbolic</property>
+                            <property name="valign">center</property>
+                            <style>
+                              <class name="circular" />
+                              <class name="flat" />
+                            </style>
+                            <signal name="toggled" handler="_on_toolbar_btn_toggle" />
+                          </object>
+                        </child>
+
+                      </object>
+                    </child>
+
+                    <!-- CONTROLLERS -->
+
+                    <!-- Drag ctrl -->
+                    <child>
+                      <object class="GtkDragSource">
+                        <property name="actions">move</property>
+                        <signal name="prepare" handler="_on_drag_prepare" />
+                        <signal name="drag-begin" handler="_on_drag_begin" />
+                        <signal name="drag-cancel" handler="_on_drag_end" />
+                        <signal name="drag-end" handler="_on_drag_end" />
+                      </object>
+                    </child>
+
+                    <!-- Drop ctrl -->
+                    <child>
+                      <object class="GtkDropTarget">
+                        <property name="formats">Task</property>
+                        <property name="actions">move</property>
+                        <signal name="drop" handler="_on_drop" />
+                      </object>
+                    </child>
+
+                    <!-- Hover ctrl -->
+                    <child>
+                      <object id="hover_ctrl" class="GtkEventControllerMotion" />
+                    </child>
+
+                    <!-- Click ctrl -->
+                    <child>
+                      <object class="GtkGestureClick">
+                        <signal name="released" handler="_on_title_row_clicked" />
+                      </object>
+                    </child>
+
+                  </object>
+                </child>
+
+                <!-- Entry row -->
+                <child>
+                  <object id="entry_row" class="AdwEntryRow">
+                    <property name="height-request">60</property>
+                    <property name="title" translatable="yes">Edit Text</property>
+                    <property name="visible">False</property>
+                    <property name="show-apply-button">True</property>
+                    <property name="margin-start">6</property>
+                    <property name="margin-end">6</property>
+                    <property name="visible" bind-source="title_row" bind-property="visible" bind-flags="sync-create | invert-boolean | bidirectional" />
+                    <style>
+                      <class name="transparent" />
+                      <class name="rounded-corners" />
+                    </style>
+                    <signal name="apply" handler="_on_entry_row_applied" />
+
+                    <child type="suffix">
+                      <object id="cancel_edit_btn" class="GtkButton">
+                        <property name="tooltip-text" translatable="yes">Cancel</property>
+                        <property name="valign">center</property>
+                        <property name="icon-name">window-close-symbolic</property>
+                        <style>
+                          <class name="circular" />
+                        </style>
+                        <signal name="clicked" handler="_on_cancel_edit_btn_clicked" />
+                      </object>
+                    </child>
+
+                  </object>
+                </child>
+
+
+              </object>
+            </child>
+
+            <!-- Progress bar -->
+            <child>
+              <object id="progress_bar_rev" class="GtkRevealer">
+                <child>
+                  <object id="progress_bar" class="GtkProgressBar">
+                    <property name="margin-start">12</property>
+                    <property name="margin-end">12</property>
+                    <property name="margin-bottom">6</property>
+                    <style>
+                      <class name="osd" />
+                      <class name="dim-label" />
+                    </style>
+                  </object>
+                </child>
+              </object>
+            </child>
+
+            <!-- Toolbar -->
+            <child>
+              <object class="GtkRevealer">
+                <property name="reveal-child" bind-source="toolbar_btn" bind-property="active" bind-flags="sync-create" />
+
+                <child>
+                  <object class="GtkBox">
+                    <property name="margin-start">12</property>
+                    <property name="margin-end">12</property>
+                    <property name="margin-bottom">6</property>
+                    <property name="spacing">5</property>
+
+                    <!-- Date and time btn -->
+                    <child>
+                      <object class="GtkMenuButton">
+                        <property name="valign">center</property>
+                        <style>
+                          <class name="flat" />
+                        </style>
+
+                        <property name="popover">
+                          <object class="GtkPopover">
+                          </object>
+                        </property>
+
+                        <child>
+                          <object class="AdwButtonContent">
+                            <property name="icon-name">errands-calendar-symbolic</property>
+                            <property name="label" translatable="yes">Date</property>
+                          </object>
+                        </child>
+
+                      </object>
+                    </child>
+
+                  </object>
+                </child>
+
+              </object>
+            </child>
+
+            <!-- Sub-Tasks -->
+            <child>
+              <object id="sub_tasks_revealer" class="GtkRevealer">
+                <child>
+                  <object class="GtkBox">
+                    <property name="orientation">vertical</property>
+                    <style>
+                      <class name="sub-tasks" />
+                    </style>
+
+                    <!-- Sub-Tasks entry -->
+                    <child>
+                      <object class="GtkEntry">
+                        <property name="margin-start">12</property>
+                        <property name="margin-end">12</property>
+                        <property name="margin-bottom">4</property>
+                        <property name="placeholder-text" translatable="yes">Add new Sub-Task</property>
+                        <signal name="activate" handler="_on_sub_task_added" />
+                      </object>
+                    </child>
+
+                    <!-- Sub-Tasks list -->
+                    <child>
+                      <object id="sub_tasks" class="GtkListBox">
+                        <property name="selection-mode">0</property>
+                        <style>
+                          <class name="transparent" />
+                        </style>
+                      </object>
+                    </child>
+
+                    <!-- Uncompleted Tasks -->
+                    <!-- <child>
+                      <object id="uncompleted_tasks" class="GtkListBox">
+
+                      </object>
+                    </child> -->
+
+                    <!-- Separator -->
+                    <!-- <child>
+                      <object class="GtkRevealer">
+                        <property name="transition-type">9</property>
+                        <child>
+                          <object id="separator" class="GtkBox">
+                            <property name="margin-start">20</property>
+                            <property name="margin-end">20</property>
+                            <style>
+                              <class name="dim-label" />
+                            </style>
+
+                            <child>
+                              <object class="GtkSeparator">
+                                <property name="valign">center</property>
+                                <property name="hexpand">true</property>
+                              </object>
+                            </child>
+
+                            <child>
+                              <object class="GtkLabel">
+                                <property name="label" translatable="yes">Completed Tasks</property>
+                                <property name="hexpand">false</property>
+                                <property name="margin-start">12</property>
+                                <property name="margin-end">12</property>
+                                <style>
+                                  <class name="caption" />
+                                </style>
+                              </object>
+                            </child>
+
+                            <child>
+                              <object class="GtkSeparator">
+                                <property name="valign">center</property>
+                                <property name="hexpand">true</property>
+                              </object>
+                            </child>
+
+                          </object>
+                        </child>
+                      </object>
+                    </child> -->
+
+                    <!-- Completed Tasks -->
+                    <!-- <child>
+                      <object id="completed_tasks" class="GtkListBox">
+
+                      </object>
+                    </child> -->
+
+                  </object>
+                </child>
+              </object>
+            </child>
+
+          </object>
+        </child>
+
+      </object>
+    </child>
+  </template>
+</interface>
+
+<!-- <child>
+  <object class="GtkBox">
+    
+  </object>
+</child> -->
+<!-- <object class="Gtk">
+  <child></child>
+</object> -->
