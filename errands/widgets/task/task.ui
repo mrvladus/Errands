@@ -1,5 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
+
+  <menu id="toolbar_menu">
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">Edit</attribute>
+        <attribute name="action">task.edit</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Move to Trash</attribute>
+        <attribute name="action">task.move_to_trash</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Copy to Clipboard</attribute>
+        <attribute name="action">task.copy_to_clipboard</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Export</attribute>
+        <attribute name="action">task.export</attribute>
+      </item>
+    </section>
+    <section>
+      <item>
+        <attribute name="custom">created</attribute>
+      </item>
+      <item>
+        <attribute name="custom">changed</attribute>
+      </item>
+    </section>
+  </menu>
+
   <template class="Task" parent="GtkRevealer">
 
     <child>
@@ -370,6 +400,52 @@
                       </object>
                     </child>
 
+                    <!-- More menu btn -->
+                    <child>
+                      <object class="GtkMenuButton">
+                        <property name="valign">center</property>
+                        <property name="icon-name">view-more-symbolic</property>
+                        <property name="tooltip-text" translatable="yes">More</property>
+                        <property name="popover">
+                          <object class="GtkPopoverMenu">
+                            <property name="menu-model">toolbar_menu</property>
+
+                            <!-- Created label -->
+                            <child type="created">
+                              <object id="created_label" class="GtkLabel">
+                                <property name="label" translatable="yes">Created:</property>
+                                <property name="halign">start</property>
+                                <property name="margin-start">12</property>
+                                <property name="margin-end">12</property>
+                                <property name="margin-bottom">6</property>
+                                <style>
+                                  <class name="caption" />
+                                </style>
+                              </object>
+                            </child>
+
+                            <!-- Changed label -->
+                            <child type="changed">
+                              <object id="changed_label" class="GtkLabel">
+                                <property name="label" translatable="yes">Changed:</property>
+                                <property name="halign">start</property>
+                                <property name="margin-start">12</property>
+                                <property name="margin-end">12</property>
+                                <property name="margin-bottom">3</property>
+                                <style>
+                                  <class name="caption" />
+                                </style>
+                              </object>
+                            </child>
+
+                          </object>
+                        </property>
+                        <style>
+                          <class name="flat" />
+                        </style>
+                      </object>
+                    </child>
+
                   </object>
                 </child>
 
@@ -475,6 +551,7 @@
       </object>
     </child>
   </template>
+
 </interface>
 
 <!-- <child>

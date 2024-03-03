@@ -101,28 +101,6 @@ class TaskToolBar(Gtk.Revealer):
         __create_action("move_to_trash", lambda *_: self.task.delete())
 
     def __build_ui(self) -> None:
-
-        # Priority
-        priority_box: Gtk.Box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=3)
-        items: tuple[tuple[str, str, int]] = (
-            (_("None"), "", 0),
-            (_("High"), "error", 1),
-            (_("Medium"), "warning", 5),
-            (_("Low"), "accent", 9),
-        )
-        for item in items:
-            btn = Gtk.ToggleButton(
-                child=Adw.ButtonContent(
-                    label=item[0], icon_name="errands-priority-symbolic", halign="start"
-                ),
-                css_classes=["flat"],
-            )
-            btn.priority = item[2]
-            if item[1]:
-                btn.add_css_class(item[1])
-            btn.connect("clicked", self.__on_priority_selected, btn.priority)
-            priority_box.append(btn)
-
         # Accent Color
         color_box: Gtk.Box = Gtk.Box()
         colors = ["none", "blue", "green", "yellow", "orange", "red", "purple", "brown"]
@@ -188,25 +166,6 @@ class TaskToolBar(Gtk.Revealer):
         )
         menu_popover.add_child(self.menu_created_label, "created")
         menu_popover.add_child(self.menu_changed_label, "changed")
-
-        # More menu button
-        more_btn = Gtk.MenuButton(
-            icon_name="view-more-symbolic",
-            popover=menu_popover,
-            css_classes=["flat"],
-            tooltip_text=_("More"),
-        )
-
-        # HBOX
-        hbox: Gtk.Box = Gtk.Box(
-            margin_start=12, margin_end=12, margin_bottom=6, spacing=5
-        )
-        hbox.append(Gtk.Separator(css_classes=["spacer"], hexpand=True))
-        hbox.append(self.priority_btn)
-        hbox.append(color_btn)
-        hbox.append(more_btn)
-
-        self.set_child(hbox)
 
     # ------ SIGNAL HANDLERS ------ #
 
@@ -397,6 +356,8 @@ class Task(Gtk.Revealer):
     notes_btn: Gtk.MenuButton = Gtk.Template.Child()
     notes_buffer: GtkSource.Buffer = Gtk.Template.Child()
     priority_btn: Gtk.MenuButton = Gtk.Template.Child()
+    created_label: Gtk.Label = Gtk.Template.Child()
+    changed_label: Gtk.Label = Gtk.Template.Child()
 
     # uncompleted_tasks: TaskUncompletedSubTasks
     # completed_tasks: TaskCompletedSubTasks
@@ -666,8 +627,6 @@ class Task(Gtk.Revealer):
             self.priority_btn.add_css_class("warning")
         elif priority == 9:
             self.priority_btn.add_css_class("accent")
-        # self.completed_tasks.update_ui()
-        # self.uncompleted_tasks.update_ui()
 
     # ------ TEMPLATE HANDLERS ------ #
 
