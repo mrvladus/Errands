@@ -100,97 +100,7 @@ class TaskToolBar(Gtk.Revealer):
         __create_action("copy_to_clipboard", __copy_to_clipboard)
         __create_action("move_to_trash", lambda *_: self.task.delete())
 
-    def __build_ui(self) -> None:
-        # Accent Color
-        color_box: Gtk.Box = Gtk.Box()
-        colors = ["none", "blue", "green", "yellow", "orange", "red", "purple", "brown"]
-        for color in colors:
-            btn = Gtk.CheckButton(
-                css_classes=["accent-color-btn", f"accent-color-btn-{color}"]
-            )
-            if first_btn := color_box.get_first_child():
-                btn.set_group(first_btn)
-            btn.connect("toggled", self.__on_accent_color_selected, color)
-            color_box.append(btn)
-
-        color_btn = Gtk.MenuButton(
-            popover=Gtk.Popover(child=color_box),
-            icon_name="errands-color-symbolic",
-            css_classes=["flat"],
-            tooltip_text=_("Accent Color"),
-        )
-        color_btn.connect("notify::active", self.__on_accent_color_menu_open, color_box)
-
-        # More menu
-        more_menu = Gio.Menu()
-
-        # Actions section
-        more_menu.append("Edit", "task_toolbar.edit")
-        more_menu.append("Copy to Clipboard", "task_toolbar.copy_to_clipboard")
-        more_menu.append("Move to Trash", "task_toolbar.move_to_trash")
-        more_menu.append("Export", "task_toolbar.export")
-
-        # Custom section
-        more_menu_custom = Gio.Menu()
-        more_menu.append_section(None, more_menu_custom)
-
-        # Created date
-        created = Gio.MenuItem()
-        created.set_attribute([("custom", "s", "created")])
-        more_menu_custom.append_item(created)
-        self.menu_created_label = Gtk.Label(
-            label=_("Created:"),
-            halign=Gtk.Align.START,
-            css_classes=["caption"],
-            margin_start=12,
-            margin_end=12,
-            margin_bottom=6,
-        )
-
-        # Changed date
-        changed = Gio.MenuItem()
-        changed.set_attribute([("custom", "s", "changed")])
-        more_menu_custom.append_item(changed)
-        self.menu_changed_label = Gtk.Label(
-            label=_("Changed:"),
-            halign=Gtk.Align.START,
-            css_classes=["caption"],
-            margin_start=12,
-            margin_end=12,
-            margin_bottom=3,
-        )
-
-        # Popover
-        menu_popover = Gtk.PopoverMenu(
-            menu_model=more_menu,
-        )
-        menu_popover.add_child(self.menu_created_label, "created")
-        menu_popover.add_child(self.menu_changed_label, "changed")
-
     # ------ SIGNAL HANDLERS ------ #
-
-    def __on_accent_color_menu_open(self, _, btn: Gtk.MenuButton, color_box: Gtk.Box):
-        self.can_sync = False
-        color: str = self.task.get_prop("color")
-        if color:
-            for btn in get_children(color_box):
-                for css_class in btn.get_css_classes():
-                    if color in css_class:
-                        btn.set_active(True)
-        else:
-            color_box.get_first_child().set_active(True)
-        self.can_sync = True
-
-    def __on_accent_color_selected(self, btn: Gtk.CheckButton, color: str):
-        if not btn.get_active() or not self.can_sync:
-            return
-
-        Log.info(f"Task: change color to '{color}'")
-        self.task.update_props(
-            ["color", "synced"], [color if color != "none" else "", False]
-        )
-        self.task.update_ui()
-        Sync.sync(False)
 
 
 class TaskUncompletedSubTasks(Gtk.Box):
@@ -810,6 +720,31 @@ class Task(Gtk.Revealer):
     #     self.update_props(["priority", "synced"], [priority, False])
     #     self.update_ui()
     #     Sync.sync(False)
+
+    @Gtk.Template.Callback()
+    def _on_accent_color_toggled(self, _, btn: Gtk.MenuButton):
+        return
+        self.can_sync = False
+        color: str = self.get_prop("color")
+        if color:
+            for btn in get_children(color_box):
+                for css_class in btn.get_css_classes():
+                    if color in css_class:
+                        btn.set_active(True)
+        else:
+            color_box.get_first_child().set_active(True)
+        self.can_sync = True
+
+    def __on_accent_color_selected(self, btn: Gtk.CheckButton, color: str):
+        if not btn.get_active() or not self.can_sync:
+            return
+
+        Log.info(f"Task: change color to '{color}'")
+        self.update_props(
+            ["color", "synced"], [color if color != "none" else "", False]
+        )
+        self.update_ui()
+        Sync.sync(False)
 
     # --- DND --- #
 
