@@ -15,7 +15,7 @@ from errands.lib.animation import scroll
 from errands.lib.data import TaskData, UserData
 from errands.lib.utils import get_children
 from errands.lib.logging import Log
-from errands.widgets.task.task import Task
+from errands.widgets.task import Task
 from errands.lib.gsettings import GSettings
 
 

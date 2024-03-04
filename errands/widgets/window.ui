@@ -15,18 +15,11 @@
             <property name="max-sidebar-width">300</property>
             <property name="min-sidebar-width">200</property>
             <property name="show-content">true</property>
-            <property name="sidebar_width_fraction">0.25</property>
-
-            <!-- Sidebar -->
-            <!-- <property name="sidebar">
-              <object class="AdwNavigationPage">
-                <property name="title" translatable="yes">Sidebar</property>
-              </object>
-            </property> -->
 
             <!-- Content -->
             <property name="content">
               <object class="AdwNavigationPage">
+                <property name="width-request">360</property>
                 <property name="title" translatable="yes">Content</property>
 
                 <!-- Stack -->
@@ -91,6 +84,14 @@
 
       </object>
     </property>
+
+    <child>
+      <object class="AdwBreakpoint">
+        <condition>max-width: 600px</condition>
+        <setter object="split_view" property="collapsed">True</setter>
+        <setter object="split_view" property="show-content">True</setter>
+      </object>
+    </child>
 
   </template>
 </interface>

@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 from __future__ import annotations
+import os
 from typing import TYPE_CHECKING
 
 from errands.widgets.trash import Trash
@@ -20,113 +21,9 @@ from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
 from errands.widgets.components import Box, ConfirmDialog
-from errands.widgets.task.task import Task
+from errands.widgets.task import Task
 from errands.widgets.task_list import TaskList
 from gi.repository import Adw, Gtk, Gio, GObject, Gdk, GLib  # type:ignore
-
-
-class SidebarHeaderBar(Adw.Bin):
-    def __init__(self, sidebar: Sidebar):
-        super().__init__()
-        self.sidebar = sidebar
-        self.list_box = sidebar.list_box
-        self.window: Window = sidebar.window
-        self._build_ui()
-
-    def _build_ui(self):
-        # HeaderBar
-        hb: Adw.HeaderBar = Adw.HeaderBar(
-            title_widget=Gtk.Label(
-                label=_("Errands"),
-                css_classes=["heading"],
-            )
-        )
-        self.set_child(hb)
-
-        # Import menu
-        import_menu: Gio.Menu = Gio.Menu.new()
-        import_menu.append(_("Import List"), "app.import")
-
-        # Add list button
-        self.add_list_btn: Adw.SplitButton = Adw.SplitButton(
-            icon_name="list-add-symbolic",
-            tooltip_text=_("Add List (Ctrl+A)"),
-            menu_model=import_menu,
-            dropdown_tooltip=_("More Options"),
-        )
-        ctrl = Gtk.ShortcutController(scope=1)
-        ctrl.add_shortcut(
-            Gtk.Shortcut(
-                trigger=Gtk.ShortcutTrigger.parse_string("<Primary>A"),
-                action=Gtk.ShortcutAction.parse_string("activate"),
-            )
-        )
-        self.add_list_btn.add_controller(ctrl)
-        self.add_list_btn.connect("clicked", self._on_add_btn_clicked)
-        hb.pack_start(self.add_list_btn)
-
-        # Main menu
-        menu: Gio.Menu = Gio.Menu.new()
-        self.top_section: Gio.Menu = Gio.Menu.new()
-        self.top_section.append(_("Sync / Fetch Tasks"), "app.sync")
-        menu.append_section(None, self.top_section)
-        bottom_section: Gio.Menu = Gio.Menu.new()
-        bottom_section.append(_("Preferences"), "app.preferences")
-        bottom_section.append(_("Keyboard Shortcuts"), "win.show-help-overlay")
-        bottom_section.append(_("About Errands"), "app.about")
-        menu.append_section(None, bottom_section)
-        self.menu_btn: Gtk.MenuButton = Gtk.MenuButton(
-            menu_model=menu,
-            primary=True,
-            icon_name="open-menu-symbolic",
-            tooltip_text=_("Main Menu"),
-        )
-        hb.pack_end(self.menu_btn)
-
-        # Sync indicator
-        self.sync_indicator: Gtk.Spinner = Gtk.Spinner(
-            tooltip_text=_("Syncing..."), visible=False, spinning=True
-        )
-        hb.pack_end(self.sync_indicator)
-
-    def _on_add_btn_clicked(self, btn) -> None:
-        def _entry_activated(_, dialog):
-            if dialog.get_response_enabled("add"):
-                dialog.response("add")
-                dialog.close()
-
-        def _entry_changed(entry, _, dialog):
-            text = entry.props.text.strip(" \n\t")
-            names = [i["name"] for i in UserData.get_lists_as_dicts()]
-            dialog.set_response_enabled("add", text and text not in names)
-
-        def _confirm(_, res, entry):
-            if res == "cancel":
-                return
-
-            name = entry.props.text.rstrip().lstrip()
-            list_dict = UserData.add_list(name)
-            row = self.sidebar.add_task_list(list_dict)
-            row.activate()
-            Sync.sync()
-
-        entry = Gtk.Entry(placeholder_text=_("New List Name"))
-        dialog = Adw.MessageDialog(
-            transient_for=self.window,
-            hide_on_close=True,
-            heading=_("Add List"),
-            default_response="add",
-            close_response="cancel",
-            extra_child=entry,
-        )
-        dialog.add_response("cancel", _("Cancel"))
-        dialog.add_response("add", _("Add"))
-        dialog.set_response_enabled("add", False)
-        dialog.set_response_appearance("add", Adw.ResponseAppearance.SUGGESTED)
-        dialog.connect("response", _confirm, entry)
-        entry.connect("activate", _entry_activated, dialog)
-        entry.connect("notify::text", _entry_changed, dialog)
-        dialog.present()
 
 
 # class SidebarPluginsList(Adw.Bin):
@@ -198,33 +95,22 @@ class SidebarHeaderBar(Adw.Bin):
 #         self.sidebar.task_lists.lists.unselect_all()
 
 
+@Gtk.Template(filename=f"{os.path.dirname(__file__)}/sidebar.ui")
 class Sidebar(Adw.Bin):
+    __gtype_name__ = "Sidebar"
+
+    sync_indicator: Gtk.Spinner = Gtk.Template.Child()
+    add_list_btn: Gtk.Button = Gtk.Template.Child()
+    list_box: Gtk.ListBox = Gtk.Template.Child()
+    status_page: Adw.StatusPage = Gtk.Template.Child()
+
     def __init__(self, window: Window):
         super().__init__()
-        self.window = window
+        self.window: Window = window
         self.__build_ui()
         self.update_ui()
 
     def __build_ui(self) -> None:
-        # --- Status Page --- #
-
-        self.status_page: Adw.StatusPage = Adw.StatusPage(
-            title=_("Add new List"),
-            description=_('Click "+" button'),
-            icon_name="errands-lists-symbolic",
-            css_classes=["compact"],
-            vexpand=True,
-        )
-
-        # --- List Box --- #
-
-        self.list_box = Gtk.ListBox(
-            css_classes=["navigation-sidebar"], activate_on_single_click=False
-        )
-        self.list_box.connect(
-            "row-selected", lambda _, row: row.activate() if row else ...
-        )
-
         # --- Categories --- #
 
         # Today
@@ -249,21 +135,6 @@ class Sidebar(Adw.Bin):
                 child=separator,
             )
         )
-
-        # --- Content box --- #
-
-        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        vbox.append(self.list_box)
-        vbox.append(self.status_page)
-
-        # Toolbar view
-        toolbar_view: Adw.ToolbarView = Adw.ToolbarView(content=vbox)
-
-        # Headerbar
-        self.hb = SidebarHeaderBar(self)
-        toolbar_view.add_top_bar(self.hb)
-
-        self.set_child(toolbar_view)
 
     def add_task_list(self, list_dict: TaskListData) -> SidebarTaskListItem:
         Log.debug(f"Sidebar: Add Task List '{list_dict['uid']}'")
@@ -324,6 +195,51 @@ class Sidebar(Adw.Bin):
         self.status_page.set_visible(length == 0)
         if length == 0:
             self.window.stack.set_visible_child_name("status")
+
+    @Gtk.Template.Callback()
+    def _on_add_btn_clicked(self, _btn):
+        def _entry_activated(_, dialog):
+            if dialog.get_response_enabled("add"):
+                dialog.response("add")
+                dialog.close()
+
+        def _entry_changed(entry: Gtk.Entry, _, dialog):
+            text = entry.props.text.strip(" \n\t")
+            names = [i["name"] for i in UserData.get_lists_as_dicts()]
+            dialog.set_response_enabled("add", text and text not in names)
+
+        def _confirm(_, res, entry: Gtk.Entry):
+            if res == "cancel":
+                return
+
+            name = entry.props.text.rstrip().lstrip()
+            list_dict = UserData.add_list(name)
+            row = self.add_task_list(list_dict)
+            row.activate()
+            Sync.sync()
+
+        entry = Gtk.Entry(placeholder_text=_("New List Name"))
+        dialog = Adw.MessageDialog(
+            transient_for=self.window,
+            hide_on_close=True,
+            heading=_("Add List"),
+            default_response="add",
+            close_response="cancel",
+            extra_child=entry,
+        )
+        dialog.add_response("cancel", _("Cancel"))
+        dialog.add_response("add", _("Add"))
+        dialog.set_response_enabled("add", False)
+        dialog.set_response_appearance("add", Adw.ResponseAppearance.SUGGESTED)
+        dialog.connect("response", _confirm, entry)
+        entry.connect("activate", _entry_activated, dialog)
+        entry.connect("notify::text", _entry_changed, dialog)
+        dialog.present()
+
+    @Gtk.Template.Callback()
+    def _on_row_selected(self, _, row: Gtk.ListBoxRow):
+        if row:
+            row.activate()
 
 
 class SidebarTodayItem(Adw.ActionRow):

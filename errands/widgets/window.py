@@ -7,15 +7,13 @@ import os
 from uuid import uuid4
 from icalendar import Calendar
 from errands.lib.data import UserData
-from errands.widgets.components import Box, Button
-from gi.repository import Gio, Adw, Gtk  # type:ignore
-from errands.widgets.sidebar import Sidebar
+from gi.repository import Gio, Adw, Gtk, GObject  # type:ignore
+
 from errands.widgets.preferences import PreferencesWindow
 from errands.lib.sync.sync import Sync
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
-
-WINDOW: Window = None
+from errands.widgets.sidebar.sidebar import Sidebar
 
 
 @Gtk.Template(filename=f"{os.path.dirname(__file__)}/window.ui")
@@ -30,15 +28,7 @@ class Window(Adw.ApplicationWindow):
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
-        global WINDOW
-        WINDOW = self
         self._create_actions()
-        self._build_ui()
-        # Setup sync
-        Sync.window = self
-        Sync.sync()
-
-    def _build_ui(self):
         # Remember window state
         GSettings.bind("width", self, "default_width")
         GSettings.bind("height", self, "default_height")
@@ -46,16 +36,12 @@ class Window(Adw.ApplicationWindow):
         # Setup theme
         Adw.StyleManager.get_default().set_color_scheme(GSettings.get("theme"))
         self.stack.set_visible_child_name("status")
-
-        # Sidebar
+        # Add Sidebar
         self.sidebar = Sidebar(self)
         self.split_view.set_sidebar(Adw.NavigationPage.new(self.sidebar, _("Sidebar")))
-
-        # Breakpoints
-        bp = Adw.Breakpoint.new(Adw.breakpoint_condition_parse("max-width: 980px"))
-        bp.add_setter(self.split_view, "collapsed", True)
-        bp.add_setter(self.split_view, "show-content", True)
-        self.add_breakpoint(bp)
+        # Setup sync
+        Sync.window = self
+        Sync.sync()
 
     def add_toast(self, text: str) -> None:
         self.toast_overlay.add_toast(Adw.Toast.new(title=text))
@@ -71,7 +57,6 @@ class Window(Adw.ApplicationWindow):
         """
         Create actions for main menu
         """
-        Log.debug("Creating actions")
 
         def _about(*args) -> None:
             """
@@ -187,5 +172,6 @@ class Window(Adw.ApplicationWindow):
             ["<primary>q", "<primary>w"],
         )
 
+    @Gtk.Template.Callback()
     def _on_add_list_clicked(self, btn: Gtk.Button):
-        self.sidebar.hb.add_list_btn.activate()
+        self.sidebar.add_list_btn.activate()

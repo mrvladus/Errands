@@ -1,6 +1,7 @@
 from __main__ import APP_ID, PROFILE
-from gi.repository import Adw, Gio, Xdp  # type:ignore
+from gi.repository import Adw, Gio, Xdp, GObject  # type:ignore
 from errands.lib.gsettings import GSettings
+from errands.widgets.sidebar.sidebar import Sidebar
 from errands.widgets.window import Window
 from errands.lib.plugins import PluginsLoader
 from errands.lib.logging import Log
