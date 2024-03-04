@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="Window" parent="AdwApplicationWindow">
+    <property name="title">Errands</property>
+    <property name="width-request">360</property>
+    <property name="height-request">200</property>
+
+    <!-- Toast overlay -->
+    <property name="content">
+      <object id="toast_overlay" class="AdwToastOverlay">
+
+        <!-- Split view -->
+        <child>
+          <object id="split_view" class="AdwNavigationSplitView">
+            <property name="max-sidebar-width">300</property>
+            <property name="min-sidebar-width">200</property>
+            <property name="show-content">true</property>
+            <property name="sidebar_width_fraction">0.25</property>
+
+            <!-- Sidebar -->
+            <!-- <property name="sidebar">
+              <object class="AdwNavigationPage">
+                <property name="title" translatable="yes">Sidebar</property>
+              </object>
+            </property> -->
+
+            <!-- Content -->
+            <property name="content">
+              <object class="AdwNavigationPage">
+                <property name="title" translatable="yes">Content</property>
+
+                <!-- Stack -->
+                <child>
+                  <object id="stack" class="AdwViewStack">
+
+                    <!-- Status page -->
+                    <child>
+                      <object class="AdwViewStackPage">
+                        <property name="title" translatable="yes">No Task Lists</property>
+                        <property name="name">status</property>
+                        <property name="child">
+                          <object class="AdwToolbarView">
+
+                            <child type="top">
+                              <object class="AdwHeaderBar">
+                                <property name="show-title">false</property>
+                              </object>
+                            </child>
+
+                            <property name="content">
+                              <object class="GtkBox">
+                                <property name="orientation">vertical</property>
+                                <property name="vexpand">true</property>
+                                <property name="valign">center</property>
+
+                                <child>
+                                  <object class="AdwStatusPage">
+                                    <property name="title" translatable="yes">No Task Lists</property>
+                                    <property name="icon-name">io.github.mrvladus.List</property>
+                                  </object>
+                                </child>
+
+                                <child>
+                                  <object class="GtkButton">
+                                    <property name="label" translatable="yes">Create List</property>
+                                    <property name="halign">center</property>
+                                    <style>
+                                      <class name="pill" />
+                                      <class name="suggested-action" />
+                                    </style>
+                                    <signal name="clicked" handler="_on_add_list_clicked" />
+                                  </object>
+                                </child>
+
+                              </object>
+                            </property>
+
+                          </object>
+                        </property>
+                      </object>
+                    </child>
+
+                  </object>
+                </child>
+
+              </object>
+            </property>
+
+          </object>
+        </child>
+
+      </object>
+    </property>
+
+  </template>
+</interface>

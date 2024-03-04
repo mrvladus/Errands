@@ -10,7 +10,6 @@ from icalendar import Calendar, Event
 if TYPE_CHECKING:
     from errands.widgets.task_list import TaskList
 
-from errands.widgets.components import Box, DateTime
 from gi.repository import Gtk, Adw, Gdk, GObject, GLib, GtkSource, Gio  # type:ignore
 from errands.lib.sync.sync import Sync
 from errands.lib.logging import Log
@@ -18,89 +17,6 @@ from errands.lib.data import TaskData, UserData
 from errands.lib.markup import Markup
 from errands.lib.utils import get_children
 from errands.lib.gsettings import GSettings
-
-
-class TaskToolBar(Gtk.Revealer):
-
-    # State
-    can_sync: bool = True
-
-    def __init__(self, task: Task):
-        super().__init__()
-        self.task: Task = task
-        self.__build_ui()
-        self.__add_actions()
-
-    def __add_actions(self) -> None:
-        group: Gio.SimpleActionGroup = Gio.SimpleActionGroup()
-        self.insert_action_group(name="task_toolbar", group=group)
-
-        def __create_action(name: str, callback: callable) -> None:
-            action: Gio.SimpleAction = Gio.SimpleAction.new(name, None)
-            action.connect("activate", callback)
-            group.add_action(action)
-
-        def __edit(*args):
-            self.task.task_row.task_edit_row.set_text(self.task.get_prop("text"))
-            self.task.task_row.task_edit_row.set_visible(True)
-
-        def __export(*args):
-            def __confirm(dialog, res):
-                try:
-                    file = dialog.save_finish(res)
-                except:
-                    Log.debug("List: Export cancelled")
-                    return
-
-                Log.info(f"Task: Export '{self.task.uid}'")
-
-                task = [
-                    i
-                    for i in UserData.get_tasks_as_dicts(self.task.list_uid)
-                    if i["uid"] == self.task.uid
-                ][0]
-                calendar = Calendar()
-                event = Event()
-                event.add("uid", task["uid"])
-                event.add("summary", task["text"])
-                if task["notes"]:
-                    event.add("description", task["notes"])
-                event.add("priority", task["priority"])
-                if task["tags"]:
-                    event.add("categories", task["tags"])
-                event.add("percent-complete", task["percent_complete"])
-                if task["color"]:
-                    event.add("x-errands-color", task["color"])
-                event.add(
-                    "dtstart",
-                    (
-                        datetime.fromisoformat(task["start_date"])
-                        if task["start_date"]
-                        else datetime.now()
-                    ),
-                )
-                if task["end_date"]:
-                    event.add("dtend", datetime.fromisoformat(task["end_date"]))
-                calendar.add_component(event)
-
-                with open(file.get_path(), "wb") as f:
-                    f.write(calendar.to_ical())
-                self.task.window.add_toast(_("Exported"))
-
-            dialog = Gtk.FileDialog(initial_name=f"{self.task.uid}.ics")
-            dialog.save(self.task.window, None, __confirm)
-
-        def __copy_to_clipboard(*args):
-            Log.info("Task: Copy text to clipboard")
-            Gdk.Display.get_default().get_clipboard().set(self.task.get_prop("text"))
-            self.task.window.add_toast(_("Copied to Clipboard"))
-
-        __create_action("edit", __edit)
-        __create_action("export", __export)
-        __create_action("copy_to_clipboard", __copy_to_clipboard)
-        __create_action("move_to_trash", lambda *_: self.task.delete())
-
-    # ------ SIGNAL HANDLERS ------ #
 
 
 class TaskUncompletedSubTasks(Gtk.Box):
@@ -269,9 +185,6 @@ class Task(Gtk.Revealer):
     created_label: Gtk.Label = Gtk.Template.Child()
     changed_label: Gtk.Label = Gtk.Template.Child()
 
-    # uncompleted_tasks: TaskUncompletedSubTasks
-    # completed_tasks: TaskCompletedSubTasks
-
     # State
     just_added: bool = True
     can_sync: bool = True
@@ -294,10 +207,80 @@ class Task(Gtk.Revealer):
         self.window = task_list.window
         self.parent = parent
         self.is_sub_task = is_sub_task
-        self._build_ui()
+        self.__build_ui()
+        self.__add_actions()
         self.just_added = False
 
-    def _build_ui(self) -> None:
+    def __add_actions(self) -> None:
+        group: Gio.SimpleActionGroup = Gio.SimpleActionGroup()
+        self.insert_action_group(name="task", group=group)
+
+        def __create_action(name: str, callback: callable) -> None:
+            action: Gio.SimpleAction = Gio.SimpleAction.new(name, None)
+            action.connect("activate", callback)
+            group.add_action(action)
+
+        def __edit(*args):
+            self.entry_row.set_text(self.get_prop("text"))
+            self.entry_row.set_visible(True)
+
+        def __export(*args):
+            def __confirm(dialog, res):
+                try:
+                    file = dialog.save_finish(res)
+                except:
+                    Log.debug("List: Export cancelled")
+                    return
+
+                Log.info(f"Task: Export '{self.uid}'")
+
+                task = [
+                    i
+                    for i in UserData.get_tasks_as_dicts(self.list_uid)
+                    if i["uid"] == self.uid
+                ][0]
+                calendar = Calendar()
+                event = Event()
+                event.add("uid", task["uid"])
+                event.add("summary", task["text"])
+                if task["notes"]:
+                    event.add("description", task["notes"])
+                event.add("priority", task["priority"])
+                if task["tags"]:
+                    event.add("categories", task["tags"])
+                event.add("percent-complete", task["percent_complete"])
+                if task["color"]:
+                    event.add("x-errands-color", task["color"])
+                event.add(
+                    "dtstart",
+                    (
+                        datetime.fromisoformat(task["start_date"])
+                        if task["start_date"]
+                        else datetime.now()
+                    ),
+                )
+                if task["end_date"]:
+                    event.add("dtend", datetime.fromisoformat(task["end_date"]))
+                calendar.add_component(event)
+
+                with open(file.get_path(), "wb") as f:
+                    f.write(calendar.to_ical())
+                self.window.add_toast(_("Exported"))
+
+            dialog = Gtk.FileDialog(initial_name=f"{self.uid}.ics")
+            dialog.save(self.window, None, __confirm)
+
+        def __copy_to_clipboard(*args):
+            Log.info("Task: Copy text to clipboard")
+            Gdk.Display.get_default().get_clipboard().set(self.get_prop("text"))
+            self.window.add_toast(_("Copied to Clipboard"))
+
+        __create_action("edit", __edit)
+        __create_action("export", __export)
+        __create_action("copy_to_clipboard", __copy_to_clipboard)
+        __create_action("move_to_trash", lambda *_: self.delete())
+
+    def __build_ui(self) -> None:
         GSettings.bind("task-show-progressbar", self.progress_bar_rev, "visible")
         self.set_reveal_child(True)
 
@@ -434,7 +417,7 @@ class Task(Gtk.Revealer):
         Log.info(f"Task: Move to trash: '{self.uid}'")
 
         self.toggle_visibility(False)
-        self.task_row.complete_btn.set_active(True)
+        self.complete_btn.set_active(True)
         self.update_props(["trash", "synced"], [True, False])
         for task in self.all_tasks:
             task.delete()
@@ -583,16 +566,16 @@ class Task(Gtk.Revealer):
         self.get_parent().reorder_child_after(self, new_task)
         new_task.toggle_visibility(True)
         # Toggle completion
-        if not task.task_row.complete_btn.get_active():
+        if not task.complete_btn.get_active():
             self.update_props(["completed", "synced"], [False, False])
             self.just_added = True
-            self.task_row.complete_btn.set_active(False)
+            self.complete_btn.set_active(False)
             self.just_added = False
             for parent in self.get_parents_tree():
-                if parent.task_row.complete_btn.get_active():
+                if parent.complete_btn.get_active():
                     parent.update_props(["completed", "synced"], [False, False])
                     parent.just_added = True
-                    parent.task_row.complete_btn.set_active(False)
+                    parent.complete_btn.set_active(False)
                     parent.just_added = False
         # Update status
         task.purge()
@@ -622,7 +605,7 @@ class Task(Gtk.Revealer):
         # Update status
         self.update_props(["completed", "synced"], [False, False])
         self.just_added = True
-        self.task_row.complete_btn.set_active(False)
+        self.complete_btn.set_active(False)
         self.just_added = False
         self.update_ui()
 

@@ -3,13 +3,11 @@
 
 from __future__ import annotations
 from __main__ import VERSION, APP_ID
+import os
 from uuid import uuid4
 from icalendar import Calendar
 from errands.lib.data import UserData
 from errands.widgets.components import Box, Button
-
-# from errands.plugins.secret_notes import SecretNotesWindow
-from errands.widgets.trash import Trash
 from gi.repository import Gio, Adw, Gtk  # type:ignore
 from errands.widgets.sidebar import Sidebar
 from errands.widgets.preferences import PreferencesWindow
@@ -20,7 +18,14 @@ from errands.lib.logging import Log
 WINDOW: Window = None
 
 
+@Gtk.Template(filename=f"{os.path.dirname(__file__)}/window.ui")
 class Window(Adw.ApplicationWindow):
+    __gtype_name__ = "Window"
+
+    toast_overlay: Adw.ToastOverlay = Gtk.Template.Child()
+    split_view: Adw.NavigationSplitView = Gtk.Template.Child()
+    stack: Adw.ViewStack = Gtk.Template.Child()
+
     about_window: Adw.AboutWindow = None
 
     def __init__(self, **kwargs) -> None:
@@ -31,70 +36,26 @@ class Window(Adw.ApplicationWindow):
         self._build_ui()
         # Setup sync
         Sync.window = self
-        # Sync.sync()
+        Sync.sync()
 
     def _build_ui(self):
-        self.set_title(_("Errands"))
-        self.props.width_request = 360
-        self.props.height_request = 200
         # Remember window state
         GSettings.bind("width", self, "default_width")
         GSettings.bind("height", self, "default_height")
         GSettings.bind("maximized", self, "maximized")
         # Setup theme
         Adw.StyleManager.get_default().set_color_scheme(GSettings.get("theme"))
-
-        # Split View
-        self.split_view = Adw.NavigationSplitView(
-            max_sidebar_width=300,
-            min_sidebar_width=240,
-            show_content=True,
-            sidebar_width_fraction=0.25,
-        )
-
-        # Stack
-        self.stack = Adw.ViewStack()
-
-        # Status page Toolbar View
-        status_toolbar_view = Adw.ToolbarView(
-            content=Box(
-                children=[
-                    Adw.StatusPage(title=_("No Task Lists"), icon_name=APP_ID),
-                    Button(
-                        label=_("Create List"),
-                        on_click=lambda *_: self.sidebar.hb.add_list_btn.activate(),
-                        halign="center",
-                        css_classes=["pill", "suggested-action"],
-                    ),
-                ],
-                orientation="vertical",
-                vexpand=True,
-                valign="center",
-            )
-        )
-        status_toolbar_view.add_top_bar(Adw.HeaderBar(show_title=False))
-        self.stack.add_titled(
-            child=status_toolbar_view,
-            name="status",
-            title=_("No Task Lists"),
-        )
         self.stack.set_visible_child_name("status")
 
         # Sidebar
         self.sidebar = Sidebar(self)
         self.split_view.set_sidebar(Adw.NavigationPage.new(self.sidebar, _("Sidebar")))
-        self.split_view.set_content(Adw.NavigationPage.new(self.stack, _("Content")))
-
-        # Toast overlay
-        self.toast_overlay = Adw.ToastOverlay(child=self.split_view)
 
         # Breakpoints
         bp = Adw.Breakpoint.new(Adw.breakpoint_condition_parse("max-width: 980px"))
         bp.add_setter(self.split_view, "collapsed", True)
         bp.add_setter(self.split_view, "show-content", True)
         self.add_breakpoint(bp)
-
-        self.set_content(self.toast_overlay)
 
     def add_toast(self, text: str) -> None:
         self.toast_overlay.add_toast(Adw.Toast.new(title=text))
@@ -225,3 +186,6 @@ class Window(Adw.ApplicationWindow):
             lambda *_: self.props.application.quit(),
             ["<primary>q", "<primary>w"],
         )
+
+    def _on_add_list_clicked(self, btn: Gtk.Button):
+        self.sidebar.hb.add_list_btn.activate()
