@@ -73,6 +73,19 @@
                       </object>
                     </child>
 
+                    <!-- Today page -->
+                    <child>
+                      <object class="AdwViewStackPage">
+                        <property name="title" translatable="yes">Today</property>
+                        <property name="name">errands_today_page</property>
+                        <property name="child">
+                          <object class="AdwStatusPage">
+                            <property name="title" translatable="yes">No Tasks for Today</property>
+                          </object>
+                        </property>
+                      </object>
+                    </child>
+
                   </object>
                 </child>
 

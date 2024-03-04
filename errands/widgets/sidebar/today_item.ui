@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="TodayItem" parent="AdwActionRow">
+    <property name="height-request">50</property>
+    <property name="title" translatable="yes">Today</property>
+    <property name="icon-name">errands-calendar-symbolic</property>
+    <property name="activatable">true</property>
+    <style>
+      <class name="sidebar-item" />
+    </style>
+    <signal name="activated" handler="_on_row_activated" />
+  </template>
+</interface>

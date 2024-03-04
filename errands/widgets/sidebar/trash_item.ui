@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+
+  <!-- Menu -->
+  <menu id="menu">
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">Restore</attribute>
+        <attribute name="action">trash_item.restore"</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Clear</attribute>
+        <attribute name="action">trash_item.clear"</attribute>
+      </item>
+    </section>
+  </menu>
+
+  <template class="TrashItem" parent="AdwActionRow">
+    <property name="height-request">50</property>
+    <property name="title" translatable="yes">Trash</property>
+    <property name="icon-name">errands-trash-symbolic</property>
+    <property name="activatable">true</property>
+    <style>
+      <class name="sidebar-item" />
+      <class name="sidebar-item-trash" />
+    </style>
+    <signal name="activated" handler="_on_row_activated" />
+
+    <!-- Suffix -->
+    <child type="suffix">
+      <object class="GtkBox">
+        <property name="spacing">12</property>
+
+        <child>
+          <object id="size_counter" class="GtkLabel">
+            <style>
+              <class name="dim-label" />
+              <class name="caption" />
+            </style>
+          </object>
+        </child>
+
+        <child>
+          <object class="GtkMenuButton">
+            <property name="menu-model">menu</property>
+            <property name="icon-name">view-more-symbolic</property>
+            <property name="valign">center</property>
+            <style>
+              <class name="flat" />
+            </style>
+          </object>
+        </child>
+
+      </object>
+    </child>
+
+    <!-- Drop controller -->
+    <child>
+      <object class="GtkDropTarget">
+        <property name="actions">move</property>
+        <property name="formats">Task</property>
+        <signal name="drop" handler="_on_task_drop" />
+      </object>
+    </child>
+
+  </template>
+</interface>

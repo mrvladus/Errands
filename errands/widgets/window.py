@@ -37,7 +37,7 @@ class Window(Adw.ApplicationWindow):
         Adw.StyleManager.get_default().set_color_scheme(GSettings.get("theme"))
         self.stack.set_visible_child_name("status")
         # Add Sidebar
-        self.sidebar = Sidebar(self)
+        self.sidebar = Sidebar()
         self.split_view.set_sidebar(Adw.NavigationPage.new(self.sidebar, _("Sidebar")))
         # Setup sync
         Sync.window = self

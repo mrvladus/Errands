@@ -4,6 +4,8 @@
 from __future__ import annotations
 import os
 from typing import TYPE_CHECKING
+from errands.widgets.sidebar.today_item import TodayItem
+from errands.widgets.sidebar.trash_item import TrashItem
 
 from errands.widgets.trash import Trash
 
@@ -104,9 +106,9 @@ class Sidebar(Adw.Bin):
     list_box: Gtk.ListBox = Gtk.Template.Child()
     status_page: Adw.StatusPage = Gtk.Template.Child()
 
-    def __init__(self, window: Window):
+    def __init__(self):
         super().__init__()
-        self.window: Window = window
+        self.window: Window = Adw.Application.get_default().get_active_window()
         self.__build_ui()
         self.update_ui()
 
@@ -114,11 +116,11 @@ class Sidebar(Adw.Bin):
         # --- Categories --- #
 
         # Today
-        self.today_item = SidebarTodayItem(self.window)
+        self.today_item = TodayItem()
         self.list_box.append(self.today_item)
 
         # Trash
-        self.trash_item = SidebarTrashItem(self.window)
+        self.trash_item = TrashItem()
         self.list_box.append(self.trash_item)
 
         # --- Separator --- #
@@ -240,135 +242,6 @@ class Sidebar(Adw.Bin):
     def _on_row_selected(self, _, row: Gtk.ListBoxRow):
         if row:
             row.activate()
-
-
-class SidebarTodayItem(Adw.ActionRow):
-    def __init__(self, window: Window) -> None:
-        super().__init__()
-        self.window: Window = window
-        self.name: str = "errands_today_page"
-        self.__build_ui()
-
-    def __build_ui(self) -> None:
-        # Add Today page
-        self.window.stack.add_titled(
-            Adw.StatusPage(title=_("No Tasks for Today")),
-            "errands_today_page",
-            _("Today"),
-        )
-
-        # Customize internal AdwActionRow styles
-        internal_box: Gtk.Box = self.get_child()
-        internal_box.remove_css_class("header")
-        internal_box.set_margin_start(6)
-        internal_box.set_spacing(12)
-
-        self.props.height_request = 50
-        self.set_title(_("Today"))
-        self.set_icon_name("errands-calendar-symbolic")
-        self.set_activatable(True)
-        self.add_css_class("sidebar-item")
-        self.connect("activated", self.__activated)
-
-    def __activated(self, *args) -> None:
-        Log.debug(f"Sidebar: Open Today")
-
-        self.window.stack.set_visible_child_name(self.name)
-        self.window.split_view.set_show_content(True)
-        GSettings.set("last-open-list", "s", self.name)
-
-    def update_ui(self) -> None:
-        pass
-
-
-class SidebarTrashItem(Adw.ActionRow):
-    def __init__(self, window: Window) -> None:
-        super().__init__()
-        self.window: Window = window
-        self.name: str = "errands_trash_page"
-        self.__build_ui()
-        self.__create_actions()
-
-    def __create_actions(self) -> None:
-        self.group: Gio.SimpleActionGroup = Gio.SimpleActionGroup()
-        self.insert_action_group(name="trash_item", group=self.group)
-
-        def __create_action(name: str, callback: callable) -> None:
-            action: Gio.SimpleAction = Gio.SimpleAction.new(name, None)
-            action.connect("activate", callback)
-            self.group.add_action(action)
-
-        __create_action("clear", self.trash.on_trash_clear)
-        __create_action("restore", self.trash.on_trash_restore)
-
-    def __build_ui(self) -> None:
-        # Create trash page
-        self.trash = Trash()
-        self.window.stack.add_titled(self.trash, "errands_trash_page", _("Trash"))
-
-        # Customize internal AdwActionRow styles
-        internal_box: Gtk.Box = self.get_child()
-        internal_box.remove_css_class("header")
-        internal_box.set_margin_start(6)
-        internal_box.set_spacing(12)
-
-        self.props.height_request = 50
-        self.set_title(_("Trash"))
-        self.set_icon_name("errands-trash-symbolic")
-        self.set_activatable(True)
-        self.add_css_class("sidebar-item")
-        self.add_css_class("sidebar-item-trash")
-        self.connect("activated", self.__activated)
-
-        # Size counter
-        self.size_counter: Gtk.Label = Gtk.Label(css_classes=["dim-label", "caption"])
-
-        # Trash Menu
-        trash_menu: Gio.Menu = Gio.Menu.new()
-        trash_menu.append(_("Restore"), "trash_item.restore")
-        trash_menu.append(_("Clear"), "trash_item.clear")
-
-        # Suffix box
-        suffix_box: Gtk.Box = Gtk.Box(spacing=12)
-        suffix_box.append(self.size_counter)
-        suffix_box.append(
-            Gtk.MenuButton(
-                menu_model=trash_menu,
-                icon_name="view-more-symbolic",
-                valign=Gtk.Align.CENTER,
-                css_classes=["flat"],
-            )
-        )
-        self.add_suffix(suffix_box)
-
-        # Trash drop controller
-        trash_drop_ctrl = Gtk.DropTarget.new(actions=Gdk.DragAction.MOVE, type=Task)
-        trash_drop_ctrl.connect("drop", lambda _d, task, _x, _y: task.delete())
-        self.add_controller(trash_drop_ctrl)
-
-    def __activated(self, *args) -> None:
-        Log.debug(f"Sidebar: Open Trash")
-
-        self.window.stack.set_visible_child_name(self.name)
-        self.window.split_view.set_show_content(True)
-        GSettings.set("last-open-list", "s", self.name)
-
-    def update_ui(self):
-        # Update trash
-        self.trash.update_ui()
-
-        # Get trash size
-        size: int = len(self.trash.trash_items)
-
-        # Update actions state
-        self.group.lookup_action("clear").set_enabled(size > 0)
-        self.group.lookup_action("restore").set_enabled(size > 0)
-
-        # Update icon name
-        self.set_icon_name(f"errands-trash{'-full' if size > 0 else ''}-symbolic")
-
-        # Update subtitle
-        self.size_counter.set_label("" if size == 0 else str(size))
 
 
 class SidebarTaskListItem(Adw.ActionRow):
