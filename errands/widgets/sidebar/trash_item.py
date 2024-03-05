@@ -17,16 +17,19 @@ from gi.repository import Adw, Gtk, Gio, GObject, Gdk, GLib  # type:ignore
 
 
 @Gtk.Template(filename=f"{os.path.dirname(__file__)}/trash_item.ui")
-class TrashItem(Adw.ActionRow):
+class TrashItem(Gtk.ListBoxRow):
     __gtype_name__ = "TrashItem"
 
     size_counter: Gtk.Label = Gtk.Template.Child()
+    icon: Gtk.Image = Gtk.Template.Child()
 
     def __init__(self) -> None:
         super().__init__()
         self.window: Window = Adw.Application.get_default().get_active_window()
         self.name: str = "errands_trash_page"
-        self.__build_ui()
+        # Create trash page
+        self.trash = Trash()
+        self.window.stack.add_titled(self.trash, "errands_trash_page", _("Trash"))
         self.__create_actions()
 
     def __create_actions(self) -> None:
@@ -41,17 +44,6 @@ class TrashItem(Adw.ActionRow):
         __create_action("clear", self.trash.on_trash_clear)
         __create_action("restore", self.trash.on_trash_restore)
 
-    def __build_ui(self) -> None:
-        # Create trash page
-        self.trash = Trash()
-        self.window.stack.add_titled(self.trash, "errands_trash_page", _("Trash"))
-
-        # Customize internal AdwActionRow styles
-        internal_box: Gtk.Box = self.get_child()
-        internal_box.remove_css_class("header")
-        internal_box.set_margin_start(6)
-        internal_box.set_spacing(12)
-
     def update_ui(self) -> None:
         # Update trash
         self.trash.update_ui()
@@ -64,7 +56,9 @@ class TrashItem(Adw.ActionRow):
         self.group.lookup_action("restore").set_enabled(size > 0)
 
         # Update icon name
-        self.set_icon_name(f"errands-trash{'-full' if size > 0 else ''}-symbolic")
+        self.icon.set_from_icon_name(
+            f"errands-trash{'-full' if size > 0 else ''}-symbolic"
+        )
 
         # Update subtitle
         self.size_counter.set_label("" if size == 0 else str(size))

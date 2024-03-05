@@ -1,13 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <template class="TodayItem" parent="AdwActionRow">
+  <template class="TodayItem" parent="GtkListBoxRow">
     <property name="height-request">50</property>
-    <property name="title" translatable="yes">Today</property>
-    <property name="icon-name">errands-calendar-symbolic</property>
-    <property name="activatable">true</property>
+    <signal name="activate" handler="_on_row_activated" />
     <style>
       <class name="sidebar-item" />
     </style>
-    <signal name="activated" handler="_on_row_activated" />
+    <accessibility>
+      <property name="label" translatable="yes">Today</property>
+    </accessibility>
+
+    <child>
+      <object class="GtkBox">
+        <property name="spacing">12</property>
+        <property name="margin-start">6</property>
+        <child>
+          <object class="GtkImage">
+            <property name="icon-name">errands-calendar-symbolic</property>
+          </object>
+        </child>
+
+        <child>
+          <object id="label" class="GtkLabel">
+            <property name="label" translatable="yes">Today</property>
+          </object>
+        </child>
+      </object>
+    </child>
+
   </template>
 </interface>
