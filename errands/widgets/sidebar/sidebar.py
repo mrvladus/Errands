@@ -102,6 +102,7 @@ class Sidebar(Adw.Bin):
     add_list_btn: Gtk.Button = Gtk.Template.Child()
     list_box: Gtk.ListBox = Gtk.Template.Child()
     status_page: Adw.StatusPage = Gtk.Template.Child()
+    separator = Gtk.Template.Child()
 
     def __init__(self):
         super().__init__()
@@ -121,22 +122,10 @@ class Sidebar(Adw.Bin):
         self.list_box.append(self.trash_item)
 
         # --- Separator --- #
-        separator = Gtk.Box(
-            spacing=6,
-            css_classes=["dim-label"],
-            margin_end=12,
-            margin_start=12,
-            margin_bottom=3,
-        )
-        separator.append(Gtk.Separator(valign=Gtk.Align.CENTER, hexpand=True))
-        separator.append(
-            Gtk.Label(label=_("Task Lists"), css_classes=["caption-heading"])
-        )
-        separator.append(Gtk.Separator(valign=Gtk.Align.CENTER, hexpand=True))
 
         self.list_box.set_header_func(
             lambda row, before: (
-                row.set_header(separator)
+                row.set_header(self.separator)
                 if row.__gtype_name__ == "TaskListItem"
                 and before.__gtype_name__ == "TrashItem"
                 else ...
@@ -192,9 +181,7 @@ class Sidebar(Adw.Bin):
 
         # Select last list
         for row in self.rows:
-            if hasattr(row, "__gtype_name__") and row.name == GSettings.get(
-                "last-open-list"
-            ):
+            if hasattr(row, "name") and row.name == GSettings.get("last-open-list"):
 
                 def __select_row(row: Gtk.ListBoxRow):
                     Log.debug("Sidebar: Select last opened item")
