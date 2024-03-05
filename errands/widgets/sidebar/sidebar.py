@@ -191,13 +191,19 @@ class Sidebar(Adw.Bin):
                 row.update_ui()
 
         # Select last list
-        # TODO select row only when window is shown
         for row in self.rows:
             if hasattr(row, "__gtype_name__") and row.name == GSettings.get(
                 "last-open-list"
             ):
-                Log.debug("Sidebar: Select last opened item")
-                self.list_box.select_row(row)
+
+                def __select_row(row: Gtk.ListBoxRow):
+                    Log.debug("Sidebar: Select last opened item")
+                    self.list_box.select_row(row)
+
+                if not row.get_realized():
+                    row.connect("realize", __select_row)
+                else:
+                    __select_row(row)
                 break
 
         # Show status
