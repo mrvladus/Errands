@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from errands.lib.gsettings import GSettings
 
 from errands.lib.logging import Log
-from errands.widgets.task import Task
+from errands.widgets.task.task import Task
 from errands.widgets.trash.trash import Trash
 
 if TYPE_CHECKING:

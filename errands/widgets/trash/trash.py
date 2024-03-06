@@ -83,7 +83,7 @@ class Trash(Adw.Bin):
                 SET deleted = 1
                 WHERE trash = 1""",
             )
-            self.window.sidebar.trash_item.update_ui()
+            self.window.sidebar.trash_row.update_ui()
             # Sync
             Sync.sync()
 

@@ -18,7 +18,7 @@ from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
 from errands.widgets.components import ConfirmDialog
-from errands.widgets.task import Task
+from errands.widgets.task.task import Task
 from errands.widgets.task_list import TaskList
 from gi.repository import Adw, Gtk, Gio, GObject, Gdk, GLib  # type:ignore
 
@@ -99,8 +99,8 @@ class TaskListRow(Gtk.ListBoxRow):
                     )
                 )
                 self.update_ui()
-                self.sidebar.trash_item.update_ui()
-                self.sidebar.today_item.update_ui()
+                self.sidebar.trash_row.update_ui()
+                self.sidebar.today_row.update_ui()
                 Sync.sync()
 
             entry: Gtk.Entry = Gtk.Entry(placeholder_text=_("New Name"))
@@ -187,6 +187,30 @@ class TaskListRow(Gtk.ListBoxRow):
         _create_action("rename", _rename)
         _create_action("export", _export)
 
+    def update_ui(self):
+        Log.debug(f"Sidebar: List Item: Update UI '{self.uid}'")
+
+        # Update title
+        self.name = [
+            i["name"] for i in UserData.get_lists_as_dicts() if i["uid"] == self.uid
+        ][0]
+        self.label.set_label(self.name)
+        self.stack_page.set_name(self.name)
+        self.stack_page.set_title(self.name)
+
+        # Update counter
+        size: int = len(
+            [
+                t
+                for t in UserData.get_tasks_as_dicts(self.uid)
+                if not t["trash"] and not t["deleted"]
+            ]
+        )
+        self.size_counter.set_label(str(size) if size > 0 else "")
+
+        # Update list
+        self.task_list.update_ui()
+
     @Gtk.Template.Callback()
     def _on_drop_hover(self, ctrl: Gtk.DropControllerMotion, _x, _y):
         """
@@ -231,27 +255,3 @@ class TaskListRow(Gtk.ListBoxRow):
         self.window.stack.set_visible_child_name(self.label.get_label())
         self.window.split_view.set_show_content(True)
         GSettings.set("last-open-list", "s", self.name)
-
-    def update_ui(self):
-        Log.debug(f"Sidebar: List Item: Update UI '{self.uid}'")
-
-        # Update title
-        self.name = [
-            i["name"] for i in UserData.get_lists_as_dicts() if i["uid"] == self.uid
-        ][0]
-        self.label.set_label(self.name)
-        self.stack_page.set_name(self.name)
-        self.stack_page.set_title(self.name)
-
-        # Update counter
-        size: int = len(
-            [
-                t
-                for t in UserData.get_tasks_as_dicts(self.uid)
-                if not t["trash"] and not t["deleted"]
-            ]
-        )
-        self.size_counter.set_label(str(size) if size > 0 else "")
-
-        # Update list
-        self.task_list.update_ui()

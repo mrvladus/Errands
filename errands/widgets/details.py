@@ -8,7 +8,7 @@ from errands.lib.gsettings import GSettings
 
 if TYPE_CHECKING:
     from errands.widgets.task_list import TaskList
-    from errands.widgets.task import Task
+    from errands.widgets.task.task import Task
 
 from datetime import datetime
 from errands.lib.data import UserData
