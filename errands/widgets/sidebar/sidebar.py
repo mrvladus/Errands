@@ -120,9 +120,6 @@ class Sidebar(Adw.Bin):
         # Trash
         self.trash_item = TrashItem()
         self.list_box.append(self.trash_item)
-
-        # --- Separator --- #
-
         self.list_box.set_header_func(
             lambda row, before: (
                 row.set_header(self.separator)
@@ -140,10 +137,12 @@ class Sidebar(Adw.Bin):
 
     @property
     def rows(self) -> list[Gtk.ListBoxRow]:
+        """Get all rows"""
         return get_children(self.list_box)
 
     @property
     def task_lists_rows(self) -> list[TaskListItem]:
+        """Get only task list rows"""
         return [
             r
             for r in self.rows
@@ -182,15 +181,11 @@ class Sidebar(Adw.Bin):
         # Select last list
         for row in self.rows:
             if hasattr(row, "name") and row.name == GSettings.get("last-open-list"):
-
-                def __select_row(row: Gtk.ListBoxRow):
-                    Log.debug("Sidebar: Select last opened item")
-                    self.list_box.select_row(row)
-
+                Log.debug("Sidebar: Select last opened item")
                 if not row.get_realized():
-                    row.connect("realize", __select_row)
+                    row.connect("realize", lambda *_: self.list_box.select_row(row))
                 else:
-                    __select_row(row)
+                    self.list_box.select_row(row)
                 break
 
         # Show status
