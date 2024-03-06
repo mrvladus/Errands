@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from errands.widgets.window import Window
 
 from errands.lib.sync.sync import Sync
-from errands.widgets.components import Box
+from errands.widgets.component import Box
 from gi.repository import Adw, Gtk, GLib, GObject  # type:ignore
 from errands.lib.animation import scroll
 from errands.lib.data import TaskData, UserData

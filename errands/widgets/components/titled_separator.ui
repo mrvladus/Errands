@@ -10,9 +10,10 @@
     </style>
 
     <child>
-      <object class="GtkSeparator" />
-      <property name="valign">center</property>
-      <property name="hexpand">true</property>
+      <object class="GtkSeparator">
+        <property name="hexpand">true</property>
+        <property name="valign">center</property>
+      </object>
     </child>
 
     <child>
@@ -24,9 +25,10 @@
     </child>
 
     <child>
-      <object class="GtkSeparator" />
-      <property name="valign">center</property>
-      <property name="hexpand">true</property>
+      <object class="GtkSeparator">
+        <property name="hexpand">true</property>
+        <property name="valign">center</property>
+      </object>
     </child>
 
   </template>

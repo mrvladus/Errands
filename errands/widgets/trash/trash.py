@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 from errands.lib.data import TaskData, TaskListData, UserData
 from errands.lib.utils import get_children
-from errands.widgets.components import ConfirmDialog
+from errands.widgets.component import ConfirmDialog
 from gi.repository import Adw, Gtk, GObject, Gio  # type:ignore
 from errands.lib.sync.sync import Sync
 from errands.lib.logging import Log

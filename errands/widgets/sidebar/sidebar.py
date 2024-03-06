@@ -5,6 +5,8 @@ from __future__ import annotations
 import os
 from typing import TYPE_CHECKING
 
+from errands.widgets.components.titled_separator import TitledSeparator
+
 
 if TYPE_CHECKING:
     from errands.widgets.window import Window
@@ -103,14 +105,13 @@ class Sidebar(Adw.Bin):
     list_box: Gtk.ListBox = Gtk.Template.Child()
     trash_row: TrashRow = Gtk.Template.Child()
     today_row: TodayRow = Gtk.Template.Child()
-    separator = Gtk.Template.Child()
 
     def __init__(self) -> None:
         super().__init__()
         self.window: Window = Adw.Application.get_default().get_active_window()
         self.list_box.set_header_func(
             lambda row, before: (
-                row.set_header(self.separator)
+                row.set_header(TitledSeparator(_("Task Lists")))
                 if row.__gtype_name__ == "TaskListRow"
                 and before.__gtype_name__ == "TrashRow"
                 else ...

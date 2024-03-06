@@ -10,8 +10,7 @@ if TYPE_CHECKING:
     from errands.widgets.window import Window
 
 from errands.lib.data import TaskData, UserData
-from errands.widgets.components import Button
-from gi.repository import Adw, Gtk, GObject, Gio  # type:ignore
+from gi.repository import Adw, Gtk, Gio  # type:ignore
 from errands.lib.logging import Log
 
 
