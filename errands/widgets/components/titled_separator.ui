@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="TitledSeparator" parent="GtkBox">
+    <property name="spacing">12</property>
+    <property name="margin-bottom">3</property>
+    <property name="margin-start">12</property>
+    <property name="margin-end">12</property>
+    <style>
+      <class name="dim-label" />
+    </style>
+
+    <child>
+      <object class="GtkSeparator" />
+      <property name="valign">center</property>
+    </child>
+
+    <child>
+      <object id="label" class="GtkLabel">
+        <style>
+          <class name="caption" />
+        </style>
+      </object>
+    </child>
+
+    <child>
+      <object class="GtkSeparator" />
+      <property name="valign">center</property>
+    </child>
+
+  </template>
+</interface>

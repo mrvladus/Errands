@@ -31,6 +31,7 @@
   </menu>
 
   <template class="Task" parent="GtkRevealer">
+    <!-- <property name="reveal-child">true</property> -->
 
     <child>
       <object id="drop_motion_ctrl" class="GtkDropControllerMotion" />

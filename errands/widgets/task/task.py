@@ -286,7 +286,7 @@ class Task(Gtk.Revealer):
 
         self.title_row.set_title(Markup.find_url(Markup.escape(self.get_prop("text"))))
 
-        # Toolbar
+        # Set notes theme
         Adw.StyleManager.get_default().bind_property(
             "dark",
             self.notes_buffer,
