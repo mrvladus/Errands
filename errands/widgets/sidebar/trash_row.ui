@@ -5,29 +5,26 @@
   <menu id="menu">
     <section>
       <item>
-        <attribute name="label" translatable="yes">Rename</attribute>
-        <attribute name="action">list_item.rename</attribute>
+        <attribute name="label" translatable="yes">Restore</attribute>
+        <attribute name="action">trash_item.restore"</attribute>
       </item>
       <item>
-        <attribute name="label" translatable="yes">Delete</attribute>
-        <attribute name="action">list_item.delete</attribute>
-      </item>
-      <item>
-        <attribute name="label" translatable="yes">Export</attribute>
-        <attribute name="action">list_item.export</attribute>
+        <attribute name="label" translatable="yes">Clear</attribute>
+        <attribute name="action">trash_item.clear"</attribute>
       </item>
     </section>
   </menu>
 
-  <template class="TaskListItem" parent="GtkListBoxRow">
+  <template class="TrashRow" parent="GtkListBoxRow">
     <property name="height-request">50</property>
     <signal name="activate" handler="_on_row_activated" />
     <style>
       <class name="sidebar-item" />
+      <class name="sidebar-item-trash" />
     </style>
-    <!-- <accessibility>
-      <property name="label" translatable="yes">Today</property>
-    </accessibility> -->
+    <accessibility>
+      <property name="label" translatable="yes">Trash</property>
+    </accessibility>
 
     <child>
       <object class="GtkBox">
@@ -35,7 +32,14 @@
         <property name="margin-start">6</property>
 
         <child>
+          <object id="icon" class="GtkImage">
+            <property name="icon-name">errands-trash-symbolic</property>
+          </object>
+        </child>
+
+        <child>
           <object id="label" class="GtkLabel">
+            <property name="label" translatable="yes">Trash</property>
             <property name="hexpand">true</property>
             <property name="halign">start</property>
           </object>
@@ -70,13 +74,6 @@
         <property name="actions">move</property>
         <property name="formats">Task</property>
         <signal name="drop" handler="_on_task_drop" />
-      </object>
-    </child>
-
-    <!-- Drop hover controller -->
-    <child>
-      <object class="GtkDropControllerMotion">
-        <signal name="enter" handler="_on_drop_hover" />
       </object>
     </child>
 

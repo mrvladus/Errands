@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="TrashItem" parent="AdwActionRow">
+    <property name="height-request">60</property>
+    <property name="title-selectable">true</property>
+    <style>
+      <class name="card" />
+    </style>
+    <child type="suffix">
+      <object class="GtkButton">
+        <property name="tooltip-text" translatable="yes">Restore</property>
+        <property name="icon-name">errands-check-toggle-symbolic</property>
+        <property name="valign">center</property>
+        <style>
+          <class name="flat" />
+          <class name="circular" />
+        </style>
+        <signal name="clicked" handler="_on_restore_btn_clicked" />
+      </object>
+    </child>
+  </template>
+</interface>

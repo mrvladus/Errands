@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 from typing import TYPE_CHECKING
 
+
 if TYPE_CHECKING:
     from errands.widgets.window import Window
 
@@ -13,11 +14,11 @@ from errands.lib.utils import get_children
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
-from errands.widgets.sidebar.task_list_item import TaskListItem
-from errands.widgets.sidebar.today_item import TodayItem
-from errands.widgets.sidebar.trash_item import TrashItem
+from errands.widgets.sidebar.task_list_row import TaskListRow
+from errands.widgets.sidebar.today_row import TodayRow
+from errands.widgets.sidebar.trash_row import TrashRow
 from errands.widgets.task_list import TaskList
-from gi.repository import Adw, Gtk  # type:ignore
+from gi.repository import Adw, Gtk, GObject  # type:ignore
 
 
 # class SidebarPluginsList(Adw.Bin):
@@ -93,39 +94,33 @@ from gi.repository import Adw, Gtk  # type:ignore
 class Sidebar(Adw.Bin):
     __gtype_name__ = "Sidebar"
 
+    GObject.type_ensure(TodayRow)
+    GObject.type_ensure(TrashRow)
+
     sync_indicator: Gtk.Spinner = Gtk.Template.Child()
     add_list_btn: Gtk.Button = Gtk.Template.Child()
-    list_box: Gtk.ListBox = Gtk.Template.Child()
     status_page: Adw.StatusPage = Gtk.Template.Child()
+    list_box: Gtk.ListBox = Gtk.Template.Child()
+    trash_row: TrashRow = Gtk.Template.Child()
+    today_row: TodayRow = Gtk.Template.Child()
     separator = Gtk.Template.Child()
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.window: Window = Adw.Application.get_default().get_active_window()
-        self.__build_ui()
-        self.update_ui()
-
-    def __build_ui(self) -> None:
-        # Today
-        self.today_item = TodayItem()
-        self.list_box.append(self.today_item)
-
-        # Trash
-        self.trash_item = TrashItem()
-        self.list_box.append(self.trash_item)
-
         self.list_box.set_header_func(
             lambda row, before: (
                 row.set_header(self.separator)
-                if row.__gtype_name__ == "TaskListItem"
-                and before.__gtype_name__ == "TrashItem"
+                if row.__gtype_name__ == "TaskListRow"
+                and before.__gtype_name__ == "TrashRow"
                 else ...
             )
         )
+        self.update_ui()
 
-    def add_task_list(self, list_dict: TaskListData) -> TaskListItem:
+    def add_task_list(self, list_dict: TaskListData) -> TaskListRow:
         Log.debug(f"Sidebar: Add Task List '{list_dict['uid']}'")
-        row: TaskListItem = TaskListItem(list_dict, self)
+        row: TaskListRow = TaskListRow(list_dict, self)
         self.list_box.append(row)
         return row
 
@@ -135,12 +130,12 @@ class Sidebar(Adw.Bin):
         return get_children(self.list_box)
 
     @property
-    def task_lists_rows(self) -> list[TaskListItem]:
+    def task_lists_rows(self) -> list[TaskListRow]:
         """Get only task list rows"""
         return [
             r
             for r in self.rows
-            if hasattr(r, "__gtype_name__") and r.__gtype_name__ == "TaskListItem"
+            if hasattr(r, "__gtype_name__") and r.__gtype_name__ == "TaskListRow"
         ]
 
     @property
@@ -172,7 +167,7 @@ class Sidebar(Adw.Bin):
             if hasattr(row, "update_ui"):
                 row.update_ui()
 
-        # Select last list
+        # Select last opened list
         for row in self.rows:
             if hasattr(row, "name") and row.name == GSettings.get("last-open-list"):
                 Log.debug("Sidebar: Select last opened item")
@@ -189,7 +184,7 @@ class Sidebar(Adw.Bin):
             self.window.stack.set_visible_child_name("status")
 
     @Gtk.Template.Callback()
-    def _on_add_btn_clicked(self, _btn):
+    def _on_add_btn_clicked(self, _btn) -> None:
         def _entry_activated(_, dialog):
             if dialog.get_response_enabled("add"):
                 dialog.response("add")
@@ -229,6 +224,6 @@ class Sidebar(Adw.Bin):
         dialog.present()
 
     @Gtk.Template.Callback()
-    def _on_row_selected(self, _, row: Gtk.ListBoxRow):
+    def _on_row_selected(self, _, row: Gtk.ListBoxRow) -> None:
         if row:
             row.activate()

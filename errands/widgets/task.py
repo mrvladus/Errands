@@ -161,7 +161,7 @@ class TaskCompletedSubTasks(Gtk.Box):
         )
 
 
-@Gtk.Template(filename=f"{os.path.dirname(__file__)}/task.ui")
+@Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
 class Task(Gtk.Revealer):
     __gtype_name__ = "Task"
 

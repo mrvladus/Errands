@@ -11,12 +11,12 @@ if TYPE_CHECKING:
     from errands.widgets.window import Window
 
 import os
-from gi.repository import Adw, Gtk, Gio, GObject, Gdk, GLib  # type:ignore
+from gi.repository import Adw, Gtk  # type:ignore
 
 
-@Gtk.Template(filename=f"{os.path.dirname(__file__)}/today_item.ui")
-class TodayItem(Gtk.ListBoxRow):
-    __gtype_name__ = "TodayItem"
+@Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
+class TodayRow(Gtk.ListBoxRow):
+    __gtype_name__ = "TodayRow"
 
     def __init__(self) -> None:
         super().__init__()

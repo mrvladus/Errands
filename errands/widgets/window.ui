@@ -16,6 +16,16 @@
             <property name="min-sidebar-width">200</property>
             <property name="show-content">true</property>
 
+            <!-- Sidebar -->
+            <!-- <property name="sidebar">
+              <object class="AdwNavigationPage">
+                <property name="title" translatable="yes">Sidebar</property>
+                <child>
+                  <object id="sidebar" class="Sidebar"></object>
+                </child>
+              </object>
+            </property> -->
+
             <!-- Content -->
             <property name="content">
               <object class="AdwNavigationPage">
@@ -85,6 +95,19 @@
                         </property>
                       </object>
                     </child>
+
+                    <!-- Trash page -->
+                    <!-- <child>
+                      <object class="AdwViewStackPage">
+                        <property name="title" translatable="yes">Trash</property>
+                        <property name="name">errands_trash_page</property>
+                        <property name="child">
+                          <object class="AdwStatusPage">
+                            <property name="title" translatable="yes">No Tasks for Today</property>
+                          </object>
+                        </property>
+                      </object>
+                    </child> -->
 
                   </object>
                 </child>

@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from errands.widgets.window import Window
-    from errands.widgets.sidebar import Sidebar
+    from errands.widgets.sidebar.sidebar import Sidebar
 
 import time
 from datetime import datetime
@@ -23,9 +23,9 @@ from errands.widgets.task_list import TaskList
 from gi.repository import Adw, Gtk, Gio, GObject, Gdk, GLib  # type:ignore
 
 
-@Gtk.Template(filename=f"{os.path.dirname(__file__)}/task_list_item.ui")
-class TaskListItem(Gtk.ListBoxRow):
-    __gtype_name__ = "TaskListItem"
+@Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
+class TaskListRow(Gtk.ListBoxRow):
+    __gtype_name__ = "TaskListRow"
 
     size_counter: Gtk.Label = Gtk.Template.Child()
     label: Gtk.Label = Gtk.Template.Child()

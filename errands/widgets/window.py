@@ -16,7 +16,7 @@ from errands.lib.logging import Log
 from errands.widgets.sidebar.sidebar import Sidebar
 
 
-@Gtk.Template(filename=f"{os.path.dirname(__file__)}/window.ui")
+@Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
 class Window(Adw.ApplicationWindow):
     __gtype_name__ = "Window"
 

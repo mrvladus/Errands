@@ -107,10 +107,22 @@
             <child>
               <object id="list_box" class="GtkListBox">
                 <property name="activate-on-single-click">false</property>
+                <property name="visible" bind-source="status_page" bind-property="visible" bind-flags="sync-create | invert-boolean" />
                 <style>
                   <class name="navigation-sidebar" />
                 </style>
                 <signal name="row-selected" handler="_on_row_selected" />
+
+                <!-- Today -->
+                <child>
+                  <object id="today_row" class="TodayRow" />
+                </child>
+
+                <!-- Trash -->
+                <child>
+                  <object id="trash_row" class="TrashRow" />
+                </child>
+
               </object>
             </child>
 

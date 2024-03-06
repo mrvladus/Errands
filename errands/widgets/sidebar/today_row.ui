@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <template class="TodayItem" parent="GtkListBoxRow">
+  <template class="TodayRow" parent="GtkListBoxRow">
     <property name="height-request">50</property>
     <signal name="activate" handler="_on_row_activated" />
     <style>

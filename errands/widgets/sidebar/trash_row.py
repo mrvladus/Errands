@@ -7,7 +7,7 @@ from errands.lib.gsettings import GSettings
 
 from errands.lib.logging import Log
 from errands.widgets.task import Task
-from errands.widgets.trash import Trash
+from errands.widgets.trash.trash import Trash
 
 if TYPE_CHECKING:
     from errands.widgets.window import Window
@@ -16,9 +16,9 @@ import os
 from gi.repository import Adw, Gtk, Gio, GObject, Gdk, GLib  # type:ignore
 
 
-@Gtk.Template(filename=f"{os.path.dirname(__file__)}/trash_item.ui")
-class TrashItem(Gtk.ListBoxRow):
-    __gtype_name__ = "TrashItem"
+@Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
+class TrashRow(Gtk.ListBoxRow):
+    __gtype_name__ = "TrashRow"
 
     size_counter: Gtk.Label = Gtk.Template.Child()
     icon: Gtk.Image = Gtk.Template.Child()
@@ -30,6 +30,7 @@ class TrashItem(Gtk.ListBoxRow):
         # Create trash page
         self.trash = Trash()
         self.window.stack.add_titled(self.trash, "errands_trash_page", _("Trash"))
+        # print(self.window.stack.get_child_by_name(self.name))
         self.__create_actions()
 
     def __create_actions(self) -> None:
