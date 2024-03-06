@@ -12,6 +12,7 @@
     <child>
       <object class="GtkSeparator" />
       <property name="valign">center</property>
+      <property name="hexpand">true</property>
     </child>
 
     <child>
@@ -25,6 +26,7 @@
     <child>
       <object class="GtkSeparator" />
       <property name="valign">center</property>
+      <property name="hexpand">true</property>
     </child>
 
   </template>
