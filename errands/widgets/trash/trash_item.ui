@@ -3,6 +3,8 @@
   <template class="TrashItem" parent="AdwActionRow">
     <property name="height-request">60</property>
     <property name="title-selectable">true</property>
+    <property name="margin-top">6</property>
+    <property name="margin-bottom">6</property>
     <style>
       <class name="card" />
     </style>

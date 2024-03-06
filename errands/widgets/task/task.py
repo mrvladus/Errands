@@ -422,7 +422,7 @@ class Task(Gtk.Revealer):
         for task in self.all_tasks:
             task.delete()
         self.parent.update_ui()
-        self.window.sidebar.trash_item.update_ui()
+        self.window.sidebar.trash_row.update_ui()
 
     def expand(self, expanded: bool) -> None:
         self.sub_tasks_revealer.set_reveal_child(expanded)

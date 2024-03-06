@@ -19,7 +19,7 @@
                 <property name="tooltip-text" translatable="yes">Clear</property>
                 <property name="valign">center</property>
                 <property name="icon-name">errands-trash-symbolic</property>
-                <property name="visible" bind-source="status_page" bind-property="visible" bind-flags="sync-create" />
+                <property name="visible" bind-source="status_page" bind-property="visible" bind-flags="sync-create | invert-boolean" />
                 <signal name="clicked" handler="on_trash_clear" />
               </object>
             </child>
@@ -30,7 +30,7 @@
                 <property name="tooltip-text" translatable="yes">Restore</property>
                 <property name="valign">center</property>
                 <property name="icon-name">edit-redo-symbolic</property>
-                <property name="visible" bind-source="status_page" bind-property="visible" bind-flags="sync-create" />
+                <property name="visible" bind-source="status_page" bind-property="visible" bind-flags="sync-create | invert-boolean" />
                 <signal name="clicked" handler="on_trash_restore" />
               </object>
             </child>
@@ -67,6 +67,10 @@
                     <property name="tightening-threshold">300</property>
                     <child>
                       <object id="trash_list" class="GtkListBox">
+                        <property name="selection-mode">0</property>
+                        <style>
+                          <class name="transparent" />
+                        </style>
                       </object>
                     </child>
                   </object>
