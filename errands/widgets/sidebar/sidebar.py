@@ -1,28 +1,23 @@
-# Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
+# Copyright 2023-2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 import os
 from typing import TYPE_CHECKING
-from errands.widgets.sidebar.task_list_item import TaskListItem
-from errands.widgets.sidebar.today_item import TodayItem
-from errands.widgets.sidebar.trash_item import TrashItem
-
-from errands.widgets.trash import Trash
 
 if TYPE_CHECKING:
     from errands.widgets.window import Window
 
-    # from errands.lib.plugins import PluginBase
-
-# from errands.lib.plugins import PluginsLoader
 from errands.lib.data import TaskListData, UserData
 from errands.lib.utils import get_children
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
+from errands.widgets.sidebar.task_list_item import TaskListItem
+from errands.widgets.sidebar.today_item import TodayItem
+from errands.widgets.sidebar.trash_item import TrashItem
 from errands.widgets.task_list import TaskList
-from gi.repository import Adw, Gtk, Gio, GObject, Gdk, GLib  # type:ignore
+from gi.repository import Adw, Gtk  # type:ignore
 
 
 # class SidebarPluginsList(Adw.Bin):
@@ -94,7 +89,7 @@ from gi.repository import Adw, Gtk, Gio, GObject, Gdk, GLib  # type:ignore
 #         self.sidebar.task_lists.lists.unselect_all()
 
 
-@Gtk.Template(filename=f"{os.path.dirname(__file__)}/sidebar.ui")
+@Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
 class Sidebar(Adw.Bin):
     __gtype_name__ = "Sidebar"
 
@@ -111,8 +106,6 @@ class Sidebar(Adw.Bin):
         self.update_ui()
 
     def __build_ui(self) -> None:
-        # --- Categories --- #
-
         # Today
         self.today_item = TodayItem()
         self.list_box.append(self.today_item)
@@ -120,6 +113,7 @@ class Sidebar(Adw.Bin):
         # Trash
         self.trash_item = TrashItem()
         self.list_box.append(self.trash_item)
+
         self.list_box.set_header_func(
             lambda row, before: (
                 row.set_header(self.separator)

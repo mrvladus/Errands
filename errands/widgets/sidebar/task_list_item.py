@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from errands.widgets.window import Window
-    from errands.widgets.sidebar.sidebar import Sidebar
+    from errands.widgets.sidebar import Sidebar
 
 import time
 from datetime import datetime
