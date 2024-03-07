@@ -598,69 +598,12 @@
                         <!-- Sub-Tasks list -->
                         <child>
                           <object id="sub_tasks" class="GtkListBox">
-                            <property name="selection-mode">0</property>
+                            <property name="selection-mode">1</property>
                             <style>
                               <class name="transparent" />
                             </style>
                           </object>
                         </child>
-
-                        <!-- Uncompleted Tasks -->
-                        <!-- <child>
-                          <object id="uncompleted_tasks" class="GtkListBox">
-    
-                          </object>
-                        </child> -->
-
-                        <!-- Separator -->
-                        <!-- <child>
-                          <object class="GtkRevealer">
-                            <property name="transition-type">9</property>
-                            <child>
-                              <object id="separator" class="GtkBox">
-                                <property name="margin-start">20</property>
-                                <property name="margin-end">20</property>
-                                <style>
-                                  <class name="dim-label" />
-                                </style>
-    
-                                <child>
-                                  <object class="GtkSeparator">
-                                    <property name="valign">center</property>
-                                    <property name="hexpand">true</property>
-                                  </object>
-                                </child>
-    
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="label" translatable="yes">Completed Tasks</property>
-                                    <property name="hexpand">false</property>
-                                    <property name="margin-start">12</property>
-                                    <property name="margin-end">12</property>
-                                    <style>
-                                      <class name="caption" />
-                                    </style>
-                                  </object>
-                                </child>
-    
-                                <child>
-                                  <object class="GtkSeparator">
-                                    <property name="valign">center</property>
-                                    <property name="hexpand">true</property>
-                                  </object>
-                                </child>
-    
-                              </object>
-                            </child>
-                          </object>
-                        </child> -->
-
-                        <!-- Completed Tasks -->
-                        <!-- <child>
-                          <object id="completed_tasks" class="GtkListBox">
-    
-                          </object>
-                        </child> -->
 
                       </object>
                     </child>

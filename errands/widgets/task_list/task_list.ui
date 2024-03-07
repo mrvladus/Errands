@@ -103,6 +103,7 @@
                         <!-- <property name="visible" bind-source="status_page" bind-property="visible" bind-flags="sync-create | invert-boolean" /> -->
                         <style>
                           <class name="transparent" />
+                          <class name="task-list" />
                         </style>
                       </object>
                     </child>

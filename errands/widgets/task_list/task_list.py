@@ -92,24 +92,20 @@ class TaskList(Adw.Bin):
         for task in self.tasks:
             task.update_ui()
 
-        # tasks: list[TaskData] = [
-        #     t
-        #     for t in UserData.get_tasks_as_dicts(self.list_uid)
-        #     if not t["trash"] and not t["deleted"]
-        # ]
-        # n_total: int = len(tasks)
-        # n_completed: int = len([t for t in tasks if t["completed"]])
+        # Update status
+        tasks: list[TaskData] = [
+            t
+            for t in UserData.get_tasks_as_dicts(self.list_uid)
+            if not t["trash"] and not t["deleted"]
+        ]
+        n_total: int = len(tasks)
+        n_completed: int = len([t for t in tasks if t["completed"]])
+        self.title.set_subtitle(
+            _("Completed:") + f" {n_completed} / {n_total}" if n_total > 0 else ""
+        )
 
-        # # Update status
-        # self.title.set_subtitle(
-        #     _("Completed:") + f" {n_completed} / {n_total}" if n_total > 0 else ""
-        # )
-
-        # # Update delete completed button
-        # self.delete_completed_btn.set_sensitive(n_completed > 0)
-
-        # self.uncompleted_list.update_ui()
-        # self.completed_list.update_ui()
+        # Update delete completed button
+        self.delete_completed_btn.set_sensitive(n_completed > 0)
 
     @Gtk.Template.Callback()
     def _on_delete_completed_btn_clicked(self, _) -> None:

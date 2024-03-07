@@ -1,4 +1,4 @@
-/* Task lists item */
+/* Sidebar */
 .sidebar-item {
   transition: background-color 0.2s;
 }
@@ -11,15 +11,17 @@
   background-color: @orange_1;
 }
 
+/* Task list */
+
+.task-list row {
+  padding: 0px;
+  border-radius: 12px;
+}
 
 /* Task */
 
 .task-title:drop(active) {
   border-radius: 10px;
-}
-
-.tasks-list:last-child {
-  margin-bottom: 36px;
 }
 
 .task {
@@ -50,19 +52,6 @@
 
 .task-completed label.title {
   text-decoration: line-through;
-}
-
-.task-toolbar-btn {
-  all: unset;
-  opacity: 0.7;
-  font-size: 12px;
-  padding: 4px;
-  border-radius: 6px;
-  transition: 0.2s;
-}
-
-.task-toolbar-btn:hover {
-  background-color: @shade_color;
 }
 
 /* Task accent colors */
