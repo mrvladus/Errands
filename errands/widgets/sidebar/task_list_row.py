@@ -19,7 +19,7 @@ from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
 from errands.widgets.component import ConfirmDialog
 from errands.widgets.task.task import Task
-from errands.widgets.task_list import TaskList
+from errands.widgets.task_list.task_list import TaskList
 from gi.repository import Adw, Gtk, Gio, GObject, Gdk, GLib  # type:ignore
 
 

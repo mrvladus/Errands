@@ -8,7 +8,7 @@ from typing import Any, TYPE_CHECKING
 from icalendar import Calendar, Event
 
 if TYPE_CHECKING:
-    from errands.widgets.task_list import TaskList
+    from errands.widgets.task_list.task_list import TaskList
 
 from gi.repository import Gtk, Adw, Gdk, GObject, GLib, GtkSource, Gio  # type:ignore
 from errands.lib.sync.sync import Sync
@@ -19,155 +19,14 @@ from errands.lib.utils import get_children
 from errands.lib.gsettings import GSettings
 
 
-class TaskUncompletedSubTasks(Gtk.Box):
-    def __init__(self, task: Task):
-        super().__init__()
-        self.task: Task = task
-        self._build_ui()
-
-    def _build_ui(self):
-        self.set_orientation(Gtk.Orientation.VERTICAL)
-
-    @property
-    def tasks(self) -> list[Task]:
-        return get_children(self)
-
-    @property
-    def tasks_dicts(self) -> list[TaskData]:
-        return [
-            t
-            for t in UserData.get_tasks_as_dicts(self.task.list_uid)
-            if not t["trash"]
-            and not t["deleted"]
-            and not t["completed"]
-            and t["list_uid"] == self.task.list_uid
-            and t["parent"] == self.task.uid
-        ]
-
-    def update_ui(self):
-        data_uids: list[str] = [
-            t["uid"]
-            for t in UserData.get_tasks_as_dicts(self.task.list_uid, self.task.uid)
-            if not t["deleted"]
-            and not t["trash"]
-            and not t["completed"]
-            and t["parent"] == self.task.uid
-        ]
-        widgets_uids: list[str] = [t.uid for t in self.tasks]
-
-        # Add sub-tasks
-        on_top: bool = GSettings.get("task-list-new-task-position-top")
-        for uid in data_uids:
-            if uid not in widgets_uids:
-                task: Task = Task(uid, self.task.task_list, self.task, True)
-                if on_top:
-                    self.prepend(task)
-                else:
-                    self.append(task)
-
-        # Remove sub-tasks
-        for task in self.tasks:
-            if task.uid not in data_uids:
-                task.purged = True
-
-        # Update sub-tasks
-        for task in self.tasks:
-            task.update_ui()
-
-
-class TaskCompletedSubTasks(Gtk.Box):
-    def __init__(self, task: Task):
-        super().__init__()
-        self.task: Task = task
-        self._build_ui()
-
-    def _build_ui(self):
-        self.set_orientation(Gtk.Orientation.VERTICAL)
-        GSettings.bind("show-completed-tasks", self, "visible")
-
-        # Separator
-        separator = Gtk.Box(css_classes=["dim-label"], margin_start=20, margin_end=20)
-        separator.append(Gtk.Separator(valign=Gtk.Align.CENTER, hexpand=True))
-        separator.append(
-            Gtk.Label(
-                label=_("Completed Tasks"),
-                css_classes=["caption"],
-                halign=Gtk.Align.CENTER,
-                hexpand=False,
-                margin_start=12,
-                margin_end=12,
-            )
-        )
-        separator.append(Gtk.Separator(valign=Gtk.Align.CENTER, hexpand=True))
-        self.separator_rev: Gtk.Revealer = Gtk.Revealer(
-            child=separator, transition_type=Gtk.RevealerTransitionType.SWING_DOWN
-        )
-        self.append(self.separator_rev)
-
-        # Completed tasks list
-        self.completed_list = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        self.append(self.completed_list)
-
-    @property
-    def tasks(self) -> list[Task]:
-        return get_children(self.completed_list)
-
-    @property
-    def tasks_dicts(self) -> list[TaskData]:
-        return [
-            t
-            for t in UserData.get_tasks_as_dicts(self.task.list_uid)
-            if not t["trash"]
-            and not t["deleted"]
-            and t["completed"]
-            and t["list_uid"] == self.task.list_uid
-            and t["parent"] == self.task.uid
-        ]
-
-    def update_ui(self):
-        data_uids: list[str] = [
-            t["uid"]
-            for t in UserData.get_tasks_as_dicts(self.task.list_uid)
-            if not t["deleted"]
-            and not t["trash"]
-            and t["completed"]
-            and t["parent"] == self.task.uid
-        ]
-        widgets_uids: list[str] = [t.uid for t in self.tasks]
-
-        # Add sub-tasks
-        on_top: bool = GSettings.get("task-list-new-task-position-top")
-        for uid in data_uids:
-            if uid not in widgets_uids:
-                task: Task = Task(uid, self.task.task_list, self.task, True)
-                if on_top:
-                    self.completed_list.prepend(task)
-                else:
-                    self.completed_list.append(task)
-
-        # Remove sub-tasks
-        for task in self.tasks:
-            if task.uid not in data_uids:
-                task.purged = True
-
-        # Update sub-tasks
-        for task in self.tasks:
-            task.update_ui()
-
-        # Show separator
-        self.separator_rev.set_reveal_child(
-            len(self.tasks_dicts) > 0
-            and len(self.task.uncompleted_tasks.tasks_dicts) > 0
-        )
-
-
 @Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
-class Task(Gtk.Revealer):
+class Task(Gtk.ListBoxRow):
     __gtype_name__ = "Task"
 
     GObject.type_register(GtkSource.View)
     GObject.type_register(GtkSource.Buffer)
 
+    revealer: Gtk.Revealer = Gtk.Template.Child()
     top_drop_area: Gtk.Revealer = Gtk.Template.Child()
     main_box: Gtk.Box = Gtk.Template.Child()
     progress_bar_rev: Gtk.Revealer = Gtk.Template.Child()
@@ -282,7 +141,7 @@ class Task(Gtk.Revealer):
 
     def __build_ui(self) -> None:
         GSettings.bind("task-show-progressbar", self.progress_bar_rev, "visible")
-        self.set_reveal_child(True)
+        self.revealer.set_reveal_child(True)
 
         self.title_row.set_title(Markup.find_url(Markup.escape(self.get_prop("text"))))
 
@@ -447,7 +306,7 @@ class Task(Gtk.Revealer):
         GLib.timeout_add(200, __finish_remove)
 
     def toggle_visibility(self, on: bool) -> None:
-        GLib.idle_add(self.set_reveal_child, on)
+        GLib.idle_add(self.revealer.set_reveal_child, on)
 
     def update_props(self, props: list[str], values: list[Any]) -> None:
         UserData.update_props(self.list_uid, self.uid, props, values)

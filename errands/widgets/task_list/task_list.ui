@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="TaskList" parent="AdwBin">
+    <child>
+      <object class="AdwToolbarView">
+
+        <!-- Headerbar -->
+        <child type="top">
+          <object class="AdwHeaderBar">
+
+            <!-- Title -->
+            <property name="title-widget">
+              <object id="title" class="AdwWindowTitle" />
+            </property>
+
+            <!-- Delete Completed btn -->
+            <child type="start">
+              <object id="delete_completed_btn" class="GtkButton">
+                <property name="icon-name">edit-clear-all-symbolic</property>
+                <property name="sensitive">false</property>
+                <property name="valign">center</property>
+                <property name="tooltip-text" translatable="yes">Delete Completed Tasks</property>
+                <signal name="clicked" handler="_on_delete_completed_btn_clicked" />
+              </object>
+            </child>
+
+            <!-- Scroll up btn -->
+            <child type="start">
+              <object id="scroll_up_btn" class="GtkButton">
+                <property name="icon-name">go-up-symbolic</property>
+                <property name="visible">false</property>
+                <property name="valign">center</property>
+                <property name="tooltip-text" translatable="yes">Scroll Up</property>
+                <signal name="clicked" handler="_on_scroll_up_btn_clicked" />
+              </object>
+            </child>
+
+          </object>
+        </child>
+
+        <!-- Content -->
+        <property name="content">
+          <object class="GtkBox">
+            <property name="orientation">vertical</property>
+
+            <!-- Entry -->
+            <child>
+              <object class="AdwClamp">
+                <property name="maximum-size">1000</property>
+                <property name="tightening-threshold">300</property>
+                <child>
+                  <object class="AdwEntryRow">
+                    <property name="title" translatable="yes">Add new Task</property>
+                    <property name="activatable">false</property>
+                    <property name="height-request">60</property>
+                    <property name="margin-top">6</property>
+                    <property name="margin-bottom">6</property>
+                    <property name="margin-end">12</property>
+                    <property name="margin-start">12</property>
+                    <style>
+                      <class name="card" />
+                    </style>
+                    <signal name="entry-activated" handler="_on_task_added" />
+                  </object>
+                </child>
+              </object>
+            </child>
+
+            <!-- Status page -->
+            <!-- <child>
+              <object id="status_page" class="AdwStatusPage">
+                <property name="title" translatable="yes">Add new List</property>
+                <property name="description" translatable="yes">Click "+" button</property>
+                <property name="icon-name">errands-lists-symbolic</property>
+                <property name="vexpand">true</property>
+                <style>
+                  <class name="compact" />
+                </style>
+              </object>
+            </child> -->
+
+            <!-- Scrolled window-->
+            <child>
+              <object id="scrl" class="GtkScrolledWindow">
+                <property name="propagate-natural-height">true</property>
+                <property name="propagate-natural-width">true</property>
+                <property name="vadjustment">
+                  <object class="GtkAdjustment">
+                    <signal name="value-changed" handler="_on_scroll" />
+                  </object>
+                </property>
+
+                <child>
+                  <object class="AdwClamp">
+                    <property name="maximum-size">1000</property>
+                    <property name="tightening-threshold">300</property>
+                    <property name="margin-bottom">32</property>
+
+                    <!-- Task List -->
+                    <child>
+                      <object id="task_list" class="GtkListBox">
+                        <property name="selection-mode">0</property>
+                        <!-- <property name="visible" bind-source="status_page" bind-property="visible" bind-flags="sync-create | invert-boolean" /> -->
+                        <style>
+                          <class name="transparent" />
+                        </style>
+                      </object>
+                    </child>
+
+                  </object>
+                </child>
+
+                <!-- Drop motion ctrl -->
+                <child>
+                  <object class="GtkDropControllerMotion">
+                    <signal name="motion" handler="_on_dnd_scroll" />
+                  </object>
+                </child>
+
+              </object>
+            </child>
+
+
+          </object>
+        </property>
+
+      </object>
+    </child>
+  </template>
+</interface>

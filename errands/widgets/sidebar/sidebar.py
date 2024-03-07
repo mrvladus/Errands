@@ -19,7 +19,7 @@ from errands.lib.sync.sync import Sync
 from errands.widgets.sidebar.task_list_row import TaskListRow
 from errands.widgets.sidebar.today_row import TodayRow
 from errands.widgets.sidebar.trash_row import TrashRow
-from errands.widgets.task_list import TaskList
+from errands.widgets.task_list.task_list import TaskList
 from gi.repository import Adw, Gtk, GObject  # type:ignore
 
 

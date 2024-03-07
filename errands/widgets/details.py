@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 from errands.lib.gsettings import GSettings
 
 if TYPE_CHECKING:
-    from errands.widgets.task_list import TaskList
+    from errands.widgets.task_list.task_list import TaskList
     from errands.widgets.task.task import Task
 
 from datetime import datetime
