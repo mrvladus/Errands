@@ -31,7 +31,7 @@ class TaskList(Adw.Bin):
     # State
     scrolling: bool = False
 
-    def __init__(self, window: Window, list_uid: str):
+    def __init__(self, window: Window, list_uid: str) -> None:
         super().__init__()
         self.window: Window = window
         self.list_uid: str = list_uid
@@ -139,11 +139,11 @@ class TaskList(Adw.Bin):
             self.scrolling = False
 
     @Gtk.Template.Callback()
-    def _on_scroll_up_btn_clicked(self, _):
+    def _on_scroll_up_btn_clicked(self, _) -> None:
         scroll(self.scrl, False)
 
     @Gtk.Template.Callback()
-    def _on_scroll(self, adj):
+    def _on_scroll(self, adj) -> None:
         self.scroll_up_btn.set_visible(adj.get_value() > 0)
 
     @Gtk.Template.Callback()
