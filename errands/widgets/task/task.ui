@@ -599,6 +599,8 @@
                         <child>
                           <object id="sub_tasks" class="GtkListBox">
                             <property name="selection-mode">1</property>
+                            <property name="margin-start">7</property>
+                            <property name="margin-end">7</property>
                             <style>
                               <class name="transparent" />
                             </style>

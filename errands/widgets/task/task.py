@@ -7,6 +7,8 @@ import os
 from typing import Any, TYPE_CHECKING
 from icalendar import Calendar, Event
 
+from errands.widgets.components.titled_separator import TitledSeparator
+
 if TYPE_CHECKING:
     from errands.widgets.task_list.task_list import TaskList
 
@@ -162,34 +164,40 @@ class Task(Gtk.ListBoxRow):
         # Sub-tasks
         self.__load_sub_tasks()
 
-        # def sort(row1: Gtk.ListBoxRow, row2: Gtk.ListBoxRow) -> int:
-        #     a1 = int(row1.get_child().task_row.complete_btn.get_active())
-        #     a2 = int(row2.get_child().task_row.complete_btn.get_active())
-        #     print(row1, a1, row2, a2)
-        #     if a1 > a2:
-        #         return 1
-        #     elif a1 < a2:
-        #         return -1
-        #     else:
-        #         return 0
+        def sort_func(task1: Task, task2: Task) -> int:
+            if not isinstance(task1, Task) or not isinstance(task2, Task):
+                return 0
+            # Move completed tasks to the bottom
+            if task1.complete_btn.get_active() and not task2.complete_btn.get_active():
+                return 1
+            else:
+                return 0
 
-        # def header(row: Gtk.ListBoxRow, before: Gtk.ListBoxRow):
-        #     if not before:
-        #         return
-        #     if (
-        #         row.get_child().task_row.complete_btn.get_active()
-        #         and not before.get_child().task_row.complete_btn.get_active()
-        #     ):
-        #         row.set_header(
-        #             Gtk.Separator(
-        #                 margin_bottom=3, margin_top=3, margin_end=12, margin_start=12
-        #             )
-        #         )
-        #     else:
-        #         row.set_header(None)
+        def header_func(task: Task, task_before: Task):
+            """Add separator between completed tasks"""
 
-        # self.sub_tasks.set_sort_func(sort)
-        # self.sub_tasks.set_header_func(header)
+            if not isinstance(task, Task) or not isinstance(task_before, Task):
+                return
+
+            if not task_before:
+                if task.complete_btn.get_active():
+                    task.set_header(
+                        TitledSeparator(_("Completed Tasks"), (20, 20, 0, 0))
+                    )
+                else:
+                    task.set_header(None)
+                return
+
+            if not task_before or (
+                task.complete_btn.get_active()
+                and not task_before.complete_btn.get_active()
+            ):
+                task.set_header(TitledSeparator(_("Completed Tasks"), (20, 20, 0, 0)))
+            else:
+                task.set_header(None)
+
+        self.sub_tasks.set_sort_func(sort_func)
+        self.sub_tasks.set_header_func(header_func)
 
     def __load_sub_tasks(self):
         tasks: list[TaskData] = [
@@ -216,6 +224,10 @@ class Task(Gtk.ListBoxRow):
         #             Task(task["uid"], self.task_list, self, True)
         #         )
 
+    @property
+    def tasks(self) -> list[Task]:
+        return [t for t in get_children(self.sub_tasks) if isinstance(t, Task)]
+
     def add_rm_crossline(self, add: bool) -> None:
         if add:
             self.title_row.add_css_class("task-completed")
@@ -229,11 +241,9 @@ class Task(Gtk.ListBoxRow):
         def __add_task(tasks: list[Task]) -> None:
             for task in tasks:
                 all_tasks.append(task)
-                __add_task(task.completed_tasks.tasks)
-                __add_task(task.uncompleted_tasks.tasks)
+                __add_task(task.tasks)
 
-        __add_task(self.completed_tasks.tasks)
-        __add_task(self.uncompleted_tasks.tasks)
+        __add_task(self.tasks)
         return all_tasks
 
     def get_parents_tree(self) -> list[Task]:
@@ -379,6 +389,28 @@ class Task(Gtk.ListBoxRow):
         elif priority == 9:
             self.priority_btn.add_css_class("accent")
 
+        data_tasks: list[TaskData] = [
+            t
+            for t in UserData.get_tasks_as_dicts(self.list_uid, self.uid)
+            if not t["deleted"]
+        ]
+        data_uids: list[str] = [t["uid"] for t in data_tasks]
+        widgets_uids: list[str] = [t.uid for t in self.tasks]
+
+        # Remove sub-tasks
+        for task in self.tasks:
+            if task.uid not in data_uids:
+                self.sub_tasks.remove(task)
+
+        # Add sub-tasks
+        for task in data_tasks:
+            if task["uid"] not in widgets_uids:
+                self.sub_tasks.append(Task(task["uid"], self.task_list, self, True))
+
+        # Update sub-tasks
+        for task in self.tasks:
+            task.update_ui()
+
     # ------ TEMPLATE HANDLERS ------ #
 
     @Gtk.Template.Callback()
@@ -462,9 +494,9 @@ class Task(Gtk.ListBoxRow):
 
         # Update status
         self.update_props(["completed", "synced"], [False, False])
-        self.just_added = True
-        self.complete_btn.set_active(False)
-        self.just_added = False
+        # self.just_added = True
+        # self.complete_btn.set_active(False)
+        # self.just_added = False
         self.update_ui()
 
         # Sync
