@@ -21,6 +21,10 @@
     <control>pointing</control>
     <internet>always</internet>
   </recommends>
+  <branding>
+    <color type="primary" scheme_preference="light">#FCF9C2</color>
+    <color type="primary" scheme_preference="dark">#ADADD2</color>
+  </branding>
   <provides>
     <binary>errands</binary>
   </provides>
