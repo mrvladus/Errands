@@ -111,7 +111,7 @@
                             <style>
                               <class name="selection-mode" />
                             </style>
-                            <signal name="activate" handler="_on_complete_btn_toggle" />
+                            <signal name="toggled" handler="_on_complete_btn_toggle" />
                           </object>
                         </child>
 

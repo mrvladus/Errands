@@ -111,7 +111,7 @@ class Sidebar(Adw.Bin):
         self.window: Window = Adw.Application.get_default().get_active_window()
         self.list_box.set_header_func(
             lambda row, before: (
-                row.set_header(TitledSeparator(_("Task Lists")))
+                row.set_header(TitledSeparator(_("Task Lists"), (12, 12, 0, 2)))
                 if row.__gtype_name__ == "TaskListRow"
                 and before.__gtype_name__ == "TrashRow"
                 else ...

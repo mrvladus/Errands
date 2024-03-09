@@ -11,6 +11,10 @@ class TitledSeparator(Gtk.Box):
 
     label: Gtk.Label = Gtk.Template.Child()
 
-    def __init__(self, title: str):
+    def __init__(self, title: str, margins: tuple[int, int, int, int]):
         super().__init__()
         self.label.set_label(title)
+        self.set_margin_start(margins[0])
+        self.set_margin_end(margins[1])
+        self.set_margin_top(margins[2])
+        self.set_margin_bottom(margins[3])

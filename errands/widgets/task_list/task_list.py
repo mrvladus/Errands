@@ -5,6 +5,8 @@ from __future__ import annotations
 import os
 from typing import TYPE_CHECKING
 
+from errands.widgets.components.titled_separator import TitledSeparator
+
 if TYPE_CHECKING:
     from errands.widgets.window import Window
 
@@ -36,9 +38,38 @@ class TaskList(Adw.Bin):
         self.window: Window = window
         self.list_uid: str = list_uid
 
+        def sort_func(task1: Task, task2: Task) -> int:
+            # Move completed tasks to the bottom
+            if task1.complete_btn.get_active() and not task2.complete_btn.get_active():
+                return 1
+            else:
+                return 0
+
+        def header_func(task: Task, task_before: Task):
+            """Add separator between completed tasks"""
+            if not task_before:
+                if task.complete_btn.get_active():
+                    task.set_header(
+                        TitledSeparator(_("Completed Tasks"), (20, 20, 0, 0))
+                    )
+                else:
+                    task.set_header(None)
+                return
+
+            if not task_before or (
+                task.complete_btn.get_active()
+                and not task_before.complete_btn.get_active()
+            ):
+                task.set_header(TitledSeparator(_("Completed Tasks"), (20, 20, 0, 0)))
+            else:
+                task.set_header(None)
+
+        self.task_list.set_sort_func(sort_func)
+        self.task_list.set_header_func(header_func)
+
     @property
     def tasks(self) -> list[Task]:
-        return get_children(self.task_list)
+        return [t for t in get_children(self.task_list) if hasattr(t, "uid")]
 
     @property
     def all_tasks(self) -> list[Task]:

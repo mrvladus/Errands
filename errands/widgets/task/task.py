@@ -141,7 +141,6 @@ class Task(Gtk.ListBoxRow):
 
     def __build_ui(self) -> None:
         GSettings.bind("task-show-progressbar", self.progress_bar_rev, "visible")
-        self.revealer.set_reveal_child(True)
 
         self.title_row.set_title(Markup.find_url(Markup.escape(self.get_prop("text"))))
 
@@ -473,7 +472,7 @@ class Task(Gtk.ListBoxRow):
 
     @Gtk.Template.Callback()
     def _on_complete_btn_toggle(self, btn: Gtk.CheckButton) -> None:
-        self.get_parent().changed()
+        self.get_parent().invalidate_sort()
         return
         Log.debug(f"Task '{self.task.uid}': Set completed to '{self.get_active()}'")
 
