@@ -39,9 +39,17 @@ class TaskList(Adw.Bin):
         self.list_uid: str = list_uid
 
         def sort_func(task1: Task, task2: Task) -> int:
+            if not isinstance(task1, Task) or not isinstance(task2, Task):
+                return 0
             # Move completed tasks to the bottom
             if task1.complete_btn.get_active() and not task2.complete_btn.get_active():
+                UserData.move_task_after(self.list_uid, task1.uid, task2.uid)
                 return 1
+            elif (
+                not task1.complete_btn.get_active() and task2.complete_btn.get_active()
+            ):
+                UserData.move_task_before(self.list_uid, task1.uid, task2.uid)
+                return -1
             else:
                 return 0
 
