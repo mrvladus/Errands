@@ -55,7 +55,6 @@ class Task(Gtk.ListBoxRow):
         uid: str,
         task_list: TaskList,
         parent: TaskList | Task,
-        is_sub_task: bool,
     ) -> None:
         super().__init__()
         Log.info(f"Add task: {uid}")
@@ -65,7 +64,6 @@ class Task(Gtk.ListBoxRow):
         self.list_uid = task_list.list_uid
         self.window = task_list.window
         self.parent = parent
-        self.is_sub_task = is_sub_task
         self.__build_ui()
         self.__add_actions()
         self.just_added = False
@@ -167,7 +165,7 @@ class Task(Gtk.ListBoxRow):
             if not t["deleted"]
         ]
         for task in tasks:
-            self.task_list_model.append(Task(task["uid"], self.task_list, self, True))
+            self.task_list_model.append(Task(task["uid"], self.task_list, self))
 
         def create_widget_func(task: Task) -> Task:
             return task
@@ -377,7 +375,7 @@ class Task(Gtk.ListBoxRow):
         on_top: bool = GSettings.get("task-list-new-task-position-top")
         for task in data_tasks:
             if task["uid"] not in widgets_uids:
-                new_task = Task(task["uid"], self.task_list, self, True)
+                new_task = Task(task["uid"], self.task_list, self)
                 if on_top:
                     self.task_list_model.insert(0, new_task)
                 else:
@@ -422,9 +420,6 @@ class Task(Gtk.ListBoxRow):
 
         # Update status
         self.update_props(["completed", "synced"], [False, False])
-        # self.just_added = True
-        # self.complete_btn.set_active(False)
-        # self.just_added = False
         self.update_ui()
 
         # Sync
@@ -619,51 +614,46 @@ class Task(Gtk.ListBoxRow):
                 False,
             )
         UserData.move_task_before(self.list_uid, task.uid, self.uid)
+
         # If task has the same parent
-        if task.get_parent() == self.get_parent():
-            print("-----------------------move------------------------")
-            task.insert_before(self.get_parent(), self)
-            print(self.parent.tasks)
-            # self.get_parent().insert(
-            #     Task(task.uid, self.task_list, self, True),
-            #     self.parent.tasks.index(self),
-            # )
-            # Move widget
-            # self.get_parent().reorder_child_after(task, self)
-            # self.get_parent().reorder_child_after(self, task)
-            return True
+        if task.parent == self.parent:
+            # Insert into new position
+            self.parent.task_list_model.insert(
+                self.parent.task_list_model.find(self)[1],
+                Task(task.uid, self.task_list, self.parent),
+            )
+            # Remove from old position
+            self.parent.task_list_model.remove(
+                self.parent.task_list_model.find(task)[1]
+            )
         # Change parent if different parents
-        # UserData.update_props(
-        #     self.list_uid,
-        #     task.uid,
-        #     ["parent", "synced"],
-        #     [self.parent.uid if isinstance(self.parent, Task) else "", False],
-        # )
-        # # Add new task widget
-        # new_task: Task = Task(
-        #     task.uid,
-        #     self.task_list,
-        #     self.parent,
-        #     self.get_prop("parent") != None,
-        # )
-        # self.get_parent().append(new_task)
-        # self.get_parent().reorder_child_after(new_task, self)
-        # self.get_parent().reorder_child_after(self, new_task)
-        # new_task.toggle_visibility(True)
-        # # Toggle completion
-        # if not task.complete_btn.get_active():
-        #     self.update_props(["completed", "synced"], [False, False])
-        #     self.just_added = True
-        #     self.complete_btn.set_active(False)
-        #     self.just_added = False
-        #     for parent in self.get_parents_tree():
-        #         if parent.complete_btn.get_active():
-        #             parent.update_props(["completed", "synced"], [False, False])
-        #             parent.just_added = True
-        #             parent.complete_btn.set_active(False)
-        #             parent.just_added = False
-        # # Update status
-        # task.purge()
-        # self.task_list.update_ui()
-        # # Sync
-        # Sync.sync()
+        else:
+            UserData.update_props(
+                self.list_uid,
+                task.uid,
+                ["parent", "synced"],
+                [self.parent.uid if isinstance(self.parent, Task) else "", False],
+            )
+
+            # Toggle completion for parents
+            if not task.get_prop("completed"):
+                for parent in self.parents_tree:
+                    if parent.get_prop("completed"):
+                        parent.update_props(["completed", "synced"], [False, False])
+
+            # Insert into new position
+            self.parent.task_list_model.insert(
+                self.parent.task_list_model.find(self)[1],
+                Task(task.uid, self.task_list, self.parent),
+            )
+
+            # Remove from old position
+            task.parent.task_list_model.remove(
+                task.parent.task_list_model.find(task)[1]
+            )
+
+        # Update UI
+        self.task_list.update_ui()
+
+        # Sync
+        Sync.sync(False)

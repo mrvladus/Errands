@@ -44,7 +44,7 @@ class TaskList(Adw.Bin):
             if not t["deleted"] and t["parent"] == ""
         ]
         for task in tasks:
-            self.task_list_model.append(Task(task["uid"], self, self, True))
+            self.task_list_model.append(Task(task["uid"], self, self))
 
         def create_widget_func(task: Task) -> Task:
             return task
@@ -104,7 +104,7 @@ class TaskList(Adw.Bin):
         on_top: bool = GSettings.get("task-list-new-task-position-top")
         for uid in data_uids:
             if uid not in widgets_uids:
-                new_task = Task(uid, self, self.task_list, False)
+                new_task = Task(uid, self, self.task_list)
                 if on_top:
                     self.task_list_model.insert(0, new_task)
                 else:
