@@ -179,25 +179,7 @@ class Task(Gtk.ListBoxRow):
             else:
                 return 0
 
-        def header_func(task: Task, task_before: Task):
-            """Add separator between completed tasks"""
-
-            if not isinstance(task, Task) or not isinstance(task_before, Task):
-                return
-
-            if not task_before:
-                task.set_header(None)
-
-            if (
-                task.complete_btn.get_active()
-                and not task_before.complete_btn.get_active()
-            ):
-                task.set_header(TitledSeparator(_("Completed Tasks"), (20, 20, 0, 0)))
-            else:
-                task.set_header(None)
-
         self.sub_tasks.set_sort_func(sort_func)
-        self.sub_tasks.set_header_func(header_func)
 
     def __load_sub_tasks(self):
         tasks: list[TaskData] = [
@@ -246,7 +228,8 @@ class Task(Gtk.ListBoxRow):
         __add_task(self.tasks)
         return all_tasks
 
-    def get_parents_tree(self) -> list[Task]:
+    @property
+    def parents_tree(self) -> list[Task]:
         """Get parent tasks chain"""
 
         parents: list[Task] = []
@@ -407,6 +390,8 @@ class Task(Gtk.ListBoxRow):
             if task["uid"] not in widgets_uids:
                 self.sub_tasks.append(Task(task["uid"], self.task_list, self, True))
 
+        self.sub_tasks.invalidate_sort()
+
         # Update sub-tasks
         for task in self.tasks:
             task.update_ui()
@@ -504,36 +489,28 @@ class Task(Gtk.ListBoxRow):
 
     @Gtk.Template.Callback()
     def _on_complete_btn_toggle(self, btn: Gtk.CheckButton) -> None:
-        self.get_parent().invalidate_sort()
-        return
-        Log.debug(f"Task '{self.task.uid}': Set completed to '{self.get_active()}'")
+        Log.debug(f"Task '{self.uid}': Set completed to '{btn.get_active()}'")
 
-        self.task.task_row.add_rm_crossline(self.get_active())
-        if self.task.just_added:
+        self.add_rm_crossline(btn.get_active())
+        if self.just_added:
             return
 
-        self.task.update_props(["completed", "synced"], [self.get_active(), False])
-        sub_tasks: list[Task] = self.task.uncompleted_tasks.tasks
-        parents: list[Task] = self.task.get_parents_tree()
+        if self.get_prop("completed") != btn.get_active():
+            self.update_props(["completed", "synced"], [btn.get_active(), False])
 
-        if self.get_active():
-            # Complete all sub-tasks
-            for sub in sub_tasks:
-                sub.just_added = True
-                sub.task_row.complete_btn.set_active(True)
-                sub.just_added = False
-                sub.update_props(["completed", "synced"], [True, False])
+        # Complete all sub-tasks
+        if btn.get_active():
+            for task in self.all_tasks:
+                if not task.get_prop("completed"):
+                    task.update_props(["completed", "synced"], [True, False])
+        # Uncomplete parent if sub-task is uncompleted
         else:
-            # Uncomplete parent if sub-task is uncompleted
-            for parent in parents:
-                if parent.task_row.complete_btn.get_active():
-                    parent.just_added = True
-                    parent.task_row.complete_btn.set_active(False)
-                    parent.just_added = False
-                    parent.update_props(["completed", "synced"], [False, False])
+            for task in self.parents_tree:
+                if task.get_prop("completed"):
+                    task.update_props(["completed", "synced"], [False, False])
 
-        self.task.task_list.update_ui()
-        Sync.sync()
+        self.task_list.update_ui()
+        Sync.sync(False)
 
     @Gtk.Template.Callback()
     def _on_toolbar_btn_toggle(self, btn: Gtk.ToggleButton) -> None:

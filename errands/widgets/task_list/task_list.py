@@ -53,23 +53,7 @@ class TaskList(Adw.Bin):
             else:
                 return 0
 
-        def header_func(task: Task, task_before: Task):
-            """Add separator between completed tasks"""
-
-            if not task_before:
-                task.set_header(None)
-                return
-
-            if (
-                task.complete_btn.get_active()
-                and not task_before.complete_btn.get_active()
-            ):
-                task.set_header(TitledSeparator(_("Completed Tasks"), (20, 20, 0, 0)))
-            else:
-                task.set_header(None)
-
         self.task_list.set_sort_func(sort_func)
-        self.task_list.set_header_func(header_func)
 
     @property
     def tasks(self) -> list[Task]:
@@ -103,7 +87,7 @@ class TaskList(Adw.Bin):
         data_uids: list[str] = [
             t["uid"]
             for t in UserData.get_tasks_as_dicts(self.list_uid)
-            if t["parent"] == "" and not t["completed"] and not t["deleted"]
+            if t["parent"] == "" and not t["deleted"]
         ]
         widgets_uids: list[str] = [t.uid for t in self.tasks]
 
@@ -140,6 +124,9 @@ class TaskList(Adw.Bin):
 
         # Update delete completed button
         self.delete_completed_btn.set_sensitive(n_completed > 0)
+
+        # Sort Tasks
+        self.task_list.invalidate_sort()
 
     @Gtk.Template.Callback()
     def _on_delete_completed_btn_clicked(self, _) -> None:
