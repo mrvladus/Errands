@@ -415,7 +415,7 @@ class Task(Gtk.ListBoxRow):
         self.update_ui()
 
         # Sync
-        Sync.sync()
+        Sync.sync(False)
 
     @Gtk.Template.Callback()
     def _on_complete_btn_toggle(self, btn: Gtk.CheckButton) -> None:
@@ -586,7 +586,7 @@ class Task(Gtk.ListBoxRow):
             self.expand(True)
 
         # Remove from old position
-        task.parent.task_list_model.remove(task.parent.task_list_model.find(task)[1])
+        task.parent.task_list_model.remove(task.get_index())
 
         # Update UI
         self.task_list.update_ui()
@@ -616,13 +616,10 @@ class Task(Gtk.ListBoxRow):
         if task.parent == self.parent:
             # Insert into new position
             self.parent.task_list_model.insert(
-                self.parent.task_list_model.find(self)[1],
-                Task(task.uid, self.task_list, self.parent),
+                self.get_index(), Task(task.uid, self.task_list, self.parent)
             )
             # Remove from old position
-            self.parent.task_list_model.remove(
-                self.parent.task_list_model.find(task)[1]
-            )
+            self.parent.task_list_model.remove(task.get_index())
         # Change parent if different parents
         else:
             UserData.update_props(
