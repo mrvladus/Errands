@@ -52,7 +52,7 @@
                   <object class="GtkImage">
                     <property name="icon-name">list-add-symbolic</property>
                     <style>
-                      <class name="dim-label" />
+                      <!-- <class name="dim-label" /> -->
                       <class name="task-drop-area" />
                     </style>
 
@@ -173,11 +173,6 @@
                             <property name="actions">move</property>
                             <signal name="drop" handler="_on_drop" />
                           </object>
-                        </child>
-
-                        <!-- Drop motion ctrl -->
-                        <child>
-                          <object id="drop_motion_ctrl" class="GtkDropControllerMotion" />
                         </child>
 
                         <!-- Hover ctrl -->
@@ -613,6 +608,11 @@
                 </child>
 
               </object>
+            </child>
+
+            <!-- Drop motion ctrl -->
+            <child>
+              <object id="drop_motion_ctrl" class="GtkDropControllerMotion" />
             </child>
 
           </object>

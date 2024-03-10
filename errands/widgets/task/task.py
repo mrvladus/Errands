@@ -7,8 +7,6 @@ import os
 from typing import Any, TYPE_CHECKING
 from icalendar import Calendar, Event
 
-from errands.widgets.components.titled_separator import TitledSeparator
-
 if TYPE_CHECKING:
     from errands.widgets.task_list.task_list import TaskList
 
@@ -162,49 +160,32 @@ class Task(Gtk.ListBoxRow):
         self.notes_buffer.set_language(lm.get_language("markdown"))
 
         # Sub-tasks
-        self.__load_sub_tasks()
-
-        def sort_func(task1: Task, task2: Task) -> int:
-            if not isinstance(task1, Task) or not isinstance(task2, Task):
-                return 0
-            # Move completed tasks to the bottom
-            if task1.complete_btn.get_active() and not task2.complete_btn.get_active():
-                UserData.move_task_after(self.list_uid, task1.uid, task2.uid)
-                return 1
-            elif (
-                not task1.complete_btn.get_active() and task2.complete_btn.get_active()
-            ):
-                UserData.move_task_before(self.list_uid, task1.uid, task2.uid)
-                return -1
-            else:
-                return 0
-
-        self.sub_tasks.set_sort_func(sort_func)
-
-    def __load_sub_tasks(self):
+        self.task_list_model = Gio.ListStore(item_type=Task)
         tasks: list[TaskData] = [
             t
             for t in UserData.get_tasks_as_dicts(self.list_uid, self.uid)
             if not t["deleted"]
         ]
         for task in tasks:
-            self.sub_tasks.append(
-                Gtk.ListBoxRow(
-                    child=Task(task["uid"], self.task_list, self, False),
-                    activatable=False,
-                    css_classes=["task"],
-                )
-            )
+            self.task_list_model.append(Task(task["uid"], self.task_list, self, True))
 
-        # for task in tasks:
-        #     if task["completed"]:
-        #         completed_tasks_model.append(
-        #             Task(task["uid"], self.task_list, self, True)
-        #         )
-        #     else:
-        #         uncompleted_tasks_model.append(
-        #             Task(task["uid"], self.task_list, self, True)
-        #         )
+        def create_widget_func(task: Task) -> Task:
+            return task
+
+        self.sub_tasks.bind_model(self.task_list_model, create_widget_func)
+
+    def __completed_sort_func(self, task1: Task, task2: Task) -> int:
+        if not isinstance(task1, Task) or not isinstance(task2, Task):
+            return 0
+        # Move completed tasks to the bottom
+        if task1.complete_btn.get_active() and not task2.complete_btn.get_active():
+            UserData.move_task_after(self.list_uid, task1.uid, task2.uid)
+            return 1
+        elif not task1.complete_btn.get_active() and task2.complete_btn.get_active():
+            UserData.move_task_before(self.list_uid, task1.uid, task2.uid)
+            return -1
+        else:
+            return 0
 
     @property
     def tasks(self) -> list[Task]:
@@ -290,7 +271,10 @@ class Task(Gtk.ListBoxRow):
             return
 
         def __finish_remove():
-            GLib.idle_add(self.get_parent().remove, self)
+            GLib.idle_add(
+                self.parent.task_list_model.remove,
+                self.task_list_model.find(self)[1],
+            )
             return False
 
         self.purging = True
@@ -304,6 +288,7 @@ class Task(Gtk.ListBoxRow):
         UserData.update_props(self.list_uid, self.uid, props, values)
 
     def update_ui(self) -> None:
+        # Purge
         if self.purged:
             self.purge()
             return
@@ -380,83 +365,41 @@ class Task(Gtk.ListBoxRow):
         data_uids: list[str] = [t["uid"] for t in data_tasks]
         widgets_uids: list[str] = [t.uid for t in self.tasks]
 
+        for uid in data_uids:
+            if uid not in widgets_uids:
+                new_task = Task(uid, self, self.task_list, False)
+                if on_top:
+                    self.task_list_model.insert(0, new_task)
+                else:
+                    self.task_list_model.append(new_task)
+
+        # Add sub-tasks
+        on_top: bool = GSettings.get("task-list-new-task-position-top")
+        for task in data_tasks:
+            if task["uid"] not in widgets_uids:
+                new_task = Task(task["uid"], self.task_list, self, True)
+                if on_top:
+                    self.task_list_model.insert(0, new_task)
+                else:
+                    self.task_list_model.append(new_task)
+
         # Remove sub-tasks
         for task in self.tasks:
             if task.uid not in data_uids:
-                self.sub_tasks.remove(task)
-
-        # Add sub-tasks
-        for task in data_tasks:
-            if task["uid"] not in widgets_uids:
-                self.sub_tasks.append(Task(task["uid"], self.task_list, self, True))
-
-        self.sub_tasks.invalidate_sort()
+                self.task_list_model.remove(self.task_list_model.find(task)[1])
 
         # Update sub-tasks
         for task in self.tasks:
             task.update_ui()
+
+        # Sort sub-tasks
+        self.task_list_model.sort(self.__completed_sort_func)
 
     # ------ TEMPLATE HANDLERS ------ #
 
     @Gtk.Template.Callback()
     def _on_title_row_clicked(self, *args):
         self.expand(not self.sub_tasks_revealer.get_child_revealed())
-
-    @Gtk.Template.Callback()
-    def _on_top_area_drop(self, _drop, task: Task, _x, _y) -> None:
-        """
-        When task is dropped on "+" area on top of task
-        """
-
-        UserData.move_task_to_list(
-            task.uid,
-            task.list_uid,
-            self.list_uid,
-            self.parent.uid if isinstance(self.parent, Task) else "",
-            False,
-        )
-        UserData.move_task_before(self.list_uid, task.uid, self.uid)
-        # If task has the same parent
-        if task.parent == self.parent:
-            # Move widget
-            self.get_parent().reorder_child_after(task, self)
-            self.get_parent().reorder_child_after(self, task)
-            return True
-        # Change parent if different parents
-        UserData.update_props(
-            self.list_uid,
-            task.uid,
-            ["parent", "synced"],
-            [self.parent.uid if isinstance(self.parent, Task) else "", False],
-        )
-        # Add new task widget
-        new_task: Task = Task(
-            task.uid,
-            self.task_list,
-            self.parent,
-            self.get_prop("parent") != None,
-        )
-        self.get_parent().append(new_task)
-        self.get_parent().reorder_child_after(new_task, self)
-        self.get_parent().reorder_child_after(self, new_task)
-        new_task.toggle_visibility(True)
-        # Toggle completion
-        if not task.complete_btn.get_active():
-            self.update_props(["completed", "synced"], [False, False])
-            self.just_added = True
-            self.complete_btn.set_active(False)
-            self.just_added = False
-            for parent in self.get_parents_tree():
-                if parent.complete_btn.get_active():
-                    parent.update_props(["completed", "synced"], [False, False])
-                    parent.just_added = True
-                    parent.complete_btn.set_active(False)
-                    parent.just_added = False
-        # Update status
-        task.purge()
-        self.task_list.update_ui()
-        # Sync
-        Sync.sync()
 
     @Gtk.Template.Callback()
     def _on_sub_task_added(self, entry: Gtk.Entry) -> None:
@@ -660,3 +603,67 @@ class Task(Gtk.ListBoxRow):
         Sync.sync()
 
         return True
+
+    @Gtk.Template.Callback()
+    def _on_top_area_drop(self, _drop, task: Task, _x, _y) -> None:
+        """
+        When task is dropped on "+" area on top of task
+        """
+
+        if task.list_uid != self.list_uid:
+            UserData.move_task_to_list(
+                task.uid,
+                task.list_uid,
+                self.list_uid,
+                self.parent.uid if isinstance(self.parent, Task) else "",
+                False,
+            )
+        UserData.move_task_before(self.list_uid, task.uid, self.uid)
+        # If task has the same parent
+        if task.get_parent() == self.get_parent():
+            print("-----------------------move------------------------")
+            task.insert_before(self.get_parent(), self)
+            print(self.parent.tasks)
+            # self.get_parent().insert(
+            #     Task(task.uid, self.task_list, self, True),
+            #     self.parent.tasks.index(self),
+            # )
+            # Move widget
+            # self.get_parent().reorder_child_after(task, self)
+            # self.get_parent().reorder_child_after(self, task)
+            return True
+        # Change parent if different parents
+        # UserData.update_props(
+        #     self.list_uid,
+        #     task.uid,
+        #     ["parent", "synced"],
+        #     [self.parent.uid if isinstance(self.parent, Task) else "", False],
+        # )
+        # # Add new task widget
+        # new_task: Task = Task(
+        #     task.uid,
+        #     self.task_list,
+        #     self.parent,
+        #     self.get_prop("parent") != None,
+        # )
+        # self.get_parent().append(new_task)
+        # self.get_parent().reorder_child_after(new_task, self)
+        # self.get_parent().reorder_child_after(self, new_task)
+        # new_task.toggle_visibility(True)
+        # # Toggle completion
+        # if not task.complete_btn.get_active():
+        #     self.update_props(["completed", "synced"], [False, False])
+        #     self.just_added = True
+        #     self.complete_btn.set_active(False)
+        #     self.just_added = False
+        #     for parent in self.get_parents_tree():
+        #         if parent.complete_btn.get_active():
+        #             parent.update_props(["completed", "synced"], [False, False])
+        #             parent.just_added = True
+        #             parent.complete_btn.set_active(False)
+        #             parent.just_added = False
+        # # Update status
+        # task.purge()
+        # self.task_list.update_ui()
+        # # Sync
+        # Sync.sync()

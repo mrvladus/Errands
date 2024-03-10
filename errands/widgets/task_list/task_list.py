@@ -5,13 +5,11 @@ from __future__ import annotations
 import os
 from typing import TYPE_CHECKING
 
-from errands.widgets.components.titled_separator import TitledSeparator
-
 if TYPE_CHECKING:
     from errands.widgets.window import Window
 
 from errands.lib.sync.sync import Sync
-from gi.repository import Adw, Gtk, GLib, GObject  # type:ignore
+from gi.repository import Adw, Gtk, GLib, Gio  # type:ignore
 from errands.lib.animation import scroll
 from errands.lib.data import TaskData, UserData
 from errands.lib.utils import get_children
@@ -38,20 +36,20 @@ class TaskList(Adw.Bin):
         self.window: Window = window
         self.list_uid: str = list_uid
 
-        def sort_func(task1: Task, task2: Task) -> int:
-            # Move completed tasks to the bottom
-            if task1.complete_btn.get_active() and not task2.complete_btn.get_active():
-                UserData.move_task_after(self.list_uid, task1.uid, task2.uid)
-                return 1
-            elif (
-                not task1.complete_btn.get_active() and task2.complete_btn.get_active()
-            ):
-                UserData.move_task_before(self.list_uid, task1.uid, task2.uid)
-                return -1
-            else:
-                return 0
+        # Tasks
+        self.task_list_model = Gio.ListStore(item_type=Task)
+        tasks: list[TaskData] = [
+            t
+            for t in UserData.get_tasks_as_dicts(self.list_uid)
+            if not t["deleted"] and t["parent"] == ""
+        ]
+        for task in tasks:
+            self.task_list_model.append(Task(task["uid"], self, self, True))
 
-        self.task_list.set_sort_func(sort_func)
+        def create_widget_func(task: Task) -> Task:
+            return task
+
+        self.task_list.bind_model(self.task_list_model, create_widget_func)
 
     @property
     def tasks(self) -> list[Task]:
@@ -68,6 +66,19 @@ class TaskList(Adw.Bin):
 
         __add_task(self.tasks)
         return all_tasks
+
+    def __completed_sort_func(self, task1: Task, task2: Task) -> int:
+        if not isinstance(task1, Task) or not isinstance(task2, Task):
+            return 0
+        # Move completed tasks to the bottom
+        if task1.complete_btn.get_active() and not task2.complete_btn.get_active():
+            UserData.move_task_after(self.list_uid, task1.uid, task2.uid)
+            return 1
+        elif not task1.complete_btn.get_active() and task2.complete_btn.get_active():
+            UserData.move_task_before(self.list_uid, task1.uid, task2.uid)
+            return -1
+        else:
+            return 0
 
     def update_ui(self) -> None:
         Log.debug(f"Task list {self.list_uid}: Update UI")
@@ -95,9 +106,9 @@ class TaskList(Adw.Bin):
             if uid not in widgets_uids:
                 new_task = Task(uid, self, self.task_list, False)
                 if on_top:
-                    self.task_list.prepend(new_task)
+                    self.task_list_model.insert(0, new_task)
                 else:
-                    self.task_list.append(new_task)
+                    self.task_list_model.append(new_task)
 
         # Remove tasks
         for task in self.tasks:
@@ -107,6 +118,9 @@ class TaskList(Adw.Bin):
         # Update tasks
         for task in self.tasks:
             task.update_ui()
+
+        # Sort tasks
+        self.task_list_model.sort(self.__completed_sort_func)
 
         # Update status
         tasks: list[TaskData] = [
@@ -123,9 +137,6 @@ class TaskList(Adw.Bin):
         # Update delete completed button
         self.delete_completed_btn.set_sensitive(n_completed > 0)
 
-        # Sort Tasks
-        self.task_list.invalidate_sort()
-
     @Gtk.Template.Callback()
     def _on_delete_completed_btn_clicked(self, _) -> None:
         """Hide completed tasks and move them to trash"""
@@ -139,6 +150,7 @@ class TaskList(Adw.Bin):
     @Gtk.Template.Callback()
     def _on_dnd_scroll(self, _motion, _x, y: float) -> bool:
         """Autoscroll while dragging task"""
+        return
 
         def __auto_scroll(scroll_up: bool) -> bool:
             """Scroll while drag is near the edge"""
@@ -180,4 +192,4 @@ class TaskList(Adw.Bin):
         if not on_top:
             scroll(self.scrl, True)
         self.update_ui()
-        Sync.sync()
+        Sync.sync(False)

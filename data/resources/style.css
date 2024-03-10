@@ -34,16 +34,12 @@
 }
 
 .task-drop-area {
-  padding: 6px;
-  margin: 0px 0px 12px 0px;
+  padding: 8px;
+  margin: 0px 0px 8px 0px;
   border-radius: 10px;
   border-width: 3px;
   border-style: dotted;
   border-color: @light_4;
-}
-
-.task-drop-target:drop(active) {
-  border-radius: 10px;
 }
 
 .task-completed box.title {
