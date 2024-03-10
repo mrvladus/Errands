@@ -5,8 +5,10 @@ from __future__ import annotations
 import os
 from typing import TYPE_CHECKING
 
+
 if TYPE_CHECKING:
     from errands.widgets.window import Window
+    from errands.widgets.sidebar.task_list_row import TaskListRow
 
 from errands.lib.sync.sync import Sync
 from gi.repository import Adw, Gtk, GLib, Gio  # type:ignore
@@ -31,10 +33,11 @@ class TaskList(Adw.Bin):
     # State
     scrolling: bool = False
 
-    def __init__(self, window: Window, list_uid: str) -> None:
+    def __init__(self, list_uid: str, sidebar_row) -> None:
         super().__init__()
-        self.window: Window = window
+        self.window: Window = Adw.Application.get_default().get_active_window()
         self.list_uid: str = list_uid
+        self.sidebar_row: TaskListRow = sidebar_row
 
         # Tasks
         self.task_list_model = Gio.ListStore(item_type=Task)
@@ -104,7 +107,7 @@ class TaskList(Adw.Bin):
         on_top: bool = GSettings.get("task-list-new-task-position-top")
         for uid in data_uids:
             if uid not in widgets_uids:
-                new_task = Task(uid, self, self.task_list)
+                new_task = Task(uid, self, self)
                 if on_top:
                     self.task_list_model.insert(0, new_task)
                 else:
@@ -133,6 +136,9 @@ class TaskList(Adw.Bin):
         self.title.set_subtitle(
             _("Completed:") + f" {n_completed} / {n_total}" if n_total > 0 else ""
         )
+
+        # Update sidebar item counter
+        self.sidebar_row.size_counter.set_label(str(n_total) if n_total > 0 else "")
 
         # Update delete completed button
         self.delete_completed_btn.set_sensitive(n_completed > 0)

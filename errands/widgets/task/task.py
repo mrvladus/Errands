@@ -649,6 +649,11 @@ class Task(Gtk.ListBoxRow):
                 task.parent.task_list_model.find(task)[1]
             )
 
+        # KDE dnd bug workaround for issue #111
+        for task in self.task_list.all_tasks:
+            task.top_drop_area.set_reveal_child(False)
+            task.set_sensitive(True)
+
         # Update UI
         self.task_list.update_ui()
 

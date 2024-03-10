@@ -39,7 +39,7 @@ class TaskListRow(Gtk.ListBoxRow):
         self.name: str = list_dict["name"]
         self.__add_actions()
         # Add Task List page
-        self.task_list: TaskList = TaskList(self.window, self.uid)
+        self.task_list: TaskList = TaskList(self.uid, self)
         self.stack_page: Adw.ViewStackPage = self.window.stack.add_titled(
             child=self.task_list, name=self.name, title=self.name
         )
@@ -197,16 +197,6 @@ class TaskListRow(Gtk.ListBoxRow):
         self.label.set_label(self.name)
         self.stack_page.set_name(self.name)
         self.stack_page.set_title(self.name)
-
-        # Update counter
-        size: int = len(
-            [
-                t
-                for t in UserData.get_tasks_as_dicts(self.uid)
-                if not t["trash"] and not t["deleted"]
-            ]
-        )
-        self.size_counter.set_label(str(size) if size > 0 else "")
 
         # Update list
         self.task_list.update_ui()
