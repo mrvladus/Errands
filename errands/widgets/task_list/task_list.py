@@ -49,15 +49,10 @@ class TaskList(Adw.Bin):
             """Add separator between completed tasks"""
 
             if not task_before:
-                if task.complete_btn.get_active():
-                    task.set_header(
-                        TitledSeparator(_("Completed Tasks"), (20, 20, 0, 0))
-                    )
-                else:
-                    task.set_header(None)
+                task.set_header(None)
                 return
 
-            if not task_before or (
+            if (
                 task.complete_btn.get_active()
                 and not task_before.complete_btn.get_active()
             ):
@@ -72,18 +67,17 @@ class TaskList(Adw.Bin):
     def tasks(self) -> list[Task]:
         return [t for t in get_children(self.task_list) if isinstance(t, Task)]
 
-    # @property
-    # def all_tasks(self) -> list[Task]:
-    #     all_tasks: list[Task] = []
+    @property
+    def all_tasks(self) -> list[Task]:
+        all_tasks: list[Task] = []
 
-    #     def __add_task(tasks: list[Task]) -> None:
-    #         for task in tasks:
-    #             all_tasks.append(task)
-    #             __add_task(task.tasks)
+        def __add_task(tasks: list[Task]) -> None:
+            for task in tasks:
+                all_tasks.append(task)
+                __add_task(task.tasks)
 
-    #     __add_task(self.tasks)
-
-    #     return all_tasks
+        __add_task(self.tasks)
+        return all_tasks
 
     def update_ui(self) -> None:
         Log.debug(f"Task list {self.list_uid}: Update UI")

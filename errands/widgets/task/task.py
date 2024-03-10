@@ -180,15 +180,9 @@ class Task(Gtk.ListBoxRow):
                 return
 
             if not task_before:
-                if task.complete_btn.get_active():
-                    task.set_header(
-                        TitledSeparator(_("Completed Tasks"), (20, 20, 0, 0))
-                    )
-                else:
-                    task.set_header(None)
-                return
+                task.set_header(None)
 
-            if not task_before or (
+            if (
                 task.complete_btn.get_active()
                 and not task_before.complete_btn.get_active()
             ):
