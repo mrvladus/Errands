@@ -363,14 +363,6 @@ class Task(Gtk.ListBoxRow):
         data_uids: list[str] = [t["uid"] for t in data_tasks]
         widgets_uids: list[str] = [t.uid for t in self.tasks]
 
-        for uid in data_uids:
-            if uid not in widgets_uids:
-                new_task = Task(uid, self, self.task_list, False)
-                if on_top:
-                    self.task_list_model.insert(0, new_task)
-                else:
-                    self.task_list_model.append(new_task)
-
         # Add sub-tasks
         on_top: bool = GSettings.get("task-list-new-task-position-top")
         for task in data_tasks:
@@ -566,38 +558,43 @@ class Task(Gtk.ListBoxRow):
         When task is dropped on task and becomes sub-task
         """
 
-        if task == task or task.parent == self:
+        if task.parent == self:
             return
 
+        # Change list
+        if task.list_uid != self.list_uid:
+            UserData.move_task_to_list(
+                task.uid,
+                task.list_uid,
+                self.list_uid,
+                self.get_prop("uid"),
+                False,
+            )
+
         # Change parent
-        UserData.move_task_to_list(
-            task.uid,
-            task.list_uid,
-            self.list_uid,
-            self.get_prop("uid"),
-            False,
-        )
+        task.update_props(["parent", "synced"], [self.uid, False])
+
         # Toggle completion
-        if not task.complete_btn.get_active():
+        if not task.get_prop("completed") and self.get_prop("completed"):
             self.update_props(["completed", "synced"], [False, False])
-            # self.task.just_added = True
-            # self.task.task_row.complete_btn.set_active(False)
-            # self.task.just_added = False
-            for parent in self.get_parents_tree():
-                if parent.complete_btn.get_active():
+            for parent in self.parents_tree:
+                if parent.get_prop("completed"):
                     parent.update_props(["completed", "synced"], [False, False])
-                    # parent.just_added = True
-                    # parent.task_row.complete_btn.set_active(False)
-                    # parent.just_added = False
+
+        # Expand sub-tasks
         if not self.get_prop("expanded"):
             self.expand(True)
-        # Remove old task
-        task.purged = True
-        self.task_list.update_ui()
-        # Sync
-        Sync.sync()
 
-        return True
+        # Remove from old position
+        task.parent.task_list_model.remove(task.parent.task_list_model.find(task)[1])
+
+        # Update UI
+        self.task_list.update_ui()
+        if task.task_list != self.task_list:
+            task.task_list.update_ui()
+
+        # Sync
+        Sync.sync(False)
 
     @Gtk.Template.Callback()
     def _on_top_area_drop(self, _drop, task: Task, _x, _y) -> None:
