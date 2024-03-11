@@ -14,7 +14,7 @@ from errands.lib.sync.sync import Sync
 from gi.repository import Adw, Gtk, GLib, Gio  # type:ignore
 from errands.lib.animation import scroll
 from errands.lib.data import TaskData, UserData
-from errands.lib.utils import get_children
+from errands.lib.utils import get_children, timeit
 from errands.lib.logging import Log
 from errands.widgets.task.task import Task
 from errands.lib.gsettings import GSettings
@@ -54,6 +54,9 @@ class TaskList(Adw.Bin):
 
         self.task_list.bind_model(self.task_list_model, create_widget_func)
 
+    def __repr__(self) -> str:
+        return f"<class 'TaskList' {self.list_uid}>"
+
     @property
     def tasks(self) -> list[Task]:
         return [t for t in get_children(self.task_list) if isinstance(t, Task)]
@@ -71,8 +74,6 @@ class TaskList(Adw.Bin):
         return all_tasks
 
     def __completed_sort_func(self, task1: Task, task2: Task) -> int:
-        if not isinstance(task1, Task) or not isinstance(task2, Task):
-            return 0
         # Move completed tasks to the bottom
         if task1.complete_btn.get_active() and not task2.complete_btn.get_active():
             UserData.move_task_after(self.list_uid, task1.uid, task2.uid)
@@ -83,6 +84,7 @@ class TaskList(Adw.Bin):
         else:
             return 0
 
+    # @timeit
     def update_ui(self) -> None:
         Log.debug(f"Task list {self.list_uid}: Update UI")
 

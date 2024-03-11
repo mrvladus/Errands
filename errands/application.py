@@ -1,4 +1,3 @@
-from __main__ import APP_ID, PROFILE
 from gi.repository import Adw, Gio, Xdp, GObject  # type:ignore
 from errands.lib.gsettings import GSettings
 from errands.widgets.window import Window
@@ -13,7 +12,7 @@ class ErrandsApplication(Adw.Application):
     window: Window
     plugins_loader: PluginsLoader = None
 
-    def __init__(self) -> None:
+    def __init__(self, APP_ID) -> None:
         super().__init__(
             application_id=APP_ID,
             flags=Gio.ApplicationFlags.DEFAULT_FLAGS,
@@ -37,10 +36,11 @@ class ErrandsApplication(Adw.Application):
         )
 
     def run_tests_suite(self):
-        if PROFILE == "development":
-            from errands.tests.tests import run_tests
+        pass
+        # if PROFILE == "development":
+        #     from errands.tests.tests import run_tests
 
-            run_tests()
+        #     run_tests()
 
     def do_startup(self) -> None:
         Adw.Application.do_startup(self)

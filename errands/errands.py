@@ -44,7 +44,7 @@ def main() -> None:
     register_resources()
     from errands.application import ErrandsApplication
 
-    sys.exit(ErrandsApplication().run(sys.argv))
+    sys.exit(ErrandsApplication(APP_ID=APP_ID).run(sys.argv))
 
 
 if __name__ == "__main__":

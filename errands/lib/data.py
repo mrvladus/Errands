@@ -5,16 +5,18 @@ import json
 import os
 import shutil
 import sqlite3
-from typing import Any, TypedDict
+from typing import Any, Self, TypedDict, get_type_hints
 from uuid import uuid4
 from errands.lib.gsettings import GSettings
 from gi.repository import GLib  # type:ignore
 from errands.lib.logging import Log
+from errands.lib.utils import threaded, timeit
 
 
 class TaskListData(TypedDict):
     deleted: bool
     name: str
+    position: int
     synced: bool
     uid: str
 
@@ -29,14 +31,49 @@ class TaskData(TypedDict):
     notes: str
     parent: str
     percent_complete: int
+    position: int
     priority: int
     start_date: str
     synced: bool
     tags: str
     text: str
-    toolbar_shown: str
+    toolbar_shown: bool
     trash: bool
     uid: str
+
+
+class SQLQuery:
+    def __init__(self) -> None:
+        self.query: str = ""
+
+    def create_table(self, name: str) -> Self:
+        self.query += f"CREATE TABLE IF NOT EXISTS {name} "
+        return self
+
+    def insert(self, into: str) -> Self:
+        self.query += f"INSERT INTO {into} "
+        return self
+
+    def select(self, query: str, from_table: str) -> Self:
+        self.query += f"SELECT {query} FROM {from_table} "
+        return self
+
+    def finish(self) -> str:
+        return self.query
+
+
+def create_table_query_from_dict(table_name: str, obj: dict) -> str:
+    dict_obj: dict[str, Any] = get_type_hints(obj)
+    query: str = f"CREATE TABLE IF NOT EXISTS {table_name} ("
+    for item in dict_obj:
+        query += item + " "
+        if dict_obj[item] == str:
+            query += "TEXT NOT NULL, "
+        elif dict_obj[item] == bool or dict_obj[item] == int:
+            query += "INTEGER NOT NULL, "
+    query = query.removesuffix(", ")
+    query += ")"
+    return query
 
 
 class UserData:
@@ -50,33 +87,8 @@ class UserData:
         cls.connection = sqlite3.connect(
             cls.db_path, check_same_thread=False, isolation_level=None
         )
-        cls.run_sql(
-            """CREATE TABLE IF NOT EXISTS lists (
-            deleted INTEGER NOT NULL,
-            name TEXT NOT NULL,
-            synced INTEGER NOT NULL,
-            uid TEXT NOT NULL
-            )""",
-            """CREATE TABLE IF NOT EXISTS tasks (
-            color TEXT NOT NULL,
-            completed INTEGER NOT NULL,
-            deleted INTEGER NOT NULL,
-            end_date TEXT NOT NULL,
-            expanded INTEGER NOT NULL,
-            list_uid TEXT NOT NULL,
-            notes TEXT NOT NULL,
-            parent TEXT NOT NULL,
-            percent_complete INTEGER NOT NULL,
-            priority INTEGER NOT NULL,
-            start_date TEXT NOT NULL,
-            synced INTEGER NOT NULL,
-            tags TEXT NOT NULL,
-            text TEXT NOT NULL,
-            toolbar_shown INTEGER NOT NULL,
-            trash INTEGER NOT NULL,
-            uid TEXT NOT NULL
-            )""",
-        )
+        cls.execute(create_table_query_from_dict("lists", TaskListData))
+        cls.execute(create_table_query_from_dict("tasks", TaskData))
         cls._convert(cls)
 
     @classmethod
@@ -84,14 +96,17 @@ class UserData:
         cls, name: str, uuid: str = None, synced: bool = False
     ) -> TaskListData:
         uid: str = str(uuid4()) if not uuid else uuid
+        position: int = len(cls.get_lists_as_dicts())
         Log.debug(f"Data: Create '{uid}' list")
         with cls.connection:
             cur = cls.connection.cursor()
             cur.execute(
-                "INSERT INTO lists (deleted, name, synced, uid) VALUES (?, ?, ?, ?)",
-                (False, name, synced, uid),
+                "INSERT INTO lists (deleted, name, synced, position, uid) VALUES (?, ?, ?, ?, ?)",
+                (False, name, synced, position, uid),
             )
-            return TaskListData(uid=uid, name=name, deleted=False, synced=synced)
+            return TaskListData(
+                uid=uid, name=name, deleted=False, position=position, synced=synced
+            )
 
     @classmethod
     def get_tasks(cls) -> list[str]:
@@ -113,24 +128,18 @@ class UserData:
 
     @classmethod
     def get_lists_as_dicts(cls) -> list[TaskListData]:
-        # Log.debug("Data: Get lists as dicts")
-
         with cls.connection:
             cur = cls.connection.cursor()
             cur.execute("SELECT * FROM lists")
-            res: list[tuple] = cur.fetchall()
-            lists: list[TaskListData] = []
-            for i in res:
-                lists.append(
-                    TaskListData(
-                        deleted=bool(i[0]),
-                        name=i[1],
-                        synced=bool(i[2]),
-                        uid=i[3],
-                    )
+            return [
+                TaskListData(
+                    **{
+                        key: i[idx]
+                        for idx, key in enumerate(get_type_hints(TaskListData))
+                    }
                 )
-
-            return lists
+                for i in cur.fetchall()
+            ]
 
     @classmethod
     def move_task_after(cls, list_uid: str, task_uid: str, after_uid: str) -> None:
@@ -164,33 +173,37 @@ class UserData:
 
     @classmethod
     def move_task_before(cls, list_uid: str, task_uid: str, before_uid: str) -> None:
-        tasks: list[TaskData] = UserData.get_tasks_as_dicts()
+        pass
+        # tasks: list[TaskData] = UserData.get_tasks_as_dicts()
+        # with cls.connection:
+        #     cur = cls.connection.cursor()
+        #     for task in tasks:
 
-        # Find tasks to move
-        task_to_move_down: TaskData = None
-        task_to_move_up: TaskData = None
-        for task in tasks:
-            if task["list_uid"] == list_uid and task["uid"] == before_uid:
-                task_to_move_down = task
-            elif task["list_uid"] == list_uid and task["uid"] == task_uid:
-                task_to_move_up = task
+        # # Find tasks to move
+        # task_to_move_down: TaskData = None
+        # task_to_move_up: TaskData = None
+        # for task in tasks:
+        #     if task["list_uid"] == list_uid and task["uid"] == before_uid:
+        #         task_to_move_down = task
+        #     elif task["list_uid"] == list_uid and task["uid"] == task_uid:
+        #         task_to_move_up = task
 
-        # Move task up
-        task_to_move_up = tasks.pop(tasks.index(task_to_move_up))
-        tasks.insert(tasks.index(task_to_move_down), task_to_move_up)
+        # # Move task up
+        # task_to_move_up = tasks.pop(tasks.index(task_to_move_up))
+        # tasks.insert(tasks.index(task_to_move_down), task_to_move_up)
 
-        # Run SQL
-        values: list[tuple[str, str]] = ((t["list_uid"], t["uid"]) for t in tasks)
-        with cls.connection:
-            cur = cls.connection.cursor()
-            cur.execute("CREATE TABLE IF NOT EXISTS tmp AS SELECT * FROM tasks WHERE 0")
-            cur.executemany(
-                f"""INSERT INTO tmp SELECT * FROM tasks
-                    WHERE list_uid = ? AND uid = ?""",
-                values,
-            )
-            cur.execute("DROP TABLE tasks")
-            cur.execute("ALTER TABLE tmp RENAME TO tasks")
+        # # Run SQL
+        # values: list[tuple[str, str]] = ((t["list_uid"], t["uid"]) for t in tasks)
+        # with cls.connection:
+        #     cur = cls.connection.cursor()
+        #     cur.execute("CREATE TABLE IF NOT EXISTS tmp AS SELECT * FROM tasks WHERE 0")
+        #     cur.executemany(
+        #         f"""INSERT INTO tmp SELECT * FROM tasks
+        #             WHERE list_uid = ? AND uid = ?""",
+        #         values,
+        #     )
+        #     cur.execute("DROP TABLE tasks")
+        #     cur.execute("ALTER TABLE tmp RENAME TO tasks")
 
     @classmethod
     def execute(
@@ -334,11 +347,9 @@ class UserData:
     def get_tasks_as_dicts(
         cls, list_uid: str = None, parent: str = None
     ) -> list[TaskData]:
-        # Log.debug(f"Data: Get tasks as dicts")
-
         with cls.connection:
             cur = cls.connection.cursor()
-            if not list_uid and not parent:
+            if not list_uid:
                 cur.execute("SELECT * FROM tasks")
             else:
                 cur.execute(
@@ -346,31 +357,12 @@ class UserData:
                     {f"AND parent = '{parent}'" if parent else ""}""",
                     (list_uid,),
                 )
-            tasks: list[TaskData] = []
-            for task in cur.fetchall():
-                tasks.append(
-                    TaskData(
-                        color=task[0],
-                        completed=bool(task[1]),
-                        deleted=bool(task[2]),
-                        end_date=task[3],
-                        expanded=bool(task[4]),
-                        list_uid=task[5],
-                        notes=task[6],
-                        parent=task[7],
-                        percent_complete=int(task[8]),
-                        priority=int(task[9]),
-                        start_date=task[10],
-                        synced=bool(task[11]),
-                        tags=task[12],
-                        text=task[13],
-                        toolbar_shown=task[14],
-                        trash=bool(task[15]),
-                        uid=task[16],
-                    )
+            return [
+                TaskData(
+                    **{key: i[idx] for idx, key in enumerate(get_type_hints(TaskData))}
                 )
-
-            return tasks
+                for i in cur.fetchall()
+            ]
 
     @classmethod
     def add_task(
@@ -384,6 +376,7 @@ class UserData:
         notes: str = "",
         parent: str = "",
         percent_complete: int = 0,
+        position: int = 0,
         priority: int = 0,
         start_date: str = "",
         synced: bool = False,
@@ -396,68 +389,38 @@ class UserData:
     ) -> str:
         if not uid:
             uid: str = str(uuid4())
+        if not insert_at_the_top:
+            position = len(cls.get_tasks_as_dicts())
 
         Log.debug(f"Data: Add task {uid}")
 
         with cls.connection:
             cur = cls.connection.cursor()
-            if not insert_at_the_top:
-                cur.execute(
-                    """INSERT INTO tasks 
-                    (uid, list_uid, text, parent, completed, deleted, color, notes, percent_complete, priority, start_date, end_date, tags, synced, expanded, trash, toolbar_shown) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                    (
-                        uid,
-                        list_uid,
-                        text,
-                        parent,
-                        completed,
-                        deleted,
-                        color,
-                        notes,
-                        percent_complete,
-                        priority,
-                        start_date,
-                        end_date,
-                        tags,
-                        synced,
-                        expanded,
-                        trash,
-                        toolbar_shown,
-                    ),
-                )
-            else:
-                cur.execute(
-                    "CREATE TABLE IF NOT EXISTS tmp AS SELECT * FROM tasks WHERE 0"
-                )
-                cur.execute(
-                    """INSERT INTO tmp 
-                (uid, list_uid, text, parent, completed, deleted, color, notes, percent_complete, priority, start_date, end_date, tags, synced, expanded, trash, toolbar_shown) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                    (
-                        uid,
-                        list_uid,
-                        text,
-                        parent,
-                        completed,
-                        deleted,
-                        color,
-                        notes,
-                        percent_complete,
-                        priority,
-                        start_date,
-                        end_date,
-                        tags,
-                        synced,
-                        expanded,
-                        trash,
-                        toolbar_shown,
-                    ),
-                )
-                cur.execute("INSERT INTO tmp SELECT * FROM tasks")
-                cur.execute("DROP TABLE tasks")
-                cur.execute("ALTER TABLE tmp RENAME TO tasks")
-
+            cur.execute(
+                """INSERT INTO tasks 
+                (uid, list_uid, text, parent, completed, deleted, color, notes, percent_complete, priority, start_date, end_date, tags, synced, expanded, trash, toolbar_shown, position) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (
+                    uid,
+                    list_uid,
+                    text,
+                    parent,
+                    completed,
+                    deleted,
+                    color,
+                    notes,
+                    percent_complete,
+                    priority,
+                    start_date,
+                    end_date,
+                    tags,
+                    synced,
+                    expanded,
+                    trash,
+                    toolbar_shown,
+                    position,
+                ),
+            )
             return uid
 
     def _convert(cls):

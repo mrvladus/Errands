@@ -15,7 +15,7 @@ from errands.lib.sync.sync import Sync
 from errands.lib.logging import Log
 from errands.lib.data import TaskData, UserData
 from errands.lib.markup import Markup
-from errands.lib.utils import get_children
+from errands.lib.utils import get_children, timeit
 from errands.lib.gsettings import GSettings
 
 
@@ -67,6 +67,9 @@ class Task(Gtk.ListBoxRow):
         self.__build_ui()
         self.__add_actions()
         self.just_added = False
+
+    def __repr__(self) -> str:
+        return f"<class 'Task' {self.uid}>"
 
     def __add_actions(self) -> None:
         group: Gio.SimpleActionGroup = Gio.SimpleActionGroup()
@@ -173,8 +176,6 @@ class Task(Gtk.ListBoxRow):
         self.sub_tasks.bind_model(self.task_list_model, create_widget_func)
 
     def __completed_sort_func(self, task1: Task, task2: Task) -> int:
-        if not isinstance(task1, Task) or not isinstance(task2, Task):
-            return 0
         # Move completed tasks to the bottom
         if task1.complete_btn.get_active() and not task2.complete_btn.get_active():
             UserData.move_task_after(self.list_uid, task1.uid, task2.uid)
