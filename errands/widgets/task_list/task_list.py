@@ -26,6 +26,7 @@ class TaskList(Adw.Bin):
 
     title: Adw.WindowTitle = Gtk.Template.Child()
     delete_completed_btn: Gtk.Button = Gtk.Template.Child()
+    toggle_completed_btn: Gtk.ToggleButton = Gtk.Template.Child()
     scroll_up_btn: Gtk.Button = Gtk.Template.Child()
     scrl: Gtk.ScrolledWindow = Gtk.Template.Child()
     task_list: Gtk.ListBox = Gtk.Template.Child()
@@ -144,6 +145,7 @@ class TaskList(Adw.Bin):
 
         # Update delete completed button
         self.delete_completed_btn.set_sensitive(n_completed > 0)
+        self.toggle_completed_btn.set_sensitive(n_completed > 0)
 
     @Gtk.Template.Callback()
     def _on_delete_completed_btn_clicked(self, _) -> None:
@@ -154,6 +156,21 @@ class TaskList(Adw.Bin):
             if not task.get_prop("trash") and task.get_prop("completed"):
                 task.delete()
         self.window.sidebar.update_ui()
+
+    @Gtk.Template.Callback()
+    def _on_toggle_completed_btn_toggled(self, _) -> None:
+        """Switch visibility of completed tasks"""
+
+        Log.info("Toggle completed tasks")
+        for task in self.all_tasks:
+            if task.get_prop("completed"):
+                Log.info(f"Task: '{task.uid}'")
+                if _.props.active:
+                    task.toggle_visibility(False)
+                    Log.info(f"Task: Hide complete")
+                else:
+                    task.toggle_visibility(True)
+                    Log.info(f"Task: Show complete")
 
     @Gtk.Template.Callback()
     def _on_dnd_scroll(self, _motion, _x, y: float) -> bool:
