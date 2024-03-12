@@ -29,7 +29,7 @@ class TrashItem(Adw.ActionRow):
 
         Log.info(f"Restore task: {self.task_dict['uid']}")
 
-        parents_uids: list[str] = UserData.get_task_parents_uids_tree(
+        parents_uids: list[str] = UserData.get_parents_uids_tree(
             self.task_dict["list_uid"], self.task_dict["uid"]
         )
         parents_uids.append(self.task_dict["uid"])

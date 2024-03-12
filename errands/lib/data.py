@@ -5,7 +5,7 @@ import json
 import os
 import shutil
 import sqlite3
-from typing import Any, Self, TypedDict, get_type_hints
+from typing import Any, Iterable, Self, TypedDict, get_type_hints
 from uuid import uuid4
 from errands.lib.gsettings import GSettings
 from gi.repository import GLib  # type:ignore
@@ -42,7 +42,7 @@ class TaskData(TypedDict):
     uid: str
 
 
-class SQLQuery:
+class SQLBuilder:
     def __init__(self) -> None:
         self.query: str = ""
 
@@ -50,8 +50,8 @@ class SQLQuery:
         self.query += f"CREATE TABLE IF NOT EXISTS {name} "
         return self
 
-    def insert(self, into: str) -> Self:
-        self.query += f"INSERT INTO {into} "
+    def insert(self, into: str, columns: Iterable[str], values: Iterable[Any]) -> Self:
+        self.query += f"INSERT INTO {into} ({', '.join(columns)}) VALUES ()"
         return self
 
     def select(self, query: str, from_table: str) -> Self:
@@ -89,7 +89,7 @@ class UserData:
         )
         cls.execute(create_table_query_from_dict("lists", TaskListData))
         cls.execute(create_table_query_from_dict("tasks", TaskData))
-        cls._convert(cls)
+        cls.__convert(cls)
 
     @classmethod
     def add_list(
@@ -107,15 +107,6 @@ class UserData:
             return TaskListData(
                 uid=uid, name=name, deleted=False, position=position, synced=synced
             )
-
-    @classmethod
-    def get_tasks(cls) -> list[str]:
-        # Log.debug(f"Data: Get tasks uids")
-
-        with cls.connection:
-            cur = cls.connection.cursor()
-            cur.execute("SELECT uid FROM tasks")
-            return [i[0] for i in cur.fetchall()]
 
     @classmethod
     def clean_deleted(cls):
@@ -206,19 +197,6 @@ class UserData:
         #     cur.execute("ALTER TABLE tmp RENAME TO tasks")
 
     @classmethod
-    def execute(
-        cls, cmd: str, values: tuple = (), fetch: bool = False
-    ) -> list[tuple] | None:
-        try:
-            with cls.connection:
-                cur = cls.connection.cursor()
-                cur.execute(cmd, values)
-                if fetch:
-                    return cur.fetchall()
-        except Exception as e:
-            Log.error(f"Data: {e}")
-
-    @classmethod
     def move_task_to_list(
         cls,
         task_uid: str,
@@ -227,7 +205,9 @@ class UserData:
         parent: str,
         synced: bool,
     ) -> None:
-        sub_tasks_uids: list[str] = cls.get_tasks_uids_tree(old_list_uid, task_uid)
+        sub_tasks_uids: list[str] = cls.__get_sub_tasks_uids_tree(
+            old_list_uid, task_uid
+        )
         tasks: list[TaskData] = cls.get_tasks_as_dicts(old_list_uid)
         task_dict: TaskData = [i for i in tasks if i["uid"] == task_uid][0]
         sub_tasks_dicts: list[TaskData] = [
@@ -274,8 +254,6 @@ class UserData:
     def update_props(
         cls, list_uid: str, uid: str, props: list[str], values: list[Any]
     ) -> None:
-        # Log.debug(f"Data: Update props for '{uid}'")
-
         with cls.connection:
             cur = cls.connection.cursor()
             for i, prop in enumerate(props):
@@ -301,41 +279,7 @@ class UserData:
             Log.error(f"Data: {e}")
 
     @classmethod
-    def get_tasks_uids(cls, list_uid: str, parent: str = None) -> list[str]:
-        # Log.debug(f"Data: Get tasks uids {f'for {parent}' if parent else ''}")
-
-        with cls.connection:
-            cur = cls.connection.cursor()
-            cur.execute(
-                f"""SELECT uid FROM tasks
-                WHERE list_uid = ?
-                AND deleted = 0
-                {f"AND parent = '{parent}'" if parent != None else ''}""",
-                (list_uid,),
-            )
-            return [i[0] for i in cur.fetchall()]
-
-    @classmethod
-    def get_tasks_uids_tree(cls, list_uid: str, parent: str) -> list[str]:
-        """
-        Get all sub-task uids recursively
-        """
-        # Log.debug(f"Data: Get tasks uids tree for '{parent}'")
-
-        uids: list[str] = []
-
-        def _add(sub_uids: list[str]) -> None:
-            for uid in sub_uids:
-                uids.append(uid)
-                if len(cls.get_tasks_uids(list_uid, uid)) > 0:
-                    _add(cls.get_tasks_uids(list_uid, uid))
-
-        _add(cls.get_tasks_uids(list_uid, parent))
-
-        return uids
-
-    @classmethod
-    def get_task_parents_uids_tree(cls, list_uid: str, task_uid: str) -> list[str]:
+    def get_parents_uids_tree(cls, list_uid: str, task_uid: str) -> list[str]:
         parents_uids: list[str] = []
         parent: str = cls.get_prop(list_uid, task_uid, "parent")
         while parent != "":
@@ -423,7 +367,54 @@ class UserData:
             )
             return uid
 
-    def _convert(cls):
+    # --- PRIVATE METHODS --- #
+
+    @classmethod
+    def execute(
+        cls, cmd: str, values: tuple = (), fetch: bool = False
+    ) -> list[tuple] | None:
+        try:
+            with cls.connection:
+                cur = cls.connection.cursor()
+                cur.execute(cmd, values)
+                if fetch:
+                    return cur.fetchall()
+        except Exception as e:
+            Log.error(f"Data: {e}")
+
+    def __get_tasks_uids(cls, list_uid: str, parent: str = None) -> list[str]:
+        # Log.debug(f"Data: Get tasks uids {f'for {parent}' if parent else ''}")
+
+        with cls.connection:
+            cur = cls.connection.cursor()
+            cur.execute(
+                f"""SELECT uid FROM tasks
+                WHERE list_uid = ?
+                AND deleted = 0
+                {f"AND parent = '{parent}'" if parent != None else ''}""",
+                (list_uid,),
+            )
+            return [i[0] for i in cur.fetchall()]
+
+    def __get_sub_tasks_uids_tree(cls, list_uid: str, parent: str) -> list[str]:
+        """
+        Get all sub-task uids recursively
+        """
+        # Log.debug(f"Data: Get tasks uids tree for '{parent}'")
+
+        uids: list[str] = []
+
+        def _add(sub_uids: list[str]) -> None:
+            for uid in sub_uids:
+                uids.append(uid)
+                if len(cls.__get_tasks_uids(list_uid, uid)) > 0:
+                    _add(cls.__get_tasks_uids(list_uid, uid))
+
+        _add(cls.__get_tasks_uids(list_uid, parent))
+
+        return uids
+
+    def __convert(cls):
         old_path = os.path.join(GLib.get_user_data_dir(), "list")
         old_data_file = os.path.join(old_path, "data.json")
         if not os.path.exists(old_data_file):
