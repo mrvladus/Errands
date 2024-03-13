@@ -28,7 +28,6 @@
             <child type="start">
               <object id="toggle_completed_btn" class="GtkToggleButton">
                 <property name="icon-name">errands-check-toggle-symbolic</property>
-                <property name="sensitive">false</property>
                 <property name="valign">center</property>
                 <property name="tooltip-text" translatable="yes">Toggle Completed Tasks</property>
                 <signal name="toggled" handler="_on_toggle_completed_btn_toggled" />

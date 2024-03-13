@@ -145,7 +145,6 @@ class TaskList(Adw.Bin):
 
         # Update delete completed button
         self.delete_completed_btn.set_sensitive(n_completed > 0)
-        self.toggle_completed_btn.set_sensitive(n_completed > 0)
 
     @Gtk.Template.Callback()
     def _on_delete_completed_btn_clicked(self, _) -> None:
