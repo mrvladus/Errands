@@ -39,8 +39,17 @@ class TaskList(Adw.Bin):
         self.window: Window = Adw.Application.get_default().get_active_window()
         self.list_uid: str = list_uid
         self.sidebar_row: TaskListRow = sidebar_row
+        self.__create_task_list_model()
 
-        # Tasks
+    def __repr__(self) -> str:
+        return f"<class 'TaskList' {self.list_uid}>"
+
+    # ------ PRIVATE METHODS ------ #
+
+    def __create_task_list_model(self) -> None:
+        def create_widget_func(task: Task) -> Task:
+            return task
+
         self.task_list_model = Gio.ListStore(item_type=Task)
         tasks: list[TaskData] = [
             t
@@ -50,29 +59,7 @@ class TaskList(Adw.Bin):
         for task in tasks:
             self.task_list_model.append(Task(task["uid"], self, self))
 
-        def create_widget_func(task: Task) -> Task:
-            return task
-
         self.task_list.bind_model(self.task_list_model, create_widget_func)
-
-    def __repr__(self) -> str:
-        return f"<class 'TaskList' {self.list_uid}>"
-
-    @property
-    def tasks(self) -> list[Task]:
-        return [t for t in get_children(self.task_list) if isinstance(t, Task)]
-
-    @property
-    def all_tasks(self) -> list[Task]:
-        all_tasks: list[Task] = []
-
-        def __add_task(tasks: list[Task]) -> None:
-            for task in tasks:
-                all_tasks.append(task)
-                __add_task(task.tasks)
-
-        __add_task(self.tasks)
-        return all_tasks
 
     def __completed_sort_func(self, task1: Task, task2: Task) -> int:
         # Move completed tasks to the bottom
@@ -84,6 +71,30 @@ class TaskList(Adw.Bin):
             return -1
         else:
             return 0
+
+    # ------ PROPERTIES ------ #
+
+    @property
+    def tasks(self) -> list[Task]:
+        """Top-level Tasks"""
+
+        return [t for t in get_children(self.task_list) if isinstance(t, Task)]
+
+    @property
+    def all_tasks(self) -> list[Task]:
+        """All tasks in the list"""
+
+        all_tasks: list[Task] = []
+
+        def __add_task(tasks: list[Task]) -> None:
+            for task in tasks:
+                all_tasks.append(task)
+                __add_task(task.tasks)
+
+        __add_task(self.tasks)
+        return all_tasks
+
+    # ------ PUBLIC METHODS ------ #
 
     # @timeit
     def update_ui(self) -> None:
@@ -145,6 +156,8 @@ class TaskList(Adw.Bin):
 
         # Update delete completed button
         self.delete_completed_btn.set_sensitive(n_completed > 0)
+
+    # ------ TEMPLATE HANDLERS ------ #
 
     @Gtk.Template.Callback()
     def _on_delete_completed_btn_clicked(self, _) -> None:
