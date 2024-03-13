@@ -293,7 +293,15 @@ class Task(Gtk.ListBoxRow):
             return
 
         # Change visibility
-        self.toggle_visibility(not self.get_prop("trash"))
+        completed = self.complete_btn.get_active()
+        hide_completed = self.task_list.toggle_completed_btn.get_active()
+        if not self.get_prop("trash"):
+            if completed and hide_completed:
+                self.toggle_visibility(False)
+            else:
+                self.toggle_visibility(True)
+        else:
+            self.toggle_visibility(False)
 
         # Expand
         self.expand(self.get_prop("expanded"))

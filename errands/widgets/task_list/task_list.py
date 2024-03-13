@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from errands.widgets.sidebar.task_list_row import TaskListRow
 
 from errands.lib.sync.sync import Sync
-from gi.repository import Adw, Gtk, GLib, Gio  # type:ignore
+from gi.repository import Adw, Gtk, GLib, Gio, GObject  # type:ignore
 from errands.lib.animation import scroll
 from errands.lib.data import TaskData, UserData
 from errands.lib.utils import get_children, timeit
@@ -158,19 +158,14 @@ class TaskList(Adw.Bin):
         self.window.sidebar.update_ui()
 
     @Gtk.Template.Callback()
-    def _on_toggle_completed_btn_toggled(self, _) -> None:
+    def _on_toggle_completed_btn_toggled(self, btn: Gtk.ToggleButton) -> None:
         """Switch visibility of completed tasks"""
 
-        Log.info("Toggle completed tasks")
+        Log.info(
+            f"Task List: Toggle completed tasks '{'off' if btn.get_active() else 'on'}'"
+        )
         for task in self.all_tasks:
-            if task.get_prop("completed"):
-                Log.info(f"Task: '{task.uid}'")
-                if _.props.active:
-                    task.toggle_visibility(False)
-                    Log.info(f"Task: Hide complete")
-                else:
-                    task.toggle_visibility(True)
-                    Log.info(f"Task: Show complete")
+            task.update_ui()
 
     @Gtk.Template.Callback()
     def _on_dnd_scroll(self, _motion, _x, y: float) -> bool:
