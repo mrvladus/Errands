@@ -47,8 +47,7 @@ class TaskList(Adw.Bin):
     # ------ PRIVATE METHODS ------ #
 
     def __create_task_list_model(self) -> None:
-        def create_widget_func(task: Task) -> Task:
-            return task
+        """Create ListModel and bind to 'self.task_list' ListBox"""
 
         self.task_list_model = Gio.ListStore(item_type=Task)
         tasks: list[TaskData] = [
@@ -59,10 +58,11 @@ class TaskList(Adw.Bin):
         for task in tasks:
             self.task_list_model.append(Task(task["uid"], self, self))
 
-        self.task_list.bind_model(self.task_list_model, create_widget_func)
+        self.task_list.bind_model(self.task_list_model, lambda task: task)
 
     def __completed_sort_func(self, task1: Task, task2: Task) -> int:
-        # Move completed tasks to the bottom
+        """Move completed tasks to the bottom"""
+
         if task1.complete_btn.get_active() and not task2.complete_btn.get_active():
             UserData.move_task_after(self.list_uid, task1.uid, task2.uid)
             return 1
