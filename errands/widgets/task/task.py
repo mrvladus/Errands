@@ -2,21 +2,30 @@
 # SPDX-License-Identifier: MIT
 
 from __future__ import annotations
-from datetime import datetime
-import os
-from typing import Any, TYPE_CHECKING
-from icalendar import Calendar, Event
+
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from errands.widgets.task_list.task_list import TaskList
 
-from gi.repository import Gtk, Adw, Gdk, GObject, GLib, GtkSource, Gio  # type:ignore
-from errands.lib.sync.sync import Sync
-from errands.lib.logging import Log
+import os
+from datetime import datetime
+
+from gi.repository import Adw  # type:ignore
+from gi.repository import Gdk  # type:ignore
+from gi.repository import Gio  # type:ignore
+from gi.repository import GLib  # type:ignore
+from gi.repository import GObject  # type:ignore
+from gi.repository import Gtk  # type:ignore
+from gi.repository import GtkSource  # type:ignore
+from icalendar import Calendar, Event
+
 from errands.lib.data import TaskData, UserData
-from errands.lib.markup import Markup
-from errands.lib.utils import get_children, timeit
 from errands.lib.gsettings import GSettings
+from errands.lib.logging import Log
+from errands.lib.markup import Markup
+from errands.lib.sync.sync import Sync
+from errands.lib.utils import get_children, timeit
 
 
 @Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
@@ -70,6 +79,8 @@ class Task(Gtk.ListBoxRow):
 
     def __repr__(self) -> str:
         return f"<class 'Task' {self.uid}>"
+
+    # ------ PRIVATE METHODS ------ #
 
     def __add_actions(self) -> None:
         group: Gio.SimpleActionGroup = Gio.SimpleActionGroup()
@@ -170,10 +181,7 @@ class Task(Gtk.ListBoxRow):
         for task in tasks:
             self.task_list_model.append(Task(task["uid"], self.task_list, self))
 
-        def create_widget_func(task: Task) -> Task:
-            return task
-
-        self.sub_tasks.bind_model(self.task_list_model, create_widget_func)
+        self.sub_tasks.bind_model(self.task_list_model, lambda task: task)
 
     def __completed_sort_func(self, task1: Task, task2: Task) -> int:
         # Move completed tasks to the bottom
@@ -186,15 +194,11 @@ class Task(Gtk.ListBoxRow):
         else:
             return 0
 
+    # ------ PROPERTIES ------ #
+
     @property
     def tasks(self) -> list[Task]:
         return [t for t in get_children(self.sub_tasks) if isinstance(t, Task)]
-
-    def add_rm_crossline(self, add: bool) -> None:
-        if add:
-            self.title_row.add_css_class("task-completed")
-        else:
-            self.title_row.remove_css_class("task-completed")
 
     @property
     def all_tasks(self) -> list[Task]:
@@ -222,6 +226,14 @@ class Task(Gtk.ListBoxRow):
         _add(self)
 
         return parents
+
+    # ------ PUBLIC METHODS ------ #
+
+    def add_rm_crossline(self, add: bool) -> None:
+        if add:
+            self.title_row.add_css_class("task-completed")
+        else:
+            self.title_row.remove_css_class("task-completed")
 
     def get_prop(self, prop: str) -> Any:
         res: Any = UserData.get_prop(self.list_uid, self.uid, prop)
