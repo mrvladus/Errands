@@ -1,21 +1,21 @@
 # Czech translation for List.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the list package.
-# Amerey.eu <info@amerey.eu>, 2023.
+# Amerey.eu <info@amerey.eu>, 2023, 2024.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-06 17:58+0300\n"
-"PO-Revision-Date: 2023-10-25 09:09+0200\n"
-"Last-Translator: YashkaWitcher\n"
+"PO-Revision-Date: 2024-03-13 19:02+0100\n"
+"Last-Translator: Amerey <info@amerey.eu>\n"
 "Language-Team: \n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.4\n"
+"X-Generator: Poedit 3.4.2\n"
 
 #: errands/widgets/components.py:153
 msgid "Today"
@@ -35,8 +35,7 @@ msgstr "Zrušit zvýraznění"
 
 #. Start date row
 #. End date row
-#: errands/widgets/components.py:231 errands/widgets/details.py:176
-#: errands/widgets/details.py:197
+#: errands/widgets/components.py:231 errands/widgets/details.py:176 errands/widgets/details.py:197
 msgid "Not Set"
 msgstr "Není nastaveno"
 
@@ -78,14 +77,12 @@ msgid "Open Details Panel"
 msgstr "Otevřít panel s podrobnostmi"
 
 #: errands/widgets/preferences.py:84
-#, fuzzy
 msgid "Show Sub-Tasks"
-msgstr "Přidat nový podúkol"
+msgstr "Zobrazit podúkoly"
 
 #: errands/widgets/preferences.py:99
-#, fuzzy
 msgid "Complete Button Size"
-msgstr "Dokončeno:"
+msgstr "Velikost tlačítka Dokončeno"
 
 #: errands/widgets/preferences.py:100
 msgid "Small"
@@ -150,7 +147,6 @@ msgid "Left"
 msgstr "Vlevo"
 
 #: errands/widgets/preferences.py:175
-#, fuzzy
 msgid "Right"
 msgstr "Vpravo"
 
@@ -166,16 +162,14 @@ msgstr "Připojeno"
 msgid "Can't connect"
 msgstr "Nelze připojit"
 
-#: errands/widgets/sidebar.py:67 errands/widgets/window.py:38
-#: errands/widgets/window.py:129 data/io.github.mrvladus.List.desktop.in.in:3
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:27
+#: errands/widgets/sidebar.py:67 errands/widgets/window.py:38 errands/widgets/window.py:129
+#: data/io.github.mrvladus.List.desktop.in.in:3 data/io.github.mrvladus.List.metainfo.xml.in.in:27
 msgid "Errands"
 msgstr "Pochůzky"
 
 #: errands/widgets/sidebar.py:75
-#, fuzzy
 msgid "Import List"
-msgstr "Importovat seznam s úkoly"
+msgstr "Importovat seznam"
 
 #: errands/widgets/sidebar.py:80
 msgid "Add List (Ctrl+A)"
@@ -187,9 +181,8 @@ msgstr "Další možností"
 
 #. top_section.append(_("Secret Notes"), "app.secret_notes")
 #: errands/widgets/sidebar.py:99 data/resources/gtk/help-overlay.ui:42
-#, fuzzy
 msgid "Sync / Fetch Tasks"
-msgstr "ynchronizace / načítání úloh"
+msgstr "Synchronizace / načítání úloh"
 
 #: errands/widgets/sidebar.py:102 data/resources/gtk/help-overlay.ui:20
 msgid "Preferences"
@@ -219,8 +212,8 @@ msgstr "Nový název seznamu"
 msgid "Add List"
 msgstr "Přidat seznam"
 
-#: errands/widgets/sidebar.py:150 errands/widgets/sidebar.py:342
-#: errands/widgets/sidebar.py:385 errands/widgets/trash.py:136
+#: errands/widgets/sidebar.py:150 errands/widgets/sidebar.py:342 errands/widgets/sidebar.py:385
+#: errands/widgets/trash.py:136
 msgid "Cancel"
 msgstr "Zrušit"
 
@@ -229,9 +222,8 @@ msgid "Add"
 msgstr "Přidat"
 
 #: errands/widgets/sidebar.py:168
-#, fuzzy
 msgid "Add new List"
-msgstr "Přidat nový úkol"
+msgstr "Přidat nový seznam"
 
 #: errands/widgets/sidebar.py:169
 msgid "Click \"+\" button"
@@ -242,12 +234,11 @@ msgid "Are you sure?"
 msgstr "Jste si jisti?"
 
 #: errands/widgets/sidebar.py:338
-#, fuzzy
 msgid "List will be permanently deleted"
-msgstr "Úkoly budou trvale smazány"
+msgstr "Seznam bude trvale smazán"
 
-#: errands/widgets/sidebar.py:343 errands/widgets/sidebar.py:478
-#: errands/widgets/details.py:54 errands/widgets/trash.py:137
+#: errands/widgets/sidebar.py:343 errands/widgets/sidebar.py:478 errands/widgets/details.py:54
+#: errands/widgets/trash.py:137
 msgid "Delete"
 msgstr "Smazat"
 
@@ -259,51 +250,41 @@ msgstr "Nový název"
 msgid "Rename List"
 msgstr "Přejmenovat seznam"
 
-#: errands/widgets/sidebar.py:386 errands/widgets/details.py:114
-#: errands/widgets/details.py:155
+#: errands/widgets/sidebar.py:386 errands/widgets/details.py:114 errands/widgets/details.py:155
 msgid "Save"
 msgstr "Uložit"
 
 #: errands/widgets/sidebar.py:444
-#, fuzzy
 msgid "Export failed"
-msgstr "Úkoly byly exportovány"
+msgstr "Export se nezdařil"
 
 #: errands/widgets/sidebar.py:446 errands/widgets/details.py:487
-#, fuzzy
 msgid "Exported"
-msgstr "Úkoly byly exportovány"
+msgstr "Exportováno"
 
 #: errands/widgets/sidebar.py:477
-#, fuzzy
 msgid "Rename"
-msgstr "Uživatelské jméno"
+msgstr "Přejmenovat"
 
 #. Export group
-#: errands/widgets/sidebar.py:479 errands/widgets/details.py:239
-#: errands/widgets/details.py:247
-#, fuzzy
+#: errands/widgets/sidebar.py:479 errands/widgets/details.py:239 errands/widgets/details.py:247
 msgid "Export"
-msgstr "Exportovat úkoly"
+msgstr "Exportovat"
 
 #: errands/widgets/sidebar.py:505
 msgid "Menu"
 msgstr "Menu"
 
-#: errands/widgets/sidebar.py:563 errands/widgets/trash.py:30
-#: errands/widgets/window.py:61
-#, fuzzy
+#: errands/widgets/sidebar.py:563 errands/widgets/trash.py:30 errands/widgets/window.py:61
 msgid "Trash"
-msgstr "Zavřít Koš"
+msgstr "Koš"
 
-#: errands/widgets/task_list.py:40 errands/widgets/task_list.py:55
-#: errands/widgets/task_list.py:96 errands/widgets/task_list.py:107
-#, fuzzy
+#: errands/widgets/task_list.py:40 errands/widgets/task_list.py:55 errands/widgets/task_list.py:96
+#: errands/widgets/task_list.py:107
 msgid "Toggle Sidebar"
 msgstr "Přepnout postranní panel"
 
 #: errands/widgets/task_list.py:70 errands/widgets/task_list.py:120
-#, fuzzy
 msgid "Delete Completed Tasks"
 msgstr "Smazat hotové úkoly"
 
@@ -328,9 +309,8 @@ msgid "Click on task to show more info"
 msgstr "Klikněte na úkol pro zobrazení podrobností"
 
 #: errands/widgets/details.py:81
-#, fuzzy
 msgid "Clear Style"
-msgstr "Zrušit zvýraznění"
+msgstr "Zrušit styl"
 
 #. Edit group
 #: errands/widgets/details.py:90
@@ -338,9 +318,8 @@ msgid "Text"
 msgstr "Text"
 
 #: errands/widgets/details.py:124 errands/widgets/details.py:166
-#, fuzzy
 msgid "Copy Text"
-msgstr "Kopírovat"
+msgstr "Kopírovat text"
 
 #. Notes group
 #: errands/widgets/details.py:131
@@ -366,7 +345,6 @@ msgstr "Termín"
 
 #. Complete % row
 #: errands/widgets/details.py:212
-#, fuzzy
 msgid "Complete %"
 msgstr "Dokončeno %"
 
@@ -382,9 +360,8 @@ msgstr "Značky"
 
 #. Tags entry
 #: errands/widgets/details.py:234
-#, fuzzy
 msgid "Add Tag"
-msgstr "Přidat nový úkol"
+msgstr "Přidat štítek"
 
 #: errands/widgets/details.py:248
 msgid "Save Task as .ics file"
@@ -435,9 +412,8 @@ msgid "No Task Lists"
 msgstr "Žádné úkoly"
 
 #: errands/widgets/window.py:69
-#, fuzzy
 msgid "Create List"
-msgstr "Importovat úkoly"
+msgstr "Vytvořit seznam"
 
 #: errands/widgets/window.py:90 data/resources/gtk/help-overlay.ui:53
 msgid "Lists"
@@ -446,16 +422,14 @@ msgstr "Seznamy"
 #: errands/widgets/window.py:134
 msgid "translator-credits"
 msgstr "Amerey.eu"
-        "YashkaWitcher"
 
 #: errands/widgets/window.py:143
 msgid "Sync is disabled"
 msgstr "Synchronizace vypnuta"
 
 #: errands/widgets/window.py:212
-#, fuzzy
 msgid "Imported"
-msgstr "Úkoly byly importovány"
+msgstr "Importováno"
 
 #: errands/lib/sync/providers/caldav.py:42
 msgid "Not all sync credentials provided. Please check settings."
@@ -478,19 +452,16 @@ msgid "Quit"
 msgstr "Ukončit"
 
 #: data/resources/gtk/help-overlay.ui:72
-#, fuzzy
 msgid "Toggle Details"
-msgstr "Přepnout postranní panel"
+msgstr "Přepnout Podrobnosti"
 
-#: data/io.github.mrvladus.List.desktop.in.in:4
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:28
+#: data/io.github.mrvladus.List.desktop.in.in:4 data/io.github.mrvladus.List.metainfo.xml.in.in:28
 msgid "Manage your tasks"
 msgstr "Spravujte své úkoly"
 
 #: data/io.github.mrvladus.List.desktop.in.in:10
-#, fuzzy
 msgid "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
-msgstr "errands;tasks;list;todo;todos;úkoly;seznam;"
+msgstr "errands;tasks;list;todo;todos;caldav;nextcloud;sync;úkoly;seznam;synchronizace;"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:30
 msgid "Todo application for those who prefer simplicity."
@@ -525,9 +496,8 @@ msgid "Drag and Drop support"
 msgstr "Podpora drag and drop"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:39
-#, fuzzy
 msgid "Import .ics files"
-msgstr "Importovat úkoly (.ics)"
+msgstr "Importovat .ics soubory"
 
 #, fuzzy
 #~ msgid "Toggle sidebar"
