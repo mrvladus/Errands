@@ -5,7 +5,7 @@
   <project_license>MIT</project_license>
   <content_rating type="oars-1.1" />
   <developer_name translatable="no">Vlad Krupinski</developer_name>
-  <developer id="github.com">
+  <developer id="io.github.mrvladus">
     <name translatable="no">Vlad Krupinski</name>
   </developer>
   <url type="homepage">https://github.com/mrvladus/Errands</url>
