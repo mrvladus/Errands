@@ -7,8 +7,10 @@ import shutil
 import sqlite3
 from typing import Any, Iterable, Self, TypedDict, get_type_hints
 from uuid import uuid4
-from errands.lib.gsettings import GSettings
+
 from gi.repository import GLib  # type:ignore
+
+from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.utils import threaded, timeit
 
@@ -16,7 +18,7 @@ from errands.lib.utils import threaded, timeit
 class TaskListData(TypedDict):
     deleted: bool
     name: str
-    position: int
+    # position: int
     synced: bool
     uid: str
 
@@ -31,7 +33,7 @@ class TaskData(TypedDict):
     notes: str
     parent: str
     percent_complete: int
-    position: int
+    # position: int
     priority: int
     start_date: str
     synced: bool
@@ -42,6 +44,7 @@ class TaskData(TypedDict):
     uid: str
 
 
+# TODO
 class SQLBuilder:
     def __init__(self) -> None:
         self.query: str = ""
@@ -50,6 +53,7 @@ class SQLBuilder:
         self.query += f"CREATE TABLE IF NOT EXISTS {name} "
         return self
 
+    # TODO
     def insert(self, into: str, columns: Iterable[str], values: Iterable[Any]) -> Self:
         self.query += f"INSERT INTO {into} ({', '.join(columns)}) VALUES ()"
         return self
@@ -96,17 +100,16 @@ class UserData:
         cls, name: str, uuid: str = None, synced: bool = False
     ) -> TaskListData:
         uid: str = str(uuid4()) if not uuid else uuid
-        position: int = len(cls.get_lists_as_dicts())
-        Log.debug(f"Data: Create '{uid}' list")
+        Log.debug(f"Data: Create list '{uid}'")
         with cls.connection:
             cur = cls.connection.cursor()
             cur.execute(
-                "INSERT INTO lists (deleted, name, synced, position, uid) VALUES (?, ?, ?, ?, ?)",
-                (False, name, synced, position, uid),
+                f"""INSERT INTO lists
+                ({", ".join(get_type_hints(TaskListData))})
+                VALUES ({", ".join(["?" for _ in get_type_hints(TaskListData)])})""",
+                (False, name, synced, uid),
             )
-            return TaskListData(
-                uid=uid, name=name, deleted=False, position=position, synced=synced
-            )
+            return TaskListData(uid=uid, name=name, deleted=False, synced=synced)
 
     @classmethod
     def clean_deleted(cls):
@@ -134,67 +137,57 @@ class UserData:
 
     @classmethod
     def move_task_after(cls, list_uid: str, task_uid: str, after_uid: str) -> None:
-        tasks: list[TaskData] = UserData.get_tasks_as_dicts()
+        # First, move task before needed task
+        cls.move_task_before(list_uid, task_uid, after_uid)
 
-        # Find tasks to move
-        task_to_move: TaskData = None
-        task_to_move_before: TaskData = None
-        for task in tasks:
-            if task["list_uid"] == list_uid and task["uid"] == task_uid:
-                task_to_move = task
-            elif task["list_uid"] == list_uid and task["uid"] == after_uid:
-                task_to_move_before = task
-
-        # Move task up
-        task_to_move = tasks.pop(tasks.index(task_to_move))
-        tasks.insert(tasks.index(task_to_move_before) + 1, task_to_move)
-
-        # Run SQL
-        values: list[tuple[str, str]] = ((t["list_uid"], t["uid"]) for t in tasks)
+        # Then, switch their position
         with cls.connection:
             cur = cls.connection.cursor()
-            cur.execute("CREATE TABLE IF NOT EXISTS tmp AS SELECT * FROM tasks WHERE 0")
-            cur.executemany(
-                f"""INSERT INTO tmp SELECT * FROM tasks
-                    WHERE list_uid = ? AND uid = ?""",
-                values,
+            prev_pos, next_pos = cur.execute(
+                f"""SELECT position FROM tasks
+                    WHERE list_uid = ?
+                    AND uid IN (?, ?)""",
+                (list_uid, task_uid, after_uid),
+            ).fetchall()
+            prev_pos, next_pos = prev_pos[0], next_pos[0]
+            cur.execute(
+                f"""UPDATE tasks
+                SET position = CASE
+                    WHEN position = ? THEN ?
+                    WHEN position = ? THEN ?
+                END
+                WHERE position IN (?, ?)""",
+                (prev_pos, next_pos, next_pos, prev_pos, prev_pos, next_pos),
             )
-            cur.execute("DROP TABLE tasks")
-            cur.execute("ALTER TABLE tmp RENAME TO tasks")
 
     @classmethod
+    # @timeit
     def move_task_before(cls, list_uid: str, task_uid: str, before_uid: str) -> None:
-        pass
-        # tasks: list[TaskData] = UserData.get_tasks_as_dicts()
-        # with cls.connection:
-        #     cur = cls.connection.cursor()
-        #     for task in tasks:
+        tasks: list[TaskData] = [
+            t for t in cls.get_tasks_as_dicts() if t["list_uid"] == list_uid
+        ]
+        # Get indexes
+        for task in tasks:
+            if task["uid"] == task_uid:
+                task_idx = tasks.index(task)
+            elif task["uid"] == before_uid:
+                before_idx = tasks.index(task)
 
-        # # Find tasks to move
-        # task_to_move_down: TaskData = None
-        # task_to_move_up: TaskData = None
-        # for task in tasks:
-        #     if task["list_uid"] == list_uid and task["uid"] == before_uid:
-        #         task_to_move_down = task
-        #     elif task["list_uid"] == list_uid and task["uid"] == task_uid:
-        #         task_to_move_up = task
+        # Get slice of tasks
+        if task_idx < before_idx:
+            tasks = tasks[task_idx:before_idx]
+        else:
+            if before_idx == 0:
+                tasks = tasks[task_idx::-1]
+            else:
+                tasks = tasks[task_idx : before_idx - 1 : -1]
 
-        # # Move task up
-        # task_to_move_up = tasks.pop(tasks.index(task_to_move_up))
-        # tasks.insert(tasks.index(task_to_move_down), task_to_move_up)
-
-        # # Run SQL
-        # values: list[tuple[str, str]] = ((t["list_uid"], t["uid"]) for t in tasks)
-        # with cls.connection:
-        #     cur = cls.connection.cursor()
-        #     cur.execute("CREATE TABLE IF NOT EXISTS tmp AS SELECT * FROM tasks WHERE 0")
-        #     cur.executemany(
-        #         f"""INSERT INTO tmp SELECT * FROM tasks
-        #             WHERE list_uid = ? AND uid = ?""",
-        #         values,
-        #     )
-        #     cur.execute("DROP TABLE tasks")
-        #     cur.execute("ALTER TABLE tmp RENAME TO tasks")
+        length: int = len(tasks)
+        for i in range(length):
+            if i + 1 == length:
+                break
+            cls.__swap_rows(list_uid, tasks[i]["uid"], tasks[i + 1]["uid"])
+            tasks[i], tasks[i + 1] = tasks[i + 1], tasks[i]
 
     @classmethod
     def move_task_to_list(
@@ -256,13 +249,14 @@ class UserData:
     ) -> None:
         with cls.connection:
             cur = cls.connection.cursor()
-            for i, prop in enumerate(props):
-                cur.execute(
-                    f"""UPDATE tasks SET {prop} = ? 
-                    WHERE uid = '{uid}'
-                    AND list_uid = '{list_uid}'""",
-                    (values[i],),
-                )
+            query_props = ", ".join([f"{p} = ?" for p in props])
+            cur.execute(
+                f"""UPDATE tasks SET
+                {query_props}
+                WHERE uid = '{uid}'
+                AND list_uid = '{list_uid}'""",
+                tuple(values),
+            )
 
     @classmethod
     def run_sql(cls, *cmds: list, fetch: bool = False) -> list[tuple] | None:
@@ -333,8 +327,6 @@ class UserData:
     ) -> str:
         if not uid:
             uid: str = str(uuid4())
-        if not insert_at_the_top:
-            position = len(cls.get_tasks_as_dicts())
 
         Log.debug(f"Data: Add task {uid}")
 
@@ -342,8 +334,8 @@ class UserData:
             cur = cls.connection.cursor()
             cur.execute(
                 """INSERT INTO tasks 
-                (uid, list_uid, text, parent, completed, deleted, color, notes, percent_complete, priority, start_date, end_date, tags, synced, expanded, trash, toolbar_shown, position) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (uid, list_uid, text, parent, completed, deleted, color, notes, percent_complete, priority, start_date, end_date, tags, synced, expanded, trash, toolbar_shown) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                 (
                     uid,
                     list_uid,
@@ -362,12 +354,48 @@ class UserData:
                     expanded,
                     trash,
                     toolbar_shown,
-                    position,
                 ),
             )
             return uid
 
     # --- PRIVATE METHODS --- #
+
+    @classmethod
+    def __swap_rows(cls, list_uid: str, uid_1: str, uid_2: str) -> None:
+        try:
+            with cls.connection:
+                cur = cls.connection.cursor()
+                # Get rows
+                row1 = cur.execute(
+                    f"SELECT * FROM tasks WHERE list_uid = ? AND uid = ?",
+                    (list_uid, uid_1),
+                ).fetchone()
+                row1_rowid = cls.__get_rowid(list_uid, uid_1)
+                row2 = cur.execute(
+                    f"SELECT * FROM tasks WHERE list_uid = ? AND uid = ?",
+                    (list_uid, uid_2),
+                ).fetchone()
+                row2_rowid = cls.__get_rowid(list_uid, uid_2)
+                # Update the rows with each other's data
+                props_query = ", ".join(
+                    [f"{p} = ?" for p in list(get_type_hints(TaskData))]
+                )
+                cur.execute(
+                    f"UPDATE tasks SET {props_query} WHERE rowid = ?", row2 + row1_rowid
+                )
+                cur.execute(
+                    f"UPDATE tasks SET {props_query} WHERE rowid = ?", row1 + row2_rowid
+                )
+        except Exception as e:
+            Log.error(f"Data: Can't swap rows. {e}")
+
+    @classmethod
+    def __get_rowid(cls, list_uid: str, uid: str) -> str:
+        return cls.execute(
+            "SELECT rowid FROM tasks WHERE list_uid = ? AND uid = ?",
+            (list_uid, uid),
+            fetch=True,
+        )[0]
 
     @classmethod
     def execute(
