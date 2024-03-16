@@ -62,6 +62,19 @@ class Button(Gtk.Button):
                 )
             )
             self.add_controller(ctrl)
+            
+            
+class LabelWithIcon(Gtk.Box):
+    """
+    Gtk.Box with Gtk.Label and Gtk.Image.
+    """
+
+    def __init__(self, label: str, icon_name: str, **kwargs):
+        super().__init__(**kwargs)
+        self.set_orientation(Gtk.Orientation.HORIZONTAL)
+        self.append(Gtk.Image.new_from_icon_name(icon_name))
+
+        self.append(Gtk.Label(label=label, margin_start=6))
 
 
 class DateTime(Gtk.Box):

@@ -2,13 +2,13 @@
 # SPDX-License-Identifier: MIT
 
 from __future__ import annotations
-from typing import Any, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING, Callable
 
 if TYPE_CHECKING:
     from errands.widgets.task_list import TaskList
     from errands.widgets.window import Window
 
-from errands.widgets.components import Box, Button
+from errands.widgets.components import Box, Button, LabelWithIcon
 from gi.repository import Gtk, Adw, Gdk, GObject  # type:ignore
 from errands.lib.sync.sync import Sync
 from errands.lib.logging import Log
@@ -433,6 +433,51 @@ class TaskDetailsButton(Gtk.Button):
         # Update details and show sidebar
         self.task.details.update_info(self.task)
         self.task.task_list.split_view.set_show_sidebar(True)
+        
+def fmt_date(date: str) -> str:
+    return f"{date[6:8]}/{date[4:6]}/{date[0:4]} {date[9:11]}:{date[11:13]}"        
+        
+class TaskOverview(Gtk.Box):
+    def __init__(self, task: Task):
+        super().__init__()
+        self.task: Task = task
+        self._build_ui()
+        
+    def _build_ui(self):
+        self.set_orientation(Gtk.Orientation.HORIZONTAL)
+        self.set_hexpand(True)
+        
+        start_date = fmt_date(self.task.get_prop('start_date')) or ""
+        end_date = fmt_date(self.task.get_prop('end_date')) or ""
+    
+        self.date_range = LabelWithIcon(
+            icon_name="errands-calendar-symbolic",
+            label=f"{start_date} - {end_date}" if start_date or end_date else "",
+            margin_end=12,
+            margin_start=12,
+            margin_bottom=6,
+        )
+        
+        self.priority = LabelWithIcon(
+            icon_name="errands-priority-symbolic",
+            label=str(self.task.get_prop("priority")),
+            margin_end=12,
+            margin_start=12,
+            margin_bottom=6,
+        )
+       
+        self.tags = LabelWithIcon(
+            icon_name="errands-lists-symbolic",
+            label=self.task.get_prop("tags").replace(",", ", "),
+            margin_end=12,
+            margin_start=12,
+            margin_bottom=6,
+        )
+         
+        self.append(self.date_range)
+        self.append(self.priority)
+        self.append(self.tags)
+        
 
 
 class TaskInfoBar(Gtk.Box):
@@ -496,8 +541,10 @@ class TaskInfoBar(Gtk.Box):
         #     margin_start=12,
         #     margin_bottom=3,
         # )
-        # GSettings.bind("task-show-toolbar", self.status_box, "visible")
-        # self.append(self.status_box)
+
+        self.status_box = TaskOverview(self.task)
+        GSettings.bind("task-show-toolbar", self.status_box, "visible")
+        self.append(self.status_box)
 
     def update_ui(self):
         # end_date = self.task.get_prop("end_date")
