@@ -1,16 +1,16 @@
 # Turkish translation for io.github.mrvladus.errands.
-# Copyright (C) 2023 io.github.mrvladus.errands's copyright holder
+# Copyright (C) 2023-2024 io.github.mrvladus.errands's copyright holder
 # This file is distributed under the same license as the io.github.mrvladus.errands package.
 #
-# Sabri Ünal <libreajans@gmail.com>, 2023.
+# Sabri Ünal <yakushabb@gmail.com>, 2023-2024.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-06 17:58+0300\n"
-"PO-Revision-Date: 2023-12-29 18:59+0300\n"
-"Last-Translator: Sabri Ünal <libreajans@gmail.com>\n"
+"PO-Revision-Date: 2024-03-17 01:38+0300\n"
+"Last-Translator: Sabri Ünal <yakushabb@gmail.com>\n"
 "Language-Team: Turkish <takim@gnome.org.tr>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -72,39 +72,36 @@ msgid "Tasks"
 msgstr "Görevler"
 
 #: errands/widgets/preferences.py:83
-#, fuzzy
 msgid "Click Action"
-msgstr "\"+\" düğmesine tıklayın"
+msgstr "Tıklama Eylemi"
 
 #: errands/widgets/preferences.py:84
 msgid "Open Details Panel"
-msgstr ""
+msgstr "Ayrıntılar Panelini Aç"
 
 #: errands/widgets/preferences.py:84
-#, fuzzy
 msgid "Show Sub-Tasks"
-msgstr "Yeni Alt Görev Ekle"
+msgstr "Alt Görevleri Göster"
 
 #: errands/widgets/preferences.py:99
-#, fuzzy
 msgid "Complete Button Size"
-msgstr "Tamamlanma Yüzdesi"
+msgstr "Bitti Düğmesi Boyutu"
 
 #: errands/widgets/preferences.py:100
 msgid "Small"
-msgstr ""
+msgstr "Küçük"
 
 #: errands/widgets/preferences.py:100
 msgid "Big"
-msgstr ""
+msgstr "Büyük"
 
 #: errands/widgets/preferences.py:113
 msgid "Progress Bar"
-msgstr ""
+msgstr "İlerleme Çubuğu"
 
 #: errands/widgets/preferences.py:119
 msgid "Tool Bar"
-msgstr ""
+msgstr "Araç Çubuğu"
 
 #: errands/widgets/preferences.py:126 errands/widgets/preferences.py:194
 #: data/resources/gtk/help-overlay.ui:38
@@ -141,26 +138,24 @@ msgid "Test Connection"
 msgstr "Bağlantıyı Sına"
 
 #: errands/widgets/preferences.py:171
-#, fuzzy
 msgid "Details Panel"
-msgstr "Ayrıntı Yok"
+msgstr "Ayrıntılar Paneli"
 
 #: errands/widgets/preferences.py:174
 msgid "Position"
-msgstr ""
+msgstr "Konum"
 
 #: errands/widgets/preferences.py:175
 msgid "Left"
-msgstr ""
+msgstr "Sol"
 
 #: errands/widgets/preferences.py:175
-#, fuzzy
 msgid "Right"
-msgstr "Açık"
+msgstr "Sağ"
 
 #: errands/widgets/preferences.py:184
 msgid "Appearance"
-msgstr ""
+msgstr "Görünüm"
 
 #: errands/widgets/preferences.py:230
 msgid "Connected"
@@ -181,9 +176,8 @@ msgid "Import List"
 msgstr "Listeyi İçe Aktar"
 
 #: errands/widgets/sidebar.py:80
-#, fuzzy
 msgid "Add List (Ctrl+A)"
-msgstr "Liste Ekle"
+msgstr "Liste Ekle (Ctrl+A)"
 
 #: errands/widgets/sidebar.py:82
 msgid "More Options"
@@ -212,7 +206,7 @@ msgstr "Ana Menü"
 
 #: errands/widgets/sidebar.py:116
 msgid "Syncing..."
-msgstr ""
+msgstr "Eşzamanlanıyor..."
 
 #: errands/widgets/sidebar.py:141
 msgid "New List Name"
@@ -393,9 +387,8 @@ msgid "Expand / Fold"
 msgstr "Genişlet / Katla"
 
 #: errands/widgets/task.py:419 data/resources/gtk/help-overlay.ui:68
-#, fuzzy
 msgid "Details"
-msgstr "Ayrıntı Yok"
+msgstr "Ayrıntılar"
 
 #: errands/widgets/task.py:530
 msgid "Add new Sub-Task"
@@ -426,18 +419,16 @@ msgid "No Task Lists"
 msgstr "Görev Listesi Yok"
 
 #: errands/widgets/window.py:69
-#, fuzzy
 msgid "Create List"
-msgstr "Listeyi Yeniden Adlandır"
+msgstr "Liste Oluştur"
 
 #: errands/widgets/window.py:90 data/resources/gtk/help-overlay.ui:53
-#, fuzzy
 msgid "Lists"
-msgstr "Liste Ekle"
+msgstr "Listeler"
 
 #: errands/widgets/window.py:134
 msgid "translator-credits"
-msgstr "Sabri Ünal <libreajans@gmail.com>"
+msgstr "Sabri Ünal <yakushabb@gmail.com>"
 
 #: errands/widgets/window.py:143
 msgid "Sync is disabled"
@@ -449,8 +440,7 @@ msgstr "İçe Aktarıldı"
 
 #: errands/lib/sync/providers/caldav.py:42
 msgid "Not all sync credentials provided. Please check settings."
-msgstr ""
-"Tüm eşzamanlama kimlik bilgileri sağlanmadı. Lütfen ayarları denetleyin."
+msgstr "Tüm eşzamanlama kimlik bilgileri sağlanmadı. Lütfen ayarları denetleyin."
 
 #: errands/lib/sync/providers/caldav.py:81
 msgid "Can't connect to CalDAV server at:"
@@ -469,9 +459,8 @@ msgid "Quit"
 msgstr "Çık"
 
 #: data/resources/gtk/help-overlay.ui:72
-#, fuzzy
 msgid "Toggle Details"
-msgstr "Ayrıntı Yok"
+msgstr "Ayrıntıları Aç/Kapat"
 
 #: data/io.github.mrvladus.List.desktop.in.in:4
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:28
@@ -517,77 +506,3 @@ msgstr "Sürükle ve Bırak desteği"
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:39
 msgid "Import .ics files"
 msgstr ".ics dosyalarını içe aktarma"
-
-#~ msgid "Create"
-#~ msgstr "Oluştur"
-
-#~ msgid "Load"
-#~ msgstr "Yükle"
-
-#~ msgid "Click for Details"
-#~ msgstr "Ayrıntılar İçin Tıklayın"
-
-#~ msgid "Toggle sidebar"
-#~ msgstr "Kenar çubuğu aç/kapat"
-
-#~ msgid "End"
-#~ msgstr "Bitiş"
-
-#, fuzzy
-#~| msgid "Errands"
-#~ msgid "errands"
-#~ msgstr "Errands"
-
-#~ msgid "Export Cancelled"
-#~ msgstr "Dışa Aktarma İptal Edildi"
-
-#~ msgid "Error"
-#~ msgstr "Hata"
-
-#~ msgid "Import Cancelled"
-#~ msgstr "İçe Aktarma İptal Edildi"
-
-#~ msgid "Invalid File"
-#~ msgstr "Geçersiz Dosya"
-
-#~ msgid "Deleted Tasks"
-#~ msgstr "Silinmiş Görevler"
-
-#~ msgid "Move to Trash"
-#~ msgstr "Çöpe Taşı"
-
-#~ msgid "Show Deleted Tasks"
-#~ msgstr "Silinmiş Görevleri Göster"
-
-#~ msgid "Delete Completed Tasks (Ctrl+Delete)"
-#~ msgstr "Tamamlanmış Görevleri Sil (Ctrl+Delete)"
-
-#~ msgid "Sync/Fetch Tasks (Ctrl+S)"
-#~ msgstr "Görevleri Eşzamanla/Getir (Ctrl+S)"
-
-#~ msgid "Export Tasks..."
-#~ msgstr "Görevleri Dışa Aktar..."
-
-#~ msgid "Import Tasks..."
-#~ msgstr "Görevleri İçe Aktar..."
-
-#~ msgid "Import and Export"
-#~ msgstr "Aktarma"
-
-#~ msgid "Exit edit mode"
-#~ msgstr "Düzenleme kipinden çık"
-
-#~ msgid "Expand Sub-Tasks on Startup"
-#~ msgstr "Başlangıçta Alt Görevleri Genişlet"
-
-#~ msgid "Calendar Name (\"Errands\" by Default)"
-#~ msgstr "Takvim Adı (\"Errands\" Öntanımlı)"
-
-#~ msgid "Token"
-#~ msgstr "Jeton"
-
-#~ msgid "Edit"
-#~ msgstr "Düzenle"
-
-#~ msgid "Cancel (Escape)"
-#~ msgstr "İptal (Esc)"
