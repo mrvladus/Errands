@@ -137,28 +137,8 @@ class UserData:
 
     @classmethod
     def move_task_after(cls, list_uid: str, task_uid: str, after_uid: str) -> None:
-        # First, move task before needed task
         cls.move_task_before(list_uid, task_uid, after_uid)
-
-        # Then, switch their position
-        with cls.connection:
-            cur = cls.connection.cursor()
-            prev_pos, next_pos = cur.execute(
-                f"""SELECT position FROM tasks
-                    WHERE list_uid = ?
-                    AND uid IN (?, ?)""",
-                (list_uid, task_uid, after_uid),
-            ).fetchall()
-            prev_pos, next_pos = prev_pos[0], next_pos[0]
-            cur.execute(
-                f"""UPDATE tasks
-                SET position = CASE
-                    WHEN position = ? THEN ?
-                    WHEN position = ? THEN ?
-                END
-                WHERE position IN (?, ?)""",
-                (prev_pos, next_pos, next_pos, prev_pos, prev_pos, next_pos),
-            )
+        cls.__swap_rows(list_uid, task_uid, after_uid)
 
     @classmethod
     # @timeit
