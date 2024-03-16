@@ -97,7 +97,7 @@ class TaskList(Adw.Bin):
     # ------ PUBLIC METHODS ------ #
 
     # @timeit
-    def update_ui(self) -> None:
+    def update_ui(self, update_tasks_ui: bool = True) -> None:
         Log.debug(f"Task list {self.list_uid}: Update UI")
 
         # Rename list
@@ -133,8 +133,9 @@ class TaskList(Adw.Bin):
                 task.purged = True
 
         # Update tasks
-        for task in self.tasks:
-            task.update_ui()
+        if update_tasks_ui:
+            for task in self.tasks:
+                task.update_ui()
 
         # Sort tasks
         self.task_list_model.sort(self.__completed_sort_func)

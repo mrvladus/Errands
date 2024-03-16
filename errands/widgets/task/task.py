@@ -460,7 +460,7 @@ class Task(Gtk.ListBoxRow):
                 if task.get_prop("completed"):
                     task.update_props(["completed", "synced"], [False, False])
 
-        self.task_list.update_ui()
+        self.task_list.update_ui(False)
         Sync.sync(False)
 
     @Gtk.Template.Callback()
