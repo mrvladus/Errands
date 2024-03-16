@@ -445,33 +445,33 @@ class TaskOverview(Gtk.Box):
         
     def _build_ui(self):
         self.set_orientation(Gtk.Orientation.HORIZONTAL)
-        self.set_hexpand(True)
         
         start_date = fmt_date(self.task.get_prop('start_date')) or ""
         end_date = fmt_date(self.task.get_prop('end_date')) or ""
+        
+        info_styling: dict[str, Any] = {
+            "margin_end": 6,
+            "margin_start": 6,
+            "margin_bottom": 6,
+            "css_classes": ["task-toolbar-btn"]
+        }
     
         self.date_range = LabelWithIcon(
             icon_name="errands-calendar-symbolic",
             label=f"{start_date} - {end_date}" if start_date or end_date else "",
-            margin_end=12,
-            margin_start=12,
-            margin_bottom=6,
+            **info_styling
         )
         
         self.priority = LabelWithIcon(
             icon_name="errands-priority-symbolic",
             label=str(self.task.get_prop("priority")),
-            margin_end=12,
-            margin_start=12,
-            margin_bottom=6,
+            **info_styling
         )
        
         self.tags = LabelWithIcon(
             icon_name="errands-lists-symbolic",
             label=self.task.get_prop("tags").replace(",", ", "),
-            margin_end=12,
-            margin_start=12,
-            margin_bottom=6,
+            **info_styling  
         )
          
         self.append(self.date_range)
@@ -547,9 +547,7 @@ class TaskInfoBar(Gtk.Box):
         self.append(self.status_box)
 
     def update_ui(self):
-        # end_date = self.task.get_prop("end_date")
-        # start_date = self.task.get_prop("start_date")
-        # notes = self.task.get_prop("notes")
+        self.status_box = TaskOverview(self.task)
 
         # Update percrent complete
         if GSettings.get("task-show-progressbar"):
