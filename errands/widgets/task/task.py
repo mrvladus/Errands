@@ -41,7 +41,7 @@ class Task(Gtk.ListBoxRow):
     progress_bar_rev: Gtk.Revealer = Gtk.Template.Child()
     progress_bar: Gtk.ProgressBar = Gtk.Template.Child()
     sub_tasks_revealer: Gtk.Revealer = Gtk.Template.Child()
-    sub_tasks: Gtk.ListBox = Gtk.Template.Child()
+    sub_tasks: Gtk.Box = Gtk.Template.Child()
     title_row: Adw.ActionRow = Gtk.Template.Child()
     complete_btn: Gtk.CheckButton = Gtk.Template.Child()
     expand_indicator: Gtk.Image = Gtk.Template.Child()
@@ -172,27 +172,24 @@ class Task(Gtk.ListBoxRow):
         self.notes_buffer.set_language(lm.get_language("markdown"))
 
         # Sub-tasks
-        self.task_list_model = Gio.ListStore(item_type=Task)
         tasks: list[TaskData] = [
             t
             for t in UserData.get_tasks_as_dicts(self.list_uid, self.uid)
             if not t["deleted"]
         ]
         for task in tasks:
-            self.task_list_model.append(Task(task["uid"], self.task_list, self))
+            self.task_list.append(Task(task["uid"], self.task_list, self))
 
-        self.sub_tasks.bind_model(self.task_list_model, lambda task: task)
-
-    def __completed_sort_func(self, task1: Task, task2: Task) -> int:
-        # Move completed tasks to the bottom
-        if task1.complete_btn.get_active() and not task2.complete_btn.get_active():
-            UserData.move_task_after(self.list_uid, task1.uid, task2.uid)
-            return 1
-        elif not task1.complete_btn.get_active() and task2.complete_btn.get_active():
-            UserData.move_task_before(self.list_uid, task1.uid, task2.uid)
-            return -1
-        else:
-            return 0
+    # def __completed_sort_func(self, task1: Task, task2: Task) -> int:
+    #     # Move completed tasks to the bottom
+    #     if task1.complete_btn.get_active() and not task2.complete_btn.get_active():
+    #         UserData.move_task_after(self.list_uid, task1.uid, task2.uid)
+    #         return 1
+    #     elif not task1.complete_btn.get_active() and task2.complete_btn.get_active():
+    #         UserData.move_task_before(self.list_uid, task1.uid, task2.uid)
+    #         return -1
+    #     else:
+    #         return 0
 
     # ------ PROPERTIES ------ #
 
@@ -282,10 +279,7 @@ class Task(Gtk.ListBoxRow):
             return
 
         def __finish_remove():
-            GLib.idle_add(
-                self.parent.task_list_model.remove,
-                self.task_list_model.find(self)[1],
-            )
+            GLib.idle_add(self.parent.task_list.remove, self)
             return False
 
         self.purging = True
@@ -390,21 +384,21 @@ class Task(Gtk.ListBoxRow):
             if task["uid"] not in widgets_uids:
                 new_task = Task(task["uid"], self.task_list, self)
                 if on_top:
-                    self.task_list_model.insert(0, new_task)
+                    self.sub_tasks.prepend(new_task)
                 else:
-                    self.task_list_model.append(new_task)
+                    self.sub_tasks.append(new_task)
 
         # Remove sub-tasks
         for task in self.tasks:
             if task.uid not in data_uids:
-                self.task_list_model.remove(self.task_list_model.find(task)[1])
+                self.sub_tasks.remove(task)
 
         # Update sub-tasks
         for task in self.tasks:
             task.update_ui()
 
         # Sort sub-tasks
-        self.task_list_model.sort(self.__completed_sort_func)
+        # self.task_list_model.sort(self.__completed_sort_func)
 
     # ------ TEMPLATE HANDLERS ------ #
 

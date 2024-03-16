@@ -108,13 +108,13 @@
 
                     <!-- Task List -->
                     <child>
-                      <object id="task_list" class="GtkListBox">
-                        <property name="selection-mode">0</property>
+                      <object id="task_list" class="GtkBox">
+                        <property name="orientation">vertical</property>
                         <!-- <property name="visible" bind-source="status_page" bind-property="visible" bind-flags="sync-create | invert-boolean" /> -->
-                        <style>
+                        <!-- <style>
                           <class name="transparent" />
                           <class name="task-list" />
-                        </style>
+                        </style> -->
                       </object>
                     </child>
 

@@ -29,7 +29,7 @@ class TaskList(Adw.Bin):
     toggle_completed_btn: Gtk.ToggleButton = Gtk.Template.Child()
     scroll_up_btn: Gtk.Button = Gtk.Template.Child()
     scrl: Gtk.ScrolledWindow = Gtk.Template.Child()
-    task_list: Gtk.ListBox = Gtk.Template.Child()
+    task_list: Gtk.Box = Gtk.Template.Child()
 
     # State
     scrolling: bool = False
@@ -39,38 +39,45 @@ class TaskList(Adw.Bin):
         self.window: Window = Adw.Application.get_default().get_active_window()
         self.list_uid: str = list_uid
         self.sidebar_row: TaskListRow = sidebar_row
-        self.__create_task_list_model()
+        # self.__create_task_list_model()
+        self.__load_tasks()
 
     def __repr__(self) -> str:
         return f"<class 'TaskList' {self.list_uid}>"
 
     # ------ PRIVATE METHODS ------ #
 
-    def __create_task_list_model(self) -> None:
-        """Create ListModel and bind to 'self.task_list' ListBox"""
-
-        self.task_list_model = Gio.ListStore(item_type=Task)
+    def __load_tasks(self) -> None:
         tasks: list[TaskData] = [
             t
             for t in UserData.get_tasks_as_dicts(self.list_uid)
             if not t["deleted"] and t["parent"] == ""
         ]
         for task in tasks:
-            self.task_list_model.append(Task(task["uid"], self, self))
+            self.task_list.append(Task(task["uid"], self, self))
 
-        self.task_list.bind_model(self.task_list_model, lambda task: task)
+    #     self.task_list_model = Gio.ListStore(item_type=Task)
+    #     tasks: list[TaskData] = [
+    #         t
+    #         for t in UserData.get_tasks_as_dicts(self.list_uid)
+    #         if not t["deleted"] and t["parent"] == ""
+    #     ]
+    #     for task in tasks:
+    #         self.task_list_model.append(Task(task["uid"], self, self))
 
-    def __completed_sort_func(self, task1: Task, task2: Task) -> int:
-        """Move completed tasks to the bottom"""
+    #     self.task_list.bind_model(self.task_list_model, lambda task: task)
 
-        if task1.get_prop("completed") and not task2.get_prop("completed"):
-            UserData.move_task_after(self.list_uid, task1.uid, task2.uid)
-            return 1
-        elif not task1.get_prop("completed") and task2.get_prop("completed"):
-            UserData.move_task_before(self.list_uid, task1.uid, task2.uid)
-            return -1
-        else:
-            return 0
+    # def __completed_sort_func(self, task1: Task, task2: Task) -> int:
+    #     """Move completed tasks to the bottom"""
+
+    #     if task1.get_prop("completed") and not task2.get_prop("completed"):
+    #         UserData.move_task_after(self.list_uid, task1.uid, task2.uid)
+    #         return 1
+    #     elif not task1.get_prop("completed") and task2.get_prop("completed"):
+    #         UserData.move_task_before(self.list_uid, task1.uid, task2.uid)
+    #         return -1
+    #     else:
+    #         return 0
 
     # ------ PROPERTIES ------ #
 
@@ -96,7 +103,18 @@ class TaskList(Adw.Bin):
 
     # ------ PUBLIC METHODS ------ #
 
-    # @timeit
+    def add_task(self, uid: str) -> Task:
+        on_top: bool = GSettings.get("task-list-new-task-position-top")
+        new_task = Task(uid, self, self)
+        if on_top:
+            self.task_list.prepend(new_task)
+        else:
+            self.task_list.append(new_task)
+        new_task.update_ui()
+
+        return new_task
+
+    @timeit
     def update_ui(self, update_tasks_ui: bool = True) -> None:
         Log.debug(f"Task list {self.list_uid}: Update UI")
 
@@ -118,14 +136,9 @@ class TaskList(Adw.Bin):
         widgets_uids: list[str] = [t.uid for t in self.tasks]
 
         # Add tasks
-        on_top: bool = GSettings.get("task-list-new-task-position-top")
         for uid in data_uids:
             if uid not in widgets_uids:
-                new_task = Task(uid, self, self)
-                if on_top:
-                    self.task_list_model.insert(0, new_task)
-                else:
-                    self.task_list_model.append(new_task)
+                self.add_task(uid)
 
         # Remove tasks
         for task in self.tasks:
@@ -138,7 +151,7 @@ class TaskList(Adw.Bin):
                 task.update_ui()
 
         # Sort tasks
-        self.task_list_model.sort(self.__completed_sort_func)
+        # self.task_list_model.sort(self.__completed_sort_func)
 
         # Update status
         tasks: list[TaskData] = [
@@ -216,13 +229,15 @@ class TaskList(Adw.Bin):
         if text.strip(" \n\t") == "":
             return
         on_top: bool = GSettings.get("task-list-new-task-position-top")
-        UserData.add_task(
-            list_uid=self.list_uid,
-            text=text,
-            insert_at_the_top=on_top,
+        self.add_task(
+            UserData.add_task(
+                list_uid=self.list_uid,
+                text=text,
+                insert_at_the_top=on_top,
+            )
         )
         entry.set_text("")
         if not on_top:
             scroll(self.scrl, True)
-        self.update_ui()
+        self.update_ui(False)
         Sync.sync(False)

@@ -592,13 +592,13 @@
 
                         <!-- Sub-Tasks list -->
                         <child>
-                          <object id="sub_tasks" class="GtkListBox">
-                            <property name="selection-mode">1</property>
+                          <object id="sub_tasks" class="GtkBox">
+                            <property name="orientation">vertical</property>
                             <property name="margin-start">7</property>
                             <property name="margin-end">7</property>
-                            <style>
+                            <!-- <style>
                               <class name="transparent" />
-                            </style>
+                            </style> -->
                           </object>
                         </child>
 
