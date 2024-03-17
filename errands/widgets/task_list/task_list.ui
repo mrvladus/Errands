@@ -92,8 +92,8 @@
             <!-- Scrolled window-->
             <child>
               <object id="scrl" class="GtkScrolledWindow">
-                <property name="propagate-natural-height">true</property>
                 <property name="propagate-natural-width">true</property>
+                <property name="vexpand">true</property>
                 <property name="vadjustment">
                   <object class="GtkAdjustment">
                     <signal name="value-changed" handler="_on_scroll" />
@@ -106,17 +106,40 @@
                     <property name="tightening-threshold">300</property>
                     <property name="margin-bottom">32</property>
 
-                    <!-- Task List -->
                     <child>
-                      <object id="task_list" class="GtkBox">
+                      <object class="GtkBox">
                         <property name="orientation">vertical</property>
-                        <!-- <property name="visible" bind-source="status_page" bind-property="visible" bind-flags="sync-create | invert-boolean" /> -->
-                        <!-- <style>
-                          <class name="transparent" />
-                          <class name="task-list" />
-                        </style> -->
+
+                        <!-- Task List Uncompleted -->
+                        <child>
+                          <object id="uncompleted_tasks_list" class="GtkBox">
+                            <property name="orientation">vertical</property>
+                            <!-- <style>
+                              <class name="transparent" />
+                              <class name="task-list" />
+                            </style> -->
+                          </object>
+                        </child>
+
+                        <child>
+                          <object class="GtkSeparator">
+                          </object>
+                        </child>
+
+                        <!-- Task List Completed-->
+                        <child>
+                          <object id="completed_tasks_list" class="GtkBox">
+                            <property name="orientation">vertical</property>
+                            <!-- <style>
+                              <class name="transparent" />
+                              <class name="task-list" />
+                            </style> -->
+                          </object>
+                        </child>
+
                       </object>
                     </child>
+
 
                   </object>
                 </child>

@@ -297,7 +297,7 @@ class Task(Gtk.ListBoxRow):
             return
 
         def __finish_remove():
-            GLib.idle_add(self.parent.task_list.remove, self)
+            GLib.idle_add(self.get_parent().remove, self)
             return False
 
         self.purging = True
@@ -466,13 +466,19 @@ class Task(Gtk.ListBoxRow):
             for task in self.all_tasks:
                 if not task.get_prop("completed"):
                     task.update_props(["completed", "synced"], [True, False])
+                    task.just_added = True
+                    task.complete_btn.set_active(True)
+                    task.just_added = False
+
         # Uncomplete parent if sub-task is uncompleted
         else:
             for task in self.parents_tree:
                 if task.get_prop("completed"):
                     task.update_props(["completed", "synced"], [False, False])
-        if self.parents_tree:
-            self.parents_tree[-1].update_ui()
+                    task.just_added = True
+                    task.complete_btn.set_active(False)
+                    task.just_added = False
+
         self.task_list.update_ui(False)
         Sync.sync(False)
 

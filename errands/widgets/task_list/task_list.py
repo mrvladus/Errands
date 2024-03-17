@@ -29,7 +29,8 @@ class TaskList(Adw.Bin):
     toggle_completed_btn: Gtk.ToggleButton = Gtk.Template.Child()
     scroll_up_btn: Gtk.Button = Gtk.Template.Child()
     scrl: Gtk.ScrolledWindow = Gtk.Template.Child()
-    task_list: Gtk.Box = Gtk.Template.Child()
+    uncompleted_tasks_list: Gtk.Box = Gtk.Template.Child()
+    completed_tasks_list: Gtk.Box = Gtk.Template.Child()
 
     # State
     scrolling: bool = False
@@ -53,25 +54,15 @@ class TaskList(Adw.Bin):
             if not t["deleted"] and t["parent"] == ""
         ]
         for task in tasks:
-            self.task_list.append(Task(task["uid"], self, self))
+            new_task = Task(task["uid"], self, self)
+            if task["completed"]:
+                self.completed_tasks_list.append(new_task)
+            else:
+                self.uncompleted_tasks_list.append(new_task)
+            new_task.update_ui()
 
     def __sort_tasks(self) -> None:
-        def __sort_completed():
-            length = len(self.tasks)
-            last_idx = length - 1
-            i = last_idx
-            while i > -1:
-                task = self.tasks[i]
-                if task.get_prop("completed"):
-                    if i != last_idx:
-                        UserData.move_task_before(
-                            self.list_uid, task.uid, self.tasks[last_idx].uid
-                        )
-                        self.task_list.reorder_child_after(task, self.tasks[last_idx])
-                    last_idx -= 1
-                i -= 1
-
-        __sort_completed()
+        pass
 
     # ------ PROPERTIES ------ #
 
@@ -79,7 +70,7 @@ class TaskList(Adw.Bin):
     def tasks(self) -> list[Task]:
         """Top-level Tasks"""
 
-        return [t for t in get_children(self.task_list) if isinstance(t, Task)]
+        return self.uncompleted_tasks + self.completed_tasks
 
     @property
     def all_tasks(self) -> list[Task]:
@@ -95,34 +86,34 @@ class TaskList(Adw.Bin):
         __add_task(self.tasks)
         return all_tasks
 
+    @property
+    def uncompleted_tasks(self) -> list[Task]:
+        return get_children(self.uncompleted_tasks_list)
+
+    @property
+    def completed_tasks(self) -> list[Task]:
+        return get_children(self.completed_tasks_list)
+
     # ------ PUBLIC METHODS ------ #
 
     def add_task(self, uid: str) -> Task:
         on_top: bool = GSettings.get("task-list-new-task-position-top")
         new_task = Task(uid, self, self)
+        task_list = (
+            self.completed_tasks_list
+            if new_task.get_prop("completed")
+            else self.completed_tasks_list
+        )
         if on_top:
-            self.task_list.prepend(new_task)
+            task_list.prepend(new_task)
         else:
-            last_uncompleted = [t for t in self.tasks if not t.get_prop("completed")][
-                -1
-            ]
-            self.task_list.append(new_task)
-            self.task_list.reorder_child_after(new_task, last_uncompleted)
+            task_list.append(new_task)
         new_task.update_ui()
 
         return new_task
 
     def update_ui(self, update_tasks_ui: bool = True, sort: bool = True) -> None:
         Log.debug(f"Task list {self.list_uid}: Update UI")
-
-        # Rename list
-        self.title.set_title(
-            UserData.run_sql(
-                f"""SELECT name FROM lists 
-                WHERE uid = '{self.list_uid}'""",
-                fetch=True,
-            )[0][0]
-        )
 
         # Update tasks
         data_uids: list[str] = [
@@ -137,10 +128,32 @@ class TaskList(Adw.Bin):
             if uid not in widgets_uids:
                 self.add_task(uid)
 
-        # Remove tasks
         for task in self.tasks:
+            # Remove task
             if task.uid not in data_uids:
                 task.purge()
+            # Move task to completed tasks
+            elif task.get_prop("completed") and task in self.uncompleted_tasks:
+                if (
+                    len(self.uncompleted_tasks) > 1
+                    and task.uid != self.uncompleted_tasks[-1].uid
+                ):
+                    UserData.move_task_after(
+                        self.list_uid, task.uid, self.uncompleted_tasks[-1].uid
+                    )
+                self.uncompleted_tasks_list.remove(task)
+                self.completed_tasks_list.prepend(task)
+            # Move task to uncompleted tasks
+            elif not task.get_prop("completed") and task in self.completed_tasks:
+                if (
+                    len(self.uncompleted_tasks) > 0
+                    and task.uid != self.uncompleted_tasks[-1].uid
+                ):
+                    UserData.move_task_after(
+                        self.list_uid, task.uid, self.uncompleted_tasks[-1].uid
+                    )
+                self.completed_tasks_list.remove(task)
+                self.uncompleted_tasks_list.append(task)
 
         # Update tasks
         if update_tasks_ui:
@@ -148,8 +161,7 @@ class TaskList(Adw.Bin):
                 task.update_ui()
 
         # Sort tasks
-        if sort:
-            self.__sort_tasks()
+        self.__sort_tasks()
 
         # Update status
         tasks: list[TaskData] = [
@@ -168,6 +180,15 @@ class TaskList(Adw.Bin):
 
         # Update delete completed button
         self.delete_completed_btn.set_sensitive(n_completed > 0)
+
+        # Rename list
+        self.title.set_title(
+            UserData.run_sql(
+                f"""SELECT name FROM lists
+                WHERE uid = '{self.list_uid}'""",
+                fetch=True,
+            )[0][0]
+        )
 
     # ------ TEMPLATE HANDLERS ------ #
 
