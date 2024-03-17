@@ -40,6 +40,7 @@ class Log:
         self._log(self, f"[INFO] {msg}")
 
     def _log(self, msg: str) -> None:
+        return
         try:
             with open(self.log_file, "a") as f:
                 f.write(msg + "\n")

@@ -39,7 +39,6 @@ class TaskList(Adw.Bin):
         self.window: Window = Adw.Application.get_default().get_active_window()
         self.list_uid: str = list_uid
         self.sidebar_row: TaskListRow = sidebar_row
-        # self.__create_task_list_model()
         self.__load_tasks()
 
     def __repr__(self) -> str:
@@ -56,28 +55,23 @@ class TaskList(Adw.Bin):
         for task in tasks:
             self.task_list.append(Task(task["uid"], self, self))
 
-    #     self.task_list_model = Gio.ListStore(item_type=Task)
-    #     tasks: list[TaskData] = [
-    #         t
-    #         for t in UserData.get_tasks_as_dicts(self.list_uid)
-    #         if not t["deleted"] and t["parent"] == ""
-    #     ]
-    #     for task in tasks:
-    #         self.task_list_model.append(Task(task["uid"], self, self))
+    def __sort_tasks(self) -> None:
+        def __sort_completed():
+            length = len(self.tasks)
+            last_idx = length - 1
+            i = last_idx
+            while i > -1:
+                task = self.tasks[i]
+                if task.get_prop("completed"):
+                    if i != last_idx:
+                        UserData.move_task_before(
+                            self.list_uid, task.uid, self.tasks[last_idx].uid
+                        )
+                        self.task_list.reorder_child_after(task, self.tasks[last_idx])
+                    last_idx -= 1
+                i -= 1
 
-    #     self.task_list.bind_model(self.task_list_model, lambda task: task)
-
-    # def __completed_sort_func(self, task1: Task, task2: Task) -> int:
-    #     """Move completed tasks to the bottom"""
-
-    #     if task1.get_prop("completed") and not task2.get_prop("completed"):
-    #         UserData.move_task_after(self.list_uid, task1.uid, task2.uid)
-    #         return 1
-    #     elif not task1.get_prop("completed") and task2.get_prop("completed"):
-    #         UserData.move_task_before(self.list_uid, task1.uid, task2.uid)
-    #         return -1
-    #     else:
-    #         return 0
+        __sort_completed()
 
     # ------ PROPERTIES ------ #
 
@@ -109,13 +103,16 @@ class TaskList(Adw.Bin):
         if on_top:
             self.task_list.prepend(new_task)
         else:
+            last_uncompleted = [t for t in self.tasks if not t.get_prop("completed")][
+                -1
+            ]
             self.task_list.append(new_task)
+            self.task_list.reorder_child_after(new_task, last_uncompleted)
         new_task.update_ui()
 
         return new_task
 
-    @timeit
-    def update_ui(self, update_tasks_ui: bool = True) -> None:
+    def update_ui(self, update_tasks_ui: bool = True, sort: bool = True) -> None:
         Log.debug(f"Task list {self.list_uid}: Update UI")
 
         # Rename list
@@ -143,7 +140,7 @@ class TaskList(Adw.Bin):
         # Remove tasks
         for task in self.tasks:
             if task.uid not in data_uids:
-                task.purged = True
+                task.purge()
 
         # Update tasks
         if update_tasks_ui:
@@ -151,7 +148,8 @@ class TaskList(Adw.Bin):
                 task.update_ui()
 
         # Sort tasks
-        # self.task_list_model.sort(self.__completed_sort_func)
+        if sort:
+            self.__sort_tasks()
 
         # Update status
         tasks: list[TaskData] = [
@@ -239,5 +237,5 @@ class TaskList(Adw.Bin):
         entry.set_text("")
         if not on_top:
             scroll(self.scrl, True)
-        self.update_ui(False)
+        self.update_ui(False, False)
         Sync.sync(False)

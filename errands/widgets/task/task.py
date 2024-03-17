@@ -180,16 +180,23 @@ class Task(Gtk.ListBoxRow):
         for task in tasks:
             self.task_list.append(Task(task["uid"], self.task_list, self))
 
-    # def __completed_sort_func(self, task1: Task, task2: Task) -> int:
-    #     # Move completed tasks to the bottom
-    #     if task1.complete_btn.get_active() and not task2.complete_btn.get_active():
-    #         UserData.move_task_after(self.list_uid, task1.uid, task2.uid)
-    #         return 1
-    #     elif not task1.complete_btn.get_active() and task2.complete_btn.get_active():
-    #         UserData.move_task_before(self.list_uid, task1.uid, task2.uid)
-    #         return -1
-    #     else:
-    #         return 0
+    def __sort_tasks(self) -> None:
+        def __sort_completed():
+            length = len(self.tasks)
+            last_idx = length - 1
+            i = last_idx
+            while i > -1:
+                task = self.tasks[i]
+                if task.get_prop("completed"):
+                    if i != last_idx:
+                        UserData.move_task_before(
+                            self.list_uid, task.uid, self.tasks[last_idx].uid
+                        )
+                        self.task_list.reorder_child_after(task, self.tasks[last_idx])
+                    last_idx -= 1
+                i -= 1
+
+        __sort_completed()
 
     # ------ PROPERTIES ------ #
 
@@ -225,6 +232,17 @@ class Task(Gtk.ListBoxRow):
         return parents
 
     # ------ PUBLIC METHODS ------ #
+
+    def add_task(self, uid: str) -> Task:
+        on_top: bool = GSettings.get("task-list-new-task-position-top")
+        new_task = Task(uid, self.task_list, self)
+        if on_top:
+            self.sub_tasks.prepend(new_task)
+        else:
+            self.sub_tasks.append(new_task)
+        new_task.update_ui()
+
+        return new_task
 
     def add_rm_crossline(self, add: bool) -> None:
         if add:
@@ -292,7 +310,7 @@ class Task(Gtk.ListBoxRow):
     def update_props(self, props: list[str], values: list[Any]) -> None:
         UserData.update_props(self.list_uid, self.uid, props, values)
 
-    def update_ui(self) -> None:
+    def update_ui(self, update_sub_tasks_ui: bool = True) -> None:
         # Purge
         if self.purged:
             self.purge()
@@ -379,14 +397,9 @@ class Task(Gtk.ListBoxRow):
         widgets_uids: list[str] = [t.uid for t in self.tasks]
 
         # Add sub-tasks
-        on_top: bool = GSettings.get("task-list-new-task-position-top")
         for task in data_tasks:
             if task["uid"] not in widgets_uids:
-                new_task = Task(task["uid"], self.task_list, self)
-                if on_top:
-                    self.sub_tasks.prepend(new_task)
-                else:
-                    self.sub_tasks.append(new_task)
+                self.add_task(task["uid"])
 
         # Remove sub-tasks
         for task in self.tasks:
@@ -394,11 +407,12 @@ class Task(Gtk.ListBoxRow):
                 self.sub_tasks.remove(task)
 
         # Update sub-tasks
-        for task in self.tasks:
-            task.update_ui()
+        if update_sub_tasks_ui:
+            for task in self.tasks:
+                task.update_ui()
 
         # Sort sub-tasks
-        # self.task_list_model.sort(self.__completed_sort_func)
+        self.__sort_tasks()
 
     # ------ TEMPLATE HANDLERS ------ #
 
@@ -415,19 +429,23 @@ class Task(Gtk.ListBoxRow):
             return
 
         # Add sub-task
-        UserData.add_task(
-            list_uid=self.list_uid,
-            text=text,
-            parent=self.uid,
-            insert_at_the_top=GSettings.get("task-list-new-task-position-top"),
+        self.add_task(
+            UserData.add_task(
+                list_uid=self.list_uid,
+                text=text,
+                parent=self.uid,
+                insert_at_the_top=GSettings.get("task-list-new-task-position-top"),
+            )
         )
 
         # Clear entry
         entry.set_text("")
 
         # Update status
-        self.update_props(["completed", "synced"], [False, False])
-        self.update_ui()
+        if self.get_prop("completed"):
+            self.update_props(["completed", "synced"], [False, False])
+
+        self.update_ui(False)
 
         # Sync
         Sync.sync(False)
@@ -453,7 +471,8 @@ class Task(Gtk.ListBoxRow):
             for task in self.parents_tree:
                 if task.get_prop("completed"):
                     task.update_props(["completed", "synced"], [False, False])
-
+        if self.parents_tree:
+            self.parents_tree[-1].update_ui()
         self.task_list.update_ui(False)
         Sync.sync(False)
 
