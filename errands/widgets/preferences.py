@@ -126,7 +126,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
             title=_("Sync"),
         )
         # Provider
-        model = Gtk.StringList.new([_("Disabled"), "Nextcloud", "CalDAV"])
+        model = Gtk.StringList.new([_("Disabled"), "Nextcloud", "CalDAV", "Vikunja"])
         self.sync_providers = Adw.ComboRow(
             title=_("Sync Provider"),
             model=model,
@@ -198,9 +198,9 @@ class PreferencesWindow(Adw.PreferencesWindow):
 
     def _setup_sync(self) -> None:
         selected: int = self.sync_providers.props.selected
-        self.sync_url.set_visible(0 < selected < 3)
-        self.sync_username.set_visible(0 < selected < 3)
-        self.sync_password.set_visible(0 < selected < 3)
+        self.sync_url.set_visible(0 < selected < 4)
+        self.sync_username.set_visible(0 < selected < 4)
+        self.sync_password.set_visible(0 < selected < 4)
         self.test_connection_row.set_visible(selected > 0)
 
         if self.sync_password.props.visible:
@@ -221,7 +221,7 @@ class PreferencesWindow(Adw.PreferencesWindow):
                 self.sync_password.set_text(data["password"])
 
     def on_sync_pass_changed(self, _entry) -> None:
-        if 0 < self.sync_providers.props.selected < 3:
+        if 0 < self.sync_providers.props.selected < 4:
             account = self.sync_providers.props.selected_item.props.string
             GSettings.set_secret(account, self.sync_password.props.text)
 
