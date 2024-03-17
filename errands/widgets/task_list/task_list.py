@@ -112,6 +112,7 @@ class TaskList(Adw.Bin):
 
         return new_task
 
+    @timeit
     def update_ui(self, update_tasks_ui: bool = True, sort: bool = True) -> None:
         Log.debug(f"Task list {self.list_uid}: Update UI")
 

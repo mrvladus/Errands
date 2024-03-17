@@ -141,7 +141,7 @@ class UserData:
         cls.__swap_rows(list_uid, task_uid, after_uid)
 
     @classmethod
-    # @timeit
+    @timeit
     def move_task_before(cls, list_uid: str, task_uid: str, before_uid: str) -> None:
         tasks: list[TaskData] = [
             t for t in cls.get_tasks_as_dicts() if t["list_uid"] == list_uid
@@ -294,7 +294,6 @@ class UserData:
         notes: str = "",
         parent: str = "",
         percent_complete: int = 0,
-        position: int = 0,
         priority: int = 0,
         start_date: str = "",
         synced: bool = False,
@@ -341,6 +340,7 @@ class UserData:
     # --- PRIVATE METHODS --- #
 
     @classmethod
+    @timeit
     def __swap_rows(cls, list_uid: str, uid_1: str, uid_2: str) -> None:
         try:
             with cls.connection:

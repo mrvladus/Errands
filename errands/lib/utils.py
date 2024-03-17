@@ -47,6 +47,8 @@ def catch_errors(function: Callable):
 from functools import wraps
 import time
 
+PROFILING_LOG = ""
+
 
 def timeit(func):
     @wraps(func)
