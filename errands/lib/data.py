@@ -49,7 +49,7 @@ class UserData:
         cls.connection = sqlite3.connect(
             cls.db_path, check_same_thread=False, isolation_level=None
         )
-        cls.run_sql(
+        init_sql: list[str] = [
             """CREATE TABLE IF NOT EXISTS lists (
             deleted INTEGER NOT NULL,
             name TEXT NOT NULL,
@@ -74,7 +74,8 @@ class UserData:
             trash INTEGER NOT NULL,
             uid TEXT NOT NULL
             )""",
-        )
+        ]
+        cls.run_sql(*init_sql)
         cls._convert(cls)
 
     @classmethod
