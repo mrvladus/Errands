@@ -20,7 +20,7 @@ from gi.repository import Gtk  # type:ignore
 from gi.repository import GtkSource  # type:ignore
 from icalendar import Calendar, Event
 
-from errands.lib.data import TaskData, UserData
+from errands.lib.data import TaskData, UserDataSQLite
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.markup import Markup
@@ -66,7 +66,6 @@ class Task(Gtk.ListBoxRow):
         parent: TaskList | Task,
     ) -> None:
         super().__init__()
-        Log.info(f"Add task: {uid}")
 
         self.uid = uid
         self.task_list = task_list
@@ -107,7 +106,7 @@ class Task(Gtk.ListBoxRow):
 
                 task = [
                     i
-                    for i in UserData.get_tasks_as_dicts(self.list_uid)
+                    for i in UserDataSQLite.get_tasks_as_dicts(self.list_uid)
                     if i["uid"] == self.uid
                 ][0]
                 calendar = Calendar()
@@ -174,7 +173,7 @@ class Task(Gtk.ListBoxRow):
         # Sub-tasks
         tasks: list[TaskData] = [
             t
-            for t in UserData.get_tasks_as_dicts(self.list_uid, self.uid)
+            for t in UserDataSQLite.get_tasks_as_dicts(self.list_uid, self.uid)
             if not t["deleted"]
         ]
         for task in tasks:
@@ -189,7 +188,7 @@ class Task(Gtk.ListBoxRow):
                 task = self.tasks[i]
                 if task.get_prop("completed"):
                     if i != last_idx:
-                        UserData.move_task_before(
+                        UserDataSQLite.move_task_before(
                             self.list_uid, task.uid, self.tasks[last_idx].uid
                         )
                         self.task_list.reorder_child_after(task, self.tasks[last_idx])
@@ -251,7 +250,7 @@ class Task(Gtk.ListBoxRow):
             self.title_row.remove_css_class("task-completed")
 
     def get_prop(self, prop: str) -> Any:
-        res: Any = UserData.get_prop(self.list_uid, self.uid, prop)
+        res: Any = UserDataSQLite.get_prop(self.list_uid, self.uid, prop)
         if prop in "deleted completed expanded trash toolbar_shown":
             res = bool(res)
         return res
@@ -261,7 +260,7 @@ class Task(Gtk.ListBoxRow):
 
         tasks: list[TaskData] = [
             t
-            for t in UserData.get_tasks_as_dicts(self.task_list.list_uid)
+            for t in UserDataSQLite.get_tasks_as_dicts(self.task_list.list_uid)
             if t["parent"] == self.uid and not t["deleted"] and not t["trash"]
         ]
         n_total: int = len(tasks)
@@ -308,7 +307,7 @@ class Task(Gtk.ListBoxRow):
         GLib.idle_add(self.revealer.set_reveal_child, on)
 
     def update_props(self, props: list[str], values: list[Any]) -> None:
-        UserData.update_props(self.list_uid, self.uid, props, values)
+        UserDataSQLite.update_props(self.list_uid, self.uid, props, values)
 
     def update_ui(self, update_sub_tasks_ui: bool = True) -> None:
         # Purge
@@ -390,7 +389,7 @@ class Task(Gtk.ListBoxRow):
 
         data_tasks: list[TaskData] = [
             t
-            for t in UserData.get_tasks_as_dicts(self.list_uid, self.uid)
+            for t in UserDataSQLite.get_tasks_as_dicts(self.list_uid, self.uid)
             if not t["deleted"]
         ]
         data_uids: list[str] = [t["uid"] for t in data_tasks]
@@ -430,7 +429,7 @@ class Task(Gtk.ListBoxRow):
 
         # Add sub-task
         self.add_task(
-            UserData.add_task(
+            UserDataSQLite.add_task(
                 list_uid=self.list_uid,
                 text=text,
                 parent=self.uid,
@@ -603,7 +602,7 @@ class Task(Gtk.ListBoxRow):
 
         # Change list
         if task.list_uid != self.list_uid:
-            UserData.move_task_to_list(
+            UserDataSQLite.move_task_to_list(
                 task.uid,
                 task.list_uid,
                 self.list_uid,
@@ -643,14 +642,14 @@ class Task(Gtk.ListBoxRow):
         """
 
         if task.list_uid != self.list_uid:
-            UserData.move_task_to_list(
+            UserDataSQLite.move_task_to_list(
                 task.uid,
                 task.list_uid,
                 self.list_uid,
                 self.parent.uid if isinstance(self.parent, Task) else "",
                 False,
             )
-        UserData.move_task_before(self.list_uid, task.uid, self.uid)
+        UserDataSQLite.move_task_before(self.list_uid, task.uid, self.uid)
 
         # If task has the same parent
         if task.parent == self.parent:
@@ -662,7 +661,7 @@ class Task(Gtk.ListBoxRow):
             self.parent.task_list_model.remove(task.get_index())
         # Change parent if different parents
         else:
-            UserData.update_props(
+            UserDataSQLite.update_props(
                 self.list_uid,
                 task.uid,
                 ["parent", "synced"],

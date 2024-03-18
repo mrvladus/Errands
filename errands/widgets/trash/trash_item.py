@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from errands.widgets.window import Window
 
-from errands.lib.data import TaskData, UserData
+from errands.lib.data import TaskData, UserDataSQLite
 from gi.repository import Adw, Gtk, Gio  # type:ignore
 from errands.lib.logging import Log
 
@@ -29,11 +29,13 @@ class TrashItem(Adw.ActionRow):
 
         Log.info(f"Restore task: {self.task_dict['uid']}")
 
-        parents_uids: list[str] = UserData.get_parents_uids_tree(
+        parents_uids: list[str] = UserDataSQLite.get_parents_uids_tree(
             self.task_dict["list_uid"], self.task_dict["uid"]
         )
         parents_uids.append(self.task_dict["uid"])
         for uid in parents_uids:
-            UserData.update_props(self.task_dict["list_uid"], uid, ["trash"], [False])
+            UserDataSQLite.update_props(
+                self.task_dict["list_uid"], uid, ["trash"], [False]
+            )
 
         self.window.sidebar.update_ui()

@@ -3,7 +3,7 @@ from errands.lib.gsettings import GSettings
 from errands.widgets.window import Window
 from errands.lib.plugins import PluginsLoader
 from errands.lib.logging import Log
-from errands.lib.data import UserData
+from errands.lib.data import UserDataSQLite
 
 
 class ErrandsApplication(Adw.Application):
@@ -50,7 +50,7 @@ class ErrandsApplication(Adw.Application):
         Log.debug("Application: Startup")
 
         # User database
-        UserData.init()
+        UserDataSQLite.init()
 
         # GSettings
         GSettings.init()

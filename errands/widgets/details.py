@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from errands.widgets.task.task import Task
 
 from datetime import datetime
-from errands.lib.data import UserData
+from errands.lib.data import UserDataSQLite
 from icalendar import Calendar, Event
 from errands.lib.utils import get_children
 from errands.widgets.components import Box, Button, DateTime

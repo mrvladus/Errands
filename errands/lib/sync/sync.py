@@ -11,7 +11,7 @@ from errands.lib.sync.providers.caldav import SyncProviderCalDAV
 from errands.lib.sync.providers.nextcloud import SyncProviderNextcloud
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
-from errands.lib.data import UserData
+from errands.lib.data import UserDataSQLite
 from errands.lib.utils import threaded
 from gi.repository import GLib  # type:ignore
 
@@ -29,7 +29,7 @@ class Sync:
         match GSettings.get("sync-provider"):
             case 0:
                 Log.info("Sync: Sync disabled")
-                UserData.clean_deleted()
+                UserDataSQLite.clean_deleted()
             case 1:
                 self.provider = SyncProviderNextcloud(
                     window=self.window, testing=testing
@@ -44,7 +44,7 @@ class Sync:
         Sync tasks without blocking the UI
         """
         if GSettings.get("sync-provider") == 0:
-            UserData.clean_deleted()
+            UserDataSQLite.clean_deleted()
             if update_ui:
                 GLib.idle_add(self.window.sidebar.update_ui)
             return
@@ -65,7 +65,7 @@ class Sync:
                 self.window.sidebar.header_bar.sync_indicator.set_visible, True
             )
             self.provider.sync()
-            UserData.clean_deleted()
+            UserDataSQLite.clean_deleted()
             if update_ui:
                 GLib.idle_add(self.window.sidebar.update_ui)
             if self.sync_again:

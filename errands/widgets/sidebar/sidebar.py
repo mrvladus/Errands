@@ -11,7 +11,7 @@ from errands.widgets.components.titled_separator import TitledSeparator
 if TYPE_CHECKING:
     from errands.widgets.window import Window
 
-from errands.lib.data import TaskListData, UserData
+from errands.lib.data import TaskListData, UserDataSQLite
 from errands.lib.utils import get_children
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
@@ -146,7 +146,7 @@ class Sidebar(Adw.Bin):
     def update_ui(self) -> None:
         Log.debug("Sidebar: Update UI")
 
-        lists: list[TaskListData] = UserData.get_lists_as_dicts()
+        lists: list[TaskListData] = UserDataSQLite.get_lists_as_dicts()
 
         # Delete lists
         uids: list[str] = [l["uid"] for l in lists]
@@ -193,7 +193,7 @@ class Sidebar(Adw.Bin):
 
         def _entry_changed(entry: Gtk.Entry, _, dialog):
             text = entry.props.text.strip(" \n\t")
-            names = [i["name"] for i in UserData.get_lists_as_dicts()]
+            names = [i["name"] for i in UserDataSQLite.get_lists_as_dicts()]
             dialog.set_response_enabled("add", text and text not in names)
 
         def _confirm(_, res, entry: Gtk.Entry):
@@ -201,7 +201,7 @@ class Sidebar(Adw.Bin):
                 return
 
             name = entry.props.text.rstrip().lstrip()
-            list_dict = UserData.add_list(name)
+            list_dict = UserDataSQLite.add_list(name)
             row = self.add_task_list(list_dict)
             row.activate()
             Sync.sync()

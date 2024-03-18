@@ -6,7 +6,7 @@ from __main__ import VERSION, APP_ID
 import os
 from uuid import uuid4
 from icalendar import Calendar
-from errands.lib.data import UserData
+from errands.lib.data import UserDataSQLite
 from gi.repository import Gio, Adw, Gtk, GObject  # type:ignore
 
 from errands.widgets.preferences import PreferencesWindow
@@ -98,11 +98,13 @@ class Window(Adw.ApplicationWindow):
                     )
                     if name in [
                         i[0]
-                        for i in UserData.run_sql("SELECT name FROM lists", fetch=True)
+                        for i in UserDataSQLite.run_sql(
+                            "SELECT name FROM lists", fetch=True
+                        )
                     ]:
                         name = f"{name}_{uuid4()}"
                     # Create list
-                    uid: str = UserData.add_list(name)
+                    uid: str = UserDataSQLite.add_list(name)
                     # Add tasks
                     for todo in calendar.walk("VTODO"):
                         # Tags
@@ -135,7 +137,7 @@ class Window(Adw.ApplicationWindow):
                             )
                         else:
                             end = ""
-                        UserData.add_task(
+                        UserDataSQLite.add_task(
                             color=todo.get("X-ERRANDS-COLOR", ""),
                             completed=str(todo.get("STATUS", "")) == "COMPLETED",
                             end_date=end,

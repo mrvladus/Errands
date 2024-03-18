@@ -5,7 +5,7 @@ import json
 import os
 import shutil
 import sqlite3
-from typing import Any, Iterable, Self, TypedDict, get_type_hints
+from typing import Any, Iterable, Protocol, Self, TypedDict, get_type_hints
 from uuid import uuid4
 
 from gi.repository import GLib  # type:ignore
@@ -18,7 +18,6 @@ from errands.lib.utils import threaded, timeit
 class TaskListData(TypedDict):
     deleted: bool
     name: str
-    # position: int
     synced: bool
     uid: str
 
@@ -33,7 +32,6 @@ class TaskData(TypedDict):
     notes: str
     parent: str
     percent_complete: int
-    # position: int
     priority: int
     start_date: str
     synced: bool
@@ -80,7 +78,63 @@ def create_table_query_from_dict(table_name: str, obj: dict) -> str:
     return query
 
 
-class UserData:
+class UserDataBase(Protocol):
+    data_dir: str
+    db_path: str
+
+    @classmethod
+    def init(cls): ...
+
+    @classmethod
+    def add_list(
+        cls, name: str, uuid: str = None, synced: bool = False
+    ) -> TaskListData: ...
+
+    @classmethod
+    def add_task(cls, **kwargs) -> str: ...
+
+    @classmethod
+    def clean_deleted(cls) -> None: ...
+
+    @classmethod
+    def get_lists_as_dicts(cls) -> list[TaskListData]: ...
+
+    @classmethod
+    def get_prop(cls, list_uid: str, uid: str, prop: str) -> Any: ...
+
+    @classmethod
+    def get_parents_uids_tree(cls, list_uid: str, task_uid: str) -> list[str]: ...
+
+    @classmethod
+    def get_tasks_as_dicts(
+        cls, list_uid: str = None, parent: str = None
+    ) -> list[TaskData]: ...
+
+    @classmethod
+    def move_task_after(cls, list_uid: str, task_uid: str, after_uid: str) -> None: ...
+
+    @classmethod
+    def move_task_before(
+        cls, list_uid: str, task_uid: str, before_uid: str
+    ) -> None: ...
+
+    @classmethod
+    def move_task_to_list(
+        cls,
+        task_uid: str,
+        old_list_uid: str,
+        new_list_uid: str,
+        parent: str,
+        synced: bool,
+    ) -> None: ...
+
+    @classmethod
+    def update_props(
+        cls, list_uid: str, uid: str, props: list[str], values: list[Any]
+    ) -> None: ...
+
+
+class UserDataSQLite(UserDataBase):
     data_dir: str = os.path.join(GLib.get_user_data_dir(), "errands")
     db_path: str = os.path.join(data_dir, "data.db")
 
@@ -141,7 +195,6 @@ class UserData:
         cls.__swap_rows(list_uid, task_uid, after_uid)
 
     @classmethod
-    @timeit
     def move_task_before(cls, list_uid: str, task_uid: str, before_uid: str) -> None:
         tasks: list[TaskData] = [
             t for t in cls.get_tasks_as_dicts() if t["list_uid"] == list_uid
@@ -340,7 +393,6 @@ class UserData:
     # --- PRIVATE METHODS --- #
 
     @classmethod
-    @timeit
     def __swap_rows(cls, list_uid: str, uid_1: str, uid_2: str) -> None:
         try:
             with cls.connection:

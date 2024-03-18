@@ -11,7 +11,7 @@ from errands.widgets.trash.trash_item import TrashItem
 if TYPE_CHECKING:
     from errands.widgets.window import Window
 
-from errands.lib.data import TaskData, TaskListData, UserData
+from errands.lib.data import TaskData, TaskListData, UserDataSQLite
 from errands.lib.utils import get_children
 from errands.widgets.component import ConfirmDialog
 from gi.repository import Adw, Gtk, GObject, Gio  # type:ignore
@@ -41,10 +41,12 @@ class Trash(Adw.Bin):
 
     def update_ui(self):
         tasks_dicts: list[TaskData] = [
-            t for t in UserData.get_tasks_as_dicts() if t["trash"] and not t["deleted"]
+            t
+            for t in UserDataSQLite.get_tasks_as_dicts()
+            if t["trash"] and not t["deleted"]
         ]
         tasks_uids: list[str] = [t["uid"] for t in tasks_dicts]
-        lists_dicts: list[TaskListData] = UserData.get_lists_as_dicts()
+        lists_dicts: list[TaskListData] = UserDataSQLite.get_lists_as_dicts()
 
         # Add items
         items_uids = [t.task_dict["uid"] for t in self.trash_items]
@@ -78,7 +80,7 @@ class Trash(Adw.Bin):
 
             Log.info("Trash: Clear")
 
-            UserData.run_sql(
+            UserDataSQLite.run_sql(
                 f"""UPDATE tasks
                 SET deleted = 1
                 WHERE trash = 1""",
@@ -105,9 +107,13 @@ class Trash(Adw.Bin):
         Log.info("Trash: Restore")
 
         trash_dicts: list[TaskData] = [
-            t for t in UserData.get_tasks_as_dicts() if t["trash"] and not t["deleted"]
+            t
+            for t in UserDataSQLite.get_tasks_as_dicts()
+            if t["trash"] and not t["deleted"]
         ]
         for task in trash_dicts:
-            UserData.update_props(task["list_uid"], task["uid"], ["trash"], [False])
+            UserDataSQLite.update_props(
+                task["list_uid"], task["uid"], ["trash"], [False]
+            )
 
         self.window.sidebar.update_ui()
