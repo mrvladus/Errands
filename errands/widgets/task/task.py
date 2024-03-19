@@ -257,7 +257,10 @@ class Task(Adw.Bin):
         """Get total tasks and completed tasks tuple"""
         return UserData.get_status(self.list_uid, self.uid)
 
-    def delete(self, *_) -> None:
+    def delete(
+        self,
+        *_,
+    ) -> None:
         """Move task to trash"""
 
         Log.info(f"Task: Move to trash: '{self.uid}'")
@@ -266,8 +269,9 @@ class Task(Adw.Bin):
         self.complete_btn.set_active(True)
         self.update_props(["trash", "synced"], [True, False])
         for task in self.all_tasks:
-            task.delete()
-        self.parent.update_ui()
+            task.delete(False)
+        # if update_task_list_ui:
+        #     self.parent.update_ui(False)
         self.window.sidebar.trash_row.update_ui()
 
     def expand(self, expanded: bool) -> None:

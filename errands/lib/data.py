@@ -135,6 +135,13 @@ class UserDataJSON:
         self.task_lists = lists
         self.tasks = tasks
 
+    def delete_tasks_from_trash(self) -> None:
+        tasks: list[TaskData] = self.tasks
+        for task in tasks:
+            if task.trash and not task.deleted:
+                task.deleted = True
+        self.tasks = tasks
+
     def get_lists_as_dicts(self) -> list[TaskListData]:
         return self.task_lists
 

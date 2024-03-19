@@ -186,8 +186,8 @@ class TaskList(Adw.Bin):
         Log.info("Delete completed tasks")
         for task in self.all_tasks:
             if not task.get_prop("trash") and task.get_prop("completed"):
-                task.delete()
-        self.window.sidebar.update_ui()
+                task.delete(False)
+        self.update_ui()
 
     @Gtk.Template.Callback()
     def _on_dnd_scroll(self, _motion, _x, y: float) -> bool:
@@ -230,9 +230,8 @@ class TaskList(Adw.Bin):
                 text=text,
             )
         )
-        # on_top: bool = GSettings.get("task-list-new-task-position-top")
         entry.set_text("")
-        # if not on_top:
-        #     scroll(self.scrl, True)
-        # self.update_ui(False, False)
+        if not GSettings.get("task-list-new-task-position-top"):
+            scroll(self.scrl, True)
+        self.update_ui(False, False)
         # Sync.sync(False)

@@ -78,11 +78,7 @@ class Trash(Adw.Bin):
 
             Log.info("Trash: Clear")
 
-            # UserData.run_sql(
-            #     f"""UPDATE tasks
-            #     SET deleted = 1
-            #     WHERE trash = 1""",
-            # )
+            UserData.delete_tasks_from_trash()
             self.window.sidebar.trash_row.update_ui()
             # Sync
             # Sync.sync()
