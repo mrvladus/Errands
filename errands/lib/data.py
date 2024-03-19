@@ -1,11 +1,13 @@
 # Copyright 2023-2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
+from dataclasses import dataclass, asdict, field
 import json
 import os
 import shutil
 import sqlite3
-from typing import Any, Iterable, Protocol, Self, TypedDict, get_type_hints
+import threading
+from typing import Any, Iterable, Self, get_type_hints
 from uuid import uuid4
 
 from gi.repository import GLib  # type:ignore
@@ -15,31 +17,167 @@ from errands.lib.logging import Log
 from errands.lib.utils import threaded, timeit
 
 
-class TaskListData(TypedDict):
+@dataclass
+class TaskListData:
     deleted: bool
     name: str
     synced: bool
     uid: str
 
 
-class TaskData(TypedDict):
-    color: str
-    completed: bool
-    deleted: bool
-    end_date: str
-    expanded: bool
-    list_uid: str
-    notes: str
-    parent: str
-    percent_complete: int
-    priority: int
-    start_date: str
-    synced: bool
-    tags: str
-    text: str
-    toolbar_shown: bool
-    trash: bool
-    uid: str
+@dataclass
+class TaskData:
+    color: str = ""
+    completed: bool = False
+    deleted: bool = False
+    end_date: str = ""
+    expanded: bool = False
+    list_uid: str = ""
+    notes: str = ""
+    parent: str = ""
+    percent_complete: int = 0
+    priority: int = 0
+    start_date: str = ""
+    synced: bool = False
+    tags: str = ""
+    text: str = ""
+    toolbar_shown: bool = False
+    trash: bool = False
+    uid: str = ""
+
+
+@dataclass
+class ErrandsData:
+    lists: list[TaskListData] = field(default_factory=list)
+    tasks: list[TaskData] = field(default_factory=list)
+
+
+class UserDataJSON:
+
+    def __init__(self) -> None:
+        self.__data_dir: str = os.path.join(GLib.get_user_data_dir(), "errands")
+        self.__data_file_path: str = os.path.join(self.__data_dir, "data.json")
+        self.__task_lists_data: list[TaskListData] = []
+        self.__tasks_data: list[TaskData] = []
+
+    # ------ PROPERTIES ------ #
+
+    @property
+    def task_lists(self) -> list[TaskListData]:
+        return self.__task_lists_data
+
+    @task_lists.setter
+    def task_lists(self, lists_data: list[TaskListData]):
+        self.__task_lists_data = lists_data
+        self.__write_data()
+
+    @property
+    def tasks(self) -> list[TaskData]:
+        return self.__tasks_data
+
+    @tasks.setter
+    def tasks(self, tasks_data: list[TaskData]):
+        self.__tasks_data = tasks_data
+        self.__write_data()
+
+    # ------ PUBLIC METHODS ------ #
+
+    def init(self):
+        if not os.path.exists(self.__data_dir):
+            os.mkdir(self.__data_dir)
+        if not os.path.exists(self.__data_file_path):
+            self.__write_data()
+        else:
+            self.__read_data()
+
+    def add_list(
+        self, name: str, uuid: str = None, synced: bool = False
+    ) -> TaskListData:
+        uid: str = str(uuid4()) if not uuid else uuid
+
+        Log.debug(f"Data: Create list '{uid}'")
+
+        new_list = TaskListData(deleted=False, name=name, uid=uid, synced=synced)
+        data: list[TaskListData] = self.task_lists
+        data.append(new_list)
+        self.task_lists = data
+
+        return new_list
+
+    def add_task(self, **kwargs) -> TaskData:
+        data: list[TaskData] = self.tasks
+        new_task = TaskData(**kwargs)
+        if not new_task.uid:
+            new_task.uid = str(uuid4())
+        if not GSettings.get("task-list-new-task-position-top"):
+            data.append(new_task)
+        else:
+            data.insert(0, new_task)
+        self.tasks = data
+
+        return new_task
+
+    def clean_deleted(self):
+        pass
+
+    def get_lists_as_dicts(self) -> list[TaskListData]:
+        return self.task_lists
+
+    def get_prop(self, list_uid: str, uid: str, prop: str) -> Any:
+        tasks: list[TaskData] = self.tasks
+        for t in tasks:
+            if t.list_uid == list_uid and t.uid == uid:
+                task = t
+                break
+
+        return getattr(task, prop)
+
+    def get_tasks_as_dicts(
+        self, list_uid: str = None, parent: str = None
+    ) -> list[TaskData]:
+        if not list_uid:
+            return self.tasks
+        elif list_uid and not parent:
+            return [t for t in self.tasks if t.list_uid == list_uid]
+        elif list_uid and parent:
+            return [
+                t for t in self.tasks if t.list_uid == list_uid and t.parent == parent
+            ]
+
+    def update_props(
+        self, list_uid: str, uid: str, props: Iterable[str], values: Iterable[Any]
+    ):
+        tasks = self.tasks
+        for task in tasks:
+            if task.list_uid == list_uid and task.uid == uid:
+                for idx, prop in enumerate(props):
+                    setattr(task, prop, values[idx])
+                break
+        self.tasks = tasks
+
+    # ------ PRIVATE METHODS ------ #
+
+    def __read_data(self):
+        try:
+            with open(self.__data_file_path, "r") as f:
+                data: dict[str, Any] = json.load(f)
+                self.task_lists = [TaskListData(**l) for l in data["lists"]]
+                self.tasks = [TaskData(**t) for t in data["tasks"]]
+        except Exception as e:
+            Log.error(f"Data: Can't read data file from disk. {e}")
+            Log.info("Data: Create new data file")
+            self.__write_data()
+
+    def __write_data(self) -> None:
+        # try:
+        with open(self.__data_file_path, "w") as f:
+            lists: list[dict] = [asdict(l) for l in self.task_lists]
+            tasks: list[dict] = [asdict(t) for t in self.tasks]
+            data: dict = {"lists": lists, "tasks": tasks}
+            json.dump(data, f, ensure_ascii=False)
+
+    # except Exception as e:
+    #     Log.error(f"Data: Can't write to disk. {e}")
 
 
 # TODO
@@ -78,72 +216,16 @@ def create_table_query_from_dict(table_name: str, obj: dict) -> str:
     return query
 
 
-class UserDataBase(Protocol):
-    data_dir: str
-    db_path: str
-
-    @classmethod
-    def init(cls): ...
-
-    @classmethod
-    def add_list(
-        cls, name: str, uuid: str = None, synced: bool = False
-    ) -> TaskListData: ...
-
-    @classmethod
-    def add_task(cls, **kwargs) -> str: ...
-
-    @classmethod
-    def clean_deleted(cls) -> None: ...
-
-    @classmethod
-    def get_lists_as_dicts(cls) -> list[TaskListData]: ...
-
-    @classmethod
-    def get_prop(cls, list_uid: str, uid: str, prop: str) -> Any: ...
-
-    @classmethod
-    def get_parents_uids_tree(cls, list_uid: str, task_uid: str) -> list[str]: ...
-
-    @classmethod
-    def get_tasks_as_dicts(
-        cls, list_uid: str = None, parent: str = None
-    ) -> list[TaskData]: ...
-
-    @classmethod
-    def move_task_after(cls, list_uid: str, task_uid: str, after_uid: str) -> None: ...
-
-    @classmethod
-    def move_task_before(
-        cls, list_uid: str, task_uid: str, before_uid: str
-    ) -> None: ...
-
-    @classmethod
-    def move_task_to_list(
-        cls,
-        task_uid: str,
-        old_list_uid: str,
-        new_list_uid: str,
-        parent: str,
-        synced: bool,
-    ) -> None: ...
-
-    @classmethod
-    def update_props(
-        cls, list_uid: str, uid: str, props: list[str], values: list[Any]
-    ) -> None: ...
-
-
-class UserDataSQLite(UserDataBase):
+class UserDataSQLite:
     data_dir: str = os.path.join(GLib.get_user_data_dir(), "errands")
-    db_path: str = os.path.join(data_dir, "data.db")
+    data_file_path: str = os.path.join(data_dir, "data.db")
 
     @classmethod
     def init(cls):
         if not os.path.exists(cls.data_dir):
             os.mkdir(cls.data_dir)
         cls.connection = sqlite3.connect(
-            cls.db_path, check_same_thread=False, isolation_level=None
+            cls.data_file_path, check_same_thread=False, isolation_level=None
         )
         cls.execute(create_table_query_from_dict("lists", TaskListData))
         cls.execute(create_table_query_from_dict("tasks", TaskData))
@@ -509,3 +591,7 @@ class UserDataSQLite(UserDataBase):
                 trash=task["deleted"],
                 uid=task["id"],
             )
+
+
+# Handle for UserData. For easily changing serializing data methods.
+UserData = UserDataJSON()

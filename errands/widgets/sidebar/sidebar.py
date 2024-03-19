@@ -11,7 +11,7 @@ from errands.widgets.components.titled_separator import TitledSeparator
 if TYPE_CHECKING:
     from errands.widgets.window import Window
 
-from errands.lib.data import TaskListData, UserDataSQLite
+from errands.lib.data import TaskListData, UserData
 from errands.lib.utils import get_children
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
@@ -120,9 +120,10 @@ class Sidebar(Adw.Bin):
         self.update_ui()
 
     def add_task_list(self, list_dict: TaskListData) -> TaskListRow:
-        Log.debug(f"Sidebar: Add Task List '{list_dict['uid']}'")
+        Log.debug(f"Sidebar: Add Task List '{list_dict.uid}'")
         row: TaskListRow = TaskListRow(list_dict, self)
         self.list_box.append(row)
+        self.status_page.set_visible(False)
         return row
 
     @property
@@ -146,10 +147,10 @@ class Sidebar(Adw.Bin):
     def update_ui(self) -> None:
         Log.debug("Sidebar: Update UI")
 
-        lists: list[TaskListData] = UserDataSQLite.get_lists_as_dicts()
+        lists: list[TaskListData] = UserData.get_lists_as_dicts()
 
         # Delete lists
-        uids: list[str] = [l["uid"] for l in lists]
+        uids: list[str] = [l.uid for l in lists]
         for l in self.task_lists_rows:
             if l.uid not in uids:
                 Log.debug(f"Sidebar: Delete list {l.uid}")
@@ -160,7 +161,7 @@ class Sidebar(Adw.Bin):
         # Add lists
         lists_uids = [l.uid for l in self.task_lists_rows]
         for l in lists:
-            if l["uid"] not in lists_uids:
+            if l.uid not in lists_uids:
                 self.add_task_list(l)
 
         # Update rows
@@ -193,7 +194,7 @@ class Sidebar(Adw.Bin):
 
         def _entry_changed(entry: Gtk.Entry, _, dialog):
             text = entry.props.text.strip(" \n\t")
-            names = [i["name"] for i in UserDataSQLite.get_lists_as_dicts()]
+            names = [i.name for i in UserData.get_lists_as_dicts()]
             dialog.set_response_enabled("add", text and text not in names)
 
         def _confirm(_, res, entry: Gtk.Entry):
@@ -201,10 +202,10 @@ class Sidebar(Adw.Bin):
                 return
 
             name = entry.props.text.rstrip().lstrip()
-            list_dict = UserDataSQLite.add_list(name)
+            list_dict = UserData.add_list(name)
             row = self.add_task_list(list_dict)
             row.activate()
-            Sync.sync()
+            # Sync.sync()
 
         entry = Gtk.Entry(placeholder_text=_("New List Name"))
         dialog = Adw.MessageDialog(

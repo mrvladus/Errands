@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 from errands.lib.sync.sync import Sync
 from gi.repository import Adw, Gtk, GLib, Gio, GObject  # type:ignore
 from errands.lib.animation import scroll
-from errands.lib.data import TaskData, UserDataSQLite
+from errands.lib.data import TaskData, UserData
 from errands.lib.utils import get_children, timeit
 from errands.lib.logging import Log
 from errands.widgets.task.task import Task
@@ -51,13 +51,11 @@ class TaskList(Adw.Bin):
         Log.info(f"Task List {self.list_uid}: Load Tasks")
 
         tasks: list[TaskData] = [
-            t
-            for t in UserDataSQLite.get_tasks_as_dicts(self.list_uid)
-            if not t["deleted"] and t["parent"] == ""
+            t for t in UserData.get_tasks_as_dicts(self.list_uid, "") if not t.deleted
         ]
         for task in tasks:
-            new_task = Task(task["uid"], self, self)
-            if task["completed"]:
+            new_task = Task(task.uid, self, self)
+            if task.completed:
                 self.completed_tasks_list.append(new_task)
             else:
                 self.uncompleted_tasks_list.append(new_task)
@@ -98,33 +96,28 @@ class TaskList(Adw.Bin):
 
     # ------ PUBLIC METHODS ------ #
 
-    def add_task(self, uid: str) -> Task:
-        Log.info(f"Task List: Add task '{uid}'")
+    def add_task(self, task: TaskData) -> Task:
+        Log.info(f"Task List: Add task '{task.uid}'")
 
         on_top: bool = GSettings.get("task-list-new-task-position-top")
-        new_task = Task(uid, self, self)
-        task_list = (
-            self.completed_tasks_list
-            if new_task.get_prop("completed")
-            else self.completed_tasks_list
-        )
+        new_task = Task(task.uid, self, self)
         if on_top:
-            task_list.prepend(new_task)
+            self.uncompleted_tasks_list.prepend(new_task)
         else:
-            task_list.append(new_task)
+            self.uncompleted_tasks_list.append(new_task)
         new_task.update_ui()
 
         return new_task
 
-    @timeit
+    # @timeit
     def update_ui(self, update_tasks_ui: bool = True, sort: bool = True) -> None:
         Log.debug(f"Task list {self.list_uid}: Update UI")
 
         # Update tasks
         data_uids: list[str] = [
-            t["uid"]
-            for t in UserDataSQLite.get_tasks_as_dicts(self.list_uid)
-            if t["parent"] == "" and not t["deleted"]
+            t.uid
+            for t in UserData.get_tasks_as_dicts(self.list_uid, "")
+            if not t.deleted
         ]
         widgets_uids: list[str] = [t.uid for t in self.tasks]
 
@@ -143,7 +136,7 @@ class TaskList(Adw.Bin):
                     len(self.uncompleted_tasks) > 1
                     and task.uid != self.uncompleted_tasks[-1].uid
                 ):
-                    UserDataSQLite.move_task_after(
+                    UserData.move_task_after(
                         self.list_uid, task.uid, self.uncompleted_tasks[-1].uid
                     )
                 self.uncompleted_tasks_list.remove(task)
@@ -154,7 +147,7 @@ class TaskList(Adw.Bin):
                     len(self.uncompleted_tasks) > 0
                     and task.uid != self.uncompleted_tasks[-1].uid
                 ):
-                    UserDataSQLite.move_task_after(
+                    UserData.move_task_after(
                         self.list_uid, task.uid, self.uncompleted_tasks[-1].uid
                     )
                 self.completed_tasks_list.remove(task)
@@ -171,11 +164,11 @@ class TaskList(Adw.Bin):
         # Update status
         tasks: list[TaskData] = [
             t
-            for t in UserDataSQLite.get_tasks_as_dicts(self.list_uid)
-            if not t["trash"] and not t["deleted"]
+            for t in UserData.get_tasks_as_dicts(self.list_uid)
+            if not t.trash and not t.deleted
         ]
         n_total: int = len(tasks)
-        n_completed: int = len([t for t in tasks if t["completed"]])
+        n_completed: int = len([t for t in tasks if t.completed])
         self.title.set_subtitle(
             _("Completed:") + f" {n_completed} / {n_total}" if n_total > 0 else ""
         )
@@ -188,11 +181,7 @@ class TaskList(Adw.Bin):
 
         # Rename list
         self.title.set_title(
-            UserDataSQLite.run_sql(
-                f"""SELECT name FROM lists
-                WHERE uid = '{self.list_uid}'""",
-                fetch=True,
-            )[0][0]
+            [l.name for l in UserData.get_lists_as_dicts() if l.uid == self.list_uid][0]
         )
 
     # ------ TEMPLATE HANDLERS ------ #
@@ -252,16 +241,15 @@ class TaskList(Adw.Bin):
         text: str = entry.get_text()
         if text.strip(" \n\t") == "":
             return
-        on_top: bool = GSettings.get("task-list-new-task-position-top")
         self.add_task(
-            UserDataSQLite.add_task(
+            UserData.add_task(
                 list_uid=self.list_uid,
                 text=text,
-                insert_at_the_top=on_top,
             )
         )
+        # on_top: bool = GSettings.get("task-list-new-task-position-top")
         entry.set_text("")
-        if not on_top:
-            scroll(self.scrl, True)
-        self.update_ui(False, False)
-        Sync.sync(False)
+        # if not on_top:
+        #     scroll(self.scrl, True)
+        # self.update_ui(False, False)
+        # Sync.sync(False)

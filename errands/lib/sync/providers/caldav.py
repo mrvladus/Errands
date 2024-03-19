@@ -3,7 +3,7 @@ import urllib3
 from caldav import Calendar, DAVClient, Principal, Todo
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
-from errands.lib.data import UserDataSQLite
+from errands.lib.data import UserData
 from gi.repository import Adw, GLib  # type:ignore
 from caldav.elements import dav
 
@@ -178,7 +178,7 @@ class SyncProviderCalDAV:
             return
 
         remote_lists_uids = [c.id for c in self.calendars]
-        for list in UserDataSQLite.get_lists_as_dicts():
+        for list in UserData.get_lists_as_dicts():
             for cal in self.calendars:
                 # Rename list on remote
                 if (
@@ -189,7 +189,7 @@ class SyncProviderCalDAV:
                     Log.debug(f"Sync: Rename remote list '{list['uid']}'")
                     cal.set_properties([dav.DisplayName(list["name"])])
                     GLib.idle_add(
-                        UserDataSQLite.run_sql,
+                        UserData.run_sql,
                         f"UPDATE lists SET synced = 1 WHERE uid = '{cal.id}'",
                     )
                 # Rename local list
@@ -200,7 +200,7 @@ class SyncProviderCalDAV:
                 ):
                     Log.debug(f"Sync: Rename local list '{list['uid']}'")
                     GLib.idle_add(
-                        UserDataSQLite.run_sql,
+                        UserData.run_sql,
                         f"UPDATE lists SET name = '{cal.name}', synced = 1 WHERE uid = '{cal.id}'",
                     )
 
@@ -212,7 +212,7 @@ class SyncProviderCalDAV:
             ):
                 Log.debug(f"Sync: Delete local list deleted on remote '{list['uid']}'")
                 GLib.idle_add(
-                    UserDataSQLite.run_sql,
+                    UserData.run_sql,
                     f"""DELETE FROM lists WHERE uid = '{list["uid"]}'""",
                 )
 
@@ -225,7 +225,7 @@ class SyncProviderCalDAV:
                         Log.debug(f"Sync: Delete list on remote {cal.id}")
                         cal.delete()
                         GLib.idle_add(
-                            UserDataSQLite.run_sql,
+                            UserData.run_sql,
                             f"DELETE FROM lists WHERE uid = '{cal.id}'",
                         )
                         break
@@ -243,7 +243,7 @@ class SyncProviderCalDAV:
                     name=list["name"],
                 )
                 GLib.idle_add(
-                    UserDataSQLite.run_sql,
+                    UserData.run_sql,
                     f"""UPDATE lists SET synced = 1
                     WHERE uid = '{list['uid']}'""",
                 )
@@ -251,18 +251,18 @@ class SyncProviderCalDAV:
         if not self._update_calendars():
             return
 
-        user_lists_uids = [i["uid"] for i in UserDataSQLite.get_lists_as_dicts()]
+        user_lists_uids = [i["uid"] for i in UserData.get_lists_as_dicts()]
         remote_lists_uids = [c.id for c in self.calendars]
 
         for calendar in self.calendars:
             # Get tasks
-            local_tasks = UserDataSQLite.get_tasks_as_dicts(calendar.id)
+            local_tasks = UserData.get_tasks_as_dicts(calendar.id)
             local_ids = [t["uid"] for t in local_tasks]
             remote_tasks = self._get_tasks(calendar)
             remote_ids = [task["uid"] for task in remote_tasks]
             deleted_uids = [
                 i[0]
-                for i in UserDataSQLite.run_sql(
+                for i in UserData.run_sql(
                     "SELECT uid FROM tasks WHERE deleted = 1", fetch=True
                 )
             ]
@@ -270,9 +270,7 @@ class SyncProviderCalDAV:
             # Add new local lists
             if calendar.id not in user_lists_uids:
                 Log.debug(f"Sync: Copy list from remote {calendar.id}")
-                UserDataSQLite.add_list(
-                    name=calendar.name, uuid=calendar.id, synced=True
-                )
+                UserData.add_list(name=calendar.name, uuid=calendar.id, synced=True)
 
             for task in local_tasks:
                 # Update local task that was changed on remote
@@ -285,7 +283,7 @@ class SyncProviderCalDAV:
                                     key not in "deleted list_uid synced expanded trash"
                                     and task[key] != remote_task[key]
                                 ):
-                                    UserDataSQLite.update_props(
+                                    UserData.update_props(
                                         calendar.id,
                                         task["uid"],
                                         [key],
@@ -324,7 +322,7 @@ class SyncProviderCalDAV:
                         )
                         if task["completed"]:
                             new_todo.complete()
-                        UserDataSQLite.update_props(
+                        UserData.update_props(
                             calendar.id, task["uid"], ["synced"], [True]
                         )
                     except Exception as e:
@@ -363,7 +361,7 @@ class SyncProviderCalDAV:
                         todo.save()
                         if task["completed"]:
                             todo.complete()
-                        UserDataSQLite.update_props(
+                        UserData.update_props(
                             calendar.id, task["uid"], ["synced"], [True]
                         )
                     except Exception as e:
@@ -376,7 +374,7 @@ class SyncProviderCalDAV:
                     Log.debug(
                         f"Sync: Delete local task deleted on remote: {task['uid']}"
                     )
-                    UserDataSQLite.run_sql(
+                    UserData.run_sql(
                         f"""DELETE FROM tasks WHERE uid = '{task["uid"]}'"""
                     )
 
@@ -397,7 +395,7 @@ class SyncProviderCalDAV:
                     Log.debug(
                         f"Sync: Copy new task from remote to list '{calendar.id}': {task['uid']}"
                     )
-                    UserDataSQLite.add_task(
+                    UserData.add_task(
                         color=task["color"],
                         completed=task["completed"],
                         end_date=task["end_date"],

@@ -1,6 +1,11 @@
 scalable_dir = join_paths('hicolor', 'scalable', 'apps')
 install_data(
-  ('@0@.svg').format(app_id),
+  'io.github.mrvladus.List.svg',
+  install_dir: join_paths(get_option('datadir'), 'icons', scalable_dir)
+)
+
+install_data(
+  'io.github.mrvladus.List.Devel.svg',
   install_dir: join_paths(get_option('datadir'), 'icons', scalable_dir)
 )
 

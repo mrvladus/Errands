@@ -20,7 +20,7 @@ from gi.repository import Gtk  # type:ignore
 from gi.repository import GtkSource  # type:ignore
 from icalendar import Calendar, Event
 
-from errands.lib.data import TaskData, UserDataSQLite
+from errands.lib.data import TaskData, UserData
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.markup import Markup
@@ -106,7 +106,7 @@ class Task(Gtk.ListBoxRow):
 
                 task = [
                     i
-                    for i in UserDataSQLite.get_tasks_as_dicts(self.list_uid)
+                    for i in UserData.get_tasks_as_dicts(self.list_uid)
                     if i["uid"] == self.uid
                 ][0]
                 calendar = Calendar()
@@ -171,13 +171,13 @@ class Task(Gtk.ListBoxRow):
         self.notes_buffer.set_language(lm.get_language("markdown"))
 
         # Sub-tasks
-        tasks: list[TaskData] = [
-            t
-            for t in UserDataSQLite.get_tasks_as_dicts(self.list_uid, self.uid)
-            if not t["deleted"]
-        ]
-        for task in tasks:
-            self.task_list.append(Task(task["uid"], self.task_list, self))
+        # tasks: list[TaskData] = [
+        #     t
+        #     for t in UserData.get_tasks_as_dicts(self.list_uid, self.uid)
+        #     if not t.deleted
+        # ]
+        # for task in tasks:
+        #     self.sub_tasks.append(Task(task.uid, self.task_list, self))
 
     def __sort_tasks(self) -> None:
         def __sort_completed():
@@ -188,13 +188,14 @@ class Task(Gtk.ListBoxRow):
                 task = self.tasks[i]
                 if task.get_prop("completed"):
                     if i != last_idx:
-                        UserDataSQLite.move_task_before(
+                        UserData.move_task_before(
                             self.list_uid, task.uid, self.tasks[last_idx].uid
                         )
                         self.task_list.reorder_child_after(task, self.tasks[last_idx])
                     last_idx -= 1
                 i -= 1
 
+        return
         __sort_completed()
 
     # ------ PROPERTIES ------ #
@@ -250,21 +251,18 @@ class Task(Gtk.ListBoxRow):
             self.title_row.remove_css_class("task-completed")
 
     def get_prop(self, prop: str) -> Any:
-        res: Any = UserDataSQLite.get_prop(self.list_uid, self.uid, prop)
-        if prop in "deleted completed expanded trash toolbar_shown":
-            res = bool(res)
-        return res
+        return UserData.get_prop(self.list_uid, self.uid, prop)
 
     def get_status(self) -> tuple[int, int]:
         """Get total tasks and completed tasks tuple"""
 
         tasks: list[TaskData] = [
             t
-            for t in UserDataSQLite.get_tasks_as_dicts(self.task_list.list_uid)
-            if t["parent"] == self.uid and not t["deleted"] and not t["trash"]
+            for t in UserData.get_tasks_as_dicts(self.list_uid, self.uid)
+            if not t.deleted and not t.trash
         ]
         n_total: int = len(tasks)
-        n_completed: int = len([t for t in tasks if t["completed"]])
+        n_completed: int = len([t for t in tasks if t.completed])
 
         return n_total, n_completed
 
@@ -307,16 +305,17 @@ class Task(Gtk.ListBoxRow):
         GLib.idle_add(self.revealer.set_reveal_child, on)
 
     def update_props(self, props: list[str], values: list[Any]) -> None:
-        UserDataSQLite.update_props(self.list_uid, self.uid, props, values)
+        UserData.update_props(self.list_uid, self.uid, props, values)
 
     def update_ui(self, update_sub_tasks_ui: bool = True) -> None:
+        Log.debug(f"Task '{self.uid}: Update UI'")
         # Purge
         if self.purged:
             self.purge()
             return
 
         # Change visibility
-        completed = self.complete_btn.get_active()
+        completed = self.get_prop("completed")
         hide_completed = self.task_list.toggle_completed_btn.get_active()
         if not self.get_prop("trash"):
             if completed and hide_completed:
@@ -330,12 +329,12 @@ class Task(Gtk.ListBoxRow):
         self.expand(self.get_prop("expanded"))
 
         # Update color
-        for c in self.main_box.get_css_classes():
-            if "task-" in c:
-                self.main_box.remove_css_class(c)
-                break
-        if color := self.get_prop("color"):
-            self.main_box.add_css_class(f"task-{color}")
+        # for c in self.main_box.get_css_classes():
+        #     if "task-" in c:
+        #         self.main_box.remove_css_class(c)
+        #         break
+        # if color := self.get_prop("color"):
+        #     self.main_box.add_css_class(f"task-{color}")
 
         # Update progress bar complete
         if GSettings.get("task-show-progressbar"):
@@ -389,16 +388,16 @@ class Task(Gtk.ListBoxRow):
 
         data_tasks: list[TaskData] = [
             t
-            for t in UserDataSQLite.get_tasks_as_dicts(self.list_uid, self.uid)
-            if not t["deleted"]
+            for t in UserData.get_tasks_as_dicts(self.list_uid, self.uid)
+            if not t.deleted
         ]
-        data_uids: list[str] = [t["uid"] for t in data_tasks]
+        data_uids: list[str] = [t.uid for t in data_tasks]
         widgets_uids: list[str] = [t.uid for t in self.tasks]
 
         # Add sub-tasks
         for task in data_tasks:
-            if task["uid"] not in widgets_uids:
-                self.add_task(task["uid"])
+            if task.uid not in widgets_uids:
+                self.add_task(task.uid)
 
         # Remove sub-tasks
         for task in self.tasks:
@@ -410,8 +409,8 @@ class Task(Gtk.ListBoxRow):
             for task in self.tasks:
                 task.update_ui()
 
-        # Sort sub-tasks
-        self.__sort_tasks()
+        # # Sort sub-tasks
+        # self.__sort_tasks()
 
     # ------ TEMPLATE HANDLERS ------ #
 
@@ -429,7 +428,7 @@ class Task(Gtk.ListBoxRow):
 
         # Add sub-task
         self.add_task(
-            UserDataSQLite.add_task(
+            UserData.add_task(
                 list_uid=self.list_uid,
                 text=text,
                 parent=self.uid,
@@ -447,7 +446,7 @@ class Task(Gtk.ListBoxRow):
         self.update_ui(False)
 
         # Sync
-        Sync.sync(False)
+        # Sync.sync(False)
 
     @Gtk.Template.Callback()
     def _on_complete_btn_toggle(self, btn: Gtk.CheckButton) -> None:
@@ -479,7 +478,7 @@ class Task(Gtk.ListBoxRow):
                     task.just_added = False
 
         self.task_list.update_ui(False)
-        Sync.sync(False)
+        # Sync.sync(False)
 
     @Gtk.Template.Callback()
     def _on_toolbar_btn_toggle(self, btn: Gtk.ToggleButton) -> None:
@@ -493,7 +492,7 @@ class Task(Gtk.ListBoxRow):
             return
         self.update_props(["text", "synced"], [text, False])
         self.update_ui()
-        Sync.sync(False)
+        # Sync.sync(False)
 
     @Gtk.Template.Callback()
     def _on_cancel_edit_btn_clicked(self, _btn: Gtk.Button) -> None:
@@ -513,7 +512,7 @@ class Task(Gtk.ListBoxRow):
             Log.info("Task: Change notes")
             self.update_props(["notes", "synced"], [text, False])
             self.update_ui()
-            Sync.sync(False)
+            # Sync.sync(False)
 
     @Gtk.Template.Callback()
     def _on_priority_toggled(self, btn: Gtk.MenuButton, *_):
@@ -538,7 +537,7 @@ class Task(Gtk.ListBoxRow):
     #             button.set_active(False)
     #     self.update_props(["priority", "synced"], [priority, False])
     #     self.update_ui()
-    #     Sync.sync(False)
+    #     # Sync.sync(False)
 
     @Gtk.Template.Callback()
     def _on_accent_color_toggled(self, _, btn: Gtk.MenuButton):
@@ -563,7 +562,7 @@ class Task(Gtk.ListBoxRow):
             ["color", "synced"], [color if color != "none" else "", False]
         )
         self.update_ui()
-        Sync.sync(False)
+        # Sync.sync(False)
 
     # --- DND --- #
 
@@ -602,7 +601,7 @@ class Task(Gtk.ListBoxRow):
 
         # Change list
         if task.list_uid != self.list_uid:
-            UserDataSQLite.move_task_to_list(
+            UserData.move_task_to_list(
                 task.uid,
                 task.list_uid,
                 self.list_uid,
@@ -633,7 +632,7 @@ class Task(Gtk.ListBoxRow):
             task.task_list.update_ui()
 
         # Sync
-        Sync.sync(False)
+        # Sync.sync(False)
 
     @Gtk.Template.Callback()
     def _on_top_area_drop(self, _drop, task: Task, _x, _y) -> None:
@@ -642,14 +641,14 @@ class Task(Gtk.ListBoxRow):
         """
 
         if task.list_uid != self.list_uid:
-            UserDataSQLite.move_task_to_list(
+            UserData.move_task_to_list(
                 task.uid,
                 task.list_uid,
                 self.list_uid,
                 self.parent.uid if isinstance(self.parent, Task) else "",
                 False,
             )
-        UserDataSQLite.move_task_before(self.list_uid, task.uid, self.uid)
+        UserData.move_task_before(self.list_uid, task.uid, self.uid)
 
         # If task has the same parent
         if task.parent == self.parent:
@@ -661,7 +660,7 @@ class Task(Gtk.ListBoxRow):
             self.parent.task_list_model.remove(task.get_index())
         # Change parent if different parents
         else:
-            UserDataSQLite.update_props(
+            UserData.update_props(
                 self.list_uid,
                 task.uid,
                 ["parent", "synced"],
@@ -694,4 +693,4 @@ class Task(Gtk.ListBoxRow):
         self.task_list.update_ui()
 
         # Sync
-        Sync.sync(False)
+        # Sync.sync(False)

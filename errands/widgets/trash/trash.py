@@ -11,7 +11,7 @@ from errands.widgets.trash.trash_item import TrashItem
 if TYPE_CHECKING:
     from errands.widgets.window import Window
 
-from errands.lib.data import TaskData, TaskListData, UserDataSQLite
+from errands.lib.data import TaskData, TaskListData, UserData
 from errands.lib.utils import get_children
 from errands.widgets.component import ConfirmDialog
 from gi.repository import Adw, Gtk, GObject, Gio  # type:ignore
@@ -41,32 +41,30 @@ class Trash(Adw.Bin):
 
     def update_ui(self):
         tasks_dicts: list[TaskData] = [
-            t
-            for t in UserDataSQLite.get_tasks_as_dicts()
-            if t["trash"] and not t["deleted"]
+            t for t in UserData.get_tasks_as_dicts() if t.trash and not t.deleted
         ]
-        tasks_uids: list[str] = [t["uid"] for t in tasks_dicts]
-        lists_dicts: list[TaskListData] = UserDataSQLite.get_lists_as_dicts()
+        tasks_uids: list[str] = [t.uid for t in tasks_dicts]
+        lists_dicts: list[TaskListData] = UserData.get_lists_as_dicts()
 
         # Add items
-        items_uids = [t.task_dict["uid"] for t in self.trash_items]
+        items_uids = [t.task_dict.uid for t in self.trash_items]
         for t in tasks_dicts:
-            if t["uid"] not in items_uids:
+            if t.uid not in items_uids:
                 self.add_trash_item(t)
 
         for item in self.trash_items:
             # Remove items
-            if item.task_dict["uid"] not in tasks_uids:
+            if item.task_dict.uid not in tasks_uids:
                 self.trash_list.remove(item)
                 continue
 
             # Update title and subtitle
-            task_dict = [t for t in tasks_dicts if t["uid"] == item.task_dict["uid"]][0]
-            list_dict = [l for l in lists_dicts if l["uid"] == task_dict["list_uid"]][0]
-            if item.get_title() != task_dict["text"]:
-                item.set_title(task_dict["text"])
-            if item.get_subtitle() != list_dict["name"]:
-                item.set_subtitle(list_dict["name"])
+            task_dict = [t for t in tasks_dicts if t.uid == item.task_dict.uid][0]
+            list_dict = [l for l in lists_dicts if l.uid == task_dict.list_uid][0]
+            if item.get_title() != task_dict.text:
+                item.set_title(task_dict.text)
+            if item.get_subtitle() != list_dict.name:
+                item.set_subtitle(list_dict.name)
 
         # Show status
         self.status_page.set_visible(len(self.trash_items) == 0)
@@ -80,14 +78,14 @@ class Trash(Adw.Bin):
 
             Log.info("Trash: Clear")
 
-            UserDataSQLite.run_sql(
-                f"""UPDATE tasks
-                SET deleted = 1
-                WHERE trash = 1""",
-            )
+            # UserData.run_sql(
+            #     f"""UPDATE tasks
+            #     SET deleted = 1
+            #     WHERE trash = 1""",
+            # )
             self.window.sidebar.trash_row.update_ui()
             # Sync
-            Sync.sync()
+            # Sync.sync()
 
         Log.debug("Trash: Show confirm dialog")
 
@@ -107,13 +105,9 @@ class Trash(Adw.Bin):
         Log.info("Trash: Restore")
 
         trash_dicts: list[TaskData] = [
-            t
-            for t in UserDataSQLite.get_tasks_as_dicts()
-            if t["trash"] and not t["deleted"]
+            t for t in UserData.get_tasks_as_dicts() if t.trash and not t.deleted
         ]
         for task in trash_dicts:
-            UserDataSQLite.update_props(
-                task["list_uid"], task["uid"], ["trash"], [False]
-            )
+            UserData.update_props(task.list_uid, task.uid, ["trash"], [False])
 
         self.window.sidebar.update_ui()

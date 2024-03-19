@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 import time
 from datetime import datetime
 from icalendar import Calendar, Todo
-from errands.lib.data import TaskListData, UserDataSQLite
+from errands.lib.data import TaskListData, UserData
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
@@ -35,14 +35,15 @@ class TaskListRow(Gtk.ListBoxRow):
         self.window: Window = Adw.Application.get_default().get_active_window()
         self.sidebar: Sidebar = sidebar
         self.list_box: Gtk.ListBox = sidebar.list_box
-        self.uid: str = list_dict["uid"]
-        self.name: str = list_dict["name"]
+        self.uid: str = list_dict.uid
+        self.name: str = list_dict.name
         self.__add_actions()
         # Add Task List page
         self.task_list: TaskList = TaskList(self.uid, self)
         self.stack_page: Adw.ViewStackPage = self.window.stack.add_titled(
             child=self.task_list, name=self.name, title=self.name
         )
+        self.update_ui()
 
     def __add_actions(self) -> None:
         group: Gio.SimpleActionGroup = Gio.SimpleActionGroup()
@@ -60,12 +61,12 @@ class TaskListRow(Gtk.ListBoxRow):
                     return
 
                 Log.info(f"Lists: Delete list '{self.uid}'")
-                UserDataSQLite.run_sql(
+                UserData.run_sql(
                     f"UPDATE lists SET deleted = 1 WHERE uid = '{self.uid}'",
                     f"DELETE FROM tasks WHERE list_uid = '{self.uid}'",
                 )
                 self.sidebar.update_ui()
-                Sync.sync()
+                # Sync.sync()
 
             ConfirmDialog(
                 _("List will be permanently deleted"),
@@ -82,7 +83,7 @@ class TaskListRow(Gtk.ListBoxRow):
 
             def _entry_changed(entry: Gtk.Entry, _, dialog: Adw.MessageDialog):
                 text = entry.props.text.strip(" \n\t")
-                names = [i["name"] for i in UserDataSQLite.get_lists_as_dicts()]
+                names = [i["name"] for i in UserData.get_lists_as_dicts()]
                 dialog.set_response_enabled("save", text and text not in names)
 
             def _confirm(_, res, entry: Gtk.Entry):
@@ -92,7 +93,7 @@ class TaskListRow(Gtk.ListBoxRow):
                 Log.info(f"ListItem: Rename list {self.uid}")
 
                 text: str = entry.props.text.rstrip().lstrip()
-                UserDataSQLite.run_sql(
+                UserData.run_sql(
                     (
                         "UPDATE lists SET name = ?, synced = 0 WHERE uid = ?",
                         (text, self.uid),
@@ -101,7 +102,7 @@ class TaskListRow(Gtk.ListBoxRow):
                 self.update_ui()
                 self.sidebar.trash_row.update_ui()
                 self.sidebar.today_row.update_ui()
-                Sync.sync()
+                # Sync.sync()
 
             entry: Gtk.Entry = Gtk.Entry(placeholder_text=_("New Name"))
             entry.get_buffer().props.text = self.label.get_label()
@@ -132,7 +133,7 @@ class TaskListRow(Gtk.ListBoxRow):
 
                 Log.info(f"List: Export '{self.uid}'")
 
-                tasks: list[dict] = UserDataSQLite.get_tasks_as_dicts(self.uid)
+                tasks: list[dict] = UserData.get_tasks_as_dicts(self.uid)
                 calendar: Calendar = Calendar()
                 calendar.add("x-wr-calname", self.label.get_label())
                 for task in tasks:
@@ -192,9 +193,7 @@ class TaskListRow(Gtk.ListBoxRow):
 
         # Update title
         self.name = [
-            i["name"]
-            for i in UserDataSQLite.get_lists_as_dicts()
-            if i["uid"] == self.uid
+            i.name for i in UserData.get_lists_as_dicts() if i.uid == self.uid
         ][0]
         self.label.set_label(self.name)
         self.stack_page.set_name(self.name)
@@ -234,11 +233,11 @@ class TaskListRow(Gtk.ListBoxRow):
             return
 
         Log.info(f"Lists: Move '{task.uid}' to '{self.uid}' list")
-        UserDataSQLite.move_task_to_list(task.uid, task.list_uid, self.uid, "", False)
+        UserData.move_task_to_list(task.uid, task.list_uid, self.uid, "", False)
         # uid: str = task.uid
         # task.purge()
         # self.task_list.add_task(uid)
-        Sync.sync()
+        # Sync.sync()
 
     @Gtk.Template.Callback()
     def _on_row_activated(self, *args) -> None:

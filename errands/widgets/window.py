@@ -6,7 +6,7 @@ from __main__ import VERSION, APP_ID
 import os
 from uuid import uuid4
 from icalendar import Calendar
-from errands.lib.data import UserDataSQLite
+from errands.lib.data import UserData
 from gi.repository import Gio, Adw, Gtk, GObject  # type:ignore
 
 from errands.widgets.preferences import PreferencesWindow
@@ -41,7 +41,7 @@ class Window(Adw.ApplicationWindow):
         self.split_view.set_sidebar(Adw.NavigationPage.new(self.sidebar, _("Sidebar")))
         # Setup sync
         Sync.window = self
-        Sync.sync()
+        # Sync.sync()
 
     def add_toast(self, text: str) -> None:
         self.toast_overlay.add_toast(Adw.Toast.new(title=text))
@@ -79,7 +79,7 @@ class Window(Adw.ApplicationWindow):
             self.about_window.present()
 
         def _sync(*args):
-            Sync.sync()
+            # Sync.sync()
             if GSettings.get("sync-provider") == 0:
                 self.add_toast(_("Sync is disabled"))
 
@@ -98,13 +98,11 @@ class Window(Adw.ApplicationWindow):
                     )
                     if name in [
                         i[0]
-                        for i in UserDataSQLite.run_sql(
-                            "SELECT name FROM lists", fetch=True
-                        )
+                        for i in UserData.run_sql("SELECT name FROM lists", fetch=True)
                     ]:
                         name = f"{name}_{uuid4()}"
                     # Create list
-                    uid: str = UserDataSQLite.add_list(name)
+                    uid: str = UserData.add_list(name)
                     # Add tasks
                     for todo in calendar.walk("VTODO"):
                         # Tags
@@ -137,7 +135,7 @@ class Window(Adw.ApplicationWindow):
                             )
                         else:
                             end = ""
-                        UserDataSQLite.add_task(
+                        UserData.add_task(
                             color=todo.get("X-ERRANDS-COLOR", ""),
                             completed=str(todo.get("STATUS", "")) == "COMPLETED",
                             end_date=end,
@@ -153,7 +151,7 @@ class Window(Adw.ApplicationWindow):
                         )
                 self.sidebar.task_lists.update_ui()
                 self.add_toast(_("Imported"))
-                Sync.sync()
+                # Sync.sync()
 
             filter = Gtk.FileFilter()
             filter.add_pattern("*.ics")
