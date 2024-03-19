@@ -82,7 +82,7 @@ class UserDataJSON:
 
     # ------ PUBLIC METHODS ------ #
 
-    def init(self):
+    def init(self) -> None:
         if not os.path.exists(self.__data_dir):
             os.mkdir(self.__data_dir)
         if not os.path.exists(self.__data_file_path):
@@ -117,7 +117,7 @@ class UserDataJSON:
 
         return new_task
 
-    def clean_deleted(self):
+    def clean_deleted(self) -> None:
         pass
 
     def get_lists_as_dicts(self) -> list[TaskListData]:
@@ -144,6 +144,61 @@ class UserDataJSON:
                 t for t in self.tasks if t.list_uid == list_uid and t.parent == parent
             ]
 
+    def move_task_after(
+        self, list_uid: str, task_uid: str, task_after_uid: str
+    ) -> None:
+        tasks: list[TaskData] = self.tasks
+
+        # Get indexes
+        for task in tasks:
+            if task.list_uid == list_uid:
+                if task.uid == task_uid:
+                    task_idx: int = tasks.index(task)
+                elif task.uid == task_after_uid:
+                    task_after_idx: int = tasks.index(task)
+
+        # Swap items
+        if task_idx < task_after_idx:
+            i = task_idx
+            while i < task_after_idx:
+                tasks[i], tasks[i + 1] = tasks[i + 1], tasks[i]
+                i += 1
+        else:
+            i = task_idx
+            while task_after_idx + 1 > i:
+                tasks[i], tasks[i - 1] = tasks[i - 1], tasks[i]
+                i -= 1
+
+        # Save tasks
+        self.tasks = tasks
+
+    def move_task_before(
+        self, list_uid: str, task_uid: str, task_before_uid: str
+    ) -> None:
+        tasks: list[TaskData] = self.tasks
+        # Get indexes
+        for task in tasks:
+            if task.list_uid == list_uid:
+                if task.uid == task_uid:
+                    task_idx: int = tasks.index(task)
+                elif task.uid == task_before_uid:
+                    task_before_idx: int = tasks.index(task)
+
+        # Swap items
+        if task_idx < task_before_idx:
+            i = task_idx
+            while i < task_before_idx - 1:
+                tasks[i], tasks[i + 1] = tasks[i + 1], tasks[i]
+                i += 1
+        else:
+            i = task_idx
+            while task_before_idx > i:
+                tasks[i], tasks[i - 1] = tasks[i - 1], tasks[i]
+                i -= 1
+
+        # Save tasks
+        self.tasks = tasks
+
     def update_props(
         self, list_uid: str, uid: str, props: Iterable[str], values: Iterable[Any]
     ):
@@ -157,27 +212,27 @@ class UserDataJSON:
 
     # ------ PRIVATE METHODS ------ #
 
-    def __read_data(self):
+    def __read_data(self) -> None:
         try:
             with open(self.__data_file_path, "r") as f:
                 data: dict[str, Any] = json.load(f)
                 self.task_lists = [TaskListData(**l) for l in data["lists"]]
                 self.tasks = [TaskData(**t) for t in data["tasks"]]
         except Exception as e:
-            Log.error(f"Data: Can't read data file from disk. {e}")
-            Log.info("Data: Create new data file")
+            Log.error(
+                f"Data: Can't read data file from disk. {e}. Creating new data file"
+            )
             self.__write_data()
 
     def __write_data(self) -> None:
-        # try:
-        with open(self.__data_file_path, "w") as f:
-            lists: list[dict] = [asdict(l) for l in self.task_lists]
-            tasks: list[dict] = [asdict(t) for t in self.tasks]
-            data: dict = {"lists": lists, "tasks": tasks}
-            json.dump(data, f, ensure_ascii=False)
-
-    # except Exception as e:
-    #     Log.error(f"Data: Can't write to disk. {e}")
+        try:
+            with open(self.__data_file_path, "w") as f:
+                lists: list[dict] = [asdict(l) for l in self.task_lists]
+                tasks: list[dict] = [asdict(t) for t in self.tasks]
+                data: dict = {"lists": lists, "tasks": tasks}
+                json.dump(data, f, ensure_ascii=False)
+        except Exception as e:
+            Log.error(f"Data: Can't write to disk. {e}.")
 
 
 # TODO
@@ -593,5 +648,5 @@ class UserDataSQLite:
             )
 
 
-# Handle for UserData. For easily changing serializing data methods.
+# Handle for UserData. For easily changing serialization methods.
 UserData = UserDataJSON()
