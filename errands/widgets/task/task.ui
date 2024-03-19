@@ -30,9 +30,7 @@
     </section>
   </menu>
 
-  <template class="Task" parent="GtkListBoxRow">
-    <property name="selectable">false</property>
-    <property name="activatable">false</property>
+  <template class="Task" parent="AdwBin">
     <child>
       <object id="revealer" class="GtkRevealer">
         <child>
@@ -52,7 +50,6 @@
                   <object class="GtkImage">
                     <property name="icon-name">list-add-symbolic</property>
                     <style>
-                      <!-- <class name="dim-label" /> -->
                       <class name="task-drop-area" />
                     </style>
 
@@ -596,9 +593,6 @@
                             <property name="orientation">vertical</property>
                             <property name="margin-start">7</property>
                             <property name="margin-end">7</property>
-                            <!-- <style>
-                              <class name="transparent" />
-                            </style> -->
                           </object>
                         </child>
 

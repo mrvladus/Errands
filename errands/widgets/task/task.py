@@ -29,7 +29,7 @@ from errands.lib.utils import get_children, timeit
 
 
 @Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
-class Task(Gtk.ListBoxRow):
+class Task(Adw.Bin):
     __gtype_name__ = "Task"
 
     GObject.type_register(GtkSource.View)
@@ -306,15 +306,7 @@ class Task(Gtk.ListBoxRow):
             return
 
         # Change visibility
-        completed = self.get_prop("completed")
-        hide_completed = self.task_list.toggle_completed_btn.get_active()
-        if not self.get_prop("trash"):
-            if completed and hide_completed:
-                self.toggle_visibility(False)
-            else:
-                self.toggle_visibility(True)
-        else:
-            self.toggle_visibility(False)
+        self.toggle_visibility(not self.get_prop("trash"))
 
         # Expand
         self.expand(self.get_prop("expanded"))

@@ -190,16 +190,6 @@ class TaskList(Adw.Bin):
         self.window.sidebar.update_ui()
 
     @Gtk.Template.Callback()
-    def _on_toggle_completed_btn_toggled(self, btn: Gtk.ToggleButton) -> None:
-        """Switch visibility of completed tasks"""
-
-        Log.info(
-            f"Task List: Toggle completed tasks '{'off' if btn.get_active() else 'on'}'"
-        )
-        for task in self.all_tasks:
-            task.update_ui()
-
-    @Gtk.Template.Callback()
     def _on_dnd_scroll(self, _motion, _x, y: float) -> bool:
         """Autoscroll while dragging task"""
         return

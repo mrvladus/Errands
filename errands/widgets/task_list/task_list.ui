@@ -30,7 +30,7 @@
                 <property name="icon-name">errands-check-toggle-symbolic</property>
                 <property name="valign">center</property>
                 <property name="tooltip-text" translatable="yes">Toggle Completed Tasks</property>
-                <signal name="toggled" handler="_on_toggle_completed_btn_toggled" />
+                <!-- <signal name="toggled" handler="_on_toggle_completed_btn_toggled" /> -->
               </object>
             </child>
 
@@ -114,15 +114,6 @@
                         <child>
                           <object id="uncompleted_tasks_list" class="GtkBox">
                             <property name="orientation">vertical</property>
-                            <!-- <style>
-                              <class name="transparent" />
-                              <class name="task-list" />
-                            </style> -->
-                          </object>
-                        </child>
-
-                        <child>
-                          <object class="GtkSeparator">
                           </object>
                         </child>
 
@@ -130,10 +121,7 @@
                         <child>
                           <object id="completed_tasks_list" class="GtkBox">
                             <property name="orientation">vertical</property>
-                            <!-- <style>
-                              <class name="transparent" />
-                              <class name="task-list" />
-                            </style> -->
+
                           </object>
                         </child>
 
