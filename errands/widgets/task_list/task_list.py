@@ -109,7 +109,6 @@ class TaskList(Adw.Bin):
 
         return new_task
 
-    # @timeit
     def update_ui(self, update_tasks_ui: bool = True, sort: bool = True) -> None:
         Log.debug(f"Task list {self.list_uid}: Update UI")
 
@@ -162,13 +161,7 @@ class TaskList(Adw.Bin):
         self.__sort_tasks()
 
         # Update status
-        tasks: list[TaskData] = [
-            t
-            for t in UserData.get_tasks_as_dicts(self.list_uid)
-            if not t.trash and not t.deleted
-        ]
-        n_total: int = len(tasks)
-        n_completed: int = len([t for t in tasks if t.completed])
+        n_total, n_completed = UserData.get_status(self.list_uid)
         self.title.set_subtitle(
             _("Completed:") + f" {n_completed} / {n_total}" if n_total > 0 else ""
         )

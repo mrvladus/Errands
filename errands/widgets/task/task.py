@@ -255,16 +255,7 @@ class Task(Gtk.ListBoxRow):
 
     def get_status(self) -> tuple[int, int]:
         """Get total tasks and completed tasks tuple"""
-
-        tasks: list[TaskData] = [
-            t
-            for t in UserData.get_tasks_as_dicts(self.list_uid, self.uid)
-            if not t.deleted and not t.trash
-        ]
-        n_total: int = len(tasks)
-        n_completed: int = len([t for t in tasks if t.completed])
-
-        return n_total, n_completed
+        return UserData.get_status(self.list_uid, self.uid)
 
     def delete(self, *_) -> None:
         """Move task to trash"""

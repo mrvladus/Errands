@@ -43,7 +43,7 @@ class TaskListRow(Gtk.ListBoxRow):
         self.stack_page: Adw.ViewStackPage = self.window.stack.add_titled(
             child=self.task_list, name=self.name, title=self.name
         )
-        self.update_ui()
+        self.update_ui(False)
 
     def __add_actions(self) -> None:
         group: Gio.SimpleActionGroup = Gio.SimpleActionGroup()
@@ -61,12 +61,10 @@ class TaskListRow(Gtk.ListBoxRow):
                     return
 
                 Log.info(f"Lists: Delete list '{self.uid}'")
-                UserData.run_sql(
-                    f"UPDATE lists SET deleted = 1 WHERE uid = '{self.uid}'",
-                    f"DELETE FROM tasks WHERE list_uid = '{self.uid}'",
-                )
-                self.sidebar.update_ui()
-                # Sync.sync()
+                UserData.delete_list(self.uid)
+                # self.sidebar.list_box.remove(self)
+                # self.window.stack.remove(self.task_list)
+                Sync.sync()
 
             ConfirmDialog(
                 _("List will be permanently deleted"),
@@ -188,7 +186,7 @@ class TaskListRow(Gtk.ListBoxRow):
         _create_action("rename", _rename)
         _create_action("export", _export)
 
-    def update_ui(self):
+    def update_ui(self, update_task_list_ui: bool = True):
         Log.debug(f"Sidebar: List Item: Update UI '{self.uid}'")
 
         # Update title
@@ -199,8 +197,9 @@ class TaskListRow(Gtk.ListBoxRow):
         self.stack_page.set_name(self.name)
         self.stack_page.set_title(self.name)
 
-        # Update list
-        self.task_list.update_ui()
+        # Update task list
+        if update_task_list_ui:
+            self.task_list.update_ui()
 
     @Gtk.Template.Callback()
     def _on_drop_hover(self, ctrl: Gtk.DropControllerMotion, _x, _y):
