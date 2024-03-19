@@ -39,7 +39,7 @@
                     <!-- Status page -->
                     <child>
                       <object class="AdwViewStackPage">
-                        <property name="title" translatable="yes">No Task Lists</property>
+                        <property name="title" translatable="yes">Create new List</property>
                         <property name="name">status</property>
                         <property name="child">
                           <object class="AdwToolbarView">
@@ -59,6 +59,7 @@
                                 <child>
                                   <object class="AdwStatusPage">
                                     <property name="title" translatable="yes">No Task Lists</property>
+                                    <property name="description" translatable="yes">Create new or import existing one</property>
                                     <property name="icon-name">io.github.mrvladus.List</property>
                                   </object>
                                 </child>
