@@ -117,14 +117,46 @@ class Sidebar(Adw.Bin):
                 else ...
             )
         )
-        self.update_ui()
 
-    def add_task_list(self, list_dict: TaskListData) -> TaskListRow:
+        self.__load_lists()
+        self.__select_last_opened_item()
+
+    # ------ PRIVATE METHODS ------ #
+
+    def __add_task_list(self, list_dict: TaskListData) -> TaskListRow:
         Log.debug(f"Sidebar: Add Task List '{list_dict.uid}'")
         row: TaskListRow = TaskListRow(list_dict, self)
         self.list_box.append(row)
         self.status_page.set_visible(False)
         return row
+
+    def __load_lists(self) -> None:
+        for list in (l for l in UserData.get_lists_as_dicts() if not l.deleted):
+            self.__add_task_list(list)
+
+    def __remove_task_list(self, l: TaskListRow) -> None:
+        Log.debug(f"Sidebar: Delete list {l.uid}")
+        self.list_box.select_row(l.get_prev_sibling())
+        self.window.stack.remove(l.task_list)
+        self.list_box.remove(l)
+
+    def __select_last_opened_item(self) -> None:
+        for row in self.rows:
+            if hasattr(row, "name") and row.name == GSettings.get("last-open-list"):
+                Log.debug("Sidebar: Select last opened item")
+                if not row.get_realized():
+                    row.connect("realize", lambda *_: self.list_box.select_row(row))
+                else:
+                    self.list_box.select_row(row)
+                break
+
+    def __show_status(self) -> None:
+        length: int = len(self.task_lists_rows)
+        self.status_page.set_visible(length == 0)
+        if length == 0:
+            self.window.stack.set_visible_child_name("status")
+
+    # ------ PROPERTIES ------ #
 
     @property
     def rows(self) -> list[Gtk.ListBoxRow]:
@@ -144,6 +176,8 @@ class Sidebar(Adw.Bin):
     def task_lists(self) -> list[TaskList]:
         return [l.task_list for l in self.task_lists_rows]
 
+    # ------ PUBLIC METHODS ------ #
+
     def update_ui(self) -> None:
         Log.debug("Sidebar: Update UI")
 
@@ -153,37 +187,22 @@ class Sidebar(Adw.Bin):
         uids: list[str] = [l.uid for l in lists]
         for l in self.task_lists_rows:
             if l.uid not in uids:
-                Log.debug(f"Sidebar: Delete list {l.uid}")
-                self.list_box.select_row(l.get_prev_sibling())
-                self.window.stack.remove(l.task_list)
-                self.list_box.remove(l)
+                self.__remove_task_list(l)
 
         # Add lists
         lists_uids = [l.uid for l in self.task_lists_rows]
         for l in lists:
             if l.uid not in lists_uids:
-                self.add_task_list(l)
+                self.__add_task_list(l)
 
         # Update rows
         for row in self.rows:
             if hasattr(row, "update_ui"):
                 row.update_ui()
 
-        # Select last opened list
-        for row in self.rows:
-            if hasattr(row, "name") and row.name == GSettings.get("last-open-list"):
-                Log.debug("Sidebar: Select last opened item")
-                if not row.get_realized():
-                    row.connect("realize", lambda *_: self.list_box.select_row(row))
-                else:
-                    self.list_box.select_row(row)
-                break
+        self.__show_status()
 
-        # Show status
-        length: int = len(self.task_lists_rows)
-        self.status_page.set_visible(length == 0)
-        if length == 0:
-            self.window.stack.set_visible_child_name("status")
+    # ------ TEMPLATE HANDLERS ------ #
 
     @Gtk.Template.Callback()
     def _on_add_btn_clicked(self, _btn) -> None:
