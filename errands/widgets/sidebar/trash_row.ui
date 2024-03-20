@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
 
-  <!-- Menu -->
   <menu id="menu">
     <section>
       <item>
-        <attribute name="label" translatable="yes">Restore</attribute>
-        <attribute name="action">trash_item.restore"</attribute>
+        <attribute name="label" translatable="yes">Clear</attribute>
+        <attribute name="action">trash_row.clear</attribute>
       </item>
       <item>
-        <attribute name="label" translatable="yes">Clear</attribute>
-        <attribute name="action">trash_item.clear"</attribute>
+        <attribute name="label" translatable="yes">Restore</attribute>
+        <attribute name="action">trash_row.restore</attribute>
       </item>
     </section>
   </menu>
@@ -22,9 +21,9 @@
       <class name="sidebar-item" />
       <class name="sidebar-item-trash" />
     </style>
-    <accessibility>
+    <!-- <accessibility>
       <property name="label" translatable="yes">Trash</property>
-    </accessibility>
+    </accessibility> -->
 
     <child>
       <object class="GtkBox">
@@ -55,7 +54,7 @@
         </child>
 
         <child>
-          <object class="GtkMenuButton">
+          <object id="menu_btn" class="GtkMenuButton">
             <property name="menu-model">menu</property>
             <property name="icon-name">view-more-symbolic</property>
             <property name="valign">center</property>

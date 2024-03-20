@@ -2,9 +2,10 @@
 # SPDX-License-Identifier: MIT
 
 from __future__ import annotations
-from typing import TYPE_CHECKING
-from errands.lib.gsettings import GSettings
 
+from typing import TYPE_CHECKING
+
+from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.widgets.task.task import Task
 from errands.widgets.trash.trash import Trash
@@ -13,7 +14,8 @@ if TYPE_CHECKING:
     from errands.widgets.window import Window
 
 import os
-from gi.repository import Adw, Gtk, Gio, GObject, Gdk, GLib  # type:ignore
+
+from gi.repository import Adw, Gio, Gtk  # type:ignore
 
 
 @Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
@@ -22,6 +24,7 @@ class TrashRow(Gtk.ListBoxRow):
 
     size_counter: Gtk.Label = Gtk.Template.Child()
     icon: Gtk.Image = Gtk.Template.Child()
+    menu_btn: Gtk.MenuButton = Gtk.Template.Child()
 
     def __init__(self) -> None:
         super().__init__()
@@ -30,20 +33,19 @@ class TrashRow(Gtk.ListBoxRow):
         # Create trash page
         self.trash = Trash()
         self.window.stack.add_titled(self.trash, "errands_trash_page", _("Trash"))
-        # print(self.window.stack.get_child_by_name(self.name))
-        self.__create_actions()
+        self.__add_actions()
 
-    def __create_actions(self) -> None:
+    def __add_actions(self) -> None:
         self.group: Gio.SimpleActionGroup = Gio.SimpleActionGroup()
-        self.insert_action_group(name="trash_item", group=self.group)
+        self.insert_action_group(name="trash_row", group=self.group)
 
         def __create_action(name: str, callback: callable) -> None:
-            action: Gio.SimpleAction = Gio.SimpleAction.new(name, None)
+            action: Gio.SimpleAction = Gio.SimpleAction(name=name)
             action.connect("activate", callback)
             self.group.add_action(action)
 
-        __create_action("clear", self.trash.on_trash_clear)
-        __create_action("restore", self.trash.on_trash_restore)
+        __create_action("clear", lambda *_: self.trash.on_trash_clear())
+        __create_action("restore", lambda *_: self.trash.on_trash_restore())
 
     def update_ui(self) -> None:
         # Update trash

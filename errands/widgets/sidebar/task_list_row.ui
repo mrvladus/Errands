@@ -25,9 +25,6 @@
     <style>
       <class name="sidebar-item" />
     </style>
-    <!-- <accessibility>
-      <property name="label" translatable="yes">Today</property>
-    </accessibility> -->
 
     <child>
       <object class="GtkBox">

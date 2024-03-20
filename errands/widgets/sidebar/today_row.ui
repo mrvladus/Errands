@@ -1,5 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
+
+  <!-- Menu -->
+  <menu id="menu">
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">Complete All</attribute>
+        <attribute name="action">today_row.complete_all</attribute>
+      </item>
+      <!-- <item>
+        <attribute name="label" translatable="yes">Delete</attribute>
+        <attribute name="action">today_row.delete</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Export</attribute>
+        <attribute name="action">today_row.export</attribute>
+      </item> -->
+    </section>
+  </menu>
+
   <template class="TodayRow" parent="GtkListBoxRow">
     <property name="height-request">50</property>
     <signal name="activate" handler="_on_row_activated" />
@@ -23,8 +42,22 @@
         <child>
           <object id="label" class="GtkLabel">
             <property name="label" translatable="yes">Today</property>
+            <property name="hexpand">true</property>
+            <property name="halign">start</property>
           </object>
         </child>
+
+        <child>
+          <object class="GtkMenuButton">
+            <property name="menu-model">menu</property>
+            <property name="icon-name">view-more-symbolic</property>
+            <property name="valign">center</property>
+            <style>
+              <class name="flat" />
+            </style>
+          </object>
+        </child>
+
       </object>
     </child>
 
