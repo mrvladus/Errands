@@ -102,11 +102,9 @@ class UserDataJSON:
     def add_task(self, **kwargs) -> TaskData:
         data: list[TaskData] = self.tasks
         new_task = TaskData(**kwargs)
-
-        Log.debug(f"Data: Add task '{new_task.uid}'")
-
         if not new_task.uid:
             new_task.uid = str(uuid4())
+        Log.debug(f"Data: Add task '{new_task.uid}'")
         if not GSettings.get("task-list-new-task-position-top"):
             data.append(new_task)
         else:
