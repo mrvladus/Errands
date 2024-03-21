@@ -554,6 +554,7 @@
 
                               </object>
                             </property>
+                            <signal name="notify::active" handler="_on_menu_toggled" />
                             <style>
                               <class name="flat" />
                             </style>

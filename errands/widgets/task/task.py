@@ -300,7 +300,21 @@ class Task(Adw.Bin):
     def toggle_visibility(self, on: bool) -> None:
         GLib.idle_add(self.revealer.set_reveal_child, on)
 
+    @timeit
     def update_props(self, props: list[str], values: list[Any]) -> None:
+        # Update 'changed_at' if it's not in local props
+        local_props: tuple[str] = (
+            "deleted",
+            "expanded",
+            "synced",
+            "toolbar_shown",
+            "trash",
+        )
+        for prop in props:
+            if prop not in local_props:
+                props.append("changed_at")
+                values.append(datetime.now().strftime("%Y%m%dT%H%M%S"))
+                break
         # Log.debug(f"Task '{self.uid}': Update props {props}")
         UserData.update_props(self.list_uid, self.uid, props, values)
 
@@ -404,6 +418,13 @@ class Task(Adw.Bin):
     # ------ TEMPLATE HANDLERS ------ #
 
     @Gtk.Template.Callback()
+    def _on_menu_toggled(self, _btn: Gtk.MenuButton, active: bool):
+        if not active:
+            return
+        self.created_label.set_label(_("Created:") + " " + self.get_prop("created_at"))
+        self.changed_label.set_label(_("Changed:") + " " + self.get_prop("changed_at"))
+
+    @Gtk.Template.Callback()
     def _on_title_row_clicked(self, *args):
         self.expand(not self.sub_tasks_revealer.get_child_revealed())
 
@@ -471,7 +492,8 @@ class Task(Adw.Bin):
 
     @Gtk.Template.Callback()
     def _on_toolbar_btn_toggle(self, btn: Gtk.ToggleButton) -> None:
-        self.update_props(["toolbar_shown"], [btn.get_active()])
+        if btn.get_active() != self.get_prop("toolbar_shown"):
+            self.update_props(["toolbar_shown"], [btn.get_active()])
 
     @Gtk.Template.Callback()
     def _on_entry_row_applied(self, entry: Adw.EntryRow):
@@ -493,7 +515,6 @@ class Task(Adw.Bin):
         notes: str = self.get_prop("notes")
         if btn.get_active():
             self.notes_buffer.set_text(notes)
-            self.update_ui()
         else:
             text: str = self.notes_buffer.props.text
             if text == notes:
