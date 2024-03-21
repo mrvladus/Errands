@@ -14,7 +14,7 @@ from errands.lib.sync.sync import Sync
 from gi.repository import Adw, Gtk, GLib, Gio, GObject  # type:ignore
 from errands.lib.animation import scroll
 from errands.lib.data import TaskData, UserData
-from errands.lib.utils import get_children, timeit
+from errands.lib.utils import get_children, idle_add, timeit
 from errands.lib.logging import Log
 from errands.widgets.task.task import Task
 from errands.lib.gsettings import GSettings
@@ -41,12 +41,14 @@ class TaskList(Adw.Bin):
         self.list_uid: str = list_uid
         self.sidebar_row: TaskListRow = sidebar_row
         self.__load_tasks()
+        self.update_status()
 
     def __repr__(self) -> str:
         return f"<class 'TaskList' {self.list_uid}>"
 
     # ------ PRIVATE METHODS ------ #
 
+    @idle_add
     def __load_tasks(self) -> None:
         Log.info(f"Task List {self.list_uid}: Load Tasks")
 
@@ -109,6 +111,23 @@ class TaskList(Adw.Bin):
 
         return new_task
 
+    def update_status(self) -> None:
+        n_total, n_completed = UserData.get_status(self.list_uid)
+
+        # Update headerbar subtitle
+        self.title.set_subtitle(
+            _("Completed:") + f" {n_completed} / {n_total}" if n_total > 0 else ""
+        )
+
+        # Update sidebar item counter
+        self.sidebar_row.size_counter.set_label(str(n_total) if n_total > 0 else "")
+
+        # Update delete completed button
+        self.delete_completed_btn.set_sensitive(n_completed > 0)
+
+        # Update list name
+        self.title.set_title(UserData.get_list_prop(self.list_uid, "name"))
+
     def update_ui(self, update_tasks_ui: bool = True, sort: bool = True) -> None:
         Log.debug(f"Task list {self.list_uid}: Update UI")
 
@@ -160,22 +179,7 @@ class TaskList(Adw.Bin):
         # Sort tasks
         self.__sort_tasks()
 
-        # Update status
-        n_total, n_completed = UserData.get_status(self.list_uid)
-        self.title.set_subtitle(
-            _("Completed:") + f" {n_completed} / {n_total}" if n_total > 0 else ""
-        )
-
-        # Update sidebar item counter
-        self.sidebar_row.size_counter.set_label(str(n_total) if n_total > 0 else "")
-
-        # Update delete completed button
-        self.delete_completed_btn.set_sensitive(n_completed > 0)
-
-        # Rename list
-        self.title.set_title(
-            [l.name for l in UserData.get_lists_as_dicts() if l.uid == self.list_uid][0]
-        )
+        self.update_status()
 
     # ------ TEMPLATE HANDLERS ------ #
 

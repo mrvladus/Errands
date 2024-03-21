@@ -300,7 +300,6 @@ class Task(Adw.Bin):
     def toggle_visibility(self, on: bool) -> None:
         GLib.idle_add(self.revealer.set_reveal_child, on)
 
-    @timeit
     def update_props(self, props: list[str], values: list[Any]) -> None:
         # Update 'changed_at' if it's not in local props
         local_props: tuple[str] = (

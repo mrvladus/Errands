@@ -1,9 +1,13 @@
 # Copyright 2023-2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-from typing import Callable
+import time
+from functools import wraps
 from threading import Thread
-from gi.repository import Gtk  # type:ignore
+from typing import Callable
+
+from gi.repository import Gtk, GLib  # type:ignore
+
 from errands.lib.logging import Log
 
 
@@ -34,6 +38,16 @@ def threaded(function: Callable):
     return wrapper
 
 
+def idle_add(func: Callable):
+    """Call function with GLib.idle_add() without blocking UI"""
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        GLib.idle_add(func, *args)
+
+    return wrapper
+
+
 def catch_errors(function: Callable):
     """Catch errors and log them"""
 
@@ -44,12 +58,6 @@ def catch_errors(function: Callable):
             Log.error(e)
 
 
-from functools import wraps
-import time
-
-# PROFILING_LOG = ""
-
-
 def timeit(func):
     @wraps(func)
     def timeit_wrapper(*args, **kwargs):
@@ -58,8 +66,7 @@ def timeit(func):
         result = func(*args, **kwargs)
         end_time = time.perf_counter()
         total_time = end_time - start_time
-        print(f"Profile | {func.__name__} | {args} | {total_time:.4f}")
-        # PROFILING_LOG += f"Profile {func.__name__} {args} {total_time:.4f}"
+        print(f"{func.__name__} | {args} | {total_time:.4f}")
         return result
 
     return timeit_wrapper
