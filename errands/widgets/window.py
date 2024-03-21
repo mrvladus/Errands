@@ -28,6 +28,8 @@ class Window(Adw.ApplicationWindow):
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
+        Log.debug("Main Window: Load")
+
         self._create_actions()
         # Remember window state
         GSettings.bind("width", self, "default_width")

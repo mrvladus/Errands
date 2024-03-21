@@ -2,12 +2,11 @@
 # SPDX-License-Identifier: MIT
 
 from dataclasses import dataclass, asdict, field
+import datetime
 import json
 import os
 import shutil
-import sqlite3
-import threading
-from typing import Any, Iterable, Self, get_type_hints
+from typing import Any, Iterable
 from uuid import uuid4
 
 from gi.repository import GLib  # type:ignore
@@ -19,16 +18,19 @@ from errands.lib.utils import threaded, timeit
 
 @dataclass
 class TaskListData:
-    deleted: bool
-    name: str
-    synced: bool
-    uid: str
+    color: str = ""
+    deleted: bool = False
+    name: str = ""
+    synced: bool = False
+    uid: str = ""
 
 
 @dataclass
 class TaskData:
     color: str = ""
     completed: bool = False
+    changed_at: str = ""
+    created_at: str = ""
     deleted: bool = False
     end_date: str = ""
     expanded: bool = False
@@ -37,6 +39,7 @@ class TaskData:
     parent: str = ""
     percent_complete: int = 0
     priority: int = 0
+    rrule: str = ""
     start_date: str = ""
     synced: bool = False
     tags: str = ""
@@ -45,11 +48,11 @@ class TaskData:
     trash: bool = False
     uid: str = ""
 
+    def __post_init__(self):
+        """Set default values that need to be calculated"""
 
-@dataclass
-class ErrandsData:
-    lists: list[TaskListData] = field(default_factory=list)
-    tasks: list[TaskData] = field(default_factory=list)
+        if not self.created_at:
+            self.created_at = datetime.datetime.now().strftime("%Y%m%dT%H%M%S")
 
 
 class UserDataJSON:
@@ -82,14 +85,6 @@ class UserDataJSON:
 
     # ------ PUBLIC METHODS ------ #
 
-    def init(self) -> None:
-        if not os.path.exists(self.__data_dir):
-            os.mkdir(self.__data_dir)
-        if not os.path.exists(self.__data_file_path):
-            self.__write_data()
-        else:
-            self.__read_data()
-
     def add_list(
         self, name: str, uuid: str = None, synced: bool = False
     ) -> TaskListData:
@@ -107,6 +102,9 @@ class UserDataJSON:
     def add_task(self, **kwargs) -> TaskData:
         data: list[TaskData] = self.tasks
         new_task = TaskData(**kwargs)
+
+        Log.debug(f"Data: Add task '{new_task.uid}'")
+
         if not new_task.uid:
             new_task.uid = str(uuid4())
         if not GSettings.get("task-list-new-task-position-top"):
@@ -132,8 +130,8 @@ class UserDataJSON:
                 l.deleted = True
                 break
         tasks: list[TaskData] = [t for t in self.tasks if not t.list_uid == list_uid]
-        self.task_lists = lists
         self.tasks = tasks
+        self.task_lists = lists
 
     def delete_tasks_from_trash(self) -> None:
         tasks: list[TaskData] = self.tasks
@@ -143,6 +141,7 @@ class UserDataJSON:
         self.tasks = tasks
 
     def get_lists_as_dicts(self) -> list[TaskListData]:
+        Log.debug(f"Data: Get lists")
         return self.task_lists
 
     def get_prop(self, list_uid: str, uid: str, prop: str) -> Any:
@@ -153,6 +152,10 @@ class UserDataJSON:
                 break
 
         return getattr(task, prop)
+
+    def get_list_prop(self, list_uid: str, prop: str) -> Any:
+        list: TaskListData = [l for l in self.task_lists if l.uid == list_uid][0]
+        return getattr(list, prop)
 
     def get_status(self, list_uid: str, parent_uid: str = "") -> tuple[int, int]:
         """Gets tuple (total_tasks, completed_tasks)"""
@@ -182,6 +185,16 @@ class UserDataJSON:
             return [
                 t for t in self.tasks if t.list_uid == list_uid and t.parent == parent
             ]
+
+    def init(self) -> None:
+        Log.debug("Data: Initialize")
+        if not os.path.exists(self.__data_dir):
+            Log.debug("Data: Create data directory")
+            os.mkdir(self.__data_dir)
+        if not os.path.exists(self.__data_file_path):
+            Log.debug("Data: Create data.json file")
+            self.__write_data()
+        self.__read_data()
 
     def move_task_after(
         self, list_uid: str, task_uid: str, task_after_uid: str
@@ -238,6 +251,16 @@ class UserDataJSON:
         # Save tasks
         self.tasks = tasks
 
+    def move_task_to_list(
+        self,
+        task_uid: str,
+        from_list_uid: str,
+        to_list_uid: str,
+        synced: bool,
+        new_parent: str = "",
+    ) -> None:
+        pass
+
     def update_props(
         self, list_uid: str, uid: str, props: Iterable[str], values: Iterable[Any]
     ):
@@ -251,12 +274,39 @@ class UserDataJSON:
 
     # ------ PRIVATE METHODS ------ #
 
+    def __get_sub_tasks_tree(self, list_uid: str, task_uid: str) -> list[TaskData]:
+        tree: list[TaskData] = []
+        tasks = [t for t in self.tasks if t.list_uid == list_uid]
+
+        def __add_sub_tasks(parent_uid: str):
+            for task in tasks:
+                if task.parent == parent_uid:
+                    tree.append(task)
+                    __add_sub_tasks(task)
+
+        __add_sub_tasks(task_uid)
+        return tree
+
+    def __get_task_parents_tree(self, list_uid: str, task_uid: str) -> list[TaskData]:
+        tree: list[TaskData] = []
+        tasks = [t for t in self.tasks if t.list_uid == list_uid]
+
+        def __add_parent(task_uid: str):
+            for task in tasks:
+                if task.parent:
+                    tree.append(task)
+                    __add_parent(task.parent)
+
+        __add_parent(task_uid)
+        return tree
+
     def __read_data(self) -> None:
         try:
+            Log.debug("Data: Read data")
             with open(self.__data_file_path, "r") as f:
                 data: dict[str, Any] = json.load(f)
-                self.task_lists = [TaskListData(**l) for l in data["lists"]]
-                self.tasks = [TaskData(**t) for t in data["tasks"]]
+                self.__task_lists_data = [TaskListData(**l) for l in data["lists"]]
+                self.__tasks_data = [TaskData(**t) for t in data["tasks"]]
         except Exception as e:
             Log.error(
                 f"Data: Can't read data file from disk. {e}. Creating new data file"
@@ -265,25 +315,18 @@ class UserDataJSON:
 
     def __write_data(self) -> None:
         try:
+            Log.debug("Data: Write data")
             with open(self.__data_file_path, "w") as f:
-                lists: list[dict] = [asdict(l) for l in self.task_lists]
-                tasks: list[dict] = [asdict(t) for t in self.tasks]
-                data: dict = {"lists": lists, "tasks": tasks}
+                data: dict[str, list[TaskListData | TaskData]] = {
+                    "lists": [asdict(l) for l in self.task_lists],
+                    "tasks": [asdict(t) for t in self.tasks],
+                }
                 json.dump(data, f, ensure_ascii=False)
         except Exception as e:
             Log.error(f"Data: Can't write to disk. {e}.")
 
 
 class UserDataSQLite:
-
-    @classmethod
-    def clean_deleted(cls):
-        Log.debug("Data: Clean deleted")
-
-        with cls.connection:
-            cur = cls.connection.cursor()
-            cur.execute("DELETE FROM lists WHERE deleted = 1")
-            cur.execute("DELETE FROM tasks WHERE deleted = 1")
 
     @classmethod
     def move_task_to_list(

@@ -187,12 +187,10 @@ class TaskListRow(Gtk.ListBoxRow):
         _create_action("export", _export)
 
     def update_ui(self, update_task_list_ui: bool = True):
-        Log.debug(f"Sidebar: List Item: Update UI '{self.uid}'")
+        Log.debug(f"Task List Row: Update UI '{self.uid}'")
 
         # Update title
-        self.name = [
-            i.name for i in UserData.get_lists_as_dicts() if i.uid == self.uid
-        ][0]
+        self.name = UserData.get_list_prop(self.uid, "name")
         self.label.set_label(self.name)
         self.stack_page.set_name(self.name)
         self.stack_page.set_title(self.name)

@@ -131,6 +131,7 @@ class Sidebar(Adw.Bin):
         return row
 
     def __load_lists(self) -> None:
+        Log.debug("Sidebar: Load Task Lists")
         for list in (l for l in UserData.get_lists_as_dicts() if not l.deleted):
             self.__add_task_list(list)
 
@@ -222,8 +223,8 @@ class Sidebar(Adw.Bin):
 
             name = entry.props.text.rstrip().lstrip()
             list_dict = UserData.add_list(name)
-            row = self.add_task_list(list_dict)
-            row.activate()
+            row = self.__add_task_list(list_dict)
+            # row.activate()
             # Sync.sync()
 
         entry = Gtk.Entry(placeholder_text=_("New List Name"))

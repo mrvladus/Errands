@@ -275,8 +275,9 @@ class Task(Adw.Bin):
         self.window.sidebar.trash_row.update_ui()
 
     def expand(self, expanded: bool) -> None:
+        if expanded != self.get_prop("expanded"):
+            self.update_props(["expanded"], [expanded])
         self.sub_tasks_revealer.set_reveal_child(expanded)
-        self.update_props(["expanded"], [expanded])
         if expanded:
             self.expand_indicator.remove_css_class("expand-indicator-expanded")
         else:
@@ -300,6 +301,7 @@ class Task(Adw.Bin):
         GLib.idle_add(self.revealer.set_reveal_child, on)
 
     def update_props(self, props: list[str], values: list[Any]) -> None:
+        # Log.debug(f"Task '{self.uid}': Update props {props}")
         UserData.update_props(self.list_uid, self.uid, props, values)
 
     def update_ui(self, update_sub_tasks_ui: bool = True) -> None:
@@ -316,12 +318,12 @@ class Task(Adw.Bin):
         self.expand(self.get_prop("expanded"))
 
         # Update color
-        # for c in self.main_box.get_css_classes():
-        #     if "task-" in c:
-        #         self.main_box.remove_css_class(c)
-        #         break
-        # if color := self.get_prop("color"):
-        #     self.main_box.add_css_class(f"task-{color}")
+        for c in self.main_box.get_css_classes():
+            if "task-" in c:
+                self.main_box.remove_css_class(c)
+                break
+        if color := self.get_prop("color"):
+            self.main_box.add_css_class(f"task-{color}")
 
         # Update progress bar complete
         if GSettings.get("task-show-progressbar"):
