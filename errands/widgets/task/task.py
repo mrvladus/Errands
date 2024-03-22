@@ -5,6 +5,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from errands.widgets.components.datetime_picker import DateTimePicker
+
 if TYPE_CHECKING:
     from errands.widgets.task_list.task_list import TaskList
 
@@ -34,6 +36,7 @@ class Task(Adw.Bin):
 
     GObject.type_register(GtkSource.View)
     GObject.type_register(GtkSource.Buffer)
+    GObject.type_register(DateTimePicker)
 
     revealer: Gtk.Revealer = Gtk.Template.Child()
     top_drop_area: Gtk.Revealer = Gtk.Template.Child()

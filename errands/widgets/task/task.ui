@@ -256,6 +256,10 @@
                             <property name="valign">center</property>
                             <property name="popover">
                               <object class="GtkPopover">
+                                <child>
+                                  <object class="DateTimePicker">
+                                  </object>
+                                </child>
                               </object>
                             </property>
                             <style>
