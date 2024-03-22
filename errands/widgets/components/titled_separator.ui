@@ -2,6 +2,7 @@
 <interface>
   <template class="TitledSeparator" parent="GtkBox">
     <property name="spacing">12</property>
+    <property name="title" bind-source="label" bind-property="label" bind-flags="sync-create | bidirectional" />
     <style>
       <class name="dim-label" />
     </style>

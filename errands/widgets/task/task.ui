@@ -260,9 +260,6 @@
                                 <child>
                                   <object class="GtkBox">
                                     <property name="orientation">vertical</property>
-                                    <style>
-                                      <class name="toolbar" />
-                                    </style>
 
                                     <child>
                                       <object class="AdwViewSwitcher">
@@ -270,12 +267,6 @@
                                         <property name="halign">center</property>
                                         <property name="stack">date_stack</property>
                                         <property name="policy">wide</property>
-                                        <property name="margin-bottom">6</property>
-                                      </object>
-                                    </child>
-
-                                    <child>
-                                      <object class="GtkSeparator">
                                         <property name="margin-bottom">6</property>
                                       </object>
                                     </child>

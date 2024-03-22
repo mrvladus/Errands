@@ -4,6 +4,12 @@
     <property name="orientation">vertical</property>
     <property name="spacing">12</property>
 
+    <child>
+      <object class="TitledSeparator">
+        <property name="title" translatable="yes">Time</property>
+      </object>
+    </child>
+
     <!-- Time-->
     <child>
       <object class="GtkBox">
@@ -130,7 +136,9 @@
     </child>
 
     <child>
-      <object class="GtkSeparator" />
+      <object class="TitledSeparator">
+        <property name="title" translatable="yes">Date</property>
+      </object>
     </child>
 
     <!-- Calendar -->
@@ -143,6 +151,7 @@
     <child>
       <object class="GtkSeparator" />
     </child>
+
 
     <!-- Day Presets -->
     <child>
