@@ -256,10 +256,61 @@
                             <property name="valign">center</property>
                             <property name="popover">
                               <object class="GtkPopover">
+
                                 <child>
-                                  <object class="DateTimePicker">
+                                  <object class="GtkBox">
+                                    <property name="orientation">vertical</property>
+                                    <style>
+                                      <class name="toolbar" />
+                                    </style>
+
+                                    <child>
+                                      <object class="AdwViewSwitcher">
+                                        <property name="height-request">35</property>
+                                        <property name="halign">center</property>
+                                        <property name="stack">date_stack</property>
+                                        <property name="policy">wide</property>
+                                        <property name="margin-bottom">6</property>
+                                      </object>
+                                    </child>
+
+                                    <child>
+                                      <object class="GtkSeparator">
+                                        <property name="margin-bottom">6</property>
+                                      </object>
+                                    </child>
+
+                                    <child>
+                                      <object id="date_stack" class="AdwViewStack">
+                                        <child>
+                                          <object class="AdwViewStackPage">
+                                            <property name="name">Start</property>
+                                            <property name="icon-name">errands-calendar-symbolic</property>
+                                            <property name="title">Start</property>
+                                            <property name="child">
+                                              <object class="DateTimePicker">
+                                              </object>
+                                            </property>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="AdwViewStackPage">
+                                            <property name="name">Due</property>
+                                            <property name="icon-name">errands-calendar-symbolic</property>
+                                            <property name="title">Due</property>
+                                            <property name="child">
+                                              <object class="DateTimePicker">
+                                              </object>
+                                            </property>
+                                          </object>
+                                        </child>
+                                      </object>
+                                    </child>
+
                                   </object>
                                 </child>
+
+
                               </object>
                             </property>
                             <style>
