@@ -533,7 +533,7 @@
                                     <property name="margin-end">12</property>
                                     <property name="margin-bottom">6</property>
                                     <style>
-                                      <class name="caption" />
+                                      <class name="caption-heading" />
                                     </style>
                                   </object>
                                 </child>
@@ -547,7 +547,7 @@
                                     <property name="margin-end">12</property>
                                     <property name="margin-bottom">3</property>
                                     <style>
-                                      <class name="caption" />
+                                      <class name="caption-heading" />
                                     </style>
                                   </object>
                                 </child>
