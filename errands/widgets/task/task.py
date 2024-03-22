@@ -420,8 +420,14 @@ class Task(Adw.Bin):
     def _on_menu_toggled(self, _btn: Gtk.MenuButton, active: bool):
         if not active:
             return
-        self.created_label.set_label(_("Created:") + " " + self.get_prop("created_at"))
-        self.changed_label.set_label(_("Changed:") + " " + self.get_prop("changed_at"))
+        created_date: str = datetime.fromisoformat(
+            self.get_prop("created_at")
+        ).strftime("%Y.%m.%d %H:%M:%S")
+        changed_date: str = datetime.fromisoformat(
+            self.get_prop("changed_at")
+        ).strftime("%Y.%m.%d %H:%M:%S")
+        self.created_label.set_label(_("Created:") + " " + created_date)
+        self.changed_label.set_label(_("Changed:") + " " + changed_date)
 
     @Gtk.Template.Callback()
     def _on_title_row_clicked(self, *args):

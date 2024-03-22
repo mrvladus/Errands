@@ -52,7 +52,9 @@ class TaskData:
         """Set default values that need to be calculated"""
 
         if not self.created_at:
-            self.created_at = datetime.datetime.now().strftime("%Y%m%dT%H%M%S")
+            now: str = datetime.datetime.now().strftime("%Y%m%dT%H%M%S")
+            self.created_at = now
+            self.changed_at = now
 
 
 class UserDataJSON:

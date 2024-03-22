@@ -28,6 +28,7 @@ class TaskList(Adw.Bin):
     delete_completed_btn: Gtk.Button = Gtk.Template.Child()
     toggle_completed_btn: Gtk.ToggleButton = Gtk.Template.Child()
     scroll_up_btn: Gtk.Button = Gtk.Template.Child()
+    loading_status_page: Gtk.Box = Gtk.Template.Child()
     scrl: Gtk.ScrolledWindow = Gtk.Template.Child()
     uncompleted_tasks_list: Gtk.Box = Gtk.Template.Child()
     completed_tasks_list: Gtk.Box = Gtk.Template.Child()
@@ -52,9 +53,9 @@ class TaskList(Adw.Bin):
     def __load_tasks(self) -> None:
         Log.info(f"Task List {self.list_uid}: Load Tasks")
 
-        tasks: list[TaskData] = [
+        tasks: list[TaskData] = (
             t for t in UserData.get_tasks_as_dicts(self.list_uid, "") if not t.deleted
-        ]
+        )
         for task in tasks:
             new_task = Task(task.uid, self, self)
             if task.completed:
@@ -62,6 +63,9 @@ class TaskList(Adw.Bin):
             else:
                 self.uncompleted_tasks_list.append(new_task)
             new_task.update_ui()
+
+        self.scrl.set_visible(True)
+        self.loading_status_page.set_visible(False)
 
     def __sort_tasks(self) -> None:
         pass
