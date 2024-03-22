@@ -256,7 +256,6 @@
                             <property name="valign">center</property>
                             <property name="popover">
                               <object class="GtkPopover">
-
                                 <child>
                                   <object class="GtkBox">
                                     <property name="orientation">vertical</property>
@@ -273,6 +272,8 @@
 
                                     <child>
                                       <object id="date_stack" class="AdwViewStack">
+
+                                        <!-- Start date -->
                                         <child>
                                           <object class="AdwViewStackPage">
                                             <property name="name">Start</property>
@@ -284,6 +285,8 @@
                                             </property>
                                           </object>
                                         </child>
+
+                                        <!-- Due date -->
                                         <child>
                                           <object class="AdwViewStackPage">
                                             <property name="name">Due</property>
@@ -295,13 +298,12 @@
                                             </property>
                                           </object>
                                         </child>
+
                                       </object>
                                     </child>
 
                                   </object>
                                 </child>
-
-
                               </object>
                             </property>
                             <style>
