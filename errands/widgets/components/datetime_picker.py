@@ -32,7 +32,7 @@ class DateTimePicker(Gtk.Box):
         return self.__datetime
 
     @datetime.setter
-    def datetime(self, new_datetime: str) -> str:
+    def datetime(self, dt: str) -> str:
         self.lock_signals = True
         if dt:
             dt = datetime.datetime.fromisoformat(dt).strftime("%Y%m%dT%H%M00")
@@ -49,7 +49,7 @@ class DateTimePicker(Gtk.Box):
             self.calendar.select_day(GLib.DateTime.new_now_local())
 
         # Set datetime
-        self.__datetime = new_datetime
+        self.__datetime = dt
         self.lock_signals = False
 
     @property
@@ -60,10 +60,10 @@ class DateTimePicker(Gtk.Box):
     def human_datetime(self) -> str:
         if self.datetime:
             out: str = (
-                f"{self.datetime[9:11]}:{self.datetime[11:13]}, {self.calendar.get_date().format('%d %B, %Y')}"
+                f"{self.calendar.get_date().format('%d %B')} {self.datetime[9:11]}:{self.datetime[11:13]}"
             )
         else:
-            out: str = _("Not Set")
+            out: str = _("Date")
         return out
 
     # ------ TEMPLATE HANDLERS ------ #

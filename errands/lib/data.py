@@ -32,7 +32,7 @@ class TaskData:
     changed_at: str = ""
     created_at: str = ""
     deleted: bool = False
-    end_date: str = ""
+    due_date: str = ""
     expanded: bool = False
     list_uid: str = ""
     notes: str = ""

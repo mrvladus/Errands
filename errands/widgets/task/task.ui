@@ -245,15 +245,19 @@
 
                     <child>
                       <object class="GtkBox">
-                        <property name="margin-start">12</property>
-                        <property name="margin-end">12</property>
-                        <property name="margin-bottom">6</property>
-                        <property name="spacing">5</property>
+                        <!-- <property name="margin-start">12</property> -->
+                        <!-- <property name="margin-end">12</property> -->
+                        <!-- <property name="margin-bottom">6</property> -->
+                        <!-- <property name="spacing">5</property> -->
+                        <style>
+                          <class name="toolbar" />
+                        </style>
 
                         <!-- Date and time btn -->
                         <child>
-                          <object class="GtkMenuButton">
+                          <object id="date_time_btn" class="GtkMenuButton">
                             <property name="valign">center</property>
+                            <property name="tooltip-text" translatable="yes">Start / Due Date</property>
                             <property name="popover">
                               <object class="GtkPopover">
                                 <child>
@@ -280,7 +284,8 @@
                                             <property name="icon-name">errands-calendar-symbolic</property>
                                             <property name="title">Start</property>
                                             <property name="child">
-                                              <object class="DateTimePicker">
+                                              <object id="start_date_time" class="DateTimePicker">
+                                                <signal name="changed" handler="_on_date_time_start_set" />
                                               </object>
                                             </property>
                                           </object>
@@ -293,7 +298,8 @@
                                             <property name="icon-name">errands-calendar-symbolic</property>
                                             <property name="title">Due</property>
                                             <property name="child">
-                                              <object class="DateTimePicker">
+                                              <object id="due_date_time" class="DateTimePicker">
+                                                <signal name="changed" handler="_on_date_time_due_set" />
                                               </object>
                                             </property>
                                           </object>
@@ -309,6 +315,7 @@
                             <style>
                               <class name="flat" />
                             </style>
+                            <signal name="notify::active" handler="_on_date_time_toggled" />
 
                             <child>
                               <object class="AdwButtonContent">

@@ -34,9 +34,9 @@ from errands.lib.utils import get_children, timeit
 class Task(Adw.Bin):
     __gtype_name__ = "Task"
 
-    GObject.type_register(GtkSource.View)
-    GObject.type_register(GtkSource.Buffer)
-    GObject.type_register(DateTimePicker)
+    GObject.type_ensure(GtkSource.View)
+    GObject.type_ensure(GtkSource.Buffer)
+    GObject.type_ensure(DateTimePicker)
 
     revealer: Gtk.Revealer = Gtk.Template.Child()
     top_drop_area: Gtk.Revealer = Gtk.Template.Child()
@@ -55,6 +55,9 @@ class Task(Adw.Bin):
     priority_btn: Gtk.MenuButton = Gtk.Template.Child()
     created_label: Gtk.Label = Gtk.Template.Child()
     changed_label: Gtk.Label = Gtk.Template.Child()
+    start_date_time: DateTimePicker = Gtk.Template.Child()
+    due_date_time: DateTimePicker = Gtk.Template.Child()
+    date_time_btn: Gtk.MenuButton = Gtk.Template.Child()
 
     # State
     just_added: bool = True
@@ -391,6 +394,11 @@ class Task(Adw.Bin):
         elif priority == 9:
             self.priority_btn.add_css_class("accent")
 
+        # Update Date and Time
+        # self.start_date_time.datetime = self.get_prop("start_date")
+        self.due_date_time.datetime = self.get_prop("due_date")
+        self.date_time_btn.get_child().props.label = self.due_date_time.human_datetime
+
         data_tasks: list[TaskData] = [
             t
             for t in UserData.get_tasks_as_dicts(self.list_uid, self.uid)
@@ -418,6 +426,21 @@ class Task(Adw.Bin):
         # self.__sort_tasks()
 
     # ------ TEMPLATE HANDLERS ------ #
+
+    @Gtk.Template.Callback()
+    def _on_date_time_toggled(self, _btn: Gtk.MenuButton, active: bool) -> None:
+        self.start_date_time.datetime = self.get_prop("start_date")
+        self.due_date_time.datetime = self.get_prop("due_date")
+
+    @Gtk.Template.Callback()
+    def _on_date_time_start_set(self, *args) -> None:
+        self.update_props(["start_date"], [self.start_date_time.datetime])
+        self.update_ui(False)
+
+    @Gtk.Template.Callback()
+    def _on_date_time_due_set(self, *args) -> None:
+        self.update_props(["due_date"], [self.due_date_time.datetime])
+        self.update_ui(False)
 
     @Gtk.Template.Callback()
     def _on_menu_toggled(self, _btn: Gtk.MenuButton, active: bool):
