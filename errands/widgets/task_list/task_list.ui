@@ -65,8 +65,8 @@
                     <property name="height-request">60</property>
                     <property name="margin-top">6</property>
                     <property name="margin-bottom">6</property>
-                    <property name="margin-end">6</property>
-                    <property name="margin-start">6</property>
+                    <property name="margin-end">12</property>
+                    <property name="margin-start">12</property>
                     <style>
                       <class name="card" />
                     </style>
@@ -120,7 +120,6 @@
                         <child>
                           <object id="completed_tasks_list" class="GtkBox">
                             <property name="orientation">vertical</property>
-
                           </object>
                         </child>
 
@@ -140,7 +139,6 @@
 
               </object>
             </child>
-
 
           </object>
         </property>

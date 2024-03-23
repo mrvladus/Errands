@@ -31,13 +31,15 @@
   </menu>
 
   <template class="Task" parent="AdwBin">
+    <property name="hexpand">false</property>
     <child>
       <object id="revealer" class="GtkRevealer">
+        <property name="hexpand">false</property>
         <child>
           <object class="GtkBox">
             <property name="orientation">vertical</property>
-            <property name="margin-start">6</property>
-            <property name="margin-end">6</property>
+            <property name="margin-start">12</property>
+            <property name="margin-end">12</property>
             <property name="margin-bottom">6</property>
             <property name="margin-top">6</property>
 
@@ -245,13 +247,10 @@
 
                     <child>
                       <object class="GtkBox">
-                        <!-- <property name="margin-start">12</property> -->
-                        <!-- <property name="margin-end">12</property> -->
-                        <!-- <property name="margin-bottom">6</property> -->
-                        <!-- <property name="spacing">5</property> -->
-                        <style>
-                          <class name="toolbar" />
-                        </style>
+                        <property name="margin-start">12</property>
+                        <property name="margin-end">12</property>
+                        <property name="margin-bottom">6</property>
+                        <property name="spacing">5</property>
 
                         <!-- Date and time btn -->
                         <child>
@@ -320,6 +319,7 @@
                             <child>
                               <object class="AdwButtonContent">
                                 <property name="icon-name">errands-calendar-symbolic</property>
+                                <property name="can-shrink">true</property>
                                 <property name="label" translatable="yes">Date</property>
                               </object>
                             </child>
