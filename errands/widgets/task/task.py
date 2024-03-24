@@ -58,6 +58,7 @@ class Task(Adw.Bin):
     start_date_time: DateTimePicker = Gtk.Template.Child()
     due_date_time: DateTimePicker = Gtk.Template.Child()
     date_time_btn: Gtk.MenuButton = Gtk.Template.Child()
+    date_stack: Adw.ViewStack = Gtk.Template.Child()
 
     # State
     just_added: bool = True

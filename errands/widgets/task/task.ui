@@ -276,29 +276,29 @@
                                     <child>
                                       <object id="date_stack" class="AdwViewStack">
 
-                                        <!-- Start date -->
-                                        <child>
-                                          <object class="AdwViewStackPage">
-                                            <property name="name">Start</property>
-                                            <property name="icon-name">errands-calendar-symbolic</property>
-                                            <property name="title">Start</property>
-                                            <property name="child">
-                                              <object id="start_date_time" class="DateTimePicker">
-                                                <signal name="changed" handler="_on_date_time_start_set" />
-                                              </object>
-                                            </property>
-                                          </object>
-                                        </child>
-
                                         <!-- Due date -->
                                         <child>
                                           <object class="AdwViewStackPage">
-                                            <property name="name">Due</property>
+                                            <property name="name">due</property>
                                             <property name="icon-name">errands-calendar-symbolic</property>
                                             <property name="title">Due</property>
                                             <property name="child">
                                               <object id="due_date_time" class="DateTimePicker">
                                                 <signal name="changed" handler="_on_date_time_due_set" />
+                                              </object>
+                                            </property>
+                                          </object>
+                                        </child>
+
+                                        <!-- Start date -->
+                                        <child>
+                                          <object class="AdwViewStackPage">
+                                            <property name="name">start</property>
+                                            <property name="icon-name">errands-calendar-symbolic</property>
+                                            <property name="title">Start</property>
+                                            <property name="child">
+                                              <object id="start_date_time" class="DateTimePicker">
+                                                <signal name="changed" handler="_on_date_time_start_set" />
                                               </object>
                                             </property>
                                           </object>
