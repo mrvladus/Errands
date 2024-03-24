@@ -313,6 +313,7 @@
                             </property>
                             <style>
                               <class name="flat" />
+                              <class name="caption" />
                             </style>
                             <signal name="notify::active" handler="_on_date_time_toggled" />
 

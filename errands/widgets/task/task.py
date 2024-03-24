@@ -395,9 +395,13 @@ class Task(Adw.Bin):
             self.priority_btn.add_css_class("accent")
 
         # Update Date and Time
+        # start_dt = self.get_prop("start_date")
+        # due_dt = self.get_prop("due_date")
         # self.start_date_time.datetime = self.get_prop("start_date")
         self.due_date_time.datetime = self.get_prop("due_date")
-        self.date_time_btn.get_child().props.label = self.due_date_time.human_datetime
+        self.date_time_btn.get_child().props.label = (
+            f"{self.due_date_time.human_datetime}"
+        )
 
         data_tasks: list[TaskData] = [
             t

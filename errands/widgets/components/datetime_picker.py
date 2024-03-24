@@ -60,7 +60,7 @@ class DateTimePicker(Gtk.Box):
     def human_datetime(self) -> str:
         if self.datetime:
             out: str = (
-                f"{self.calendar.get_date().format('%d %B')} {self.datetime[9:11]}:{self.datetime[11:13]}"
+                f"{self.calendar.get_date().format('%d %b')} {self.datetime[9:11]}:{self.datetime[11:13]}"
             )
         else:
             out: str = _("Date")
