@@ -6,6 +6,7 @@ import os
 from typing import TYPE_CHECKING
 
 from errands.widgets.components.titled_separator import TitledSeparator
+from errands.widgets.sidebar.tags_row import TagsRow
 
 
 if TYPE_CHECKING:
@@ -96,6 +97,7 @@ from gi.repository import Adw, Gtk, GObject  # type:ignore
 class Sidebar(Adw.Bin):
     __gtype_name__ = "Sidebar"
 
+    GObject.type_ensure(TagsRow)
     GObject.type_ensure(TodayRow)
     GObject.type_ensure(TrashRow)
 
@@ -103,6 +105,7 @@ class Sidebar(Adw.Bin):
     add_list_btn: Gtk.Button = Gtk.Template.Child()
     status_page: Adw.StatusPage = Gtk.Template.Child()
     list_box: Gtk.ListBox = Gtk.Template.Child()
+    tags_row: TodayRow = Gtk.Template.Child()
     trash_row: TrashRow = Gtk.Template.Child()
     today_row: TodayRow = Gtk.Template.Child()
 

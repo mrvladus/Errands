@@ -5,10 +5,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from errands.widgets.components.datetime_picker import DateTimePicker
+from errands.widgets.task.tag import Tag
 
 if TYPE_CHECKING:
     from errands.widgets.task_list.task_list import TaskList
+    from errands.widgets.task.toolbar.toolbar import TaskToolbar
 
 import os
 from datetime import datetime
@@ -19,8 +20,6 @@ from gi.repository import Gio  # type:ignore
 from gi.repository import GLib  # type:ignore
 from gi.repository import GObject  # type:ignore
 from gi.repository import Gtk  # type:ignore
-from gi.repository import GtkSource  # type:ignore
-from icalendar import Calendar, Event
 
 from errands.lib.data import TaskData, UserData
 from errands.lib.gsettings import GSettings
@@ -34,10 +33,6 @@ from errands.lib.utils import get_children, timeit
 class Task(Adw.Bin):
     __gtype_name__ = "Task"
 
-    GObject.type_ensure(GtkSource.View)
-    GObject.type_ensure(GtkSource.Buffer)
-    GObject.type_ensure(DateTimePicker)
-
     revealer: Gtk.Revealer = Gtk.Template.Child()
     top_drop_area: Gtk.Revealer = Gtk.Template.Child()
     main_box: Gtk.Box = Gtk.Template.Child()
@@ -49,16 +44,8 @@ class Task(Adw.Bin):
     complete_btn: Gtk.CheckButton = Gtk.Template.Child()
     expand_indicator: Gtk.Image = Gtk.Template.Child()
     entry_row: Adw.EntryRow = Gtk.Template.Child()
-    toolbar_rev: Gtk.Revealer = Gtk.Template.Child()
-    notes_btn: Gtk.MenuButton = Gtk.Template.Child()
-    notes_buffer: GtkSource.Buffer = Gtk.Template.Child()
-    priority_btn: Gtk.MenuButton = Gtk.Template.Child()
-    created_label: Gtk.Label = Gtk.Template.Child()
-    changed_label: Gtk.Label = Gtk.Template.Child()
-    start_date_time: DateTimePicker = Gtk.Template.Child()
-    due_date_time: DateTimePicker = Gtk.Template.Child()
-    date_time_btn: Gtk.MenuButton = Gtk.Template.Child()
-    date_stack: Adw.ViewStack = Gtk.Template.Child()
+    tags_bar: Gtk.Box = Gtk.Template.Child()
+    toolbar: TaskToolbar = Gtk.Template.Child()
 
     # State
     just_added: bool = True
@@ -97,85 +84,10 @@ class Task(Adw.Bin):
             action.connect("activate", callback)
             group.add_action(action)
 
-        def __edit(*args):
-            self.entry_row.set_text(self.get_prop("text"))
-            self.entry_row.set_visible(True)
-
-        def __export(*args):
-            def __confirm(dialog, res):
-                try:
-                    file = dialog.save_finish(res)
-                except:
-                    Log.debug("List: Export cancelled")
-                    return
-
-                Log.info(f"Task: Export '{self.uid}'")
-
-                task = [
-                    i
-                    for i in UserData.get_tasks_as_dicts(self.list_uid)
-                    if i["uid"] == self.uid
-                ][0]
-                calendar = Calendar()
-                event = Event()
-                event.add("uid", task["uid"])
-                event.add("summary", task["text"])
-                if task["notes"]:
-                    event.add("description", task["notes"])
-                event.add("priority", task["priority"])
-                if task["tags"]:
-                    event.add("categories", task["tags"])
-                event.add("percent-complete", task["percent_complete"])
-                if task["color"]:
-                    event.add("x-errands-color", task["color"])
-                event.add(
-                    "dtstart",
-                    (
-                        datetime.fromisoformat(task["start_date"])
-                        if task["start_date"]
-                        else datetime.now()
-                    ),
-                )
-                if task["end_date"]:
-                    event.add("dtend", datetime.fromisoformat(task["end_date"]))
-                calendar.add_component(event)
-
-                with open(file.get_path(), "wb") as f:
-                    f.write(calendar.to_ical())
-                self.window.add_toast(_("Exported"))
-
-            dialog = Gtk.FileDialog(initial_name=f"{self.uid}.ics")
-            dialog.save(self.window, None, __confirm)
-
-        def __copy_to_clipboard(*args):
-            Log.info("Task: Copy text to clipboard")
-            Gdk.Display.get_default().get_clipboard().set(self.get_prop("text"))
-            self.window.add_toast(_("Copied to Clipboard"))
-
-        __create_action("edit", __edit)
-        __create_action("export", __export)
-        __create_action("copy_to_clipboard", __copy_to_clipboard)
-        __create_action("move_to_trash", lambda *_: self.delete())
-
     def __build_ui(self) -> None:
         GSettings.bind("task-show-progressbar", self.progress_bar_rev, "visible")
 
         self.title_row.set_title(Markup.find_url(Markup.escape(self.get_prop("text"))))
-
-        # Set notes theme
-        Adw.StyleManager.get_default().bind_property(
-            "dark",
-            self.notes_buffer,
-            "style-scheme",
-            GObject.BindingFlags.SYNC_CREATE,
-            lambda _, is_dark: self.notes_buffer.set_style_scheme(
-                GtkSource.StyleSchemeManager.get_default().get_scheme(
-                    "Adwaita-dark" if is_dark else "Adwaita"
-                )
-            ),
-        )
-        lm: GtkSource.LanguageManager = GtkSource.LanguageManager.get_default()
-        self.notes_buffer.set_language(lm.get_language("markdown"))
 
         # Sub-tasks
         # tasks: list[TaskData] = [
@@ -204,6 +116,29 @@ class Task(Adw.Bin):
 
         return
         __sort_completed()
+
+    def __update_tags(self):
+        return
+        tags: str = self.get_prop("tags")
+        if tags != "":
+            tags: list[str] = tags.split(",")
+        else:
+            tags = []
+
+        tags_list: list[Tag] = get_children(self.tags_list)
+        tags_list_text: list[str] = [t.title for t in tags_list]
+
+        # Delete tags
+        for t in tags_list:
+            if t.title not in tags:
+                self.tags_list.remove(t)
+
+        # Add tags
+        for t in tags:
+            if t not in tags_list_text:
+                self.add_tag(t)
+
+        self.tags_bar.set_visible(tags != [])
 
     # ------ PROPERTIES ------ #
 
@@ -239,6 +174,10 @@ class Task(Adw.Bin):
         return parents
 
     # ------ PUBLIC METHODS ------ #
+
+    def add_tag(self, tag: str):
+        Log.debug(f"Task: Add Tag '{tag}'")
+        self.tags_bar.append(Tag(tag))
 
     def add_task(self, uid: str) -> Task:
         on_top: bool = GSettings.get("task-list-new-task-position-top")
@@ -376,33 +315,11 @@ class Task(Adw.Bin):
             _("Completed:") + f" {completed} / {total}" if total > 0 else ""
         )
 
-        # Show toolbar
-        self.toolbar_rev.set_reveal_child(self.get_prop("toolbar_shown"))
+        # Update toolbar
+        self.toolbar.update_ui()
 
-        # Update notes button css
-        if self.get_prop("notes"):
-            self.notes_btn.add_css_class("accent")
-        else:
-            self.notes_btn.remove_css_class("accent")
-
-        # Update priority button css
-        priority: int = self.get_prop("priority")
-        self.priority_btn.props.css_classes = ["flat"]
-        if 0 < priority < 5:
-            self.priority_btn.add_css_class("error")
-        elif 4 < priority < 9:
-            self.priority_btn.add_css_class("warning")
-        elif priority == 9:
-            self.priority_btn.add_css_class("accent")
-
-        # Update Date and Time
-        # start_dt = self.get_prop("start_date")
-        # due_dt = self.get_prop("due_date")
-        # self.start_date_time.datetime = self.get_prop("start_date")
-        self.due_date_time.datetime = self.get_prop("due_date")
-        self.date_time_btn.get_child().props.label = (
-            f"{self.due_date_time.human_datetime}"
-        )
+        # Update tags
+        self.__update_tags()
 
         data_tasks: list[TaskData] = [
             t
@@ -431,34 +348,6 @@ class Task(Adw.Bin):
         # self.__sort_tasks()
 
     # ------ TEMPLATE HANDLERS ------ #
-
-    @Gtk.Template.Callback()
-    def _on_date_time_toggled(self, _btn: Gtk.MenuButton, active: bool) -> None:
-        self.start_date_time.datetime = self.get_prop("start_date")
-        self.due_date_time.datetime = self.get_prop("due_date")
-
-    @Gtk.Template.Callback()
-    def _on_date_time_start_set(self, *args) -> None:
-        self.update_props(["start_date"], [self.start_date_time.datetime])
-        self.update_ui(False)
-
-    @Gtk.Template.Callback()
-    def _on_date_time_due_set(self, *args) -> None:
-        self.update_props(["due_date"], [self.due_date_time.datetime])
-        self.update_ui(False)
-
-    @Gtk.Template.Callback()
-    def _on_menu_toggled(self, _btn: Gtk.MenuButton, active: bool):
-        if not active:
-            return
-        created_date: str = datetime.fromisoformat(
-            self.get_prop("created_at")
-        ).strftime("%Y.%m.%d %H:%M:%S")
-        changed_date: str = datetime.fromisoformat(
-            self.get_prop("changed_at")
-        ).strftime("%Y.%m.%d %H:%M:%S")
-        self.created_label.set_label(_("Created:") + " " + created_date)
-        self.changed_label.set_label(_("Changed:") + " " + changed_date)
 
     @Gtk.Template.Callback()
     def _on_title_row_clicked(self, *args):
@@ -545,70 +434,6 @@ class Task(Adw.Bin):
     def _on_cancel_edit_btn_clicked(self, _btn: Gtk.Button) -> None:
         self.entry_row.props.text = ""
         self.entry_row.emit("apply")
-
-    @Gtk.Template.Callback()
-    def _on_notes_toggled(self, btn: Gtk.MenuButton, *_):
-        notes: str = self.get_prop("notes")
-        if btn.get_active():
-            self.notes_buffer.set_text(notes)
-        else:
-            text: str = self.notes_buffer.props.text
-            if text == notes:
-                return
-            Log.info("Task: Change notes")
-            self.update_props(["notes", "synced"], [text, False])
-            self.update_ui()
-            # Sync.sync(False)
-
-    @Gtk.Template.Callback()
-    def _on_priority_toggled(self, btn: Gtk.MenuButton, *_):
-        if not btn.get_active():
-            return
-        # priority: int = self.get_prop("priority")
-        # for btn in get_children(priority_box):
-        #     if btn.priority == 0 == priority:
-        #         btn.set_active(True)
-        #     elif btn.priority == 1 and 0 < priority < 5:
-        #         btn.set_active(True)
-        #     elif btn.priority == 5 and 4 < priority < 9:
-        #         btn.set_active(True)
-        #     elif btn.priority == 9 and 8 < priority:
-        #         btn.set_active(True)
-
-    # @Gtk.Template.Callback()
-    # def _on_priority_selected(self, btn: Gtk.ToggleButton, priority: int):
-    #     box: Gtk.Box = btn.get_parent()
-    #     for button in get_children(box):
-    #         if button != btn:
-    #             button.set_active(False)
-    #     self.update_props(["priority", "synced"], [priority, False])
-    #     self.update_ui()
-    #     # Sync.sync(False)
-
-    @Gtk.Template.Callback()
-    def _on_accent_color_toggled(self, _, btn: Gtk.MenuButton):
-        return
-        self.can_sync = False
-        color: str = self.get_prop("color")
-        if color:
-            for btn in get_children(color_box):
-                for css_class in btn.get_css_classes():
-                    if color in css_class:
-                        btn.set_active(True)
-        else:
-            color_box.get_first_child().set_active(True)
-        self.can_sync = True
-
-    def __on_accent_color_selected(self, btn: Gtk.CheckButton, color: str):
-        if not btn.get_active() or not self.can_sync:
-            return
-
-        Log.info(f"Task: change color to '{color}'")
-        self.update_props(
-            ["color", "synced"], [color if color != "none" else "", False]
-        )
-        self.update_ui()
-        # Sync.sync(False)
 
     # --- DND --- #
 

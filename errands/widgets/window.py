@@ -1,4 +1,4 @@
-# Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
+# Copyright 2023-2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
 from __future__ import annotations
@@ -128,19 +128,19 @@ class Window(Adw.ApplicationWindow):
                         else:
                             start = ""
                         # End
-                        if (end := todo.get("DUE", todo.get("DTEND", ""))) != "":
-                            end = (
+                        if (due := todo.get("DUE", todo.get("DTEND", ""))) != "":
+                            due = (
                                 todo.get("DUE", todo.get("DTEND", ""))
                                 .to_ical()
                                 .decode("utf-8")
                                 .strip("Z")
                             )
                         else:
-                            end = ""
+                            due = ""
                         UserData.add_task(
                             color=todo.get("X-ERRANDS-COLOR", ""),
                             completed=str(todo.get("STATUS", "")) == "COMPLETED",
-                            end_date=end,
+                            due_date=due,
                             list_uid=uid,
                             notes=str(todo.get("DESCRIPTION", "")),
                             parent=str(todo.get("RELATED-TO", "")),

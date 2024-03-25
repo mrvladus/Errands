@@ -174,6 +174,13 @@ class UserDataJSON:
                     completed += 1
         return total, completed
 
+    def get_tags(self) -> list[str]:
+        tags_list: list[str] = [t.tags for t in self.tasks if t.tags]
+        tags: list[str] = []
+        for item in tags_list:
+            tags.extend(item.split(","))
+        return tags
+
     def get_tasks_as_dicts(
         self, list_uid: str = None, parent: str = None
     ) -> list[TaskData]:

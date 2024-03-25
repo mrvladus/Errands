@@ -97,6 +97,19 @@
                       </object>
                     </child>
 
+                    <!-- Tags page -->
+                    <child>
+                      <object class="AdwViewStackPage">
+                        <property name="title" translatable="yes">Tags</property>
+                        <property name="name">errands_tags_page</property>
+                        <property name="child">
+                          <object class="AdwStatusPage">
+                            <property name="title" translatable="yes">No Tags</property>
+                          </object>
+                        </property>
+                      </object>
+                    </child>
+
                     <!-- Trash page -->
                     <!-- <child>
                       <object class="AdwViewStackPage">

@@ -22,8 +22,8 @@
     <internet>always</internet>
   </recommends>
   <branding>
-    <color type="primary" scheme_preference="light">#FCF9C2</color>
-    <color type="primary" scheme_preference="dark">#ADADD2</color>
+    <color type="primary" scheme_preference="light">#a9a9da</color>
+    <color type="primary" scheme_preference="dark">#45457c</color>
   </branding>
   <provides>
     <binary>errands</binary>

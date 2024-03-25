@@ -118,6 +118,11 @@
                   <object id="today_row" class="TodayRow" />
                 </child>
 
+                <!-- Today -->
+                <child>
+                  <object id="tags_row" class="TagsRow" />
+                </child>
+
                 <!-- Trash -->
                 <child>
                   <object id="trash_row" class="TrashRow" />

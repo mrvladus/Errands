@@ -137,6 +137,22 @@
   background-color: @brown_2;
 }
 
+/* Tag */
+
+.tag {
+  border-radius: 5px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: @shade_color;
+}
+
+.tag>button {
+  all: unset;
+  margin-left: 6px;
+}
+
 /* Sub-task */
 
 .sub-tasks:last-child {
