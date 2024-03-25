@@ -709,4 +709,8 @@
       </description>
     </release>
   </releases>
+  <branding>
+    <color type="primary" scheme_preference="light">#a9a9da</color>
+    <color type="primary" scheme_preference="dark">#45457c</color>
+  </branding>
 </component>
