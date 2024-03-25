@@ -203,7 +203,6 @@
                 <style>
                   <class name="menu" />
                 </style>
-
                 <child>
                   <object class="GtkBox">
                     <property name="orientation">vertical</property>
@@ -292,8 +291,6 @@
 
                   </object>
                 </child>
-
-
               </object>
             </property>
             <style>
@@ -313,91 +310,112 @@
               <object class="GtkPopover">
                 <child>
                   <object class="GtkBox">
+                    <property name="orientation">vertical</property>
 
-                    <!-- None -->
                     <child>
-                      <object id="accent_color_btn_none" class="GtkCheckButton">
-                        <style>
-                          <class name="accent-color-btn" />
-                          <class name="accent-color-btn-none" />
-                        </style>
+                      <object class="GtkBox">
+
+                        <!-- None -->
+                        <child>
+                          <object id="none" class="GtkCheckButton">
+                            <style>
+                              <class name="accent-color-btn" />
+                              <class name="accent-color-btn-none" />
+                            </style>
+                            <signal name="toggled" handler="_on_accent_color_selected" />
+                          </object>
+                        </child>
+
+                        <!-- Blue -->
+                        <child>
+                          <object id="blue" class="GtkCheckButton">
+                            <property name="group">none</property>
+                            <style>
+                              <class name="accent-color-btn" />
+                              <class name="accent-color-btn-blue" />
+                            </style>
+                            <signal name="toggled" handler="_on_accent_color_selected" />
+                          </object>
+                        </child>
+
+                        <!-- Green -->
+                        <child>
+                          <object id="green" class="GtkCheckButton">
+                            <property name="group">none</property>
+                            <style>
+                              <class name="accent-color-btn" />
+                              <class name="accent-color-btn-green" />
+                            </style>
+                            <signal name="toggled" handler="_on_accent_color_selected" />
+                          </object>
+                        </child>
+
+                        <!-- Yellow -->
+                        <child>
+                          <object id="yellow" class="GtkCheckButton">
+                            <property name="group">none</property>
+                            <style>
+                              <class name="accent-color-btn" />
+                              <class name="accent-color-btn-yellow" />
+                            </style>
+                            <signal name="toggled" handler="_on_accent_color_selected" />
+                          </object>
+                        </child>
+
                       </object>
                     </child>
 
-                    <!-- Blue -->
                     <child>
-                      <object class="GtkCheckButton">
-                        <property name="group">accent_color_btn_none</property>
-                        <style>
-                          <class name="accent-color-btn" />
-                          <class name="accent-color-btn-blue" />
-                        </style>
-                      </object>
-                    </child>
+                      <object class="GtkBox">
 
-                    <!-- Green -->
-                    <child>
-                      <object class="GtkCheckButton">
-                        <property name="group">accent_color_btn_none</property>
-                        <style>
-                          <class name="accent-color-btn" />
-                          <class name="accent-color-btn-green" />
-                        </style>
-                      </object>
-                    </child>
+                        <!-- Orange -->
+                        <child>
+                          <object id="orange" class="GtkCheckButton">
+                            <property name="group">none</property>
+                            <style>
+                              <class name="accent-color-btn" />
+                              <class name="accent-color-btn-orange" />
+                            </style>
+                            <signal name="toggled" handler="_on_accent_color_selected" />
+                          </object>
+                        </child>
 
-                    <!-- Yellow -->
-                    <child>
-                      <object class="GtkCheckButton">
-                        <property name="group">accent_color_btn_none</property>
-                        <style>
-                          <class name="accent-color-btn" />
-                          <class name="accent-color-btn-yellow" />
-                        </style>
-                      </object>
-                    </child>
+                        <!-- Red -->
+                        <child>
+                          <object id="red" class="GtkCheckButton">
+                            <property name="group">none</property>
+                            <style>
+                              <class name="accent-color-btn" />
+                              <class name="accent-color-btn-red" />
+                            </style>
+                            <signal name="toggled" handler="_on_accent_color_selected" />
+                          </object>
+                        </child>
 
-                    <!-- Orange -->
-                    <child>
-                      <object class="GtkCheckButton">
-                        <property name="group">accent_color_btn_none</property>
-                        <style>
-                          <class name="accent-color-btn" />
-                          <class name="accent-color-btn-orange" />
-                        </style>
-                      </object>
-                    </child>
+                        <!-- Purple -->
+                        <child>
+                          <object id="purple" class="GtkCheckButton">
+                            <property name="group">none</property>
+                            <style>
+                              <class name="accent-color-btn" />
+                              <class name="accent-color-btn-purple" />
+                            </style>
+                            <signal name="toggled" handler="_on_accent_color_selected" />
+                          </object>
+                        </child>
 
-                    <!-- Red -->
-                    <child>
-                      <object class="GtkCheckButton">
-                        <property name="group">accent_color_btn_none</property>
-                        <style>
-                          <class name="accent-color-btn" />
-                          <class name="accent-color-btn-red" />
-                        </style>
-                      </object>
-                    </child>
+                        <!-- Brown -->
+                        <child>
+                          <object id="brown" class="GtkCheckButton">
+                            <property name="group">none</property>
+                            <style>
+                              <class name="accent-color-btn" />
+                              <class name="accent-color-btn-brown" />
+                            </style>
+                            <signal name="toggled" handler="_on_accent_color_selected" />
+                          </object>
+                        </child>
 
-                    <!-- Purple -->
-                    <child>
-                      <object class="GtkCheckButton">
-                        <property name="group">accent_color_btn_none</property>
-                        <style>
-                          <class name="accent-color-btn" />
-                          <class name="accent-color-btn-purple" />
-                        </style>
-                      </object>
-                    </child>
-
-                    <!-- Brown -->
-                    <child>
-                      <object class="GtkCheckButton">
-                        <property name="group">accent_color_btn_none</property>
-                        <style>
-                          <class name="accent-color-btn" />
-                          <class name="accent-color-btn-brown" />
-                        </style>
                       </object>
                     </child>
 
@@ -408,7 +426,7 @@
             <style>
               <class name="flat" />
             </style>
-            <signal name="notify::active" handler="_on_accent_color_toggled" />
+            <signal name="notify::active" handler="_on_accent_color_btn_toggled" />
           </object>
         </child>
 

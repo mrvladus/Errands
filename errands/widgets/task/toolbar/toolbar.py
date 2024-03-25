@@ -38,6 +38,8 @@ class TaskToolbar(Gtk.Revealer):
     tags_list: Gtk.ListBox = Gtk.Template.Child()
     priority: Gtk.SpinButton = Gtk.Template.Child()
 
+    can_sync = True
+
     def __init__(self) -> None:
         super().__init__()
         self.__add_actions()
@@ -270,27 +272,28 @@ class TaskToolbar(Gtk.Revealer):
         self.priority_btn.popdown()
 
     @Gtk.Template.Callback()
-    def _on_accent_color_toggled(self, _, btn: Gtk.MenuButton):
-        return
-        self.can_sync = False
-        color: str = self.get_prop("color")
-        if color:
-            for btn in get_children(color_box):
-                for css_class in btn.get_css_classes():
-                    if color in css_class:
-                        btn.set_active(True)
-        else:
-            color_box.get_first_child().set_active(True)
-        self.can_sync = True
+    def _on_accent_color_btn_toggled(self, btn: Gtk.MenuButton, *_):
+        if btn.get_active():
+            color: str = self.task.get_prop("color")
+            box1 = btn.get_popover().get_child().get_first_child()
+            box2 = btn.get_popover().get_child().get_last_child()
+            color_btns = get_children(box1) + get_children(box2)
+            for btn in color_btns:
+                btn_color = btn.get_buildable_id()
+                if btn_color == color:
+                    self.can_sync = False
+                    btn.set_active(True)
+                    self.can_sync = True
 
-    # @Gtk.Template.Callback()
-    # def __on_accent_color_selected(self, btn: Gtk.CheckButton, color: str):
-    #     if not btn.get_active() or not self.can_sync:
-    #         return
-
-    #     Log.info(f"Task: change color to '{color}'")
-    #     self.update_props(
-    #         ["color", "synced"], [color if color != "none" else "", False]
-    #     )
-    #     self.update_ui()
-    #     # Sync.sync(False)
+    @Gtk.Template.Callback()
+    def _on_accent_color_selected(self, btn: Gtk.CheckButton):
+        if not btn.get_active() or not self.can_sync:
+            return
+        color: str = btn.get_buildable_id()
+        Log.info(f"Task: change color to '{color}'")
+        if color != self.task.get_prop("color"):
+            self.task.update_props(
+                ["color", "synced"], [color if color != "none" else "", False]
+            )
+            self.task.update_ui(False)
+        # Sync.sync(False)
