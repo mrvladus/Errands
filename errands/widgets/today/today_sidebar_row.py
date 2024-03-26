@@ -15,8 +15,8 @@ from gi.repository import Adw, Gtk, Gio  # type:ignore
 
 
 @Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
-class TodayRow(Gtk.ListBoxRow):
-    __gtype_name__ = "TodayRow"
+class TodaySidebarRow(Gtk.ListBoxRow):
+    __gtype_name__ = "TodaySidebarRow"
 
     def __init__(self) -> None:
         super().__init__()

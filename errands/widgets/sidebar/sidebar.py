@@ -18,7 +18,7 @@ from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
 from errands.widgets.task_list.task_list_sidebar_row import TaskListSidebarRow
-from errands.widgets.sidebar.today_row import TodayRow
+from errands.widgets.today.today_sidebar_row import TodaySidebarRow
 from errands.widgets.trash.trash_sidebar_row import TrashSidebarRow
 from errands.widgets.task_list.task_list import TaskList
 from gi.repository import Adw, Gtk, GObject  # type:ignore
@@ -98,16 +98,16 @@ class Sidebar(Adw.Bin):
     __gtype_name__ = "Sidebar"
 
     GObject.type_ensure(TagsSidebarRow)
-    GObject.type_ensure(TodayRow)
+    GObject.type_ensure(TodaySidebarRow)
     GObject.type_ensure(TrashSidebarRow)
 
     sync_indicator: Gtk.Spinner = Gtk.Template.Child()
     add_list_btn: Gtk.Button = Gtk.Template.Child()
     status_page: Adw.StatusPage = Gtk.Template.Child()
     list_box: Gtk.ListBox = Gtk.Template.Child()
-    tags_row: TodayRow = Gtk.Template.Child()
+    tags_row: TagsSidebarRow = Gtk.Template.Child()
     trash_row: TrashSidebarRow = Gtk.Template.Child()
-    today_row: TodayRow = Gtk.Template.Child()
+    today_row: TodaySidebarRow = Gtk.Template.Child()
 
     def __init__(self) -> None:
         super().__init__()

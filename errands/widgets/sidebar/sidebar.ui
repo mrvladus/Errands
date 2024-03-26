@@ -115,7 +115,7 @@
 
                 <!-- Today -->
                 <child>
-                  <object id="today_row" class="TodayRow" />
+                  <object id="today_row" class="TodaySidebarRow" />
                 </child>
 
                 <!-- Tags -->

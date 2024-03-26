@@ -11,7 +11,7 @@
     </section>
   </menu> -->
 
-  <template class="TodayRow" parent="GtkListBoxRow">
+  <template class="TodaySidebarRow" parent="GtkListBoxRow">
     <property name="height-request">50</property>
     <signal name="activate" handler="_on_row_activated" />
     <style>
