@@ -66,12 +66,18 @@
                         <!-- Due date -->
                         <child>
                           <object class="AdwViewStackPage">
-                            <property name="name">due</property>
+                            <property name="name" translatable="yes">Due</property>
                             <property name="icon-name">errands-calendar-symbolic</property>
-                            <property name="title">Due</property>
+                            <property name="title" translatable="yes">Due</property>
                             <property name="child">
-                              <object id="due_date_time" class="DateTimePicker">
-                                <signal name="changed" handler="_on_date_time_due_set" />
+                              <object class="GtkScrolledWindow">
+                                <property name="propagate-natural-height">true</property>
+                                <property name="propagate-natural-width">true</property>
+                                <child>
+                                  <object id="due_date_time" class="DateTimePicker">
+                                    <signal name="changed" handler="_on_date_time_due_set" />
+                                  </object>
+                                </child>
                               </object>
                             </property>
                           </object>
@@ -80,12 +86,18 @@
                         <!-- Start date -->
                         <child>
                           <object class="AdwViewStackPage">
-                            <property name="name">start</property>
+                            <property name="name" translatable="yes">Start</property>
                             <property name="icon-name">errands-calendar-symbolic</property>
-                            <property name="title">Start</property>
+                            <property name="title" translatable="yes">Start</property>
                             <property name="child">
-                              <object id="start_date_time" class="DateTimePicker">
-                                <signal name="changed" handler="_on_date_time_start_set" />
+                              <object class="GtkScrolledWindow">
+                                <property name="propagate-natural-height">true</property>
+                                <property name="propagate-natural-width">true</property>
+                                <child>
+                                  <object id="start_date_time" class="DateTimePicker">
+                                    <signal name="changed" handler="_on_date_time_start_set" />
+                                  </object>
+                                </child>
                               </object>
                             </property>
                           </object>
