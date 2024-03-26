@@ -210,6 +210,8 @@ class Sidebar(Adw.Bin):
 
     @Gtk.Template.Callback()
     def _on_add_btn_clicked(self, _btn) -> None:
+        lists_names: list[str] = [i.name for i in UserData.get_lists_as_dicts()]
+
         def _entry_activated(_, dialog):
             if dialog.get_response_enabled("add"):
                 dialog.response("add")
@@ -217,8 +219,7 @@ class Sidebar(Adw.Bin):
 
         def _entry_changed(entry: Gtk.Entry, _, dialog):
             text = entry.props.text.strip(" \n\t")
-            names = [i.name for i in UserData.get_lists_as_dicts()]
-            dialog.set_response_enabled("add", text and text not in names)
+            dialog.set_response_enabled("add", text and text not in lists_names)
 
         def _confirm(_, res, entry: Gtk.Entry):
             if res == "cancel":
