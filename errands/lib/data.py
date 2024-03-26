@@ -6,7 +6,7 @@ import datetime
 import json
 import os
 import shutil
-from typing import Any, Iterable
+from typing import Any, Iterable, List
 from uuid import uuid4
 
 from gi.repository import GLib  # type:ignore
@@ -47,7 +47,7 @@ class TaskData:
     rrule: str = ""
     start_date: str = ""
     synced: bool = False
-    tags: str = ""
+    tags: list[str] = field(default_factory=lambda: [])
     text: str = ""
     toolbar_shown: bool = False
     trash: bool = False
@@ -361,6 +361,9 @@ class UserDataJSON:
         __add_parent(task_uid)
         return tree
 
+    def __backup_data(self) -> None:
+        shutil.copyfile(self.__data_file_path, self.__data_file_path + ".old")
+
     def __read_data(self) -> None:
         try:
             Log.debug("Data: Read data")
@@ -373,6 +376,7 @@ class UserDataJSON:
             Log.error(
                 f"Data: Can't read data file from disk. {e}. Creating new data file"
             )
+            self.__backup_data()
             self.__write_data()
 
     def __write_data(self) -> None:

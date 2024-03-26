@@ -20,7 +20,7 @@ from gi.repository import Adw, Gtk  # type:ignore
 class TagsRow(Gtk.ListBoxRow):
     __gtype_name__ = "TagsRow"
 
-    size_counter: Gtk.Label = Gtk.Template.Child()
+    size_counter: Gtk.Button = Gtk.Template.Child()
 
     def __init__(self) -> None:
         super().__init__()

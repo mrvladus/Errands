@@ -24,25 +24,16 @@
         </child>
 
         <child>
-          <object id="size_counter" class="GtkLabel">
-            <property name="margin-end">14</property>
+          <object id="size_counter" class="GtkButton">
+            <property name="valign">center</property>
+            <property name="can-target">false</property>
             <style>
               <class name="dim-label" />
               <class name="caption" />
-            </style>
-          </object>
-        </child>
-
-        <!-- <child>
-          <object class="GtkMenuButton">
-            <property name="menu-model">menu</property>
-            <property name="icon-name">view-more-symbolic</property>
-            <property name="valign">center</property>
-            <style>
               <class name="flat" />
             </style>
           </object>
-        </child> -->
+        </child>
 
       </object>
     </child>

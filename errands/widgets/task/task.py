@@ -118,12 +118,7 @@ class Task(Adw.Bin):
         __sort_completed()
 
     def update_tags(self):
-        data_tags: str = self.get_prop("tags")
-        if data_tags != "":
-            tags: list[str] = data_tags.split(",")
-        else:
-            tags = []
-
+        tags: str = self.get_prop("tags")
         tags_list_text: list[str] = [t.title for t in self.tags]
 
         # Delete tags

@@ -1,5 +1,6 @@
 # Copyright 2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -26,7 +27,7 @@ class Tag(Gtk.Box):
         self.append(btn)
 
     def delete(self, _btn):
-        tags: list[str] = self.task.get_prop("tags").split(",")
+        tags: list[str] = self.task.get_prop("tags")
         tags.remove(self.title)
-        self.task.update_props(["tags", "synced"], [",".join(tags), False])
+        self.task.update_props(["tags", "synced"], [tags, False])
         self.get_parent().get_parent().remove(self)

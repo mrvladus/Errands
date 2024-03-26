@@ -32,11 +32,8 @@ class TagsListItem(Gtk.Box):
     def __on_toggle(self, btn: Gtk.CheckButton) -> None:
         if self.block_signals:
             return
+
         tags: str = self.task.get_prop("tags")
-        if tags != "":
-            tags: list[str] = tags.split(",")
-        else:
-            tags = []
 
         if btn.get_active():
             if self.title not in tags:
@@ -45,5 +42,5 @@ class TagsListItem(Gtk.Box):
             if self.title in tags:
                 tags.remove(self.title)
 
-        self.task.update_props(["tags", "synced"], [",".join(tags), False])
+        self.task.update_props(["tags", "synced"], [tags, False])
         self.task.update_tags()
