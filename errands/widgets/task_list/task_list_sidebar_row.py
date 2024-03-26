@@ -24,8 +24,8 @@ from gi.repository import Adw, Gtk, Gio, GObject, Gdk, GLib  # type:ignore
 
 
 @Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
-class TaskListRow(Gtk.ListBoxRow):
-    __gtype_name__ = "TaskListRow"
+class TaskListSidebarRow(Gtk.ListBoxRow):
+    __gtype_name__ = "TaskListSidebarRow"
 
     size_counter: Gtk.Label = Gtk.Template.Child()
     label: Gtk.Label = Gtk.Template.Child()

@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from errands.widgets.window import Window
-    from errands.widgets.sidebar.task_list_row import TaskListRow
+    from errands.widgets.task_list.task_list_sidebar_row import TaskListSidebarRow
 
 from errands.lib.sync.sync import Sync
 from gi.repository import Adw, Gtk, GLib, Gio, GObject  # type:ignore
@@ -36,11 +36,11 @@ class TaskList(Adw.Bin):
     # State
     scrolling: bool = False
 
-    def __init__(self, list_uid: str, sidebar_row) -> None:
+    def __init__(self, list_uid: str, sidebar_row: TaskListSidebarRow) -> None:
         super().__init__()
         self.window: Window = Adw.Application.get_default().get_active_window()
         self.list_uid: str = list_uid
-        self.sidebar_row: TaskListRow = sidebar_row
+        self.sidebar_row: TaskListSidebarRow = sidebar_row
         self.__load_tasks()
         self.update_status()
 

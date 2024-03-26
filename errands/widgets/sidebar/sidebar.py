@@ -17,7 +17,7 @@ from errands.lib.utils import get_children
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
-from errands.widgets.sidebar.task_list_row import TaskListRow
+from errands.widgets.task_list.task_list_sidebar_row import TaskListSidebarRow
 from errands.widgets.sidebar.today_row import TodayRow
 from errands.widgets.trash.trash_sidebar_row import TrashSidebarRow
 from errands.widgets.task_list.task_list import TaskList
@@ -115,8 +115,8 @@ class Sidebar(Adw.Bin):
         self.list_box.set_header_func(
             lambda row, before: (
                 row.set_header(TitledSeparator(_("Task Lists"), (12, 12, 0, 2)))
-                if row.__gtype_name__ == "TaskListRow"
-                and before.__gtype_name__ != "TaskListRow"
+                if row.__gtype_name__ == "TaskListSidebarRow"
+                and before.__gtype_name__ != "TaskListSidebarRow"
                 else ...
             )
         )
@@ -126,9 +126,9 @@ class Sidebar(Adw.Bin):
 
     # ------ PRIVATE METHODS ------ #
 
-    def __add_task_list(self, list_dict: TaskListData) -> TaskListRow:
+    def __add_task_list(self, list_dict: TaskListData) -> TaskListSidebarRow:
         Log.debug(f"Sidebar: Add Task List '{list_dict.uid}'")
-        row: TaskListRow = TaskListRow(list_dict, self)
+        row: TaskListSidebarRow = TaskListSidebarRow(list_dict, self)
         self.list_box.append(row)
         self.status_page.set_visible(False)
         return row
@@ -138,7 +138,7 @@ class Sidebar(Adw.Bin):
         for list in (l for l in UserData.get_lists_as_dicts() if not l.deleted):
             self.__add_task_list(list)
 
-    def __remove_task_list(self, l: TaskListRow) -> None:
+    def __remove_task_list(self, l: TaskListSidebarRow) -> None:
         Log.debug(f"Sidebar: Delete list {l.uid}")
         self.list_box.select_row(l.get_prev_sibling())
         self.window.stack.remove(l.task_list)
@@ -168,12 +168,12 @@ class Sidebar(Adw.Bin):
         return get_children(self.list_box)
 
     @property
-    def task_lists_rows(self) -> list[TaskListRow]:
+    def task_lists_rows(self) -> list[TaskListSidebarRow]:
         """Get only task list rows"""
         return [
             r
             for r in self.rows
-            if hasattr(r, "__gtype_name__") and r.__gtype_name__ == "TaskListRow"
+            if hasattr(r, "__gtype_name__") and r.__gtype_name__ == "TaskListSidebarRow"
         ]
 
     @property
@@ -227,7 +227,7 @@ class Sidebar(Adw.Bin):
             name = entry.props.text.rstrip().lstrip()
             list_dict = UserData.add_list(name)
             row = self.__add_task_list(list_dict)
-            # row.activate()
+            row.activate()
             # Sync.sync()
 
         entry = Gtk.Entry(placeholder_text=_("New List Name"))
