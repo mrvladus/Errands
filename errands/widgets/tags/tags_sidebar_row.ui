@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <template class="TagsRow" parent="GtkListBoxRow">
+  <template class="TagsSidebarRow" parent="GtkListBoxRow">
     <property name="height-request">50</property>
     <signal name="activate" handler="_on_row_activated" />
-
     <child>
       <object class="GtkBox">
         <property name="spacing">12</property>
         <property name="margin-start">6</property>
 
+        <!-- Icon -->
         <child>
           <object class="GtkImage">
             <property name="icon-name">errands-tag-symbolic</property>
           </object>
         </child>
 
+        <!-- Title -->
         <child>
           <object class="GtkLabel">
             <property name="label" translatable="yes">Tags</property>
@@ -23,6 +24,7 @@
           </object>
         </child>
 
+        <!-- Counter -->
         <child>
           <object id="size_counter" class="GtkButton">
             <property name="valign">center</property>
@@ -37,6 +39,5 @@
 
       </object>
     </child>
-
   </template>
 </interface>

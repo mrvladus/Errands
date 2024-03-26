@@ -22,11 +22,10 @@ class TagsListItem(Gtk.Box):
         self.toggle_btn.connect("toggled", self.__on_toggle)
         self.append(self.toggle_btn)
         self.append(
-            Gtk.Label(
-                label=title,
-                hexpand=True,
-                halign="start",
-            )
+            Gtk.Label(label=title, hexpand=True, halign="start", max_width_chars=20)
+        )
+        self.append(
+            Gtk.Image(icon_name="errands-tag-symbolic", css_classes=["dim-label"])
         )
 
     def __on_toggle(self, btn: Gtk.CheckButton) -> None:

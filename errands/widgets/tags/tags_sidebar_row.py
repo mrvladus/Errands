@@ -17,8 +17,8 @@ from gi.repository import Adw, Gtk  # type:ignore
 
 
 @Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
-class TagsRow(Gtk.ListBoxRow):
-    __gtype_name__ = "TagsRow"
+class TagsSidebarRow(Gtk.ListBoxRow):
+    __gtype_name__ = "TagsSidebarRow"
 
     size_counter: Gtk.Button = Gtk.Template.Child()
 

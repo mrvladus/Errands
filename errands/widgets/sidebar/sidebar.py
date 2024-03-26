@@ -6,7 +6,7 @@ import os
 from typing import TYPE_CHECKING
 
 from errands.widgets.components.titled_separator import TitledSeparator
-from errands.widgets.sidebar.tags_row import TagsRow
+from errands.widgets.tags.tags_sidebar_row import TagsSidebarRow
 
 
 if TYPE_CHECKING:
@@ -19,7 +19,7 @@ from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
 from errands.widgets.sidebar.task_list_row import TaskListRow
 from errands.widgets.sidebar.today_row import TodayRow
-from errands.widgets.sidebar.trash_row import TrashRow
+from errands.widgets.trash.trash_sidebar_row import TrashSidebarRow
 from errands.widgets.task_list.task_list import TaskList
 from gi.repository import Adw, Gtk, GObject  # type:ignore
 
@@ -97,16 +97,16 @@ from gi.repository import Adw, Gtk, GObject  # type:ignore
 class Sidebar(Adw.Bin):
     __gtype_name__ = "Sidebar"
 
-    GObject.type_ensure(TagsRow)
+    GObject.type_ensure(TagsSidebarRow)
     GObject.type_ensure(TodayRow)
-    GObject.type_ensure(TrashRow)
+    GObject.type_ensure(TrashSidebarRow)
 
     sync_indicator: Gtk.Spinner = Gtk.Template.Child()
     add_list_btn: Gtk.Button = Gtk.Template.Child()
     status_page: Adw.StatusPage = Gtk.Template.Child()
     list_box: Gtk.ListBox = Gtk.Template.Child()
     tags_row: TodayRow = Gtk.Template.Child()
-    trash_row: TrashRow = Gtk.Template.Child()
+    trash_row: TrashSidebarRow = Gtk.Template.Child()
     today_row: TodayRow = Gtk.Template.Child()
 
     def __init__(self) -> None:
@@ -116,7 +116,7 @@ class Sidebar(Adw.Bin):
             lambda row, before: (
                 row.set_header(TitledSeparator(_("Task Lists"), (12, 12, 0, 2)))
                 if row.__gtype_name__ == "TaskListRow"
-                and before.__gtype_name__ == "TrashRow"
+                and before.__gtype_name__ != "TaskListRow"
                 else ...
             )
         )

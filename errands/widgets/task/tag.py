@@ -23,11 +23,20 @@ class Tag(Gtk.Box):
             icon_name="errands-close-symbolic", cursor=Gdk.Cursor(name="pointer")
         )
         btn.connect("clicked", self.delete)
-        self.append(Gtk.Label(label=title))
+        self.append(
+            Gtk.Label(
+                label=title,
+                css_classes=["caption-heading"],
+                max_width_chars=15,
+                ellipsize=3,
+                hexpand=True,
+                halign=Gtk.Align.START,
+            )
+        )
         self.append(btn)
 
     def delete(self, _btn):
         tags: list[str] = self.task.get_prop("tags")
         tags.remove(self.title)
         self.task.update_props(["tags", "synced"], [tags, False])
-        self.get_parent().get_parent().remove(self)
+        self.task.update_tags()

@@ -14,7 +14,7 @@
     </section>
   </menu>
 
-  <template class="TrashRow" parent="GtkListBoxRow">
+  <template class="TrashSidebarRow" parent="GtkListBoxRow">
     <property name="height-request">50</property>
     <signal name="activate" handler="_on_row_activated" />
     <style>

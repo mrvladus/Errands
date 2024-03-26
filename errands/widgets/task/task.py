@@ -44,7 +44,8 @@ class Task(Adw.Bin):
     complete_btn: Gtk.CheckButton = Gtk.Template.Child()
     expand_indicator: Gtk.Image = Gtk.Template.Child()
     entry_row: Adw.EntryRow = Gtk.Template.Child()
-    tags_bar: Gtk.Box = Gtk.Template.Child()
+    tags_bar: Gtk.FlowBox = Gtk.Template.Child()
+    tags_bar_rev: Gtk.Revealer = Gtk.Template.Child()
     toolbar: TaskToolbar = Gtk.Template.Child()
 
     # State
@@ -131,7 +132,7 @@ class Task(Adw.Bin):
             if t not in tags_list_text:
                 self.tags_bar.append(Tag(t, self))
 
-        self.tags_bar.set_visible(tags != [])
+        self.tags_bar_rev.set_reveal_child(tags != [])
 
     # ------ PROPERTIES ------ #
 

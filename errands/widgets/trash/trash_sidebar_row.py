@@ -19,8 +19,8 @@ from gi.repository import Adw, Gio, Gtk  # type:ignore
 
 
 @Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
-class TrashRow(Gtk.ListBoxRow):
-    __gtype_name__ = "TrashRow"
+class TrashSidebarRow(Gtk.ListBoxRow):
+    __gtype_name__ = "TrashSidebarRow"
 
     size_counter: Gtk.Label = Gtk.Template.Child()
     icon: Gtk.Image = Gtk.Template.Child()
