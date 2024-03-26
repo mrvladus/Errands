@@ -17,6 +17,11 @@ from errands.lib.utils import threaded, timeit
 
 
 @dataclass
+class TagsData:
+    text: str
+
+
+@dataclass
 class TaskListData:
     color: str = ""
     deleted: bool = False
@@ -64,8 +69,18 @@ class UserDataJSON:
         self.__data_file_path: str = os.path.join(self.__data_dir, "data.json")
         self.__task_lists_data: list[TaskListData] = []
         self.__tasks_data: list[TaskData] = []
+        self.__tags_data: list[TagsData] = []
 
     # ------ PROPERTIES ------ #
+
+    @property
+    def tags(self) -> list[TagsData]:
+        return self.__tags_data
+
+    @tags.setter
+    def tags(self, new_data: list[TagsData]):
+        self.__tags_data = new_data
+        self.__write_data()
 
     @property
     def task_lists(self) -> list[TaskListData]:
@@ -159,6 +174,7 @@ class UserDataJSON:
 
     def get_status(self, list_uid: str, parent_uid: str = "") -> tuple[int, int]:
         """Gets tuple (total_tasks, completed_tasks)"""
+
         tasks: list[TaskData] = self.tasks
         total: int = 0
         completed: int = 0
@@ -174,12 +190,50 @@ class UserDataJSON:
                     completed += 1
         return total, completed
 
-    def get_tags(self) -> list[str]:
+    def add_tag(self, tag: str) -> None:
+        new_tags = self.tags
+        for t in new_tags:
+            if t.text == tag:
+                return
+        new_tags.append(TagsData(text=tag))
+        self.tags = new_tags
+
+    def update_tags(self) -> None:
         tags_list: list[str] = [t.tags for t in self.tasks if t.tags]
+        current_tags = self.tags
+        current_tags_texts = [t.text for t in current_tags]
+
         tags: list[str] = []
         for item in tags_list:
             tags.extend(item.split(","))
-        return tags
+
+        for tag in tags:
+            if tag not in current_tags_texts:
+                current_tags.append(TagsData(text=tag))
+
+        self.tags = current_tags
+
+    def remove_tags(self, tags: list[str]) -> None:
+        new_tags = self.tags
+        to_remove: list[TagsData] = []
+        for t in new_tags:
+            if t.text in tags:
+                to_remove.append(t)
+        for t in to_remove:
+            new_tags.remove(t)
+        self.tags = new_tags
+
+        # Remove tags from tasks
+        tasks = self.tasks
+        for task in tasks:
+            if task.tags:
+                taks_tags = task.tags.split(",")
+                for tag in taks_tags:
+                    if tag in tags:
+                        taks_tags.remove(tag)
+                task.tags = ",".join(taks_tags)
+        if tasks != self.tasks:
+            self.tasks = tasks
 
     def get_tasks_as_dicts(
         self, list_uid: str = None, parent: str = None
@@ -314,6 +368,7 @@ class UserDataJSON:
                 data: dict[str, Any] = json.load(f)
                 self.__task_lists_data = [TaskListData(**l) for l in data["lists"]]
                 self.__tasks_data = [TaskData(**t) for t in data["tasks"]]
+                self.__tags_data = [TagsData(**t) for t in data["tags"]]
         except Exception as e:
             Log.error(
                 f"Data: Can't read data file from disk. {e}. Creating new data file"
@@ -326,6 +381,7 @@ class UserDataJSON:
             with open(self.__data_file_path, "w") as f:
                 data: dict[str, list[TaskListData | TaskData]] = {
                     "lists": [asdict(l) for l in self.task_lists],
+                    "tags": [asdict(t) for t in self.tags],
                     "tasks": [asdict(t) for t in self.tasks],
                 }
                 json.dump(data, f, ensure_ascii=False)

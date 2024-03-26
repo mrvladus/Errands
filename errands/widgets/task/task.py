@@ -117,30 +117,32 @@ class Task(Adw.Bin):
         return
         __sort_completed()
 
-    def __update_tags(self):
-        return
-        tags: str = self.get_prop("tags")
-        if tags != "":
-            tags: list[str] = tags.split(",")
+    def update_tags(self):
+        data_tags: str = self.get_prop("tags")
+        if data_tags != "":
+            tags: list[str] = data_tags.split(",")
         else:
             tags = []
 
-        tags_list: list[Tag] = get_children(self.tags_list)
-        tags_list_text: list[str] = [t.title for t in tags_list]
+        tags_list_text: list[str] = [t.title for t in self.tags]
 
         # Delete tags
-        for t in tags_list:
+        for t in self.tags:
             if t.title not in tags:
-                self.tags_list.remove(t)
+                self.tags_bar.remove(t)
 
         # Add tags
         for t in tags:
             if t not in tags_list_text:
-                self.add_tag(t)
+                self.tags_bar.append(Tag(t, self))
 
         self.tags_bar.set_visible(tags != [])
 
     # ------ PROPERTIES ------ #
+
+    @property
+    def tags(self) -> list[Tag]:
+        return [t.get_child() for t in get_children(self.tags_bar)]
 
     @property
     def tasks(self) -> list[Task]:
@@ -174,10 +176,6 @@ class Task(Adw.Bin):
         return parents
 
     # ------ PUBLIC METHODS ------ #
-
-    def add_tag(self, tag: str):
-        Log.debug(f"Task: Add Tag '{tag}'")
-        self.tags_bar.append(Tag(tag))
 
     def add_task(self, uid: str) -> Task:
         on_top: bool = GSettings.get("task-list-new-task-position-top")
@@ -319,7 +317,7 @@ class Task(Adw.Bin):
         self.toolbar.update_ui()
 
         # Update tags
-        self.__update_tags()
+        self.update_tags()
 
         data_tasks: list[TaskData] = [
             t

@@ -1,24 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-
-  <!-- Menu -->
-  <!-- <menu id="menu">
-    <section>
-      <item>
-        <attribute name="label" translatable="yes">Rename</attribute>
-        <attribute name="action">list_item.rename</attribute>
-      </item>
-      <item>
-        <attribute name="label" translatable="yes">Delete</attribute>
-        <attribute name="action">list_item.delete</attribute>
-      </item>
-      <item>
-        <attribute name="label" translatable="yes">Export</attribute>
-        <attribute name="action">list_item.export</attribute>
-      </item>
-    </section>
-  </menu> -->
-
   <template class="TagsRow" parent="GtkListBoxRow">
     <property name="height-request">50</property>
     <signal name="activate" handler="_on_row_activated" />
@@ -35,7 +16,7 @@
         </child>
 
         <child>
-          <object id="label" class="GtkLabel">
+          <object class="GtkLabel">
             <property name="label" translatable="yes">Tags</property>
             <property name="hexpand">true</property>
             <property name="halign">start</property>
@@ -44,6 +25,7 @@
 
         <child>
           <object id="size_counter" class="GtkLabel">
+            <property name="margin-end">14</property>
             <style>
               <class name="dim-label" />
               <class name="caption" />

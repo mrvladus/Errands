@@ -37,5 +37,6 @@
     <file preprocess="xml-stripblanks" alias="errands-tag-symbolic.svg">icons/errands-tag-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-tag-add-symbolic.svg">icons/errands-tag-add-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-close-symbolic.svg">icons/errands-close-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-right-symbolic.svg">icons/errands-right-symbolic.svg</file>
   </gresource>
 </gresources>

@@ -166,21 +166,45 @@
             <property name="popover">
               <object class="GtkPopover">
                 <style>
-                  <class name="menu" />
+                  <class name="tags-menu" />
                 </style>
                 <child>
                   <object class="GtkScrolledWindow">
-                    <property name="height-request">240</property>
-                    <property name="width-request">220</property>
-                    <property name="propagate-natural-height">true</property>
+                    <property name="max-content-width">200</property>
+                    <property name="width-request">200</property>
+                    <property name="max-content-height">200</property>
                     <property name="propagate-natural-width">true</property>
+                    <property name="propagate-natural-height">true</property>
                     <property name="vexpand">true</property>
                     <child>
-                      <object id="tags_list" class="GtkListBox">
-                        <property name="selection-mode">0</property>
-                        <signal name="row-activated" handler="_on_tag_selected" />
+                      <object class="GtkBox">
+                        <property name="orientation">vertical</property>
+
+                        <child>
+                          <object id="tags_list" class="GtkBox">
+                            <property name="spacing">6</property>
+                            <property name="margin-start">6</property>
+                            <property name="margin-end">6</property>
+                            <property name="margin-top">6</property>
+                            <property name="margin-bottom">6</property>
+                            <property name="orientation">vertical</property>
+                          </object>
+                        </child>
+
+                        <child>
+                          <object class="AdwStatusPage">
+                            <property name="title" translatable="yes">No Tags</property>
+                            <property name="icon-name">errands-info-symbolic</property>
+                            <property name="visible" bind-source="tags_list" bind-property="visible" bind-flags="sync-create | invert-boolean" />
+                            <style>
+                              <class name="compact" />
+                            </style>
+                          </object>
+                        </child>
+
                       </object>
                     </child>
+
                   </object>
                 </child>
               </object>

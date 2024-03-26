@@ -153,6 +153,10 @@
   margin-left: 6px;
 }
 
+.tags-menu contents {
+  padding: 0px;
+}
+
 /* Sub-task */
 
 .sub-tasks:last-child {

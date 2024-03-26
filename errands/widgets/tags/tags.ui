@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="Tags" parent="AdwBin">
+    <child>
+      <object class="AdwToolbarView">
+
+        <!-- Headerbar -->
+        <child type="top">
+          <object class="AdwHeaderBar">
+            <property name="title-widget">
+              <object class="AdwWindowTitle">
+                <property name="title" translatable="yes">Tags</property>
+              </object>
+            </property>
+          </object>
+        </child>
+
+        <property name="content">
+          <object class="GtkBox">
+            <property name="orientation">vertical</property>
+
+            <!-- Tag Entry -->
+            <child>
+              <object class="AdwClamp">
+                <property name="maximum-size">700</property>
+                <property name="tightening-threshold">300</property>
+                <child>
+                  <object class="GtkListBox">
+                    <property name="selection-mode">0</property>
+                    <property name="margin-start">12</property>
+                    <property name="margin-end">12</property>
+                    <property name="margin-bottom">6</property>
+                    <style>
+                      <class name="boxed-list" />
+                    </style>
+                    <child>
+                      <object class="AdwEntryRow">
+                        <property name="title" translatable="yes">Add new Tag</property>
+                        <property name="activatable">false</property>
+                        <signal name="entry-activated" handler="_on_tag_added" />
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+
+            <!-- Tags list -->
+            <child>
+              <object class="GtkScrolledWindow">
+                <property name="propagate-natural-height">true</property>
+                <child>
+                  <object class="AdwClamp">
+                    <property name="maximum-size">700</property>
+                    <property name="tightening-threshold">300</property>
+                    <child>
+                      <object id="tags_list" class="GtkListBox">
+                        <property name="selection-mode">0</property>
+                        <property name="margin-start">12</property>
+                        <property name="margin-end">12</property>
+                        <property name="margin-top">6</property>
+                        <property name="margin-bottom">28</property>
+                        <style>
+                          <class name="boxed-list" />
+                        </style>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+
+            <!-- Status -->
+            <child>
+              <object class="AdwStatusPage">
+                <property name="title" translatable="yes">No Tags Found</property>
+                <property name="description" translatable="yes">Add new Tags in the entry above</property>
+                <property name="icon-name">errands-info-symbolic</property>
+                <property name="vexpand">true</property>
+                <property name="visible" bind-source="tags_list" bind-property="visible" bind-flags="sync-create | invert-boolean" />
+                <style>
+                  <class name="compact" />
+                </style>
+              </object>
+            </child>
+
+          </object>
+        </property>
+
+      </object>
+    </child>
+  </template>
+</interface>

@@ -1,23 +1,22 @@
 # Copyright 2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-from __future__ import annotations
 
+import os
 from datetime import datetime
+
+from gi.repository import Adw, Gdk, Gio, GObject, Gtk, GtkSource  # type:ignore
+from icalendar import Calendar, Event
 
 from errands.lib.data import UserData
 from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
 from errands.lib.utils import get_children
+from errands.widgets import task
+from errands.widgets.components.datetime_picker import DateTimePicker
 from errands.widgets.task.tag import Tag
 from errands.widgets.task.task import Task
-from icalendar import Calendar, Event
-
-import os
-
-from gi.repository import Adw, Gio, Gtk, GObject, GtkSource, Gdk  # type:ignore
-
-from errands.widgets.components.datetime_picker import DateTimePicker
+from errands.widgets.task.toolbar.tags_list_item import TagsListItem
 
 
 @Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
@@ -57,13 +56,6 @@ class TaskToolbar(Gtk.Revealer):
         )
         lm: GtkSource.LanguageManager = GtkSource.LanguageManager.get_default()
         self.notes_buffer.set_language(lm.get_language("markdown"))
-        self.tags_list.set_placeholder(
-            Adw.StatusPage(
-                icon_name="errands-info-symbolic",
-                title=_("No Tags"),
-                css_classes=["compact"],
-            )
-        )
 
     def __add_actions(self) -> None:
         self.group: Gio.SimpleActionGroup = Gio.SimpleActionGroup()
@@ -190,41 +182,32 @@ class TaskToolbar(Gtk.Revealer):
         self.changed_label.set_label(_("Changed:") + " " + changed_date)
 
     @Gtk.Template.Callback()
-    def _on_tags_btn_toggled(self, btn: Gtk.ToggleButton, active: bool) -> None:
-        return
-        if not active:
+    def _on_tags_btn_toggled(self, btn: Gtk.MenuButton, *_) -> None:
+        if not btn.get_active():
             return
-        tags = UserData.get_tags()
+        tags: list[str] = [t.text for t in UserData.tags]
         tags_list_items: list[TagsListItem] = get_children(self.tags_list)
-        tags_list_items_text = [t.title.get_label() for t in tags_list_items]
+        tags_list_items_text = [t.title for t in tags_list_items]
+
+        # Remove tags
         for item in tags_list_items:
-            if item.title.get_label() not in tags:
+            if item.title not in tags:
                 self.tags_list.remove(item)
+
+        # Add tags
         for tag in tags:
             if tag not in tags_list_items_text:
-                self.tags_list.append(TagsListItem(tag, self))
+                self.tags_list.append(TagsListItem(tag, self.task))
 
-    # @Gtk.Template.Callback()
-    # def _on_tag_added(self, entry: Gtk.Entry, *_args) -> None:
-    #     tag: str = entry.get_text().strip(" \n\r,")
-    #     tags_prop: str = self.get_prop("tags")
-    #     if tags_prop:
-    #         tags: list[str] = tags_prop.split(",")
-    #     else:
-    #         tags = []
+        # Toggle tags
+        task_tags: list[str] = [t.title for t in self.task.tags]
+        tags_items: list[TagsListItem] = get_children(self.tags_list)
+        for t in tags_items:
+            t.block_signals = True
+            t.toggle_btn.set_active(t.title in task_tags)
+            t.block_signals = False
 
-    #     if tag in tags:
-    #         return
-
-    #     tags.append(tag)
-    #     self.update_props(["tags", "synced"], [",".join(tags), False])
-    #     # self.tags_list.append(TagsListItem(tag, self))
-    #     entry.set_text("")
-
-    @Gtk.Template.Callback()
-    def _on_tag_selected(self, _, row: Tag) -> None:
-        self.add_tag(row.title)
-        self.task.tags_bar.set_visible(True)
+        self.tags_list.set_visible(len(get_children(self.tags_list)) > 0)
 
     @Gtk.Template.Callback()
     def _on_notes_toggled(self, btn: Gtk.MenuButton, *_):
@@ -275,9 +258,9 @@ class TaskToolbar(Gtk.Revealer):
     def _on_accent_color_btn_toggled(self, btn: Gtk.MenuButton, *_):
         if btn.get_active():
             color: str = self.task.get_prop("color")
-            box1 = btn.get_popover().get_child().get_first_child()
-            box2 = btn.get_popover().get_child().get_last_child()
-            color_btns = get_children(box1) + get_children(box2)
+            color_btns = get_children(
+                btn.get_popover().get_child().get_first_child()
+            ) + get_children(btn.get_popover().get_child().get_last_child())
             for btn in color_btns:
                 btn_color = btn.get_buildable_id()
                 if btn_color == color:
@@ -290,10 +273,10 @@ class TaskToolbar(Gtk.Revealer):
         if not btn.get_active() or not self.can_sync:
             return
         color: str = btn.get_buildable_id()
-        Log.info(f"Task: change color to '{color}'")
+        Log.debug(f"Task: change color to '{color}'")
         if color != self.task.get_prop("color"):
             self.task.update_props(
                 ["color", "synced"], [color if color != "none" else "", False]
             )
             self.task.update_ui(False)
-        # Sync.sync(False)
+            # Sync.sync(False)

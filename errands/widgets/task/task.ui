@@ -196,7 +196,6 @@
                 <!-- Tags bar -->
                 <child>
                   <object id="tags_bar" class="GtkFlowBox">
-                    <property name="visible">false</property>
                     <property name="margin-start">10</property>
                     <property name="margin-end">10</property>
                     <property name="margin-bottom">3</property>
