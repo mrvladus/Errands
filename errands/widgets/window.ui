@@ -84,19 +84,6 @@
                       </object>
                     </child>
 
-                    <!-- Today page -->
-                    <child>
-                      <object class="AdwViewStackPage">
-                        <property name="title" translatable="yes">Today</property>
-                        <property name="name">errands_today_page</property>
-                        <property name="child">
-                          <object class="Today">
-                            <property name="window">Window</property>
-                          </object>
-                        </property>
-                      </object>
-                    </child>
-
                     <!-- Tags page -->
                     <child>
                       <object class="AdwViewStackPage">

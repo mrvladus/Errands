@@ -113,11 +113,6 @@
                 </style>
                 <signal name="row-selected" handler="_on_row_selected" />
 
-                <!-- Today -->
-                <child>
-                  <object id="today_row" class="TodaySidebarRow" />
-                </child>
-
                 <!-- Tags -->
                 <child>
                   <object id="tags_row" class="TagsSidebarRow" />
