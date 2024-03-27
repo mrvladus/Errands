@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="TodayTask" parent="AdwBin">
+    <child>
+      <object id="revealer" class="GtkRevealer">
+        <child>
+          <object id="main_box" class="GtkBox">
+            <property name="orientation">vertical</property>
+            <property name="margin-bottom">6</property>
+            <property name="margin-top">6</property>
+            <property name="margin-start">6</property>
+            <property name="margin-end">6</property>
+
+            <style>
+              <class name="card" />
+              <class name="fade" />
+            </style>
+
+            <!-- Task Row -->
+            <child>
+              <object class="GtkListBox">
+                <style>
+                  <class name="transparent" />
+                  <class name="rounded-corners" />
+                </style>
+
+                <!-- Title row -->
+                <child>
+                  <object id="title_row" class="AdwActionRow">
+                    <property name="height-request">60</property>
+                    <property name="use-markup">True</property>
+                    <style>
+                      <class name="transparent" />
+                      <class name="rounded-corners" />
+                    </style>
+
+                    <!-- Complete toggle -->
+                    <child type="prefix">
+                      <object id="complete_btn" class="GtkCheckButton">
+                        <property name="tooltip-text" translatable="yes">Toggle Completion</property>
+                        <property name="valign">center</property>
+                        <property name="cursor">
+                          <object class="GdkCursor">
+                            <property name="name">pointer</property>
+                          </object>
+                        </property>
+                        <style>
+                          <class name="selection-mode" />
+                        </style>
+                        <signal name="toggled" handler="_on_complete_btn_toggle" />
+                      </object>
+                    </child>
+
+                    <!-- Suffix -->
+                    <child type="suffix">
+                      <object class="GtkButton">
+                        <property name="tooltip-text" translatable="yes">Show Task</property>
+                        <property name="icon-name">errands-right-symbolic</property>
+                        <property name="valign">center</property>
+                        <property name="cursor">
+                          <object class="GdkCursor">
+                            <property name="name">pointer</property>
+                          </object>
+                        </property>
+                        <style>
+                          <class name="circular" />
+                          <class name="flat" />
+                        </style>
+                      </object>
+                    </child>
+
+                  </object>
+                </child>
+
+                <!-- Entry row -->
+                <child>
+                  <object id="entry_row" class="AdwEntryRow">
+                    <property name="height-request">60</property>
+                    <property name="title" translatable="yes">Edit Text</property>
+                    <property name="visible">False</property>
+                    <property name="show-apply-button">True</property>
+                    <property name="visible" bind-source="title_row" bind-property="visible" bind-flags="sync-create | invert-boolean | bidirectional" />
+                    <style>
+                      <class name="transparent" />
+                      <class name="rounded-corners" />
+                    </style>
+                    <signal name="apply" handler="_on_entry_row_applied" />
+
+                    <child type="suffix">
+                      <object id="cancel_edit_btn" class="GtkButton">
+                        <property name="tooltip-text" translatable="yes">Cancel</property>
+                        <property name="valign">center</property>
+                        <property name="icon-name">window-close-symbolic</property>
+                        <style>
+                          <class name="circular" />
+                        </style>
+                        <signal name="clicked" handler="_on_cancel_edit_btn_clicked" />
+                      </object>
+                    </child>
+
+                  </object>
+                </child>
+
+              </object>
+            </child>
+
+            <!-- Tags bar -->
+            <child>
+              <object id="tags_bar_rev" class="GtkRevealer">
+                <child>
+                  <object id="tags_bar" class="GtkFlowBox">
+                    <property name="height-request">20</property>
+                    <property name="margin-start">10</property>
+                    <property name="margin-end">10</property>
+                    <property name="margin-bottom">3</property>
+                    <property name="selection-mode">0</property>
+                    <property name="max-children-per-line">1000</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+
+            <!-- Tool bar -->
+            <!-- <child>
+                  <object id="toolbar" class="TaskToolbar">
+                    <property name="reveal-child" bind-source="toolbar_btn" bind-property="active" bind-flags="sync-create | bidirectional" />
+                    <property name="task">Task</property>
+                  </object>
+                </child> -->
+
+          </object>
+        </child>
+      </object>
+    </child>
+  </template>
+</interface>

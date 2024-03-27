@@ -32,6 +32,7 @@
                         <property name="margin-start">12</property>
                         <property name="margin-end">12</property>
                         <property name="margin-bottom">28</property>
+                        <property name="orientation">vertical</property>
                       </object>
                     </child>
                   </object>
