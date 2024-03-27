@@ -212,6 +212,7 @@ class TaskList(Adw.Bin):
                 if (
                     len(self.uncompleted_tasks) > 1
                     and task.uid != self.uncompleted_tasks[-1].uid
+                    and self.config.is_task_list
                 ):
                     UserData.move_task_after(
                         self.list_uid, task.uid, self.uncompleted_tasks[-1].uid
@@ -223,6 +224,7 @@ class TaskList(Adw.Bin):
                 if (
                     len(self.uncompleted_tasks) > 0
                     and task.uid != self.uncompleted_tasks[-1].uid
+                    and self.config.is_task_list
                 ):
                     UserData.move_task_after(
                         self.list_uid, task.uid, self.uncompleted_tasks[-1].uid
