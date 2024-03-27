@@ -198,6 +198,7 @@
                   <object id="tags_bar_rev" class="GtkRevealer">
                     <child>
                       <object id="tags_bar" class="GtkFlowBox">
+                        <property name="height-request">20</property>
                         <property name="margin-start">10</property>
                         <property name="margin-end">10</property>
                         <property name="margin-bottom">3</property>
