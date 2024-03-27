@@ -53,9 +53,9 @@ class TaskList(Adw.Bin):
     def __load_tasks(self) -> None:
         Log.info(f"Task List {self.list_uid}: Load Tasks")
 
-        tasks: list[TaskData] = (
+        tasks: list[TaskData] = [
             t for t in UserData.get_tasks_as_dicts(self.list_uid, "") if not t.deleted
-        )
+        ]
         for task in tasks:
             new_task = Task(task.uid, self, self)
             if task.completed:
@@ -63,7 +63,6 @@ class TaskList(Adw.Bin):
             else:
                 self.uncompleted_tasks_list.append(new_task)
             new_task.update_ui()
-
         self.scrl.set_visible(True)
         self.loading_status_page.set_visible(False)
 
@@ -102,11 +101,11 @@ class TaskList(Adw.Bin):
 
     # ------ PUBLIC METHODS ------ #
 
-    def add_task(self, task: TaskData) -> Task:
-        Log.info(f"Task List: Add task '{task.uid}'")
+    def add_task(self, uid: str) -> Task:
+        Log.info(f"Task List: Add task '{uid}'")
 
         on_top: bool = GSettings.get("task-list-new-task-position-top")
-        new_task = Task(task.uid, self, self)
+        new_task = Task(uid, self, self)
         if on_top:
             self.uncompleted_tasks_list.prepend(new_task)
         else:
@@ -236,7 +235,7 @@ class TaskList(Adw.Bin):
             UserData.add_task(
                 list_uid=self.list_uid,
                 text=text,
-            )
+            ).uid
         )
         entry.set_text("")
         if not GSettings.get("task-list-new-task-position-top"):

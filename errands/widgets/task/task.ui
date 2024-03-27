@@ -2,9 +2,9 @@
 <interface>
 
   <template class="Task" parent="AdwBin">
+    <property name="hexpand">false</property>
     <child>
       <object id="revealer" class="GtkRevealer">
-        <property name="hexpand">false</property>
         <child>
           <object class="GtkBox">
             <property name="orientation">vertical</property>
@@ -188,7 +188,6 @@
                       </object>
                     </child>
 
-
                   </object>
                 </child>
 
@@ -257,10 +256,24 @@
 
                         <!-- Sub-Tasks list -->
                         <child>
-                          <object id="sub_tasks" class="GtkBox">
+                          <object class="GtkBox">
                             <property name="orientation">vertical</property>
-                            <property name="margin-start">7</property>
-                            <property name="margin-end">7</property>
+                            <property name="hexpand">false</property>
+
+                            <!-- Task List Uncompleted -->
+                            <child>
+                              <object id="uncompleted_tasks_list" class="GtkBox">
+                                <property name="orientation">vertical</property>
+                              </object>
+                            </child>
+
+                            <!-- Task List Completed-->
+                            <child>
+                              <object id="completed_tasks_list" class="GtkBox">
+                                <property name="orientation">vertical</property>
+                              </object>
+                            </child>
+
                           </object>
                         </child>
 

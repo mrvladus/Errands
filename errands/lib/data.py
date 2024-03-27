@@ -240,9 +240,9 @@ class UserDataJSON:
     ) -> list[TaskData]:
         if not list_uid:
             return self.tasks
-        elif list_uid and not parent:
+        elif list_uid and parent == None:
             return [t for t in self.tasks if t.list_uid == list_uid]
-        elif list_uid and parent:
+        elif list_uid and parent != None:
             return [
                 t for t in self.tasks if t.list_uid == list_uid and t.parent == parent
             ]

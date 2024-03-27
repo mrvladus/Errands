@@ -39,7 +39,6 @@ class Task(Adw.Bin):
     progress_bar_rev: Gtk.Revealer = Gtk.Template.Child()
     progress_bar: Gtk.ProgressBar = Gtk.Template.Child()
     sub_tasks_revealer: Gtk.Revealer = Gtk.Template.Child()
-    sub_tasks: Gtk.Box = Gtk.Template.Child()
     title_row: Adw.ActionRow = Gtk.Template.Child()
     complete_btn: Gtk.CheckButton = Gtk.Template.Child()
     expand_indicator: Gtk.Image = Gtk.Template.Child()
@@ -47,6 +46,8 @@ class Task(Adw.Bin):
     tags_bar: Gtk.FlowBox = Gtk.Template.Child()
     tags_bar_rev: Gtk.Revealer = Gtk.Template.Child()
     toolbar: TaskToolbar = Gtk.Template.Child()
+    uncompleted_tasks_list: Gtk.Box = Gtk.Template.Child()
+    completed_tasks_list: Gtk.Box = Gtk.Template.Child()
 
     # State
     just_added: bool = True
@@ -67,56 +68,12 @@ class Task(Adw.Bin):
         self.list_uid = task_list.list_uid
         self.window = task_list.window
         self.parent = parent
-        self.__build_ui()
-        self.__add_actions()
+        GSettings.bind("task-show-progressbar", self.progress_bar_rev, "visible")
+        self.title_row.set_title(Markup.find_url(Markup.escape(self.get_prop("text"))))
         self.just_added = False
 
     def __repr__(self) -> str:
         return f"<class 'Task' {self.uid}>"
-
-    # ------ PRIVATE METHODS ------ #
-
-    def __add_actions(self) -> None:
-        group: Gio.SimpleActionGroup = Gio.SimpleActionGroup()
-        self.insert_action_group(name="task", group=group)
-
-        def __create_action(name: str, callback: callable) -> None:
-            action: Gio.SimpleAction = Gio.SimpleAction.new(name, None)
-            action.connect("activate", callback)
-            group.add_action(action)
-
-    def __build_ui(self) -> None:
-        GSettings.bind("task-show-progressbar", self.progress_bar_rev, "visible")
-
-        self.title_row.set_title(Markup.find_url(Markup.escape(self.get_prop("text"))))
-
-        # Sub-tasks
-        # tasks: list[TaskData] = [
-        #     t
-        #     for t in UserData.get_tasks_as_dicts(self.list_uid, self.uid)
-        #     if not t.deleted
-        # ]
-        # for task in tasks:
-        #     self.sub_tasks.append(Task(task.uid, self.task_list, self))
-
-    def __sort_tasks(self) -> None:
-        def __sort_completed():
-            length = len(self.tasks)
-            last_idx = length - 1
-            i = last_idx
-            while i > -1:
-                task = self.tasks[i]
-                if task.get_prop("completed"):
-                    if i != last_idx:
-                        UserData.move_task_before(
-                            self.list_uid, task.uid, self.tasks[last_idx].uid
-                        )
-                        self.task_list.reorder_child_after(task, self.tasks[last_idx])
-                    last_idx -= 1
-                i -= 1
-
-        return
-        __sort_completed()
 
     def update_tags(self):
         tags: str = self.get_prop("tags")
@@ -141,22 +98,6 @@ class Task(Adw.Bin):
         return [t.get_child() for t in get_children(self.tags_bar)]
 
     @property
-    def tasks(self) -> list[Task]:
-        return [t for t in get_children(self.sub_tasks) if isinstance(t, Task)]
-
-    @property
-    def all_tasks(self) -> list[Task]:
-        all_tasks: list[Task] = []
-
-        def __add_task(tasks: list[Task]) -> None:
-            for task in tasks:
-                all_tasks.append(task)
-                __add_task(task.tasks)
-
-        __add_task(self.tasks)
-        return all_tasks
-
-    @property
     def parents_tree(self) -> list[Task]:
         """Get parent tasks chain"""
 
@@ -171,18 +112,46 @@ class Task(Adw.Bin):
 
         return parents
 
+    @property
+    def tasks(self) -> list[Task]:
+        """Top-level Tasks"""
+
+        return self.uncompleted_tasks + self.completed_tasks
+
+    @property
+    def all_tasks(self) -> list[Task]:
+        """All tasks in the list"""
+
+        all_tasks: list[Task] = []
+
+        def __add_task(tasks: list[Task]) -> None:
+            for task in tasks:
+                all_tasks.append(task)
+                __add_task(task.tasks)
+
+        __add_task(self.tasks)
+        return all_tasks
+
+    @property
+    def uncompleted_tasks(self) -> list[Task]:
+        return get_children(self.uncompleted_tasks_list)
+
+    @property
+    def completed_tasks(self) -> list[Task]:
+        return get_children(self.completed_tasks_list)
+
     # ------ PUBLIC METHODS ------ #
 
     def add_task(self, uid: str) -> Task:
-        on_top: bool = GSettings.get("task-list-new-task-position-top")
-        new_task = Task(uid, self.task_list, self)
-        if on_top:
-            self.sub_tasks.prepend(new_task)
-        else:
-            self.sub_tasks.append(new_task)
-        new_task.update_ui()
+        Log.info(f"Task List: Add task '{uid}'")
 
-        return new_task
+        on_top: bool = GSettings.get("task-list-new-task-position-top")
+        new_task = Task(uid, self, self)
+        if on_top:
+            self.uncompleted_tasks_list.prepend(new_task)
+        else:
+            self.uncompleted_tasks_list.append(new_task)
+        new_task.update_ui()
 
     def add_rm_crossline(self, add: bool) -> None:
         if add:
@@ -257,6 +226,51 @@ class Task(Adw.Bin):
         # Log.debug(f"Task '{self.uid}': Update props {props}")
         UserData.update_props(self.list_uid, self.uid, props, values)
 
+    def update_tasks(self):
+        # Update tasks
+        data_uids: list[str] = [
+            t.uid
+            for t in UserData.get_tasks_as_dicts(self.list_uid, self.uid)
+            if not t.deleted
+        ]
+        widgets_uids: list[str] = [t.uid for t in self.tasks]
+
+        # Add tasks
+        for uid in data_uids:
+            if uid not in widgets_uids:
+                self.add_task(uid)
+
+        for task in self.tasks:
+            # Remove task
+            if task.uid not in data_uids:
+                task.purge()
+            # Move task to completed tasks
+            elif task.get_prop("completed") and task in self.uncompleted_tasks:
+                if (
+                    len(self.uncompleted_tasks) > 1
+                    and task.uid != self.uncompleted_tasks[-1].uid
+                ):
+                    UserData.move_task_after(
+                        self.list_uid, task.uid, self.uncompleted_tasks[-1].uid
+                    )
+                self.uncompleted_tasks_list.remove(task)
+                self.completed_tasks_list.prepend(task)
+            # Move task to uncompleted tasks
+            elif not task.get_prop("completed") and task in self.completed_tasks:
+                if (
+                    len(self.uncompleted_tasks) > 0
+                    and task.uid != self.uncompleted_tasks[-1].uid
+                ):
+                    UserData.move_task_after(
+                        self.list_uid, task.uid, self.uncompleted_tasks[-1].uid
+                    )
+                self.completed_tasks_list.remove(task)
+                self.uncompleted_tasks_list.append(task)
+
+        # Update tasks
+        for task in self.tasks:
+            task.update_ui()
+
     def update_ui(self, update_sub_tasks_ui: bool = True) -> None:
         Log.debug(f"Task '{self.uid}: Update UI'")
         # Purge
@@ -315,31 +329,7 @@ class Task(Adw.Bin):
         # Update tags
         self.update_tags()
 
-        data_tasks: list[TaskData] = [
-            t
-            for t in UserData.get_tasks_as_dicts(self.list_uid, self.uid)
-            if not t.deleted
-        ]
-        data_uids: list[str] = [t.uid for t in data_tasks]
-        widgets_uids: list[str] = [t.uid for t in self.tasks]
-
-        # Add sub-tasks
-        for task in data_tasks:
-            if task.uid not in widgets_uids:
-                self.add_task(task.uid)
-
-        # Remove sub-tasks
-        for task in self.tasks:
-            if task.uid not in data_uids:
-                self.sub_tasks.remove(task)
-
-        # Update sub-tasks
-        if update_sub_tasks_ui:
-            for task in self.tasks:
-                task.update_ui()
-
-        # # Sort sub-tasks
-        # self.__sort_tasks()
+        self.update_tasks()
 
     # ------ TEMPLATE HANDLERS ------ #
 
@@ -361,8 +351,7 @@ class Task(Adw.Bin):
                 list_uid=self.list_uid,
                 text=text,
                 parent=self.uid,
-                insert_at_the_top=GSettings.get("task-list-new-task-position-top"),
-            )
+            ).uid
         )
 
         # Clear entry

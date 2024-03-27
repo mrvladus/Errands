@@ -39,10 +39,16 @@
         <property name="margin-bottom">6</property>
         <property name="spacing">3</property>
 
+        <style>
+          <class name="task-red" />
+        </style>
+
         <!-- Date and time btn -->
-        <child>
+        <child type="start">
           <object id="date_time_btn" class="GtkMenuButton">
             <property name="valign">center</property>
+            <property name="halign">start</property>
+            <property name="hexpand">false</property>
             <property name="tooltip-text" translatable="yes">Start / Due Date</property>
             <property name="popover">
               <object class="GtkPopover">
@@ -113,6 +119,7 @@
             <style>
               <class name="flat" />
               <class name="caption" />
+              <class name="task-blue" />
             </style>
             <signal name="notify::active" handler="_on_date_time_toggled" />
 
@@ -127,9 +134,9 @@
           </object>
         </child>
 
+        <!-- Separator -->
         <child>
-          <object class="GtkSeparator">
-            <property name="hexpand">true</property>
+          <object class="GtkBox">
             <style>
               <class name="spacer" />
             </style>
