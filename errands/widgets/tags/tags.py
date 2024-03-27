@@ -67,7 +67,6 @@ class Tag(Adw.ActionRow):
         super().__init__()
         self.tags = tags
         self.set_title(title)
-        self.set_activatable(True)
         delete_btn = Gtk.Button(
             icon_name="errands-trash-symbolic",
             css_classes=["flat", "error"],
@@ -84,10 +83,10 @@ class Tag(Adw.ActionRow):
             GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
         )
         self.number_of_tasks: Gtk.Label = Gtk.Label()
-        box = Gtk.Box(spacing=12)
-        box.append(self.number_of_tasks)
-        box.append(arrow)
-        self.add_suffix(box)
+        # box = Gtk.Box(spacing=12)
+        # box.append(self.number_of_tasks)
+        # box.append(arrow)
+        self.add_suffix(self.number_of_tasks)
 
     def delete(self, _btn: Gtk.Button):
         UserData.remove_tags([self.get_title()])
@@ -102,5 +101,5 @@ class Tag(Adw.ActionRow):
             if self.get_title() in tags:
                 count += 1
 
-        self.set_activatable(count > 0)
+        self.set_activatable(False)
         self.number_of_tasks.set_label(str(count) if count > 0 else "")
