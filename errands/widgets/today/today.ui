@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="Today" parent="AdwBin">
+    <child>
+      <object class="AdwToolbarView">
+
+        <!-- Headerbar -->
+        <child type="top">
+          <object class="AdwHeaderBar">
+            <property name="title-widget">
+              <object class="AdwWindowTitle">
+                <property name="title" translatable="yes">Today</property>
+              </object>
+            </property>
+          </object>
+        </child>
+
+        <property name="content">
+          <object class="GtkBox">
+            <property name="orientation">vertical</property>
+
+            <!-- Tasks list -->
+            <child>
+              <object class="GtkScrolledWindow">
+                <property name="propagate-natural-height">true</property>
+                <child>
+                  <object class="AdwClamp">
+                    <property name="maximum-size">1000</property>
+                    <property name="tightening-threshold">300</property>
+                    <child>
+                      <object id="tasks_list" class="GtkBox">
+                        <property name="margin-start">12</property>
+                        <property name="margin-end">12</property>
+                        <property name="margin-bottom">28</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+
+            <!-- Status -->
+            <child>
+              <object class="AdwStatusPage">
+                <property name="title" translatable="yes">No Tasks for Today</property>
+                <property name="icon-name">errands-info-symbolic</property>
+                <property name="vexpand">true</property>
+                <property name="valign">center</property>
+                <property name="visible" bind-source="tasks_list" bind-property="visible" bind-flags="sync-create | invert-boolean" />
+                <style>
+                  <class name="compact" />
+                </style>
+              </object>
+            </child>
+
+          </object>
+        </property>
+
+      </object>
+    </child>
+  </template>
+</interface>

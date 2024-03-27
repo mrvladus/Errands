@@ -6,13 +6,12 @@ from typing import TYPE_CHECKING
 from errands.lib.gsettings import GSettings
 
 from errands.lib.logging import Log
-from errands.widgets.task_list.task_list import TaskList, TaskListConfig
 
 if TYPE_CHECKING:
     from errands.widgets.window import Window
 
 import os
-from gi.repository import Adw, Gtk  # type:ignore
+from gi.repository import Adw, Gtk, Gio  # type:ignore
 
 
 @Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
@@ -21,20 +20,18 @@ class TodaySidebarRow(Gtk.ListBoxRow):
 
     def __init__(self) -> None:
         super().__init__()
-        self.__setup_config()
         self.window: Window = Adw.Application.get_default().get_active_window()
         self.name: str = "errands_today_page"
-        self.task_list = TaskList(self.config)
-        self.page: Adw.ViewStackPage = self.window.stack.add_titled(
-            self.task_list, self.name, _("Today")
-        )
+        self.__add_actions()
 
-    def __setup_config(self):
-        self.config = TaskListConfig(
-            is_today_list=True,
-            show_entry=False,
-            title=_("Today"),
-        )
+    def __add_actions(self) -> None:
+        group: Gio.SimpleActionGroup = Gio.SimpleActionGroup()
+        self.insert_action_group(name="today_row", group=group)
+
+        def __create_action(name: str, callback: callable) -> None:
+            action: Gio.SimpleAction = Gio.SimpleAction.new(name, None)
+            action.connect("activate", callback)
+            group.add_action(action)
 
     @Gtk.Template.Callback()
     def _on_row_activated(self, *args) -> None:
@@ -43,7 +40,9 @@ class TodaySidebarRow(Gtk.ListBoxRow):
         self.window.stack.set_visible_child_name(self.name)
         self.window.split_view.set_show_content(True)
         GSettings.set("last-open-list", "s", self.name)
-        self.page.get_child().update_ui()
+        page = self.window.stack.get_child_by_name("errands_today_page")
+        page.update_ui()
+        # print(page)
 
     def update_ui(self) -> None:
         pass

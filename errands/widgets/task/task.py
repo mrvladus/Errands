@@ -56,15 +56,15 @@ class Task(Adw.Bin):
 
     def __init__(
         self,
-        task: TaskData,
+        uid: str,
         task_list: TaskList,
         parent: TaskList | Task,
     ) -> None:
         super().__init__()
-        self.task = task
-        self.uid = task.uid
+
+        self.uid = uid
         self.task_list = task_list
-        self.list_uid = task.list_uid
+        self.list_uid = task_list.list_uid
         self.window = task_list.window
         self.parent = parent
         self.__build_ui()

@@ -59,7 +59,7 @@
                 <property name="maximum-size">1000</property>
                 <property name="tightening-threshold">300</property>
                 <child>
-                  <object id="new_task_entry" class="AdwEntryRow">
+                  <object class="AdwEntryRow">
                     <property name="title" translatable="yes">Add new Task</property>
                     <property name="activatable">false</property>
                     <property name="height-request">60</property>

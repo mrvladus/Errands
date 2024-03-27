@@ -19,7 +19,7 @@ from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
 from errands.widgets.component import ConfirmDialog
 from errands.widgets.task.task import Task
-from errands.widgets.task_list.task_list import TaskList, TaskListConfig
+from errands.widgets.task_list.task_list import TaskList
 from gi.repository import Adw, Gtk, Gio, GObject, Gdk, GLib  # type:ignore
 
 
@@ -39,8 +39,7 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
         self.name: str = list_dict.name
         self.__add_actions()
         # Add Task List page
-        config = TaskListConfig(list_uid=self.uid, is_task_list=True)
-        self.task_list: TaskList = TaskList(config)
+        self.task_list: TaskList = TaskList(self.uid, self)
         self.stack_page: Adw.ViewStackPage = self.window.stack.add_titled(
             child=self.task_list, name=self.name, title=self.name
         )
