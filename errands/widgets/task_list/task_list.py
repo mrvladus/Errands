@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: MIT
 
 from __future__ import annotations
+from dataclasses import dataclass
+import datetime
 import os
 from typing import TYPE_CHECKING
 
@@ -20,11 +22,23 @@ from errands.widgets.task.task import Task
 from errands.lib.gsettings import GSettings
 
 
+@dataclass
+class TaskListConfig:
+    """Configuration for use in Trash, Today, Tags etc."""
+
+    list_uid: str = ""
+    is_task_list: bool = False
+    is_today_list: bool = False
+    show_entry: bool = True
+    title: str = ""
+
+
 @Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
 class TaskList(Adw.Bin):
     __gtype_name__ = "TaskList"
 
     title: Adw.WindowTitle = Gtk.Template.Child()
+    new_task_entry: Adw.EntryRow = Gtk.Template.Child()
     delete_completed_btn: Gtk.Button = Gtk.Template.Child()
     toggle_completed_btn: Gtk.ToggleButton = Gtk.Template.Child()
     scroll_up_btn: Gtk.Button = Gtk.Template.Child()
@@ -36,11 +50,12 @@ class TaskList(Adw.Bin):
     # State
     scrolling: bool = False
 
-    def __init__(self, list_uid: str, sidebar_row: TaskListSidebarRow) -> None:
+    def __init__(self, config: TaskListConfig) -> None:
         super().__init__()
+        self.config = config
+        self.__config()
         self.window: Window = Adw.Application.get_default().get_active_window()
-        self.list_uid: str = list_uid
-        self.sidebar_row: TaskListSidebarRow = sidebar_row
+        # self.sidebar_row: TaskListSidebarRow = sidebar_row
         self.__load_tasks()
         self.update_status()
 
@@ -49,20 +64,45 @@ class TaskList(Adw.Bin):
 
     # ------ PRIVATE METHODS ------ #
 
+    def __config(self):
+        self.list_uid: str = self.config.list_uid
+        self.new_task_entry.set_visible(self.config.show_entry)
+        self.title.set_title(self.config.title)
+
     @idle_add
     def __load_tasks(self) -> None:
-        Log.info(f"Task List {self.list_uid}: Load Tasks")
 
-        tasks: list[TaskData] = (
-            t for t in UserData.get_tasks_as_dicts(self.list_uid, "") if not t.deleted
-        )
-        for task in tasks:
-            new_task = Task(task.uid, self, self)
-            if task.completed:
-                self.completed_tasks_list.append(new_task)
-            else:
-                self.uncompleted_tasks_list.append(new_task)
-            new_task.update_ui()
+        if self.config.is_task_list:
+            Log.info(f"Task List {self.list_uid}: Load Tasks")
+            tasks: list[TaskData] = (
+                t
+                for t in UserData.get_tasks_as_dicts(self.list_uid, "")
+                if not t.deleted
+            )
+            for task in tasks:
+                new_task = Task(task, self, self)
+                if task.completed:
+                    self.completed_tasks_list.append(new_task)
+                else:
+                    self.uncompleted_tasks_list.append(new_task)
+                new_task.update_ui()
+
+        elif self.config.is_today_list:
+            today = datetime.datetime.today().date()
+            tasks: list[TaskData] = (
+                t
+                for t in UserData.get_tasks_as_dicts()
+                if not t.deleted
+                and t.due_date
+                and datetime.datetime.fromisoformat(t.due_date).date() == today
+            )
+            for task in tasks:
+                new_task = Task(task, self, self)
+                if task.completed:
+                    self.completed_tasks_list.append(new_task)
+                else:
+                    self.uncompleted_tasks_list.append(new_task)
+                new_task.update_ui()
 
         self.scrl.set_visible(True)
         self.loading_status_page.set_visible(False)
@@ -106,7 +146,7 @@ class TaskList(Adw.Bin):
         Log.info(f"Task List: Add task '{task.uid}'")
 
         on_top: bool = GSettings.get("task-list-new-task-position-top")
-        new_task = Task(task.uid, self, self)
+        new_task = Task(task, self, self)
         if on_top:
             self.uncompleted_tasks_list.prepend(new_task)
         else:
@@ -116,6 +156,9 @@ class TaskList(Adw.Bin):
         return new_task
 
     def update_status(self) -> None:
+        if not self.config.is_task_list:
+            return
+
         n_total, n_completed = UserData.get_status(self.list_uid)
 
         # Update headerbar subtitle
@@ -124,7 +167,7 @@ class TaskList(Adw.Bin):
         )
 
         # Update sidebar item counter
-        self.sidebar_row.size_counter.set_label(str(n_total) if n_total > 0 else "")
+        # self.sidebar_row.size_counter.set_label(str(n_total) if n_total > 0 else "")
 
         # Update delete completed button
         self.delete_completed_btn.set_sensitive(n_completed > 0)
@@ -136,21 +179,33 @@ class TaskList(Adw.Bin):
         Log.debug(f"Task list {self.list_uid}: Update UI")
 
         # Update tasks
-        data_uids: list[str] = [
-            t.uid
-            for t in UserData.get_tasks_as_dicts(self.list_uid, "")
-            if not t.deleted
-        ]
+        if self.config.is_task_list:
+            tasks: list[str] = [
+                t
+                for t in UserData.get_tasks_as_dicts(self.list_uid, "")
+                if not t.deleted
+            ]
+        elif self.config.is_today_list:
+            today = datetime.datetime.today().date()
+            tasks: list[TaskData] = (
+                t
+                for t in UserData.get_tasks_as_dicts()
+                if not t.deleted
+                and t.due_date
+                and datetime.datetime.fromisoformat(t.due_date).date() == today
+            )
+
+        tasks_uids: list[str] = [t.uid for t in tasks]
         widgets_uids: list[str] = [t.uid for t in self.tasks]
 
         # Add tasks
-        for uid in data_uids:
-            if uid not in widgets_uids:
-                self.add_task(uid)
+        for task in tasks:
+            if task not in widgets_uids:
+                self.add_task(task)
 
         for task in self.tasks:
             # Remove task
-            if task.uid not in data_uids:
+            if task.uid not in tasks_uids:
                 task.purge()
             # Move task to completed tasks
             elif task.get_prop("completed") and task in self.uncompleted_tasks:
