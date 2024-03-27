@@ -2,7 +2,6 @@
 <interface>
 
   <template class="Task" parent="AdwBin">
-    <property name="hexpand">false</property>
     <child>
       <object id="revealer" class="GtkRevealer">
         <property name="hexpand">false</property>

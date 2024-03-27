@@ -90,8 +90,8 @@
                         <property name="title" translatable="yes">Today</property>
                         <property name="name">errands_today_page</property>
                         <property name="child">
-                          <object class="AdwStatusPage">
-                            <property name="title" translatable="yes">No Tasks for Today</property>
+                          <object class="Today">
+                            <property name="window">Window</property>
                           </object>
                         </property>
                       </object>
@@ -100,11 +100,10 @@
                     <!-- Tags page -->
                     <child>
                       <object class="AdwViewStackPage">
-                        <property name="title" translatable="yes">Trash</property>
+                        <property name="title" translatable="yes">Tags</property>
                         <property name="name">errands_tags_page</property>
                         <property name="child">
-                          <object class="Tags">
-                          </object>
+                          <object class="Tags" />
                         </property>
                       </object>
                     </child>

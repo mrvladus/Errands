@@ -7,21 +7,18 @@ import os
 from uuid import uuid4
 from icalendar import Calendar
 from errands.lib.data import UserData
-from gi.repository import Gio, Adw, Gtk, GObject  # type:ignore
+from gi.repository import Gio, Adw, Gtk  # type:ignore
 
 from errands.widgets.preferences import PreferencesWindow
 from errands.lib.sync.sync import Sync
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.widgets.sidebar.sidebar import Sidebar
-from errands.widgets.tags.tags import Tags
 
 
 @Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
 class Window(Adw.ApplicationWindow):
     __gtype_name__ = "Window"
-
-    GObject.type_ensure(Tags)
 
     toast_overlay: Adw.ToastOverlay = Gtk.Template.Child()
     split_view: Adw.NavigationSplitView = Gtk.Template.Child()

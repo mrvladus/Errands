@@ -33,8 +33,6 @@ class TodaySidebarRow(Gtk.ListBoxRow):
             action.connect("activate", callback)
             group.add_action(action)
 
-        __create_action("complete_all", lambda *_: print("Complete All"))
-
     @Gtk.Template.Callback()
     def _on_row_activated(self, *args) -> None:
         Log.debug(f"Sidebar: Open Today")
@@ -42,6 +40,9 @@ class TodaySidebarRow(Gtk.ListBoxRow):
         self.window.stack.set_visible_child_name(self.name)
         self.window.split_view.set_show_content(True)
         GSettings.set("last-open-list", "s", self.name)
+        page = self.window.stack.get_child_by_name("errands_today_page")
+        page.update_ui()
+        # print(page)
 
     def update_ui(self) -> None:
         pass
