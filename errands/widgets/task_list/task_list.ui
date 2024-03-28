@@ -59,20 +59,27 @@
                 <property name="maximum-size">1000</property>
                 <property name="tightening-threshold">300</property>
                 <child>
-                  <object class="AdwEntryRow">
-                    <property name="title" translatable="yes">Add new Task</property>
-                    <property name="activatable">false</property>
-                    <property name="height-request">60</property>
+                  <object class="GtkListBox">
+                    <property name="selection-mode">0</property>
                     <property name="margin-top">6</property>
                     <property name="margin-bottom">6</property>
                     <property name="margin-end">12</property>
                     <property name="margin-start">12</property>
                     <style>
-                      <class name="card" />
+                      <class name="boxed-list" />
                     </style>
-                    <signal name="entry-activated" handler="_on_task_added" />
+
+                    <child>
+                      <object class="AdwEntryRow">
+                        <property name="title" translatable="yes">Add new Task</property>
+                        <property name="activatable">false</property>
+                        <property name="height-request">60</property>
+                        <signal name="entry-activated" handler="_on_task_added" />
+                      </object>
+                    </child>
                   </object>
                 </child>
+
               </object>
             </child>
 
@@ -91,7 +98,10 @@
             <child>
               <object id="scrl" class="GtkScrolledWindow">
                 <property name="propagate-natural-width">true</property>
+                <property name="propagate-natural-height">true</property>
+                <!-- <property name="hscrollbar-policy">never</property> -->
                 <property name="vexpand">true</property>
+                <property name="hexpand">false</property>
                 <property name="visible">false</property>
                 <property name="vadjustment">
                   <object class="GtkAdjustment">
@@ -103,11 +113,13 @@
                   <object class="AdwClamp">
                     <property name="maximum-size">1000</property>
                     <property name="tightening-threshold">300</property>
-                    <property name="margin-bottom">32</property>
 
                     <child>
                       <object class="GtkBox">
                         <property name="orientation">vertical</property>
+                        <!-- <property name="margin-end">6</property> -->
+                        <!-- <property name="margin-start">6</property> -->
+                        <property name="margin-bottom">32</property>
 
                         <!-- Task List Uncompleted -->
                         <child>
