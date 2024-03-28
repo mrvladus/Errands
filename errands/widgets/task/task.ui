@@ -33,6 +33,7 @@
 
   <template class="Task" parent="AdwBin">
     <property name="hexpand">false</property>
+
     <child>
       <object id="revealer" class="GtkRevealer">
         <child>
@@ -40,8 +41,7 @@
             <property name="orientation">vertical</property>
             <property name="margin-bottom">6</property>
             <property name="margin-top">6</property>
-            <property name="margin-start">12</property>
-            <property name="margin-end">12</property>
+
 
             <!-- Top Drop area -->
             <child>
@@ -73,6 +73,8 @@
             <child>
               <object id="main_box" class="GtkBox">
                 <property name="orientation">vertical</property>
+                <property name="margin-start">12</property>
+                <property name="margin-end">12</property>
                 <style>
                   <class name="card" />
                   <class name="fade" />
@@ -258,6 +260,7 @@
                 <!-- Tool bar -->
                 <child>
                   <object id="toolbar" class="GtkRevealer">
+                    <!-- <property name="visible">false</property> -->
                     <property name="reveal-child" bind-source="toolbar_btn" bind-property="active" bind-flags="sync-create | bidirectional" />
                     <child>
                       <object class="GtkBox">
@@ -748,17 +751,6 @@
                           <class name="sub-tasks" />
                         </style>
 
-                        <!-- Toolbar -->
-                        <child>
-                          <object class="GtkEntry">
-                            <property name="margin-start">12</property>
-                            <property name="margin-end">12</property>
-                            <property name="margin-bottom">4</property>
-                            <property name="placeholder-text" translatable="yes">Add new Sub-Task</property>
-                            <signal name="activate" handler="_on_sub_task_added" />
-                          </object>
-                        </child>
-
                         <child>
                           <object class="GtkEntry">
                             <property name="margin-start">12</property>
@@ -773,7 +765,6 @@
                         <child>
                           <object class="GtkBox">
                             <property name="orientation">vertical</property>
-                            <property name="hexpand">false</property>
 
                             <!-- Task List Uncompleted -->
                             <child>
