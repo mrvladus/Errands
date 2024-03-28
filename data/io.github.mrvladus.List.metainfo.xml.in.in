@@ -4,9 +4,9 @@
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>MIT</project_license>
   <content_rating type="oars-1.1" />
-  <developer_name translatable="no">Vlad Krupinski</developer_name>
+  <developer_name translate="no">Vlad Krupinski</developer_name>
   <developer id="io.github.mrvladus">
-    <name translatable="no">Vlad Krupinski</name>
+    <name translate="no">Vlad Krupinski</name>
   </developer>
   <url type="homepage">https://github.com/mrvladus/Errands</url>
   <url type="bugtracker">https://github.com/mrvladus/Errands/issues</url>
@@ -49,7 +49,7 @@
   </screenshots>
   <releases>
     <release version="45.1.9" date="2024-02-08">
-      <description translatable="no">
+      <description translate="no">
         <p>Fixed:</p>
         <ul>
           <li>Notes white background with dark theme</li>
@@ -61,7 +61,7 @@
       </description>
     </release>
     <release version="45.1.8" date="2024-02-07">
-      <description translatable="no">
+      <description translate="no">
         <p>Added:</p>
         <ul>
           <li>Moving tasks to different lists with Drag and Drop</li>
@@ -86,7 +86,7 @@
       </description>
     </release>
     <release version="45.1.7" date="2024-01-27">
-      <description translatable="no">
+      <description translate="no">
         <p>Added:</p>
         <ul>
           <li>Preference for complete button size</li>
@@ -112,7 +112,7 @@
       </description>
     </release>
     <release version="45.1.6" date="2024-01-15">
-      <description translatable="no">
+      <description translate="no">
         <p>Added:</p>
         <ul>
           <li>If Gnome Online Accounts is installed, Nextcloud credentials will be pulled from it</li>
@@ -128,7 +128,7 @@
       </description>
     </release>
     <release version="45.1.5" date="2024-01-10">
-      <description translatable="no">
+      <description translate="no">
         <p>Thanks to the work of @david-swift Errands now has:</p>
         <ul>
           <li>Preference for side of the Details panel</li>
@@ -151,7 +151,7 @@
       </description>
     </release>
     <release version="45.1.4" date="2024-01-06">
-      <description translatable="no">
+      <description translate="no">
         <p>Added:</p>
         <ul>
           <li>Time presets for date and time picker</li>
@@ -165,7 +165,7 @@
       </description>
     </release>
     <release version="45.1.3" date="2024-01-05">
-      <description translatable="no">
+      <description translate="no">
         <p>Added:</p>
         <ul>
           <li>Deleting task with drag and drop on top of the trash button</li>
@@ -186,7 +186,7 @@
       </description>
     </release>
     <release version="45.1.2" date="2024-01-01">
-      <description translatable="no">
+      <description translate="no">
         <p>Added:</p>
         <ul>
           <li>More options in the date picker</li>
@@ -212,7 +212,7 @@
       </description>
     </release>
     <release version="45.1.1" date="2023-12-28">
-      <description translatable="no">
+      <description translate="no">
         <p>Fixed:</p>
         <ul>
           <li>Typos</li>
@@ -227,7 +227,7 @@
       </description>
     </release>
     <release version="45.1" date="2023-12-27">
-      <description translatable="no">
+      <description translate="no">
         <p>It's a BIG update!</p>
         <p>New features:</p>
         <ul>
@@ -250,7 +250,7 @@
       </description>
     </release>
     <release version="45.0.6" date="2023-11-30">
-      <description translatable="no">
+      <description translate="no">
         <p>Fixed:</p>
         <ul>
           <li>Task status not being updated when deleting completed tasks button is clicked</li>
@@ -262,7 +262,7 @@
       </description>
     </release>
     <release version="45.0.5" date="2023-11-26">
-      <description translatable="no">
+      <description translate="no">
         <p>Improved:</p>
         <ul>
           <li>Store password safely using libsecret (Thanks to
@@ -286,7 +286,7 @@
       </description>
     </release>
     <release version="45.0.4" date="2023-10-23">
-      <description translatable="no">
+      <description translate="no">
         <p>Fixed:</p>
         <ul>
           <li>Sync errors</li>
@@ -294,7 +294,7 @@
       </description>
     </release>
     <release version="45.0.3" date="2023-10-22">
-      <description translatable="no">
+      <description translate="no">
         <p>Fixed:</p>
         <ul>
           <li>Bug when all sub-tasks becomes unfinished when new sub-task added or moved.</li>
@@ -303,7 +303,7 @@
       </description>
     </release>
     <release version="45.0.2" date="2023-10-19">
-      <description translatable="no">
+      <description translate="no">
         <p>Fixed:</p>
         <ul>
           <li>CalDAV: changing calendar name now updates UI</li>
@@ -317,12 +317,12 @@
       </description>
     </release>
     <release version="45.0.1" date="2023-10-18">
-      <description translatable="no">
+      <description translate="no">
         <p>Fixed bug with empty list</p>
       </description>
     </release>
     <release version="45.0" date="2023-10-16">
-      <description translatable="no">
+      <description translate="no">
         <p>Sync is here!</p>
         <p>If you have a Nextcloud or any CalDAV server you can go to settings and enter your server credentials, including URL, username, password and name of the calendar you wish to sync ("Errands" by default). Then test your connection and you are ready to sync!</p>
         <p>It's using CalDAV protocol and python3-caldav library.</p>
@@ -343,7 +343,7 @@
       </description>
     </release>
     <release version="44.7.6" date="2023-09-22">
-      <description translatable="no">
+      <description translate="no">
         <p>UI/UX:</p>
         <ul>
           <li>Added setting to expand Tasks on startup</li>
@@ -359,7 +359,7 @@
       </description>
     </release>
     <release version="44.7.5" date="2023-09-19">
-      <description translatable="no">
+      <description translate="no">
         <p>UI/UX:</p>
         <ul>
           <li>Now you can add sub-tasks to sub-tasks! As a result of that, it is possible to add accent colors to sub-tasks now.</li>
@@ -384,14 +384,14 @@
       </description>
     </release>
     <release version="44.7.3" date="2023-09-08">
-      <description translatable="no">
+      <description translate="no">
         <ul>
           <li>Fixed translations</li>
         </ul>
       </description>
     </release>
     <release version="44.7.2" date="2023-09-08">
-      <description translatable="no">
+      <description translate="no">
         <p>UI/UX:</p>
         <ul>
           <li>Added confirmation dialog before clearing trash</li>
@@ -404,7 +404,7 @@
       </description>
     </release>
     <release version="44.7.1" date="2023-09-05">
-      <description translatable="no">
+      <description translate="no">
         <p>UI/UX:</p>
         <ul>
           <li>New cool app icon. Big thanks to Tobias Bernard!</li>
@@ -418,7 +418,7 @@
       </description>
     </release>
     <release version="44.7" date="2023-09-01">
-      <description translatable="no">
+      <description translate="no">
         <p>UI/UX:</p>
         <ul>
           <li>App renamed to Errands</li>
@@ -444,7 +444,7 @@
       </description>
     </release>
     <release version="44.6.8" date="2023-07-10">
-      <description translatable="no">
+      <description translate="no">
         <ul>
           <li>Improved text alignment</li>
           <li>Fixed Drag and Drop widget being too long</li>
@@ -453,7 +453,7 @@
       </description>
     </release>
     <release version="44.6.7" date="2023-07-07">
-      <description translatable="no">
+      <description translate="no">
         <ul>
           <li>Added support for Drag and Drop operations. Now you can easily move tasks around.
             Moving sub-tasks between tasks now works too.</li>
@@ -467,7 +467,7 @@
       </description>
     </release>
     <release version="44.6.6" date="2023-06-25">
-      <description translatable="no">
+      <description translate="no">
         <p>UI/UX:</p>
         <ul>
           <li>Updated .desktop file for better mobile support</li>
@@ -479,7 +479,7 @@
       </description>
     </release>
     <release version="44.6.5" date="2023-06-24">
-      <description translatable="no">
+      <description translate="no">
         <p>UI/UX:</p>
         <ul>
           <li>Set minimum window size to 250px for better phone screen support</li>
@@ -488,7 +488,7 @@
       </description>
     </release>
     <release version="44.6.4" date="2023-06-23">
-      <description translatable="no">
+      <description translate="no">
         <p>UI/UX:</p>
         <ul>
           <li>Added animation for task and sub-task edit mode switching</li>
@@ -499,7 +499,7 @@
       </description>
     </release>
     <release version="44.6.3" date="2023-06-19">
-      <description translatable="no">
+      <description translate="no">
         <p>UI/UX:</p>
         <ul>
           <li>Added task add/remove animations</li>
@@ -513,7 +513,7 @@
       </description>
     </release>
     <release version="44.6.2" date="2023-06-18">
-      <description translatable="no">
+      <description translate="no">
         <p>UI/UX:</p>
         <ul>
           <li>Added animations for progress bars</li>
@@ -526,7 +526,7 @@
       </description>
     </release>
     <release version="44.6.1" date="2023-06-17">
-      <description translatable="no">
+      <description translate="no">
         <ul>
           <li>Fixed bug with app not opening</li>
           <li>Added animations for accent color switching</li>
@@ -534,7 +534,7 @@
       </description>
     </release>
     <release version="44.6" date="2023-06-16">
-      <description translatable="no">
+      <description translate="no">
         <p>UI/UX:</p>
         <ul>
           <li>Added undo button for restoring deleted tasks and sub-tasks</li>
@@ -551,7 +551,7 @@
       </description>
     </release>
     <release version="44.5.4" date="2023-06-12">
-      <description translatable="no">
+      <description translate="no">
         <ul>
           <li>Add progress bar for completed tasks and sub-tasks</li>
           <li>Add button for deleting completed tasks</li>
@@ -563,7 +563,7 @@
       </description>
     </release>
     <release version="44.5.3" date="2023-05-28">
-      <description translatable="no">
+      <description translate="no">
         <ul>
           <li>Added Italian translation. Thanks to Albano Battistella.</li>
           <li>Bug fixes.</li>
@@ -571,14 +571,14 @@
       </description>
     </release>
     <release version="44.5.2" date="2023-05-27">
-      <description translatable="no">
+      <description translate="no">
         <ul>
           <li>Bug fixes.</li>
         </ul>
       </description>
     </release>
     <release version="44.5.1" date="2023-05-25">
-      <description translatable="no">
+      <description translate="no">
         <p>UI/UX:</p>
         <ul>
           <li>Added buttons for moving tasks and sub-tasks up and down in list. To show them just
@@ -592,7 +592,7 @@
       </description>
     </release>
     <release version="44.5" date="2023-05-23">
-      <description translatable="no">
+      <description translate="no">
         <p>UI/UX:</p>
         <ul>
           <li>New custom widgets for tasks</li>
@@ -621,7 +621,7 @@
       </description>
     </release>
     <release version="44.4.3" date="2023-05-13">
-      <description translatable="no">
+      <description translate="no">
         <ul>
           <li>Fixed bug with apostrophe character being displayed incorrectly (Thanks to
             CastelJeremy)</li>
@@ -629,21 +629,21 @@
       </description>
     </release>
     <release version="44.4.2" date="2023-05-10">
-      <description translatable="no">
+      <description translate="no">
         <ul>
           <li>Fixed another one bug with URL's</li>
         </ul>
       </description>
     </release>
     <release version="44.4.1" date="2023-05-08">
-      <description translatable="no">
+      <description translate="no">
         <ul>
           <li>Fixed bug with URL's not being visible (Thanks to fastrizwaan)</li>
         </ul>
       </description>
     </release>
     <release version="44.4" date="2023-05-06">
-      <description translatable="no">
+      <description translate="no">
         <ul>
           <li>Checkbox to mark sub-task as completed</li>
           <li>UI improvements</li>
@@ -651,7 +651,7 @@
       </description>
     </release>
     <release version="44.3" date="2023-04-26">
-      <description translatable="no">
+      <description translate="no">
         <ul>
           <li>Color tags</li>
           <li>Tasks and sub-task editing</li>
@@ -659,14 +659,14 @@
       </description>
     </release>
     <release version="44.2.1" date="2023-04-18">
-      <description translatable="no">
+      <description translate="no">
         <ul>
           <li>UI improvements.</li>
         </ul>
       </description>
     </release>
     <release version="44.2" date="2023-04-18">
-      <description translatable="no">
+      <description translate="no">
         <ul>
           <li>You can now add sub-tasks!</li>
           <li>Redesigned interface for better visibility and contrast</li>
@@ -674,35 +674,35 @@
       </description>
     </release>
     <release version="44.1.1" date="2023-04-09">
-      <description translatable="no">
+      <description translate="no">
         <p>
           Fixed add task button not being clickable.
         </p>
       </description>
     </release>
     <release version="44.1" date="2023-04-08">
-      <description translatable="no">
+      <description translate="no">
         <p>
           Added menu with theme switcher.
         </p>
       </description>
     </release>
     <release version="44.0.2" date="2023-04-06">
-      <description translatable="no">
+      <description translate="no">
         <p>
           Bug fixes.
         </p>
       </description>
     </release>
     <release version="44.0.1" date="2023-04-05">
-      <description translatable="no">
+      <description translate="no">
         <p>
           Bug fixes.
         </p>
       </description>
     </release>
     <release version="44.0" date="2023-04-04">
-      <description translatable="no">
+      <description translate="no">
         <p>
           First release.
         </p>
