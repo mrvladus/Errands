@@ -11,13 +11,6 @@
   background-color: @orange_1;
 }
 
-/* Task list */
-
-.task-list row {
-  padding: 0px;
-  border-radius: 12px;
-}
-
 /* Task */
 
 .task-title:drop(active) {
@@ -86,8 +79,8 @@
   all: unset;
   border: 2px solid transparent;
   border-radius: 9999px;
-  min-width: 24px;
-  min-height: 24px;
+  min-width: 14px;
+  min-height: 14px;
   color: @light_1;
 }
 
@@ -162,12 +155,6 @@
 .sub-tasks:last-child {
   margin-bottom: 6px;
 }
-
-/* .sub-task {
-  margin: 6px 11px 6px 11px;
-  background-color: alpha(@card_bg_color, 0.5);
-} */
-
 
 /* Utils */
 

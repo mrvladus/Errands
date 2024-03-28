@@ -51,7 +51,6 @@ class Task(Adw.Bin):
     toolbar: Gtk.Revealer = Gtk.Template.Child()
     uncompleted_tasks_list: Gtk.Box = Gtk.Template.Child()
     completed_tasks_list: Gtk.Box = Gtk.Template.Child()
-
     notes_btn: Gtk.MenuButton = Gtk.Template.Child()
     notes_buffer: GtkSource.Buffer = Gtk.Template.Child()
     priority_btn: Gtk.MenuButton = Gtk.Template.Child()
@@ -63,6 +62,7 @@ class Task(Adw.Bin):
     date_stack: Adw.ViewStack = Gtk.Template.Child()
     tags_list: Gtk.ListBox = Gtk.Template.Child()
     priority: Gtk.SpinButton = Gtk.Template.Child()
+    accent_color_btns: Gtk.Box = Gtk.Template.Child()
 
     # State
     just_added: bool = True
@@ -414,10 +414,10 @@ class Task(Adw.Bin):
         self.toolbar.set_reveal_child(self.get_prop("toolbar_shown"))
 
         # Update Date and Time
-        # self.due_date_time.datetime = self.get_prop("due_date")
-        # self.date_time_btn.get_child().props.label = (
-        #     f"{self.due_date_time.human_datetime}"
-        # )
+        self.due_date_time.datetime = self.get_prop("due_date")
+        self.date_time_btn.get_child().props.label = (
+            f"{self.due_date_time.human_datetime}"
+        )
 
         # Update notes button css
         if self.get_prop("notes"):
@@ -558,6 +558,8 @@ class Task(Adw.Bin):
     def _on_menu_toggled(self, _btn: Gtk.MenuButton, active: bool):
         if not active:
             return
+
+        # Update dates
         created_date: str = datetime.fromisoformat(
             self.get_prop("created_at")
         ).strftime("%Y.%m.%d %H:%M:%S")
@@ -566,6 +568,15 @@ class Task(Adw.Bin):
         ).strftime("%Y.%m.%d %H:%M:%S")
         self.created_label.set_label(_("Created:") + " " + created_date)
         self.changed_label.set_label(_("Changed:") + " " + changed_date)
+
+        # Update color
+        color: str = self.get_prop("color")
+        for btn in get_children(self.accent_color_btns):
+            btn_color = btn.get_buildable_id()
+            if btn_color == color:
+                self.can_sync = False
+                btn.set_active(True)
+                self.can_sync = True
 
     @Gtk.Template.Callback()
     def _on_tags_btn_toggled(self, btn: Gtk.MenuButton, *_) -> None:
@@ -639,20 +650,6 @@ class Task(Adw.Bin):
             case 3:
                 self.priority.set_value(0)
         self.priority_btn.popdown()
-
-    @Gtk.Template.Callback()
-    def _on_accent_color_btn_toggled(self, btn: Gtk.MenuButton, *_):
-        if btn.get_active():
-            color: str = self.get_prop("color")
-            color_btns = get_children(
-                btn.get_popover().get_child().get_first_child()
-            ) + get_children(btn.get_popover().get_child().get_last_child())
-            for btn in color_btns:
-                btn_color = btn.get_buildable_id()
-                if btn_color == color:
-                    self.can_sync = False
-                    btn.set_active(True)
-                    self.can_sync = True
 
     @Gtk.Template.Callback()
     def _on_accent_color_selected(self, btn: Gtk.CheckButton):

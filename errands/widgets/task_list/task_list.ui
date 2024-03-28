@@ -90,7 +90,6 @@
             <!-- Scrolled window-->
             <child>
               <object id="scrl" class="GtkScrolledWindow">
-                <property name="propagate-natural-width">true</property>
                 <property name="vexpand">true</property>
                 <property name="visible">false</property>
                 <property name="vadjustment">
