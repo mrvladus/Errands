@@ -50,7 +50,7 @@ class TaskList(Adw.Bin):
     # ------ PRIVATE METHODS ------ #
 
     @idle_add
-    @timeit
+    # @timeit
     def __load_tasks(self) -> None:
         Log.info(f"Task List {self.list_uid}: Load Tasks")
 

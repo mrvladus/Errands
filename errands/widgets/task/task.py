@@ -198,22 +198,6 @@ class Task(Adw.Bin):
         self.update_completion_state()
         self.update_progressbar()
 
-    def update_tags(self):
-        tags: str = self.get_prop("tags")
-        tags_list_text: list[str] = [t.title for t in self.tags]
-
-        # Delete tags
-        for t in self.tags:
-            if t.title not in tags:
-                self.tags_bar.remove(t)
-
-        # Add tags
-        for t in tags:
-            if t not in tags_list_text:
-                self.tags_bar.append(Tag(t, self))
-
-        self.tags_bar_rev.set_reveal_child(tags != [])
-
     # ------ PROPERTIES ------ #
 
     @property
@@ -366,9 +350,26 @@ class Task(Adw.Bin):
             self.complete_btn.set_active(completed)
             self.just_added = False
 
+    def update_tags(self):
+        tags: str = self.task_data.tags
+        tags_list_text: list[str] = [t.title for t in self.tags]
+
+        # Delete tags
+        for t in self.tags:
+            if t.title not in tags:
+                self.tags_bar.remove(t)
+
+        # Add tags
+        for t in tags:
+            if t not in tags_list_text:
+                self.tags_bar.append(Tag(t, self))
+
+        self.tags_bar_rev.set_reveal_child(tags != [])
+
     def update_headerbar(self):
         # Update title
         self.title_row.set_title(Markup.find_url(Markup.escape(self.task_data.text)))
+
         # Update subtitle
         total, completed = self.get_status()
         self.title_row.set_subtitle(
@@ -541,6 +542,7 @@ class Task(Adw.Bin):
                     task.complete_btn.set_active(False)
                     task.just_added = False
 
+        self.parent.update_ui()
         self.task_list.update_status()
         # Sync.sync(False)
 
