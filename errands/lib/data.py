@@ -211,7 +211,7 @@ class UserDataJSON:
         self.tags = current_tags
 
     def remove_tags(self, tags: list[str]) -> None:
-        Log.debug(f"Data: remove tags {tags}")
+        Log.debug(f"Data: remove tag")
         self.tags = [t for t in self.tags if t.text not in tags]
         changed = False
         tasks = self.tasks

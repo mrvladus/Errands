@@ -29,6 +29,7 @@
     <file preprocess="xml-stripblanks" alias="errands-select-symbolic.svg">icons/errands-select-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-notes-symbolic.svg">icons/errands-notes-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-priority-symbolic.svg">icons/errands-priority-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-priority-set-symbolic.svg">icons/errands-priority-set-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-color-symbolic.svg">icons/errands-color-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-toolbar-symbolic.svg">icons/errands-toolbar-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-progressbar-symbolic.svg">icons/errands-progressbar-symbolic.svg</file>

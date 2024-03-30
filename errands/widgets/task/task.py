@@ -447,6 +447,9 @@ class Task(Adw.Bin):
             self.priority_btn.add_css_class("warning")
         elif priority == 9:
             self.priority_btn.add_css_class("accent")
+        self.priority_btn.set_icon_name(
+            f"errands-priority{'-set' if priority>0 else ''}-symbolic"
+        )
 
     def update_ui(self, update_sub_tasks_ui: bool = True) -> None:
         Log.debug(f"Task '{self.uid}: Update UI'")
