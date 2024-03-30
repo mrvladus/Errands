@@ -29,7 +29,7 @@ from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.markup import Markup
 from errands.lib.sync.sync import Sync
-from errands.lib.utils import get_children, timeit
+from errands.lib.utils import get_children, idle_add, timeit
 
 
 @Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
@@ -72,20 +72,20 @@ class Task(Adw.Bin):
 
     def __init__(
         self,
-        uid: str,
+        task_data: TaskData,
         task_list: TaskList,
         parent: TaskList | Task,
     ) -> None:
         super().__init__()
-
-        self.uid = uid
+        self.task_data = task_data
+        self.uid = task_data.uid
+        self.list_uid = task_data.list_uid
         self.task_list = task_list
-        self.list_uid = task_list.list_uid
         self.window = task_list.window
         self.parent = parent
         GSettings.bind("task-show-progressbar", self.progress_bar_rev, "visible")
-        self.title_row.set_title(Markup.find_url(Markup.escape(self.get_prop("text"))))
         self.__add_actions()
+        self.__load_sub_tasks()
         # Set notes theme
         Adw.StyleManager.get_default().bind_property(
             "dark",
@@ -174,6 +174,30 @@ class Task(Adw.Bin):
         __create_action("export", __export)
         __create_action("move_to_trash", lambda *_: self.delete())
 
+    @idle_add
+    def __load_sub_tasks(self):
+        tasks: list[TaskData] = (
+            t
+            for t in UserData.get_tasks_as_dicts(self.list_uid, self.uid)
+            if not t.deleted
+        )
+
+        for task in tasks:
+            new_task = Task(task, self.task_list, self)
+            if task.completed:
+                self.completed_tasks_list.append(new_task)
+            else:
+                self.uncompleted_tasks_list.append(new_task)
+
+        self.expand(self.task_data.expanded)
+        self.toggle_visibility(not self.task_data.trash)
+        self.update_headerbar()
+        self.update_toolbar()
+        self.update_tags()
+        self.update_color()
+        self.update_completion_state()
+        self.update_progressbar()
+
     def update_tags(self):
         tags: str = self.get_prop("tags")
         tags_list_text: list[str] = [t.title for t in self.tags]
@@ -241,16 +265,15 @@ class Task(Adw.Bin):
 
     # ------ PUBLIC METHODS ------ #
 
-    def add_task(self, uid: str) -> Task:
-        Log.info(f"Task List: Add task '{uid}'")
+    def add_task(self, task: TaskData) -> Task:
+        Log.info(f"Task List: Add task '{task.uid}'")
 
         on_top: bool = GSettings.get("task-list-new-task-position-top")
-        new_task = Task(uid, self, self)
+        new_task = Task(task, self, self)
         if on_top:
             self.uncompleted_tasks_list.prepend(new_task)
         else:
             self.uncompleted_tasks_list.append(new_task)
-        new_task.update_ui()
 
     def add_rm_crossline(self, add: bool) -> None:
         if add:
@@ -325,16 +348,18 @@ class Task(Adw.Bin):
         # Log.debug(f"Task '{self.uid}': Update props {props}")
         UserData.update_props(self.list_uid, self.uid, props, values)
 
+    # --- UPDATE UI FUNCTIONS --- #
+
     def update_color(self):
         for c in self.main_box.get_css_classes():
             if "task-" in c:
                 self.main_box.remove_css_class(c)
                 break
-        if color := self.get_prop("color"):
+        if color := self.task_data.color:
             self.main_box.add_css_class(f"task-{color}")
 
     def update_completion_state(self):
-        completed: bool = self.get_prop("completed")
+        completed: bool = self.task_data.completed
         self.add_rm_crossline(completed)
         if self.complete_btn.get_active() != completed:
             self.just_added = True
@@ -343,7 +368,7 @@ class Task(Adw.Bin):
 
     def update_headerbar(self):
         # Update title
-        self.title_row.set_title(Markup.find_url(Markup.escape(self.get_prop("text"))))
+        self.title_row.set_title(Markup.find_url(Markup.escape(self.task_data.text)))
         # Update subtitle
         total, completed = self.get_status()
         self.title_row.set_subtitle(
@@ -411,22 +436,22 @@ class Task(Adw.Bin):
 
     def update_toolbar(self) -> None:
         # Show toolbar
-        self.toolbar.set_reveal_child(self.get_prop("toolbar_shown"))
+        self.toolbar.set_reveal_child(self.task_data.toolbar_shown)
 
         # Update Date and Time
-        self.due_date_time.datetime = self.get_prop("due_date")
+        self.due_date_time.datetime = self.task_data.due_date
         self.date_time_btn.get_child().props.label = (
             f"{self.due_date_time.human_datetime}"
         )
 
         # Update notes button css
-        if self.get_prop("notes"):
+        if self.task_data.notes:
             self.notes_btn.add_css_class("accent")
         else:
             self.notes_btn.remove_css_class("accent")
 
         # Update priority button css
-        priority: int = self.get_prop("priority")
+        priority: int = self.task_data.priority
         self.priority_btn.props.css_classes = ["flat"]
         if 0 < priority < 5:
             self.priority_btn.add_css_class("error")
@@ -440,8 +465,9 @@ class Task(Adw.Bin):
         if self.purged:
             self.purge()
             return
-        self.toggle_visibility(not self.get_prop("trash"))
-        self.expand(self.get_prop("expanded"))
+        self.task_data = UserData.get_task(self.list_uid, self.uid)
+        self.toggle_visibility(not self.task_data.trash)
+        self.expand(self.task_data.expanded)
         self.update_color()
         self.update_progressbar()
         self.update_completion_state()
@@ -471,7 +497,7 @@ class Task(Adw.Bin):
                 list_uid=self.list_uid,
                 text=text,
                 parent=self.uid,
-            ).uid
+            )
         )
 
         # Clear entry
@@ -515,7 +541,7 @@ class Task(Adw.Bin):
                     task.complete_btn.set_active(False)
                     task.just_added = False
 
-        self.task_list.update_ui(False)
+        self.task_list.update_status()
         # Sync.sync(False)
 
     @Gtk.Template.Callback()

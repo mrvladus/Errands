@@ -172,22 +172,19 @@ class UserDataJSON:
         list: TaskListData = [l for l in self.task_lists if l.uid == list_uid][0]
         return getattr(list, prop)
 
-    def get_status(self, list_uid: str, parent_uid: str = "") -> tuple[int, int]:
+    def get_status(self, list_uid: str, parent_uid: str = None) -> tuple[int, int]:
         """Gets tuple (total_tasks, completed_tasks)"""
 
-        tasks: list[TaskData] = self.tasks
-        total: int = 0
-        completed: int = 0
-        for task in tasks:
-            if (
-                task.list_uid == list_uid
-                and task.parent == parent_uid
-                and not task.deleted
-                and not task.trash
-            ):
-                total += 1
-                if task.completed:
-                    completed += 1
+        tasks: list[TaskData] = [
+            t
+            for t in self.tasks
+            if t.list_uid == list_uid and not t.deleted and not t.trash
+        ]
+        if parent_uid:
+            tasks: list[TaskData] = [t for t in tasks if t.parent == parent_uid]
+        total: int = len(tasks)
+        completed: int = len([t for t in tasks if t.completed])
+
         return total, completed
 
     def add_tag(self, tag: str) -> None:
@@ -227,13 +224,19 @@ class UserDataJSON:
         tasks = self.tasks
         for task in tasks:
             if task.tags:
-                taks_tags = task.tags.split(",")
-                for tag in taks_tags:
-                    if tag in tags:
-                        taks_tags.remove(tag)
-                task.tags = ",".join(taks_tags)
+                task.tags = [t for t in task.tags if t not in tags]
         if tasks != self.tasks:
             self.tasks = tasks
+
+    def get_task(self, list_uid: str, uid: str) -> TaskData:
+        try:
+            task: TaskData = [
+                t for t in self.tasks if t.list_uid == list_uid and t.uid == uid
+            ][0]
+            return task
+        except Exception as e:
+            Log.error(f"Data: can't get task '{uid}'")
+            return TaskData()
 
     def get_tasks_as_dicts(
         self, list_uid: str = None, parent: str = None

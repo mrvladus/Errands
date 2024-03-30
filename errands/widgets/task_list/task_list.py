@@ -50,6 +50,7 @@ class TaskList(Adw.Bin):
     # ------ PRIVATE METHODS ------ #
 
     @idle_add
+    @timeit
     def __load_tasks(self) -> None:
         Log.info(f"Task List {self.list_uid}: Load Tasks")
 
@@ -57,12 +58,12 @@ class TaskList(Adw.Bin):
             t for t in UserData.get_tasks_as_dicts(self.list_uid, "") if not t.deleted
         ]
         for task in tasks:
-            new_task = Task(task.uid, self, self)
+            new_task = Task(task, self, self)
             if task.completed:
                 self.completed_tasks_list.append(new_task)
             else:
                 self.uncompleted_tasks_list.append(new_task)
-            new_task.update_ui()
+
         self.scrl.set_visible(True)
         self.loading_status_page.set_visible(False)
 
@@ -101,11 +102,11 @@ class TaskList(Adw.Bin):
 
     # ------ PUBLIC METHODS ------ #
 
-    def add_task(self, uid: str) -> Task:
-        Log.info(f"Task List: Add task '{uid}'")
+    def add_task(self, task: str) -> Task:
+        Log.info(f"Task List: Add task '{task.uid}'")
 
         on_top: bool = GSettings.get("task-list-new-task-position-top")
-        new_task = Task(uid, self, self)
+        new_task = Task(task, self, self)
         if on_top:
             self.uncompleted_tasks_list.prepend(new_task)
         else:
@@ -135,21 +136,20 @@ class TaskList(Adw.Bin):
         Log.debug(f"Task list {self.list_uid}: Update UI")
 
         # Update tasks
-        data_uids: list[str] = [
-            t.uid
-            for t in UserData.get_tasks_as_dicts(self.list_uid, "")
-            if not t.deleted
+        tasks: list[TaskData] = [
+            t for t in UserData.get_tasks_as_dicts(self.list_uid, "") if not t.deleted
         ]
+        tasks_uids: list[str] = [t.uid for t in tasks]
         widgets_uids: list[str] = [t.uid for t in self.tasks]
 
         # Add tasks
-        for uid in data_uids:
-            if uid not in widgets_uids:
-                self.add_task(uid)
+        for task in tasks:
+            if task.uid not in widgets_uids:
+                self.add_task(task)
 
         for task in self.tasks:
             # Remove task
-            if task.uid not in data_uids:
+            if task.uid not in tasks_uids:
                 task.purge()
             # Move task to completed tasks
             elif task.get_prop("completed") and task in self.uncompleted_tasks:
@@ -235,7 +235,7 @@ class TaskList(Adw.Bin):
             UserData.add_task(
                 list_uid=self.list_uid,
                 text=text,
-            ).uid
+            )
         )
         entry.set_text("")
         if not GSettings.get("task-list-new-task-position-top"):
