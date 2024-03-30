@@ -40,3 +40,4 @@ class Tag(Gtk.Box):
         tags.remove(self.title)
         self.task.update_props(["tags", "synced"], [tags, False])
         self.task.update_tags()
+        # Sync.sync(False)

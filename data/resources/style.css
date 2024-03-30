@@ -107,6 +107,7 @@
 
 .accent-color-btn-green radio {
   background-color: @green_2;
+  color: @window_fg_color;
 }
 
 .accent-color-btn-yellow radio {
@@ -116,6 +117,7 @@
 
 .accent-color-btn-orange radio {
   background-color: @orange_2;
+  color: @window_fg_color;
 }
 
 .accent-color-btn-red radio {
