@@ -41,6 +41,7 @@ class NotesWindow(Adw.Dialog):
             bottom_margin=6,
             right_margin=6,
             left_margin=6,
+            show_line_numbers=True,
         )
         view = Adw.ToolbarView(
             content=Gtk.ScrolledWindow(
