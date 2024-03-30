@@ -4,11 +4,13 @@
 from __future__ import annotations
 import os
 
-from errands.lib.data import TaskData, UserData
+from errands.lib.data import UserData
 from errands.lib.utils import get_children
 
 
 from gi.repository import Adw, Gio, GObject, Gtk  # type:ignore
+
+from errands.widgets.task_list.task_list import TaskList
 
 
 @Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
@@ -83,12 +85,21 @@ class Tag(Adw.ActionRow):
             GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
         )
         self.number_of_tasks: Gtk.Label = Gtk.Label()
-        # box = Gtk.Box(spacing=12)
-        # box.append(self.number_of_tasks)
-        # box.append(arrow)
         self.add_suffix(self.number_of_tasks)
 
     def delete(self, _btn: Gtk.Button):
+        task_lists: list[TaskList] = (
+            Adw.Application.get_default().get_active_window().sidebar.task_lists
+        )
+        for list in task_lists:
+            for task in list.all_tasks:
+                for tag in task.tags:
+                    if tag.title == self.get_title():
+                        task.tags_bar.remove(tag)
+                        task.tags_bar_rev.set_reveal_child(
+                            len(task.task_data.tags) - 1 > 0
+                        )
+                        break
         UserData.remove_tags([self.get_title()])
         self.tags.update_ui(False)
 

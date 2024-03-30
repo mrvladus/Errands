@@ -211,21 +211,15 @@ class UserDataJSON:
         self.tags = current_tags
 
     def remove_tags(self, tags: list[str]) -> None:
-        new_tags = self.tags
-        to_remove: list[TagsData] = []
-        for t in new_tags:
-            if t.text in tags:
-                to_remove.append(t)
-        for t in to_remove:
-            new_tags.remove(t)
-        self.tags = new_tags
-
-        # Remove tags from tasks
+        Log.debug(f"Data: remove tags {tags}")
+        self.tags = [t for t in self.tags if t.text not in tags]
+        changed = False
         tasks = self.tasks
         for task in tasks:
-            if task.tags:
+            if task.tags != []:
                 task.tags = [t for t in task.tags if t not in tags]
-        if tasks != self.tasks:
+                changed = True
+        if changed:
             self.tasks = tasks
 
     def get_task(self, list_uid: str, uid: str) -> TaskData:

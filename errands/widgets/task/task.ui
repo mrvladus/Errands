@@ -274,6 +274,7 @@
                         <property name="margin-end">9</property>
                         <property name="margin-bottom">2</property>
                         <property name="max-children-per-line">2</property>
+                        <property name="selection-mode">0</property>
 
                         <!-- Date and time btn -->
                         <child>
