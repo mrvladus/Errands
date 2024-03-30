@@ -6,6 +6,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from errands.widgets.components.datetime_picker import DateTimePicker
+from errands.widgets.task.notes import NotesWindow
 from errands.widgets.task.tag import Tag
 from errands.widgets.task.tags_list_item import TagsListItem
 
@@ -52,7 +53,6 @@ class Task(Adw.Bin):
     uncompleted_tasks_list: Gtk.Box = Gtk.Template.Child()
     completed_tasks_list: Gtk.Box = Gtk.Template.Child()
     notes_btn: Gtk.MenuButton = Gtk.Template.Child()
-    notes_buffer: GtkSource.Buffer = Gtk.Template.Child()
     priority_btn: Gtk.MenuButton = Gtk.Template.Child()
     created_label: Gtk.Label = Gtk.Template.Child()
     changed_label: Gtk.Label = Gtk.Template.Child()
@@ -63,6 +63,7 @@ class Task(Adw.Bin):
     tags_list: Gtk.ListBox = Gtk.Template.Child()
     priority: Gtk.SpinButton = Gtk.Template.Child()
     accent_color_btns: Gtk.Box = Gtk.Template.Child()
+    notes_window: NotesWindow = None
 
     # State
     just_added: bool = True
@@ -86,20 +87,6 @@ class Task(Adw.Bin):
         GSettings.bind("task-show-progressbar", self.progress_bar_rev, "visible")
         self.__add_actions()
         self.__load_sub_tasks()
-        # Set notes theme
-        Adw.StyleManager.get_default().bind_property(
-            "dark",
-            self.notes_buffer,
-            "style-scheme",
-            GObject.BindingFlags.SYNC_CREATE,
-            lambda _, is_dark: self.notes_buffer.set_style_scheme(
-                GtkSource.StyleSchemeManager.get_default().get_scheme(
-                    "Adwaita-dark" if is_dark else "Adwaita"
-                )
-            ),
-        )
-        lm: GtkSource.LanguageManager = GtkSource.LanguageManager.get_default()
-        self.notes_buffer.set_language(lm.get_language("markdown"))
         self.just_added = False
 
     def __repr__(self) -> str:
@@ -635,18 +622,10 @@ class Task(Adw.Bin):
         self.tags_list.set_visible(len(get_children(self.tags_list)) > 0)
 
     @Gtk.Template.Callback()
-    def _on_notes_toggled(self, btn: Gtk.MenuButton, *_):
-        notes: str = self.get_prop("notes")
-        if btn.get_active():
-            self.notes_buffer.set_text(notes)
-        else:
-            text: str = self.notes_buffer.props.text
-            if text == notes:
-                return
-            Log.info("Task: Change notes")
-            self.update_props(["notes", "synced"], [text, False])
-            self.update_ui()
-            # Sync.sync(False)
+    def _on_notes_btn_clicked(self, btn: Gtk.Button):
+        if not self.notes_window:
+            self.notes_window = NotesWindow(self)
+        self.notes_window.show()
 
     @Gtk.Template.Callback()
     def _on_priority_toggled(self, btn: Gtk.MenuButton, *_):

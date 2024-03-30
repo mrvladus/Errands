@@ -372,34 +372,14 @@
 
                             <!-- Notes btn -->
                             <child>
-                              <object id="notes_btn" class="GtkMenuButton">
+                              <object id="notes_btn" class="GtkButton">
                                 <property name="valign">center</property>
                                 <property name="icon-name">errands-notes-symbolic</property>
                                 <property name="tooltip-text" translatable="yes">Notes</property>
-                                <property name="popover">
-                                  <object class="GtkPopover">
-                                    <child>
-                                      <object class="GtkScrolledWindow">
-                                        <property name="propagate-natural-height">true</property>
-                                        <property name="propagate-natural-width">true</property>
-                                        <child>
-                                          <object class="GtkSourceView">
-                                            <property name="width-request">360</property>
-                                            <property name="height-request">360</property>
-                                            <property name="wrap-mode">3</property>
-                                            <property name="buffer">
-                                              <object id="notes_buffer" class="GtkSourceBuffer" />
-                                            </property>
-                                          </object>
-                                        </child>
-                                      </object>
-                                    </child>
-                                  </object>
-                                </property>
                                 <style>
                                   <class name="flat" />
                                 </style>
-                                <signal name="notify::active" handler="_on_notes_toggled" />
+                                <signal name="clicked" handler="_on_notes_btn_clicked" />
                               </object>
                             </child>
 
