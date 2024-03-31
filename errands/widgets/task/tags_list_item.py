@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -22,7 +23,9 @@ class TagsListItem(Gtk.Box):
         self.toggle_btn.connect("toggled", self.__on_toggle)
         self.append(self.toggle_btn)
         self.append(
-            Gtk.Label(label=title, hexpand=True, halign="start", max_width_chars=20)
+            Gtk.Label(
+                label=title, hexpand=True, halign=Gtk.Align.START, max_width_chars=20
+            )
         )
         self.append(
             Gtk.Image(icon_name="errands-tag-symbolic", css_classes=["dim-label"])
@@ -32,7 +35,7 @@ class TagsListItem(Gtk.Box):
         if self.block_signals:
             return
 
-        tags: str = self.task.get_prop("tags")
+        tags: list[str] = self.task.get_prop("tags")
 
         if btn.get_active():
             if self.title not in tags:
@@ -42,4 +45,5 @@ class TagsListItem(Gtk.Box):
                 tags.remove(self.title)
 
         self.task.update_props(["tags", "synced"], [tags, False])
+        self.task.update_task_data()
         self.task.update_tags()

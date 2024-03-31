@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="NotesWindow" parent="AdwDialog">
+    <property name="content-width">600</property>
+    <property name="content-height">600</property>
+    <property name="title" translatable="yes">Notes</property>
+
+    <child>
+      <object class="AdwToolbarView">
+        <property name="top-bar-style">raised</property>
+
+        <child type="top">
+          <object class="AdwHeaderBar" />
+        </child>
+
+        <property name="content">
+          <object class="GtkScrolledWindow">
+            <property name="propagate-natural-height">true</property>
+            <property name="propagate-natural-width">true</property>
+            <child>
+              <object class="GtkSourceView">
+                <property name="wrap-mode">3</property>
+                <property name="top-margin">6</property>
+                <property name="bottom-margin">6</property>
+                <property name="right-margin">6</property>
+                <property name="left-margin">6</property>
+                <property name="show-line-numbers">true</property>
+                <property name="buffer">
+                  <object id="buffer" class="GtkSourceBuffer" />
+                </property>
+              </object>
+            </child>
+          </object>
+        </property>
+
+      </object>
+    </child>
+  </template>
+</interface>

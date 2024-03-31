@@ -278,82 +278,16 @@
 
                         <!-- Date and time btn -->
                         <child>
-                          <object id="date_time_btn" class="GtkMenuButton">
+                          <object id="date_time_btn" class="GtkButton">
                             <property name="valign">center</property>
                             <property name="halign">start</property>
                             <property name="hexpand">true</property>
                             <property name="tooltip-text" translatable="yes">Start / Due Date</property>
-                            <property name="popover">
-                              <object class="GtkPopover">
-                                <child>
-                                  <object class="GtkBox">
-                                    <property name="orientation">vertical</property>
-
-                                    <child>
-                                      <object class="AdwViewSwitcher">
-                                        <property name="height-request">35</property>
-                                        <property name="halign">center</property>
-                                        <property name="stack">date_stack</property>
-                                        <property name="policy">wide</property>
-                                        <property name="margin-bottom">6</property>
-                                      </object>
-                                    </child>
-
-                                    <child>
-                                      <object id="date_stack" class="AdwViewStack">
-
-                                        <!-- Due date -->
-                                        <child>
-                                          <object class="AdwViewStackPage">
-                                            <property name="name" translatable="yes">Due</property>
-                                            <property name="icon-name">errands-calendar-symbolic</property>
-                                            <property name="title" translatable="yes">Due</property>
-                                            <property name="child">
-                                              <object class="GtkScrolledWindow">
-                                                <property name="propagate-natural-height">true</property>
-                                                <property name="propagate-natural-width">true</property>
-                                                <child>
-                                                  <object id="due_date_time" class="DateTimePicker">
-                                                    <signal name="changed" handler="_on_date_time_due_set" />
-                                                  </object>
-                                                </child>
-                                              </object>
-                                            </property>
-                                          </object>
-                                        </child>
-
-                                        <!-- Start date -->
-                                        <child>
-                                          <object class="AdwViewStackPage">
-                                            <property name="name" translatable="yes">Start</property>
-                                            <property name="icon-name">errands-calendar-symbolic</property>
-                                            <property name="title" translatable="yes">Start</property>
-                                            <property name="child">
-                                              <object class="GtkScrolledWindow">
-                                                <property name="propagate-natural-height">true</property>
-                                                <property name="propagate-natural-width">true</property>
-                                                <child>
-                                                  <object id="start_date_time" class="DateTimePicker">
-                                                    <signal name="changed" handler="_on_date_time_start_set" />
-                                                  </object>
-                                                </child>
-                                              </object>
-                                            </property>
-                                          </object>
-                                        </child>
-
-                                      </object>
-                                    </child>
-
-                                  </object>
-                                </child>
-                              </object>
-                            </property>
                             <style>
                               <class name="flat" />
                               <class name="caption" />
                             </style>
-                            <signal name="notify::active" handler="_on_date_time_toggled" />
+                            <signal name="clicked" handler="_on_date_time_btn_clicked" />
 
                             <child>
                               <object class="AdwButtonContent">

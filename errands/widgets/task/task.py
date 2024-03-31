@@ -5,8 +5,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from errands.widgets.components.datetime_picker import DateTimePicker
-from errands.widgets.task.notes import NotesWindow
+from errands.widgets.task.datetime_window import DateTimeWindow
+from errands.widgets.task.notes_window import NotesWindow
 from errands.widgets.task.tag import Tag
 from errands.widgets.task.tags_list_item import TagsListItem
 
@@ -23,13 +23,13 @@ from gi.repository import Gio  # type:ignore
 from gi.repository import GLib  # type:ignore
 from gi.repository import GObject  # type:ignore
 from gi.repository import Gtk  # type:ignore
-from gi.repository import GtkSource  # type:ignore
 
 from errands.lib.data import TaskData, UserData
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.markup import Markup
-from errands.lib.sync.sync import Sync
+
+# from errands.lib.sync.sync import Sync
 from errands.lib.utils import get_children, idle_add, timeit
 
 
@@ -56,14 +56,10 @@ class Task(Adw.Bin):
     priority_btn: Gtk.MenuButton = Gtk.Template.Child()
     created_label: Gtk.Label = Gtk.Template.Child()
     changed_label: Gtk.Label = Gtk.Template.Child()
-    start_date_time: DateTimePicker = Gtk.Template.Child()
-    due_date_time: DateTimePicker = Gtk.Template.Child()
     date_time_btn: Gtk.MenuButton = Gtk.Template.Child()
-    date_stack: Adw.ViewStack = Gtk.Template.Child()
     tags_list: Gtk.ListBox = Gtk.Template.Child()
     priority: Gtk.SpinButton = Gtk.Template.Child()
     accent_color_btns: Gtk.Box = Gtk.Template.Child()
-    notes_window: NotesWindow = None
 
     # State
     just_added: bool = True
@@ -84,6 +80,8 @@ class Task(Adw.Bin):
         self.task_list = task_list
         self.window = task_list.window
         self.parent = parent
+        self.notes_window: NotesWindow = NotesWindow(self)
+        self.datetime_window: DateTimeWindow = DateTimeWindow(self)
         GSettings.bind("task-show-progressbar", self.progress_bar_rev, "visible")
         self.__add_actions()
         self.__load_sub_tasks()
@@ -109,8 +107,8 @@ class Task(Adw.Bin):
             def __confirm(dialog, res):
                 try:
                     file = dialog.save_finish(res)
-                except:
-                    Log.debug("List: Export cancelled")
+                except Exception as e:
+                    Log.debug(f"List: Export cancelled. {e}")
                     return
 
                 Log.info(f"Task: Export '{self.uid}'")
@@ -146,7 +144,7 @@ class Task(Adw.Bin):
 
                 with open(file.get_path(), "wb") as f:
                     f.write(calendar.to_ical())
-                self.window.add_toast(_("Exported"))
+                self.window.add_toast(_("Exported"))  # noqa: F821
 
             dialog = Gtk.FileDialog(initial_name=f"{self.task.uid}.ics")
             dialog.save(self.window, None, __confirm)
@@ -154,7 +152,7 @@ class Task(Adw.Bin):
         def __copy_to_clipboard(*args):
             Log.info("Task: Copy text to clipboard")
             Gdk.Display.get_default().get_clipboard().set(self.get_prop("text"))
-            self.window.add_toast(_("Copied to Clipboard"))
+            self.window.add_toast(_("Copied to Clipboard"))  # noqa: F821
 
         __create_action("edit", __edit)
         __create_action("copy_to_clipboard", __copy_to_clipboard)
@@ -316,12 +314,14 @@ class Task(Adw.Bin):
                 props.append("changed_at")
                 values.append(datetime.now().strftime("%Y%m%dT%H%M%S"))
                 break
-        # Log.debug(f"Task '{self.uid}': Update props {props}")
         UserData.update_props(self.list_uid, self.uid, props, values)
+
+    def update_task_data(self) -> None:
+        self.task_data = UserData.get_task(self.list_uid, self.uid)
 
     # --- UPDATE UI FUNCTIONS --- #
 
-    def update_color(self):
+    def update_color(self) -> None:
         for c in self.main_box.get_css_classes():
             if "task-" in c:
                 self.main_box.remove_css_class(c)
@@ -329,7 +329,7 @@ class Task(Adw.Bin):
         if color := self.task_data.color:
             self.main_box.add_css_class(f"task-{color}")
 
-    def update_completion_state(self):
+    def update_completion_state(self) -> None:
         completed: bool = self.task_data.completed
         self.add_rm_crossline(completed)
         if self.complete_btn.get_active() != completed:
@@ -337,7 +337,7 @@ class Task(Adw.Bin):
             self.complete_btn.set_active(completed)
             self.just_added = False
 
-    def update_tags(self):
+    def update_tags(self) -> None:
         tags: str = self.task_data.tags
         tags_list_text: list[str] = [t.title for t in self.tags]
 
@@ -353,17 +353,17 @@ class Task(Adw.Bin):
 
         self.tags_bar_rev.set_reveal_child(tags != [])
 
-    def update_headerbar(self):
+    def update_headerbar(self) -> None:
         # Update title
         self.title_row.set_title(Markup.find_url(Markup.escape(self.task_data.text)))
 
         # Update subtitle
         total, completed = self.get_status()
         self.title_row.set_subtitle(
-            _("Completed:") + f" {completed} / {total}" if total > 0 else ""
+            _("Completed:") + f" {completed} / {total}" if total > 0 else ""  # noqa: F821
         )
 
-    def update_progressbar(self):
+    def update_progressbar(self) -> None:
         if GSettings.get("task-show-progressbar"):
             total, completed = self.get_status()
             pc: int = (
@@ -377,7 +377,7 @@ class Task(Adw.Bin):
             self.progress_bar.set_fraction(pc / 100)
             self.progress_bar_rev.set_reveal_child(self.get_status()[0] > 0)
 
-    def update_tasks(self):
+    def update_tasks(self) -> None:
         # Update tasks
         data_uids: list[str] = [
             t.uid
@@ -427,10 +427,11 @@ class Task(Adw.Bin):
         self.toolbar.set_reveal_child(self.task_data.toolbar_shown)
 
         # Update Date and Time
-        self.due_date_time.datetime = self.task_data.due_date
-        self.date_time_btn.get_child().props.label = (
-            f"{self.due_date_time.human_datetime}"
-        )
+        if self.datetime_window:
+            self.datetime_window.due_date_time.datetime = self.task_data.due_date
+            self.date_time_btn.get_child().props.label = (
+                f"{self.datetime_window.due_date_time.human_datetime}"
+            )
 
         # Update notes button css
         if self.task_data.notes:
@@ -471,7 +472,7 @@ class Task(Adw.Bin):
     # ------ TEMPLATE HANDLERS ------ #
 
     @Gtk.Template.Callback()
-    def _on_title_row_clicked(self, *args):
+    def _on_title_row_clicked(self, *args) -> None:
         self.expand(not self.sub_tasks_revealer.get_child_revealed())
 
     @Gtk.Template.Callback()
@@ -542,7 +543,7 @@ class Task(Adw.Bin):
             self.update_props(["toolbar_shown"], [btn.get_active()])
 
     @Gtk.Template.Callback()
-    def _on_entry_row_applied(self, entry: Adw.EntryRow):
+    def _on_entry_row_applied(self, entry: Adw.EntryRow) -> None:
         text: str = entry.props.text.strip()
         entry.set_visible(False)
         if not text or text == self.get_prop("text"):
@@ -559,21 +560,11 @@ class Task(Adw.Bin):
     # --- TOOLBAR --- #
 
     @Gtk.Template.Callback()
-    def _on_date_time_toggled(self, _btn: Gtk.MenuButton, active: bool) -> None:
-        self.start_date_time.datetime = self.get_prop("start_date")
-        self.due_date_time.datetime = self.get_prop("due_date")
+    def _on_date_time_btn_clicked(self, _btn: Gtk.Button) -> None:
+        self.datetime_window.show()
 
     @Gtk.Template.Callback()
-    def _on_date_time_start_set(self, *args) -> None:
-        self.update_props(["start_date"], [self.start_date_time.datetime])
-
-    @Gtk.Template.Callback()
-    def _on_date_time_due_set(self, *args) -> None:
-        self.update_props(["due_date"], [self.due_date_time.datetime])
-        self.update_ui()
-
-    @Gtk.Template.Callback()
-    def _on_menu_toggled(self, _btn: Gtk.MenuButton, active: bool):
+    def _on_menu_toggled(self, _btn: Gtk.MenuButton, active: bool) -> None:
         if not active:
             return
 
@@ -584,8 +575,8 @@ class Task(Adw.Bin):
         changed_date: str = datetime.fromisoformat(
             self.get_prop("changed_at")
         ).strftime("%Y.%m.%d %H:%M:%S")
-        self.created_label.set_label(_("Created:") + " " + created_date)
-        self.changed_label.set_label(_("Changed:") + " " + changed_date)
+        self.created_label.set_label(_("Created:") + " " + created_date)  # noqa: F821
+        self.changed_label.set_label(_("Changed:") + " " + changed_date)  # noqa: F821
 
         # Update color
         color: str = self.get_prop("color")
@@ -625,13 +616,11 @@ class Task(Adw.Bin):
         self.tags_list.set_visible(len(get_children(self.tags_list)) > 0)
 
     @Gtk.Template.Callback()
-    def _on_notes_btn_clicked(self, btn: Gtk.Button):
-        if not self.notes_window:
-            self.notes_window = NotesWindow(self)
+    def _on_notes_btn_clicked(self, btn: Gtk.Button) -> None:
         self.notes_window.show()
 
     @Gtk.Template.Callback()
-    def _on_priority_toggled(self, btn: Gtk.MenuButton, *_):
+    def _on_priority_toggled(self, btn: Gtk.MenuButton, *_) -> None:
         priority: int = self.get_prop("priority")
         if btn.get_active():
             self.priority.set_value(priority)
@@ -644,7 +633,7 @@ class Task(Adw.Bin):
                 # Sync.sync(False)
 
     @Gtk.Template.Callback()
-    def _on_priority_selected(self, box: Gtk.ListBox, row: Gtk.ListBoxRow):
+    def _on_priority_selected(self, box: Gtk.ListBox, row: Gtk.ListBoxRow) -> None:
         rows: list[Gtk.ListBoxRow] = get_children(box)
         for i, r in enumerate(rows):
             if r == row:
@@ -662,7 +651,7 @@ class Task(Adw.Bin):
         self.priority_btn.popdown()
 
     @Gtk.Template.Callback()
-    def _on_accent_color_selected(self, btn: Gtk.CheckButton):
+    def _on_accent_color_selected(self, btn: Gtk.CheckButton) -> None:
         if not btn.get_active() or not self.can_sync:
             return
         color: str = btn.get_buildable_id()
