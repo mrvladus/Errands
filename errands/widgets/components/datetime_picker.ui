@@ -4,130 +4,236 @@
     <property name="orientation">vertical</property>
     <property name="spacing">12</property>
 
-    <!-- Time-->
+    <!-- Time Box-->
     <child>
       <object class="GtkBox">
+        <property name="spacing">6</property>
         <property name="halign">center</property>
-        <property name="spacing">6</property>
 
-        <!-- Hour -->
+        <!-- Time-->
         <child>
-          <object id="hours" class="GtkSpinButton">
-            <property name="adjustment">
-              <object class="GtkAdjustment">
-                <property name="lower">0</property>
-                <property name="upper">23</property>
-                <property name="step-increment">1</property>
+          <object class="GtkBox">
+            <property name="halign">center</property>
+            <property name="spacing">6</property>
+
+            <!-- Hour -->
+            <child>
+              <object id="hours" class="GtkSpinButton">
+                <property name="orientation">vertical</property>
+                <property name="width-request">40</property>
+                <property name="adjustment">
+                  <object class="GtkAdjustment">
+                    <property name="lower">0</property>
+                    <property name="upper">23</property>
+                    <property name="step-increment">1</property>
+                  </object>
+                </property>
                 <signal name="value-changed" handler="_on_date_time_changed" />
-              </object>
-            </property>
-          </object>
-        </child>
-
-        <child>
-          <object class="GtkLabel">
-            <property name="label">:</property>
-            <style>
-              <class name="heading" />
-            </style>
-          </object>
-        </child>
-
-        <!-- Minute -->
-        <child>
-          <object id="minutes" class="GtkSpinButton">
-            <property name="adjustment">
-              <object class="GtkAdjustment">
-                <property name="lower">0</property>
-                <property name="upper">59</property>
-                <property name="step-increment">1</property>
-              </object>
-            </property>
-            <signal name="value-changed" handler="_on_date_time_changed" />
-          </object>
-        </child>
-
-      </object>
-    </child>
-
-    <!-- Time Presets -->
-    <child>
-      <object class="GtkBox">
-        <property name="orientation">vertical</property>
-        <property name="spacing">6</property>
-
-        <child>
-          <object class="GtkBox">
-            <property name="homogeneous">true</property>
-            <property name="spacing">6</property>
-            <child>
-              <object class="GtkButton">
-                <signal name="clicked" handler="_on_time_preset_clicked" />
                 <style>
-                  <class name="flat" />
+                  <class name="title-2" />
                 </style>
-                <child>
-                  <object class="AdwButtonContent">
-                    <property name="label">09:00</property>
-                    <property name="icon-name">errands-daytime-morning-symbolic</property>
-                  </object>
-                </child>
               </object>
             </child>
+
             <child>
-              <object class="GtkButton">
-                <signal name="clicked" handler="_on_time_preset_clicked" />
+              <object class="GtkLabel">
+                <property name="label">:</property>
                 <style>
-                  <class name="flat" />
+                  <class name="heading" />
                 </style>
-                <child>
-                  <object class="AdwButtonContent">
-                    <property name="label">13:00</property>
-                    <property name="icon-name">errands-theme-light-symbolic</property>
-                  </object>
-                </child>
               </object>
             </child>
+
+            <!-- Minute -->
+            <child>
+              <object id="minutes" class="GtkSpinButton">
+                <property name="orientation">vertical</property>
+                <property name="width-request">40</property>
+                <property name="adjustment">
+                  <object class="GtkAdjustment">
+                    <property name="lower">0</property>
+                    <property name="upper">59</property>
+                    <property name="step-increment">1</property>
+                  </object>
+                </property>
+                <signal name="value-changed" handler="_on_date_time_changed" />
+                <style>
+                  <class name="title-2" />
+                </style>
+              </object>
+            </child>
+
           </object>
         </child>
 
         <child>
           <object class="GtkBox">
-            <property name="homogeneous">true</property>
+            <property name="orientation">vertical</property>
             <property name="spacing">6</property>
+
+            <!-- Time Presets -->
             <child>
-              <object class="GtkButton">
-                <signal name="clicked" handler="_on_time_preset_clicked" />
-                <style>
-                  <class name="flat" />
-                </style>
+              <object class="GtkBox">
+                <property name="orientation">vertical</property>
+                <property name="spacing">6</property>
+
                 <child>
-                  <object class="AdwButtonContent">
-                    <property name="label">17:00</property>
-                    <property name="icon-name">errands-daytime-sunset-symbolic</property>
+                  <object class="GtkBox">
+                    <property name="spacing">6</property>
+                    <property name="homogeneous">true</property>
+                    <child>
+                      <object class="GtkButton">
+                        <signal name="clicked" handler="_on_time_preset_clicked" />
+                        <style>
+                          <class name="flat" />
+                        </style>
+                        <child>
+                          <object class="AdwButtonContent">
+                            <property name="label">09:00</property>
+                            <property name="icon-name">errands-daytime-morning-symbolic</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+
+                    <child>
+                      <object class="GtkButton">
+                        <signal name="clicked" handler="_on_time_preset_clicked" />
+                        <style>
+                          <class name="flat" />
+                        </style>
+                        <child>
+                          <object class="AdwButtonContent">
+                            <property name="label">13:00</property>
+                            <property name="icon-name">errands-theme-light-symbolic</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
                   </object>
                 </child>
-              </object>
-            </child>
-            <child>
-              <object class="GtkButton">
-                <signal name="clicked" handler="_on_time_preset_clicked" />
-                <style>
-                  <class name="flat" />
-                </style>
+
                 <child>
-                  <object class="AdwButtonContent">
-                    <property name="label">20:00</property>
-                    <property name="icon-name">errands-theme-dark-symbolic</property>
+                  <object class="GtkBox">
+                    <property name="spacing">6</property>
+                    <property name="homogeneous">true</property>
+                    <child>
+                      <object class="GtkButton">
+                        <signal name="clicked" handler="_on_time_preset_clicked" />
+                        <style>
+                          <class name="flat" />
+                        </style>
+                        <child>
+                          <object class="AdwButtonContent">
+                            <property name="label">17:00</property>
+                            <property name="icon-name">errands-daytime-sunset-symbolic</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+
+                    <child>
+                      <object class="GtkButton">
+                        <signal name="clicked" handler="_on_time_preset_clicked" />
+                        <style>
+                          <class name="flat" />
+                        </style>
+                        <child>
+                          <object class="AdwButtonContent">
+                            <property name="label">20:00</property>
+                            <property name="icon-name">errands-theme-dark-symbolic</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
                   </object>
                 </child>
+
               </object>
             </child>
+
+            <child>
+              <object class="GtkSeparator">
+                <property name="margin-start">6</property>
+                <property name="margin-end">6</property>
+                <style>
+                  <class name="dim-label" />
+                </style>
+              </object>
+            </child>
+
+            <!-- Day Presets -->
+            <child>
+              <object class="GtkBox">
+                <property name="orientation">vertical</property>
+                <property name="spacing">6</property>
+
+                <child>
+                  <object class="GtkBox">
+                    <property name="homogeneous">true</property>
+                    <property name="spacing">6</property>
+
+                    <child>
+                      <object class="GtkButton">
+                        <property name="label" translatable="yes">Today</property>
+                        <signal name="clicked" handler="_on_today_clicked" />
+                        <style>
+                          <class name="flat" />
+                        </style>
+                      </object>
+                    </child>
+
+                    <child>
+                      <object class="GtkButton">
+                        <property name="label" translatable="yes">Tomorrow</property>
+                        <signal name="clicked" handler="_on_tomorrow_clicked" />
+                        <style>
+                          <class name="flat" />
+                        </style>
+                      </object>
+                    </child>
+
+                  </object>
+                </child>
+
+                <child>
+                  <object class="GtkBox">
+                    <property name="homogeneous">true</property>
+                    <property name="spacing">6</property>
+
+                    <child>
+                      <object class="GtkButton">
+                        <property name="label" translatable="yes">Now</property>
+                        <signal name="clicked" handler="_on_now_clicked" />
+                        <style>
+                          <class name="flat" />
+                        </style>
+                      </object>
+                    </child>
+
+                    <child>
+                      <object class="GtkButton">
+                        <property name="label" translatable="yes">Clear</property>
+                        <signal name="clicked" handler="_on_clear_clicked" />
+                        <style>
+                          <class name="flat" />
+                        </style>
+                      </object>
+                    </child>
+
+                  </object>
+                </child>
+
+              </object>
+            </child>
+
           </object>
         </child>
 
+
       </object>
     </child>
+
 
     <child>
       <object class="GtkSeparator" />
@@ -140,75 +246,6 @@
       </object>
     </child>
 
-    <child>
-      <object class="GtkSeparator" />
-    </child>
-
-
-    <!-- Day Presets -->
-    <child>
-      <object class="GtkBox">
-        <property name="orientation">vertical</property>
-        <property name="spacing">6</property>
-
-        <child>
-          <object class="GtkBox">
-            <property name="homogeneous">true</property>
-            <property name="spacing">6</property>
-
-            <child>
-              <object class="GtkButton">
-                <property name="label" translatable="yes">Today</property>
-                <signal name="clicked" handler="_on_today_clicked" />
-                <style>
-                  <class name="flat" />
-                </style>
-              </object>
-            </child>
-
-            <child>
-              <object class="GtkButton">
-                <property name="label" translatable="yes">Tomorrow</property>
-                <signal name="clicked" handler="_on_tomorrow_clicked" />
-                <style>
-                  <class name="flat" />
-                </style>
-              </object>
-            </child>
-
-          </object>
-        </child>
-
-        <child>
-          <object class="GtkBox">
-            <property name="homogeneous">true</property>
-            <property name="spacing">6</property>
-
-            <child>
-              <object class="GtkButton">
-                <property name="label" translatable="yes">Now</property>
-                <signal name="clicked" handler="_on_now_clicked" />
-                <style>
-                  <class name="flat" />
-                </style>
-              </object>
-            </child>
-
-            <child>
-              <object class="GtkButton">
-                <property name="label" translatable="yes">Clear</property>
-                <signal name="clicked" handler="_on_clear_clicked" />
-                <style>
-                  <class name="flat" />
-                </style>
-              </object>
-            </child>
-
-          </object>
-        </child>
-
-      </object>
-    </child>
 
   </template>
 </interface>
