@@ -52,7 +52,7 @@ class DateTimePicker(Gtk.Box):
         # Set datetime
         self.__datetime = dt
         self.lock_signals = False
-        self.label.set_label(self.human_datetime if dt else _("Set Date"))
+        self.label.set_label(self.human_datetime if dt else _("Set Date"))  # noqa: F821
 
     @property
     def datetime_as_int(self) -> int:
