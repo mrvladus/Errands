@@ -8,7 +8,7 @@ from errands.lib.data import UserData
 from errands.lib.utils import get_children
 
 
-from gi.repository import Adw, Gio, GObject, Gtk  # type:ignore
+from gi.repository import Adw, GObject, Gtk  # type:ignore
 
 from errands.widgets.task_list.task_list import TaskList
 
@@ -72,7 +72,7 @@ class Tag(Adw.ActionRow):
         delete_btn = Gtk.Button(
             icon_name="errands-trash-symbolic",
             css_classes=["flat", "error"],
-            tooltip_text=_("Delete"),
+            tooltip_text=_("Delete"),  # noqa: F821
             valign=Gtk.Align.CENTER,
         )
         delete_btn.connect("clicked", self.delete)

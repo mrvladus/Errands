@@ -4,6 +4,27 @@
     <property name="orientation">vertical</property>
     <property name="spacing">12</property>
 
+    <!-- Date Label -->
+
+    <child>
+      <object id="label" class="GtkLabel">
+        <property name="halign">center</property>
+        <style>
+          <class name="title-2" />
+        </style>
+      </object>
+    </child>
+
+    <child>
+      <object class="GtkSeparator">
+        <property name="margin-start">6</property>
+        <property name="margin-end">6</property>
+        <style>
+          <class name="dim-label" />
+        </style>
+      </object>
+    </child>
+
     <!-- Time Box-->
     <child>
       <object class="GtkBox">
@@ -21,6 +42,7 @@
               <object id="hours" class="GtkSpinButton">
                 <property name="orientation">vertical</property>
                 <property name="width-request">40</property>
+                <property name="numeric">true</property>
                 <property name="adjustment">
                   <object class="GtkAdjustment">
                     <property name="lower">0</property>
@@ -47,6 +69,7 @@
             <!-- Minute -->
             <child>
               <object id="minutes" class="GtkSpinButton">
+                <property name="numeric">true</property>
                 <property name="orientation">vertical</property>
                 <property name="width-request">40</property>
                 <property name="adjustment">
@@ -66,6 +89,7 @@
           </object>
         </child>
 
+        <!-- Presets -->
         <child>
           <object class="GtkBox">
             <property name="orientation">vertical</property>
@@ -152,6 +176,7 @@
               </object>
             </child>
 
+            <!-- Separator -->
             <child>
               <object class="GtkSeparator">
                 <property name="margin-start">6</property>
@@ -234,9 +259,14 @@
       </object>
     </child>
 
-
     <child>
-      <object class="GtkSeparator" />
+      <object class="GtkSeparator">
+        <property name="margin-start">6</property>
+        <property name="margin-end">6</property>
+        <style>
+          <class name="dim-label" />
+        </style>
+      </object>
     </child>
 
     <!-- Calendar -->
@@ -245,7 +275,6 @@
         <signal name="day-selected" handler="_on_date_time_changed" />
       </object>
     </child>
-
 
   </template>
 </interface>

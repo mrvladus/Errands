@@ -14,6 +14,7 @@ class DateTimePicker(Gtk.Box):
     changed = GObject.Signal()
 
     # CHILDREN
+    label: Gtk.Label = Gtk.Template.Child()
     hours: Gtk.SpinButton = Gtk.Template.Child()
     minutes: Gtk.SpinButton = Gtk.Template.Child()
     calendar: Gtk.Calendar = Gtk.Template.Child()
@@ -44,13 +45,14 @@ class DateTimePicker(Gtk.Box):
                 )
             )
         else:
-            self.hours.set_value(0)
-            self.minutes.set_value(0)
+            self.hours.set_value(00)
+            self.minutes.set_value(00)
             self.calendar.select_day(GLib.DateTime.new_now_local())
 
         # Set datetime
         self.__datetime = dt
         self.lock_signals = False
+        self.label.set_label(self.human_datetime if dt else _("Set Date"))
 
     @property
     def datetime_as_int(self) -> int:
@@ -59,11 +61,9 @@ class DateTimePicker(Gtk.Box):
     @property
     def human_datetime(self) -> str:
         if self.datetime:
-            out: str = (
-                f"{self.calendar.get_date().format('%d %b')} {self.datetime[9:11]}:{self.datetime[11:13]}"
-            )
+            out: str = f"{self.calendar.get_date().format('%d %b')} {self.datetime[9:11]}:{self.datetime[11:13]}"
         else:
-            out: str = _("Date")
+            out: str = _("Date")  # noqa: F821
         return out
 
     # ------ TEMPLATE HANDLERS ------ #

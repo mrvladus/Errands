@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <template class="DateTimeWindow" parent="AdwDialog">
-    <property name="content-width">360</property>
-    <property name="content-height">400</property>
+    <property name="follows-content-size">true</property>
     <property name="title" translatable="yes">Date and Time</property>
 
     <child>
