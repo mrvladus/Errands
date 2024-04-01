@@ -73,7 +73,7 @@ class TodayTask(Adw.Bin):
         self.just_added = False
 
     def __repr__(self) -> str:
-        return f"<class 'Task' {self.uid}>"
+        return f"<class 'TodayTask' {self.uid}>"
 
     def __add_actions(self) -> None:
         self.group: Gio.SimpleActionGroup = Gio.SimpleActionGroup()

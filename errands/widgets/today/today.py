@@ -16,7 +16,6 @@ from datetime import datetime
 from gi.repository import Adw, Gtk  # type:ignore
 
 from errands.lib.data import TaskData, UserData
-from errands.lib.logging import Log
 from errands.lib.utils import get_children
 from errands.widgets.today.today_task import TodayTask
 
@@ -31,23 +30,6 @@ class Today(Adw.Bin):
     def __init__(self, today_sidebar_row: TodaySidebarRow):
         super().__init__()
         self.sidebar_row: TodaySidebarRow = today_sidebar_row
-        self.__load_tasks()
-
-    def __load_tasks(self):
-        Log.debug("Today: Load Tasks")
-        tasks: list[TaskData] = [
-            t
-            for t in UserData.tasks
-            if not t.deleted
-            and not t.trash
-            and t.due_date
-            and datetime.fromisoformat(t.due_date).date() == datetime.today().date()
-        ]
-        for task in tasks:
-            new_task = TodayTask(task)
-            self.task_list.append(new_task)
-            new_task.update_ui()
-        self.status_page.set_visible(len(tasks) == 0)
 
     @property
     def tasks(self) -> list[TodayTask]:

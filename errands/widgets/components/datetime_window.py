@@ -34,9 +34,15 @@ class DateTimeWindow(Adw.Dialog):
 
     @Gtk.Template.Callback()
     def _on_date_time_start_set(self, *args) -> None:
-        self.task.update_props(["start_date"], [self.start_date_time.datetime])
+        if self.start_date_time.datetime != self.task.get_prop("start_date"):
+            self.task.update_props(
+                ["start_date", "synced"], [self.start_date_time.datetime, False]
+            )
 
     @Gtk.Template.Callback()
     def _on_date_time_due_set(self, *args) -> None:
-        self.task.update_props(["due_date"], [self.due_date_time.datetime])
-        self.task.update_toolbar()
+        if self.due_date_time.datetime != self.task.get_prop("due_date"):
+            self.task.update_props(
+                ["due_date", "synced"], [self.due_date_time.datetime, False]
+            )
+            self.task.update_toolbar()
