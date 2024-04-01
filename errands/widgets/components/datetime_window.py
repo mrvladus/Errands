@@ -13,6 +13,7 @@ from errands.widgets.components.datetime_picker import DateTimePicker
 
 if TYPE_CHECKING:
     from errands.widgets.task.task import Task
+    from errands.widgets.today.today_task import TodayTask
 
 
 @Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
@@ -22,17 +23,14 @@ class DateTimeWindow(Adw.Dialog):
     start_date_time: DateTimePicker = Gtk.Template.Child()
     due_date_time: DateTimePicker = Gtk.Template.Child()
 
-    def __init__(self, task: Task):
+    def __init__(self, task: Task | TodayTask):
         super().__init__()
         self.task = task
 
     def show(self):
         self.start_date_time.datetime = self.task.get_prop("start_date")
         self.due_date_time.datetime = self.task.get_prop("due_date")
-        self.present(self.task.window)
-
-    def do_closed(self):
-        pass
+        self.present(Adw.Application.get_default().get_active_window())
 
     @Gtk.Template.Callback()
     def _on_date_time_start_set(self, *args) -> None:

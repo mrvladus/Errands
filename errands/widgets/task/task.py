@@ -3,15 +3,17 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
-from errands.widgets.task.datetime_window import DateTimeWindow
-from errands.widgets.task.notes_window import NotesWindow
+from errands.widgets.components.datetime_window import DateTimeWindow
+from errands.widgets.components.notes_window import NotesWindow
 from errands.widgets.task.tag import Tag
 from errands.widgets.task.tags_list_item import TagsListItem
 
 if TYPE_CHECKING:
     from errands.widgets.task_list.task_list import TaskList
+    from errands.widgets.today.today import Today
 
 import os
 from datetime import datetime
@@ -31,6 +33,11 @@ from errands.lib.markup import Markup
 
 # from errands.lib.sync.sync import Sync
 from errands.lib.utils import get_children, idle_add, timeit
+
+
+@dataclass
+class TaskConfig:
+    parent: TaskList | Today
 
 
 @Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))

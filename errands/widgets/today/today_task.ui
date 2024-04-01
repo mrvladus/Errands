@@ -1,0 +1,533 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+
+  <!-- Menu -->
+  <menu id="menu">
+    <section>
+      <item>
+        <attribute name="custom">color</attribute>
+      </item>
+    </section>
+
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">Edit</attribute>
+        <attribute name="action">task.edit</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Move to Trash</attribute>
+        <attribute name="action">task.move_to_trash</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Copy to Clipboard</attribute>
+        <attribute name="action">task.copy_to_clipboard</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Export</attribute>
+        <attribute name="action">task.export</attribute>
+      </item>
+    </section>
+
+    <section>
+      <item>
+        <attribute name="custom">created</attribute>
+      </item>
+      <item>
+        <attribute name="custom">changed</attribute>
+      </item>
+    </section>
+  </menu>
+
+  <template class="TodayTask" parent="AdwBin">
+    <property name="hexpand">false</property>
+
+    <child>
+      <object id="revealer" class="GtkRevealer">
+        <child>
+          <object class="GtkBox">
+            <property name="orientation">vertical</property>
+            <property name="margin-bottom">6</property>
+            <property name="margin-top">6</property>
+
+            <!-- Main Box -->
+            <child>
+              <object id="main_box" class="GtkBox">
+                <property name="orientation">vertical</property>
+                <property name="margin-start">12</property>
+                <property name="margin-end">12</property>
+                <style>
+                  <class name="card" />
+                  <class name="fade" />
+                </style>
+
+                <!-- Task Row -->
+                <child>
+                  <object class="GtkListBox">
+                    <style>
+                      <class name="transparent" />
+                      <class name="rounded-corners" />
+                    </style>
+
+                    <!-- Title row -->
+                    <child>
+                      <object id="title_row" class="AdwActionRow">
+                        <property name="height-request">60</property>
+                        <property name="use-markup">True</property>
+                        <property name="tooltip-text" translatable="yes">Toggle Sub-Tasks</property>
+                        <property name="cursor">
+                          <object class="GdkCursor">
+                            <property name="name">pointer</property>
+                          </object>
+                        </property>
+                        <style>
+                          <class name="transparent" />
+                          <class name="rounded-corners" />
+                        </style>
+
+                        <!-- Complete toggle -->
+                        <child type="prefix">
+                          <object id="complete_btn" class="GtkCheckButton">
+                            <property name="tooltip-text" translatable="yes">Toggle Completion</property>
+                            <property name="valign">center</property>
+                            <style>
+                              <class name="selection-mode" />
+                            </style>
+                            <signal name="toggled" handler="_on_complete_btn_toggle" />
+                          </object>
+                        </child>
+
+                      </object>
+                    </child>
+
+                    <!-- Entry row -->
+                    <child>
+                      <object id="entry_row" class="AdwEntryRow">
+                        <property name="height-request">60</property>
+                        <property name="title" translatable="yes">Edit Text</property>
+                        <property name="visible">False</property>
+                        <property name="show-apply-button">True</property>
+                        <property name="visible" bind-source="title_row" bind-property="visible" bind-flags="sync-create | invert-boolean | bidirectional" />
+                        <style>
+                          <class name="transparent" />
+                          <class name="rounded-corners" />
+                        </style>
+                        <signal name="apply" handler="_on_entry_row_applied" />
+
+                        <child type="suffix">
+                          <object id="cancel_edit_btn" class="GtkButton">
+                            <property name="tooltip-text" translatable="yes">Cancel</property>
+                            <property name="valign">center</property>
+                            <property name="icon-name">window-close-symbolic</property>
+                            <style>
+                              <class name="circular" />
+                            </style>
+                            <signal name="clicked" handler="_on_cancel_edit_btn_clicked" />
+                          </object>
+                        </child>
+
+                      </object>
+                    </child>
+
+                  </object>
+                </child>
+
+                <!-- Tags bar -->
+                <child>
+                  <object id="tags_bar_rev" class="GtkRevealer">
+                    <child>
+                      <object id="tags_bar" class="GtkFlowBox">
+                        <property name="height-request">20</property>
+                        <property name="margin-start">10</property>
+                        <property name="margin-end">10</property>
+                        <property name="margin-bottom">3</property>
+                        <property name="selection-mode">0</property>
+                        <property name="max-children-per-line">1000</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+
+                <!-- Tool bar -->
+                <child>
+                  <object class="GtkFlowBox">
+                    <property name="margin-start">9</property>
+                    <property name="margin-end">9</property>
+                    <property name="margin-bottom">2</property>
+                    <property name="max-children-per-line">2</property>
+                    <property name="selection-mode">0</property>
+
+                    <!-- Date and time btn -->
+                    <child>
+                      <object id="date_time_btn" class="GtkButton">
+                        <property name="valign">center</property>
+                        <property name="halign">start</property>
+                        <property name="hexpand">true</property>
+                        <property name="tooltip-text" translatable="yes">Start / Due Date</property>
+                        <style>
+                          <class name="flat" />
+                          <class name="caption" />
+                        </style>
+                        <signal name="clicked" handler="_on_date_time_btn_clicked" />
+
+                        <child>
+                          <object class="AdwButtonContent">
+                            <property name="icon-name">errands-calendar-symbolic</property>
+                            <property name="can-shrink">true</property>
+                            <property name="label" translatable="yes">Date</property>
+                          </object>
+                        </child>
+
+                      </object>
+                    </child>
+
+                    <child>
+                      <object id="toolbar_suffix" class="GtkBox">
+                        <property name="halign">end</property>
+                        <property name="spacing">3</property>
+
+                        <!-- Notes btn -->
+                        <child>
+                          <object id="notes_btn" class="GtkButton">
+                            <property name="valign">center</property>
+                            <property name="icon-name">errands-notes-symbolic</property>
+                            <property name="tooltip-text" translatable="yes">Notes</property>
+                            <style>
+                              <class name="flat" />
+                            </style>
+                            <signal name="clicked" handler="_on_notes_btn_clicked" />
+                          </object>
+                        </child>
+
+                        <!-- Tags btn -->
+                        <child>
+                          <object id="tags_btn" class="GtkMenuButton">
+                            <property name="valign">center</property>
+                            <property name="icon-name">errands-tag-add-symbolic</property>
+                            <property name="tooltip-text" translatable="yes">Add Tag</property>
+                            <property name="popover">
+                              <object class="GtkPopover">
+                                <style>
+                                  <class name="tags-menu" />
+                                </style>
+                                <child>
+                                  <object class="GtkScrolledWindow">
+                                    <property name="max-content-width">200</property>
+                                    <property name="width-request">200</property>
+                                    <property name="max-content-height">200</property>
+                                    <property name="propagate-natural-width">true</property>
+                                    <property name="propagate-natural-height">true</property>
+                                    <property name="vexpand">true</property>
+                                    <child>
+                                      <object class="GtkBox">
+                                        <property name="orientation">vertical</property>
+
+                                        <child>
+                                          <object id="tags_list" class="GtkBox">
+                                            <property name="spacing">6</property>
+                                            <property name="margin-start">6</property>
+                                            <property name="margin-end">6</property>
+                                            <property name="margin-top">6</property>
+                                            <property name="margin-bottom">6</property>
+                                            <property name="orientation">vertical</property>
+                                          </object>
+                                        </child>
+
+                                        <child>
+                                          <object class="AdwStatusPage">
+                                            <property name="title" translatable="yes">No Tags</property>
+                                            <property name="icon-name">errands-info-symbolic</property>
+                                            <property name="visible" bind-source="tags_list" bind-property="visible" bind-flags="sync-create | invert-boolean" />
+                                            <style>
+                                              <class name="compact" />
+                                            </style>
+                                          </object>
+                                        </child>
+
+                                      </object>
+                                    </child>
+
+                                  </object>
+                                </child>
+                              </object>
+                            </property>
+                            <style>
+                              <class name="flat" />
+                            </style>
+                            <signal name="notify::active" handler="_on_tags_btn_toggled" />
+                          </object>
+                        </child>
+
+                        <!-- Priority btn -->
+                        <child>
+                          <object id="priority_btn" class="GtkMenuButton">
+                            <property name="valign">center</property>
+                            <property name="icon-name">errands-priority-symbolic</property>
+                            <property name="tooltip-text" translatable="yes">Priority</property>
+                            <property name="popover">
+                              <object class="GtkPopover">
+                                <style>
+                                  <class name="menu" />
+                                </style>
+                                <child>
+                                  <object class="GtkBox">
+                                    <property name="orientation">vertical</property>
+                                    <property name="margin-start">6</property>
+                                    <property name="margin-end">6</property>
+                                    <property name="margin-bottom">6</property>
+                                    <property name="margin-top">6</property>
+
+                                    <child>
+                                      <object class="GtkListBox">
+                                        <property name="selection-mode">0</property>
+                                        <signal name="row-activated" handler="_on_priority_selected" />
+
+                                        <child>
+                                          <object class="GtkListBoxRow">
+                                            <style>
+                                              <class name="error" />
+                                            </style>
+                                            <child>
+                                              <object class="GtkLabel">
+                                                <property name="label" translatable="yes">High</property>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+
+                                        <child>
+                                          <object class="GtkListBoxRow">
+                                            <style>
+                                              <class name="warning" />
+                                            </style>
+                                            <child>
+                                              <object class="GtkLabel">
+                                                <property name="label" translatable="yes">Medium</property>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+
+                                        <child>
+                                          <object class="GtkListBoxRow">
+                                            <style>
+                                              <class name="accent" />
+                                            </style>
+                                            <child>
+                                              <object class="GtkLabel">
+                                                <property name="label" translatable="yes">Low</property>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+
+                                        <child>
+                                          <object class="GtkListBoxRow">
+                                            <child>
+                                              <object class="GtkLabel">
+                                                <property name="label" translatable="yes">None</property>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+
+                                      </object>
+                                    </child>
+
+                                    <child>
+                                      <object class="TitledSeparator">
+                                        <property name="margin-top">6</property>
+                                        <property name="margin-bottom">6</property>
+                                        <property name="title" translatable="yes">Custom</property>
+                                      </object>
+                                    </child>
+
+                                    <child>
+                                      <object class="GtkSpinButton" id="priority">
+                                        <property name="valign">center</property>
+                                        <property name="adjustment">
+                                          <object class="GtkAdjustment">
+                                            <property name="upper">9</property>
+                                            <property name="lower">0</property>
+                                            <property name="step-increment">1</property>
+                                          </object>
+                                        </property>
+                                      </object>
+                                    </child>
+
+                                  </object>
+                                </child>
+                              </object>
+                            </property>
+                            <style>
+                              <class name="flat" />
+                            </style>
+                            <signal name="notify::active" handler="_on_priority_toggled" />
+                          </object>
+                        </child>
+
+                        <!-- More menu btn -->
+                        <child>
+                          <object class="GtkMenuButton">
+                            <property name="valign">center</property>
+                            <property name="icon-name">view-more-symbolic</property>
+                            <property name="tooltip-text" translatable="yes">More</property>
+                            <property name="popover">
+                              <object class="GtkPopoverMenu">
+                                <property name="menu-model">menu</property>
+
+                                <!-- Color selector -->
+                                <child type="color">
+                                  <object id="accent_color_btns" class="GtkBox">
+
+                                    <!-- None -->
+                                    <child>
+                                      <object id="none" class="GtkCheckButton">
+                                        <style>
+                                          <class name="accent-color-btn" />
+                                          <class name="accent-color-btn-none" />
+                                        </style>
+                                        <signal name="toggled" handler="_on_accent_color_selected" />
+                                      </object>
+                                    </child>
+
+                                    <!-- Blue -->
+                                    <child>
+                                      <object id="blue" class="GtkCheckButton">
+                                        <property name="group">none</property>
+                                        <style>
+                                          <class name="accent-color-btn" />
+                                          <class name="accent-color-btn-blue" />
+                                        </style>
+                                        <signal name="toggled" handler="_on_accent_color_selected" />
+                                      </object>
+                                    </child>
+
+                                    <!-- Green -->
+                                    <child>
+                                      <object id="green" class="GtkCheckButton">
+                                        <property name="group">none</property>
+                                        <style>
+                                          <class name="accent-color-btn" />
+                                          <class name="accent-color-btn-green" />
+                                        </style>
+                                        <signal name="toggled" handler="_on_accent_color_selected" />
+                                      </object>
+                                    </child>
+
+                                    <!-- Yellow -->
+                                    <child>
+                                      <object id="yellow" class="GtkCheckButton">
+                                        <property name="group">none</property>
+                                        <style>
+                                          <class name="accent-color-btn" />
+                                          <class name="accent-color-btn-yellow" />
+                                        </style>
+                                        <signal name="toggled" handler="_on_accent_color_selected" />
+                                      </object>
+                                    </child>
+
+                                    <!-- Orange -->
+                                    <child>
+                                      <object id="orange" class="GtkCheckButton">
+                                        <property name="group">none</property>
+                                        <style>
+                                          <class name="accent-color-btn" />
+                                          <class name="accent-color-btn-orange" />
+                                        </style>
+                                        <signal name="toggled" handler="_on_accent_color_selected" />
+                                      </object>
+                                    </child>
+
+                                    <!-- Red -->
+                                    <child>
+                                      <object id="red" class="GtkCheckButton">
+                                        <property name="group">none</property>
+                                        <style>
+                                          <class name="accent-color-btn" />
+                                          <class name="accent-color-btn-red" />
+                                        </style>
+                                        <signal name="toggled" handler="_on_accent_color_selected" />
+                                      </object>
+                                    </child>
+
+                                    <!-- Purple -->
+                                    <child>
+                                      <object id="purple" class="GtkCheckButton">
+                                        <property name="group">none</property>
+                                        <style>
+                                          <class name="accent-color-btn" />
+                                          <class name="accent-color-btn-purple" />
+                                        </style>
+                                        <signal name="toggled" handler="_on_accent_color_selected" />
+                                      </object>
+                                    </child>
+
+                                    <!-- Brown -->
+                                    <child>
+                                      <object id="brown" class="GtkCheckButton">
+                                        <property name="group">none</property>
+                                        <style>
+                                          <class name="accent-color-btn" />
+                                          <class name="accent-color-btn-brown" />
+                                        </style>
+                                        <signal name="toggled" handler="_on_accent_color_selected" />
+                                      </object>
+                                    </child>
+
+                                  </object>
+                                </child>
+
+                                <!-- Created label -->
+                                <child type="created">
+                                  <object id="created_label" class="GtkLabel">
+                                    <property name="label" translatable="yes">Created:</property>
+                                    <property name="halign">start</property>
+                                    <property name="margin-start">12</property>
+                                    <property name="margin-end">12</property>
+                                    <property name="margin-bottom">6</property>
+                                    <style>
+                                      <class name="caption-heading" />
+                                    </style>
+                                  </object>
+                                </child>
+
+                                <!-- Changed label -->
+                                <child type="changed">
+                                  <object id="changed_label" class="GtkLabel">
+                                    <property name="label" translatable="yes">Changed:</property>
+                                    <property name="halign">start</property>
+                                    <property name="margin-start">12</property>
+                                    <property name="margin-end">12</property>
+                                    <property name="margin-bottom">3</property>
+                                    <style>
+                                      <class name="caption-heading" />
+                                    </style>
+                                  </object>
+                                </child>
+
+                              </object>
+                            </property>
+                            <signal name="notify::active" handler="_on_menu_toggled" />
+                            <style>
+                              <class name="flat" />
+                            </style>
+                          </object>
+                        </child>
+
+                      </object>
+                    </child>
+
+                  </object>
+                </child>
+
+              </object>
+            </child>
+
+          </object>
+        </child>
+
+      </object>
+    </child>
+  </template>
+
+</interface>

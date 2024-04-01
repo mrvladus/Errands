@@ -40,7 +40,7 @@ class NotesWindow(Adw.Dialog):
 
     def show(self):
         self.buffer.props.text = self.task.get_prop("notes")
-        self.present(self.task.window)
+        self.present(Adw.Application.get_default().get_active_window())
 
     def do_closed(self):
         text: str = self.buffer.props.text
