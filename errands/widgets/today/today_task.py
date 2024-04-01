@@ -5,9 +5,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+
 if TYPE_CHECKING:
     from errands.widgets.task.task import Task
     from errands.widgets.window import Window
+    from errands.widgets.today.today import Today
 
 import os
 from datetime import datetime
@@ -61,11 +63,12 @@ class TodayTask(Adw.Bin):
     purged: bool = False
     purging: bool = False
 
-    def __init__(self, task_data: TaskData) -> None:
+    def __init__(self, task_data: TaskData, today_page: Today) -> None:
         super().__init__()
         self.task_data = task_data
         self.uid = task_data.uid
         self.list_uid = task_data.list_uid
+        self.today_page = today_page
         self.window: Window = Adw.Application.get_default().get_active_window()
         self.notes_window: NotesWindow = NotesWindow(self)
         self.datetime_window: DateTimeWindow = DateTimeWindow(self)
@@ -216,10 +219,12 @@ class TodayTask(Adw.Bin):
         # Purge self if date set other than today
         if "due_date" in props:
             if (
-                datetime.fromisoformat(values[props.index("due_date")]).date()
+                values[props.index("due_date")] == ""
+                or datetime.fromisoformat(values[props.index("due_date")]).date()
                 != datetime.today().date()
             ):
                 self.purge()
+                self.today_page.update_status()
         # Update linked task every time TodayTask is changes props
         self.__update_linked_task_ui()
 

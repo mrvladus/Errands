@@ -30,13 +30,15 @@ class Today(Adw.Bin):
     def __init__(self, today_sidebar_row: TodaySidebarRow):
         super().__init__()
         self.sidebar_row: TodaySidebarRow = today_sidebar_row
+        self.update_ui()
 
     @property
     def tasks(self) -> list[TodayTask]:
         return get_children(self.task_list)
 
-    def update_ui(self):
-        tasks: list[TaskData] = [
+    @property
+    def tasks_data(self) -> list[TaskData]:
+        return [
             t
             for t in UserData.tasks
             if not t.deleted
@@ -44,13 +46,22 @@ class Today(Adw.Bin):
             and t.due_date
             and datetime.fromisoformat(t.due_date).date() == datetime.today().date()
         ]
+
+    def update_status(self):
+        # Update status and counter
+        length: int = len(self.tasks_data)
+        self.status_page.set_visible(length == 0)
+        self.sidebar_row.size_counter.set_label("" if length == 0 else str(length))
+
+    def update_ui(self):
+        tasks = self.tasks_data
         tasks_uids: list[str] = [t.uid for t in tasks]
         widgets_uids: list[str] = [t.uid for t in self.tasks]
 
         # Add tasks
         for task in tasks:
             if task.uid not in widgets_uids:
-                new_task = TodayTask(task)
+                new_task = TodayTask(task, self)
                 self.task_list.append(new_task)
                 new_task.update_ui()
 
@@ -59,4 +70,4 @@ class Today(Adw.Bin):
             if task.uid not in tasks_uids:
                 task.purge()
 
-        self.status_page.set_visible(len(tasks) == 0)
+        self.update_status()

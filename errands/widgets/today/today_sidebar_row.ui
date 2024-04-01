@@ -27,10 +27,13 @@
         </child>
 
         <child>
-          <object id="size_counter" class="GtkLabel">
+          <object id="size_counter" class="GtkButton">
+            <property name="valign">center</property>
+            <property name="can-target">false</property>
             <style>
               <class name="dim-label" />
               <class name="caption" />
+              <class name="flat" />
             </style>
           </object>
         </child>

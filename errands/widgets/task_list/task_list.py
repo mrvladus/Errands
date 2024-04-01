@@ -10,8 +10,8 @@ if TYPE_CHECKING:
     from errands.widgets.window import Window
     from errands.widgets.task_list.task_list_sidebar_row import TaskListSidebarRow
 
-from errands.lib.sync.sync import Sync
-from gi.repository import Adw, Gtk, GLib, Gio, GObject  # type:ignore
+# from errands.lib.sync.sync import Sync
+from gi.repository import Adw, Gtk, GLib  # type:ignore
 from errands.lib.animation import scroll
 from errands.lib.data import TaskData, UserData
 from errands.lib.utils import get_children, idle_add, timeit

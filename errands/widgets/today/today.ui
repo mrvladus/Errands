@@ -32,7 +32,7 @@
               </object>
             </child>
 
-            <!-- Trash list -->
+            <!-- Task list -->
             <child>
               <object class="GtkScrolledWindow">
                 <property name="propagate-natural-height">true</property>

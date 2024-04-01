@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING
 
 from gi.repository import Adw, Gtk  # type:ignore
 
-# from errands.lib.logging import Log
 from errands.widgets.components.datetime_picker import DateTimePicker
 
 if TYPE_CHECKING:
@@ -32,17 +31,13 @@ class DateTimeWindow(Adw.Dialog):
         self.due_date_time.datetime = self.task.get_prop("due_date")
         self.present(Adw.Application.get_default().get_active_window())
 
-    @Gtk.Template.Callback()
-    def _on_date_time_start_set(self, *args) -> None:
-        if self.start_date_time.datetime != self.task.get_prop("start_date"):
-            self.task.update_props(
-                ["start_date", "synced"], [self.start_date_time.datetime, False]
-            )
-
-    @Gtk.Template.Callback()
-    def _on_date_time_due_set(self, *args) -> None:
+    def do_closed(self):
         if self.due_date_time.datetime != self.task.get_prop("due_date"):
             self.task.update_props(
                 ["due_date", "synced"], [self.due_date_time.datetime, False]
             )
             self.task.update_toolbar()
+        if self.start_date_time.datetime != self.task.get_prop("start_date"):
+            self.task.update_props(
+                ["start_date", "synced"], [self.start_date_time.datetime, False]
+            )

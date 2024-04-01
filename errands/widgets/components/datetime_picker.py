@@ -3,15 +3,12 @@
 
 import datetime
 import os
-from gi.repository import Gtk, GObject, GLib  # type:ignore
+from gi.repository import Gtk, GLib  # type:ignore
 
 
 @Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
 class DateTimePicker(Gtk.Box):
     __gtype_name__ = "DateTimePicker"
-
-    # SIGNALS
-    changed = GObject.Signal()
 
     # CHILDREN
     label: Gtk.Label = Gtk.Template.Child()
@@ -45,8 +42,8 @@ class DateTimePicker(Gtk.Box):
                 )
             )
         else:
-            self.hours.set_value(00)
-            self.minutes.set_value(00)
+            self.hours.set_value(0)
+            self.minutes.set_value(0)
             self.calendar.select_day(GLib.DateTime.new_now_local())
 
         # Set datetime
@@ -70,8 +67,7 @@ class DateTimePicker(Gtk.Box):
 
     @Gtk.Template.Callback()
     def _on_clear_clicked(self, btn: Gtk.Button):
-        self.__datetime = ""
-        self.emit("changed")
+        self.datetime = ""
 
     @Gtk.Template.Callback()
     def _on_date_time_changed(self, *_args):
@@ -84,14 +80,11 @@ class DateTimePicker(Gtk.Box):
         # Get date
         date: str = self.calendar.get_date().format("%Y%m%d")
         # Set date
-        self.__datetime = f"{date}T{hour}{min}00"
-        if not self.lock_signals:
-            self.emit("changed")
+        self.datetime = f"{date}T{hour}{min}00"
 
     @Gtk.Template.Callback()
     def _on_now_clicked(self, btn: Gtk.Button):
         self.datetime = datetime.datetime.now().strftime("%Y%m%dT%H%M00")
-        self.emit("changed")
 
     @Gtk.Template.Callback()
     def _on_time_preset_clicked(self, btn: Gtk.Button):
@@ -102,11 +95,9 @@ class DateTimePicker(Gtk.Box):
     @Gtk.Template.Callback()
     def _on_today_clicked(self, btn: Gtk.Button):
         self.datetime = datetime.datetime.now().strftime("%Y%m%dT000000")
-        self.emit("changed")
 
     @Gtk.Template.Callback()
     def _on_tomorrow_clicked(self, btn: Gtk.Button):
         self.datetime = (datetime.datetime.now() + datetime.timedelta(1)).strftime(
             "%Y%m%dT000000"
         )
-        self.emit("changed")

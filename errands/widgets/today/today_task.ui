@@ -74,11 +74,6 @@
                         <property name="height-request">60</property>
                         <property name="use-markup">True</property>
                         <property name="tooltip-text" translatable="yes">Toggle Sub-Tasks</property>
-                        <property name="cursor">
-                          <object class="GdkCursor">
-                            <property name="name">pointer</property>
-                          </object>
-                        </property>
                         <style>
                           <class name="transparent" />
                           <class name="rounded-corners" />
