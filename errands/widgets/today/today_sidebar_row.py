@@ -38,4 +38,3 @@ class TodaySidebarRow(Gtk.ListBoxRow):
         self.window.stack.set_visible_child_name(self.name)
         self.window.split_view.set_show_content(True)
         GSettings.set("last-open-list", "s", self.name)
-        self.today.update_ui()

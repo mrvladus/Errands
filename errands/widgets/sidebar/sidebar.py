@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 
 from errands.widgets.components.titled_separator import TitledSeparator
 from errands.widgets.tags.tags_sidebar_row import TagsSidebarRow
+from errands.widgets.today.today_sidebar_row import TodaySidebarRow
 
 
 if TYPE_CHECKING:
@@ -99,7 +100,7 @@ class Sidebar(Adw.Bin):
     __gtype_name__ = "Sidebar"
 
     GObject.type_ensure(TagsSidebarRow)
-    # GObject.type_ensure(TodaySidebarRow)
+    GObject.type_ensure(TodaySidebarRow)
     GObject.type_ensure(TrashSidebarRow)
 
     sync_indicator: Gtk.Spinner = Gtk.Template.Child()
@@ -108,7 +109,7 @@ class Sidebar(Adw.Bin):
     list_box: Gtk.ListBox = Gtk.Template.Child()
     tags_row: TagsSidebarRow = Gtk.Template.Child()
     trash_row: TrashSidebarRow = Gtk.Template.Child()
-    # today_row: TodaySidebarRow = Gtk.Template.Child()
+    today_row: TodaySidebarRow = Gtk.Template.Child()
 
     def __init__(self) -> None:
         super().__init__()

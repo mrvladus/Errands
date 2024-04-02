@@ -266,7 +266,6 @@ class TodayTask(Adw.Bin):
         self.tags_bar_rev.set_reveal_child(tags != [])
 
     def update_headerbar(self) -> None:
-        # Update title
         self.title_row.set_title(Markup.find_url(Markup.escape(self.task_data.text)))
 
     def update_toolbar(self) -> None:
@@ -298,10 +297,8 @@ class TodayTask(Adw.Bin):
 
     def update_ui(self) -> None:
         Log.debug(f"Task '{self.uid}: Update UI'")
-        if self.purged:
-            self.purge()
-            return
-        self.task_data = UserData.get_task(self.list_uid, self.uid)
+
+        self.update_task_data()
         self.toggle_visibility(not self.task_data.trash)
         self.update_color()
         self.update_completion_state()

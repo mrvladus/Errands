@@ -10,6 +10,7 @@ from errands.widgets.components.datetime_window import DateTimeWindow
 from errands.widgets.components.notes_window import NotesWindow
 from errands.widgets.task.tag import Tag
 from errands.widgets.task.tags_list_item import TagsListItem
+from errands.widgets.today.today_task import TodayTask
 
 if TYPE_CHECKING:
     from errands.widgets.task_list.task_list import TaskList
@@ -264,10 +265,7 @@ class Task(Adw.Bin):
         """Get total tasks and completed tasks tuple"""
         return UserData.get_status(self.list_uid, self.uid)
 
-    def delete(
-        self,
-        *_,
-    ) -> None:
+    def delete(self, *_) -> None:
         """Move task to trash"""
 
         Log.info(f"Task: Move to trash: '{self.uid}'")
@@ -322,6 +320,7 @@ class Task(Adw.Bin):
                 values.append(datetime.now().strftime("%Y%m%dT%H%M%S"))
                 break
         UserData.update_props(self.list_uid, self.uid, props, values)
+        self.window.sidebar.today_row.today.update_ui()
 
     def update_task_data(self) -> None:
         self.task_data = UserData.get_task(self.list_uid, self.uid)

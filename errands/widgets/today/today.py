@@ -70,4 +70,7 @@ class Today(Adw.Bin):
             if task.uid not in tasks_uids:
                 task.purge()
 
+        for task in self.tasks:
+            task.update_ui()
+
         self.update_status()
