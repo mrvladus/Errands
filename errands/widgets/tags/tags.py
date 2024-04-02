@@ -10,6 +10,7 @@ from errands.lib.utils import get_children
 
 from gi.repository import Adw, GObject, Gtk  # type:ignore
 
+from errands.state import State
 from errands.widgets.task_list.task_list import TaskList
 
 
@@ -21,6 +22,8 @@ class Tags(Adw.Bin):
 
     def __init__(self):
         super().__init__()
+        State.tags_page = self
+        # Load tags
         for tag in UserData.tags:
             self.tags_list.append(Tag(tag.text, self))
         self.update_ui()
@@ -50,8 +53,8 @@ class Tags(Adw.Bin):
                 tag.update_ui(tags_in_tasks)
 
         self.tags_list.set_visible(len(self.tags) > 0)
-        if window := Gtk.Application.get_default().get_active_window():
-            window.sidebar.tags_row.update_ui()
+        if State.main_window:
+            State.tags_sidebar_row.update_ui()
 
     @Gtk.Template.Callback()
     def _on_tag_added(self, entry: Adw.EntryRow):

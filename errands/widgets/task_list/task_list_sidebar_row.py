@@ -2,25 +2,22 @@
 # SPDX-License-Identifier: MIT
 
 from __future__ import annotations
+
 import os
-from typing import TYPE_CHECKING
-
-
-if TYPE_CHECKING:
-    from errands.widgets.window import Window
-    from errands.widgets.sidebar.sidebar import Sidebar
-
 import time
 from datetime import datetime
+
+from gi.repository import Adw, Gio, GLib, Gtk  # type:ignore
 from icalendar import Calendar, Todo
+
 from errands.lib.data import TaskListData, UserData
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
+from errands.state import State
 from errands.widgets.component import ConfirmDialog
 from errands.widgets.task.task import Task
 from errands.widgets.task_list.task_list import TaskList
-from gi.repository import Adw, Gtk, Gio, GLib  # type:ignore
 
 
 @Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
@@ -30,17 +27,14 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
     size_counter: Gtk.Label = Gtk.Template.Child()
     label: Gtk.Label = Gtk.Template.Child()
 
-    def __init__(self, list_dict: TaskListData, sidebar: Sidebar) -> None:
+    def __init__(self, list_dict: TaskListData) -> None:
         super().__init__()
-        self.window: Window = Adw.Application.get_default().get_active_window()
-        self.sidebar: Sidebar = sidebar
-        self.list_box: Gtk.ListBox = sidebar.list_box
         self.uid: str = list_dict.uid
         self.name: str = list_dict.name
         self.__add_actions()
         # Add Task List page
         self.task_list: TaskList = TaskList(self.uid, self)
-        self.stack_page: Adw.ViewStackPage = self.window.stack.add_titled(
+        self.stack_page: Adw.ViewStackPage = State.view_stack.add_titled(
             child=self.task_list, name=self.name, title=self.name
         )
         self.update_ui(False)
@@ -67,8 +61,8 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
                 Sync.sync()
 
             ConfirmDialog(
-                _("List will be permanently deleted"),
-                _("Delete"),
+                _("List will be permanently deleted"),  # noqa: F821
+                _("Delete"),  # noqa: F821
                 Adw.ResponseAppearance.DESTRUCTIVE,
                 __confirm,
             )
@@ -98,22 +92,22 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
                     )
                 )
                 self.update_ui()
-                self.sidebar.trash_row.update_ui()
-                self.sidebar.today_row.update_ui()
+                State.trash_sidebar_row.update_ui()
+                State.today_sidebar_row.update_ui()
                 # Sync.sync()
 
-            entry: Gtk.Entry = Gtk.Entry(placeholder_text=_("New Name"))
+            entry: Gtk.Entry = Gtk.Entry(placeholder_text=_("New Name"))  # noqa: F821
             entry.get_buffer().props.text = self.label.get_label()
             dialog: Adw.MessageDialog = Adw.MessageDialog(
-                transient_for=self.window,
+                transient_for=State.main_window,
                 hide_on_close=True,
-                heading=_("Rename List"),
+                heading=_("Rename List"),  # noqa: F821
                 default_response="save",
                 close_response="cancel",
                 extra_child=entry,
             )
-            dialog.add_response("cancel", _("Cancel"))
-            dialog.add_response("save", _("Save"))
+            dialog.add_response("cancel", _("Cancel"))  # noqa: F821
+            dialog.add_response("save", _("Save"))  # noqa: F821
             dialog.set_response_enabled("save", False)
             dialog.set_response_appearance("save", Adw.ResponseAppearance.SUGGESTED)
             dialog.connect("response", _confirm, entry)
@@ -125,8 +119,8 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
             def _confirm(dialog, res):
                 try:
                     file = dialog.save_finish(res)
-                except:
-                    Log.debug("List: Export cancelled")
+                except Exception as e:
+                    Log.debug(f"List: Export cancelled. {e}")
                     return
 
                 Log.info(f"List: Export '{self.uid}'")
@@ -171,16 +165,16 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
                         f.write(calendar.to_ical())
                 except Exception as e:
                     Log.error(f"List: Export failed. {e}")
-                    self.window.add_toast(_("Export failed"))
+                    State.main_window.add_toast(_("Export failed"))  # noqa: F821
 
-                self.window.add_toast(_("Exported"))
+                State.main_window.add_toast(_("Exported"))  # noqa: F821
 
             filter: Gtk.FileFilter = Gtk.FileFilter()
             filter.add_pattern("*.ics")
             dialog: Gtk.FileDialog = Gtk.FileDialog(
                 initial_name=f"{self.uid}.ics", default_filter=filter
             )
-            dialog.save(self.window, None, _confirm)
+            dialog.save(State.main_window, None, _confirm)
 
         _create_action("delete", _delete)
         _create_action("rename", _rename)
@@ -240,6 +234,6 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
     def _on_row_activated(self, *args) -> None:
         Log.debug(f"Sidebar: Switch to list '{self.uid}'")
 
-        self.window.stack.set_visible_child_name(self.label.get_label())
-        self.window.split_view.set_show_content(True)
+        State.view_stack.set_visible_child_name(self.label.get_label())
+        State.split_view.set_show_content(True)
         GSettings.set("last-open-list", "s", self.name)

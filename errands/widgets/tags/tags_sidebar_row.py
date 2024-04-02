@@ -4,16 +4,13 @@
 from __future__ import annotations
 
 import os
-from typing import TYPE_CHECKING
+
+from gi.repository import Gtk  # type:ignore
 
 from errands.lib.data import UserData
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
-
-if TYPE_CHECKING:
-    from errands.widgets.window import Window
-
-from gi.repository import Adw, Gtk  # type:ignore
+from errands.state import State
 
 
 @Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
@@ -24,18 +21,17 @@ class TagsSidebarRow(Gtk.ListBoxRow):
 
     def __init__(self) -> None:
         super().__init__()
-        self.window: Window = Adw.Application.get_default().get_active_window()
-        self.name: str = "errands_tags_page"
+        State.tags_sidebar_row = self
         self.update_ui()
 
     @Gtk.Template.Callback()
     def _on_row_activated(self, *args) -> None:
-        Log.debug(f"Sidebar: Open Tags")
+        Log.debug("Sidebar: Open Tags")
 
-        self.window.stack.set_visible_child_name(self.name)
-        self.window.split_view.set_show_content(True)
-        GSettings.set("last-open-list", "s", self.name)
-        self.window.stack.get_child_by_name(self.name).update_ui()
+        State.view_stack.set_visible_child_name("errands_tags_page")
+        State.split_view.set_show_content(True)
+        GSettings.set("last-open-list", "s", "errands_tags_page")
+        State.tags_page.update_ui()
 
     def update_ui(self) -> None:
         size: int = len(UserData.tags)

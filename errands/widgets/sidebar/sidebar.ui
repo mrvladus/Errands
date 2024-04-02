@@ -115,17 +115,17 @@
 
                 <!-- Today -->
                 <child>
-                  <object id="today_row" class="TodaySidebarRow" />
+                  <object class="TodaySidebarRow" />
                 </child>
 
                 <!-- Tags -->
                 <child>
-                  <object id="tags_row" class="TagsSidebarRow" />
+                  <object class="TagsSidebarRow" />
                 </child>
 
                 <!-- Trash -->
                 <child>
-                  <object id="trash_row" class="TrashSidebarRow" />
+                  <object class="TrashSidebarRow" />
                 </child>
 
               </object>

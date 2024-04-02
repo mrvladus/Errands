@@ -1,22 +1,17 @@
 # Copyright 2023-2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-from __future__ import annotations
 import os
-from typing import TYPE_CHECKING
 
-from errands.widgets.trash.trash_item import TrashItem
-
-
-if TYPE_CHECKING:
-    from errands.widgets.window import Window
+from gi.repository import Adw, Gtk  # type:ignore
 
 from errands.lib.data import TaskData, TaskListData, UserData
-from errands.lib.utils import get_children
-from errands.widgets.component import ConfirmDialog
-from gi.repository import Adw, Gtk, GObject, Gio  # type:ignore
-from errands.lib.sync.sync import Sync
 from errands.lib.logging import Log
+from errands.lib.sync.sync import Sync
+from errands.lib.utils import get_children
+from errands.state import State
+from errands.widgets.component import ConfirmDialog
+from errands.widgets.trash.trash_item import TrashItem
 
 
 @Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
@@ -28,8 +23,7 @@ class Trash(Adw.Bin):
 
     def __init__(self):
         super().__init__()
-        self.window: Window = Gio.Application.get_default().get_active_window()
-        self.stack: Adw.ViewStack = self.window.stack
+        State.trash_page = self
 
     @property
     def trash_items(self) -> list[TrashItem]:
@@ -79,7 +73,7 @@ class Trash(Adw.Bin):
             Log.info("Trash: Clear")
 
             UserData.delete_tasks_from_trash()
-            self.window.sidebar.trash_row.update_ui()
+            State.trash_sidebar_row.update_ui()
             # Sync
             # Sync.sync()
 
@@ -106,4 +100,4 @@ class Trash(Adw.Bin):
         for task in trash_dicts:
             UserData.update_props(task.list_uid, task.uid, ["trash"], [False])
 
-        self.window.sidebar.update_ui()
+        State.sidebar.update_ui()

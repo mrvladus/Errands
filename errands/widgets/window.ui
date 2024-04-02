@@ -17,14 +17,14 @@
             <property name="show-content">true</property>
 
             <!-- Sidebar -->
-            <!-- <property name="sidebar">
+            <property name="sidebar">
               <object class="AdwNavigationPage">
                 <property name="title" translatable="yes">Sidebar</property>
                 <child>
-                  <object id="sidebar" class="Sidebar"></object>
+                  <object class="Sidebar" />
                 </child>
               </object>
-            </property> -->
+            </property>
 
             <!-- Content -->
             <property name="content">
@@ -34,7 +34,7 @@
 
                 <!-- Stack -->
                 <child>
-                  <object id="stack" class="AdwViewStack">
+                  <object id="view_stack" class="AdwViewStack">
 
                     <!-- Status page -->
                     <child>
@@ -84,6 +84,17 @@
                       </object>
                     </child>
 
+                    <!-- Today page -->
+                    <child>
+                      <object class="AdwViewStackPage">
+                        <property name="title" translatable="yes">Today</property>
+                        <property name="name">errands_today_page</property>
+                        <property name="child">
+                          <object class="Today" />
+                        </property>
+                      </object>
+                    </child>
+
                     <!-- Tags page -->
                     <child>
                       <object class="AdwViewStackPage">
@@ -91,6 +102,17 @@
                         <property name="name">errands_tags_page</property>
                         <property name="child">
                           <object class="Tags" />
+                        </property>
+                      </object>
+                    </child>
+
+                    <!-- Trash page -->
+                    <child>
+                      <object class="AdwViewStackPage">
+                        <property name="title" translatable="yes">Trash</property>
+                        <property name="name">errands_trash_page</property>
+                        <property name="child">
+                          <object class="Trash" />
                         </property>
                       </object>
                     </child>

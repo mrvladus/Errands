@@ -2,29 +2,20 @@
 # SPDX-License-Identifier: MIT
 
 from __future__ import annotations
+
 import os
-from typing import TYPE_CHECKING
 
-from errands.widgets.components.titled_separator import TitledSeparator
-from errands.widgets.tags.tags_sidebar_row import TagsSidebarRow
-from errands.widgets.today.today_sidebar_row import TodaySidebarRow
-
-
-if TYPE_CHECKING:
-    from errands.widgets.window import Window
+from gi.repository import Adw, Gtk  # type:ignore
 
 from errands.lib.data import TaskListData, UserData
-from errands.lib.utils import get_children
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
-from errands.widgets.task_list.task_list_sidebar_row import TaskListSidebarRow
-
-# from errands.widgets.today.today_sidebar_row import TodaySidebarRow
-from errands.widgets.trash.trash_sidebar_row import TrashSidebarRow
+from errands.lib.utils import get_children
+from errands.state import State
+from errands.widgets.components.titled_separator import TitledSeparator
 from errands.widgets.task_list.task_list import TaskList
-from gi.repository import Adw, Gtk, GObject  # type:ignore
-
+from errands.widgets.task_list.task_list_sidebar_row import TaskListSidebarRow
 
 # class SidebarPluginsList(Adw.Bin):
 #     def __init__(self, sidebar: Sidebar):
@@ -99,52 +90,37 @@ from gi.repository import Adw, Gtk, GObject  # type:ignore
 class Sidebar(Adw.Bin):
     __gtype_name__ = "Sidebar"
 
-    GObject.type_ensure(TagsSidebarRow)
-    GObject.type_ensure(TodaySidebarRow)
-    GObject.type_ensure(TrashSidebarRow)
-
     sync_indicator: Gtk.Spinner = Gtk.Template.Child()
     add_list_btn: Gtk.Button = Gtk.Template.Child()
     status_page: Adw.StatusPage = Gtk.Template.Child()
     list_box: Gtk.ListBox = Gtk.Template.Child()
-    tags_row: TagsSidebarRow = Gtk.Template.Child()
-    trash_row: TrashSidebarRow = Gtk.Template.Child()
-    today_row: TodaySidebarRow = Gtk.Template.Child()
 
     def __init__(self) -> None:
         super().__init__()
-        self.window: Window = Adw.Application.get_default().get_active_window()
+        State.sidebar = self
         self.list_box.set_header_func(
             lambda row, before: (
-                row.set_header(TitledSeparator(_("Task Lists"), (12, 12, 0, 2)))
+                row.set_header(TitledSeparator(_("Task Lists"), (12, 12, 0, 2)))  # noqa: F821
                 if row.__gtype_name__ == "TaskListSidebarRow"
                 and before.__gtype_name__ != "TaskListSidebarRow"
                 else ...
             )
         )
 
-        self.__load_lists()
-        self.__select_last_opened_item()
-
     # ------ PRIVATE METHODS ------ #
 
     def __add_task_list(self, list_dict: TaskListData) -> TaskListSidebarRow:
         Log.debug(f"Sidebar: Add Task List '{list_dict.uid}'")
-        row: TaskListSidebarRow = TaskListSidebarRow(list_dict, self)
+        row: TaskListSidebarRow = TaskListSidebarRow(list_dict)
         self.list_box.append(row)
         self.status_page.set_visible(False)
         return row
 
-    def __load_lists(self) -> None:
-        Log.debug("Sidebar: Load Task Lists")
-        for list in (l for l in UserData.get_lists_as_dicts() if not l.deleted):
-            self.__add_task_list(list)
-
-    def __remove_task_list(self, l: TaskListSidebarRow) -> None:
-        Log.debug(f"Sidebar: Delete list {l.uid}")
-        self.list_box.select_row(l.get_prev_sibling())
-        self.window.stack.remove(l.task_list)
-        self.list_box.remove(l)
+    def __remove_task_list(self, row: TaskListSidebarRow) -> None:
+        Log.debug(f"Sidebar: Delete list {row.uid}")
+        self.list_box.select_row(row.get_prev_sibling())
+        State.view_stack.remove(row.task_list)
+        self.list_box.remove(row)
 
     def __select_last_opened_item(self) -> None:
         for row in self.rows:
@@ -160,7 +136,7 @@ class Sidebar(Adw.Bin):
         length: int = len(self.task_lists_rows)
         self.status_page.set_visible(length == 0)
         if length == 0:
-            self.window.stack.set_visible_child_name("status")
+            State.view_stack.set_visible_child_name("status")
 
     # ------ PROPERTIES ------ #
 
@@ -183,6 +159,16 @@ class Sidebar(Adw.Bin):
         return [l.task_list for l in self.task_lists_rows]
 
     # ------ PUBLIC METHODS ------ #
+
+    def load_task_lists(self) -> None:
+        Log.debug("Sidebar: Load Task Lists")
+
+        for list in (
+            list for list in UserData.get_lists_as_dicts() if not list.deleted
+        ):
+            self.__add_task_list(list)
+
+        self.__select_last_opened_item()
 
     def update_ui(self) -> None:
         Log.debug("Sidebar: Update UI")
@@ -235,7 +221,7 @@ class Sidebar(Adw.Bin):
 
         entry = Gtk.Entry(placeholder_text=_("New List Name"))
         dialog = Adw.MessageDialog(
-            transient_for=self.window,
+            transient_for=State.main_window,
             hide_on_close=True,
             heading=_("Add List"),
             default_response="add",

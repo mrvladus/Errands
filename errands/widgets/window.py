@@ -6,6 +6,7 @@ from __main__ import VERSION, APP_ID
 import os
 from uuid import uuid4
 from icalendar import Calendar
+from errands.state import State
 from errands.lib.data import UserData
 from gi.repository import Gio, Adw, Gtk  # type:ignore
 
@@ -13,16 +14,15 @@ from errands.widgets.preferences import PreferencesWindow
 from errands.lib.sync.sync import Sync
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
-from errands.widgets.sidebar.sidebar import Sidebar
 
 
 @Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
 class Window(Adw.ApplicationWindow):
     __gtype_name__ = "Window"
 
-    toast_overlay: Adw.ToastOverlay = Gtk.Template.Child()
+    view_stack: Adw.ViewStack = Gtk.Template.Child()
     split_view: Adw.NavigationSplitView = Gtk.Template.Child()
-    stack: Adw.ViewStack = Gtk.Template.Child()
+    toast_overlay: Adw.ToastOverlay = Gtk.Template.Child()
 
     about_window: Adw.AboutWindow = None
 
@@ -37,16 +37,20 @@ class Window(Adw.ApplicationWindow):
         GSettings.bind("maximized", self, "maximized")
         # Setup theme
         Adw.StyleManager.get_default().set_color_scheme(GSettings.get("theme"))
-        self.stack.set_visible_child_name("status")
-        # Add Sidebar
-        self.sidebar = Sidebar()
-        self.split_view.set_sidebar(Adw.NavigationPage.new(self.sidebar, _("Sidebar")))
         # Setup sync
         Sync.window = self
         # Sync.sync()
 
+        self.connect("realize", self.__finish_load)
+
+    def __finish_load(self, *_):
+        State.view_stack = self.view_stack
+        State.split_view = self.split_view
+        State.view_stack.set_visible_child_name("status")
+        State.sidebar.load_task_lists()
+
     def add_toast(self, text: str) -> None:
-        self.toast_overlay.add_toast(Adw.Toast.new(title=text))
+        State.toast_overlay.add_toast(Adw.Toast.new(title=text))
 
     def _create_action(self, name: str, callback: callable, shortcuts=None) -> None:
         action: Gio.SimpleAction = Gio.SimpleAction.new(name, None)
@@ -151,7 +155,7 @@ class Window(Adw.ApplicationWindow):
                             text=str(todo.get("SUMMARY", "")),
                             uid=todo.get("UID", None),
                         )
-                self.sidebar.task_lists.update_ui()
+                State.sidebar.task_lists.update_ui()
                 self.add_toast(_("Imported"))
                 # Sync.sync()
 
@@ -176,4 +180,4 @@ class Window(Adw.ApplicationWindow):
 
     @Gtk.Template.Callback()
     def _on_add_list_clicked(self, btn: Gtk.Button):
-        self.sidebar.add_list_btn.activate()
+        State.sidebar.add_list_btn.activate()

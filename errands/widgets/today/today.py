@@ -1,14 +1,6 @@
 # Copyright 2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-from __future__ import annotations
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
-
-if TYPE_CHECKING:
-    from errands.widgets.today.today_sidebar_row import TodaySidebarRow
 
 import os
 from datetime import datetime
@@ -17,6 +9,7 @@ from gi.repository import Adw, Gtk  # type:ignore
 
 from errands.lib.data import TaskData, UserData
 from errands.lib.utils import get_children
+from errands.state import State
 from errands.widgets.today.today_task import TodayTask
 
 
@@ -27,10 +20,12 @@ class Today(Adw.Bin):
     status_page: Adw.StatusPage = Gtk.Template.Child()
     task_list: Gtk.ListBox = Gtk.Template.Child()
 
-    def __init__(self, today_sidebar_row: TodaySidebarRow):
+    def __init__(self):
         super().__init__()
-        self.sidebar_row: TodaySidebarRow = today_sidebar_row
+        State.today_page = self
         self.update_ui()
+
+    # ------ PROPERTIES ------ #
 
     @property
     def tasks(self) -> list[TodayTask]:
@@ -47,11 +42,16 @@ class Today(Adw.Bin):
             and datetime.fromisoformat(t.due_date).date() == datetime.today().date()
         ]
 
+    # ------ PUBLIC METHODS ------ #
+
     def update_status(self):
-        # Update status and counter
+        """Update status and counter"""
+
         length: int = len(self.tasks_data)
         self.status_page.set_visible(length == 0)
-        self.sidebar_row.size_counter.set_label("" if length == 0 else str(length))
+        State.today_sidebar_row.size_counter.set_label(
+            "" if length == 0 else str(length)
+        )
 
     def update_ui(self):
         tasks = self.tasks_data

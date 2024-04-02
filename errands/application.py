@@ -1,15 +1,14 @@
-from gi.repository import Adw, Gio, Xdp, GObject  # type:ignore
-from errands.lib.gsettings import GSettings
-from errands.widgets.window import Window
-from errands.lib.plugins import PluginsLoader
-from errands.lib.logging import Log
+from gi.repository import Adw, Gio, Xdp  # type:ignore
+
 from errands.lib.data import UserData
+from errands.lib.gsettings import GSettings
+from errands.lib.logging import Log
+from errands.lib.plugins import PluginsLoader
+from errands.state import State
+from errands.widgets.window import Window
 
 
 class ErrandsApplication(Adw.Application):
-
-    # Public elements
-    window: Window
     plugins_loader: PluginsLoader = None
 
     def __init__(self, APP_ID) -> None:
@@ -18,6 +17,7 @@ class ErrandsApplication(Adw.Application):
             flags=Gio.ApplicationFlags.DEFAULT_FLAGS,
         )
         self.set_resource_base_path("/io/github/mrvladus/Errands/")
+        State.application = self
 
     def run_in_background(self):
         """Create or remove autostart desktop file"""
@@ -27,7 +27,7 @@ class ErrandsApplication(Adw.Application):
         portal: Xdp.Portal = Xdp.Portal()
         portal.request_background(
             None,
-            _("Errands need to run in the background for notifications"),
+            _("Errands need to run in the background for notifications"),  # noqa: F821
             ["errands", "--gapplication-service"],
             Xdp.BackgroundFlags.AUTOSTART,
             None,
@@ -36,11 +36,11 @@ class ErrandsApplication(Adw.Application):
         )
 
     def run_tests_suite(self):
-        pass
-        # if PROFILE == "development":
-        #     from errands.tests.tests import run_tests
+        return
+        if State.profile == "development":
+            from errands.tests.tests import run_tests
 
-        #     run_tests()
+            run_tests()
 
     def do_startup(self) -> None:
         Adw.Application.do_startup(self)
@@ -62,10 +62,10 @@ class ErrandsApplication(Adw.Application):
         # self.plugins_loader = PluginsLoader(self)
 
         # Main window
-        self.window = Window(application=self)
-        self.add_window(self.window)
+        State.main_window = Window(application=State.application)
+        self.add_window(State.main_window)
 
     def do_activate(self) -> None:
         Log.debug("Application: Activate")
-        self.window.present()
-        # self.run_tests_suite()
+        State.main_window.present()
+        self.run_tests_suite()

@@ -3,19 +3,14 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import os
+
+from gi.repository import Gio, Gtk  # type:ignore
 
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
+from errands.state import State
 from errands.widgets.task.task import Task
-from errands.widgets.trash.trash import Trash
-
-if TYPE_CHECKING:
-    from errands.widgets.window import Window
-
-import os
-
-from gi.repository import Adw, Gio, Gtk  # type:ignore
 
 
 @Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
@@ -28,11 +23,7 @@ class TrashSidebarRow(Gtk.ListBoxRow):
 
     def __init__(self) -> None:
         super().__init__()
-        self.window: Window = Adw.Application.get_default().get_active_window()
-        self.name: str = "errands_trash_page"
-        # Create trash page
-        self.trash = Trash()
-        self.window.stack.add_titled(self.trash, "errands_trash_page", _("Trash"))
+        State.trash_sidebar_row = self
         self.__add_actions()
 
     def __add_actions(self) -> None:
@@ -44,15 +35,15 @@ class TrashSidebarRow(Gtk.ListBoxRow):
             action.connect("activate", callback)
             self.group.add_action(action)
 
-        __create_action("clear", lambda *_: self.trash.on_trash_clear())
-        __create_action("restore", lambda *_: self.trash.on_trash_restore())
+        __create_action("clear", lambda *_: State.trash_page.on_trash_clear())
+        __create_action("restore", lambda *_: State.trash_page.on_trash_restore())
 
     def update_ui(self) -> None:
         # Update trash
-        self.trash.update_ui()
+        State.trash_page.update_ui()
 
         # Get trash size
-        size: int = len(self.trash.trash_items)
+        size: int = len(State.trash_page.trash_items)
 
         # Update actions state
         self.group.lookup_action("clear").set_enabled(size > 0)
@@ -68,11 +59,11 @@ class TrashSidebarRow(Gtk.ListBoxRow):
 
     @Gtk.Template.Callback()
     def _on_row_activated(self, *args) -> None:
-        Log.debug(f"Sidebar: Open Trash")
+        Log.debug("Sidebar: Open Trash")
 
-        self.window.stack.set_visible_child_name(self.name)
-        self.window.split_view.set_show_content(True)
-        GSettings.set("last-open-list", "s", self.name)
+        State.view_stack.set_visible_child_name("errands_trash_page")
+        State.split_view.set_show_content(True)
+        GSettings.set("last-open-list", "s", "errands_trash_page")
 
     @Gtk.Template.Callback()
     def _on_task_drop(self, _d, task: Task, _x, _y) -> None:
