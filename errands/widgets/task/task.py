@@ -6,11 +6,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
+from errands.state import State
 from errands.widgets.components.datetime_window import DateTimeWindow
 from errands.widgets.components.notes_window import NotesWindow
 from errands.widgets.task.tag import Tag
 from errands.widgets.task.tags_list_item import TagsListItem
-from errands.widgets.today.today_task import TodayTask
 
 if TYPE_CHECKING:
     from errands.widgets.task_list.task_list import TaskList
@@ -86,7 +86,6 @@ class Task(Adw.Bin):
         self.uid = task_data.uid
         self.list_uid = task_data.list_uid
         self.task_list = task_list
-        self.window = task_list.window
         self.parent = parent
         self.notes_window: NotesWindow = NotesWindow(self)
         self.datetime_window: DateTimeWindow = DateTimeWindow(self)
@@ -152,15 +151,15 @@ class Task(Adw.Bin):
 
                 with open(file.get_path(), "wb") as f:
                     f.write(calendar.to_ical())
-                self.window.add_toast(_("Exported"))  # noqa: F821
+                State.main_window.add_toast(_("Exported"))  # noqa: F821
 
-            dialog = Gtk.FileDialog(initial_name=f"{self.task.uid}.ics")
-            dialog.save(self.window, None, __confirm)
+            dialog = Gtk.FileDialog(initial_name=f"{self.uid}.ics")
+            dialog.save(State.main_window, None, __confirm)
 
         def __copy_to_clipboard(*args):
             Log.info("Task: Copy text to clipboard")
             Gdk.Display.get_default().get_clipboard().set(self.get_prop("text"))
-            self.window.add_toast(_("Copied to Clipboard"))  # noqa: F821
+            State.main_window.add_toast(_("Copied to Clipboard"))  # noqa: F821
 
         __create_action("edit", __edit)
         __create_action("copy_to_clipboard", __copy_to_clipboard)
@@ -277,7 +276,7 @@ class Task(Adw.Bin):
             task.delete(False)
         # if update_task_list_ui:
         #     self.parent.update_ui(False)
-        self.window.sidebar.trash_row.update_ui()
+        State.trash_sidebar_row.update_ui()
 
     def expand(self, expanded: bool) -> None:
         if expanded != self.get_prop("expanded"):
@@ -320,7 +319,7 @@ class Task(Adw.Bin):
                 values.append(datetime.now().strftime("%Y%m%dT%H%M%S"))
                 break
         UserData.update_props(self.list_uid, self.uid, props, values)
-        self.window.sidebar.today_row.today.update_ui()
+        State.today_page.update_ui()
 
     def update_task_data(self) -> None:
         self.task_data = UserData.get_task(self.list_uid, self.uid)

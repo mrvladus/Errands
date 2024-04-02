@@ -5,6 +5,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from errands.state import State
+
 
 if TYPE_CHECKING:
     from errands.widgets.task.task import Task
@@ -148,12 +150,7 @@ class TodayTask(Adw.Bin):
         __create_action("move_to_trash", lambda *_: self.delete())
 
     def __find_linked_task(self) -> None:
-        for list in self.window.sidebar.task_lists:
-            if list.list_uid == self.list_uid:
-                for task in list.all_tasks:
-                    if task.uid == self.uid:
-                        self.linked_task = task
-                        return
+        self.linked_task = State.get_task(self.list_uid, self.uid)
 
     def __update_linked_task_ui(self):
         if not self.linked_task:

@@ -50,17 +50,25 @@ class State:
     tags_sidebar_row: TagsSidebarRow = None
     trash_sidebar_row: TrashSidebarRow = None
 
-    @property
-    def task_lists(cls) -> list[TaskList]:
+    @classmethod
+    def get_task_lists(cls) -> list[TaskList]:
         """All Task Lists"""
 
         return cls.sidebar.task_lists
 
-    @property
-    def tasks(cls) -> list[Task]:
+    @classmethod
+    def get_tasks(cls) -> list[Task]:
         """All Tasks in all Task Lists"""
 
         all_tasks: list[Task] = []
-        for list in cls.task_lists:
+        for list in cls.get_task_lists():
             all_tasks.extend(list.all_tasks)
         return all_tasks
+
+    @classmethod
+    def get_task(cls, list_uid: str, uid: str) -> Task:
+        for list in cls.get_task_lists():
+            if list.list_uid == list_uid:
+                for task in list.all_tasks:
+                    if task.uid == uid:
+                        return task
