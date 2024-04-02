@@ -25,8 +25,8 @@ if TYPE_CHECKING:
 
 
 class State:
-    """Application state class for accessing core widgets globally
-    and some utils for quick access to deeper widgets"""
+    """Application's state class for accessing core widgets globally
+    and some utils for quick access to deeper nested widgets"""
 
     profile: str = PROFILE
 
