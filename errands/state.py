@@ -1,3 +1,6 @@
+# Copyright 2024 Vlad Krupinskii <mrvladus@yandex.ru>
+# SPDX-License-Identifier: MIT
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -26,17 +29,21 @@ class State:
     and some utils for quick access to deeper widgets"""
 
     profile: str = PROFILE
+
     # Application
     application: ErrandsApplication = None
+
     # Main window
     main_window: Window = None
     toast_overlay: Adw.ToastOverlay = None
     split_view: Adw.NavigationSplitView = None
+
     # View Stack
     view_stack: Adw.ViewStack = None
     today_page: Today = None
     tags_page: Tags = None
     trash_page: Trash = None
+
     # Sidebar
     sidebar: Sidebar = None
     today_sidebar_row: TodaySidebarRow = None

@@ -2,18 +2,20 @@
 # SPDX-License-Identifier: MIT
 
 from __future__ import annotations
-from __main__ import VERSION, APP_ID
+
 import os
 from uuid import uuid4
-from icalendar import Calendar
-from errands.state import State
-from errands.lib.data import UserData
-from gi.repository import Gio, Adw, Gtk  # type:ignore
 
-from errands.widgets.preferences import PreferencesWindow
-from errands.lib.sync.sync import Sync
+from gi.repository import Adw, Gio, Gtk  # type:ignore
+from icalendar import Calendar
+
+from __main__ import APP_ID, VERSION
+from errands.lib.data import UserData
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
+from errands.lib.sync.sync import Sync
+from errands.state import State
+from errands.widgets.preferences import PreferencesWindow
 
 
 @Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
@@ -73,12 +75,12 @@ class Window(Adw.ApplicationWindow):
                     transient_for=self,
                     version=VERSION,
                     application_icon=APP_ID,
-                    application_name=_("Errands"),
+                    application_name=_("Errands"),  # noqa: F821
                     copyright="© 2023 Vlad Krupinskii",
                     website="https://github.com/mrvladus/Errands",
                     issue_url="https://github.com/mrvladus/Errands/issues",
                     license_type=Gtk.License.MIT_X11,
-                    translator_credits=_("translator-credits"),
+                    translator_credits=_("translator-credits"),  # noqa: F821
                     modal=True,
                     hide_on_close=True,
                 )
@@ -87,14 +89,14 @@ class Window(Adw.ApplicationWindow):
         def _sync(*args):
             # Sync.sync()
             if GSettings.get("sync-provider") == 0:
-                self.add_toast(_("Sync is disabled"))
+                self.add_toast(_("Sync is disabled"))  # noqa: F821
 
         def _import(*args) -> None:
             def _confirm(dialog: Gtk.FileDialog, res) -> None:
                 try:
                     file: Gio.File = dialog.open_finish(res)
-                except:
-                    Log.debug("Lists: Import cancelled")
+                except Exception as e:
+                    Log.debug(f"Lists: Import cancelled. {e}")
                     return
                 with open(file.get_path(), "r") as f:
                     calendar: Calendar = Calendar.from_ical(f.read())
@@ -156,7 +158,7 @@ class Window(Adw.ApplicationWindow):
                             uid=todo.get("UID", None),
                         )
                 State.sidebar.task_lists.update_ui()
-                self.add_toast(_("Imported"))
+                self.add_toast(_("Imported"))  # noqa: F821
                 # Sync.sync()
 
             filter = Gtk.FileFilter()
