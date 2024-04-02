@@ -50,6 +50,7 @@ class Window(Adw.ApplicationWindow):
         State.split_view = self.split_view
         State.view_stack.set_visible_child_name("status")
         State.sidebar.load_task_lists()
+        State.trash_sidebar_row.update_ui()
 
     def add_toast(self, text: str) -> None:
         State.toast_overlay.add_toast(Adw.Toast.new(title=text))

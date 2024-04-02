@@ -222,6 +222,15 @@ class UserDataJSON:
         if changed:
             self.tasks = tasks
 
+    def get_parents_uids_tree(cls, list_uid: str, task_uid: str) -> list[str]:
+        parents_uids: list[str] = []
+        parent: str = cls.get_prop(list_uid, task_uid, "parent")
+        while parent != "":
+            parents_uids.append(parent)
+            parent = cls.get_prop(list_uid, parent, "parent")
+        return parents_uids
+
+
     def get_task(self, list_uid: str, uid: str) -> TaskData:
         try:
             task: TaskData = [
