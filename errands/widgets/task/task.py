@@ -276,7 +276,9 @@ class Task(Adw.Bin):
             task.delete(False)
         # if update_task_list_ui:
         #     self.parent.update_ui(False)
-        State.trash_sidebar_row.update_ui()
+        # State.trash_sidebar_row.update_ui()
+        State.sidebar.update_ui()
+        self.update_ui()
 
     def expand(self, expanded: bool) -> None:
         if expanded != self.get_prop("expanded"):

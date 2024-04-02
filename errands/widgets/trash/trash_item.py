@@ -12,6 +12,7 @@ if TYPE_CHECKING:
 from errands.lib.data import TaskData, UserData
 from gi.repository import Adw, Gtk, Gio  # type:ignore
 from errands.lib.logging import Log
+from errands.state import State
 
 
 @Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
@@ -36,4 +37,5 @@ class TrashItem(Adw.ActionRow):
         for uid in parents_uids:
             UserData.update_props(self.task_dict.list_uid, uid, ["trash"], [False])
 
-        self.window.sidebar.update_ui()
+        State.sidebar.update_ui()
+        State.today_page.update_ui()
