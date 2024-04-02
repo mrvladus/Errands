@@ -20,6 +20,9 @@ class TodaySidebarRow(Gtk.ListBoxRow):
         super().__init__()
         State.today_sidebar_row = self
 
+    def update_ui(self):
+        State.today_page.update_ui()
+
     @Gtk.Template.Callback()
     def _on_row_activated(self, *args) -> None:
         Log.debug("Sidebar: Open Today")

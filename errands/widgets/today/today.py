@@ -74,7 +74,7 @@ class Today(Adw.Bin):
         # Add tasks
         for task in tasks:
             if task.uid not in widgets_uids:
-                new_task = TodayTask(task, self)
+                new_task = TodayTask(task)
                 self.task_list.append(new_task)
                 new_task.update_ui()
 

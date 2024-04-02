@@ -12,19 +12,19 @@
     <section>
       <item>
         <attribute name="label" translatable="yes">Edit</attribute>
-        <attribute name="action">task.edit</attribute>
+        <attribute name="action">today_task.edit</attribute>
       </item>
       <item>
         <attribute name="label" translatable="yes">Move to Trash</attribute>
-        <attribute name="action">task.move_to_trash</attribute>
+        <attribute name="action">today_task.move_to_trash</attribute>
       </item>
       <item>
         <attribute name="label" translatable="yes">Copy to Clipboard</attribute>
-        <attribute name="action">task.copy_to_clipboard</attribute>
+        <attribute name="action">today_task.copy_to_clipboard</attribute>
       </item>
       <item>
         <attribute name="label" translatable="yes">Export</attribute>
-        <attribute name="action">task.export</attribute>
+        <attribute name="action">today_task.export</attribute>
       </item>
     </section>
 

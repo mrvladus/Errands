@@ -10,7 +10,6 @@ from errands.state import State
 
 if TYPE_CHECKING:
     from errands.widgets.task.task import Task
-    from errands.widgets.window import Window
 
 import os
 from datetime import datetime
@@ -79,7 +78,7 @@ class TodayTask(Adw.Bin):
 
     def __add_actions(self) -> None:
         self.group: Gio.SimpleActionGroup = Gio.SimpleActionGroup()
-        self.insert_action_group(name="task", group=self.group)
+        self.insert_action_group(name="today_task", group=self.group)
 
         def __create_action(name: str, callback: callable) -> None:
             action: Gio.SimpleAction = Gio.SimpleAction(name=name)
@@ -139,7 +138,7 @@ class TodayTask(Adw.Bin):
         def __copy_to_clipboard(*args):
             Log.info("Task: Copy text to clipboard")
             Gdk.Display.get_default().get_clipboard().set(self.get_prop("text"))
-            self.window.add_toast(_("Copied to Clipboard"))  # noqa: F821
+            State.main_window.add_toast(_("Copied to Clipboard"))  # noqa: F821
 
         __create_action("edit", __edit)
         __create_action("copy_to_clipboard", __copy_to_clipboard)
@@ -174,7 +173,7 @@ class TodayTask(Adw.Bin):
         return UserData.get_status(self.list_uid, self.uid)
 
     def delete(self, *_) -> None:
-        pass
+        self.linked_task.delete()
 
     def purge(self) -> None:
         """Completely remove widget"""
