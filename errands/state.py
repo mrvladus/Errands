@@ -9,7 +9,6 @@ from gi.repository import Adw  # type:ignore
 
 from __main__ import PROFILE
 
-
 if TYPE_CHECKING:
     from errands.application import ErrandsApplication
     from errands.widgets.sidebar.sidebar import Sidebar
@@ -19,9 +18,10 @@ if TYPE_CHECKING:
     from errands.widgets.task_list.task_list import TaskList
     from errands.widgets.today.today import Today
     from errands.widgets.today.today_sidebar_row import TodaySidebarRow
+    from errands.widgets.today.today_task import TodayTask
+    from errands.widgets.trash.trash import Trash
     from errands.widgets.trash.trash_sidebar_row import TrashSidebarRow
     from errands.widgets.window import Window
-    from errands.widgets.trash.trash import Trash
 
 
 class State:
@@ -72,3 +72,9 @@ class State:
                 for task in list.all_tasks:
                     if task.uid == uid:
                         return task
+
+    @classmethod
+    def get_today_task(cls, list_uid: str, uid: str) -> TodayTask:
+        for task in cls.today_page.tasks:
+            if task.list_uid == list_uid and task.uid == uid:
+                return task

@@ -11,7 +11,6 @@ from errands.state import State
 if TYPE_CHECKING:
     from errands.widgets.task.task import Task
     from errands.widgets.window import Window
-    from errands.widgets.today.today import Today
 
 import os
 from datetime import datetime
@@ -57,21 +56,19 @@ class TodayTask(Adw.Bin):
     priority: Gtk.SpinButton = Gtk.Template.Child()
     accent_color_btns: Gtk.Box = Gtk.Template.Child()
 
-    linked_task: Task = None
-
     # State
     just_added: bool = True
     can_sync: bool = True
     purged: bool = False
     purging: bool = False
 
-    def __init__(self, task_data: TaskData, today_page: Today) -> None:
+    __linked_task: Task = None
+
+    def __init__(self, task_data: TaskData) -> None:
         super().__init__()
         self.task_data = task_data
         self.uid = task_data.uid
         self.list_uid = task_data.list_uid
-        self.today_page = today_page
-        self.window: Window = Adw.Application.get_default().get_active_window()
         self.notes_window: NotesWindow = NotesWindow(self)
         self.datetime_window: DateTimeWindow = DateTimeWindow(self)
         self.__add_actions()
@@ -149,15 +146,13 @@ class TodayTask(Adw.Bin):
         __create_action("export", __export)
         __create_action("move_to_trash", lambda *_: self.delete())
 
-    def __find_linked_task(self) -> None:
-        self.linked_task = State.get_task(self.list_uid, self.uid)
-
-    def __update_linked_task_ui(self):
-        if not self.linked_task:
-            self.__find_linked_task()
-        self.linked_task.update_ui()
-
     # ------ PROPERTIES ------ #
+
+    @property
+    def linked_task(self) -> Task:
+        if not self.__linked_task:
+            self.__linked_task = State.get_task(self.list_uid, self.uid)
+        return self.__linked_task
 
     @property
     def tags(self) -> list[Tag]:
@@ -221,9 +216,9 @@ class TodayTask(Adw.Bin):
                 != datetime.today().date()
             ):
                 self.purge()
-                self.today_page.update_status()
+                State.today_page.update_status()
         # Update linked task every time TodayTask is changes props
-        self.__update_linked_task_ui()
+        self.linked_task.update_ui()
 
     def update_task_data(self) -> None:
         self.task_data = UserData.get_task(self.list_uid, self.uid)
@@ -293,7 +288,7 @@ class TodayTask(Adw.Bin):
         )
 
     def update_ui(self) -> None:
-        Log.debug(f"Task '{self.uid}: Update UI'")
+        Log.debug(f"Today Task '{self.uid}: Update UI'")
 
         self.update_task_data()
         self.toggle_visibility(not self.task_data.trash)
@@ -307,7 +302,13 @@ class TodayTask(Adw.Bin):
 
     @Gtk.Template.Callback()
     def _on_complete_btn_toggle(self, btn: Gtk.CheckButton) -> None:
-        pass
+        self.add_rm_crossline(btn.get_active())
+        if self.just_added:
+            return
+
+        Log.debug(f"Today Task '{self.uid}': Set completed to '{btn.get_active()}'")
+
+        self.linked_task.complete_btn.set_active(btn.get_active())
 
     @Gtk.Template.Callback()
     def _on_entry_row_applied(self, entry: Adw.EntryRow) -> None:

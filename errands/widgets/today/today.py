@@ -8,7 +8,8 @@ from datetime import datetime
 from gi.repository import Adw, Gtk  # type:ignore
 
 from errands.lib.data import TaskData, UserData
-from errands.lib.utils import get_children
+from errands.lib.logging import Log
+from errands.lib.utils import get_children, idle_add
 from errands.state import State
 from errands.widgets.today.today_task import TodayTask
 
@@ -22,8 +23,20 @@ class Today(Adw.Bin):
 
     def __init__(self):
         super().__init__()
+        Log.debug("Today Page: Load")
         State.today_page = self
-        self.update_ui()
+        self.__load_tasks()
+
+    # ------ PRIVATE METHODS ------ #
+
+    @idle_add
+    def __load_tasks(self) -> None:
+        Log.debug("Today Page: Load tasks for today")
+        for task in self.tasks_data:
+            new_task = TodayTask(task)
+            self.task_list.append(new_task)
+            new_task.update_ui()
+        self.update_status()
 
     # ------ PROPERTIES ------ #
 

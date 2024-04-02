@@ -3,7 +3,6 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 from errands.state import State
@@ -14,7 +13,6 @@ from errands.widgets.task.tags_list_item import TagsListItem
 
 if TYPE_CHECKING:
     from errands.widgets.task_list.task_list import TaskList
-    from errands.widgets.today.today import Today
 
 import os
 from datetime import datetime
@@ -34,11 +32,6 @@ from errands.lib.markup import Markup
 
 # from errands.lib.sync.sync import Sync
 from errands.lib.utils import get_children, idle_add, timeit
-
-
-@dataclass
-class TaskConfig:
-    parent: TaskList | Today
 
 
 @Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
@@ -72,7 +65,6 @@ class Task(Adw.Bin):
     # State
     just_added: bool = True
     can_sync: bool = True
-    purged: bool = False
     purging: bool = False
 
     def __init__(
@@ -319,6 +311,7 @@ class Task(Adw.Bin):
                 values.append(datetime.now().strftime("%Y%m%dT%H%M%S"))
                 break
         UserData.update_props(self.list_uid, self.uid, props, values)
+        # Update linked today task
         State.today_page.update_ui()
 
     def update_task_data(self) -> None:
@@ -459,10 +452,7 @@ class Task(Adw.Bin):
 
     def update_ui(self, update_sub_tasks_ui: bool = True) -> None:
         Log.debug(f"Task '{self.uid}: Update UI'")
-        if self.purged:
-            self.purge()
-            return
-        self.task_data = UserData.get_task(self.list_uid, self.uid)
+        self.update_task_data()
         self.toggle_visibility(not self.task_data.trash)
         self.expand(self.task_data.expanded)
         self.update_color()
@@ -511,11 +501,11 @@ class Task(Adw.Bin):
 
     @Gtk.Template.Callback()
     def _on_complete_btn_toggle(self, btn: Gtk.CheckButton) -> None:
-        Log.debug(f"Task '{self.uid}': Set completed to '{btn.get_active()}'")
-
         self.add_rm_crossline(btn.get_active())
         if self.just_added:
             return
+
+        Log.debug(f"Task '{self.uid}': Set completed to '{btn.get_active()}'")
 
         if self.get_prop("completed") != btn.get_active():
             self.update_props(["completed", "synced"], [btn.get_active(), False])
@@ -538,7 +528,10 @@ class Task(Adw.Bin):
                     task.complete_btn.set_active(False)
                     task.just_added = False
 
-        self.parent.update_ui()
+        if isinstance(self.parent, Task):
+            self.parent.update_ui()
+        else:
+            self.parent.update_ui(False)
         self.task_list.update_status()
         # Sync.sync(False)
 

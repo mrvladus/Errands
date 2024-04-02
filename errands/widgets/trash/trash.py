@@ -23,6 +23,8 @@ class Trash(Adw.Bin):
 
     def __init__(self):
         super().__init__()
+        Log.debug("Trash Page: Load")
+
         State.trash_page = self
 
     @property
@@ -80,8 +82,8 @@ class Trash(Adw.Bin):
         Log.debug("Trash: Show confirm dialog")
 
         ConfirmDialog(
-            _("Tasks will be permanently deleted"),
-            _("Delete"),
+            _("Tasks will be permanently deleted"),  # noqa: F821
+            _("Delete"),  # noqa: F821
             Adw.ResponseAppearance.DESTRUCTIVE,
             __confirm,
         )
