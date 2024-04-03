@@ -26,7 +26,7 @@ class TaskListData:
     color: str = ""
     deleted: bool = False
     name: str = ""
-    show_completed: bool = False
+    show_completed: bool = True
     synced: bool = False
     uid: str = ""
 
