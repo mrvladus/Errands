@@ -24,6 +24,10 @@ class TagsSidebarRow(Gtk.ListBoxRow):
         State.tags_sidebar_row = self
         self.update_ui()
 
+    def update_ui(self) -> None:
+        size: int = len(UserData.tags)
+        self.size_counter.set_label(str(size) if size > 0 else "")
+
     @Gtk.Template.Callback()
     def _on_row_activated(self, *args) -> None:
         Log.debug("Sidebar: Open Tags")
@@ -32,7 +36,3 @@ class TagsSidebarRow(Gtk.ListBoxRow):
         State.split_view.set_show_content(True)
         GSettings.set("last-open-list", "s", "errands_tags_page")
         State.tags_page.update_ui()
-
-    def update_ui(self) -> None:
-        size: int = len(UserData.tags)
-        self.size_counter.set_label(str(size) if size > 0 else "")

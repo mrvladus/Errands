@@ -262,15 +262,19 @@ class Task(Adw.Bin):
         Log.info(f"Task: Move to trash: '{self.uid}'")
 
         self.toggle_visibility(False)
+        self.just_added = True
         self.complete_btn.set_active(True)
-        self.update_props(["trash", "synced"], [True, False])
+        self.just_added = False
+        self.update_props(["trash", "completed", "synced"], [True, True, False])
         for task in self.all_tasks:
-            task.delete(False)
-        # if update_task_list_ui:
-        #     self.parent.update_ui(False)
-        # State.trash_sidebar_row.update_ui()
-        State.sidebar.update_ui()
-        self.update_ui()
+            task.just_added = True
+            task.complete_btn.set_active(True)
+            task.just_added = False
+            task.update_props(["trash", "completed", "synced"], [True, True, False])
+        State.today_page.update_ui()
+        State.trash_sidebar_row.update_ui()
+        State.tags_page.update_ui()
+        self.task_list.update_status()
 
     def expand(self, expanded: bool) -> None:
         if expanded != self.get_prop("expanded"):
@@ -296,6 +300,13 @@ class Task(Adw.Bin):
         GLib.timeout_add(200, __finish_remove)
 
     def toggle_visibility(self, on: bool) -> None:
+        if self.task_data.completed:
+            GLib.idle_add(
+                self.revealer.set_reveal_child,
+                self.task_list.toggle_completed_btn.get_active(),
+            )
+            return
+
         GLib.idle_add(self.revealer.set_reveal_child, on)
 
     def update_props(self, props: list[str], values: list[Any]) -> None:
@@ -530,6 +541,7 @@ class Task(Adw.Bin):
                     task.complete_btn.set_active(False)
                     task.just_added = False
 
+        self.toggle_visibility(not btn.get_active())
         if isinstance(self.parent, Task):
             self.parent.update_ui()
         else:

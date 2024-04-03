@@ -50,7 +50,6 @@ class TaskList(Adw.Bin):
     # ------ PRIVATE METHODS ------ #
 
     @idle_add
-    # @timeit
     def __load_tasks(self) -> None:
         Log.info(f"Task List {self.list_uid}: Load Tasks")
 
@@ -66,6 +65,9 @@ class TaskList(Adw.Bin):
 
         self.scrl.set_visible(True)
         self.loading_status_page.set_visible(False)
+        self.toggle_completed_btn.set_active(
+            UserData.get_list_prop(self.list_uid, "show_completed")
+        )
 
     def __sort_tasks(self) -> None:
         pass
@@ -138,6 +140,11 @@ class TaskList(Adw.Bin):
     def update_ui(self, update_tasks_ui: bool = True, sort: bool = True) -> None:
         Log.debug(f"Task list {self.list_uid}: Update UI")
 
+        # Show completed tasks
+        self.toggle_completed_btn.set_active(
+            UserData.get_list_prop(self.list_uid, "show_completed")
+        )
+
         # Update tasks
         tasks: list[TaskData] = [
             t for t in UserData.get_tasks_as_dicts(self.list_uid, "") if not t.deleted
@@ -196,8 +203,15 @@ class TaskList(Adw.Bin):
         Log.info("Delete completed tasks")
         for task in self.all_tasks:
             if not task.get_prop("trash") and task.get_prop("completed"):
-                task.delete(False)
-        self.update_ui()
+                task.delete()
+        self.update_status()
+
+    @Gtk.Template.Callback()
+    def _on_toggle_completed_btn_toggled(self, btn: Gtk.ToggleButton):
+        for task in self.all_tasks:
+            if task.task_data.completed:
+                task.toggle_visibility(btn.get_active())
+        UserData.update_list_prop(self.list_uid, "show_completed", btn.get_active())
 
     @Gtk.Template.Callback()
     def _on_dnd_scroll(self, _motion, _x, y: float) -> bool:

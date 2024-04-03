@@ -13,6 +13,16 @@
               <object id="title" class="AdwWindowTitle" />
             </property>
 
+            <!-- Toggle Completed btn -->
+            <child type="start">
+              <object id="toggle_completed_btn" class="GtkToggleButton">
+                <property name="icon-name">errands-check-toggle-symbolic</property>
+                <property name="valign">center</property>
+                <property name="tooltip-text" translatable="yes">Toggle Completed Tasks</property>
+                <signal name="toggled" handler="_on_toggle_completed_btn_toggled" />
+              </object>
+            </child>
+
             <!-- Delete Completed btn -->
             <child type="start">
               <object id="delete_completed_btn" class="GtkButton">
@@ -20,17 +30,8 @@
                 <property name="sensitive">false</property>
                 <property name="valign">center</property>
                 <property name="tooltip-text" translatable="yes">Delete Completed Tasks</property>
+                <property name="visible" bind-source="toggle_completed_btn" bind-property="active" bind-flags="sync-create" />
                 <signal name="clicked" handler="_on_delete_completed_btn_clicked" />
-              </object>
-            </child>
-
-            <!-- Toggle Completed btn -->
-            <child type="start">
-              <object id="toggle_completed_btn" class="GtkToggleButton">
-                <property name="icon-name">errands-check-toggle-symbolic</property>
-                <property name="valign">center</property>
-                <property name="tooltip-text" translatable="yes">Toggle Completed Tasks</property>
-                <!-- <signal name="toggled" handler="_on_toggle_completed_btn_toggled" /> -->
               </object>
             </child>
 

@@ -13,7 +13,6 @@ from gi.repository import GLib  # type:ignore
 
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
-from errands.lib.utils import threaded, timeit
 
 
 @dataclass
@@ -26,6 +25,7 @@ class TaskListData:
     color: str = ""
     deleted: bool = False
     name: str = ""
+    show_completed: bool = False
     synced: bool = False
     uid: str = ""
 
@@ -63,7 +63,6 @@ class TaskData:
 
 
 class UserDataJSON:
-
     def __init__(self) -> None:
         self.__data_dir: str = os.path.join(GLib.get_user_data_dir(), "errands")
         self.__data_file_path: str = os.path.join(self.__data_dir, "data.json")
@@ -156,7 +155,6 @@ class UserDataJSON:
         self.tasks = tasks
 
     def get_lists_as_dicts(self) -> list[TaskListData]:
-        Log.debug(f"Data: Get lists")
         return self.task_lists
 
     def get_prop(self, list_uid: str, uid: str, prop: str) -> Any:
@@ -169,8 +167,16 @@ class UserDataJSON:
         return getattr(task, prop)
 
     def get_list_prop(self, list_uid: str, prop: str) -> Any:
-        list: TaskListData = [l for l in self.task_lists if l.uid == list_uid][0]
+        list: TaskListData = [lst for lst in self.task_lists if lst.uid == list_uid][0]
         return getattr(list, prop)
+
+    def update_list_prop(self, list_uid: str, prop: str, value: Any) -> None:
+        lists: list[TaskListData] = self.task_lists
+        for lst in lists:
+            if lst.uid == list_uid:
+                setattr(lst, prop, value)
+                break
+        self.task_lists = lists
 
     def get_status(self, list_uid: str, parent_uid: str = None) -> tuple[int, int]:
         """Gets tuple (total_tasks, completed_tasks)"""
@@ -211,7 +217,6 @@ class UserDataJSON:
         self.tags = current_tags
 
     def remove_tags(self, tags: list[str]) -> None:
-        Log.debug(f"Data: remove tag")
         self.tags = [t for t in self.tags if t.text not in tags]
         changed = False
         tasks = self.tasks
@@ -229,7 +234,6 @@ class UserDataJSON:
             parents_uids.append(parent)
             parent = cls.get_prop(list_uid, parent, "parent")
         return parents_uids
-
 
     def get_task(self, list_uid: str, uid: str) -> TaskData:
         try:
@@ -400,7 +404,6 @@ class UserDataJSON:
 
 
 class UserDataSQLite:
-
     @classmethod
     def move_task_to_list(
         cls,
