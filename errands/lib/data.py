@@ -1,12 +1,12 @@
 # Copyright 2023-2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-from dataclasses import dataclass, asdict, field
 import datetime
 import json
 import os
 import shutil
 import sqlite3
+from dataclasses import asdict, dataclass, field
 from typing import Any, Iterable
 from uuid import uuid4
 
