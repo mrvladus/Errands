@@ -7,6 +7,7 @@ import datetime
 import json
 import os
 import shutil
+import sqlite3
 from typing import Any, Iterable, List
 from uuid import uuid4
 
@@ -263,9 +264,13 @@ class UserDataJSON:
         if not os.path.exists(self.__data_dir):
             Log.debug("Data: Create data directory")
             os.mkdir(self.__data_dir)
+
+        self.__convert_data()
+
         if not os.path.exists(self.__data_file_path):
             Log.debug("Data: Create data.json file")
             self.__write_data()
+
         self.__read_data()
 
     def move_task_after(
@@ -396,6 +401,52 @@ class UserDataJSON:
 
     def __backup_data(self) -> None:
         shutil.copyfile(self.__data_file_path, self.__data_file_path + ".old")
+
+    def __convert_data(self):
+        old_db_path: str = os.path.join(self.__data_dir, "data.db")
+        if not os.path.exists(old_db_path):
+            return
+
+        Log.info("Data: Convert old data format to a new one")
+
+        connection = sqlite3.connect(old_db_path)
+        cur = connection.cursor()
+
+        # Convert lists
+        cur.execute("SELECT * FROM lists")
+        lists_data: tuple[tuple] = cur.fetchall()
+        for item in lists_data:
+            self.__task_lists_data.append(
+                TaskListData(deleted=item[0], synced=item[2], name=item[1], uid=item[3])
+            )
+
+        # Convert tasks
+        cur.execute("SELECT * FROM tasks")
+        tasks_data: tuple[tuple] = cur.fetchall()
+        for item in tasks_data:
+            self.__tasks_data.append(
+                TaskData(
+                    color=item[0],
+                    completed=item[1],
+                    deleted=item[2],
+                    due_date=item[3],
+                    expanded=item[4],
+                    list_uid=item[5],
+                    notes=item[6],
+                    parent=item[7],
+                    percent_complete=item[8],
+                    priority=item[9],
+                    start_date=item[10],
+                    synced=item[11],
+                    tags=item[12].split(",") if item[12] else [],
+                    text=item[13],
+                    toolbar_shown=item[14],
+                    trash=item[15],
+                    uid=item[16],
+                )
+            )
+
+        self.__write_data()
 
     def __read_data(self) -> None:
         try:
