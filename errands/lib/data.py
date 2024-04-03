@@ -1,14 +1,13 @@
 # Copyright 2023-2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-from copy import deepcopy
 from dataclasses import dataclass, asdict, field
 import datetime
 import json
 import os
 import shutil
 import sqlite3
-from typing import Any, Iterable, List
+from typing import Any, Iterable
 from uuid import uuid4
 
 from gi.repository import GLib  # type:ignore
@@ -134,16 +133,16 @@ class UserDataJSON:
     def clean_deleted(self) -> None:
         Log.debug("Data: Clean deleted")
 
-        lists = [l for l in self.task_lists if not l.deleted]
+        lists = [lst for lst in self.task_lists if not lst.deleted]
         tasks = [t for t in self.tasks if not t.deleted]
         self.task_lists = lists
         self.tasks = tasks
 
     def delete_list(self, list_uid: str) -> None:
         lists: list[TaskListData] = self.task_lists
-        for l in lists:
-            if l.uid == list_uid:
-                l.deleted = True
+        for lst in lists:
+            if lst.uid == list_uid:
+                lst.deleted = True
                 break
         tasks: list[TaskData] = [t for t in self.tasks if not t.list_uid == list_uid]
         self.tasks = tasks
@@ -244,7 +243,7 @@ class UserDataJSON:
             ][0]
             return task
         except Exception as e:
-            Log.error(f"Data: can't get task '{uid}'")
+            Log.error(f"Data: can't get task '{uid}'. {e}")
             return TaskData()
 
     def get_tasks_as_dicts(
@@ -453,7 +452,7 @@ class UserDataJSON:
             Log.debug("Data: Read data")
             with open(self.__data_file_path, "r") as f:
                 data: dict[str, Any] = json.load(f)
-                self.__task_lists_data = [TaskListData(**l) for l in data["lists"]]
+                self.__task_lists_data = [TaskListData(**lst) for lst in data["lists"]]
                 self.__tasks_data = [TaskData(**t) for t in data["tasks"]]
                 self.__tags_data = [TagsData(**t) for t in data["tags"]]
         except Exception as e:
@@ -468,7 +467,7 @@ class UserDataJSON:
             Log.debug("Data: Write data")
             with open(self.__data_file_path, "w") as f:
                 data: dict[str, list[TaskListData | TaskData]] = {
-                    "lists": [asdict(l) for l in self.task_lists],
+                    "lists": [asdict(lst) for lst in self.task_lists],
                     "tags": [asdict(t) for t in self.tags],
                     "tasks": [asdict(t) for t in self.tasks],
                 }
