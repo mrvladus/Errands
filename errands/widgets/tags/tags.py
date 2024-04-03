@@ -85,8 +85,11 @@ class Tag(Adw.ActionRow):
             "activatable",
             GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
         )
-        self.number_of_tasks: Gtk.Label = Gtk.Button(
-            css_classes=["flat", "dim-label"], can_target=False
+        self.number_of_tasks: Gtk.Button = Gtk.Button(
+            css_classes=["flat", "dim-label", "circular"],
+            can_target=False,
+            halign=Gtk.Align.CENTER,
+            valign=Gtk.Align.CENTER,
         )
         self.add_suffix(self.number_of_tasks)
 
