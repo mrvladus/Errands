@@ -2,16 +2,14 @@
 # SPDX-License-Identifier: MIT
 
 from __future__ import annotations
+
 import os
-
-from errands.lib.data import UserData
-from errands.lib.utils import get_children
-
 
 from gi.repository import Adw, GObject, Gtk  # type:ignore
 
+from errands.lib.data import UserData
+from errands.lib.utils import get_children
 from errands.state import State
-from errands.widgets.task_list.task_list import TaskList
 
 
 @Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
@@ -87,14 +85,13 @@ class Tag(Adw.ActionRow):
             "activatable",
             GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
         )
-        self.number_of_tasks: Gtk.Label = Gtk.Label()
+        self.number_of_tasks: Gtk.Label = Gtk.Button(
+            css_classes=["flat", "dim-label"], can_target=False
+        )
         self.add_suffix(self.number_of_tasks)
 
     def delete(self, _btn: Gtk.Button):
-        task_lists: list[TaskList] = (
-            Adw.Application.get_default().get_active_window().sidebar.task_lists
-        )
-        for list in task_lists:
+        for list in State.get_task_lists():
             for task in list.all_tasks:
                 for tag in task.tags:
                     if tag.title == self.get_title():

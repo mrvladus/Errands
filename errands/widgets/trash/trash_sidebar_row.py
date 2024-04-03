@@ -23,6 +23,7 @@ class TrashSidebarRow(Gtk.ListBoxRow):
 
     def __init__(self) -> None:
         super().__init__()
+        self.name = "errands_trash_page"
         State.trash_sidebar_row = self
         self.__add_actions()
 

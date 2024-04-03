@@ -18,6 +18,7 @@ class TodaySidebarRow(Gtk.ListBoxRow):
 
     def __init__(self) -> None:
         super().__init__()
+        self.name = "errands_today_page"
         State.today_sidebar_row = self
 
     def update_ui(self):
@@ -26,6 +27,6 @@ class TodaySidebarRow(Gtk.ListBoxRow):
     @Gtk.Template.Callback()
     def _on_row_activated(self, *args) -> None:
         Log.debug("Sidebar: Open Today")
-        State.view_stack.set_visible_child_name("errands_today_page")
+        State.view_stack.set_visible_child_name(self.name)
         State.split_view.set_show_content(True)
-        GSettings.set("last-open-list", "s", "errands_today_page")
+        GSettings.set("last-open-list", "s", self.name)
