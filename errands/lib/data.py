@@ -1,6 +1,7 @@
 # Copyright 2023-2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
+from copy import deepcopy
 from dataclasses import dataclass, asdict, field
 import datetime
 import json
@@ -250,9 +251,9 @@ class UserDataJSON:
     ) -> list[TaskData]:
         if not list_uid:
             return self.tasks
-        elif list_uid and parent == None:
+        elif list_uid and parent is None:
             return [t for t in self.tasks if t.list_uid == list_uid]
-        elif list_uid and parent != None:
+        elif list_uid and parent is not None:
             return [
                 t for t in self.tasks if t.list_uid == list_uid and t.parent == parent
             ]
@@ -323,14 +324,31 @@ class UserDataJSON:
         self.tasks = tasks
 
     def move_task_to_list(
-        self,
-        task_uid: str,
-        from_list_uid: str,
-        to_list_uid: str,
-        synced: bool,
-        new_parent: str = "",
+        self, task_uid: str, from_list_uid: str, to_list_uid: str, new_parent: str = ""
     ) -> None:
-        pass
+        tasks = self.tasks
+
+        to_delete = []
+
+        def move_task(task: TaskData, parent: str = None):
+            to_delete.append(task)
+            new_task = TaskData(**asdict(task))
+            new_task.list_uid = to_list_uid
+            new_task.synced = False
+            new_task.uid = str(uuid4())
+            if parent:
+                new_task.parent = parent
+            tasks.append(new_task)
+            for sub in self.__get_sub_tasks(task.list_uid, task.uid):
+                move_task(sub, new_task.uid)
+
+        move_task(self.get_task(from_list_uid, task_uid))
+
+        for task in tasks:
+            if task in to_delete:
+                task.deleted = True
+
+        self.tasks = tasks
 
     def update_props(
         self, list_uid: str, uid: str, props: Iterable[str], values: Iterable[Any]
@@ -344,6 +362,11 @@ class UserDataJSON:
         self.tasks = tasks
 
     # ------ PRIVATE METHODS ------ #
+
+    def __get_sub_tasks(self, list_uid: str, task_uid: str) -> list[TaskData]:
+        return [
+            t for t in self.tasks if t.list_uid == list_uid and t.parent == task_uid
+        ]
 
     def __get_sub_tasks_tree(self, list_uid: str, task_uid: str) -> list[TaskData]:
         tree: list[TaskData] = []
@@ -404,57 +427,6 @@ class UserDataJSON:
 
 
 class UserDataSQLite:
-    @classmethod
-    def move_task_to_list(
-        cls,
-        task_uid: str,
-        old_list_uid: str,
-        new_list_uid: str,
-        parent: str,
-        synced: bool,
-    ) -> None:
-        sub_tasks_uids: list[str] = cls.__get_sub_tasks_uids_tree(
-            old_list_uid, task_uid
-        )
-        tasks: list[TaskData] = cls.get_tasks_as_dicts(old_list_uid)
-        task_dict: TaskData = [i for i in tasks if i["uid"] == task_uid][0]
-        sub_tasks_dicts: list[TaskData] = [
-            i for i in tasks if i["uid"] in sub_tasks_uids
-        ]
-        # Move task
-        if old_list_uid == new_list_uid:
-            cls.run_sql(
-                f"DELETE FROM tasks WHERE list_uid = '{old_list_uid}' AND uid = '{task_uid}'"
-            )
-        else:
-            cls.update_props(old_list_uid, task_uid, ["deleted"], [True])
-        task_dict["list_uid"] = new_list_uid
-        task_dict["parent"] = parent
-        task_dict["synced"] = synced
-        cls.add_task(**task_dict)
-        # Move sub-tasks
-        for sub_dict in sub_tasks_dicts:
-            if old_list_uid == new_list_uid:
-                cls.run_sql(
-                    f"""DELETE FROM tasks
-                    WHERE list_uid = '{old_list_uid}'
-                    AND uid = '{sub_dict['uid']}'"""
-                )
-            else:
-                cls.update_props(old_list_uid, sub_dict["uid"], ["deleted"], [True])
-            sub_dict["list_uid"] = new_list_uid
-            sub_dict["synced"] = synced
-            cls.add_task(**sub_dict)
-
-    @classmethod
-    def get_parents_uids_tree(cls, list_uid: str, task_uid: str) -> list[str]:
-        parents_uids: list[str] = []
-        parent: str = cls.get_prop(list_uid, task_uid, "parent")
-        while parent != "":
-            parents_uids.append(parent)
-            parent = cls.get_prop(list_uid, parent, "parent")
-        return parents_uids
-
     def __convert(cls):
         old_path = os.path.join(GLib.get_user_data_dir(), "list")
         old_data_file = os.path.join(old_path, "data.json")

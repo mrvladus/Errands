@@ -104,7 +104,7 @@ class TaskList(Adw.Bin):
 
     # ------ PUBLIC METHODS ------ #
 
-    def add_task(self, task: str) -> Task:
+    def add_task(self, task: TaskData) -> Task:
         Log.info(f"Task List: Add task '{task.uid}'")
 
         on_top: bool = GSettings.get("task-list-new-task-position-top")

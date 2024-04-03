@@ -249,7 +249,6 @@
                 <!-- Progress bar -->
                 <child>
                   <object id="progress_bar_rev" class="GtkRevealer">
-                    <!-- <property name="reveal-child" bind-source="entry_row" bind-property="visible" bind-flags="sync-create | invert-boolean" /> -->
                     <child>
                       <object id="progress_bar" class="GtkProgressBar">
                         <property name="margin-start">12</property>

@@ -10,7 +10,7 @@ from datetime import datetime
 from gi.repository import Adw, Gio, GLib, Gtk  # type:ignore
 from icalendar import Calendar, Todo
 
-from errands.lib.data import TaskListData, UserData
+from errands.lib.data import TaskData, TaskListData, UserData
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
@@ -222,12 +222,14 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
 
         if task.list_uid == self.uid:
             return
+        old_task_list = task.task_list
 
         Log.info(f"Lists: Move '{task.uid}' to '{self.uid}' list")
-        UserData.move_task_to_list(task.uid, task.list_uid, self.uid, "", False)
-        # uid: str = task.uid
-        # task.purge()
-        # self.task_list.add_task(uid)
+        UserData.move_task_to_list(task.uid, task.list_uid, self.uid)
+        task.purge()
+        self.task_list.update_ui(False)
+        if old_task_list != self.task_list:
+            old_task_list.update_status()
         # Sync.sync()
 
     @Gtk.Template.Callback()

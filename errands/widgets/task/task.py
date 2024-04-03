@@ -158,7 +158,6 @@ class Task(Adw.Bin):
         __create_action("export", __export)
         __create_action("move_to_trash", lambda *_: self.delete())
 
-    @idle_add
     def __load_sub_tasks(self):
         tasks: list[TaskData] = (
             t
@@ -390,21 +389,22 @@ class Task(Adw.Bin):
 
     def update_tasks(self) -> None:
         # Update tasks
-        data_uids: list[str] = [
-            t.uid
+        tasks: list[TaskData] = [
+            t
             for t in UserData.get_tasks_as_dicts(self.list_uid, self.uid)
             if not t.deleted
         ]
+        tasks_uids: list[str] = [t.uid for t in tasks]
         widgets_uids: list[str] = [t.uid for t in self.tasks]
 
         # Add tasks
-        for uid in data_uids:
-            if uid not in widgets_uids:
-                self.add_task(uid)
+        for task in tasks:
+            if task.uid not in widgets_uids:
+                self.add_task(task)
 
         for task in self.tasks:
             # Remove task
-            if task.uid not in data_uids:
+            if task.uid not in tasks_uids:
                 task.purge()
             # Move task to completed tasks
             elif task.get_prop("completed") and task in self.uncompleted_tasks:
@@ -710,38 +710,40 @@ class Task(Adw.Bin):
         if task.parent == self:
             return
 
-        # Change list
-        if task.list_uid != self.list_uid:
-            UserData.move_task_to_list(
-                task.uid,
-                task.list_uid,
-                self.list_uid,
-                self.get_prop("uid"),
-                False,
-            )
-
         # Change parent
         task.update_props(["parent", "synced"], [self.uid, False])
 
+        # Change list
+        if task.list_uid != self.list_uid:
+            UserData.move_task_to_list(task.uid, task.list_uid, self.list_uid)
+
+        # Add task
+        data: TaskData = UserData.get_task(self.list_uid, task.uid)
+        self.add_task(data)
+
+        # Remove task
+        if task.task_list != self.task_list:
+            task.task_list.update_status()
+        task.purge()
+
         # Toggle completion
-        if not task.get_prop("completed") and self.get_prop("completed"):
+        if self.task_data.completed and not data.completed:
             self.update_props(["completed", "synced"], [False, False])
+            self.just_added = True
+            self.complete_btn.set_active(False)
+            self.just_added = False
             for parent in self.parents_tree:
-                if parent.get_prop("completed"):
+                if parent.task_data.completed:
                     parent.update_props(["completed", "synced"], [False, False])
+                    parent.just_added = True
+                    parent.complete_btn.set_active(False)
+                    parent.just_added = False
 
         # Expand sub-tasks
         if not self.get_prop("expanded"):
             self.expand(True)
 
-        # Remove from old position
-        task.parent.task_list_model.remove(task.get_index())
-
-        # Update UI
-        self.task_list.update_ui()
-        if task.task_list != self.task_list:
-            task.task_list.update_ui()
-
+        self.task_list.update_status()
         # Sync
         # Sync.sync(False)
 
