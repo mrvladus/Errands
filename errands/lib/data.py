@@ -445,6 +445,8 @@ class UserDataJSON:
                 )
             )
 
+        os.remove(old_db_path)
+
         self.__write_data()
 
     def __read_data(self) -> None:
