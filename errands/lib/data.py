@@ -477,43 +477,5 @@ class UserDataJSON:
             Log.error(f"Data: Can't write to disk. {e}.")
 
 
-class UserDataSQLite:
-    def __convert(cls):
-        old_path = os.path.join(GLib.get_user_data_dir(), "list")
-        old_data_file = os.path.join(old_path, "data.json")
-        if not os.path.exists(old_data_file):
-            return
-        Log.debug("Data: convert data file")
-        # Get tasks
-        try:
-            with open(old_data_file, "r") as f:
-                data: dict = json.loads(f.read())
-        except:
-            Log.error("Data: can't read data file")
-            return
-        # Remove old data folder
-        shutil.rmtree(old_path, True)
-        # If sync is enabled
-        if GSettings.get("sync-provider") != 0:
-            uid = cls.add_list(GSettings.get("sync-cal-name"), synced=True)
-            GSettings.set("sync-cal-name", "s", "")
-        # If sync is disabled
-        else:
-            uid = cls.add_list("Errands")
-        # Add tasks
-        for task in data["tasks"]:
-            cls.add_task(
-                color=task["color"],
-                completed=task["completed"],
-                deleted=task["id"] in data["deleted"],
-                list_uid=uid,
-                parent=task["parent"],
-                synced=task["synced_caldav"],
-                text=task["text"],
-                trash=task["deleted"],
-                uid=task["id"],
-            )
-
-
 # Handle for UserData. For easily changing serialization methods.
 UserData = UserDataJSON()
