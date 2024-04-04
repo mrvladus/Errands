@@ -419,8 +419,10 @@ class SyncProviderCalDAV:
                         )
                         todo.icalendar_component["related-to"] = task.parent
                         todo.icalendar_component["x-errands-color"] = task.color
-                        todo.icalendar_component["x-errands-expanded"] = task.expanded
-                        todo.icalendar_component["x-errands-toolbar-shown"] = (
+                        todo.icalendar_component["x-errands-expanded"] = int(
+                            task.expanded
+                        )
+                        todo.icalendar_component["x-errands-toolbar-shown"] = int(
                             task.toolbar_shown
                         )
                         todo.save()
