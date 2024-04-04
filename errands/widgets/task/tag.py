@@ -5,7 +5,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from gi.repository import Gdk, Gtk  # type:ignore
+from gi.repository import Gdk, Gtk
+
+from errands.lib.sync.sync import Sync  # type:ignore
 
 if TYPE_CHECKING:
     from errands.widgets.task.task import Task
@@ -40,4 +42,4 @@ class Tag(Gtk.Box):
         tags.remove(self.title)
         self.task.update_props(["tags", "synced"], [tags, False])
         self.task.update_tags()
-        # Sync.sync(False)
+        Sync.sync(False)

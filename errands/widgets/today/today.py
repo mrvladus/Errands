@@ -29,7 +29,6 @@ class Today(Adw.Bin):
 
     # ------ PRIVATE METHODS ------ #
 
-    @idle_add
     def __load_tasks(self) -> None:
         Log.debug("Today Page: Load tasks for today")
         for task in self.tasks_data:

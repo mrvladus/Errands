@@ -39,10 +39,6 @@ class Window(Adw.ApplicationWindow):
         GSettings.bind("maximized", self, "maximized")
         # Setup theme
         Adw.StyleManager.get_default().set_color_scheme(GSettings.get("theme"))
-        # Setup sync
-        Sync.window = self
-        # Sync.sync()
-
         self.connect("realize", self.__finish_load)
 
     def __finish_load(self, *_):
@@ -51,9 +47,11 @@ class Window(Adw.ApplicationWindow):
         State.view_stack.set_visible_child_name("status")
         State.sidebar.load_task_lists()
         State.trash_sidebar_row.update_ui()
+        # Sync
+        Sync.sync()
 
     def add_toast(self, text: str) -> None:
-        State.toast_overlay.add_toast(Adw.Toast.new(title=text))
+        self.toast_overlay.add_toast(Adw.Toast.new(title=text))
 
     def _create_action(self, name: str, callback: callable, shortcuts=None) -> None:
         action: Gio.SimpleAction = Gio.SimpleAction.new(name, None)
@@ -88,7 +86,7 @@ class Window(Adw.ApplicationWindow):
             self.about_window.present()
 
         def _sync(*args):
-            # Sync.sync()
+            Sync.sync()
             if GSettings.get("sync-provider") == 0:
                 self.add_toast(_("Sync is disabled"))  # noqa: F821
 
@@ -160,7 +158,7 @@ class Window(Adw.ApplicationWindow):
                         )
                 State.sidebar.task_lists.update_ui()
                 self.add_toast(_("Imported"))  # noqa: F821
-                # Sync.sync()
+                Sync.sync()
 
             filter = Gtk.FileFilter()
             filter.add_pattern("*.ics")

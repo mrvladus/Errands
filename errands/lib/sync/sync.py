@@ -31,14 +31,12 @@ class Sync:
 
     @classmethod
     @threaded
-    def sync(self, update_ui: bool = True) -> None:
+    def sync(self) -> None:
         """
         Sync tasks without blocking the UI
         """
         if GSettings.get("sync-provider") == 0:
             UserData.clean_deleted()
-            if update_ui:
-                GLib.idle_add(State.sidebar.update_ui)
             return
         if not self.provider:
             GLib.idle_add(State.sidebar.sync_indicator.set_visible, True)
@@ -52,8 +50,6 @@ class Sync:
             GLib.idle_add(State.sidebar.sync_indicator.set_visible, True)
             self.provider.sync()
             UserData.clean_deleted()
-            if update_ui:
-                GLib.idle_add(State.sidebar.update_ui)
             if self.sync_again:
                 self.sync()
                 self.sync_again = False

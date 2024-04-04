@@ -150,6 +150,12 @@ class UserDataJSON:
         self.tasks = tasks
         self.task_lists = lists
 
+    def delete_task(self, list_uid: str, uid: str) -> None:
+        tasks: list[TaskData] = [
+            t for t in self.tasks if t.list_uid != list_uid and t.uid != uid
+        ]
+        self.tasks = tasks
+
     def delete_tasks_from_trash(self) -> None:
         tasks: list[TaskData] = self.tasks
         for task in tasks:
@@ -178,6 +184,17 @@ class UserDataJSON:
         for lst in lists:
             if lst.uid == list_uid:
                 setattr(lst, prop, value)
+                break
+        self.task_lists = lists
+
+    def update_list_props(
+        self, list_uid: str, props: list[str], values: list[Any]
+    ) -> None:
+        lists: list[TaskListData] = self.task_lists
+        for lst in lists:
+            if lst.uid == list_uid:
+                for i, prop in enumerate(props):
+                    setattr(lst, prop, values[i])
                 break
         self.task_lists = lists
 
@@ -401,6 +418,7 @@ class UserDataJSON:
         return tree
 
     def __backup_data(self) -> None:
+        Log.info("Data: Backup")
         shutil.copyfile(self.__data_file_path, self.__data_file_path + ".old")
 
     def __convert_data(self):
@@ -475,7 +493,7 @@ class UserDataJSON:
                 "tasks": [asdict(t) for t in self.tasks],
             }
             w = ThreadSafeWriter(self.__data_file_path, "w")
-            w.write(json.dumps(data))
+            w.write(json.dumps(data, ensure_ascii=False))
             w.close()
             # with open(self.__data_file_path, "w") as f:
             #     data: dict[str, list[TaskListData | TaskData]] = {

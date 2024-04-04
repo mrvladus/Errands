@@ -5,6 +5,9 @@ from __future__ import annotations
 import os
 from typing import TYPE_CHECKING
 
+from errands.lib.sync.sync import Sync
+from errands.state import State
+
 
 if TYPE_CHECKING:
     from errands.widgets.window import Window
@@ -14,7 +17,7 @@ if TYPE_CHECKING:
 from gi.repository import Adw, Gtk, GLib  # type:ignore
 from errands.lib.animation import scroll
 from errands.lib.data import TaskData, UserData
-from errands.lib.utils import get_children, idle_add, timeit
+from errands.lib.utils import get_children
 from errands.lib.logging import Log
 from errands.widgets.task.task import Task
 from errands.lib.gsettings import GSettings
@@ -28,7 +31,6 @@ class TaskList(Adw.Bin):
     delete_completed_btn: Gtk.Button = Gtk.Template.Child()
     toggle_completed_btn: Gtk.ToggleButton = Gtk.Template.Child()
     scroll_up_btn: Gtk.Button = Gtk.Template.Child()
-    loading_status_page: Gtk.Box = Gtk.Template.Child()
     scrl: Gtk.ScrolledWindow = Gtk.Template.Child()
     uncompleted_tasks_list: Gtk.Box = Gtk.Template.Child()
     completed_tasks_list: Gtk.Box = Gtk.Template.Child()
@@ -42,6 +44,7 @@ class TaskList(Adw.Bin):
         self.list_uid: str = list_uid
         self.sidebar_row: TaskListSidebarRow = sidebar_row
         self.__load_tasks()
+        self.update_title()
         self.update_status()
 
     def __repr__(self) -> str:
@@ -49,7 +52,6 @@ class TaskList(Adw.Bin):
 
     # ------ PRIVATE METHODS ------ #
 
-    @idle_add
     def __load_tasks(self) -> None:
         Log.info(f"Task List {self.list_uid}: Load Tasks")
 
@@ -63,8 +65,6 @@ class TaskList(Adw.Bin):
             else:
                 self.uncompleted_tasks_list.append(new_task)
 
-        self.scrl.set_visible(True)
-        self.loading_status_page.set_visible(False)
         self.toggle_completed_btn.set_active(
             UserData.get_list_prop(self.list_uid, "show_completed")
         )
@@ -123,12 +123,22 @@ class TaskList(Adw.Bin):
 
         return new_task
 
+    def purge(self) -> None:
+        State.sidebar.list_box.select_row(self.sidebar_row.get_prev_sibling())
+        State.sidebar.list_box.remove(self.sidebar_row)
+        State.view_stack.remove(self)
+        self.sidebar_row.run_dispose()
+        self.run_dispose()
+
+    def update_title(self) -> None:
+        self.title.set_title(UserData.get_list_prop(self.list_uid, "name"))
+
     def update_status(self) -> None:
         n_total, n_completed = UserData.get_status(self.list_uid)
 
         # Update headerbar subtitle
         self.title.set_subtitle(
-            _("Completed:") + f" {n_completed} / {n_total}" if n_total > 0 else ""
+            _("Completed:") + f" {n_completed} / {n_total}" if n_total > 0 else ""  # noqa: F821
         )
 
         # Update sidebar item counter
@@ -140,11 +150,10 @@ class TaskList(Adw.Bin):
         # Update delete completed button
         self.delete_completed_btn.set_sensitive(n_completed > 0)
 
-        # Update list name
-        self.title.set_title(UserData.get_list_prop(self.list_uid, "name"))
-
     def update_ui(self, update_tasks_ui: bool = True) -> None:
         Log.debug(f"Task list {self.list_uid}: Update UI")
+
+        self.update_title()
 
         # Update toogle completed button completed tasks
         self.toggle_completed_btn.set_active(
@@ -261,5 +270,6 @@ class TaskList(Adw.Bin):
         entry.set_text("")
         if not GSettings.get("task-list-new-task-position-top"):
             scroll(self.scrl, True)
-        self.update_ui(False)
-        # Sync.sync(False)
+
+        self.update_status()
+        Sync.sync()

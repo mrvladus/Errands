@@ -35,7 +35,6 @@ class State:
 
     # Main window
     main_window: Window = None
-    toast_overlay: Adw.ToastOverlay = None
     split_view: Adw.NavigationSplitView = None
 
     # View Stack
@@ -49,6 +48,10 @@ class State:
     today_sidebar_row: TodaySidebarRow = None
     tags_sidebar_row: TagsSidebarRow = None
     trash_sidebar_row: TrashSidebarRow = None
+
+    @classmethod
+    def get_task_list(cls, uid: str) -> TaskList:
+        return [lst for lst in cls.get_task_lists() if lst.list_uid == uid][0]
 
     @classmethod
     def get_task_lists(cls) -> list[TaskList]:

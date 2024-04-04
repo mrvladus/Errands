@@ -5,6 +5,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from errands.lib.sync.sync import Sync
 from errands.state import State
 from errands.widgets.components.datetime_window import DateTimeWindow
 from errands.widgets.components.notes_window import NotesWindow
@@ -31,7 +32,7 @@ from errands.lib.logging import Log
 from errands.lib.markup import Markup
 
 # from errands.lib.sync.sync import Sync
-from errands.lib.utils import get_children, idle_add, timeit
+from errands.lib.utils import get_children
 
 
 @Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
@@ -503,7 +504,7 @@ class Task(Adw.Bin):
         self.update_ui(False)
 
         # Sync
-        # Sync.sync(False)
+        Sync.sync()
 
     @Gtk.Template.Callback()
     def _on_complete_btn_toggle(self, btn: Gtk.CheckButton) -> None:
@@ -539,7 +540,7 @@ class Task(Adw.Bin):
         else:
             self.parent.update_ui(False)
         self.task_list.update_status()
-        # Sync.sync(False)
+        Sync.sync(False)
 
     @Gtk.Template.Callback()
     def _on_toolbar_btn_toggle(self, btn: Gtk.ToggleButton) -> None:
@@ -554,7 +555,7 @@ class Task(Adw.Bin):
             return
         self.update_props(["text", "synced"], [text, False])
         self.update_ui()
-        # Sync.sync(False)
+        Sync.sync()
 
     @Gtk.Template.Callback()
     def _on_cancel_edit_btn_clicked(self, _btn: Gtk.Button) -> None:
@@ -634,7 +635,7 @@ class Task(Adw.Bin):
                 Log.debug(f"Task Toolbar: Set priority to '{new_priority}'")
                 self.update_props(["priority", "synced"], [new_priority, False])
                 self.update_ui()
-                # Sync.sync(False)
+                Sync.sync()
 
     @Gtk.Template.Callback()
     def _on_priority_selected(self, box: Gtk.ListBox, row: Gtk.ListBoxRow) -> None:
@@ -665,7 +666,7 @@ class Task(Adw.Bin):
                 ["color", "synced"], [color if color != "none" else "", False]
             )
             self.update_color()
-            # Sync.sync(False)
+            Sync.sync()
 
     # --- DND --- #
 
@@ -737,7 +738,7 @@ class Task(Adw.Bin):
 
         self.task_list.update_status()
         # Sync
-        # Sync.sync(False)
+        Sync.sync()
 
     @Gtk.Template.Callback()
     def _on_top_area_drop(self, _drop, task: Task, _x, _y) -> None:
@@ -798,4 +799,4 @@ class Task(Adw.Bin):
         self.task_list.update_ui()
 
         # Sync
-        # Sync.sync(False)
+        Sync.sync()

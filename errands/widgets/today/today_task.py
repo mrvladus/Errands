@@ -5,6 +5,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from errands.lib.sync.sync import Sync
 from errands.state import State
 
 
@@ -317,7 +318,7 @@ class TodayTask(Adw.Bin):
             return
         self.update_props(["text", "synced"], [text, False])
         self.update_ui()
-        # Sync.sync(False)
+        Sync.sync()
 
     @Gtk.Template.Callback()
     def _on_cancel_edit_btn_clicked(self, _btn: Gtk.Button) -> None:
@@ -397,7 +398,7 @@ class TodayTask(Adw.Bin):
                 Log.debug(f"Task Toolbar: Set priority to '{new_priority}'")
                 self.update_props(["priority", "synced"], [new_priority, False])
                 self.update_ui()
-                # Sync.sync(False)
+                Sync.sync()
 
     @Gtk.Template.Callback()
     def _on_priority_selected(self, box: Gtk.ListBox, row: Gtk.ListBoxRow) -> None:
@@ -428,4 +429,4 @@ class TodayTask(Adw.Bin):
                 ["color", "synced"], [color if color != "none" else "", False]
             )
             self.update_color()
-            # Sync.sync(False)
+            Sync.sync()

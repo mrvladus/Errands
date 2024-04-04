@@ -77,21 +77,9 @@
           <object class="GtkBox">
             <property name="orientation">vertical</property>
 
-            <!-- Loading Tasks Status Page -->
-            <child>
-              <object id="loading_status_page" class="AdwStatusPage">
-                <property name="title" translatable="yes">Loading Tasks...</property>
-                <property name="vexpand">true</property>
-                <style>
-                  <class name="compact" />
-                </style>
-              </object>
-            </child>
-
             <!-- Scrolled window-->
             <child>
               <object id="scrl" class="GtkScrolledWindow">
-                <property name="visible">false</property>
                 <property name="vadjustment">
                   <object class="GtkAdjustment">
                     <signal name="value-changed" handler="_on_scroll" />

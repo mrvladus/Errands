@@ -75,26 +75,21 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
 
             def _entry_changed(entry: Gtk.Entry, _, dialog: Adw.MessageDialog):
                 text = entry.props.text.strip(" \n\t")
-                names = [i["name"] for i in UserData.get_lists_as_dicts()]
+                names = [i.name for i in UserData.get_lists_as_dicts()]
                 dialog.set_response_enabled("save", text and text not in names)
 
             def _confirm(_, res, entry: Gtk.Entry):
                 if res == "cancel":
                     Log.debug("ListItem: Editing list name is cancelled")
                     return
-                Log.info(f"ListItem: Rename list {self.uid}")
+                Log.info(f"ListItem: Rename list '{self.uid}'")
 
                 text: str = entry.props.text.rstrip().lstrip()
-                UserData.run_sql(
-                    (
-                        "UPDATE lists SET name = ?, synced = 0 WHERE uid = ?",
-                        (text, self.uid),
-                    )
-                )
+                UserData.update_list_props(self.uid, ["name", "synced"], [text, False])
                 self.update_ui()
                 State.trash_sidebar_row.update_ui()
                 State.today_sidebar_row.update_ui()
-                # Sync.sync()
+                Sync.sync()
 
             entry: Gtk.Entry = Gtk.Entry(placeholder_text=_("New Name"))  # noqa: F821
             entry.get_buffer().props.text = self.label.get_label()
@@ -125,36 +120,36 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
 
                 Log.info(f"List: Export '{self.uid}'")
 
-                tasks: list[dict] = UserData.get_tasks_as_dicts(self.uid)
+                tasks: list[TaskData] = UserData.get_tasks_as_dicts(self.uid)
                 calendar: Calendar = Calendar()
                 calendar.add("x-wr-calname", self.label.get_label())
                 for task in tasks:
                     event = Todo()
-                    event.add("uid", task["uid"])
-                    event.add("related-to", task["parent"])
-                    event.add("summary", task["text"])
-                    if task["notes"]:
-                        event.add("description", task["notes"])
-                    event.add("priority", task["priority"])
-                    if task["tags"]:
-                        event.add("categories", task["tags"])
-                    event.add("percent-complete", task["percent_complete"])
+                    event.add("uid", task.uid)
+                    event.add("related-to", task.parent)
+                    event.add("summary", task.text)
+                    if task.notes:
+                        event.add("description", task.notes)
+                    event.add("priority", task.priority)
+                    if task.tags:
+                        event.add("categories", ",".join(task.tags))
+                    event.add("percent-complete", task.percent_complete)
                     if task["color"]:
-                        event.add("x-errands-color", task["color"])
+                        event.add("x-errands-color", task.color)
                     event.add(
                         "dtstart",
                         (
-                            datetime.fromisoformat(task["start_date"])
-                            if task["start_date"]
+                            datetime.fromisoformat(task.start_date)
+                            if task.start_date
                             else datetime.now()
                         ),
                     )
-                    if task["end_date"]:
+                    if task.due_date:
                         event.add(
                             "due",
                             (
-                                datetime.fromisoformat(task["end_date"])
-                                if task["end_date"]
+                                datetime.fromisoformat(task.due_date)
+                                if task.due_date
                                 else datetime.now()
                             ),
                         )
@@ -230,7 +225,7 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
         self.task_list.update_ui(False)
         if old_task_list != self.task_list:
             old_task_list.update_status()
-        # Sync.sync()
+        Sync.sync()
 
     @Gtk.Template.Callback()
     def _on_row_activated(self, *args) -> None:

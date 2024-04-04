@@ -78,5 +78,5 @@ class GSettings:
                 account = "Nextcloud" if account == 1 else "CalDAV"
                 self.set_secret(account, password)
                 self.gsettings.set_string("sync-password", "")  # Clean pass
-        except:
-            pass
+        except Exception as e:
+            Log.error(f"GSettings: {e}")

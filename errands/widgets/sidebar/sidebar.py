@@ -109,7 +109,7 @@ class Sidebar(Adw.Bin):
 
     # ------ PRIVATE METHODS ------ #
 
-    def __add_task_list(self, list_dict: TaskListData) -> TaskListSidebarRow:
+    def add_task_list(self, list_dict: TaskListData) -> TaskListSidebarRow:
         Log.debug(f"Sidebar: Add Task List '{list_dict.uid}'")
         row: TaskListSidebarRow = TaskListSidebarRow(list_dict)
         self.list_box.append(row)
@@ -166,7 +166,7 @@ class Sidebar(Adw.Bin):
         for list in (
             list for list in UserData.get_lists_as_dicts() if not list.deleted
         ):
-            self.__add_task_list(list)
+            self.add_task_list(list)
 
         self.__select_last_opened_item()
 
@@ -185,7 +185,7 @@ class Sidebar(Adw.Bin):
         lists_uids = [l.uid for l in self.task_lists_rows]
         for l in lists:
             if l.uid not in lists_uids:
-                self.__add_task_list(l)
+                self.add_task_list(l)
 
         # Update rows
         for row in self.rows:
@@ -215,9 +215,9 @@ class Sidebar(Adw.Bin):
 
             name = entry.props.text.rstrip().lstrip()
             list_dict = UserData.add_list(name)
-            row = self.__add_task_list(list_dict)
+            row = self.add_task_list(list_dict)
             row.activate()
-            # Sync.sync()
+            Sync.sync()
 
         entry = Gtk.Entry(placeholder_text=_("New List Name"))
         dialog = Adw.MessageDialog(
