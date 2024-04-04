@@ -1,3 +1,6 @@
+# Copyright 2023-2024 Vlad Krupinskii <mrvladus@yandex.ru>
+# SPDX-License-Identifier: MIT
+
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.sync.providers.caldav import SyncProviderCalDAV

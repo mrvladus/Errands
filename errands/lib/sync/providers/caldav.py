@@ -1,6 +1,8 @@
+# Copyright 2023-2024 Vlad Krupinskii <mrvladus@yandex.ru>
+# SPDX-License-Identifier: MIT
+
 import datetime
 from dataclasses import asdict, dataclass, field
-from typing import TYPE_CHECKING
 
 import urllib3
 from caldav import Calendar, DAVClient, Principal, Todo
@@ -11,9 +13,6 @@ from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.utils import idle_add
 from errands.state import State
-
-if TYPE_CHECKING:
-    pass
 
 
 @dataclass
@@ -114,6 +113,9 @@ class SyncProviderCalDAV:
                     color=str(todo.icalendar_component.get("x-errands-color", "")),
                     completed=str(todo.icalendar_component.get("status", ""))
                     == "COMPLETED",
+                    expanded=bool(
+                        todo.icalendar_component.get("x-errands-expanded", False)
+                    ),
                     notes=str(todo.icalendar_component.get("description", "")),
                     parent=str(todo.icalendar_component.get("related-to", "")),
                     percent_complete=int(
@@ -121,6 +123,9 @@ class SyncProviderCalDAV:
                     ),
                     priority=int(todo.icalendar_component.get("priority", 0)),
                     text=str(todo.icalendar_component.get("summary", "")),
+                    toolbar_shown=bool(
+                        todo.icalendar_component.get("x-errands-toolbar-shown", False)
+                    ),
                     uid=str(todo.icalendar_component.get("uid", "")),
                     list_uid=calendar.id,
                 )
@@ -134,13 +139,16 @@ class SyncProviderCalDAV:
                 else:
                     task.tags = []
 
-                # Set date
+                # Set dates
+
                 if todo.icalendar_component.get("due", "") != "":
                     task.due_date = (
                         todo.icalendar_component.get("due", "")
                         .to_ical()
                         .decode("utf-8")
                     )
+                    if task.due_date and "T" not in task.due_date:
+                        task.due_date += "T000000"
                 else:
                     task.due_date = ""
 
@@ -150,10 +158,31 @@ class SyncProviderCalDAV:
                         .to_ical()
                         .decode("utf-8")
                     )
+                    if task.start_date and "T" not in task.start_date:
+                        task.start_date += "T000000"
                 else:
                     task.start_date = ""
-                tasks.append(task)
 
+                if todo.icalendar_component.get("dtstamp", "") != "":
+                    task.created_at = (
+                        todo.icalendar_component.get("dtstamp", "")
+                        .to_ical()
+                        .decode("utf-8")
+                    )
+                else:
+                    task.created_at = ""
+
+                if todo.icalendar_component.get("last-modified", "") != "":
+                    task.changed_at = (
+                        todo.icalendar_component.get("last-modified", "")
+                        .to_ical()
+                        .decode("utf-8")
+                    )
+                else:
+                    task.changed_at = ""
+
+                tasks.append(task)
+                # print(task)
             return tasks
         except Exception as e:
             Log.error(f"Sync: Can't get tasks from remote. {e}")
@@ -359,14 +388,27 @@ class SyncProviderCalDAV:
                         todo = calendar.todo_by_uid(task.uid)
                         todo.uncomplete()
                         todo.icalendar_component["summary"] = task.text
+
                         if task.due_date:
                             todo.icalendar_component["due"] = task.due_date
                         else:
                             todo.icalendar_component.pop("DUE", None)
+
                         if task.start_date:
                             todo.icalendar_component["dtstart"] = task.start_date
                         else:
                             todo.icalendar_component.pop("DTSTART", None)
+
+                        if task.created_at:
+                            todo.icalendar_component["dtstamp"] = task.created_at
+                        else:
+                            todo.icalendar_component.pop("DTSTAMP", None)
+
+                        if task.changed_at:
+                            todo.icalendar_component["last-modified"] = task.changed_at
+                        else:
+                            todo.icalendar_component.pop("LAST-MODIFIED", None)
+
                         todo.icalendar_component["percent-complete"] = int(
                             task.percent_complete
                         )
@@ -377,6 +419,10 @@ class SyncProviderCalDAV:
                         )
                         todo.icalendar_component["related-to"] = task.parent
                         todo.icalendar_component["x-errands-color"] = task.color
+                        todo.icalendar_component["x-errands-expanded"] = task.expanded
+                        todo.icalendar_component["x-errands-toolbar-shown"] = (
+                            task.toolbar_shown
+                        )
                         todo.save()
                         if task.completed:
                             todo.complete()

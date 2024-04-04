@@ -59,10 +59,17 @@ class TaskData:
     def __post_init__(self):
         """Set default values that need to be calculated"""
 
+        now: str = datetime.datetime.now().strftime("%Y%m%dT%H%M%S")
         if not self.created_at:
-            now: str = datetime.datetime.now().strftime("%Y%m%dT%H%M%S")
             self.created_at = now
+        if not self.changed_at:
             self.changed_at = now
+
+        # # Convert dates
+        # if self.start_date and "T" not in self.start_date:
+        #     self.start_date += "T000000"
+        # if self.due_date and "T" not in self.due_date:
+        #     self.due_date += "T000000"
 
 
 class UserDataJSON:

@@ -27,8 +27,7 @@ def get_children(obj: Gtk.Widget) -> list[Gtk.Widget]:
 def threaded(function: Callable):
     """
     Decorator to run function in thread.
-    Use GLib.idle_add(func) as callback at the end of threaded function
-    if you need to change UI from thread.
+    Use GLib.idle_add(func) if you need to change UI from thread.
     It's needed to be called to make changes in UI thread safe.
     """
 
@@ -51,6 +50,7 @@ def idle_add(func: Callable):
 def catch_errors(function: Callable):
     """Catch errors and log them"""
 
+    @wraps(function)
     def wrapper(*args, **kwargs):
         try:
             function(*args, **kwargs)
