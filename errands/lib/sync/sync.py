@@ -1,43 +1,33 @@
 # Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-from __future__ import annotations
-from typing import TYPE_CHECKING
+from gi.repository import GLib  # type:ignore
 
-from errands.state import State
-
-if TYPE_CHECKING:
-    from errands.widgets.window import Window
-
-from errands.lib.sync.providers.caldav import SyncProviderCalDAV
-from errands.lib.sync.providers.nextcloud import SyncProviderNextcloud
+from errands.lib.data import UserData
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
-from errands.lib.data import UserData
+from errands.lib.sync.providers.caldav import SyncProviderCalDAV
+from errands.lib.sync.providers.nextcloud import SyncProviderNextcloud
 from errands.lib.utils import threaded
-from gi.repository import GLib  # type:ignore
+from errands.state import State
 
 
 class Sync:
     provider = None
-    window: Window = None
     syncing: bool = False
     sync_again: bool = False
 
     @classmethod
-    def init(self, window: Window, testing: bool = False) -> None:
-        self.window: Window = window
+    def init(self, testing: bool = False) -> None:
         Log.info("Sync: Initialize sync provider")
         match GSettings.get("sync-provider"):
             case 0:
                 Log.info("Sync: Sync disabled")
                 UserData.clean_deleted()
             case 1:
-                self.provider = SyncProviderNextcloud(
-                    window=self.window, testing=testing
-                )
+                self.provider = SyncProviderNextcloud(testing=testing)
             case 2:
-                self.provider = SyncProviderCalDAV(window=self.window, testing=testing)
+                self.provider = SyncProviderCalDAV(testing=testing)
 
     @classmethod
     @threaded
@@ -52,7 +42,7 @@ class Sync:
             return
         if not self.provider:
             GLib.idle_add(State.sidebar.sync_indicator.set_visible, True)
-            self.init(self.window)
+            self.init()
             GLib.idle_add(State.sidebar.sync_indicator.set_visible, False)
         if self.provider and self.provider.can_sync:
             if self.syncing:
@@ -72,5 +62,5 @@ class Sync:
 
     @classmethod
     def test_connection(self) -> bool:
-        self.init(testing=True, window=self.window)
+        self.init(testing=True)
         return self.provider.can_sync

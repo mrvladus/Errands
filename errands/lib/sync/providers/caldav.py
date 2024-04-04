@@ -1,11 +1,14 @@
 import datetime
+
 import urllib3
 from caldav import Calendar, DAVClient, Principal, Todo
+from caldav.elements import dav
+from gi.repository import GLib  # type:ignore
+
+from errands.lib.data import UserData
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
-from errands.lib.data import UserData
-from gi.repository import Adw, GLib  # type:ignore
-from caldav.elements import dav
+from errands.state import State
 
 
 class SyncProviderCalDAV:
@@ -13,13 +16,10 @@ class SyncProviderCalDAV:
     calendars: list[Calendar] = None
     window = None
 
-    def __init__(
-        self, window: Adw.ApplicationWindow, testing: bool, name: str = "CalDAV"
-    ) -> bool:
+    def __init__(self, testing: bool, name: str = "CalDAV") -> bool:
         Log.info(f"Sync: Initialize '{name}' sync provider")
 
         self.name: str = name
-        self.window: Adw.ApplicationWindow = window
         self.testing: bool = testing  # Only for connection test
 
         if not self._check_credentials():
@@ -38,8 +38,8 @@ class SyncProviderCalDAV:
         if self.url == "" or self.username == "" or self.password == "":
             Log.error(f"Sync: Not all {self.name} credentials provided")
             if not self.testing:
-                self.window.add_toast(
-                    _("Not all sync credentials provided. Please check settings.")
+                State.main_window.add_toast(
+                    _("Not all sync credentials provided. Please check settings.")  # noqa: F821
                 )
             return False
 
@@ -53,7 +53,7 @@ class SyncProviderCalDAV:
         Log.debug(f"Sync: URL is set to {self.url}")
 
     def _connect(self) -> bool:
-        Log.debug(f"Sync: Attempting connection")
+        Log.debug("Sync: Attempting connection")
 
         urllib3.disable_warnings()
 
@@ -77,8 +77,8 @@ class SyncProviderCalDAV:
                     f"Sync: Can't connect to {self.name} server at '{self.url}'. {e}"
                 )
                 if not self.testing:
-                    self.window.add_toast(
-                        _("Can't connect to CalDAV server at:")  # pyright:ignore
+                    State.main_window.add_toast(
+                        _("Can't connect to CalDAV server at:")  # pyright:ignore  # noqa: F821
                         + " "
                         + self.url
                     )
@@ -167,12 +167,12 @@ class SyncProviderCalDAV:
                 if "VTODO" in cal.get_supported_components()
             ]
             return True
-        except:
-            Log.error(f"Sync: Can't get caldendars from remote")
+        except Exception as e:
+            Log.error(f"Sync: Can't get caldendars from remote. {e}")
             return False
 
     def sync(self) -> None:
-        Log.info(f"Sync: Sync tasks with remote")
+        Log.info("Sync: Sync tasks with remote")
 
         if not self._update_calendars():
             return
