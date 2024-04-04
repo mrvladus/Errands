@@ -223,7 +223,7 @@ msgstr "Отмена"
 
 #: errands/widgets/sidebar.py:151
 msgid "Add"
-msgstr "Довавить"
+msgstr "Добавить"
 
 #: errands/widgets/sidebar.py:168
 msgid "Add new List"
