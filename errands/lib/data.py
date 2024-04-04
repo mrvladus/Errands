@@ -4,9 +4,11 @@
 import datetime
 import json
 import os
+from queue import Empty, Queue
 import shutil
 import sqlite3
 from dataclasses import asdict, dataclass, field
+from threading import Thread
 from typing import Any, Iterable
 from uuid import uuid4
 
@@ -467,15 +469,48 @@ class UserDataJSON:
     def __write_data(self) -> None:
         try:
             Log.debug("Data: Write data")
-            with open(self.__data_file_path, "w") as f:
-                data: dict[str, list[TaskListData | TaskData]] = {
-                    "lists": [asdict(lst) for lst in self.task_lists],
-                    "tags": [asdict(t) for t in self.tags],
-                    "tasks": [asdict(t) for t in self.tasks],
-                }
-                json.dump(data, f, ensure_ascii=False)
+            data: dict[str, list[TaskListData | TaskData]] = {
+                "lists": [asdict(lst) for lst in self.task_lists],
+                "tags": [asdict(t) for t in self.tags],
+                "tasks": [asdict(t) for t in self.tasks],
+            }
+            w = ThreadSafeWriter(self.__data_file_path, "w")
+            w.write(json.dumps(data))
+            w.close()
+            # with open(self.__data_file_path, "w") as f:
+            #     data: dict[str, list[TaskListData | TaskData]] = {
+            #         "lists": [asdict(lst) for lst in self.task_lists],
+            #         "tags": [asdict(t) for t in self.tags],
+            #         "tasks": [asdict(t) for t in self.tasks],
+            #     }
+            #     json.dump(data, f, ensure_ascii=False)
         except Exception as e:
             Log.error(f"Data: Can't write to disk. {e}.")
+
+
+class ThreadSafeWriter:
+    def __init__(self, path: str, mode: str) -> None:
+        self.filewriter = open(path, mode)
+        self.queue = Queue()
+        self.finished = False
+        Thread(name="ThreadSafeWriter", target=self.internal_writer).start()
+
+    def write(self, data):
+        self.queue.put(data)
+
+    def internal_writer(self):
+        while not self.finished:
+            try:
+                data = self.queue.get(True, 1)
+            except Empty:
+                continue
+            self.filewriter.write(data)
+            self.queue.task_done()
+
+    def close(self):
+        self.queue.join()
+        self.finished = True
+        self.filewriter.close()
 
 
 # Handle for UserData. For easily changing serialization methods.
