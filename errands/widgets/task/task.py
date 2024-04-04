@@ -299,13 +299,6 @@ class Task(Adw.Bin):
         GLib.timeout_add(200, __finish_remove)
 
     def toggle_visibility(self, on: bool) -> None:
-        if self.task_data.completed:
-            GLib.idle_add(
-                self.revealer.set_reveal_child,
-                self.task_list.toggle_completed_btn.get_active(),
-            )
-            return
-
         GLib.idle_add(self.revealer.set_reveal_child, on)
 
     def update_props(self, props: list[str], values: list[Any]) -> None:
@@ -541,7 +534,6 @@ class Task(Adw.Bin):
                     task.complete_btn.set_active(False)
                     task.just_added = False
 
-        self.toggle_visibility(not btn.get_active())
         if isinstance(self.parent, Task):
             self.parent.update_ui()
         else:

@@ -109,10 +109,16 @@ class TaskList(Adw.Bin):
 
         on_top: bool = GSettings.get("task-list-new-task-position-top")
         new_task = Task(task, self, self)
-        if on_top:
-            self.uncompleted_tasks_list.prepend(new_task)
+        if not task.completed:
+            if on_top:
+                self.uncompleted_tasks_list.prepend(new_task)
+            else:
+                self.uncompleted_tasks_list.append(new_task)
         else:
-            self.uncompleted_tasks_list.append(new_task)
+            if on_top:
+                self.completed_tasks_list.prepend(new_task)
+            else:
+                self.completed_tasks_list.append(new_task)
         new_task.update_ui()
 
         return new_task
@@ -137,10 +143,10 @@ class TaskList(Adw.Bin):
         # Update list name
         self.title.set_title(UserData.get_list_prop(self.list_uid, "name"))
 
-    def update_ui(self, update_tasks_ui: bool = True, sort: bool = True) -> None:
+    def update_ui(self, update_tasks_ui: bool = True) -> None:
         Log.debug(f"Task list {self.list_uid}: Update UI")
 
-        # Show completed tasks
+        # Update toogle completed button completed tasks
         self.toggle_completed_btn.set_active(
             UserData.get_list_prop(self.list_uid, "show_completed")
         )
@@ -208,9 +214,7 @@ class TaskList(Adw.Bin):
 
     @Gtk.Template.Callback()
     def _on_toggle_completed_btn_toggled(self, btn: Gtk.ToggleButton):
-        for task in self.all_tasks:
-            if task.task_data.completed:
-                task.toggle_visibility(btn.get_active())
+        self.completed_tasks_list.set_visible(btn.get_active())
         UserData.update_list_prop(self.list_uid, "show_completed", btn.get_active())
 
     @Gtk.Template.Callback()
@@ -257,5 +261,5 @@ class TaskList(Adw.Bin):
         entry.set_text("")
         if not GSettings.get("task-list-new-task-position-top"):
             scroll(self.scrl, True)
-        self.update_ui(False, False)
+        self.update_ui(False)
         # Sync.sync(False)
