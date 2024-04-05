@@ -11,6 +11,12 @@
     </section>
     <section>
       <item>
+        <attribute name="label" translatable="yes">Import Task List</attribute>
+        <attribute name="action">app.import</attribute>
+      </item>
+    </section>
+    <section>
+      <item>
         <attribute name="label" translatable="yes">Preferences</attribute>
         <attribute name="action">app.preferences</attribute>
       </item>

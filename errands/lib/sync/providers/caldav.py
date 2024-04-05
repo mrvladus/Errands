@@ -94,7 +94,7 @@ class SyncProviderCalDAV:
                 )
                 if not self.testing:
                     State.main_window.add_toast(
-                        _("Can't connect to CalDAV server at:")  # pyright:ignore  # noqa: F821
+                        _("Can't connect to CalDAV server at:")  # noqa: F821
                         + " "
                         + self.url
                     )

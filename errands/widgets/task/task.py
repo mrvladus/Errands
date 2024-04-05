@@ -318,7 +318,8 @@ class Task(Adw.Bin):
                 break
         UserData.update_props(self.list_uid, self.uid, props, values)
         # Update linked today task
-        State.today_page.update_ui()
+        if props == ["expanded"] or props == ["toolbar_shown"]:
+            State.today_page.update_ui()
 
     def update_task_data(self) -> None:
         self.task_data = UserData.get_task(self.list_uid, self.uid)

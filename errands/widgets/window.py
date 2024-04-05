@@ -4,13 +4,14 @@
 from __future__ import annotations
 
 import os
+from dataclasses import asdict
 from uuid import uuid4
 
 from gi.repository import Adw, Gio, Gtk  # type:ignore
 from icalendar import Calendar
 
 from __main__ import APP_ID, VERSION
-from errands.lib.data import UserData
+from errands.lib.data import TaskData, TaskListData, UserData
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
@@ -103,59 +104,94 @@ class Window(Adw.ApplicationWindow):
                     name = calendar.get(
                         "X-WR-CALNAME", file.get_basename().rstrip(".ics")
                     )
-                    if name in [
-                        i[0]
-                        for i in UserData.run_sql("SELECT name FROM lists", fetch=True)
-                    ]:
+                    if name in [lst.name for lst in UserData.get_lists_as_dicts()]:
                         name = f"{name}_{uuid4()}"
                     # Create list
-                    uid: str = UserData.add_list(name)
+                    new_list: TaskListData = UserData.add_list(name=name)
                     # Add tasks
                     for todo in calendar.walk("VTODO"):
-                        # Tags
-                        if (tags := todo.get("CATEGORIES", "")) != "":
-                            tags = ",".join(
-                                [
-                                    i.to_ical().decode("utf-8")
-                                    for i in (
-                                        tags if isinstance(tags, list) else tags.cats
-                                    )
-                                ]
-                            )
-                        # Start
-                        if (start := todo.get("DTSTART", "")) != "":
-                            start = (
-                                todo.get("DTSTART", "")
-                                .to_ical()
-                                .decode("utf-8")
-                                .strip("Z")
-                            )
-                        else:
-                            start = ""
-                        # End
-                        if (due := todo.get("DUE", todo.get("DTEND", ""))) != "":
-                            due = (
-                                todo.get("DUE", todo.get("DTEND", ""))
-                                .to_ical()
-                                .decode("utf-8")
-                                .strip("Z")
-                            )
-                        else:
-                            due = ""
-                        UserData.add_task(
-                            color=todo.get("X-ERRANDS-COLOR", ""),
-                            completed=str(todo.get("STATUS", "")) == "COMPLETED",
-                            due_date=due,
-                            list_uid=uid,
-                            notes=str(todo.get("DESCRIPTION", "")),
-                            parent=str(todo.get("RELATED-TO", "")),
-                            percent_complete=int(todo.get("PERCENT-COMPLETE", 0)),
-                            priority=int(todo.get("PRIORITY", 0)),
-                            start_date=start,
-                            tags=tags,
-                            text=str(todo.get("SUMMARY", "")),
-                            uid=todo.get("UID", None),
+                        task: TaskData = TaskData(
+                            color=str(
+                                todo.icalendar_component.get("x-errands-color", "")
+                            ),
+                            completed=str(todo.icalendar_component.get("status", ""))
+                            == "COMPLETED",
+                            expanded=bool(
+                                todo.icalendar_component.get(
+                                    "x-errands-expanded", False
+                                )
+                            ),
+                            notes=str(todo.icalendar_component.get("description", "")),
+                            parent=str(todo.icalendar_component.get("related-to", "")),
+                            percent_complete=int(
+                                todo.icalendar_component.get("percent-complete", 0)
+                            ),
+                            priority=int(todo.icalendar_component.get("priority", 0)),
+                            text=str(todo.icalendar_component.get("summary", "")),
+                            toolbar_shown=bool(
+                                todo.icalendar_component.get(
+                                    "x-errands-toolbar-shown", False
+                                )
+                            ),
+                            uid=str(todo.icalendar_component.get("uid", "")),
+                            list_uid=new_list.uid,
                         )
+
+                        # Set tags
+                        if (
+                            tags := todo.icalendar_component.get("categories", "")
+                        ) != "":
+                            task.tags = [
+                                i.to_ical().decode("utf-8")
+                                for i in (tags if isinstance(tags, list) else tags.cats)
+                            ]
+                        else:
+                            task.tags = []
+
+                        # Set dates
+
+                        if todo.icalendar_component.get("due", "") != "":
+                            task.due_date = (
+                                todo.icalendar_component.get("due", "")
+                                .to_ical()
+                                .decode("utf-8")
+                            )
+                            if task.due_date and "T" not in task.due_date:
+                                task.due_date += "T000000"
+                        else:
+                            task.due_date = ""
+
+                        if todo.icalendar_component.get("dtstart", "") != "":
+                            task.start_date = (
+                                todo.icalendar_component.get("dtstart", "")
+                                .to_ical()
+                                .decode("utf-8")
+                            )
+                            if task.start_date and "T" not in task.start_date:
+                                task.start_date += "T000000"
+                        else:
+                            task.start_date = ""
+
+                        if todo.icalendar_component.get("dtstamp", "") != "":
+                            task.created_at = (
+                                todo.icalendar_component.get("dtstamp", "")
+                                .to_ical()
+                                .decode("utf-8")
+                            )
+                        else:
+                            task.created_at = ""
+
+                        if todo.icalendar_component.get("last-modified", "") != "":
+                            task.changed_at = (
+                                todo.icalendar_component.get("last-modified", "")
+                                .to_ical()
+                                .decode("utf-8")
+                            )
+                        else:
+                            task.changed_at = ""
+
+                        UserData.add_task(**asdict(task))
+
                 State.sidebar.task_lists.update_ui()
                 self.add_toast(_("Imported"))  # noqa: F821
                 Sync.sync()

@@ -66,6 +66,7 @@ class Today(Adw.Bin):
         )
 
     def update_ui(self):
+        Log.debug("Today Page: Update UI")
         tasks = self.tasks_data
         tasks_uids: list[str] = [t.uid for t in tasks]
         widgets_uids: list[str] = [t.uid for t in self.tasks]
