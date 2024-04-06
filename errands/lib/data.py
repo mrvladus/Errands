@@ -65,12 +65,6 @@ class TaskData:
         if not self.changed_at:
             self.changed_at = now
 
-        # # Convert dates
-        # if self.start_date and "T" not in self.start_date:
-        #     self.start_date += "T000000"
-        # if self.due_date and "T" not in self.due_date:
-        #     self.due_date += "T000000"
-
 
 class UserDataJSON:
     def __init__(self) -> None:
@@ -303,6 +297,12 @@ class UserDataJSON:
     ) -> None:
         tasks: list[TaskData] = self.tasks
 
+        # task_to_move = self.get_task(list_uid, task_uid)
+        # task_to_move_after = self.get_task(list_uid, task_after_uid)
+        # tasks.insert(
+        #     tasks.index(task_to_move_after) + 1, tasks.pop(tasks.index(task_to_move))
+        # )
+
         # Get indexes
         for task in tasks:
             if task.list_uid == list_uid:
@@ -330,6 +330,7 @@ class UserDataJSON:
         self, list_uid: str, task_uid: str, task_before_uid: str
     ) -> None:
         tasks: list[TaskData] = self.tasks
+
         # Get indexes
         for task in tasks:
             if task.list_uid == list_uid:
@@ -338,47 +339,42 @@ class UserDataJSON:
                 elif task.uid == task_before_uid:
                     task_before_idx: int = tasks.index(task)
 
-        # Swap items
-        if task_idx < task_before_idx:
-            i = task_idx
-            while i < task_before_idx - 1:
-                tasks[i], tasks[i + 1] = tasks[i + 1], tasks[i]
-                i += 1
-        else:
-            i = task_idx
-            while task_before_idx > i:
-                tasks[i], tasks[i - 1] = tasks[i - 1], tasks[i]
-                i -= 1
+        tasks.insert(task_before_idx, tasks.pop(task_idx))
 
         # Save tasks
         self.tasks = tasks
 
     def move_task_to_list(
         self, task_uid: str, from_list_uid: str, to_list_uid: str, new_parent: str = ""
-    ) -> None:
-        tasks = self.tasks
+    ) -> TaskData:
+        tasks: list[TaskData] = self.tasks
+        to_delete_tasks: list[TaskData] = [
+            self.get_task(from_list_uid, task_uid)
+        ] + self.__get_sub_tasks_tree(from_list_uid, task_uid)
 
-        to_delete = []
+        # Move task
+        new_main_task: TaskData = TaskData(
+            **asdict(self.get_task(from_list_uid, task_uid))
+        )
+        new_main_task.parent = new_parent
+        new_main_task.list_uid = to_list_uid
+        new_main_task.synced = False
+        tasks.append(new_main_task)
 
-        def move_task(task: TaskData, parent: str = None):
-            to_delete.append(task)
-            new_task = TaskData(**asdict(task))
+        for task in self.__get_sub_tasks_tree(from_list_uid, task_uid):
+            new_task: TaskData = TaskData(**asdict(task))
             new_task.list_uid = to_list_uid
             new_task.synced = False
-            new_task.uid = str(uuid4())
-            if parent:
-                new_task.parent = parent
             tasks.append(new_task)
-            for sub in self.__get_sub_tasks(task.list_uid, task.uid):
-                move_task(sub, new_task.uid)
-
-        move_task(self.get_task(from_list_uid, task_uid))
 
         for task in tasks:
-            if task in to_delete:
+            if task in to_delete_tasks:
                 task.deleted = True
+                task.synced = False
 
         self.tasks = tasks
+
+        return new_main_task
 
     def update_props(
         self, list_uid: str, uid: str, props: Iterable[str], values: Iterable[Any]
@@ -400,13 +396,13 @@ class UserDataJSON:
 
     def __get_sub_tasks_tree(self, list_uid: str, task_uid: str) -> list[TaskData]:
         tree: list[TaskData] = []
-        tasks = [t for t in self.tasks if t.list_uid == list_uid]
 
-        def __add_sub_tasks(parent_uid: str):
-            for task in tasks:
-                if task.parent == parent_uid:
-                    tree.append(task)
-                    __add_sub_tasks(task)
+        def __add_sub_tasks(uid: str):
+            sub_tasks: list[TaskData] = self.__get_sub_tasks(list_uid, uid)
+            if sub_tasks:
+                tree.extend(sub_tasks)
+                for sub_task in sub_tasks:
+                    __add_sub_tasks(sub_task.uid)
 
         __add_sub_tasks(task_uid)
         return tree

@@ -225,14 +225,19 @@ class SyncProviderCalDAV:
 
         # Add tasks
         lists_to_add_uids: list[str] = [lst.uid for lst in args.lists_to_add]
+        parents_added_uids: list[str] = []
         for task in args.tasks_to_add:
             if task.list_uid not in lists_to_add_uids:
-                State.get_task_list(task.list_uid).add_task(task)
+                if task.parent not in parents_added_uids:
+                    State.get_task_list(task.list_uid).add_task(task)
+                    parents_added_uids.append(task.uid)
 
         # Update tasks
         for task in args.tasks_to_update:
-            State.get_task(task.list_uid, task.uid).update_ui(False)
-
+            try:
+                State.get_task(task.list_uid, task.uid).update_ui(False)
+            except Exception:
+                pass
         # Update tags
         if args.update_tags:
             State.tags_sidebar_row.update_ui()

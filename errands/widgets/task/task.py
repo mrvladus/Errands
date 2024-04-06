@@ -237,7 +237,7 @@ class Task(Adw.Bin):
         Log.info(f"Task List: Add task '{task.uid}'")
 
         on_top: bool = GSettings.get("task-list-new-task-position-top")
-        new_task = Task(task, self, self)
+        new_task = Task(task, self.task_list, self)
         if on_top:
             self.uncompleted_tasks_list.prepend(new_task)
         else:
@@ -541,7 +541,7 @@ class Task(Adw.Bin):
         else:
             self.parent.update_ui(False)
         self.task_list.update_status()
-        Sync.sync(False)
+        Sync.sync()
 
     @Gtk.Template.Callback()
     def _on_toolbar_btn_toggle(self, btn: Gtk.ToggleButton) -> None:
@@ -704,12 +704,13 @@ class Task(Adw.Bin):
         if task.parent == self:
             return
 
-        # Change parent
-        task.update_props(["parent", "synced"], [self.uid, False])
+        UserData.update_props(
+            self.list_uid, task.uid, ["parent", "synced"], [self.uid, False]
+        )
 
         # Change list
         if task.list_uid != self.list_uid:
-            UserData.move_task_to_list(task.uid, task.list_uid, self.list_uid)
+            UserData.move_task_to_list(task.uid, task.list_uid, self.list_uid, self.uid)
 
         # Add task
         data: TaskData = UserData.get_task(self.list_uid, task.uid)
@@ -718,6 +719,8 @@ class Task(Adw.Bin):
         # Remove task
         if task.task_list != self.task_list:
             task.task_list.update_status()
+        if task.parent != self.parent:
+            task.parent.update_ui(False)
         task.purge()
 
         # Toggle completion
@@ -738,6 +741,7 @@ class Task(Adw.Bin):
             self.expand(True)
 
         self.task_list.update_status()
+        self.update_ui(False)
         # Sync
         Sync.sync()
 
@@ -753,18 +757,15 @@ class Task(Adw.Bin):
                 task.list_uid,
                 self.list_uid,
                 self.parent.uid if isinstance(self.parent, Task) else "",
-                False,
             )
         UserData.move_task_before(self.list_uid, task.uid, self.uid)
 
-        # If task has the same parent
+        # If task has the same parent box
         if task.parent == self.parent:
-            # Insert into new position
-            self.parent.task_list_model.insert(
-                self.get_index(), Task(task.uid, self.task_list, self.parent)
-            )
-            # Remove from old position
-            self.parent.task_list_model.remove(task.get_index())
+            box: Gtk.Box = self.get_parent()
+            box.reorder_child_after(task, self)
+            box.reorder_child_after(self, task)
+
         # Change parent if different parents
         else:
             UserData.update_props(
@@ -775,21 +776,19 @@ class Task(Adw.Bin):
             )
 
             # Toggle completion for parents
-            if not task.get_prop("completed"):
-                for parent in self.parents_tree:
-                    if parent.get_prop("completed"):
-                        parent.update_props(["completed", "synced"], [False, False])
+            # if not task.get_prop("completed"):
+            #     for parent in self.parents_tree:
+            #         if parent.get_prop("completed"):
+            #             parent.update_props(["completed", "synced"], [False, False])
 
-            # Insert into new position
-            self.parent.task_list_model.insert(
-                self.parent.task_list_model.find(self)[1],
-                Task(task.uid, self.task_list, self.parent),
+            new_task: Task = Task(
+                UserData.get_task(self.list_uid, task.uid), self.task_list, self.parent
             )
-
-            # Remove from old position
-            task.parent.task_list_model.remove(
-                task.parent.task_list_model.find(task)[1]
-            )
+            box: Gtk.Box = self.get_parent()
+            box.append(new_task)
+            box.reorder_child_after(new_task, self)
+            box.reorder_child_after(self, new_task)
+            task.purge()
 
         # KDE dnd bug workaround for issue #111
         for task in self.task_list.all_tasks:
