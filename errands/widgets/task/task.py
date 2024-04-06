@@ -297,7 +297,7 @@ class Task(Adw.Bin):
 
         self.purging = True
         self.toggle_visibility(False)
-        GLib.timeout_add(200, __finish_remove)
+        GLib.timeout_add(300, __finish_remove)
 
     def toggle_visibility(self, on: bool) -> None:
         GLib.idle_add(self.revealer.set_reveal_child, on)
@@ -760,6 +760,12 @@ class Task(Adw.Bin):
             )
         UserData.move_task_before(self.list_uid, task.uid, self.uid)
 
+        # If task completed and self is not completed - uncomplete task
+        if task.complete_btn.get_active() and not self.complete_btn.get_active():
+            task.update_props(["completed"], [False])
+        elif not task.complete_btn.get_active() and self.complete_btn.get_active():
+            task.update_props(["completed"], [True])
+
         # If task has the same parent box
         if task.parent == self.parent:
             box: Gtk.Box = self.get_parent()
@@ -776,10 +782,10 @@ class Task(Adw.Bin):
             )
 
             # Toggle completion for parents
-            # if not task.get_prop("completed"):
-            #     for parent in self.parents_tree:
-            #         if parent.get_prop("completed"):
-            #             parent.update_props(["completed", "synced"], [False, False])
+            if not task.get_prop("completed"):
+                for parent in self.parents_tree:
+                    parent.complete_btn.set_active(False)
+            task.purge()
 
             new_task: Task = Task(
                 UserData.get_task(self.list_uid, task.uid), self.task_list, self.parent
@@ -788,7 +794,6 @@ class Task(Adw.Bin):
             box.append(new_task)
             box.reorder_child_after(new_task, self)
             box.reorder_child_after(self, new_task)
-            task.purge()
 
         # KDE dnd bug workaround for issue #111
         for task in self.task_list.all_tasks:
@@ -796,7 +801,7 @@ class Task(Adw.Bin):
             task.set_sensitive(True)
 
         # Update UI
-        self.task_list.update_ui()
+        self.task_list.update_status()
 
         # Sync
         Sync.sync()
