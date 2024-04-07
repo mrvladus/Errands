@@ -676,9 +676,6 @@ class Task(Adw.Bin):
         # Bug workaround when task is not sensitive after short dnd
         for task in self.task_list.all_tasks:
             task.set_sensitive(True)
-        # Disable dnd if task is completed
-        if self.task_data.completed:
-            return
         self.set_sensitive(False)
         value: GObject.Value = GObject.Value(Task)
         value.set_object(self)
