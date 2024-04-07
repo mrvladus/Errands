@@ -38,8 +38,8 @@
     </section>
   </menu>
 
-  <template class="Task" parent="GtkListBoxRow">
-    <property name="activatable">false</property>
+  <template class="Task" parent="AdwBin">
+    <property name="hexpand">false</property>
 
     <child>
       <object id="revealer" class="GtkRevealer">
