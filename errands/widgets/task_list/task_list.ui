@@ -97,19 +97,23 @@
                         <property name="orientation">vertical</property>
                         <property name="margin-bottom">32</property>
 
-                        <!-- Task List Uncompleted -->
+                        <!-- Task List -->
                         <child>
-                          <object id="uncompleted_tasks_list" class="GtkBox">
-                            <property name="orientation">vertical</property>
+                          <object id="task_list" class="GtkListBox">
+                            <property name="selection-mode">0</property>
+                            <style>
+                              <class name="transparent" />
+                              <class name="task-list" />
+                            </style>
                           </object>
                         </child>
 
                         <!-- Task List Completed-->
-                        <child>
+                        <!-- <child>
                           <object id="completed_tasks_list" class="GtkBox">
                             <property name="orientation">vertical</property>
                           </object>
-                        </child>
+                        </child> -->
 
                       </object>
                     </child>

@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from errands.widgets.task_list.task_list_sidebar_row import TaskListSidebarRow
 
 # from errands.lib.sync.sync import Sync
-from gi.repository import Adw, Gtk, GLib  # type:ignore
+from gi.repository import Adw, Gtk, GLib, Gio  # type:ignore
 from errands.lib.animation import scroll
 from errands.lib.data import TaskData, UserData
 from errands.lib.utils import get_children
@@ -32,8 +32,8 @@ class TaskList(Adw.Bin):
     toggle_completed_btn: Gtk.ToggleButton = Gtk.Template.Child()
     scroll_up_btn: Gtk.Button = Gtk.Template.Child()
     scrl: Gtk.ScrolledWindow = Gtk.Template.Child()
-    uncompleted_tasks_list: Gtk.Box = Gtk.Template.Child()
-    completed_tasks_list: Gtk.Box = Gtk.Template.Child()
+    task_list: Gtk.ListBox = Gtk.Template.Child()
+    # completed_tasks_list: Gtk.Box = Gtk.Template.Child()
 
     # State
     scrolling: bool = False
@@ -52,8 +52,17 @@ class TaskList(Adw.Bin):
 
     # ------ PRIVATE METHODS ------ #
 
+    def __filter_completed_func(self, task: Task) -> bool:
+        return not task.task_data.completed
+
     def __load_tasks(self) -> None:
         Log.info(f"Task List {self.list_uid}: Load Tasks")
+
+        self.task_list_model = Gio.ListStore(item_type=Task)
+        self.filtered_task_list_model = Gtk.FilterListModel(
+            filter=Gtk.CustomFilter.new(match_func=self.__filter_completed_func),
+            model=self.task_list_model,
+        )
 
         tasks: list[TaskData] = [
             t for t in UserData.get_tasks_as_dicts(self.list_uid, "") if not t.deleted
@@ -61,16 +70,26 @@ class TaskList(Adw.Bin):
         for task in tasks:
             new_task = Task(task, self, self)
             if task.completed:
-                self.completed_tasks_list.append(new_task)
+                self.task_list_model.insert(0, new_task)
             else:
-                self.uncompleted_tasks_list.append(new_task)
+                self.task_list_model.append(new_task)
 
-        self.toggle_completed_btn.set_active(
-            UserData.get_list_prop(self.list_uid, "show_completed")
+        self.sort_tasks()
+
+        show_completed: bool = UserData.get_list_prop(self.list_uid, "show_completed")
+        self.toggle_completed_btn.set_active(show_completed)
+        self.task_list.bind_model(
+            self.filtered_task_list_model
+            if not show_completed
+            else self.task_list_model,
+            lambda task: task,
         )
 
-    def __sort_tasks(self) -> None:
-        pass
+    def sort_tasks(self):
+        def __sort_completed(task1: Task, task2: Task) -> int:
+            return int(task1.task_data.completed) - int(task2.task_data.completed)
+
+        self.task_list_model.sort(__sort_completed)
 
     # ------ PROPERTIES ------ #
 
@@ -109,16 +128,10 @@ class TaskList(Adw.Bin):
 
         on_top: bool = GSettings.get("task-list-new-task-position-top")
         new_task = Task(task, self, self)
-        if not task.completed:
-            if on_top:
-                self.uncompleted_tasks_list.prepend(new_task)
-            else:
-                self.uncompleted_tasks_list.append(new_task)
+        if on_top:
+            self.task_list_model.insert(0, new_task)
         else:
-            if on_top:
-                self.completed_tasks_list.prepend(new_task)
-            else:
-                self.completed_tasks_list.append(new_task)
+            self.task_list_model.append(new_task)
         new_task.update_ui()
 
         return new_task
@@ -161,51 +174,51 @@ class TaskList(Adw.Bin):
         )
 
         # Update tasks
-        tasks: list[TaskData] = [
-            t for t in UserData.get_tasks_as_dicts(self.list_uid, "") if not t.deleted
-        ]
-        tasks_uids: list[str] = [t.uid for t in tasks]
-        widgets_uids: list[str] = [t.uid for t in self.tasks]
+        # tasks: list[TaskData] = [
+        #     t for t in UserData.get_tasks_as_dicts(self.list_uid, "") if not t.deleted
+        # ]
+        # tasks_uids: list[str] = [t.uid for t in tasks]
+        # widgets_uids: list[str] = [t.uid for t in self.tasks]
 
         # Add tasks
-        for task in tasks:
-            if task.uid not in widgets_uids:
-                self.add_task(task)
+        # for task in tasks:
+        #     if task.uid not in widgets_uids:
+        #         self.add_task(task)
 
-        for task in self.tasks:
-            # Remove task
-            if task.uid not in tasks_uids:
-                task.purge()
-            # Move task to completed tasks
-            elif task.get_prop("completed") and task in self.uncompleted_tasks:
-                if (
-                    len(self.uncompleted_tasks) > 1
-                    and task.uid != self.uncompleted_tasks[-1].uid
-                ):
-                    UserData.move_task_after(
-                        self.list_uid, task.uid, self.uncompleted_tasks[-1].uid
-                    )
-                self.uncompleted_tasks_list.remove(task)
-                self.completed_tasks_list.prepend(task)
-            # Move task to uncompleted tasks
-            elif not task.get_prop("completed") and task in self.completed_tasks:
-                if (
-                    len(self.uncompleted_tasks) > 0
-                    and task.uid != self.uncompleted_tasks[-1].uid
-                ):
-                    UserData.move_task_after(
-                        self.list_uid, task.uid, self.uncompleted_tasks[-1].uid
-                    )
-                self.completed_tasks_list.remove(task)
-                self.uncompleted_tasks_list.append(task)
+        # for task in self.tasks:
+        #     # Remove task
+        #     if task.uid not in tasks_uids:
+        #         task.purge()
+        #     # Move task to completed tasks
+        #     elif task.get_prop("completed") and task in self.uncompleted_tasks:
+        #         if (
+        #             len(self.uncompleted_tasks) > 1
+        #             and task.uid != self.uncompleted_tasks[-1].uid
+        #         ):
+        #             UserData.move_task_after(
+        #                 self.list_uid, task.uid, self.uncompleted_tasks[-1].uid
+        #             )
+        #         self.uncompleted_tasks_list.remove(task)
+        #         self.completed_tasks_list.prepend(task)
+        #     # Move task to uncompleted tasks
+        #     elif not task.get_prop("completed") and task in self.completed_tasks:
+        #         if (
+        #             len(self.uncompleted_tasks) > 0
+        #             and task.uid != self.uncompleted_tasks[-1].uid
+        #         ):
+        #             UserData.move_task_after(
+        #                 self.list_uid, task.uid, self.uncompleted_tasks[-1].uid
+        #             )
+        #         self.completed_tasks_list.remove(task)
+        #         self.uncompleted_tasks_list.append(task)
 
         # Update tasks
-        if update_tasks_ui:
-            for task in self.tasks:
-                task.update_ui()
+        # if update_tasks_ui:
+        #     for task in self.tasks:
+        #         task.update_ui()
 
         # Sort tasks
-        self.__sort_tasks()
+        self.sort_tasks()
 
         self.update_status()
 
@@ -223,8 +236,13 @@ class TaskList(Adw.Bin):
 
     @Gtk.Template.Callback()
     def _on_toggle_completed_btn_toggled(self, btn: Gtk.ToggleButton):
-        self.completed_tasks_list.set_visible(btn.get_active())
         UserData.update_list_prop(self.list_uid, "show_completed", btn.get_active())
+        self.task_list.bind_model(
+            self.filtered_task_list_model
+            if not btn.get_active()
+            else self.task_list_model,
+            lambda task: task,
+        )
 
     @Gtk.Template.Callback()
     def _on_dnd_scroll(self, _motion, _x, y: float) -> bool:

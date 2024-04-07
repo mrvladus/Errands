@@ -36,7 +36,7 @@ from errands.lib.utils import get_children
 
 
 @Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
-class Task(Adw.Bin):
+class Task(Gtk.ListBoxRow):
     __gtype_name__ = "Task"
 
     revealer: Gtk.Revealer = Gtk.Template.Child()
@@ -540,6 +540,7 @@ class Task(Adw.Bin):
             self.parent.update_ui()
         else:
             self.parent.update_ui(False)
+        self.parent.sort_tasks()
         self.task_list.update_status()
         Sync.sync()
 

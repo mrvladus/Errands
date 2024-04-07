@@ -11,6 +11,12 @@
   background-color: @orange_1;
 }
 
+/* Task List */
+.task-list>row {
+  padding: 0px;
+  border-radius: 10px;
+}
+
 /* Task */
 
 .task-title:drop(active) {
