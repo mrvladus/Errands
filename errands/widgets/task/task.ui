@@ -54,6 +54,7 @@
             <child>
               <object id="top_drop_area" class="GtkRevealer">
                 <property name="reveal-child" bind-source="drop_motion_ctrl" bind-property="contains-pointer" bind-flags="sync-create" />
+                <property name="visible" bind-source="complete_btn" bind-property="active" bind-flags="sync-create | invert-boolean" />
 
                 <child>
                   <object class="GtkImage">

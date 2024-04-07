@@ -97,7 +97,7 @@ class TaskList(Adw.Bin):
     def tasks(self) -> list[Task]:
         """Top-level Tasks"""
 
-        return self.uncompleted_tasks + self.completed_tasks
+        return get_children(self.task_list)
 
     @property
     def all_tasks(self) -> list[Task]:
@@ -112,14 +112,6 @@ class TaskList(Adw.Bin):
 
         __add_task(self.tasks)
         return all_tasks
-
-    @property
-    def uncompleted_tasks(self) -> list[Task]:
-        return get_children(self.uncompleted_tasks_list)
-
-    @property
-    def completed_tasks(self) -> list[Task]:
-        return get_children(self.completed_tasks_list)
 
     # ------ PUBLIC METHODS ------ #
 
