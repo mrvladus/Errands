@@ -1,6 +1,8 @@
 # Copyright 2023-2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
+from __future__ import annotations
+
 import datetime
 import json
 import os
@@ -16,6 +18,13 @@ from gi.repository import GLib  # type:ignore
 
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
+
+
+@dataclass
+class ErrandsData:
+    tags: list[TagsData]
+    lists: list[TaskListData]
+    tasks: list[TaskData]
 
 
 @dataclass
@@ -70,11 +79,25 @@ class UserDataJSON:
     def __init__(self) -> None:
         self.__data_dir: str = os.path.join(GLib.get_user_data_dir(), "errands")
         self.__data_file_path: str = os.path.join(self.__data_dir, "data.json")
+
+        self.__tags_data: list[TagsData] = []
         self.__task_lists_data: list[TaskListData] = []
         self.__tasks_data: list[TaskData] = []
-        self.__tags_data: list[TagsData] = []
 
     # ------ PROPERTIES ------ #
+
+    @property
+    def data(self) -> ErrandsData:
+        return ErrandsData(
+            tags=self.__tags_data, lists=self.__task_lists_data, tasks=self.__tasks_data
+        )
+
+    @data.setter
+    def data(self, new_data: ErrandsData):
+        self.__tags_data = new_data.tags
+        self.__task_lists_data = new_data.lists
+        self.__tasks_data = new_data.tasks
+        self.__write_data()
 
     @property
     def tags(self) -> list[TagsData]:
@@ -136,10 +159,10 @@ class UserDataJSON:
     def clean_deleted(self) -> None:
         Log.debug("Data: Clean deleted")
 
-        lists = [lst for lst in self.task_lists if not lst.deleted]
-        tasks = [t for t in self.tasks if not t.deleted]
-        self.task_lists = lists
-        self.tasks = tasks
+        data: ErrandsData = self.data
+        data.lists = [lst for lst in data.lists if not lst.deleted]
+        data.tasks = [t for t in data.tasks if not t.deleted]
+        self.data = data
 
     def delete_list(self, list_uid: str) -> None:
         lists: list[TaskListData] = self.task_lists
@@ -296,12 +319,6 @@ class UserDataJSON:
         self, list_uid: str, task_uid: str, task_after_uid: str
     ) -> None:
         tasks: list[TaskData] = self.tasks
-
-        # task_to_move = self.get_task(list_uid, task_uid)
-        # task_to_move_after = self.get_task(list_uid, task_after_uid)
-        # tasks.insert(
-        #     tasks.index(task_to_move_after) + 1, tasks.pop(tasks.index(task_to_move))
-        # )
 
         # Get indexes
         for task in tasks:
@@ -498,13 +515,6 @@ class UserDataJSON:
             w = ThreadSafeWriter(self.__data_file_path, "w")
             w.write(json.dumps(data, ensure_ascii=False))
             w.close()
-            # with open(self.__data_file_path, "w") as f:
-            #     data: dict[str, list[TaskListData | TaskData]] = {
-            #         "lists": [asdict(lst) for lst in self.task_lists],
-            #         "tags": [asdict(t) for t in self.tags],
-            #         "tasks": [asdict(t) for t in self.tasks],
-            #     }
-            #     json.dump(data, f, ensure_ascii=False)
         except Exception as e:
             Log.error(f"Data: Can't write to disk. {e}.")
 
