@@ -15,6 +15,7 @@ from errands.lib.data import TaskData, TaskListData, UserData
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
+from errands.lib.utils import timeit
 from errands.state import State
 from errands.widgets.preferences import PreferencesWindow
 

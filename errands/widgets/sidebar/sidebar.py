@@ -11,7 +11,7 @@ from errands.lib.data import TaskListData, UserData
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
-from errands.lib.utils import get_children
+from errands.lib.utils import get_children, timeit
 from errands.state import State
 from errands.widgets.components.titled_separator import TitledSeparator
 from errands.widgets.task_list import TaskList
@@ -160,6 +160,7 @@ class Sidebar(Adw.Bin):
 
     # ------ PUBLIC METHODS ------ #
 
+    @timeit
     def load_task_lists(self) -> None:
         Log.debug("Sidebar: Load Task Lists")
 
