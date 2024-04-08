@@ -14,8 +14,8 @@ from errands.lib.sync.sync import Sync
 from errands.lib.utils import get_children
 from errands.state import State
 from errands.widgets.components.titled_separator import TitledSeparator
-from errands.widgets.task_list.task_list import TaskList
-from errands.widgets.task_list.task_list_sidebar_row import TaskListSidebarRow
+from errands.widgets.task_list import TaskList
+from errands.widgets.task_list import TaskListSidebarRow
 
 # class SidebarPluginsList(Adw.Bin):
 #     def __init__(self, sidebar: Sidebar):
@@ -101,8 +101,8 @@ class Sidebar(Adw.Bin):
         self.list_box.set_header_func(
             lambda row, before: (
                 row.set_header(TitledSeparator(_("Task Lists"), (12, 12, 0, 2)))  # noqa: F821
-                if row.__gtype_name__ == "TaskListSidebarRow"
-                and before.__gtype_name__ != "TaskListSidebarRow"
+                if isinstance(row, TaskListSidebarRow)
+                and not isinstance(before, TaskListSidebarRow)
                 else ...
             )
         )

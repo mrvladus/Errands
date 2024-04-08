@@ -1,56 +1,45 @@
-# Copyright 2023-2024 Vlad Krupinskii <mrvladus@yandex.ru>
+# Copyright 2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
 from __future__ import annotations
-import os
+
 from typing import TYPE_CHECKING
 
-from errands.lib.sync.sync import Sync
-from errands.state import State
+from gi.repository import Adw  # type:ignore
 
+from errands.lib.data import TaskData, UserData
+from errands.lib.gsettings import GSettings
+from errands.lib.logging import Log
+from errands.lib.utils import get_children
+from errands.state import State
+from errands.widgets.task.task import Task
+from errands.widgets.task_list import TaskListContent, TaskListEntry, TaskListHeaderBar
 
 if TYPE_CHECKING:
-    from errands.widgets.window import Window
-    from errands.widgets.task_list.task_list_sidebar_row import TaskListSidebarRow
-
-# from errands.lib.sync.sync import Sync
-from gi.repository import Adw, Gtk, GLib  # type:ignore
-from errands.lib.animation import scroll
-from errands.lib.data import TaskData, UserData
-from errands.lib.utils import get_children
-from errands.lib.logging import Log
-from errands.widgets.task.task import Task
-from errands.lib.gsettings import GSettings
+    from errands.widgets.task_list import TaskListSidebarRow
 
 
-@Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
 class TaskList(Adw.Bin):
-    __gtype_name__ = "TaskList"
-
-    title: Adw.WindowTitle = Gtk.Template.Child()
-    delete_completed_btn: Gtk.Button = Gtk.Template.Child()
-    toggle_completed_btn: Gtk.ToggleButton = Gtk.Template.Child()
-    scroll_up_btn: Gtk.Button = Gtk.Template.Child()
-    scrl: Gtk.ScrolledWindow = Gtk.Template.Child()
-    uncompleted_tasks_list: Gtk.Box = Gtk.Template.Child()
-    completed_tasks_list: Gtk.Box = Gtk.Template.Child()
-
-    # State
-    scrolling: bool = False
-
-    def __init__(self, list_uid: str, sidebar_row: TaskListSidebarRow) -> None:
+    def __init__(self, sidebar_row: TaskListSidebarRow) -> None:
         super().__init__()
-        self.window: Window = Adw.Application.get_default().get_active_window()
-        self.list_uid: str = list_uid
+        self.list_uid: str = sidebar_row.uid
         self.sidebar_row: TaskListSidebarRow = sidebar_row
+        self.__build_ui()
         self.__load_tasks()
-        self.update_title()
-        self.update_status()
+
+    # ------ PRIVATE METHODS ------ #
 
     def __repr__(self) -> str:
         return f"<class 'TaskList' {self.list_uid}>"
 
-    # ------ PRIVATE METHODS ------ #
+    def __build_ui(self) -> None:
+        self.content = TaskListContent(self)
+        self.entry = TaskListEntry(self)
+        self.header_bar = TaskListHeaderBar(self)
+        toolbar_view: Adw.ToolbarView = Adw.ToolbarView(content=self.content)
+        toolbar_view.add_top_bar(self.header_bar)
+        toolbar_view.add_top_bar(self.entry)
+        self.set_child(toolbar_view)
 
     def __load_tasks(self) -> None:
         Log.info(f"Task List {self.list_uid}: Load Tasks")
@@ -61,16 +50,13 @@ class TaskList(Adw.Bin):
         for task in tasks:
             new_task = Task(task, self, self)
             if task.completed:
-                self.completed_tasks_list.append(new_task)
+                self.content.completed_task_list.append(new_task)
             else:
-                self.uncompleted_tasks_list.append(new_task)
+                self.content.uncompleted_task_list.append(new_task)
 
-        self.toggle_completed_btn.set_active(
+        self.header_bar.toggle_completed_btn.set_active(
             UserData.get_list_prop(self.list_uid, "show_completed")
         )
-
-    def __sort_tasks(self) -> None:
-        pass
 
     # ------ PROPERTIES ------ #
 
@@ -96,11 +82,11 @@ class TaskList(Adw.Bin):
 
     @property
     def uncompleted_tasks(self) -> list[Task]:
-        return get_children(self.uncompleted_tasks_list)
+        return get_children(self.content.uncompleted_task_list)
 
     @property
     def completed_tasks(self) -> list[Task]:
-        return get_children(self.completed_tasks_list)
+        return get_children(self.content.completed_task_list)
 
     # ------ PUBLIC METHODS ------ #
 
@@ -111,14 +97,14 @@ class TaskList(Adw.Bin):
         new_task = Task(task, self, self)
         if not task.completed:
             if on_top:
-                self.uncompleted_tasks_list.prepend(new_task)
+                self.content.uncompleted_task_list.prepend(new_task)
             else:
-                self.uncompleted_tasks_list.append(new_task)
+                self.content.uncompleted_task_list.append(new_task)
         else:
             if on_top:
-                self.completed_tasks_list.prepend(new_task)
+                self.content.completed_task_list.prepend(new_task)
             else:
-                self.completed_tasks_list.append(new_task)
+                self.content.completed_task_list.append(new_task)
         new_task.update_ui()
 
         return new_task
@@ -130,146 +116,6 @@ class TaskList(Adw.Bin):
         self.sidebar_row.run_dispose()
         self.run_dispose()
 
-    def update_title(self) -> None:
-        self.title.set_title(UserData.get_list_prop(self.list_uid, "name"))
-
-    def update_status(self) -> None:
-        n_total, n_completed = UserData.get_status(self.list_uid)
-
-        # Update headerbar subtitle
-        self.title.set_subtitle(
-            _("Completed:") + f" {n_completed} / {n_total}" if n_total > 0 else ""  # noqa: F821
-        )
-
-        # Update sidebar item counter
-        total = str(n_total) if n_total > 0 else ""
-        completed = str(n_completed) if n_total > 0 else ""
-        counter = completed + " / " + total if n_total > 0 else ""
-        self.sidebar_row.size_counter.set_label(counter)
-
-        # Update delete completed button
-        self.delete_completed_btn.set_sensitive(n_completed > 0)
-
-    def update_ui(self, update_tasks_ui: bool = True) -> None:
-        Log.debug(f"Task list {self.list_uid}: Update UI")
-
-        self.update_title()
-
-        # Update toogle completed button completed tasks
-        self.toggle_completed_btn.set_active(
-            UserData.get_list_prop(self.list_uid, "show_completed")
-        )
-
-        # Update tasks
-        tasks: list[TaskData] = [
-            t for t in UserData.get_tasks_as_dicts(self.list_uid, "") if not t.deleted
-        ]
-        tasks_uids: list[str] = [t.uid for t in tasks]
-        widgets_uids: list[str] = [t.uid for t in self.tasks]
-
-        # Add tasks
-        for task in tasks:
-            if task.uid not in widgets_uids:
-                self.add_task(task)
-
-        for task in self.tasks:
-            # Remove task
-            if task.uid not in tasks_uids:
-                task.purge()
-            # Move task to completed tasks
-            elif task.get_prop("completed") and task in self.uncompleted_tasks:
-                if (
-                    len(self.uncompleted_tasks) > 1
-                    and task.uid != self.uncompleted_tasks[-1].uid
-                ):
-                    UserData.move_task_after(
-                        self.list_uid, task.uid, self.uncompleted_tasks[-1].uid
-                    )
-                self.uncompleted_tasks_list.remove(task)
-                self.completed_tasks_list.prepend(task)
-            # Move task to uncompleted tasks
-            elif not task.get_prop("completed") and task in self.completed_tasks:
-                if (
-                    len(self.uncompleted_tasks) > 0
-                    and task.uid != self.uncompleted_tasks[-1].uid
-                ):
-                    UserData.move_task_after(
-                        self.list_uid, task.uid, self.uncompleted_tasks[-1].uid
-                    )
-                self.completed_tasks_list.remove(task)
-                self.uncompleted_tasks_list.append(task)
-
-        # Update tasks
-        if update_tasks_ui:
-            for task in self.tasks:
-                task.update_ui()
-
-        # Sort tasks
-        self.__sort_tasks()
-
-        self.update_status()
-
-    # ------ TEMPLATE HANDLERS ------ #
-
-    @Gtk.Template.Callback()
-    def _on_delete_completed_btn_clicked(self, _) -> None:
-        """Hide completed tasks and move them to trash"""
-
-        Log.info("Delete completed tasks")
-        for task in self.all_tasks:
-            if not task.get_prop("trash") and task.get_prop("completed"):
-                task.delete()
-        self.update_status()
-
-    @Gtk.Template.Callback()
-    def _on_toggle_completed_btn_toggled(self, btn: Gtk.ToggleButton):
-        self.completed_tasks_list.set_visible(btn.get_active())
-        UserData.update_list_prop(self.list_uid, "show_completed", btn.get_active())
-
-    @Gtk.Template.Callback()
-    def _on_dnd_scroll(self, _motion, _x, y: float) -> bool:
-        """Autoscroll while dragging task"""
-        return
-
-        def __auto_scroll(scroll_up: bool) -> bool:
-            """Scroll while drag is near the edge"""
-            if not self.scrolling or not self.dnd_ctrl.contains_pointer():
-                return False
-            self.adj.set_value(self.adj.get_value() - (2 if scroll_up else -2))
-            return True
-
-        MARGIN: int = 50
-        if y < MARGIN:
-            self.scrolling = True
-            GLib.timeout_add(100, __auto_scroll, True)
-        elif y > self.get_allocation().height - MARGIN:
-            self.scrolling = True
-            GLib.timeout_add(100, __auto_scroll, False)
-        else:
-            self.scrolling = False
-
-    @Gtk.Template.Callback()
-    def _on_scroll_up_btn_clicked(self, _) -> None:
-        scroll(self.scrl, False)
-
-    @Gtk.Template.Callback()
-    def _on_scroll(self, adj) -> None:
-        self.scroll_up_btn.set_visible(adj.get_value() > 0)
-
-    @Gtk.Template.Callback()
-    def _on_task_added(self, entry: Adw.EntryRow) -> None:
-        text: str = entry.get_text()
-        if text.strip(" \n\t") == "":
-            return
-        self.add_task(
-            UserData.add_task(
-                list_uid=self.list_uid,
-                text=text,
-            )
-        )
-        entry.set_text("")
-        if not GSettings.get("task-list-new-task-position-top"):
-            scroll(self.scrl, True)
-
-        self.update_status()
-        Sync.sync()
+    def update_ui(self, update_tasks: bool = True) -> None:
+        self.header_bar.update_ui()
+        self.content.update_ui(update_tasks)

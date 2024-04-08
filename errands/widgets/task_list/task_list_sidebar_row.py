@@ -1,13 +1,10 @@
 # Copyright 2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-from __future__ import annotations
-
-import os
 import time
 from datetime import datetime
 
-from gi.repository import Adw, Gio, GLib, Gtk  # type:ignore
+from gi.repository import Adw, Gdk, Gio, GLib, Gtk  # type:ignore
 from icalendar import Calendar, Todo
 
 from errands.lib.data import TaskData, TaskListData, UserData
@@ -16,24 +13,19 @@ from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
 from errands.state import State
 from errands.widgets.component import ConfirmDialog
+from errands.widgets.task_list import TaskList
 from errands.widgets.task.task import Task
-from errands.widgets.task_list.task_list import TaskList
 
 
-@Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
 class TaskListSidebarRow(Gtk.ListBoxRow):
-    __gtype_name__ = "TaskListSidebarRow"
-
-    size_counter: Gtk.Label = Gtk.Template.Child()
-    label: Gtk.Label = Gtk.Template.Child()
-
     def __init__(self, list_dict: TaskListData) -> None:
         super().__init__()
         self.uid: str = list_dict.uid
         self.name: str = list_dict.name
         self.__add_actions()
+        self.__build_ui()
         # Add Task List page
-        self.task_list: TaskList = TaskList(self.uid, self)
+        self.task_list: TaskList = TaskList(self)
         self.stack_page: Adw.ViewStackPage = State.view_stack.add_titled(
             child=self.task_list, name=self.name, title=self.name
         )
@@ -41,7 +33,7 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
 
     def __add_actions(self) -> None:
         group: Gio.SimpleActionGroup = Gio.SimpleActionGroup()
-        self.insert_action_group(name="list_item", group=group)
+        self.insert_action_group(name="list_row", group=group)
 
         def _create_action(name: str, callback: callable) -> None:
             action: Gio.SimpleAction = Gio.SimpleAction.new(name, None)
@@ -56,8 +48,8 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
 
                 Log.info(f"Lists: Delete list '{self.uid}'")
                 UserData.delete_list(self.uid)
-                # self.sidebar.list_box.remove(self)
-                # self.window.stack.remove(self.task_list)
+                State.sidebar.list_box.remove(self)
+                State.view_stack.remove(self.task_list)
                 Sync.sync()
 
             ConfirmDialog(
@@ -175,6 +167,45 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
         _create_action("rename", _rename)
         _create_action("export", _export)
 
+    def __build_ui(self) -> None:
+        self.props.height_request = 50
+        self.add_css_class("sidebar-item")
+        self.connect("activate", self._on_row_activated)
+
+        # Drop controller
+        drop_ctrl: Gtk.DropTarget = Gtk.DropTarget.new(
+            type=Task, actions=Gdk.DragAction.MOVE
+        )
+        drop_ctrl.connect("drop", self._on_task_drop)
+        self.add_controller(drop_ctrl)
+
+        # Drag Hover controller
+        drag_hover_ctrl: Gtk.DropControllerMotion = Gtk.DropControllerMotion()
+        drag_hover_ctrl.connect("enter", self._on_drop_hover)
+        self.add_controller(drag_hover_ctrl)
+
+        # Title
+        self.label: Gtk.Label = Gtk.Label(hexpand=True, halign=Gtk.Align.START)
+
+        # Counter
+        self.size_counter = Gtk.Label(css_classes=["dim-label", "caption"])
+
+        # Menu
+        menu: Gio.Menu = Gio.Menu()
+        menu.append(label=_("Rename"), detailed_action="list_row.rename")  # noqa: F821
+        menu.append(label=_("Delete"), detailed_action="list_row.delete")  # noqa: F821
+        menu.append(label=_("Export"), detailed_action="list_row.export")  # noqa: F821
+        menu_btn: Gtk.MenuButton = Gtk.MenuButton(
+            menu_model=menu, icon_name="errands-more-symbolic", css_classes=["flat"]
+        )
+
+        box: Gtk.Box = Gtk.Box(spacing=12, margin_start=6)
+        box.append(self.label)
+        box.append(self.size_counter)
+        box.append(menu_btn)
+
+        self.set_child(box)
+
     def update_ui(self, update_task_list_ui: bool = True):
         Log.debug(f"Task List Row: Update UI '{self.uid}'")
 
@@ -188,7 +219,6 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
         if update_task_list_ui:
             self.task_list.update_ui()
 
-    @Gtk.Template.Callback()
     def _on_drop_hover(self, ctrl: Gtk.DropControllerMotion, _x, _y):
         """
         Switch list on dnd hover after DELAY_SECONDS
@@ -209,7 +239,6 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
 
         GLib.timeout_add(100, _switch_delay)
 
-    @Gtk.Template.Callback()
     def _on_task_drop(self, _drop, task: Task, _x, _y):
         """
         Move task and sub-tasks to new list
@@ -229,7 +258,6 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
             old_task_list.update_status()
         Sync.sync()
 
-    @Gtk.Template.Callback()
     def _on_row_activated(self, *args) -> None:
         Log.debug(f"Sidebar: Switch to list '{self.uid}'")
 
