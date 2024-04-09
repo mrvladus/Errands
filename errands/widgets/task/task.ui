@@ -40,22 +40,6 @@
 
   <template class="Task" parent="AdwBin">
 
-    <!-- Progress bar -->
-    <child>
-      <object id="progress_bar_rev" class="GtkRevealer">
-        <child>
-          <object id="progress_bar" class="GtkProgressBar">
-            <property name="margin-start">12</property>
-            <property name="margin-end">12</property>
-            <property name="margin-bottom">2</property>
-            <style>
-              <class name="osd" />
-              <class name="dim-label" />
-            </style>
-          </object>
-        </child>
-      </object>
-    </child>
 
     <!-- Tool bar -->
     <child>
@@ -445,35 +429,10 @@
               <class name="sub-tasks" />
             </style>
 
-            <child>
-              <object class="GtkEntry">
-                <property name="margin-start">12</property>
-                <property name="margin-end">12</property>
-                <property name="margin-bottom">4</property>
-                <property name="margin-top">3</property>
-                <property name="placeholder-text" translatable="yes">Add new Sub-Task</property>
-                <signal name="activate" handler="_on_sub_task_added" />
-              </object>
-            </child>
-
             <!-- Sub-Tasks list -->
             <child>
               <object class="GtkBox">
                 <property name="orientation">vertical</property>
-
-                <!-- Task List Uncompleted -->
-                <child>
-                  <object id="uncompleted_tasks_list" class="GtkBox">
-                    <property name="orientation">vertical</property>
-                  </object>
-                </child>
-
-                <!-- Task List Completed-->
-                <child>
-                  <object id="completed_tasks_list" class="GtkBox">
-                    <property name="orientation">vertical</property>
-                  </object>
-                </child>
 
               </object>
             </child>

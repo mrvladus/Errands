@@ -341,35 +341,6 @@ class Task(Adw.Bin):
     # ------ TEMPLATE HANDLERS ------ #
 
     @Gtk.Template.Callback()
-    def _on_sub_task_added(self, entry: Gtk.Entry) -> None:
-        text: str = entry.get_text()
-
-        # Return if entry is empty
-        if text.strip(" \n\t") == "":
-            return
-
-        # Add sub-task
-        self.add_task(
-            UserData.add_task(
-                list_uid=self.list_uid,
-                text=text,
-                parent=self.uid,
-            )
-        )
-
-        # Clear entry
-        entry.set_text("")
-
-        # Update status
-        if self.get_prop("completed"):
-            self.update_props(["completed", "synced"], [False, False])
-
-        self.update_ui(False)
-
-        # Sync
-        Sync.sync()
-
-    @Gtk.Template.Callback()
     def _on_entry_row_applied(self, entry: Adw.EntryRow) -> None:
         text: str = entry.props.text.strip()
         entry.set_visible(False)

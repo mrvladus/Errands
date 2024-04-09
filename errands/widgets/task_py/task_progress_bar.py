@@ -23,7 +23,12 @@ class TaskProgressBar(Gtk.Revealer):
     # ------ PRIVATE METHODS ------ #
 
     def __build_ui(self):
-        self.progress_bar: Gtk.ProgressBar = Gtk.ProgressBar()
+        self.progress_bar: Gtk.ProgressBar = Gtk.ProgressBar(
+            margin_start=12,
+            margin_end=12,
+            margin_bottom=2,
+            css_classes=["osd", "dim-label"],
+        )
         self.set_child(self.progress_bar)
 
     # ------ PUBLIC METHODS ------ #

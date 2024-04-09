@@ -160,7 +160,6 @@ class Sidebar(Adw.Bin):
 
     # ------ PUBLIC METHODS ------ #
 
-    @timeit
     def load_task_lists(self) -> None:
         Log.debug("Sidebar: Load Task Lists")
 

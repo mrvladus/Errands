@@ -11,8 +11,10 @@ from gi.repository import Adw, GObject, Gtk, GLib  # type:ignore
 from errands.lib.data import TaskData, UserData
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
+from errands.lib.utils import get_children
 from errands.state import State
 from errands.widgets.task_py.task_progress_bar import TaskProgressBar
+from errands.widgets.task_py.task_sub_tasks import TaskSubTasks
 from errands.widgets.task_py.task_tags_bar import TaskTagsBar
 from errands.widgets.task_py.task_title import TaskTitle
 from errands.widgets.task_py.task_top_drop_area import TaskTopDropArea
@@ -56,6 +58,9 @@ class Task(Adw.Bin):
         # Progress bar
         self.progress_bar = TaskProgressBar(self)
 
+        # Sub-Tasks
+        self.sub_tasks = TaskSubTasks(self)
+
         # Main box
         self.main_box: Gtk.Box = Gtk.Box(
             orientation=Gtk.Orientation.VERTICAL,
@@ -66,6 +71,7 @@ class Task(Adw.Bin):
         self.main_box.append(self.title)
         self.main_box.append(self.tags_bar)
         self.main_box.append(self.progress_bar)
+        self.main_box.append(self.sub_tasks)
 
         # Box
         box: Gtk.Box = Gtk.Box(
@@ -78,6 +84,43 @@ class Task(Adw.Bin):
         self.revealer = Gtk.Revealer(child=box)
         self.set_child(self.revealer)
 
+    # ------ PROPERTIES ------ #
+
+    @property
+    def parents_tree(self) -> list[Task]:
+        """Get parent tasks chain"""
+
+        parents: list[Task] = []
+
+        def _add(task: Task):
+            if isinstance(task.parent, Task):
+                parents.append(task.parent)
+                _add(task.parent)
+
+        _add(self)
+
+        return parents
+
+    @property
+    def tasks(self) -> list[Task]:
+        """Top-level Tasks"""
+
+        return self.sub_tasks.tasks
+
+    @property
+    def all_tasks(self) -> list[Task]:
+        """All tasks in the list"""
+
+        all_tasks: list[Task] = []
+
+        def __add_task(tasks: list[Task]) -> None:
+            for task in tasks:
+                all_tasks.append(task)
+                __add_task(task.tasks)
+
+        __add_task(self.tasks)
+        return all_tasks
+
     # ------ PUBLIC METHODS ------ #
 
     def add_task(self, task: TaskData) -> Task:
@@ -86,15 +129,15 @@ class Task(Adw.Bin):
         on_top: bool = GSettings.get("task-list-new-task-position-top")
         new_task = Task(task, self.task_list, self)
         if on_top:
-            self.uncompleted_tasks_list.prepend(new_task)
+            self.sub_tasks.uncompleted_task_list.prepend(new_task)
         else:
-            self.uncompleted_tasks_list.append(new_task)
+            self.sub_tasks.uncompleted_task_list.append(new_task)
 
     def add_rm_crossline(self, add: bool) -> None:
         if add:
-            self.title_row.add_css_class("task-completed")
+            self.title.title_row.add_css_class("task-completed")
         else:
-            self.title_row.remove_css_class("task-completed")
+            self.title.title_row.remove_css_class("task-completed")
 
     def get_prop(self, prop: str) -> Any:
         return UserData.get_prop(self.list_uid, self.uid, prop)
@@ -110,7 +153,7 @@ class Task(Adw.Bin):
 
         self.toggle_visibility(False)
         self.just_added = True
-        self.complete_btn.set_active(True)
+        self.title.complete_btn.set_active(True)
         self.just_added = False
         self.update_props(["trash", "completed", "synced"], [True, True, False])
         for task in self.all_tasks:
@@ -124,13 +167,13 @@ class Task(Adw.Bin):
         self.task_list.update_status()
 
     def expand(self, expanded: bool) -> None:
-        if expanded != self.get_prop("expanded"):
+        if expanded != self.task_data.expanded:
             self.update_props(["expanded"], [expanded])
-        self.sub_tasks_revealer.set_reveal_child(expanded)
+        self.sub_tasks.set_reveal_child(expanded)
         if expanded:
-            self.expand_indicator.remove_css_class("expand-indicator-expanded")
+            self.title.expand_indicator.remove_css_class("expand-indicator-expanded")
         else:
-            self.expand_indicator.add_css_class("expand-indicator-expanded")
+            self.title.expand_indicator.add_css_class("expand-indicator-expanded")
 
     def purge(self) -> None:
         """Completely remove widget"""
@@ -170,3 +213,6 @@ class Task(Adw.Bin):
 
     def update_ui(self) -> None:
         self.title.update_ui()
+        self.tags_bar.update_ui()
+        self.progress_bar.update_ui()
+        self.sub_tasks.update_ui()
