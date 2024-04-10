@@ -7,9 +7,10 @@ from typing import TYPE_CHECKING, Any
 
 from errands.lib.sync.sync import Sync
 from errands.state import State
-from errands.widgets.components.datetime_window import DateTimeWindow
-from errands.widgets.components.notes_window import NotesWindow
-from errands.widgets.task.tag import Tag
+from errands.widgets.shared.datetime_window import DateTimeWindow
+from errands.widgets.shared.notes_window import NotesWindow
+
+# from errands.widgets.task.tag import Tag
 from errands.widgets.task.tags_list_item import TagsListItem
 
 if TYPE_CHECKING:
@@ -295,22 +296,6 @@ class Task(Adw.Bin):
             task.update_ui()
 
     def update_toolbar(self) -> None:
-        # Show toolbar
-        self.toolbar.set_reveal_child(self.task_data.toolbar_shown)
-
-        # Update Date and Time
-        if self.datetime_window:
-            self.datetime_window.due_date_time.datetime = self.task_data.due_date
-            self.date_time_btn.get_child().props.label = (
-                f"{self.datetime_window.due_date_time.human_datetime}"
-            )
-
-        # Update notes button css
-        if self.task_data.notes:
-            self.notes_btn.add_css_class("accent")
-        else:
-            self.notes_btn.remove_css_class("accent")
-
         # Update priority button css
         priority: int = self.task_data.priority
         self.priority_btn.props.css_classes = ["flat"]
@@ -412,10 +397,6 @@ class Task(Adw.Bin):
             t.block_signals = False
 
         self.tags_list.set_visible(len(get_children(self.tags_list)) > 0)
-
-    @Gtk.Template.Callback()
-    def _on_notes_btn_clicked(self, btn: Gtk.Button) -> None:
-        self.notes_window.show()
 
     @Gtk.Template.Callback()
     def _on_priority_toggled(self, btn: Gtk.MenuButton, *_) -> None:

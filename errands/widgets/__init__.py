@@ -7,7 +7,7 @@
 
 from gi.repository import GObject, GtkSource  # type:ignore
 
-from errands.widgets.components.datetime_picker import DateTimePicker
+from errands.widgets.shared.datetime_picker import DateTimePicker
 from errands.widgets.sidebar.sidebar import Sidebar
 from errands.widgets.tags.tags import Tags
 from errands.widgets.tags.tags_sidebar_row import TagsSidebarRow

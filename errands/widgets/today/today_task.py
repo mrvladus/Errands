@@ -30,9 +30,9 @@ from errands.lib.markup import Markup
 
 # from errands.lib.sync.sync import Sync
 from errands.lib.utils import get_children
-from errands.widgets.components.datetime_window import DateTimeWindow
-from errands.widgets.components.notes_window import NotesWindow
-from errands.widgets.task.tag import Tag
+from errands.widgets.shared.datetime_window import DateTimeWindow
+from errands.widgets.shared.notes_window import NotesWindow
+from errands.widgets.task_py.task_tags_bar import TaskTagsBarTag
 from errands.widgets.task.tags_list_item import TagsListItem
 
 

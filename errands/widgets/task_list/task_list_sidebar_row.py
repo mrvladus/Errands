@@ -196,7 +196,10 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
         menu.append(label=_("Delete"), detailed_action="list_row.delete")  # noqa: F821
         menu.append(label=_("Export"), detailed_action="list_row.export")  # noqa: F821
         menu_btn: Gtk.MenuButton = Gtk.MenuButton(
-            menu_model=menu, icon_name="errands-more-symbolic", css_classes=["flat"]
+            menu_model=menu,
+            icon_name="errands-more-symbolic",
+            css_classes=["flat"],
+            valign=Gtk.Align.CENTER,
         )
 
         box: Gtk.Box = Gtk.Box(spacing=12, margin_start=6)

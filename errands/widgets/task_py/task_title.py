@@ -152,6 +152,9 @@ class TaskTitle(Gtk.ListBox):
             _("Completed:") + f" {completed} / {total}" if total > 0 else ""  # noqa: F821
         )
 
+        # Update toolbar button
+        self.toolbar_toggle_btn.set_active(self.task.task_data.toolbar_shown)
+
     # ------ SIGNAL HANDLERS ------ #
 
     def _on_complete_btn_toggled(self, btn: Gtk.CheckButton) -> None:
@@ -204,7 +207,7 @@ class TaskTitle(Gtk.ListBox):
 
     def _on_toolbar_toggle_btn_toggled(self, btn: Gtk.ToggleButton) -> None:
         if btn.get_active() != self.task.task_data.toolbar_shown:
-            self.update_props(["toolbar_shown"], [btn.get_active()])
+            self.task.update_props(["toolbar_shown"], [btn.get_active()])
 
     def _on_title_row_clicked(self, *args) -> None:
         self.task.expand(not self.task.sub_tasks.get_child_revealed())

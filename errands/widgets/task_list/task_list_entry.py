@@ -57,5 +57,5 @@ class TaskListEntry(Adw.Bin):
         if not GSettings.get("task-list-new-task-position-top"):
             scroll(self.task_list.content, True)
 
-        self.update_status()
+        self.task_list.header_bar.update_ui()
         Sync.sync()

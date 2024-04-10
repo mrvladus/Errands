@@ -26,7 +26,6 @@ class TaskSubTasks(Gtk.Revealer):
     # ------ PRIVATE METHODS ------ #
 
     def __build_ui(self):
-        self.set_transition_type(Gtk.RevealerTransitionType.SLIDE_DOWN)
         # Entry
         entry: Gtk.Entry = Gtk.Entry(
             margin_start=12,

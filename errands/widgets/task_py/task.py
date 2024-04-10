@@ -11,12 +11,12 @@ from gi.repository import Adw, GObject, Gtk, GLib  # type:ignore
 from errands.lib.data import TaskData, UserData
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
-from errands.lib.utils import get_children
 from errands.state import State
 from errands.widgets.task_py.task_progress_bar import TaskProgressBar
 from errands.widgets.task_py.task_sub_tasks import TaskSubTasks
 from errands.widgets.task_py.task_tags_bar import TaskTagsBar
 from errands.widgets.task_py.task_title import TaskTitle
+from errands.widgets.task_py.task_toolbar import TaskToolbar
 from errands.widgets.task_py.task_top_drop_area import TaskTopDropArea
 
 
@@ -58,6 +58,9 @@ class Task(Adw.Bin):
         # Progress bar
         self.progress_bar = TaskProgressBar(self)
 
+        # Tool bar
+        self.toolbar = TaskToolbar(self)
+
         # Sub-Tasks
         self.sub_tasks = TaskSubTasks(self)
 
@@ -71,6 +74,7 @@ class Task(Adw.Bin):
         self.main_box.append(self.title)
         self.main_box.append(self.tags_bar)
         self.main_box.append(self.progress_bar)
+        self.main_box.append(self.toolbar)
         self.main_box.append(self.sub_tasks)
 
         # Box

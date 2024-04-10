@@ -20,8 +20,8 @@ class DateTimePicker(Gtk.Box):
     __datetime: str = ""
     lock_signals: bool = True
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     # ------ PROPERTIES ------ #
 
