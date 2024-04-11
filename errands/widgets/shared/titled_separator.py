@@ -28,8 +28,7 @@ class TitledSeparator(Gtk.Box):
             "label",
             self,
             "title",
-            GObject.BindingFlags.SYNC_CREATE,
-            GObject.BindingFlags.BIDIRECTIONAL,
+            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
         )
 
         self.append(Gtk.Separator(hexpand=True, valign=Gtk.Align.CENTER))

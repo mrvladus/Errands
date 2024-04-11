@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from errands.lib.sync.sync import Sync
 from errands.state import State
@@ -23,14 +23,11 @@ from icalendar import Calendar, Event
 from gi.repository import Adw  # type:ignore
 from gi.repository import Gdk  # type:ignore
 from gi.repository import Gio  # type:ignore
-from gi.repository import GLib  # type:ignore
-from gi.repository import GObject  # type:ignore
 from gi.repository import Gtk  # type:ignore
 
 from errands.lib.data import TaskData, UserData
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
-from errands.lib.markup import Markup
 
 # from errands.lib.sync.sync import Sync
 from errands.lib.utils import get_children
@@ -295,20 +292,6 @@ class Task(Adw.Bin):
         for task in self.tasks:
             task.update_ui()
 
-    def update_toolbar(self) -> None:
-        # Update priority button css
-        priority: int = self.task_data.priority
-        self.priority_btn.props.css_classes = ["flat"]
-        if 0 < priority < 5:
-            self.priority_btn.add_css_class("error")
-        elif 4 < priority < 9:
-            self.priority_btn.add_css_class("warning")
-        elif priority == 9:
-            self.priority_btn.add_css_class("accent")
-        self.priority_btn.set_icon_name(
-            f"errands-priority{'-set' if priority>0 else ''}-symbolic"
-        )
-
     def update_ui(self, update_sub_tasks_ui: bool = True) -> None:
         Log.debug(f"Task '{self.uid}: Update UI'")
         self.update_task_data()
@@ -341,11 +324,6 @@ class Task(Adw.Bin):
         self.entry_row.emit("apply")
 
     # --- TOOLBAR --- #
-
-    @Gtk.Template.Callback()
-    def _on_date_time_btn_clicked(self, _btn: Gtk.Button) -> None:
-        self.datetime_window.show()
-
     @Gtk.Template.Callback()
     def _on_menu_toggled(self, _btn: Gtk.MenuButton, active: bool) -> None:
         if not active:
@@ -397,37 +375,6 @@ class Task(Adw.Bin):
             t.block_signals = False
 
         self.tags_list.set_visible(len(get_children(self.tags_list)) > 0)
-
-    @Gtk.Template.Callback()
-    def _on_priority_toggled(self, btn: Gtk.MenuButton, *_) -> None:
-        priority: int = self.get_prop("priority")
-        if btn.get_active():
-            self.priority.set_value(priority)
-        else:
-            new_priority: int = self.priority.get_value_as_int()
-            if priority != new_priority:
-                Log.debug(f"Task Toolbar: Set priority to '{new_priority}'")
-                self.update_props(["priority", "synced"], [new_priority, False])
-                self.update_ui()
-                Sync.sync()
-
-    @Gtk.Template.Callback()
-    def _on_priority_selected(self, box: Gtk.ListBox, row: Gtk.ListBoxRow) -> None:
-        rows: list[Gtk.ListBoxRow] = get_children(box)
-        for i, r in enumerate(rows):
-            if r == row:
-                index = i
-                break
-        match index:
-            case 0:
-                self.priority.set_value(1)
-            case 1:
-                self.priority.set_value(5)
-            case 2:
-                self.priority.set_value(9)
-            case 3:
-                self.priority.set_value(0)
-        self.priority_btn.popdown()
 
     @Gtk.Template.Callback()
     def _on_accent_color_selected(self, btn: Gtk.CheckButton) -> None:
