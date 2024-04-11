@@ -136,7 +136,7 @@ class Sidebar(Adw.Bin):
         length: int = len(self.task_lists_rows)
         self.status_page.set_visible(length == 0)
         if length == 0:
-            State.view_stack.set_visible_child_name("status")
+            State.view_stack.set_visible_child_name("errands_status_page")
 
     # ------ PROPERTIES ------ #
 

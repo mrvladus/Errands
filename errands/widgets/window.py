@@ -3,7 +3,6 @@
 
 from __future__ import annotations
 
-import os
 from dataclasses import asdict
 from uuid import uuid4
 
@@ -15,25 +14,21 @@ from errands.lib.data import TaskData, TaskListData, UserData
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
-from errands.lib.utils import timeit
 from errands.state import State
 from errands.widgets.preferences import PreferencesWindow
+from errands.widgets.sidebar.sidebar import Sidebar
+from errands.widgets.tags.tags import Tags
+from errands.widgets.today.today import Today
+from errands.widgets.trash.trash import Trash
 
 
-@Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
 class Window(Adw.ApplicationWindow):
-    __gtype_name__ = "Window"
-
-    view_stack: Adw.ViewStack = Gtk.Template.Child()
-    split_view: Adw.NavigationSplitView = Gtk.Template.Child()
-    toast_overlay: Adw.ToastOverlay = Gtk.Template.Child()
-
     about_window: Adw.AboutWindow = None
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
         Log.debug("Main Window: Load")
-
+        self.__build_ui()
         self._create_actions()
         # Remember window state
         GSettings.bind("width", self, "default_width")
@@ -43,10 +38,80 @@ class Window(Adw.ApplicationWindow):
         Adw.StyleManager.get_default().set_color_scheme(GSettings.get("theme"))
         self.connect("realize", self.__finish_load)
 
+    def __build_ui(self) -> None:
+        self.set_title(_("Errands"))  # noqa: F821
+        self.props.width_request = 360
+        self.props.height_request = 200
+
+        # Split View
+        self.split_view: Adw.NavigationSplitView = Adw.NavigationSplitView(
+            show_content=True,
+            max_sidebar_width=300,
+            min_sidebar_width=200,
+            sidebar=Adw.NavigationPage(child=Sidebar(), title=_("Sidebar")),  # noqa: F821
+        )
+
+        # View Stack
+        self.view_stack: Adw.ViewStack = Adw.ViewStack()
+        self.split_view.set_content(
+            Adw.NavigationPage(
+                child=self.view_stack,
+                title=_("Content"),  # noqa: F821
+                width_request=360,
+            )
+        )
+        self.view_stack.add_titled(
+            child=Today(),
+            name="errands_today_page",
+            title=_("Today"),  # noqa: F821
+        )
+        self.view_stack.add_titled(
+            child=Tags(),
+            name="errands_tags_page",
+            title=_("Tags"),  # noqa: F821
+        )
+        self.view_stack.add_titled(
+            child=Trash(),
+            name="errands_trash_page",
+            title=_("Trash"),  # noqa: F821
+        )
+
+        # Status Page
+        status_page: Adw.ToolbarView = Adw.ToolbarView()
+        status_page.add_top_bar(Adw.HeaderBar(show_title=False))
+        status_page_create_list_btn: Gtk.Button = Gtk.Button(
+            label=_("Create List"),  # noqa: F821
+            css_classes=["pill", "suggested-action"],
+            halign=Gtk.Align.CENTER,
+        )
+        status_page_create_list_btn.connect(
+            "clicked", lambda btn: State.sidebar.add_list_btn.activate()
+        )
+        status_page_box: Gtk.Box = Gtk.Box(
+            orientation=Gtk.Orientation.VERTICAL, hexpand=True, valign=Gtk.Align.CENTER
+        )
+        status_page_box.append(
+            Adw.StatusPage(
+                title=_("No Task Lists"),  # noqa: F821
+                description=_("Create new or import existing one"),  # noqa: F821
+                icon_name="io.github.mrvladus.List",
+            )
+        )
+        status_page_box.append(status_page_create_list_btn)
+        self.view_stack.add_titled(
+            child=status_page,
+            name="errands_status_page",
+            title=_("Create new List"),  # noqa: F821
+        )
+
+        # Toast Overlay
+        self.toast_overlay: Adw.ToastOverlay = Adw.ToastOverlay(child=self.split_view)
+        self.set_content(self.toast_overlay)
+
     def __finish_load(self, *_):
         State.view_stack = self.view_stack
         State.split_view = self.split_view
-        State.view_stack.set_visible_child_name("status")
+        State.view_stack.set_visible_child_name("errands_status_page")
         State.sidebar.load_task_lists()
         State.trash_sidebar_row.update_ui()
         # Sync
@@ -215,7 +280,3 @@ class Window(Adw.ApplicationWindow):
             lambda *_: self.props.application.quit(),
             ["<primary>q", "<primary>w"],
         )
-
-    @Gtk.Template.Callback()
-    def _on_add_list_clicked(self, btn: Gtk.Button):
-        State.sidebar.add_list_btn.activate()
