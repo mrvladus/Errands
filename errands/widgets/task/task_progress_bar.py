@@ -10,7 +10,7 @@ from gi.repository import Gtk  # type:ignore
 from errands.lib.gsettings import GSettings
 
 if TYPE_CHECKING:
-    from errands.widgets.task_py.task import Task
+    from errands.widgets.task.task import Task
 
 
 class TaskProgressBar(Gtk.Revealer):

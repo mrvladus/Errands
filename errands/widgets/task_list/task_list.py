@@ -13,7 +13,7 @@ from errands.lib.logging import Log
 from errands.lib.utils import get_children
 from errands.state import State
 from errands.widgets.task_list import TaskListContent, TaskListEntry, TaskListHeaderBar
-from errands.widgets.task_py.task import Task
+from errands.widgets.task.task import Task
 
 if TYPE_CHECKING:
     from errands.widgets.task_list import TaskListSidebarRow

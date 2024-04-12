@@ -13,7 +13,7 @@ from errands.lib.utils import get_children
 
 
 if TYPE_CHECKING:
-    from errands.widgets.task_py.task import Task
+    from errands.widgets.task.task import Task
 
 
 class TaskSubTasks(Gtk.Revealer):
@@ -56,7 +56,7 @@ class TaskSubTasks(Gtk.Revealer):
         self.set_child(box)
 
     def __load_sub_tasks(self) -> None:
-        from errands.widgets.task_py.task import Task
+        from errands.widgets.task.task import Task
 
         tasks: list[TaskData] = (
             t
@@ -76,12 +76,32 @@ class TaskSubTasks(Gtk.Revealer):
     # ------ PROPERTIES ------ #
 
     @property
+    def all_tasks(self) -> list[Task]:
+        """All tasks in the list"""
+
+        all_tasks: list[Task] = []
+
+        def __add_task(tasks: list[Task]) -> None:
+            for task in tasks:
+                all_tasks.append(task)
+                __add_task(task.tasks)
+
+        __add_task(self.tasks)
+        return all_tasks
+
+    @property
     def tasks(self) -> list[Task]:
         """Top-level Tasks"""
 
-        return get_children(self.uncompleted_task_list) + get_children(
-            self.completed_task_list
-        )
+        return self.uncompleted_tasks + self.completed_tasks
+
+    @property
+    def uncompleted_tasks(self) -> list[Task]:
+        return get_children(self.uncompleted_task_list)
+
+    @property
+    def completed_tasks(self) -> list[Task]:
+        return get_children(self.completed_task_list)
 
     # ------ PUBLIC METHODS ------ #
 
@@ -102,10 +122,32 @@ class TaskSubTasks(Gtk.Revealer):
             if task.uid not in sub_tasks_widgets_uids:
                 self.task.add_task(task)
 
-        # Remove tasks
-        for task in sub_tasks_widgets:
+        for task in self.tasks:
+            # Remove task
             if task.uid not in sub_tasks_data_uids:
                 task.purge()
+            # Move task to completed tasks
+            elif task.task_data.completed and task in self.uncompleted_tasks:
+                if (
+                    len(self.uncompleted_tasks) > 1
+                    and task.uid != self.uncompleted_tasks[-1].uid
+                ):
+                    UserData.move_task_after(
+                        self.task.list_uid, task.uid, self.uncompleted_tasks[-1].uid
+                    )
+                self.uncompleted_task_list.remove(task)
+                self.completed_task_list.prepend(task)
+            # Move task to uncompleted tasks
+            elif not task.task_data.completed and task in self.completed_tasks:
+                if (
+                    len(self.uncompleted_tasks) > 0
+                    and task.uid != self.uncompleted_tasks[-1].uid
+                ):
+                    UserData.move_task_after(
+                        self.task.list_uid, task.uid, self.uncompleted_tasks[-1].uid
+                    )
+                self.completed_task_list.remove(task)
+                self.uncompleted_task_list.append(task)
 
         # Update tasks
         if update_tasks:

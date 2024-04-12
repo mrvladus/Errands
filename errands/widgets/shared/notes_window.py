@@ -11,7 +11,7 @@ from errands.lib.logging import Log
 from errands.state import State
 
 if TYPE_CHECKING:
-    from errands.widgets.task_py.task import Task
+    from errands.widgets.task.task import Task
 
 
 class NotesWindow(Adw.Dialog):

@@ -11,3 +11,9 @@ class ErrandsButton(Gtk.Button):
     def __init__(self, on_click: Callable, **kwargs) -> None:
         super().__init__(**kwargs)
         self.connect("clicked", on_click)
+
+
+class ErrandsCheckButton(Gtk.CheckButton):
+    def __init__(self, on_toggle: Callable, **kwargs) -> None:
+        super().__init__(**kwargs)
+        self.connect("toggled", on_toggle)

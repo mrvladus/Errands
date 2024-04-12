@@ -68,13 +68,13 @@
     </child>
 
     <!-- Drop controller -->
-    <child>
+    <!-- <child>
       <object class="GtkDropTarget">
         <property name="actions">move</property>
         <property name="formats">Task</property>
         <signal name="drop" handler="_on_task_drop" />
       </object>
-    </child>
+    </child> -->
 
   </template>
 </interface>

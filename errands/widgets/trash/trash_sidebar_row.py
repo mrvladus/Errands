@@ -66,6 +66,6 @@ class TrashSidebarRow(Gtk.ListBoxRow):
         State.split_view.set_show_content(True)
         GSettings.set("last-open-list", "s", "errands_trash_page")
 
-    @Gtk.Template.Callback()
-    def _on_task_drop(self, _d, task: Task, _x, _y) -> None:
-        task.delete()
+    # @Gtk.Template.Callback()
+    # def _on_task_drop(self, _d, task: Task, _x, _y) -> None:
+    #     task.delete()

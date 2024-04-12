@@ -11,7 +11,7 @@ from errands.state import State
 from errands.widgets.shared.datetime_picker import DateTimePicker
 
 if TYPE_CHECKING:
-    from errands.widgets.task_py.task import Task
+    from errands.widgets.task.task import Task
     from errands.widgets.today.today_task import TodayTask
 
 

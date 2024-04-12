@@ -140,6 +140,12 @@ class TaskTitle(Gtk.ListBox):
 
     # ------ PUBLIC METHODS ------ #
 
+    def add_rm_crossline(self, add: bool) -> None:
+        if add:
+            self.title_row.add_css_class("task-completed")
+        else:
+            self.title_row.remove_css_class("task-completed")
+
     def update_ui(self) -> None:
         # Update title
         self.title_row.set_title(
@@ -154,6 +160,14 @@ class TaskTitle(Gtk.ListBox):
 
         # Update toolbar button
         self.toolbar_toggle_btn.set_active(self.task.task_data.toolbar_shown)
+
+        # Update completion
+        completed: bool = self.task.task_data.completed
+        self.add_rm_crossline(completed)
+        if self.complete_btn.get_active() != completed:
+            self.just_added = True
+            self.complete_btn.set_active(completed)
+            self.just_added = False
 
     # ------ SIGNAL HANDLERS ------ #
 
@@ -173,7 +187,7 @@ class TaskTitle(Gtk.ListBox):
                 if not task.get_prop("completed"):
                     task.update_props(["completed", "synced"], [True, False])
                     task.just_added = True
-                    task.complete_btn.set_active(True)
+                    task.title.complete_btn.set_active(True)
                     task.just_added = False
 
         # Uncomplete parent if sub-task is uncompleted
@@ -182,7 +196,7 @@ class TaskTitle(Gtk.ListBox):
                 if task.get_prop("completed"):
                     task.update_props(["completed", "synced"], [False, False])
                     task.just_added = True
-                    task.complete_btn.set_active(False)
+                    task.title.complete_btn.set_active(False)
                     task.just_added = False
 
         if isinstance(self.task.parent, Task):
