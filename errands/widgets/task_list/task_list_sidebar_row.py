@@ -53,8 +53,8 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
                 Sync.sync()
 
             ConfirmDialog(
-                _("List will be permanently deleted"),  # noqa: F821
-                _("Delete"),  # noqa: F821
+                _("List will be permanently deleted"),
+                _("Delete"),
                 Adw.ResponseAppearance.DESTRUCTIVE,
                 __confirm,
             )
@@ -83,18 +83,18 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
                 State.today_sidebar_row.update_ui()
                 Sync.sync()
 
-            entry: Gtk.Entry = Gtk.Entry(placeholder_text=_("New Name"))  # noqa: F821
+            entry: Gtk.Entry = Gtk.Entry(placeholder_text=_("New Name"))
             entry.get_buffer().props.text = self.label.get_label()
             dialog: Adw.MessageDialog = Adw.MessageDialog(
                 transient_for=State.main_window,
                 hide_on_close=True,
-                heading=_("Rename List"),  # noqa: F821
+                heading=_("Rename List"),
                 default_response="save",
                 close_response="cancel",
                 extra_child=entry,
             )
-            dialog.add_response("cancel", _("Cancel"))  # noqa: F821
-            dialog.add_response("save", _("Save"))  # noqa: F821
+            dialog.add_response("cancel", _("Cancel"))
+            dialog.add_response("save", _("Save"))
             dialog.set_response_enabled("save", False)
             dialog.set_response_appearance("save", Adw.ResponseAppearance.SUGGESTED)
             dialog.connect("response", _confirm, entry)
@@ -152,9 +152,9 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
                         f.write(calendar.to_ical())
                 except Exception as e:
                     Log.error(f"List: Export failed. {e}")
-                    State.main_window.add_toast(_("Export failed"))  # noqa: F821
+                    State.main_window.add_toast(_("Export failed"))
 
-                State.main_window.add_toast(_("Exported"))  # noqa: F821
+                State.main_window.add_toast(_("Exported"))
 
             filter: Gtk.FileFilter = Gtk.FileFilter()
             filter.add_pattern("*.ics")
@@ -192,9 +192,9 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
 
         # Menu
         menu: Gio.Menu = Gio.Menu()
-        menu.append(label=_("Rename"), detailed_action="list_row.rename")  # noqa: F821
-        menu.append(label=_("Delete"), detailed_action="list_row.delete")  # noqa: F821
-        menu.append(label=_("Export"), detailed_action="list_row.export")  # noqa: F821
+        menu.append(label=_("Rename"), detailed_action="list_row.rename")
+        menu.append(label=_("Delete"), detailed_action="list_row.delete")
+        menu.append(label=_("Export"), detailed_action="list_row.export")
         menu_btn: Gtk.MenuButton = Gtk.MenuButton(
             menu_model=menu,
             icon_name="errands-more-symbolic",

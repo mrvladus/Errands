@@ -16,7 +16,7 @@ from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
 from errands.state import State
 from errands.widgets.preferences import PreferencesWindow
-from errands.widgets.sidebar.sidebar import Sidebar
+from errands.widgets.sidebar import Sidebar
 from errands.widgets.tags.tags import Tags
 from errands.widgets.today.today import Today
 from errands.widgets.trash.trash import Trash
@@ -39,7 +39,7 @@ class Window(Adw.ApplicationWindow):
         self.connect("realize", self.__finish_load)
 
     def __build_ui(self) -> None:
-        self.set_title(_("Errands"))  # noqa: F821
+        self.set_title(_("Errands"))
         self.props.width_request = 360
         self.props.height_request = 200
 
@@ -48,7 +48,7 @@ class Window(Adw.ApplicationWindow):
             show_content=True,
             max_sidebar_width=300,
             min_sidebar_width=200,
-            sidebar=Adw.NavigationPage(child=Sidebar(), title=_("Sidebar")),  # noqa: F821
+            sidebar=Adw.NavigationPage(child=Sidebar(), title=_("Sidebar")),
         )
 
         # View Stack
@@ -56,31 +56,31 @@ class Window(Adw.ApplicationWindow):
         self.split_view.set_content(
             Adw.NavigationPage(
                 child=self.view_stack,
-                title=_("Content"),  # noqa: F821
+                title=_("Content"),
                 width_request=360,
             )
         )
         self.view_stack.add_titled(
             child=Today(),
             name="errands_today_page",
-            title=_("Today"),  # noqa: F821
+            title=_("Today"),
         )
         self.view_stack.add_titled(
             child=Tags(),
             name="errands_tags_page",
-            title=_("Tags"),  # noqa: F821
+            title=_("Tags"),
         )
         self.view_stack.add_titled(
             child=Trash(),
             name="errands_trash_page",
-            title=_("Trash"),  # noqa: F821
+            title=_("Trash"),
         )
 
         # Status Page
         status_page: Adw.ToolbarView = Adw.ToolbarView()
         status_page.add_top_bar(Adw.HeaderBar(show_title=False))
         status_page_create_list_btn: Gtk.Button = Gtk.Button(
-            label=_("Create List"),  # noqa: F821
+            label=_("Create List"),
             css_classes=["pill", "suggested-action"],
             halign=Gtk.Align.CENTER,
         )
@@ -92,8 +92,8 @@ class Window(Adw.ApplicationWindow):
         )
         status_page_box.append(
             Adw.StatusPage(
-                title=_("No Task Lists"),  # noqa: F821
-                description=_("Create new or import existing one"),  # noqa: F821
+                title=_("No Task Lists"),
+                description=_("Create new or import existing one"),
                 icon_name="io.github.mrvladus.List",
             )
         )
@@ -101,7 +101,7 @@ class Window(Adw.ApplicationWindow):
         self.view_stack.add_titled(
             child=status_page,
             name="errands_status_page",
-            title=_("Create new List"),  # noqa: F821
+            title=_("Create new List"),
         )
 
         # Toast Overlay
@@ -141,12 +141,12 @@ class Window(Adw.ApplicationWindow):
                     transient_for=self,
                     version=VERSION,
                     application_icon=APP_ID,
-                    application_name=_("Errands"),  # noqa: F821
+                    application_name=_("Errands"),
                     copyright="© 2023 Vlad Krupinskii",
                     website="https://github.com/mrvladus/Errands",
                     issue_url="https://github.com/mrvladus/Errands/issues",
                     license_type=Gtk.License.MIT_X11,
-                    translator_credits=_("translator-credits"),  # noqa: F821
+                    translator_credits=_("translator-credits"),
                     modal=True,
                     hide_on_close=True,
                 )
@@ -155,7 +155,7 @@ class Window(Adw.ApplicationWindow):
         def _sync(*args):
             Sync.sync()
             if GSettings.get("sync-provider") == 0:
-                self.add_toast(_("Sync is disabled"))  # noqa: F821
+                self.add_toast(_("Sync is disabled"))
 
         def _import(*args) -> None:
             def _confirm(dialog: Gtk.FileDialog, res) -> None:
@@ -259,7 +259,7 @@ class Window(Adw.ApplicationWindow):
                         UserData.add_task(**asdict(task))
 
                 State.sidebar.task_lists.update_ui()
-                self.add_toast(_("Imported"))  # noqa: F821
+                self.add_toast(_("Imported"))
                 Sync.sync()
 
             filter = Gtk.FileFilter()

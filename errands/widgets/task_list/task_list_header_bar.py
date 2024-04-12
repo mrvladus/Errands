@@ -33,7 +33,7 @@ class TaskListHeaderBar(Adw.Bin):
         self.toggle_completed_btn: Gtk.ToggleButton = Gtk.ToggleButton(
             icon_name="errands-check-toggle-symbolic",
             valign=Gtk.Align.CENTER,
-            tooltip_text=_("Toggle Completed Tasks"),  # noqa: F821
+            tooltip_text=_("Toggle Completed Tasks"),
         )
         self.toggle_completed_btn.connect(
             "toggled", self._on_toggle_completed_btn_toggled
@@ -43,7 +43,7 @@ class TaskListHeaderBar(Adw.Bin):
         self.delete_completed_btn: Gtk.Button = Gtk.Button(
             icon_name="errands-delete-all-symbolic",
             valign=Gtk.Align.CENTER,
-            tooltip_text=_("Delete Completed Tasks"),  # noqa: F821
+            tooltip_text=_("Delete Completed Tasks"),
         )
         self.delete_completed_btn.bind_property(
             "visible",
@@ -60,7 +60,7 @@ class TaskListHeaderBar(Adw.Bin):
             icon_name="errands-up-symbolic",
             visible=False,
             valign=Gtk.Align.CENTER,
-            tooltip_text=_("Scroll Up"),  # noqa: F821
+            tooltip_text=_("Scroll Up"),
         )
         self.scroll_up_btn.connect("clicked", self._on_scroll_up_btn_clicked)
 
@@ -78,7 +78,7 @@ class TaskListHeaderBar(Adw.Bin):
 
         # Update headerbar subtitle
         self.title.set_subtitle(
-            _("Completed:") + f" {n_completed} / {n_total}" if n_total > 0 else ""  # noqa: F821
+            _("Completed:") + f" {n_completed} / {n_total}" if n_total > 0 else ""
         )
 
         # Update sidebar item counter

@@ -73,7 +73,7 @@ class Tag(Adw.ActionRow):
         delete_btn = Gtk.Button(
             icon_name="errands-trash-symbolic",
             css_classes=["flat", "error"],
-            tooltip_text=_("Delete"),  # noqa: F821
+            tooltip_text=_("Delete"),
             valign=Gtk.Align.CENTER,
         )
         delete_btn.connect("clicked", self.delete)

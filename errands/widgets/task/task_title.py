@@ -60,7 +60,7 @@ class TaskTitle(Gtk.ListBox):
         self.title_row = Adw.ActionRow(
             height_request=60,
             use_markup=True,
-            tooltip_text=_("Toggle Sub-Tasks"),  # noqa: F821
+            tooltip_text=_("Toggle Sub-Tasks"),
             cursor=Gdk.Cursor(name="pointer"),
             css_classes=["transparent", "rounded-corners"],
         )
@@ -68,7 +68,7 @@ class TaskTitle(Gtk.ListBox):
 
         # Complete button
         self.complete_btn: Gtk.CheckButton = Gtk.CheckButton(
-            tooltip_text=_("Toggle Completion"),  # noqa: F821
+            tooltip_text=_("Toggle Completion"),
             valign=Gtk.Align.CENTER,
             css_classes=["selection-mode"],
         )
@@ -98,7 +98,7 @@ class TaskTitle(Gtk.ListBox):
         self.toolbar_toggle_btn: Gtk.ToggleButton = Gtk.ToggleButton(
             icon_name="errands-toolbar-symbolic",
             valign=Gtk.Align.CENTER,
-            tooltip_text=_("Toggle Toolbar"),  # noqa: F821
+            tooltip_text=_("Toggle Toolbar"),
             css_classes=["circular", "flat"],
         )
         self.toolbar_toggle_btn.connect("toggled", self._on_toolbar_toggle_btn_toggled)
@@ -111,7 +111,7 @@ class TaskTitle(Gtk.ListBox):
 
         # Edit row
         self.edit_row: Adw.EntryRow = Adw.EntryRow(
-            title=_("Edit"),  # noqa: F821
+            title=_("Edit"),
             visible=False,
             height_request=60,
             show_apply_button=True,
@@ -130,7 +130,7 @@ class TaskTitle(Gtk.ListBox):
 
         # Cancel edit button
         cancel_edit_btn: Gtk.Button = Gtk.Button(
-            tooltip_text=_("Cancel"),  # noqa: F821
+            tooltip_text=_("Cancel"),
             valign=Gtk.Align.CENTER,
             icon_name="window-close-symbolic",
             css_classes=["circular"],
@@ -155,7 +155,7 @@ class TaskTitle(Gtk.ListBox):
         # Update subtitle
         total, completed = self.task.get_status()
         self.title_row.set_subtitle(
-            _("Completed:") + f" {completed} / {total}" if total > 0 else ""  # noqa: F821
+            _("Completed:") + f" {completed} / {total}" if total > 0 else ""
         )
 
         # Update toolbar button

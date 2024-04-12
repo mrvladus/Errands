@@ -49,7 +49,7 @@ class DateTimePicker(Gtk.Box):
         # Set datetime
         self.__datetime = dt
         self.lock_signals = False
-        self.label.set_label(self.human_datetime if dt else _("Set Date"))  # noqa: F821
+        self.label.set_label(self.human_datetime if dt else _("Set Date"))
 
     @property
     def datetime_as_int(self) -> int:
@@ -60,7 +60,7 @@ class DateTimePicker(Gtk.Box):
         if self.datetime:
             out: str = f"{self.calendar.get_date().format('%d %b')} {self.datetime[9:11]}:{self.datetime[11:13]}"
         else:
-            out: str = _("Date")  # noqa: F821
+            out: str = _("Date")
         return out
 
     # ------ TEMPLATE HANDLERS ------ #

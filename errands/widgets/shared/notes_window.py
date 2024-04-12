@@ -25,7 +25,7 @@ class NotesWindow(Adw.Dialog):
     def __build_ui(self) -> None:
         self.set_content_width(600)
         self.set_content_height(600)
-        self.set_title(_("Notes"))  # noqa: F821
+        self.set_title(_("Notes"))
 
         # Buffer
         self.buffer: GtkSource.Buffer = GtkSource.Buffer()

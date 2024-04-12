@@ -25,7 +25,7 @@ class DateTimeWindow(Adw.Dialog):
 
     def __build_ui(self) -> None:
         self.set_follows_content_size(True)
-        self.set_title(_("Date and Time"))  # noqa: F821
+        self.set_title(_("Date and Time"))
 
         # View Stack
         stack: Adw.ViewStack = Adw.ViewStack()
@@ -35,9 +35,9 @@ class DateTimeWindow(Adw.Dialog):
             margin_start=12, margin_end=12, margin_top=12, margin_bottom=12
         )
         stack.add_titled_with_icon(
-            name=_("Due"),  # noqa: F821
+            name=_("Due"),
             icon_name="errands-calendar-symbolic",
-            title=_("Due"),  # noqa: F821
+            title=_("Due"),
             child=Gtk.ScrolledWindow(
                 propagate_natural_height=True,
                 propagate_natural_width=True,
@@ -50,9 +50,9 @@ class DateTimeWindow(Adw.Dialog):
             margin_start=12, margin_end=12, margin_top=12, margin_bottom=12
         )
         stack.add_titled_with_icon(
-            name=_("Start"),  # noqa: F821
+            name=_("Start"),
             icon_name="errands-calendar-symbolic",
-            title=_("Start"),  # noqa: F821
+            title=_("Start"),
             child=Gtk.ScrolledWindow(
                 propagate_natural_height=True,
                 propagate_natural_width=True,

@@ -45,12 +45,12 @@ class TaskToolbar(Gtk.Revealer):
             valign=Gtk.Align.CENTER,
             halign=Gtk.Align.START,
             hexpand=True,
-            tooltip_text=_("Start / Due Date"),  # noqa: F821
+            tooltip_text=_("Start / Due Date"),
             css_classes=["flat", "caption"],
             child=Adw.ButtonContent(
                 icon_name="errands-calendar-symbolic",
                 can_shrink=True,
-                label=_("Date"),  # noqa: F821
+                label=_("Date"),
             ),
             on_click=self._on_date_time_btn_clicked,
         )
@@ -60,7 +60,7 @@ class TaskToolbar(Gtk.Revealer):
         self.notes_btn: ErrandsButton = ErrandsButton(
             valign=Gtk.Align.CENTER,
             icon_name="errands-notes-symbolic",
-            tooltip_text=_("Notes"),  # noqa: F821
+            tooltip_text=_("Notes"),
             css_classes=["flat"],
             on_click=self._on_notes_btn_clicked,
         )
@@ -74,7 +74,7 @@ class TaskToolbar(Gtk.Revealer):
         self.priority_btn: Gtk.MenuButton = Gtk.MenuButton(
             valign=Gtk.Align.CENTER,
             icon_name="errands-priority-symbolic",
-            tooltip_text=_("Priority"),  # noqa: F821
+            tooltip_text=_("Priority"),
             css_classes=["flat"],
             popover=Gtk.Popover(
                 css_classes=["menu"],
@@ -92,20 +92,20 @@ class TaskToolbar(Gtk.Revealer):
                             children=[
                                 Gtk.ListBoxRow(
                                     css_classes=["error"],
-                                    child=Gtk.Label(label=_("High")),  # noqa: F821
+                                    child=Gtk.Label(label=_("High")),
                                 ),
                                 Gtk.ListBoxRow(
                                     css_classes=["warning"],
-                                    child=Gtk.Label(label=_("Medium")),  # noqa: F821
+                                    child=Gtk.Label(label=_("Medium")),
                                 ),
                                 Gtk.ListBoxRow(
                                     css_classes=["accent"],
-                                    child=Gtk.Label(label=_("Low")),  # noqa: F821
+                                    child=Gtk.Label(label=_("Low")),
                                 ),
-                                Gtk.ListBoxRow(child=Gtk.Label(label=_("None"))),  # noqa: F821
+                                Gtk.ListBoxRow(child=Gtk.Label(label=_("None"))),
                             ],
                         ),
-                        TitledSeparator(title=_("Custom")),  # noqa: F821
+                        TitledSeparator(title=_("Custom")),
                         self.custom_priority_btn,
                     ],
                 ),
@@ -123,7 +123,7 @@ class TaskToolbar(Gtk.Revealer):
             margin_top=6,
         )
         tags_status_page: Adw.StatusPage = Adw.StatusPage(
-            title=_("No Tags"),  # noqa: F821
+            title=_("No Tags"),
             icon_name="errands-info-symbolic",
             css_classes=["compact"],
         )
@@ -136,7 +136,7 @@ class TaskToolbar(Gtk.Revealer):
         self.tags_btn: Gtk.MenuButton = Gtk.MenuButton(
             valign=Gtk.Align.CENTER,
             icon_name="errands-tag-add-symbolic",
-            tooltip_text=_("Tags"),  # noqa: F821
+            tooltip_text=_("Tags"),
             css_classes=["flat"],
             popover=Gtk.Popover(
                 css_classes=["tags-menu"],
@@ -164,16 +164,16 @@ class TaskToolbar(Gtk.Revealer):
 
         menu: Gio.Menu = Gio.Menu()
 
-        menu.append(label=_("Edit"), detailed_action="task_toolbar.edit")  # noqa: F821
+        menu.append(label=_("Edit"), detailed_action="task_toolbar.edit")
         menu.append(
-            label=_("Move to Trash"),  # noqa: F821
+            label=_("Move to Trash"),
             detailed_action="task_toolbar.move_to_trash",
         )
         menu.append(
-            label=_("Copy to Clipboard"),  # noqa: F821
+            label=_("Copy to Clipboard"),
             detailed_action="task_toolbar.copy_to_clipboard",
         )
-        menu.append(label=_("Export"), detailed_action="task_toolbar.export")  # noqa: F821
+        menu.append(label=_("Export"), detailed_action="task_toolbar.export")
         menu.append_section(None, menu_top_section)
 
         menu_bottom_section: Gio.Menu = Gio.Menu()
@@ -192,7 +192,7 @@ class TaskToolbar(Gtk.Revealer):
             on_toggle=self._on_accent_color_selected,
             name="none",
             css_classes=["accent-color-btn", "accent-color-btn-none"],
-            tooltip_text=_("None"),  # noqa: F821
+            tooltip_text=_("None"),
         )
         self.accent_color_btns = ErrandsBox(
             children=[
@@ -202,49 +202,49 @@ class TaskToolbar(Gtk.Revealer):
                     on_toggle=self._on_accent_color_selected,
                     name="blue",
                     css_classes=["accent-color-btn", "accent-color-btn-blue"],
-                    tooltip_text=_("Blue"),  # noqa: F821
+                    tooltip_text=_("Blue"),
                 ),
                 ErrandsCheckButton(
                     group=none_color_btn,
                     on_toggle=self._on_accent_color_selected,
                     name="green",
                     css_classes=["accent-color-btn", "accent-color-btn-green"],
-                    tooltip_text=_("Green"),  # noqa: F821
+                    tooltip_text=_("Green"),
                 ),
                 ErrandsCheckButton(
                     group=none_color_btn,
                     on_toggle=self._on_accent_color_selected,
                     name="yellow",
                     css_classes=["accent-color-btn", "accent-color-btn-yellow"],
-                    tooltip_text=_("Yellow"),  # noqa: F821
+                    tooltip_text=_("Yellow"),
                 ),
                 ErrandsCheckButton(
                     group=none_color_btn,
                     on_toggle=self._on_accent_color_selected,
                     name="orange",
                     css_classes=["accent-color-btn", "accent-color-btn-orange"],
-                    tooltip_text=_("Orange"),  # noqa: F821
+                    tooltip_text=_("Orange"),
                 ),
                 ErrandsCheckButton(
                     group=none_color_btn,
                     on_toggle=self._on_accent_color_selected,
                     name="red",
                     css_classes=["accent-color-btn", "accent-color-btn-red"],
-                    tooltip_text=_("Red"),  # noqa: F821
+                    tooltip_text=_("Red"),
                 ),
                 ErrandsCheckButton(
                     group=none_color_btn,
                     on_toggle=self._on_accent_color_selected,
                     name="purple",
                     css_classes=["accent-color-btn", "accent-color-btn-purple"],
-                    tooltip_text=_("Purple"),  # noqa: F821
+                    tooltip_text=_("Purple"),
                 ),
                 ErrandsCheckButton(
                     group=none_color_btn,
                     on_toggle=self._on_accent_color_selected,
                     name="brown",
                     css_classes=["accent-color-btn", "accent-color-btn-brown"],
-                    tooltip_text=_("Brown"),  # noqa: F821
+                    tooltip_text=_("Brown"),
                 ),
             ]
         )
@@ -252,7 +252,7 @@ class TaskToolbar(Gtk.Revealer):
 
         # Created label
         self.created_label = Gtk.Label(
-            label=_("Created:"),  # noqa: F821
+            label=_("Created:"),
             halign=Gtk.Align.START,
             margin_bottom=6,
             margin_end=6,
@@ -263,7 +263,7 @@ class TaskToolbar(Gtk.Revealer):
 
         # Changed label
         self.changed_label = Gtk.Label(
-            label=_("Changed:"),  # noqa: F821
+            label=_("Changed:"),
             halign=Gtk.Align.START,
             margin_end=6,
             margin_start=6,
@@ -351,8 +351,8 @@ class TaskToolbar(Gtk.Revealer):
         changed_date: str = datetime.fromisoformat(
             self.task.task_data.changed_at
         ).strftime("%Y.%m.%d %H:%M:%S")
-        self.created_label.set_label(_("Created:") + " " + created_date)  # noqa: F821
-        self.changed_label.set_label(_("Changed:") + " " + changed_date)  # noqa: F821
+        self.created_label.set_label(_("Created:") + " " + created_date)
+        self.changed_label.set_label(_("Changed:") + " " + changed_date)
 
         # Update color
         color: str = self.task.task_data.color

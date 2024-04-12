@@ -31,7 +31,7 @@ class TaskListEntry(Adw.Bin):
             margin_bottom=3,
             margin_end=12,
             margin_start=12,
-            title=_("Add new Task"),  # noqa: F821
+            title=_("Add new Task"),
             activatable=False,
             height_request=60,
             css_classes=["card"],

@@ -3,9 +3,7 @@
 
 from __future__ import annotations
 
-import os
-
-from gi.repository import Adw, Gtk  # type:ignore
+from gi.repository import Adw, Gio, GObject, Gtk  # type:ignore
 
 from errands.lib.data import TaskListData, UserData
 from errands.lib.gsettings import GSettings
@@ -13,9 +11,13 @@ from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
 from errands.lib.utils import get_children, timeit
 from errands.state import State
-from errands.widgets.components.titled_separator import TitledSeparator
-from errands.widgets.task_list import TaskList
-from errands.widgets.task_list import TaskListSidebarRow
+from errands.widgets.shared.components.boxes import ErrandsBox, ErrandsListBox
+from errands.widgets.shared.components.buttons import ErrandsButton
+from errands.widgets.shared.titled_separator import TitledSeparator
+from errands.widgets.tags.tags_sidebar_row import TagsSidebarRow
+from errands.widgets.task_list import TaskList, TaskListSidebarRow
+from errands.widgets.today.today_sidebar_row import TodaySidebarRow
+from errands.widgets.trash.trash_sidebar_row import TrashSidebarRow
 
 # class SidebarPluginsList(Adw.Bin):
 #     def __init__(self, sidebar: Sidebar):
@@ -86,35 +88,107 @@ from errands.widgets.task_list import TaskListSidebarRow
 #         self.sidebar.task_lists.lists.unselect_all()
 
 
-@Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
 class Sidebar(Adw.Bin):
-    __gtype_name__ = "Sidebar"
-
-    sync_indicator: Gtk.Spinner = Gtk.Template.Child()
-    add_list_btn: Gtk.Button = Gtk.Template.Child()
-    status_page: Adw.StatusPage = Gtk.Template.Child()
-    list_box: Gtk.ListBox = Gtk.Template.Child()
-
     def __init__(self) -> None:
         super().__init__()
         State.sidebar = self
+        self.__build_ui()
+
+    # ------ PRIVATE METHODS ------ #
+
+    def __build_ui(self) -> None:
+        # Header Bar
+        hb = Adw.HeaderBar(
+            title_widget=Gtk.Label(
+                label=_("Errands"),
+                css_classes=["heading"],
+            )
+        )
+
+        # Add List button
+        self.add_list_btn = ErrandsButton(
+            icon_name="errands-add-symbolic",
+            tooltip_text=_("Add List (Ctrl+A)"),
+            on_click=self._on_add_list_btn_clicked,
+        )
+        add_list_ctrl = Gtk.ShortcutController(scope=Gtk.ShortcutScope.MANAGED)
+        add_list_ctrl.add_shortcut(
+            Gtk.Shortcut(
+                action=Gtk.ShortcutAction.parse_string("activate"),
+                trigger=Gtk.ShortcutTrigger.parse_string("<Control>a"),
+            )
+        )
+        self.add_list_btn.add_controller(add_list_ctrl)
+        hb.pack_start(self.add_list_btn)
+
+        # Sync indicator
+        self.sync_indicator = Gtk.Spinner(
+            spinning=True,
+            visible=False,
+            tooltip_text=_("Syncing..."),
+        )
+        hb.pack_end(self.sync_indicator)
+
+        # Main Menu
+        main_menu_model = Gio.Menu()
+        main_menu_model.append(_("Sync / Fetch Tasks"), "app.sync")
+        main_menu_model.append(_("Import Task List"), "app.import")
+        main_menu_model.append(_("Preferences"), "app.preferences")
+        main_menu_model.append(_("Keyboard Shortcuts"), "win.show-help-overlay")
+        main_menu_model.append(_("About Errands"), "app.about")
+
+        main_menu_btn = Gtk.MenuButton(
+            primary=True,
+            tooltip_text=_("Main Menu"),
+            icon_name="open-menu-symbolic",
+            menu_model=main_menu_model,
+        )
+        hb.pack_end(main_menu_btn)
+
+        # Status page
+        self.status_page = Adw.StatusPage(
+            title=_("Add new List"),
+            description=_('Click "+" button'),
+            icon_name="errands-lists-symbolic",
+            css_classes=["compact"],
+            vexpand=True,
+        )
+
+        # List box
+        self.list_box = ErrandsListBox(
+            activate_on_single_click=False,
+            on_row_selected=self._on_row_selected,
+            css_classes=["navigation-sidebar"],
+            children=[
+                TodaySidebarRow(),
+                TagsSidebarRow(),
+                TrashSidebarRow(),
+            ],
+        )
+        self.list_box.bind_property(
+            "visible",
+            self.status_page,
+            "visible",
+            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.INVERT_BOOLEAN,
+        )
         self.list_box.set_header_func(
             lambda row, before: (
-                row.set_header(TitledSeparator(_("Task Lists"), (12, 12, 0, 2)))  # noqa: F821
+                row.set_header(TitledSeparator(_("Task Lists"), (12, 12, 0, 2)))
                 if isinstance(row, TaskListSidebarRow)
                 and not isinstance(before, TaskListSidebarRow)
                 else ...
             )
         )
 
-    # ------ PRIVATE METHODS ------ #
-
-    def add_task_list(self, list_dict: TaskListData) -> TaskListSidebarRow:
-        Log.debug(f"Sidebar: Add Task List '{list_dict.uid}'")
-        row: TaskListSidebarRow = TaskListSidebarRow(list_dict)
-        self.list_box.append(row)
-        self.status_page.set_visible(False)
-        return row
+        # Toolbar View
+        toolbar_view: Adw.ToolbarView = Adw.ToolbarView(
+            content=ErrandsBox(
+                orientation=Gtk.Orientation.VERTICAL,
+                children=[self.list_box, self.status_page],
+            )
+        )
+        toolbar_view.add_top_bar(hb)
+        self.set_child(toolbar_view)
 
     def __remove_task_list(self, row: TaskListSidebarRow) -> None:
         Log.debug(f"Sidebar: Delete list {row.uid}")
@@ -159,6 +233,12 @@ class Sidebar(Adw.Bin):
         return [l.task_list for l in self.task_lists_rows]
 
     # ------ PUBLIC METHODS ------ #
+    def add_task_list(self, list_dict: TaskListData) -> TaskListSidebarRow:
+        Log.debug(f"Sidebar: Add Task List '{list_dict.uid}'")
+        row: TaskListSidebarRow = TaskListSidebarRow(list_dict)
+        self.list_box.append(row)
+        self.status_page.set_visible(False)
+        return row
 
     # @timeit
     def load_task_lists(self) -> None:
@@ -197,8 +277,7 @@ class Sidebar(Adw.Bin):
 
     # ------ TEMPLATE HANDLERS ------ #
 
-    @Gtk.Template.Callback()
-    def _on_add_btn_clicked(self, _btn) -> None:
+    def _on_add_list_btn_clicked(self, btn: ErrandsButton) -> None:
         lists_names: list[str] = [i.name for i in UserData.get_lists_as_dicts()]
 
         def _entry_activated(_, dialog):
@@ -238,7 +317,6 @@ class Sidebar(Adw.Bin):
         entry.connect("notify::text", _entry_changed, dialog)
         dialog.present()
 
-    @Gtk.Template.Callback()
     def _on_row_selected(self, _, row: Gtk.ListBoxRow) -> None:
         if row:
             row.activate()

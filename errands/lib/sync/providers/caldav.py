@@ -55,7 +55,7 @@ class SyncProviderCalDAV:
             Log.error(f"Sync: Not all {self.name} credentials provided")
             if not self.testing:
                 State.main_window.add_toast(
-                    _("Not all sync credentials provided. Please check settings.")  # noqa: F821
+                    _("Not all sync credentials provided. Please check settings.")
                 )
             return False
 
@@ -94,9 +94,7 @@ class SyncProviderCalDAV:
                 )
                 if not self.testing:
                     State.main_window.add_toast(
-                        _("Can't connect to CalDAV server at:")  # noqa: F821
-                        + " "
-                        + self.url
+                        _("Can't connect to CalDAV server at:") + " " + self.url
                     )
 
     def __get_tasks(self, calendar: Calendar) -> list[TaskData]:

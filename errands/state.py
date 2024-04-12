@@ -11,7 +11,7 @@ from __main__ import PROFILE
 
 if TYPE_CHECKING:
     from errands.application import ErrandsApplication
-    from errands.widgets.sidebar.sidebar import Sidebar
+    from errands.widgets.sidebar import Sidebar
     from errands.widgets.tags.tags import Tags
     from errands.widgets.tags.tags_sidebar_row import TagsSidebarRow
     from errands.widgets.task.task import Task

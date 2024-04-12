@@ -27,7 +27,7 @@ class ErrandsApplication(Adw.Application):
         portal: Xdp.Portal = Xdp.Portal()
         portal.request_background(
             None,
-            _("Errands need to run in the background for notifications"),  # noqa: F821
+            _("Errands need to run in the background for notifications"),
             ["errands", "--gapplication-service"],
             Xdp.BackgroundFlags.AUTOSTART,
             None,

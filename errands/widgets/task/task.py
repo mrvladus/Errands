@@ -97,7 +97,7 @@ class Task(Adw.Bin):
 
                 with open(file.get_path(), "wb") as f:
                     f.write(calendar.to_ical())
-                State.main_window.add_toast(_("Exported"))  # noqa: F821
+                State.main_window.add_toast(_("Exported"))
 
             dialog = Gtk.FileDialog(initial_name=f"{self.uid}.ics")
             dialog.save(State.main_window, None, __confirm)
@@ -105,7 +105,7 @@ class Task(Adw.Bin):
         def __copy_to_clipboard(*args):
             Log.info("Task: Copy text to clipboard")
             Gdk.Display.get_default().get_clipboard().set(self.get_prop("text"))
-            State.main_window.add_toast(_("Copied to Clipboard"))  # noqa: F821
+            State.main_window.add_toast(_("Copied to Clipboard"))
 
         __create_action("edit", __edit)
         __create_action("copy_to_clipboard", __copy_to_clipboard)

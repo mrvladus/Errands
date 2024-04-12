@@ -131,7 +131,7 @@ class TodayTask(Adw.Bin):
 
                 with open(file.get_path(), "wb") as f:
                     f.write(calendar.to_ical())
-                self.window.add_toast(_("Exported"))  # noqa: F821
+                self.window.add_toast(_("Exported"))
 
             dialog = Gtk.FileDialog(initial_name=f"{self.task_data.uid}.ics")
             dialog.save(self.window, None, __confirm)
@@ -139,7 +139,7 @@ class TodayTask(Adw.Bin):
         def __copy_to_clipboard(*args):
             Log.info("Task: Copy text to clipboard")
             Gdk.Display.get_default().get_clipboard().set(self.get_prop("text"))
-            State.main_window.add_toast(_("Copied to Clipboard"))  # noqa: F821
+            State.main_window.add_toast(_("Copied to Clipboard"))
 
         __create_action("edit", __edit)
         __create_action("copy_to_clipboard", __copy_to_clipboard)
@@ -343,8 +343,8 @@ class TodayTask(Adw.Bin):
         changed_date: str = datetime.fromisoformat(
             self.get_prop("changed_at")
         ).strftime("%Y.%m.%d %H:%M:%S")
-        self.created_label.set_label(_("Created:") + " " + created_date)  # noqa: F821
-        self.changed_label.set_label(_("Changed:") + " " + changed_date)  # noqa: F821
+        self.created_label.set_label(_("Created:") + " " + created_date)
+        self.changed_label.set_label(_("Changed:") + " " + changed_date)
 
         # Update color
         color: str = self.get_prop("color")

@@ -91,7 +91,7 @@ class TaskTagsBarTag(Gtk.Box):
         delete_btn = Gtk.Button(
             icon_name="errands-close-symbolic",
             cursor=Gdk.Cursor(name="pointer"),
-            tooltip_text=_("Delete Tag"),  # noqa: F821
+            tooltip_text=_("Delete Tag"),
         )
         delete_btn.connect("clicked", self._on_delete_btn_clicked)
         self.append(delete_btn)

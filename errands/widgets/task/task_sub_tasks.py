@@ -32,7 +32,7 @@ class TaskSubTasks(Gtk.Revealer):
             margin_end=12,
             margin_top=3,
             margin_bottom=4,
-            placeholder_text=_("Add new Sub-Task"),  # noqa: F821
+            placeholder_text=_("Add new Sub-Task"),
         )
         entry.connect("activate", self._on_sub_task_added)
 

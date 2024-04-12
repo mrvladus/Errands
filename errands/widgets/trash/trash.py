@@ -82,8 +82,8 @@ class Trash(Adw.Bin):
         Log.debug("Trash: Show confirm dialog")
 
         ConfirmDialog(
-            _("Tasks will be permanently deleted"),  # noqa: F821
-            _("Delete"),  # noqa: F821
+            _("Tasks will be permanently deleted"),
+            _("Delete"),
             Adw.ResponseAppearance.DESTRUCTIVE,
             __confirm,
         )
