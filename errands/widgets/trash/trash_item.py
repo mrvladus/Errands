@@ -1,30 +1,37 @@
 # Copyright 2023-2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-from __future__ import annotations
-import os
-from typing import TYPE_CHECKING
 
-
-if TYPE_CHECKING:
-    from errands.widgets.window import Window
+from gi.repository import Adw, Gtk  # type:ignore
 
 from errands.lib.data import TaskData, UserData
-from gi.repository import Adw, Gtk, Gio  # type:ignore
 from errands.lib.logging import Log
 from errands.state import State
+from errands.widgets.shared.components.buttons import ErrandsButton
 
 
-@Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
 class TrashItem(Adw.ActionRow):
-    __gtype_name__ = "TrashItem"
-
     def __init__(self, task: TaskData) -> None:
         super().__init__()
         self.task_dict: TaskData = task
-        self.window: Window = Gio.Application.get_default().get_active_window()
+        self.__build_ui()
 
-    @Gtk.Template.Callback()
+    def __build_ui(self) -> None:
+        self.props.height_request = 60
+        self.set_title_selectable(True)
+        self.set_margin_top(6)
+        self.set_margin_bottom(6)
+        self.add_css_class("card")
+        self.add_suffix(
+            ErrandsButton(
+                tooltip_text=_("Restore"),
+                icon_name="errands-check-toggle-symbolic",
+                valign=Gtk.Align.CENTER,
+                css_classes=["circular", "flat"],
+                on_click=self._on_restore_btn_clicked,
+            )
+        )
+
     def _on_restore_btn_clicked(self, _) -> None:
         """Restore task and its parents"""
 

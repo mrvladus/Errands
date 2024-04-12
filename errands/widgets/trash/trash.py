@@ -1,9 +1,8 @@
 # Copyright 2023-2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-import os
 
-from gi.repository import Adw, Gtk  # type:ignore
+from gi.repository import Adw, GObject, Gtk  # type:ignore
 
 from errands.lib.data import TaskData, TaskListData, UserData
 from errands.lib.logging import Log
@@ -11,21 +10,91 @@ from errands.lib.sync.sync import Sync
 from errands.lib.utils import get_children
 from errands.state import State
 from errands.widgets.component import ConfirmDialog
+from errands.widgets.shared.components.boxes import ErrandsBox
+from errands.widgets.shared.components.buttons import ErrandsButton
 from errands.widgets.trash.trash_item import TrashItem
 
 
-@Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
 class Trash(Adw.Bin):
-    __gtype_name__ = "Trash"
-
-    status_page: Adw.StatusPage = Gtk.Template.Child()
-    trash_list: Gtk.ListBox = Gtk.Template.Child()
-
     def __init__(self):
         super().__init__()
         Log.debug("Trash Page: Load")
-
         State.trash_page = self
+        self.__build_ui()
+
+    def __build_ui(self):
+        # Status Page
+        self.status_page = Adw.StatusPage(
+            title=_("Empty Trash"),
+            description=_("No deleted items"),
+            icon_name="errands-trash-symbolic",
+            vexpand=True,
+            css_classes=["compact"],
+        )
+
+        # Header Bar
+        hb: Adw.HeaderBar = Adw.HeaderBar(
+            title_widget=Adw.WindowTitle(title=_("Trash"))
+        )
+
+        # Clear button
+        clear_button: ErrandsButton = ErrandsButton(
+            on_click=self._on_trash_clear,
+            icon_name="errands-trash-symbolic",
+            css_classes=["flat"],
+        )
+        self.status_page.bind_property(
+            "visible",
+            clear_button,
+            "visible",
+            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.INVERT_BOOLEAN,
+        )
+        hb.pack_start(clear_button)
+
+        # Restore button
+        restore_button: ErrandsButton = ErrandsButton(
+            on_click=self._on_trash_restore,
+            icon_name="errands-restore-symbolic",
+            css_classes=["flat"],
+        )
+        self.status_page.bind_property(
+            "visible",
+            restore_button,
+            "visible",
+            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.INVERT_BOOLEAN,
+        )
+        hb.pack_end(restore_button)
+
+        # Trash List
+        self.trash_list = Gtk.ListBox(
+            selection_mode=Gtk.SelectionMode.NONE,
+            margin_bottom=32,
+            css_classes=["transparent"],
+        )
+
+        # Content
+        content = Gtk.ScrolledWindow(
+            propagate_natural_height=True,
+            child=Adw.Clamp(
+                maximum_size=1000, tightening_threshold=300, child=self.trash_list
+            ),
+        )
+        content.bind_property(
+            "visible",
+            self.status_page,
+            "visible",
+            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.INVERT_BOOLEAN,
+        )
+
+        # Toolbar View
+        toolbar_view: Adw.ToolbarView = Adw.ToolbarView(
+            content=ErrandsBox(
+                orientation=Gtk.Orientation.VERTICAL,
+                children=[self.status_page, content],
+            )
+        )
+        toolbar_view.add_top_bar(hb)
+        self.set_child(toolbar_view)
 
     @property
     def trash_items(self) -> list[TrashItem]:
@@ -65,8 +134,7 @@ class Trash(Adw.Bin):
         # Show status
         self.status_page.set_visible(len(self.trash_items) == 0)
 
-    @Gtk.Template.Callback()
-    def on_trash_clear(self, *args) -> None:
+    def _on_trash_clear(self, *args) -> None:
         def __confirm(_, res) -> None:
             if res == "cancel":
                 Log.debug("Trash: Clear cancelled")
@@ -88,8 +156,7 @@ class Trash(Adw.Bin):
             __confirm,
         )
 
-    @Gtk.Template.Callback()
-    def on_trash_restore(self, *args) -> None:
+    def _on_trash_restore(self, *args) -> None:
         """
         Remove trash items and restore all tasks
         """

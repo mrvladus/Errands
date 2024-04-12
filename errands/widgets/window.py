@@ -137,8 +137,7 @@ class Window(Adw.ApplicationWindow):
             Show about window
             """
             if not self.about_window:
-                self.about_window = Adw.AboutWindow(
-                    transient_for=self,
+                self.about_window = Adw.AboutDialog(
                     version=VERSION,
                     application_icon=APP_ID,
                     application_name=_("Errands"),
@@ -147,10 +146,8 @@ class Window(Adw.ApplicationWindow):
                     issue_url="https://github.com/mrvladus/Errands/issues",
                     license_type=Gtk.License.MIT_X11,
                     translator_credits=_("translator-credits"),
-                    modal=True,
-                    hide_on_close=True,
                 )
-            self.about_window.present()
+            self.about_window.present(self)
 
         def _sync(*args):
             Sync.sync()
@@ -269,7 +266,7 @@ class Window(Adw.ApplicationWindow):
 
         self._create_action(
             "preferences",
-            lambda *_: PreferencesWindow(self).show(),
+            lambda *_: PreferencesWindow().present(self),
             ["<primary>comma"],
         )
         self._create_action("about", _about)

@@ -13,19 +13,15 @@ from errands.lib.sync.sync import Sync
 from errands.lib.gsettings import GSettings
 
 
-class PreferencesWindow(Adw.PreferencesWindow):
+class PreferencesWindow(Adw.PreferencesDialog):
     selected_provider: int = 0
 
-    def __init__(self, win: Window) -> None:
+    def __init__(self) -> None:
         super().__init__()
-        self.window: Window = win
         self._build_ui()
         self._setup_sync()
 
     def _build_ui(self) -> None:
-        self.set_transient_for(self.window)
-        self.set_search_enabled(False)
-
         # Theme group
         theme_group: Adw.PreferencesGroup = Adw.PreferencesGroup(
             title=_("Application Theme"),

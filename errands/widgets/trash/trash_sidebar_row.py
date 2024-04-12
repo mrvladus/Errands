@@ -3,29 +3,66 @@
 
 from __future__ import annotations
 
-import os
 
-from gi.repository import Gio, Gtk  # type:ignore
+from gi.repository import Gio, Gtk, Gdk  # type:ignore
 
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.state import State
+from errands.widgets.shared.components.boxes import ErrandsBox
 from errands.widgets.task.task import Task
 
 
-@Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
 class TrashSidebarRow(Gtk.ListBoxRow):
-    __gtype_name__ = "TrashSidebarRow"
-
-    size_counter: Gtk.Label = Gtk.Template.Child()
-    icon: Gtk.Image = Gtk.Template.Child()
-    menu_btn: Gtk.MenuButton = Gtk.Template.Child()
-
     def __init__(self) -> None:
         super().__init__()
         self.name = "errands_trash_page"
         State.trash_sidebar_row = self
         self.__add_actions()
+        self.__build_ui()
+
+    def __build_ui(self) -> None:
+        self.props.height_request = 50
+        self.add_css_class("sidebar-item")
+        self.add_css_class("sidebar-item-trash")
+        self.connect("activate", self._on_row_activated)
+
+        # Drop controller
+        drop_ctrl: Gtk.DropTarget = Gtk.DropTarget.new(
+            type=Task, actions=Gdk.DragAction.MOVE
+        )
+        drop_ctrl.connect("drop", self._on_task_drop)
+        self.add_controller(drop_ctrl)
+
+        # Icon
+        self.icon = Gtk.Image(icon_name="errands-trash-symbolic")
+
+        # Title
+        self.label: Gtk.Label = Gtk.Label(
+            hexpand=True, halign=Gtk.Align.START, label=_("Trash")
+        )
+
+        # Counter
+        self.size_counter = Gtk.Label(css_classes=["dim-label", "caption"])
+
+        # Menu
+        menu: Gio.Menu = Gio.Menu()
+        menu.append(label=_("Clear"), detailed_action="trash_row.rename")
+        menu.append(label=_("Restore"), detailed_action="trash_row.restore")
+        menu_btn: Gtk.MenuButton = Gtk.MenuButton(
+            menu_model=menu,
+            icon_name="errands-more-symbolic",
+            css_classes=["flat"],
+            valign=Gtk.Align.CENTER,
+        )
+
+        self.set_child(
+            ErrandsBox(
+                spacing=12,
+                margin_start=6,
+                children=[self.label, self.size_counter, menu_btn],
+            )
+        )
 
     def __add_actions(self) -> None:
         self.group: Gio.SimpleActionGroup = Gio.SimpleActionGroup()
@@ -58,7 +95,6 @@ class TrashSidebarRow(Gtk.ListBoxRow):
         # Update subtitle
         self.size_counter.set_label("" if size == 0 else str(size))
 
-    @Gtk.Template.Callback()
     def _on_row_activated(self, *args) -> None:
         Log.debug("Sidebar: Open Trash")
 
@@ -66,6 +102,5 @@ class TrashSidebarRow(Gtk.ListBoxRow):
         State.split_view.set_show_content(True)
         GSettings.set("last-open-list", "s", "errands_trash_page")
 
-    # @Gtk.Template.Callback()
-    # def _on_task_drop(self, _d, task: Task, _x, _y) -> None:
-    #     task.delete()
+    def _on_task_drop(self, _d, task: Task, _x, _y) -> None:
+        task.delete()
