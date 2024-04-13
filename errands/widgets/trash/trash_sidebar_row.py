@@ -60,7 +60,7 @@ class TrashSidebarRow(Gtk.ListBoxRow):
             ErrandsBox(
                 spacing=12,
                 margin_start=6,
-                children=[self.label, self.size_counter, menu_btn],
+                children=[self.icon, self.label, self.size_counter, menu_btn],
             )
         )
 

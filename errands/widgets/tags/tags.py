@@ -3,28 +3,92 @@
 
 from __future__ import annotations
 
-import os
 
 from gi.repository import Adw, GObject, Gtk  # type:ignore
 
 from errands.lib.data import UserData
 from errands.lib.utils import get_children
 from errands.state import State
+from errands.widgets.shared.components.boxes import ErrandsBox, ErrandsListBox
+from errands.widgets.shared.components.rows import ErrandsEntryRow
 
 
-@Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
 class Tags(Adw.Bin):
-    __gtype_name__ = "Tags"
-
-    tags_list: Gtk.ListBox = Gtk.Template.Child()
-
     def __init__(self):
         super().__init__()
         State.tags_page = self
+        self.__build_ui()
         # Load tags
         for tag in UserData.tags:
             self.tags_list.append(Tag(tag.text, self))
         self.update_ui()
+
+    def __build_ui(self):
+        # Status Page
+        self.status_page = Adw.StatusPage(
+            title=_("No Tags Found"),
+            description=_("Add new Tags in the entry above"),
+            icon_name="errands-info-symbolic",
+            vexpand=True,
+            css_classes=["compact"],
+        )
+
+        # Header Bar
+        hb: Adw.HeaderBar = Adw.HeaderBar(title_widget=Adw.WindowTitle(title=_("Tags")))
+
+        # Content
+        self.tags_list = Gtk.ListBox(
+            selection_mode=Gtk.SelectionMode.NONE,
+            margin_bottom=32,
+            margin_end=12,
+            margin_start=12,
+            margin_top=6,
+            css_classes=["boxed-list"],
+        )
+        content = Gtk.ScrolledWindow(
+            propagate_natural_height=True,
+            child=Adw.Clamp(
+                maximum_size=1000, tightening_threshold=300, child=self.tags_list
+            ),
+        )
+        content.bind_property(
+            "visible",
+            self.status_page,
+            "visible",
+            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.INVERT_BOOLEAN,
+        )
+
+        # Toolbar View
+        toolbar_view: Adw.ToolbarView = Adw.ToolbarView(
+            content=ErrandsBox(
+                orientation=Gtk.Orientation.VERTICAL,
+                children=[
+                    self.status_page,
+                    Adw.Clamp(
+                        maximum_size=1000,
+                        tightening_threshold=300,
+                        child=ErrandsListBox(
+                            selection_mode=Gtk.SelectionMode.NONE,
+                            margin_bottom=6,
+                            margin_start=12,
+                            margin_end=12,
+                            css_classes=["boxed-list"],
+                            children=[
+                                ErrandsEntryRow(
+                                    on_entry_activated=self._on_tag_added,
+                                    height_request=60,
+                                    activatable=False,
+                                    title=_("Add new Tag"),
+                                )
+                            ],
+                        ),
+                    ),
+                    content,
+                ],
+            )
+        )
+        toolbar_view.add_top_bar(hb)
+        self.set_child(toolbar_view)
 
     @property
     def tags(self) -> list[Tag]:
@@ -54,7 +118,6 @@ class Tags(Adw.Bin):
         if State.main_window:
             State.tags_sidebar_row.update_ui()
 
-    @Gtk.Template.Callback()
     def _on_tag_added(self, entry: Adw.EntryRow):
         text: str = entry.get_text().strip().strip(",")
         if text.strip(" \n\t") == "" or text in [t.text for t in UserData.tags]:
@@ -98,10 +161,8 @@ class Tag(Adw.ActionRow):
             for task in list.all_tasks:
                 for tag in task.tags:
                     if tag.title == self.get_title():
-                        task.tags_bar.remove(tag)
-                        task.tags_bar_rev.set_reveal_child(
-                            len(task.task_data.tags) - 1 > 0
-                        )
+                        task.tags_bar.box.remove(tag)
+                        task.tags_bar.set_reveal_child(len(task.task_data.tags) - 1 > 0)
                         break
         UserData.remove_tags([self.get_title()])
         self.tags.update_ui(False)

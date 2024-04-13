@@ -51,35 +51,13 @@ class Trash(Adw.Bin):
         )
         hb.pack_start(clear_button)
 
-        # Restore button
-        restore_button: ErrandsButton = ErrandsButton(
-            on_click=self._on_trash_restore,
-            icon_name="errands-restore-symbolic",
-            css_classes=["flat"],
-        )
-        self.status_page.bind_property(
-            "visible",
-            restore_button,
-            "visible",
-            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.INVERT_BOOLEAN,
-        )
-        hb.pack_end(restore_button)
-
         # Trash List
         self.trash_list = Gtk.ListBox(
             selection_mode=Gtk.SelectionMode.NONE,
             margin_bottom=32,
             css_classes=["transparent"],
         )
-
-        # Content
-        content = Gtk.ScrolledWindow(
-            propagate_natural_height=True,
-            child=Adw.Clamp(
-                maximum_size=1000, tightening_threshold=300, child=self.trash_list
-            ),
-        )
-        content.bind_property(
+        self.trash_list.bind_property(
             "visible",
             self.status_page,
             "visible",
@@ -90,7 +68,7 @@ class Trash(Adw.Bin):
         toolbar_view: Adw.ToolbarView = Adw.ToolbarView(
             content=ErrandsBox(
                 orientation=Gtk.Orientation.VERTICAL,
-                children=[self.status_page, content],
+                children=[self.status_page, self.trash_list],
             )
         )
         toolbar_view.add_top_bar(hb)
