@@ -11,6 +11,7 @@ from errands.lib.utils import get_children
 from errands.state import State
 from errands.widgets.shared.components.boxes import ErrandsBox, ErrandsListBox
 from errands.widgets.shared.components.rows import ErrandsEntryRow
+from errands.widgets.shared.components.toolbar_view import ErrandsToolbarView
 
 
 class Tags(Adw.Bin):
@@ -32,9 +33,6 @@ class Tags(Adw.Bin):
             vexpand=True,
             css_classes=["compact"],
         )
-
-        # Header Bar
-        hb: Adw.HeaderBar = Adw.HeaderBar(title_widget=Adw.WindowTitle(title=_("Tags")))
 
         # Content
         self.tags_list = Gtk.ListBox(
@@ -58,37 +56,37 @@ class Tags(Adw.Bin):
             GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.INVERT_BOOLEAN,
         )
 
-        # Toolbar View
-        toolbar_view: Adw.ToolbarView = Adw.ToolbarView(
-            content=ErrandsBox(
-                orientation=Gtk.Orientation.VERTICAL,
-                children=[
-                    self.status_page,
-                    Adw.Clamp(
-                        maximum_size=1000,
-                        tightening_threshold=300,
-                        child=ErrandsListBox(
-                            selection_mode=Gtk.SelectionMode.NONE,
-                            margin_bottom=6,
-                            margin_start=12,
-                            margin_end=12,
-                            css_classes=["boxed-list"],
-                            children=[
-                                ErrandsEntryRow(
-                                    on_entry_activated=self._on_tag_added,
-                                    height_request=60,
-                                    activatable=False,
-                                    title=_("Add new Tag"),
-                                )
-                            ],
+        self.set_child(
+            ErrandsToolbarView(
+                top_bars=[Adw.HeaderBar(title_widget=Adw.WindowTitle(title=_("Tags")))],
+                content=ErrandsBox(
+                    orientation=Gtk.Orientation.VERTICAL,
+                    children=[
+                        self.status_page,
+                        Adw.Clamp(
+                            maximum_size=1000,
+                            tightening_threshold=300,
+                            child=ErrandsListBox(
+                                selection_mode=Gtk.SelectionMode.NONE,
+                                margin_bottom=6,
+                                margin_start=12,
+                                margin_end=12,
+                                css_classes=["boxed-list"],
+                                children=[
+                                    ErrandsEntryRow(
+                                        on_entry_activated=self._on_tag_added,
+                                        height_request=60,
+                                        activatable=False,
+                                        title=_("Add new Tag"),
+                                    )
+                                ],
+                            ),
                         ),
-                    ),
-                    content,
-                ],
+                        content,
+                    ],
+                ),
             )
         )
-        toolbar_view.add_top_bar(hb)
-        self.set_child(toolbar_view)
 
     @property
     def tags(self) -> list[Tag]:

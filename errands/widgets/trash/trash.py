@@ -9,9 +9,11 @@ from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
 from errands.lib.utils import get_children
 from errands.state import State
-from errands.widgets.component import ConfirmDialog
+from errands.widgets.shared.components.dialogs import ConfirmDialog
 from errands.widgets.shared.components.boxes import ErrandsBox
 from errands.widgets.shared.components.buttons import ErrandsButton
+from errands.widgets.shared.components.header_bar import ErrandsHeaderBar
+from errands.widgets.shared.components.toolbar_view import ErrandsToolbarView
 from errands.widgets.trash.trash_item import TrashItem
 
 
@@ -32,24 +34,33 @@ class Trash(Adw.Bin):
             css_classes=["compact"],
         )
 
-        # Header Bar
-        hb: Adw.HeaderBar = Adw.HeaderBar(
-            title_widget=Adw.WindowTitle(title=_("Trash"))
-        )
-
         # Clear button
-        clear_button: ErrandsButton = ErrandsButton(
+        clear_btn: ErrandsButton = ErrandsButton(
             on_click=self._on_trash_clear,
             icon_name="errands-trash-symbolic",
             css_classes=["flat"],
+            valign=Gtk.Align.CENTER,
         )
         self.status_page.bind_property(
             "visible",
-            clear_button,
+            clear_btn,
             "visible",
             GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.INVERT_BOOLEAN,
         )
-        hb.pack_start(clear_button)
+
+        # Restore button
+        restore_btn: ErrandsButton = ErrandsButton(
+            on_click=self._on_trash_restore,
+            icon_name="errands-trash-symbolic",
+            css_classes=["flat"],
+            valign=Gtk.Align.CENTER,
+        )
+        self.status_page.bind_property(
+            "visible",
+            restore_btn,
+            "visible",
+            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.INVERT_BOOLEAN,
+        )
 
         # Trash List
         self.trash_list = Gtk.ListBox(
@@ -64,15 +75,21 @@ class Trash(Adw.Bin):
             GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.INVERT_BOOLEAN,
         )
 
-        # Toolbar View
-        toolbar_view: Adw.ToolbarView = Adw.ToolbarView(
-            content=ErrandsBox(
-                orientation=Gtk.Orientation.VERTICAL,
-                children=[self.status_page, self.trash_list],
+        self.set_child(
+            ErrandsToolbarView(
+                top_bars=[
+                    ErrandsHeaderBar(
+                        start_children=[clear_btn],
+                        end_children=[restore_btn],
+                        title_widget=Adw.WindowTitle(title=_("Trash")),
+                    )
+                ],
+                content=ErrandsBox(
+                    orientation=Gtk.Orientation.VERTICAL,
+                    children=[self.status_page, self.trash_list],
+                ),
             )
         )
-        toolbar_view.add_top_bar(hb)
-        self.set_child(toolbar_view)
 
     @property
     def trash_items(self) -> list[TrashItem]:

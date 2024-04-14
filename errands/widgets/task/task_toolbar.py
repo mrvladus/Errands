@@ -296,8 +296,6 @@ class TaskToolbar(Gtk.Revealer):
         )
         self.set_child(flow_box)
 
-    # ------ PROPERTIES ------ #
-
     # ------ PUBLIC METHODS ------ #
 
     def update_ui(self) -> None:
@@ -415,7 +413,7 @@ class TaskToolbar(Gtk.Revealer):
         # Add tags
         for tag in tags:
             if tag not in tags_list_items_text:
-                self.tags_list.append(TagsListItem(tag, self))
+                self.tags_list.append(TagsListItem(tag, self.task))
 
         # Toggle tags
         task_tags: list[str] = [t.title for t in self.task.tags]

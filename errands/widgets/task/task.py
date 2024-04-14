@@ -13,12 +13,16 @@ from errands.lib.data import TaskData, UserData
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.state import State
-from errands.widgets.task.task_progress_bar import TaskProgressBar
-from errands.widgets.task.task_sub_tasks import TaskSubTasks
-from errands.widgets.task.task_tags_bar import TaskTagsBar
-from errands.widgets.task.task_title import TaskTitle
-from errands.widgets.task.task_toolbar import TaskToolbar
-from errands.widgets.task.task_top_drop_area import TaskTopDropArea
+from errands.widgets.shared.components.boxes import ErrandsBox
+from errands.widgets.task import (
+    TaskProgressBar,
+    TaskSubTasks,
+    TaskTagsBar,
+    TaskTitle,
+    TaskToolbar,
+    TaskTopDropArea,
+)
+from errands.widgets.task.task_tags_bar import TaskTagsBarTag
 
 if TYPE_CHECKING:
     from errands.widgets.task_list import TaskList
@@ -26,6 +30,7 @@ if TYPE_CHECKING:
 
 class Task(Adw.Bin):
     block_signals: bool = True
+    today_task = None
 
     def __init__(self, task_data: TaskData, task_list: TaskList, parent) -> None:
         super().__init__()
@@ -139,27 +144,29 @@ class Task(Adw.Bin):
         self.sub_tasks = TaskSubTasks(self)
 
         # Main box
-        self.main_box: Gtk.Box = Gtk.Box(
+        self.main_box: ErrandsBox = ErrandsBox(
             orientation=Gtk.Orientation.VERTICAL,
             margin_start=12,
             margin_end=12,
             css_classes=["card", "fade"],
+            children=[
+                self.title,
+                self.tags_bar,
+                self.progress_bar,
+                self.toolbar,
+                self.sub_tasks,
+            ],
         )
-        self.main_box.append(self.title)
-        self.main_box.append(self.tags_bar)
-        self.main_box.append(self.progress_bar)
-        self.main_box.append(self.toolbar)
-        self.main_box.append(self.sub_tasks)
-
-        # Box
-        box: Gtk.Box = Gtk.Box(
-            orientation=Gtk.Orientation.VERTICAL, margin_bottom=6, margin_top=6
-        )
-        box.append(self.top_drop_area)
-        box.append(self.main_box)
 
         # Revealer
-        self.revealer = Gtk.Revealer(child=box)
+        self.revealer = Gtk.Revealer(
+            child=ErrandsBox(
+                orientation=Gtk.Orientation.VERTICAL,
+                margin_bottom=6,
+                margin_top=6,
+                children=[self.top_drop_area, self.main_box],
+            )
+        )
         self.set_child(self.revealer)
 
     # ------ PROPERTIES ------ #
@@ -180,7 +187,7 @@ class Task(Adw.Bin):
         return parents
 
     @property
-    def tags(self) -> list[Task]:
+    def tags(self) -> list[TaskTagsBarTag]:
         """Top-level Tasks"""
 
         return self.tags_bar.tags

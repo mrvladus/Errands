@@ -2,40 +2,67 @@
 # SPDX-License-Identifier: MIT
 
 
-import os
 from datetime import datetime
 
-from gi.repository import Adw, Gtk  # type:ignore
+from gi.repository import Adw, GObject, Gtk  # type:ignore
 
 from errands.lib.data import TaskData, UserData
 from errands.lib.logging import Log
-from errands.lib.utils import get_children, idle_add
+from errands.lib.utils import get_children
 from errands.state import State
+from errands.widgets.shared.components.boxes import ErrandsBox
+from errands.widgets.shared.components.toolbar_view import ErrandsToolbarView
 from errands.widgets.today.today_task import TodayTask
 
 
-@Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
 class Today(Adw.Bin):
-    __gtype_name__ = "Today"
-
-    status_page: Adw.StatusPage = Gtk.Template.Child()
-    task_list: Gtk.ListBox = Gtk.Template.Child()
-
     def __init__(self):
         super().__init__()
         Log.debug("Today Page: Load")
         State.today_page = self
-        self.__load_tasks()
+        self.__build_ui()
+        self.update_status()
 
     # ------ PRIVATE METHODS ------ #
 
-    def __load_tasks(self) -> None:
-        Log.debug("Today Page: Load tasks for today")
-        for task in self.tasks_data:
-            new_task = TodayTask(task)
-            self.task_list.append(new_task)
-            new_task.update_ui()
-        self.update_status()
+    def __build_ui(self):
+        # Status Page
+        self.status_page = Adw.StatusPage(
+            title=_("No Tasks for Today"),
+            description=_("No deleted items"),
+            icon_name="errands-info-symbolic",
+            vexpand=True,
+            css_classes=["compact"],
+        )
+
+        # Task List
+        self.task_list = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, margin_bottom=32)
+
+        # Content
+        content = Gtk.ScrolledWindow(
+            propagate_natural_height=True,
+            child=Adw.Clamp(
+                maximum_size=1000, tightening_threshold=300, child=self.task_list
+            ),
+        )
+        self.status_page.bind_property(
+            "visible",
+            content,
+            "visible",
+            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.INVERT_BOOLEAN,
+        )
+
+        self.set_child(
+            ErrandsToolbarView(
+                top_bars=[
+                    Adw.HeaderBar(title_widget=Adw.WindowTitle(title=_("Today")))
+                ],
+                content=ErrandsBox(
+                    orientation=Gtk.Orientation.VERTICAL,
+                    children=[self.status_page, content],
+                ),
+            )
+        )
 
     # ------ PROPERTIES ------ #
 
@@ -56,6 +83,12 @@ class Today(Adw.Bin):
 
     # ------ PUBLIC METHODS ------ #
 
+    def add_task(self, task) -> TodayTask:
+        new_task = TodayTask(task)
+        self.task_list.append(new_task)
+        self.status_page.set_visible(False)
+        return new_task
+
     def update_status(self):
         """Update status and counter"""
 
@@ -66,6 +99,7 @@ class Today(Adw.Bin):
         )
 
     def update_ui(self):
+        return
         Log.debug("Today Page: Update UI")
         tasks = self.tasks_data
         tasks_uids: list[str] = [t.uid for t in tasks]

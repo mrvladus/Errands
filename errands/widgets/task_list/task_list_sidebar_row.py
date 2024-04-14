@@ -12,9 +12,11 @@ from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
 from errands.state import State
-from errands.widgets.component import ConfirmDialog
-from errands.widgets.task_list import TaskList
+from errands.widgets.shared.components.boxes import ErrandsBox
+from errands.widgets.shared.components.dialogs import ConfirmDialog
+from errands.widgets.shared.components.menus import ErrandsMenuItem, ErrandsSimpleMenu
 from errands.widgets.task.task import Task
+from errands.widgets.task_list.task_list import TaskList
 
 
 class TaskListSidebarRow(Gtk.ListBoxRow):
@@ -190,24 +192,28 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
         # Counter
         self.size_counter = Gtk.Label(css_classes=["dim-label", "caption"])
 
-        # Menu
-        menu: Gio.Menu = Gio.Menu()
-        menu.append(label=_("Rename"), detailed_action="list_row.rename")
-        menu.append(label=_("Delete"), detailed_action="list_row.delete")
-        menu.append(label=_("Export"), detailed_action="list_row.export")
-        menu_btn: Gtk.MenuButton = Gtk.MenuButton(
-            menu_model=menu,
-            icon_name="errands-more-symbolic",
-            css_classes=["flat"],
-            valign=Gtk.Align.CENTER,
+        self.set_child(
+            ErrandsBox(
+                spacing=12,
+                margin_start=6,
+                children=[
+                    self.label,
+                    self.size_counter,
+                    Gtk.MenuButton(
+                        menu_model=ErrandsSimpleMenu(
+                            (
+                                ErrandsMenuItem(_("Rename"), "list_row.rename"),
+                                ErrandsMenuItem(_("Delete"), "list_row.delete"),
+                                ErrandsMenuItem(_("Export"), "list_row.export"),
+                            )
+                        ),
+                        icon_name="errands-more-symbolic",
+                        css_classes=["flat"],
+                        valign=Gtk.Align.CENTER,
+                    ),
+                ],
+            )
         )
-
-        box: Gtk.Box = Gtk.Box(spacing=12, margin_start=6)
-        box.append(self.label)
-        box.append(self.size_counter)
-        box.append(menu_btn)
-
-        self.set_child(box)
 
     def update_ui(self, update_task_list_ui: bool = True):
         Log.debug(f"Task List Row: Update UI '{self.uid}'")

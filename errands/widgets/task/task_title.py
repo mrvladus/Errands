@@ -172,38 +172,40 @@ class TaskTitle(Gtk.ListBox):
     # ------ SIGNAL HANDLERS ------ #
 
     def _on_complete_btn_toggled(self, btn: Gtk.CheckButton) -> None:
+        from errands.widgets.task.task import Task
+
         self.add_rm_crossline(btn.get_active())
-        if self.task.just_added:
+        if self.task.block_signals:
             return
 
         Log.debug(f"Task '{self.task.uid}': Set completed to '{btn.get_active()}'")
 
-        if self.get_prop("completed") != btn.get_active():
-            self.update_props(["completed", "synced"], [btn.get_active(), False])
+        if self.task.task_data.completed != btn.get_active():
+            self.task.update_props(["completed", "synced"], [btn.get_active(), False])
 
         # Complete all sub-tasks
         if btn.get_active():
             for task in self.task.all_tasks:
-                if not task.get_prop("completed"):
+                if not task.task_data.completed:
                     task.update_props(["completed", "synced"], [True, False])
-                    task.just_added = True
+                    task.block_signals = True
                     task.title.complete_btn.set_active(True)
-                    task.just_added = False
+                    task.block_signals = False
 
         # Uncomplete parent if sub-task is uncompleted
         else:
             for task in self.task.parents_tree:
-                if task.get_prop("completed"):
+                if task.task_data.completed:
                     task.update_props(["completed", "synced"], [False, False])
-                    task.just_added = True
+                    task.block_signals = True
                     task.title.complete_btn.set_active(False)
-                    task.just_added = False
+                    task.block_signals = False
 
         if isinstance(self.task.parent, Task):
             self.task.parent.update_ui()
         else:
             self.task.parent.update_ui(False)
-        self.task.task_list.update_status()
+        self.task.task_list.header_bar.update_ui()
         Sync.sync()
 
     def _on_edit_row_applied(self, entry: Adw.EntryRow) -> None:
@@ -211,7 +213,7 @@ class TaskTitle(Gtk.ListBox):
         entry.set_visible(False)
         if not text or text == self.task.task_data.text:
             return
-        self.update_props(["text", "synced"], [text, False])
+        self.task.update_props(["text", "synced"], [text, False])
         self.update_ui()
         Sync.sync()
 

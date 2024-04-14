@@ -3,6 +3,7 @@
 
 
 from typing import Callable
+
 from gi.repository import Adw  # type:ignore
 
 

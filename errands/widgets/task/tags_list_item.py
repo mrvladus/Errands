@@ -35,7 +35,7 @@ class TagsListItem(Gtk.Box):
         if self.block_signals:
             return
 
-        tags: list[str] = self.task.get_prop("tags")
+        tags: list[str] = self.task.task_data.tags
 
         if btn.get_active():
             if self.title not in tags:
@@ -45,5 +45,4 @@ class TagsListItem(Gtk.Box):
                 tags.remove(self.title)
 
         self.task.update_props(["tags", "synced"], [tags, False])
-        self.task.update_task_data()
-        self.task.update_tags()
+        self.task.tags_bar.update_ui()

@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 from gi.repository import Adw, Gtk  # type:ignore
 
 from errands.state import State
+from errands.widgets.shared.components.toolbar_view import ErrandsToolbarView
 from errands.widgets.shared.datetime_picker import DateTimePicker
 
 if TYPE_CHECKING:
@@ -60,17 +61,18 @@ class DateTimeWindow(Adw.Dialog):
             ),
         )
 
-        # Header Bar
-        hb: Adw.HeaderBar = Adw.HeaderBar(
-            title_widget=Adw.ViewSwitcher(
-                policy=Adw.ViewSwitcherPolicy.WIDE, stack=stack
-            )
+        self.set_child(
+            ErrandsToolbarView(
+                top_bars=[
+                    Adw.HeaderBar(
+                        title_widget=Adw.ViewSwitcher(
+                            policy=Adw.ViewSwitcherPolicy.WIDE, stack=stack
+                        )
+                    )
+                ]
+            ),
+            content=stack,
         )
-
-        # Toolbar View
-        toolbar_view: Adw.ToolbarView = Adw.ToolbarView(content=stack)
-        toolbar_view.add_top_bar(hb)
-        self.set_child(toolbar_view)
 
     # ------ PUBLIC METHODS ------ #
 

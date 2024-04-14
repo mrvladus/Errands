@@ -22,7 +22,6 @@ class TagsSidebarRow(Gtk.ListBoxRow):
     def __build_ui(self) -> None:
         self.props.height_request = 50
         self.add_css_class("sidebar-item")
-        self.add_css_class("sidebar-item-trash")
         self.connect("activate", self._on_row_activated)
 
         # Icon

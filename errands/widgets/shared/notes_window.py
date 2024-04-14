@@ -9,6 +9,7 @@ from gi.repository import Adw, GObject, Gtk, GtkSource  # type:ignore
 
 from errands.lib.logging import Log
 from errands.state import State
+from errands.widgets.shared.components.toolbar_view import ErrandsToolbarView
 
 if TYPE_CHECKING:
     from errands.widgets.task.task import Task
@@ -45,24 +46,25 @@ class NotesWindow(Adw.Dialog):
         )
 
         # Toolbar View
-        toolbar_view: Adw.ToolbarView = Adw.ToolbarView(
-            top_bar_style=Adw.ToolbarStyle.RAISED,
-            content=Gtk.ScrolledWindow(
-                propagate_natural_height=True,
-                propagate_natural_width=True,
-                child=GtkSource.View(
-                    wrap_mode=3,
-                    top_margin=6,
-                    bottom_margin=6,
-                    left_margin=6,
-                    right_margin=6,
-                    show_line_numbers=True,
-                    buffer=self.buffer,
+        self.set_child(
+            ErrandsToolbarView(
+                top_bars=[Adw.HeaderBar()],
+                top_bar_style=Adw.ToolbarStyle.RAISED,
+                content=Gtk.ScrolledWindow(
+                    propagate_natural_height=True,
+                    propagate_natural_width=True,
+                    child=GtkSource.View(
+                        wrap_mode=3,
+                        top_margin=6,
+                        bottom_margin=6,
+                        left_margin=6,
+                        right_margin=6,
+                        show_line_numbers=True,
+                        buffer=self.buffer,
+                    ),
                 ),
-            ),
+            )
         )
-        toolbar_view.add_top_bar(Adw.HeaderBar())
-        self.set_child(toolbar_view)
 
     # ------ PUBLIC METHODS ------ #
 
