@@ -17,9 +17,9 @@ from errands.state import State
 from errands.widgets.shared.components.boxes import ErrandsBox
 from errands.widgets.shared.components.buttons import ErrandsButton, ErrandsToggleButton
 from errands.widgets.shared.components.header_bar import ErrandsHeaderBar
-from errands.widgets.shared.components.rows import ErrandsEntryRow
+from errands.widgets.shared.components.entries import ErrandsEntryRow
 from errands.widgets.shared.components.toolbar_view import ErrandsToolbarView
-from errands.widgets.task.task import Task
+from errands.widgets.task import Task
 
 if TYPE_CHECKING:
     from errands.widgets.task_list.task_list_sidebar_row import TaskListSidebarRow

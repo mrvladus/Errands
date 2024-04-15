@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from errands.widgets.sidebar import Sidebar
     from errands.widgets.tags.tags import Tags
     from errands.widgets.tags.tags_sidebar_row import TagsSidebarRow
-    from errands.widgets.task.task import Task
+    from errands.widgets.task import Task
     from errands.widgets.task_list.task_list import TaskList
     from errands.widgets.today.today import Today
     from errands.widgets.today.today_sidebar_row import TodaySidebarRow

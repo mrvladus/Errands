@@ -10,7 +10,7 @@ from errands.lib.data import UserData
 from errands.lib.utils import get_children
 from errands.state import State
 from errands.widgets.shared.components.boxes import ErrandsBox, ErrandsListBox
-from errands.widgets.shared.components.rows import ErrandsEntryRow
+from errands.widgets.shared.components.entries import ErrandsEntryRow
 from errands.widgets.shared.components.toolbar_view import ErrandsToolbarView
 
 

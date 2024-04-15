@@ -12,7 +12,7 @@ from errands.state import State
 from errands.widgets.shared.components.toolbar_view import ErrandsToolbarView
 
 if TYPE_CHECKING:
-    from errands.widgets.task.task import Task
+    from errands.widgets.task import Task
 
 
 class NotesWindow(Adw.Dialog):

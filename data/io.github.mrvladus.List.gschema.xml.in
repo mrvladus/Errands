@@ -13,9 +13,6 @@
     <key name="maximized" type="b">
       <default>false</default>
     </key>
-    <key name="sidebar-open" type="b">
-      <default>false</default>
-    </key>
     <key name="theme" type="i">
       <default>0</default>
     </key>
@@ -30,9 +27,6 @@
     </key>
     <key name="sync-username" type="s">
       <default>""</default>
-    </key>
-    <key name="task-show-progressbar" type="b">
-      <default>true</default>
     </key>
     <key name="task-list-new-task-position-top" type="b">
       <default>false</default>

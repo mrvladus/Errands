@@ -12,7 +12,7 @@ from errands.widgets.shared.components.toolbar_view import ErrandsToolbarView
 from errands.widgets.shared.datetime_picker import DateTimePicker
 
 if TYPE_CHECKING:
-    from errands.widgets.task.task import Task
+    from errands.widgets.task import Task
     from errands.widgets.today.today_task import TodayTask
 
 

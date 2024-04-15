@@ -15,7 +15,7 @@ from errands.state import State
 from errands.widgets.shared.components.boxes import ErrandsBox
 from errands.widgets.shared.components.dialogs import ConfirmDialog
 from errands.widgets.shared.components.menus import ErrandsMenuItem, ErrandsSimpleMenu
-from errands.widgets.task.task import Task
+from errands.widgets.task import Task
 from errands.widgets.task_list.task_list import TaskList
 
 

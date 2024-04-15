@@ -10,7 +10,7 @@ from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.state import State
 from errands.widgets.shared.components.boxes import ErrandsBox
-from errands.widgets.task.task import Task
+from errands.widgets.task import Task
 
 
 class TrashSidebarRow(Gtk.ListBoxRow):

@@ -3,7 +3,7 @@ from gi.repository import Adw, Gtk, GObject  # type:ignore
 from errands.lib.utils import get_children
 from errands.widgets.shared.components.boxes import ErrandsBox, ErrandsListBox
 from errands.widgets.shared.components.buttons import ErrandsButton
-from errands.widgets.task.task import Task
+from errands.widgets.task import Task
 from errands.widgets.task.task_tags_bar import TaskTagsBarTag
 
 

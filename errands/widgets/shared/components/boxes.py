@@ -25,6 +25,23 @@ class ErrandsBox(Gtk.Box):
             func(child)
 
 
+class ErrandsFlowBox(Gtk.FlowBox):
+    def __init__(self, children: list[Gtk.Widget], **kwargs) -> None:
+        super().__init__(**kwargs)
+        for child in children:
+            self.append(child)
+
+    @property
+    def children(self) -> list[Gtk.Widget]:
+        return get_children(self)
+
+    def for_each(self, func: Callable) -> None:
+        """Call func for each child. Child passed as first argument"""
+
+        for child in self.children:
+            func(child)
+
+
 class ErrandsListBox(Gtk.ListBox):
     def __init__(
         self,
