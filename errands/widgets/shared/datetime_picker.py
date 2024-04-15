@@ -2,26 +2,183 @@
 # SPDX-License-Identifier: MIT
 
 import datetime
-import os
-from gi.repository import Gtk, GLib  # type:ignore
+
+from gi.repository import Adw, GLib, Gtk  # type:ignore
+
+from errands.widgets.shared.components.boxes import ErrandsBox
+from errands.widgets.shared.components.buttons import ErrandsButton, ErrandsSpinButton
 
 
-@Gtk.Template(filename=os.path.abspath(__file__).replace(".py", ".ui"))
 class DateTimePicker(Gtk.Box):
-    __gtype_name__ = "DateTimePicker"
-
-    # CHILDREN
-    label: Gtk.Label = Gtk.Template.Child()
-    hours: Gtk.SpinButton = Gtk.Template.Child()
-    minutes: Gtk.SpinButton = Gtk.Template.Child()
-    calendar: Gtk.Calendar = Gtk.Template.Child()
-
     # STATE
     __datetime: str = ""
     lock_signals: bool = True
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.__build_ui()
+
+    # ------ PRIVATE METHODS ------ #
+
+    def __build_ui(self) -> None:
+        self.set_orientation(Gtk.Orientation.VERTICAL)
+        self.set_spacing(12)
+
+        # Date and Time label
+        self.label = Gtk.Label(halign=Gtk.Align.CENTER, css_classes=["title-2"])
+        self.append(self.label)
+
+        # Separator
+        self.append(
+            Gtk.Separator(margin_end=6, margin_start=6, css_classes=["dim-label"])
+        )
+
+        # Time
+        self.hours: ErrandsSpinButton = ErrandsSpinButton(
+            orientation=Gtk.Orientation.VERTICAL,
+            numeric=True,
+            adjustment=Gtk.Adjustment(lower=0, upper=23, step_increment=1),
+            on_value_changed=self._on_date_time_changed,
+        )
+        self.minutes: ErrandsSpinButton = ErrandsSpinButton(
+            orientation=Gtk.Orientation.VERTICAL,
+            numeric=True,
+            adjustment=Gtk.Adjustment(lower=0, upper=59, step_increment=1),
+            on_value_changed=self._on_date_time_changed,
+        )
+
+        self.append(
+            ErrandsBox(
+                halign=Gtk.Align.CENTER,
+                spacing=6,
+                children=[
+                    # Time
+                    ErrandsBox(
+                        halign=Gtk.Align.CENTER,
+                        spacing=6,
+                        children=[
+                            self.hours,
+                            Gtk.Label(label=":", css_classes=["heading"]),
+                            self.minutes,
+                        ],
+                    ),
+                    # Presets
+                    ErrandsBox(
+                        orientation=Gtk.Orientation.VERTICAL,
+                        spacing=6,
+                        children=[
+                            # Time presets
+                            ErrandsBox(
+                                orientation=Gtk.Orientation.VERTICAL,
+                                spacing=6,
+                                children=[
+                                    ErrandsBox(
+                                        spacing=6,
+                                        homogeneous=True,
+                                        children=[
+                                            ErrandsButton(
+                                                on_click=self._on_time_preset_clicked,
+                                                css_classes=["flat"],
+                                                child=Adw.ButtonContent(
+                                                    label="09:00",
+                                                    icon_name="errands-daytime-morning-symbolic",
+                                                ),
+                                            ),
+                                            ErrandsButton(
+                                                on_click=self._on_time_preset_clicked,
+                                                css_classes=["flat"],
+                                                child=Adw.ButtonContent(
+                                                    label="13:00",
+                                                    icon_name="errands-theme-light-symbolic",
+                                                ),
+                                            ),
+                                        ],
+                                    ),
+                                    ErrandsBox(
+                                        spacing=6,
+                                        homogeneous=True,
+                                        children=[
+                                            ErrandsButton(
+                                                on_click=self._on_time_preset_clicked,
+                                                css_classes=["flat"],
+                                                child=Adw.ButtonContent(
+                                                    label="17:00",
+                                                    icon_name="errands-daytime-sunset-symbolic",
+                                                ),
+                                            ),
+                                            ErrandsButton(
+                                                on_click=self._on_time_preset_clicked,
+                                                css_classes=["flat"],
+                                                child=Adw.ButtonContent(
+                                                    label="20:00",
+                                                    icon_name="errands-theme-dark-symbolic",
+                                                ),
+                                            ),
+                                        ],
+                                    ),
+                                ],
+                            ),
+                            # Separator
+                            Gtk.Separator(
+                                margin_end=6, margin_start=6, css_classes=["dim-label"]
+                            ),
+                            # Day presets
+                            ErrandsBox(
+                                orientation=Gtk.Orientation.VERTICAL,
+                                spacing=6,
+                                children=[
+                                    ErrandsBox(
+                                        spacing=6,
+                                        homogeneous=True,
+                                        children=[
+                                            ErrandsButton(
+                                                on_click=self._on_today_clicked,
+                                                css_classes=["flat"],
+                                                label=_("Today"),
+                                            ),
+                                            ErrandsButton(
+                                                on_click=self._on_tomorrow_clicked,
+                                                css_classes=["flat"],
+                                                label=_("Tomorrow"),
+                                            ),
+                                        ],
+                                    ),
+                                    ErrandsBox(
+                                        spacing=6,
+                                        homogeneous=True,
+                                        children=[
+                                            ErrandsButton(
+                                                on_click=self._on_now_clicked,
+                                                css_classes=["flat"],
+                                                label=_("Now"),
+                                            ),
+                                            ErrandsButton(
+                                                on_click=self._on_clear_clicked,
+                                                css_classes=["flat"],
+                                                child=Adw.ButtonContent(
+                                                    label=_("Clear"),
+                                                    icon_name="errands-delete-all-symbolic",
+                                                ),
+                                            ),
+                                        ],
+                                    ),
+                                ],
+                            ),
+                        ],
+                    ),
+                ],
+            )
+        )
+
+        # Separator
+        self.append(
+            Gtk.Separator(margin_end=6, margin_start=6, css_classes=["dim-label"])
+        )
+
+        # Calendar
+        self.calendar = Gtk.Calendar()
+        self.calendar.connect("day-selected", self._on_date_time_changed)
+        self.append(self.calendar)
 
     # ------ PROPERTIES ------ #
 
@@ -63,13 +220,14 @@ class DateTimePicker(Gtk.Box):
             out: str = _("Date")
         return out
 
-    # ------ TEMPLATE HANDLERS ------ #
+    # ------ SIGNAL HANDLERS ------ #
 
-    @Gtk.Template.Callback()
+    def _on_day_preset_clicked(self, btn: Gtk.Button) -> None:
+        pass
+
     def _on_clear_clicked(self, btn: Gtk.Button):
         self.datetime = ""
 
-    @Gtk.Template.Callback()
     def _on_date_time_changed(self, *_args):
         # Get hour
         hour: str = str(self.hours.get_value_as_int())
@@ -82,21 +240,17 @@ class DateTimePicker(Gtk.Box):
         # Set date
         self.datetime = f"{date}T{hour}{min}00"
 
-    @Gtk.Template.Callback()
     def _on_now_clicked(self, btn: Gtk.Button):
         self.datetime = datetime.datetime.now().strftime("%Y%m%dT%H%M00")
 
-    @Gtk.Template.Callback()
     def _on_time_preset_clicked(self, btn: Gtk.Button):
         hour, min = btn.get_child().props.label.split(":")
         self.hours.set_value(int(hour))
         self.minutes.set_value(int(min))
 
-    @Gtk.Template.Callback()
     def _on_today_clicked(self, btn: Gtk.Button):
         self.datetime = datetime.datetime.now().strftime("%Y%m%dT000000")
 
-    @Gtk.Template.Callback()
     def _on_tomorrow_clicked(self, btn: Gtk.Button):
         self.datetime = (datetime.datetime.now() + datetime.timedelta(1)).strftime(
             "%Y%m%dT000000"

@@ -69,9 +69,9 @@ class DateTimeWindow(Adw.Dialog):
                             policy=Adw.ViewSwitcherPolicy.WIDE, stack=stack
                         )
                     )
-                ]
-            ),
-            content=stack,
+                ],
+                content=stack,
+            )
         )
 
     # ------ PUBLIC METHODS ------ #

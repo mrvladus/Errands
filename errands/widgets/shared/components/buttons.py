@@ -26,3 +26,10 @@ class ErrandsToggleButton(Gtk.ToggleButton):
         super().__init__(**kwargs)
         if on_toggle:
             self.connect("toggled", on_toggle)
+
+
+class ErrandsSpinButton(Gtk.SpinButton):
+    def __init__(self, on_value_changed: Callable = None, **kwargs) -> None:
+        super().__init__(**kwargs)
+        if on_value_changed:
+            self.connect("value-changed", on_value_changed)
