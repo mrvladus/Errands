@@ -27,26 +27,22 @@ from errands.widgets.shared.datetime_window import DateTimeWindow
 from errands.widgets.shared.notes_window import NotesWindow
 from errands.widgets.shared.titled_separator import TitledSeparator
 
-
 if TYPE_CHECKING:
     from errands.widgets.task_list.task_list import TaskList
 
 
 class Task(Gtk.Revealer):
     block_signals: bool = True
-    today_task = None
 
-    def __init__(self, task_data: TaskData, task_list: TaskList, parent) -> None:
+    def __init__(self, task_data: TaskData, parent: TaskList | Task) -> None:
         super().__init__()
         self.task_data = task_data
         self.list_uid = task_data.list_uid
         self.uid = task_data.uid
-        self.task_list: TaskList = task_list
         self.parent = parent
         self.__build_ui()
         self.__load_sub_tasks()
         self.__add_actions()
-
         self.block_signals = False
 
     def __repr__(self) -> str:
@@ -62,8 +58,9 @@ class Task(Gtk.Revealer):
             self.group.add_action(action)
 
         def __edit(*args):
-            self.title.edit_row.set_text(self.get_prop("text"))
-            self.title.edit_row.set_visible(True)
+            self.edit_row.set_text(self.task_data.text)
+            self.edit_row.set_visible(True)
+            self.edit_row.grab_focus()
 
         def __export(*args):
             def __confirm(dialog, res):
@@ -113,7 +110,7 @@ class Task(Gtk.Revealer):
 
         def __copy_to_clipboard(*args):
             Log.info("Task: Copy text to clipboard")
-            Gdk.Display.get_default().get_clipboard().set(self.get_prop("text"))
+            Gdk.Display.get_default().get_clipboard().set(self.task_data.text)
             State.main_window.add_toast(_("Copied to Clipboard"))
 
         __create_action("edit", __edit)
@@ -408,16 +405,16 @@ class Task(Gtk.Revealer):
 
         menu: Gio.Menu = Gio.Menu()
 
-        menu.append(label=_("Edit"), detailed_action="task_toolbar.edit")
+        menu.append(label=_("Edit"), detailed_action="task.edit")
         menu.append(
             label=_("Move to Trash"),
-            detailed_action="task_toolbar.move_to_trash",
+            detailed_action="task.move_to_trash",
         )
         menu.append(
             label=_("Copy to Clipboard"),
-            detailed_action="task_toolbar.copy_to_clipboard",
+            detailed_action="task.copy_to_clipboard",
         )
-        menu.append(label=_("Export"), detailed_action="task_toolbar.export")
+        menu.append(label=_("Export"), detailed_action="task.export")
         menu.append_section(None, menu_top_section)
 
         menu_bottom_section: Gio.Menu = Gio.Menu()
@@ -614,7 +611,7 @@ class Task(Gtk.Revealer):
             if not t.deleted
         )
         for task in tasks:
-            new_task = Task(task, self.task_list, self)
+            new_task = Task(task, self)
             if task.completed:
                 self.completed_task_list.append(new_task)
             else:
@@ -629,6 +626,10 @@ class Task(Gtk.Revealer):
         self.update_toolbar()
 
     # ------ PROPERTIES ------ #
+
+    @property
+    def task_list(self) -> TaskList:
+        return State.get_task_list(self.task_data.list_uid)
 
     @property
     def parents_tree(self) -> list[Task]:
@@ -692,7 +693,7 @@ class Task(Gtk.Revealer):
         Log.info(f"Task '{self.uid}': Add task '{task.uid}'")
 
         on_top: bool = GSettings.get("task-list-new-task-position-top")
-        new_task = Task(task, self.task_list, self)
+        new_task = Task(task, self)
         if on_top:
             self.uncompleted_task_list.prepend(new_task)
         else:
@@ -1129,7 +1130,8 @@ class Task(Gtk.Revealer):
         if self.task_data.completed:
             self.update_props(["completed", "synced"], [False, False])
 
-        self.update_ui(False)
+        self.update_title()
+        self.task_list.update_status()
 
         # Sync
         Sync.sync()
@@ -1244,8 +1246,7 @@ class TagsListItem(Gtk.Box):
         self.set_spacing(6)
         self.title = title
         self.task = task
-        self.toggle_btn = Gtk.CheckButton()
-        self.toggle_btn.connect("toggled", self.__on_toggle)
+        self.toggle_btn = ErrandsCheckButton(on_toggle=self.__on_toggle)
         self.append(self.toggle_btn)
         self.append(
             Gtk.Label(
@@ -1300,13 +1301,14 @@ class Tag(Gtk.Box):
         self.append(text)
 
         # Delete button
-        delete_btn = Gtk.Button(
-            icon_name="errands-close-symbolic",
-            cursor=Gdk.Cursor(name="pointer"),
-            tooltip_text=_("Delete Tag"),
+        self.append(
+            ErrandsButton(
+                icon_name="errands-close-symbolic",
+                cursor=Gdk.Cursor(name="pointer"),
+                tooltip_text=_("Delete Tag"),
+                on_click=self._on_delete_btn_clicked,
+            )
         )
-        delete_btn.connect("clicked", self._on_delete_btn_clicked)
-        self.append(delete_btn)
 
     # ------ SIGNAL HANDLERS ------ #
 
@@ -1314,5 +1316,5 @@ class Tag(Gtk.Box):
         tags: list[str] = self.task.task_data.tags
         tags.remove(self.title)
         self.task.update_props(["tags", "synced"], [tags, False])
-        self.tags_bar.remove(self)
+        self.task.update_tags_bar()
         Sync.sync()

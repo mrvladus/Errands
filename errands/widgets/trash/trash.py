@@ -134,7 +134,7 @@ class Trash(Adw.Bin):
 
             # Update title and subtitle
             task_dict = [t for t in tasks_dicts if t.uid == item.task_dict.uid][0]
-            list_dict = [l for l in lists_dicts if l.uid == task_dict.list_uid][0]
+            list_dict = [lst for lst in lists_dicts if lst.uid == task_dict.list_uid][0]
             if item.get_title() != task_dict.text:
                 item.set_title(task_dict.text)
             if item.get_subtitle() != list_dict.name:

@@ -143,7 +143,7 @@ class TaskList(Adw.Bin):
             t for t in UserData.get_tasks_as_dicts(self.list_uid, "") if not t.deleted
         ]
         for task in tasks:
-            new_task = Task(task, self, self)
+            new_task = Task(task, self)
             if task.completed:
                 self.completed_task_list.append(new_task)
             else:
@@ -190,7 +190,7 @@ class TaskList(Adw.Bin):
         Log.info(f"Task List: Add task '{task.uid}'")
 
         on_top: bool = GSettings.get("task-list-new-task-position-top")
-        new_task = Task(task, self, self)
+        new_task = Task(task, self)
         if not task.completed:
             if on_top:
                 self.uncompleted_task_list.prepend(new_task)

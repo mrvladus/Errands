@@ -45,5 +45,5 @@ class TrashItem(Adw.ActionRow):
             UserData.update_props(self.task_dict.list_uid, uid, ["trash"], [False])
             State.get_task(self.task_dict.list_uid, uid).toggle_visibility(True)
 
-        State.sidebar.update_ui()
+        State.trash_page.update_ui()
         State.today_page.update_ui()
