@@ -7,6 +7,7 @@ from __future__ import annotations
 from gi.repository import Adw, GObject, Gtk  # type:ignore
 
 from errands.lib.data import UserData
+from errands.lib.logging import Log
 from errands.lib.utils import get_children
 from errands.state import State
 from errands.widgets.shared.components.boxes import ErrandsBox, ErrandsListBox
@@ -155,13 +156,14 @@ class Tag(Adw.ActionRow):
         self.add_suffix(self.number_of_tasks)
 
     def delete(self, _btn: Gtk.Button):
-        for list in State.get_task_lists():
-            for task in list.all_tasks:
-                for tag in task.tags:
-                    if tag.title == self.get_title():
-                        task.tags_bar.box.remove(tag)
-                        task.tags_bar.set_reveal_child(len(task.task_data.tags) - 1 > 0)
-                        break
+        Log.info(f"Tags: Delete Tag '{self.get_title()}'")
+        for task in State.get_tasks():
+            for tag in task.tags:
+                if self.get_title() == tag.title:
+                    task.tags_bar.remove(tag)
+                    if len(task.tags) == 0:
+                        task.tags_bar_rev.set_reveal_child(False)
+                    break
         UserData.remove_tags([self.get_title()])
         self.tags.update_ui(False)
 

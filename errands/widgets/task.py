@@ -356,6 +356,11 @@ class Task(Gtk.Revealer):
         self.priority_btn.connect("notify::active", self._on_priority_btn_toggled)
 
         # Tags button
+        tags_status_page: Adw.StatusPage = Adw.StatusPage(
+            title=_("No Tags"),
+            icon_name="errands-info-symbolic",
+            css_classes=["compact"],
+        )
         self.tags_list: Gtk.Box = Gtk.Box(
             orientation=Gtk.Orientation.VERTICAL,
             spacing=6,
@@ -364,14 +369,9 @@ class Task(Gtk.Revealer):
             margin_start=6,
             margin_top=6,
         )
-        tags_status_page: Adw.StatusPage = Adw.StatusPage(
-            title=_("No Tags"),
-            icon_name="errands-info-symbolic",
-            css_classes=["compact"],
-        )
-        tags_status_page.bind_property(
+        self.tags_list.bind_property(
             "visible",
-            self.tags_list,
+            tags_status_page,
             "visible",
             GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.INVERT_BOOLEAN,
         )
@@ -391,6 +391,8 @@ class Task(Gtk.Revealer):
                     vexpand=True,
                     child=ErrandsBox(
                         orientation=Gtk.Orientation.VERTICAL,
+                        vexpand=True,
+                        valign=Gtk.Align.CENTER,
                         children=[self.tags_list, tags_status_page],
                     ),
                 ),
@@ -645,7 +647,7 @@ class Task(Gtk.Revealer):
 
     @property
     def tags(self) -> list[Tag]:
-        return get_children(self.tags_bar)
+        return [item.get_child() for item in get_children(self.tags_bar)]
 
     @property
     def all_tasks(self) -> list[Task]:
@@ -1186,7 +1188,7 @@ class Task(Gtk.Revealer):
             if priority != new_priority:
                 Log.debug(f"Task Toolbar: Set priority to '{new_priority}'")
                 self.update_props(["priority", "synced"], [new_priority, False])
-                self.update_ui()
+                self.update_toolbar()
                 Sync.sync()
 
     def _on_priority_selected(self, box: Gtk.ListBox, row: Gtk.ListBoxRow) -> None:
@@ -1268,7 +1270,7 @@ class TagsListItem(Gtk.Box):
                 tags.remove(self.title)
 
         self.task.update_props(["tags", "synced"], [tags, False])
-        self.task.tags_bar.update_ui()
+        self.task.update_tags_bar()
 
 
 class Tag(Gtk.Box):

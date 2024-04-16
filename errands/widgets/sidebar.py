@@ -230,11 +230,7 @@ class Sidebar(Adw.Bin):
     @property
     def task_lists_rows(self) -> list[TaskListSidebarRow]:
         """Get only task list rows"""
-        return [
-            r
-            for r in self.rows
-            if hasattr(r, "__gtype_name__") and r.__gtype_name__ == "TaskListSidebarRow"
-        ]
+        return [r for r in self.rows if isinstance(r, TaskListSidebarRow)]
 
     @property
     def task_lists(self) -> list[TaskList]:
