@@ -2,21 +2,22 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the errands package.
 # Danial Behzadi <dani.behzi@ubuntu.com>, 2024.
+# Goudarz Jafari <me@goudarzjafari.com>, 2024.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-06 17:58+0300\n"
-"PO-Revision-Date: 2024-02-04 13:34+0330\n"
-"Last-Translator: Danial Behzadi <dani.behzi@ubuntu.com>\n"
+"PO-Revision-Date: 2024-04-09 15:46+0330\n"
+"Last-Translator: Goudarz Jafari <me@goudarzjafari.com>\n"
 "Language-Team: \n"
 "Language: fa_IR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n==0 || n==1);\n"
-"X-Generator: Poedit 3.2.2\n"
+"X-Generator: Poedit 3.4.2\n"
 
 #: errands/widgets/components.py:153
 msgid "Today"
@@ -96,11 +97,11 @@ msgstr "بزرگ"
 
 #: errands/widgets/preferences.py:113
 msgid "Progress Bar"
-msgstr ""
+msgstr "نوار پیشرفت"
 
 #: errands/widgets/preferences.py:119
 msgid "Tool Bar"
-msgstr ""
+msgstr "نوار ابزار"
 
 #: errands/widgets/preferences.py:126 errands/widgets/preferences.py:194
 #: data/resources/gtk/help-overlay.ui:38
@@ -427,7 +428,9 @@ msgstr "سیاهه‌ها"
 
 #: errands/widgets/window.py:134
 msgid "translator-credits"
-msgstr "دانیال بهزادی <dani.behzi@ubuntu.com>"
+msgstr ""
+"دانیال بهزادی <dani.behzi@ubuntu.com>\n"
+"گودرز جعفری <me@goudarzjafari.com>"
 
 #: errands/widgets/window.py:143
 msgid "Sync is disabled"
