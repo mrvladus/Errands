@@ -26,7 +26,6 @@ class NotesWindow(Adw.Dialog):
     def __build_ui(self) -> None:
         self.set_content_width(600)
         self.set_content_height(600)
-        # self.set_follows_content_size(True)
         self.set_title(_("Notes"))
 
         # Buffer

@@ -36,6 +36,7 @@ class Trash(Adw.Bin):
 
         # Clear button
         clear_btn: ErrandsButton = ErrandsButton(
+            tooltip_text=_("Clear"),
             on_click=self._on_trash_clear,
             icon_name="errands-trash-symbolic",
             css_classes=["flat"],
@@ -50,8 +51,9 @@ class Trash(Adw.Bin):
 
         # Restore button
         restore_btn: ErrandsButton = ErrandsButton(
+            tooltip_text=_("Restore"),
             on_click=self._on_trash_restore,
-            icon_name="errands-trash-symbolic",
+            icon_name="errands-restore-symbolic",
             css_classes=["flat"],
             valign=Gtk.Align.CENTER,
         )
@@ -66,6 +68,8 @@ class Trash(Adw.Bin):
         self.trash_list = Gtk.ListBox(
             selection_mode=Gtk.SelectionMode.NONE,
             margin_bottom=32,
+            margin_end=12,
+            margin_start=12,
             css_classes=["transparent"],
         )
         self.trash_list.bind_property(
@@ -86,7 +90,17 @@ class Trash(Adw.Bin):
                 ],
                 content=ErrandsBox(
                     orientation=Gtk.Orientation.VERTICAL,
-                    children=[self.status_page, self.trash_list],
+                    children=[
+                        self.status_page,
+                        Gtk.ScrolledWindow(
+                            propagate_natural_height=True,
+                            child=Adw.Clamp(
+                                maximum_size=1000,
+                                tightening_threshold=300,
+                                child=self.trash_list,
+                            ),
+                        ),
+                    ],
                 ),
             )
         )

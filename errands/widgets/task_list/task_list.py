@@ -277,6 +277,8 @@ class TaskList(Adw.Bin):
                     )
                 self.completed_task_list.remove(task)
                 self.uncompleted_task_list.append(task)
+            if not task.get_reveal_child() and not task.task_data.trash:
+                task.toggle_visibility(True)
 
     def update_ui(self, update_tasks: bool = True) -> None:
         self.update_status()

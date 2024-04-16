@@ -20,6 +20,6 @@ def ErrandsHeaderBar(
 
     if end_children:
         for child in end_children:
-            hb.pack_start(child)
+            hb.pack_end(child)
 
     return hb

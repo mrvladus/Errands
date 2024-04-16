@@ -43,6 +43,7 @@ class TrashItem(Adw.ActionRow):
         parents_uids.append(self.task_dict.uid)
         for uid in parents_uids:
             UserData.update_props(self.task_dict.list_uid, uid, ["trash"], [False])
+            State.get_task(self.task_dict.list_uid, uid).toggle_visibility(True)
 
         State.sidebar.update_ui()
         State.today_page.update_ui()
