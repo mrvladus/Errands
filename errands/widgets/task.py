@@ -617,6 +617,7 @@ class Task(Gtk.Revealer):
                 self.completed_task_list.append(new_task)
             else:
                 self.uncompleted_task_list.append(new_task)
+
         self.set_reveal_child(self.task_data.expanded)
         self.toggle_visibility(not self.task_data.trash)
         self.update_color()
@@ -644,13 +645,11 @@ class Task(Gtk.Revealer):
 
     @property
     def tags(self) -> list[Tag]:
-        """Top-level Tasks"""
-
         return get_children(self.tags_bar)
 
     @property
     def all_tasks(self) -> list[Task]:
-        """All tasks in the list"""
+        """All sub tasks"""
 
         all_tasks: list[Task] = []
 
@@ -688,7 +687,7 @@ class Task(Gtk.Revealer):
             self.title_row.remove_css_class("task-completed")
 
     def add_task(self, task: TaskData) -> Task:
-        Log.info(f"Task List: Add task '{task.uid}'")
+        Log.info(f"Task '{self.uid}': Add task '{task.uid}'")
 
         on_top: bool = GSettings.get("task-list-new-task-position-top")
         new_task = Task(task, self.task_list, self)

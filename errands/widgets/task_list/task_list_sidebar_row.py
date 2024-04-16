@@ -50,8 +50,7 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
 
                 Log.info(f"Lists: Delete list '{self.uid}'")
                 UserData.delete_list(self.uid)
-                State.sidebar.list_box.remove(self)
-                State.view_stack.remove(self.task_list)
+                State.sidebar.remove_task_list(self)
                 Sync.sync()
 
             ConfirmDialog(

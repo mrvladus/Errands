@@ -9,13 +9,16 @@ from errands.lib.data import TaskListData, UserData
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
-from errands.lib.utils import get_children, timeit
+from errands.lib.utils import get_children
 from errands.state import State
 from errands.widgets.shared.components.boxes import ErrandsBox, ErrandsListBox
 from errands.widgets.shared.components.buttons import ErrandsButton
+from errands.widgets.shared.components.menus import ErrandsMenuItem, ErrandsSimpleMenu
+from errands.widgets.shared.components.toolbar_view import ErrandsToolbarView
 from errands.widgets.shared.titled_separator import TitledSeparator
 from errands.widgets.tags.tags_sidebar_row import TagsSidebarRow
-from errands.widgets.task_list import TaskList, TaskListSidebarRow
+from errands.widgets.task_list.task_list import TaskList
+from errands.widgets.task_list.task_list_sidebar_row import TaskListSidebarRow
 from errands.widgets.today.today_sidebar_row import TodaySidebarRow
 from errands.widgets.trash.trash_sidebar_row import TrashSidebarRow
 
@@ -130,20 +133,24 @@ class Sidebar(Adw.Bin):
         hb.pack_end(self.sync_indicator)
 
         # Main Menu
-        main_menu_model = Gio.Menu()
-        main_menu_model.append(_("Sync / Fetch Tasks"), "app.sync")
-        main_menu_model.append(_("Import Task List"), "app.import")
-        main_menu_model.append(_("Preferences"), "app.preferences")
-        main_menu_model.append(_("Keyboard Shortcuts"), "win.show-help-overlay")
-        main_menu_model.append(_("About Errands"), "app.about")
-
-        main_menu_btn = Gtk.MenuButton(
-            primary=True,
-            tooltip_text=_("Main Menu"),
-            icon_name="open-menu-symbolic",
-            menu_model=main_menu_model,
+        hb.pack_end(
+            Gtk.MenuButton(
+                primary=True,
+                tooltip_text=_("Main Menu"),
+                icon_name="open-menu-symbolic",
+                menu_model=ErrandsSimpleMenu(
+                    items=[
+                        ErrandsMenuItem(_("Sync / Fetch Tasks"), "app.sync"),
+                        ErrandsMenuItem(_("Import Task List"), "app.import"),
+                        ErrandsMenuItem(_("Preferences"), "app.preferences"),
+                        ErrandsMenuItem(
+                            _("Keyboard Shortcuts"), "win.show-help-overlay"
+                        ),
+                        ErrandsMenuItem(_("About Errands"), "app.about"),
+                    ]
+                ),
+            )
         )
-        hb.pack_end(main_menu_btn)
 
         # Status page
         self.status_page = Adw.StatusPage(
@@ -165,9 +172,9 @@ class Sidebar(Adw.Bin):
                 TrashSidebarRow(),
             ],
         )
-        self.list_box.bind_property(
+        self.status_page.bind_property(
             "visible",
-            self.status_page,
+            self.list_box,
             "visible",
             GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.INVERT_BOOLEAN,
         )
@@ -180,21 +187,22 @@ class Sidebar(Adw.Bin):
             )
         )
 
-        # Toolbar View
-        toolbar_view: Adw.ToolbarView = Adw.ToolbarView(
-            content=ErrandsBox(
-                orientation=Gtk.Orientation.VERTICAL,
-                children=[self.list_box, self.status_page],
+        self.set_child(
+            ErrandsToolbarView(
+                top_bars=[hb],
+                content=ErrandsBox(
+                    orientation=Gtk.Orientation.VERTICAL,
+                    children=[self.list_box, self.status_page],
+                ),
             )
         )
-        toolbar_view.add_top_bar(hb)
-        self.set_child(toolbar_view)
 
-    def __remove_task_list(self, row: TaskListSidebarRow) -> None:
+    def remove_task_list(self, row: TaskListSidebarRow) -> None:
         Log.debug(f"Sidebar: Delete list {row.uid}")
         self.list_box.select_row(row.get_prev_sibling())
         State.view_stack.remove(row.task_list)
         self.list_box.remove(row)
+        self.update_status()
 
     def __select_last_opened_item(self) -> None:
         for row in self.rows:
@@ -206,7 +214,7 @@ class Sidebar(Adw.Bin):
                     self.list_box.select_row(row)
                 break
 
-    def __show_status(self) -> None:
+    def update_status(self) -> None:
         length: int = len(self.task_lists_rows)
         self.status_page.set_visible(length == 0)
         if length == 0:
@@ -230,9 +238,10 @@ class Sidebar(Adw.Bin):
 
     @property
     def task_lists(self) -> list[TaskList]:
-        return [l.task_list for l in self.task_lists_rows]
+        return [lst.task_list for lst in self.task_lists_rows]
 
     # ------ PUBLIC METHODS ------ #
+
     def add_task_list(self, list_dict: TaskListData) -> TaskListSidebarRow:
         Log.debug(f"Sidebar: Add Task List '{list_dict.uid}'")
         row: TaskListSidebarRow = TaskListSidebarRow(list_dict)
@@ -240,40 +249,52 @@ class Sidebar(Adw.Bin):
         self.status_page.set_visible(False)
         return row
 
-    # @timeit
     def load_task_lists(self) -> None:
         Log.debug("Sidebar: Load Task Lists")
+
+        list_added: bool = False
 
         for list in (
             list for list in UserData.get_lists_as_dicts() if not list.deleted
         ):
             self.add_task_list(list)
+            list_added = True
 
         self.__select_last_opened_item()
+        if list_added:
+            self.status_page.set_visible(False)
+
+    def update_task_lists(self, update_lists_ui: bool = True):
+        lists: list[TaskListData] = UserData.get_lists_as_dicts()
+
+        # Delete lists
+        uids: list[str] = [lst.uid for lst in lists]
+        for row in self.task_lists_rows:
+            if row.uid not in uids:
+                self.remove_task_list(row)
+
+        # Add lists
+        lists_uids = [lst.uid for lst in self.task_lists_rows]
+        for lst in lists:
+            if lst.uid not in lists_uids:
+                self.add_task_list(lst)
+
+        if update_lists_ui:
+            for row in self.rows:
+                if hasattr(row, "update_ui"):
+                    row.update_ui()
 
     def update_ui(self) -> None:
         Log.debug("Sidebar: Update UI")
 
-        lists: list[TaskListData] = UserData.get_lists_as_dicts()
-
-        # Delete lists
-        uids: list[str] = [l.uid for l in lists]
-        for l in self.task_lists_rows:
-            if l.uid not in uids:
-                self.__remove_task_list(l)
-
-        # Add lists
-        lists_uids = [l.uid for l in self.task_lists_rows]
-        for l in lists:
-            if l.uid not in lists_uids:
-                self.add_task_list(l)
+        self.update_task_lists()
 
         # Update rows
         for row in self.rows:
             if hasattr(row, "update_ui"):
                 row.update_ui()
 
-        self.__show_status()
+        self.update_status()
 
     # ------ TEMPLATE HANDLERS ------ #
 

@@ -16,6 +16,9 @@ from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
 from errands.state import State
 from errands.widgets.preferences import PreferencesWindow
+from errands.widgets.shared.components.boxes import ErrandsBox
+from errands.widgets.shared.components.buttons import ErrandsButton
+from errands.widgets.shared.components.toolbar_view import ErrandsToolbarView
 from errands.widgets.sidebar import Sidebar
 from errands.widgets.tags.tags import Tags
 from errands.widgets.today.today import Today
@@ -43,23 +46,22 @@ class Window(Adw.ApplicationWindow):
         self.props.width_request = 360
         self.props.height_request = 200
 
+        # View Stack
+        self.view_stack: Adw.ViewStack = Adw.ViewStack()
+
         # Split View
         self.split_view: Adw.NavigationSplitView = Adw.NavigationSplitView(
             show_content=True,
             max_sidebar_width=300,
             min_sidebar_width=200,
             sidebar=Adw.NavigationPage(child=Sidebar(), title=_("Sidebar")),
-        )
-
-        # View Stack
-        self.view_stack: Adw.ViewStack = Adw.ViewStack()
-        self.split_view.set_content(
-            Adw.NavigationPage(
+            content=Adw.NavigationPage(
                 child=self.view_stack,
                 title=_("Content"),
                 width_request=360,
-            )
+            ),
         )
+
         self.view_stack.add_titled(
             child=Today(),
             name="errands_today_page",
@@ -77,29 +79,28 @@ class Window(Adw.ApplicationWindow):
         )
 
         # Status Page
-        status_page: Adw.ToolbarView = Adw.ToolbarView()
-        status_page.add_top_bar(Adw.HeaderBar(show_title=False))
-        status_page_create_list_btn: Gtk.Button = Gtk.Button(
-            label=_("Create List"),
-            css_classes=["pill", "suggested-action"],
-            halign=Gtk.Align.CENTER,
-        )
-        status_page_create_list_btn.connect(
-            "clicked", lambda btn: State.sidebar.add_list_btn.activate()
-        )
-        status_page_box: Gtk.Box = Gtk.Box(
-            orientation=Gtk.Orientation.VERTICAL, hexpand=True, valign=Gtk.Align.CENTER
-        )
-        status_page_box.append(
-            Adw.StatusPage(
-                title=_("No Task Lists"),
-                description=_("Create new or import existing one"),
-                icon_name="io.github.mrvladus.List",
-            )
-        )
-        status_page_box.append(status_page_create_list_btn)
         self.view_stack.add_titled(
-            child=status_page,
+            child=ErrandsToolbarView(
+                top_bars=[Adw.HeaderBar(show_title=False)],
+                content=ErrandsBox(
+                    orientation=Gtk.Orientation.VERTICAL,
+                    hexpand=True,
+                    valign=Gtk.Align.CENTER,
+                    children=[
+                        Adw.StatusPage(
+                            title=_("No Task Lists"),
+                            description=_("Create new or import existing one"),
+                            icon_name="io.github.mrvladus.List",
+                        ),
+                        ErrandsButton(
+                            label=_("Create List"),
+                            css_classes=["pill", "suggested-action"],
+                            halign=Gtk.Align.CENTER,
+                            on_click=lambda btn: State.sidebar.add_list_btn.activate(),
+                        ),
+                    ],
+                ),
+            ),
             name="errands_status_page",
             title=_("Create new List"),
         )

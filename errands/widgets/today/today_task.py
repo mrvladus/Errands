@@ -4,7 +4,7 @@ from errands.lib.utils import get_children
 from errands.widgets.shared.components.boxes import ErrandsBox, ErrandsListBox
 from errands.widgets.shared.components.buttons import ErrandsButton
 from errands.widgets.task import Task
-from errands.widgets.task.task_tags_bar import TaskTagsBarTag
+from errands.widgets.task import Tag
 
 
 class TodayTask(Adw.Bin):
@@ -121,7 +121,7 @@ class TodayTask(Adw.Bin):
     # ------ PROPERTIES ------ #
 
     @property
-    def tags(self) -> list[TaskTagsBarTag]:
+    def tags(self) -> list[Tag]:
         """Top-level Tasks"""
 
         return get_children(self.tags_bar)
@@ -129,7 +129,7 @@ class TodayTask(Adw.Bin):
     # ------ PUBLIC METHODS ------ #
 
     def add_tag(self, tag: str) -> None:
-        self.tags_bar.append(TaskTagsBarTag(tag, self.tags_bar))
+        self.tags_bar.append(Tag(tag, self.tags_bar))
 
     def update_ui(self):
         # Update tags

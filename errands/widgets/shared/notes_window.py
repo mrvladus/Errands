@@ -80,4 +80,4 @@ class NotesWindow(Adw.Dialog):
             return
         Log.info("Task: Change notes")
         self.task.update_props(["notes", "synced"], [self.buffer.props.text, False])
-        self.task.toolbar.update_ui()
+        self.task.update_toolbar()

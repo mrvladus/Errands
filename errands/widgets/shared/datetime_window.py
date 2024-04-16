@@ -88,7 +88,7 @@ class DateTimeWindow(Adw.Dialog):
             self.task.update_props(
                 ["due_date", "synced"], [self.due_date_time.datetime, False]
             )
-            self.task.toolbar.update_ui()
+            self.task.update_toolbar()
         if self.start_date_time.datetime != self.task.get_prop("start_date"):
             self.task.update_props(
                 ["start_date", "synced"], [self.start_date_time.datetime, False]
