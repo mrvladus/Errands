@@ -202,6 +202,7 @@ class Sidebar(Adw.Bin):
         self.list_box.select_row(row.get_prev_sibling())
         State.view_stack.remove(row.task_list)
         self.list_box.remove(row)
+        State.trash_sidebar_row.update_ui()
         self.update_status()
 
     def __select_last_opened_item(self) -> None:

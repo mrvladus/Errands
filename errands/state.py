@@ -31,7 +31,7 @@ class State:
     profile: str = PROFILE
 
     # Application
-    application: ErrandsApplication = None
+    application: ErrandsApplication  = None
 
     # Main window
     main_window: Window = None

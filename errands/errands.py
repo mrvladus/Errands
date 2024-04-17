@@ -5,7 +5,7 @@
 
 import os
 import sys
-import gi  # type:ignore
+import gi  # type: ignore
 
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
@@ -23,7 +23,9 @@ localedir = "@localedir@"
 
 
 def setup_gettext():
-    import signal, locale, gettext
+    import signal
+    import locale
+    import gettext
 
     sys.path.insert(1, pkgdatadir)
     signal.signal(signal.SIGINT, signal.SIG_DFL)
