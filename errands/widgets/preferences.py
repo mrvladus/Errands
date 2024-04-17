@@ -86,13 +86,6 @@ class PreferencesWindow(Adw.PreferencesDialog):
         # Tasks group
         tasks_group = Adw.PreferencesGroup(title=_("Tasks"))
 
-        # Progress bar
-        task_progress_bar = Adw.SwitchRow(
-            title=_("Progress Bar"), icon_name="errands-progressbar-symbolic"
-        )
-        GSettings.bind("task-show-progressbar", task_progress_bar, "active")
-        tasks_group.add(task_progress_bar)
-
         # Sync group
         sync_group = Adw.PreferencesGroup(
             title=_("Sync"),
@@ -144,7 +137,7 @@ class PreferencesWindow(Adw.PreferencesDialog):
         )
         appearance_page.add(theme_group)
         appearance_page.add(task_list_group)
-        appearance_page.add(tasks_group)
+        # appearance_page.add(tasks_group)
         self.add(appearance_page)
 
         # Sync Page

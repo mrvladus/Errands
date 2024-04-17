@@ -620,6 +620,7 @@ class Task(Gtk.Revealer):
 
         self.set_reveal_child(self.task_data.expanded)
         self.toggle_visibility(not self.task_data.trash)
+        self.expand(self.task_data.expanded)
         self.update_color()
         self.update_title()
         self.update_progress_bar()
