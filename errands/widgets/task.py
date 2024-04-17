@@ -33,6 +33,7 @@ if TYPE_CHECKING:
 
 class Task(Gtk.Revealer):
     block_signals: bool = True
+    purging: bool = False
 
     def __init__(self, task_data: TaskData, parent: TaskList | Task) -> None:
         super().__init__()

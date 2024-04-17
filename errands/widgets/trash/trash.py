@@ -37,7 +37,7 @@ class Trash(Adw.Bin):
         # Clear button
         clear_btn: ErrandsButton = ErrandsButton(
             tooltip_text=_("Clear"),
-            on_click=self._on_trash_clear,
+            on_click=self.on_trash_clear,
             icon_name="errands-trash-symbolic",
             css_classes=["flat"],
             valign=Gtk.Align.CENTER,
@@ -52,7 +52,7 @@ class Trash(Adw.Bin):
         # Restore button
         restore_btn: ErrandsButton = ErrandsButton(
             tooltip_text=_("Restore"),
-            on_click=self._on_trash_restore,
+            on_click=self.on_trash_restore,
             icon_name="errands-restore-symbolic",
             css_classes=["flat"],
             valign=Gtk.Align.CENTER,
@@ -143,7 +143,7 @@ class Trash(Adw.Bin):
         # Show status
         self.status_page.set_visible(len(self.trash_items) == 0)
 
-    def _on_trash_clear(self, *args) -> None:
+    def on_trash_clear(self, *args) -> None:
         def __confirm(_, res) -> None:
             if res == "cancel":
                 Log.debug("Trash: Clear cancelled")
@@ -165,7 +165,7 @@ class Trash(Adw.Bin):
             __confirm,
         )
 
-    def _on_trash_restore(self, *args) -> None:
+    def on_trash_restore(self, *args) -> None:
         """
         Remove trash items and restore all tasks
         """

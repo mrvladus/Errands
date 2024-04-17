@@ -1,9 +1,8 @@
 # Copyright 2023-2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-from __future__ import annotations
 
-from gi.repository import Adw, Gio, GObject, Gtk  # type:ignore
+from gi.repository import Adw, GObject, Gtk  # type:ignore
 
 from errands.lib.data import TaskListData, UserData
 from errands.lib.gsettings import GSettings

@@ -10,6 +10,7 @@ from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.state import State
 from errands.widgets.shared.components.boxes import ErrandsBox
+from errands.widgets.shared.components.menus import ErrandsMenuItem, ErrandsSimpleMenu
 from errands.widgets.task import Task
 
 
@@ -46,14 +47,16 @@ class TrashSidebarRow(Gtk.ListBoxRow):
         self.size_counter = Gtk.Label(css_classes=["dim-label", "caption"])
 
         # Menu
-        menu: Gio.Menu = Gio.Menu()
-        menu.append(label=_("Clear"), detailed_action="trash_row.rename")
-        menu.append(label=_("Restore"), detailed_action="trash_row.restore")
         menu_btn: Gtk.MenuButton = Gtk.MenuButton(
-            menu_model=menu,
             icon_name="errands-more-symbolic",
             css_classes=["flat"],
             valign=Gtk.Align.CENTER,
+            menu_model=ErrandsSimpleMenu(
+                items=[
+                    ErrandsMenuItem(_("Clear"), "trash_row.clear"),
+                    ErrandsMenuItem(_("Restore"), "trash_row.restore"),
+                ]
+            ),
         )
 
         self.set_child(
@@ -84,8 +87,8 @@ class TrashSidebarRow(Gtk.ListBoxRow):
         size: int = len(State.trash_page.trash_items)
 
         # Update actions state
-        self.group.lookup_action("clear").set_enabled(size > 0)
         self.group.lookup_action("restore").set_enabled(size > 0)
+        self.group.lookup_action("clear").set_enabled(size > 0)
 
         # Update icon name
         self.icon.set_from_icon_name(
