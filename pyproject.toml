@@ -7,14 +7,12 @@ exclude = [
     ".vscode",
     "_build",
     "venv",
+    ".venv",
 ]
-
-# Same as Black.
-line-length = 88
-indent-width = 4
-
-# Assume Python 3.12
-target-version = "py312"
 
 [tool.ruff.lint]
 ignore = ["F821"]
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"

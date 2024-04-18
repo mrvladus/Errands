@@ -31,6 +31,10 @@
     background: #512e12;
 }
 
+.tag {
+    background-color: alpha(white, 0.25);
+}
+
 link {
     color: white;
 }

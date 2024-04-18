@@ -12,6 +12,7 @@ from errands.lib.utils import get_children
 from errands.state import State
 from errands.widgets.shared.components.boxes import ErrandsBox, ErrandsListBox
 from errands.widgets.shared.components.buttons import ErrandsButton
+from errands.widgets.shared.components.header_bar import ErrandsHeaderBar
 from errands.widgets.shared.components.menus import ErrandsMenuItem, ErrandsSimpleMenu
 from errands.widgets.shared.components.toolbar_view import ErrandsToolbarView
 from errands.widgets.shared.titled_separator import TitledSeparator
@@ -99,14 +100,6 @@ class Sidebar(Adw.Bin):
     # ------ PRIVATE METHODS ------ #
 
     def __build_ui(self) -> None:
-        # Header Bar
-        hb = Adw.HeaderBar(
-            title_widget=Gtk.Label(
-                label=_("Errands"),
-                css_classes=["heading"],
-            )
-        )
-
         # Add List button
         self.add_list_btn = ErrandsButton(
             icon_name="errands-add-symbolic",
@@ -121,34 +114,12 @@ class Sidebar(Adw.Bin):
             )
         )
         self.add_list_btn.add_controller(add_list_ctrl)
-        hb.pack_start(self.add_list_btn)
 
         # Sync indicator
         self.sync_indicator = Gtk.Spinner(
             spinning=True,
             visible=False,
             tooltip_text=_("Syncing..."),
-        )
-        hb.pack_end(self.sync_indicator)
-
-        # Main Menu
-        hb.pack_end(
-            Gtk.MenuButton(
-                primary=True,
-                tooltip_text=_("Main Menu"),
-                icon_name="open-menu-symbolic",
-                menu_model=ErrandsSimpleMenu(
-                    items=[
-                        ErrandsMenuItem(_("Sync / Fetch Tasks"), "app.sync"),
-                        ErrandsMenuItem(_("Import Task List"), "app.import"),
-                        ErrandsMenuItem(_("Preferences"), "app.preferences"),
-                        ErrandsMenuItem(
-                            _("Keyboard Shortcuts"), "win.show-help-overlay"
-                        ),
-                        ErrandsMenuItem(_("About Errands"), "app.about"),
-                    ]
-                ),
-            )
         )
 
         # Status page
@@ -188,7 +159,45 @@ class Sidebar(Adw.Bin):
 
         self.set_child(
             ErrandsToolbarView(
-                top_bars=[hb],
+                top_bars=[
+                    ErrandsHeaderBar(
+                        title_widget=Gtk.Label(
+                            label=_("Errands"),
+                            css_classes=["heading"],
+                        ),
+                        start_children=[self.add_list_btn],
+                        end_children=[
+                            # Main Menu
+                            Gtk.MenuButton(
+                                primary=True,
+                                tooltip_text=_("Main Menu"),
+                                icon_name="open-menu-symbolic",
+                                menu_model=ErrandsSimpleMenu(
+                                    items=[
+                                        ErrandsMenuItem(
+                                            _("Sync / Fetch Tasks"), "app.sync"
+                                        ),
+                                        ErrandsMenuItem(
+                                            _("Import Task List"), "app.import"
+                                        ),
+                                        ErrandsMenuItem(
+                                            _("Preferences"), "app.preferences"
+                                        ),
+                                        ErrandsMenuItem(
+                                            _("Keyboard Shortcuts"),
+                                            "win.show-help-overlay",
+                                        ),
+                                        ErrandsMenuItem(
+                                            _("About Errands"), "app.about"
+                                        ),
+                                    ]
+                                ),
+                            ),
+                            # Sync indicator
+                            self.sync_indicator,
+                        ],
+                    )
+                ],
                 content=ErrandsBox(
                     orientation=Gtk.Orientation.VERTICAL,
                     children=[self.list_box, self.status_page],

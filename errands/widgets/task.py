@@ -1274,6 +1274,7 @@ class TagsListItem(Gtk.Box):
 
         self.task.update_props(["tags", "synced"], [tags, False])
         self.task.update_tags_bar()
+        Sync.sync()
 
 
 class Tag(Gtk.Box):
@@ -1315,6 +1316,7 @@ class Tag(Gtk.Box):
     # ------ SIGNAL HANDLERS ------ #
 
     def _on_delete_btn_clicked(self, _btn: Gtk.Button) -> None:
+        Log.debug(f"Task '{self.task.uid}': Delete tag '{self.title}'")
         tags: list[str] = self.task.task_data.tags
         tags.remove(self.title)
         self.task.update_props(["tags", "synced"], [tags, False])

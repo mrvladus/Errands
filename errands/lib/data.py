@@ -246,27 +246,30 @@ class UserDataJSON:
         self.tags = new_tags
 
     def update_tags(self) -> None:
-        tags_list: list[str] = [t.tags for t in self.tasks if t.tags]
+        tasks_tags_texts: list[str] = []
+        for task in self.tasks:
+            tasks_tags_texts.extend(task.tags)
+
         current_tags = self.tags
         current_tags_texts = [t.text for t in current_tags]
 
-        tags: list[str] = []
-        for item in tags_list:
-            tags.extend(item.split(","))
-
-        for tag in tags:
+        added_tag: bool = False
+        for tag in tasks_tags_texts:
             if tag not in current_tags_texts:
                 current_tags.append(TagsData(text=tag))
+                added_tag = True
 
-        self.tags = current_tags
+        if added_tag:
+            self.tags = current_tags
 
-    def remove_tags(self, tags: list[str]) -> None:
-        self.tags = [t for t in self.tags if t.text not in tags]
+    def remove_tag(self, tag: str) -> None:
+        self.tags = [t for t in self.tags if t.text != tag]
         changed = False
         tasks = self.tasks
         for task in tasks:
-            if task.tags != []:
-                task.tags = [t for t in task.tags if t not in tags]
+            if task.tags != [] and tag in task.tags:
+                task.tags = [t for t in task.tags if t != tag]
+                task.synced = False
                 changed = True
         if changed:
             self.tasks = tasks

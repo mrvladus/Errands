@@ -21,6 +21,7 @@ flatpak build \
 --env=PKG_CONFIG_PATH=/app/lib/pkgconfig:/app/share/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig \
 --filesystem=$cwd/_build \ $cwd/.flatpak/repo meson install -C _build
 
+echo "Run"
 flatpak build \
 --with-appdir \
 --allow=devel \

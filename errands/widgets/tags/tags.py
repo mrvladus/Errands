@@ -8,6 +8,7 @@ from gi.repository import Adw, GObject, Gtk  # type:ignore
 
 from errands.lib.data import UserData
 from errands.lib.logging import Log
+from errands.lib.sync.sync import Sync
 from errands.lib.utils import get_children
 from errands.state import State
 from errands.widgets.shared.components.boxes import ErrandsBox, ErrandsListBox
@@ -94,6 +95,7 @@ class Tags(Adw.Bin):
         return get_children(self.tags_list)
 
     def update_ui(self, update_tag_rows: bool = True):
+        UserData.update_tags()
         tags: list[str] = [t.text for t in UserData.tags]
 
         # Remove tags
@@ -164,8 +166,9 @@ class Tag(Adw.ActionRow):
                     if len(task.tags) == 0:
                         task.tags_bar_rev.set_reveal_child(False)
                     break
-        UserData.remove_tags([self.get_title()])
+        UserData.remove_tag(self.get_title())
         self.tags.update_ui(False)
+        Sync.sync()
 
     def update_ui(self, tags_in_tasks: list[list[str]] = None):
         if not tags_in_tasks:

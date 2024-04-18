@@ -3,6 +3,8 @@
 
 import datetime
 from dataclasses import asdict, dataclass, field
+import time
+from typing import Any
 
 import urllib3
 from caldav import Calendar, DAVClient, Principal, Todo
@@ -89,6 +91,7 @@ class SyncProviderCalDAV:
                     if "VTODO" in cal.get_supported_components()
                 ]
             except Exception as e:
+                time.sleep(2)
                 Log.error(
                     f"Sync: Can't connect to {self.name} server at '{self.url}'. {e}"
                 )
@@ -111,9 +114,6 @@ class SyncProviderCalDAV:
                     color=str(todo.icalendar_component.get("x-errands-color", "")),
                     completed=str(todo.icalendar_component.get("status", ""))
                     == "COMPLETED",
-                    expanded=bool(
-                        todo.icalendar_component.get("x-errands-expanded", False)
-                    ),
                     notes=str(todo.icalendar_component.get("description", "")),
                     parent=str(todo.icalendar_component.get("related-to", "")),
                     percent_complete=int(
@@ -121,9 +121,6 @@ class SyncProviderCalDAV:
                     ),
                     priority=int(todo.icalendar_component.get("priority", 0)),
                     text=str(todo.icalendar_component.get("summary", "")),
-                    toolbar_shown=bool(
-                        todo.icalendar_component.get("x-errands-toolbar-shown", False)
-                    ),
                     uid=str(todo.icalendar_component.get("uid", "")),
                     list_uid=calendar.id,
                 )
@@ -236,6 +233,7 @@ class SyncProviderCalDAV:
                 State.get_task(task.list_uid, task.uid).update_ui(False)
             except Exception:
                 pass
+
         # Update tags
         if args.update_tags:
             State.tags_sidebar_row.update_ui()
@@ -253,6 +251,17 @@ class SyncProviderCalDAV:
         update_ui_args: UpdateUIArgs = UpdateUIArgs()
 
         remote_lists_uids = [c.id for c in self.calendars]
+        user_lists_uids = [lst.uid for lst in UserData.get_lists_as_dicts()]
+
+        # Add new local list
+        for calendar in self.calendars:
+            if calendar.id not in user_lists_uids:
+                Log.debug(f"Sync: Copy list from remote '{calendar.id}'")
+                new_list: TaskListData = UserData.add_list(
+                    name=calendar.name, uuid=calendar.id, synced=True
+                )
+                update_ui_args.lists_to_add.append(new_list)
+
         for list in UserData.get_lists_as_dicts():
             # Rename list
             for cal in self.calendars:
@@ -305,9 +314,6 @@ class SyncProviderCalDAV:
         if not self.__update_calendars():
             return
 
-        user_lists_uids = [lst.uid for lst in UserData.get_lists_as_dicts()]
-        remote_lists_uids = [c.id for c in self.calendars]
-
         for calendar in self.calendars:
             # Get tasks
             local_tasks = UserData.get_tasks_as_dicts(calendar.id)
@@ -316,73 +322,33 @@ class SyncProviderCalDAV:
             remote_ids = [task.uid for task in remote_tasks]
             deleted_uids = [t.uid for t in UserData.get_tasks_as_dicts() if t.deleted]
 
-            # Add new local list
-            if calendar.id not in user_lists_uids:
-                Log.debug(f"Sync: Copy list from remote '{calendar.id}'")
-                new_list: TaskListData = UserData.add_list(
-                    name=calendar.name, uuid=calendar.id, synced=True
-                )
-                update_ui_args.lists_to_add.append(new_list)
-
             for task in local_tasks:
                 # Update local task that was changed on remote
                 if task.uid in remote_ids and task.synced:
                     for remote_task in remote_tasks:
                         if remote_task.uid == task.uid:
-                            updated: bool = False
-                            for key in asdict(task).keys():
+                            remote_task_keys = asdict(remote_task).keys()
+                            updated_props = []
+                            updated_values = []
+                            for key in remote_task_keys:
                                 if (
                                     key
-                                    not in "deleted list_uid synced expanded trash toolbar_shown"
-                                    and getattr(task, key) != getattr(remote_task, key)
+                                    not in "synced trash expanded toolbar_shown deleted"
+                                    and getattr(remote_task, key) != getattr(task, key)
                                 ):
-                                    UserData.update_props(
-                                        calendar.id,
-                                        task.uid,
-                                        [key],
-                                        [getattr(remote_task, key)],
-                                    )
-                                    updated = True
-                            if updated:
+                                    updated_props.append(key)
+                                    updated_values.append(getattr(remote_task, key))
+                            if updated_props:
                                 Log.debug(
-                                    f"Sync: Update local task from remote '{task.uid}'"
+                                    f"Sync: Update local task from remote '{task.uid}'. Updated: {updated_props}"
                                 )
-                            update_ui_args.tasks_to_update.append(task)
-                            update_ui_args.update_tags = True
-                            update_ui_args.update_trash = True
+                                UserData.update_props(
+                                    calendar.id, task.uid, updated_props, updated_values
+                                )
+                                update_ui_args.tasks_to_update.append(task)
+                                update_ui_args.update_tags = True
+                                update_ui_args.update_trash = True
                             break
-
-                # Create new task on remote that was created offline
-                if task.uid not in remote_ids and not task.synced:
-                    try:
-                        Log.debug(f"Sync: Create new task on remote: {task.uid}")
-                        new_todo = calendar.save_todo(
-                            categories=",".join(task.tags) if task.tags else None,
-                            description=task.notes,
-                            dtstart=(
-                                datetime.datetime.fromisoformat(task.start_date)
-                                if task.start_date
-                                else None
-                            ),
-                            due=(
-                                datetime.datetime.fromisoformat(task.due_date)
-                                if task.due_date
-                                else None
-                            ),
-                            priority=task.priority,
-                            percent_complete=task.percent_complete,
-                            related_to=task.parent,
-                            summary=task.text,
-                            uid=task.uid,
-                            x_errands_color=task.color,
-                        )
-                        if task.completed:
-                            new_todo.complete()
-                        UserData.update_props(calendar.id, task.uid, ["synced"], [True])
-                    except Exception as e:
-                        Log.error(
-                            f"Sync: Can't create new task on remote: {task.uid}. {e}"
-                        )
 
                 # Update task on remote that was changed locally
                 elif task.uid in remote_ids and not task.synced:
@@ -422,18 +388,44 @@ class SyncProviderCalDAV:
                         )
                         todo.icalendar_component["related-to"] = task.parent
                         todo.icalendar_component["x-errands-color"] = task.color
-                        todo.icalendar_component["x-errands-expanded"] = int(
-                            task.expanded
-                        )
-                        todo.icalendar_component["x-errands-toolbar-shown"] = int(
-                            task.toolbar_shown
-                        )
                         todo.save()
                         if task.completed:
                             todo.complete()
                         UserData.update_props(calendar.id, task.uid, ["synced"], [True])
                     except Exception as e:
                         Log.error(f"Sync: Can't update task on remote: {task.uid}. {e}")
+
+                # Create new task on remote that was created offline
+                if task.uid not in remote_ids and not task.synced:
+                    try:
+                        Log.debug(f"Sync: Create new task on remote: {task.uid}")
+                        new_todo = calendar.save_todo(
+                            categories=",".join(task.tags) if task.tags else None,
+                            description=task.notes,
+                            dtstart=(
+                                datetime.datetime.fromisoformat(task.start_date)
+                                if task.start_date
+                                else None
+                            ),
+                            due=(
+                                datetime.datetime.fromisoformat(task.due_date)
+                                if task.due_date
+                                else None
+                            ),
+                            priority=task.priority,
+                            percent_complete=task.percent_complete,
+                            related_to=task.parent,
+                            summary=task.text,
+                            uid=task.uid,
+                            x_errands_color=task.color,
+                        )
+                        if task.completed:
+                            new_todo.complete()
+                        UserData.update_props(calendar.id, task.uid, ["synced"], [True])
+                    except Exception as e:
+                        Log.error(
+                            f"Sync: Can't create new task on remote: {task.uid}. {e}"
+                        )
 
                 # Delete local task that was deleted on remote
                 elif task.uid not in remote_ids and task.synced:
@@ -454,7 +446,7 @@ class SyncProviderCalDAV:
                             f"Sync: Can't delete task from remote: '{task.uid}'. {e}"
                         )
 
-            # Create new local task that was created on CalDAV
+            # Create new local task that was created on remote
             for task in remote_tasks:
                 if task.uid not in local_ids and task.uid not in deleted_uids:
                     Log.debug(

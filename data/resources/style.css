@@ -140,7 +140,7 @@
   padding-bottom: 3px;
   padding-left: 5px;
   padding-right: 5px;
-  background-color: @shade_color;
+  background-color: alpha(black, 0.07);
 }
 
 .tag>button {
