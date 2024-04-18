@@ -152,7 +152,7 @@ class TaskList(Adw.Bin):
         self.toggle_completed_btn.set_active(
             UserData.get_list_prop(self.list_uid, "show_completed")
         )
-        self.update_status()
+        self.update_title()
 
     # ------ PROPERTIES ------ #
 
@@ -214,7 +214,7 @@ class TaskList(Adw.Bin):
 
     # - UPDATE UI FUNCTIONS - #
 
-    def update_status(self) -> None:
+    def update_title(self) -> None:
         # Update title
         self.title.set_title(UserData.get_list_prop(self.list_uid, "name"))
 
@@ -281,7 +281,7 @@ class TaskList(Adw.Bin):
                 task.toggle_visibility(True)
 
     def update_ui(self, update_tasks: bool = True) -> None:
-        self.update_status()
+        self.update_title()
         self.update_tasks(update_tasks)
 
     # ------ SIGNAL HANDLERS ------ #
@@ -339,5 +339,5 @@ class TaskList(Adw.Bin):
         if not GSettings.get("task-list-new-task-position-top"):
             scroll(self.scrl, True)
 
-        self.update_status()
+        self.update_title()
         Sync.sync()
