@@ -815,6 +815,7 @@ class Task(Gtk.Revealer):
         self.tags_bar_rev.set_reveal_child(tags != [])
 
     def update_progress_bar(self) -> None:
+        # Log.debug(f"Task '{self.uid}': Update progress bar")
         total, completed = self.get_status()
         pc: int = (
             completed / total * 100
@@ -961,7 +962,6 @@ class Task(Gtk.Revealer):
 
         self.update_title()
         self.update_progress_bar()
-
         Sync.sync()
 
     def _on_edit_row_applied(self, entry: Adw.EntryRow) -> None:
@@ -1052,9 +1052,7 @@ class Task(Gtk.Revealer):
             task.purge()
 
             new_task: Task = Task(
-                UserData.get_task(self.list_uid, task.uid),
-                self.task_list,
-                self.parent,
+                UserData.get_task(self.list_uid, task.uid), self.parent
             )
             box: Gtk.Box = self.get_parent()
             box.append(new_task)
@@ -1128,7 +1126,6 @@ class Task(Gtk.Revealer):
         self.task_list.update_title()
         self.update_title()
         self.update_progress_bar()
-        self.update_tasks(False)
         # Sync
         Sync.sync()
 

@@ -299,6 +299,8 @@ class TaskList(Adw.Bin):
         if not hasattr(self, "completed_task_list"):
             return
         self.completed_task_list.set_visible(btn.get_active())
+        for task in self.all_tasks:
+            task.completed_task_list.set_visible(btn.get_active())
         UserData.update_list_prop(self.list_uid, "show_completed", btn.get_active())
 
     def _on_scroll_up_btn_clicked(self, btn: Gtk.ToggleButton) -> None:
