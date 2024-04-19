@@ -31,7 +31,7 @@ class State:
     profile: str = PROFILE
 
     # Application
-    application: ErrandsApplication  = None
+    application: ErrandsApplication = None
 
     # Main window
     main_window: Window = None
@@ -66,6 +66,7 @@ class State:
         all_tasks: list[Task] = []
         for list in cls.get_task_lists():
             all_tasks.extend(list.all_tasks)
+
         return all_tasks
 
     @classmethod

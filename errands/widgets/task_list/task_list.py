@@ -19,6 +19,7 @@ from errands.widgets.shared.components.buttons import ErrandsButton, ErrandsTogg
 from errands.widgets.shared.components.header_bar import ErrandsHeaderBar
 from errands.widgets.shared.components.entries import ErrandsEntryRow
 from errands.widgets.shared.components.toolbar_view import ErrandsToolbarView
+from errands.widgets.shared.titled_separator import TitledSeparator
 from errands.widgets.task import Task
 
 if TYPE_CHECKING:
@@ -78,9 +79,20 @@ class TaskList(Adw.Bin):
             orientation=Gtk.Orientation.VERTICAL
         )
 
+        # Separator
+        self.task_lists_separator: Adw.Bin = Adw.Bin(
+            child=TitledSeparator(_("Completed"), (24, 24, 0, 0))
+        )
+
         # Completed list
         self.completed_task_list: Gtk.Box = Gtk.Box(
             orientation=Gtk.Orientation.VERTICAL
+        )
+        self.completed_task_list.bind_property(
+            "visible",
+            self.task_lists_separator,
+            "visible",
+            GObject.BindingFlags.SYNC_CREATE,
         )
 
         # Scrolled window
@@ -91,7 +103,11 @@ class TaskList(Adw.Bin):
                 child=ErrandsBox(
                     orientation=Gtk.Orientation.VERTICAL,
                     margin_bottom=32,
-                    children=[self.uncompleted_task_list, self.completed_task_list],
+                    children=[
+                        self.uncompleted_task_list,
+                        self.task_lists_separator,
+                        self.completed_task_list,
+                    ],
                 ),
             )
         )
@@ -197,11 +213,7 @@ class TaskList(Adw.Bin):
             else:
                 self.uncompleted_task_list.append(new_task)
         else:
-            if on_top:
-                self.completed_task_list.prepend(new_task)
-            else:
-                self.completed_task_list.append(new_task)
-        new_task.update_ui()
+            self.completed_task_list.prepend(new_task)
 
         return new_task
 
@@ -233,6 +245,17 @@ class TaskList(Adw.Bin):
 
         # Update delete completed button
         self.delete_completed_btn.set_sensitive(n_completed > 0)
+        # Update separator
+        toplevel_tasks: list[TaskData] = [
+            t
+            for t in UserData.get_tasks_as_dicts(self.list_uid, "")
+            if not t.deleted and not t.trash
+        ]
+        n_completed: int = len([t for t in toplevel_tasks if t.completed])
+        n_total: int = len(toplevel_tasks)
+        self.task_lists_separator.set_visible(
+            n_completed > 0 and n_completed != n_total
+        )
 
     def update_tasks(self, update_tasks: bool = True) -> None:
         # Update tasks
