@@ -15,6 +15,7 @@ from errands.widgets.shared.components.buttons import ErrandsButton
 from errands.widgets.shared.components.dialogs import ConfirmDialog
 from errands.widgets.shared.components.header_bar import ErrandsHeaderBar
 from errands.widgets.shared.components.toolbar_view import ErrandsToolbarView
+from errands.widgets.task import Task
 
 
 class Trash(Adw.Bin):
@@ -172,13 +173,16 @@ class Trash(Adw.Bin):
 
         Log.info("Trash: Restore")
 
-        trash_dicts: list[TaskData] = [
-            t for t in UserData.get_tasks_as_dicts() if t.trash and not t.deleted
-        ]
-        for task in trash_dicts:
-            UserData.update_props(task.list_uid, task.uid, ["trash"], [False])
+        for task in self.trash_items:
+            task.on_restore_btn_clicked(None)
 
-        State.sidebar.update_ui()
+        # trash_dicts: list[TaskData] = [
+        #     t for t in UserData.get_tasks_as_dicts() if t.trash and not t.deleted
+        # ]
+        # for task in trash_dicts:
+        #     UserData.update_props(task.list_uid, task.uid, ["trash"], [False])
+
+        # State.sidebar.update_ui()
 
 
 class TrashItem(Adw.ActionRow):
@@ -199,11 +203,11 @@ class TrashItem(Adw.ActionRow):
                 icon_name="errands-check-toggle-symbolic",
                 valign=Gtk.Align.CENTER,
                 css_classes=["circular", "flat"],
-                on_click=self._on_restore_btn_clicked,
+                on_click=self.on_restore_btn_clicked,
             )
         )
 
-    def _on_restore_btn_clicked(self, _) -> None:
+    def on_restore_btn_clicked(self, _) -> None:
         """Restore task and its parents"""
 
         Log.info(f"Restore task: {self.task_dict.uid}")
@@ -214,7 +218,12 @@ class TrashItem(Adw.ActionRow):
         parents_uids.append(self.task_dict.uid)
         for uid in parents_uids:
             UserData.update_props(self.task_dict.list_uid, uid, ["trash"], [False])
-            State.get_task(self.task_dict.list_uid, uid).toggle_visibility(True)
+            task: Task = State.get_task(self.task_dict.list_uid, uid)
+            task.task_list.update_title()
+            task.toggle_visibility(True)
+            if isinstance(task.parent, Task):
+                task.parent.update_title()
+                task.parent.update_progress_bar()
 
         State.trash_sidebar_row.update_ui()
         State.today_page.update_ui()

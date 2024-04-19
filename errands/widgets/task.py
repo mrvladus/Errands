@@ -746,6 +746,9 @@ class Task(Gtk.Revealer):
         State.trash_sidebar_row.update_ui()
         State.tags_page.update_ui()
         self.task_list.update_title()
+        if isinstance(self.parent, Task):
+            self.parent.update_title()
+            self.parent.update_progress_bar()
 
     def expand(self, expanded: bool) -> None:
         if expanded != self.task_data.expanded:
