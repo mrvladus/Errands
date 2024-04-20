@@ -286,6 +286,9 @@ class Task(Gtk.Revealer):
         # --- TOOL BAR --- #
 
         # Date and Time button
+        self.datetime_window: DateTimeWindow = DateTimeWindow(self)
+        self.datetime_window.connect("date-time-set", self._on_datetime_window_closed)
+
         self.date_time_btn: ErrandsButton = ErrandsButton(
             valign=Gtk.Align.CENTER,
             halign=Gtk.Align.START,
@@ -299,7 +302,6 @@ class Task(Gtk.Revealer):
             ),
             on_click=self._on_date_time_btn_clicked,
         )
-        self.datetime_window: DateTimeWindow = DateTimeWindow(self)
 
         # Notes button
         self.notes_btn: ErrandsButton = ErrandsButton(
@@ -522,6 +524,7 @@ class Task(Gtk.Revealer):
             popover=popover_menu,
             icon_name="errands-more-symbolic",
             css_classes=["flat"],
+            valign=Gtk.Align.CENTER,
         )
         menu_btn.connect("notify::active", self._on_menu_toggled)
 
@@ -1236,6 +1239,14 @@ class Task(Gtk.Revealer):
 
     def _on_date_time_btn_clicked(self, btn: Gtk.Button) -> None:
         self.datetime_window.show()
+
+    def _on_datetime_window_closed(self, *_) -> None:
+        # if (
+        #     self.task_data.due_date
+        #     and datetime.fromisoformat(self.task_data.due_date).date()
+        #     == datetime.today().date()
+        # ):
+        State.today_page.update_status()
 
     def _on_notes_btn_clicked(self, btn: Gtk.Button) -> None:
         self.notes_window.show()

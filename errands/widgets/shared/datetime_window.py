@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from gi.repository import Adw, Gtk  # type:ignore
+from gi.repository import Adw, GObject, Gtk  # type:ignore
 
 from errands.state import State
 from errands.widgets.shared.components.toolbar_view import ErrandsToolbarView
@@ -17,6 +17,8 @@ if TYPE_CHECKING:
 
 
 class DateTimeWindow(Adw.Dialog):
+    date_time_set = GObject.Signal(name="date-time-set")
+
     def __init__(self, task: Task | TodayTask):
         super().__init__()
         self.task = task
@@ -93,3 +95,4 @@ class DateTimeWindow(Adw.Dialog):
             self.task.update_props(
                 ["start_date", "synced"], [self.start_date_time.datetime, False]
             )
+        self.emit("date-time-set")

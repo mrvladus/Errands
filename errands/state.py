@@ -78,7 +78,8 @@ class State:
                         return task
 
     @classmethod
-    def get_today_task(cls, list_uid: str, uid: str) -> TodayTask:
+    def get_today_task(cls, list_uid: str, uid: str) -> TodayTask | None:
         for task in cls.today_page.tasks:
             if task.list_uid == list_uid and task.uid == uid:
                 return task
+        return None

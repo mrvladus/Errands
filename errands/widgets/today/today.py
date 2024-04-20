@@ -21,7 +21,7 @@ class Today(Adw.Bin):
         Log.debug("Today Page: Load")
         State.today_page = self
         self.__build_ui()
-        self.update_status()
+        self.update_ui()
 
     # ------ PRIVATE METHODS ------ #
 
@@ -29,7 +29,6 @@ class Today(Adw.Bin):
         # Status Page
         self.status_page = Adw.StatusPage(
             title=_("No Tasks for Today"),
-            description=_("No deleted items"),
             icon_name="errands-info-symbolic",
             vexpand=True,
             css_classes=["compact"],
@@ -83,11 +82,9 @@ class Today(Adw.Bin):
 
     # ------ PUBLIC METHODS ------ #
 
-    def add_task(self, task) -> TodayTask:
-        new_task = TodayTask(task)
-        self.task_list.append(new_task)
+    def add_task(self, task_data: TaskData) -> TodayTask:
+        self.task_list.append(TodayTask(task_data, self))
         self.status_page.set_visible(False)
-        return new_task
 
     def update_status(self):
         """Update status and counter"""
@@ -99,7 +96,6 @@ class Today(Adw.Bin):
         )
 
     def update_ui(self):
-        return
         Log.debug("Today Page: Update UI")
         tasks = self.tasks_data
         tasks_uids: list[str] = [t.uid for t in tasks]
@@ -108,9 +104,7 @@ class Today(Adw.Bin):
         # Add tasks
         for task in tasks:
             if task.uid not in widgets_uids:
-                new_task = TodayTask(task)
-                self.task_list.append(new_task)
-                new_task.update_ui()
+                self.add_task(task)
 
         # Remove tasks
         for task in self.tasks:
