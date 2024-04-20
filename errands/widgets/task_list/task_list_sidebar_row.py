@@ -257,13 +257,18 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
         old_task_list = task.task_list
 
         Log.info(f"Lists: Move '{task.uid}' to '{self.uid}' list")
+
         UserData.move_task_to_list(task.uid, task.list_uid, self.uid, "")
+
         if isinstance(task.parent, Task):
-            task.parent.update_ui(False)
+            task.parent.update_progress_bar()
+            task.parent.update_title()
+
         task.purge()
+
+        old_task_list.update_title()
         self.task_list.update_ui(False)
-        if old_task_list != self.task_list:
-            old_task_list.update_status()
+
         Sync.sync()
 
     def _on_row_activated(self, *args) -> None:

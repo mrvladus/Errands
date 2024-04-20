@@ -176,14 +176,6 @@ class Trash(Adw.Bin):
         for task in self.trash_items:
             task.on_restore_btn_clicked(None)
 
-        # trash_dicts: list[TaskData] = [
-        #     t for t in UserData.get_tasks_as_dicts() if t.trash and not t.deleted
-        # ]
-        # for task in trash_dicts:
-        #     UserData.update_props(task.list_uid, task.uid, ["trash"], [False])
-
-        # State.sidebar.update_ui()
-
 
 class TrashItem(Adw.ActionRow):
     def __init__(self, task: TaskData) -> None:
