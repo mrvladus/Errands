@@ -43,6 +43,7 @@ class Window(Adw.ApplicationWindow):
 
     def __build_ui(self) -> None:
         self.set_title(_("Errands"))
+        self.set_hide_on_close(True)
         self.props.width_request = 360
         self.props.height_request = 200
 

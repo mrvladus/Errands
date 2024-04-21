@@ -3,6 +3,7 @@ from gi.repository import Adw, Gio, Xdp  # type:ignore
 from errands.lib.data import UserData
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
+from errands.lib.notifications import ErrandsNotificationsDaemon
 from errands.lib.plugins import PluginsLoader
 from errands.state import State
 from errands.widgets.window import Window
@@ -25,14 +26,22 @@ class ErrandsApplication(Adw.Application):
         Log.debug("Application: Checking autostart")
 
         portal: Xdp.Portal = Xdp.Portal()
-        portal.request_background(
-            None,
-            _("Errands need to run in the background for notifications"),
-            ["errands", "--gapplication-service"],
-            Xdp.BackgroundFlags.AUTOSTART,
-            None,
-            None,
-            None,
+
+        # Request background
+        if GSettings.get("run-in-background"):
+            portal.request_background(
+                None,
+                _("Errands need to run in the background for notifications"),
+                ["errands", "--gapplication-service"],
+                Xdp.BackgroundFlags.AUTOSTART,
+                None,
+                None,
+                None,
+            )
+
+        # Run notifications daemon
+        self.notification_daemon: ErrandsNotificationsDaemon = (
+            ErrandsNotificationsDaemon()
         )
 
     def run_tests_suite(self):
@@ -67,5 +76,7 @@ class ErrandsApplication(Adw.Application):
 
     def do_activate(self) -> None:
         Log.debug("Application: Activate")
+        if not State.main_window:
+            State.main_window = Window(application=State.application)
+            self.add_window(State.main_window)
         State.main_window.present()
-        self.run_tests_suite()

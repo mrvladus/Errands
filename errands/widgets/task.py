@@ -1241,11 +1241,6 @@ class Task(Gtk.Revealer):
         self.datetime_window.show()
 
     def _on_datetime_window_closed(self, *_) -> None:
-        # if (
-        #     self.task_data.due_date
-        #     and datetime.fromisoformat(self.task_data.due_date).date()
-        #     == datetime.today().date()
-        # ):
         State.today_page.update_status()
 
     def _on_notes_btn_clicked(self, btn: Gtk.Button) -> None:

@@ -53,6 +53,7 @@ class TaskData:
     expanded: bool = False
     list_uid: str = ""
     notes: str = ""
+    notified: bool = False
     parent: str = ""
     percent_complete: int = 0
     priority: int = 0
@@ -404,6 +405,8 @@ class UserDataJSON:
             if task.list_uid == list_uid and task.uid == uid:
                 for idx, prop in enumerate(props):
                     setattr(task, prop, values[idx])
+                if "due_date" in props:
+                    setattr(task, "notified", False)
                 break
         self.tasks = tasks
 
