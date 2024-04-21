@@ -42,5 +42,7 @@
     <file preprocess="xml-stripblanks" alias="errands-more-symbolic.svg">icons/errands-more-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-delete-all-symbolic.svg">icons/errands-delete-all-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-restore-symbolic.svg">icons/errands-restore-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-settings-symbolic.svg">icons/errands-settings-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-notification-symbolic.svg">icons/errands-notification-symbolic.svg</file>
   </gresource>
 </gresources>

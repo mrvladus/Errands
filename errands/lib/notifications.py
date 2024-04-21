@@ -49,9 +49,9 @@ class ErrandsNotificationsDaemon:
     def __check_data(self) -> bool:
         """Get due tasks and send notifications"""
 
-        # If notifications is disabled - stop daemon
+        # If notifications is disabled - do nothing
         if not GSettings.get("notifications-enabled"):
-            return False
+            return True
 
         Log.debug("Notifications: Check")
 

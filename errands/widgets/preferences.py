@@ -4,6 +4,8 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
+from errands.widgets.shared.components.buttons import ErrandsButton
+
 if TYPE_CHECKING:
     from errands.widgets.window import Window
 
@@ -83,8 +85,14 @@ class PreferencesWindow(Adw.PreferencesDialog):
         )
         task_list_group.add(new_task_position)
 
-        # Tasks group
-        tasks_group = Adw.PreferencesGroup(title=_("Tasks"))
+        # Notifications
+        notifications = Adw.SwitchRow(
+            title=_("Show Notifications"),
+            icon_name="errands-notification-symbolic",
+        )
+        GSettings.bind("notifications-enabled", notifications, "active")
+        notifications_group = Adw.PreferencesGroup(title=_("Notifications"))
+        notifications_group.add(notifications)
 
         # Sync group
         sync_group = Adw.PreferencesGroup(
@@ -119,11 +127,11 @@ class PreferencesWindow(Adw.PreferencesDialog):
         self.sync_password.connect("changed", self.on_sync_pass_changed)
         sync_group.add(self.sync_password)
         # Test connection
-        test_btn = Gtk.Button(
+        test_btn = ErrandsButton(
             label=_("Test"),
             valign="center",
+            on_click=self.on_test_connection_btn_clicked,
         )
-        test_btn.connect("clicked", self.on_test_connection_btn_clicked)
         self.test_connection_row = Adw.ActionRow(
             title=_("Test Connection"),
         )
@@ -133,11 +141,11 @@ class PreferencesWindow(Adw.PreferencesDialog):
 
         # Appearance Page
         appearance_page = Adw.PreferencesPage(
-            title=_("Appearance"), icon_name="errands-appearance-symbolic"
+            title=_("General"), icon_name="errands-settings-symbolic"
         )
         appearance_page.add(theme_group)
         appearance_page.add(task_list_group)
-        # appearance_page.add(tasks_group)
+        appearance_page.add(notifications_group)
         self.add(appearance_page)
 
         # Sync Page
