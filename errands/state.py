@@ -7,10 +7,11 @@ from typing import TYPE_CHECKING
 
 from gi.repository import Adw  # type:ignore
 
-from __main__ import PROFILE
+from __main__ import APP_ID, PROFILE
 
 if TYPE_CHECKING:
     from errands.application import ErrandsApplication
+    from errands.lib.notifications import ErrandsNotificationsDaemon
     from errands.widgets.sidebar import Sidebar
     from errands.widgets.tags.tags import Tags
     from errands.widgets.tags.tags_sidebar_row import TagsSidebarRow
@@ -28,26 +29,31 @@ class State:
     """Application's state class for accessing core widgets globally
     and some utils for quick access to deeper nested widgets"""
 
-    profile: str = PROFILE
+    # Constants
+    PROFILE: str = PROFILE
+    APP_ID: str = APP_ID
+
+    # Notifications
+    notifications_daemon: ErrandsNotificationsDaemon | None = None
 
     # Application
-    application: ErrandsApplication = None
+    application: ErrandsApplication | None = None
 
     # Main window
-    main_window: Window = None
-    split_view: Adw.NavigationSplitView = None
+    main_window: Window | None = None
+    split_view: Adw.NavigationSplitView | None = None
 
     # View Stack
-    view_stack: Adw.ViewStack = None
-    today_page: Today = None
-    tags_page: Tags = None
-    trash_page: Trash = None
+    view_stack: Adw.ViewStack | None = None
+    today_page: Today | None = None
+    tags_page: Tags | None = None
+    trash_page: Trash | None = None
 
     # Sidebar
-    sidebar: Sidebar = None
-    today_sidebar_row: TodaySidebarRow = None
-    tags_sidebar_row: TagsSidebarRow = None
-    trash_sidebar_row: TrashSidebarRow = None
+    sidebar: Sidebar | None = None
+    today_sidebar_row: TodaySidebarRow | None = None
+    tags_sidebar_row: TagsSidebarRow | None = None
+    trash_sidebar_row: TrashSidebarRow | None = None
 
     @classmethod
     def get_task_list(cls, uid: str) -> TaskList:

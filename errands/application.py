@@ -15,7 +15,7 @@ class ErrandsApplication(Adw.Application):
     def __init__(self, APP_ID) -> None:
         super().__init__(
             application_id=APP_ID,
-            flags=Gio.ApplicationFlags.DEFAULT_FLAGS,
+            flags=Gio.ApplicationFlags.IS_SERVICE,
         )
         self.set_resource_base_path("/io/github/mrvladus/Errands/")
         State.application = self

@@ -15,6 +15,7 @@ class ErrandsNotificationsDaemon:
     CHECK_INTERVAL_SEC: int = 30  # Check tasks every _ seconds
 
     def __init__(self) -> None:
+        State.notifications_daemon = self
         self.start()
 
     # ------ PROPERTIES ------ #
