@@ -2,9 +2,8 @@
 # SPDX-License-Identifier: MIT
 
 import datetime
-from dataclasses import asdict, dataclass, field
 import time
-from typing import Any
+from dataclasses import asdict, dataclass, field
 
 import urllib3
 from caldav import Calendar, DAVClient, Principal, Todo
@@ -333,7 +332,7 @@ class SyncProviderCalDAV:
                             for key in remote_task_keys:
                                 if (
                                     key
-                                    not in "synced trash expanded toolbar_shown deleted"
+                                    not in "synced trash expanded toolbar_shown deleted notified"
                                     and getattr(remote_task, key) != getattr(task, key)
                                 ):
                                     updated_props.append(key)

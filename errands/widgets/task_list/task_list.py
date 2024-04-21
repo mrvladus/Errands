@@ -250,7 +250,7 @@ class TaskList(Adw.Bin):
         ]
         n_completed: int = len([t for t in toplevel_tasks if t.completed])
         n_total: int = len(toplevel_tasks)
-        self.task_lists_separator.set_visible(
+        self.task_lists_separator.get_child().set_visible(
             n_completed > 0 and n_completed != n_total
         )
 

@@ -6,10 +6,10 @@ from __future__ import annotations
 import datetime
 import json
 import os
-from queue import Empty, Queue
 import shutil
 import sqlite3
 from dataclasses import asdict, dataclass, field
+from queue import Empty, Queue
 from threading import Thread
 from typing import Any, Iterable
 from uuid import uuid4

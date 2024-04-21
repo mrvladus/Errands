@@ -820,7 +820,7 @@ class Task(Gtk.Revealer):
             self.just_added = False
 
         # Update separator
-        self.task_lists_separator.set_visible(
+        self.task_lists_separator.get_child().set_visible(
             n_completed > 0 and n_completed != n_total
         )
 
@@ -1193,6 +1193,7 @@ class Task(Gtk.Revealer):
             self.update_props(["completed", "synced"], [False, False])
 
         self.update_title()
+        self.update_progress_bar()
         self.task_list.update_title()
 
         # Sync

@@ -1,3 +1,6 @@
+# Copyright 2023-2024 Vlad Krupinskii <mrvladus@yandex.ru>
+# SPDX-License-Identifier: MIT
+
 from gi.repository import Adw, Gio, Xdp  # type:ignore
 
 from errands.lib.data import UserData
