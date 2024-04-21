@@ -44,13 +44,6 @@ class ErrandsApplication(Adw.Application):
             ErrandsNotificationsDaemon()
         )
 
-    def run_tests_suite(self):
-        return
-        if State.profile == "development":
-            from errands.tests.tests import run_tests
-
-            run_tests()
-
     def do_startup(self) -> None:
         Adw.Application.do_startup(self)
 
