@@ -26,7 +26,7 @@
       <default>""</default>
     </key>
     <key name="task-list-new-task-position-top" type="b">
-      <default>false</default>
+      <default>true</default>
     </key>
     <key name="run-in-background" type="b">
       <default>true</default>
