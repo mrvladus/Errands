@@ -120,7 +120,7 @@ class TaskList(Adw.Bin):
         # Drop controller
         self.dnd_ctrl: Gtk.DropControllerMotion = Gtk.DropControllerMotion()
         self.dnd_ctrl.connect("motion", self._on_dnd_scroll, adj)
-        self.scrl.add_controller(self.dnd_ctrl)
+        self.add_controller(self.dnd_ctrl)
 
         self.set_child(
             ErrandsToolbarView(
@@ -334,11 +334,11 @@ class TaskList(Adw.Bin):
             adj.set_value(adj.get_value() - (2 if scroll_up else -2))
             return True
 
-        MARGIN: int = 50
+        MARGIN: int = 100
         if y < MARGIN:
             self.scrolling = True
             GLib.timeout_add(100, __auto_scroll, True)
-        elif y > self.get_allocation().height - MARGIN:
+        elif y > self.get_height() - MARGIN:
             self.scrolling = True
             GLib.timeout_add(100, __auto_scroll, False)
         else:
