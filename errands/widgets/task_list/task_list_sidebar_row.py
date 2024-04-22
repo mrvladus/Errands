@@ -127,7 +127,7 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
                     if task.tags:
                         event.add("categories", ",".join(task.tags))
                     event.add("percent-complete", task.percent_complete)
-                    if task["color"]:
+                    if task.color:
                         event.add("x-errands-color", task.color)
                     event.add(
                         "dtstart",
@@ -186,7 +186,9 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
         self.add_controller(drag_hover_ctrl)
 
         # Title
-        self.label: Gtk.Label = Gtk.Label(hexpand=True, halign=Gtk.Align.START)
+        self.label: Gtk.Label = Gtk.Label(
+            hexpand=True, halign=Gtk.Align.START, ellipsize=3
+        )
 
         # Counter
         self.size_counter = Gtk.Label(css_classes=["dim-label", "caption"])
