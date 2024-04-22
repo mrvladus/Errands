@@ -59,6 +59,13 @@
               </object>
             </child>
 
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title" translatable="yes">Import List</property>
+                <property name="accelerator">&lt;Control&gt;I</property>
+              </object>
+            </child>
+
           </object>
         </child>
 

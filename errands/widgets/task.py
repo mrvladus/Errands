@@ -525,6 +525,7 @@ class Task(Gtk.Revealer):
             icon_name="errands-more-symbolic",
             css_classes=["flat"],
             valign=Gtk.Align.CENTER,
+            tooltip_text=_("More"),
         )
         menu_btn.connect("notify::active", self._on_menu_toggled)
 

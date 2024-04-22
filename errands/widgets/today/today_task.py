@@ -378,6 +378,7 @@ class TodayTask(Gtk.Revealer):
             icon_name="errands-more-symbolic",
             css_classes=["flat", "circular"],
             valign=Gtk.Align.CENTER,
+            tooltip_text=_("More"),
         )
         menu_btn.connect("notify::active", self._on_menu_toggled)
         self.title_row.add_suffix(menu_btn)

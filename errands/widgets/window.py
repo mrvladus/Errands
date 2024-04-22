@@ -277,7 +277,7 @@ class Window(Adw.ApplicationWindow):
             ["<primary>comma"],
         )
         self._create_action("about", _about)
-        self._create_action("import", _import)
+        self._create_action("import", _import, ["<primary>i"])
         self._create_action("sync", _sync, ["<primary>f"])
         self._create_action(
             "quit",
