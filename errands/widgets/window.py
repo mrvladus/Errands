@@ -7,7 +7,7 @@ from dataclasses import asdict
 from uuid import uuid4
 
 from gi.repository import Adw, Gio, Gtk  # type:ignore
-from icalendar import Calendar, Todo
+from icalendar import Calendar
 
 from __main__ import APP_ID, VERSION
 from errands.lib.data import TaskData, TaskListData, UserData
