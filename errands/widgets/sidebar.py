@@ -200,7 +200,12 @@ class Sidebar(Adw.Bin):
                 ],
                 content=ErrandsBox(
                     orientation=Gtk.Orientation.VERTICAL,
-                    children=[self.list_box, self.status_page],
+                    children=[
+                        Gtk.ScrolledWindow(
+                            propagate_natural_height=True, child=self.list_box
+                        ),
+                        self.status_page,
+                    ],
                 ),
             )
         )
