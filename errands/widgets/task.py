@@ -791,10 +791,10 @@ class Task(Gtk.Revealer):
                 props.append("changed_at")
                 values.append(datetime.now().strftime("%Y%m%dT%H%M%S"))
                 break
+        if "synced" not in props and "changed_at" in props:
+            props.append("synced")
+            values.append(False)
         UserData.update_props(self.list_uid, self.uid, props, values)
-        # Update linked today task
-        if props == ["expanded"] or props == ["toolbar_shown"]:
-            State.today_page.update_ui()
 
     def toggle_visibility(self, on: bool) -> None:
         GLib.idle_add(self.set_reveal_child, on)
@@ -938,6 +938,7 @@ class Task(Gtk.Revealer):
     def update_ui(self) -> None:
         self.update_title()
         self.update_tags_bar()
+        self.update_toolbar()
         self.update_progress_bar()
         self.update_tasks()
         self.update_color()

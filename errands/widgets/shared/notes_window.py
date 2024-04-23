@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 from gi.repository import Adw, GObject, Gtk, GtkSource  # type:ignore
 
 from errands.lib.logging import Log
+from errands.lib.sync.sync import Sync
 from errands.state import State
 from errands.widgets.shared.components.toolbar_view import ErrandsToolbarView
 
@@ -81,3 +82,4 @@ class NotesWindow(Adw.Dialog):
         Log.info("Task: Change notes")
         self.task.update_props(["notes", "synced"], [self.buffer.props.text, False])
         self.task.update_toolbar()
+        Sync.sync()

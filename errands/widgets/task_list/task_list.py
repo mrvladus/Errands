@@ -227,11 +227,12 @@ class TaskList(Adw.Bin):
     # - UPDATE UI FUNCTIONS - #
 
     def update_title(self) -> None:
+        Log.debug(f"Task List '{self.list_uid}': Update title")
         # Update title
         self.title.set_title(UserData.get_list_prop(self.list_uid, "name"))
 
         n_total, n_completed = UserData.get_status(self.list_uid)
-
+        print(n_total, n_completed)
         # Update headerbar subtitle
         self.title.set_subtitle(
             _("Completed:") + f" {n_completed} / {n_total}" if n_total > 0 else ""
@@ -242,6 +243,7 @@ class TaskList(Adw.Bin):
 
         # Update delete completed button
         self.delete_completed_btn.set_sensitive(n_completed > 0)
+
         # Update separator
         toplevel_tasks: list[TaskData] = [
             t
