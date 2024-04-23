@@ -121,6 +121,8 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
                     event.add("uid", task.uid)
                     event.add("related-to", task.parent)
                     event.add("summary", task.text)
+                    if task.completed:
+                        event.add("status", "COMPLETED")
                     if task.notes:
                         event.add("description", task.notes)
                     event.add("priority", task.priority)
@@ -129,6 +131,11 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
                     event.add("percent-complete", task.percent_complete)
                     if task.color:
                         event.add("x-errands-color", task.color)
+                    event.add("x-errands-expanded", task.expanded)
+                    event.add("x-errands-toolbar-shown", task.toolbar_shown)
+                    event.add("x-errands-color", task.color)
+                    event.add("dtstamp", task.created_at)
+                    event.add("last-modified", task.changed_at)
                     event.add(
                         "dtstart",
                         (
