@@ -737,15 +737,8 @@ class Task(Gtk.Revealer):
         Log.info(f"Task: Move to trash: '{self.uid}'")
 
         self.toggle_visibility(False)
-        self.just_added = True
+        self.update_props(["trash"], [True])
         self.complete_btn.set_active(True)
-        self.just_added = False
-        self.update_props(["trash", "completed", "synced"], [True, True, False])
-        for task in self.all_tasks:
-            task.just_added = True
-            task.complete_btn.set_active(True)
-            task.just_added = False
-            task.update_props(["trash", "completed", "synced"], [True, True, False])
         State.today_page.update_ui()
         State.trash_sidebar_row.update_ui()
         State.tags_page.update_ui()
@@ -847,7 +840,7 @@ class Task(Gtk.Revealer):
         pc: int = (
             completed / total * 100
             if total > 0
-            else (100 if self.complete_btn.get_active() else 0)
+            else (100 if self.task_data.completed else 0)
         )
         if self.task_data.percent_complete != pc:
             self.update_props(["percent_complete", "synced"], [pc, False])
@@ -922,11 +915,6 @@ class Task(Gtk.Revealer):
                 self.completed_task_list.remove(task)
                 self.uncompleted_task_list.append(task)
 
-        # Update tasks
-        if update_tasks:
-            for task in self.tasks:
-                task.update_ui()
-
     def update_color(self) -> None:
         for c in self.main_box.get_css_classes():
             if "task-" in c:
@@ -953,8 +941,15 @@ class Task(Gtk.Revealer):
         Log.debug(f"Task '{self.uid}': Set completed to '{btn.get_active()}'")
 
         # Change prop
-        if self.task_data.completed != btn.get_active():
-            self.update_props(["completed", "synced"], [btn.get_active(), False])
+        self.update_props(["completed", "synced"], [btn.get_active(), False])
+
+        # Move section
+        if btn.get_active():
+            self.parent.uncompleted_task_list.remove(self)
+            self.parent.completed_task_list.prepend(self)
+        else:
+            self.parent.completed_task_list.remove(self)
+            self.parent.uncompleted_task_list.append(self)
 
         # Complete all sub-tasks if toggle is active
         if btn.get_active():
@@ -966,22 +961,18 @@ class Task(Gtk.Revealer):
         # Uncomplete parents if sub-task is uncompleted
         else:
             for task in self.parents_tree:
-                if task.task_data.completed:
-                    task.update_props(["completed", "synced"], [False, False])
-                    task.block_signals = True
+                if task.complete_btn.get_active():
+                    task.can_sync = False
                     task.complete_btn.set_active(False)
-                    task.block_signals = False
+                    task.can_sync = True
 
         # Update parent Task
         if isinstance(self.parent, Task):
-            self.parent.update_tasks(False)
             self.parent.update_progress_bar()
             self.parent.update_title()
 
         # Update parent TaskList
         self.task_list.update_title()
-        if not isinstance(self.parent, Task):
-            self.parent.update_tasks(False)
 
         self.update_title()
         self.update_progress_bar()

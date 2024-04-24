@@ -176,9 +176,11 @@ class UserDataJSON:
         self.task_lists = lists
 
     def delete_task(self, list_uid: str, uid: str) -> None:
-        tasks: list[TaskData] = [
-            t for t in self.tasks if t.list_uid != list_uid and t.uid != uid
-        ]
+        tasks: list[TaskData] = self.tasks
+        for task in tasks:
+            if task.list_uid == list_uid and task.uid == uid:
+                tasks.remove(task)
+                break
         self.tasks = tasks
 
     def delete_tasks_from_trash(self) -> None:
@@ -186,6 +188,7 @@ class UserDataJSON:
         for task in tasks:
             if task.trash and not task.deleted:
                 task.deleted = True
+                task.synced = False
         self.tasks = tasks
 
     def get_lists_as_dicts(self) -> list[TaskListData]:

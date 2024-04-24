@@ -232,7 +232,7 @@ class TaskList(Adw.Bin):
         self.title.set_title(UserData.get_list_prop(self.list_uid, "name"))
 
         n_total, n_completed = UserData.get_status(self.list_uid)
-        print(n_total, n_completed)
+
         # Update headerbar subtitle
         self.title.set_subtitle(
             _("Completed:") + f" {n_completed} / {n_total}" if n_total > 0 else ""
@@ -256,7 +256,7 @@ class TaskList(Adw.Bin):
             n_completed > 0 and n_completed != n_total
         )
 
-    def update_tasks(self, update_tasks: bool = True) -> None:
+    def update_tasks(self) -> None:
         # Update tasks
         tasks: list[TaskData] = [
             t for t in UserData.get_tasks_as_dicts(self.list_uid, "") if not t.deleted
@@ -302,9 +302,9 @@ class TaskList(Adw.Bin):
             if not task.get_reveal_child() and not task.task_data.trash:
                 task.toggle_visibility(True)
 
-    def update_ui(self, update_tasks: bool = True) -> None:
+    def update_ui(self) -> None:
         self.update_title()
-        self.update_tasks(update_tasks)
+        self.update_tasks()
 
     # ------ SIGNAL HANDLERS ------ #
 

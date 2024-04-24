@@ -276,7 +276,7 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
         task.purge()
 
         old_task_list.update_title()
-        self.task_list.update_ui(False)
+        self.task_list.update_ui()
 
         Sync.sync()
 

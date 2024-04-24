@@ -76,7 +76,7 @@ class NotesWindow(Adw.Dialog):
     # ------ SIGNAL HANDLERS ------ #
 
     def do_closed(self):
-        text: str = self.buffer.props.text.strip()
+        text: str = self.buffer.props.text
         if text == self.task.task_data.notes:
             return
         Log.info("Task: Change notes")
