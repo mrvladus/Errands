@@ -407,8 +407,10 @@ class SyncProviderCalDAV:
             self.update_ui_args.update_tags = True
         if "parent" in updated_props:
             if "list_uid" in updated_props:
-                self.update_ui_args.lists_to_update_tasks.append(old_task.list_uid)
-            self.update_ui_args.lists_to_update_tasks.append(task.list_uid)
+                if old_task.list_uid not in self.update_ui_args.lists_to_update_tasks:
+                    self.update_ui_args.lists_to_update_tasks.append(old_task.list_uid)
+            if task.list_uid not in self.update_ui_args.lists_to_update_tasks:
+                self.update_ui_args.lists_to_update_tasks.append(task.list_uid)
         else:
             self.update_ui_args.tasks_to_update.append(task)
 
