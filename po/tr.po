@@ -1,8 +1,8 @@
 # Turkish translation for io.github.mrvladus.errands.
-# Copyright (C) 2023 io.github.mrvladus.errands's copyright holder
+# Copyright (C) 2023-2024 io.github.mrvladus.errands's copyright holder
 # This file is distributed under the same license as the io.github.mrvladus.errands package.
 #
-# Sabri Ünal <libreajans@gmail.com>, 2023.
+# Sabri Ünal <yakushabb@gmail.com>, 2023-2024.
 #
 msgid ""
 msgstr ""
@@ -11,6 +11,9 @@ msgstr ""
 "POT-Creation-Date: 2024-04-22 18:21+0300\n"
 "PO-Revision-Date: 2023-12-29 18:59+0300\n"
 "Last-Translator: Sabri Ünal <libreajans@gmail.com>\n"
+"POT-Creation-Date: 2024-02-06 17:58+0300\n"
+"PO-Revision-Date: 2024-03-17 01:38+0300\n"
+"Last-Translator: Sabri Ünal <yakushabb@gmail.com>\n"
 "Language-Team: Turkish <takim@gnome.org.tr>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -352,6 +355,49 @@ msgstr ""
 #: errands/widgets/preferences.py:94
 msgid "Notifications"
 msgstr ""
+#. task_list_group = Adw.PreferencesGroup(title=_("Task Lists"))
+#. add_tasks_position = Adw.ComboRow(
+#. title=_("Add new Tasks"),
+#. model=Gtk.StringList.new([_("At the Top"), _("At the Bottom")]),
+#. icon_name="errands-add-symbolic",
+#. )
+#. task_list_group.add(add_tasks_position)
+#. Tasks group
+#: errands/widgets/preferences.py:80 errands/widgets/window.py:91
+msgid "Tasks"
+msgstr "Görevler"
+
+#: errands/widgets/preferences.py:83
+msgid "Click Action"
+msgstr "Tıklama Eylemi"
+
+#: errands/widgets/preferences.py:84
+msgid "Open Details Panel"
+msgstr "Ayrıntılar Panelini Aç"
+
+#: errands/widgets/preferences.py:84
+msgid "Show Sub-Tasks"
+msgstr "Alt Görevleri Göster"
+
+#: errands/widgets/preferences.py:99
+msgid "Complete Button Size"
+msgstr "Bitti Düğmesi Boyutu"
+
+#: errands/widgets/preferences.py:100
+msgid "Small"
+msgstr "Küçük"
+
+#: errands/widgets/preferences.py:100
+msgid "Big"
+msgstr "Büyük"
+
+#: errands/widgets/preferences.py:113
+msgid "Progress Bar"
+msgstr "İlerleme Çubuğu"
+
+#: errands/widgets/preferences.py:119
+msgid "Tool Bar"
+msgstr "Araç Çubuğu"
 
 #: errands/widgets/preferences.py:99 errands/widgets/preferences.py:153
 #: data/resources/gtk/help-overlay.ui:38
@@ -392,6 +438,27 @@ msgid "General"
 msgstr "Genel"
 
 #: errands/widgets/preferences.py:189
+#: errands/widgets/preferences.py:171
+msgid "Details Panel"
+msgstr "Ayrıntılar Paneli"
+
+#: errands/widgets/preferences.py:174
+msgid "Position"
+msgstr "Konum"
+
+#: errands/widgets/preferences.py:175
+msgid "Left"
+msgstr "Sol"
+
+#: errands/widgets/preferences.py:175
+msgid "Right"
+msgstr "Sağ"
+
+#: errands/widgets/preferences.py:184
+msgid "Appearance"
+msgstr "Görünüm"
+
+#: errands/widgets/preferences.py:230
 msgid "Connected"
 msgstr "Bağlandı"
 
@@ -401,12 +468,23 @@ msgstr "Bağlanamadı"
 
 #: errands/widgets/sidebar.py:106
 #, fuzzy
+#: errands/widgets/sidebar.py:67 errands/widgets/window.py:38
+#: errands/widgets/window.py:129 data/io.github.mrvladus.List.desktop.in.in:3
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:27
+msgid "Errands"
+msgstr "Errands"
+
+#: errands/widgets/sidebar.py:75
+msgid "Import List"
+msgstr "Listeyi İçe Aktar"
+
+#: errands/widgets/sidebar.py:80
 msgid "Add List (Ctrl+A)"
-msgstr "Liste Ekle"
+msgstr "Liste Ekle (Ctrl+A)"
 
 #: errands/widgets/sidebar.py:122
 msgid "Syncing..."
-msgstr ""
+msgstr "Eşzamanlanıyor..."
 
 #: errands/widgets/sidebar.py:127
 msgid "Add new List"
@@ -467,6 +545,17 @@ msgstr "Panoya Kopyalandı"
 #, fuzzy
 msgid "Toggle Sub-Tasks"
 msgstr "Yeni Alt Görev Ekle"
+#: errands/widgets/task.py:301 errands/widgets/task.py:312
+msgid "Mark as Completed"
+msgstr "Tamamlanmadı Olarak İmle"
+
+#: errands/widgets/task.py:399
+msgid "Expand / Fold"
+msgstr "Genişlet / Katla"
+
+#: errands/widgets/task.py:419 data/resources/gtk/help-overlay.ui:68
+msgid "Details"
+msgstr "Ayrıntılar"
 
 #: errands/widgets/task.py:220
 #, fuzzy
@@ -501,17 +590,18 @@ msgstr ""
 
 #: errands/widgets/window.py:97
 #, fuzzy
+#: errands/widgets/window.py:69
 msgid "Create List"
-msgstr "Listeyi Yeniden Adlandır"
+msgstr "Liste Oluştur"
 
 #: errands/widgets/window.py:106
 #, fuzzy
-msgid "Create new List"
 msgstr "Listeyi Yeniden Adlandır"
+#: errands/widgets/window.py:90 data/resources/gtk/help-overlay.ui:53
+msgid "Lists"
 
 #: errands/widgets/window.py:155
-msgid "translator-credits"
-msgstr "Sabri Ünal <libreajans@gmail.com>"
+msgstr "Sabri Ünal <yakushabb@gmail.com>"
 
 #: errands/widgets/window.py:162
 msgid "Sync is disabled"
@@ -520,6 +610,18 @@ msgstr "Eşzamanlama devre dışı"
 #: errands/widgets/window.py:266
 msgid "Imported"
 msgstr "İçe Aktarıldı"
+
+#: errands/lib/sync/providers/caldav.py:42
+msgid "Not all sync credentials provided. Please check settings."
+msgstr "Tüm eşzamanlama kimlik bilgileri sağlanmadı. Lütfen ayarları denetleyin."
+
+#: errands/lib/sync/providers/caldav.py:81
+msgid "Can't connect to CalDAV server at:"
+msgstr "CalDAV sunucusuna bağlanılamıyor:"
+
+#: data/resources/gtk/help-overlay.ui:9
+msgid "General"
+msgstr "Genel"
 
 #: data/resources/gtk/help-overlay.ui:13
 msgid "Show keyboard shortcuts"
@@ -545,8 +647,9 @@ msgstr "Ayrıntı Yok"
 
 #: data/resources/gtk/help-overlay.ui:79
 #, fuzzy
+#: data/resources/gtk/help-overlay.ui:72
 msgid "Toggle Details"
-msgstr "Ayrıntı Yok"
+msgstr "Ayrıntıları Aç/Kapat"
 
 #: data/io.github.mrvladus.List.desktop.in.in:4
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:32

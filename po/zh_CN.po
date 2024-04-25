@@ -49,15 +49,15 @@ msgstr "取消"
 #: errands/widgets/today/today_sidebar_row.py:30
 #: errands/widgets/today/today.py:57 errands/widgets/window.py:69
 msgid "Today"
-msgstr ""
+msgstr "今日"
 
 #: errands/widgets/shared/datetime_picker.py:142
 msgid "Tomorrow"
-msgstr ""
+msgstr "明日"
 
 #: errands/widgets/shared/datetime_picker.py:153
 msgid "Now"
-msgstr ""
+msgstr "当前"
 
 #: errands/widgets/shared/datetime_picker.py:159
 #: errands/widgets/trash/trash_sidebar_row.py:56
@@ -68,6 +68,12 @@ msgstr "清除"
 #: errands/widgets/shared/datetime_picker.py:209
 msgid "Set Date"
 msgstr ""
+#. Start date row
+#. End date row
+#: errands/widgets/components.py:231 errands/widgets/details.py:176
+#: errands/widgets/details.py:197
+msgid "Not Set"
+msgstr "未设置"
 
 #: errands/widgets/shared/datetime_picker.py:220
 #: errands/widgets/today/today_task.py:154 errands/widgets/task.py:301
@@ -317,15 +323,15 @@ msgstr "主题"
 
 #: errands/widgets/preferences.py:37
 msgid "System"
-msgstr "系统配色"
+msgstr "跟随系统"
 
 #: errands/widgets/preferences.py:49
 msgid "Light"
-msgstr "亮配色"
+msgstr "亮色"
 
 #: errands/widgets/preferences.py:61
 msgid "Dark"
-msgstr "暗配色"
+msgstr "暗色"
 
 #. Task lists group
 #: errands/widgets/preferences.py:69 errands/widgets/sidebar.py:153
@@ -353,6 +359,37 @@ msgstr ""
 #: errands/widgets/preferences.py:94
 msgid "Notifications"
 msgstr ""
+#: errands/widgets/preferences.py:83
+msgid "Click Action"
+msgstr "单击操作"
+
+#: errands/widgets/preferences.py:84
+msgid "Open Details Panel"
+msgstr "打开详情面板"
+
+#: errands/widgets/preferences.py:84
+msgid "Show Sub-Tasks"
+msgstr "显示子任务"
+
+#: errands/widgets/preferences.py:99
+msgid "Complete Button Size"
+msgstr "完成按钮大小"
+
+#: errands/widgets/preferences.py:100
+msgid "Small"
+msgstr "小"
+
+#: errands/widgets/preferences.py:100
+msgid "Big"
+msgstr "大"
+
+#: errands/widgets/preferences.py:113
+msgid "Progress Bar"
+msgstr "进度条"
+
+#: errands/widgets/preferences.py:119
+msgid "Tool Bar"
+msgstr "工具条"
 
 #: errands/widgets/preferences.py:99 errands/widgets/preferences.py:153
 #: data/resources/gtk/help-overlay.ui:38
@@ -370,7 +407,7 @@ msgstr "同步服务"
 
 #: errands/widgets/preferences.py:113
 msgid "Server URL"
-msgstr "服务器链接"
+msgstr "服务器 URL"
 
 #: errands/widgets/preferences.py:119
 msgid "Username"
@@ -393,29 +430,105 @@ msgid "General"
 msgstr "一般选项"
 
 #: errands/widgets/preferences.py:189
+#: errands/widgets/preferences.py:171
+msgid "Details Panel"
+msgstr "详情面板"
+
+#: errands/widgets/preferences.py:174
+msgid "Position"
+msgstr "位置"
+
+#: errands/widgets/preferences.py:175
+msgid "Left"
+msgstr "左侧"
+
+#: errands/widgets/preferences.py:175
+msgid "Right"
+msgstr "右侧"
+
+#: errands/widgets/preferences.py:184
+msgid "Appearance"
+msgstr "外观设置"
+
+#: errands/widgets/preferences.py:230
 msgid "Connected"
-msgstr ""
+msgstr "已连接"
 
 #: errands/widgets/preferences.py:189
 msgid "Can't connect"
-msgstr ""
+msgstr "无法连接"
 
 #: errands/widgets/sidebar.py:106
+#: errands/widgets/sidebar.py:67 errands/widgets/window.py:38
+#: errands/widgets/window.py:129 data/io.github.mrvladus.List.desktop.in.in:3
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:27
+msgid "Errands"
+msgstr "Errands"
+
+#: errands/widgets/sidebar.py:75
+msgid "Import List"
+msgstr "导入清单"
+
+#: errands/widgets/sidebar.py:80
 msgid "Add List (Ctrl+A)"
-msgstr ""
+msgstr "添加清单 (Ctrl+A)"
 
 #: errands/widgets/sidebar.py:122
+#: errands/widgets/sidebar.py:82
+msgid "More Options"
+msgstr "更多选项"
+
+#. top_section.append(_("Secret Notes"), "app.secret_notes")
+#: errands/widgets/sidebar.py:99 data/resources/gtk/help-overlay.ui:42
+msgid "Sync / Fetch Tasks"
+msgstr "同步/获取任务"
+
+#: errands/widgets/sidebar.py:102 data/resources/gtk/help-overlay.ui:20
+msgid "Preferences"
+msgstr "偏好设置"
+
+#: errands/widgets/sidebar.py:103
+msgid "Keyboard Shortcuts"
+msgstr "键盘快捷键"
+
+#: errands/widgets/sidebar.py:104
+msgid "About Errands"
+msgstr "关于 Errands"
+
+#: errands/widgets/sidebar.py:110
+msgid "Main Menu"
+msgstr "主菜单"
+
+#: errands/widgets/sidebar.py:116
 msgid "Syncing..."
-msgstr ""
+msgstr "同步中..."
 
 #: errands/widgets/sidebar.py:127
 #, fuzzy
+#: errands/widgets/sidebar.py:141
+msgid "New List Name"
+msgstr "新清单名称"
+
+#: errands/widgets/sidebar.py:145 data/resources/gtk/help-overlay.ui:57
+msgid "Add List"
+msgstr "添加清单"
+
+#: errands/widgets/sidebar.py:150 errands/widgets/sidebar.py:342
+#: errands/widgets/sidebar.py:385 errands/widgets/trash.py:136
+msgid "Cancel"
+msgstr "取消"
+
+#: errands/widgets/sidebar.py:151
+msgid "Add"
+msgstr "添加"
+
+#: errands/widgets/sidebar.py:168
 msgid "Add new List"
-msgstr "添加新任务"
+msgstr "添加新清单"
 
 #: errands/widgets/sidebar.py:128
 msgid "Click \"+\" button"
-msgstr ""
+msgstr "点击 \"+\" 按钮"
 
 #: errands/widgets/sidebar.py:165 errands/widgets/window.py:45
 #: errands/widgets/window.py:150 data/io.github.mrvladus.List.desktop.in.in:3
@@ -462,6 +575,143 @@ msgid "Add"
 msgstr ""
 
 #: errands/widgets/task.py:116
+msgid "List will be permanently deleted"
+msgstr "清单将会被永久删除"
+
+#: errands/widgets/sidebar.py:343 errands/widgets/sidebar.py:478
+#: errands/widgets/details.py:54 errands/widgets/trash.py:137
+msgid "Delete"
+msgstr "删除"
+
+#: errands/widgets/sidebar.py:375
+msgid "New Name"
+msgstr "新名称"
+
+#: errands/widgets/sidebar.py:380
+msgid "Rename List"
+msgstr "重命名清单"
+
+#: errands/widgets/sidebar.py:386 errands/widgets/details.py:114
+#: errands/widgets/details.py:155
+msgid "Save"
+msgstr "保存"
+
+#: errands/widgets/sidebar.py:444
+msgid "Export failed"
+msgstr "导出失败"
+
+#: errands/widgets/sidebar.py:446 errands/widgets/details.py:487
+msgid "Exported"
+msgstr "已导出"
+
+#: errands/widgets/sidebar.py:477
+msgid "Rename"
+msgstr "重命名"
+
+#. Export group
+#: errands/widgets/sidebar.py:479 errands/widgets/details.py:239
+#: errands/widgets/details.py:247
+msgid "Export"
+msgstr "导出"
+
+#: errands/widgets/sidebar.py:505
+msgid "Menu"
+msgstr "菜单"
+
+#: errands/widgets/sidebar.py:563 errands/widgets/trash.py:30
+#: errands/widgets/window.py:61
+msgid "Trash"
+msgstr "垃圾桶"
+
+#: errands/widgets/task_list.py:40 errands/widgets/task_list.py:55
+#: errands/widgets/task_list.py:96 errands/widgets/task_list.py:107
+msgid "Toggle Sidebar"
+msgstr "侧边栏"
+
+#: errands/widgets/task_list.py:70 errands/widgets/task_list.py:120
+msgid "Delete Completed Tasks"
+msgstr "删除已完成任务"
+
+#: errands/widgets/task_list.py:80 errands/widgets/task_list.py:134
+msgid "Scroll Up"
+msgstr "向上滚动"
+
+#: errands/widgets/task_list.py:277 errands/widgets/task.py:217
+msgid "Completed:"
+msgstr "已完成："
+
+#: errands/widgets/task_list.py:401
+msgid "Add new Task"
+msgstr "添加新任务"
+
+#: errands/widgets/details.py:63
+msgid "No Details"
+msgstr "无详情"
+
+#: errands/widgets/details.py:64
+msgid "Click on task to show more info"
+msgstr "单击任务显示更多信息"
+
+#: errands/widgets/details.py:81
+msgid "Clear Style"
+msgstr "清除格式"
+
+#. Edit group
+#: errands/widgets/details.py:90
+msgid "Text"
+msgstr "文本"
+
+#: errands/widgets/details.py:124 errands/widgets/details.py:166
+msgid "Copy Text"
+msgstr "复制文本"
+
+#. Notes group
+#: errands/widgets/details.py:131
+msgid "Notes"
+msgstr "笔记"
+
+#. Properties group
+#: errands/widgets/details.py:173
+msgid "Properties"
+msgstr "特性"
+
+#: errands/widgets/details.py:176
+msgid "Start"
+msgstr "开始"
+
+#: errands/widgets/details.py:183 errands/widgets/details.py:204
+msgid "Set Date"
+msgstr "设置日期"
+
+#: errands/widgets/details.py:197
+msgid "Due"
+msgstr "到期"
+
+#. Complete % row
+#: errands/widgets/details.py:212
+msgid "Complete %"
+msgstr "已完成 %"
+
+#. Priority row
+#: errands/widgets/details.py:222
+msgid "Priority"
+msgstr "优先级"
+
+#. Tags group
+#: errands/widgets/details.py:232
+msgid "Tags"
+msgstr "标签"
+
+#. Tags entry
+#: errands/widgets/details.py:234
+msgid "Add Tag"
+msgstr "添加标签"
+
+#: errands/widgets/details.py:248
+msgid "Save Task as .ics file"
+msgstr "保存任务为 .ics 文件"
+
+#: errands/widgets/details.py:440
 msgid "Copied to Clipboard"
 msgstr "复制到剪贴板"
 
@@ -476,13 +726,25 @@ msgid "Toggle Toolbar"
 msgstr "侧边栏"
 
 #: errands/widgets/task.py:594
+#: errands/widgets/task.py:399
+msgid "Expand / Fold"
+msgstr "展开/合并"
+
+#: errands/widgets/task.py:419 data/resources/gtk/help-overlay.ui:68
+msgid "Details"
+msgstr "详情"
+
+#: errands/widgets/task.py:530
 msgid "Add new Sub-Task"
-msgstr "添加新子项目"
+msgstr "添加新子任务"
 
 #: errands/widgets/task.py:1339
 #, fuzzy
 msgid "Delete Tag"
 msgstr "删除的任务"
+#: errands/widgets/trash.py:45
+msgid "Restore All"
+msgstr "恢复全部"
 
 #: errands/widgets/window.py:58
 #, fuzzy
@@ -492,10 +754,13 @@ msgstr "侧边栏"
 #: errands/widgets/window.py:61
 msgid "Content"
 msgstr ""
+#: errands/widgets/trash.py:52
+msgid "No deleted items"
+msgstr "无已删除项目"
 
 #: errands/widgets/window.py:92
 msgid "No Task Lists"
-msgstr ""
+msgstr "当前无任务清单"
 
 #: errands/widgets/window.py:93
 msgid "Create new or import existing one"
@@ -503,13 +768,17 @@ msgstr ""
 
 #: errands/widgets/window.py:97
 #, fuzzy
+#: errands/widgets/window.py:69
 msgid "Create List"
-msgstr "导入任务"
+msgstr "创建清单"
 
 #: errands/widgets/window.py:106
 #, fuzzy
 msgid "Create new List"
 msgstr "导入任务"
+#: errands/widgets/window.py:90 data/resources/gtk/help-overlay.ui:53
+msgid "Lists"
+msgstr "清单"
 
 #: errands/widgets/window.py:155
 msgid "translator-credits"
@@ -517,12 +786,25 @@ msgstr "翻译者名单"
 
 #: errands/widgets/window.py:162
 msgid "Sync is disabled"
-msgstr ""
+msgstr "同步已禁用"
 
 #: errands/widgets/window.py:266
 #, fuzzy
+#: errands/widgets/window.py:212
 msgid "Imported"
-msgstr "任务导入"
+msgstr "已导入"
+
+#: errands/lib/sync/providers/caldav.py:42
+msgid "Not all sync credentials provided. Please check settings."
+msgstr "未提供所有同步凭据。请检查设置。"
+
+#: errands/lib/sync/providers/caldav.py:81
+msgid "Can't connect to CalDAV server at:"
+msgstr "无法连接以下 CalDAV 服务器："
+
+#: data/resources/gtk/help-overlay.ui:9
+msgid "General"
+msgstr "常规选项"
 
 #: data/resources/gtk/help-overlay.ui:13
 msgid "Show keyboard shortcuts"
@@ -547,18 +829,18 @@ msgstr ""
 
 #: data/resources/gtk/help-overlay.ui:79
 #, fuzzy
+#: data/resources/gtk/help-overlay.ui:72
 msgid "Toggle Details"
-msgstr "侧边栏"
+msgstr "切换详情栏"
 
 #: data/io.github.mrvladus.List.desktop.in.in:4
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:32
 msgid "Manage your tasks"
-msgstr "管理任务"
+msgstr "管理你的任务"
 
 #: data/io.github.mrvladus.List.desktop.in.in:10
-#, fuzzy
 msgid "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
-msgstr "errands;任务;列表;待办;todos;"
+msgstr "errands;任务;清单;待办;todo;caldav;nextcloud;同步;"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:34
 msgid "Todo application for those who prefer simplicity."
@@ -570,7 +852,7 @@ msgstr "特性："
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:37
 msgid "Multiple task lists support"
-msgstr ""
+msgstr "多任务清单支持"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:38
 msgid "Add, remove, edit tasks and sub-tasks"
@@ -594,8 +876,9 @@ msgstr "支持拖放"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:43
 #, fuzzy
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:39
 msgid "Import .ics files"
-msgstr "导入任务"
+msgstr "导入 .ics 文件"
 
 #, fuzzy
 #~ msgid "Complete Button Size"
