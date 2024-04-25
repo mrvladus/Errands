@@ -413,6 +413,17 @@ class UserDataJSON:
                 break
         self.tasks = tasks
 
+    def clean_orphans(self) -> list[TaskData]:
+        orphans: list[TaskData] = []
+        tasks: list[TaskData] = self.tasks
+        uids: list[str] = [t.uid for t in tasks]
+        for task in tasks:
+            if task.parent not in uids:
+                task.parent = ""
+                orphans.append(task)
+        self.tasks = tasks
+        return orphans
+
     # ------ PRIVATE METHODS ------ #
 
     def __get_sub_tasks(self, list_uid: str, task_uid: str) -> list[TaskData]:

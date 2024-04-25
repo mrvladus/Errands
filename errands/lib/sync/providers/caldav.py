@@ -210,6 +210,11 @@ class SyncProviderCalDAV:
 
         Log.debug("Sync: Update UI")
 
+        # Move orphans on top-level
+        for task in UserData.clean_orphans():
+            if task.list_uid not in self.update_ui_args.lists_to_update_tasks:
+                self.update_ui_args.lists_to_update_tasks.append(task.list_uid)
+
         # Remove lists
         for lst in State.get_task_lists():
             if lst.list_uid in self.update_ui_args.lists_to_purge_uids:

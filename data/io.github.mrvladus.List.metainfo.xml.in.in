@@ -4,9 +4,9 @@
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>MIT</project_license>
   <content_rating type="oars-1.1" />
-  <developer_name translatable="no">Vlad Krupinski</developer_name>
+  <developer_name translatable="no">Vlad Krupinskii</developer_name>
   <developer id="github.com">
-    <name translatable="no">Vlad Krupinski</name>
+    <name translatable="no">Vlad Krupinskii</name>
   </developer>
   <url type="homepage">https://github.com/mrvladus/Errands</url>
   <url type="bugtracker">https://github.com/mrvladus/Errands/issues</url>
@@ -47,28 +47,26 @@
     <screenshot type="default">
       <image>https://raw.githubusercontent.com/mrvladus/Errands/main/screenshots/main.png</image>
     </screenshot>
-    <screenshot>
-      <image>https://raw.githubusercontent.com/mrvladus/Errands/main/screenshots/secondary.png</image>
-    </screenshot>
   </screenshots>
   <releases>
-    <release version="46.0" date="2024-23-04">
+    <release version="46.0" date="2024-25-04">
       <description translatable="no">
         <p>One year anniversary release!</p>
         <p>Changes:</p>
         <ul>
-          <li>Details panel is replaced with toolbar for each task, that you can toggle</li>
+          <li>Details panel is replaced with toolbar for each task</li>
           <li>Added Today page for tasks planned for today</li>
           <li>Added Tags page where you can manage your tags</li>
           <li>Added desktop notifications for due tasks</li>
-          <li>Errands now run in the background and on startup</li>
+          <li>Errands now will run in the background and on startup</li>
           <li>Completed tasks now moved down the list</li>
           <li>Toggle for each list for hiding / showing completed tasks</li>
           <li>Added Tags bar under task text. If task have tags, they will be visible.</li>
           <li>Added priority flags</li>
+          <li>Added setting for selecting new task position</li>
           <li>Sidebar redesign</li>
           <li>Using GNOME 46 platform with latest libadwaita widgets</li>
-          <li>Perfomance improvements. Now lists with hundreds of tasks are loaded pretty much immediately. Startup time has been drastically reduced too.</li>
+          <li>Perfomance improvements. Now lists with hundreds of tasks are loaded really fast. Startup time has been drastically reduced too.</li>
         </ul>
       </description>
     </release>
