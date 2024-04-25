@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-22 18:21+0300\n"
+"POT-Creation-Date: 2024-04-25 18:51+0300\n"
 "PO-Revision-Date: 2024-02-06 17:56+0200\n"
 "Last-Translator: volkov <volkovissocool@gmail.com>\n"
 "Language-Team: volkov <volkovissocool@gmail.com>\n"
@@ -21,13 +21,13 @@ msgstr ""
 msgid "Errands need to run in the background for notifications"
 msgstr ""
 
-#: errands/lib/sync/providers/caldav.py:59
+#: errands/lib/sync/providers/caldav.py:63
 msgid "Not all sync credentials provided. Please check settings."
 msgstr ""
 "Надано не всі облікові дані синхронізації. Будь ласка, перевірте "
 "налаштування."
 
-#: errands/lib/sync/providers/caldav.py:99
+#: errands/lib/sync/providers/caldav.py:103
 msgid "Can't connect to CalDAV server at:"
 msgstr "Не вдалося з'єднатися з CalDAV сервером за адресою:"
 
@@ -42,7 +42,7 @@ msgstr "Ви впевнені?"
 
 #: errands/widgets/shared/components/dialogs.py:33
 #: errands/widgets/task_list/task_list_sidebar_row.py:97
-#: errands/widgets/today/today_task.py:119 errands/widgets/sidebar.py:337
+#: errands/widgets/today/today_task.py:119 errands/widgets/sidebar.py:342
 #: errands/widgets/task.py:253
 msgid "Cancel"
 msgstr "Скасувати"
@@ -91,7 +91,7 @@ msgstr "До"
 msgid "Start"
 msgstr "Розпочати"
 
-#: errands/widgets/shared/notes_window.py:29
+#: errands/widgets/shared/notes_window.py:30
 #: errands/widgets/today/today_task.py:163 errands/widgets/task.py:310
 msgid "Notes"
 msgstr "Примітки"
@@ -117,7 +117,7 @@ msgstr "Додати нову задачу"
 
 #: errands/widgets/tags/tags.py:140
 #: errands/widgets/task_list/task_list_sidebar_row.py:58
-#: errands/widgets/task_list/task_list_sidebar_row.py:205
+#: errands/widgets/task_list/task_list_sidebar_row.py:214
 #: errands/widgets/trash/trash.py:164
 msgid "Delete"
 msgstr "Видалити"
@@ -138,20 +138,20 @@ msgstr "Перейменувати список"
 msgid "Save"
 msgstr "Зберегти"
 
-#: errands/widgets/task_list/task_list_sidebar_row.py:156
+#: errands/widgets/task_list/task_list_sidebar_row.py:163
 msgid "Export failed"
 msgstr "Не вдалося експортувати"
 
-#: errands/widgets/task_list/task_list_sidebar_row.py:158
+#: errands/widgets/task_list/task_list_sidebar_row.py:165
 #: errands/widgets/task.py:108
 msgid "Exported"
 msgstr "Експортовано"
 
-#: errands/widgets/task_list/task_list_sidebar_row.py:204
+#: errands/widgets/task_list/task_list_sidebar_row.py:213
 msgid "Rename"
 msgstr "Перейменувати"
 
-#: errands/widgets/task_list/task_list_sidebar_row.py:206
+#: errands/widgets/task_list/task_list_sidebar_row.py:215
 #: errands/widgets/today/today_task.py:278 errands/widgets/task.py:425
 msgid "Export"
 msgstr "Експортувати"
@@ -178,7 +178,7 @@ msgstr "Завершено:"
 msgid "Add new Task"
 msgstr "Додати нову задачу"
 
-#: errands/widgets/task_list/task_list.py:237 errands/widgets/task.py:809
+#: errands/widgets/task_list/task_list.py:238 errands/widgets/task.py:802
 msgid "Completed:"
 msgstr "Завершено:"
 
@@ -268,14 +268,14 @@ msgstr ""
 
 #: errands/widgets/today/today_task.py:357
 #: errands/widgets/today/today_task.py:624 errands/widgets/task.py:504
-#: errands/widgets/task.py:1228
+#: errands/widgets/task.py:1220
 #, fuzzy
 msgid "Created:"
 msgstr "Створити"
 
 #: errands/widgets/today/today_task.py:368
 #: errands/widgets/today/today_task.py:625 errands/widgets/task.py:515
-#: errands/widgets/task.py:1229
+#: errands/widgets/task.py:1221
 msgid "Changed:"
 msgstr ""
 
@@ -445,15 +445,15 @@ msgstr "Клавіатурні скорочення"
 msgid "About Errands"
 msgstr "Про Errands"
 
-#: errands/widgets/sidebar.py:328
+#: errands/widgets/sidebar.py:333
 msgid "New List Name"
 msgstr "Назва нового списку"
 
-#: errands/widgets/sidebar.py:332 data/resources/gtk/help-overlay.ui:57
+#: errands/widgets/sidebar.py:337 data/resources/gtk/help-overlay.ui:57
 msgid "Add List"
 msgstr "Додати список"
 
-#: errands/widgets/sidebar.py:338
+#: errands/widgets/sidebar.py:343
 msgid "Add"
 msgstr "Додати"
 
@@ -475,7 +475,7 @@ msgstr "Показати / сховати бічну панель"
 msgid "Add new Sub-Task"
 msgstr "Додати нову підзадачу"
 
-#: errands/widgets/task.py:1339
+#: errands/widgets/task.py:1331
 #, fuzzy
 msgid "Delete Tag"
 msgstr "Видалені задачі"
@@ -514,7 +514,7 @@ msgstr "volkov <volkovissocool@gmail.com>"
 msgid "Sync is disabled"
 msgstr "Синхронізація вимкнена"
 
-#: errands/widgets/window.py:266
+#: errands/widgets/window.py:245
 msgid "Imported"
 msgstr "Імпортовано"
 

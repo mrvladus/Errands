@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-22 18:21+0300\n"
+"POT-Creation-Date: 2024-04-25 18:51+0300\n"
 "PO-Revision-Date: 2023-12-29 18:59+0300\n"
 "Last-Translator: Sabri Ünal <libreajans@gmail.com>\n"
 "Language-Team: Turkish <takim@gnome.org.tr>\n"
@@ -23,12 +23,12 @@ msgstr ""
 msgid "Errands need to run in the background for notifications"
 msgstr ""
 
-#: errands/lib/sync/providers/caldav.py:59
+#: errands/lib/sync/providers/caldav.py:63
 msgid "Not all sync credentials provided. Please check settings."
 msgstr ""
 "Tüm eşzamanlama kimlik bilgileri sağlanmadı. Lütfen ayarları denetleyin."
 
-#: errands/lib/sync/providers/caldav.py:99
+#: errands/lib/sync/providers/caldav.py:103
 msgid "Can't connect to CalDAV server at:"
 msgstr "CalDAV sunucusuna bağlanılamıyor:"
 
@@ -43,7 +43,7 @@ msgstr "Emin misiniz?"
 
 #: errands/widgets/shared/components/dialogs.py:33
 #: errands/widgets/task_list/task_list_sidebar_row.py:97
-#: errands/widgets/today/today_task.py:119 errands/widgets/sidebar.py:337
+#: errands/widgets/today/today_task.py:119 errands/widgets/sidebar.py:342
 #: errands/widgets/task.py:253
 msgid "Cancel"
 msgstr "İptal"
@@ -92,7 +92,7 @@ msgstr "Tamamlanma"
 msgid "Start"
 msgstr "Başlangıç"
 
-#: errands/widgets/shared/notes_window.py:29
+#: errands/widgets/shared/notes_window.py:30
 #: errands/widgets/today/today_task.py:163 errands/widgets/task.py:310
 msgid "Notes"
 msgstr "Notlar"
@@ -118,7 +118,7 @@ msgstr "Yeni Görev Ekle"
 
 #: errands/widgets/tags/tags.py:140
 #: errands/widgets/task_list/task_list_sidebar_row.py:58
-#: errands/widgets/task_list/task_list_sidebar_row.py:205
+#: errands/widgets/task_list/task_list_sidebar_row.py:214
 #: errands/widgets/trash/trash.py:164
 msgid "Delete"
 msgstr "Sil"
@@ -139,20 +139,20 @@ msgstr "Listeyi Yeniden Adlandır"
 msgid "Save"
 msgstr "Kaydet"
 
-#: errands/widgets/task_list/task_list_sidebar_row.py:156
+#: errands/widgets/task_list/task_list_sidebar_row.py:163
 msgid "Export failed"
 msgstr "Dışa aktarılamadı"
 
-#: errands/widgets/task_list/task_list_sidebar_row.py:158
+#: errands/widgets/task_list/task_list_sidebar_row.py:165
 #: errands/widgets/task.py:108
 msgid "Exported"
 msgstr "Dışa Aktarıldı"
 
-#: errands/widgets/task_list/task_list_sidebar_row.py:204
+#: errands/widgets/task_list/task_list_sidebar_row.py:213
 msgid "Rename"
 msgstr "Yeniden Adlandır"
 
-#: errands/widgets/task_list/task_list_sidebar_row.py:206
+#: errands/widgets/task_list/task_list_sidebar_row.py:215
 #: errands/widgets/today/today_task.py:278 errands/widgets/task.py:425
 msgid "Export"
 msgstr "Dışa Aktar"
@@ -179,7 +179,7 @@ msgstr "Tamamlandı:"
 msgid "Add new Task"
 msgstr "Yeni Görev Ekle"
 
-#: errands/widgets/task_list/task_list.py:237 errands/widgets/task.py:809
+#: errands/widgets/task_list/task_list.py:238 errands/widgets/task.py:802
 msgid "Completed:"
 msgstr "Tamamlandı:"
 
@@ -269,14 +269,14 @@ msgstr ""
 
 #: errands/widgets/today/today_task.py:357
 #: errands/widgets/today/today_task.py:624 errands/widgets/task.py:504
-#: errands/widgets/task.py:1228
+#: errands/widgets/task.py:1220
 #, fuzzy
 msgid "Created:"
 msgstr "Oluştur"
 
 #: errands/widgets/today/today_task.py:368
 #: errands/widgets/today/today_task.py:625 errands/widgets/task.py:515
-#: errands/widgets/task.py:1229
+#: errands/widgets/task.py:1221
 msgid "Changed:"
 msgstr ""
 
@@ -447,15 +447,15 @@ msgstr "Klavye Kısayolları"
 msgid "About Errands"
 msgstr "Errands Hakkında"
 
-#: errands/widgets/sidebar.py:328
+#: errands/widgets/sidebar.py:333
 msgid "New List Name"
 msgstr "Yeni Liste Adı"
 
-#: errands/widgets/sidebar.py:332 data/resources/gtk/help-overlay.ui:57
+#: errands/widgets/sidebar.py:337 data/resources/gtk/help-overlay.ui:57
 msgid "Add List"
 msgstr "Liste Ekle"
 
-#: errands/widgets/sidebar.py:338
+#: errands/widgets/sidebar.py:343
 msgid "Add"
 msgstr "Ekle"
 
@@ -477,7 +477,7 @@ msgstr "Kenar Çubuğunu Aç/Kapat"
 msgid "Add new Sub-Task"
 msgstr "Yeni Alt Görev Ekle"
 
-#: errands/widgets/task.py:1339
+#: errands/widgets/task.py:1331
 #, fuzzy
 msgid "Delete Tag"
 msgstr "Silinmiş Görevler"
@@ -517,7 +517,7 @@ msgstr "Sabri Ünal <libreajans@gmail.com>"
 msgid "Sync is disabled"
 msgstr "Eşzamanlama devre dışı"
 
-#: errands/widgets/window.py:266
+#: errands/widgets/window.py:245
 msgid "Imported"
 msgstr "İçe Aktarıldı"
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-22 18:21+0300\n"
+"POT-Creation-Date: 2024-04-25 18:51+0300\n"
 "PO-Revision-Date: 2024-01-28 13:51+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -22,11 +22,11 @@ msgstr ""
 msgid "Errands need to run in the background for notifications"
 msgstr ""
 
-#: errands/lib/sync/providers/caldav.py:59
+#: errands/lib/sync/providers/caldav.py:63
 msgid "Not all sync credentials provided. Please check settings."
 msgstr "Λείπουν στοιχεία για τον συγχρονισμό. Παρακαλώ ελέγξτε τις ρυθμίσεις."
 
-#: errands/lib/sync/providers/caldav.py:99
+#: errands/lib/sync/providers/caldav.py:103
 msgid "Can't connect to CalDAV server at:"
 msgstr "Αδυναμία σύνδεσης σε σέρβερ CalDAV στο:"
 
@@ -41,7 +41,7 @@ msgstr "Είστε σίγουροι;"
 
 #: errands/widgets/shared/components/dialogs.py:33
 #: errands/widgets/task_list/task_list_sidebar_row.py:97
-#: errands/widgets/today/today_task.py:119 errands/widgets/sidebar.py:337
+#: errands/widgets/today/today_task.py:119 errands/widgets/sidebar.py:342
 #: errands/widgets/task.py:253
 msgid "Cancel"
 msgstr "Ακύρωση"
@@ -90,7 +90,7 @@ msgstr "Τέλος"
 msgid "Start"
 msgstr "Αρχή"
 
-#: errands/widgets/shared/notes_window.py:29
+#: errands/widgets/shared/notes_window.py:30
 #: errands/widgets/today/today_task.py:163 errands/widgets/task.py:310
 msgid "Notes"
 msgstr "Σημειώσεις"
@@ -116,7 +116,7 @@ msgstr "Προσθήκη νέας Δουλειάς"
 
 #: errands/widgets/tags/tags.py:140
 #: errands/widgets/task_list/task_list_sidebar_row.py:58
-#: errands/widgets/task_list/task_list_sidebar_row.py:205
+#: errands/widgets/task_list/task_list_sidebar_row.py:214
 #: errands/widgets/trash/trash.py:164
 msgid "Delete"
 msgstr "Διαγραφή"
@@ -137,20 +137,20 @@ msgstr "Μετονομασία Λίστας"
 msgid "Save"
 msgstr "Αποθήκευση"
 
-#: errands/widgets/task_list/task_list_sidebar_row.py:156
+#: errands/widgets/task_list/task_list_sidebar_row.py:163
 msgid "Export failed"
 msgstr "Εξαγωγή απέτυχε"
 
-#: errands/widgets/task_list/task_list_sidebar_row.py:158
+#: errands/widgets/task_list/task_list_sidebar_row.py:165
 #: errands/widgets/task.py:108
 msgid "Exported"
 msgstr "Εξαγωγή ολοκληρώθηκε"
 
-#: errands/widgets/task_list/task_list_sidebar_row.py:204
+#: errands/widgets/task_list/task_list_sidebar_row.py:213
 msgid "Rename"
 msgstr "Μετονομασία"
 
-#: errands/widgets/task_list/task_list_sidebar_row.py:206
+#: errands/widgets/task_list/task_list_sidebar_row.py:215
 #: errands/widgets/today/today_task.py:278 errands/widgets/task.py:425
 msgid "Export"
 msgstr "Εξαγωγή"
@@ -177,7 +177,7 @@ msgstr "Ολοκληρωμένα:"
 msgid "Add new Task"
 msgstr "Προσθήκη νέας Δουλειάς"
 
-#: errands/widgets/task_list/task_list.py:237 errands/widgets/task.py:809
+#: errands/widgets/task_list/task_list.py:238 errands/widgets/task.py:802
 msgid "Completed:"
 msgstr "Ολοκληρωμένα:"
 
@@ -267,14 +267,14 @@ msgstr ""
 
 #: errands/widgets/today/today_task.py:357
 #: errands/widgets/today/today_task.py:624 errands/widgets/task.py:504
-#: errands/widgets/task.py:1228
+#: errands/widgets/task.py:1220
 #, fuzzy
 msgid "Created:"
 msgstr "Ολοκληρωμένα:"
 
 #: errands/widgets/today/today_task.py:368
 #: errands/widgets/today/today_task.py:625 errands/widgets/task.py:515
-#: errands/widgets/task.py:1229
+#: errands/widgets/task.py:1221
 msgid "Changed:"
 msgstr ""
 
@@ -444,15 +444,15 @@ msgstr "Συντομεύσεις Πληκτρολογίου"
 msgid "About Errands"
 msgstr "Περί Errands"
 
-#: errands/widgets/sidebar.py:328
+#: errands/widgets/sidebar.py:333
 msgid "New List Name"
 msgstr "Όνομα Νέας Λίστας"
 
-#: errands/widgets/sidebar.py:332 data/resources/gtk/help-overlay.ui:57
+#: errands/widgets/sidebar.py:337 data/resources/gtk/help-overlay.ui:57
 msgid "Add List"
 msgstr "Προσθήκη Λίστας"
 
-#: errands/widgets/sidebar.py:338
+#: errands/widgets/sidebar.py:343
 msgid "Add"
 msgstr "Προσθήκη"
 
@@ -474,7 +474,7 @@ msgstr "Εναλλαγή Πλευρικής Εργαλειοθήκης"
 msgid "Add new Sub-Task"
 msgstr "Προσθήκη νέας υπο-δουλειάς"
 
-#: errands/widgets/task.py:1339
+#: errands/widgets/task.py:1331
 #, fuzzy
 msgid "Delete Tag"
 msgstr "Διαγραφή"
@@ -513,7 +513,7 @@ msgstr "itsnotAZ"
 msgid "Sync is disabled"
 msgstr "Ο Συγχρονισμός είναι απενεργοποιημένος"
 
-#: errands/widgets/window.py:266
+#: errands/widgets/window.py:245
 msgid "Imported"
 msgstr "Εισαγωγές"
 

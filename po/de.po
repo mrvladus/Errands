@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-22 18:21+0300\n"
+"POT-Creation-Date: 2024-04-25 18:51+0300\n"
 "PO-Revision-Date: 2024-02-10 16:57+0100\n"
 "Last-Translator: Philipp Kiemle <philipp.kiemle@gmail.com>\n"
 "Language-Team: \n"
@@ -25,13 +25,13 @@ msgstr ""
 msgid "Errands need to run in the background for notifications"
 msgstr ""
 
-#: errands/lib/sync/providers/caldav.py:59
+#: errands/lib/sync/providers/caldav.py:63
 msgid "Not all sync credentials provided. Please check settings."
 msgstr ""
 "Einige Synchonisations-Zugangsdaten fehlen. Bitte überprüfen Sie die "
 "Einstellungen."
 
-#: errands/lib/sync/providers/caldav.py:99
+#: errands/lib/sync/providers/caldav.py:103
 msgid "Can't connect to CalDAV server at:"
 msgstr "Verbindung folgendem CalDAV-Server kann nicht hergestellt werden:"
 
@@ -46,7 +46,7 @@ msgstr "Sind Sie sicher?"
 
 #: errands/widgets/shared/components/dialogs.py:33
 #: errands/widgets/task_list/task_list_sidebar_row.py:97
-#: errands/widgets/today/today_task.py:119 errands/widgets/sidebar.py:337
+#: errands/widgets/today/today_task.py:119 errands/widgets/sidebar.py:342
 #: errands/widgets/task.py:253
 msgid "Cancel"
 msgstr "Abbrechen"
@@ -95,7 +95,7 @@ msgstr "Fällig"
 msgid "Start"
 msgstr "Start"
 
-#: errands/widgets/shared/notes_window.py:29
+#: errands/widgets/shared/notes_window.py:30
 #: errands/widgets/today/today_task.py:163 errands/widgets/task.py:310
 msgid "Notes"
 msgstr "Anmerkungen"
@@ -121,7 +121,7 @@ msgstr "Neue Aufgabe hinzufügen"
 
 #: errands/widgets/tags/tags.py:140
 #: errands/widgets/task_list/task_list_sidebar_row.py:58
-#: errands/widgets/task_list/task_list_sidebar_row.py:205
+#: errands/widgets/task_list/task_list_sidebar_row.py:214
 #: errands/widgets/trash/trash.py:164
 msgid "Delete"
 msgstr "Löschen"
@@ -142,20 +142,20 @@ msgstr "Liste umbenennen"
 msgid "Save"
 msgstr "Speichern"
 
-#: errands/widgets/task_list/task_list_sidebar_row.py:156
+#: errands/widgets/task_list/task_list_sidebar_row.py:163
 msgid "Export failed"
 msgstr "Export fehlgeschlagen"
 
-#: errands/widgets/task_list/task_list_sidebar_row.py:158
+#: errands/widgets/task_list/task_list_sidebar_row.py:165
 #: errands/widgets/task.py:108
 msgid "Exported"
 msgstr "Exportiert"
 
-#: errands/widgets/task_list/task_list_sidebar_row.py:204
+#: errands/widgets/task_list/task_list_sidebar_row.py:213
 msgid "Rename"
 msgstr "Umbenennen"
 
-#: errands/widgets/task_list/task_list_sidebar_row.py:206
+#: errands/widgets/task_list/task_list_sidebar_row.py:215
 #: errands/widgets/today/today_task.py:278 errands/widgets/task.py:425
 msgid "Export"
 msgstr "Exportieren"
@@ -182,7 +182,7 @@ msgstr "Abgeschlossen:"
 msgid "Add new Task"
 msgstr "Neue Aufgabe hinzufügen"
 
-#: errands/widgets/task_list/task_list.py:237 errands/widgets/task.py:809
+#: errands/widgets/task_list/task_list.py:238 errands/widgets/task.py:802
 msgid "Completed:"
 msgstr "Abgeschlossen:"
 
@@ -272,14 +272,14 @@ msgstr ""
 
 #: errands/widgets/today/today_task.py:357
 #: errands/widgets/today/today_task.py:624 errands/widgets/task.py:504
-#: errands/widgets/task.py:1228
+#: errands/widgets/task.py:1220
 #, fuzzy
 msgid "Created:"
 msgstr "Erstellen"
 
 #: errands/widgets/today/today_task.py:368
 #: errands/widgets/today/today_task.py:625 errands/widgets/task.py:515
-#: errands/widgets/task.py:1229
+#: errands/widgets/task.py:1221
 msgid "Changed:"
 msgstr ""
 
@@ -449,15 +449,15 @@ msgstr "Tastenkürzel"
 msgid "About Errands"
 msgstr "Info zu Errands"
 
-#: errands/widgets/sidebar.py:328
+#: errands/widgets/sidebar.py:333
 msgid "New List Name"
 msgstr "Name der neuen Liste"
 
-#: errands/widgets/sidebar.py:332 data/resources/gtk/help-overlay.ui:57
+#: errands/widgets/sidebar.py:337 data/resources/gtk/help-overlay.ui:57
 msgid "Add List"
 msgstr "Liste hinzufügen"
 
-#: errands/widgets/sidebar.py:338
+#: errands/widgets/sidebar.py:343
 msgid "Add"
 msgstr "Hinzufügen"
 
@@ -479,7 +479,7 @@ msgstr "Seitenleiste ein-/ausblenden"
 msgid "Add new Sub-Task"
 msgstr "Neue Unteraufgabe hinzufügen"
 
-#: errands/widgets/task.py:1339
+#: errands/widgets/task.py:1331
 #, fuzzy
 msgid "Delete Tag"
 msgstr "Löschen"
@@ -521,7 +521,7 @@ msgstr ""
 msgid "Sync is disabled"
 msgstr "Synchronisation ist deaktiviert"
 
-#: errands/widgets/window.py:266
+#: errands/widgets/window.py:245
 msgid "Imported"
 msgstr "Importiert"
 
