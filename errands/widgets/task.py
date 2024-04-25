@@ -14,7 +14,7 @@ from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.markup import Markup
 from errands.lib.sync.sync import Sync
-from errands.lib.utils import get_children
+from errands.lib.utils import get_children, idle_add
 from errands.state import State
 from errands.widgets.shared.components.boxes import (
     ErrandsBox,
@@ -626,6 +626,7 @@ class Task(Gtk.Revealer):
             )
         )
 
+    @idle_add
     def __load_sub_tasks(self) -> None:
         tasks: list[TaskData] = (
             t
