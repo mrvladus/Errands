@@ -2,7 +2,6 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the errands package.
 # Danial Behzadi <dani.behzi@ubuntu.com>, 2024.
-# Goudarz Jafari <me@goudarzjafari.com>, 2024.
 #
 msgid ""
 msgstr ""
@@ -11,16 +10,13 @@ msgstr ""
 "POT-Creation-Date: 2024-04-22 18:21+0300\n"
 "PO-Revision-Date: 2024-02-04 13:34+0330\n"
 "Last-Translator: Danial Behzadi <dani.behzi@ubuntu.com>\n"
-"POT-Creation-Date: 2024-02-06 17:58+0300\n"
-"PO-Revision-Date: 2024-04-09 15:46+0330\n"
-"Last-Translator: Goudarz Jafari <me@goudarzjafari.com>\n"
 "Language-Team: \n"
 "Language: fa_IR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n==0 || n==1);\n"
-"X-Generator: Poedit 3.4.2\n"
+"X-Generator: Poedit 3.2.2\n"
 
 #: errands/application.py:37
 msgid "Errands need to run in the background for notifications"
@@ -346,33 +342,6 @@ msgstr ""
 #: errands/widgets/preferences.py:74
 msgid "At the Top"
 msgstr ""
-#: errands/widgets/preferences.py:84
-msgid "Open Details Panel"
-msgstr "گشودن تابلوی جزییات"
-
-#: errands/widgets/preferences.py:84
-msgid "Show Sub-Tasks"
-msgstr "نمایش زیرتکلیف‌ها"
-
-#: errands/widgets/preferences.py:99
-msgid "Complete Button Size"
-msgstr "اندازهٔ‌ دکمهٔ کامل"
-
-#: errands/widgets/preferences.py:100
-msgid "Small"
-msgstr "کوچک"
-
-#: errands/widgets/preferences.py:100
-msgid "Big"
-msgstr "بزرگ"
-
-#: errands/widgets/preferences.py:113
-msgid "Progress Bar"
-msgstr "نوار پیشرفت"
-
-#: errands/widgets/preferences.py:119
-msgid "Tool Bar"
-msgstr "نوار ابزار"
 
 #: errands/widgets/preferences.py:90
 msgid "Show Notifications"
@@ -538,9 +507,7 @@ msgstr "ایجاد سیاهه"
 
 #: errands/widgets/window.py:155
 msgid "translator-credits"
-msgstr ""
-"دانیال بهزادی <dani.behzi@ubuntu.com>\n"
-"گودرز جعفری <me@goudarzjafari.com>"
+msgstr "دانیال بهزادی <dani.behzi@ubuntu.com>"
 
 #: errands/widgets/window.py:162
 msgid "Sync is disabled"
@@ -620,3 +587,81 @@ msgstr "پشتیبانی از کشیدن و رها کردن"
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:43
 msgid "Import .ics files"
 msgstr "درون‌ریزی پرونده‌های ‪.ics"
+
+#~ msgid "Not Set"
+#~ msgstr "تنظیم نشده"
+
+#~ msgid "Click Action"
+#~ msgstr "کنش کلیک"
+
+#~ msgid "Open Details Panel"
+#~ msgstr "گشودن تابلوی جزییات"
+
+#~ msgid "Complete Button Size"
+#~ msgstr "اندازهٔ‌ دکمهٔ کامل"
+
+#~ msgid "Small"
+#~ msgstr "کوچک"
+
+#~ msgid "Big"
+#~ msgstr "بزرگ"
+
+#~ msgid "Details Panel"
+#~ msgstr "تابلوی جزییات"
+
+#~ msgid "Position"
+#~ msgstr "جایگاه"
+
+#~ msgid "Left"
+#~ msgstr "چپ"
+
+#~ msgid "Right"
+#~ msgstr "راست"
+
+#~ msgid "Appearance"
+#~ msgstr "ظاهر"
+
+#~ msgid "More Options"
+#~ msgstr "گزینه‌های بیش‌تر"
+
+#~ msgid "Menu"
+#~ msgstr "فهرست"
+
+#~ msgid "No Details"
+#~ msgstr "بدون جزییات"
+
+#~ msgid "Click on task to show more info"
+#~ msgstr "کلیک روی تکلیف برای نمایش اطّلاعات بیش‌تر"
+
+#~ msgid "Clear Style"
+#~ msgstr "پاک سازی سبک"
+
+#~ msgid "Text"
+#~ msgstr "متن"
+
+#~ msgid "Copy Text"
+#~ msgstr "رونوشت از متن"
+
+#~ msgid "Properties"
+#~ msgstr "ترجیحات"
+
+#~ msgid "Complete %"
+#~ msgstr "٪ انجام شده"
+
+#~ msgid "Add Tag"
+#~ msgstr "افزودن برچسب"
+
+#~ msgid "Save Task as .ics file"
+#~ msgstr "ذخیرهٔ تکلیف به شکل پروندهٔ ‪.ics"
+
+#~ msgid "Mark as Completed"
+#~ msgstr "علامت به کامل شده"
+
+#~ msgid "Expand / Fold"
+#~ msgstr "گسترش یا جمع کردن"
+
+#~ msgid "Restore All"
+#~ msgstr "بازگردانی همه"
+
+#~ msgid "Save changed details"
+#~ msgstr "ذخیرهٔ جزییات تغییر یافته"

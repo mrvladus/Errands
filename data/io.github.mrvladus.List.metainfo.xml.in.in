@@ -4,9 +4,9 @@
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>MIT</project_license>
   <content_rating type="oars-1.1" />
-  <developer_name translatable="no">Vlad Krupinski</developer_name>
-  <developer id="io.github.mrvladus">
-    <name translatable="no">Vlad Krupinski</name>
+  <developer_name translatable="no">Vlad Krupinskii</developer_name>
+  <developer id="github.com">
+    <name translatable="no">Vlad Krupinskii</name>
   </developer>
   <url type="homepage">https://github.com/mrvladus/Errands</url>
   <url type="bugtracker">https://github.com/mrvladus/Errands/issues</url>
@@ -731,8 +731,4 @@
       </description>
     </release>
   </releases>
-  <branding>
-    <color type="primary" scheme_preference="light">#a9a9da</color>
-    <color type="primary" scheme_preference="dark">#45457c</color>
-  </branding>
 </component>

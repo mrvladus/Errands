@@ -395,24 +395,6 @@ msgid "Syncing..."
 msgstr "Синхронизация..."
 
 #: errands/widgets/sidebar.py:127
-#: errands/widgets/sidebar.py:141
-msgid "New List Name"
-msgstr "Новое имя списка"
-
-#: errands/widgets/sidebar.py:145 data/resources/gtk/help-overlay.ui:57
-msgid "Add List"
-msgstr "Добавить список"
-
-#: errands/widgets/sidebar.py:150 errands/widgets/sidebar.py:342
-#: errands/widgets/sidebar.py:385 errands/widgets/trash.py:136
-msgid "Cancel"
-msgstr "Отмена"
-
-#: errands/widgets/sidebar.py:151
-msgid "Add"
-msgstr "Добавить"
-
-#: errands/widgets/sidebar.py:168
 msgid "Add new List"
 msgstr "Добавить новый список"
 
