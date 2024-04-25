@@ -38,6 +38,7 @@
                 "-Dwebdav=false",
                 "-Dkerberos=false",
                 "-Dwindows_live=false",
+                "-Dms_graph=false",
                 "-Dvapi=false"
             ],
             "sources": [
