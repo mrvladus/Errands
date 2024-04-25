@@ -499,9 +499,8 @@ class UserDataJSON:
                     synced=item[11],
                     tags=item[12].split(",") if item[12] else [],
                     text=item[13],
-                    toolbar_shown=item[14],
-                    trash=item[15],
-                    uid=item[16],
+                    trash=item[14],
+                    uid=item[15],
                 )
             )
 
