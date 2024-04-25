@@ -1035,6 +1035,7 @@ class Task(Gtk.Revealer):
                 self.list_uid,
                 self.parent.uid if isinstance(self.parent, Task) else "",
             )
+            task.task_list.update_title()
 
         # Move task
         UserData.move_task_before(self.list_uid, task.uid, self.uid)
@@ -1094,9 +1095,6 @@ class Task(Gtk.Revealer):
         if isinstance(task.parent, Task):
             task.parent.update_progress_bar()
             task.parent.update_title()
-
-        if task.task_list != self.task_list:
-            task.task_list.update_title()
 
         self.task_list.update_title()
 
