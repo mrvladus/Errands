@@ -66,7 +66,6 @@
           <li>Added setting for selecting new task position</li>
           <li>Sidebar redesign</li>
           <li>Using GNOME 46 platform with latest libadwaita widgets</li>
-          <li>Perfomance improvements. Now lists with hundreds of tasks are loaded really fast. Startup time has been drastically reduced too.</li>
         </ul>
       </description>
     </release>

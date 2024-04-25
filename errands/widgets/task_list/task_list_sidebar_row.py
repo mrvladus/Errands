@@ -129,21 +129,21 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
                     if task.tags:
                         event.add("categories", ",".join(task.tags))
                     event.add("percent-complete", task.percent_complete)
-                    if task.color:
-                        event.add("x-errands-color", task.color)
-                    event.add("x-errands-expanded", task.expanded)
-                    event.add("x-errands-toolbar-shown", task.toolbar_shown)
-                    event.add("x-errands-color", task.color)
-                    event.add("dtstamp", task.created_at)
-                    event.add("last-modified", task.changed_at)
-                    event.add(
-                        "dtstart",
-                        (
-                            datetime.fromisoformat(task.start_date)
-                            if task.start_date
-                            else datetime.now()
-                        ),
-                    )
+                    if task.created_at:
+                        event.add("dtstamp", datetime.fromisoformat(task.created_at))
+                    if task.changed_at:
+                        event.add(
+                            "last-modified", datetime.fromisoformat(task.changed_at)
+                        )
+                    if task.start_date:
+                        event.add(
+                            "dtstart",
+                            (
+                                datetime.fromisoformat(task.start_date)
+                                if task.start_date
+                                else datetime.now()
+                            ),
+                        )
                     if task.due_date:
                         event.add(
                             "due",
