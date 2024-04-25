@@ -252,7 +252,9 @@ class SyncProviderCalDAV:
 
         # Update tags
         if self.update_ui_args.update_tags:
+            UserData.update_tags()
             State.tags_sidebar_row.update_ui()
+            State.tags_page.update_ui()
 
         # Update trash
         if self.update_ui_args.update_trash:
