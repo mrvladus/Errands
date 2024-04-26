@@ -5,6 +5,7 @@ import datetime
 
 from gi.repository import Adw, GLib, Gtk  # type:ignore
 
+from errands.lib.utils import get_human_datetime
 from errands.widgets.shared.components.boxes import ErrandsBox
 from errands.widgets.shared.components.buttons import ErrandsButton, ErrandsSpinButton
 
@@ -214,11 +215,7 @@ class DateTimePicker(Gtk.Box):
 
     @property
     def human_datetime(self) -> str:
-        if self.datetime:
-            out: str = f"{self.calendar.get_date().format('%d %b')} {self.datetime[9:11]}:{self.datetime[11:13]}"
-        else:
-            out: str = _("Date")
-        return out
+        return get_human_datetime(self.datetime)
 
     # ------ SIGNAL HANDLERS ------ #
 

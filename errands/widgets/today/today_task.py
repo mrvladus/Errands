@@ -12,7 +12,7 @@ from errands.lib.data import TaskData, UserData
 from errands.lib.logging import Log
 from errands.lib.markup import Markup
 from errands.lib.sync.sync import Sync
-from errands.lib.utils import get_children
+from errands.lib.utils import get_children, get_human_datetime
 from errands.state import State
 from errands.widgets.shared.components.boxes import (
     ErrandsBox,
@@ -20,7 +20,6 @@ from errands.widgets.shared.components.boxes import (
     ErrandsListBox,
 )
 from errands.widgets.shared.components.buttons import ErrandsButton, ErrandsCheckButton
-from errands.widgets.shared.datetime_window import DateTimeWindow
 from errands.widgets.shared.titled_separator import TitledSeparator
 from errands.widgets.task import TagsListItem, Task
 from errands.widgets.task import Tag
@@ -33,8 +32,6 @@ if TYPE_CHECKING:
 class TodayTask(Gtk.Revealer):
     block_signals: bool = True
     purging: bool = False
-
-    __task: Task | None = None
 
     def __init__(self, task_data: TaskData, today_page: Today) -> None:
         super().__init__()
@@ -138,9 +135,6 @@ class TodayTask(Gtk.Revealer):
         # --- TOOL BAR --- #
 
         # Date and Time button
-        self.datetime_window: DateTimeWindow = DateTimeWindow(self)
-        self.datetime_window.connect("date-time-set", self._on_datetime_window_closed)
-
         self.date_time_btn: ErrandsButton = ErrandsButton(
             valign=Gtk.Align.CENTER,
             halign=Gtk.Align.START,
@@ -152,7 +146,7 @@ class TodayTask(Gtk.Revealer):
                 can_shrink=True,
                 label=_("Date"),
             ),
-            on_click=lambda *_: self.datetime_window.show(),
+            on_click=lambda *_: State.datetime_window.show(self),
         )
 
         # Notes button
@@ -161,7 +155,7 @@ class TodayTask(Gtk.Revealer):
             icon_name="errands-notes-symbolic",
             tooltip_text=_("Notes"),
             css_classes=["flat"],
-            on_click=self._on_notes_btn_clicked,
+            on_click=lambda *_: State.notes_window.show(self),
         )
 
         # Priority button
@@ -531,9 +525,8 @@ class TodayTask(Gtk.Revealer):
 
     def update_toolbar(self) -> None:
         # Update Date and Time
-        self.datetime_window.due_date_time.datetime = self.task_data.due_date
-        self.date_time_btn.get_child().props.label = (
-            f"{self.datetime_window.due_date_time.human_datetime}"
+        self.date_time_btn.get_child().props.label = get_human_datetime(
+            self.task_data.due_date
         )
 
         # Update notes button css
@@ -632,19 +625,6 @@ class TodayTask(Gtk.Revealer):
                 self.block_signals = True
                 btn.set_active(True)
                 self.block_signals = False
-
-    def _on_datetime_window_closed(self, *_) -> None:
-        self.task.update_toolbar()
-        self.today_page.update_status()
-        if (
-            self.task_data.due_date
-            and datetime.fromisoformat(self.task_data.due_date).date()
-            != datetime.today().date()
-        ):
-            self.purge()
-
-    def _on_notes_btn_clicked(self, _btn: Gtk.Button) -> None:
-        State.notes_window.show(self)
 
     def _on_priority_btn_toggled(self, btn: Gtk.MenuButton, *_) -> None:
         priority: int = self.task_data.priority

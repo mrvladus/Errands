@@ -14,7 +14,7 @@ from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.markup import Markup
 from errands.lib.sync.sync import Sync
-from errands.lib.utils import get_children, idle_add
+from errands.lib.utils import get_children, get_human_datetime, idle_add
 from errands.state import State
 from errands.widgets.shared.components.boxes import (
     ErrandsBox,
@@ -23,7 +23,6 @@ from errands.widgets.shared.components.boxes import (
 )
 from errands.widgets.shared.components.buttons import ErrandsButton, ErrandsCheckButton
 from errands.widgets.shared.components.entries import ErrandsEntry
-from errands.widgets.shared.datetime_window import DateTimeWindow
 from errands.widgets.shared.titled_separator import TitledSeparator
 
 if TYPE_CHECKING:
@@ -285,9 +284,6 @@ class Task(Gtk.Revealer):
         # --- TOOL BAR --- #
 
         # Date and Time button
-        self.datetime_window: DateTimeWindow = DateTimeWindow(self)
-        self.datetime_window.connect("date-time-set", self._on_datetime_window_closed)
-
         self.date_time_btn: ErrandsButton = ErrandsButton(
             valign=Gtk.Align.CENTER,
             halign=Gtk.Align.START,
@@ -299,7 +295,7 @@ class Task(Gtk.Revealer):
                 can_shrink=True,
                 label=_("Date"),
             ),
-            on_click=self._on_date_time_btn_clicked,
+            on_click=lambda *_: State.datetime_window.show(self),
         )
 
         # Notes button
@@ -308,7 +304,7 @@ class Task(Gtk.Revealer):
             icon_name="errands-notes-symbolic",
             tooltip_text=_("Notes"),
             css_classes=["flat"],
-            on_click=self._on_notes_btn_clicked,
+            on_click=lambda *_: State.notes_window.show(self),
         )
 
         # Priority button
@@ -849,9 +845,8 @@ class Task(Gtk.Revealer):
 
     def update_toolbar(self) -> None:
         # Update Date and Time
-        self.datetime_window.due_date_time.datetime = self.task_data.due_date
-        self.date_time_btn.get_child().props.label = (
-            f"{self.datetime_window.due_date_time.human_datetime}"
+        self.date_time_btn.get_child().props.label = get_human_datetime(
+            self.task_data.due_date
         )
 
         # Update notes button css
@@ -1230,15 +1225,6 @@ class Task(Gtk.Revealer):
                 self.block_signals = True
                 btn.set_active(True)
                 self.block_signals = False
-
-    def _on_date_time_btn_clicked(self, btn: Gtk.Button) -> None:
-        self.datetime_window.show()
-
-    def _on_datetime_window_closed(self, *_) -> None:
-        State.today_page.update_status()
-
-    def _on_notes_btn_clicked(self, _btn: Gtk.Button) -> None:
-        State.notes_window.show(self)
 
     def _on_priority_btn_toggled(self, btn: Gtk.MenuButton, *_) -> None:
         priority: int = self.task_data.priority

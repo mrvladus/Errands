@@ -1,6 +1,7 @@
 # Copyright 2023-2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
+from datetime import datetime
 import time
 from functools import wraps
 from threading import Thread
@@ -9,6 +10,14 @@ from typing import Callable
 from gi.repository import Gtk, GLib  # type:ignore
 
 from errands.lib.logging import Log
+
+
+def get_human_datetime(date_time: str) -> str:
+    if date_time:
+        out: str = datetime.fromisoformat(date_time).strftime("%d %b %H:%M")
+    else:
+        out: str = _("Date")
+    return out
 
 
 def get_children(obj: Gtk.Widget) -> list[Gtk.Widget]:

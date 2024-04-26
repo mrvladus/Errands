@@ -9,6 +9,7 @@ from errands.lib.logging import Log
 from errands.lib.notifications import ErrandsNotificationsDaemon
 from errands.lib.plugins import PluginsLoader
 from errands.state import State
+from errands.widgets.shared.datetime_window import DateTimeWindow
 from errands.widgets.shared.notes_window import NotesWindow
 from errands.widgets.window import Window
 
@@ -69,6 +70,9 @@ class ErrandsApplication(Adw.Application):
 
         # Notes window
         State.notes_window = NotesWindow()
+
+        # Date and time window
+        State.datetime_window = DateTimeWindow()
 
         # Main window
         State.main_window = Window(application=State.application)

@@ -5,8 +5,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from gi.repository import Adw, GObject, Gtk  # type:ignore
+from gi.repository import Adw, Gtk  # type:ignore
 
+from errands.lib.sync.sync import Sync
 from errands.state import State
 from errands.widgets.shared.components.toolbar_view import ErrandsToolbarView
 from errands.widgets.shared.datetime_picker import DateTimePicker
@@ -17,11 +18,8 @@ if TYPE_CHECKING:
 
 
 class DateTimeWindow(Adw.Dialog):
-    date_time_set = GObject.Signal(name="date-time-set")
-
-    def __init__(self, task: Task | TodayTask):
+    def __init__(self):
         super().__init__()
-        self.task = task
         self.__build_ui()
 
     # ------ PRIVATE METHODS ------ #
@@ -78,21 +76,37 @@ class DateTimeWindow(Adw.Dialog):
 
     # ------ PUBLIC METHODS ------ #
 
-    def show(self):
-        self.start_date_time.datetime = self.task.get_prop("start_date")
-        self.due_date_time.datetime = self.task.get_prop("due_date")
+    def show(self, task: Task | TodayTask):
+        self.task = task
+        self.start_date_time.datetime = self.task.task_data.start_date
+        self.due_date_time.datetime = self.task.task_data.due_date
         self.present(State.main_window)
 
     # ------ SIGNAL HANDLERS ------ #
 
     def do_closed(self):
-        if self.due_date_time.datetime != self.task.get_prop("due_date"):
+        changed: bool = False
+        if self.due_date_time.datetime != self.task.task_data.due_date:
             self.task.update_props(
                 ["due_date", "synced"], [self.due_date_time.datetime, False]
             )
             self.task.update_toolbar()
-        if self.start_date_time.datetime != self.task.get_prop("start_date"):
+            changed = True
+        if self.start_date_time.datetime != self.task.task_data.start_date:
             self.task.update_props(
                 ["start_date", "synced"], [self.start_date_time.datetime, False]
             )
-        self.emit("date-time-set")
+            changed = True
+
+        # self.task.update_toolbar()
+        # self.today_page.update_status()
+        # if (
+        #     self.task_data.due_date
+        #     and datetime.fromisoformat(self.task_data.due_date).date()
+        #     != datetime.today().date()
+        # ):
+        #     self.purge()
+
+        State.today_page.update_ui()
+        if changed:
+            Sync.sync()
