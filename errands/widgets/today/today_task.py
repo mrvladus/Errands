@@ -21,7 +21,6 @@ from errands.widgets.shared.components.boxes import (
 )
 from errands.widgets.shared.components.buttons import ErrandsButton, ErrandsCheckButton
 from errands.widgets.shared.datetime_window import DateTimeWindow
-from errands.widgets.shared.notes_window import NotesWindow
 from errands.widgets.shared.titled_separator import TitledSeparator
 from errands.widgets.task import TagsListItem, Task
 from errands.widgets.task import Tag
@@ -164,7 +163,6 @@ class TodayTask(Gtk.Revealer):
             css_classes=["flat"],
             on_click=self._on_notes_btn_clicked,
         )
-        self.notes_window: NotesWindow = NotesWindow(self)
 
         # Priority button
         self.custom_priority_btn: Gtk.SpinButton = Gtk.SpinButton(
@@ -645,8 +643,8 @@ class TodayTask(Gtk.Revealer):
         ):
             self.purge()
 
-    def _on_notes_btn_clicked(self, btn: Gtk.Button) -> None:
-        self.notes_window.show()
+    def _on_notes_btn_clicked(self, _btn: Gtk.Button) -> None:
+        State.notes_window.show(self)
 
     def _on_priority_btn_toggled(self, btn: Gtk.MenuButton, *_) -> None:
         priority: int = self.task_data.priority

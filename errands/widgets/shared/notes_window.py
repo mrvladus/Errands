@@ -17,9 +17,8 @@ if TYPE_CHECKING:
 
 
 class NotesWindow(Adw.Dialog):
-    def __init__(self, task: Task):
+    def __init__(self):
         super().__init__()
-        self.task: Task = task
         self.__build_ui()
 
     # ------ PRIVATE METHODS ------ #
@@ -69,7 +68,8 @@ class NotesWindow(Adw.Dialog):
 
     # ------ PUBLIC METHODS ------ #
 
-    def show(self):
+    def show(self, task: Task):
+        self.task = task
         self.buffer.props.text = self.task.task_data.notes
         self.present(State.main_window)
 

@@ -12,6 +12,7 @@ from __main__ import APP_ID, PROFILE
 if TYPE_CHECKING:
     from errands.application import ErrandsApplication
     from errands.lib.notifications import ErrandsNotificationsDaemon
+    from errands.widgets.shared.notes_window import NotesWindow
     from errands.widgets.sidebar import Sidebar
     from errands.widgets.tags.tags import Tags
     from errands.widgets.tags.tags_sidebar_row import TagsSidebarRow
@@ -54,6 +55,9 @@ class State:
     today_sidebar_row: TodaySidebarRow | None = None
     tags_sidebar_row: TagsSidebarRow | None = None
     trash_sidebar_row: TrashSidebarRow | None = None
+
+    # Notes window
+    notes_window: NotesWindow | None = None
 
     @classmethod
     def get_task_list(cls, uid: str) -> TaskList:

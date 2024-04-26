@@ -24,7 +24,6 @@ from errands.widgets.shared.components.boxes import (
 from errands.widgets.shared.components.buttons import ErrandsButton, ErrandsCheckButton
 from errands.widgets.shared.components.entries import ErrandsEntry
 from errands.widgets.shared.datetime_window import DateTimeWindow
-from errands.widgets.shared.notes_window import NotesWindow
 from errands.widgets.shared.titled_separator import TitledSeparator
 
 if TYPE_CHECKING:
@@ -311,7 +310,6 @@ class Task(Gtk.Revealer):
             css_classes=["flat"],
             on_click=self._on_notes_btn_clicked,
         )
-        self.notes_window: NotesWindow = NotesWindow(self)
 
         # Priority button
         self.custom_priority_btn: Gtk.SpinButton = Gtk.SpinButton(
@@ -1027,15 +1025,27 @@ class Task(Gtk.Revealer):
         """
         When task is dropped on "+" area on top of task
         """
-        # Change list
-        if task.list_uid != self.list_uid:
-            UserData.move_task_to_list(
-                task.uid,
-                task.list_uid,
-                self.list_uid,
-                self.parent.uid if isinstance(self.parent, Task) else "",
-            )
-            task.task_list.update_title()
+        # If task has the same parent box just reorder
+        if task.parent == self.parent:
+            box: Gtk.Box = self.get_parent()
+            box.reorder_child_after(task, self)
+            box.reorder_child_after(self, task)
+        else:
+            # Change list
+            if task.task_list != self.task_list:
+                if task.task_data.completed != self.task_data.completed:
+                    task.complete_btn.set_active(self.task_data.completed)
+                UserData.move_task_to_list(
+                    task.uid,
+                    task.list_uid,
+                    self.list_uid,
+                    self.parent.uid if isinstance(self.parent, Task) else "",
+                )
+                task.get_parent().remove(task)
+                box: Gtk.Box = self.get_parent()
+                box.append(task)
+                box.reorder_child_after(task, self)
+                box.reorder_child_after(self, task)
 
         # Move task
         UserData.move_task_before(self.list_uid, task.uid, self.uid)
@@ -1045,15 +1055,6 @@ class Task(Gtk.Revealer):
         for sub in self.all_tasks:
             UserData.move_task_after(self.list_uid, sub.uid, last_task.uid)
             last_task = sub
-
-        if task.complete_btn.get_active() != self.complete_btn.get_active():
-            task.complete_btn.set_active(self.complete_btn.get_active())
-
-        # If task has the same parent box just reorder
-        if task.parent == self.parent:
-            box: Gtk.Box = self.get_parent()
-            box.reorder_child_after(task, self)
-            box.reorder_child_after(self, task)
 
         # Change parent if different parents
         else:
@@ -1236,8 +1237,8 @@ class Task(Gtk.Revealer):
     def _on_datetime_window_closed(self, *_) -> None:
         State.today_page.update_status()
 
-    def _on_notes_btn_clicked(self, btn: Gtk.Button) -> None:
-        self.notes_window.show()
+    def _on_notes_btn_clicked(self, _btn: Gtk.Button) -> None:
+        State.notes_window.show(self)
 
     def _on_priority_btn_toggled(self, btn: Gtk.MenuButton, *_) -> None:
         priority: int = self.task_data.priority
