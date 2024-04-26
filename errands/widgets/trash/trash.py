@@ -154,6 +154,7 @@ class Trash(Adw.Bin):
 
             UserData.delete_tasks_from_trash()
             State.trash_sidebar_row.update_ui()
+            State.today_page.update_ui()
             # Sync
             Sync.sync()
 

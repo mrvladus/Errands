@@ -39,7 +39,7 @@ class Window(Adw.ApplicationWindow):
         GSettings.bind("maximized", self, "maximized")
         # Setup theme
         Adw.StyleManager.get_default().set_color_scheme(GSettings.get("theme"))
-        self.connect("realize", self.__finish_load)
+        self.__finish_load()
 
     def __build_ui(self) -> None:
         self.set_title(_("Errands"))
