@@ -620,7 +620,6 @@ class Task(Gtk.Revealer):
             )
         )
 
-    @idle_add
     def __load_sub_tasks(self) -> None:
         tasks: list[TaskData] = (
             t

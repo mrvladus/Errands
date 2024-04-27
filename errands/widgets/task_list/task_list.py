@@ -159,7 +159,6 @@ class TaskList(Adw.Bin):
 
         self.set_child(self.loading_overlay)
 
-    @idle_add
     def __load_tasks(self) -> None:
         Log.info(f"Task List {self.list_uid}: Load Tasks")
 
