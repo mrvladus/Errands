@@ -1017,32 +1017,29 @@ class Task(Gtk.Revealer):
             task.set_sensitive(True)
 
     def _on_task_top_area_drop(self, _drop, task: Task, _x, _y) -> None:
-        """
-        When task is dropped on "+" area on top of task
-        """
-        # If task has the same parent box just reorder
-        if task.parent == self.parent:
-            box: Gtk.Box = self.get_parent()
-            box.reorder_child_after(task, self)
-            box.reorder_child_after(self, task)
-        else:
-            # Change list
-            if task.task_list != self.task_list:
-                if task.task_data.completed != self.task_data.completed:
-                    task.complete_btn.set_active(self.task_data.completed)
-                UserData.move_task_to_list(
-                    task.uid,
-                    task.list_uid,
-                    self.list_uid,
-                    self.parent.uid if isinstance(self.parent, Task) else "",
-                )
-                task.get_parent().remove(task)
-                box: Gtk.Box = self.get_parent()
-                box.append(task)
-                box.reorder_child_after(task, self)
-                box.reorder_child_after(self, task)
+        """When task is dropped on "+" area on top of task"""
 
-        # Move task
+        if task.get_next_sibling() == self:
+            return
+
+        # Change data
+        if task.list_uid == self.task_data.list_uid:
+            if task.parent != self.task_data.parent:
+                UserData.update_props(
+                    self.list_uid,
+                    task.uid,
+                    ["parent", "synced"],
+                    [self.task_data.parent, False],
+                )
+                if isinstance(task.parent, Task):
+                    task.parent.update_title()
+                    task.parent.update_progress_bar()
+        else:
+            old_task_list: TaskList = task.task_list
+            UserData.move_task_to_list(
+                task.uid, task.list_uid, self.list_uid, self.task_data.parent
+            )
+            old_task_list.update_title()
         UserData.move_task_before(self.list_uid, task.uid, self.uid)
 
         # Move sub-tasks in data to prevent gaps
@@ -1051,46 +1048,24 @@ class Task(Gtk.Revealer):
             UserData.move_task_after(self.list_uid, sub.uid, last_task.uid)
             last_task = sub
 
-        # Change parent if different parents
-        else:
-            UserData.update_props(
-                self.list_uid,
-                task.uid,
-                ["parent", "synced"],
-                [
-                    self.parent.uid if isinstance(self.parent, Task) else "",
-                    False,
-                ],
-            )
+        # Move widget
+        task.complete_btn.set_active(self.task_data.completed)
+        task.get_parent().remove(task)
+        task.insert_before(self.get_parent(), self)
 
-            # Toggle completion for parents
-            if not task.get_prop("completed"):
-                for parent in self.parents_tree:
-                    parent.complete_btn.set_active(False)
-
-            new_task: Task = Task(
-                UserData.get_task(self.list_uid, task.uid), self.parent
-            )
-            box: Gtk.Box = self.get_parent()
-            box.append(new_task)
-            box.reorder_child_after(new_task, self)
-            box.reorder_child_after(self, new_task)
-
-            if isinstance(task.parent, Task):
-                task.parent.update_title()
-                task.parent.update_progress_bar()
-
-            task.purge()
+        if self.task_data.completed and not task.task_data.completed:
+            self.complete_btn.set_active(False)
+            for parent in self.parents_tree:
+                parent.complete_btn.set_active(False)
 
         # KDE dnd bug workaround for issue #111
         for task in self.task_list.all_tasks:
             task.top_drop_area.set_reveal_child(False)
             task.set_sensitive(True)
 
-        # Update UI
-        if isinstance(task.parent, Task):
-            task.parent.update_progress_bar()
-            task.parent.update_title()
+        if isinstance(self.parent, Task):
+            self.parent.update_title()
+            self.parent.update_progress_bar()
 
         self.task_list.update_title()
 
@@ -1098,62 +1073,67 @@ class Task(Gtk.Revealer):
         Sync.sync()
 
     def _on_task_drop(self, _drop, task: Task, _x, _y) -> None:
-        """
-        When task is dropped on task and becomes sub-task
-        """
+        """When task is dropped on task and becomes sub-task"""
 
         if task.parent == self:
             return
-
-        UserData.update_props(
-            self.list_uid, task.uid, ["parent", "synced"], [self.uid, False]
-        )
-
-        # Change list
-        if task.list_uid != self.list_uid:
-            UserData.move_task_to_list(task.uid, task.list_uid, self.list_uid, self.uid)
-
-        # Move position
-        if len(self.tasks) > 0:
-            if GSettings.get("task-list-new-task-position-top"):
-                UserData.move_task_before(self.list_uid, task.uid, self.tasks[0].uid)
-            else:
-                UserData.move_task_after(self.list_uid, task.uid, self.tasks[-1].uid)
-
-        # Add task
-        data: TaskData = UserData.get_task(self.list_uid, task.uid)
-
-        self.add_task(data)
-
-        if task.task_list != self.task_list:
-            task.task_list.update_title()
-        if task.parent != self.parent:
-            task.parent.update_title()
-            if isinstance(task.parent, Task):
-                task.parent.update_progress_bar()
-        # Remove task
-        task.purge()
-
-        # Toggle completion
-        if self.task_data.completed and not data.completed:
-            self.update_props(["completed", "synced"], [False, False])
-            self.just_added = True
-            self.complete_btn.set_active(False)
-            self.just_added = False
-            for parent in self.parents_tree:
-                if parent.task_data.completed:
-                    parent.update_props(["completed", "synced"], [False, False])
-                    parent.just_added = True
-                    parent.complete_btn.set_active(False)
-                    parent.just_added = False
 
         # Expand sub-tasks
         if not self.task_data.expanded:
             self.expand(True)
 
+        task_data: TaskData = task.task_data
+        task_parent = task.parent
+        old_task_list = task.task_list
+        task.purge()
+        del task
+
+        # Change data
+        if task_data.list_uid == self.list_uid:
+            UserData.update_props(
+                self.list_uid, task_data.uid, ["parent", "synced"], [self.uid, False]
+            )
+        else:
+            UserData.move_task_to_list(
+                task_data.uid, task_data.list_uid, self.list_uid, self.uid
+            )
+            old_task_list.update_title()
+        if len(self.tasks) > 0:
+            if GSettings.get("task-list-new-task-position-top"):
+                UserData.move_task_before(
+                    self.list_uid, task_data.uid, self.tasks[0].uid
+                )
+            else:
+                UserData.move_task_after(
+                    self.list_uid, task_data.uid, self.tasks[-1].uid
+                )
+
+        # Move sub-tasks in data to prevent gaps
+        last_task: Task = self
+        for sub in self.all_tasks:
+            UserData.move_task_after(self.list_uid, sub.uid, last_task.uid)
+            last_task = sub
+
+        if isinstance(task_parent, Task):
+            task_parent.update_title()
+            task_parent.update_progress_bar()
+
+        self.add_task(task_data)
+
+        if self.task_data.completed and not task_data.completed:
+            self.complete_btn.set_active(False)
+            for parent in self.parents_tree:
+                parent.complete_btn.set_active(False)
+
         self.task_list.update_title()
         self.update_title()
         self.update_progress_bar()
+
+        # KDE dnd bug workaround for issue #111
+        for task in self.task_list.all_tasks:
+            task.top_drop_area.set_reveal_child(False)
+            task.set_sensitive(True)
+
         # Sync
         Sync.sync()
 

@@ -326,46 +326,22 @@ class UserDataJSON:
         self, list_uid: str, task_uid: str, task_after_uid: str
     ) -> None:
         tasks: list[TaskData] = self.tasks
-
-        # Get indexes
-        for task in tasks:
-            if task.list_uid == list_uid:
-                if task.uid == task_uid:
-                    task_idx: int = tasks.index(task)
-                elif task.uid == task_after_uid:
-                    task_after_idx: int = tasks.index(task)
-
-        # Swap items
-        if task_idx < task_after_idx:
-            i = task_idx
-            while i < task_after_idx:
-                tasks[i], tasks[i + 1] = tasks[i + 1], tasks[i]
-                i += 1
-        else:
-            i = task_idx
-            while task_after_idx + 1 > i:
-                tasks[i], tasks[i - 1] = tasks[i - 1], tasks[i]
-                i -= 1
-
-        # Save tasks
+        task_to_move: TaskData = tasks.pop(
+            tasks.index(self.get_task(list_uid, task_uid))
+        )
+        index_to_insert: int = tasks.index(self.get_task(list_uid, task_after_uid)) + 1
+        tasks.insert(index_to_insert, task_to_move)
         self.tasks = tasks
 
     def move_task_before(
         self, list_uid: str, task_uid: str, task_before_uid: str
     ) -> None:
         tasks: list[TaskData] = self.tasks
-
-        # Get indexes
-        for task in tasks:
-            if task.list_uid == list_uid:
-                if task.uid == task_uid:
-                    task_idx: int = tasks.index(task)
-                elif task.uid == task_before_uid:
-                    task_before_idx: int = tasks.index(task)
-
-        tasks.insert(task_before_idx, tasks.pop(task_idx))
-
-        # Save tasks
+        task_to_move: TaskData = tasks.pop(
+            tasks.index(self.get_task(list_uid, task_uid))
+        )
+        index_to_insert: int = tasks.index(self.get_task(list_uid, task_before_uid))
+        tasks.insert(index_to_insert, task_to_move)
         self.tasks = tasks
 
     def move_task_to_list(
