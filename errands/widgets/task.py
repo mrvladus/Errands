@@ -939,11 +939,10 @@ class Task(Gtk.Revealer):
         self.update_props(["completed", "synced"], [btn.get_active(), False])
 
         # Move section
+        self.get_parent().remove(self)
         if btn.get_active():
-            self.parent.uncompleted_task_list.remove(self)
             self.parent.completed_task_list.prepend(self)
         else:
-            self.parent.completed_task_list.remove(self)
             self.parent.uncompleted_task_list.append(self)
 
         # Complete all sub-tasks if toggle is active
@@ -1023,36 +1022,34 @@ class Task(Gtk.Revealer):
         if task.get_next_sibling() == self:
             return
 
+        task_data: TaskData = task.task_data
+        task_parent: Task = task.parent
+        old_task_list: TaskList = task.task_list
+        task.purge()
+        del task
+
         # Change data
-        if task.list_uid == self.task_data.list_uid:
-            if task.parent != self.task_data.parent:
+        if task_data.list_uid == self.task_data.list_uid:
+            if task_data.parent != self.task_data.parent:
                 UserData.update_props(
                     self.list_uid,
-                    task.uid,
+                    task_data.uid,
                     ["parent", "synced"],
                     [self.task_data.parent, False],
                 )
-                if isinstance(task.parent, Task):
-                    task.parent.update_title()
-                    task.parent.update_progress_bar()
-                    task.parent = self.parent
         else:
-            old_task_list: TaskList = task.task_list
             UserData.move_task_to_list(
-                task.uid, task.list_uid, self.list_uid, self.task_data.parent
+                task_data.uid, task_data.list_uid, self.list_uid, self.task_data.parent
             )
             old_task_list.update_title()
-        UserData.move_task_before(self.list_uid, task.uid, self.uid)
+        if isinstance(task_parent, Task):
+            task_parent.update_title()
+            task_parent.update_progress_bar()
+        UserData.move_task_before(self.list_uid, task_data.uid, self.uid)
 
         # Move widget
-        task.complete_btn.set_active(self.task_data.completed)
-        task.get_parent().remove(task)
-        task.insert_before(self.get_parent(), self)
-
-        if self.task_data.completed and not task.task_data.completed:
-            self.complete_btn.set_active(False)
-            for parent in self.parents_tree:
-                parent.complete_btn.set_active(False)
+        task_data.completed = self.task_data.completed
+        self.parent.add_task(task_data)
 
         # KDE dnd bug workaround for issue #111
         for task in self.task_list.all_tasks:
@@ -1078,30 +1075,30 @@ class Task(Gtk.Revealer):
         if not self.task_data.expanded:
             self.expand(True)
 
+        task_data: TaskData = task.task_data
+        task_parent: Task = task.parent
+        old_task_list: TaskList = task.task_list
+        task.purge()
+        del task
+
         # Change parent
-        if task.list_uid == self.list_uid:
+        if task_data.list_uid == self.list_uid:
             UserData.update_props(
-                self.list_uid, task.uid, ["parent", "synced"], [self.uid, False]
+                self.list_uid, task_data.uid, ["parent", "synced"], [self.uid, False]
             )
-            if isinstance(task.parent, Task):
-                task.parent.update_title()
-                task.parent.update_progress_bar()
-                task.parent = self
         else:
-            old_task_list: TaskList = task.task_list
-            UserData.move_task_to_list(task.uid, task.list_uid, self.list_uid, self.uid)
+            UserData.move_task_to_list(
+                task_data.uid, task_data.list_uid, self.list_uid, self.uid
+            )
             old_task_list.update_title()
+        UserData.move_task_after(self.list_uid, task_data.uid, self.uid)
 
-        UserData.move_task_after(self.list_uid, task.uid, self.uid)
+        self.add_task(task_data)
+        if isinstance(task_parent, Task):
+            task_parent.update_title()
+            task_parent.update_progress_bar()
 
-        # Move widget
-        task.get_parent().remove(task)
-        if task.task_data.completed:
-            self.completed_task_list.prepend(task)
-        else:
-            self.uncompleted_task_list.prepend(task)
-
-        if self.task_data.completed and not task.task_data.completed:
+        if self.task_data.completed and not task_data.completed:
             self.complete_btn.set_active(False)
             for parent in self.parents_tree:
                 parent.complete_btn.set_active(False)
