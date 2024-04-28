@@ -14,7 +14,7 @@ from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.markup import Markup
 from errands.lib.sync.sync import Sync
-from errands.lib.utils import get_children, get_human_datetime, idle_add
+from errands.lib.utils import get_children, get_human_datetime
 from errands.state import State
 from errands.widgets.shared.components.boxes import (
     ErrandsBox,
@@ -772,6 +772,8 @@ class Task(Gtk.Revealer):
             "synced",
             "toolbar_shown",
             "trash",
+            "color",
+            "notified",
         )
         for prop in props:
             if prop not in local_props:
