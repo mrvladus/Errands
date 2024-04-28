@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version:  errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-25 18:51+0300\n"
-"PO-Revision-Date: 2024-02-07 14:31+0100\n"
+"PO-Revision-Date: 2024-04-28 14:31+0100\n"
 "Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
 "Language-Team: Italian <LL@li.org>\n"
 "Language: it\n"
@@ -20,7 +20,7 @@ msgstr ""
 
 #: errands/application.py:37
 msgid "Errands need to run in the background for notifications"
-msgstr ""
+msgstr "Errands deve essere eseguito in background per le notifiche"
 
 #: errands/lib/sync/providers/caldav.py:63
 msgid "Not all sync credentials provided. Please check settings."
@@ -33,9 +33,8 @@ msgid "Can't connect to CalDAV server at:"
 msgstr "Impossibile connettersi al server CalDAV su:"
 
 #: errands/lib/notifications.py:69
-#, fuzzy
 msgid "Task is Due"
-msgstr "Attività"
+msgstr "L'attività è scaduta"
 
 #: errands/widgets/shared/components/dialogs.py:29
 msgid "Are you sure?"
@@ -74,13 +73,12 @@ msgstr "Imposta data"
 
 #: errands/widgets/shared/datetime_picker.py:220
 #: errands/widgets/today/today_task.py:154 errands/widgets/task.py:301
-#, fuzzy
 msgid "Date"
-msgstr "Imposta data"
+msgstr "Data"
 
 #: errands/widgets/shared/datetime_window.py:31
 msgid "Date and Time"
-msgstr ""
+msgstr "Data e ora"
 
 #: errands/widgets/shared/datetime_window.py:41
 #: errands/widgets/shared/datetime_window.py:43
@@ -105,16 +103,15 @@ msgstr "Tag"
 
 #: errands/widgets/tags/tags.py:32
 msgid "No Tags Found"
-msgstr ""
+msgstr "Nessun tag trovato"
 
 #: errands/widgets/tags/tags.py:33
 msgid "Add new Tags in the entry above"
-msgstr ""
+msgstr "Aggiungi nuovi tag nella voce sopra"
 
 #: errands/widgets/tags/tags.py:82
-#, fuzzy
 msgid "Add new Tag"
-msgstr "Aggiungi nuova attività"
+msgstr "Aggiungi nuovo tag"
 
 #: errands/widgets/tags/tags.py:140
 #: errands/widgets/task_list/task_list_sidebar_row.py:58
@@ -158,9 +155,8 @@ msgid "Export"
 msgstr "Esporta"
 
 #: errands/widgets/task_list/task_list.py:50
-#, fuzzy
 msgid "Toggle Completed Tasks"
-msgstr "Elimina attività completate"
+msgstr "Attiva le attività completate"
 
 #: errands/widgets/task_list/task_list.py:58
 msgid "Delete Completed Tasks"
@@ -171,9 +167,8 @@ msgid "Scroll Up"
 msgstr "Scorri verso l'alto"
 
 #: errands/widgets/task_list/task_list.py:84 errands/widgets/task.py:570
-#, fuzzy
 msgid "Completed"
-msgstr "Completato:"
+msgstr "Completato"
 
 #: errands/widgets/task_list/task_list.py:143
 msgid "Add new Task"
@@ -184,9 +179,8 @@ msgid "Completed:"
 msgstr "Completato:"
 
 #: errands/widgets/today/today_task.py:91 errands/widgets/task.py:190
-#, fuzzy
 msgid "Toggle Completion"
-msgstr "Attiva/disattiva i dettagli"
+msgstr "Attiva completamento"
 
 #: errands/widgets/today/today_task.py:100
 #: errands/widgets/today/today_task.py:269 errands/widgets/task.py:233
@@ -196,7 +190,7 @@ msgstr "Modifica"
 
 #: errands/widgets/today/today_task.py:149 errands/widgets/task.py:296
 msgid "Start / Due Date"
-msgstr ""
+msgstr "Data di inizio / scadenza"
 
 #: errands/widgets/today/today_task.py:177 errands/widgets/task.py:324
 msgid "Priority"
@@ -204,89 +198,85 @@ msgstr "Priorità"
 
 #: errands/widgets/today/today_task.py:195 errands/widgets/task.py:342
 msgid "High"
-msgstr ""
+msgstr "Alta"
 
 #: errands/widgets/today/today_task.py:199 errands/widgets/task.py:346
 msgid "Medium"
-msgstr ""
+msgstr "Media"
 
 #: errands/widgets/today/today_task.py:203 errands/widgets/task.py:350
-#, fuzzy
 msgid "Low"
-msgstr "Ora"
+msgstr "Bassa"
 
 #: errands/widgets/today/today_task.py:205
 #: errands/widgets/today/today_task.py:297 errands/widgets/task.py:352
 #: errands/widgets/task.py:444
 msgid "None"
-msgstr ""
+msgstr "Nessuna"
 
 #: errands/widgets/today/today_task.py:208 errands/widgets/task.py:355
 msgid "Custom"
-msgstr ""
+msgstr "Personalizzato"
 
 #: errands/widgets/today/today_task.py:218 errands/widgets/task.py:365
-#, fuzzy
 msgid "No Tags"
-msgstr "Tag"
+msgstr "Nessun tag"
 
 #: errands/widgets/today/today_task.py:271 errands/widgets/task.py:418
 msgid "Move to Trash"
 msgstr "Sposta nel cestino"
 
 #: errands/widgets/today/today_task.py:275 errands/widgets/task.py:422
-#, fuzzy
 msgid "Copy to Clipboard"
-msgstr "Copiato negli appunti"
+msgstr "Copia negli appunti"
 
 #: errands/widgets/today/today_task.py:307 errands/widgets/task.py:454
 msgid "Blue"
-msgstr ""
+msgstr "Blu"
 
 #: errands/widgets/today/today_task.py:314 errands/widgets/task.py:461
 msgid "Green"
-msgstr ""
+msgstr "Verde"
 
 #: errands/widgets/today/today_task.py:321 errands/widgets/task.py:468
 msgid "Yellow"
-msgstr ""
+msgstr "Giallo"
 
 #: errands/widgets/today/today_task.py:328 errands/widgets/task.py:475
 msgid "Orange"
-msgstr ""
+msgstr "Arancio"
 
 #: errands/widgets/today/today_task.py:335 errands/widgets/task.py:482
 msgid "Red"
-msgstr ""
+msgstr "Rosso"
 
 #: errands/widgets/today/today_task.py:342 errands/widgets/task.py:489
 msgid "Purple"
-msgstr ""
+msgstr "Viola"
 
 #: errands/widgets/today/today_task.py:349 errands/widgets/task.py:496
 msgid "Brown"
-msgstr ""
+msgstr "Marrone"
 
 #: errands/widgets/today/today_task.py:357
 #: errands/widgets/today/today_task.py:624 errands/widgets/task.py:504
 #: errands/widgets/task.py:1220
-#, fuzzy
 msgid "Created:"
-msgstr "Crea"
+msgstr "Creato:"
 
 #: errands/widgets/today/today_task.py:368
 #: errands/widgets/today/today_task.py:625 errands/widgets/task.py:515
 #: errands/widgets/task.py:1221
 msgid "Changed:"
-msgstr ""
+msgstr "Modificato:"
 
 #: errands/widgets/today/today_task.py:381 errands/widgets/task.py:528
 msgid "More"
-msgstr ""
+msgstr "Altro"
 
 #: errands/widgets/today/today.py:31
 msgid "No Tasks for Today"
-msgstr ""
+msgstr "Nessuna attività per oggi"
 
 #: errands/widgets/trash/trash_sidebar_row.py:43
 #: errands/widgets/trash/trash.py:89 errands/widgets/window.py:79
@@ -328,30 +318,28 @@ msgstr "Scuro"
 
 #. Task lists group
 #: errands/widgets/preferences.py:69 errands/widgets/sidebar.py:153
-#, fuzzy
 msgid "Task Lists"
-msgstr "Nessun elenco di attività"
+msgstr "Elenchi di attività"
 
 #: errands/widgets/preferences.py:73
-#, fuzzy
 msgid "Add new Tasks"
-msgstr "Aggiungi nuova attività"
+msgstr "Aggiungi nuove attività"
 
 #: errands/widgets/preferences.py:74
 msgid "At the Bottom"
-msgstr ""
+msgstr "In basso"
 
 #: errands/widgets/preferences.py:74
 msgid "At the Top"
-msgstr ""
+msgstr "In alto"
 
 #: errands/widgets/preferences.py:90
 msgid "Show Notifications"
-msgstr ""
+msgstr "Mostra notifiche"
 
 #: errands/widgets/preferences.py:94
 msgid "Notifications"
-msgstr ""
+msgstr "Notifiche"
 
 #: errands/widgets/preferences.py:99 errands/widgets/preferences.py:153
 #: data/resources/gtk/help-overlay.ui:38
@@ -430,9 +418,8 @@ msgid "Sync / Fetch Tasks"
 msgstr "Sincronizza / Recupera attività"
 
 #: errands/widgets/sidebar.py:181
-#, fuzzy
 msgid "Import Task List"
-msgstr "Importa lista"
+msgstr "Importa liste delle attività"
 
 #: errands/widgets/sidebar.py:184 data/resources/gtk/help-overlay.ui:20
 msgid "Preferences"
@@ -463,32 +450,28 @@ msgid "Copied to Clipboard"
 msgstr "Copiato negli appunti"
 
 #: errands/widgets/task.py:182
-#, fuzzy
 msgid "Toggle Sub-Tasks"
-msgstr "Mostra attività secondarie"
+msgstr "Attiva attività secondarie"
 
 #: errands/widgets/task.py:220
-#, fuzzy
 msgid "Toggle Toolbar"
-msgstr "Attiva barra laterale"
+msgstr "Attiva barra degli strumenti"
 
 #: errands/widgets/task.py:594
 msgid "Add new Sub-Task"
 msgstr "Aggiungi una nuova attività secondaria"
 
 #: errands/widgets/task.py:1331
-#, fuzzy
 msgid "Delete Tag"
-msgstr "Attività completate"
+msgstr "Elimina tag"
 
 #: errands/widgets/window.py:58
-#, fuzzy
 msgid "Sidebar"
-msgstr "Attiva barra laterale"
+msgstr "Barra laterale"
 
 #: errands/widgets/window.py:61
 msgid "Content"
-msgstr ""
+msgstr "Contenuto"
 
 #: errands/widgets/window.py:92
 msgid "No Task Lists"
@@ -496,16 +479,15 @@ msgstr "Nessun elenco di attività"
 
 #: errands/widgets/window.py:93
 msgid "Create new or import existing one"
-msgstr ""
+msgstr "Creane uno nuovo o importane uno esistente"
 
 #: errands/widgets/window.py:97
 msgid "Create List"
 msgstr "Crea lista"
 
 #: errands/widgets/window.py:106
-#, fuzzy
 msgid "Create new List"
-msgstr "Crea lista"
+msgstr "Crea nuova lista"
 
 #: errands/widgets/window.py:155
 msgid "translator-credits"
