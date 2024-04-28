@@ -326,22 +326,42 @@ class UserDataJSON:
         self, list_uid: str, task_uid: str, task_after_uid: str
     ) -> None:
         tasks: list[TaskData] = self.tasks
-        task_to_move: TaskData = tasks.pop(
-            tasks.index(self.get_task(list_uid, task_uid))
-        )
-        index_to_insert: int = tasks.index(self.get_task(list_uid, task_after_uid)) + 1
-        tasks.insert(index_to_insert, task_to_move)
+
+        def __move_task(uid: str, after_uid: str):
+            task_to_move: TaskData = tasks.pop(
+                tasks.index(self.get_task(list_uid, uid))
+            )
+            index_to_insert: int = tasks.index(self.get_task(list_uid, after_uid)) + 1
+            tasks[index_to_insert:index_to_insert] = [task_to_move]
+
+        __move_task(task_uid, task_after_uid)
+
+        # Move sub-tasks
+        after_uid: str = task_uid
+        for task in self.__get_sub_tasks_tree(list_uid, task_uid):
+            __move_task(task.uid, after_uid)
+            after_uid = task.uid
+
         self.tasks = tasks
 
     def move_task_before(
         self, list_uid: str, task_uid: str, task_before_uid: str
     ) -> None:
         tasks: list[TaskData] = self.tasks
-        task_to_move: TaskData = tasks.pop(
-            tasks.index(self.get_task(list_uid, task_uid))
-        )
-        index_to_insert: int = tasks.index(self.get_task(list_uid, task_before_uid))
-        tasks.insert(index_to_insert, task_to_move)
+
+        def __move_task(uid: str):
+            task_to_move: TaskData = tasks.pop(
+                tasks.index(self.get_task(list_uid, uid))
+            )
+            index_to_insert: int = tasks.index(self.get_task(list_uid, task_before_uid))
+            tasks[index_to_insert:index_to_insert] = [task_to_move]
+
+        __move_task(task_uid)
+
+        # Move sub-tasks
+        for task in self.__get_sub_tasks_tree(list_uid, task_uid):
+            __move_task(task.uid)
+
         self.tasks = tasks
 
     def move_task_to_list(

@@ -1033,6 +1033,7 @@ class Task(Gtk.Revealer):
                 if isinstance(task.parent, Task):
                     task.parent.update_title()
                     task.parent.update_progress_bar()
+                    task.parent = self.parent
         else:
             old_task_list: TaskList = task.task_list
             UserData.move_task_to_list(
@@ -1040,12 +1041,6 @@ class Task(Gtk.Revealer):
             )
             old_task_list.update_title()
         UserData.move_task_before(self.list_uid, task.uid, self.uid)
-
-        # Move sub-tasks in data to prevent gaps
-        last_task: Task = self
-        for sub in self.all_tasks:
-            UserData.move_task_after(self.list_uid, sub.uid, last_task.uid)
-            last_task = sub
 
         # Move widget
         task.complete_btn.set_active(self.task_data.completed)
@@ -1081,45 +1076,30 @@ class Task(Gtk.Revealer):
         if not self.task_data.expanded:
             self.expand(True)
 
-        task_data: TaskData = task.task_data
-        task_parent = task.parent
-        old_task_list = task.task_list
-        task.purge()
-        del task
-
-        # Change data
-        if task_data.list_uid == self.list_uid:
+        # Change parent
+        if task.list_uid == self.list_uid:
             UserData.update_props(
-                self.list_uid, task_data.uid, ["parent", "synced"], [self.uid, False]
+                self.list_uid, task.uid, ["parent", "synced"], [self.uid, False]
             )
+            if isinstance(task.parent, Task):
+                task.parent.update_title()
+                task.parent.update_progress_bar()
+                task.parent = self
         else:
-            UserData.move_task_to_list(
-                task_data.uid, task_data.list_uid, self.list_uid, self.uid
-            )
+            old_task_list: TaskList = task.task_list
+            UserData.move_task_to_list(task.uid, task.list_uid, self.list_uid, self.uid)
             old_task_list.update_title()
-        if len(self.tasks) > 0:
-            if GSettings.get("task-list-new-task-position-top"):
-                UserData.move_task_before(
-                    self.list_uid, task_data.uid, self.tasks[0].uid
-                )
-            else:
-                UserData.move_task_after(
-                    self.list_uid, task_data.uid, self.tasks[-1].uid
-                )
 
-        # Move sub-tasks in data to prevent gaps
-        last_task: Task = self
-        for sub in self.all_tasks:
-            UserData.move_task_after(self.list_uid, sub.uid, last_task.uid)
-            last_task = sub
+        UserData.move_task_after(self.list_uid, task.uid, self.uid)
 
-        if isinstance(task_parent, Task):
-            task_parent.update_title()
-            task_parent.update_progress_bar()
+        # Move widget
+        task.get_parent().remove(task)
+        if task.task_data.completed:
+            self.completed_task_list.prepend(task)
+        else:
+            self.uncompleted_task_list.prepend(task)
 
-        self.add_task(task_data)
-
-        if self.task_data.completed and not task_data.completed:
+        if self.task_data.completed and not task.task_data.completed:
             self.complete_btn.set_active(False)
             for parent in self.parents_tree:
                 parent.complete_btn.set_active(False)
