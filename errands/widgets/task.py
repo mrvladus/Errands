@@ -1044,7 +1044,9 @@ class Task(Gtk.Revealer):
 
         # Move widget
         task_data.completed = self.task_data.completed
-        self.parent.add_task(task_data)
+        new_task: Task = self.parent.add_task(task_data)
+        self.get_parent().reorder_child_after(new_task, self)
+        self.get_parent().reorder_child_after(self, new_task)
 
         # KDE dnd bug workaround for issue #111
         for task in self.task_list.all_tasks:
