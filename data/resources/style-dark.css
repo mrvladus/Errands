@@ -4,31 +4,31 @@
 }
 
 .task-blue {
-    background: #264770;
+    background: darker(#3584e4);
 }
 
 .task-green {
-    background: #345039;
+    background: darker(#33d17a);
 }
 
 .task-yellow {
-    background: #5e5900;
+    background: darker(#f5c211);
 }
 
 .task-orange {
-    background: #65461f;
+    background: darker(#ff7800);
 }
 
 .task-red {
-    background: #5e0800;
+    background: darker(#e01b24);
 }
 
 .task-purple {
-    background: #5c395c;
+    background: darker(#9141ac);
 }
 
 .task-brown {
-    background: #512e12;
+    background: #986a44;
 }
 
 .tag {
