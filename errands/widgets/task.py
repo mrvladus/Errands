@@ -72,33 +72,28 @@ class Task(Gtk.Revealer):
 
                 Log.info(f"Task: Export '{self.uid}'")
 
-                task = [
-                    i
-                    for i in UserData.get_tasks_as_dicts(self.list_uid)
-                    if i.uid == self.uid
-                ][0]
                 calendar = Calendar()
                 event = Event()
-                event.add("uid", task.uid)
-                event.add("summary", task.text)
-                if task.notes:
-                    event.add("description", task.notes)
-                event.add("priority", task.priority)
-                if task.tags:
-                    event.add("categories", task.tags)
-                event.add("percent-complete", task.percent_complete)
-                if task.color:
-                    event.add("x-errands-color", task.color)
+                event.add("uid", self.task_data.uid)
+                event.add("summary", self.task_data.text)
+                if self.task_data.notes:
+                    event.add("description", self.task_data.notes)
+                event.add("priority", self.task_data.priority)
+                if self.task_data.tags:
+                    event.add("categories", self.task_data.tags)
+                event.add("percent-complete", self.task_data.percent_complete)
+                if self.task_data.color:
+                    event.add("x-errands-color", self.task_data.color)
                 event.add(
                     "dtstart",
                     (
-                        datetime.fromisoformat(task.start_date)
-                        if task.start_date
+                        datetime.fromisoformat(self.task_data.start_date)
+                        if self.task_data.start_date
                         else datetime.now()
                     ),
                 )
-                if task.due_date:
-                    event.add("dtend", datetime.fromisoformat(task.due_date))
+                if self.task_data.due_date:
+                    event.add("dtend", datetime.fromisoformat(self.task_data.due_date))
                 calendar.add_component(event)
 
                 with open(file.get_path(), "wb") as f:
