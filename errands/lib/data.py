@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 import datetime
 import json
 import os
@@ -368,33 +369,29 @@ class UserDataJSON:
         self, task_uid: str, from_list_uid: str, to_list_uid: str, new_parent: str = ""
     ) -> TaskData:
         tasks: list[TaskData] = self.tasks
-        to_delete_tasks: list[TaskData] = [
-            self.get_task(from_list_uid, task_uid)
-        ] + self.__get_sub_tasks_tree(from_list_uid, task_uid)
+        tasks_to_delete: list[TaskData] = [self.get_task(from_list_uid, task_uid)]
 
-        # Move task
-        new_main_task: TaskData = TaskData(
-            **asdict(self.get_task(from_list_uid, task_uid))
-        )
-        new_main_task.parent = new_parent
-        new_main_task.list_uid = to_list_uid
-        new_main_task.synced = False
-        tasks.append(new_main_task)
+        base_task: TaskData = deepcopy(self.get_task(from_list_uid, task_uid))
+        base_task.list_uid = to_list_uid
+        base_task.parent = new_parent
+        base_task.synced = False
+        tasks.append(base_task)
 
         for task in self.__get_sub_tasks_tree(from_list_uid, task_uid):
-            new_task: TaskData = TaskData(**asdict(task))
-            new_task.list_uid = to_list_uid
-            new_task.synced = False
-            tasks.append(new_task)
+            new_sub_task: TaskData = deepcopy(task)
+            new_sub_task.list_uid = to_list_uid
+            new_sub_task.synced = False
+            tasks.append(new_sub_task)
+            tasks_to_delete.append(task)
 
         for task in tasks:
-            if task in to_delete_tasks:
+            if task in tasks_to_delete:
                 task.deleted = True
                 task.synced = False
 
         self.tasks = tasks
 
-        return new_main_task
+        return base_task
 
     def update_props(
         self, list_uid: str, uid: str, props: Iterable[str], values: Iterable[Any]

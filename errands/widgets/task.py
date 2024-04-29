@@ -1005,7 +1005,7 @@ class Task(Gtk.Revealer):
         return Gdk.ContentProvider.new_for_value(value)
 
     def _on_drag_begin(self, _, drag) -> bool:
-        text: str = self.get_prop("text")
+        text: str = self.task_data.text
         icon: Gtk.DragIcon = Gtk.DragIcon.get_for_drag(drag)
         icon.set_child(Gtk.Button(label=text if len(text) < 20 else f"{text[0:20]}..."))
 
@@ -1026,7 +1026,6 @@ class Task(Gtk.Revealer):
         task_parent: Task = task.parent
         old_task_list: TaskList = task.task_list
         task.purge()
-        del task
 
         # Change data
         if task_data.list_uid == self.task_data.list_uid:
@@ -1038,14 +1037,15 @@ class Task(Gtk.Revealer):
                     [self.task_data.parent, False],
                 )
         else:
-            UserData.move_task_to_list(
+            task_data: TaskData = UserData.move_task_to_list(
                 task_data.uid, task_data.list_uid, self.list_uid, self.task_data.parent
             )
             old_task_list.update_title()
+        UserData.move_task_before(self.list_uid, task_data.uid, self.uid)
+
         if isinstance(task_parent, Task):
             task_parent.update_title()
             task_parent.update_progress_bar()
-        UserData.move_task_before(self.list_uid, task_data.uid, self.uid)
 
         # Move widget
         task_data.completed = self.task_data.completed
@@ -1079,7 +1079,6 @@ class Task(Gtk.Revealer):
         task_parent: Task = task.parent
         old_task_list: TaskList = task.task_list
         task.purge()
-        del task
 
         # Change parent
         if task_data.list_uid == self.list_uid:
@@ -1087,12 +1086,11 @@ class Task(Gtk.Revealer):
                 self.list_uid, task_data.uid, ["parent", "synced"], [self.uid, False]
             )
         else:
-            UserData.move_task_to_list(
+            task_data: TaskData = UserData.move_task_to_list(
                 task_data.uid, task_data.list_uid, self.list_uid, self.uid
             )
             old_task_list.update_title()
         UserData.move_task_after(self.list_uid, task_data.uid, self.uid)
-
         self.add_task(task_data)
         if isinstance(task_parent, Task):
             task_parent.update_title()
