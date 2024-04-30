@@ -399,7 +399,9 @@ class SyncProviderCalDAV:
                 updated_props.append(key)
                 updated_values.append(getattr(remote_task, key))
 
-        if not updated_props:
+        if not updated_props or (
+            updated_props == ["changed_at"] and updated_values == [""]
+        ):
             return
 
         Log.debug(f"Sync: Update local task '{task.uid}'. Updated: {updated_props}")
