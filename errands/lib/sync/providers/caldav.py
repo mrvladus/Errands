@@ -396,7 +396,6 @@ class SyncProviderCalDAV:
             if key not in exclude_keys and getattr(remote_task, key) != getattr(
                 task, key
             ):
-                print(key, ":", getattr(remote_task, key), "---", getattr(task, key))
                 updated_props.append(key)
                 updated_values.append(getattr(remote_task, key))
 
