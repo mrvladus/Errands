@@ -47,8 +47,7 @@ It's the **only** supported verion.
 
 ### Report a bug
 - Make sure you are using latest version from [flathub](https://flathub.org/apps/details/io.github.mrvladus.List).
-- See the log file at `~/.var/app/io.github.mrvladus.List/data/errands/log.txt` if it has any errors.
-- If there is no errors in log file, then launch app from terminal with `flatpak run io.github.mrvladus.List` and copy the output.
+- Launch the app from terminal with `flatpak run io.github.mrvladus.List` and copy the output.
 - Create new issue.
 - Add steps to reproduce the bug if needed.
 
@@ -58,8 +57,9 @@ To translate **Errands** to your language see **[TRANSLATIONS.md](TRANSLATIONS.m
 ### Package
 The only officially supported format is **flatpak** on [Flathub](https://flathub.org/apps/details/io.github.mrvladus.List)!
 Please, **do not package** it in other formats, but if you do, these are dependencies:
-- `libadwaita >= 1.4`
+- `libadwaita >= 1.5`
 - `libsecret`
+- `libportal`
 - `gtksourceview5`
 - `PyGObject`
 - `python3-caldav`

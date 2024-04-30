@@ -49,7 +49,7 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="46.0" date="2024-26-04">
+    <release version="46.0" date="2024-30-04">
       <description translatable="no">
         <p>One year anniversary release!</p>
 
@@ -58,7 +58,7 @@
           <li>New contributors: 50</li>
           <li>Commits: 1610</li>
           <li>Lines of code: 6980</li>
-          <li>Installs on Flathub: 25 650</li>
+          <li>Installs on Flathub: 26 350</li>
         </ul>
 
         <p>Changes in this release:</p>
