@@ -46,10 +46,11 @@
   <screenshots>
     <screenshot type="default">
       <image>https://raw.githubusercontent.com/mrvladus/Errands/main/screenshots/main.png</image>
+      <caption>Main window</caption>
     </screenshot>
   </screenshots>
   <releases>
-    <release version="46.0" date="2024-30-04">
+    <release version="46.0" date="2024-04-30">
       <description translatable="no">
         <p>One year anniversary release!</p>
 
