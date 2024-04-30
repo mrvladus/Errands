@@ -176,13 +176,9 @@ class SyncProviderCalDAV:
             else:
                 task.created_at = ""
 
-            if todo.icalendar_component.get("last-modified", "") != "":
-                task.changed_at = (
-                    todo.icalendar_component.get("last-modified", "")
-                    .to_ical()
-                    .decode("utf-8")
-                    .strip("Z")
-                )
+            last_modified = todo.icalendar_component.get("LAST-MODIFIED", "")
+            if last_modified != "":
+                task.changed_at = last_modified.to_ical().decode("utf-8").strip("Z")
             else:
                 task.changed_at = ""
 
@@ -400,6 +396,7 @@ class SyncProviderCalDAV:
             if key not in exclude_keys and getattr(remote_task, key) != getattr(
                 task, key
             ):
+                print(key, ":", getattr(remote_task, key), "---", getattr(task, key))
                 updated_props.append(key)
                 updated_values.append(getattr(remote_task, key))
 

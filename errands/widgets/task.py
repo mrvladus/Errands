@@ -1023,6 +1023,7 @@ class Task(Gtk.Revealer):
         task.purge()
 
         # Change data
+        parent_changed: bool = False
         if task_data.list_uid == self.task_data.list_uid:
             if task_data.parent != self.task_data.parent:
                 UserData.update_props(
@@ -1031,10 +1032,12 @@ class Task(Gtk.Revealer):
                     ["parent", "synced"],
                     [self.task_data.parent, False],
                 )
+                parent_changed = True
         else:
             task_data: TaskData = UserData.move_task_to_list(
                 task_data.uid, task_data.list_uid, self.list_uid, self.task_data.parent
             )
+            parent_changed = True
             old_task_list.update_title()
         UserData.move_task_before(self.list_uid, task_data.uid, self.uid)
 
@@ -1060,7 +1063,8 @@ class Task(Gtk.Revealer):
         self.task_list.update_title()
 
         # Sync
-        Sync.sync()
+        if parent_changed:
+            Sync.sync()
 
     def _on_task_drop(self, _drop, task: Task, _x, _y) -> None:
         """When task is dropped on task and becomes sub-task"""
@@ -1078,14 +1082,17 @@ class Task(Gtk.Revealer):
         task.purge()
 
         # Change parent
+        parent_changed: bool = False
         if task_data.list_uid == self.list_uid:
             UserData.update_props(
                 self.list_uid, task_data.uid, ["parent", "synced"], [self.uid, False]
             )
+            parent_changed = True
         else:
             task_data: TaskData = UserData.move_task_to_list(
                 task_data.uid, task_data.list_uid, self.list_uid, self.uid
             )
+            parent_changed = True
             old_task_list.update_title()
         UserData.move_task_after(self.list_uid, task_data.uid, self.uid)
         self.add_task(task_data)
@@ -1108,7 +1115,8 @@ class Task(Gtk.Revealer):
             task.set_sensitive(True)
 
         # Sync
-        Sync.sync()
+        if parent_changed:
+            Sync.sync()
 
     def _on_sub_task_added(self, entry: Gtk.Entry) -> None:
         text: str = entry.get_text().strip()
