@@ -1,5 +1,5 @@
 {
-    "id": "io.github.mrvladus.List.Devel",
+    "id": "io.github.mrvladus.List",
     "runtime": "org.gnome.Platform",
     "runtime-version": "46",
     "sdk": "org.gnome.Sdk",
@@ -14,7 +14,6 @@
         "--talk-name=org.gnome.OnlineAccounts"
     ],
     "cleanup": [
-        "/lib/debug",
         "/include",
         "/lib/pkgconfig",
         "/man",
@@ -45,7 +44,7 @@
                 {
                     "type": "git",
                     "url": "https://gitlab.gnome.org/GNOME/gnome-online-accounts.git",
-                    "branch": "master"
+                    "tag": "3.50.1"
                 }
             ]
         },
@@ -66,7 +65,7 @@
                 }
             ]
         },
-        "build-aux/python3-modules.json",
+        "python3-modules.json",
         {
             "name": "errands",
             "buildsystem": "meson",
@@ -74,7 +73,7 @@
                 {
                     "type": "git",
                     "url": "https://github.com/mrvladus/Errands.git",
-                    "tag": "46.0"
+                    "commit": "0b8f689757afe6f8eab209cc818daed8360b0f5e"
                 }
             ]
         }
