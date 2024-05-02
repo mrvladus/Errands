@@ -48,8 +48,20 @@
     <control>pointing</control>
     <internet>always</internet>
   </recommends>
-  
+
   <releases>
+    <release version="46.0.1" date="2024-05-02">
+      <description translate="no">
+        <p>Fixed:</p>
+        <ul>
+          <li>CATEGORIES field not showing tags correctly in ical format on sync remote</li>
+        </ul>
+        <p>Translations:</p>
+        <ul>
+          <li>Updated Simplified Chinese translation (jexjws)</li>
+        </ul>
+      </description>
+    </release>
     <release version="46.0" date="2024-04-30">
       <description translate="no">
         <p>One year anniversary release!</p>

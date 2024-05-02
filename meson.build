@@ -1,10 +1,10 @@
 project(
   'errands',
-  version: '46.0',
+  version: '46.0ю1',
   meson_version: '>= 0.62.0',
 )
 
-dependency('libadwaita-1', version: '>= 1.4')
+dependency('libadwaita-1', version: '>= 1.5')
 dependency('libsecret-1')
 dependency('libportal')
 dependency('gtksourceview-5')
