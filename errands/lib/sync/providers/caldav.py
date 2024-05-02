@@ -436,7 +436,9 @@ class SyncProviderCalDAV:
             todo.icalendar_component["percent-complete"] = int(task.percent_complete)
             todo.icalendar_component["description"] = task.notes
             todo.icalendar_component["priority"] = task.priority
-            todo.icalendar_component["categories"] = task.tags if task.tags else []
+            todo.icalendar_component["categories"] = (
+                ",".join(task.tags) if task.tags else []
+            )
             todo.icalendar_component["related-to"] = task.parent
             todo.icalendar_component["x-errands-color"] = task.color
             todo.complete() if task.completed else todo.uncomplete()
