@@ -50,6 +50,24 @@
   </recommends>
 
   <releases>
+    <release version="46.0.2" date="2024-05-04">
+      <description translate="no">
+        <p>Added:</p>
+        <ul>
+          <li>Quit menu item for completely closing the app</li>
+        </ul>
+        <p>Fixed:</p>
+        <ul>
+          <li>Trash errors</li>
+        </ul>
+        <p>Translations:</p>
+        <ul>
+          <li>Updated Dutch translation (Heimen Stoffels)</li>
+          <li>Updated Czech translation (32GRat)</li>
+          <li>Updated German translation (Otmar Grünn)</li>
+        </ul>
+      </description>
+    </release>
     <release version="46.0.1" date="2024-05-02">
       <description translate="no">
         <p>Fixed:</p>
