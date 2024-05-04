@@ -190,6 +190,7 @@ class Sidebar(Adw.Bin):
                                         ErrandsMenuItem(
                                             _("About Errands"), "app.about"
                                         ),
+                                        ErrandsMenuItem(_("Quit"), "app.quit"),
                                     ]
                                 ),
                             ),

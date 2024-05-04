@@ -257,6 +257,7 @@ class Window(Adw.ApplicationWindow):
         )
         self._create_action("about", _about)
         self._create_action("import", _import, ["<primary>i"])
+        self._create_action("quit", lambda *_: State.application.quit(), ["<primary>q"])
         self._create_action("sync", _sync, ["<primary>f"])
         self._create_action(
             "quit",
