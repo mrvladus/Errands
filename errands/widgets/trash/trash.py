@@ -119,7 +119,6 @@ class Trash(Adw.Bin):
             t for t in UserData.get_tasks_as_dicts() if t.trash and not t.deleted
         ]
         tasks_uids: list[str] = [t.uid for t in tasks_dicts]
-        lists_dicts: list[TaskListData] = UserData.get_lists_as_dicts()
 
         # Add items
         items_uids = [t.task_dict.uid for t in self.trash_items]
@@ -134,12 +133,7 @@ class Trash(Adw.Bin):
                 continue
 
             # Update title and subtitle
-            task_dict = [t for t in tasks_dicts if t.uid == item.task_dict.uid][0]
-            list_dict = [lst for lst in lists_dicts if lst.uid == task_dict.list_uid][0]
-            if item.get_title() != task_dict.text:
-                item.set_title(task_dict.text)
-            if item.get_subtitle() != list_dict.name:
-                item.set_subtitle(list_dict.name)
+            item.update_ui()
 
         # Show status
         self.status_page.set_visible(len(self.trash_items) == 0)
@@ -199,6 +193,10 @@ class TrashItem(Adw.ActionRow):
                 on_click=self.on_restore_btn_clicked,
             )
         )
+
+    def update_ui(self):
+        self.set_title(self.task_dict.text)
+        self.set_subtitle(UserData.get_list_prop(self.task_dict.list_uid, "name"))
 
     def on_restore_btn_clicked(self, _) -> None:
         """Restore task and its parents"""
