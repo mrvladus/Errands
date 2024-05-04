@@ -200,6 +200,23 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
         # Counter
         self.size_counter = Gtk.Label(css_classes=["dim-label", "caption"])
 
+        # Gesture click
+        self.gesture_click = Gtk.GestureClick(button=3)
+        self.gesture_click.connect("pressed", self._on_row_pressed)
+
+        # Context menu
+        self.popover_menu = Gtk.PopoverMenu(
+            halign=Gtk.Align.START,
+            has_arrow=False,
+            menu_model=ErrandsSimpleMenu(
+                items=[
+                    ErrandsMenuItem(_("Rename"), "list_row.rename"),
+                    ErrandsMenuItem(_("Delete"), "list_row.delete"),
+                    ErrandsMenuItem(_("Export"), "list_row.export"),
+                    ]
+            )
+        )
+
         self.set_child(
             ErrandsBox(
                 spacing=12,
@@ -207,21 +224,12 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
                 children=[
                     self.label,
                     self.size_counter,
-                    Gtk.MenuButton(
-                        menu_model=ErrandsSimpleMenu(
-                            (
-                                ErrandsMenuItem(_("Rename"), "list_row.rename"),
-                                ErrandsMenuItem(_("Delete"), "list_row.delete"),
-                                ErrandsMenuItem(_("Export"), "list_row.export"),
-                            )
-                        ),
-                        icon_name="errands-more-symbolic",
-                        css_classes=["flat"],
-                        valign=Gtk.Align.CENTER,
-                    ),
+                    self.popover_menu
                 ],
             )
         )
+
+        self.add_controller(self.gesture_click)
 
     def update_ui(self, update_task_list_ui: bool = True):
         Log.debug(f"Task List Row: Update UI '{self.uid}'")
@@ -286,3 +294,10 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
         State.view_stack.set_visible_child_name(self.label.get_label())
         State.split_view.set_show_content(True)
         GSettings.set("last-open-list", "s", self.name)
+
+    def _on_row_pressed(self, _gesture_click, _n_press, x, y) -> None:
+        position = Gdk.Rectangle()
+        position.x = x
+        position.y = y
+        self.popover_menu.set_pointing_to(position)
+        self.popover_menu.popup()
