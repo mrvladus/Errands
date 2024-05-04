@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from gi.repository import Adw, GObject, Gtk  # type:ignore
 
-from errands.lib.data import TaskData, TaskListData, UserData
+from errands.lib.data import TaskData, UserData
 from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
 from errands.lib.utils import get_children
