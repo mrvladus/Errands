@@ -1,18 +1,12 @@
 # Copyright 2023-2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-from __future__ import annotations
-from typing import TYPE_CHECKING
-
-from errands.widgets.shared.components.buttons import ErrandsButton
-
-if TYPE_CHECKING:
-    from errands.widgets.window import Window
+from gi.repository import Adw, Gtk  # type:ignore
 
 from errands.lib.goa import get_goa_credentials
-from gi.repository import Adw, Gtk  # type:ignore
-from errands.lib.sync.sync import Sync
 from errands.lib.gsettings import GSettings
+from errands.lib.sync.sync import Sync
+from errands.widgets.shared.components.buttons import ErrandsButton
 
 
 class PreferencesWindow(Adw.PreferencesDialog):
@@ -91,8 +85,20 @@ class PreferencesWindow(Adw.PreferencesDialog):
             icon_name="errands-notification-symbolic",
         )
         GSettings.bind("notifications-enabled", notifications, "active")
-        notifications_group = Adw.PreferencesGroup(title=_("Notifications"))
-        notifications_group.add(notifications)
+
+        # Background
+        background = Adw.SwitchRow(
+            title=_("Run in Background"),
+            subtitle=_("Hide the application window instead of closing it"),
+            icon_name="errands-progressbar-symbolic",
+        )
+        GSettings.bind("run-in-background", background, "active")
+
+        notifications_and_bg_group = Adw.PreferencesGroup(
+            title=_("Notifications and Background")
+        )
+        notifications_and_bg_group.add(notifications)
+        notifications_and_bg_group.add(background)
 
         # Sync group
         sync_group = Adw.PreferencesGroup(
@@ -145,7 +151,7 @@ class PreferencesWindow(Adw.PreferencesDialog):
         )
         appearance_page.add(theme_group)
         appearance_page.add(task_list_group)
-        appearance_page.add(notifications_group)
+        appearance_page.add(notifications_and_bg_group)
         self.add(appearance_page)
 
         # Sync Page
