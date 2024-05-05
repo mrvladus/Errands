@@ -157,9 +157,10 @@ class Window(Adw.ApplicationWindow):
             self.about_window.present(self)
 
         def _sync(*args):
-            Sync.sync()
             if GSettings.get("sync-provider") == 0:
                 self.add_toast(_("Sync is disabled"))
+                return
+            Sync.sync()
 
         def _import(*args) -> None:
             def _confirm(dialog: Gtk.FileDialog, res) -> None:
