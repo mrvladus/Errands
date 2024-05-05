@@ -44,13 +44,21 @@ class TrashSidebarRow(Gtk.ListBoxRow):
         )
 
         # Counter
-        self.size_counter = Gtk.Label(css_classes=["dim-label", "caption"])
-
-        # Menu
-        menu_btn: Gtk.MenuButton = Gtk.MenuButton(
-            icon_name="errands-more-symbolic",
-            css_classes=["flat"],
+        self.size_counter = Gtk.Button(
+            css_classes=["dim-label", "caption", "flat", "circular"],
+            halign=Gtk.Align.CENTER,
             valign=Gtk.Align.CENTER,
+            can_target=False,
+        )
+
+        # Gesture click
+        self.gesture_click = Gtk.GestureClick(button=3)
+        self.gesture_click.connect("pressed", self._on_row_pressed)
+
+        # Context menu
+        self.popover_menu = Gtk.PopoverMenu(
+            halign=Gtk.Align.START,
+            has_arrow=False,
             menu_model=ErrandsSimpleMenu(
                 items=[
                     ErrandsMenuItem(_("Clear"), "trash_row.clear"),
@@ -63,9 +71,11 @@ class TrashSidebarRow(Gtk.ListBoxRow):
             ErrandsBox(
                 spacing=12,
                 margin_start=6,
-                children=[self.icon, self.label, self.size_counter, menu_btn],
+                children=[self.icon, self.label, self.size_counter,  self.popover_menu ],
             )
         )
+
+        self.add_controller(self.gesture_click)
 
     def __add_actions(self) -> None:
         self.group: Gio.SimpleActionGroup = Gio.SimpleActionGroup()
@@ -104,6 +114,13 @@ class TrashSidebarRow(Gtk.ListBoxRow):
         State.view_stack.set_visible_child_name("errands_trash_page")
         State.split_view.set_show_content(True)
         GSettings.set("last-open-list", "s", "errands_trash_page")
+
+    def _on_row_pressed(self, _gesture_click, _n_press, x, y) -> None:
+        position = Gdk.Rectangle()
+        position.x = x
+        position.y = y
+        self.popover_menu.set_pointing_to(position)
+        self.popover_menu.popup()
 
     def _on_task_drop(self, _d, task: Task, _x, _y) -> None:
         task.delete()
