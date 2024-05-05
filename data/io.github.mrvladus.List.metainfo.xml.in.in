@@ -50,6 +50,15 @@
   </recommends>
 
   <releases>
+    <release version="46.0.3" date="2024-05-06">
+      <description translatable="no">
+        <p>Added:</p>
+        <ul>
+          <li>Right-click menu instead of menu buttons on sidebar items</li>
+          <li>Preference for disabling running the app in background</li>
+        </ul>
+      </description>
+    </release>
     <release version="46.0.2" date="2024-05-04">
       <description translatable="no">
         <p>Added:</p>
