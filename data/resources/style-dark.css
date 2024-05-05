@@ -7,8 +7,8 @@
     background: darker(#3584e4);
 }
 
-.task-blue progressbar progress,
-.task-blue checkbutton check:checked {
+.progressbar-blue progress,
+.checkbtn-blue check:checked {
     background-color: @blue_2;
 }
 
@@ -16,8 +16,8 @@
     background: darker(#33d17a);
 }
 
-.task-green progressbar progress,
-.task-green checkbutton check:checked {
+.progressbar-green progress,
+.checkbtn-green check:checked {
     background-color: @green_3;
 }
 
@@ -25,8 +25,8 @@
     background: darker(#f5c211);
 }
 
-.task-yellow progressbar progress,
-.task-yellow checkbutton check:checked {
+.progressbar-yellow progress,
+.checkbtn-yellow check:checked {
     background-color: @yellow_4;
 }
 
@@ -34,8 +34,8 @@
     background: darker(#ff7800);
 }
 
-.task-orange progressbar progress,
-.task-orange checkbutton check:checked {
+.progressbar-orange progress,
+.checkbtn-orange check:checked {
     background-color: @orange_2;
 }
 
@@ -43,8 +43,8 @@
     background: darker(#e01b24);
 }
 
-.task-red progressbar progress,
-.task-red checkbutton check:checked {
+.progressbar-red progress,
+.checkbtn-red check:checked {
     background-color: @red_1;
 }
 
@@ -52,8 +52,8 @@
     background: darker(#9141ac);
 }
 
-.task-purple progressbar progress,
-.task-purple checkbutton check:checked {
+.progressbar-purple progress,
+.checkbtn-purple check:checked {
     background-color: @purple_2;
 }
 
@@ -61,8 +61,8 @@
     background: #986a44;
 }
 
-.task-brown progressbar progress,
-.task-brown checkbutton check:checked {
+.progressbar-brown progress,
+.checkbtn-brown check:checked {
     background-color: @brown_1;
 }
 

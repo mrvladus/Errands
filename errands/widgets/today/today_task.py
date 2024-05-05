@@ -552,9 +552,11 @@ class TodayTask(Gtk.Revealer):
         for c in self.main_box.get_css_classes():
             if "task-" in c:
                 self.main_box.remove_css_class(c)
+                self.complete_btn.remove_css_class(c)
                 break
         if color := self.task_data.color:
             self.main_box.add_css_class(f"task-{color}")
+            self.complete_btn.add_css_class(f"checkbtn-{color}")
 
     def update_ui(self) -> None:
         self.toggle_visibility(not self.task_data.trash)
