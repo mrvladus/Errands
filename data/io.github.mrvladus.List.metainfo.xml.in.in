@@ -56,14 +56,13 @@
     <display_length compare="ge">360</display_length>
   </requires>
 
-
   <releases>
     <release version="46.0.3" date="2024-05-06">
       <description translatable="no">
         <p>Added:</p>
         <ul>
           <li>Right-click menu instead of menu buttons on sidebar items</li>
-          <li>Accent color for task now applied for check button and progress bar</li>
+          <li>Accent color now applied for check button and progress bar</li>
           <li>Preference for disabling running the app in background</li>
         </ul>
       </description>
