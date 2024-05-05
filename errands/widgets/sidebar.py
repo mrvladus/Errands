@@ -135,6 +135,7 @@ class Sidebar(Adw.Bin):
         self.list_box = ErrandsListBox(
             activate_on_single_click=False,
             on_row_selected=self._on_row_selected,
+            selection_mode=Gtk.SelectionMode.SINGLE,
             css_classes=["navigation-sidebar"],
             children=[
                 TodaySidebarRow(),

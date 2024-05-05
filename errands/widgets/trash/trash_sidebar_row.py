@@ -53,7 +53,7 @@ class TrashSidebarRow(Gtk.ListBoxRow):
 
         # Gesture click
         self.gesture_click = Gtk.GestureClick(button=3)
-        self.gesture_click.connect("pressed", self._on_row_pressed)
+        self.gesture_click.connect("released", self._on_row_pressed)
 
         # Context menu
         self.popover_menu = Gtk.PopoverMenu(
