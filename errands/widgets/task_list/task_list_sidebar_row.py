@@ -176,7 +176,7 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
         _create_action("export", _export)
 
     def __build_ui(self) -> None:
-        self.props.height_request = 50
+        self.props.height_request = 45
         self.add_css_class("sidebar-item")
         self.connect("activate", self._on_row_activated)
 
@@ -198,7 +198,12 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
         )
 
         # Counter
-        self.size_counter = Gtk.Label(css_classes=["dim-label", "caption"])
+        self.size_counter = Gtk.Button(
+            css_classes=["dim-label", "caption", "flat", "circular"],
+            halign=Gtk.Align.CENTER,
+            valign=Gtk.Align.CENTER,
+            can_target=False,
+        )
 
         # Gesture click
         self.gesture_click = Gtk.GestureClick(button=3)
@@ -213,19 +218,15 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
                     ErrandsMenuItem(_("Rename"), "list_row.rename"),
                     ErrandsMenuItem(_("Delete"), "list_row.delete"),
                     ErrandsMenuItem(_("Export"), "list_row.export"),
-                    ]
-            )
+                ]
+            ),
         )
 
         self.set_child(
             ErrandsBox(
                 spacing=12,
                 margin_start=6,
-                children=[
-                    self.label,
-                    self.size_counter,
-                    self.popover_menu
-                ],
+                children=[self.label, self.size_counter, self.popover_menu],
             )
         )
 

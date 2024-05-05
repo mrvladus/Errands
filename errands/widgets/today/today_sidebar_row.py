@@ -18,7 +18,7 @@ class TodaySidebarRow(Gtk.ListBoxRow):
         self.__build_ui()
 
     def __build_ui(self):
-        self.props.height_request = 50
+        self.props.height_request = 45
         self.add_css_class("sidebar-item")
         self.connect("activate", self._on_row_activated)
 

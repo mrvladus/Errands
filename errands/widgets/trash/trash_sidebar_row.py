@@ -23,7 +23,7 @@ class TrashSidebarRow(Gtk.ListBoxRow):
         self.__build_ui()
 
     def __build_ui(self) -> None:
-        self.props.height_request = 50
+        self.props.height_request = 45
         self.add_css_class("sidebar-item")
         self.add_css_class("sidebar-item-trash")
         self.connect("activate", self._on_row_activated)
@@ -71,7 +71,7 @@ class TrashSidebarRow(Gtk.ListBoxRow):
             ErrandsBox(
                 spacing=12,
                 margin_start=6,
-                children=[self.icon, self.label, self.size_counter,  self.popover_menu ],
+                children=[self.icon, self.label, self.size_counter, self.popover_menu],
             )
         )
 
