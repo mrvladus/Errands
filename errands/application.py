@@ -33,16 +33,15 @@ class ErrandsApplication(Adw.Application):
         portal: Xdp.Portal = Xdp.Portal()
 
         # Request background
-        if GSettings.get("run-in-background"):
-            portal.request_background(
-                None,
-                _("Errands need to run in the background for notifications"),
-                ["errands", "--gapplication-service"],
-                Xdp.BackgroundFlags.AUTOSTART,
-                None,
-                None,
-                None,
-            )
+        portal.request_background(
+            None,
+            _("Errands need to run in the background for notifications"),
+            ["errands", "--gapplication-service"],
+            Xdp.BackgroundFlags.AUTOSTART,
+            None,
+            None,
+            None,
+        )
 
         # Run notifications daemon
         self.notification_daemon: ErrandsNotificationsDaemon = (
