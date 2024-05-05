@@ -549,10 +549,15 @@ class TodayTask(Gtk.Revealer):
         )
 
     def update_color(self) -> None:
-        for c in self.main_box.get_css_classes():
-            color = c.strip("task-")
-            self.main_box.remove_css_class(f"task-{c}")
-            self.complete_btn.remove_css_class(f"checkbtn-{c}")
+        for cls in self.main_box.get_css_classes():
+            if "task-" in cls:
+                self.main_box.remove_css_class(cls)
+                break
+        for cls in self.complete_btn.get_css_classes():
+            if "checkbtn-" in cls:
+                self.complete_btn.remove_css_class(cls)
+                break
+
         if color := self.task_data.color:
             self.main_box.add_css_class(f"task-{color}")
             self.complete_btn.add_css_class(f"checkbtn-{color}")
