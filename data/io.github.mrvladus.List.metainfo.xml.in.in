@@ -55,6 +55,7 @@
         <p>Added:</p>
         <ul>
           <li>Right-click menu instead of menu buttons on sidebar items</li>
+          <li>Accent color for task now applied for check button and progress bar</li>
           <li>Preference for disabling running the app in background</li>
         </ul>
       </description>
