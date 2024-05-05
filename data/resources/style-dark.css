@@ -7,28 +7,63 @@
     background: darker(#3584e4);
 }
 
+.task-blue progressbar progress,
+.task-blue checkbutton check:checked {
+    background-color: @blue_2;
+}
+
 .task-green {
     background: darker(#33d17a);
+}
+
+.task-green progressbar progress,
+.task-green checkbutton check:checked {
+    background-color: @green_3;
 }
 
 .task-yellow {
     background: darker(#f5c211);
 }
 
+.task-yellow progressbar progress,
+.task-yellow checkbutton check:checked {
+    background-color: @yellow_4;
+}
+
 .task-orange {
     background: darker(#ff7800);
+}
+
+.task-orange progressbar progress,
+.task-orange checkbutton check:checked {
+    background-color: @orange_2;
 }
 
 .task-red {
     background: darker(#e01b24);
 }
 
+.task-red progressbar progress,
+.task-red checkbutton check:checked {
+    background-color: @red_1;
+}
+
 .task-purple {
     background: darker(#9141ac);
 }
 
+.task-purple progressbar progress,
+.task-purple checkbutton check:checked {
+    background-color: @purple_2;
+}
+
 .task-brown {
     background: #986a44;
+}
+
+.task-brown progressbar progress,
+.task-brown checkbutton check:checked {
+    background-color: @brown_1;
 }
 
 .tag {

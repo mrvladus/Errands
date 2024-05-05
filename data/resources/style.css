@@ -49,28 +49,63 @@
   background: #dde9f7;
 }
 
+.task-blue progressbar progress,
+.task-blue checkbutton check:checked {
+  background-color: @blue_2;
+}
+
 .task-green {
   background: #daf7e0;
+}
+
+.task-green progressbar progress,
+.task-green checkbutton check:checked {
+  background-color: @green_3;
 }
 
 .task-yellow {
   background: #faf7cf;
 }
 
+.task-yellow progressbar progress,
+.task-yellow checkbutton check:checked {
+  background-color: @yellow_4;
+}
+
 .task-orange {
   background: #fce8d0;
+}
+
+.task-orange progressbar progress,
+.task-orange checkbutton check:checked {
+  background-color: @orange_2;
 }
 
 .task-red {
   background: #f9ccc7;
 }
 
+.task-red progressbar progress,
+.task-red checkbutton check:checked {
+  background-color: @red_1;
+}
+
 .task-purple {
   background: #f1d8f1;
 }
 
+.task-purple progressbar progress,
+.task-purple checkbutton check:checked {
+  background-color: @purple_2;
+}
+
 .task-brown {
   background: #ece2da;
+}
+
+.task-brown progressbar progress,
+.task-brown checkbutton check:checked {
+  background-color: @brown_2;
 }
 
 /* Accent color buttons */
@@ -183,6 +218,10 @@
 }
 
 /* Overrides */
+
+checkbutton check {
+  transition: background-color 0.2s;
+}
 
 progressbar.osd {
   background-color: @shade_color;
