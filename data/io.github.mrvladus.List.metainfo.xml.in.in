@@ -46,8 +46,16 @@
     <control>touch</control>
     <control>keyboard</control>
     <control>pointing</control>
+    <control>tablet</control>
     <internet>always</internet>
   </recommends>
+  <custom>
+    <value key="Purism::form_factor">mobile</value>
+  </custom>
+  <requires>
+    <display_length compare="ge">360</display_length>
+  </requires>
+
 
   <releases>
     <release version="46.0.3" date="2024-05-06">
