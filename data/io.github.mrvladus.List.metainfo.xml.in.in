@@ -57,6 +57,19 @@
   </requires>
 
   <releases>
+    <release version="46.0.4" date="2024-05-07">
+      <description translatable="no">
+        <p>Added:</p>
+        <ul>
+          <li>When errands updated while working in background, message will be shown to restart the app</li>
+          <li>Changed "Task is Due" notification icon</li>
+        </ul>
+        <p>Fixed:</p>
+        <ul>
+          <li>Notifications not showing correctly</li>
+        </ul>
+      </description>
+    </release>
     <release version="46.0.3" date="2024-05-05">
       <description translatable="no">
         <p>Added:</p>
