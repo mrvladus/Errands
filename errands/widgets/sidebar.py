@@ -13,7 +13,11 @@ from errands.state import State
 from errands.widgets.shared.components.boxes import ErrandsBox, ErrandsListBox
 from errands.widgets.shared.components.buttons import ErrandsButton
 from errands.widgets.shared.components.header_bar import ErrandsHeaderBar
-from errands.widgets.shared.components.menus import ErrandsMenuItem, ErrandsSimpleMenu
+from errands.widgets.shared.components.menus import (
+    ErrandsMenuItem,
+    ErrandsSectionedMenu,
+    ErrandsSimpleMenu,
+)
 from errands.widgets.shared.components.toolbar_view import ErrandsToolbarView
 from errands.widgets.shared.titled_separator import TitledSeparator
 from errands.widgets.tags.tags_sidebar_row import TagsSidebarRow
@@ -105,26 +109,38 @@ class Sidebar(Adw.Bin):
                                 primary=True,
                                 tooltip_text=_("Main Menu"),
                                 icon_name="open-menu-symbolic",
-                                menu_model=ErrandsSimpleMenu(
-                                    items=[
-                                        ErrandsMenuItem(
-                                            _("Sync / Fetch Tasks"), "app.sync"
+                                menu_model=ErrandsSectionedMenu(
+                                    sections=(
+                                        ErrandsSimpleMenu(
+                                            items=(
+                                                ErrandsMenuItem(
+                                                    _("Sync / Fetch Tasks"), "app.sync"
+                                                ),
+                                            )
                                         ),
-                                        ErrandsMenuItem(
-                                            _("Import Task List"), "app.import"
+                                        ErrandsSimpleMenu(
+                                            items=(
+                                                ErrandsMenuItem(
+                                                    _("Import Task List"), "app.import"
+                                                ),
+                                            )
                                         ),
-                                        ErrandsMenuItem(
-                                            _("Preferences"), "app.preferences"
+                                        ErrandsSimpleMenu(
+                                            items=(
+                                                ErrandsMenuItem(
+                                                    _("Preferences"), "app.preferences"
+                                                ),
+                                                ErrandsMenuItem(
+                                                    _("Keyboard Shortcuts"),
+                                                    "win.show-help-overlay",
+                                                ),
+                                                ErrandsMenuItem(
+                                                    _("About Errands"), "app.about"
+                                                ),
+                                                ErrandsMenuItem(_("Quit"), "app.quit"),
+                                            )
                                         ),
-                                        ErrandsMenuItem(
-                                            _("Keyboard Shortcuts"),
-                                            "win.show-help-overlay",
-                                        ),
-                                        ErrandsMenuItem(
-                                            _("About Errands"), "app.about"
-                                        ),
-                                        ErrandsMenuItem(_("Quit"), "app.quit"),
-                                    ]
+                                    )
                                 ),
                             ),
                             # Sync indicator

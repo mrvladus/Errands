@@ -18,3 +18,10 @@ class ErrandsSimpleMenu(Gio.Menu):
         super().__init__()
         for item in items:
             self.append(item.label, item.detailed_action)
+
+
+class ErrandsSectionedMenu(Gio.Menu):
+    def __init__(self, sections: tuple[ErrandsSimpleMenu]) -> None:
+        super().__init__()
+        for section in sections:
+            self.append_section(None, section)
