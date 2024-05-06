@@ -12,7 +12,7 @@ from errands.state import State
 
 
 class ErrandsNotificationsDaemon:
-    CHECK_INTERVAL_SEC: int = 30  # Check tasks every _ seconds
+    CHECK_INTERVAL_SEC: int = 20  # Check tasks every _ seconds
 
     def __init__(self) -> None:
         State.notifications_daemon = self
@@ -24,13 +24,16 @@ class ErrandsNotificationsDaemon:
     def due_tasks(self) -> list[TaskData]:
         """Get due tasks that haven't been notified yet"""
 
-        return [
+        now: datetime = datetime.now()
+        tasks: list[TaskData] = [
             t
             for t in UserData.tasks
             if t.due_date
-            and datetime.fromisoformat(t.due_date).now() < datetime.now()
+            and datetime.fromisoformat(t.due_date) < now
             and not t.notified
         ]
+
+        return tasks
 
     # ------ PUBLIC METHODS ------ #
 
@@ -56,6 +59,7 @@ class ErrandsNotificationsDaemon:
         Log.debug("Notifications: Check")
 
         for task in self.due_tasks:
+            print(task)
             self.__send_due_notification(task)
             UserData.update_props(task.list_uid, task.uid, ["notified"], [True])
 

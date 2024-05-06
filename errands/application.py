@@ -1,7 +1,9 @@
 # Copyright 2023-2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-from gi.repository import Adw, Gio, Xdp  # type:ignore
+import sys
+from gi.repository import Adw, Gio, Xdp
+from gi.repository.GLib import VariantDict  # type:ignore
 
 from errands.lib.data import UserData
 from errands.lib.gsettings import GSettings
@@ -20,10 +22,17 @@ class ErrandsApplication(Adw.Application):
     def __init__(self, APP_ID) -> None:
         super().__init__(
             application_id=APP_ID,
-            flags=Gio.ApplicationFlags.REPLACE,
+            flags=Gio.ApplicationFlags.DEFAULT_FLAGS,
         )
         self.set_resource_base_path("/io/github/mrvladus/Errands/")
         State.application = self
+
+    def check_reload(self) -> None:
+        portal: Xdp.Portal = Xdp.Portal()
+        is_flatpak: bool = portal.running_under_flatpak()
+
+        print(is_flatpak)
+        print(sys.argv)
 
     def run_in_background(self):
         """Create or remove autostart desktop file"""
@@ -43,11 +52,6 @@ class ErrandsApplication(Adw.Application):
             None,
         )
 
-        # Run notifications daemon
-        self.notification_daemon: ErrandsNotificationsDaemon = (
-            ErrandsNotificationsDaemon()
-        )
-
     def do_startup(self) -> None:
         Adw.Application.do_startup(self)
 
@@ -64,6 +68,9 @@ class ErrandsApplication(Adw.Application):
         # Background
         self.run_in_background()
 
+        # Start notifications daemon
+        ErrandsNotificationsDaemon()
+
         # Plugins
         # self.plugins_loader = PluginsLoader(self)
 
@@ -76,6 +83,8 @@ class ErrandsApplication(Adw.Application):
         # Main window
         State.main_window = Window(application=State.application)
         self.add_window(State.main_window)
+
+        # self.check_reload()
 
     def do_activate(self) -> None:
         Log.debug("Application: Activate")
