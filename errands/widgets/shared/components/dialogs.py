@@ -2,7 +2,9 @@
 # SPDX-License-Identifier: MIT
 
 from typing import Callable
-from gi.repository import Adw, Gio  # type:ignore
+from gi.repository import Adw, Gio
+
+from errands.state import State  # type:ignore
 
 
 class ConfirmDialog(Adw.MessageDialog):
@@ -24,7 +26,7 @@ class ConfirmDialog(Adw.MessageDialog):
         self.present()
 
     def __build_ui(self):
-        self.set_transient_for(Gio.Application.get_default().get_active_window())
+        self.set_transient_for(State.main_window)
         self.set_hide_on_close(True)
         self.set_heading(_("Are you sure?"))
         self.set_body(self.__text)

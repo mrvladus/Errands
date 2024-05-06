@@ -1,15 +1,19 @@
 # Copyright 2023-2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-import sys
-from gi.repository import Adw, Gio, Xdp
-from gi.repository.GLib import VariantDict  # type:ignore
+import os
+from subprocess import getoutput
+from time import sleep
 
+from gi.repository import Adw, Gio, GLib, Xdp  # type:ignore
+
+from __main__ import APP_ID, VERSION
 from errands.lib.data import UserData
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.notifications import ErrandsNotificationsDaemon
 from errands.lib.plugins import PluginsLoader
+from errands.lib.utils import threaded
 from errands.state import State
 from errands.widgets.shared.datetime_window import DateTimeWindow
 from errands.widgets.shared.notes_window import NotesWindow
@@ -19,7 +23,7 @@ from errands.widgets.window import Window
 class ErrandsApplication(Adw.Application):
     plugins_loader: PluginsLoader = None
 
-    def __init__(self, APP_ID) -> None:
+    def __init__(self) -> None:
         super().__init__(
             application_id=APP_ID,
             flags=Gio.ApplicationFlags.DEFAULT_FLAGS,
@@ -27,12 +31,72 @@ class ErrandsApplication(Adw.Application):
         self.set_resource_base_path("/io/github/mrvladus/Errands/")
         State.application = self
 
+    @threaded
     def check_reload(self) -> None:
+        """Check if there is newer version installed"""
+
+        TIMEOUT_SECONDS: int = 60
         portal: Xdp.Portal = Xdp.Portal()
         is_flatpak: bool = portal.running_under_flatpak()
 
-        print(is_flatpak)
-        print(sys.argv)
+        def __restart(*args):
+            """Restart the app"""
+
+            State.application.quit()
+
+            if is_flatpak:
+                cmd: str = "flatpak-spawn --host flatpak run io.github.mrvladus.List"
+            else:
+                cmd: str = "errands"
+            os.system(cmd)
+            exit()
+
+        def __inner_check() -> bool:
+            """Get installed version"""
+
+            if not GSettings.get("run-in-background"):
+                return True
+
+            try:
+                version: str = ""
+                if is_flatpak:
+                    out: str = getoutput(
+                        "flatpak-spawn --host flatpak info io.github.mrvladus.List"
+                    ).splitlines()
+                    for line in out:
+                        # TODO: Maybe use regex here
+                        if VERSION[:3] in line:
+                            version: str = line.split(" ")[-1]
+                else:
+                    version: str = (
+                        getoutput(
+                            "cat $(whereis -b errands | cut -d ' ' -f 2) | grep VERSION"
+                        )
+                        .split(" ")[-1]
+                        .strip('"')
+                    )
+                if version:
+                    # If installed version is different from running then show message
+                    if version != VERSION:
+                        restart_message = Adw.MessageDialog(
+                            heading=_("Errands was updated"),
+                            body=_("Restart is required"),
+                            transient_for=State.main_window,
+                        )
+                        restart_message.add_response("restart", _("Restart"))
+                        restart_message.set_default_response("restart")
+                        restart_message.connect("response", __restart)
+                        GLib.idle_add(restart_message.present)
+                        return False
+                    else:
+                        return True
+            except Exception:
+                return True
+
+        while True:
+            sleep(TIMEOUT_SECONDS)
+            if not __inner_check():
+                break
 
     def run_in_background(self):
         """Create or remove autostart desktop file"""
@@ -84,7 +148,7 @@ class ErrandsApplication(Adw.Application):
         State.main_window = Window(application=State.application)
         self.add_window(State.main_window)
 
-        # self.check_reload()
+        self.check_reload()
 
     def do_activate(self) -> None:
         Log.debug("Application: Activate")

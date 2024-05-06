@@ -11,6 +11,7 @@
         "--share=ipc",
         "--share=network",
         "--talk-name=org.freedesktop.secrets",
+        "--talk-name=org.freedesktop.Flatpak",
         "--talk-name=org.gnome.OnlineAccounts"
     ],
     "cleanup": [
