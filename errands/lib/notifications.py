@@ -59,7 +59,6 @@ class ErrandsNotificationsDaemon:
         Log.debug("Notifications: Check")
 
         for task in self.due_tasks:
-            print(task)
             self.__send_due_notification(task)
             UserData.update_props(task.list_uid, task.uid, ["notified"], [True])
 
