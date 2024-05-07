@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-25 18:51+0300\n"
+"POT-Creation-Date: 2024-05-07 18:25+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Chung-Wei Chung <webb790709@proton.me>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,20 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: errands/application.py:37
+#: errands/application.py:82
+msgid "Errands was updated"
+msgstr ""
+
+#: errands/application.py:83
+msgid "Restart is required"
+msgstr ""
+
+#: errands/application.py:86
+#, fuzzy
+msgid "Restart"
+msgstr "還原"
+
+#: errands/application.py:114
 msgid "Errands need to run in the background for notifications"
 msgstr ""
 
@@ -29,72 +42,72 @@ msgstr "沒有提供全部的驗證資訊。請檢查設定值。"
 msgid "Can't connect to CalDAV server at:"
 msgstr "無法連線到以下的 CalDAV 伺服器："
 
-#: errands/lib/notifications.py:69
+#: errands/lib/notifications.py:72
 #, fuzzy
 msgid "Task is Due"
 msgstr "待辦事項"
 
-#: errands/widgets/shared/components/dialogs.py:29
+#: errands/lib/utils.py:21 errands/widgets/today/today_task.py:147
+#: errands/widgets/task.py:291
+msgid "Date"
+msgstr ""
+
+#: errands/widgets/shared/components/dialogs.py:31
 msgid "Are you sure?"
 msgstr "您確定嗎？"
 
-#: errands/widgets/shared/components/dialogs.py:33
+#: errands/widgets/shared/components/dialogs.py:35
 #: errands/widgets/task_list/task_list_sidebar_row.py:97
-#: errands/widgets/today/today_task.py:119 errands/widgets/sidebar.py:342
-#: errands/widgets/task.py:253
+#: errands/widgets/today/today_task.py:115 errands/widgets/sidebar.py:293
+#: errands/widgets/task.py:246
 msgid "Cancel"
 msgstr "取消"
 
-#: errands/widgets/shared/datetime_picker.py:137
+#: errands/widgets/shared/datetime_picker.py:138
 #: errands/widgets/today/today_sidebar_row.py:30
 #: errands/widgets/today/today.py:57 errands/widgets/window.py:69
 msgid "Today"
 msgstr ""
 
-#: errands/widgets/shared/datetime_picker.py:142
+#: errands/widgets/shared/datetime_picker.py:143
 msgid "Tomorrow"
 msgstr ""
 
-#: errands/widgets/shared/datetime_picker.py:153
+#: errands/widgets/shared/datetime_picker.py:154
 msgid "Now"
 msgstr ""
 
-#: errands/widgets/shared/datetime_picker.py:159
-#: errands/widgets/trash/trash_sidebar_row.py:56
+#: errands/widgets/shared/datetime_picker.py:160
+#: errands/widgets/trash/trash_sidebar_row.py:64
 #: errands/widgets/trash/trash.py:40
 msgid "Clear"
 msgstr "清除"
 
-#: errands/widgets/shared/datetime_picker.py:209
+#: errands/widgets/shared/datetime_picker.py:210
 msgid "Set Date"
 msgstr ""
 
-#: errands/widgets/shared/datetime_picker.py:220
-#: errands/widgets/today/today_task.py:154 errands/widgets/task.py:301
-msgid "Date"
-msgstr ""
-
-#: errands/widgets/shared/datetime_window.py:31
+#: errands/widgets/shared/datetime_window.py:29
 msgid "Date and Time"
 msgstr ""
 
+#: errands/widgets/shared/datetime_window.py:39
 #: errands/widgets/shared/datetime_window.py:41
-#: errands/widgets/shared/datetime_window.py:43
 msgid "Due"
 msgstr ""
 
+#: errands/widgets/shared/datetime_window.py:54
 #: errands/widgets/shared/datetime_window.py:56
-#: errands/widgets/shared/datetime_window.py:58
 msgid "Start"
 msgstr ""
 
-#: errands/widgets/shared/notes_window.py:30
-#: errands/widgets/today/today_task.py:163 errands/widgets/task.py:310
+#: errands/widgets/shared/notes_window.py:29
+#: errands/widgets/today/today_task.py:156 errands/widgets/task.py:300
 msgid "Notes"
 msgstr ""
 
 #: errands/widgets/tags/tags_sidebar_row.py:32 errands/widgets/tags/tags.py:63
-#: errands/widgets/today/today_task.py:239 errands/widgets/task.py:386
+#: errands/widgets/today/today_task.py:231 errands/widgets/task.py:375
 #: errands/widgets/window.py:74
 msgid "Tags"
 msgstr ""
@@ -114,8 +127,8 @@ msgstr "新增待辦事項"
 
 #: errands/widgets/tags/tags.py:140
 #: errands/widgets/task_list/task_list_sidebar_row.py:58
-#: errands/widgets/task_list/task_list_sidebar_row.py:214
-#: errands/widgets/trash/trash.py:164
+#: errands/widgets/task_list/task_list_sidebar_row.py:219
+#: errands/widgets/trash/trash.py:159
 msgid "Delete"
 msgstr "刪除"
 
@@ -142,18 +155,18 @@ msgid "Export failed"
 msgstr "待辦事項已匯入"
 
 #: errands/widgets/task_list/task_list_sidebar_row.py:165
-#: errands/widgets/task.py:108
+#: errands/widgets/task.py:101
 #, fuzzy
 msgid "Exported"
 msgstr "待辦事項已匯入"
 
-#: errands/widgets/task_list/task_list_sidebar_row.py:213
+#: errands/widgets/task_list/task_list_sidebar_row.py:218
 #, fuzzy
 msgid "Rename"
 msgstr "帳號"
 
-#: errands/widgets/task_list/task_list_sidebar_row.py:215
-#: errands/widgets/today/today_task.py:278 errands/widgets/task.py:425
+#: errands/widgets/task_list/task_list_sidebar_row.py:220
+#: errands/widgets/today/today_task.py:270 errands/widgets/task.py:414
 #, fuzzy
 msgid "Export"
 msgstr "匯出待辦事項"
@@ -172,115 +185,119 @@ msgstr "刪除已完成事項"
 msgid "Scroll Up"
 msgstr "往上捲動"
 
-#: errands/widgets/task_list/task_list.py:84 errands/widgets/task.py:570
+#: errands/widgets/task_list/task_list.py:84 errands/widgets/task.py:559
 #, fuzzy
 msgid "Completed"
 msgstr "已完成："
 
-#: errands/widgets/task_list/task_list.py:143
+#: errands/widgets/task_list/task_list.py:144
 msgid "Add new Task"
 msgstr "新增待辦事項"
 
-#: errands/widgets/task_list/task_list.py:238 errands/widgets/task.py:802
+#: errands/widgets/task_list/task_list.py:156
+msgid "Loading..."
+msgstr ""
+
+#: errands/widgets/task_list/task_list.py:246 errands/widgets/task.py:793
 msgid "Completed:"
 msgstr "已完成："
 
-#: errands/widgets/today/today_task.py:91 errands/widgets/task.py:190
+#: errands/widgets/today/today_task.py:87 errands/widgets/task.py:183
 #, fuzzy
 msgid "Toggle Completion"
 msgstr "側選單開關"
 
-#: errands/widgets/today/today_task.py:100
-#: errands/widgets/today/today_task.py:269 errands/widgets/task.py:233
-#: errands/widgets/task.py:416
+#: errands/widgets/today/today_task.py:96
+#: errands/widgets/today/today_task.py:261 errands/widgets/task.py:226
+#: errands/widgets/task.py:405
 msgid "Edit"
 msgstr "編輯"
 
-#: errands/widgets/today/today_task.py:149 errands/widgets/task.py:296
+#: errands/widgets/today/today_task.py:142 errands/widgets/task.py:286
 msgid "Start / Due Date"
 msgstr ""
 
-#: errands/widgets/today/today_task.py:177 errands/widgets/task.py:324
+#: errands/widgets/today/today_task.py:169 errands/widgets/task.py:313
 msgid "Priority"
 msgstr ""
 
-#: errands/widgets/today/today_task.py:195 errands/widgets/task.py:342
+#: errands/widgets/today/today_task.py:187 errands/widgets/task.py:331
 msgid "High"
 msgstr ""
 
-#: errands/widgets/today/today_task.py:199 errands/widgets/task.py:346
+#: errands/widgets/today/today_task.py:191 errands/widgets/task.py:335
 msgid "Medium"
 msgstr ""
 
-#: errands/widgets/today/today_task.py:203 errands/widgets/task.py:350
+#: errands/widgets/today/today_task.py:195 errands/widgets/task.py:339
 msgid "Low"
 msgstr ""
 
-#: errands/widgets/today/today_task.py:205
-#: errands/widgets/today/today_task.py:297 errands/widgets/task.py:352
-#: errands/widgets/task.py:444
+#: errands/widgets/today/today_task.py:197
+#: errands/widgets/today/today_task.py:289 errands/widgets/task.py:341
+#: errands/widgets/task.py:433
 msgid "None"
 msgstr ""
 
-#: errands/widgets/today/today_task.py:208 errands/widgets/task.py:355
+#: errands/widgets/today/today_task.py:200 errands/widgets/task.py:344
 msgid "Custom"
 msgstr ""
 
-#: errands/widgets/today/today_task.py:218 errands/widgets/task.py:365
+#: errands/widgets/today/today_task.py:210 errands/widgets/task.py:354
 msgid "No Tags"
 msgstr ""
 
-#: errands/widgets/today/today_task.py:271 errands/widgets/task.py:418
+#: errands/widgets/today/today_task.py:263 errands/widgets/task.py:407
 msgid "Move to Trash"
 msgstr "移到垃圾桶"
 
-#: errands/widgets/today/today_task.py:275 errands/widgets/task.py:422
+#: errands/widgets/today/today_task.py:267 errands/widgets/task.py:411
 #, fuzzy
 msgid "Copy to Clipboard"
 msgstr "已複製到剪貼簿"
 
-#: errands/widgets/today/today_task.py:307 errands/widgets/task.py:454
+#: errands/widgets/today/today_task.py:299 errands/widgets/task.py:443
 msgid "Blue"
 msgstr ""
 
-#: errands/widgets/today/today_task.py:314 errands/widgets/task.py:461
+#: errands/widgets/today/today_task.py:306 errands/widgets/task.py:450
 msgid "Green"
 msgstr ""
 
-#: errands/widgets/today/today_task.py:321 errands/widgets/task.py:468
+#: errands/widgets/today/today_task.py:313 errands/widgets/task.py:457
 msgid "Yellow"
 msgstr ""
 
-#: errands/widgets/today/today_task.py:328 errands/widgets/task.py:475
+#: errands/widgets/today/today_task.py:320 errands/widgets/task.py:464
 msgid "Orange"
 msgstr ""
 
-#: errands/widgets/today/today_task.py:335 errands/widgets/task.py:482
+#: errands/widgets/today/today_task.py:327 errands/widgets/task.py:471
 msgid "Red"
 msgstr ""
 
-#: errands/widgets/today/today_task.py:342 errands/widgets/task.py:489
+#: errands/widgets/today/today_task.py:334 errands/widgets/task.py:478
 msgid "Purple"
 msgstr ""
 
-#: errands/widgets/today/today_task.py:349 errands/widgets/task.py:496
+#: errands/widgets/today/today_task.py:341 errands/widgets/task.py:485
 msgid "Brown"
 msgstr ""
 
-#: errands/widgets/today/today_task.py:357
-#: errands/widgets/today/today_task.py:624 errands/widgets/task.py:504
-#: errands/widgets/task.py:1220
+#: errands/widgets/today/today_task.py:349
+#: errands/widgets/today/today_task.py:621 errands/widgets/task.py:493
+#: errands/widgets/task.py:1187
 #, fuzzy
 msgid "Created:"
 msgstr "已完成："
 
-#: errands/widgets/today/today_task.py:368
-#: errands/widgets/today/today_task.py:625 errands/widgets/task.py:515
-#: errands/widgets/task.py:1221
+#: errands/widgets/today/today_task.py:360
+#: errands/widgets/today/today_task.py:622 errands/widgets/task.py:504
+#: errands/widgets/task.py:1188
 msgid "Changed:"
 msgstr ""
 
-#: errands/widgets/today/today_task.py:381 errands/widgets/task.py:528
+#: errands/widgets/today/today_task.py:373 errands/widgets/task.py:517
 msgid "More"
 msgstr ""
 
@@ -294,8 +311,8 @@ msgstr ""
 msgid "Trash"
 msgstr "關閉垃圾桶"
 
-#: errands/widgets/trash/trash_sidebar_row.py:57
-#: errands/widgets/trash/trash.py:55 errands/widgets/trash/trash.py:194
+#: errands/widgets/trash/trash_sidebar_row.py:65
+#: errands/widgets/trash/trash.py:55 errands/widgets/trash/trash.py:189
 msgid "Restore"
 msgstr "還原"
 
@@ -307,179 +324,191 @@ msgstr "清空垃圾桶"
 msgid "No deleted items"
 msgstr "沒有已刪除的項目"
 
-#: errands/widgets/trash/trash.py:163
+#: errands/widgets/trash/trash.py:158
 msgid "Tasks will be permanently deleted"
 msgstr "待辦事項將會永久刪除"
 
-#: errands/widgets/preferences.py:29
+#: errands/widgets/preferences.py:23
 msgid "Application Theme"
 msgstr "主題風格"
 
-#: errands/widgets/preferences.py:37
+#: errands/widgets/preferences.py:31
 msgid "System"
 msgstr "跟隨系統配色"
 
-#: errands/widgets/preferences.py:49
+#: errands/widgets/preferences.py:43
 msgid "Light"
 msgstr "亮色"
 
-#: errands/widgets/preferences.py:61
+#: errands/widgets/preferences.py:55
 msgid "Dark"
 msgstr "暗色"
 
 #. Task lists group
-#: errands/widgets/preferences.py:69 errands/widgets/sidebar.py:153
+#: errands/widgets/preferences.py:63 errands/widgets/sidebar.py:90
 #, fuzzy
 msgid "Task Lists"
 msgstr "待辦事項"
 
-#: errands/widgets/preferences.py:73
+#: errands/widgets/preferences.py:67
 #, fuzzy
 msgid "Add new Tasks"
 msgstr "新增待辦事項"
 
-#: errands/widgets/preferences.py:74
+#: errands/widgets/preferences.py:68
 msgid "At the Bottom"
 msgstr ""
 
-#: errands/widgets/preferences.py:74
+#: errands/widgets/preferences.py:68
 msgid "At the Top"
 msgstr ""
 
-#: errands/widgets/preferences.py:90
+#: errands/widgets/preferences.py:84
 msgid "Show Notifications"
 msgstr ""
 
-#: errands/widgets/preferences.py:94
-msgid "Notifications"
+#: errands/widgets/preferences.py:91
+msgid "Run in Background"
 msgstr ""
 
-#: errands/widgets/preferences.py:99 errands/widgets/preferences.py:153
+#: errands/widgets/preferences.py:92
+msgid "Hide the application window instead of closing it"
+msgstr ""
+
+#: errands/widgets/preferences.py:98
+msgid "Notifications and Background"
+msgstr ""
+
+#: errands/widgets/preferences.py:105 errands/widgets/preferences.py:159
 #: data/resources/gtk/help-overlay.ui:38
 msgid "Sync"
 msgstr "同步"
 
 #. Provider
-#: errands/widgets/preferences.py:102
+#: errands/widgets/preferences.py:108
 msgid "Disabled"
 msgstr "關閉"
 
-#: errands/widgets/preferences.py:104
+#: errands/widgets/preferences.py:110
 msgid "Sync Provider"
 msgstr "同步服務"
 
-#: errands/widgets/preferences.py:113
+#: errands/widgets/preferences.py:119
 msgid "Server URL"
 msgstr "伺服器 URL"
 
-#: errands/widgets/preferences.py:119
+#: errands/widgets/preferences.py:125
 msgid "Username"
 msgstr "帳號"
 
-#: errands/widgets/preferences.py:125
+#: errands/widgets/preferences.py:131
 msgid "Password"
 msgstr "密碼"
 
-#: errands/widgets/preferences.py:131
+#: errands/widgets/preferences.py:137
 msgid "Test"
 msgstr "測試"
 
-#: errands/widgets/preferences.py:136
+#: errands/widgets/preferences.py:142
 msgid "Test Connection"
 msgstr "測試連線"
 
-#: errands/widgets/preferences.py:144 data/resources/gtk/help-overlay.ui:9
+#: errands/widgets/preferences.py:150 data/resources/gtk/help-overlay.ui:9
 msgid "General"
 msgstr "一般功能"
 
-#: errands/widgets/preferences.py:189
+#: errands/widgets/preferences.py:195
 msgid "Connected"
 msgstr ""
 
-#: errands/widgets/preferences.py:189
+#: errands/widgets/preferences.py:195
 msgid "Can't connect"
 msgstr ""
 
-#: errands/widgets/sidebar.py:106
+#: errands/widgets/sidebar.py:42
 msgid "Add List (Ctrl+A)"
 msgstr ""
 
-#: errands/widgets/sidebar.py:122
+#: errands/widgets/sidebar.py:58
 msgid "Syncing..."
 msgstr ""
 
-#: errands/widgets/sidebar.py:127
+#: errands/widgets/sidebar.py:63
 #, fuzzy
 msgid "Add new List"
 msgstr "新增待辦事項"
 
-#: errands/widgets/sidebar.py:128
+#: errands/widgets/sidebar.py:64
 msgid "Click \"+\" button"
 msgstr ""
 
-#: errands/widgets/sidebar.py:165 errands/widgets/window.py:45
+#: errands/widgets/sidebar.py:102 errands/widgets/window.py:45
 #: errands/widgets/window.py:150 data/io.github.mrvladus.List.desktop.in.in:3
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:31
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:6
 msgid "Errands"
 msgstr ""
 
-#: errands/widgets/sidebar.py:173
+#: errands/widgets/sidebar.py:110
 msgid "Main Menu"
 msgstr "主選單"
 
-#: errands/widgets/sidebar.py:178 data/resources/gtk/help-overlay.ui:42
+#: errands/widgets/sidebar.py:117 data/resources/gtk/help-overlay.ui:42
 #, fuzzy
 msgid "Sync / Fetch Tasks"
 msgstr "同步待辦事項"
 
-#: errands/widgets/sidebar.py:181
+#: errands/widgets/sidebar.py:124
 #, fuzzy
 msgid "Import Task List"
 msgstr "匯入待辦事項"
 
-#: errands/widgets/sidebar.py:184 data/resources/gtk/help-overlay.ui:20
+#: errands/widgets/sidebar.py:131 data/resources/gtk/help-overlay.ui:20
 msgid "Preferences"
 msgstr "偏好設定"
 
-#: errands/widgets/sidebar.py:187
+#: errands/widgets/sidebar.py:134
 msgid "Keyboard Shortcuts"
 msgstr "鍵盤快捷鍵"
 
-#: errands/widgets/sidebar.py:191
+#: errands/widgets/sidebar.py:138
 msgid "About Errands"
 msgstr "關於 Errands"
 
-#: errands/widgets/sidebar.py:333
+#: errands/widgets/sidebar.py:140 data/resources/gtk/help-overlay.ui:27
+msgid "Quit"
+msgstr "離開"
+
+#: errands/widgets/sidebar.py:284
 msgid "New List Name"
 msgstr ""
 
-#: errands/widgets/sidebar.py:337 data/resources/gtk/help-overlay.ui:57
+#: errands/widgets/sidebar.py:288 data/resources/gtk/help-overlay.ui:57
 msgid "Add List"
 msgstr ""
 
-#: errands/widgets/sidebar.py:343
+#: errands/widgets/sidebar.py:294
 msgid "Add"
 msgstr ""
 
-#: errands/widgets/task.py:116
+#: errands/widgets/task.py:109
 msgid "Copied to Clipboard"
 msgstr "已複製到剪貼簿"
 
-#: errands/widgets/task.py:182
+#: errands/widgets/task.py:175
 #, fuzzy
 msgid "Toggle Sub-Tasks"
 msgstr "新增子項目"
 
-#: errands/widgets/task.py:220
+#: errands/widgets/task.py:213
 #, fuzzy
 msgid "Toggle Toolbar"
 msgstr "側選單開關"
 
-#: errands/widgets/task.py:594
+#: errands/widgets/task.py:583
 msgid "Add new Sub-Task"
 msgstr "新增子項目"
 
-#: errands/widgets/task.py:1331
+#: errands/widgets/task.py:1289
 #, fuzzy
 msgid "Delete Tag"
 msgstr "已刪除的待辦事項"
@@ -515,11 +544,11 @@ msgstr "匯入待辦事項"
 msgid "translator-credits"
 msgstr "翻譯者名單"
 
-#: errands/widgets/window.py:162
+#: errands/widgets/window.py:161
 msgid "Sync is disabled"
 msgstr ""
 
-#: errands/widgets/window.py:245
+#: errands/widgets/window.py:246
 #, fuzzy
 msgid "Imported"
 msgstr "待辦事項已匯入"
@@ -527,10 +556,6 @@ msgstr "待辦事項已匯入"
 #: data/resources/gtk/help-overlay.ui:13
 msgid "Show keyboard shortcuts"
 msgstr "顯示鍵盤快捷鍵"
-
-#: data/resources/gtk/help-overlay.ui:27
-msgid "Quit"
-msgstr "離開"
 
 #: data/resources/gtk/help-overlay.ui:53
 msgid "Lists"
@@ -551,7 +576,7 @@ msgid "Toggle Details"
 msgstr "側選單開關"
 
 #: data/io.github.mrvladus.List.desktop.in.in:4
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:32
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:7
 msgid "Manage your tasks"
 msgstr "管理待辦事項"
 
@@ -560,42 +585,46 @@ msgstr "管理待辦事項"
 msgid "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
 msgstr "errands;待辦事項;清單;工作項目;todos;"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:34
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:12
 msgid "Todo application for those who prefer simplicity."
 msgstr "為簡潔而生的待辦事項軟體"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:35
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:13
 msgid "Features:"
 msgstr "功能："
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:37
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:15
 msgid "Multiple task lists support"
 msgstr ""
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:38
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:16
 msgid "Add, remove, edit tasks and sub-tasks"
 msgstr "新增、移除、編輯待辦事項和子項目"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:39
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:17
 msgid "Mark task and sub-tasks as completed"
 msgstr "把待辦事項和子項目標記爲已完成"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:40
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:18
 msgid "Add accent color for each task"
 msgstr "為每個待辦事項新增強調色"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:41
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:19
 msgid "Sync tasks with Nextcloud or other CalDAV providers"
 msgstr "透過 Nextcloud 或其他 CalDAV 服務同步待辦事項"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:42
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:20
 msgid "Drag and Drop support"
 msgstr "支援拖拉"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:43
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:21
 #, fuzzy
 msgid "Import .ics files"
 msgstr "匯入待辦事項"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:41
+msgid "Main Window View"
+msgstr ""
 
 #, fuzzy
 #~ msgid "Complete Button Size"
