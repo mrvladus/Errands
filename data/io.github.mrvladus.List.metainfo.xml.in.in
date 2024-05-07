@@ -67,6 +67,10 @@
         <ul>
           <li>Notifications not showing correctly</li>
         </ul>
+        <p>Translations:</p>
+        <ul>
+          <li>Updated Japanese translation (Lemon73)</li>
+        </ul>
       </description>
     </release>
     <release version="46.0.3" date="2024-05-05">
