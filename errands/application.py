@@ -86,8 +86,10 @@ class ErrandsApplication(Adw.Application):
                         restart_message.add_response("restart", _("Restart"))
                         restart_message.set_default_response("restart")
                         restart_message.connect("response", __restart)
-                        GLib.idle_add(State.main_window.show)
-                        GLib.idle_add(restart_message.present)
+                        if State.main_window.get_visible():
+                            GLib.idle_add(restart_message.present)
+                        else:
+                            GLib.idle_add(__restart)
                         return False
                     else:
                         return True
