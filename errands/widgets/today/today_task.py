@@ -3,10 +3,10 @@
 
 from __future__ import annotations
 
+import datetime
+from typing import TYPE_CHECKING, Any
 
-from datetime import datetime
-from typing import Any, TYPE_CHECKING
-from gi.repository import Adw, Gtk, Gio, GLib, GObject  # type:ignore
+from gi.repository import Adw, Gio, GLib, GObject, Gtk  # type:ignore
 
 from errands.lib.data import TaskData, UserData
 from errands.lib.logging import Log
@@ -21,8 +21,7 @@ from errands.widgets.shared.components.boxes import (
 )
 from errands.widgets.shared.components.buttons import ErrandsButton, ErrandsCheckButton
 from errands.widgets.shared.titled_separator import TitledSeparator
-from errands.widgets.task import TagsListItem, Task
-from errands.widgets.task import Tag
+from errands.widgets.task import Tag, TagsListItem, Task
 from errands.widgets.task_list.task_list import TaskList
 
 if TYPE_CHECKING:
@@ -480,7 +479,7 @@ class TodayTask(Gtk.Revealer):
         for prop in props:
             if prop not in local_props:
                 props.append("changed_at")
-                values.append(datetime.now().strftime("%Y%m%dT%H%M%S"))
+                values.append(datetime.datetime.now().strftime("%Y%m%dT%H%M%S"))
                 break
         UserData.update_props(self.list_uid, self.uid, props, values)
         # Update linked today task
@@ -530,8 +529,8 @@ class TodayTask(Gtk.Revealer):
         )
         self.date_time_btn.remove_css_class("error")
         if (
-            datetime.fromisoformat(self.task_data.due_date).date()
-            < datetime.today().date()
+            datetime.datetime.fromisoformat(self.task_data.due_date).date()
+            < datetime.datetime.today().date()
         ):
             self.date_time_btn.add_css_class("error")
 
@@ -618,12 +617,12 @@ class TodayTask(Gtk.Revealer):
             return
 
         # Update dates
-        created_date: str = datetime.fromisoformat(self.task_data.created_at).strftime(
-            "%Y.%m.%d %H:%M:%S"
-        )
-        changed_date: str = datetime.fromisoformat(self.task_data.changed_at).strftime(
-            "%Y.%m.%d %H:%M:%S"
-        )
+        created_date: str = datetime.datetime.fromisoformat(
+            self.task_data.created_at
+        ).strftime("%Y.%m.%d %H:%M:%S")
+        changed_date: str = datetime.datetime.fromisoformat(
+            self.task_data.changed_at
+        ).strftime("%Y.%m.%d %H:%M:%S")
         self.created_label.set_label(_("Created:") + " " + created_date)
         self.changed_label.set_label(_("Changed:") + " " + changed_date)
 
