@@ -36,6 +36,7 @@ class UpdateUIArgs:
 class SyncProviderCalDAV:
     can_sync: bool = False
     calendars: list[Calendar] = None
+    err: Exception = None
 
     def __init__(self, testing: bool, name: str = "CalDAV") -> bool:
         Log.info(f"Sync: Initialize '{name}' sync provider")
@@ -47,7 +48,7 @@ class SyncProviderCalDAV:
             return
 
         self._check_url()
-        return self._connect()
+        self._connect()
 
     def _check_credentials(self) -> bool:
         Log.debug("Sync: Checking credentials")
@@ -75,6 +76,7 @@ class SyncProviderCalDAV:
 
     def _connect(self) -> bool:
         Log.debug("Sync: Attempting connection")
+        self.err = None
 
         urllib3.disable_warnings()
 
@@ -95,13 +97,17 @@ class SyncProviderCalDAV:
                 ]
             except Exception as e:
                 time.sleep(2)
+                self.err = e
+
                 Log.error(
                     f"Sync: Can't connect to {self.name} server at '{self.url}'. {e}"
                 )
+
                 if not self.testing:
                     State.main_window.add_toast(
                         _("Can't connect to CalDAV server at:") + " " + self.url
                     )
+
 
     def __get_tasks(self, calendar: Calendar) -> list[TaskData]:
         """

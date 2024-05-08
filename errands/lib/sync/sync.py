@@ -56,7 +56,8 @@ class Sync:
             GLib.idle_add(State.sidebar.sync_indicator.set_visible, False)
             self.syncing = False
 
+    # TODO: Needs to be threaded to not block UI
     @classmethod
-    def test_connection(self) -> bool:
+    def test_connection(self) -> tuple:
         self.init(testing=True)
-        return self.provider.can_sync
+        return self.provider.can_sync, self.provider.err

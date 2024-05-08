@@ -6,6 +6,8 @@ from gi.repository import Adw, Gtk  # type:ignore
 from errands.lib.goa import get_goa_credentials
 from errands.lib.gsettings import GSettings
 from errands.lib.sync.sync import Sync
+from caldav.lib import error
+from requests import exceptions
 from errands.widgets.shared.components.buttons import ErrandsButton
 
 
@@ -191,8 +193,19 @@ class PreferencesWindow(Adw.PreferencesDialog):
             GSettings.set_secret(account, self.sync_password.props.text)
 
     def on_test_connection_btn_clicked(self, _btn) -> None:
-        res: bool = Sync.test_connection()
-        msg: str = _("Connected") if res else _("Can't connect")
+        res, err = Sync.test_connection()
+        msg: str = _("Connected")
+        if not res:
+            match type(err):
+                case error.AuthorizationError:
+                    msg: str = _("Authorization failed")
+                case exceptions.ConnectionError:
+                    msg: str = _("Could not locate server")
+                case error.PropfindError:
+                    msg: str = _("Can't connect")
+                case _: # NOTE: Also catches invalid credentials
+                    msg: str = _("Can't connect. Check credentials")
+
         toast: Adw.Toast = Adw.Toast(title=msg, timeout=2)
         self.add_toast(toast)
 
