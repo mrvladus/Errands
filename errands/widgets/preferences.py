@@ -200,10 +200,10 @@ class PreferencesWindow(Adw.PreferencesDialog):
                 case error.AuthorizationError:
                     msg: str = _("Authorization failed")
                 case exceptions.ConnectionError:
-                    msg: str = _("Could not locate server")
+                    msg: str = _("Could not locate server. Check network and url.")
                 case error.PropfindError:
                     msg: str = _("Can't connect")
-                case _: # NOTE: Also catches invalid credentials
+                case _:  # NOTE: Also catches invalid credentials
                     msg: str = _("Can't connect. Check credentials")
 
         toast: Adw.Toast = Adw.Toast(title=msg, timeout=2)
