@@ -184,14 +184,14 @@ class Window(Adw.ApplicationWindow):
                         task: TaskData = TaskData(
                             color=str(todo.get("x-errands-color", "")),
                             completed=str(todo.get("status", "")) == "COMPLETED",
-                            expanded=bool(todo.get("x-errands-expanded", False)),
+                            expanded=bool(int(todo.get("x-errands-expanded", 0))),
                             notes=str(todo.get("description", "")),
                             parent=str(todo.get("related-to", "")),
                             percent_complete=int(todo.get("percent-complete", 0)),
                             priority=int(todo.get("priority", 0)),
                             text=str(todo.get("summary", "")),
                             toolbar_shown=bool(
-                                todo.get("x-errands-toolbar-shown", False)
+                                int(todo.get("x-errands-toolbar-shown", 0))
                             ),
                             uid=str(todo.get("uid", "")),
                             list_uid=new_list.uid,

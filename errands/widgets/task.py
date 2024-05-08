@@ -82,8 +82,6 @@ class Task(Gtk.Revealer):
                 if self.task_data.tags:
                     event.add("categories", self.task_data.tags)
                 event.add("percent-complete", self.task_data.percent_complete)
-                if self.task_data.color:
-                    event.add("x-errands-color", self.task_data.color)
                 event.add(
                     "dtstart",
                     (
@@ -94,6 +92,9 @@ class Task(Gtk.Revealer):
                 )
                 if self.task_data.due_date:
                     event.add("dtend", datetime.fromisoformat(self.task_data.due_date))
+                event.add("x-errands-toolbar-shown", int(self.task_data.toolbar_shown))
+                event.add("x-errands-expanded", int(self.task_data.expanded))
+                event.add("x-errands-color", self.task_data.color)
                 calendar.add_component(event)
 
                 with open(file.get_path(), "wb") as f:

@@ -153,6 +153,10 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
                                 else datetime.now()
                             ),
                         )
+
+                    event.add("x-errands-toolbar-shown", int(task.toolbar_shown))
+                    event.add("x-errands-expanded", int(task.expanded))
+                    event.add("x-errands-color", task.color)
                     calendar.add_component(event)
 
                 try:
