@@ -108,7 +108,6 @@ class SyncProviderCalDAV:
                         _("Can't connect to CalDAV server at:") + " " + self.url
                     )
 
-
     def __get_tasks(self, calendar: Calendar) -> list[TaskData]:
         """
         Get todos from calendar and convert them to TaskData list
@@ -127,7 +126,7 @@ class SyncProviderCalDAV:
                     else False
                 ),
                 expanded=bool(
-                    int(todo.icalendar_component.get("x-errands-expanded", 0))
+                    int(todo.icalendar_component.get("x-errands-expanded", "0"))
                 ),
                 notes=str(todo.icalendar_component.get("description", "")),
                 parent=str(todo.icalendar_component.get("related-to", "")),
@@ -137,7 +136,7 @@ class SyncProviderCalDAV:
                 priority=int(todo.icalendar_component.get("priority", 0)),
                 text=str(todo.icalendar_component.get("summary", "")),
                 toolbar_shown=bool(
-                    int(todo.icalendar_component.get("x-errands-toolbar-shown", 0))
+                    int(todo.icalendar_component.get("x-errands-toolbar-shown", "0"))
                 ),
                 uid=str(todo.icalendar_component.get("uid", "")),
                 list_uid=calendar.id,
@@ -453,8 +452,10 @@ class SyncProviderCalDAV:
             )
             todo.icalendar_component["related-to"] = task.parent
             todo.icalendar_component["x-errands-color"] = task.color
-            todo.icalendar_component["x-errands-toolbar-shown"] = task.toolbar_shown
-            todo.icalendar_component["x-errands-expanded"] = task.expanded
+            todo.icalendar_component["x-errands-toolbar-shown"] = int(
+                task.toolbar_shown
+            )
+            todo.icalendar_component["x-errands-expanded"] = int(task.expanded)
             todo.complete() if task.completed else todo.uncomplete()
             todo.save()
             UserData.update_props(calendar.id, task.uid, ["synced"], [True])
@@ -484,8 +485,8 @@ class SyncProviderCalDAV:
                 summary=task.text,
                 uid=task.uid,
                 x_errands_color=task.color,
-                x_errands_expanded=task.expanded,
-                x_errands_toolbar_shown=task.toolbar_shown,
+                x_errands_expanded=int(task.expanded),
+                x_errands_toolbar_shown=int(task.toolbar_shown),
             )
             if task.completed:
                 new_todo.complete()

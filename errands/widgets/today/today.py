@@ -77,7 +77,7 @@ class Today(Adw.Bin):
             if not t.deleted
             and not t.trash
             and t.due_date
-            and datetime.fromisoformat(t.due_date).date() == datetime.today().date()
+            and datetime.fromisoformat(t.due_date).date() <= datetime.today().date()
         ]
 
     # ------ PUBLIC METHODS ------ #
