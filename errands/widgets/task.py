@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime  # type:ignore
 from typing import TYPE_CHECKING, Any
 
 from gi.repository import Adw, Gdk, Gio, GLib, GObject, Gtk  # type:ignore

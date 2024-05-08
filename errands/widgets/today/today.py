@@ -89,10 +89,11 @@ class Today(Adw.Bin):
     def update_status(self):
         """Update status and counter"""
 
-        length: int = len(self.tasks_data)
-        self.status_page.set_visible(length == 0)
+        total: int = len(self.tasks_data)
+        completed: int = len([t for t in self.tasks_data if t.completed])
+        self.status_page.set_visible(total == 0)
         State.today_sidebar_row.size_counter.set_label(
-            "" if length == 0 else str(length)
+            f"{completed} / {total}" if total > 0 else ""
         )
 
     def update_ui(self):

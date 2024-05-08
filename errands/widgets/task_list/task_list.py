@@ -247,7 +247,9 @@ class TaskList(Adw.Bin):
         )
 
         # Update sidebar item counter
-        self.sidebar_row.size_counter.set_label(str(n_total) if n_total > 0 else "")
+        self.sidebar_row.size_counter.set_label(
+            f"{n_completed} / {n_total}" if n_total > 0 else ""
+        )
 
         # Update delete completed button
         self.delete_completed_btn.set_sensitive(n_completed > 0)
