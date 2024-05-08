@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-07 18:25+0300\n"
-"PO-Revision-Date: 2024-05-03 21:19+0200\n"
+"PO-Revision-Date: 2024-05-08 20:30+0200\n"
 "Last-Translator: Otmar Grünn <ogruenn@me.com>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -23,16 +23,15 @@ msgstr ""
 
 #: errands/application.py:82
 msgid "Errands was updated"
-msgstr ""
+msgstr "Errands wurde aktualisiert"
 
 #: errands/application.py:83
 msgid "Restart is required"
-msgstr ""
+msgstr "Neustart ist erforderlich"
 
 #: errands/application.py:86
-#, fuzzy
 msgid "Restart"
-msgstr "Wiederherstellen"
+msgstr "Neustart"
 
 #: errands/application.py:114
 msgid "Errands need to run in the background for notifications"
@@ -191,9 +190,8 @@ msgid "Add new Task"
 msgstr "Neue Aufgabe hinzufügen"
 
 #: errands/widgets/task_list/task_list.py:156
-#, fuzzy
 msgid "Loading..."
-msgstr "Synchronisiere …"
+msgstr "Lade …"
 
 #: errands/widgets/task_list/task_list.py:246 errands/widgets/task.py:793
 msgid "Completed:"
@@ -360,16 +358,15 @@ msgstr "Benachrichtigungen anzeigen"
 
 #: errands/widgets/preferences.py:91
 msgid "Run in Background"
-msgstr ""
+msgstr "Im Hintergrund laufen"
 
 #: errands/widgets/preferences.py:92
 msgid "Hide the application window instead of closing it"
-msgstr ""
+msgstr "Blendet das Anwendungsfenster aus anstatt es zu schließen"
 
 #: errands/widgets/preferences.py:98
-#, fuzzy
 msgid "Notifications and Background"
-msgstr "Benachrichtigungen"
+msgstr "Benachrichtigungen und Hintergrundeinstellungen"
 
 #: errands/widgets/preferences.py:105 errands/widgets/preferences.py:159
 #: data/resources/gtk/help-overlay.ui:38
@@ -489,7 +486,7 @@ msgstr "Unteraufgaben ein-/ausblenden"
 
 #: errands/widgets/task.py:213
 msgid "Toggle Toolbar"
-msgstr "Seitenleiste ein-/ausblenden"
+msgstr "Werkzeugleiste ein-/ausblenden"
 
 #: errands/widgets/task.py:583
 msgid "Add new Sub-Task"
@@ -512,7 +509,6 @@ msgid "No Task Lists"
 msgstr "Keine Aufgabenlisten"
 
 #: errands/widgets/window.py:93
-#, fuzzy
 msgid "Create new or import existing one"
 msgstr "Neue erstellen oder bestehende importieren"
 
@@ -566,9 +562,8 @@ msgid "Manage your tasks"
 msgstr "Verwalten Sie Ihre Aufgaben"
 
 #: data/io.github.mrvladus.List.desktop.in.in:10
-#, fuzzy
 msgid "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
-msgstr "errands;tasks;list;todo;todos;Erledigungen;Aufgaben;Listen;"
+msgstr "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:12
 msgid "Todo application for those who prefer simplicity."
@@ -608,7 +603,7 @@ msgstr ".ics Dateien importieren"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:41
 msgid "Main Window View"
-msgstr ""
+msgstr "Hauptfenster"
 
 #~ msgid "Not Set"
 #~ msgstr "Nicht gesetzt"
