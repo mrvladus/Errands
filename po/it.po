@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version:  errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-07 18:25+0300\n"
-"PO-Revision-Date: 2024-04-28 14:31+0100\n"
+"PO-Revision-Date: 2024-05-09 10:31+0100\n"
 "Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
 "Language-Team: Italian <LL@li.org>\n"
 "Language: it\n"
@@ -20,16 +20,15 @@ msgstr ""
 
 #: errands/application.py:82
 msgid "Errands was updated"
-msgstr ""
+msgstr "Errands è stato aggiornato"
 
 #: errands/application.py:83
 msgid "Restart is required"
-msgstr ""
+msgstr "È richiesto il riavvio"
 
 #: errands/application.py:86
-#, fuzzy
 msgid "Restart"
-msgstr "Ripristina"
+msgstr "Riavvia"
 
 #: errands/application.py:114
 msgid "Errands need to run in the background for notifications"
@@ -188,9 +187,8 @@ msgid "Add new Task"
 msgstr "Aggiungi nuova attività"
 
 #: errands/widgets/task_list/task_list.py:156
-#, fuzzy
 msgid "Loading..."
-msgstr "Sincronizzazione..."
+msgstr "Caricamento..."
 
 #: errands/widgets/task_list/task_list.py:246 errands/widgets/task.py:793
 msgid "Completed:"
@@ -357,16 +355,15 @@ msgstr "Mostra notifiche"
 
 #: errands/widgets/preferences.py:91
 msgid "Run in Background"
-msgstr ""
+msgstr "Esegui in background"
 
 #: errands/widgets/preferences.py:92
 msgid "Hide the application window instead of closing it"
-msgstr ""
+msgstr "Nascondi la finestra dell'applicazione invece di chiuderla"
 
 #: errands/widgets/preferences.py:98
-#, fuzzy
 msgid "Notifications and Background"
-msgstr "Notifiche"
+msgstr "Notifiche e background"
 
 #: errands/widgets/preferences.py:105 errands/widgets/preferences.py:159
 #: data/resources/gtk/help-overlay.ui:38
@@ -601,7 +598,7 @@ msgstr "Importa  file .ics"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:41
 msgid "Main Window View"
-msgstr ""
+msgstr "Vista della finestra principale"
 
 #~ msgid "Not Set"
 #~ msgstr "Non impostato"
