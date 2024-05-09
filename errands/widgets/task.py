@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime  # type:ignore
+from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
 from gi.repository import Adw, Gdk, Gio, GLib, GObject, Gtk  # type:ignore
@@ -820,6 +820,12 @@ class Task(Gtk.Revealer):
         self.date_time_btn.get_child().props.label = get_human_datetime(
             self.task_data.due_date
         )
+        self.date_time_btn.remove_css_class("error")
+        if (
+            datetime.fromisoformat(self.task_data.due_date).date()
+            < datetime.today().date()
+        ):
+            self.date_time_btn.add_css_class("error")
 
         # Update notes button css
         if self.task_data.notes:
