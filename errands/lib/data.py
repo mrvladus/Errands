@@ -3,12 +3,12 @@
 
 from __future__ import annotations
 
-from copy import deepcopy
 import datetime
 import json
 import os
 import shutil
 import sqlite3
+from copy import deepcopy
 from dataclasses import asdict, dataclass, field
 from queue import Empty, Queue
 from threading import Thread
@@ -41,6 +41,45 @@ class TaskListData:
     show_completed: bool = True
     synced: bool = False
     uid: str = ""
+
+    def to_ical(self, single_task: str = None) -> str:
+        """Build VTODO iCal component from TaskData properties"""
+
+        ical: str = ""
+        ical += "BEGIN:VCALENDAR\n"
+        ical += "VERSION:2.0\n"
+        ical += "PROID:-//Errands\n"
+        ical += f"X-WR-CALNAME:{self.name}\n"
+        ical += f"X-APPLE-CALENDAR-COLOR:{self.color}\n"
+        ical += f"X-ERRANDS-LIST-UID:{self.uid}\n"
+
+        if single_task:
+            ical += single_task
+        else:
+            for task in UserData.get_tasks_as_dicts(self.uid):
+                ical += task.to_ical()
+
+        ical += "END:VCALENDAR"
+
+        return ical
+
+    @staticmethod
+    def from_ical(ical: str | bytes) -> TaskListData:
+        ical: str = str(ical)
+        new_task_list: TaskListData = TaskListData()
+
+        assert ical != ""
+
+        for line in ical.split("BEGIN:")[1].splitlines():
+            prop: str = line.split(":")[0]
+            value: str = line.split(":")[-1]
+
+            if "X-WR-CALNAME" in prop:
+                new_task_list.name = value
+            elif "X-APPLE-CALENDAR-COLOR" in prop:
+                new_task_list.color = value
+
+        return new_task_list
 
 
 @dataclass
@@ -75,6 +114,84 @@ class TaskData:
             self.created_at = now
         if not self.changed_at:
             self.changed_at = now
+
+    def to_ical(self, as_calendar: bool = False) -> str:
+        """Build VTODO iCal component from TaskData properties"""
+
+        ical: str = ""
+        ical += "BEGIN:VTODO\n"
+        ical += f"X-ERRANDS-COLOR:{self.color}\n"
+        ical += f"STATUS:{"COMPLETED" if self.completed else "NEEDS-ACTION"}\n"
+        ical += f"LAST-MODIFIED:{self.changed_at}\n"
+        ical += f"DTSTAMP:{self.created_at}\n"
+        ical += f"DUE:{self.due_date}\n"
+        ical += f"X-ERRANDS-EXPANDED:{int(self.expanded)}\n"
+        ical += f"DESCRIPTION:{self.notes}\n"
+        ical += f"RELATED-TO:{self.parent}\n"
+        ical += f"PERCENT-COMPLETE:{self.percent_complete}\n"
+        ical += f"PRIORITY:{self.priority}\n"
+        ical += f"DTSTART:{self.start_date}\n"
+        ical += f"CATEGORIES:{','.join(self.tags)}\n"
+        ical += f"SUMMARY:{self.text}\n"
+        ical += f"X-ERRANDS-TOOLBAR-SHOWN:{int(self.toolbar_shown)}\n"
+        ical += f"UID:{self.uid}\n"
+        ical += "END:VTODO\n"
+
+        if as_calendar:
+            return UserData.get_list(self.list_uid).to_ical(ical)
+
+        return ical
+
+    @staticmethod
+    def from_ical(ical: str | bytes, list_uid: str) -> TaskData:
+        """Build TaskData from iCal string"""
+
+        ical: str = str(ical)
+        task: TaskData = TaskData(list_uid=list_uid)
+
+        assert ical != ""
+
+        ical = ical[ical.find("BEGIN:VTODO") : ical.find("END:VTODO")]
+        for line in ical.splitlines():
+            prop: str = line.split(":")[0]
+            value: str = line.split(":")[-1]
+
+            if "DTSTAMP" in prop:
+                task.created_at = value.strip("Z")
+            elif "LAST-MODIFIED" in prop:
+                task.changed_at = value.strip("Z")
+            elif "PERCENT-COMPLETE" in prop:
+                task.percent_complete = int(value)
+            elif "PRIORITY" in prop:
+                task.priority = int(value)
+            elif "RELATED-TO" in prop:
+                task.parent = value
+            elif "STATUS" in prop:
+                task.completed = True if value == "COMPLETED" else False
+            elif "SUMMARY" in prop:
+                task.text = value
+            elif "UID" in prop:
+                task.uid = value
+            elif "DUE" in prop:
+                task.due_date = value.strip("Z")
+                if task.due_date and "T" not in task.due_date:
+                    task.due_date += "T000000"
+            elif "DTSTART" in prop:
+                task.start_date = value.strip("Z")
+                if task.start_date and "T" not in task.start_date:
+                    task.start_date += "T000000"
+            elif "DESCRIPTION" in prop:
+                task.notes = value
+            elif "CATEGORIES" in prop:
+                task.tags = value.split(",") if value else []
+            elif "X-ERRANDS-COLOR" in prop:
+                task.notes = value
+            elif "X-ERRANDS-EXPANDED" in prop:
+                task.notes = bool(int(value))
+            elif "X-ERRANDS-TOOLBAR-SHOWN" in prop:
+                task.notes = bool(int(value))
+
+        return task
 
 
 class UserDataJSON:
@@ -143,6 +260,12 @@ class UserDataJSON:
         self.task_lists = data
 
         return new_list
+
+    def get_list(self, list_uid: str) -> TaskListData | None:
+        for list in self.get_lists_as_dicts():
+            if list.uid == list_uid:
+                return list
+        return None
 
     def add_task(self, **kwargs) -> TaskData:
         data: list[TaskData] = self.tasks

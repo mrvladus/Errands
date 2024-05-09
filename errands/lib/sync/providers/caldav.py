@@ -113,91 +113,13 @@ class SyncProviderCalDAV:
         Get todos from calendar and convert them to TaskData list
         """
 
-        # try:
-        Log.debug(f"Sync: Getting tasks for list '{calendar.id}'")
-        todos: list[Todo] = calendar.todos(include_completed=True)
-        tasks: list[TaskData] = []
-        for todo in todos:
-            task: TaskData = TaskData(
-                color=str(todo.icalendar_component.get("x-errands-color", "")),
-                completed=(
-                    True
-                    if todo.icalendar_component.get("status", "") == "COMPLETED"
-                    else False
-                ),
-                expanded=bool(
-                    int(todo.icalendar_component.get("x-errands-expanded", "0"))
-                ),
-                notes=str(todo.icalendar_component.get("description", "")),
-                parent=str(todo.icalendar_component.get("related-to", "")),
-                percent_complete=int(
-                    todo.icalendar_component.get("percent-complete", 0)
-                ),
-                priority=int(todo.icalendar_component.get("priority", 0)),
-                text=str(todo.icalendar_component.get("summary", "")),
-                toolbar_shown=bool(
-                    int(todo.icalendar_component.get("x-errands-toolbar-shown", "0"))
-                ),
-                uid=str(todo.icalendar_component.get("uid", "")),
-                list_uid=calendar.id,
-            )
-
-            # Set tags
-            if (tags := todo.icalendar_component.get("categories", "")) != "":
-                task.tags = [
-                    i.to_ical().decode("utf-8")
-                    for i in (tags if isinstance(tags, list) else tags.cats)
-                ]
-            else:
-                task.tags = []
-
-            # Set dates
-
-            if todo.icalendar_component.get("due", "") != "":
-                task.due_date = (
-                    todo.icalendar_component.get("due", "")
-                    .to_ical()
-                    .decode("utf-8")
-                    .strip("Z")
-                )
-                if task.due_date and "T" not in task.due_date:
-                    task.due_date += "T000000"
-            else:
-                task.due_date = ""
-
-            if todo.icalendar_component.get("dtstart", "") != "":
-                task.start_date = (
-                    todo.icalendar_component.get("dtstart", "")
-                    .to_ical()
-                    .decode("utf-8")
-                    .strip("Z")
-                )
-                if task.start_date and "T" not in task.start_date:
-                    task.start_date += "T000000"
-            else:
-                task.start_date = ""
-
-            if todo.icalendar_component.get("dtstamp", "") != "":
-                task.created_at = (
-                    todo.icalendar_component.get("dtstamp", "")
-                    .to_ical()
-                    .decode("utf-8")
-                    .strip("Z")
-                )
-            else:
-                task.created_at = ""
-
-            last_modified = todo.icalendar_component.get("LAST-MODIFIED", "")
-            if last_modified != "":
-                task.changed_at = last_modified.to_ical().decode("utf-8").strip("Z")
-            else:
-                task.changed_at = ""
-
-            tasks.append(task)
-        return tasks
-        # except Exception as e:
-        #     Log.error(f"Sync: Can't get tasks from remote. {e}")
-        #     return []
+        try:
+            Log.debug(f"Sync: Getting tasks for list '{calendar.id}'")
+            todos: list[Todo] = calendar.todos(include_completed=True)
+            return [TaskData.from_ical(todo.data, calendar.id) for todo in todos]
+        except Exception as e:
+            Log.error(f"Sync: Can't get tasks from remote. {e}")
+            return []
 
     def __update_calendars(self) -> bool:
         try:
@@ -310,7 +232,7 @@ class SyncProviderCalDAV:
                 and not list.synced
                 and not list.deleted
             ):
-                self.__create_local_list(list)
+                self.__create_remote_list(list)
 
     def __add_local_lists(self) -> None:
         user_lists_uids = [lst.uid for lst in UserData.get_lists_as_dicts()]
@@ -351,8 +273,8 @@ class SyncProviderCalDAV:
                 UserData.delete_list(cal.id)
                 return
 
-    def __create_local_list(self, list: TaskListData) -> None:
-        Log.debug(f"Sync: Create list on remote {list.uid}")
+    def __create_remote_list(self, list: TaskListData) -> None:
+        Log.debug(f"Sync: Create remote list {list.uid}")
         try:
             self.principal.make_calendar(
                 cal_id=list.uid,
@@ -360,7 +282,7 @@ class SyncProviderCalDAV:
                 name=list.name,
             )
         except Exception as e:
-            Log.error(f"Sync: Can't create local list '{list.uid}'. {e}")
+            Log.error(f"Sync: Can't create remote list '{list.uid}'. {e}")
         UserData.update_list_prop(list.uid, "synced", True)
 
     # ----- SYNC TASKS FUNCTIONS ----- #

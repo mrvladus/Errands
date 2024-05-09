@@ -7,7 +7,6 @@ from datetime import datetime  # type:ignore
 from typing import TYPE_CHECKING, Any
 
 from gi.repository import Adw, Gdk, Gio, GLib, GObject, Gtk  # type:ignore
-from icalendar import Calendar, Event
 
 from errands.lib.data import TaskData, UserData
 from errands.lib.gsettings import GSettings
@@ -72,33 +71,9 @@ class Task(Gtk.Revealer):
 
                 Log.info(f"Task: Export '{self.uid}'")
 
-                calendar = Calendar()
-                event = Event()
-                event.add("uid", self.task_data.uid)
-                event.add("summary", self.task_data.text)
-                if self.task_data.notes:
-                    event.add("description", self.task_data.notes)
-                event.add("priority", self.task_data.priority)
-                if self.task_data.tags:
-                    event.add("categories", self.task_data.tags)
-                event.add("percent-complete", self.task_data.percent_complete)
-                event.add(
-                    "dtstart",
-                    (
-                        datetime.fromisoformat(self.task_data.start_date)
-                        if self.task_data.start_date
-                        else datetime.now()
-                    ),
-                )
-                if self.task_data.due_date:
-                    event.add("dtend", datetime.fromisoformat(self.task_data.due_date))
-                event.add("x-errands-toolbar-shown", int(self.task_data.toolbar_shown))
-                event.add("x-errands-expanded", int(self.task_data.expanded))
-                event.add("x-errands-color", self.task_data.color)
-                calendar.add_component(event)
+                with open(file.get_path(), "w") as f:
+                    f.write(self.task_data.to_ical(True))
 
-                with open(file.get_path(), "wb") as f:
-                    f.write(calendar.to_ical())
                 State.main_window.add_toast(_("Exported"))
 
             dialog = Gtk.FileDialog(initial_name=f"{self.uid}.ics")

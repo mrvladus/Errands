@@ -2,12 +2,10 @@
 # SPDX-License-Identifier: MIT
 
 import time
-from datetime import datetime
 
 from gi.repository import Adw, Gdk, Gio, GLib, Gtk  # type:ignore
-from icalendar import Calendar, Todo
 
-from errands.lib.data import TaskData, TaskListData, UserData
+from errands.lib.data import TaskListData, UserData
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
@@ -20,10 +18,11 @@ from errands.widgets.task_list.task_list import TaskList
 
 
 class TaskListSidebarRow(Gtk.ListBoxRow):
-    def __init__(self, list_dict: TaskListData) -> None:
+    def __init__(self, list_data: TaskListData) -> None:
         super().__init__()
-        self.uid: str = list_dict.uid
-        self.name: str = list_dict.name
+        self.list_data = list_data
+        self.uid: str = list_data.uid
+        self.name: str = list_data.name
         self.__add_actions()
         self.__build_ui()
         # Add Task List page
@@ -113,55 +112,9 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
 
                 Log.info(f"List: Export '{self.uid}'")
 
-                tasks: list[TaskData] = UserData.get_tasks_as_dicts(self.uid)
-                calendar: Calendar = Calendar()
-                calendar.add("x-wr-calname", self.label.get_label())
-                for task in tasks:
-                    event = Todo()
-                    event.add("uid", task.uid)
-                    event.add("related-to", task.parent)
-                    event.add("summary", task.text)
-                    if task.completed:
-                        event.add("status", "COMPLETED")
-                    if task.notes:
-                        event.add("description", task.notes)
-                    event.add("priority", task.priority)
-                    if task.tags:
-                        event.add("categories", ",".join(task.tags))
-                    event.add("percent-complete", task.percent_complete)
-                    if task.created_at:
-                        event.add("dtstamp", datetime.fromisoformat(task.created_at))
-                    if task.changed_at:
-                        event.add(
-                            "last-modified", datetime.fromisoformat(task.changed_at)
-                        )
-                    if task.start_date:
-                        event.add(
-                            "dtstart",
-                            (
-                                datetime.fromisoformat(task.start_date)
-                                if task.start_date
-                                else datetime.now()
-                            ),
-                        )
-                    if task.due_date:
-                        event.add(
-                            "due",
-                            (
-                                datetime.fromisoformat(task.due_date)
-                                if task.due_date
-                                else datetime.now()
-                            ),
-                        )
-
-                    event.add("x-errands-toolbar-shown", int(task.toolbar_shown))
-                    event.add("x-errands-expanded", int(task.expanded))
-                    event.add("x-errands-color", task.color)
-                    calendar.add_component(event)
-
                 try:
                     with open(file.get_path(), "wb") as f:
-                        f.write(calendar.to_ical())
+                        f.write(self.list_data.to_ical())
                 except Exception as e:
                     Log.error(f"List: Export failed. {e}")
                     State.main_window.add_toast(_("Export failed"))
