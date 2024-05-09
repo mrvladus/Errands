@@ -121,7 +121,7 @@ class TaskData:
         ical: str = ""
         ical += "BEGIN:VTODO\n"
         ical += f"X-ERRANDS-COLOR:{self.color}\n"
-        ical += f"STATUS:{"COMPLETED" if self.completed else "NEEDS-ACTION"}\n"
+        ical += f"STATUS:{'COMPLETED' if self.completed else 'NEEDS-ACTION'}\n"
         ical += f"LAST-MODIFIED:{self.changed_at}\n"
         ical += f"DTSTAMP:{self.created_at}\n"
         ical += f"DUE:{self.due_date}\n"
