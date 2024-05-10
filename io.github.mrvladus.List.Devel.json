@@ -67,7 +67,7 @@
                 }
             ]
         },
-        "build-aux/python3-modules.json",
+        "build-aux/python3-caldav.json",
         {
             "name": "errands",
             "buildsystem": "meson",
