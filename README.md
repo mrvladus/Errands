@@ -47,8 +47,9 @@ It's the **only** supported verion.
 
 ### Report a bug
 - Make sure you are using latest version from [flathub](https://flathub.org/apps/details/io.github.mrvladus.List).
-- Launch the app from terminal with `flatpak run io.github.mrvladus.List` and copy the output.
+- See log file at `$HOME/.var/app/io.github.mrvladus.List/data/errands/log.txt`
 - Create new issue.
+- Copy log if needed.
 - Add steps to reproduce the bug if needed.
 
 ### Translate
