@@ -8,7 +8,6 @@ from uuid import uuid4
 
 from gi.repository import Adw, Gio, Gtk  # type:ignore
 
-from __main__ import APP_ID, VERSION
 from errands.lib.data import TaskListData, UserData
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
@@ -144,8 +143,8 @@ class Window(Adw.ApplicationWindow):
             """
             if not self.about_window:
                 self.about_window = Adw.AboutDialog(
-                    version=VERSION,
-                    application_icon=APP_ID,
+                    version=State.VERSION,
+                    application_icon=State.APP_ID,
                     application_name=_("Errands"),
                     copyright="© 2023 Vlad Krupinskii",
                     website="https://github.com/mrvladus/Errands",

@@ -4,7 +4,8 @@
 import datetime
 import os
 from gi.repository import GLib  # type:ignore
-from __main__ import VERSION
+
+from errands.state import State
 
 
 class Log:
@@ -22,7 +23,7 @@ class Log:
         self.empty(
             f"""
 -------------------------------------------------
-Starting Errands {VERSION} at "{datetime.datetime.now().strftime("%Y %d %B %H:%M:%S")}"
+Starting Errands {State.VERSION} at "{datetime.datetime.now().strftime("%Y %d %B %H:%M:%S")}"
 -------------------------------------------------
 """
         )

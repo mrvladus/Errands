@@ -5,7 +5,9 @@
 
 import os
 import sys
+
 import gi  # type: ignore
+
 
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
@@ -23,15 +25,23 @@ localedir = "@localedir@"
 
 
 def setup_gettext():
-    import signal
-    import locale
     import gettext
+    import locale
+    import signal
 
     sys.path.insert(1, pkgdatadir)
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     gettext.install("errands", localedir)
     locale.bindtextdomain("errands", localedir)
     locale.textdomain("errands")
+
+
+def setup_state():
+    from errands.state import State
+
+    State.PROFILE = PROFILE
+    State.APP_ID = APP_ID
+    State.VERSION = VERSION
 
 
 def register_resources():
@@ -44,6 +54,7 @@ def register_resources():
 def main() -> None:
     setup_gettext()
     register_resources()
+    setup_state()
     from errands.application import ErrandsApplication
 
     sys.exit(ErrandsApplication().run(sys.argv))

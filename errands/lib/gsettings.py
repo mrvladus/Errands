@@ -2,11 +2,11 @@
 # SPDX-License-Identifier: MIT
 
 from gi.repository import GLib, Gio, Gtk, Secret  # type:ignore
-from __main__ import APP_ID
 from errands.lib.logging import Log
+from errands.state import State
 
 SECRETS_SCHEMA: Secret.Schema = Secret.Schema.new(
-    APP_ID,
+    State.APP_ID,
     Secret.SchemaFlags.NONE,
     {
         "account": Secret.SchemaAttributeType.STRING,
@@ -66,7 +66,7 @@ class GSettings:
     @classmethod
     def init(self) -> None:
         Log.debug("GSettings: Initialize")
-        self.gsettings = Gio.Settings.new(APP_ID)
+        self.gsettings = Gio.Settings.new(State.APP_ID)
 
         # Migrate old password
         if "sync-password" not in self.gsettings.list_keys():

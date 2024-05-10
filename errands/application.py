@@ -7,7 +7,6 @@ from time import sleep
 
 from gi.repository import Adw, Gio, GLib, Xdp  # type:ignore
 
-from __main__ import APP_ID, VERSION
 from errands.lib.data import UserData
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
@@ -25,7 +24,7 @@ class ErrandsApplication(Adw.Application):
 
     def __init__(self) -> None:
         super().__init__(
-            application_id=APP_ID,
+            application_id=State.APP_ID,
             flags=Gio.ApplicationFlags.DEFAULT_FLAGS,
         )
         self.set_resource_base_path("/io/github/mrvladus/Errands/")
@@ -34,6 +33,9 @@ class ErrandsApplication(Adw.Application):
     @threaded
     def check_reload(self) -> None:
         """Check if there is newer version installed"""
+
+        if State.PROFILE == "development":
+            return
 
         TIMEOUT_SECONDS: int = 60
         portal: Xdp.Portal = Xdp.Portal()
@@ -48,6 +50,7 @@ class ErrandsApplication(Adw.Application):
                 cmd: str = "flatpak-spawn --host flatpak run io.github.mrvladus.List"
             else:
                 cmd: str = "errands"
+
             os.system(cmd)
             exit()
 
@@ -65,7 +68,7 @@ class ErrandsApplication(Adw.Application):
                     ).splitlines()
                     for line in out:
                         # TODO: Maybe use regex here
-                        if VERSION[:3] in line:
+                        if State.VERSION[:3] in line:
                             version: str = line.split(" ")[-1]
                 else:
                     version: str = (
@@ -77,7 +80,7 @@ class ErrandsApplication(Adw.Application):
                     )
                 if version:
                     # If installed version is different from running then show message
-                    if version != VERSION:
+                    if version != State.VERSION:
                         restart_message = Adw.MessageDialog(
                             heading=_("Errands was updated"),
                             body=_("Restart is required"),

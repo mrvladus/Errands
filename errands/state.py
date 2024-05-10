@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING
 
 from gi.repository import Adw  # type:ignore
 
-from __main__ import APP_ID, PROFILE
 
 if TYPE_CHECKING:
     from errands.application import ErrandsApplication
@@ -32,8 +31,9 @@ class State:
     and some utils for quick access to deeper nested widgets"""
 
     # Constants
-    PROFILE: str = PROFILE
-    APP_ID: str = APP_ID
+    PROFILE: str = None
+    APP_ID: str = None
+    VERSION: str = None
 
     # Notifications
     notifications_daemon: ErrandsNotificationsDaemon | None = None
