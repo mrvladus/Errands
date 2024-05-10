@@ -136,7 +136,11 @@ class PreferencesWindow(Adw.PreferencesDialog):
                         lines=5,
                         wrap_mode=0,
                         wrap=True,
-                        max_width_chars=30,
+                        max_width_chars=20,
+                        margin_bottom=6,
+                        margin_top=6,
+                        margin_end=3,
+                        margin_start=3,
                     )
                 ),
             )
