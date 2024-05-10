@@ -121,6 +121,26 @@ class PreferencesWindow(Adw.PreferencesDialog):
             title=_("Server URL"),
         )
         GSettings.bind("sync-url", self.sync_url, "text")
+        self.sync_url.add_suffix(
+            Gtk.MenuButton(
+                valign=Gtk.Align.CENTER,
+                icon_name="errands-info-symbolic",
+                tooltip_text=_("Info"),
+                css_classes=["flat"],
+                popover=Gtk.Popover(
+                    child=Gtk.Label(
+                        label=_(
+                            "URL needs to include protocol, like <b>http://</b> or <b>https://</b>. If you have problems with connection - try to change protocol first."
+                        ),
+                        use_markup=True,
+                        lines=5,
+                        wrap_mode=0,
+                        wrap=True,
+                        max_width_chars=30,
+                    )
+                ),
+            )
+        )
         sync_group.add(self.sync_url)
         # Username
         self.sync_username = Adw.EntryRow(
