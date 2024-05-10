@@ -92,7 +92,6 @@ class TaskListData:
         for todo in ical.split("BEGIN:VTODO")[1:]:
             todo = "BEGIN:VTODO\n" + todo
             tasks.append(TaskData.from_ical(todo, task_list.uid))
-            print(todo)
 
         return task_list, tasks
 
