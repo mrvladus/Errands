@@ -1,6 +1,6 @@
 project(
   'errands',
-  version: '46.0.4',
+  version: '46.0.5',
   meson_version: '>= 0.62.0',
 )
 
@@ -37,7 +37,6 @@ conf.set('PROFILE', profile)
 conf.set('localedir', join_paths(get_option('prefix'), get_option('localedir')))
 conf.set('pkgdatadir', pkgdatadir)
 conf.set('bindir', get_option('prefix') / get_option('bindir'))
-
 
 subdir('data')
 subdir('errands')

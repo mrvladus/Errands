@@ -57,6 +57,28 @@
   </requires>
 
   <releases>
+    <release version="46.0.5" date="2024-05-10">
+      <description translatable="no">
+        <p>Changed:</p>
+        <ul>
+          <li>Improved Import / Export</li>
+          <li>Now only number of un-completed Tasks shows in sidebar rows</li>
+          <li>All overdue tasks now showing inside of Today page</li>
+        </ul>
+        <p>Added:</p>
+        <ul>
+          <li>Info button in sync url entry</li>
+          <li>Better sync errors</li>
+          <li>Red accent color for date button of overdue tasks</li>
+          <li>Logs are now written in log.txt file</li>
+        </ul>
+        <p>Translations:</p>
+        <ul>
+          <li>Updated German translation (Otmar Grünn)</li>
+          <li>Updated Italian translation (Albano Battistella)</li>
+        </ul>
+      </description>
+    </release>
     <release version="46.0.4" date="2024-05-07">
       <description translatable="no">
         <p>Changed:</p>
