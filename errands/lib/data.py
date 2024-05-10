@@ -342,8 +342,7 @@ class UserDataJSON:
         return getattr(task, prop)
 
     def get_list_prop(self, list_uid: str, prop: str) -> Any:
-        list: TaskListData = [lst for lst in self.task_lists if lst.uid == list_uid][0]
-        return getattr(list, prop)
+        return getattr(self.get_list(list_uid), prop)
 
     def update_list_prop(self, list_uid: str, prop: str, value: Any) -> None:
         lists: list[TaskListData] = self.task_lists

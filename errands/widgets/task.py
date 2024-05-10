@@ -959,6 +959,7 @@ class Task(Gtk.Revealer):
 
         self.update_title()
         self.update_progress_bar()
+        State.today_page.update_status()
         if self.can_sync:
             Sync.sync()
 

@@ -75,6 +75,7 @@ class Today(Adw.Bin):
             t
             for t in UserData.tasks
             if not t.deleted
+            and not t.completed
             and not t.trash
             and t.due_date
             and datetime.fromisoformat(t.due_date).date() <= datetime.today().date()
@@ -90,11 +91,8 @@ class Today(Adw.Bin):
         """Update status and counter"""
 
         total: int = len(self.tasks_data)
-        completed: int = len([t for t in self.tasks_data if t.completed])
         self.status_page.set_visible(total == 0)
-        State.today_sidebar_row.size_counter.set_label(
-            f"{completed} / {total}" if total > 0 else ""
-        )
+        State.today_sidebar_row.size_counter.set_label(str(total) if total > 0 else "")
 
     def update_ui(self):
         Log.debug("Today Page: Update UI")

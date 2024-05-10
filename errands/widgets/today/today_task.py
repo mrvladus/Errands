@@ -582,6 +582,9 @@ class TodayTask(Gtk.Revealer):
             return
 
         self.task.complete_btn.set_active(btn.get_active())
+        if btn.get_active():
+            self.purge()
+            State.today_page.update_status()
 
     def _on_edit_row_applied(self, entry: Adw.EntryRow) -> None:
         text: str = entry.props.text.strip()
