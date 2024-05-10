@@ -7,10 +7,9 @@ from dataclasses import asdict
 from uuid import uuid4
 
 from gi.repository import Adw, Gio, Gtk  # type:ignore
-from icalendar import Calendar
 
 from __main__ import APP_ID, VERSION
-from errands.lib.data import TaskData, TaskListData, UserData
+from errands.lib.data import TaskListData, UserData
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
@@ -169,80 +168,30 @@ class Window(Adw.ApplicationWindow):
                 except Exception as e:
                     Log.debug(f"Lists: Import cancelled. {e}")
                     return
+
                 with open(file.get_path(), "r") as f:
-                    calendar: Calendar = Calendar.from_ical(f.read())
-                    # List name
-                    name = calendar.get(
-                        "X-WR-CALNAME", file.get_basename().rstrip(".ics")
+                    task_list, tasks = TaskListData.from_ical(f.read())
+
+                    if task_list.uid in [
+                        lst.uid for lst in UserData.get_lists_as_dicts()
+                    ]:
+                        task_list.uid = uuid4()
+                        for task in tasks:
+                            task.list_uid = task_list.uid
+
+                    if task_list.name in [
+                        lst.name for lst in UserData.get_lists_as_dicts()
+                    ]:
+                        task_list.name = f"{task_list.name}_{task_list.uid}"
+
+                    new_task_list: TaskListData = UserData.add_list(
+                        name=task_list.name, uuid=task_list.uid, color=task_list.color
                     )
-                    if name in [lst.name for lst in UserData.get_lists_as_dicts()]:
-                        name = f"{name}_{uuid4()}"
-                    # Create list
-                    new_list: TaskListData = UserData.add_list(name=name)
-                    # Add tasks
-                    for todo in calendar.walk("VTODO"):
-                        task: TaskData = TaskData(
-                            color=str(todo.get("x-errands-color", "")),
-                            completed=str(todo.get("status", "")) == "COMPLETED",
-                            expanded=bool(int(todo.get("x-errands-expanded", 0))),
-                            notes=str(todo.get("description", "")),
-                            parent=str(todo.get("related-to", "")),
-                            percent_complete=int(todo.get("percent-complete", 0)),
-                            priority=int(todo.get("priority", 0)),
-                            text=str(todo.get("summary", "")),
-                            toolbar_shown=bool(
-                                int(todo.get("x-errands-toolbar-shown", 0))
-                            ),
-                            uid=str(todo.get("uid", "")),
-                            list_uid=new_list.uid,
-                        )
 
-                        # Set tags
-                        if (tags := todo.get("categories", "")) != "":
-                            task.tags = [
-                                i.to_ical().decode("utf-8")
-                                for i in (tags if isinstance(tags, list) else tags.cats)
-                            ]
-                        else:
-                            task.tags = []
-
-                        # Set dates
-
-                        if todo.get("due", "") != "":
-                            task.due_date = (
-                                todo.get("due", "").to_ical().decode("utf-8")
-                            )
-                            if task.due_date and "T" not in task.due_date:
-                                task.due_date += "T000000"
-                        else:
-                            task.due_date = ""
-
-                        if todo.get("dtstart", "") != "":
-                            task.start_date = (
-                                todo.get("dtstart", "").to_ical().decode("utf-8")
-                            )
-                            if task.start_date and "T" not in task.start_date:
-                                task.start_date += "T000000"
-                        else:
-                            task.start_date = ""
-
-                        if todo.get("dtstamp", "") != "":
-                            task.created_at = (
-                                todo.get("dtstamp", "").to_ical().decode("utf-8")
-                            )
-                        else:
-                            task.created_at = ""
-
-                        if todo.get("last-modified", "") != "":
-                            task.changed_at = (
-                                todo.get("last-modified", "").to_ical().decode("utf-8")
-                            )
-                        else:
-                            task.changed_at = ""
-
+                    for task in tasks:
                         UserData.add_task(**asdict(task))
 
-                State.sidebar.add_task_list(new_list)
+                State.sidebar.add_task_list(new_task_list)
                 self.add_toast(_("Imported"))
                 Sync.sync()
 

@@ -42,6 +42,10 @@ class TaskListData:
     synced: bool = False
     uid: str = ""
 
+    def __post_init__(self):
+        if not self.uid:
+            self.uid = str(uuid4())
+
     def to_ical(self, single_task: str = None) -> str:
         """Build VTODO iCal component from TaskData properties"""
 
@@ -64,9 +68,9 @@ class TaskListData:
         return ical
 
     @staticmethod
-    def from_ical(ical: str | bytes) -> TaskListData:
+    def from_ical(ical: str | bytes) -> tuple[TaskListData, list[TaskData]]:
         ical: str = str(ical)
-        new_task_list: TaskListData = TaskListData()
+        task_list: TaskListData = TaskListData()
 
         assert ical != ""
 
@@ -75,11 +79,22 @@ class TaskListData:
             value: str = line.split(":")[-1]
 
             if "X-WR-CALNAME" in prop:
-                new_task_list.name = value
+                task_list.name = value
             elif "X-APPLE-CALENDAR-COLOR" in prop:
-                new_task_list.color = value
+                task_list.color = value
+            elif "X-ERRANDS-LIST-UID" in prop:
+                task_list.uid = value
 
-        return new_task_list
+        if not task_list.name:
+            task_list.name = _("New Task List")
+
+        tasks: list[TaskData] = []
+        for todo in ical.split("BEGIN:VTODO")[1:]:
+            todo = "BEGIN:VTODO\n" + todo
+            tasks.append(TaskData.from_ical(todo, task_list.uid))
+            print(todo)
+
+        return task_list, tasks
 
 
 @dataclass
@@ -185,11 +200,11 @@ class TaskData:
             elif "CATEGORIES" in prop:
                 task.tags = value.split(",") if value else []
             elif "X-ERRANDS-COLOR" in prop:
-                task.notes = value
+                task.color = value
             elif "X-ERRANDS-EXPANDED" in prop:
-                task.notes = bool(int(value))
+                task.expanded = bool(int(value))
             elif "X-ERRANDS-TOOLBAR-SHOWN" in prop:
-                task.notes = bool(int(value))
+                task.toolbar_shown = bool(int(value))
 
         return task
 
@@ -248,13 +263,15 @@ class UserDataJSON:
     # ------ PUBLIC METHODS ------ #
 
     def add_list(
-        self, name: str, uuid: str = None, synced: bool = False
+        self, name: str, uuid: str = None, synced: bool = False, color: str = ""
     ) -> TaskListData:
         uid: str = str(uuid4()) if not uuid else uuid
 
         Log.debug(f"Data: Create list '{uid}'")
 
-        new_list = TaskListData(deleted=False, name=name, uid=uid, synced=synced)
+        new_list = TaskListData(
+            deleted=False, name=name, uid=uid, synced=synced, color=color
+        )
         data: list[TaskListData] = self.task_lists
         data.append(new_list)
         self.task_lists = data

@@ -822,7 +822,8 @@ class Task(Gtk.Revealer):
         )
         self.date_time_btn.remove_css_class("error")
         if (
-            datetime.fromisoformat(self.task_data.due_date).date()
+            self.task_data.due_date
+            and datetime.fromisoformat(self.task_data.due_date).date()
             < datetime.today().date()
         ):
             self.date_time_btn.add_css_class("error")
