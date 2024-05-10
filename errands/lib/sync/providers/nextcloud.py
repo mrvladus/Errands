@@ -19,7 +19,7 @@ class SyncProviderNextcloud(SyncProviderCalDAV):
             GSettings.set("sync-url", "s", self.url)
 
         # Add suffix if needed
-        if "remote.php/dav" not in GSettings.get("sync-url"):
+        if "remote.php" not in GSettings.get("sync-url"):
             self.url = f"{self.url}/remote.php/dav/"
             GSettings.set("sync-url", "s", self.url)
         else:
