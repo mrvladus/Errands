@@ -264,12 +264,10 @@ class UserDataJSON:
     def add_list(
         self, name: str, uuid: str = None, synced: bool = False, color: str = ""
     ) -> TaskListData:
-        uid: str = str(uuid4()) if not uuid else uuid
-
-        Log.debug(f"Data: Create list '{uid}'")
+        Log.debug(f"Data: Create list '{uuid}'")
 
         new_list = TaskListData(
-            deleted=False, name=name, uid=uid, synced=synced, color=color
+            deleted=False, name=name, uid=uuid, synced=synced, color=color
         )
         data: list[TaskListData] = self.task_lists
         data.append(new_list)
