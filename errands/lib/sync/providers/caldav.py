@@ -5,6 +5,7 @@ from copy import deepcopy
 import datetime
 import time
 from dataclasses import asdict, dataclass, field
+from typing import Any
 
 import urllib3
 from caldav import Calendar, DAVClient, Principal, Todo
@@ -323,11 +324,9 @@ class SyncProviderCalDAV:
     ):
         remote_task: TaskData = [t for t in remote_tasks if t.uid == task.uid][0]
         remote_task_keys = asdict(remote_task).keys()
-        exclude_keys: str = (
-            "synced trash expanded toolbar_shown deleted notified created_at"
-        )
-        updated_props = []
-        updated_values = []
+        exclude_keys: str = "attachments synced trash expanded toolbar_shown deleted notified created_at"
+        updated_props: list[str] = []
+        updated_values: list[Any] = []
         for key in remote_task_keys:
             if key not in exclude_keys and getattr(remote_task, key) != getattr(
                 task, key

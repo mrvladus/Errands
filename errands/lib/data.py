@@ -98,6 +98,7 @@ class TaskListData:
 
 @dataclass
 class TaskData:
+    attachments: list[str] = field(default_factory=lambda: [])
     color: str = ""
     completed: bool = False
     changed_at: str = ""
