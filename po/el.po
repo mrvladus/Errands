@@ -424,8 +424,8 @@ msgid "Can't connect"
 msgstr "Αδυναμία Σύνδεσης"
 
 #: errands/widgets/sidebar.py:42
-msgid "Add List (Ctrl+A)"
-msgstr "Προσθήκη Λίστας (Ctrl+A)"
+msgid "Add List (Ctrl+Shift+A)"
+msgstr "Προσθήκη Λίστας (Ctrl+Shift+A)"
 
 #: errands/widgets/sidebar.py:58
 msgid "Syncing..."

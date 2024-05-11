@@ -39,14 +39,14 @@ class Sidebar(Adw.Bin):
         # Add List button
         self.add_list_btn = ErrandsButton(
             icon_name="errands-add-symbolic",
-            tooltip_text=_("Add List (Ctrl+A)"),
+            tooltip_text=_("Add List (Ctrl+Shift+A)"),
             on_click=self._on_add_list_btn_clicked,
         )
         add_list_ctrl = Gtk.ShortcutController(scope=Gtk.ShortcutScope.MANAGED)
         add_list_ctrl.add_shortcut(
             Gtk.Shortcut(
                 action=Gtk.ShortcutAction.parse_string("activate"),
-                trigger=Gtk.ShortcutTrigger.parse_string("<Control>a"),
+                trigger=Gtk.ShortcutTrigger.parse_string("<Control><Shift>a"),
             )
         )
         self.add_list_btn.add_controller(add_list_ctrl)

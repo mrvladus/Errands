@@ -55,7 +55,7 @@
             <child>
               <object class="GtkShortcutsShortcut">
                 <property name="title" translatable="yes">Add List</property>
-                <property name="accelerator">&lt;Control&gt;A</property>
+                <property name="accelerator">&lt;Control&gt;&lt;Shift&gt;A</property>
               </object>
             </child>
 

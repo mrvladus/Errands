@@ -424,7 +424,7 @@ msgstr "Kan ikke tilslutte"
 
 #: errands/widgets/sidebar.py:42
 #, fuzzy
-msgid "Add List (Ctrl+A)"
+msgid "Add List (Ctrl+Shift+A)"
 msgstr "Tilføj liste"
 
 #: errands/widgets/sidebar.py:58

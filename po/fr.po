@@ -427,7 +427,7 @@ msgstr "Impossible de se connecter"
 
 #: errands/widgets/sidebar.py:42
 #, fuzzy
-msgid "Add List (Ctrl+A)"
+msgid "Add List (Ctrl+Shift+A)"
 msgstr "Ajouter une liste"
 
 #: errands/widgets/sidebar.py:58

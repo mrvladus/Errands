@@ -423,7 +423,7 @@ msgstr "Povezivanje nije moguće"
 
 #: errands/widgets/sidebar.py:42
 #, fuzzy
-msgid "Add List (Ctrl+A)"
+msgid "Add List (Ctrl+Shift+A)"
 msgstr "Dodaj popis"
 
 #: errands/widgets/sidebar.py:58

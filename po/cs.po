@@ -425,8 +425,8 @@ msgid "Can't connect"
 msgstr "Nemůžu se připojit"
 
 #: errands/widgets/sidebar.py:42
-msgid "Add List (Ctrl+A)"
-msgstr "Přidat list (Ctrl+A)"
+msgid "Add List (Ctrl+Shift+A)"
+msgstr "Přidat list (Ctrl+Shift+A)"
 
 #: errands/widgets/sidebar.py:58
 msgid "Syncing..."

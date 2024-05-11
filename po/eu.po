@@ -431,7 +431,7 @@ msgid "Can't connect"
 msgstr ""
 
 #: errands/widgets/sidebar.py:42
-msgid "Add List (Ctrl+A)"
+msgid "Add List (Ctrl+Shift+A)"
 msgstr ""
 
 #: errands/widgets/sidebar.py:58

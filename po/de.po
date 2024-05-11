@@ -415,7 +415,7 @@ msgid "Can't connect"
 msgstr "Kann keine Verbindung herstellen"
 
 #: errands/widgets/sidebar.py:42
-msgid "Add List (Ctrl+A)"
+msgid "Add List (Ctrl+Shift+A)"
 msgstr "Liste hinzufügen (Strg+A)"
 
 #: errands/widgets/sidebar.py:58

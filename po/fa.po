@@ -424,7 +424,7 @@ msgid "Can't connect"
 msgstr "نمی‌توان وصل شد"
 
 #: errands/widgets/sidebar.py:42
-msgid "Add List (Ctrl+A)"
+msgid "Add List (Ctrl+Shift+A)"
 msgstr "افزودن سیاهه (مهار+A)"
 
 #: errands/widgets/sidebar.py:58
