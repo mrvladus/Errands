@@ -64,7 +64,7 @@
           <li>Improved Import / Export</li>
           <li>Now only number of un-completed Tasks shows in sidebar rows</li>
           <li>All overdue tasks now showing inside of Today page</li>
-          <li>Shortcut for adding Task from Ctrl+A to Ctrl+Shift+A</li>
+          <li>Shortcut for adding Task List from Ctrl+A to Ctrl+Shift+A</li>
         </ul>
         <p>Added:</p>
         <ul>
