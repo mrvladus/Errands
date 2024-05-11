@@ -8,6 +8,7 @@ from errands.lib.gsettings import GSettings
 from errands.lib.sync.sync import Sync
 from caldav.lib import error
 from requests import exceptions
+from errands.state import State
 from errands.widgets.shared.components.buttons import ErrandsButton, ErrandsInfoButton
 
 
@@ -96,11 +97,23 @@ class PreferencesWindow(Adw.PreferencesDialog):
         )
         GSettings.bind("run-in-background", background, "active")
 
+        # Background
+        launch_on_startup = Adw.SwitchRow(
+            title=_("Launch on Startup"),
+            subtitle=_("Launch application when user logs in"),
+            icon_name="errands-progressbar-symbolic",
+        )
+        GSettings.bind("launch-on-startup", launch_on_startup, "active")
+        launch_on_startup.connect(
+            "notify::active", lambda *_: State.application.run_in_background()
+        )
+
         notifications_and_bg_group = Adw.PreferencesGroup(
             title=_("Notifications and Background")
         )
         notifications_and_bg_group.add(notifications)
         notifications_and_bg_group.add(background)
+        notifications_and_bg_group.add(launch_on_startup)
 
         # Sync group
         sync_group = Adw.PreferencesGroup(

@@ -28,6 +28,9 @@
     <key name="task-list-new-task-position-top" type="b">
       <default>true</default>
     </key>
+    <key name="launch-on-startup" type="b">
+      <default>true</default>
+    </key>
     <key name="run-in-background" type="b">
       <default>true</default>
     </key>

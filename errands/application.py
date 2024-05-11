@@ -100,6 +100,8 @@ class ErrandsApplication(Adw.Application):
                 return True
 
         while True:
+            if not GSettings.get("launch-on-startup"):
+                break
             sleep(TIMEOUT_SECONDS)
             if not __inner_check():
                 break
@@ -112,15 +114,28 @@ class ErrandsApplication(Adw.Application):
         portal: Xdp.Portal = Xdp.Portal()
 
         # Request background
-        portal.request_background(
-            None,
-            _("Errands need to run in the background for notifications"),
-            ["errands", "--gapplication-service"],
-            Xdp.BackgroundFlags.AUTOSTART,
-            None,
-            None,
-            None,
-        )
+        if GSettings.get("launch-on-startup"):
+            portal.request_background(
+                None,
+                _("Errands need to run in the background for notifications"),
+                ["errands", "--gapplication-service"],
+                Xdp.BackgroundFlags.AUTOSTART,
+                None,
+                None,
+                None,
+            )
+        else:
+            try:
+                os.remove(
+                    os.path.join(
+                        GLib.get_home_dir(),
+                        ".config",
+                        "autostart",
+                        State.APP_ID + ".desktop",
+                    )
+                )
+            except Exception:
+                pass
 
     def do_startup(self) -> None:
         Adw.Application.do_startup(self)

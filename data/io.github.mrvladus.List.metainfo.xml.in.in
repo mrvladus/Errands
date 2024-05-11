@@ -72,6 +72,7 @@
           <li>Better sync errors</li>
           <li>Red accent color for date button of overdue tasks</li>
           <li>Logs are now written in log.txt file</li>
+          <li>Setting for disabling autostart</li>
         </ul>
         <p>Translations:</p>
         <ul>
