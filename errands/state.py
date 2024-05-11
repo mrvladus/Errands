@@ -7,10 +7,10 @@ from typing import TYPE_CHECKING
 
 from gi.repository import Adw  # type:ignore
 
-
 if TYPE_CHECKING:
     from errands.application import ErrandsApplication
     from errands.lib.notifications import ErrandsNotificationsDaemon
+    from errands.widgets.shared.attachments_window import ErrandsAttachmentsWindow
     from errands.widgets.shared.datetime_window import DateTimeWindow
     from errands.widgets.shared.notes_window import NotesWindow
     from errands.widgets.sidebar import Sidebar
@@ -62,6 +62,9 @@ class State:
 
     # Date and time window
     datetime_window: DateTimeWindow | None = None
+
+    # Attachments window
+    attachments_window: ErrandsAttachmentsWindow | None = None
 
     @classmethod
     def get_task_list(cls, uid: str) -> TaskList:

@@ -370,6 +370,12 @@ class Task(Gtk.Revealer):
         )
         self.tags_btn.connect("notify::active", self._on_tags_btn_toggled)
 
+        self.attachments_btn: ErrandsButton = ErrandsButton(
+            icon_name="errands-attachment-symbolic",
+            css_classes=["flat"],
+            on_click=lambda *_: State.attachments_window.show(self),
+        )
+
         # Menu button
         menu_top_section: Gio.Menu = Gio.Menu()
         menu_colors_item: Gio.MenuItem = Gio.MenuItem()
@@ -510,6 +516,7 @@ class Task(Gtk.Revealer):
                             self.notes_btn,
                             self.priority_btn,
                             self.tags_btn,
+                            self.attachments_btn,
                             menu_btn,
                         ],
                     ),

@@ -14,6 +14,7 @@ from errands.lib.notifications import ErrandsNotificationsDaemon
 from errands.lib.plugins import PluginsLoader
 from errands.lib.utils import threaded
 from errands.state import State
+from errands.widgets.shared.attachments_window import ErrandsAttachmentsWindow
 from errands.widgets.shared.datetime_window import DateTimeWindow
 from errands.widgets.shared.notes_window import NotesWindow
 from errands.widgets.window import Window
@@ -164,6 +165,9 @@ class ErrandsApplication(Adw.Application):
 
         # Date and time window
         State.datetime_window = DateTimeWindow()
+
+        # Attachments window
+        State.attachments_window = ErrandsAttachmentsWindow()
 
         # Main window
         State.main_window = Window(application=State.application)
