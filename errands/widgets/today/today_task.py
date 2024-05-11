@@ -250,6 +250,7 @@ class TodayTask(Gtk.Revealer):
         self.tags_btn.connect("notify::active", self._on_tags_btn_toggled)
 
         self.attachments_btn: ErrandsButton = ErrandsButton(
+            tooltip_text=_("Attachments"),
             icon_name="errands-attachment-symbolic",
             css_classes=["flat"],
             on_click=lambda *_: State.attachments_window.show(self),
