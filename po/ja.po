@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-07 18:25+0300\n"
-"PO-Revision-Date: 2024-05-07 21:16+0900\n"
-"Last-Translator: Lemon73 <Lemonade.Flash.1164@gmail.com>\n"
+"PO-Revision-Date: 2024-05-11 14:10+0900\n"
+"Last-Translator: Gnuey56 <gnuey56@proton.me>\n"
 "Language-Team: \n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -20,16 +20,15 @@ msgstr ""
 
 #: errands/application.py:82
 msgid "Errands was updated"
-msgstr ""
+msgstr "Errands は更新されました"
 
 #: errands/application.py:83
 msgid "Restart is required"
-msgstr ""
+msgstr "アプリケーションの再起動が必要です"
 
 #: errands/application.py:86
-#, fuzzy
 msgid "Restart"
-msgstr "復元"
+msgstr "再起動"
 
 #: errands/application.py:114
 msgid "Errands need to run in the background for notifications"
@@ -45,7 +44,7 @@ msgstr "CalDAV サーバーに接続できません:"
 
 #: errands/lib/notifications.py:72
 msgid "Task is Due"
-msgstr "タスクの期限"
+msgstr "タスクの期限を過ぎています"
 
 #: errands/lib/utils.py:21 errands/widgets/today/today_task.py:147
 #: errands/widgets/task.py:291
@@ -186,9 +185,8 @@ msgid "Add new Task"
 msgstr "新しいタスクを追加"
 
 #: errands/widgets/task_list/task_list.py:156
-#, fuzzy
 msgid "Loading..."
-msgstr "同期中..."
+msgstr "読み込み中..."
 
 #: errands/widgets/task_list/task_list.py:246 errands/widgets/task.py:793
 msgid "Completed:"
@@ -355,16 +353,15 @@ msgstr "通知を表示"
 
 #: errands/widgets/preferences.py:91
 msgid "Run in Background"
-msgstr ""
+msgstr "バックグランドで動作"
 
 #: errands/widgets/preferences.py:92
 msgid "Hide the application window instead of closing it"
-msgstr ""
+msgstr "アプリケーションを終了せずにウィンドウを非表示にします"
 
 #: errands/widgets/preferences.py:98
-#, fuzzy
 msgid "Notifications and Background"
-msgstr "通知"
+msgstr "通知とバックグランド動作"
 
 #: errands/widgets/preferences.py:105 errands/widgets/preferences.py:159
 #: data/resources/gtk/help-overlay.ui:38
@@ -374,7 +371,7 @@ msgstr "同期"
 #. Provider
 #: errands/widgets/preferences.py:108
 msgid "Disabled"
-msgstr "無効"
+msgstr "しない"
 
 #: errands/widgets/preferences.py:110
 msgid "Sync Provider"
@@ -382,7 +379,7 @@ msgstr "同期プロバイダー"
 
 #: errands/widgets/preferences.py:119
 msgid "Server URL"
-msgstr "サーバーURL"
+msgstr "サーバーの URL"
 
 #: errands/widgets/preferences.py:125
 msgid "Username"
@@ -558,8 +555,8 @@ msgstr "タスクを管理"
 #: data/io.github.mrvladus.List.desktop.in.in:10
 msgid "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
 msgstr ""
-"errands;tasks;list;todo;todos;caldav;nextcloud;sync;用事;タスク;リスト;やるこ"
-"とリスト;同期;"
+"errands;tasks;list;todo;todos;caldav;nextcloud;sync;用事;タスク;リスト;やる"
+"ことリスト;同期;"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:12
 msgid "Todo application for those who prefer simplicity."
@@ -599,7 +596,7 @@ msgstr ".ics ファイルをインポート"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:41
 msgid "Main Window View"
-msgstr ""
+msgstr "メインウィンドウの画面"
 
 #~ msgid "Not Set"
 #~ msgstr "未設定"
