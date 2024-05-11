@@ -378,8 +378,10 @@ class SyncProviderCalDAV:
                 task.toolbar_shown
             )
             todo.icalendar_component["x-errands-expanded"] = int(task.expanded)
-            todo.complete() if task.completed else todo.uncomplete()
             todo.save()
+            todo.uncomplete()
+            if task.completed:
+                todo.complete()
             UserData.update_props(calendar.id, task.uid, ["synced"], [True])
         except Exception as e:
             Log.error(f"Sync: Can't update task on remote '{task.uid}'. {e}")
