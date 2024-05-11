@@ -1,8 +1,8 @@
 {
-    "name": "python3-package-installation",
+    "name": "python3-caldav",
     "buildsystem": "simple",
     "build-commands": [
-        "pip3 install --verbose --exists-action=i --no-index --find-links=\"file://${PWD}\" --prefix=${FLATPAK_DEST} --no-build-isolation caldav certifi charset-normalizer icalendar idna lxml python-dateutil pytz recurring-ical-events requests six tzlocal urllib3 vobject x-wr-timezone"
+        "pip3 install --verbose --exists-action=i --no-index --find-links=\"file://${PWD}\" --prefix=${FLATPAK_DEST} --no-build-isolation --ignore-installed caldav certifi charset-normalizer icalendar idna lxml python-dateutil pytz recurring-ical-events requests six tzlocal urllib3 vobject x-wr-timezone"
     ],
     "sources": [
         {
