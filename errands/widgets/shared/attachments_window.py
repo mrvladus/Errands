@@ -88,7 +88,7 @@ class ErrandsAttachmentsWindow(Adw.Dialog):
             try:
                 file: Gio.File = dialog.open_finish(res)
             except Exception as e:
-                Log.debug(f"Attachments: Cancelled. {e}")
+                Log.debug(f"Attachments: Selecting file cancelled. {e}")
                 return
 
             path: str = file.get_path()
@@ -126,7 +126,8 @@ class ErrandsAttachment(Adw.ActionRow):
         self.connect("activated", self.__on_click)
 
     def __on_click(self, *_args):
-        os.system(f"xdg-open {self.path}")
+        file: Gio.File = Gio.File.new_for_path(self.path)
+        Gtk.FileLauncher(file=file).launch(State.main_window, None)
 
     def __on_delete_btn_clicked(self, _btn: ErrandsButton):
         task: Task = State.attachments_window.task

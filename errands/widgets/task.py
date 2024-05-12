@@ -375,7 +375,6 @@ class Task(Gtk.Revealer):
             icon_name="errands-attachment-symbolic",
             css_classes=["flat"],
             on_click=lambda *_: State.attachments_window.show(self),
-            visible=False,
         )
 
         # Menu button
