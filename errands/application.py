@@ -58,19 +58,12 @@ class ErrandsApplication(Adw.Application):
         def __inner_check() -> bool:
             """Get installed version"""
 
-            if not GSettings.get("run-in-background"):
-                return True
-
             try:
                 version: str = ""
                 if is_flatpak:
-                    out: str = getoutput(
-                        "flatpak-spawn --host flatpak info io.github.mrvladus.List"
-                    ).splitlines()
-                    for line in out:
-                        # TODO: Maybe use regex here
-                        if State.VERSION[:3] in line:
-                            version: str = line.split(" ")[-1]
+                    version: str = getoutput(
+                        "flatpak-spawn --host flatpak list --app | grep io.github.mrvladus.List | awk '{ print $3 }'"
+                    )
                 else:
                     version: str = (
                         getoutput(
@@ -101,8 +94,6 @@ class ErrandsApplication(Adw.Application):
                 return True
 
         while True:
-            if not GSettings.get("launch-on-startup"):
-                break
             sleep(TIMEOUT_SECONDS)
             if not __inner_check():
                 break
