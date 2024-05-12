@@ -176,7 +176,7 @@ class TaskData:
             elif "LAST-MODIFIED" in prop:
                 task.changed_at = value.strip("Z")
             elif "PERCENT-COMPLETE" in prop:
-                task.percent_complete = int(value)
+                task.percent_complete = int(float(value))
             elif "PRIORITY" in prop:
                 task.priority = int(value)
             elif "RELATED-TO" in prop:

@@ -113,7 +113,7 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
                 Log.info(f"List: Export '{self.uid}'")
 
                 try:
-                    with open(file.get_path(), "wb") as f:
+                    with open(file.get_path(), "w") as f:
                         f.write(self.list_data.to_ical())
                 except Exception as e:
                     Log.error(f"List: Export failed. {e}")
