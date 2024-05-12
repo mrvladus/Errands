@@ -115,17 +115,28 @@ class ErrandsAttachment(Adw.ActionRow):
         self.set_activatable(True)
         self.set_tooltip_text(_("Open File"))
         self.set_title(os.path.basename(self.path))
-        self.add_prefix(
+        self.add_suffix(
             ErrandsButton(
+                tooltip_text=_("Delete"),
                 valign=Gtk.Align.CENTER,
                 icon_name="errands-trash-symbolic",
                 css_classes=["error", "flat"],
                 on_click=self.__on_delete_btn_clicked,
             )
         )
+        self.add_prefix(
+            ErrandsButton(
+                tooltip_text=_("Open Containing Folder"),
+                valign=Gtk.Align.CENTER,
+                icon_name="errands-folder-symbolic",
+                css_classes=["flat"],
+                on_click=self.__on_show_folder_btn_clicked,
+            )
+        )
         self.connect("activated", self.__on_click)
 
     def __on_click(self, *_args):
+        Log.info(f"Attachments: Open file '{self.path}'")
         file: Gio.File = Gio.File.new_for_path(self.path)
         Gtk.FileLauncher(file=file).launch(State.main_window, None)
 
@@ -137,3 +148,8 @@ class ErrandsAttachment(Adw.ActionRow):
         State.attachments_window.attachments_list.remove(self)
         State.attachments_window.update_ui()
         del self
+
+    def __on_show_folder_btn_clicked(self, _btn: ErrandsButton):
+        Log.info(f"Attachments: Open folder '{self.path}'")
+        file: Gio.File = Gio.File.new_for_path(self.path)
+        Gtk.FileLauncher(file=file).open_containing_folder(State.main_window, None)
