@@ -164,7 +164,7 @@ class ErrandsApplication(Adw.Application):
         State.main_window = Window(application=State.application)
         self.add_window(State.main_window)
 
-        self.check_reload()
+        # self.check_reload()
 
     def do_activate(self) -> None:
         Log.debug("Application: Activate")
