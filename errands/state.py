@@ -10,9 +10,9 @@ from gi.repository import Adw  # type:ignore
 if TYPE_CHECKING:
     from errands.application import ErrandsApplication
     from errands.lib.notifications import ErrandsNotificationsDaemon
-    from errands.widgets.shared.attachments_window import ErrandsAttachmentsWindow
-    from errands.widgets.shared.datetime_window import DateTimeWindow
-    from errands.widgets.shared.notes_window import NotesWindow
+    from errands.widgets.shared.task_toolbar import ErrandsAttachmentsWindow
+    from errands.widgets.shared.task_toolbar import DateTimeWindow
+    from errands.widgets.shared.task_toolbar import NotesWindow
     from errands.widgets.sidebar import Sidebar
     from errands.widgets.tags.tags import Tags
     from errands.widgets.tags.tags_sidebar_row import TagsSidebarRow
