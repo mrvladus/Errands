@@ -52,10 +52,14 @@ class Sidebar(Adw.Bin):
         self.add_list_btn.add_controller(add_list_ctrl)
 
         # Sync indicator
-        self.sync_indicator = Gtk.Spinner(
-            spinning=True,
-            visible=False,
-            tooltip_text=_("Syncing..."),
+        self.sync_indicator_rev: Gtk.Revealer = Gtk.Revealer(
+            transition_type=Gtk.RevealerTransitionType.CROSSFADE,
+            transition_duration=200,
+            reveal_child=False,
+            child=Gtk.Spinner(
+                spinning=True,
+                tooltip_text=_("Syncing..."),
+            ),
         )
 
         # Status page
@@ -144,7 +148,7 @@ class Sidebar(Adw.Bin):
                                 ),
                             ),
                             # Sync indicator
-                            self.sync_indicator,
+                            self.sync_indicator_rev,
                         ],
                     )
                 ],
@@ -225,7 +229,10 @@ class Sidebar(Adw.Bin):
         if list_added:
             self.status_page.set_visible(False)
 
-    def update_task_lists(self, update_lists_ui: bool = True):
+    def toggle_sync_indicator(self, on: bool) -> None:
+        self.sync_indicator_rev.set_reveal_child(on)
+
+    def update_task_lists(self, update_lists_ui: bool = True) -> None:
         lists: list[TaskListData] = UserData.get_lists_as_dicts()
 
         # Delete lists

@@ -39,21 +39,21 @@ class Sync:
             UserData.clean_deleted()
             return
         if not self.provider:
-            GLib.idle_add(State.sidebar.sync_indicator.set_visible, True)
+            GLib.idle_add(State.sidebar.toggle_sync_indicator, True)
             self.init()
-            GLib.idle_add(State.sidebar.sync_indicator.set_visible, False)
+            GLib.idle_add(State.sidebar.toggle_sync_indicator, False)
         if self.provider and self.provider.can_sync:
             if self.syncing:
                 self.sync_again = True
                 return
             self.syncing = True
-            GLib.idle_add(State.sidebar.sync_indicator.set_visible, True)
+            GLib.idle_add(State.sidebar.toggle_sync_indicator, True)
             self.provider.sync()
             UserData.clean_deleted()
             if self.sync_again:
                 self.sync()
                 self.sync_again = False
-            GLib.idle_add(State.sidebar.sync_indicator.set_visible, False)
+            GLib.idle_add(State.sidebar.toggle_sync_indicator, False)
             self.syncing = False
 
     # TODO: Needs to be threaded to not block UI
