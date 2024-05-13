@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-07 18:25+0300\n"
+"POT-Creation-Date: 2024-05-13 15:13+0300\n"
 "PO-Revision-Date: 2024-04-22 18:45+0300\n"
 "Last-Translator: Vlad Krupinskii <mrvladus@yandex.ru>\n"
 "Language-Team: \n"
@@ -19,53 +19,24 @@ msgstr ""
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Generator: Poedit 3.4.2\n"
 
-#: errands/application.py:82
-msgid "Errands was updated"
-msgstr "Дела были обновлены"
-
-#: errands/application.py:83
-msgid "Restart is required"
-msgstr "Необходим перезапуск приложения"
-
-#: errands/application.py:86
-msgid "Restart"
-msgstr "Перезапустить"
-
-#: errands/application.py:114
-msgid "Errands need to run in the background for notifications"
-msgstr "\"Дела\" должны работать в фоновом режиме для уведомлений"
-
-#: errands/lib/sync/providers/caldav.py:63
-msgid "Not all sync credentials provided. Please check settings."
-msgstr "Не все данные для синхронизации предоставлены. Проверьте настройки."
-
-#: errands/lib/sync/providers/caldav.py:103
-msgid "Can't connect to CalDAV server at:"
-msgstr "Невозможно подключиться к CalDAV серверу по адресу:"
-
-#: errands/lib/notifications.py:72
-msgid "Task is Due"
-msgstr "Напоминание о задаче"
-
-#: errands/lib/utils.py:21 errands/widgets/today/today_task.py:147
-#: errands/widgets/task.py:291
-msgid "Date"
-msgstr "Дата"
+#: errands/widgets/shared/components/buttons.py:45
+msgid "Info"
+msgstr "Информация"
 
 #: errands/widgets/shared/components/dialogs.py:31
 msgid "Are you sure?"
 msgstr "Вы уверены?"
 
 #: errands/widgets/shared/components/dialogs.py:35
-#: errands/widgets/task_list/task_list_sidebar_row.py:97
-#: errands/widgets/today/today_task.py:115 errands/widgets/sidebar.py:293
-#: errands/widgets/task.py:246
+#: errands/widgets/sidebar.py:293 errands/widgets/task.py:180
+#: errands/widgets/task_list/task_list_sidebar_row.py:96
+#: errands/widgets/today/today_task.py:83
 msgid "Cancel"
 msgstr "Отмена"
 
 #: errands/widgets/shared/datetime_picker.py:138
-#: errands/widgets/today/today_sidebar_row.py:30
-#: errands/widgets/today/today.py:57 errands/widgets/window.py:69
+#: errands/widgets/today/today.py:57
+#: errands/widgets/today/today_sidebar_row.py:30 errands/widgets/window.py:67
 msgid "Today"
 msgstr "Сегодня"
 
@@ -78,8 +49,8 @@ msgid "Now"
 msgstr "Сейчас"
 
 #: errands/widgets/shared/datetime_picker.py:160
-#: errands/widgets/trash/trash_sidebar_row.py:64
 #: errands/widgets/trash/trash.py:40
+#: errands/widgets/trash/trash_sidebar_row.py:64
 msgid "Clear"
 msgstr "Очистить"
 
@@ -87,328 +58,165 @@ msgstr "Очистить"
 msgid "Set Date"
 msgstr "Задать дату"
 
-#: errands/widgets/shared/datetime_window.py:29
-msgid "Date and Time"
-msgstr "Дата и время"
+#: errands/widgets/shared/task_toolbar/toolbar.py:59
+#: errands/widgets/task_list/task_list_sidebar_row.py:122
+msgid "Exported"
+msgstr "Экспортировано"
 
-#: errands/widgets/shared/datetime_window.py:39
-#: errands/widgets/shared/datetime_window.py:41
-msgid "Due"
-msgstr "Конец"
+#: errands/widgets/shared/task_toolbar/toolbar.py:67
+msgid "Copied to Clipboard"
+msgstr "Скопировано в буфер обмена"
 
-#: errands/widgets/shared/datetime_window.py:54
-#: errands/widgets/shared/datetime_window.py:56
-msgid "Start"
-msgstr "Начало"
+#: errands/widgets/shared/task_toolbar/toolbar.py:86
+msgid "Start / Due Date"
+msgstr "Начало / Конец"
 
-#: errands/widgets/shared/notes_window.py:29
-#: errands/widgets/today/today_task.py:156 errands/widgets/task.py:300
+#: errands/widgets/shared/task_toolbar/toolbar.py:91 errands/lib/utils.py:21
+msgid "Date"
+msgstr "Дата"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:101
+#: errands/widgets/shared/task_toolbar/notes_window.py:29
 msgid "Notes"
 msgstr "Заметки"
 
-#: errands/widgets/tags/tags_sidebar_row.py:32 errands/widgets/tags/tags.py:63
-#: errands/widgets/today/today_task.py:231 errands/widgets/task.py:375
-#: errands/widgets/window.py:74
+#: errands/widgets/shared/task_toolbar/toolbar.py:114
+msgid "Priority"
+msgstr "Приоритет"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:132
+msgid "High"
+msgstr "Высокий"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:136
+msgid "Medium"
+msgstr "Средний"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:140
+msgid "Low"
+msgstr "Низкий"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:142
+#: errands/widgets/shared/task_toolbar/toolbar.py:241
+msgid "None"
+msgstr "Нет"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:145
+msgid "Custom"
+msgstr "Настроить"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:155
+msgid "No Tags"
+msgstr "Нет меток"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:176
+#: errands/widgets/tags/tags.py:63 errands/widgets/tags/tags_sidebar_row.py:32
+#: errands/widgets/window.py:72
 msgid "Tags"
 msgstr "Метки"
 
-#: errands/widgets/tags/tags.py:32
-msgid "No Tags Found"
-msgstr "Меток не найдено"
+#: errands/widgets/shared/task_toolbar/toolbar.py:199
+#: errands/widgets/shared/task_toolbar/attachments_window.py:30
+msgid "Attachments"
+msgstr "Вложения"
 
-#: errands/widgets/tags/tags.py:33
-msgid "Add new Tags in the entry above"
-msgstr "Добавьте новые метки выше"
+#: errands/widgets/shared/task_toolbar/toolbar.py:213
+#: errands/widgets/task.py:160 errands/widgets/today/today_task.py:64
+msgid "Edit"
+msgstr "Редактировать"
 
-#: errands/widgets/tags/tags.py:82
-msgid "Add new Tag"
-msgstr "Добавить метку"
+#: errands/widgets/shared/task_toolbar/toolbar.py:215
+msgid "Move to Trash"
+msgstr "Переместить в корзину"
 
+#: errands/widgets/shared/task_toolbar/toolbar.py:219
+msgid "Copy to Clipboard"
+msgstr "Скопировать в буфер обмена"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:222
+#: errands/widgets/task_list/task_list_sidebar_row.py:177
+msgid "Export"
+msgstr "Экспорт"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:251
+msgid "Blue"
+msgstr "Голубой"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:258
+msgid "Green"
+msgstr "Зеленый"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:265
+msgid "Yellow"
+msgstr "Желтый"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:272
+msgid "Orange"
+msgstr "Оранжевый"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:279
+msgid "Red"
+msgstr "Красный"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:286
+msgid "Purple"
+msgstr "Фиолетовый"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:293
+msgid "Brown"
+msgstr "Коричневый"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:301
+#: errands/widgets/shared/task_toolbar/toolbar.py:398
+msgid "Created:"
+msgstr "Создано:"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:312
+#: errands/widgets/shared/task_toolbar/toolbar.py:399
+msgid "Changed:"
+msgstr "Изменено:"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:325
+msgid "More"
+msgstr "Больше"
+
+#: errands/widgets/shared/task_toolbar/attachments_window.py:33
+msgid "No Files Attached"
+msgstr "Нет вложенных файлов"
+
+#: errands/widgets/shared/task_toolbar/attachments_window.py:56
+msgid "Add Attachment"
+msgstr "Добавить вложение"
+
+#: errands/widgets/shared/task_toolbar/attachments_window.py:116
+msgid "Open File"
+msgstr "Открыть файл"
+
+#: errands/widgets/shared/task_toolbar/attachments_window.py:120
 #: errands/widgets/tags/tags.py:140
-#: errands/widgets/task_list/task_list_sidebar_row.py:58
-#: errands/widgets/task_list/task_list_sidebar_row.py:219
+#: errands/widgets/task_list/task_list_sidebar_row.py:57
+#: errands/widgets/task_list/task_list_sidebar_row.py:176
 #: errands/widgets/trash/trash.py:159
 msgid "Delete"
 msgstr "Удалить"
 
-#: errands/widgets/task_list/task_list_sidebar_row.py:57
-msgid "List will be permanently deleted"
-msgstr "Список будет безвозвратно удален"
-
-#: errands/widgets/task_list/task_list_sidebar_row.py:87
-msgid "New Name"
-msgstr "Новое имя"
-
-#: errands/widgets/task_list/task_list_sidebar_row.py:92
-msgid "Rename List"
-msgstr "Переименовать список"
-
-#: errands/widgets/task_list/task_list_sidebar_row.py:98
-msgid "Save"
-msgstr "Сохранить"
-
-#: errands/widgets/task_list/task_list_sidebar_row.py:163
-msgid "Export failed"
-msgstr "Экспорт не удался"
-
-#: errands/widgets/task_list/task_list_sidebar_row.py:165
-#: errands/widgets/task.py:101
-msgid "Exported"
-msgstr "Экспортировано"
-
-#: errands/widgets/task_list/task_list_sidebar_row.py:218
-msgid "Rename"
-msgstr "Переименовать"
-
-#: errands/widgets/task_list/task_list_sidebar_row.py:220
-#: errands/widgets/today/today_task.py:270 errands/widgets/task.py:414
-msgid "Export"
-msgstr "Экспорт"
-
-#: errands/widgets/task_list/task_list.py:50
-msgid "Toggle Completed Tasks"
-msgstr "Переключить выполненные задачи"
-
-#: errands/widgets/task_list/task_list.py:58
-msgid "Delete Completed Tasks"
-msgstr "Удалить выполненные задачи"
-
-#: errands/widgets/task_list/task_list.py:73
-msgid "Scroll Up"
-msgstr "Прокрутить вверх"
-
-#: errands/widgets/task_list/task_list.py:84 errands/widgets/task.py:559
-msgid "Completed"
-msgstr "Выполнено"
-
-#: errands/widgets/task_list/task_list.py:144
-msgid "Add new Task"
-msgstr "Добавьте задачу"
-
-#: errands/widgets/task_list/task_list.py:156
-msgid "Loading..."
-msgstr "Загрузка..."
-
-#: errands/widgets/task_list/task_list.py:246 errands/widgets/task.py:793
-msgid "Completed:"
-msgstr "Выполнено:"
-
-#: errands/widgets/today/today_task.py:87 errands/widgets/task.py:183
-msgid "Toggle Completion"
-msgstr "Переключить выполнение"
-
-#: errands/widgets/today/today_task.py:96
-#: errands/widgets/today/today_task.py:261 errands/widgets/task.py:226
-#: errands/widgets/task.py:405
-msgid "Edit"
-msgstr "Редактировать"
-
-#: errands/widgets/today/today_task.py:142 errands/widgets/task.py:286
-msgid "Start / Due Date"
-msgstr "Начало / Конец"
-
-#: errands/widgets/today/today_task.py:169 errands/widgets/task.py:313
-msgid "Priority"
-msgstr "Приоритет"
-
-#: errands/widgets/today/today_task.py:187 errands/widgets/task.py:331
-msgid "High"
-msgstr "Высокий"
-
-#: errands/widgets/today/today_task.py:191 errands/widgets/task.py:335
-msgid "Medium"
-msgstr "Средний"
-
-#: errands/widgets/today/today_task.py:195 errands/widgets/task.py:339
-msgid "Low"
-msgstr "Низкий"
-
-#: errands/widgets/today/today_task.py:197
-#: errands/widgets/today/today_task.py:289 errands/widgets/task.py:341
-#: errands/widgets/task.py:433
-msgid "None"
-msgstr "Нет"
-
-#: errands/widgets/today/today_task.py:200 errands/widgets/task.py:344
-msgid "Custom"
-msgstr "Настроить"
-
-#: errands/widgets/today/today_task.py:210 errands/widgets/task.py:354
-msgid "No Tags"
-msgstr "Нет меток"
-
-#: errands/widgets/today/today_task.py:263 errands/widgets/task.py:407
-msgid "Move to Trash"
-msgstr "Переместить в корзину"
-
-#: errands/widgets/today/today_task.py:267 errands/widgets/task.py:411
-msgid "Copy to Clipboard"
-msgstr "Скопировать в буфер обмена"
-
-#: errands/widgets/today/today_task.py:299 errands/widgets/task.py:443
-msgid "Blue"
-msgstr "Голубой"
-
-#: errands/widgets/today/today_task.py:306 errands/widgets/task.py:450
-msgid "Green"
-msgstr "Зеленый"
-
-#: errands/widgets/today/today_task.py:313 errands/widgets/task.py:457
-msgid "Yellow"
-msgstr "Желтый"
-
-#: errands/widgets/today/today_task.py:320 errands/widgets/task.py:464
-msgid "Orange"
-msgstr "Оранжевый"
-
-#: errands/widgets/today/today_task.py:327 errands/widgets/task.py:471
-msgid "Red"
-msgstr "Красный"
-
-#: errands/widgets/today/today_task.py:334 errands/widgets/task.py:478
-msgid "Purple"
-msgstr "Фиолетовый"
-
-#: errands/widgets/today/today_task.py:341 errands/widgets/task.py:485
-msgid "Brown"
-msgstr "Коричневый"
-
-#: errands/widgets/today/today_task.py:349
-#: errands/widgets/today/today_task.py:621 errands/widgets/task.py:493
-#: errands/widgets/task.py:1187
-msgid "Created:"
-msgstr "Создано:"
-
-#: errands/widgets/today/today_task.py:360
-#: errands/widgets/today/today_task.py:622 errands/widgets/task.py:504
-#: errands/widgets/task.py:1188
-msgid "Changed:"
-msgstr "Изменено:"
-
-#: errands/widgets/today/today_task.py:373 errands/widgets/task.py:517
-msgid "More"
-msgstr "Больше"
-
-#: errands/widgets/today/today.py:31
-msgid "No Tasks for Today"
-msgstr "Нет задач на сегодня"
-
-#: errands/widgets/trash/trash_sidebar_row.py:43
-#: errands/widgets/trash/trash.py:89 errands/widgets/window.py:79
-msgid "Trash"
-msgstr "Корзина"
-
-#: errands/widgets/trash/trash_sidebar_row.py:65
-#: errands/widgets/trash/trash.py:55 errands/widgets/trash/trash.py:189
-msgid "Restore"
-msgstr "Восстановить"
-
-#: errands/widgets/trash/trash.py:31
-msgid "Empty Trash"
-msgstr "Корзина пуста"
-
-#: errands/widgets/trash/trash.py:32
-msgid "No deleted items"
-msgstr "Нет удаленных задач"
-
-#: errands/widgets/trash/trash.py:158
-msgid "Tasks will be permanently deleted"
-msgstr "Задачи будут безвозвратно удалены"
-
-#: errands/widgets/preferences.py:23
-msgid "Application Theme"
-msgstr "Тема"
-
-#: errands/widgets/preferences.py:31
-msgid "System"
-msgstr "Системная"
-
-#: errands/widgets/preferences.py:43
-msgid "Light"
-msgstr "Светлая"
-
-#: errands/widgets/preferences.py:55
-msgid "Dark"
-msgstr "Темная"
-
-#. Task lists group
-#: errands/widgets/preferences.py:63 errands/widgets/sidebar.py:90
-msgid "Task Lists"
-msgstr "Списки задач"
-
-#: errands/widgets/preferences.py:67
-msgid "Add new Tasks"
-msgstr "Добавить задачу"
-
-#: errands/widgets/preferences.py:68
-msgid "At the Bottom"
-msgstr "Снизу"
-
-#: errands/widgets/preferences.py:68
-msgid "At the Top"
-msgstr "Сверху"
-
-#: errands/widgets/preferences.py:84
-msgid "Show Notifications"
-msgstr "Показывать уведомления"
-
-#: errands/widgets/preferences.py:91
-msgid "Run in Background"
-msgstr "Работать в фоне"
-
-#: errands/widgets/preferences.py:92
-msgid "Hide the application window instead of closing it"
-msgstr "Прятать окно приложения вместо закрытия"
-
-#: errands/widgets/preferences.py:98
-msgid "Notifications and Background"
-msgstr "Уведомления и работа в фоне"
-
-#: errands/widgets/preferences.py:105 errands/widgets/preferences.py:159
-#: data/resources/gtk/help-overlay.ui:38
-msgid "Sync"
-msgstr "Синхронизация"
-
-#. Provider
-#: errands/widgets/preferences.py:108
-msgid "Disabled"
-msgstr "Отключено"
-
-#: errands/widgets/preferences.py:110
-msgid "Sync Provider"
-msgstr "Способ синхронизации"
-
-#: errands/widgets/preferences.py:119
-msgid "Server URL"
-msgstr "URL сервера"
-
-#: errands/widgets/preferences.py:125
-msgid "Username"
-msgstr "Имя пользователя"
-
-#: errands/widgets/preferences.py:131
-msgid "Password"
-msgstr "Пароль"
-
-#: errands/widgets/preferences.py:137
-msgid "Test"
-msgstr "Тест"
-
-#: errands/widgets/preferences.py:142
-msgid "Test Connection"
-msgstr "Тест соединения"
-
-#: errands/widgets/preferences.py:150 data/resources/gtk/help-overlay.ui:9
-msgid "General"
-msgstr "Основные"
-
-#: errands/widgets/preferences.py:195
-msgid "Connected"
-msgstr "Соединено"
-
-#: errands/widgets/preferences.py:195
-msgid "Can't connect"
-msgstr "Соединение не удалось"
+#: errands/widgets/shared/task_toolbar/attachments_window.py:129
+msgid "Open Containing Folder"
+msgstr "Открыть папку"
+
+#: errands/widgets/shared/task_toolbar/datetime_window.py:29
+msgid "Date and Time"
+msgstr "Дата и время"
+
+#: errands/widgets/shared/task_toolbar/datetime_window.py:39
+#: errands/widgets/shared/task_toolbar/datetime_window.py:41
+msgid "Due"
+msgstr "Конец"
+
+#: errands/widgets/shared/task_toolbar/datetime_window.py:54
+#: errands/widgets/shared/task_toolbar/datetime_window.py:56
+msgid "Start"
+msgstr "Начало"
 
 #: errands/widgets/sidebar.py:42
 msgid "Add List (Ctrl+Shift+A)"
@@ -426,8 +234,13 @@ msgstr "Добавить новый список"
 msgid "Click \"+\" button"
 msgstr "Нажмите на кнопку \"+\""
 
-#: errands/widgets/sidebar.py:102 errands/widgets/window.py:45
-#: errands/widgets/window.py:150 data/io.github.mrvladus.List.desktop.in.in:3
+#. Task lists group
+#: errands/widgets/sidebar.py:90 errands/widgets/preferences.py:66
+msgid "Task Lists"
+msgstr "Списки задач"
+
+#: errands/widgets/sidebar.py:102 errands/widgets/window.py:43
+#: errands/widgets/window.py:148 data/io.github.mrvladus.List.desktop.in.in:3
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:6
 msgid "Errands"
 msgstr "Дела"
@@ -472,61 +285,302 @@ msgstr "Добавить список"
 msgid "Add"
 msgstr "Довавить"
 
-#: errands/widgets/task.py:109
-msgid "Copied to Clipboard"
-msgstr "Скопировано в буфер обмена"
+#: errands/widgets/tags/tags.py:32
+msgid "No Tags Found"
+msgstr "Меток не найдено"
 
-#: errands/widgets/task.py:175
+#: errands/widgets/tags/tags.py:33
+msgid "Add new Tags in the entry above"
+msgstr "Добавьте новые метки выше"
+
+#: errands/widgets/tags/tags.py:82
+msgid "Add new Tag"
+msgstr "Добавить метку"
+
+#: errands/widgets/task.py:109
 msgid "Toggle Sub-Tasks"
 msgstr "Переключить подзадачи"
 
-#: errands/widgets/task.py:213
+#: errands/widgets/task.py:117 errands/widgets/today/today_task.py:55
+msgid "Toggle Completion"
+msgstr "Переключить выполнение"
+
+#: errands/widgets/task.py:147
 msgid "Toggle Toolbar"
 msgstr "Переключить панель инструментов"
 
-#: errands/widgets/task.py:583
+#: errands/widgets/task.py:233 errands/widgets/task_list/task_list.py:84
+msgid "Completed"
+msgstr "Выполнено"
+
+#: errands/widgets/task.py:257
 msgid "Add new Sub-Task"
 msgstr "Добавьте подзадачу"
 
-#: errands/widgets/task.py:1289
+#: errands/widgets/task.py:467 errands/widgets/task_list/task_list.py:246
+msgid "Completed:"
+msgstr "Выполнено:"
+
+#: errands/widgets/task.py:847
 msgid "Delete Tag"
 msgstr "Удалить метку"
 
-#: errands/widgets/window.py:58
+#: errands/widgets/task_list/task_list.py:50
+msgid "Toggle Completed Tasks"
+msgstr "Переключить выполненные задачи"
+
+#: errands/widgets/task_list/task_list.py:58
+msgid "Delete Completed Tasks"
+msgstr "Удалить выполненные задачи"
+
+#: errands/widgets/task_list/task_list.py:73
+msgid "Scroll Up"
+msgstr "Прокрутить вверх"
+
+#: errands/widgets/task_list/task_list.py:144
+msgid "Add new Task"
+msgstr "Добавьте задачу"
+
+#: errands/widgets/task_list/task_list.py:156
+msgid "Loading..."
+msgstr "Загрузка..."
+
+#: errands/widgets/task_list/task_list_sidebar_row.py:56
+msgid "List will be permanently deleted"
+msgstr "Список будет безвозвратно удален"
+
+#: errands/widgets/task_list/task_list_sidebar_row.py:86
+msgid "New Name"
+msgstr "Новое имя"
+
+#: errands/widgets/task_list/task_list_sidebar_row.py:91
+msgid "Rename List"
+msgstr "Переименовать список"
+
+#: errands/widgets/task_list/task_list_sidebar_row.py:97
+msgid "Save"
+msgstr "Сохранить"
+
+#: errands/widgets/task_list/task_list_sidebar_row.py:120
+msgid "Export failed"
+msgstr "Экспорт не удался"
+
+#: errands/widgets/task_list/task_list_sidebar_row.py:175
+msgid "Rename"
+msgstr "Переименовать"
+
+#: errands/widgets/today/today.py:31
+msgid "No Tasks for Today"
+msgstr "Нет задач на сегодня"
+
+#: errands/widgets/trash/trash.py:31
+msgid "Empty Trash"
+msgstr "Корзина пуста"
+
+#: errands/widgets/trash/trash.py:32
+msgid "No deleted items"
+msgstr "Нет удаленных задач"
+
+#: errands/widgets/trash/trash.py:55 errands/widgets/trash/trash.py:189
+#: errands/widgets/trash/trash_sidebar_row.py:65
+msgid "Restore"
+msgstr "Восстановить"
+
+#: errands/widgets/trash/trash.py:89
+#: errands/widgets/trash/trash_sidebar_row.py:43 errands/widgets/window.py:77
+msgid "Trash"
+msgstr "Корзина"
+
+#: errands/widgets/trash/trash.py:158
+msgid "Tasks will be permanently deleted"
+msgstr "Задачи будут безвозвратно удалены"
+
+#: errands/widgets/window.py:56
 msgid "Sidebar"
 msgstr "Боковая панель"
 
-#: errands/widgets/window.py:61
+#: errands/widgets/window.py:59
 msgid "Content"
 msgstr "Контент"
 
-#: errands/widgets/window.py:92
+#: errands/widgets/window.py:90
 msgid "No Task Lists"
 msgstr "Нет списков задач"
 
-#: errands/widgets/window.py:93
+#: errands/widgets/window.py:91
 msgid "Create new or import existing one"
 msgstr "Создайте новый или импортируйте существующий"
 
-#: errands/widgets/window.py:97
+#: errands/widgets/window.py:95
 msgid "Create List"
 msgstr "Создать список"
 
-#: errands/widgets/window.py:106
+#: errands/widgets/window.py:104
 msgid "Create new List"
 msgstr "Создать новый список"
 
-#: errands/widgets/window.py:155
+#: errands/widgets/window.py:153
 msgid "translator-credits"
 msgstr "Vlad Krupinski <mrvladus@yandex.ru>"
 
-#: errands/widgets/window.py:161
+#: errands/widgets/window.py:159
 msgid "Sync is disabled"
 msgstr "Синхронизация отключена"
 
-#: errands/widgets/window.py:246
+#: errands/widgets/window.py:194
 msgid "Imported"
 msgstr "Импортировано"
+
+#: errands/widgets/preferences.py:26
+msgid "Application Theme"
+msgstr "Тема"
+
+#: errands/widgets/preferences.py:34
+msgid "System"
+msgstr "Системная"
+
+#: errands/widgets/preferences.py:46
+msgid "Light"
+msgstr "Светлая"
+
+#: errands/widgets/preferences.py:58
+msgid "Dark"
+msgstr "Темная"
+
+#: errands/widgets/preferences.py:70
+msgid "Add new Tasks"
+msgstr "Добавить задачу"
+
+#: errands/widgets/preferences.py:71
+msgid "At the Bottom"
+msgstr "Снизу"
+
+#: errands/widgets/preferences.py:71
+msgid "At the Top"
+msgstr "Сверху"
+
+#: errands/widgets/preferences.py:87
+msgid "Show Notifications"
+msgstr "Показывать уведомления"
+
+#: errands/widgets/preferences.py:94
+msgid "Run in Background"
+msgstr "Работать в фоне"
+
+#: errands/widgets/preferences.py:95
+msgid "Hide the application window instead of closing it"
+msgstr "Прятать окно приложения вместо закрытия"
+
+#: errands/widgets/preferences.py:102
+msgid "Launch on Startup"
+msgstr "Автозапуск"
+
+#: errands/widgets/preferences.py:103
+msgid "Launch application when user logs in"
+msgstr "Запускать при старте системы"
+
+#: errands/widgets/preferences.py:112
+msgid "Notifications and Background"
+msgstr "Уведомления и работа в фоне"
+
+#: errands/widgets/preferences.py:120 errands/widgets/preferences.py:181
+#: data/resources/gtk/help-overlay.ui:38
+msgid "Sync"
+msgstr "Синхронизация"
+
+#. Provider
+#: errands/widgets/preferences.py:123
+msgid "Disabled"
+msgstr "Отключено"
+
+#: errands/widgets/preferences.py:125
+msgid "Sync Provider"
+msgstr "Способ синхронизации"
+
+#: errands/widgets/preferences.py:134
+msgid "Server URL"
+msgstr "URL сервера"
+
+#: errands/widgets/preferences.py:140
+msgid ""
+"URL needs to include protocol, like <b>http://</b> or <b>https://</b>. If "
+"you have problems with connection - try to change protocol first."
+msgstr ""
+"URL должен включать протокол: <b>http://</b> или <b>https://</b>. Если "
+"у вас проблемы с соединением - попробуйте изменить протокол."
+
+#: errands/widgets/preferences.py:147
+msgid "Username"
+msgstr "Имя пользователя"
+
+#: errands/widgets/preferences.py:153
+msgid "Password"
+msgstr "Пароль"
+
+#: errands/widgets/preferences.py:159
+msgid "Test"
+msgstr "Тест"
+
+#: errands/widgets/preferences.py:164
+msgid "Test Connection"
+msgstr "Тест соединения"
+
+#: errands/widgets/preferences.py:172 data/resources/gtk/help-overlay.ui:9
+msgid "General"
+msgstr "Основные"
+
+#: errands/widgets/preferences.py:217
+msgid "Connected"
+msgstr "Соединено"
+
+#: errands/widgets/preferences.py:221
+msgid "Authorization failed"
+msgstr "Экспорт не удался"
+
+#: errands/widgets/preferences.py:223
+msgid "Could not locate server. Check network and url."
+msgstr "Сервен не найден. Проверьте подключение."
+
+#: errands/widgets/preferences.py:225
+msgid "Can't connect"
+msgstr "Соединение не удалось"
+
+#. NOTE: Also catches invalid credentials
+#: errands/widgets/preferences.py:227
+msgid "Can't connect. Check credentials"
+msgstr "Нет соединенияю. Проверьте данные"
+
+#: errands/lib/sync/providers/caldav.py:65
+msgid "Not all sync credentials provided. Please check settings."
+msgstr "Не все данные для синхронизации предоставлены. Проверьте настройки."
+
+#: errands/lib/sync/providers/caldav.py:109
+msgid "Can't connect to CalDAV server at:"
+msgstr "Невозможно подключиться к CalDAV серверу по адресу:"
+
+#: errands/lib/data.py:89
+msgid "New Task List"
+msgstr "Новый список задач"
+
+#: errands/lib/notifications.py:72
+msgid "Task is Due"
+msgstr "Напоминание о задаче"
+
+#: errands/application.py:79
+msgid "Errands was updated"
+msgstr "Дела были обновлены"
+
+#: errands/application.py:80
+msgid "Restart is required"
+msgstr "Необходим перезапуск приложения"
+
+#: errands/application.py:83
+msgid "Restart"
+msgstr "Перезапустить"
+
+#: errands/application.py:112
+msgid "Errands need to run in the background for notifications"
+msgstr "\"Дела\" должны работать в фоновом режиме для уведомлений"
 
 #: data/resources/gtk/help-overlay.ui:13
 msgid "Show keyboard shortcuts"
