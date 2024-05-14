@@ -57,6 +57,14 @@
   </requires>
 
   <releases>
+    <release version="46.1.1" date="2024-05-16">
+      <description translatable="no">
+        <p>Fixed:</p>
+        <ul>
+          <li>Sending notification for completed and deleted tasks</li>
+        </ul>
+      </description>
+    </release>
     <release version="46.1" date="2024-05-14">
       <description translatable="no">
         <p>Added:</p>
