@@ -234,8 +234,15 @@ class TodayTask(Gtk.Revealer):
 
         self.tags_bar_rev.set_reveal_child(tags != [])
 
+        linked_task = State.get_task(self.task_data.list_uid, self.task_data.uid)
+        if linked_task:
+            linked_task.update_tags_bar()
+
     def update_toolbar(self) -> None:
         self.toolbar.update_ui()
+        linked_task = State.get_task(self.task_data.list_uid, self.task_data.uid)
+        if linked_task:
+            linked_task.update_toolbar()
 
     def update_color(self) -> None:
         for cls in self.main_box.get_css_classes():

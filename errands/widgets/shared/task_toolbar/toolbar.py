@@ -418,7 +418,7 @@ class ErrandsTaskToolbar(Gtk.FlowBox):
             if priority != new_priority:
                 Log.debug(f"Task Toolbar: Set priority to '{new_priority}'")
                 self.task.update_props(["priority", "synced"], [new_priority, False])
-                self.update_ui()
+                self.task.update_toolbar()
                 Sync.sync()
 
     def _on_priority_selected(self, box: Gtk.ListBox, row: Gtk.ListBoxRow) -> None:

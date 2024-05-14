@@ -3,6 +3,7 @@
 
 import os
 from subprocess import getoutput
+import subprocess
 from time import sleep
 
 from gi.repository import Adw, Gio, GLib, Xdp  # type:ignore
@@ -52,7 +53,7 @@ class ErrandsApplication(Adw.Application):
             else:
                 cmd: str = "errands"
 
-            os.system(cmd)
+            subprocess.run(cmd)
             exit()
 
         def __inner_check() -> bool:
