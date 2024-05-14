@@ -57,6 +57,22 @@
   </requires>
 
   <releases>
+    <release version="46.1" date="2024-05-14">
+      <description translatable="no">
+        <p>Added:</p>
+        <ul>
+          <li>Task Attachments. Add any local files to your Tasks.</li>
+        </ul>
+        <p>Changed:</p>
+        <ul>
+          <li>Sync indicator now has animation</li>
+        </ul>
+        <p>Fixed:</p>
+        <ul>
+          <li>App reloading</li>
+        </ul>
+      </description>
+    </release>
     <release version="46.0.6" date="2024-05-12">
       <description translatable="no">
         <p>Fix bug with export</p>
