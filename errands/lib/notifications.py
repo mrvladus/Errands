@@ -30,6 +30,9 @@ class ErrandsNotificationsDaemon:
             for t in UserData.tasks
             if t.due_date
             and datetime.fromisoformat(t.due_date) < now
+            and not t.deleted
+            and not t.completed
+            and not t.trash
             and not t.notified
         ]
 
