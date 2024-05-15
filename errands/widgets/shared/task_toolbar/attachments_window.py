@@ -102,6 +102,9 @@ class ErrandsAttachmentsWindow(Adw.Dialog):
         dialog = Gtk.FileDialog()
         dialog.open(State.main_window, None, __confirm)
 
+    def do_closed(self):
+        self.task.update_toolbar()
+
 
 class ErrandsAttachment(Adw.ActionRow):
     def __init__(self, path: str):

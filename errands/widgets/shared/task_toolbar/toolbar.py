@@ -318,6 +318,11 @@ class ErrandsTaskToolbar(Gtk.FlowBox):
             f"errands-priority{'-set' if priority>0 else ''}-symbolic"
         )
 
+        # Update attachments button css
+        self.attachments_btn.remove_css_class("accent")
+        if len(self.task.task_data.attachments) > 0:
+            self.attachments_btn.add_css_class("accent")
+
     def _on_accent_color_selected(self, btn: Gtk.CheckButton) -> None:
         if not btn.get_active() or self.task.block_signals:
             return
