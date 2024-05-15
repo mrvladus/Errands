@@ -62,6 +62,7 @@
         <p>Added:</p>
         <ul>
           <li>Right-click menu for Tasks. Moved all task actions from toolbar menu to it.</li>
+          <li>Accent color to attachmants button if it has attachments</li>
         </ul>
         <p>Fixed:</p>
         <ul>
