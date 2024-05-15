@@ -274,7 +274,7 @@ class ErrandsTaskToolbar(Gtk.FlowBox):
 
         self.append(
             ErrandsBox(
-                spacing=3,
+                spacing=2,
                 halign=Gtk.Align.END,
                 children=[
                     self.notes_btn,
