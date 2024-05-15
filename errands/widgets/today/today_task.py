@@ -6,18 +6,20 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING, Any
 
-from gi.repository import Adw, GLib, GObject, Gtk  # type:ignore
+from gi.repository import Adw, Gdk, Gio, GLib, GObject, Gtk  # type:ignore
 
 from errands.lib.data import TaskData, UserData
+from errands.lib.logging import Log
 from errands.lib.markup import Markup
 from errands.lib.sync.sync import Sync
 from errands.lib.utils import get_children
 from errands.state import State
 from errands.widgets.shared.components.boxes import ErrandsBox, ErrandsListBox
 from errands.widgets.shared.components.buttons import ErrandsButton, ErrandsCheckButton
+from errands.widgets.shared.components.menus import ErrandsMenuItem, ErrandsSimpleMenu
+from errands.widgets.shared.task_toolbar.toolbar import ErrandsTaskToolbar
 from errands.widgets.task import Tag, Task
 from errands.widgets.task_list.task_list import TaskList
-from errands.widgets.shared.task_toolbar.toolbar import ErrandsTaskToolbar
 
 if TYPE_CHECKING:
     from errands.widgets.today.today import Today
@@ -34,11 +36,54 @@ class TodayTask(Gtk.Revealer):
         self.uid = task_data.uid
         self.today_page = today_page
         self.__build_ui()
+        self.__add_actions()
         self.update_ui()
         self.block_signals = False
 
     def __repr__(self) -> str:
         return f"<class 'TodayTask' {self.task_data.uid}>"
+
+    def __add_actions(self) -> None:
+        self.group: Gio.SimpleActionGroup = Gio.SimpleActionGroup()
+        self.insert_action_group(name="task", group=self.group)
+
+        def __create_action(name: str, callback: callable) -> None:
+            action: Gio.SimpleAction = Gio.SimpleAction(name=name)
+            action.connect("activate", callback)
+            self.group.add_action(action)
+
+        def __edit(*args):
+            self.edit_row.set_text(self.task_data.text)
+            self.edit_row.set_visible(True)
+            self.edit_row.grab_focus()
+
+        def __export(*args):
+            def __confirm(dialog, res):
+                try:
+                    file = dialog.save_finish(res)
+                except Exception as e:
+                    Log.debug(f"List: Export cancelled. {e}")
+                    return
+
+                Log.info(f"Task: Export '{self.uid}'")
+
+                with open(file.get_path(), "w") as f:
+                    f.write(self.task_data.to_ical(True))
+
+                State.main_window.add_toast(_("Exported"))
+
+            dialog = Gtk.FileDialog(initial_name=f"{self.uid}.ics")
+            dialog.save(State.main_window, None, __confirm)
+
+        def __copy_to_clipboard(*args):
+            Log.info("Task: Copy text to clipboard")
+            self.get_clipboard().set(self.task_data.text)
+            State.main_window.add_toast(_("Copied to Clipboard"))
+
+        __create_action("edit", __edit)
+        __create_action("copy_to_clipboard", __copy_to_clipboard)
+        __create_action("export", __export)
+        __create_action("move_to_trash", lambda *_: self.delete())
 
     def __build_ui(self):
         # --- TITLE --- #
@@ -58,6 +103,24 @@ class TodayTask(Gtk.Revealer):
             on_toggle=self._on_complete_btn_toggled,
         )
         self.title_row.add_prefix(self.complete_btn)
+
+        # Right click menu
+        right_click_ctrl = Gtk.GestureClick(button=3)
+        right_click_ctrl.connect("released", self.__on_right_click)
+        self.title_row.add_controller(right_click_ctrl)
+
+        self.popover_menu: Gtk.PopoverMenu = Gtk.PopoverMenu(
+            halign=Gtk.Align.START,
+            has_arrow=False,
+            menu_model=ErrandsSimpleMenu(
+                items=(
+                    ErrandsMenuItem(_("Edit"), "task.edit"),
+                    ErrandsMenuItem(_("Move to Trash"), "task.move_to_trash"),
+                    ErrandsMenuItem(_("Copy to Clipboard"), "task.copy_to_clipboard"),
+                    ErrandsMenuItem(_("Export"), "task.export"),
+                )
+            ),
+        )
 
         # Edit row
         self.edit_row: Adw.EntryRow = Adw.EntryRow(
@@ -119,6 +182,7 @@ class TodayTask(Gtk.Revealer):
                     css_classes=["transparent", "rounded-corners"],
                     children=[self.title_row, self.edit_row],
                 ),
+                self.popover_menu,
                 # Tags
                 self.tags_bar_rev,
                 # Toolbar
@@ -290,3 +354,10 @@ class TodayTask(Gtk.Revealer):
     def _on_cancel_edit_btn_clicked(self, _btn: Gtk.Button) -> None:
         self.edit_row.props.text = ""
         self.edit_row.emit("apply")
+
+    def __on_right_click(self, _gesture_click, _n_press, x: int, y: int) -> None:
+        position: Gdk.Rectangle = Gdk.Rectangle()
+        position.x = x
+        position.y = y
+        self.popover_menu.set_pointing_to(position)
+        self.popover_menu.popup()

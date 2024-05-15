@@ -26,50 +26,7 @@ class ErrandsTaskToolbar(Gtk.FlowBox):
     def __init__(self, task: Task) -> None:
         super().__init__()
         self.task: Task = task
-        self.__add_actions()
         self.__build_ui()
-
-    def __add_actions(self) -> None:
-        self.group: Gio.SimpleActionGroup = Gio.SimpleActionGroup()
-        self.insert_action_group(name="task_toolbar", group=self.group)
-
-        def __create_action(name: str, callback: callable) -> None:
-            action: Gio.SimpleAction = Gio.SimpleAction(name=name)
-            action.connect("activate", callback)
-            self.group.add_action(action)
-
-        def __edit(*args):
-            self.task.edit_row.set_text(self.task.task_data.text)
-            self.task.edit_row.set_visible(True)
-            self.task.edit_row.grab_focus()
-
-        def __export(*args):
-            def __confirm(dialog, res):
-                try:
-                    file = dialog.save_finish(res)
-                except Exception as e:
-                    Log.debug(f"List: Export cancelled. {e}")
-                    return
-
-                Log.info(f"Task: Export '{self.task.uid}'")
-
-                with open(file.get_path(), "w") as f:
-                    f.write(self.task.task_data.to_ical(True))
-
-                State.main_window.add_toast(_("Exported"))
-
-            dialog = Gtk.FileDialog(initial_name=f"{self.task.uid}.ics")
-            dialog.save(State.main_window, None, __confirm)
-
-        def __copy_to_clipboard(*args):
-            Log.info("Task: Copy text to clipboard")
-            self.task.get_clipboard().set(self.task.task_data.text)
-            State.main_window.add_toast(_("Copied to Clipboard"))
-
-        __create_action("edit", __edit)
-        __create_action("copy_to_clipboard", __copy_to_clipboard)
-        __create_action("export", __export)
-        __create_action("move_to_trash", lambda *_: self.task.delete())
 
     def __build_ui(self) -> None:
         self.set_margin_bottom(2)
@@ -209,17 +166,6 @@ class ErrandsTaskToolbar(Gtk.FlowBox):
         menu_top_section.append_item(menu_colors_item)
 
         menu: Gio.Menu = Gio.Menu()
-
-        menu.append(label=_("Edit"), detailed_action="task_toolbar.edit")
-        menu.append(
-            label=_("Move to Trash"),
-            detailed_action="task_toolbar.move_to_trash",
-        )
-        menu.append(
-            label=_("Copy to Clipboard"),
-            detailed_action="task_toolbar.copy_to_clipboard",
-        )
-        menu.append(label=_("Export"), detailed_action="task_toolbar.export")
         menu.append_section(None, menu_top_section)
 
         menu_bottom_section: Gio.Menu = Gio.Menu()
