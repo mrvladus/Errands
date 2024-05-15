@@ -181,8 +181,9 @@ class ErrandsTaskToolbar(Gtk.FlowBox):
         popover_menu = Gtk.PopoverMenu(menu_model=menu)
 
         # Colors
-        self.color_selector: ErrandsColorSelector = ErrandsColorSelector()
-        self.color_selector.connect("color-selected", self.__on_accent_color_selected)
+        self.color_selector: ErrandsColorSelector = ErrandsColorSelector(
+            on_color_selected=self.__on_accent_color_selected
+        )
         popover_menu.add_child(self.color_selector, "color")
 
         # Created label

@@ -1,6 +1,7 @@
 # Copyright 2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
+from typing import Callable
 from gi.repository import GObject, Gtk  # type:ignore
 
 from errands.lib.logging import Log
@@ -14,9 +15,10 @@ class ErrandsColorSelector(Gtk.Box):
         arg_types=(ErrandsCheckButton, str),
     )
 
-    def __init__(self):
+    def __init__(self, on_color_selected: Callable):
         super().__init__()
         self.__build_ui()
+        self.connect("color-selected", on_color_selected)
 
     @property
     def buttons(self) -> list[ErrandsCheckButton]:
