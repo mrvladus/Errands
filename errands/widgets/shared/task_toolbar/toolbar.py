@@ -13,6 +13,7 @@ from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
 from errands.lib.utils import get_children, get_human_datetime
 from errands.state import State
+from errands.widgets.shared.color_selector import ErrandsColorSelector
 from errands.widgets.shared.components.boxes import ErrandsBox, ErrandsListBox
 from errands.widgets.shared.components.buttons import ErrandsButton, ErrandsCheckButton
 from errands.widgets.shared.titled_separator import TitledSeparator
@@ -180,67 +181,9 @@ class ErrandsTaskToolbar(Gtk.FlowBox):
         popover_menu = Gtk.PopoverMenu(menu_model=menu)
 
         # Colors
-        none_color_btn = ErrandsCheckButton(
-            on_toggle=self._on_accent_color_selected,
-            name="none",
-            css_classes=["accent-color-btn", "accent-color-btn-none"],
-            tooltip_text=_("None"),
-        )
-        self.accent_color_btns = ErrandsBox(
-            children=[
-                none_color_btn,
-                ErrandsCheckButton(
-                    group=none_color_btn,
-                    on_toggle=self._on_accent_color_selected,
-                    name="blue",
-                    css_classes=["accent-color-btn", "accent-color-btn-blue"],
-                    tooltip_text=_("Blue"),
-                ),
-                ErrandsCheckButton(
-                    group=none_color_btn,
-                    on_toggle=self._on_accent_color_selected,
-                    name="green",
-                    css_classes=["accent-color-btn", "accent-color-btn-green"],
-                    tooltip_text=_("Green"),
-                ),
-                ErrandsCheckButton(
-                    group=none_color_btn,
-                    on_toggle=self._on_accent_color_selected,
-                    name="yellow",
-                    css_classes=["accent-color-btn", "accent-color-btn-yellow"],
-                    tooltip_text=_("Yellow"),
-                ),
-                ErrandsCheckButton(
-                    group=none_color_btn,
-                    on_toggle=self._on_accent_color_selected,
-                    name="orange",
-                    css_classes=["accent-color-btn", "accent-color-btn-orange"],
-                    tooltip_text=_("Orange"),
-                ),
-                ErrandsCheckButton(
-                    group=none_color_btn,
-                    on_toggle=self._on_accent_color_selected,
-                    name="red",
-                    css_classes=["accent-color-btn", "accent-color-btn-red"],
-                    tooltip_text=_("Red"),
-                ),
-                ErrandsCheckButton(
-                    group=none_color_btn,
-                    on_toggle=self._on_accent_color_selected,
-                    name="purple",
-                    css_classes=["accent-color-btn", "accent-color-btn-purple"],
-                    tooltip_text=_("Purple"),
-                ),
-                ErrandsCheckButton(
-                    group=none_color_btn,
-                    on_toggle=self._on_accent_color_selected,
-                    name="brown",
-                    css_classes=["accent-color-btn", "accent-color-btn-brown"],
-                    tooltip_text=_("Brown"),
-                ),
-            ]
-        )
-        popover_menu.add_child(self.accent_color_btns, "color")
+        self.color_selector: ErrandsColorSelector = ErrandsColorSelector()
+        self.color_selector.connect("color-selected", self.__on_accent_color_selected)
+        popover_menu.add_child(self.color_selector, "color")
 
         # Created label
         self.created_label = Gtk.Label(
@@ -323,10 +266,11 @@ class ErrandsTaskToolbar(Gtk.FlowBox):
         if len(self.task.task_data.attachments) > 0:
             self.attachments_btn.add_css_class("accent")
 
-    def _on_accent_color_selected(self, btn: Gtk.CheckButton) -> None:
+    def __on_accent_color_selected(
+        self, _color_selector, btn: ErrandsCheckButton, color: str
+    ) -> None:
         if not btn.get_active() or self.task.block_signals:
             return
-        color: str = btn.get_name()
         Log.debug(f"Task: change color to '{color}'")
         if color != self.task.task_data.color:
             self.task.update_props(
@@ -350,15 +294,9 @@ class ErrandsTaskToolbar(Gtk.FlowBox):
         self.changed_label.set_label(_("Changed:") + " " + changed_date)
 
         # Update color
-        color: str = self.task.task_data.color
-        for btn in self.accent_color_btns.children:
-            btn_color = btn.get_name()
-            if color == "":
-                color = "none"
-            if btn_color == color:
-                self.task.block_signals = True
-                btn.set_active(True)
-                self.task.block_signals = False
+        self.task.block_signals = True
+        self.color_selector.select_color(self.task.task_data.color)
+        self.task.block_signals = False
 
     def _on_priority_btn_toggled(self, btn: Gtk.MenuButton, *_) -> None:
         priority: int = self.task.task_data.priority
