@@ -243,22 +243,14 @@ calendar header {
 }
 
 colorbutton {
-  margin: 0px;
-  padding: 0px;
   transform: scale(0.6);
 }
 
 colorbutton button {
   border-radius: 9999px;
+  padding: 4px;
 }
 
 colorbutton button colorswatch {
-  all: unset;
   border-radius: 9999px;
 }
-
-/* colorbutton button,
-colorbutton colorswatch {
-  border-radius: 9999px;
-  margin: 0px;
-} */

@@ -193,7 +193,7 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
             ErrandsBox(
                 spacing=6,
                 children=[
-                    # self.color_btn,
+                    self.color_btn,
                     self.label,
                     self.size_counter,
                     self.popover_menu,
