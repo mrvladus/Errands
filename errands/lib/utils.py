@@ -1,6 +1,7 @@
 # Copyright 2023-2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
+import random
 import time
 from datetime import datetime
 from functools import wraps
@@ -8,8 +9,6 @@ from threading import Thread
 from typing import Callable
 
 from gi.repository import GLib, Gtk  # type:ignore
-
-from errands.lib.logging import Log
 
 
 def get_human_datetime(date_time: str) -> str:
@@ -58,17 +57,6 @@ def idle_add(func: Callable):
     return wrapper
 
 
-def catch_errors(function: Callable):
-    """Catch errors and log them"""
-
-    @wraps(function)
-    def wrapper(*args, **kwargs):
-        try:
-            function(*args, **kwargs)
-        except Exception as e:
-            Log.error(e)
-
-
 def timeit(func):
     @wraps(func)
     def timeit_wrapper(*args, **kwargs):
@@ -81,3 +69,12 @@ def timeit(func):
         return result
 
     return timeit_wrapper
+
+
+def rgb_to_hex(r: str, g: str, b: str) -> str:
+    return "#{:02x}{:02x}{:02x}".format(int(r), int(g), int(b))
+
+
+def random_hex_color() -> str:
+    hex_chars: str = "0123456789ABCDEF"
+    return "#" + "".join(random.choice(hex_chars) for _ in range(6))

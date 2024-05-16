@@ -9,6 +9,7 @@ from errands.lib.data import TaskListData, UserData
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
+from errands.lib.utils import rgb_to_hex
 from errands.state import State
 from errands.widgets.shared.components.boxes import ErrandsBox
 from errands.widgets.shared.components.dialogs import ConfirmDialog
@@ -18,6 +19,8 @@ from errands.widgets.task_list.task_list import TaskList
 
 
 class TaskListSidebarRow(Gtk.ListBoxRow):
+    block_signals: bool = False
+
     def __init__(self, list_data: TaskListData) -> None:
         super().__init__()
         self.list_data = list_data
@@ -149,6 +152,13 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
         drag_hover_ctrl.connect("enter", self._on_drop_hover)
         self.add_controller(drag_hover_ctrl)
 
+        # Color button
+        color_dialog: Gtk.ColorDialog = Gtk.ColorDialog(with_alpha=False)
+        self.color_btn: Gtk.ColorDialogButton = Gtk.ColorDialogButton(
+            dialog=color_dialog
+        )
+        self.color_btn.connect("notify::rgba", self.__on_color_selected)
+
         # Title
         self.label: Gtk.Label = Gtk.Label(
             hexpand=True, halign=Gtk.Align.START, ellipsize=3
@@ -181,9 +191,13 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
 
         self.set_child(
             ErrandsBox(
-                spacing=12,
-                margin_start=6,
-                children=[self.label, self.size_counter, self.popover_menu],
+                spacing=6,
+                children=[
+                    # self.color_btn,
+                    self.label,
+                    self.size_counter,
+                    self.popover_menu,
+                ],
             )
         )
 
@@ -197,6 +211,12 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
         self.label.set_label(self.name)
         self.stack_page.set_name(self.name)
         self.stack_page.set_title(self.name)
+
+        color: Gdk.RGBA = Gdk.RGBA()
+        color.parse(self.list_data.color)
+        self.block_signals = True
+        self.color_btn.set_rgba(color)
+        self.block_signals = False
 
         # Update task list
         if update_task_list_ui:
@@ -259,3 +279,15 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
         position.y = y
         self.popover_menu.set_pointing_to(position)
         self.popover_menu.popup()
+
+    def __on_color_selected(self, btn: Gtk.ColorDialogButton, _):
+        if self.block_signals:
+            return
+        try:
+            r, g, b = btn.get_rgba().to_string().strip("rgba()").split(",")[:3]
+            color: str = rgb_to_hex(r, g, b)
+        except BaseException:
+            color: str = "#3584e4"
+        Log.debug(f"Task List '{self.list_data.uid}': Set color to '{color}'")
+        UserData.update_list_prop(self.list_data.uid, "color", color)
+        Sync.sync()

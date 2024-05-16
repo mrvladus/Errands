@@ -19,6 +19,7 @@ from gi.repository import GLib  # type:ignore
 
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
+from errands.lib.utils import random_hex_color
 
 
 @dataclass
@@ -45,6 +46,8 @@ class TaskListData:
     def __post_init__(self):
         if not self.uid:
             self.uid = str(uuid4())
+        if not self.color:
+            self.color = random_hex_color()
 
     def to_ical(self, single_task: str = None) -> str:
         """Build VTODO iCal component from TaskData properties"""
