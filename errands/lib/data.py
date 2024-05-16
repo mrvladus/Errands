@@ -187,7 +187,7 @@ class TaskData:
             elif "STATUS" in prop:
                 task.completed = True if value == "COMPLETED" else False
             elif "SUMMARY" in prop:
-                task.text = value
+                task.text = value.replace("\\,", ",").replace("\\\\", "\\")
             elif "UID" in prop:
                 task.uid = value
             elif "DUE" in prop:
@@ -199,7 +199,7 @@ class TaskData:
                 if task.start_date and "T" not in task.start_date:
                     task.start_date += "T000000"
             elif "DESCRIPTION" in prop:
-                task.notes = value
+                task.notes = value.replace("\\,", ",").replace("\\\\", "\\")
             elif "CATEGORIES" in prop:
                 task.tags = value.split(",") if value else []
             elif "X-ERRANDS-COLOR" in prop:
