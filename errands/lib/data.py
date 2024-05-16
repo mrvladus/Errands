@@ -163,8 +163,6 @@ class TaskData:
     @staticmethod
     def from_ical(ical: str | bytes, list_uid: str) -> TaskData:
         """Build TaskData from iCal string"""
-
-        ical: str = str(ical)
         task: TaskData = TaskData(list_uid=list_uid)
 
         assert ical != ""
@@ -186,8 +184,8 @@ class TaskData:
                 task.parent = value
             elif "STATUS" in prop:
                 task.completed = True if value == "COMPLETED" else False
-            elif "SUMMARY" in prop:
-                task.text = value.replace("\\,", ",").replace("\\\\", "\\")
+            # elif "SUMMARY" in prop:
+            #     task.text = value.replace("\\,", ",").replace("\\\\", "\\")
             elif "UID" in prop:
                 task.uid = value
             elif "DUE" in prop:
@@ -198,8 +196,8 @@ class TaskData:
                 task.start_date = value.strip("Z")
                 if task.start_date and "T" not in task.start_date:
                     task.start_date += "T000000"
-            elif "DESCRIPTION" in prop:
-                task.notes = value.replace("\\,", ",").replace("\\\\", "\\")
+            # elif "DESCRIPTION" in prop:
+            #     task.notes = value.replace("\\,", ",").replace("\\\\", "\\")
             elif "CATEGORIES" in prop:
                 task.tags = value.split(",") if value else []
             elif "X-ERRANDS-COLOR" in prop:

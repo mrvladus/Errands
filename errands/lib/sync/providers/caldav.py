@@ -117,8 +117,14 @@ class SyncProviderCalDAV:
         try:
             Log.debug(f"Sync: Getting tasks for list '{calendar.id}'")
             todos: list[Todo] = calendar.todos(include_completed=True)
-            return [TaskData.from_ical(todo.data, calendar.id) for todo in todos]
-        except Exception as e:
+            tasks: list[TaskData] = []
+            for todo in todos:
+                task: TaskData = TaskData.from_ical(todo.data, calendar.id)
+                task.text = str(todo.icalendar_component.get("summary", ""))
+                task.notes = str(todo.icalendar_component.get("description", ""))
+                tasks.append(task)
+            return tasks
+        except BaseException as e:
             Log.error(f"Sync: Can't get tasks from remote. {e}")
             return []
 
