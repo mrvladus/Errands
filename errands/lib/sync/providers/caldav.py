@@ -8,6 +8,7 @@ from dataclasses import asdict, dataclass, field
 from typing import Any
 
 import urllib3
+import caldav
 from caldav import Calendar, DAVClient, Principal, Todo
 from caldav.elements import dav
 
@@ -229,10 +230,11 @@ class SyncProviderCalDAV:
 
         for list in UserData.get_lists_as_dicts():
             for cal in self.calendars:
-                if cal.id == list.uid and cal.name != list.name and not list.synced:
-                    self.__rename_remote_list(cal, list)
-                elif cal.id == list.uid and cal.name != list.name and list.synced:
-                    self.__rename_local_list(cal, list)
+                if cal.id == list.uid:
+                    if list.synced:
+                        self.__update_local_list(cal, list)
+                    else:
+                        self.__update_remote_list(cal, list)
             if list.uid not in remote_lists_uids and list.synced and not list.deleted:
                 self.__delete_local_list(list)
             elif list.uid in remote_lists_uids and list.deleted and list.synced:
@@ -254,19 +256,6 @@ class SyncProviderCalDAV:
                 )
                 self.update_ui_args.lists_to_add.append(new_list)
 
-    def __rename_remote_list(self, cal: Calendar, list: TaskListData) -> None:
-        Log.debug(f"Sync: Rename remote list '{list.uid}'")
-
-        cal.set_properties([dav.DisplayName(list.name)])
-        UserData.update_list_prop(cal.id, "synced", False)
-
-    def __rename_local_list(self, cal: Calendar, list: TaskListData) -> None:
-        Log.debug(f"Sync: Rename local list '{list.uid}'")
-
-        UserData.update_list_props(cal.id, ["name", "synced"], [cal.name, True])
-        self.update_ui_args.lists_to_update_name.append(cal.id)
-        self.update_ui_args.update_trash = True
-
     def __delete_local_list(self, list: TaskListData) -> None:
         Log.debug(f"Sync: Delete local list deleted on remote '{list.uid}'")
 
@@ -279,21 +268,63 @@ class SyncProviderCalDAV:
         for cal in self.calendars:
             if cal.id == list.uid:
                 Log.debug(f"Sync: Delete list on remote '{cal.id}'")
-                cal.delete()
-                UserData.delete_list(cal.id)
+                try:
+                    cal.delete()
+                    UserData.delete_list(cal.id)
+                except BaseException:
+                    Log.debug(f"Sync: Can't delete list on remote '{cal.id}'")
                 return
 
     def __create_remote_list(self, list: TaskListData) -> None:
         Log.debug(f"Sync: Create remote list {list.uid}")
         try:
-            self.principal.make_calendar(
+            cal = self.principal.make_calendar(
                 cal_id=list.uid,
                 supported_calendar_component_set=["VTODO"],
                 name=list.name,
             )
-        except Exception as e:
+            # Set color
+            try:
+                cal.set_properties([caldav.elements.ical.CalendarColor(list.color)])
+            except BaseException as e:
+                Log.error(f"Sync: Can't set calendar color for list '{list.uid}'. {e}")
+
+            UserData.update_list_prop(list.uid, "synced", True)
+        except BaseException as e:
             Log.error(f"Sync: Can't create remote list '{list.uid}'. {e}")
-        UserData.update_list_prop(list.uid, "synced", True)
+
+    def __update_local_list(self, cal: Calendar, list: TaskListData):
+        color: str | None = None
+        color = cal.get_property(caldav.elements.ical.CalendarColor())
+        if not color:
+            color = list.color
+
+        if list.color != color or list.name != cal.name:
+            Log.debug(f"Sync: Update local list '{list.uid}'")
+            UserData.update_list_props(
+                cal.id, ["name", "color", "synced"], [cal.name, color, True]
+            )
+            self.update_ui_args.lists_to_update_name.append(cal.id)
+            self.update_ui_args.update_trash = True
+
+    def __update_remote_list(self, cal: Calendar, list: TaskListData):
+        color: str | None = None
+        color = cal.get_property(caldav.elements.ical.CalendarColor())
+        if not color:
+            color = list.color
+
+        if list.name != cal.name or list.color != color:
+            try:
+                Log.debug(f"Sync: Update remote list '{list.uid}'")
+                cal.set_properties(
+                    [
+                        dav.DisplayName(list.name),
+                        caldav.elements.ical.CalendarColor(list.color),
+                    ]
+                )
+                UserData.update_list_props(cal.id, ["synced"], [True])
+            except BaseException as e:
+                Log.error(f"Sync: Can't update remote list '{list.uid}'. {e}")
 
     # ----- SYNC TASKS FUNCTIONS ----- #
 

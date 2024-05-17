@@ -191,7 +191,7 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
 
         self.set_child(
             ErrandsBox(
-                spacing=6,
+                spacing=4,
                 children=[
                     self.color_btn,
                     self.label,
@@ -289,5 +289,7 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
         except BaseException:
             color: str = "#3584e4"
         Log.debug(f"Task List '{self.list_data.uid}': Set color to '{color}'")
-        UserData.update_list_prop(self.list_data.uid, "color", color)
+        UserData.update_list_props(
+            self.list_data.uid, ["color", "synced"], [color, False]
+        )
         Sync.sync()

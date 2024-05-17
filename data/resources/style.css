@@ -248,6 +248,7 @@ colorbutton {
 
 colorbutton button {
   border-radius: 9999px;
+  margin: 0px;
   padding: 4px;
 }
 
