@@ -7,6 +7,7 @@ errands/widgets/shared/components/entries.py
 errands/widgets/shared/components/header_bar.py
 errands/widgets/shared/components/menus.py
 errands/widgets/shared/components/toolbar_view.py
+errands/widgets/shared/color_selector.py
 errands/widgets/shared/datetime_picker.py
 errands/widgets/shared/titled_separator.py
 errands/widgets/shared/task_toolbar/toolbar.py
