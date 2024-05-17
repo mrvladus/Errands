@@ -155,7 +155,7 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
         # Color button
         color_dialog: Gtk.ColorDialog = Gtk.ColorDialog(with_alpha=False)
         self.color_btn: Gtk.ColorDialogButton = Gtk.ColorDialogButton(
-            dialog=color_dialog
+            dialog=color_dialog, tooltip_text=_("Color")
         )
         self.color_btn.connect("notify::rgba", self.__on_color_selected)
 
