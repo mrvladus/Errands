@@ -12,7 +12,7 @@ from errands.lib.data import TaskData, UserData
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
-from errands.lib.utils import get_children
+from errands.lib.utils import get_children, idle_add
 from errands.state import State
 from errands.widgets.shared.components.boxes import ErrandsBox
 from errands.widgets.shared.components.buttons import ErrandsButton, ErrandsToggleButton
@@ -122,9 +122,8 @@ class TaskList(Adw.Bin):
         self.dnd_ctrl.connect("motion", self._on_dnd_scroll, adj)
         self.add_controller(self.dnd_ctrl)
 
-        # Loading overlay
-        self.loading_overlay = Gtk.Overlay(
-            child=ErrandsToolbarView(
+        self.set_child(
+            ErrandsToolbarView(
                 top_bars=[
                     ErrandsHeaderBar(
                         start_children=[
@@ -152,13 +151,8 @@ class TaskList(Adw.Bin):
                 content=self.scrl,
             )
         )
-        self.loading_label = Gtk.Label(
-            label=_("Loading..."), css_classes=["title-2", "background"], vexpand=True
-        )
-        self.loading_overlay.add_overlay(self.loading_label)
 
-        self.set_child(self.loading_overlay)
-
+    @idle_add
     def __load_tasks(self) -> None:
         Log.info(f"Task List {self.list_uid}: Load Tasks")
 
@@ -176,7 +170,6 @@ class TaskList(Adw.Bin):
             UserData.get_list_prop(self.list_uid, "show_completed")
         )
         self.update_title()
-        self.loading_overlay.remove_overlay(self.loading_label)
 
     # ------ PROPERTIES ------ #
 

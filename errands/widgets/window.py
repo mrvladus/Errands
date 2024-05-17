@@ -13,6 +13,7 @@ from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
 from errands.state import State
+from errands.widgets.loading_page import ErrandsLoadingPage
 from errands.widgets.preferences import PreferencesWindow
 from errands.widgets.shared.components.boxes import ErrandsBox
 from errands.widgets.shared.components.buttons import ErrandsButton
@@ -61,6 +62,11 @@ class Window(Adw.ApplicationWindow):
             ),
         )
 
+        self.view_stack.add_titled(
+            child=ErrandsLoadingPage(),
+            name="errands_loading_page",
+            title=_("Loading Tasks"),
+        )
         self.view_stack.add_titled(
             child=Today(),
             name="errands_today_page",

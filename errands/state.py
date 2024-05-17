@@ -10,9 +10,12 @@ from gi.repository import Adw  # type:ignore
 if TYPE_CHECKING:
     from errands.application import ErrandsApplication
     from errands.lib.notifications import ErrandsNotificationsDaemon
-    from errands.widgets.shared.task_toolbar import ErrandsAttachmentsWindow
-    from errands.widgets.shared.task_toolbar import DateTimeWindow
-    from errands.widgets.shared.task_toolbar import NotesWindow
+    from errands.widgets.loading_page import ErrandsLoadingPage
+    from errands.widgets.shared.task_toolbar import (
+        DateTimeWindow,
+        ErrandsAttachmentsWindow,
+        NotesWindow,
+    )
     from errands.widgets.sidebar import Sidebar
     from errands.widgets.tags.tags import Tags
     from errands.widgets.tags.tags_sidebar_row import TagsSidebarRow
@@ -46,6 +49,7 @@ class State:
     split_view: Adw.NavigationSplitView | None = None
 
     # View Stack
+    loading_page: ErrandsLoadingPage | None = None
     view_stack: Adw.ViewStack | None = None
     today_page: Today | None = None
     tags_page: Tags | None = None
