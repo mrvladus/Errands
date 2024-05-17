@@ -170,6 +170,7 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
             halign=Gtk.Align.CENTER,
             valign=Gtk.Align.CENTER,
             can_target=False,
+            label="...",
         )
 
         # Right-click
