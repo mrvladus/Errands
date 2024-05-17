@@ -172,9 +172,10 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
             can_target=False,
         )
 
-        # Gesture click
-        self.gesture_click = Gtk.GestureClick(button=3)
-        self.gesture_click.connect("released", self._on_row_pressed)
+        # Right-click
+        right_click = Gtk.GestureClick(button=3)
+        right_click.connect("released", self._on_row_pressed)
+        self.add_controller(right_click)
 
         # Context menu
         self.popover_menu = Gtk.PopoverMenu(
@@ -200,8 +201,6 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
                 ],
             )
         )
-
-        self.add_controller(self.gesture_click)
 
     def update_ui(self, update_task_list_ui: bool = True):
         Log.debug(f"Task List Row: Update UI '{self.uid}'")
