@@ -57,7 +57,7 @@
   </requires>
 
   <releases>
-    <release version="46.2" date="2024-05-20">
+    <release version="46.2" date="2024-05-18">
       <description translatable="no">
         <p>Added:</p>
         <ul>
