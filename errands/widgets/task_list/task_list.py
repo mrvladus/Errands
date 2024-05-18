@@ -152,7 +152,6 @@ class TaskList(Adw.Bin):
             )
         )
 
-    @idle_add
     def __load_tasks(self) -> None:
         Log.info(f"Task List {self.list_uid}: Load Tasks")
 
