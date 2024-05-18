@@ -57,12 +57,13 @@
   </requires>
 
   <releases>
-    <release version="46.1.1" date="2024-05-16">
+    <release version="46.2" date="2024-05-20">
       <description translatable="no">
         <p>Added:</p>
         <ul>
+          <li>Colors for Task Lists (Compatable with Nextcloud)</li>
           <li>Right-click menu for Tasks. Moved all task actions from toolbar menu to it.</li>
-          <li>Accent color to attachmants button if it has attachments</li>
+          <li>If task has attachments - attachments button will have blue accent</li>
         </ul>
         <p>Fixed:</p>
         <ul>
