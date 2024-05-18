@@ -68,6 +68,12 @@
         <p>Fixed:</p>
         <ul>
           <li>Sending notification for completed and deleted tasks</li>
+          <li>CalDAV sync errors</li>
+        </ul>
+        <p>Translations:</p>
+        <ul>
+          <li>Updated Occitan translation (Mejans)</li>
+          <li>Updated Japanese translation (Gnuey56)</li>
         </ul>
       </description>
     </release>
