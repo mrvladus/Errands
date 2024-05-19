@@ -278,14 +278,17 @@ class Task(Gtk.Revealer):
 
         # --- TOOL BAR --- #
 
-        self.toolbar = ErrandsTaskToolbar(self)
-        toolbar_rev: Gtk.Revealer = Gtk.Revealer(child=self.toolbar)
+        self.toolbar_rev: Gtk.Revealer = Gtk.Revealer()
         self.toolbar_toggle_btn.bind_property(
             "active",
-            toolbar_rev,
+            self.toolbar_rev,
             "reveal-child",
             GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.BIDIRECTIONAL,
         )
+        # Build toolbar if needed
+        self.toolbar = None
+        if self.task_data.toolbar_shown:
+            self.__build_toolbar()
 
         # --- SUB TASKS --- #
 
@@ -342,7 +345,7 @@ class Task(Gtk.Revealer):
                 self.popover_menu,
                 self.tags_bar_rev,
                 self.progress_bar_rev,
-                toolbar_rev,
+                self.toolbar_rev,
                 self.sub_tasks,
             ],
         )
@@ -355,6 +358,20 @@ class Task(Gtk.Revealer):
                 children=[self.top_drop_area, self.main_box],
             )
         )
+
+    def __build_toolbar(self) -> None:
+        """
+        Separate func for building toolbar.
+        Needed for lazy loading of the widget.
+        If toolbar doesn't need to be shown on startup - don't load it.
+        It's saves memory. About 80 Mb for 100 Tasks.
+        """
+
+        self.toolbar = ErrandsTaskToolbar(self)
+        self.toolbar_rev.set_child(self.toolbar)
+
+    def __build_sub_tasks(self) -> None:
+        pass
 
     def __load_sub_tasks(self) -> None:
         tasks: list[TaskData] = (
@@ -581,7 +598,9 @@ class Task(Gtk.Revealer):
         self.progress_bar_rev.set_reveal_child(total > 0)
 
     def update_toolbar(self) -> None:
-        self.toolbar.update_ui()
+        # If toolbar exists then update it
+        if self.toolbar:
+            self.toolbar.update_ui()
 
     def update_tasks(self, update_tasks: bool = True) -> None:
         # Tasks
@@ -722,6 +741,10 @@ class Task(Gtk.Revealer):
     def _on_toolbar_toggle_btn_toggled(self, btn: Gtk.ToggleButton) -> None:
         if btn.get_active() != self.task_data.toolbar_shown:
             self.update_props(["toolbar_shown"], [btn.get_active()])
+            # Create toolbar if needed
+            if not self.toolbar and btn.get_active():
+                self.__build_toolbar()
+                self.update_toolbar()
 
     def _on_title_row_clicked(self, *args) -> None:
         self.expand(not self.sub_tasks.get_child_revealed())
