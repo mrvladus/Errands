@@ -364,7 +364,7 @@ class Task(Gtk.Revealer):
         Separate func for building toolbar.
         Needed for lazy loading of the widget.
         If toolbar doesn't need to be shown on startup - don't load it.
-        It's saves memory. About 50 Mb for  each 100 Tasks.
+        It's saves memory. About 50 Mb for each 100 Tasks.
         """
 
         self.toolbar = ErrandsTaskToolbar(self)
