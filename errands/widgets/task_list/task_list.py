@@ -12,7 +12,7 @@ from errands.lib.data import TaskData, UserData
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
-from errands.lib.utils import get_children, idle_add
+from errands.lib.utils import get_children
 from errands.state import State
 from errands.widgets.shared.components.boxes import ErrandsBox
 from errands.widgets.shared.components.buttons import ErrandsButton, ErrandsToggleButton
