@@ -362,7 +362,7 @@ class Task(Gtk.Revealer):
     def __build_toolbar(self) -> None:
         """
         Separate func for building toolbar.
-        Needed for lazy loading of the widget.
+        Needed for lazy loading of the toolbar.
         If toolbar doesn't need to be shown on startup - don't load it.
         It's saves memory. About 50 Mb for each 100 Tasks.
         """
@@ -373,8 +373,8 @@ class Task(Gtk.Revealer):
     def __load_sub_tasks(self) -> None:
         tasks: list[TaskData] = (
             t
-            for t in UserData.get_tasks_as_dicts(self.list_uid, self.uid)
-            if not t.deleted
+            for t in UserData.tasks
+            if not t.deleted and t.list_uid == self.list_uid and t.parent == self.uid
         )
         for task in tasks:
             new_task = Task(task, self)
@@ -728,7 +728,7 @@ class Task(Gtk.Revealer):
         if not text or text == self.task_data.text:
             return
         self.update_props(["text", "synced"], [text, False])
-        self.update_ui()
+        self.update_title()
         Sync.sync()
 
     def _on_cancel_edit_btn_clicked(self, _btn: Gtk.Button) -> None:
