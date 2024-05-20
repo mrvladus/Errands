@@ -434,7 +434,7 @@ msgstr "Aucune liste de tâches"
 
 #: errands/widgets/window.py:91
 msgid "Create new or import existing one"
-msgstr ""
+msgstr "Créer un nouveau fichier ou importer un fichier existant"
 
 #: errands/widgets/window.py:95
 msgid "Create List"
