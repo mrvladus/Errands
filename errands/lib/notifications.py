@@ -73,5 +73,4 @@ class ErrandsNotificationsDaemon:
         notification = Gio.Notification()
         notification.set_title(_("Task is Due"))
         notification.set_body(task.text)
-        notification.set_icon(Gio.ThemedIcon(name="io.github.mrvladus.List-symbolic"))
         self.send(task.uid, notification)
