@@ -12,17 +12,15 @@ from errands.lib.data import UserData
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.notifications import ErrandsNotificationsDaemon
-from errands.lib.plugins import PluginsLoader
+
+# from errands.lib.plugins import PluginsLoader
 from errands.lib.utils import threaded
 from errands.state import State
-from errands.widgets.shared.task_toolbar import ErrandsAttachmentsWindow
-from errands.widgets.shared.task_toolbar import DateTimeWindow
-from errands.widgets.shared.task_toolbar import NotesWindow
 from errands.widgets.window import Window
 
 
 class ErrandsApplication(Adw.Application):
-    plugins_loader: PluginsLoader = None
+    # plugins_loader: PluginsLoader = None
 
     def __init__(self) -> None:
         super().__init__(
@@ -152,14 +150,8 @@ class ErrandsApplication(Adw.Application):
         # Plugins
         # self.plugins_loader = PluginsLoader(self)
 
-        # Notes window
-        State.notes_window = NotesWindow()
-
-        # Date and time window
-        State.datetime_window = DateTimeWindow()
-
-        # Attachments window
-        State.attachments_window = ErrandsAttachmentsWindow()
+        # Initialize State
+        State.init()
 
         # Main window
         State.main_window = Window(application=State.application)

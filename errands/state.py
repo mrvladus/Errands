@@ -12,9 +12,9 @@ if TYPE_CHECKING:
     from errands.lib.notifications import ErrandsNotificationsDaemon
     from errands.widgets.loading_page import ErrandsLoadingPage
     from errands.widgets.shared.task_toolbar import (
-        DateTimeWindow,
+        ErrandsDateTimeWindow,
         ErrandsAttachmentsWindow,
-        NotesWindow,
+        ErrandsNotesWindow,
     )
     from errands.widgets.sidebar import Sidebar
     from errands.widgets.tags.tags import Tags
@@ -62,13 +62,25 @@ class State:
     trash_sidebar_row: TrashSidebarRow | None = None
 
     # Notes window
-    notes_window: NotesWindow | None = None
+    notes_window: ErrandsNotesWindow | None = None
 
     # Date and time window
-    datetime_window: DateTimeWindow | None = None
+    datetime_window: ErrandsDateTimeWindow | None = None
 
     # Attachments window
     attachments_window: ErrandsAttachmentsWindow | None = None
+
+    @classmethod
+    def init(cls) -> None:
+        from errands.widgets.shared.task_toolbar import (
+            ErrandsNotesWindow,
+            ErrandsDateTimeWindow,
+            ErrandsAttachmentsWindow,
+        )
+
+        cls.notes_window = ErrandsNotesWindow()
+        cls.datetime_window = ErrandsDateTimeWindow()
+        cls.attachments_window = ErrandsAttachmentsWindow()
 
     @classmethod
     def get_task_list(cls, uid: str) -> TaskList:

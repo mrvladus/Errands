@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from errands.widgets.task import Task
 
 
-class NotesWindow(Adw.Dialog):
+class ErrandsNotesWindow(Adw.Dialog):
     def __init__(self):
         super().__init__()
         self.__build_ui()

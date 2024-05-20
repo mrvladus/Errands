@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from errands.widgets.today.today_task import TodayTask
 
 
-class DateTimeWindow(Adw.Dialog):
+class ErrandsDateTimeWindow(Adw.Dialog):
     def __init__(self):
         super().__init__()
         self.__build_ui()
