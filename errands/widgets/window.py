@@ -56,9 +56,7 @@ class Window(Adw.ApplicationWindow):
             min_sidebar_width=200,
             sidebar=Adw.NavigationPage(child=Sidebar(), title=_("Sidebar")),
             content=Adw.NavigationPage(
-                child=self.view_stack,
-                title=_("Content"),
-                width_request=360,
+                child=self.view_stack, title=_("Content"), width_request=360
             ),
         )
 
@@ -68,19 +66,13 @@ class Window(Adw.ApplicationWindow):
             title=_("Loading Tasks"),
         )
         self.view_stack.add_titled(
-            child=Today(),
-            name="errands_today_page",
-            title=_("Today"),
+            child=Today(), name="errands_today_page", title=_("Today")
         )
         self.view_stack.add_titled(
-            child=Tags(),
-            name="errands_tags_page",
-            title=_("Tags"),
+            child=Tags(), name="errands_tags_page", title=_("Tags")
         )
         self.view_stack.add_titled(
-            child=Trash(),
-            name="errands_trash_page",
-            title=_("Trash"),
+            child=Trash(), name="errands_trash_page", title=_("Trash")
         )
 
         # Status Page
