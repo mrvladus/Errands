@@ -98,15 +98,6 @@ class ErrandsDateTimeWindow(Adw.Dialog):
             )
             changed = True
 
-        # self.task.update_toolbar()
-        # self.today_page.update_status()
-        # if (
-        #     self.task_data.due_date
-        #     and datetime.fromisoformat(self.task_data.due_date).date()
-        #     != datetime.today().date()
-        # ):
-        #     self.purge()
-
         State.today_page.update_ui()
         if changed:
             Sync.sync()

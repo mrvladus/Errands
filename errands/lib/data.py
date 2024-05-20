@@ -190,12 +190,8 @@ class TaskData:
                 task.uid = value
             elif "DUE" in prop:
                 task.due_date = value.strip("Z")
-                if task.due_date and "T" not in task.due_date:
-                    task.due_date += "T000000"
             elif "DTSTART" in prop:
                 task.start_date = value.strip("Z")
-                if task.start_date and "T" not in task.start_date:
-                    task.start_date += "T000000"
             elif "DESCRIPTION" in prop:
                 task.notes = value
             elif "CATEGORIES" in prop:

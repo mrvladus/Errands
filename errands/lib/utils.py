@@ -13,9 +13,13 @@ from gi.repository import GLib, Gtk  # type:ignore
 
 def get_human_datetime(date_time: str) -> str:
     if date_time:
-        out: str = datetime.fromisoformat(date_time).strftime("%d %B %H:%M")
-        if "00:00" in out:
-            out = out.removesuffix("00:00")
+        dt: datetime = datetime.fromisoformat(date_time)
+        if "T" not in date_time:
+            out: str = dt.strftime("%d %B")
+        else:
+            out: str = dt.strftime("%d %B %H:%M")
+            if "00:00" in out:
+                out: str = out.removesuffix("00:00")
     else:
         out: str = _("Date")
     return out

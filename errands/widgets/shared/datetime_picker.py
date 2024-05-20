@@ -191,9 +191,13 @@ class DateTimePicker(Gtk.Box):
     def datetime(self, dt: str) -> str:
         self.lock_signals = True
         if dt:
-            dt = datetime.datetime.fromisoformat(dt).strftime("%Y%m%dT%H%M00")
-            self.hours.set_value(int(dt[9:11]))
-            self.minutes.set_value(int(dt[11:13]))
+            if "T" not in dt:
+                self.hours.set_value(0)
+                self.minutes.set_value(0)
+            else:
+                dt = datetime.datetime.fromisoformat(dt).strftime("%Y%m%dT%H%M")
+                self.hours.set_value(int(dt[9:11]))
+                self.minutes.set_value(int(dt[11:13]))
             self.calendar.select_day(
                 GLib.DateTime.new_local(
                     int(dt[:4]), int(dt[4:6]), int(dt[6:8]), 0, 0, 0
@@ -210,17 +214,10 @@ class DateTimePicker(Gtk.Box):
         self.label.set_label(self.human_datetime if dt else _("Set Date"))
 
     @property
-    def datetime_as_int(self) -> int:
-        return int(f"{self.datetime[:8]}{self.datetime[9:]}") if self.datetime else 0
-
-    @property
     def human_datetime(self) -> str:
         return get_human_datetime(self.datetime)
 
     # ------ SIGNAL HANDLERS ------ #
-
-    def _on_day_preset_clicked(self, btn: Gtk.Button) -> None:
-        pass
 
     def _on_clear_clicked(self, btn: Gtk.Button):
         self.datetime = ""
@@ -246,9 +243,9 @@ class DateTimePicker(Gtk.Box):
         self.minutes.set_value(int(min))
 
     def _on_today_clicked(self, btn: Gtk.Button):
-        self.datetime = datetime.datetime.now().strftime("%Y%m%dT000000")
+        self.datetime = datetime.datetime.now().strftime("%Y%m%d")
 
     def _on_tomorrow_clicked(self, btn: Gtk.Button):
         self.datetime = (datetime.datetime.now() + datetime.timedelta(1)).strftime(
-            "%Y%m%dT000000"
+            "%Y%m%d"
         )
