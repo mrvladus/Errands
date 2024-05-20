@@ -11,19 +11,19 @@ msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-17 17:01+0300\n"
-"PO-Revision-Date: 2024-05-08 20:30+0200\n"
-"Last-Translator: Otmar Grünn <ogruenn@me.com>\n"
+"PO-Revision-Date: 2024-05-20 13:02+0200\n"
+"Last-Translator: Philipp Kiemle <philipp.kiemle@gmail.com>\n"
 "Language-Team: \n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.4.2\n"
+"X-Generator: Poedit 3.4.3\n"
 
 #: errands/widgets/shared/components/buttons.py:45
 msgid "Info"
-msgstr ""
+msgstr "Info"
 
 #: errands/widgets/shared/components/dialogs.py:31
 msgid "Are you sure?"
@@ -139,7 +139,7 @@ msgstr "Tags"
 #: errands/widgets/shared/task_toolbar/toolbar.py:157
 #: errands/widgets/shared/task_toolbar/attachments_window.py:30
 msgid "Attachments"
-msgstr ""
+msgstr "Anhänge"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:191
 #: errands/widgets/shared/task_toolbar/toolbar.py:294
@@ -157,15 +157,15 @@ msgstr "Mehr"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:33
 msgid "No Files Attached"
-msgstr ""
+msgstr "Keine Dateien angehängt"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:56
 msgid "Add Attachment"
-msgstr ""
+msgstr "Anhang hinzufügen"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:119
 msgid "Open File"
-msgstr ""
+msgstr "Datei öffnen"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:123
 #: errands/widgets/tags/tags.py:140
@@ -177,11 +177,11 @@ msgstr "Löschen"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:132
 msgid "Open Containing Folder"
-msgstr ""
+msgstr "Beinhaltenden Ordner öffnen"
 
 #: errands/widgets/shared/task_toolbar/datetime_window.py:29
 msgid "Date and Time"
-msgstr "Datum und Zeit"
+msgstr "Datum und Uhrzeit"
 
 #: errands/widgets/shared/task_toolbar/datetime_window.py:39
 #: errands/widgets/shared/task_toolbar/datetime_window.py:41
@@ -195,11 +195,11 @@ msgstr "Start"
 
 #: errands/widgets/sidebar.py:42
 msgid "Add List (Ctrl+Shift+A)"
-msgstr "Liste hinzufügen (Strg+A)"
+msgstr "Liste hinzufügen (Strg+Umschalt+A)"
 
 #: errands/widgets/sidebar.py:61
 msgid "Syncing..."
-msgstr "Synchronisiere …"
+msgstr "Synchronisieren …"
 
 #: errands/widgets/sidebar.py:67
 msgid "Add new List"
@@ -207,7 +207,7 @@ msgstr "Neue Liste hinzufügen"
 
 #: errands/widgets/sidebar.py:68
 msgid "Click \"+\" button"
-msgstr "Den »+«-Knopf klicken"
+msgstr "Drücken Sie den »+«-Knopf"
 
 #. Task lists group
 #: errands/widgets/sidebar.py:94 errands/widgets/preferences.py:66
@@ -242,7 +242,7 @@ msgstr "Tastenkürzel"
 
 #: errands/widgets/sidebar.py:142
 msgid "About Errands"
-msgstr "Über Errands"
+msgstr "Info zu Errands"
 
 #: errands/widgets/sidebar.py:144 data/resources/gtk/help-overlay.ui:27
 msgid "Quit"
@@ -266,7 +266,7 @@ msgstr "Keine Tags gefunden"
 
 #: errands/widgets/tags/tags.py:33
 msgid "Add new Tags in the entry above"
-msgstr "Neue Tags zur Aufgabe oben"
+msgstr "Neue Tags zu obigem Eintrag hinzufügen"
 
 #: errands/widgets/tags/tags.py:82
 msgid "Add new Tag"
@@ -328,11 +328,11 @@ msgstr "Abgeschlossen:"
 
 #: errands/widgets/task.py:921
 msgid "Delete Tag"
-msgstr "Tag Löschen"
+msgstr "Tag löschen"
 
 #: errands/widgets/task_list/task_list.py:50
 msgid "Toggle Completed Tasks"
-msgstr "Abgeschlossene  Aufgaben ausblenden"
+msgstr "Abgeschlossene Aufgaben ausblenden"
 
 #: errands/widgets/task_list/task_list.py:58
 msgid "Delete Completed Tasks"
@@ -348,7 +348,7 @@ msgstr "Neue Aufgabe hinzufügen"
 
 #: errands/widgets/task_list/task_list.py:156
 msgid "Loading..."
-msgstr "Lade …"
+msgstr "Laden …"
 
 #: errands/widgets/task_list/task_list_sidebar_row.py:59
 msgid "List will be permanently deleted"
@@ -372,7 +372,7 @@ msgstr "Export fehlgeschlagen"
 
 #: errands/widgets/task_list/task_list_sidebar_row.py:158
 msgid "Color"
-msgstr ""
+msgstr "Farbe"
 
 #: errands/widgets/task_list/task_list_sidebar_row.py:186
 msgid "Rename"
@@ -402,7 +402,7 @@ msgstr "Papierkorb"
 
 #: errands/widgets/trash/trash.py:158
 msgid "Tasks will be permanently deleted"
-msgstr "Die Aufgaben werden dauerhaft gelöscht"
+msgstr "Die Aufgaben werden unwiderruflich gelöscht"
 
 #: errands/widgets/window.py:56
 msgid "Sidebar"
@@ -418,7 +418,7 @@ msgstr "Keine Aufgabenlisten"
 
 #: errands/widgets/window.py:91
 msgid "Create new or import existing one"
-msgstr "Neue erstellen oder bestehende importieren"
+msgstr "Neu erstellen oder bestehende importieren"
 
 #: errands/widgets/window.py:95
 msgid "Create List"
@@ -482,19 +482,19 @@ msgstr "Im Hintergrund laufen"
 
 #: errands/widgets/preferences.py:95
 msgid "Hide the application window instead of closing it"
-msgstr "Blendet das Anwendungsfenster aus anstatt es zu schließen"
+msgstr "Das Anwendungsfenster ausblenden, statt es zu schließen"
 
 #: errands/widgets/preferences.py:102
 msgid "Launch on Startup"
-msgstr ""
+msgstr "Bei Systemstart starten"
 
 #: errands/widgets/preferences.py:103
 msgid "Launch application when user logs in"
-msgstr ""
+msgstr "Anwendung bei Benutzeranmeldung starten"
 
 #: errands/widgets/preferences.py:112
 msgid "Notifications and Background"
-msgstr "Benachrichtigungen und Hintergrundeinstellungen"
+msgstr "Benachrichtigungen und Hintergrund"
 
 #: errands/widgets/preferences.py:120 errands/widgets/preferences.py:181
 #: data/resources/gtk/help-overlay.ui:38
@@ -519,6 +519,9 @@ msgid ""
 "URL needs to include protocol, like <b>http://</b> or <b>https://</b>. If "
 "you have problems with connection - try to change protocol first."
 msgstr ""
+"Die URL muss das Protokoll enthalten, z. B. <b>http://</b> oder <b>https://</"
+"b>. Falls Sie Verbindungsprobleme haben, versuchen Sie zunächst das "
+"Protokoll zu ändern."
 
 #: errands/widgets/preferences.py:147
 msgid "Username"
@@ -545,13 +548,13 @@ msgid "Connected"
 msgstr "Verbunden"
 
 #: errands/widgets/preferences.py:221
-#, fuzzy
 msgid "Authorization failed"
-msgstr "Export fehlgeschlagen"
+msgstr "Autorisieren fehlgeschlagen"
 
 #: errands/widgets/preferences.py:223
 msgid "Could not locate server. Check network and url."
 msgstr ""
+"Server konnte nicht gefunden werden. Überprüfen Sie das Netzwerk und die URL."
 
 #: errands/widgets/preferences.py:225
 msgid "Can't connect"
@@ -560,7 +563,7 @@ msgstr "Kann keine Verbindung herstellen"
 #. NOTE: Also catches invalid credentials
 #: errands/widgets/preferences.py:227
 msgid "Can't connect. Check credentials"
-msgstr ""
+msgstr "Verbindung fehlgeschlagen. Überprüfen Sie die Anmeldedaten"
 
 #: errands/lib/sync/providers/caldav.py:66
 msgid "Not all sync credentials provided. Please check settings."
@@ -573,9 +576,8 @@ msgid "Can't connect to CalDAV server at:"
 msgstr "Kann keine Verbindung zu diesem CalDAV-Server herstellen:"
 
 #: errands/lib/data.py:92
-#, fuzzy
 msgid "New Task List"
-msgstr "Keine Aufgabenlisten"
+msgstr "Neue Aufgabenliste"
 
 #: errands/lib/notifications.py:75
 msgid "Task is Due"
@@ -591,7 +593,7 @@ msgstr "Neustart ist erforderlich"
 
 #: errands/application.py:84
 msgid "Restart"
-msgstr "Neustart"
+msgstr "Neu starten"
 
 #: errands/application.py:113
 msgid "Errands need to run in the background for notifications"
@@ -624,11 +626,11 @@ msgstr "Verwalten Sie Ihre Aufgaben"
 
 #: data/io.github.mrvladus.List.desktop.in.in:10
 msgid "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
-msgstr "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
+msgstr "errands;tasks;list;todo;todos;caldav;nextcloud;sync;Aufgaben;Liste;"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:12
 msgid "Todo application for those who prefer simplicity."
-msgstr "Todo Anwendung für alle, die es lieber einfach haben."
+msgstr "Todo-Anwendung für alle, die es lieber einfach haben."
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:13
 msgid "Features:"
@@ -660,7 +662,7 @@ msgstr "Unterstützung von Drag and Drop"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:21
 msgid "Import .ics files"
-msgstr ".ics Dateien importieren"
+msgstr ".ics-Dateien importieren"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:41
 msgid "Main Window View"
