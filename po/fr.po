@@ -387,7 +387,7 @@ msgstr "Exportation échouée"
 
 #: errands/widgets/task_list/task_list_sidebar_row.py:158
 msgid "Color"
-msgstr ""
+msgstr "Couleur"
 
 #: errands/widgets/task_list/task_list_sidebar_row.py:186
 msgid "Rename"
