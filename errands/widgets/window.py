@@ -144,7 +144,7 @@ class Window(Adw.ApplicationWindow):
                     version=State.VERSION,
                     application_icon=State.APP_ID,
                     application_name=_("Errands"),
-                    copyright="© 2023 Vlad Krupinskii",
+                    copyright="© 2023-2024 Vlad Krupinskii",
                     website="https://github.com/mrvladus/Errands",
                     issue_url="https://github.com/mrvladus/Errands/issues",
                     license_type=Gtk.License.MIT_X11,
