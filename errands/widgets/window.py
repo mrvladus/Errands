@@ -12,7 +12,6 @@ from errands.lib.data import TaskListData, UserData
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
-from errands.lib.utils import timeit
 from errands.state import State
 from errands.widgets.loading_page import ErrandsLoadingPage
 from errands.widgets.preferences import PreferencesWindow
@@ -112,7 +111,6 @@ class Window(Adw.ApplicationWindow):
         bp.add_setter(self.split_view, "collapsed", True)
         self.add_breakpoint(bp)
 
-    @timeit
     def __finish_load(self, *_):
         State.view_stack = self.view_stack
         State.split_view = self.split_view
