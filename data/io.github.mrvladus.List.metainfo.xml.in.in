@@ -64,6 +64,10 @@
         <ul>
           <li>CalDAV date formats</li>
         </ul>
+        <p>Translations:</p>
+        <ul>
+          <li>Updated German translation (Philipp Kiemle)</li>
+        </ul>
       </description>
     </release>
     <release version="46.2" date="2024-05-18">
