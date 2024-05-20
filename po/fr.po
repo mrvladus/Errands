@@ -236,7 +236,7 @@ msgstr "Synchroniser / Récupérer les tâches"
 #: errands/widgets/sidebar.py:128
 #, fuzzy
 msgid "Import Task List"
-msgstr "Importer une liste"
+msgstr "Importer une liste de tâches"
 
 #: errands/widgets/sidebar.py:135 data/resources/gtk/help-overlay.ui:20
 msgid "Preferences"
