@@ -60,6 +60,10 @@
     <release version="46.2.1" date="2024-05-21">
       <description translatable="no">
         <p>Improved perfomance. Startup time and memory consumption is now cut by up to 2x.</p>
+        <p>Fixed:</p>
+        <ul>
+          <li>CalDAV date formats</li>
+        </ul>
       </description>
     </release>
     <release version="46.2" date="2024-05-18">
