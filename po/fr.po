@@ -487,7 +487,7 @@ msgstr "En bas"
 
 #: errands/widgets/preferences.py:71
 msgid "At the Top"
-msgstr ""En haut
+msgstr "En haut"
 
 #: errands/widgets/preferences.py:87
 msgid "Show Notifications"
