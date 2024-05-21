@@ -186,7 +186,7 @@ class TaskData:
                 task.completed = True if value == "COMPLETED" else False
             elif "SUMMARY" in prop:
                 task.text = value
-            elif "UID" in prop:
+            elif "UID" == prop:
                 task.uid = value
             elif "DUE" in prop:
                 task.due_date = value.strip("Z")
