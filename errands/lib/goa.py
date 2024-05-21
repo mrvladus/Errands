@@ -37,9 +37,8 @@ def get_goa_credentials(acc_name: str) -> GoaCredentials | None:
                 username: str = (
                     acc.get_cached_property("PresentationIdentity")
                     .get_string()
-                    .split("@")[:-1]
+                    .rsplit("@", 1)[0]
                 )
-                username = "".join(username)
                 password = account.get_password_based().call_get_password_sync(
                     arg_id=acc.get_cached_property("Id").get_string()
                 )
