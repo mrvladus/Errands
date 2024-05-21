@@ -447,7 +447,10 @@ msgstr "Créer une liste"
 
 #: errands/widgets/window.py:153
 msgid "translator-credits"
-msgstr "Jeremy Castel <jeremy.castel@protonmail.com>, Irénée THIRION <irenee.thirion@e.email>, Wedone <wedoneofficiel@outlook.fr>"
+msgstr ""
+"Jeremy Castel <jeremy.castel@protonmail.com>\n"
+"Irénée THIRION <irenee.thirion@e.email>\n"
+"Wedone <wedoneofficiel@outlook.fr>"
 
 #: errands/widgets/window.py:159
 msgid "Sync is disabled"
