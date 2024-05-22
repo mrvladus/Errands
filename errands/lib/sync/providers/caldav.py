@@ -406,8 +406,12 @@ class SyncProviderCalDAV:
                 del todo.icalendar_component["dtstart"]
             if task.created_at:
                 todo.icalendar_component["dtstamp"] = task.created_at
+            else:
+                del todo.icalendar_component["dtstamp"]
             if task.changed_at:
                 todo.icalendar_component["last-modified"] = task.changed_at
+            else:
+                del todo.icalendar_component["last-modified"]
             todo.icalendar_component["summary"] = task.text
             todo.icalendar_component["percent-complete"] = int(task.percent_complete)
             todo.icalendar_component["description"] = task.notes
