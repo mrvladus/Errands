@@ -142,13 +142,15 @@ class TaskData:
         ical += f"STATUS:{'COMPLETED' if self.completed else 'NEEDS-ACTION'}\n"
         ical += f"LAST-MODIFIED:{self.changed_at}\n"
         ical += f"DTSTAMP:{self.created_at}\n"
-        ical += f"DUE:{self.due_date}\n"
+        if self.due_date:
+            ical += f"DUE{';VALUE=DATE' if 'T' not in self.due_date else ''}:{self.due_date}\n"
         ical += f"X-ERRANDS-EXPANDED:{int(self.expanded)}\n"
         ical += f"DESCRIPTION:{self.notes}\n"
         ical += f"RELATED-TO:{self.parent}\n"
         ical += f"PERCENT-COMPLETE:{self.percent_complete}\n"
         ical += f"PRIORITY:{self.priority}\n"
-        ical += f"DTSTART:{self.start_date}\n"
+        if self.start_date:
+            ical += f"DTSTART{';VALUE=DATE' if 'T' not in self.due_date else ''}:{self.start_date}\n"
         ical += f"CATEGORIES:{','.join(self.tags)}\n"
         ical += f"SUMMARY:{self.text}\n"
         ical += f"X-ERRANDS-TOOLBAR-SHOWN:{int(self.toolbar_shown)}\n"

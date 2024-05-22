@@ -398,8 +398,12 @@ class SyncProviderCalDAV:
             todo: Todo = calendar.todo_by_uid(task.uid)
             if task.due_date:
                 todo.icalendar_component["due"] = task.due_date
+            else:
+                del todo.icalendar_component["due"]
             if task.start_date:
                 todo.icalendar_component["dtstart"] = task.start_date
+            else:
+                del todo.icalendar_component["dtstart"]
             if task.created_at:
                 todo.icalendar_component["dtstamp"] = task.created_at
             if task.changed_at:
