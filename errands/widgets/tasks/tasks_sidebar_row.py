@@ -7,14 +7,14 @@ from gi.repository import Gtk  # type:ignore
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.state import State
+from errands.widgets.tasks.tasks_page_name import TasksPageName
 from errands.widgets.shared.components.boxes import ErrandsBox
 
 
-class TodaySidebarRow(Gtk.ListBoxRow):
+class TasksSidebarRow(TasksPageName, Gtk.ListBoxRow):
     def __init__(self) -> None:
         super().__init__()
-        self.name = "errands_today_page"
-        State.today_sidebar_row = self
+        State.tasks_sidebar_row = self
         self.__build_ui()
 
     def __build_ui(self):
@@ -23,11 +23,11 @@ class TodaySidebarRow(Gtk.ListBoxRow):
         self.connect("activate", self._on_row_activated)
 
         # Icon
-        self.icon = Gtk.Image(icon_name="errands-calendar-symbolic")
+        self.icon = Gtk.Image(icon_name="io.github.mrvladus.List-symbolic")
 
         # Title
         self.label: Gtk.Label = Gtk.Label(
-            hexpand=True, halign=Gtk.Align.START, label=_("Today")
+            hexpand=True, halign=Gtk.Align.START, label=_(self.title)
         )
 
         # Counter
@@ -47,11 +47,11 @@ class TodaySidebarRow(Gtk.ListBoxRow):
         )
 
     def update_ui(self):
-        State.today_page.update_ui()
+        State.tasks_page.update_ui()
 
     def _on_row_activated(self, *args) -> None:
-        Log.debug("Sidebar: Open Today")
+        Log.debug(f"Sidebar: Open {self.title}")
         State.view_stack.set_visible_child_name(self.name)
         State.split_view.set_show_content(True)
         GSettings.set("last-open-list", "s", self.name)
-        State.today_page.update_ui()
+        State.tasks_page.update_ui()

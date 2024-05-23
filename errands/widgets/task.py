@@ -483,7 +483,7 @@ class Task(Gtk.Revealer):
         self.toggle_visibility(False)
         self.update_props(["trash"], [True])
         self.complete_btn.set_active(True)
-        State.today_page.update_ui()
+        State.tasks_page.update_ui()
         State.trash_sidebar_row.update_ui()
         State.tags_page.update_ui()
         self.task_list.update_title()
@@ -718,7 +718,7 @@ class Task(Gtk.Revealer):
 
         self.update_title()
         self.update_progress_bar()
-        State.today_page.update_status()
+        State.tasks_page.update_status()
         if self.can_sync:
             Sync.sync()
 

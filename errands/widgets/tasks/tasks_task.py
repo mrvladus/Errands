@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any
 
 from gi.repository import Adw, Gdk, Gio, GLib, GObject, Gtk  # type:ignore
 
-from errands.lib.data import TaskData, UserData
+from errands.lib.data import UserData
 from errands.lib.logging import Log
 from errands.lib.markup import Markup
 from errands.lib.sync.sync import Sync
@@ -20,28 +20,26 @@ from errands.widgets.shared.components.menus import ErrandsMenuItem, ErrandsSimp
 from errands.widgets.shared.task_toolbar.toolbar import ErrandsTaskToolbar
 from errands.widgets.task import Tag, Task
 from errands.widgets.task_list.task_list import TaskList
+from errands.widgets.tasks.task_data_list_view import TaskDataListView
 
 if TYPE_CHECKING:
-    from errands.widgets.today.today import Today
+    from errands.widgets.tasks.tasks_page import TasksPage
 
 
-class TodayTask(Gtk.Revealer):
+class TasksTask(Gtk.Revealer):
     block_signals: bool = True
     purging: bool = False
 
-    def __init__(self, task_data: TaskData, today_page: Today) -> None:
+    def __init__(self, page: TasksPage) -> None:
         super().__init__()
-        self.task_data = task_data
-        self.list_uid = task_data.list_uid
-        self.uid = task_data.uid
-        self.today_page = today_page
+        self.task_data = None
+        self.page = page
         self.__build_ui()
         self.__add_actions()
-        self.update_ui()
         self.block_signals = False
 
     def __repr__(self) -> str:
-        return f"<class 'TodayTask' {self.task_data.uid}>"
+        return f"<class '{self.__class__.__name__}' {self.task_data.uid}>"
 
     def __add_actions(self) -> None:
         self.group: Gio.SimpleActionGroup = Gio.SimpleActionGroup()
@@ -195,6 +193,14 @@ class TodayTask(Gtk.Revealer):
     # ------ PROPERTIES ------ #
 
     @property
+    def uid(self) -> str:
+        return self.task_data.uid
+
+    @property
+    def list_uid(self) -> str:
+        return self.task_data.list_uid
+
+    @property
     def task(self) -> Task:
         return State.get_task(self.task_data.list_uid, self.task_data.uid)
 
@@ -207,6 +213,10 @@ class TodayTask(Gtk.Revealer):
         return [item.get_child() for item in get_children(self.tags_bar)]
 
     # ------ PUBLIC METHODS ------ #
+
+    def set_data(self, task_data: TaskDataListView):
+        self.task_data = task_data
+        self.update_ui()
 
     def add_rm_crossline(self, add: bool) -> None:
         if add:
@@ -227,7 +237,7 @@ class TodayTask(Gtk.Revealer):
     def delete(self, *_) -> None:
         self.toggle_visibility(False)
         self.task.delete()
-        self.today_page.update_status()
+        self.page.update_status()
 
     def purge(self) -> None:
         """Completely remove widget"""
@@ -258,9 +268,10 @@ class TodayTask(Gtk.Revealer):
                 values.append(datetime.datetime.now().strftime("%Y%m%dT%H%M%S"))
                 break
         UserData.update_props(self.list_uid, self.uid, props, values)
-        # Update linked today task
+        # Update linked page
         if props == ["expanded"] or props == ["toolbar_shown"]:
-            State.today_page.update_ui()
+            State.tasks_page.update_ui()
+        self.page.update_ui()
 
     def toggle_visibility(self, on: bool) -> None:
         GLib.idle_add(self.set_reveal_child, on)
@@ -339,7 +350,7 @@ class TodayTask(Gtk.Revealer):
         self.task.complete_btn.set_active(btn.get_active())
         if btn.get_active():
             self.purge()
-            State.today_page.update_status()
+            State.tasks_page.update_status()
 
     def _on_edit_row_applied(self, entry: Adw.EntryRow) -> None:
         text: str = entry.props.text.strip()

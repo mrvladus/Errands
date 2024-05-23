@@ -23,7 +23,7 @@ from errands.widgets.shared.titled_separator import TitledSeparator
 from errands.widgets.tags.tags_sidebar_row import TagsSidebarRow
 from errands.widgets.task_list.task_list import TaskList
 from errands.widgets.task_list.task_list_sidebar_row import TaskListSidebarRow
-from errands.widgets.today.today_sidebar_row import TodaySidebarRow
+from errands.widgets.tasks.tasks_sidebar_row import TasksSidebarRow
 from errands.widgets.trash.trash_sidebar_row import TrashSidebarRow
 
 
@@ -78,7 +78,7 @@ class Sidebar(Adw.Bin):
             selection_mode=Gtk.SelectionMode.SINGLE,
             css_classes=["navigation-sidebar"],
             children=[
-                TodaySidebarRow(),
+                TasksSidebarRow(),
                 TagsSidebarRow(),
                 TrashSidebarRow(),
             ],
@@ -170,7 +170,7 @@ class Sidebar(Adw.Bin):
         State.view_stack.remove(row.task_list)
         self.list_box.remove(row)
         State.trash_sidebar_row.update_ui()
-        State.today_page.update_ui()
+        State.tasks_page.update_ui()
         self.update_status()
 
     def __select_last_opened_item(self) -> None:
