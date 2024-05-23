@@ -235,16 +235,16 @@ class SyncProviderCalDAV:
                         self.__update_local_list(cal, list)
                     else:
                         self.__update_remote_list(cal, list)
-            if list.uid not in remote_lists_uids and list.synced and not list.deleted:
-                self.__delete_local_list(list)
-            elif list.uid in remote_lists_uids and list.deleted and list.synced:
-                self.__delete_remote_list(list)
-            elif (
+            if (
                 list.uid not in remote_lists_uids
                 and not list.synced
                 and not list.deleted
             ):
                 self.__create_remote_list(list)
+            elif list.uid not in remote_lists_uids and list.synced and not list.deleted:
+                self.__delete_local_list(list)
+            elif list.uid in remote_lists_uids and list.deleted and list.synced:
+                self.__delete_remote_list(list)
 
     def __add_local_lists(self) -> None:
         user_lists_uids = [lst.uid for lst in UserData.get_lists_as_dicts()]
@@ -399,19 +399,31 @@ class SyncProviderCalDAV:
             if task.due_date:
                 todo.icalendar_component["due"] = task.due_date
             else:
-                del todo.icalendar_component["due"]
+                try:
+                    del todo.icalendar_component["due"]
+                except BaseException:
+                    pass
             if task.start_date:
                 todo.icalendar_component["dtstart"] = task.start_date
             else:
-                del todo.icalendar_component["dtstart"]
+                try:
+                    del todo.icalendar_component["dtstart"]
+                except BaseException:
+                    pass
             if task.created_at:
                 todo.icalendar_component["dtstamp"] = task.created_at
             else:
-                del todo.icalendar_component["dtstamp"]
+                try:
+                    del todo.icalendar_component["dtstamp"]
+                except BaseException:
+                    pass
             if task.changed_at:
                 todo.icalendar_component["last-modified"] = task.changed_at
             else:
-                del todo.icalendar_component["last-modified"]
+                try:
+                    del todo.icalendar_component["last-modified"]
+                except BaseException:
+                    pass
             todo.icalendar_component["summary"] = task.text
             todo.icalendar_component["percent-complete"] = int(task.percent_complete)
             todo.icalendar_component["description"] = task.notes
