@@ -8,10 +8,9 @@ from typing import TYPE_CHECKING
 
 from gi.repository import Adw, Gio, GLib, GObject, Gtk  # type:ignore
 
-from errands.lib.data import UserData
 from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
-from errands.lib.utils import get_children, get_human_datetime
+from errands.lib.utils import get_human_datetime
 from errands.state import State
 from errands.widgets.shared.color_selector import ErrandsColorSelector
 from errands.widgets.shared.components.boxes import ErrandsBox
@@ -70,49 +69,13 @@ class ErrandsTaskToolbar(Gtk.FlowBox):
         )
 
         # Tags button
-        tags_status_page: Adw.StatusPage = Adw.StatusPage(
-            title=_("No Tags"),
-            icon_name="errands-info-symbolic",
-            css_classes=["compact"],
-        )
-        self.tags_list: Gtk.Box = Gtk.Box(
-            orientation=Gtk.Orientation.VERTICAL,
-            spacing=6,
-            margin_bottom=6,
-            margin_end=6,
-            margin_start=6,
-            margin_top=6,
-        )
-        self.tags_list.bind_property(
-            "visible",
-            tags_status_page,
-            "visible",
-            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.INVERT_BOOLEAN,
-        )
-        self.tags_btn: Gtk.MenuButton = Gtk.MenuButton(
+        tag_btn: ErrandsButton = ErrandsButton(
             valign=Gtk.Align.CENTER,
             icon_name="errands-tag-add-symbolic",
             tooltip_text=_("Tags"),
             css_classes=["flat"],
-            popover=Gtk.Popover(
-                css_classes=["tags-menu"],
-                child=Gtk.ScrolledWindow(
-                    max_content_width=200,
-                    max_content_height=200,
-                    width_request=200,
-                    propagate_natural_height=True,
-                    propagate_natural_width=True,
-                    vexpand=True,
-                    child=ErrandsBox(
-                        orientation=Gtk.Orientation.VERTICAL,
-                        vexpand=True,
-                        valign=Gtk.Align.CENTER,
-                        children=[self.tags_list, tags_status_page],
-                    ),
-                ),
-            ),
+            on_click=lambda *_: State.tag_window.show(self.task),
         )
-        self.tags_btn.connect("notify::active", self._on_tags_btn_toggled)
 
         self.attachments_btn: ErrandsButton = ErrandsButton(
             tooltip_text=_("Attachments"),
@@ -184,7 +147,7 @@ class ErrandsTaskToolbar(Gtk.FlowBox):
                 children=[
                     self.notes_btn,
                     self.priority_btn,
-                    self.tags_btn,
+                    tag_btn,
                     self.attachments_btn,
                     menu_btn,
                 ],
@@ -259,67 +222,3 @@ class ErrandsTaskToolbar(Gtk.FlowBox):
         self.task.block_signals = True
         self.color_selector.select_color(self.task.task_data.color)
         self.task.block_signals = False
-
-    def _on_tags_btn_toggled(self, btn: Gtk.MenuButton, *_) -> None:
-        if not btn.get_active():
-            return
-        tags: list[str] = [t.text for t in UserData.tags]
-        tags_list_items: list[ErrandsToolbarTagsListItem] = get_children(self.tags_list)
-        tags_list_items_text = [t.title for t in tags_list_items]
-
-        # Remove tags
-        for item in tags_list_items:
-            if item.title not in tags:
-                self.tags_list.remove(item)
-
-        # Add tags
-        for tag in tags:
-            if tag not in tags_list_items_text:
-                self.tags_list.append(ErrandsToolbarTagsListItem(tag, self.task))
-
-        # Toggle tags
-        task_tags: list[str] = [t.title for t in self.task.tags]
-        tags_items: list[ErrandsToolbarTagsListItem] = get_children(self.tags_list)
-        for t in tags_items:
-            t.block_signals = True
-            t.toggle_btn.set_active(t.title in task_tags)
-            t.block_signals = False
-
-        self.tags_list.set_visible(len(get_children(self.tags_list)) > 0)
-
-
-class ErrandsToolbarTagsListItem(Gtk.Box):
-    block_signals = False
-
-    def __init__(self, title: str, task: Task) -> None:
-        super().__init__()
-        self.set_spacing(6)
-        self.title = title
-        self.task = task
-        self.toggle_btn = ErrandsCheckButton(on_toggle=self.__on_toggle)
-        self.append(self.toggle_btn)
-        self.append(
-            Gtk.Label(
-                label=title, hexpand=True, halign=Gtk.Align.START, max_width_chars=20
-            )
-        )
-        self.append(
-            Gtk.Image(icon_name="errands-tag-symbolic", css_classes=["dim-label"])
-        )
-
-    def __on_toggle(self, btn: Gtk.CheckButton) -> None:
-        if self.block_signals:
-            return
-
-        tags: list[str] = self.task.task_data.tags
-
-        if btn.get_active():
-            if self.title not in tags:
-                tags.append(self.title)
-        else:
-            if self.title in tags:
-                tags.remove(self.title)
-
-        self.task.update_props(["tags", "synced"], [tags, False])
-        self.task.update_tags_bar()
-        Sync.sync()

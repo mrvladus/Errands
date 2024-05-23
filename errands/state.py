@@ -16,6 +16,7 @@ if TYPE_CHECKING:
         ErrandsAttachmentsWindow,
         ErrandsNotesWindow,
         PriorityWindow,
+        TagWindow,
     )
     from errands.widgets.sidebar import Sidebar
     from errands.widgets.tags.tags import Tags
@@ -72,6 +73,7 @@ class State:
     attachments_window: ErrandsAttachmentsWindow | None = None
 
     priority_window: PriorityWindow | None = None
+    tag_window: TagWindow | None = None
 
     @classmethod
     def init(cls) -> None:
@@ -80,12 +82,14 @@ class State:
             ErrandsDateTimeWindow,
             ErrandsAttachmentsWindow,
             PriorityWindow,
+            TagWindow,
         )
 
         cls.notes_window = ErrandsNotesWindow()
         cls.datetime_window = ErrandsDateTimeWindow()
         cls.attachments_window = ErrandsAttachmentsWindow()
         cls.priority_window = PriorityWindow()
+        cls.tag_window = TagWindow()
 
     @classmethod
     def get_task_list(cls, uid: str) -> TaskList:
