@@ -387,9 +387,9 @@ class UserDataJSON:
         self.tags = new_tags
 
     def update_tags(self) -> None:
-        tasks_tags_texts: list[str] = []
+        tasks_tags_texts: set[str] = set()
         for task in self.tasks:
-            tasks_tags_texts.extend(task.tags)
+            tasks_tags_texts.update(task.tags)
 
         current_tags = self.tags
         current_tags_texts = [t.text for t in current_tags]
