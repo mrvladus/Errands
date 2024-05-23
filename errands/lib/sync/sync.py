@@ -55,6 +55,11 @@ class Sync:
                 self.sync_again = False
             GLib.idle_add(State.sidebar.toggle_sync_indicator, False)
             self.syncing = False
+            if (
+                State.view_stack.get_visible_child_name() == "errands_status_page"
+                and UserData.task_lists
+            ):
+                State.view_stack.set_visible_child_name("errands_today_page")
 
     # TODO: Needs to be threaded to not block UI
     @classmethod
