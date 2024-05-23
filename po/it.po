@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version:  errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-17 17:01+0300\n"
-"PO-Revision-Date: 2024-05-09 10:31+0100\n"
+"PO-Revision-Date: 2024-05-23 13:31+0100\n"
 "Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
 "Language-Team: Italian <LL@li.org>\n"
 "Language: it\n"
@@ -20,7 +20,7 @@ msgstr ""
 
 #: errands/widgets/shared/components/buttons.py:45
 msgid "Info"
-msgstr ""
+msgstr "Informazioni"
 
 #: errands/widgets/shared/components/dialogs.py:31
 msgid "Are you sure?"
@@ -136,7 +136,7 @@ msgstr "Tag"
 #: errands/widgets/shared/task_toolbar/toolbar.py:157
 #: errands/widgets/shared/task_toolbar/attachments_window.py:30
 msgid "Attachments"
-msgstr ""
+msgstr "Allegati"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:191
 #: errands/widgets/shared/task_toolbar/toolbar.py:294
@@ -154,15 +154,15 @@ msgstr "Altro"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:33
 msgid "No Files Attached"
-msgstr ""
+msgstr "Nessun file allegato"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:56
 msgid "Add Attachment"
-msgstr ""
+msgstr "Aggiungi allegato"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:119
 msgid "Open File"
-msgstr ""
+msgstr "Apri file"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:123
 #: errands/widgets/tags/tags.py:140
@@ -174,7 +174,7 @@ msgstr "Cancella"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:132
 msgid "Open Containing Folder"
-msgstr ""
+msgstr "Apri la cartella dei documenti"
 
 #: errands/widgets/shared/task_toolbar/datetime_window.py:29
 msgid "Date and Time"
@@ -369,7 +369,7 @@ msgstr "Esportazione non riuscita"
 
 #: errands/widgets/task_list/task_list_sidebar_row.py:158
 msgid "Color"
-msgstr ""
+msgstr "Colore"
 
 #: errands/widgets/task_list/task_list_sidebar_row.py:186
 msgid "Rename"
@@ -479,11 +479,11 @@ msgstr "Nascondi la finestra dell'applicazione invece di chiuderla"
 
 #: errands/widgets/preferences.py:102
 msgid "Launch on Startup"
-msgstr ""
+msgstr "Avvia all'avvio del sistema"
 
 #: errands/widgets/preferences.py:103
 msgid "Launch application when user logs in"
-msgstr ""
+msgstr "Avvia l'applicazione quando l'utente accede"
 
 #: errands/widgets/preferences.py:112
 msgid "Notifications and Background"
@@ -512,6 +512,8 @@ msgid ""
 "URL needs to include protocol, like <b>http://</b> or <b>https://</b>. If "
 "you have problems with connection - try to change protocol first."
 msgstr ""
+"L'URL deve includere un protocollo, ad esempio <b>http://</b> o <b>https://</b>. Se "
+"hai problemi con la connessione: prova prima a cambiare protocollo."
 
 #: errands/widgets/preferences.py:147
 msgid "Username"
@@ -538,13 +540,12 @@ msgid "Connected"
 msgstr "Connesso"
 
 #: errands/widgets/preferences.py:221
-#, fuzzy
 msgid "Authorization failed"
-msgstr "Esportazione non riuscita"
+msgstr "Autorizzazione non concessa"
 
 #: errands/widgets/preferences.py:223
 msgid "Could not locate server. Check network and url."
-msgstr ""
+msgstr "Impossibile individuare il server. Controlla la rete e l'URL."
 
 #: errands/widgets/preferences.py:225
 msgid "Can't connect"
@@ -553,7 +554,7 @@ msgstr "Impossibile connettere"
 #. NOTE: Also catches invalid credentials
 #: errands/widgets/preferences.py:227
 msgid "Can't connect. Check credentials"
-msgstr ""
+msgstr "Impossibile connettersi. Controlla le credenziali"
 
 #: errands/lib/sync/providers/caldav.py:66
 msgid "Not all sync credentials provided. Please check settings."
@@ -566,9 +567,8 @@ msgid "Can't connect to CalDAV server at:"
 msgstr "Impossibile connettersi al server CalDAV su:"
 
 #: errands/lib/data.py:92
-#, fuzzy
 msgid "New Task List"
-msgstr "Nessun elenco di attività"
+msgstr "Nuovo elenco di attività"
 
 #: errands/lib/notifications.py:75
 msgid "Task is Due"
