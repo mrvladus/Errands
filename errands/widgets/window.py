@@ -102,6 +102,27 @@ class Window(Adw.ApplicationWindow):
             title=_("Create new List"),
         )
 
+        # Syncing Page
+        self.view_stack.add_titled(
+            child=ErrandsToolbarView(
+                top_bars=[Adw.HeaderBar(show_title=False)],
+                content=ErrandsBox(
+                    orientation=Gtk.Orientation.VERTICAL,
+                    hexpand=True,
+                    valign=Gtk.Align.CENTER,
+                    children=[
+                        Adw.StatusPage(
+                            title=_("Syncing"),
+                            description=_("First syncronization running"),
+                            icon_name="errands-sync-symbolic",
+                        ),
+                    ],
+                ),
+            ),
+            name="errands_syncing_page",
+            title=_("Syncing"),
+        )
+
         # Toast Overlay
         self.toast_overlay: Adw.ToastOverlay = Adw.ToastOverlay(child=self.split_view)
         self.set_content(self.toast_overlay)
