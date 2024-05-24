@@ -47,6 +47,8 @@ class Sync:
                 self.sync_again = True
                 return
             self.syncing = True
+            if State.view_stack.get_visible_child_name() == "errands_status_page":
+                State.view_stack.set_visible_child_name("errands_syncing_page")
             GLib.idle_add(State.sidebar.toggle_sync_indicator, True)
             self.provider.sync()
             UserData.clean_deleted()
@@ -56,7 +58,7 @@ class Sync:
             GLib.idle_add(State.sidebar.toggle_sync_indicator, False)
             self.syncing = False
             if (
-                State.view_stack.get_visible_child_name() == "errands_status_page"
+                State.view_stack.get_visible_child_name() == "errands_syncing_page"
                 and UserData.task_lists
             ):
                 State.view_stack.set_visible_child_name("errands_today_page")
