@@ -14,9 +14,8 @@ from errands.lib.sync.sync import Sync
 from errands.lib.utils import get_children, get_human_datetime
 from errands.state import State
 from errands.widgets.shared.color_selector import ErrandsColorSelector
-from errands.widgets.shared.components.boxes import ErrandsBox, ErrandsListBox
+from errands.widgets.shared.components.boxes import ErrandsBox
 from errands.widgets.shared.components.buttons import ErrandsButton, ErrandsCheckButton
-from errands.widgets.shared.titled_separator import TitledSeparator
 
 
 if TYPE_CHECKING:
@@ -62,51 +61,13 @@ class ErrandsTaskToolbar(Gtk.FlowBox):
         )
 
         # Priority button
-        self.custom_priority_btn: Gtk.SpinButton = Gtk.SpinButton(
-            valign=Gtk.Align.CENTER,
-            adjustment=Gtk.Adjustment(upper=9, lower=0, step_increment=1),
-        )
-        self.priority_btn: Gtk.MenuButton = Gtk.MenuButton(
+        self.priority_btn: ErrandsButton = ErrandsButton(
             valign=Gtk.Align.CENTER,
             icon_name="errands-priority-symbolic",
             tooltip_text=_("Priority"),
             css_classes=["flat"],
-            popover=Gtk.Popover(
-                css_classes=["menu"],
-                child=ErrandsBox(
-                    orientation=Gtk.Orientation.VERTICAL,
-                    margin_bottom=6,
-                    margin_top=6,
-                    margin_end=6,
-                    margin_start=6,
-                    spacing=3,
-                    children=[
-                        ErrandsListBox(
-                            on_row_activated=self._on_priority_selected,
-                            selection_mode=Gtk.SelectionMode.NONE,
-                            children=[
-                                Gtk.ListBoxRow(
-                                    css_classes=["error"],
-                                    child=Gtk.Label(label=_("High")),
-                                ),
-                                Gtk.ListBoxRow(
-                                    css_classes=["warning"],
-                                    child=Gtk.Label(label=_("Medium")),
-                                ),
-                                Gtk.ListBoxRow(
-                                    css_classes=["accent"],
-                                    child=Gtk.Label(label=_("Low")),
-                                ),
-                                Gtk.ListBoxRow(child=Gtk.Label(label=_("None"))),
-                            ],
-                        ),
-                        TitledSeparator(title=_("Custom")),
-                        self.custom_priority_btn,
-                    ],
-                ),
-            ),
+            on_click=lambda *_: State.priority_window.show(self.task),
         )
-        self.priority_btn.connect("notify::active", self._on_priority_btn_toggled)
 
         # Tags button
         tags_status_page: Adw.StatusPage = Adw.StatusPage(
@@ -298,35 +259,6 @@ class ErrandsTaskToolbar(Gtk.FlowBox):
         self.task.block_signals = True
         self.color_selector.select_color(self.task.task_data.color)
         self.task.block_signals = False
-
-    def _on_priority_btn_toggled(self, btn: Gtk.MenuButton, *_) -> None:
-        priority: int = self.task.task_data.priority
-        if btn.get_active():
-            self.custom_priority_btn.set_value(priority)
-        else:
-            new_priority: int = self.custom_priority_btn.get_value_as_int()
-            if priority != new_priority:
-                Log.debug(f"Task Toolbar: Set priority to '{new_priority}'")
-                self.task.update_props(["priority", "synced"], [new_priority, False])
-                self.task.update_toolbar()
-                Sync.sync()
-
-    def _on_priority_selected(self, box: Gtk.ListBox, row: Gtk.ListBoxRow) -> None:
-        rows: list[Gtk.ListBoxRow] = get_children(box)
-        for i, r in enumerate(rows):
-            if r == row:
-                index = i
-                break
-        match index:
-            case 0:
-                self.custom_priority_btn.set_value(1)
-            case 1:
-                self.custom_priority_btn.set_value(5)
-            case 2:
-                self.custom_priority_btn.set_value(9)
-            case 3:
-                self.custom_priority_btn.set_value(0)
-        self.priority_btn.popdown()
 
     def _on_tags_btn_toggled(self, btn: Gtk.MenuButton, *_) -> None:
         if not btn.get_active():
