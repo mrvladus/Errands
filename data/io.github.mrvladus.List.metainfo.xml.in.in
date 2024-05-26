@@ -57,6 +57,15 @@
   </requires>
 
   <releases>
+    <release version="46.2.2" date="2024-05-25">
+      <description translatable="no">
+        <p>Bug fixes and UI improvements</p>
+        <p>Translations:</p>
+        <ul>
+          <li>Updated Italian translation (Albano Battistella)</li>
+        </ul>
+      </description>
+    </release>
     <release version="46.2.1" date="2024-05-21">
       <description translatable="no">
         <p>Improved perfomance. Startup time and memory consumption is now cut by up to 50%.</p>
