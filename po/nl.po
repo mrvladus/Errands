@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-17 17:01+0300\n"
-"PO-Revision-Date: 2024-05-02 17:56+0200\n"
+"PO-Revision-Date: 2024-05-26 13:42+0200\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: \n"
 "Language: nl\n"
@@ -19,7 +19,7 @@ msgstr ""
 
 #: errands/widgets/shared/components/buttons.py:45
 msgid "Info"
-msgstr ""
+msgstr "Informatie"
 
 #: errands/widgets/shared/components/dialogs.py:31
 msgid "Are you sure?"
@@ -135,7 +135,7 @@ msgstr "Labels"
 #: errands/widgets/shared/task_toolbar/toolbar.py:157
 #: errands/widgets/shared/task_toolbar/attachments_window.py:30
 msgid "Attachments"
-msgstr ""
+msgstr "Bijlagen"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:191
 #: errands/widgets/shared/task_toolbar/toolbar.py:294
@@ -153,15 +153,15 @@ msgstr "Meer"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:33
 msgid "No Files Attached"
-msgstr ""
+msgstr "Er zijn geen bijlagen"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:56
 msgid "Add Attachment"
-msgstr ""
+msgstr "Bijlage toevoegen"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:119
 msgid "Open File"
-msgstr ""
+msgstr "Bestand openen"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:123
 #: errands/widgets/tags/tags.py:140
@@ -173,7 +173,7 @@ msgstr "Verwĳderen"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:132
 msgid "Open Containing Folder"
-msgstr ""
+msgstr "Bijbehorende map openen"
 
 #: errands/widgets/shared/task_toolbar/datetime_window.py:29
 msgid "Date and Time"
@@ -343,9 +343,8 @@ msgid "Add new Task"
 msgstr "Taak toevoegen"
 
 #: errands/widgets/task_list/task_list.py:156
-#, fuzzy
 msgid "Loading..."
-msgstr "Bezig met synchroniseren…"
+msgstr "Bezig met laden…"
 
 #: errands/widgets/task_list/task_list_sidebar_row.py:59
 msgid "List will be permanently deleted"
@@ -369,7 +368,7 @@ msgstr "Exporteren mislukt"
 
 #: errands/widgets/task_list/task_list_sidebar_row.py:158
 msgid "Color"
-msgstr ""
+msgstr "Kleur"
 
 #: errands/widgets/task_list/task_list_sidebar_row.py:186
 msgid "Rename"
@@ -471,24 +470,24 @@ msgstr "Meldingen tonen"
 
 #: errands/widgets/preferences.py:94
 msgid "Run in Background"
-msgstr ""
+msgstr "Uitvoeren op achtergrond"
 
 #: errands/widgets/preferences.py:95
 msgid "Hide the application window instead of closing it"
 msgstr ""
+"Verberg het toepassingsvenster in plaats van de toepassing af te sluiten"
 
 #: errands/widgets/preferences.py:102
 msgid "Launch on Startup"
-msgstr ""
+msgstr "Automatisch opstarten"
 
 #: errands/widgets/preferences.py:103
 msgid "Launch application when user logs in"
-msgstr ""
+msgstr "Start de toepassing op na het aanmelden"
 
 #: errands/widgets/preferences.py:112
-#, fuzzy
 msgid "Notifications and Background"
-msgstr "Meldingen"
+msgstr "Meldingen en achtergronddienst"
 
 #: errands/widgets/preferences.py:120 errands/widgets/preferences.py:181
 #: data/resources/gtk/help-overlay.ui:38
@@ -513,6 +512,9 @@ msgid ""
 "URL needs to include protocol, like <b>http://</b> or <b>https://</b>. If "
 "you have problems with connection - try to change protocol first."
 msgstr ""
+"De url dient voorzien te zijn van een protocol, zoals <b>http://</b> of "
+"<b>https://</b>. Als u verbindingsproblemen heeft, probeer dan het protocol "
+"aan te passen."
 
 #: errands/widgets/preferences.py:147
 msgid "Username"
@@ -539,13 +541,14 @@ msgid "Connected"
 msgstr "Verbonden"
 
 #: errands/widgets/preferences.py:221
-#, fuzzy
 msgid "Authorization failed"
-msgstr "Exporteren mislukt"
+msgstr "Verificatie mislukt"
 
 #: errands/widgets/preferences.py:223
 msgid "Could not locate server. Check network and url."
 msgstr ""
+"De server kan niet worden gevonden. Controleer de url en uw "
+"internetverbinding."
 
 #: errands/widgets/preferences.py:225
 msgid "Can't connect"
@@ -554,7 +557,7 @@ msgstr "Verbinding mislukt"
 #. NOTE: Also catches invalid credentials
 #: errands/widgets/preferences.py:227
 msgid "Can't connect. Check credentials"
-msgstr ""
+msgstr "Controleer uw inloggegevens"
 
 #: errands/lib/sync/providers/caldav.py:66
 msgid "Not all sync credentials provided. Please check settings."
@@ -565,9 +568,8 @@ msgid "Can't connect to CalDAV server at:"
 msgstr "Er kan geen verbinding worden gemaakt met de server:"
 
 #: errands/lib/data.py:92
-#, fuzzy
 msgid "New Task List"
-msgstr "Er zijn geen lijsten"
+msgstr "Nieuwe takenlijst"
 
 #: errands/lib/notifications.py:75
 msgid "Task is Due"
@@ -575,16 +577,15 @@ msgstr "Taak is bijna verlopen"
 
 #: errands/application.py:80
 msgid "Errands was updated"
-msgstr ""
+msgstr "Takenlijst is bijgewerkt"
 
 #: errands/application.py:81
 msgid "Restart is required"
-msgstr ""
+msgstr "Herstart de toepassing"
 
 #: errands/application.py:84
-#, fuzzy
 msgid "Restart"
-msgstr "Herstellen"
+msgstr "Herstarten"
 
 #: errands/application.py:113
 msgid "Errands need to run in the background for notifications"
@@ -620,8 +621,8 @@ msgstr "Beheer uw taken"
 #: data/io.github.mrvladus.List.desktop.in.in:10
 msgid "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
 msgstr ""
-"takenlijst;boodschappen;taken;lĳst;taak;todo;caldav;nextcloud;synchronisatie;"
-"synchroniseren;"
+"takenlijst;boodschappen;taken;lĳst;taak;todo;caldav;nextcloud;"
+"synchronisatie;synchroniseren;"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:12
 msgid "Todo application for those who prefer simplicity."
@@ -661,7 +662,7 @@ msgstr "Importeer .ics-bestanden"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:41
 msgid "Main Window View"
-msgstr ""
+msgstr "Hoofdvenster"
 
 #~ msgid "Not Set"
 #~ msgstr "Niet ingesteld"
