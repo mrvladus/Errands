@@ -450,26 +450,28 @@ class SyncProviderCalDAV:
 
         try:
             new_todo = calendar.save_todo(
-                categories=",".join(task.tags) if task.tags else None,
-                description=task.notes,
-                dtstart=(
-                    datetime.datetime.fromisoformat(task.start_date)
-                    if task.start_date
-                    else None
-                ),
-                due=(
-                    datetime.datetime.fromisoformat(task.due_date)
-                    if task.due_date
-                    else None
-                ),
-                priority=task.priority,
-                percent_complete=task.percent_complete,
-                related_to=task.parent,
-                summary=task.text,
-                uid=task.uid,
-                x_errands_color=task.color,
-                x_errands_expanded=int(task.expanded),
-                x_errands_toolbar_shown=int(task.toolbar_shown),
+                **{
+                    "categories": ",".join(task.tags) if task.tags else None,
+                    "description": task.notes,
+                    "dtstart": (
+                        datetime.datetime.fromisoformat(task.start_date)
+                        if task.start_date
+                        else None
+                    ),
+                    "due": (
+                        datetime.datetime.fromisoformat(task.due_date)
+                        if task.due_date
+                        else None
+                    ),
+                    "priority": task.priority,
+                    "percent-complete": task.percent_complete,
+                    "related-to": task.parent,
+                    "summary": task.text,
+                    "uid": task.uid,
+                    "x-errands-color": task.color,
+                    "x-errands-expanded": int(task.expanded),
+                    "x-errands-toolbar-shown": int(task.toolbar_shown),
+                }
             )
             if task.completed:
                 new_todo.complete()
