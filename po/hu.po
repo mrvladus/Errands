@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-17 17:01+0300\n"
-"PO-Revision-Date: 2024-02-20 14:49+0100\n"
+"PO-Revision-Date: 2024-06-11 16:08+0200\n"
 "Last-Translator: acszoltan111@gmail.com\n"
 "Language-Team: \n"
 "Language: hu\n"
@@ -19,7 +19,7 @@ msgstr ""
 
 #: errands/widgets/shared/components/buttons.py:45
 msgid "Info"
-msgstr ""
+msgstr "Információ"
 
 #: errands/widgets/shared/components/dialogs.py:31
 msgid "Are you sure?"
@@ -35,35 +35,35 @@ msgstr "Mégse"
 #: errands/widgets/shared/color_selector.py:32
 #: errands/widgets/shared/task_toolbar/toolbar.py:100
 msgid "None"
-msgstr ""
+msgstr "Nincs"
 
 #: errands/widgets/shared/color_selector.py:41
 msgid "Blue"
-msgstr ""
+msgstr "Kék"
 
 #: errands/widgets/shared/color_selector.py:50
 msgid "Green"
-msgstr ""
+msgstr "Zöld"
 
 #: errands/widgets/shared/color_selector.py:61
 msgid "Yellow"
-msgstr ""
+msgstr "Sárga"
 
 #: errands/widgets/shared/color_selector.py:72
 msgid "Orange"
-msgstr ""
+msgstr "Narancs"
 
 #: errands/widgets/shared/color_selector.py:81
 msgid "Red"
-msgstr ""
+msgstr "Piros"
 
 #: errands/widgets/shared/color_selector.py:92
 msgid "Purple"
-msgstr ""
+msgstr "Lila"
 
 #: errands/widgets/shared/color_selector.py:101
 msgid "Brown"
-msgstr ""
+msgstr "Barna"
 
 #: errands/widgets/shared/datetime_picker.py:138
 #: errands/widgets/today/today.py:57
@@ -91,12 +91,11 @@ msgstr "Dátum beállítása"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:44
 msgid "Start / Due Date"
-msgstr ""
+msgstr "Kezdet / esedékesség dátuma"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:49 errands/lib/utils.py:20
-#, fuzzy
 msgid "Date"
-msgstr "Dátum beállítása"
+msgstr "Dátum"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:59
 #: errands/widgets/shared/task_toolbar/notes_window.py:29
@@ -109,25 +108,23 @@ msgstr "Prioritás"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:90
 msgid "High"
-msgstr ""
+msgstr "Magas"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:94
 msgid "Medium"
-msgstr ""
+msgstr "Közepes"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:98
-#, fuzzy
 msgid "Low"
-msgstr "Most"
+msgstr "Alacsony"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:103
 msgid "Custom"
-msgstr ""
+msgstr "Egyéni"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:113
-#, fuzzy
 msgid "No Tags"
-msgstr "Címkék"
+msgstr "Nincsenek címkék"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:134
 #: errands/widgets/tags/tags.py:63 errands/widgets/tags/tags_sidebar_row.py:32
@@ -138,34 +135,33 @@ msgstr "Címkék"
 #: errands/widgets/shared/task_toolbar/toolbar.py:157
 #: errands/widgets/shared/task_toolbar/attachments_window.py:30
 msgid "Attachments"
-msgstr ""
+msgstr "Csatolmányok"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:191
 #: errands/widgets/shared/task_toolbar/toolbar.py:294
-#, fuzzy
 msgid "Created:"
-msgstr "Befejezett:"
+msgstr "Létrehozva:"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:202
 #: errands/widgets/shared/task_toolbar/toolbar.py:295
 msgid "Changed:"
-msgstr ""
+msgstr "Módosítva:"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:215
 msgid "More"
-msgstr ""
+msgstr "Több"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:33
 msgid "No Files Attached"
-msgstr ""
+msgstr "Nincsenek csatolt fájlok"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:56
 msgid "Add Attachment"
-msgstr ""
+msgstr "Csatolmány hozzáadása"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:119
 msgid "Open File"
-msgstr ""
+msgstr "Fájl megnyitása"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:123
 #: errands/widgets/tags/tags.py:140
@@ -177,16 +173,16 @@ msgstr "Törlés"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:132
 msgid "Open Containing Folder"
-msgstr ""
+msgstr "Tartalmazó mappa megnyitása"
 
 #: errands/widgets/shared/task_toolbar/datetime_window.py:29
 msgid "Date and Time"
-msgstr ""
+msgstr "Dátum és idő"
 
 #: errands/widgets/shared/task_toolbar/datetime_window.py:39
 #: errands/widgets/shared/task_toolbar/datetime_window.py:41
 msgid "Due"
-msgstr "Lejárat"
+msgstr "Esedékesség"
 
 #: errands/widgets/shared/task_toolbar/datetime_window.py:54
 #: errands/widgets/shared/task_toolbar/datetime_window.py:56
@@ -211,9 +207,8 @@ msgstr "Kattintson a \"+\" gombra"
 
 #. Task lists group
 #: errands/widgets/sidebar.py:94 errands/widgets/preferences.py:66
-#, fuzzy
 msgid "Task Lists"
-msgstr "Nincsenek feladatlisták"
+msgstr "Feladatlisták"
 
 #: errands/widgets/sidebar.py:106 errands/widgets/window.py:43
 #: errands/widgets/window.py:148 data/io.github.mrvladus.List.desktop.in.in:3
@@ -230,9 +225,8 @@ msgid "Sync / Fetch Tasks"
 msgstr "Feladatok szinkronizálása / lekérése"
 
 #: errands/widgets/sidebar.py:128
-#, fuzzy
 msgid "Import Task List"
-msgstr "Lista importálása"
+msgstr "Feladatlista importálása"
 
 #: errands/widgets/sidebar.py:135 data/resources/gtk/help-overlay.ui:20
 msgid "Preferences"
@@ -264,16 +258,15 @@ msgstr "Hozzáadás"
 
 #: errands/widgets/tags/tags.py:32
 msgid "No Tags Found"
-msgstr ""
+msgstr "Nem találhatók címkék"
 
 #: errands/widgets/tags/tags.py:33
 msgid "Add new Tags in the entry above"
-msgstr ""
+msgstr "Adjon hozzá új címkéket a fenti szövegdobozban"
 
 #: errands/widgets/tags/tags.py:82
-#, fuzzy
 msgid "Add new Tag"
-msgstr "Új feladat hozzáadása"
+msgstr "Új címke hozzáadása"
 
 #: errands/widgets/task.py:79
 #: errands/widgets/task_list/task_list_sidebar_row.py:125
@@ -286,34 +279,30 @@ msgid "Copied to Clipboard"
 msgstr "Vágólapra másolva"
 
 #: errands/widgets/task.py:153
-#, fuzzy
 msgid "Toggle Sub-Tasks"
-msgstr "Alfeladatok megjelenítése"
+msgstr "Alfeladatok megjelenítése / elrejtése"
 
 #: errands/widgets/task.py:161 errands/widgets/today/today_task.py:100
-#, fuzzy
 msgid "Toggle Completion"
-msgstr "Részletek megjelenítése / elrejtése"
+msgstr "Befejezettek megjelenítése / elrejtése"
 
 #: errands/widgets/task.py:191
-#, fuzzy
 msgid "Toggle Toolbar"
-msgstr "Oldalsáv megjelenítése / elrejtése"
+msgstr "Eszköztár megjelenítése / elrejtése"
 
 #: errands/widgets/task.py:206 errands/widgets/task.py:226
 #: errands/widgets/today/today_task.py:117
 #: errands/widgets/today/today_task.py:127
 msgid "Edit"
-msgstr ""
+msgstr "Szerkesztés"
 
 #: errands/widgets/task.py:207 errands/widgets/today/today_task.py:118
 msgid "Move to Trash"
-msgstr ""
+msgstr "Kukába helyezés"
 
 #: errands/widgets/task.py:208 errands/widgets/today/today_task.py:119
-#, fuzzy
 msgid "Copy to Clipboard"
-msgstr "Vágólapra másolva"
+msgstr "Másolás vágólapra"
 
 #: errands/widgets/task.py:209
 #: errands/widgets/task_list/task_list_sidebar_row.py:188
@@ -322,9 +311,8 @@ msgid "Export"
 msgstr "Exportálás"
 
 #: errands/widgets/task.py:299 errands/widgets/task_list/task_list.py:84
-#, fuzzy
 msgid "Completed"
-msgstr "Befejezett:"
+msgstr "Befejezve"
 
 #: errands/widgets/task.py:323
 msgid "Add new Sub-Task"
@@ -335,14 +323,12 @@ msgid "Completed:"
 msgstr "Befejezett:"
 
 #: errands/widgets/task.py:921
-#, fuzzy
 msgid "Delete Tag"
-msgstr "Törlés"
+msgstr "Címke törlése"
 
 #: errands/widgets/task_list/task_list.py:50
-#, fuzzy
 msgid "Toggle Completed Tasks"
-msgstr "Befejezett feladatok törlése"
+msgstr "Befejezett feladatok megjelenítése / elrejtése"
 
 #: errands/widgets/task_list/task_list.py:58
 msgid "Delete Completed Tasks"
@@ -357,9 +343,8 @@ msgid "Add new Task"
 msgstr "Új feladat hozzáadása"
 
 #: errands/widgets/task_list/task_list.py:156
-#, fuzzy
 msgid "Loading..."
-msgstr "Szinkronizálás..."
+msgstr "Betöltés..."
 
 #: errands/widgets/task_list/task_list_sidebar_row.py:59
 msgid "List will be permanently deleted"
@@ -383,7 +368,7 @@ msgstr "Az exportálás sikertelen"
 
 #: errands/widgets/task_list/task_list_sidebar_row.py:158
 msgid "Color"
-msgstr ""
+msgstr "Szín"
 
 #: errands/widgets/task_list/task_list_sidebar_row.py:186
 msgid "Rename"
@@ -391,7 +376,7 @@ msgstr "Átnevezés"
 
 #: errands/widgets/today/today.py:31
 msgid "No Tasks for Today"
-msgstr ""
+msgstr "Nincsenek feladatok mára"
 
 #: errands/widgets/trash/trash.py:31
 msgid "Empty Trash"
@@ -416,13 +401,12 @@ msgid "Tasks will be permanently deleted"
 msgstr "A feladatok véglegesen törölve lesznek"
 
 #: errands/widgets/window.py:56
-#, fuzzy
 msgid "Sidebar"
-msgstr "Oldalsáv megjelenítése / elrejtése"
+msgstr "Oldalsáv"
 
 #: errands/widgets/window.py:59
 msgid "Content"
-msgstr ""
+msgstr "Tartalom"
 
 #: errands/widgets/window.py:90
 msgid "No Task Lists"
@@ -430,16 +414,15 @@ msgstr "Nincsenek feladatlisták"
 
 #: errands/widgets/window.py:91
 msgid "Create new or import existing one"
-msgstr ""
+msgstr "Új létrehozása vagy létező importálása"
 
 #: errands/widgets/window.py:95
 msgid "Create List"
 msgstr "Lista létrehozása"
 
 #: errands/widgets/window.py:104
-#, fuzzy
 msgid "Create new List"
-msgstr "Lista létrehozása"
+msgstr "Új lista létrehozása"
 
 #: errands/widgets/window.py:153
 msgid "translator-credits"
@@ -470,41 +453,40 @@ msgid "Dark"
 msgstr "Sötét"
 
 #: errands/widgets/preferences.py:70
-#, fuzzy
 msgid "Add new Tasks"
-msgstr "Új feladat hozzáadása"
+msgstr "Új feladatok hozzáadása"
 
 #: errands/widgets/preferences.py:71
 msgid "At the Bottom"
-msgstr ""
+msgstr "Alul"
 
 #: errands/widgets/preferences.py:71
 msgid "At the Top"
-msgstr ""
+msgstr "Felül"
 
 #: errands/widgets/preferences.py:87
 msgid "Show Notifications"
-msgstr ""
+msgstr "Értesítések megjelenítése"
 
 #: errands/widgets/preferences.py:94
 msgid "Run in Background"
-msgstr ""
+msgstr "Futtatás a háttérben"
 
 #: errands/widgets/preferences.py:95
 msgid "Hide the application window instead of closing it"
-msgstr ""
+msgstr "Az alkalmazásablak elrejtése bezárás helyett"
 
 #: errands/widgets/preferences.py:102
 msgid "Launch on Startup"
-msgstr ""
+msgstr "Indítás a munkamenettel"
 
 #: errands/widgets/preferences.py:103
 msgid "Launch application when user logs in"
-msgstr ""
+msgstr "Alkalmazás elindítása, amikor a felhasználó bejelentkezik"
 
 #: errands/widgets/preferences.py:112
 msgid "Notifications and Background"
-msgstr ""
+msgstr "Értesítések és háttér"
 
 #: errands/widgets/preferences.py:120 errands/widgets/preferences.py:181
 #: data/resources/gtk/help-overlay.ui:38
@@ -522,13 +504,16 @@ msgstr "Szinkronizáció szolgáltató"
 
 #: errands/widgets/preferences.py:134
 msgid "Server URL"
-msgstr "Szerver URL"
+msgstr "Kiszolgáló URL"
 
 #: errands/widgets/preferences.py:140
 msgid ""
 "URL needs to include protocol, like <b>http://</b> or <b>https://</b>. If "
 "you have problems with connection - try to change protocol first."
 msgstr ""
+"Az URL-címnek tartalmaznia kell a protokollt, például <b>http://</b> vagy "
+"<b>https://</b>. Ha problémái vannak a csatlakozással - először próbálja "
+"meg megváltoztatni a protokollt."
 
 #: errands/widgets/preferences.py:147
 msgid "Username"
@@ -555,13 +540,12 @@ msgid "Connected"
 msgstr "Csatlakozva"
 
 #: errands/widgets/preferences.py:221
-#, fuzzy
 msgid "Authorization failed"
-msgstr "Az exportálás sikertelen"
+msgstr "A hitelesítés sikertelen"
 
 #: errands/widgets/preferences.py:223
 msgid "Could not locate server. Check network and url."
-msgstr ""
+msgstr "Nem található kiszolgáló. Ellenőrizze a hálózatot és az URL-t."
 
 #: errands/widgets/preferences.py:225
 msgid "Can't connect"
@@ -570,7 +554,7 @@ msgstr "Nem lehet csatlakozni"
 #. NOTE: Also catches invalid credentials
 #: errands/widgets/preferences.py:227
 msgid "Can't connect. Check credentials"
-msgstr ""
+msgstr "Nem lehet csatlakozni. Ellenőrizze a hitelesítő adatokat"
 
 #: errands/lib/sync/providers/caldav.py:66
 msgid "Not all sync credentials provided. Please check settings."
@@ -580,34 +564,31 @@ msgstr ""
 
 #: errands/lib/sync/providers/caldav.py:110
 msgid "Can't connect to CalDAV server at:"
-msgstr "Nem lehet csatlakozni a CalDAV szerverhez itt:"
+msgstr "Nem lehet csatlakozni a CalDAV kiszolgálóhoz itt:"
 
 #: errands/lib/data.py:92
-#, fuzzy
 msgid "New Task List"
-msgstr "Nincsenek feladatlisták"
+msgstr "Új feladatlista"
 
 #: errands/lib/notifications.py:75
-#, fuzzy
 msgid "Task is Due"
-msgstr "Feladatok"
+msgstr "A feladat esedékes"
 
 #: errands/application.py:80
 msgid "Errands was updated"
-msgstr ""
+msgstr "A tennivalók frissítve lett"
 
 #: errands/application.py:81
 msgid "Restart is required"
-msgstr ""
+msgstr "Újraindítás szükséges"
 
 #: errands/application.py:84
-#, fuzzy
 msgid "Restart"
-msgstr "Visszaállítás"
+msgstr "Újraindítás"
 
 #: errands/application.py:113
 msgid "Errands need to run in the background for notifications"
-msgstr ""
+msgstr "A Tennivalóknak a háttérben kell futnia az értesítésekhez"
 
 #: data/resources/gtk/help-overlay.ui:13
 msgid "Show keyboard shortcuts"
@@ -637,7 +618,8 @@ msgstr "Kezelje a feladatait"
 #: data/io.github.mrvladus.List.desktop.in.in:10
 msgid "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
 msgstr ""
-"errands;tasks;list;todo;caldav;nextcloud;feladatok;tennivalók;szinkronizáció;"
+"errands;tasks;list;todo;caldav;nextcloud;feladatok;tennivalók;"
+"szinkronizáció;"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:12
 msgid "Todo application for those who prefer simplicity."
@@ -677,7 +659,7 @@ msgstr ".ics fájlok importálása"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:41
 msgid "Main Window View"
-msgstr ""
+msgstr "Főablak nézet"
 
 #~ msgid "Not Set"
 #~ msgstr "Nincs beállítva"
