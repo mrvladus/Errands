@@ -195,7 +195,7 @@ class DateTimePicker(Gtk.Box):
                 self.hours.set_value(0)
                 self.minutes.set_value(0)
             else:
-                dt = datetime.datetime.fromisoformat(dt).strftime("%Y%m%dT%H%M")
+                dt = datetime.datetime.fromisoformat(dt).strftime("%Y%m%dT%H%M%S")
                 self.hours.set_value(int(dt[9:11]))
                 self.minutes.set_value(int(dt[11:13]))
             self.calendar.select_day(
