@@ -57,6 +57,17 @@
   </requires>
 
   <releases>
+    <release version="46.2.3" date="2024-06-18">
+      <description translatable="no">
+        <p>Fixed bug with task date changing while using sync.</p>
+        <p>Translations:</p>
+        <ul>
+          <li>Added Hindi translation (Scrambled777)</li>
+          <li>Updated Dutch translation (Heimen Stoffels)</li>
+          <li>Updated Hungarian translation (zoli111)</li>
+        </ul>
+      </description>
+    </release>
     <release version="46.2.2" date="2024-05-25">
       <description translatable="no">
         <p>Bug fixes and UI improvements</p>
