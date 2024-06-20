@@ -22,7 +22,7 @@ msgstr ""
 
 #: errands/widgets/shared/components/buttons.py:45
 msgid "Info"
-msgstr ""
+msgstr "Informacje"
 
 #: errands/widgets/shared/components/dialogs.py:31
 msgid "Are you sure?"
@@ -94,7 +94,7 @@ msgstr "Ustaw datę"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:44
 msgid "Start / Due Date"
-msgstr ""
+msgstr "Data rozpoczęcia / zakończenia"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:49 errands/lib/utils.py:20
 msgid "Date"
@@ -123,7 +123,7 @@ msgstr "Niski"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:103
 msgid "Custom"
-msgstr ""
+msgstr "Własne"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:113
 msgid "No Tags"
@@ -164,7 +164,7 @@ msgstr "Dodaj załącznik"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:119
 msgid "Open File"
-msgstr ""
+msgstr "Otwórz plik"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:123
 #: errands/widgets/tags/tags.py:140
@@ -176,21 +176,21 @@ msgstr "Usuń"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:132
 msgid "Open Containing Folder"
-msgstr ""
+msgstr "Otwórz folder załącznika"
 
 #: errands/widgets/shared/task_toolbar/datetime_window.py:29
 msgid "Date and Time"
-msgstr ""
+msgstr "Data i czas"
 
 #: errands/widgets/shared/task_toolbar/datetime_window.py:39
 #: errands/widgets/shared/task_toolbar/datetime_window.py:41
 msgid "Due"
-msgstr ""
+msgstr "Zakończenie"
 
 #: errands/widgets/shared/task_toolbar/datetime_window.py:54
 #: errands/widgets/shared/task_toolbar/datetime_window.py:56
 msgid "Start"
-msgstr ""
+msgstr "Rozpoczeńcie"
 
 #: errands/widgets/sidebar.py:42
 msgid "Add List (Ctrl+Shift+A)"
@@ -198,7 +198,7 @@ msgstr "Dodaj listę (Ctrl+Shift+A)"
 
 #: errands/widgets/sidebar.py:61
 msgid "Syncing..."
-msgstr ""
+msgstr "Synchronizowanie.."
 
 #: errands/widgets/sidebar.py:67
 msgid "Add new List"
@@ -261,11 +261,11 @@ msgstr "Dodaj"
 
 #: errands/widgets/tags/tags.py:32
 msgid "No Tags Found"
-msgstr ""
+msgstr "Nie znaleziono żadnych tagów"
 
 #: errands/widgets/tags/tags.py:33
 msgid "Add new Tags in the entry above"
-msgstr ""
+msgstr "Dodaj nowe tagi w powyższym wpisie"
 
 #: errands/widgets/tags/tags.py:82
 msgid "Add new Tag"
