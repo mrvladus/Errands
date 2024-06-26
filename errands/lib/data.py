@@ -276,7 +276,7 @@ class UserDataJSON:
         return new_list
 
     def get_list(self, list_uid: str) -> TaskListData | None:
-        for list in self.get_lists_as_dicts():
+        for list in self.task_lists:
             if list.uid == list_uid:
                 return list
         return None
@@ -342,7 +342,8 @@ class UserDataJSON:
         return getattr(task, prop)
 
     def get_list_prop(self, list_uid: str, prop: str) -> Any:
-        return getattr(self.get_list(list_uid), prop)
+        property: Any = getattr(self.get_list(list_uid), prop)
+        return property if property else None
 
     def update_list_prop(self, list_uid: str, prop: str, value: Any) -> None:
         lists: list[TaskListData] = self.task_lists
