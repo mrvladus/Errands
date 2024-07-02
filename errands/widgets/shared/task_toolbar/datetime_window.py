@@ -14,7 +14,7 @@ from errands.widgets.shared.datetime_picker import DateTimePicker
 
 if TYPE_CHECKING:
     from errands.widgets.task import Task
-    from errands.widgets.today.today_task import TodayTask
+    from errands.widgets.tasks.tasks_task import TasksTask
 
 
 class ErrandsDateTimeWindow(Adw.Dialog):
@@ -76,7 +76,7 @@ class ErrandsDateTimeWindow(Adw.Dialog):
 
     # ------ PUBLIC METHODS ------ #
 
-    def show(self, task: Task | TodayTask):
+    def show(self, task: Task | TasksTask):
         self.task = task
         self.start_date_time.datetime = self.task.task_data.start_date
         self.due_date_time.datetime = self.task.task_data.due_date
@@ -98,6 +98,6 @@ class ErrandsDateTimeWindow(Adw.Dialog):
             )
             changed = True
 
-        State.today_page.update_ui()
+        State.tasks_page.update_ui()
         if changed:
             Sync.sync()

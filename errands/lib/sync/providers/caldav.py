@@ -202,8 +202,8 @@ class SyncProviderCalDAV:
         if self.update_ui_args.update_trash:
             State.trash_sidebar_row.update_ui()
 
-        if State.view_stack.get_visible_child_name() == "errands_today_page":
-            State.today_page.update_ui()
+        if State.view_stack.get_visible_child_name() == "errands_tasks_page":
+            State.tasks_page.update_ui()
 
     def sync(self) -> None:
         Log.info("Sync: Sync tasks with remote")
