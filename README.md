@@ -34,7 +34,7 @@ Other providers **may not work**. See [python-caldav  documentation](https://cal
 ### Flatpak
 Errands is available as a Flatpak on Flathub:
 
-<a href="https://flathub.org/apps/details/io.github.mrvladus.List"><img width='240' alt='Download on Flathub' src='https://dl.flathub.org/assets/badges/flathub-badge-en.png'/></a>
+<a href="https://flathub.org/apps/details/io.github.mrvladus.List"><img alt='Download on Flathub' src='https://flathub.org/api/badge?svg&locale=en'/></a>
 
 It's the **only** supported verion.
 
