@@ -1,145 +1,296 @@
-# Copyright 2023 Vlad Krupinskii <mrvladus@yandex.ru>
+# Copyright 2023-2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-from __future__ import annotations
-import time
-from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from errands.widgets.window import Window
+from gi.repository import Adw, GObject, Gtk  # type:ignore
 
-from datetime import datetime
-from icalendar import Calendar, Todo
-from errands.lib.data import UserData
-from errands.lib.functions import get_children
+from errands.lib.data import TaskListData, UserData
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.sync.sync import Sync
-from errands.widgets.components import Box
-from errands.widgets.task import Task
-from errands.widgets.task_list import TaskList
-from gi.repository import Adw, Gtk, Gio, GObject, Gdk, GLib  # type:ignore
+from errands.lib.utils import get_children
+from errands.state import State
+from errands.widgets.shared.components.boxes import ErrandsBox, ErrandsListBox
+from errands.widgets.shared.components.buttons import ErrandsButton
+from errands.widgets.shared.components.header_bar import ErrandsHeaderBar
+from errands.widgets.shared.components.menus import (
+    ErrandsMenuItem,
+    ErrandsSectionedMenu,
+    ErrandsSimpleMenu,
+)
+from errands.widgets.shared.components.toolbar_view import ErrandsToolbarView
+from errands.widgets.shared.titled_separator import TitledSeparator
+from errands.widgets.tags.tags_sidebar_row import TagsSidebarRow
+from errands.widgets.task_list.task_list import TaskList
+from errands.widgets.task_list.task_list_sidebar_row import TaskListSidebarRow
+from errands.widgets.today.today_sidebar_row import TodaySidebarRow
+from errands.widgets.trash.trash_sidebar_row import TrashSidebarRow
 
 
 class Sidebar(Adw.Bin):
-    def __init__(self, window: Window):
+    def __init__(self) -> None:
         super().__init__()
-        self.window: Window = window
-        self._build_ui()
+        State.sidebar = self
+        self.__build_ui()
 
-    def _build_ui(self):
-        # Components
-        self.status_page: SidebarStatusPage = SidebarStatusPage(self)
-        self.task_lists: SidebarTaskLists = SidebarTaskLists(self)
-        self.header_bar: SidebarHeaderBar = SidebarHeaderBar(
-            self.task_lists, self.window
+    # ------ PRIVATE METHODS ------ #
+
+    def __build_ui(self) -> None:
+        # Add List button
+        self.add_list_btn = ErrandsButton(
+            icon_name="errands-add-symbolic",
+            tooltip_text=_("Add List (Ctrl+Shift+A)"),
+            on_click=self._on_add_list_btn_clicked,
         )
-        self.trash_button: SidebarTrashButton = SidebarTrashButton(
-            self.task_lists, self.window
-        )
-        # Toolbar view
-        toolbar_view: Adw.ToolbarView = Adw.ToolbarView(
-            content=Box(
-                children=[
-                    self.status_page,
-                    self.task_lists,
-                    self.trash_button,
-                ],
-                orientation=Gtk.Orientation.VERTICAL,
-            )
-        )
-        toolbar_view.add_top_bar(self.header_bar)
-        self.set_child(toolbar_view)
-
-
-class SidebarHeaderBar(Adw.Bin):
-    def __init__(self, task_lists: SidebarTaskLists, window: Window):
-        super().__init__()
-        self.task_lists: SidebarTaskLists = task_lists
-        self.window: Window = window
-        self._build_ui()
-
-    def _build_ui(self):
-        # HeaderBar
-        hb: Adw.HeaderBar = Adw.HeaderBar(
-            title_widget=Gtk.Label(
-                label=_("Errands"),
-                css_classes=["heading"],
-            )
-        )
-        self.set_child(hb)
-
-        # Import menu
-        import_menu: Gio.Menu = Gio.Menu.new()
-        import_menu.append(_("Import List"), "app.import")
-
-        # Add list button
-        self.add_list_btn: Adw.SplitButton = Adw.SplitButton(
-            icon_name="list-add-symbolic",
-            tooltip_text=_("Add List (Ctrl+A)"),
-            menu_model=import_menu,
-            dropdown_tooltip=_("More Options"),
-        )
-        ctrl = Gtk.ShortcutController(scope=1)
-        ctrl.add_shortcut(
+        add_list_ctrl = Gtk.ShortcutController(scope=Gtk.ShortcutScope.MANAGED)
+        add_list_ctrl.add_shortcut(
             Gtk.Shortcut(
-                trigger=Gtk.ShortcutTrigger.parse_string("<Primary>A"),
                 action=Gtk.ShortcutAction.parse_string("activate"),
+                trigger=Gtk.ShortcutTrigger.parse_string("<Control><Shift>a"),
             )
         )
-        self.add_list_btn.add_controller(ctrl)
-        self.add_list_btn.connect("clicked", self._on_add_btn_clicked)
-        hb.pack_start(self.add_list_btn)
-
-        # Main menu
-        menu: Gio.Menu = Gio.Menu.new()
-        top_section: Gio.Menu = Gio.Menu.new()
-        # top_section.append(_("Secret Notes"), "app.secret_notes")
-        top_section.append(_("Sync / Fetch Tasks"), "app.sync")
-        menu.append_section(None, top_section)
-        bottom_section: Gio.Menu = Gio.Menu.new()
-        bottom_section.append(_("Preferences"), "app.preferences")
-        bottom_section.append(_("Keyboard Shortcuts"), "win.show-help-overlay")
-        bottom_section.append(_("About Errands"), "app.about")
-        menu.append_section(None, bottom_section)
-        menu_btn: Gtk.MenuButton = Gtk.MenuButton(
-            menu_model=menu,
-            primary=True,
-            icon_name="open-menu-symbolic",
-            tooltip_text=_("Main Menu"),
-        )
-        hb.pack_end(menu_btn)
+        self.add_list_btn.add_controller(add_list_ctrl)
 
         # Sync indicator
-        self.sync_indicator: Gtk.Spinner = Gtk.Spinner(
-            tooltip_text=_("Syncing..."), visible=False, spinning=True
+        self.sync_indicator_rev: Gtk.Revealer = Gtk.Revealer(
+            transition_type=Gtk.RevealerTransitionType.CROSSFADE,
+            transition_duration=200,
+            reveal_child=False,
+            child=Gtk.Spinner(
+                spinning=True,
+                tooltip_text=_("Syncing..."),
+            ),
         )
-        hb.pack_end(self.sync_indicator)
 
-    def _on_add_btn_clicked(self, btn) -> None:
+        # Status page
+        self.status_page = Adw.StatusPage(
+            title=_("Add new List"),
+            description=_('Click "+" button'),
+            icon_name="errands-lists-symbolic",
+            css_classes=["compact"],
+            vexpand=True,
+        )
+
+        # List box
+        self.list_box = ErrandsListBox(
+            activate_on_single_click=False,
+            on_row_selected=self._on_row_selected,
+            selection_mode=Gtk.SelectionMode.SINGLE,
+            css_classes=["navigation-sidebar"],
+            children=[
+                TodaySidebarRow(),
+                TagsSidebarRow(),
+                TrashSidebarRow(),
+            ],
+        )
+        self.status_page.bind_property(
+            "visible",
+            self.list_box,
+            "visible",
+            GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.INVERT_BOOLEAN,
+        )
+        self.list_box.set_header_func(
+            lambda row, before: (
+                row.set_header(TitledSeparator(_("Task Lists"), (12, 12, 0, 2)))
+                if isinstance(row, TaskListSidebarRow)
+                and not isinstance(before, TaskListSidebarRow)
+                else ...
+            )
+        )
+
+        self.set_child(
+            ErrandsToolbarView(
+                top_bars=[
+                    ErrandsHeaderBar(
+                        title_widget=Gtk.Label(
+                            label=_("Errands"),
+                            css_classes=["heading"],
+                        ),
+                        start_children=[self.add_list_btn],
+                        end_children=[
+                            # Main Menu
+                            Gtk.MenuButton(
+                                primary=True,
+                                tooltip_text=_("Main Menu"),
+                                icon_name="open-menu-symbolic",
+                                menu_model=ErrandsSectionedMenu(
+                                    sections=(
+                                        ErrandsSimpleMenu(
+                                            items=(
+                                                ErrandsMenuItem(
+                                                    _("Sync / Fetch Tasks"), "app.sync"
+                                                ),
+                                            )
+                                        ),
+                                        ErrandsSimpleMenu(
+                                            items=(
+                                                ErrandsMenuItem(
+                                                    _("Import Task List"), "app.import"
+                                                ),
+                                            )
+                                        ),
+                                        ErrandsSimpleMenu(
+                                            items=(
+                                                ErrandsMenuItem(
+                                                    _("Preferences"), "app.preferences"
+                                                ),
+                                                ErrandsMenuItem(
+                                                    _("Keyboard Shortcuts"),
+                                                    "win.show-help-overlay",
+                                                ),
+                                                ErrandsMenuItem(
+                                                    _("About Errands"), "app.about"
+                                                ),
+                                                ErrandsMenuItem(_("Quit"), "app.quit"),
+                                            )
+                                        ),
+                                    )
+                                ),
+                            ),
+                            # Sync indicator
+                            self.sync_indicator_rev,
+                        ],
+                    )
+                ],
+                content=ErrandsBox(
+                    orientation=Gtk.Orientation.VERTICAL,
+                    children=[
+                        Gtk.ScrolledWindow(
+                            propagate_natural_height=True, child=self.list_box
+                        ),
+                        self.status_page,
+                    ],
+                ),
+            )
+        )
+
+    def remove_task_list(self, row: TaskListSidebarRow) -> None:
+        Log.debug(f"Sidebar: Delete list {row.uid}")
+        self.list_box.select_row(row.get_prev_sibling())
+        State.view_stack.remove(row.task_list)
+        self.list_box.remove(row)
+        State.trash_sidebar_row.update_ui()
+        State.today_page.update_ui()
+        self.update_status()
+
+    def __select_last_opened_item(self) -> None:
+        for row in self.rows:
+            if hasattr(row, "name") and row.name == GSettings.get("last-open-list"):
+                Log.debug("Sidebar: Select last opened page")
+                if not row.get_realized():
+                    row.connect("realize", lambda *_: self.list_box.select_row(row))
+                else:
+                    self.list_box.select_row(row)
+                break
+
+    def update_status(self) -> None:
+        length: int = len(self.task_lists_rows)
+        self.status_page.set_visible(length == 0)
+        if length == 0:
+            State.view_stack.set_visible_child_name("errands_status_page")
+
+    # ------ PROPERTIES ------ #
+
+    @property
+    def rows(self) -> list[Gtk.ListBoxRow]:
+        """Get all rows"""
+        return get_children(self.list_box)
+
+    @property
+    def task_lists_rows(self) -> list[TaskListSidebarRow]:
+        """Get only task list rows"""
+        return [r for r in self.rows if isinstance(r, TaskListSidebarRow)]
+
+    @property
+    def task_lists(self) -> list[TaskList]:
+        return [lst.task_list for lst in self.task_lists_rows]
+
+    # ------ PUBLIC METHODS ------ #
+
+    def add_task_list(self, list_dict: TaskListData) -> TaskListSidebarRow:
+        Log.debug(f"Sidebar: Add Task List '{list_dict.uid}'")
+        row: TaskListSidebarRow = TaskListSidebarRow(list_dict)
+        self.list_box.append(row)
+        self.status_page.set_visible(False)
+        return row
+
+    def load_task_lists(self) -> None:
+        Log.debug("Sidebar: Load Task Lists")
+
+        list_added: bool = False
+
+        for list in (
+            list for list in UserData.get_lists_as_dicts() if not list.deleted
+        ):
+            self.add_task_list(list)
+            list_added = True
+
+        self.__select_last_opened_item()
+        if list_added:
+            self.status_page.set_visible(False)
+
+    def toggle_sync_indicator(self, on: bool) -> None:
+        self.sync_indicator_rev.set_reveal_child(on)
+
+    def update_task_lists(self, update_lists_ui: bool = True) -> None:
+        lists: list[TaskListData] = UserData.get_lists_as_dicts()
+
+        # Delete lists
+        uids: list[str] = [lst.uid for lst in lists]
+        for row in self.task_lists_rows:
+            if row.uid not in uids:
+                self.remove_task_list(row)
+
+        # Add lists
+        lists_uids = [lst.uid for lst in self.task_lists_rows]
+        for lst in lists:
+            if lst.uid not in lists_uids:
+                self.add_task_list(lst)
+
+        if update_lists_ui:
+            for row in self.rows:
+                if hasattr(row, "update_ui"):
+                    row.update_ui()
+
+    def update_ui(self) -> None:
+        Log.debug("Sidebar: Update UI")
+
+        self.update_task_lists()
+
+        # Update rows
+        for row in self.rows:
+            if hasattr(row, "update_ui"):
+                row.update_ui()
+
+        self.update_status()
+
+    # ------ TEMPLATE HANDLERS ------ #
+
+    def _on_add_list_btn_clicked(self, btn: ErrandsButton) -> None:
+        lists_names: list[str] = [i.name for i in UserData.get_lists_as_dicts()]
+
         def _entry_activated(_, dialog):
             if dialog.get_response_enabled("add"):
                 dialog.response("add")
                 dialog.close()
 
-        def _entry_changed(entry, _, dialog):
+        def _entry_changed(entry: Gtk.Entry, _, dialog):
             text = entry.props.text.strip(" \n\t")
-            names = [i["name"] for i in UserData.get_lists_as_dicts()]
-            dialog.set_response_enabled("add", text and text not in names)
+            dialog.set_response_enabled("add", text and text not in lists_names)
 
-        def _confirm(_, res, entry):
+        def _confirm(_, res, entry: Gtk.Entry):
             if res == "cancel":
                 return
 
             name = entry.props.text.rstrip().lstrip()
-            uid = UserData.add_list(name)
-            row = self.task_lists.add_list(name, uid)
-            self.task_lists.lists.select_row(row)
+            list_dict = UserData.add_list(name)
+            row = self.add_task_list(list_dict)
+            row.activate()
             Sync.sync()
 
         entry = Gtk.Entry(placeholder_text=_("New List Name"))
         dialog = Adw.MessageDialog(
-            transient_for=self.window,
+            transient_for=State.main_window,
             hide_on_close=True,
             heading=_("Add List"),
             default_response="add",
@@ -155,432 +306,6 @@ class SidebarHeaderBar(Adw.Bin):
         entry.connect("notify::text", _entry_changed, dialog)
         dialog.present()
 
-
-class SidebarStatusPage(Adw.Bin):
-    def __init__(self, sidebar: Sidebar):
-        super().__init__()
-        self.sidebar: Sidebar = sidebar
-        self._build_ui()
-
-    def _build_ui(self) -> None:
-        status_page: Adw.StatusPage = Adw.StatusPage(
-            title=_("Add new List"),
-            description=_('Click "+" button'),
-            icon_name="errands-lists-symbolic",
-            css_classes=["compact"],
-            vexpand=True,
-        )
-        self.set_child(status_page)
-
-
-class SidebarTaskLists(Gtk.ScrolledWindow):
-    def __init__(self, sidebar: Sidebar):
-        super().__init__()
-        self.sidebar: Sidebar = sidebar
-        self.window: Window = sidebar.window
-        self._build_ui()
-        self._load_lists()
-        self.update_ui()
-
-    def _build_ui(self) -> None:
-        self.set_propagate_natural_height(True)
-        self.set_vexpand(True)
-        # Lists
-        self.lists: Gtk.ListBox = Gtk.ListBox(css_classes=["navigation-sidebar"])
-        self.lists.connect("row-selected", self._on_row_selected)
-        self.bind_property(
-            "visible",
-            self.sidebar.status_page,
-            "visible",
-            GObject.BindingFlags.SYNC_CREATE
-            | GObject.BindingFlags.INVERT_BOOLEAN
-            | GObject.BindingFlags.BIDIRECTIONAL,
-        )
-        self.set_child(self.lists)
-
-    def add_list(self, name, uid) -> SidebarTaskListsItem:
-        task_list: TaskList = TaskList(self.window, uid, self)
-        page: Adw.ViewStackPage = self.window.stack.add_titled(
-            child=task_list, name=name, title=name
-        )
-        task_list.title.bind_property(
-            "title", page, "title", GObject.BindingFlags.SYNC_CREATE
-        )
-        task_list.title.bind_property(
-            "title", page, "name", GObject.BindingFlags.SYNC_CREATE
-        )
-        row: SidebarTaskListsItem = SidebarTaskListsItem(task_list, self)
-        self.lists.append(row)
-        return row
-
     def _on_row_selected(self, _, row: Gtk.ListBoxRow) -> None:
-        Log.debug("Lists: Switch list")
         if row:
-            name = row.label.get_label()
-            self.window.stack.set_visible_child_name(name)
-            self.window.split_view.set_show_content(True)
-            GSettings.set("last-open-list", "s", name)
-            self.sidebar.status_page.set_visible(False)
-
-    def _get_task_lists(self) -> list[TaskList]:
-        lists: list[TaskList] = []
-        pages: Adw.ViewStackPages = self.window.stack.get_pages()
-        for i in range(pages.get_n_items()):
-            child: TaskList = pages.get_item(i).get_child()
-            if isinstance(child, TaskList):
-                lists.append(child)
-        return lists
-
-    def _get_task_lists_items(self) -> list[SidebarTaskListsItem]:
-        return get_children(self.lists)
-
-    def _load_lists(self) -> None:
-        lists: list[dict] = [
-            i for i in UserData.get_lists_as_dicts() if not i["deleted"]
-        ]
-        for l in lists:
-            row: SidebarTaskListsItem = self.add_list(l["name"], l["uid"])
-            if GSettings.get("last-open-list") == l["name"]:
-                self.lists.select_row(row)
-        self.sidebar.status_page.set_visible(len(lists) == 0)
-
-    def update_ui(self) -> None:
-        Log.debug("Lists: Update UI...")
-
-        # Delete lists
-        uids: list[str] = [i["uid"] for i in UserData.get_lists_as_dicts()]
-        for row in self._get_task_lists_items():
-            if row.uid not in uids:
-                prev_child: SidebarTaskListsItem | None = row.get_prev_sibling()
-                next_child: SidebarTaskListsItem | None = row.get_next_sibling()
-                list: TaskList = row.task_list
-                self.window.stack.remove(list)
-                if prev_child or next_child:
-                    self.lists.select_row(prev_child or next_child)
-                self.lists.remove(row)
-
-        # Update old lists
-        for l in self._get_task_lists():
-            l.update_ui()
-
-        # Create new lists
-        old_uids: list[str] = [row.uid for row in self._get_task_lists_items()]
-        new_lists: list[dict] = UserData.get_lists_as_dicts()
-        for l in new_lists:
-            if l["uid"] not in old_uids:
-                Log.debug(f"Lists: Add list '{l['uid']}'")
-                row: SidebarTaskListsItem = self.add_list(l["name"], l["uid"])
-                self.lists.select_row(row)
-                self.window.stack.set_visible_child_name(l["name"])
-                self.sidebar.status_page.set_visible(False)
-
-        # Show status
-        length: int = len(self._get_task_lists_items())
-        self.sidebar.status_page.set_visible(length == 0)
-        if length == 0:
-            self.window.stack.set_visible_child_name("status")
-
-
-class SidebarTaskListsItem(Gtk.ListBoxRow):
-    def __init__(self, task_list: TaskList, task_lists: SidebarTaskLists) -> None:
-        super().__init__()
-        self.task_lists: SidebarTaskLists = task_lists
-        self.list_box: Gtk.ListBox = task_lists.lists
-        self.task_list: TaskList = task_list
-        self.uid: str = task_list.list_uid
-        self.window: Window = task_lists.window
-        self._build_ui()
-        self._add_actions()
-
-    def _add_actions(self) -> None:
-        group: Gio.SimpleActionGroup = Gio.SimpleActionGroup()
-        self.insert_action_group(name="list_item", group=group)
-
-        def _create_action(name: str, callback: callable) -> None:
-            action: Gio.SimpleAction = Gio.SimpleAction.new(name, None)
-            action.connect("activate", callback)
-            group.add_action(action)
-
-        def _delete(*args):
-            def _confirm(_, res):
-                if res == "cancel":
-                    Log.debug("ListItem: Deleting list is cancelled")
-                    return
-
-                Log.info(f"Lists: Delete list '{self.uid}'")
-                UserData.run_sql(
-                    f"UPDATE lists SET deleted = 1 WHERE uid = '{self.uid}'",
-                    f"DELETE FROM tasks WHERE list_uid = '{self.uid}'",
-                )
-                self.window.stack.remove(self.task_list)
-                # Switch row
-                next_row: SidebarTaskListsItem = self.get_next_sibling()
-                prev_row: SidebarTaskListsItem = self.get_prev_sibling()
-                self.list_box.remove(self)
-                if next_row or prev_row:
-                    self.list_box.select_row(next_row or prev_row)
-                else:
-                    self.window.stack.set_visible_child_name("status")
-                    self.task_lists.sidebar.status_page.set_visible(True)
-
-                # Remove items from trash
-                for item in get_children(self.window.trash.trash_list):
-                    if item.task_widget.list_uid == self.uid:
-                        self.window.trash.trash_list.remove(item)
-
-                Sync.sync()
-
-            dialog: Adw.MessageDialog = Adw.MessageDialog(
-                transient_for=self.window,
-                hide_on_close=True,
-                heading=_("Are you sure?"),
-                body=_("List will be permanently deleted"),
-                default_response="delete",
-                close_response="cancel",
-            )
-            dialog.add_response("cancel", _("Cancel"))
-            dialog.add_response("delete", _("Delete"))
-            dialog.set_response_appearance("delete", Adw.ResponseAppearance.DESTRUCTIVE)
-            dialog.connect("response", _confirm)
-            dialog.present()
-
-        def _rename(*args):
-            def _entry_activated(_, dialog: Adw.MessageDialog):
-                if dialog.get_response_enabled("save"):
-                    dialog.response("save")
-                    dialog.close()
-
-            def _entry_changed(entry: Gtk.Entry, _, dialog: Adw.MessageDialog):
-                text = entry.props.text.strip(" \n\t")
-                names = [i["name"] for i in UserData.get_lists_as_dicts()]
-                dialog.set_response_enabled("save", text and text not in names)
-
-            def _confirm(_, res, entry: Gtk.Entry):
-                if res == "cancel":
-                    Log.debug("ListItem: Editing list name is cancelled")
-                    return
-                Log.info(f"ListItem: Rename list {self.uid}")
-
-                text: str = entry.props.text.rstrip().lstrip()
-                UserData.run_sql(
-                    (
-                        "UPDATE lists SET name = ?, synced = 0 WHERE uid = ?",
-                        (text, self.uid),
-                    )
-                )
-                self.task_list.title.set_title(text)
-                Sync.sync()
-
-            entry: Gtk.Entry = Gtk.Entry(placeholder_text=_("New Name"))
-            entry.get_buffer().props.text = self.label.get_label()
-            dialog: Adw.MessageDialog = Adw.MessageDialog(
-                transient_for=self.window,
-                hide_on_close=True,
-                heading=_("Rename List"),
-                default_response="save",
-                close_response="cancel",
-                extra_child=entry,
-            )
-            dialog.add_response("cancel", _("Cancel"))
-            dialog.add_response("save", _("Save"))
-            dialog.set_response_enabled("save", False)
-            dialog.set_response_appearance("save", Adw.ResponseAppearance.SUGGESTED)
-            dialog.connect("response", _confirm, entry)
-            entry.connect("activate", _entry_activated, dialog)
-            entry.connect("notify::text", _entry_changed, dialog)
-            dialog.present()
-
-        def _export(*args):
-            def _confirm(dialog, res):
-                try:
-                    file = dialog.save_finish(res)
-                except:
-                    Log.debug("List: Export cancelled")
-                    return
-
-                Log.info(f"List: Export '{self.uid}'")
-
-                tasks: list[dict] = UserData.get_tasks_as_dicts(self.uid)
-                calendar: Calendar = Calendar()
-                calendar.add("x-wr-calname", self.label.get_label())
-                for task in tasks:
-                    event = Todo()
-                    event.add("uid", task["uid"])
-                    event.add("related-to", task["parent"])
-                    event.add("summary", task["text"])
-                    if task["notes"]:
-                        event.add("description", task["notes"])
-                    event.add("priority", task["priority"])
-                    if task["tags"]:
-                        event.add("categories", task["tags"])
-                    event.add("percent-complete", task["percent_complete"])
-                    if task["color"]:
-                        event.add("x-errands-color", task["color"])
-                    event.add(
-                        "dtstart",
-                        (
-                            datetime.fromisoformat(task["start_date"])
-                            if task["start_date"]
-                            else datetime.now()
-                        ),
-                    )
-                    if task["end_date"]:
-                        event.add(
-                            "due",
-                            (
-                                datetime.fromisoformat(task["end_date"])
-                                if task["end_date"]
-                                else datetime.now()
-                            ),
-                        )
-                    calendar.add_component(event)
-
-                try:
-                    with open(file.get_path(), "wb") as f:
-                        f.write(calendar.to_ical())
-                except Exception as e:
-                    Log.error(f"List: Export failed. {e}")
-                    self.window.add_toast(_("Export failed"))
-
-                self.window.add_toast(_("Exported"))
-
-            filter: Gtk.FileFilter = Gtk.FileFilter()
-            filter.add_pattern("*.ics")
-            dialog: Gtk.FileDialog = Gtk.FileDialog(
-                initial_name=f"{self.uid}.ics", default_filter=filter
-            )
-            dialog.save(self.window, None, _confirm)
-
-        _create_action("delete", _delete)
-        _create_action("rename", _rename)
-        _create_action("export", _export)
-
-    def _build_ui(self) -> None:
-        self.add_css_class("task-lists-item")
-
-        # Label
-        self.label: Gtk.Label = Gtk.Label(
-            halign="start",
-            hexpand=True,
-            ellipsize=3,
-        )
-        self.task_list.title.bind_property(
-            "title",
-            self.label,
-            "label",
-            GObject.BindingFlags.SYNC_CREATE,
-        )
-
-        # Menu
-        menu: Gio.Menu = Gio.Menu.new()
-        menu.append(_("Rename"), "list_item.rename")
-        menu.append(_("Delete"), "list_item.delete")
-        menu.append(_("Export"), "list_item.export")
-
-        # Click controller
-        ctrl: Gtk.GestureClick = Gtk.GestureClick()
-        ctrl.connect("released", self._on_click)
-        self.add_controller(ctrl)
-
-        # Drop controller
-        drop_ctrl: Gtk.DropTarget = Gtk.DropTarget.new(
-            actions=Gdk.DragAction.MOVE, type=Task
-        )
-        drop_ctrl.connect("drop", self._on_task_drop)
-        self.add_controller(drop_ctrl)
-
-        # Drop hover controller
-        drop_hover_ctrl: Gtk.DropControllerMotion = Gtk.DropControllerMotion()
-        drop_hover_ctrl.connect("enter", self._on_drop_hover)
-        self.add_controller(drop_hover_ctrl)
-
-        self.set_child(
-            Box(
-                children=[
-                    self.label,
-                    Gtk.MenuButton(
-                        menu_model=menu,
-                        icon_name="view-more-symbolic",
-                        tooltip_text=_("Menu"),
-                    ),
-                ],
-                css_classes=["toolbar"],
-            )
-        )
-
-    def _on_click(self, *args) -> None:
-        self.window.stack.set_visible_child_name(self.label.get_label())
-        self.window.split_view.set_show_content(True)
-
-    def _on_drop_hover(self, ctrl: Gtk.DropControllerMotion, _x, _y):
-        """
-        Switch list on dnd hover after DELAY_SECONDS
-        """
-
-        DELAY_SECONDS: float = 0.7
-        entered_at: float = time.time()
-
-        def _switch_delay():
-            if ctrl.contains_pointer():
-                if time.time() - entered_at >= DELAY_SECONDS:
-                    self.activate()
-                    return False
-                else:
-                    return True
-            else:
-                return False
-
-        GLib.timeout_add(100, _switch_delay)
-
-    def _on_task_drop(self, _drop, task: Task, _x, _y):
-        """
-        Move task and sub-tasks to new list
-        """
-
-        if task.list_uid == self.uid:
-            return
-
-        Log.info(f"Lists: Move '{task.uid}' to '{self.uid}' list")
-        UserData.move_task_to_list(task.uid, task.list_uid, self.uid, "", False)
-        uid: str = task.uid
-        task.purge()
-        self.task_list.add_task(uid)
-        Sync.sync()
-
-
-class SidebarTrashButton(Gtk.Button):
-    def __init__(self, task_lists: SidebarTaskLists, window: Window):
-        super().__init__()
-        self.task_lists: SidebarTaskLists = task_lists
-        self.window: Window = window
-        self._build_ui()
-
-    def _build_ui(self):
-        self.set_child(
-            Adw.ButtonContent(
-                icon_name="errands-trash-symbolic",
-                label=_("Trash"),
-                halign="center",
-            )
-        )
-        self.add_css_class("flat")
-        self.set_margin_top(6)
-        self.set_margin_bottom(6)
-        self.set_margin_start(6)
-        self.set_margin_end(6)
-        self.task_lists.bind_property(
-            "visible",
-            self,
-            "visible",
-            GObject.BindingFlags.SYNC_CREATE,
-        )
-
-        # Drop controller
-        trash_drop_ctrl = Gtk.DropTarget.new(actions=Gdk.DragAction.MOVE, type=Task)
-        trash_drop_ctrl.connect("drop", lambda _d, t, _x, _y: t.delete())
-        self.add_controller(trash_drop_ctrl)
-
-    def do_clicked(self) -> None:
-        self.task_lists.lists.unselect_all()
-        self.window.stack.set_visible_child_name("trash")
-        self.window.split_view.set_show_content(True)
+            row.activate()

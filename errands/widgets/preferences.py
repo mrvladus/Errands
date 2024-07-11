@@ -1,31 +1,26 @@
 # Copyright 2023-2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-from __future__ import annotations
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from errands.widgets.window import Window
+from gi.repository import Adw, Gtk  # type:ignore
 
 from errands.lib.goa import get_goa_credentials
-from gi.repository import Adw, Gtk  # type:ignore
-from errands.lib.sync.sync import Sync
 from errands.lib.gsettings import GSettings
+from errands.lib.sync.sync import Sync
+from caldav.lib import error
+from requests import exceptions
+from errands.state import State
+from errands.widgets.shared.components.buttons import ErrandsButton, ErrandsInfoButton
 
 
-class PreferencesWindow(Adw.PreferencesWindow):
+class PreferencesWindow(Adw.PreferencesDialog):
     selected_provider: int = 0
 
-    def __init__(self, win: Window) -> None:
+    def __init__(self) -> None:
         super().__init__()
-        self.window: Window = win
         self._build_ui()
         self._setup_sync()
 
     def _build_ui(self) -> None:
-        self.set_transient_for(self.window)
-        self.set_search_enabled(False)
-
         # Theme group
         theme_group: Adw.PreferencesGroup = Adw.PreferencesGroup(
             title=_("Application Theme"),
@@ -68,58 +63,57 @@ class PreferencesWindow(Adw.PreferencesWindow):
         theme_group.add(theme_dark_row)
 
         # Task lists group
-        # task_list_group = Adw.PreferencesGroup(title=_("Task Lists"))
-        # add_tasks_position = Adw.ComboRow(
-        #     title=_("Add new Tasks"),
-        #     model=Gtk.StringList.new([_("At the Top"), _("At the Bottom")]),
-        #     icon_name="errands-add-symbolic",
-        # )
-        # task_list_group.add(add_tasks_position)
+        task_list_group = Adw.PreferencesGroup(title=_("Task Lists"))
 
-        # Tasks group
-        tasks_group = Adw.PreferencesGroup(title=_("Tasks"))
-        # Primary action
-        task_primary_action = Adw.ComboRow(
-            title=_("Click Action"),
-            model=Gtk.StringList.new([_("Open Details Panel"), _("Show Sub-Tasks")]),
-            icon_name="errands-click-symbolic",
+        # New task position
+        new_task_position = Adw.ComboRow(
+            title=_("Add new Tasks"),
+            model=Gtk.StringList.new([_("At the Bottom"), _("At the Top")]),
+            icon_name="errands-add-symbolic",
         )
-        task_primary_action.set_selected(
-            int(GSettings.get("primary-action-show-sub-tasks"))
+        new_task_position.set_selected(
+            int(GSettings.get("task-list-new-task-position-top"))
         )
-        task_primary_action.connect(
+        new_task_position.connect(
             "notify::selected",
             lambda row, *_: GSettings.set(
-                "primary-action-show-sub-tasks", "b", bool(row.get_selected())
+                "task-list-new-task-position-top", "b", bool(row.get_selected())
             ),
         )
-        tasks_group.add(task_primary_action)
-        # Toggle size
-        task_big_toggle = Adw.ComboRow(
-            title=_("Complete Button Size"),
-            model=Gtk.StringList.new([_("Small"), _("Big")]),
-            icon_name="errands-check-toggle-symbolic",
+        task_list_group.add(new_task_position)
+
+        # Notifications
+        notifications = Adw.SwitchRow(
+            title=_("Show Notifications"),
+            icon_name="errands-notification-symbolic",
         )
-        task_big_toggle.set_selected(int(GSettings.get("task-big-toggle")))
-        task_big_toggle.connect(
-            "notify::selected",
-            lambda row, *_: GSettings.set(
-                "task-big-toggle", "b", bool(row.get_selected())
-            ),
+        GSettings.bind("notifications-enabled", notifications, "active")
+
+        # Background
+        background = Adw.SwitchRow(
+            title=_("Run in Background"),
+            subtitle=_("Hide the application window instead of closing it"),
+            icon_name="errands-progressbar-symbolic",
         )
-        tasks_group.add(task_big_toggle)
-        # Progress bar
-        task_progress_bar = Adw.SwitchRow(
-            title=_("Progress Bar"), icon_name="errands-progressbar-symbolic"
+        GSettings.bind("run-in-background", background, "active")
+
+        # Background
+        launch_on_startup = Adw.SwitchRow(
+            title=_("Launch on Startup"),
+            subtitle=_("Launch application when user logs in"),
+            icon_name="errands-progressbar-symbolic",
         )
-        GSettings.bind("task-show-progressbar", task_progress_bar, "active")
-        tasks_group.add(task_progress_bar)
-        # Toolbar
-        task_toolbar = Adw.SwitchRow(
-            title=_("Tool Bar"), icon_name="errands-toolbar-symbolic"
+        GSettings.bind("launch-on-startup", launch_on_startup, "active")
+        launch_on_startup.connect(
+            "notify::active", lambda *_: State.application.run_in_background()
         )
-        GSettings.bind("task-show-toolbar", task_toolbar, "active")
-        # tasks_group.add(task_toolbar)
+
+        notifications_and_bg_group = Adw.PreferencesGroup(
+            title=_("Notifications and Background")
+        )
+        notifications_and_bg_group.add(notifications)
+        notifications_and_bg_group.add(background)
+        notifications_and_bg_group.add(launch_on_startup)
 
         # Sync group
         sync_group = Adw.PreferencesGroup(
@@ -140,6 +134,13 @@ class PreferencesWindow(Adw.PreferencesWindow):
             title=_("Server URL"),
         )
         GSettings.bind("sync-url", self.sync_url, "text")
+        self.sync_url.add_suffix(
+            ErrandsInfoButton(
+                info_text=_(
+                    "URL needs to include protocol, like <b>http://</b> or <b>https://</b>. If you have problems with connection - try to change protocol first."
+                )
+            )
+        )
         sync_group.add(self.sync_url)
         # Username
         self.sync_username = Adw.EntryRow(
@@ -154,11 +155,11 @@ class PreferencesWindow(Adw.PreferencesWindow):
         self.sync_password.connect("changed", self.on_sync_pass_changed)
         sync_group.add(self.sync_password)
         # Test connection
-        test_btn = Gtk.Button(
+        test_btn = ErrandsButton(
             label=_("Test"),
             valign="center",
+            on_click=self.on_test_connection_btn_clicked,
         )
-        test_btn.connect("clicked", self.on_test_connection_btn_clicked)
         self.test_connection_row = Adw.ActionRow(
             title=_("Test Connection"),
         )
@@ -166,27 +167,13 @@ class PreferencesWindow(Adw.PreferencesWindow):
         self.test_connection_row.set_activatable_widget(test_btn)
         sync_group.add(self.test_connection_row)
 
-        # Details group
-        details_group = Adw.PreferencesGroup(
-            title=_("Details Panel"),
-        )
-        details_position = Adw.ComboRow(
-            title=_("Position"),
-            model=Gtk.StringList.new([_("Left"), _("Right")]),
-            icon_name="errands-sidebar-left-symbolic",
-        )
-        details_position.set_selected(int(GSettings.get("right-sidebar")))
-        details_position.connect("notify::selected", self._on_details_position_changed)
-        details_group.add(details_position)
-
         # Appearance Page
         appearance_page = Adw.PreferencesPage(
-            title=_("Appearance"), icon_name="errands-appearance-symbolic"
+            title=_("General"), icon_name="errands-settings-symbolic"
         )
         appearance_page.add(theme_group)
-        appearance_page.add(tasks_group)
-        appearance_page.add(details_group)
-        # page.add(task_list_group)
+        appearance_page.add(task_list_group)
+        appearance_page.add(notifications_and_bg_group)
         self.add(appearance_page)
 
         # Sync Page
@@ -226,16 +213,22 @@ class PreferencesWindow(Adw.PreferencesWindow):
             GSettings.set_secret(account, self.sync_password.props.text)
 
     def on_test_connection_btn_clicked(self, _btn) -> None:
-        res: bool = Sync.test_connection()
-        msg: str = _("Connected") if res else _("Can't connect")
+        res, err = Sync.test_connection()
+        msg: str = _("Connected")
+        if not res:
+            match type(err):
+                case error.AuthorizationError:
+                    msg: str = _("Authorization failed")
+                case exceptions.ConnectionError:
+                    msg: str = _("Could not locate server. Check network and url.")
+                case error.PropfindError:
+                    msg: str = _("Can't connect")
+                case _:  # NOTE: Also catches invalid credentials
+                    msg: str = _("Can't connect. Check credentials")
+
         toast: Adw.Toast = Adw.Toast(title=msg, timeout=2)
         self.add_toast(toast)
 
     def on_theme_change(self, btn: Gtk.Button, theme: int) -> None:
         Adw.StyleManager.get_default().set_color_scheme(theme)
         GSettings.set("theme", "i", theme)
-
-    def _on_details_position_changed(self, row: Adw.ComboRow, *_) -> None:
-        for list in self.window.sidebar.task_lists._get_task_lists():
-            list.split_view.set_sidebar_position(row.get_selected())
-        GSettings.set("right-sidebar", "b", bool(row.get_selected())),

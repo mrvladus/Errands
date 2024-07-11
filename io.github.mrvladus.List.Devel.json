@@ -1,7 +1,7 @@
 {
     "id": "io.github.mrvladus.List.Devel",
     "runtime": "org.gnome.Platform",
-    "runtime-version": "45",
+    "runtime-version": "46",
     "sdk": "org.gnome.Sdk",
     "command": "errands",
     "finish-args": [
@@ -11,7 +11,8 @@
         "--share=ipc",
         "--share=network",
         "--talk-name=org.freedesktop.secrets",
-        "--talk-name=org.gnome.OnlineAccounts"
+        "--talk-name=org.gnome.OnlineAccounts",
+        "--filesystem=home"
     ],
     "cleanup": [
         "/lib/debug",
@@ -38,6 +39,7 @@
                 "-Dwebdav=false",
                 "-Dkerberos=false",
                 "-Dwindows_live=false",
+                "-Dms_graph=false",
                 "-Dvapi=false"
             ],
             "sources": [
@@ -48,7 +50,24 @@
                 }
             ]
         },
-        "build-aux/python3-modules.json",
+        {
+            "name": "libportal",
+            "buildsystem": "meson",
+            "config-opts": [
+                "-Dbackend-gtk4=enabled",
+                "-Dvapi=false",
+                "-Ddocs=false",
+                "-Dtests=false"
+            ],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "https://github.com/flatpak/libportal.git",
+                    "tag": "0.7.1"
+                }
+            ]
+        },
+        "build-aux/python3-caldav.json",
         {
             "name": "errands",
             "buildsystem": "meson",

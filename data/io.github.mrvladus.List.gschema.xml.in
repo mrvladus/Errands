@@ -10,12 +10,6 @@
     <key name="maximized" type="b">
       <default>false</default>
     </key>
-    <key name="sidebar-open" type="b">
-      <default>false</default>
-    </key>
-    <key name="right-sidebar" type="b">
-      <default>false</default>
-    </key>
     <key name="theme" type="i">
       <default>0</default>
     </key>
@@ -31,29 +25,17 @@
     <key name="sync-username" type="s">
       <default>""</default>
     </key>
-    <key name="sync-password" type="s">
-      <default>""</default>
-    </key>
-    <key name="sync-cal-name" type="s">
-      <default>""</default>
-    </key>
-    <key name="primary-action-show-sub-tasks" type="b">
-      <default>false</default>
-    </key>
-    <key name="task-big-toggle" type="b">
+    <key name="task-list-new-task-position-top" type="b">
       <default>true</default>
     </key>
-    <key name="task-show-progressbar" type="b">
+    <key name="launch-on-startup" type="b">
       <default>true</default>
     </key>
-    <key name="task-show-toolbar" type="b">
+    <key name="run-in-background" type="b">
       <default>true</default>
     </key>
-    <key name="secret-notes-width" type="i">
-      <default>1000</default>
-    </key>
-    <key name="secret-notes-height" type="i">
-      <default>700</default>
+    <key name="notifications-enabled" type="b">
+      <default>true</default>
     </key>
   </schema>
 </schemalist>

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-06 17:58+0300\n"
-"PO-Revision-Date: 2024-01-31 22:21+0100\n"
+"POT-Creation-Date: 2024-05-17 17:01+0300\n"
+"PO-Revision-Date: 2024-05-26 13:42+0200\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: \n"
 "Language: nl\n"
@@ -17,503 +17,733 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.4.2\n"
 
-#: errands/widgets/components.py:153
+#: errands/widgets/shared/components/buttons.py:45
+msgid "Info"
+msgstr "Informatie"
+
+#: errands/widgets/shared/components/dialogs.py:31
+msgid "Are you sure?"
+msgstr "Weet u het zeker?"
+
+#: errands/widgets/shared/components/dialogs.py:35
+#: errands/widgets/sidebar.py:300 errands/widgets/task.py:246
+#: errands/widgets/task_list/task_list_sidebar_row.py:99
+#: errands/widgets/today/today_task.py:146
+msgid "Cancel"
+msgstr "Annuleren"
+
+#: errands/widgets/shared/color_selector.py:32
+#: errands/widgets/shared/task_toolbar/toolbar.py:100
+msgid "None"
+msgstr "Geen"
+
+#: errands/widgets/shared/color_selector.py:41
+msgid "Blue"
+msgstr "Blauw"
+
+#: errands/widgets/shared/color_selector.py:50
+msgid "Green"
+msgstr "Groen"
+
+#: errands/widgets/shared/color_selector.py:61
+msgid "Yellow"
+msgstr "Geel"
+
+#: errands/widgets/shared/color_selector.py:72
+msgid "Orange"
+msgstr "Oranje"
+
+#: errands/widgets/shared/color_selector.py:81
+msgid "Red"
+msgstr "Rood"
+
+#: errands/widgets/shared/color_selector.py:92
+msgid "Purple"
+msgstr "Paars"
+
+#: errands/widgets/shared/color_selector.py:101
+msgid "Brown"
+msgstr "Bruin"
+
+#: errands/widgets/shared/datetime_picker.py:138
+#: errands/widgets/today/today.py:57
+#: errands/widgets/today/today_sidebar_row.py:30 errands/widgets/window.py:67
 msgid "Today"
 msgstr "Vandaag"
 
-#: errands/widgets/components.py:157
+#: errands/widgets/shared/datetime_picker.py:143
 msgid "Tomorrow"
 msgstr "Morgen"
 
-#: errands/widgets/components.py:167
+#: errands/widgets/shared/datetime_picker.py:154
 msgid "Now"
 msgstr "Zojuist"
 
-#: errands/widgets/components.py:172 errands/widgets/trash.py:37
+#: errands/widgets/shared/datetime_picker.py:160
+#: errands/widgets/trash/trash.py:40
+#: errands/widgets/trash/trash_sidebar_row.py:64
 msgid "Clear"
 msgstr "Standaard"
 
-#. Start date row
-#. End date row
-#: errands/widgets/components.py:231 errands/widgets/details.py:176
-#: errands/widgets/details.py:197
-msgid "Not Set"
-msgstr "Niet ingesteld"
+#: errands/widgets/shared/datetime_picker.py:210
+msgid "Set Date"
+msgstr "Datum instellen"
 
-#: errands/widgets/preferences.py:31
+#: errands/widgets/shared/task_toolbar/toolbar.py:44
+msgid "Start / Due Date"
+msgstr "Begindatum"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:49 errands/lib/utils.py:20
+msgid "Date"
+msgstr "Datum"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:59
+#: errands/widgets/shared/task_toolbar/notes_window.py:29
+msgid "Notes"
+msgstr "Aantekeningen"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:72
+msgid "Priority"
+msgstr "Prioriteit"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:90
+msgid "High"
+msgstr "Hoog"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:94
+msgid "Medium"
+msgstr "Gemiddeld"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:98
+msgid "Low"
+msgstr "Laag"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:103
+msgid "Custom"
+msgstr "Aangepast"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:113
+msgid "No Tags"
+msgstr "Geen labels"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:134
+#: errands/widgets/tags/tags.py:63 errands/widgets/tags/tags_sidebar_row.py:32
+#: errands/widgets/window.py:72
+msgid "Tags"
+msgstr "Labels"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:157
+#: errands/widgets/shared/task_toolbar/attachments_window.py:30
+msgid "Attachments"
+msgstr "Bijlagen"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:191
+#: errands/widgets/shared/task_toolbar/toolbar.py:294
+msgid "Created:"
+msgstr "Aangemaakt op"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:202
+#: errands/widgets/shared/task_toolbar/toolbar.py:295
+msgid "Changed:"
+msgstr "Bewerkt op"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:215
+msgid "More"
+msgstr "Meer"
+
+#: errands/widgets/shared/task_toolbar/attachments_window.py:33
+msgid "No Files Attached"
+msgstr "Er zijn geen bijlagen"
+
+#: errands/widgets/shared/task_toolbar/attachments_window.py:56
+msgid "Add Attachment"
+msgstr "Bijlage toevoegen"
+
+#: errands/widgets/shared/task_toolbar/attachments_window.py:119
+msgid "Open File"
+msgstr "Bestand openen"
+
+#: errands/widgets/shared/task_toolbar/attachments_window.py:123
+#: errands/widgets/tags/tags.py:140
+#: errands/widgets/task_list/task_list_sidebar_row.py:60
+#: errands/widgets/task_list/task_list_sidebar_row.py:187
+#: errands/widgets/trash/trash.py:159
+msgid "Delete"
+msgstr "Verwĳderen"
+
+#: errands/widgets/shared/task_toolbar/attachments_window.py:132
+msgid "Open Containing Folder"
+msgstr "Bijbehorende map openen"
+
+#: errands/widgets/shared/task_toolbar/datetime_window.py:29
+msgid "Date and Time"
+msgstr "Datum en tijd"
+
+#: errands/widgets/shared/task_toolbar/datetime_window.py:39
+#: errands/widgets/shared/task_toolbar/datetime_window.py:41
+msgid "Due"
+msgstr "Einddatum"
+
+#: errands/widgets/shared/task_toolbar/datetime_window.py:54
+#: errands/widgets/shared/task_toolbar/datetime_window.py:56
+msgid "Start"
+msgstr "Starten"
+
+#: errands/widgets/sidebar.py:42
+msgid "Add List (Ctrl+Shift+A)"
+msgstr "Lijst toevoegen (Ctrl+Shift+A)"
+
+#: errands/widgets/sidebar.py:61
+msgid "Syncing..."
+msgstr "Bezig met synchroniseren…"
+
+#: errands/widgets/sidebar.py:67
+msgid "Add new List"
+msgstr "Lijst toevoegen"
+
+#: errands/widgets/sidebar.py:68
+msgid "Click \"+\" button"
+msgstr "Klik op de ‘+’-knop"
+
+#. Task lists group
+#: errands/widgets/sidebar.py:94 errands/widgets/preferences.py:66
+msgid "Task Lists"
+msgstr "Takenlijsten"
+
+#: errands/widgets/sidebar.py:106 errands/widgets/window.py:43
+#: errands/widgets/window.py:148 data/io.github.mrvladus.List.desktop.in.in:3
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:6
+msgid "Errands"
+msgstr "Takenlijst"
+
+#: errands/widgets/sidebar.py:114
+msgid "Main Menu"
+msgstr "Hoofdmenu"
+
+#: errands/widgets/sidebar.py:121 data/resources/gtk/help-overlay.ui:42
+msgid "Sync / Fetch Tasks"
+msgstr "Taken ophalen/synchroniseren"
+
+#: errands/widgets/sidebar.py:128
+msgid "Import Task List"
+msgstr "Takenlijst importeren"
+
+#: errands/widgets/sidebar.py:135 data/resources/gtk/help-overlay.ui:20
+msgid "Preferences"
+msgstr "Voorkeuren"
+
+#: errands/widgets/sidebar.py:138
+msgid "Keyboard Shortcuts"
+msgstr "Sneltoetsen"
+
+#: errands/widgets/sidebar.py:142
+msgid "About Errands"
+msgstr "Over Takenlijst"
+
+#: errands/widgets/sidebar.py:144 data/resources/gtk/help-overlay.ui:27
+msgid "Quit"
+msgstr "Afsluiten"
+
+#: errands/widgets/sidebar.py:291
+msgid "New List Name"
+msgstr "Nieuwe lijstnaam"
+
+#: errands/widgets/sidebar.py:295 data/resources/gtk/help-overlay.ui:57
+msgid "Add List"
+msgstr "Lijst toevoegen"
+
+#: errands/widgets/sidebar.py:301
+msgid "Add"
+msgstr "Toevoegen"
+
+#: errands/widgets/tags/tags.py:32
+msgid "No Tags Found"
+msgstr "Er zijn geen labels aangetroffen"
+
+#: errands/widgets/tags/tags.py:33
+msgid "Add new Tags in the entry above"
+msgstr "Voeg nieuwe labels toe in het vak hierboven"
+
+#: errands/widgets/tags/tags.py:82
+msgid "Add new Tag"
+msgstr "Label toevoegen"
+
+#: errands/widgets/task.py:79
+#: errands/widgets/task_list/task_list_sidebar_row.py:125
+#: errands/widgets/today/today_task.py:73
+msgid "Exported"
+msgstr "Exporteren voltooid"
+
+#: errands/widgets/task.py:87 errands/widgets/today/today_task.py:81
+msgid "Copied to Clipboard"
+msgstr "Gekopieerd naar het klembord"
+
+#: errands/widgets/task.py:153
+msgid "Toggle Sub-Tasks"
+msgstr "Bĳkomende taken tonen/verbergen"
+
+#: errands/widgets/task.py:161 errands/widgets/today/today_task.py:100
+msgid "Toggle Completion"
+msgstr "Markeren als (on)afgerond"
+
+#: errands/widgets/task.py:191
+msgid "Toggle Toolbar"
+msgstr "Werkbalk tonen/verbergen"
+
+#: errands/widgets/task.py:206 errands/widgets/task.py:226
+#: errands/widgets/today/today_task.py:117
+#: errands/widgets/today/today_task.py:127
+msgid "Edit"
+msgstr "Bewerken"
+
+#: errands/widgets/task.py:207 errands/widgets/today/today_task.py:118
+msgid "Move to Trash"
+msgstr "Verplaatsen naar prullenbak"
+
+#: errands/widgets/task.py:208 errands/widgets/today/today_task.py:119
+msgid "Copy to Clipboard"
+msgstr "Kopiëren naar klembord"
+
+#: errands/widgets/task.py:209
+#: errands/widgets/task_list/task_list_sidebar_row.py:188
+#: errands/widgets/today/today_task.py:120
+msgid "Export"
+msgstr "Exporteren"
+
+#: errands/widgets/task.py:299 errands/widgets/task_list/task_list.py:84
+msgid "Completed"
+msgstr "Afgerond"
+
+#: errands/widgets/task.py:323
+msgid "Add new Sub-Task"
+msgstr "Bĳkomende taak toevoegen"
+
+#: errands/widgets/task.py:534 errands/widgets/task_list/task_list.py:246
+msgid "Completed:"
+msgstr "Afgerond:"
+
+#: errands/widgets/task.py:921
+msgid "Delete Tag"
+msgstr "Label wissen"
+
+#: errands/widgets/task_list/task_list.py:50
+msgid "Toggle Completed Tasks"
+msgstr "Afgeronde taken tonen/verbergen"
+
+#: errands/widgets/task_list/task_list.py:58
+msgid "Delete Completed Tasks"
+msgstr "Afgeronde taken wissen"
+
+#: errands/widgets/task_list/task_list.py:73
+msgid "Scroll Up"
+msgstr "Omhoog schuiven"
+
+#: errands/widgets/task_list/task_list.py:144
+msgid "Add new Task"
+msgstr "Taak toevoegen"
+
+#: errands/widgets/task_list/task_list.py:156
+msgid "Loading..."
+msgstr "Bezig met laden…"
+
+#: errands/widgets/task_list/task_list_sidebar_row.py:59
+msgid "List will be permanently deleted"
+msgstr "De lijst wordt permanent verwĳderd"
+
+#: errands/widgets/task_list/task_list_sidebar_row.py:89
+msgid "New Name"
+msgstr "Nieuwe naam"
+
+#: errands/widgets/task_list/task_list_sidebar_row.py:94
+msgid "Rename List"
+msgstr "Lijstnaam wĳzigen"
+
+#: errands/widgets/task_list/task_list_sidebar_row.py:100
+msgid "Save"
+msgstr "Opslaan"
+
+#: errands/widgets/task_list/task_list_sidebar_row.py:123
+msgid "Export failed"
+msgstr "Exporteren mislukt"
+
+#: errands/widgets/task_list/task_list_sidebar_row.py:158
+msgid "Color"
+msgstr "Kleur"
+
+#: errands/widgets/task_list/task_list_sidebar_row.py:186
+msgid "Rename"
+msgstr "Naam wijzigen"
+
+#: errands/widgets/today/today.py:31
+msgid "No Tasks for Today"
+msgstr "Er staan vandaag geen taken op de planning"
+
+#: errands/widgets/trash/trash.py:31
+msgid "Empty Trash"
+msgstr "Prullenbak legen"
+
+#: errands/widgets/trash/trash.py:32
+msgid "No deleted items"
+msgstr "Er zĳn geen verwĳderde items"
+
+#: errands/widgets/trash/trash.py:55 errands/widgets/trash/trash.py:189
+#: errands/widgets/trash/trash_sidebar_row.py:65
+msgid "Restore"
+msgstr "Herstellen"
+
+#: errands/widgets/trash/trash.py:89
+#: errands/widgets/trash/trash_sidebar_row.py:43 errands/widgets/window.py:77
+msgid "Trash"
+msgstr "Prullenbak"
+
+#: errands/widgets/trash/trash.py:158
+msgid "Tasks will be permanently deleted"
+msgstr "De taken worden permanent verwĳderd"
+
+#: errands/widgets/window.py:56
+msgid "Sidebar"
+msgstr "Zĳbalk"
+
+#: errands/widgets/window.py:59
+msgid "Content"
+msgstr "Inhoud"
+
+#: errands/widgets/window.py:90
+msgid "No Task Lists"
+msgstr "Er zijn geen lijsten"
+
+#: errands/widgets/window.py:91
+msgid "Create new or import existing one"
+msgstr "Maak een nieuwe aan of importeer een bestaande"
+
+#: errands/widgets/window.py:95
+msgid "Create List"
+msgstr "Lijst maken"
+
+#: errands/widgets/window.py:104
+msgid "Create new List"
+msgstr "Lijst maken"
+
+#: errands/widgets/window.py:153
+msgid "translator-credits"
+msgstr "Heimen Stoffels <vistausss@fastmail.com>"
+
+#: errands/widgets/window.py:159
+msgid "Sync is disabled"
+msgstr "Synchronisatie is uitgeschakeld"
+
+#: errands/widgets/window.py:194
+msgid "Imported"
+msgstr "Importeren voltooid"
+
+#: errands/widgets/preferences.py:26
 msgid "Application Theme"
 msgstr "Thema"
 
-#: errands/widgets/preferences.py:39
+#: errands/widgets/preferences.py:34
 msgid "System"
 msgstr "Systeemthema"
 
-#: errands/widgets/preferences.py:51
+#: errands/widgets/preferences.py:46
 msgid "Light"
 msgstr "Licht thema"
 
-#: errands/widgets/preferences.py:63
+#: errands/widgets/preferences.py:58
 msgid "Dark"
 msgstr "Donker thema"
 
-#. Task lists group
-#. task_list_group = Adw.PreferencesGroup(title=_("Task Lists"))
-#. add_tasks_position = Adw.ComboRow(
-#. title=_("Add new Tasks"),
-#. model=Gtk.StringList.new([_("At the Top"), _("At the Bottom")]),
-#. icon_name="errands-add-symbolic",
-#. )
-#. task_list_group.add(add_tasks_position)
-#. Tasks group
-#: errands/widgets/preferences.py:80 errands/widgets/window.py:91
-msgid "Tasks"
-msgstr "Taken"
+#: errands/widgets/preferences.py:70
+msgid "Add new Tasks"
+msgstr "Taken toevoegen"
 
-#: errands/widgets/preferences.py:83
-msgid "Click Action"
-msgstr "Klikactie"
+#: errands/widgets/preferences.py:71
+msgid "At the Bottom"
+msgstr "Onderaan"
 
-#: errands/widgets/preferences.py:84
-msgid "Open Details Panel"
-msgstr "Details tonen"
+#: errands/widgets/preferences.py:71
+msgid "At the Top"
+msgstr "Bovenaan"
 
-#: errands/widgets/preferences.py:84
-msgid "Show Sub-Tasks"
-msgstr "Bĳkomende taken tonen"
+#: errands/widgets/preferences.py:87
+msgid "Show Notifications"
+msgstr "Meldingen tonen"
 
-#: errands/widgets/preferences.py:99
-msgid "Complete Button Size"
-msgstr "Grootte van afrondknop"
+#: errands/widgets/preferences.py:94
+msgid "Run in Background"
+msgstr "Uitvoeren op achtergrond"
 
-#: errands/widgets/preferences.py:100
-msgid "Small"
-msgstr "Klein"
-
-#: errands/widgets/preferences.py:100
-msgid "Big"
-msgstr "Groot"
-
-#: errands/widgets/preferences.py:113
-msgid "Progress Bar"
+#: errands/widgets/preferences.py:95
+msgid "Hide the application window instead of closing it"
 msgstr ""
+"Verberg het toepassingsvenster in plaats van de toepassing af te sluiten"
 
-#: errands/widgets/preferences.py:119
-msgid "Tool Bar"
-msgstr ""
+#: errands/widgets/preferences.py:102
+msgid "Launch on Startup"
+msgstr "Automatisch opstarten"
 
-#: errands/widgets/preferences.py:126 errands/widgets/preferences.py:194
+#: errands/widgets/preferences.py:103
+msgid "Launch application when user logs in"
+msgstr "Start de toepassing op na het aanmelden"
+
+#: errands/widgets/preferences.py:112
+msgid "Notifications and Background"
+msgstr "Meldingen en achtergronddienst"
+
+#: errands/widgets/preferences.py:120 errands/widgets/preferences.py:181
 #: data/resources/gtk/help-overlay.ui:38
 msgid "Sync"
 msgstr "Synchroniseren"
 
 #. Provider
-#: errands/widgets/preferences.py:129
+#: errands/widgets/preferences.py:123
 msgid "Disabled"
 msgstr "Uitgeschakeld"
 
-#: errands/widgets/preferences.py:131
+#: errands/widgets/preferences.py:125
 msgid "Sync Provider"
 msgstr "Synchronisatiedienst"
 
-#: errands/widgets/preferences.py:140
+#: errands/widgets/preferences.py:134
 msgid "Server URL"
 msgstr "Server-url"
 
-#: errands/widgets/preferences.py:146
+#: errands/widgets/preferences.py:140
+msgid ""
+"URL needs to include protocol, like <b>http://</b> or <b>https://</b>. If "
+"you have problems with connection - try to change protocol first."
+msgstr ""
+"De url dient voorzien te zijn van een protocol, zoals <b>http://</b> of "
+"<b>https://</b>. Als u verbindingsproblemen heeft, probeer dan het protocol "
+"aan te passen."
+
+#: errands/widgets/preferences.py:147
 msgid "Username"
 msgstr "Gebruikersnaam"
 
-#: errands/widgets/preferences.py:152
+#: errands/widgets/preferences.py:153
 msgid "Password"
 msgstr "Wachtwoord"
 
-#: errands/widgets/preferences.py:158
+#: errands/widgets/preferences.py:159
 msgid "Test"
 msgstr "Testen"
 
-#: errands/widgets/preferences.py:163
+#: errands/widgets/preferences.py:164
 msgid "Test Connection"
 msgstr "Verbinding testen"
 
-#: errands/widgets/preferences.py:171
-msgid "Details Panel"
-msgstr "Detailpaneel"
+#: errands/widgets/preferences.py:172 data/resources/gtk/help-overlay.ui:9
+msgid "General"
+msgstr "Algemeen"
 
-#: errands/widgets/preferences.py:174
-msgid "Position"
-msgstr "Locatie"
-
-#: errands/widgets/preferences.py:175
-msgid "Left"
-msgstr "Links"
-
-#: errands/widgets/preferences.py:175
-msgid "Right"
-msgstr "Rechts"
-
-#: errands/widgets/preferences.py:184
-msgid "Appearance"
-msgstr "Vormgeving"
-
-#: errands/widgets/preferences.py:230
+#: errands/widgets/preferences.py:217
 msgid "Connected"
 msgstr "Verbonden"
 
-#: errands/widgets/preferences.py:230
+#: errands/widgets/preferences.py:221
+msgid "Authorization failed"
+msgstr "Verificatie mislukt"
+
+#: errands/widgets/preferences.py:223
+msgid "Could not locate server. Check network and url."
+msgstr ""
+"De server kan niet worden gevonden. Controleer de url en uw "
+"internetverbinding."
+
+#: errands/widgets/preferences.py:225
 msgid "Can't connect"
 msgstr "Verbinding mislukt"
 
-#: errands/widgets/sidebar.py:67 errands/widgets/window.py:38
-#: errands/widgets/window.py:129 data/io.github.mrvladus.List.desktop.in.in:3
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:27
-msgid "Errands"
-msgstr "Boodschappen"
-
-#: errands/widgets/sidebar.py:75
-msgid "Import List"
-msgstr "Lijst importeren"
-
-#: errands/widgets/sidebar.py:80
-msgid "Add List (Ctrl+A)"
-msgstr "Lijst toevoegen (Ctrl+A)"
-
-#: errands/widgets/sidebar.py:82
-msgid "More Options"
-msgstr "Meer opties"
-
-#. top_section.append(_("Secret Notes"), "app.secret_notes")
-#: errands/widgets/sidebar.py:99 data/resources/gtk/help-overlay.ui:42
-msgid "Sync / Fetch Tasks"
-msgstr "Taken ophalen/synchroniseren"
-
-#: errands/widgets/sidebar.py:102 data/resources/gtk/help-overlay.ui:20
-msgid "Preferences"
-msgstr "Voorkeuren"
-
-#: errands/widgets/sidebar.py:103
-msgid "Keyboard Shortcuts"
-msgstr "Sneltoetsen"
-
-#: errands/widgets/sidebar.py:104
-msgid "About Errands"
-msgstr "Over Errands"
-
-#: errands/widgets/sidebar.py:110
-msgid "Main Menu"
-msgstr "Hoofdmenu"
-
-#: errands/widgets/sidebar.py:116
-msgid "Syncing..."
-msgstr "Bezig met synchroniseren…"
-
-#: errands/widgets/sidebar.py:141
-msgid "New List Name"
-msgstr "Nieuwe lijstnaam"
-
-#: errands/widgets/sidebar.py:145 data/resources/gtk/help-overlay.ui:57
-msgid "Add List"
-msgstr "Lijst toevoegen"
-
-#: errands/widgets/sidebar.py:150 errands/widgets/sidebar.py:342
-#: errands/widgets/sidebar.py:385 errands/widgets/trash.py:136
-msgid "Cancel"
-msgstr "Annuleren"
-
-#: errands/widgets/sidebar.py:151
-msgid "Add"
-msgstr "Toevoegen"
-
-#: errands/widgets/sidebar.py:168
-msgid "Add new List"
-msgstr "Lijst toevoegen"
-
-#: errands/widgets/sidebar.py:169
-msgid "Click \"+\" button"
-msgstr "Klik op de ‘+’-knop"
-
-#: errands/widgets/sidebar.py:337 errands/widgets/trash.py:131
-msgid "Are you sure?"
-msgstr "Weet u het zeker?"
-
-#: errands/widgets/sidebar.py:338
-msgid "List will be permanently deleted"
-msgstr "De lijst wordt permanent verwĳderd"
-
-#: errands/widgets/sidebar.py:343 errands/widgets/sidebar.py:478
-#: errands/widgets/details.py:54 errands/widgets/trash.py:137
-msgid "Delete"
-msgstr "Verwĳderen"
-
-#: errands/widgets/sidebar.py:375
-msgid "New Name"
-msgstr "Nieuwe naam"
-
-#: errands/widgets/sidebar.py:380
-msgid "Rename List"
-msgstr "Lijstnaam wĳzigen"
-
-#: errands/widgets/sidebar.py:386 errands/widgets/details.py:114
-#: errands/widgets/details.py:155
-msgid "Save"
-msgstr "Opslaan"
-
-#: errands/widgets/sidebar.py:444
-msgid "Export failed"
-msgstr "Exporteren mislukt"
-
-#: errands/widgets/sidebar.py:446 errands/widgets/details.py:487
-msgid "Exported"
-msgstr "Exporteren voltooid"
-
-#: errands/widgets/sidebar.py:477
-msgid "Rename"
-msgstr "Naam wijzigen"
-
-#. Export group
-#: errands/widgets/sidebar.py:479 errands/widgets/details.py:239
-#: errands/widgets/details.py:247
-msgid "Export"
-msgstr "Exporteren"
-
-#: errands/widgets/sidebar.py:505
-msgid "Menu"
-msgstr "Menu"
-
-#: errands/widgets/sidebar.py:563 errands/widgets/trash.py:30
-#: errands/widgets/window.py:61
-msgid "Trash"
-msgstr "Prullenbak"
-
-#: errands/widgets/task_list.py:40 errands/widgets/task_list.py:55
-#: errands/widgets/task_list.py:96 errands/widgets/task_list.py:107
-msgid "Toggle Sidebar"
-msgstr "Zĳbalk tonen/verbergen"
-
-#: errands/widgets/task_list.py:70 errands/widgets/task_list.py:120
-msgid "Delete Completed Tasks"
-msgstr "Afgeronde taken wissen"
-
-#: errands/widgets/task_list.py:80 errands/widgets/task_list.py:134
-msgid "Scroll Up"
-msgstr "Omhoog schuiven"
-
-#: errands/widgets/task_list.py:277 errands/widgets/task.py:217
-msgid "Completed:"
-msgstr "Afgerond:"
-
-#: errands/widgets/task_list.py:401
-msgid "Add new Task"
-msgstr "Taak toevoegen"
-
-#: errands/widgets/details.py:63
-msgid "No Details"
-msgstr "Geen omschrijving"
-
-#: errands/widgets/details.py:64
-msgid "Click on task to show more info"
-msgstr "Klik op een taak om meer informatie te tonen"
-
-#: errands/widgets/details.py:81
-msgid "Clear Style"
-msgstr "Stijl wissen"
-
-#. Edit group
-#: errands/widgets/details.py:90
-msgid "Text"
-msgstr "Tekst"
-
-#: errands/widgets/details.py:124 errands/widgets/details.py:166
-msgid "Copy Text"
-msgstr "Tekst kopiëren"
-
-#. Notes group
-#: errands/widgets/details.py:131
-msgid "Notes"
-msgstr "Aantekeningen"
-
-#. Properties group
-#: errands/widgets/details.py:173
-msgid "Properties"
-msgstr "Eigenschappen"
-
-#: errands/widgets/details.py:176
-msgid "Start"
-msgstr "Starten"
-
-#: errands/widgets/details.py:183 errands/widgets/details.py:204
-msgid "Set Date"
-msgstr "Datum instellen"
-
-#: errands/widgets/details.py:197
-msgid "Due"
-msgstr "Einddatum"
-
-#. Complete % row
-#: errands/widgets/details.py:212
-msgid "Complete %"
-msgstr "% afgerond"
-
-#. Priority row
-#: errands/widgets/details.py:222
-msgid "Priority"
-msgstr "Prioriteit"
-
-#. Tags group
-#: errands/widgets/details.py:232
-msgid "Tags"
-msgstr "Labels"
-
-#. Tags entry
-#: errands/widgets/details.py:234
-msgid "Add Tag"
-msgstr "Label toekennen"
-
-#: errands/widgets/details.py:248
-msgid "Save Task as .ics file"
-msgstr "Taak opslaan als .ics-bestand"
-
-#: errands/widgets/details.py:440
-msgid "Copied to Clipboard"
-msgstr "Gekopieerd naar het klembord"
-
-#: errands/widgets/task.py:301 errands/widgets/task.py:312
-msgid "Mark as Completed"
-msgstr "Markeren als afgerond"
-
-#: errands/widgets/task.py:399
-msgid "Expand / Fold"
-msgstr "Uit-/Inklappen"
-
-#: errands/widgets/task.py:419 data/resources/gtk/help-overlay.ui:68
-msgid "Details"
-msgstr "Details"
-
-#: errands/widgets/task.py:530
-msgid "Add new Sub-Task"
-msgstr "Bĳkomende taak toevoegen"
-
-#: errands/widgets/trash.py:45
-msgid "Restore All"
-msgstr "Alles herstellen"
-
-#: errands/widgets/trash.py:51
-msgid "Empty Trash"
-msgstr "Prullenbak legen"
-
-#: errands/widgets/trash.py:52
-msgid "No deleted items"
-msgstr "Er zĳn geen verwĳderde items"
-
-#: errands/widgets/trash.py:132
-msgid "Tasks will be permanently deleted"
-msgstr "De taken worden permanent verwĳderd"
-
-#: errands/widgets/trash.py:212
-msgid "Restore"
-msgstr "Herstellen"
-
-#: errands/widgets/window.py:67 errands/widgets/window.py:84
-msgid "No Task Lists"
-msgstr "Er zijn geen lijsten"
-
-#: errands/widgets/window.py:69
-msgid "Create List"
-msgstr "Lijst maken"
-
-#: errands/widgets/window.py:90 data/resources/gtk/help-overlay.ui:53
-msgid "Lists"
-msgstr "Lijsten"
-
-#: errands/widgets/window.py:134
-msgid "translator-credits"
-msgstr "Heimen Stoffels <vistausss@fastmail.com>"
-
-#: errands/widgets/window.py:143
-msgid "Sync is disabled"
-msgstr "Synchronisatie is uitgeschakeld"
-
-#: errands/widgets/window.py:212
-msgid "Imported"
-msgstr "Importeren voltooid"
-
-#: errands/lib/sync/providers/caldav.py:42
+#. NOTE: Also catches invalid credentials
+#: errands/widgets/preferences.py:227
+msgid "Can't connect. Check credentials"
+msgstr "Controleer uw inloggegevens"
+
+#: errands/lib/sync/providers/caldav.py:66
 msgid "Not all sync credentials provided. Please check settings."
 msgstr "Er zijn geen inloggegevens bekend. Controleer de voorkeuren."
 
-#: errands/lib/sync/providers/caldav.py:81
+#: errands/lib/sync/providers/caldav.py:110
 msgid "Can't connect to CalDAV server at:"
 msgstr "Er kan geen verbinding worden gemaakt met de server:"
 
-#: data/resources/gtk/help-overlay.ui:9
-msgid "General"
-msgstr "Algemeen"
+#: errands/lib/data.py:92
+msgid "New Task List"
+msgstr "Nieuwe takenlijst"
+
+#: errands/lib/notifications.py:75
+msgid "Task is Due"
+msgstr "Taak is bijna verlopen"
+
+#: errands/application.py:80
+msgid "Errands was updated"
+msgstr "Takenlijst is bijgewerkt"
+
+#: errands/application.py:81
+msgid "Restart is required"
+msgstr "Herstart de toepassing"
+
+#: errands/application.py:84
+msgid "Restart"
+msgstr "Herstarten"
+
+#: errands/application.py:113
+msgid "Errands need to run in the background for notifications"
+msgstr ""
+"Takenlijst dient op de achtergrond te worden uitgevoerd om meldingen te "
+"kunnen tonen"
 
 #: data/resources/gtk/help-overlay.ui:13
 msgid "Show keyboard shortcuts"
 msgstr "Sneltoetsen tonen"
 
-#: data/resources/gtk/help-overlay.ui:27
-msgid "Quit"
-msgstr "Afsluiten"
+#: data/resources/gtk/help-overlay.ui:53
+msgid "Lists"
+msgstr "Lijsten"
 
-#: data/resources/gtk/help-overlay.ui:72
+#: data/resources/gtk/help-overlay.ui:64
+msgid "Import List"
+msgstr "Lijst importeren"
+
+#: data/resources/gtk/help-overlay.ui:75
+msgid "Details"
+msgstr "Details"
+
+#: data/resources/gtk/help-overlay.ui:79
 msgid "Toggle Details"
 msgstr "Details tonen/verbergen"
 
 #: data/io.github.mrvladus.List.desktop.in.in:4
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:28
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:7
 msgid "Manage your tasks"
 msgstr "Beheer uw taken"
 
 #: data/io.github.mrvladus.List.desktop.in.in:10
 msgid "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
 msgstr ""
-"errands;taken;lĳst;taak;todo;caldav;nextcloud;synchronisatie;synchroniseren;"
+"takenlijst;boodschappen;taken;lĳst;taak;todo;caldav;nextcloud;"
+"synchronisatie;synchroniseren;"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:30
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:12
 msgid "Todo application for those who prefer simplicity."
 msgstr "Een takentoepassing voor zij die eenvoud boven alles verkiezen."
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:31
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:13
 msgid "Features:"
 msgstr "Kenmerken:"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:33
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:15
 msgid "Multiple task lists support"
 msgstr "Ondersteuning voor meerdere lijsten"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:34
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:16
 msgid "Add, remove, edit tasks and sub-tasks"
 msgstr "Voeg taken en bijkomende taken toe, bewerk ze of verwijder ze"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:35
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:17
 msgid "Mark task and sub-tasks as completed"
 msgstr "Markeer taken en bijkomende taken als afgerond"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:36
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:18
 msgid "Add accent color for each task"
 msgstr "Voorzie elke taak van een andere kleur"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:37
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:19
 msgid "Sync tasks with Nextcloud or other CalDAV providers"
 msgstr "Synchroniseer taken met Nextcloud of andere CalDAV-diensten"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:38
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:20
 msgid "Drag and Drop support"
 msgstr "Sleep taken naar het venster"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:39
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:21
 msgid "Import .ics files"
 msgstr "Importeer .ics-bestanden"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:41
+msgid "Main Window View"
+msgstr "Hoofdvenster"
+
+#~ msgid "Not Set"
+#~ msgstr "Niet ingesteld"
+
+#~ msgid "Click Action"
+#~ msgstr "Klikactie"
+
+#~ msgid "Open Details Panel"
+#~ msgstr "Details tonen"
+
+#~ msgid "Complete Button Size"
+#~ msgstr "Grootte van afrondknop"
+
+#~ msgid "Small"
+#~ msgstr "Klein"
+
+#~ msgid "Big"
+#~ msgstr "Groot"
+
+#~ msgid "Details Panel"
+#~ msgstr "Detailpaneel"
+
+#~ msgid "Position"
+#~ msgstr "Locatie"
+
+#~ msgid "Left"
+#~ msgstr "Links"
+
+#~ msgid "Right"
+#~ msgstr "Rechts"
+
+#~ msgid "Appearance"
+#~ msgstr "Vormgeving"
+
+#~ msgid "More Options"
+#~ msgstr "Meer opties"
+
+#~ msgid "Menu"
+#~ msgstr "Menu"
+
+#~ msgid "No Details"
+#~ msgstr "Geen omschrijving"
+
+#~ msgid "Click on task to show more info"
+#~ msgstr "Klik op een taak om meer informatie te tonen"
+
+#~ msgid "Clear Style"
+#~ msgstr "Stijl wissen"
+
+#~ msgid "Text"
+#~ msgstr "Tekst"
+
+#~ msgid "Copy Text"
+#~ msgstr "Tekst kopiëren"
+
+#~ msgid "Properties"
+#~ msgstr "Eigenschappen"
+
+#~ msgid "Complete %"
+#~ msgstr "% afgerond"
+
+#~ msgid "Add Tag"
+#~ msgstr "Label toekennen"
+
+#~ msgid "Save Task as .ics file"
+#~ msgstr "Taak opslaan als .ics-bestand"
+
+#~ msgid "Mark as Completed"
+#~ msgstr "Markeren als afgerond"
+
+#~ msgid "Expand / Fold"
+#~ msgstr "Uit-/Inklappen"
+
+#~ msgid "Restore All"
+#~ msgstr "Alles herstellen"
 
 #~ msgid "Save changed details"
 #~ msgstr "Wijzigingen opslaan"
 
 #~ msgid "Save (Ctrl+S)"
 #~ msgstr "Opslaan (Ctrl+S)"
-
-#~ msgid "Create"
-#~ msgstr "Maken"
 
 #~ msgid "Load"
 #~ msgstr "Laden"
@@ -527,12 +757,6 @@ msgstr "Importeer .ics-bestanden"
 #, fuzzy
 #~ msgid "End"
 #~ msgstr "Boodschappen"
-
-#~ msgid "Deleted Tasks"
-#~ msgstr "Taken wissen"
-
-#~ msgid "Move to Trash"
-#~ msgstr "Verplaatsen naar prullenbak"
 
 #~ msgid "Show Deleted Tasks"
 #~ msgstr "Verwĳderde taken tonen"
@@ -548,6 +772,3 @@ msgstr "Importeer .ics-bestanden"
 
 #~ msgid "Import and Export"
 #~ msgstr "Im- en exporteren"
-
-#~ msgid "Edit"
-#~ msgstr "Bewerken"

@@ -1,6 +1,6 @@
 
 <div align="center">
-  <img src="data/icons/io.github.mrvladus.List.svg" width="200" height="200">
+  <img src="data/icons/hicolor/scalable/apps/io.github.mrvladus.List.svg" width="200" height="200">
 
   # Errands
 
@@ -11,8 +11,7 @@
   ![CI](https://github.com/mrvladus/Errands/actions/workflows/CI.yml/badge.svg)
   
 <p align="center">
-  <img src="screenshots/main.png" width="360" align="center">
-  <img src="screenshots/secondary.png" width="360" align="center">
+  <img src="screenshots/main.png" width="500" align="center">
 </p>
 
 </div>
@@ -48,9 +47,9 @@ It's the **only** supported verion.
 
 ### Report a bug
 - Make sure you are using latest version from [flathub](https://flathub.org/apps/details/io.github.mrvladus.List).
-- See the log file at `~/.var/app/io.github.mrvladus.List/data/errands/log.txt` if it has any errors.
-- If there is no errors in log file, then launch app from terminal with `flatpak run io.github.mrvladus.List` and copy the output.
+- See log file at `$HOME/.var/app/io.github.mrvladus.List/data/errands/log.txt`
 - Create new issue.
+- Copy log if needed.
 - Add steps to reproduce the bug if needed.
 
 ### Translate
@@ -59,8 +58,9 @@ To translate **Errands** to your language see **[TRANSLATIONS.md](TRANSLATIONS.m
 ### Package
 The only officially supported format is **flatpak** on [Flathub](https://flathub.org/apps/details/io.github.mrvladus.List)!
 Please, **do not package** it in other formats, but if you do, these are dependencies:
-- `libadwaita >= 1.4`
+- `libadwaita >= 1.5`
 - `libsecret`
+- `libportal`
 - `gtksourceview5`
 - `PyGObject`
 - `python3-caldav`

@@ -3,3 +3,6 @@
 _build/
 .vscode/
 venv/
+.venv/
+.ruff_cache/
+*.flatpak

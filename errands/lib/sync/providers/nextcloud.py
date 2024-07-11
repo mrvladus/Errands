@@ -1,3 +1,6 @@
+# Copyright 2023-2024 Vlad Krupinskii <mrvladus@yandex.ru>
+# SPDX-License-Identifier: MIT
+
 from errands.lib.gsettings import GSettings
 from errands.lib.logging import Log
 from errands.lib.sync.providers.caldav import SyncProviderCalDAV
@@ -14,8 +17,9 @@ class SyncProviderNextcloud(SyncProviderCalDAV):
         if not self.url.startswith("http"):
             self.url = "https://" + self.url
             GSettings.set("sync-url", "s", self.url)
+
         # Add suffix if needed
-        if not "remote.php/dav" in GSettings.get("sync-url"):
+        if "remote.php" not in GSettings.get("sync-url"):
             self.url = f"{self.url}/remote.php/dav/"
             GSettings.set("sync-url", "s", self.url)
         else:
