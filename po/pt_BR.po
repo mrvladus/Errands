@@ -3,6 +3,7 @@
 # This file is distributed under the same license as the list package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # Vitor Gabriel Gomes <vitorgabrielgomesro9090@gmail.com>, 2023
+# Leandro Cunha <leandrocunha016@gmail.com>, 2023-2024
 # Gabriel de Moura <smolblackcat@proton.me>, 2024
 msgid ""
 msgstr ""
