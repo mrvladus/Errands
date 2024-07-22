@@ -1,16 +1,51 @@
 # .py
-errands/widgets/details.py
-errands/widgets/components.py
-errands/widgets/lists.py
-errands/widgets/preferences.py
-errands/widgets/task_list.py
+errands/widgets/shared/components/boxes.py
+errands/widgets/shared/components/buttons.py
+errands/widgets/shared/components/controllers.py
+errands/widgets/shared/components/dialogs.py
+errands/widgets/shared/components/entries.py
+errands/widgets/shared/components/header_bar.py
+errands/widgets/shared/components/menus.py
+errands/widgets/shared/components/toolbar_view.py
+errands/widgets/shared/color_selector.py
+errands/widgets/shared/datetime_picker.py
+errands/widgets/shared/titled_separator.py
+errands/widgets/shared/task_toolbar/toolbar.py
+errands/widgets/shared/task_toolbar/__init__.py
+errands/widgets/shared/task_toolbar/attachments_window.py
+errands/widgets/shared/task_toolbar/datetime_window.py
+errands/widgets/shared/task_toolbar/notes_window.py
+errands/widgets/sidebar.py
+errands/widgets/tags/tags.py
+errands/widgets/tags/tags_sidebar_row.py
 errands/widgets/task.py
-errands/widgets/trash.py
+errands/widgets/task_list/task_list.py
+errands/widgets/task_list/task_list_sidebar_row.py
+errands/widgets/today/today.py
+errands/widgets/today/today_sidebar_row.py
+errands/widgets/today/today_task.py
+errands/widgets/trash/trash.py
+errands/widgets/trash/trash_sidebar_row.py
 errands/widgets/window.py
-errands/utils/sync.py
+errands/widgets/preferences.py
+errands/lib/sync/providers/nextcloud.py
+errands/lib/sync/providers/caldav.py
+errands/lib/sync/sync.py
+errands/lib/animation.py
+errands/lib/goa.py
+errands/lib/markup.py
+errands/lib/data.py
+errands/lib/gsettings.py
+errands/lib/logging.py
+errands/lib/notifications.py
+errands/lib/plugins.py
+errands/lib/utils.py
+errands/application.py
+errands/errands.py
+errands/state.py
 
 # .ui
-errands/resources/gtk/help-overlay.ui
+data/resources/gtk/help-overlay.ui
 
 # Data
 data/io.github.mrvladus.List.desktop.in.in
