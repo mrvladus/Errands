@@ -201,7 +201,7 @@
   border-radius: 12px;
 }
 
-.transparent {
+.transparent, .transparent row:hover {
   background-color: transparent;
 }
 

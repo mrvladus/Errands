@@ -148,7 +148,7 @@ class Trash(Adw.Bin):
 
             UserData.delete_tasks_from_trash()
             State.trash_sidebar_row.update_ui()
-            State.today_page.update_ui()
+            State.tasks_page.update_ui()
             # Sync
             Sync.sync()
 
@@ -217,4 +217,4 @@ class TrashItem(Adw.ActionRow):
                 task.parent.update_progress_bar()
 
         State.trash_sidebar_row.update_ui()
-        State.today_page.update_ui()
+        State.tasks_page.update_ui()
