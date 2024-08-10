@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-17 17:01+0300\n"
-"PO-Revision-Date: 2024-08-10 18:11+0200\n"
+"PO-Revision-Date: 2024-08-10 18:33+0200\n"
 "Last-Translator: Ladislav Galadík <terist@duck.com>\n"
 "Language-Team: \n"
 "Language: sk_SK\n"
@@ -215,7 +215,7 @@ msgstr "Zoznamy úloh"
 #: errands/widgets/window.py:148 data/io.github.mrvladus.List.desktop.in.in:3
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:6
 msgid "Errands"
-msgstr "Erands"
+msgstr "Pokyny"
 
 #: errands/widgets/sidebar.py:114
 msgid "Main Menu"
@@ -239,7 +239,7 @@ msgstr "Klávesové sklatky"
 
 #: errands/widgets/sidebar.py:142
 msgid "About Errands"
-msgstr "O Errands"
+msgstr "O Pokynoch"
 
 #: errands/widgets/sidebar.py:144 data/resources/gtk/help-overlay.ui:27
 msgid "Quit"
@@ -575,7 +575,7 @@ msgstr "Termín splnenia úlohy"
 
 #: errands/application.py:80
 msgid "Errands was updated"
-msgstr "Errands bolo aktualizované"
+msgstr "Pokyny boli aktualizované"
 
 #: errands/application.py:81
 msgid "Restart is required"
@@ -587,7 +587,7 @@ msgstr "Reštart"
 
 #: errands/application.py:113
 msgid "Errands need to run in the background for notifications"
-msgstr "Errands musí bežať na pozadí pre zobrazenie notifikácií"
+msgstr "Pokyny musí bežať na pozadí pre zobrazenie notifikácií"
 
 #: data/resources/gtk/help-overlay.ui:13
 msgid "Show keyboard shortcuts"
