@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 
 // Log formatted message
 #define LOG(format, ...) fprintf(stderr, "Errands: " format "\n", ##__VA_ARGS__)
@@ -48,6 +49,20 @@ static inline bool string_array_contains(GPtrArray *str_arr,
     if (string_contains((char *)str_arr->pdata[i], needle))
       return true;
   return false;
+}
+
+bool file_exists(const char *filename) {
+  FILE *file = fopen(filename, "r");
+  if (file) {
+    fclose(file);
+    return true; // File exists
+  }
+  return false; // File does not exist
+}
+
+bool directory_exists(const char *path) {
+  struct stat statbuf;
+  return (stat(path, &statbuf) == 0 && S_ISDIR(statbuf.st_mode));
 }
 
 #endif // ERRANDS_UTILS_H

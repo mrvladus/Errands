@@ -12,9 +12,25 @@
 
 // Function to read a file into a string
 static char *errands_data_read() {
-  FILE *file = fopen("data.json", "r"); // Open the file in read mode
+  // Get data dir
+  const char *data_dir =
+      g_build_path("/", g_get_user_data_dir(), "errands", NULL);
+  // Create if not exist
+  if (!directory_exists(data_dir)) {
+    g_mkdir_with_parents(data_dir, 0755);
+  }
+  // Get data.json file path
+  const char *data_file_path = g_build_path("/", data_dir, "data.json", NULL);
+  // Create if not exist
+  if (!file_exists(data_file_path)) {
+    FILE *file = fopen(data_file_path, "w");
+    fprintf(file, "{\"lists\":[],\"tags\":[],\"tasks\":[]}");
+    fclose(file);
+  }
+
+  FILE *file = fopen(data_file_path, "r"); // Open the file in read mode
   if (!file) {
-    perror("Could not open file"); // Print error if file cannot be opened
+    LOG("Could not open file"); // Print error if file cannot be opened
     return NULL;
   }
 
@@ -22,21 +38,16 @@ static char *errands_data_read() {
   fseek(file, 0, SEEK_END);
   long file_size = ftell(file); // Get the current position (file size)
   fseek(file, 0, SEEK_SET);     // Move back to the beginning of the file
-
   // Allocate memory for the string (+1 for the null terminator)
   char *buffer = (char *)malloc(file_size + 1);
-  if (!buffer) {
-    perror(
-        "Could not allocate memory"); // Print error if memory allocation fails
-    fclose(file);                     // Close the file before returning
-    return NULL;
-  }
-
-  // Read the file contents into the buffer
   fread(buffer, 1, file_size, file);
   buffer[file_size] = '\0'; // Null-terminate the string
+  fclose(file);
 
-  fclose(file);  // Close the file
+  // Free memory
+  g_free((gpointer)data_dir);
+  g_free((gpointer)data_file_path);
+
   return buffer; // Return the string
 }
 
