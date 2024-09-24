@@ -1,8 +1,2 @@
-.flatpak-builder/
-.flatpak/
-_build/
-.vscode/
-venv/
-.venv/
-.ruff_cache/
-*.flatpak
+*.o
+errands

@@ -1,0 +1,20 @@
+.task-title-row {
+    border-radius: 12px;
+    background-color: transparent;
+}
+
+.sub-tasks:last-child {
+    margin-bottom: 6px;
+}
+
+.priority-low {
+    color: var(--accent-blue);
+}
+
+.priority-medium {
+    color: var(--accent-orange);
+}
+
+.priority-high {
+    color: var(--accent-red);
+}
