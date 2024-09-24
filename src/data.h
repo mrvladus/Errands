@@ -46,6 +46,7 @@ void errands_data_load();
 void errands_data_write();
 
 TaskData *errands_data_add_task(char *text, char *list_uid, char *parent_uid);
+TaskListData *errands_data_add_list(const char *name);
 
 TaskData *errands_data_get_task(char *uid);
 

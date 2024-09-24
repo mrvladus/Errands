@@ -208,9 +208,12 @@ void errands_data_write() {
 
   // Save to file
   char *json_string = cJSON_PrintUnformatted(json);
-  FILE *file = fopen("data.json", "w");
+  const char *data_file_path =
+      g_build_path("/", g_get_user_data_dir(), "errands", "data.json", NULL);
+
+  FILE *file = fopen(data_file_path, "w");
   if (file == NULL) {
-    perror("Error opening file");
+    LOG("Error opening data.json file");
     cJSON_Delete(json);
     free(json_string);
   }
@@ -220,9 +223,22 @@ void errands_data_write() {
   // Clean up
   cJSON_Delete(json);
   free(json_string);
+  g_free((gpointer)data_file_path);
 }
 
-void errands_data_add_list(char *name) {}
+TaskListData *errands_data_add_list(const char *name) {
+  TaskListData *tl = malloc(sizeof(*tl));
+  tl->color = generate_hex();
+  tl->deleted = false;
+  tl->name = strdup(name);
+  tl->show_completed = true;
+  tl->synced = false;
+  tl->uid = g_uuid_string_random();
+  g_ptr_array_insert(state.tl_data, 0, tl);
+  errands_data_write();
+  LOG("Create list data '%s'", tl->uid);
+  return tl;
+}
 
 TaskData *errands_data_add_task(char *text, char *list_uid, char *parent_uid) {
   TaskData *t = malloc(sizeof(*t));

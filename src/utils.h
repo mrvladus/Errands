@@ -51,7 +51,7 @@ static inline bool string_array_contains(GPtrArray *str_arr,
   return false;
 }
 
-bool file_exists(const char *filename) {
+static inline bool file_exists(const char *filename) {
   FILE *file = fopen(filename, "r");
   if (file) {
     fclose(file);
@@ -60,9 +60,25 @@ bool file_exists(const char *filename) {
   return false; // File does not exist
 }
 
-bool directory_exists(const char *path) {
+static inline bool directory_exists(const char *path) {
   struct stat statbuf;
   return (stat(path, &statbuf) == 0 && S_ISDIR(statbuf.st_mode));
+}
+
+static inline char *generate_hex() {
+  // Allocate memory for the HEX color string
+  char *color =
+      (char *)malloc(8 * sizeof(char)); // 7 characters + 1 for null terminator
+
+  // Generate random values for red, green, and blue components
+  int red = rand() % 256;
+  int green = rand() % 256;
+  int blue = rand() % 256;
+
+  // Format the values into a HEX color string
+  sprintf(color, "#%02X%02X%02X", red, green, blue);
+
+  return color;
 }
 
 #endif // ERRANDS_UTILS_H
