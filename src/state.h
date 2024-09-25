@@ -36,8 +36,6 @@ typedef struct {
 
   // Notes window
   AdwDialog *notes_window;
-  GtkWidget *notes_window_source_view;
-  char *notes_window_uid;
 
   AdwDialog *datetime_window;
   AdwDialog *tags_window;
