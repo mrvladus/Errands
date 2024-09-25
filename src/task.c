@@ -4,6 +4,7 @@
 #include "priority-window.h"
 #include "state.h"
 #include "task-list.h"
+#include "task-toolbar.h"
 #include "utils.h"
 
 #include <stdlib.h>
@@ -77,53 +78,10 @@ GtkWidget *errands_task_new(TaskData *td) {
   gtk_list_box_append(GTK_LIST_BOX(title_lb), edit_row);
   gtk_box_append(GTK_BOX(vbox), title_lb);
 
-  // Toolbar hbox
-  GtkWidget *tb_hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-  g_object_set(tb_hbox, "margin-start", 12, "margin-end", 12, "margin-bottom",
-               6, "hexpand", true, NULL);
-
-  // Date button
-  GtkWidget *tb_date_btn_content = adw_button_content_new();
-  g_object_set(tb_date_btn_content, "icon-name", "errands-calendar-symbolic",
-               "label", "Date", NULL);
-  GtkWidget *tb_date_btn = gtk_button_new();
-  g_object_set(tb_date_btn, "child", tb_date_btn_content, NULL);
-  gtk_widget_add_css_class(tb_date_btn, "flat");
-  gtk_widget_add_css_class(tb_date_btn, "caption");
-  gtk_box_append(GTK_BOX(tb_hbox), tb_date_btn);
-
-  // Notes button
-  GtkWidget *tb_notes_btn =
-      gtk_button_new_from_icon_name("errands-notes-symbolic");
-  g_object_set(tb_notes_btn, "halign", GTK_ALIGN_END, "hexpand", true, NULL);
-  gtk_widget_add_css_class(tb_notes_btn, "flat");
-  g_signal_connect_swapped(tb_notes_btn, "clicked",
-                           G_CALLBACK(errands_notes_window_show), td);
-  gtk_box_append(GTK_BOX(tb_hbox), tb_notes_btn);
-
-  // Priority button
-  GtkWidget *tb_priority_btn =
-      gtk_button_new_from_icon_name("errands-priority-symbolic");
-  gtk_widget_add_css_class(tb_priority_btn, "flat");
-  g_signal_connect_swapped(tb_priority_btn, "clicked",
-                           G_CALLBACK(errands_priority_window_show), rev);
-  gtk_box_append(GTK_BOX(tb_hbox), tb_priority_btn);
-
-  // Tags button
-  GtkWidget *tb_tags_btn =
-      gtk_button_new_from_icon_name("errands-tags-symbolic");
-  gtk_widget_add_css_class(tb_tags_btn, "flat");
-  gtk_box_append(GTK_BOX(tb_hbox), tb_tags_btn);
-
-  // Attachments button
-  GtkWidget *tb_attachments_btn =
-      gtk_button_new_from_icon_name("errands-attachment-symbolic");
-  gtk_widget_add_css_class(tb_attachments_btn, "flat");
-  gtk_box_append(GTK_BOX(tb_hbox), tb_attachments_btn);
-
   // Toolbar revealer
   GtkWidget *tb_rev = gtk_revealer_new();
-  g_object_set(tb_rev, "child", tb_hbox, "reveal-child", true, NULL);
+  g_object_set(tb_rev, "child", errands_task_toolbar_new(td), "reveal-child",
+               true, NULL);
   g_object_bind_property(toolbar_btn, "active", tb_rev, "reveal-child",
                          G_BINDING_SYNC_CREATE);
   gtk_box_append(GTK_BOX(vbox), tb_rev);
@@ -161,10 +119,11 @@ GtkWidget *errands_task_new(TaskData *td) {
 
   // Set data
   g_object_set_data(G_OBJECT(rev), "task_data", td);
-  g_object_set_data(G_OBJECT(rev), "priority_btn", tb_priority_btn);
   g_object_set_data(G_OBJECT(rev), "task_list", sub_tasks);
   g_object_set_data(G_OBJECT(rev), "sub_rev", sub_rev);
   g_object_set_data(G_OBJECT(rev), "card", vbox);
+
+  td->task = rev;
 
   return rev;
 }

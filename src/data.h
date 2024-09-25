@@ -9,6 +9,9 @@
 #include <stdint.h>
 
 typedef struct {
+  // Associated task widget
+  GtkWidget *task;
+
   GPtrArray *attachments;
   char *color;
   bool completed;
