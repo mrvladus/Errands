@@ -12,7 +12,7 @@ static void on_errands_notes_window_close_cb(AdwDialog *win, gpointer data);
 // --- LOCAL STATE --- //
 
 GtkWidget *notes_window_source_view;
-char *notes_window_uid;
+TaskData *td;
 
 // --- FUNCTIONS IMPLEMENTATIONS --- //
 
@@ -46,9 +46,9 @@ void errands_notes_window_build() {
                    G_CALLBACK(on_errands_notes_window_close_cb), NULL);
 }
 
-void errands_notes_window_show(TaskData *td) {
+void errands_notes_window_show(TaskData *data) {
   adw_dialog_present(state.notes_window, state.main_window);
-  notes_window_uid = td->uid;
+  td = data;
   GtkTextBuffer *buf =
       gtk_text_view_get_buffer(GTK_TEXT_VIEW(notes_window_source_view));
   gtk_text_buffer_set_text(buf, td->notes, -1);
@@ -57,7 +57,6 @@ void errands_notes_window_show(TaskData *td) {
 // --- SIGNAL HANDLERS --- //
 
 static void on_errands_notes_window_close_cb(AdwDialog *win, gpointer data) {
-  TaskData *td = errands_data_get_task(notes_window_uid);
   GtkTextBuffer *buf =
       gtk_text_view_get_buffer(GTK_TEXT_VIEW(notes_window_source_view));
 

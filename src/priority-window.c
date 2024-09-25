@@ -13,9 +13,7 @@
 static GtkWidget *none_btn, *low_btn, *medium_btn, *high_btn;
 // Spin row for custom value
 static GtkWidget *custom;
-// Task widget
-static GtkWidget *current_task;
-// Data of the task widget
+// Data of the current task
 static TaskData *td;
 
 static void on_errands_priority_window_close(AdwDialog *win, gpointer data) {
@@ -130,10 +128,9 @@ void errands_priority_window_build() {
                    G_CALLBACK(on_errands_priority_window_close), NULL);
 }
 
-void errands_priority_window_show(GtkWidget *task) {
+void errands_priority_window_show(TaskData *data) {
   adw_dialog_present(state.priority_window, state.main_window);
-  current_task = task;
-  td = g_object_get_data(G_OBJECT(task), "task_data");
+  td = data;
 
   // Un-toggle buttons
   gtk_check_button_set_active(GTK_CHECK_BUTTON(none_btn), false);

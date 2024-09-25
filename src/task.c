@@ -1,7 +1,5 @@
 #include "task.h"
 #include "data.h"
-#include "notes-window.h"
-#include "priority-window.h"
 #include "state.h"
 #include "task-list.h"
 #include "task-toolbar.h"
