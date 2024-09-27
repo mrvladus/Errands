@@ -1,5 +1,6 @@
 #include "task-list.h"
 #include "data.h"
+#include "gtk/gtk.h"
 #include "sidebar-all-row.h"
 #include "sidebar-task-list-row.h"
 #include "state.h"
@@ -19,8 +20,8 @@ static void on_task_added(AdwEntryRow *entry, gpointer data) {
     return;
 
   TaskData *td = errands_data_add_task((char *)text, state.current_uid, "");
-  GtkWidget *t = errands_task_new(td);
-  gtk_box_prepend(GTK_BOX(state.task_list), t);
+  ErrandsTask *t = errands_task_new(td);
+  gtk_box_prepend(GTK_BOX(state.task_list), GTK_WIDGET(t));
 
   // Clear text
   gtk_editable_set_text(GTK_EDITABLE(entry), "");
@@ -87,7 +88,8 @@ void errands_task_list_build() {
   for (int i = 0; i < state.t_data->len; i++) {
     TaskData *data = state.t_data->pdata[i];
     if (!strcmp(data->parent, ""))
-      gtk_box_append(GTK_BOX(state.task_list), errands_task_new(data));
+      gtk_box_append(GTK_BOX(state.task_list),
+                     GTK_WIDGET(errands_task_new(data)));
   }
 
   GtkWidget *tbox_clamp = adw_clamp_new();
@@ -120,22 +122,21 @@ void errands_task_list_filter_by_uid(const char *uid) {
 
   if (!strcmp(uid, "")) {
     for (int i = 0; i < tasks->len; i++) {
-      GtkWidget *task = tasks->pdata[i];
-      TaskData *td = g_object_get_data(G_OBJECT(task), "task_data");
-      if (!td->deleted)
-        gtk_widget_set_visible(task, true);
+      ErrandsTask *task = tasks->pdata[i];
+      if (!task->data->deleted)
+        gtk_widget_set_visible(GTK_WIDGET(task), true);
     }
     return;
   }
 
   for (int i = 0; i < tasks->len; i++) {
-    GtkWidget *task = tasks->pdata[i];
-    TaskData *td = g_object_get_data(G_OBJECT(task), "task_data");
-    if (!strcmp(uid, td->list_uid) && !td->deleted) {
-      gtk_widget_set_visible(task, true);
-    } else {
-      gtk_widget_set_visible(task, !strcmp(td->list_uid, uid) && !td->deleted);
-    }
+    ErrandsTask *task = tasks->pdata[i];
+    if (!strcmp(uid, task->data->list_uid) && !task->data->deleted)
+      gtk_widget_set_visible(GTK_WIDGET(task), true);
+    else
+      gtk_widget_set_visible(GTK_WIDGET(task),
+                             !strcmp(task->data->list_uid, uid) &&
+                                 !task->data->deleted);
   }
 }
 
@@ -167,17 +168,13 @@ void errands_task_list_filter_by_text(const char *text) {
 }
 
 static bool errands_task_list_sorted_by_completion(GtkWidget *task_list) {
-  GtkWidget *task = gtk_widget_get_last_child(task_list);
-  GtkWidget *prev_task = NULL;
-  TaskData *td, *prev_td;
+  ErrandsTask *task = (ErrandsTask *)gtk_widget_get_last_child(task_list);
+  ErrandsTask *prev_task = NULL;
   while (task) {
-    prev_task = gtk_widget_get_prev_sibling(task);
-    if (prev_task) {
-      td = g_object_get_data(G_OBJECT(task), "task_data");
-      prev_td = g_object_get_data(G_OBJECT(prev_task), "task_data");
-      if (td->completed - prev_td->completed <= 0)
+    prev_task = (ErrandsTask *)gtk_widget_get_prev_sibling(GTK_WIDGET(task));
+    if (prev_task)
+      if (task->data->completed - prev_task->data->completed <= 0)
         return false;
-    }
     task = prev_task;
   }
   return true;
@@ -188,25 +185,26 @@ void errands_task_list_sort_by_completion(GtkWidget *task_list) {
   if (errands_task_list_sorted_by_completion(task_list))
     return;
 
-  GtkWidget *task = gtk_widget_get_last_child(task_list);
+  ErrandsTask *task = (ErrandsTask *)gtk_widget_get_last_child(task_list);
 
   // Return if there are no tasks
   if (!task)
     return;
 
   // Skip if last task completed
-  GtkWidget *last_cmp_task = task;
-  TaskData *td = g_object_get_data(G_OBJECT(task), "task_data");
-  if (td->completed)
-    task = last_cmp_task = gtk_widget_get_prev_sibling(task);
+  ErrandsTask *last_cmp_task = task;
+  if (task->data->completed)
+    task = last_cmp_task =
+        (ErrandsTask *)gtk_widget_get_prev_sibling(GTK_WIDGET(task));
 
   // Sort the rest of the tasks
   while (task) {
-    td = g_object_get_data(G_OBJECT(task), "task_data");
-    if (td->completed) {
-      gtk_box_reorder_child_after(GTK_BOX(task_list), task, last_cmp_task);
-      last_cmp_task = gtk_widget_get_prev_sibling(task);
+    if (task->data->completed) {
+      gtk_box_reorder_child_after(GTK_BOX(task_list), GTK_WIDGET(task),
+                                  GTK_WIDGET(last_cmp_task));
+      last_cmp_task =
+          (ErrandsTask *)gtk_widget_get_prev_sibling(GTK_WIDGET(task));
     }
-    task = gtk_widget_get_prev_sibling(task);
+    task = (ErrandsTask *)gtk_widget_get_prev_sibling(GTK_WIDGET(task));
   }
 }
