@@ -14,11 +14,10 @@ void errands_window_build() {
   g_object_set(state.main_window, "title", "Errands", "hexpand", true, NULL);
   gtk_window_set_default_size(GTK_WINDOW(state.main_window), 800, 600);
 
-  // Main View Stack
   state.stack = adw_view_stack_new();
 
   state.notes_window = errands_notes_window_new();
-  errands_priority_window_build();
+  state.priority_window = errands_priority_window_new();
   errands_tags_page_build();
   errands_task_list_build();
   errands_sidebar_build();

@@ -2,6 +2,7 @@
 #define ERRANDS_STATE_H
 
 #include "notes-window.h"
+#include "priority-window.h"
 
 #include <adwaita.h>
 
@@ -38,7 +39,7 @@ typedef struct {
   AdwDialog *tags_window;
 
   // Priority
-  AdwDialog *priority_window;
+  ErrandsPriorityWindow *priority_window;
 
   // User Data
   GPtrArray *tl_data;
