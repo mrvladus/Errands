@@ -1,7 +1,7 @@
 #ifndef ERRANDS_NOTES_WINDOW_H
 #define ERRANDS_NOTES_WINDOW_H
 
-#include "data.h"
+#include "task.h"
 
 #include <adwaita.h>
 #include <gtksourceview/gtksource.h>
@@ -14,10 +14,10 @@ G_DECLARE_FINAL_TYPE(ErrandsNotesWindow, errands_notes_window, ERRANDS,
 struct _ErrandsNotesWindow {
   AdwDialog parent_instance;
   GtkWidget *view;
-  TaskData *data;
+  ErrandsTask *task;
 };
 
 ErrandsNotesWindow *errands_notes_window_new();
-void errands_notes_window_show(TaskData *data);
+void errands_notes_window_show(ErrandsTask *task);
 
 #endif // ERRANDS_NOTES_WINDOW_H

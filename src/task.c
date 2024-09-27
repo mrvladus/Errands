@@ -120,7 +120,7 @@ ErrandsTask *errands_task_new(TaskData *data) {
                                data->toolbar_shown);
   // Lazy load toolbar
   if (data->toolbar_shown) {
-    task->toolbar = errands_task_toolbar_new(data);
+    task->toolbar = errands_task_toolbar_new(task);
     gtk_revealer_set_child(GTK_REVEALER(task->toolbar_revealer),
                            GTK_WIDGET(task->toolbar));
   }
@@ -172,7 +172,7 @@ static void on_errands_task_toolbar_btn_toggle(GtkToggleButton *btn,
   LOG("Toggle toolbar '%s'", task->data->uid);
   // Lazy load toolbar
   if (!task->toolbar) {
-    task->toolbar = errands_task_toolbar_new(task->data);
+    task->toolbar = errands_task_toolbar_new(task);
     gtk_revealer_set_child(GTK_REVEALER(task->toolbar_revealer),
                            GTK_WIDGET(task->toolbar));
   }

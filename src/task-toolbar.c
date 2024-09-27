@@ -1,5 +1,4 @@
 #include "task-toolbar.h"
-#include "data.h"
 #include "notes-window.h"
 #include "priority-window.h"
 
@@ -46,11 +45,11 @@ static void errands_task_toolbar_init(ErrandsTaskToolbar *self) {
   gtk_box_append(GTK_BOX(self), self->attachments_btn);
 }
 
-ErrandsTaskToolbar *errands_task_toolbar_new(TaskData *td) {
+ErrandsTaskToolbar *errands_task_toolbar_new(void *task) {
   ErrandsTaskToolbar *tb = g_object_new(ERRANDS_TYPE_TASK_TOOLBAR, NULL);
   g_signal_connect_swapped(tb->notes_btn, "clicked",
-                           G_CALLBACK(errands_notes_window_show), td);
+                           G_CALLBACK(errands_notes_window_show), task);
   g_signal_connect_swapped(tb->priority_btn, "clicked",
-                           G_CALLBACK(errands_priority_window_show), td);
+                           G_CALLBACK(errands_priority_window_show), task);
   return tb;
 }

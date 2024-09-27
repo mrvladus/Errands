@@ -1,6 +1,7 @@
 #include "notes-window.h"
 #include "data.h"
 #include "state.h"
+#include "task.h"
 #include "utils.h"
 
 static void on_errands_notes_window_close_cb(ErrandsNotesWindow *win,
@@ -41,12 +42,12 @@ ErrandsNotesWindow *errands_notes_window_new() {
   return g_object_ref_sink(g_object_new(ERRANDS_TYPE_NOTES_WINDOW, NULL));
 }
 
-void errands_notes_window_show(TaskData *data) {
+void errands_notes_window_show(ErrandsTask *task) {
   adw_dialog_present(ADW_DIALOG(state.notes_window), state.main_window);
-  state.notes_window->data = data;
+  state.notes_window->task = task;
   gtk_text_buffer_set_text(
       gtk_text_view_get_buffer(GTK_TEXT_VIEW(state.notes_window->view)),
-      data->notes, -1);
+      task->data->notes, -1);
 }
 
 // --- SIGNAL HANDLERS --- //
@@ -62,10 +63,16 @@ static void on_errands_notes_window_close_cb(ErrandsNotesWindow *win,
   char *text = gtk_text_buffer_get_text(buf, &start, &end, FALSE);
 
   // If text is different then save it
-  if (strcmp(text, win->data->notes)) {
-    free(win->data->notes);
-    win->data->notes = strdup(text);
+  if (strcmp(text, win->task->data->notes)) {
+    free(win->task->data->notes);
+    win->task->data->notes = strdup(text);
     errands_data_write();
   }
   g_free(text);
+
+  // Add css class to button if notes not empty
+  if (strcmp(win->task->data->notes, ""))
+    gtk_widget_add_css_class(win->task->toolbar->notes_btn, "accent");
+  else
+    gtk_widget_remove_css_class(win->task->toolbar->notes_btn, "accent");
 }

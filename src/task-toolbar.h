@@ -1,8 +1,6 @@
 #ifndef ERRANDS_TASK_TOOLBAR_H
 #define ERRANDS_TASK_TOOLBAR_H
 
-#include "data.h"
-
 #include <gtk/gtk.h>
 
 #define ERRANDS_TYPE_TASK_TOOLBAR (errands_task_toolbar_get_type())
@@ -19,6 +17,6 @@ struct _ErrandsTaskToolbar {
   GtkWidget *attachments_btn;
 };
 
-ErrandsTaskToolbar *errands_task_toolbar_new(TaskData *td);
+ErrandsTaskToolbar *errands_task_toolbar_new(void *task);
 
 #endif // ERRANDS_TASK_TOOLBAR_H
