@@ -13,7 +13,7 @@
 static void on_errands_task_complete_btn_toggle(GtkCheckButton *btn,
                                                 ErrandsTask *task);
 static void on_errands_task_toolbar_btn_toggle(GtkToggleButton *btn,
-                                               TaskData *data);
+                                               ErrandsTask *task);
 static void on_errands_task_expand_click(GtkGestureClick *self, gint n_press,
                                          gdouble x, gdouble y,
                                          ErrandsTask *task);
@@ -118,8 +118,12 @@ ErrandsTask *errands_task_new(TaskData *data) {
                               data->completed);
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(task->toolbar_btn),
                                data->toolbar_shown);
-  gtk_revealer_set_child(GTK_REVEALER(task->toolbar_revealer),
-                         GTK_WIDGET(errands_task_toolbar_new(data)));
+  // Lazy load toolbar
+  if (data->toolbar_shown) {
+    task->toolbar = errands_task_toolbar_new(data);
+    gtk_revealer_set_child(GTK_REVEALER(task->toolbar_revealer),
+                           GTK_WIDGET(task->toolbar));
+  }
   gtk_revealer_set_reveal_child(GTK_REVEALER(task->sub_tasks_revealer),
                                 data->expanded);
 
@@ -138,7 +142,7 @@ ErrandsTask *errands_task_new(TaskData *data) {
   g_signal_connect(task->complete_btn, "toggled",
                    G_CALLBACK(on_errands_task_complete_btn_toggle), task);
   g_signal_connect(task->toolbar_btn, "toggled",
-                   G_CALLBACK(on_errands_task_toolbar_btn_toggle), data);
+                   G_CALLBACK(on_errands_task_toolbar_btn_toggle), task);
   g_signal_connect(task->sub_entry, "activate",
                    G_CALLBACK(on_errands_task_sub_task_added), task);
 
@@ -164,10 +168,15 @@ static void on_errands_task_complete_btn_toggle(GtkCheckButton *btn,
 }
 
 static void on_errands_task_toolbar_btn_toggle(GtkToggleButton *btn,
-                                               TaskData *data) {
-  LOG("Toggle toolbar '%s'", data->uid);
-
-  data->toolbar_shown = gtk_toggle_button_get_active(btn);
+                                               ErrandsTask *task) {
+  LOG("Toggle toolbar '%s'", task->data->uid);
+  // Lazy load toolbar
+  if (!task->toolbar) {
+    task->toolbar = errands_task_toolbar_new(task->data);
+    gtk_revealer_set_child(GTK_REVEALER(task->toolbar_revealer),
+                           GTK_WIDGET(task->toolbar));
+  }
+  task->data->toolbar_shown = gtk_toggle_button_get_active(btn);
   errands_data_write();
 }
 

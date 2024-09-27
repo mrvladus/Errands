@@ -2,11 +2,11 @@
 #define ERRANDS_TASK_H
 
 #include "data.h"
+#include "task-toolbar.h"
 
 #include <adwaita.h>
 
 #define ERRANDS_TYPE_TASK (errands_task_get_type())
-
 G_DECLARE_FINAL_TYPE(ErrandsTask, errands_task, ERRANDS, TASK, AdwBin)
 
 struct _ErrandsTask {
@@ -18,6 +18,7 @@ struct _ErrandsTask {
   GtkWidget *complete_btn;
   GtkWidget *toolbar_btn;
   GtkWidget *toolbar_revealer;
+  ErrandsTaskToolbar *toolbar;
   GtkWidget *sub_tasks_revealer;
   GtkWidget *sub_entry;
   GtkWidget *sub_tasks;
@@ -25,7 +26,5 @@ struct _ErrandsTask {
 };
 
 ErrandsTask *errands_task_new(TaskData *data);
-
-// GtkWidget *errands_task_new(TaskData *td);
 
 #endif // ERRANDS_TASK_H

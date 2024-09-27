@@ -113,7 +113,7 @@ void errands_task_list_build() {
                            "errands_task_list_page");
 
   // Sort tasks
-  errands_task_list_sort_by_completion(state.task_list);
+  // errands_task_list_sort_by_completion(state.task_list);
   state.current_uid = "";
 }
 
@@ -145,25 +145,25 @@ void errands_task_list_filter_by_text(const char *text) {
   // Search all tasks
   if (!strcmp(state.current_uid, "")) {
     for (int i = 0; i < tasks->len; i++) {
-      GtkWidget *task = tasks->pdata[i];
-      TaskData *td = g_object_get_data(G_OBJECT(task), "task_data");
-      bool contains = string_contains(td->text, text) ||
-                      string_contains(td->notes, text) ||
-                      string_array_contains(td->tags, text);
-      gtk_widget_set_visible(task, !td->deleted && contains);
+      ErrandsTask *task = tasks->pdata[i];
+      bool contains = string_contains(task->data->text, text) ||
+                      string_contains(task->data->notes, text) ||
+                      string_array_contains(task->data->tags, text);
+      gtk_widget_set_visible(GTK_WIDGET(task),
+                             !task->data->deleted && contains);
     }
     return;
   }
   // Search for task list uid
   for (int i = 0; i < tasks->len; i++) {
-    GtkWidget *task = tasks->pdata[i];
-    TaskData *td = g_object_get_data(G_OBJECT(task), "task_data");
-    bool contains = string_contains(td->text, text) ||
-                    string_contains(td->notes, text) ||
-                    string_array_contains(td->tags, text);
-    gtk_widget_set_visible(task, !td->deleted &&
-                                     !strcmp(td->list_uid, state.current_uid) &&
-                                     contains);
+    ErrandsTask *task = tasks->pdata[i];
+    bool contains = string_contains(task->data->text, text) ||
+                    string_contains(task->data->notes, text) ||
+                    string_array_contains(task->data->tags, text);
+    gtk_widget_set_visible(GTK_WIDGET(task), !task->data->deleted &&
+                                                 !strcmp(task->data->list_uid,
+                                                         state.current_uid) &&
+                                                 contains);
   }
 }
 
