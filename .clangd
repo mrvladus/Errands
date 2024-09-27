@@ -1,5 +1,7 @@
 CompileFlags:
   Add:
+    - -x
+    - c
     - -I/usr/include/libadwaita-1
     - -I/usr/include/gtk-4.0
     - -I/usr/include/pango-1.0

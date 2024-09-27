@@ -1,7 +1,6 @@
 #ifndef ERRANDS_UTILS_H
 #define ERRANDS_UTILS_H
 
-#include <glib.h>
 #include <gtk/gtk.h>
 
 #include <stdio.h>

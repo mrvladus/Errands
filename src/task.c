@@ -77,9 +77,9 @@ GtkWidget *errands_task_new(TaskData *td) {
   gtk_box_append(GTK_BOX(vbox), title_lb);
 
   // Toolbar revealer
+  ErrandsTaskToolbar *toolbar = errands_task_toolbar_new(td);
   GtkWidget *tb_rev = gtk_revealer_new();
-  g_object_set(tb_rev, "child", errands_task_toolbar_new(td), "reveal-child",
-               true, NULL);
+  g_object_set(tb_rev, "child", toolbar, "reveal-child", true, NULL);
   g_object_bind_property(toolbar_btn, "active", tb_rev, "reveal-child",
                          G_BINDING_SYNC_CREATE);
   gtk_box_append(GTK_BOX(vbox), tb_rev);

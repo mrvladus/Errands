@@ -17,6 +17,7 @@ static void on_task_added(AdwEntryRow *entry, gpointer data) {
 
   if (!state.current_uid)
     return;
+
   TaskData *td = errands_data_add_task((char *)text, state.current_uid, "");
   GtkWidget *t = errands_task_new(td);
   gtk_box_prepend(GTK_BOX(state.task_list), t);

@@ -1,15 +1,12 @@
 #ifndef ERRANDS_DATA_H
 #define ERRANDS_DATA_H
 
-#include "utils.h"
-
-#include <glib.h>
+#include <gtk/gtk.h>
 
 #include <stdbool.h>
 #include <stdint.h>
 
 typedef struct {
-  // Associated task widget
   GtkWidget *task;
 
   GPtrArray *attachments;
@@ -47,12 +44,9 @@ typedef struct {
 
 void errands_data_load();
 void errands_data_write();
-
 TaskData *errands_data_add_task(char *text, char *list_uid, char *parent_uid);
 TaskListData *errands_data_add_list(const char *name);
-
 TaskData *errands_data_get_task(char *uid);
-
 void errands_data_print(char *list_uid, char *file_path);
 
 #endif // ERRANDS_DATA_H
