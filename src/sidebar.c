@@ -6,6 +6,7 @@
 #include "sidebar-task-list-row.h"
 #include "state.h"
 #include "task-list.h"
+#include "utils.h"
 
 #include <gtk/gtk.h>
 

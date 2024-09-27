@@ -2,6 +2,7 @@
 #include "data.h"
 #include "state.h"
 #include "task-list.h"
+#include "utils.h"
 
 #include <string.h>
 

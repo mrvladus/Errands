@@ -1,10 +1,7 @@
 #ifndef ERRANDS_STATE_H
 #define ERRANDS_STATE_H
 
-#include "data.h"
-#include "gtk/gtkshortcut.h"
-#include "task-list.h"
-#include "utils.h"
+#include "notes-window.h"
 
 #include <adwaita.h>
 
@@ -35,7 +32,7 @@ typedef struct {
   // Dialog windows
 
   // Notes window
-  AdwDialog *notes_window;
+  ErrandsNotesWindow *notes_window;
 
   AdwDialog *datetime_window;
   AdwDialog *tags_window;

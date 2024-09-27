@@ -4,6 +4,8 @@
 #include "sidebar.h"
 #include "state.h"
 #include "tags-page.h"
+#include "task-list.h"
+#include "utils.h"
 
 void errands_window_build() {
   LOG("Creating main window");
@@ -15,7 +17,7 @@ void errands_window_build() {
   // Main View Stack
   state.stack = adw_view_stack_new();
 
-  errands_notes_window_build();
+  state.notes_window = errands_notes_window_new();
   errands_priority_window_build();
   errands_tags_page_build();
   errands_task_list_build();

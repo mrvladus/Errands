@@ -4,6 +4,7 @@
 #include "gtk/gtk.h"
 #include "gtk/gtkshortcut.h"
 #include "state.h"
+#include "utils.h"
 
 #include <string.h>
 
