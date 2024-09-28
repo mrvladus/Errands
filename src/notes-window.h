@@ -14,6 +14,8 @@ G_DECLARE_FINAL_TYPE(ErrandsNotesWindow, errands_notes_window, ERRANDS,
 struct _ErrandsNotesWindow {
   AdwDialog parent_instance;
   GtkWidget *view;
+  GtkSourceBuffer *buffer;
+  GtkSourceLanguage *md_lang;
   ErrandsTask *task;
 };
 
