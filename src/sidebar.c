@@ -3,7 +3,6 @@
 #include "data.h"
 #include "new-list-dialog.h"
 #include "sidebar-all-row.h"
-#include "sidebar-task-list-row.h"
 #include "state.h"
 #include "task-list.h"
 #include "utils.h"
@@ -103,8 +102,8 @@ void errands_sidebar_build() {
                                         "errands_task_list_page");
 }
 
-GtkWidget *errands_sidebar_add_task_list(TaskListData *data) {
-  GtkWidget *row = errands_sidebar_task_list_row_new(data);
-  gtk_list_box_append(GTK_LIST_BOX(state.task_lists_list_box), row);
+ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(TaskListData *data) {
+  ErrandsSidebarTaskListRow *row = errands_sidebar_task_list_row_new(data);
+  gtk_list_box_append(GTK_LIST_BOX(state.task_lists_list_box), GTK_WIDGET(row));
   return row;
 }

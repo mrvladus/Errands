@@ -1,6 +1,7 @@
 #include "new-list-dialog.h"
 #include "data.h"
 #include "gtk/gtk.h"
+#include "sidebar-task-list-row.h"
 #include "sidebar.h"
 #include "state.h"
 #include <string.h>
@@ -78,7 +79,7 @@ static void on_response_cb(AdwAlertDialog *dialog, gchar *response,
   if (!strcmp(response, "create")) {
     TaskListData *tld = errands_data_add_list(
         gtk_editable_get_text(GTK_EDITABLE(new_list_dialog_entry)));
-    GtkWidget *row = errands_sidebar_add_task_list(tld);
+    ErrandsSidebarTaskListRow *row = errands_sidebar_add_task_list(tld);
     g_signal_emit_by_name(row, "activate", NULL);
   }
 }
