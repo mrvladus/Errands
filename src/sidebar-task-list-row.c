@@ -1,5 +1,6 @@
 #include "sidebar-task-list-row.h"
 #include "data.h"
+#include "gio/gio.h"
 #include "gtk/gtk.h"
 #include "state.h"
 #include "task-list.h"
@@ -10,6 +11,12 @@
 
 static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x,
                            gdouble y, GtkPopover *popover);
+static void on_action_rename(GSimpleAction *action, GVariant *param,
+                             gpointer data);
+static void on_action_export(GSimpleAction *action, GVariant *param,
+                             gpointer data);
+static void on_action_delete(GSimpleAction *action, GVariant *param,
+                             gpointer data);
 
 G_DEFINE_TYPE(ErrandsSidebarTaskListRow, errands_sidebar_task_list_row,
               GTK_TYPE_LIST_BOX_ROW)
@@ -52,6 +59,16 @@ errands_sidebar_task_list_row_init(ErrandsSidebarTaskListRow *self) {
   gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(ctrl), 3);
   g_signal_connect(ctrl, "released", G_CALLBACK(on_right_click), menu_popover);
   gtk_widget_add_controller(box, GTK_EVENT_CONTROLLER(ctrl));
+
+  // Actions
+  GSimpleActionGroup *ag = g_simple_action_group_new();
+  const GActionEntry entries[] = {{"rename", on_action_rename},
+                                  {"export", on_action_export},
+                                  {"delete", on_action_delete}};
+  g_action_map_add_action_entries(G_ACTION_MAP(ag), entries,
+                                  G_N_ELEMENTS(entries), NULL);
+  gtk_widget_insert_action_group(GTK_WIDGET(self), "task-list-row",
+                                 G_ACTION_GROUP(ag));
 }
 
 ErrandsSidebarTaskListRow *
@@ -119,4 +136,19 @@ static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x,
                            gdouble y, GtkPopover *popover) {
   gtk_popover_set_pointing_to(popover, &(GdkRectangle){.x = x, .y = y});
   gtk_popover_popup(popover);
+}
+
+static void on_action_rename(GSimpleAction *action, GVariant *param,
+                             gpointer data) {
+  LOG("Rename");
+}
+
+static void on_action_export(GSimpleAction *action, GVariant *param,
+                             gpointer data) {
+  LOG("Export");
+}
+
+static void on_action_delete(GSimpleAction *action, GVariant *param,
+                             gpointer data) {
+  LOG("Delete");
 }
