@@ -1,7 +1,9 @@
 #include "sidebar-task-list-row.h"
 #include "data.h"
 #include "gio/gio.h"
+#include "glib-object.h"
 #include "gtk/gtk.h"
+#include "rename-list-dialog.h"
 #include "state.h"
 #include "task-list.h"
 #include "utils.h"
@@ -12,7 +14,7 @@
 static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x,
                            gdouble y, GtkPopover *popover);
 static void on_action_rename(GSimpleAction *action, GVariant *param,
-                             gpointer data);
+                             ErrandsSidebarTaskListRow *row);
 static void on_action_export(GSimpleAction *action, GVariant *param,
                              gpointer data);
 static void on_action_delete(GSimpleAction *action, GVariant *param,
@@ -62,11 +64,11 @@ errands_sidebar_task_list_row_init(ErrandsSidebarTaskListRow *self) {
 
   // Actions
   GSimpleActionGroup *ag = g_simple_action_group_new();
-  const GActionEntry entries[] = {{"rename", on_action_rename},
-                                  {"export", on_action_export},
-                                  {"delete", on_action_delete}};
-  g_action_map_add_action_entries(G_ACTION_MAP(ag), entries,
-                                  G_N_ELEMENTS(entries), NULL);
+
+  GSimpleAction *rename = g_simple_action_new("rename", NULL);
+  g_signal_connect(rename, "activate", G_CALLBACK(on_action_rename), self);
+  g_action_map_add_action(G_ACTION_MAP(ag), G_ACTION(rename));
+
   gtk_widget_insert_action_group(GTK_WIDGET(self), "task-list-row",
                                  G_ACTION_GROUP(ag));
 }
@@ -139,8 +141,9 @@ static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x,
 }
 
 static void on_action_rename(GSimpleAction *action, GVariant *param,
-                             gpointer data) {
-  LOG("Rename");
+                             ErrandsSidebarTaskListRow *row) {
+  LOG("%s", row->data->name);
+  errands_rename_list_dialog_show(row);
 }
 
 static void on_action_export(GSimpleAction *action, GVariant *param,

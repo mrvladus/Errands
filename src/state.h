@@ -3,6 +3,7 @@
 
 #include "notes-window.h"
 #include "priority-window.h"
+#include "rename-list-dialog.h"
 
 #include <adwaita.h>
 
@@ -29,6 +30,8 @@ typedef struct {
   GtkWidget *today_row;
   GtkWidget *tags_row;
   GtkWidget *trash_row;
+
+  ErrandsRenameListDialog *rename_list_dialog;
 
   // Dialog windows
 

@@ -1,6 +1,7 @@
 #include "window.h"
 #include "notes-window.h"
 #include "priority-window.h"
+#include "rename-list-dialog.h"
 #include "sidebar.h"
 #include "state.h"
 #include "tags-page.h"
@@ -18,6 +19,7 @@ void errands_window_build() {
 
   state.notes_window = errands_notes_window_new();
   state.priority_window = errands_priority_window_new();
+  state.rename_list_dialog = errands_rename_list_dialog_new();
   errands_tags_page_build();
   errands_task_list_build();
   errands_sidebar_build();
