@@ -8,5 +8,6 @@
 void errands_sidebar_build();
 GtkWidget *errands_sidebar_get_list_row(const char *uid);
 ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(TaskListData *data);
+void errands_sidebar_select_last_opened_page();
 
 #endif // ERRANDS_SIDEBAR_H

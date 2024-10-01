@@ -1,7 +1,7 @@
 #include "sidebar.h"
 #include "components.h"
 #include "data.h"
-#include "gtk/gtkrevealer.h"
+#include "glib-object.h"
 #include "new-list-dialog.h"
 #include "sidebar-all-row.h"
 #include "state.h"
@@ -103,12 +103,16 @@ void errands_sidebar_build() {
   state.sidebar = tb;
 
   // Select last opened page
-  adw_view_stack_set_visible_child_name(ADW_VIEW_STACK(state.stack),
-                                        "errands_task_list_page");
+  g_signal_connect(state.main_window, "realize",
+                   G_CALLBACK(errands_sidebar_select_last_opened_page), NULL);
 }
 
 ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(TaskListData *data) {
   ErrandsSidebarTaskListRow *row = errands_sidebar_task_list_row_new(data);
   gtk_list_box_append(GTK_LIST_BOX(state.task_lists_list_box), GTK_WIDGET(row));
   return row;
+}
+
+void errands_sidebar_select_last_opened_page() {
+  g_signal_emit_by_name(state.all_row, "activate", NULL);
 }
