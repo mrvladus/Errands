@@ -1,5 +1,7 @@
 #include "task-list.h"
+#include "adwaita.h"
 #include "data.h"
+#include "glib.h"
 #include "sidebar-all-row.h"
 #include "sidebar-task-list-row.h"
 #include "state.h"
@@ -8,47 +10,24 @@
 
 #include <string.h>
 
-static void on_task_added(AdwEntryRow *entry, gpointer data) {
-  const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
+static void on_task_added(AdwEntryRow *entry, gpointer data);
+static void on_task_list_search(GtkSearchEntry *entry, gpointer user_data);
 
-  // Skip empty text
-  if (!strcmp(text, ""))
-    return;
+G_DEFINE_TYPE(ErrandsTaskList, errands_task_list, ADW_TYPE_BIN)
 
-  if (!state.current_uid)
-    return;
+static void errands_task_list_class_init(ErrandsTaskListClass *class) {}
 
-  TaskData *td = errands_data_add_task((char *)text, state.current_uid, "");
-  ErrandsTask *t = errands_task_new(td);
-  gtk_box_prepend(GTK_BOX(state.task_list), GTK_WIDGET(t));
-
-  // Clear text
-  gtk_editable_set_text(GTK_EDITABLE(entry), "");
-
-  // Update counter
-  errands_sidebar_task_list_row_update_counter(
-      errands_sidebar_task_list_row_get(state.current_uid));
-  errands_sidebar_all_row_update_counter();
-
-  LOG("Add task '%s' to task list '%s'", td->uid, td->list_uid);
-}
-
-static void on_task_list_search(GtkSearchEntry *entry, gpointer user_data) {
-  const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
-  errands_task_list_filter_by_text(text);
-}
-
-void errands_task_list_build() {
-  LOG("Creating task list");
-
+static void errands_task_list_init(ErrandsTaskList *self) {
   // Toolbar View
   GtkWidget *tb = adw_toolbar_view_new();
   g_object_set(tb, "width-request", 360, NULL);
+  adw_bin_set_child(ADW_BIN(self), tb);
 
   // Header Bar
   GtkWidget *hb = adw_header_bar_new();
+  self->title = adw_window_title_new("", "");
+  adw_header_bar_set_title_widget(ADW_HEADER_BAR(hb), self->title);
   adw_toolbar_view_add_top_bar(ADW_TOOLBAR_VIEW(tb), hb);
-  g_object_set(hb, "show-title", false, NULL);
 
   // Search Bar
   GtkWidget *sb = gtk_search_bar_new();
@@ -56,9 +35,9 @@ void errands_task_list_build() {
   GtkWidget *s_btn = gtk_toggle_button_new();
   g_object_set(s_btn, "icon-name", "errands-search-symbolic", NULL);
   gtk_widget_add_css_class(s_btn, "flat");
-  adw_header_bar_pack_end(ADW_HEADER_BAR(hb), s_btn);
   g_object_bind_property(s_btn, "active", sb, "search-mode-enabled",
                          G_BINDING_BIDIRECTIONAL);
+  adw_header_bar_pack_end(ADW_HEADER_BAR(hb), s_btn);
   GtkWidget *se = gtk_search_entry_new();
   g_signal_connect(se, "search-changed", G_CALLBACK(on_task_list_search), NULL);
   gtk_search_bar_connect_entry(GTK_SEARCH_BAR(sb), GTK_EDITABLE(se));
@@ -75,26 +54,27 @@ void errands_task_list_build() {
   GtkWidget *entry_clamp = adw_clamp_new();
   g_object_set(entry_clamp, "child", task_entry, "tightening-threshold", 300,
                "maximum-size", 1000, "margin-top", 6, "margin-bottom", 6, NULL);
-  state.task_list_entry = gtk_revealer_new();
-  g_object_set(state.task_list_entry, "child", entry_clamp, "transition-type",
+  self->entry = gtk_revealer_new();
+  g_object_set(self->entry, "child", entry_clamp, "transition-type",
                GTK_REVEALER_TRANSITION_TYPE_SLIDE_UP, "margin-start", 12,
                "margin-end", 12, NULL);
-  g_object_bind_property(s_btn, "active", state.task_list_entry, "reveal-child",
+  g_object_bind_property(s_btn, "active", self->entry, "reveal-child",
                          G_BINDING_SYNC_CREATE | G_BINDING_INVERT_BOOLEAN);
 
   // Tasks Box
-  state.task_list = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+  self->task_list = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   for (int i = 0; i < state.t_data->len; i++) {
     TaskData *data = state.t_data->pdata[i];
     if (!strcmp(data->parent, "") && !data->deleted)
-      gtk_box_append(GTK_BOX(state.task_list),
+      gtk_box_append(GTK_BOX(self->task_list),
                      GTK_WIDGET(errands_task_new(data)));
   }
 
+  // Task list clamp
   GtkWidget *tbox_clamp = adw_clamp_new();
   g_object_set(tbox_clamp, "tightening-threshold", 300, "maximum-size", 1000,
                "margin-start", 12, "margin-end", 12, NULL);
-  adw_clamp_set_child(ADW_CLAMP(tbox_clamp), state.task_list);
+  adw_clamp_set_child(ADW_CLAMP(tbox_clamp), self->task_list);
 
   // Scrolled window
   GtkWidget *scrl = gtk_scrolled_window_new();
@@ -103,21 +83,50 @@ void errands_task_list_build() {
 
   // VBox
   GtkWidget *vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-  gtk_box_append(GTK_BOX(vbox), state.task_list_entry);
+  gtk_box_append(GTK_BOX(vbox), self->entry);
   gtk_box_append(GTK_BOX(vbox), scrl);
   adw_toolbar_view_set_content(ADW_TOOLBAR_VIEW(tb), vbox);
 
   // Create task list page in the view stack
-  adw_view_stack_add_named(ADW_VIEW_STACK(state.stack), tb,
+  adw_view_stack_add_named(ADW_VIEW_STACK(state.stack), GTK_WIDGET(self),
                            "errands_task_list_page");
 
-  // Sort tasks
-  // errands_task_list_sort_by_completion(state.task_list);
-  state.current_uid = "";
+  errands_task_list_sort_by_completion(self->task_list);
+}
+
+ErrandsTaskList *errands_task_list_new() {
+  return g_object_new(ERRANDS_TYPE_TASK_LIST, NULL);
+}
+
+void errands_task_list_update_title() {
+  if (!state.task_list->data)
+    return;
+
+  // Set name of the list
+  adw_window_title_set_title(ADW_WINDOW_TITLE(state.task_list->title),
+                             state.task_list->data->name);
+
+  // Set completed stats
+  int completed = 0;
+  int total = 0;
+  for (int i = 0; i < state.t_data->len; i++) {
+    TaskData *td = state.t_data->pdata[i];
+    if (!strcmp(td->list_uid, state.task_list->data->uid) && !td->deleted &&
+        !td->trash) {
+      total++;
+      if (td->completed)
+        completed++;
+    }
+  }
+  const char *stats =
+      g_strdup_printf("%s %d / %d", "Completed:", completed, total);
+  adw_window_title_set_subtitle(ADW_WINDOW_TITLE(state.task_list->title),
+                                total > 0 ? stats : "");
+  g_free((gpointer)stats);
 }
 
 void errands_task_list_filter_by_uid(const char *uid) {
-  GPtrArray *tasks = get_children(state.task_list);
+  GPtrArray *tasks = get_children(state.task_list->task_list);
 
   if (!strcmp(uid, "")) {
     for (int i = 0; i < tasks->len; i++) {
@@ -140,9 +149,9 @@ void errands_task_list_filter_by_uid(const char *uid) {
 }
 
 void errands_task_list_filter_by_text(const char *text) {
-  GPtrArray *tasks = get_children(state.task_list);
+  GPtrArray *tasks = get_children(state.task_list->task_list);
   // Search all tasks
-  if (!strcmp(state.current_uid, "")) {
+  if (!strcmp(state.task_list->data->uid, "")) {
     for (int i = 0; i < tasks->len; i++) {
       ErrandsTask *task = tasks->pdata[i];
       bool contains = string_contains(task->data->text, text) ||
@@ -159,10 +168,11 @@ void errands_task_list_filter_by_text(const char *text) {
     bool contains = string_contains(task->data->text, text) ||
                     string_contains(task->data->notes, text) ||
                     string_array_contains(task->data->tags, text);
-    gtk_widget_set_visible(GTK_WIDGET(task), !task->data->deleted &&
-                                                 !strcmp(task->data->list_uid,
-                                                         state.current_uid) &&
-                                                 contains);
+    gtk_widget_set_visible(
+        GTK_WIDGET(task),
+        !task->data->deleted &&
+            !strcmp(task->data->list_uid, state.task_list->data->uid) &&
+            contains);
   }
 }
 
@@ -206,4 +216,37 @@ void errands_task_list_sort_by_completion(GtkWidget *task_list) {
     }
     task = (ErrandsTask *)gtk_widget_get_prev_sibling(GTK_WIDGET(task));
   }
+}
+
+// --- SIGNAL HANDLERS --- //
+
+static void on_task_added(AdwEntryRow *entry, gpointer data) {
+  const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
+
+  // Skip empty text
+  if (!strcmp(text, ""))
+    return;
+
+  if (!state.task_list->data->uid)
+    return;
+
+  TaskData *td =
+      errands_data_add_task((char *)text, state.task_list->data->uid, "");
+  ErrandsTask *t = errands_task_new(td);
+  gtk_box_prepend(GTK_BOX(state.task_list->task_list), GTK_WIDGET(t));
+
+  // Clear text
+  gtk_editable_set_text(GTK_EDITABLE(entry), "");
+
+  // Update counter
+  errands_sidebar_task_list_row_update_counter(
+      errands_sidebar_task_list_row_get(state.task_list->data->uid));
+  errands_sidebar_all_row_update_counter();
+
+  LOG("Add task '%s' to task list '%s'", td->uid, td->list_uid);
+}
+
+static void on_task_list_search(GtkSearchEntry *entry, gpointer user_data) {
+  const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
+  errands_task_list_filter_by_text(text);
 }

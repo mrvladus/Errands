@@ -5,6 +5,7 @@
 #include "notes-window.h"
 #include "priority-window.h"
 #include "rename-list-dialog.h"
+#include "task-list.h"
 
 #include <adwaita.h>
 
@@ -18,9 +19,7 @@ typedef struct {
   GtkWidget *tags_page;
 
   // Task List Page
-  GtkWidget *task_list; // Task List Box
-  GtkWidget *task_list_entry;
-  char *current_uid; // Current list uid
+  ErrandsTaskList *task_list;
 
   // Sidebar list boxes
   GtkWidget *filters_list_box;

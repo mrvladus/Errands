@@ -1,4 +1,5 @@
 #include "sidebar-task-list-row.h"
+#include "adwaita.h"
 #include "data.h"
 #include "delete-list-dialog.h"
 #include "gio/gio.h"
@@ -129,10 +130,13 @@ void on_errands_sidebar_task_list_row_activate(GtkListBox *box,
 
   // Filter by uid
   errands_task_list_filter_by_uid(row->data->uid);
-  state.current_uid = row->data->uid;
+  state.task_list->data = row->data;
 
   // Show entry
-  gtk_widget_set_visible(state.task_list_entry, true);
+  gtk_widget_set_visible(state.task_list->entry, true);
+
+  // Update title
+  errands_task_list_update_title();
 
   LOG("Switch to list '%s'", row->data->uid);
 }

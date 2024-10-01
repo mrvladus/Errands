@@ -1,8 +1,5 @@
 #include "task.h"
-#include "adwaita.h"
 #include "data.h"
-#include "gtk/gtk.h"
-#include "gtk/gtkrevealer.h"
 #include "state.h"
 #include "task-list.h"
 #include "task-toolbar.h"
@@ -160,11 +157,12 @@ static void on_errands_task_complete_btn_toggle(GtkCheckButton *btn,
 
   GtkWidget *task_list;
   if (!strcmp(task->data->parent, ""))
-    task_list = state.task_list;
+    task_list = state.task_list->task_list;
   else
     task_list = gtk_widget_get_parent(GTK_WIDGET(task));
 
   errands_task_list_sort_by_completion(task_list);
+  errands_task_list_update_title();
 }
 
 static void on_errands_task_toolbar_btn_toggle(GtkToggleButton *btn,

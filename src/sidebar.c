@@ -23,7 +23,7 @@ static void on_errands_sidebar_row_activated(GtkListBox *box,
     adw_view_stack_set_visible_child_name(ADW_VIEW_STACK(state.stack),
                                           "errands_task_list_page");
     errands_task_list_filter_by_uid("");
-    gtk_widget_set_visible(state.task_list_entry, false);
+    gtk_widget_set_visible(state.task_list->entry, false);
   }
 }
 

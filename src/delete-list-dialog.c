@@ -44,7 +44,7 @@ static void on_response_cb(ErrandsDeleteListDialog *dialog, gchar *response,
                            gpointer data) {
   if (!strcmp(response, "confirm")) {
     // Delete tasks widgets
-    GPtrArray *tasks = get_children(state.task_list);
+    GPtrArray *tasks = get_children(state.task_list->task_list);
     for (int i = 0; i < tasks->len; i++) {
       ErrandsTask *task = tasks->pdata[i];
       // FIXME

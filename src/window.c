@@ -21,8 +21,8 @@ void errands_window_build() {
   state.priority_window = errands_priority_window_new();
   state.rename_list_dialog = errands_rename_list_dialog_new();
   state.delete_list_dialog = errands_delete_list_dialog_new();
+  state.task_list = errands_task_list_new();
   errands_tags_page_build();
-  errands_task_list_build();
   errands_sidebar_build();
 
   // Split view
