@@ -1,6 +1,5 @@
 #include "task-list.h"
 #include "data.h"
-#include "gtk/gtk.h"
 #include "sidebar-all-row.h"
 #include "sidebar-task-list-row.h"
 #include "state.h"

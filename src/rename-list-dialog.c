@@ -30,7 +30,7 @@ static void errands_rename_list_dialog_init(ErrandsRenameListDialog *self) {
   g_signal_connect(self->entry, "changed", G_CALLBACK(on_entry_changed_cb),
                    self);
   g_signal_connect(self->entry, "entry-activated",
-                   G_CALLBACK(on_entry_activate_cb), NULL);
+                   G_CALLBACK(on_entry_activate_cb), self);
   gtk_list_box_append(GTK_LIST_BOX(box), self->entry);
 
   // Dialog
@@ -86,7 +86,7 @@ static void on_response_cb(ErrandsRenameListDialog *dialog, gchar *response,
     dialog->row->data->name = strdup(text);
     errands_data_write();
     errands_sidebar_task_list_row_update_title(dialog->row);
-    // TODO: update task list title is current uid is the same as this
+    // TODO: update task list title if current uid is the same as this
     // TODO: sync
   }
 }
