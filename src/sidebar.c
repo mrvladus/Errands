@@ -82,7 +82,8 @@ void errands_sidebar_build() {
   // Add rows
   for (int i = 0; i < state.tl_data->len; i++) {
     TaskListData *tld = state.tl_data->pdata[i];
-    errands_sidebar_add_task_list(tld);
+    if (!tld->deleted)
+      errands_sidebar_add_task_list(tld);
   }
 
   // Sidebar content box

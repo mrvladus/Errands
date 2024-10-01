@@ -44,8 +44,12 @@ typedef struct {
 
 void errands_data_load();
 void errands_data_write();
-TaskData *errands_data_add_task(char *text, char *list_uid, char *parent_uid);
 TaskListData *errands_data_add_list(const char *name);
+void errands_data_free_list(TaskListData *data);
+void errands_data_delete_list(TaskListData *data);
+TaskData *errands_data_add_task(char *text, char *list_uid, char *parent_uid);
+void errands_data_free_task(TaskData *data);
+void errands_data_delete_task(const char *list_uid, const char *uid);
 TaskData *errands_data_get_task(char *uid);
 void errands_data_print(char *list_uid, char *file_path);
 

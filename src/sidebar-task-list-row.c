@@ -1,5 +1,6 @@
 #include "sidebar-task-list-row.h"
 #include "data.h"
+#include "delete-list-dialog.h"
 #include "gio/gio.h"
 #include "glib-object.h"
 #include "gtk/gtk.h"
@@ -18,7 +19,7 @@ static void on_action_rename(GSimpleAction *action, GVariant *param,
 static void on_action_export(GSimpleAction *action, GVariant *param,
                              gpointer data);
 static void on_action_delete(GSimpleAction *action, GVariant *param,
-                             gpointer data);
+                             ErrandsSidebarTaskListRow *row);
 
 G_DEFINE_TYPE(ErrandsSidebarTaskListRow, errands_sidebar_task_list_row,
               GTK_TYPE_LIST_BOX_ROW)
@@ -68,6 +69,10 @@ errands_sidebar_task_list_row_init(ErrandsSidebarTaskListRow *self) {
   GSimpleAction *rename = g_simple_action_new("rename", NULL);
   g_signal_connect(rename, "activate", G_CALLBACK(on_action_rename), self);
   g_action_map_add_action(G_ACTION_MAP(ag), G_ACTION(rename));
+
+  GSimpleAction *delete = g_simple_action_new("delete", NULL);
+  g_signal_connect(delete, "activate", G_CALLBACK(on_action_delete), self);
+  g_action_map_add_action(G_ACTION_MAP(ag), G_ACTION(delete));
 
   gtk_widget_insert_action_group(GTK_WIDGET(self), "task-list-row",
                                  G_ACTION_GROUP(ag));
@@ -142,7 +147,6 @@ static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x,
 
 static void on_action_rename(GSimpleAction *action, GVariant *param,
                              ErrandsSidebarTaskListRow *row) {
-  LOG("%s", row->data->name);
   errands_rename_list_dialog_show(row);
 }
 
@@ -152,6 +156,6 @@ static void on_action_export(GSimpleAction *action, GVariant *param,
 }
 
 static void on_action_delete(GSimpleAction *action, GVariant *param,
-                             gpointer data) {
-  LOG("Delete");
+                             ErrandsSidebarTaskListRow *row) {
+  errands_delete_list_dialog_show(row);
 }

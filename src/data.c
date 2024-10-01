@@ -10,6 +10,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+// --- READ / WRITE --- //
+
 // Function to read a file into a string
 static char *errands_data_read() {
   // Get data dir
@@ -82,9 +84,8 @@ void errands_data_load() {
   for (int i = 0; i < len; i++) {
     item = cJSON_GetArrayItem(arr, i);
     TaskData *t = malloc(sizeof(*t));
-    t->attachments = g_ptr_array_new();
     // Get attachments
-    t->tags = g_ptr_array_new();
+    t->attachments = g_ptr_array_new();
     cJSON *atch_arr = cJSON_GetObjectItem(item, "attachments");
     for (int i = 0; i < cJSON_GetArraySize(atch_arr); i++) {
       g_ptr_array_add(t->attachments,
@@ -170,6 +171,7 @@ void errands_data_write() {
   for (int i = 0; i < state.t_data->len; i++) {
     TaskData *data = state.t_data->pdata[i];
     cJSON *t_data = cJSON_CreateObject();
+    // TODO: attachments
     cJSON_AddItemToObject(t_data, "attachments", cJSON_CreateArray());
     cJSON_AddItemToObject(t_data, "color", cJSON_CreateString(data->color));
     cJSON_AddItemToObject(t_data, "completed",
@@ -195,6 +197,7 @@ void errands_data_write() {
     cJSON_AddItemToObject(t_data, "start_date",
                           cJSON_CreateString(data->start_date));
     cJSON_AddItemToObject(t_data, "synced", cJSON_CreateBool(data->synced));
+    // TODO: tags
     cJSON_AddItemToObject(t_data, "tags", cJSON_CreateArray());
     cJSON_AddItemToObject(t_data, "text", cJSON_CreateString(data->text));
     cJSON_AddItemToObject(t_data, "toolbar_shown",
@@ -226,6 +229,8 @@ void errands_data_write() {
   g_free((gpointer)data_file_path);
 }
 
+// --- LISTS --- //
+
 TaskListData *errands_data_add_list(const char *name) {
   TaskListData *tl = malloc(sizeof(*tl));
   tl->color = generate_hex();
@@ -236,13 +241,38 @@ TaskListData *errands_data_add_list(const char *name) {
   tl->uid = g_uuid_string_random();
   g_ptr_array_insert(state.tl_data, 0, tl);
   errands_data_write();
-  LOG("Create list data '%s'", tl->uid);
   return tl;
 }
 
+void errands_data_free_list(TaskListData *data) {
+  free(data->color);
+  free(data->name);
+  free(data->uid);
+}
+
+void errands_data_delete_list(TaskListData *data) {
+  // Mark list as deleted
+  data->deleted = true;
+  // Remove tasks
+  GPtrArray *new_t_data = g_ptr_array_new();
+  for (int i = 0; i < state.t_data->len; i++) {
+    TaskData *td = state.t_data->pdata[i];
+    if (!strcmp(data->uid, td->list_uid)) {
+      errands_data_free_task(td);
+    } else {
+      g_ptr_array_add(new_t_data, td);
+    }
+  }
+  g_ptr_array_free(state.t_data, TRUE);
+  state.t_data = new_t_data;
+  return;
+}
+
+// --- TASKS --- //
+
 TaskData *errands_data_add_task(char *text, char *list_uid, char *parent_uid) {
   TaskData *t = malloc(sizeof(*t));
-  t->attachments = NULL;
+  t->attachments = g_ptr_array_new();
   t->color = strdup("");
   t->completed = false;
   t->changed_at = get_date_time();
@@ -259,7 +289,7 @@ TaskData *errands_data_add_task(char *text, char *list_uid, char *parent_uid) {
   t->rrule = strdup("");
   t->start_date = strdup("");
   t->synced = false;
-  t->tags = NULL;
+  t->tags = g_ptr_array_new();
   t->text = strdup(text);
   t->toolbar_shown = false;
   t->trash = false;
@@ -268,6 +298,27 @@ TaskData *errands_data_add_task(char *text, char *list_uid, char *parent_uid) {
   errands_data_write();
   return t;
 }
+
+void errands_data_free_task(TaskData *data) {
+  for (int i = 0; i < data->attachments->len; i++)
+    free(data->attachments->pdata[i]);
+  g_ptr_array_unref(data->attachments);
+  free(data->changed_at);
+  free(data->created_at);
+  free(data->due_date);
+  free(data->list_uid);
+  free(data->notes);
+  free(data->parent);
+  free(data->rrule);
+  free(data->start_date);
+  for (int i = 0; i < data->tags->len; i++)
+    free(data->tags->pdata[i]);
+  g_ptr_array_unref(data->tags);
+  free(data->text);
+  free(data->uid);
+}
+
+void errands_data_delete_task(const char *list_uid, const char *uid) {}
 
 TaskData *errands_data_get_task(char *uid) {
   TaskData *td = NULL;
@@ -278,6 +329,8 @@ TaskData *errands_data_get_task(char *uid) {
   }
   return td;
 }
+
+// --- OTHER --- //
 
 static void errands_print_tasks(const char *parent_uid, const char *list_uid,
                                 int indent) {

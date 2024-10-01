@@ -87,7 +87,7 @@ void errands_task_list_build() {
   state.task_list = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   for (int i = 0; i < state.t_data->len; i++) {
     TaskData *data = state.t_data->pdata[i];
-    if (!strcmp(data->parent, ""))
+    if (!strcmp(data->parent, "") && !data->deleted)
       gtk_box_append(GTK_BOX(state.task_list),
                      GTK_WIDGET(errands_task_new(data)));
   }

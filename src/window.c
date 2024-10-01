@@ -1,4 +1,5 @@
 #include "window.h"
+#include "delete-list-dialog.h"
 #include "notes-window.h"
 #include "priority-window.h"
 #include "rename-list-dialog.h"
@@ -16,10 +17,10 @@ void errands_window_build() {
   gtk_window_set_default_size(GTK_WINDOW(state.main_window), 800, 600);
 
   state.stack = adw_view_stack_new();
-
   state.notes_window = errands_notes_window_new();
   state.priority_window = errands_priority_window_new();
   state.rename_list_dialog = errands_rename_list_dialog_new();
+  state.delete_list_dialog = errands_delete_list_dialog_new();
   errands_tags_page_build();
   errands_task_list_build();
   errands_sidebar_build();
