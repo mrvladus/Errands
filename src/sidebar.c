@@ -1,6 +1,7 @@
 #include "sidebar.h"
 #include "components.h"
 #include "data.h"
+#include "gtk/gtkrevealer.h"
 #include "new-list-dialog.h"
 #include "sidebar-all-row.h"
 #include "state.h"
@@ -18,12 +19,14 @@ static void on_errands_sidebar_row_activated(GtkListBox *box,
                                              GtkListBoxRow *row,
                                              gpointer data) {
   gtk_list_box_unselect_all(GTK_LIST_BOX(state.task_lists_list_box));
-  if (GTK_WIDGET(row) == state.all_row) {
+  if (GTK_WIDGET(row) == GTK_WIDGET(state.all_row)) {
     LOG("Switch to all tasks page");
     adw_view_stack_set_visible_child_name(ADW_VIEW_STACK(state.stack),
                                           "errands_task_list_page");
+    state.task_list->data = NULL;
+    errands_task_list_update_title();
     errands_task_list_filter_by_uid("");
-    gtk_widget_set_visible(state.task_list->entry, false);
+    gtk_revealer_set_reveal_child(GTK_REVEALER(state.task_list->entry), false);
   }
 }
 
@@ -59,7 +62,8 @@ void errands_sidebar_build() {
   // All tasks row
   state.all_row = errands_sidebar_all_row_new();
   errands_sidebar_all_row_update_counter();
-  gtk_list_box_append(GTK_LIST_BOX(state.filters_list_box), state.all_row);
+  gtk_list_box_append(GTK_LIST_BOX(state.filters_list_box),
+                      GTK_WIDGET(state.all_row));
 
   // // Today row
   // GtkWidget *today_row = errands_sidebar_row_new(

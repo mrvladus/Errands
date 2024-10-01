@@ -1,23 +1,30 @@
 #include "task-list.h"
 #include "adwaita.h"
 #include "data.h"
+#include "glib-object.h"
 #include "glib.h"
+#include "gtk/gtk.h"
+#include "gtk/gtkrevealer.h"
 #include "sidebar-all-row.h"
 #include "sidebar-task-list-row.h"
 #include "state.h"
 #include "task.h"
 #include "utils.h"
 
+#include <stdbool.h>
 #include <string.h>
 
 static void on_task_added(AdwEntryRow *entry, gpointer data);
 static void on_task_list_search(GtkSearchEntry *entry, gpointer user_data);
+static void on_search_btn_toggle(GtkToggleButton *btn);
 
 G_DEFINE_TYPE(ErrandsTaskList, errands_task_list, ADW_TYPE_BIN)
 
 static void errands_task_list_class_init(ErrandsTaskListClass *class) {}
 
 static void errands_task_list_init(ErrandsTaskList *self) {
+  LOG("Creating task list");
+
   // Toolbar View
   GtkWidget *tb = adw_toolbar_view_new();
   g_object_set(tb, "width-request", 360, NULL);
@@ -37,6 +44,7 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   gtk_widget_add_css_class(s_btn, "flat");
   g_object_bind_property(s_btn, "active", sb, "search-mode-enabled",
                          G_BINDING_BIDIRECTIONAL);
+  g_signal_connect(s_btn, "toggled", G_CALLBACK(on_search_btn_toggle), NULL);
   adw_header_bar_pack_end(ADW_HEADER_BAR(hb), s_btn);
   GtkWidget *se = gtk_search_entry_new();
   g_signal_connect(se, "search-changed", G_CALLBACK(on_task_list_search), NULL);
@@ -58,11 +66,12 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   g_object_set(self->entry, "child", entry_clamp, "transition-type",
                GTK_REVEALER_TRANSITION_TYPE_SLIDE_UP, "margin-start", 12,
                "margin-end", 12, NULL);
-  g_object_bind_property(s_btn, "active", self->entry, "reveal-child",
-                         G_BINDING_SYNC_CREATE | G_BINDING_INVERT_BOOLEAN);
+  // g_object_bind_property(s_btn, "active", self->entry, "reveal-child",
+  //                        G_BINDING_SYNC_CREATE | G_BINDING_INVERT_BOOLEAN);
 
   // Tasks Box
   self->task_list = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+  LOG("Loading tasks");
   for (int i = 0; i < state.t_data->len; i++) {
     TaskData *data = state.t_data->pdata[i];
     if (!strcmp(data->parent, "") && !data->deleted)
@@ -99,8 +108,26 @@ ErrandsTaskList *errands_task_list_new() {
 }
 
 void errands_task_list_update_title() {
-  if (!state.task_list->data)
+  // If no data - show for all tasks
+  if (!state.task_list->data) {
+    adw_window_title_set_title(ADW_WINDOW_TITLE(state.task_list->title), "All");
+    // Set completed stats
+    int completed = 0;
+    int total = 0;
+    for (int i = 0; i < state.t_data->len; i++) {
+      TaskData *td = state.t_data->pdata[i];
+      if (!td->deleted && !td->trash) {
+        total++;
+        if (td->completed)
+          completed++;
+      }
+    }
+    char *stats = g_strdup_printf("%s %d / %d", "Completed:", completed, total);
+    adw_window_title_set_subtitle(ADW_WINDOW_TITLE(state.task_list->title),
+                                  total > 0 ? stats : "");
+    g_free(stats);
     return;
+  }
 
   // Set name of the list
   adw_window_title_set_title(ADW_WINDOW_TITLE(state.task_list->title),
@@ -118,11 +145,10 @@ void errands_task_list_update_title() {
         completed++;
     }
   }
-  const char *stats =
-      g_strdup_printf("%s %d / %d", "Completed:", completed, total);
+  char *stats = g_strdup_printf("%s %d / %d", "Completed:", completed, total);
   adw_window_title_set_subtitle(ADW_WINDOW_TITLE(state.task_list->title),
                                 total > 0 ? stats : "");
-  g_free((gpointer)stats);
+  g_free(stats);
 }
 
 void errands_task_list_filter_by_uid(const char *uid) {
@@ -249,4 +275,13 @@ static void on_task_added(AdwEntryRow *entry, gpointer data) {
 static void on_task_list_search(GtkSearchEntry *entry, gpointer user_data) {
   const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
   errands_task_list_filter_by_text(text);
+}
+
+static void on_search_btn_toggle(GtkToggleButton *btn) {
+  bool active = gtk_toggle_button_get_active(btn);
+  if (state.task_list->data)
+    gtk_revealer_set_reveal_child(GTK_REVEALER(state.task_list->entry),
+                                  !active);
+  else
+    gtk_revealer_set_reveal_child(GTK_REVEALER(state.task_list->entry), false);
 }

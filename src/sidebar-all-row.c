@@ -1,36 +1,31 @@
 #include "sidebar-all-row.h"
 #include "data.h"
-#include "glib-object.h"
 #include "gtk/gtk.h"
-#include "gtk/gtkshortcut.h"
 #include "state.h"
 
-GtkWidget *errands_sidebar_all_row_new() {
+G_DEFINE_TYPE(ErrandsSidebarAllRow, errands_sidebar_all_row,
+              GTK_TYPE_LIST_BOX_ROW)
+
+static void
+errands_sidebar_all_row_class_init(ErrandsSidebarAllRowClass *class) {}
+
+static void errands_sidebar_all_row_init(ErrandsSidebarAllRow *self) {
   GtkWidget *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
-
-  // Icon
-  GtkWidget *icon = gtk_image_new_from_icon_name("errands-all-tasks-symbolic");
-  gtk_box_append(GTK_BOX(box), icon);
-
-  // Label
-  GtkWidget *label = gtk_label_new("All");
-  gtk_box_append(GTK_BOX(box), label);
+  gtk_list_box_row_set_child(GTK_LIST_BOX_ROW(self), box);
+  gtk_box_append(GTK_BOX(box),
+                 gtk_image_new_from_icon_name("errands-all-tasks-symbolic"));
+  gtk_box_append(GTK_BOX(box), gtk_label_new("All"));
 
   // Counter
-  GtkWidget *counter = gtk_label_new("");
-  gtk_box_append(GTK_BOX(box), counter);
-  g_object_set(counter, "hexpand", true, "halign", GTK_ALIGN_END, NULL);
-  gtk_widget_add_css_class(counter, "dim-label");
-  gtk_widget_add_css_class(counter, "caption");
+  self->counter = gtk_label_new("");
+  gtk_box_append(GTK_BOX(box), self->counter);
+  g_object_set(self->counter, "hexpand", true, "halign", GTK_ALIGN_END, NULL);
+  gtk_widget_add_css_class(self->counter, "dim-label");
+  gtk_widget_add_css_class(self->counter, "caption");
+}
 
-  // ListBoxRow
-  GtkWidget *row = gtk_list_box_row_new();
-  gtk_list_box_row_set_child(GTK_LIST_BOX_ROW(row), box);
-
-  // Set data
-  g_object_set_data(G_OBJECT(row), "counter", counter);
-
-  return row;
+ErrandsSidebarAllRow *errands_sidebar_all_row_new() {
+  return g_object_new(ERRANDS_TYPE_SIDEBAR_ALL_ROW, NULL);
 }
 
 void errands_sidebar_all_row_update_counter() {
@@ -41,7 +36,6 @@ void errands_sidebar_all_row_update_counter() {
       len++;
   }
   char *num = g_strdup_printf("%d", len);
-  GtkLabel *counter = g_object_get_data(G_OBJECT(state.all_row), "counter");
-  gtk_label_set_label(counter, len > 0 ? num : "");
+  gtk_label_set_label(GTK_LABEL(state.all_row->counter), len > 0 ? num : "");
   g_free(num);
 }

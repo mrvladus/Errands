@@ -118,6 +118,8 @@ void errands_sidebar_task_list_row_update_title(
   gtk_label_set_label(GTK_LABEL(row->label), row->data->name);
 }
 
+// --- SIGNAL HANDLERS --- //
+
 void on_errands_sidebar_task_list_row_activate(GtkListBox *box,
                                                ErrandsSidebarTaskListRow *row,
                                                gpointer user_data) {
@@ -133,7 +135,7 @@ void on_errands_sidebar_task_list_row_activate(GtkListBox *box,
   state.task_list->data = row->data;
 
   // Show entry
-  gtk_widget_set_visible(state.task_list->entry, true);
+  gtk_revealer_set_reveal_child(GTK_REVEALER(state.task_list->entry), true);
 
   // Update title
   errands_task_list_update_title();

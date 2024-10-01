@@ -5,6 +5,7 @@
 #include "notes-window.h"
 #include "priority-window.h"
 #include "rename-list-dialog.h"
+#include "sidebar-all-row.h"
 #include "task-list.h"
 
 #include <adwaita.h>
@@ -26,10 +27,10 @@ typedef struct {
   GtkWidget *task_lists_list_box;
 
   // Sidebar filter rows
-  GtkWidget *all_row;
-  GtkWidget *today_row;
-  GtkWidget *tags_row;
-  GtkWidget *trash_row;
+  ErrandsSidebarAllRow *all_row;
+  // GtkWidget *today_row;
+  // GtkWidget *tags_row;
+  // GtkWidget *trash_row;
 
   ErrandsRenameListDialog *rename_list_dialog;
   ErrandsDeleteListDialog *delete_list_dialog;
