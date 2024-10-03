@@ -2,6 +2,7 @@
 #include "data.h"
 #include "gtk/gtk.h"
 #include "state.h"
+#include "utils.h"
 
 G_DEFINE_TYPE(ErrandsSidebarAllRow, errands_sidebar_all_row,
               GTK_TYPE_LIST_BOX_ROW)
@@ -10,6 +11,8 @@ static void
 errands_sidebar_all_row_class_init(ErrandsSidebarAllRowClass *class) {}
 
 static void errands_sidebar_all_row_init(ErrandsSidebarAllRow *self) {
+  LOG("Creating all tasks sidebar row");
+
   GtkWidget *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
   gtk_list_box_row_set_child(GTK_LIST_BOX_ROW(self), box);
   gtk_box_append(GTK_BOX(box),
@@ -28,7 +31,7 @@ ErrandsSidebarAllRow *errands_sidebar_all_row_new() {
   return g_object_new(ERRANDS_TYPE_SIDEBAR_ALL_ROW, NULL);
 }
 
-void errands_sidebar_all_row_update_counter() {
+void errands_sidebar_all_row_update_counter(ErrandsSidebarAllRow *row) {
   int len = 0;
   for (int i = 0; i < state.t_data->len; i++) {
     TaskData *td = state.t_data->pdata[i];
@@ -36,6 +39,6 @@ void errands_sidebar_all_row_update_counter() {
       len++;
   }
   char *num = g_strdup_printf("%d", len);
-  gtk_label_set_label(GTK_LABEL(state.all_row->counter), len > 0 ? num : "");
+  gtk_label_set_label(GTK_LABEL(row->counter), len > 0 ? num : "");
   g_free(num);
 }

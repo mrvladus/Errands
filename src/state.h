@@ -5,7 +5,7 @@
 #include "notes-window.h"
 #include "priority-window.h"
 #include "rename-list-dialog.h"
-#include "sidebar-all-row.h"
+#include "sidebar.h"
 #include "task-list.h"
 
 #include <adwaita.h>
@@ -16,35 +16,21 @@ typedef struct {
   GtkWidget *main_window;
   GtkWidget *split_view;
   GtkWidget *stack;
-  GtkWidget *sidebar;
   GtkWidget *tags_page;
+  ErrandsSidebar *sidebar;
 
   // Task List Page
   ErrandsTaskList *task_list;
 
-  // Sidebar list boxes
-  GtkWidget *filters_list_box;
-  GtkWidget *task_lists_list_box;
-
-  // Sidebar filter rows
-  ErrandsSidebarAllRow *all_row;
-  // GtkWidget *today_row;
-  // GtkWidget *tags_row;
-  // GtkWidget *trash_row;
-
+  // Dialog windows
   ErrandsRenameListDialog *rename_list_dialog;
   ErrandsDeleteListDialog *delete_list_dialog;
 
-  // Dialog windows
-
   // Notes window
   ErrandsNotesWindow *notes_window;
-
+  ErrandsPriorityWindow *priority_window;
   AdwDialog *datetime_window;
   AdwDialog *tags_window;
-
-  // Priority
-  ErrandsPriorityWindow *priority_window;
 
   // User Data
   GPtrArray *tl_data;

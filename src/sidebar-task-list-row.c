@@ -90,7 +90,7 @@ errands_sidebar_task_list_row_new(TaskListData *data) {
 }
 
 ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_get(const char *uid) {
-  GPtrArray *children = get_children(state.task_lists_list_box);
+  GPtrArray *children = get_children(state.sidebar->task_lists_box);
   for (int i = 0; i < children->len; i++) {
     TaskListData *l_data =
         ((ErrandsSidebarTaskListRow *)children->pdata[i])->data;
@@ -105,7 +105,8 @@ void errands_sidebar_task_list_row_update_counter(
   int c = 0;
   for (int i = 0; i < state.t_data->len; i++) {
     TaskData *td = state.t_data->pdata[i];
-    if (!strcmp(row->data->uid, td->list_uid))
+    if (!strcmp(row->data->uid, td->list_uid) && !td->trash && !td->deleted &&
+        !td->completed)
       c++;
   }
   char *num = g_strdup_printf("%d", c);
@@ -124,7 +125,7 @@ void on_errands_sidebar_task_list_row_activate(GtkListBox *box,
                                                ErrandsSidebarTaskListRow *row,
                                                gpointer user_data) {
   // Unselect filter rows
-  gtk_list_box_unselect_all(GTK_LIST_BOX(state.filters_list_box));
+  gtk_list_box_unselect_all(GTK_LIST_BOX(state.sidebar->filters_box));
 
   // Switch to Task List view
   adw_view_stack_set_visible_child_name(ADW_VIEW_STACK(state.stack),

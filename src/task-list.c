@@ -61,8 +61,6 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   g_object_set(self->entry, "child", entry_clamp, "transition-type",
                GTK_REVEALER_TRANSITION_TYPE_SLIDE_UP, "margin-start", 12,
                "margin-end", 12, NULL);
-  // g_object_bind_property(s_btn, "active", self->entry, "reveal-child",
-  //                        G_BINDING_SYNC_CREATE | G_BINDING_INVERT_BOOLEAN);
 
   // Tasks Box
   self->task_list = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
@@ -262,7 +260,7 @@ static void on_task_added(AdwEntryRow *entry, gpointer data) {
   // Update counter
   errands_sidebar_task_list_row_update_counter(
       errands_sidebar_task_list_row_get(state.task_list->data->uid));
-  errands_sidebar_all_row_update_counter();
+  errands_sidebar_all_row_update_counter(state.sidebar->all_row);
 
   LOG("Add task '%s' to task list '%s'", td->uid, td->list_uid);
 }

@@ -54,7 +54,7 @@ static void on_response_cb(ErrandsDeleteListDialog *dialog, gchar *response,
       }
     }
     // Delete sidebar row
-    gtk_list_box_remove(GTK_LIST_BOX(state.task_lists_list_box),
+    gtk_list_box_remove(GTK_LIST_BOX(state.sidebar->task_lists_box),
                         GTK_WIDGET(dialog->row));
     // Delete data
     errands_data_delete_list(dialog->row->data);

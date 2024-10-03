@@ -1,5 +1,7 @@
 #include "task.h"
 #include "data.h"
+#include "sidebar-all-row.h"
+#include "sidebar-task-list-row.h"
 #include "state.h"
 #include "task-list.h"
 #include "task-toolbar.h"
@@ -163,6 +165,9 @@ static void on_errands_task_complete_btn_toggle(GtkCheckButton *btn,
 
   errands_task_list_sort_by_completion(task_list);
   errands_task_list_update_title();
+  errands_sidebar_all_row_update_counter(state.sidebar->all_row);
+  errands_sidebar_task_list_row_update_counter(
+      errands_sidebar_task_list_row_get(task->data->list_uid));
 }
 
 static void on_errands_task_toolbar_btn_toggle(GtkToggleButton *btn,

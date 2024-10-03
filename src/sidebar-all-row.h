@@ -14,6 +14,6 @@ struct _ErrandsSidebarAllRow {
 };
 
 ErrandsSidebarAllRow *errands_sidebar_all_row_new();
-void errands_sidebar_all_row_update_counter();
+void errands_sidebar_all_row_update_counter(ErrandsSidebarAllRow *row);
 
 #endif // ERRANDS_SIDEBAR_ALL_ROW_H

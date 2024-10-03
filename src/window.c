@@ -5,7 +5,7 @@
 #include "rename-list-dialog.h"
 #include "sidebar.h"
 #include "state.h"
-#include "tags-page.h"
+// #include "tags-page.h"
 #include "task-list.h"
 #include "utils.h"
 
@@ -22,18 +22,17 @@ void errands_window_build() {
   state.rename_list_dialog = errands_rename_list_dialog_new();
   state.delete_list_dialog = errands_delete_list_dialog_new();
   state.task_list = errands_task_list_new();
-  errands_tags_page_build();
-  errands_sidebar_build();
+  state.sidebar = errands_sidebar_new();
+  // errands_tags_page_build();
 
   // Split view
   state.split_view = adw_navigation_split_view_new();
   adw_navigation_split_view_set_sidebar(
       ADW_NAVIGATION_SPLIT_VIEW(state.split_view),
-      adw_navigation_page_new(state.sidebar, "Sidebar"));
+      adw_navigation_page_new(GTK_WIDGET(state.sidebar), "Sidebar"));
   adw_navigation_split_view_set_content(
       ADW_NAVIGATION_SPLIT_VIEW(state.split_view),
       adw_navigation_page_new(state.stack, "Content"));
-
   adw_application_window_set_content(ADW_APPLICATION_WINDOW(state.main_window),
                                      state.split_view);
 }
