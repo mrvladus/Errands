@@ -35,7 +35,7 @@ void errands_sidebar_all_row_update_counter(ErrandsSidebarAllRow *row) {
   int len = 0;
   for (int i = 0; i < state.t_data->len; i++) {
     TaskData *td = state.t_data->pdata[i];
-    if (!td->deleted && !td->trash)
+    if (!td->deleted && !td->trash && !td->completed)
       len++;
   }
   char *num = g_strdup_printf("%d", len);
