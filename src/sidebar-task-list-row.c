@@ -1,5 +1,6 @@
 #include "sidebar-task-list-row.h"
 #include "adwaita.h"
+#include "components.h"
 #include "data.h"
 #include "delete-list-dialog.h"
 #include "gio/gio.h"
@@ -49,10 +50,9 @@ errands_sidebar_task_list_row_init(ErrandsSidebarTaskListRow *self) {
   gtk_widget_add_css_class(self->counter, "caption");
 
   // Right-click menu
-  GMenu *menu = g_menu_new();
-  g_menu_append(menu, "Rename", "task-list-row.rename");
-  g_menu_append(menu, "Export", "task-list-row.export");
-  g_menu_append(menu, "Delete", "task-list-row.delete");
+  GMenu *menu = errands_menu_new(3, "Rename", "task-list-row.rename", "Export",
+                                 "task-list-row.export", "Delete",
+                                 "task-list-row.delete");
 
   // Menu popover
   GtkWidget *menu_popover = gtk_popover_menu_new_from_model(G_MENU_MODEL(menu));
@@ -65,16 +65,8 @@ errands_sidebar_task_list_row_init(ErrandsSidebarTaskListRow *self) {
   gtk_widget_add_controller(box, GTK_EVENT_CONTROLLER(ctrl));
 
   // Actions
-  GSimpleActionGroup *ag = g_simple_action_group_new();
-
-  GSimpleAction *rename = g_simple_action_new("rename", NULL);
-  g_signal_connect(rename, "activate", G_CALLBACK(on_action_rename), self);
-  g_action_map_add_action(G_ACTION_MAP(ag), G_ACTION(rename));
-
-  GSimpleAction *delete = g_simple_action_new("delete", NULL);
-  g_signal_connect(delete, "activate", G_CALLBACK(on_action_delete), self);
-  g_action_map_add_action(G_ACTION_MAP(ag), G_ACTION(delete));
-
+  GSimpleActionGroup *ag = errands_action_group_new(
+      2, "rename", on_action_rename, self, "delete", on_action_delete, self);
   gtk_widget_insert_action_group(GTK_WIDGET(self), "task-list-row",
                                  G_ACTION_GROUP(ag));
 }

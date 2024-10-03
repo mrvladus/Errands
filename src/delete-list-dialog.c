@@ -16,8 +16,6 @@ errands_delete_list_dialog_class_init(ErrandsDeleteListDialogClass *class) {}
 
 static void errands_delete_list_dialog_init(ErrandsDeleteListDialog *self) {
   adw_alert_dialog_set_heading(ADW_ALERT_DIALOG(self), "Are you sure?");
-  adw_alert_dialog_set_body(ADW_ALERT_DIALOG(self),
-                            "Deleting task list can't be un-done");
 
   // Dialog
   adw_alert_dialog_add_response(ADW_ALERT_DIALOG(self), "cancel", "Cancel");
@@ -35,7 +33,11 @@ ErrandsDeleteListDialog *errands_delete_list_dialog_new() {
 
 void errands_delete_list_dialog_show(ErrandsSidebarTaskListRow *row) {
   state.delete_list_dialog->row = row;
+  char *msg = g_strdup_printf("This will completely delete \"%s\" task list",
+                              row->data->name);
+  adw_alert_dialog_set_body(ADW_ALERT_DIALOG(state.delete_list_dialog), msg);
   adw_dialog_present(ADW_DIALOG(state.delete_list_dialog), state.main_window);
+  g_free(msg);
 }
 
 // --- SIGNAL HANDLERS --- //
@@ -47,11 +49,8 @@ static void on_response_cb(ErrandsDeleteListDialog *dialog, gchar *response,
     GPtrArray *tasks = get_children(state.task_list->task_list);
     for (int i = 0; i < tasks->len; i++) {
       ErrandsTask *task = tasks->pdata[i];
-      // FIXME
-      LOG("%s", task->data->uid);
-      if (!strcmp(dialog->row->data->uid, task->data->list_uid)) {
-        gtk_box_remove(GTK_BOX(state.task_list), GTK_WIDGET(task));
-      }
+      if (!strcmp(dialog->row->data->uid, task->data->list_uid))
+        gtk_box_remove(GTK_BOX(state.task_list->task_list), GTK_WIDGET(task));
     }
     // Delete sidebar row
     gtk_list_box_remove(GTK_LIST_BOX(state.sidebar->task_lists_box),
@@ -59,6 +58,7 @@ static void on_response_cb(ErrandsDeleteListDialog *dialog, gchar *response,
     // Delete data
     errands_data_delete_list(dialog->row->data);
     errands_data_write();
+    // TODO: switch to previous list or "no lists" page
     // TODO: sync
   }
 }
