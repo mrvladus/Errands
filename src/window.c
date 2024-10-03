@@ -19,11 +19,11 @@ void errands_window_build() {
   state.stack = adw_view_stack_new();
   state.notes_window = errands_notes_window_new();
   state.priority_window = errands_priority_window_new();
+  state.new_list_dialog = errands_new_list_dialog_new();
   state.rename_list_dialog = errands_rename_list_dialog_new();
   state.delete_list_dialog = errands_delete_list_dialog_new();
   state.task_list = errands_task_list_new();
   state.sidebar = errands_sidebar_new();
-  // errands_tags_page_build();
 
   // Split view
   state.split_view = adw_navigation_split_view_new();

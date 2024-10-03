@@ -2,6 +2,7 @@
 #define ERRANDS_STATE_H
 
 #include "delete-list-dialog.h"
+#include "new-list-dialog.h"
 #include "notes-window.h"
 #include "priority-window.h"
 #include "rename-list-dialog.h"
@@ -23,6 +24,7 @@ typedef struct {
   ErrandsTaskList *task_list;
 
   // Dialog windows
+  ErrandsNewListDialog *new_list_dialog;
   ErrandsRenameListDialog *rename_list_dialog;
   ErrandsDeleteListDialog *delete_list_dialog;
 

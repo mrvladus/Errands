@@ -1,14 +1,10 @@
 #include "sidebar.h"
 #include "components.h"
 #include "data.h"
-#include "glib-object.h"
-#include "new-list-dialog.h"
 #include "sidebar-all-row.h"
 #include "state.h"
 #include "task-list.h"
 #include "utils.h"
-
-#include <gtk/gtk.h>
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -41,7 +37,6 @@ static void errands_sidebar_init(ErrandsSidebar *self) {
   adw_toolbar_view_add_top_bar(ADW_TOOLBAR_VIEW(tb), hb);
 
   // Add list button
-  errands_new_list_dialog_build();
   GtkWidget *add_btn = gtk_button_new_from_icon_name("errands-add-symbolic");
   g_signal_connect(add_btn, "clicked", G_CALLBACK(errands_new_list_dialog_show),
                    NULL);
