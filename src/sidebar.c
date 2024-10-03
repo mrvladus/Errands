@@ -1,6 +1,8 @@
 #include "sidebar.h"
 #include "components.h"
 #include "data.h"
+#include "gtk/gtk.h"
+#include "gtk/gtkshortcut.h"
 #include "sidebar-all-row.h"
 #include "state.h"
 #include "task-list.h"
@@ -41,6 +43,7 @@ static void errands_sidebar_init(ErrandsSidebar *self) {
   g_signal_connect(add_btn, "clicked", G_CALLBACK(errands_new_list_dialog_show),
                    NULL);
   adw_header_bar_pack_start(ADW_HEADER_BAR(hb), add_btn);
+  errands_add_shortcut(add_btn, "<Control><Shift>N", "activate");
 
   // Menu button
   GtkWidget *menu_btn = gtk_menu_button_new();

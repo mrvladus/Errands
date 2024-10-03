@@ -40,6 +40,7 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   g_object_bind_property(s_btn, "active", sb, "search-mode-enabled",
                          G_BINDING_BIDIRECTIONAL);
   g_signal_connect(s_btn, "toggled", G_CALLBACK(on_search_btn_toggle), NULL);
+  errands_add_shortcut(s_btn, "<Control>F", "activate");
   adw_header_bar_pack_end(ADW_HEADER_BAR(hb), s_btn);
   GtkWidget *se = gtk_search_entry_new();
   g_signal_connect(se, "search-changed", G_CALLBACK(on_task_list_search), NULL);

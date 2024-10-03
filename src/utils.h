@@ -54,9 +54,9 @@ static inline bool file_exists(const char *filename) {
   FILE *file = fopen(filename, "r");
   if (file) {
     fclose(file);
-    return true; // File exists
+    return true;
   }
-  return false; // File does not exist
+  return false;
 }
 
 static inline bool directory_exists(const char *path) {
@@ -65,19 +65,24 @@ static inline bool directory_exists(const char *path) {
 }
 
 static inline char *generate_hex() {
-  // Allocate memory for the HEX color string
-  char *color =
-      (char *)malloc(8 * sizeof(char)); // 7 characters + 1 for null terminator
-
-  // Generate random values for red, green, and blue components
+  char *color = (char *)malloc(8 * sizeof(char));
   int red = rand() % 256;
   int green = rand() % 256;
   int blue = rand() % 256;
-
-  // Format the values into a HEX color string
   sprintf(color, "#%02X%02X%02X", red, green, blue);
-
   return color;
+}
+
+// Add shortcut to the widget
+static inline void errands_add_shortcut(GtkWidget *widget, const char *trigger,
+                                        const char *action) {
+  GtkEventController *ctrl = gtk_shortcut_controller_new();
+  gtk_shortcut_controller_set_scope(GTK_SHORTCUT_CONTROLLER(ctrl),
+                                    GTK_SHORTCUT_SCOPE_GLOBAL);
+  GtkShortcut *sc = gtk_shortcut_new(gtk_shortcut_trigger_parse_string(trigger),
+                                     gtk_shortcut_action_parse_string(action));
+  gtk_shortcut_controller_add_shortcut(GTK_SHORTCUT_CONTROLLER(ctrl), sc);
+  gtk_widget_add_controller(widget, ctrl);
 }
 
 #endif // ERRANDS_UTILS_H
