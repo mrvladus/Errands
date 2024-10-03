@@ -3,6 +3,7 @@
 
 #include "delete-list-dialog.h"
 #include "new-list-dialog.h"
+#include "no-lists-page.h"
 #include "notes-window.h"
 #include "priority-window.h"
 #include "rename-list-dialog.h"
@@ -22,6 +23,7 @@ typedef struct {
 
   // Task List Page
   ErrandsTaskList *task_list;
+  ErrandsNoListsPage *no_lists_page;
 
   // Dialog windows
   ErrandsNewListDialog *new_list_dialog;
