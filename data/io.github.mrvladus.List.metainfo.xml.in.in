@@ -57,6 +57,17 @@
   </requires>
 
   <releases>
+  <release version="46.2.5" date="2024-10-03">
+      <description translatable="no">
+        <p>Translations:</p>
+        <ul>
+          <li>Added Slovak translation (Ladislav Galadík)</li>
+          <li>Added Estonian translation (Indrek Haav)</li>
+          <li>Updated Danish translation (Peter Normann)</li>
+          <li>Updated Spanish translation (haggen88)</li>
+        </ul>
+      </description>
+    </release>
     <release version="46.2.4" date="2024-07-18">
       <description translatable="no">
         <p>Translations:</p>
