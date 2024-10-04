@@ -5,7 +5,6 @@
 #include "rename-list-dialog.h"
 #include "sidebar.h"
 #include "state.h"
-// #include "tags-page.h"
 #include "task-list.h"
 #include "utils.h"
 
@@ -23,6 +22,7 @@ void errands_window_build() {
   state.rename_list_dialog = errands_rename_list_dialog_new();
   state.delete_list_dialog = errands_delete_list_dialog_new();
   state.task_list = errands_task_list_new();
+  state.no_lists_page = errands_no_lists_page_new();
   state.sidebar = errands_sidebar_new();
 
   // Split view

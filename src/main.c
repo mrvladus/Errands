@@ -4,7 +4,7 @@
 #include "window.h"
 
 #include <adwaita.h>
-#include <gtk/gtk.h>
+
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
