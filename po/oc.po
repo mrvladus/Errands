@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-17 17:01+0300\n"
-"PO-Revision-Date: 2024-05-17 19:29+0200\n"
+"PO-Revision-Date: 2024-10-04 14:35+0200\n"
 "Last-Translator: Quentin PAGÈS\n"
 "Language-Team: \n"
 "Language: oc\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.4.3\n"
+"X-Generator: Poedit 3.4.2\n"
 
 #: errands/widgets/shared/components/buttons.py:45
 msgid "Info"
@@ -623,7 +623,7 @@ msgstr ""
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:12
 msgid "Todo application for those who prefer simplicity."
-msgstr "Alicacion de lista de prètzfaches pel monde qu'estima la simplicitat."
+msgstr "Aplicacion de lista de prètzfaches pel monde qu'estima la simplicitat."
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:13
 msgid "Features:"
