@@ -22,6 +22,8 @@ static void on_action_export(GSimpleAction *action, GVariant *param,
                              gpointer data);
 static void on_action_delete(GSimpleAction *action, GVariant *param,
                              ErrandsSidebarTaskListRow *row);
+static void on_action_print(GSimpleAction *action, GVariant *param,
+                            ErrandsSidebarTaskListRow *row);
 
 G_DEFINE_TYPE(ErrandsSidebarTaskListRow, errands_sidebar_task_list_row,
               GTK_TYPE_LIST_BOX_ROW)
@@ -50,9 +52,9 @@ errands_sidebar_task_list_row_init(ErrandsSidebarTaskListRow *self) {
   gtk_widget_add_css_class(self->counter, "caption");
 
   // Right-click menu
-  GMenu *menu = errands_menu_new(3, "Rename", "task-list-row.rename", "Export",
-                                 "task-list-row.export", "Delete",
-                                 "task-list-row.delete");
+  GMenu *menu = errands_menu_new(
+      4, "Rename", "task-list-row.rename", "Delete", "task-list-row.delete",
+      "Export", "task-list-row.export", "Print", "task-list-row.print");
 
   // Menu popover
   GtkWidget *menu_popover = gtk_popover_menu_new_from_model(G_MENU_MODEL(menu));
@@ -66,7 +68,8 @@ errands_sidebar_task_list_row_init(ErrandsSidebarTaskListRow *self) {
 
   // Actions
   GSimpleActionGroup *ag = errands_action_group_new(
-      2, "rename", on_action_rename, self, "delete", on_action_delete, self);
+      3, "rename", on_action_rename, self, "delete", on_action_delete, self,
+      "print", on_action_print, self);
   gtk_widget_insert_action_group(GTK_WIDGET(self), "task-list-row",
                                  G_ACTION_GROUP(ag));
 }
@@ -157,4 +160,9 @@ static void on_action_export(GSimpleAction *action, GVariant *param,
 static void on_action_delete(GSimpleAction *action, GVariant *param,
                              ErrandsSidebarTaskListRow *row) {
   errands_delete_list_dialog_show(row);
+}
+
+static void on_action_print(GSimpleAction *action, GVariant *param,
+                            ErrandsSidebarTaskListRow *row) {
+  LOG("Print");
 }
