@@ -9,13 +9,14 @@
 #include "rename-list-dialog.h"
 #include "sidebar.h"
 #include "task-list.h"
+#include "window.h"
 
 #include <adwaita.h>
 
 // Structure to hold the application state
 typedef struct {
   AdwApplication *app;
-  GtkWidget *main_window;
+  ErrandsWindow *main_window;
   GtkWidget *split_view;
   GtkWidget *stack;
   GtkWidget *tags_page;

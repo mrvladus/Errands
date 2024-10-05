@@ -54,7 +54,8 @@ void errands_rename_list_dialog_show(ErrandsSidebarTaskListRow *row) {
   state.rename_list_dialog->row = row;
   gtk_editable_set_text(GTK_EDITABLE(state.rename_list_dialog->entry),
                         row->data->name);
-  adw_dialog_present(ADW_DIALOG(state.rename_list_dialog), state.main_window);
+  adw_dialog_present(ADW_DIALOG(state.rename_list_dialog),
+                     GTK_WIDGET(state.main_window));
   gtk_widget_grab_focus(state.rename_list_dialog->entry);
 }
 

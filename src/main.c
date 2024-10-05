@@ -10,7 +10,8 @@
 #include <stdlib.h>
 
 static void activate(GtkApplication *app) {
-  errands_window_build();
+  state.main_window = errands_window_new();
+  errands_window_build(state.main_window);
   gtk_window_present(GTK_WINDOW(state.main_window));
 }
 

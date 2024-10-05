@@ -53,6 +53,7 @@ static char *errands_data_read() {
   return buffer; // Return the string
 }
 
+// Load user data from data.json
 void errands_data_load() {
   LOG("Loading user data");
   char *data = errands_data_read();

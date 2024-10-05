@@ -36,7 +36,8 @@ void errands_delete_list_dialog_show(ErrandsSidebarTaskListRow *row) {
   char *msg = g_strdup_printf("This will completely delete \"%s\" task list",
                               row->data->name);
   adw_alert_dialog_set_body(ADW_ALERT_DIALOG(state.delete_list_dialog), msg);
-  adw_dialog_present(ADW_DIALOG(state.delete_list_dialog), state.main_window);
+  adw_dialog_present(ADW_DIALOG(state.delete_list_dialog),
+                     GTK_WIDGET(state.main_window));
   g_free(msg);
 }
 

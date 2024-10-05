@@ -98,7 +98,8 @@ ErrandsPriorityWindow *errands_priority_window_new() {
 }
 
 void errands_priority_window_show(ErrandsTask *task) {
-  adw_dialog_present(ADW_DIALOG(state.priority_window), state.main_window);
+  adw_dialog_present(ADW_DIALOG(state.priority_window),
+                     GTK_WIDGET(state.main_window));
   state.priority_window->task = task;
 
   // Un-toggle buttons

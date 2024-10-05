@@ -1,5 +1,6 @@
 #include "task-list.h"
 #include "data.h"
+#include "gtk/gtkrevealer.h"
 #include "sidebar-all-row.h"
 #include "sidebar-task-list-row.h"
 #include "state.h"
@@ -60,7 +61,7 @@ static void errands_task_list_init(ErrandsTaskList *self) {
                "maximum-size", 1000, "margin-top", 6, "margin-bottom", 6, NULL);
   self->entry = gtk_revealer_new();
   g_object_set(self->entry, "child", entry_clamp, "transition-type",
-               GTK_REVEALER_TRANSITION_TYPE_SLIDE_UP, "margin-start", 12,
+               GTK_REVEALER_TRANSITION_TYPE_SWING_DOWN, "margin-start", 12,
                "margin-end", 12, NULL);
 
   // Tasks Box
@@ -91,8 +92,8 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   adw_toolbar_view_set_content(ADW_TOOLBAR_VIEW(tb), vbox);
 
   // Create task list page in the view stack
-  adw_view_stack_add_named(ADW_VIEW_STACK(state.stack), GTK_WIDGET(self),
-                           "errands_task_list_page");
+  adw_view_stack_add_named(ADW_VIEW_STACK(state.main_window->stack),
+                           GTK_WIDGET(self), "errands_task_list_page");
 
   errands_task_list_sort_by_completion(self->task_list);
 }

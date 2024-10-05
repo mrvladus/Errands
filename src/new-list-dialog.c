@@ -54,7 +54,8 @@ ErrandsNewListDialog *errands_new_list_dialog_new() {
 }
 
 void errands_new_list_dialog_show() {
-  adw_dialog_present(ADW_DIALOG(state.new_list_dialog), state.main_window);
+  adw_dialog_present(ADW_DIALOG(state.new_list_dialog),
+                     GTK_WIDGET(state.main_window));
   gtk_editable_set_text(GTK_EDITABLE(state.new_list_dialog->entry), "");
   gtk_widget_grab_focus(state.new_list_dialog->entry);
 }
