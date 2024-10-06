@@ -5,6 +5,7 @@
 #include "delete-list-dialog.h"
 #include "gio/gio.h"
 #include "glib-object.h"
+#include "glib.h"
 #include "gtk/gtk.h"
 #include "rename-list-dialog.h"
 #include "state.h"
@@ -162,7 +163,92 @@ static void on_action_delete(GSimpleAction *action, GVariant *param,
   errands_delete_list_dialog_show(row);
 }
 
+// - PRINTING - //
+
+#define FONT_SIZE 12
+#define LINE_HEIGHT 20
+#define LINES_PER_PAGE 38
+
+// Function to calculate number of pages and handle pagination
+static void begin_print(GtkPrintOperation *operation, GtkPrintContext *context,
+                        gpointer user_data) {
+  const char *text = (const char *)user_data;
+  int num_lines = 0;
+  const char *p = text;
+  while ((p = strchr(p, '\n'))) {
+    num_lines++;
+    p++;
+  }
+  int total_pages = (num_lines + LINES_PER_PAGE - 1) / LINES_PER_PAGE;
+  gtk_print_operation_set_n_pages(operation, total_pages);
+}
+
+// Function to draw the text, handling LINES_PER_PAGE
+static void print_draw_page(GtkPrintOperation *operation,
+                            GtkPrintContext *context, int page_nr,
+                            gpointer user_data) {
+  cairo_t *cr = gtk_print_context_get_cairo_context(context);
+  const char *text = (const char *)user_data;
+  // Set the font to monospace and size to 12
+  cairo_select_font_face(cr, "Monospace", CAIRO_FONT_SLANT_NORMAL,
+                         CAIRO_FONT_WEIGHT_NORMAL);
+  cairo_set_font_size(cr, FONT_SIZE);
+  // Split the text into lines
+  char *text_copy = g_strdup(text); // Duplicate text to safely tokenize
+  char *line = strtok(text_copy, "\n");
+  // Calculate the start and end lines for the current page
+  int start_line = page_nr * LINES_PER_PAGE;
+  int end_line = start_line + LINES_PER_PAGE;
+
+  double x = 10; // Starting x position
+  double y = 10; // Starting y position for the first line
+
+  // Iterate over each line and draw it if it belongs to the current page
+  int current_line = 0;
+  while (line) {
+    if (current_line >= start_line && current_line < end_line) {
+      cairo_move_to(cr, x, y);   // Move to the next line's position
+      cairo_show_text(cr, line); // Draw the current line
+      y += LINE_HEIGHT; // Move down for the next line (LINE_HEIGHT between
+                        // lines)
+    }
+    current_line++;
+    line = strtok(NULL, "\n"); // Get the next line
+  }
+  // Free the duplicated text
+  g_free(text_copy);
+  // Ensure everything is drawn
+  cairo_stroke(cr);
+}
+
+void start_print(const char *str) {
+  // Create a new print operation
+  GtkPrintOperation *print = gtk_print_operation_new();
+  // Connect signal to draw on page
+  g_signal_connect(print, "draw-page", G_CALLBACK(print_draw_page),
+                   (gpointer)str);
+  g_signal_connect(print, "begin-print", G_CALLBACK(begin_print),
+                   (gpointer)str);
+  // Set default print settings if needed
+  GtkPrintOperationResult result =
+      gtk_print_operation_run(print, GTK_PRINT_OPERATION_ACTION_PRINT_DIALOG,
+                              GTK_WINDOW(state.main_window), NULL);
+  // Check the result (if user cancels or accepts the dialog)
+  if (result == GTK_PRINT_OPERATION_RESULT_ERROR) {
+    g_print("An error occurred during the print operation.\n");
+  } else if (result == GTK_PRINT_OPERATION_RESULT_APPLY) {
+    g_print("Print operation successful.\n");
+  }
+  // Cleanup the print operation object
+  g_object_unref(print);
+}
+
 static void on_action_print(GSimpleAction *action, GVariant *param,
                             ErrandsSidebarTaskListRow *row) {
-  LOG("Print");
+  LOG("Start printing of the list '%s'", row->data->uid);
+
+  GString *str = errands_data_print_list(row->data->uid);
+  printf("%s", str->str);
+  start_print(str->str);
+  g_string_free(str, true);
 }

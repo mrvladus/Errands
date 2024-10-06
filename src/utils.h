@@ -8,8 +8,13 @@
 #include <string.h>
 #include <sys/stat.h>
 
+// --- MACROS --- //
+
 // Log formatted message
 #define LOG(format, ...) fprintf(stderr, "Errands: " format "\n", ##__VA_ARGS__)
+
+// For range
+#define for_range(var, n) for (int var = 0; var < n; var++)
 
 // Lambda function macro
 // #define lambda(lambda$_ret, lambda$_args, lambda$_body) \

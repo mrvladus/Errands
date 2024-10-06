@@ -333,20 +333,48 @@ TaskData *errands_data_get_task(char *uid) {
 
 // --- OTHER --- //
 
-static void errands_print_tasks(const char *parent_uid, const char *list_uid,
-                                int indent) {
+static void __print_indent(GString *out, int indent) {
+  for (int i = 0; i < indent; i++)
+    g_string_append(out, "    ");
+}
+
+static void errands_print_task(TaskData *task, GString *out, int indent) {
+  __print_indent(out, indent);
+  // Add checkbox
+  g_string_append_printf(out, "[%s] ", task->completed ? "x" : " ");
+  // Set idx to account for indentation and checkbox
+  int idx = indent * 4; // The checkbox takes 4 characters
+  for (int i = 0; i < strlen(task->text); i++) {
+    // If idx exceeds 73, start a new line with indentation
+    if (idx >= 73) {
+      g_string_append(out, "\n");
+      if (indent == 0)
+        __print_indent(out, 1);
+      else
+        __print_indent(out, indent + 1);
+      idx = indent * 4;
+    }
+    g_string_append_printf(out, "%c", task->text[i]);
+    idx++;
+  }
+  g_string_append(out, "\n");
+}
+
+static void errands_print_tasks(GString *out, const char *parent_uid,
+                                const char *list_uid, int indent) {
   for (int i = 0; i < state.t_data->len; i++) {
     TaskData *td = state.t_data->pdata[i];
     if (!strcmp(td->parent, parent_uid) && !strcmp(td->list_uid, list_uid)) {
-      for (int j = 0; j < indent; j++)
-        printf("    ");
-      printf("[%s] %s\n", td->completed ? "x" : " ", td->text);
-      errands_print_tasks(td->uid, list_uid, indent + 1);
+      errands_print_task(td, out, indent);
+      errands_print_tasks(out, td->uid, list_uid, indent + 1);
     }
   }
 }
 
-void errands_data_print(char *list_uid, char *file_path) {
+GString *errands_data_print_list(char *list_uid) {
+  // Output string
+  GString *out = g_string_new("");
+
   // Print list name
   const char *list_name;
   for (int i = 0; i < state.tl_data->len; i++) {
@@ -357,17 +385,18 @@ void errands_data_print(char *list_uid, char *file_path) {
     }
   }
   int len = strlen(list_name);
-  printf("╔");
+  g_string_append(out, "╔");
   for (int i = 0; i <= len + 1; i++) {
-    printf("═");
+    g_string_append(out, "═");
   }
-  printf("╗\n");
-  printf("║ %s ║\n", list_name);
-  printf("╚");
+  g_string_append(out, "╗\n");
+  g_string_append_printf(out, "║ %s ║\n", list_name);
+  g_string_append(out, "╚");
   for (int i = 0; i <= len + 1; i++) {
-    printf("═");
+    g_string_append(out, "═");
   }
-  printf("╝\n");
+  g_string_append(out, "╝\n");
   // Print tasks
-  errands_print_tasks("", list_uid, 0);
+  errands_print_tasks(out, "", list_uid, 0);
+  return out;
 }
