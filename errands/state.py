@@ -12,9 +12,12 @@ if TYPE_CHECKING:
     from errands.lib.notifications import ErrandsNotificationsDaemon
     from errands.widgets.loading_page import ErrandsLoadingPage
     from errands.widgets.shared.task_toolbar import (
+        DetailWindow,
         ErrandsDateTimeWindow,
         ErrandsAttachmentsWindow,
         ErrandsNotesWindow,
+        PriorityWindow,
+        TagWindow,
     )
     from errands.widgets.sidebar import Sidebar
     from errands.widgets.tags.tags import Tags
@@ -70,17 +73,27 @@ class State:
     # Attachments window
     attachments_window: ErrandsAttachmentsWindow | None = None
 
+    detail_window: DetailWindow | None = None
+    priority_window: PriorityWindow | None = None
+    tag_window: TagWindow | None = None
+
     @classmethod
     def init(cls) -> None:
         from errands.widgets.shared.task_toolbar import (
+            DetailWindow,
             ErrandsNotesWindow,
             ErrandsDateTimeWindow,
             ErrandsAttachmentsWindow,
+            PriorityWindow,
+            TagWindow,
         )
 
+        cls.detail_window = DetailWindow()
         cls.notes_window = ErrandsNotesWindow()
         cls.datetime_window = ErrandsDateTimeWindow()
         cls.attachments_window = ErrandsAttachmentsWindow()
+        cls.priority_window = PriorityWindow()
+        cls.tag_window = TagWindow()
 
     @classmethod
     def get_task_list(cls, uid: str) -> TaskList:
