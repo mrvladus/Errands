@@ -7,6 +7,7 @@
 #include "glib-object.h"
 #include "glib.h"
 #include "gtk/gtk.h"
+#include "pango/pango-layout.h"
 #include "rename-list-dialog.h"
 #include "state.h"
 #include "task-list.h"
@@ -44,6 +45,7 @@ errands_sidebar_task_list_row_init(ErrandsSidebarTaskListRow *self) {
   // Label
   self->label = gtk_label_new("");
   gtk_box_append(GTK_BOX(box), self->label);
+  gtk_label_set_ellipsize(GTK_LABEL(self->label), PANGO_ELLIPSIZE_END);
 
   // Counter
   self->counter = gtk_label_new("");
