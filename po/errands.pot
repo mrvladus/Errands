@@ -409,7 +409,7 @@ msgid "Content"
 msgstr ""
 
 #: errands/widgets/window.py:90
-msgid "No Task Lists"
+msgid "Task Lists"
 msgstr ""
 
 #: errands/widgets/window.py:91
