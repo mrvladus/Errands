@@ -331,7 +331,9 @@ TaskData *errands_data_get_task(char *uid) {
   return td;
 }
 
-// --- OTHER --- //
+// --- PRINTING --- //
+
+#define MAX_LINE_LENGTH 73
 
 static void __print_indent(GString *out, int indent) {
   for (int i = 0; i < indent; i++)
@@ -345,8 +347,8 @@ static void errands_print_task(TaskData *task, GString *out, int indent) {
   // Set idx to account for indentation and checkbox
   int idx = indent * 4; // The checkbox takes 4 characters
   for (int i = 0; i < strlen(task->text); i++) {
-    // If idx exceeds 73, start a new line with indentation
-    if (idx >= 73) {
+    // If idx exceeds MAX_LINE_LENGTH, start a new line with indentation
+    if (idx >= MAX_LINE_LENGTH) {
       g_string_append(out, "\n");
       if (indent == 0)
         __print_indent(out, 1);
@@ -376,25 +378,47 @@ GString *errands_data_print_list(char *list_uid) {
   GString *out = g_string_new("");
 
   // Print list name
-  const char *list_name;
+  char *list_name;
   for (int i = 0; i < state.tl_data->len; i++) {
     TaskListData *tld = state.tl_data->pdata[i];
     if (!strcmp(list_uid, tld->uid)) {
-      list_name = tld->name;
+      list_name = strdup(tld->name);
       break;
     }
   }
-  int len = strlen(list_name);
   g_string_append(out, "╔");
-  for (int i = 0; i <= len + 1; i++) {
-    g_string_append(out, "═");
-  }
+  for_range(i, MAX_LINE_LENGTH - 1) g_string_append(out, "═");
   g_string_append(out, "╗\n");
-  g_string_append_printf(out, "║ %s ║\n", list_name);
-  g_string_append(out, "╚");
-  for (int i = 0; i <= len + 1; i++) {
-    g_string_append(out, "═");
+  g_string_append(out, "║ ");
+
+  int len = strlen(list_name);
+  // If name is too long add '...' to the end
+  if (len > MAX_LINE_LENGTH - 4) {
+    list_name[MAX_LINE_LENGTH - 4] = '.';
+    list_name[MAX_LINE_LENGTH - 5] = '.';
+    list_name[MAX_LINE_LENGTH - 6] = '.';
+    for_range(i, MAX_LINE_LENGTH - 3) {
+      g_string_append_printf(out, "%c", list_name[i]);
+    }
+  } else if (len < MAX_LINE_LENGTH) {
+    GString *title = g_string_new(list_name);
+    int title_len = title->len;
+    while (title_len <= MAX_LINE_LENGTH - 4) {
+      g_string_prepend(title, " ");
+      title_len++;
+      if (title_len < MAX_LINE_LENGTH - 4) {
+        g_string_append(title, " ");
+        title_len++;
+      }
+    }
+    g_string_append(out, title->str);
+    g_string_free(title, TRUE);
   }
+  free(list_name);
+
+  g_string_append(out, " ║\n");
+  g_string_append(out, "╚");
+  for_range(i, MAX_LINE_LENGTH - 1) g_string_append(out, "═");
   g_string_append(out, "╝\n");
   // Print tasks
   errands_print_tasks(out, "", list_uid, 0);
