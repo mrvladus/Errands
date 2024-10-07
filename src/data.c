@@ -387,26 +387,26 @@ GString *errands_data_print_list(char *list_uid) {
     }
   }
   g_string_append(out, "╔");
-  for_range(i, MAX_LINE_LENGTH - 1) g_string_append(out, "═");
+  for_range(i, MAX_LINE_LENGTH + 2) g_string_append(out, "═");
   g_string_append(out, "╗\n");
   g_string_append(out, "║ ");
 
   int len = strlen(list_name);
   // If name is too long add '...' to the end
-  if (len > MAX_LINE_LENGTH - 4) {
-    list_name[MAX_LINE_LENGTH - 4] = '.';
-    list_name[MAX_LINE_LENGTH - 5] = '.';
-    list_name[MAX_LINE_LENGTH - 6] = '.';
-    for_range(i, MAX_LINE_LENGTH - 3) {
+  if (len > MAX_LINE_LENGTH - 1) {
+    list_name[MAX_LINE_LENGTH - 1] = '.';
+    list_name[MAX_LINE_LENGTH - 2] = '.';
+    list_name[MAX_LINE_LENGTH - 3] = '.';
+    for_range(i, MAX_LINE_LENGTH) {
       g_string_append_printf(out, "%c", list_name[i]);
     }
   } else if (len < MAX_LINE_LENGTH) {
     GString *title = g_string_new(list_name);
     int title_len = title->len;
-    while (title_len <= MAX_LINE_LENGTH - 4) {
+    while (title_len <= MAX_LINE_LENGTH - 1) {
       g_string_prepend(title, " ");
       title_len++;
-      if (title_len < MAX_LINE_LENGTH - 4) {
+      if (title_len < MAX_LINE_LENGTH - 1) {
         g_string_append(title, " ");
         title_len++;
       }
@@ -415,10 +415,9 @@ GString *errands_data_print_list(char *list_uid) {
     g_string_free(title, TRUE);
   }
   free(list_name);
-
   g_string_append(out, " ║\n");
   g_string_append(out, "╚");
-  for_range(i, MAX_LINE_LENGTH - 1) g_string_append(out, "═");
+  for_range(i, MAX_LINE_LENGTH + 2) g_string_append(out, "═");
   g_string_append(out, "╝\n");
   // Print tasks
   errands_print_tasks(out, "", list_uid, 0);

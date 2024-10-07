@@ -173,13 +173,22 @@ static void on_action_delete(GSimpleAction *action, GVariant *param,
 
 // Function to calculate number of pages and handle pagination
 static void begin_print(GtkPrintOperation *operation, GtkPrintContext *context,
-                        gpointer user_data) {
-  const char *text = (const char *)user_data;
+                        const char *text) {
   int num_lines = 0;
-  const char *p = text;
-  while ((p = strchr(p, '\n'))) {
-    num_lines++;
-    p++;
+  char c;
+  int len = 0;
+  for (int i = 0; i < strlen(text); i++) {
+    c = text[i];
+    if (c == '\n') {
+      num_lines++;
+      len = 0;
+      continue;
+    }
+    if (len > 73 && c != '\n') {
+      num_lines++;
+      len = 0;
+    }
+    len++;
   }
   int total_pages = (num_lines + LINES_PER_PAGE - 1) / LINES_PER_PAGE;
   gtk_print_operation_set_n_pages(operation, total_pages);
