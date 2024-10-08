@@ -7,8 +7,6 @@
 #include <stdint.h>
 
 typedef struct {
-  GtkWidget *task;
-
   GPtrArray *attachments;
   char *color;
   bool completed;
