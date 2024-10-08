@@ -1,6 +1,8 @@
 #include "task.h"
+#include "adwaita.h"
 #include "components.h"
 #include "data.h"
+#include "gtk/gtk.h"
 #include "sidebar-all-row.h"
 #include "sidebar-task-list-row.h"
 #include "state.h"
@@ -28,6 +30,7 @@ static void on_errands_task_expand_click(GtkGestureClick *self, gint n_press,
                                          ErrandsTask *task);
 static void on_errands_task_sub_task_added(GtkEntry *entry, ErrandsTask *task);
 static void on_errands_task_edited(AdwEntryRow *entry, ErrandsTask *task);
+static void on_errands_task_edit_cancelled(GtkButton *btn, ErrandsTask *task);
 
 // ---------- TASK ---------- //
 
@@ -90,10 +93,17 @@ static void errands_task_init(ErrandsTask *self) {
                    self);
   g_signal_connect(self->edit_row, "entry-activated",
                    G_CALLBACK(on_errands_task_edited), self);
+  GtkWidget *cancel_btn =
+      gtk_button_new_from_icon_name("errands-cancel-symbolic");
+  g_object_set(cancel_btn, "valign", GTK_ALIGN_CENTER, NULL);
+  gtk_widget_add_css_class(cancel_btn, "flat");
+  gtk_widget_add_css_class(cancel_btn, "circular");
+  g_signal_connect(cancel_btn, "clicked",
+                   G_CALLBACK(on_errands_task_edit_cancelled), self);
+  adw_entry_row_add_suffix(ADW_ENTRY_ROW(self->edit_row), cancel_btn);
   gtk_list_box_append(GTK_LIST_BOX(title_lb), self->edit_row);
 
   // Toolbar revealer
-  // ErrandsTaskToolbar *toolbar = errands_task_toolbar_new(td);
   self->toolbar_revealer = gtk_revealer_new();
   g_object_bind_property(self->toolbar_btn, "active", self->toolbar_revealer,
                          "reveal-child", G_BINDING_SYNC_CREATE);
@@ -275,4 +285,8 @@ static void on_errands_task_edited(AdwEntryRow *entry, ErrandsTask *task) {
   adw_preferences_row_set_title(ADW_PREFERENCES_ROW(task->title_row), text);
   gtk_widget_set_visible(task->title_row, true);
   // TODO: sync
+}
+
+static void on_errands_task_edit_cancelled(GtkButton *btn, ErrandsTask *task) {
+  gtk_widget_set_visible(task->title_row, true);
 }

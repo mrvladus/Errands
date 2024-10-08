@@ -20,5 +20,6 @@
     <file preprocess="xml-stripblanks" alias="errands-priority-symbolic.svg">icons/errands-priority-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-priority-set-symbolic.svg">icons/errands-priority-set-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-priority-none-symbolic.svg">icons/errands-priority-none-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-cancel-symbolic.svg">icons/errands-cancel-symbolic.svg</file>
   </gresource>
 </gresources>
