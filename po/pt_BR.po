@@ -5,19 +5,20 @@
 # Vitor Gabriel Gomes <vitorgabrielgomesro9090@gmail.com>, 2023
 # Leandro Cunha <leandrocunha016@gmail.com>, 2023-2024
 # Gabriel de Moura <smolblackcat@proton.me>, 2024
+# Guilherme Berbet <guilhermeberbet@icloud.com>
 msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-17 17:01+0300\n"
-"PO-Revision-Date: 2024-01-09 09:36-0300\n"
-"Last-Translator:  Gabriel de Moura <smolblackcat@proton.me>\n"
+"PO-Revision-Date: 2024-10-07 10:24-0300\n"
+"Last-Translator: Leandro Cunha <leandrocunha016@gmail.com>\n"
 "Language-Team: \n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.4\n"
+"X-Generator: Poedit 3.4.2\n"
 
 #: errands/widgets/shared/components/buttons.py:45
 msgid "Info"
@@ -27,9 +28,8 @@ msgstr "Informações"
 msgid "Are you sure?"
 msgstr "Tem certeza?"
 
-#: errands/widgets/shared/components/dialogs.py:35
-#: errands/widgets/sidebar.py:300 errands/widgets/task.py:246
-#: errands/widgets/task_list/task_list_sidebar_row.py:99
+#: errands/widgets/shared/components/dialogs.py:35 errands/widgets/sidebar.py:300
+#: errands/widgets/task.py:246 errands/widgets/task_list/task_list_sidebar_row.py:99
 #: errands/widgets/today/today_task.py:146
 msgid "Cancel"
 msgstr "Cancelar"
@@ -67,8 +67,7 @@ msgstr "Roxo"
 msgid "Brown"
 msgstr "Marrom"
 
-#: errands/widgets/shared/datetime_picker.py:138
-#: errands/widgets/today/today.py:57
+#: errands/widgets/shared/datetime_picker.py:138 errands/widgets/today/today.py:57
 #: errands/widgets/today/today_sidebar_row.py:30 errands/widgets/window.py:67
 msgid "Today"
 msgstr "Hoje"
@@ -81,8 +80,7 @@ msgstr "Amanhã"
 msgid "Now"
 msgstr "Agora"
 
-#: errands/widgets/shared/datetime_picker.py:160
-#: errands/widgets/trash/trash.py:40
+#: errands/widgets/shared/datetime_picker.py:160 errands/widgets/trash/trash.py:40
 #: errands/widgets/trash/trash_sidebar_row.py:64
 msgid "Clear"
 msgstr "Limpar"
@@ -128,9 +126,8 @@ msgstr "Personalizado"
 msgid "No Tags"
 msgstr "Sem Etiquetas"
 
-#: errands/widgets/shared/task_toolbar/toolbar.py:134
-#: errands/widgets/tags/tags.py:63 errands/widgets/tags/tags_sidebar_row.py:32
-#: errands/widgets/window.py:72
+#: errands/widgets/shared/task_toolbar/toolbar.py:134 errands/widgets/tags/tags.py:63
+#: errands/widgets/tags/tags_sidebar_row.py:32 errands/widgets/window.py:72
 msgid "Tags"
 msgstr "Etiquetas"
 
@@ -166,8 +163,7 @@ msgid "Open File"
 msgstr "Abrir Arquivo"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:123
-#: errands/widgets/tags/tags.py:140
-#: errands/widgets/task_list/task_list_sidebar_row.py:60
+#: errands/widgets/tags/tags.py:140 errands/widgets/task_list/task_list_sidebar_row.py:60
 #: errands/widgets/task_list/task_list_sidebar_row.py:187
 #: errands/widgets/trash/trash.py:159
 msgid "Delete"
@@ -210,7 +206,7 @@ msgstr "Clique no botão \"+\""
 #. Task lists group
 #: errands/widgets/sidebar.py:94 errands/widgets/preferences.py:66
 msgid "Task Lists"
-msgstr "Sem listas de tarefas"
+msgstr "Listas de tarefas"
 
 #: errands/widgets/sidebar.py:106 errands/widgets/window.py:43
 #: errands/widgets/window.py:148 data/io.github.mrvladus.List.desktop.in.in:3
@@ -264,14 +260,13 @@ msgstr "Nenhuma etiqueta foi encontrada"
 
 #: errands/widgets/tags/tags.py:33
 msgid "Add new Tags in the entry above"
-msgstr "Adicionar novas etiquetas na "
+msgstr "Adicione novas tags na entrada acima"
 
 #: errands/widgets/tags/tags.py:82
 msgid "Add new Tag"
 msgstr "Adicionar nova Etiqueta"
 
-#: errands/widgets/task.py:79
-#: errands/widgets/task_list/task_list_sidebar_row.py:125
+#: errands/widgets/task.py:79 errands/widgets/task_list/task_list_sidebar_row.py:125
 #: errands/widgets/today/today_task.py:73
 msgid "Exported"
 msgstr "Exportado"
@@ -293,8 +288,7 @@ msgid "Toggle Toolbar"
 msgstr "Ver Barra de Ferramentas"
 
 #: errands/widgets/task.py:206 errands/widgets/task.py:226
-#: errands/widgets/today/today_task.py:117
-#: errands/widgets/today/today_task.py:127
+#: errands/widgets/today/today_task.py:117 errands/widgets/today/today_task.py:127
 msgid "Edit"
 msgstr "Editar"
 
@@ -306,8 +300,7 @@ msgstr "Mover para lixeira"
 msgid "Copy to Clipboard"
 msgstr "Copiar para a área de transferência"
 
-#: errands/widgets/task.py:209
-#: errands/widgets/task_list/task_list_sidebar_row.py:188
+#: errands/widgets/task.py:209 errands/widgets/task_list/task_list_sidebar_row.py:188
 #: errands/widgets/today/today_task.py:120
 msgid "Export"
 msgstr "Exportar"
@@ -393,8 +386,8 @@ msgstr "Não há itens deletados"
 msgid "Restore"
 msgstr "Restaurar"
 
-#: errands/widgets/trash/trash.py:89
-#: errands/widgets/trash/trash_sidebar_row.py:43 errands/widgets/window.py:77
+#: errands/widgets/trash/trash.py:89 errands/widgets/trash/trash_sidebar_row.py:43
+#: errands/widgets/window.py:77
 msgid "Trash"
 msgstr "Lixeira"
 
@@ -431,7 +424,8 @@ msgid "translator-credits"
 msgstr ""
 "Leandro Cunha <leandrocunha016@gmail.com>\n"
 "Guilherme Berbet <guilhermeberbet@icloud.com>\n"
-"Gabriel de Moura <smolblackcat@proton.me>"
+"Gabriel de Moura <smolblackcat@proton.me>\n"
+"Vitor Gabriel Gomes <vitorgabrielgomesro9090@gmail.com>"
 
 #: errands/widgets/window.py:159
 msgid "Sync is disabled"
@@ -513,11 +507,11 @@ msgstr "URL do servidor"
 
 #: errands/widgets/preferences.py:140
 msgid ""
-"URL needs to include protocol, like <b>http://</b> or <b>https://</b>. If "
-"you have problems with connection - try to change protocol first."
+"URL needs to include protocol, like <b>http://</b> or <b>https://</b>. If you have "
+"problems with connection - try to change protocol first."
 msgstr ""
-"URL precisa incluir o protocolo, como <b>http://</b> ou <b>https://</b>."
-"Se estiver com problemas com a conexão, tente alterar o protocolo primeiro."
+"URL precisa incluir o protocolo, como <b>http://</b> ou <b>https://</b>.Se estiver com "
+"problemas com a conexão, tente alterar o protocolo primeiro."
 
 #: errands/widgets/preferences.py:147
 msgid "Username"
@@ -549,7 +543,7 @@ msgstr "Autorização falhou"
 
 #: errands/widgets/preferences.py:223
 msgid "Could not locate server. Check network and url."
-msgstr "Não foi possível localizar servidor. Cheque a rede e a URL"
+msgstr "Não foi possível localizar servidor. Cheque a rede e a URL."
 
 #: errands/widgets/preferences.py:225
 msgid "Can't connect"
@@ -563,8 +557,8 @@ msgstr "Não é possível conectar. Cheque as credenciais"
 #: errands/lib/sync/providers/caldav.py:66
 msgid "Not all sync credentials provided. Please check settings."
 msgstr ""
-"Nem todas as credenciais de sincronização são fornecidas. Por favor, "
-"verifique as configurações."
+"Nem todas as credenciais de sincronização são fornecidas. Por favor, verifique as "
+"configurações."
 
 #: errands/lib/sync/providers/caldav.py:110
 msgid "Can't connect to CalDAV server at:"
