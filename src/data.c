@@ -331,6 +331,44 @@ TaskData *errands_data_get_task(char *uid) {
   return td;
 }
 
+char *errands_data_task_as_ical(TaskData *data) {
+  // Ensure that mandatory fields like UID are set
+  if (data->uid == NULL)
+    return NULL; // UID is required for VTODO
+  // Create a GString to build the iCal output dynamically
+  GString *ical = g_string_new("BEGIN:VTODO\n");
+  // Add UID and SUMMARY
+  g_string_append_printf(ical, "UID:%s\nSUMMARY:%s\n", data->uid,
+                         data->text ? data->text : "");
+  // Add start date if available
+  if (data->start_date)
+    g_string_append_printf(ical, "DTSTART:%s\n", data->start_date);
+  // Add due date if available
+  if (data->due_date)
+    g_string_append_printf(ical, "DUE:%s\n", data->due_date);
+  // Add recurrence rule if available
+  if (data->rrule)
+    g_string_append_printf(ical, "RRULE:%s\n", data->rrule);
+  // Add description (notes) if available
+  if (data->notes)
+    g_string_append_printf(ical, "DESCRIPTION:%s\n", data->notes);
+  // Add priority
+  g_string_append_printf(ical, "PRIORITY:%d\n", data->priority);
+  // Add percent complete
+  g_string_append_printf(ical, "PERCENT-COMPLETE:%d\n", data->percent_complete);
+  // Add completion status
+  if (data->completed)
+    g_string_append(ical, "STATUS:COMPLETED\n");
+  else
+    g_string_append(ical, "STATUS:IN-PROCESS\n");
+  // End the VTODO and VCALENDAR sections
+  g_string_append(ical, "END:VTODO\n");
+  // Return the string and free the GString structure
+  char *ical_str = g_string_free(
+      ical, FALSE); // Don't free the actual string, just the GString wrapper
+  return ical_str;
+}
+
 // --- PRINTING --- //
 
 #define MAX_LINE_LENGTH 73

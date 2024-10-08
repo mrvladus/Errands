@@ -2,6 +2,8 @@
 #include "adwaita.h"
 #include "components.h"
 #include "data.h"
+#include "gio/gio.h"
+#include "glib-object.h"
 #include "gtk/gtk.h"
 #include "gtk/gtkrevealer.h"
 #include "sidebar-all-row.h"
@@ -10,6 +12,7 @@
 #include "task-list.h"
 #include "task-toolbar.h"
 #include "utils.h"
+#include <string.h>
 
 // ---------- SIGNALS ---------- //
 static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x,
@@ -212,8 +215,24 @@ static void on_action_rename(GSimpleAction *action, GVariant *param,
   gtk_widget_grab_focus(task->edit_row);
 }
 
+// - EXPORT - //
+
+static void __on_export_finish(GObject *dialog, GAsyncResult *res,
+                               gpointer data) {
+  GFile *file = gtk_file_dialog_save_finish(GTK_FILE_DIALOG(dialog), res, NULL);
+  LOG("%s", g_file_get_path(file));
+}
+
 static void on_action_export(GSimpleAction *action, GVariant *param,
-                             ErrandsTask *task) {}
+                             ErrandsTask *task) {
+
+  GtkFileDialog *dialog = gtk_file_dialog_new();
+  g_object_set(dialog, "initial-name", task->data->text, NULL);
+  gtk_file_dialog_save(dialog, GTK_WINDOW(state.main_window), NULL,
+                       __on_export_finish, NULL);
+  char *ical = errands_data_task_as_ical(task->data);
+  free(ical);
+}
 
 static void on_action_trash(GSimpleAction *action, GVariant *param,
                             ErrandsTask *task) {
