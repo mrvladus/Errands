@@ -3,6 +3,7 @@
 #include "components.h"
 #include "data.h"
 #include "gtk/gtk.h"
+#include "gtk/gtkrevealer.h"
 #include "sidebar-all-row.h"
 #include "sidebar-task-list-row.h"
 #include "state.h"
@@ -215,7 +216,11 @@ static void on_action_export(GSimpleAction *action, GVariant *param,
                              ErrandsTask *task) {}
 
 static void on_action_trash(GSimpleAction *action, GVariant *param,
-                            ErrandsTask *task) {}
+                            ErrandsTask *task) {
+  task->data->trash = true;
+  errands_data_write();
+  gtk_revealer_set_reveal_child(GTK_REVEALER(task->revealer), false);
+}
 
 static void on_action_print(GSimpleAction *action, GVariant *param,
                             ErrandsTask *task) {}
