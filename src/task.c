@@ -1,4 +1,5 @@
 #include "task.h"
+#include "components.h"
 #include "data.h"
 #include "sidebar-all-row.h"
 #include "sidebar-task-list-row.h"
@@ -8,7 +9,16 @@
 #include "utils.h"
 
 // ---------- SIGNALS ---------- //
-
+static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x,
+                           gdouble y, GtkPopover *popover);
+static void on_action_rename(GSimpleAction *action, GVariant *param,
+                             ErrandsTask *task);
+static void on_action_export(GSimpleAction *action, GVariant *param,
+                             ErrandsTask *task);
+static void on_action_trash(GSimpleAction *action, GVariant *param,
+                            ErrandsTask *task);
+static void on_action_print(GSimpleAction *action, GVariant *param,
+                            ErrandsTask *task);
 static void on_errands_task_complete_btn_toggle(GtkCheckButton *btn,
                                                 ErrandsTask *task);
 static void on_errands_task_toolbar_btn_toggle(GtkToggleButton *btn,
@@ -17,6 +27,7 @@ static void on_errands_task_expand_click(GtkGestureClick *self, gint n_press,
                                          gdouble x, gdouble y,
                                          ErrandsTask *task);
 static void on_errands_task_sub_task_added(GtkEntry *entry, ErrandsTask *task);
+static void on_errands_task_edited(AdwEntryRow *entry, ErrandsTask *task);
 
 // ---------- TASK ---------- //
 
@@ -69,11 +80,17 @@ static void errands_task_init(ErrandsTask *self) {
   adw_action_row_add_suffix(ADW_ACTION_ROW(self->title_row), self->toolbar_btn);
 
   // Edit row
-  GtkWidget *edit_row = adw_entry_row_new();
-  g_object_set(edit_row, "title", "Edit", "hexpand", true, NULL);
-  g_object_bind_property(self->title_row, "visible", edit_row, "visible",
+  self->edit_row = adw_entry_row_new();
+  g_object_set(self->edit_row, "title", "Edit", "hexpand", true,
+               "show-apply-button", true, NULL);
+  g_object_bind_property(self->title_row, "visible", self->edit_row, "visible",
                          G_BINDING_SYNC_CREATE | G_BINDING_INVERT_BOOLEAN);
-  gtk_widget_add_css_class(edit_row, "task-title-row");
+  gtk_widget_add_css_class(self->edit_row, "task-title-row");
+  g_signal_connect(self->edit_row, "apply", G_CALLBACK(on_errands_task_edited),
+                   self);
+  g_signal_connect(self->edit_row, "entry-activated",
+                   G_CALLBACK(on_errands_task_edited), self);
+  gtk_list_box_append(GTK_LIST_BOX(title_lb), self->edit_row);
 
   // Toolbar revealer
   // ErrandsTaskToolbar *toolbar = errands_task_toolbar_new(td);
@@ -101,6 +118,27 @@ static void errands_task_init(ErrandsTask *self) {
   self->sub_tasks = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_widget_add_css_class(self->sub_tasks, "sub-tasks");
   gtk_box_append(GTK_BOX(sub_vbox), self->sub_tasks);
+
+  // Right-click menu
+  GMenu *menu =
+      errands_menu_new(4, "Edit", "task.edit", "Move to Trash", "task.trash",
+                       "Export", "task.export", "Print", "task.print");
+
+  // Menu popover
+  GtkWidget *menu_popover = gtk_popover_menu_new_from_model(G_MENU_MODEL(menu));
+  g_object_set(menu_popover, "has-arrow", false, "halign", GTK_ALIGN_START,
+               NULL);
+  gtk_box_append(GTK_BOX(self->card), menu_popover);
+  GtkGesture *ctrl = gtk_gesture_click_new();
+  gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(ctrl), 3);
+  g_signal_connect(ctrl, "released", G_CALLBACK(on_right_click), menu_popover);
+  gtk_widget_add_controller(self->title_row, GTK_EVENT_CONTROLLER(ctrl));
+
+  // Actions
+  GSimpleActionGroup *ag = errands_action_group_new(
+      4, "edit", on_action_rename, self, "trash", on_action_trash, self,
+      "export", on_action_export, self, "print", on_action_print, self);
+  gtk_widget_insert_action_group(GTK_WIDGET(self), "task", G_ACTION_GROUP(ag));
 }
 
 ErrandsTask *errands_task_new(TaskData *data) {
@@ -147,6 +185,30 @@ ErrandsTask *errands_task_new(TaskData *data) {
 
   return task;
 }
+
+// --- SIGNALS HANDLERS --- //
+
+static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x,
+                           gdouble y, GtkPopover *popover) {
+  gtk_popover_set_pointing_to(popover, &(GdkRectangle){.x = x, .y = y});
+  gtk_popover_popup(popover);
+}
+
+static void on_action_rename(GSimpleAction *action, GVariant *param,
+                             ErrandsTask *task) {
+  gtk_widget_set_visible(task->title_row, false);
+  gtk_editable_set_text(GTK_EDITABLE(task->edit_row), task->data->text);
+  gtk_widget_grab_focus(task->edit_row);
+}
+
+static void on_action_export(GSimpleAction *action, GVariant *param,
+                             ErrandsTask *task) {}
+
+static void on_action_trash(GSimpleAction *action, GVariant *param,
+                            ErrandsTask *task) {}
+
+static void on_action_print(GSimpleAction *action, GVariant *param,
+                            ErrandsTask *task) {}
 
 static void on_errands_task_complete_btn_toggle(GtkCheckButton *btn,
                                                 ErrandsTask *task) {
@@ -201,4 +263,16 @@ static void on_errands_task_sub_task_added(GtkEntry *entry, ErrandsTask *task) {
   gtk_box_prepend(GTK_BOX(task->sub_tasks),
                   GTK_WIDGET(errands_task_new(new_td)));
   gtk_editable_set_text(GTK_EDITABLE(entry), "");
+}
+
+static void on_errands_task_edited(AdwEntryRow *entry, ErrandsTask *task) {
+  const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
+  if (!strcmp(text, task->data->text) || !strcmp("", task->data->text))
+    return;
+  free(task->data->text);
+  task->data->text = strdup(text);
+  errands_data_write();
+  adw_preferences_row_set_title(ADW_PREFERENCES_ROW(task->title_row), text);
+  gtk_widget_set_visible(task->title_row, true);
+  // TODO: sync
 }

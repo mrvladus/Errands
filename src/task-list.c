@@ -66,6 +66,7 @@ static void errands_task_list_init(ErrandsTaskList *self) {
 
   // Tasks Box
   self->task_list = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+  g_object_set(self->task_list, "margin-bottom", 18, NULL);
   LOG("Loading tasks");
   for (int i = 0; i < state.t_data->len; i++) {
     TaskData *data = state.t_data->pdata[i];
@@ -148,19 +149,14 @@ void errands_task_list_update_title() {
 
 void errands_task_list_filter_by_uid(const char *uid) {
   GPtrArray *tasks = get_children(state.task_list->task_list);
-
-  if (!strcmp(uid, "")) {
-    for (int i = 0; i < tasks->len; i++) {
-      ErrandsTask *task = tasks->pdata[i];
-      if (!task->data->deleted)
-        gtk_widget_set_visible(GTK_WIDGET(task), true);
-    }
-    return;
-  }
-
   for (int i = 0; i < tasks->len; i++) {
     ErrandsTask *task = tasks->pdata[i];
-    if (!strcmp(uid, task->data->list_uid) && !task->data->deleted)
+    if (!strcmp(uid, "") && !task->data->deleted && !task->data->trash) {
+      gtk_widget_set_visible(GTK_WIDGET(task), true);
+      continue;
+    }
+    if (!strcmp(uid, task->data->list_uid) && !task->data->deleted &&
+        !task->data->trash)
       gtk_widget_set_visible(GTK_WIDGET(task), true);
     else
       gtk_widget_set_visible(GTK_WIDGET(task),

@@ -1,7 +1,6 @@
 #include "data.h"
 #include "resources.h"
 #include "state.h"
-#include "utils.h"
 #include "window.h"
 
 #include <adwaita.h>
@@ -17,7 +16,6 @@ static void activate(GtkApplication *app) {
 }
 
 int main(int argc, char **argv) {
-  // LOG("%d", 10 % 5);
   errands_data_load();
   state.app = adw_application_new("io.github.mrvladus.Errands",
                                   G_APPLICATION_DEFAULT_FLAGS);
