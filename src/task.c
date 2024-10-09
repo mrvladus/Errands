@@ -217,21 +217,32 @@ static void on_action_rename(GSimpleAction *action, GVariant *param,
 
 // - EXPORT - //
 
-static void __on_export_finish(GObject *dialog, GAsyncResult *res,
-                               gpointer data) {
-  GFile *file = gtk_file_dialog_save_finish(GTK_FILE_DIALOG(dialog), res, NULL);
-  LOG("%s", g_file_get_path(file));
+static void __on_export_finish(GObject *obj, GAsyncResult *res, gpointer data) {
+  GFile *f = gtk_file_dialog_save_finish(GTK_FILE_DIALOG(obj), res, NULL);
+  FILE *file = fopen(g_file_get_path(f), "w");
+  if (file == NULL) {
+    LOG("Error exporting task");
+    fclose(file);
+    return;
+  }
+  TaskData *td = data;
+  char *ical = errands_data_task_as_ical(td);
+  fprintf(file, "%s", ical);
+  fclose(file);
+  free(ical);
+  LOG("Export task '%s'", td->uid);
 }
 
 static void on_action_export(GSimpleAction *action, GVariant *param,
                              ErrandsTask *task) {
 
   GtkFileDialog *dialog = gtk_file_dialog_new();
-  g_object_set(dialog, "initial-name", task->data->text, NULL);
+  GString *name = g_string_new(task->data->text);
+  g_string_append(name, ".ics");
+  g_object_set(dialog, "initial-name", name->str, NULL);
   gtk_file_dialog_save(dialog, GTK_WINDOW(state.main_window), NULL,
-                       __on_export_finish, NULL);
-  char *ical = errands_data_task_as_ical(task->data);
-  free(ical);
+                       __on_export_finish, task->data);
+  g_string_free(name, true);
 }
 
 static void on_action_trash(GSimpleAction *action, GVariant *param,

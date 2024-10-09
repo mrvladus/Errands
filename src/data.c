@@ -341,16 +341,16 @@ char *errands_data_task_as_ical(TaskData *data) {
   g_string_append_printf(ical, "UID:%s\nSUMMARY:%s\n", data->uid,
                          data->text ? data->text : "");
   // Add start date if available
-  if (data->start_date)
+  if (strcmp(data->start_date, ""))
     g_string_append_printf(ical, "DTSTART:%s\n", data->start_date);
   // Add due date if available
-  if (data->due_date)
+  if (strcmp(data->due_date, ""))
     g_string_append_printf(ical, "DUE:%s\n", data->due_date);
   // Add recurrence rule if available
-  if (data->rrule)
+  if (strcmp(data->rrule, ""))
     g_string_append_printf(ical, "RRULE:%s\n", data->rrule);
   // Add description (notes) if available
-  if (data->notes)
+  if (strcmp(data->notes, ""))
     g_string_append_printf(ical, "DESCRIPTION:%s\n", data->notes);
   // Add priority
   g_string_append_printf(ical, "PRIORITY:%d\n", data->priority);
