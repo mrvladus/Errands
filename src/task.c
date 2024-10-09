@@ -143,10 +143,17 @@ static void errands_task_init(ErrandsTask *self) {
   g_object_set(menu_popover, "has-arrow", false, "halign", GTK_ALIGN_START,
                NULL);
   gtk_box_append(GTK_BOX(self->card), menu_popover);
+
+  // Right-click controllers
   GtkGesture *ctrl = gtk_gesture_click_new();
   gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(ctrl), 3);
   g_signal_connect(ctrl, "released", G_CALLBACK(on_right_click), menu_popover);
   gtk_widget_add_controller(self->title_row, GTK_EVENT_CONTROLLER(ctrl));
+  GtkGesture *touch_ctrl = gtk_gesture_long_press_new();
+  g_signal_connect(touch_ctrl, "pressed", G_CALLBACK(on_right_click),
+                   menu_popover);
+  gtk_gesture_single_set_touch_only(GTK_GESTURE_SINGLE(touch_ctrl), true);
+  gtk_widget_add_controller(self->title_row, GTK_EVENT_CONTROLLER(touch_ctrl));
 
   // Actions
   GSimpleActionGroup *ag = errands_action_group_new(
