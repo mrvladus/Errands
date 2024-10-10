@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version:  errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-10-10 12:25+0300\n"
-"PO-Revision-Date: 2024-05-23 13:31+0100\n"
+"PO-Revision-Date: 2024-10-10 20:12+0100\n"
 "Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
 "Language-Team: Italian <LL@li.org>\n"
 "Language: it\n"
@@ -406,9 +406,8 @@ msgid "Content"
 msgstr "Contenuto"
 
 #: errands/widgets/window.py:66
-#, fuzzy
 msgid "Loading Tasks"
-msgstr "Aggiungi nuove attività"
+msgstr "Caricamento attività"
 
 #: errands/widgets/window.py:88
 msgid "No Task Lists"
@@ -427,13 +426,12 @@ msgid "Create new List"
 msgstr "Crea nuova lista"
 
 #: errands/widgets/window.py:115 errands/widgets/window.py:123
-#, fuzzy
 msgid "Syncing"
-msgstr "Sincronizzazione..."
+msgstr "Sincronizzazione"
 
 #: errands/widgets/window.py:116
 msgid "First syncronization is running"
-msgstr ""
+msgstr "La prima sincronizzazione è in esecuzione"
 
 #: errands/widgets/window.py:172
 msgid "translator-credits"
