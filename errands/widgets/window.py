@@ -20,7 +20,7 @@ from errands.widgets.shared.components.buttons import ErrandsButton
 from errands.widgets.shared.components.toolbar_view import ErrandsToolbarView
 from errands.widgets.sidebar import Sidebar
 from errands.widgets.tags.tags import Tags
-from errands.widgets.today.today import Today
+from errands.widgets.tasks.tasks_page import TasksPage
 from errands.widgets.trash.trash import Trash
 
 
@@ -65,8 +65,11 @@ class Window(Adw.ApplicationWindow):
             name="errands_loading_page",
             title=_("Loading Tasks"),
         )
+        tasks_page = TasksPage()
         self.view_stack.add_titled(
-            child=Today(), name="errands_today_page", title=_("Today")
+            child=tasks_page,
+            name=tasks_page.name,
+            title=_(tasks_page.title),
         )
         self.view_stack.add_titled(
             child=Tags(), name="errands_tags_page", title=_("Tags")

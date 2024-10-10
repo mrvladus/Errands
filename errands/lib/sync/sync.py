@@ -61,7 +61,7 @@ class Sync:
                 State.view_stack.get_visible_child_name() == "errands_syncing_page"
                 and UserData.task_lists
             ):
-                State.view_stack.set_visible_child_name("errands_today_page")
+                State.view_stack.set_visible_child_name("errands_tasks_page")
 
     # TODO: Needs to be threaded to not block UI
     @classmethod

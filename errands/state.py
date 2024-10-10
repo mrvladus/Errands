@@ -21,9 +21,9 @@ if TYPE_CHECKING:
     from errands.widgets.tags.tags_sidebar_row import TagsSidebarRow
     from errands.widgets.task import Task
     from errands.widgets.task_list.task_list import TaskList
-    from errands.widgets.today.today import Today
-    from errands.widgets.today.today_sidebar_row import TodaySidebarRow
-    from errands.widgets.today.today_task import TodayTask
+    from errands.widgets.tasks.tasks_page import TasksPage
+    from errands.widgets.tasks.tasks_sidebar_row import TasksSidebarRow
+    from errands.widgets.tasks.tasks_task import TasksTask
     from errands.widgets.trash.trash import Trash
     from errands.widgets.trash.trash_sidebar_row import TrashSidebarRow
     from errands.widgets.window import Window
@@ -51,13 +51,13 @@ class State:
     # View Stack
     loading_page: ErrandsLoadingPage | None = None
     view_stack: Adw.ViewStack | None = None
-    today_page: Today | None = None
+    tasks_page: TasksPage | None = None
     tags_page: Tags | None = None
     trash_page: Trash | None = None
 
     # Sidebar
     sidebar: Sidebar | None = None
-    today_sidebar_row: TodaySidebarRow | None = None
+    tasks_sidebar_row: TasksSidebarRow | None = None
     tags_sidebar_row: TagsSidebarRow | None = None
     trash_sidebar_row: TrashSidebarRow | None = None
 
@@ -111,7 +111,7 @@ class State:
                         return task
 
     @classmethod
-    def get_today_task(cls, list_uid: str, uid: str) -> TodayTask | None:
+    def get_today_task(cls, list_uid: str, uid: str) -> TasksTask | None:
         for task in cls.today_page.tasks:
             if task.list_uid == list_uid and task.uid == uid:
                 return task

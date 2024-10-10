@@ -83,7 +83,7 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
                 UserData.update_list_props(self.uid, ["name", "synced"], [text, False])
                 self.update_ui()
                 State.trash_sidebar_row.update_ui()
-                State.today_sidebar_row.update_ui()
+                State.tasks_sidebar_row.update_ui()
                 Sync.sync()
 
             entry: Gtk.Entry = Gtk.Entry(placeholder_text=_("New Name"))
