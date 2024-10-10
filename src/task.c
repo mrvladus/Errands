@@ -176,6 +176,7 @@ ErrandsTask *errands_task_new(TaskData *data) {
                               data->completed);
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(task->toolbar_btn),
                                data->toolbar_shown);
+
   // Lazy load toolbar
   if (data->toolbar_shown) {
     task->toolbar = errands_task_toolbar_new(task);

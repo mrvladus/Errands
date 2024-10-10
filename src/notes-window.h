@@ -1,5 +1,4 @@
-#ifndef ERRANDS_NOTES_WINDOW_H
-#define ERRANDS_NOTES_WINDOW_H
+#pragma once
 
 #include "task.h"
 
@@ -21,5 +20,3 @@ struct _ErrandsNotesWindow {
 
 ErrandsNotesWindow *errands_notes_window_new();
 void errands_notes_window_show(ErrandsTask *task);
-
-#endif // ERRANDS_NOTES_WINDOW_H

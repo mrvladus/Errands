@@ -1,6 +1,7 @@
 #include "task-toolbar.h"
 #include "notes-window.h"
 #include "priority-window.h"
+#include "tags-window.h"
 
 G_DEFINE_TYPE(ErrandsTaskToolbar, errands_task_toolbar, GTK_TYPE_BOX)
 
@@ -51,5 +52,7 @@ ErrandsTaskToolbar *errands_task_toolbar_new(void *task) {
                            G_CALLBACK(errands_notes_window_show), task);
   g_signal_connect_swapped(tb->priority_btn, "clicked",
                            G_CALLBACK(errands_priority_window_show), task);
+  g_signal_connect_swapped(tb->tags_btn, "clicked",
+                           G_CALLBACK(errands_tags_window_show), task);
   return tb;
 }

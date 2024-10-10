@@ -8,6 +8,7 @@
 #include "priority-window.h"
 #include "rename-list-dialog.h"
 #include "sidebar.h"
+#include "tags-window.h"
 #include "task-list.h"
 #include "window.h"
 
@@ -31,11 +32,9 @@ typedef struct {
   ErrandsRenameListDialog *rename_list_dialog;
   ErrandsDeleteListDialog *delete_list_dialog;
 
-  // Notes window
   ErrandsNotesWindow *notes_window;
   ErrandsPriorityWindow *priority_window;
-  AdwDialog *datetime_window;
-  AdwDialog *tags_window;
+  ErrandsTagsWindow *tags_window;
 
   // User Data
   GPtrArray *tl_data;

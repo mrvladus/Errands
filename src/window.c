@@ -5,6 +5,7 @@
 #include "rename-list-dialog.h"
 #include "sidebar.h"
 #include "state.h"
+#include "tags-window.h"
 #include "task-list.h"
 #include "utils.h"
 
@@ -46,6 +47,7 @@ void errands_window_build(ErrandsWindow *win) {
   // Dialogs
   state.notes_window = errands_notes_window_new();
   state.priority_window = errands_priority_window_new();
+  state.tags_window = errands_tags_window_new();
   state.new_list_dialog = errands_new_list_dialog_new();
   state.rename_list_dialog = errands_rename_list_dialog_new();
   state.delete_list_dialog = errands_delete_list_dialog_new();

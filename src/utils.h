@@ -1,6 +1,7 @@
 #ifndef ERRANDS_UTILS_H
 #define ERRANDS_UTILS_H
 
+#include <ctype.h>
 #include <gtk/gtk.h>
 
 #include <stdio.h>
@@ -53,6 +54,20 @@ static inline bool string_array_contains(GPtrArray *str_arr,
     if (string_contains((char *)str_arr->pdata[i], needle))
       return true;
   return false;
+}
+
+// Function to trim leading and trailing whitespace
+static inline char *string_trim(char *str) {
+  // Trim leading whitespace
+  while (isspace((unsigned char)*str))
+    str++;
+  // Trim trailing whitespace
+  char *end = str + strlen(str) - 1;
+  while (end > str && isspace((unsigned char)*end))
+    end--;
+  // Null terminate the trimmed string
+  *(end + 1) = '\0';
+  return str;
 }
 
 static inline bool file_exists(const char *filename) {

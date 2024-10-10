@@ -309,9 +309,7 @@ TaskData *errands_data_add_task(char *text, char *list_uid, char *parent_uid) {
 }
 
 void errands_data_free_task(TaskData *data) {
-  for (int i = 0; i < data->attachments->len; i++)
-    free(data->attachments->pdata[i]);
-  g_ptr_array_unref(data->attachments);
+  g_ptr_array_free(data->attachments, true);
   free(data->changed_at);
   free(data->created_at);
   free(data->due_date);
@@ -320,9 +318,7 @@ void errands_data_free_task(TaskData *data) {
   free(data->parent);
   free(data->rrule);
   free(data->start_date);
-  for (int i = 0; i < data->tags->len; i++)
-    free(data->tags->pdata[i]);
-  g_ptr_array_unref(data->tags);
+  g_ptr_array_free(data->tags, true);
   free(data->text);
   free(data->uid);
 }
@@ -469,3 +465,18 @@ GString *errands_data_print_list(char *list_uid) {
   errands_print_tasks(out, "", list_uid, 0);
   return out;
 }
+
+// --- TAGS --- //
+
+void errands_data_tag_add(char *tag) {
+  // Return if empty
+  if (!strcmp(tag, ""))
+    return;
+  // Return if has duplicates
+  for (int i = 0; i < state.tags_data->len; i++)
+    if (!strcmp(tag, state.tags_data->pdata[i]))
+      return;
+  g_ptr_array_insert(state.tags_data, 0, strdup(tag));
+}
+
+void errands_data_tags_free() { g_ptr_array_free(state.tags_data, true); }

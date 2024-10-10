@@ -1,5 +1,4 @@
-#ifndef ERRANDS_DATA_H
-#define ERRANDS_DATA_H
+#pragma once
 
 #include <gtk/gtk.h>
 
@@ -54,4 +53,7 @@ char *errands_data_task_as_ical(TaskData *data);
 // Get task list as formatted for printing string. Return value must be freed.
 GString *errands_data_print_list(char *list_uid);
 
-#endif // ERRANDS_DATA_H
+// --- TAGS --- //
+
+void errands_data_tag_add(char *tag);
+void errands_data_tags_free();
