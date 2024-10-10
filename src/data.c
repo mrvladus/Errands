@@ -67,6 +67,10 @@ void errands_data_load() {
   cJSON *item;
   for (int i = 0; i < len; i++) {
     item = cJSON_GetArrayItem(arr, i);
+    // Check if item deleted
+    // TODO: skip if sync enabled and item synced
+    if (cJSON_GetObjectItem(item, "deleted")->valueint)
+      continue;
     TaskListData *tl = malloc(sizeof(*tl));
     tl->color = strdup(cJSON_GetObjectItem(item, "color")->valuestring);
     tl->deleted = (bool)cJSON_GetObjectItem(item, "deleted")->valueint;
@@ -84,6 +88,10 @@ void errands_data_load() {
   state.t_data = g_ptr_array_new();
   for (int i = 0; i < len; i++) {
     item = cJSON_GetArrayItem(arr, i);
+    // Check if item deleted
+    // TODO: skip if sync enabled and item synced
+    if (cJSON_GetObjectItem(item, "deleted")->valueint)
+      continue;
     TaskData *t = malloc(sizeof(*t));
     // Get attachments
     t->attachments = g_ptr_array_new();
