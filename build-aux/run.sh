@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-SDK_VER=46
+SDK_VER=47
 APP_ID=io.github.mrvladus.List.Devel
 BIN_NAME=errands
 CWD=$(pwd)
@@ -49,5 +49,3 @@ else
         run
     fi
 fi
-
-

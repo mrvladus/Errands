@@ -1,8 +1,8 @@
 {
-    "name": "python3-caldav",
+    "name": "python3-package-installation",
     "buildsystem": "simple",
     "build-commands": [
-        "pip3 install --verbose --exists-action=i --no-index --find-links=\"file://${PWD}\" --prefix=${FLATPAK_DEST} --no-build-isolation --ignore-installed caldav certifi charset-normalizer icalendar idna lxml python-dateutil pytz recurring-ical-events requests six tzlocal urllib3 vobject x-wr-timezone"
+        "pip3 install --verbose --exists-action=i --no-index --find-links=\"file://${PWD}\" --prefix=${FLATPAK_DEST} --no-build-isolation caldav certifi charset-normalizer icalendar idna lxml python-dateutil pytz recurring-ical-events requests six tzlocal urllib3 vobject x-wr-timezone"
     ],
     "sources": [
         {
@@ -17,16 +17,16 @@
         },
         {
             "type": "file",
-            "url": "https://files.pythonhosted.org/packages/e4/a6/7ee57823d46331ddc37dd00749c95b0edec2c79b15fc0d6e6efb532e89ac/charset_normalizer-3.3.2-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl",
-            "sha256": "f27273b60488abe721a075bcca6d7f3964f9f6f067c8c4c605743023d7d3944f",
+            "url": "https://files.pythonhosted.org/packages/99/b0/9c365f6d79a9f0f3c379ddb40a256a67aa69c59609608fe7feb6235896e1/charset_normalizer-3.3.2-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl",
+            "sha256": "8f4a014bc36d3c57402e2977dada34f9c12300af536839dc38c0beab8878f38a",
             "only-arches": [
                 "aarch64"
             ]
         },
         {
             "type": "file",
-            "url": "https://files.pythonhosted.org/packages/40/26/f35951c45070edc957ba40a5b1db3cf60a9dbb1b350c2d5bef03e01e61de/charset_normalizer-3.3.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
-            "sha256": "753f10e867343b4511128c6ed8c82f7bec3bd026875576dfd88483c5c73b2fd8",
+            "url": "https://files.pythonhosted.org/packages/ee/fb/14d30eb4956408ee3ae09ad34299131fb383c47df355ddb428a7331cfa1e/charset_normalizer-3.3.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+            "sha256": "90d558489962fd4918143277a773316e56c72da56ec7aa3dc3dbbe20fdfed15b",
             "only-arches": [
                 "x86_64"
             ]
@@ -43,16 +43,16 @@
         },
         {
             "type": "file",
-            "url": "https://files.pythonhosted.org/packages/6e/27/5775154626e0898a82dba7a7ee8bb503c78f64d33e56c3a031bd1bf4e336/lxml-5.2.1-cp311-cp311-manylinux_2_28_aarch64.whl",
-            "sha256": "3a6b45da02336895da82b9d472cd274b22dc27a5cea1d4b793874eead23dd14f",
+            "url": "https://files.pythonhosted.org/packages/d0/f1/3a0bd5064c764966e5d1dd0e75048960a7f38c833422ff5e10c8f4ad8363/lxml-5.2.1-cp312-cp312-manylinux_2_28_aarch64.whl",
+            "sha256": "f9737bf36262046213a28e789cc82d82c6ef19c85a0cf05e75c670a33342ac2c",
             "only-arches": [
                 "aarch64"
             ]
         },
         {
             "type": "file",
-            "url": "https://files.pythonhosted.org/packages/be/c3/1765e019344d3f042dfe750eb9a424c0ea2fd43deb6b2ac176b5603a436e/lxml-5.2.1-cp311-cp311-manylinux_2_28_x86_64.whl",
-            "sha256": "200e63525948e325d6a13a76ba2911f927ad399ef64f57898cf7c74e69b71095",
+            "url": "https://files.pythonhosted.org/packages/ac/9b/f97fac2e2bacbc91d1a15f24e3bdbb52e418591109393144a943bd502d2c/lxml-5.2.1-cp312-cp312-manylinux_2_28_x86_64.whl",
+            "sha256": "f0a1bc63a465b6d72569a9bba9f2ef0334c4e03958e043da1920299100bc7c08",
             "only-arches": [
                 "x86_64"
             ]
