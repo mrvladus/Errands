@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Callable
 
 from gi.repository import Adw, Gdk, Gio, GLib, GObject, Gtk  # type:ignore
 
@@ -53,7 +53,7 @@ class Task(Gtk.Revealer):
         self.group: Gio.SimpleActionGroup = Gio.SimpleActionGroup()
         self.insert_action_group(name="task", group=self.group)
 
-        def __create_action(name: str, callback: callable) -> None:
+        def __create_action(name: str, callback: Callable) -> None:
             action: Gio.SimpleAction = Gio.SimpleAction(name=name)
             action.connect("activate", callback)
             self.group.add_action(action)
@@ -197,6 +197,10 @@ class Task(Gtk.Revealer):
         right_click_ctrl = Gtk.GestureClick(button=3)
         right_click_ctrl.connect("released", self.__on_right_click)
         self.title_row.add_controller(right_click_ctrl)
+        right_click_ctrl_touch = Gtk.GestureLongPress(touch_only=True)
+        right_click_ctrl_touch.connect("pressed", self.__on_right_click)
+        self.title_row.add_controller(right_click_ctrl_touch)
+
 
         self.popover_menu: Gtk.PopoverMenu = Gtk.PopoverMenu(
             halign=Gtk.Align.START,

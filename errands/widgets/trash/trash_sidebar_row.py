@@ -54,16 +54,20 @@ class TrashSidebarRow(Gtk.ListBoxRow):
         # Gesture click
         self.gesture_click = Gtk.GestureClick(button=3)
         self.gesture_click.connect("released", self._on_row_pressed)
+        self.add_controller(self.gesture_click)
+        right_click_ctrl_touch = Gtk.GestureLongPress(touch_only=True)
+        right_click_ctrl_touch.connect("pressed", self._on_row_pressed)
+        self.add_controller(right_click_ctrl_touch)
 
         # Context menu
         self.popover_menu = Gtk.PopoverMenu(
             halign=Gtk.Align.START,
             has_arrow=False,
             menu_model=ErrandsSimpleMenu(
-                items=[
+                items=(
                     ErrandsMenuItem(_("Clear"), "trash_row.clear"),
-                    ErrandsMenuItem(_("Restore"), "trash_row.restore"),
-                ]
+                    ErrandsMenuItem(_("Restore"), "trash_row.restore")
+                )
             ),
         )
 
@@ -75,7 +79,6 @@ class TrashSidebarRow(Gtk.ListBoxRow):
             )
         )
 
-        self.add_controller(self.gesture_click)
 
     def __add_actions(self) -> None:
         self.group: Gio.SimpleActionGroup = Gio.SimpleActionGroup()

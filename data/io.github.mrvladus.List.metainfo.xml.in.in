@@ -57,6 +57,18 @@
   </requires>
 
   <releases>
+  <release version="46.2.6" date="2024-10-09">
+      <description translatable="no">
+        <p>Fixes:</p>
+        <ul>
+          <li>Fixed long-press right-click menu on touch devices</li>
+        </ul>
+        <p>Translations:</p>
+        <ul>
+          <li>Updated Spanish translation (haggen88)</li>
+        </ul>
+      </description>
+    </release>
   <release version="46.2.5" date="2024-10-03">
       <description translatable="no">
         <p>Translations:</p>

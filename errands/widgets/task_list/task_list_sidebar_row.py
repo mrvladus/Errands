@@ -177,6 +177,9 @@ class TaskListSidebarRow(Gtk.ListBoxRow):
         right_click = Gtk.GestureClick(button=3)
         right_click.connect("released", self._on_row_pressed)
         self.add_controller(right_click)
+        right_click_ctrl_touch = Gtk.GestureLongPress(touch_only=True)
+        right_click_ctrl_touch.connect("pressed", self._on_row_pressed)
+        self.add_controller(right_click_ctrl_touch)
 
         # Context menu
         self.popover_menu = Gtk.PopoverMenu(
