@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-10-10 12:25+0300\n"
-"PO-Revision-Date: 2024-09-25 13:18+0300\n"
+"PO-Revision-Date: 2024-10-11 08:27+0300\n"
 "Last-Translator: Indrek Haav <indrek.haav@pm.me>\n"
 "Language-Team: \n"
 "Language: et\n"
@@ -406,9 +406,8 @@ msgid "Content"
 msgstr "Sisu"
 
 #: errands/widgets/window.py:66
-#, fuzzy
 msgid "Loading Tasks"
-msgstr "Lisa uued ülesanded"
+msgstr "Ülesannete laadimine"
 
 #: errands/widgets/window.py:88
 msgid "No Task Lists"
@@ -427,13 +426,12 @@ msgid "Create new List"
 msgstr "Lisa uus nimekiri"
 
 #: errands/widgets/window.py:115 errands/widgets/window.py:123
-#, fuzzy
 msgid "Syncing"
-msgstr "Sünkroonimine..."
+msgstr "Sünkroonimine"
 
 #: errands/widgets/window.py:116
 msgid "First syncronization is running"
-msgstr ""
+msgstr "Esmane sünkroonimine käib"
 
 #: errands/widgets/window.py:172
 msgid "translator-credits"
