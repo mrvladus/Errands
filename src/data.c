@@ -180,8 +180,12 @@ void errands_data_write() {
   for (int i = 0; i < state.t_data->len; i++) {
     TaskData *data = state.t_data->pdata[i];
     cJSON *t_data = cJSON_CreateObject();
-    // TODO: attachments
-    cJSON_AddItemToObject(t_data, "attachments", cJSON_CreateArray());
+    cJSON *attachments_array = cJSON_CreateArray();
+    for (int j = 0; j < data->attachments->len; j++) {
+      cJSON *attachment_item = cJSON_CreateString(data->tags->pdata[j]);
+      cJSON_AddItemToArray(attachments_array, attachment_item);
+    }
+    cJSON_AddItemToObject(t_data, "attachments", attachments_array);
     cJSON_AddItemToObject(t_data, "color", cJSON_CreateString(data->color));
     cJSON_AddItemToObject(t_data, "completed",
                           cJSON_CreateBool(data->completed));
@@ -206,8 +210,12 @@ void errands_data_write() {
     cJSON_AddItemToObject(t_data, "start_date",
                           cJSON_CreateString(data->start_date));
     cJSON_AddItemToObject(t_data, "synced", cJSON_CreateBool(data->synced));
-    // TODO: tags
-    cJSON_AddItemToObject(t_data, "tags", cJSON_CreateArray());
+    cJSON *tags_array = cJSON_CreateArray();
+    for (int j = 0; j < data->tags->len; j++) {
+      cJSON *tag_item = cJSON_CreateString(data->tags->pdata[j]);
+      cJSON_AddItemToArray(tags_array, tag_item);
+    }
+    cJSON_AddItemToObject(t_data, "tags", tags_array);
     cJSON_AddItemToObject(t_data, "text", cJSON_CreateString(data->text));
     cJSON_AddItemToObject(t_data, "toolbar_shown",
                           cJSON_CreateBool(data->toolbar_shown));
@@ -477,6 +485,25 @@ void errands_data_tag_add(char *tag) {
     if (!strcmp(tag, state.tags_data->pdata[i]))
       return;
   g_ptr_array_insert(state.tags_data, 0, strdup(tag));
+}
+
+void errands_data_tag_remove(char *tag) {
+  // Remove from tags
+  for (int i = 0; i < state.tags_data->len; i++)
+    if (!strcmp(tag, state.tags_data->pdata[i])) {
+      char *_tag = g_ptr_array_steal_index(state.tags_data, i);
+      free(_tag);
+    }
+  // Remove from tasks's tags
+  for (int i = 0; i < state.t_data->len; i++) {
+    TaskData *td = state.t_data->pdata[i];
+    for (int j = 0; j < td->tags->len; j++)
+      if (!strcmp(tag, td->tags->pdata[j])) {
+        char *_tag = g_ptr_array_steal_index(td->tags, j);
+        free(_tag);
+        j--;
+      }
+  }
 }
 
 void errands_data_tags_free() { g_ptr_array_free(state.tags_data, true); }

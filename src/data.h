@@ -57,3 +57,4 @@ GString *errands_data_print_list(char *list_uid);
 
 void errands_data_tag_add(char *tag);
 void errands_data_tags_free();
+void errands_data_tag_remove(char *tag);
