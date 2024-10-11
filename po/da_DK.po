@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-10-10 12:25+0300\n"
-"PO-Revision-Date: 2024-07-22 14:32+0200\n"
+"PO-Revision-Date: 2024-10-11 05:15+0200\n"
 "Last-Translator: Peter Normann <peter@normann.dev>\n"
 "Language-Team: \n"
 "Language: da_DK\n"
@@ -406,9 +406,8 @@ msgid "Content"
 msgstr "Indhold"
 
 #: errands/widgets/window.py:66
-#, fuzzy
 msgid "Loading Tasks"
-msgstr "Tilføj nye opgaver"
+msgstr "Indlæser opgaver"
 
 #: errands/widgets/window.py:88
 msgid "No Task Lists"
@@ -427,13 +426,12 @@ msgid "Create new List"
 msgstr "Opret ny liste"
 
 #: errands/widgets/window.py:115 errands/widgets/window.py:123
-#, fuzzy
 msgid "Syncing"
-msgstr "Synkroniserer..."
+msgstr "Synkroniserer"
 
 #: errands/widgets/window.py:116
 msgid "First syncronization is running"
-msgstr ""
+msgstr "Første synkronisering kører"
 
 #: errands/widgets/window.py:172
 msgid "translator-credits"
@@ -565,7 +563,7 @@ msgstr "Kan ikke skabe forbindelse"
 #. NOTE: Also catches invalid credentials
 #: errands/widgets/preferences.py:227
 msgid "Can't connect. Check credentials"
-msgstr "Kan ikke skabe forbindelse. Tjek dine adgangsoplysninger."
+msgstr "Kan ikke skabe forbindelse. Tjek dine adgangsoplysninger"
 
 #: errands/lib/sync/providers/caldav.py:66
 msgid "Not all sync credentials provided. Please check settings."
