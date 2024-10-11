@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-17 17:01+0300\n"
+"POT-Creation-Date: 2024-10-10 12:25+0300\n"
 "PO-Revision-Date: 2024-02-04 13:34+0330\n"
 "Last-Translator: Danial Behzadi <dani.behzi@ubuntu.com>\n"
 "Language-Team: \n"
@@ -27,7 +27,7 @@ msgid "Are you sure?"
 msgstr "مطمئنید؟"
 
 #: errands/widgets/shared/components/dialogs.py:35
-#: errands/widgets/sidebar.py:300 errands/widgets/task.py:246
+#: errands/widgets/sidebar.py:300 errands/widgets/task.py:250
 #: errands/widgets/task_list/task_list_sidebar_row.py:99
 #: errands/widgets/today/today_task.py:146
 msgid "Cancel"
@@ -68,7 +68,7 @@ msgstr ""
 
 #: errands/widgets/shared/datetime_picker.py:138
 #: errands/widgets/today/today.py:57
-#: errands/widgets/today/today_sidebar_row.py:30 errands/widgets/window.py:67
+#: errands/widgets/today/today_sidebar_row.py:30 errands/widgets/window.py:69
 msgid "Today"
 msgstr "امروز"
 
@@ -82,11 +82,11 @@ msgstr "اکنون"
 
 #: errands/widgets/shared/datetime_picker.py:160
 #: errands/widgets/trash/trash.py:40
-#: errands/widgets/trash/trash_sidebar_row.py:64
+#: errands/widgets/trash/trash_sidebar_row.py:68
 msgid "Clear"
 msgstr "پاک‌سازی"
 
-#: errands/widgets/shared/datetime_picker.py:210
+#: errands/widgets/shared/datetime_picker.py:214
 msgid "Set Date"
 msgstr "تنظیم تاریخ"
 
@@ -94,7 +94,7 @@ msgstr "تنظیم تاریخ"
 msgid "Start / Due Date"
 msgstr ""
 
-#: errands/widgets/shared/task_toolbar/toolbar.py:49 errands/lib/utils.py:20
+#: errands/widgets/shared/task_toolbar/toolbar.py:49 errands/lib/utils.py:24
 #, fuzzy
 msgid "Date"
 msgstr "تنظیم تاریخ"
@@ -171,7 +171,7 @@ msgstr ""
 #: errands/widgets/shared/task_toolbar/attachments_window.py:123
 #: errands/widgets/tags/tags.py:140
 #: errands/widgets/task_list/task_list_sidebar_row.py:60
-#: errands/widgets/task_list/task_list_sidebar_row.py:187
+#: errands/widgets/task_list/task_list_sidebar_row.py:191
 #: errands/widgets/trash/trash.py:159
 msgid "Delete"
 msgstr "حذف"
@@ -216,8 +216,8 @@ msgstr "زدن دکمهٔ «+»"
 msgid "Task Lists"
 msgstr "بدون سیاههٔ تکلیف"
 
-#: errands/widgets/sidebar.py:106 errands/widgets/window.py:43
-#: errands/widgets/window.py:148 data/io.github.mrvladus.List.desktop.in.in:3
+#: errands/widgets/sidebar.py:106 errands/widgets/window.py:44
+#: errands/widgets/window.py:167 data/io.github.mrvladus.List.desktop.in.in:3
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:6
 msgid "Errands"
 msgstr "مأموریت‌ها"
@@ -301,41 +301,41 @@ msgstr "تغغیر وضعیت جزییات"
 msgid "Toggle Toolbar"
 msgstr "تغییر وضعیت نوار کناری"
 
-#: errands/widgets/task.py:206 errands/widgets/task.py:226
+#: errands/widgets/task.py:210 errands/widgets/task.py:230
 #: errands/widgets/today/today_task.py:117
 #: errands/widgets/today/today_task.py:127
 msgid "Edit"
 msgstr ""
 
-#: errands/widgets/task.py:207 errands/widgets/today/today_task.py:118
+#: errands/widgets/task.py:211 errands/widgets/today/today_task.py:118
 msgid "Move to Trash"
 msgstr ""
 
-#: errands/widgets/task.py:208 errands/widgets/today/today_task.py:119
+#: errands/widgets/task.py:212 errands/widgets/today/today_task.py:119
 #, fuzzy
 msgid "Copy to Clipboard"
 msgstr "رونوشت شده در تخته‌گیره"
 
-#: errands/widgets/task.py:209
-#: errands/widgets/task_list/task_list_sidebar_row.py:188
+#: errands/widgets/task.py:213
+#: errands/widgets/task_list/task_list_sidebar_row.py:192
 #: errands/widgets/today/today_task.py:120
 msgid "Export"
 msgstr "برون‌ریزی"
 
-#: errands/widgets/task.py:299 errands/widgets/task_list/task_list.py:84
+#: errands/widgets/task.py:306 errands/widgets/task_list/task_list.py:84
 #, fuzzy
 msgid "Completed"
 msgstr "کامل شده:"
 
-#: errands/widgets/task.py:323
+#: errands/widgets/task.py:330
 msgid "Add new Sub-Task"
 msgstr "افزودن زیرتکلیف جدید"
 
-#: errands/widgets/task.py:534 errands/widgets/task_list/task_list.py:246
+#: errands/widgets/task.py:552 errands/widgets/task_list/task_list.py:238
 msgid "Completed:"
 msgstr "کامل شده:"
 
-#: errands/widgets/task.py:921
+#: errands/widgets/task.py:945
 #, fuzzy
 msgid "Delete Tag"
 msgstr "حذف"
@@ -353,14 +353,9 @@ msgstr "حذف تکلیف‌های انجام شده"
 msgid "Scroll Up"
 msgstr "لغزش به بالا"
 
-#: errands/widgets/task_list/task_list.py:144
+#: errands/widgets/task_list/task_list.py:143
 msgid "Add new Task"
 msgstr "افزودن تکلیف جدید"
-
-#: errands/widgets/task_list/task_list.py:156
-#, fuzzy
-msgid "Loading..."
-msgstr "هم‌گام ساختن…"
 
 #: errands/widgets/task_list/task_list_sidebar_row.py:59
 msgid "List will be permanently deleted"
@@ -386,7 +381,7 @@ msgstr "برون‌ریزی شکست خورد"
 msgid "Color"
 msgstr ""
 
-#: errands/widgets/task_list/task_list_sidebar_row.py:186
+#: errands/widgets/task_list/task_list_sidebar_row.py:190
 msgid "Rename"
 msgstr "تغییر نام"
 
@@ -403,12 +398,12 @@ msgid "No deleted items"
 msgstr "بدون مورد حذف شده"
 
 #: errands/widgets/trash/trash.py:55 errands/widgets/trash/trash.py:189
-#: errands/widgets/trash/trash_sidebar_row.py:65
+#: errands/widgets/trash/trash_sidebar_row.py:69
 msgid "Restore"
 msgstr "بازآوری"
 
 #: errands/widgets/trash/trash.py:89
-#: errands/widgets/trash/trash_sidebar_row.py:43 errands/widgets/window.py:77
+#: errands/widgets/trash/trash_sidebar_row.py:43 errands/widgets/window.py:75
 msgid "Trash"
 msgstr "زباله‌دان"
 
@@ -416,7 +411,7 @@ msgstr "زباله‌دان"
 msgid "Tasks will be permanently deleted"
 msgstr "تکلیف برای همیشه حذف خواهد شد"
 
-#: errands/widgets/window.py:56
+#: errands/widgets/window.py:57
 #, fuzzy
 msgid "Sidebar"
 msgstr "تغییر وضعیت نوار کناری"
@@ -425,32 +420,46 @@ msgstr "تغییر وضعیت نوار کناری"
 msgid "Content"
 msgstr ""
 
-#: errands/widgets/window.py:90
+#: errands/widgets/window.py:66
+#, fuzzy
+msgid "Loading Tasks"
+msgstr "افزودن تکلیف جدید"
+
+#: errands/widgets/window.py:88
 msgid "No Task Lists"
 msgstr "بدون سیاههٔ تکلیف"
 
-#: errands/widgets/window.py:91
+#: errands/widgets/window.py:89
 msgid "Create new or import existing one"
 msgstr ""
 
-#: errands/widgets/window.py:95
+#: errands/widgets/window.py:93
 msgid "Create List"
 msgstr "ایجاد سیاهه"
 
-#: errands/widgets/window.py:104
+#: errands/widgets/window.py:102
 #, fuzzy
 msgid "Create new List"
 msgstr "ایجاد سیاهه"
 
-#: errands/widgets/window.py:153
+#: errands/widgets/window.py:115 errands/widgets/window.py:123
+#, fuzzy
+msgid "Syncing"
+msgstr "هم‌گام ساختن…"
+
+#: errands/widgets/window.py:116
+msgid "First syncronization is running"
+msgstr ""
+
+#: errands/widgets/window.py:172
 msgid "translator-credits"
 msgstr "دانیال بهزادی <dani.behzi@ubuntu.com>"
 
-#: errands/widgets/window.py:159
+#: errands/widgets/window.py:178
 msgid "Sync is disabled"
 msgstr "همگام سازی از کار افتاده"
 
-#: errands/widgets/window.py:194
+#: errands/widgets/window.py:213
 msgid "Imported"
 msgstr "درون ریخته"
 
@@ -586,25 +595,25 @@ msgstr "نتواسنت به این کارساز CalDAV وصل شود:"
 msgid "New Task List"
 msgstr "بدون سیاههٔ تکلیف"
 
-#: errands/lib/notifications.py:75
+#: errands/lib/notifications.py:74
 #, fuzzy
 msgid "Task is Due"
 msgstr "تکلیف‌ها"
 
-#: errands/application.py:80
+#: errands/application.py:78
 msgid "Errands was updated"
 msgstr ""
 
-#: errands/application.py:81
+#: errands/application.py:79
 msgid "Restart is required"
 msgstr ""
 
-#: errands/application.py:84
+#: errands/application.py:82
 #, fuzzy
 msgid "Restart"
 msgstr "بازآوری"
 
-#: errands/application.py:113
+#: errands/application.py:111
 msgid "Errands need to run in the background for notifications"
 msgstr ""
 
@@ -678,6 +687,10 @@ msgstr "درون‌ریزی پرونده‌های ‪.ics"
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:41
 msgid "Main Window View"
 msgstr ""
+
+#, fuzzy
+#~ msgid "Loading..."
+#~ msgstr "هم‌گام ساختن…"
 
 #~ msgid "Not Set"
 #~ msgstr "تنظیم نشده"

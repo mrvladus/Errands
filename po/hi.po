@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-17 17:01+0300\n"
+"POT-Creation-Date: 2024-10-10 12:25+0300\n"
 "PO-Revision-Date: 2024-05-30 21:53+0530\n"
 "Last-Translator: Scrambled777 <weblate.scrambled777@simplelogin.com>\n"
 "Language-Team: Hindi <indlinux-hindi@lists.sourceforge.net>\n"
@@ -28,7 +28,7 @@ msgid "Are you sure?"
 msgstr "क्या आप निश्चित हैं?"
 
 #: errands/widgets/shared/components/dialogs.py:35
-#: errands/widgets/sidebar.py:300 errands/widgets/task.py:246
+#: errands/widgets/sidebar.py:300 errands/widgets/task.py:250
 #: errands/widgets/task_list/task_list_sidebar_row.py:99
 #: errands/widgets/today/today_task.py:146
 msgid "Cancel"
@@ -69,7 +69,7 @@ msgstr "भूरा"
 
 #: errands/widgets/shared/datetime_picker.py:138
 #: errands/widgets/today/today.py:57
-#: errands/widgets/today/today_sidebar_row.py:30 errands/widgets/window.py:67
+#: errands/widgets/today/today_sidebar_row.py:30 errands/widgets/window.py:69
 msgid "Today"
 msgstr "आज"
 
@@ -83,11 +83,11 @@ msgstr "अभी"
 
 #: errands/widgets/shared/datetime_picker.py:160
 #: errands/widgets/trash/trash.py:40
-#: errands/widgets/trash/trash_sidebar_row.py:64
+#: errands/widgets/trash/trash_sidebar_row.py:68
 msgid "Clear"
 msgstr "साफ करें"
 
-#: errands/widgets/shared/datetime_picker.py:210
+#: errands/widgets/shared/datetime_picker.py:214
 msgid "Set Date"
 msgstr "तिथि निर्धारित करें"
 
@@ -95,7 +95,7 @@ msgstr "तिथि निर्धारित करें"
 msgid "Start / Due Date"
 msgstr "प्रारंभ / नियत तिथि"
 
-#: errands/widgets/shared/task_toolbar/toolbar.py:49 errands/lib/utils.py:20
+#: errands/widgets/shared/task_toolbar/toolbar.py:49 errands/lib/utils.py:24
 msgid "Date"
 msgstr "तिथि"
 
@@ -168,7 +168,7 @@ msgstr "फाइल खोलें"
 #: errands/widgets/shared/task_toolbar/attachments_window.py:123
 #: errands/widgets/tags/tags.py:140
 #: errands/widgets/task_list/task_list_sidebar_row.py:60
-#: errands/widgets/task_list/task_list_sidebar_row.py:187
+#: errands/widgets/task_list/task_list_sidebar_row.py:191
 #: errands/widgets/trash/trash.py:159
 msgid "Delete"
 msgstr "मिटाएं"
@@ -212,8 +212,8 @@ msgstr "\"+\" बटन क्लिक करें"
 msgid "Task Lists"
 msgstr "कार्य सूचियां"
 
-#: errands/widgets/sidebar.py:106 errands/widgets/window.py:43
-#: errands/widgets/window.py:148 data/io.github.mrvladus.List.desktop.in.in:3
+#: errands/widgets/sidebar.py:106 errands/widgets/window.py:44
+#: errands/widgets/window.py:167 data/io.github.mrvladus.List.desktop.in.in:3
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:6
 msgid "Errands"
 msgstr "Errands"
@@ -292,39 +292,39 @@ msgstr "पूर्णता टॉगल करें"
 msgid "Toggle Toolbar"
 msgstr "टूलबार टॉगल करें"
 
-#: errands/widgets/task.py:206 errands/widgets/task.py:226
+#: errands/widgets/task.py:210 errands/widgets/task.py:230
 #: errands/widgets/today/today_task.py:117
 #: errands/widgets/today/today_task.py:127
 msgid "Edit"
 msgstr "संपादित करें"
 
-#: errands/widgets/task.py:207 errands/widgets/today/today_task.py:118
+#: errands/widgets/task.py:211 errands/widgets/today/today_task.py:118
 msgid "Move to Trash"
 msgstr "रद्दी में ले जाएं"
 
-#: errands/widgets/task.py:208 errands/widgets/today/today_task.py:119
+#: errands/widgets/task.py:212 errands/widgets/today/today_task.py:119
 msgid "Copy to Clipboard"
 msgstr "क्लिपबोर्ड पर कॉपी करें"
 
-#: errands/widgets/task.py:209
-#: errands/widgets/task_list/task_list_sidebar_row.py:188
+#: errands/widgets/task.py:213
+#: errands/widgets/task_list/task_list_sidebar_row.py:192
 #: errands/widgets/today/today_task.py:120
 msgid "Export"
 msgstr "निर्यात"
 
-#: errands/widgets/task.py:299 errands/widgets/task_list/task_list.py:84
+#: errands/widgets/task.py:306 errands/widgets/task_list/task_list.py:84
 msgid "Completed"
 msgstr "पूर्ण"
 
-#: errands/widgets/task.py:323
+#: errands/widgets/task.py:330
 msgid "Add new Sub-Task"
 msgstr "नया उप-कार्य जोड़ें"
 
-#: errands/widgets/task.py:534 errands/widgets/task_list/task_list.py:246
+#: errands/widgets/task.py:552 errands/widgets/task_list/task_list.py:238
 msgid "Completed:"
 msgstr "पूर्ण:"
 
-#: errands/widgets/task.py:921
+#: errands/widgets/task.py:945
 msgid "Delete Tag"
 msgstr "टैग मिटाएं"
 
@@ -340,13 +340,9 @@ msgstr "पूर्ण कार्य मिटाएं"
 msgid "Scroll Up"
 msgstr "ऊपर स्क्रॉल करें"
 
-#: errands/widgets/task_list/task_list.py:144
+#: errands/widgets/task_list/task_list.py:143
 msgid "Add new Task"
 msgstr "नया कार्य जोड़ें"
-
-#: errands/widgets/task_list/task_list.py:156
-msgid "Loading..."
-msgstr "लोड हो रहा है..."
 
 #: errands/widgets/task_list/task_list_sidebar_row.py:59
 msgid "List will be permanently deleted"
@@ -372,7 +368,7 @@ msgstr "निर्यात विफल"
 msgid "Color"
 msgstr "रंग"
 
-#: errands/widgets/task_list/task_list_sidebar_row.py:186
+#: errands/widgets/task_list/task_list_sidebar_row.py:190
 msgid "Rename"
 msgstr "नाम बदलें"
 
@@ -389,12 +385,12 @@ msgid "No deleted items"
 msgstr "कोई मिटाया गयी वस्तुएं नहीं"
 
 #: errands/widgets/trash/trash.py:55 errands/widgets/trash/trash.py:189
-#: errands/widgets/trash/trash_sidebar_row.py:65
+#: errands/widgets/trash/trash_sidebar_row.py:69
 msgid "Restore"
 msgstr "पुनर्स्थापित करें"
 
 #: errands/widgets/trash/trash.py:89
-#: errands/widgets/trash/trash_sidebar_row.py:43 errands/widgets/window.py:77
+#: errands/widgets/trash/trash_sidebar_row.py:43 errands/widgets/window.py:75
 msgid "Trash"
 msgstr "रद्दी"
 
@@ -402,7 +398,7 @@ msgstr "रद्दी"
 msgid "Tasks will be permanently deleted"
 msgstr "कार्य स्थायी रूप से मिटा दिए जाएंगे"
 
-#: errands/widgets/window.py:56
+#: errands/widgets/window.py:57
 msgid "Sidebar"
 msgstr "पार्श्वपट्टी"
 
@@ -410,31 +406,45 @@ msgstr "पार्श्वपट्टी"
 msgid "Content"
 msgstr "अंतर्वस्तु"
 
-#: errands/widgets/window.py:90
+#: errands/widgets/window.py:66
+#, fuzzy
+msgid "Loading Tasks"
+msgstr "नये कार्य जोड़ें"
+
+#: errands/widgets/window.py:88
 msgid "No Task Lists"
 msgstr "कोई कार्य सूची नहीं"
 
-#: errands/widgets/window.py:91
+#: errands/widgets/window.py:89
 msgid "Create new or import existing one"
 msgstr "नई बनाएं या मौजूदा आयात करें"
 
-#: errands/widgets/window.py:95
+#: errands/widgets/window.py:93
 msgid "Create List"
 msgstr "सूची बनाएं"
 
-#: errands/widgets/window.py:104
+#: errands/widgets/window.py:102
 msgid "Create new List"
 msgstr "नई सूची बनाएं"
 
-#: errands/widgets/window.py:153
+#: errands/widgets/window.py:115 errands/widgets/window.py:123
+#, fuzzy
+msgid "Syncing"
+msgstr "समन्वयित हो रहा है..."
+
+#: errands/widgets/window.py:116
+msgid "First syncronization is running"
+msgstr ""
+
+#: errands/widgets/window.py:172
 msgid "translator-credits"
 msgstr "Scrambled777 <weblate.scrambled777@simplelogin.com>"
 
-#: errands/widgets/window.py:159
+#: errands/widgets/window.py:178
 msgid "Sync is disabled"
 msgstr "समन्वयन अक्षम है"
 
-#: errands/widgets/window.py:194
+#: errands/widgets/window.py:213
 msgid "Imported"
 msgstr "आयातित"
 
@@ -569,23 +579,23 @@ msgstr "CalDAV सर्वर से जुड़ नहीं सके:"
 msgid "New Task List"
 msgstr "नई कार्य सूची"
 
-#: errands/lib/notifications.py:75
+#: errands/lib/notifications.py:74
 msgid "Task is Due"
 msgstr "कार्य देय है"
 
-#: errands/application.py:80
+#: errands/application.py:78
 msgid "Errands was updated"
 msgstr "Errands अद्यतित किया गया"
 
-#: errands/application.py:81
+#: errands/application.py:79
 msgid "Restart is required"
 msgstr "पुनरारंभ आवश्यक है"
 
-#: errands/application.py:84
+#: errands/application.py:82
 msgid "Restart"
 msgstr "पुनरारंभ"
 
-#: errands/application.py:113
+#: errands/application.py:111
 msgid "Errands need to run in the background for notifications"
 msgstr "अधिसूचनाओं के लिए Errands को पृष्ठभूमि में चलाना होगा"
 
@@ -657,3 +667,6 @@ msgstr ".ics फाइलें आयात करें"
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:41
 msgid "Main Window View"
 msgstr "मुख्य विंडो दृश्य"
+
+#~ msgid "Loading..."
+#~ msgstr "लोड हो रहा है..."

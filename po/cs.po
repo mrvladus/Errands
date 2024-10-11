@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-17 17:01+0300\n"
+"POT-Creation-Date: 2024-10-10 12:25+0300\n"
 "PO-Revision-Date: 2024-05-02 18:35+0200\n"
 "Last-Translator: 32GRat\n"
 "Language-Team: \n"
@@ -26,7 +26,7 @@ msgid "Are you sure?"
 msgstr "Jste si jistý?"
 
 #: errands/widgets/shared/components/dialogs.py:35
-#: errands/widgets/sidebar.py:300 errands/widgets/task.py:246
+#: errands/widgets/sidebar.py:300 errands/widgets/task.py:250
 #: errands/widgets/task_list/task_list_sidebar_row.py:99
 #: errands/widgets/today/today_task.py:146
 msgid "Cancel"
@@ -68,7 +68,7 @@ msgstr "Hnědá"
 
 #: errands/widgets/shared/datetime_picker.py:138
 #: errands/widgets/today/today.py:57
-#: errands/widgets/today/today_sidebar_row.py:30 errands/widgets/window.py:67
+#: errands/widgets/today/today_sidebar_row.py:30 errands/widgets/window.py:69
 msgid "Today"
 msgstr "Dnes"
 
@@ -82,11 +82,11 @@ msgstr "Teď"
 
 #: errands/widgets/shared/datetime_picker.py:160
 #: errands/widgets/trash/trash.py:40
-#: errands/widgets/trash/trash_sidebar_row.py:64
+#: errands/widgets/trash/trash_sidebar_row.py:68
 msgid "Clear"
 msgstr "Zrušit výběr"
 
-#: errands/widgets/shared/datetime_picker.py:210
+#: errands/widgets/shared/datetime_picker.py:214
 msgid "Set Date"
 msgstr "Vybrat datum"
 
@@ -95,7 +95,7 @@ msgstr "Vybrat datum"
 msgid "Start / Due Date"
 msgstr "Start / Do čas"
 
-#: errands/widgets/shared/task_toolbar/toolbar.py:49 errands/lib/utils.py:20
+#: errands/widgets/shared/task_toolbar/toolbar.py:49 errands/lib/utils.py:24
 msgid "Date"
 msgstr "Datum"
 
@@ -168,7 +168,7 @@ msgstr ""
 #: errands/widgets/shared/task_toolbar/attachments_window.py:123
 #: errands/widgets/tags/tags.py:140
 #: errands/widgets/task_list/task_list_sidebar_row.py:60
-#: errands/widgets/task_list/task_list_sidebar_row.py:187
+#: errands/widgets/task_list/task_list_sidebar_row.py:191
 #: errands/widgets/trash/trash.py:159
 msgid "Delete"
 msgstr "Vymazat"
@@ -212,8 +212,8 @@ msgstr "Stiskni klávesu \"+\""
 msgid "Task Lists"
 msgstr "Seznamy úkolů"
 
-#: errands/widgets/sidebar.py:106 errands/widgets/window.py:43
-#: errands/widgets/window.py:148 data/io.github.mrvladus.List.desktop.in.in:3
+#: errands/widgets/sidebar.py:106 errands/widgets/window.py:44
+#: errands/widgets/window.py:167 data/io.github.mrvladus.List.desktop.in.in:3
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:6
 msgid "Errands"
 msgstr "Pochůzky"
@@ -295,40 +295,40 @@ msgstr "Přepnout dokončení"
 msgid "Toggle Toolbar"
 msgstr "Přepnout postranní panel"
 
-#: errands/widgets/task.py:206 errands/widgets/task.py:226
+#: errands/widgets/task.py:210 errands/widgets/task.py:230
 #: errands/widgets/today/today_task.py:117
 #: errands/widgets/today/today_task.py:127
 msgid "Edit"
 msgstr "Upravit"
 
-#: errands/widgets/task.py:207 errands/widgets/today/today_task.py:118
+#: errands/widgets/task.py:211 errands/widgets/today/today_task.py:118
 msgid "Move to Trash"
 msgstr "Přesunout do koše"
 
-#: errands/widgets/task.py:208 errands/widgets/today/today_task.py:119
+#: errands/widgets/task.py:212 errands/widgets/today/today_task.py:119
 #, fuzzy
 msgid "Copy to Clipboard"
 msgstr "Zkopírovat do schránky"
 
-#: errands/widgets/task.py:209
-#: errands/widgets/task_list/task_list_sidebar_row.py:188
+#: errands/widgets/task.py:213
+#: errands/widgets/task_list/task_list_sidebar_row.py:192
 #: errands/widgets/today/today_task.py:120
 msgid "Export"
 msgstr "Exportovat"
 
-#: errands/widgets/task.py:299 errands/widgets/task_list/task_list.py:84
+#: errands/widgets/task.py:306 errands/widgets/task_list/task_list.py:84
 msgid "Completed"
 msgstr "Dokončeno"
 
-#: errands/widgets/task.py:323
+#: errands/widgets/task.py:330
 msgid "Add new Sub-Task"
 msgstr "Přidat nový podúkol"
 
-#: errands/widgets/task.py:534 errands/widgets/task_list/task_list.py:246
+#: errands/widgets/task.py:552 errands/widgets/task_list/task_list.py:238
 msgid "Completed:"
 msgstr "Dokončeno:"
 
-#: errands/widgets/task.py:921
+#: errands/widgets/task.py:945
 msgid "Delete Tag"
 msgstr "Smazat štítek"
 
@@ -344,14 +344,9 @@ msgstr "Smazat hotové úkoly"
 msgid "Scroll Up"
 msgstr "Posunout nahoru"
 
-#: errands/widgets/task_list/task_list.py:144
+#: errands/widgets/task_list/task_list.py:143
 msgid "Add new Task"
 msgstr "Přidat nový úkol"
-
-#: errands/widgets/task_list/task_list.py:156
-#, fuzzy
-msgid "Loading..."
-msgstr "Synchronizace..."
 
 #: errands/widgets/task_list/task_list_sidebar_row.py:59
 #, fuzzy
@@ -378,7 +373,7 @@ msgstr "Export selhal"
 msgid "Color"
 msgstr ""
 
-#: errands/widgets/task_list/task_list_sidebar_row.py:186
+#: errands/widgets/task_list/task_list_sidebar_row.py:190
 msgid "Rename"
 msgstr "Přejmenovat"
 
@@ -396,12 +391,12 @@ msgid "No deleted items"
 msgstr "Žádné smazané položky"
 
 #: errands/widgets/trash/trash.py:55 errands/widgets/trash/trash.py:189
-#: errands/widgets/trash/trash_sidebar_row.py:65
+#: errands/widgets/trash/trash_sidebar_row.py:69
 msgid "Restore"
 msgstr "Obnovit"
 
 #: errands/widgets/trash/trash.py:89
-#: errands/widgets/trash/trash_sidebar_row.py:43 errands/widgets/window.py:77
+#: errands/widgets/trash/trash_sidebar_row.py:43 errands/widgets/window.py:75
 msgid "Trash"
 msgstr "Koš"
 
@@ -409,7 +404,7 @@ msgstr "Koš"
 msgid "Tasks will be permanently deleted"
 msgstr "Úkoly budou trvale smazány"
 
-#: errands/widgets/window.py:56
+#: errands/widgets/window.py:57
 msgid "Sidebar"
 msgstr "Postranní panel"
 
@@ -417,32 +412,46 @@ msgstr "Postranní panel"
 msgid "Content"
 msgstr "Obsah"
 
-#: errands/widgets/window.py:90
+#: errands/widgets/window.py:66
+#, fuzzy
+msgid "Loading Tasks"
+msgstr "Přidat nový úkol"
+
+#: errands/widgets/window.py:88
 msgid "No Task Lists"
 msgstr "Žádné listy úkolů"
 
-#: errands/widgets/window.py:91
+#: errands/widgets/window.py:89
 #, fuzzy
 msgid "Create new or import existing one"
 msgstr "Vytvořit nebo importovat stávajicí"
 
-#: errands/widgets/window.py:95
+#: errands/widgets/window.py:93
 msgid "Create List"
 msgstr "Vytvořit list"
 
-#: errands/widgets/window.py:104
+#: errands/widgets/window.py:102
 msgid "Create new List"
 msgstr "Vytvořit nová list"
 
-#: errands/widgets/window.py:153
+#: errands/widgets/window.py:115 errands/widgets/window.py:123
+#, fuzzy
+msgid "Syncing"
+msgstr "Synchronizace..."
+
+#: errands/widgets/window.py:116
+msgid "First syncronization is running"
+msgstr ""
+
+#: errands/widgets/window.py:172
 msgid "translator-credits"
 msgstr "Amerey.eu"
 
-#: errands/widgets/window.py:159
+#: errands/widgets/window.py:178
 msgid "Sync is disabled"
 msgstr "Synchronizace je vypnuta"
 
-#: errands/widgets/window.py:194
+#: errands/widgets/window.py:213
 #, fuzzy
 msgid "Imported"
 msgstr "Úkoly byly importovány"
@@ -585,25 +594,25 @@ msgstr "Nelze se připojit k serveru CalDAV na adrese:"
 msgid "New Task List"
 msgstr "Žádné listy úkolů"
 
-#: errands/lib/notifications.py:75
+#: errands/lib/notifications.py:74
 #, fuzzy
 msgid "Task is Due"
 msgstr "Je na čase splnit úkol"
 
-#: errands/application.py:80
+#: errands/application.py:78
 msgid "Errands was updated"
 msgstr ""
 
-#: errands/application.py:81
+#: errands/application.py:79
 msgid "Restart is required"
 msgstr ""
 
-#: errands/application.py:84
+#: errands/application.py:82
 #, fuzzy
 msgid "Restart"
 msgstr "Obnovit"
 
-#: errands/application.py:113
+#: errands/application.py:111
 msgid "Errands need to run in the background for notifications"
 msgstr "Pochůzky potřebují běžet v pozadí aby mohly posílat oznámení"
 
@@ -676,6 +685,10 @@ msgstr "Importovat .ics soubor"
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:41
 msgid "Main Window View"
 msgstr ""
+
+#, fuzzy
+#~ msgid "Loading..."
+#~ msgstr "Synchronizace..."
 
 #, fuzzy
 #~ msgid "Complete Button Size"

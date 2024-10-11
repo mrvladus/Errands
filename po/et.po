@@ -9,160 +9,160 @@ msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-10-10 12:25+0300\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Chung-Wei Chung <webb790709@proton.me>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: zh_TW\n"
+"PO-Revision-Date: 2024-09-25 13:18+0300\n"
+"Last-Translator: Indrek Haav <indrek.haav@pm.me>\n"
+"Language-Team: \n"
+"Language: et\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.5\n"
 
 #: errands/widgets/shared/components/buttons.py:45
 msgid "Info"
-msgstr ""
+msgstr "Info"
 
 #: errands/widgets/shared/components/dialogs.py:31
 msgid "Are you sure?"
-msgstr "您確定嗎？"
+msgstr "Kas oled kindel?"
 
 #: errands/widgets/shared/components/dialogs.py:35
 #: errands/widgets/sidebar.py:300 errands/widgets/task.py:250
 #: errands/widgets/task_list/task_list_sidebar_row.py:99
 #: errands/widgets/today/today_task.py:146
 msgid "Cancel"
-msgstr "取消"
+msgstr "Katkesta"
 
 #: errands/widgets/shared/color_selector.py:32
 #: errands/widgets/shared/task_toolbar/toolbar.py:100
 msgid "None"
-msgstr ""
+msgstr "Puudub"
 
 #: errands/widgets/shared/color_selector.py:41
 msgid "Blue"
-msgstr ""
+msgstr "Sinine"
 
 #: errands/widgets/shared/color_selector.py:50
 msgid "Green"
-msgstr ""
+msgstr "Roheline"
 
 #: errands/widgets/shared/color_selector.py:61
 msgid "Yellow"
-msgstr ""
+msgstr "Kollane"
 
 #: errands/widgets/shared/color_selector.py:72
 msgid "Orange"
-msgstr ""
+msgstr "Oranž"
 
 #: errands/widgets/shared/color_selector.py:81
 msgid "Red"
-msgstr ""
+msgstr "Punane"
 
 #: errands/widgets/shared/color_selector.py:92
 msgid "Purple"
-msgstr ""
+msgstr "Lilla"
 
 #: errands/widgets/shared/color_selector.py:101
 msgid "Brown"
-msgstr ""
+msgstr "Pruun"
 
 #: errands/widgets/shared/datetime_picker.py:138
 #: errands/widgets/today/today.py:57
 #: errands/widgets/today/today_sidebar_row.py:30 errands/widgets/window.py:69
 msgid "Today"
-msgstr ""
+msgstr "Täna"
 
 #: errands/widgets/shared/datetime_picker.py:143
 msgid "Tomorrow"
-msgstr ""
+msgstr "Homme"
 
 #: errands/widgets/shared/datetime_picker.py:154
 msgid "Now"
-msgstr ""
+msgstr "Praegu"
 
 #: errands/widgets/shared/datetime_picker.py:160
 #: errands/widgets/trash/trash.py:40
 #: errands/widgets/trash/trash_sidebar_row.py:68
 msgid "Clear"
-msgstr "清除"
+msgstr "Tühjenda"
 
 #: errands/widgets/shared/datetime_picker.py:214
 msgid "Set Date"
-msgstr ""
+msgstr "Sea kuupäev"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:44
 msgid "Start / Due Date"
-msgstr ""
+msgstr "Algus / Tähtaeg"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:49 errands/lib/utils.py:24
 msgid "Date"
-msgstr ""
+msgstr "Kuupäev"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:59
 #: errands/widgets/shared/task_toolbar/notes_window.py:29
 msgid "Notes"
-msgstr ""
+msgstr "Märkused"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:72
 msgid "Priority"
-msgstr ""
+msgstr "Prioriteet"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:90
 msgid "High"
-msgstr ""
+msgstr "Kõrge"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:94
 msgid "Medium"
-msgstr ""
+msgstr "Keskmine"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:98
 msgid "Low"
-msgstr ""
+msgstr "Madal"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:103
 msgid "Custom"
-msgstr ""
+msgstr "Kohandatud"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:113
 msgid "No Tags"
-msgstr ""
+msgstr "Silte pole"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:134
 #: errands/widgets/tags/tags.py:63 errands/widgets/tags/tags_sidebar_row.py:32
 #: errands/widgets/window.py:72
 msgid "Tags"
-msgstr ""
+msgstr "Sildid"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:157
 #: errands/widgets/shared/task_toolbar/attachments_window.py:30
 msgid "Attachments"
-msgstr ""
+msgstr "Manused"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:191
 #: errands/widgets/shared/task_toolbar/toolbar.py:294
-#, fuzzy
 msgid "Created:"
-msgstr "已完成："
+msgstr "Lisatud:"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:202
 #: errands/widgets/shared/task_toolbar/toolbar.py:295
 msgid "Changed:"
-msgstr ""
+msgstr "Muudetud:"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:215
 msgid "More"
-msgstr ""
+msgstr "Rohkem"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:33
 msgid "No Files Attached"
-msgstr ""
+msgstr "Manuseid pole"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:56
 msgid "Add Attachment"
-msgstr ""
+msgstr "Lisa manus"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:119
 msgid "Open File"
-msgstr ""
+msgstr "Ava fail"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:123
 #: errands/widgets/tags/tags.py:140
@@ -170,288 +170,266 @@ msgstr ""
 #: errands/widgets/task_list/task_list_sidebar_row.py:191
 #: errands/widgets/trash/trash.py:159
 msgid "Delete"
-msgstr "刪除"
+msgstr "Kustuta"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:132
 msgid "Open Containing Folder"
-msgstr ""
+msgstr "Ava faili sisaldav kaust"
 
 #: errands/widgets/shared/task_toolbar/datetime_window.py:29
 msgid "Date and Time"
-msgstr ""
+msgstr "Kuupäev ja kellaaeg"
 
 #: errands/widgets/shared/task_toolbar/datetime_window.py:39
 #: errands/widgets/shared/task_toolbar/datetime_window.py:41
 msgid "Due"
-msgstr ""
+msgstr "Tähtaeg"
 
 #: errands/widgets/shared/task_toolbar/datetime_window.py:54
 #: errands/widgets/shared/task_toolbar/datetime_window.py:56
 msgid "Start"
-msgstr ""
+msgstr "Algus"
 
 #: errands/widgets/sidebar.py:42
 msgid "Add List (Ctrl+Shift+A)"
-msgstr ""
+msgstr "Lisa nimekiri (Ctrl+Shift+A)"
 
 #: errands/widgets/sidebar.py:61
 msgid "Syncing..."
-msgstr ""
+msgstr "Sünkroonimine..."
 
 #: errands/widgets/sidebar.py:67
-#, fuzzy
 msgid "Add new List"
-msgstr "新增待辦事項"
+msgstr "Lisa uus nimekiri"
 
 #: errands/widgets/sidebar.py:68
 msgid "Click \"+\" button"
-msgstr ""
+msgstr "Klõpsa \"+\" nupul"
 
 #. Task lists group
 #: errands/widgets/sidebar.py:94 errands/widgets/preferences.py:66
-#, fuzzy
 msgid "Task Lists"
-msgstr "待辦事項"
+msgstr "Ülesannete nimekirjad"
 
 #: errands/widgets/sidebar.py:106 errands/widgets/window.py:44
 #: errands/widgets/window.py:167 data/io.github.mrvladus.List.desktop.in.in:3
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:6
 msgid "Errands"
-msgstr ""
+msgstr "Errands"
 
 #: errands/widgets/sidebar.py:114
 msgid "Main Menu"
-msgstr "主選單"
+msgstr "Peamenüü"
 
 #: errands/widgets/sidebar.py:121 data/resources/gtk/help-overlay.ui:42
-#, fuzzy
 msgid "Sync / Fetch Tasks"
-msgstr "同步待辦事項"
+msgstr "Sünkrooni ülesanded"
 
 #: errands/widgets/sidebar.py:128
-#, fuzzy
 msgid "Import Task List"
-msgstr "匯入待辦事項"
+msgstr "Impordi ülesannete nimekiri"
 
 #: errands/widgets/sidebar.py:135 data/resources/gtk/help-overlay.ui:20
 msgid "Preferences"
-msgstr "偏好設定"
+msgstr "Eelistused"
 
 #: errands/widgets/sidebar.py:138
 msgid "Keyboard Shortcuts"
-msgstr "鍵盤快捷鍵"
+msgstr "Klaviatuuri otseteed"
 
 #: errands/widgets/sidebar.py:142
 msgid "About Errands"
-msgstr "關於 Errands"
+msgstr "Teave"
 
 #: errands/widgets/sidebar.py:144 data/resources/gtk/help-overlay.ui:27
 msgid "Quit"
-msgstr "離開"
+msgstr "Välju"
 
 #: errands/widgets/sidebar.py:291
 msgid "New List Name"
-msgstr ""
+msgstr "Uue nimekirja nimi"
 
 #: errands/widgets/sidebar.py:295 data/resources/gtk/help-overlay.ui:57
 msgid "Add List"
-msgstr ""
+msgstr "Lisa nimekiri"
 
 #: errands/widgets/sidebar.py:301
 msgid "Add"
-msgstr ""
+msgstr "Lisa"
 
 #: errands/widgets/tags/tags.py:32
 msgid "No Tags Found"
-msgstr ""
+msgstr "Silte ei leitud"
 
 #: errands/widgets/tags/tags.py:33
 msgid "Add new Tags in the entry above"
-msgstr ""
+msgstr "Sisesta uued sildid ülalpool"
 
 #: errands/widgets/tags/tags.py:82
-#, fuzzy
 msgid "Add new Tag"
-msgstr "新增待辦事項"
+msgstr "Lisa uus silt"
 
 #: errands/widgets/task.py:79
 #: errands/widgets/task_list/task_list_sidebar_row.py:125
 #: errands/widgets/today/today_task.py:73
-#, fuzzy
 msgid "Exported"
-msgstr "待辦事項已匯入"
+msgstr "Eksporditud"
 
 #: errands/widgets/task.py:87 errands/widgets/today/today_task.py:81
 msgid "Copied to Clipboard"
-msgstr "已複製到剪貼簿"
+msgstr "Kopeeritud lõikelauale"
 
 #: errands/widgets/task.py:153
-#, fuzzy
 msgid "Toggle Sub-Tasks"
-msgstr "新增子項目"
+msgstr "Kuva/peida sammud"
 
 #: errands/widgets/task.py:161 errands/widgets/today/today_task.py:100
-#, fuzzy
 msgid "Toggle Completion"
-msgstr "側選單開關"
+msgstr "Märgi tehtuks/mittetehtuks"
 
 #: errands/widgets/task.py:191
-#, fuzzy
 msgid "Toggle Toolbar"
-msgstr "側選單開關"
+msgstr "Kuva/peida tööriistariba"
 
 #: errands/widgets/task.py:210 errands/widgets/task.py:230
 #: errands/widgets/today/today_task.py:117
 #: errands/widgets/today/today_task.py:127
 msgid "Edit"
-msgstr "編輯"
+msgstr "Muuda"
 
 #: errands/widgets/task.py:211 errands/widgets/today/today_task.py:118
 msgid "Move to Trash"
-msgstr "移到垃圾桶"
+msgstr "Liiguta prügikasti"
 
 #: errands/widgets/task.py:212 errands/widgets/today/today_task.py:119
-#, fuzzy
 msgid "Copy to Clipboard"
-msgstr "已複製到剪貼簿"
+msgstr "Kopeeri lõikelauale"
 
 #: errands/widgets/task.py:213
 #: errands/widgets/task_list/task_list_sidebar_row.py:192
 #: errands/widgets/today/today_task.py:120
-#, fuzzy
 msgid "Export"
-msgstr "匯出待辦事項"
+msgstr "Ekspordi"
 
 #: errands/widgets/task.py:306 errands/widgets/task_list/task_list.py:84
-#, fuzzy
 msgid "Completed"
-msgstr "已完成："
+msgstr "Tehtud"
 
 #: errands/widgets/task.py:330
 msgid "Add new Sub-Task"
-msgstr "新增子項目"
+msgstr "Lisa uus samm"
 
 #: errands/widgets/task.py:552 errands/widgets/task_list/task_list.py:238
 msgid "Completed:"
-msgstr "已完成："
+msgstr "Tehtud:"
 
 #: errands/widgets/task.py:945
-#, fuzzy
 msgid "Delete Tag"
-msgstr "已刪除的待辦事項"
+msgstr "Kustuta silt"
 
 #: errands/widgets/task_list/task_list.py:50
-#, fuzzy
 msgid "Toggle Completed Tasks"
-msgstr "刪除已完成事項"
+msgstr "Kuva/peida tehtud ülesanded"
 
 #: errands/widgets/task_list/task_list.py:58
-#, fuzzy
 msgid "Delete Completed Tasks"
-msgstr "刪除已完成事項"
+msgstr "Kustuta tehtud ülesanded"
 
 #: errands/widgets/task_list/task_list.py:73
 msgid "Scroll Up"
-msgstr "往上捲動"
+msgstr "Keri üles"
 
 #: errands/widgets/task_list/task_list.py:143
 msgid "Add new Task"
-msgstr "新增待辦事項"
+msgstr "Lisa uus ülesanne"
 
 #: errands/widgets/task_list/task_list_sidebar_row.py:59
-#, fuzzy
 msgid "List will be permanently deleted"
-msgstr "待辦事項將會永久刪除"
+msgstr "Nimekiri kustutatakse jäädavalt"
 
 #: errands/widgets/task_list/task_list_sidebar_row.py:89
 msgid "New Name"
-msgstr ""
+msgstr "Uus nimi"
 
 #: errands/widgets/task_list/task_list_sidebar_row.py:94
 msgid "Rename List"
-msgstr ""
+msgstr "Nimeta nimekiri ümber"
 
 #: errands/widgets/task_list/task_list_sidebar_row.py:100
 msgid "Save"
-msgstr ""
+msgstr "Salvesta"
 
 #: errands/widgets/task_list/task_list_sidebar_row.py:123
-#, fuzzy
 msgid "Export failed"
-msgstr "待辦事項已匯入"
+msgstr "Eksportimine ebaõnnestus"
 
 #: errands/widgets/task_list/task_list_sidebar_row.py:158
 msgid "Color"
-msgstr ""
+msgstr "Värv"
 
 #: errands/widgets/task_list/task_list_sidebar_row.py:190
-#, fuzzy
 msgid "Rename"
-msgstr "帳號"
+msgstr "Nimeta ümber"
 
 #: errands/widgets/today/today.py:31
 msgid "No Tasks for Today"
-msgstr ""
+msgstr "Tänaseks ülesandeid ei ole"
 
 #: errands/widgets/trash/trash.py:31
 msgid "Empty Trash"
-msgstr "清空垃圾桶"
+msgstr "Prügikast tühi"
 
 #: errands/widgets/trash/trash.py:32
 msgid "No deleted items"
-msgstr "沒有已刪除的項目"
+msgstr "Kustutatud üksuseid ei ole"
 
 #: errands/widgets/trash/trash.py:55 errands/widgets/trash/trash.py:189
 #: errands/widgets/trash/trash_sidebar_row.py:69
 msgid "Restore"
-msgstr "還原"
+msgstr "Taasta"
 
 #: errands/widgets/trash/trash.py:89
 #: errands/widgets/trash/trash_sidebar_row.py:43 errands/widgets/window.py:75
-#, fuzzy
 msgid "Trash"
-msgstr "關閉垃圾桶"
+msgstr "Prügikast"
 
 #: errands/widgets/trash/trash.py:158
 msgid "Tasks will be permanently deleted"
-msgstr "待辦事項將會永久刪除"
+msgstr "Ülesanded kustutatakse jäädavalt"
 
 #: errands/widgets/window.py:57
-#, fuzzy
 msgid "Sidebar"
-msgstr "側選單開關"
+msgstr "Külgriba"
 
 #: errands/widgets/window.py:59
 msgid "Content"
-msgstr ""
+msgstr "Sisu"
 
 #: errands/widgets/window.py:66
 #, fuzzy
 msgid "Loading Tasks"
-msgstr "新增待辦事項"
+msgstr "Lisa uued ülesanded"
 
 #: errands/widgets/window.py:88
 msgid "No Task Lists"
-msgstr ""
+msgstr "Ülesannete nimekirju pole"
 
 #: errands/widgets/window.py:89
 msgid "Create new or import existing one"
-msgstr ""
+msgstr "Lisa uus või impordi olemasolev"
 
 #: errands/widgets/window.py:93
-#, fuzzy
 msgid "Create List"
-msgstr "匯入待辦事項"
+msgstr "Lisa nimekiri"
 
 #: errands/widgets/window.py:102
-#, fuzzy
 msgid "Create new List"
-msgstr "匯入待辦事項"
+msgstr "Lisa uus nimekiri"
 
 #: errands/widgets/window.py:115 errands/widgets/window.py:123
 #, fuzzy
 msgid "Syncing"
-msgstr "同步"
+msgstr "Sünkroonimine..."
 
 #: errands/widgets/window.py:116
 msgid "First syncronization is running"
@@ -459,322 +437,236 @@ msgstr ""
 
 #: errands/widgets/window.py:172
 msgid "translator-credits"
-msgstr "翻譯者名單"
+msgstr "Indrek Haav"
 
 #: errands/widgets/window.py:178
 msgid "Sync is disabled"
-msgstr ""
+msgstr "Sünkroonimine on keelatud"
 
 #: errands/widgets/window.py:213
-#, fuzzy
 msgid "Imported"
-msgstr "待辦事項已匯入"
+msgstr "Imporditud"
 
 #: errands/widgets/preferences.py:26
 msgid "Application Theme"
-msgstr "主題風格"
+msgstr "Rakenduse teema"
 
 #: errands/widgets/preferences.py:34
 msgid "System"
-msgstr "跟隨系統配色"
+msgstr "Süsteemne"
 
 #: errands/widgets/preferences.py:46
 msgid "Light"
-msgstr "亮色"
+msgstr "Hele"
 
 #: errands/widgets/preferences.py:58
 msgid "Dark"
-msgstr "暗色"
+msgstr "Tume"
 
 #: errands/widgets/preferences.py:70
-#, fuzzy
 msgid "Add new Tasks"
-msgstr "新增待辦事項"
+msgstr "Lisa uued ülesanded"
 
 #: errands/widgets/preferences.py:71
 msgid "At the Bottom"
-msgstr ""
+msgstr "Nimekirja lõppu"
 
 #: errands/widgets/preferences.py:71
 msgid "At the Top"
-msgstr ""
+msgstr "Nimekirja algusesse"
 
 #: errands/widgets/preferences.py:87
 msgid "Show Notifications"
-msgstr ""
+msgstr "Kuva teavitusi"
 
 #: errands/widgets/preferences.py:94
 msgid "Run in Background"
-msgstr ""
+msgstr "Jooksuta taustal"
 
 #: errands/widgets/preferences.py:95
 msgid "Hide the application window instead of closing it"
-msgstr ""
+msgstr "Rakenduse akna sulgemise asemel peida see"
 
 #: errands/widgets/preferences.py:102
 msgid "Launch on Startup"
-msgstr ""
+msgstr "Käivita automaatselt"
 
 #: errands/widgets/preferences.py:103
 msgid "Launch application when user logs in"
-msgstr ""
+msgstr "Käivita rakendus, kui kasutaja sisse logib"
 
 #: errands/widgets/preferences.py:112
 msgid "Notifications and Background"
-msgstr ""
+msgstr "Teavitused ja tausttöö"
 
 #: errands/widgets/preferences.py:120 errands/widgets/preferences.py:181
 #: data/resources/gtk/help-overlay.ui:38
 msgid "Sync"
-msgstr "同步"
+msgstr "Sünkroonimine"
 
 #. Provider
 #: errands/widgets/preferences.py:123
 msgid "Disabled"
-msgstr "關閉"
+msgstr "Keelatud"
 
 #: errands/widgets/preferences.py:125
 msgid "Sync Provider"
-msgstr "同步服務"
+msgstr "Sünkroonimisteenuse pakkuja"
 
 #: errands/widgets/preferences.py:134
 msgid "Server URL"
-msgstr "伺服器 URL"
+msgstr "Serveri URL"
 
 #: errands/widgets/preferences.py:140
 msgid ""
 "URL needs to include protocol, like <b>http://</b> or <b>https://</b>. If "
 "you have problems with connection - try to change protocol first."
 msgstr ""
+"URL peab sisaldama protokolli, nagu <b>http://</b> või <b>https://</b>. Kui "
+"ühendusega on probleeme, proovi kõigepealt protokolli muuta."
 
 #: errands/widgets/preferences.py:147
 msgid "Username"
-msgstr "帳號"
+msgstr "Kasutajanimi"
 
 #: errands/widgets/preferences.py:153
 msgid "Password"
-msgstr "密碼"
+msgstr "Parool"
 
 #: errands/widgets/preferences.py:159
 msgid "Test"
-msgstr "測試"
+msgstr "Testi"
 
 #: errands/widgets/preferences.py:164
 msgid "Test Connection"
-msgstr "測試連線"
+msgstr "Testi ühendust"
 
 #: errands/widgets/preferences.py:172 data/resources/gtk/help-overlay.ui:9
 msgid "General"
-msgstr "一般功能"
+msgstr "Üldine"
 
 #: errands/widgets/preferences.py:217
 msgid "Connected"
-msgstr ""
+msgstr "Ühendatud"
 
 #: errands/widgets/preferences.py:221
-#, fuzzy
 msgid "Authorization failed"
-msgstr "待辦事項已匯入"
+msgstr "Autoriseerimine ebaõnnestus"
 
 #: errands/widgets/preferences.py:223
 msgid "Could not locate server. Check network and url."
-msgstr ""
+msgstr "Ei saanud serveriga ühendust. Kontrolli võrguühendust ja URL-i."
 
 #: errands/widgets/preferences.py:225
 msgid "Can't connect"
-msgstr ""
+msgstr "Ühendus ebaõnnestus"
 
 #. NOTE: Also catches invalid credentials
 #: errands/widgets/preferences.py:227
 msgid "Can't connect. Check credentials"
-msgstr ""
+msgstr "Ühendus ebaõnnestus. Kontrolli kasutajanime ja parooli"
 
 #: errands/lib/sync/providers/caldav.py:66
 msgid "Not all sync credentials provided. Please check settings."
-msgstr "沒有提供全部的驗證資訊。請檢查設定值。"
+msgstr ""
+"Sünkroonimiseks vajalikud andmed pole sisestatud. Palun kontrolli seadeid."
 
 #: errands/lib/sync/providers/caldav.py:110
 msgid "Can't connect to CalDAV server at:"
-msgstr "無法連線到以下的 CalDAV 伺服器："
+msgstr "Ei saa ühendust CalDAV serveriga aadressil:"
 
 #: errands/lib/data.py:92
-#, fuzzy
 msgid "New Task List"
-msgstr "待辦事項"
+msgstr "Uus ülesannete nimekiri"
 
 #: errands/lib/notifications.py:74
-#, fuzzy
 msgid "Task is Due"
-msgstr "待辦事項"
+msgstr "Ülesande tähtaeg on käes"
 
 #: errands/application.py:78
 msgid "Errands was updated"
-msgstr ""
+msgstr "Errands uuendati"
 
 #: errands/application.py:79
 msgid "Restart is required"
-msgstr ""
+msgstr "Taaskäivitamine on vajalik"
 
 #: errands/application.py:82
-#, fuzzy
 msgid "Restart"
-msgstr "還原"
+msgstr "Taaskäivita"
 
 #: errands/application.py:111
 msgid "Errands need to run in the background for notifications"
-msgstr ""
+msgstr "Errands peab teavituste saatmiseks taustal jooksma"
 
 #: data/resources/gtk/help-overlay.ui:13
 msgid "Show keyboard shortcuts"
-msgstr "顯示鍵盤快捷鍵"
+msgstr "Kuva klaviatuuri otseteed"
 
 #: data/resources/gtk/help-overlay.ui:53
 msgid "Lists"
-msgstr ""
+msgstr "Nimekirjad"
 
 #: data/resources/gtk/help-overlay.ui:64
-#, fuzzy
 msgid "Import List"
-msgstr "匯入待辦事項"
+msgstr "Impordi nimekiri"
 
 #: data/resources/gtk/help-overlay.ui:75
 msgid "Details"
-msgstr ""
+msgstr "Üksikasjad"
 
 #: data/resources/gtk/help-overlay.ui:79
-#, fuzzy
 msgid "Toggle Details"
-msgstr "側選單開關"
+msgstr "Kuva/peida üksikasjad"
 
 #: data/io.github.mrvladus.List.desktop.in.in:4
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:7
 msgid "Manage your tasks"
-msgstr "管理待辦事項"
+msgstr "Halda oma ülesandeid"
 
 #: data/io.github.mrvladus.List.desktop.in.in:10
-#, fuzzy
 msgid "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
-msgstr "errands;待辦事項;清單;工作項目;todos;"
+msgstr "errands;ülesanded;nimekiri;todo;caldav;nextcloud;sync;"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:12
 msgid "Todo application for those who prefer simplicity."
-msgstr "為簡潔而生的待辦事項軟體"
+msgstr "To-do-nimekirja rakendus neile, kes eelistavad lihtsust."
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:13
 msgid "Features:"
-msgstr "功能："
+msgstr "Funktsioonid:"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:15
 msgid "Multiple task lists support"
-msgstr ""
+msgstr "Mitme nimekirja tugi"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:16
 msgid "Add, remove, edit tasks and sub-tasks"
-msgstr "新增、移除、編輯待辦事項和子項目"
+msgstr "Lisa, eemalda ja muuda ülesandeid ja samme"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:17
 msgid "Mark task and sub-tasks as completed"
-msgstr "把待辦事項和子項目標記爲已完成"
+msgstr "Märgi ülesanded ja sammud tehtuks"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:18
 msgid "Add accent color for each task"
-msgstr "為每個待辦事項新增強調色"
+msgstr "Lisa igale ülesandele taustavärv"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:19
 msgid "Sync tasks with Nextcloud or other CalDAV providers"
-msgstr "透過 Nextcloud 或其他 CalDAV 服務同步待辦事項"
+msgstr "Sünkrooni ülesandeid Nextcloud'i ja teiste CalDAV teenusepakkujatega"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:20
 msgid "Drag and Drop support"
-msgstr "支援拖拉"
+msgstr "Hiirega lohistamise tugi"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:21
-#, fuzzy
 msgid "Import .ics files"
-msgstr "匯入待辦事項"
+msgstr "Impordi .ics faile"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:41
 msgid "Main Window View"
-msgstr ""
+msgstr "Avavaade"
 
-#, fuzzy
-#~ msgid "Complete Button Size"
-#~ msgstr "已完成："
-
-#, fuzzy
-#~ msgid "Right"
-#~ msgstr "亮色"
-
-#~ msgid "Menu"
-#~ msgstr "選單"
-
-#, fuzzy
-#~ msgid "Clear Style"
-#~ msgstr "移除顏色"
-
-#, fuzzy
-#~ msgid "Copy Text"
-#~ msgstr "複製"
-
-#, fuzzy
-#~ msgid "Complete %"
-#~ msgstr "已完成："
-
-#, fuzzy
-#~ msgid "Add Tag"
-#~ msgstr "新增待辦事項"
-
-#~ msgid "Mark as Completed"
-#~ msgstr "標註爲完成"
-
-#~ msgid "Restore All"
-#~ msgstr "全部復原"
-
-#, fuzzy
-#~ msgid "Toggle sidebar"
-#~ msgstr "側選單開關"
-
-#~ msgid "Export Cancelled"
-#~ msgstr "匯出已取消"
-
-#~ msgid "Error"
-#~ msgstr "發生錯誤"
-
-#~ msgid "Import Cancelled"
-#~ msgstr "匯入已取消"
-
-#~ msgid "Invalid File"
-#~ msgstr "不支援的檔案"
-
-#~ msgid "Show Deleted Tasks"
-#~ msgstr "顯示刪除項目"
-
-#~ msgid "Delete Completed Tasks (Ctrl+Delete)"
-#~ msgstr "刪除已完成項目 (Ctrl+Delete)"
-
-#~ msgid "Sync/Fetch Tasks (Ctrl+S)"
-#~ msgstr "同步/擷取待辦事項 (Ctrl+S)"
-
-#~ msgid "Export Tasks..."
-#~ msgstr "匯出待辦事項..."
-
-#~ msgid "Import Tasks..."
-#~ msgstr "匯入待辦事項..."
-
-#~ msgid "Import and Export"
-#~ msgstr "匯入和匯出"
-
-#~ msgid "Exit edit mode"
-#~ msgstr "離開編輯模式"
-
-#~ msgid "Expand Sub-Tasks on Startup"
-#~ msgstr "開啟應用程式後展開子項目"
-
-#~ msgid "Calendar Name (\"Errands\" by Default)"
-#~ msgstr "日曆名稱 (預設為 \"Errands\")"
-
-#~ msgid "Token"
-#~ msgstr "權杖"
-
-#~ msgid "Cancel (Escape)"
-#~ msgstr "取消 (ESC)"
+#~ msgid "Loading..."
+#~ msgstr "Laadimine..."

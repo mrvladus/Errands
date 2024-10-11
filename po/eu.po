@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-17 17:01+0300\n"
+"POT-Creation-Date: 2024-10-10 12:25+0300\n"
 "PO-Revision-Date: 2023-12-02 00:14+0100\n"
 "Last-Translator: Sergio Varela <sergiovg01@outlook.com>\n"
 "Language-Team: Spanish - Spain <sergiovg01@outlook.com>\n"
@@ -27,7 +27,7 @@ msgid "Are you sure?"
 msgstr "Ziur zaude?"
 
 #: errands/widgets/shared/components/dialogs.py:35
-#: errands/widgets/sidebar.py:300 errands/widgets/task.py:246
+#: errands/widgets/sidebar.py:300 errands/widgets/task.py:250
 #: errands/widgets/task_list/task_list_sidebar_row.py:99
 #: errands/widgets/today/today_task.py:146
 msgid "Cancel"
@@ -68,7 +68,7 @@ msgstr ""
 
 #: errands/widgets/shared/datetime_picker.py:138
 #: errands/widgets/today/today.py:57
-#: errands/widgets/today/today_sidebar_row.py:30 errands/widgets/window.py:67
+#: errands/widgets/today/today_sidebar_row.py:30 errands/widgets/window.py:69
 msgid "Today"
 msgstr ""
 
@@ -82,11 +82,11 @@ msgstr ""
 
 #: errands/widgets/shared/datetime_picker.py:160
 #: errands/widgets/trash/trash.py:40
-#: errands/widgets/trash/trash_sidebar_row.py:64
+#: errands/widgets/trash/trash_sidebar_row.py:68
 msgid "Clear"
 msgstr "Ezabatu"
 
-#: errands/widgets/shared/datetime_picker.py:210
+#: errands/widgets/shared/datetime_picker.py:214
 msgid "Set Date"
 msgstr ""
 
@@ -94,7 +94,7 @@ msgstr ""
 msgid "Start / Due Date"
 msgstr ""
 
-#: errands/widgets/shared/task_toolbar/toolbar.py:49 errands/lib/utils.py:20
+#: errands/widgets/shared/task_toolbar/toolbar.py:49 errands/lib/utils.py:24
 msgid "Date"
 msgstr ""
 
@@ -168,7 +168,7 @@ msgstr ""
 #: errands/widgets/shared/task_toolbar/attachments_window.py:123
 #: errands/widgets/tags/tags.py:140
 #: errands/widgets/task_list/task_list_sidebar_row.py:60
-#: errands/widgets/task_list/task_list_sidebar_row.py:187
+#: errands/widgets/task_list/task_list_sidebar_row.py:191
 #: errands/widgets/trash/trash.py:159
 msgid "Delete"
 msgstr "Ezabatu"
@@ -216,8 +216,8 @@ msgstr ""
 msgid "Task Lists"
 msgstr "Atazak"
 
-#: errands/widgets/sidebar.py:106 errands/widgets/window.py:43
-#: errands/widgets/window.py:148 data/io.github.mrvladus.List.desktop.in.in:3
+#: errands/widgets/sidebar.py:106 errands/widgets/window.py:44
+#: errands/widgets/window.py:167 data/io.github.mrvladus.List.desktop.in.in:3
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:6
 msgid "Errands"
 msgstr "Errands"
@@ -303,42 +303,42 @@ msgstr "Txandakatu alboko barra"
 msgid "Toggle Toolbar"
 msgstr "Txandakatu alboko barra"
 
-#: errands/widgets/task.py:206 errands/widgets/task.py:226
+#: errands/widgets/task.py:210 errands/widgets/task.py:230
 #: errands/widgets/today/today_task.py:117
 #: errands/widgets/today/today_task.py:127
 msgid "Edit"
 msgstr "Editatu"
 
-#: errands/widgets/task.py:207 errands/widgets/today/today_task.py:118
+#: errands/widgets/task.py:211 errands/widgets/today/today_task.py:118
 msgid "Move to Trash"
 msgstr "Zakarrontzira mugitu"
 
-#: errands/widgets/task.py:208 errands/widgets/today/today_task.py:119
+#: errands/widgets/task.py:212 errands/widgets/today/today_task.py:119
 #, fuzzy
 msgid "Copy to Clipboard"
 msgstr "Arbelean kopiatuta"
 
-#: errands/widgets/task.py:209
-#: errands/widgets/task_list/task_list_sidebar_row.py:188
+#: errands/widgets/task.py:213
+#: errands/widgets/task_list/task_list_sidebar_row.py:192
 #: errands/widgets/today/today_task.py:120
 #, fuzzy
 msgid "Export"
 msgstr "Esportatu atazak"
 
-#: errands/widgets/task.py:299 errands/widgets/task_list/task_list.py:84
+#: errands/widgets/task.py:306 errands/widgets/task_list/task_list.py:84
 #, fuzzy
 msgid "Completed"
 msgstr "Eginda:"
 
-#: errands/widgets/task.py:323
+#: errands/widgets/task.py:330
 msgid "Add new Sub-Task"
 msgstr "Erantsi azpiataza berri bat"
 
-#: errands/widgets/task.py:534 errands/widgets/task_list/task_list.py:246
+#: errands/widgets/task.py:552 errands/widgets/task_list/task_list.py:238
 msgid "Completed:"
 msgstr "Eginda:"
 
-#: errands/widgets/task.py:921
+#: errands/widgets/task.py:945
 #, fuzzy
 msgid "Delete Tag"
 msgstr "Ezabatutako atazak"
@@ -357,13 +357,9 @@ msgstr "Ezabatu betetako atazak"
 msgid "Scroll Up"
 msgstr "Gorantz egin"
 
-#: errands/widgets/task_list/task_list.py:144
+#: errands/widgets/task_list/task_list.py:143
 msgid "Add new Task"
 msgstr "Gehitu ataza berria"
-
-#: errands/widgets/task_list/task_list.py:156
-msgid "Loading..."
-msgstr ""
 
 #: errands/widgets/task_list/task_list_sidebar_row.py:59
 #, fuzzy
@@ -391,7 +387,7 @@ msgstr "Atazak esportatu egin dira"
 msgid "Color"
 msgstr ""
 
-#: errands/widgets/task_list/task_list_sidebar_row.py:186
+#: errands/widgets/task_list/task_list_sidebar_row.py:190
 #, fuzzy
 msgid "Rename"
 msgstr "Erabiltzailearen izena"
@@ -409,12 +405,12 @@ msgid "No deleted items"
 msgstr "Ez dago elementurik ezabatuta"
 
 #: errands/widgets/trash/trash.py:55 errands/widgets/trash/trash.py:189
-#: errands/widgets/trash/trash_sidebar_row.py:65
+#: errands/widgets/trash/trash_sidebar_row.py:69
 msgid "Restore"
 msgstr "Leheneratu"
 
 #: errands/widgets/trash/trash.py:89
-#: errands/widgets/trash/trash_sidebar_row.py:43 errands/widgets/window.py:77
+#: errands/widgets/trash/trash_sidebar_row.py:43 errands/widgets/window.py:75
 #, fuzzy
 msgid "Trash"
 msgstr "Zakarrontzia itxi"
@@ -423,7 +419,7 @@ msgstr "Zakarrontzia itxi"
 msgid "Tasks will be permanently deleted"
 msgstr "Atazak etengabe ezabatuko dira"
 
-#: errands/widgets/window.py:56
+#: errands/widgets/window.py:57
 #, fuzzy
 msgid "Sidebar"
 msgstr "Txandakatu alboko barra"
@@ -432,35 +428,49 @@ msgstr "Txandakatu alboko barra"
 msgid "Content"
 msgstr ""
 
-#: errands/widgets/window.py:90
+#: errands/widgets/window.py:66
+#, fuzzy
+msgid "Loading Tasks"
+msgstr "Gehitu ataza berria"
+
+#: errands/widgets/window.py:88
 msgid "No Task Lists"
 msgstr ""
 
-#: errands/widgets/window.py:91
+#: errands/widgets/window.py:89
 msgid "Create new or import existing one"
 msgstr ""
 
-#: errands/widgets/window.py:95
+#: errands/widgets/window.py:93
 #, fuzzy
 msgid "Create List"
 msgstr "Inportatu atazak"
 
-#: errands/widgets/window.py:104
+#: errands/widgets/window.py:102
 #, fuzzy
 msgid "Create new List"
 msgstr "Inportatu atazak"
 
-#: errands/widgets/window.py:153
+#: errands/widgets/window.py:115 errands/widgets/window.py:123
+#, fuzzy
+msgid "Syncing"
+msgstr "Sinkronizatu"
+
+#: errands/widgets/window.py:116
+msgid "First syncronization is running"
+msgstr ""
+
+#: errands/widgets/window.py:172
 msgid "translator-credits"
 msgstr ""
 "Sergio Varela\n"
 "https://ingrownmink4.codeberg.page"
 
-#: errands/widgets/window.py:159
+#: errands/widgets/window.py:178
 msgid "Sync is disabled"
 msgstr ""
 
-#: errands/widgets/window.py:194
+#: errands/widgets/window.py:213
 #, fuzzy
 msgid "Imported"
 msgstr "Atazak inportatu egin dira"
@@ -601,25 +611,25 @@ msgstr "Atazak"
 
 # ES_EU: Use "Atazak" instead of "Zereginak".
 # https://hiztegiak.elhuyar.eus/es/tarea#
-#: errands/lib/notifications.py:75
+#: errands/lib/notifications.py:74
 #, fuzzy
 msgid "Task is Due"
 msgstr "Atazak"
 
-#: errands/application.py:80
+#: errands/application.py:78
 msgid "Errands was updated"
 msgstr ""
 
-#: errands/application.py:81
+#: errands/application.py:79
 msgid "Restart is required"
 msgstr ""
 
-#: errands/application.py:84
+#: errands/application.py:82
 #, fuzzy
 msgid "Restart"
 msgstr "Leheneratu"
 
-#: errands/application.py:113
+#: errands/application.py:111
 msgid "Errands need to run in the background for notifications"
 msgstr ""
 

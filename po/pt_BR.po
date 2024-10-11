@@ -5,19 +5,20 @@
 # Vitor Gabriel Gomes <vitorgabrielgomesro9090@gmail.com>, 2023
 # Leandro Cunha <leandrocunha016@gmail.com>, 2023-2024
 # Gabriel de Moura <smolblackcat@proton.me>, 2024
+# Guilherme Berbet <guilhermeberbet@icloud.com>
 msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-17 17:01+0300\n"
-"PO-Revision-Date: 2024-01-09 09:36-0300\n"
-"Last-Translator:  Gabriel de Moura <smolblackcat@proton.me>\n"
+"POT-Creation-Date: 2024-10-10 12:25+0300\n"
+"PO-Revision-Date: 2024-10-07 10:24-0300\n"
+"Last-Translator: Leandro Cunha <leandrocunha016@gmail.com>\n"
 "Language-Team: \n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.4\n"
+"X-Generator: Poedit 3.4.2\n"
 
 #: errands/widgets/shared/components/buttons.py:45
 msgid "Info"
@@ -28,7 +29,7 @@ msgid "Are you sure?"
 msgstr "Tem certeza?"
 
 #: errands/widgets/shared/components/dialogs.py:35
-#: errands/widgets/sidebar.py:300 errands/widgets/task.py:246
+#: errands/widgets/sidebar.py:300 errands/widgets/task.py:250
 #: errands/widgets/task_list/task_list_sidebar_row.py:99
 #: errands/widgets/today/today_task.py:146
 msgid "Cancel"
@@ -69,7 +70,7 @@ msgstr "Marrom"
 
 #: errands/widgets/shared/datetime_picker.py:138
 #: errands/widgets/today/today.py:57
-#: errands/widgets/today/today_sidebar_row.py:30 errands/widgets/window.py:67
+#: errands/widgets/today/today_sidebar_row.py:30 errands/widgets/window.py:69
 msgid "Today"
 msgstr "Hoje"
 
@@ -83,11 +84,11 @@ msgstr "Agora"
 
 #: errands/widgets/shared/datetime_picker.py:160
 #: errands/widgets/trash/trash.py:40
-#: errands/widgets/trash/trash_sidebar_row.py:64
+#: errands/widgets/trash/trash_sidebar_row.py:68
 msgid "Clear"
 msgstr "Limpar"
 
-#: errands/widgets/shared/datetime_picker.py:210
+#: errands/widgets/shared/datetime_picker.py:214
 msgid "Set Date"
 msgstr "Definir Data"
 
@@ -95,7 +96,7 @@ msgstr "Definir Data"
 msgid "Start / Due Date"
 msgstr "Início / Prazo"
 
-#: errands/widgets/shared/task_toolbar/toolbar.py:49 errands/lib/utils.py:20
+#: errands/widgets/shared/task_toolbar/toolbar.py:49 errands/lib/utils.py:24
 msgid "Date"
 msgstr "Data"
 
@@ -168,7 +169,7 @@ msgstr "Abrir Arquivo"
 #: errands/widgets/shared/task_toolbar/attachments_window.py:123
 #: errands/widgets/tags/tags.py:140
 #: errands/widgets/task_list/task_list_sidebar_row.py:60
-#: errands/widgets/task_list/task_list_sidebar_row.py:187
+#: errands/widgets/task_list/task_list_sidebar_row.py:191
 #: errands/widgets/trash/trash.py:159
 msgid "Delete"
 msgstr "Deletar"
@@ -210,10 +211,10 @@ msgstr "Clique no botão \"+\""
 #. Task lists group
 #: errands/widgets/sidebar.py:94 errands/widgets/preferences.py:66
 msgid "Task Lists"
-msgstr "Sem listas de tarefas"
+msgstr "Listas de tarefas"
 
-#: errands/widgets/sidebar.py:106 errands/widgets/window.py:43
-#: errands/widgets/window.py:148 data/io.github.mrvladus.List.desktop.in.in:3
+#: errands/widgets/sidebar.py:106 errands/widgets/window.py:44
+#: errands/widgets/window.py:167 data/io.github.mrvladus.List.desktop.in.in:3
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:6
 msgid "Errands"
 msgstr "Errands"
@@ -264,7 +265,7 @@ msgstr "Nenhuma etiqueta foi encontrada"
 
 #: errands/widgets/tags/tags.py:33
 msgid "Add new Tags in the entry above"
-msgstr "Adicionar novas etiquetas na "
+msgstr "Adicione novas tags na entrada acima"
 
 #: errands/widgets/tags/tags.py:82
 msgid "Add new Tag"
@@ -292,39 +293,39 @@ msgstr "Ver Progresso"
 msgid "Toggle Toolbar"
 msgstr "Ver Barra de Ferramentas"
 
-#: errands/widgets/task.py:206 errands/widgets/task.py:226
+#: errands/widgets/task.py:210 errands/widgets/task.py:230
 #: errands/widgets/today/today_task.py:117
 #: errands/widgets/today/today_task.py:127
 msgid "Edit"
 msgstr "Editar"
 
-#: errands/widgets/task.py:207 errands/widgets/today/today_task.py:118
+#: errands/widgets/task.py:211 errands/widgets/today/today_task.py:118
 msgid "Move to Trash"
 msgstr "Mover para lixeira"
 
-#: errands/widgets/task.py:208 errands/widgets/today/today_task.py:119
+#: errands/widgets/task.py:212 errands/widgets/today/today_task.py:119
 msgid "Copy to Clipboard"
 msgstr "Copiar para a área de transferência"
 
-#: errands/widgets/task.py:209
-#: errands/widgets/task_list/task_list_sidebar_row.py:188
+#: errands/widgets/task.py:213
+#: errands/widgets/task_list/task_list_sidebar_row.py:192
 #: errands/widgets/today/today_task.py:120
 msgid "Export"
 msgstr "Exportar"
 
-#: errands/widgets/task.py:299 errands/widgets/task_list/task_list.py:84
+#: errands/widgets/task.py:306 errands/widgets/task_list/task_list.py:84
 msgid "Completed"
 msgstr "Completo"
 
-#: errands/widgets/task.py:323
+#: errands/widgets/task.py:330
 msgid "Add new Sub-Task"
 msgstr "Adicionar nova sub-tarefa"
 
-#: errands/widgets/task.py:534 errands/widgets/task_list/task_list.py:246
+#: errands/widgets/task.py:552 errands/widgets/task_list/task_list.py:238
 msgid "Completed:"
 msgstr "Completado:"
 
-#: errands/widgets/task.py:921
+#: errands/widgets/task.py:945
 msgid "Delete Tag"
 msgstr "Apagar Etiqueta"
 
@@ -340,13 +341,9 @@ msgstr "Deletar tarefas concluídas"
 msgid "Scroll Up"
 msgstr "Rolar para cima"
 
-#: errands/widgets/task_list/task_list.py:144
+#: errands/widgets/task_list/task_list.py:143
 msgid "Add new Task"
 msgstr "Adicionar nova tarefa"
-
-#: errands/widgets/task_list/task_list.py:156
-msgid "Loading..."
-msgstr "Carregando..."
 
 #: errands/widgets/task_list/task_list_sidebar_row.py:59
 msgid "List will be permanently deleted"
@@ -372,7 +369,7 @@ msgstr "Falha na exportação"
 msgid "Color"
 msgstr "Cor"
 
-#: errands/widgets/task_list/task_list_sidebar_row.py:186
+#: errands/widgets/task_list/task_list_sidebar_row.py:190
 msgid "Rename"
 msgstr "Renomear"
 
@@ -388,13 +385,13 @@ msgstr "Lixeira vazia"
 msgid "No deleted items"
 msgstr "Não há itens deletados"
 
-#: errands/widgets/trash/trash.py:55 errands/widgets/trash/trash.py:189:
-#: errands/widgets/trash/trash_sidebar_row.py:65
+#: errands/widgets/trash/trash.py:55 errands/widgets/trash/trash.py:189
+#: errands/widgets/trash/trash_sidebar_row.py:69
 msgid "Restore"
 msgstr "Restaurar"
 
 #: errands/widgets/trash/trash.py:89
-#: errands/widgets/trash/trash_sidebar_row.py:43 errands/widgets/window.py:77
+#: errands/widgets/trash/trash_sidebar_row.py:43 errands/widgets/window.py:75
 msgid "Trash"
 msgstr "Lixeira"
 
@@ -402,7 +399,7 @@ msgstr "Lixeira"
 msgid "Tasks will be permanently deleted"
 msgstr "As tarefas serão excluídas permanentemente"
 
-#: errands/widgets/window.py:56
+#: errands/widgets/window.py:57
 msgid "Sidebar"
 msgstr "Barra lateral"
 
@@ -410,34 +407,49 @@ msgstr "Barra lateral"
 msgid "Content"
 msgstr "Conteúdo"
 
-#: errands/widgets/window.py:90
+#: errands/widgets/window.py:66
+#, fuzzy
+msgid "Loading Tasks"
+msgstr "Adicionar novas Tarefas"
+
+#: errands/widgets/window.py:88
 msgid "No Task Lists"
 msgstr "Sem listas de tarefas"
 
-#: errands/widgets/window.py:91
+#: errands/widgets/window.py:89
 msgid "Create new or import existing one"
 msgstr "Criar novo ou importar um existente"
 
-#: errands/widgets/window.py:95
+#: errands/widgets/window.py:93
 msgid "Create List"
 msgstr "Criar lista"
 
-#: errands/widgets/window.py:104
+#: errands/widgets/window.py:102
 msgid "Create new List"
 msgstr "Criar nova Lista"
 
-#: errands/widgets/window.py:153
+#: errands/widgets/window.py:115 errands/widgets/window.py:123
+#, fuzzy
+msgid "Syncing"
+msgstr "Sincronizando..."
+
+#: errands/widgets/window.py:116
+msgid "First syncronization is running"
+msgstr ""
+
+#: errands/widgets/window.py:172
 msgid "translator-credits"
 msgstr ""
 "Leandro Cunha <leandrocunha016@gmail.com>\n"
 "Guilherme Berbet <guilhermeberbet@icloud.com>\n"
-"Gabriel de Moura <smolblackcat@proton.me>"
+"Gabriel de Moura <smolblackcat@proton.me>\n"
+"Vitor Gabriel Gomes <vitorgabrielgomesro9090@gmail.com>"
 
-#: errands/widgets/window.py:159
+#: errands/widgets/window.py:178
 msgid "Sync is disabled"
 msgstr "A sincronização está desativada"
 
-#: errands/widgets/window.py:194
+#: errands/widgets/window.py:213
 msgid "Imported"
 msgstr "Importado"
 
@@ -516,8 +528,8 @@ msgid ""
 "URL needs to include protocol, like <b>http://</b> or <b>https://</b>. If "
 "you have problems with connection - try to change protocol first."
 msgstr ""
-"URL precisa incluir o protocolo, como <b>http://</b> ou <b>https://</b>."
-"Se estiver com problemas com a conexão, tente alterar o protocolo primeiro."
+"URL precisa incluir o protocolo, como <b>http://</b> ou <b>https://</b>.Se "
+"estiver com problemas com a conexão, tente alterar o protocolo primeiro."
 
 #: errands/widgets/preferences.py:147
 msgid "Username"
@@ -549,7 +561,7 @@ msgstr "Autorização falhou"
 
 #: errands/widgets/preferences.py:223
 msgid "Could not locate server. Check network and url."
-msgstr "Não foi possível localizar servidor. Cheque a rede e a URL"
+msgstr "Não foi possível localizar servidor. Cheque a rede e a URL."
 
 #: errands/widgets/preferences.py:225
 msgid "Can't connect"
@@ -574,25 +586,27 @@ msgstr "Não é possível conectar-se ao servidor CalDAV em:"
 msgid "New Task List"
 msgstr "Nova Lista de Tarefas"
 
-#: errands/lib/notifications.py:75
+#: errands/lib/notifications.py:74
 msgid "Task is Due"
 msgstr "Tarefa está pendente"
 
-#: errands/application.py:80
+#: errands/application.py:78
 msgid "Errands was updated"
 msgstr "Errands foi atualizado"
 
-#: errands/application.py:81
+#: errands/application.py:79
 msgid "Restart is required"
 msgstr "Reinicialização é necessária"
 
-#: errands/application.py:84
+#: errands/application.py:82
 msgid "Restart"
 msgstr "Reiniciar"
 
-#: errands/application.py:113
+#: errands/application.py:111
 msgid "Errands need to run in the background for notifications"
-msgstr "Errands precisa ser executado em plano de fundo para as notificações funcionarem"
+msgstr ""
+"Errands precisa ser executado em plano de fundo para as notificações "
+"funcionarem"
 
 #: data/resources/gtk/help-overlay.ui:13
 msgid "Show keyboard shortcuts"
@@ -662,6 +676,9 @@ msgstr "Importar arquivo .ics"
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:41
 msgid "Main Window View"
 msgstr "Janela Principal"
+
+#~ msgid "Loading..."
+#~ msgstr "Carregando..."
 
 #~ msgid "Not Set"
 #~ msgstr "Não configurado"
