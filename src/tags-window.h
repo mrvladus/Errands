@@ -13,8 +13,9 @@ G_DECLARE_FINAL_TYPE(ErrandsTagsWindow, errands_tags_window, ERRANDS,
 struct _ErrandsTagsWindow {
   AdwDialog parent_instance;
   GtkWidget *title;
-  GtkWidget *list_box;
   GtkWidget *entry;
+  GtkWidget *list_box;
+  GtkWidget *placeholder;
   ErrandsTask *task;
 };
 

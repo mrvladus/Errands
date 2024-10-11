@@ -1,15 +1,18 @@
 #include "tags-window.h"
 #include "adwaita.h"
 #include "data.h"
+#include "glib-object.h"
 #include "glib.h"
+#include "gtk/gtk.h"
 #include "state.h"
 #include "utils.h"
+#include <stdbool.h>
 
 // ------------------------------------------------------ //
 //                      TAGS WINDOW                       //
 // ------------------------------------------------------ //
 
-static void errands_tags_window_update_counter();
+static void errands_tags_window_update_ui();
 static void on_errands_tags_window_close(ErrandsTagsWindow *win);
 static void on_errands_tags_window_tag_added(GtkEditable *entry,
                                              ErrandsTagsWindow *win);
@@ -38,9 +41,13 @@ static void errands_tags_window_init(ErrandsTagsWindow *self) {
   g_signal_connect(self->entry, "entry-activated",
                    G_CALLBACK(on_errands_tags_window_tag_added), self);
 
+  // Vertical box
+  GtkWidget *vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+
   // Scrolled window
   GtkWidget *scrl = gtk_scrolled_window_new();
   g_object_set(scrl, "propagate-natural-height", true, NULL);
+  gtk_box_append(GTK_BOX(vbox), scrl);
 
   // List box
   self->list_box = gtk_list_box_new();
@@ -52,16 +59,20 @@ static void errands_tags_window_init(ErrandsTagsWindow *self) {
   gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrl), self->list_box);
 
   // Placeholder
-  // GtkWidget *placeholder = adw_status_page_new();
-  // g_object_set(placeholder, "icon-name", "errands-tag-symbolic",
-  // "description",
-  //              "Add new tags in the entry above", NULL);
+  self->placeholder = adw_status_page_new();
+  g_object_set(self->placeholder, "icon-name", "errands-tag-symbolic", "title",
+               "No Tags", "description", "Add new ones in the entry above",
+               "vexpand", true, NULL);
+  g_object_bind_property(self->placeholder, "visible", scrl, "visible",
+                         G_BINDING_SYNC_CREATE | G_BINDING_INVERT_BOOLEAN);
+  gtk_widget_add_css_class(self->placeholder, "compact");
+  gtk_box_append(GTK_BOX(vbox), self->placeholder);
 
   // Toolbar view
   GtkWidget *tb = adw_toolbar_view_new();
   adw_toolbar_view_add_top_bar(ADW_TOOLBAR_VIEW(tb), hb);
   adw_toolbar_view_add_top_bar(ADW_TOOLBAR_VIEW(tb), self->entry);
-  adw_toolbar_view_set_content(ADW_TOOLBAR_VIEW(tb), scrl);
+  adw_toolbar_view_set_content(ADW_TOOLBAR_VIEW(tb), vbox);
   adw_dialog_set_child(ADW_DIALOG(self), tb);
 }
 
@@ -74,7 +85,7 @@ void errands_tags_window_show(ErrandsTask *task) {
   state.tags_window->task = task;
   // Remove rows
   gtk_list_box_remove_all(GTK_LIST_BOX(state.tags_window->list_box));
-  errands_tags_window_update_counter();
+  errands_tags_window_update_ui();
   // Add rows
   for (int i = 0; i < state.tags_data->len; i++) {
     const char *tag = state.tags_data->pdata[i];
@@ -87,15 +98,17 @@ void errands_tags_window_show(ErrandsTask *task) {
                      GTK_WIDGET(state.main_window));
 }
 
-static void errands_tags_window_update_counter() {
+static void errands_tags_window_update_ui() {
   if (state.tags_data->len > 0) {
     char *len = g_strdup_printf("%d", state.tags_data->len);
     adw_window_title_set_subtitle(ADW_WINDOW_TITLE(state.tags_window->title),
                                   len);
     g_free(len);
+    gtk_widget_set_visible(state.tags_window->placeholder, false);
   } else {
     adw_window_title_set_subtitle(ADW_WINDOW_TITLE(state.tags_window->title),
                                   "");
+    gtk_widget_set_visible(state.tags_window->placeholder, true);
   }
 }
 
@@ -121,7 +134,7 @@ static void on_errands_tags_window_tag_added(GtkEditable *entry,
   gtk_list_box_prepend(GTK_LIST_BOX(state.tags_window->list_box),
                        GTK_WIDGET(row));
   gtk_editable_set_text(entry, "");
-  errands_tags_window_update_counter();
+  errands_tags_window_update_ui();
 }
 
 // ------------------------------------------------------------- //
@@ -191,5 +204,5 @@ static void on_errands_tags_window_row_delete(GtkButton *btn,
   errands_data_write();
   gtk_list_box_remove(GTK_LIST_BOX(state.tags_window->list_box),
                       GTK_WIDGET(row));
-  errands_tags_window_update_counter();
+  errands_tags_window_update_ui();
 }
