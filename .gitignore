@@ -6,3 +6,4 @@ venv/
 .venv/
 .ruff_cache/
 *.flatpak
+.idea/
