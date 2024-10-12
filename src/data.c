@@ -182,7 +182,7 @@ void errands_data_write() {
     cJSON *t_data = cJSON_CreateObject();
     cJSON *attachments_array = cJSON_CreateArray();
     for (int j = 0; j < data->attachments->len; j++) {
-      cJSON *attachment_item = cJSON_CreateString(data->tags->pdata[j]);
+      cJSON *attachment_item = cJSON_CreateString(data->attachments->pdata[j]);
       cJSON_AddItemToArray(attachments_array, attachment_item);
     }
     cJSON_AddItemToObject(t_data, "attachments", attachments_array);

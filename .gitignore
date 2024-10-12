@@ -1,2 +1,7 @@
 *.o
 errands
+_build/
+.flatpak/
+.flatpak-builder/
+.vscode/
+.idea/

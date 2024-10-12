@@ -1,6 +1,7 @@
 #ifndef ERRANDS_STATE_H
 #define ERRANDS_STATE_H
 
+#include "attachments-window.h"
 #include "delete-list-dialog.h"
 #include "new-list-dialog.h"
 #include "no-lists-page.h"
@@ -35,6 +36,7 @@ typedef struct {
   ErrandsNotesWindow *notes_window;
   ErrandsPriorityWindow *priority_window;
   ErrandsTagsWindow *tags_window;
+  ErrandsAttachmentsWindow *attachments_window;
 
   // User Data
   GPtrArray *tl_data;
