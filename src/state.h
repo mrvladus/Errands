@@ -1,5 +1,4 @@
-#ifndef ERRANDS_STATE_H
-#define ERRANDS_STATE_H
+#pragma once
 
 #include "attachments-window.h"
 #include "delete-list-dialog.h"
@@ -46,5 +45,3 @@ typedef struct {
 
 // Global state object
 extern State state;
-
-#endif // ERRANDS_STATE_H

@@ -1,5 +1,4 @@
-#ifndef ERRANDS_PRIORITY_WINDOW_H
-#define ERRANDS_PRIORITY_WINDOW_H
+#pragma once
 
 #include "task.h"
 
@@ -21,5 +20,3 @@ struct _ErrandsPriorityWindow {
 
 ErrandsPriorityWindow *errands_priority_window_new();
 void errands_priority_window_show(ErrandsTask *task);
-
-#endif // ERRANDS_PRIORITY_WINDOW_H

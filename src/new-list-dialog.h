@@ -1,5 +1,4 @@
-#ifndef ERRANDS_NEW_LIST_DIALOG_H
-#define ERRANDS_NEW_LIST_DIALOG_H
+#pragma once
 
 #include <adwaita.h>
 
@@ -15,5 +14,3 @@ struct _ErrandsNewListDialog {
 ErrandsNewListDialog *errands_new_list_dialog_new();
 
 void errands_new_list_dialog_show();
-
-#endif // ERRANDS_NEW_LIST_DIALOG_H

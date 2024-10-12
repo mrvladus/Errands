@@ -1,5 +1,4 @@
-#ifndef ERRANDS_DELETE_LIST_DIALOG_H
-#define ERRANDS_DELETE_LIST_DIALOG_H
+#pragma once
 
 #include "sidebar-task-list-row.h"
 
@@ -16,5 +15,3 @@ struct _ErrandsDeleteListDialog {
 
 ErrandsDeleteListDialog *errands_delete_list_dialog_new();
 void errands_delete_list_dialog_show(ErrandsSidebarTaskListRow *row);
-
-#endif // ERRANDS_DELETE_LIST_DIALOG_H

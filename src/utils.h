@@ -1,5 +1,4 @@
-#ifndef ERRANDS_UTILS_H
-#define ERRANDS_UTILS_H
+#pragma once
 
 #include <ctype.h>
 #include <gtk/gtk.h>
@@ -104,5 +103,3 @@ static inline void errands_add_shortcut(GtkWidget *widget, const char *trigger,
   gtk_shortcut_controller_add_shortcut(GTK_SHORTCUT_CONTROLLER(ctrl), sc);
   gtk_widget_add_controller(widget, ctrl);
 }
-
-#endif // ERRANDS_UTILS_H

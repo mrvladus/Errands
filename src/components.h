@@ -1,5 +1,4 @@
-#ifndef ERRANDS_COMPONENTS_H
-#define ERRANDS_COMPONENTS_H
+#pragma once
 
 #include <adwaita.h>
 
@@ -53,5 +52,3 @@ static inline GSimpleActionGroup *errands_action_group_new(int n_items, ...) {
   va_end(args);
   return ag;
 }
-
-#endif // ERRANDS_COMPONENTS_H

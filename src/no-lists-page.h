@@ -1,3 +1,5 @@
+#pragma once
+
 #include <adwaita.h>
 
 #define ERRANDS_TYPE_NO_LISTS_PAGE (errands_no_lists_page_get_type())

@@ -1,5 +1,4 @@
-#ifndef ERRANDS_SIDEBAR_H
-#define ERRANDS_SIDEBAR_H
+#pragma once
 
 #include "data.h"
 #include "sidebar-all-row.h"
@@ -23,5 +22,3 @@ ErrandsSidebar *errands_sidebar_new();
 ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(ErrandsSidebar *sb,
                                                          TaskListData *data);
 void errands_sidebar_select_last_opened_page();
-
-#endif // ERRANDS_SIDEBAR_H

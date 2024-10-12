@@ -1,5 +1,4 @@
-#ifndef ERRANDS_SIDEBAR_TASK_LIST_ROW_H
-#define ERRANDS_SIDEBAR_TASK_LIST_ROW_H
+#pragma once
 
 #include "data.h"
 
@@ -27,5 +26,3 @@ ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_get(const char *uid);
 void on_errands_sidebar_task_list_row_activate(GtkListBox *box,
                                                ErrandsSidebarTaskListRow *row,
                                                gpointer user_data);
-
-#endif // ERRANDS_SIDEBAR_TASK_LIST_ROW_H

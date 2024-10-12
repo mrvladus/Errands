@@ -1,5 +1,4 @@
-#ifndef ERRANDS_TASK_H
-#define ERRANDS_TASK_H
+#pragma once
 
 #include "data.h"
 #include "task-toolbar.h"
@@ -27,5 +26,3 @@ struct _ErrandsTask {
 };
 
 ErrandsTask *errands_task_new(TaskData *data);
-
-#endif // ERRANDS_TASK_H

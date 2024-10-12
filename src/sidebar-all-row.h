@@ -1,5 +1,4 @@
-#ifndef ERRANDS_SIDEBAR_ALL_ROW_H
-#define ERRANDS_SIDEBAR_ALL_ROW_H
+#pragma once
 
 #include <gtk/gtk.h>
 
@@ -15,5 +14,3 @@ struct _ErrandsSidebarAllRow {
 
 ErrandsSidebarAllRow *errands_sidebar_all_row_new();
 void errands_sidebar_all_row_update_counter(ErrandsSidebarAllRow *row);
-
-#endif // ERRANDS_SIDEBAR_ALL_ROW_H

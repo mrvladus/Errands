@@ -1,5 +1,4 @@
-#ifndef ERRANDS_TASK_TOOLBAR_H
-#define ERRANDS_TASK_TOOLBAR_H
+#pragma once
 
 #include <gtk/gtk.h>
 
@@ -18,5 +17,3 @@ struct _ErrandsTaskToolbar {
 };
 
 ErrandsTaskToolbar *errands_task_toolbar_new(void *task);
-
-#endif // ERRANDS_TASK_TOOLBAR_H

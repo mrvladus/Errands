@@ -1,5 +1,4 @@
-#ifndef ERRANDS_RENAME_LIST_DIALOG_H
-#define ERRANDS_RENAME_LIST_DIALOG_H
+#pragma once
 
 #include "sidebar-task-list-row.h"
 
@@ -17,5 +16,3 @@ struct _ErrandsRenameListDialog {
 
 ErrandsRenameListDialog *errands_rename_list_dialog_new();
 void errands_rename_list_dialog_show(ErrandsSidebarTaskListRow *row);
-
-#endif // ERRANDS_RENAME_LIST_DIALOG_H
