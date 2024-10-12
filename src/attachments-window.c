@@ -1,8 +1,8 @@
 #include "attachments-window.h"
 #include "data.h"
+#include "glib.h"
 #include "gtk/gtk.h"
 #include "state.h"
-#include "utils.h"
 
 // ------------------------------------------------------ //
 //                  ATTACHMENTS WINDOW                    //
@@ -118,7 +118,11 @@ static void errands_attachments_window_update_ui() {
 // --- SIGNAL HANDLERS FOR ATTACHMENTS WINDOW --- //
 
 static void on_errands_attachments_window_close(ErrandsAttachmentsWindow *win) {
-  // TODO: update attachments button
+  // Add css class to button if attachments not empty
+  GPtrArray *attachments = win->task->data->attachments;
+  gtk_widget_remove_css_class(win->task->toolbar->attachments_btn, "accent");
+  if (attachments->len > 0)
+    gtk_widget_add_css_class(win->task->toolbar->attachments_btn, "accent");
 }
 
 static void __on_open_finish(GObject *obj, GAsyncResult *res, gpointer data) {
