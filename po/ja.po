@@ -9,14 +9,14 @@ msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-10-10 12:25+0300\n"
-"PO-Revision-Date: 2024-05-17 20:41+0900\n"
+"PO-Revision-Date: 2024-10-12 17:58+0900\n"
 "Last-Translator: Gnuey56 <gnuey56@proton.me>\n"
 "Language-Team: \n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.4.2\n"
+"X-Generator: Poedit 3.5\n"
 
 #: errands/widgets/shared/components/buttons.py:45
 msgid "Info"
@@ -365,7 +365,7 @@ msgstr "エクスポートに失敗しました"
 
 #: errands/widgets/task_list/task_list_sidebar_row.py:158
 msgid "Color"
-msgstr ""
+msgstr "色"
 
 #: errands/widgets/task_list/task_list_sidebar_row.py:190
 msgid "Rename"
@@ -406,9 +406,8 @@ msgid "Content"
 msgstr "内容"
 
 #: errands/widgets/window.py:66
-#, fuzzy
 msgid "Loading Tasks"
-msgstr "新しいタスクを追加"
+msgstr "タスクを読み込み中"
 
 #: errands/widgets/window.py:88
 msgid "No Task Lists"
@@ -427,17 +426,18 @@ msgid "Create new List"
 msgstr "新しいリストを作成"
 
 #: errands/widgets/window.py:115 errands/widgets/window.py:123
-#, fuzzy
 msgid "Syncing"
-msgstr "同期中..."
+msgstr "同期中"
 
 #: errands/widgets/window.py:116
 msgid "First syncronization is running"
-msgstr ""
+msgstr "初回同期を実行しています"
 
 #: errands/widgets/window.py:172
 msgid "translator-credits"
-msgstr "Gnuey56"
+msgstr ""
+"Gnuey56\n"
+"Lemon73"
 
 #: errands/widgets/window.py:178
 msgid "Sync is disabled"
@@ -522,8 +522,8 @@ msgid ""
 "URL needs to include protocol, like <b>http://</b> or <b>https://</b>. If "
 "you have problems with connection - try to change protocol first."
 msgstr ""
-"URL には <b>http://</b> や <b>https://</b> のようなプロトコルを含んでいる必要"
-"があります。接続で問題が発生した場合は、まず、プロトコルを変えてみてくださ"
+"URL には <b>http://</b> や <b>https://</b> のようなプロトコルを含んでいる必"
+"要があります。接続で問題が発生した場合は、まず、プロトコルを変えてみてくださ"
 "い。"
 
 #: errands/widgets/preferences.py:147
@@ -628,8 +628,8 @@ msgstr "タスクを管理"
 #: data/io.github.mrvladus.List.desktop.in.in:10
 msgid "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
 msgstr ""
-"errands;tasks;list;todo;todos;caldav;nextcloud;sync;用事;タスク;リスト;やるこ"
-"とリスト;同期;"
+"errands;tasks;list;todo;todos;caldav;nextcloud;sync;用事;タスク;リスト;やる"
+"ことリスト;同期;"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:12
 msgid "Todo application for those who prefer simplicity."
