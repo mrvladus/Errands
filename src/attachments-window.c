@@ -1,6 +1,8 @@
 #include "attachments-window.h"
 #include "data.h"
+#include "gtk/gtk.h"
 #include "state.h"
+#include "utils.h"
 
 // ------------------------------------------------------ //
 //                  ATTACHMENTS WINDOW                    //
@@ -9,6 +11,9 @@
 static void errands_attachments_window_update_ui();
 static void on_errands_attachments_window_close(ErrandsAttachmentsWindow *win);
 static void on_errands_attachments_window_attachment_add(GtkButton *btn);
+static void
+on_errands_attachments_window_row_activate(GtkListBox *box,
+                                           ErrandsAttachmentsWindowRow *row);
 
 G_DEFINE_TYPE(ErrandsAttachmentsWindow, errands_attachments_window,
               ADW_TYPE_DIALOG)
@@ -49,6 +54,9 @@ static void errands_attachments_window_init(ErrandsAttachmentsWindow *self) {
                "margin-bottom", 12, "valign", GTK_ALIGN_START, "vexpand", false,
                NULL);
   gtk_widget_add_css_class(self->list_box, "boxed-list");
+  g_signal_connect(self->list_box, "row-activated",
+                   G_CALLBACK(on_errands_attachments_window_row_activate),
+                   NULL);
   gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrl), self->list_box);
 
   // Placeholder
@@ -142,13 +150,18 @@ static void on_errands_attachments_window_attachment_add(GtkButton *btn) {
                        __on_open_finish, NULL);
 }
 
+static void
+on_errands_attachments_window_row_activate(GtkListBox *box,
+                                           ErrandsAttachmentsWindowRow *row) {
+  GtkFileLauncher *l = gtk_file_launcher_new(row->file);
+  gtk_file_launcher_launch(l, GTK_WINDOW(state.main_window), NULL, NULL, NULL);
+  g_object_unref(l);
+}
+
 // ------------------------------------------------------------- //
-//                  TAGS WINDOW ATTACHMENT ROW                   //
+//               ATTACHMENTS WINDOW ATTACHMENT ROW               //
 // ------------------------------------------------------------- //
 
-static void
-on_errands_attachments_window_row_toggle(GtkCheckButton *btn,
-                                         ErrandsAttachmentsWindowRow *row);
 static void
 on_errands_attachments_window_row_delete(GtkButton *btn,
                                          ErrandsAttachmentsWindowRow *row);
@@ -163,6 +176,8 @@ static void errands_attachments_window_row_class_init(
 
 static void
 errands_attachments_window_row_init(ErrandsAttachmentsWindowRow *self) {
+  gtk_list_box_row_set_activatable(GTK_LIST_BOX_ROW(self), true);
+
   // Delete button
   self->del_btn = gtk_button_new_from_icon_name("errands-trash-symbolic");
   g_object_set(self->del_btn, "valign", GTK_ALIGN_CENTER, NULL);
