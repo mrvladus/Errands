@@ -14,13 +14,13 @@ TARGET = errands
 # Default target
 all: $(TARGET)
 
-# Generate resource files from resource.xml
-gen-res:
+# Generate resource files from errands.gresource.xml
+compile-resources: data/errands.gresource.xml $(wildcard data/icons/*.svg data/styles/*.css)
 	glib-compile-resources data/errands.gresource.xml --generate-header --sourcedir=data --target=src/resources.h --c-name=errands
 	glib-compile-resources data/errands.gresource.xml --generate-source --sourcedir=data --target=src/resources.c --c-name=errands
 
 # Link object files to create the executable
-$(TARGET): $(OBJ)
+$(TARGET): compile-resources $(OBJ)
 	$(CC) $(OBJ) -o $(TARGET) $(LDFLAGS)
 
 # Compile source files to object files
