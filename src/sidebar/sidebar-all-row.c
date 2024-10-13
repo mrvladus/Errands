@@ -1,8 +1,7 @@
 #include "sidebar-all-row.h"
-#include "data.h"
-#include "gtk/gtk.h"
-#include "state.h"
-#include "utils.h"
+#include "../data.h"
+#include "../state.h"
+#include "../utils.h"
 
 G_DEFINE_TYPE(ErrandsSidebarAllRow, errands_sidebar_all_row,
               GTK_TYPE_LIST_BOX_ROW)

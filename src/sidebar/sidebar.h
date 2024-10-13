@@ -1,6 +1,6 @@
 #pragma once
 
-#include "data.h"
+#include "../data.h"
 #include "sidebar-all-row.h"
 #include "sidebar-task-list-row.h"
 

@@ -1,12 +1,7 @@
 #include "tags-window.h"
-#include "adwaita.h"
-#include "data.h"
-#include "glib-object.h"
-#include "glib.h"
-#include "gtk/gtk.h"
-#include "state.h"
-#include "utils.h"
-#include <stdbool.h>
+#include "../data.h"
+#include "../state.h"
+#include "../utils.h"
 
 // ------------------------------------------------------ //
 //                      TAGS WINDOW                       //

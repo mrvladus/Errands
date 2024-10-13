@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sidebar-task-list-row.h"
+#include "../sidebar/sidebar-task-list-row.h"
 
 #include <adwaita.h>
 

@@ -1,18 +1,12 @@
 #include "task.h"
-#include "adwaita.h"
-#include "components.h"
-#include "data.h"
-#include "gio/gio.h"
-#include "glib-object.h"
-#include "gtk/gtk.h"
-#include "gtk/gtkrevealer.h"
-#include "sidebar-all-row.h"
-#include "sidebar-task-list-row.h"
-#include "state.h"
-#include "task-list.h"
+#include "../components.h"
+#include "../data.h"
+#include "../sidebar/sidebar-all-row.h"
+#include "../sidebar/sidebar-task-list-row.h"
+#include "../state.h"
+#include "../task-list.h"
+#include "../utils.h"
 #include "task-toolbar.h"
-#include "utils.h"
-#include <string.h>
 
 // ---------- SIGNALS ---------- //
 static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x,

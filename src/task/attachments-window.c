@@ -1,8 +1,6 @@
 #include "attachments-window.h"
-#include "data.h"
-#include "glib.h"
-#include "gtk/gtk.h"
-#include "state.h"
+#include "../data.h"
+#include "../state.h"
 
 // ------------------------------------------------------ //
 //                  ATTACHMENTS WINDOW                    //

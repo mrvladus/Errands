@@ -1,7 +1,7 @@
 #include "rename-list-dialog.h"
-#include "data.h"
-#include "sidebar-task-list-row.h"
-#include "state.h"
+#include "../data.h"
+#include "../sidebar/sidebar-task-list-row.h"
+#include "../state.h"
 
 static void on_entry_changed_cb(AdwEntryRow *entry,
                                 ErrandsRenameListDialog *dialog);

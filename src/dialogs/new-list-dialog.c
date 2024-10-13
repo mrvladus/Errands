@@ -1,8 +1,8 @@
 #include "new-list-dialog.h"
-#include "data.h"
-#include "sidebar-task-list-row.h"
-#include "sidebar.h"
-#include "state.h"
+#include "../data.h"
+#include "../sidebar/sidebar-task-list-row.h"
+#include "../sidebar/sidebar.h"
+#include "../state.h"
 
 #include <string.h>
 

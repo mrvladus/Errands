@@ -1,6 +1,6 @@
 #include "priority-window.h"
-#include "data.h"
-#include "state.h"
+#include "../data.h"
+#include "../state.h"
 
 static void on_errands_priority_window_close(ErrandsPriorityWindow *win,
                                              gpointer data);

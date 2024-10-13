@@ -1,9 +1,9 @@
 #include "delete-list-dialog.h"
-#include "data.h"
-#include "sidebar-task-list-row.h"
-#include "state.h"
-#include "task.h"
-#include "utils.h"
+#include "../data.h"
+#include "../sidebar/sidebar-task-list-row.h"
+#include "../state.h"
+#include "../task/task.h"
+#include "../utils.h"
 
 static void on_response_cb(ErrandsDeleteListDialog *dialog, gchar *response,
                            gpointer data);

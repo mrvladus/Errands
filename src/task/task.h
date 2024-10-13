@@ -1,6 +1,6 @@
 #pragma once
 
-#include "data.h"
+#include "../data.h"
 #include "task-toolbar.h"
 
 #include <adwaita.h>

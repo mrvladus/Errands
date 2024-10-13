@@ -1,10 +1,9 @@
 #include "task-list.h"
 #include "data.h"
-#include "gtk/gtkrevealer.h"
-#include "sidebar-all-row.h"
-#include "sidebar-task-list-row.h"
+#include "sidebar/sidebar-all-row.h"
+#include "sidebar/sidebar-task-list-row.h"
 #include "state.h"
-#include "task.h"
+#include "task/task.h"
 #include "utils.h"
 
 #include <stdbool.h>

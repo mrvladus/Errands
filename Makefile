@@ -3,7 +3,7 @@ CFLAGS = $(shell pkg-config --cflags libadwaita-1 gtksourceview-5) -O3
 LDFLAGS = $(shell pkg-config --libs libadwaita-1 gtksourceview-5)
 
 # Source files
-SRC = $(wildcard src/*.c)
+SRC = $(shell find src -name '*.c')
 
 # Object files
 OBJ = $(SRC:.c=.o)
@@ -11,16 +11,24 @@ OBJ = $(SRC:.c=.o)
 # Executable name
 TARGET = errands
 
+# Resource files and CSS files
+RESOURCES = data/errands.gresource.xml data/styles/style.css data/styles/style-dark.css
+RESOURCES_SRC = src/resources.h src/resources.c
+
 # Default target
 all: $(TARGET)
 
-# Generate resource files from errands.gresource.xml
-compile-resources: data/errands.gresource.xml $(wildcard data/icons/*.svg data/styles/*.css)
-	glib-compile-resources data/errands.gresource.xml --generate-header --sourcedir=data --target=src/resources.h --c-name=errands
+# Generate source resource file
+src/resources.c: $(RESOURCES)
 	glib-compile-resources data/errands.gresource.xml --generate-source --sourcedir=data --target=src/resources.c --c-name=errands
 
+# Generate header resource file
+src/resources.h: $(RESOURCES)
+	glib-compile-resources data/errands.gresource.xml --generate-header --sourcedir=data --target=src/resources.h --c-name=errands
+
+
 # Link object files to create the executable
-$(TARGET): compile-resources $(OBJ)
+$(TARGET): $(OBJ) $(RESOURCES_SRC)
 	$(CC) $(OBJ) -o $(TARGET) $(LDFLAGS)
 
 # Compile source files to object files
@@ -31,9 +39,9 @@ $(TARGET): compile-resources $(OBJ)
 run: $(TARGET)
 	./$(TARGET)
 
-# Clean up build files
+# Clean up build files (excluding resource files)
 clean:
 	rm -f $(OBJ) $(TARGET)
 
 # Phony targets
-.PHONY: all clean run gen-res
+.PHONY: all clean run

@@ -1,11 +1,8 @@
 #include "notes-window.h"
-#include "adwaita.h"
-#include "data.h"
-#include "glib-object.h"
-#include "gtksourceview/gtksource.h"
-#include "state.h"
+#include "../data.h"
+#include "../state.h"
+#include "../utils.h"
 #include "task.h"
-#include "utils.h"
 
 static void on_errands_notes_window_close_cb(ErrandsNotesWindow *win,
                                              gpointer data);

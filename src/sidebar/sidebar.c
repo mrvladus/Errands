@@ -1,12 +1,10 @@
 #include "sidebar.h"
-#include "components.h"
-#include "data.h"
-#include "gtk/gtk.h"
-#include "gtk/gtkshortcut.h"
+#include "../components.h"
+#include "../data.h"
+#include "../state.h"
+#include "../task-list.h"
+#include "../utils.h"
 #include "sidebar-all-row.h"
-#include "state.h"
-#include "task-list.h"
-#include "utils.h"
 
 #include <stdbool.h>
 #include <stdio.h>

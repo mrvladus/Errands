@@ -1,5 +1,4 @@
 #include "tags-page.h"
-#include "gtk/gtk.h"
 #include "state.h"
 #include "utils.h"
 

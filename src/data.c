@@ -1,7 +1,8 @@
 #include "data.h"
-#include "cJSON.h"
 #include "state.h"
 #include "utils.h"
+
+#include "external/cJSON.h"
 
 #include <glib.h>
 

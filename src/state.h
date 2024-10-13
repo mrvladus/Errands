@@ -1,15 +1,15 @@
 #pragma once
 
-#include "attachments-window.h"
-#include "delete-list-dialog.h"
-#include "new-list-dialog.h"
+#include "dialogs/delete-list-dialog.h"
+#include "dialogs/new-list-dialog.h"
+#include "dialogs/rename-list-dialog.h"
 #include "no-lists-page.h"
-#include "notes-window.h"
-#include "priority-window.h"
-#include "rename-list-dialog.h"
-#include "sidebar.h"
-#include "tags-window.h"
+#include "sidebar/sidebar.h"
 #include "task-list.h"
+#include "task/attachments-window.h"
+#include "task/notes-window.h"
+#include "task/priority-window.h"
+#include "task/tags-window.h"
 #include "window.h"
 
 #include <adwaita.h>
