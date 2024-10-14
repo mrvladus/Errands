@@ -225,8 +225,7 @@ static void __on_export_finish(GObject *obj, GAsyncResult *res, gpointer data) {
   if (!f)
     return;
   FILE *file = fopen(g_file_get_path(f), "w");
-  if (file == NULL) {
-    LOG("Error exporting task");
+  if (!file) {
     fclose(file);
     return;
   }
