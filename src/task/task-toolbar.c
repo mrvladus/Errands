@@ -49,6 +49,7 @@ static void errands_task_toolbar_init(ErrandsTaskToolbar *self) {
 
 ErrandsTaskToolbar *errands_task_toolbar_new(void *task) {
   ErrandsTaskToolbar *tb = g_object_new(ERRANDS_TYPE_TASK_TOOLBAR, NULL);
+  // Connect signals
   g_signal_connect_swapped(tb->notes_btn, "clicked",
                            G_CALLBACK(errands_notes_window_show), task);
   g_signal_connect_swapped(tb->priority_btn, "clicked",
@@ -57,5 +58,24 @@ ErrandsTaskToolbar *errands_task_toolbar_new(void *task) {
                            G_CALLBACK(errands_tags_window_show), task);
   g_signal_connect_swapped(tb->attachments_btn, "clicked",
                            G_CALLBACK(errands_attachments_window_show), task);
+  // Update css for buttons
+  ErrandsTask *_task = task;
+  // Notes button
+  if (strcmp(_task->data->notes, ""))
+    gtk_widget_add_css_class(tb->notes_btn, "accent");
+  // Attachments button
+  if (_task->data->attachments->len > 0)
+    gtk_widget_add_css_class(tb->attachments_btn, "accent");
+  // Priority button
+  int priority = _task->data->priority;
+  gtk_button_set_icon_name(GTK_BUTTON(tb->priority_btn),
+                           priority > 0 ? "errands-priority-set-symbolic"
+                                        : "errands-priority-symbolic");
+  if (priority > 0 && priority < 3)
+    gtk_widget_add_css_class(tb->priority_btn, "priority-low");
+  else if (priority > 3 && priority < 6)
+    gtk_widget_add_css_class(tb->priority_btn, "priority-medium");
+  else if (priority > 6 && priority < 10)
+    gtk_widget_add_css_class(tb->priority_btn, "priority-high");
   return tb;
 }
