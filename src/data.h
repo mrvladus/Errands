@@ -44,12 +44,13 @@ void errands_data_write();
 TaskListData *errands_data_add_list(const char *name);
 void errands_data_free_list(TaskListData *data);
 void errands_data_delete_list(TaskListData *data);
+// Allocated string in ICAL format for task list
 char *errands_data_task_list_as_ical(TaskListData *data);
 TaskData *errands_data_add_task(char *text, char *list_uid, char *parent_uid);
 void errands_data_free_task(TaskData *data);
 void errands_data_delete_task(const char *list_uid, const char *uid);
 TaskData *errands_data_get_task(char *uid);
-// Allocated string in ICAL format
+// Allocated string in ICAL format for task
 char *errands_data_task_as_ical(TaskData *data);
 // Get task list as formatted for printing string. Return value must be freed.
 GString *errands_data_print_list(char *list_uid);

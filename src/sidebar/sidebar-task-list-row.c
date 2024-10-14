@@ -6,6 +6,7 @@
 #include "../state.h"
 #include "../task-list.h"
 #include "../utils.h"
+#include "gtk/gtk.h"
 
 #include <stdbool.h>
 #include <string.h>
@@ -34,7 +35,9 @@ errands_sidebar_task_list_row_init(ErrandsSidebarTaskListRow *self) {
   gtk_list_box_row_set_child(GTK_LIST_BOX_ROW(self), box);
 
   // Color
-  // TODO
+  self->color_dialog = gtk_color_dialog_new();
+  self->color_btn = gtk_color_dialog_button_new(self->color_dialog);
+  gtk_box_append(GTK_BOX(box), self->color_btn);
 
   // Label
   self->label = gtk_label_new("");

@@ -12,6 +12,8 @@ G_DECLARE_FINAL_TYPE(ErrandsSidebarTaskListRow, errands_sidebar_task_list_row,
 
 struct _ErrandsSidebarTaskListRow {
   GtkListBoxRow parent_instance;
+  GtkColorDialog *color_dialog;
+  GtkWidget *color_btn;
   GtkWidget *label;
   GtkWidget *counter;
   TaskListData *data;
