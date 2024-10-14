@@ -239,7 +239,6 @@ static void __on_export_finish(GObject *obj, GAsyncResult *res, gpointer data) {
 
 static void on_action_export(GSimpleAction *action, GVariant *param,
                              ErrandsTask *task) {
-
   GtkFileDialog *dialog = gtk_file_dialog_new();
   GString *name = g_string_new(task->data->text);
   g_string_append(name, ".ics");

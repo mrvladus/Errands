@@ -44,6 +44,7 @@ void errands_data_write();
 TaskListData *errands_data_add_list(const char *name);
 void errands_data_free_list(TaskListData *data);
 void errands_data_delete_list(TaskListData *data);
+char *errands_data_task_list_as_ical(TaskListData *data);
 TaskData *errands_data_add_task(char *text, char *list_uid, char *parent_uid);
 void errands_data_free_task(TaskData *data);
 void errands_data_delete_task(const char *list_uid, const char *uid);

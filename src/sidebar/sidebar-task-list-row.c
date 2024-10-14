@@ -15,7 +15,7 @@ static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x,
 static void on_action_rename(GSimpleAction *action, GVariant *param,
                              ErrandsSidebarTaskListRow *row);
 static void on_action_export(GSimpleAction *action, GVariant *param,
-                             gpointer data);
+                             ErrandsSidebarTaskListRow *row);
 static void on_action_delete(GSimpleAction *action, GVariant *param,
                              ErrandsSidebarTaskListRow *row);
 static void on_action_print(GSimpleAction *action, GVariant *param,
@@ -65,8 +65,8 @@ errands_sidebar_task_list_row_init(ErrandsSidebarTaskListRow *self) {
 
   // Actions
   GSimpleActionGroup *ag = errands_action_group_new(
-      3, "rename", on_action_rename, self, "delete", on_action_delete, self,
-      "print", on_action_print, self);
+      4, "rename", on_action_rename, self, "delete", on_action_delete, self,
+      "print", on_action_print, self, "export", on_action_export, self);
   gtk_widget_insert_action_group(GTK_WIDGET(self), "task-list-row",
                                  G_ACTION_GROUP(ag));
 }
@@ -136,8 +136,6 @@ void on_errands_sidebar_task_list_row_activate(GtkListBox *box,
   LOG("Switch to list '%s'", row->data->uid);
 }
 
-// --- SIGNALS HANDLERS --- //
-
 static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x,
                            gdouble y, GtkPopover *popover) {
   gtk_popover_set_pointing_to(popover, &(GdkRectangle){.x = x, .y = y});
@@ -149,9 +147,34 @@ static void on_action_rename(GSimpleAction *action, GVariant *param,
   errands_rename_list_dialog_show(row);
 }
 
+// - EXPORT - //
+
+static void __on_export_finish(GObject *obj, GAsyncResult *res, gpointer data) {
+  GFile *f = gtk_file_dialog_save_finish(GTK_FILE_DIALOG(obj), res, NULL);
+  if (!f)
+    return;
+  FILE *file = fopen(g_file_get_path(f), "w");
+  if (!file) {
+    fclose(file);
+    return;
+  }
+  TaskListData *tld = data;
+  char *ical = errands_data_task_list_as_ical(tld);
+  fprintf(file, "%s", ical);
+  fclose(file);
+  free(ical);
+  LOG("Export task list '%s'", tld->uid);
+}
+
 static void on_action_export(GSimpleAction *action, GVariant *param,
-                             gpointer data) {
-  LOG("Export");
+                             ErrandsSidebarTaskListRow *row) {
+  GtkFileDialog *dialog = gtk_file_dialog_new();
+  GString *name = g_string_new(row->data->name);
+  g_string_append(name, ".ics");
+  g_object_set(dialog, "initial-name", name->str, NULL);
+  gtk_file_dialog_save(dialog, GTK_WINDOW(state.main_window), NULL,
+                       __on_export_finish, row->data);
+  g_string_free(name, true);
 }
 
 static void on_action_delete(GSimpleAction *action, GVariant *param,
@@ -239,11 +262,11 @@ void start_print(const char *str) {
       gtk_print_operation_run(print, GTK_PRINT_OPERATION_ACTION_PRINT_DIALOG,
                               GTK_WINDOW(state.main_window), NULL);
   // Check the result (if user cancels or accepts the dialog)
-  if (result == GTK_PRINT_OPERATION_RESULT_ERROR) {
+  if (result == GTK_PRINT_OPERATION_RESULT_ERROR)
     g_print("An error occurred during the print operation.\n");
-  } else if (result == GTK_PRINT_OPERATION_RESULT_APPLY) {
+  else if (result == GTK_PRINT_OPERATION_RESULT_APPLY)
     g_print("Print operation successful.\n");
-  }
+
   // Cleanup the print operation object
   g_object_unref(print);
 }
@@ -253,7 +276,6 @@ static void on_action_print(GSimpleAction *action, GVariant *param,
   LOG("Start printing of the list '%s'", row->data->uid);
 
   GString *str = errands_data_print_list(row->data->uid);
-  printf("%s", str->str);
   start_print(str->str);
   g_string_free(str, true);
 }

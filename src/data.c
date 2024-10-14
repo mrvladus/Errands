@@ -286,6 +286,25 @@ void errands_data_delete_list(TaskListData *data) {
   return;
 }
 
+char *errands_data_task_list_as_ical(TaskListData *data) {
+  GString *ical =
+      g_string_new("BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Errands\n");
+  g_string_append_printf(ical, "X-ERRANDS-LIST-UID:%s\n", data->uid);
+  g_string_append_printf(ical, "X-WR-CALNAME:%s\n", data->name);
+  if (data->color)
+    g_string_append_printf(ical, "X-APPLE-CALENDAR-COLOR:%s\n", data->color);
+  // Add tasks
+  for (int i = 0; i < state.t_data->len; i++) {
+    TaskData *td = state.t_data->pdata[i];
+    char *task_ical = errands_data_task_as_ical(td);
+    g_string_append(ical, task_ical);
+    free(task_ical);
+  }
+  g_string_append(ical, "END:VCALENDAR\n");
+  char *ical_str = g_string_free(ical, FALSE);
+  return ical_str;
+}
+
 // --- TASKS --- //
 
 TaskData *errands_data_add_task(char *text, char *list_uid, char *parent_uid) {
