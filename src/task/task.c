@@ -9,6 +9,7 @@
 #include "task-toolbar.h"
 
 // ---------- SIGNALS ---------- //
+
 static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x,
                            gdouble y, GtkPopover *popover);
 static void on_action_rename(GSimpleAction *action, GVariant *param,
@@ -221,6 +222,8 @@ static void on_action_rename(GSimpleAction *action, GVariant *param,
 
 static void __on_export_finish(GObject *obj, GAsyncResult *res, gpointer data) {
   GFile *f = gtk_file_dialog_save_finish(GTK_FILE_DIALOG(obj), res, NULL);
+  if (!f)
+    return;
   FILE *file = fopen(g_file_get_path(f), "w");
   if (file == NULL) {
     LOG("Error exporting task");
