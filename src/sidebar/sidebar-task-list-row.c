@@ -6,13 +6,17 @@
 #include "../state.h"
 #include "../task-list.h"
 #include "../utils.h"
+#include "gdk/gdk.h"
 #include "gtk/gtk.h"
 
 #include <stdbool.h>
+#include <stdlib.h>
 #include <string.h>
 
 static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x,
                            gdouble y, GtkPopover *popover);
+static void on_color_changed(GtkColorDialogButton *btn, GParamSpec *pspec,
+                             TaskListData *data);
 static void on_action_rename(GSimpleAction *action, GVariant *param,
                              ErrandsSidebarTaskListRow *row);
 static void on_action_export(GSimpleAction *action, GVariant *param,
@@ -31,7 +35,7 @@ static void errands_sidebar_task_list_row_class_init(
 static void
 errands_sidebar_task_list_row_init(ErrandsSidebarTaskListRow *self) {
   // Box
-  GtkWidget *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
+  GtkWidget *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
   gtk_list_box_row_set_child(GTK_LIST_BOX_ROW(self), box);
 
   // Color
@@ -76,9 +80,18 @@ errands_sidebar_task_list_row_init(ErrandsSidebarTaskListRow *self) {
 
 ErrandsSidebarTaskListRow *
 errands_sidebar_task_list_row_new(TaskListData *data) {
+
   ErrandsSidebarTaskListRow *row =
       g_object_new(ERRANDS_TYPE_SIDEBAR_TASK_LIST_ROW, NULL);
   row->data = data;
+  // Set color
+  GdkRGBA color;
+  gdk_rgba_parse(&color, data->color);
+  gtk_color_dialog_button_set_rgba(GTK_COLOR_DIALOG_BUTTON(row->color_btn),
+                                   &color);
+  g_signal_connect(row->color_btn, "notify::rgba", G_CALLBACK(on_color_changed),
+                   data);
+  // Update
   errands_sidebar_task_list_row_update_title(row);
   errands_sidebar_task_list_row_update_counter(row);
   return row;
@@ -143,6 +156,14 @@ static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x,
                            gdouble y, GtkPopover *popover) {
   gtk_popover_set_pointing_to(popover, &(GdkRectangle){.x = x, .y = y});
   gtk_popover_popup(popover);
+}
+
+static void on_color_changed(GtkColorDialogButton *btn, GParamSpec *pspec,
+                             TaskListData *data) {
+  const GdkRGBA *color_rgba = gtk_color_dialog_button_get_rgba(btn);
+  free(data->color);
+  data->color = gdk_rgba_to_hex_string(color_rgba);
+  errands_data_write();
 }
 
 static void on_action_rename(GSimpleAction *action, GVariant *param,

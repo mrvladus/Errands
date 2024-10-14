@@ -33,6 +33,7 @@ ErrandsDeleteListDialog *errands_delete_list_dialog_new() {
 
 void errands_delete_list_dialog_show(ErrandsSidebarTaskListRow *row) {
   state.delete_list_dialog->row = row;
+  LOG("Show delete dialog for '%s'", row->data->uid);
   char *msg = g_strdup_printf("This will completely delete \"%s\" task list",
                               row->data->name);
   adw_alert_dialog_set_body(ADW_ALERT_DIALOG(state.delete_list_dialog), msg);

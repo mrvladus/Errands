@@ -92,6 +92,18 @@ static inline char *generate_hex() {
   return color;
 }
 
+static inline char *gdk_rgba_to_hex_string(const GdkRGBA *rgba) {
+  // Allocate memory for the hex string (7 characters: #RRGGBB + null
+  // terminator)
+  char *hex_string = malloc(8);
+  // Convert the RGBA components to integers in the range [0, 255]
+  int r = (int)(rgba->red * 255);
+  int g = (int)(rgba->green * 255);
+  int b = (int)(rgba->blue * 255);
+  // Format the string as #RRGGBB
+  snprintf(hex_string, 8, "#%02X%02X%02X", r, g, b);
+  return hex_string;
+}
 // Add shortcut to the widget
 static inline void errands_add_shortcut(GtkWidget *widget, const char *trigger,
                                         const char *action) {
