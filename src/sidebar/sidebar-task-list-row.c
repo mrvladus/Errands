@@ -80,7 +80,6 @@ errands_sidebar_task_list_row_init(ErrandsSidebarTaskListRow *self) {
 
 ErrandsSidebarTaskListRow *
 errands_sidebar_task_list_row_new(TaskListData *data) {
-
   ErrandsSidebarTaskListRow *row =
       g_object_new(ERRANDS_TYPE_SIDEBAR_TASK_LIST_ROW, NULL);
   row->data = data;
