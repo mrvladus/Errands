@@ -19,6 +19,129 @@
     color: var(--accent-red);
 }
 
+/* Accent color buttons */
+
+.accent-color-btn radio {
+    all: unset;
+    border: 2px solid transparent;
+    border-radius: 50%;
+    min-width: 26px;
+    min-height: 26px;
+    color: @light_2;
+}
+
+.accent-color-btn radio:hover {
+    filter: brightness(1.2);
+}
+
+.accent-color-btn radio:checked {
+    -gtk-icon-transform: scale(0.7);
+    -gtk-icon-source: -gtk-icontheme("errands-select-symbolic");
+}
+
+.accent-color-btn-none radio {
+    border-color: alpha(@view_fg_color, 0.3);
+}
+
+.accent-color-btn-none radio:checked {
+    color: @window_fg_color;
+}
+
+.accent-color-btn-blue radio {
+    background-color: @blue_2;
+}
+
+.accent-color-btn-green radio {
+    background-color: @green_2;
+}
+
+.accent-color-btn-yellow radio {
+    background-color: @yellow_2;
+    color: @window_fg_color;
+}
+
+.accent-color-btn-orange radio {
+    background-color: @orange_2;
+    color: @window_fg_color;
+}
+
+.accent-color-btn-red radio {
+    background-color: @red_2;
+}
+
+.accent-color-btn-purple radio {
+    background-color: @purple_2;
+}
+
+.accent-color-btn-brown radio {
+    background-color: @brown_2;
+}
+
+/* Task accent colors */
+
+.task-blue {
+    background: #dde9f7;
+}
+
+.progressbar-blue progress,
+.checkbtn-blue check:checked {
+    background-color: @blue_2;
+}
+
+.task-green {
+    background: #daf7e0;
+}
+
+.progressbar-green progress,
+.checkbtn-green check:checked {
+    background-color: @green_3;
+}
+
+.task-yellow {
+    background: #faf7cf;
+}
+
+.progressbar-yellow progress,
+.checkbtn-yellow check:checked {
+    background-color: @yellow_4;
+}
+
+.task-orange {
+    background: #fce8d0;
+}
+
+.progressbar-orange progress,
+.checkbtn-orange check:checked {
+    background-color: @orange_2;
+}
+
+.task-red {
+    background: #f9ccc7;
+}
+
+.progressbar-red progress,
+.checkbtn-red check:checked {
+    background-color: @red_1;
+}
+
+.task-purple {
+    background: #f1d8f1;
+}
+
+.progressbar-purple progress,
+.checkbtn-purple check:checked {
+    background-color: @purple_2;
+}
+
+.task-brown {
+    background: #ece2da;
+}
+
+.progressbar-brown progress,
+.checkbtn-brown check:checked {
+    background-color: @brown_2;
+}
+
 /* Overrides */
 
 colorbutton button {

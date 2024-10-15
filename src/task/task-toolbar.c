@@ -1,5 +1,6 @@
 #include "task-toolbar.h"
 #include "attachments-window.h"
+#include "color-window.h"
 #include "notes-window.h"
 #include "priority-window.h"
 #include "tags-window.h"
@@ -45,6 +46,11 @@ static void errands_task_toolbar_init(ErrandsTaskToolbar *self) {
       gtk_button_new_from_icon_name("errands-attachment-symbolic");
   gtk_widget_add_css_class(self->attachments_btn, "flat");
   gtk_box_append(GTK_BOX(self), self->attachments_btn);
+
+  // Color button
+  self->color_btn = gtk_button_new_from_icon_name("errands-color-symbolic");
+  gtk_widget_add_css_class(self->color_btn, "flat");
+  gtk_box_append(GTK_BOX(self), self->color_btn);
 }
 
 ErrandsTaskToolbar *errands_task_toolbar_new(void *task) {
@@ -58,6 +64,8 @@ ErrandsTaskToolbar *errands_task_toolbar_new(void *task) {
                            G_CALLBACK(errands_tags_window_show), task);
   g_signal_connect_swapped(tb->attachments_btn, "clicked",
                            G_CALLBACK(errands_attachments_window_show), task);
+  g_signal_connect_swapped(tb->color_btn, "clicked",
+                           G_CALLBACK(errands_color_window_show), task);
   // Update css for buttons
   ErrandsTask *_task = task;
   // Notes button

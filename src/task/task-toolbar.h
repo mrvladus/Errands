@@ -14,6 +14,7 @@ struct _ErrandsTaskToolbar {
   GtkWidget *priority_btn;
   GtkWidget *tags_btn;
   GtkWidget *attachments_btn;
+  GtkWidget *color_btn;
 };
 
 ErrandsTaskToolbar *errands_task_toolbar_new(void *task);

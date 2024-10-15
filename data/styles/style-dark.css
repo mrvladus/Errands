@@ -1,0 +1,68 @@
+.task-blue {
+    background: darker(#3584e4);
+}
+
+.progressbar-blue progress,
+.checkbtn-blue check:checked {
+    background-color: @blue_2;
+}
+
+.task-green {
+    background: darker(#33d17a);
+}
+
+.progressbar-green progress,
+.checkbtn-green check:checked {
+    background-color: @green_3;
+}
+
+.task-yellow {
+    background: darker(#f5c211);
+}
+
+.progressbar-yellow progress,
+.checkbtn-yellow check:checked {
+    background-color: @yellow_4;
+}
+
+.task-orange {
+    background: darker(#ff7800);
+}
+
+.progressbar-orange progress,
+.checkbtn-orange check:checked {
+    background-color: @orange_2;
+}
+
+.task-red {
+    background: darker(#e01b24);
+}
+
+.progressbar-red progress,
+.checkbtn-red check:checked {
+    background-color: @red_1;
+}
+
+.task-purple {
+    background: darker(#9141ac);
+}
+
+.progressbar-purple progress,
+.checkbtn-purple check:checked {
+    background-color: @purple_2;
+}
+
+.task-brown {
+    background: #986a44;
+}
+
+.progressbar-brown progress,
+.checkbtn-brown check:checked {
+    background-color: @brown_1;
+}
+
+/* Overrides */
+
+link {
+    color: white;
+}

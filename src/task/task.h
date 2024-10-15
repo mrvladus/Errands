@@ -26,3 +26,4 @@ struct _ErrandsTask {
 };
 
 ErrandsTask *errands_task_new(TaskData *data);
+void errands_task_update_accent_color(ErrandsTask *task);

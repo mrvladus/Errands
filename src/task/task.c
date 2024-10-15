@@ -6,6 +6,7 @@
 #include "../state.h"
 #include "../task-list.h"
 #include "../utils.h"
+#include "glib.h"
 #include "task-toolbar.h"
 
 // ---------- SIGNALS ---------- //
@@ -172,6 +173,9 @@ ErrandsTask *errands_task_new(TaskData *data) {
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(task->toolbar_btn),
                                data->toolbar_shown);
 
+  // Setup accent color
+  errands_task_update_accent_color(task);
+
   // Lazy load toolbar
   if (data->toolbar_shown) {
     task->toolbar = errands_task_toolbar_new(task);
@@ -201,6 +205,19 @@ ErrandsTask *errands_task_new(TaskData *data) {
                    G_CALLBACK(on_errands_task_sub_task_added), task);
 
   return task;
+}
+
+void errands_task_update_accent_color(ErrandsTask *task) {
+  if (strcmp(task->data->color, "")) {
+    GString *accent_style = g_string_new("task-");
+    g_string_append(accent_style, task->data->color);
+    const char *classes[4] = {"vertical", "card", accent_style->str, NULL};
+    gtk_widget_set_css_classes(GTK_WIDGET(task->card), classes);
+    g_string_free(accent_style, true);
+  } else {
+    const char *classes[3] = {"vertical", "card", NULL};
+    gtk_widget_set_css_classes(GTK_WIDGET(task->card), classes);
+  }
 }
 
 // --- SIGNALS HANDLERS --- //
