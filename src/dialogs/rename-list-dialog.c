@@ -3,6 +3,8 @@
 #include "../sidebar/sidebar-task-list-row.h"
 #include "../state.h"
 
+#include <glib/gi18n.h>
+
 static void on_entry_changed_cb(AdwEntryRow *entry,
                                 ErrandsRenameListDialog *dialog);
 static void on_entry_activate_cb(AdwEntryRow *entry,
@@ -17,7 +19,7 @@ static void
 errands_rename_list_dialog_class_init(ErrandsRenameListDialogClass *class) {}
 
 static void errands_rename_list_dialog_init(ErrandsRenameListDialog *self) {
-  adw_alert_dialog_set_heading(ADW_ALERT_DIALOG(self), "Rename List");
+  adw_alert_dialog_set_heading(ADW_ALERT_DIALOG(self), _("Rename List"));
 
   // Box
   GtkWidget *box = gtk_list_box_new();
@@ -26,7 +28,7 @@ static void errands_rename_list_dialog_init(ErrandsRenameListDialog *self) {
 
   // Entry
   self->entry = adw_entry_row_new();
-  g_object_set(self->entry, "title", "New List Name", NULL);
+  g_object_set(self->entry, "title", _("New List Name"), NULL);
   g_signal_connect(self->entry, "changed", G_CALLBACK(on_entry_changed_cb),
                    self);
   g_signal_connect(self->entry, "entry-activated",
@@ -34,8 +36,9 @@ static void errands_rename_list_dialog_init(ErrandsRenameListDialog *self) {
   gtk_list_box_append(GTK_LIST_BOX(box), self->entry);
 
   // Dialog
-  adw_alert_dialog_add_response(ADW_ALERT_DIALOG(self), "cancel", "Cancel");
-  adw_alert_dialog_add_response(ADW_ALERT_DIALOG(self), "confirm", "Confirm");
+  adw_alert_dialog_add_response(ADW_ALERT_DIALOG(self), "cancel", _("Cancel"));
+  adw_alert_dialog_add_response(ADW_ALERT_DIALOG(self), "confirm",
+                                _("Confirm"));
   adw_alert_dialog_set_response_appearance(ADW_ALERT_DIALOG(self), "confirm",
                                            ADW_RESPONSE_SUGGESTED);
   adw_alert_dialog_set_default_response(ADW_ALERT_DIALOG(self), "cancel");

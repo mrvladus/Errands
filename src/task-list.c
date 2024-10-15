@@ -6,6 +6,8 @@
 #include "task/task.h"
 #include "utils.h"
 
+#include <glib/gi18n.h>
+
 #include <stdbool.h>
 #include <string.h>
 
@@ -50,7 +52,7 @@ static void errands_task_list_init(ErrandsTaskList *self) {
 
   // Entry
   GtkWidget *task_entry = adw_entry_row_new();
-  g_object_set(task_entry, "title", "Add Task", "activatable", false,
+  g_object_set(task_entry, "title", _("Add Task"), "activatable", false,
                "margin-start", 12, "margin-end", 12, NULL);
   gtk_widget_add_css_class(task_entry, "card");
   g_signal_connect(task_entry, "entry-activated", G_CALLBACK(on_task_added),
@@ -105,7 +107,8 @@ ErrandsTaskList *errands_task_list_new() {
 void errands_task_list_update_title() {
   // If no data - show for all tasks
   if (!state.task_list->data) {
-    adw_window_title_set_title(ADW_WINDOW_TITLE(state.task_list->title), "All");
+    adw_window_title_set_title(ADW_WINDOW_TITLE(state.task_list->title),
+                               _("All tasks"));
     // Set completed stats
     int completed = 0;
     int total = 0;
@@ -117,7 +120,8 @@ void errands_task_list_update_title() {
           completed++;
       }
     }
-    char *stats = g_strdup_printf("%s %d / %d", "Completed:", completed, total);
+    char *stats =
+        g_strdup_printf("%s %d / %d", _("Completed:"), completed, total);
     adw_window_title_set_subtitle(ADW_WINDOW_TITLE(state.task_list->title),
                                   total > 0 ? stats : "");
     g_free(stats);
@@ -140,7 +144,8 @@ void errands_task_list_update_title() {
         completed++;
     }
   }
-  char *stats = g_strdup_printf("%s %d / %d", "Completed:", completed, total);
+  char *stats =
+      g_strdup_printf("%s %d / %d", _("Completed:"), completed, total);
   adw_window_title_set_subtitle(ADW_WINDOW_TITLE(state.task_list->title),
                                 total > 0 ? stats : "");
   g_free(stats);

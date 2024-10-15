@@ -6,8 +6,9 @@
 #include "../state.h"
 #include "../task-list.h"
 #include "../utils.h"
-#include "glib.h"
 #include "task-toolbar.h"
+
+#include <glib/gi18n.h>
 
 // ---------- SIGNALS ---------- //
 
@@ -84,7 +85,7 @@ static void errands_task_init(ErrandsTask *self) {
 
   // Edit row
   self->edit_row = adw_entry_row_new();
-  g_object_set(self->edit_row, "title", "Edit", "hexpand", true,
+  g_object_set(self->edit_row, "title", _("Edit"), "hexpand", true,
                "show-apply-button", true, NULL);
   g_object_bind_property(self->title_row, "visible", self->edit_row, "visible",
                          G_BINDING_SYNC_CREATE | G_BINDING_INVERT_BOOLEAN);
@@ -130,9 +131,9 @@ static void errands_task_init(ErrandsTask *self) {
   gtk_box_append(GTK_BOX(sub_vbox), self->sub_tasks);
 
   // Right-click menu
-  GMenu *menu =
-      errands_menu_new(4, "Edit", "task.edit", "Move to Trash", "task.trash",
-                       "Export", "task.export", "Print", "task.print");
+  GMenu *menu = errands_menu_new(4, _("Edit"), "task.edit", _("Move to Trash"),
+                                 "task.trash", _("Export"), "task.export",
+                                 _("Print"), "task.print");
 
   // Menu popover
   GtkWidget *menu_popover = gtk_popover_menu_new_from_model(G_MENU_MODEL(menu));

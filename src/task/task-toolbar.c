@@ -5,6 +5,8 @@
 #include "priority-window.h"
 #include "tags-window.h"
 
+#include <glib/gi18n.h>
+
 G_DEFINE_TYPE(ErrandsTaskToolbar, errands_task_toolbar, GTK_TYPE_BOX)
 
 static void errands_task_toolbar_class_init(ErrandsTaskToolbarClass *class) {}
@@ -17,7 +19,7 @@ static void errands_task_toolbar_init(ErrandsTaskToolbar *self) {
   // Date button
   GtkWidget *date_btn_content = adw_button_content_new();
   g_object_set(date_btn_content, "icon-name", "errands-calendar-symbolic",
-               "label", "Date", NULL);
+               "label", _("Date"), NULL);
   self->date_btn = gtk_button_new();
   g_object_set(self->date_btn, "child", date_btn_content, NULL);
   gtk_widget_add_css_class(self->date_btn, "flat");

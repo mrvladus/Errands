@@ -104,6 +104,7 @@ static inline char *gdk_rgba_to_hex_string(const GdkRGBA *rgba) {
   snprintf(hex_string, 8, "#%02X%02X%02X", r, g, b);
   return hex_string;
 }
+
 // Add shortcut to the widget
 static inline void errands_add_shortcut(GtkWidget *widget, const char *trigger,
                                         const char *action) {

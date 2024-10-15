@@ -4,6 +4,8 @@
 #include "../utils.h"
 #include "task.h"
 
+#include <glib/gi18n.h>
+
 static void on_errands_notes_window_close_cb(ErrandsNotesWindow *win,
                                              gpointer data);
 static gboolean on_style_toggled(GBinding *binding, const GValue *from_value,
@@ -16,8 +18,8 @@ static void errands_notes_window_class_init(ErrandsNotesWindowClass *class) {}
 static void errands_notes_window_init(ErrandsNotesWindow *self) {
   LOG("Creating notes window");
 
-  g_object_set(self, "title", "Notes", "content-width", 600, "content-height",
-               600, NULL);
+  g_object_set(self, "title", _("Notes"), "content-width", 600,
+               "content-height", 600, NULL);
   g_signal_connect(self, "closed", G_CALLBACK(on_errands_notes_window_close_cb),
                    NULL);
 

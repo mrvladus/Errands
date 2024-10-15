@@ -3,6 +3,8 @@
 #include "../state.h"
 #include "../utils.h"
 
+#include <glib/gi18n.h>
+
 // ------------------------------------------------------ //
 //                      TAGS WINDOW                       //
 // ------------------------------------------------------ //
@@ -17,19 +19,19 @@ G_DEFINE_TYPE(ErrandsTagsWindow, errands_tags_window, ADW_TYPE_DIALOG)
 static void errands_tags_window_class_init(ErrandsTagsWindowClass *class) {}
 
 static void errands_tags_window_init(ErrandsTagsWindow *self) {
-  g_object_set(self, "title", "Tags", "content-width", 330, "content-height",
+  g_object_set(self, "title", _("Tags"), "content-width", 330, "content-height",
                400, NULL);
   g_signal_connect(self, "closed", G_CALLBACK(on_errands_tags_window_close),
                    NULL);
 
   // Header bar
   GtkWidget *hb = adw_header_bar_new();
-  self->title = adw_window_title_new("Tags", "");
+  self->title = adw_window_title_new(_("Tags"), "");
   adw_header_bar_set_title_widget(ADW_HEADER_BAR(hb), self->title);
 
   // Entry
   self->entry = adw_entry_row_new();
-  g_object_set(self->entry, "title", "Add new Tag", "margin-start", 12,
+  g_object_set(self->entry, "title", _("Add new Tag"), "margin-start", 12,
                "margin-end", 12, "margin-bottom", 3, "activatable", false,
                NULL);
   gtk_widget_add_css_class(self->entry, "card");
@@ -56,8 +58,8 @@ static void errands_tags_window_init(ErrandsTagsWindow *self) {
   // Placeholder
   self->placeholder = adw_status_page_new();
   g_object_set(self->placeholder, "icon-name", "errands-tag-symbolic", "title",
-               "No Tags", "description", "Add new ones in the entry above",
-               "vexpand", true, NULL);
+               _("No Tags"), "description",
+               _("Add new ones in the entry above"), "vexpand", true, NULL);
   g_object_bind_property(self->placeholder, "visible", scrl, "visible",
                          G_BINDING_SYNC_CREATE | G_BINDING_INVERT_BOOLEAN);
   gtk_widget_add_css_class(self->placeholder, "compact");

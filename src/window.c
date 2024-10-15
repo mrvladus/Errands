@@ -11,6 +11,8 @@
 #include "task/tags-window.h"
 #include "utils.h"
 
+#include <glib/gi18n.h>
+
 G_DEFINE_TYPE(ErrandsWindow, errands_window, ADW_TYPE_APPLICATION_WINDOW)
 
 static void errands_window_class_init(ErrandsWindowClass *class) {}
@@ -19,7 +21,7 @@ static void errands_window_init(ErrandsWindow *self) {
   LOG("Creating main window");
 
   g_object_set(self, "application", GTK_APPLICATION(state.app), "title",
-               "Errands", NULL);
+               _("Errands"), NULL);
   gtk_window_set_default_size(GTK_WINDOW(self), 800, 600);
 
   self->stack = adw_view_stack_new();

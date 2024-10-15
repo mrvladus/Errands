@@ -4,6 +4,8 @@
 #include "../sidebar/sidebar.h"
 #include "../state.h"
 
+#include <glib/gi18n.h>
+
 #include <string.h>
 
 // --- DECLARATIONS --- //
@@ -23,8 +25,8 @@ errands_new_list_dialog_class_init(ErrandsNewListDialogClass *class) {}
 
 static void errands_new_list_dialog_init(ErrandsNewListDialog *self) {
   adw_alert_dialog_set_heading(ADW_ALERT_DIALOG(self), "Add List");
-  adw_alert_dialog_add_response(ADW_ALERT_DIALOG(self), "cancel", "Cancel");
-  adw_alert_dialog_add_response(ADW_ALERT_DIALOG(self), "create", "Create");
+  adw_alert_dialog_add_response(ADW_ALERT_DIALOG(self), "cancel", _("Cancel"));
+  adw_alert_dialog_add_response(ADW_ALERT_DIALOG(self), "create", _("Create"));
   adw_alert_dialog_set_response_appearance(ADW_ALERT_DIALOG(self), "create",
                                            ADW_RESPONSE_SUGGESTED);
   adw_alert_dialog_set_default_response(ADW_ALERT_DIALOG(self), "cancel");
@@ -41,7 +43,7 @@ static void errands_new_list_dialog_init(ErrandsNewListDialog *self) {
 
   // Entry
   self->entry = adw_entry_row_new();
-  g_object_set(self->entry, "title", "List Name", NULL);
+  g_object_set(self->entry, "title", _("List Name"), NULL);
   g_signal_connect(self->entry, "changed", G_CALLBACK(on_entry_changed_cb),
                    NULL);
   g_signal_connect(self->entry, "entry-activated",

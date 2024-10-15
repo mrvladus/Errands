@@ -3,6 +3,8 @@
 #include "../utils.h"
 #include "task.h"
 
+#include <glib/gi18n.h>
+
 static void on_errands_color_window_close_cb(ErrandsColorWindow *win);
 static void on_errands_color_window_color_select_cb(GtkCheckButton *btn,
                                                     ErrandsColorWindow *win);
@@ -14,7 +16,7 @@ static void errands_color_window_class_init(ErrandsColorWindowClass *class) {}
 static void errands_color_window_init(ErrandsColorWindow *self) {
   LOG("Creating color window");
 
-  g_object_set(self, "title", "Accent Color", NULL);
+  g_object_set(self, "title", _("Accent Color"), NULL);
   g_signal_connect(self, "closed", G_CALLBACK(on_errands_color_window_close_cb),
                    NULL);
 

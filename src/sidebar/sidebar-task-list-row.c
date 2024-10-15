@@ -6,12 +6,8 @@
 #include "../state.h"
 #include "../task-list.h"
 #include "../utils.h"
-#include "gdk/gdk.h"
-#include "gtk/gtk.h"
 
-#include <stdbool.h>
-#include <stdlib.h>
-#include <string.h>
+#include <glib/gi18n.h>
 
 static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x,
                            gdouble y, GtkPopover *popover);
@@ -56,9 +52,10 @@ errands_sidebar_task_list_row_init(ErrandsSidebarTaskListRow *self) {
   gtk_widget_add_css_class(self->counter, "caption");
 
   // Right-click menu
-  GMenu *menu = errands_menu_new(
-      4, "Rename", "task-list-row.rename", "Delete", "task-list-row.delete",
-      "Export", "task-list-row.export", "Print", "task-list-row.print");
+  GMenu *menu = errands_menu_new(4, _("Rename"), "task-list-row.rename",
+                                 _("Delete"), "task-list-row.delete",
+                                 _("Export"), "task-list-row.export",
+                                 _("Print"), "task-list-row.print");
 
   // Menu popover
   GtkWidget *menu_popover = gtk_popover_menu_new_from_model(G_MENU_MODEL(menu));

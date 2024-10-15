@@ -2,6 +2,8 @@
 #include "../data.h"
 #include "../state.h"
 
+#include <glib/gi18n.h>
+
 // ------------------------------------------------------ //
 //                  ATTACHMENTS WINDOW                    //
 // ------------------------------------------------------ //
@@ -20,14 +22,14 @@ static void
 errands_attachments_window_class_init(ErrandsAttachmentsWindowClass *class) {}
 
 static void errands_attachments_window_init(ErrandsAttachmentsWindow *self) {
-  g_object_set(self, "title", "Attachments", "content-width", 330,
+  g_object_set(self, "title", _("Attachments"), "content-width", 330,
                "content-height", 400, NULL);
   g_signal_connect(self, "closed",
                    G_CALLBACK(on_errands_attachments_window_close), NULL);
 
   // Header bar
   GtkWidget *hb = adw_header_bar_new();
-  self->title = adw_window_title_new("Attachments", "");
+  self->title = adw_window_title_new(_("Attachments"), "");
   adw_header_bar_set_title_widget(ADW_HEADER_BAR(hb), self->title);
 
   // Add button
@@ -60,8 +62,8 @@ static void errands_attachments_window_init(ErrandsAttachmentsWindow *self) {
   // Placeholder
   self->placeholder = adw_status_page_new();
   g_object_set(self->placeholder, "icon-name", "errands-attachment-symbolic",
-               "title", "No Attachments", "description",
-               "Click \"+\" button to add new attachment", "vexpand", true,
+               "title", _("No Attachments"), "description",
+               _("Click \"+\" button to add new attachment"), "vexpand", true,
                NULL);
   g_object_bind_property(self->placeholder, "visible", scrl, "visible",
                          G_BINDING_SYNC_CREATE | G_BINDING_INVERT_BOOLEAN);

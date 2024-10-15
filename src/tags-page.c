@@ -2,7 +2,7 @@
 #include "state.h"
 #include "utils.h"
 
-#include <adwaita.h>
+#include <glib/gi18n.h>
 
 GtkWidget *errands_tag_new(char *text) {
   GtkWidget *row = adw_action_row_new();
@@ -16,7 +16,7 @@ void errands_tags_page_build() {
   GtkWidget *hb = adw_header_bar_new();
   // Entry
   GtkWidget *tags_entry = adw_entry_row_new();
-  g_object_set(tags_entry, "title", "Add Tag", "activatable", false, NULL);
+  g_object_set(tags_entry, "title", _("Add Tag"), "activatable", false, NULL);
   gtk_widget_add_css_class(tags_entry, "card");
   GtkWidget *entry_clamp = adw_clamp_new();
   g_object_set(entry_clamp, "tightening-threshold", 300, "maximum-size", 1000,
@@ -56,5 +56,5 @@ void errands_tags_page_build() {
   state.tags_page = tb;
   // Create task list page in the view stack
   adw_view_stack_add_titled(ADW_VIEW_STACK(state.stack), tb,
-                            "errands_tags_page", "Tags");
+                            "errands_tags_page", _("Tags"));
 }

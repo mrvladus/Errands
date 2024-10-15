@@ -2,6 +2,8 @@
 #include "../data.h"
 #include "../state.h"
 
+#include <glib/gi18n.h>
+
 static void on_errands_priority_window_close(ErrandsPriorityWindow *win,
                                              gpointer data);
 static void on_priority_button_activate(GtkCheckButton *btn, char *str);
@@ -12,7 +14,7 @@ static void
 errands_priority_window_class_init(ErrandsPriorityWindowClass *class) {}
 
 static void errands_priority_window_init(ErrandsPriorityWindow *self) {
-  g_object_set(self, "title", "Priority", "content-width", 300, NULL);
+  g_object_set(self, "title", _("Priority"), "content-width", 300, NULL);
   g_signal_connect(self, "closed", G_CALLBACK(on_errands_priority_window_close),
                    NULL);
 
@@ -30,7 +32,7 @@ static void errands_priority_window_init(ErrandsPriorityWindow *self) {
 
   // High
   GtkWidget *high = adw_action_row_new();
-  g_object_set(high, "title", "High", NULL);
+  g_object_set(high, "title", _("High"), NULL);
   gtk_widget_add_css_class(high, "priority-high");
   adw_action_row_add_prefix(
       ADW_ACTION_ROW(high),
@@ -44,7 +46,7 @@ static void errands_priority_window_init(ErrandsPriorityWindow *self) {
 
   // Medium
   GtkWidget *medium = adw_action_row_new();
-  g_object_set(medium, "title", "Medium", NULL);
+  g_object_set(medium, "title", _("Medium"), NULL);
   gtk_widget_add_css_class(medium, "priority-medium");
   adw_action_row_add_prefix(
       ADW_ACTION_ROW(medium),
@@ -60,7 +62,7 @@ static void errands_priority_window_init(ErrandsPriorityWindow *self) {
 
   // Low
   GtkWidget *low = adw_action_row_new();
-  g_object_set(low, "title", "Low", NULL);
+  g_object_set(low, "title", _("Low"), NULL);
   gtk_widget_add_css_class(low, "priority-low");
   adw_action_row_add_prefix(
       ADW_ACTION_ROW(low),
@@ -75,7 +77,7 @@ static void errands_priority_window_init(ErrandsPriorityWindow *self) {
 
   // None
   GtkWidget *none = adw_action_row_new();
-  g_object_set(none, "title", "None", NULL);
+  g_object_set(none, "title", _("None"), NULL);
   adw_action_row_add_prefix(
       ADW_ACTION_ROW(none),
       gtk_image_new_from_icon_name("errands-priority-none-symbolic"));
@@ -89,7 +91,7 @@ static void errands_priority_window_init(ErrandsPriorityWindow *self) {
 
   // Custom
   self->custom = adw_spin_row_new(gtk_adjustment_new(0, 0, 9, 1, 0, 0), 1, 0);
-  g_object_set(self->custom, "title", "Custom", NULL);
+  g_object_set(self->custom, "title", _("Custom"), NULL);
   gtk_list_box_append(GTK_LIST_BOX(box), self->custom);
 }
 

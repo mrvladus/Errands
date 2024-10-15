@@ -5,6 +5,8 @@
 #include "../task/task.h"
 #include "../utils.h"
 
+#include <glib/gi18n.h>
+
 static void on_response_cb(ErrandsDeleteListDialog *dialog, gchar *response,
                            gpointer data);
 
@@ -15,11 +17,12 @@ static void
 errands_delete_list_dialog_class_init(ErrandsDeleteListDialogClass *class) {}
 
 static void errands_delete_list_dialog_init(ErrandsDeleteListDialog *self) {
-  adw_alert_dialog_set_heading(ADW_ALERT_DIALOG(self), "Are you sure?");
+  adw_alert_dialog_set_heading(ADW_ALERT_DIALOG(self), _("Are you sure?"));
 
   // Dialog
-  adw_alert_dialog_add_response(ADW_ALERT_DIALOG(self), "cancel", "Cancel");
-  adw_alert_dialog_add_response(ADW_ALERT_DIALOG(self), "confirm", "Confirm");
+  adw_alert_dialog_add_response(ADW_ALERT_DIALOG(self), "cancel", _("Cancel"));
+  adw_alert_dialog_add_response(ADW_ALERT_DIALOG(self), "confirm",
+                                _("Confirm"));
   adw_alert_dialog_set_response_appearance(ADW_ALERT_DIALOG(self), "confirm",
                                            ADW_RESPONSE_DESTRUCTIVE);
   adw_alert_dialog_set_default_response(ADW_ALERT_DIALOG(self), "cancel");
@@ -34,7 +37,7 @@ ErrandsDeleteListDialog *errands_delete_list_dialog_new() {
 void errands_delete_list_dialog_show(ErrandsSidebarTaskListRow *row) {
   state.delete_list_dialog->row = row;
   LOG("Show delete dialog for '%s'", row->data->uid);
-  char *msg = g_strdup_printf("This will completely delete \"%s\" task list",
+  char *msg = g_strdup_printf(_("This will completely delete \"%s\" task list"),
                               row->data->name);
   adw_alert_dialog_set_body(ADW_ALERT_DIALOG(state.delete_list_dialog), msg);
   adw_dialog_present(ADW_DIALOG(state.delete_list_dialog),

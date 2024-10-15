@@ -6,6 +6,8 @@
 #include "../utils.h"
 #include "sidebar-all-row.h"
 
+#include <glib/gi18n.h>
+
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -88,7 +90,7 @@ static void errands_sidebar_init(ErrandsSidebar *self) {
   // Sidebar content box
   GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_append(GTK_BOX(box), self->filters_box);
-  gtk_box_append(GTK_BOX(box), errands_separator_new("Task Lists"));
+  gtk_box_append(GTK_BOX(box), errands_separator_new(_("Task Lists")));
   gtk_box_append(GTK_BOX(box), self->task_lists_box);
 
   // Scrolled window
