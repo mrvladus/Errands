@@ -18,7 +18,7 @@ static void errands_sidebar_all_row_init(ErrandsSidebarAllRow *self) {
   gtk_list_box_row_set_child(GTK_LIST_BOX_ROW(self), box);
   gtk_box_append(GTK_BOX(box),
                  gtk_image_new_from_icon_name("errands-all-tasks-symbolic"));
-  gtk_box_append(GTK_BOX(box), gtk_label_new(_("All Tasks")));
+  gtk_box_append(GTK_BOX(box), gtk_label_new(C_("All tasks", "All")));
 
   // Counter
   self->counter = gtk_label_new("");

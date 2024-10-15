@@ -108,7 +108,7 @@ void errands_task_list_update_title() {
   // If no data - show for all tasks
   if (!state.task_list->data) {
     adw_window_title_set_title(ADW_WINDOW_TITLE(state.task_list->title),
-                               _("All tasks"));
+                               _("All Tasks"));
     // Set completed stats
     int completed = 0;
     int total = 0;
