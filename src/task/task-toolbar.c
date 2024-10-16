@@ -26,17 +26,17 @@ static void errands_task_toolbar_init(ErrandsTaskToolbar *self) {
   gtk_widget_add_css_class(self->date_btn, "caption");
   gtk_box_append(GTK_BOX(self), self->date_btn);
 
-  // Notes button
-  self->notes_btn = gtk_button_new_from_icon_name("errands-notes-symbolic");
-  g_object_set(self->notes_btn, "halign", GTK_ALIGN_END, "hexpand", true, NULL);
-  gtk_widget_add_css_class(self->notes_btn, "flat");
-  gtk_box_append(GTK_BOX(self), self->notes_btn);
-
   // Priority button
   self->priority_btn =
       gtk_button_new_from_icon_name("errands-priority-symbolic");
   gtk_widget_add_css_class(self->priority_btn, "flat");
   gtk_box_append(GTK_BOX(self), self->priority_btn);
+
+  // Notes button
+  self->notes_btn = gtk_button_new_from_icon_name("errands-notes-symbolic");
+  g_object_set(self->notes_btn, "halign", GTK_ALIGN_END, "hexpand", true, NULL);
+  gtk_widget_add_css_class(self->notes_btn, "flat");
+  gtk_box_append(GTK_BOX(self), self->notes_btn);
 
   // Tags button
   self->tags_btn = gtk_button_new_from_icon_name("errands-tags-symbolic");

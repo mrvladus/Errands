@@ -173,3 +173,7 @@ colorbutton button colorswatch {
     border-radius: 50%;
     transform: scale(0.8, 0.75);
 }
+
+progressbar.osd {
+    background-color: @shade_color;
+}

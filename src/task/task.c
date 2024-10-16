@@ -6,9 +6,13 @@
 #include "../state.h"
 #include "../task-list.h"
 #include "../utils.h"
+#include "glib.h"
+#include "gtk/gtk.h"
 #include "task-toolbar.h"
 
 #include <glib/gi18n.h>
+#include <math.h>
+#include <string.h>
 
 // ---------- SIGNALS ---------- //
 
@@ -105,7 +109,7 @@ static void errands_task_init(ErrandsTask *self) {
   // Tags box
   self->tags_box = gtk_flow_box_new();
   g_object_set(self->tags_box, "max-children-per-line", 1000, "margin-bottom",
-               3, "margin-start", 10, "margin-end", 12, "selection-mode",
+               3, "margin-start", 8, "margin-end", 8, "selection-mode",
                GTK_SELECTION_NONE, NULL);
 
   // Tags revealer
@@ -114,7 +118,18 @@ static void errands_task_init(ErrandsTask *self) {
                "transition-duration", 100, NULL);
   gtk_box_append(GTK_BOX(self->card), self->tags_revealer);
 
-  // TODO: progress bar
+  // Progress bar
+  self->progress_bar = gtk_progress_bar_new();
+  g_object_set(self->progress_bar, "margin-start", 12, "margin-end", 12,
+               "margin-bottom", 6, NULL);
+  gtk_widget_add_css_class(self->progress_bar, "osd");
+  gtk_widget_add_css_class(self->progress_bar, "dim-label");
+
+  // Progress bar revealer
+  self->progress_revealer = gtk_revealer_new();
+  g_object_set(self->progress_revealer, "child", self->progress_bar,
+               "transition-duration", 100, NULL);
+  gtk_box_append(GTK_BOX(self->card), self->progress_revealer);
 
   // Toolbar revealer
   self->toolbar_revealer = gtk_revealer_new();
@@ -132,7 +147,7 @@ static void errands_task_init(ErrandsTask *self) {
 
   // Sub-task entry
   self->sub_entry = gtk_entry_new();
-  g_object_set(self->sub_entry, "margin-top", 6, "margin-bottom", 6,
+  g_object_set(self->sub_entry, "margin-top", 0, "margin-bottom", 6,
                "margin-start", 12, "margin-end", 12, "placeholder-text",
                "Add Sub-Task", NULL);
   gtk_box_append(GTK_BOX(sub_vbox), self->sub_entry);
@@ -185,12 +200,6 @@ ErrandsTask *errands_task_new(TaskData *data) {
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(task->toolbar_btn),
                                data->toolbar_shown);
 
-  // Add tags
-  errands_task_update_tags(task);
-
-  // Set accent color
-  errands_task_update_accent_color(task);
-
   // Lazy load toolbar
   if (data->toolbar_shown) {
     task->toolbar = errands_task_toolbar_new(task);
@@ -208,6 +217,10 @@ ErrandsTask *errands_task_new(TaskData *data) {
                      GTK_WIDGET(errands_task_new(td)));
   }
   errands_task_list_sort_by_completion(task->sub_tasks);
+
+  errands_task_update_tags(task);
+  errands_task_update_accent_color(task);
+  errands_task_update_progress(task);
 
   // Connect signals
   g_signal_connect(task->click_ctrl, "released",
@@ -233,6 +246,26 @@ void errands_task_update_accent_color(ErrandsTask *task) {
     const char *classes[3] = {"vertical", "card", NULL};
     gtk_widget_set_css_classes(GTK_WIDGET(task->card), classes);
   }
+}
+
+void errands_task_update_progress(ErrandsTask *task) {
+  GPtrArray *sub_tasks = get_children(task->sub_tasks);
+  int total = 0;
+  int completed = 0;
+  for (int i = 0; i < sub_tasks->len; i++) {
+    ErrandsTask *sub_task = sub_tasks->pdata[i];
+    TaskData *td = sub_task->data;
+    if (!td->trash && !td->deleted) {
+      total++;
+      if (td->completed)
+        completed++;
+    }
+  }
+  gtk_revealer_set_reveal_child(GTK_REVEALER(task->progress_revealer),
+                                total > 0);
+  gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(task->progress_bar),
+                                total > 0 ? (float)completed / (float)total
+                                          : 0);
 }
 
 // --- TAGS --- //
@@ -272,6 +305,18 @@ void errands_task_update_tags(ErrandsTask *task) {
   }
   gtk_revealer_set_reveal_child(GTK_REVEALER(task->tags_revealer),
                                 task->data->tags->len > 0);
+}
+
+GPtrArray *errands_task_get_parents(ErrandsTask *task) {
+  GPtrArray *parents = g_ptr_array_new();
+  ErrandsTask *parent = ERRANDS_TASK(gtk_widget_get_ancestor(
+      gtk_widget_get_parent(GTK_WIDGET(task)), ERRANDS_TYPE_TASK));
+  while (parent) {
+    g_ptr_array_add(parents, parent);
+    parent = ERRANDS_TASK(gtk_widget_get_ancestor(
+        gtk_widget_get_parent(GTK_WIDGET(parent)), ERRANDS_TYPE_TASK));
+  }
+  return parents;
 }
 
 // --- SIGNALS HANDLERS --- //
@@ -341,6 +386,30 @@ static void on_errands_task_complete_btn_toggle(GtkCheckButton *btn,
   else
     task_list = gtk_widget_get_parent(GTK_WIDGET(task));
 
+  // Complete all sub-tasks if task is completed
+  if (task->data->completed) {
+    GPtrArray *sub_tasks = get_children(task->sub_tasks);
+    for (int i = 0; i < sub_tasks->len; i++) {
+      ErrandsTask *sub_task = sub_tasks->pdata[i];
+      gtk_check_button_set_active(GTK_CHECK_BUTTON(sub_task->complete_btn),
+                                  true);
+    }
+    g_ptr_array_free(sub_tasks, true);
+  }
+
+  // Update parents
+  GPtrArray *parents = errands_task_get_parents(task);
+  for (int i = 0; i < parents->len; i++) {
+    ErrandsTask *parent = parents->pdata[i];
+    errands_task_update_progress(parent);
+    // Uncomplete parent task if task is un-completed
+    if (!gtk_check_button_get_active(btn))
+      gtk_check_button_set_active(GTK_CHECK_BUTTON(parent->complete_btn),
+                                  false);
+  }
+  g_ptr_array_free(parents, true);
+
+  // Update task list
   errands_task_list_sort_by_completion(task_list);
   errands_task_list_update_title();
   errands_sidebar_all_row_update_counter(state.sidebar->all_row);
