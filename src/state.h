@@ -8,6 +8,7 @@
 #include "task-list.h"
 #include "task/attachments-window.h"
 #include "task/color-window.h"
+#include "task/date-window.h"
 #include "task/notes-window.h"
 #include "task/priority-window.h"
 #include "task/tags-window.h"
@@ -38,6 +39,7 @@ typedef struct {
   ErrandsTagsWindow *tags_window;
   ErrandsAttachmentsWindow *attachments_window;
   ErrandsColorWindow *color_window;
+  ErrandsDateWindow *date_window;
 
   // User Data
   GPtrArray *tl_data;
