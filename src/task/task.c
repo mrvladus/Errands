@@ -20,8 +20,6 @@ static void on_action_export(GSimpleAction *action, GVariant *param,
                              ErrandsTask *task);
 static void on_action_trash(GSimpleAction *action, GVariant *param,
                             ErrandsTask *task);
-static void on_action_print(GSimpleAction *action, GVariant *param,
-                            ErrandsTask *task);
 static void on_errands_task_complete_btn_toggle(GtkCheckButton *btn,
                                                 ErrandsTask *task);
 static void on_errands_task_toolbar_btn_toggle(GtkToggleButton *btn,
@@ -104,6 +102,20 @@ static void errands_task_init(ErrandsTask *self) {
   adw_entry_row_add_suffix(ADW_ENTRY_ROW(self->edit_row), cancel_btn);
   gtk_list_box_append(GTK_LIST_BOX(title_lb), self->edit_row);
 
+  // Tags box
+  self->tags_box = gtk_flow_box_new();
+  g_object_set(self->tags_box, "max-children-per-line", 1000, "margin-bottom",
+               3, "margin-start", 10, "margin-end", 12, "selection-mode",
+               GTK_SELECTION_NONE, NULL);
+
+  // Tags revealer
+  self->tags_revealer = gtk_revealer_new();
+  g_object_set(self->tags_revealer, "child", self->tags_box,
+               "transition-duration", 100, NULL);
+  gtk_box_append(GTK_BOX(self->card), self->tags_revealer);
+
+  // TODO: progress bar
+
   // Toolbar revealer
   self->toolbar_revealer = gtk_revealer_new();
   g_object_bind_property(self->toolbar_btn, "active", self->toolbar_revealer,
@@ -131,9 +143,8 @@ static void errands_task_init(ErrandsTask *self) {
   gtk_box_append(GTK_BOX(sub_vbox), self->sub_tasks);
 
   // Right-click menu
-  GMenu *menu = errands_menu_new(4, _("Edit"), "task.edit", _("Move to Trash"),
-                                 "task.trash", _("Export"), "task.export",
-                                 _("Print"), "task.print");
+  GMenu *menu = errands_menu_new(3, _("Edit"), "task.edit", _("Move to Trash"),
+                                 "task.trash", _("Export"), "task.export");
 
   // Menu popover
   GtkWidget *menu_popover = gtk_popover_menu_new_from_model(G_MENU_MODEL(menu));
@@ -154,8 +165,8 @@ static void errands_task_init(ErrandsTask *self) {
 
   // Actions
   GSimpleActionGroup *ag = errands_action_group_new(
-      4, "edit", on_action_rename, self, "trash", on_action_trash, self,
-      "export", on_action_export, self, "print", on_action_print, self);
+      3, "edit", on_action_rename, self, "trash", on_action_trash, self,
+      "export", on_action_export, self);
   gtk_widget_insert_action_group(GTK_WIDGET(self), "task", G_ACTION_GROUP(ag));
 }
 
@@ -174,7 +185,10 @@ ErrandsTask *errands_task_new(TaskData *data) {
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(task->toolbar_btn),
                                data->toolbar_shown);
 
-  // Setup accent color
+  // Add tags
+  errands_task_update_tags(task);
+
+  // Set accent color
   errands_task_update_accent_color(task);
 
   // Lazy load toolbar
@@ -219,6 +233,45 @@ void errands_task_update_accent_color(ErrandsTask *task) {
     const char *classes[3] = {"vertical", "card", NULL};
     gtk_widget_set_css_classes(GTK_WIDGET(task->card), classes);
   }
+}
+
+// --- TAGS --- //
+
+static void errands_task_tag_delete(GtkWidget *tag) {
+  GtkWidget *flow_box = gtk_widget_get_ancestor(tag, GTK_TYPE_FLOW_BOX);
+  gtk_flow_box_remove(GTK_FLOW_BOX(flow_box), tag);
+}
+
+static GtkWidget *errands_task_tag_new(const char *tag) {
+  // Box
+  GtkWidget *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+  gtk_widget_add_css_class(box, "tag");
+
+  // Label
+  GtkWidget *label = gtk_label_new(tag);
+  g_object_set(label, "max-width-chars", 15, "halign", GTK_ALIGN_START,
+               "ellipsize", PANGO_ELLIPSIZE_END, NULL);
+  gtk_widget_add_css_class(box, "caption-heading");
+  gtk_box_append(GTK_BOX(box), label);
+
+  // Button
+  GtkWidget *btn = gtk_button_new_from_icon_name("errands-close-symbolic");
+  g_signal_connect_swapped(btn, "clicked", G_CALLBACK(errands_task_tag_delete),
+                           box);
+  gtk_box_append(GTK_BOX(box), btn);
+
+  return box;
+}
+
+void errands_task_update_tags(ErrandsTask *task) {
+  gtk_flow_box_remove_all(GTK_FLOW_BOX(task->tags_box));
+  for (int i = 0; i < task->data->tags->len; i++) {
+    const char *tag = task->data->tags->pdata[i];
+    GtkWidget *tag_pill = errands_task_tag_new(tag);
+    gtk_flow_box_append(GTK_FLOW_BOX(task->tags_box), tag_pill);
+  }
+  gtk_revealer_set_reveal_child(GTK_REVEALER(task->tags_revealer),
+                                task->data->tags->len > 0);
 }
 
 // --- SIGNALS HANDLERS --- //
@@ -272,9 +325,6 @@ static void on_action_trash(GSimpleAction *action, GVariant *param,
   errands_data_write();
   gtk_revealer_set_reveal_child(GTK_REVEALER(task->revealer), false);
 }
-
-static void on_action_print(GSimpleAction *action, GVariant *param,
-                            ErrandsTask *task) {}
 
 static void on_errands_task_complete_btn_toggle(GtkCheckButton *btn,
                                                 ErrandsTask *task) {

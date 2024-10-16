@@ -2,6 +2,7 @@
 #include "../data.h"
 #include "../state.h"
 #include "../utils.h"
+#include "task.h"
 
 #include <glib/gi18n.h>
 
@@ -112,7 +113,7 @@ static void errands_tags_window_update_ui() {
 // --- SIGNAL HANDLERS FOR TAGS WINDOW --- //
 
 static void on_errands_tags_window_close(ErrandsTagsWindow *win) {
-  // TODO: update tags bar
+  errands_task_update_tags(win->task);
 }
 
 static void on_errands_tags_window_tag_added(GtkEditable *entry,

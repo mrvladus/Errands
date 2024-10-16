@@ -17,6 +17,8 @@ struct _ErrandsTask {
   GtkWidget *complete_btn;
   GtkWidget *edit_row;
   GtkWidget *toolbar_btn;
+  GtkWidget *tags_revealer;
+  GtkWidget *tags_box;
   GtkWidget *toolbar_revealer;
   ErrandsTaskToolbar *toolbar;
   GtkWidget *sub_tasks_revealer;
@@ -27,3 +29,4 @@ struct _ErrandsTask {
 
 ErrandsTask *errands_task_new(TaskData *data);
 void errands_task_update_accent_color(ErrandsTask *task);
+void errands_task_update_tags(ErrandsTask *task);

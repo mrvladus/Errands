@@ -3,6 +3,24 @@
     background-color: transparent;
 }
 
+/* Tag */
+
+.tag {
+    border-radius: 5px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 5px;
+    padding-right: 3px;
+    background-color: alpha(black, 0.07);
+}
+
+.tag > button {
+    all: unset;
+    margin-left: 4px;
+}
+
+/* Sub tasks */
+
 .sub-tasks:last-child {
     margin-bottom: 6px;
 }

@@ -23,5 +23,6 @@
     <file preprocess="xml-stripblanks" alias="errands-cancel-symbolic.svg">icons/errands-cancel-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-color-symbolic.svg">icons/errands-color-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-select-symbolic.svg">icons/errands-select-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-close-symbolic.svg">icons/errands-close-symbolic.svg</file>
   </gresource>
 </gresources>
