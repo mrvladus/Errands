@@ -20,10 +20,14 @@ static void errands_date_window_init(ErrandsDateWindow *self) {
   g_signal_connect(self, "closed", G_CALLBACK(on_errands_date_window_close_cb),
                    NULL);
 
+  // Scrolled window
+  GtkWidget *scrl = gtk_scrolled_window_new();
+  g_object_set(scrl, "propagate-natural-height", true, NULL);
+  // gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrl), self->view);
+
   // Toolbar view
   GtkWidget *tb = adw_toolbar_view_new();
-  // g_object_set(tb, "content", scrl, "top-bar-style", ADW_TOOLBAR_RAISED,
-  // NULL);
+  g_object_set(tb, "content", scrl, NULL);
   adw_toolbar_view_add_top_bar(ADW_TOOLBAR_VIEW(tb), adw_header_bar_new());
   adw_dialog_set_child(ADW_DIALOG(self), tb);
 }
