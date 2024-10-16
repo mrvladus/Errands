@@ -177,3 +177,12 @@ colorbutton button colorswatch {
 progressbar.osd {
     background-color: @shade_color;
 }
+
+calendar {
+    background: @background;
+}
+
+calendar,
+calendar header {
+    border: none;
+}

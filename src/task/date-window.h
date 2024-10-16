@@ -9,6 +9,9 @@ G_DECLARE_FINAL_TYPE(ErrandsDateWindow, errands_date_window, ERRANDS,
 
 struct _ErrandsDateWindow {
   AdwDialog parent_instance;
+  GtkWidget *start_time_row;
+  GtkWidget *start_date_row;
+  GtkWidget *start_calendar;
   ErrandsTask *task;
 };
 
