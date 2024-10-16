@@ -151,6 +151,7 @@ errands_tags_window_row_class_init(ErrandsTagsWindowRowClass *class) {}
 
 static void errands_tags_window_row_init(ErrandsTagsWindowRow *self) {
   self->toggle = gtk_check_button_new();
+  g_object_set(self->toggle, "valign", GTK_ALIGN_CENTER, NULL);
   adw_action_row_add_prefix(ADW_ACTION_ROW(self), self->toggle);
   self->del_btn = gtk_button_new_from_icon_name("errands-trash-symbolic");
   g_object_set(self->del_btn, "valign", GTK_ALIGN_CENTER, NULL);
