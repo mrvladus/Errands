@@ -24,5 +24,10 @@
     <file preprocess="xml-stripblanks" alias="errands-color-symbolic.svg">icons/errands-color-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-select-symbolic.svg">icons/errands-select-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-close-symbolic.svg">icons/errands-close-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-clock-symbolic.svg">icons/errands-clock-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-morning-symbolic.svg">icons/errands-morning-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-afternoon-symbolic.svg">icons/errands-afternoon-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-sunset-symbolic.svg">icons/errands-sunset-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-night-symbolic.svg">icons/errands-night-symbolic.svg</file>
   </gresource>
 </gresources>
