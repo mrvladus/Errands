@@ -2,18 +2,21 @@
 #include "../state.h"
 #include "../utils.h"
 #include "adwaita.h"
+#include "glib-object.h"
 #include "glib.h"
 #include "gtk/gtk.h"
 
 #include <glib/gi18n.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 static void on_errands_date_window_close_cb(ErrandsDateWindow *win,
                                             gpointer data);
-static void on_start_time_set_cb(ErrandsDateWindow *win);
-static void on_start_time_preset_cb(const char *time);
+static void on_time_set_cb(ErrandsTimeChooser *tc, GtkLabel *label);
 static void on_start_date_set_cb(GtkCalendar *calendar, ErrandsDateWindow *win);
+static void on_due_time_set_cb(ErrandsTimeChooser *tc, ErrandsDateWindow *win);
+static void on_due_date_set_cb(GtkCalendar *calendar, ErrandsDateWindow *win);
 
 G_DEFINE_TYPE(ErrandsDateWindow, errands_date_window, ADW_TYPE_DIALOG)
 
@@ -23,11 +26,11 @@ static void errands_date_window_init(ErrandsDateWindow *self) {
   LOG("Creating date window");
 
   g_object_set(self, "title", _("Date and Time"), "content-width", 360,
-               "content-height", 400, NULL);
+               "content-height", 600, NULL);
   g_signal_connect(self, "closed", G_CALLBACK(on_errands_date_window_close_cb),
                    NULL);
 
-  // Start group
+  // --- Start group --- //
   GtkWidget *start_group = adw_preferences_group_new();
   g_object_set(start_group, "title", _("Start"), NULL);
 
@@ -39,76 +42,16 @@ static void errands_date_window_init(ErrandsDateWindow *self) {
 
   self->start_time_label = gtk_label_new("");
   gtk_widget_add_css_class(self->start_time_label, "numeric");
-  gtk_widget_add_css_class(self->start_time_label, "dim-label");
+  gtk_widget_add_css_class(self->start_time_label, "heading");
   adw_action_row_add_suffix(ADW_ACTION_ROW(self->start_time_row),
                             self->start_time_label);
 
-  // Start time popover menu
-
-  GtkWidget *morning_btn = gtk_button_new();
-  GtkWidget *morning_btn_content = adw_button_content_new();
-  g_object_set(morning_btn_content, "icon-name", "errands-morning-symbolic",
-               "label", "9:00", NULL);
-  g_object_set(morning_btn, "child", morning_btn_content, NULL);
-  g_signal_connect_swapped(morning_btn, "clicked",
-                           G_CALLBACK(on_start_time_preset_cb), "9");
-
-  GtkWidget *afternoon_btn = gtk_button_new();
-  GtkWidget *afternoon_btn_content = adw_button_content_new();
-  g_object_set(afternoon_btn_content, "icon-name", "errands-afternoon-symbolic",
-               "label", "12:00", NULL);
-  g_object_set(afternoon_btn, "child", afternoon_btn_content, NULL);
-  g_signal_connect_swapped(afternoon_btn, "clicked",
-                           G_CALLBACK(on_start_time_preset_cb), "12");
-
-  GtkWidget *sunset_btn = gtk_button_new();
-  GtkWidget *sunset_btn_content = adw_button_content_new();
-  g_object_set(sunset_btn_content, "icon-name", "errands-sunset-symbolic",
-               "label", "17:00", NULL);
-  g_object_set(sunset_btn, "child", sunset_btn_content, NULL);
-  g_signal_connect_swapped(sunset_btn, "clicked",
-                           G_CALLBACK(on_start_time_preset_cb), "17");
-
-  GtkWidget *night_btn = gtk_button_new();
-  GtkWidget *night_btn_content = adw_button_content_new();
-  g_object_set(night_btn_content, "icon-name", "errands-night-symbolic",
-               "label", "20:00", NULL);
-  g_object_set(night_btn, "child", night_btn_content, NULL);
-  g_signal_connect_swapped(night_btn, "clicked",
-                           G_CALLBACK(on_start_time_preset_cb), "20");
-
-  GtkWidget *clock_preset_vbox1 = gtk_box_new(GTK_ORIENTATION_VERTICAL, 6);
-  g_object_set(clock_preset_vbox1, "homogeneous", true, NULL);
-  gtk_box_append(GTK_BOX(clock_preset_vbox1), morning_btn);
-  gtk_box_append(GTK_BOX(clock_preset_vbox1), afternoon_btn);
-  GtkWidget *clock_preset_vbox2 = gtk_box_new(GTK_ORIENTATION_VERTICAL, 6);
-  g_object_set(clock_preset_vbox2, "homogeneous", true, NULL);
-  gtk_box_append(GTK_BOX(clock_preset_vbox2), sunset_btn);
-  gtk_box_append(GTK_BOX(clock_preset_vbox2), night_btn);
-
-  self->start_time_h = gtk_spin_button_new_with_range(0, 23, 1);
-  g_object_set(self->start_time_h, "orientation", GTK_ORIENTATION_VERTICAL,
-               NULL);
-  g_signal_connect_swapped(self->start_time_h, "value-changed",
-                           G_CALLBACK(on_start_time_set_cb), self);
-
-  self->start_time_m = gtk_spin_button_new_with_range(0, 59, 1);
-  g_object_set(self->start_time_m, "orientation", GTK_ORIENTATION_VERTICAL,
-               NULL);
-  g_signal_connect_swapped(self->start_time_m, "value-changed",
-                           G_CALLBACK(on_start_time_set_cb), self);
-
-  GtkWidget *clock_hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
-  gtk_box_append(GTK_BOX(clock_hbox), self->start_time_h);
-  gtk_box_append(GTK_BOX(clock_hbox), gtk_label_new(":"));
-  gtk_box_append(GTK_BOX(clock_hbox), self->start_time_m);
-  gtk_box_append(GTK_BOX(clock_hbox), clock_preset_vbox1);
-  gtk_box_append(GTK_BOX(clock_hbox), clock_preset_vbox2);
+  self->start_time_chooser = errands_time_chooser_new();
+  g_signal_connect(self->start_time_chooser, "changed",
+                   G_CALLBACK(on_time_set_cb), self->start_time_label);
 
   GtkWidget *start_time_btn_popover = gtk_popover_new();
-  g_object_set(start_time_btn_popover, "child", clock_hbox, NULL);
-  g_signal_connect_swapped(start_time_btn_popover, "show",
-                           G_CALLBACK(on_start_time_set_cb), self);
+  g_object_set(start_time_btn_popover, "child", self->start_time_chooser, NULL);
 
   GtkWidget *start_time_btn = gtk_menu_button_new();
   g_object_set(start_time_btn, "popover", start_time_btn_popover, "icon-name",
@@ -118,36 +61,113 @@ static void errands_date_window_init(ErrandsDateWindow *self) {
                             start_time_btn);
 
   // Start Date
-  self->start_date_row = adw_action_row_new();
-  g_object_set(self->start_date_row, "title", _("Date"), NULL);
+  // self->start_date_row = adw_action_row_new();
+  // g_object_set(self->start_date_row, "title", _("Date"), NULL);
+  // adw_preferences_group_add(ADW_PREFERENCES_GROUP(start_group),
+  //                           self->start_date_row);
+
+  // self->start_date_label = gtk_label_new("");
+  // gtk_widget_add_css_class(self->start_date_label, "numeric");
+  // gtk_widget_add_css_class(self->start_date_label, "dim-label");
+  // adw_action_row_add_suffix(ADW_ACTION_ROW(self->start_date_row),
+  //                           self->start_date_label);
+
+  // self->start_calendar = gtk_calendar_new();
+  // g_signal_connect(self->start_calendar, "day-selected",
+  //                  G_CALLBACK(on_start_date_set_cb), self);
+
+  // GtkWidget *start_calendar_button_popover = gtk_popover_new();
+  // g_object_set(start_calendar_button_popover, "child", self->start_calendar,
+  //              NULL);
+
+  // GtkWidget *start_calendar_button = gtk_menu_button_new();
+  // g_object_set(start_calendar_button, "popover",
+  // start_calendar_button_popover,
+  //              "icon-name", "errands-calendar-symbolic", "valign",
+  //              GTK_ALIGN_CENTER, NULL);
+  // gtk_widget_add_css_class(start_calendar_button, "flat");
+  // adw_action_row_add_suffix(ADW_ACTION_ROW(self->start_date_row),
+  //                           start_calendar_button);
+
+  self->start_date_all_day_row = adw_switch_row_new();
+  g_object_set(self->start_date_all_day_row, "title", _("All Day"), NULL);
   adw_preferences_group_add(ADW_PREFERENCES_GROUP(start_group),
-                            self->start_date_row);
+                            self->start_date_all_day_row);
 
-  self->start_date_label = gtk_label_new("");
-  gtk_widget_add_css_class(self->start_date_label, "numeric");
-  gtk_widget_add_css_class(self->start_date_label, "dim-label");
-  adw_action_row_add_suffix(ADW_ACTION_ROW(self->start_date_row),
-                            self->start_date_label);
+  // --- Due group --- //
 
-  self->start_calendar = gtk_calendar_new();
-  g_signal_connect(self->start_calendar, "day-selected",
-                   G_CALLBACK(on_start_date_set_cb), self);
+  GtkWidget *due_group = adw_preferences_group_new();
+  g_object_set(due_group, "title", _("Due"), NULL);
+  g_object_bind_property(self->start_date_all_day_row, "active", due_group,
+                         "visible",
+                         G_BINDING_SYNC_CREATE | G_BINDING_INVERT_BOOLEAN);
 
-  GtkWidget *start_calendar_button_popover = gtk_popover_new();
-  g_object_set(start_calendar_button_popover, "child", self->start_calendar,
-               NULL);
+  self->due_time_row = adw_action_row_new();
+  g_object_set(self->due_time_row, "title", _("Time"), NULL);
+  adw_preferences_group_add(ADW_PREFERENCES_GROUP(due_group),
+                            self->due_time_row);
 
-  GtkWidget *start_calendar_button = gtk_menu_button_new();
-  g_object_set(start_calendar_button, "popover", start_calendar_button_popover,
-               "icon-name", "errands-calendar-symbolic", "valign",
-               GTK_ALIGN_CENTER, NULL);
-  gtk_widget_add_css_class(start_calendar_button, "flat");
-  adw_action_row_add_suffix(ADW_ACTION_ROW(self->start_date_row),
-                            start_calendar_button);
+  self->due_time_label = gtk_label_new("");
+  gtk_widget_add_css_class(self->due_time_label, "numeric");
+  gtk_widget_add_css_class(self->due_time_label, "heading");
+  adw_action_row_add_suffix(ADW_ACTION_ROW(self->due_time_row),
+                            self->due_time_label);
+
+  self->due_time_chooser = errands_time_chooser_new();
+  g_signal_connect(self->due_time_chooser, "changed",
+                   G_CALLBACK(on_time_set_cb), self->due_time_label);
+
+  GtkWidget *due_time_btn_popover = gtk_popover_new();
+  g_object_set(due_time_btn_popover, "child", self->due_time_chooser, NULL);
+
+  GtkWidget *due_time_btn = gtk_menu_button_new();
+  g_object_set(due_time_btn, "popover", due_time_btn_popover, "icon-name",
+               "errands-clock-symbolic", "valign", GTK_ALIGN_CENTER, NULL);
+  gtk_widget_add_css_class(due_time_btn, "flat");
+  adw_action_row_add_suffix(ADW_ACTION_ROW(self->due_time_row), due_time_btn);
+
+  // // Due Date
+  // self->due_date_row = adw_action_row_new();
+  // g_object_set(self->due_date_row, "title", _("Date"), NULL);
+  // adw_preferences_group_add(ADW_PREFERENCES_GROUP(due_group),
+  //                           self->due_date_row);
+
+  // self->due_date_label = gtk_label_new("");
+  // gtk_widget_add_css_class(self->due_date_label, "numeric");
+  // gtk_widget_add_css_class(self->due_date_label, "dim-label");
+  // adw_action_row_add_suffix(ADW_ACTION_ROW(self->due_date_row),
+  //                           self->due_date_label);
+
+  // self->due_calendar = gtk_calendar_new();
+  // g_signal_connect(self->due_calendar, "day-selected",
+  //                  G_CALLBACK(on_due_date_set_cb), self);
+
+  // GtkWidget *due_calendar_button_popover = gtk_popover_new();
+  // g_object_set(due_calendar_button_popover, "child", self->due_calendar,
+  // NULL);
+
+  // GtkWidget *due_calendar_button = gtk_menu_button_new();
+  // g_object_set(due_calendar_button, "popover", due_calendar_button_popover,
+  //              "icon-name", "errands-calendar-symbolic", "valign",
+  //              GTK_ALIGN_CENTER, NULL);
+  // gtk_widget_add_css_class(due_calendar_button, "flat");
+  // adw_action_row_add_suffix(ADW_ACTION_ROW(self->due_date_row),
+  //                           due_calendar_button);
+
+  // // --- Repeat group --- //
+
+  GtkWidget *repeat_group = adw_preferences_group_new();
+  g_object_set(repeat_group, "title", _("Repeat"), NULL);
+
+  // --- Page --- //
 
   GtkWidget *page = adw_preferences_page_new();
   adw_preferences_page_add(ADW_PREFERENCES_PAGE(page),
                            ADW_PREFERENCES_GROUP(start_group));
+  adw_preferences_page_add(ADW_PREFERENCES_PAGE(page),
+                           ADW_PREFERENCES_GROUP(due_group));
+  adw_preferences_page_add(ADW_PREFERENCES_PAGE(page),
+                           ADW_PREFERENCES_GROUP(repeat_group));
 
   // Toolbar view
   GtkWidget *tb = adw_toolbar_view_new();
@@ -162,6 +182,14 @@ ErrandsDateWindow *errands_date_window_new() {
 
 void errands_date_window_show(ErrandsTask *task) {
   state.date_window->task = task;
+  char *s_dt = task->data->start_date;
+  // If start date not empty
+  if (strcmp(s_dt, "")) {
+
+    // If time is set
+    if (string_contains(s_dt, "T")) {
+    }
+  }
   adw_dialog_present(ADW_DIALOG(state.date_window),
                      GTK_WIDGET(state.main_window));
 }
@@ -171,33 +199,51 @@ void errands_date_window_show(ErrandsTask *task) {
 static void on_errands_date_window_close_cb(ErrandsDateWindow *win,
                                             gpointer data) {}
 
-static void on_start_time_set_cb(ErrandsDateWindow *win) {
-  gchar *h = g_strdup_printf("%d", gtk_spin_button_get_value_as_int(
-                                       GTK_SPIN_BUTTON(win->start_time_h)));
-  gtk_editable_set_text(GTK_EDITABLE(win->start_time_h), h);
-  gchar *m = g_strdup_printf("%02d", gtk_spin_button_get_value_as_int(
-                                         GTK_SPIN_BUTTON(win->start_time_m)));
-  gtk_editable_set_text(GTK_EDITABLE(win->start_time_m), m);
-  gchar *hm = g_strdup_printf("%s:%s", h, m);
-  g_object_set(win->start_time_label, "label", hm, NULL);
-  g_signal_emit_by_name(win->start_calendar, "day-selected", NULL);
-
-  g_free(h);
-  g_free(m);
-  g_free(hm);
+static void on_time_set_cb(ErrandsTimeChooser *tc, GtkLabel *label) {
+  char time[8];
+  sprintf(time, "%c%c:%c%c", tc->time->str[0], tc->time->str[1],
+          tc->time->str[2], tc->time->str[3]);
+  gtk_label_set_label(label, time);
 }
 
-static void on_start_date_set_cb(GtkCalendar *calendar,
-                                 ErrandsDateWindow *win) {
-  GDateTime *date = gtk_calendar_get_date(calendar);
-  char *datetime = g_date_time_format(date, "%x");
-  g_object_set(win->start_date_label, "label", datetime, NULL);
-  g_free(datetime);
-}
+// static void on_start_time_preset_cb(const char *h) {}
 
-static void on_start_time_preset_cb(const char *h) {
-  gtk_spin_button_set_value(GTK_SPIN_BUTTON(state.date_window->start_time_m),
-                            0);
-  gtk_spin_button_set_value(GTK_SPIN_BUTTON(state.date_window->start_time_h),
-                            atoi(h));
-}
+// static void on_start_date_set_cb(GtkCalendar *calendar,
+//                                  ErrandsDateWindow *win) {
+//   GDateTime *date = gtk_calendar_get_date(calendar);
+//   char *datetime = g_date_time_format(date, "%x");
+//   g_object_set(win->start_date_label, "label", datetime, NULL);
+//   g_free(datetime);
+// }
+
+// static void on_due_time_set_cb(ErrandsDateWindow *win) {
+//   gchar *h = g_strdup_printf(
+//       "%d",
+//       gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(win->due_time_h)));
+//   gtk_editable_set_text(GTK_EDITABLE(win->due_time_h), h);
+//   gchar *m = g_strdup_printf("%02d", gtk_spin_button_get_value_as_int(
+//                                          GTK_SPIN_BUTTON(win->due_time_m)));
+//   gtk_editable_set_text(GTK_EDITABLE(win->due_time_m), m);
+//   gchar *hm = g_strdup_printf("%s:%s", h, m);
+//   g_object_set(win->due_time_label, "label", hm, NULL);
+//   g_signal_emit_by_name(win->due_calendar, "day-selected", NULL);
+
+//   g_free(h);
+//   g_free(m);
+//   g_free(hm);
+// }
+
+// static void on_due_time_preset_cb(const char *h) {
+//   gtk_spin_button_set_value(GTK_SPIN_BUTTON(state.date_window->due_time_m),
+//   0);
+//   gtk_spin_button_set_value(GTK_SPIN_BUTTON(state.date_window->due_time_h),
+//                             atoi(h));
+// }
+
+// static void on_due_date_set_cb(GtkCalendar *calendar, ErrandsDateWindow *win)
+// {
+//   GDateTime *date = gtk_calendar_get_date(calendar);
+//   char *datetime = g_date_time_format(date, "%x");
+//   g_object_set(win->due_date_label, "label", datetime, NULL);
+//   g_free(datetime);
+// }
