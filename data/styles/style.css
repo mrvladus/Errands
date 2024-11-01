@@ -160,6 +160,12 @@
     background-color: @brown_2;
 }
 
+/* Date and time widndow */
+
+.weekday {
+    padding: 2px;
+}
+
 /* Overrides */
 
 colorbutton button {
@@ -185,4 +191,8 @@ calendar {
 calendar,
 calendar header {
     border: none;
+}
+
+flowboxchild {
+    all: unset;
 }

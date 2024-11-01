@@ -1,14 +1,13 @@
 #pragma once
 
-#include <gtk/gtk.h>
+#include <adwaita.h>
 
 #define ERRANDS_TYPE_TASK_TOOLBAR (errands_task_toolbar_get_type())
 
-G_DECLARE_FINAL_TYPE(ErrandsTaskToolbar, errands_task_toolbar, ERRANDS,
-                     TASK_TOOLBAR, GtkBox)
+G_DECLARE_FINAL_TYPE(ErrandsTaskToolbar, errands_task_toolbar, ERRANDS, TASK_TOOLBAR, AdwBin)
 
 struct _ErrandsTaskToolbar {
-  GtkBox parent_instance;
+  AdwBin parent_instance;
   GtkWidget *date_btn;
   GtkWidget *notes_btn;
   GtkWidget *priority_btn;

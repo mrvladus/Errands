@@ -457,7 +457,7 @@ GString *errands_data_print_list(char *list_uid) {
     }
   }
   g_string_append(out, "╔");
-  for_range(i, MAX_LINE_LENGTH + 2) g_string_append(out, "═");
+  for_range(i, 0, MAX_LINE_LENGTH + 2) g_string_append(out, "═");
   g_string_append(out, "╗\n");
   g_string_append(out, "║ ");
 
@@ -467,7 +467,7 @@ GString *errands_data_print_list(char *list_uid) {
     list_name[MAX_LINE_LENGTH - 1] = '.';
     list_name[MAX_LINE_LENGTH - 2] = '.';
     list_name[MAX_LINE_LENGTH - 3] = '.';
-    for_range(i, MAX_LINE_LENGTH) {
+    for_range(i, 0, MAX_LINE_LENGTH) {
       g_string_append_printf(out, "%c", list_name[i]);
     }
   } else if (len < MAX_LINE_LENGTH) {
@@ -487,7 +487,7 @@ GString *errands_data_print_list(char *list_uid) {
   free(list_name);
   g_string_append(out, " ║\n");
   g_string_append(out, "╚");
-  for_range(i, MAX_LINE_LENGTH + 2) g_string_append(out, "═");
+  for_range(i, 0, MAX_LINE_LENGTH + 2) g_string_append(out, "═");
   g_string_append(out, "╝\n");
   // Print tasks
   errands_print_tasks(out, "", list_uid, 0);

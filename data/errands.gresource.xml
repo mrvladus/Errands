@@ -29,5 +29,6 @@
     <file preprocess="xml-stripblanks" alias="errands-afternoon-symbolic.svg">icons/errands-afternoon-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-sunset-symbolic.svg">icons/errands-sunset-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="errands-night-symbolic.svg">icons/errands-night-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="errands-reset-symbolic.svg">icons/errands-reset-symbolic.svg</file>
   </gresource>
 </gresources>

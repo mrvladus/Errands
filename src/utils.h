@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include <gtk/gtk.h>
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,7 +15,12 @@
 #define LOG(format, ...) fprintf(stderr, "Errands: " format "\n", ##__VA_ARGS__)
 
 // For range
-#define for_range(var, n) for (int var = 0; var < n; var++)
+#define for_range(var, from, to) for (int var = from; var < to; var++)
+
+// Avoid dangling pointers
+#define free(mem)                                                                                  \
+  free(mem);                                                                                       \
+  mem = NULL;
 
 // Lambda function macro
 // #define lambda(lambda$_ret, lambda$_args, lambda$_body) \
@@ -47,8 +53,7 @@ static inline bool string_contains(const char *haystack, const char *needle) {
 }
 
 // Check if any string in the array contains string
-static inline bool string_array_contains(GPtrArray *str_arr,
-                                         const char *needle) {
+static inline bool string_array_contains(GPtrArray *str_arr, const char *needle) {
   for (int i = 0; i < str_arr->len; i++)
     if (string_contains((char *)str_arr->pdata[i], needle))
       return true;
@@ -109,10 +114,175 @@ static inline char *gdk_rgba_to_hex_string(const GdkRGBA *rgba) {
 static inline void errands_add_shortcut(GtkWidget *widget, const char *trigger,
                                         const char *action) {
   GtkEventController *ctrl = gtk_shortcut_controller_new();
-  gtk_shortcut_controller_set_scope(GTK_SHORTCUT_CONTROLLER(ctrl),
-                                    GTK_SHORTCUT_SCOPE_GLOBAL);
+  gtk_shortcut_controller_set_scope(GTK_SHORTCUT_CONTROLLER(ctrl), GTK_SHORTCUT_SCOPE_GLOBAL);
   GtkShortcut *sc = gtk_shortcut_new(gtk_shortcut_trigger_parse_string(trigger),
                                      gtk_shortcut_action_parse_string(action));
   gtk_shortcut_controller_add_shortcut(GTK_SHORTCUT_CONTROLLER(ctrl), sc);
   gtk_widget_add_controller(widget, ctrl);
+}
+
+static inline char *get_rrule_value(const char *rrule, const char *key) {
+  const char *value_start = strstr(rrule, key);
+  if (!value_start)
+    return NULL;
+  value_start += strlen(key) + 1;
+  const char *value_end = strchr(value_start, ';');
+  if (!value_end)
+    return NULL;
+  int length = value_end - value_start;
+  char *out = malloc(length);
+  out[length] = '\0';
+  strncpy(out, value_start, length);
+  return out;
+}
+
+static bool string_is_number(const char *str) {
+  // Check for empty string
+  if (str == NULL || *str == '\0')
+    return false; // Not a number
+
+  char *endptr;
+  // Try to convert to long
+  strtol(str, &endptr, 10);
+  if (endptr != str && *endptr == '\0') {
+    return true; // Valid integer
+  }
+
+  // Try to convert to double
+  strtod(str, &endptr);
+  if (endptr != str && *endptr == '\0') {
+    return true; // Valid floating-point number
+  }
+
+  return false;
+}
+
+static inline int *string_to_int_array(const char *str) {
+  // First, count the number of integers
+  int count = 1;
+  for (const char *p = str; *p != '\0'; p++) {
+    if (*p == ',')
+      count++;
+  }
+
+  // Allocate memory for the array, with one extra space for NULL termination
+  int *arr = (int *)malloc((count + 1) * sizeof(int));
+  if (!arr)
+    return NULL;
+
+  // Parse the string and fill the array
+  int index = 0;
+  const char *start = str;
+  char *end;
+  while (*start != '\0') {
+    arr[index++] = strtol(start, &end, 10);
+    start = end + 1;
+  }
+
+  arr[index] = 0; // NULL terminate the array
+  return arr;
+}
+
+// ---------- DYNAMIC STRING ---------- //
+
+// Struct to hold string data
+typedef struct {
+  char *str;
+  int len;
+} str;
+
+// Creates new string
+inline str str_new(const char *init_str) {
+  str s;
+  s.len = strlen(init_str);
+  s.str = strdup(init_str);
+  return s;
+}
+
+// Append string to the end
+inline void str_append(str *s, const char *str) {
+  int new_len = s->len + strlen(str);
+  s->str = realloc(s->str, new_len + 1);
+  strcat(s->str, str);
+  s->len = new_len;
+}
+
+// Prepend string to the beginning
+inline void str_prepend(str *s, const char *str) {
+  int new_len = s->len + strlen(str);
+  s->str = realloc(s->str, new_len + 1);
+  memmove(s->str + strlen(str), s->str, s->len + 1);
+  memcpy(s->str, str, strlen(str));
+  s->len = new_len;
+}
+
+inline bool str_contains(str *s, const char *str) { return (bool)strstr(s->str, str); }
+
+inline void str_replace(str *s, const char *str_to_replace, const char *str_replace_with) {
+  int str_to_replace_len = strlen(str_to_replace);
+  int str_replace_with_len = strlen(str_replace_with);
+  // Count the number of occurances of str_to_replace and return if none found
+  int count = 0;
+  const char *temp = s->str;
+  while ((temp = strstr(temp, str_to_replace)) != NULL) {
+    count++;
+    temp += str_to_replace_len;
+  }
+  if (count == 0)
+    return;
+  // Calculate new length
+  int new_len = s->len + count * (str_replace_with_len - str_to_replace_len);
+  // Create new string
+  char *new_str = malloc(new_len + 1);
+  // Replace occurrences
+  char *current_pos = new_str;
+  temp = s->str;
+  while ((temp = strstr(temp, str_to_replace)) != NULL) {
+    // Copy the part before the occurrence
+    int bytes_to_copy = temp - s->str;
+    memcpy(current_pos, s->str, bytes_to_copy);
+    current_pos += bytes_to_copy;
+    // Copy the replacement string
+    memcpy(current_pos, str_replace_with, str_replace_with_len);
+    current_pos += str_replace_with_len;
+    // Move past the replaced substring
+    temp += str_to_replace_len;
+    s->str = (char *)temp; // Update the original string pointer
+  }
+  // Copy the remaining part of the original string
+  strcpy(current_pos, s->str);
+  // Update the str struct
+  free(s->str); // Free the old string memory
+  s->str = new_str;
+  s->len = new_len;
+}
+
+// Get null-terminated, newly allocated string slice.
+// Returns NULL if error is occured.
+inline char *str_slice(str *s, int start_idx, int end_idx) {
+  if (end_idx > s->len - 1 || start_idx > end_idx || start_idx < 0 || end_idx < 0)
+    return NULL;
+  int size = end_idx - start_idx + 1;
+  char *slice = malloc(size);
+  slice[size] = '\0';
+  for (int i = start_idx; i != end_idx; i++)
+    slice[i] = s->str[i];
+  return slice;
+}
+
+// Check if strings are equal
+inline bool str_eq(str *s1, str *s2) {
+  if (s1->len != s2->len)
+    return false;
+  return !strcmp(s1->str, s2->str) ? true : false;
+}
+
+// Print string
+inline void str_print(str *s) { printf("%s\n", s->str); }
+
+// Free the string memory
+inline void str_free(str *s) {
+  free(s->str);
+  s->str = NULL;
+  s->len = 0;
 }
