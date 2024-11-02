@@ -1,11 +1,8 @@
 #include "date-window.h"
 #include "../state.h"
 #include "../utils.h"
-#include "adwaita.h"
-#include "glib.h"
 
 #include <glib/gi18n.h>
-#include <string.h>
 
 static void on_errands_date_window_close_cb(ErrandsDateWindow *win, gpointer data);
 static void on_freq_changed_cb(AdwComboRow *row, GParamSpec *param, ErrandsDateWindow *win);
@@ -179,9 +176,9 @@ void errands_date_window_show(ErrandsTask *task) {
                                         is_repeated);
   adw_expander_row_set_expanded(ADW_EXPANDER_ROW(state.date_window->repeat_row), is_repeated);
   // Need to select second first if not repeating
-  if (!is_repeated) {
+  if (!is_repeated)
     adw_combo_row_set_selected(ADW_COMBO_ROW(state.date_window->frequency_row), 2);
-  } else {
+  else {
     // Set frequency
     char *freq = get_rrule_value(task->data->rrule, "FREQ");
     if (freq) {
@@ -314,118 +311,19 @@ static void on_errands_date_window_close_cb(ErrandsDateWindow *win, gpointer dat
   } else if (start_time_is_set) {
     const char *start_date = errands_date_chooser_get_date(win->start_date_chooser);
     const char *start_time = errands_time_chooser_get_time(win->start_time_chooser);
-    GString *s_dt = g_string_new(start_date);
-    g_string_append_printf(s_dt, "T%sZ", start_time);
+    str s_dt = str_new(start_date);
+    str_append_printf(&s_dt, "T%sZ", start_time);
     free(win->task->data->start_date);
-    win->task->data->start_date = strdup(s_dt->str);
-    g_string_free(s_dt, true);
+    win->task->data->start_date = strdup(s_dt.str);
+    str_free(&s_dt);
   } else if (start_date_is_set && !start_time_is_set) {
     const char *start_date = errands_date_chooser_get_date(win->start_date_chooser);
     free(win->task->data->start_date);
     win->task->data->start_date = strdup(start_date);
   }
 
-  // Check if repeat is enabled
-  bool repeated = adw_expander_row_get_enable_expansion(ADW_EXPANDER_ROW(win->repeat_row));
-  if (!repeated) {
-    // If not - clean rrule
-    free(win->task->data->rrule);
-    win->task->data->rrule = strdup("");
-  }
-  // Generate new rrule
-  else {
-    // Get frequency
-    int frequency = adw_combo_row_get_selected(ADW_COMBO_ROW(win->frequency_row));
-
-    // Create new rrule string
-    GString *rrule = g_string_new("RRULE:");
-
-    // Set frequency
-    if (frequency == 0)
-      g_string_append(rrule, "FREQ=MINUTELY;");
-    else if (frequency == 1)
-      g_string_append(rrule, "FREQ=HOURLY;");
-    else if (frequency == 2)
-      g_string_append(rrule, "FREQ=DAILY;");
-    else if (frequency == 3)
-      g_string_append(rrule, "FREQ=WEEKLY;");
-    else if (frequency == 4)
-      g_string_append(rrule, "FREQ=MONTHLY;");
-    else if (frequency == 5)
-      g_string_append(rrule, "FREQ=YEARLY;");
-
-    // Set interval
-    g_string_append_printf(rrule, "INTERVAL=%d;",
-                           (int)adw_spin_row_get_value(ADW_SPIN_ROW(win->interval_row)));
-
-    // Set week days
-    g_string_append(rrule, errands_week_chooser_get_days(win->week_chooser));
-
-    // Set months
-    GtkWidget *month_box_2 =
-        gtk_widget_get_last_child(gtk_list_box_row_get_child(GTK_LIST_BOX_ROW(win->by_month_row)));
-    GtkWidget *month_box_1 = gtk_widget_get_prev_sibling(month_box_2);
-    GString *by_month = g_string_new("BYMONTH=");
-    // First 6 months
-    GPtrArray *months_1 = get_children(month_box_1);
-    for_range(i, 0, 6) {
-      if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(months_1->pdata[i]))) {
-        if (!strcmp(by_month->str, "BYMONTH=")) {
-          g_string_append_printf(by_month, "%d", i + 1);
-        } else {
-          g_string_append_printf(by_month, ",%d", i + 1);
-        }
-      }
-    }
-    g_ptr_array_free(months_1, true);
-    // Last 6 months
-    GPtrArray *months_2 = get_children(month_box_2);
-    for_range(i, 0, 6) {
-      if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(months_2->pdata[i]))) {
-        if (!strcmp(by_month->str, "BYMONTH=")) {
-          g_string_append_printf(by_month, "%d", i + 7);
-        } else {
-          g_string_append_printf(by_month, ",%d", i + 7);
-        }
-      }
-    }
-    g_ptr_array_free(months_2, true);
-    if (strcmp(by_month->str, "BYMONTH=")) {
-      g_string_append(by_month, ";");
-      g_string_append(rrule, by_month->str);
-    }
-    g_string_free(by_month, true);
-
-    // Set UNTIL if until date is set
-    const char *until_label = gtk_label_get_label(GTK_LABEL(win->until_date_chooser->label));
-    if (strcmp(until_label, _("Not Set"))) {
-      GDateTime *until_d = gtk_calendar_get_date(GTK_CALENDAR(win->until_date_chooser->calendar));
-      char *until_d_str = g_date_time_format(until_d, "%Y%m%d");
-      g_string_append_printf(rrule, "UNTIL=%s", until_d_str);
-      g_free(until_d_str);
-      // If start date contains time - add it to the until date
-      const char *time = strstr(win->task->data->start_date, "T");
-      if (time)
-        g_string_append(rrule, time);
-      g_string_append(rrule, ";");
-    }
-
-    // Set count if until is not set
-    int count = adw_spin_row_get_value(ADW_SPIN_ROW(win->count_row));
-    if (count > 0 && !strstr(rrule->str, "UNTIL="))
-      g_string_append_printf(rrule, "COUNT=%d;", count);
-
-    // Save rrule
-    free(win->task->data->rrule);
-    win->task->data->rrule = strdup(rrule->str);
-
-    LOG("%s", rrule->str);
-
-    // Cleanup
-    g_string_free(rrule, true);
-  }
-
   // Set due datetime
+  bool repeated = adw_expander_row_get_enable_expansion(ADW_EXPANDER_ROW(win->repeat_row));
   if (!repeated) {
     bool due_time_is_set =
         strcmp(gtk_label_get_label(GTK_LABEL(win->due_time_chooser->label)), _("Not Set"));
@@ -437,77 +335,116 @@ static void on_errands_date_window_close_cb(ErrandsDateWindow *win, gpointer dat
     } else if (due_time_is_set) {
       const char *due_date = errands_date_chooser_get_date(win->due_date_chooser);
       const char *due_time = errands_time_chooser_get_time(win->due_time_chooser);
-      GString *d_dt = g_string_new(due_date);
-      g_string_append_printf(d_dt, "T%sZ", due_time);
+      str d_dt = str_new(due_date);
+      str_append_printf(&d_dt, "T%sZ", due_time);
       free(win->task->data->due_date);
-      win->task->data->due_date = strdup(d_dt->str);
-      g_string_free(d_dt, true);
+      win->task->data->due_date = strdup(d_dt.str);
+      str_free(&d_dt);
     } else if (due_date_is_set && !due_time_is_set) {
       const char *due_date = errands_date_chooser_get_date(win->due_date_chooser);
       free(win->task->data->due_date);
       win->task->data->due_date = strdup(due_date);
     }
   }
-  errands_data_write();
 
-  // Set date button text
-
-  // If not repeated - set due date and time as label
+  // Check if repeat is enabled
   if (!repeated) {
-    if (!strcmp(win->task->data->due_date, ""))
-      adw_button_content_set_label(
-          ADW_BUTTON_CONTENT(gtk_button_get_child(GTK_BUTTON(win->task->toolbar->date_btn))),
-          _("Date"));
-    else {
-      GDateTime *due_dt;
-      char *due_str;
-      // If due date don't have time
-      if (!string_contains(win->task->data->due_date, "T")) {
-        char new_due_dt[16];
-        sprintf(new_due_dt, "%sT000000Z", win->task->data->due_date);
-        due_dt = g_date_time_new_from_iso8601(new_due_dt, NULL);
-        due_str = g_date_time_format(due_dt, "%d %b");
-      } else {
-        due_dt = g_date_time_new_from_iso8601(win->task->data->due_date, NULL);
-        due_str = g_date_time_format(due_dt, "%d %b %R");
-      }
-      adw_button_content_set_label(
-          ADW_BUTTON_CONTENT(gtk_button_get_child(GTK_BUTTON(win->task->toolbar->date_btn))),
-          due_str);
-      LOG("Date Window: Set button text to '%s'", due_str);
-      g_free(due_str);
-      g_date_time_unref(due_dt);
-    }
+    // If not - clean rrule
+    free(win->task->data->rrule);
+    win->task->data->rrule = strdup("");
   }
-  // Set label when task is repeated
+  // Generate new rrule
   else {
-    str label = str_new("");
+    // Get frequency
     int frequency = adw_combo_row_get_selected(ADW_COMBO_ROW(win->frequency_row));
-    int interval = adw_spin_row_get_value(ADW_SPIN_ROW(win->interval_row));
-    if (frequency == 0) {
-      interval == 1 ? str_append(&label, _("Every minute"))
-                    : str_append_printf(&label, _("Every %d minutes"), interval);
-    } else if (frequency == 1) {
-      interval == 1 ? str_append(&label, _("Every hour"))
-                    : str_append_printf(&label, _("Every %d hours"), interval);
-    } else if (frequency == 2) {
-      interval == 1 ? str_append(&label, _("Every day"))
-                    : str_append_printf(&label, _("Every %d days"), interval);
-    } else if (frequency == 3) {
-      interval == 1 ? str_append(&label, _("Every week"))
-                    : str_append_printf(&label, _("Every %d weeks"), interval);
-    } else if (frequency == 4) {
-      interval == 1 ? str_append(&label, _("Every month"))
-                    : str_append_printf(&label, _("Every %d months"), interval);
-    } else if (frequency == 5) {
-      interval == 1 ? str_append(&label, _("Every year"))
-                    : str_append_printf(&label, _("Every %d years"), interval);
+
+    // Create new rrule string
+    str rrule = str_new("RRULE:");
+
+    // Set frequency
+    if (frequency == 0)
+      str_append(&rrule, "FREQ=MINUTELY;");
+    else if (frequency == 1)
+      str_append(&rrule, "FREQ=HOURLY;");
+    else if (frequency == 2)
+      str_append(&rrule, "FREQ=DAILY;");
+    else if (frequency == 3)
+      str_append(&rrule, "FREQ=WEEKLY;");
+    else if (frequency == 4)
+      str_append(&rrule, "FREQ=MONTHLY;");
+    else if (frequency == 5)
+      str_append(&rrule, "FREQ=YEARLY;");
+
+    // Set interval
+    str_append_printf(&rrule, "INTERVAL=%d;",
+                      (int)adw_spin_row_get_value(ADW_SPIN_ROW(win->interval_row)));
+
+    // Set week days
+    str_append(&rrule, errands_week_chooser_get_days(win->week_chooser));
+
+    // Set months
+    GtkWidget *month_box_2 =
+        gtk_widget_get_last_child(gtk_list_box_row_get_child(GTK_LIST_BOX_ROW(win->by_month_row)));
+    GtkWidget *month_box_1 = gtk_widget_get_prev_sibling(month_box_2);
+    str by_month = str_new("BYMONTH=");
+    // First 6 months
+    GPtrArray *months_1 = get_children(month_box_1);
+    for_range(i, 0, 6) {
+      if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(months_1->pdata[i]))) {
+        if (!strcmp(by_month.str, "BYMONTH="))
+          str_append_printf(&by_month, "%d", i + 1);
+        else
+          str_append_printf(&by_month, ",%d", i + 1);
+      }
     }
-    adw_button_content_set_label(
-        ADW_BUTTON_CONTENT(gtk_button_get_child(GTK_BUTTON(win->task->toolbar->date_btn))),
-        label.str);
-    str_free(&label);
+    g_ptr_array_free(months_1, true);
+    // Last 6 months
+    GPtrArray *months_2 = get_children(month_box_2);
+    for_range(i, 0, 6) {
+      if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(months_2->pdata[i]))) {
+        if (!strcmp(by_month.str, "BYMONTH="))
+          str_append_printf(&by_month, "%d", i + 7);
+        else
+          str_append_printf(&by_month, ",%d", i + 7);
+      }
+    }
+    g_ptr_array_free(months_2, true);
+    if (str_eq_c(&by_month, "BYMONTH=")) {
+      str_append(&by_month, ";");
+      str_append(&rrule, by_month.str);
+    }
+    str_free(&by_month);
+
+    // Set UNTIL if until date is set
+    const char *until_label = gtk_label_get_label(GTK_LABEL(win->until_date_chooser->label));
+    if (strcmp(until_label, _("Not Set"))) {
+      GDateTime *until_d = gtk_calendar_get_date(GTK_CALENDAR(win->until_date_chooser->calendar));
+      char *until_d_str = g_date_time_format(until_d, "%Y%m%d");
+      str_append_printf(&rrule, "UNTIL=%s", until_d_str);
+      g_free(until_d_str);
+      // If start date contains time - add it to the until date
+      const char *time = strstr(win->task->data->start_date, "T");
+      if (time)
+        str_append(&rrule, time);
+      str_append(&rrule, ";");
+    }
+
+    // Set count if until is not set
+    int count = adw_spin_row_get_value(ADW_SPIN_ROW(win->count_row));
+    if (count > 0 && !strstr(rrule.str, "UNTIL="))
+      str_append_printf(&rrule, "COUNT=%d;", count);
+
+    // Save rrule
+    free(win->task->data->rrule);
+    win->task->data->rrule = strdup(rrule.str);
+
+    // Cleanup
+    str_free(&rrule);
   }
+
+  errands_data_write();
+  // Set date button text
+  errands_task_toolbar_update_date_btn(win->task->toolbar);
   // TODO: sync
 }
 
@@ -525,25 +462,23 @@ static void on_interval_changed_cb(AdwSpinRow *row, GParamSpec *param, ErrandsDa
   int selected_freq = adw_combo_row_get_selected(ADW_COMBO_ROW(win->frequency_row));
 
   char *ending;
-  if (selected_freq == 0) {
+  if (selected_freq == 0)
     ending = (char *)C_("Every ...", "minutes");
-  } else if (selected_freq == 1) {
+  else if (selected_freq == 1)
     ending = (char *)C_("Every ...", "hours");
-  } else if (selected_freq == 2) {
+  else if (selected_freq == 2)
     ending = (char *)C_("Every ...", "days");
-  } else if (selected_freq == 3) {
+  else if (selected_freq == 3)
     ending = (char *)C_("Every ...", "weeks");
-  } else if (selected_freq == 4) {
+  else if (selected_freq == 4)
     ending = (char *)C_("Every ...", "months");
-  } else if (selected_freq == 5) {
+  else if (selected_freq == 5)
     ending = (char *)C_("Every ...", "years");
-  }
 
   // Set subtitle
-  char *subtitle =
-      g_strdup_printf(_("Repeat every %d %s"), (int)adw_spin_row_get_value(row), ending);
-  g_object_set(row, "subtitle", subtitle, NULL);
-  g_free(subtitle);
+  str subtitle = str_new_printf(_("Repeat every %d %s"), (int)adw_spin_row_get_value(row), ending);
+  g_object_set(row, "subtitle", subtitle.str, NULL);
+  str_free(&subtitle);
 }
 
 static void on_count_changed_cb(AdwSpinRow *row, GParamSpec *param, ErrandsDateWindow *win) {
@@ -551,8 +486,8 @@ static void on_count_changed_cb(AdwSpinRow *row, GParamSpec *param, ErrandsDateW
   if (value == 0)
     g_object_set(row, "subtitle", _("Repeat infinitely"), NULL);
   else {
-    char *subtitle = g_strdup_printf(_("Repeat %d times"), value);
-    g_object_set(row, "subtitle", subtitle, NULL);
-    g_free(subtitle);
+    str subtitle = str_new_printf(_("Repeat %d times"), value);
+    g_object_set(row, "subtitle", subtitle.str, NULL);
+    str_free(&subtitle);
   }
 }

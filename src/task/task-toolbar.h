@@ -8,6 +8,7 @@ G_DECLARE_FINAL_TYPE(ErrandsTaskToolbar, errands_task_toolbar, ERRANDS, TASK_TOO
 
 struct _ErrandsTaskToolbar {
   AdwBin parent_instance;
+  void *task; // ErrandsTask *task
   GtkWidget *date_btn;
   GtkWidget *notes_btn;
   GtkWidget *priority_btn;
@@ -17,3 +18,4 @@ struct _ErrandsTaskToolbar {
 };
 
 ErrandsTaskToolbar *errands_task_toolbar_new(void *task);
+void errands_task_toolbar_update_date_btn(ErrandsTaskToolbar *tb);
