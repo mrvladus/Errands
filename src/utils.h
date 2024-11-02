@@ -207,12 +207,66 @@ inline void str_append(str *s, const char *str) {
   s->len = new_len;
 }
 
+static inline void str_append_printf(str *s, const char *format, ...) {
+  // Initialize a variable argument list
+  va_list args;
+  va_start(args, format);
+  // Get the length of the formatted string
+  int formatted_len = vsnprintf(NULL, 0, format, args);
+  va_end(args);
+  // Allocate enough space for the formatted string
+  char *formatted_str = malloc(formatted_len + 1);
+  // Write the formatted string into the allocated space
+  va_start(args, format);
+  vsnprintf(formatted_str, formatted_len + 1, format, args);
+  va_end(args);
+  // Append the formatted string to the existing string
+  str_append(s, formatted_str);
+  // Free the temporary formatted string
+  free(formatted_str);
+}
+
 // Prepend string to the beginning
 inline void str_prepend(str *s, const char *str) {
   int new_len = s->len + strlen(str);
   s->str = realloc(s->str, new_len + 1);
   memmove(s->str + strlen(str), s->str, s->len + 1);
   memcpy(s->str, str, strlen(str));
+  s->len = new_len;
+}
+
+static inline void str_remove(str *s, const char *str_to_remove) {
+  int str_to_remove_len = strlen(str_to_remove);
+  if (str_to_remove_len == 0)
+    return; // Nothing to remove
+  // Calculate the new length after removal
+  int count = 0;
+  const char *temp = s->str;
+  while ((temp = strstr(temp, str_to_remove)) != NULL) {
+    count++;
+    temp += str_to_remove_len;
+  }
+  if (count == 0)
+    return; // No occurrences found
+  // Allocate memory for the new string
+  int new_len = s->len - count * str_to_remove_len;
+  char *new_str = malloc(new_len + 1);
+  // Remove occurrences
+  char *current_pos = new_str;
+  const char *src_pos = s->str;
+  while ((temp = strstr(src_pos, str_to_remove)) != NULL) {
+    // Copy the part before the occurrence
+    int bytes_to_copy = temp - src_pos;
+    memcpy(current_pos, src_pos, bytes_to_copy);
+    current_pos += bytes_to_copy;
+    // Move past the substring to remove
+    src_pos = temp + str_to_remove_len;
+  }
+  // Copy the remaining part of the original string
+  strcpy(current_pos, src_pos);
+  // Update the str struct
+  free(s->str); // Free the old string memory
+  s->str = new_str;
   s->len = new_len;
 }
 

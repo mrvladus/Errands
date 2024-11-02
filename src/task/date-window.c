@@ -1,9 +1,11 @@
 #include "date-window.h"
 #include "../state.h"
 #include "../utils.h"
+#include "adwaita.h"
 #include "glib.h"
 
 #include <glib/gi18n.h>
+#include <string.h>
 
 static void on_errands_date_window_close_cb(ErrandsDateWindow *win, gpointer data);
 static void on_freq_changed_cb(AdwComboRow *row, GParamSpec *param, ErrandsDateWindow *win);
@@ -449,20 +451,63 @@ static void on_errands_date_window_close_cb(ErrandsDateWindow *win, gpointer dat
   errands_data_write();
 
   // Set date button text
-  if (!strcmp(win->task->data->due_date, ""))
+
+  // If not repeated - set due date and time as label
+  if (!repeated) {
+    if (!strcmp(win->task->data->due_date, ""))
+      adw_button_content_set_label(
+          ADW_BUTTON_CONTENT(gtk_button_get_child(GTK_BUTTON(win->task->toolbar->date_btn))),
+          _("Date"));
+    else {
+      GDateTime *due_dt;
+      char *due_str;
+      // If due date don't have time
+      if (!string_contains(win->task->data->due_date, "T")) {
+        char new_due_dt[16];
+        sprintf(new_due_dt, "%sT000000Z", win->task->data->due_date);
+        due_dt = g_date_time_new_from_iso8601(new_due_dt, NULL);
+        due_str = g_date_time_format(due_dt, "%d %b");
+      } else {
+        due_dt = g_date_time_new_from_iso8601(win->task->data->due_date, NULL);
+        due_str = g_date_time_format(due_dt, "%d %b %R");
+      }
+      adw_button_content_set_label(
+          ADW_BUTTON_CONTENT(gtk_button_get_child(GTK_BUTTON(win->task->toolbar->date_btn))),
+          due_str);
+      LOG("Date Window: Set button text to '%s'", due_str);
+      g_free(due_str);
+      g_date_time_unref(due_dt);
+    }
+  }
+  // Set label when task is repeated
+  else {
+    str label = str_new("");
+    int frequency = adw_combo_row_get_selected(ADW_COMBO_ROW(win->frequency_row));
+    int interval = adw_spin_row_get_value(ADW_SPIN_ROW(win->interval_row));
+    if (frequency == 0) {
+      interval == 1 ? str_append(&label, _("Every minute"))
+                    : str_append_printf(&label, _("Every %d minutes"), interval);
+    } else if (frequency == 1) {
+      interval == 1 ? str_append(&label, _("Every hour"))
+                    : str_append_printf(&label, _("Every %d hours"), interval);
+    } else if (frequency == 2) {
+      interval == 1 ? str_append(&label, _("Every day"))
+                    : str_append_printf(&label, _("Every %d days"), interval);
+    } else if (frequency == 3) {
+      interval == 1 ? str_append(&label, _("Every week"))
+                    : str_append_printf(&label, _("Every %d weeks"), interval);
+    } else if (frequency == 4) {
+      interval == 1 ? str_append(&label, _("Every month"))
+                    : str_append_printf(&label, _("Every %d months"), interval);
+    } else if (frequency == 5) {
+      interval == 1 ? str_append(&label, _("Every year"))
+                    : str_append_printf(&label, _("Every %d years"), interval);
+    }
     adw_button_content_set_label(
         ADW_BUTTON_CONTENT(gtk_button_get_child(GTK_BUTTON(win->task->toolbar->date_btn))),
-        _("Date"));
-  // else {
-  //   GDateTime *due_dt = g_date_time_new_from_iso8601(win->task->data->due_date, NULL);
-  //   char *due_str = g_date_time_format(due_dt, "%x %R");
-  //   adw_button_content_set_label(
-  //       ADW_BUTTON_CONTENT(gtk_button_get_child(GTK_BUTTON(win->task->toolbar->date_btn))),
-  //       due_str);
-  //   g_free(due_str);
-  //   g_date_time_unref(due_dt);
-  // }
-
+        label.str);
+    str_free(&label);
+  }
   // TODO: sync
 }
 
