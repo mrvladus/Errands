@@ -3,6 +3,7 @@
 #include "../utils.h"
 
 #include <glib/gi18n.h>
+#include <stdbool.h>
 
 static void on_errands_date_window_close_cb(ErrandsDateWindow *win, gpointer data);
 static void on_freq_changed_cb(AdwComboRow *row, GParamSpec *param, ErrandsDateWindow *win);
@@ -69,31 +70,9 @@ static void errands_date_window_init(ErrandsDateWindow *self) {
   self->week_chooser = errands_week_chooser_new();
   adw_expander_row_add_row(ADW_EXPANDER_ROW(self->repeat_row), GTK_WIDGET(self->week_chooser));
 
-  // Month
-  GtkWidget *month_row_box =
-      g_object_new(GTK_TYPE_BOX, "orientation", GTK_ORIENTATION_VERTICAL, "spacing", 8,
-                   "margin-start", 12, "margin-end", 12, "margin-top", 6, "margin-bottom", 6, NULL);
-  gtk_box_append(GTK_BOX(month_row_box), g_object_new(GTK_TYPE_LABEL, "label", _("Months"),
-                                                      "halign", GTK_ALIGN_START, NULL));
-  GtkWidget *month_box1 = g_object_new(GTK_TYPE_BOX, "spacing", 6, "homogeneous", true, NULL);
-  GtkWidget *month_box2 = g_object_new(GTK_TYPE_BOX, "spacing", 6, "homogeneous", true, NULL);
-  const char *const months[12] = {
-      _("Jan"), _("Feb"), _("Mar"), _("Apr"), _("May"), _("Jun"),
-      _("Jul"), _("Aug"), _("Sep"), _("Oct"), _("Nov"), _("Dec"),
-  };
-  for_range(i, 0, 12) {
-    GtkWidget *btn =
-        g_object_new(GTK_TYPE_TOGGLE_BUTTON, "label", months[i], "valign", GTK_ALIGN_CENTER, NULL);
-    gtk_widget_add_css_class(btn, "weekday");
-    if (i < 6)
-      gtk_box_append(GTK_BOX(month_box1), btn);
-    else
-      gtk_box_append(GTK_BOX(month_box2), btn);
-  }
-  gtk_box_append(GTK_BOX(month_row_box), month_box1);
-  gtk_box_append(GTK_BOX(month_row_box), month_box2);
-  self->by_month_row = g_object_new(GTK_TYPE_LIST_BOX_ROW, "child", month_row_box, NULL);
-  adw_expander_row_add_row(ADW_EXPANDER_ROW(self->repeat_row), self->by_month_row);
+  // Month chooser
+  self->month_chooser = errands_month_chooser_new();
+  adw_expander_row_add_row(ADW_EXPANDER_ROW(self->repeat_row), GTK_WIDGET(self->month_chooser));
 
   // Until Date
   self->until_row = adw_action_row_new();
@@ -147,38 +126,62 @@ ErrandsDateWindow *errands_date_window_new() {
 
 void errands_date_window_show(ErrandsTask *task) {
   LOG("Date window: Show for '%s'", task->data->uid);
+
   state.date_window->task = task;
+
+  // Reset all rows
+  errands_date_chooser_reset(state.date_window->start_date_chooser);
+  errands_time_chooser_reset(state.date_window->start_time_chooser);
+  errands_date_chooser_reset(state.date_window->due_date_chooser);
+  errands_time_chooser_reset(state.date_window->due_time_chooser);
+  adw_combo_row_set_selected(ADW_COMBO_ROW(state.date_window->frequency_row), 2);
+  adw_spin_row_set_value(ADW_SPIN_ROW(state.date_window->interval_row), 1);
+  errands_week_chooser_reset(state.date_window->week_chooser);
+  errands_month_chooser_reset(state.date_window->month_chooser);
+  errands_date_chooser_reset(state.date_window->until_date_chooser);
 
   // Set start date and time
 
-  // Clear start date and time
-  errands_date_chooser_reset(state.date_window->start_date_chooser);
-  errands_time_chooser_reset(state.date_window->start_time_chooser);
-
-  // Set date
-  char *s_date = task->data->start_date;
+  // Set start date
+  str s_date = str_new(task->data->start_date);
   // If start date not empty
-  if (strcmp(s_date, "")) {
-    errands_date_chooser_set_date(state.date_window->start_date_chooser, s_date);
-    LOG("Date window: Set date to '%s'", s_date);
+  if (!str_eq_c(&s_date, "")) {
+    errands_date_chooser_set_date(state.date_window->start_date_chooser, s_date.str);
+    LOG("Date window: Set start date to '%s'", s_date.str);
   }
-  // Set time
-  const char *s_time = strstr(s_date, "T");
+  // Set start time
+  const char *s_time = strstr(s_date.str, "T");
   if (s_time) {
     s_time++;
     errands_time_chooser_set_time(state.date_window->start_time_chooser, s_time);
-    LOG("Date window: Set time to '%s'", s_time);
+    LOG("Date window: Set start time to '%s'", s_time);
   }
+  str_free(&s_date);
+
+  // Setup due date and time
+  str d_date = str_new(task->data->due_date);
+  // If due date not empty set date
+  if (!str_eq_c(&d_date, "")) {
+    errands_date_chooser_set_date(state.date_window->due_date_chooser, d_date.str);
+    LOG("Date window: Set due date to '%s'", d_date.str);
+  }
+  // If time is set
+  const char *d_time = strstr(d_date.str, "T");
+  if (d_time) {
+    d_time++;
+    errands_time_chooser_set_time(state.date_window->due_time_chooser, d_time);
+    LOG("Date window: Set due time to '%s'", d_time);
+  }
+  str_free(&d_date);
 
   // Setup repeat
   bool is_repeated = !strcmp(task->data->rrule, "") ? false : true;
   adw_expander_row_set_enable_expansion(ADW_EXPANDER_ROW(state.date_window->repeat_row),
                                         is_repeated);
   adw_expander_row_set_expanded(ADW_EXPANDER_ROW(state.date_window->repeat_row), is_repeated);
-  // Need to select second first if not repeating
-  if (!is_repeated)
-    adw_combo_row_set_selected(ADW_COMBO_ROW(state.date_window->frequency_row), 2);
-  else {
+  if (!is_repeated) {
+    LOG("Date window: Reccurrence is disabled");
+  } else {
     // Set frequency
     char *freq = get_rrule_value(task->data->rrule, "FREQ");
     if (freq) {
@@ -213,41 +216,10 @@ void errands_date_window_show(ErrandsTask *task) {
     }
 
     // Set weekdays
-    errands_week_chooser_reset(state.date_window->week_chooser);
     errands_week_chooser_set_days(state.date_window->week_chooser, task->data->rrule);
 
     // Set month
-    GtkWidget *month_box_2 = gtk_widget_get_last_child(
-        gtk_list_box_row_get_child(GTK_LIST_BOX_ROW(state.date_window->by_month_row)));
-    GtkWidget *month_box_1 = gtk_widget_get_prev_sibling(month_box_2);
-    GPtrArray *months1 = get_children(month_box_1);
-    GPtrArray *months2 = get_children(month_box_2);
-    for_range(i, 0, months1->len) {
-      gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(months1->pdata[i]), false);
-    }
-    for_range(i, 0, months2->len) {
-      gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(months2->pdata[i]), false);
-    }
-    char *months = get_rrule_value(task->data->rrule, "BYMONTH");
-    if (months) {
-      int *nums = string_to_int_array(months);
-      for (int *i = nums; *i != 0; i++) {
-        if (*i <= 6)
-          gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(months1->pdata[*i - 1]), true);
-        else
-          gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(months2->pdata[*i - 7]), true);
-      }
-      LOG("Date window: Set months to '%s'", months);
-      free(months);
-      free(nums);
-    }
-    g_ptr_array_free(months1, true);
-    g_ptr_array_free(months2, true);
-
-    // Clear until date
-    errands_date_chooser_reset(state.date_window->until_date_chooser);
-    // Show count row
-    // gtk_widget_set_visible(state.date_window->count_row, true);
+    errands_month_chooser_set_months(state.date_window->month_chooser, task->data->rrule);
 
     // Set until date
     char *until = get_rrule_value(task->data->rrule, "UNTIL");
@@ -272,28 +244,6 @@ void errands_date_window_show(ErrandsTask *task) {
     }
   }
 
-  // Setup due date and time if not repeated
-
-  // Clear date and time
-  errands_date_chooser_reset(state.date_window->due_date_chooser);
-  errands_time_chooser_reset(state.date_window->due_time_chooser);
-
-  if (!is_repeated) {
-    char *d_date = task->data->due_date;
-    // If due date not empty set date
-    if (strcmp(d_date, "")) {
-      errands_date_chooser_set_date(state.date_window->due_date_chooser, d_date);
-      LOG("Date window: Set due date to '%s'", d_date);
-    }
-    // If time is set
-    const char *d_time = strstr(d_date, "T");
-    if (d_time) {
-      d_time++;
-      errands_time_chooser_set_time(state.date_window->due_time_chooser, d_time);
-      LOG("Date window: Set due time to '%s'", d_time);
-    }
-  }
-
   adw_dialog_present(ADW_DIALOG(state.date_window), GTK_WIDGET(state.main_window));
 }
 
@@ -302,56 +252,58 @@ void errands_date_window_show(ErrandsTask *task) {
 static void on_errands_date_window_close_cb(ErrandsDateWindow *win, gpointer data) {
   // Set start datetime
   bool start_time_is_set =
-      strcmp(gtk_label_get_label(GTK_LABEL(win->start_time_chooser->label)), _("Not Set"));
+      !strcmp(gtk_label_get_label(GTK_LABEL(win->start_time_chooser->label)), _("Not Set")) ? false
+                                                                                            : true;
   bool start_date_is_set =
-      strcmp(gtk_label_get_label(GTK_LABEL(win->start_date_chooser->label)), _("Not Set"));
-  if (!start_time_is_set && !start_date_is_set) {
-    free(win->task->data->start_date);
-    win->task->data->start_date = strdup("");
-  } else if (start_time_is_set) {
+      !strcmp(gtk_label_get_label(GTK_LABEL(win->start_date_chooser->label)), _("Not Set")) ? false
+                                                                                            : true;
+  str s_dt = str_new("");
+  if (start_date_is_set) {
     const char *start_date = errands_date_chooser_get_date(win->start_date_chooser);
-    const char *start_time = errands_time_chooser_get_time(win->start_time_chooser);
-    str s_dt = str_new(start_date);
-    str_append_printf(&s_dt, "T%sZ", start_time);
-    free(win->task->data->start_date);
-    win->task->data->start_date = strdup(s_dt.str);
-    str_free(&s_dt);
-  } else if (start_date_is_set && !start_time_is_set) {
-    const char *start_date = errands_date_chooser_get_date(win->start_date_chooser);
-    free(win->task->data->start_date);
-    win->task->data->start_date = strdup(start_date);
-  }
-
-  // Set due datetime
-  bool repeated = adw_expander_row_get_enable_expansion(ADW_EXPANDER_ROW(win->repeat_row));
-  if (!repeated) {
-    bool due_time_is_set =
-        strcmp(gtk_label_get_label(GTK_LABEL(win->due_time_chooser->label)), _("Not Set"));
-    bool due_date_is_set =
-        strcmp(gtk_label_get_label(GTK_LABEL(win->due_date_chooser->label)), _("Not Set"));
-    if (!due_time_is_set && !due_date_is_set) {
-      free(win->task->data->due_date);
-      win->task->data->due_date = strdup("");
-    } else if (due_time_is_set) {
-      const char *due_date = errands_date_chooser_get_date(win->due_date_chooser);
-      const char *due_time = errands_time_chooser_get_time(win->due_time_chooser);
-      str d_dt = str_new(due_date);
-      str_append_printf(&d_dt, "T%sZ", due_time);
-      free(win->task->data->due_date);
-      win->task->data->due_date = strdup(d_dt.str);
-      str_free(&d_dt);
-    } else if (due_date_is_set && !due_time_is_set) {
-      const char *due_date = errands_date_chooser_get_date(win->due_date_chooser);
-      free(win->task->data->due_date);
-      win->task->data->due_date = strdup(due_date);
+    str_append(&s_dt, start_date);
+    if (start_time_is_set) {
+      const char *start_time = errands_time_chooser_get_time(win->start_time_chooser);
+      str_append_printf(&s_dt, "T%sZ", start_time);
+    }
+    errands_data_update_str(win->task->data->start_date, s_dt.str);
+  } else {
+    if (start_time_is_set) {
+      const char *start_time = errands_time_chooser_get_time(win->start_time_chooser);
+      str_append_printf(&s_dt, "%sT%sZ", get_today_date(), start_time);
     }
   }
+  errands_data_update_str(win->task->data->start_date, s_dt.str);
+  str_free(&s_dt);
+
+  // Set due datetime
+  bool due_time_is_set =
+      !strcmp(gtk_label_get_label(GTK_LABEL(win->due_time_chooser->label)), _("Not Set")) ? false
+                                                                                          : true;
+  bool due_date_is_set =
+      !strcmp(gtk_label_get_label(GTK_LABEL(win->due_date_chooser->label)), _("Not Set")) ? false
+                                                                                          : true;
+  str d_dt = str_new("");
+  if (due_date_is_set) {
+    const char *due_date = errands_date_chooser_get_date(win->due_date_chooser);
+    str_append(&d_dt, due_date);
+    if (due_time_is_set) {
+      const char *due_time = errands_time_chooser_get_time(win->due_time_chooser);
+      str_append_printf(&d_dt, "T%sZ", due_time);
+    }
+    errands_data_update_str(win->task->data->due_date, d_dt.str);
+  } else {
+    if (due_time_is_set) {
+      const char *due_time = errands_time_chooser_get_time(win->due_time_chooser);
+      str_append_printf(&d_dt, "%sT%sZ", get_today_date(), due_time);
+    }
+  }
+  errands_data_update_str(win->task->data->due_date, d_dt.str);
+  str_free(&d_dt);
 
   // Check if repeat is enabled
-  if (!repeated) {
+  if (!adw_expander_row_get_enable_expansion(ADW_EXPANDER_ROW(win->repeat_row))) {
     // If not - clean rrule
-    free(win->task->data->rrule);
-    win->task->data->rrule = strdup("");
+    errands_data_update_str(win->task->data->rrule, "");
   }
   // Generate new rrule
   else {
@@ -383,37 +335,7 @@ static void on_errands_date_window_close_cb(ErrandsDateWindow *win, gpointer dat
     str_append(&rrule, errands_week_chooser_get_days(win->week_chooser));
 
     // Set months
-    GtkWidget *month_box_2 =
-        gtk_widget_get_last_child(gtk_list_box_row_get_child(GTK_LIST_BOX_ROW(win->by_month_row)));
-    GtkWidget *month_box_1 = gtk_widget_get_prev_sibling(month_box_2);
-    str by_month = str_new("BYMONTH=");
-    // First 6 months
-    GPtrArray *months_1 = get_children(month_box_1);
-    for_range(i, 0, 6) {
-      if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(months_1->pdata[i]))) {
-        if (!strcmp(by_month.str, "BYMONTH="))
-          str_append_printf(&by_month, "%d", i + 1);
-        else
-          str_append_printf(&by_month, ",%d", i + 1);
-      }
-    }
-    g_ptr_array_free(months_1, true);
-    // Last 6 months
-    GPtrArray *months_2 = get_children(month_box_2);
-    for_range(i, 0, 6) {
-      if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(months_2->pdata[i]))) {
-        if (!strcmp(by_month.str, "BYMONTH="))
-          str_append_printf(&by_month, "%d", i + 7);
-        else
-          str_append_printf(&by_month, ",%d", i + 7);
-      }
-    }
-    g_ptr_array_free(months_2, true);
-    if (str_eq_c(&by_month, "BYMONTH=")) {
-      str_append(&by_month, ";");
-      str_append(&rrule, by_month.str);
-    }
-    str_free(&by_month);
+    str_append(&rrule, errands_month_chooser_get_months(win->month_chooser));
 
     // Set UNTIL if until date is set
     const char *until_label = gtk_label_get_label(GTK_LABEL(win->until_date_chooser->label));
@@ -435,14 +357,18 @@ static void on_errands_date_window_close_cb(ErrandsDateWindow *win, gpointer dat
       str_append_printf(&rrule, "COUNT=%d;", count);
 
     // Save rrule
-    free(win->task->data->rrule);
-    win->task->data->rrule = strdup(rrule.str);
+    errands_data_update_str(win->task->data->rrule, rrule.str);
 
     // Cleanup
     str_free(&rrule);
   }
 
   errands_data_write();
+
+  LOG("Date Window:\n\t Set Start Date and Time to '%s'\n\t Set Due Date and Time to '%s'\n\t "
+      "Set RRULE to '%s'",
+      win->task->data->start_date, win->task->data->due_date, win->task->data->rrule);
+
   // Set date button text
   errands_task_toolbar_update_date_btn(win->task->toolbar);
   // TODO: sync

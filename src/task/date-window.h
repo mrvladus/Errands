@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../components/date-chooser.h"
+#include "../components/month-chooser.h"
 #include "../components/time-chooser.h"
 #include "../components/week-chooser.h"
 #include "task.h"
@@ -20,7 +21,7 @@ struct _ErrandsDateWindow {
   GtkWidget *repeat_row;
   GtkWidget *frequency_row;
   ErrandsWeekChooser *week_chooser;
-  GtkWidget *by_month_row;
+  ErrandsMonthChooser *month_chooser;
   GtkWidget *count_row;
   GtkWidget *interval_row;
   GtkWidget *until_row;

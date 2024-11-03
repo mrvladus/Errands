@@ -1,6 +1,5 @@
 #include "week-chooser.h"
 #include "../utils.h"
-#include "gtk/gtk.h"
 
 #include <glib/gi18n.h>
 
@@ -11,15 +10,18 @@ static void errands_week_chooser_class_init(ErrandsWeekChooserClass *class) {}
 static void errands_week_chooser_init(ErrandsWeekChooser *self) {
   self->week_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
   g_object_set(self->week_box, "homogeneous", true, NULL);
+
   const char *const week_days[7] = {
       C_("Monday", "Mo"), C_("Tuesday", "Tu"),  C_("Wednesday", "We"), C_("Thursday", "Th"),
       C_("Friday", "Fr"), C_("Saturday", "Sa"), C_("Sunday", "Su")};
+
   for_range(i, 0, 6) {
     GtkWidget *btn = g_object_new(GTK_TYPE_TOGGLE_BUTTON, "label", week_days[i], "valign",
                                   GTK_ALIGN_CENTER, NULL);
     gtk_widget_add_css_class(btn, "weekday");
     gtk_box_append(GTK_BOX(self->week_box), btn);
   }
+
   GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 8);
   g_object_set(box, "margin-start", 12, "margin-end", 12, "margin-top", 6, "margin-bottom", 6,
                NULL);

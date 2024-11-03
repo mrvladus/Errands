@@ -5,6 +5,11 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+// Free allocated string and allocate new_string
+#define errands_data_update_str(string, new_string)                                                \
+  free(string);                                                                                    \
+  string = strdup(new_string);
+
 typedef struct {
   GPtrArray *attachments;
   char *color;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "glib.h"
 #include <ctype.h>
 #include <gtk/gtk.h>
 
@@ -18,9 +19,8 @@
 #define for_range(var, from, to) for (int var = from; var < to; var++)
 
 // Avoid dangling pointers
-#define free(mem)                                                                                  \
-  free(mem);                                                                                       \
-  mem = NULL;
+// #define free(mem) \
+//   free(mem); \ mem = NULL;
 
 // Lambda function macro
 // #define lambda(lambda$_ret, lambda$_args, lambda$_body) \
@@ -45,7 +45,23 @@ static inline GPtrArray *get_children(GtkWidget *parent) {
 }
 
 static inline char *get_date_time() {
-  return g_date_time_format(g_date_time_new_now_local(), "%Y%m%dT%H%M%SZ");
+  GDateTime *dt = g_date_time_new_now_local();
+  static char datetime[17];
+  char *tmp = g_date_time_format(dt, "%Y%m%dT%H%M%SZ");
+  strcpy(datetime, tmp);
+  g_free(tmp);
+  g_date_time_unref(dt);
+  return datetime;
+}
+
+static inline char *get_today_date() {
+  GDateTime *dt = g_date_time_new_now_local();
+  static char date[9];
+  char *tmp = g_date_time_format(dt, "%Y%m%d");
+  strcpy(date, tmp);
+  g_free(tmp);
+  g_date_time_unref(dt);
+  return date;
 }
 
 static inline bool string_contains(const char *haystack, const char *needle) {

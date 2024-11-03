@@ -89,26 +89,19 @@ void errands_date_chooser_set_date(ErrandsDateChooser *dc, const char *date) {
   if (dt) {
     GDateTime *today = g_date_time_new_now_local();
     char *today_date = g_date_time_format(today, "%Y%m%d");
+    GDateTime *tomorrow = g_date_time_add_days(today, 1);
     char *dt_date = g_date_time_format(dt, "%Y%m%d");
     if (!strcmp(dt_date, today_date)) {
-      GDateTime *tomorrow = g_date_time_add_days(today, 1);
-
       gtk_calendar_select_day(GTK_CALENDAR(dc->calendar), tomorrow);
       gtk_calendar_select_day(GTK_CALENDAR(dc->calendar), today);
-
-      g_date_time_unref(tomorrow);
-      g_date_time_unref(today);
-      g_free(today_date);
-      g_free(dt_date);
-      return;
+    } else {
+      gtk_calendar_select_day(GTK_CALENDAR(dc->calendar), dt);
     }
-
+    g_date_time_unref(dt);
     g_date_time_unref(today);
+    g_date_time_unref(tomorrow);
     g_free(today_date);
     g_free(dt_date);
-
-    gtk_calendar_select_day(GTK_CALENDAR(dc->calendar), dt);
-    g_date_time_unref(dt);
   }
 }
 
