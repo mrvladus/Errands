@@ -6,13 +6,8 @@
 #include "../state.h"
 #include "../task-list.h"
 #include "../utils.h"
-#include "glib.h"
-#include "gtk/gtk.h"
-#include "task-toolbar.h"
 
 #include <glib/gi18n.h>
-#include <math.h>
-#include <string.h>
 
 // ---------- SIGNALS ---------- //
 
@@ -190,7 +185,7 @@ ErrandsTask *errands_task_new(TaskData *data) {
   // Load sub-tasks
   for (int i = 0; i < state.t_data->len; i++) {
     TaskData *td = state.t_data->pdata[i];
-    if (!strcmp(td->parent, data->uid))
+    if (!strcmp(td->parent, data->uid) && !td->deleted)
       gtk_box_append(GTK_BOX(task->sub_tasks), GTK_WIDGET(errands_task_new(td)));
   }
   errands_task_list_sort_by_completion(task->sub_tasks);
@@ -336,6 +331,10 @@ static void on_action_trash(GSimpleAction *action, GVariant *param, ErrandsTask 
   task->data->trash = true;
   errands_data_write();
   gtk_revealer_set_reveal_child(GTK_REVEALER(task->revealer), false);
+  errands_task_list_update_title();
+  errands_sidebar_all_row_update_counter(state.sidebar->all_row);
+  errands_sidebar_task_list_row_update_counter(
+      errands_sidebar_task_list_row_get(task->data->list_uid));
 }
 
 static void on_errands_task_complete_btn_toggle(GtkCheckButton *btn, ErrandsTask *task) {

@@ -15,8 +15,7 @@
 
 // --- DECLARATIONS --- //
 
-static void on_errands_sidebar_filter_row_activated(GtkListBox *box,
-                                                    GtkListBoxRow *row,
+static void on_errands_sidebar_filter_row_activated(GtkListBox *box, GtkListBoxRow *row,
                                                     gpointer data);
 
 // --- IMPLEMENTATIONS --- //
@@ -34,14 +33,12 @@ static void errands_sidebar_init(ErrandsSidebar *self) {
 
   // Headerbar
   GtkWidget *hb = adw_header_bar_new();
-  adw_header_bar_set_title_widget(ADW_HEADER_BAR(hb),
-                                  adw_window_title_new("Errands", ""));
+  adw_header_bar_set_title_widget(ADW_HEADER_BAR(hb), adw_window_title_new("Errands", ""));
   adw_toolbar_view_add_top_bar(ADW_TOOLBAR_VIEW(tb), hb);
 
   // Add list button
   GtkWidget *add_btn = gtk_button_new_from_icon_name("errands-add-symbolic");
-  g_signal_connect(add_btn, "clicked", G_CALLBACK(errands_new_list_dialog_show),
-                   NULL);
+  g_signal_connect(add_btn, "clicked", G_CALLBACK(errands_new_list_dialog_show), NULL);
   adw_header_bar_pack_start(ADW_HEADER_BAR(hb), add_btn);
   errands_add_shortcut(add_btn, "<Control><Shift>N", "activate");
 
@@ -59,8 +56,7 @@ static void errands_sidebar_init(ErrandsSidebar *self) {
   // All tasks row
   self->all_row = errands_sidebar_all_row_new();
   errands_sidebar_all_row_update_counter(self->all_row);
-  gtk_list_box_append(GTK_LIST_BOX(self->filters_box),
-                      GTK_WIDGET(self->all_row));
+  gtk_list_box_append(GTK_LIST_BOX(self->filters_box), GTK_WIDGET(self->all_row));
 
   // // Today row
   // GtkWidget *today_row = errands_sidebar_row_new(
@@ -103,12 +99,9 @@ static void errands_sidebar_init(ErrandsSidebar *self) {
                    G_CALLBACK(errands_sidebar_select_last_opened_page), NULL);
 }
 
-ErrandsSidebar *errands_sidebar_new() {
-  return g_object_new(ERRANDS_TYPE_SIDEBAR, NULL);
-}
+ErrandsSidebar *errands_sidebar_new() { return g_object_new(ERRANDS_TYPE_SIDEBAR, NULL); }
 
-ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(ErrandsSidebar *sb,
-                                                         TaskListData *data) {
+ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(ErrandsSidebar *sb, TaskListData *data) {
   ErrandsSidebarTaskListRow *row = errands_sidebar_task_list_row_new(data);
   gtk_list_box_append(GTK_LIST_BOX(sb->task_lists_box), GTK_WIDGET(row));
   return row;
@@ -121,14 +114,13 @@ void errands_sidebar_select_last_opened_page() {
 
 // --- SIGNAL HANDLERS --- //
 
-static void on_errands_sidebar_filter_row_activated(GtkListBox *box,
-                                                    GtkListBoxRow *row,
+static void on_errands_sidebar_filter_row_activated(GtkListBox *box, GtkListBoxRow *row,
                                                     gpointer data) {
   gtk_list_box_unselect_all(GTK_LIST_BOX(state.sidebar->task_lists_box));
   if (GTK_WIDGET(row) == GTK_WIDGET(state.sidebar->all_row)) {
     LOG("Switch to all tasks page");
-    adw_view_stack_set_visible_child_name(
-        ADW_VIEW_STACK(state.main_window->stack), "errands_task_list_page");
+    adw_view_stack_set_visible_child_name(ADW_VIEW_STACK(state.main_window->stack),
+                                          "errands_task_list_page");
     state.task_list->data = NULL;
     errands_task_list_update_title();
     errands_task_list_filter_by_uid("");

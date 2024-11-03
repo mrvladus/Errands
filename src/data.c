@@ -16,8 +16,7 @@
 // Function to read a file into a string
 static char *errands_data_read() {
   // Get data dir
-  const char *data_dir =
-      g_build_path("/", g_get_user_data_dir(), "errands", NULL);
+  const char *data_dir = g_build_path("/", g_get_user_data_dir(), "errands", NULL);
   // Create if not exist
   if (!directory_exists(data_dir)) {
     g_mkdir_with_parents(data_dir, 0755);
@@ -76,8 +75,7 @@ void errands_data_load() {
     tl->color = strdup(cJSON_GetObjectItem(item, "color")->valuestring);
     tl->deleted = (bool)cJSON_GetObjectItem(item, "deleted")->valueint;
     tl->name = strdup(cJSON_GetObjectItem(item, "name")->valuestring);
-    tl->show_completed =
-        (bool)cJSON_GetObjectItem(item, "show_completed")->valueint;
+    tl->show_completed = (bool)cJSON_GetObjectItem(item, "show_completed")->valueint;
     tl->synced = (bool)cJSON_GetObjectItem(item, "synced")->valueint;
     tl->uid = strdup(cJSON_GetObjectItem(item, "uid")->valuestring);
     g_ptr_array_add(state.tl_data, tl);
@@ -98,15 +96,12 @@ void errands_data_load() {
     t->attachments = g_ptr_array_new();
     cJSON *atch_arr = cJSON_GetObjectItem(item, "attachments");
     for (int i = 0; i < cJSON_GetArraySize(atch_arr); i++) {
-      g_ptr_array_add(t->attachments,
-                      strdup(cJSON_GetArrayItem(atch_arr, i)->valuestring));
+      g_ptr_array_add(t->attachments, strdup(cJSON_GetArrayItem(atch_arr, i)->valuestring));
     }
     t->color = strdup(cJSON_GetObjectItem(item, "color")->valuestring);
     t->completed = (bool)cJSON_GetObjectItem(item, "completed")->valueint;
-    t->changed_at =
-        strdup(cJSON_GetObjectItem(item, "changed_at")->valuestring);
-    t->created_at =
-        strdup(cJSON_GetObjectItem(item, "created_at")->valuestring);
+    t->changed_at = strdup(cJSON_GetObjectItem(item, "changed_at")->valuestring);
+    t->created_at = strdup(cJSON_GetObjectItem(item, "created_at")->valuestring);
     t->deleted = (bool)cJSON_GetObjectItem(item, "deleted")->valueint;
     t->due_date = strdup(cJSON_GetObjectItem(item, "due_date")->valuestring);
     t->expanded = (bool)cJSON_GetObjectItem(item, "expanded")->valueint;
@@ -114,23 +109,19 @@ void errands_data_load() {
     t->notes = strdup(cJSON_GetObjectItem(item, "notes")->valuestring);
     t->notified = (bool)cJSON_GetObjectItem(item, "notified")->valueint;
     t->parent = strdup(cJSON_GetObjectItem(item, "parent")->valuestring);
-    t->percent_complete =
-        cJSON_GetObjectItem(item, "percent_complete")->valueint;
+    t->percent_complete = cJSON_GetObjectItem(item, "percent_complete")->valueint;
     t->priority = cJSON_GetObjectItem(item, "priority")->valueint;
     t->rrule = strdup(cJSON_GetObjectItem(item, "rrule")->valuestring);
-    t->start_date =
-        strdup(cJSON_GetObjectItem(item, "start_date")->valuestring);
+    t->start_date = strdup(cJSON_GetObjectItem(item, "start_date")->valuestring);
     t->synced = (bool)cJSON_GetObjectItem(item, "synced")->valueint;
     // Get tags
     t->tags = g_ptr_array_new();
     cJSON *tags_arr = cJSON_GetObjectItem(item, "tags");
     for (int i = 0; i < cJSON_GetArraySize(tags_arr); i++) {
-      g_ptr_array_add(t->tags,
-                      strdup(cJSON_GetArrayItem(tags_arr, i)->valuestring));
+      g_ptr_array_add(t->tags, strdup(cJSON_GetArrayItem(tags_arr, i)->valuestring));
     }
     t->text = strdup(cJSON_GetObjectItem(item, "text")->valuestring);
-    t->toolbar_shown =
-        (bool)cJSON_GetObjectItem(item, "toolbar_shown")->valueint;
+    t->toolbar_shown = (bool)cJSON_GetObjectItem(item, "toolbar_shown")->valueint;
     t->trash = (bool)cJSON_GetObjectItem(item, "trash")->valueint;
     t->uid = strdup(cJSON_GetObjectItem(item, "uid")->valuestring);
     g_ptr_array_add(state.t_data, t);
@@ -160,8 +151,7 @@ void errands_data_write() {
     cJSON_AddItemToObject(l_data, "color", cJSON_CreateString(data->color));
     cJSON_AddItemToObject(l_data, "deleted", cJSON_CreateBool(data->deleted));
     cJSON_AddItemToObject(l_data, "name", cJSON_CreateString(data->name));
-    cJSON_AddItemToObject(l_data, "show_completed",
-                          cJSON_CreateBool(data->show_completed));
+    cJSON_AddItemToObject(l_data, "show_completed", cJSON_CreateBool(data->show_completed));
     cJSON_AddItemToObject(l_data, "synced", cJSON_CreateBool(data->synced));
     cJSON_AddItemToObject(l_data, "uid", cJSON_CreateString(data->uid));
     cJSON_AddItemToArray(lists, l_data);
@@ -188,28 +178,20 @@ void errands_data_write() {
     }
     cJSON_AddItemToObject(t_data, "attachments", attachments_array);
     cJSON_AddItemToObject(t_data, "color", cJSON_CreateString(data->color));
-    cJSON_AddItemToObject(t_data, "completed",
-                          cJSON_CreateBool(data->completed));
-    cJSON_AddItemToObject(t_data, "changed_at",
-                          cJSON_CreateString(data->changed_at));
-    cJSON_AddItemToObject(t_data, "created_at",
-                          cJSON_CreateString(data->created_at));
+    cJSON_AddItemToObject(t_data, "completed", cJSON_CreateBool(data->completed));
+    cJSON_AddItemToObject(t_data, "changed_at", cJSON_CreateString(data->changed_at));
+    cJSON_AddItemToObject(t_data, "created_at", cJSON_CreateString(data->created_at));
     cJSON_AddItemToObject(t_data, "deleted", cJSON_CreateBool(data->deleted));
-    cJSON_AddItemToObject(t_data, "due_date",
-                          cJSON_CreateString(data->due_date));
+    cJSON_AddItemToObject(t_data, "due_date", cJSON_CreateString(data->due_date));
     cJSON_AddItemToObject(t_data, "expanded", cJSON_CreateBool(data->expanded));
-    cJSON_AddItemToObject(t_data, "list_uid",
-                          cJSON_CreateString(data->list_uid));
+    cJSON_AddItemToObject(t_data, "list_uid", cJSON_CreateString(data->list_uid));
     cJSON_AddItemToObject(t_data, "notes", cJSON_CreateString(data->notes));
     cJSON_AddItemToObject(t_data, "notified", cJSON_CreateBool(data->notified));
     cJSON_AddItemToObject(t_data, "parent", cJSON_CreateString(data->parent));
-    cJSON_AddItemToObject(t_data, "percent_complete",
-                          cJSON_CreateNumber(data->percent_complete));
-    cJSON_AddItemToObject(t_data, "priority",
-                          cJSON_CreateNumber(data->priority));
+    cJSON_AddItemToObject(t_data, "percent_complete", cJSON_CreateNumber(data->percent_complete));
+    cJSON_AddItemToObject(t_data, "priority", cJSON_CreateNumber(data->priority));
     cJSON_AddItemToObject(t_data, "rrule", cJSON_CreateString(data->rrule));
-    cJSON_AddItemToObject(t_data, "start_date",
-                          cJSON_CreateString(data->start_date));
+    cJSON_AddItemToObject(t_data, "start_date", cJSON_CreateString(data->start_date));
     cJSON_AddItemToObject(t_data, "synced", cJSON_CreateBool(data->synced));
     cJSON *tags_array = cJSON_CreateArray();
     for (int j = 0; j < data->tags->len; j++) {
@@ -218,8 +200,7 @@ void errands_data_write() {
     }
     cJSON_AddItemToObject(t_data, "tags", tags_array);
     cJSON_AddItemToObject(t_data, "text", cJSON_CreateString(data->text));
-    cJSON_AddItemToObject(t_data, "toolbar_shown",
-                          cJSON_CreateBool(data->toolbar_shown));
+    cJSON_AddItemToObject(t_data, "toolbar_shown", cJSON_CreateBool(data->toolbar_shown));
     cJSON_AddItemToObject(t_data, "trash", cJSON_CreateBool(data->trash));
     cJSON_AddItemToObject(t_data, "uid", cJSON_CreateString(data->uid));
 
@@ -257,7 +238,7 @@ TaskListData *errands_data_add_list(const char *name) {
   tl->show_completed = true;
   tl->synced = false;
   tl->uid = g_uuid_string_random();
-  g_ptr_array_insert(state.tl_data, 0, tl);
+  g_ptr_array_add(state.tl_data, tl);
   errands_data_write();
   return tl;
 }
@@ -269,12 +250,15 @@ void errands_data_free_list(TaskListData *data) {
 }
 
 void errands_data_delete_list(TaskListData *data) {
+  LOG("Data: deleting task list %p", data);
+  LOG("Data: deleting task list '%s'", data->uid);
   // Mark list as deleted
   data->deleted = true;
   // Remove tasks
   GPtrArray *new_t_data = g_ptr_array_new();
   for (int i = 0; i < state.t_data->len; i++) {
     TaskData *td = state.t_data->pdata[i];
+    LOG("Data: deleting task '%s'", td->uid);
     if (!strcmp(data->uid, td->list_uid)) {
       errands_data_free_task(td);
     } else {
@@ -287,8 +271,7 @@ void errands_data_delete_list(TaskListData *data) {
 }
 
 char *errands_data_task_list_as_ical(TaskListData *data) {
-  GString *ical =
-      g_string_new("BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Errands\n");
+  GString *ical = g_string_new("BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Errands\n");
   g_string_append_printf(ical, "X-ERRANDS-LIST-UID:%s\n", data->uid);
   g_string_append_printf(ical, "X-WR-CALNAME:%s\n", data->name);
   if (data->color)
@@ -370,8 +353,7 @@ char *errands_data_task_as_ical(TaskData *data) {
   // Create a GString to build the iCal output dynamically
   GString *ical = g_string_new("BEGIN:VTODO\n");
   // Add UID and SUMMARY
-  g_string_append_printf(ical, "UID:%s\nSUMMARY:%s\n", data->uid,
-                         data->text ? data->text : "");
+  g_string_append_printf(ical, "UID:%s\nSUMMARY:%s\n", data->uid, data->text ? data->text : "");
   // Add start date if available
   if (strcmp(data->start_date, ""))
     g_string_append_printf(ical, "DTSTART:%s\n", data->start_date);
@@ -396,8 +378,8 @@ char *errands_data_task_as_ical(TaskData *data) {
   // End the VTODO and VCALENDAR sections
   g_string_append(ical, "END:VTODO\n");
   // Return the string and free the GString structure
-  char *ical_str = g_string_free(
-      ical, FALSE); // Don't free the actual string, just the GString wrapper
+  char *ical_str =
+      g_string_free(ical, FALSE); // Don't free the actual string, just the GString wrapper
   return ical_str;
 }
 
@@ -432,8 +414,8 @@ static void errands_print_task(TaskData *task, GString *out, int indent) {
   g_string_append(out, "\n");
 }
 
-static void errands_print_tasks(GString *out, const char *parent_uid,
-                                const char *list_uid, int indent) {
+static void errands_print_tasks(GString *out, const char *parent_uid, const char *list_uid,
+                                int indent) {
   for (int i = 0; i < state.t_data->len; i++) {
     TaskData *td = state.t_data->pdata[i];
     if (!strcmp(td->parent, parent_uid) && !strcmp(td->list_uid, list_uid)) {
@@ -467,9 +449,7 @@ GString *errands_data_print_list(char *list_uid) {
     list_name[MAX_LINE_LENGTH - 1] = '.';
     list_name[MAX_LINE_LENGTH - 2] = '.';
     list_name[MAX_LINE_LENGTH - 3] = '.';
-    for_range(i, 0, MAX_LINE_LENGTH) {
-      g_string_append_printf(out, "%c", list_name[i]);
-    }
+    for_range(i, 0, MAX_LINE_LENGTH) { g_string_append_printf(out, "%c", list_name[i]); }
   } else if (len < MAX_LINE_LENGTH) {
     GString *title = g_string_new(list_name);
     int title_len = title->len;

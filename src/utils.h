@@ -105,11 +105,13 @@ static inline bool directory_exists(const char *path) {
 }
 
 static inline char *generate_hex() {
-  static char color[8];
+  srand(time(NULL));
+  char *color = malloc(8 * sizeof(char));
   int red = rand() % 256;
   int green = rand() % 256;
   int blue = rand() % 256;
   sprintf(color, "#%02X%02X%02X", red, green, blue);
+  LOG("Generate color '%s'", color);
   return color;
 }
 
