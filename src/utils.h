@@ -29,6 +29,24 @@
 // lambda$_body &lambda$__anon$; \
 //   })
 
+static inline char *read_file_to_string(const char *path) {
+  FILE *file = fopen(path, "r"); // Open the file in read mode
+  if (!file) {
+    LOG("Could not open file"); // Print error if file cannot be opened
+    return NULL;
+  }
+  // Move the file pointer to the end of the file to get the size
+  fseek(file, 0, SEEK_END);
+  long file_size = ftell(file); // Get the current position (file size)
+  fseek(file, 0, SEEK_SET);     // Move back to the beginning of the file
+  // Allocate memory for the string (+1 for the null terminator)
+  char *buf = (char *)malloc(file_size + 1);
+  fread(buf, 1, file_size, file);
+  buf[file_size] = '\0'; // Null-terminate the string
+  fclose(file);
+  return buf;
+}
+
 // Get children of the widget
 static inline GPtrArray *get_children(GtkWidget *parent) {
   GPtrArray *children = g_ptr_array_new();
@@ -185,7 +203,8 @@ static inline int *string_to_int_array(const char *str) {
   arr[index] = 0; // NULL terminate the array
   return arr;
 }
-// ---------- RRULE ---------- //
+
+// ---------- ICAL ---------- //
 
 static inline char *get_rrule_value(const char *rrule, const char *key) {
   const char *value_start = strstr(rrule, key);
@@ -200,6 +219,51 @@ static inline char *get_rrule_value(const char *rrule, const char *key) {
   out[length] = '\0';
   strncpy(out, value_start, length);
   return out;
+}
+
+static inline char *get_ical_value(const char *ical, const char *key) {
+  const char *val_start = strstr(ical, key);
+  if (!val_start)
+    return NULL;
+  val_start += strlen(key) + 1;
+  const char *val_end = strchr(val_start, '\n');
+  if (!val_end)
+    return NULL;
+  const int val_len = val_end - val_start;
+  char *value = malloc(val_len);
+  value[val_len] = '\0';
+  strncpy(value, val_start, val_len);
+  return value;
+}
+
+static inline GPtrArray *get_vtodos(const char *ical) {
+  GPtrArray *vtodo_array = g_ptr_array_new();
+  const char *vtodo_start = "BEGIN:VTODO";
+  const char *vtodo_end = "END:VTODO";
+  const char *current_pos = ical;
+  while ((current_pos = strstr(current_pos, vtodo_start)) != NULL) {
+    const char *end_pos = strstr(current_pos, vtodo_end);
+    if (end_pos == NULL) {
+      break; // No matching END found
+    }
+    // Calculate the length of the VTODO entry
+    size_t vtodo_length = end_pos + strlen(vtodo_end) - current_pos;
+    // Allocate memory for the VTODO string
+    char *vtodo_entry = (char *)malloc(vtodo_length + 1);
+    if (vtodo_entry == NULL) {
+      g_ptr_array_free(vtodo_array, TRUE);
+      return NULL; // Memory allocation failed
+    }
+    // Copy the VTODO entry into the allocated memory
+    strncpy(vtodo_entry, current_pos, vtodo_length);
+    vtodo_entry[vtodo_length] = '\0'; // Null-terminate the string
+    // Add the VTODO entry to the GPtrArray
+    g_ptr_array_add(vtodo_array, vtodo_entry);
+    // Move the current position past the end of the current VTODO entry
+    current_pos = end_pos + strlen(vtodo_end);
+  }
+
+  return vtodo_array;
 }
 
 // ---------- DYNAMIC STRING ---------- //

@@ -29,28 +29,10 @@ static char *errands_data_read() {
     fprintf(file, "{\"lists\":[],\"tags\":[],\"tasks\":[]}");
     fclose(file);
   }
-
-  FILE *file = fopen(data_file_path, "r"); // Open the file in read mode
-  if (!file) {
-    LOG("Could not open file"); // Print error if file cannot be opened
-    return NULL;
-  }
-
-  // Move the file pointer to the end of the file to get the size
-  fseek(file, 0, SEEK_END);
-  long file_size = ftell(file); // Get the current position (file size)
-  fseek(file, 0, SEEK_SET);     // Move back to the beginning of the file
-  // Allocate memory for the string (+1 for the null terminator)
-  char *buffer = (char *)malloc(file_size + 1);
-  fread(buffer, 1, file_size, file);
-  buffer[file_size] = '\0'; // Null-terminate the string
-  fclose(file);
-
-  // Free memory
+  char *out = read_file_to_string(data_file_path);
   g_free((gpointer)data_dir);
   g_free((gpointer)data_file_path);
-
-  return buffer; // Return the string
+  return out;
 }
 
 // Load user data from data.json
@@ -272,7 +254,6 @@ void errands_data_delete_list(TaskListData *data) {
 
 char *errands_data_task_list_as_ical(TaskListData *data) {
   GString *ical = g_string_new("BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Errands\n");
-  g_string_append_printf(ical, "X-ERRANDS-LIST-UID:%s\n", data->uid);
   g_string_append_printf(ical, "X-WR-CALNAME:%s\n", data->name);
   if (data->color)
     g_string_append_printf(ical, "X-APPLE-CALENDAR-COLOR:%s\n", data->color);
@@ -286,6 +267,19 @@ char *errands_data_task_list_as_ical(TaskListData *data) {
   g_string_append(ical, "END:VCALENDAR\n");
   char *ical_str = g_string_free(ical, FALSE);
   return ical_str;
+}
+
+TaskListData *errands_task_list_from_ical(const char *ical) {
+  TaskListData *data = malloc(sizeof(*data));
+  char *name = get_ical_value(ical, "X-WR-CALNAME");
+  data->name = name ? name : strdup("New List");
+  char *color = get_ical_value(ical, "X-APPLE-CALENDAR-COLOR");
+  data->color = color ? color : generate_hex();
+  data->deleted = false;
+  data->show_completed = true;
+  data->synced = false;
+  data->uid = g_uuid_string_random();
+  return data;
 }
 
 // --- TASKS --- //
@@ -334,8 +328,6 @@ void errands_data_free_task(TaskData *data) {
   free(data->uid);
 }
 
-void errands_data_delete_task(const char *list_uid, const char *uid) {}
-
 TaskData *errands_data_get_task(char *uid) {
   TaskData *td = NULL;
   for (int i = 0; i < state.t_data->len; i++) {
@@ -381,6 +373,77 @@ char *errands_data_task_as_ical(TaskData *data) {
   char *ical_str =
       g_string_free(ical, FALSE); // Don't free the actual string, just the GString wrapper
   return ical_str;
+}
+
+GPtrArray *errands_data_tasks_from_ical(const char *ical, const char *list_uid) {
+  GPtrArray *out = g_ptr_array_new();
+  GPtrArray *todos = get_vtodos(ical);
+  if (todos) {
+    for_range(i, 0, todos->len) {
+      const char *todo = todos->pdata[i];
+      TaskData *t = malloc(sizeof(*t));
+
+      t->attachments = g_ptr_array_new();
+
+      char *color = get_ical_value(todo, "X-ERRANDS-COLOR");
+      t->color = color ? color : strdup("");
+
+      char *completed = get_ical_value(todo, "STATUS");
+      if (completed) {
+        t->completed = !strcmp(completed, "COMPLETED") ? true : false;
+        free(completed);
+      }
+
+      char *changed_at = get_ical_value(todo, "LAST-MODIFIED");
+      t->changed_at = changed_at ? changed_at : get_date_time();
+
+      char *created_at = get_ical_value(todo, "CREATED");
+      t->created_at = created_at ? created_at : strdup(t->changed_at);
+
+      t->deleted = false;
+
+      char *due = get_ical_value(todo, "DUE");
+      t->due_date = due ? due : strdup("");
+
+      t->expanded = false;
+      t->list_uid = strdup(list_uid);
+
+      char *notes = get_ical_value(todo, "DESCRIPTION");
+      t->notes = notes ? notes : strdup("");
+
+      t->notified = false;
+
+      char *parent = get_ical_value(todo, "RELATED-TO");
+      t->parent = parent ? parent : strdup("");
+
+      char *percent_complete = get_ical_value(todo, "PERCENT-COMPLETE");
+      t->percent_complete = percent_complete ? atoi(percent_complete) : 0;
+
+      char *priority = get_ical_value(todo, "PRIORITY");
+      t->priority = priority ? atoi(priority) : 0;
+
+      char *rrule = get_ical_value(todo, "RRULE");
+      t->rrule = rrule ? rrule : strdup("");
+
+      char *start_date = get_ical_value(todo, "DTSTART");
+      t->start_date = start_date ? start_date : strdup("");
+
+      t->synced = false;
+      t->tags = g_ptr_array_new();
+
+      char *text = get_ical_value(todo, "SUMMARY");
+      t->text = text ? text : strdup("Task Text");
+
+      t->toolbar_shown = false;
+      t->trash = false;
+      t->uid = g_uuid_string_random();
+
+      g_ptr_array_add(out, t);
+    }
+    g_ptr_array_free(todos, true);
+  }
+  // for_range(i, 0, out->len) { LOG("%s", ((TaskData *)(out->pdata[i]))->uid); }
+  return out;
 }
 
 // --- PRINTING --- //

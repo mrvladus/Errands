@@ -44,8 +44,11 @@ typedef struct {
   char *uid;
 } TaskListData;
 
+// Load user data from data.json
 void errands_data_load();
+// Write user data to data.json
 void errands_data_write();
+// Add new task list with name
 TaskListData *errands_data_add_list(const char *name);
 void errands_data_free_list(TaskListData *data);
 void errands_data_delete_list(TaskListData *data);
@@ -53,10 +56,12 @@ void errands_data_delete_list(TaskListData *data);
 char *errands_data_task_list_as_ical(TaskListData *data);
 TaskData *errands_data_add_task(char *text, char *list_uid, char *parent_uid);
 void errands_data_free_task(TaskData *data);
-void errands_data_delete_task(const char *list_uid, const char *uid);
 TaskData *errands_data_get_task(char *uid);
 // Allocated string in ICAL format for task
 char *errands_data_task_as_ical(TaskData *data);
+GPtrArray *errands_data_tasks_from_ical(const char *ical, const char *list_uid);
+// Create TaskListData from ical string
+TaskListData *errands_task_list_from_ical(const char *ical);
 // Get task list as formatted for printing string. Return value must be freed.
 GString *errands_data_print_list(char *list_uid);
 
