@@ -6,6 +6,9 @@
 #include "../state.h"
 #include "../task-list.h"
 #include "../utils.h"
+#include "gdk/gdk.h"
+#include "glib-object.h"
+#include "gtk/gtk.h"
 
 #include <glib/gi18n.h>
 
@@ -19,12 +22,19 @@ static void on_action_export(GSimpleAction *action, GVariant *param,
 static void on_action_delete(GSimpleAction *action, GVariant *param,
                              ErrandsSidebarTaskListRow *row);
 static void on_action_print(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row);
+static GdkContentProvider *on_drag_prepare(GtkDragSource *source, double x, double y,
+                                           ErrandsSidebarTaskListRow *row);
+static void on_drag_begin(GtkDragSource *source, GdkDrag *drag, ErrandsSidebarTaskListRow *row);
+static gboolean on_drop(GtkDropTarget *target, const GValue *value, double x, double y,
+                        ErrandsSidebarTaskListRow *row);
 
 G_DEFINE_TYPE(ErrandsSidebarTaskListRow, errands_sidebar_task_list_row, GTK_TYPE_LIST_BOX_ROW)
 
 static void errands_sidebar_task_list_row_class_init(ErrandsSidebarTaskListRowClass *class) {}
 
 static void errands_sidebar_task_list_row_init(ErrandsSidebarTaskListRow *self) {
+  gtk_widget_add_css_class(GTK_WIDGET(self), "sidebar-task-list-row");
+
   // Box
   GtkWidget *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
   gtk_list_box_row_set_child(GTK_LIST_BOX_ROW(self), box);
@@ -65,6 +75,18 @@ static void errands_sidebar_task_list_row_init(ErrandsSidebarTaskListRow *self) 
       4, "rename", on_action_rename, self, "delete", on_action_delete, self, "print",
       on_action_print, self, "export", on_action_export, self);
   gtk_widget_insert_action_group(GTK_WIDGET(self), "task-list-row", G_ACTION_GROUP(ag));
+
+  // DND
+  GtkDragSource *drag_source = gtk_drag_source_new();
+  gtk_drag_source_set_actions(drag_source, GDK_ACTION_MOVE);
+  g_signal_connect(drag_source, "prepare", G_CALLBACK(on_drag_prepare), self);
+  g_signal_connect(drag_source, "drag-begin", G_CALLBACK(on_drag_begin), self);
+  gtk_widget_add_controller(GTK_WIDGET(self), GTK_EVENT_CONTROLLER(drag_source));
+
+  // Drop target setup
+  GtkDropTarget *drop_target = gtk_drop_target_new(G_TYPE_OBJECT, GDK_ACTION_MOVE);
+  g_signal_connect(drop_target, "drop", G_CALLBACK(on_drop), self);
+  gtk_widget_add_controller(GTK_WIDGET(self), GTK_EVENT_CONTROLLER(drop_target));
 }
 
 ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_new(TaskListData *data) {
@@ -269,4 +291,44 @@ static void on_action_print(GSimpleAction *action, GVariant *param,
   GString *str = errands_data_print_list(row->data->uid);
   start_print(str->str);
   g_string_free(str, true);
+}
+
+// --- DND --- //
+
+static GdkContentProvider *on_drag_prepare(GtkDragSource *source, double x, double y,
+                                           ErrandsSidebarTaskListRow *row) {
+  GValue value = G_VALUE_INIT;
+  g_value_init(&value, G_TYPE_OBJECT);
+  g_value_set_object(&value, row);
+  return gdk_content_provider_new_for_value(&value);
+}
+
+static void on_drag_begin(GtkDragSource *source, GdkDrag *drag, ErrandsSidebarTaskListRow *row) {
+  g_object_set(gtk_drag_icon_get_for_drag(drag), "child",
+               g_object_new(GTK_TYPE_BUTTON, "label", row->data->name, NULL), NULL);
+}
+
+static gboolean on_drop(GtkDropTarget *target, const GValue *value, double x, double y,
+                        ErrandsSidebarTaskListRow *target_row) {
+
+  ErrandsSidebarTaskListRow *row = g_value_get_object(value);
+  if (!ERRANDS_IS_SIDEBAR_TASK_LIST_ROW(row))
+    return false;
+  LOG("Reorder task lists");
+  // Move widget
+  int idx = gtk_list_box_row_get_index(GTK_LIST_BOX_ROW(target_row));
+  GtkListBox *box = (GtkListBox *)gtk_widget_get_parent(GTK_WIDGET(row));
+  gtk_list_box_remove(box, GTK_WIDGET(row));
+  gtk_list_box_insert(box, GTK_WIDGET(row), idx);
+  // Move data
+  guint idx_to_move, idx_to_move_before;
+  g_ptr_array_find(state.tl_data, row->data, &idx_to_move);
+  TaskListData *to_move = g_ptr_array_steal_index(state.tl_data, idx_to_move);
+  g_ptr_array_find(state.tl_data, target_row->data, &idx_to_move_before);
+  if (idx_to_move < idx_to_move_before)
+    g_ptr_array_insert(state.tl_data, idx_to_move_before + 1, to_move);
+  else
+    g_ptr_array_insert(state.tl_data, idx_to_move_before, to_move);
+  errands_data_write();
+  return true;
 }

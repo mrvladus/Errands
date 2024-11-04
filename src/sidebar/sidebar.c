@@ -8,11 +8,6 @@
 
 #include <glib/gi18n.h>
 
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 // --- DECLARATIONS --- //
 
 static void on_errands_sidebar_filter_row_activated(GtkListBox *box, GtkListBoxRow *row,
@@ -38,6 +33,7 @@ static void errands_sidebar_init(ErrandsSidebar *self) {
 
   // Add list button
   GtkWidget *add_btn = gtk_button_new_from_icon_name("errands-add-symbolic");
+  g_object_set(add_btn, "tooltip-text", _("Add Task List (Ctrl+Shift+N)"), NULL);
   g_signal_connect(add_btn, "clicked", G_CALLBACK(errands_new_list_dialog_show), NULL);
   adw_header_bar_pack_start(ADW_HEADER_BAR(hb), add_btn);
   errands_add_shortcut(add_btn, "<Control><Shift>N", "activate");

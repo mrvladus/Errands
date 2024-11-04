@@ -166,6 +166,16 @@
     padding: 2px;
 }
 
+/* Sidebar */
+
+.sidebar-task-list-row {
+    transition: 0.2s;
+}
+
+.sidebar-task-list-row:drop(active) {
+    background-color: var(--blue-1);
+}
+
 /* Overrides */
 
 colorbutton button {
