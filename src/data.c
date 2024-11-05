@@ -346,6 +346,8 @@ char *errands_data_task_as_ical(TaskData *data) {
   GString *ical = g_string_new("BEGIN:VTODO\n");
   // Add UID and SUMMARY
   g_string_append_printf(ical, "UID:%s\nSUMMARY:%s\n", data->uid, data->text ? data->text : "");
+  if (strcmp(data->color, ""))
+    g_string_append_printf(ical, "X-ERRANDS-COLOR:%s\n", data->color);
   // Add start date if available
   if (strcmp(data->start_date, ""))
     g_string_append_printf(ical, "DTSTART:%s\n", data->start_date);
@@ -367,6 +369,25 @@ char *errands_data_task_as_ical(TaskData *data) {
     g_string_append(ical, "STATUS:COMPLETED\n");
   else
     g_string_append(ical, "STATUS:IN-PROCESS\n");
+  // Add changed_at if available
+  if (strcmp(data->changed_at, ""))
+    g_string_append_printf(ical, "LAST-MODIFIED:%s\n", data->changed_at);
+  // Add created_at if available
+  if (strcmp(data->created_at, ""))
+    g_string_append_printf(ical, "CREATED:%s\n", data->created_at);
+  // Add parent if available
+  if (strcmp(data->parent, ""))
+    g_string_append_printf(ical, "RELATED-TO:%s\n", data->parent);
+  // Add tags if available
+  if (data->tags->len > 0) {
+    g_string_append(ical, "CATEGORIES:");
+    for (guint i = 0; i < data->tags->len; i++) {
+      char *tag = data->tags->pdata[i];
+      if (tag && strcmp(tag, ""))
+        g_string_append(ical, tag);
+    }
+    g_string_append(ical, "\n");
+  }
   // End the VTODO and VCALENDAR sections
   g_string_append(ical, "END:VTODO\n");
   // Return the string and free the GString structure
@@ -418,9 +439,13 @@ GPtrArray *errands_data_tasks_from_ical(const char *ical, const char *list_uid) 
 
       char *percent_complete = get_ical_value(todo, "PERCENT-COMPLETE");
       t->percent_complete = percent_complete ? atoi(percent_complete) : 0;
+      if (percent_complete)
+        free(percent_complete);
 
       char *priority = get_ical_value(todo, "PRIORITY");
       t->priority = priority ? atoi(priority) : 0;
+      if (priority)
+        free(priority);
 
       char *rrule = get_ical_value(todo, "RRULE");
       t->rrule = rrule ? rrule : strdup("");
@@ -442,7 +467,6 @@ GPtrArray *errands_data_tasks_from_ical(const char *ical, const char *list_uid) 
     }
     g_ptr_array_free(todos, true);
   }
-  // for_range(i, 0, out->len) { LOG("%s", ((TaskData *)(out->pdata[i]))->uid); }
   return out;
 }
 
