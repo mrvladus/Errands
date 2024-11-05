@@ -23,8 +23,8 @@ typedef struct {
   char *notes;
   bool notified;
   char *parent;
-  uint8_t percent_complete;
-  uint8_t priority;
+  int percent_complete;
+  int priority;
   char *rrule;
   char *start_date;
   bool synced;

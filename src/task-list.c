@@ -65,7 +65,7 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   // Tasks Box
   self->task_list = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   g_object_set(self->task_list, "margin-bottom", 18, NULL);
-  LOG("Loading tasks");
+  LOG("Task List: Loading tasks");
   for (int i = 0; i < state.t_data->len; i++) {
     TaskData *data = state.t_data->pdata[i];
     if (!strcmp(data->parent, "") && !data->deleted)
@@ -159,9 +159,12 @@ void errands_task_list_filter_by_uid(const char *uid) {
 }
 
 void errands_task_list_filter_by_text(const char *text) {
+  LOG("Task List: Filter by text '%s'", text);
+
   GPtrArray *tasks = get_children(state.task_list->task_list);
+  bool search_all_tasks = !state.task_list->data || !strcmp(state.task_list->data->uid, "");
   // Search all tasks
-  if (!strcmp(state.task_list->data->uid, "")) {
+  if (search_all_tasks) {
     for (int i = 0; i < tasks->len; i++) {
       ErrandsTask *task = tasks->pdata[i];
       bool contains = string_contains(task->data->text, text) ||
@@ -182,6 +185,7 @@ void errands_task_list_filter_by_text(const char *text) {
                                !strcmp(task->data->list_uid, state.task_list->data->uid) &&
                                contains);
   }
+  LOG("asdasd");
 }
 
 static bool errands_task_list_sorted_by_completion(GtkWidget *task_list) {
