@@ -315,6 +315,8 @@ static gboolean on_drop(GtkDropTarget *target, const GValue *value, double x, do
   ErrandsSidebarTaskListRow *row = g_value_get_object(value);
   if (!ERRANDS_IS_SIDEBAR_TASK_LIST_ROW(row))
     return false;
+  if (row == target_row)
+    return false;
   LOG("Reorder task lists");
   // Move widget
   int idx = gtk_list_box_row_get_index(GTK_LIST_BOX_ROW(target_row));

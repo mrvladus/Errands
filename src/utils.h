@@ -136,7 +136,7 @@ static inline char *generate_hex() {
 static inline char *gdk_rgba_to_hex_string(const GdkRGBA *rgba) {
   // Allocate memory for the hex string (7 characters: #RRGGBB + null
   // terminator)
-  static char hex_string[8];
+  char *hex_string = malloc(8);
   // Convert the RGBA components to integers in the range [0, 255]
   int r = (int)(rgba->red * 255);
   int g = (int)(rgba->green * 255);

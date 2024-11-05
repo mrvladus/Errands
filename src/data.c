@@ -13,31 +13,118 @@
 
 // --- READ / WRITE --- //
 
-// Function to read a file into a string
+#define MAX_BACKUPS 10
+#define BACKUP_PREFIX "data-"
+#define BACKUP_SUFFIX ".json"
+
+// Function to create a backup of the data.json file
+void create_backup(const char *data_file_path) {
+  // const char *backup_dir = g_path_get_dirname(data_file_path);
+  // char backup_file_path[strlen(data_file_path) + 20];
+  // time_t now = time(NULL);
+  // struct tm *tm_info = localtime(&now);
+
+  // // Create a timestamp for the backup file
+  // char timestamp[20];
+  // strftime(timestamp, sizeof(timestamp), "%Y%m%d%H%M%S", tm_info);
+
+  // // Create the backup file name
+  // snprintf(backup_file_path, sizeof(backup_file_path), "%s/%s%s%s", backup_dir, BACKUP_PREFIX,
+  //          timestamp, BACKUP_SUFFIX);
+
+  // // Copy the data.json file to the backup file
+  // FILE *src_file = fopen(data_file_path, "rb");
+  // if (src_file) {
+  //   FILE *dest_file = fopen(backup_file_path, "wb");
+  //   if (dest_file) {
+  //     char buffer[1024];
+  //     size_t bytes;
+  //     while ((bytes = fread(buffer, 1, sizeof(buffer), src_file)) > 0) {
+  //       fwrite(buffer, 1, bytes, dest_file);
+  //     }
+  //     fclose(dest_file);
+  //   }
+  //   fclose(src_file);
+  // }
+
+  // // Check for existing backups and manage them
+  // DIR *dir = opendir(backup_dir);
+  // if (dir) {
+  //   struct dirent *entry;
+  //   int backup_count = 0;
+  //   char oldest_backup[256];
+  //   time_t oldest_time = time(NULL);
+
+  //   // Count existing backups and find the oldest one
+  //   while ((entry = readdir(dir)) != NULL) {
+  //     if (strstr(entry->d_name, BACKUP_PREFIX) == entry->d_name &&
+  //         strstr(entry->d_name, BACKUP_SUFFIX) != NULL) {
+  //       backup_count++;
+  //       char full_path[256];
+  //       snprintf(full_path, sizeof(full_path), "%s/%s", backup_dir, entry->d_name);
+  //       struct stat file_stat;
+  //       stat(full_path, &file_stat);
+  //       if (file_stat.st_mtime < oldest_time) {
+  //         oldest_time = file_stat.st_mtime;
+  //         strcpy(oldest_backup, full_path);
+  //       }
+  //     }
+  //   }
+  //   closedir(dir);
+
+  //   // If there are more than MAX_BACKUPS, delete the oldest one
+  //   if (backup_count >= MAX_BACKUPS) {
+  //     remove(oldest_backup);
+  //   }
+  // }
+}
+
+// Function to validate JSON data
+static bool validate_json(const char *json_data) {
+  cJSON *json = cJSON_Parse(json_data);
+  if (json == NULL)
+    return false;
+  cJSON_Delete(json);
+  return true;
+}
+
+// Function to read a data.json file
 static char *errands_data_read() {
-  // Get data dir
   const char *data_dir = g_build_path("/", g_get_user_data_dir(), "errands", NULL);
-  // Create if not exist
   if (!directory_exists(data_dir))
     g_mkdir_with_parents(data_dir, 0755);
-  // Get data.json file path
   const char *data_file_path = g_build_path("/", data_dir, "data.json", NULL);
-  // Create if not exist
   if (!file_exists(data_file_path)) {
     FILE *file = fopen(data_file_path, "w");
     fprintf(file, "{\"lists\":[],\"tags\":[],\"tasks\":[]}");
     fclose(file);
+  } else {
+    create_backup(data_file_path);
   }
-  char *out = read_file_to_string(data_file_path);
+  char *json_data = read_file_to_string(data_file_path);
+  if (json_data == NULL) {
+    g_free((gpointer)data_dir);
+    g_free((gpointer)data_file_path);
+    return NULL;
+  }
+  if (!validate_json(json_data)) {
+    free(json_data);
+    g_free((gpointer)data_dir);
+    g_free((gpointer)data_file_path);
+    return NULL;
+  }
   g_free((gpointer)data_dir);
   g_free((gpointer)data_file_path);
-  return out;
+  return json_data;
 }
 
 // Load user data from data.json
 void errands_data_load() {
   LOG("Loading user data");
   char *data = errands_data_read();
+  if (!data)
+    return;
+
   cJSON *json = cJSON_Parse(data);
   free(data);
 
