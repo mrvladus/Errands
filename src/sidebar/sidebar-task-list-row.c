@@ -142,7 +142,8 @@ void on_errands_sidebar_task_list_row_activate(GtkListBox *box, ErrandsSidebarTa
   errands_task_list_filter_by_uid(row->data->uid);
   state.task_list->data = row->data;
   // Show entry
-  gtk_revealer_set_reveal_child(GTK_REVEALER(state.task_list->entry), true);
+  if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(state.task_list->search_btn)))
+    gtk_revealer_set_reveal_child(GTK_REVEALER(state.task_list->entry), true);
   // Update title
   errands_task_list_update_title();
 

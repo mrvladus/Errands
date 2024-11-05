@@ -36,13 +36,15 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   // Search Bar
   GtkWidget *sb = gtk_search_bar_new();
   adw_toolbar_view_add_top_bar(ADW_TOOLBAR_VIEW(tb), sb);
-  GtkWidget *s_btn = gtk_toggle_button_new();
-  g_object_set(s_btn, "icon-name", "errands-search-symbolic", NULL);
-  gtk_widget_add_css_class(s_btn, "flat");
-  g_object_bind_property(s_btn, "active", sb, "search-mode-enabled", G_BINDING_BIDIRECTIONAL);
-  g_signal_connect(s_btn, "toggled", G_CALLBACK(on_search_btn_toggle), NULL);
-  errands_add_shortcut(s_btn, "<Control>F", "activate");
-  adw_header_bar_pack_end(ADW_HEADER_BAR(hb), s_btn);
+  self->search_btn = gtk_toggle_button_new();
+  g_object_set(self->search_btn, "icon-name", "errands-search-symbolic", "tooltip-text",
+               _("Search (Ctrl+F)"), NULL);
+  gtk_widget_add_css_class(self->search_btn, "flat");
+  g_object_bind_property(self->search_btn, "active", sb, "search-mode-enabled",
+                         G_BINDING_BIDIRECTIONAL);
+  g_signal_connect(self->search_btn, "toggled", G_CALLBACK(on_search_btn_toggle), NULL);
+  errands_add_shortcut(self->search_btn, "<Control>F", "activate");
+  adw_header_bar_pack_end(ADW_HEADER_BAR(hb), self->search_btn);
   GtkWidget *se = gtk_search_entry_new();
   g_signal_connect(se, "search-changed", G_CALLBACK(on_task_list_search), NULL);
   gtk_search_bar_connect_entry(GTK_SEARCH_BAR(sb), GTK_EDITABLE(se));
@@ -261,6 +263,7 @@ static void on_task_list_search(GtkSearchEntry *entry, gpointer user_data) {
 
 static void on_search_btn_toggle(GtkToggleButton *btn) {
   bool active = gtk_toggle_button_get_active(btn);
+  LOG("Task List: Toggle search %s", active ? "on" : "off");
   if (state.task_list->data)
     gtk_revealer_set_reveal_child(GTK_REVEALER(state.task_list->entry), !active);
   else

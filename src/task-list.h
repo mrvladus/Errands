@@ -6,12 +6,12 @@
 
 #define ERRANDS_TYPE_TASK_LIST (errands_task_list_get_type())
 
-G_DECLARE_FINAL_TYPE(ErrandsTaskList, errands_task_list, ERRANDS, TASK_LIST,
-                     AdwBin)
+G_DECLARE_FINAL_TYPE(ErrandsTaskList, errands_task_list, ERRANDS, TASK_LIST, AdwBin)
 
 struct _ErrandsTaskList {
   AdwBin parent_instance;
   GtkWidget *title;
+  GtkWidget *search_btn;
   GtkWidget *entry;
   GtkWidget *task_list;
   TaskListData *data;
