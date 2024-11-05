@@ -18,9 +18,8 @@ static char *errands_data_read() {
   // Get data dir
   const char *data_dir = g_build_path("/", g_get_user_data_dir(), "errands", NULL);
   // Create if not exist
-  if (!directory_exists(data_dir)) {
+  if (!directory_exists(data_dir))
     g_mkdir_with_parents(data_dir, 0755);
-  }
   // Get data.json file path
   const char *data_file_path = g_build_path("/", data_dir, "data.json", NULL);
   // Create if not exist
@@ -77,9 +76,8 @@ void errands_data_load() {
     // Get attachments
     t->attachments = g_ptr_array_new();
     cJSON *atch_arr = cJSON_GetObjectItem(item, "attachments");
-    for (int i = 0; i < cJSON_GetArraySize(atch_arr); i++) {
+    for (int i = 0; i < cJSON_GetArraySize(atch_arr); i++)
       g_ptr_array_add(t->attachments, strdup(cJSON_GetArrayItem(atch_arr, i)->valuestring));
-    }
     t->color = strdup(cJSON_GetObjectItem(item, "color")->valuestring);
     t->completed = (bool)cJSON_GetObjectItem(item, "completed")->valueint;
     t->changed_at = strdup(cJSON_GetObjectItem(item, "changed_at")->valuestring);
@@ -99,9 +97,8 @@ void errands_data_load() {
     // Get tags
     t->tags = g_ptr_array_new();
     cJSON *tags_arr = cJSON_GetObjectItem(item, "tags");
-    for (int i = 0; i < cJSON_GetArraySize(tags_arr); i++) {
+    for (int i = 0; i < cJSON_GetArraySize(tags_arr); i++)
       g_ptr_array_add(t->tags, strdup(cJSON_GetArrayItem(tags_arr, i)->valuestring));
-    }
     t->text = strdup(cJSON_GetObjectItem(item, "text")->valuestring);
     t->toolbar_shown = (bool)cJSON_GetObjectItem(item, "toolbar_shown")->valueint;
     t->trash = (bool)cJSON_GetObjectItem(item, "trash")->valueint;
@@ -241,11 +238,10 @@ void errands_data_delete_list(TaskListData *data) {
   for (int i = 0; i < state.t_data->len; i++) {
     TaskData *td = state.t_data->pdata[i];
     LOG("Data: deleting task '%s'", td->uid);
-    if (!strcmp(data->uid, td->list_uid)) {
+    if (!strcmp(data->uid, td->list_uid))
       errands_data_free_task(td);
-    } else {
+    else
       g_ptr_array_add(new_t_data, td);
-    }
   }
   g_ptr_array_free(state.t_data, TRUE);
   state.t_data = new_t_data;
@@ -253,20 +249,19 @@ void errands_data_delete_list(TaskListData *data) {
 }
 
 char *errands_data_task_list_as_ical(TaskListData *data) {
-  GString *ical = g_string_new("BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Errands\n");
-  g_string_append_printf(ical, "X-WR-CALNAME:%s\n", data->name);
+  str ical = str_new("BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Errands\n");
+  str_append_printf(&ical, "X-WR-CALNAME:%s\n", data->name);
   if (data->color)
-    g_string_append_printf(ical, "X-APPLE-CALENDAR-COLOR:%s\n", data->color);
+    str_append_printf(&ical, "X-APPLE-CALENDAR-COLOR:%s\n", data->color);
   // Add tasks
   for (int i = 0; i < state.t_data->len; i++) {
     TaskData *td = state.t_data->pdata[i];
     char *task_ical = errands_data_task_as_ical(td);
-    g_string_append(ical, task_ical);
+    str_append(&ical, task_ical);
     free(task_ical);
   }
-  g_string_append(ical, "END:VCALENDAR\n");
-  char *ical_str = g_string_free(ical, FALSE);
-  return ical_str;
+  str_append(&ical, "END:VCALENDAR\n");
+  return ical.str;
 }
 
 TaskListData *errands_task_list_from_ical(const char *ical) {
@@ -342,58 +337,54 @@ char *errands_data_task_as_ical(TaskData *data) {
   // Ensure that mandatory fields like UID are set
   if (data->uid == NULL)
     return NULL; // UID is required for VTODO
-  // Create a GString to build the iCal output dynamically
-  GString *ical = g_string_new("BEGIN:VTODO\n");
+  str ical = str_new("BEGIN:VTODO\n");
   // Add UID and SUMMARY
-  g_string_append_printf(ical, "UID:%s\nSUMMARY:%s\n", data->uid, data->text ? data->text : "");
+  str_append_printf(&ical, "UID:%s\nSUMMARY:%s\n", data->uid, data->text ? data->text : "");
   if (strcmp(data->color, ""))
-    g_string_append_printf(ical, "X-ERRANDS-COLOR:%s\n", data->color);
+    str_append_printf(&ical, "X-ERRANDS-COLOR:%s\n", data->color);
   // Add start date if available
   if (strcmp(data->start_date, ""))
-    g_string_append_printf(ical, "DTSTART:%s\n", data->start_date);
+    str_append_printf(&ical, "DTSTART:%s\n", data->start_date);
   // Add due date if available
   if (strcmp(data->due_date, ""))
-    g_string_append_printf(ical, "DUE:%s\n", data->due_date);
+    str_append_printf(&ical, "DUE:%s\n", data->due_date);
   // Add recurrence rule if available
   if (strcmp(data->rrule, ""))
-    g_string_append_printf(ical, "RRULE:%s\n", data->rrule);
+    str_append_printf(&ical, "RRULE:%s\n", data->rrule);
   // Add description (notes) if available
   if (strcmp(data->notes, ""))
-    g_string_append_printf(ical, "DESCRIPTION:%s\n", data->notes);
+    str_append_printf(&ical, "DESCRIPTION:%s\n", data->notes);
   // Add priority
-  g_string_append_printf(ical, "PRIORITY:%d\n", data->priority);
+  str_append_printf(&ical, "PRIORITY:%d\n", data->priority);
   // Add percent complete
-  g_string_append_printf(ical, "PERCENT-COMPLETE:%d\n", data->percent_complete);
+  str_append_printf(&ical, "PERCENT-COMPLETE:%d\n", data->percent_complete);
   // Add completion status
   if (data->completed)
-    g_string_append(ical, "STATUS:COMPLETED\n");
+    str_append(&ical, "STATUS:COMPLETED\n");
   else
-    g_string_append(ical, "STATUS:IN-PROCESS\n");
+    str_append(&ical, "STATUS:IN-PROCESS\n");
   // Add changed_at if available
   if (strcmp(data->changed_at, ""))
-    g_string_append_printf(ical, "LAST-MODIFIED:%s\n", data->changed_at);
+    str_append_printf(&ical, "LAST-MODIFIED:%s\n", data->changed_at);
   // Add created_at if available
   if (strcmp(data->created_at, ""))
-    g_string_append_printf(ical, "CREATED:%s\n", data->created_at);
+    str_append_printf(&ical, "CREATED:%s\n", data->created_at);
   // Add parent if available
   if (strcmp(data->parent, ""))
-    g_string_append_printf(ical, "RELATED-TO:%s\n", data->parent);
+    str_append_printf(&ical, "RELATED-TO:%s\n", data->parent);
   // Add tags if available
   if (data->tags->len > 0) {
-    g_string_append(ical, "CATEGORIES:");
+    str_append(&ical, "CATEGORIES:");
     for (guint i = 0; i < data->tags->len; i++) {
       char *tag = data->tags->pdata[i];
       if (tag && strcmp(tag, ""))
-        g_string_append(ical, tag);
+        str_append(&ical, tag);
     }
-    g_string_append(ical, "\n");
+    str_append(&ical, "\n");
   }
   // End the VTODO and VCALENDAR sections
-  g_string_append(ical, "END:VTODO\n");
-  // Return the string and free the GString structure
-  char *ical_str =
-      g_string_free(ical, FALSE); // Don't free the actual string, just the GString wrapper
-  return ical_str;
+  str_append(&ical, "END:VTODO\n");
+  return ical.str;
 }
 
 GPtrArray *errands_data_tasks_from_ical(const char *ical, const char *list_uid) {
