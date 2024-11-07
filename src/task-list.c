@@ -1,5 +1,6 @@
 #include "task-list.h"
 #include "data.h"
+#include "gio/gio.h"
 #include "sidebar/sidebar-all-row.h"
 #include "sidebar/sidebar-task-list-row.h"
 #include "state.h"
@@ -14,6 +15,7 @@
 static void on_task_added(AdwEntryRow *entry, gpointer data);
 static void on_task_list_search(GtkSearchEntry *entry, gpointer user_data);
 static void on_search_btn_toggle(GtkToggleButton *btn);
+static void on_action_toggle_completed(GSimpleAction *action, GVariant *state, gpointer user_data);
 
 G_DEFINE_TYPE(ErrandsTaskList, errands_task_list, ADW_TYPE_BIN)
 
@@ -21,6 +23,16 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {}
 
 static void errands_task_list_init(ErrandsTaskList *self) {
   LOG("Creating task list");
+
+  // Actions
+  GSimpleActionGroup *ag = g_simple_action_group_new();
+  gtk_widget_insert_action_group(GTK_WIDGET(self), "task-list", G_ACTION_GROUP(ag));
+  GSimpleAction *toggle_completed_action =
+      g_simple_action_new_stateful("toggle-completed", NULL, g_variant_new_boolean(FALSE));
+  g_signal_connect(toggle_completed_action, "change-state", G_CALLBACK(on_action_toggle_completed),
+                   NULL);
+  g_action_map_add_action(G_ACTION_MAP(ag), G_ACTION(toggle_completed_action));
+  g_object_unref(toggle_completed_action);
 
   // Toolbar View
   GtkWidget *tb = adw_toolbar_view_new();
@@ -32,6 +44,24 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   self->title = adw_window_title_new("", "");
   adw_header_bar_set_title_widget(ADW_HEADER_BAR(hb), self->title);
   adw_toolbar_view_add_top_bar(ADW_TOOLBAR_VIEW(tb), hb);
+
+  // Menu Button
+  GtkWidget *menu_btn = gtk_menu_button_new();
+  g_object_set(menu_btn, "icon-name", "open-menu-symbolic", NULL);
+  adw_header_bar_pack_start(ADW_HEADER_BAR(hb), menu_btn);
+
+  // Define the menu model
+  GMenu *menu = g_menu_new();
+  GMenuItem *completed_item = g_menu_item_new(_("Show Completed"), "task-list.toggle-completed");
+  g_menu_item_set_attribute(completed_item, "action-state", "b",
+                            g_variant_new_boolean(FALSE)); // Default state is false
+  g_menu_append_item(menu, completed_item);
+  g_object_unref(completed_item);
+
+  // Set the menu model on the menu button
+  GMenuModel *menu_model = G_MENU_MODEL(menu);
+  gtk_menu_button_set_menu_model(GTK_MENU_BUTTON(menu_btn), menu_model);
+  g_object_unref(menu);
 
   // Search Bar
   GtkWidget *sb = gtk_search_bar_new();
@@ -268,4 +298,22 @@ static void on_search_btn_toggle(GtkToggleButton *btn) {
     gtk_revealer_set_reveal_child(GTK_REVEALER(state.task_list->entry), !active);
   else
     gtk_revealer_set_reveal_child(GTK_REVEALER(state.task_list->entry), false);
+}
+
+static void on_action_toggle_completed(GSimpleAction *action, GVariant *variant,
+                                       gpointer user_data) {
+  bool show_completed = g_variant_get_boolean(variant);
+
+  // Iterate over tasks in the task list and set visibility based on completed state
+  // Update the visibility of completed tasks
+  GPtrArray *tasks = get_children(state.task_list->task_list);
+  for (int i = 0; i < tasks->len; i++) {
+    ErrandsTask *task = tasks->pdata[i];
+    gtk_widget_set_visible(GTK_WIDGET(task), !task->data->completed || show_completed);
+  }
+
+  // Update the action state to reflect the new toggle state
+  g_simple_action_set_state(action, g_variant_new_boolean(show_completed));
+
+  LOG("Task List: Set show completed to '%s'", show_completed ? "on" : "off");
 }
