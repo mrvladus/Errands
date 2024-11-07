@@ -1,91 +1,85 @@
 #include "settings.h"
 #include "external/cJSON.h"
-#include "glib.h"
-#include "state.h"
 #include "utils.h"
 
-#define DEFAULT_WIDTH 800
-#define DEFAULT_HEIGHT 600
+#include <glib.h>
+#include <stdlib.h>
+#include <string.h>
 
-void errands_settings_init() {
-  LOG("Initialize settings.json");
+// Save settings with cooldown period of 1s.
+static void errands_settings_save();
 
-  char *settings_file_path =
-      g_build_path("/", g_get_user_data_dir(), "errands", "settings.json", NULL);
-  if (!file_exists(settings_file_path)) {
-    errands_settings_migrate();
+// --- GLOBAL SETTINGS VARIABLES --- //
 
-    LOG("Create default settings.json");
-
-    char default_settings_format[] = "{\"show_completed\":true,"
-                                     "\"window_width\":%d,"
-                                     "\"window_height\":%d,"
-                                     "\"maximized\":false}";
-    str default_settings = str_new_printf(default_settings_format, DEFAULT_WIDTH, DEFAULT_HEIGHT);
-    FILE *file = fopen(settings_file_path, "w");
-    fprintf(file, "%s", default_settings.str);
-    fclose(file);
-    str_free(&default_settings);
-  } else {
-    LOG("Reading settings.json");
-
-    char *settings_str = read_file_to_string(settings_file_path);
-    if (settings_str) {
-      cJSON *json = cJSON_Parse(settings_str);
-      if (json) {
-        cJSON *show_completed = cJSON_GetObjectItem(json, "show_completed");
-        state.settings.show_completed = show_completed ? (bool)show_completed->valueint : true;
-
-        cJSON *window_width = cJSON_GetObjectItem(json, "window_width");
-        state.settings.window_width = window_width ? window_width->valueint : DEFAULT_WIDTH;
-
-        cJSON *window_height = cJSON_GetObjectItem(json, "window_height");
-        state.settings.window_height = window_height ? window_height->valueint : DEFAULT_HEIGHT;
-
-        cJSON *maximized = cJSON_GetObjectItem(json, "maximized");
-        state.settings.maximized = maximized ? (bool)maximized->valueint : false;
-      }
-      free(settings_str);
-      cJSON_Delete(json);
-    }
-  }
-  g_free(settings_file_path);
-}
-
-void errands_settings_migrate() { LOG("Migrate to settings.json"); }
-
+static const char *settings_path;
+static const char *default_settings =
+    "{\"show_completed\":true,\"window_width\":800,\"window_height\":600,\"maximized\":false}";
 static time_t last_save_time = 0;
 static bool pending_save = false;
+static cJSON *settings;
+
+// Migrate from GSettings to settings.json
+bool errands_settings_migrate() {
+  LOG("Settings: Migrate to settings.json");
+  return false;
+}
+
+void errands_settings_init() {
+  LOG("Settings: Initialize");
+  settings_path = g_build_path("/", g_get_user_data_dir(), "errands", "settings.json", NULL);
+  // Create settings file
+  if (!file_exists(settings_path)) {
+    bool migrated = errands_settings_migrate();
+    if (!migrated) {
+      LOG("Settings: Create default");
+      write_string_to_file(settings_path, default_settings);
+    }
+    settings = cJSON_Parse(default_settings);
+  } else {
+    LOG("Settings: Read");
+    char *settings_str = read_file_to_string(settings_path);
+    if (!settings_str || !strcmp(settings_str, "")) {
+      LOG("Settings: settings.json is corrupted. Creating default.");
+      settings = cJSON_Parse(default_settings);
+      write_string_to_file(settings_path, default_settings);
+      free(settings_str);
+      return;
+    }
+    settings = cJSON_Parse(settings_str);
+    free(settings_str);
+  }
+}
+
+int errands_settings_get_int(const char *key) {
+  return cJSON_GetObjectItem(settings, key)->valueint;
+}
+
+bool errands_settings_get_bool(const char *key) {
+  return cJSON_GetObjectItem(settings, key)->valueint;
+}
+
+char *errands_settings_get_str(const char *key) {
+  return strdup(cJSON_GetObjectItem(settings, key)->valuestring);
+}
+
+void errands_settings_set(const char *key, const char *type, void *value) {
+  cJSON *val = cJSON_GetObjectItem(settings, key);
+  if (!strcmp(type, "int"))
+    cJSON_SetIntValue(val, *(int *)value);
+  else if (!strcmp(type, "bool"))
+    cJSON_SetBoolValue(val, *(bool *)value);
+  else if (!strcmp(type, "string"))
+    cJSON_SetValuestring(val, (const char *)value);
+  errands_settings_save();
+}
+
+// --- SAVING SETTINGS --- //
 
 static void perform_save() {
   LOG("Settings: Save");
-
-  cJSON *json = cJSON_CreateObject();
-
-  cJSON_AddItemToObject(json, "show_completed", cJSON_CreateBool(state.settings.show_completed));
-  cJSON_AddItemToObject(json, "window_width", cJSON_CreateNumber(state.settings.window_width));
-  cJSON_AddItemToObject(json, "window_height", cJSON_CreateNumber(state.settings.window_height));
-  cJSON_AddItemToObject(json, "maximized", cJSON_CreateBool(state.settings.maximized));
-
-  // Save to file
-  char *json_string = cJSON_PrintUnformatted(json);
-  char *settings_file_path =
-      g_build_path("/", g_get_user_data_dir(), "errands", "settings.json", NULL);
-
-  FILE *file = fopen(settings_file_path, "w");
-  if (file == NULL) {
-    LOG("Error opening settings.json file");
-    cJSON_Delete(json);
-    free(json_string);
-  }
-  fprintf(file, "%s", json_string);
-  fclose(file);
-
-  // Clean up
-  cJSON_Delete(json);
+  char *json_string = cJSON_PrintUnformatted(settings);
+  write_string_to_file(settings_path, json_string);
   free(json_string);
-  g_free(settings_file_path);
-
   last_save_time = time(NULL);
   pending_save = false;
 }

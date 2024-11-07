@@ -4,7 +4,6 @@
 #include "dialogs/new-list-dialog.h"
 #include "dialogs/rename-list-dialog.h"
 #include "no-lists-page.h"
-#include "settings.h"
 #include "sidebar/sidebar.h"
 #include "task-list.h"
 #include "task/attachments-window.h"
@@ -46,9 +45,6 @@ typedef struct {
   GPtrArray *tl_data;
   GPtrArray *t_data;
   GPtrArray *tags_data;
-
-  // Settings
-  ErrandsSettings settings;
 } State;
 
 // Global state object

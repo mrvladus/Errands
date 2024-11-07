@@ -1,7 +1,6 @@
 #include "window.h"
 #include "dialogs/delete-list-dialog.h"
 #include "dialogs/rename-list-dialog.h"
-#include "gtk/gtk.h"
 #include "no-lists-page.h"
 #include "settings.h"
 #include "sidebar/sidebar.h"
@@ -38,10 +37,10 @@ static void errands_window_init(ErrandsWindow *self) {
 
 ErrandsWindow *errands_window_new() {
   ErrandsWindow *self = g_object_new(ERRANDS_TYPE_WINDOW, NULL);
-  if (state.settings.maximized)
+  if (errands_settings_get_bool("maximized"))
     gtk_window_maximize(GTK_WINDOW(self));
-  gtk_window_set_default_size(GTK_WINDOW(self), state.settings.window_width,
-                              state.settings.window_height);
+  gtk_window_set_default_size(GTK_WINDOW(self), errands_settings_get_int("window_width"),
+                              errands_settings_get_int("window_height"));
   g_signal_connect_swapped(self, "notify::default-width", G_CALLBACK(on_size_changed), self);
   g_signal_connect_swapped(self, "notify::default-height", G_CALLBACK(on_size_changed), self);
   g_signal_connect_swapped(self, "notify::maximized", G_CALLBACK(on_state_changed), self);
@@ -87,12 +86,13 @@ void errands_window_update(ErrandsWindow *win) {
 // --- SIGNAL HANDLERS --- //
 
 static void on_size_changed(ErrandsWindow *win) {
-  gtk_window_get_default_size(GTK_WINDOW(win), &state.settings.window_width,
-                              &state.settings.window_height);
-  errands_settings_save();
+  int w, h;
+  gtk_window_get_default_size(GTK_WINDOW(win), &w, &h);
+  errands_settings_set("window_width", "int", &w);
+  errands_settings_set("window_height", "int", &h);
 }
 
 static void on_state_changed(ErrandsWindow *win) {
-  state.settings.maximized = gtk_window_is_maximized(GTK_WINDOW(win));
-  errands_settings_save();
+  bool m = gtk_window_is_maximized(GTK_WINDOW(win));
+  errands_settings_set("maximized", "bool", &m);
 }

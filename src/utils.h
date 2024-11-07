@@ -47,6 +47,14 @@ static inline char *read_file_to_string(const char *path) {
   return buf;
 }
 
+static inline void write_string_to_file(const char *path, const char *str) {
+  FILE *file = fopen(path, "w");
+  if (file) {
+    fprintf(file, "%s", str);
+    fclose(file);
+  }
+}
+
 // Get children of the widget
 static inline GPtrArray *get_children(GtkWidget *parent) {
   GPtrArray *children = g_ptr_array_new();
