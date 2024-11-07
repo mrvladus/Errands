@@ -11,6 +11,7 @@ G_DECLARE_FINAL_TYPE(ErrandsSidebar, errands_sidebar, ERRANDS, SIDEBAR, AdwBin)
 
 struct _ErrandsSidebar {
   AdwBin parent_instance;
+  GtkWidget *add_btn;
   GtkWidget *filters_box;
   ErrandsSidebarAllRow *all_row;
   GtkWidget *task_lists_box;
@@ -19,6 +20,5 @@ struct _ErrandsSidebar {
 ErrandsSidebar *errands_sidebar_new();
 
 // ErrandsSidebarTaskListRow *errands_sidebar_get_list_row(const char *uid);
-ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(ErrandsSidebar *sb,
-                                                         TaskListData *data);
+ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(ErrandsSidebar *sb, TaskListData *data);
 void errands_sidebar_select_last_opened_page();

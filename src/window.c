@@ -1,6 +1,8 @@
 #include "window.h"
 #include "dialogs/delete-list-dialog.h"
 #include "dialogs/rename-list-dialog.h"
+#include "gtk/gtk.h"
+#include "no-lists-page.h"
 #include "settings.h"
 #include "sidebar/sidebar.h"
 #include "state.h"
@@ -27,7 +29,11 @@ static void errands_window_init(ErrandsWindow *self) {
   g_object_set(self, "application", GTK_APPLICATION(state.app), "title", _("Errands"), NULL);
   self->stack = adw_view_stack_new();
   self->split_view = adw_navigation_split_view_new();
-  adw_application_window_set_content(ADW_APPLICATION_WINDOW(self), self->split_view);
+  self->no_lists_page = errands_no_lists_page_new();
+  GtkWidget *overlay = gtk_overlay_new();
+  gtk_overlay_add_overlay(GTK_OVERLAY(overlay), GTK_WIDGET(self->no_lists_page));
+  gtk_overlay_set_child(GTK_OVERLAY(overlay), self->split_view);
+  adw_application_window_set_content(ADW_APPLICATION_WINDOW(self), overlay);
 }
 
 ErrandsWindow *errands_window_new() {
@@ -67,6 +73,18 @@ void errands_window_build(ErrandsWindow *win) {
   state.delete_list_dialog = errands_delete_list_dialog_new();
   state.no_lists_page = errands_no_lists_page_new();
 }
+
+void errands_window_update(ErrandsWindow *win) {
+  int count = 0;
+  for (int i = 0; i < state.tl_data->len; i++) {
+    TaskListData *tld = state.tl_data->pdata[i];
+    if (!tld->deleted)
+      count++;
+  }
+  g_object_set(state.main_window->no_lists_page, "visible", count == 0, NULL);
+}
+
+// --- SIGNAL HANDLERS --- //
 
 static void on_size_changed(ErrandsWindow *win) {
   gtk_window_get_default_size(GTK_WINDOW(win), &state.settings.window_width,

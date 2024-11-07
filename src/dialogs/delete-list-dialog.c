@@ -56,6 +56,9 @@ static void on_response_cb(ErrandsDeleteListDialog *dialog, gchar *response, gpo
     errands_data_delete_list(dialog->row->data);
     errands_data_write();
 
+    // Show placeholder
+    errands_window_update(state.main_window);
+
     GtkWidget *prev = gtk_widget_get_prev_sibling(GTK_WIDGET(dialog->row));
     GtkWidget *next = gtk_widget_get_next_sibling(GTK_WIDGET(dialog->row));
     // Delete sidebar row

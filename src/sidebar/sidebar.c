@@ -35,13 +35,14 @@ static void errands_sidebar_init(ErrandsSidebar *self) {
   adw_toolbar_view_add_top_bar(ADW_TOOLBAR_VIEW(tb), hb);
 
   // Add list button
-  GtkWidget *add_btn = adw_split_button_new();
+  self->add_btn = adw_split_button_new();
   GMenu *menu = errands_menu_new(1, _("Import \".ics\""), "sidebar.import");
-  g_object_set(add_btn, "tooltip-text", _("Add Task List (Ctrl+Shift+N)"), "icon-name",
+  g_object_set(self->add_btn, "tooltip-text", _("Add Task List (Ctrl+Shift+N)"), "icon-name",
                "errands-add-symbolic", "menu-model", menu, NULL);
-  g_signal_connect(add_btn, "clicked", G_CALLBACK(errands_new_list_dialog_show), NULL);
-  errands_add_shortcut(add_btn, "<Control><Shift>N", "activate");
-  adw_header_bar_pack_start(ADW_HEADER_BAR(hb), add_btn);
+  g_signal_connect(self->add_btn, "clicked", G_CALLBACK(errands_new_list_dialog_show), NULL);
+  errands_add_shortcut(self->add_btn, "<Control><Shift>N", "activate");
+  adw_header_bar_pack_start(ADW_HEADER_BAR(hb), self->add_btn);
+  g_object_unref(menu);
 
   // Menu button
   GtkWidget *menu_btn = gtk_menu_button_new();
@@ -77,12 +78,17 @@ static void errands_sidebar_init(ErrandsSidebar *self) {
   gtk_widget_add_css_class(self->task_lists_box, "navigation-sidebar");
   g_signal_connect(self->task_lists_box, "row-activated",
                    G_CALLBACK(on_errands_sidebar_task_list_row_activate), NULL);
+
   // Add rows
+  int count = 0;
   for (int i = 0; i < state.tl_data->len; i++) {
     TaskListData *tld = state.tl_data->pdata[i];
-    if (!tld->deleted)
+    if (!tld->deleted) {
       errands_sidebar_add_task_list(self, tld);
+      count++;
+    }
   }
+  g_object_set(state.main_window->no_lists_page, "visible", count == 0, NULL);
 
   // Sidebar content box
   GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);

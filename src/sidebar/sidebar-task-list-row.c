@@ -6,9 +6,6 @@
 #include "../state.h"
 #include "../task-list.h"
 #include "../utils.h"
-#include "gdk/gdk.h"
-#include "glib-object.h"
-#include "gtk/gtk.h"
 
 #include <glib/gi18n.h>
 
