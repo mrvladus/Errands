@@ -37,10 +37,11 @@ static void errands_window_init(ErrandsWindow *self) {
 
 ErrandsWindow *errands_window_new() {
   ErrandsWindow *self = g_object_new(ERRANDS_TYPE_WINDOW, NULL);
-  if (errands_settings_get_bool("maximized"))
+  if (errands_settings_get("maximized", SETTING_TYPE_BOOL).b)
     gtk_window_maximize(GTK_WINDOW(self));
-  gtk_window_set_default_size(GTK_WINDOW(self), errands_settings_get_int("window_width"),
-                              errands_settings_get_int("window_height"));
+  gtk_window_set_default_size(GTK_WINDOW(self),
+                              errands_settings_get("window_width", SETTING_TYPE_INT).i,
+                              errands_settings_get("window_height", SETTING_TYPE_INT).i);
   g_signal_connect_swapped(self, "notify::default-width", G_CALLBACK(on_size_changed), self);
   g_signal_connect_swapped(self, "notify::default-height", G_CALLBACK(on_size_changed), self);
   g_signal_connect_swapped(self, "notify::maximized", G_CALLBACK(on_state_changed), self);
@@ -88,11 +89,11 @@ void errands_window_update(ErrandsWindow *win) {
 static void on_size_changed(ErrandsWindow *win) {
   int w, h;
   gtk_window_get_default_size(GTK_WINDOW(win), &w, &h);
-  errands_settings_set("window_width", "int", &w);
-  errands_settings_set("window_height", "int", &h);
+  errands_settings_set("window_width", SETTING_TYPE_INT, &w);
+  errands_settings_set("window_height", SETTING_TYPE_INT, &h);
 }
 
 static void on_state_changed(ErrandsWindow *win) {
   bool m = gtk_window_is_maximized(GTK_WINDOW(win));
-  errands_settings_set("maximized", "bool", &m);
+  errands_settings_set("maximized", SETTING_TYPE_BOOL, &m);
 }

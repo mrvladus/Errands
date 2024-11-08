@@ -2,12 +2,17 @@
 
 #include <stdbool.h>
 
+typedef enum { SETTING_TYPE_BOOL, SETTING_TYPE_INT, SETTING_TYPE_STRING } ErrandsSettingType;
+
+typedef union {
+  int i;
+  bool b;
+  char *s;
+} ErrandsSetting;
+
 // Initialize settings.json file
 void errands_settings_init();
-
-bool errands_settings_get_bool(const char *key);
-int errands_settings_get_int(const char *key);
-char *errands_settings_get_str(const char *key);
-
-// Set setting. "type" can be "int", "bool", "string"
-void errands_settings_set(const char *key, const char *type, void *value);
+// Get setting
+ErrandsSetting errands_settings_get(const char *key, ErrandsSettingType type);
+// Set setting
+void errands_settings_set(const char *key, ErrandsSettingType type, void *value);
