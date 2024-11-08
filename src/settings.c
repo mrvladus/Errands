@@ -14,6 +14,8 @@ static time_t last_save_time = 0;
 static bool pending_save = false;
 static cJSON *settings;
 
+// --- LOADING --- //
+
 void errands_settings_load_default() {
   LOG("Settings: Load default configuration");
 
@@ -43,21 +45,14 @@ void errands_settings_load_user() {
     return;
   }
 
-  cJSON *show_completed = cJSON_GetObjectItem(json, "show_completed");
-  if (show_completed)
-    cJSON_ReplaceItemInObject(settings, "show_completed", show_completed);
+  const char *settings_keys[] = {"show_completed", "window_width", "window_height", "maximized"};
 
-  cJSON *window_width = cJSON_GetObjectItem(json, "window_width");
-  if (window_width)
-    cJSON_ReplaceItemInObject(settings, "window_width", window_width);
-
-  cJSON *window_height = cJSON_GetObjectItem(json, "window_height");
-  if (window_height)
-    cJSON_ReplaceItemInObject(settings, "window_height", window_height);
-
-  cJSON *maximized = cJSON_GetObjectItem(json, "maximized");
-  if (maximized)
-    cJSON_ReplaceItemInObject(settings, "maximized", maximized);
+  const int len = sizeof(settings_keys) / sizeof(settings_keys[0]);
+  for (int i = 0; i < len; i++) {
+    cJSON *val = cJSON_GetObjectItem(json, settings_keys[i]);
+    if (val)
+      cJSON_ReplaceItemInObject(settings, settings_keys[i], val);
+  }
 
   errands_settings_save();
 }
@@ -65,15 +60,14 @@ void errands_settings_load_user() {
 // Migrate from GSettings to settings.json
 void errands_settings_migrate() { LOG("Settings: Migrate to settings.json"); }
 
-// Check if settings has all keys, if not - add default ones.
-void errands_settings_upgrade() {}
-
 void errands_settings_init() {
   LOG("Settings: Initialize");
   settings_path = g_build_path("/", g_get_user_data_dir(), "errands", "settings.json", NULL);
   errands_settings_load_default();
   file_exists(settings_path) ? errands_settings_load_user() : errands_settings_migrate();
 }
+
+// --- GET / SET SETTINGS --- //
 
 ErrandsSetting errands_settings_get(const char *key, ErrandsSettingType type) {
   ErrandsSetting setting;
@@ -89,25 +83,12 @@ ErrandsSetting errands_settings_get(const char *key, ErrandsSettingType type) {
 
 void errands_settings_set(const char *key, ErrandsSettingType type, void *value) {
   cJSON *val = cJSON_GetObjectItem(settings, key);
-  // Create key-value if not exists
-  if (!val) {
-    if (type == SETTING_TYPE_INT)
-      val = cJSON_CreateNumber(*(int *)value);
-    else if (type == SETTING_TYPE_BOOL)
-      val = cJSON_CreateBool(*(bool *)value);
-    else if (type == SETTING_TYPE_STRING)
-      val = cJSON_CreateString((const char *)value);
-    cJSON_AddItemToObject(settings, key, val);
-  }
-  // Change existing value
-  else {
-    if (type == SETTING_TYPE_INT)
-      cJSON_SetIntValue(val, *(int *)value);
-    else if (type == SETTING_TYPE_BOOL)
-      cJSON_SetBoolValue(val, *(bool *)value);
-    else if (type == SETTING_TYPE_STRING)
-      cJSON_SetValuestring(val, (const char *)value);
-  }
+  if (type == SETTING_TYPE_INT)
+    cJSON_SetIntValue(val, *(int *)value);
+  else if (type == SETTING_TYPE_BOOL)
+    cJSON_SetBoolValue(val, *(bool *)value);
+  else if (type == SETTING_TYPE_STRING)
+    cJSON_SetValuestring(val, (const char *)value);
   errands_settings_save();
 }
 
