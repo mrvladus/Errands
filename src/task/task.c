@@ -1,6 +1,7 @@
 #include "task.h"
 #include "../components.h"
 #include "../data.h"
+#include "../settings.h"
 #include "../sidebar/sidebar-all-row.h"
 #include "../sidebar/sidebar-task-list-row.h"
 #include "../state.h"
@@ -170,7 +171,10 @@ ErrandsTask *errands_task_new(TaskData *data) {
   task->data = data;
 
   // Setup
-  gtk_revealer_set_reveal_child(GTK_REVEALER(task->revealer), true);
+  gtk_revealer_set_reveal_child(
+      GTK_REVEALER(task->revealer),
+      !data->deleted && !data->trash &&
+          (!data->completed || errands_settings_get("show_completed", SETTING_TYPE_BOOL).b));
   adw_preferences_row_set_title(ADW_PREFERENCES_ROW(task->title_row), data->text);
   gtk_check_button_set_active(GTK_CHECK_BUTTON(task->complete_btn), data->completed);
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(task->toolbar_btn), data->toolbar_shown);
@@ -371,6 +375,11 @@ static void on_errands_task_complete_btn_toggle(GtkCheckButton *btn, ErrandsTask
       gtk_check_button_set_active(GTK_CHECK_BUTTON(parent->complete_btn), false);
   }
   g_ptr_array_free(parents, true);
+
+  gtk_revealer_set_reveal_child(
+      GTK_REVEALER(task->revealer),
+      !task->data->deleted && !task->data->trash &&
+          (!task->data->completed || errands_settings_get("show_completed", SETTING_TYPE_BOOL).b));
 
   // Update task list
   errands_task_list_sort_by_completion(task_list);

@@ -1,6 +1,7 @@
 #include "task-list.h"
 #include "data.h"
 #include "gio/gio.h"
+#include "settings.h"
 #include "sidebar/sidebar-all-row.h"
 #include "sidebar/sidebar-task-list-row.h"
 #include "state.h"
@@ -27,8 +28,9 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   // Actions
   GSimpleActionGroup *ag = g_simple_action_group_new();
   gtk_widget_insert_action_group(GTK_WIDGET(self), "task-list", G_ACTION_GROUP(ag));
-  GSimpleAction *toggle_completed_action =
-      g_simple_action_new_stateful("toggle-completed", NULL, g_variant_new_boolean(FALSE));
+  GSimpleAction *toggle_completed_action = g_simple_action_new_stateful(
+      "toggle-completed", NULL,
+      g_variant_new_boolean(errands_settings_get("show_completed", SETTING_TYPE_BOOL).b));
   g_signal_connect(toggle_completed_action, "change-state", G_CALLBACK(on_action_toggle_completed),
                    NULL);
   g_action_map_add_action(G_ACTION_MAP(ag), G_ACTION(toggle_completed_action));
@@ -174,6 +176,18 @@ void errands_task_list_update_title() {
   g_free(stats);
 }
 
+void errands_task_list_filter_by_completion(GtkWidget *task_list, bool show_completed) {
+  GPtrArray *tasks = get_children(task_list);
+  for (int i = 0; i < tasks->len; i++) {
+    ErrandsTask *task = tasks->pdata[i];
+    gtk_revealer_set_reveal_child(GTK_REVEALER(task->revealer),
+                                  !task->data->deleted && !task->data->trash &&
+                                      (!task->data->completed || show_completed));
+    errands_task_list_filter_by_completion(task->sub_tasks, show_completed);
+  }
+  g_ptr_array_free(tasks, false);
+}
+
 void errands_task_list_filter_by_uid(const char *uid) {
   GPtrArray *tasks = get_children(state.task_list->task_list);
   for (int i = 0; i < tasks->len; i++) {
@@ -303,17 +317,8 @@ static void on_search_btn_toggle(GtkToggleButton *btn) {
 static void on_action_toggle_completed(GSimpleAction *action, GVariant *variant,
                                        gpointer user_data) {
   bool show_completed = g_variant_get_boolean(variant);
-
-  // Iterate over tasks in the task list and set visibility based on completed state
-  // Update the visibility of completed tasks
-  GPtrArray *tasks = get_children(state.task_list->task_list);
-  for (int i = 0; i < tasks->len; i++) {
-    ErrandsTask *task = tasks->pdata[i];
-    gtk_widget_set_visible(GTK_WIDGET(task), !task->data->completed || show_completed);
-  }
-
-  // Update the action state to reflect the new toggle state
+  errands_settings_set("show_completed", SETTING_TYPE_BOOL, &show_completed);
+  errands_task_list_filter_by_completion(state.task_list->task_list, show_completed);
   g_simple_action_set_state(action, g_variant_new_boolean(show_completed));
-
   LOG("Task List: Set show completed to '%s'", show_completed ? "on" : "off");
 }
