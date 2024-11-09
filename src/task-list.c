@@ -49,7 +49,7 @@ static void errands_task_list_init(ErrandsTaskList *self) {
 
   // Menu Button
   GtkWidget *menu_btn = gtk_menu_button_new();
-  g_object_set(menu_btn, "icon-name", "open-menu-symbolic", NULL);
+  g_object_set(menu_btn, "icon-name", "errands-more-symbolic", NULL);
   adw_header_bar_pack_start(ADW_HEADER_BAR(hb), menu_btn);
 
   // Define the menu model
