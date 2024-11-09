@@ -1,10 +1,13 @@
 #include "sidebar.h"
 #include "../components.h"
 #include "../data.h"
+#include "../settings.h"
 #include "../state.h"
 #include "../task-list.h"
 #include "../utils.h"
+#include "glib.h"
 #include "sidebar-all-row.h"
+#include "sidebar-task-list-row.h"
 
 #include <glib/gi18n.h>
 
@@ -116,8 +119,14 @@ ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(ErrandsSidebar *sb, Tas
 }
 
 void errands_sidebar_select_last_opened_page() {
-  // TODO: get page from settings
-  g_signal_emit_by_name(state.sidebar->all_row, "activate", NULL);
+  GPtrArray *rows = get_children(state.sidebar->task_lists_box);
+  char *last_uid = errands_settings_get("last_list_uid", SETTING_TYPE_STRING).s;
+  for (int i = 0; i < rows->len; i++) {
+    ErrandsSidebarTaskListRow *row = rows->pdata[i];
+    if (!strcmp(last_uid, row->data->uid))
+      g_signal_emit_by_name(row, "activate", NULL);
+  }
+  g_ptr_array_free(rows, false);
 }
 
 // --- SIGNAL HANDLERS --- //

@@ -3,6 +3,7 @@
 #include "utils.h"
 
 #include <glib.h>
+#include <stdbool.h>
 
 // Save settings with cooldown period of 1s.
 static void errands_settings_save();
@@ -25,8 +26,7 @@ void errands_settings_load_default() {
   cJSON_AddNumberToObject(settings, "window_width", 800);
   cJSON_AddNumberToObject(settings, "window_height", 600);
   cJSON_AddBoolToObject(settings, "maximized", false);
-
-  errands_settings_save();
+  cJSON_AddStringToObject(settings, "last_list_uid", "");
 }
 
 void errands_settings_load_user() {
@@ -34,27 +34,27 @@ void errands_settings_load_user() {
   char *settings_str = read_file_to_string(settings_path);
   if (!strcmp(settings_str, "")) {
     LOG("Settings: settings.json is empty");
-    errands_settings_save();
     free(settings_str);
     return;
   }
   cJSON *json = cJSON_Parse(settings_str);
   free(settings_str);
-  if (!json) {
-    errands_settings_save();
+  if (!json)
     return;
-  }
 
-  const char *settings_keys[] = {"show_completed", "window_width", "window_height", "maximized"};
+  const char *const settings_keys[] = {"show_completed", "window_width", "window_height",
+                                       "maximized", "last_list_uid"};
 
   const int len = sizeof(settings_keys) / sizeof(settings_keys[0]);
   for (int i = 0; i < len; i++) {
     cJSON *val = cJSON_GetObjectItem(json, settings_keys[i]);
-    if (val)
-      cJSON_ReplaceItemInObject(settings, settings_keys[i], val);
+    if (val) {
+      cJSON *val_cpy = cJSON_Duplicate(val, false);
+      cJSON_DeleteItemFromObject(settings, settings_keys[i]);
+      cJSON_AddItemToObject(settings, settings_keys[i], val_cpy);
+    }
   }
-
-  errands_settings_save();
+  cJSON_Delete(json);
 }
 
 // Migrate from GSettings to settings.json
@@ -65,6 +65,7 @@ void errands_settings_init() {
   settings_path = g_build_path("/", g_get_user_data_dir(), "errands", "settings.json", NULL);
   errands_settings_load_default();
   file_exists(settings_path) ? errands_settings_load_user() : errands_settings_migrate();
+  errands_settings_save();
 }
 
 // --- GET / SET SETTINGS --- //

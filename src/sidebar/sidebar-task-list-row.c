@@ -3,6 +3,7 @@
 #include "../data.h"
 #include "../dialogs/delete-list-dialog.h"
 #include "../dialogs/rename-list-dialog.h"
+#include "../settings.h"
 #include "../state.h"
 #include "../task-list.h"
 #include "../utils.h"
@@ -135,6 +136,8 @@ void on_errands_sidebar_task_list_row_activate(GtkListBox *box, ErrandsSidebarTa
   // Switch to Task List view
   adw_view_stack_set_visible_child_name(ADW_VIEW_STACK(state.main_window->stack),
                                         "errands_task_list_page");
+  // Set setting
+  errands_settings_set("last_list_uid", SETTING_TYPE_STRING, row->data->uid);
   // Filter by uid
   errands_task_list_filter_by_uid(row->data->uid);
   state.task_list->data = row->data;
