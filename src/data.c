@@ -185,7 +185,7 @@ void errands_data_load() {
     t->text = strdup(cJSON_GetObjectItem(item, "text")->valuestring);
     t->toolbar_shown = (bool)cJSON_GetObjectItem(item, "toolbar_shown")->valueint;
     t->trash = (bool)cJSON_GetObjectItem(item, "trash")->valueint;
-    t->uid = strdup(cJSON_GetObjectItem(item, "uid")->valuestring);
+    strcpy(t->uid, cJSON_GetObjectItem(item, "uid")->valuestring);
     g_ptr_array_add(state.t_data, t);
   }
 
@@ -373,7 +373,7 @@ TaskData *errands_data_add_task(char *text, char *list_uid, char *parent_uid) {
   t->text = strdup(text);
   t->toolbar_shown = false;
   t->trash = false;
-  t->uid = g_uuid_string_random();
+  generate_uuid(t->uid);
   g_ptr_array_insert(state.t_data, 0, t);
   errands_data_write();
   return t;
@@ -391,7 +391,6 @@ void errands_data_free_task(TaskData *data) {
   free(data->start_date);
   g_ptr_array_free(data->tags, true);
   free(data->text);
-  free(data->uid);
 }
 
 TaskData *errands_data_get_task(char *uid) {
@@ -405,9 +404,6 @@ TaskData *errands_data_get_task(char *uid) {
 }
 
 char *errands_data_task_as_ical(TaskData *data) {
-  // Ensure that mandatory fields like UID are set
-  if (data->uid == NULL)
-    return NULL; // UID is required for VTODO
   str ical = str_new("BEGIN:VTODO\n");
   // Add UID and SUMMARY
   str_append_printf(&ical, "UID:%s\nSUMMARY:%s\n", data->uid, data->text ? data->text : "");
@@ -523,7 +519,7 @@ GPtrArray *errands_data_tasks_from_ical(const char *ical, const char *list_uid) 
 
       t->toolbar_shown = false;
       t->trash = false;
-      t->uid = g_uuid_string_random();
+      generate_uuid(t->uid);
 
       g_ptr_array_add(out, t);
     }

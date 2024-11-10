@@ -32,7 +32,7 @@ typedef struct {
   char *text;
   bool toolbar_shown;
   bool trash;
-  char *uid;
+  char uid[37];
 } TaskData;
 
 typedef struct {
