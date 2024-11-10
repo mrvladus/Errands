@@ -345,7 +345,7 @@ static void on_errands_task_complete_btn_toggle(GtkCheckButton *btn, ErrandsTask
   LOG("Toggle completion '%s'", task->data->uid);
 
   task->data->completed = gtk_check_button_get_active(btn);
-  task->data->changed_at = get_date_time();
+  get_date_time(task->data->changed_at);
   task->data->synced = false;
   errands_data_write();
 

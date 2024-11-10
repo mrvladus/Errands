@@ -163,19 +163,19 @@ void errands_data_load() {
       g_ptr_array_add(t->attachments, strdup(cJSON_GetArrayItem(atch_arr, i)->valuestring));
     t->color = strdup(cJSON_GetObjectItem(item, "color")->valuestring);
     t->completed = (bool)cJSON_GetObjectItem(item, "completed")->valueint;
-    t->changed_at = strdup(cJSON_GetObjectItem(item, "changed_at")->valuestring);
-    t->created_at = strdup(cJSON_GetObjectItem(item, "created_at")->valuestring);
+    strcpy(t->changed_at, cJSON_GetObjectItem(item, "changed_at")->valuestring);
+    strcpy(t->created_at, cJSON_GetObjectItem(item, "created_at")->valuestring);
     t->deleted = (bool)cJSON_GetObjectItem(item, "deleted")->valueint;
-    t->due_date = strdup(cJSON_GetObjectItem(item, "due_date")->valuestring);
+    strcpy(t->due_date, cJSON_GetObjectItem(item, "due_date")->valuestring);
     t->expanded = (bool)cJSON_GetObjectItem(item, "expanded")->valueint;
-    t->list_uid = strdup(cJSON_GetObjectItem(item, "list_uid")->valuestring);
+    strcpy(t->list_uid, cJSON_GetObjectItem(item, "list_uid")->valuestring);
     t->notes = strdup(cJSON_GetObjectItem(item, "notes")->valuestring);
     t->notified = (bool)cJSON_GetObjectItem(item, "notified")->valueint;
-    t->parent = strdup(cJSON_GetObjectItem(item, "parent")->valuestring);
+    strcpy(t->parent, cJSON_GetObjectItem(item, "parent")->valuestring);
     t->percent_complete = cJSON_GetObjectItem(item, "percent_complete")->valueint;
     t->priority = cJSON_GetObjectItem(item, "priority")->valueint;
     t->rrule = strdup(cJSON_GetObjectItem(item, "rrule")->valuestring);
-    t->start_date = strdup(cJSON_GetObjectItem(item, "start_date")->valuestring);
+    strcpy(t->start_date, cJSON_GetObjectItem(item, "start_date")->valuestring);
     t->synced = (bool)cJSON_GetObjectItem(item, "synced")->valueint;
     // Get tags
     t->tags = g_ptr_array_new();
@@ -355,19 +355,19 @@ TaskData *errands_data_add_task(char *text, char *list_uid, char *parent_uid) {
   t->attachments = g_ptr_array_new();
   t->color = strdup("");
   t->completed = false;
-  t->changed_at = get_date_time();
-  t->created_at = get_date_time();
+  get_date_time(t->changed_at);
+  get_date_time(t->created_at);
   t->deleted = false;
-  t->due_date = strdup("");
+  strcpy(t->due_date, "");
   t->expanded = false;
-  t->list_uid = strdup(list_uid);
+  strcpy(t->list_uid, list_uid);
   t->notes = strdup("");
   t->notified = false;
-  t->parent = strdup(parent_uid);
+  strcpy(t->parent, parent_uid);
   t->percent_complete = 0;
   t->priority = 0;
   t->rrule = strdup("");
-  t->start_date = strdup("");
+  strcpy(t->start_date, "");
   t->synced = false;
   t->tags = g_ptr_array_new();
   t->text = strdup(text);
@@ -381,14 +381,8 @@ TaskData *errands_data_add_task(char *text, char *list_uid, char *parent_uid) {
 
 void errands_data_free_task(TaskData *data) {
   g_ptr_array_free(data->attachments, true);
-  free(data->changed_at);
-  free(data->created_at);
-  free(data->due_date);
-  free(data->list_uid);
   free(data->notes);
-  free(data->parent);
   free(data->rrule);
-  free(data->start_date);
   g_ptr_array_free(data->tags, true);
   free(data->text);
 }
@@ -474,18 +468,21 @@ GPtrArray *errands_data_tasks_from_ical(const char *ical, const char *list_uid) 
       }
 
       char *changed_at = get_ical_value(todo, "LAST-MODIFIED");
-      t->changed_at = changed_at ? changed_at : get_date_time();
+      changed_at ? strcpy(t->changed_at, changed_at) : get_date_time(t->changed_at);
+      free(changed_at);
 
       char *created_at = get_ical_value(todo, "CREATED");
-      t->created_at = created_at ? created_at : strdup(t->changed_at);
+      created_at ? strcpy(t->created_at, created_at) : get_date_time(t->created_at);
+      free(created_at);
 
       t->deleted = false;
 
       char *due = get_ical_value(todo, "DUE");
-      t->due_date = due ? due : strdup("");
+      due ? strcpy(t->due_date, due) : strcpy(t->due_date, "");
+      free(due);
 
       t->expanded = false;
-      t->list_uid = strdup(list_uid);
+      strcpy(t->list_uid, list_uid);
 
       char *notes = get_ical_value(todo, "DESCRIPTION");
       t->notes = notes ? notes : strdup("");
@@ -493,7 +490,7 @@ GPtrArray *errands_data_tasks_from_ical(const char *ical, const char *list_uid) 
       t->notified = false;
 
       char *parent = get_ical_value(todo, "RELATED-TO");
-      t->parent = parent ? parent : strdup("");
+      parent ? strcpy(t->parent, parent) : strcpy(t->parent, "");
 
       char *percent_complete = get_ical_value(todo, "PERCENT-COMPLETE");
       t->percent_complete = percent_complete ? atoi(percent_complete) : 0;
@@ -509,7 +506,8 @@ GPtrArray *errands_data_tasks_from_ical(const char *ical, const char *list_uid) 
       t->rrule = rrule ? rrule : strdup("");
 
       char *start_date = get_ical_value(todo, "DTSTART");
-      t->start_date = start_date ? start_date : strdup("");
+      start_date ? strcpy(t->start_date, start_date) : strcpy(t->start_date, "");
+      free(start_date);
 
       t->synced = false;
       t->tags = g_ptr_array_new();

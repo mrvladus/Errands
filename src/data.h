@@ -5,28 +5,23 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-// Free allocated string and allocate new_string
-#define errands_data_update_str(string, new_string)                                                \
-  free(string);                                                                                    \
-  string = strdup(new_string);
-
 typedef struct {
   GPtrArray *attachments;
   char *color;
   bool completed;
-  char *changed_at;
-  char *created_at;
+  char changed_at[17];
+  char created_at[17];
   bool deleted;
-  char *due_date;
+  char due_date[17];
   bool expanded;
-  char *list_uid;
+  char list_uid[37];
   char *notes;
   bool notified;
-  char *parent;
+  char parent[37];
   int percent_complete;
   int priority;
   char *rrule;
-  char *start_date;
+  char start_date[17];
   bool synced;
   GPtrArray *tags;
   char *text;
@@ -38,7 +33,7 @@ typedef struct {
 typedef struct {
   char color[10];
   bool deleted;
-  char *name;
+  char *name; // TODO: make it 255
   bool show_completed;
   bool synced;
   char uid[37];

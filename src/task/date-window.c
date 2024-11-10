@@ -265,14 +265,14 @@ static void on_errands_date_window_close_cb(ErrandsDateWindow *win, gpointer dat
       const char *start_time = errands_time_chooser_get_time(win->start_time_chooser);
       str_append_printf(&s_dt, "T%sZ", start_time);
     }
-    errands_data_update_str(win->task->data->start_date, s_dt.str);
+    strcpy(win->task->data->start_date, s_dt.str);
   } else {
     if (start_time_is_set) {
       const char *start_time = errands_time_chooser_get_time(win->start_time_chooser);
       str_append_printf(&s_dt, "%sT%sZ", get_today_date(), start_time);
     }
   }
-  errands_data_update_str(win->task->data->start_date, s_dt.str);
+  strcpy(win->task->data->start_date, s_dt.str);
   str_free(&s_dt);
 
   // Set due datetime
@@ -290,20 +290,21 @@ static void on_errands_date_window_close_cb(ErrandsDateWindow *win, gpointer dat
       const char *due_time = errands_time_chooser_get_time(win->due_time_chooser);
       str_append_printf(&d_dt, "T%sZ", due_time);
     }
-    errands_data_update_str(win->task->data->due_date, d_dt.str);
+    strcpy(win->task->data->due_date, d_dt.str);
   } else {
     if (due_time_is_set) {
       const char *due_time = errands_time_chooser_get_time(win->due_time_chooser);
       str_append_printf(&d_dt, "%sT%sZ", get_today_date(), due_time);
     }
   }
-  errands_data_update_str(win->task->data->due_date, d_dt.str);
+  strcpy(win->task->data->due_date, d_dt.str);
   str_free(&d_dt);
 
   // Check if repeat is enabled
   if (!adw_expander_row_get_enable_expansion(ADW_EXPANDER_ROW(win->repeat_row))) {
     // If not - clean rrule
-    errands_data_update_str(win->task->data->rrule, "");
+    free(win->task->data->rrule);
+    win->task->data->rrule = strdup("");
   }
   // Generate new rrule
   else {
@@ -357,7 +358,8 @@ static void on_errands_date_window_close_cb(ErrandsDateWindow *win, gpointer dat
       str_append_printf(&rrule, "COUNT=%d;", count);
 
     // Save rrule
-    errands_data_update_str(win->task->data->rrule, rrule.str);
+    free(win->task->data->rrule);
+    win->task->data->rrule = strdup(rrule.str);
 
     // Cleanup
     str_free(&rrule);
