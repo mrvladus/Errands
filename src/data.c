@@ -161,7 +161,7 @@ void errands_data_load() {
     cJSON *atch_arr = cJSON_GetObjectItem(item, "attachments");
     for (int i = 0; i < cJSON_GetArraySize(atch_arr); i++)
       g_ptr_array_add(t->attachments, strdup(cJSON_GetArrayItem(atch_arr, i)->valuestring));
-    t->color = strdup(cJSON_GetObjectItem(item, "color")->valuestring);
+    strcpy(t->color, cJSON_GetObjectItem(item, "color")->valuestring);
     t->completed = (bool)cJSON_GetObjectItem(item, "completed")->valueint;
     strcpy(t->changed_at, cJSON_GetObjectItem(item, "changed_at")->valuestring);
     strcpy(t->created_at, cJSON_GetObjectItem(item, "created_at")->valuestring);
@@ -353,7 +353,7 @@ TaskListData *errands_task_list_from_ical(const char *ical) {
 TaskData *errands_data_add_task(char *text, char *list_uid, char *parent_uid) {
   TaskData *t = malloc(sizeof(*t));
   t->attachments = g_ptr_array_new();
-  t->color = strdup("");
+  strcpy(t->color, "");
   t->completed = false;
   get_date_time(t->changed_at);
   get_date_time(t->created_at);
@@ -459,7 +459,8 @@ GPtrArray *errands_data_tasks_from_ical(const char *ical, const char *list_uid) 
       t->attachments = g_ptr_array_new();
 
       char *color = get_ical_value(todo, "X-ERRANDS-COLOR");
-      t->color = color ? color : strdup("");
+      color ? strcpy(t->color, color) : strcpy(t->color, "");
+      free(color);
 
       char *completed = get_ical_value(todo, "STATUS");
       if (completed) {

@@ -7,7 +7,7 @@
 
 typedef struct {
   GPtrArray *attachments;
-  char *color;
+  char color[7];
   bool completed;
   char changed_at[17];
   char created_at[17];
@@ -33,7 +33,7 @@ typedef struct {
 typedef struct {
   char color[10];
   bool deleted;
-  char *name; // TODO: make it 255
+  char *name; // TODO: make it 256
   bool show_completed;
   bool synced;
   char uid[37];
