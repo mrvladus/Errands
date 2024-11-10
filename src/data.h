@@ -18,8 +18,8 @@ typedef struct {
   char *notes;
   bool notified;
   char parent[37];
-  int percent_complete;
-  int priority;
+  uint8_t percent_complete;
+  uint8_t priority;
   char *rrule;
   char start_date[17];
   bool synced;
@@ -33,7 +33,7 @@ typedef struct {
 typedef struct {
   char color[10];
   bool deleted;
-  char *name; // TODO: make it 256
+  char name[256];
   bool show_completed;
   bool synced;
   char uid[37];

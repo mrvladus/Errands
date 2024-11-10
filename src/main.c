@@ -7,6 +7,7 @@
 
 #include <adwaita.h>
 #include <glib/gi18n.h>
+#include <stddef.h>
 
 static void activate(GtkApplication *app) {
   state.main_window = errands_window_new();
@@ -15,6 +16,9 @@ static void activate(GtkApplication *app) {
 }
 
 int main(int argc, char **argv) {
+  // Generate random seed
+  srand((unsigned int)(time(NULL) ^ getpid()));
+
   bindtextdomain("errands", LOCALE_DIR);
   bind_textdomain_codeset("errands", "UTF-8");
   textdomain("errands");

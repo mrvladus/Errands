@@ -81,14 +81,7 @@ static inline void errands_add_shortcut(GtkWidget *widget, const char *trigger,
 }
 
 static inline void generate_uuid(char *uuid) {
-  const char *hex_chars = "0123456789abcdef";
-  // Generate random numbers for each part of the UUID
-  srand((unsigned int)(time(NULL) ^ getpid()));
-  for (int i = 0; i < 36; i++) {
-    if (i == 8 || i == 13 || i == 18 || i == 23)
-      uuid[i] = '-'; // Insert dashes at the appropriate positions
-    else
-      uuid[i] = hex_chars[rand() % 16]; // Random hex character
-  }
-  uuid[36] = '\0'; // Null-terminate the string
+  gchar *uid = g_uuid_string_random();
+  strcpy(uuid, uid);
+  g_free(uid);
 }

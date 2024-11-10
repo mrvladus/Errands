@@ -6,6 +6,7 @@
 #include "utils/files.h"
 
 #include <glib.h>
+#include <string.h>
 
 // --- READ / WRITE --- //
 
@@ -138,7 +139,7 @@ void errands_data_load() {
     TaskListData *tl = malloc(sizeof(*tl));
     strcpy(tl->color, cJSON_GetObjectItem(item, "color")->valuestring);
     tl->deleted = (bool)cJSON_GetObjectItem(item, "deleted")->valueint;
-    tl->name = strdup(cJSON_GetObjectItem(item, "name")->valuestring);
+    strncpy(tl->name, cJSON_GetObjectItem(item, "name")->valuestring, 255);
     tl->show_completed = (bool)cJSON_GetObjectItem(item, "show_completed")->valueint;
     tl->synced = (bool)cJSON_GetObjectItem(item, "synced")->valueint;
     strcpy(tl->uid, cJSON_GetObjectItem(item, "uid")->valuestring);
@@ -288,7 +289,7 @@ TaskListData *errands_data_add_list(const char *name) {
   TaskListData *tl = malloc(sizeof(*tl));
   generate_hex(tl->color);
   tl->deleted = false;
-  tl->name = strdup(name);
+  strncpy(tl->name, name, 255);
   tl->show_completed = true;
   tl->synced = false;
   generate_uuid(tl->uid);
@@ -296,8 +297,6 @@ TaskListData *errands_data_add_list(const char *name) {
   errands_data_write();
   return tl;
 }
-
-void errands_data_free_list(TaskListData *data) { free(data->name); }
 
 void errands_data_delete_list(TaskListData *data) {
   LOG("Data: Deleting task list '%s'", data->uid);
@@ -336,7 +335,7 @@ char *errands_data_task_list_as_ical(TaskListData *data) {
 TaskListData *errands_task_list_from_ical(const char *ical) {
   TaskListData *data = malloc(sizeof(*data));
   char *name = get_ical_value(ical, "X-WR-CALNAME");
-  data->name = name ? name : strdup("New List");
+  name ? strncpy(data->name, name, 255) : strcpy(data->name, "New List");
   free(name);
   char *color = get_ical_value(ical, "X-APPLE-CALENDAR-COLOR");
   color ? strcpy(data->color, color) : generate_hex(data->color);

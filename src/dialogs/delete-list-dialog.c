@@ -4,7 +4,6 @@
 #include "../state.h"
 #include "../task/task.h"
 #include "../utils.h"
-#include "gtk/gtk.h"
 
 #include <glib/gi18n.h>
 
@@ -22,7 +21,7 @@ static void errands_delete_list_dialog_init(ErrandsDeleteListDialog *self) {
   adw_alert_dialog_add_response(ADW_ALERT_DIALOG(self), "confirm", _("Confirm"));
   adw_alert_dialog_set_response_appearance(ADW_ALERT_DIALOG(self), "confirm",
                                            ADW_RESPONSE_DESTRUCTIVE);
-  adw_alert_dialog_set_default_response(ADW_ALERT_DIALOG(self), "cancel");
+  adw_alert_dialog_set_default_response(ADW_ALERT_DIALOG(self), "confirm");
   adw_alert_dialog_set_close_response(ADW_ALERT_DIALOG(self), "cancel");
   g_signal_connect(self, "response", G_CALLBACK(on_response_cb), NULL);
 }

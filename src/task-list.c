@@ -297,6 +297,8 @@ static void on_task_added(AdwEntryRow *entry, gpointer data) {
       errands_sidebar_task_list_row_get(state.task_list->data->uid));
   errands_sidebar_all_row_update_counter(state.sidebar->all_row);
 
+  errands_task_list_update_title();
+
   LOG("Add task '%s' to task list '%s'", td->uid, td->list_uid);
 }
 
