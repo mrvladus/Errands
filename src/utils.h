@@ -51,28 +51,22 @@ static inline char *string_trim(char *str) {
   return str;
 }
 
-static inline char *generate_hex() {
+static inline void generate_hex(char *color) {
   srand(time(NULL));
-  char *color = malloc(8 * sizeof(char));
   int red = rand() % 256;
   int green = rand() % 256;
   int blue = rand() % 256;
   sprintf(color, "#%02X%02X%02X", red, green, blue);
   LOG("Generate color '%s'", color);
-  return color;
 }
 
-static inline char *gdk_rgba_to_hex_string(const GdkRGBA *rgba) {
-  // Allocate memory for the hex string (7 characters: #RRGGBB + null
-  // terminator)
-  char *hex_string = malloc(8);
+static inline void gdk_rgba_to_hex_string(const GdkRGBA *rgba, char *hex_string) {
   // Convert the RGBA components to integers in the range [0, 255]
   int r = (int)(rgba->red * 255);
   int g = (int)(rgba->green * 255);
   int b = (int)(rgba->blue * 255);
   // Format the string as #RRGGBB
   sprintf(hex_string, "#%02X%02X%02X", r, g, b);
-  return hex_string;
 }
 
 // Add shortcut to the widget
@@ -84,4 +78,17 @@ static inline void errands_add_shortcut(GtkWidget *widget, const char *trigger,
                                      gtk_shortcut_action_parse_string(action));
   gtk_shortcut_controller_add_shortcut(GTK_SHORTCUT_CONTROLLER(ctrl), sc);
   gtk_widget_add_controller(widget, ctrl);
+}
+
+static inline void generate_uuid(char *uuid) {
+  const char *hex_chars = "0123456789abcdef";
+  // Generate random numbers for each part of the UUID
+  srand((unsigned int)(time(NULL) ^ getpid()));
+  for (int i = 0; i < 36; i++) {
+    if (i == 8 || i == 13 || i == 18 || i == 23)
+      uuid[i] = '-'; // Insert dashes at the appropriate positions
+    else
+      uuid[i] = hex_chars[rand() % 16]; // Random hex character
+  }
+  uuid[36] = '\0'; // Null-terminate the string
 }

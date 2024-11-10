@@ -3,13 +3,9 @@
 #include "utils.h"
 
 #include "external/cJSON.h"
+#include "utils/files.h"
 
 #include <glib.h>
-
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 // --- READ / WRITE --- //
 
@@ -140,12 +136,12 @@ void errands_data_load() {
     if (cJSON_GetObjectItem(item, "deleted")->valueint)
       continue;
     TaskListData *tl = malloc(sizeof(*tl));
-    tl->color = strdup(cJSON_GetObjectItem(item, "color")->valuestring);
+    strcpy(tl->color, cJSON_GetObjectItem(item, "color")->valuestring);
     tl->deleted = (bool)cJSON_GetObjectItem(item, "deleted")->valueint;
     tl->name = strdup(cJSON_GetObjectItem(item, "name")->valuestring);
     tl->show_completed = (bool)cJSON_GetObjectItem(item, "show_completed")->valueint;
     tl->synced = (bool)cJSON_GetObjectItem(item, "synced")->valueint;
-    tl->uid = strdup(cJSON_GetObjectItem(item, "uid")->valuestring);
+    strcpy(tl->uid, cJSON_GetObjectItem(item, "uid")->valuestring);
     g_ptr_array_add(state.tl_data, tl);
   }
 
@@ -276,48 +272,35 @@ void errands_data_write() {
 
   // Save to file
   char *json_string = cJSON_PrintUnformatted(json);
-  const char *data_file_path =
-      g_build_path("/", g_get_user_data_dir(), "errands", "data.json", NULL);
+  char *data_file_path = g_build_path("/", g_get_user_data_dir(), "errands", "data.json", NULL);
 
-  FILE *file = fopen(data_file_path, "w");
-  if (file == NULL) {
-    LOG("Error opening data.json file");
-    cJSON_Delete(json);
-    free(json_string);
-  }
-  fprintf(file, "%s", json_string);
-  fclose(file);
+  write_string_to_file(data_file_path, json_string);
 
   // Clean up
   cJSON_Delete(json);
   free(json_string);
-  g_free((gpointer)data_file_path);
+  g_free(data_file_path);
 }
 
 // --- LISTS --- //
 
 TaskListData *errands_data_add_list(const char *name) {
   TaskListData *tl = malloc(sizeof(*tl));
-  tl->color = generate_hex();
+  generate_hex(tl->color);
   tl->deleted = false;
   tl->name = strdup(name);
   tl->show_completed = true;
   tl->synced = false;
-  tl->uid = g_uuid_string_random();
+  generate_uuid(tl->uid);
   g_ptr_array_add(state.tl_data, tl);
   errands_data_write();
   return tl;
 }
 
-void errands_data_free_list(TaskListData *data) {
-  free(data->color);
-  free(data->name);
-  free(data->uid);
-}
+void errands_data_free_list(TaskListData *data) { free(data->name); }
 
 void errands_data_delete_list(TaskListData *data) {
-  LOG("Data: deleting task list %p", data);
-  LOG("Data: deleting task list '%s'", data->uid);
+  LOG("Data: Deleting task list '%s'", data->uid);
   // Mark list as deleted
   data->deleted = true;
   // Remove tasks
@@ -338,8 +321,7 @@ void errands_data_delete_list(TaskListData *data) {
 char *errands_data_task_list_as_ical(TaskListData *data) {
   str ical = str_new("BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Errands\n");
   str_append_printf(&ical, "X-WR-CALNAME:%s\n", data->name);
-  if (data->color)
-    str_append_printf(&ical, "X-APPLE-CALENDAR-COLOR:%s\n", data->color);
+  str_append_printf(&ical, "X-APPLE-CALENDAR-COLOR:%s\n", data->color);
   // Add tasks
   for (int i = 0; i < state.t_data->len; i++) {
     TaskData *td = state.t_data->pdata[i];
@@ -355,12 +337,14 @@ TaskListData *errands_task_list_from_ical(const char *ical) {
   TaskListData *data = malloc(sizeof(*data));
   char *name = get_ical_value(ical, "X-WR-CALNAME");
   data->name = name ? name : strdup("New List");
+  free(name);
   char *color = get_ical_value(ical, "X-APPLE-CALENDAR-COLOR");
-  data->color = color ? color : generate_hex();
+  color ? strcpy(data->color, color) : generate_hex(data->color);
+  free(color);
   data->deleted = false;
   data->show_completed = true;
   data->synced = false;
-  data->uid = g_uuid_string_random();
+  generate_uuid(data->uid);
   return data;
 }
 

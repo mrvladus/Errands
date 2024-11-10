@@ -282,7 +282,7 @@ static void on_task_added(AdwEntryRow *entry, gpointer data) {
   if (!strcmp(text, ""))
     return;
 
-  if (!state.task_list->data->uid)
+  if (!strcmp(state.task_list->data->uid, ""))
     return;
 
   TaskData *td = errands_data_add_task((char *)text, state.task_list->data->uid, "");

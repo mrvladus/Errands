@@ -158,8 +158,7 @@ static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x, gdoub
 
 static void on_color_changed(GtkColorDialogButton *btn, GParamSpec *pspec, TaskListData *data) {
   const GdkRGBA *color_rgba = gtk_color_dialog_button_get_rgba(btn);
-  free(data->color);
-  data->color = gdk_rgba_to_hex_string(color_rgba);
+  gdk_rgba_to_hex_string(color_rgba, data->color);
   errands_data_write();
 }
 

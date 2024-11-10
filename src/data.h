@@ -36,12 +36,12 @@ typedef struct {
 } TaskData;
 
 typedef struct {
-  char *color;
+  char color[10];
   bool deleted;
   char *name;
   bool show_completed;
   bool synced;
-  char *uid;
+  char uid[37];
 } TaskListData;
 
 // Load user data from data.json
