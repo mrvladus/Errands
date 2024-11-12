@@ -160,6 +160,11 @@
     background-color: @brown_2;
 }
 
+.task-top-drop-area {
+    border-radius: 6px;
+    padding: 4px;
+}
+
 /* Date and time widndow */
 
 .weekday {

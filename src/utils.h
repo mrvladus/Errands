@@ -9,6 +9,7 @@
 #include "glib.h"
 #include <ctype.h>
 #include <gtk/gtk.h>
+#include <stdint.h>
 
 // Get children of the widget
 static inline GPtrArray *get_children(GtkWidget *parent) {
@@ -84,4 +85,70 @@ static inline void generate_uuid(char *uuid) {
   gchar *uid = g_uuid_string_random();
   strcpy(uuid, uid);
   g_free(uid);
+}
+
+static inline void g_ptr_array_move_before(GPtrArray *array, gpointer element, gpointer target) {
+  gint index = -1;
+  gint target_index = -1;
+
+  // Find the indices of the element to move and the target element
+  for (gint i = 0; i < array->len; i++) {
+    if (g_ptr_array_index(array, i) == element) {
+      index = i;
+    }
+    if (g_ptr_array_index(array, i) == target) {
+      target_index = i;
+    }
+  }
+
+  // Check if both indices were found
+  if (index == -1 || target_index == -1 || index == target_index) {
+    g_print("Element or target not found, or they are the same.\n");
+    return;
+  }
+
+  // Remove the element from its current position
+  gpointer temp = g_ptr_array_index(array, index);
+  g_ptr_array_remove_index(array, index);
+
+  // Adjust the target index if the element was before it
+  if (index < target_index) {
+    target_index--; // Adjust because we removed the element
+  }
+
+  // Insert the element before the target
+  g_ptr_array_insert(array, target_index, temp);
+}
+
+static inline void g_ptr_array_move_after(GPtrArray *array, gpointer element, gpointer target) {
+  gint index = -1;
+  gint target_index = -1;
+
+  // Find the indices of the element to move and the target element
+  for (gint i = 0; i < array->len; i++) {
+    if (g_ptr_array_index(array, i) == element) {
+      index = i;
+    }
+    if (g_ptr_array_index(array, i) == target) {
+      target_index = i;
+    }
+  }
+
+  // Check if both indices were found
+  if (index == -1 || target_index == -1 || index == target_index) {
+    g_print("Element or target not found, or they are the same.\n");
+    return;
+  }
+
+  // Remove the element from its current position
+  gpointer temp = g_ptr_array_index(array, index);
+  g_ptr_array_remove_index(array, index);
+
+  // Adjust the target index if the element was before it
+  if (index < target_index) {
+    target_index--; // Adjust because we removed the element
+  }
+
+  // Insert the element after the target
+  g_ptr_array_insert(array, target_index + 1, temp);
 }

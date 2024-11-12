@@ -40,10 +40,10 @@ static void errands_sidebar_init(ErrandsSidebar *self) {
   // Add list button
   self->add_btn = adw_split_button_new();
   GMenu *menu = errands_menu_new(1, _("Import \".ics\""), "sidebar.import");
-  g_object_set(self->add_btn, "tooltip-text", _("Add Task List (Ctrl+Shift+N)"), "icon-name",
+  g_object_set(self->add_btn, "tooltip-text", _("Add Task List (Ctrl+Shift+L)"), "icon-name",
                "errands-add-symbolic", "menu-model", menu, NULL);
   g_signal_connect(self->add_btn, "clicked", G_CALLBACK(errands_new_list_dialog_show), NULL);
-  errands_add_shortcut(self->add_btn, "<Control><Shift>N", "activate");
+  errands_add_shortcut(self->add_btn, "<Control><Shift>L", "activate");
   adw_header_bar_pack_start(ADW_HEADER_BAR(hb), self->add_btn);
   g_object_unref(menu);
 

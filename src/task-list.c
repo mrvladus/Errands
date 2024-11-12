@@ -1,6 +1,7 @@
 #include "task-list.h"
 #include "data.h"
 #include "gio/gio.h"
+#include "glib.h"
 #include "settings.h"
 #include "sidebar/sidebar-all-row.h"
 #include "sidebar/sidebar-task-list-row.h"

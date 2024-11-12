@@ -2,9 +2,6 @@
 
 #include <gtk/gtk.h>
 
-#include <stdbool.h>
-#include <stdint.h>
-
 typedef struct {
   GPtrArray *attachments;
   char color[7];

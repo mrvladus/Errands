@@ -6,8 +6,6 @@
 
 #include <glib/gi18n.h>
 
-#include <string.h>
-
 // --- DECLARATIONS --- //
 
 static void on_entry_changed_cb(AdwEntryRow *entry);

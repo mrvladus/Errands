@@ -7,8 +7,15 @@
 #include "../state.h"
 #include "../task-list.h"
 #include "../utils.h"
+#include "glib-object.h"
+#include "glib.h"
+#include "gtk/gtk.h"
+#include "gtk/gtkrevealer.h"
 
 #include <glib/gi18n.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <string.h>
 
 // ---------- SIGNALS ---------- //
 
@@ -25,6 +32,18 @@ static void on_errands_task_sub_task_added(GtkEntry *entry, ErrandsTask *task);
 static void on_errands_task_edited(AdwEntryRow *entry, ErrandsTask *task);
 static void on_errands_task_edit_cancelled(GtkButton *btn, ErrandsTask *task);
 
+static GdkContentProvider *on_drag_prepare(GtkDragSource *source, double x, double y,
+                                           ErrandsTask *task);
+static void on_drag_begin(GtkDragSource *source, GdkDrag *drag, ErrandsTask *task);
+static void on_drag_end(GtkDragSource *self, GdkDrag *drag, gboolean delete_data,
+                        ErrandsTask *task);
+static gboolean on_drag_cancel(GtkDragSource *self, GdkDrag *drag, GdkDragCancelReason *reason,
+                               ErrandsTask *task);
+static gboolean on_drop(GtkDropTarget *target, const GValue *value, double x, double y,
+                        ErrandsTask *task);
+static gboolean on_top_area_drop(GtkDropTarget *target, const GValue *value, double x, double y,
+                                 ErrandsTask *task);
+
 // ---------- TASK ---------- //
 
 G_DEFINE_TYPE(ErrandsTask, errands_task, ADW_TYPE_BIN)
@@ -37,11 +56,24 @@ static void errands_task_init(ErrandsTask *self) {
   adw_bin_set_child(ADW_BIN(self), self->revealer);
 
   // Task main box
+  GtkWidget *main_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+  gtk_revealer_set_child(GTK_REVEALER(self->revealer), main_box);
+
+  // Top drop area
+  GtkWidget *top_drop_area = gtk_image_new_from_icon_name("errands-add-symbolic");
+  gtk_widget_add_css_class(top_drop_area, "task-top-drop-area");
+  GtkDropTarget *top_drop_area_target = gtk_drop_target_new(G_TYPE_OBJECT, GDK_ACTION_MOVE);
+  g_signal_connect(top_drop_area_target, "drop", G_CALLBACK(on_top_area_drop), self);
+  gtk_widget_add_controller(GTK_WIDGET(top_drop_area), GTK_EVENT_CONTROLLER(top_drop_area_target));
+  g_object_set(top_drop_area, "margin-start", 12, "margin-end", 12, NULL);
+  gtk_box_append(GTK_BOX(main_box), top_drop_area);
+
+  // Card
   self->card = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   g_object_set(self->card, "margin-top", 6, "margin-bottom", 6, "margin-start", 12, "margin-end",
                12, NULL);
   gtk_widget_add_css_class(self->card, "card");
-  gtk_revealer_set_child(GTK_REVEALER(self->revealer), self->card);
+  gtk_box_append(GTK_BOX(main_box), self->card);
 
   // Title list box
   GtkWidget *title_lb = gtk_list_box_new();
@@ -162,6 +194,24 @@ static void errands_task_init(ErrandsTask *self) {
       errands_action_group_new(3, "edit", on_action_rename, self, "trash", on_action_trash, self,
                                "export", on_action_export, self);
   gtk_widget_insert_action_group(GTK_WIDGET(self), "task", G_ACTION_GROUP(ag));
+
+  // DND
+  GtkDragSource *drag_source = gtk_drag_source_new();
+  gtk_drag_source_set_actions(drag_source, GDK_ACTION_MOVE);
+  g_signal_connect(drag_source, "prepare", G_CALLBACK(on_drag_prepare), self);
+  g_signal_connect(drag_source, "drag-begin", G_CALLBACK(on_drag_begin), self);
+  g_signal_connect(drag_source, "drag-end", G_CALLBACK(on_drag_end), self);
+  g_signal_connect(drag_source, "drag-cancel", G_CALLBACK(on_drag_cancel), self);
+  gtk_widget_add_controller(GTK_WIDGET(self->title_row), GTK_EVENT_CONTROLLER(drag_source));
+
+  GtkDropTarget *drop_target = gtk_drop_target_new(G_TYPE_OBJECT, GDK_ACTION_MOVE);
+  g_signal_connect(drop_target, "drop", G_CALLBACK(on_drop), self);
+  gtk_widget_add_controller(GTK_WIDGET(self->title_row), GTK_EVENT_CONTROLLER(drop_target));
+
+  GtkEventController *drop_ctrl = gtk_drop_controller_motion_new();
+  g_object_bind_property(drop_ctrl, "contains-pointer", top_drop_area, "visible",
+                         G_BINDING_SYNC_CREATE);
+  gtk_widget_add_controller(GTK_WIDGET(self), drop_ctrl);
 }
 
 ErrandsTask *errands_task_new(TaskData *data) {
@@ -238,6 +288,15 @@ void errands_task_update_progress(ErrandsTask *task) {
   gtk_revealer_set_reveal_child(GTK_REVEALER(task->progress_revealer), total > 0);
   gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(task->progress_bar),
                                 total > 0 ? (float)completed / (float)total : 0);
+
+  // Set sub-title
+  if (total == 0)
+    g_object_set(task->title_row, "subtitle", "", NULL);
+  else {
+    str subtitle = str_new_printf(_("Completed: %d / %d"), completed, total);
+    g_object_set(task->title_row, "subtitle", subtitle.str, NULL);
+    str_free(&subtitle);
+  }
 }
 
 // --- TAGS --- //
@@ -430,4 +489,97 @@ static void on_errands_task_edited(AdwEntryRow *entry, ErrandsTask *task) {
 
 static void on_errands_task_edit_cancelled(GtkButton *btn, ErrandsTask *task) {
   gtk_widget_set_visible(task->title_row, true);
+}
+
+// - DND - //
+
+static GdkContentProvider *on_drag_prepare(GtkDragSource *source, double x, double y,
+                                           ErrandsTask *task) {
+  g_object_set(task, "sensitive", false, NULL);
+  GValue value = G_VALUE_INIT;
+  g_value_init(&value, G_TYPE_OBJECT);
+  g_value_set_object(&value, task);
+  return gdk_content_provider_new_for_value(&value);
+}
+
+static void on_drag_begin(GtkDragSource *source, GdkDrag *drag, ErrandsTask *row) {
+  char label[21];
+  if (strlen(row->data->text) > 20)
+    snprintf(label, 17, "%s...", row->data->text);
+  else
+    strcpy(label, row->data->text);
+  g_object_set(gtk_drag_icon_get_for_drag(drag), "child",
+               g_object_new(GTK_TYPE_BUTTON, "label", label, NULL), NULL);
+}
+
+static void on_drag_end(GtkDragSource *self, GdkDrag *drag, gboolean delete_data,
+                        ErrandsTask *task) {
+  g_object_set(task, "sensitive", true, NULL);
+}
+
+static gboolean on_drag_cancel(GtkDragSource *self, GdkDrag *drag, GdkDragCancelReason *reason,
+                               ErrandsTask *task) {
+  g_object_set(task, "sensitive", true, NULL);
+  return true;
+}
+
+static gboolean on_drop(GtkDropTarget *target, const GValue *value, double x, double y,
+                        ErrandsTask *target_task) {
+  ErrandsTask *task = g_value_get_object(value);
+  if (!ERRANDS_IS_TASK(task))
+    return false;
+  // Get old parent if task was sub-task
+  ErrandsTask *old_parent = ERRANDS_TASK(
+      gtk_widget_get_ancestor(gtk_widget_get_parent(GTK_WIDGET(task)), ERRANDS_TYPE_TASK));
+  // Move widget
+  gtk_box_remove(GTK_BOX(gtk_widget_get_parent(GTK_WIDGET(task))), GTK_WIDGET(task));
+  gtk_box_prepend(GTK_BOX(target_task->sub_tasks), GTK_WIDGET(task));
+  // Set data
+  strcpy(task->data->parent, target_task->data->uid);
+  g_ptr_array_move_before(state.t_data, task->data, state.t_data->pdata[0]);
+  errands_data_write();
+  // Toggle completion
+  if (target_task->data->completed && !task->data->completed)
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(target_task->complete_btn), false);
+  // Expand sub-tasks if needed
+  gtk_revealer_set_reveal_child(GTK_REVEALER(target_task->sub_tasks_revealer), true);
+  errands_task_list_sort_by_completion(target_task->sub_tasks);
+  // Update ui
+  errands_task_update_progress(target_task);
+  if (old_parent)
+    errands_task_update_progress(old_parent);
+  // TODO: sync
+  return true;
+}
+
+static gboolean on_top_area_drop(GtkDropTarget *target, const GValue *value, double x, double y,
+                                 ErrandsTask *target_task) {
+  ErrandsTask *task = g_value_get_object(value);
+  if (!ERRANDS_IS_TASK(task))
+    return false;
+  ErrandsTask *target_parent = ERRANDS_TASK(
+      gtk_widget_get_ancestor(gtk_widget_get_parent(GTK_WIDGET(target_task)), ERRANDS_TYPE_TASK));
+  // Get old parent if task was sub-task
+  ErrandsTask *old_parent = ERRANDS_TASK(
+      gtk_widget_get_ancestor(gtk_widget_get_parent(GTK_WIDGET(task)), ERRANDS_TYPE_TASK));
+  // Move widget
+  gtk_box_remove(GTK_BOX(gtk_widget_get_parent(GTK_WIDGET(task))), GTK_WIDGET(task));
+  gtk_widget_insert_before(GTK_WIDGET(task), gtk_widget_get_parent(GTK_WIDGET(target_task)),
+                           GTK_WIDGET(target_task));
+  // Set data
+  strcpy(task->data->parent, target_task->data->parent);
+  g_ptr_array_move_before(state.t_data, task->data, target_task->data);
+  errands_data_write();
+  if (target_parent) {
+    if (!task->data->completed && target_parent->data->completed)
+      gtk_check_button_set_active(GTK_CHECK_BUTTON(target_parent->complete_btn), false);
+    errands_task_list_sort_by_completion(target_parent->sub_tasks);
+  } else
+    errands_task_list_sort_by_completion(gtk_widget_get_parent(GTK_WIDGET(target_task)));
+  // Update ui
+  errands_task_update_progress(target_task);
+  if (old_parent)
+    errands_task_update_progress(old_parent);
+  // TODO: sync
+  return true;
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "data.h"
+#include "glib.h"
 
 #include <adwaita.h>
 

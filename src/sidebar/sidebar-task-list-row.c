@@ -310,7 +310,6 @@ static void on_drag_begin(GtkDragSource *source, GdkDrag *drag, ErrandsSidebarTa
 
 static gboolean on_drop(GtkDropTarget *target, const GValue *value, double x, double y,
                         ErrandsSidebarTaskListRow *target_row) {
-
   ErrandsSidebarTaskListRow *row = g_value_get_object(value);
   if (!ERRANDS_IS_SIDEBAR_TASK_LIST_ROW(row))
     return false;
