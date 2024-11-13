@@ -299,6 +299,22 @@ void errands_task_update_progress(ErrandsTask *task) {
   }
 }
 
+static void __append_sub_tasks(GPtrArray *arr, ErrandsTask *task) {
+  GPtrArray *sub_tasks = get_children(task->sub_tasks);
+  for (int i = 0; i < sub_tasks->len; i++) {
+    ErrandsTask *t = sub_tasks->pdata[i];
+    g_ptr_array_add(arr, t);
+    __append_sub_tasks(arr, t);
+  }
+  g_ptr_array_free(sub_tasks, false);
+}
+
+GPtrArray *errands_task_get_sub_tasks(ErrandsTask *task) {
+  GPtrArray *arr = g_ptr_array_new();
+  __append_sub_tasks(arr, task);
+  return arr;
+}
+
 // --- TAGS --- //
 
 static void errands_task_tag_delete(GtkWidget *tag) {
@@ -537,12 +553,12 @@ static gboolean on_drop(GtkDropTarget *target, const GValue *value, double x, do
   // Set data
   strcpy(task->data->parent, target_task->data->uid);
   g_ptr_array_move_before(state.t_data, task->data, state.t_data->pdata[0]);
+  gtk_revealer_set_reveal_child(GTK_REVEALER(target_task->sub_tasks_revealer), true);
+  target_task->data->expanded = true;
   errands_data_write();
   // Toggle completion
   if (target_task->data->completed && !task->data->completed)
     gtk_check_button_set_active(GTK_CHECK_BUTTON(target_task->complete_btn), false);
-  // Expand sub-tasks if needed
-  gtk_revealer_set_reveal_child(GTK_REVEALER(target_task->sub_tasks_revealer), true);
   errands_task_list_sort_by_completion(target_task->sub_tasks);
   // Update ui
   errands_task_update_progress(target_task);

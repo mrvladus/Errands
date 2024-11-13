@@ -3,7 +3,7 @@
 #include "utils.h"
 
 #include "external/cJSON.h"
-#include "utils/files.h"
+#include "utils/array.h"
 
 #include <glib.h>
 #include <string.h>

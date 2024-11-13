@@ -36,3 +36,4 @@ void errands_task_update_tags(ErrandsTask *task);
 // Return list of ErrandsTask widgets from parent to great ... great parent
 // Free with g_ptr_array_free(arr, true)
 GPtrArray *errands_task_get_parents(ErrandsTask *task);
+GPtrArray *errands_task_get_sub_tasks(ErrandsTask *task);

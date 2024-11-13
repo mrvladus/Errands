@@ -7,8 +7,11 @@
 #include "../state.h"
 #include "../task-list.h"
 #include "../utils.h"
+#include "glib.h"
+#include "gtk/gtkrevealer.h"
 
 #include <glib/gi18n.h>
+#include <time.h>
 
 static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x, gdouble y,
                            GtkPopover *popover);
@@ -25,6 +28,8 @@ static GdkContentProvider *on_drag_prepare(GtkDragSource *source, double x, doub
 static void on_drag_begin(GtkDragSource *source, GdkDrag *drag, ErrandsSidebarTaskListRow *row);
 static gboolean on_drop(GtkDropTarget *target, const GValue *value, double x, double y,
                         ErrandsSidebarTaskListRow *row);
+// static GdkDragAction on_hover_begin(GtkDropTarget *target, gdouble x, gdouble y,
+//                                     ErrandsSidebarTaskListRow *row);
 
 G_DEFINE_TYPE(ErrandsSidebarTaskListRow, errands_sidebar_task_list_row, GTK_TYPE_LIST_BOX_ROW)
 
@@ -84,7 +89,13 @@ static void errands_sidebar_task_list_row_init(ErrandsSidebarTaskListRow *self) 
   // Drop target setup
   GtkDropTarget *drop_target = gtk_drop_target_new(G_TYPE_OBJECT, GDK_ACTION_MOVE);
   g_signal_connect(drop_target, "drop", G_CALLBACK(on_drop), self);
+  // g_signal_connect(drop_target, "enter", G_CALLBACK(on_hover_begin), self);
   gtk_widget_add_controller(GTK_WIDGET(self), GTK_EVENT_CONTROLLER(drop_target));
+
+  // Drop motion
+  self->hover_ctrl = gtk_drop_controller_motion_new();
+  // g_signal_connect(drop_target, "enter", G_CALLBACK(on_hover_begin), self);
+  gtk_widget_add_controller(GTK_WIDGET(self), GTK_EVENT_CONTROLLER(self->hover_ctrl));
 }
 
 ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_new(TaskListData *data) {
@@ -310,26 +321,75 @@ static void on_drag_begin(GtkDragSource *source, GdkDrag *drag, ErrandsSidebarTa
 
 static gboolean on_drop(GtkDropTarget *target, const GValue *value, double x, double y,
                         ErrandsSidebarTaskListRow *target_row) {
-  ErrandsSidebarTaskListRow *row = g_value_get_object(value);
-  if (!ERRANDS_IS_SIDEBAR_TASK_LIST_ROW(row))
-    return false;
-  if (row == target_row)
-    return false;
-  LOG("Reorder task lists");
-  // Move widget
-  int idx = gtk_list_box_row_get_index(GTK_LIST_BOX_ROW(target_row));
-  GtkListBox *box = (GtkListBox *)gtk_widget_get_parent(GTK_WIDGET(row));
-  gtk_list_box_remove(box, GTK_WIDGET(row));
-  gtk_list_box_insert(box, GTK_WIDGET(row), idx);
-  // Move data
-  guint idx_to_move, idx_to_move_before;
-  g_ptr_array_find(state.tl_data, row->data, &idx_to_move);
-  TaskListData *to_move = g_ptr_array_steal_index(state.tl_data, idx_to_move);
-  g_ptr_array_find(state.tl_data, target_row->data, &idx_to_move_before);
-  if (idx_to_move < idx_to_move_before)
-    g_ptr_array_insert(state.tl_data, idx_to_move_before + 1, to_move);
-  else
-    g_ptr_array_insert(state.tl_data, idx_to_move_before, to_move);
-  errands_data_write();
-  return true;
+  gpointer object = g_value_get_object(value);
+  if (ERRANDS_IS_SIDEBAR_TASK_LIST_ROW(object)) {
+    ErrandsSidebarTaskListRow *row = ERRANDS_SIDEBAR_TASK_LIST_ROW(object);
+    if (row == target_row)
+      return false;
+    LOG("Reorder task lists");
+    // Move widget
+    int idx = gtk_list_box_row_get_index(GTK_LIST_BOX_ROW(target_row));
+    GtkListBox *box = (GtkListBox *)gtk_widget_get_parent(GTK_WIDGET(row));
+    gtk_list_box_remove(box, GTK_WIDGET(row));
+    gtk_list_box_insert(box, GTK_WIDGET(row), idx);
+    // Move data
+    guint idx_to_move, idx_to_move_before;
+    g_ptr_array_find(state.tl_data, row->data, &idx_to_move);
+    TaskListData *to_move = g_ptr_array_steal_index(state.tl_data, idx_to_move);
+    g_ptr_array_find(state.tl_data, target_row->data, &idx_to_move_before);
+    if (idx_to_move < idx_to_move_before)
+      g_ptr_array_insert(state.tl_data, idx_to_move_before + 1, to_move);
+    else
+      g_ptr_array_insert(state.tl_data, idx_to_move_before, to_move);
+    errands_data_write();
+    return true;
+  } else if (ERRANDS_IS_TASK(object)) {
+    ErrandsTask *task = ERRANDS_TASK(object);
+    if (!strcmp(task->data->list_uid, target_row->data->uid))
+      return false;
+    LOG("Move task '%s' to list '%s'", task->data->uid, target_row->data->uid);
+    ErrandsSidebarTaskListRow *task_row = errands_sidebar_task_list_row_get(task->data->list_uid);
+    // Move widget
+    if (!strcmp(task->data->parent, "")) {
+      GtkWidget *first_task = gtk_widget_get_first_child(state.task_list->task_list);
+      if (first_task)
+        gtk_widget_insert_before(GTK_WIDGET(task), state.task_list->task_list, first_task);
+    } else {
+      ErrandsTask *task_parent = ERRANDS_TASK(
+          gtk_widget_get_ancestor(gtk_widget_get_parent(GTK_WIDGET(task)), ERRANDS_TYPE_TASK));
+      gtk_box_remove(GTK_BOX(task_parent->sub_tasks), GTK_WIDGET(task));
+      gtk_box_prepend(GTK_BOX(state.task_list->task_list), GTK_WIDGET(task));
+      errands_task_update_progress(task_parent);
+    }
+    gtk_widget_set_visible(GTK_WIDGET(task), false);
+    // Change data
+    strcpy(task->data->list_uid, target_row->data->uid);
+    strcpy(task->data->parent, "");
+    GPtrArray *sub_tasks = errands_task_get_sub_tasks(task);
+    for (int i = 0; i < sub_tasks->len; i++) {
+      ErrandsTask *t = sub_tasks->pdata[i];
+      strcpy(t->data->list_uid, target_row->data->uid);
+    }
+    // TODO: Change list_uid of all sub-tasks
+    errands_data_write();
+    // Update ui
+    errands_sidebar_task_list_row_update_counter(task_row);
+    errands_sidebar_task_list_row_update_counter(target_row);
+    errands_task_list_update_title();
+    // TODO: sync
+    return true;
+  }
+
+  return false;
 }
+
+// static time_t hover_time = 0;
+// static GdkDragAction on_hover_begin(GtkDropTarget *target, gdouble x, gdouble y,
+//                                     ErrandsSidebarTaskListRow *row) {
+//   if (time(NULL) - hover_time > 1) {
+//     bool contains =
+//         gtk_event_controller_motion_contains_pointer((GtkEventControllerMotion
+//         *)row->hover_ctrl);
+//   }
+//   return 0;
+// }

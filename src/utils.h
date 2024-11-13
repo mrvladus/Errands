@@ -1,5 +1,6 @@
 #pragma once
 
+#include "utils/array.h"
 #include "utils/datetime.h"
 #include "utils/files.h"
 #include "utils/ical.h"
