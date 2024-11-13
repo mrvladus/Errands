@@ -15,7 +15,7 @@ struct _ErrandsSidebarTaskListRow {
   GtkWidget *color_btn;
   GtkWidget *label;
   GtkWidget *counter;
-  GtkEventController *hover_ctrl;
+  // GtkEventController *hover_ctrl;
   TaskListData *data;
 };
 

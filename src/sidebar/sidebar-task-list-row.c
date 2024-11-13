@@ -93,9 +93,9 @@ static void errands_sidebar_task_list_row_init(ErrandsSidebarTaskListRow *self) 
   gtk_widget_add_controller(GTK_WIDGET(self), GTK_EVENT_CONTROLLER(drop_target));
 
   // Drop motion
-  self->hover_ctrl = gtk_drop_controller_motion_new();
+  // self->hover_ctrl = gtk_drop_controller_motion_new();
   // g_signal_connect(drop_target, "enter", G_CALLBACK(on_hover_begin), self);
-  gtk_widget_add_controller(GTK_WIDGET(self), GTK_EVENT_CONTROLLER(self->hover_ctrl));
+  // gtk_widget_add_controller(GTK_WIDGET(self), GTK_EVENT_CONTROLLER(self->hover_ctrl));
 }
 
 ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_new(TaskListData *data) {
@@ -370,7 +370,6 @@ static gboolean on_drop(GtkDropTarget *target, const GValue *value, double x, do
       ErrandsTask *t = sub_tasks->pdata[i];
       strcpy(t->data->list_uid, target_row->data->uid);
     }
-    // TODO: Change list_uid of all sub-tasks
     errands_data_write();
     // Update ui
     errands_sidebar_task_list_row_update_counter(task_row);
