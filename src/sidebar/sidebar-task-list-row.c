@@ -7,8 +7,6 @@
 #include "../state.h"
 #include "../task-list.h"
 #include "../utils.h"
-#include "glib.h"
-#include "gtk/gtkrevealer.h"
 
 #include <glib/gi18n.h>
 #include <time.h>
@@ -113,7 +111,7 @@ ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_new(TaskListData *data)
 }
 
 ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_get(const char *uid) {
-  GPtrArray *children = get_children(state.sidebar->task_lists_box);
+  g_autoptr(GPtrArray) children = get_children(state.sidebar->task_lists_box);
   for (int i = 0; i < children->len; i++) {
     TaskListData *l_data = ((ErrandsSidebarTaskListRow *)children->pdata[i])->data;
     if (!strcmp(l_data->uid, uid))
@@ -129,9 +127,8 @@ void errands_sidebar_task_list_row_update_counter(ErrandsSidebarTaskListRow *row
     if (!strcmp(row->data->uid, td->list_uid) && !td->trash && !td->deleted && !td->completed)
       c++;
   }
-  char *num = g_strdup_printf("%d", c);
+  g_autofree char *num = g_strdup_printf("%d", c);
   gtk_label_set_label(GTK_LABEL(row->counter), c > 0 ? num : "");
-  g_free(num);
 }
 
 void errands_sidebar_task_list_row_update_title(ErrandsSidebarTaskListRow *row) {
@@ -181,7 +178,7 @@ static void on_action_rename(GSimpleAction *action, GVariant *param,
 // - EXPORT - //
 
 static void __on_export_finish(GObject *obj, GAsyncResult *res, gpointer data) {
-  GFile *f = gtk_file_dialog_save_finish(GTK_FILE_DIALOG(obj), res, NULL);
+  g_autoptr(GFile) f = gtk_file_dialog_save_finish(GTK_FILE_DIALOG(obj), res, NULL);
   if (!f)
     return;
   FILE *file = fopen(g_file_get_path(f), "w");
@@ -199,7 +196,7 @@ static void __on_export_finish(GObject *obj, GAsyncResult *res, gpointer data) {
 
 static void on_action_export(GSimpleAction *action, GVariant *param,
                              ErrandsSidebarTaskListRow *row) {
-  GtkFileDialog *dialog = gtk_file_dialog_new();
+  g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
   GString *name = g_string_new(row->data->name);
   g_string_append(name, ".ics");
   g_object_set(dialog, "initial-name", name->str, NULL);
@@ -365,7 +362,7 @@ static gboolean on_drop(GtkDropTarget *target, const GValue *value, double x, do
     // Change data
     strcpy(task->data->list_uid, target_row->data->uid);
     strcpy(task->data->parent, "");
-    GPtrArray *sub_tasks = errands_task_get_sub_tasks(task);
+    g_autoptr(GPtrArray) sub_tasks = errands_task_get_sub_tasks(task);
     for (int i = 0; i < sub_tasks->len; i++) {
       ErrandsTask *t = sub_tasks->pdata[i];
       strcpy(t->data->list_uid, target_row->data->uid);

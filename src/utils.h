@@ -27,6 +27,12 @@ static inline GPtrArray *get_children(GtkWidget *parent) {
   return children;
 }
 
+static inline void gtk_box_remove_all(GtkWidget *box) {
+  g_autoptr(GPtrArray) children = get_children(box);
+  for (int i = 0; i < children->len; i++)
+    gtk_box_remove(GTK_BOX(box), GTK_WIDGET(children->pdata[i]));
+}
+
 static inline bool string_contains(const char *haystack, const char *needle) {
   return (bool)strcasestr(haystack, needle);
 }

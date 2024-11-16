@@ -5,19 +5,16 @@
 
 #include <glib/gi18n.h>
 
-G_DEFINE_TYPE(ErrandsSidebarAllRow, errands_sidebar_all_row,
-              GTK_TYPE_LIST_BOX_ROW)
+G_DEFINE_TYPE(ErrandsSidebarAllRow, errands_sidebar_all_row, GTK_TYPE_LIST_BOX_ROW)
 
-static void
-errands_sidebar_all_row_class_init(ErrandsSidebarAllRowClass *class) {}
+static void errands_sidebar_all_row_class_init(ErrandsSidebarAllRowClass *class) {}
 
 static void errands_sidebar_all_row_init(ErrandsSidebarAllRow *self) {
   LOG("Creating all tasks sidebar row");
 
   GtkWidget *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
   gtk_list_box_row_set_child(GTK_LIST_BOX_ROW(self), box);
-  gtk_box_append(GTK_BOX(box),
-                 gtk_image_new_from_icon_name("errands-all-tasks-symbolic"));
+  gtk_box_append(GTK_BOX(box), gtk_image_new_from_icon_name("errands-all-tasks-symbolic"));
   gtk_box_append(GTK_BOX(box), gtk_label_new(C_("All tasks", "All")));
 
   // Counter
@@ -39,7 +36,6 @@ void errands_sidebar_all_row_update_counter(ErrandsSidebarAllRow *row) {
     if (!td->deleted && !td->trash && !td->completed)
       len++;
   }
-  char *num = g_strdup_printf("%d", len);
+  g_autofree char *num = g_strdup_printf("%d", len);
   gtk_label_set_label(GTK_LABEL(row->counter), len > 0 ? num : "");
-  g_free(num);
 }

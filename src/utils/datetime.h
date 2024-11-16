@@ -19,3 +19,21 @@ static inline char *get_today_date() {
   g_date_time_unref(dt);
   return date;
 }
+
+// Helper function to parse the due date into a GDateTime
+static inline GDateTime *parse_date(const char *date) {
+  if (strlen(date) == 8) { // Format: "YYYYMMDD"
+    char year[5], month[3], day[3];
+    strncpy(year, date, 4);
+    strncpy(month, date + 4, 2);
+    strncpy(day, date + 6, 2);
+    year[4] = '\0';
+    month[2] = '\0';
+    day[2] = '\0';
+
+    return g_date_time_new_local(atoi(year), atoi(month), atoi(day), 0, 0, 0);
+  } else if (strlen(date) == 16) { // Format: "YYYYMMDDTHHMMSSZ"
+    return g_date_time_new_from_iso8601(date, NULL);
+  }
+  return NULL;
+}

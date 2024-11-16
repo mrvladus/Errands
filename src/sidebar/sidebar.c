@@ -5,7 +5,7 @@
 #include "../state.h"
 #include "../task-list.h"
 #include "../utils.h"
-#include "glib.h"
+#include "glibconfig.h"
 #include "sidebar-all-row.h"
 #include "sidebar-task-list-row.h"
 
@@ -119,14 +119,13 @@ ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(ErrandsSidebar *sb, Tas
 }
 
 void errands_sidebar_select_last_opened_page() {
-  GPtrArray *rows = get_children(state.sidebar->task_lists_box);
+  g_autoptr(GPtrArray) rows = get_children(state.sidebar->task_lists_box);
   char *last_uid = errands_settings_get("last_list_uid", SETTING_TYPE_STRING).s;
   for (int i = 0; i < rows->len; i++) {
     ErrandsSidebarTaskListRow *row = rows->pdata[i];
     if (!strcmp(last_uid, row->data->uid))
       g_signal_emit_by_name(row, "activate", NULL);
   }
-  g_ptr_array_free(rows, false);
 }
 
 // --- SIGNAL HANDLERS --- //
@@ -146,10 +145,10 @@ static void on_errands_sidebar_filter_row_activated(GtkListBox *box, GtkListBoxR
 }
 
 static void __on_open_finish(GObject *obj, GAsyncResult *res, ErrandsSidebar *sb) {
-  GFile *file = gtk_file_dialog_open_finish(GTK_FILE_DIALOG(obj), res, NULL);
+  g_autoptr(GFile) file = gtk_file_dialog_open_finish(GTK_FILE_DIALOG(obj), res, NULL);
   if (!file)
     return;
-  char *path = g_file_get_path(file);
+  g_autofree char *path = g_file_get_path(file);
   char *ical = read_file_to_string(path);
   if (ical) {
     TaskListData *tld = errands_task_list_from_ical(ical);
@@ -157,23 +156,21 @@ static void __on_open_finish(GObject *obj, GAsyncResult *res, ErrandsSidebar *sb
       g_ptr_array_add(state.tl_data, tld);
       errands_sidebar_add_task_list(sb, tld);
       // Add tasks
-      GPtrArray *tasks = errands_data_tasks_from_ical(ical, tld->uid);
+      g_autoptr(GPtrArray) tasks = errands_data_tasks_from_ical(ical, tld->uid);
       for_range(i, 0, tasks->len) {
         TaskData *td = tasks->pdata[i];
         g_ptr_array_add(state.t_data, td);
         errands_task_list_add(td);
       }
-      g_ptr_array_free(tasks, false);
     }
     free(ical);
   }
-  g_free(path);
   errands_data_write();
   // TODO: sync
 }
 
 static void on_import_action(GSimpleAction *action, GVariant *param, ErrandsSidebar *sb) {
-  GtkFileDialog *dialog = gtk_file_dialog_new();
+  g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
   gtk_file_dialog_open(dialog, GTK_WINDOW(state.main_window), NULL,
                        (GAsyncReadyCallback)__on_open_finish, sb);
 }

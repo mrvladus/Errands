@@ -1,7 +1,6 @@
 #pragma once
 
 #include "data.h"
-#include "glib.h"
 
 #include <adwaita.h>
 
@@ -28,3 +27,4 @@ void errands_task_list_filter_by_uid(const char *uid);
 void errands_task_list_filter_by_text(const char *text);
 // Sort tasks by completion in the given task list box
 void errands_task_list_sort_by_completion(GtkWidget *task_list);
+void errands_task_list_sort_by_date(GtkWidget *task_list);

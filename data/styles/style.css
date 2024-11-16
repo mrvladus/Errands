@@ -181,6 +181,17 @@
     background-color: var(--blue-1);
 }
 
+/* Menus */
+
+.menu-item {
+    padding: 4px;
+    border-radius: 6px;
+}
+
+.menu-item:hover {
+    background-color: var(--shade-color);
+}
+
 /* Overrides */
 
 colorbutton button {
