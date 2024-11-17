@@ -1,6 +1,8 @@
 #pragma once
 
+#include "macros.h"
 #include <glib.h>
+#include <stdio.h>
 
 static inline void get_date_time(char *date_time) {
   GDateTime *dt = g_date_time_new_now_local();
@@ -30,8 +32,9 @@ static inline GDateTime *parse_date(const char *date) {
     year[4] = '\0';
     month[2] = '\0';
     day[2] = '\0';
-
-    return g_date_time_new_local(atoi(year), atoi(month), atoi(day), 0, 0, 0);
+    char dt[17];
+    sprintf(dt, "%s%s%sT000000Z", year, month, day);
+    return g_date_time_new_from_iso8601(dt, NULL);
   } else if (strlen(date) == 16) { // Format: "YYYYMMDDTHHMMSSZ"
     return g_date_time_new_from_iso8601(date, NULL);
   }

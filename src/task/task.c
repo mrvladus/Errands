@@ -7,15 +7,8 @@
 #include "../state.h"
 #include "../task-list.h"
 #include "../utils.h"
-#include "glib-object.h"
-#include "glib.h"
-#include "gtk/gtk.h"
-#include "gtk/gtkrevealer.h"
 
 #include <glib/gi18n.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <string.h>
 
 // ---------- SIGNALS ---------- //
 
@@ -489,6 +482,7 @@ static void on_errands_task_sub_task_added(GtkEntry *entry, ErrandsTask *task) {
   TaskData *new_td = errands_data_add_task((char *)text, task->data->list_uid, task->data->uid);
   gtk_box_prepend(GTK_BOX(task->sub_tasks), GTK_WIDGET(errands_task_new(new_td)));
   gtk_editable_set_text(GTK_EDITABLE(entry), "");
+  errands_task_list_sort(task->sub_tasks);
 }
 
 static void on_errands_task_edited(AdwEntryRow *entry, ErrandsTask *task) {

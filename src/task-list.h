@@ -27,4 +27,7 @@ void errands_task_list_filter_by_uid(const char *uid);
 void errands_task_list_filter_by_text(const char *text);
 // Sort tasks by completion in the given task list box
 void errands_task_list_sort_by_completion(GtkWidget *task_list);
-void errands_task_list_sort_by_date(GtkWidget *task_list);
+// General task list sort function. Depends on sort_by setting. Sorts by completion anyways.
+void errands_task_list_sort(GtkWidget *task_list);
+void errands_task_list_sort_recursive(GtkWidget *task_list);
+void errands_task_list_reload();
