@@ -145,11 +145,12 @@ class Window(Adw.ApplicationWindow):
         self.toast_overlay.add_toast(Adw.Toast.new(title=text))
 
     def _create_action(self, name: str, callback: callable, shortcuts=None) -> None:
+        app: Gio.Application = Gio.Application.get_default()
         action: Gio.SimpleAction = Gio.SimpleAction.new(name, None)
         action.connect("activate", callback)
         if shortcuts:
-            self.props.application.set_accels_for_action(f"app.{name}", shortcuts)
-        self.props.application.add_action(action)
+            app.set_accels_for_action(f"app.{name}", shortcuts)
+        app.add_action(action)
 
     def _create_actions(self) -> None:
         """
