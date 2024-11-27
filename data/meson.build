@@ -1,6 +1,10 @@
 subdir('resources')
 
-install_subdir('icons', install_dir: get_option('datadir'))
+install_subdir(
+  'icons',
+  install_dir: get_option('datadir'),
+  exclude_files: ['io.github.mrvladus.List.Source.svg'],
+)
 
 desktop_file = i18n.merge_file(
   input: configure_file(
