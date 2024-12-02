@@ -10,7 +10,7 @@ from typing import Any
 import urllib3
 import caldav
 from caldav import Calendar, DAVClient, Principal, Todo
-from caldav.elements import dav
+from caldav.elements import dav, ical
 
 from errands.lib.data import TaskData, TaskListData, UserData
 from errands.lib.gsettings import GSettings
