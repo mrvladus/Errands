@@ -53,7 +53,6 @@ configure_file(
   configuration: conf,
   install: true,
   install_dir: get_option('bindir'),
-  install_mode: 'r-xr--r--',
 )
 install_data(join_paths('errands', 'application.py'), install_dir: moduledir)
 install_data(join_paths('errands', 'state.py'), install_dir: moduledir)
