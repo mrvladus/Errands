@@ -1,6 +1,6 @@
 CC = gcc
-CFLAGS = $(shell pkg-config --cflags libadwaita-1 gtksourceview-5) -O3
-LDFLAGS = $(shell pkg-config --libs libadwaita-1 gtksourceview-5)
+CFLAGS = $(shell pkg-config --cflags libadwaita-1 gtksourceview-5 libcurl) -O3
+LDFLAGS = $(shell pkg-config --libs libadwaita-1 gtksourceview-5 libcurl)
 
 # Source files
 SRC = $(shell find src -name '*.c')

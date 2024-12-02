@@ -1,7 +1,7 @@
 #include "sidebar-all-row.h"
-#include "../data.h"
-#include "../state.h"
-#include "../utils.h"
+#include "data.h"
+#include "state.h"
+#include "utils.h"
 
 #include <glib/gi18n.h>
 

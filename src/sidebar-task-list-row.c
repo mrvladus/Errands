@@ -1,12 +1,12 @@
 #include "sidebar-task-list-row.h"
-#include "../components.h"
-#include "../data.h"
-#include "../dialogs/delete-list-dialog.h"
-#include "../dialogs/rename-list-dialog.h"
-#include "../settings.h"
-#include "../state.h"
-#include "../task-list.h"
-#include "../utils.h"
+#include "components.h"
+#include "data.h"
+#include "delete-list-dialog.h"
+#include "rename-list-dialog.h"
+#include "settings.h"
+#include "state.h"
+#include "task-list.h"
+#include "utils.h"
 
 #include <glib/gi18n.h>
 #include <time.h>

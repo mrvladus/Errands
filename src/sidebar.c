@@ -1,13 +1,13 @@
 #include "sidebar.h"
-#include "../components.h"
-#include "../data.h"
-#include "../settings.h"
-#include "../state.h"
-#include "../task-list.h"
-#include "../utils.h"
+#include "components.h"
+#include "data.h"
 #include "glibconfig.h"
+#include "settings.h"
 #include "sidebar-all-row.h"
 #include "sidebar-task-list-row.h"
+#include "state.h"
+#include "task-list.h"
+#include "utils.h"
 
 #include <glib/gi18n.h>
 

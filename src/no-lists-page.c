@@ -1,7 +1,4 @@
 #include "no-lists-page.h"
-#include "adwaita.h"
-#include "glib-object.h"
-#include "gtk/gtk.h"
 #include "state.h"
 
 #include <glib/gi18n.h>

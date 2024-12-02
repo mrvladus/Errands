@@ -23,3 +23,9 @@ CompileFlags:
     - -I/usr/lib64/glib-2.0/include
     - -I/usr/include/sysprof-6
     - -I/usr/include/gtksourceview-5
+    - -I/usr/include/evolution-data-server
+    - -I/usr/include/libsoup-3.0
+    - -I/usr/include/json-glib-1.0
+    - -I/usr/include/gio-unix-2.0
+    - -I/usr/include/libsecret-1
+    - -I/usr/include/p11-kit-1

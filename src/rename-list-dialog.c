@@ -1,7 +1,7 @@
 #include "rename-list-dialog.h"
-#include "../data.h"
-#include "../sidebar/sidebar-task-list-row.h"
-#include "../state.h"
+#include "data.h"
+#include "sidebar-task-list-row.h"
+#include "state.h"
 
 #include <glib/gi18n.h>
 

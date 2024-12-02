@@ -1,8 +1,5 @@
 #pragma once
 
-#include "gdk/gdk.h"
-#include "glib-object.h"
-#include "gtk/gtk.h"
 #include <adwaita.h>
 
 #include <stdarg.h>
