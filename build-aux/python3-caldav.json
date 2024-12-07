@@ -7,8 +7,8 @@
   "sources": [
     {
       "type": "file",
-      "url": "https://files.pythonhosted.org/packages/f1/e0/0a3762eea7b1d4d855639f7eaee3a0006169fd79d86ae0c660ae5d1d4c60/caldav-1.3.9-py3-none-any.whl",
-      "sha256": "7c38f1def110809bd50acd3d648f6115b33b8f5395c457215b3b1147c70564d9"
+      "url": "https://files.pythonhosted.org/packages/77/86/c8fff55bd0ab9410cca9dbfa92e91ebcf3cc1a7266e33888364e7aaa1222/caldav-1.4.0-py3-none-any.whl",
+      "sha256": "e75e84824092e33a9e03ac693de3d01133a3e044fd50a1c542c7f78d1aff0cb2"
     },
     {
       "type": "file",
@@ -18,14 +18,12 @@
     {
       "type": "file",
       "url": "https://files.pythonhosted.org/packages/99/b0/9c365f6d79a9f0f3c379ddb40a256a67aa69c59609608fe7feb6235896e1/charset_normalizer-3.3.2-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl",
-      "sha256": "8f4a014bc36d3c57402e2977dada34f9c12300af536839dc38c0beab8878f38a",
-      "only-arches": ["aarch64"]
+      "sha256": "8f4a014bc36d3c57402e2977dada34f9c12300af536839dc38c0beab8878f38a"
     },
     {
       "type": "file",
       "url": "https://files.pythonhosted.org/packages/ee/fb/14d30eb4956408ee3ae09ad34299131fb383c47df355ddb428a7331cfa1e/charset_normalizer-3.3.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
-      "sha256": "90d558489962fd4918143277a773316e56c72da56ec7aa3dc3dbbe20fdfed15b",
-      "only-arches": ["x86_64"]
+      "sha256": "90d558489962fd4918143277a773316e56c72da56ec7aa3dc3dbbe20fdfed15b"
     },
     {
       "type": "file",
@@ -40,14 +38,12 @@
     {
       "type": "file",
       "url": "https://files.pythonhosted.org/packages/d0/f1/3a0bd5064c764966e5d1dd0e75048960a7f38c833422ff5e10c8f4ad8363/lxml-5.2.1-cp312-cp312-manylinux_2_28_aarch64.whl",
-      "sha256": "f9737bf36262046213a28e789cc82d82c6ef19c85a0cf05e75c670a33342ac2c",
-      "only-arches": ["aarch64"]
+      "sha256": "f9737bf36262046213a28e789cc82d82c6ef19c85a0cf05e75c670a33342ac2c"
     },
     {
       "type": "file",
       "url": "https://files.pythonhosted.org/packages/ac/9b/f97fac2e2bacbc91d1a15f24e3bdbb52e418591109393144a943bd502d2c/lxml-5.2.1-cp312-cp312-manylinux_2_28_x86_64.whl",
-      "sha256": "f0a1bc63a465b6d72569a9bba9f2ef0334c4e03958e043da1920299100bc7c08",
-      "only-arches": ["x86_64"]
+      "sha256": "f0a1bc63a465b6d72569a9bba9f2ef0334c4e03958e043da1920299100bc7c08"
     },
     {
       "type": "file",
