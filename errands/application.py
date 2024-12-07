@@ -135,7 +135,7 @@ Exec=errands --gapplication-service"""
                 portal.request_background(
                     None,
                     None,
-                    None,
+                    [""],
                     Xdp.BackgroundFlags.NONE,
                     None,
                     None,
