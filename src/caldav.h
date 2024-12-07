@@ -1,5 +1,4 @@
 #pragma once
 
-#include <curl/curl.h>
-
-char *caldav_discover_caldav_url(const char *base_url);
+void caldav_init(const char *base_url, const char *username, const char *password);
+void caldav_cleanup();

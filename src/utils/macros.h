@@ -1,7 +1,9 @@
 #pragma once
 
 // Log formatted message
-#define LOG(format, ...) fprintf(stderr, "Errands: " format "\n", ##__VA_ARGS__)
+#define LOG(format, ...) fprintf(stderr, "\033[0;32m[Errands] \033[0m" format "\n", ##__VA_ARGS__)
+#define ERROR(format, ...)                                                                         \
+  fprintf(stderr, "\033[1;31m[Errands Error] " format "\033[0m\n", ##__VA_ARGS__)
 
 // For range
 #define for_range(var, from, to) for (int var = from; var < to; var++)
