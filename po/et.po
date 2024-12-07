@@ -430,7 +430,7 @@ msgid "Syncing"
 msgstr "Sünkroonimine"
 
 #: errands/widgets/window.py:116
-msgid "First syncronization is running"
+msgid "First synchronization is running"
 msgstr "Esmane sünkroonimine käib"
 
 #: errands/widgets/window.py:172

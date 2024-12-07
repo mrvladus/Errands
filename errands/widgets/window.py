@@ -113,7 +113,7 @@ class Window(Adw.ApplicationWindow):
                     children=[
                         Adw.StatusPage(
                             title=_("Syncing"),
-                            description=_("First syncronization is running"),
+                            description=_("First synchronization is running"),
                             icon_name="errands-sync-symbolic",
                         ),
                     ],
