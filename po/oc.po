@@ -431,7 +431,7 @@ msgid "Syncing"
 msgstr "Sincronizacion..."
 
 #: errands/widgets/window.py:116
-msgid "First syncronization is running"
+msgid "First synchronization is running"
 msgstr ""
 
 #: errands/widgets/window.py:172
