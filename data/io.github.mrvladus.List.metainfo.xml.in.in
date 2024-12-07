@@ -57,6 +57,11 @@
   </requires>
 
   <releases>
+   <release version="46.2.7" date="2024-12-07">
+    <description translate="no">
+      <p>Bug fixes and translations updates</p>
+    </description>
+  </release>
   <release version="46.2.6" date="2024-10-09">
       <description translate="no">
         <p>Fixes:</p>
