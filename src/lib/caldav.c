@@ -1,8 +1,11 @@
 #include "caldav.h"
+// #define XML_H_DEBUG
+#include "xml.h"
 
 #include <curl/curl.h>
 
 #include <regex.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -79,47 +82,6 @@ char *caldav_propfind(const char *url, int depth, const char *xml) {
   return response.data; // Caller is responsible for freeing the returned string
 }
 
-char *get_tag(const char *xml, const char *regex) {
-  regex_t compiled_regex;
-  regmatch_t matches[2];
-
-  // Compile the regex
-  if (regcomp(&compiled_regex, regex, REG_EXTENDED) != 0) {
-    fprintf(stderr, "Could not compile regex\n");
-    return NULL;
-  }
-
-  // Execute the regex
-  if (regexec(&compiled_regex, xml, 2, matches, 0) == 0) {
-    // Extract the matched href
-    size_t start = matches[1].rm_so; // Start of the match
-    size_t end = matches[1].rm_eo;   // End of the match
-
-    // Calculate the length of the matched string
-    size_t length = end - start;
-
-    // Allocate memory for the matched string
-    char *href = (char *)malloc(length + 1);
-    if (href == NULL) {
-      fprintf(stderr, "Memory allocation failed\n");
-      regfree(&compiled_regex);
-      return NULL;
-    }
-
-    // Copy the matched string into the allocated memory
-    strncpy(href, xml + start, length);
-    href[length] = '\0'; // Null-terminate the string
-
-    // Free the compiled regex
-    regfree(&compiled_regex);
-    return href; // Return the matched href
-  } else {
-    // Free the compiled regex
-    regfree(&compiled_regex);
-    return NULL; // No match found
-  }
-}
-
 // No-op callback to discard response body
 static size_t null_write_callback(void *ptr, size_t size, size_t nmemb, void *data) {
   return size * nmemb; // Ignore the data
@@ -160,18 +122,22 @@ char *caldav_get_principal_url() {
   printf("Getting CalDAV principal URL ... ");
 
   char *out = NULL;
+  const char *request_body = "<d:propfind xmlns:d=\"DAV:\">"
+                             "  <d:prop>"
+                             "    <d:current-user-principal />"
+                             "  </d:prop>"
+                             "</d:propfind>";
+  char *xml = caldav_propfind(__caldav_url, 0, request_body);
+  XMLNode *root = xml_parse_string(xml);
+  XMLNode *href = xml_node_find_by_path(
+      root, "multistatus/response/propstat/prop/current-user-principal/href", false);
 
-  char *xml = caldav_propfind(
-      __caldav_url, 0,
-      "<d:propfind xmlns:d=\"DAV:\"><d:prop><d:current-user-principal /></d:prop></d:propfind>");
-  char *principal_url = get_tag(xml, "<[^:]+:current-user-principal>\\s*<[^:]+:href>(.*?)</"
-                                     "[^:]+:href>\\s*</[^:]+:current-user-principal>");
-  char url[strlen(principal_url) + strlen(__base_url) + 1];
-  sprintf(url, "%s%s", __base_url, principal_url);
+  char url[strlen(href->text) + strlen(__base_url) + 1];
+  sprintf(url, "%s%s", __base_url, href->text);
   out = strdup(url);
 
   free(xml);
-  free(principal_url);
+  xml_node_free(root);
 
   printf("%s\n", out);
   return out;
@@ -188,14 +154,16 @@ char *caldav_get_calendars_url() {
       "  </d:prop>"
       "</d:propfind>";
   char *xml = caldav_propfind(__principal_url, 0, request_body);
-  char *calendar_url = get_tag(xml, "<[^:]+:calendar-home-set>\\s*<[^:]+:href>(.*?)</"
-                                    "[^:]+:href>\\s*</[^:]+:calendar-home-set>");
-  char url[strlen(calendar_url) + strlen(__base_url) + 1];
-  sprintf(url, "%s%s", __base_url, calendar_url);
+  XMLNode *root = xml_parse_string(xml);
+  XMLNode *href = xml_node_find_by_path(
+      root, "multistatus/response/propstat/prop/calendar-home-set/href", false);
+
+  char url[strlen(href->text) + strlen(__base_url) + 1];
+  sprintf(url, "%s%s", __base_url, href->text);
   out = strdup(url);
 
   free(xml);
-  free(calendar_url);
+  xml_node_free(root);
 
   printf("%s\n", out);
   return out;

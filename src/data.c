@@ -2,7 +2,7 @@
 #include "state.h"
 #include "utils.h"
 
-#include "external/cJSON.h"
+#include "lib/cJSON.h"
 #include "utils/array.h"
 
 #include <glib.h>

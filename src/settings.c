@@ -1,5 +1,5 @@
 #include "settings.h"
-#include "external/cJSON.h"
+#include "lib/cJSON.h"
 #include "utils.h"
 
 #include <glib.h>
