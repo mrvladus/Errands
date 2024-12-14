@@ -175,18 +175,13 @@ static inline XMLNode *xml_node_find_tag(XMLNode *node, const char *tag, bool ex
 }
 
 static inline XMLNode *xml_node_find_by_path(XMLNode *root, const char *path, bool exact) {
-  if (!root || !path) {
-    return NULL; // Invalid input
-  }
-
+  if (!root || !path)
+    return NULL;                       // Invalid input
   char *tokenized_path = strdup(path); // Copy to avoid modifying the input
-  if (!tokenized_path) {
+  if (!tokenized_path)
     return NULL; // Memory allocation failure
-  }
-
   char *segment = strtok(tokenized_path, "/");
   XMLNode *current = root;
-
   while (segment && current) {
     bool found = false;
     for (size_t i = 0; i < current->children->len; i++) {
@@ -204,12 +199,13 @@ static inline XMLNode *xml_node_find_by_path(XMLNode *root, const char *path, bo
     }
     segment = strtok(NULL, "/");
   }
-
   free(tokenized_path);
   return current;
 }
 
 static inline const char *xml_node_attr(XMLNode *node, const char *attr_key) {
+  if (!node || !attr_key)
+    return NULL;
   for (size_t i = 0; i < node->attrs->len; i++) {
     XMLAttr *attr = (XMLAttr *)node->attrs->data[i];
     if (!strcmp(attr->key, attr_key))
@@ -247,161 +243,182 @@ static inline void xml_node_free(XMLNode *node) {
 
 // ------ PARSING FUNCTIONS ------ //
 
-static void skip_white_space(const char *xml, size_t *idx) {
-  while (isspace(xml[*idx]))
-    (*idx)++;
-}
-
 static void strip_new_lines(char *str) {
-  // Pointer to the first non-whitespace character
   char *start = str;
   while (isspace((unsigned char)*start))
     start++;
-  // Pointer to the last non-whitespace character
   char *end = str + strlen(str) - 1;
   while (end > start && isspace((unsigned char)*end))
     end--;
-  // Null-terminate the string after the last non-whitespace character
   *(end + 1) = '\0';
-  // Move the stripped string to the beginning of the original string
   if (start != str)
-    memmove(str, start, end - start + 2); // +2 to include the null terminator
-}
-
-// Parse attr="value" key value pairs inside of the tag
-static XMLNode *parse_tag_attrs(XMLNode *node, const char *xml, size_t *idx) {
-  while (xml[*idx] != '>') {
-    // Skip white spaces
-    if (isspace(xml[*idx])) {
-      (*idx)++;
-      continue;
-    }
-    // Tag is self-closing like <foo />
-    if (xml[*idx] == '/') {
-      (*idx) += 2;
-      return node->parent;
-    }
-    // Get attribute key
-    size_t key_start = *idx;
-    while (xml[*idx] != '=')
-      (*idx)++;
-    size_t key_len = *idx - key_start;
-    char *attr_key = (char *)malloc(sizeof(char) * key_len + 1);
-    strncpy(attr_key, xml + key_start, key_len);
-    attr_key[key_len] = '\0';
-    (*idx) += 2; // Skip '=' and '"'
-    // Get attribute value
-    size_t value_start = *idx;
-    while (xml[*idx] != '"')
-      (*idx)++;
-    size_t value_len = *idx - value_start;
-    (*idx)++; // Skip '"'
-    char *attr_value = (char *)malloc(sizeof(char) * value_len + 1);
-    strncpy(attr_value, xml + value_start, value_len);
-    attr_value[value_len] = '\0';
-    // Add attribute to node
-    xml_node_add_attr(node, attr_key, attr_value);
-  }
-  return node;
-}
-
-// Parse start tag
-static XMLNode *parse_start_tag(XMLNode *node, const char *xml, size_t *idx) {
-  (*idx)++; // Move past '<' character
-  size_t tag_start = *idx;
-  while (!isspace(xml[*idx]) && xml[*idx] != '>')
-    (*idx)++;
-  size_t tag_len = *idx - tag_start;
-  node->tag = (char *)malloc(sizeof(char) * tag_len + 1);
-  strncpy(node->tag, xml + tag_start, tag_len);
-  node->tag[tag_len] = '\0';
-  LOG_DEBUG("Parse start tag %s", node->tag);
-  XMLNode *out = node;
-  if (xml[*idx] != '>')
-    out = parse_tag_attrs(node, xml, idx);
-  (*idx)++; // Move past '>' character
-  return out;
-}
-
-// Parse inner text of the tag
-static void parse_text(XMLNode *node, const char *xml, size_t *idx) {
-  size_t text_start = *idx;
-  // while (xml[*idx] != '<' && xml[*idx + 1] != '/') {
-  //   LOG_DEBUG("%c", xml[*idx]);
-  //   (*idx)++;
-  // }
-  while (xml[*idx] != '<') {
-    (*idx)++;
-  }
-  size_t text_len = *idx - text_start;
-  node->text = (char *)malloc(sizeof(char) * text_len + 1);
-  strncpy(node->text, xml + text_start, text_len);
-  node->text[text_len] = '\0';
-  strip_new_lines(node->text);
-  LOG_DEBUG("Parse text %s", node->text);
-}
-
-// Parse ending tag like </tag>
-static XMLNode *parse_end_tag(XMLNode *node, const char *xml, size_t *idx) {
-  LOG_DEBUG("Parse end tag %s", node->tag);
-  while (xml[*idx] != '>')
-    (*idx)++;
-  (*idx)++; // Move past '>' character
-  return node->parent;
-}
-
-// Skip comments like <!-- comment -->
-static void parse_comment(const char *xml, size_t *idx) {
-  LOG_DEBUG("Parse comment");
-  while (xml[*idx] != '>')
-    (*idx)++;
-  (*idx)++; // Move past '>' character
-}
-
-// Parse <!tag> type of tags
-static void parse_processing_instruction(const char *xml, size_t *idx) {
-  LOG_DEBUG("Parse processing instruction");
-  size_t count = 0; // Count for inner '<' and '>' brackets
-  while (xml[*idx] != '>' && count != 0) {
-    if (xml[*idx] == '<')
-      count++;
-    else if (xml[*idx] == '>')
-      count--;
-    (*idx)++;
-  }
-  (*idx)++; // Move past '>' character
+    memmove(str, start, end - start + 2);
 }
 
 static inline XMLNode *xml_parse_string(const char *xml) {
   LOG_DEBUG("Parse string");
+
   XMLNode *root = xml_node_new(NULL);
   XMLNode *curr_node = root;
   size_t idx = 0;
+
   while (xml[idx] != '\0') {
-    // LOG_DEBUG("%c", xml[idx]);
     if (xml[idx] == '<') {
+
+      // Processing instruction
       if (xml[idx + 1] == '?') {
-        parse_processing_instruction(xml, &idx);
+        LOG_DEBUG("Parse processing instruction");
+        int count = 0; // Count for inner '<' and '>' brackets
+        while (true) {
+          if (xml[idx] == '<')
+            count++;
+          else if (xml[idx] == '>') {
+            count--;
+            if (count <= 0) {
+              idx++;
+              break;
+            }
+          }
+          idx++;
+        }
+        idx++; // Move past '>' character
         continue;
       }
+
+      // DOCTYPE
       if (xml[idx + 1] == '!') {
+        // Comment
         if (xml[idx + 2] == '-' && xml[idx + 3] == '-') {
-          parse_comment(xml, &idx);
+          LOG_DEBUG("Parse comment");
+          while (xml[idx] != '>')
+            idx++;
+          idx++; // Move past '>' character
           continue;
         }
       }
+
+      // End tag
       if (xml[idx + 1] == '/') {
-        curr_node = parse_end_tag(curr_node, xml, &idx);
+        LOG_DEBUG("Parse end tag: %s", curr_node->tag);
+        while (xml[idx] != '>')
+          idx++;
+        idx++; // Move past '>' character
+        curr_node = curr_node->parent;
         continue;
       }
+
       curr_node = xml_node_new(curr_node);
-      curr_node = parse_start_tag(curr_node, xml, &idx);
+
+      // Start tag
+      LOG_DEBUG("Start parsing tag");
+      XMLNode *new_current_node = curr_node;
+      idx++; // Move past '<' character
+      size_t tag_start = idx;
+      while (true) {
+        // Self-closing tag without attributes
+        if (xml[idx] == '/') {
+          LOG_DEBUG("Tag is self-closing without attributes");
+          while (xml[idx] != '>')
+            idx++;
+          new_current_node = curr_node->parent;
+          break;
+        }
+
+        // Space after tag name
+        if (isspace(xml[idx])) {
+          // Set tag name
+          size_t tag_len = idx - tag_start;
+          curr_node->tag = (char *)malloc(sizeof(char) * tag_len + 1);
+          strncpy(curr_node->tag, xml + tag_start, tag_len);
+          curr_node->tag[tag_len] = '\0';
+          LOG_DEBUG("Parsed start tag: %s", curr_node->tag);
+
+          // Skip white space
+          while (isspace(xml[idx]))
+            idx++;
+
+          // Self-closing tag without attributes
+          if (xml[idx] == '/') {
+            LOG_DEBUG("Tag is self-closing without attributes");
+            while (xml[idx] != '>')
+              idx++;
+            new_current_node = curr_node->parent;
+            break;
+          }
+
+          // Tag attributes
+          else {
+            while (xml[idx] != '>') {
+              // Skip white spaces
+              if (isspace(xml[idx])) {
+                idx++;
+                continue;
+              }
+              // Self-closing tag with attributes
+              if (xml[idx] == '/') {
+                LOG_DEBUG("Tag is self-closing");
+                new_current_node = curr_node->parent;
+                idx++;
+                continue;
+              }
+              // Get attribute key
+              size_t key_start = idx;
+              while (xml[idx] != '=')
+                idx++;
+              size_t key_len = idx - key_start;
+              char *attr_key = (char *)malloc(sizeof(char) * key_len + 1);
+              strncpy(attr_key, xml + key_start, key_len);
+              attr_key[key_len] = '\0';
+              idx += 2; // Skip '=' and '"'
+              // Get attribute value
+              size_t value_start = idx;
+              while (xml[idx] != '"')
+                idx++;
+              size_t value_len = idx - value_start;
+              idx++; // Skip '"'
+              char *attr_value = (char *)malloc(sizeof(char) * value_len + 1);
+              strncpy(attr_value, xml + value_start, value_len);
+              attr_value[value_len] = '\0';
+              // Add attribute to node
+              xml_node_add_attr(curr_node, attr_key, attr_value);
+              LOG_DEBUG("Parse attribute: %s='%s'", attr_key, attr_value);
+            }
+            break;
+          }
+        } else if (xml[idx] == '>') {
+          // Set tag name
+          size_t tag_len = idx - tag_start;
+          curr_node->tag = (char *)malloc(sizeof(char) * tag_len + 1);
+          strncpy(curr_node->tag, xml + tag_start, tag_len);
+          curr_node->tag[tag_len] = '\0';
+          LOG_DEBUG("Parsed start tag with no attributes: %s", curr_node->tag);
+          break;
+        }
+        idx++;
+      }
+      idx++; // Move past '>' character
+      curr_node = new_current_node;
       continue;
     }
-    if (!isspace(xml[idx]))
-      parse_text(curr_node, xml, &idx);
-    else
+
+    // Inner text
+    if (!isspace(xml[idx])) {
+      LOG_DEBUG("Start parsing text");
+      size_t text_start = idx;
+      while (true) {
+        if (xml[idx] == '<' && xml[idx + 1] == '/')
+          break;
+        idx++;
+      }
+      size_t text_len = idx - text_start;
+      curr_node->text = (char *)malloc(sizeof(char) * text_len + 1);
+      strncpy(curr_node->text, xml + text_start, text_len);
+      curr_node->text[text_len] = '\0';
+      strip_new_lines(curr_node->text);
+      LOG_DEBUG("End parsing text: %s", curr_node->text);
+    } else {
       idx++;
+    }
   }
   LOG_DEBUG("Done parsing string");
   return root;

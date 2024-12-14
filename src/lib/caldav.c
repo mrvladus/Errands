@@ -6,6 +6,7 @@
 
 #include <regex.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -20,6 +21,26 @@ char *__base_url = NULL;
 char *__caldav_url = NULL;
 char *__principal_url = NULL;
 char *__calendars_url = NULL;
+
+char *__extract_uuid(const char *path) {
+  // Check if the path is empty
+  if (!path || *path == '\0') {
+    return strdup(""); // Return an empty string if the path is empty
+  }
+  size_t len = strlen(path);
+  size_t end = len - 1;
+  if (path[end] == '/')
+    end--;
+  size_t start = end;
+  while (path[start] != '/')
+    start--;
+  start++;
+  char *out = malloc(sizeof(char) * (end - start) + 1);
+  strncpy(out, path + start, end - start);
+  out[end - start] = '\0';
+
+  return out;
+}
 
 // ---------- REQUESTS ---------- //
 
@@ -169,8 +190,9 @@ char *caldav_get_calendars_url() {
   return out;
 }
 
-char *caldav_get_calendars() {
-  char *out = NULL;
+CalDAVCalendar *caldav_calendar_new() { return (CalDAVCalendar *)malloc(sizeof(CalDAVCalendar)); }
+
+CalDAVList *caldav_get_calendars() {
   const char *request_body =
       "<d:propfind xmlns:d=\"DAV:\" "
       "xmlns:cs=\"http://calendarserver.org/ns/\" xmlns:c=\"urn:ietf:params:xml:ns:caldav\">"
@@ -182,8 +204,40 @@ char *caldav_get_calendars() {
       "  </d:prop>"
       "</d:propfind>";
   char *xml = caldav_propfind(__calendars_url, 1, request_body);
-  printf("%s\n", xml);
-  return out;
+  CalDAVList *calendars_list = caldav_list_new();
+
+  XMLNode *root = xml_parse_string(xml);
+  XMLNode *multistatus = xml_node_child_at(root, 0);
+  for (size_t i = 0; i < multistatus->children->len; i++) {
+    XMLNode *response = xml_node_child_at(multistatus, i);
+    XMLNode *supported_set = xml_node_find_tag(response, "supported-calendar-component-set", false);
+    if (supported_set) {
+      const char *set = xml_node_attr(xml_node_child_at(supported_set, 0), "name");
+      if (!strcmp(set, "VTODO")) {
+        XMLNode *deleted = xml_node_find_tag(response, "deleted-calendar", false);
+        if (!deleted) {
+          CalDAVCalendar *calendar = caldav_calendar_new();
+
+          XMLNode *name = xml_node_find_tag(response, "displayname", false);
+          calendar->name = strdup(name->text);
+
+          XMLNode *href = xml_node_find_tag(response, "href", false);
+          char cal_url[strlen(__base_url) + strlen(href->text) + 1];
+          snprintf(cal_url, strlen(__base_url) + strlen(href->text) + 1, "%s%s", __base_url,
+                   href->text);
+          calendar->url = strdup(cal_url);
+          calendar->uuid = __extract_uuid(href->text);
+          caldav_list_add(calendars_list, calendar);
+
+          printf("Found calendar '%s' at %s with uuid='%s'\n", calendar->name, calendar->url,
+                 calendar->uuid);
+        }
+      }
+    }
+  }
+  xml_node_free(root);
+
+  return calendars_list;
 }
 
 // ---------- INIT / CLEANUP ---------- //
@@ -208,4 +262,41 @@ void caldav_cleanup() {
   free(__caldav_url);
   free(__principal_url);
   curl_global_cleanup();
+}
+
+CalDAVList *caldav_list_new() {
+  CalDAVList *list = (CalDAVList *)malloc(sizeof(CalDAVList)); // Correct allocation
+  if (list == NULL) {
+    fprintf(stderr, "Memory allocation failed\n");
+    return NULL;
+  }
+  list->len = 0;
+  list->size = 1;
+  list->data = (void **)malloc(list->size * sizeof(void *));
+  if (list->data == NULL) {
+    fprintf(stderr, "Memory allocation for data array failed\n");
+    free(list);
+    return NULL;
+  }
+  return list;
+}
+
+void caldav_list_add(CalDAVList *list, void *data) {
+  if (list->len >= list->size) {
+    list->size *= 2;
+    void **new_data = (void **)realloc(list->data, list->size * sizeof(void *));
+    if (new_data == NULL) {
+      fprintf(stderr, "Memory reallocation failed\n");
+      return;
+    }
+    list->data = new_data;
+  }
+  list->data[list->len++] = data;
+}
+
+void caldav_list_free(CalDAVList *list) {
+  if (list != NULL) {
+    free(list->data);
+    free(list);
+  }
 }
