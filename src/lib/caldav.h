@@ -2,12 +2,24 @@
 
 #include <stddef.h>
 
-// Initialize caldav client with url, username and password
-void caldav_init(const char *base_url, const char *username, const char *password);
-// Cleanup all the memory allocations
-void caldav_cleanup();
+// --- CLIENT --- //
 
-typedef struct CalDAVList {
+typedef struct {
+  char *usrpwd;
+  char *base_url;
+  char *caldav_url;
+  char *principal_url;
+  char *calendars_url;
+} CalDAVClient;
+
+// Initialize caldav client with url, username and password
+CalDAVClient *caldav_client_new(const char *base_url, const char *username, const char *password);
+// Free client data
+void caldav_client_free(CalDAVClient *client);
+
+// --- DYNAMIC ARRAY --- //
+
+typedef struct {
   size_t size;
   size_t len;
   void **data;
@@ -19,10 +31,15 @@ void caldav_list_free(CalDAVList *list);
 
 // --- CALENDARS --- //
 
-typedef struct CalDAVCalendar {
+// CalDAV calendar
+typedef struct {
+  // Display name
   char *name;
+  // Supported component set like "VTODO" or "VEVENT"
   char *set;
+  // URL
   char *url;
+  // UUID
   char *uuid;
 } CalDAVCalendar;
 
@@ -30,15 +47,18 @@ typedef struct CalDAVCalendar {
 #define CALDAV_CALENDAR(ptr) (CalDAVCalendar *)ptr
 
 // Create new calendar struct.
-// set - "VEVENT" or "VTODO"
+// set - "VEVENT" or "VTODO".
 CalDAVCalendar *caldav_calendar_new(char *set, char *name, char *url);
-// Fetch calendars from server
-CalDAVList *caldav_get_calendars(const char *set);
+// Fetch calendars from server.
+// set - "VEVENT" or "VTODO".
+// Returns a CalDAVList* with items of type CalDAVCalendar.
+CalDAVList *caldav_get_calendars(CalDAVClient *client, const char *set);
 // Fetch events from CalDAVCalendar of type "calendar->set".
 // Returns a CalDAVList* with items of type CalDAVEvent.
-CalDAVList *caldav_calendar_get_events(CalDAVCalendar *calendar);
+CalDAVList *caldav_calendar_get_events(CalDAVClient *client, CalDAVCalendar *calendar);
 // Print calendar info
 void caldav_calendar_print(CalDAVCalendar *calendar);
+void caldav_calendar_free(CalDAVCalendar *calendar);
 
 // --- EVENTS --- //
 
