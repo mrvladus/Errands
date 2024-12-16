@@ -12,6 +12,27 @@
 
 #define CALDAV_LOG(format, ...) printf("[CalDAV] " format "\n", ##__VA_ARGS__)
 
+// --- STRUCTS --- //
+
+struct _CalDAVClient {
+  char *usrpwd;
+  char *base_url;
+  char *caldav_url;
+  char *principal_url;
+  char *calendars_url;
+};
+
+struct _CalDAVEvent {
+  char *ical;
+  char *url;
+};
+
+struct _CalDAVList {
+  size_t size;
+  size_t len;
+  void **data;
+};
+
 // --- HELPER FUCTIONS --- //
 
 char *__extract_uuid(const char *path) {
@@ -128,7 +149,7 @@ static char *caldav_discover_caldav_url(CalDAVClient *client) {
 
 // ---------- CLIENT ---------- //
 
-static char *caldav_get_principal_url(CalDAVClient *client) {
+static char *caldav_client_get_principal_url(CalDAVClient *client) {
   CALDAV_LOG("Getting CalDAV principal URL...");
   char *out = NULL;
   const char *request_body = "<d:propfind xmlns:d=\"DAV:\">"
@@ -149,7 +170,7 @@ static char *caldav_get_principal_url(CalDAVClient *client) {
   return out;
 }
 
-static char *caldav_get_calendars_url(CalDAVClient *client) {
+static char *caldav_client_get_calendars_url(CalDAVClient *client) {
   CALDAV_LOG("Getting CalDAV calendars URL...");
   char *out = NULL;
   const char *request_body =
@@ -182,9 +203,54 @@ CalDAVClient *caldav_client_new(const char *base_url, const char *username, cons
   client->caldav_url = caldav_discover_caldav_url(client);
   if (!client->caldav_url)
     return NULL;
-  client->principal_url = caldav_get_principal_url(client);
-  client->calendars_url = caldav_get_calendars_url(client);
+  client->principal_url = caldav_client_get_principal_url(client);
+  client->calendars_url = caldav_client_get_calendars_url(client);
   return client;
+}
+
+CalDAVList *caldav_client_get_calendars(CalDAVClient *client, const char *set) {
+  CALDAV_LOG("Getting calendars with '%s'...", set);
+  const char *request_body =
+      "<d:propfind xmlns:d=\"DAV:\" xmlns:cs=\"http://calendarserver.org/ns/\" "
+      "xmlns:c=\"urn:ietf:params:xml:ns:caldav\" xmlns:x1=\"http://apple.com/ns/ical/\">"
+      "  <d:prop>"
+      "    <d:resourcetype />"
+      "    <d:displayname />"
+      "    <x1:calendar-color />"
+      "    <cs:getctag />"
+      "    <c:supported-calendar-component-set />"
+      "  </d:prop>"
+      "</d:propfind>";
+  char *xml = caldav_request(client, "PROPFIND", client->calendars_url, 1, request_body);
+  CalDAVList *calendars_list = caldav_list_new();
+  XMLNode *root = xml_parse_string(xml);
+  XMLNode *multistatus = xml_node_child_at(root, 0);
+  for (size_t i = 0; i < multistatus->children->len; i++) {
+    XMLNode *response = xml_node_child_at(multistatus, i);
+    XMLNode *supported_set = xml_node_find_tag(response, "supported-calendar-component-set", false);
+    if (supported_set) {
+      const char *set_val = xml_node_attr(xml_node_child_at(supported_set, 0), "name");
+      if (!strcmp(set, "VTODO") && !strcmp(set_val, "VTODO")) {
+        XMLNode *deleted = xml_node_find_tag(response, "deleted-calendar", false);
+        if (!deleted) {
+          XMLNode *name = xml_node_find_tag(response, "displayname", false);
+          XMLNode *color = xml_node_find_tag(response, "calendar-color", false);
+          XMLNode *href = xml_node_find_tag(response, "href", false);
+          char cal_url[strlen(client->base_url) + strlen(href->text) + 1];
+          snprintf(cal_url, strlen(client->base_url) + strlen(href->text) + 1, "%s%s",
+                   client->base_url, href->text);
+          CalDAVCalendar *calendar =
+              caldav_calendar_new(color->text, (char *)set, name->text, cal_url);
+          caldav_list_add(calendars_list, calendar);
+          caldav_calendar_print(calendar);
+        }
+      }
+    }
+  }
+  free(xml);
+  xml_node_free(root);
+
+  return calendars_list;
 }
 
 void caldav_client_free(CalDAVClient *client) {
@@ -202,8 +268,9 @@ void caldav_client_free(CalDAVClient *client) {
 
 // ---------- CALENDAR ---------- //
 
-CalDAVCalendar *caldav_calendar_new(char *set, char *name, char *url) {
+CalDAVCalendar *caldav_calendar_new(char *color, char *set, char *name, char *url) {
   CalDAVCalendar *calendar = (CalDAVCalendar *)malloc(sizeof(CalDAVCalendar));
+  calendar->color = color;
   calendar->set = set;
   calendar->name = strdup(name);
   calendar->url = strdup(url);
@@ -243,50 +310,9 @@ CalDAVList *caldav_calendar_get_events(CalDAVClient *client, CalDAVCalendar *cal
   return events_list;
 }
 
-CalDAVList *caldav_get_calendars(CalDAVClient *client, const char *set) {
-  CALDAV_LOG("Getting calendars with '%s'...", set);
-  const char *request_body =
-      "<d:propfind xmlns:d=\"DAV:\" xmlns:cs=\"http://calendarserver.org/ns/\" "
-      "xmlns:c=\"urn:ietf:params:xml:ns:caldav\">"
-      "  <d:prop>"
-      "    <d:resourcetype />"
-      "    <d:displayname/>"
-      "    <cs:getctag />"
-      "    <c:supported-calendar-component-set />"
-      "  </d:prop>"
-      "</d:propfind>";
-  char *xml = caldav_request(client, "PROPFIND", client->calendars_url, 1, request_body);
-  CalDAVList *calendars_list = caldav_list_new();
-  XMLNode *root = xml_parse_string(xml);
-  XMLNode *multistatus = xml_node_child_at(root, 0);
-  for (size_t i = 0; i < multistatus->children->len; i++) {
-    XMLNode *response = xml_node_child_at(multistatus, i);
-    XMLNode *supported_set = xml_node_find_tag(response, "supported-calendar-component-set", false);
-    if (supported_set) {
-      const char *set_val = xml_node_attr(xml_node_child_at(supported_set, 0), "name");
-      if (!strcmp(set, "VTODO") && !strcmp(set_val, "VTODO")) {
-        XMLNode *deleted = xml_node_find_tag(response, "deleted-calendar", false);
-        if (!deleted) {
-          XMLNode *name = xml_node_find_tag(response, "displayname", false);
-          XMLNode *href = xml_node_find_tag(response, "href", false);
-          char cal_url[strlen(client->base_url) + strlen(href->text) + 1];
-          snprintf(cal_url, strlen(client->base_url) + strlen(href->text) + 1, "%s%s",
-                   client->base_url, href->text);
-          CalDAVCalendar *calendar = caldav_calendar_new((char *)set, name->text, cal_url);
-          caldav_list_add(calendars_list, calendar);
-          caldav_calendar_print(calendar);
-        }
-      }
-    }
-  }
-  free(xml);
-  xml_node_free(root);
-
-  return calendars_list;
-}
-
 void caldav_calendar_print(CalDAVCalendar *calendar) {
-  CALDAV_LOG("Calendar '%s' at %s", calendar->name, calendar->url);
+  CALDAV_LOG("Calendar '%s' at %s with color '%s'", calendar->name, calendar->url,
+             calendar->color ? calendar->color : "");
 }
 
 void caldav_calendar_free(CalDAVCalendar *calendar) {
@@ -299,12 +325,32 @@ void caldav_calendar_free(CalDAVCalendar *calendar) {
 
 // ---------- EVENT ---------- //
 
-CalDAVEvent *caldav_event_new(char *ical, char *url) {
+CalDAVEvent *caldav_event_new(const char *ical, const char *url) {
   CalDAVEvent *event = malloc(sizeof(CalDAVEvent));
   event->ical = strdup(ical);
   event->url = strdup(url);
   return event;
 }
+
+void caldav_event_set_url(CalDAVEvent *event, const char *url) {
+  if (event->url)
+    free(event->url);
+  event->url = strdup(url);
+}
+
+const char *caldav_event_get_url(CalDAVEvent *event) { return event->url; }
+
+void caldav_event_set_ical(CalDAVEvent *event, const char *ical) {
+  if (event->ical)
+    free(event->ical);
+  event->ical = strdup(ical);
+}
+
+const char *caldav_event_get_ical(CalDAVEvent *event) { return event->ical; }
+
+bool caldav_event_pull(CalDAVClient *client, CalDAVEvent *event) { return true; }
+
+bool caldav_event_push(CalDAVClient *client, CalDAVEvent *event) { return true; }
 
 void caldav_event_print(CalDAVEvent *event) {
   CALDAV_LOG("Event at %s:\n%s\n", event->url, event->ical);
@@ -346,6 +392,14 @@ void caldav_list_add(CalDAVList *list, void *data) {
     list->data = new_data;
   }
   list->data[list->len++] = data;
+}
+
+size_t caldav_list_length(CalDAVList *list) { return list->len; }
+
+void *caldav_list_at(CalDAVList *list, size_t index) {
+  if (index >= list->len)
+    return NULL;
+  return list->data[index];
 }
 
 void caldav_list_free(CalDAVList *list) {
