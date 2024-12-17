@@ -29,6 +29,8 @@ CalDAVClient *caldav_client_new(const char *base_url, const char *username, cons
 // set - "VEVENT" or "VTODO".
 // Returns a CalDAVList* with items of type CalDAVCalendar.
 CalDAVList *caldav_client_get_calendars(CalDAVClient *client, const char *set);
+bool caldav_client_create_calendar(CalDAVClient *client, const char *name, const char *set,
+                                   const char *color);
 // Free client data
 void caldav_client_free(CalDAVClient *client);
 
@@ -90,4 +92,4 @@ void caldav_calendar_free(CalDAVCalendar *calendar);
 
 // ---------- ICAL ---------- //
 
-// char *caldav_ical_get_prop(const char *ical);
+char *caldav_ical_get_prop(const char *ical, const char *prop);

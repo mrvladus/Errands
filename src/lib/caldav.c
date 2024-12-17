@@ -55,6 +55,58 @@ char *__extract_uuid(const char *path) {
   return out;
 }
 
+static char *__generate_uuid4() {
+  srand((unsigned int)time(NULL));
+  const char *hex_chars = "0123456789abcdef";
+  char *uuid = malloc(37 * sizeof(char)); // Allocate 36 characters + null terminator
+  if (!uuid)
+    return NULL; // Allocation failed
+  for (int i = 0; i < 36; i++) {
+    switch (i) {
+    case 8:
+    case 13:
+    case 18:
+    case 23: uuid[i] = '-'; break;
+    case 14: // UUID version 4
+      uuid[i] = '4';
+      break;
+    case 19:                                 // UUID variant (10xx)
+      uuid[i] = hex_chars[(rand() % 4) + 8]; // Random 8-11
+      break;
+    default: uuid[i] = hex_chars[rand() % 16]; break;
+    }
+  }
+  uuid[36] = '\0'; // Null-terminate the string
+  return uuid;
+}
+
+static char *strdup_printf(const char *format, ...) {
+  va_list args;
+  va_list args_copy;
+  char *result = NULL;
+  int size;
+  // Initialize the variable argument list
+  va_start(args, format);
+  // Copy the argument list to determine required buffer size
+  va_copy(args_copy, args);
+  size = vsnprintf(NULL, 0, format, args_copy);
+  va_end(args_copy);
+  if (size < 0) {
+    va_end(args);
+    return NULL; // Formatting error
+  }
+  // Allocate memory for the formatted string (size + 1 for null terminator)
+  result = malloc(size + 1);
+  if (!result) {
+    va_end(args);
+    return NULL; // Memory allocation failed
+  }
+  // Format the string into the allocated buffer
+  vsnprintf(result, size + 1, format, args);
+  va_end(args);
+  return result;
+}
+
 // ---------- REQUESTS ---------- //
 
 struct response_data {
@@ -209,7 +261,7 @@ CalDAVClient *caldav_client_new(const char *base_url, const char *username, cons
 }
 
 CalDAVList *caldav_client_get_calendars(CalDAVClient *client, const char *set) {
-  CALDAV_LOG("Getting calendars with '%s'...", set);
+  CALDAV_LOG("Getting calendars with '%s' componet set...", set);
   const char *request_body =
       "<d:propfind xmlns:d=\"DAV:\" xmlns:cs=\"http://calendarserver.org/ns/\" "
       "xmlns:c=\"urn:ietf:params:xml:ns:caldav\" xmlns:x1=\"http://apple.com/ns/ical/\">"
@@ -251,6 +303,52 @@ CalDAVList *caldav_client_get_calendars(CalDAVClient *client, const char *set) {
   xml_node_free(root);
 
   return calendars_list;
+}
+
+bool caldav_client_create_calendar(CalDAVClient *client, const char *name, const char *set,
+                                   const char *color) {
+  CALDAV_LOG("Create calendar '%s'", name);
+  bool output = false;
+  char *uuid = __generate_uuid4();
+  char *url = strdup_printf("%s%s/", client->calendars_url, uuid);
+  const char *request_template =
+      "<c:mkcalendar xmlns:d=\"DAV:\" xmlns:c=\"urn:ietf:params:xml:ns:caldav\" "
+      "xmlns:x1=\"http://apple.com/ns/ical/\">"
+      "  <d:set>"
+      "    <d:prop>"
+      "      <d:displayname>%s</d:displayname>"
+      "      <c:supported-calendar-component-set>"
+      "        <c:comp name=\"%s\"/>"
+      "      </c:supported-calendar-component-set>"
+      "      <x1:calendar-color>%s</x1:calendar-color>"
+      "    </d:prop>"
+      "  </d:set>"
+      "</c:mkcalendar>";
+  char *xml = strdup_printf(request_template, name, set, color);
+  CURL *curl = curl_easy_init();
+  CURLcode res;
+  if (curl) {
+    curl_easy_setopt(curl, CURLOPT_URL, url);
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "MKCALENDAR");
+    struct curl_slist *headers = NULL;
+    headers = curl_slist_append(headers, "Content-Type: application/xml; charset=utf-8");
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, xml);
+    curl_easy_setopt(curl, CURLOPT_USERPWD, client->usrpwd);
+    curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, null_write_callback);
+    res = curl_easy_perform(curl);
+    if (res != CURLE_OK)
+      CALDAV_LOG("MKCALENDAR request failed: %s\n", curl_easy_strerror(res));
+    else
+      output = true;
+    curl_slist_free_all(headers);
+    curl_easy_cleanup(curl);
+    free(uuid);
+    free(url);
+    free(xml);
+  }
+  return output;
 }
 
 void caldav_client_free(CalDAVClient *client) {
@@ -353,7 +451,7 @@ bool caldav_event_pull(CalDAVClient *client, CalDAVEvent *event) { return true; 
 bool caldav_event_push(CalDAVClient *client, CalDAVEvent *event) { return true; }
 
 void caldav_event_print(CalDAVEvent *event) {
-  CALDAV_LOG("Event at %s:\n%s\n", event->url, event->ical);
+  CALDAV_LOG("Event at %s:\n%s", event->url, event->ical);
 }
 
 void caldav_event_free(CalDAVEvent *event) {
@@ -407,4 +505,22 @@ void caldav_list_free(CalDAVList *list) {
     free(list->data);
     free(list);
   }
+}
+
+// ---------- ICAL ---------- //
+
+// Get ical prop
+char *caldav_ical_get_prop(const char *ical, const char *prop) {
+  const char *val_start = strstr(ical, prop);
+  if (!val_start)
+    return NULL;
+  val_start += strlen(prop) + 1;
+  const char *val_end = strchr(val_start, '\n');
+  if (!val_end)
+    return NULL;
+  const int val_len = val_end - val_start;
+  char *value = malloc(val_len);
+  value[val_len] = '\0';
+  strncpy(value, val_start, val_len);
+  return value;
 }
