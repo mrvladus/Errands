@@ -3,6 +3,13 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+// Client object
+typedef struct _CalDAVClient CalDAVClient;
+// Calendar object
+typedef struct _CalDAVCalendar CalDAVCalendar;
+// Event object
+typedef struct _CalDAVEvent CalDAVEvent;
+
 // --- DYNAMIC ARRAY --- //
 
 // Simple dynamic array of pointers that can only grow in size
@@ -20,24 +27,21 @@ void caldav_list_free(CalDAVList *list);
 
 // --- CLIENT --- //
 
-// Client object.
-// If function takes CalDAVClient as argument - it will perform request to the server.
-typedef struct _CalDAVClient CalDAVClient;
 // Initialize caldav client with url, username and password
 CalDAVClient *caldav_client_new(const char *base_url, const char *username, const char *password);
 // Fetch calendars from server.
 // set - "VEVENT" or "VTODO".
 // Returns a CalDAVList* with items of type CalDAVCalendar.
 CalDAVList *caldav_client_get_calendars(CalDAVClient *client, const char *set);
-bool caldav_client_create_calendar(CalDAVClient *client, const char *name, const char *set,
-                                   const char *color);
+// Create new calendar on the server with name, component set ("VEVENT" or "VTODO") and HEX color.
+// Returns "true" on success and "false" on failure.
+CalDAVCalendar *caldav_client_create_calendar(CalDAVClient *client, const char *name,
+                                              const char *set, const char *color);
 // Free client data
 void caldav_client_free(CalDAVClient *client);
 
-// --- EVENTS --- //
+// --- EVENT --- //
 
-// CalDAV event
-typedef struct _CalDAVEvent CalDAVEvent;
 // Cast to CalDAVEvent* macro
 #define CALDAV_EVENT(ptr) (CalDAVEvent *)ptr
 // Create new CalDAVEvent. Free with caldav_event_free().
@@ -61,31 +65,18 @@ void caldav_event_print(CalDAVEvent *event);
 // Cleanup event
 void caldav_event_free(CalDAVEvent *event);
 
-// --- CALENDARS --- //
-
-// CalDAV calendar
-typedef struct {
-  // Display name
-  char *name;
-  // Calendar color
-  char *color;
-  // Supported component set like "VTODO" or "VEVENT"
-  char *set;
-  // URL
-  char *url;
-  // UUID
-  char *uuid;
-} CalDAVCalendar;
+// --- CALENDAR --- //
 
 // Cast to CalDAVCalendar* macro
 #define CALDAV_CALENDAR(ptr) (CalDAVCalendar *)ptr
-
 // Create new calendar struct.
 // set - "VEVENT" or "VTODO".
-CalDAVCalendar *caldav_calendar_new(char *color, char *set, char *name, char *url);
+CalDAVCalendar *caldav_calendar_new(CalDAVClient *client, char *color, char *set, char *name,
+                                    char *url);
 // Fetch events from CalDAVCalendar of type "calendar->set".
 // Returns a CalDAVList* with items of type CalDAVEvent.
-CalDAVList *caldav_calendar_get_events(CalDAVClient *client, CalDAVCalendar *calendar);
+CalDAVList *caldav_calendar_get_events(CalDAVCalendar *calendar);
+CalDAVEvent *caldav_calendar_create_event(CalDAVCalendar *calendar, const char *ical);
 // Print calendar info
 void caldav_calendar_print(CalDAVCalendar *calendar);
 void caldav_calendar_free(CalDAVCalendar *calendar);
