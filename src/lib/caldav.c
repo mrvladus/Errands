@@ -151,8 +151,9 @@ static size_t null_write_callback(void *ptr, size_t size, size_t nmemb, void *da
 static char *caldav_propfind(const char *url, const char *usrpwd, size_t depth, const char *body,
                              const char *err_msg) {
   CURL *curl = curl_easy_init();
-  if (!curl)
+  if (!curl) {
     return NULL;
+  }
   struct response_data response = {NULL, 0};
   curl_easy_setopt(curl, CURLOPT_URL, url);
   curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PROPFIND");
@@ -183,8 +184,10 @@ static char *caldav_propfind(const char *url, const char *usrpwd, size_t depth, 
 static char *caldav_client_get_caldav_url(CalDAVClient *client) {
   CALDAV_LOG("Getting CalDAV URL...");
   CURL *curl = curl_easy_init();
-  if (!curl)
+  if (!curl) {
+    CALDAV_LOG("Failed to initialize CURL.");
     return NULL;
+  }
   char *out = NULL;
   char discover_url[strlen(client->base_url) + 20];
   sprintf(discover_url, "%s/.well-known/caldav", client->base_url);
@@ -193,16 +196,20 @@ static char *caldav_client_get_caldav_url(CalDAVClient *client) {
   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, null_write_callback);
   curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
   CURLcode res = curl_easy_perform(curl);
-  if (res != CURLE_OK) {
+  if (res != CURLE_OK)
     CALDAV_LOG("Failed to get CalDAV url: %s", curl_easy_strerror(res));
-  } else {
-    char *effective_url;
+  else {
+    char *effective_url = NULL; // Initialize the pointer
     res = curl_easy_getinfo(curl, CURLINFO_EFFECTIVE_URL, &effective_url);
-    out = strdup(effective_url);
-    CALDAV_FREE(effective_url);
-    CALDAV_LOG("%s", out);
+    if (res == CURLE_OK && effective_url) {
+      out = strdup(effective_url); // Duplicate the effective URL
+      if (!out)
+        CALDAV_LOG("Failed to allocate memory for the URL.");
+      CALDAV_LOG("CalDAV URL: %s", out);
+    } else
+      CALDAV_LOG("Failed to retrieve effective URL.");
   }
-  curl_easy_cleanup(curl);
+  curl_easy_cleanup(curl); // Cleanup the CURL resource safely
   return out;
 }
 
@@ -280,19 +287,20 @@ CalDAVClient *caldav_client_new(const char *base_url, const char *username, cons
   CALDAV_LOG("Initialize");
   CalDAVClient *client = malloc(sizeof(CalDAVClient));
   client->base_url = strdup(base_url);
-  client->usrpwd = strdup_printf("%s:%s", username, password);
+  asprintf(&client->usrpwd, "%s:%s", username, password);
+  curl_global_init(CURL_GLOBAL_DEFAULT);
   client->caldav_url = caldav_client_get_caldav_url(client);
   if (!client->caldav_url) {
     caldav_client_free(client);
     return NULL;
   }
   client->principal_url = caldav_client_get_principal_url(client);
-  if (!client->caldav_url) {
+  if (!client->principal_url) {
     caldav_client_free(client);
     return NULL;
   }
   client->calendars_url = caldav_client_get_calendars_url(client);
-  if (!client->caldav_url) {
+  if (!client->calendars_url) {
     caldav_client_free(client);
     return NULL;
   }
@@ -544,6 +552,7 @@ void caldav_calendar_free(CalDAVCalendar *calendar) {
   CALDAV_FREE(calendar->url);
   CALDAV_FREE(calendar->uuid);
   CALDAV_FREE(calendar);
+  curl_global_cleanup();
 }
 
 // ---------- EVENT ---------- //
