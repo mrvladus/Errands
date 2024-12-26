@@ -231,7 +231,7 @@ static char *caldav_client_get_principal_url(CalDAVClient *client) {
     sprintf(url, "%s%s", client->base_url, href->text);
     out = strdup(url);
     xml_node_free(root);
-    CALDAV_LOG("%s", out);
+    CALDAV_LOG("Principal URL: %s", out);
   }
   CALDAV_FREE(result);
   return out;
@@ -273,7 +273,7 @@ static char *caldav_client_get_calendars_url(CalDAVClient *client) {
     sprintf(url, "%s%s", client->base_url, href->text);
     out = strdup(url);
     xml_node_free(root);
-    CALDAV_LOG("%s", url);
+    CALDAV_LOG("Calendars URL: %s", url);
   }
   CALDAV_FREE(response.data);
   curl_slist_free_all(headers);
