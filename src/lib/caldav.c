@@ -4,7 +4,6 @@
 
 #include <curl/curl.h>
 
-#include <curl/easy.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -151,9 +150,8 @@ static size_t null_write_callback(void *ptr, size_t size, size_t nmemb, void *da
 static char *caldav_propfind(const char *url, const char *usrpwd, size_t depth, const char *body,
                              const char *err_msg) {
   CURL *curl = curl_easy_init();
-  if (!curl) {
+  if (!curl)
     return NULL;
-  }
   struct response_data response = {NULL, 0};
   curl_easy_setopt(curl, CURLOPT_URL, url);
   curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PROPFIND");
@@ -179,6 +177,23 @@ static char *caldav_propfind(const char *url, const char *usrpwd, size_t depth, 
   curl_slist_free_all(headers);
   curl_easy_cleanup(curl);
   return response.data;
+}
+
+static bool caldav_delete(CalDAVClient *client, const char *url, const char *err_msg) {
+  CURL *curl = curl_easy_init();
+  if (!curl)
+    return false;
+  curl_easy_setopt(curl, CURLOPT_URL, url);
+  curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
+  curl_easy_setopt(curl, CURLOPT_USERPWD, client->usrpwd);
+  bool out = true;
+  CURLcode res = curl_easy_perform(curl);
+  if (res != CURLE_OK) {
+    CALDAV_LOG("%s: %s", err_msg, curl_easy_strerror(res));
+    out = false;
+  }
+  curl_easy_cleanup(curl);
+  return out;
 }
 
 static char *caldav_client_get_caldav_url(CalDAVClient *client) {
@@ -444,6 +459,12 @@ CalDAVCalendar *caldav_calendar_new(CalDAVClient *client, char *color, char *set
   calendar->url = strdup(url);
   calendar->uuid = __extract_uuid(url);
   return calendar;
+}
+
+const char *caldav_calendar_get_name(CalDAVCalendar *calendar) { return calendar->name; }
+
+bool caldav_calendar_delete(CalDAVCalendar *calendar) {
+  return caldav_delete(calendar->client, calendar->url, "Failed to delete calendar");
 }
 
 CalDAVList *caldav_calendar_get_events(CalDAVCalendar *calendar) {

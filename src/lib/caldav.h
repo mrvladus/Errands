@@ -73,10 +73,14 @@ void caldav_event_free(CalDAVEvent *event);
 // set - "VEVENT" or "VTODO".
 CalDAVCalendar *caldav_calendar_new(CalDAVClient *client, char *color, char *set, char *name,
                                     char *url);
+const char *caldav_calendar_get_name(CalDAVCalendar *calendar);
+// Delete calendar on server
+// Returns "true" on success and "false" on failure.
+bool caldav_calendar_delete(CalDAVCalendar *calendar);
 // Fetch events from CalDAVCalendar of type "calendar->set".
 // Returns a CalDAVList* with items of type CalDAVEvent.
 CalDAVList *caldav_calendar_get_events(CalDAVCalendar *calendar);
-CalDAVEvent *caldav_calendar_create_event(CalDAVCalendar *calendar, const char *ical);
+// CalDAVEvent *caldav_calendar_create_event(CalDAVCalendar *calendar, const char *ical);
 // Print calendar info
 void caldav_calendar_print(CalDAVCalendar *calendar);
 void caldav_calendar_free(CalDAVCalendar *calendar);
