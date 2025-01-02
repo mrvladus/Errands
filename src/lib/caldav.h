@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CALDAV_H
+#define CALDAV_H
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -14,12 +15,15 @@ typedef struct {
   char *set;            // Supported component set like "VTODO" or "VEVENT"
   char *url;            // URL
   char *uuid;           // UUID
+  bool deleted;         // TODO
 } CalDAVCalendar;
 
 // Event object
 typedef struct {
+  CalDAVCalendar *calendar;
   char *ical;
   char *url;
+  bool deleted; // TODO
 } CalDAVEvent;
 
 // --- DYNAMIC ARRAY --- //
@@ -57,10 +61,17 @@ void caldav_client_free(CalDAVClient *client);
 // Cast to CalDAVEvent* macro
 #define CALDAV_EVENT(ptr) (CalDAVEvent *)ptr
 // Create new CalDAVEvent
-CalDAVEvent *caldav_event_new(const char *ical, const char *url);
+CalDAVEvent *caldav_event_new(CalDAVCalendar *calendar, const char *ical, const char *url);
+// Delete event on the server.
+// Sets event->deleted to "true" on success.
+// Returns "true" on success and "false" on failure.
+bool caldav_event_delete(CalDAVEvent *event);
 // Replace ical data of the event with new, pulled from the server.
 // Returns "true" on success and "false" on failure.
-bool caldav_event_pull(CalDAVClient *client, CalDAVEvent *event);
+bool caldav_event_pull(CalDAVEvent *event);
+// Update event on the server with event->ical
+// Returns "true" on success and "false" on failure.
+bool caldav_event_push(CalDAVEvent *event);
 // Print event info
 void caldav_event_print(CalDAVEvent *event);
 // Cleanup event
@@ -96,3 +107,5 @@ void caldav_calendar_free(CalDAVCalendar *calendar);
 // ---------- ICAL ---------- //
 
 char *caldav_ical_get_prop(const char *ical, const char *prop);
+
+#endif // CALDAV_H
