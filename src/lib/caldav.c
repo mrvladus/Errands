@@ -27,20 +27,6 @@ struct _CalDAVClient {
   char *calendars_url;
 };
 
-struct _CalDAVCalendar {
-  CalDAVClient *client; // Client associated with calendar
-  char *name;           // Display name
-  char *color;          // Calendar color
-  char *set;            // Supported component set like "VTODO" or "VEVENT"
-  char *url;            // URL
-  char *uuid;           // UUID
-};
-
-struct _CalDAVEvent {
-  char *ical;
-  char *url;
-};
-
 struct _CalDAVList {
   size_t size;
   size_t len;
@@ -186,6 +172,7 @@ static bool caldav_delete(CalDAVClient *client, const char *url, const char *err
   curl_easy_setopt(curl, CURLOPT_URL, url);
   curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
   curl_easy_setopt(curl, CURLOPT_USERPWD, client->usrpwd);
+  curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
   bool out = true;
   CURLcode res = curl_easy_perform(curl);
   if (res != CURLE_OK) {
@@ -194,6 +181,26 @@ static bool caldav_delete(CalDAVClient *client, const char *url, const char *err
   }
   curl_easy_cleanup(curl);
   return out;
+}
+
+static char *caldav_get(CalDAVClient *client, const char *url, const char *err_msg) {
+  CURL *curl = curl_easy_init();
+  if (!curl)
+    return false;
+  curl_easy_setopt(curl, CURLOPT_URL, url);
+  curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
+  curl_easy_setopt(curl, CURLOPT_USERPWD, client->usrpwd);
+  curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
+  struct response_data response = {NULL, 0};
+  curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+  CURLcode res = curl_easy_perform(curl);
+  if (res != CURLE_OK) {
+    CALDAV_LOG("%s: %s", err_msg, curl_easy_strerror(res));
+    free(response.data);
+  }
+  curl_easy_cleanup(curl);
+  return response.data;
 }
 
 static char *caldav_client_get_caldav_url(CalDAVClient *client) {
@@ -453,18 +460,18 @@ CalDAVCalendar *caldav_calendar_new(CalDAVClient *client, char *color, char *set
                                     char *url) {
   CalDAVCalendar *calendar = (CalDAVCalendar *)malloc(sizeof(CalDAVCalendar));
   calendar->client = client;
-  calendar->color = color;
-  calendar->set = set;
+  calendar->color = strdup(color);
+  calendar->set = strdup(set);
   calendar->name = strdup(name);
   calendar->url = strdup(url);
   calendar->uuid = __extract_uuid(url);
   return calendar;
 }
 
-const char *caldav_calendar_get_name(CalDAVCalendar *calendar) { return calendar->name; }
-
 bool caldav_calendar_delete(CalDAVCalendar *calendar) {
-  return caldav_delete(calendar->client, calendar->url, "Failed to delete calendar");
+  char msg[strlen(calendar->url) + 30];
+  sprintf(msg, "Failed to delete calendar at %s", calendar->url);
+  return caldav_delete(calendar->client, calendar->url, msg);
 }
 
 CalDAVList *caldav_calendar_get_events(CalDAVCalendar *calendar) {
@@ -530,33 +537,26 @@ CalDAVEvent *caldav_calendar_create_event(CalDAVCalendar *calendar, const char *
   if (!curl)
     return NULL;
   char *uuid = caldav_ical_get_prop(ical, "UID");
-  char *url = strdup_printf("%s%s.ics", calendar->client->calendars_url, uuid);
-  char *request_body;
-  if (!strstr(ical, "BEGIN:VCALENDAR"))
-    request_body =
-        strdup_printf("BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Errands//EN\n%sEND:VCALENDAR", ical);
-  else
-    request_body = strdup(ical);
-  CURLcode res;
+  char *url = strdup_printf("%s%s.ics", calendar->url, uuid);
   curl_easy_setopt(curl, CURLOPT_URL, url);
   curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
   struct curl_slist *headers = NULL;
   headers = curl_slist_append(headers, "Content-Type: text/calendar");
   curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-  curl_easy_setopt(curl, CURLOPT_POSTFIELDS, request_body);
+  curl_easy_setopt(curl, CURLOPT_POSTFIELDS, ical);
   curl_easy_setopt(curl, CURLOPT_USERPWD, calendar->client->usrpwd);
   curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, null_write_callback);
   CalDAVEvent *event = NULL;
-  res = curl_easy_perform(curl);
+  CURLcode res = curl_easy_perform(curl);
   if (res != CURLE_OK)
-    CALDAV_LOG("PUT request failed: %s\n", curl_easy_strerror(res));
+    CALDAV_LOG("Failed to create event at %s: %s\n", url, curl_easy_strerror(res));
   else {
-    CalDAVEvent *event = caldav_event_new(request_body, url);
+    event = caldav_event_new(ical, url);
+    caldav_event_pull(calendar->client, event);
   }
   CALDAV_FREE(uuid);
   CALDAV_FREE(url);
-  CALDAV_FREE(request_body);
   curl_slist_free_all(headers);
   curl_easy_cleanup(curl);
   return event;
@@ -585,28 +585,24 @@ CalDAVEvent *caldav_event_new(const char *ical, const char *url) {
   return event;
 }
 
-void caldav_event_set_url(CalDAVEvent *event, const char *url) {
-  if (event->url)
-    CALDAV_FREE(event->url);
-  event->url = strdup(url);
-}
-
-const char *caldav_event_get_url(CalDAVEvent *event) { return event->url; }
-
-void caldav_event_set_ical(CalDAVEvent *event, const char *ical) {
-  if (event->ical)
+// Replace ical data of the event with new, pulled from the server.
+// Returns "true" on success and "false" on failure.
+bool caldav_event_pull(CalDAVClient *client, CalDAVEvent *event) {
+  char msg[strlen(event->url) + 25];
+  sprintf(msg, "Failed to pull event at %s", event->url);
+  char *res = caldav_get(client, event->url, msg);
+  if (res) {
     CALDAV_FREE(event->ical);
-  event->ical = strdup(ical);
+    event->ical = res;
+    return true;
+  }
+  return false;
 }
 
-const char *caldav_event_get_ical(CalDAVEvent *event) { return event->ical; }
-
-bool caldav_event_pull(CalDAVClient *client, CalDAVEvent *event) { return true; }
-
-bool caldav_event_push(CalDAVClient *client, CalDAVEvent *event) { return true; }
+// bool caldav_event_push(CalDAVClient *client, CalDAVEvent *event) { return true; }
 
 void caldav_event_print(CalDAVEvent *event) {
-  CALDAV_LOG("Event at %s:\n%s", event->url, event->ical);
+  CALDAV_LOG("Event at %s:\n%s\n", event->url, event->ical);
 }
 
 void caldav_event_free(CalDAVEvent *event) {

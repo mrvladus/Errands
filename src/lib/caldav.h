@@ -5,10 +5,22 @@
 
 // Client object
 typedef struct _CalDAVClient CalDAVClient;
+
 // Calendar object
-typedef struct _CalDAVCalendar CalDAVCalendar;
+typedef struct {
+  CalDAVClient *client; // Client associated with calendar
+  char *name;           // Display name
+  char *color;          // Calendar color
+  char *set;            // Supported component set like "VTODO" or "VEVENT"
+  char *url;            // URL
+  char *uuid;           // UUID
+} CalDAVCalendar;
+
 // Event object
-typedef struct _CalDAVEvent CalDAVEvent;
+typedef struct {
+  char *ical;
+  char *url;
+} CalDAVEvent;
 
 // --- DYNAMIC ARRAY --- //
 
@@ -34,7 +46,7 @@ CalDAVClient *caldav_client_new(const char *base_url, const char *username, cons
 // Returns a CalDAVList* with items of type CalDAVCalendar.
 CalDAVList *caldav_client_get_calendars(CalDAVClient *client, const char *set);
 // Create new calendar on the server with name, component set ("VEVENT" or "VTODO") and HEX color.
-// Returns "true" on success and "false" on failure.
+// Returns NULL on failure.
 CalDAVCalendar *caldav_client_create_calendar(CalDAVClient *client, const char *name,
                                               const char *set, const char *color);
 // Free client data
@@ -44,22 +56,11 @@ void caldav_client_free(CalDAVClient *client);
 
 // Cast to CalDAVEvent* macro
 #define CALDAV_EVENT(ptr) (CalDAVEvent *)ptr
-// Create new CalDAVEvent. Free with caldav_event_free().
+// Create new CalDAVEvent
 CalDAVEvent *caldav_event_new(const char *ical, const char *url);
-// Set URL of the event
-void caldav_event_set_url(CalDAVEvent *event, const char *url);
-// Get URL of the event
-const char *caldav_event_get_url(CalDAVEvent *event);
-// Set iCAL string of the event
-void caldav_event_set_ical(CalDAVEvent *event, const char *ical);
-// Get iCAL string of the event
-const char *caldav_event_get_ical(CalDAVEvent *event);
-// Pull event from the server.
+// Replace ical data of the event with new, pulled from the server.
 // Returns "true" on success and "false" on failure.
 bool caldav_event_pull(CalDAVClient *client, CalDAVEvent *event);
-// Update / Create event on the server. If event->url not exists - will create new.
-// Returns "true" on success and "false" on failure.
-bool caldav_event_push(CalDAVClient *client, CalDAVEvent *event);
 // Print event info
 void caldav_event_print(CalDAVEvent *event);
 // Cleanup event
@@ -69,18 +70,25 @@ void caldav_event_free(CalDAVEvent *event);
 
 // Cast to CalDAVCalendar* macro
 #define CALDAV_CALENDAR(ptr) (CalDAVCalendar *)ptr
-// Create new calendar struct.
+// Create new calendar object.
 // set - "VEVENT" or "VTODO".
 CalDAVCalendar *caldav_calendar_new(CalDAVClient *client, char *color, char *set, char *name,
                                     char *url);
-const char *caldav_calendar_get_name(CalDAVCalendar *calendar);
-// Delete calendar on server
+// Delete calendar on server.
 // Returns "true" on success and "false" on failure.
 bool caldav_calendar_delete(CalDAVCalendar *calendar);
 // Fetch events from CalDAVCalendar of type "calendar->set".
-// Returns a CalDAVList* with items of type CalDAVEvent.
+// Returns a CalDAVList* with items of type CalDAVEvent*.
 CalDAVList *caldav_calendar_get_events(CalDAVCalendar *calendar);
-// CalDAVEvent *caldav_calendar_create_event(CalDAVCalendar *calendar, const char *ical);
+// Create new event on the server.
+// Caller is responsible for passing valid ical data:
+// - ical must start with BEGIN:VCALENDAR and end with END:VCALENDAR and contain VERSION and PROID
+//   properties.
+// - component type must be the same as calendar->set (VEVENT or VTODO). It must start with
+//   BEGIN:<component set> and end with END:<component set> and contain at least
+//   UID property.
+// Returns new event or NULL on failure.
+CalDAVEvent *caldav_calendar_create_event(CalDAVCalendar *calendar, const char *ical);
 // Print calendar info
 void caldav_calendar_print(CalDAVCalendar *calendar);
 void caldav_calendar_free(CalDAVCalendar *calendar);
