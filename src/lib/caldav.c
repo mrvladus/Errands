@@ -531,10 +531,11 @@ CalDAVList *caldav_calendar_get_events(CalDAVCalendar *calendar) {
 }
 
 CalDAVEvent *caldav_calendar_create_event(CalDAVCalendar *calendar, const char *ical) {
-  CALDAV_LOG("Create event in calendar '%s'", calendar->name);
-  CURL *curl = curl_easy_init();
-  if (!curl)
+  CALDAV_LOG("Create event in calendar %s", calendar->uuid);
+  if (!caldav_ical_is_valid(ical)) {
+    CALDAV_LOG("ical is invalid");
     return NULL;
+  }
   char *uuid = caldav_ical_get_prop(ical, "UID");
   char url[strlen(calendar->url) + strlen(uuid) + 5];
   sprintf(url, "%s%s.ics", calendar->url, uuid);
@@ -574,15 +575,27 @@ CalDAVEvent *caldav_event_new(CalDAVCalendar *calendar, const char *ical, const 
   return event;
 }
 
+// Delete event on the server.
+// Sets event->deleted to "true" on success.
+// Returns "true" on success and "false" on failure.
+bool caldav_event_delete(CalDAVEvent *event) {
+  CALDAV_LOG("Delete event at %s", event->url);
+  char msg[strlen(event->url) + 27];
+  sprintf(msg, "Failed to delete event at %s", event->url);
+  bool res = caldav_delete(event->calendar->client, event->url, msg);
+  event->deleted = res;
+  return res;
+}
+
 // Replace ical data of the event with new, pulled from the server.
 // Returns "true" on success and "false" on failure.
 bool caldav_event_pull(CalDAVEvent *event) {
+  CALDAV_LOG("Pull event at %s", event->url);
   char msg[strlen(event->url) + 25];
   sprintf(msg, "Failed to pull event at %s", event->url);
   char *res = caldav_get(event->calendar->client, event->url, msg);
   if (res) {
     CALDAV_FREE_AND_REPLACE(event->ical, res);
-    event->deleted = true;
     return true;
   }
   return false;
@@ -591,6 +604,11 @@ bool caldav_event_pull(CalDAVEvent *event) {
 // Update event on the server with event->ical
 // Returns "true" on success and "false" on failure.
 bool caldav_event_push(CalDAVEvent *event) {
+  CALDAV_LOG("Push event at %s", event->url);
+  if (!caldav_ical_is_valid(event->ical)) {
+    CALDAV_LOG("ical is invalid");
+    return false;
+  }
   char msg[strlen(event->url) + 25];
   sprintf(msg, "Failed to push event to %s", event->url);
   return caldav_put(event->calendar->client, event->url, event->ical, msg);
@@ -671,4 +689,18 @@ char *caldav_ical_get_prop(const char *ical, const char *prop) {
   value[val_len] = '\0';
   strncpy(value, val_start, val_len);
   return value;
+}
+
+bool caldav_ical_is_valid(const char *ical) {
+  if (!strstr(ical, "BEGIN:VCALENDAR"))
+    return false;
+  if (!(!strstr(ical, "BEGIN:VEVENT") || !strstr(ical, "BEGIN:VTODO")))
+    return false;
+  if (!(!strstr(ical, "END:VEVENT") || !strstr(ical, "END:VTODO")))
+    return false;
+  if (!strstr(ical, "UID:"))
+    return false;
+  if (!strstr(ical, "END:VCALENDAR"))
+    return false;
+  return true;
 }

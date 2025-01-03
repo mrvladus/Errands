@@ -93,8 +93,7 @@ bool caldav_calendar_delete(CalDAVCalendar *calendar);
 CalDAVList *caldav_calendar_get_events(CalDAVCalendar *calendar);
 // Create new event on the server.
 // Caller is responsible for passing valid ical data:
-// - ical must start with BEGIN:VCALENDAR and end with END:VCALENDAR and contain VERSION and PROID
-//   properties.
+// - ical must start with BEGIN:VCALENDAR and end with END:VCALENDAR.
 // - component type must be the same as calendar->set (VEVENT or VTODO). It must start with
 //   BEGIN:<component set> and end with END:<component set> and contain at least
 //   UID property.
@@ -107,5 +106,6 @@ void caldav_calendar_free(CalDAVCalendar *calendar);
 // ---------- ICAL ---------- //
 
 char *caldav_ical_get_prop(const char *ical, const char *prop);
+bool caldav_ical_is_valid(const char *ical);
 
 #endif // CALDAV_H
