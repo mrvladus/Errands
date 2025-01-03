@@ -15,7 +15,7 @@ typedef struct {
   char *set;            // Supported component set like "VTODO" or "VEVENT"
   char *url;            // URL
   char *uuid;           // UUID
-  bool deleted;         // TODO
+  bool deleted;
 } CalDAVCalendar;
 
 // Event object
@@ -23,7 +23,7 @@ typedef struct {
   CalDAVCalendar *calendar;
   char *ical;
   char *url;
-  bool deleted; // TODO
+  bool deleted;
 } CalDAVEvent;
 
 // --- DYNAMIC ARRAY --- //
@@ -94,7 +94,7 @@ CalDAVList *caldav_calendar_get_events(CalDAVCalendar *calendar);
 // Create new event on the server.
 // Caller is responsible for passing valid ical data:
 // - ical must start with BEGIN:VCALENDAR and end with END:VCALENDAR.
-// - component type must be the same as calendar->set (VEVENT or VTODO). It must start with
+// - component set must be the same as calendar->set (VEVENT or VTODO). It must start with
 //   BEGIN:<component set> and end with END:<component set> and contain at least
 //   UID property.
 // Returns new event or NULL on failure.
@@ -107,5 +107,9 @@ void caldav_calendar_free(CalDAVCalendar *calendar);
 
 char *caldav_ical_get_prop(const char *ical, const char *prop);
 bool caldav_ical_is_valid(const char *ical);
+
+// ---------- UTILS ---------- //
+
+char *caldav_generate_hex_color();
 
 #endif // CALDAV_H

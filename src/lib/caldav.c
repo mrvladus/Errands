@@ -370,19 +370,26 @@ CalDAVList *caldav_client_get_calendars(CalDAVClient *client, const char *set) {
       XMLNode *supported_set =
           xml_node_find_tag(response, "supported-calendar-component-set", false);
       if (supported_set) {
-        const char *set_val = xml_node_attr(xml_node_child_at(supported_set, 0), "name");
-        if (!strcmp(set, set) && !strcmp(set_val, set)) {
+        char *set_val;
+        for (size_t j = 0; j < supported_set->children->len; j++) {
+          set_val = (char *)xml_node_attr(xml_node_child_at(supported_set, j), "name");
+          if (!strcmp(set_val, set))
+            break;
+        }
+        if (!strcmp(set_val, set)) {
           XMLNode *deleted = xml_node_find_tag(response, "deleted-calendar", false);
           if (!deleted) {
             XMLNode *name = xml_node_find_tag(response, "displayname", false);
-            XMLNode *color = xml_node_find_tag(response, "calendar-color", false);
             XMLNode *href = xml_node_find_tag(response, "href", false);
-            char *cal_url = strdup_printf("%s%s", client->base_url, href->text);
+            XMLNode *color = xml_node_find_tag(response, "calendar-color", false);
+            char *hex_color = color ? strdup(color->text) : caldav_generate_hex_color();
+            char cal_url[strlen(client->base_url) + strlen(href->text) + 1];
+            sprintf(cal_url, "%s%s", client->base_url, href->text);
             CalDAVCalendar *calendar =
-                caldav_calendar_new(client, color->text, (char *)set, name->text, cal_url);
+                caldav_calendar_new(client, hex_color, (char *)set, name->text, cal_url);
             caldav_list_add(calendars_list, calendar);
             caldav_calendar_print(calendar);
-            CALDAV_FREE(cal_url);
+            CALDAV_FREE(hex_color);
           }
         }
       }
@@ -616,7 +623,10 @@ bool caldav_event_push(CalDAVEvent *event) {
 
 // Print event info
 void caldav_event_print(CalDAVEvent *event) {
-  CALDAV_LOG("Event at %s:\n%s\n", event->url, event->ical);
+  if (event)
+    CALDAV_LOG("Event at %s:\n%s\n", event->url, event->ical);
+  else
+    CALDAV_LOG("Event is NULL");
 }
 
 // Cleanup event
@@ -703,4 +713,18 @@ bool caldav_ical_is_valid(const char *ical) {
   if (!strstr(ical, "END:VCALENDAR"))
     return false;
   return true;
+}
+
+// ---------- UTILS ---------- //
+
+char *caldav_generate_hex_color() {
+  char *color = (char *)malloc(8 * sizeof(char));
+  if (color == NULL)
+    return NULL;
+  srand(time(NULL));
+  int r = rand() % 256;
+  int g = rand() % 256;
+  int b = rand() % 256;
+  sprintf(color, "#%02X%02X%02X", r, g, b);
+  return color;
 }
