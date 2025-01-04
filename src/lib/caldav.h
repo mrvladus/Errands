@@ -3,6 +3,11 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // Client object
 typedef struct {
@@ -91,7 +96,7 @@ void caldav_event_free(CalDAVEvent *event);
 // Cast to CalDAVCalendar* macro
 #define CALDAV_CALENDAR(ptr) (CalDAVCalendar *)ptr
 // Create new calendar object.
-// set - "VEVENT" or "VTODO".
+// set - "VEVENT", "VTODO", "VJOURNAL".
 CalDAVCalendar *caldav_calendar_new(CalDAVClient *client, char *color, char *set, char *name,
                                     char *url);
 // Delete calendar on server.
@@ -103,7 +108,7 @@ CalDAVList *caldav_calendar_get_events(CalDAVCalendar *calendar);
 // Create new event on the server.
 // Caller is responsible for passing valid ical data:
 // - ical must start with BEGIN:VCALENDAR and end with END:VCALENDAR.
-// - component set must be the same as calendar->set (VEVENT or VTODO). It must start with
+// - component set must be the same as calendar->set (VEVENT, VTODO, VJOURNAL). It must start with
 //   BEGIN:<component set> and end with END:<component set> and contain at least
 //   UID property.
 // Returns new event or NULL on failure.
@@ -120,6 +125,10 @@ bool caldav_ical_is_valid(const char *ical);
 // ---------- UTILS ---------- //
 
 char *caldav_generate_hex_color();
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // CALDAV_H
 
@@ -818,17 +827,11 @@ char *caldav_ical_get_prop(const char *ical, const char *prop) {
 }
 
 bool caldav_ical_is_valid(const char *ical) {
-  if (!strstr(ical, "BEGIN:VCALENDAR"))
-    return false;
-  if (!(!strstr(ical, "BEGIN:VEVENT") || !strstr(ical, "BEGIN:VTODO")))
-    return false;
-  if (!(!strstr(ical, "END:VEVENT") || !strstr(ical, "END:VTODO")))
-    return false;
-  if (!strstr(ical, "UID:"))
-    return false;
-  if (!strstr(ical, "END:VCALENDAR"))
-    return false;
-  return true;
+  bool calendar = strstr(ical, "BEGIN:VCALENDAR") && strstr(ical, "END:VCALENDAR");
+  bool event = strstr(ical, "BEGIN:VEVENT") && strstr(ical, "END:VEVENT");
+  bool todo = strstr(ical, "BEGIN:VTODO") && strstr(ical, "END:VTODO");
+  bool uid = strstr(ical, "UID:");
+  return calendar && (event || todo) && uid;
 }
 
 // ---------- UTILS ---------- //
