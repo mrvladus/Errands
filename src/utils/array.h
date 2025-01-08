@@ -10,11 +10,11 @@ typedef struct {
   void **data;
   size_t len;
   size_t capacity;
-} Array;
+} PtrArray;
 
 // Create dynamic array
-static inline Array *array_new(size_t initial_capacity) {
-  Array *array = malloc(sizeof(Array));
+static inline PtrArray *array_new(size_t initial_capacity) {
+  PtrArray *array = malloc(sizeof(PtrArray));
   if (!array) {
     printf("Failed to allocate memory for array structure");
     return NULL;
@@ -31,7 +31,7 @@ static inline Array *array_new(size_t initial_capacity) {
 }
 
 // Increase array capacity by 2
-static inline void array_resize(Array *array) {
+static inline void array_resize(PtrArray *array) {
   size_t new_capacity = array->capacity * 2;
   void **new_data = realloc(array->data, new_capacity * sizeof(void *));
   if (!new_data) {
@@ -43,14 +43,14 @@ static inline void array_resize(Array *array) {
 }
 
 // Add an element to the array
-static inline void array_append(Array *a, void *data) {
+static inline void array_append(PtrArray *a, void *data) {
   if (a->len == a->capacity)
     array_resize(a);
   a->data[a->len++] = data;
 }
 
 // Add an element to the beginning of the array
-static inline void array_prepend(Array *a, void *data) {
+static inline void array_prepend(PtrArray *a, void *data) {
   if (a->len == a->capacity)
     array_resize(a);
   for (size_t i = a->len; i > 0; i--)
@@ -60,7 +60,7 @@ static inline void array_prepend(Array *a, void *data) {
 }
 
 // Get an element from the array at a given index
-static inline void *array_at(Array *a, size_t index) {
+static inline void *array_at(PtrArray *a, size_t index) {
   if (index >= a->len) {
     printf("Index out of bounds\n");
     return NULL;
@@ -69,7 +69,7 @@ static inline void *array_at(Array *a, size_t index) {
 }
 
 // Find the index of a given data pointer, or -1 if not found
-static inline int array_index(Array *a, void *data) {
+static inline int array_index(PtrArray *a, void *data) {
   for (size_t i = 0; i < a->len; i++)
     if (a->data[i] == data)
       return (int)i;
@@ -77,7 +77,7 @@ static inline int array_index(Array *a, void *data) {
 }
 
 // Swap elements at two indices in the array
-static inline void array_swap_index(Array *a, size_t index1, size_t index2) {
+static inline void array_swap_index(PtrArray *a, size_t index1, size_t index2) {
   if (index1 >= a->len || index2 >= a->len) {
     printf("Index out of bounds\n");
     return;
@@ -88,7 +88,7 @@ static inline void array_swap_index(Array *a, size_t index1, size_t index2) {
 }
 
 // Swap the positions of two elements specified by their data pointers
-static inline void array_swap_data(Array *array, void *data1, void *data2) {
+static inline void array_swap_data(PtrArray *array, void *data1, void *data2) {
   size_t index1 = -1, index2 = -1;
   // Find the indices of data1 and data2 in the array
   for (size_t i = 0; i < array->len; i++) {
@@ -109,7 +109,7 @@ static inline void array_swap_data(Array *array, void *data1, void *data2) {
 }
 
 // Move an element at 'index_to_move' before the element at 'index_to_move_before'
-static inline void array_move_index_before(Array *array, size_t index_to_move,
+static inline void array_move_index_before(PtrArray *array, size_t index_to_move,
                                            size_t index_to_move_before) {
   if (index_to_move >= array->len || index_to_move_before >= array->len) {
     printf("Index out of bounds\n");
@@ -131,7 +131,7 @@ static inline void array_move_index_before(Array *array, size_t index_to_move,
 }
 
 // Move an element at 'index_to_move' after the element at 'index_to_move_after'
-static inline void array_move_index_after(Array *array, size_t index_to_move,
+static inline void array_move_index_after(PtrArray *array, size_t index_to_move,
                                           size_t index_to_move_after) {
   if (index_to_move >= array->len || index_to_move_after >= array->len) {
     printf("Index out of bounds\n");
@@ -153,7 +153,7 @@ static inline void array_move_index_after(Array *array, size_t index_to_move,
 }
 
 // Remove and return the element at the specified index
-static inline void *array_pop_at(Array *array, size_t index) {
+static inline void *array_pop_at(PtrArray *array, size_t index) {
   if (index >= array->len) {
     printf("Index out of bounds\n");
     return NULL;
@@ -169,7 +169,7 @@ static inline void *array_pop_at(Array *array, size_t index) {
 // Remove the first occurrence of the specified element.
 // Return true for successful operation.
 // Return false if the element was not found.
-static inline bool array_remove(Array *array, void *data) {
+static inline bool array_remove(PtrArray *array, void *data) {
   for (size_t i = 0; i < array->len; i++)
     if (array->data[i] == data) {
       void *element = array_pop_at(array, i);
@@ -181,10 +181,39 @@ static inline bool array_remove(Array *array, void *data) {
 }
 
 // Free the array. If free_data is true - call free() on each element.
-static inline void array_free(Array *array, bool free_data) {
+static inline void array_free(PtrArray *array, bool free_data) {
   if (free_data)
     for (size_t i = 0; i < array->len; i++)
       free(array->data[i]);
   free(array->data);
   free(array);
 }
+
+// Generic dynamic array
+#define DECLARE_DYNAMIC_ARRAY(type, prefix)                                                        \
+  typedef struct {                                                                                 \
+    size_t len;                                                                                    \
+    size_t capacity;                                                                               \
+    type *data;                                                                                    \
+  } type##_array;                                                                                  \
+                                                                                                   \
+  static inline type##_array prefix##_array_new() {                                                \
+    type##_array array;                                                                            \
+    array.len = 0;                                                                                 \
+    array.capacity = 2;                                                                            \
+    array.data = malloc(sizeof(type##_array) * array.capacity);                                    \
+    return array;                                                                                  \
+  }                                                                                                \
+                                                                                                   \
+  static inline void prefix##_array_append(type##_array *array, type data) {                       \
+    if (array->len == array->capacity) {                                                           \
+      array->capacity *= 2;                                                                        \
+      type *new_data = realloc(array->data, array->capacity * sizeof(type##_array));               \
+      if (!new_data) {                                                                             \
+        printf("Failed to reallocate memory for array");                                           \
+        return;                                                                                    \
+      }                                                                                            \
+      array->data = new_data;                                                                      \
+    }                                                                                              \
+    array->data[array->len++] = data;                                                              \
+  }

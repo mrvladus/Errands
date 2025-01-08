@@ -1,6 +1,59 @@
 #pragma once
 
+#include "utils/array.h"
+
 #include <gtk/gtk.h>
+#include <libical/ical.h>
+
+typedef struct {
+  char *uid;
+  icalcomponent *ical;
+} CalendarData;
+
+DECLARE_DYNAMIC_ARRAY(CalendarData, calendar_data)
+
+CalendarData calendar_data_new(const char *uid, icalcomponent *ical);
+void calendar_data_free(CalendarData *data);
+
+const char *calendar_data_get_uid(CalendarData *data);
+const char *calendar_data_get_name(CalendarData *data);
+const char *calendar_data_get_color(CalendarData *data);
+bool calendar_data_get_deleted(CalendarData *data);
+bool calendar_data_get_synced(CalendarData *data);
+
+typedef struct {
+  icalcomponent *ical;
+} EventData;
+
+DECLARE_DYNAMIC_ARRAY(EventData, event_data)
+
+EventData event_data_new(icalcomponent *ical);
+void event_data_free(EventData *data);
+
+// const char *event_data_get_attachments(EventData *data);
+const char *event_data_get_color(EventData *data);
+bool event_data_get_completed(EventData *data);
+const char *event_data_get_changed_at(EventData *data);
+const char *event_data_get_created_at(EventData *data);
+bool event_data_get_deleted(EventData *data);
+const char *event_data_get_due_date(EventData *data);
+bool event_data_get_expanded(EventData *data);
+const char *event_data_get_list_uid(EventData *data);
+const char *event_data_get_notes(EventData *data);
+bool event_data_get_notified(EventData *data);
+const char *event_data_get_parent(EventData *data);
+uint8_t event_data_get_percent(EventData *data);
+uint8_t event_data_get_priority(EventData *data);
+const char *event_data_get_rrule(EventData *data); // ?
+const char *event_data_get_start_date(EventData *data);
+bool event_data_get_synced(EventData *data);
+// const char *event_data_get_tags(EventData *data);
+const char *event_data_get_text(EventData *data);
+bool event_data_get_toolbar_shown(EventData *data);
+bool event_data_get_trash(EventData *data);
+const char *event_data_get_uid(EventData *data);
+
+CalendarData_array _errands_data_load();
 
 typedef struct {
   GPtrArray *attachments;

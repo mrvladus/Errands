@@ -3,78 +3,129 @@
 #include "utils.h"
 
 #include "lib/cJSON.h"
-#include "utils/array.h"
+#include "utils/files.h"
+#include "utils/macros.h"
 
 #include <glib.h>
+#include <libical/ical.h>
+
+#include <stdbool.h>
+#include <stdlib.h>
 #include <string.h>
 
-// --- READ / WRITE --- //
+#define PATH_SEP "/"
+const char *user_dir;
 
-#define MAX_BACKUPS 10
-#define BACKUP_PREFIX "data-"
-#define BACKUP_SUFFIX ".json"
+// --- ICAL UTILS --- //
 
-// Function to create a backup of the data.json file
-void create_backup(const char *data_file_path) {
-  // const char *backup_dir = g_path_get_dirname(data_file_path);
-  // char backup_file_path[strlen(data_file_path) + 20];
-  // time_t now = time(NULL);
-  // struct tm *tm_info = localtime(&now);
-
-  // // Create a timestamp for the backup file
-  // char timestamp[20];
-  // strftime(timestamp, sizeof(timestamp), "%Y%m%d%H%M%S", tm_info);
-
-  // // Create the backup file name
-  // snprintf(backup_file_path, sizeof(backup_file_path), "%s/%s%s%s", backup_dir, BACKUP_PREFIX,
-  //          timestamp, BACKUP_SUFFIX);
-
-  // // Copy the data.json file to the backup file
-  // FILE *src_file = fopen(data_file_path, "rb");
-  // if (src_file) {
-  //   FILE *dest_file = fopen(backup_file_path, "wb");
-  //   if (dest_file) {
-  //     char buffer[1024];
-  //     size_t bytes;
-  //     while ((bytes = fread(buffer, 1, sizeof(buffer), src_file)) > 0) {
-  //       fwrite(buffer, 1, bytes, dest_file);
-  //     }
-  //     fclose(dest_file);
-  //   }
-  //   fclose(src_file);
-  // }
-
-  // // Check for existing backups and manage them
-  // DIR *dir = opendir(backup_dir);
-  // if (dir) {
-  //   struct dirent *entry;
-  //   int backup_count = 0;
-  //   char oldest_backup[256];
-  //   time_t oldest_time = time(NULL);
-
-  //   // Count existing backups and find the oldest one
-  //   while ((entry = readdir(dir)) != NULL) {
-  //     if (strstr(entry->d_name, BACKUP_PREFIX) == entry->d_name &&
-  //         strstr(entry->d_name, BACKUP_SUFFIX) != NULL) {
-  //       backup_count++;
-  //       char full_path[256];
-  //       snprintf(full_path, sizeof(full_path), "%s/%s", backup_dir, entry->d_name);
-  //       struct stat file_stat;
-  //       stat(full_path, &file_stat);
-  //       if (file_stat.st_mtime < oldest_time) {
-  //         oldest_time = file_stat.st_mtime;
-  //         strcpy(oldest_backup, full_path);
-  //       }
-  //     }
-  //   }
-  //   closedir(dir);
-
-  //   // If there are more than MAX_BACKUPS, delete the oldest one
-  //   if (backup_count >= MAX_BACKUPS) {
-  //     remove(oldest_backup);
-  //   }
-  // }
+// Get X property
+icalproperty *__get_x_prop(icalcomponent *ical, const char *xprop) {
+  icalproperty *property = icalcomponent_get_first_property(ical, ICAL_X_PROPERTY);
+  while (property) {
+    const char *name = icalproperty_get_x_name(property);
+    if (name && !strcmp(name, xprop))
+      return property;
+    property = icalcomponent_get_next_property(ical, ICAL_X_PROPERTY);
+  }
+  return NULL;
 }
+
+// Get X property value string
+const char *__get_x_prop_value(icalcomponent *ical, const char *xprop) {
+  icalproperty *property = __get_x_prop(ical, xprop);
+  if (property)
+    return icalproperty_get_value_as_string(property);
+  return NULL;
+}
+
+// Add X property value string
+void __add_x_prop(icalcomponent *ical, const char *xprop, const char *value) {
+  icalproperty *property = icalproperty_new_x(value);
+  if (!property)
+    return;
+  icalproperty_set_x_name(property, xprop);
+  icalcomponent_add_property(ical, property);
+}
+
+bool __calendar_get_x_bool(icalcomponent *ical, const char *prop) {
+  const char *property = __get_x_prop_value(ical, prop);
+  if (property)
+    return (bool)atoi(property);
+  else
+    __add_x_prop(ical, prop, "0");
+  return false;
+}
+
+const char *__calendar_get_string(icalcomponent *ical, const char *prop) {
+  const char *property = __get_x_prop_value(ical, prop);
+  if (property)
+    return property;
+  else
+    return NULL;
+}
+
+void calendar_set_bool(icalcomponent *ical, const char *prop, bool value) {}
+
+// --- CALENDAR --- //
+
+CalendarData calendar_data_new(const char *uid, icalcomponent *ical) {
+  CalendarData data;
+  data.uid = strdup(uid);
+  data.ical = ical;
+  return data;
+}
+
+void calendar_data_free(CalendarData *data) {
+  icalcomponent_free(data->ical);
+  free(data->uid);
+}
+
+const char *calendar_data_get_uid(CalendarData *data) { return data->uid; }
+
+const char *calendar_data_get_name(CalendarData *data) {
+  return __get_x_prop_value(data->ical, "X-WR-CALNAME");
+}
+
+const char *calendar_data_get_color(CalendarData *data) {
+  return __get_x_prop_value(data->ical, "X-ERRANDS-COLOR");
+}
+
+bool calendar_data_get_deleted(CalendarData *data) {
+  return __calendar_get_x_bool(data->ical, "X-ERRANDS-DELETED");
+}
+
+bool calendar_data_get_synced(CalendarData *data) {
+  return __calendar_get_x_bool(data->ical, "X-ERRANDS-SYNCED");
+}
+
+CalendarData_array _errands_data_load() {
+  CalendarData_array array = calendar_data_array_new();
+  user_dir = g_build_path(PATH_SEP, g_get_user_data_dir(), "errands", NULL);
+  LOG("Loading user data at %s", user_dir);
+  g_autoptr(GDir) dir = g_dir_open(user_dir, 0, NULL);
+  if (!dir)
+    return array;
+  const char *filename;
+  while ((filename = g_dir_read_name(dir))) {
+    char *is_ics = strstr(filename, ".ics");
+    if (is_ics) {
+      g_autofree gchar *path = g_build_path(PATH_SEP, user_dir, filename, NULL);
+      char *content = read_file_to_string(path);
+      if (content) {
+        LOG("Loading calendar %s", path);
+        icalcomponent *calendar = icalparser_parse_string(content);
+        if (calendar) {
+          *(strstr(filename, ".")) = '\0';
+          calendar_data_array_append(&array, calendar_data_new(filename, calendar));
+        }
+        free(content);
+      }
+    }
+  }
+  return array;
+}
+
+// --- READ / WRITE --- //
 
 // Function to validate JSON data
 static bool validate_json(const char *json_data) {
@@ -96,7 +147,7 @@ static char *errands_data_read() {
     fprintf(file, "{\"lists\":[],\"tags\":[],\"tasks\":[]}");
     fclose(file);
   } else {
-    create_backup(data_file_path);
+    // create_backup(data_file_path);
   }
   char *json_data = read_file_to_string(data_file_path);
   if (json_data == NULL) {

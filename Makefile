@@ -1,6 +1,6 @@
 CC = gcc
-CFLAGS = $(shell pkg-config --cflags libadwaita-1 gtksourceview-5 libcurl) -O3
-LDFLAGS = $(shell pkg-config --libs libadwaita-1 gtksourceview-5 libcurl)
+CFLAGS = $(shell pkg-config --cflags libadwaita-1 gtksourceview-5 libcurl libical) -O3
+LDFLAGS = $(shell pkg-config --libs libadwaita-1 gtksourceview-5 libcurl libical)
 
 # Source files
 SRC = $(shell find src -name '*.c')
@@ -28,7 +28,7 @@ src/resources.h: $(RESOURCES)
 
 
 # Link object files to create the executable
-$(TARGET): $(OBJ) $(RESOURCES_SRC)
+$(TARGET): $(RESOURCES_SRC) $(OBJ)
 	$(CC) $(OBJ) -o $(TARGET) $(LDFLAGS)
 
 # Compile source files to object files

@@ -1,13 +1,16 @@
 #include "config.h"
 #include "data.h"
+#include "glib.h"
 #include "resources.h"
 #include "settings.h"
 #include "state.h"
 #include "sync.h"
+#include "utils/files.h"
 #include "window.h"
 
 #include <adwaita.h>
 #include <glib/gi18n.h>
+
 #include <stddef.h>
 
 static void activate(GtkApplication *app) {
@@ -18,6 +21,11 @@ static void activate(GtkApplication *app) {
 }
 
 int main(int argc, char **argv) {
+  CalendarData_array a = _errands_data_load();
+  for (size_t i = 0; i < a.len; i++) {
+    CalendarData d = a.data[i];
+    LOG("uid: %s, deleted: %d", d.uid, calendar_data_get_deleted(&d));
+  }
   // Generate random seed
   srand((unsigned int)(time(NULL) ^ getpid()));
 
