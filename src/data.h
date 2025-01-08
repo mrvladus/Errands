@@ -49,11 +49,13 @@ const char *event_data_get_start_date(EventData *data);
 bool event_data_get_synced(EventData *data);
 // const char *event_data_get_tags(EventData *data);
 const char *event_data_get_text(EventData *data);
+void event_data_set_text(EventData *data, const char *text);
 bool event_data_get_toolbar_shown(EventData *data);
 bool event_data_get_trash(EventData *data);
 const char *event_data_get_uid(EventData *data);
 
-CalendarData_array _errands_data_load();
+CalendarData_array errands_data_load_calendars();
+EventData_array errands_data_load_events(CalendarData_array *calendars);
 
 typedef struct {
   GPtrArray *attachments;

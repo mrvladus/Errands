@@ -6,6 +6,7 @@
 #include "state.h"
 #include "sync.h"
 #include "utils/files.h"
+#include "utils/macros.h"
 #include "window.h"
 
 #include <adwaita.h>
@@ -21,11 +22,17 @@ static void activate(GtkApplication *app) {
 }
 
 int main(int argc, char **argv) {
-  CalendarData_array a = _errands_data_load();
-  for (size_t i = 0; i < a.len; i++) {
-    CalendarData d = a.data[i];
-    LOG("uid: %s, deleted: %d", d.uid, calendar_data_get_deleted(&d));
+  CalendarData_array a = errands_data_load_calendars();
+  // for (size_t i = 0; i < a.len; i++) {
+  //   CalendarData d = a.data[i];
+  //   LOG("uid: %s, deleted: %d", d.uid, calendar_data_get_deleted(&d));
+  // }
+
+  EventData_array e = errands_data_load_events(&a);
+  for (size_t i = 0; i < e.len; i++) {
+    LOG("%s", event_data_get_text(&e.data[i]));
   }
+
   // Generate random seed
   srand((unsigned int)(time(NULL) ^ getpid()));
 

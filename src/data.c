@@ -10,6 +10,7 @@
 #include <libical/ical.h>
 
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -98,7 +99,45 @@ bool calendar_data_get_synced(CalendarData *data) {
   return __calendar_get_x_bool(data->ical, "X-ERRANDS-SYNCED");
 }
 
-CalendarData_array _errands_data_load() {
+// --- EVENT --- //
+
+EventData event_data_new(icalcomponent *ical) {
+  EventData data;
+  data.ical = ical;
+  return data;
+}
+
+void event_data_free(EventData *data) { icalcomponent_free(data->ical); }
+
+// const char *event_data_get_attachments(EventData *data);
+// const char *event_data_get_color(EventData *data);
+// bool event_data_get_completed(EventData *data);
+// const char *event_data_get_changed_at(EventData *data);
+// const char *event_data_get_created_at(EventData *data);
+// bool event_data_get_deleted(EventData *data);
+// const char *event_data_get_due_date(EventData *data);
+// bool event_data_get_expanded(EventData *data);
+// const char *event_data_get_list_uid(EventData *data);
+// const char *event_data_get_notes(EventData *data);
+// bool event_data_get_notified(EventData *data);
+// const char *event_data_get_parent(EventData *data);
+// uint8_t event_data_get_percent(EventData *data);
+// uint8_t event_data_get_priority(EventData *data);
+// const char *event_data_get_rrule(EventData *data); // ?
+// const char *event_data_get_start_date(EventData *data);
+// bool event_data_get_synced(EventData *data);
+// const char *event_data_get_tags(EventData *data);
+const char *event_data_get_text(EventData *data) { return icalcomponent_get_summary(data->ical); }
+void event_data_set_text(EventData *data, const char *text) {
+  icalcomponent_set_summary(data->ical, text);
+}
+// bool event_data_get_toolbar_shown(EventData *data);
+// bool event_data_get_trash(EventData *data);
+// const char *event_data_get_uid(EventData *data);
+
+// --- LOADING --- //
+
+CalendarData_array errands_data_load_calendars() {
   CalendarData_array array = calendar_data_array_new();
   user_dir = g_build_path(PATH_SEP, g_get_user_data_dir(), "errands", NULL);
   LOG("Loading user data at %s", user_dir);
@@ -123,6 +162,18 @@ CalendarData_array _errands_data_load() {
     }
   }
   return array;
+}
+
+EventData_array errands_data_load_events(CalendarData_array *calendars) {
+  EventData_array events = event_data_array_new();
+  for (size_t i = 0; i < calendars->len; i++) {
+    CalendarData calendar = calendars->data[i];
+    icalcomponent *c;
+    for (c = icalcomponent_get_first_component(calendar.ical, ICAL_VTODO_COMPONENT); c != 0;
+         c = icalcomponent_get_next_component(calendar.ical, ICAL_VTODO_COMPONENT))
+      event_data_array_append(&events, event_data_new(c));
+  }
+  return events;
 }
 
 // --- READ / WRITE --- //
