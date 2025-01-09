@@ -28,10 +28,10 @@ int main(int argc, char **argv) {
   //   LOG("uid: %s, deleted: %d", d.uid, calendar_data_get_deleted(&d));
   // }
 
-  EventData_array e = errands_data_load_events(&a);
-  for (size_t i = 0; i < e.len; i++) {
-    LOG("%s", event_data_get_text(&e.data[i]));
-  }
+  // EventData_array e = errands_data_load_events(&a);
+  // for (size_t i = 0; i < e.len; i++) {
+  //   LOG("%s", event_data_get_text(&e.data[i]));
+  // }
 
   // Generate random seed
   srand((unsigned int)(time(NULL) ^ getpid()));

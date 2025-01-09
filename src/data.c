@@ -137,10 +137,114 @@ void event_data_set_text(EventData *data, const char *text) {
 
 // --- LOADING --- //
 
+static void errands_data_migrate() {
+  g_autofree gchar *old_data_file = g_build_path(PATH_SEP, user_dir, "data.json", NULL);
+  if (!file_exists(old_data_file))
+    return;
+  LOG("Migrate user data");
+  char *json_data = read_file_to_string(old_data_file);
+  cJSON *json = cJSON_Parse(json_data);
+  free(json_data);
+  if (!json)
+    return;
+  cJSON *cal_arr = cJSON_GetObjectItem(json, "lists");
+  cJSON *cal_item;
+  for (size_t i = 0; i < cJSON_GetArraySize(cal_arr); i++) {
+    cal_item = cJSON_GetArrayItem(cal_arr, i);
+    char *color = cJSON_GetObjectItem(cal_item, "color")->valuestring;
+    bool deleted = (bool)cJSON_GetObjectItem(cal_item, "deleted")->valueint;
+    bool synced = (bool)cJSON_GetObjectItem(cal_item, "synced")->valueint;
+    char *name = cJSON_GetObjectItem(cal_item, "name")->valuestring;
+    char *list_uid = cJSON_GetObjectItem(cal_item, "uid")->valuestring;
+
+    icalcomponent *calendar = icalcomponent_new(ICAL_VCALENDAR_COMPONENT);
+    icalcomponent_add_property(calendar, icalproperty_new_version("2.0"));
+    icalcomponent_add_property(calendar, icalproperty_new_prodid("~//Errands"));
+    __add_x_prop(calendar, "X-WR-CALNAME", name);
+    __add_x_prop(calendar, "X-ERRANDS-COLOR", color);
+    __add_x_prop(calendar, "X-ERRANDS-DELETED", deleted ? "1" : "0");
+    __add_x_prop(calendar, "X-ERRANDS-SYNCED", synced ? "1" : "0");
+    // Add events
+    cJSON *tasks_arr = cJSON_GetObjectItem(json, "tasks");
+    cJSON *task_item;
+    for (size_t j = 0; j < cJSON_GetArraySize(tasks_arr); j++) {
+      task_item = cJSON_GetArrayItem(tasks_arr, j);
+      char *task_list_uid = cJSON_GetObjectItem(task_item, "list_uid")->valuestring;
+      if (strcmp(task_list_uid, list_uid))
+        continue;
+      // TODO: attachments
+      char *color = cJSON_GetObjectItem(task_item, "color")->valuestring;
+      bool completed = (bool)cJSON_GetObjectItem(task_item, "completed")->valueint;
+      char *changed_at = cJSON_GetObjectItem(task_item, "changed_at")->valuestring;
+      char *created_at = cJSON_GetObjectItem(task_item, "created_at")->valuestring;
+      bool deleted = (bool)cJSON_GetObjectItem(task_item, "deleted")->valueint;
+      char *due_date = cJSON_GetObjectItem(task_item, "due_date")->valuestring;
+      bool expanded = (bool)cJSON_GetObjectItem(task_item, "expanded")->valueint;
+      char *notes = cJSON_GetObjectItem(task_item, "notes")->valuestring;
+      bool notified = (bool)cJSON_GetObjectItem(task_item, "notified")->valueint;
+      char *parent = cJSON_GetObjectItem(task_item, "parent")->valuestring;
+      uint8_t percent_complete = cJSON_GetObjectItem(task_item, "percent_complete")->valueint;
+      uint8_t priority = cJSON_GetObjectItem(task_item, "priority")->valueint;
+      char *rrule = cJSON_GetObjectItem(task_item, "rrule")->valuestring;
+      char *start_date = cJSON_GetObjectItem(task_item, "start_date")->valuestring;
+      bool synced = (bool)cJSON_GetObjectItem(task_item, "synced")->valueint;
+      // TODO: tags
+      char *text = cJSON_GetObjectItem(task_item, "text")->valuestring;
+      bool toolbar_shown = (bool)cJSON_GetObjectItem(task_item, "toolbar_shown")->valueint;
+      bool trash = (bool)cJSON_GetObjectItem(task_item, "trash")->valueint;
+      char *uid = cJSON_GetObjectItem(task_item, "uid")->valuestring;
+
+      icalcomponent *event = icalcomponent_new(ICAL_VTODO_COMPONENT);
+      // TODO: attachments
+      // TODO: completed
+      icalcomponent_add_property(event,
+                                 icalproperty_new_lastmodified(icaltime_from_string(changed_at)));
+      icalcomponent_add_property(event, icalproperty_new_dtstamp(icaltime_from_string(created_at)));
+      if (strcmp(due_date, ""))
+        icalcomponent_add_property(event, icalproperty_new_due(icaltime_from_string(due_date)));
+      if (strcmp(notes, ""))
+        icalcomponent_add_property(event, icalproperty_new_description(notes));
+      if (strcmp(parent, ""))
+        icalcomponent_add_property(event, icalproperty_new_relatedto(parent));
+      icalcomponent_add_property(event, icalproperty_new_percentcomplete(percent_complete));
+      icalcomponent_add_property(event, icalproperty_new_priority(priority));
+      if (strcmp(rrule, ""))
+        icalcomponent_add_property(event,
+                                   icalproperty_new_rrule(icalrecurrencetype_from_string(rrule)));
+      if (strcmp(start_date, ""))
+        icalcomponent_add_property(event,
+                                   icalproperty_new_dtstart(icaltime_from_string(start_date)));
+      icalcomponent_add_property(event, icalproperty_new_summary(text));
+      icalcomponent_add_property(event, icalproperty_new_uid(uid));
+      __add_x_prop(event, "X-ERRANDS-COLOR", color);
+      __add_x_prop(event, "X-ERRANDS-DELETED", deleted ? "1" : "0");
+      __add_x_prop(event, "X-ERRANDS-EXPANDED", expanded ? "1" : "0");
+      __add_x_prop(event, "X-ERRANDS-NOTIFIED", notified ? "1" : "0");
+      __add_x_prop(event, "X-ERRANDS-SYNCED", synced ? "1" : "0");
+      __add_x_prop(event, "X-ERRANDS-TOOLBAR-SHOWN", toolbar_shown ? "1" : "0");
+      __add_x_prop(event, "X-ERRANDS-TRASH", trash ? "1" : "0");
+      __add_x_prop(event, "X-ERRANDS-LIST-UID", task_list_uid);
+
+      icalcomponent_add_component(calendar, event);
+    }
+    g_autofree gchar *calendar_filename = g_strdup_printf("%s.ics", list_uid);
+    g_autofree gchar *calendar_file_path =
+        g_build_path(PATH_SEP, user_dir, calendar_filename, NULL);
+    write_string_to_file(calendar_file_path, icalcomponent_as_ical_string(calendar));
+  }
+  cJSON_Delete(json);
+  // TODO: Delete data.json
+}
+
 CalendarData_array errands_data_load_calendars() {
-  CalendarData_array array = calendar_data_array_new();
   user_dir = g_build_path(PATH_SEP, g_get_user_data_dir(), "errands", NULL);
+  if (!directory_exists(user_dir)) {
+    LOG("Creating user data directory at %s", user_dir);
+    g_mkdir_with_parents(user_dir, 0755);
+  }
   LOG("Loading user data at %s", user_dir);
+  errands_data_migrate();
+  CalendarData_array array = calendar_data_array_new();
   g_autoptr(GDir) dir = g_dir_open(user_dir, 0, NULL);
   if (!dir)
     return array;
