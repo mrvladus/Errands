@@ -172,7 +172,15 @@ static void errands_data_migrate() {
       char *task_list_uid = cJSON_GetObjectItem(task_item, "list_uid")->valuestring;
       if (strcmp(task_list_uid, list_uid))
         continue;
-      // TODO: attachments
+      cJSON *task_attachments_arr = cJSON_GetObjectItem(task_item, "attachments");
+      g_autoptr(GString) attachments = g_string_new("");
+      size_t attachments_arr_size = cJSON_GetArraySize(task_attachments_arr);
+      for (size_t a = 0; a < attachments_arr_size; a++) {
+        char *attachment_str = cJSON_GetArrayItem(task_attachments_arr, a)->valuestring;
+        g_string_append(attachments, attachment_str);
+        if (a > 0 && a < attachments_arr_size)
+          g_string_append(attachments, ",");
+      }
       char *color = cJSON_GetObjectItem(task_item, "color")->valuestring;
       bool completed = (bool)cJSON_GetObjectItem(task_item, "completed")->valueint;
       char *changed_at = cJSON_GetObjectItem(task_item, "changed_at")->valuestring;
@@ -188,15 +196,25 @@ static void errands_data_migrate() {
       char *rrule = cJSON_GetObjectItem(task_item, "rrule")->valuestring;
       char *start_date = cJSON_GetObjectItem(task_item, "start_date")->valuestring;
       bool synced = (bool)cJSON_GetObjectItem(task_item, "synced")->valueint;
-      // TODO: tags
+      cJSON *task_tags_arr = cJSON_GetObjectItem(task_item, "attachments");
+      g_autoptr(GString) tags = g_string_new("");
+      size_t tags_arr_size = cJSON_GetArraySize(task_tags_arr);
+      for (size_t a = 0; a < tags_arr_size; a++) {
+        char *tag_str = cJSON_GetArrayItem(task_tags_arr, a)->valuestring;
+        g_string_append(tags, tag_str);
+        if (a > 0 && a < tags_arr_size)
+          g_string_append(tags, ",");
+      }
       char *text = cJSON_GetObjectItem(task_item, "text")->valuestring;
       bool toolbar_shown = (bool)cJSON_GetObjectItem(task_item, "toolbar_shown")->valueint;
       bool trash = (bool)cJSON_GetObjectItem(task_item, "trash")->valueint;
       char *uid = cJSON_GetObjectItem(task_item, "uid")->valuestring;
 
       icalcomponent *event = icalcomponent_new(ICAL_VTODO_COMPONENT);
-      // TODO: attachments
-      // TODO: completed
+      if (completed)
+        icalcomponent_add_property(event, icalproperty_new_completed(icaltime_today()));
+      if (strcmp(tags->str, ""))
+        icalcomponent_add_property(event, icalproperty_new_categories(tags->str));
       icalcomponent_add_property(event,
                                  icalproperty_new_lastmodified(icaltime_from_string(changed_at)));
       icalcomponent_add_property(event, icalproperty_new_dtstamp(icaltime_from_string(created_at)));
@@ -216,6 +234,7 @@ static void errands_data_migrate() {
                                    icalproperty_new_dtstart(icaltime_from_string(start_date)));
       icalcomponent_add_property(event, icalproperty_new_summary(text));
       icalcomponent_add_property(event, icalproperty_new_uid(uid));
+      __add_x_prop(event, "X-ERRANDS-ATTACHMENTS", attachments->str);
       __add_x_prop(event, "X-ERRANDS-COLOR", color);
       __add_x_prop(event, "X-ERRANDS-DELETED", deleted ? "1" : "0");
       __add_x_prop(event, "X-ERRANDS-EXPANDED", expanded ? "1" : "0");
