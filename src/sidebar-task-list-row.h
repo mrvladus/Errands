@@ -16,10 +16,10 @@ struct _ErrandsSidebarTaskListRow {
   GtkWidget *label;
   GtkWidget *counter;
   // GtkEventController *hover_ctrl;
-  TaskListData *data;
+  ListData *data;
 };
 
-ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_new(TaskListData *data);
+ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_new(ListData *data);
 void errands_sidebar_task_list_row_update_counter(ErrandsSidebarTaskListRow *row);
 void errands_sidebar_task_list_row_update_title(ErrandsSidebarTaskListRow *row);
 ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_get(const char *uid);

@@ -1,18 +1,20 @@
 #include "window.h"
-#include "delete-list-dialog.h"
+#include "data.h"
+// #include "delete-list-dialog.h"
 #include "no-lists-page.h"
-#include "rename-list-dialog.h"
+// #include "rename-list-dialog.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "state.h"
-#include "task-list.h"
-#include "task/attachments-window.h"
-#include "task/color-window.h"
-#include "task/date-window.h"
-#include "task/notes-window.h"
-#include "task/priority-window.h"
-#include "task/tags-window.h"
 #include "utils.h"
+// #include "task-list.h"
+// #include "task/attachments-window.h"
+// #include "task/color-window.h"
+// #include "task/date-window.h"
+// #include "task/notes-window.h"
+// #include "task/priority-window.h"
+// #include "task/tags-window.h"
+// #include "utils.h"
 
 #include <glib/gi18n.h>
 
@@ -59,26 +61,26 @@ void errands_window_build(ErrandsWindow *win) {
   adw_navigation_split_view_set_content(ADW_NAVIGATION_SPLIT_VIEW(win->split_view),
                                         adw_navigation_page_new(win->stack, "Content"));
 
-  state.task_list = errands_task_list_new();
+  // state.task_list = errands_task_list_new();
 
   // Dialogs
-  state.date_window = errands_date_window_new();
-  state.notes_window = errands_notes_window_new();
-  state.priority_window = errands_priority_window_new();
-  state.tags_window = errands_tags_window_new();
-  state.attachments_window = errands_attachments_window_new();
-  state.color_window = errands_color_window_new();
-  state.new_list_dialog = errands_new_list_dialog_new();
-  state.rename_list_dialog = errands_rename_list_dialog_new();
-  state.delete_list_dialog = errands_delete_list_dialog_new();
-  state.no_lists_page = errands_no_lists_page_new();
+  // state.date_window = errands_date_window_new();
+  // state.notes_window = errands_notes_window_new();
+  // state.priority_window = errands_priority_window_new();
+  // state.tags_window = errands_tags_window_new();
+  // state.attachments_window = errands_attachments_window_new();
+  // state.color_window = errands_color_window_new();
+  // state.new_list_dialog = errands_new_list_dialog_new();
+  // state.rename_list_dialog = errands_rename_list_dialog_new();
+  // state.delete_list_dialog = errands_delete_list_dialog_new();
+  // state.no_lists_page = errands_no_lists_page_new();
 }
 
 void errands_window_update(ErrandsWindow *win) {
   int count = 0;
   for (int i = 0; i < state.tl_data->len; i++) {
-    TaskListData *tld = state.tl_data->pdata[i];
-    if (!tld->deleted)
+    ListData *ld = state.tl_data->pdata[i];
+    if (!list_data_get(ld, LIST_PROP_DELETED).b)
       count++;
   }
   g_object_set(state.main_window->no_lists_page, "visible", count == 0, NULL);

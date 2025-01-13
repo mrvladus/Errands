@@ -1,17 +1,17 @@
 #pragma once
 
-#include "delete-list-dialog.h"
-#include "new-list-dialog.h"
-#include "no-lists-page.h"
-#include "rename-list-dialog.h"
+// #include "delete-list-dialog.h"
+// #include "new-list-dialog.h"
+// #include "no-lists-page.h"
+// #include "rename-list-dialog.h"
 #include "sidebar.h"
-#include "task-list.h"
-#include "task/attachments-window.h"
-#include "task/color-window.h"
-#include "task/date-window.h"
-#include "task/notes-window.h"
-#include "task/priority-window.h"
-#include "task/tags-window.h"
+// #include "task-list.h"
+// #include "task/attachments-window.h"
+// #include "task/color-window.h"
+// #include "task/date-window.h"
+// #include "task/notes-window.h"
+// #include "task/priority-window.h"
+// #include "task/tags-window.h"
 #include "window.h"
 
 #include <adwaita.h>
@@ -20,26 +20,22 @@
 typedef struct {
   AdwApplication *app;
   ErrandsWindow *main_window;
-  GtkWidget *split_view;
-  GtkWidget *stack;
-  GtkWidget *tags_page;
   ErrandsSidebar *sidebar;
 
   // Task List Page
-  ErrandsTaskList *task_list;
-  ErrandsNoListsPage *no_lists_page;
+  // ErrandsTaskList *task_list;
 
   // Dialog windows
-  ErrandsNewListDialog *new_list_dialog;
-  ErrandsRenameListDialog *rename_list_dialog;
-  ErrandsDeleteListDialog *delete_list_dialog;
+  // ErrandsNewListDialog *new_list_dialog;
+  // ErrandsRenameListDialog *rename_list_dialog;
+  // ErrandsDeleteListDialog *delete_list_dialog;
 
-  ErrandsNotesWindow *notes_window;
-  ErrandsPriorityWindow *priority_window;
-  ErrandsTagsWindow *tags_window;
-  ErrandsAttachmentsWindow *attachments_window;
-  ErrandsColorWindow *color_window;
-  ErrandsDateWindow *date_window;
+  // ErrandsNotesWindow *notes_window;
+  // ErrandsPriorityWindow *priority_window;
+  // ErrandsTagsWindow *tags_window;
+  // ErrandsAttachmentsWindow *attachments_window;
+  // ErrandsColorWindow *color_window;
+  // ErrandsDateWindow *date_window;
 
   // User Data
   GPtrArray *tl_data;

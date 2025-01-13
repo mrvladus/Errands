@@ -1,8 +1,7 @@
 #include "data.h"
 
 #include "lib/cJSON.h"
-#include "utils/files.h"
-#include "utils/macros.h"
+#include "utils.h"
 
 #include <glib.h>
 #include <libical/ical.h>
