@@ -24,7 +24,7 @@ G_DEFINE_TYPE(ErrandsSidebar, errands_sidebar, ADW_TYPE_BIN)
 static void errands_sidebar_class_init(ErrandsSidebarClass *class) {}
 
 static void errands_sidebar_init(ErrandsSidebar *self) {
-  LOG("Creating sidebar");
+  LOG("Sidebar: Create");
   // GSimpleActionGroup *ag = errands_action_group_new(1, "import", on_import_action, self);
   // gtk_widget_insert_action_group(GTK_WIDGET(self), "sidebar", G_ACTION_GROUP(ag));
 

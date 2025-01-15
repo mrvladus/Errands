@@ -29,3 +29,4 @@ CompileFlags:
     - -I/usr/include/gio-unix-2.0
     - -I/usr/include/libsecret-1
     - -I/usr/include/p11-kit-1
+    - -I../_build

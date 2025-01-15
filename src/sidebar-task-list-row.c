@@ -3,6 +3,7 @@
 #include "data.h"
 #include "settings.h"
 #include "state.h"
+#include "utils.h"
 // #include "state.h"
 // #include "delete-list-dialog.h"
 // #include "rename-list-dialog.h"
@@ -149,17 +150,17 @@ void on_errands_sidebar_task_list_row_activate(GtkListBox *box, ErrandsSidebarTa
   adw_view_stack_set_visible_child_name(ADW_VIEW_STACK(state.main_window->stack),
                                         "errands_task_list_page");
   // Set setting
-  // errands_settings_set("last_list_uid", SETTING_TYPE_STRING, row->data->uid);
+  const char *list_uid = list_data_get(row->data, LIST_PROP_UID).s;
+  errands_settings_set("last_list_uid", SETTING_TYPE_STRING, (void *)list_uid);
   // Filter by uid
-  // errands_task_list_filter_by_uid(row->data->uid);
-  // state.task_list->data = row->data;
+  errands_task_list_filter_by_uid(list_uid);
+  state.task_list->data = row->data;
   // Show entry
-  // if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(state.task_list->search_btn)))
-  // gtk_revealer_set_reveal_child(GTK_REVEALER(state.task_list->entry), true);
+  if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(state.task_list->search_btn)))
+    gtk_revealer_set_reveal_child(GTK_REVEALER(state.task_list->entry), true);
   // Update title
-  // errands_task_list_update_title();
-
-  // LOG("Switch to list '%s'", row->data->uid);
+  errands_task_list_update_title();
+  LOG("Switch to list '%s'", list_uid);
 }
 
 // static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x, gdouble y,

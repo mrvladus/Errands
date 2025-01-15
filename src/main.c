@@ -4,10 +4,12 @@
 #include "settings.h"
 #include "state.h"
 // #include "sync.h"
+#include "utils.h"
 #include "window.h"
 
 #include <adwaita.h>
 #include <glib/gi18n.h>
+#include <libportal/portal.h>
 
 #include <stddef.h>
 
@@ -19,6 +21,8 @@ static void activate(GtkApplication *app) {
 }
 
 int main(int argc, char **argv) {
+  state.is_flatpak = xdp_portal_running_under_flatpak();
+  LOG("Starting Errands %s %s", VERSION, state.is_flatpak ? "(flatpak)" : "(not official)");
   // Generate random seed
   srand((unsigned int)(time(NULL) ^ getpid()));
 
@@ -28,9 +32,6 @@ int main(int argc, char **argv) {
 
   state.tl_data = errands_data_load_lists();
   state.t_data = errands_data_load_tasks(state.tl_data);
-
-  GPtrArray *l = errands_data_load_lists();
-  GPtrArray *t = errands_data_load_tasks(l);
 
   errands_settings_init();
 

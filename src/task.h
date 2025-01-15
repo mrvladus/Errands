@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../data.h"
-#include "task-toolbar.h"
+#include "data.h"
+// #include "task-toolbar.h"
 
 #include <adwaita.h>
 
@@ -22,7 +22,7 @@ struct _ErrandsTask {
   GtkWidget *progress_bar;
   GtkWidget *tags_box;
   GtkWidget *toolbar_revealer;
-  ErrandsTaskToolbar *toolbar;
+  // ErrandsTaskToolbar *toolbar;
   GtkWidget *sub_tasks_revealer;
   GtkWidget *sub_entry;
   GtkWidget *sub_tasks;
@@ -34,6 +34,5 @@ void errands_task_update_accent_color(ErrandsTask *task);
 void errands_task_update_progress(ErrandsTask *task);
 void errands_task_update_tags(ErrandsTask *task);
 // Return list of ErrandsTask widgets from parent to great ... great parent
-// Free with g_ptr_array_free(arr, true)
 GPtrArray *errands_task_get_parents(ErrandsTask *task);
 GPtrArray *errands_task_get_sub_tasks(ErrandsTask *task);

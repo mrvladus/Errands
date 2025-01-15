@@ -5,6 +5,7 @@
 #include <ctype.h>
 #include <stdint.h>
 #include <sys/stat.h>
+#include <time.h>
 
 // Log formatted message
 #define LOG(format, ...) fprintf(stderr, "\033[0;32m[Errands] \033[0m" format "\n", ##__VA_ARGS__)

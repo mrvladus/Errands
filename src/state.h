@@ -5,7 +5,7 @@
 // #include "no-lists-page.h"
 // #include "rename-list-dialog.h"
 #include "sidebar.h"
-// #include "task-list.h"
+#include "task-list.h"
 // #include "task/attachments-window.h"
 // #include "task/color-window.h"
 // #include "task/date-window.h"
@@ -18,12 +18,11 @@
 
 // Structure to hold the application state
 typedef struct {
+  bool is_flatpak;
   AdwApplication *app;
   ErrandsWindow *main_window;
   ErrandsSidebar *sidebar;
-
-  // Task List Page
-  // ErrandsTaskList *task_list;
+  ErrandsTaskList *task_list;
 
   // Dialog windows
   // ErrandsNewListDialog *new_list_dialog;

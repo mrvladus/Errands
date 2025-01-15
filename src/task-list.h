@@ -14,7 +14,7 @@ struct _ErrandsTaskList {
   GtkWidget *search_btn;
   GtkWidget *entry;
   GtkWidget *task_list;
-  TaskListData *data;
+  ListData *data;
 };
 
 ErrandsTaskList *errands_task_list_new();

@@ -81,6 +81,15 @@ void list_data_set(ListData *data, ListDataProp prop, void *value) {
     __set_x_prop_value(data, "X-ERRANDS-LIST-UID", (const char *)value);
 }
 
+GPtrArray *list_data_get_tasks(ListData *data) {
+  GPtrArray *tasks = g_ptr_array_new();
+  icalcomponent *c;
+  for (c = icalcomponent_get_first_component(data, ICAL_VTODO_COMPONENT); c != 0;
+       c = icalcomponent_get_next_component(data, ICAL_VTODO_COMPONENT))
+    g_ptr_array_add(tasks, c);
+  return tasks;
+}
+
 // --- TASK DATA --- //
 
 TaskData *task_data_new(ListData *list, const char *text, const char *list_uid) {
@@ -102,55 +111,57 @@ ErrandsDataVal task_data_get(ListData *data, TaskDataProp prop) {
     res.b = property ? true : false;
   } else if (prop == TASK_PROP_CHANGED) {
     icalproperty *property = icalcomponent_get_first_property(data, ICAL_LASTMODIFIED_PROPERTY);
-    res.s = icalproperty_as_ical_string(property);
+    res.s = property ? icalproperty_get_value_as_string(property) : "";
   } else if (prop == TASK_PROP_CREATED) {
     icalproperty *property = icalcomponent_get_first_property(data, ICAL_DTSTAMP_PROPERTY);
-    res.s = icalproperty_as_ical_string(property);
+    res.s = property ? icalproperty_get_value_as_string(property) : "";
   } else if (prop == TASK_PROP_DELETED)
     res.b = (bool)atoi(__get_x_prop_value(data, "X-ERRANDS-DELETED", "0"));
   else if (prop == TASK_PROP_DUE) {
     icalproperty *property = icalcomponent_get_first_property(data, ICAL_DUE_PROPERTY);
-    res.s = icalproperty_as_ical_string(property);
+    res.s = property ? icalproperty_get_value_as_string(property) : "";
   } else if (prop == TASK_PROP_EXPANDED)
     res.b = (bool)atoi(__get_x_prop_value(data, "X-ERRANDS-EXPANDED", "0"));
   else if (prop == TASK_PROP_LIST_UID)
     res.s = __get_x_prop_value(data, "X-ERRANDS-LIST-UID", "");
   else if (prop == TASK_PROP_NOTES) {
     icalproperty *property = icalcomponent_get_first_property(data, ICAL_DESCRIPTION_PROPERTY);
-    res.s = icalproperty_as_ical_string(property);
+    res.s = property ? icalproperty_get_value_as_string(property) : "";
   } else if (prop == TASK_PROP_NOTIFIED)
     res.b = (bool)atoi(__get_x_prop_value(data, "X-ERRANDS-NOTIFIED", "0"));
   else if (prop == TASK_PROP_PARENT) {
     icalproperty *property = icalcomponent_get_first_property(data, ICAL_RELATEDTO_PROPERTY);
-    res.s = icalproperty_as_ical_string(property);
+    res.s = property ? icalproperty_get_value_as_string(property) : "";
   } else if (prop == TASK_PROP_PRIORITY) {
     icalproperty *property = icalcomponent_get_first_property(data, ICAL_PRIORITY_PROPERTY);
-    res.i = atoi(icalproperty_as_ical_string(property));
+    res.i = property ? atoi(icalproperty_get_value_as_string(property)) : 0;
   } else if (prop == TASK_PROP_RRULE) {
     icalproperty *property = icalcomponent_get_first_property(data, ICAL_RRULE_PROPERTY);
-    res.s = icalproperty_as_ical_string(property);
+    res.s = property ? icalproperty_get_value_as_string(property) : "";
   } else if (prop == TASK_PROP_START) {
     icalproperty *property = icalcomponent_get_first_property(data, ICAL_DTSTART_PROPERTY);
-    res.s = icalproperty_as_ical_string(property);
-  } else if (prop == TASK_PROP_NOTIFIED)
+    res.s = property ? icalproperty_get_value_as_string(property) : "";
+  } else if (prop == TASK_PROP_SYNCED)
     res.b = (bool)atoi(__get_x_prop_value(data, "X-ERRANDS-SYNCED", "0"));
   else if (prop == TASK_PROP_TAGS) {
     icalproperty *property = icalcomponent_get_first_property(data, ICAL_CATEGORIES_PROPERTY);
-    res.s = icalproperty_as_ical_string(property);
+    res.s = property ? icalproperty_get_value_as_string(property) : "";
   } else if (prop == TASK_PROP_TEXT) {
     icalproperty *property = icalcomponent_get_first_property(data, ICAL_SUMMARY_PROPERTY);
-    res.s = icalproperty_as_ical_string(property);
+    res.s = property ? icalproperty_get_value_as_string(property) : "";
   } else if (prop == TASK_PROP_TOOLBAR_SHOWN)
     res.b = (bool)atoi(__get_x_prop_value(data, "X-ERRANDS-TOOLBAR-SHOWN", "0"));
   else if (prop == TASK_PROP_TRASH)
     res.b = (bool)atoi(__get_x_prop_value(data, "X-ERRANDS-TRASH", "0"));
   else if (prop == TASK_PROP_UID) {
     icalproperty *property = icalcomponent_get_first_property(data, ICAL_UID_PROPERTY);
-    res.s = icalproperty_as_ical_string(property);
+    res.s = property ? icalproperty_get_value_as_string(property) : "";
   }
   return res;
 }
 void task_data_set(TaskData *data, TaskDataProp prop, void *value);
+
+ListData *task_data_get_list(TaskData *data) { return icalcomponent_get_parent(data); }
 
 // --- LOADING --- //
 
@@ -158,7 +169,7 @@ static void errands_data_migrate() {
   g_autofree gchar *old_data_file = g_build_path(PATH_SEP, user_dir, "data.json", NULL);
   if (!file_exists(old_data_file))
     return;
-  LOG("Migrate user data");
+  LOG("User Data: Migrate");
   char *json_data = read_file_to_string(old_data_file);
   cJSON *json = cJSON_Parse(json_data);
   free(json_data);
@@ -181,6 +192,7 @@ static void errands_data_migrate() {
     __set_x_prop_value(calendar, "X-ERRANDS-COLOR", color);
     __set_x_prop_value(calendar, "X-ERRANDS-DELETED", deleted ? "1" : "0");
     __set_x_prop_value(calendar, "X-ERRANDS-SYNCED", synced ? "1" : "0");
+    __set_x_prop_value(calendar, "X-ERRANDS-LIST-UID", list_uid);
     // Add events
     cJSON *tasks_arr = cJSON_GetObjectItem(json, "tasks");
     cJSON *task_item;
@@ -275,10 +287,10 @@ static void errands_data_migrate() {
 GPtrArray *errands_data_load_lists() {
   user_dir = g_build_path(PATH_SEP, g_get_user_data_dir(), "errands", NULL);
   if (!directory_exists(user_dir)) {
-    LOG("Creating user data directory at %s", user_dir);
+    LOG("User Data: Creating user data directory at %s", user_dir);
     g_mkdir_with_parents(user_dir, 0755);
   }
-  LOG("Loading user data at %s", user_dir);
+  LOG("User Data: Loading at %s", user_dir);
   errands_data_migrate();
   GPtrArray *array = g_ptr_array_new();
   g_autoptr(GDir) dir = g_dir_open(user_dir, 0, NULL);
@@ -291,7 +303,7 @@ GPtrArray *errands_data_load_lists() {
       g_autofree gchar *path = g_build_path(PATH_SEP, user_dir, filename, NULL);
       char *content = read_file_to_string(path);
       if (content) {
-        LOG("Loading calendar %s", path);
+        LOG("User Data: Loading calendar %s", path);
         icalcomponent *calendar = icalparser_parse_string(content);
         if (calendar) {
           *(strstr(filename, ".")) = '\0';

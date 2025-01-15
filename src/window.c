@@ -6,8 +6,8 @@
 #include "settings.h"
 #include "sidebar.h"
 #include "state.h"
+#include "task-list.h"
 #include "utils.h"
-// #include "task-list.h"
 // #include "task/attachments-window.h"
 // #include "task/color-window.h"
 // #include "task/date-window.h"
@@ -26,7 +26,7 @@ G_DEFINE_TYPE(ErrandsWindow, errands_window, ADW_TYPE_APPLICATION_WINDOW)
 static void errands_window_class_init(ErrandsWindowClass *class) {}
 
 static void errands_window_init(ErrandsWindow *self) {
-  LOG("Creating main window");
+  LOG("Main Window: Create");
   g_object_set(self, "application", GTK_APPLICATION(state.app), "title", _("Errands"), NULL);
   self->stack = adw_view_stack_new();
   self->split_view = adw_navigation_split_view_new();
@@ -61,7 +61,7 @@ void errands_window_build(ErrandsWindow *win) {
   adw_navigation_split_view_set_content(ADW_NAVIGATION_SPLIT_VIEW(win->split_view),
                                         adw_navigation_page_new(win->stack, "Content"));
 
-  // state.task_list = errands_task_list_new();
+  state.task_list = errands_task_list_new();
 
   // Dialogs
   // state.date_window = errands_date_window_new();

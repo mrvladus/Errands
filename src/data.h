@@ -24,6 +24,7 @@ ListData *list_data_new(const char *uid);
 void list_data_free(ListData *data);
 ErrandsDataVal list_data_get(ListData *data, ListDataProp prop);
 void list_data_set(ListData *data, ListDataProp prop, void *value);
+GPtrArray *list_data_get_tasks(ListData *data);
 
 typedef icalcomponent TaskData;
 
@@ -55,6 +56,7 @@ TaskData *task_data_new(ListData *list, const char *text, const char *parent);
 void task_data_free(TaskData *data);
 ErrandsDataVal task_data_get(ListData *data, TaskDataProp prop);
 void task_data_set(TaskData *data, TaskDataProp prop, void *value);
+ListData *task_data_get_list(TaskData *data);
 
 GPtrArray *errands_data_load_lists();
 GPtrArray *errands_data_load_tasks(GPtrArray *calendars);
