@@ -1,7 +1,7 @@
 #pragma once
 
 #include "data.h"
-// #include "sidebar-all-row.h"
+#include "sidebar-all-row.h"
 #include "sidebar-task-list-row.h"
 
 #include <adwaita.h>
@@ -13,7 +13,7 @@ struct _ErrandsSidebar {
   AdwBin parent_instance;
   GtkWidget *add_btn;
   GtkWidget *filters_box;
-  // ErrandsSidebarAllRow *all_row;
+  ErrandsSidebarAllRow *all_row;
   GtkWidget *task_lists_box;
 };
 

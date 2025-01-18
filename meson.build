@@ -29,6 +29,7 @@ sources = files(
   'src/no-lists-page.c',
   'src/resources.c',
   'src/settings.c',
+  'src/sidebar-all-row.c',
   'src/sidebar-task-list-row.c',
   'src/sidebar.c',
   'src/state.c',

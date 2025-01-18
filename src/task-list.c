@@ -1,6 +1,8 @@
 #include "task-list.h"
 #include "components.h"
 #include "data.h"
+#include "glibconfig.h"
+#include "gtk/gtk.h"
 #include "settings.h"
 // #include "sidebar-all-row.h"
 // #include "sidebar-task-list-row.h"
@@ -241,33 +243,50 @@ void errands_task_list_filter_by_uid(const char *uid) {
   }
 }
 
-void errands_task_list_filter_by_text(const char *text) {
+bool errands_task_list_filter_by_text(GtkWidget *task_list, const char *text) {
   LOG("Task List: Filter by text '%s'", text);
 
-  // g_autoptr(GPtrArray) tasks = get_children(state.task_list->task_list);
-  // bool search_all_tasks = !state.task_list->data || !strcmp(state.task_list->data->uid, "");
-  // // Search all tasks
-  // if (search_all_tasks) {
-  //   for (int i = 0; i < tasks->len; i++) {
-  //     ErrandsTask *task = tasks->pdata[i];
-  //     bool contains = string_contains(task->data->text, text) ||
-  //                     string_contains(task->data->notes, text) ||
-  //                     string_array_contains(task->data->tags, text);
-  //     gtk_widget_set_visible(GTK_WIDGET(task), !task->data->deleted && contains);
-  //   }
-  //   return;
-  // }
-  // // Search for task list uid
-  // for (int i = 0; i < tasks->len; i++) {
-  //   ErrandsTask *task = tasks->pdata[i];
-  //   bool contains = string_contains(task->data->text, text) ||
-  //                   string_contains(task->data->notes, text) ||
-  //                   string_array_contains(task->data->tags, text);
-  //   gtk_widget_set_visible(GTK_WIDGET(task),
-  //                          !task->data->deleted &&
-  //                              !strcmp(task->data->list_uid, state.task_list->data->uid) &&
-  //                              contains);
-  // }
+  bool search_all_tasks =
+      !state.task_list->data || !strcmp(list_data_get_uid(state.task_list->data), "");
+
+  g_autoptr(GPtrArray) tasks = get_children(task_list);
+  if (search_all_tasks) {
+    bool res = false;
+    for (size_t i = 0; i < tasks->len; i++) {
+      ErrandsTask *task = tasks->pdata[i];
+      if (task_data_get_deleted(task->data) || task_data_get_trash(task->data))
+        continue;
+      bool contains = string_contains(task_data_get_text(task->data), text) ||
+                      string_contains(task_data_get_notes(task->data), text) ||
+                      string_contains(task_data_get_tags(task->data), text);
+      bool sub_tasks_contains = errands_task_list_filter_by_text(task->sub_tasks, text);
+      if (contains || sub_tasks_contains) {
+        res = true;
+        gtk_widget_set_visible(GTK_WIDGET(task), true);
+      } else
+        gtk_widget_set_visible(GTK_WIDGET(task), false);
+    }
+    return res;
+  } else {
+    bool res = false;
+    for (size_t i = 0; i < tasks->len; i++) {
+      ErrandsTask *task = tasks->pdata[i];
+      if (strcmp(list_data_get_uid(state.task_list->data), task_data_get_list_uid(task->data)))
+        continue;
+      if (task_data_get_deleted(task->data) || task_data_get_trash(task->data))
+        continue;
+      bool contains = string_contains(task_data_get_text(task->data), text) ||
+                      string_contains(task_data_get_notes(task->data), text) ||
+                      string_contains(task_data_get_tags(task->data), text);
+      bool sub_tasks_contains = errands_task_list_filter_by_text(task->sub_tasks, text);
+      if (contains || sub_tasks_contains) {
+        res = true;
+        gtk_widget_set_visible(GTK_WIDGET(task), true);
+      } else
+        gtk_widget_set_visible(GTK_WIDGET(task), false);
+    }
+    return res;
+  }
 }
 
 static bool errands_task_list_sorted_by_completion(GtkWidget *task_list) {
@@ -414,11 +433,11 @@ void errands_task_list_sort_recursive(GtkWidget *task_list) {
 void errands_task_list_reload() {
   LOG("Task List: Reload");
   gtk_box_remove_all(state.task_list->task_list);
-  // for (int i = 0; i < state.t_data->len; i++) {
-  //   TaskData *data = state.t_data->pdata[i];
-  //   if (!strcmp(data->parent, "") && !data->deleted)
-  //     gtk_box_append(GTK_BOX(state.task_list->task_list), GTK_WIDGET(errands_task_new(data)));
-  // }
+  for (size_t i = 0; i < state.t_data->len; i++) {
+    TaskData *data = state.t_data->pdata[i];
+    if (!strcmp(task_data_get_parent(data), "") && !task_data_get_deleted(data))
+      gtk_box_append(GTK_BOX(state.task_list->task_list), GTK_WIDGET(errands_task_new(data)));
+  }
   errands_task_list_sort_recursive(state.task_list->task_list);
 }
 
@@ -453,7 +472,7 @@ static void on_task_added(AdwEntryRow *entry, gpointer data) {
 
 static void on_task_list_search(GtkSearchEntry *entry, gpointer user_data) {
   const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
-  errands_task_list_filter_by_text(text);
+  errands_task_list_filter_by_text(state.task_list->task_list, text);
 }
 
 static void on_search_btn_toggle(GtkToggleButton *btn) {

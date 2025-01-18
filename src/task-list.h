@@ -22,9 +22,9 @@ ErrandsTaskList *errands_task_list_new();
 // Add new Task to Task List
 void errands_task_list_add(TaskData *td);
 void errands_task_list_update_title();
+bool errands_task_list_filter_by_text(GtkWidget *task_list, const char *text);
 void errands_task_list_filter_by_completion(GtkWidget *task_list, bool show_completed);
 void errands_task_list_filter_by_uid(const char *uid);
-void errands_task_list_filter_by_text(const char *text);
 // Sort tasks by completion in the given task list box
 void errands_task_list_sort_by_completion(GtkWidget *task_list);
 // General task list sort function. Depends on sort_by setting. Sorts by completion anyways.
