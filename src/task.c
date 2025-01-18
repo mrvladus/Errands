@@ -261,7 +261,6 @@ ErrandsTask *errands_task_new(TaskData *data) {
 
 void errands_task_update_accent_color(ErrandsTask *task) {
   const char *color = task_data_get_color(task->data);
-  LOG("%s", color);
   if (strcmp(color, "none")) {
     g_autoptr(GString) accent_style = g_string_new("task-");
     g_string_append(accent_style, color);
