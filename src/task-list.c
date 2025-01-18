@@ -303,30 +303,25 @@ static bool errands_task_list_sorted_by_completion(GtkWidget *task_list) {
 }
 
 void errands_task_list_sort_by_completion(GtkWidget *task_list) {
-  // // Check if the task list is already sorted by completion
-  // if (errands_task_list_sorted_by_completion(task_list))
-  //   return;
-
-  // ErrandsTask *task = (ErrandsTask *)gtk_widget_get_last_child(task_list);
-
-  // // Return if there are no tasks
-  // if (!task)
-  //   return;
-
-  // // Skip if last task completed
-  // ErrandsTask *last_cmp_task = task;
-  // if (task->data->completed)
-  //   task = last_cmp_task = (ErrandsTask *)gtk_widget_get_prev_sibling(GTK_WIDGET(task));
-
-  // // Sort the rest of the tasks
-  // while (task) {
-  //   if (task->data->completed) {
-  //     gtk_box_reorder_child_after(GTK_BOX(task_list), GTK_WIDGET(task),
-  //     GTK_WIDGET(last_cmp_task)); last_cmp_task = (ErrandsTask
-  //     *)gtk_widget_get_prev_sibling(GTK_WIDGET(task));
-  //   }
-  //   task = (ErrandsTask *)gtk_widget_get_prev_sibling(GTK_WIDGET(task));
-  // }
+  // Check if the task list is already sorted by completion
+  if (errands_task_list_sorted_by_completion(task_list))
+    return;
+  ErrandsTask *task = (ErrandsTask *)gtk_widget_get_last_child(task_list);
+  // Return if there are no tasks
+  if (!task)
+    return;
+  // Skip if last task completed
+  ErrandsTask *last_cmp_task = task;
+  if (task_data_get_completed(task->data))
+    task = last_cmp_task = (ErrandsTask *)gtk_widget_get_prev_sibling(GTK_WIDGET(task));
+  // Sort the rest of the tasks
+  while (task) {
+    if (task_data_get_completed(task->data)) {
+      gtk_box_reorder_child_after(GTK_BOX(task_list), GTK_WIDGET(task), GTK_WIDGET(last_cmp_task));
+      last_cmp_task = (ErrandsTask *)gtk_widget_get_prev_sibling(GTK_WIDGET(task));
+    }
+    task = (ErrandsTask *)gtk_widget_get_prev_sibling(GTK_WIDGET(task));
+  }
 }
 
 // - SORT BY DUE DATE - //

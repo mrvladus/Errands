@@ -1,16 +1,8 @@
 project(
-  'Errands',
+  'errands',
   'c',
   license: 'MIT',
   version: '47.1',
-)
-
-configure_file(
-  input: 'src/config.h.in',
-  output: 'config.h',
-  configuration: {
-    'VERSION': meson.project_version(),
-  },
 )
 
 # Dependencies
@@ -23,27 +15,36 @@ dependencies = [
 
 # Source files
 sources = files(
-  'src/data.c',
-  'src/lib/cJSON.c',
-  'src/main.c',
-  'src/no-lists-page.c',
-  'src/resources.c',
-  'src/settings.c',
-  'src/sidebar-all-row.c',
-  'src/sidebar-task-list-row.c',
-  'src/sidebar.c',
-  'src/state.c',
-  'src/task-list.c',
-  'src/task.c',
-  'src/window.c',
+  'src' / 'data.c',
+  'src' / 'lib' / 'cJSON.c',
+  'src' / 'main.c',
+  'src' / 'no-lists-page.c',
+  'src' / 'resources.c',
+  'src' / 'settings.c',
+  'src' / 'sidebar-all-row.c',
+  'src' / 'sidebar-task-list-row.c',
+  'src' / 'sidebar.c',
+  'src' / 'state.c',
+  'src' / 'task-list.c',
+  'src' / 'task.c',
+  'src' / 'window.c',
+)
+
+# Configuration config.h file
+configure_file(
+  input: 'src' / 'config.h.in',
+  output: 'config.h',
+  configuration: {
+    'VERSION': meson.project_version(),
+  },
 )
 
 # Errands executable
-errands_bin = executable(
-  'errands',
+bin = executable(
+  meson.project_name(),
   sources: sources,
   dependencies: dependencies,
 )
 
 # Run target for building and running errands: 'meson compile run'
-run_target('run', command: errands_bin)
+run_target('run', command: bin)

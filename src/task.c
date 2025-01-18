@@ -1,6 +1,7 @@
 #include "task.h"
 #include "data.h"
 #include "settings.h"
+#include "task-list.h"
 #include "utils.h"
 
 #include <glib/gi18n.h>
@@ -204,7 +205,7 @@ static void errands_task_init(ErrandsTask *self) {
 }
 
 ErrandsTask *errands_task_new(TaskData *data) {
-  LOG("Creating task '%s'", task_data_get_uid(data));
+  LOG("Task: Create '%s'", task_data_get_uid(data));
 
   ErrandsTask *task = g_object_new(ERRANDS_TYPE_TASK, NULL);
   task->data = data;
@@ -240,7 +241,7 @@ ErrandsTask *errands_task_new(TaskData *data) {
     }
   }
 
-  // errands_task_list_sort_by_completion(task->sub_tasks);
+  errands_task_list_sort_by_completion(task->sub_tasks);
 
   // errands_task_update_tags(task);
   errands_task_update_accent_color(task);
