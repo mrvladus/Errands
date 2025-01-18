@@ -86,7 +86,7 @@ static void errands_sidebar_init(ErrandsSidebar *self) {
   int count = 0;
   for (int i = 0; i < state.tl_data->len; i++) {
     ListData *ld = state.tl_data->pdata[i];
-    if (!list_data_get(ld, LIST_PROP_DELETED).b) {
+    if (!list_data_get_deleted(ld)) {
       errands_sidebar_add_task_list(self, ld);
       count++;
     }
@@ -112,7 +112,7 @@ static void errands_sidebar_init(ErrandsSidebar *self) {
 ErrandsSidebar *errands_sidebar_new() { return g_object_new(ERRANDS_TYPE_SIDEBAR, NULL); }
 
 ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(ErrandsSidebar *sb, ListData *data) {
-  LOG("Sidebar: Add task list '%s'", list_data_get(data, LIST_PROP_UID).s);
+  LOG("Sidebar: Add task list '%s'", list_data_get_uid(data));
   ErrandsSidebarTaskListRow *row = errands_sidebar_task_list_row_new(data);
   gtk_list_box_append(GTK_LIST_BOX(sb->task_lists_box), GTK_WIDGET(row));
   return row;
@@ -123,7 +123,7 @@ void errands_sidebar_select_last_opened_page() {
   char *last_uid = errands_settings_get("last_list_uid", SETTING_TYPE_STRING).s;
   for (int i = 0; i < rows->len; i++) {
     ErrandsSidebarTaskListRow *row = rows->pdata[i];
-    if (!strcmp(last_uid, list_data_get(row->data, LIST_PROP_UID).s))
+    if (!strcmp(last_uid, list_data_get_uid(row->data)))
       g_signal_emit_by_name(row, "activate", NULL);
   }
 }

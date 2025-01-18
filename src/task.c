@@ -1,9 +1,6 @@
 #include "task.h"
 #include "data.h"
-#include "glib.h"
-#include "glibconfig.h"
 #include "settings.h"
-#include "state.h"
 #include "utils.h"
 
 #include <glib/gi18n.h>
@@ -85,7 +82,7 @@ static void errands_task_init(ErrandsTask *self) {
 
   // Complete toggle
   self->complete_btn = gtk_check_button_new();
-  g_object_set(self->complete_btn, "valign", GTK_ALIGN_CENTER, NULL);
+  g_object_set(self->complete_btn, "valign", GTK_ALIGN_CENTER, "active", false, NULL);
   gtk_widget_add_css_class(self->complete_btn, "selection-mode");
   adw_action_row_add_prefix(ADW_ACTION_ROW(self->title_row), self->complete_btn);
 
@@ -207,43 +204,38 @@ static void errands_task_init(ErrandsTask *self) {
 }
 
 ErrandsTask *errands_task_new(TaskData *data) {
-  LOG("Creating task '%s'", task_data_get(data, TASK_PROP_UID).s);
+  LOG("Creating task '%s'", task_data_get_uid(data));
 
   ErrandsTask *task = g_object_new(ERRANDS_TYPE_TASK, NULL);
   task->data = data;
 
   // Setup
   gtk_revealer_set_reveal_child(GTK_REVEALER(task->revealer),
-                                !task_data_get(data, TASK_PROP_DELETED).b &&
-                                    !task_data_get(data, TASK_PROP_TRASH).b &&
-                                    (!task_data_get(data, TASK_PROP_COMPLETED).b ||
+                                !task_data_get_deleted(data) && !task_data_get_trash(data) &&
+                                    (!task_data_get_completed(data) ||
                                      errands_settings_get("show_completed", SETTING_TYPE_BOOL).b));
-  adw_preferences_row_set_title(ADW_PREFERENCES_ROW(task->title_row),
-                                task_data_get(data, TASK_PROP_TEXT).s);
-  gtk_check_button_set_active(GTK_CHECK_BUTTON(task->complete_btn),
-                              task_data_get(data, TASK_PROP_COMPLETED).b);
+  adw_preferences_row_set_title(ADW_PREFERENCES_ROW(task->title_row), task_data_get_text(data));
+  gtk_check_button_set_active(GTK_CHECK_BUTTON(task->complete_btn), task_data_get_completed(data));
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(task->toolbar_btn),
-                               task_data_get(data, TASK_PROP_TOOLBAR_SHOWN).b);
+                               task_data_get_toolbar_shown(data));
 
   // Lazy load toolbar
-  if (task_data_get(data, TASK_PROP_TOOLBAR_SHOWN).b) {
+  if (task_data_get_toolbar_shown(data)) {
     // task->toolbar = errands_task_toolbar_new(task);
     // gtk_revealer_set_child(GTK_REVEALER(task->toolbar_revealer), GTK_WIDGET(task->toolbar));
   }
   gtk_revealer_set_reveal_child(GTK_REVEALER(task->sub_tasks_revealer),
-                                task_data_get(data, TASK_PROP_EXPANDED).b);
+                                task_data_get_expanded(data));
 
   // Load sub-tasks
-  const char *task_uid = task_data_get(data, TASK_PROP_UID).s;
+  const char *task_uid = task_data_get_uid(data);
   g_autoptr(GPtrArray) tasks = list_data_get_tasks(task_data_get_list(data));
   for (size_t i = 0; i < tasks->len; i++) {
     TaskData *td = tasks->pdata[i];
-    const char *parent = task_data_get(td, TASK_PROP_PARENT).s;
-    const char *uid = task_data_get(data, TASK_PROP_UID).s;
-    bool deleted = task_data_get(td, TASK_PROP_DELETED).b;
-    if (!strcmp(parent, uid) && !deleted) {
-      const char *sub_uid = task_data_get(td, TASK_PROP_UID).s;
-      LOG("Task '%s': Add sub task '%s'", task_uid, sub_uid);
+    const char *parent = task_data_get_parent(td);
+    bool deleted = task_data_get_deleted(td);
+    if (!strcmp(parent, task_uid) && !deleted) {
+      LOG("Task '%s': Add sub task '%s'", task_uid, task_data_get_uid(td));
       gtk_box_append(GTK_BOX(task->sub_tasks), GTK_WIDGET(errands_task_new(td)));
     }
   }
@@ -251,8 +243,8 @@ ErrandsTask *errands_task_new(TaskData *data) {
   // errands_task_list_sort_by_completion(task->sub_tasks);
 
   // errands_task_update_tags(task);
-  // errands_task_update_accent_color(task);
-  // errands_task_update_progress(task);
+  errands_task_update_accent_color(task);
+  errands_task_update_progress(task);
 
   // Connect signals
   // g_signal_connect(task->click_ctrl, "released", G_CALLBACK(on_errands_task_expand_click), task);
@@ -268,9 +260,11 @@ ErrandsTask *errands_task_new(TaskData *data) {
 }
 
 void errands_task_update_accent_color(ErrandsTask *task) {
-  if (strcmp(task_data_get(task->data, TASK_PROP_COLOR).s, "")) {
+  const char *color = task_data_get_color(task->data);
+  LOG("%s", color);
+  if (strcmp(color, "none")) {
     g_autoptr(GString) accent_style = g_string_new("task-");
-    g_string_append(accent_style, task_data_get(task->data, TASK_PROP_COLOR).s);
+    g_string_append(accent_style, color);
     const char *classes[4] = {"vertical", "card", accent_style->str, NULL};
     gtk_widget_set_css_classes(GTK_WIDGET(task->card), classes);
   } else {
@@ -286,9 +280,9 @@ void errands_task_update_progress(ErrandsTask *task) {
   for (size_t i = 0; i < sub_tasks->len; i++) {
     ErrandsTask *sub_task = sub_tasks->pdata[i];
     TaskData *td = sub_task->data;
-    if (!task_data_get(td, TASK_PROP_DELETED).b && !task_data_get(td, TASK_PROP_TRASH).b) {
+    if (!task_data_get_deleted(td) && !task_data_get_trash(td)) {
       total++;
-      if (task_data_get(td, TASK_PROP_COMPLETED).b)
+      if (task_data_get_completed(td))
         completed++;
     }
   }
@@ -379,7 +373,7 @@ static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x, gdoub
 
 static void on_action_rename(GSimpleAction *action, GVariant *param, ErrandsTask *task) {
   gtk_widget_set_visible(task->title_row, false);
-  gtk_editable_set_text(GTK_EDITABLE(task->edit_row), task_data_get(task->data, TASK_PROP_TEXT).s);
+  gtk_editable_set_text(GTK_EDITABLE(task->edit_row), task_data_get_text(task->data));
   gtk_widget_grab_focus(task->edit_row);
 }
 

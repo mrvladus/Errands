@@ -45,4 +45,4 @@ errands_bin = executable(
 )
 
 # Run target for building and running errands: 'meson compile run'
-run_target('run', command: [errands_bin])
+run_target('run', command: errands_bin)

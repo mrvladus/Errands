@@ -3,7 +3,6 @@
 #include "resources.h"
 #include "settings.h"
 #include "state.h"
-// #include "sync.h"
 #include "utils.h"
 #include "window.h"
 

@@ -163,12 +163,10 @@ static inline void g_ptr_array_move_after(GPtrArray *array, gpointer element, gp
   g_ptr_array_insert(array, target_index + 1, temp);
 }
 
-static inline void get_date_time(char *date_time) {
-  GDateTime *dt = g_date_time_new_now_local();
-  char *tmp = g_date_time_format(dt, "%Y%m%dT%H%M%SZ");
+static inline void get_date_time(char date_time[17]) {
+  g_autoptr(GDateTime) dt = g_date_time_new_now_local();
+  g_autofree gchar *tmp = g_date_time_format(dt, "%Y%m%dT%H%M%SZ");
   strcpy(date_time, tmp);
-  g_free(tmp);
-  g_date_time_unref(dt);
 }
 
 static inline char *get_today_date() {

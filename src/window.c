@@ -77,10 +77,11 @@ void errands_window_build(ErrandsWindow *win) {
 }
 
 void errands_window_update(ErrandsWindow *win) {
+  LOG("Main Window: Update");
   int count = 0;
   for (int i = 0; i < state.tl_data->len; i++) {
     ListData *ld = state.tl_data->pdata[i];
-    if (!list_data_get(ld, LIST_PROP_DELETED).b)
+    if (!list_data_get_deleted(ld))
       count++;
   }
   g_object_set(state.main_window->no_lists_page, "visible", count == 0, NULL);

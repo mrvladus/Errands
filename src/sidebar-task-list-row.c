@@ -15,9 +15,9 @@
 #include <glib/gi18n.h>
 #include <time.h>
 
-// static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x, gdouble y,
-//                            GtkPopover *popover);
-// static void on_color_changed(GtkColorDialogButton *btn, GParamSpec *pspec, ListData *data);
+static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x, gdouble y,
+                           GtkPopover *popover);
+static void on_color_changed(GtkColorDialogButton *btn, GParamSpec *pspec, ListData *data);
 static void on_action_rename(GSimpleAction *action, GVariant *param,
                              ErrandsSidebarTaskListRow *row);
 static void on_action_export(GSimpleAction *action, GVariant *param,
@@ -72,7 +72,7 @@ static void errands_sidebar_task_list_row_init(ErrandsSidebarTaskListRow *self) 
   gtk_box_append(GTK_BOX(box), menu_popover);
   GtkGesture *ctrl = gtk_gesture_click_new();
   gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(ctrl), 3);
-  // g_signal_connect(ctrl, "released", G_CALLBACK(on_right_click), menu_popover);
+  g_signal_connect(ctrl, "released", G_CALLBACK(on_right_click), menu_popover);
   gtk_widget_add_controller(box, GTK_EVENT_CONTROLLER(ctrl));
 
   // Actions
@@ -105,24 +105,24 @@ ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_new(ListData *data) {
   row->data = data;
   // Set color
   GdkRGBA color;
-  gdk_rgba_parse(&color, list_data_get(data, LIST_PROP_COLOR).s);
+  gdk_rgba_parse(&color, list_data_get_color(data));
   gtk_color_dialog_button_set_rgba(GTK_COLOR_DIALOG_BUTTON(row->color_btn), &color);
-  // g_signal_connect(row->color_btn, "notify::rgba", G_CALLBACK(on_color_changed), data);
+  g_signal_connect(row->color_btn, "notify::rgba", G_CALLBACK(on_color_changed), data);
   // Update
   errands_sidebar_task_list_row_update_title(row);
   errands_sidebar_task_list_row_update_counter(row);
   return row;
 }
 
-// ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_get(const char *uid) {
-//   g_autoptr(GPtrArray) children = get_children(state.sidebar->task_lists_box);
-//   for (int i = 0; i < children->len; i++) {
-//     ListData *l_data = ((ErrandsSidebarTaskListRow *)children->pdata[i])->data;
-//     if (!strcmp(l_data->uid, uid))
-//       return children->pdata[i];
-//   }
-//   return NULL;
-// }
+ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_get(const char *uid) {
+  g_autoptr(GPtrArray) children = get_children(state.sidebar->task_lists_box);
+  for (int i = 0; i < children->len; i++) {
+    ListData *data = ((ErrandsSidebarTaskListRow *)children->pdata[i])->data;
+    if (!strcmp(list_data_get_uid(data), uid))
+      return children->pdata[i];
+  }
+  return NULL;
+}
 
 void errands_sidebar_task_list_row_update_counter(ErrandsSidebarTaskListRow *row) {
   // int c = 0;
@@ -137,7 +137,7 @@ void errands_sidebar_task_list_row_update_counter(ErrandsSidebarTaskListRow *row
 }
 
 void errands_sidebar_task_list_row_update_title(ErrandsSidebarTaskListRow *row) {
-  gtk_label_set_label(GTK_LABEL(row->label), list_data_get(row->data, LIST_PROP_NAME).s);
+  gtk_label_set_label(GTK_LABEL(row->label), list_data_get_name(row->data));
 }
 
 // --- SIGNAL HANDLERS --- //
@@ -150,7 +150,7 @@ void on_errands_sidebar_task_list_row_activate(GtkListBox *box, ErrandsSidebarTa
   adw_view_stack_set_visible_child_name(ADW_VIEW_STACK(state.main_window->stack),
                                         "errands_task_list_page");
   // Set setting
-  const char *list_uid = list_data_get(row->data, LIST_PROP_UID).s;
+  const char *list_uid = list_data_get_uid(row->data);
   errands_settings_set("last_list_uid", SETTING_TYPE_STRING, (void *)list_uid);
   // Filter by uid
   errands_task_list_filter_by_uid(list_uid);
@@ -163,24 +163,26 @@ void on_errands_sidebar_task_list_row_activate(GtkListBox *box, ErrandsSidebarTa
   LOG("Switch to list '%s'", list_uid);
 }
 
-// static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x, gdouble y,
-//                            GtkPopover *popover) {
-//   gtk_popover_set_pointing_to(popover, &(GdkRectangle){.x = x, .y = y});
-//   gtk_popover_popup(popover);
-// }
+static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x, gdouble y,
+                           GtkPopover *popover) {
+  gtk_popover_set_pointing_to(popover, &(GdkRectangle){.x = x, .y = y});
+  gtk_popover_popup(popover);
+}
 
-// static void on_color_changed(GtkColorDialogButton *btn, GParamSpec *pspec, TaskListData *data) {
-//   const GdkRGBA *color_rgba = gtk_color_dialog_button_get_rgba(btn);
-//   gdk_rgba_to_hex_string(color_rgba, data->color);
-//   errands_data_write();
-// }
+static void on_color_changed(GtkColorDialogButton *btn, GParamSpec *pspec, ListData *data) {
+  const GdkRGBA *color_rgba = gtk_color_dialog_button_get_rgba(btn);
+  char new_color[8];
+  gdk_rgba_to_hex_string(color_rgba, new_color);
+  list_data_set_color(data, new_color);
+  errands_data_write_list(data);
+}
 
-// static void on_action_rename(GSimpleAction *action, GVariant *param,
-//                              ErrandsSidebarTaskListRow *row) {
-//   errands_rename_list_dialog_show(row);
-// }
+static void on_action_rename(GSimpleAction *action, GVariant *param,
+                             ErrandsSidebarTaskListRow *row) {
+  // errands_rename_list_dialog_show(row);
+}
 
-// // - EXPORT - //
+// - EXPORT - //
 
 // static void __on_export_finish(GObject *obj, GAsyncResult *res, gpointer data) {
 //   g_autoptr(GFile) f = gtk_file_dialog_save_finish(GTK_FILE_DIALOG(obj), res, NULL);
