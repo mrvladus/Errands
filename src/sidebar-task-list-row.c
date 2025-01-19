@@ -1,6 +1,7 @@
 #include "sidebar-task-list-row.h"
 #include "components.h"
 #include "data.h"
+#include "glibconfig.h"
 #include "settings.h"
 #include "state.h"
 #include "utils.h"
@@ -13,6 +14,7 @@
 // #include "utils.h"
 
 #include <glib/gi18n.h>
+#include <stddef.h>
 #include <time.h>
 
 static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x, gdouble y,
@@ -125,15 +127,15 @@ ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_get(const char *uid) {
 }
 
 void errands_sidebar_task_list_row_update_counter(ErrandsSidebarTaskListRow *row) {
-  // int c = 0;
-  // for (int i = 0; i < state.t_data->len; i++) {
-  //   TaskData *td = state.t_data->pdata[i];
-  //   if (!strcmp(list_data_get(row->data, LIST_PROP_UID).s, td->list_uid) && !td->trash &&
-  //       !td->deleted && !td->completed)
-  //     c++;
-  // }
-  // g_autofree char *num = g_strdup_printf("%d", c);
-  // gtk_label_set_label(GTK_LABEL(row->counter), c > 0 ? num : "");
+  size_t c = 0;
+  g_autoptr(GPtrArray) tasks = list_data_get_tasks(row->data);
+  for (size_t i = 0; i < tasks->len; i++) {
+    TaskData *td = tasks->pdata[i];
+    if (!task_data_get_trash(td) && !task_data_get_deleted(td) && !task_data_get_completed(td))
+      c++;
+  }
+  g_autofree char *num = g_strdup_printf("%zu", c);
+  gtk_label_set_label(GTK_LABEL(row->counter), c > 0 ? num : "");
 }
 
 void errands_sidebar_task_list_row_update_title(ErrandsSidebarTaskListRow *row) {

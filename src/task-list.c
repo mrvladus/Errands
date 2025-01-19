@@ -244,8 +244,6 @@ void errands_task_list_filter_by_uid(const char *uid) {
 }
 
 bool errands_task_list_filter_by_text(GtkWidget *task_list, const char *text) {
-  LOG("Task List: Filter by text '%s'", text);
-
   bool search_all_tasks =
       !state.task_list->data || !strcmp(list_data_get_uid(state.task_list->data), "");
 
