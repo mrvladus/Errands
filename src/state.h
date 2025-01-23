@@ -1,7 +1,7 @@
 #pragma once
 
 // #include "delete-list-dialog.h"
-// #include "new-list-dialog.h"
+#include "new-list-dialog.h"
 // #include "no-lists-page.h"
 // #include "rename-list-dialog.h"
 #include "sidebar.h"
@@ -25,7 +25,7 @@ typedef struct {
   ErrandsTaskList *task_list;
 
   // Dialog windows
-  // ErrandsNewListDialog *new_list_dialog;
+  ErrandsNewListDialog *new_list_dialog;
   // ErrandsRenameListDialog *rename_list_dialog;
   // ErrandsDeleteListDialog *delete_list_dialog;
 

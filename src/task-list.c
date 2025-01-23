@@ -1,6 +1,7 @@
 #include "task-list.h"
 #include "components.h"
 #include "data.h"
+#include "glib.h"
 #include "glibconfig.h"
 #include "gtk/gtk.h"
 #include "settings.h"
@@ -447,6 +448,8 @@ static void on_task_added(AdwEntryRow *entry, gpointer data) {
     return;
 
   TaskData *td = list_data_create_task(state.task_list->data, (char *)text, list_uid, "");
+  g_ptr_array_add(state.t_data, td);
+  errands_data_write_list(state.task_list->data);
   ErrandsTask *t = errands_task_new(td);
   gtk_box_prepend(GTK_BOX(state.task_list->task_list), GTK_WIDGET(t));
   errands_task_list_sort(state.task_list->task_list);
@@ -456,7 +459,7 @@ static void on_task_added(AdwEntryRow *entry, gpointer data) {
 
   // Update counter
   errands_sidebar_task_list_row_update_counter(errands_sidebar_task_list_row_get(list_uid));
-  // errands_sidebar_all_row_update_counter(state.sidebar->all_row);
+  errands_sidebar_all_row_update_counter(state.sidebar->all_row);
 
   errands_task_list_update_title();
 

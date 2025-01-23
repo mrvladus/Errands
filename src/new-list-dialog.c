@@ -1,5 +1,6 @@
 #include "new-list-dialog.h"
 #include "data.h"
+#include "glib.h"
 #include "sidebar-task-list-row.h"
 #include "sidebar.h"
 #include "state.h"
@@ -70,7 +71,10 @@ static void on_entry_activate_cb(AdwEntryRow *entry) {
 
 static void on_response_cb(ErrandsNewListDialog *dialog, gchar *response, gpointer data) {
   if (!strcmp(response, "create")) {
-    TaskListData *tld = errands_data_add_list(gtk_editable_get_text(GTK_EDITABLE(dialog->entry)));
+    ListData *tld = list_data_new(NULL, gtk_editable_get_text(GTK_EDITABLE(dialog->entry)), NULL,
+                                  false, false, state.tl_data->len);
+    g_ptr_array_add(state.tl_data, tld);
+    errands_data_write_list(tld);
     ErrandsSidebarTaskListRow *row = errands_sidebar_add_task_list(state.sidebar, tld);
     g_signal_emit_by_name(row, "activate", NULL);
     g_object_set(state.main_window->no_lists_page, "visible", false, NULL);

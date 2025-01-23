@@ -19,6 +19,7 @@ sources = files(
   'src' / 'lib' / 'cJSON.c',
   'src' / 'main.c',
   'src' / 'no-lists-page.c',
+  'src' / 'new-list-dialog.c',
   'src' / 'resources.c',
   'src' / 'settings.c',
   'src' / 'sidebar-all-row.c',

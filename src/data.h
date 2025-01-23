@@ -18,7 +18,8 @@
 typedef icalcomponent ListData;
 typedef icalcomponent TaskData;
 
-ListData *list_data_new(const char *uid);
+ListData *list_data_new(const char *uid, const char *name, const char *color, bool deleted,
+                        bool synced, int position);
 void list_data_free(ListData *data);
 GPtrArray *list_data_get_tasks(ListData *data);
 TaskData *list_data_create_task(ListData *list, const char *text, const char *list_uid,
@@ -29,6 +30,7 @@ DECLARE_LIST_PROPERTY(const char *, name);
 DECLARE_LIST_PROPERTY(const char *, uid);
 DECLARE_LIST_PROPERTY(bool, deleted);
 DECLARE_LIST_PROPERTY(bool, synced);
+DECLARE_LIST_PROPERTY(int, position);
 
 TaskData *task_data_new(ListData *list, const char *text, const char *parent);
 void task_data_free(TaskData *data);

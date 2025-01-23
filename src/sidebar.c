@@ -1,10 +1,11 @@
 #include "sidebar.h"
 #include "components.h"
 #include "data.h"
+#include "gtk/gtk.h"
+#include "new-list-dialog.h"
 #include "settings.h"
 #include "sidebar-task-list-row.h"
 #include "state.h"
-// #include "task-list.h"
 #include "utils.h"
 
 #include <glib/gi18n.h>
@@ -41,7 +42,7 @@ static void errands_sidebar_init(ErrandsSidebar *self) {
   GMenu *menu = errands_menu_new(1, _("Import \".ics\""), "sidebar.import");
   g_object_set(self->add_btn, "tooltip-text", _("Add Task List (Ctrl+Shift+L)"), "icon-name",
                "errands-add-symbolic", "menu-model", menu, NULL);
-  // g_signal_connect(self->add_btn, "clicked", G_CALLBACK(errands_new_list_dialog_show), NULL);
+  g_signal_connect(self->add_btn, "clicked", G_CALLBACK(errands_new_list_dialog_show), NULL);
   errands_add_shortcut(self->add_btn, "<Control><Shift>L", "activate");
   adw_header_bar_pack_start(ADW_HEADER_BAR(hb), self->add_btn);
   g_object_unref(menu);
@@ -83,10 +84,18 @@ static void errands_sidebar_init(ErrandsSidebar *self) {
 
   // Add rows
   size_t count = 0;
+  int last_pos = -1;
   for (size_t i = 0; i < state.tl_data->len; i++) {
     ListData *ld = state.tl_data->pdata[i];
     if (!list_data_get_deleted(ld)) {
-      errands_sidebar_add_task_list(self, ld);
+      ErrandsSidebarTaskListRow *row = errands_sidebar_task_list_row_new(ld);
+      int pos = list_data_get_position(ld);
+      if (pos > last_pos) {
+        gtk_list_box_append(GTK_LIST_BOX(self->task_lists_box), GTK_WIDGET(row));
+      } else {
+        gtk_list_box_prepend(GTK_LIST_BOX(self->task_lists_box), GTK_WIDGET(row));
+      }
+      last_pos = pos;
       count++;
     }
   }

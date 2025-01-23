@@ -15,6 +15,7 @@
 
 #define PATH_SEP "/"
 const char *user_dir;
+bool can_write_data = true;
 
 // --- ICAL UTILS --- //
 
@@ -66,29 +67,30 @@ const char *__get_prop_value_or(icalcomponent *ical, icalproperty_kind kind, con
   return or_prop;
 }
 
-void __set_prop_str(icalcomponent *ical, icalproperty_kind kind, const char *val) {
-  icalproperty *property = icalcomponent_get_first_property(ical, kind);
-  if (property)
-    icalproperty_set_value(property, icalvalue_new_from_string(ICAL_ANY_VALUE, val));
-  else {
-    property = icalproperty_new(kind);
-    icalproperty_set_value(property, icalvalue_new_from_string(ICAL_ANY_VALUE, val));
-    icalcomponent_add_property(ical, property);
-  }
-}
-void __set_prop_int(icalcomponent *ical, icalproperty_kind kind, int val) {
-  g_autofree gchar *str = g_strdup_printf("%d", val);
-  __set_prop_str(ical, kind, str);
-}
-void __set_prop_bool(icalcomponent *ical, icalproperty_kind kind, bool val) {
-  __set_prop_str(ical, kind, val ? "1" : "0");
-}
-
 // --- LIST DATA --- //
 
-ListData *list_data_new(const char *uid) {
+ListData *list_data_new(const char *uid, const char *name, const char *color, bool deleted,
+                        bool synced, int position) {
   icalcomponent *cal = icalcomponent_new(ICAL_VCALENDAR_COMPONENT);
-  __set_x_prop_value(cal, "X-ERRANDS-LIST-UID", uid);
+  icalcomponent_add_property(cal, icalproperty_new_version("2.0"));
+  icalcomponent_add_property(cal, icalproperty_new_prodid("~//Errands"));
+  if (!uid) {
+    g_autofree gchar *_uid = g_uuid_string_random();
+    __set_x_prop_value(cal, "X-ERRANDS-LIST-UID", _uid);
+  } else {
+    __set_x_prop_value(cal, "X-ERRANDS-LIST-UID", uid);
+  }
+  if (!color || !strcmp(color, "")) {
+    char _color[8];
+    generate_hex(_color);
+    __set_x_prop_value(cal, "X-ERRANDS-COLOR", _color);
+  } else {
+    __set_x_prop_value(cal, "X-ERRANDS-COLOR", color);
+  }
+  list_data_set_synced(cal, synced);
+  list_data_set_deleted(cal, deleted);
+  list_data_set_position(cal, position);
+  list_data_set_name(cal, name);
   return cal;
 }
 
@@ -106,6 +108,12 @@ GPtrArray *list_data_get_tasks(ListData *data) {
 TaskData *list_data_create_task(ListData *list, const char *text, const char *list_uid,
                                 const char *parent) {
   TaskData *task_data = icalcomponent_new(ICAL_VTODO_COMPONENT);
+  g_autofree gchar *uid = g_uuid_string_random();
+  task_data_set_uid(task_data, uid);
+  task_data_set_text(task_data, text);
+  if (strcmp(parent, ""))
+    task_data_set_parent(task_data, parent);
+  task_data_set_list_uid(task_data, list_uid);
   icalcomponent_add_component(list, task_data);
   return task_data;
 }
@@ -134,6 +142,13 @@ bool list_data_get_deleted(ListData *data) {
 void list_data_set_deleted(ListData *data, bool deleted) {
   __set_x_prop_value(data, "X-ERRANDS-DELETED", deleted ? "1" : "0");
 }
+int list_data_get_position(ListData *data) {
+  return atoi(__get_x_prop_value(data, "X-ERRANDS-POSITION", "0"));
+}
+void list_data_set_position(ListData *data, int position) {
+  g_autofree gchar *pos = g_strdup_printf("%d", position);
+  __set_x_prop_value(data, "X-ERRANDS-POSITION", pos);
+}
 bool list_data_get_synced(ListData *data) {
   return (bool)atoi(__get_x_prop_value(data, "X-ERRANDS-SYNCED", "0"));
 }
@@ -150,148 +165,95 @@ TaskData *task_data_new(ListData *list, const char *text, const char *list_uid) 
 void task_data_free(TaskData *data) { free(data); }
 ListData *task_data_get_list(TaskData *data) { return icalcomponent_get_parent(data); }
 
-const char *task_data_get_changed(ListData *data) {
-  return __get_prop_value_or(data, ICAL_LASTMODIFIED_PROPERTY, "");
-}
-void task_data_set_changed(ListData *data, const char *changed) {
-  __set_prop_str(data, ICAL_LASTMODIFIED_PROPERTY, changed);
-}
-const char *task_data_get_created(ListData *data) {
-  return __get_prop_value_or(data, ICAL_DTSTAMP_PROPERTY, "");
-}
-void task_data_set_created(ListData *data, const char *created) {
-  __set_prop_str(data, ICAL_DTSTAMP_PROPERTY, created);
-}
-const char *task_data_get_due(ListData *data) {
-  return __get_prop_value_or(data, ICAL_DUE_PROPERTY, "");
-}
-void task_data_set_due(ListData *data, const char *due) {
-  __set_prop_str(data, ICAL_DUE_PROPERTY, due);
-}
-const char *task_data_get_notes(ListData *data) {
-  return __get_prop_value_or(data, ICAL_DESCRIPTION_PROPERTY, "");
-}
-void task_data_set_notes(ListData *data, const char *notes) {
-  __set_prop_str(data, ICAL_DESCRIPTION_PROPERTY, notes);
-}
-const char *task_data_get_parent(ListData *data) {
-  return __get_prop_value_or(data, ICAL_RELATEDTO_PROPERTY, "");
-}
-void task_data_set_parent(ListData *data, const char *parent) {
-  __set_prop_str(data, ICAL_RELATEDTO_PROPERTY, parent);
-}
-const char *task_data_get_start(ListData *data) {
-  return __get_prop_value_or(data, ICAL_DTSTART_PROPERTY, "");
-}
-void task_data_set_start(ListData *data, const char *start) {
-  __set_prop_str(data, ICAL_DTSTART_PROPERTY, start);
-}
-const char *task_data_get_rrule(ListData *data) {
-  return __get_prop_value_or(data, ICAL_RRULE_PROPERTY, "");
-}
-void task_data_set_rrule(ListData *data, const char *rrule) {
-  __set_prop_str(data, ICAL_RRULE_PROPERTY, rrule);
-}
-const char *task_data_get_text(ListData *data) {
-  return __get_prop_value_or(data, ICAL_SUMMARY_PROPERTY, "");
-}
-void task_data_set_text(ListData *data, const char *text) {
-  __set_prop_str(data, ICAL_SUMMARY_PROPERTY, text);
-}
-const char *task_data_get_uid(ListData *data) {
-  return __get_prop_value_or(data, ICAL_UID_PROPERTY, "");
-}
-void task_data_set_uid(ListData *data, const char *uid) {
-  __set_prop_str(data, ICAL_UID_PROPERTY, uid);
-}
+#define STR_TO_STR(string) string
+#define STR_TO_INT(string) atoi(string)
+#define STR_TO_BOOL(string) !strcmp(string, "1") ? true : false
+#define STR_TO_TIME(string) icaltime_from_string(string)
+#define STR_TO_RRULE(string) icalrecurrencetype_from_string(string)
+#define BOOL_TO_STR(boolean) boolean ? "1" : "0"
+#define INT_TO_INT(integer) integer
+
+#define DEFINE_TASK_PROPERTY(return_type, property, ical_property, ical_prop_suffix, getter,       \
+                             setter, default_out)                                                  \
+  return_type task_data_get_##property(TaskData *data) {                                           \
+    icalproperty *prop = icalcomponent_get_first_property(data, ical_property);                    \
+    if (prop) {                                                                                    \
+      const char *out = icalproperty_get_value_as_string(prop);                                    \
+      if (!out)                                                                                    \
+        return getter(default_out);                                                                \
+      return getter(out);                                                                          \
+    }                                                                                              \
+    return getter(default_out);                                                                    \
+  }                                                                                                \
+                                                                                                   \
+  void task_data_set_##property(TaskData *data, return_type property) {                            \
+    icalproperty *prop = icalcomponent_get_first_property(data, ical_property);                    \
+    if (prop) {                                                                                    \
+      icalproperty_set_##ical_prop_suffix(prop, setter(property));                                 \
+    } else {                                                                                       \
+      prop = icalproperty_new_##ical_prop_suffix(setter(property));                                \
+      icalcomponent_add_property(data, prop);                                                      \
+    }                                                                                              \
+  }
+
+#define DEFINE_TASK_X_PROPERTY(return_type, property, xprop, getter, setter, default_out)          \
+  return_type task_data_get_##property(TaskData *data) {                                           \
+    return getter(__get_x_prop_value(data, xprop, default_out));                                   \
+  }                                                                                                \
+  void task_data_set_##property(TaskData *data, return_type property) {                            \
+    __set_x_prop_value(data, xprop, setter(property));                                             \
+  }
+
+DEFINE_TASK_PROPERTY(const char *, changed, ICAL_LASTMODIFIED_PROPERTY, lastmodified, STR_TO_STR,
+                     STR_TO_TIME, "");
+DEFINE_TASK_PROPERTY(const char *, created, ICAL_DTSTAMP_PROPERTY, dtstamp, STR_TO_STR, STR_TO_TIME,
+                     "");
+DEFINE_TASK_PROPERTY(const char *, due, ICAL_DUE_PROPERTY, due, STR_TO_STR, STR_TO_TIME, "");
+DEFINE_TASK_PROPERTY(const char *, start, ICAL_DTSTART_PROPERTY, dtstart, STR_TO_STR, STR_TO_TIME,
+                     "");
+DEFINE_TASK_PROPERTY(const char *, notes, ICAL_DESCRIPTION_PROPERTY, description, STR_TO_STR,
+                     STR_TO_STR, "");
+DEFINE_TASK_PROPERTY(const char *, parent, ICAL_RELATEDTO_PROPERTY, relatedto, STR_TO_STR,
+                     STR_TO_STR, "");
+DEFINE_TASK_PROPERTY(const char *, rrule, ICAL_RRULE_PROPERTY, rrule, STR_TO_STR, STR_TO_RRULE, "");
+DEFINE_TASK_PROPERTY(const char *, text, ICAL_SUMMARY_PROPERTY, summary, STR_TO_STR, STR_TO_STR,
+                     "");
+DEFINE_TASK_PROPERTY(const char *, uid, ICAL_UID_PROPERTY, uid, STR_TO_STR, STR_TO_STR, "");
+DEFINE_TASK_PROPERTY(const char *, tags, ICAL_CATEGORIES_PROPERTY, categories, STR_TO_STR,
+                     STR_TO_STR, "");
+DEFINE_TASK_PROPERTY(uint8_t, percent, ICAL_PERCENTCOMPLETE_PROPERTY, percentcomplete, STR_TO_INT,
+                     INT_TO_INT, "0");
+DEFINE_TASK_PROPERTY(uint8_t, priority, ICAL_PRIORITY_PROPERTY, priority, STR_TO_INT, INT_TO_INT,
+                     "0");
+DEFINE_TASK_X_PROPERTY(const char *, attachments, "X-ERRANDS-ATTACHMENTS", STR_TO_STR, STR_TO_STR,
+                       "");
+DEFINE_TASK_X_PROPERTY(const char *, color, "X-ERRANDS-COLOR", STR_TO_STR, STR_TO_STR, "none");
+DEFINE_TASK_X_PROPERTY(const char *, list_uid, "X-ERRANDS-LIST-UID", STR_TO_STR, STR_TO_STR, "");
+DEFINE_TASK_X_PROPERTY(bool, deleted, "X-ERRANDS-DELETED", STR_TO_BOOL, BOOL_TO_STR, "0");
+DEFINE_TASK_X_PROPERTY(bool, expanded, "X-ERRANDS-EXPANDED", STR_TO_BOOL, BOOL_TO_STR, "0");
+DEFINE_TASK_X_PROPERTY(bool, notified, "X-ERRANDS-NOTIFIED", STR_TO_BOOL, BOOL_TO_STR, "0");
+DEFINE_TASK_X_PROPERTY(bool, synced, "X-ERRANDS-SYNCED", STR_TO_BOOL, BOOL_TO_STR, "0");
+DEFINE_TASK_X_PROPERTY(bool, toolbar_shown, "X-ERRANDS-TOOLBAR-SHOWN", STR_TO_BOOL, BOOL_TO_STR,
+                       "0");
+DEFINE_TASK_X_PROPERTY(bool, trash, "X-ERRANDS-TRASH", STR_TO_BOOL, BOOL_TO_STR, "0");
 bool task_data_get_completed(ListData *data) {
   return __get_prop_value_or(data, ICAL_COMPLETED_PROPERTY, NULL) ? true : false;
 }
 void task_data_set_completed(ListData *data, bool completed) {
   icalproperty *prop = icalcomponent_get_first_property(data, ICAL_COMPLETED_PROPERTY);
-  if (completed) {
-    char dt[17];
-    get_date_time(dt);
-    if (prop)
+  char dt[17];
+  get_date_time(dt);
+  if (prop) {
+    if (completed)
       icalproperty_set_completed(prop, icaltime_from_string(dt));
     else
-      prop = icalproperty_new_completed(icaltime_from_string(dt));
-  } else {
-    if (prop)
       icalcomponent_remove_property(data, prop);
+  } else {
+    if (completed) {
+      prop = icalproperty_new_completed(icaltime_from_string(dt));
+      icalcomponent_add_property(data, prop);
+    }
   }
-}
-const char *task_data_get_tags(ListData *data) {
-  return __get_prop_value_or(data, ICAL_CATEGORIES_PROPERTY, "");
-}
-void task_data_set_tags(ListData *data, const char *tags) {
-  __set_prop_str(data, ICAL_CATEGORIES_PROPERTY, tags);
-}
-uint8_t task_data_get_percent(ListData *data) {
-  return atoi(__get_prop_value_or(data, ICAL_PERCENTCOMPLETE_PROPERTY, ""));
-}
-void task_data_set_percent(ListData *data, uint8_t percent) {
-  __set_prop_int(data, ICAL_PERCENTCOMPLETE_PROPERTY, percent);
-}
-uint8_t task_data_get_priority(ListData *data) {
-  return atoi(__get_prop_value_or(data, ICAL_PRIORITY_PROPERTY, ""));
-}
-void task_data_set_priority(ListData *data, uint8_t priority) {
-  __set_prop_int(data, ICAL_PRIORITY_PROPERTY, priority);
-}
-const char *task_data_get_attachments(ListData *data) {
-  return __get_x_prop_value(data, "X-ERRANDS-ATTACHMENTS", "");
-}
-void task_data_set_attachments(ListData *data, const char *attachments) {
-  __set_x_prop_value(data, "X-ERRANDS-ATTACHMENTS", attachments);
-}
-const char *task_data_get_color(ListData *data) {
-  return __get_x_prop_value(data, "X-ERRANDS-COLOR", "");
-}
-void task_data_set_color(ListData *data, const char *color) {
-  __set_x_prop_value(data, "X-ERRANDS-COLOR", color);
-}
-const char *task_data_get_list_uid(ListData *data) {
-  return __get_x_prop_value(data, "X-ERRANDS-LIST-UID", "");
-}
-void task_data_set_list_uid(ListData *data, const char *list_uid) {
-  __set_x_prop_value(data, "X-ERRANDS-LIST-UID", list_uid);
-}
-bool task_data_get_deleted(ListData *data) {
-  return (bool)atoi(__get_x_prop_value(data, "X-ERRANDS-DELETED", "0"));
-}
-void task_data_set_deleted(ListData *data, bool deleted) {
-  __set_x_prop_value(data, "X-ERRANDS-DELETED", deleted ? "1" : "0");
-}
-bool task_data_get_expanded(ListData *data) {
-  return (bool)atoi(__get_x_prop_value(data, "X-ERRANDS-EXPANDED", "0"));
-}
-void task_data_set_expanded(ListData *data, bool expanded) {
-  __set_x_prop_value(data, "X-ERRANDS-EXPANDED", expanded ? "1" : "0");
-}
-bool task_data_get_notified(ListData *data) {
-  return (bool)atoi(__get_x_prop_value(data, "X-ERRANDS-NOTIFIED", "0"));
-}
-void task_data_set_notified(ListData *data, bool notified) {
-  __set_x_prop_value(data, "X-ERRANDS-NOTIFIED", notified ? "1" : "0");
-}
-bool task_data_get_synced(ListData *data) {
-  return (bool)atoi(__get_x_prop_value(data, "X-ERRANDS-SYNCED", "0"));
-}
-void task_data_set_synced(ListData *data, bool synced) {
-  __set_x_prop_value(data, "X-ERRANDS-SYNCED", synced ? "1" : "0");
-}
-bool task_data_get_toolbar_shown(ListData *data) {
-  return (bool)atoi(__get_x_prop_value(data, "X-ERRANDS-TOOLBAR-SHOWN", "0"));
-}
-void task_data_set_toolbar_shown(ListData *data, bool toolbar_shown) {
-  __set_x_prop_value(data, "X-ERRANDS-TOOLBAR-SHOWN", toolbar_shown ? "1" : "0");
-}
-bool task_data_get_trash(ListData *data) {
-  return (bool)atoi(__get_x_prop_value(data, "X-ERRANDS-TRASH", "0"));
-}
-void task_data_set_trash(ListData *data, bool trash) {
-  __set_x_prop_value(data, "X-ERRANDS-TRASH", trash ? "1" : "0");
 }
 
 // --- LOADING --- //
@@ -310,20 +272,14 @@ static void errands_data_migrate() {
   cJSON *cal_item;
   for (size_t i = 0; i < cJSON_GetArraySize(cal_arr); i++) {
     cal_item = cJSON_GetArrayItem(cal_arr, i);
-    char *color = cJSON_GetObjectItem(cal_item, "color")->valuestring;
-    bool deleted = (bool)cJSON_GetObjectItem(cal_item, "deleted")->valueint;
-    bool synced = (bool)cJSON_GetObjectItem(cal_item, "synced")->valueint;
-    char *name = cJSON_GetObjectItem(cal_item, "name")->valuestring;
-    char *list_uid = cJSON_GetObjectItem(cal_item, "uid")->valuestring;
+    const char *color = cJSON_GetObjectItem(cal_item, "color")->valuestring;
+    const bool deleted = (bool)cJSON_GetObjectItem(cal_item, "deleted")->valueint;
+    const bool synced = (bool)cJSON_GetObjectItem(cal_item, "synced")->valueint;
+    const char *name = cJSON_GetObjectItem(cal_item, "name")->valuestring;
+    const char *list_uid = cJSON_GetObjectItem(cal_item, "uid")->valuestring;
+    ListData *calendar =
+        list_data_new(list_uid, name, !strcmp(color, "") ? "none" : color, deleted, synced, i);
 
-    icalcomponent *calendar = icalcomponent_new(ICAL_VCALENDAR_COMPONENT);
-    icalcomponent_add_property(calendar, icalproperty_new_version("2.0"));
-    icalcomponent_add_property(calendar, icalproperty_new_prodid("~//Errands"));
-    __set_x_prop_value(calendar, "X-WR-CALNAME", name);
-    __set_x_prop_value(calendar, "X-ERRANDS-COLOR", color);
-    __set_x_prop_value(calendar, "X-ERRANDS-DELETED", deleted ? "1" : "0");
-    __set_x_prop_value(calendar, "X-ERRANDS-SYNCED", synced ? "1" : "0");
-    __set_x_prop_value(calendar, "X-ERRANDS-LIST-UID", list_uid);
     // Add events
     cJSON *tasks_arr = cJSON_GetObjectItem(json, "tasks");
     cJSON *task_item;
