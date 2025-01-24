@@ -39,13 +39,12 @@ static void errands_sidebar_init(ErrandsSidebar *self) {
 
   // Add list button
   self->add_btn = adw_split_button_new();
-  GMenu *menu = errands_menu_new(1, _("Import \".ics\""), "sidebar.import");
+  g_autoptr(GMenu) menu = errands_menu_new(1, _("Import \".ics\""), "sidebar.import");
   g_object_set(self->add_btn, "tooltip-text", _("Add Task List (Ctrl+Shift+L)"), "icon-name",
                "errands-add-symbolic", "menu-model", menu, NULL);
   g_signal_connect(self->add_btn, "clicked", G_CALLBACK(errands_new_list_dialog_show), NULL);
   errands_add_shortcut(self->add_btn, "<Control><Shift>L", "activate");
   adw_header_bar_pack_start(ADW_HEADER_BAR(hb), self->add_btn);
-  g_object_unref(menu);
 
   // Menu button
   GtkWidget *menu_btn = gtk_menu_button_new();
@@ -128,7 +127,7 @@ ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(ErrandsSidebar *sb, Lis
 
 void errands_sidebar_select_last_opened_page() {
   g_autoptr(GPtrArray) rows = get_children(state.sidebar->task_lists_box);
-  char *last_uid = errands_settings_get("last_list_uid", SETTING_TYPE_STRING).s;
+  const char *last_uid = errands_settings_get("last_list_uid", SETTING_TYPE_STRING).s;
   for (int i = 0; i < rows->len; i++) {
     ErrandsSidebarTaskListRow *row = rows->pdata[i];
     if (!strcmp(last_uid, list_data_get_uid(row->data)))
