@@ -7,6 +7,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
+extern GPtrArray *ldata;
+extern GPtrArray *tdata;
+
 #define DECLARE_LIST_PROPERTY(type, property)                                                      \
   type list_data_get_##property(ListData *data);                                                   \
   void list_data_set_##property(ListData *data, type property);
@@ -20,6 +23,7 @@ typedef icalcomponent TaskData;
 
 ListData *list_data_new(const char *uid, const char *name, const char *color, bool deleted,
                         bool synced, int position);
+ListData *list_data_new_from_ical(const char *ical, const char *uid, size_t position);
 void list_data_free(ListData *data);
 GPtrArray *list_data_get_tasks(ListData *data);
 TaskData *list_data_create_task(ListData *list, const char *text, const char *list_uid,
@@ -60,7 +64,7 @@ DECLARE_TASK_PROPERTY(bool, synced);
 DECLARE_TASK_PROPERTY(bool, toolbar_shown);
 DECLARE_TASK_PROPERTY(bool, trash);
 
-GPtrArray *errands_data_load_lists();
-GPtrArray *errands_data_load_tasks(GPtrArray *lists);
+void errands_data_load_lists();
+void errands_data_load_tasks();
 void errands_data_write_list(ListData *data);
-void errands_data_write_lists(GPtrArray *lists);
+void errands_data_write_lists();

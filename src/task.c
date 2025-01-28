@@ -556,7 +556,7 @@ static gboolean on_drop(GtkDropTarget *target, const GValue *value, double x, do
   // gtk_box_prepend(GTK_BOX(target_task->sub_tasks), GTK_WIDGET(task));
   // // Set data
   // strcpy(task->data->parent, target_task->data->uid);
-  // g_ptr_array_move_before(state.t_data, task->data, state.t_data->pdata[0]);
+  // g_ptr_array_move_before(tdata, task->data, tdata->pdata[0]);
   // gtk_revealer_set_reveal_child(GTK_REVEALER(target_task->sub_tasks_revealer), true);
   // target_task->data->expanded = true;
   // errands_data_write();
@@ -589,7 +589,7 @@ static gboolean on_top_area_drop(GtkDropTarget *target, const GValue *value, dou
   //                          GTK_WIDGET(target_task));
   // // Set data
   // strcpy(task->data->parent, target_task->data->parent);
-  // g_ptr_array_move_before(state.t_data, task->data, target_task->data);
+  // g_ptr_array_move_before(tdata, task->data, target_task->data);
   // errands_data_write();
   // if (target_parent) {
   //   if (!task->data->completed && target_parent->data->completed)

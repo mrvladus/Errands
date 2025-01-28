@@ -341,13 +341,13 @@ static void on_action_rename(GSimpleAction *action, GVariant *param,
 //     gtk_list_box_insert(box, GTK_WIDGET(row), idx);
 //     // Move data
 //     guint idx_to_move, idx_to_move_before;
-//     g_ptr_array_find(state.tl_data, row->data, &idx_to_move);
-//     TaskListData *to_move = g_ptr_array_steal_index(state.tl_data, idx_to_move);
-//     g_ptr_array_find(state.tl_data, target_row->data, &idx_to_move_before);
+//     g_ptr_array_find(ldata, row->data, &idx_to_move);
+//     TaskListData *to_move = g_ptr_array_steal_index(ldata, idx_to_move);
+//     g_ptr_array_find(ldata, target_row->data, &idx_to_move_before);
 //     if (idx_to_move < idx_to_move_before)
-//       g_ptr_array_insert(state.tl_data, idx_to_move_before + 1, to_move);
+//       g_ptr_array_insert(ldata, idx_to_move_before + 1, to_move);
 //     else
-//       g_ptr_array_insert(state.tl_data, idx_to_move_before, to_move);
+//       g_ptr_array_insert(ldata, idx_to_move_before, to_move);
 //     errands_data_write();
 //     return true;
 //   } else if (ERRANDS_IS_TASK(object)) {

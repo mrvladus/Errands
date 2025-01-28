@@ -79,8 +79,8 @@ void errands_window_build(ErrandsWindow *win) {
 void errands_window_update(ErrandsWindow *win) {
   LOG("Main Window: Update");
   int count = 0;
-  for (int i = 0; i < state.tl_data->len; i++) {
-    ListData *ld = state.tl_data->pdata[i];
+  for (int i = 0; i < ldata->len; i++) {
+    ListData *ld = ldata->pdata[i];
     if (!list_data_get_deleted(ld))
       count++;
   }

@@ -1,14 +1,15 @@
 #include "sidebar.h"
 #include "components.h"
 #include "data.h"
-#include "gtk/gtk.h"
-#include "new-list-dialog.h"
+#include "dialogs.h"
 #include "settings.h"
-#include "sidebar-task-list-row.h"
+#include "sidebar-rows.h"
 #include "state.h"
+#include "task-list.h"
 #include "utils.h"
 
 #include <glib/gi18n.h>
+
 #include <stddef.h>
 
 // --- DECLARATIONS --- //
@@ -25,8 +26,8 @@ static void errands_sidebar_class_init(ErrandsSidebarClass *class) {}
 
 static void errands_sidebar_init(ErrandsSidebar *self) {
   LOG("Sidebar: Create");
-  // GSimpleActionGroup *ag = errands_action_group_new(1, "import", on_import_action, self);
-  // gtk_widget_insert_action_group(GTK_WIDGET(self), "sidebar", G_ACTION_GROUP(ag));
+  g_autoptr(GSimpleActionGroup) ag = errands_action_group_new(1, "import", on_import_action, self);
+  gtk_widget_insert_action_group(GTK_WIDGET(self), "sidebar", G_ACTION_GROUP(ag));
 
   // Toolbar View
   GtkWidget *tb = adw_toolbar_view_new();
@@ -66,10 +67,7 @@ static void errands_sidebar_init(ErrandsSidebar *self) {
   // GtkWidget *today_row = errands_sidebar_row_new(
   //     "errands_today_page", "errands-today-symbolic", "Today", NULL);
   // gtk_list_box_append(GTK_LIST_BOX(state.filters_list_box), today_row);
-  // // Today row
-  // GtkWidget *tags_row = errands_sidebar_row_new(
-  //     "errands_tags_page", "errands-tag-symbolic", "Tags", NULL);
-  // gtk_list_box_append(GTK_LIST_BOX(state.filters_list_box), tags_row);
+
   // // Trash row
   // GtkWidget *trash_row = errands_sidebar_row_new(
   //     "errands_trash_page", "errands-trash-symbolic", "Trash", NULL);
@@ -83,18 +81,11 @@ static void errands_sidebar_init(ErrandsSidebar *self) {
 
   // Add rows
   size_t count = 0;
-  int last_pos = -1;
-  for (size_t i = 0; i < state.tl_data->len; i++) {
-    ListData *ld = state.tl_data->pdata[i];
+  for (size_t i = 0; i < ldata->len; i++) {
+    ListData *ld = ldata->pdata[i];
     if (!list_data_get_deleted(ld)) {
       ErrandsSidebarTaskListRow *row = errands_sidebar_task_list_row_new(ld);
-      int pos = list_data_get_position(ld);
-      if (pos > last_pos) {
-        gtk_list_box_append(GTK_LIST_BOX(self->task_lists_box), GTK_WIDGET(row));
-      } else {
-        gtk_list_box_prepend(GTK_LIST_BOX(self->task_lists_box), GTK_WIDGET(row));
-      }
-      last_pos = pos;
+      gtk_list_box_append(GTK_LIST_BOX(self->task_lists_box), GTK_WIDGET(row));
       count++;
     }
   }
@@ -151,33 +142,36 @@ static void on_errands_sidebar_filter_row_activated(GtkListBox *box, GtkListBoxR
   }
 }
 
-// static void __on_open_finish(GObject *obj, GAsyncResult *res, ErrandsSidebar *sb) {
-//   g_autoptr(GFile) file = gtk_file_dialog_open_finish(GTK_FILE_DIALOG(obj), res, NULL);
-//   if (!file)
-//     return;
-//   g_autofree char *path = g_file_get_path(file);
-//   char *ical = read_file_to_string(path);
-//   if (ical) {
-//     TaskListData *tld = errands_task_list_from_ical(ical);
-//     if (tld) {
-//       g_ptr_array_add(state.tl_data, tld);
-//       errands_sidebar_add_task_list(sb, tld);
-//       // Add tasks
-//       g_autoptr(GPtrArray) tasks = errands_data_tasks_from_ical(ical, tld->uid);
-//       for_range(i, 0, tasks->len) {
-//         TaskData *td = tasks->pdata[i];
-//         g_ptr_array_add(state.t_data, td);
-//         errands_task_list_add(td);
-//       }
-//     }
-//     free(ical);
-//   }
-//   errands_data_write();
-//   // TODO: sync
-// }
+static void __on_open_finish(GObject *obj, GAsyncResult *res, ErrandsSidebar *sb) {
+  g_autoptr(GFile) file = gtk_file_dialog_open_finish(GTK_FILE_DIALOG(obj), res, NULL);
+  if (!file)
+    return;
+  g_autofree gchar *path = g_file_get_path(file);
+  char *ical = read_file_to_string(path);
+  if (ical) {
+    g_autofree gchar *basename = g_file_get_basename(file);
+    *(strrchr(basename, '.')) = '\0';
+    int pos = list_data_get_position(ldata->pdata[ldata->len - 1]);
+    ListData *data = list_data_new_from_ical(ical, basename, pos);
+    if (data) {
+      g_ptr_array_add(ldata, data);
+      errands_sidebar_add_task_list(sb, data);
+      GPtrArray *tasks = list_data_get_tasks(data);
+      for (size_t i = 0; i < tasks->len; i++) {
+        TaskData *td = tasks->pdata[i];
+        g_ptr_array_add(tdata, td);
+        errands_task_list_add(td);
+      }
+    }
+    free(ical);
+    errands_data_write_list(data);
+    errands_task_list_filter_by_uid(basename);
+  }
+  // TODO: sync
+}
 
-// static void on_import_action(GSimpleAction *action, GVariant *param, ErrandsSidebar *sb) {
-//   g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
-//   gtk_file_dialog_open(dialog, GTK_WINDOW(state.main_window), NULL,
-//                        (GAsyncReadyCallback)__on_open_finish, sb);
-// }
+static void on_import_action(GSimpleAction *action, GVariant *param, ErrandsSidebar *sb) {
+  g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
+  gtk_file_dialog_open(dialog, GTK_WINDOW(state.main_window), NULL,
+                       (GAsyncReadyCallback)__on_open_finish, sb);
+}

@@ -32,8 +32,8 @@ ErrandsSidebarAllRow *errands_sidebar_all_row_new() {
 
 void errands_sidebar_all_row_update_counter(ErrandsSidebarAllRow *row) {
   size_t len = 0;
-  for (size_t i = 0; i < state.t_data->len; i++) {
-    TaskData *td = state.t_data->pdata[i];
+  for (size_t i = 0; i < tdata->len; i++) {
+    TaskData *td = tdata->pdata[i];
     if (!task_data_get_deleted(td) && !task_data_get_trash(td) && !task_data_get_completed(td))
       len++;
   }

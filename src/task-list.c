@@ -128,8 +128,8 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   self->task_list = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   g_object_set(self->task_list, "margin-bottom", 18, NULL);
   LOG("Task List: Loading tasks");
-  for (size_t i = 0; i < state.t_data->len; i++) {
-    TaskData *data = state.t_data->pdata[i];
+  for (size_t i = 0; i < tdata->len; i++) {
+    TaskData *data = tdata->pdata[i];
     const char *parent = task_data_get_parent(data);
     bool deleted = task_data_get_deleted(data);
     const char *text = task_data_get_text(data);
@@ -177,8 +177,8 @@ void errands_task_list_update_title() {
     // Set completed stats
     size_t completed = 0;
     size_t total = 0;
-    for (size_t i = 0; i < state.t_data->len; i++) {
-      TaskData *td = state.t_data->pdata[i];
+    for (size_t i = 0; i < tdata->len; i++) {
+      TaskData *td = tdata->pdata[i];
       if (!task_data_get_deleted(td) && !task_data_get_trash(td)) {
         total++;
         if (task_data_get_completed(td))
@@ -198,8 +198,8 @@ void errands_task_list_update_title() {
   size_t completed = 0;
   size_t total = 0;
   const char *list_uid = list_data_get_uid(state.task_list->data);
-  for (size_t i = 0; i < state.t_data->len; i++) {
-    TaskData *td = state.t_data->pdata[i];
+  for (size_t i = 0; i < tdata->len; i++) {
+    TaskData *td = tdata->pdata[i];
     bool deleted = task_data_get_deleted(td);
     bool trash = task_data_get_trash(td);
     const char *task_list_uid = task_data_get_list_uid(td);
@@ -427,8 +427,8 @@ void errands_task_list_sort_recursive(GtkWidget *task_list) {
 void errands_task_list_reload() {
   LOG("Task List: Reload");
   gtk_box_remove_all(state.task_list->task_list);
-  for (size_t i = 0; i < state.t_data->len; i++) {
-    TaskData *data = state.t_data->pdata[i];
+  for (size_t i = 0; i < tdata->len; i++) {
+    TaskData *data = tdata->pdata[i];
     if (!strcmp(task_data_get_parent(data), "") && !task_data_get_deleted(data))
       gtk_box_append(GTK_BOX(state.task_list->task_list), GTK_WIDGET(errands_task_new(data)));
   }
@@ -448,7 +448,7 @@ static void on_task_added(AdwEntryRow *entry, gpointer data) {
     return;
 
   TaskData *td = list_data_create_task(state.task_list->data, (char *)text, list_uid, "");
-  g_ptr_array_add(state.t_data, td);
+  g_ptr_array_add(tdata, td);
   errands_data_write_list(state.task_list->data);
   ErrandsTask *t = errands_task_new(td);
   gtk_box_prepend(GTK_BOX(state.task_list->task_list), GTK_WIDGET(t));

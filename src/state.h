@@ -1,9 +1,7 @@
 #pragma once
 
-// #include "delete-list-dialog.h"
-#include "new-list-dialog.h"
+#include "dialogs.h"
 // #include "no-lists-page.h"
-// #include "rename-list-dialog.h"
 #include "sidebar.h"
 #include "task-list.h"
 // #include "task/attachments-window.h"
@@ -35,11 +33,6 @@ typedef struct {
   // ErrandsAttachmentsWindow *attachments_window;
   // ErrandsColorWindow *color_window;
   // ErrandsDateWindow *date_window;
-
-  // User Data
-  GPtrArray *tl_data;
-  GPtrArray *t_data;
-  GPtrArray *tags_data;
 } State;
 
 // Global state object

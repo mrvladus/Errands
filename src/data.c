@@ -1,5 +1,6 @@
 #include "data.h"
 
+#include "glibconfig.h"
 #include "lib/cJSON.h"
 #include "utils.h"
 
@@ -15,7 +16,9 @@
 
 #define PATH_SEP "/"
 const char *user_dir;
-bool can_write_data = true;
+
+GPtrArray *ldata = NULL;
+GPtrArray *tdata = NULL;
 
 // --- ICAL UTILS --- //
 
@@ -92,6 +95,27 @@ ListData *list_data_new(const char *uid, const char *name, const char *color, bo
   list_data_set_position(cal, position);
   list_data_set_name(cal, name);
   return cal;
+}
+
+ListData *list_data_new_from_ical(const char *ical, const char *uid, size_t position) {
+  ListData *data = icalcomponent_new_from_string(ical);
+  if (!data)
+    return NULL;
+
+  __get_x_prop_value(data, "X-ERRANDS-LIST-UID", uid);
+  g_autofree gchar *pos = g_strdup_printf("%zu", position);
+  __set_x_prop_value(data, "X-ERRANDS-POSITION", pos);
+  __get_x_prop_value(data, "X-ERRANDS-DELETED", "0");
+  char _color[8];
+  generate_hex(_color);
+  __get_x_prop_value(data, "X-ERRANDS-COLOR", _color);
+
+  return data;
+}
+
+void list_data_update_positions() {
+  for (size_t i = 0; i < ldata->len; i++)
+    list_data_set_position(ldata->pdata[i], i);
 }
 
 void list_data_free(ListData *data) { icalcomponent_free(data); }
@@ -258,6 +282,10 @@ void task_data_set_completed(ListData *data, bool completed) {
 
 // --- LOADING --- //
 
+static gint list_sort_by_position_func(gconstpointer a, gconstpointer b) {
+  return list_data_get_position((ListData *)a) > list_data_get_position((ListData *)b);
+}
+
 static void errands_data_migrate() {
   g_autofree gchar *old_data_file = g_build_path(PATH_SEP, user_dir, "data.json", NULL);
   if (!file_exists(old_data_file))
@@ -371,7 +399,7 @@ static void errands_data_migrate() {
   remove(old_data_file);
 }
 
-GPtrArray *errands_data_load_lists() {
+void errands_data_load_lists() {
   user_dir = g_build_path(PATH_SEP, g_get_user_data_dir(), "errands", NULL);
   if (!directory_exists(user_dir)) {
     LOG("User Data: Creating user data directory at %s", user_dir);
@@ -379,40 +407,37 @@ GPtrArray *errands_data_load_lists() {
   }
   LOG("User Data: Loading at %s", user_dir);
   errands_data_migrate();
-  GPtrArray *array = g_ptr_array_new();
+  ldata = g_ptr_array_new();
   g_autoptr(GDir) dir = g_dir_open(user_dir, 0, NULL);
   if (!dir)
-    return array;
+    return;
   const char *filename;
   while ((filename = g_dir_read_name(dir))) {
     char *is_ics = strstr(filename, ".ics");
     if (is_ics) {
       g_autofree gchar *path = g_build_path(PATH_SEP, user_dir, filename, NULL);
-      char *content = read_file_to_string(path);
+      g_autofree gchar *content = read_file_to_string(path);
       if (content) {
         LOG("User Data: Loading calendar %s", path);
         icalcomponent *calendar = icalparser_parse_string(content);
-        if (calendar) {
-          *(strstr(filename, ".")) = '\0';
-          g_ptr_array_add(array, calendar);
-        }
-        free(content);
+        if (calendar)
+          g_ptr_array_add(ldata, calendar);
       }
     }
   }
-  return array;
+  g_ptr_array_sort(ldata, list_sort_by_position_func);
+  list_data_update_positions();
 }
 
-GPtrArray *errands_data_load_tasks(GPtrArray *calendars) {
-  GPtrArray *events = g_ptr_array_new();
-  for (size_t i = 0; i < calendars->len; i++) {
-    ListData *calendar = calendars->pdata[i];
+void errands_data_load_tasks() {
+  tdata = g_ptr_array_new();
+  for (size_t i = 0; i < ldata->len; i++) {
+    ListData *calendar = ldata->pdata[i];
     icalcomponent *c;
     for (c = icalcomponent_get_first_component(calendar, ICAL_VTODO_COMPONENT); c != 0;
          c = icalcomponent_get_next_component(calendar, ICAL_VTODO_COMPONENT))
-      g_ptr_array_add(events, c);
+      g_ptr_array_add(tdata, c);
   }
-  return events;
 }
 
 void errands_data_write_list(ListData *data) {
@@ -423,9 +448,9 @@ void errands_data_write_list(ListData *data) {
   LOG("User Data: Save list %s", path);
 }
 
-void errands_data_write_lists(GPtrArray *lists) {
-  for (size_t i = 0; i < lists->len; i++)
-    errands_data_write_list(lists->pdata[i]);
+void errands_data_write_lists() {
+  for (size_t i = 0; i < ldata->len; i++)
+    errands_data_write_list(ldata->pdata[i]);
 }
 
 // --- PRINTING --- //
@@ -461,8 +486,8 @@ void errands_data_write_lists(GPtrArray *lists) {
 
 // static void errands_print_tasks(GString *out, const char *parent_uid, const char *list_uid,
 //                                 int indent) {
-//   for (int i = 0; i < state.t_data->len; i++) {
-//     TaskData *td = state.t_data->pdata[i];
+//   for (int i = 0; i < tdata->len; i++) {
+//     TaskData *td = tdata->pdata[i];
 //     if (!strcmp(td->parent, parent_uid) && !strcmp(td->list_uid, list_uid)) {
 //       errands_print_task(td, out, indent);
 //       errands_print_tasks(out, td->uid, list_uid, indent + 1);
@@ -476,8 +501,8 @@ void errands_data_write_lists(GPtrArray *lists) {
 
 //   // Print list name
 //   char *list_name;
-//   for (int i = 0; i < state.tl_data->len; i++) {
-//     TaskListData *tld = state.tl_data->pdata[i];
+//   for (int i = 0; i < ldata->len; i++) {
+//     TaskListData *tld = ldata->pdata[i];
 //     if (!strcmp(list_uid, tld->uid)) {
 //       list_name = strdup(tld->name);
 //       break;

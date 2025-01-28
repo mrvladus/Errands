@@ -5,7 +5,6 @@
 #include <adwaita.h>
 
 #define ERRANDS_TYPE_TASK_LIST (errands_task_list_get_type())
-
 G_DECLARE_FINAL_TYPE(ErrandsTaskList, errands_task_list, ERRANDS, TASK_LIST, AdwBin)
 
 struct _ErrandsTaskList {
@@ -18,16 +17,12 @@ struct _ErrandsTaskList {
 };
 
 ErrandsTaskList *errands_task_list_new();
-
-// Add new Task to Task List
 void errands_task_list_add(TaskData *td);
 void errands_task_list_update_title();
 bool errands_task_list_filter_by_text(GtkWidget *task_list, const char *text);
 void errands_task_list_filter_by_completion(GtkWidget *task_list, bool show_completed);
 void errands_task_list_filter_by_uid(const char *uid);
-// Sort tasks by completion in the given task list box
 void errands_task_list_sort_by_completion(GtkWidget *task_list);
-// General task list sort function. Depends on sort_by setting. Sorts by completion anyways.
 void errands_task_list_sort(GtkWidget *task_list);
 void errands_task_list_sort_recursive(GtkWidget *task_list);
 void errands_task_list_reload();

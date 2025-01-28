@@ -30,8 +30,8 @@ int main(int argc, char **argv) {
   bind_textdomain_codeset("errands", "UTF-8");
   textdomain("errands");
 
-  state.tl_data = errands_data_load_lists();
-  state.t_data = errands_data_load_tasks(state.tl_data);
+  errands_data_load_lists();
+  errands_data_load_tasks();
 
   errands_settings_init();
 
