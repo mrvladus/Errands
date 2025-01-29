@@ -154,6 +154,15 @@ static void __on_open_finish(GObject *obj, GAsyncResult *res, ErrandsSidebar *sb
     *(strrchr(basename, '.')) = '\0';
     int pos = list_data_get_position(ldata->pdata[ldata->len - 1]);
     ListData *data = list_data_new_from_ical(ical, basename, pos);
+    free(ical);
+    // Check if uid exists
+    for (size_t i = 0; i < ldata->len; i++) {
+      if (!strcmp(list_data_get_uid(ldata->pdata[i]), list_data_get_uid(data))) {
+        LOG("Sidebar: Import failed. List exists.");
+        list_data_free(data);
+        return;
+      }
+    }
     if (data) {
       g_ptr_array_add(ldata, data);
       errands_sidebar_add_task_list(sb, data);
@@ -164,7 +173,6 @@ static void __on_open_finish(GObject *obj, GAsyncResult *res, ErrandsSidebar *sb
         errands_task_list_add(td);
       }
     }
-    free(ical);
     errands_data_write_list(data);
     errands_task_list_filter_by_uid(basename);
   }
