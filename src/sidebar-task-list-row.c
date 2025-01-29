@@ -1,12 +1,14 @@
 #include "components.h"
 #include "data.h"
 #include "dialogs.h"
+#include "glibconfig.h"
 #include "settings.h"
 #include "sidebar-rows.h"
 #include "state.h"
 #include "utils.h"
 
 #include <glib/gi18n.h>
+#include <libical/ical.h>
 
 static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x, gdouble y,
                            GtkPopover *popover);
@@ -177,31 +179,28 @@ static void on_action_rename(GSimpleAction *action, GVariant *param,
 
 // - EXPORT - //
 
-// static void __on_export_finish(GObject *obj, GAsyncResult *res, gpointer data) {
-//   g_autoptr(GFile) f = gtk_file_dialog_save_finish(GTK_FILE_DIALOG(obj), res, NULL);
-//   if (!f)
-//     return;
-//   FILE *file = fopen(g_file_get_path(f), "w");
-//   if (!file) {
-//     fclose(file);
-//     return;
-//   }
-//   TaskListData *tld = data;
-//   char *ical = errands_data_task_list_as_ical(tld);
-//   fprintf(file, "%s", ical);
-//   fclose(file);
-//   free(ical);
-//   LOG("Export task list '%s'", tld->uid);
-// }
+static void __on_export_finish(GObject *obj, GAsyncResult *res, gpointer data) {
+  g_autoptr(GFile) f = gtk_file_dialog_save_finish(GTK_FILE_DIALOG(obj), res, NULL);
+  if (!f)
+    return;
+  FILE *file = fopen(g_file_get_path(f), "w");
+  if (!file) {
+    fclose(file);
+    return;
+  }
+  char *ical = icalcomponent_as_ical_string(data);
+  fprintf(file, "%s", ical);
+  fclose(file);
+  free(ical);
+  LOG("Export task list %s", list_data_get_uid(data));
+}
 
 static void on_action_export(GSimpleAction *action, GVariant *param,
                              ErrandsSidebarTaskListRow *row) {
-  // g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
-  // GString *name = g_string_new(row->data->name);
-  // g_string_append(name, ".ics");
-  // g_object_set(dialog, "initial-name", name->str, NULL);
-  // gtk_file_dialog_save(dialog, GTK_WINDOW(state.main_window), NULL, __on_export_finish,
-  // row->data); g_string_free(name, true);
+  g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
+  g_autofree gchar *filename = g_strdup_printf("%s.ics", list_data_get_uid(row->data));
+  g_object_set(dialog, "initial-name", filename, NULL);
+  gtk_file_dialog_save(dialog, GTK_WINDOW(state.main_window), NULL, __on_export_finish, row->data);
 }
 
 static void on_action_delete(GSimpleAction *action, GVariant *param,
