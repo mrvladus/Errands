@@ -1,7 +1,6 @@
-#include "new-list-dialog.h"
 #include "data.h"
-#include "glib.h"
-#include "sidebar-task-list-row.h"
+#include "dialogs.h"
+#include "sidebar-rows.h"
 #include "sidebar.h"
 #include "state.h"
 

@@ -1,6 +1,5 @@
-#include "rename-list-dialog.h"
-#include "data.h"
-#include "sidebar-task-list-row.h"
+#include "dialogs.h"
+#include "sidebar-rows.h"
 #include "state.h"
 
 #include <glib/gi18n.h>

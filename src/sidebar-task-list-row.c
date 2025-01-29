@@ -1,8 +1,7 @@
-#include "sidebar-task-list-row.h"
 #include "components.h"
 #include "data.h"
-#include "glibconfig.h"
 #include "settings.h"
+#include "sidebar-rows.h"
 #include "state.h"
 #include "utils.h"
 // #include "state.h"
@@ -14,8 +13,6 @@
 // #include "utils.h"
 
 #include <glib/gi18n.h>
-#include <stddef.h>
-#include <time.h>
 
 static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x, gdouble y,
                            GtkPopover *popover);

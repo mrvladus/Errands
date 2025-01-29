@@ -1,6 +1,7 @@
 #pragma once
 
 #include "data.h"
+
 #include <gtk/gtk.h>
 
 #define ERRANDS_TYPE_SIDEBAR_ALL_ROW (errands_sidebar_all_row_get_type())
@@ -26,7 +27,7 @@ struct _ErrandsSidebarTaskListRow {
   GtkWidget *color_btn;
   GtkWidget *label;
   GtkWidget *counter;
-  // GtkEventController *hover_ctrl;
+  GtkEventController *hover_ctrl;
   ListData *data;
 };
 
