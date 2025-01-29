@@ -1,7 +1,7 @@
 #include "data.h"
 
-#include "glibconfig.h"
 #include "lib/cJSON.h"
+#include "settings.h"
 #include "utils.h"
 
 #include <glib.h>
@@ -408,6 +408,7 @@ void errands_data_load_lists() {
   LOG("User Data: Loading at %s", user_dir);
   errands_data_migrate();
   ldata = g_ptr_array_new();
+  tdata = g_ptr_array_new();
   g_autoptr(GDir) dir = g_dir_open(user_dir, 0, NULL);
   if (!dir)
     return;
@@ -420,24 +421,27 @@ void errands_data_load_lists() {
       if (content) {
         LOG("User Data: Loading calendar %s", path);
         icalcomponent *calendar = icalparser_parse_string(content);
-        if (calendar)
+        if (calendar) {
+          // Delete file if calendar deleted and sync is off
+          if (!errands_settings_get("sync", SETTING_TYPE_BOOL).b &&
+              list_data_get_deleted(calendar)) {
+            LOG("User Data: Calendar was deleted. Removing %s", path);
+            icalcomponent_free(calendar);
+            remove(path);
+            continue;
+          }
           g_ptr_array_add(ldata, calendar);
+          // Load tasks
+          icalcomponent *c;
+          for (c = icalcomponent_get_first_component(calendar, ICAL_VTODO_COMPONENT); c != 0;
+               c = icalcomponent_get_next_component(calendar, ICAL_VTODO_COMPONENT))
+            g_ptr_array_add(tdata, c);
+        }
       }
     }
   }
   g_ptr_array_sort(ldata, list_sort_by_position_func);
   list_data_update_positions();
-}
-
-void errands_data_load_tasks() {
-  tdata = g_ptr_array_new();
-  for (size_t i = 0; i < ldata->len; i++) {
-    ListData *calendar = ldata->pdata[i];
-    icalcomponent *c;
-    for (c = icalcomponent_get_first_component(calendar, ICAL_VTODO_COMPONENT); c != 0;
-         c = icalcomponent_get_next_component(calendar, ICAL_VTODO_COMPONENT))
-      g_ptr_array_add(tdata, c);
-  }
 }
 
 void errands_data_write_list(ListData *data) {

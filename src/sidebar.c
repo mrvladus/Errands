@@ -94,7 +94,8 @@ static void errands_sidebar_init(ErrandsSidebar *self) {
   // Sidebar content box
   GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_append(GTK_BOX(box), self->filters_box);
-  gtk_box_append(GTK_BOX(box), errands_separator_new(_("Task Lists")));
+  gtk_box_append(GTK_BOX(box),
+                 g_object_new(GTK_TYPE_SEPARATOR, "margin-start", 8, "margin-end", 8, NULL));
   gtk_box_append(GTK_BOX(box), self->task_lists_box);
 
   // Scrolled window
@@ -119,7 +120,7 @@ ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(ErrandsSidebar *sb, Lis
 void errands_sidebar_select_last_opened_page() {
   g_autoptr(GPtrArray) rows = get_children(state.sidebar->task_lists_box);
   const char *last_uid = errands_settings_get("last_list_uid", SETTING_TYPE_STRING).s;
-  for (int i = 0; i < rows->len; i++) {
+  for (size_t i = 0; i < rows->len; i++) {
     ErrandsSidebarTaskListRow *row = rows->pdata[i];
     if (!strcmp(last_uid, list_data_get_uid(row->data)))
       g_signal_emit_by_name(row, "activate", NULL);

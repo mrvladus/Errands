@@ -71,8 +71,8 @@ void errands_window_build(ErrandsWindow *win) {
   // state.attachments_window = errands_attachments_window_new();
   // state.color_window = errands_color_window_new();
   state.new_list_dialog = errands_new_list_dialog_new();
-  // state.rename_list_dialog = errands_rename_list_dialog_new();
-  // state.delete_list_dialog = errands_delete_list_dialog_new();
+  state.rename_list_dialog = errands_rename_list_dialog_new();
+  state.delete_list_dialog = errands_delete_list_dialog_new();
   // state.no_lists_page = errands_no_lists_page_new();
 }
 

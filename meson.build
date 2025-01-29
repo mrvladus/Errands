@@ -15,25 +15,27 @@ dependencies = [
 
 # Source files
 sources = files(
-  'src' / 'data.c',
-  'src' / 'lib' / 'cJSON.c',
-  'src' / 'main.c',
-  'src' / 'no-lists-page.c',
-  'src' / 'new-list-dialog.c',
-  'src' / 'resources.c',
-  'src' / 'settings.c',
-  'src' / 'sidebar-all-row.c',
-  'src' / 'sidebar-task-list-row.c',
-  'src' / 'sidebar.c',
-  'src' / 'state.c',
-  'src' / 'task-list.c',
-  'src' / 'task.c',
-  'src' / 'window.c',
+  'src/data.c',
+  'src/delete-list-dialog.c',
+  'src/lib/cJSON.c',
+  'src/main.c',
+  'src/new-list-dialog.c',
+  'src/no-lists-page.c',
+  'src/rename-list-dialog.c',
+  'src/resources.c',
+  'src/settings.c',
+  'src/sidebar-all-row.c',
+  'src/sidebar-task-list-row.c',
+  'src/sidebar.c',
+  'src/state.c',
+  'src/task-list.c',
+  'src/task.c',
+  'src/window.c',
 )
 
 # Configuration config.h file
 configure_file(
-  input: 'src' / 'config.h.in',
+  input: 'src/config.h.in',
   output: 'config.h',
   configuration: {
     'VERSION': meson.project_version(),

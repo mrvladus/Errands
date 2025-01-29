@@ -30,10 +30,8 @@ int main(int argc, char **argv) {
   bind_textdomain_codeset("errands", "UTF-8");
   textdomain("errands");
 
-  errands_data_load_lists();
-  errands_data_load_tasks();
-
   errands_settings_init();
+  errands_data_load_lists();
 
   state.app = adw_application_new(APP_ID, G_APPLICATION_DEFAULT_FLAGS);
   g_signal_connect(state.app, "activate", G_CALLBACK(activate), NULL);

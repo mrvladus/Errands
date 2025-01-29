@@ -24,8 +24,8 @@ typedef struct {
 
   // Dialog windows
   ErrandsNewListDialog *new_list_dialog;
-  // ErrandsRenameListDialog *rename_list_dialog;
-  // ErrandsDeleteListDialog *delete_list_dialog;
+  ErrandsRenameListDialog *rename_list_dialog;
+  ErrandsDeleteListDialog *delete_list_dialog;
 
   // ErrandsNotesWindow *notes_window;
   // ErrandsPriorityWindow *priority_window;

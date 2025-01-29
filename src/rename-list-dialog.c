@@ -1,3 +1,4 @@
+#include "data.h"
 #include "dialogs.h"
 #include "sidebar-rows.h"
 #include "state.h"
@@ -45,7 +46,8 @@ ErrandsRenameListDialog *errands_rename_list_dialog_new() {
 
 void errands_rename_list_dialog_show(ErrandsSidebarTaskListRow *row) {
   state.rename_list_dialog->row = row;
-  gtk_editable_set_text(GTK_EDITABLE(state.rename_list_dialog->entry), row->data->name);
+  gtk_editable_set_text(GTK_EDITABLE(state.rename_list_dialog->entry),
+                        list_data_get_name(row->data));
   adw_dialog_present(ADW_DIALOG(state.rename_list_dialog), GTK_WIDGET(state.main_window));
   gtk_widget_grab_focus(state.rename_list_dialog->entry);
 }
@@ -54,8 +56,8 @@ void errands_rename_list_dialog_show(ErrandsSidebarTaskListRow *row) {
 
 static void on_entry_changed_cb(AdwEntryRow *entry, ErrandsRenameListDialog *dialog) {
   const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
-  const char *list_name = dialog->row->data->name;
-  bool enable = strcmp("", text) && strcmp(text, list_name);
+  const char *list_name = list_data_get_name(dialog->row->data);
+  const bool enable = strcmp("", text) && strcmp(text, list_name);
   adw_alert_dialog_set_response_enabled(ADW_ALERT_DIALOG(dialog), "confirm", enable);
 }
 
@@ -70,8 +72,8 @@ static void on_entry_activate_cb(AdwEntryRow *entry, ErrandsRenameListDialog *di
 static void on_response_cb(ErrandsRenameListDialog *dialog, gchar *response, gpointer data) {
   if (!strcmp(response, "confirm")) {
     const char *text = gtk_editable_get_text(GTK_EDITABLE(dialog->entry));
-    strcpy(dialog->row->data->name, text);
-    errands_data_write();
+    list_data_set_name(dialog->row->data, text);
+    errands_data_write_list(dialog->row->data);
     errands_sidebar_task_list_row_update_title(dialog->row);
     // TODO: update task list title if current uid is the same as this
     // TODO: sync

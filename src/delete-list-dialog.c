@@ -1,11 +1,13 @@
-#include "delete-list-dialog.h"
 #include "data.h"
-#include "sidebar-task-list-row.h"
+#include "dialogs.h"
+#include "glib.h"
+#include "sidebar-rows.h"
 #include "state.h"
-#include "task/task.h"
+#include "task.h"
 #include "utils.h"
 
 #include <glib/gi18n.h>
+#include <stddef.h>
 
 static void on_response_cb(ErrandsDeleteListDialog *dialog, gchar *response, gpointer data);
 
@@ -32,8 +34,9 @@ ErrandsDeleteListDialog *errands_delete_list_dialog_new() {
 
 void errands_delete_list_dialog_show(ErrandsSidebarTaskListRow *row) {
   state.delete_list_dialog->row = row;
-  LOG("Show delete dialog for '%s'", row->data->uid);
-  char *msg = g_strdup_printf(_("This will completely delete \"%s\" task list"), row->data->name);
+  LOG("Show delete dialog for '%s'", list_data_get_uid(row->data));
+  char *msg = g_strdup_printf(_("This will completely delete \"%s\" task list"),
+                              list_data_get_name(row->data));
   adw_alert_dialog_set_body(ADW_ALERT_DIALOG(state.delete_list_dialog), msg);
   adw_dialog_present(ADW_DIALOG(state.delete_list_dialog), GTK_WIDGET(state.main_window));
   g_free(msg);
@@ -43,17 +46,19 @@ void errands_delete_list_dialog_show(ErrandsSidebarTaskListRow *row) {
 
 static void on_response_cb(ErrandsDeleteListDialog *dialog, gchar *response, gpointer data) {
   if (!strcmp(response, "confirm")) {
-    LOG("Delete list dialog: Deleting task list '%s'", dialog->row->data->uid);
+    LOG("Delete List Dialog: Deleting task list %s", list_data_get_uid(dialog->row->data));
     // Delete tasks widgets
     GPtrArray *tasks = get_children(state.task_list->task_list);
-    for (int i = 0; i < tasks->len; i++) {
+    for (size_t i = 0; i < tasks->len; i++) {
       ErrandsTask *task = tasks->pdata[i];
-      if (!strcmp(dialog->row->data->uid, task->data->list_uid))
+      if (!strcmp(list_data_get_uid(dialog->row->data), task_data_get_list_uid(task->data)))
         gtk_box_remove(GTK_BOX(state.task_list->task_list), GTK_WIDGET(task));
     }
     // Delete data
-    errands_data_delete_list(dialog->row->data);
-    errands_data_write();
+    list_data_set_deleted(dialog->row->data, true);
+    list_data_set_synced(dialog->row->data, false);
+    // g_ptr_array_remove(ldata, dialog->row->data);
+    errands_data_write_list(dialog->row->data);
 
     // Show placeholder
     errands_window_update(state.main_window);
@@ -71,8 +76,6 @@ static void on_response_cb(ErrandsDeleteListDialog *dialog, gchar *response, gpo
       g_signal_emit_by_name(next, "activate", NULL);
       return;
     }
-    // TODO: show no lists page
-
     // TODO: sync
   }
 }

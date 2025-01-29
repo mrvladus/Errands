@@ -1,16 +1,10 @@
 #include "components.h"
 #include "data.h"
+#include "dialogs.h"
 #include "settings.h"
 #include "sidebar-rows.h"
 #include "state.h"
 #include "utils.h"
-// #include "state.h"
-// #include "delete-list-dialog.h"
-// #include "rename-list-dialog.h"
-// #include "settings.h"
-// #include "state.h"
-// #include "task-list.h"
-// #include "utils.h"
 
 #include <glib/gi18n.h>
 
@@ -75,10 +69,10 @@ static void errands_sidebar_task_list_row_init(ErrandsSidebarTaskListRow *self) 
   gtk_widget_add_controller(box, GTK_EVENT_CONTROLLER(ctrl));
 
   // Actions
-  // GSimpleActionGroup *ag = errands_action_group_new(
-  //     4, "rename", on_action_rename, self, "delete", on_action_delete, self, "print",
-  //     on_action_print, self, "export", on_action_export, self);
-  // gtk_widget_insert_action_group(GTK_WIDGET(self), "task-list-row", G_ACTION_GROUP(ag));
+  GSimpleActionGroup *ag = errands_action_group_new(
+      4, "rename", on_action_rename, self, "delete", on_action_delete, self, "print",
+      on_action_print, self, "export", on_action_export, self);
+  gtk_widget_insert_action_group(GTK_WIDGET(self), "task-list-row", G_ACTION_GROUP(ag));
 
   // DND
   GtkDragSource *drag_source = gtk_drag_source_new();
@@ -178,7 +172,7 @@ static void on_color_changed(GtkColorDialogButton *btn, GParamSpec *pspec, ListD
 
 static void on_action_rename(GSimpleAction *action, GVariant *param,
                              ErrandsSidebarTaskListRow *row) {
-  // errands_rename_list_dialog_show(row);
+  errands_rename_list_dialog_show(row);
 }
 
 // - EXPORT - //
@@ -200,20 +194,20 @@ static void on_action_rename(GSimpleAction *action, GVariant *param,
 //   LOG("Export task list '%s'", tld->uid);
 // }
 
-// static void on_action_export(GSimpleAction *action, GVariant *param,
-//                              ErrandsSidebarTaskListRow *row) {
-//   g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
-//   GString *name = g_string_new(row->data->name);
-//   g_string_append(name, ".ics");
-//   g_object_set(dialog, "initial-name", name->str, NULL);
-//   gtk_file_dialog_save(dialog, GTK_WINDOW(state.main_window), NULL, __on_export_finish,
-//   row->data); g_string_free(name, true);
-// }
+static void on_action_export(GSimpleAction *action, GVariant *param,
+                             ErrandsSidebarTaskListRow *row) {
+  // g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
+  // GString *name = g_string_new(row->data->name);
+  // g_string_append(name, ".ics");
+  // g_object_set(dialog, "initial-name", name->str, NULL);
+  // gtk_file_dialog_save(dialog, GTK_WINDOW(state.main_window), NULL, __on_export_finish,
+  // row->data); g_string_free(name, true);
+}
 
-// static void on_action_delete(GSimpleAction *action, GVariant *param,
-//                              ErrandsSidebarTaskListRow *row) {
-//   errands_delete_list_dialog_show(row);
-// }
+static void on_action_delete(GSimpleAction *action, GVariant *param,
+                             ErrandsSidebarTaskListRow *row) {
+  errands_delete_list_dialog_show(row);
+}
 
 // // - PRINTING - //
 
@@ -299,14 +293,14 @@ static void on_action_rename(GSimpleAction *action, GVariant *param,
 //   g_object_unref(print);
 // }
 
-// static void on_action_print(GSimpleAction *action, GVariant *param,
-//                             ErrandsSidebarTaskListRow *row) {
-//   LOG("Start printing of the list '%s'", row->data->uid);
+static void on_action_print(GSimpleAction *action, GVariant *param,
+                            ErrandsSidebarTaskListRow *row) {
+  // LOG("Start printing of the list '%s'", row->data->uid);
 
-//   GString *str = errands_data_print_list(row->data->uid);
-//   start_print(str->str);
-//   g_string_free(str, true);
-// }
+  // GString *str = errands_data_print_list(row->data->uid);
+  // start_print(str->str);
+  // g_string_free(str, true);
+}
 
 // // --- DND --- //
 

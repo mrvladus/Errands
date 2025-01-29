@@ -28,6 +28,7 @@ void errands_settings_load_default() {
   cJSON_AddBoolToObject(settings, "maximized", false);
   cJSON_AddStringToObject(settings, "last_list_uid", "");
   cJSON_AddStringToObject(settings, "sort_by", "default");
+  cJSON_AddBoolToObject(settings, "sync", false);
 }
 
 void errands_settings_load_user() {
@@ -43,8 +44,9 @@ void errands_settings_load_user() {
   if (!json)
     return;
 
-  const char *const settings_keys[] = {"show_completed", "window_width",  "window_height",
-                                       "maximized",      "last_list_uid", "sort_by"};
+  const char *const settings_keys[] = {
+      "show_completed", "window_width", "window_height", "maximized",
+      "last_list_uid",  "sort_by",      "sync"};
 
   const int len = sizeof(settings_keys) / sizeof(settings_keys[0]);
   for (int i = 0; i < len; i++) {
