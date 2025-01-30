@@ -28,6 +28,7 @@ void list_data_free(ListData *data);
 GPtrArray *list_data_get_tasks(ListData *data);
 TaskData *list_data_create_task(ListData *list, const char *text, const char *list_uid,
                                 const char *parent);
+gchar *list_data_print(ListData *data);
 
 DECLARE_LIST_PROPERTY(const char *, color);
 DECLARE_LIST_PROPERTY(const char *, name);
@@ -39,6 +40,8 @@ DECLARE_LIST_PROPERTY(int, position);
 TaskData *task_data_new(ListData *list, const char *text, const char *parent);
 void task_data_free(TaskData *data);
 ListData *task_data_get_list(TaskData *data);
+GPtrArray *task_data_get_children(TaskData *data);
+void task_data_print(TaskData *data, GString *out, size_t indent);
 
 DECLARE_TASK_PROPERTY(const char *, changed);
 DECLARE_TASK_PROPERTY(const char *, created);

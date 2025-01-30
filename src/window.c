@@ -1,9 +1,7 @@
 #include "window.h"
 #include "adwaita.h"
 #include "data.h"
-// #include "delete-list-dialog.h"
 #include "no-lists-page.h"
-// #include "rename-list-dialog.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "state.h"
@@ -76,7 +74,6 @@ void errands_window_build(ErrandsWindow *win) {
   state.new_list_dialog = errands_new_list_dialog_new();
   state.rename_list_dialog = errands_rename_list_dialog_new();
   state.delete_list_dialog = errands_delete_list_dialog_new();
-  // state.no_lists_page = errands_no_lists_page_new();
 }
 
 void errands_window_update(ErrandsWindow *win) {

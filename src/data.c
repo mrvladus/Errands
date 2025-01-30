@@ -142,6 +142,23 @@ TaskData *list_data_create_task(ListData *list, const char *text, const char *li
   return task_data;
 }
 
+gchar *list_data_print(ListData *data) {
+  const char *list_uid = list_data_get_uid(data);
+  const char *name = list_data_get_name(data);
+  size_t len = strlen(name);
+  char *list_name = strndup(name, len > 72 ? 72 : len);
+  // Print list name
+  GString *out = g_string_new(list_name);
+  g_string_append(out, "\n\n");
+  // Print tasks
+  GPtrArray *tasks = list_data_get_tasks(data);
+  for (size_t i = 0; i < tasks->len; i++)
+    task_data_print(tasks->pdata[i], out, 0);
+  free(list_name);
+  g_ptr_array_free(tasks, false);
+  return g_string_free(out, false);
+}
+
 const char *list_data_get_color(ListData *data) {
   return __get_x_prop_value(data, "X-ERRANDS-COLOR", "");
 }
@@ -186,8 +203,47 @@ TaskData *task_data_new(ListData *list, const char *text, const char *list_uid) 
   icalcomponent *task = icalcomponent_new(ICAL_VTODO_COMPONENT);
   return task;
 }
+
 void task_data_free(TaskData *data) { free(data); }
+
 ListData *task_data_get_list(TaskData *data) { return icalcomponent_get_parent(data); }
+
+GPtrArray *task_data_get_children(TaskData *data) {
+  const char *uid = task_data_get_uid(data);
+  ListData *list = task_data_get_list(data);
+  GPtrArray *tasks = list_data_get_tasks(list);
+  GPtrArray *children = g_ptr_array_new();
+  for (size_t i = 0; i < tasks->len; i++)
+    if (!strcmp(uid, task_data_get_parent(tasks->pdata[i])))
+      g_ptr_array_add(children, tasks->pdata[i]);
+  g_ptr_array_free(tasks, false);
+  return children;
+}
+
+void task_data_print(TaskData *data, GString *out, size_t indent) {
+  for (size_t i = 0; i < indent; i++)
+    g_string_append(out, "  ");
+  g_string_append_printf(out, "[%s] ", task_data_get_completed(data) ? "x" : " ");
+  const char *text = task_data_get_text(data);
+  size_t count = 0;
+  char c = text[0];
+  while (c != '\0') {
+    g_string_append_c(out, c);
+    count++;
+    c = text[count];
+    if (count % 72 == 0) {
+      g_string_append_c(out, '\n');
+      for (size_t i = 0; i < indent; i++)
+        g_string_append(out, "  ");
+      g_string_append(out, "    ");
+    }
+  }
+  g_string_append_c(out, '\n');
+  GPtrArray *children = task_data_get_children(data);
+  indent++;
+  for (size_t i = 0; i < children->len; i++)
+    task_data_print(children->pdata[i], out, indent);
+}
 
 #define STR_TO_STR(string) string
 #define STR_TO_INT(string) atoi(string)
@@ -453,94 +509,3 @@ void errands_data_write_list(ListData *data) {
   write_string_to_file(path, ical_string);
   LOG("User Data: Save list %s", path);
 }
-
-// --- PRINTING --- //
-
-// #define MAX_LINE_LENGTH 73
-
-// static void __print_indent(GString *out, int indent) {
-//   for (int i = 0; i < indent; i++)
-//     g_string_append(out, "    ");
-// }
-
-// static void errands_print_task(TaskData *task, GString *out, int indent) {
-//   __print_indent(out, indent);
-//   // Add checkbox
-//   g_string_append_printf(out, "[%s] ", task->completed ? "x" : " ");
-//   // Set idx to account for indentation and checkbox
-//   int idx = indent * 4; // The checkbox takes 4 characters
-//   for (int i = 0; i < strlen(task->text); i++) {
-//     // If idx exceeds MAX_LINE_LENGTH, start a new line with indentation
-//     if (idx >= MAX_LINE_LENGTH) {
-//       g_string_append(out, "\n");
-//       if (indent == 0)
-//         __print_indent(out, 1);
-//       else
-//         __print_indent(out, indent + 1);
-//       idx = indent * 4;
-//     }
-//     g_string_append_printf(out, "%c", task->text[i]);
-//     idx++;
-//   }
-//   g_string_append(out, "\n");
-// }
-
-// static void errands_print_tasks(GString *out, const char *parent_uid, const char *list_uid,
-//                                 int indent) {
-//   for (int i = 0; i < tdata->len; i++) {
-//     TaskData *td = tdata->pdata[i];
-//     if (!strcmp(td->parent, parent_uid) && !strcmp(td->list_uid, list_uid)) {
-//       errands_print_task(td, out, indent);
-//       errands_print_tasks(out, td->uid, list_uid, indent + 1);
-//     }
-//   }
-// }
-
-// GString *errands_data_print_list(char *list_uid) {
-//   // Output string
-//   GString *out = g_string_new("");
-
-//   // Print list name
-//   char *list_name;
-//   for (int i = 0; i < ldata->len; i++) {
-//     TaskListData *tld = ldata->pdata[i];
-//     if (!strcmp(list_uid, tld->uid)) {
-//       list_name = strdup(tld->name);
-//       break;
-//     }
-//   }
-//   g_string_append(out, "╔");
-//   for_range(i, 0, MAX_LINE_LENGTH + 2) g_string_append(out, "═");
-//   g_string_append(out, "╗\n");
-//   g_string_append(out, "║ ");
-
-//   int len = strlen(list_name);
-//   // If name is too long add '...' to the end
-//   if (len > MAX_LINE_LENGTH - 1) {
-//     list_name[MAX_LINE_LENGTH - 1] = '.';
-//     list_name[MAX_LINE_LENGTH - 2] = '.';
-//     list_name[MAX_LINE_LENGTH - 3] = '.';
-//     for_range(i, 0, MAX_LINE_LENGTH) { g_string_append_printf(out, "%c", list_name[i]); }
-//   } else if (len < MAX_LINE_LENGTH) {
-//     GString *title = g_string_new(list_name);
-//     int title_len = title->len;
-//     while (title_len <= MAX_LINE_LENGTH - 1) {
-//       g_string_prepend(title, " ");
-//       title_len++;
-//       if (title_len < MAX_LINE_LENGTH - 1) {
-//         g_string_append(title, " ");
-//         title_len++;
-//       }
-//     }
-//     g_string_append(out, title->str);
-//     g_string_free(title, TRUE);
-//   }
-//   free(list_name);
-//   g_string_append(out, " ║\n");
-//   g_string_append(out, "╚");
-//   for_range(i, 0, MAX_LINE_LENGTH + 2) g_string_append(out, "═");
-//   g_string_append(out, "╝\n");
-//   // Print tasks
-//   errands_print_tasks(out, "", list_uid, 0);
-//   return out;
-// }

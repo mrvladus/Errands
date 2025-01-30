@@ -3,7 +3,7 @@
 
 #include <glib/gi18n.h>
 
-static void on_button_clicked();
+static void on_button_clicked() { g_signal_emit_by_name(state.sidebar->add_btn, "activate", NULL); }
 
 G_DEFINE_TYPE(ErrandsNoListsPage, errands_no_lists_page, ADW_TYPE_BIN)
 
@@ -31,5 +31,3 @@ static void errands_no_lists_page_init(ErrandsNoListsPage *self) {
 ErrandsNoListsPage *errands_no_lists_page_new() {
   return g_object_new(ERRANDS_TYPE_NO_LISTS_PAGE, NULL);
 }
-
-static void on_button_clicked() { g_signal_emit_by_name(state.sidebar->add_btn, "activate", NULL); }
