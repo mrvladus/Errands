@@ -283,7 +283,9 @@ void task_data_set_completed(ListData *data, bool completed) {
 // --- LOADING --- //
 
 static gint list_sort_by_position_func(gconstpointer a, gconstpointer b) {
-  return list_data_get_position((ListData *)a) > list_data_get_position((ListData *)b);
+  ListData *d1 = *(ListData **)a;
+  ListData *d2 = *(ListData **)b;
+  return list_data_get_position(d1) > list_data_get_position(d2);
 }
 
 static void errands_data_migrate() {
@@ -450,11 +452,6 @@ void errands_data_write_list(ListData *data) {
   const char *ical_string = icalcomponent_as_ical_string(data);
   write_string_to_file(path, ical_string);
   LOG("User Data: Save list %s", path);
-}
-
-void errands_data_write_lists() {
-  for (size_t i = 0; i < ldata->len; i++)
-    errands_data_write_list(ldata->pdata[i]);
 }
 
 // --- PRINTING --- //

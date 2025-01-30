@@ -66,4 +66,3 @@ DECLARE_TASK_PROPERTY(bool, trash);
 
 void errands_data_load_lists();
 void errands_data_write_list(ListData *data);
-void errands_data_write_lists();

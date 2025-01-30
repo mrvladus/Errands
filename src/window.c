@@ -1,4 +1,5 @@
 #include "window.h"
+#include "adwaita.h"
 #include "data.h"
 // #include "delete-list-dialog.h"
 #include "no-lists-page.h"
@@ -34,7 +35,9 @@ static void errands_window_init(ErrandsWindow *self) {
   GtkWidget *overlay = gtk_overlay_new();
   gtk_overlay_add_overlay(GTK_OVERLAY(overlay), GTK_WIDGET(self->no_lists_page));
   gtk_overlay_set_child(GTK_OVERLAY(overlay), self->split_view);
-  adw_application_window_set_content(ADW_APPLICATION_WINDOW(self), overlay);
+  self->toast_overlay = adw_toast_overlay_new();
+  adw_toast_overlay_set_child(ADW_TOAST_OVERLAY(self->toast_overlay), overlay);
+  adw_application_window_set_content(ADW_APPLICATION_WINDOW(self), self->toast_overlay);
 }
 
 ErrandsWindow *errands_window_new() {
@@ -85,6 +88,10 @@ void errands_window_update(ErrandsWindow *win) {
       count++;
   }
   g_object_set(state.main_window->no_lists_page, "visible", count == 0, NULL);
+}
+
+void errands_window_add_toast(ErrandsWindow *win, const char *msg) {
+  adw_toast_overlay_add_toast(ADW_TOAST_OVERLAY(win->toast_overlay), adw_toast_new(msg));
 }
 
 // --- SIGNAL HANDLERS --- //

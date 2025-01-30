@@ -33,6 +33,5 @@ ErrandsTask *errands_task_new(TaskData *data);
 void errands_task_update_accent_color(ErrandsTask *task);
 void errands_task_update_progress(ErrandsTask *task);
 void errands_task_update_tags(ErrandsTask *task);
-// Return list of ErrandsTask widgets from parent to great ... great parent
 GPtrArray *errands_task_get_parents(ErrandsTask *task);
 GPtrArray *errands_task_get_sub_tasks(ErrandsTask *task);

@@ -7,6 +7,7 @@
 #include "state.h"
 #include "task-list.h"
 #include "utils.h"
+#include "window.h"
 
 #include <glib/gi18n.h>
 
@@ -158,7 +159,8 @@ static void __on_open_finish(GObject *obj, GAsyncResult *res, ErrandsSidebar *sb
     // Check if uid exists
     for (size_t i = 0; i < ldata->len; i++) {
       if (!strcmp(list_data_get_uid(ldata->pdata[i]), list_data_get_uid(data))) {
-        LOG("Sidebar: Import failed. List exists.");
+        LOG("Sidebar: List already exists");
+        errands_window_add_toast(state.main_window, _("List already exists"));
         list_data_free(data);
         return;
       }
