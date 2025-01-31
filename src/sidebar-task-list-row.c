@@ -1,7 +1,6 @@
 #include "components.h"
 #include "data.h"
 #include "dialogs.h"
-#include "glibconfig.h"
 #include "settings.h"
 #include "sidebar-rows.h"
 #include "state.h"
@@ -9,6 +8,7 @@
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>
+#include <stdint.h>
 
 static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x, gdouble y,
                            GtkPopover *popover);
@@ -57,7 +57,7 @@ static void errands_sidebar_task_list_row_init(ErrandsSidebarTaskListRow *self) 
   gtk_widget_add_css_class(self->counter, "caption");
 
   // Right-click menu
-  GMenu *menu =
+  g_autoptr(GMenu) menu =
       errands_menu_new(4, _("Rename"), "task-list-row.rename", _("Delete"), "task-list-row.delete",
                        _("Export"), "task-list-row.export", _("Print"), "task-list-row.print");
 
@@ -71,7 +71,7 @@ static void errands_sidebar_task_list_row_init(ErrandsSidebarTaskListRow *self) 
   gtk_widget_add_controller(box, GTK_EVENT_CONTROLLER(ctrl));
 
   // Actions
-  GSimpleActionGroup *ag = errands_action_group_new(
+  g_autoptr(GSimpleActionGroup) ag = errands_action_group_new(
       4, "rename", on_action_rename, self, "delete", on_action_delete, self, "print",
       on_action_print, self, "export", on_action_export, self);
   gtk_widget_insert_action_group(GTK_WIDGET(self), "task-list-row", G_ACTION_GROUP(ag));
@@ -111,7 +111,7 @@ ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_new(ListData *data) {
 
 ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_get(const char *uid) {
   g_autoptr(GPtrArray) children = get_children(state.sidebar->task_lists_box);
-  for (int i = 0; i < children->len; i++) {
+  for (size_t i = 0; i < children->len; i++) {
     ListData *data = ((ErrandsSidebarTaskListRow *)children->pdata[i])->data;
     if (!strcmp(list_data_get_uid(data), uid))
       return children->pdata[i];
@@ -127,7 +127,7 @@ void errands_sidebar_task_list_row_update_counter(ErrandsSidebarTaskListRow *row
     if (!task_data_get_trash(td) && !task_data_get_deleted(td) && !task_data_get_completed(td))
       c++;
   }
-  g_autofree char *num = g_strdup_printf("%zu", c);
+  g_autofree gchar *num = g_strdup_printf("%zu", c);
   gtk_label_set_label(GTK_LABEL(row->counter), c > 0 ? num : "");
 }
 
@@ -210,16 +210,16 @@ static void on_action_delete(GSimpleAction *action, GVariant *param,
 
 // - PRINTING - //
 
-#define FONT_SIZE 12
-#define LINE_HEIGHT 20
-#define LINES_PER_PAGE 40
+const uint8_t FONT_SIZE = 12;
+const uint8_t LINE_HEIGHT = 20;
+const uint8_t LINES_PER_PAGE = 40;
 
 // Function to calculate number of pages and handle pagination
 static void begin_print(GtkPrintOperation *operation, GtkPrintContext *context, const char *text) {
-  int num_lines = 0;
+  size_t num_lines = 0;
   char c;
-  int len = 0;
-  for (int i = 0; i < strlen(text); i++) {
+  size_t len = 0;
+  for (size_t i = 0; i < strlen(text); i++) {
     c = text[i];
     if (c == '\n') {
       num_lines++;
@@ -232,7 +232,7 @@ static void begin_print(GtkPrintOperation *operation, GtkPrintContext *context, 
     }
     len++;
   }
-  int total_pages = (num_lines + LINES_PER_PAGE - 1) / LINES_PER_PAGE;
+  const size_t total_pages = (num_lines + LINES_PER_PAGE - 1) / LINES_PER_PAGE;
   gtk_print_operation_set_n_pages(operation, total_pages);
 }
 
@@ -245,17 +245,17 @@ static void print_draw_page(GtkPrintOperation *operation, GtkPrintContext *conte
   cairo_select_font_face(cr, "Monospace", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
   cairo_set_font_size(cr, FONT_SIZE);
   // Split the text into lines
-  char *text_copy = g_strdup(text); // Duplicate text to safely tokenize
+  g_autofree gchar *text_copy = g_strdup(text); // Duplicate text to safely tokenize
   char *line = strtok(text_copy, "\n");
   // Calculate the start and end lines for the current page
-  int start_line = page_nr * LINES_PER_PAGE;
-  int end_line = start_line + LINES_PER_PAGE;
+  size_t start_line = page_nr * LINES_PER_PAGE;
+  size_t end_line = start_line + LINES_PER_PAGE;
 
-  double x = 10; // Starting x position
-  double y = 10; // Starting y position for the first line
+  const uint8_t x = 10; // Starting x position
+  double y = 10;        // Starting y position for the first line
 
   // Iterate over each line and draw it if it belongs to the current page
-  int current_line = 0;
+  size_t current_line = 0;
   while (line) {
     if (current_line >= start_line && current_line < end_line) {
       cairo_move_to(cr, x, y);   // Move to the next line's position
@@ -266,8 +266,6 @@ static void print_draw_page(GtkPrintOperation *operation, GtkPrintContext *conte
     current_line++;
     line = strtok(NULL, "\n"); // Get the next line
   }
-  // Free the duplicated text
-  g_free(text_copy);
   // Ensure everything is drawn
   cairo_stroke(cr);
 }
@@ -292,7 +290,6 @@ static void on_action_print(GSimpleAction *action, GVariant *param,
                             ErrandsSidebarTaskListRow *row) {
   LOG("Start printing of the list '%s'", list_data_get_uid(row->data));
   g_autofree gchar *str = list_data_print(row->data);
-  printf("%s", str);
   start_print(str);
 }
 
