@@ -378,13 +378,13 @@ static void on_action_rename(GSimpleAction *action, GVariant *param, ErrandsTask
 }
 
 static void on_action_trash(GSimpleAction *action, GVariant *param, ErrandsTask *task) {
-  // task->data->trash = true;
-  // errands_data_write();
-  // gtk_revealer_set_reveal_child(GTK_REVEALER(task->revealer), false);
-  // errands_task_list_update_title();
-  // errands_sidebar_all_row_update_counter(state.sidebar->all_row);
-  // errands_sidebar_task_list_row_update_counter(
-  //     errands_sidebar_task_list_row_get(task->data->list_uid));
+  task_data_set_trash(task->data, true);
+  errands_data_write_list(task_data_get_list(task->data));
+  gtk_revealer_set_reveal_child(GTK_REVEALER(task->revealer), false);
+  errands_task_list_update_title();
+  errands_sidebar_all_row_update_counter(state.sidebar->all_row);
+  errands_sidebar_task_list_row_update_counter(
+      errands_sidebar_task_list_row_get(task_data_get_list_uid(task->data)));
 }
 
 static void on_errands_task_complete_btn_toggle(GtkCheckButton *btn, ErrandsTask *task) {
