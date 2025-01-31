@@ -1,5 +1,7 @@
 #include "task.h"
+#include "components.h"
 #include "data.h"
+#include "glibconfig.h"
 #include "settings.h"
 #include "state.h"
 #include "task-list.h"
@@ -14,7 +16,6 @@
 static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x, gdouble y,
                            GtkPopover *popover);
 static void on_action_rename(GSimpleAction *action, GVariant *param, ErrandsTask *task);
-static void on_action_export(GSimpleAction *action, GVariant *param, ErrandsTask *task);
 static void on_action_trash(GSimpleAction *action, GVariant *param, ErrandsTask *task);
 static void on_errands_task_complete_btn_toggle(GtkCheckButton *btn, ErrandsTask *task);
 static void on_errands_task_toolbar_btn_toggle(GtkToggleButton *btn, ErrandsTask *task);
@@ -163,29 +164,28 @@ static void errands_task_init(ErrandsTask *self) {
   gtk_box_append(GTK_BOX(sub_vbox), self->sub_tasks);
 
   // Right-click menu
-  // GMenu *menu = errands_menu_new(3, _("Edit"), "task.edit", _("Move to Trash"), "task.trash",
-  //                                _("Export"), "task.export");
+  g_autoptr(GMenu) menu =
+      errands_menu_new(2, _("Edit"), "task.edit", _("Move to Trash"), "task.trash");
 
   // Menu popover
-  // GtkWidget *menu_popover = gtk_popover_menu_new_from_model(G_MENU_MODEL(menu));
-  // g_object_set(menu_popover, "has-arrow", false, "halign", GTK_ALIGN_START, NULL);
-  // gtk_box_append(GTK_BOX(self->card), menu_popover);
+  GtkWidget *menu_popover = gtk_popover_menu_new_from_model(G_MENU_MODEL(menu));
+  g_object_set(menu_popover, "has-arrow", false, "halign", GTK_ALIGN_START, NULL);
+  gtk_box_append(GTK_BOX(self->card), menu_popover);
 
   // Right-click controllers
   GtkGesture *ctrl = gtk_gesture_click_new();
   gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(ctrl), 3);
-  // g_signal_connect(ctrl, "released", G_CALLBACK(on_right_click), menu_popover);
+  g_signal_connect(ctrl, "released", G_CALLBACK(on_right_click), menu_popover);
   gtk_widget_add_controller(self->title_row, GTK_EVENT_CONTROLLER(ctrl));
   GtkGesture *touch_ctrl = gtk_gesture_long_press_new();
-  // g_signal_connect(touch_ctrl, "pressed", G_CALLBACK(on_right_click), menu_popover);
+  g_signal_connect(touch_ctrl, "pressed", G_CALLBACK(on_right_click), menu_popover);
   gtk_gesture_single_set_touch_only(GTK_GESTURE_SINGLE(touch_ctrl), true);
   gtk_widget_add_controller(self->title_row, GTK_EVENT_CONTROLLER(touch_ctrl));
 
   // Actions
-  // GSimpleActionGroup *ag =
-  //     errands_action_group_new(3, "edit", on_action_rename, self, "trash", on_action_trash, self,
-  //                              "export", on_action_export, self);
-  // gtk_widget_insert_action_group(GTK_WIDGET(self), "task", G_ACTION_GROUP(ag));
+  g_autoptr(GSimpleActionGroup) ag =
+      errands_action_group_new(2, "edit", on_action_rename, self, "trash", on_action_trash, self);
+  gtk_widget_insert_action_group(GTK_WIDGET(self), "task", G_ACTION_GROUP(ag));
 
   // DND
   GtkDragSource *drag_source = gtk_drag_source_new();
@@ -377,34 +377,6 @@ static void on_action_rename(GSimpleAction *action, GVariant *param, ErrandsTask
   gtk_widget_grab_focus(task->edit_row);
 }
 
-// - EXPORT - //
-
-static void __on_export_finish(GObject *obj, GAsyncResult *res, gpointer data) {
-  // GFile *f = gtk_file_dialog_save_finish(GTK_FILE_DIALOG(obj), res, NULL);
-  // if (!f)
-  //   return;
-  // FILE *file = fopen(g_file_get_path(f), "w");
-  // if (!file) {
-  //   fclose(file);
-  //   return;
-  // }
-  // TaskData *td = data;
-  // char *ical = errands_data_task_as_ical(td);
-  // fprintf(file, "%s", ical);
-  // fclose(file);
-  // free(ical);
-  // LOG("Export task '%s'", td->uid);
-}
-
-static void on_action_export(GSimpleAction *action, GVariant *param, ErrandsTask *task) {
-  // GtkFileDialog *dialog = gtk_file_dialog_new();
-  // GString *name = g_string_new(task->data->text);
-  // g_string_append(name, ".ics");
-  // g_object_set(dialog, "initial-name", name->str, NULL);
-  // gtk_file_dialog_save(dialog, GTK_WINDOW(state.main_window), NULL, __on_export_finish,
-  // task->data); g_string_free(name, true);
-}
-
 static void on_action_trash(GSimpleAction *action, GVariant *param, ErrandsTask *task) {
   // task->data->trash = true;
   // errands_data_write();
@@ -496,14 +468,14 @@ static void on_errands_task_sub_task_added(GtkEntry *entry, ErrandsTask *task) {
 }
 
 static void on_errands_task_edited(AdwEntryRow *entry, ErrandsTask *task) {
-  // const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
-  // if (!strcmp(text, task->data->text) || !strcmp("", task->data->text))
-  //   return;
-  // free(task->data->text);
-  // task->data->text = strdup(text);
-  // errands_data_write();
-  // adw_preferences_row_set_title(ADW_PREFERENCES_ROW(task->title_row), text);
-  // gtk_widget_set_visible(task->title_row, true);
+  const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
+  const char *current_text = task_data_get_text(task->data);
+  if (!strcmp(text, current_text) || !strcmp("", current_text))
+    return;
+  task_data_set_text(task->data, text);
+  errands_data_write_list(task_data_get_list(task->data));
+  adw_preferences_row_set_title(ADW_PREFERENCES_ROW(task->title_row), text);
+  gtk_widget_set_visible(task->title_row, true);
   // TODO: sync
 }
 
