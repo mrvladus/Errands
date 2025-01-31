@@ -1,7 +1,7 @@
 #pragma once
 
 #include "data.h"
-// #include "task-toolbar.h"
+#include "task-toolbar.h"
 
 #include <adwaita.h>
 
@@ -22,7 +22,7 @@ struct _ErrandsTask {
   GtkWidget *progress_bar;
   GtkWidget *tags_box;
   GtkWidget *toolbar_revealer;
-  // ErrandsTaskToolbar *toolbar;
+  ErrandsTaskToolbar *toolbar;
   GtkWidget *sub_tasks_revealer;
   GtkWidget *sub_entry;
   GtkWidget *sub_tasks;

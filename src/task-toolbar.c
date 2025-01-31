@@ -1,11 +1,13 @@
 #include "task-toolbar.h"
-#include "../utils.h"
-#include "attachments-window.h"
-#include "color-window.h"
-#include "date-window.h"
+#include "data.h"
 #include "notes-window.h"
-#include "priority-window.h"
-#include "tags-window.h"
+#include "task.h"
+#include "utils.h"
+// #include "attachments-window.h"
+// #include "color-window.h"
+// #include "date-window.h"
+// #include "priority-window.h"
+// #include "tags-window.h"
 
 #include <glib/gi18n.h>
 
@@ -60,27 +62,27 @@ static void errands_task_toolbar_init(ErrandsTaskToolbar *self) {
   gtk_flow_box_append(GTK_FLOW_BOX(box), ebox);
 }
 
-ErrandsTaskToolbar *errands_task_toolbar_new(void *task) {
+ErrandsTaskToolbar *errands_task_toolbar_new(ErrandsTask *task) {
   ErrandsTaskToolbar *tb = g_object_new(ERRANDS_TYPE_TASK_TOOLBAR, NULL);
+  tb->task = task;
   // Connect signals
-  g_signal_connect_swapped(tb->date_btn, "clicked", G_CALLBACK(errands_date_window_show), task);
+  // g_signal_connect_swapped(tb->date_btn, "clicked", G_CALLBACK(errands_date_window_show), task);
   g_signal_connect_swapped(tb->notes_btn, "clicked", G_CALLBACK(errands_notes_window_show), task);
-  g_signal_connect_swapped(tb->priority_btn, "clicked", G_CALLBACK(errands_priority_window_show),
-                           task);
-  g_signal_connect_swapped(tb->tags_btn, "clicked", G_CALLBACK(errands_tags_window_show), task);
-  g_signal_connect_swapped(tb->attachments_btn, "clicked",
-                           G_CALLBACK(errands_attachments_window_show), task);
-  g_signal_connect_swapped(tb->color_btn, "clicked", G_CALLBACK(errands_color_window_show), task);
-  // Update css for buttons
-  ErrandsTask *_task = tb->task = task;
+  // g_signal_connect_swapped(tb->priority_btn, "clicked", G_CALLBACK(errands_priority_window_show),
+  // task);
+  // g_signal_connect_swapped(tb->tags_btn, "clicked", G_CALLBACK(errands_tags_window_show), task);
+  // g_signal_connect_swapped(tb->attachments_btn, "clicked",
+  //                          G_CALLBACK(errands_attachments_window_show), task);
+  // g_signal_connect_swapped(tb->color_btn, "clicked", G_CALLBACK(errands_color_window_show),
+  // task); Update css for buttons
   // Notes button
-  if (strcmp(_task->data->notes, ""))
+  if (strcmp(task_data_get_notes(task->data), ""))
     gtk_widget_add_css_class(tb->notes_btn, "accent");
   // Attachments button
-  if (_task->data->attachments->len > 0)
-    gtk_widget_add_css_class(tb->attachments_btn, "accent");
+  // if (task_data_get_attachments(task->data)->len > 0)
+  //   gtk_widget_add_css_class(tb->attachments_btn, "accent");
   // Priority button
-  int priority = _task->data->priority;
+  uint8_t priority = task_data_get_priority(task->data);
   gtk_button_set_icon_name(GTK_BUTTON(tb->priority_btn), priority > 0
                                                              ? "errands-priority-set-symbolic"
                                                              : "errands-priority-symbolic");
@@ -98,69 +100,68 @@ ErrandsTaskToolbar *errands_task_toolbar_new(void *task) {
 }
 
 void errands_task_toolbar_update_date_btn(ErrandsTaskToolbar *tb) {
-  TaskData *data = ((ErrandsTask *)(tb->task))->data;
+  TaskData *data = tb->task->data;
   // If not repeated
-  if (!strcmp(data->rrule, "")) {
+  if (!strcmp(task_data_get_rrule(data), "")) {
     // If no due date - set "Date" label
-    if (!strcmp(data->due_date, "")) {
+    const char *due = task_data_get_due(data);
+    if (!strcmp(due, "")) {
       adw_button_content_set_label(
           ADW_BUTTON_CONTENT(gtk_button_get_child(GTK_BUTTON(tb->date_btn))), _("Date"));
     }
     // If due date is set
     else {
-      GDateTime *dt;
-      char *label;
-      if (!string_contains(data->due_date, "T")) {
+      g_autoptr(GDateTime) dt = NULL;
+      g_autofree gchar *label = NULL;
+      if (!string_contains(due, "T")) {
         char new_dt[16];
-        sprintf(new_dt, "%sT000000Z", data->due_date);
+        sprintf(new_dt, "%sT000000Z", due);
         dt = g_date_time_new_from_iso8601(new_dt, NULL);
         label = g_date_time_format(dt, "%d %b");
       } else {
-        dt = g_date_time_new_from_iso8601(data->due_date, NULL);
+        dt = g_date_time_new_from_iso8601(due, NULL);
         label = g_date_time_format(dt, "%d %b %R");
       }
       adw_button_content_set_label(
           ADW_BUTTON_CONTENT(gtk_button_get_child(GTK_BUTTON(tb->date_btn))), label);
-      g_free(label);
-      g_date_time_unref(dt);
     }
   }
   // If repeated
-  else {
-    str label = str_new("");
+  // else {
+  //   str label = str_new("");
 
-    // Get interval
-    char *inter = get_rrule_value(data->rrule, "INTERVAL");
-    int interval;
-    if (inter) {
-      interval = atoi(inter);
-      free(inter);
-    } else
-      interval = 1;
+  //   // Get interval
+  //   char *inter = get_rrule_value(data->rrule, "INTERVAL");
+  //   int interval;
+  //   if (inter) {
+  //     interval = atoi(inter);
+  //     free(inter);
+  //   } else
+  //     interval = 1;
 
-    // Get frequency
-    char *frequency = get_rrule_value(data->rrule, "FREQ");
-    if (!strcmp(frequency, "MINUTELY"))
-      interval == 1 ? str_append(&label, _("Every minute"))
-                    : str_append_printf(&label, _("Every %d minutes"), interval);
-    else if (!strcmp(frequency, "HOURLY"))
-      interval == 1 ? str_append(&label, _("Every hour"))
-                    : str_append_printf(&label, _("Every %d hours"), interval);
-    else if (!strcmp(frequency, "DAILY"))
-      interval == 1 ? str_append(&label, _("Every day"))
-                    : str_append_printf(&label, _("Every %d days"), interval);
-    else if (!strcmp(frequency, "WEEKLY"))
-      interval == 1 ? str_append(&label, _("Every week"))
-                    : str_append_printf(&label, _("Every %d weeks"), interval);
-    else if (!strcmp(frequency, "MONTHLY"))
-      interval == 1 ? str_append(&label, _("Every month"))
-                    : str_append_printf(&label, _("Every %d months"), interval);
-    else if (!strcmp(frequency, "YEARLY"))
-      interval == 1 ? str_append(&label, _("Every year"))
-                    : str_append_printf(&label, _("Every %d years"), interval);
-    adw_button_content_set_label(ADW_BUTTON_CONTENT(gtk_button_get_child(GTK_BUTTON(tb->date_btn))),
-                                 label.str);
-    free(frequency);
-    str_free(&label);
-  }
+  //   // Get frequency
+  //   char *frequency = get_rrule_value(data->rrule, "FREQ");
+  //   if (!strcmp(frequency, "MINUTELY"))
+  //     interval == 1 ? str_append(&label, _("Every minute"))
+  //                   : str_append_printf(&label, _("Every %d minutes"), interval);
+  //   else if (!strcmp(frequency, "HOURLY"))
+  //     interval == 1 ? str_append(&label, _("Every hour"))
+  //                   : str_append_printf(&label, _("Every %d hours"), interval);
+  //   else if (!strcmp(frequency, "DAILY"))
+  //     interval == 1 ? str_append(&label, _("Every day"))
+  //                   : str_append_printf(&label, _("Every %d days"), interval);
+  //   else if (!strcmp(frequency, "WEEKLY"))
+  //     interval == 1 ? str_append(&label, _("Every week"))
+  //                   : str_append_printf(&label, _("Every %d weeks"), interval);
+  //   else if (!strcmp(frequency, "MONTHLY"))
+  //     interval == 1 ? str_append(&label, _("Every month"))
+  //                   : str_append_printf(&label, _("Every %d months"), interval);
+  //   else if (!strcmp(frequency, "YEARLY"))
+  //     interval == 1 ? str_append(&label, _("Every year"))
+  //                   : str_append_printf(&label, _("Every %d years"), interval);
+  //   adw_button_content_set_label(ADW_BUTTON_CONTENT(gtk_button_get_child(GTK_BUTTON(tb->date_btn))),
+  //                                label.str);
+  //   free(frequency);
+  //   str_free(&label);
+  // }
 }

@@ -1,19 +1,12 @@
 #include "window.h"
-#include "adwaita.h"
 #include "data.h"
 #include "no-lists-page.h"
+#include "notes-window.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "state.h"
 #include "task-list.h"
 #include "utils.h"
-// #include "task/attachments-window.h"
-// #include "task/color-window.h"
-// #include "task/date-window.h"
-// #include "task/notes-window.h"
-// #include "task/priority-window.h"
-// #include "task/tags-window.h"
-// #include "utils.h"
 
 #include <glib/gi18n.h>
 
@@ -65,8 +58,8 @@ void errands_window_build(ErrandsWindow *win) {
   state.task_list = errands_task_list_new();
 
   // Dialogs
+  state.notes_window = errands_notes_window_new();
   // state.date_window = errands_date_window_new();
-  // state.notes_window = errands_notes_window_new();
   // state.priority_window = errands_priority_window_new();
   // state.tags_window = errands_tags_window_new();
   // state.attachments_window = errands_attachments_window_new();

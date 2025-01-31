@@ -11,6 +11,7 @@ dependencies = [
   dependency('libadwaita-1', version: '>=1.6'),
   dependency('libportal', version: '>=0.8'),
   dependency('libical', version: '>=3.0'),
+  dependency('gtksourceview-5', version: '>=5.14'),
 ]
 
 # Source files
@@ -21,6 +22,7 @@ sources = files(
   'src/main.c',
   'src/new-list-dialog.c',
   'src/no-lists-page.c',
+  'src/notes-window.c',
   'src/rename-list-dialog.c',
   'src/resources.c',
   'src/settings.c',
@@ -29,6 +31,7 @@ sources = files(
   'src/sidebar.c',
   'src/state.c',
   'src/task-list.c',
+  'src/task-toolbar.c',
   'src/task.c',
   'src/window.c',
 )

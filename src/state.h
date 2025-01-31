@@ -1,15 +1,9 @@
 #pragma once
 
 #include "dialogs.h"
-// #include "no-lists-page.h"
+#include "notes-window.h"
 #include "sidebar.h"
 #include "task-list.h"
-// #include "task/attachments-window.h"
-// #include "task/color-window.h"
-// #include "task/date-window.h"
-// #include "task/notes-window.h"
-// #include "task/priority-window.h"
-// #include "task/tags-window.h"
 #include "window.h"
 
 #include <adwaita.h>
@@ -27,7 +21,7 @@ typedef struct {
   ErrandsRenameListDialog *rename_list_dialog;
   ErrandsDeleteListDialog *delete_list_dialog;
 
-  // ErrandsNotesWindow *notes_window;
+  ErrandsNotesWindow *notes_window;
   // ErrandsPriorityWindow *priority_window;
   // ErrandsTagsWindow *tags_window;
   // ErrandsAttachmentsWindow *attachments_window;
