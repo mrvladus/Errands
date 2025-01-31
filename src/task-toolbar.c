@@ -1,12 +1,12 @@
 #include "task-toolbar.h"
 #include "data.h"
 #include "notes-window.h"
+#include "priority-window.h"
 #include "task.h"
 #include "utils.h"
 // #include "attachments-window.h"
 // #include "color-window.h"
 // #include "date-window.h"
-// #include "priority-window.h"
 // #include "tags-window.h"
 
 #include <glib/gi18n.h>
@@ -68,8 +68,8 @@ ErrandsTaskToolbar *errands_task_toolbar_new(ErrandsTask *task) {
   // Connect signals
   // g_signal_connect_swapped(tb->date_btn, "clicked", G_CALLBACK(errands_date_window_show), task);
   g_signal_connect_swapped(tb->notes_btn, "clicked", G_CALLBACK(errands_notes_window_show), task);
-  // g_signal_connect_swapped(tb->priority_btn, "clicked", G_CALLBACK(errands_priority_window_show),
-  // task);
+  g_signal_connect_swapped(tb->priority_btn, "clicked", G_CALLBACK(errands_priority_window_show),
+                           task);
   // g_signal_connect_swapped(tb->tags_btn, "clicked", G_CALLBACK(errands_tags_window_show), task);
   // g_signal_connect_swapped(tb->attachments_btn, "clicked",
   //                          G_CALLBACK(errands_attachments_window_show), task);

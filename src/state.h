@@ -2,6 +2,7 @@
 
 #include "dialogs.h"
 #include "notes-window.h"
+#include "priority-window.h"
 #include "sidebar.h"
 #include "task-list.h"
 #include "window.h"
@@ -22,7 +23,7 @@ typedef struct {
   ErrandsDeleteListDialog *delete_list_dialog;
 
   ErrandsNotesWindow *notes_window;
-  // ErrandsPriorityWindow *priority_window;
+  ErrandsPriorityWindow *priority_window;
   // ErrandsTagsWindow *tags_window;
   // ErrandsAttachmentsWindow *attachments_window;
   // ErrandsColorWindow *color_window;

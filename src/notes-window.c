@@ -61,6 +61,9 @@ ErrandsNotesWindow *errands_notes_window_new() {
 }
 
 void errands_notes_window_show(ErrandsTask *task) {
+  if (!state.notes_window)
+    state.notes_window = errands_notes_window_new();
+
   adw_dialog_present(ADW_DIALOG(state.notes_window), GTK_WIDGET(state.main_window));
   state.notes_window->task = task;
   g_autofree gchar *text = gtk_source_utils_unescape_search_text(task_data_get_notes(task->data));
@@ -80,7 +83,8 @@ static void on_errands_notes_window_close_cb(ErrandsNotesWindow *win, gpointer d
   g_autofree char *text = gtk_text_buffer_get_text(buf, &start, &end, FALSE);
 
   // If text is different then save it
-  const char *curr_notes = task_data_get_notes(win->task->data);
+  g_autofree gchar *curr_notes =
+      gtk_source_utils_unescape_search_text(task_data_get_notes(win->task->data));
   if (strcmp(text, curr_notes)) {
     task_data_set_notes(win->task->data, text);
     errands_data_write_list(task_data_get_list(win->task->data));

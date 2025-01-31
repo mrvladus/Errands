@@ -33,6 +33,9 @@ ErrandsDeleteListDialog *errands_delete_list_dialog_new() {
 }
 
 void errands_delete_list_dialog_show(ErrandsSidebarTaskListRow *row) {
+  if (!state.delete_list_dialog)
+    state.delete_list_dialog = errands_delete_list_dialog_new();
+
   state.delete_list_dialog->row = row;
   LOG("Show delete dialog for '%s'", list_data_get_uid(row->data));
   char *msg = g_strdup_printf(_("This will completely delete \"%s\" task list"),

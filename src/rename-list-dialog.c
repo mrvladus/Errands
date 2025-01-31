@@ -45,6 +45,9 @@ ErrandsRenameListDialog *errands_rename_list_dialog_new() {
 }
 
 void errands_rename_list_dialog_show(ErrandsSidebarTaskListRow *row) {
+  if (!state.rename_list_dialog)
+    state.rename_list_dialog = errands_rename_list_dialog_new();
+
   state.rename_list_dialog->row = row;
   gtk_editable_set_text(GTK_EDITABLE(state.rename_list_dialog->entry),
                         list_data_get_name(row->data));

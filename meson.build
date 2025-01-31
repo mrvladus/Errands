@@ -23,6 +23,7 @@ sources = files(
   'src/new-list-dialog.c',
   'src/no-lists-page.c',
   'src/notes-window.c',
+  'src/priority-window.c',
   'src/rename-list-dialog.c',
   'src/resources.c',
   'src/settings.c',
