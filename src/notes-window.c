@@ -1,6 +1,5 @@
 #include "notes-window.h"
 #include "data.h"
-#include "gtksourceview/gtksource.h"
 #include "state.h"
 #include "task.h"
 #include "utils.h"

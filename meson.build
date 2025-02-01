@@ -16,6 +16,7 @@ dependencies = [
 
 # Source files
 sources = files(
+  'src/color-window.c',
   'src/data.c',
   'src/delete-list-dialog.c',
   'src/lib/cJSON.c',

@@ -1,10 +1,11 @@
 #include "color-window.h"
-#include "../state.h"
-#include "../utils.h"
+#include "data.h"
+#include "state.h"
 #include "task.h"
+#include "utils.h"
 
 #include <glib/gi18n.h>
-#include <stdio.h>
+#include <string.h>
 
 static void on_errands_color_window_close_cb(ErrandsColorWindow *win);
 static void on_errands_color_window_color_select_cb(GtkCheckButton *btn, ErrandsColorWindow *win);
@@ -28,7 +29,7 @@ static void errands_color_window_init(ErrandsColorWindow *self) {
                                  "orange", "red",  "purple", "brown"};
 
   GtkWidget *group_btn;
-  for (int i = 0; i < 8; i++) {
+  for (size_t i = 0; i < 8; i++) {
     GtkWidget *btn = gtk_check_button_new();
     g_object_set(btn, "name", colors[i], NULL);
     gtk_widget_add_css_class(btn, "accent-color-btn");
@@ -56,22 +57,21 @@ ErrandsColorWindow *errands_color_window_new() {
 }
 
 void errands_color_window_show(ErrandsTask *task) {
+  if (!state.color_window)
+    state.color_window = errands_color_window_new();
+
   state.color_window->block_signals = true;
   state.color_window->task = task;
   // Select color
-  GPtrArray *colors = get_children(state.color_window->color_box);
-  for (int i = 0; i < colors->len; i++) {
+  g_autoptr(GPtrArray) colors = get_children(state.color_window->color_box);
+  for (size_t i = 0; i < colors->len; i++) {
     const char *name = gtk_widget_get_name(colors->pdata[i]);
-    if (!strcmp(name, "none") && !strcmp(task->data->color, "")) {
-      gtk_check_button_set_active(GTK_CHECK_BUTTON(colors->pdata[i]), true);
-      break;
-    }
-    if (!strcmp(name, task->data->color)) {
+    const char *color = task_data_get_color(task->data);
+    if (!strcmp(name, color)) {
       gtk_check_button_set_active(GTK_CHECK_BUTTON(colors->pdata[i]), true);
       break;
     }
   }
-  g_ptr_array_free(colors, true);
   state.color_window->block_signals = false;
   // Show dialog
   adw_dialog_present(ADW_DIALOG(state.color_window), GTK_WIDGET(state.main_window));
@@ -80,25 +80,23 @@ void errands_color_window_show(ErrandsTask *task) {
 // --- SIGNAL HANDLERS --- //
 
 static void on_errands_color_window_close_cb(ErrandsColorWindow *win) {
-  GPtrArray *colors = get_children(win->color_box);
-  for (int i = 0; i < colors->len; i++) {
+  g_autoptr(GPtrArray) colors = get_children(win->color_box);
+  for (size_t i = 0; i < colors->len; i++) {
     GtkCheckButton *btn = GTK_CHECK_BUTTON(colors->pdata[i]);
     if (gtk_check_button_get_active(btn)) {
       const char *name = gtk_widget_get_name(GTK_WIDGET(btn));
-      if (!strcmp(name, "none")) {
-        LOG("Clean accent color on task '%s'", win->task->data->uid);
-        strcpy(win->task->data->color, "");
-        errands_task_update_accent_color(win->task);
-      } else {
-        LOG("Set accent color '%s' to task '%s'", name, win->task->data->uid);
-        strcpy(win->task->data->color, name);
-        errands_task_update_accent_color(win->task);
+      if (!strcmp(name, task_data_get_color(win->task->data))) {
+        adw_dialog_close(ADW_DIALOG(win));
+        return;
       }
+      const char *uid = task_data_get_uid(win->task->data);
+      LOG("Set accent color '%s' to task '%s'", name, uid);
+      task_data_set_color(win->task->data, name);
+      errands_task_update_accent_color(win->task);
       break;
     }
   }
-  g_ptr_array_free(colors, true);
-  errands_data_write();
+  errands_data_write_list(task_data_get_list(win->task->data));
   adw_dialog_close(ADW_DIALOG(win));
   // TODO: sync
 }

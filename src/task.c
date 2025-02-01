@@ -236,7 +236,7 @@ ErrandsTask *errands_task_new(TaskData *data) {
   for (size_t i = 0; i < tasks->len; i++) {
     TaskData *td = tasks->pdata[i];
     const char *parent = task_data_get_parent(td);
-    bool deleted = task_data_get_deleted(td);
+    const bool deleted = task_data_get_deleted(td);
     if (!strcmp(parent, task_uid) && !deleted) {
       LOG("Task '%s': Add sub task '%s'", task_uid, task_data_get_uid(td));
       gtk_box_append(GTK_BOX(task->sub_tasks), GTK_WIDGET(errands_task_new(td)));
@@ -301,7 +301,7 @@ void errands_task_update_progress(ErrandsTask *task) {
 
 static void __append_sub_tasks(GPtrArray *arr, ErrandsTask *task) {
   g_autoptr(GPtrArray) sub_tasks = get_children(task->sub_tasks);
-  for (int i = 0; i < sub_tasks->len; i++) {
+  for (size_t i = 0; i < sub_tasks->len; i++) {
     ErrandsTask *t = sub_tasks->pdata[i];
     g_ptr_array_add(arr, t);
     __append_sub_tasks(arr, t);
@@ -405,7 +405,7 @@ static void on_errands_task_complete_btn_toggle(GtkCheckButton *btn, ErrandsTask
   // Complete all sub-tasks if task is completed
   if (task_data_get_completed(task->data)) {
     g_autoptr(GPtrArray) sub_tasks = get_children(task->sub_tasks);
-    for (int i = 0; i < sub_tasks->len; i++) {
+    for (size_t i = 0; i < sub_tasks->len; i++) {
       ErrandsTask *sub_task = sub_tasks->pdata[i];
       gtk_check_button_set_active(GTK_CHECK_BUTTON(sub_task->complete_btn), true);
     }
@@ -413,7 +413,7 @@ static void on_errands_task_complete_btn_toggle(GtkCheckButton *btn, ErrandsTask
 
   // Update parents
   g_autoptr(GPtrArray) parents = errands_task_get_parents(task);
-  for (int i = 0; i < parents->len; i++) {
+  for (size_t i = 0; i < parents->len; i++) {
     ErrandsTask *parent = parents->pdata[i];
     errands_task_update_progress(parent);
     // Uncomplete parent task if task is un-completed
@@ -448,7 +448,7 @@ static void on_errands_task_toolbar_btn_toggle(GtkToggleButton *btn, ErrandsTask
 
 static void on_errands_task_expand_click(GtkGestureClick *self, gint n_press, gdouble x, gdouble y,
                                          ErrandsTask *task) {
-  bool expanded = task_data_get_expanded(task->data);
+  const bool expanded = task_data_get_expanded(task->data);
   task_data_set_expanded(task->data, !expanded);
   errands_data_write_list(task_data_get_list(task->data));
   gtk_revealer_set_reveal_child(GTK_REVEALER(task->sub_tasks_revealer), !expanded);

@@ -1,11 +1,11 @@
 #include "task-toolbar.h"
+#include "color-window.h"
 #include "data.h"
 #include "notes-window.h"
 #include "priority-window.h"
 #include "task.h"
 #include "utils.h"
 // #include "attachments-window.h"
-// #include "color-window.h"
 // #include "date-window.h"
 // #include "tags-window.h"
 
@@ -73,8 +73,8 @@ ErrandsTaskToolbar *errands_task_toolbar_new(ErrandsTask *task) {
   // g_signal_connect_swapped(tb->tags_btn, "clicked", G_CALLBACK(errands_tags_window_show), task);
   // g_signal_connect_swapped(tb->attachments_btn, "clicked",
   //                          G_CALLBACK(errands_attachments_window_show), task);
-  // g_signal_connect_swapped(tb->color_btn, "clicked", G_CALLBACK(errands_color_window_show),
-  // task); Update css for buttons
+  g_signal_connect_swapped(tb->color_btn, "clicked", G_CALLBACK(errands_color_window_show), task);
+  // Update css for buttons
   // Notes button
   if (strcmp(task_data_get_notes(task->data), ""))
     gtk_widget_add_css_class(tb->notes_btn, "accent");
