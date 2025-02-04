@@ -1,5 +1,6 @@
 #pragma once
 
+#include "attachments-window.h"
 #include "color-window.h"
 #include "dialogs.h"
 #include "notes-window.h"
@@ -23,11 +24,11 @@ typedef struct {
   ErrandsRenameListDialog *rename_list_dialog;
   ErrandsDeleteListDialog *delete_list_dialog;
 
+  ErrandsAttachmentsWindow *attachments_window;
   ErrandsColorWindow *color_window;
   ErrandsNotesWindow *notes_window;
   ErrandsPriorityWindow *priority_window;
   // ErrandsTagsWindow *tags_window;
-  // ErrandsAttachmentsWindow *attachments_window;
   // ErrandsDateWindow *date_window;
 } State;
 

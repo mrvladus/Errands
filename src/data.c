@@ -1,18 +1,7 @@
 #include "data.h"
-
 #include "lib/cJSON.h"
 #include "settings.h"
 #include "utils.h"
-
-#include <glib.h>
-#include <libical/ical.h>
-
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #define PATH_SEP "/"
 const char *user_dir;
@@ -245,77 +234,298 @@ void task_data_print(TaskData *data, GString *out, size_t indent) {
     task_data_print(children->pdata[i], out, indent);
 }
 
-#define STR_TO_STR(string) string
-#define STR_TO_INT(string) atoi(string)
-#define STR_TO_BOOL(string) !strcmp(string, "1") ? true : false
-#define STR_TO_TIME(string) icaltime_from_string(string)
-#define STR_TO_RRULE(string) icalrecurrencetype_from_string(string)
-#define BOOL_TO_STR(boolean) boolean ? "1" : "0"
-#define INT_TO_INT(integer) integer
-
-#define DEFINE_TASK_PROPERTY(return_type, property, ical_property, ical_prop_suffix, getter,       \
-                             setter, default_out)                                                  \
-  return_type task_data_get_##property(TaskData *data) {                                           \
-    icalproperty *prop = icalcomponent_get_first_property(data, ical_property);                    \
-    if (prop) {                                                                                    \
-      const char *out = icalproperty_get_value_as_string(prop);                                    \
-      if (!out)                                                                                    \
-        return getter(default_out);                                                                \
-      return getter(out);                                                                          \
-    }                                                                                              \
-    return getter(default_out);                                                                    \
-  }                                                                                                \
-                                                                                                   \
-  void task_data_set_##property(TaskData *data, return_type property) {                            \
-    icalproperty *prop = icalcomponent_get_first_property(data, ical_property);                    \
-    if (prop) {                                                                                    \
-      icalproperty_set_##ical_prop_suffix(prop, setter(property));                                 \
-    } else {                                                                                       \
-      prop = icalproperty_new_##ical_prop_suffix(setter(property));                                \
-      icalcomponent_add_property(data, prop);                                                      \
-    }                                                                                              \
+const char *task_data_get_changed(TaskData *data) {
+  icalproperty *prop = icalcomponent_get_first_property(data, ICAL_LASTMODIFIED_PROPERTY);
+  if (prop) {
+    const char *out = icalproperty_get_value_as_string(prop);
+    if (!out)
+      return "";
+    return out;
   }
-
-#define DEFINE_TASK_X_PROPERTY(return_type, property, xprop, getter, setter, default_out)          \
-  return_type task_data_get_##property(TaskData *data) {                                           \
-    return getter(__get_x_prop_value(data, xprop, default_out));                                   \
-  }                                                                                                \
-  void task_data_set_##property(TaskData *data, return_type property) {                            \
-    __set_x_prop_value(data, xprop, setter(property));                                             \
+  return "";
+}
+void task_data_set_changed(TaskData *data, const char *changed) {
+  icalproperty *prop = icalcomponent_get_first_property(data, ICAL_LASTMODIFIED_PROPERTY);
+  if (prop) {
+    icalproperty_set_lastmodified(prop, icaltime_from_string(changed));
+  } else {
+    prop = icalproperty_new_lastmodified(icaltime_from_string(changed));
+    icalcomponent_add_property(data, prop);
   }
-
-DEFINE_TASK_PROPERTY(const char *, changed, ICAL_LASTMODIFIED_PROPERTY, lastmodified, STR_TO_STR,
-                     STR_TO_TIME, "");
-DEFINE_TASK_PROPERTY(const char *, created, ICAL_DTSTAMP_PROPERTY, dtstamp, STR_TO_STR, STR_TO_TIME,
-                     "");
-DEFINE_TASK_PROPERTY(const char *, due, ICAL_DUE_PROPERTY, due, STR_TO_STR, STR_TO_TIME, "");
-DEFINE_TASK_PROPERTY(const char *, start, ICAL_DTSTART_PROPERTY, dtstart, STR_TO_STR, STR_TO_TIME,
-                     "");
-DEFINE_TASK_PROPERTY(const char *, notes, ICAL_DESCRIPTION_PROPERTY, description, STR_TO_STR,
-                     STR_TO_STR, "");
-DEFINE_TASK_PROPERTY(const char *, parent, ICAL_RELATEDTO_PROPERTY, relatedto, STR_TO_STR,
-                     STR_TO_STR, "");
-DEFINE_TASK_PROPERTY(const char *, rrule, ICAL_RRULE_PROPERTY, rrule, STR_TO_STR, STR_TO_RRULE, "");
-DEFINE_TASK_PROPERTY(const char *, text, ICAL_SUMMARY_PROPERTY, summary, STR_TO_STR, STR_TO_STR,
-                     "");
-DEFINE_TASK_PROPERTY(const char *, uid, ICAL_UID_PROPERTY, uid, STR_TO_STR, STR_TO_STR, "");
-DEFINE_TASK_PROPERTY(const char *, tags, ICAL_CATEGORIES_PROPERTY, categories, STR_TO_STR,
-                     STR_TO_STR, "");
-DEFINE_TASK_PROPERTY(uint8_t, percent, ICAL_PERCENTCOMPLETE_PROPERTY, percentcomplete, STR_TO_INT,
-                     INT_TO_INT, "0");
-DEFINE_TASK_PROPERTY(uint8_t, priority, ICAL_PRIORITY_PROPERTY, priority, STR_TO_INT, INT_TO_INT,
-                     "0");
-DEFINE_TASK_X_PROPERTY(const char *, attachments, "X-ERRANDS-ATTACHMENTS", STR_TO_STR, STR_TO_STR,
-                       "");
-DEFINE_TASK_X_PROPERTY(const char *, color, "X-ERRANDS-COLOR", STR_TO_STR, STR_TO_STR, "none");
-DEFINE_TASK_X_PROPERTY(const char *, list_uid, "X-ERRANDS-LIST-UID", STR_TO_STR, STR_TO_STR, "");
-DEFINE_TASK_X_PROPERTY(bool, deleted, "X-ERRANDS-DELETED", STR_TO_BOOL, BOOL_TO_STR, "0");
-DEFINE_TASK_X_PROPERTY(bool, expanded, "X-ERRANDS-EXPANDED", STR_TO_BOOL, BOOL_TO_STR, "0");
-DEFINE_TASK_X_PROPERTY(bool, notified, "X-ERRANDS-NOTIFIED", STR_TO_BOOL, BOOL_TO_STR, "0");
-DEFINE_TASK_X_PROPERTY(bool, synced, "X-ERRANDS-SYNCED", STR_TO_BOOL, BOOL_TO_STR, "0");
-DEFINE_TASK_X_PROPERTY(bool, toolbar_shown, "X-ERRANDS-TOOLBAR-SHOWN", STR_TO_BOOL, BOOL_TO_STR,
-                       "0");
-DEFINE_TASK_X_PROPERTY(bool, trash, "X-ERRANDS-TRASH", STR_TO_BOOL, BOOL_TO_STR, "0");
+}
+const char *task_data_get_created(TaskData *data) {
+  icalproperty *prop = icalcomponent_get_first_property(data, ICAL_DTSTAMP_PROPERTY);
+  if (prop) {
+    const char *out = icalproperty_get_value_as_string(prop);
+    if (!out)
+      return "";
+    return out;
+  }
+  return "";
+}
+void task_data_set_created(TaskData *data, const char *created) {
+  icalproperty *prop = icalcomponent_get_first_property(data, ICAL_DTSTAMP_PROPERTY);
+  if (prop) {
+    icalproperty_set_dtstamp(prop, icaltime_from_string(created));
+  } else {
+    prop = icalproperty_new_dtstamp(icaltime_from_string(created));
+    icalcomponent_add_property(data, prop);
+  }
+}
+const char *task_data_get_due(TaskData *data) {
+  icalproperty *prop = icalcomponent_get_first_property(data, ICAL_DUE_PROPERTY);
+  if (prop) {
+    const char *out = icalproperty_get_value_as_string(prop);
+    if (!out)
+      return "";
+    return out;
+  }
+  return "";
+}
+void task_data_set_due(TaskData *data, const char *due) {
+  icalproperty *prop = icalcomponent_get_first_property(data, ICAL_DUE_PROPERTY);
+  if (prop) {
+    icalproperty_set_due(prop, icaltime_from_string(due));
+  } else {
+    prop = icalproperty_new_due(icaltime_from_string(due));
+    icalcomponent_add_property(data, prop);
+  }
+}
+const char *task_data_get_start(TaskData *data) {
+  icalproperty *prop = icalcomponent_get_first_property(data, ICAL_DTSTART_PROPERTY);
+  if (prop) {
+    const char *out = icalproperty_get_value_as_string(prop);
+    if (!out)
+      return "";
+    return out;
+  }
+  return "";
+}
+void task_data_set_start(TaskData *data, const char *start) {
+  icalproperty *prop = icalcomponent_get_first_property(data, ICAL_DTSTART_PROPERTY);
+  if (prop) {
+    icalproperty_set_dtstart(prop, icaltime_from_string(start));
+  } else {
+    prop = icalproperty_new_dtstart(icaltime_from_string(start));
+    icalcomponent_add_property(data, prop);
+  }
+}
+const char *task_data_get_notes(TaskData *data) {
+  icalproperty *prop = icalcomponent_get_first_property(data, ICAL_DESCRIPTION_PROPERTY);
+  if (prop) {
+    const char *out = icalproperty_get_value_as_string(prop);
+    if (!out)
+      return "";
+    return out;
+  }
+  return "";
+}
+void task_data_set_notes(TaskData *data, const char *notes) {
+  icalproperty *prop = icalcomponent_get_first_property(data, ICAL_DESCRIPTION_PROPERTY);
+  if (prop) {
+    icalproperty_set_description(prop, notes);
+  } else {
+    prop = icalproperty_new_description(notes);
+    icalcomponent_add_property(data, prop);
+  }
+}
+const char *task_data_get_parent(TaskData *data) {
+  icalproperty *prop = icalcomponent_get_first_property(data, ICAL_RELATEDTO_PROPERTY);
+  if (prop) {
+    const char *out = icalproperty_get_value_as_string(prop);
+    if (!out)
+      return "";
+    return out;
+  }
+  return "";
+}
+void task_data_set_parent(TaskData *data, const char *parent) {
+  icalproperty *prop = icalcomponent_get_first_property(data, ICAL_RELATEDTO_PROPERTY);
+  if (prop) {
+    icalproperty_set_relatedto(prop, parent);
+  } else {
+    prop = icalproperty_new_relatedto(parent);
+    icalcomponent_add_property(data, prop);
+  }
+}
+const char *task_data_get_rrule(TaskData *data) {
+  icalproperty *prop = icalcomponent_get_first_property(data, ICAL_RRULE_PROPERTY);
+  if (prop) {
+    const char *out = icalproperty_get_value_as_string(prop);
+    if (!out)
+      return "";
+    return out;
+  }
+  return "";
+}
+void task_data_set_rrule(TaskData *data, const char *rrule) {
+  icalproperty *prop = icalcomponent_get_first_property(data, ICAL_RRULE_PROPERTY);
+  if (prop) {
+    icalproperty_set_rrule(prop, icalrecurrencetype_from_string(rrule));
+  } else {
+    prop = icalproperty_new_rrule(icalrecurrencetype_from_string(rrule));
+    icalcomponent_add_property(data, prop);
+  }
+}
+const char *task_data_get_text(TaskData *data) {
+  icalproperty *prop = icalcomponent_get_first_property(data, ICAL_SUMMARY_PROPERTY);
+  if (prop) {
+    const char *out = icalproperty_get_value_as_string(prop);
+    if (!out)
+      return "";
+    return out;
+  }
+  return "";
+}
+void task_data_set_text(TaskData *data, const char *text) {
+  icalproperty *prop = icalcomponent_get_first_property(data, ICAL_SUMMARY_PROPERTY);
+  if (prop) {
+    icalproperty_set_summary(prop, text);
+  } else {
+    prop = icalproperty_new_summary(text);
+    icalcomponent_add_property(data, prop);
+  }
+}
+const char *task_data_get_uid(TaskData *data) {
+  icalproperty *prop = icalcomponent_get_first_property(data, ICAL_UID_PROPERTY);
+  if (prop) {
+    const char *out = icalproperty_get_value_as_string(prop);
+    if (!out)
+      return "";
+    return out;
+  }
+  return "";
+}
+void task_data_set_uid(TaskData *data, const char *uid) {
+  icalproperty *prop = icalcomponent_get_first_property(data, ICAL_UID_PROPERTY);
+  if (prop) {
+    icalproperty_set_uid(prop, uid);
+  } else {
+    prop = icalproperty_new_uid(uid);
+    icalcomponent_add_property(data, prop);
+  }
+}
+const char *task_data_get_tags(TaskData *data) {
+  icalproperty *prop = icalcomponent_get_first_property(data, ICAL_CATEGORIES_PROPERTY);
+  if (prop) {
+    const char *out = icalproperty_get_value_as_string(prop);
+    if (!out)
+      return "";
+    return out;
+  }
+  return "";
+}
+void task_data_set_tags(TaskData *data, const char *tags) {
+  icalproperty *prop = icalcomponent_get_first_property(data, ICAL_CATEGORIES_PROPERTY);
+  if (prop) {
+    icalproperty_set_categories(prop, tags);
+  } else {
+    prop = icalproperty_new_categories(tags);
+    icalcomponent_add_property(data, prop);
+  }
+}
+uint8_t task_data_get_percent(TaskData *data) {
+  icalproperty *prop = icalcomponent_get_first_property(data, ICAL_PERCENTCOMPLETE_PROPERTY);
+  if (prop) {
+    const char *out = icalproperty_get_value_as_string(prop);
+    if (!out)
+      return atoi("0");
+    return atoi(out);
+  }
+  return atoi("0");
+}
+void task_data_set_percent(TaskData *data, uint8_t percent) {
+  icalproperty *prop = icalcomponent_get_first_property(data, ICAL_PERCENTCOMPLETE_PROPERTY);
+  if (prop) {
+    icalproperty_set_percentcomplete(prop, percent);
+  } else {
+    prop = icalproperty_new_percentcomplete(percent);
+    icalcomponent_add_property(data, prop);
+  }
+}
+uint8_t task_data_get_priority(TaskData *data) {
+  icalproperty *prop = icalcomponent_get_first_property(data, ICAL_PRIORITY_PROPERTY);
+  if (prop) {
+    const char *out = icalproperty_get_value_as_string(prop);
+    if (!out)
+      return atoi("0");
+    return atoi(out);
+  }
+  return atoi("0");
+}
+void task_data_set_priority(TaskData *data, uint8_t priority) {
+  icalproperty *prop = icalcomponent_get_first_property(data, ICAL_PRIORITY_PROPERTY);
+  if (prop) {
+    icalproperty_set_priority(prop, priority);
+  } else {
+    prop = icalproperty_new_priority(priority);
+    icalcomponent_add_property(data, prop);
+  }
+}
+GStrv task_data_get_attachments(TaskData *data) {
+  const char *prop = __get_x_prop_value(data, "X-ERRANDS-ATTACHMENTS", "");
+  if (prop)
+    return g_strsplit(prop, ",", -1);
+  return NULL;
+}
+void task_data_set_attachments(TaskData *data, GStrv attachments) {
+  g_autoptr(GString) str = g_string_new("");
+  size_t len = g_strv_length(attachments);
+  for (size_t i = 0; i < len; i++) {
+    g_string_append(str, attachments[i]);
+    if (i + 1 < len)
+      g_string_append_c(str, ',');
+  }
+  __set_x_prop_value(data, "X-ERRANDS-ATTACHMENTS", str->str);
+}
+const char *task_data_get_color(TaskData *data) {
+  return __get_x_prop_value(data, "X-ERRANDS-COLOR", "none");
+}
+void task_data_set_color(TaskData *data, const char *color) {
+  __set_x_prop_value(data, "X-ERRANDS-COLOR", color);
+};
+const char *task_data_get_list_uid(TaskData *data) {
+  return __get_x_prop_value(data, "X-ERRANDS-LIST-UID", "");
+}
+void task_data_set_list_uid(TaskData *data, const char *list_uid) {
+  __set_x_prop_value(data, "X-ERRANDS-LIST-UID", list_uid);
+}
+bool task_data_get_deleted(TaskData *data) {
+  return !strcmp(__get_x_prop_value(data, "X-ERRANDS-DELETED", "0"), "1") ? 1 : 0;
+}
+void task_data_set_deleted(TaskData *data, _Bool deleted) {
+  __set_x_prop_value(data, "X-ERRANDS-DELETED", deleted ? "1" : "0");
+}
+bool task_data_get_expanded(TaskData *data) {
+  return !strcmp(__get_x_prop_value(data, "X-ERRANDS-EXPANDED", "0"), "1") ? 1 : 0;
+}
+void task_data_set_expanded(TaskData *data, _Bool expanded) {
+  __set_x_prop_value(data, "X-ERRANDS-EXPANDED", expanded ? "1" : "0");
+}
+bool task_data_get_notified(TaskData *data) {
+  return !strcmp(__get_x_prop_value(data, "X-ERRANDS-NOTIFIED", "0"), "1") ? 1 : 0;
+}
+void task_data_set_notified(TaskData *data, _Bool notified) {
+  __set_x_prop_value(data, "X-ERRANDS-NOTIFIED", notified ? "1" : "0");
+}
+bool task_data_get_synced(TaskData *data) {
+  return !strcmp(__get_x_prop_value(data, "X-ERRANDS-SYNCED", "0"), "1") ? 1 : 0;
+}
+void task_data_set_synced(TaskData *data, _Bool synced) {
+  __set_x_prop_value(data, "X-ERRANDS-SYNCED", synced ? "1" : "0");
+}
+bool task_data_get_toolbar_shown(TaskData *data) {
+  return !strcmp(__get_x_prop_value(data, "X-ERRANDS-TOOLBAR-SHOWN", "0"), "1") ? 1 : 0;
+}
+void task_data_set_toolbar_shown(TaskData *data, _Bool toolbar_shown) {
+  __set_x_prop_value(data, "X-ERRANDS-TOOLBAR-SHOWN", toolbar_shown ? "1" : "0");
+}
+bool task_data_get_trash(TaskData *data) {
+  return !strcmp(__get_x_prop_value(data, "X-ERRANDS-TRASH", "0"), "1") ? 1 : 0;
+}
+void task_data_set_trash(TaskData *data, _Bool trash) {
+  __set_x_prop_value(data, "X-ERRANDS-TRASH", trash ? "1" : "0");
+}
 bool task_data_get_completed(ListData *data) {
   return __get_prop_value_or(data, ICAL_COMPLETED_PROPERTY, NULL) ? true : false;
 }
