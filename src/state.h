@@ -6,6 +6,7 @@
 #include "notes-window.h"
 #include "priority-window.h"
 #include "sidebar.h"
+#include "tags-window.h"
 #include "task-list.h"
 #include "window.h"
 
@@ -28,7 +29,7 @@ typedef struct {
   ErrandsColorWindow *color_window;
   ErrandsNotesWindow *notes_window;
   ErrandsPriorityWindow *priority_window;
-  // ErrandsTagsWindow *tags_window;
+  ErrandsTagsWindow *tags_window;
   // ErrandsDateWindow *date_window;
 } State;
 

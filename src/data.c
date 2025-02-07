@@ -1,7 +1,12 @@
 #include "data.h"
+#include "glib.h"
 #include "lib/cJSON.h"
 #include "settings.h"
 #include "utils.h"
+#include <libical/ical.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <string.h>
 
 #define PATH_SEP "/"
 const char *user_dir;
@@ -38,8 +43,7 @@ void __set_x_prop_value(icalcomponent *ical, const char *xprop, const char *val)
   icalproperty_set_x(property, val);
 }
 
-const char *__get_prop_value_str(icalcomponent *ical, icalproperty_kind kind,
-                                 const char *default_val) {
+const char *__get_prop_value_str(icalcomponent *ical, icalproperty_kind kind, const char *default_val) {
   icalproperty *property = icalcomponent_get_first_property(ical, kind);
   if (property)
     return icalproperty_get_value_as_string(property);
@@ -61,8 +65,7 @@ const char *__get_prop_value_or(icalcomponent *ical, icalproperty_kind kind, con
 
 // --- LIST DATA --- //
 
-ListData *list_data_new(const char *uid, const char *name, const char *color, bool deleted,
-                        bool synced, int position) {
+ListData *list_data_new(const char *uid, const char *name, const char *color, bool deleted, bool synced, int position) {
   icalcomponent *cal = icalcomponent_new(ICAL_VCALENDAR_COMPONENT);
   icalcomponent_add_property(cal, icalproperty_new_version("2.0"));
   icalcomponent_add_property(cal, icalproperty_new_prodid("~//Errands"));
@@ -118,8 +121,7 @@ GPtrArray *list_data_get_tasks(ListData *data) {
   return tasks;
 }
 
-TaskData *list_data_create_task(ListData *list, const char *text, const char *list_uid,
-                                const char *parent) {
+TaskData *list_data_create_task(ListData *list, const char *text, const char *list_uid, const char *parent) {
   TaskData *task_data = icalcomponent_new(ICAL_VTODO_COMPONENT);
   g_autofree gchar *uid = g_uuid_string_random();
   task_data_set_uid(task_data, uid);
@@ -148,42 +150,70 @@ gchar *list_data_print(ListData *data) {
   return g_string_free(out, false);
 }
 
-const char *list_data_get_color(ListData *data) {
-  return __get_x_prop_value(data, "X-ERRANDS-COLOR", "");
-}
-void list_data_set_color(ListData *data, const char *color) {
-  __set_x_prop_value(data, "X-ERRANDS-COLOR", color);
-}
-const char *list_data_get_name(ListData *data) {
-  return __get_x_prop_value(data, "X-WR-CALNAME", "Untitled");
-}
-void list_data_set_name(ListData *data, const char *name) {
-  __set_x_prop_value(data, "X-WR-CALNAME", name);
-}
-const char *list_data_get_uid(ListData *data) {
-  return __get_x_prop_value(data, "X-ERRANDS-LIST-UID", "");
-}
-void list_data_set_uid(ListData *data, const char *uid) {
-  __set_x_prop_value(data, "X-ERRANDS-LIST-UID", uid);
-}
-bool list_data_get_deleted(ListData *data) {
-  return (bool)atoi(__get_x_prop_value(data, "X-ERRANDS-DELETED", "0"));
-}
+const char *list_data_get_color(ListData *data) { return __get_x_prop_value(data, "X-ERRANDS-COLOR", ""); }
+void list_data_set_color(ListData *data, const char *color) { __set_x_prop_value(data, "X-ERRANDS-COLOR", color); }
+const char *list_data_get_name(ListData *data) { return __get_x_prop_value(data, "X-WR-CALNAME", "Untitled"); }
+void list_data_set_name(ListData *data, const char *name) { __set_x_prop_value(data, "X-WR-CALNAME", name); }
+const char *list_data_get_uid(ListData *data) { return __get_x_prop_value(data, "X-ERRANDS-LIST-UID", ""); }
+void list_data_set_uid(ListData *data, const char *uid) { __set_x_prop_value(data, "X-ERRANDS-LIST-UID", uid); }
+bool list_data_get_deleted(ListData *data) { return (bool)atoi(__get_x_prop_value(data, "X-ERRANDS-DELETED", "0")); }
 void list_data_set_deleted(ListData *data, bool deleted) {
   __set_x_prop_value(data, "X-ERRANDS-DELETED", deleted ? "1" : "0");
 }
-int list_data_get_position(ListData *data) {
-  return atoi(__get_x_prop_value(data, "X-ERRANDS-POSITION", "0"));
-}
+int list_data_get_position(ListData *data) { return atoi(__get_x_prop_value(data, "X-ERRANDS-POSITION", "0")); }
 void list_data_set_position(ListData *data, int position) {
   g_autofree gchar *pos = g_strdup_printf("%d", position);
   __set_x_prop_value(data, "X-ERRANDS-POSITION", pos);
 }
-bool list_data_get_synced(ListData *data) {
-  return (bool)atoi(__get_x_prop_value(data, "X-ERRANDS-SYNCED", "0"));
-}
+bool list_data_get_synced(ListData *data) { return (bool)atoi(__get_x_prop_value(data, "X-ERRANDS-SYNCED", "0")); }
 void list_data_set_synced(ListData *data, bool synced) {
   __set_x_prop_value(data, "X-ERRANDS-SYNCED", synced ? "1" : "0");
+}
+GStrv list_data_get_tags(ListData *data) {
+  const char *str = __get_x_prop_value(data, "X-ERRANDS-TAGS", "");
+  if (!str || !strcmp(str, ""))
+    return NULL;
+  return g_strsplit(str, ",", -1);
+}
+GStrv list_data_get_all_tags() {
+  g_autoptr(GStrvBuilder) builder = g_strv_builder_new();
+  for (size_t i = 0; i < ldata->len; i++) {
+    g_auto(GStrv) tags = list_data_get_tags(ldata->pdata[i]);
+    if (tags)
+      g_strv_builder_addv(builder, (const char **)tags);
+  }
+  return g_strv_builder_end(builder);
+}
+void list_data_add_tag(ListData *data, const char *tag) {
+  g_auto(GStrv) tags = list_data_get_tags(data);
+  g_autoptr(GStrvBuilder) builder = g_strv_builder_new();
+  if (tags)
+    g_strv_builder_addv(builder, (const char **)tags);
+  g_strv_builder_add(builder, tag);
+  g_auto(GStrv) new_tags = g_strv_builder_end(builder);
+  list_data_set_tags(data, new_tags);
+}
+void list_data_remove_tag(ListData *data, const char *tag) {
+  g_auto(GStrv) tags = list_data_get_tags(data);
+  g_autoptr(GStrvBuilder) builder = g_strv_builder_new();
+  for (size_t i = 0; i < g_strv_length(tags); i++)
+    if (strcmp(tag, tags[i]))
+      g_strv_builder_add(builder, tags[i]);
+  g_auto(GStrv) new_tags = g_strv_builder_end(builder);
+  list_data_set_tags(data, new_tags);
+  // Remove tag from all tasks too
+  for (size_t i = 0; i < tdata->len; i++)
+    task_data_remove_tag(tdata->pdata[i], tag);
+}
+void list_data_set_tags(ListData *data, GStrv tags) {
+  g_autoptr(GString) str = g_string_new("");
+  size_t len = g_strv_length(tags);
+  for (size_t i = 0; i < len; i++) {
+    g_string_append(str, tags[i]);
+    if (i + 1 < len)
+      g_string_append_c(str, ',');
+  }
+  __set_x_prop_value(data, "X-ERRANDS-TAGS", str->str);
 }
 
 // --- TASK DATA --- //
@@ -210,6 +240,7 @@ GPtrArray *task_data_get_children(TaskData *data) {
 }
 
 void task_data_print(TaskData *data, GString *out, size_t indent) {
+  const uint8_t max_line_len = 72;
   for (size_t i = 0; i < indent; i++)
     g_string_append(out, "  ");
   g_string_append_printf(out, "[%s] ", task_data_get_completed(data) ? "x" : " ");
@@ -220,7 +251,7 @@ void task_data_print(TaskData *data, GString *out, size_t indent) {
     g_string_append_c(out, c);
     count++;
     c = text[count];
-    if (count % 72 == 0) {
+    if (count % max_line_len == 0) {
       g_string_append_c(out, '\n');
       for (size_t i = 0; i < indent; i++)
         g_string_append(out, "  ");
@@ -405,23 +436,31 @@ void task_data_set_uid(TaskData *data, const char *uid) {
     icalcomponent_add_property(data, prop);
   }
 }
-const char *task_data_get_tags(TaskData *data) {
-  icalproperty *prop = icalcomponent_get_first_property(data, ICAL_CATEGORIES_PROPERTY);
-  if (prop) {
-    const char *out = icalproperty_get_value_as_string(prop);
-    if (!out)
-      return "";
-    return out;
-  }
-  return "";
+GStrv task_data_get_tags(TaskData *data) {
+  g_autoptr(GStrvBuilder) builder = g_strv_builder_new();
+  icalproperty *p;
+  for (p = icalcomponent_get_first_property(data, ICAL_CATEGORIES_PROPERTY); p != 0;
+       p = icalcomponent_get_next_property(data, ICAL_CATEGORIES_PROPERTY))
+    g_strv_builder_add(builder, icalproperty_get_value_as_string(p));
+  GStrv tags = g_strv_builder_end(builder);
+  if (tags)
+    return tags;
+  return NULL;
 }
-void task_data_set_tags(TaskData *data, const char *tags) {
-  icalproperty *prop = icalcomponent_get_first_property(data, ICAL_CATEGORIES_PROPERTY);
-  if (prop) {
-    icalproperty_set_categories(prop, tags);
-  } else {
-    prop = icalproperty_new_categories(tags);
-    icalcomponent_add_property(data, prop);
+void task_data_add_tag(TaskData *data, const char *tag) {
+  LOG("User Data: Add tag '%s' to task '%s'", tag, task_data_get_uid(data));
+  g_auto(GStrv) tags = task_data_get_tags(data);
+  if (!tags || (tags && !g_strv_contains((const gchar *const *)tags, tag)))
+    icalcomponent_add_property(data, icalproperty_new_categories(tag));
+}
+void task_data_remove_tag(TaskData *data, const char *tag) {
+  icalproperty *p;
+  for (p = icalcomponent_get_first_property(data, ICAL_CATEGORIES_PROPERTY); p != 0;
+       p = icalcomponent_get_next_property(data, ICAL_CATEGORIES_PROPERTY)) {
+    if (!strcmp(tag, icalproperty_get_value_as_string(p))) {
+      icalcomponent_remove_property(data, p);
+      return;
+    }
   }
 }
 uint8_t task_data_get_percent(TaskData *data) {
@@ -478,15 +517,9 @@ void task_data_set_attachments(TaskData *data, GStrv attachments) {
   }
   __set_x_prop_value(data, "X-ERRANDS-ATTACHMENTS", str->str);
 }
-const char *task_data_get_color(TaskData *data) {
-  return __get_x_prop_value(data, "X-ERRANDS-COLOR", "none");
-}
-void task_data_set_color(TaskData *data, const char *color) {
-  __set_x_prop_value(data, "X-ERRANDS-COLOR", color);
-};
-const char *task_data_get_list_uid(TaskData *data) {
-  return __get_x_prop_value(data, "X-ERRANDS-LIST-UID", "");
-}
+const char *task_data_get_color(TaskData *data) { return __get_x_prop_value(data, "X-ERRANDS-COLOR", "none"); }
+void task_data_set_color(TaskData *data, const char *color) { __set_x_prop_value(data, "X-ERRANDS-COLOR", color); };
+const char *task_data_get_list_uid(TaskData *data) { return __get_x_prop_value(data, "X-ERRANDS-LIST-UID", ""); }
 void task_data_set_list_uid(TaskData *data, const char *list_uid) {
   __set_x_prop_value(data, "X-ERRANDS-LIST-UID", list_uid);
 }
@@ -573,8 +606,7 @@ static void errands_data_migrate() {
     const bool synced = (bool)cJSON_GetObjectItem(cal_item, "synced")->valueint;
     const char *name = cJSON_GetObjectItem(cal_item, "name")->valuestring;
     const char *list_uid = cJSON_GetObjectItem(cal_item, "uid")->valuestring;
-    ListData *calendar =
-        list_data_new(list_uid, name, !strcmp(color, "") ? "none" : color, deleted, synced, i);
+    ListData *calendar = list_data_new(list_uid, name, !strcmp(color, "") ? "none" : color, deleted, synced, i);
 
     // Add events
     cJSON *tasks_arr = cJSON_GetObjectItem(json, "tasks");
@@ -627,8 +659,7 @@ static void errands_data_migrate() {
         icalcomponent_add_property(event, icalproperty_new_completed(icaltime_today()));
       if (strcmp(tags->str, ""))
         icalcomponent_add_property(event, icalproperty_new_categories(tags->str));
-      icalcomponent_add_property(event,
-                                 icalproperty_new_lastmodified(icaltime_from_string(changed_at)));
+      icalcomponent_add_property(event, icalproperty_new_lastmodified(icaltime_from_string(changed_at)));
       icalcomponent_add_property(event, icalproperty_new_dtstamp(icaltime_from_string(created_at)));
       if (strcmp(due_date, ""))
         icalcomponent_add_property(event, icalproperty_new_due(icaltime_from_string(due_date)));
@@ -639,11 +670,9 @@ static void errands_data_migrate() {
       icalcomponent_add_property(event, icalproperty_new_percentcomplete(percent_complete));
       icalcomponent_add_property(event, icalproperty_new_priority(priority));
       if (strcmp(rrule, ""))
-        icalcomponent_add_property(event,
-                                   icalproperty_new_rrule(icalrecurrencetype_from_string(rrule)));
+        icalcomponent_add_property(event, icalproperty_new_rrule(icalrecurrencetype_from_string(rrule)));
       if (strcmp(start_date, ""))
-        icalcomponent_add_property(event,
-                                   icalproperty_new_dtstart(icaltime_from_string(start_date)));
+        icalcomponent_add_property(event, icalproperty_new_dtstart(icaltime_from_string(start_date)));
       icalcomponent_add_property(event, icalproperty_new_summary(text));
       icalcomponent_add_property(event, icalproperty_new_uid(uid));
       __set_x_prop_value(event, "X-ERRANDS-ATTACHMENTS", attachments->str);
@@ -659,8 +688,7 @@ static void errands_data_migrate() {
       icalcomponent_add_component(calendar, event);
     }
     g_autofree gchar *calendar_filename = g_strdup_printf("%s.ics", list_uid);
-    g_autofree gchar *calendar_file_path =
-        g_build_path(PATH_SEP, user_dir, calendar_filename, NULL);
+    g_autofree gchar *calendar_file_path = g_build_path(PATH_SEP, user_dir, calendar_filename, NULL);
     write_string_to_file(calendar_file_path, icalcomponent_as_ical_string(calendar));
   }
   cJSON_Delete(json);
@@ -691,8 +719,7 @@ void errands_data_load_lists() {
         icalcomponent *calendar = icalparser_parse_string(content);
         if (calendar) {
           // Delete file if calendar deleted and sync is off
-          if (!errands_settings_get("sync", SETTING_TYPE_BOOL).b &&
-              list_data_get_deleted(calendar)) {
+          if (!errands_settings_get("sync", SETTING_TYPE_BOOL).b && list_data_get_deleted(calendar)) {
             LOG("User Data: Calendar was deleted. Removing %s", path);
             icalcomponent_free(calendar);
             remove(path);

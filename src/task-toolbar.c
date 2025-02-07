@@ -2,12 +2,13 @@
 #include "attachments-window.h"
 #include "color-window.h"
 #include "data.h"
+#include "glib.h"
 #include "notes-window.h"
 #include "priority-window.h"
+#include "tags-window.h"
 #include "task.h"
 #include "utils.h"
 // #include "date-window.h"
-// #include "tags-window.h"
 
 #include <glib/gi18n.h>
 
@@ -70,7 +71,7 @@ ErrandsTaskToolbar *errands_task_toolbar_new(ErrandsTask *task) {
   g_signal_connect_swapped(tb->notes_btn, "clicked", G_CALLBACK(errands_notes_window_show), task);
   g_signal_connect_swapped(tb->priority_btn, "clicked", G_CALLBACK(errands_priority_window_show),
                            task);
-  // g_signal_connect_swapped(tb->tags_btn, "clicked", G_CALLBACK(errands_tags_window_show), task);
+  g_signal_connect_swapped(tb->tags_btn, "clicked", G_CALLBACK(errands_tags_window_show), task);
   g_signal_connect_swapped(tb->attachments_btn, "clicked",
                            G_CALLBACK(errands_attachments_window_show), task);
   g_signal_connect_swapped(tb->color_btn, "clicked", G_CALLBACK(errands_color_window_show), task);
@@ -79,8 +80,9 @@ ErrandsTaskToolbar *errands_task_toolbar_new(ErrandsTask *task) {
   if (strcmp(task_data_get_notes(task->data), ""))
     gtk_widget_add_css_class(tb->notes_btn, "accent");
   // Attachments button
-  // if (task_data_get_attachments(task->data)->len > 0)
-  //   gtk_widget_add_css_class(tb->attachments_btn, "accent");
+  GStrv attachments = task_data_get_attachments(task->data);
+  if (attachments && g_strv_length(attachments) > 0)
+    gtk_widget_add_css_class(tb->attachments_btn, "accent");
   // Priority button
   uint8_t priority = task_data_get_priority(task->data);
   gtk_button_set_icon_name(GTK_BUTTON(tb->priority_btn), priority > 0

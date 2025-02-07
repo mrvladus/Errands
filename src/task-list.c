@@ -1,9 +1,6 @@
 #include "task-list.h"
 #include "components.h"
 #include "data.h"
-#include "glib.h"
-#include "glibconfig.h"
-#include "gtk/gtk.h"
 #include "settings.h"
 // #include "sidebar-all-row.h"
 // #include "sidebar-task-list-row.h"
@@ -12,9 +9,6 @@
 #include "utils.h"
 
 #include <glib/gi18n.h>
-
-#include <stddef.h>
-#include <string.h>
 
 static void on_task_added(AdwEntryRow *entry, gpointer data);
 static void on_task_list_search(GtkSearchEntry *entry, gpointer user_data);
@@ -50,8 +44,7 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   gtk_box_append(GTK_BOX(menu_box), filter_label);
 
   GtkWidget *show_completed = errands_menu_check_item(
-      _("Show Completed"), errands_settings_get("show_completed", SETTING_TYPE_BOOL).b,
-      on_toggle_completed);
+      _("Show Completed"), errands_settings_get("show_completed", SETTING_TYPE_BOOL).b, on_toggle_completed);
   gtk_box_append(GTK_BOX(menu_box), show_completed);
   gtk_box_append(GTK_BOX(menu_box), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL));
 
@@ -88,8 +81,8 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   g_object_set(menu_popover, "child", menu_box, NULL);
 
   GtkWidget *menu_btn = gtk_menu_button_new();
-  g_object_set(menu_btn, "icon-name", "errands-more-symbolic", "tooltip-text", _("Filter and Sort"),
-               "popover", menu_popover, NULL);
+  g_object_set(menu_btn, "icon-name", "errands-more-symbolic", "tooltip-text", _("Filter and Sort"), "popover",
+               menu_popover, NULL);
 
   adw_header_bar_pack_start(ADW_HEADER_BAR(hb), menu_btn);
 
@@ -97,11 +90,9 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   GtkWidget *sb = gtk_search_bar_new();
   adw_toolbar_view_add_top_bar(ADW_TOOLBAR_VIEW(tb), sb);
   self->search_btn = gtk_toggle_button_new();
-  g_object_set(self->search_btn, "icon-name", "errands-search-symbolic", "tooltip-text",
-               _("Search (Ctrl+F)"), NULL);
+  g_object_set(self->search_btn, "icon-name", "errands-search-symbolic", "tooltip-text", _("Search (Ctrl+F)"), NULL);
   gtk_widget_add_css_class(self->search_btn, "flat");
-  g_object_bind_property(self->search_btn, "active", sb, "search-mode-enabled",
-                         G_BINDING_BIDIRECTIONAL);
+  g_object_bind_property(self->search_btn, "active", sb, "search-mode-enabled", G_BINDING_BIDIRECTIONAL);
   g_signal_connect(self->search_btn, "toggled", G_CALLBACK(on_search_btn_toggle), NULL);
   errands_add_shortcut(self->search_btn, "<Control>F", "activate");
   adw_header_bar_pack_end(ADW_HEADER_BAR(hb), self->search_btn);
@@ -113,16 +104,15 @@ static void errands_task_list_init(ErrandsTaskList *self) {
 
   // Entry
   GtkWidget *task_entry = adw_entry_row_new();
-  g_object_set(task_entry, "title", _("Add Task"), "activatable", false, "margin-start", 12,
-               "margin-end", 12, NULL);
+  g_object_set(task_entry, "title", _("Add Task"), "activatable", false, "margin-start", 12, "margin-end", 12, NULL);
   gtk_widget_add_css_class(task_entry, "card");
   g_signal_connect(task_entry, "entry-activated", G_CALLBACK(on_task_added), NULL);
   GtkWidget *entry_clamp = adw_clamp_new();
-  g_object_set(entry_clamp, "child", task_entry, "tightening-threshold", 300, "maximum-size", 1000,
-               "margin-top", 6, "margin-bottom", 6, NULL);
+  g_object_set(entry_clamp, "child", task_entry, "tightening-threshold", 300, "maximum-size", 1000, "margin-top", 6,
+               "margin-bottom", 6, NULL);
   self->entry = gtk_revealer_new();
-  g_object_set(self->entry, "child", entry_clamp, "transition-type",
-               GTK_REVEALER_TRANSITION_TYPE_SWING_DOWN, "margin-start", 12, "margin-end", 12, NULL);
+  g_object_set(self->entry, "child", entry_clamp, "transition-type", GTK_REVEALER_TRANSITION_TYPE_SWING_DOWN,
+               "margin-start", 12, "margin-end", 12, NULL);
 
   // Tasks Box
   self->task_list = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
@@ -142,14 +132,13 @@ static void errands_task_list_init(ErrandsTaskList *self) {
 
   // Task list clamp
   GtkWidget *tbox_clamp = adw_clamp_new();
-  g_object_set(tbox_clamp, "tightening-threshold", 300, "maximum-size", 1000, "margin-start", 12,
-               "margin-end", 12, NULL);
+  g_object_set(tbox_clamp, "tightening-threshold", 300, "maximum-size", 1000, "margin-start", 12, "margin-end", 12,
+               NULL);
   adw_clamp_set_child(ADW_CLAMP(tbox_clamp), self->task_list);
 
   // Scrolled window
   GtkWidget *scrl = gtk_scrolled_window_new();
-  g_object_set(scrl, "child", tbox_clamp, "propagate-natural-height", true,
-               "propagate-natural-width", true, NULL);
+  g_object_set(scrl, "child", tbox_clamp, "propagate-natural-height", true, "propagate-natural-width", true, NULL);
 
   // VBox
   GtkWidget *vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
@@ -158,8 +147,7 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   adw_toolbar_view_set_content(ADW_TOOLBAR_VIEW(tb), vbox);
 
   // Create task list page in the view stack
-  adw_view_stack_add_named(ADW_VIEW_STACK(state.main_window->stack), GTK_WIDGET(self),
-                           "errands_task_list_page");
+  adw_view_stack_add_named(ADW_VIEW_STACK(state.main_window->stack), GTK_WIDGET(self), "errands_task_list_page");
 
   errands_task_list_sort_recursive(self->task_list);
 }
@@ -213,6 +201,21 @@ void errands_task_list_update_title() {
   adw_window_title_set_subtitle(ADW_WINDOW_TITLE(state.task_list->title), total > 0 ? stats : "");
 }
 
+static void __append_tasks(GPtrArray *arr, GtkWidget *task_list) {
+  g_autoptr(GPtrArray) tasks = get_children(task_list);
+  for (size_t i = 0; i < tasks->len; i++) {
+    ErrandsTask *t = tasks->pdata[i];
+    g_ptr_array_add(arr, t);
+    __append_tasks(arr, t->sub_tasks);
+  }
+}
+
+GPtrArray *errands_task_list_get_all_tasks() {
+  GPtrArray *arr = g_ptr_array_new();
+  __append_tasks(arr, state.task_list->task_list);
+  return arr;
+}
+
 void errands_task_list_filter_by_completion(GtkWidget *task_list, bool show_completed) {
   g_autoptr(GPtrArray) tasks = get_children(task_list);
   for (size_t i = 0; i < tasks->len; i++) {
@@ -220,8 +223,7 @@ void errands_task_list_filter_by_completion(GtkWidget *task_list, bool show_comp
     bool deleted = task_data_get_deleted(task->data);
     bool trash = task_data_get_trash(task->data);
     bool completed = task_data_get_completed(task->data);
-    gtk_revealer_set_reveal_child(GTK_REVEALER(task->revealer),
-                                  !deleted && !trash && (!completed || show_completed));
+    gtk_revealer_set_reveal_child(GTK_REVEALER(task->revealer), !deleted && !trash && (!completed || show_completed));
     errands_task_list_filter_by_completion(task->sub_tasks, show_completed);
   }
 }
@@ -245,8 +247,7 @@ void errands_task_list_filter_by_uid(const char *uid) {
 }
 
 bool errands_task_list_filter_by_text(GtkWidget *task_list, const char *text) {
-  bool search_all_tasks =
-      !state.task_list->data || !strcmp(list_data_get_uid(state.task_list->data), "");
+  bool search_all_tasks = !state.task_list->data || !strcmp(list_data_get_uid(state.task_list->data), "");
 
   g_autoptr(GPtrArray) tasks = get_children(task_list);
   if (search_all_tasks) {
@@ -255,9 +256,10 @@ bool errands_task_list_filter_by_text(GtkWidget *task_list, const char *text) {
       ErrandsTask *task = tasks->pdata[i];
       if (task_data_get_deleted(task->data) || task_data_get_trash(task->data))
         continue;
+      GStrv tags = task_data_get_tags(task->data);
       bool contains = string_contains(task_data_get_text(task->data), text) ||
                       string_contains(task_data_get_notes(task->data), text) ||
-                      string_contains(task_data_get_tags(task->data), text);
+                      (tags && g_strv_contains((const gchar *const *)tags, text));
       bool sub_tasks_contains = errands_task_list_filter_by_text(task->sub_tasks, text);
       if (contains || sub_tasks_contains) {
         res = true;
@@ -274,9 +276,10 @@ bool errands_task_list_filter_by_text(GtkWidget *task_list, const char *text) {
         continue;
       if (task_data_get_deleted(task->data) || task_data_get_trash(task->data))
         continue;
+      GStrv tags = task_data_get_tags(task->data);
       bool contains = string_contains(task_data_get_text(task->data), text) ||
                       string_contains(task_data_get_notes(task->data), text) ||
-                      string_contains(task_data_get_tags(task->data), text);
+                      (tags && g_strv_contains((const gchar *const *)tags, text));
       bool sub_tasks_contains = errands_task_list_filter_by_text(task->sub_tasks, text);
       if (contains || sub_tasks_contains) {
         res = true;

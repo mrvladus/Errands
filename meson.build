@@ -33,6 +33,7 @@ sources = files(
   'src/sidebar-task-list-row.c',
   'src/sidebar.c',
   'src/state.c',
+  'src/tags-window.c',
   'src/task-list.c',
   'src/task-toolbar.c',
   'src/task.c',

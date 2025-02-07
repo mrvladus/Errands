@@ -1,6 +1,7 @@
 #pragma once
 
 #include "data.h"
+#include "glib.h"
 
 #include <adwaita.h>
 
@@ -19,6 +20,7 @@ struct _ErrandsTaskList {
 ErrandsTaskList *errands_task_list_new();
 void errands_task_list_add(TaskData *td);
 void errands_task_list_update_title();
+GPtrArray *errands_task_list_get_all_tasks();
 bool errands_task_list_filter_by_text(GtkWidget *task_list, const char *text);
 void errands_task_list_filter_by_completion(GtkWidget *task_list, bool show_completed);
 void errands_task_list_filter_by_uid(const char *uid);

@@ -33,6 +33,12 @@ bool list_data_get_synced(ListData *data);
 void list_data_set_synced(ListData *data, bool synced);
 int list_data_get_position(ListData *data);
 void list_data_set_position(ListData *data, int position);
+GStrv list_data_get_tags(ListData *data);
+// Get all tags from all the lists
+GStrv list_data_get_all_tags();
+void list_data_add_tag(ListData *data, const char *tag);
+void list_data_remove_tag(ListData *data, const char *tag);
+void list_data_set_tags(ListData *data, GStrv tags);
 
 TaskData *task_data_new(ListData *list, const char *text, const char *parent);
 void task_data_free(TaskData *data);
@@ -58,8 +64,10 @@ const char *task_data_get_text(TaskData *data);
 void task_data_set_text(TaskData *data, const char *text);
 const char *task_data_get_uid(TaskData *data);
 void task_data_set_uid(TaskData *data, const char *uid);
-const char *task_data_get_tags(TaskData *data);
-void task_data_set_tags(TaskData *data, const char *tags);
+// Returns NULL on error
+GStrv task_data_get_tags(TaskData *data);
+void task_data_add_tag(TaskData *data, const char *tag);
+void task_data_remove_tag(TaskData *data, const char *tag);
 // Returns NULL on error
 GStrv task_data_get_attachments(TaskData *data);
 void task_data_set_attachments(TaskData *data, GStrv attachments);

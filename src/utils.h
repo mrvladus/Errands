@@ -9,11 +9,10 @@
 
 // Log formatted message
 #define LOG(format, ...) fprintf(stderr, "\033[0;32m[Errands] \033[0m" format "\n", ##__VA_ARGS__)
-#define ERROR(format, ...)                                                                         \
-  fprintf(stderr, "\033[1;31m[Errands Error] " format "\033[0m\n", ##__VA_ARGS__)
+#define ERROR(format, ...) fprintf(stderr, "\033[1;31m[Errands Error] " format "\033[0m\n", ##__VA_ARGS__)
 
-// For range
-#define for_range(var, from, to) for (int var = from; var < to; var++)
+// For range from start to end - 1
+#define for_range(var, start, end) for (int var = start; var < end; var++)
 
 // Get children of the widget
 static inline GPtrArray *get_children(GtkWidget *parent) {
@@ -81,12 +80,11 @@ static inline void gdk_rgba_to_hex_string(const GdkRGBA *rgba, char *hex_string)
 }
 
 // Add shortcut to the widget
-static inline void errands_add_shortcut(GtkWidget *widget, const char *trigger,
-                                        const char *action) {
+static inline void errands_add_shortcut(GtkWidget *widget, const char *trigger, const char *action) {
   GtkEventController *ctrl = gtk_shortcut_controller_new();
   gtk_shortcut_controller_set_scope(GTK_SHORTCUT_CONTROLLER(ctrl), GTK_SHORTCUT_SCOPE_GLOBAL);
-  GtkShortcut *sc = gtk_shortcut_new(gtk_shortcut_trigger_parse_string(trigger),
-                                     gtk_shortcut_action_parse_string(action));
+  GtkShortcut *sc =
+      gtk_shortcut_new(gtk_shortcut_trigger_parse_string(trigger), gtk_shortcut_action_parse_string(action));
   gtk_shortcut_controller_add_shortcut(GTK_SHORTCUT_CONTROLLER(ctrl), sc);
   gtk_widget_add_controller(widget, ctrl);
 }
@@ -348,30 +346,30 @@ static bool string_is_number(const char *str) {
 }
 
 // Generic dynamic array
-#define DECLARE_DYNAMIC_ARRAY(type, item_type, func_prefix)                                        \
-  typedef struct type {                                                                            \
-    size_t len;                                                                                    \
-    size_t capacity;                                                                               \
-    item_type *data;                                                                               \
-  } type;                                                                                          \
-                                                                                                   \
-  static inline type func_prefix##_array_new() {                                                   \
-    type array;                                                                                    \
-    array.len = 0;                                                                                 \
-    array.capacity = 2;                                                                            \
-    array.data = malloc(sizeof(type) * array.capacity);                                            \
-    return array;                                                                                  \
-  }                                                                                                \
-                                                                                                   \
-  static inline void func_prefix##_array_append(type *array, type data) {                          \
-    if (array->len == array->capacity) {                                                           \
-      array->capacity *= 2;                                                                        \
-      type *new_data = realloc(array->data, array->capacity * sizeof(type));                       \
-      if (!new_data) {                                                                             \
-        printf("Failed to reallocate memory for array");                                           \
-        return;                                                                                    \
-      }                                                                                            \
-      array->data = new_data;                                                                      \
-    }                                                                                              \
-    array->data[array->len++] = data;                                                              \
+#define DECLARE_DYNAMIC_ARRAY(type, item_type, func_prefix)                                                            \
+  typedef struct type {                                                                                                \
+    size_t len;                                                                                                        \
+    size_t capacity;                                                                                                   \
+    item_type *data;                                                                                                   \
+  } type;                                                                                                              \
+                                                                                                                       \
+  static inline type func_prefix##_array_new() {                                                                       \
+    type array;                                                                                                        \
+    array.len = 0;                                                                                                     \
+    array.capacity = 2;                                                                                                \
+    array.data = malloc(sizeof(type) * array.capacity);                                                                \
+    return array;                                                                                                      \
+  }                                                                                                                    \
+                                                                                                                       \
+  static inline void func_prefix##_array_append(type *array, type data) {                                              \
+    if (array->len == array->capacity) {                                                                               \
+      array->capacity *= 2;                                                                                            \
+      type *new_data = realloc(array->data, array->capacity * sizeof(type));                                           \
+      if (!new_data) {                                                                                                 \
+        printf("Failed to reallocate memory for array");                                                               \
+        return;                                                                                                        \
+      }                                                                                                                \
+      array->data = new_data;                                                                                          \
+    }                                                                                                                  \
+    array->data[array->len++] = data;                                                                                  \
   }
