@@ -18,17 +18,15 @@ static void errands_task_toolbar_class_init(ErrandsTaskToolbarClass *class) {}
 
 static void errands_task_toolbar_init(ErrandsTaskToolbar *self) {
   GtkWidget *box = gtk_flow_box_new();
-  g_object_set(box, "selection-mode", GTK_SELECTION_NONE, "margin-start", 12, "margin-end", 12,
-               "margin-bottom", 6, "max-children-per-line", 2, NULL);
+  g_object_set(box, "selection-mode", GTK_SELECTION_NONE, "margin-start", 6, "margin-end", 6, "margin-bottom", 6,
+               "max-children-per-line", 2, NULL);
   adw_bin_set_child(ADW_BIN(self), box);
 
   // Date button
   GtkWidget *date_btn_content = adw_button_content_new();
-  g_object_set(date_btn_content, "icon-name", "errands-calendar-symbolic", "label", _("Date"),
-               NULL);
+  g_object_set(date_btn_content, "icon-name", "errands-calendar-symbolic", "label", _("Date"), NULL);
   self->date_btn = gtk_button_new();
-  g_object_set(self->date_btn, "child", date_btn_content, "halign", GTK_ALIGN_START, "hexpand",
-               true, NULL);
+  g_object_set(self->date_btn, "child", date_btn_content, "halign", GTK_ALIGN_START, "hexpand", true, NULL);
   gtk_widget_add_css_class(self->date_btn, "flat");
   gtk_widget_add_css_class(self->date_btn, "caption");
   gtk_flow_box_append(GTK_FLOW_BOX(box), self->date_btn);
@@ -69,11 +67,9 @@ ErrandsTaskToolbar *errands_task_toolbar_new(ErrandsTask *task) {
   // Connect signals
   // g_signal_connect_swapped(tb->date_btn, "clicked", G_CALLBACK(errands_date_window_show), task);
   g_signal_connect_swapped(tb->notes_btn, "clicked", G_CALLBACK(errands_notes_window_show), task);
-  g_signal_connect_swapped(tb->priority_btn, "clicked", G_CALLBACK(errands_priority_window_show),
-                           task);
+  g_signal_connect_swapped(tb->priority_btn, "clicked", G_CALLBACK(errands_priority_window_show), task);
   g_signal_connect_swapped(tb->tags_btn, "clicked", G_CALLBACK(errands_tags_window_show), task);
-  g_signal_connect_swapped(tb->attachments_btn, "clicked",
-                           G_CALLBACK(errands_attachments_window_show), task);
+  g_signal_connect_swapped(tb->attachments_btn, "clicked", G_CALLBACK(errands_attachments_window_show), task);
   g_signal_connect_swapped(tb->color_btn, "clicked", G_CALLBACK(errands_color_window_show), task);
   // Update css for buttons
   // Notes button
@@ -85,9 +81,8 @@ ErrandsTaskToolbar *errands_task_toolbar_new(ErrandsTask *task) {
     gtk_widget_add_css_class(tb->attachments_btn, "accent");
   // Priority button
   uint8_t priority = task_data_get_priority(task->data);
-  gtk_button_set_icon_name(GTK_BUTTON(tb->priority_btn), priority > 0
-                                                             ? "errands-priority-set-symbolic"
-                                                             : "errands-priority-symbolic");
+  gtk_button_set_icon_name(GTK_BUTTON(tb->priority_btn),
+                           priority > 0 ? "errands-priority-set-symbolic" : "errands-priority-symbolic");
   if (priority > 0 && priority < 3)
     gtk_widget_add_css_class(tb->priority_btn, "priority-low");
   else if (priority > 3 && priority < 6)
@@ -108,8 +103,7 @@ void errands_task_toolbar_update_date_btn(ErrandsTaskToolbar *tb) {
     // If no due date - set "Date" label
     const char *due = task_data_get_due(data);
     if (!strcmp(due, "")) {
-      adw_button_content_set_label(
-          ADW_BUTTON_CONTENT(gtk_button_get_child(GTK_BUTTON(tb->date_btn))), _("Date"));
+      adw_button_content_set_label(ADW_BUTTON_CONTENT(gtk_button_get_child(GTK_BUTTON(tb->date_btn))), _("Date"));
     }
     // If due date is set
     else {
@@ -124,8 +118,7 @@ void errands_task_toolbar_update_date_btn(ErrandsTaskToolbar *tb) {
         dt = g_date_time_new_from_iso8601(due, NULL);
         label = g_date_time_format(dt, "%d %b %R");
       }
-      adw_button_content_set_label(
-          ADW_BUTTON_CONTENT(gtk_button_get_child(GTK_BUTTON(tb->date_btn))), label);
+      adw_button_content_set_label(ADW_BUTTON_CONTENT(gtk_button_get_child(GTK_BUTTON(tb->date_btn))), label);
     }
   }
   // If repeated

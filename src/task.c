@@ -143,7 +143,7 @@ static void errands_task_init(ErrandsTask *self) {
 
   // Sub-task entry
   self->sub_entry = gtk_entry_new();
-  g_object_set(self->sub_entry, "margin-top", 0, "margin-bottom", 6, "margin-start", 12, "margin-end", 12,
+  g_object_set(self->sub_entry, "margin-top", 0, "margin-bottom", 3, "margin-start", 12, "margin-end", 12,
                "placeholder-text", "Add Sub-Task", NULL);
   gtk_box_append(GTK_BOX(sub_vbox), self->sub_entry);
 
@@ -413,7 +413,7 @@ static void on_errands_task_complete_btn_toggle(GtkCheckButton *btn, ErrandsTask
 
 static void on_errands_task_toolbar_btn_toggle(GtkToggleButton *btn, ErrandsTask *task) {
   // Lazy load toolbar
-  LOG("Toggle toolbar '%s'", task_data_get_uid(task->data));
+  LOG("Task %s: Toggle toolbar", task_data_get_uid(task->data));
   if (!task->toolbar) {
     task->toolbar = errands_task_toolbar_new(task);
     gtk_revealer_set_child(GTK_REVEALER(task->toolbar_revealer), GTK_WIDGET(task->toolbar));
