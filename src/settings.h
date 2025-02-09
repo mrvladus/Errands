@@ -7,7 +7,7 @@ typedef enum { SETTING_TYPE_BOOL, SETTING_TYPE_INT, SETTING_TYPE_STRING } Errand
 typedef union {
   int i;
   bool b;
-  char *s;
+  const char *s;
 } ErrandsSetting;
 
 // Initialize settings.json file

@@ -2,8 +2,6 @@
 #include "components.h"
 #include "data.h"
 #include "glib.h"
-#include "glibconfig.h"
-#include "gtk/gtk.h"
 #include "settings.h"
 #include "state.h"
 #include "task-list.h"
@@ -144,7 +142,7 @@ static void errands_task_init(ErrandsTask *self) {
   // Sub-task entry
   self->sub_entry = gtk_entry_new();
   g_object_set(self->sub_entry, "margin-top", 0, "margin-bottom", 3, "margin-start", 12, "margin-end", 12,
-               "placeholder-text", "Add Sub-Task", NULL);
+               "placeholder-text", _("Add Sub-Task"), NULL);
   gtk_box_append(GTK_BOX(sub_vbox), self->sub_entry);
 
   // Sub-tasks
@@ -194,7 +192,7 @@ static void errands_task_init(ErrandsTask *self) {
 }
 
 ErrandsTask *errands_task_new(TaskData *data) {
-  LOG("Task: Create '%s'", task_data_get_uid(data));
+  LOG("Task '%s': Create", task_data_get_uid(data));
 
   ErrandsTask *task = g_object_new(ERRANDS_TYPE_TASK, NULL);
   task->data = data;
@@ -246,13 +244,10 @@ ErrandsTask *errands_task_new(TaskData *data) {
 void errands_task_update_accent_color(ErrandsTask *task) {
   const char *color = task_data_get_color(task->data);
   if (strcmp(color, "none")) {
-    g_autoptr(GString) accent_style = g_string_new("task-");
-    g_string_append(accent_style, color);
-    const char *classes[4] = {"vertical", "card", accent_style->str, NULL};
-    gtk_widget_set_css_classes(GTK_WIDGET(task->card), classes);
+    g_autofree gchar *accent_style = g_strdup_printf("task-%s", color);
+    gtk_widget_set_css_classes(GTK_WIDGET(task->card), (const char *[]){"vertical", "card", accent_style, NULL});
   } else {
-    const char *classes[3] = {"vertical", "card", NULL};
-    gtk_widget_set_css_classes(GTK_WIDGET(task->card), classes);
+    gtk_widget_set_css_classes(GTK_WIDGET(task->card), (const char *[]){"vertical", "card", NULL});
   }
 }
 

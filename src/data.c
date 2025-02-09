@@ -1,6 +1,6 @@
 #include "data.h"
 #include "glib.h"
-#include "lib/cJSON.h"
+#include "json-glib/json-glib.h"
 #include "settings.h"
 #include "utils.h"
 #include <libical/ical.h>
@@ -134,7 +134,6 @@ TaskData *list_data_create_task(ListData *list, const char *text, const char *li
 }
 
 gchar *list_data_print(ListData *data) {
-  const char *list_uid = list_data_get_uid(data);
   const char *name = list_data_get_name(data);
   size_t len = strlen(name);
   char *list_name = strndup(name, len > 72 ? 72 : len);
@@ -278,8 +277,16 @@ const char *task_data_get_changed(TaskData *data) {
 void task_data_set_changed(TaskData *data, const char *changed) {
   icalproperty *prop = icalcomponent_get_first_property(data, ICAL_LASTMODIFIED_PROPERTY);
   if (prop) {
+    if (!strcmp(changed, "")) {
+      icalcomponent_remove_property(data, prop);
+      return;
+    }
     icalproperty_set_lastmodified(prop, icaltime_from_string(changed));
   } else {
+    if (!strcmp(changed, "")) {
+      icalcomponent_remove_property(data, prop);
+      return;
+    }
     prop = icalproperty_new_lastmodified(icaltime_from_string(changed));
     icalcomponent_add_property(data, prop);
   }
@@ -297,8 +304,16 @@ const char *task_data_get_created(TaskData *data) {
 void task_data_set_created(TaskData *data, const char *created) {
   icalproperty *prop = icalcomponent_get_first_property(data, ICAL_DTSTAMP_PROPERTY);
   if (prop) {
+    if (!strcmp(created, "")) {
+      icalcomponent_remove_property(data, prop);
+      return;
+    }
     icalproperty_set_dtstamp(prop, icaltime_from_string(created));
   } else {
+    if (!strcmp(created, "")) {
+      icalcomponent_remove_property(data, prop);
+      return;
+    }
     prop = icalproperty_new_dtstamp(icaltime_from_string(created));
     icalcomponent_add_property(data, prop);
   }
@@ -316,8 +331,16 @@ const char *task_data_get_due(TaskData *data) {
 void task_data_set_due(TaskData *data, const char *due) {
   icalproperty *prop = icalcomponent_get_first_property(data, ICAL_DUE_PROPERTY);
   if (prop) {
+    if (!strcmp(due, "")) {
+      icalcomponent_remove_property(data, prop);
+      return;
+    }
     icalproperty_set_due(prop, icaltime_from_string(due));
   } else {
+    if (!strcmp(due, "")) {
+      icalcomponent_remove_property(data, prop);
+      return;
+    }
     prop = icalproperty_new_due(icaltime_from_string(due));
     icalcomponent_add_property(data, prop);
   }
@@ -335,8 +358,16 @@ const char *task_data_get_start(TaskData *data) {
 void task_data_set_start(TaskData *data, const char *start) {
   icalproperty *prop = icalcomponent_get_first_property(data, ICAL_DTSTART_PROPERTY);
   if (prop) {
+    if (!strcmp(start, "")) {
+      icalcomponent_remove_property(data, prop);
+      return;
+    }
     icalproperty_set_dtstart(prop, icaltime_from_string(start));
   } else {
+    if (!strcmp(start, "")) {
+      icalcomponent_remove_property(data, prop);
+      return;
+    }
     prop = icalproperty_new_dtstart(icaltime_from_string(start));
     icalcomponent_add_property(data, prop);
   }
@@ -383,17 +414,27 @@ const char *task_data_get_rrule(TaskData *data) {
   icalproperty *prop = icalcomponent_get_first_property(data, ICAL_RRULE_PROPERTY);
   if (prop) {
     const char *out = icalproperty_get_value_as_string(prop);
-    if (!out)
-      return "";
+    if (!out || !strcmp(out, "")) {
+      icalcomponent_remove_property(data, prop);
+      return NULL;
+    }
     return out;
   }
-  return "";
+  return NULL;
 }
 void task_data_set_rrule(TaskData *data, const char *rrule) {
   icalproperty *prop = icalcomponent_get_first_property(data, ICAL_RRULE_PROPERTY);
   if (prop) {
+    if (!strcmp(rrule, "")) {
+      icalcomponent_remove_property(data, prop);
+      return;
+    }
     icalproperty_set_rrule(prop, icalrecurrencetype_from_string(rrule));
   } else {
+    if (!strcmp(rrule, "")) {
+      icalcomponent_remove_property(data, prop);
+      return;
+    }
     prop = icalproperty_new_rrule(icalrecurrencetype_from_string(rrule));
     icalcomponent_add_property(data, prop);
   }
@@ -588,95 +629,114 @@ static gint list_sort_by_position_func(gconstpointer a, gconstpointer b) {
 }
 
 static void errands_data_migrate() {
-  g_autofree gchar *old_data_file = g_build_path(PATH_SEP, user_dir, "data.json", NULL);
-  if (!file_exists(old_data_file))
+  g_autofree gchar *old_data_file = g_build_filename(user_dir, "data.json", NULL);
+  if (!g_file_test(old_data_file, G_FILE_TEST_EXISTS))
     return;
-  LOG("User Data: Migrate");
-  char *json_data = read_file_to_string(old_data_file);
-  cJSON *json = cJSON_Parse(json_data);
-  free(json_data);
-  if (!json)
-    return;
-  cJSON *cal_arr = cJSON_GetObjectItem(json, "lists");
-  cJSON *cal_item;
-  for (size_t i = 0; i < cJSON_GetArraySize(cal_arr); i++) {
-    cal_item = cJSON_GetArrayItem(cal_arr, i);
-    const char *color = cJSON_GetObjectItem(cal_item, "color")->valuestring;
-    const bool deleted = (bool)cJSON_GetObjectItem(cal_item, "deleted")->valueint;
-    const bool synced = (bool)cJSON_GetObjectItem(cal_item, "synced")->valueint;
-    const char *name = cJSON_GetObjectItem(cal_item, "name")->valuestring;
-    const char *list_uid = cJSON_GetObjectItem(cal_item, "uid")->valuestring;
-    ListData *calendar = list_data_new(list_uid, name, !strcmp(color, "") ? "none" : color, deleted, synced, i);
 
-    // Add events
-    cJSON *tasks_arr = cJSON_GetObjectItem(json, "tasks");
-    cJSON *task_item;
-    for (size_t j = 0; j < cJSON_GetArraySize(tasks_arr); j++) {
-      task_item = cJSON_GetArrayItem(tasks_arr, j);
-      char *task_list_uid = cJSON_GetObjectItem(task_item, "list_uid")->valuestring;
-      if (strcmp(task_list_uid, list_uid))
+  LOG("User Data: Migrate");
+
+  g_autoptr(GError) error = NULL;
+  g_autoptr(JsonParser) parser = json_parser_new();
+  if (!json_parser_load_from_file(parser, old_data_file, &error)) {
+    LOG("User Data: Failed to parse old data file: %s", error->message);
+    return;
+  }
+  JsonNode *root = json_parser_get_root(parser);
+  if (!JSON_NODE_HOLDS_OBJECT(root)) {
+    LOG("User Data: Invalid JSON format in old data file");
+    return;
+  }
+  JsonObject *root_obj = json_node_get_object(root);
+  // Process lists
+  JsonArray *cal_arr = json_object_get_array_member(root_obj, "lists");
+  for (guint i = 0; i < json_array_get_length(cal_arr); i++) {
+    JsonObject *cal_item = json_array_get_object_element(cal_arr, i);
+
+    const gchar *color = json_object_get_string_member(cal_item, "color");
+    gboolean deleted = json_object_get_boolean_member(cal_item, "deleted");
+    gboolean synced = json_object_get_boolean_member(cal_item, "synced");
+    const gchar *name = json_object_get_string_member(cal_item, "name");
+    const gchar *list_uid = json_object_get_string_member(cal_item, "uid");
+
+    ListData *calendar = list_data_new(list_uid, name, (color && *color) ? color : "none", deleted, synced, i);
+
+    // Process tasks
+    JsonArray *tasks_arr = json_object_get_array_member(root_obj, "tasks");
+    for (guint j = 0; j < json_array_get_length(tasks_arr); j++) {
+      JsonObject *task_item = json_array_get_object_element(tasks_arr, j);
+
+      const gchar *task_list_uid = json_object_get_string_member(task_item, "list_uid");
+      if (!g_str_equal(task_list_uid, list_uid))
         continue;
-      cJSON *task_attachments_arr = cJSON_GetObjectItem(task_item, "attachments");
+
+      // Process attachments
+      JsonArray *task_attachments_arr = json_object_get_array_member(task_item, "attachments");
       g_autoptr(GString) attachments = g_string_new("");
-      size_t attachments_arr_size = cJSON_GetArraySize(task_attachments_arr);
-      for (size_t a = 0; a < attachments_arr_size; a++) {
-        char *attachment_str = cJSON_GetArrayItem(task_attachments_arr, a)->valuestring;
+      for (guint a = 0; a < json_array_get_length(task_attachments_arr); a++) {
+        const gchar *attachment_str = json_array_get_string_element(task_attachments_arr, a);
         g_string_append(attachments, attachment_str);
-        if (a > 0 && a < attachments_arr_size)
+        if (a > 0 && a < json_array_get_length(task_attachments_arr) - 1)
           g_string_append(attachments, ",");
       }
-      char *color = cJSON_GetObjectItem(task_item, "color")->valuestring;
-      bool completed = (bool)cJSON_GetObjectItem(task_item, "completed")->valueint;
-      char *changed_at = cJSON_GetObjectItem(task_item, "changed_at")->valuestring;
-      char *created_at = cJSON_GetObjectItem(task_item, "created_at")->valuestring;
-      bool deleted = (bool)cJSON_GetObjectItem(task_item, "deleted")->valueint;
-      char *due_date = cJSON_GetObjectItem(task_item, "due_date")->valuestring;
-      bool expanded = (bool)cJSON_GetObjectItem(task_item, "expanded")->valueint;
-      char *notes = cJSON_GetObjectItem(task_item, "notes")->valuestring;
-      bool notified = (bool)cJSON_GetObjectItem(task_item, "notified")->valueint;
-      char *parent = cJSON_GetObjectItem(task_item, "parent")->valuestring;
-      uint8_t percent_complete = cJSON_GetObjectItem(task_item, "percent_complete")->valueint;
-      uint8_t priority = cJSON_GetObjectItem(task_item, "priority")->valueint;
-      char *rrule = cJSON_GetObjectItem(task_item, "rrule")->valuestring;
-      char *start_date = cJSON_GetObjectItem(task_item, "start_date")->valuestring;
-      bool synced = (bool)cJSON_GetObjectItem(task_item, "synced")->valueint;
-      cJSON *task_tags_arr = cJSON_GetObjectItem(task_item, "attachments");
+
+      // Extract task properties
+      const gchar *color = json_object_get_string_member(task_item, "color");
+      gboolean completed = json_object_get_boolean_member(task_item, "completed");
+      const gchar *changed_at = json_object_get_string_member(task_item, "changed_at");
+      const gchar *created_at = json_object_get_string_member(task_item, "created_at");
+      gboolean deleted = json_object_get_boolean_member(task_item, "deleted");
+      const gchar *due_date = json_object_get_string_member(task_item, "due_date");
+      gboolean expanded = json_object_get_boolean_member(task_item, "expanded");
+      const gchar *notes = json_object_get_string_member(task_item, "notes");
+      gboolean notified = json_object_get_boolean_member(task_item, "notified");
+      const gchar *parent = json_object_get_string_member(task_item, "parent");
+      gint percent_complete = json_object_get_int_member(task_item, "percent_complete");
+      gint priority = json_object_get_int_member(task_item, "priority");
+      const gchar *rrule = json_object_get_string_member(task_item, "rrule");
+      const gchar *start_date = json_object_get_string_member(task_item, "start_date");
+      gboolean synced = json_object_get_boolean_member(task_item, "synced");
+
+      // Process tags
+      JsonArray *task_tags_arr = json_object_get_array_member(task_item, "tags");
       g_autoptr(GString) tags = g_string_new("");
-      size_t tags_arr_size = cJSON_GetArraySize(task_tags_arr);
-      for (size_t a = 0; a < tags_arr_size; a++) {
-        char *tag_str = cJSON_GetArrayItem(task_tags_arr, a)->valuestring;
+      for (guint a = 0; a < json_array_get_length(task_tags_arr); a++) {
+        const gchar *tag_str = json_array_get_string_element(task_tags_arr, a);
         g_string_append(tags, tag_str);
-        if (a > 0 && a < tags_arr_size)
+        if (a > 0 && a < json_array_get_length(task_tags_arr) - 1)
           g_string_append(tags, ",");
       }
-      char *text = cJSON_GetObjectItem(task_item, "text")->valuestring;
-      bool toolbar_shown = (bool)cJSON_GetObjectItem(task_item, "toolbar_shown")->valueint;
-      bool trash = (bool)cJSON_GetObjectItem(task_item, "trash")->valueint;
-      char *uid = cJSON_GetObjectItem(task_item, "uid")->valuestring;
 
+      const gchar *text = json_object_get_string_member(task_item, "text");
+      gboolean toolbar_shown = json_object_get_boolean_member(task_item, "toolbar_shown");
+      gboolean trash = json_object_get_boolean_member(task_item, "trash");
+      const gchar *uid = json_object_get_string_member(task_item, "uid");
+
+      // Create iCalendar event
       icalcomponent *event = icalcomponent_new(ICAL_VTODO_COMPONENT);
       if (completed)
         icalcomponent_add_property(event, icalproperty_new_completed(icaltime_today()));
-      if (strcmp(tags->str, ""))
+      if (tags->len > 0)
         icalcomponent_add_property(event, icalproperty_new_categories(tags->str));
       icalcomponent_add_property(event, icalproperty_new_lastmodified(icaltime_from_string(changed_at)));
       icalcomponent_add_property(event, icalproperty_new_dtstamp(icaltime_from_string(created_at)));
-      if (strcmp(due_date, ""))
+      if (due_date && *due_date)
         icalcomponent_add_property(event, icalproperty_new_due(icaltime_from_string(due_date)));
-      if (strcmp(notes, ""))
+      if (notes && *notes)
         icalcomponent_add_property(event, icalproperty_new_description(notes));
-      if (strcmp(parent, ""))
+      if (parent && *parent)
         icalcomponent_add_property(event, icalproperty_new_relatedto(parent));
       icalcomponent_add_property(event, icalproperty_new_percentcomplete(percent_complete));
       icalcomponent_add_property(event, icalproperty_new_priority(priority));
-      if (strcmp(rrule, ""))
+      if (rrule && *rrule)
         icalcomponent_add_property(event, icalproperty_new_rrule(icalrecurrencetype_from_string(rrule)));
-      if (strcmp(start_date, ""))
+      if (start_date && *start_date)
         icalcomponent_add_property(event, icalproperty_new_dtstart(icaltime_from_string(start_date)));
       icalcomponent_add_property(event, icalproperty_new_summary(text));
       icalcomponent_add_property(event, icalproperty_new_uid(uid));
+
+      // Set custom properties
       __set_x_prop_value(event, "X-ERRANDS-ATTACHMENTS", attachments->str);
-      __set_x_prop_value(event, "X-ERRANDS-COLOR", !strcmp(color, "") ? "none" : color);
+      __set_x_prop_value(event, "X-ERRANDS-COLOR", (color && *color) ? color : "none");
       __set_x_prop_value(event, "X-ERRANDS-DELETED", deleted ? "1" : "0");
       __set_x_prop_value(event, "X-ERRANDS-EXPANDED", expanded ? "1" : "0");
       __set_x_prop_value(event, "X-ERRANDS-NOTIFIED", notified ? "1" : "0");
@@ -687,11 +747,14 @@ static void errands_data_migrate() {
 
       icalcomponent_add_component(calendar, event);
     }
+
+    // Save calendar to file
     g_autofree gchar *calendar_filename = g_strdup_printf("%s.ics", list_uid);
-    g_autofree gchar *calendar_file_path = g_build_path(PATH_SEP, user_dir, calendar_filename, NULL);
-    write_string_to_file(calendar_file_path, icalcomponent_as_ical_string(calendar));
+    g_autofree gchar *calendar_file_path = g_build_filename(user_dir, calendar_filename, NULL);
+    if (!g_file_set_contents(calendar_file_path, icalcomponent_as_ical_string(calendar), -1, &error))
+      LOG("User Data: Failed to save calendar to %s: %s", calendar_file_path, error->message);
   }
-  cJSON_Delete(json);
+  // Clean up
   remove(old_data_file);
 }
 
@@ -741,8 +804,8 @@ void errands_data_load_lists() {
 
 void errands_data_write_list(ListData *data) {
   g_autofree gchar *filename = g_strdup_printf("%s.ics", list_data_get_uid(data));
-  g_autofree gchar *path = g_build_path(PATH_SEP, user_dir, filename, NULL);
-  const char *ical_string = icalcomponent_as_ical_string(data);
-  write_string_to_file(path, ical_string);
+  g_autofree gchar *path = g_build_filename(user_dir, filename, NULL);
+  if (!g_file_set_contents(path, icalcomponent_as_ical_string(data), -1, NULL))
+    LOG("User Data: Failed to save list %s", path);
   LOG("User Data: Save list %s", path);
 }

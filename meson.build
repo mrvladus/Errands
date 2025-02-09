@@ -2,7 +2,7 @@ project(
   'errands',
   'c',
   license: 'MIT',
-  version: '47.1',
+  version: '47.0',
 )
 
 # Dependencies
@@ -10,8 +10,11 @@ dependencies = [
   dependency('gtk4', version: '>=4.16'),
   dependency('libadwaita-1', version: '>=1.6'),
   dependency('libportal', version: '>=0.8'),
+  dependency('libsecret-1', version: '>=0.21'),
   dependency('libical', version: '>=3.0'),
   dependency('gtksourceview-5', version: '>=5.14'),
+  dependency('libecal-2.0', version: '>=3.54'),
+  dependency('json-glib-1.0', version: '>=1.10'),
 ]
 
 # Source files
@@ -19,9 +22,11 @@ sources = files(
   'src/attachments-window.c',
   'src/color-window.c',
   'src/data.c',
+  'src/date-chooser.c',
+  'src/date-window.c',
   'src/delete-list-dialog.c',
-  'src/lib/cJSON.c',
   'src/main.c',
+  'src/month-chooser.c',
   'src/new-list-dialog.c',
   'src/no-lists-page.c',
   'src/notes-window.c',
@@ -37,6 +42,8 @@ sources = files(
   'src/task-list.c',
   'src/task-toolbar.c',
   'src/task.c',
+  'src/time-chooser.c',
+  'src/week-chooser.c',
   'src/window.c',
 )
 

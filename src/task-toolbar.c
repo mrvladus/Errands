@@ -2,13 +2,13 @@
 #include "attachments-window.h"
 #include "color-window.h"
 #include "data.h"
+#include "date-window.h"
 #include "glib.h"
 #include "notes-window.h"
 #include "priority-window.h"
 #include "tags-window.h"
 #include "task.h"
 #include "utils.h"
-// #include "date-window.h"
 
 #include <glib/gi18n.h>
 
@@ -65,7 +65,7 @@ ErrandsTaskToolbar *errands_task_toolbar_new(ErrandsTask *task) {
   ErrandsTaskToolbar *tb = g_object_new(ERRANDS_TYPE_TASK_TOOLBAR, NULL);
   tb->task = task;
   // Connect signals
-  // g_signal_connect_swapped(tb->date_btn, "clicked", G_CALLBACK(errands_date_window_show), task);
+  g_signal_connect_swapped(tb->date_btn, "clicked", G_CALLBACK(errands_date_window_show), task);
   g_signal_connect_swapped(tb->notes_btn, "clicked", G_CALLBACK(errands_notes_window_show), task);
   g_signal_connect_swapped(tb->priority_btn, "clicked", G_CALLBACK(errands_priority_window_show), task);
   g_signal_connect_swapped(tb->tags_btn, "clicked", G_CALLBACK(errands_tags_window_show), task);
@@ -99,7 +99,7 @@ ErrandsTaskToolbar *errands_task_toolbar_new(ErrandsTask *task) {
 void errands_task_toolbar_update_date_btn(ErrandsTaskToolbar *tb) {
   TaskData *data = tb->task->data;
   // If not repeated
-  if (!strcmp(task_data_get_rrule(data), "")) {
+  if (!task_data_get_rrule(data)) {
     // If no due date - set "Date" label
     const char *due = task_data_get_due(data);
     if (!strcmp(due, "")) {
@@ -122,41 +122,33 @@ void errands_task_toolbar_update_date_btn(ErrandsTaskToolbar *tb) {
     }
   }
   // If repeated
-  // else {
-  //   str label = str_new("");
-
-  //   // Get interval
-  //   char *inter = get_rrule_value(data->rrule, "INTERVAL");
-  //   int interval;
-  //   if (inter) {
-  //     interval = atoi(inter);
-  //     free(inter);
-  //   } else
-  //     interval = 1;
-
-  //   // Get frequency
-  //   char *frequency = get_rrule_value(data->rrule, "FREQ");
-  //   if (!strcmp(frequency, "MINUTELY"))
-  //     interval == 1 ? str_append(&label, _("Every minute"))
-  //                   : str_append_printf(&label, _("Every %d minutes"), interval);
-  //   else if (!strcmp(frequency, "HOURLY"))
-  //     interval == 1 ? str_append(&label, _("Every hour"))
-  //                   : str_append_printf(&label, _("Every %d hours"), interval);
-  //   else if (!strcmp(frequency, "DAILY"))
-  //     interval == 1 ? str_append(&label, _("Every day"))
-  //                   : str_append_printf(&label, _("Every %d days"), interval);
-  //   else if (!strcmp(frequency, "WEEKLY"))
-  //     interval == 1 ? str_append(&label, _("Every week"))
-  //                   : str_append_printf(&label, _("Every %d weeks"), interval);
-  //   else if (!strcmp(frequency, "MONTHLY"))
-  //     interval == 1 ? str_append(&label, _("Every month"))
-  //                   : str_append_printf(&label, _("Every %d months"), interval);
-  //   else if (!strcmp(frequency, "YEARLY"))
-  //     interval == 1 ? str_append(&label, _("Every year"))
-  //                   : str_append_printf(&label, _("Every %d years"), interval);
-  //   adw_button_content_set_label(ADW_BUTTON_CONTENT(gtk_button_get_child(GTK_BUTTON(tb->date_btn))),
-  //                                label.str);
-  //   free(frequency);
-  //   str_free(&label);
-  // }
+  else {
+    g_autoptr(GString) label = g_string_new("");
+    const char *rrule = task_data_get_rrule(data);
+    // Get interval
+    char *inter = get_rrule_value(rrule, "INTERVAL");
+    int interval;
+    if (inter) {
+      interval = atoi(inter);
+      free(inter);
+    } else
+      interval = 1;
+    // Get frequency
+    char *frequency = get_rrule_value(rrule, "FREQ");
+    if (!strcmp(frequency, "MINUTELY"))
+      interval == 1 ? g_string_append(label, _("Every minute"))
+                    : g_string_printf(label, _("Every %d minutes"), interval);
+    else if (!strcmp(frequency, "HOURLY"))
+      interval == 1 ? g_string_append(label, _("Every hour")) : g_string_printf(label, _("Every %d hours"), interval);
+    else if (!strcmp(frequency, "DAILY"))
+      interval == 1 ? g_string_append(label, _("Every day")) : g_string_printf(label, _("Every %d days"), interval);
+    else if (!strcmp(frequency, "WEEKLY"))
+      interval == 1 ? g_string_append(label, _("Every week")) : g_string_printf(label, _("Every %d weeks"), interval);
+    else if (!strcmp(frequency, "MONTHLY"))
+      interval == 1 ? g_string_append(label, _("Every month")) : g_string_printf(label, _("Every %d months"), interval);
+    else if (!strcmp(frequency, "YEARLY"))
+      interval == 1 ? g_string_append(label, _("Every year")) : g_string_printf(label, _("Every %d years"), interval);
+    adw_button_content_set_label(ADW_BUTTON_CONTENT(gtk_button_get_child(GTK_BUTTON(tb->date_btn))), label->str);
+    free(frequency);
+  }
 }

@@ -2,6 +2,7 @@
 
 #include "attachments-window.h"
 #include "color-window.h"
+#include "date-window.h"
 #include "dialogs.h"
 #include "notes-window.h"
 #include "priority-window.h"
@@ -30,7 +31,7 @@ typedef struct {
   ErrandsNotesWindow *notes_window;
   ErrandsPriorityWindow *priority_window;
   ErrandsTagsWindow *tags_window;
-  // ErrandsDateWindow *date_window;
+  ErrandsDateWindow *date_window;
 } State;
 
 // Global state object

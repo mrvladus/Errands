@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../components/date-chooser.h"
-#include "../components/month-chooser.h"
-#include "../components/time-chooser.h"
-#include "../components/week-chooser.h"
+#include "date-chooser.h"
+#include "month-chooser.h"
 #include "task.h"
+#include "time-chooser.h"
+#include "week-chooser.h"
 
 #define ERRANDS_TYPE_DATE_WINDOW (errands_date_window_get_type())
 

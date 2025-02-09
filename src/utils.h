@@ -324,27 +324,6 @@ static inline int *string_to_int_array(const char *str) {
   return arr;
 }
 
-static bool string_is_number(const char *str) {
-  // Check for empty string
-  if (str == NULL || *str == '\0')
-    return false; // Not a number
-
-  char *endptr;
-  // Try to convert to long
-  strtol(str, &endptr, 10);
-  if (endptr != str && *endptr == '\0') {
-    return true; // Valid integer
-  }
-
-  // Try to convert to double
-  strtod(str, &endptr);
-  if (endptr != str && *endptr == '\0') {
-    return true; // Valid floating-point number
-  }
-
-  return false;
-}
-
 // Generic dynamic array
 #define DECLARE_DYNAMIC_ARRAY(type, item_type, func_prefix)                                                            \
   typedef struct type {                                                                                                \
