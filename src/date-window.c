@@ -1,8 +1,7 @@
-#include "date-window.h"
 #include "data.h"
-#include "glib.h"
-#include "glibconfig.h"
 #include "state.h"
+#include "task-toolbar.h"
+#include "task.h"
 #include "utils.h"
 
 #include <glib/gi18n.h>

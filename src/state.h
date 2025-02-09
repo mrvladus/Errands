@@ -1,14 +1,9 @@
 #pragma once
 
-#include "attachments-window.h"
-#include "color-window.h"
-#include "date-window.h"
 #include "dialogs.h"
-#include "notes-window.h"
-#include "priority-window.h"
 #include "sidebar.h"
-#include "tags-window.h"
 #include "task-list.h"
+#include "task-toolbar.h"
 #include "window.h"
 
 #include <adwaita.h>

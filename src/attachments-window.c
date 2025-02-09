@@ -1,7 +1,7 @@
-#include "attachments-window.h"
 #include "data.h"
-#include "glib.h"
 #include "state.h"
+#include "task-toolbar.h"
+#include "task.h"
 #include "utils.h"
 
 #include <glib/gi18n.h>
@@ -13,8 +13,7 @@
 static void errands_attachments_window_update_ui();
 static void on_errands_attachments_window_close(ErrandsAttachmentsWindow *win);
 static void on_errands_attachments_window_attachment_add(GtkButton *btn);
-static void on_errands_attachments_window_row_activate(GtkListBox *box,
-                                                       ErrandsAttachmentsWindowRow *row);
+static void on_errands_attachments_window_row_activate(GtkListBox *box, ErrandsAttachmentsWindowRow *row);
 
 G_DEFINE_TYPE(ErrandsAttachmentsWindow, errands_attachments_window, ADW_TYPE_DIALOG)
 
@@ -31,8 +30,7 @@ static void errands_attachments_window_init(ErrandsAttachmentsWindow *self) {
 
   // Add button
   GtkWidget *add_btn = gtk_button_new_from_icon_name("errands-add-symbolic");
-  g_signal_connect(add_btn, "clicked", G_CALLBACK(on_errands_attachments_window_attachment_add),
-                   NULL);
+  g_signal_connect(add_btn, "clicked", G_CALLBACK(on_errands_attachments_window_attachment_add), NULL);
   adw_header_bar_pack_start(ADW_HEADER_BAR(hb), add_btn);
 
   // Vertical box
@@ -45,19 +43,16 @@ static void errands_attachments_window_init(ErrandsAttachmentsWindow *self) {
 
   // List box
   self->list_box = gtk_list_box_new();
-  g_object_set(self->list_box, "selection-mode", GTK_SELECTION_NONE, "margin-start", 12,
-               "margin-end", 12, "margin-top", 6, "margin-bottom", 12, "valign", GTK_ALIGN_START,
-               "vexpand", true, NULL);
+  g_object_set(self->list_box, "selection-mode", GTK_SELECTION_NONE, "margin-start", 12, "margin-end", 12, "margin-top",
+               6, "margin-bottom", 12, "valign", GTK_ALIGN_START, "vexpand", true, NULL);
   gtk_widget_add_css_class(self->list_box, "boxed-list");
-  g_signal_connect(self->list_box, "row-activated",
-                   G_CALLBACK(on_errands_attachments_window_row_activate), NULL);
+  g_signal_connect(self->list_box, "row-activated", G_CALLBACK(on_errands_attachments_window_row_activate), NULL);
   gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrl), self->list_box);
 
   // Placeholder
   self->placeholder = adw_status_page_new();
-  g_object_set(self->placeholder, "icon-name", "errands-attachment-symbolic", "title",
-               _("No Attachments"), "description", _("Click \"+\" button to add new attachment"),
-               "vexpand", true, NULL);
+  g_object_set(self->placeholder, "icon-name", "errands-attachment-symbolic", "title", _("No Attachments"),
+               "description", _("Click \"+\" button to add new attachment"), "vexpand", true, NULL);
   g_object_bind_property(self->placeholder, "visible", scrl, "visible",
                          G_BINDING_SYNC_CREATE | G_BINDING_INVERT_BOOLEAN);
   gtk_widget_add_css_class(self->placeholder, "compact");
@@ -86,8 +81,7 @@ void errands_attachments_window_show(ErrandsTask *task) {
   if (attachments) {
     // Add rows
     for (size_t i = 0; i < g_strv_length(attachments); i++) {
-      ErrandsAttachmentsWindowRow *row =
-          errands_attachments_window_row_new(g_file_new_for_path(attachments[i]));
+      ErrandsAttachmentsWindowRow *row = errands_attachments_window_row_new(g_file_new_for_path(attachments[i]));
       gtk_list_box_append(GTK_LIST_BOX(state.attachments_window->list_box), GTK_WIDGET(row));
     }
   }
@@ -151,8 +145,7 @@ static void on_errands_attachments_window_attachment_add(GtkButton *btn) {
   gtk_file_dialog_open(dialog, GTK_WINDOW(state.main_window), NULL, __on_open_finish, NULL);
 }
 
-static void on_errands_attachments_window_row_activate(GtkListBox *box,
-                                                       ErrandsAttachmentsWindowRow *row) {
+static void on_errands_attachments_window_row_activate(GtkListBox *box, ErrandsAttachmentsWindowRow *row) {
   g_autoptr(GtkFileLauncher) l = gtk_file_launcher_new(row->file);
   gtk_file_launcher_launch(l, GTK_WINDOW(state.main_window), NULL, NULL, NULL);
 }
@@ -161,8 +154,7 @@ static void on_errands_attachments_window_row_activate(GtkListBox *box,
 //               ATTACHMENTS WINDOW ATTACHMENT ROW               //
 // ------------------------------------------------------------- //
 
-static void on_errands_attachments_window_row_delete(GtkButton *btn,
-                                                     ErrandsAttachmentsWindowRow *row);
+static void on_errands_attachments_window_row_delete(GtkButton *btn, ErrandsAttachmentsWindowRow *row);
 static void on_errands_attachments_window_row_destroy(ErrandsAttachmentsWindowRow *row);
 
 G_DEFINE_TYPE(ErrandsAttachmentsWindowRow, errands_attachments_window_row, ADW_TYPE_ACTION_ROW)
@@ -174,8 +166,7 @@ static void errands_attachments_window_row_init(ErrandsAttachmentsWindowRow *sel
   // Delete button
   self->del_btn = gtk_button_new_from_icon_name("errands-trash-symbolic");
   g_object_set(self->del_btn, "valign", GTK_ALIGN_CENTER, NULL);
-  g_signal_connect(self->del_btn, "clicked", G_CALLBACK(on_errands_attachments_window_row_delete),
-                   self);
+  g_signal_connect(self->del_btn, "clicked", G_CALLBACK(on_errands_attachments_window_row_delete), self);
   gtk_widget_add_css_class(self->del_btn, "flat");
   gtk_widget_add_css_class(self->del_btn, "error");
   adw_action_row_add_suffix(ADW_ACTION_ROW(self), self->del_btn);
@@ -194,8 +185,7 @@ ErrandsAttachmentsWindowRow *errands_attachments_window_row_new(GFile *file) {
 
 // --- SIGNAL HANDLERS FOR ATTACHMENT ROW --- //
 
-static void on_errands_attachments_window_row_delete(GtkButton *btn,
-                                                     ErrandsAttachmentsWindowRow *row) {
+static void on_errands_attachments_window_row_delete(GtkButton *btn, ErrandsAttachmentsWindowRow *row) {
   LOG("Tag: Delete");
   g_autofree gchar *path = g_file_get_path(row->file);
   LOG("Tag: Delete %s", path);
@@ -212,6 +202,4 @@ static void on_errands_attachments_window_row_delete(GtkButton *btn,
   errands_attachments_window_update_ui();
 }
 
-static void on_errands_attachments_window_row_destroy(ErrandsAttachmentsWindowRow *row) {
-  g_free(row->file);
-}
+static void on_errands_attachments_window_row_destroy(ErrandsAttachmentsWindowRow *row) { g_free(row->file); }

@@ -1,8 +1,7 @@
-#include "tags-window.h"
 #include "data.h"
-#include "glib.h"
 #include "state.h"
 #include "task-list.h"
+#include "task-toolbar.h"
 #include "task.h"
 #include "utils.h"
 

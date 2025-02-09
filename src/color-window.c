@@ -1,11 +1,11 @@
-#include "color-window.h"
 #include "data.h"
+#include "glib.h"
 #include "state.h"
+#include "task-toolbar.h"
 #include "task.h"
 #include "utils.h"
 
 #include <glib/gi18n.h>
-#include <string.h>
 
 static void on_errands_color_window_close_cb(ErrandsColorWindow *win);
 static void on_errands_color_window_color_select_cb(GtkCheckButton *btn, ErrandsColorWindow *win);
@@ -25,8 +25,7 @@ static void errands_color_window_init(ErrandsColorWindow *self) {
 
   // --- Buttons --- //
 
-  const char *const colors[8] = {"none",   "blue", "green",  "yellow",
-                                 "orange", "red",  "purple", "brown"};
+  const char *const colors[8] = {"none", "blue", "green", "yellow", "orange", "red", "purple", "brown"};
 
   GtkWidget *group_btn;
   for (size_t i = 0; i < 8; i++) {
@@ -37,7 +36,7 @@ static void errands_color_window_init(ErrandsColorWindow *self) {
     sprintf(class_name, "%s%s", "accent-color-btn-", colors[i]);
     gtk_widget_add_css_class(btn, class_name);
     g_signal_connect(btn, "toggled", G_CALLBACK(on_errands_color_window_color_select_cb), self);
-    if (!strcmp(colors[i], "none"))
+    if (g_str_equal(colors[i], "none"))
       group_btn = btn;
     else
       g_object_set(btn, "group", group_btn, NULL);
@@ -46,8 +45,7 @@ static void errands_color_window_init(ErrandsColorWindow *self) {
 
   // Toolbar view
   GtkWidget *tb = adw_toolbar_view_new();
-  g_object_set(tb, "content", self->color_box, "margin-start", 12, "margin-end", 12,
-               "margin-bottom", 12, NULL);
+  g_object_set(tb, "content", self->color_box, "margin-start", 12, "margin-end", 12, "margin-bottom", 12, NULL);
   adw_toolbar_view_add_top_bar(ADW_TOOLBAR_VIEW(tb), adw_header_bar_new());
   adw_dialog_set_child(ADW_DIALOG(self), tb);
 }
@@ -67,7 +65,7 @@ void errands_color_window_show(ErrandsTask *task) {
   for (size_t i = 0; i < colors->len; i++) {
     const char *name = gtk_widget_get_name(colors->pdata[i]);
     const char *color = task_data_get_color(task->data);
-    if (!strcmp(name, color)) {
+    if (g_str_equal(name, color)) {
       gtk_check_button_set_active(GTK_CHECK_BUTTON(colors->pdata[i]), true);
       break;
     }
@@ -85,7 +83,7 @@ static void on_errands_color_window_close_cb(ErrandsColorWindow *win) {
     GtkCheckButton *btn = GTK_CHECK_BUTTON(colors->pdata[i]);
     if (gtk_check_button_get_active(btn)) {
       const char *name = gtk_widget_get_name(GTK_WIDGET(btn));
-      if (!strcmp(name, task_data_get_color(win->task->data))) {
+      if (g_str_equal(name, task_data_get_color(win->task->data))) {
         adw_dialog_close(ADW_DIALOG(win));
         return;
       }

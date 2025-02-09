@@ -1,12 +1,5 @@
 #include "task-toolbar.h"
-#include "attachments-window.h"
-#include "color-window.h"
 #include "data.h"
-#include "date-window.h"
-#include "glib.h"
-#include "notes-window.h"
-#include "priority-window.h"
-#include "tags-window.h"
 #include "task.h"
 #include "utils.h"
 

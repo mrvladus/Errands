@@ -1,6 +1,7 @@
-#include "priority-window.h"
 #include "data.h"
 #include "state.h"
+#include "task-toolbar.h"
+#include "task.h"
 
 #include <glib/gi18n.h>
 #include <stdint.h>
@@ -23,8 +24,8 @@ static void errands_priority_window_init(ErrandsPriorityWindow *self) {
 
   // Box
   GtkWidget *box = gtk_list_box_new();
-  g_object_set(box, "selection-mode", GTK_SELECTION_NONE, "margin-start", 12, "margin-end", 12,
-               "margin-bottom", 12, NULL);
+  g_object_set(box, "selection-mode", GTK_SELECTION_NONE, "margin-start", 12, "margin-end", 12, "margin-bottom", 12,
+               NULL);
   gtk_widget_add_css_class(box, "boxed-list");
   adw_toolbar_view_set_content(ADW_TOOLBAR_VIEW(tb), box);
 
@@ -32,8 +33,7 @@ static void errands_priority_window_init(ErrandsPriorityWindow *self) {
   GtkWidget *high = adw_action_row_new();
   g_object_set(high, "title", _("High"), NULL);
   gtk_widget_add_css_class(high, "priority-high");
-  adw_action_row_add_prefix(ADW_ACTION_ROW(high),
-                            gtk_image_new_from_icon_name("errands-priority-symbolic"));
+  adw_action_row_add_prefix(ADW_ACTION_ROW(high), gtk_image_new_from_icon_name("errands-priority-symbolic"));
   self->high_btn = gtk_check_button_new();
   g_signal_connect(self->high_btn, "activate", G_CALLBACK(on_priority_button_activate), "high");
   adw_action_row_add_suffix(ADW_ACTION_ROW(high), self->high_btn);
@@ -44,8 +44,7 @@ static void errands_priority_window_init(ErrandsPriorityWindow *self) {
   GtkWidget *medium = adw_action_row_new();
   g_object_set(medium, "title", _("Medium"), NULL);
   gtk_widget_add_css_class(medium, "priority-medium");
-  adw_action_row_add_prefix(ADW_ACTION_ROW(medium),
-                            gtk_image_new_from_icon_name("errands-priority-symbolic"));
+  adw_action_row_add_prefix(ADW_ACTION_ROW(medium), gtk_image_new_from_icon_name("errands-priority-symbolic"));
   self->medium_btn = gtk_check_button_new();
   g_object_set(self->medium_btn, "group", self->high_btn, NULL);
   g_signal_connect(self->medium_btn, "activate", G_CALLBACK(on_priority_button_activate), "medium");
@@ -57,8 +56,7 @@ static void errands_priority_window_init(ErrandsPriorityWindow *self) {
   GtkWidget *low = adw_action_row_new();
   g_object_set(low, "title", _("Low"), NULL);
   gtk_widget_add_css_class(low, "priority-low");
-  adw_action_row_add_prefix(ADW_ACTION_ROW(low),
-                            gtk_image_new_from_icon_name("errands-priority-symbolic"));
+  adw_action_row_add_prefix(ADW_ACTION_ROW(low), gtk_image_new_from_icon_name("errands-priority-symbolic"));
   self->low_btn = gtk_check_button_new();
   g_object_set(self->low_btn, "group", self->high_btn, NULL);
   g_signal_connect(self->low_btn, "activate", G_CALLBACK(on_priority_button_activate), "low");
@@ -69,8 +67,7 @@ static void errands_priority_window_init(ErrandsPriorityWindow *self) {
   // None
   GtkWidget *none = adw_action_row_new();
   g_object_set(none, "title", _("None"), NULL);
-  adw_action_row_add_prefix(ADW_ACTION_ROW(none),
-                            gtk_image_new_from_icon_name("errands-priority-none-symbolic"));
+  adw_action_row_add_prefix(ADW_ACTION_ROW(none), gtk_image_new_from_icon_name("errands-priority-none-symbolic"));
   self->none_btn = gtk_check_button_new();
   g_object_set(self->none_btn, "group", self->high_btn, NULL);
   g_signal_connect(self->none_btn, "activate", G_CALLBACK(on_priority_button_activate), "none");
