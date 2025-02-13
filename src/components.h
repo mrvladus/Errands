@@ -34,8 +34,7 @@ static void __errands_menu_check_activate(void *data[2]) {
   callback(active);
 }
 
-static inline GtkWidget *errands_menu_check_item(const char *label, bool active,
-                                                 void (*callback)(bool active)) {
+static inline GtkWidget *errands_menu_check_item(const char *label, bool active, void (*callback)(bool active)) {
   GtkWidget *check = gtk_check_button_new();
   gtk_check_button_set_active(GTK_CHECK_BUTTON(check), active);
 
@@ -68,8 +67,7 @@ static void __errands_menu_radio_activate(void *data[3]) {
   callback(id);
 }
 
-static inline GtkWidget *errands_menu_radio_item(const char *label, const char *id, bool active,
-                                                 GtkWidget *group,
+static inline GtkWidget *errands_menu_radio_item(const char *label, const char *id, bool active, GtkWidget *group,
                                                  void (*callback)(const char *active_id)) {
   GtkWidget *check = gtk_check_button_new();
   gtk_check_button_set_active(GTK_CHECK_BUTTON(check), active);

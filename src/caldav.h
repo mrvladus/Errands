@@ -1,6 +1,7 @@
 #ifndef CALDAV_H
 #define CALDAV_H
 
+#include "libxml/xmlstring.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -479,6 +480,111 @@ CalDAVClient *caldav_client_new(const char *base_url, const char *username, cons
   return client;
 }
 
+CalDAVList *caldav_client_get_calendars(CalDAVClient *client, const char *set) {
+  CALDAV_LOG("Getting calendars with '%s' component set...", set);
+  const char *request_body = "<d:propfind xmlns:d=\"DAV:\" xmlns:cs=\"http://calendarserver.org/ns/\" "
+                             "xmlns:c=\"urn:ietf:params:xml:ns:caldav\" xmlns:x1=\"http://apple.com/ns/ical/\">"
+                             "  <d:prop>"
+                             "    <d:resourcetype />"
+                             "    <d:displayname />"
+                             "    <x1:calendar-color />"
+                             "    <cs:getctag />"
+                             "    <c:supported-calendar-component-set />"
+                             "  </d:prop>"
+                             "</d:propfind>";
+  CalDAVList *output = NULL;
+  char *xml = caldav_propfind(client, client->calendars_url, 1, request_body, "Failed to get calendars");
+  if (xml) {
+    xmlDocPtr doc = xmlReadMemory(xml, strlen(xml), NULL, NULL, 0);
+    if (!doc) {
+      CALDAV_LOG("Error: Failed to parse XML\n");
+      CALDAV_FREE(xml);
+      return NULL;
+    }
+    // Create XPath context
+    xmlXPathContextPtr xpathCtx = xmlXPathNewContext(doc);
+    if (xpathCtx == NULL) {
+      fprintf(stderr, "Error: Unable to create XPath context\n");
+      xmlFreeDoc(doc);
+      CALDAV_FREE(xml);
+      return NULL;
+    }
+    // Register namespaces
+    xmlXPathRegisterNs(xpathCtx, BAD_CAST "d", BAD_CAST "DAV:");
+    xmlXPathRegisterNs(xpathCtx, BAD_CAST "cs", BAD_CAST "http://calendarserver.org/ns/");
+    xmlXPathRegisterNs(xpathCtx, BAD_CAST "cal", BAD_CAST "urn:ietf:params:xml:ns:caldav");
+    xmlXPathRegisterNs(xpathCtx, BAD_CAST "x1", BAD_CAST "http://apple.com/ns/ical/");
+    // Evaluate XPath expression for responses
+    xmlXPathObjectPtr xpathObj = xmlXPathEvalExpression(BAD_CAST "//d:response", xpathCtx);
+    if (!xpathObj) {
+      CALDAV_LOG("Error: Unable to evaluate XPath expression\n");
+      xmlXPathFreeContext(xpathCtx);
+      xmlFreeDoc(doc);
+      CALDAV_FREE(xml);
+      return NULL;
+    }
+    CalDAVList *calendars_list = caldav_list_new();
+    // Iterate over responses
+    if (xpathObj->nodesetval) {
+      for (int i = 0; i < xpathObj->nodesetval->nodeNr; i++) {
+        xmlNodePtr response = xpathObj->nodesetval->nodeTab[i];
+        // Check for supported component set
+        xmlXPathObjectPtr supportedSetObj =
+            xmlXPathNodeEval(response, BAD_CAST ".//cal:supported-calendar-component-set/cal:comp", xpathCtx);
+        if (supportedSetObj && supportedSetObj->nodesetval) {
+          bool set_matched = false;
+          for (int j = 0; j < supportedSetObj->nodesetval->nodeNr; j++) {
+            xmlChar *name = xmlGetProp(supportedSetObj->nodesetval->nodeTab[j], BAD_CAST "name");
+            if (name && !strcmp((char *)name, set)) {
+              set_matched = true;
+              xmlFree(name);
+              break;
+            }
+            xmlFree(name);
+          }
+          if (set_matched) {
+            // Check if the calendar is not deleted
+            xmlXPathObjectPtr deletedObj = xmlXPathNodeEval(response, BAD_CAST ".//cs:deleted-calendar", xpathCtx);
+            if (!deletedObj || !deletedObj->nodesetval || deletedObj->nodesetval->nodeNr == 0) {
+              // Extract calendar details
+              xmlChar *displayName = xmlNodeGetContent(
+                  xmlXPathNodeEval(response, BAD_CAST ".//d:displayname", xpathCtx)->nodesetval->nodeTab[0]);
+              xmlChar *href =
+                  xmlNodeGetContent(xmlXPathNodeEval(response, BAD_CAST ".//d:href", xpathCtx)->nodesetval->nodeTab[0]);
+              xmlXPathObjectPtr colorObj = xmlXPathNodeEval(response, BAD_CAST ".//x1:calendar-color", xpathCtx);
+              char *hex_color;
+              if (colorObj && colorObj->nodesetval && colorObj->nodesetval->nodeNr != 0) {
+                hex_color = strdup((char *)xmlNodeGetContent(colorObj->nodesetval->nodeTab[0]));
+                xmlFree(colorObj);
+              } else {
+                hex_color = caldav_generate_hex_color();
+              }
+              char cal_url[strlen(client->base_url) + strlen((char *)href) + 1];
+              sprintf(cal_url, "%s%s", client->base_url, href);
+
+              CalDAVCalendar *calendar =
+                  caldav_calendar_new(client, hex_color, (char *)set, (char *)displayName, cal_url);
+              caldav_list_add(calendars_list, calendar);
+
+              CALDAV_FREE(hex_color);
+              xmlFree(displayName);
+              xmlFree(href);
+            }
+            xmlXPathFreeObject(deletedObj);
+          }
+        }
+        xmlXPathFreeObject(supportedSetObj);
+      }
+    }
+    xmlXPathFreeObject(xpathObj);
+    xmlXPathFreeContext(xpathCtx);
+    xmlFreeDoc(doc);
+    CALDAV_FREE(xml);
+    output = calendars_list;
+  }
+  return output;
+}
+
 // CalDAVList *caldav_client_get_calendars(CalDAVClient *client, const char *set) {
 //   CALDAV_LOG("Getting calendars with '%s' componet set...", set);
 //   CURL *curl = curl_easy_init();
@@ -495,8 +601,9 @@ CalDAVClient *caldav_client_new(const char *base_url, const char *username, cons
 //                              "  </d:prop>"
 //                              "</d:propfind>";
 //   CalDAVList *output = NULL;
-//   char *result = caldav_propfind(client, client->calendars_url, 1, request_body, "Failed to get calendars");
-//   if (result) {
+//   char *xml = caldav_propfind(client, client->calendars_url, 1, request_body, "Failed to get calendars");
+//   // printf("%s\n", xml);
+//   if (xml) {
 //     XMLNode *root = xml_parse_string(result);
 //     XMLNode *multistatus = xml_node_child_at(root, 0);
 //     CalDAVList *calendars_list = caldav_list_new();
@@ -529,8 +636,8 @@ CalDAVClient *caldav_client_new(const char *base_url, const char *username, cons
 //     }
 //     xml_node_free(root);
 //     output = calendars_list;
+//     CALDAV_FREE(result);
 //   }
-//   CALDAV_FREE(result);
 //   return output;
 // }
 

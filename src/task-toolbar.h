@@ -145,6 +145,7 @@ struct _ErrandsNotesWindow {
   GtkWidget *view;
   GtkSourceBuffer *buffer;
   GtkSourceLanguage *md_lang;
+  GtkWidget *md_view;
   struct _ErrandsTask *task;
 };
 

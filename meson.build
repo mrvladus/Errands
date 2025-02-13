@@ -7,16 +7,16 @@ project(
 
 # Dependencies
 dependencies = [
-  dependency('gtk4', version: '>=4.16'),
   dependency('libadwaita-1', version: '>=1.6'),
-  dependency('libportal', version: '>=0.8'),
-  # dependency('libsecret-1', version: '>=0.21'),
-  dependency('libical', version: '>=3.0'),
-  dependency('gtksourceview-5', version: '>=5.14'),
-  # dependency('libecal-2.0', version: '>=3.54'),
-  dependency('json-glib-1.0', version: '>=1.10'),
+  dependency('gtk4'),
+  dependency('libportal'),
+  dependency('libical'),
+  dependency('gtksourceview-5'),
+  dependency('json-glib-1.0'),
   dependency('libcurl'),
   dependency('libxml-2.0'),
+  dependency('webkitgtk-6.0'),
+  dependency('libcmark'),
 ]
 
 # Source files
@@ -34,7 +34,6 @@ sources = files(
   'src/notes-window.c',
   'src/priority-window.c',
   'src/rename-list-dialog.c',
-  'src/resources.c',
   'src/settings.c',
   'src/sidebar-all-row.c',
   'src/sidebar-task-list-row.c',
@@ -59,10 +58,19 @@ configure_file(
   },
 )
 
+# Resources
+gnome = import('gnome')
+resources = gnome.compile_resources(
+  meson.project_name(),
+  'data/errands.gresource.xml',
+  c_name: meson.project_name(),
+  source_dir: 'data',
+)
+
 # Errands executable
 bin = executable(
   meson.project_name(),
-  sources: sources,
+  sources: [sources, resources],
   dependencies: dependencies,
 )
 
