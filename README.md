@@ -22,7 +22,6 @@
 - Multiple task lists support
 - Add accent color for each task
 - Drag and Drop support
-- Customizable UI
 
 ## Sync
 Errands is using [python-caldav](https://github.com/python-caldav/caldav) library for syncing with Nextcloud Tasks and other CalDAV providers.
