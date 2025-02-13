@@ -1,5 +1,4 @@
 #include "data.h"
-#include "glib.h"
 #include "state.h"
 #include "task-toolbar.h"
 #include "task.h"

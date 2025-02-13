@@ -7,16 +7,16 @@ project(
 
 # Dependencies
 dependencies = [
-  dependency('libadwaita-1', version: '>=1.6'),
+  dependency('libportal'), # For flatpak sandbox
+  dependency('libical'), # For working with user data in ical format
+  dependency('gtksourceview-5'), # For notes syntax highlighting
+  dependency('webkitgtk-6.0'), # For markdown preview
+  dependency('libcmark'), # For markdown preview
+  dependency('libcurl'), # For caldav requests
+  dependency('libxml-2.0'), # For caldav parsing
+  dependency('json-glib-1.0'), # For parsing json
   dependency('gtk4'),
-  dependency('libportal'),
-  dependency('libical'),
-  dependency('gtksourceview-5'),
-  dependency('json-glib-1.0'),
-  dependency('libcurl'),
-  dependency('libxml-2.0'),
-  dependency('webkitgtk-6.0'),
-  dependency('libcmark'),
+  dependency('libadwaita-1', version: '>=1.6'),
 ]
 
 # Source files
