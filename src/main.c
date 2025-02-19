@@ -2,7 +2,7 @@
 #include "data.h"
 #include "settings.h"
 #include "state.h"
-// #include "sync.h"
+#include "sync.h"
 #include "utils.h"
 #include "window.h"
 
@@ -11,15 +11,13 @@
 #include <libical/ical.h>
 #include <libportal/portal.h>
 
-#include <stddef.h>
-
 extern GResource *errands_get_resource(void);
 
 static void activate(GtkApplication *app) {
   state.main_window = errands_window_new();
   errands_window_build(state.main_window);
   gtk_window_present(GTK_WINDOW(state.main_window));
-  // sync_init();
+  sync_init();
 }
 
 int main(int argc, char **argv) {

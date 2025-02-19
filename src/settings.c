@@ -1,5 +1,4 @@
 #include "settings.h"
-#include "glib.h"
 #include "utils.h"
 
 #include <json-glib/json-glib.h>
@@ -44,6 +43,15 @@ void errands_settings_load_default() {
   json_builder_set_member_name(builder, "sync");
   json_builder_add_boolean_value(builder, FALSE);
 
+  json_builder_set_member_name(builder, "sync_provider");
+  json_builder_add_string_value(builder, "nextcloud");
+
+  json_builder_set_member_name(builder, "sync_url");
+  json_builder_add_string_value(builder, "");
+
+  json_builder_set_member_name(builder, "sync_user");
+  json_builder_add_string_value(builder, "");
+
   json_builder_end_object(builder);
 
   settings_root = json_builder_get_root(builder);
@@ -66,7 +74,8 @@ void errands_settings_load_user() {
     JsonObject *settings_obj = json_node_get_object(settings_root);
 
     const gchar *const settings_keys[] = {"show_completed", "window_width", "window_height", "maximized",
-                                          "last_list_uid",  "sort_by",      "sync"};
+                                          "last_list_uid",  "sort_by",      "sync",          "sync_provider",
+                                          "sync_url",       "sync_user"};
 
     for (guint i = 0; i < G_N_ELEMENTS(settings_keys); i++) {
       const gchar *key = settings_keys[i];
