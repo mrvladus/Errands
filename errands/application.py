@@ -30,73 +30,6 @@ class ErrandsApplication(Adw.Application):
         self.set_resource_base_path("/io/github/mrvladus/Errands/")
         State.application = self
 
-    @threaded
-    def check_reload(self) -> None:
-        """Check if there is newer version installed"""
-
-        if State.PROFILE == "development":
-            return
-
-        TIMEOUT_SECONDS: int = 60
-        portal: Xdp.Portal = Xdp.Portal()
-        is_flatpak: bool = portal.running_under_flatpak()
-
-        def __restart(*args):
-            """Restart the app"""
-
-            State.application.quit()
-
-            if is_flatpak:
-                cmd: str = "flatpak-spawn --host flatpak run io.github.mrvladus.List"
-            else:
-                cmd: str = "errands"
-
-            subprocess.run(cmd)
-            exit()
-
-        def __inner_check() -> bool:
-            """Get installed version"""
-
-            try:
-                version: str = ""
-                if is_flatpak:
-                    version: str = getoutput(
-                        "flatpak-spawn --host flatpak list --app | grep io.github.mrvladus.List | awk '{ print $3 }'"
-                    )
-                else:
-                    version: str = (
-                        getoutput(
-                            "cat $(whereis -b errands | cut -d ' ' -f 2) | grep VERSION"
-                        )
-                        .split(" ")[-1]
-                        .strip('"')
-                    )
-                if version:
-                    # If installed version is different from running then show message
-                    if version != State.VERSION:
-                        restart_message = Adw.MessageDialog(
-                            heading=_("Errands was updated"),
-                            body=_("Restart is required"),
-                            transient_for=State.main_window,
-                        )
-                        restart_message.add_response("restart", _("Restart"))
-                        restart_message.set_default_response("restart")
-                        restart_message.connect("response", __restart)
-                        if State.main_window.get_visible():
-                            GLib.idle_add(restart_message.present)
-                        else:
-                            GLib.idle_add(__restart)
-                        return False
-                    else:
-                        return True
-            except Exception:
-                return True
-
-        while True:
-            sleep(TIMEOUT_SECONDS)
-            if not __inner_check():
-                break
-
     def run_in_background(self):
         """Create or remove autostart desktop file"""
 
@@ -110,7 +43,7 @@ class ErrandsApplication(Adw.Application):
                 # Request background
                 portal.request_background(
                     None,
-                    _("Errands need to run in the background for notifications"),
+                    None,
                     ["errands", "--gapplication-service"],
                     Xdp.BackgroundFlags.AUTOSTART,
                     None,
@@ -173,17 +106,12 @@ Exec=errands --gapplication-service"""
         # Start notifications daemon
         ErrandsNotificationsDaemon()
 
-        # Plugins
-        # self.plugins_loader = PluginsLoader(self)
-
         # Initialize State
         State.init()
 
         # Main window
         State.main_window = Window(application=State.application)
         self.add_window(State.main_window)
-
-        # self.check_reload()
 
     def do_activate(self) -> None:
         Log.debug("Application: Activate")
