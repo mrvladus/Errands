@@ -57,6 +57,11 @@
   </requires>
 
   <releases>
+  <release version="46.2.8" date="2025-03-15">
+   <description translate="no">
+     <p>Fix autostart</p>
+   </description>
+ </release>
    <release version="46.2.7" date="2024-12-07">
     <description translate="no">
       <p>Bug fixes and translations updates</p>
