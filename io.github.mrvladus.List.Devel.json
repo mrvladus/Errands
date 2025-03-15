@@ -15,7 +15,6 @@
     "--filesystem=home"
   ],
   "cleanup": [
-    "/lib/debug",
     "/include",
     "/lib/pkgconfig",
     "/man",

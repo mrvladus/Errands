@@ -46,17 +46,15 @@ class ErrandsApplication(Adw.Application):
                 None,
             )
         else:
-            try:
-                os.remove(
-                    os.path.join(
-                        GLib.get_home_dir(),
-                        ".config",
-                        "autostart",
-                        State.APP_ID + ".desktop",
-                    )
-                )
-            except Exception:
-                pass
+            portal.request_background(
+                None,
+                None,
+                [""],
+                Xdp.BackgroundFlags.NONE,
+                None,
+                None,
+                None,
+            )
 
     def do_startup(self) -> None:
         Adw.Application.do_startup(self)
