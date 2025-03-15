@@ -32,60 +32,31 @@ class ErrandsApplication(Adw.Application):
 
     def run_in_background(self):
         """Create or remove autostart desktop file"""
-
         Log.debug("Application: Checking autostart")
-
         portal: Xdp.Portal = Xdp.Portal()
-        is_flatpak: bool = portal.running_under_flatpak()
-
+        # Request background
         if GSettings.get("launch-on-startup"):
-            if is_flatpak:
-                # Request background
-                portal.request_background(
-                    None,
-                    None,
-                    ["errands", "--gapplication-service"],
-                    Xdp.BackgroundFlags.AUTOSTART,
-                    None,
-                    None,
-                    None,
-                )
-            else:
-                # Get or create autostart dir
-                autostart_dir: str = os.path.join(GLib.get_home_dir(), ".config", "autostart")
-                if not os.path.exists(autostart_dir):
-                    os.mkdir(autostart_dir)
-                autostart_file_content = f"""[Desktop Entry]
-Type=Application
-Name={State.APP_ID}
-Exec=errands --gapplication-service"""
-                # Create autostart file
-                file_path: str = os.path.join(autostart_dir, f"{State.APP_ID}.desktop")
-                with open(file_path, "w") as f:
-                    f.write(autostart_file_content)
+            portal.request_background(
+                None,
+                _("Errands need to run in the background for notifications"),
+                ["errands", "--gapplication-service"],
+                Xdp.BackgroundFlags.AUTOSTART,
+                None,
+                None,
+                None,
+            )
         else:
-            if is_flatpak:
-                portal.request_background(
-                    None,
-                    None,
-                    [""],
-                    Xdp.BackgroundFlags.NONE,
-                    None,
-                    None,
-                    None,
-                )
-            else:
-                try:
-                    os.remove(
-                        os.path.join(
-                            GLib.get_home_dir(),
-                            ".config",
-                            "autostart",
-                            State.APP_ID + ".desktop",
-                        )
+            try:
+                os.remove(
+                    os.path.join(
+                        GLib.get_home_dir(),
+                        ".config",
+                        "autostart",
+                        State.APP_ID + ".desktop",
                     )
-                except Exception:
-                    pass
+                )
+            except Exception:
+                pass
 
     def do_startup(self) -> None:
         Adw.Application.do_startup(self)
