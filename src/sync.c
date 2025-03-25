@@ -18,7 +18,7 @@ void sync_init() {
   for (size_t i = 0; i < calendars->len; i++) {
     CalDAVCalendar *calendar = caldav_list_at(calendars, i);
     caldav_calendar_print(calendar);
-    // CalDAVList *events = caldav_calendar_get_events(CALDAV_CALENDAR(caldav_list_at(calendars, i)));
+    CalDAVList *events = caldav_calendar_get_events(CALDAV_CALENDAR(caldav_list_at(calendars, i)));
     // for (size_t idx = 0; idx < events->len; idx++) {
     //   CalDAVEvent *event = caldav_list_at(events, idx);
     //   caldav_event_print(event);

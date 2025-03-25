@@ -371,6 +371,31 @@ static bool caldav_put(CalDAVClient *client, const char *url, const char *body, 
   return out;
 }
 
+static char *caldav_report(CalDAVClient *client, const char *url, const char *body, const char *err_msg) {
+  CURL *curl = curl_easy_init();
+  if (!curl)
+    return NULL;
+  struct response_data response = {NULL, 0};
+  curl_easy_setopt(curl, CURLOPT_URL, url);
+  curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "REPORT");
+  struct curl_slist *headers = NULL;
+  headers = curl_slist_append(headers, "Depth: 1");
+  headers = curl_slist_append(headers, "Prefer: return-minimal");
+  headers = curl_slist_append(headers, "Content-Type: application/xml; charset=utf-8");
+  curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+  curl_easy_setopt(curl, CURLOPT_POSTFIELDS, body);
+  curl_easy_setopt(curl, CURLOPT_USERPWD, client->usrpwd);
+  curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
+  curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+  CURLcode res = curl_easy_perform(curl);
+  if (res != CURLE_OK)
+    CALDAV_LOG("%s: %s\n", err_msg, curl_easy_strerror(res));
+  curl_slist_free_all(headers);
+  curl_easy_cleanup(curl);
+  return response.data;
+}
+
 static char *caldav_client_get_caldav_url(CalDAVClient *client) {
   CALDAV_LOG("Getting CalDAV URL for %s", client->base_url);
   CURL *curl = curl_easy_init();
@@ -514,6 +539,9 @@ CalDAVList *caldav_client_get_calendars(CalDAVClient *client, const char *set) {
     xmlXPathRegisterNs(xpathCtx, BAD_CAST "cs", BAD_CAST "http://calendarserver.org/ns/");
     xmlXPathRegisterNs(xpathCtx, BAD_CAST "cal", BAD_CAST "urn:ietf:params:xml:ns:caldav");
     xmlXPathRegisterNs(xpathCtx, BAD_CAST "x1", BAD_CAST "http://apple.com/ns/ical/");
+    // Register Nextcloud namespace for deleted calendars
+    xmlXPathRegisterNs(xpathCtx, BAD_CAST "nc", BAD_CAST "http://nextcloud.com/ns");
+
     // Evaluate XPath expression for responses
     xmlXPathObjectPtr xpathObj = xmlXPathEvalExpression(BAD_CAST "//d:response", xpathCtx);
     if (!xpathObj) {
@@ -543,19 +571,36 @@ CalDAVList *caldav_client_get_calendars(CalDAVClient *client, const char *set) {
             xmlFree(name);
           }
           if (set_matched) {
-            // Check if the calendar is not deleted
-            xmlXPathObjectPtr deletedObj = xmlXPathNodeEval(response, BAD_CAST ".//cs:deleted-calendar", xpathCtx);
-            if (!deletedObj || !deletedObj->nodesetval || deletedObj->nodesetval->nodeNr == 0) {
+            // Skip calendar if it includes Nextcloud's deleted-calendar element
+            xmlXPathObjectPtr deletedObj = xmlXPathNodeEval(response, BAD_CAST ".//nc:deleted-calendar", xpathCtx);
+            bool is_deleted = (deletedObj && deletedObj->nodesetval && deletedObj->nodesetval->nodeNr > 0);
+            xmlXPathFreeObject(deletedObj);
+            if (!is_deleted) {
               // Extract calendar details
-              xmlChar *displayName = xmlNodeGetContent(
-                  xmlXPathNodeEval(response, BAD_CAST ".//d:displayname", xpathCtx)->nodesetval->nodeTab[0]);
-              xmlChar *href =
-                  xmlNodeGetContent(xmlXPathNodeEval(response, BAD_CAST ".//d:href", xpathCtx)->nodesetval->nodeTab[0]);
+              xmlXPathObjectPtr displayNameObj = xmlXPathNodeEval(response, BAD_CAST ".//d:displayname", xpathCtx);
+              xmlXPathObjectPtr hrefObj = xmlXPathNodeEval(response, BAD_CAST ".//d:href", xpathCtx);
+              if (!displayNameObj || !hrefObj || !displayNameObj->nodesetval ||
+                  displayNameObj->nodesetval->nodeNr == 0 || !hrefObj->nodesetval || hrefObj->nodesetval->nodeNr == 0) {
+                if (displayNameObj)
+                  xmlXPathFreeObject(displayNameObj);
+                if (hrefObj)
+                  xmlXPathFreeObject(hrefObj);
+                xmlXPathFreeObject(supportedSetObj);
+                continue;
+              }
+
+              xmlChar *displayName = xmlNodeGetContent(displayNameObj->nodesetval->nodeTab[0]);
+              xmlChar *href = xmlNodeGetContent(hrefObj->nodesetval->nodeTab[0]);
+              xmlXPathFreeObject(displayNameObj);
+              xmlXPathFreeObject(hrefObj);
+
               xmlXPathObjectPtr colorObj = xmlXPathNodeEval(response, BAD_CAST ".//x1:calendar-color", xpathCtx);
               char *hex_color;
               if (colorObj && colorObj->nodesetval && colorObj->nodesetval->nodeNr != 0) {
-                hex_color = strdup((char *)xmlNodeGetContent(colorObj->nodesetval->nodeTab[0]));
-                xmlFree(colorObj);
+                xmlChar *colorContent = xmlNodeGetContent(colorObj->nodesetval->nodeTab[0]);
+                hex_color = strdup((char *)colorContent);
+                xmlFree(colorContent);
+                xmlXPathFreeObject(colorObj);
               } else {
                 hex_color = caldav_generate_hex_color();
               }
@@ -570,7 +615,6 @@ CalDAVList *caldav_client_get_calendars(CalDAVClient *client, const char *set) {
               xmlFree(displayName);
               xmlFree(href);
             }
-            xmlXPathFreeObject(deletedObj);
           }
         }
         xmlXPathFreeObject(supportedSetObj);
@@ -662,60 +706,134 @@ bool caldav_calendar_delete(CalDAVCalendar *calendar) {
   return res;
 }
 
-// CalDAVList *caldav_calendar_get_events(CalDAVCalendar *calendar) {
-//   CURL *curl = curl_easy_init();
-//   if (!curl)
-//     return NULL;
-//   const char *request_template = "<c:calendar-query xmlns:d=\"DAV:\" xmlns:c=\"urn:ietf:params:xml:ns:caldav\">"
-//                                  "  <d:prop>"
-//                                  "    <c:calendar-data/>"
-//                                  "  </d:prop>"
-//                                  "  <c:filter>"
-//                                  "    <c:comp-filter name=\"VCALENDAR\">"
-//                                  "      <c:comp-filter name=\"%s\"/>"
-//                                  "    </c:comp-filter>"
-//                                  "  </c:filter>"
-//                                  "</c:calendar-query>";
-//   char request_body[strlen(request_template) + 7];
-//   sprintf(request_body, request_template, calendar->set);
-//   CURLcode res;
-//   struct response_data response = {NULL, 0};
-//   curl_easy_setopt(curl, CURLOPT_URL, calendar->url);
-//   curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "REPORT");
-//   struct curl_slist *headers = NULL;
-//   headers = curl_slist_append(headers, "Depth: 1");
-//   headers = curl_slist_append(headers, "Prefer: return-minimal");
-//   headers = curl_slist_append(headers, "Content-Type: application/xml; charset=utf-8");
-//   curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-//   curl_easy_setopt(curl, CURLOPT_POSTFIELDS, request_body);
-//   curl_easy_setopt(curl, CURLOPT_USERPWD, calendar->client->usrpwd);
-//   curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-//   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
-//   curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
-//   res = curl_easy_perform(curl);
-//   CalDAVList *output = NULL;
-//   if (res != CURLE_OK)
-//     CALDAV_LOG("Failed to get events for calendar '%s': %s", calendar->url, curl_easy_strerror(res));
-//   else {
-//     XMLNode *root = xml_parse_string(response.data);
-//     output = caldav_list_new();
-//     XMLNode *multistatus = xml_node_child_at(root, 0);
-//     for (size_t i = 0; i < multistatus->children->len; i++) {
-//       XMLNode *response = xml_node_child_at(multistatus, i);
-//       XMLNode *href = xml_node_find_tag(response, "href", false);
-//       char url[strlen(calendar->client->base_url) + strlen(href->text) + 1];
-//       sprintf(url, "%s%s", calendar->client->base_url, href->text);
-//       XMLNode *cal_data = xml_node_find_tag(response, "calendar-data", false);
-//       CalDAVEvent *event = caldav_event_new(calendar, cal_data->text, url);
-//       caldav_list_add(output, event);
-//     }
-//     xml_node_free(root);
-//   }
-//   CALDAV_FREE(response.data);
-//   curl_slist_free_all(headers);
-//   curl_easy_cleanup(curl);
-//   return output;
-// }
+CalDAVList *caldav_calendar_get_events(CalDAVCalendar *calendar) {
+  // Define the XML request template.
+  const char *request_template = "<c:calendar-query xmlns:d=\"DAV:\" xmlns:c=\"urn:ietf:params:xml:ns:caldav\">"
+                                 "  <d:prop>"
+                                 "    <c:calendar-data/>"
+                                 "  </d:prop>"
+                                 "  <c:filter>"
+                                 "    <c:comp-filter name=\"VCALENDAR\">"
+                                 "      <c:comp-filter name=\"%s\"/>"
+                                 "    </c:comp-filter>"
+                                 "  </c:filter>"
+                                 "</c:calendar-query>";
+
+  // Allocate enough memory for the request body.
+  char request_body[strlen(request_template) + strlen(calendar->set) + 1];
+  sprintf(request_body, request_template, calendar->set);
+
+  // Issue the REPORT request.
+  char *xml = caldav_report(calendar->client, calendar->url, request_body, "Failed to get events for calendar");
+  if (!xml)
+    return NULL;
+
+  // Parse the returned XML document.
+  xmlDocPtr doc = xmlReadMemory(xml, strlen(xml), NULL, NULL, 0);
+  if (!doc) {
+    CALDAV_LOG("Error: Failed to parse XML\n");
+    CALDAV_FREE(xml);
+    return NULL;
+  }
+
+  // Create an XPath evaluation context.
+  xmlXPathContextPtr xpathCtx = xmlXPathNewContext(doc);
+  if (!xpathCtx) {
+    CALDAV_LOG("Error: Unable to create XPath context\n");
+    xmlFreeDoc(doc);
+    CALDAV_FREE(xml);
+    return NULL;
+  }
+
+  // Register namespaces.
+  xmlXPathRegisterNs(xpathCtx, BAD_CAST "d", BAD_CAST "DAV:");
+  xmlXPathRegisterNs(xpathCtx, BAD_CAST "cal", BAD_CAST "urn:ietf:params:xml:ns:caldav");
+
+  // Evaluate XPath expression to find all <d:response> nodes.
+  xmlXPathObjectPtr xpathObj = xmlXPathEvalExpression(BAD_CAST "//d:response", xpathCtx);
+  if (!xpathObj) {
+    CALDAV_LOG("Error: Unable to evaluate XPath expression\n");
+    xmlXPathFreeContext(xpathCtx);
+    xmlFreeDoc(doc);
+    CALDAV_FREE(xml);
+    return NULL;
+  }
+
+  xmlNodeSetPtr nodes = xpathObj->nodesetval;
+  if (!nodes) {
+    xmlXPathFreeObject(xpathObj);
+    xmlXPathFreeContext(xpathCtx);
+    xmlFreeDoc(doc);
+    CALDAV_FREE(xml);
+    return NULL;
+  }
+
+  // Create a dynamic list for events.
+  CalDAVList *events = caldav_list_new();
+  if (!events) {
+    CALDAV_LOG("Error: Unable to create events list\n");
+    xmlXPathFreeObject(xpathObj);
+    xmlXPathFreeContext(xpathCtx);
+    xmlFreeDoc(doc);
+    CALDAV_FREE(xml);
+    return NULL;
+  }
+
+  // Loop through each <d:response> node.
+  for (size_t i = 0; i < nodes->nodeNr; i++) {
+    xmlNodePtr response = nodes->nodeTab[i];
+    // Set the current node as the context for relative XPath queries.
+    xmlXPathSetContextNode(response, xpathCtx);
+
+    // Temporary buffers for storing the extracted URL and iCal data.
+    char *url = NULL;
+    char *ical = NULL;
+
+    // Evaluate XPath to extract the <d:href> element.
+    xmlXPathObjectPtr hrefObj = xmlXPathEvalExpression(BAD_CAST "./d:href", xpathCtx);
+    if (hrefObj && hrefObj->nodesetval && hrefObj->nodesetval->nodeNr > 0) {
+      xmlChar *hrefContent = xmlNodeGetContent(hrefObj->nodesetval->nodeTab[0]);
+      if (hrefContent) {
+        url = strdup((char *)hrefContent);
+        xmlFree(hrefContent);
+      }
+    }
+    if (hrefObj)
+      xmlXPathFreeObject(hrefObj);
+
+    // Evaluate XPath to extract the <cal:calendar-data> element.
+    xmlXPathObjectPtr calDataObj = xmlXPathEvalExpression(BAD_CAST ".//cal:calendar-data", xpathCtx);
+    if (calDataObj && calDataObj->nodesetval && calDataObj->nodesetval->nodeNr > 0) {
+      xmlChar *calDataContent = xmlNodeGetContent(calDataObj->nodesetval->nodeTab[0]);
+      if (calDataContent) {
+        ical = strdup((char *)calDataContent);
+        CALDAV_LOG("iCal Data:\n%s", ical);
+        xmlFree(calDataContent);
+      }
+    }
+    if (calDataObj)
+      xmlXPathFreeObject(calDataObj);
+
+    // Create a new CalDAVEvent using the helper function.
+    CalDAVEvent *event = caldav_event_new(calendar, ical, url);
+
+    // Free temporary buffers since caldav_event_new duplicates the strings.
+    free(ical);
+    free(url);
+
+    // Add the new event to the dynamic events list.
+    caldav_list_add(events, event);
+  }
+
+  // Cleanup XML-related resources.
+  xmlXPathFreeObject(xpathObj);
+  xmlXPathFreeContext(xpathCtx);
+  xmlFreeDoc(doc);
+  CALDAV_FREE(xml);
+
+  // Return the populated event list.
+  return events;
+}
 
 CalDAVEvent *caldav_calendar_create_event(CalDAVCalendar *calendar, const char *ical) {
   CALDAV_LOG("Create event in calendar %s", calendar->uuid);
