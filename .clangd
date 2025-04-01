@@ -31,3 +31,4 @@ CompileFlags:
     - -I/usr/include/p11-kit-1
     - -I/usr/include/webkitgtk-6.0
     - -I../_build
+    - -DCALDAV_H_IMPLEMENTATION

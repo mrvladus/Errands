@@ -2,7 +2,7 @@ project(
   'errands',
   'c',
   license: 'MIT',
-  version: '47.0',
+  version: '48.0',
 )
 
 # Dependencies
@@ -13,7 +13,6 @@ dependencies = [
   dependency('webkitgtk-6.0'), # For markdown preview
   dependency('libcmark'), # For markdown preview
   dependency('libcurl'), # For caldav requests
-  dependency('libxml-2.0'), # For caldav parsing
   dependency('json-glib-1.0'), # For parsing json
   dependency('gtk4'),
   dependency('libadwaita-1', version: '>=1.6'),
@@ -22,6 +21,7 @@ dependencies = [
 # Source files
 sources = files(
   'src/attachments-window.c',
+  'src/caldav.c',
   'src/color-window.c',
   'src/data.c',
   'src/date-chooser.c',
