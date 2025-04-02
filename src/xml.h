@@ -88,18 +88,35 @@ void xml_node_free(XMLNode *node);
 #ifdef XML_H_IMPLEMENTATION
 
 #include <ctype.h>
+#include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-// Print debug message. Only if XML_H_DEBUG is defined.
+// ------ UTILS ------ //
+
+// Print debug message.
+// Only if XML_H_DEBUG is defined.
+void log_debug(const char *format, ...) {
 #ifdef XML_H_DEBUG
-#define LOG_DEBUG(format, ...) printf("[XML.H DEBUG] " format "\n", ##__VA_ARGS__)
-#else
-#define LOG_DEBUG(format, ...)
+  va_list args;
+  printf("[XML.H DEBUG] ");
+  va_start(args, format);
+  vprintf(format, args);
+  va_end(args);
+  printf("\n");
 #endif
-#define LOG_ERROR(format, ...) fprintf(stderr, "[XML.H ERROR] " format "\n", ##__VA_ARGS__)
+}
+
+void log_error(const char *format, ...) {
+  va_list args;
+  printf("[XML.H ERROR] ");
+  va_start(args, format);
+  vprintf(format, args);
+  va_end(args);
+  printf("\n");
+}
 
 // ------ LIST ------ //
 
@@ -247,14 +264,14 @@ static bool skip_tags(const char *xml, size_t *idx) {
   if (xml[*idx] == '?') {
     while (!(xml[*idx] == '>' && xml[*idx - 1] == '?')) (*idx)++;
     (*idx)++;
-    LOG_DEBUG("Parsed processing instruction: <%.*s", (int)(*idx - start), xml + start);
+    log_debug("Parsed processing instruction: <%.*s", (int)(*idx - start), xml + start);
     return true;
   }
   // Comment
   else if (xml[*idx] == '!' && xml[*idx + 1] == '-' && xml[*idx + 2] == '-') {
     while (!(xml[*idx] == '>' && xml[*idx - 1] == '-' && xml[*idx - 2] == '-')) (*idx)++;
     (*idx)++;
-    LOG_DEBUG("Parsed comment: <%.*s", (int)(*idx - start), xml + start);
+    log_debug("Parsed comment: <%.*s", (int)(*idx - start), xml + start);
     return true;
   }
   return false;
@@ -266,7 +283,7 @@ static void parse_end_tag(const char *xml, size_t *idx, XMLNode **curr_node) {
   skip_whitespace(xml, idx);
   while (xml[*idx] != '>') (*idx)++;
   (*idx)++; // Skip '>'
-  LOG_DEBUG("Parsed end tag: </%s>", (*curr_node)->tag);
+  log_debug("Parsed end tag: </%s>", (*curr_node)->tag);
   *curr_node = (*curr_node)->parent;
 }
 
@@ -299,7 +316,7 @@ static void parse_tag_attributes(const char *xml, size_t *idx, XMLNode **curr_no
     (*idx)++; // Skip closing quote
     xml_node_add_attr(*curr_node, attr_key, attr_value);
     skip_whitespace(xml, idx);
-    LOG_DEBUG("Parsed tag attribute: <%s %s=\"%s\">", (*curr_node)->tag, attr_key, attr_value);
+    log_debug("Parsed tag attribute: <%s %s=\"%s\">", (*curr_node)->tag, attr_key, attr_value);
   }
 }
 
@@ -309,7 +326,7 @@ static void parse_tag_inner_text(const char *xml, size_t *idx, XMLNode **curr_no
   if (*idx > text_start) {
     (*curr_node)->text = strndup(xml + text_start, *idx - text_start);
     trim_text((*curr_node)->text);
-    LOG_DEBUG("Parsed inner text for <%s>: %s", (*curr_node)->tag, (*curr_node)->text);
+    log_debug("Parsed inner text for <%s>: %s", (*curr_node)->tag, (*curr_node)->text);
   }
 }
 
@@ -334,14 +351,14 @@ static bool parse_tag(const char *xml, size_t *idx, XMLNode **curr_node) {
     (*idx)++; // Skip '/'
     while (xml[*idx] != '>') (*idx)++;
     (*idx)++; // Consume '>'
-    LOG_DEBUG("Parsed self-closing tag: <%s/>", (*curr_node)->tag);
+    log_debug("Parsed self-closing tag: <%s/>", (*curr_node)->tag);
     *curr_node = (*curr_node)->parent;
     return false;
   }
   // Start tag <tag ... >
   else if (xml[*idx] == '>') {
     (*idx)++; // Consume '>'
-    LOG_DEBUG("Parsed start tag: <%s>", (*curr_node)->tag);
+    log_debug("Parsed start tag: <%s>", (*curr_node)->tag);
     skip_whitespace(xml, idx);
     parse_tag_inner_text(xml, idx, curr_node);
     // If the next character is '<', parse the next tag
@@ -356,7 +373,7 @@ static bool parse_tag(const char *xml, size_t *idx, XMLNode **curr_node) {
 }
 
 XMLNode *xml_parse_string(const char *xml) {
-  LOG_DEBUG("Parse string: %s", xml);
+  log_debug("Parse string: %s", xml);
   XMLNode *root = xml_node_new(NULL);
   XMLNode *curr_node = root;
   size_t idx = 0;
@@ -371,7 +388,7 @@ XMLNode *xml_parse_string(const char *xml) {
     }
     idx++;
   }
-  LOG_DEBUG("Done parsing string");
+  log_debug("Done parsing string");
   return root;
 }
 
