@@ -1,9 +1,9 @@
 #pragma once
 
-#include "dialogs.h"
-#include "sidebar.h"
+#include "dialogs/dialogs.h"
+#include "sidebar/sidebar.h"
 #include "task-list.h"
-#include "task-toolbar.h"
+#include "task/task.h"
 #include "window.h"
 
 #include <adwaita.h>

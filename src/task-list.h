@@ -1,7 +1,6 @@
 #pragma once
 
-#include "data.h"
-#include "glib.h"
+#include "data/data.h"
 
 #include <adwaita.h>
 
@@ -16,7 +15,6 @@ struct _ErrandsTaskList {
   GtkWidget *task_list;
   ListData *data;
 };
-
 ErrandsTaskList *errands_task_list_new();
 void errands_task_list_add(TaskData *td);
 void errands_task_list_update_title();

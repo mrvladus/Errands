@@ -1,7 +1,8 @@
 #pragma once
 
-#include "adwaita.h"
 #include "no-lists-page.h"
+
+#include <adwaita.h>
 
 #define ERRANDS_TYPE_WINDOW (errands_window_get_type())
 G_DECLARE_FINAL_TYPE(ErrandsWindow, errands_window, ERRANDS, WINDOW, AdwApplicationWindow)

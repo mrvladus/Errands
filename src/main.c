@@ -1,14 +1,16 @@
+#if !(defined(__GNUC__) || defined(__clang__))
+#error "This code requires GCC or Clang compiler because it uses features not supported by other compilers.\
+e.g. GLib's g_autoptr, g_auto and g_autofree"
+#endif
+
 #include "config.h"
-#include "data.h"
+#include "data/data.h"
 #include "settings.h"
 #include "state.h"
-#include "sync.h"
 #include "utils.h"
 #include "window.h"
 
-#include <adwaita.h>
 #include <glib/gi18n.h>
-#include <libical/ical.h>
 #include <libportal/portal.h>
 
 extern GResource *errands_get_resource(void);
@@ -17,7 +19,7 @@ static void activate(GtkApplication *app) {
   state.main_window = errands_window_new();
   errands_window_build(state.main_window);
   gtk_window_present(GTK_WINDOW(state.main_window));
-  sync_init();
+  // sync_init();
 }
 
 int main(int argc, char **argv) {

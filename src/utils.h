@@ -14,6 +14,10 @@
 // For range from start to end - 1
 #define for_range(var, start, end) for (int var = start; var < end; var++)
 
+#define RUN_THREAD_FUNC(func, on_finish_cb)                                                                            \
+  g_autoptr(GTask) task = g_task_new(NULL, NULL, on_finish_cb, NULL);                                                  \
+  g_task_run_in_thread(task, func);
+
 // Get children of the widget
 static inline GPtrArray *get_children(GtkWidget *parent) {
   GPtrArray *children = g_ptr_array_new();
@@ -31,8 +35,7 @@ static inline GPtrArray *get_children(GtkWidget *parent) {
 
 static inline void gtk_box_remove_all(GtkWidget *box) {
   g_autoptr(GPtrArray) children = get_children(box);
-  for (int i = 0; i < children->len; i++)
-    gtk_box_remove(GTK_BOX(box), GTK_WIDGET(children->pdata[i]));
+  for (int i = 0; i < children->len; i++) gtk_box_remove(GTK_BOX(box), GTK_WIDGET(children->pdata[i]));
 }
 
 static inline bool string_contains(const char *haystack, const char *needle) {
@@ -42,32 +45,31 @@ static inline bool string_contains(const char *haystack, const char *needle) {
 // Check if any string in the array contains string
 static inline bool string_array_contains(GPtrArray *str_arr, const char *needle) {
   for (int i = 0; i < str_arr->len; i++)
-    if (string_contains((char *)str_arr->pdata[i], needle))
-      return true;
+    if (string_contains((char *)str_arr->pdata[i], needle)) return true;
   return false;
 }
 
 // Function to trim leading and trailing whitespace
 static inline char *string_trim(char *str) {
   // Trim leading whitespace
-  while (isspace((unsigned char)*str))
-    str++;
+  while (isspace((unsigned char)*str)) str++;
   // Trim trailing whitespace
   char *end = str + strlen(str) - 1;
-  while (end > str && isspace((unsigned char)*end))
-    end--;
+  while (end > str && isspace((unsigned char)*end)) end--;
   // Null terminate the trimmed string
   *(end + 1) = '\0';
   return str;
 }
 
-static inline void generate_hex(char *color) {
+static inline const char *generate_hex() {
+  static char color[8];
   srand(time(NULL));
   int red = rand() % 256;
   int green = rand() % 256;
   int blue = rand() % 256;
   sprintf(color, "#%02X%02X%02X", red, green, blue);
   LOG("Generate color '%s'", color);
+  return color;
 }
 
 static inline void gdk_rgba_to_hex_string(const GdkRGBA *rgba, char *hex_string) {
@@ -101,12 +103,8 @@ static inline void g_ptr_array_move_before(GPtrArray *array, gpointer element, g
 
   // Find the indices of the element to move and the target element
   for (gint i = 0; i < array->len; i++) {
-    if (g_ptr_array_index(array, i) == element) {
-      index = i;
-    }
-    if (g_ptr_array_index(array, i) == target) {
-      target_index = i;
-    }
+    if (g_ptr_array_index(array, i) == element) { index = i; }
+    if (g_ptr_array_index(array, i) == target) { target_index = i; }
   }
 
   // Check if both indices were found
@@ -134,12 +132,8 @@ static inline void g_ptr_array_move_after(GPtrArray *array, gpointer element, gp
 
   // Find the indices of the element to move and the target element
   for (gint i = 0; i < array->len; i++) {
-    if (g_ptr_array_index(array, i) == element) {
-      index = i;
-    }
-    if (g_ptr_array_index(array, i) == target) {
-      target_index = i;
-    }
+    if (g_ptr_array_index(array, i) == element) { index = i; }
+    if (g_ptr_array_index(array, i) == target) { target_index = i; }
   }
 
   // Check if both indices were found
@@ -161,10 +155,12 @@ static inline void g_ptr_array_move_after(GPtrArray *array, gpointer element, gp
   g_ptr_array_insert(array, target_index + 1, temp);
 }
 
-static inline void get_date_time(char date_time[17]) {
+static inline const char *get_date_time() {
+  static char out[17];
   g_autoptr(GDateTime) dt = g_date_time_new_now_local();
   g_autofree gchar *tmp = g_date_time_format(dt, "%Y%m%dT%H%M%SZ");
-  strcpy(date_time, tmp);
+  strcpy(out, tmp);
+  return out;
 }
 
 static inline char *get_today_date() {
@@ -240,12 +236,10 @@ static inline bool directory_exists(const char *path) {
 
 static inline char *get_rrule_value(const char *rrule, const char *key) {
   const char *value_start = strstr(rrule, key);
-  if (!value_start)
-    return NULL;
+  if (!value_start) return NULL;
   value_start += strlen(key) + 1;
   const char *value_end = strchr(value_start, ';');
-  if (!value_end)
-    return NULL;
+  if (!value_end) return NULL;
   int length = value_end - value_start;
   char *out = malloc(length);
   out[length] = '\0';
@@ -255,12 +249,10 @@ static inline char *get_rrule_value(const char *rrule, const char *key) {
 
 static inline char *get_ical_value(const char *ical, const char *key) {
   const char *val_start = strstr(ical, key);
-  if (!val_start)
-    return NULL;
+  if (!val_start) return NULL;
   val_start += strlen(key) + 1;
   const char *val_end = strchr(val_start, '\n');
-  if (!val_end)
-    return NULL;
+  if (!val_end) return NULL;
   const int val_len = val_end - val_start;
   char *value = malloc(val_len);
   value[val_len] = '\0';
@@ -302,14 +294,12 @@ static inline int *string_to_int_array(const char *str) {
   // First, count the number of integers
   int count = 1;
   for (const char *p = str; *p != '\0'; p++) {
-    if (*p == ',')
-      count++;
+    if (*p == ',') count++;
   }
 
   // Allocate memory for the array, with one extra space for NULL termination
   int *arr = (int *)malloc((count + 1) * sizeof(int));
-  if (!arr)
-    return NULL;
+  if (!arr) return NULL;
 
   // Parse the string and fill the array
   int index = 0;

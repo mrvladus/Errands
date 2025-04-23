@@ -1,8 +1,8 @@
 #include "window.h"
-#include "data.h"
+#include "data/data.h"
 #include "no-lists-page.h"
 #include "settings.h"
-#include "sidebar.h"
+#include "sidebar/sidebar.h"
 #include "state.h"
 #include "task-list.h"
 #include "utils.h"
@@ -32,10 +32,8 @@ static void errands_window_init(ErrandsWindow *self) {
 
 ErrandsWindow *errands_window_new() {
   ErrandsWindow *self = g_object_new(ERRANDS_TYPE_WINDOW, NULL);
-  if (errands_settings_get("maximized", SETTING_TYPE_BOOL).b)
-    gtk_window_maximize(GTK_WINDOW(self));
-  gtk_window_set_default_size(GTK_WINDOW(self),
-                              errands_settings_get("window_width", SETTING_TYPE_INT).i,
+  if (errands_settings_get("maximized", SETTING_TYPE_BOOL).b) gtk_window_maximize(GTK_WINDOW(self));
+  gtk_window_set_default_size(GTK_WINDOW(self), errands_settings_get("window_width", SETTING_TYPE_INT).i,
                               errands_settings_get("window_height", SETTING_TYPE_INT).i);
   g_signal_connect_swapped(self, "notify::default-width", G_CALLBACK(on_size_changed), self);
   g_signal_connect_swapped(self, "notify::default-height", G_CALLBACK(on_size_changed), self);
@@ -46,9 +44,8 @@ ErrandsWindow *errands_window_new() {
 void errands_window_build(ErrandsWindow *win) {
   // Sidebar
   state.sidebar = errands_sidebar_new();
-  adw_navigation_split_view_set_sidebar(
-      ADW_NAVIGATION_SPLIT_VIEW(win->split_view),
-      adw_navigation_page_new(GTK_WIDGET(state.sidebar), "Sidebar"));
+  adw_navigation_split_view_set_sidebar(ADW_NAVIGATION_SPLIT_VIEW(win->split_view),
+                                        adw_navigation_page_new(GTK_WIDGET(state.sidebar), "Sidebar"));
 
   // Content
   adw_navigation_split_view_set_content(ADW_NAVIGATION_SPLIT_VIEW(win->split_view),
@@ -60,10 +57,10 @@ void errands_window_build(ErrandsWindow *win) {
 void errands_window_update(ErrandsWindow *win) {
   LOG("Main Window: Update");
   int count = 0;
-  for (int i = 0; i < ldata->len; i++) {
-    ListData *ld = ldata->pdata[i];
-    if (!list_data_get_deleted(ld))
-      count++;
+  GPtrArray *lists = g_hash_table_get_values_as_ptr_array(ldata);
+  for (int i = 0; i < lists->len; i++) {
+    ListData *ld = lists->pdata[i];
+    if (!errands_data_get_bool(ld, DATA_PROP_DELETED)) count++;
   }
   g_object_set(state.main_window->no_lists_page, "visible", count == 0, NULL);
 }
