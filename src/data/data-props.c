@@ -143,6 +143,8 @@ void errands_data_set_str(icalcomponent *data, DataPropStr prop, const char *val
   case DATA_PROP_TEXT: icalcomponent_set_summary(data, value); break;
   case DATA_PROP_UID: icalcomponent_set_uid(data, value); break;
   }
+  if (icalcomponent_isa(data) == ICAL_VTODO_COMPONENT && prop != DATA_PROP_CHANGED)
+    errands_data_set_str(data, DATA_PROP_CHANGED, get_date_time());
 }
 
 void errands_data_set_int(icalcomponent *data, DataPropInt prop, size_t value) {
@@ -160,6 +162,8 @@ void errands_data_set_int(icalcomponent *data, DataPropInt prop, size_t value) {
     break;
   }
   }
+  if (icalcomponent_isa(data) == ICAL_VTODO_COMPONENT && prop != DATA_PROP_CHANGED)
+    errands_data_set_str(data, DATA_PROP_CHANGED, get_date_time());
 }
 
 void errands_data_set_bool(icalcomponent *data, DataPropBool prop, bool value) {
@@ -172,6 +176,7 @@ void errands_data_set_bool(icalcomponent *data, DataPropBool prop, bool value) {
   case DATA_PROP_TRASH: set_x_prop_value(data, "X-ERRANDS-TRASH", str); break;
   case DATA_PROP_SYNCED: set_x_prop_value(data, "X-ERRANDS-SYNCED", str); break;
   }
+  if (icalcomponent_isa(data) == ICAL_VTODO_COMPONENT) errands_data_set_str(data, DATA_PROP_CHANGED, get_date_time());
 }
 
 void errands_data_set_strv(icalcomponent *data, DataPropStrv prop, GStrv value) {
@@ -186,6 +191,7 @@ void errands_data_set_strv(icalcomponent *data, DataPropStrv prop, GStrv value) 
       icalcomponent_add_property(data, icalproperty_new_categories(value[i]));
     break;
   }
+  errands_data_set_str(data, DATA_PROP_CHANGED, get_date_time());
 }
 
 void errands_data_add_tag(icalcomponent *data, DataPropStrv prop, const char *tag) {
@@ -193,6 +199,7 @@ void errands_data_add_tag(icalcomponent *data, DataPropStrv prop, const char *ta
   case DATA_PROP_TAGS: icalcomponent_add_property(data, icalproperty_new_categories(tag)); break;
   case DATA_PROP_ATTACHMENTS: break;
   }
+  errands_data_set_str(data, DATA_PROP_CHANGED, get_date_time());
 }
 
 void errands_data_remove_tag(icalcomponent *data, DataPropStrv prop, const char *tag) {
@@ -204,4 +211,5 @@ void errands_data_remove_tag(icalcomponent *data, DataPropStrv prop, const char 
     break;
   case DATA_PROP_ATTACHMENTS: break;
   }
+  errands_data_set_str(data, DATA_PROP_CHANGED, get_date_time());
 }

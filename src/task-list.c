@@ -204,7 +204,7 @@ void errands_task_list_update_title() {
   g_ptr_array_free(tasks, false);
   g_autofree gchar *stats = g_strdup_printf("%s %zu / %zu", _("Completed:"), completed, total);
   adw_window_title_set_subtitle(ADW_WINDOW_TITLE(state.task_list->title), total > 0 ? stats : "");
-  errands_data_write_list(state.task_list->data);
+  // errands_data_write_list(state.task_list->data);
 }
 
 static void __append_tasks(GPtrArray *arr, GtkWidget *task_list) {
@@ -239,18 +239,15 @@ void errands_task_list_filter_by_uid(const char *uid) {
   for (size_t i = 0; i < tasks->len; i++) {
     ErrandsTask *task = tasks->pdata[i];
     gtk_widget_set_visible(GTK_WIDGET(task), true);
-    //   bool deleted = errands_data_get_str(*(task->data),DATA_PROP_DELETED);
-    //   bool trash = errands_data_get_str(*(task->data),DATA_PROP_TRASH);
-    //   const char *list_uid = task_data_get_list_uid(*(task->data));
-    //   if (!strcmp(uid, "") && !deleted && !trash) {
-    //     gtk_widget_set_visible(GTK_WIDGET(task), true);
-    //     continue;
-    //   }
-    //   if (!strcmp(uid, list_uid) && !deleted && !trash)
-    //     gtk_widget_set_visible(GTK_WIDGET(task), true);
-    //   else
-    //     gtk_widget_set_visible(GTK_WIDGET(task), !strcmp(list_uid, uid) && !deleted);
-    // }
+    bool deleted = errands_data_get_bool(task->data, DATA_PROP_DELETED);
+    bool trash = errands_data_get_bool(task->data, DATA_PROP_TRASH);
+    const char *list_uid = errands_data_get_str(task->data, DATA_PROP_LIST_UID);
+    if (!strcmp(uid, "") && !deleted && !trash) {
+      gtk_widget_set_visible(GTK_WIDGET(task), true);
+      continue;
+    }
+    if (!strcmp(uid, list_uid) && !deleted && !trash) gtk_widget_set_visible(GTK_WIDGET(task), true);
+    else gtk_widget_set_visible(GTK_WIDGET(task), !strcmp(list_uid, uid) && !deleted);
   }
 }
 

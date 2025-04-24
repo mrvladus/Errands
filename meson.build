@@ -14,7 +14,7 @@ dependencies = [
   dependency('webkitgtk-6.0'), # For markdown preview
   dependency('libcmark'), # For markdown preview
   dependency('gtk4'),
-  dependency('libadwaita-1', version: '>=1.6'),
+  dependency('libadwaita-1', version: '>=1.7'),
 ]
 
 # Source files
