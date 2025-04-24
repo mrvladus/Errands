@@ -123,7 +123,7 @@ static void errands_task_list_init(ErrandsTaskList *self) {
     const char *parent = errands_data_get_str(data, DATA_PROP_PARENT);
     bool deleted = errands_data_get_bool(data, DATA_PROP_DELETED);
     const char *text = errands_data_get_str(data, DATA_PROP_TEXT);
-    if (!strcmp(parent, "") && !deleted) {
+    if (!parent && !deleted) {
       GtkWidget *task = GTK_WIDGET(errands_task_new(data));
       gtk_box_append(GTK_BOX(self->task_list), task);
     }

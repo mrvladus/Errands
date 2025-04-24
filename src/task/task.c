@@ -193,7 +193,6 @@ static void errands_task_init(ErrandsTask *self) {
 
 ErrandsTask *errands_task_new(TaskData *data) {
   LOG("Task '%s': Create", errands_data_get_str(data, DATA_PROP_UID));
-  LOG("%s", errands_data_get_str(data, DATA_PROP_TEXT));
 
   ErrandsTask *task = g_object_new(ERRANDS_TYPE_TASK, NULL);
   task->data = data;

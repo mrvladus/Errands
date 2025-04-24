@@ -26,50 +26,33 @@ static void set_x_prop_value(icalcomponent *ical, const char *xprop, const char 
   icalproperty_set_x(property, val);
 }
 
-static const char *get_prop_value(icalcomponent *ical, icalproperty_kind kind, const char *default_val) {
-  icalproperty *property = icalcomponent_get_first_property(ical, kind);
-  if (property) return icalproperty_get_value_as_string(property);
-  if (default_val) {
-    property = icalproperty_new(kind);
-    icalproperty_set_value(property, icalvalue_new_from_string(ICAL_STRING_VALUE, default_val));
-    icalcomponent_add_property(ical, property);
-  }
-  return default_val;
-}
-
-static void set_prop_value(icalcomponent *ical, icalproperty_kind kind, const char *val) {
-  icalproperty *property = icalcomponent_get_first_property(ical, kind);
-  if (!property) {
-    property = icalproperty_new(kind);
-    icalcomponent_add_property(ical, property);
-  }
-  icalproperty_set_value(property, icalvalue_new_from_string(ICAL_STRING_VALUE, val));
-}
-
-static void set_prop_value_int(icalcomponent *ical, icalproperty_kind kind, size_t val) {
-  g_autofree gchar *str = g_strdup_printf("%zu", val);
-  set_prop_value(ical, kind, str);
-}
-
 // --- GETTERS --- //
 
 const char *errands_data_get_str(icalcomponent *data, DataPropStr prop) {
   const char *out = NULL;
   switch (prop) {
-  case DATA_PROP_COLOR: out = get_x_prop_value(data, "X-ERRANDS-COLOR", ""); break;
+  case DATA_PROP_COLOR: out = get_x_prop_value(data, "X-ERRANDS-COLOR", "none"); break;
   case DATA_PROP_LIST_NAME: out = get_x_prop_value(data, "X-ERRANDS-LIST-NAME", ""); break;
   case DATA_PROP_LIST_UID: out = get_x_prop_value(data, "X-ERRANDS-LIST-UID", ""); break;
-  case DATA_PROP_COMPLETED: out = get_prop_value(data, ICAL_COMPLETED_PROPERTY, NULL); break;
-  case DATA_PROP_CHANGED: out = get_prop_value(data, ICAL_LASTMODIFIED_PROPERTY, get_date_time()); break;
-  case DATA_PROP_CREATED: out = get_prop_value(data, ICAL_DTSTAMP_PROPERTY, get_date_time()); break;
-  case DATA_PROP_DUE: out = get_prop_value(data, ICAL_DUE_PROPERTY, NULL); break;
-  case DATA_PROP_END: out = get_prop_value(data, ICAL_DTEND_PROPERTY, NULL); break;
-  case DATA_PROP_NOTES: out = get_prop_value(data, ICAL_DESCRIPTION_PROPERTY, NULL); break;
-  case DATA_PROP_PARENT: out = get_prop_value(data, ICAL_RELATEDTO_PROPERTY, NULL); break;
-  case DATA_PROP_RRULE: out = get_prop_value(data, ICAL_RRULE_PROPERTY, NULL); break;
-  case DATA_PROP_START: out = get_prop_value(data, ICAL_DTSTART_PROPERTY, NULL); break;
-  case DATA_PROP_TEXT: out = get_prop_value(data, ICAL_SUMMARY_PROPERTY, ""); break;
-  case DATA_PROP_UID: out = get_prop_value(data, ICAL_UID_PROPERTY, NULL); break;
+  case DATA_PROP_COMPLETED:
+    out = icalproperty_as_ical_string(icalcomponent_get_first_property(data, ICAL_COMPLETED_PROPERTY));
+    break;
+  case DATA_PROP_CHANGED:
+    out = icalproperty_as_ical_string(icalcomponent_get_first_property(data, ICAL_LASTMODIFIED_PROPERTY));
+    break;
+  case DATA_PROP_CREATED: out = icaltime_as_ical_string(icalcomponent_get_dtstamp(data)); break;
+  case DATA_PROP_DUE: out = icaltime_as_ical_string(icalcomponent_get_due(data)); break;
+  case DATA_PROP_END: out = icaltime_as_ical_string(icalcomponent_get_dtend(data)); break;
+  case DATA_PROP_NOTES: out = icalcomponent_get_description(data); break;
+  case DATA_PROP_PARENT:
+    out = icalproperty_as_ical_string(icalcomponent_get_first_property(data, ICAL_RELATEDTO_PROPERTY));
+    break;
+  case DATA_PROP_RRULE:
+    out = icalproperty_as_ical_string(icalcomponent_get_first_property(data, ICAL_RRULE_PROPERTY));
+    break;
+  case DATA_PROP_START: out = icaltime_as_ical_string(icalcomponent_get_dtstart(data)); break;
+  case DATA_PROP_TEXT: out = icalcomponent_get_summary(data); break;
+  case DATA_PROP_UID: out = icalcomponent_get_uid(data); break;
   }
   return out;
 }
@@ -77,8 +60,12 @@ const char *errands_data_get_str(icalcomponent *data, DataPropStr prop) {
 size_t errands_data_get_int(icalcomponent *data, DataPropInt prop) {
   size_t out = 0;
   switch (prop) {
-  case DATA_PROP_PERCENT: out = atoi(get_prop_value(data, ICAL_PERCENTCOMPLETE_PROPERTY, "0")); break;
-  case DATA_PROP_PRIORITY: out = atoi(get_prop_value(data, ICAL_PRIORITY_PROPERTY, "0")); break;
+  case DATA_PROP_PERCENT:
+    out = atoi(icalproperty_as_ical_string(icalcomponent_get_first_property(data, ICAL_PERCENTCOMPLETE_PROPERTY)));
+    break;
+  case DATA_PROP_PRIORITY:
+    out = atoi(icalproperty_as_ical_string(icalcomponent_get_first_property(data, ICAL_PRIORITY_PROPERTY)));
+    break;
   }
   return out;
 }
@@ -120,30 +107,58 @@ void errands_data_set_str(icalcomponent *data, DataPropStr prop, const char *val
   case DATA_PROP_LIST_NAME: set_x_prop_value(data, "X-ERRANDS-LIST-NAME", value); break;
   case DATA_PROP_LIST_UID: set_x_prop_value(data, "X-ERRANDS-LIST-UID", value); break;
   case DATA_PROP_COMPLETED: {
-    if (value) set_prop_value(data, ICAL_COMPLETED_PROPERTY, value);
-    else {
+    if (value) {
+      icalproperty *property = icalcomponent_get_first_property(data, ICAL_COMPLETED_PROPERTY);
+      if (property) icalproperty_set_completed(property, icaltime_from_string(value));
+      else icalcomponent_add_property(data, icalproperty_new_completed(icaltime_from_string(value)));
+    } else {
       icalproperty *property = icalcomponent_get_first_property(data, ICAL_COMPLETED_PROPERTY);
       if (property) icalcomponent_remove_property(data, property);
     }
     break;
   }
-  case DATA_PROP_CHANGED: set_prop_value(data, ICAL_LASTMODIFIED_PROPERTY, value); break;
-  case DATA_PROP_CREATED: set_prop_value(data, ICAL_DTSTAMP_PROPERTY, value); break;
-  case DATA_PROP_DUE: set_prop_value(data, ICAL_DUE_PROPERTY, value); break;
-  case DATA_PROP_END: set_prop_value(data, ICAL_DTEND_PROPERTY, value); break;
-  case DATA_PROP_NOTES: set_prop_value(data, ICAL_DESCRIPTION_PROPERTY, value); break;
-  case DATA_PROP_PARENT: set_prop_value(data, ICAL_RELATEDTO_PROPERTY, value); break;
-  case DATA_PROP_RRULE: set_prop_value(data, ICAL_RRULE_PROPERTY, value); break;
-  case DATA_PROP_START: set_prop_value(data, ICAL_DTSTART_PROPERTY, value); break;
-  case DATA_PROP_TEXT: set_prop_value(data, ICAL_SUMMARY_PROPERTY, value); break;
-  case DATA_PROP_UID: set_prop_value(data, ICAL_UID_PROPERTY, value); break;
+  case DATA_PROP_CHANGED: {
+    icalproperty *property = icalcomponent_get_first_property(data, ICAL_LASTMODIFIED_PROPERTY);
+    if (property) icalproperty_set_lastmodified(property, icaltime_from_string(value));
+    else icalcomponent_add_property(data, icalproperty_new_lastmodified(icaltime_from_string(value)));
+    break;
+  }
+  case DATA_PROP_CREATED: icalcomponent_set_dtstamp(data, icaltime_from_string(value)); break;
+  case DATA_PROP_DUE: icalcomponent_set_due(data, icaltime_from_string(value)); break;
+  case DATA_PROP_END: icalcomponent_set_dtend(data, icaltime_from_string(value)); break;
+  case DATA_PROP_NOTES: icalcomponent_set_description(data, value); break;
+  case DATA_PROP_PARENT: {
+    icalproperty *property = icalcomponent_get_first_property(data, ICAL_RELATEDTO_PROPERTY);
+    if (property) icalproperty_set_relatedto(property, value);
+    else icalcomponent_add_property(data, icalproperty_new_relatedto(value));
+    break;
+  }
+  case DATA_PROP_RRULE: {
+    icalproperty *property = icalcomponent_get_first_property(data, ICAL_RRULE_PROPERTY);
+    if (property) icalproperty_set_rrule(property, icalrecurrencetype_from_string(value));
+    else icalcomponent_add_property(data, icalproperty_new_rrule(icalrecurrencetype_from_string(value)));
+    break;
+  }
+  case DATA_PROP_START: icalcomponent_set_dtstart(data, icaltime_from_string(value)); break;
+  case DATA_PROP_TEXT: icalcomponent_set_summary(data, value); break;
+  case DATA_PROP_UID: icalcomponent_set_uid(data, value); break;
   }
 }
 
 void errands_data_set_int(icalcomponent *data, DataPropInt prop, size_t value) {
   switch (prop) {
-  case DATA_PROP_PERCENT: set_prop_value_int(data, ICAL_PERCENTCOMPLETE_PROPERTY, value); break;
-  case DATA_PROP_PRIORITY: set_prop_value_int(data, ICAL_PRIORITY_PROPERTY, value); break;
+  case DATA_PROP_PERCENT: {
+    icalproperty *property = icalcomponent_get_first_property(data, ICAL_PERCENTCOMPLETE_PROPERTY);
+    if (property) icalproperty_set_percentcomplete(property, value);
+    else icalcomponent_add_property(data, icalproperty_new_percentcomplete(value));
+    break;
+  }
+  case DATA_PROP_PRIORITY: {
+    icalproperty *property = icalcomponent_get_first_property(data, ICAL_PRIORITY_PROPERTY);
+    if (property) icalproperty_set_priority(property, value);
+    else icalcomponent_add_property(data, icalproperty_new_priority(value));
+    break;
+  }
   }
 }
 
@@ -167,7 +182,8 @@ void errands_data_set_strv(icalcomponent *data, DataPropStrv prop, GStrv value) 
     for (icalproperty *p = icalcomponent_get_first_property(data, ICAL_CATEGORIES_PROPERTY); p != 0;
          p = icalcomponent_get_next_property(data, ICAL_CATEGORIES_PROPERTY))
       icalcomponent_remove_property(data, p);
-    set_prop_value(data, ICAL_CATEGORIES_PROPERTY, str);
+    for (size_t i = 0; i < g_strv_length(value); i++)
+      icalcomponent_add_property(data, icalproperty_new_categories(value[i]));
     break;
   }
 }
