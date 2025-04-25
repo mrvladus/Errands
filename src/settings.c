@@ -77,6 +77,43 @@ void errands_settings_set(const char *key, ErrandsSettingType type, void *value)
   errands_settings_save();
 }
 
+// Global tags
+
+GStrv errands_settings_get_tags() {
+  cJSON *res = cJSON_GetObjectItem(settings, "tags");
+  return g_strsplit(res->valuestring, ",", -1);
+}
+
+void errands_settings_set_tags(GStrv tags) {
+  g_autofree char *value = g_strjoinv(",", tags);
+  cJSON_SetValuestring(cJSON_GetObjectItem(settings, "tags"), value);
+  errands_settings_save();
+}
+
+void errands_settings_add_tag(const char *tag) {
+  cJSON *res = cJSON_GetObjectItem(settings, "tags");
+  g_auto(GStrv) tags = g_strsplit(res->valuestring, ",", -1);
+  if (!g_strv_contains((const char *const *)tags, tag)) {
+    g_autoptr(GStrvBuilder) builder = g_strv_builder_new();
+    g_strv_builder_addv(builder, (const char **)tags);
+    g_strv_builder_add(builder, tag);
+    g_auto(GStrv) new_tags = g_strv_builder_end(builder);
+    errands_settings_set_tags(new_tags);
+  }
+}
+
+void errands_settings_remove_tag(const char *tag) {
+  cJSON *res = cJSON_GetObjectItem(settings, "tags");
+  g_auto(GStrv) tags = g_strsplit(res->valuestring, ",", -1);
+  if (g_strv_contains((const char *const *)tags, tag)) {
+    g_autoptr(GStrvBuilder) builder = g_strv_builder_new();
+    for (int i = 0; tags[i]; i++)
+      if (strcmp(tags[i], tag)) g_strv_builder_add(builder, tags[i]);
+    g_auto(GStrv) new_tags = g_strv_builder_end(builder);
+    errands_settings_set_tags(new_tags);
+  }
+}
+
 // --- SAVING SETTINGS --- //
 
 static void perform_save() {

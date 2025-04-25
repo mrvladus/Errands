@@ -1,6 +1,7 @@
 #include "../data/data.h"
 #include "../state.h"
 #include "../utils.h"
+#include "gtk/gtk.h"
 #include "task.h"
 
 #include <cmark.h>
@@ -83,8 +84,11 @@ void errands_notes_window_show(ErrandsTask *task) {
 
   adw_dialog_present(ADW_DIALOG(state.notes_window), GTK_WIDGET(state.main_window));
   state.notes_window->task = task;
-  g_autofree gchar *text = gtk_source_utils_unescape_search_text(errands_data_get_str(task->data, DATA_PROP_TEXT));
+  const char *notes = errands_data_get_str(task->data, DATA_PROP_NOTES);
+  if (!notes) return;
+  g_autofree gchar *text = gtk_source_utils_unescape_search_text(notes);
   gtk_text_buffer_set_text(gtk_text_view_get_buffer(GTK_TEXT_VIEW(state.notes_window->view)), text, -1);
+  gtk_widget_grab_focus(state.notes_window->view);
 }
 
 // --- SIGNAL HANDLERS --- //
@@ -92,20 +96,22 @@ void errands_notes_window_show(ErrandsTask *task) {
 static void on_errands_notes_window_close_cb(ErrandsNotesWindow *win, gpointer _data) {
   TaskData *data = win->task->data;
   GtkTextBuffer *buf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(win->view));
-
   // Get the start and end iterators of the text buffer
   GtkTextIter start, end;
   gtk_text_buffer_get_start_iter(buf, &start);
   gtk_text_buffer_get_end_iter(buf, &end);
   g_autofree char *text = gtk_text_buffer_get_text(buf, &start, &end, FALSE);
-
   // If text is different then save it
-  g_autofree gchar *curr_notes = gtk_source_utils_unescape_search_text(errands_data_get_str(data, DATA_PROP_NOTES));
-  if (strcmp(text, curr_notes)) {
+  const char *notes = errands_data_get_str(data, DATA_PROP_NOTES);
+  // g_autofree gchar *curr_notes = NULL;
+  // if (notes) curr_notes = gtk_source_utils_unescape_search_text(notes);
+  if (notes && strcmp(text, notes)) {
+    errands_data_set_str(data, DATA_PROP_NOTES, text);
+    errands_data_write_list(task_data_get_list(data));
+  } else if (!notes && text && strcmp(text, "")) {
     errands_data_set_str(data, DATA_PROP_NOTES, text);
     errands_data_write_list(task_data_get_list(data));
   }
-
   // Add css class to button if notes not empty
   if (strcmp(text, "")) gtk_widget_add_css_class(win->task->toolbar->notes_btn, "accent");
   else gtk_widget_remove_css_class(win->task->toolbar->notes_btn, "accent");

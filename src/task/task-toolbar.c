@@ -3,6 +3,7 @@
 #include "task.h"
 
 #include <glib/gi18n.h>
+#include <string.h>
 
 G_DEFINE_TYPE(ErrandsTaskToolbar, errands_task_toolbar, ADW_TYPE_BIN)
 
@@ -61,12 +62,12 @@ ErrandsTaskToolbar *errands_task_toolbar_new(ErrandsTask *task) {
   g_signal_connect_swapped(tb->date_btn, "clicked", G_CALLBACK(errands_date_window_show), task);
   g_signal_connect_swapped(tb->notes_btn, "clicked", G_CALLBACK(errands_notes_window_show), task);
   g_signal_connect_swapped(tb->priority_btn, "clicked", G_CALLBACK(errands_priority_window_show), task);
-  // g_signal_connect_swapped(tb->tags_btn, "clicked", G_CALLBACK(errands_tags_window_show), task);
+  g_signal_connect_swapped(tb->tags_btn, "clicked", G_CALLBACK(errands_tags_window_show), task);
   g_signal_connect_swapped(tb->attachments_btn, "clicked", G_CALLBACK(errands_attachments_window_show), task);
   g_signal_connect_swapped(tb->color_btn, "clicked", G_CALLBACK(errands_color_window_show), task);
   // Update css for buttons
   // Notes button
-  if (strcmp(errands_data_get_str(data, DATA_PROP_NOTES), "")) gtk_widget_add_css_class(tb->notes_btn, "accent");
+  if (errands_data_get_str(data, DATA_PROP_NOTES)) gtk_widget_add_css_class(tb->notes_btn, "accent");
   // Attachments button
   g_auto(GStrv) attachments = errands_data_get_strv(data, DATA_PROP_ATTACHMENTS);
   if (attachments && g_strv_length(attachments) > 0) gtk_widget_add_css_class(tb->attachments_btn, "accent");
@@ -80,7 +81,6 @@ ErrandsTaskToolbar *errands_task_toolbar_new(ErrandsTask *task) {
 
   // Update buttons
   errands_task_toolbar_update_date_btn(tb);
-
   return tb;
 }
 
@@ -90,20 +90,23 @@ void errands_task_toolbar_update_date_btn(ErrandsTaskToolbar *tb) {
   if (!errands_data_get_str(data, DATA_PROP_RRULE)) {
     // If no due date - set "Date" label
     const char *due = errands_data_get_str(data, DATA_PROP_DUE);
-    if (!strcmp(due, "")) {
+    if (!due || !strcmp(due, "00000000T000000"))
       adw_button_content_set_label(ADW_BUTTON_CONTENT(gtk_button_get_child(GTK_BUTTON(tb->date_btn))), _("Date"));
-    }
     // If due date is set
     else {
       g_autoptr(GDateTime) dt = NULL;
       g_autofree gchar *label = NULL;
       if (!string_contains(due, "T")) {
-        char new_dt[16];
+        char new_dt[128];
         sprintf(new_dt, "%sT000000Z", due);
         dt = g_date_time_new_from_iso8601(new_dt, NULL);
         label = g_date_time_format(dt, "%d %b");
       } else {
-        dt = g_date_time_new_from_iso8601(due, NULL);
+        if (!string_contains(due, "Z")) {
+          char new_dt[128];
+          sprintf(new_dt, "%sZ", due);
+          dt = g_date_time_new_from_iso8601(new_dt, NULL);
+        } else dt = g_date_time_new_from_iso8601(due, NULL);
         label = g_date_time_format(dt, "%d %b %R");
       }
       adw_button_content_set_label(ADW_BUTTON_CONTENT(gtk_button_get_child(GTK_BUTTON(tb->date_btn))), label);

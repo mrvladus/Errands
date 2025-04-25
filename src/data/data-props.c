@@ -1,6 +1,7 @@
 #include "../utils.h"
 #include "data.h"
 #include <libical/ical.h>
+#include <stddef.h>
 
 // --- UTILS --- //
 
@@ -11,6 +12,7 @@ static icalproperty *get_x_prop(icalcomponent *ical, const char *xprop, const ch
     if (name && !strcmp(name, xprop)) return property;
     property = icalcomponent_get_next_property(ical, ICAL_X_PROPERTY);
   }
+  if (!default_val) return NULL;
   property = icalproperty_new_x(default_val);
   icalproperty_set_x_name(property, xprop);
   icalcomponent_add_property(ical, property);
@@ -18,7 +20,9 @@ static icalproperty *get_x_prop(icalcomponent *ical, const char *xprop, const ch
 }
 
 static const char *get_x_prop_value(icalcomponent *ical, const char *xprop, const char *default_val) {
-  return icalproperty_get_value_as_string(get_x_prop(ical, xprop, default_val));
+  icalproperty *property = get_x_prop(ical, xprop, default_val);
+  if (!property) return NULL;
+  return icalproperty_get_value_as_string(property);
 }
 
 static void set_x_prop_value(icalcomponent *ical, const char *xprop, const char *val) {
@@ -58,16 +62,17 @@ const char *errands_data_get_str(icalcomponent *data, DataPropStr prop) {
 }
 
 size_t errands_data_get_int(icalcomponent *data, DataPropInt prop) {
-  size_t out = 0;
   switch (prop) {
-  case DATA_PROP_PERCENT:
-    out = atoi(icalproperty_as_ical_string(icalcomponent_get_first_property(data, ICAL_PERCENTCOMPLETE_PROPERTY)));
-    break;
-  case DATA_PROP_PRIORITY:
-    out = atoi(icalproperty_as_ical_string(icalcomponent_get_first_property(data, ICAL_PRIORITY_PROPERTY)));
-    break;
+  case DATA_PROP_PERCENT: {
+    icalproperty *property = icalcomponent_get_first_property(data, ICAL_PERCENTCOMPLETE_PROPERTY);
+    return property ? icalproperty_get_percentcomplete(property) : 0;
   }
-  return out;
+  case DATA_PROP_PRIORITY: {
+    icalproperty *property = icalcomponent_get_first_property(data, ICAL_PRIORITY_PROPERTY);
+    return property ? icalproperty_get_priority(property) : 0;
+  }
+  }
+  return 0;
 }
 
 bool errands_data_get_bool(icalcomponent *data, DataPropBool prop) {
@@ -86,7 +91,11 @@ bool errands_data_get_bool(icalcomponent *data, DataPropBool prop) {
 GStrv errands_data_get_strv(icalcomponent *data, DataPropStrv prop) {
   GStrv out = NULL;
   switch (prop) {
-  case DATA_PROP_ATTACHMENTS: out = g_strsplit(get_x_prop_value(data, "X-ERRANDS-ATTACHMENTS", ""), ",", -1); break;
+  case DATA_PROP_ATTACHMENTS: {
+    const char *property = get_x_prop_value(data, "X-ERRANDS-ATTACHMENTS", NULL);
+    if (property) out = g_strsplit(property, ",", -1);
+    break;
+  }
   case DATA_PROP_TAGS: {
     g_autoptr(GStrvBuilder) builder = g_strv_builder_new();
     for (icalproperty *p = icalcomponent_get_first_property(data, ICAL_CATEGORIES_PROPERTY); p != 0;
@@ -162,8 +171,7 @@ void errands_data_set_int(icalcomponent *data, DataPropInt prop, size_t value) {
     break;
   }
   }
-  if (icalcomponent_isa(data) == ICAL_VTODO_COMPONENT && prop != DATA_PROP_CHANGED)
-    errands_data_set_str(data, DATA_PROP_CHANGED, get_date_time());
+  errands_data_set_str(data, DATA_PROP_CHANGED, get_date_time());
 }
 
 void errands_data_set_bool(icalcomponent *data, DataPropBool prop, bool value) {
