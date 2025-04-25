@@ -1,9 +1,12 @@
 #include "../data/data.h"
 #include "../state.h"
 #include "../utils.h"
+#include "glib-object.h"
+#include "gtk/gtk.h"
 #include "task.h"
 
 #include <glib/gi18n.h>
+#include <stdbool.h>
 
 static void on_errands_color_window_close_cb(ErrandsColorWindow *win);
 static void on_errands_color_window_color_select_cb(GtkCheckButton *btn, ErrandsColorWindow *win);
@@ -13,10 +16,9 @@ G_DEFINE_TYPE(ErrandsColorWindow, errands_color_window, ADW_TYPE_DIALOG)
 static void errands_color_window_class_init(ErrandsColorWindowClass *class) {}
 
 static void errands_color_window_init(ErrandsColorWindow *self) {
-  LOG("Creating color window");
+  LOG("Color Window: Create");
 
   g_object_set(self, "title", _("Accent Color"), NULL);
-  g_signal_connect(self, "closed", G_CALLBACK(on_errands_color_window_close_cb), NULL);
   self->color_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   const char *const colors[8] = {"none", "blue", "green", "yellow", "orange", "red", "purple", "brown"};
   GtkWidget *group_btn;
@@ -34,8 +36,8 @@ static void errands_color_window_init(ErrandsColorWindow *self) {
   }
 
   // Toolbar view
-  GtkWidget *tb = adw_toolbar_view_new();
-  g_object_set(tb, "content", self->color_box, "margin-start", 12, "margin-end", 12, "margin-bottom", 12, NULL);
+  GtkWidget *tb = g_object_new(ADW_TYPE_TOOLBAR_VIEW, "content", self->color_box, "margin-start", 12, "margin-end", 12,
+                               "margin-bottom", 12, NULL);
   adw_toolbar_view_add_top_bar(ADW_TOOLBAR_VIEW(tb), adw_header_bar_new());
   adw_dialog_set_child(ADW_DIALOG(self), tb);
 }
@@ -68,6 +70,7 @@ void errands_color_window_show(ErrandsTask *task) {
 // --- SIGNAL HANDLERS --- //
 
 static void on_errands_color_window_close_cb(ErrandsColorWindow *win) {
+  LOG("Color Window: Close");
   g_autoptr(GPtrArray) colors = get_children(win->color_box);
   for (size_t i = 0; i < colors->len; i++) {
     GtkCheckButton *btn = GTK_CHECK_BUTTON(colors->pdata[i]);
@@ -90,5 +93,5 @@ static void on_errands_color_window_close_cb(ErrandsColorWindow *win) {
 }
 
 static void on_errands_color_window_color_select_cb(GtkCheckButton *btn, ErrandsColorWindow *win) {
-  if (!win->block_signals) on_errands_color_window_close_cb(win);
+  if (!win->block_signals && gtk_check_button_get_active(btn)) { on_errands_color_window_close_cb(win); }
 }

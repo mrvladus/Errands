@@ -1,6 +1,7 @@
 #include "../data/data.h"
 #include "../state.h"
 #include "../utils.h"
+#include "glib.h"
 #include "gtk/gtk.h"
 #include "task.h"
 
@@ -105,15 +106,15 @@ static void on_errands_notes_window_close_cb(ErrandsNotesWindow *win, gpointer _
   const char *notes = errands_data_get_str(data, DATA_PROP_NOTES);
   // g_autofree gchar *curr_notes = NULL;
   // if (notes) curr_notes = gtk_source_utils_unescape_search_text(notes);
-  if (notes && strcmp(text, notes)) {
+  if (notes && !g_str_equal(text, notes)) {
     errands_data_set_str(data, DATA_PROP_NOTES, text);
     errands_data_write_list(task_data_get_list(data));
-  } else if (!notes && text && strcmp(text, "")) {
+  } else if (!notes && text && !g_str_equal(text, "")) {
     errands_data_set_str(data, DATA_PROP_NOTES, text);
     errands_data_write_list(task_data_get_list(data));
   }
   // Add css class to button if notes not empty
-  if (strcmp(text, "")) gtk_widget_add_css_class(win->task->toolbar->notes_btn, "accent");
+  if (!g_str_equal(text, "")) gtk_widget_add_css_class(win->task->toolbar->notes_btn, "accent");
   else gtk_widget_remove_css_class(win->task->toolbar->notes_btn, "accent");
 }
 
