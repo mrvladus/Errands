@@ -1,12 +1,9 @@
 #include "../data/data.h"
 #include "../state.h"
 #include "../utils.h"
-#include "glib-object.h"
-#include "gtk/gtk.h"
 #include "task.h"
 
 #include <glib/gi18n.h>
-#include <stdbool.h>
 
 static void on_errands_color_window_close_cb(ErrandsColorWindow *win);
 static void on_errands_color_window_color_select_cb(GtkCheckButton *btn, ErrandsColorWindow *win);

@@ -2,6 +2,7 @@
 #include "data.h"
 #include <libical/ical.h>
 #include <stddef.h>
+#include <string.h>
 
 // --- UTILS --- //
 
@@ -127,29 +128,83 @@ void errands_data_set_str(icalcomponent *data, DataPropStr prop, const char *val
     break;
   }
   case DATA_PROP_CHANGED: {
+    if (!value || !strcmp(value, "")) {
+      icalcomponent_remove_property(data, icalcomponent_get_first_property(data, ICAL_LASTMODIFIED_PROPERTY));
+      break;
+    }
     icalproperty *property = icalcomponent_get_first_property(data, ICAL_LASTMODIFIED_PROPERTY);
     if (property) icalproperty_set_lastmodified(property, icaltime_from_string(value));
     else icalcomponent_add_property(data, icalproperty_new_lastmodified(icaltime_from_string(value)));
     break;
   }
-  case DATA_PROP_CREATED: icalcomponent_set_dtstamp(data, icaltime_from_string(value)); break;
-  case DATA_PROP_DUE: icalcomponent_set_due(data, icaltime_from_string(value)); break;
-  case DATA_PROP_END: icalcomponent_set_dtend(data, icaltime_from_string(value)); break;
-  case DATA_PROP_NOTES: icalcomponent_set_description(data, value); break;
+  case DATA_PROP_CREATED: {
+    if (!value || !strcmp(value, "")) {
+      icalcomponent_remove_property(data, icalcomponent_get_first_property(data, ICAL_DTSTAMP_PROPERTY));
+      break;
+    }
+    icalcomponent_set_dtstamp(data, icaltime_from_string(value));
+    break;
+  }
+  case DATA_PROP_DUE: {
+    if (!value || !strcmp(value, "")) {
+      icalcomponent_remove_property(data, icalcomponent_get_first_property(data, ICAL_DUE_PROPERTY));
+      break;
+    }
+    icalcomponent_set_due(data, icaltime_from_string(value));
+    break;
+  }
+  case DATA_PROP_END: {
+    if (!value || !strcmp(value, "")) {
+      icalcomponent_remove_property(data, icalcomponent_get_first_property(data, ICAL_DTEND_PROPERTY));
+      break;
+    }
+    icalcomponent_set_dtend(data, icaltime_from_string(value));
+    break;
+  }
+  case DATA_PROP_NOTES: {
+    if (!value || !strcmp(value, "")) {
+      icalcomponent_remove_property(data, icalcomponent_get_first_property(data, ICAL_RELATEDTO_PROPERTY));
+      break;
+    }
+    icalcomponent_set_description(data, value);
+    break;
+  }
   case DATA_PROP_PARENT: {
+    if (!value || !strcmp(value, "")) {
+      icalcomponent_remove_property(data, icalcomponent_get_first_property(data, ICAL_RELATEDTO_PROPERTY));
+      break;
+    }
     icalproperty *property = icalcomponent_get_first_property(data, ICAL_RELATEDTO_PROPERTY);
     if (property) icalproperty_set_relatedto(property, value);
     else icalcomponent_add_property(data, icalproperty_new_relatedto(value));
     break;
   }
   case DATA_PROP_RRULE: {
+    if (!value || !strcmp(value, "")) {
+      icalcomponent_remove_property(data, icalcomponent_get_first_property(data, ICAL_RRULE_PROPERTY));
+      break;
+    }
     icalproperty *property = icalcomponent_get_first_property(data, ICAL_RRULE_PROPERTY);
     if (property) icalproperty_set_rrule(property, icalrecurrencetype_from_string(value));
     else icalcomponent_add_property(data, icalproperty_new_rrule(icalrecurrencetype_from_string(value)));
     break;
   }
-  case DATA_PROP_START: icalcomponent_set_dtstart(data, icaltime_from_string(value)); break;
-  case DATA_PROP_TEXT: icalcomponent_set_summary(data, value); break;
+  case DATA_PROP_START: {
+    if (!value || !strcmp(value, "")) {
+      icalcomponent_remove_property(data, icalcomponent_get_first_property(data, ICAL_DTSTART_PROPERTY));
+      break;
+    }
+    icalcomponent_set_dtstart(data, icaltime_from_string(value));
+    break;
+  }
+  case DATA_PROP_TEXT: {
+    if (!value || !strcmp(value, "")) {
+      icalcomponent_remove_property(data, icalcomponent_get_first_property(data, ICAL_SUMMARY_PROPERTY));
+      break;
+    }
+    icalcomponent_set_summary(data, value);
+    break;
+  }
   case DATA_PROP_UID: icalcomponent_set_uid(data, value); break;
   }
   if (icalcomponent_isa(data) == ICAL_VTODO_COMPONENT && prop != DATA_PROP_CHANGED)

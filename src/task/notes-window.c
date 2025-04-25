@@ -106,6 +106,7 @@ static void on_errands_notes_window_close_cb(ErrandsNotesWindow *win, gpointer _
   const char *notes = errands_data_get_str(data, DATA_PROP_NOTES);
   // g_autofree gchar *curr_notes = NULL;
   // if (notes) curr_notes = gtk_source_utils_unescape_search_text(notes);
+  LOG("Text '%s'", text);
   if (notes && !g_str_equal(text, notes)) {
     errands_data_set_str(data, DATA_PROP_NOTES, text);
     errands_data_write_list(task_data_get_list(data));
