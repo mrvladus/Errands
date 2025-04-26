@@ -1,5 +1,6 @@
 #pragma once
 
+#include "glib.h"
 #include <gtk/gtk.h>
 
 #include <ctype.h>
@@ -312,6 +313,17 @@ static inline int *string_to_int_array(const char *str) {
 
   arr[index] = 0; // NULL terminate the array
   return arr;
+}
+
+static inline GStrv gstrv_remove_duplicates(GStrv strv) {
+  g_autoptr(GHashTable) hash_table = g_hash_table_new(g_str_hash, g_str_equal);
+  g_autoptr(GStrvBuilder) builder = g_strv_builder_new();
+  for (int i = 0; strv[i] != NULL; i++)
+    if (!g_hash_table_contains(hash_table, strv[i])) {
+      g_hash_table_add(hash_table, strv[i]);
+      g_strv_builder_add(builder, strv[i]);
+    }
+  return g_strv_builder_end(builder);
 }
 
 // Generic dynamic array

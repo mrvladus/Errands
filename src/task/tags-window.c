@@ -3,6 +3,7 @@
 #include "../state.h"
 #include "../task-list.h"
 #include "../utils.h"
+#include "glib.h"
 #include "task.h"
 
 #include <glib/gi18n.h>
@@ -25,7 +26,6 @@ static void errands_tags_window_init(ErrandsTagsWindow *self) {
 
   // Header bar
   GtkWidget *hb = adw_header_bar_new();
-  // adw_header_bar_set_title_widget(ADW_HEADER_BAR(hb), adw_window_title_new(_("Tags"), ""));
 
   // Entry
   self->entry = adw_entry_row_new();
@@ -74,15 +74,26 @@ void errands_tags_window_show(ErrandsTask *task) {
   state.tags_window->task = task;
   // Remove rows
   gtk_list_box_remove_all(GTK_LIST_BOX(state.tags_window->list_box));
-  g_auto(GStrv) tags = errands_settings_get_tags();
   // Add rows
-  for (size_t i = 0; i < g_strv_length(tags); i++) {
+  g_autoptr(GStrvBuilder) builder = g_strv_builder_new();
+  g_auto(GStrv) tags = errands_settings_get_tags();
+  g_strv_builder_addv(builder, (const char **)tags);
+  GPtrArray *tasks = errands_task_list_get_all_tasks();
+  for (size_t i = 0; i < tasks->len; i++) {
+    ErrandsTask *task = tasks->pdata[i];
+    g_auto(GStrv) task_tags = errands_data_get_strv(task->data, DATA_PROP_TAGS);
+    g_strv_builder_addv(builder, (const char **)task_tags);
+  }
+  g_auto(GStrv) all_tags = g_strv_builder_end(builder);
+  g_auto(GStrv) all_tags_no_dups = gstrv_remove_duplicates(all_tags);
+  for (size_t i = 0; i < g_strv_length(all_tags_no_dups); i++) {
     ErrandsTagsWindowRow *row = errands_tags_window_row_new(tags[i]);
     gtk_list_box_append(GTK_LIST_BOX(state.tags_window->list_box), GTK_WIDGET(row));
   }
   errands_tags_window_update_ui();
   // Show dialog
   adw_dialog_present(ADW_DIALOG(state.tags_window), GTK_WIDGET(state.main_window));
+  g_ptr_array_free(tasks, false);
 }
 
 static void errands_tags_window_update_ui() {
@@ -156,14 +167,23 @@ static void on_errands_tags_window_row_toggle(GtkCheckButton *btn, ErrandsTagsWi
 static void on_errands_tags_window_row_delete(GtkButton *btn, ErrandsTagsWindowRow *row) {
   // Delete tag from lists and all tasks
   const char *tag = adw_preferences_row_get_title(ADW_PREFERENCES_ROW(row));
-  ListData *data = task_data_get_list(state.tags_window->task->data);
-  errands_settings_add_tag(tag);
-  errands_data_write_list(data);
+  errands_settings_remove_tag(tag);
   // Delete tag widget row
   gtk_list_box_remove(GTK_LIST_BOX(state.tags_window->list_box), GTK_WIDGET(row));
   // Update all tasks and remove tag from their tags
   GPtrArray *tasks = errands_task_list_get_all_tasks();
-  for (size_t i = 0; i < tasks->len; i++) errands_task_update_tags(tasks->pdata[i]);
+  GPtrArray *lists_to_save = g_ptr_array_new();
+  for (size_t i = 0; i < tasks->len; i++) {
+    ErrandsTask *task = tasks->pdata[i];
+    g_auto(GStrv) task_tags = errands_data_get_strv(task->data, DATA_PROP_TAGS);
+    if (g_strv_contains((const gchar *const *)task_tags, tag)) {
+      errands_data_remove_tag(task->data, DATA_PROP_TAGS, tag);
+      errands_task_update_tags(task);
+      g_ptr_array_add(lists_to_save, task_data_get_list(task->data));
+    }
+  }
+  for (size_t i = 0; i < lists_to_save->len; i++) errands_data_write_list(lists_to_save->pdata[i]);
   errands_tags_window_update_ui();
   g_ptr_array_free(tasks, false);
+  g_ptr_array_free(lists_to_save, false);
 }
