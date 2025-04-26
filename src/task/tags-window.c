@@ -103,9 +103,7 @@ static void on_errands_tags_window_tag_added(GtkEditable *entry, ErrandsTagsWind
   for (size_t i = 0; i < g_strv_length(tags); i++)
     if (!strcmp(tag, tags[i])) return;
   // Add tag to current list data
-  ListData *data = task_data_get_list(win->task->data);
   errands_settings_add_tag(tag);
-  errands_data_write_list(data);
   ErrandsTagsWindowRow *row = errands_tags_window_row_new(tag);
   gtk_list_box_append(GTK_LIST_BOX(state.tags_window->list_box), GTK_WIDGET(row));
   gtk_editable_set_text(entry, "");

@@ -178,9 +178,8 @@ ErrandsAttachmentsWindowRow *errands_attachments_window_row_new(GFile *file) {
 // --- SIGNAL HANDLERS FOR ATTACHMENT ROW --- //
 
 static void on_errands_attachments_window_row_delete(GtkButton *btn, ErrandsAttachmentsWindowRow *row) {
-  LOG("Tag: Delete");
+  LOG("Attachment: Delete");
   g_autofree gchar *path = g_file_get_path(row->file);
-  LOG("Tag: Delete %s", path);
   g_auto(GStrv) cur_attachments = errands_data_get_strv(state.attachments_window->task->data, DATA_PROP_ATTACHMENTS);
   g_autoptr(GStrvBuilder) builder = g_strv_builder_new();
   for (size_t i = 0; i < g_strv_length(cur_attachments); i++)

@@ -1,8 +1,7 @@
 #include "../utils.h"
 #include "data.h"
+
 #include <libical/ical.h>
-#include <stddef.h>
-#include <string.h>
 
 // --- UTILS --- //
 
