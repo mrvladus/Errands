@@ -46,7 +46,6 @@ sources = files(
   'src/task/task.c',
   'src/task/time-chooser.c',
   'src/task/week-chooser.c',
-  'src/vendor/cJSON.c',
   'src/window.c',
 )
 

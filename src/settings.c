@@ -1,6 +1,7 @@
 #include "settings.h"
 #include "utils.h"
-#include "vendor/cJSON.h"
+#define JSON_H_IMPLEMENTATION
+#include "vendor/json.h"
 
 // Save settings with cooldown period of 1s.
 static void errands_settings_save();
@@ -11,38 +12,41 @@ static const char *settings_path;
 static time_t last_save_time = 0;
 static bool pending_save = false;
 
-static cJSON *settings = NULL;
+static JSON *settings = NULL;
 
 // --- LOADING --- //
 
 void errands_settings_load_default() {
   LOG("Settings: Load default configuration");
-  settings = cJSON_CreateObject();
-  cJSON_AddBoolToObject(settings, "show_completed", true);
-  cJSON_AddNumberToObject(settings, "window_width", 800);
-  cJSON_AddNumberToObject(settings, "window_height", 600);
-  cJSON_AddBoolToObject(settings, "maximized", true);
-  cJSON_AddStringToObject(settings, "last_list_uid", "");
-  cJSON_AddStringToObject(settings, "sort_by", "default");
-  cJSON_AddBoolToObject(settings, "sync", false);
-  cJSON_AddStringToObject(settings, "sync_provider", "caldav");
-  cJSON_AddStringToObject(settings, "sync_url", "");
-  cJSON_AddStringToObject(settings, "sync_username", "");
-  cJSON_AddStringToObject(settings, "tags", "");
+  settings = json_object_new();
+  json_object_add(settings, "show_completed", json_bool_new(true));
+  json_object_add(settings, "maximized", json_bool_new(false));
+  json_object_add(settings, "sync", json_bool_new(false));
+  json_object_add(settings, "window_width", json_int_new(800));
+  json_object_add(settings, "window_height", json_int_new(600));
+  json_object_add(settings, "last_list_uid", json_string_new(""));
+  json_object_add(settings, "sort_by", json_string_new("default"));
+  json_object_add(settings, "sync_provider", json_string_new("caldav"));
+  json_object_add(settings, "sync_url", json_string_new(""));
+  json_object_add(settings, "sync_username", json_string_new(""));
+  json_object_add(settings, "tags", json_string_new(""));
 }
 
 void errands_settings_load_user() {
   LOG("Settings: Load user configuration");
   char *json = read_file_to_string(settings_path);
   if (!json) return;
-  cJSON *json_parsed = cJSON_Parse(json);
+  JSON *json_parsed = json_parse(json);
   if (!json_parsed) return;
-  const char *const settings_keys[] = {"show_completed", "window_width", "window_height", "maximized",
-                                       "last_list_uid",  "sort_by",      "sync",          "sync_provider",
-                                       "sync_url",       "sync_user",    "tags"};
-  for (size_t i = 0; i < G_N_ELEMENTS(settings_keys); i++)
-    cJSON_ReplaceItemInObject(settings, settings_keys[i], cJSON_DetachItemFromObject(json_parsed, settings_keys[i]));
-  cJSON_Delete(json_parsed);
+  const char *const settings_keys[] = {"show_completed", "window_width",  "window_height", "maximized",
+                                       "last_list_uid",  "sort_by",       "sync",          "sync_provider",
+                                       "sync_url",       "sync_username", "tags"};
+  for (size_t i = 0; i < G_N_ELEMENTS(settings_keys); i++) {
+    JSON *node = json_object_get(json_parsed, settings_keys[i]);
+    JSON *dup = json_dup(node);
+    json_object_add(settings, settings_keys[i], dup);
+  }
+  json_free(json_parsed);
   free(json);
 }
 
@@ -62,37 +66,38 @@ void errands_settings_init() {
 
 ErrandsSetting errands_settings_get(const char *key, ErrandsSettingType type) {
   ErrandsSetting setting = {0};
-  cJSON *res = cJSON_GetObjectItem(settings, key);
-  if (type == SETTING_TYPE_INT && cJSON_IsNumber(res)) setting.i = res->valueint;
-  else if (type == SETTING_TYPE_BOOL && cJSON_IsBool(res)) setting.b = res->valueint;
-  else if (type == SETTING_TYPE_STRING && cJSON_IsString(res)) setting.s = res->valuestring;
+  JSON *res = json_object_get(settings, key);
+  if (type == SETTING_TYPE_INT) setting.i = res->int_val;
+  else if (type == SETTING_TYPE_BOOL) setting.b = res->bool_val;
+  else if (type == SETTING_TYPE_STRING) setting.s = res->string_val;
   return setting;
 }
 
 void errands_settings_set(const char *key, ErrandsSettingType type, void *value) {
-  cJSON *res = cJSON_GetObjectItem(settings, key);
-  if (type == SETTING_TYPE_INT) cJSON_SetIntValue(res, *(int *)value);
-  else if (type == SETTING_TYPE_BOOL) cJSON_SetBoolValue(res, *(bool *)value);
-  else if (type == SETTING_TYPE_STRING) cJSON_SetValuestring(res, (const char *)value);
+  JSON *res = json_object_get(settings, key);
+  if (type == SETTING_TYPE_INT) res->int_val = *(int *)value;
+  else if (type == SETTING_TYPE_BOOL) res->bool_val = *(bool *)value;
+  else if (type == SETTING_TYPE_STRING) json_replace_string(&res->string_val, (const char *)value);
   errands_settings_save();
 }
 
 // Global tags
 
 GStrv errands_settings_get_tags() {
-  cJSON *res = cJSON_GetObjectItem(settings, "tags");
-  return g_strsplit(res->valuestring, ",", -1);
+  JSON *res = json_object_get(settings, "tags");
+  return g_strsplit(res->string_val, ",", -1);
 }
 
 void errands_settings_set_tags(GStrv tags) {
   g_autofree char *value = g_strjoinv(",", tags);
-  cJSON_SetValuestring(cJSON_GetObjectItem(settings, "tags"), value);
+  JSON *res = json_object_get(settings, "tags");
+  json_replace_string(&res->string_val, value);
   errands_settings_save();
 }
 
 void errands_settings_add_tag(const char *tag) {
-  cJSON *res = cJSON_GetObjectItem(settings, "tags");
-  g_auto(GStrv) tags = g_strsplit(res->valuestring, ",", -1);
+  JSON *res = json_object_get(settings, "tags");
+  g_auto(GStrv) tags = g_strsplit(res->string_val, ",", -1);
   if (!g_strv_contains((const char *const *)tags, tag)) {
     g_autoptr(GStrvBuilder) builder = g_strv_builder_new();
     g_strv_builder_addv(builder, (const char **)tags);
@@ -103,8 +108,8 @@ void errands_settings_add_tag(const char *tag) {
 }
 
 void errands_settings_remove_tag(const char *tag) {
-  cJSON *res = cJSON_GetObjectItem(settings, "tags");
-  g_auto(GStrv) tags = g_strsplit(res->valuestring, ",", -1);
+  JSON *res = json_object_get(settings, "tags");
+  g_auto(GStrv) tags = g_strsplit(res->string_val, ",", -1);
   if (g_strv_contains((const char *const *)tags, tag)) {
     g_autoptr(GStrvBuilder) builder = g_strv_builder_new();
     for (int i = 0; tags[i]; i++)
@@ -119,7 +124,7 @@ void errands_settings_remove_tag(const char *tag) {
 static void perform_save() {
   LOG("Settings: Save");
   g_autoptr(GError) error = NULL;
-  char *json = cJSON_Print(settings);
+  char *json = json_print(settings);
   if (!g_file_set_contents(settings_path, json, -1, &error))
     LOG("Settings: Failed to save settings: %s", error->message);
   last_save_time = time(NULL);

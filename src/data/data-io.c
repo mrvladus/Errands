@@ -1,6 +1,6 @@
 #include "../settings.h"
 #include "../utils.h"
-#include "../vendor/cJSON.h"
+#include "../vendor/json.h"
 #include "data.h"
 #include <libical/ical.h>
 
@@ -18,100 +18,98 @@ static void errands_data_migrate_from_46() {
     LOG("User Data: Failed to read old data file: %s", error->message);
     return;
   }
-  // Parse JSON with cJSON
-  cJSON *root = cJSON_Parse(contents);
-  if (!root) {
-    LOG("User Data: Failed to parse JSON: %s", cJSON_GetErrorPtr());
-    return;
-  }
+  // Parse JSON
+  JSON *root = json_parse(contents);
+  if (!root) return;
   // Process lists
-  cJSON *cal_arr = cJSON_GetObjectItem(root, "lists");
-  cJSON *cal_item = NULL;
-  cJSON_ArrayForEach(cal_item, cal_arr) {
-    cJSON *color_item = cJSON_GetObjectItem(cal_item, "color");
-    cJSON *deleted_item = cJSON_GetObjectItem(cal_item, "deleted");
-    cJSON *synced_item = cJSON_GetObjectItem(cal_item, "synced");
-    cJSON *name_item = cJSON_GetObjectItem(cal_item, "name");
-    cJSON *list_uid_item = cJSON_GetObjectItem(cal_item, "uid");
+  JSON *cal_arr = json_object_get(root, "lists");
+  JSON *cal_item = NULL;
+  for (JSON *cal_item = cal_arr->child; cal_item; cal_item = cal_item->next) {
+    JSON *color_item = json_object_get(cal_item, "color");
+    JSON *deleted_item = json_object_get(cal_item, "deleted");
+    JSON *synced_item = json_object_get(cal_item, "synced");
+    JSON *name_item = json_object_get(cal_item, "name");
+    JSON *list_uid_item = json_object_get(cal_item, "uid");
 
-    icalcomponent *calendar = list_data_new(list_uid_item->valuestring, name_item->valuestring, color_item->valuestring,
-                                            cJSON_IsTrue(deleted_item), cJSON_IsTrue(synced_item), 0);
+    icalcomponent *calendar = list_data_new(list_uid_item->string_val, name_item->string_val, color_item->string_val,
+                                            deleted_item->bool_val, synced_item->bool_val, 0);
 
     // Process tasks
-    cJSON *tasks_arr = cJSON_GetObjectItem(root, "tasks");
-    if (!cJSON_IsArray(tasks_arr)) continue;
-    cJSON *task_item = NULL;
-    cJSON_ArrayForEach(task_item, tasks_arr) {
-      cJSON *task_list_uid_item = cJSON_GetObjectItem(task_item, "list_uid");
-      const gchar *task_list_uid = task_list_uid_item ? task_list_uid_item->valuestring : NULL;
-      if (!task_list_uid || !g_str_equal(task_list_uid, list_uid_item->valuestring)) continue;
+    JSON *tasks_arr = json_object_get(root, "tasks");
+    if (tasks_arr->type != JSON_TYPE_ARRAY) continue;
+    for (JSON *task_item = tasks_arr->child; task_item; task_item = task_item->next) {
+      JSON *task_list_uid_item = json_object_get(task_item, "list_uid");
+      const gchar *task_list_uid = task_list_uid_item ? task_list_uid_item->string_val : NULL;
+      if (!task_list_uid || !g_str_equal(task_list_uid, list_uid_item->string_val)) continue;
       // Process attachments
-      cJSON *task_attachments_arr = cJSON_GetObjectItem(task_item, "attachments");
+      JSON *task_attachments_arr = json_object_get(task_item, "attachments");
       g_autoptr(GStrvBuilder) builder = g_strv_builder_new();
-      cJSON *attachment_item = NULL;
-      cJSON_ArrayForEach(attachment_item, task_attachments_arr)
-          g_strv_builder_add(builder, attachment_item->valuestring);
+      for (JSON *attachment_item = task_attachments_arr->child; attachment_item;
+           attachment_item = attachment_item->next) {
+        g_strv_builder_add(builder, attachment_item->string_val);
+      }
       g_auto(GStrv) attachments = g_strv_builder_end(builder);
       // Process tags
-      cJSON *task_tags_arr = cJSON_GetObjectItem(task_item, "tags");
+      JSON *task_tags_arr = json_object_get(task_item, "tags");
       g_autoptr(GStrvBuilder) tags_builder = g_strv_builder_new();
-      cJSON *tags_tem = NULL;
-      cJSON_ArrayForEach(tags_tem, task_tags_arr) g_strv_builder_add(builder, tags_tem->valuestring);
+      JSON *tags_item = NULL;
+      for (JSON *tags_item = task_tags_arr->child; tags_item; tags_item = tags_item->next)
+        g_strv_builder_add(builder, tags_item->string_val);
       g_auto(GStrv) tags = g_strv_builder_end(builder);
       // Extract task properties
-      cJSON *color_item = cJSON_GetObjectItem(task_item, "color");
-      cJSON *completed_item = cJSON_GetObjectItem(task_item, "completed");
-      cJSON *changed_at_item = cJSON_GetObjectItem(task_item, "changed_at");
-      cJSON *created_at_item = cJSON_GetObjectItem(task_item, "created_at");
-      cJSON *deleted_item = cJSON_GetObjectItem(task_item, "deleted");
-      cJSON *due_date_item = cJSON_GetObjectItem(task_item, "due_date");
-      cJSON *expanded_item = cJSON_GetObjectItem(task_item, "expanded");
-      cJSON *notes_item = cJSON_GetObjectItem(task_item, "notes");
-      cJSON *notified_item = cJSON_GetObjectItem(task_item, "notified");
-      cJSON *parent_item = cJSON_GetObjectItem(task_item, "parent");
-      cJSON *percent_complete_item = cJSON_GetObjectItem(task_item, "percent_complete");
-      cJSON *priority_item = cJSON_GetObjectItem(task_item, "priority");
-      cJSON *rrule_item = cJSON_GetObjectItem(task_item, "rrule");
-      cJSON *start_date_item = cJSON_GetObjectItem(task_item, "start_date");
-      cJSON *synced_item = cJSON_GetObjectItem(task_item, "synced");
-      cJSON *text_item = cJSON_GetObjectItem(task_item, "text");
-      cJSON *toolbar_shown_item = cJSON_GetObjectItem(task_item, "toolbar_shown");
-      cJSON *trash_item = cJSON_GetObjectItem(task_item, "trash");
-      cJSON *uid_item = cJSON_GetObjectItem(task_item, "uid");
+      JSON *color_item = json_object_get(task_item, "color");
+      JSON *completed_item = json_object_get(task_item, "completed");
+      JSON *changed_at_item = json_object_get(task_item, "changed_at");
+      JSON *created_at_item = json_object_get(task_item, "created_at");
+      JSON *deleted_item = json_object_get(task_item, "deleted");
+      JSON *due_date_item = json_object_get(task_item, "due_date");
+      JSON *expanded_item = json_object_get(task_item, "expanded");
+      JSON *notes_item = json_object_get(task_item, "notes");
+      JSON *notified_item = json_object_get(task_item, "notified");
+      JSON *parent_item = json_object_get(task_item, "parent");
+      JSON *percent_complete_item = json_object_get(task_item, "percent_complete");
+      JSON *priority_item = json_object_get(task_item, "priority");
+      JSON *rrule_item = json_object_get(task_item, "rrule");
+      JSON *start_date_item = json_object_get(task_item, "start_date");
+      JSON *synced_item = json_object_get(task_item, "synced");
+      JSON *text_item = json_object_get(task_item, "text");
+      JSON *toolbar_shown_item = json_object_get(task_item, "toolbar_shown");
+      JSON *trash_item = json_object_get(task_item, "trash");
+      JSON *uid_item = json_object_get(task_item, "uid");
       // Create iCalendar event
       icalcomponent *event = icalcomponent_new(ICAL_VTODO_COMPONENT);
       if (completed_item) errands_data_set_str(event, DATA_PROP_COMPLETED, get_date_time());
       if (tags) errands_data_set_strv(event, DATA_PROP_TAGS, tags);
-      if (changed_at_item) errands_data_set_str(event, DATA_PROP_CHANGED, changed_at_item->valuestring);
-      if (created_at_item) errands_data_set_str(event, DATA_PROP_CREATED, created_at_item->valuestring);
-      if (due_date_item) errands_data_set_str(event, DATA_PROP_DUE, due_date_item->valuestring);
-      if (notes_item) errands_data_set_str(event, DATA_PROP_NOTES, notes_item->valuestring);
-      if (parent_item) errands_data_set_str(event, DATA_PROP_PARENT, parent_item->valuestring);
-      if (percent_complete_item) errands_data_set_int(event, DATA_PROP_PERCENT, percent_complete_item->valueint);
-      if (priority_item) errands_data_set_int(event, DATA_PROP_PRIORITY, priority_item->valueint);
-      if (rrule_item) errands_data_set_str(event, DATA_PROP_RRULE, rrule_item->valuestring);
-      if (start_date_item) errands_data_set_str(event, DATA_PROP_START, start_date_item->valuestring);
-      if (text_item) errands_data_set_str(event, DATA_PROP_TEXT, text_item->valuestring);
-      if (uid_item) errands_data_set_str(event, DATA_PROP_UID, uid_item->valuestring);
+      if (changed_at_item) errands_data_set_str(event, DATA_PROP_CHANGED, changed_at_item->string_val);
+      if (created_at_item) errands_data_set_str(event, DATA_PROP_CREATED, created_at_item->string_val);
+      if (due_date_item) errands_data_set_str(event, DATA_PROP_DUE, due_date_item->string_val);
+      if (notes_item) errands_data_set_str(event, DATA_PROP_NOTES, notes_item->string_val);
+      if (parent_item) errands_data_set_str(event, DATA_PROP_PARENT, parent_item->string_val);
+      if (percent_complete_item) errands_data_set_int(event, DATA_PROP_PERCENT, percent_complete_item->int_val);
+      if (priority_item) errands_data_set_int(event, DATA_PROP_PRIORITY, priority_item->int_val);
+      if (rrule_item) errands_data_set_str(event, DATA_PROP_RRULE, rrule_item->string_val);
+      if (start_date_item) errands_data_set_str(event, DATA_PROP_START, start_date_item->string_val);
+      if (text_item) errands_data_set_str(event, DATA_PROP_TEXT, text_item->string_val);
+      if (uid_item) errands_data_set_str(event, DATA_PROP_UID, uid_item->string_val);
       errands_data_set_strv(event, DATA_PROP_ATTACHMENTS, attachments);
-      errands_data_set_str(event, DATA_PROP_COLOR, color_item->valuestring);
-      errands_data_set_bool(event, DATA_PROP_DELETED, cJSON_IsTrue(deleted_item));
-      errands_data_set_bool(event, DATA_PROP_EXPANDED, cJSON_IsTrue(expanded_item));
-      errands_data_set_bool(event, DATA_PROP_NOTIFIED, cJSON_IsTrue(notified_item));
-      errands_data_set_bool(event, DATA_PROP_SYNCED, cJSON_IsTrue(synced_item));
-      errands_data_set_bool(event, DATA_PROP_TOOLBAR_SHOWN, cJSON_IsTrue(toolbar_shown_item));
-      errands_data_set_bool(event, DATA_PROP_TRASH, cJSON_IsTrue(trash_item));
-      errands_data_set_str(event, DATA_PROP_LIST_UID, task_list_uid_item->valuestring);
+      errands_data_set_str(event, DATA_PROP_COLOR, color_item->string_val);
+      errands_data_set_bool(event, DATA_PROP_DELETED, deleted_item->bool_val);
+      errands_data_set_bool(event, DATA_PROP_EXPANDED, expanded_item->bool_val);
+      errands_data_set_bool(event, DATA_PROP_NOTIFIED, notified_item->bool_val);
+      errands_data_set_bool(event, DATA_PROP_SYNCED, synced_item->bool_val);
+      errands_data_set_bool(event, DATA_PROP_TOOLBAR_SHOWN, toolbar_shown_item->bool_val);
+      errands_data_set_bool(event, DATA_PROP_TRASH, trash_item->bool_val);
+      errands_data_set_str(event, DATA_PROP_LIST_UID, task_list_uid_item->string_val);
       icalcomponent_add_component(calendar, event);
     }
     // Save calendar to file
-    g_autofree gchar *calendar_filename = g_strdup_printf("%s.ics", list_uid_item->valuestring);
+    g_autofree gchar *calendar_filename = g_strdup_printf("%s.ics", list_uid_item->string_val);
     g_autofree gchar *calendar_file_path = g_build_filename(user_dir, calendar_filename, NULL);
     if (!g_file_set_contents(calendar_file_path, icalcomponent_as_ical_string(calendar), -1, &error))
       LOG("User Data: Failed to save calendar to %s: %s", calendar_file_path, error->message);
   }
   // Clean up
-  cJSON_Delete(root);
+  json_free(root);
   remove(old_data_file);
 }
 

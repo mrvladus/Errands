@@ -32,3 +32,5 @@ CompileFlags:
     - -I/usr/include/webkitgtk-6.0
     - -I../_build
     - -DCALDAV_H_IMPLEMENTATION
+    - -DJSON_H_IMPLEMENTATION
+    - -Wno-macro-redefined
