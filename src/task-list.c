@@ -1,6 +1,8 @@
 #include "task-list.h"
 #include "components.h"
 #include "data/data.h"
+#include "glib.h"
+#include "gtk/gtk.h"
 #include "settings.h"
 #include "sidebar/sidebar.h"
 #include "state.h"
@@ -252,48 +254,30 @@ void errands_task_list_filter_by_uid(const char *uid) {
 }
 
 bool errands_task_list_filter_by_text(GtkWidget *task_list, const char *text) {
-  bool search_all_tasks =
-      !state.task_list->data || !strcmp(errands_data_get_str(state.task_list->data, DATA_PROP_LIST_UID), "");
-
+  bool search_all_tasks = !state.task_list->data;
   GPtrArray *tasks = get_children(task_list);
-  if (search_all_tasks) {
-    bool res = false;
-    for (size_t i = 0; i < tasks->len; i++) {
-      ErrandsTask *task = tasks->pdata[i];
-      if (errands_data_get_bool(task->data, DATA_PROP_DELETED) || errands_data_get_bool(task->data, DATA_PROP_TRASH))
-        continue;
-      GStrv tags = errands_data_get_strv(task->data, DATA_PROP_TAGS);
-      bool contains = string_contains(errands_data_get_str(task->data, DATA_PROP_TEXT), text) ||
-                      string_contains(errands_data_get_str(task->data, DATA_PROP_NOTES), text) ||
-                      (tags && g_strv_contains((const gchar *const *)tags, text));
-      bool sub_tasks_contains = errands_task_list_filter_by_text(task->sub_tasks, text);
-      if (contains || sub_tasks_contains) {
-        res = true;
-        gtk_widget_set_visible(GTK_WIDGET(task), true);
-      } else gtk_widget_set_visible(GTK_WIDGET(task), false);
+  bool res = false;
+  for (size_t i = 0; i < tasks->len; i++) {
+    ErrandsTask *task = tasks->pdata[i];
+    const char *list_uid = errands_data_get_str(task->data, DATA_PROP_LIST_UID);
+    if ((!search_all_tasks && strcmp(errands_data_get_str(state.task_list->data, DATA_PROP_LIST_UID), list_uid)) ||
+        errands_data_get_bool(task->data, DATA_PROP_DELETED) || errands_data_get_bool(task->data, DATA_PROP_TRASH))
+      continue;
+    const char *task_text = errands_data_get_str(task->data, DATA_PROP_TEXT);
+    const char *task_notes = errands_data_get_str(task->data, DATA_PROP_NOTES);
+    GStrv tags = errands_data_get_strv(task->data, DATA_PROP_TAGS);
+    bool contains = (task_text && string_contains(task_text, text)) ||
+                    (task_notes && string_contains(task_notes, text)) ||
+                    (tags && g_strv_contains((const gchar *const *)tags, text));
+    bool sub_tasks_contains = errands_task_list_filter_by_text(task->sub_tasks, text);
+    if (contains || sub_tasks_contains) {
+      res = true;
+      gtk_widget_set_visible(GTK_WIDGET(task), true);
+    } else {
+      gtk_widget_set_visible(GTK_WIDGET(task), false);
     }
-    return res;
-  } else {
-    bool res = false;
-    for (size_t i = 0; i < tasks->len; i++) {
-      ErrandsTask *task = tasks->pdata[i];
-      if (strcmp(errands_data_get_str(state.task_list->data, DATA_PROP_LIST_UID),
-                 errands_data_get_str(task->data, DATA_PROP_LIST_UID)))
-        continue;
-      if (errands_data_get_bool(task->data, DATA_PROP_DELETED) || errands_data_get_bool(task->data, DATA_PROP_TRASH))
-        continue;
-      GStrv tags = errands_data_get_strv(task->data, DATA_PROP_TAGS);
-      bool contains = string_contains(errands_data_get_str(task->data, DATA_PROP_TEXT), text) ||
-                      string_contains(errands_data_get_str(task->data, DATA_PROP_NOTES), text) ||
-                      (tags && g_strv_contains((const gchar *const *)tags, text));
-      bool sub_tasks_contains = errands_task_list_filter_by_text(task->sub_tasks, text);
-      if (contains || sub_tasks_contains) {
-        res = true;
-        gtk_widget_set_visible(GTK_WIDGET(task), true);
-      } else gtk_widget_set_visible(GTK_WIDGET(task), false);
-    }
-    return res;
   }
+  return res;
 }
 
 static bool errands_task_list_sorted_by_completion(GtkWidget *task_list) {
