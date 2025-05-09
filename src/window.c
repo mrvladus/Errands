@@ -4,7 +4,7 @@
 #include "settings.h"
 #include "sidebar/sidebar.h"
 #include "state.h"
-#include "task-list.h"
+#include "task-list/task-list.h"
 #include "utils.h"
 
 #include <glib/gi18n.h>

@@ -113,5 +113,9 @@
             preprocess="xml-stripblanks"
             alias="errands-md-symbolic.svg"
         >icons/errands-md-symbolic.svg</file>
+        <file
+            preprocess="xml-stripblanks"
+            alias="errands-sort-symbolic.svg"
+        >icons/errands-sort-symbolic.svg</file>
   </gresource>
 </gresources>

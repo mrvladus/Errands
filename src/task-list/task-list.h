@@ -1,6 +1,6 @@
 #pragma once
 
-#include "data/data.h"
+#include "../data/data.h"
 
 #include <adwaita.h>
 
@@ -15,6 +15,7 @@ struct _ErrandsTaskList {
   GtkWidget *task_list;
   ListData *data;
 };
+
 ErrandsTaskList *errands_task_list_new();
 void errands_task_list_add(TaskData *td);
 void errands_task_list_update_title();
@@ -26,3 +27,11 @@ void errands_task_list_sort_by_completion(GtkWidget *task_list);
 void errands_task_list_sort(GtkWidget *task_list);
 void errands_task_list_sort_recursive(GtkWidget *task_list);
 void errands_task_list_reload();
+
+#define ERRANDS_TYPE_SORT_DIALOG (errands_sort_dialog_get_type())
+G_DECLARE_FINAL_TYPE(ErrandsSortDialog, errands_sort_dialog, ERRANDS, SORT_DIALOG, AdwDialog)
+
+struct _ErrandsSortDialog {
+  AdwDialog parent_instance;
+};
+void errands_sort_dialog_show();

@@ -3,7 +3,7 @@
 #include "../data/data.h"
 #include "../settings.h"
 #include "../state.h"
-#include "../task-list.h"
+#include "../task-list/task-list.h"
 #include "../utils.h"
 
 #include <glib/gi18n.h>

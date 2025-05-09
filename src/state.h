@@ -2,7 +2,7 @@
 
 #include "dialogs/dialogs.h"
 #include "sidebar/sidebar.h"
-#include "task-list.h"
+#include "task-list/task-list.h"
 #include "task/task.h"
 #include "window.h"
 
@@ -15,6 +15,7 @@ typedef struct {
   ErrandsWindow *main_window;
   ErrandsSidebar *sidebar;
   ErrandsTaskList *task_list;
+  ErrandsSortDialog *sort_dialog;
 
   // Dialog windows
   ErrandsNewListDialog *new_list_dialog;
