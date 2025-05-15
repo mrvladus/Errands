@@ -41,11 +41,6 @@ static void errands_attachments_window_init(ErrandsAttachmentsWindow *self) {
   g_object_set(scrl, "propagate-natural-height", true, NULL);
   gtk_box_append(GTK_BOX(vbox), scrl);
 
-  // Drop target
-  GtkDropTarget *drop_target = gtk_drop_target_new(G_TYPE_FILE, GDK_ACTION_COPY);
-  g_signal_connect(drop_target, "drop", G_CALLBACK(on_drop), NULL);
-  gtk_widget_add_controller(scrl, GTK_EVENT_CONTROLLER(drop_target));
-
   // List box
   self->list_box = gtk_list_box_new();
   g_object_set(self->list_box, "selection-mode", GTK_SELECTION_NONE, "margin-start", 12, "margin-end", 12, "margin-top",
@@ -68,6 +63,11 @@ static void errands_attachments_window_init(ErrandsAttachmentsWindow *self) {
   adw_toolbar_view_add_top_bar(ADW_TOOLBAR_VIEW(tb), hb);
   adw_toolbar_view_set_content(ADW_TOOLBAR_VIEW(tb), vbox);
   adw_dialog_set_child(ADW_DIALOG(self), tb);
+
+  // Drop target
+  GtkDropTarget *drop_target = gtk_drop_target_new(G_TYPE_FILE, GDK_ACTION_COPY);
+  g_signal_connect(drop_target, "drop", G_CALLBACK(on_drop), NULL);
+  gtk_widget_add_controller(tb, GTK_EVENT_CONTROLLER(drop_target));
 }
 
 ErrandsAttachmentsWindow *errands_attachments_window_new() {
