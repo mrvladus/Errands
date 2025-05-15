@@ -14,7 +14,10 @@ typedef union {
 
 void errands_settings_init();
 ErrandsSetting errands_settings_get(const char *key, ErrandsSettingType type);
-void errands_settings_set(const char *key, ErrandsSettingType type, void *value);
+
+void errands_settings_set_string(const char *key, const char *value);
+void errands_settings_set_int(const char *key, int value);
+void errands_settings_set_bool(const char *key, bool value);
 
 // Global tags
 

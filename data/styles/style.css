@@ -195,15 +195,15 @@
 /* Overrides */
 
 colorbutton button {
-    border-radius: 50%;
+    border-radius: 9999px;
     padding: 0px;
     margin: 0px;
     transform: scale(0.8);
 }
 
 colorbutton button colorswatch {
-    border-radius: 50%;
-    transform: scale(0.8, 0.75);
+    border-radius: 9999px;
+    transform: scale(0.8);
 }
 
 progressbar.osd {

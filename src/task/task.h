@@ -177,9 +177,9 @@ void errands_attachments_window_show(ErrandsTask *task);
 struct _ErrandsAttachmentsWindowRow {
   AdwActionRow parent_instance;
   GtkWidget *del_btn;
-  GFile *file;
+  char *file_path;
 };
-ErrandsAttachmentsWindowRow *errands_attachments_window_row_new(GFile *file);
+ErrandsAttachmentsWindowRow *errands_attachments_window_row_new(const char *file_path);
 
 // --- TAGS WINDOW --- //
 

@@ -1,7 +1,6 @@
 #include "sidebar.h"
 #include "../components.h"
 #include "../data/data.h"
-#include "../dialogs/dialogs.h"
 #include "../settings.h"
 #include "../state.h"
 #include "../task-list/task-list.h"
@@ -9,8 +8,6 @@
 #include "../window.h"
 
 #include <glib/gi18n.h>
-
-#include <stddef.h>
 
 // --- DECLARATIONS --- //
 

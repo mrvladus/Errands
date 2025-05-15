@@ -1,5 +1,8 @@
 #pragma once
 
+#include "glib-object.h"
+#include "gtk/gtk.h"
+#include "gtk/gtkshortcut.h"
 #include <adwaita.h>
 
 #include <stdarg.h>
@@ -100,4 +103,22 @@ static inline GSimpleActionGroup *errands_action_group_new(int n_items, ...) {
   }
   va_end(args);
   return ag;
+}
+
+static inline GtkWidget *errands_check_row_new(const char *title, const char *icon_name, GtkWidget *group,
+                                               void (*cb)(GtkCheckButton *btn)) {
+  GtkWidget *toggle = gtk_check_button_new();
+  if (group)
+    gtk_check_button_set_group(GTK_CHECK_BUTTON(toggle),
+                               GTK_CHECK_BUTTON(g_object_get_data(G_OBJECT(group), "toggle")));
+
+  GtkWidget *row = adw_action_row_new();
+  adw_preferences_row_set_title(ADW_PREFERENCES_ROW(row), title);
+  adw_action_row_add_suffix(ADW_ACTION_ROW(row), toggle);
+  adw_action_row_set_activatable_widget(ADW_ACTION_ROW(row), toggle);
+  g_object_set_data(G_OBJECT(row), "toggle", toggle);
+  if (icon_name) adw_action_row_add_prefix(ADW_ACTION_ROW(row), gtk_image_new_from_icon_name(icon_name));
+  if (cb) g_signal_connect(toggle, "toggled", G_CALLBACK(cb), NULL);
+
+  return row;
 }

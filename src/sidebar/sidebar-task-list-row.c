@@ -1,6 +1,5 @@
 #include "../components.h"
 #include "../data/data.h"
-#include "../dialogs/dialogs.h"
 #include "../settings.h"
 #include "../state.h"
 #include "../utils.h"
@@ -8,7 +7,6 @@
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>
-#include <stdint.h>
 
 static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x, gdouble y, GtkPopover *popover);
 static void on_color_changed(GtkColorDialogButton *btn, GParamSpec *pspec, ListData *data);
@@ -140,7 +138,7 @@ void on_errands_sidebar_task_list_row_activate(GtkListBox *box, ErrandsSidebarTa
   adw_view_stack_set_visible_child_name(ADW_VIEW_STACK(state.main_window->stack), "errands_task_list_page");
   // Set setting
   const char *list_uid = errands_data_get_str(row->data, DATA_PROP_LIST_UID);
-  errands_settings_set("last_list_uid", SETTING_TYPE_STRING, (void *)list_uid);
+  errands_settings_set_string("last_list_uid", list_uid);
   // Filter by uid
   errands_task_list_filter_by_uid(list_uid);
   state.task_list->data = row->data;

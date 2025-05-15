@@ -1,21 +1,18 @@
 #include "task-list.h"
-#include "../components.h"
 #include "../data/data.h"
 #include "../settings.h"
 #include "../sidebar/sidebar.h"
 #include "../state.h"
 #include "../task/task.h"
 #include "../utils.h"
-#include "glib-object.h"
-#include "gtk/gtk.h"
 
 #include <glib/gi18n.h>
+
+#include <string.h>
 
 static void on_task_added(AdwEntryRow *entry, gpointer data);
 static void on_task_list_search(GtkSearchEntry *entry, gpointer user_data);
 static void on_search_btn_toggle(GtkToggleButton *btn);
-static void on_toggle_completed(bool active);
-static void on_sort_by(const char *active_id);
 static void on_sort_btn_clicked();
 
 G_DEFINE_TYPE(ErrandsTaskList, errands_task_list, ADW_TYPE_BIN)
@@ -134,14 +131,12 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   LOG("Task List: Loading tasks complete");
 
   // Task list clamp
-  GtkWidget *tbox_clamp = adw_clamp_new();
-  g_object_set(tbox_clamp, "tightening-threshold", 300, "maximum-size", 1000, "margin-start", 12, "margin-end", 12,
-               NULL);
-  adw_clamp_set_child(ADW_CLAMP(tbox_clamp), self->task_list);
+  GtkWidget *tbox_clamp = g_object_new(ADW_TYPE_CLAMP, "child", self->task_list, "tightening-threshold", 300,
+                                       "maximum-size", 1000, "margin-start", 12, "margin-end", 12, NULL);
 
   // Scrolled window
-  GtkWidget *scrl = gtk_scrolled_window_new();
-  g_object_set(scrl, "child", tbox_clamp, "propagate-natural-height", true, "propagate-natural-width", true, NULL);
+  GtkWidget *scrl = g_object_new(GTK_TYPE_SCROLLED_WINDOW, "child", tbox_clamp, "propagate-natural-height", true,
+                                 "propagate-natural-width", true, NULL);
 
   // VBox
   GtkWidget *vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
@@ -432,7 +427,7 @@ static void on_task_added(AdwEntryRow *entry, gpointer data) {
   if (g_str_equal(list_uid, "")) return;
 
   TaskData *td = list_data_create_task(state.task_list->data, (char *)text, list_uid, "");
-  g_hash_table_insert(tdata, strdup(errands_data_get_str(td, DATA_PROP_LIST_UID)), td);
+  g_hash_table_insert(tdata, g_strdup(errands_data_get_str(td, DATA_PROP_LIST_UID)), td);
   errands_data_write_list(state.task_list->data);
   ErrandsTask *t = errands_task_new(td);
   gtk_box_prepend(GTK_BOX(state.task_list->task_list), GTK_WIDGET(t));
@@ -460,18 +455,6 @@ static void on_search_btn_toggle(GtkToggleButton *btn) {
   LOG("Task List: Toggle search %s", active ? "on" : "off");
   if (state.task_list->data) gtk_revealer_set_reveal_child(GTK_REVEALER(state.task_list->entry), !active);
   else gtk_revealer_set_reveal_child(GTK_REVEALER(state.task_list->entry), false);
-}
-
-static void on_toggle_completed(bool active) {
-  LOG("Task List: Set show completed to '%s'", active ? "on" : "off");
-  errands_settings_set("show_completed", SETTING_TYPE_BOOL, &active);
-  errands_task_list_filter_by_completion(state.task_list->task_list, active);
-}
-
-static void on_sort_by(const char *active_id) {
-  LOG("Task List: Set sort by '%s'", active_id);
-  errands_settings_set("sort_by", SETTING_TYPE_STRING, (void *)active_id);
-  if (strcmp(active_id, "default")) errands_task_list_sort_recursive(state.task_list->task_list);
 }
 
 static void on_sort_btn_clicked() { errands_sort_dialog_show(); }

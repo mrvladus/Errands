@@ -1,6 +1,5 @@
 #pragma once
 
-#include "dialogs/dialogs.h"
 #include "sidebar/sidebar.h"
 #include "task-list/task-list.h"
 #include "task/task.h"
@@ -16,12 +15,9 @@ typedef struct {
   ErrandsSidebar *sidebar;
   ErrandsTaskList *task_list;
   ErrandsSortDialog *sort_dialog;
-
-  // Dialog windows
   ErrandsNewListDialog *new_list_dialog;
   ErrandsRenameListDialog *rename_list_dialog;
   ErrandsDeleteListDialog *delete_list_dialog;
-
   ErrandsAttachmentsWindow *attachments_window;
   ErrandsColorWindow *color_window;
   ErrandsNotesWindow *notes_window;

@@ -74,11 +74,11 @@ void errands_window_add_toast(ErrandsWindow *win, const char *msg) {
 static void on_size_changed(ErrandsWindow *win) {
   int w, h;
   gtk_window_get_default_size(GTK_WINDOW(win), &w, &h);
-  errands_settings_set("window_width", SETTING_TYPE_INT, &w);
-  errands_settings_set("window_height", SETTING_TYPE_INT, &h);
+  errands_settings_set_int("window_width", w);
+  errands_settings_set_int("window_height", h);
 }
 
 static void on_state_changed(ErrandsWindow *win) {
   bool m = gtk_window_is_maximized(GTK_WINDOW(win));
-  errands_settings_set("maximized", SETTING_TYPE_BOOL, &m);
+  errands_settings_set_bool("maximized", m);
 }

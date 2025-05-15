@@ -51,8 +51,7 @@ static void errands_tags_window_init(ErrandsTagsWindow *self) {
 
   // Placeholder
   self->placeholder = adw_status_page_new();
-  g_object_set(self->placeholder, "icon-name", "errands-tag-symbolic", "title", _("No Tags"), "description",
-               _("Add new ones in the entry above"), "vexpand", true, NULL);
+  g_object_set(self->placeholder, "icon-name", "errands-tag-symbolic", "title", _("No Tags"), "vexpand", true, NULL);
   g_object_bind_property(self->placeholder, "visible", scrl, "visible",
                          G_BINDING_SYNC_CREATE | G_BINDING_INVERT_BOOLEAN);
   gtk_widget_add_css_class(self->placeholder, "compact");

@@ -13,6 +13,7 @@ static void errands_attachments_window_update_ui();
 static void on_errands_attachments_window_close(ErrandsAttachmentsWindow *win);
 static void on_errands_attachments_window_attachment_add(GtkButton *btn);
 static void on_errands_attachments_window_row_activate(GtkListBox *box, ErrandsAttachmentsWindowRow *row);
+static gboolean on_drop(GtkDropTarget *target, const GValue *value, double x, double y, gpointer data);
 
 G_DEFINE_TYPE(ErrandsAttachmentsWindow, errands_attachments_window, ADW_TYPE_DIALOG)
 
@@ -40,6 +41,11 @@ static void errands_attachments_window_init(ErrandsAttachmentsWindow *self) {
   g_object_set(scrl, "propagate-natural-height", true, NULL);
   gtk_box_append(GTK_BOX(vbox), scrl);
 
+  // Drop target
+  GtkDropTarget *drop_target = gtk_drop_target_new(G_TYPE_FILE, GDK_ACTION_COPY);
+  g_signal_connect(drop_target, "drop", G_CALLBACK(on_drop), NULL);
+  gtk_widget_add_controller(scrl, GTK_EVENT_CONTROLLER(drop_target));
+
   // List box
   self->list_box = gtk_list_box_new();
   g_object_set(self->list_box, "selection-mode", GTK_SELECTION_NONE, "margin-start", 12, "margin-end", 12, "margin-top",
@@ -51,7 +57,7 @@ static void errands_attachments_window_init(ErrandsAttachmentsWindow *self) {
   // Placeholder
   self->placeholder = adw_status_page_new();
   g_object_set(self->placeholder, "icon-name", "errands-attachment-symbolic", "title", _("No Attachments"),
-               "description", _("Click \"+\" button to add new attachment"), "vexpand", true, NULL);
+               "description", _("Click \"+\" button to add new attachment or drag files here"), "vexpand", true, NULL);
   g_object_bind_property(self->placeholder, "visible", scrl, "visible",
                          G_BINDING_SYNC_CREATE | G_BINDING_INVERT_BOOLEAN);
   gtk_widget_add_css_class(self->placeholder, "compact");
@@ -76,13 +82,12 @@ void errands_attachments_window_show(ErrandsTask *task) {
   // Remove rows
   gtk_list_box_remove_all(GTK_LIST_BOX(state.attachments_window->list_box));
   g_auto(GStrv) attachments = errands_data_get_strv(task->data, DATA_PROP_ATTACHMENTS);
-  if (attachments) {
-    // Add rows
+  // Add rows
+  if (attachments)
     for (size_t i = 0; i < g_strv_length(attachments); i++) {
-      ErrandsAttachmentsWindowRow *row = errands_attachments_window_row_new(g_file_new_for_path(attachments[i]));
+      ErrandsAttachmentsWindowRow *row = errands_attachments_window_row_new(attachments[i]);
       gtk_list_box_append(GTK_LIST_BOX(state.attachments_window->list_box), GTK_WIDGET(row));
     }
-  }
   errands_attachments_window_update_ui();
   // Show dialog
   adw_dialog_present(ADW_DIALOG(state.attachments_window), GTK_WIDGET(state.main_window));
@@ -101,6 +106,24 @@ static void errands_attachments_window_update_ui() {
   }
 }
 
+static void errands_attachments_window_add_attachment(const char *path) {
+  LOG("Attachments: Add '%s'", path);
+  // Get current attachments
+  g_auto(GStrv) cur_attachments = errands_data_get_strv(state.attachments_window->task->data, DATA_PROP_ATTACHMENTS);
+  // If already contains - return
+  if (cur_attachments && g_strv_contains((const gchar *const *)cur_attachments, path)) return;
+  // Add attachment
+  g_autoptr(GStrvBuilder) builder = g_strv_builder_new();
+  if (cur_attachments) g_strv_builder_addv(builder, (const char **)cur_attachments);
+  g_strv_builder_add(builder, path);
+  g_auto(GStrv) attachments = g_strv_builder_end(builder);
+  errands_data_set_strv(state.attachments_window->task->data, DATA_PROP_ATTACHMENTS, attachments);
+  ErrandsAttachmentsWindowRow *row = errands_attachments_window_row_new(path);
+  gtk_list_box_append(GTK_LIST_BOX(state.attachments_window->list_box), GTK_WIDGET(row));
+  errands_data_write_list(task_data_get_list(state.attachments_window->task->data));
+  errands_attachments_window_update_ui();
+}
+
 // --- SIGNAL HANDLERS FOR ATTACHMENTS WINDOW --- //
 
 static void on_errands_attachments_window_close(ErrandsAttachmentsWindow *win) {
@@ -115,31 +138,25 @@ static void __on_open_finish(GObject *obj, GAsyncResult *res, gpointer data) {
   GFile *file = gtk_file_dialog_open_finish(GTK_FILE_DIALOG(obj), res, NULL);
   if (!file) return;
   g_autofree char *path = g_file_get_path(file);
-  LOG("Attachments: Add '%s'", path);
-  // Get current attachments
-  g_auto(GStrv) cur_attachments = errands_data_get_strv(state.attachments_window->task->data, DATA_PROP_ATTACHMENTS);
-  // If already contains - return
-  if (cur_attachments && g_strv_contains((const gchar *const *)cur_attachments, path)) return;
-  // Add attachment
-  g_autoptr(GStrvBuilder) builder = g_strv_builder_new();
-  if (cur_attachments) g_strv_builder_addv(builder, (const char **)cur_attachments);
-  g_strv_builder_add(builder, path);
-  g_auto(GStrv) attachments = g_strv_builder_end(builder);
-  errands_data_set_strv(state.attachments_window->task->data, DATA_PROP_ATTACHMENTS, attachments);
-  ErrandsAttachmentsWindowRow *row = errands_attachments_window_row_new(file);
-  gtk_list_box_append(GTK_LIST_BOX(state.attachments_window->list_box), GTK_WIDGET(row));
-  errands_data_write_list(task_data_get_list(state.attachments_window->task->data));
-  errands_attachments_window_update_ui();
+  errands_attachments_window_add_attachment(path);
 }
 
 static void on_errands_attachments_window_attachment_add(GtkButton *btn) {
-  GtkFileDialog *dialog = gtk_file_dialog_new();
+  g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
   gtk_file_dialog_open(dialog, GTK_WINDOW(state.main_window), NULL, __on_open_finish, NULL);
 }
 
 static void on_errands_attachments_window_row_activate(GtkListBox *box, ErrandsAttachmentsWindowRow *row) {
-  g_autoptr(GtkFileLauncher) l = gtk_file_launcher_new(row->file);
+  g_autoptr(GFile) file = g_file_new_for_path(row->file_path);
+  g_autoptr(GtkFileLauncher) l = gtk_file_launcher_new(file);
   gtk_file_launcher_launch(l, GTK_WINDOW(state.main_window), NULL, NULL, NULL);
+}
+
+static gboolean on_drop(GtkDropTarget *target, const GValue *value, double x, double y, gpointer data) {
+  GFile *file = g_value_get_object(value);
+  g_autofree gchar *path = g_file_get_path(file);
+  errands_attachments_window_add_attachment(path);
+  return true;
 }
 
 // ------------------------------------------------------------- //
@@ -164,13 +181,12 @@ static void errands_attachments_window_row_init(ErrandsAttachmentsWindowRow *sel
   adw_action_row_add_suffix(ADW_ACTION_ROW(self), self->del_btn);
 }
 
-ErrandsAttachmentsWindowRow *errands_attachments_window_row_new(GFile *file) {
+ErrandsAttachmentsWindowRow *errands_attachments_window_row_new(const char *file_path) {
   ErrandsAttachmentsWindowRow *row = g_object_new(ERRANDS_TYPE_ATTACHMENTS_WINDOW_ROW, NULL);
   g_signal_connect(row, "destroy", G_CALLBACK(on_errands_attachments_window_row_destroy), NULL);
-  row->file = file;
-  g_autofree gchar *path = g_file_get_path(file);
-  g_autofree gchar *basename = g_file_get_basename(file);
-  adw_action_row_set_subtitle(ADW_ACTION_ROW(row), path);
+  row->file_path = g_strdup(file_path);
+  g_autofree gchar *basename = g_path_get_basename(file_path);
+  adw_action_row_set_subtitle(ADW_ACTION_ROW(row), row->file_path);
   adw_preferences_row_set_title(ADW_PREFERENCES_ROW(row), basename);
   return row;
 }
@@ -179,11 +195,10 @@ ErrandsAttachmentsWindowRow *errands_attachments_window_row_new(GFile *file) {
 
 static void on_errands_attachments_window_row_delete(GtkButton *btn, ErrandsAttachmentsWindowRow *row) {
   LOG("Attachment: Delete");
-  g_autofree gchar *path = g_file_get_path(row->file);
   g_auto(GStrv) cur_attachments = errands_data_get_strv(state.attachments_window->task->data, DATA_PROP_ATTACHMENTS);
   g_autoptr(GStrvBuilder) builder = g_strv_builder_new();
   for (size_t i = 0; i < g_strv_length(cur_attachments); i++)
-    if (strcmp(cur_attachments[i], path)) { g_strv_builder_add(builder, cur_attachments[i]); }
+    if (strcmp(cur_attachments[i], row->file_path)) g_strv_builder_add(builder, cur_attachments[i]);
   g_auto(GStrv) attachments = g_strv_builder_end(builder);
   errands_data_set_strv(state.attachments_window->task->data, DATA_PROP_ATTACHMENTS, attachments);
   errands_data_write_list(task_data_get_list(state.attachments_window->task->data));
@@ -191,4 +206,4 @@ static void on_errands_attachments_window_row_delete(GtkButton *btn, ErrandsAtta
   errands_attachments_window_update_ui();
 }
 
-static void on_errands_attachments_window_row_destroy(ErrandsAttachmentsWindowRow *row) { g_free(row->file); }
+static void on_errands_attachments_window_row_destroy(ErrandsAttachmentsWindowRow *row) { g_free(row->file_path); }

@@ -14,22 +14,27 @@ static bool pending_save = false;
 
 static JSON *settings = NULL;
 
+const char *const settings_keys[] = {
+    "last_list_uid", "maximized",     "show_completed", "sort_by",       "sync",         "sync_provider",
+    "sync_url",      "sync_username", "tags",           "window_height", "window_width",
+};
+
 // --- LOADING --- //
 
 void errands_settings_load_default() {
-  LOG("Settings: Load default configuration");
+  LOG("Settings: Create default configuration");
   settings = json_object_new();
-  json_object_add(settings, "show_completed", json_bool_new(true));
-  json_object_add(settings, "maximized", json_bool_new(false));
-  json_object_add(settings, "sync", json_bool_new(false));
-  json_object_add(settings, "window_width", json_int_new(800));
-  json_object_add(settings, "window_height", json_int_new(600));
-  json_object_add(settings, "last_list_uid", json_string_new(""));
-  json_object_add(settings, "sort_by", json_string_new("default"));
-  json_object_add(settings, "sync_provider", json_string_new("caldav"));
-  json_object_add(settings, "sync_url", json_string_new(""));
-  json_object_add(settings, "sync_username", json_string_new(""));
-  json_object_add(settings, "tags", json_string_new(""));
+  json_object_add(settings, settings_keys[0], json_string_new(""));
+  json_object_add(settings, settings_keys[1], json_bool_new(false));
+  json_object_add(settings, settings_keys[2], json_bool_new(true));
+  json_object_add(settings, settings_keys[3], json_string_new("created"));
+  json_object_add(settings, settings_keys[4], json_bool_new(false));
+  json_object_add(settings, settings_keys[5], json_string_new("caldav"));
+  json_object_add(settings, settings_keys[6], json_string_new(""));
+  json_object_add(settings, settings_keys[7], json_string_new(""));
+  json_object_add(settings, settings_keys[8], json_string_new(""));
+  json_object_add(settings, settings_keys[9], json_int_new(600));
+  json_object_add(settings, settings_keys[10], json_int_new(800));
 }
 
 void errands_settings_load_user() {
@@ -38,9 +43,6 @@ void errands_settings_load_user() {
   if (!json) return;
   JSON *json_parsed = json_parse(json);
   if (!json_parsed) return;
-  const char *const settings_keys[] = {"show_completed", "window_width",  "window_height", "maximized",
-                                       "last_list_uid",  "sort_by",       "sync",          "sync_provider",
-                                       "sync_url",       "sync_username", "tags"};
   for (size_t i = 0; i < G_N_ELEMENTS(settings_keys); i++) {
     JSON *node = json_object_get(json_parsed, settings_keys[i]);
     JSON *dup = json_dup(node);
@@ -73,11 +75,21 @@ ErrandsSetting errands_settings_get(const char *key, ErrandsSettingType type) {
   return setting;
 }
 
-void errands_settings_set(const char *key, ErrandsSettingType type, void *value) {
+void errands_settings_set_string(const char *key, const char *value) {
   JSON *res = json_object_get(settings, key);
-  if (type == SETTING_TYPE_INT) res->int_val = *(int *)value;
-  else if (type == SETTING_TYPE_BOOL) res->bool_val = *(bool *)value;
-  else if (type == SETTING_TYPE_STRING) json_replace_string(&res->string_val, (const char *)value);
+  json_replace_string(&res->string_val, value);
+  errands_settings_save();
+}
+
+void errands_settings_set_int(const char *key, int value) {
+  JSON *res = json_object_get(settings, key);
+  res->int_val = value;
+  errands_settings_save();
+}
+
+void errands_settings_set_bool(const char *key, bool value) {
+  JSON *res = json_object_get(settings, key);
+  res->bool_val = value;
   errands_settings_save();
 }
 

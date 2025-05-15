@@ -1,9 +1,8 @@
 #include "../data/data.h"
-#include "../sidebar/sidebar.h"
 #include "../state.h"
 #include "../task/task.h"
 #include "../utils.h"
-#include "dialogs.h"
+#include "sidebar.h"
 
 #include <glib/gi18n.h>
 
