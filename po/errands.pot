@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-10 12:25+0300\n"
+"POT-Creation-Date: 2025-05-16 13:01+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -577,19 +577,7 @@ msgstr ""
 msgid "Task is Due"
 msgstr ""
 
-#: errands/application.py:78
-msgid "Errands was updated"
-msgstr ""
-
-#: errands/application.py:79
-msgid "Restart is required"
-msgstr ""
-
-#: errands/application.py:82
-msgid "Restart"
-msgstr ""
-
-#: errands/application.py:111
+#: errands/application.py:41
 msgid "Errands need to run in the background for notifications"
 msgstr ""
 
