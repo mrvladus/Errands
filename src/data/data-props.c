@@ -38,22 +38,40 @@ const char *errands_data_get_str(icalcomponent *data, DataPropStr prop) {
   case DATA_PROP_COLOR: out = get_x_prop_value(data, "X-ERRANDS-COLOR", "none"); break;
   case DATA_PROP_LIST_NAME: out = get_x_prop_value(data, "X-ERRANDS-LIST-NAME", ""); break;
   case DATA_PROP_LIST_UID: out = get_x_prop_value(data, "X-ERRANDS-LIST-UID", ""); break;
-  case DATA_PROP_COMPLETED:
-    out = icalproperty_as_ical_string(icalcomponent_get_first_property(data, ICAL_COMPLETED_PROPERTY));
+  case DATA_PROP_COMPLETED: {
+    icalproperty *property = icalcomponent_get_first_property(data, ICAL_COMPLETED_PROPERTY);
+    if (property) out = icaltime_as_ical_string(icalproperty_get_completed(property));
     break;
-  case DATA_PROP_CHANGED:
-    out = icalproperty_as_ical_string(icalcomponent_get_first_property(data, ICAL_LASTMODIFIED_PROPERTY));
+  }
+  case DATA_PROP_CHANGED: {
+    icalproperty *property = icalcomponent_get_first_property(data, ICAL_LASTMODIFIED_PROPERTY);
+    if (property) {
+      out = icaltime_as_ical_string(icalproperty_get_lastmodified(property));
+    } else {
+      property = icalcomponent_get_first_property(data, ICAL_DTSTAMP_PROPERTY);
+      if (property) out = icaltime_as_ical_string(icalproperty_get_dtstamp(property));
+    }
     break;
-  case DATA_PROP_CREATED: out = icaltime_as_ical_string(icalcomponent_get_dtstamp(data)); break;
+  }
+  case DATA_PROP_CREATED: {
+    icalproperty *property = icalcomponent_get_first_property(data, ICAL_CREATED_PROPERTY);
+    if (property) out = icaltime_as_ical_string(icalproperty_get_created(property));
+    break;
+  }
   case DATA_PROP_DUE: out = icaltime_as_ical_string(icalcomponent_get_due(data)); break;
   case DATA_PROP_END: out = icaltime_as_ical_string(icalcomponent_get_dtend(data)); break;
   case DATA_PROP_NOTES: out = icalcomponent_get_description(data); break;
   case DATA_PROP_PARENT:
     out = icalproperty_as_ical_string(icalcomponent_get_first_property(data, ICAL_RELATEDTO_PROPERTY));
     break;
-  case DATA_PROP_RRULE:
-    out = icalproperty_as_ical_string(icalcomponent_get_first_property(data, ICAL_RRULE_PROPERTY));
+  case DATA_PROP_RRULE: {
+    icalproperty *property = icalcomponent_get_first_property(data, ICAL_RRULE_PROPERTY);
+    if (property) {
+      struct icalrecurrencetype rrule = icalproperty_get_rrule(property);
+      out = icalrecurrencetype_as_string(&rrule);
+    }
     break;
+  }
   case DATA_PROP_START: out = icaltime_as_ical_string(icalcomponent_get_dtstart(data)); break;
   case DATA_PROP_TEXT: out = icalcomponent_get_summary(data); break;
   case DATA_PROP_UID: out = icalcomponent_get_uid(data); break;
@@ -129,19 +147,25 @@ void errands_data_set_str(icalcomponent *data, DataPropStr prop, const char *val
   case DATA_PROP_CHANGED: {
     if (!value || !strcmp(value, "")) {
       icalcomponent_remove_property(data, icalcomponent_get_first_property(data, ICAL_LASTMODIFIED_PROPERTY));
+      icalcomponent_remove_property(data, icalcomponent_get_first_property(data, ICAL_DTSTAMP_PROPERTY));
       break;
     }
     icalproperty *property = icalcomponent_get_first_property(data, ICAL_LASTMODIFIED_PROPERTY);
     if (property) icalproperty_set_lastmodified(property, icaltime_from_string(value));
     else icalcomponent_add_property(data, icalproperty_new_lastmodified(icaltime_from_string(value)));
+    property = icalcomponent_get_first_property(data, ICAL_DTSTAMP_PROPERTY);
+    if (property) icalproperty_set_dtstamp(property, icaltime_from_string(value));
+    else icalcomponent_add_property(data, icalproperty_new_dtstamp(icaltime_from_string(value)));
     break;
   }
   case DATA_PROP_CREATED: {
     if (!value || !strcmp(value, "")) {
-      icalcomponent_remove_property(data, icalcomponent_get_first_property(data, ICAL_DTSTAMP_PROPERTY));
+      icalcomponent_remove_property(data, icalcomponent_get_first_property(data, ICAL_CREATED_PROPERTY));
       break;
     }
-    icalcomponent_set_dtstamp(data, icaltime_from_string(value));
+    icalproperty *property = icalcomponent_get_first_property(data, ICAL_CREATED_PROPERTY);
+    if (property) icalproperty_set_created(property, icaltime_from_string(value));
+    else icalcomponent_add_property(data, icalproperty_new_created(icaltime_from_string(value)));
     break;
   }
   case DATA_PROP_DUE: {

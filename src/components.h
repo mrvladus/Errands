@@ -106,7 +106,7 @@ static inline GSimpleActionGroup *errands_action_group_new(int n_items, ...) {
 }
 
 static inline GtkWidget *errands_check_row_new(const char *title, const char *icon_name, GtkWidget *group,
-                                               void (*cb)(GtkCheckButton *btn)) {
+                                               void (*cb)(GtkCheckButton *btn, void *data), void *cb_data) {
   GtkWidget *toggle = gtk_check_button_new();
   if (group)
     gtk_check_button_set_group(GTK_CHECK_BUTTON(toggle),
@@ -118,7 +118,7 @@ static inline GtkWidget *errands_check_row_new(const char *title, const char *ic
   adw_action_row_set_activatable_widget(ADW_ACTION_ROW(row), toggle);
   g_object_set_data(G_OBJECT(row), "toggle", toggle);
   if (icon_name) adw_action_row_add_prefix(ADW_ACTION_ROW(row), gtk_image_new_from_icon_name(icon_name));
-  if (cb) g_signal_connect(toggle, "toggled", G_CALLBACK(cb), NULL);
+  if (cb) g_signal_connect(toggle, "toggled", G_CALLBACK(cb), cb_data);
 
   return row;
 }

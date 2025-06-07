@@ -81,7 +81,7 @@ static void initial_sync_finished_cb(GObject *source_object, GAsyncResult *res, 
           // TaskData *td = task_data_new_from_ical(event->ical);
         }
         // bool found = false;
-        // g_autoptr(GPtrArray) tasks = g_hash_table_get_values_as_ptr_array(tdata);
+        // GPtrArray* tasks = g_hash_table_get_values_as_ptr_array(tdata);
         // for (size_t j = 0; j < tasks->len; ++j) {
         //   const char *td_uid = icalcomponent_get_uid((TaskData *)tasks->pdata[j]);
         //   if (!strcmp(uid, td_uid)) {

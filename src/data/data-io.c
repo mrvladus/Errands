@@ -2,6 +2,8 @@
 #include "../utils.h"
 #include "../vendor/json.h"
 #include "data.h"
+#include "gio/gio.h"
+#include "glib.h"
 #include <libical/ical.h>
 
 const char *user_dir;
@@ -155,10 +157,21 @@ void errands_data_load_lists() {
   }
 }
 
-void errands_data_write_list(ListData *data) {
+// Async write list data to file function
+static void errands_data_write_list_func(GTask *task, gpointer source_object, ListData *data,
+                                         GCancellable *cancellable) {
   g_autofree gchar *filename = g_strdup_printf("%s.ics", errands_data_get_str(data, DATA_PROP_LIST_UID));
   g_autofree gchar *path = g_build_filename(user_dir, filename, NULL);
-  if (!g_file_set_contents(path, icalcomponent_as_ical_string(data), -1, NULL))
-    LOG("User Data: Failed to save list %s", path);
-  LOG("User Data: Save list %s", path);
+  if (!g_file_set_contents(path, icalcomponent_as_ical_string(data), -1, NULL)) {
+    LOG("User Data: Failed to save list '%s'", path);
+    return;
+  }
+  LOG("User Data: Saved list '%s'", path);
+}
+
+// Async write list data to file
+void errands_data_write_list(ListData *data) {
+  g_autoptr(GTask) task = g_task_new(NULL, NULL, NULL, NULL);
+  g_task_set_task_data(task, data, NULL);
+  g_task_run_in_thread(task, (gpointer)errands_data_write_list_func);
 }

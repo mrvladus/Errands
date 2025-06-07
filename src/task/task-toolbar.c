@@ -1,5 +1,6 @@
 #include "../data/data.h"
 #include "../utils.h"
+#include "glib-object.h"
 #include "task.h"
 
 #include <glib/gi18n.h>
@@ -16,7 +17,8 @@ static void errands_task_toolbar_init(ErrandsTaskToolbar *self) {
 
   // Date button
   GtkWidget *date_btn_content = adw_button_content_new();
-  g_object_set(date_btn_content, "icon-name", "errands-calendar-symbolic", "label", _("Date"), NULL);
+  g_object_set(date_btn_content, "icon-name", "errands-calendar-symbolic", "label", _("Date"), "tooltip-text",
+               _("Select Date"), NULL);
   self->date_btn = gtk_button_new();
   g_object_set(self->date_btn, "child", date_btn_content, "halign", GTK_ALIGN_START, "hexpand", true, NULL);
   gtk_widget_add_css_class(self->date_btn, "flat");
@@ -24,23 +26,28 @@ static void errands_task_toolbar_init(ErrandsTaskToolbar *self) {
   gtk_flow_box_append(GTK_FLOW_BOX(box), self->date_btn);
 
   // Priority button
-  self->priority_btn = gtk_button_new_from_icon_name("errands-priority-symbolic");
+
+  self->priority_btn =
+      g_object_new(GTK_TYPE_BUTTON, "icon-name", "errands-priority-symbolic", "tooltip-text", _("Priority"), NULL);
   gtk_widget_add_css_class(self->priority_btn, "flat");
 
   // Notes button
-  self->notes_btn = gtk_button_new_from_icon_name("errands-notes-symbolic");
+  self->notes_btn =
+      g_object_new(GTK_TYPE_BUTTON, "icon-name", "errands-notes-symbolic", "tooltip-text", _("Notes"), NULL);
   gtk_widget_add_css_class(self->notes_btn, "flat");
 
   // Tags button
-  self->tags_btn = gtk_button_new_from_icon_name("errands-tags-symbolic");
+  self->tags_btn = g_object_new(GTK_TYPE_BUTTON, "icon-name", "errands-tags-symbolic", "tooltip-text", _("Tags"), NULL);
   gtk_widget_add_css_class(self->tags_btn, "flat");
 
   // Attachments button
-  self->attachments_btn = gtk_button_new_from_icon_name("errands-attachment-symbolic");
+  self->attachments_btn =
+      g_object_new(GTK_TYPE_BUTTON, "icon-name", "errands-attachment-symbolic", "tooltip-text", _("Attachments"), NULL);
   gtk_widget_add_css_class(self->attachments_btn, "flat");
 
   // Color button
-  self->color_btn = gtk_button_new_from_icon_name("errands-color-symbolic");
+  self->color_btn =
+      g_object_new(GTK_TYPE_BUTTON, "icon-name", "errands-color-symbolic", "tooltip-text", _("Color"), NULL);
   gtk_widget_add_css_class(self->color_btn, "flat");
 
   // End box

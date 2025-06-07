@@ -6,6 +6,7 @@
 #include "../task-list/task-list.h"
 #include "../utils.h"
 #include "../window.h"
+#include "glib.h"
 
 #include <glib/gi18n.h>
 
@@ -111,11 +112,12 @@ ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(ErrandsSidebar *sb, Lis
 }
 
 void errands_sidebar_select_last_opened_page() {
-  g_autoptr(GPtrArray) rows = get_children(state.sidebar->task_lists_box);
+  GPtrArray *rows = get_children(state.sidebar->task_lists_box);
   const char *last_uid = errands_settings_get("last_list_uid", SETTING_TYPE_STRING).s;
+  LOG("Sidebar: Selecting last opened list: '%s'", last_uid);
   for (size_t i = 0; i < rows->len; i++) {
     ErrandsSidebarTaskListRow *row = rows->pdata[i];
-    if (!strcmp(last_uid, errands_data_get_str(row->data, DATA_PROP_LIST_UID)))
+    if (g_str_equal(last_uid, errands_data_get_str(row->data, DATA_PROP_LIST_UID)))
       g_signal_emit_by_name(row, "activate", NULL);
   }
 }

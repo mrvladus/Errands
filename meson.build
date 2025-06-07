@@ -3,6 +3,7 @@ project(
   'c',
   license: 'MIT',
   version: '48.0',
+  default_options: ['--buildtype=debug'],
 )
 
 # Dependencies
@@ -12,7 +13,6 @@ dependencies = [
   dependency('libical'), # For working with user data in ical format
   dependency('gtksourceview-5'), # For notes syntax highlighting
   dependency('webkitgtk-6.0'), # For markdown preview
-  dependency('libcmark'), # For markdown preview
   dependency('gtk4'),
   dependency('libadwaita-1', version: '>=1.7'),
 ]

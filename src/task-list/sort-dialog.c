@@ -9,9 +9,9 @@
 
 static void on_errands_sort_dialog_close_cb(ErrandsSortDialog *self);
 static void on_show_completed_toggle(AdwSwitchRow *row);
-static void on_created_toggle(GtkCheckButton *btn);
-static void on_due_toggle(GtkCheckButton *btn);
-static void on_priority_toggle(GtkCheckButton *btn);
+static void on_created_toggle(GtkCheckButton *btn, void *data);
+static void on_due_toggle(GtkCheckButton *btn, void *data);
+static void on_priority_toggle(GtkCheckButton *btn, void *data);
 
 G_DEFINE_TYPE(ErrandsSortDialog, errands_sort_dialog, ADW_TYPE_DIALOG)
 
@@ -37,13 +37,13 @@ static void errands_sort_dialog_init(ErrandsSortDialog *self) {
   adw_preferences_page_add(ADW_PREFERENCES_PAGE(page), ADW_PREFERENCES_GROUP(sort_group));
 
   // Creation Date
-  self->created_row = errands_check_row_new(_("Creation Date"), NULL, NULL, on_created_toggle);
+  self->created_row = errands_check_row_new(_("Creation Date"), NULL, NULL, on_created_toggle, NULL);
   adw_preferences_group_add(ADW_PREFERENCES_GROUP(sort_group), self->created_row);
   // Due Date
-  self->due_row = errands_check_row_new(_("Due Date"), NULL, self->created_row, on_due_toggle);
+  self->due_row = errands_check_row_new(_("Due Date"), NULL, self->created_row, on_due_toggle, NULL);
   adw_preferences_group_add(ADW_PREFERENCES_GROUP(sort_group), self->due_row);
   // Priority
-  self->priority_row = errands_check_row_new(_("Priority"), NULL, self->created_row, on_priority_toggle);
+  self->priority_row = errands_check_row_new(_("Priority"), NULL, self->created_row, on_priority_toggle, NULL);
   adw_preferences_group_add(ADW_PREFERENCES_GROUP(sort_group), self->priority_row);
 
   // Toolbar View
@@ -97,6 +97,6 @@ static void set_sort_by(GtkCheckButton *btn, const char *sort_by) {
   state.sort_dialog->sort_changed = true;
 }
 
-static void on_created_toggle(GtkCheckButton *btn) { set_sort_by(btn, "created"); }
-static void on_due_toggle(GtkCheckButton *btn) { set_sort_by(btn, "due"); }
-static void on_priority_toggle(GtkCheckButton *btn) { set_sort_by(btn, "priority"); }
+static void on_created_toggle(GtkCheckButton *btn, void *data) { set_sort_by(btn, "created"); }
+static void on_due_toggle(GtkCheckButton *btn, void *data) { set_sort_by(btn, "due"); }
+static void on_priority_toggle(GtkCheckButton *btn, void *data) { set_sort_by(btn, "priority"); }

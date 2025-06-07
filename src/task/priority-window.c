@@ -1,12 +1,14 @@
+#include "../components.h"
 #include "../data/data.h"
 #include "../state.h"
+#include "adwaita.h"
 #include "task.h"
 
 #include <glib/gi18n.h>
-#include <stdint.h>
+#include <stddef.h>
 
 static void on_errands_priority_window_close(ErrandsPriorityWindow *win, gpointer data);
-static void on_priority_button_activate(GtkCheckButton *btn, char *str);
+static void on_priority_button_activate(GtkCheckButton *btn, void *data);
 
 G_DEFINE_TYPE(ErrandsPriorityWindow, errands_priority_window, ADW_TYPE_DIALOG)
 
@@ -28,51 +30,24 @@ static void errands_priority_window_init(ErrandsPriorityWindow *self) {
   gtk_widget_add_css_class(box, "boxed-list");
   adw_toolbar_view_set_content(ADW_TOOLBAR_VIEW(tb), box);
 
-  // High
-  GtkWidget *high = adw_action_row_new();
-  g_object_set(high, "title", _("High"), NULL);
-  gtk_widget_add_css_class(high, "priority-high");
-  adw_action_row_add_prefix(ADW_ACTION_ROW(high), gtk_image_new_from_icon_name("errands-priority-symbolic"));
-  self->high_btn = gtk_check_button_new();
-  g_signal_connect(self->high_btn, "activate", G_CALLBACK(on_priority_button_activate), "high");
-  adw_action_row_add_suffix(ADW_ACTION_ROW(high), self->high_btn);
-  adw_action_row_set_activatable_widget(ADW_ACTION_ROW(high), self->high_btn);
-  gtk_list_box_append(GTK_LIST_BOX(box), high);
+  self->high_row =
+      errands_check_row_new(_("High"), "errands-priority-symbolic", NULL, on_priority_button_activate, "high");
+  gtk_widget_add_css_class(self->high_row, "priority-high");
+  gtk_list_box_append(GTK_LIST_BOX(box), self->high_row);
 
-  // Medium
-  GtkWidget *medium = adw_action_row_new();
-  g_object_set(medium, "title", _("Medium"), NULL);
-  gtk_widget_add_css_class(medium, "priority-medium");
-  adw_action_row_add_prefix(ADW_ACTION_ROW(medium), gtk_image_new_from_icon_name("errands-priority-symbolic"));
-  self->medium_btn = gtk_check_button_new();
-  g_object_set(self->medium_btn, "group", self->high_btn, NULL);
-  g_signal_connect(self->medium_btn, "activate", G_CALLBACK(on_priority_button_activate), "medium");
-  adw_action_row_add_suffix(ADW_ACTION_ROW(medium), self->medium_btn);
-  adw_action_row_set_activatable_widget(ADW_ACTION_ROW(medium), self->medium_btn);
-  gtk_list_box_append(GTK_LIST_BOX(box), medium);
+  self->medium_row = errands_check_row_new(_("Medium"), "errands-priority-symbolic", self->high_row,
+                                           on_priority_button_activate, "medium");
+  gtk_widget_add_css_class(self->medium_row, "priority-medium");
+  gtk_list_box_append(GTK_LIST_BOX(box), self->medium_row);
 
-  // Low
-  GtkWidget *low = adw_action_row_new();
-  g_object_set(low, "title", _("Low"), NULL);
-  gtk_widget_add_css_class(low, "priority-low");
-  adw_action_row_add_prefix(ADW_ACTION_ROW(low), gtk_image_new_from_icon_name("errands-priority-symbolic"));
-  self->low_btn = gtk_check_button_new();
-  g_object_set(self->low_btn, "group", self->high_btn, NULL);
-  g_signal_connect(self->low_btn, "activate", G_CALLBACK(on_priority_button_activate), "low");
-  adw_action_row_add_suffix(ADW_ACTION_ROW(low), self->low_btn);
-  adw_action_row_set_activatable_widget(ADW_ACTION_ROW(low), self->low_btn);
-  gtk_list_box_append(GTK_LIST_BOX(box), low);
+  self->low_row =
+      errands_check_row_new(_("Low"), "errands-priority-symbolic", self->high_row, on_priority_button_activate, "low");
+  gtk_widget_add_css_class(self->low_row, "priority-low");
+  gtk_list_box_append(GTK_LIST_BOX(box), self->low_row);
 
-  // None
-  GtkWidget *none = adw_action_row_new();
-  g_object_set(none, "title", _("None"), NULL);
-  adw_action_row_add_prefix(ADW_ACTION_ROW(none), gtk_image_new_from_icon_name("errands-priority-none-symbolic"));
-  self->none_btn = gtk_check_button_new();
-  g_object_set(self->none_btn, "group", self->high_btn, NULL);
-  g_signal_connect(self->none_btn, "activate", G_CALLBACK(on_priority_button_activate), "none");
-  adw_action_row_add_suffix(ADW_ACTION_ROW(none), self->none_btn);
-  adw_action_row_set_activatable_widget(ADW_ACTION_ROW(none), self->none_btn);
-  gtk_list_box_append(GTK_LIST_BOX(box), none);
+  self->none_row = errands_check_row_new(_("None"), "errands-priority-symbolic", self->high_row,
+                                         on_priority_button_activate, "none");
+  gtk_list_box_append(GTK_LIST_BOX(box), self->none_row);
 
   // Custom
   self->custom = adw_spin_row_new(gtk_adjustment_new(0, 0, 9, 1, 0, 0), 1, 0);
@@ -86,22 +61,13 @@ ErrandsPriorityWindow *errands_priority_window_new() {
 
 void errands_priority_window_show(ErrandsTask *task) {
   if (!state.priority_window) state.priority_window = errands_priority_window_new();
-
   adw_dialog_present(ADW_DIALOG(state.priority_window), GTK_WIDGET(state.main_window));
   state.priority_window->task = task;
-
-  // Un-toggle buttons
-  gtk_check_button_set_active(GTK_CHECK_BUTTON(state.priority_window->none_btn), false);
-  gtk_check_button_set_active(GTK_CHECK_BUTTON(state.priority_window->low_btn), false);
-  gtk_check_button_set_active(GTK_CHECK_BUTTON(state.priority_window->medium_btn), false);
-  gtk_check_button_set_active(GTK_CHECK_BUTTON(state.priority_window->high_btn), false);
-
-  // Toggle for priority
   const uint8_t priority = errands_data_get_int(task->data, DATA_PROP_PRIORITY);
-  if (priority == 0) gtk_check_button_set_active(GTK_CHECK_BUTTON(state.priority_window->none_btn), true);
-  else if (priority == 1) gtk_check_button_set_active(GTK_CHECK_BUTTON(state.priority_window->low_btn), true);
-  else if (priority == 5) gtk_check_button_set_active(GTK_CHECK_BUTTON(state.priority_window->medium_btn), true);
-  else if (priority == 9) gtk_check_button_set_active(GTK_CHECK_BUTTON(state.priority_window->high_btn), true);
+  if (priority == 0) adw_action_row_activate(ADW_ACTION_ROW(state.priority_window->none_row));
+  else if (priority == 1) adw_action_row_activate(ADW_ACTION_ROW(state.priority_window->low_row));
+  else if (priority == 5) adw_action_row_activate(ADW_ACTION_ROW(state.priority_window->medium_row));
+  else if (priority == 9) adw_action_row_activate(ADW_ACTION_ROW(state.priority_window->high_row));
   adw_spin_row_set_value(ADW_SPIN_ROW(state.priority_window->custom), priority);
 }
 
@@ -127,12 +93,12 @@ static void on_errands_priority_window_close(ErrandsPriorityWindow *win, gpointe
   else if (val > 6 && val < 10) gtk_widget_add_css_class(win->task->toolbar->priority_btn, "priority-high");
 }
 
-static void on_priority_button_activate(GtkCheckButton *btn, char *str) {
+static void on_priority_button_activate(GtkCheckButton *btn, void *data) {
   if (!gtk_check_button_get_active(btn)) return;
   uint8_t val;
-  if (!strcmp(str, "none")) val = 0;
-  else if (!strcmp(str, "low")) val = 1;
-  else if (!strcmp(str, "medium")) val = 5;
-  else if (!strcmp(str, "high")) val = 9;
+  if (!strcmp(data, "none")) val = 0;
+  else if (!strcmp(data, "low")) val = 1;
+  else if (!strcmp(data, "medium")) val = 5;
+  else if (!strcmp(data, "high")) val = 9;
   adw_spin_row_set_value(ADW_SPIN_ROW(state.priority_window->custom), val);
 }

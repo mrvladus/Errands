@@ -49,6 +49,7 @@ TaskData *list_data_create_task(ListData *list, const char *text, const char *li
   errands_data_set_str(task_data, DATA_PROP_TEXT, text);
   if (strcmp(parent, "")) errands_data_set_str(task_data, DATA_PROP_PARENT, parent);
   errands_data_set_str(task_data, DATA_PROP_LIST_UID, list_uid);
+  errands_data_set_str(task_data, DATA_PROP_CREATED, get_date_time());
   icalcomponent_add_component(list, task_data);
   return task_data;
 }

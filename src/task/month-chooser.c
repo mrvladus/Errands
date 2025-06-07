@@ -37,7 +37,7 @@ const char *errands_month_chooser_get_months(ErrandsMonthChooser *mc) {
   static char months[35];
   g_autoptr(GString) by_month = g_string_new("");
   // First 6 months
-  g_autoptr(GPtrArray) months_1 = get_children(mc->month_box1);
+  GPtrArray *months_1 = get_children(mc->month_box1);
   for_range(i, 0, 6) {
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(months_1->pdata[i]))) {
       if (!strcmp(by_month->str, "")) g_string_append_printf(by_month, "%d", i + 1);
@@ -45,7 +45,7 @@ const char *errands_month_chooser_get_months(ErrandsMonthChooser *mc) {
     }
   }
   // Last 6 months
-  g_autoptr(GPtrArray) months_2 = get_children(mc->month_box2);
+  GPtrArray *months_2 = get_children(mc->month_box2);
   for_range(i, 0, 6) {
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(months_2->pdata[i]))) {
       if (!strcmp(by_month->str, "")) g_string_append_printf(by_month, "%d", i + 7);
@@ -61,8 +61,8 @@ const char *errands_month_chooser_get_months(ErrandsMonthChooser *mc) {
 }
 
 void errands_month_chooser_set_months(ErrandsMonthChooser *mc, const char *rrule) {
-  g_autoptr(GPtrArray) months1 = get_children(mc->month_box1);
-  g_autoptr(GPtrArray) months2 = get_children(mc->month_box2);
+  GPtrArray *months1 = get_children(mc->month_box1);
+  GPtrArray *months2 = get_children(mc->month_box2);
   char *months = get_rrule_value(rrule, "BYMONTH");
   if (months) {
     int *nums = string_to_int_array(months);
@@ -77,8 +77,8 @@ void errands_month_chooser_set_months(ErrandsMonthChooser *mc, const char *rrule
 }
 
 void errands_month_chooser_reset(ErrandsMonthChooser *mc) {
-  g_autoptr(GPtrArray) months1 = get_children(mc->month_box1);
-  g_autoptr(GPtrArray) months2 = get_children(mc->month_box2);
+  GPtrArray *months1 = get_children(mc->month_box1);
+  GPtrArray *months2 = get_children(mc->month_box2);
   for_range(i, 0, months1->len) { gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(months1->pdata[i]), false); }
   for_range(i, 0, months2->len) { gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(months2->pdata[i]), false); }
 }

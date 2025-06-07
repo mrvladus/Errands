@@ -1,12 +1,16 @@
 #include "../data/data.h"
 #include "../state.h"
 #include "../utils.h"
-#include "glib.h"
-#include "gtk/gtk.h"
+
 #include "task.h"
+
+#define HOEDOWN_IMPLEMENTATION
+#include "../vendor/hoedown.h"
 
 #include <cmark.h>
 #include <glib/gi18n.h>
+#include <stdint.h>
+#include <string.h>
 #include <webkit/webkit.h>
 
 static void on_errands_notes_window_close_cb(ErrandsNotesWindow *win, gpointer data);
@@ -132,23 +136,27 @@ static void on_text_changed(ErrandsNotesWindow *win) {
   GtkTextIter start, end;
   gtk_text_buffer_get_bounds(buffer, &start, &end);
   g_autofree char *text = gtk_text_buffer_get_text(buffer, &start, &end, FALSE);
-  cmark_parser *parser = cmark_parser_new(CMARK_OPT_DEFAULT);
-  cmark_parser_feed(parser, text, strlen(text));
-  cmark_node *doc = cmark_parser_finish(parser);
-  char *html = cmark_render_html(doc, CMARK_OPT_DEFAULT);
+
+  // Parse MD and convert it to HTML
+  hoedown_renderer *renderer = hoedown_html_renderer_new(0, 0);
+  hoedown_document *document = hoedown_document_new(renderer, 0, 16);
+  hoedown_buffer *buff = hoedown_buffer_new(strlen(text) * 2);
+  hoedown_document_render(document, buff, (const uint8_t *)text, strlen(text));
   bool is_dark = adw_style_manager_get_dark(adw_style_manager_get_default());
-  g_autofree gchar *outer_html =
-      g_strdup_printf("<body>"
-                      "<style>body{margin:0;padding:0;background-color:%s;color:%s}a{color:%s}</style>"
-                      "<div style='margin:6'>"
-                      "%s"
-                      "</div>"
-                      "</body>",
-                      is_dark ? "#242424" : "white", is_dark ? "white" : "black", is_dark ? "white" : "#blue", html);
+  g_autofree gchar *outer_html = g_strdup_printf(
+      "<body>"
+      "<style>body{margin:0;padding:0;background-color:%s;color:%s}a{color:%s}</style>"
+      "<div style='margin:6'>"
+      "%s"
+      "</div>"
+      "</body>",
+      is_dark ? "#242424" : "white", is_dark ? "white" : "black", is_dark ? "white" : "#blue", buff->data);
+
   webkit_web_view_load_html(WEBKIT_WEB_VIEW(win->md_view), outer_html, NULL);
-  free(html);
-  cmark_node_free(doc);
-  cmark_parser_free(parser);
+
+  hoedown_buffer_free(buff);
+  hoedown_document_free(document);
+  hoedown_html_renderer_free(renderer);
 }
 
 static void on_web_view_decide_policy(WebKitWebView *web_view, WebKitPolicyDecision *decision,

@@ -1,9 +1,11 @@
 #include "../data/data.h"
 #include "../utils.h"
+#include "glib.h"
 #include "sidebar.h"
 
 #include <glib/gi18n.h>
 
+#include <stdbool.h>
 #include <stddef.h>
 
 G_DEFINE_TYPE(ErrandsSidebarAllRow, errands_sidebar_all_row, GTK_TYPE_LIST_BOX_ROW)
@@ -29,7 +31,7 @@ static void errands_sidebar_all_row_init(ErrandsSidebarAllRow *self) {
 ErrandsSidebarAllRow *errands_sidebar_all_row_new() { return g_object_new(ERRANDS_TYPE_SIDEBAR_ALL_ROW, NULL); }
 
 void errands_sidebar_all_row_update_counter(ErrandsSidebarAllRow *row) {
-  g_autoptr(GPtrArray) tasks = g_hash_table_get_values_as_ptr_array(tdata);
+  GPtrArray *tasks = g_hash_table_get_values_as_ptr_array(tdata);
   size_t len = 0;
   for (size_t i = 0; i < tasks->len; i++) {
     TaskData *td = tasks->pdata[i];
@@ -39,4 +41,5 @@ void errands_sidebar_all_row_update_counter(ErrandsSidebarAllRow *row) {
   }
   g_autofree char *num = g_strdup_printf("%zu", len);
   gtk_label_set_label(GTK_LABEL(row->counter), len > 0 ? num : "");
+  g_ptr_array_free(tasks, false);
 }

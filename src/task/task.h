@@ -1,13 +1,14 @@
 #pragma once
 
 #include "../data/data.h"
+#include "gtk/gtk.h"
 
 #include <adwaita.h>
 
 // --- DECLARE WIDGETS --- //
 
 #define ERRANDS_TYPE_TASK (errands_task_get_type())
-G_DECLARE_FINAL_TYPE(ErrandsTask, errands_task, ERRANDS, TASK, AdwBin)
+G_DECLARE_FINAL_TYPE(ErrandsTask, errands_task, ERRANDS, TASK, GtkListBoxRow)
 #define ERRANDS_TYPE_TASK_TOOLBAR (errands_task_toolbar_get_type())
 G_DECLARE_FINAL_TYPE(ErrandsTaskToolbar, errands_task_toolbar, ERRANDS, TASK_TOOLBAR, AdwBin)
 #define ERRANDS_TYPE_DATE_CHOOSER (errands_date_chooser_get_type())
@@ -39,13 +40,10 @@ G_DECLARE_FINAL_TYPE(ErrandsPriorityWindow, errands_priority_window, ERRANDS, PR
 // --- TASK --- //
 
 struct _ErrandsTask {
-  AdwBin parent_instance;
-  GtkWidget *revealer;
-  GtkWidget *card;
-  GtkWidget *title_row;
-  GtkGesture *click_ctrl;
+  GtkListBoxRow parent_instance;
+  GtkWidget *title;
+  GtkWidget *edit_title;
   GtkWidget *complete_btn;
-  GtkWidget *edit_row;
   GtkWidget *toolbar_btn;
   GtkWidget *tags_revealer;
   GtkWidget *progress_revealer;
@@ -221,10 +219,10 @@ void errands_notes_window_show(ErrandsTask *task);
 
 struct _ErrandsPriorityWindow {
   AdwDialog parent_instance;
-  GtkWidget *none_btn;
-  GtkWidget *low_btn;
-  GtkWidget *medium_btn;
-  GtkWidget *high_btn;
+  GtkWidget *high_row;
+  GtkWidget *medium_row;
+  GtkWidget *low_row;
+  GtkWidget *none_row;
   GtkWidget *custom;
   ErrandsTask *task;
 };

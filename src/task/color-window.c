@@ -50,7 +50,7 @@ void errands_color_window_show(ErrandsTask *task) {
   state.color_window->task = task;
 
   // Select color
-  g_autoptr(GPtrArray) colors = get_children(state.color_window->color_box);
+  GPtrArray *colors = get_children(state.color_window->color_box);
   for (size_t i = 0; i < colors->len; i++) {
     const char *name = gtk_widget_get_name(colors->pdata[i]);
     const char *color = errands_data_get_str(task->data, DATA_PROP_COLOR);
@@ -68,7 +68,7 @@ void errands_color_window_show(ErrandsTask *task) {
 
 static void on_errands_color_window_close_cb(ErrandsColorWindow *win) {
   LOG("Color Window: Close");
-  g_autoptr(GPtrArray) colors = get_children(win->color_box);
+  GPtrArray *colors = get_children(win->color_box);
   for (size_t i = 0; i < colors->len; i++) {
     GtkCheckButton *btn = GTK_CHECK_BUTTON(colors->pdata[i]);
     if (gtk_check_button_get_active(btn)) {

@@ -35,7 +35,7 @@ static inline GPtrArray *get_children(GtkWidget *parent) {
 }
 
 static inline void gtk_box_remove_all(GtkWidget *box) {
-  g_autoptr(GPtrArray) children = get_children(box);
+  GPtrArray *children = get_children(box);
   for (int i = 0; i < children->len; i++) gtk_box_remove(GTK_BOX(box), GTK_WIDGET(children->pdata[i]));
 }
 
@@ -176,6 +176,7 @@ static inline char *get_today_date() {
 
 // Helper function to parse the due date into a GDateTime
 static inline GDateTime *parse_date(const char *date) {
+  if (!date) return NULL;
   if (strlen(date) == 8) { // Format: "YYYYMMDD"
     char year[5], month[3], day[3];
     strncpy(year, date, 4);

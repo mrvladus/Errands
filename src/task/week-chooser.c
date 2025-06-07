@@ -32,7 +32,7 @@ static void errands_week_chooser_init(ErrandsWeekChooser *self) {
 ErrandsWeekChooser *errands_week_chooser_new() { return g_object_new(ERRANDS_TYPE_WEEK_CHOOSER, NULL); }
 
 const char *errands_week_chooser_get_days(ErrandsWeekChooser *wc) {
-  g_autoptr(GPtrArray) week_days = get_children(wc->week_box);
+  GPtrArray *week_days = get_children(wc->week_box);
   g_autoptr(GString) week_days_str = g_string_new("");
   for (size_t i = 0; i < week_days->len; i++) {
     GtkToggleButton *btn = week_days->pdata[i];
@@ -57,7 +57,7 @@ const char *errands_week_chooser_get_days(ErrandsWeekChooser *wc) {
 }
 
 void errands_week_chooser_set_days(ErrandsWeekChooser *wc, const char *rrule) {
-  g_autoptr(GPtrArray) week_days_btns = get_children(wc->week_box);
+  GPtrArray *week_days_btns = get_children(wc->week_box);
   char *week_days = get_rrule_value(rrule, "BYDAY");
   if (week_days) {
     if (string_contains(week_days, "MO"))
@@ -80,7 +80,7 @@ void errands_week_chooser_set_days(ErrandsWeekChooser *wc, const char *rrule) {
 }
 
 void errands_week_chooser_reset(ErrandsWeekChooser *wc) {
-  g_autoptr(GPtrArray) week_days_btns = get_children(wc->week_box);
+  GPtrArray *week_days_btns = get_children(wc->week_box);
   for_range(i, 0, week_days_btns->len) {
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(week_days_btns->pdata[i]), false);
   }

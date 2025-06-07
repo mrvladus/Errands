@@ -79,6 +79,5 @@ static void on_size_changed(ErrandsWindow *win) {
 }
 
 static void on_state_changed(ErrandsWindow *win) {
-  bool m = gtk_window_is_maximized(GTK_WINDOW(win));
-  errands_settings_set_bool("maximized", m);
+  errands_settings_set_bool("maximized", gtk_window_is_maximized(GTK_WINDOW(win)));
 }
