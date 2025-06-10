@@ -2,8 +2,9 @@
 #include "../utils.h"
 #include "../vendor/json.h"
 #include "data.h"
-#include "gio/gio.h"
-#include "glib.h"
+
+#include <gio/gio.h>
+#include <glib.h>
 #include <libical/ical.h>
 
 const char *user_dir;
@@ -167,11 +168,12 @@ static void errands_data_write_list_func(GTask *task, gpointer source_object, Li
     return;
   }
   LOG("User Data: Saved list '%s'", path);
+  g_object_unref(task);
 }
 
 // Async write list data to file
 void errands_data_write_list(ListData *data) {
-  g_autoptr(GTask) task = g_task_new(NULL, NULL, NULL, NULL);
+  GTask *task = g_task_new(NULL, NULL, NULL, NULL);
   g_task_set_task_data(task, data, NULL);
   g_task_run_in_thread(task, (gpointer)errands_data_write_list_func);
 }

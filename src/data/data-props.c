@@ -126,6 +126,41 @@ GStrv errands_data_get_strv(icalcomponent *data, DataPropStrv prop) {
   return out;
 }
 
+icaltimetype errands_data_get_time(icalcomponent *data, DataPropTime prop) {
+  icaltimetype out;
+  switch (prop) {
+  case DATA_PROP_CHANGED_TIME: {
+    icalproperty *property = icalcomponent_get_first_property(data, ICAL_LASTMODIFIED_PROPERTY);
+    if (property) {
+      out = icalproperty_get_lastmodified(property);
+    } else {
+      property = icalcomponent_get_first_property(data, ICAL_DTSTAMP_PROPERTY);
+      if (property) out = icalproperty_get_dtstamp(property);
+    }
+    break;
+  }
+  case DATA_PROP_COMPLETED_TIME: {
+    icalproperty *property = icalcomponent_get_first_property(data, ICAL_COMPLETED_PROPERTY);
+    if (property) out = icalproperty_get_completed(property);
+    break;
+  }
+  case DATA_PROP_CREATED_TIME: {
+    icalproperty *property = icalcomponent_get_first_property(data, ICAL_CREATED_PROPERTY);
+    if (property) {
+      out = icalproperty_get_created(property);
+    } else {
+      property = icalcomponent_get_first_property(data, ICAL_DTSTAMP_PROPERTY);
+      if (property) out = icalproperty_get_dtstamp(property);
+    }
+    break;
+  }
+  case DATA_PROP_DUE_TIME: out = icalcomponent_get_due(data); break;
+  case DATA_PROP_END_TIME: out = icalcomponent_get_dtend(data); break;
+  case DATA_PROP_START_TIME: out = icalcomponent_get_dtstart(data); break;
+  }
+  return out;
+}
+
 // --- SETTERS --- //
 
 void errands_data_set_str(icalcomponent *data, DataPropStr prop, const char *value) {

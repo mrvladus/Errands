@@ -4,13 +4,41 @@
 #include "../state.h"
 #include "../task/task.h"
 #include "../utils.h"
+#include "gio/gio.h"
+#include "glib-object.h"
+#include "glib.h"
+#include "gtk/gtk.h"
+#include "gtk/gtknoselection.h"
 
 #include <glib/gi18n.h>
+#include <libical/ical.h>
+#include <stddef.h>
+#include <stdio.h>
 
 static void on_task_added(AdwEntryRow *entry, gpointer data);
 static void on_task_list_search(GtkSearchEntry *entry, gpointer user_data);
 static void on_search_btn_toggle(GtkToggleButton *btn);
 static void on_sort_btn_clicked();
+static void on_test_btn_clicked();
+
+static void setup_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item) {
+  gtk_list_item_set_child(list_item, GTK_WIDGET(errands_task_new()));
+  gtk_list_item_set_activatable(list_item, false);
+}
+
+static void bind_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item) {
+  ErrandsTask *task = ERRANDS_TASK(gtk_list_item_get_child(list_item));
+  TaskData *data = g_object_get_data(gtk_list_item_get_item(list_item), "data");
+  errands_task_set_data(task, data);
+}
+
+static gint sort_func_creation_date(gconstpointer a, gconstpointer b, gpointer user_data) {
+  TaskData *data1 = g_object_get_data(G_OBJECT(a), "data");
+  icaltimetype date1 = errands_data_get_time(data1, DATA_PROP_CREATED_TIME);
+  TaskData *data2 = g_object_get_data(G_OBJECT(b), "data");
+  icaltimetype date2 = errands_data_get_time(data2, DATA_PROP_CREATED_TIME);
+  return icaltime_compare(date1, date2);
+}
 
 G_DEFINE_TYPE(ErrandsTaskList, errands_task_list, ADW_TYPE_BIN)
 
@@ -30,6 +58,12 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   adw_header_bar_set_title_widget(ADW_HEADER_BAR(hb), self->title);
   adw_toolbar_view_add_top_bar(ADW_TOOLBAR_VIEW(tb), hb);
 
+  // Test button
+  GtkWidget *test_btn = g_object_new(GTK_TYPE_BUTTON, "label", "test", NULL);
+  g_signal_connect(test_btn, "clicked", G_CALLBACK(on_test_btn_clicked), NULL);
+  adw_header_bar_pack_start(ADW_HEADER_BAR(hb), test_btn);
+
+  // Sort button
   GtkWidget *sort_btn =
       g_object_new(GTK_TYPE_BUTTON, "icon-name", "errands-sort-symbolic", "tooltip-text", _("Filter and Sort"), NULL);
   g_signal_connect(sort_btn, "clicked", G_CALLBACK(on_sort_btn_clicked), NULL);
@@ -52,41 +86,69 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   gtk_search_bar_set_child(GTK_SEARCH_BAR(sb), se);
 
   // Entry
-  GtkWidget *task_entry = g_object_new(ADW_TYPE_ENTRY_ROW, "title", _("Add Task"), "activatable", false, NULL);
+  GtkWidget *task_entry =
+      g_object_new(ADW_TYPE_ENTRY_ROW, "title", _("Add Task"), "activatable", false, "height-request", 10, NULL);
   gtk_widget_add_css_class(task_entry, "card");
   g_signal_connect(task_entry, "entry-activated", G_CALLBACK(on_task_added), NULL);
-  self->entry = g_object_new(GTK_TYPE_REVEALER, "transition-type", GTK_REVEALER_TRANSITION_TYPE_SWING_DOWN, "child",
-                             g_object_new(ADW_TYPE_CLAMP, "child", task_entry, "tightening-threshold", 300,
-                                          "maximum-size", 1000, "margin-top", 6, "margin-bottom", 6, NULL),
-                             NULL);
+  self->entry =
+      g_object_new(GTK_TYPE_REVEALER, "transition-type", GTK_REVEALER_TRANSITION_TYPE_SWING_DOWN, "child",
+                   g_object_new(ADW_TYPE_CLAMP, "child", task_entry, "tightening-threshold", 300, "maximum-size", 1000,
+                                "margin-top", 6, "margin-bottom", 6, "margin-start", 11, "margin-end", 11, NULL),
+                   NULL);
 
-  // Tasks Box
-  self->task_list = gtk_list_box_new();
-  gtk_widget_add_css_class(self->task_list, "background");
-  g_object_set(self->task_list, "margin-bottom", 18, "margin-top", 6, "selection-mode", GTK_SELECTION_NONE, "vexpand",
-               true, NULL);
-  gtk_widget_add_css_class(self->task_list, "boxed-list-separate");
-  LOG("Task List: Loading tasks");
+  // Create tasks model
+  self->tasks_model = g_list_store_new(G_TYPE_OBJECT);
   GPtrArray *tasks = g_hash_table_get_values_as_ptr_array(tdata);
   for (size_t i = 0; i < tasks->len; i++) {
     TaskData *data = tasks->pdata[i];
     const char *parent = errands_data_get_str(data, DATA_PROP_PARENT);
     bool deleted = errands_data_get_bool(data, DATA_PROP_DELETED);
     if (!parent && !deleted) {
-      GtkWidget *task = GTK_WIDGET(errands_task_new(data));
-      gtk_list_box_append(GTK_LIST_BOX(self->task_list), task);
+      GObject *data_object = g_object_new(G_TYPE_OBJECT, NULL);
+      g_object_set_data(data_object, "data", data);
+      g_list_store_append(self->tasks_model, data_object);
     }
   }
   g_ptr_array_free(tasks, false);
+
+  GtkCustomSorter *creation_date_sorter = gtk_custom_sorter_new(sort_func_creation_date, NULL, NULL);
+  GtkSortListModel *creation_date_sort_model =
+      gtk_sort_list_model_new(G_LIST_MODEL(self->tasks_model), GTK_SORTER(creation_date_sorter));
+
+  GtkNoSelection *selection_model = gtk_no_selection_new(G_LIST_MODEL(creation_date_sort_model));
+  GtkListItemFactory *tasks_factory = gtk_signal_list_item_factory_new();
+  g_signal_connect(tasks_factory, "setup", G_CALLBACK(setup_listitem_cb), NULL);
+  g_signal_connect(tasks_factory, "bind", G_CALLBACK(bind_listitem_cb), NULL);
+
+  self->task_list = gtk_list_view_new(GTK_SELECTION_MODEL(selection_model), tasks_factory);
+  g_object_set(self->task_list, "single-click-activate", true, NULL);
+  // Tasks Box
+  // self->task_list = gtk_list_box_new();
+  // gtk_list_box_bind_model(GTK_LIST_BOX(self->task_list), G_LIST_MODEL(self->tasks_model),
+  //                         (GtkListBoxCreateWidgetFunc)errands_task_list_create_widget_func, NULL, NULL);
+  // gtk_widget_add_css_class(self->task_list, "background");
+  // g_object_set(self->task_list, "margin-bottom", 18, "margin-top", 6, "selection-mode", GTK_SELECTION_NONE,
+  // "vexpand",
+  //              true, NULL);
+  // gtk_widget_add_css_class(self->task_list, "boxed-list-separate");
+  LOG("Task List: Loading tasks");
+
+  // GPtrArray *tasks = g_hash_table_get_values_as_ptr_array(tdata);
+  // for (size_t i = 0; i < tasks->len; i++) {
+  //   TaskData *data = tasks->pdata[i];
+  //   const char *parent = errands_data_get_str(data, DATA_PROP_PARENT);
+  //   bool deleted = errands_data_get_bool(data, DATA_PROP_DELETED);
+  //   if (!parent && !deleted) {
+  //     GtkWidget *task = GTK_WIDGET(errands_task_new(data));
+  //     gtk_list_box_append(GTK_LIST_BOX(self->task_list), task);
+  //   }
+  // }
+  // g_ptr_array_free(tasks, false);
   LOG("Task List: Loading tasks complete");
 
-  // Task list clamp
-  GtkWidget *tbox_clamp =
-      g_object_new(ADW_TYPE_CLAMP, "child", self->task_list, "tightening-threshold", 300, "maximum-size", 1000, NULL);
-
   // Scrolled window
-  GtkWidget *scrl = g_object_new(GTK_TYPE_SCROLLED_WINDOW, "child", tbox_clamp, "propagate-natural-height", true,
-                                 "propagate-natural-width", true, NULL);
+  GtkWidget *scrl =
+      g_object_new(GTK_TYPE_SCROLLED_WINDOW, "child", self->task_list, "propagate-natural-height", true, NULL);
 
   // VBox
   GtkWidget *vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
@@ -97,14 +159,27 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   // Create task list page in the view stack
   adw_view_stack_add_named(ADW_VIEW_STACK(state.main_window->stack), GTK_WIDGET(self), "errands_task_list_page");
 
-  errands_task_list_sort_recursive(self->task_list);
+  // errands_task_list_sort_recursive(self->task_list);
   LOG("Task List: Created");
 }
 
 ErrandsTaskList *errands_task_list_new() { return g_object_new(ERRANDS_TYPE_TASK_LIST, NULL); }
 
+static void on_test_btn_clicked() {
+  char buff[10];
+  for (size_t i = 0; i < 1000; ++i) {
+    sprintf(buff, "task %zu", i);
+    TaskData *data = list_data_create_task(state.task_list->data, buff,
+                                           errands_data_get_str(state.task_list->data, DATA_PROP_LIST_UID), "");
+    GObject *data_object = g_object_new(G_TYPE_OBJECT, NULL);
+    g_object_set_data(data_object, "data", data);
+    g_list_store_append(state.task_list->tasks_model, data_object);
+  }
+  // errands_sidebar_all_row_update_counter(state.sidebar->all_row);
+}
+
 void errands_task_list_add(TaskData *td) {
-  gtk_box_append(GTK_BOX(state.task_list->task_list), GTK_WIDGET(errands_task_new(td)));
+  // gtk_box_append(GTK_BOX(state.task_list->task_list), GTK_WIDGET(errands_task_new(td)));
 }
 
 void errands_task_list_update_title() {
@@ -263,17 +338,14 @@ void errands_task_list_sort_by_completion(GtkWidget *task_list) {
 // - SORT BY DUE DATE - //
 
 static gint __due_date_sort_func(gconstpointer a, gconstpointer b) {
-  // ErrandsTask *task_a = *((ErrandsTask **)a);
-  // ErrandsTask *task_b = *((ErrandsTask **)b);
-  // g_autoptr(GDateTime) dt_a = parse_date(task_a->data->due_date);
-  // g_autoptr(GDateTime) dt_b = parse_date(task_b->data->due_date);
-  // if (!dt_a && dt_b)
-  //   return -1;
-  // else if (dt_a && !dt_b)
-  //   return 1;
-  // else if (!dt_a && !dt_b)
-  //   return 0;
-  // return g_date_time_compare(dt_a, dt_b);
+  ErrandsTask *task_a = *((ErrandsTask **)a);
+  ErrandsTask *task_b = *((ErrandsTask **)b);
+  g_autoptr(GDateTime) dt_a = parse_date(errands_data_get_str(task_a->data, DATA_PROP_DUE));
+  g_autoptr(GDateTime) dt_b = parse_date(errands_data_get_str(task_b->data, DATA_PROP_DUE));
+  if (!dt_a && dt_b) return -1;
+  else if (dt_a && !dt_b) return 1;
+  else if (!dt_a && !dt_b) return 0;
+  return g_date_time_compare(dt_a, dt_b);
 }
 
 void errands_task_list_sort_by_due_date(GtkWidget *task_list) {
@@ -352,17 +424,17 @@ void errands_task_list_sort_recursive(GtkWidget *task_list) {
 }
 
 void errands_task_list_reload() {
-  LOG("Task List: Reload");
-  gtk_box_remove_all(state.task_list->task_list);
-  GPtrArray *tasks = g_hash_table_get_values_as_ptr_array(tdata);
-  for (size_t i = 0; i < tasks->len; i++) {
-    TaskData *data = tasks->pdata[i];
-    if (g_str_equal(errands_data_get_str(data, DATA_PROP_PARENT), "") &&
-        !errands_data_get_bool(data, DATA_PROP_DELETED))
-      gtk_box_append(GTK_BOX(state.task_list->task_list), GTK_WIDGET(errands_task_new(data)));
-  }
-  g_ptr_array_free(tasks, false);
-  errands_task_list_sort_recursive(state.task_list->task_list);
+  // LOG("Task List: Reload");
+  // gtk_box_remove_all(state.task_list->task_list);
+  // GPtrArray *tasks = g_hash_table_get_values_as_ptr_array(tdata);
+  // for (size_t i = 0; i < tasks->len; i++) {
+  //   TaskData *data = tasks->pdata[i];
+  //   if (g_str_equal(errands_data_get_str(data, DATA_PROP_PARENT), "") &&
+  //       !errands_data_get_bool(data, DATA_PROP_DELETED))
+  //     gtk_box_append(GTK_BOX(state.task_list->task_list), GTK_WIDGET(errands_task_new(data)));
+  // }
+  // g_ptr_array_free(tasks, false);
+  // errands_task_list_sort_recursive(state.task_list->task_list);
 }
 
 // --- SIGNAL HANDLERS --- //
@@ -378,18 +450,19 @@ static void on_task_added(AdwEntryRow *entry, gpointer data) {
 
   TaskData *td = list_data_create_task(state.task_list->data, (char *)text, list_uid, "");
   g_hash_table_insert(tdata, g_strdup(errands_data_get_str(td, DATA_PROP_UID)), td);
+  GObject *data_object = g_object_new(G_TYPE_OBJECT, NULL);
+  g_object_set_data(data_object, "data", data);
+  g_list_store_append(state.task_list->tasks_model, data_object);
   errands_data_write_list(state.task_list->data);
-  ErrandsTask *t = errands_task_new(td);
-  gtk_list_box_prepend(GTK_LIST_BOX(state.task_list->task_list), GTK_WIDGET(t));
   // Sort list
-  errands_task_list_sort(state.task_list->task_list);
+  // errands_task_list_sort(state.task_list->task_list);
 
   // Clear text
   gtk_editable_set_text(GTK_EDITABLE(entry), "");
 
   // Update counter
-  // errands_sidebar_task_list_row_update_counter(errands_sidebar_task_list_row_get(list_uid));
-  // errands_sidebar_all_row_update_counter(state.sidebar->all_row);
+  errands_sidebar_task_list_row_update_counter(errands_sidebar_task_list_row_get(list_uid));
+  errands_sidebar_all_row_update_counter(state.sidebar->all_row);
 
   errands_task_list_update_title();
 

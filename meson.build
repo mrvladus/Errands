@@ -3,7 +3,6 @@ project(
   'c',
   license: 'MIT',
   version: '48.0',
-  default_options: ['--buildtype=debug'],
 )
 
 # Dependencies

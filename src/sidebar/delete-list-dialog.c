@@ -51,7 +51,7 @@ static void on_response_cb(ErrandsDeleteListDialog *dialog, gchar *response, gpo
       ErrandsTask *task = tasks->pdata[i];
       if (!strcmp(errands_data_get_str(dialog->row->data, DATA_PROP_LIST_UID),
                   errands_data_get_str(task->data, DATA_PROP_LIST_UID)))
-        gtk_box_remove(GTK_BOX(state.task_list->task_list), GTK_WIDGET(task));
+        gtk_list_box_remove(GTK_LIST_BOX(state.task_list->task_list), GTK_WIDGET(task));
     }
     // Delete data
     errands_data_set_bool(dialog->row->data, DATA_PROP_DELETED, true);

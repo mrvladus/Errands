@@ -24,6 +24,7 @@ typedef struct {
   ErrandsPriorityWindow *priority_window;
   ErrandsTagsWindow *tags_window;
   ErrandsDateWindow *date_window;
+
 } State;
 
 // Global state object

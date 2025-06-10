@@ -194,6 +194,13 @@
 
 /* Overrides */
 
+listview {
+    background-color: transparent;
+}
+listview row {
+    border-radius: 12px;
+}
+
 colorbutton button {
     border-radius: 9999px;
     padding: 0px;

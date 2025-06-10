@@ -141,20 +141,20 @@ void on_errands_sidebar_task_list_row_activate(GtkListBox *box, ErrandsSidebarTa
   g_assert_nonnull(row);
   g_assert_nonnull(row->data);
   // Unselect filter rows
-  gtk_list_box_unselect_all(GTK_LIST_BOX(state.sidebar->filters_box));
+  // gtk_list_box_unselect_all(GTK_LIST_BOX(state.sidebar->filters_box));
   // Switch to Task List view
   adw_view_stack_set_visible_child_name(ADW_VIEW_STACK(state.main_window->stack), "errands_task_list_page");
   // Set setting
   g_autofree gchar *list_uid = g_strdup(errands_data_get_str(row->data, DATA_PROP_LIST_UID));
   errands_settings_set_string("last_list_uid", list_uid);
   // Filter by uid
-  errands_task_list_filter_by_uid(list_uid);
+  // errands_task_list_filter_by_uid(list_uid);
   state.task_list->data = row->data;
   // Show entry
   if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(state.task_list->search_btn)))
     gtk_revealer_set_reveal_child(GTK_REVEALER(state.task_list->entry), true);
   // Update title
-  errands_task_list_update_title();
+  // errands_task_list_update_title();
   LOG("Switch to list '%s'", list_uid);
 }
 

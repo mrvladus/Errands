@@ -48,6 +48,15 @@ typedef enum {
   DATA_PROP_TAGS,
 } DataPropStrv;
 
+typedef enum {
+  DATA_PROP_CHANGED_TIME,
+  DATA_PROP_COMPLETED_TIME,
+  DATA_PROP_CREATED_TIME,
+  DATA_PROP_DUE_TIME,
+  DATA_PROP_END_TIME,
+  DATA_PROP_START_TIME,
+} DataPropTime;
+
 void errands_data_load_lists();
 void errands_data_write_list(ListData *data);
 
@@ -55,6 +64,7 @@ const char *errands_data_get_str(icalcomponent *data, DataPropStr prop);
 size_t errands_data_get_int(icalcomponent *data, DataPropInt prop);
 bool errands_data_get_bool(icalcomponent *data, DataPropBool prop);
 GStrv errands_data_get_strv(icalcomponent *data, DataPropStrv prop);
+icaltimetype errands_data_get_time(icalcomponent *data, DataPropTime prop);
 
 void errands_data_set_str(icalcomponent *data, DataPropStr prop, const char *value);
 void errands_data_set_int(icalcomponent *data, DataPropInt prop, size_t value);

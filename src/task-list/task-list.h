@@ -14,6 +14,8 @@ struct _ErrandsTaskList {
   GtkWidget *entry;
   GtkWidget *task_list;
   ListData *data;
+
+  GListStore *tasks_model;
 };
 
 ErrandsTaskList *errands_task_list_new();

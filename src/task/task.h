@@ -1,14 +1,13 @@
 #pragma once
 
 #include "../data/data.h"
-#include "gtk/gtk.h"
 
 #include <adwaita.h>
 
 // --- DECLARE WIDGETS --- //
 
 #define ERRANDS_TYPE_TASK (errands_task_get_type())
-G_DECLARE_FINAL_TYPE(ErrandsTask, errands_task, ERRANDS, TASK, GtkListBoxRow)
+G_DECLARE_FINAL_TYPE(ErrandsTask, errands_task, ERRANDS, TASK, AdwBin)
 #define ERRANDS_TYPE_TASK_TOOLBAR (errands_task_toolbar_get_type())
 G_DECLARE_FINAL_TYPE(ErrandsTaskToolbar, errands_task_toolbar, ERRANDS, TASK_TOOLBAR, AdwBin)
 #define ERRANDS_TYPE_DATE_CHOOSER (errands_date_chooser_get_type())
@@ -40,7 +39,10 @@ G_DECLARE_FINAL_TYPE(ErrandsPriorityWindow, errands_priority_window, ERRANDS, PR
 // --- TASK --- //
 
 struct _ErrandsTask {
-  GtkListBoxRow parent_instance;
+  AdwBin parent_instance;
+
+  GtkWidget *clamp;
+
   GtkWidget *title;
   GtkWidget *edit_title;
   GtkWidget *complete_btn;
@@ -54,9 +56,12 @@ struct _ErrandsTask {
   GtkWidget *sub_tasks_revealer;
   GtkWidget *sub_entry;
   GtkWidget *sub_tasks;
+
   TaskData *data;
 };
-ErrandsTask *errands_task_new(TaskData *data);
+
+ErrandsTask *errands_task_new();
+void errands_task_set_data(ErrandsTask *task, TaskData *data);
 void errands_task_update_accent_color(ErrandsTask *task);
 void errands_task_update_progress(ErrandsTask *task);
 void errands_task_update_tags(ErrandsTask *task);
@@ -67,7 +72,7 @@ GPtrArray *errands_task_get_sub_tasks(ErrandsTask *task);
 
 struct _ErrandsTaskToolbar {
   AdwBin parent_instance;
-  ErrandsTask *task; // Avoid circular import
+  ErrandsTask *task;
   GtkWidget *date_btn;
   GtkWidget *notes_btn;
   GtkWidget *priority_btn;
@@ -75,6 +80,7 @@ struct _ErrandsTaskToolbar {
   GtkWidget *attachments_btn;
   GtkWidget *color_btn;
 };
+
 ErrandsTaskToolbar *errands_task_toolbar_new(ErrandsTask *task);
 void errands_task_toolbar_update_date_btn(ErrandsTaskToolbar *tb);
 
@@ -86,6 +92,7 @@ struct _ErrandsDateChooser {
   GtkWidget *label;
   GtkWidget *reset_btn;
 };
+
 ErrandsDateChooser *errands_date_chooser_new();
 // Get string in format YYYYMMDD
 const char *errands_date_chooser_get_date(ErrandsDateChooser *dc);
