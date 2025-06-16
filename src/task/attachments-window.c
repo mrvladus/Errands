@@ -128,10 +128,10 @@ static void errands_attachments_window_add_attachment(const char *path) {
 
 static void on_errands_attachments_window_close(ErrandsAttachmentsWindow *win) {
   // Add css class to button if attachments not empty
-  gtk_widget_remove_css_class(win->task->toolbar->attachments_btn, "accent");
+  gtk_widget_remove_css_class(win->task->attachments_btn, "accent");
   g_auto(GStrv) attachments = errands_data_get_strv(state.attachments_window->task->data, DATA_PROP_ATTACHMENTS);
   size_t length = attachments ? g_strv_length(attachments) : 0;
-  if (length > 0) gtk_widget_add_css_class(win->task->toolbar->attachments_btn, "accent");
+  if (length > 0) gtk_widget_add_css_class(win->task->attachments_btn, "accent");
 }
 
 static void __on_open_finish(GObject *obj, GAsyncResult *res, gpointer data) {

@@ -8,8 +8,6 @@
 
 #define ERRANDS_TYPE_TASK (errands_task_get_type())
 G_DECLARE_FINAL_TYPE(ErrandsTask, errands_task, ERRANDS, TASK, AdwBin)
-#define ERRANDS_TYPE_TASK_TOOLBAR (errands_task_toolbar_get_type())
-G_DECLARE_FINAL_TYPE(ErrandsTaskToolbar, errands_task_toolbar, ERRANDS, TASK_TOOLBAR, AdwBin)
 #define ERRANDS_TYPE_DATE_CHOOSER (errands_date_chooser_get_type())
 G_DECLARE_FINAL_TYPE(ErrandsDateChooser, errands_date_chooser, ERRANDS, DATE_CHOOSER, GtkBox)
 #define ERRANDS_TYPE_MONTH_CHOOSER (errands_month_chooser_get_type())
@@ -51,8 +49,15 @@ struct _ErrandsTask {
   GtkWidget *progress_revealer;
   GtkWidget *progress_bar;
   GtkWidget *tags_box;
+  // Toolbar
   GtkWidget *toolbar_revealer;
-  ErrandsTaskToolbar *toolbar;
+  GtkWidget *date_btn;
+  GtkWidget *notes_btn;
+  GtkWidget *priority_btn;
+  GtkWidget *tags_btn;
+  GtkWidget *attachments_btn;
+  GtkWidget *color_btn;
+  // Sub-tasks
   GtkWidget *sub_tasks_revealer;
   GtkWidget *sub_entry;
   GtkWidget *sub_tasks;
@@ -65,24 +70,9 @@ void errands_task_set_data(ErrandsTask *task, TaskData *data);
 void errands_task_update_accent_color(ErrandsTask *task);
 void errands_task_update_progress(ErrandsTask *task);
 void errands_task_update_tags(ErrandsTask *task);
+void errands_task_update_toolbar(ErrandsTask *task);
 GPtrArray *errands_task_get_parents(ErrandsTask *task);
 GPtrArray *errands_task_get_sub_tasks(ErrandsTask *task);
-
-// --- TOOLBAR --- //
-
-struct _ErrandsTaskToolbar {
-  AdwBin parent_instance;
-  ErrandsTask *task;
-  GtkWidget *date_btn;
-  GtkWidget *notes_btn;
-  GtkWidget *priority_btn;
-  GtkWidget *tags_btn;
-  GtkWidget *attachments_btn;
-  GtkWidget *color_btn;
-};
-
-ErrandsTaskToolbar *errands_task_toolbar_new(ErrandsTask *task);
-void errands_task_toolbar_update_date_btn(ErrandsTaskToolbar *tb);
 
 // --- DATE WINDOW --- //
 

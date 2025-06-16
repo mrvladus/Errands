@@ -42,7 +42,6 @@ sources = files(
   'src/task/notes-window.c',
   'src/task/priority-window.c',
   'src/task/tags-window.c',
-  'src/task/task-toolbar.c',
   'src/task/task.c',
   'src/task/time-chooser.c',
   'src/task/week-chooser.c',

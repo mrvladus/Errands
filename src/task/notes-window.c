@@ -7,7 +7,6 @@
 #define HOEDOWN_IMPLEMENTATION
 #include "../vendor/hoedown.h"
 
-#include <cmark.h>
 #include <glib/gi18n.h>
 #include <stdint.h>
 #include <string.h>
@@ -116,8 +115,8 @@ static void on_errands_notes_window_close_cb(ErrandsNotesWindow *win, gpointer _
     errands_data_write_list(task_data_get_list(data));
   }
   // Add css class to button if notes not empty
-  if (!g_str_equal(text, "")) gtk_widget_add_css_class(win->task->toolbar->notes_btn, "accent");
-  else gtk_widget_remove_css_class(win->task->toolbar->notes_btn, "accent");
+  if (!g_str_equal(text, "")) gtk_widget_add_css_class(win->task->notes_btn, "accent");
+  else gtk_widget_remove_css_class(win->task->notes_btn, "accent");
 }
 
 static gboolean on_style_toggled(GBinding *binding, const GValue *from_value, GValue *to_value, gpointer user_data) {

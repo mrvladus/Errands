@@ -3,7 +3,6 @@
 #include "../state.h"
 #include "../task-list/task-list.h"
 #include "../utils.h"
-#include "glib.h"
 #include "task.h"
 
 #include <glib/gi18n.h>

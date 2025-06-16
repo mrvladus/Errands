@@ -6,7 +6,6 @@
 #include "../task-list/task-list.h"
 #include "../utils.h"
 #include "../window.h"
-#include "glib.h"
 
 #include <glib/gi18n.h>
 
@@ -131,7 +130,7 @@ static void on_errands_sidebar_filter_row_activated(GtkListBox *box, GtkListBoxR
     adw_view_stack_set_visible_child_name(ADW_VIEW_STACK(state.main_window->stack), "errands_task_list_page");
     state.task_list->data = NULL;
     errands_task_list_update_title();
-    errands_task_list_filter_by_uid("");
+    // errands_task_list_filter_by_uid("");
     gtk_revealer_set_reveal_child(GTK_REVEALER(state.task_list->entry), false);
   }
 }
@@ -160,10 +159,11 @@ static void __on_open_finish(GObject *obj, GAsyncResult *res, ErrandsSidebar *sb
     for (size_t i = 0; i < tasks->len; i++) {
       TaskData *td = tasks->pdata[i];
       g_hash_table_insert(tdata, strdup(errands_data_get_str(data, DATA_PROP_UID)), td);
-      errands_task_list_add(td);
+      // TODO
+      // errands_task_list_add(td);
     }
     errands_data_write_list(data);
-    errands_task_list_filter_by_uid(basename);
+    // errands_task_list_filter_by_uid(basename);
   }
   // TODO: sync
 }

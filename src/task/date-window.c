@@ -360,7 +360,7 @@ static void on_errands_date_window_close_cb(ErrandsDateWindow *win, gpointer _da
   // }
   errands_data_write_list(task_data_get_list(data));
   // Set date button text
-  errands_task_toolbar_update_date_btn(win->task->toolbar);
+  errands_task_update_toolbar(win->task);
   // TODO: sync
 }
 

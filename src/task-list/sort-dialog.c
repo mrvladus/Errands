@@ -78,7 +78,7 @@ void errands_sort_dialog_show() {
 
 static void on_errands_sort_dialog_close_cb(ErrandsSortDialog *self) {
   if (!state.sort_dialog->sort_changed) return;
-  errands_task_list_sort_recursive(state.task_list->task_list);
+  // errands_task_list_sort_recursive(state.task_list->task_list);
   state.sort_dialog->sort_changed = false;
 }
 

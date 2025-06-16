@@ -80,17 +80,17 @@ static void on_errands_priority_window_close(ErrandsPriorityWindow *win, gpointe
   }
 
   // Change icon of priority button
-  gtk_button_set_icon_name(GTK_BUTTON(win->task->toolbar->priority_btn),
+  gtk_button_set_icon_name(GTK_BUTTON(win->task->priority_btn),
                            val > 0 ? "errands-priority-set-symbolic" : "errands-priority-symbolic");
 
   // Add css class to priority button
-  gtk_widget_set_css_classes(win->task->toolbar->priority_btn, (const char **){NULL});
-  gtk_widget_add_css_class(win->task->toolbar->priority_btn, "image-button");
-  gtk_widget_add_css_class(win->task->toolbar->priority_btn, "flat");
+  gtk_widget_set_css_classes(win->task->priority_btn, (const char **){NULL});
+  gtk_widget_add_css_class(win->task->priority_btn, "image-button");
+  gtk_widget_add_css_class(win->task->priority_btn, "flat");
   if (val == 0) return;
-  else if (val > 0 && val < 3) gtk_widget_add_css_class(win->task->toolbar->priority_btn, "priority-low");
-  else if (val > 3 && val < 6) gtk_widget_add_css_class(win->task->toolbar->priority_btn, "priority-medium");
-  else if (val > 6 && val < 10) gtk_widget_add_css_class(win->task->toolbar->priority_btn, "priority-high");
+  else if (val > 0 && val < 3) gtk_widget_add_css_class(win->task->priority_btn, "priority-low");
+  else if (val > 3 && val < 6) gtk_widget_add_css_class(win->task->priority_btn, "priority-medium");
+  else if (val > 6 && val < 10) gtk_widget_add_css_class(win->task->priority_btn, "priority-high");
 }
 
 static void on_priority_button_activate(GtkCheckButton *btn, void *data) {
