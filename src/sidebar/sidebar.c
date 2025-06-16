@@ -128,10 +128,11 @@ static void on_errands_sidebar_filter_row_activated(GtkListBox *box, GtkListBoxR
   if (GTK_WIDGET(row) == GTK_WIDGET(state.sidebar->all_row)) {
     LOG("Sidebar: Switch to all tasks page");
     adw_view_stack_set_visible_child_name(ADW_VIEW_STACK(state.main_window->stack), "errands_task_list_page");
-    state.task_list->data = NULL;
     errands_task_list_update_title();
-    // errands_task_list_filter_by_uid("");
     gtk_revealer_set_reveal_child(GTK_REVEALER(state.task_list->entry), false);
+    // Filter task list
+    state.task_list->data = NULL;
+    gtk_filter_changed(GTK_FILTER(state.task_list->toplevel_tasks_filter), GTK_FILTER_CHANGE_LESS_STRICT);
   }
 }
 

@@ -3,6 +3,10 @@
 #include "../state.h"
 #include "../task/task.h"
 #include "../utils.h"
+#include "gio/gio.h"
+#include "glib-object.h"
+#include "glib.h"
+#include "gtk/gtk.h"
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>
@@ -21,6 +25,20 @@ static void bind_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item
   ErrandsTask *task = ERRANDS_TASK(gtk_list_item_get_child(list_item));
   TaskData *data = g_object_get_data(gtk_list_item_get_item(list_item), "data");
   errands_task_set_data(task, data);
+}
+
+static bool toplevel_tasks_filter_func(GObject *obj, gpointer user_data) {
+  TaskData *data = g_object_get_data(G_OBJECT(obj), "data");
+  const char *parent = errands_data_get_str(data, DATA_PROP_PARENT);
+  const char *list_uid = errands_data_get_str(data, DATA_PROP_LIST_UID);
+  bool deleted = errands_data_get_bool(data, DATA_PROP_DELETED);
+  bool trash = errands_data_get_bool(data, DATA_PROP_TRASH);
+  bool visible = true;
+  if (state.task_list->data) {
+    const char *curr_list_uid = errands_data_get_str(state.task_list->data, DATA_PROP_LIST_UID);
+    visible = g_str_equal(curr_list_uid, list_uid);
+  }
+  return !parent && !deleted && !trash && visible;
 }
 
 static gint sort_func_creation_date(gconstpointer a, gconstpointer b, gpointer user_data) {
@@ -85,26 +103,17 @@ static void errands_task_list_init(ErrandsTaskList *self) {
                                 "margin-top", 6, "margin-bottom", 6, "margin-start", 11, "margin-end", 11, NULL),
                    NULL);
 
-  LOG("Task List: Loading tasks");
   // Create tasks model
   // TODO: move to data.c
   self->tasks_model = g_list_store_new(G_TYPE_OBJECT);
-  GPtrArray *tasks = g_hash_table_get_values_as_ptr_array(tdata);
-  for (size_t i = 0; i < tasks->len; i++) {
-    TaskData *data = tasks->pdata[i];
-    const char *parent = errands_data_get_str(data, DATA_PROP_PARENT);
-    bool deleted = errands_data_get_bool(data, DATA_PROP_DELETED);
-    if (!parent && !deleted) {
-      GObject *data_object = g_object_new(G_TYPE_OBJECT, NULL);
-      g_object_set_data(data_object, "data", data);
-      g_list_store_append(self->tasks_model, data_object);
-    }
-  }
-  g_ptr_array_free(tasks, false);
+
+  self->toplevel_tasks_filter = gtk_custom_filter_new((GtkCustomFilterFunc)toplevel_tasks_filter_func, NULL, NULL);
+  self->toplevel_tasks_filter_model =
+      gtk_filter_list_model_new(G_LIST_MODEL(self->tasks_model), GTK_FILTER(self->toplevel_tasks_filter));
 
   GtkCustomSorter *creation_date_sorter = gtk_custom_sorter_new(sort_func_creation_date, NULL, NULL);
   GtkSortListModel *creation_date_sort_model =
-      gtk_sort_list_model_new(G_LIST_MODEL(self->tasks_model), GTK_SORTER(creation_date_sorter));
+      gtk_sort_list_model_new(G_LIST_MODEL(self->toplevel_tasks_filter_model), GTK_SORTER(creation_date_sorter));
 
   GtkNoSelection *selection_model = gtk_no_selection_new(G_LIST_MODEL(creation_date_sort_model));
   GtkListItemFactory *tasks_factory = gtk_signal_list_item_factory_new();
@@ -113,8 +122,6 @@ static void errands_task_list_init(ErrandsTaskList *self) {
 
   self->task_list = gtk_list_view_new(GTK_SELECTION_MODEL(selection_model), tasks_factory);
   g_object_set(self->task_list, "single-click-activate", true, NULL);
-
-  LOG("Task List: Loading tasks complete");
 
   // Scrolled window
   GtkWidget *scrl =
@@ -133,6 +140,21 @@ static void errands_task_list_init(ErrandsTaskList *self) {
 }
 
 ErrandsTaskList *errands_task_list_new() { return g_object_new(ERRANDS_TYPE_TASK_LIST, NULL); }
+
+void errands_task_list_load_tasks(ErrandsTaskList *self) {
+  LOG("Task List: Loading tasks");
+  GPtrArray *tasks = g_hash_table_get_values_as_ptr_array(tdata);
+  for (size_t i = 0; i < tasks->len; i++) {
+    GObject *data_object = g_object_new(G_TYPE_OBJECT, NULL);
+    g_object_set_data(data_object, "data", tasks->pdata[i]);
+    g_list_store_append(self->tasks_model, data_object);
+  }
+  g_ptr_array_free(tasks, false);
+  if (g_list_model_get_n_items(G_LIST_MODEL(self->toplevel_tasks_filter_model)) > 0) {
+    gtk_list_view_scroll_to(GTK_LIST_VIEW(self->task_list), 0, GTK_LIST_SCROLL_FOCUS, NULL);
+  }
+  LOG("Task List: Loading tasks complete");
+}
 
 static void on_test_btn_clicked() {
   char buff[10];

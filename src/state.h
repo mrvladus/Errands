@@ -1,11 +1,10 @@
 #pragma once
 
 #include "sidebar/sidebar.h"
+#include "task-list/sort-dialog.h"
 #include "task-list/task-list.h"
 #include "task/task.h"
 #include "window.h"
-
-#include <adwaita.h>
 
 // Structure to hold the application state
 typedef struct {
@@ -24,7 +23,6 @@ typedef struct {
   ErrandsPriorityWindow *priority_window;
   ErrandsTagsWindow *tags_window;
   ErrandsDateWindow *date_window;
-
 } State;
 
 // Global state object

@@ -1,3 +1,4 @@
+#include "task-list/task-list.h"
 #if !(defined(__GNUC__) || defined(__clang__))
 #error "This code requires GCC or Clang compiler because it uses features not supported by other compilers.\
 e.g. GLib's g_autoptr, g_auto and g_autofree"
@@ -19,6 +20,7 @@ static void activate(GtkApplication *app) {
   state.main_window = errands_window_new();
   errands_window_build(state.main_window);
   gtk_window_present(GTK_WINDOW(state.main_window));
+  errands_task_list_load_tasks(state.task_list);
   // sync_init();
 }
 
