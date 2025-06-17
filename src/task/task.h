@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../data/data.h"
+#include "glib.h"
 
 #include <adwaita.h>
 
@@ -44,7 +45,9 @@ struct _ErrandsTask {
   GtkWidget *title;
   GtkWidget *edit_title;
   GtkWidget *complete_btn;
+  gulong complete_btn_signal_id;
   GtkWidget *toolbar_btn;
+  gulong toolbar_btn_signal_id;
   GtkWidget *tags_revealer;
   GtkWidget *progress_revealer;
   GtkWidget *progress_bar;

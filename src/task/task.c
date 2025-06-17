@@ -4,6 +4,7 @@
 #include "../state.h"
 #include "../task-list/task-list.h"
 #include "../utils.h"
+#include "glib-object.h"
 #include "gtk/gtkrevealer.h"
 
 #include <glib/gi18n.h>
@@ -67,6 +68,8 @@ static void errands_task_init(ErrandsTask *self) {
   self->complete_btn = g_object_new(GTK_TYPE_CHECK_BUTTON, "valign", GTK_ALIGN_CENTER, "active", false, "tooltip-text",
                                     _("Toggle Completion"), NULL);
   gtk_widget_add_css_class(self->complete_btn, "selection-mode");
+  self->complete_btn_signal_id =
+      g_signal_connect(self->complete_btn, "toggled", G_CALLBACK(on_errands_task_complete_btn_toggle), self);
   gtk_box_append(GTK_BOX(title_box), self->complete_btn);
 
   // Title
@@ -80,13 +83,15 @@ static void errands_task_init(ErrandsTask *self) {
   g_object_bind_property(self->title, "visible", self->edit_title, "visible",
                          G_BINDING_SYNC_CREATE | G_BINDING_INVERT_BOOLEAN | G_BINDING_BIDIRECTIONAL);
   gtk_box_append(GTK_BOX(title_box), self->edit_title);
+  g_signal_connect(self->edit_title, "notify::editing", G_CALLBACK(on_title_edit), self);
 
   // Toolbar toggle
   self->toolbar_btn = g_object_new(GTK_TYPE_TOGGLE_BUTTON, "icon-name", "errands-toolbar-symbolic", "valign",
                                    GTK_ALIGN_CENTER, "tooltip-text", _("Toggle Toolbar"), NULL);
   gtk_widget_add_css_class(self->toolbar_btn, "flat");
   gtk_widget_add_css_class(self->toolbar_btn, "circular");
-  g_signal_connect(self->toolbar_btn, "toggled", G_CALLBACK(on_errands_task_toolbar_btn_toggle), self);
+  self->toolbar_btn_signal_id =
+      g_signal_connect(self->toolbar_btn, "toggled", G_CALLBACK(on_errands_task_toolbar_btn_toggle), self);
   gtk_box_append(GTK_BOX(title_box), self->toolbar_btn);
 
   // Tags box
@@ -182,6 +187,7 @@ static void errands_task_init(ErrandsTask *self) {
   self->sub_entry = gtk_entry_new();
   g_object_set(self->sub_entry, "margin-start", 6, "margin-end", 6, "placeholder-text", _("Add Sub-Task"), NULL);
   gtk_box_append(GTK_BOX(sub_vbox), self->sub_entry);
+  g_signal_connect(self->sub_entry, "activate", G_CALLBACK(on_errands_task_sub_task_added), self);
 
   // Sub-tasks
   self->sub_tasks = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
@@ -234,23 +240,22 @@ ErrandsTask *errands_task_new() { return g_object_new(ERRANDS_TYPE_TASK, NULL); 
 void errands_task_set_data(ErrandsTask *task, TaskData *data) {
   task->data = data;
 
-  // bool is_toplevel = errands_data_get_str(data, DATA_PROP_PARENT);
   adw_clamp_set_maximum_size(ADW_CLAMP(task->clamp), 1000);
   adw_clamp_set_tightening_threshold(ADW_CLAMP(task->clamp), 300);
 
-  // Setup
-  // bool visible = !errands_data_get_bool(data, DATA_PROP_DELETED) && !errands_data_get_bool(data, DATA_PROP_TRASH);
-  // if (errands_data_get_str(data, DATA_PROP_COMPLETED) && !errands_settings_get("show_completed",
-  // SETTING_TYPE_BOOL).b)
-  //   visible = false;
-  // gtk_widget_set_visible(GTK_WIDGET(task), visible);
-
+  // Set text
   gtk_label_set_label(GTK_LABEL(task->title), errands_data_get_str(data, DATA_PROP_TEXT));
-  // gtk_check_button_set_active(GTK_CHECK_BUTTON(task->complete_btn),
-  //                             (bool)errands_data_get_str(data, DATA_PROP_COMPLETED));
-  // gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(task->toolbar_btn),
-  //                              errands_data_get_bool(data, DATA_PROP_TOOLBAR_SHOWN));
-
+  // Set completion
+  g_signal_handler_block(task->complete_btn, task->complete_btn_signal_id);
+  gtk_check_button_set_active(GTK_CHECK_BUTTON(task->complete_btn),
+                              (bool)errands_data_get_str(data, DATA_PROP_COMPLETED));
+  g_signal_handler_unblock(task->complete_btn, task->complete_btn_signal_id);
+  // Set toolbar
+  g_signal_handler_block(task->toolbar_btn, task->toolbar_btn_signal_id);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(task->toolbar_btn),
+                               errands_data_get_bool(data, DATA_PROP_TOOLBAR_SHOWN));
+  g_signal_handler_unblock(task->toolbar_btn, task->toolbar_btn_signal_id);
+  // Set sub-tasks
   gtk_revealer_set_reveal_child(GTK_REVEALER(task->sub_tasks_revealer),
                                 errands_data_get_bool(data, DATA_PROP_EXPANDED));
   // Load sub-tasks
@@ -268,15 +273,11 @@ void errands_task_set_data(ErrandsTask *task, TaskData *data) {
   //
   // errands_task_list_sort_by_completion(task->sub_tasks);
 
-  // errands_task_update_tags(task);
-  // errands_task_update_accent_color(task);
-  // errands_task_update_progress(task);
+  errands_task_update_tags(task);
+  errands_task_update_accent_color(task);
+  errands_task_update_progress(task);
 
   // Connect signals
-  // g_signal_connect(task->complete_btn, "toggled", G_CALLBACK(on_errands_task_complete_btn_toggle), task);
-  // g_signal_connect(task->toolbar_btn, "toggled", G_CALLBACK(on_errands_task_toolbar_btn_toggle), task);
-  // g_signal_connect(task->sub_entry, "activate", G_CALLBACK(on_errands_task_sub_task_added), task);
-  // g_signal_connect(task->edit_title, "notify::editing", G_CALLBACK(on_title_edit), task);
 }
 
 void errands_task_update_accent_color(ErrandsTask *task) {

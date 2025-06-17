@@ -122,3 +122,17 @@ static inline GtkWidget *errands_check_row_new(const char *title, const char *ic
 
   return row;
 }
+
+// Box with children
+static inline GtkWidget *errands_box_new(GtkOrientation orientation, size_t spacing, GtkWidget *first_child, ...) {
+  GtkWidget *box = gtk_box_new(orientation, spacing);
+  if (first_child != NULL) {
+    gtk_box_append(GTK_BOX(box), first_child);
+    va_list children;
+    va_start(children, first_child);
+    GtkWidget *child;
+    while ((child = va_arg(children, GtkWidget *)) != NULL) gtk_box_append(GTK_BOX(box), child);
+    va_end(children);
+  }
+  return box;
+}

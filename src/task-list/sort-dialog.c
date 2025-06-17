@@ -2,7 +2,7 @@
 #include "../settings.h"
 #include "../state.h"
 #include "../utils.h"
-#include "task-list.h"
+#include "gtk/gtknoselection.h"
 
 #include <glib/gi18n.h>
 #include <stdbool.h>
@@ -78,7 +78,18 @@ void errands_sort_dialog_show() {
 
 static void on_errands_sort_dialog_close_cb(ErrandsSortDialog *self) {
   if (!state.sort_dialog->sort_changed) return;
-  // errands_task_list_sort_recursive(state.task_list->task_list);
+  const char *sort_by = errands_settings_get("sort_by", SETTING_TYPE_STRING).s;
+  if (g_str_equal(sort_by, "created")) {
+    gtk_no_selection_set_model(GTK_NO_SELECTION(state.task_list->selection_model),
+                               G_LIST_MODEL(state.task_list->creation_date_sort_model));
+  } else if (g_str_equal(sort_by, "due")) {
+    gtk_no_selection_set_model(GTK_NO_SELECTION(state.task_list->selection_model),
+                               G_LIST_MODEL(state.task_list->due_date_sort_model));
+  } else if (g_str_equal(sort_by, "priority")) {
+    gtk_no_selection_set_model(GTK_NO_SELECTION(state.task_list->selection_model),
+                               G_LIST_MODEL(state.task_list->priority_sort_model));
+  }
+
   state.sort_dialog->sort_changed = false;
 }
 

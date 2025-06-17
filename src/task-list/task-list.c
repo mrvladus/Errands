@@ -1,5 +1,6 @@
 #include "task-list.h"
 #include "../data/data.h"
+#include "../settings.h"
 #include "../state.h"
 #include "../task/task.h"
 #include "../utils.h"
@@ -7,9 +8,12 @@
 #include "glib-object.h"
 #include "glib.h"
 #include "gtk/gtk.h"
+#include "gtk/gtknoselection.h"
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>
+#include <stddef.h>
+#include <stdint.h>
 
 static void on_task_added(AdwEntryRow *entry, gpointer data);
 static void on_task_list_search(GtkSearchEntry *entry, gpointer user_data);
@@ -41,12 +45,30 @@ static bool toplevel_tasks_filter_func(GObject *obj, gpointer user_data) {
   return !parent && !deleted && !trash && visible;
 }
 
-static gint sort_func_creation_date(gconstpointer a, gconstpointer b, gpointer user_data) {
+static gint creation_date_sort_func(gconstpointer a, gconstpointer b, gpointer user_data) {
   TaskData *data1 = g_object_get_data(G_OBJECT(a), "data");
   icaltimetype date1 = errands_data_get_time(data1, DATA_PROP_CREATED_TIME);
   TaskData *data2 = g_object_get_data(G_OBJECT(b), "data");
   icaltimetype date2 = errands_data_get_time(data2, DATA_PROP_CREATED_TIME);
   return icaltime_compare(date2, date1);
+}
+
+static gint due_date_sort_func(gconstpointer a, gconstpointer b, gpointer user_data) {
+  TaskData *data1 = g_object_get_data(G_OBJECT(a), "data");
+  icaltimetype date1 = errands_data_get_time(data1, DATA_PROP_DUE_TIME);
+  TaskData *data2 = g_object_get_data(G_OBJECT(b), "data");
+  icaltimetype date2 = errands_data_get_time(data2, DATA_PROP_DUE_TIME);
+  return icaltime_compare(date2, date1);
+}
+
+static gint priority_sort_func(gconstpointer a, gconstpointer b, gpointer user_data) {
+  TaskData *data1 = g_object_get_data(G_OBJECT(a), "data");
+  uint8_t p1 = errands_data_get_int(data1, DATA_PROP_PRIORITY);
+  TaskData *data2 = g_object_get_data(G_OBJECT(b), "data");
+  uint8_t p2 = errands_data_get_int(data2, DATA_PROP_PRIORITY);
+  if (p2 == p1) return 0;
+  else if (p2 > p1) return 1;
+  else return -1;
 }
 
 G_DEFINE_TYPE(ErrandsTaskList, errands_task_list, ADW_TYPE_BIN)
@@ -111,16 +133,36 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   self->toplevel_tasks_filter_model =
       gtk_filter_list_model_new(G_LIST_MODEL(self->tasks_model), GTK_FILTER(self->toplevel_tasks_filter));
 
-  GtkCustomSorter *creation_date_sorter = gtk_custom_sorter_new(sort_func_creation_date, NULL, NULL);
-  GtkSortListModel *creation_date_sort_model =
+  GtkCustomSorter *creation_date_sorter = gtk_custom_sorter_new(creation_date_sort_func, NULL, NULL);
+  self->creation_date_sort_model =
       gtk_sort_list_model_new(G_LIST_MODEL(self->toplevel_tasks_filter_model), GTK_SORTER(creation_date_sorter));
 
-  GtkNoSelection *selection_model = gtk_no_selection_new(G_LIST_MODEL(creation_date_sort_model));
+  GtkCustomSorter *due_date_sorter = gtk_custom_sorter_new(due_date_sort_func, NULL, NULL);
+  self->due_date_sort_model =
+      gtk_sort_list_model_new(G_LIST_MODEL(self->toplevel_tasks_filter_model), GTK_SORTER(due_date_sorter));
+
+  GtkCustomSorter *priority_sorter = gtk_custom_sorter_new(priority_sort_func, NULL, NULL);
+  self->priority_sort_model =
+      gtk_sort_list_model_new(G_LIST_MODEL(self->toplevel_tasks_filter_model), GTK_SORTER(priority_sorter));
+
+  // TODO: SINGLE SORT FUNC AND MODEL
+
+  self->selection_model = gtk_no_selection_new(NULL);
+  const char *sort_by = errands_settings_get("sort_by", SETTING_TYPE_STRING).s;
+  LOG("Task List: Set sort by '%s'", sort_by);
+  if (g_str_equal(sort_by, "created")) {
+    gtk_no_selection_set_model(GTK_NO_SELECTION(self->selection_model), G_LIST_MODEL(self->creation_date_sort_model));
+  } else if (g_str_equal(sort_by, "due")) {
+    gtk_no_selection_set_model(GTK_NO_SELECTION(self->selection_model), G_LIST_MODEL(self->due_date_sort_model));
+  } else if (g_str_equal(sort_by, "priority")) {
+    gtk_no_selection_set_model(GTK_NO_SELECTION(self->selection_model), G_LIST_MODEL(self->priority_sort_model));
+  }
+
   GtkListItemFactory *tasks_factory = gtk_signal_list_item_factory_new();
   g_signal_connect(tasks_factory, "setup", G_CALLBACK(setup_listitem_cb), NULL);
   g_signal_connect(tasks_factory, "bind", G_CALLBACK(bind_listitem_cb), NULL);
 
-  self->task_list = gtk_list_view_new(GTK_SELECTION_MODEL(selection_model), tasks_factory);
+  self->task_list = gtk_list_view_new(GTK_SELECTION_MODEL(self->selection_model), tasks_factory);
   g_object_set(self->task_list, "single-click-activate", true, NULL);
 
   // Scrolled window
