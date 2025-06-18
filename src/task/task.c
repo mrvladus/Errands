@@ -280,12 +280,12 @@ void errands_task_set_data(ErrandsTask *task, TaskData *data) {
 
 void errands_task_update_accent_color(ErrandsTask *task) {
   const char *color = errands_data_get_str(task->data, DATA_PROP_COLOR);
-  if (strcmp(color, "none")) {
-    g_autofree gchar *accent_style = g_strdup_printf("task-%s", color);
-    gtk_widget_set_css_classes(GTK_WIDGET(task), (const char *[]){"vertical", "card", accent_style, NULL});
-  } else {
-    gtk_widget_set_css_classes(GTK_WIDGET(task), (const char *[]){"vertical", "card", NULL});
-  }
+  // if (strcmp(color, "none")) {
+  //   g_autofree gchar *accent_style = g_strdup_printf("task-%s", color);
+  //   gtk_widget_set_css_classes(GTK_WIDGET(task), (const char *[]){"vertical", "card", accent_style, NULL});
+  // } else {
+  //   gtk_widget_set_css_classes(GTK_WIDGET(task), (const char *[]){"vertical", "card", NULL});
+  // }
 }
 
 void errands_task_update_progress(ErrandsTask *task) {

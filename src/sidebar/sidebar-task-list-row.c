@@ -115,7 +115,6 @@ ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_get(const char *uid) {
 }
 
 void errands_sidebar_task_list_row_update_counter(ErrandsSidebarTaskListRow *row) {
-  LOG("Sidebar Task List Row: Update counter");
   size_t c = 0;
   GPtrArray *tasks = list_data_get_tasks(row->data);
   for (size_t i = 0; i < tasks->len; i++) {
