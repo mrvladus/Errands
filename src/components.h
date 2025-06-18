@@ -136,3 +136,12 @@ static inline GtkWidget *errands_box_new(GtkOrientation orientation, size_t spac
   }
   return box;
 }
+
+static inline GtkWidget *errands_toolbar_view_new(GtkWidget *child, GtkWidget *top_bar, GtkWidget *bottom_bar) {
+  if (!child) return NULL;
+  GtkWidget *tb = adw_toolbar_view_new();
+  adw_toolbar_view_set_content(ADW_TOOLBAR_VIEW(tb), child);
+  if (top_bar) adw_toolbar_view_add_top_bar(ADW_TOOLBAR_VIEW(tb), top_bar);
+  if (bottom_bar) adw_toolbar_view_add_bottom_bar(ADW_TOOLBAR_VIEW(tb), bottom_bar);
+  return tb;
+}

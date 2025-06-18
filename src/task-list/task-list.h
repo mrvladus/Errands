@@ -19,9 +19,8 @@ struct _ErrandsTaskList {
   GListStore *tasks_model;
   GtkCustomFilter *toplevel_tasks_filter;
   GtkFilterListModel *toplevel_tasks_filter_model;
-  GtkSortListModel *creation_date_sort_model;
-  GtkSortListModel *due_date_sort_model;
-  GtkSortListModel *priority_sort_model;
+  GtkCustomSorter *tasks_sorter;
+  GtkSortListModel *sort_model;
   GtkNoSelection *selection_model;
 };
 

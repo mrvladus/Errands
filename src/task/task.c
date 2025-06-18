@@ -4,8 +4,6 @@
 #include "../state.h"
 #include "../task-list/task-list.h"
 #include "../utils.h"
-#include "glib-object.h"
-#include "gtk/gtkrevealer.h"
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>

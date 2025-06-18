@@ -1,11 +1,9 @@
 #include "../components.h"
 #include "../settings.h"
 #include "../state.h"
-#include "../utils.h"
-#include "gtk/gtknoselection.h"
+#include "gtk/gtkshortcut.h"
 
 #include <glib/gi18n.h>
-#include <stdbool.h>
 
 static void on_errands_sort_dialog_close_cb(ErrandsSortDialog *self);
 static void on_show_completed_toggle(AdwSwitchRow *row);
@@ -47,11 +45,11 @@ static void errands_sort_dialog_init(ErrandsSortDialog *self) {
   adw_preferences_group_add(ADW_PREFERENCES_GROUP(sort_group), self->priority_row);
 
   // Toolbar View
-  GtkWidget *tb = g_object_new(ADW_TYPE_TOOLBAR_VIEW, "content", page, NULL);
-  adw_toolbar_view_add_top_bar(ADW_TOOLBAR_VIEW(tb),
-                               g_object_new(ADW_TYPE_HEADER_BAR, "title-widget",
-                                            g_object_new(ADW_TYPE_WINDOW_TITLE, "title", _("Filter and Sort"), NULL),
-                                            NULL));
+  GtkWidget *tb = errands_toolbar_view_new(
+      page,
+      g_object_new(ADW_TYPE_HEADER_BAR, "title-widget",
+                   g_object_new(ADW_TYPE_WINDOW_TITLE, "title", _("Filter and Sort"), NULL), NULL),
+      NULL);
   adw_dialog_set_child(ADW_DIALOG(self), tb);
 }
 
@@ -67,10 +65,10 @@ void errands_sort_dialog_show() {
   bool show_completed = errands_settings_get("show_completed", SETTING_TYPE_STRING).b;
   adw_switch_row_set_active(ADW_SWITCH_ROW(state.sort_dialog->show_completed_row), show_completed);
 
-  const char *sort_by = errands_settings_get("sort_by", SETTING_TYPE_STRING).s;
-  if (g_str_equal(sort_by, "created")) adw_action_row_activate(ADW_ACTION_ROW(state.sort_dialog->created_row));
-  else if (g_str_equal(sort_by, "due")) adw_action_row_activate(ADW_ACTION_ROW(state.sort_dialog->due_row));
-  else if (g_str_equal(sort_by, "priority")) adw_action_row_activate(ADW_ACTION_ROW(state.sort_dialog->priority_row));
+  ErrandsSortType sort_by = errands_settings_get("sort_by", SETTING_TYPE_INT).i;
+  if (sort_by == SORT_TYPE_CREATION_DATE) adw_action_row_activate(ADW_ACTION_ROW(state.sort_dialog->created_row));
+  else if (sort_by == SORT_TYPE_DUE_DATE) adw_action_row_activate(ADW_ACTION_ROW(state.sort_dialog->due_row));
+  else if (sort_by == SORT_TYPE_PRIORITY) adw_action_row_activate(ADW_ACTION_ROW(state.sort_dialog->priority_row));
 
   adw_dialog_present(ADW_DIALOG(state.sort_dialog), GTK_WIDGET(state.main_window));
   state.sort_dialog->block_signals = false;
@@ -78,18 +76,7 @@ void errands_sort_dialog_show() {
 
 static void on_errands_sort_dialog_close_cb(ErrandsSortDialog *self) {
   if (!state.sort_dialog->sort_changed) return;
-  const char *sort_by = errands_settings_get("sort_by", SETTING_TYPE_STRING).s;
-  if (g_str_equal(sort_by, "created")) {
-    gtk_no_selection_set_model(GTK_NO_SELECTION(state.task_list->selection_model),
-                               G_LIST_MODEL(state.task_list->creation_date_sort_model));
-  } else if (g_str_equal(sort_by, "due")) {
-    gtk_no_selection_set_model(GTK_NO_SELECTION(state.task_list->selection_model),
-                               G_LIST_MODEL(state.task_list->due_date_sort_model));
-  } else if (g_str_equal(sort_by, "priority")) {
-    gtk_no_selection_set_model(GTK_NO_SELECTION(state.task_list->selection_model),
-                               G_LIST_MODEL(state.task_list->priority_sort_model));
-  }
-
+  gtk_sorter_changed(GTK_SORTER(state.task_list->tasks_sorter), GTK_SORTER_CHANGE_MORE_STRICT);
   state.sort_dialog->sort_changed = false;
 }
 
@@ -98,16 +85,14 @@ static void on_show_completed_toggle(AdwSwitchRow *row) {
   errands_settings_set_bool("show_completed", adw_switch_row_get_active(row));
 }
 
-static void set_sort_by(GtkCheckButton *btn, const char *sort_by) {
+static void set_sort_by(GtkCheckButton *btn, size_t sort_by) {
   if (state.sort_dialog->block_signals) return;
-  bool active = gtk_check_button_get_active(btn);
-  const char *sort_by_current = errands_settings_get("sort_by", SETTING_TYPE_STRING).s;
-  if (!active || g_str_equal(sort_by_current, sort_by)) return;
-  LOG("Sort Window: Set sort by '%s'", sort_by);
-  errands_settings_set_string("sort_by", sort_by);
+  size_t sort_by_current = errands_settings_get("sort_by", SETTING_TYPE_INT).i;
+  if (!gtk_check_button_get_active(btn) || sort_by_current == sort_by) return;
+  errands_settings_set_int("sort_by", sort_by);
   state.sort_dialog->sort_changed = true;
 }
 
-static void on_created_toggle(GtkCheckButton *btn, void *data) { set_sort_by(btn, "created"); }
-static void on_due_toggle(GtkCheckButton *btn, void *data) { set_sort_by(btn, "due"); }
-static void on_priority_toggle(GtkCheckButton *btn, void *data) { set_sort_by(btn, "priority"); }
+static void on_created_toggle(GtkCheckButton *btn, void *data) { set_sort_by(btn, SORT_TYPE_CREATION_DATE); }
+static void on_due_toggle(GtkCheckButton *btn, void *data) { set_sort_by(btn, SORT_TYPE_DUE_DATE); }
+static void on_priority_toggle(GtkCheckButton *btn, void *data) { set_sort_by(btn, SORT_TYPE_PRIORITY); }

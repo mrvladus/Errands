@@ -27,7 +27,7 @@ void errands_settings_load_default() {
   json_object_add(settings, settings_keys[0], json_string_new(""));
   json_object_add(settings, settings_keys[1], json_bool_new(false));
   json_object_add(settings, settings_keys[2], json_bool_new(true));
-  json_object_add(settings, settings_keys[3], json_string_new("created"));
+  json_object_add(settings, settings_keys[3], json_int_new(SORT_TYPE_CREATION_DATE));
   json_object_add(settings, settings_keys[4], json_bool_new(false));
   json_object_add(settings, settings_keys[5], json_string_new("caldav"));
   json_object_add(settings, settings_keys[6], json_string_new(""));

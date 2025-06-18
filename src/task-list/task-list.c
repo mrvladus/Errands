@@ -31,6 +31,8 @@ static void bind_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item
   errands_task_set_data(task, data);
 }
 
+// --- SORT AND FILTER CALLBACKS --- //
+
 static bool toplevel_tasks_filter_func(GObject *obj, gpointer user_data) {
   TaskData *data = g_object_get_data(G_OBJECT(obj), "data");
   const char *parent = errands_data_get_str(data, DATA_PROP_PARENT);
@@ -45,30 +47,35 @@ static bool toplevel_tasks_filter_func(GObject *obj, gpointer user_data) {
   return !parent && !deleted && !trash && visible;
 }
 
-static gint creation_date_sort_func(gconstpointer a, gconstpointer b, gpointer user_data) {
-  TaskData *data1 = g_object_get_data(G_OBJECT(a), "data");
-  icaltimetype date1 = errands_data_get_time(data1, DATA_PROP_CREATED_TIME);
-  TaskData *data2 = g_object_get_data(G_OBJECT(b), "data");
-  icaltimetype date2 = errands_data_get_time(data2, DATA_PROP_CREATED_TIME);
-  return icaltime_compare(date2, date1);
-}
+static gint sort_func(gconstpointer a, gconstpointer b, gpointer user_data) {
+  size_t sort_by = errands_settings_get("sort_by", SETTING_TYPE_INT).i;
 
-static gint due_date_sort_func(gconstpointer a, gconstpointer b, gpointer user_data) {
   TaskData *data1 = g_object_get_data(G_OBJECT(a), "data");
-  icaltimetype date1 = errands_data_get_time(data1, DATA_PROP_DUE_TIME);
   TaskData *data2 = g_object_get_data(G_OBJECT(b), "data");
-  icaltimetype date2 = errands_data_get_time(data2, DATA_PROP_DUE_TIME);
-  return icaltime_compare(date2, date1);
-}
 
-static gint priority_sort_func(gconstpointer a, gconstpointer b, gpointer user_data) {
-  TaskData *data1 = g_object_get_data(G_OBJECT(a), "data");
-  uint8_t p1 = errands_data_get_int(data1, DATA_PROP_PRIORITY);
-  TaskData *data2 = g_object_get_data(G_OBJECT(b), "data");
-  uint8_t p2 = errands_data_get_int(data2, DATA_PROP_PRIORITY);
-  if (p2 == p1) return 0;
-  else if (p2 > p1) return 1;
-  else return -1;
+  icaltimetype creation_date1 = errands_data_get_time(data1, DATA_PROP_CREATED_TIME);
+  icaltimetype creation_date2 = errands_data_get_time(data2, DATA_PROP_CREATED_TIME);
+
+  switch (sort_by) {
+  case SORT_TYPE_CREATION_DATE: return icaltime_compare(creation_date2, creation_date1);
+  case SORT_TYPE_DUE_DATE: {
+    icaltimetype due_date1 = errands_data_get_time(data1, DATA_PROP_DUE_TIME);
+    bool due_date1_null = icaltime_is_null_time(due_date1);
+    icaltimetype due_date2 = errands_data_get_time(data2, DATA_PROP_DUE_TIME);
+    bool due_date2_null = icaltime_is_null_time(due_date2);
+    if (!due_date1_null && !due_date2_null) return icaltime_compare(due_date2, due_date1);
+    else return icaltime_compare(creation_date2, creation_date1);
+  }
+  case SORT_TYPE_PRIORITY: {
+    uint8_t p1 = errands_data_get_int(data1, DATA_PROP_PRIORITY);
+    uint8_t p2 = errands_data_get_int(data2, DATA_PROP_PRIORITY);
+    if (p2 == p1) return 0;
+    else if (p2 > p1) return 1;
+    else return -1;
+  }
+  }
+
+  return 0;
 }
 
 G_DEFINE_TYPE(ErrandsTaskList, errands_task_list, ADW_TYPE_BIN)
@@ -133,30 +140,11 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   self->toplevel_tasks_filter_model =
       gtk_filter_list_model_new(G_LIST_MODEL(self->tasks_model), GTK_FILTER(self->toplevel_tasks_filter));
 
-  GtkCustomSorter *creation_date_sorter = gtk_custom_sorter_new(creation_date_sort_func, NULL, NULL);
-  self->creation_date_sort_model =
-      gtk_sort_list_model_new(G_LIST_MODEL(self->toplevel_tasks_filter_model), GTK_SORTER(creation_date_sorter));
+  self->tasks_sorter = gtk_custom_sorter_new(sort_func, NULL, NULL);
+  self->sort_model =
+      gtk_sort_list_model_new(G_LIST_MODEL(self->toplevel_tasks_filter_model), GTK_SORTER(self->tasks_sorter));
 
-  GtkCustomSorter *due_date_sorter = gtk_custom_sorter_new(due_date_sort_func, NULL, NULL);
-  self->due_date_sort_model =
-      gtk_sort_list_model_new(G_LIST_MODEL(self->toplevel_tasks_filter_model), GTK_SORTER(due_date_sorter));
-
-  GtkCustomSorter *priority_sorter = gtk_custom_sorter_new(priority_sort_func, NULL, NULL);
-  self->priority_sort_model =
-      gtk_sort_list_model_new(G_LIST_MODEL(self->toplevel_tasks_filter_model), GTK_SORTER(priority_sorter));
-
-  // TODO: SINGLE SORT FUNC AND MODEL
-
-  self->selection_model = gtk_no_selection_new(NULL);
-  const char *sort_by = errands_settings_get("sort_by", SETTING_TYPE_STRING).s;
-  LOG("Task List: Set sort by '%s'", sort_by);
-  if (g_str_equal(sort_by, "created")) {
-    gtk_no_selection_set_model(GTK_NO_SELECTION(self->selection_model), G_LIST_MODEL(self->creation_date_sort_model));
-  } else if (g_str_equal(sort_by, "due")) {
-    gtk_no_selection_set_model(GTK_NO_SELECTION(self->selection_model), G_LIST_MODEL(self->due_date_sort_model));
-  } else if (g_str_equal(sort_by, "priority")) {
-    gtk_no_selection_set_model(GTK_NO_SELECTION(self->selection_model), G_LIST_MODEL(self->priority_sort_model));
-  }
+  self->selection_model = gtk_no_selection_new(G_LIST_MODEL(self->sort_model));
 
   GtkListItemFactory *tasks_factory = gtk_signal_list_item_factory_new();
   g_signal_connect(tasks_factory, "setup", G_CALLBACK(setup_listitem_cb), NULL);
