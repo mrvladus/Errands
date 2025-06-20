@@ -21,6 +21,11 @@ struct _ErrandsTaskList {
   GtkFilterListModel *toplevel_tasks_filter_model;
   GtkCustomSorter *tasks_sorter;
   GtkSortListModel *sort_model;
+  GtkCustomSorter *completion_sorter;
+  GtkSortListModel *completion_sort_model;
+  GtkCustomFilter *search_filter;
+  GtkFilterListModel *search_filter_model;
+  const char *search_query;
   GtkNoSelection *selection_model;
 };
 

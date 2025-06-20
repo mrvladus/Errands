@@ -274,8 +274,7 @@ void errands_task_set_data(ErrandsTask *task, TaskData *data) {
   errands_task_update_tags(task);
   errands_task_update_accent_color(task);
   errands_task_update_progress(task);
-
-  // Connect signals
+  errands_task_update_toolbar(task);
 }
 
 void errands_task_update_accent_color(ErrandsTask *task) {
@@ -400,6 +399,17 @@ GPtrArray *errands_task_get_sub_tasks(ErrandsTask *task) {
   return arr;
 }
 
+GPtrArray *errands_task_get_parents(ErrandsTask *task) {
+  GPtrArray *parents = g_ptr_array_new();
+  ErrandsTask *parent =
+      ERRANDS_TASK(gtk_widget_get_ancestor(gtk_widget_get_parent(GTK_WIDGET(task)), ERRANDS_TYPE_TASK));
+  while (parent) {
+    g_ptr_array_add(parents, parent);
+    parent = ERRANDS_TASK(gtk_widget_get_ancestor(gtk_widget_get_parent(GTK_WIDGET(parent)), ERRANDS_TYPE_TASK));
+  }
+  return parents;
+}
+
 // --- TAGS --- //
 
 static void errands_task_tag_delete(GtkWidget *label) {
@@ -440,17 +450,6 @@ void errands_task_update_tags(ErrandsTask *task) {
   gtk_revealer_set_reveal_child(GTK_REVEALER(task->tags_revealer), len > 0);
 }
 
-GPtrArray *errands_task_get_parents(ErrandsTask *task) {
-  GPtrArray *parents = g_ptr_array_new();
-  ErrandsTask *parent =
-      ERRANDS_TASK(gtk_widget_get_ancestor(gtk_widget_get_parent(GTK_WIDGET(task)), ERRANDS_TYPE_TASK));
-  while (parent) {
-    g_ptr_array_add(parents, parent);
-    parent = ERRANDS_TASK(gtk_widget_get_ancestor(gtk_widget_get_parent(GTK_WIDGET(parent)), ERRANDS_TYPE_TASK));
-  }
-  return parents;
-}
-
 // --- SIGNALS HANDLERS --- //
 
 static void on_title_edit(GtkEditableLabel *label, GParamSpec *pspec, gpointer user_data) {
@@ -486,7 +485,7 @@ static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x, gdoub
 }
 
 static void on_action_edit(GSimpleAction *action, GVariant *param, ErrandsTask *task) {
-  gtk_editable_label_start_editing(GTK_EDITABLE_LABEL(task->edit_title));
+  // gtk_editable_label_start_editing(GTK_EDITABLE_LABEL(task->edit_title));
 }
 
 static void on_action_trash(GSimpleAction *action, GVariant *param, ErrandsTask *task) {
@@ -502,37 +501,41 @@ static void on_action_trash(GSimpleAction *action, GVariant *param, ErrandsTask 
 static void on_errands_task_complete_btn_toggle(GtkCheckButton *btn, ErrandsTask *task) {
   LOG("Toggle completion '%s'", errands_data_get_str(task->data, DATA_PROP_UID));
   errands_data_set_str(task->data, DATA_PROP_COMPLETED, gtk_check_button_get_active(btn) ? get_date_time() : NULL);
-  errands_data_set_str(task->data, DATA_PROP_CHANGED, get_date_time());
-  errands_data_set_bool(task->data, DATA_PROP_SYNCED, false);
   errands_data_write_list(state.task_list->data);
 
-  GtkWidget *task_list;
-  if (!strcmp(errands_data_get_str(task->data, DATA_PROP_PARENT), "")) task_list = state.task_list->task_list;
-  else task_list = gtk_widget_get_parent(GTK_WIDGET(task));
+  // GtkWidget *task_list;
+  // if (!strcmp(errands_data_get_str(task->data, DATA_PROP_PARENT), "")) task_list = state.task_list->task_list;
+  // else task_list = gtk_widget_get_parent(GTK_WIDGET(task));
 
   // Complete all sub-tasks if task is completed
-  if (errands_data_get_str(task->data, DATA_PROP_COMPLETED)) {
-    GPtrArray *sub_tasks = get_children(task->sub_tasks);
-    for (size_t i = 0; i < sub_tasks->len; i++) {
-      ErrandsTask *sub_task = sub_tasks->pdata[i];
-      gtk_check_button_set_active(GTK_CHECK_BUTTON(sub_task->complete_btn), true);
-    }
-  }
+  // if (errands_data_get_str(task->data, DATA_PROP_COMPLETED)) {
+  //   GPtrArray *sub_tasks = get_children(task->sub_tasks);
+  //   for (size_t i = 0; i < sub_tasks->len; i++) {
+  //     ErrandsTask *sub_task = sub_tasks->pdata[i];
+  //     gtk_check_button_set_active(GTK_CHECK_BUTTON(sub_task->complete_btn), true);
+  //   }
+  // }
 
   // Update parents
-  GPtrArray *parents = errands_task_get_parents(task);
-  for (size_t i = 0; i < parents->len; i++) {
-    ErrandsTask *parent = parents->pdata[i];
-    errands_task_update_progress(parent);
-    // Uncomplete parent task if task is un-completed
-    if (!gtk_check_button_get_active(btn)) gtk_check_button_set_active(GTK_CHECK_BUTTON(parent->complete_btn), false);
-  }
+  // GPtrArray *parents = errands_task_get_parents(task);
+  // for (size_t i = 0; i < parents->len; i++) {
+  //   ErrandsTask *parent = parents->pdata[i];
+  //   errands_task_update_progress(parent);
+  //   // Uncomplete parent task if task is un-completed
+  //   if (!gtk_check_button_get_active(btn)) gtk_check_button_set_active(GTK_CHECK_BUTTON(parent->complete_btn),
+  //   false);
+  // }
 
   // gtk_revealer_set_reveal_child(GTK_REVEALER(task->revealer),
   //                               !errands_data_get_bool(task->data, DATA_PROP_DELETED) &&
   //                                   !errands_data_get_bool(task->data, DATA_PROP_TRASH) &&
   //                                   (!errands_data_get_str(task->data, DATA_PROP_COMPLETED) ||
   //                                    errands_settings_get("show_completed", SETTING_TYPE_BOOL).b));
+
+  // Sort parent task list by completion
+  if (!errands_data_get_str(task->data, DATA_PROP_PARENT)) {
+    gtk_sorter_changed(GTK_SORTER(state.task_list->completion_sorter), GTK_SORTER_CHANGE_MORE_STRICT);
+  }
 
   // Update task list
   errands_task_list_update_title();

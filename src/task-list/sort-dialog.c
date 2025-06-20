@@ -1,7 +1,6 @@
 #include "../components.h"
 #include "../settings.h"
 #include "../state.h"
-#include "gtk/gtkshortcut.h"
 
 #include <glib/gi18n.h>
 
@@ -77,6 +76,7 @@ void errands_sort_dialog_show() {
 static void on_errands_sort_dialog_close_cb(ErrandsSortDialog *self) {
   if (!state.sort_dialog->sort_changed) return;
   gtk_sorter_changed(GTK_SORTER(state.task_list->tasks_sorter), GTK_SORTER_CHANGE_MORE_STRICT);
+  gtk_list_view_scroll_to(GTK_LIST_VIEW(state.task_list->task_list), 0, GTK_LIST_SCROLL_FOCUS, NULL);
   state.sort_dialog->sort_changed = false;
 }
 

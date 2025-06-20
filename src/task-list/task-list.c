@@ -5,15 +5,12 @@
 #include "../task/task.h"
 #include "../utils.h"
 #include "gio/gio.h"
-#include "glib-object.h"
 #include "glib.h"
 #include "gtk/gtk.h"
-#include "gtk/gtknoselection.h"
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>
-#include <stddef.h>
-#include <stdint.h>
+#include <unistd.h>
 
 static void on_task_added(AdwEntryRow *entry, gpointer data);
 static void on_task_list_search(GtkSearchEntry *entry, gpointer user_data);
@@ -47,6 +44,19 @@ static bool toplevel_tasks_filter_func(GObject *obj, gpointer user_data) {
   return !parent && !deleted && !trash && visible;
 }
 
+static bool search_filter_func(GObject *obj, gpointer user_data) {
+  if (!state.task_list->search_query || g_str_equal(state.task_list->search_query, "")) return true;
+
+  TaskData *data = g_object_get_data(G_OBJECT(obj), "data");
+  const char *text = errands_data_get_str(data, DATA_PROP_TEXT);
+  const char *notes = errands_data_get_str(data, DATA_PROP_NOTES);
+  g_auto(GStrv) tags = errands_data_get_strv(data, DATA_PROP_TAGS);
+
+  return (text && string_contains(text, state.task_list->search_query)) ||
+         (notes && string_contains(notes, state.task_list->search_query)) ||
+         (tags && g_strv_contains((const gchar *const *)tags, state.task_list->search_query));
+}
+
 static gint sort_func(gconstpointer a, gconstpointer b, gpointer user_data) {
   size_t sort_by = errands_settings_get("sort_by", SETTING_TYPE_INT).i;
 
@@ -76,6 +86,14 @@ static gint sort_func(gconstpointer a, gconstpointer b, gpointer user_data) {
   }
 
   return 0;
+}
+
+static gint completion_sort_func(gconstpointer a, gconstpointer b, gpointer user_data) {
+  TaskData *data1 = g_object_get_data(G_OBJECT(a), "data");
+  int completed1 = errands_data_get_str(data1, DATA_PROP_COMPLETED) ? 1 : 0;
+  TaskData *data2 = g_object_get_data(G_OBJECT(b), "data");
+  int completed2 = errands_data_get_str(data2, DATA_PROP_COMPLETED) ? 1 : 0;
+  return completed1 - completed2;
 }
 
 G_DEFINE_TYPE(ErrandsTaskList, errands_task_list, ADW_TYPE_BIN)
@@ -144,7 +162,15 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   self->sort_model =
       gtk_sort_list_model_new(G_LIST_MODEL(self->toplevel_tasks_filter_model), GTK_SORTER(self->tasks_sorter));
 
-  self->selection_model = gtk_no_selection_new(G_LIST_MODEL(self->sort_model));
+  self->completion_sorter = gtk_custom_sorter_new(completion_sort_func, NULL, NULL);
+  self->completion_sort_model =
+      gtk_sort_list_model_new(G_LIST_MODEL(self->sort_model), GTK_SORTER(self->completion_sorter));
+
+  self->search_filter = gtk_custom_filter_new((GtkCustomFilterFunc)search_filter_func, NULL, NULL);
+  self->search_filter_model =
+      gtk_filter_list_model_new(G_LIST_MODEL(self->completion_sort_model), GTK_FILTER(self->search_filter));
+
+  self->selection_model = gtk_no_selection_new(G_LIST_MODEL(self->search_filter_model));
 
   GtkListItemFactory *tasks_factory = gtk_signal_list_item_factory_new();
   g_signal_connect(tasks_factory, "setup", G_CALLBACK(setup_listitem_cb), NULL);
@@ -197,6 +223,7 @@ static void on_test_btn_clicked() {
     g_list_store_append(state.task_list->tasks_model, data_object);
   }
   errands_sidebar_all_row_update_counter(state.sidebar->all_row);
+  gtk_list_view_scroll_to(GTK_LIST_VIEW(state.task_list->task_list), 0, GTK_LIST_SCROLL_FOCUS, NULL);
 }
 
 void errands_task_list_update_title() {
@@ -279,8 +306,11 @@ static void on_task_added(AdwEntryRow *entry, gpointer data) {
 }
 
 static void on_task_list_search(GtkSearchEntry *entry, gpointer user_data) {
-  // const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
-  // errands_task_list_filter_by_text(state.task_list->task_list, text);
+  const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
+  LOG("Task List: Search '%s'", text);
+  state.task_list->search_query = text;
+  gtk_filter_changed(GTK_FILTER(state.task_list->search_filter), GTK_FILTER_CHANGE_DIFFERENT);
+  gtk_list_view_scroll_to(GTK_LIST_VIEW(state.task_list->task_list), 0, GTK_LIST_SCROLL_FOCUS, NULL);
 }
 
 static void on_search_btn_toggle(GtkToggleButton *btn) {
