@@ -1,11 +1,9 @@
 #include "../components.h"
 #include "../data/data.h"
 #include "../state.h"
-#include "adwaita.h"
 #include "task.h"
 
 #include <glib/gi18n.h>
-#include <stddef.h>
 
 static void on_errands_priority_window_close(ErrandsPriorityWindow *win, gpointer data);
 static void on_priority_button_activate(GtkCheckButton *btn, void *data);
@@ -60,15 +58,19 @@ ErrandsPriorityWindow *errands_priority_window_new() {
 }
 
 void errands_priority_window_show(ErrandsTask *task) {
-  if (!state.priority_window) state.priority_window = errands_priority_window_new();
-  adw_dialog_present(ADW_DIALOG(state.priority_window), GTK_WIDGET(state.main_window));
-  state.priority_window->task = task;
+  if (!state.main_window->task_list->priority_window)
+    state.main_window->task_list->priority_window = errands_priority_window_new();
+  adw_dialog_present(ADW_DIALOG(state.main_window->task_list->priority_window), GTK_WIDGET(state.main_window));
+  state.main_window->task_list->priority_window->task = task;
   const uint8_t priority = errands_data_get_int(task->data, DATA_PROP_PRIORITY);
-  if (priority == 0) adw_action_row_activate(ADW_ACTION_ROW(state.priority_window->none_row));
-  else if (priority == 1) adw_action_row_activate(ADW_ACTION_ROW(state.priority_window->low_row));
-  else if (priority == 5) adw_action_row_activate(ADW_ACTION_ROW(state.priority_window->medium_row));
-  else if (priority == 9) adw_action_row_activate(ADW_ACTION_ROW(state.priority_window->high_row));
-  adw_spin_row_set_value(ADW_SPIN_ROW(state.priority_window->custom), priority);
+  if (priority == 0) adw_action_row_activate(ADW_ACTION_ROW(state.main_window->task_list->priority_window->none_row));
+  else if (priority == 1)
+    adw_action_row_activate(ADW_ACTION_ROW(state.main_window->task_list->priority_window->low_row));
+  else if (priority == 5)
+    adw_action_row_activate(ADW_ACTION_ROW(state.main_window->task_list->priority_window->medium_row));
+  else if (priority == 9)
+    adw_action_row_activate(ADW_ACTION_ROW(state.main_window->task_list->priority_window->high_row));
+  adw_spin_row_set_value(ADW_SPIN_ROW(state.main_window->task_list->priority_window->custom), priority);
 }
 
 static void on_errands_priority_window_close(ErrandsPriorityWindow *win, gpointer data) {
@@ -100,5 +102,5 @@ static void on_priority_button_activate(GtkCheckButton *btn, void *data) {
   else if (!strcmp(data, "low")) val = 1;
   else if (!strcmp(data, "medium")) val = 5;
   else if (!strcmp(data, "high")) val = 9;
-  adw_spin_row_set_value(ADW_SPIN_ROW(state.priority_window->custom), val);
+  adw_spin_row_set_value(ADW_SPIN_ROW(state.main_window->task_list->priority_window->custom), val);
 }

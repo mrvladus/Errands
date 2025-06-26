@@ -1,0 +1,113 @@
+using Gtk 4.0;
+using Adw 1;
+
+Adw.AlertDialog rename_list_dialog {
+  close-response: "r_close";
+  default-response: "rename";
+  response => $on_rename_response_cb();
+
+  responses [
+    r_close: _("Cancel"),
+    rename: _("Rename") suggested disabled,
+  ]
+
+  extra-child: ListBox {
+    styles [
+      "boxed-list",
+    ]
+
+    Adw.EntryRow rename_list_dialog_entry {
+      title: _("New List Name");
+      changed => $on_rename_entry_changed_cb(rename_list_dialog);
+      entry-activated => $on_rename_entry_activated_cb(rename_list_dialog);
+    }
+  };
+}
+
+Adw.AlertDialog delete_list_dialog {
+  close-response: "d_close";
+  default-response: "delete";
+  heading: _("Are you sure?");
+  response => $on_delete_response_cb();
+
+  responses [
+    d_close: _("Cancel"),
+    delete: _("Delete") destructive,
+  ]
+}
+
+
+menu add_menu {
+  item (_("Import .ics"), "sidebar.import")
+}
+
+menu main_menu {
+  item (_("Preferences"), "sidebar.preferences")
+  item (_("About Errands"), "sidebar.about")
+}
+
+template $ErrandsSidebar: Adw.Bin {
+  Adw.ToolbarView {
+    width-request: 200;
+
+    [top]
+    Adw.HeaderBar {
+      title-widget: Adw.WindowTitle {
+        title: _("Errands");
+      };
+
+      [start]
+      Adw.SplitButton add_btn {
+        icon-name: "errands-add-symbolic";
+        tooltip-text: _("Add Task List (Ctrl+Shift+L)");
+        menu-model: add_menu;
+        action-name: "sidebar.new_list";
+
+        ShortcutController {
+          Shortcut {
+            trigger: "<Control><Shift>L";
+            action: "action(sidebar.new_list)";
+          }
+
+          scope: global;
+        }
+      }
+
+      [end]
+      MenuButton {
+        icon-name: "open-menu-symbolic";
+        menu-model: main_menu;
+      }
+    }
+
+    content: ScrolledWindow {
+      Box {
+        orientation: vertical;
+
+        ListBox filters_box {
+          row-activated => $on_errands_sidebar_filter_row_activated();
+
+          styles [
+            "navigation-sidebar",
+          ]
+
+          $ErrandsSidebarAllRow all_row {}
+        }
+
+        Separator {
+          orientation: vertical;
+          margin-start: 8;
+          margin-end: 8;
+        }
+
+        ListBox task_lists_box {
+          row-activated => $on_errands_sidebar_task_list_row_activate();
+
+          styles [
+            "navigation-sidebar",
+          ]
+        }
+      }
+    };
+  }
+}

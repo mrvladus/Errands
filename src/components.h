@@ -1,12 +1,6 @@
 #pragma once
 
-#include "glib-object.h"
-#include "gtk/gtk.h"
-#include "gtk/gtkshortcut.h"
 #include <adwaita.h>
-
-#include <stdarg.h>
-#include <stdlib.h>
 
 // --- CHECK MENU ITEM --- //
 
@@ -121,27 +115,4 @@ static inline GtkWidget *errands_check_row_new(const char *title, const char *ic
   if (cb) g_signal_connect(toggle, "toggled", G_CALLBACK(cb), cb_data);
 
   return row;
-}
-
-// Box with children
-static inline GtkWidget *errands_box_new(GtkOrientation orientation, size_t spacing, GtkWidget *first_child, ...) {
-  GtkWidget *box = gtk_box_new(orientation, spacing);
-  if (first_child != NULL) {
-    gtk_box_append(GTK_BOX(box), first_child);
-    va_list children;
-    va_start(children, first_child);
-    GtkWidget *child;
-    while ((child = va_arg(children, GtkWidget *)) != NULL) gtk_box_append(GTK_BOX(box), child);
-    va_end(children);
-  }
-  return box;
-}
-
-static inline GtkWidget *errands_toolbar_view_new(GtkWidget *child, GtkWidget *top_bar, GtkWidget *bottom_bar) {
-  if (!child) return NULL;
-  GtkWidget *tb = adw_toolbar_view_new();
-  adw_toolbar_view_set_content(ADW_TOOLBAR_VIEW(tb), child);
-  if (top_bar) adw_toolbar_view_add_top_bar(ADW_TOOLBAR_VIEW(tb), top_bar);
-  if (bottom_bar) adw_toolbar_view_add_bottom_bar(ADW_TOOLBAR_VIEW(tb), bottom_bar);
-  return tb;
 }

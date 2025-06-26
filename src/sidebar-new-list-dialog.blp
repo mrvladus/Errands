@@ -1,0 +1,24 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $ErrandsSidebarNewListDialog: Adw.AlertDialog {
+  default-response: "create";
+  response => $on_response_cb();
+
+  responses [
+    close: _("Cancel"),
+    create: _("Create") suggested disabled,
+  ]
+
+  extra-child: ListBox {
+    styles [
+      "boxed-list",
+    ]
+
+    Adw.EntryRow entry {
+      title: _("New List Name");
+      changed => $on_entry_changed_cb();
+      entry-activated => $on_entry_activated_cb();
+    }
+  };
+}

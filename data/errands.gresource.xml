@@ -4,6 +4,29 @@
     <file compressed="true" alias="style.css">styles/style.css</file>
     <file compressed="true" alias="style-dark.css">styles/style-dark.css</file>
   </gresource>
+
+  <gresource prefix="/io/github/mrvladus/Errands/ui">
+    <file
+            compressed="true"
+            alias="sidebar-all-row.ui"
+        >src/sidebar-all-row.ui</file>
+    <file
+            compressed="true"
+            alias="sidebar-task-list-row.ui"
+        >src/sidebar-task-list-row.ui</file>
+        <file compressed="true" alias="sidebar.ui">src/sidebar.ui</file>
+    <file
+            compressed="true"
+            alias="sidebar-new-list-dialog.ui"
+        >src/sidebar-new-list-dialog.ui</file>
+    <file compressed="true" alias="window.ui">src/window.ui</file>
+    <file compressed="true" alias="task-list.ui">src/task-list.ui</file>
+    <file
+            compressed="true"
+            alias="task-list-sort-dialog.ui"
+        >src/task-list-sort-dialog.ui</file>
+  </gresource>
+
   <gresource prefix="/io/github/mrvladus/Errands/icons/scalable/actions/">
     <file
             preprocess="xml-stripblanks"

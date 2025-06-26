@@ -1,6 +1,7 @@
 #pragma once
 
-#include "no-lists-page.h"
+#include "sidebar.h"
+#include "task-list.h"
 
 #include <adwaita.h>
 
@@ -9,13 +10,14 @@ G_DECLARE_FINAL_TYPE(ErrandsWindow, errands_window, ERRANDS, WINDOW, AdwApplicat
 
 struct _ErrandsWindow {
   AdwApplicationWindow parent_instance;
-  GtkWidget *stack;
-  GtkWidget *split_view;
   GtkWidget *toast_overlay;
-  ErrandsNoListsPage *no_lists_page;
+  GtkWidget *split_view;
+  ErrandsSidebar *sidebar;
+  ErrandsTaskList *task_list;
+  GtkWidget *stack;
+  GtkWidget *no_lists_page;
 };
 
-ErrandsWindow *errands_window_new();
-void errands_window_build(ErrandsWindow *win);
+ErrandsWindow *errands_window_new(GtkApplication *app);
 void errands_window_update(ErrandsWindow *win);
 void errands_window_add_toast(ErrandsWindow *win, const char *msg);

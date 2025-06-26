@@ -8,7 +8,7 @@
 // --- DECLARE WIDGETS --- //
 
 #define ERRANDS_TYPE_TASK (errands_task_get_type())
-G_DECLARE_FINAL_TYPE(ErrandsTask, errands_task, ERRANDS, TASK, AdwBin)
+G_DECLARE_FINAL_TYPE(ErrandsTask, errands_task, ERRANDS, TASK, GtkListBoxRow)
 #define ERRANDS_TYPE_DATE_CHOOSER (errands_date_chooser_get_type())
 G_DECLARE_FINAL_TYPE(ErrandsDateChooser, errands_date_chooser, ERRANDS, DATE_CHOOSER, GtkBox)
 #define ERRANDS_TYPE_MONTH_CHOOSER (errands_month_chooser_get_type())
@@ -38,7 +38,7 @@ G_DECLARE_FINAL_TYPE(ErrandsPriorityWindow, errands_priority_window, ERRANDS, PR
 // --- TASK --- //
 
 struct _ErrandsTask {
-  AdwBin parent_instance;
+  GtkListBoxRow parent_instance;
 
   GtkWidget *clamp;
 
@@ -61,21 +61,24 @@ struct _ErrandsTask {
   GtkWidget *attachments_btn;
   GtkWidget *color_btn;
   // Sub-tasks
+  GtkCustomFilter *sub_tasks_filter;
+  GtkFilterListModel *sub_tasks_filter_model;
   GtkWidget *sub_tasks_revealer;
   GtkWidget *sub_entry;
-  GtkWidget *sub_tasks;
+  GtkWidget *task_list;
 
   TaskData *data;
 };
 
 ErrandsTask *errands_task_new();
-void errands_task_set_data(ErrandsTask *task, TaskData *data);
+void errands_task_set_data(ErrandsTask *self, TaskData *data);
 void errands_task_update_accent_color(ErrandsTask *task);
 void errands_task_update_progress(ErrandsTask *task);
 void errands_task_update_tags(ErrandsTask *task);
 void errands_task_update_toolbar(ErrandsTask *task);
 GPtrArray *errands_task_get_parents(ErrandsTask *task);
 GPtrArray *errands_task_get_sub_tasks(ErrandsTask *task);
+const char *errands_task_as_str(ErrandsTask *task);
 
 // --- DATE WINDOW --- //
 

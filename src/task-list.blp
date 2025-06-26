@@ -1,0 +1,81 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $ErrandsTaskList: Adw.Bin {
+  width-request: 360;
+
+  Adw.ToolbarView {
+    [top]
+    Adw.HeaderBar {
+      title-widget: Adw.WindowTitle title {};
+
+      [start]
+      Button {
+        icon-name: "errands-sort-symbolic";
+        tooltip-text: _("Filter and Sort");
+        clicked => $on_sort_dialog_show_cb();
+      }
+
+      [start]
+      Button {
+        label: _("Test");
+        clicked => $on_test_btn_clicked_cb();
+      }
+
+      [end]
+      ToggleButton search_btn {
+        icon-name: "errands-search-symbolic";
+        tooltip-text: _("Search (Ctrl+F)");
+        action-name: "task-list.toggle_search";
+
+        ShortcutController {
+          Shortcut {
+            trigger: "<Control>F";
+            action: "action(task-list.toggle_search)";
+          }
+
+          scope: global;
+        }
+      }
+    }
+
+    [top]
+    SearchBar search_bar {
+      search-mode-enabled: bind search_btn.active;
+      key-capture-widget: search_entry;
+
+      SearchEntry search_entry {
+        search-changed => $on_task_list_search_cb();
+      }
+    }
+
+    content: Box {
+      orientation: vertical;
+
+      Revealer entry_rev {
+        transition-type: swing_down;
+
+        Adw.Clamp {
+          tightening-threshold: 300;
+          maximum-size: 1000;
+
+          Adw.EntryRow {
+            title: _("Add Task");
+            activatable: false;
+            entry-activated => $on_task_list_entry_activated_cb();
+
+            styles [
+              "card",
+            ]
+          }
+        }
+      }
+
+      ScrolledWindow {
+        propagate-natural-height: true;
+
+        ListView task_list {}
+      }
+    };
+  }
+}

@@ -1,6 +1,8 @@
 #pragma once
 
-#include "../data/data.h"
+#include "data/data.h"
+#include "task-list-sort-dialog.h"
+#include "task/task.h"
 
 #include <adwaita.h>
 
@@ -9,12 +11,13 @@ G_DECLARE_FINAL_TYPE(ErrandsTaskList, errands_task_list, ERRANDS, TASK_LIST, Adw
 
 struct _ErrandsTaskList {
   AdwBin parent_instance;
-  GtkWidget *title;
-  GtkWidget *search_btn;
-  GtkWidget *entry;
-  GtkWidget *task_list;
 
-  ListData *data;
+  GtkWidget *title;
+  GtkWidget *task_list;
+  GtkWidget *search_btn;
+  GtkWidget *search_bar;
+  GtkWidget *search_entry;
+  GtkWidget *entry_rev;
 
   GListStore *tasks_model;
   GtkCustomFilter *toplevel_tasks_filter;
@@ -26,7 +29,17 @@ struct _ErrandsTaskList {
   GtkCustomFilter *search_filter;
   GtkFilterListModel *search_filter_model;
   const char *search_query;
-  GtkNoSelection *selection_model;
+
+  ErrandsTaskListSortDialog *sort_dialog;
+
+  ErrandsAttachmentsWindow *attachments_window;
+  ErrandsColorWindow *color_window;
+  ErrandsNotesWindow *notes_window;
+  ErrandsPriorityWindow *priority_window;
+  ErrandsTagsWindow *tags_window;
+  ErrandsDateWindow *date_window;
+
+  ListData *data;
 };
 
 ErrandsTaskList *errands_task_list_new();

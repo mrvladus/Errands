@@ -84,15 +84,17 @@ ErrandsNotesWindow *errands_notes_window_new() {
 }
 
 void errands_notes_window_show(ErrandsTask *task) {
-  if (!state.notes_window) state.notes_window = errands_notes_window_new();
+  if (!state.main_window->task_list->notes_window)
+    state.main_window->task_list->notes_window = errands_notes_window_new();
 
-  adw_dialog_present(ADW_DIALOG(state.notes_window), GTK_WIDGET(state.main_window));
-  state.notes_window->task = task;
+  adw_dialog_present(ADW_DIALOG(state.main_window->task_list->notes_window), GTK_WIDGET(state.main_window));
+  state.main_window->task_list->notes_window->task = task;
   const char *notes = errands_data_get_str(task->data, DATA_PROP_NOTES);
   if (!notes) return;
   g_autofree gchar *text = gtk_source_utils_unescape_search_text(notes);
-  gtk_text_buffer_set_text(gtk_text_view_get_buffer(GTK_TEXT_VIEW(state.notes_window->view)), text, -1);
-  gtk_widget_grab_focus(state.notes_window->view);
+  gtk_text_buffer_set_text(gtk_text_view_get_buffer(GTK_TEXT_VIEW(state.main_window->task_list->notes_window->view)),
+                           text, -1);
+  gtk_widget_grab_focus(state.main_window->task_list->notes_window->view);
 }
 
 // --- SIGNAL HANDLERS --- //
@@ -120,13 +122,13 @@ static void on_errands_notes_window_close_cb(ErrandsNotesWindow *win, gpointer _
 }
 
 static gboolean on_style_toggled(GBinding *binding, const GValue *from_value, GValue *to_value, gpointer user_data) {
-  if (!state.notes_window) return false;
+  if (!state.main_window->task_list->notes_window) return false;
   // Set style scheme
   gtk_source_buffer_set_style_scheme(
-      state.notes_window->buffer,
+      state.main_window->task_list->notes_window->buffer,
       gtk_source_style_scheme_manager_get_scheme(gtk_source_style_scheme_manager_get_default(),
                                                  g_value_get_boolean(from_value) ? "Adwaita-dark" : "Adwaita"));
-  on_text_changed(state.notes_window);
+  on_text_changed(state.main_window->task_list->notes_window);
   return false;
 }
 

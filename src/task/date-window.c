@@ -119,24 +119,24 @@ static void errands_date_window_init(ErrandsDateWindow *self) {
 ErrandsDateWindow *errands_date_window_new() { return g_object_ref_sink(g_object_new(ERRANDS_TYPE_DATE_WINDOW, NULL)); }
 
 void errands_date_window_show(ErrandsTask *task) {
-  if (!state.date_window) state.date_window = errands_date_window_new();
+  if (!state.main_window->task_list->date_window) state.main_window->task_list->date_window = errands_date_window_new();
 
   TaskData *data = task->data;
 
   LOG("Date window: Show for '%s'", errands_data_get_str(data, DATA_PROP_UID));
 
-  state.date_window->task = task;
+  state.main_window->task_list->date_window->task = task;
 
   // Reset all rows
-  errands_date_chooser_reset(state.date_window->start_date_chooser);
-  errands_time_chooser_reset(state.date_window->start_time_chooser);
-  errands_date_chooser_reset(state.date_window->due_date_chooser);
-  errands_time_chooser_reset(state.date_window->due_time_chooser);
-  adw_combo_row_set_selected(ADW_COMBO_ROW(state.date_window->frequency_row), 2);
-  adw_spin_row_set_value(ADW_SPIN_ROW(state.date_window->interval_row), 1);
-  errands_week_chooser_reset(state.date_window->week_chooser);
-  errands_month_chooser_reset(state.date_window->month_chooser);
-  errands_date_chooser_reset(state.date_window->until_date_chooser);
+  errands_date_chooser_reset(state.main_window->task_list->date_window->start_date_chooser);
+  errands_time_chooser_reset(state.main_window->task_list->date_window->start_time_chooser);
+  errands_date_chooser_reset(state.main_window->task_list->date_window->due_date_chooser);
+  errands_time_chooser_reset(state.main_window->task_list->date_window->due_time_chooser);
+  adw_combo_row_set_selected(ADW_COMBO_ROW(state.main_window->task_list->date_window->frequency_row), 2);
+  adw_spin_row_set_value(ADW_SPIN_ROW(state.main_window->task_list->date_window->interval_row), 1);
+  errands_week_chooser_reset(state.main_window->task_list->date_window->week_chooser);
+  errands_month_chooser_reset(state.main_window->task_list->date_window->month_chooser);
+  errands_date_chooser_reset(state.main_window->task_list->date_window->until_date_chooser);
 
   // Set start date and time
 
@@ -146,13 +146,13 @@ void errands_date_window_show(ErrandsTask *task) {
     g_autoptr(GString) s_date = g_string_new(start_dt);
     // If start date not empty
     if (strcmp(s_date->str, "")) {
-      errands_date_chooser_set_date(state.date_window->start_date_chooser, s_date->str);
+      errands_date_chooser_set_date(state.main_window->task_list->date_window->start_date_chooser, s_date->str);
       LOG("Date window: Set start date to '%s'", s_date->str);
       // Set start time
       const char *s_time = strstr(s_date->str, "T");
       if (s_time) {
         s_time++;
-        errands_time_chooser_set_time(state.date_window->start_time_chooser, s_time);
+        errands_time_chooser_set_time(state.main_window->task_list->date_window->start_time_chooser, s_time);
         LOG("Date window: Set start time to '%s'", s_time);
       }
     }
@@ -164,13 +164,13 @@ void errands_date_window_show(ErrandsTask *task) {
     g_autoptr(GString) d_date = g_string_new(errands_data_get_str(data, DATA_PROP_DUE));
     // If due date not empty set date
     if (strcmp(d_date->str, "")) {
-      errands_date_chooser_set_date(state.date_window->due_date_chooser, d_date->str);
+      errands_date_chooser_set_date(state.main_window->task_list->date_window->due_date_chooser, d_date->str);
       LOG("Date window: Set due date to '%s'", d_date->str);
       // If time is set
       const char *d_time = strstr(d_date->str, "T");
       if (d_time) {
         d_time++;
-        errands_time_chooser_set_time(state.date_window->due_time_chooser, d_time);
+        errands_time_chooser_set_time(state.main_window->task_list->date_window->due_time_chooser, d_time);
         LOG("Date window: Set due time to '%s'", d_time);
       }
     }
@@ -179,8 +179,9 @@ void errands_date_window_show(ErrandsTask *task) {
   // Setup repeat
   const char *rrule = errands_data_get_str(data, DATA_PROP_RRULE);
   bool is_repeated = rrule ? true : false;
-  adw_expander_row_set_enable_expansion(ADW_EXPANDER_ROW(state.date_window->repeat_row), is_repeated);
-  adw_expander_row_set_expanded(ADW_EXPANDER_ROW(state.date_window->repeat_row), is_repeated);
+  adw_expander_row_set_enable_expansion(ADW_EXPANDER_ROW(state.main_window->task_list->date_window->repeat_row),
+                                        is_repeated);
+  adw_expander_row_set_expanded(ADW_EXPANDER_ROW(state.main_window->task_list->date_window->repeat_row), is_repeated);
   // if (!is_repeated) {
   //   LOG("Date window: Reccurrence is disabled");
   // } else {
@@ -188,17 +189,17 @@ void errands_date_window_show(ErrandsTask *task) {
   //   char *freq = get_rrule_value(rrule, "FREQ");
   //   if (freq) {
   //     if (!strcmp(freq, "MINUTELY"))
-  //       adw_combo_row_set_selected(ADW_COMBO_ROW(state.date_window->frequency_row), 0);
+  //       adw_combo_row_set_selected(ADW_COMBO_ROW(state.main_window->task_list->date_window->frequency_row), 0);
   //     else if (!strcmp(freq, "HOURLY"))
-  //       adw_combo_row_set_selected(ADW_COMBO_ROW(state.date_window->frequency_row), 1);
+  //       adw_combo_row_set_selected(ADW_COMBO_ROW(state.main_window->task_list->date_window->frequency_row), 1);
   //     else if (!strcmp(freq, "DAILY"))
-  //       adw_combo_row_set_selected(ADW_COMBO_ROW(state.date_window->frequency_row), 2);
+  //       adw_combo_row_set_selected(ADW_COMBO_ROW(state.main_window->task_list->date_window->frequency_row), 2);
   //     else if (!strcmp(freq, "WEEKLY"))
-  //       adw_combo_row_set_selected(ADW_COMBO_ROW(state.date_window->frequency_row), 3);
+  //       adw_combo_row_set_selected(ADW_COMBO_ROW(state.main_window->task_list->date_window->frequency_row), 3);
   //     else if (!strcmp(freq, "MONTHLY"))
-  //       adw_combo_row_set_selected(ADW_COMBO_ROW(state.date_window->frequency_row), 4);
+  //       adw_combo_row_set_selected(ADW_COMBO_ROW(state.main_window->task_list->date_window->frequency_row), 4);
   //     else if (!strcmp(freq, "YEARLY"))
-  //       adw_combo_row_set_selected(ADW_COMBO_ROW(state.date_window->frequency_row), 5);
+  //       adw_combo_row_set_selected(ADW_COMBO_ROW(state.main_window->task_list->date_window->frequency_row), 5);
   //     LOG("Date window: Set frequency to '%s'", freq);
   //     free(freq);
   //   }
@@ -208,25 +209,25 @@ void errands_date_window_show(ErrandsTask *task) {
   //   if (interval_str) {
   //     if (string_is_number(interval_str)) {
   //       int interval = atoi(interval_str);
-  //       adw_spin_row_set_value(ADW_SPIN_ROW(state.date_window->interval_row), interval);
+  //       adw_spin_row_set_value(ADW_SPIN_ROW(state.main_window->task_list->date_window->interval_row), interval);
   //     }
   //     LOG("Date window: Set interval to '%s'", interval_str);
   //     free(interval_str);
   //   } else {
-  //     adw_spin_row_set_value(ADW_SPIN_ROW(state.date_window->interval_row), 1);
+  //     adw_spin_row_set_value(ADW_SPIN_ROW(state.main_window->task_list->date_window->interval_row), 1);
   //     LOG("Date window: Set interval to '1'");
   //   }
 
   //   // Set weekdays
-  //   errands_week_chooser_set_days(state.date_window->week_chooser, rrule);
+  //   errands_week_chooser_set_days(state.main_window->task_list->date_window->week_chooser, rrule);
 
   //   // Set month
-  //   errands_month_chooser_set_months(state.date_window->month_chooser, rrule);
+  //   errands_month_chooser_set_months(state.main_window->task_list->date_window->month_chooser, rrule);
 
   //   // Set until date
   //   char *until = get_rrule_value(rrule, "UNTIL");
   //   if (until) {
-  //     errands_date_chooser_set_date(state.date_window->until_date_chooser, until);
+  //     errands_date_chooser_set_date(state.main_window->task_list->date_window->until_date_chooser, until);
   //     LOG("Date window: Set until date to '%s'", until);
   //     free(until);
   //   } else {
@@ -235,18 +236,18 @@ void errands_date_window_show(ErrandsTask *task) {
   //     if (count_str) {
   //       if (string_is_number(count_str)) {
   //         int count = atoi(count_str);
-  //         adw_spin_row_set_value(ADW_SPIN_ROW(state.date_window->count_row), count);
+  //         adw_spin_row_set_value(ADW_SPIN_ROW(state.main_window->task_list->date_window->count_row), count);
   //       }
   //       LOG("Date window: Set count to '%s'", count_str);
   //       free(count_str);
   //     } else {
-  //       adw_spin_row_set_value(ADW_SPIN_ROW(state.date_window->count_row), 0);
+  //       adw_spin_row_set_value(ADW_SPIN_ROW(state.main_window->task_list->date_window->count_row), 0);
   //       LOG("Date window: Set count to infinite");
   //     }
   //   }
   // }
 
-  adw_dialog_present(ADW_DIALOG(state.date_window), GTK_WIDGET(state.main_window));
+  adw_dialog_present(ADW_DIALOG(state.main_window->task_list->date_window), GTK_WIDGET(state.main_window));
 }
 
 // --- SIGNAL HANDLERS --- //

@@ -1,83 +1,73 @@
 #include "window.h"
 #include "data/data.h"
-#include "no-lists-page.h"
 #include "settings.h"
-#include "sidebar/sidebar.h"
+#include "sidebar.h"
 #include "state.h"
-#include "task-list/task-list.h"
+#include "task-list.h"
 #include "utils.h"
 
-#include <glib/gi18n.h>
-
-static void on_size_changed(ErrandsWindow *win);
-static void on_state_changed(ErrandsWindow *win);
+static void on_size_changed_cb(ErrandsWindow *win);
+static void on_maximize_changed_cb(ErrandsWindow *win);
+static void on_new_list_btn_clicked_cb();
 
 G_DEFINE_TYPE(ErrandsWindow, errands_window, ADW_TYPE_APPLICATION_WINDOW)
 
-static void errands_window_class_init(ErrandsWindowClass *class) {}
-
-static void errands_window_init(ErrandsWindow *self) {
-  LOG("Main Window: Create");
-  g_object_set(self, "application", GTK_APPLICATION(state.app), "title", _("Errands"), NULL);
-  self->stack = adw_view_stack_new();
-  self->split_view = adw_navigation_split_view_new();
-  self->no_lists_page = errands_no_lists_page_new();
-  GtkWidget *overlay = gtk_overlay_new();
-  gtk_overlay_add_overlay(GTK_OVERLAY(overlay), GTK_WIDGET(self->no_lists_page));
-  gtk_overlay_set_child(GTK_OVERLAY(overlay), self->split_view);
-  self->toast_overlay = adw_toast_overlay_new();
-  adw_toast_overlay_set_child(ADW_TOAST_OVERLAY(self->toast_overlay), overlay);
-  adw_application_window_set_content(ADW_APPLICATION_WINDOW(self), self->toast_overlay);
+static void errands_window_dispose(GObject *gobject) {
+  gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_WINDOW);
+  G_OBJECT_CLASS(errands_window_parent_class)->dispose(gobject);
 }
 
-ErrandsWindow *errands_window_new() {
-  ErrandsWindow *self = g_object_new(ERRANDS_TYPE_WINDOW, NULL);
-  if (errands_settings_get("maximized", SETTING_TYPE_BOOL).b) gtk_window_maximize(GTK_WINDOW(self));
-  gtk_window_set_default_size(GTK_WINDOW(self), errands_settings_get("window_width", SETTING_TYPE_INT).i,
-                              errands_settings_get("window_height", SETTING_TYPE_INT).i);
-  g_signal_connect_swapped(self, "notify::default-width", G_CALLBACK(on_size_changed), self);
-  g_signal_connect_swapped(self, "notify::default-height", G_CALLBACK(on_size_changed), self);
-  g_signal_connect_swapped(self, "notify::maximized", G_CALLBACK(on_state_changed), self);
-  return self;
+static void errands_window_class_init(ErrandsWindowClass *class) {
+  G_OBJECT_CLASS(class)->dispose = errands_window_dispose;
+  g_type_ensure(ERRANDS_TYPE_SIDEBAR);
+  g_type_ensure(ERRANDS_TYPE_TASK_LIST);
+  gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), "/io/github/mrvladus/Errands/ui/window.ui");
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsWindow, toast_overlay);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsWindow, split_view);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsWindow, sidebar);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsWindow, stack);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsWindow, task_list);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsWindow, no_lists_page);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_maximize_changed_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_size_changed_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_new_list_btn_clicked_cb);
 }
 
-void errands_window_build(ErrandsWindow *win) {
-  // Sidebar
-  state.sidebar = errands_sidebar_new();
-  adw_navigation_split_view_set_sidebar(ADW_NAVIGATION_SPLIT_VIEW(win->split_view),
-                                        adw_navigation_page_new(GTK_WIDGET(state.sidebar), "Sidebar"));
+static void errands_window_init(ErrandsWindow *self) { gtk_widget_init_template(GTK_WIDGET(self)); }
 
-  // Content
-  adw_navigation_split_view_set_content(ADW_NAVIGATION_SPLIT_VIEW(win->split_view),
-                                        adw_navigation_page_new(win->stack, "Content"));
-
-  state.task_list = errands_task_list_new();
+ErrandsWindow *errands_window_new(GtkApplication *app) {
+  return g_object_new(ERRANDS_TYPE_WINDOW, "application", app, "maximized",
+                      errands_settings_get("maximized", SETTING_TYPE_BOOL).b, "default-width",
+                      errands_settings_get("window_width", SETTING_TYPE_INT).i, "default-height",
+                      errands_settings_get("window_height", SETTING_TYPE_INT).i, NULL);
 }
 
 void errands_window_update(ErrandsWindow *win) {
-  LOG("Main Window: Update");
-  int count = 0;
+  LOG("Window: Update");
+  size_t count = 0;
   GPtrArray *lists = g_hash_table_get_values_as_ptr_array(ldata);
-  for (int i = 0; i < lists->len; i++) {
-    ListData *ld = lists->pdata[i];
-    if (!errands_data_get_bool(ld, DATA_PROP_DELETED)) count++;
-  }
+  for (int i = 0; i < lists->len; i++)
+    if (!errands_data_get_bool(lists->pdata[i], DATA_PROP_DELETED)) count++;
+  g_ptr_array_free(lists, false);
   g_object_set(state.main_window->no_lists_page, "visible", count == 0, NULL);
 }
 
 void errands_window_add_toast(ErrandsWindow *win, const char *msg) {
+  LOG("Window: Add Toast '%s'", msg);
   adw_toast_overlay_add_toast(ADW_TOAST_OVERLAY(win->toast_overlay), adw_toast_new(msg));
 }
 
 // --- SIGNAL HANDLERS --- //
 
-static void on_size_changed(ErrandsWindow *win) {
+static void on_size_changed_cb(ErrandsWindow *win) {
   int w, h;
   gtk_window_get_default_size(GTK_WINDOW(win), &w, &h);
   errands_settings_set_int("window_width", w);
   errands_settings_set_int("window_height", h);
 }
 
-static void on_state_changed(ErrandsWindow *win) {
+static void on_maximize_changed_cb(ErrandsWindow *win) {
   errands_settings_set_bool("maximized", gtk_window_is_maximized(GTK_WINDOW(win)));
 }
+
+static void on_new_list_btn_clicked_cb() { errands_sidebar_new_list_dialog_show(); }

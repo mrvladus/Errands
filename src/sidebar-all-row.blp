@@ -1,0 +1,26 @@
+using Gtk 4.0;
+
+template $ErrandsSidebarAllRow: ListBoxRow {
+  Box {
+    spacing: 12;
+
+    Image {
+      icon-name: "errands-all-tasks-symbolic";
+    }
+
+    Label {
+      label: C_("All Tasks", "All");
+    }
+
+    Label counter {
+      label: "";
+      hexpand: true;
+      halign: end;
+
+      styles [
+        "dim-label",
+        "caption",
+      ]
+    }
+  }
+}

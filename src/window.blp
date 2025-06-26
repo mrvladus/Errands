@@ -1,0 +1,64 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $ErrandsWindow: Adw.ApplicationWindow {
+  title: _("Errands");
+  notify::default-width => $on_size_changed_cb();
+  notify::default-height => $on_size_changed_cb();
+  notify::maximized => $on_maximize_changed_cb();
+
+  Adw.ToastOverlay toast_overlay {
+    Overlay {
+      Adw.NavigationSplitView split_view {
+        sidebar: Adw.NavigationPage {
+          title: _("Sidebar");
+
+          child: $ErrandsSidebar sidebar {};
+        };
+
+        content: Adw.NavigationPage {
+          title: _("Content");
+
+          child: Adw.ViewStack stack {
+            Adw.ViewStackPage {
+              name: "errands_task_list_page";
+
+              child: $ErrandsTaskList task_list {};
+            }
+          };
+        };
+      }
+
+      [overlay]
+      Adw.Bin no_lists_page {
+        styles [
+          "background",
+        ]
+
+        Adw.ToolbarView {
+          [top]
+          Adw.HeaderBar {
+            show-title: false;
+          }
+
+          content: Adw.StatusPage {
+            title: _("Add Task List");
+            icon-name: "io.github.mrvladus.List";
+
+            Button {
+              icon-name: "errands-add-symbolic";
+              halign: center;
+              tooltip-text: _("Create new Task List");
+              clicked => $on_new_list_btn_clicked_cb();
+
+              styles [
+                "pill",
+                "suggested-action",
+              ]
+            }
+          };
+        }
+      }
+    }
+  }
+}

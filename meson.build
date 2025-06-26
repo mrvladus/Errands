@@ -8,7 +8,7 @@ project(
 # Dependencies
 subdir('src' / 'sync' / 'caldav') # Build 'libcaldav' to work with CalDAV servers
 dependencies = [
-  dependency('libportal'), # For flatpak sandbox
+  dependency('libportal'), # For checking flatpak sandbox
   dependency('libical'), # For working with user data in ical format
   dependency('gtksourceview-5'), # For notes syntax highlighting
   dependency('webkitgtk-6.0'), # For markdown preview
@@ -22,18 +22,15 @@ sources = files(
   'src/data/data-props.c',
   'src/data/data.c',
   'src/main.c',
-  'src/no-lists-page.c',
   'src/settings.c',
-  'src/sidebar/delete-list-dialog.c',
-  'src/sidebar/new-list-dialog.c',
-  'src/sidebar/rename-list-dialog.c',
-  'src/sidebar/sidebar-all-row.c',
-  'src/sidebar/sidebar-task-list-row.c',
-  'src/sidebar/sidebar.c',
+  'src/sidebar-all-row.c',
+  'src/sidebar-new-list-dialog.c',
+  'src/sidebar-task-list-row.c',
+  'src/sidebar.c',
   'src/state.c',
   'src/sync/sync.c',
-  'src/task-list/sort-dialog.c',
-  'src/task-list/task-list.c',
+  'src/task-list-sort-dialog.c',
+  'src/task-list.c',
   'src/task/attachments-window.c',
   'src/task/color-window.c',
   'src/task/date-chooser.c',
@@ -57,12 +54,35 @@ configure_file(
   },
 )
 
+# UI files
+blueprints = custom_target(
+  'blueprints',
+  input: files(
+    'src/sidebar-all-row.blp',
+    'src/sidebar-new-list-dialog.blp',
+    'src/sidebar-task-list-row.blp',
+    'src/sidebar.blp',
+    'src/task-list-sort-dialog.blp',
+    'src/task-list.blp',
+    'src/window.blp',
+  ),
+  output: '.',
+  command: [
+    find_program('blueprint-compiler'),
+    'batch-compile',
+    '@OUTPUT@',
+    '@CURRENT_SOURCE_DIR@',
+    '@INPUT@',
+  ],
+)
+
 # Resources
 gnome = import('gnome')
 resources = gnome.compile_resources(
   meson.project_name(),
   'data' / 'errands.gresource.xml',
   c_name: meson.project_name(),
+  dependencies: blueprints,
   source_dir: 'data',
 )
 

@@ -1,0 +1,49 @@
+using Gtk 4.0;
+
+menu rc_menu {
+  item (_("Rename"), "task-list-row.rename")
+  item (_("Delete"), "task-list-row.delete")
+  item (_("Export"), "task-list-row.export")
+  item (_("Print"), "task-list-row.print")
+}
+
+template $ErrandsSidebarTaskListRow: Gtk.ListBoxRow {
+  Box {
+    spacing: 6;
+
+    styles [
+      "sidebar-task-list-row",
+    ]
+
+    Gtk.ColorDialogButton color_btn {
+      dialog: Gtk.ColorDialog {};
+    }
+
+    Label label {
+      label: "";
+      ellipsize: end;
+    }
+
+    Label counter {
+      label: "";
+      hexpand: true;
+      halign: end;
+
+      styles [
+        "dim-label",
+        "caption",
+      ]
+    }
+
+    PopoverMenu popover_menu {
+      menu-model: rc_menu;
+      has-arrow: false;
+      halign: start;
+    }
+
+    GestureClick {
+      button: 3;
+      released => $on_right_click(popover_menu);
+    }
+  }
+}

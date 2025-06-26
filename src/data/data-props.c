@@ -61,9 +61,11 @@ const char *errands_data_get_str(icalcomponent *data, DataPropStr prop) {
   case DATA_PROP_DUE: out = icaltime_as_ical_string(icalcomponent_get_due(data)); break;
   case DATA_PROP_END: out = icaltime_as_ical_string(icalcomponent_get_dtend(data)); break;
   case DATA_PROP_NOTES: out = icalcomponent_get_description(data); break;
-  case DATA_PROP_PARENT:
-    out = icalproperty_as_ical_string(icalcomponent_get_first_property(data, ICAL_RELATEDTO_PROPERTY));
+  case DATA_PROP_PARENT: {
+    icalproperty *property = icalcomponent_get_first_property(data, ICAL_RELATEDTO_PROPERTY);
+    if (property) out = icalproperty_get_relatedto(property);
     break;
+  }
   case DATA_PROP_RRULE: {
     icalproperty *property = icalcomponent_get_first_property(data, ICAL_RRULE_PROPERTY);
     if (property) {

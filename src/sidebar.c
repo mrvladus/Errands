@@ -1,0 +1,226 @@
+#include "sidebar.h"
+#include "components.h"
+#include "data/data.h"
+#include "settings.h"
+#include "state.h"
+#include "task-list.h"
+#include "utils.h"
+#include "window.h"
+
+#include <glib/gi18n.h>
+
+// --- DECLARATIONS --- //
+
+static void on_errands_sidebar_filter_row_activated(GtkListBox *box, GtkListBoxRow *row, gpointer data);
+static void on_import_action_cb(GSimpleAction *action, GVariant *param, ErrandsSidebar *self);
+
+static void on_rename_entry_changed_cb(GtkWidget *dialog, AdwEntryRow *entry);
+static void on_rename_entry_activated_cb(GtkWidget *dialog, AdwEntryRow *entry);
+static void on_rename_response_cb(GtkWidget *dialog, gchar *response, gpointer data);
+
+static void on_delete_response_cb(GtkWidget *dialog, gchar *response, gpointer data);
+
+// --- IMPLEMENTATIONS --- //
+
+G_DEFINE_TYPE(ErrandsSidebar, errands_sidebar, ADW_TYPE_BIN)
+
+static void errands_sidebar_dispose(GObject *gobject) {
+  gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_SIDEBAR);
+  G_OBJECT_CLASS(errands_sidebar_parent_class)->dispose(gobject);
+}
+
+static void errands_sidebar_class_init(ErrandsSidebarClass *class) {
+  G_OBJECT_CLASS(class)->dispose = errands_sidebar_dispose;
+
+  g_type_ensure(ERRANDS_TYPE_SIDEBAR_ALL_ROW);
+  g_type_ensure(ERRANDS_TYPE_SIDEBAR_TASK_LIST_ROW);
+
+  gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), "/io/github/mrvladus/Errands/ui/sidebar.ui");
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, filters_box);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, all_row);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, task_lists_box);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, rename_list_dialog);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, rename_list_dialog_entry);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, delete_list_dialog);
+
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_errands_sidebar_filter_row_activated);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_errands_sidebar_task_list_row_activate);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_rename_entry_changed_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_rename_entry_activated_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_rename_response_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_delete_response_cb);
+}
+
+static void errands_sidebar_init(ErrandsSidebar *self) {
+  gtk_widget_init_template(GTK_WIDGET(self));
+  g_autoptr(GSimpleActionGroup) ag = errands_action_group_new(2, "import", on_import_action_cb, self, "new_list",
+                                                              errands_sidebar_new_list_dialog_show, NULL);
+  gtk_widget_insert_action_group(GTK_WIDGET(self), "sidebar", G_ACTION_GROUP(ag));
+}
+
+ErrandsSidebar *errands_sidebar_new() { return g_object_new(ERRANDS_TYPE_SIDEBAR, NULL); }
+
+void errands_sidebar_load_lists(ErrandsSidebar *self) {
+  // Add rows
+  GPtrArray *lists = g_hash_table_get_values_as_ptr_array(ldata);
+  for (size_t i = 0; i < lists->len; i++) {
+    ListData *ld = lists->pdata[i];
+    if (!errands_data_get_bool(ld, DATA_PROP_DELETED)) {
+      ErrandsSidebarTaskListRow *row = errands_sidebar_task_list_row_new(ld);
+      gtk_list_box_append(GTK_LIST_BOX(self->task_lists_box), GTK_WIDGET(row));
+    }
+  }
+  g_ptr_array_free(lists, false);
+  errands_sidebar_all_row_update_counter(self->all_row);
+  errands_window_update(state.main_window);
+  // Select last opened page
+  g_signal_connect(state.main_window, "realize", G_CALLBACK(errands_sidebar_select_last_opened_page), NULL);
+}
+
+ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(ErrandsSidebar *sb, ListData *data) {
+  LOG("Sidebar: Add task list '%s'", errands_data_get_str(data, DATA_PROP_LIST_UID));
+  ErrandsSidebarTaskListRow *row = errands_sidebar_task_list_row_new(data);
+  gtk_list_box_append(GTK_LIST_BOX(sb->task_lists_box), GTK_WIDGET(row));
+  return row;
+}
+
+void errands_sidebar_select_last_opened_page() {
+  GPtrArray *rows = get_children(state.main_window->sidebar->task_lists_box);
+  const char *last_uid = errands_settings_get("last_list_uid", SETTING_TYPE_STRING).s;
+  LOG("Sidebar: Selecting last opened list: '%s'", last_uid);
+  for (size_t i = 0; i < rows->len; i++) {
+    ErrandsSidebarTaskListRow *row = rows->pdata[i];
+    if (g_str_equal(last_uid, errands_data_get_str(row->data, DATA_PROP_LIST_UID)))
+      g_signal_emit_by_name(row, "activate", NULL);
+  }
+}
+
+void errands_sidebar_rename_list_dialog_show(ErrandsSidebarTaskListRow *row) {
+  state.main_window->sidebar->current_task_list_row = row;
+  gtk_editable_set_text(GTK_EDITABLE(state.main_window->sidebar->rename_list_dialog_entry),
+                        errands_data_get_str(row->data, DATA_PROP_LIST_NAME));
+  adw_dialog_present(ADW_DIALOG(state.main_window->sidebar->rename_list_dialog), GTK_WIDGET(state.main_window));
+  gtk_widget_grab_focus(state.main_window->sidebar->rename_list_dialog);
+}
+
+void errands_sidebar_delete_list_dialog_show(ErrandsSidebarTaskListRow *row) {
+  state.main_window->sidebar->current_task_list_row = row;
+  LOG("Show delete dialog for '%s'", errands_data_get_str(row->data, DATA_PROP_LIST_UID));
+  adw_dialog_present(ADW_DIALOG(state.main_window->sidebar->delete_list_dialog), GTK_WIDGET(state.main_window));
+}
+
+// --- SIGNAL HANDLERS --- //
+
+static void on_errands_sidebar_filter_row_activated(GtkListBox *box, GtkListBoxRow *row, gpointer data) {
+  gtk_list_box_unselect_all(GTK_LIST_BOX(state.main_window->sidebar->task_lists_box));
+  if (GTK_WIDGET(row) == GTK_WIDGET(state.main_window->sidebar->all_row)) {
+    LOG("Sidebar: Switch to all tasks page");
+    adw_view_stack_set_visible_child_name(ADW_VIEW_STACK(state.main_window->stack), "errands_task_list_page");
+    errands_task_list_update_title();
+    gtk_revealer_set_reveal_child(GTK_REVEALER(state.main_window->task_list->entry_rev), false);
+    // Filter task list
+    state.main_window->task_list->data = NULL;
+    // gtk_filter_changed(GTK_FILTER(state.task_list->toplevel_tasks_filter), GTK_FILTER_CHANGE_LESS_STRICT);
+  }
+}
+
+static void __on_open_finish(GObject *obj, GAsyncResult *res, ErrandsSidebar *sb) {
+  g_autoptr(GFile) file = gtk_file_dialog_open_finish(GTK_FILE_DIALOG(obj), res, NULL);
+  if (!file) return;
+  g_autofree gchar *path = g_file_get_path(file);
+  char *ical = read_file_to_string(path);
+  if (ical) {
+    g_autofree gchar *basename = g_file_get_basename(file);
+    *(strrchr(basename, '.')) = '\0';
+    ListData *data = list_data_new_from_ical(ical, basename, g_hash_table_size(ldata));
+    free(ical);
+    // Check if uid exists
+    bool exists = g_hash_table_contains(ldata, errands_data_get_str(data, DATA_PROP_LIST_UID));
+    if (!exists) {
+      LOG("Sidebar: List already exists");
+      errands_window_add_toast(state.main_window, _("List already exists"));
+      errands_data_free(data);
+      return;
+    }
+    g_hash_table_insert(ldata, strdup(errands_data_get_str(data, DATA_PROP_LIST_UID)), data);
+    errands_sidebar_add_task_list(sb, data);
+    GPtrArray *tasks = list_data_get_tasks(data);
+    for (size_t i = 0; i < tasks->len; i++) {
+      TaskData *td = tasks->pdata[i];
+      g_hash_table_insert(tdata, strdup(errands_data_get_str(data, DATA_PROP_UID)), td);
+      // TODO
+      // errands_task_list_add(td);
+    }
+    errands_data_write_list(data);
+    // errands_task_list_filter_by_uid(basename);
+  }
+  // TODO: sync
+}
+
+static void on_import_action_cb(GSimpleAction *action, GVariant *param, ErrandsSidebar *self) {
+  g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
+  gtk_file_dialog_open(dialog, GTK_WINDOW(state.main_window), NULL, (GAsyncReadyCallback)__on_open_finish, self);
+}
+
+static void on_rename_entry_changed_cb(GtkWidget *dialog, AdwEntryRow *entry) {
+  const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
+  const char *list_name =
+      errands_data_get_str(state.main_window->sidebar->current_task_list_row->data, DATA_PROP_LIST_NAME);
+  const bool enable = !g_str_equal("", text) && !g_str_equal(text, list_name);
+  adw_alert_dialog_set_response_enabled(ADW_ALERT_DIALOG(dialog), "rename", enable);
+}
+
+static void on_rename_entry_activated_cb(GtkWidget *dialog, AdwEntryRow *entry) {
+  const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
+  if (g_str_equal(text, "")) return;
+  on_rename_response_cb(dialog, "rename", NULL);
+  adw_dialog_close(ADW_DIALOG(dialog));
+}
+
+static void on_rename_response_cb(GtkWidget *dialog, gchar *response, gpointer data) {
+  if (g_str_equal(response, "rename")) {
+    const char *text = gtk_editable_get_text(GTK_EDITABLE(state.main_window->sidebar->rename_list_dialog_entry));
+    errands_data_set_str(state.main_window->sidebar->current_task_list_row->data, DATA_PROP_LIST_NAME, text);
+    errands_data_write_list(state.main_window->sidebar->current_task_list_row->data);
+    errands_sidebar_task_list_row_update_title(state.main_window->sidebar->current_task_list_row);
+    // TODO: update task list title if current uid is the same as this
+    // TODO: sync
+  }
+}
+
+static void on_delete_response_cb(GtkWidget *dialog, gchar *response, gpointer data) {
+  if (!strcmp(response, "delete")) {
+    ErrandsSidebarTaskListRow *row = state.main_window->sidebar->current_task_list_row;
+    LOG("Delete List Dialog: Deleting task list %s", errands_data_get_str(row->data, DATA_PROP_LIST_UID));
+    // Delete tasks widgets
+    GPtrArray *tasks = get_children(state.main_window->task_list->task_list);
+    for (size_t i = 0; i < tasks->len; i++) {
+      ErrandsTask *task = tasks->pdata[i];
+      if (!strcmp(errands_data_get_str(row->data, DATA_PROP_LIST_UID),
+                  errands_data_get_str(task->data, DATA_PROP_LIST_UID)))
+        gtk_list_box_remove(GTK_LIST_BOX(state.main_window->task_list->task_list), GTK_WIDGET(task));
+    }
+    // Delete data
+    errands_data_set_bool(row->data, DATA_PROP_DELETED, true);
+    errands_data_set_bool(row->data, DATA_PROP_SYNCED, false);
+    // g_ptr_array_remove(ldata, dialog->row->data);
+    errands_data_write_list(row->data);
+
+    GtkWidget *prev = gtk_widget_get_prev_sibling(GTK_WIDGET(row));
+    GtkWidget *next = gtk_widget_get_next_sibling(GTK_WIDGET(row));
+    // Delete sidebar row
+    gtk_list_box_remove(GTK_LIST_BOX(state.main_window->sidebar->task_lists_box), GTK_WIDGET(row));
+    // Switch row
+    if (prev) {
+      g_signal_emit_by_name(prev, "activate", NULL);
+      return;
+    }
+    if (next) {
+      g_signal_emit_by_name(next, "activate", NULL);
+      return;
+    }
+    // Show placeholder
+    errands_window_update(state.main_window);
+    // TODO: sync
+  }
+}

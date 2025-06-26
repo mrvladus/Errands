@@ -44,13 +44,14 @@ ErrandsColorWindow *errands_color_window_new() {
 }
 
 void errands_color_window_show(ErrandsTask *task) {
-  if (!state.color_window) state.color_window = errands_color_window_new();
+  if (!state.main_window->task_list->color_window)
+    state.main_window->task_list->color_window = errands_color_window_new();
 
-  state.color_window->block_signals = true;
-  state.color_window->task = task;
+  state.main_window->task_list->color_window->block_signals = true;
+  state.main_window->task_list->color_window->task = task;
 
   // Select color
-  GPtrArray *colors = get_children(state.color_window->color_box);
+  GPtrArray *colors = get_children(state.main_window->task_list->color_window->color_box);
   for (size_t i = 0; i < colors->len; i++) {
     const char *name = gtk_widget_get_name(colors->pdata[i]);
     const char *color = errands_data_get_str(task->data, DATA_PROP_COLOR);
@@ -59,9 +60,9 @@ void errands_color_window_show(ErrandsTask *task) {
       break;
     }
   }
-  state.color_window->block_signals = false;
+  state.main_window->task_list->color_window->block_signals = false;
   // Show dialog
-  adw_dialog_present(ADW_DIALOG(state.color_window), GTK_WIDGET(state.main_window));
+  adw_dialog_present(ADW_DIALOG(state.main_window->task_list->color_window), GTK_WIDGET(state.main_window));
 }
 
 // --- SIGNAL HANDLERS --- //
