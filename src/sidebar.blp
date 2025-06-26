@@ -24,19 +24,6 @@ Adw.AlertDialog rename_list_dialog {
   };
 }
 
-Adw.AlertDialog delete_list_dialog {
-  close-response: "d_close";
-  default-response: "delete";
-  heading: _("Are you sure?");
-  response => $on_delete_response_cb();
-
-  responses [
-    d_close: _("Cancel"),
-    delete: _("Delete") destructive,
-  ]
-}
-
-
 menu add_menu {
   item (_("Import .ics"), "sidebar.import")
 }

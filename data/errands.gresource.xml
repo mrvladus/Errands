@@ -19,6 +19,10 @@
             compressed="true"
             alias="sidebar-new-list-dialog.ui"
         >src/sidebar-new-list-dialog.ui</file>
+    <file
+            compressed="true"
+            alias="sidebar-delete-list-dialog.ui"
+        >src/sidebar-delete-list-dialog.ui</file>
     <file compressed="true" alias="window.ui">src/window.ui</file>
     <file compressed="true" alias="task-list.ui">src/task-list.ui</file>
     <file

@@ -24,6 +24,7 @@ sources = files(
   'src/main.c',
   'src/settings.c',
   'src/sidebar-all-row.c',
+  'src/sidebar-delete-list-dialog.c',
   'src/sidebar-new-list-dialog.c',
   'src/sidebar-task-list-row.c',
   'src/sidebar.c',
@@ -59,6 +60,7 @@ blueprints = custom_target(
   'blueprints',
   input: files(
     'src/sidebar-all-row.blp',
+    'src/sidebar-delete-list-dialog.blp',
     'src/sidebar-new-list-dialog.blp',
     'src/sidebar-task-list-row.blp',
     'src/sidebar.blp',

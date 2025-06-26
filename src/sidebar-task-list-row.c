@@ -1,7 +1,7 @@
+#include "sidebar-task-list-row.h"
 #include "components.h"
 #include "data/data.h"
 #include "settings.h"
-#include "sidebar.h"
 #include "state.h"
 #include "utils.h"
 

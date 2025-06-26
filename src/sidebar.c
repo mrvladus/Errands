@@ -18,8 +18,6 @@ static void on_rename_entry_changed_cb(GtkWidget *dialog, AdwEntryRow *entry);
 static void on_rename_entry_activated_cb(GtkWidget *dialog, AdwEntryRow *entry);
 static void on_rename_response_cb(GtkWidget *dialog, gchar *response, gpointer data);
 
-static void on_delete_response_cb(GtkWidget *dialog, gchar *response, gpointer data);
-
 // --- IMPLEMENTATIONS --- //
 
 G_DEFINE_TYPE(ErrandsSidebar, errands_sidebar, ADW_TYPE_BIN)
@@ -41,14 +39,12 @@ static void errands_sidebar_class_init(ErrandsSidebarClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, task_lists_box);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, rename_list_dialog);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, rename_list_dialog_entry);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, delete_list_dialog);
 
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_errands_sidebar_filter_row_activated);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_errands_sidebar_task_list_row_activate);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_rename_entry_changed_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_rename_entry_activated_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_rename_response_cb);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_delete_response_cb);
 }
 
 static void errands_sidebar_init(ErrandsSidebar *self) {
@@ -101,12 +97,6 @@ void errands_sidebar_rename_list_dialog_show(ErrandsSidebarTaskListRow *row) {
                         errands_data_get_str(row->data, DATA_PROP_LIST_NAME));
   adw_dialog_present(ADW_DIALOG(state.main_window->sidebar->rename_list_dialog), GTK_WIDGET(state.main_window));
   gtk_widget_grab_focus(state.main_window->sidebar->rename_list_dialog);
-}
-
-void errands_sidebar_delete_list_dialog_show(ErrandsSidebarTaskListRow *row) {
-  state.main_window->sidebar->current_task_list_row = row;
-  LOG("Show delete dialog for '%s'", errands_data_get_str(row->data, DATA_PROP_LIST_UID));
-  adw_dialog_present(ADW_DIALOG(state.main_window->sidebar->delete_list_dialog), GTK_WIDGET(state.main_window));
 }
 
 // --- SIGNAL HANDLERS --- //
@@ -184,43 +174,6 @@ static void on_rename_response_cb(GtkWidget *dialog, gchar *response, gpointer d
     errands_data_write_list(state.main_window->sidebar->current_task_list_row->data);
     errands_sidebar_task_list_row_update_title(state.main_window->sidebar->current_task_list_row);
     // TODO: update task list title if current uid is the same as this
-    // TODO: sync
-  }
-}
-
-static void on_delete_response_cb(GtkWidget *dialog, gchar *response, gpointer data) {
-  if (!strcmp(response, "delete")) {
-    ErrandsSidebarTaskListRow *row = state.main_window->sidebar->current_task_list_row;
-    LOG("Delete List Dialog: Deleting task list %s", errands_data_get_str(row->data, DATA_PROP_LIST_UID));
-    // Delete tasks widgets
-    GPtrArray *tasks = get_children(state.main_window->task_list->task_list);
-    for (size_t i = 0; i < tasks->len; i++) {
-      ErrandsTask *task = tasks->pdata[i];
-      if (!strcmp(errands_data_get_str(row->data, DATA_PROP_LIST_UID),
-                  errands_data_get_str(task->data, DATA_PROP_LIST_UID)))
-        gtk_list_box_remove(GTK_LIST_BOX(state.main_window->task_list->task_list), GTK_WIDGET(task));
-    }
-    // Delete data
-    errands_data_set_bool(row->data, DATA_PROP_DELETED, true);
-    errands_data_set_bool(row->data, DATA_PROP_SYNCED, false);
-    // g_ptr_array_remove(ldata, dialog->row->data);
-    errands_data_write_list(row->data);
-
-    GtkWidget *prev = gtk_widget_get_prev_sibling(GTK_WIDGET(row));
-    GtkWidget *next = gtk_widget_get_next_sibling(GTK_WIDGET(row));
-    // Delete sidebar row
-    gtk_list_box_remove(GTK_LIST_BOX(state.main_window->sidebar->task_lists_box), GTK_WIDGET(row));
-    // Switch row
-    if (prev) {
-      g_signal_emit_by_name(prev, "activate", NULL);
-      return;
-    }
-    if (next) {
-      g_signal_emit_by_name(next, "activate", NULL);
-      return;
-    }
-    // Show placeholder
-    errands_window_update(state.main_window);
     // TODO: sync
   }
 }
