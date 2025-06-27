@@ -1,29 +1,6 @@
 using Gtk 4.0;
 using Adw 1;
 
-Adw.AlertDialog rename_list_dialog {
-  close-response: "r_close";
-  default-response: "rename";
-  response => $on_rename_response_cb();
-
-  responses [
-    r_close: _("Cancel"),
-    rename: _("Rename") suggested disabled,
-  ]
-
-  extra-child: ListBox {
-    styles [
-      "boxed-list",
-    ]
-
-    Adw.EntryRow rename_list_dialog_entry {
-      title: _("New List Name");
-      changed => $on_rename_entry_changed_cb(rename_list_dialog);
-      entry-activated => $on_rename_entry_activated_cb(rename_list_dialog);
-    }
-  };
-}
-
 menu add_menu {
   item (_("Import .ics"), "sidebar.import")
 }

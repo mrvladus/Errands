@@ -37,14 +37,9 @@ static void errands_sidebar_class_init(ErrandsSidebarClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, filters_box);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, all_row);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, task_lists_box);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, rename_list_dialog);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, rename_list_dialog_entry);
 
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_errands_sidebar_filter_row_activated);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_errands_sidebar_task_list_row_activate);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_rename_entry_changed_cb);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_rename_entry_activated_cb);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_rename_response_cb);
 }
 
 static void errands_sidebar_init(ErrandsSidebar *self) {
@@ -89,14 +84,6 @@ void errands_sidebar_select_last_opened_page() {
     if (g_str_equal(last_uid, errands_data_get_str(row->data, DATA_PROP_LIST_UID)))
       g_signal_emit_by_name(row, "activate", NULL);
   }
-}
-
-void errands_sidebar_rename_list_dialog_show(ErrandsSidebarTaskListRow *row) {
-  state.main_window->sidebar->current_task_list_row = row;
-  gtk_editable_set_text(GTK_EDITABLE(state.main_window->sidebar->rename_list_dialog_entry),
-                        errands_data_get_str(row->data, DATA_PROP_LIST_NAME));
-  adw_dialog_present(ADW_DIALOG(state.main_window->sidebar->rename_list_dialog), GTK_WIDGET(state.main_window));
-  gtk_widget_grab_focus(state.main_window->sidebar->rename_list_dialog);
 }
 
 // --- SIGNAL HANDLERS --- //
@@ -150,30 +137,4 @@ static void __on_open_finish(GObject *obj, GAsyncResult *res, ErrandsSidebar *sb
 static void on_import_action_cb(GSimpleAction *action, GVariant *param, ErrandsSidebar *self) {
   g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
   gtk_file_dialog_open(dialog, GTK_WINDOW(state.main_window), NULL, (GAsyncReadyCallback)__on_open_finish, self);
-}
-
-static void on_rename_entry_changed_cb(GtkWidget *dialog, AdwEntryRow *entry) {
-  const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
-  const char *list_name =
-      errands_data_get_str(state.main_window->sidebar->current_task_list_row->data, DATA_PROP_LIST_NAME);
-  const bool enable = !g_str_equal("", text) && !g_str_equal(text, list_name);
-  adw_alert_dialog_set_response_enabled(ADW_ALERT_DIALOG(dialog), "rename", enable);
-}
-
-static void on_rename_entry_activated_cb(GtkWidget *dialog, AdwEntryRow *entry) {
-  const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
-  if (g_str_equal(text, "")) return;
-  on_rename_response_cb(dialog, "rename", NULL);
-  adw_dialog_close(ADW_DIALOG(dialog));
-}
-
-static void on_rename_response_cb(GtkWidget *dialog, gchar *response, gpointer data) {
-  if (g_str_equal(response, "rename")) {
-    const char *text = gtk_editable_get_text(GTK_EDITABLE(state.main_window->sidebar->rename_list_dialog_entry));
-    errands_data_set_str(state.main_window->sidebar->current_task_list_row->data, DATA_PROP_LIST_NAME, text);
-    errands_data_write_list(state.main_window->sidebar->current_task_list_row->data);
-    errands_sidebar_task_list_row_update_title(state.main_window->sidebar->current_task_list_row);
-    // TODO: update task list title if current uid is the same as this
-    // TODO: sync
-  }
 }

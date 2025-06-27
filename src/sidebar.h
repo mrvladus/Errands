@@ -4,6 +4,7 @@
 #include "sidebar-all-row.h"
 #include "sidebar-delete-list-dialog.h"
 #include "sidebar-new-list-dialog.h"
+#include "sidebar-rename-list-dialog.h"
 
 #include <adwaita.h>
 
@@ -20,12 +21,10 @@ struct _ErrandsSidebar {
 
   ErrandsSidebarDeleteListDialog *delete_list_dialog;
   ErrandsSidebarNewListDialog *new_list_dialog;
-  GtkWidget *rename_list_dialog;
-  GtkWidget *rename_list_dialog_entry;
+  ErrandsSidebarRenameListDialog *rename_list_dialog;
 };
 
 ErrandsSidebar *errands_sidebar_new();
 void errands_sidebar_load_lists(ErrandsSidebar *self);
 ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(ErrandsSidebar *sb, ListData *data);
 void errands_sidebar_select_last_opened_page();
-void errands_sidebar_rename_list_dialog_show(ErrandsSidebarTaskListRow *row);
