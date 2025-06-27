@@ -30,8 +30,6 @@ G_DECLARE_FINAL_TYPE(ErrandsTagsWindow, errands_tags_window, ERRANDS, TAGS_WINDO
 G_DECLARE_FINAL_TYPE(ErrandsTagsWindowRow, errands_tags_window_row, ERRANDS, TAGS_WINDOW_ROW, AdwActionRow)
 #define ERRANDS_TYPE_NOTES_WINDOW (errands_notes_window_get_type())
 G_DECLARE_FINAL_TYPE(ErrandsNotesWindow, errands_notes_window, ERRANDS, NOTES_WINDOW, AdwDialog)
-#define ERRANDS_TYPE_PRIORITY_WINDOW (errands_priority_window_get_type())
-G_DECLARE_FINAL_TYPE(ErrandsPriorityWindow, errands_priority_window, ERRANDS, PRIORITY_WINDOW, AdwDialog)
 
 // --- TASK --- //
 
@@ -204,17 +202,3 @@ struct _ErrandsNotesWindow {
 };
 ErrandsNotesWindow *errands_notes_window_new();
 void errands_notes_window_show(ErrandsTask *task);
-
-// --- PRIORITY WINDOW --- //
-
-struct _ErrandsPriorityWindow {
-  AdwDialog parent_instance;
-  GtkWidget *high_row;
-  GtkWidget *medium_row;
-  GtkWidget *low_row;
-  GtkWidget *none_row;
-  GtkWidget *custom;
-  ErrandsTask *task;
-};
-ErrandsPriorityWindow *errands_priority_window_new();
-void errands_priority_window_show(ErrandsTask *task);
