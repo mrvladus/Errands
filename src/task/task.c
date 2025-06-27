@@ -182,7 +182,7 @@ static void errands_task_init(ErrandsTask *self) {
   g_signal_connect_swapped(self->priority_btn, "clicked", G_CALLBACK(errands_priority_window_show), self);
   g_signal_connect_swapped(self->tags_btn, "clicked", G_CALLBACK(errands_tags_window_show), self);
   g_signal_connect_swapped(self->attachments_btn, "clicked", G_CALLBACK(errands_attachments_window_show), self);
-  g_signal_connect_swapped(self->color_btn, "clicked", G_CALLBACK(errands_color_window_show), self);
+  g_signal_connect_swapped(self->color_btn, "clicked", G_CALLBACK(errands_task_list_color_dialog_show), self);
 
   // Sub-tasks revealer
   self->sub_tasks_revealer = gtk_revealer_new();

@@ -19,8 +19,6 @@ G_DECLARE_FINAL_TYPE(ErrandsTimeChooser, errands_time_chooser, ERRANDS, TIME_CHO
 G_DECLARE_FINAL_TYPE(ErrandsWeekChooser, errands_week_chooser, ERRANDS, WEEK_CHOOSER, GtkListBoxRow)
 #define ERRANDS_TYPE_DATE_WINDOW (errands_date_window_get_type())
 G_DECLARE_FINAL_TYPE(ErrandsDateWindow, errands_date_window, ERRANDS, DATE_WINDOW, AdwDialog)
-#define ERRANDS_TYPE_COLOR_WINDOW (errands_color_window_get_type())
-G_DECLARE_FINAL_TYPE(ErrandsColorWindow, errands_color_window, ERRANDS, COLOR_WINDOW, AdwDialog)
 #define ERRANDS_TYPE_ATTACHMENTS_WINDOW (errands_attachments_window_get_type())
 G_DECLARE_FINAL_TYPE(ErrandsAttachmentsWindow, errands_attachments_window, ERRANDS, ATTACHMENTS_WINDOW, AdwDialog)
 #define ERRANDS_TYPE_ATTACHMENTS_WINDOW_ROW (errands_attachments_window_row_get_type())
@@ -149,17 +147,6 @@ struct _ErrandsDateWindow {
 };
 ErrandsDateWindow *errands_date_window_new();
 void errands_date_window_show(ErrandsTask *task);
-
-// --- COLOR WINDOW --- //
-
-struct _ErrandsColorWindow {
-  AdwDialog parent_instance;
-  GtkWidget *color_box;
-  ErrandsTask *task;
-  bool block_signals;
-};
-ErrandsColorWindow *errands_color_window_new();
-void errands_color_window_show(ErrandsTask *task);
 
 // --- ATTACHMENTS WINDOW --- //
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "data/data.h"
+#include "task-list-color-dialog.h"
 #include "task-list-sort-dialog.h"
 #include "task/task.h"
 
@@ -31,9 +32,9 @@ struct _ErrandsTaskList {
   const char *search_query;
 
   ErrandsTaskListSortDialog *sort_dialog;
+  ErrandsTaskListColorDialog *color_dialog;
 
   ErrandsAttachmentsWindow *attachments_window;
-  ErrandsColorWindow *color_window;
   ErrandsNotesWindow *notes_window;
   ErrandsPriorityWindow *priority_window;
   ErrandsTagsWindow *tags_window;

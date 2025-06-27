@@ -39,8 +39,9 @@ ErrandsTaskListSortDialog *errands_task_list_sort_dialog_new() {
 }
 
 void errands_task_list_sort_dialog_show() {
+  if (!state.main_window->task_list->sort_dialog)
+    state.main_window->task_list->sort_dialog = errands_task_list_sort_dialog_new();
   ErrandsTaskListSortDialog *dialog = state.main_window->task_list->sort_dialog;
-  if (!dialog) dialog = errands_task_list_sort_dialog_new();
   dialog->block_signals = true;
   dialog->sort_changed = false;
   adw_switch_row_set_active(ADW_SWITCH_ROW(dialog->completed_toggle_row),
