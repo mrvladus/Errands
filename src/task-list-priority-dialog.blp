@@ -12,6 +12,8 @@ template $ErrandsTaskListPriorityDialog: Adw.Dialog {
 
     content: Adw.PreferencesPage {
       Adw.PreferencesGroup {
+        title: _("Presets");
+
         Adw.ActionRow high_row {
           title: C_("Priority level", "High");
           activatable-widget: high_toggle_btn;
@@ -91,9 +93,14 @@ template $ErrandsTaskListPriorityDialog: Adw.Dialog {
             toggled => $on_toggle_cb(template);
           }
         }
+      }
+
+      Adw.PreferencesGroup {
+        title: _("Custom");
 
         Adw.SpinRow custom_row {
-          title: C_("Priority level", "Custom");
+          title: _("Custom Priority");
+          subtitle: _("Value in range 0-9");
           climb-rate: 1;
           digits: 0;
 
