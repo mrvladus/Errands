@@ -69,7 +69,7 @@ static void on_dialog_close_cb(ErrandsTaskListPriorityDialog *self) {
 static void on_toggle_cb(ErrandsTaskListPriorityDialog *self, GtkCheckButton *btn) {
   if (!gtk_check_button_get_active(btn) || self->block_signals) return;
   const char *name = gtk_widget_get_name(GTK_WIDGET(btn));
-  uint8_t val;
+  uint8_t val = 0;
   if (g_str_equal(name, "none")) val = 0;
   else if (g_str_equal(name, "low")) val = 1;
   else if (g_str_equal(name, "medium")) val = 5;

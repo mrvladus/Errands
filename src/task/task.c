@@ -178,8 +178,8 @@ static void errands_task_init(ErrandsTask *self) {
 
   // Connect signals
   g_signal_connect_swapped(self->date_btn, "clicked", G_CALLBACK(errands_date_window_show), self);
-  g_signal_connect_swapped(self->notes_btn, "clicked", G_CALLBACK(errands_notes_window_show), self);
-  g_signal_connect_swapped(self->priority_btn, "clicked", G_CALLBACK(errands_priority_window_show), self);
+  g_signal_connect_swapped(self->notes_btn, "clicked", G_CALLBACK(errands_task_list_notes_dialog_show), self);
+  g_signal_connect_swapped(self->priority_btn, "clicked", G_CALLBACK(errands_task_list_priority_dialog_show), self);
   g_signal_connect_swapped(self->tags_btn, "clicked", G_CALLBACK(errands_tags_window_show), self);
   g_signal_connect_swapped(self->attachments_btn, "clicked", G_CALLBACK(errands_attachments_window_show), self);
   g_signal_connect_swapped(self->color_btn, "clicked", G_CALLBACK(errands_task_list_color_dialog_show), self);

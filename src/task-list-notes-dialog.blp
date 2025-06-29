@@ -1,0 +1,50 @@
+using Gtk 4.0;
+using Adw 1;
+using WebKit 6.0;
+using GtkSource 5;
+
+template $ErrandsTaskListColorDialog: Adw.Dialog {
+  title: _("Notes");
+  content-width: 600;
+  content-height: 600;
+  closed => $on_dialog_close_cb();
+
+  Adw.ToolbarView {
+    top-bar-style: raised;
+
+    [top]
+    Adw.HeaderBar {
+      [start]
+      ToggleButton md_btn {
+        icon-name: "errands-md-symbolic";
+        tooltip-markup: _("Toggle Markdown View");
+      }
+    }
+
+    content: Box {
+      orientation: vertical;
+
+      ScrolledWindow {
+        visible: bind md_btn.active inverted;
+        vexpand: true;
+
+        GtkSource.View source_view {
+          top-margin: 6;
+          bottom-margin: 6;
+          right-margin: 6;
+          left-margin: 6;
+          wrap-mode: word;
+
+          buffer: GtkSource.Buffer source_buffer {
+            changed => $on_text_changed_cb();
+          };
+        }
+      }
+
+      WebKit.WebView md_view {
+        visible: bind md_btn.active;
+        decide-policy => $on_web_view_decide_policy_cb();
+      }
+    };
+  }
+}

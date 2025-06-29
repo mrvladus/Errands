@@ -41,6 +41,10 @@
             compressed="true"
             alias="task-list-priority-dialog.ui"
         >src/task-list-priority-dialog.ui</file>
+    <file
+            compressed="true"
+            alias="task-list-notes-dialog.ui"
+        >src/task-list-notes-dialog.ui</file>
   </gresource>
 
   <gresource prefix="/io/github/mrvladus/Errands/icons/scalable/actions/">
