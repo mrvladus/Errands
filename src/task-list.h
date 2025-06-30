@@ -5,6 +5,7 @@
 #include "task-list-notes-dialog.h"
 #include "task-list-priority-dialog.h"
 #include "task-list-sort-dialog.h"
+#include "task-list-tags-dialog.h"
 #include "task/task.h"
 
 #include <adwaita.h>
@@ -37,9 +38,9 @@ struct _ErrandsTaskList {
   ErrandsTaskListColorDialog *color_dialog;
   ErrandsTaskListPriorityDialog *priority_dialog;
   ErrandsTaskListNotesDialog *notes_dialog;
+  ErrandsTaskListTagsDialog *tags_dialog;
 
   ErrandsAttachmentsWindow *attachments_window;
-  ErrandsTagsWindow *tags_window;
   ErrandsDateWindow *date_window;
 
   ListData *data;

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../data/data.h"
-#include "glib.h"
 
 #include <adwaita.h>
 
@@ -24,12 +23,6 @@ G_DECLARE_FINAL_TYPE(ErrandsAttachmentsWindow, errands_attachments_window, ERRAN
 #define ERRANDS_TYPE_ATTACHMENTS_WINDOW_ROW (errands_attachments_window_row_get_type())
 G_DECLARE_FINAL_TYPE(ErrandsAttachmentsWindowRow, errands_attachments_window_row, ERRANDS, ATTACHMENTS_WINDOW_ROW,
                      AdwActionRow)
-#define ERRANDS_TYPE_TAGS_WINDOW (errands_tags_window_get_type())
-G_DECLARE_FINAL_TYPE(ErrandsTagsWindow, errands_tags_window, ERRANDS, TAGS_WINDOW, AdwDialog)
-#define ERRANDS_TYPE_TAGS_WINDOW_ROW (errands_tags_window_row_get_type())
-G_DECLARE_FINAL_TYPE(ErrandsTagsWindowRow, errands_tags_window_row, ERRANDS, TAGS_WINDOW_ROW, AdwActionRow)
-#define ERRANDS_TYPE_NOTES_WINDOW (errands_notes_window_get_type())
-G_DECLARE_FINAL_TYPE(ErrandsNotesWindow, errands_notes_window, ERRANDS, NOTES_WINDOW, AdwDialog)
 
 // --- TASK --- //
 
@@ -166,39 +159,3 @@ struct _ErrandsAttachmentsWindowRow {
   char *file_path;
 };
 ErrandsAttachmentsWindowRow *errands_attachments_window_row_new(const char *file_path);
-
-// --- TAGS WINDOW --- //
-
-struct _ErrandsTagsWindow {
-  AdwDialog parent_instance;
-  GtkWidget *entry;
-  GtkWidget *list_box;
-  GtkWidget *placeholder;
-  ErrandsTask *task;
-};
-ErrandsTagsWindow *errands_tags_window_new();
-void errands_tags_window_show(ErrandsTask *task);
-
-// --- TAGS WINDOW TAG ROW --- //
-
-struct _ErrandsTagsWindowRow {
-  AdwActionRow parent_instance;
-  GtkWidget *toggle;
-  GtkWidget *del_btn;
-};
-ErrandsTagsWindowRow *errands_tags_window_row_new(const char *tag);
-
-// --- NOTES WINDOW --- //
-
-#include <gtksourceview/gtksource.h>
-
-struct _ErrandsNotesWindow {
-  AdwDialog parent_instance;
-  GtkWidget *view;
-  GtkSourceBuffer *buffer;
-  GtkSourceLanguage *md_lang;
-  GtkWidget *md_view;
-  ErrandsTask *task;
-};
-ErrandsNotesWindow *errands_notes_window_new();
-void errands_notes_window_show(ErrandsTask *task);
