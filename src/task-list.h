@@ -1,6 +1,7 @@
 #pragma once
 
 #include "data/data.h"
+#include "task-list-attachments-dialog.h"
 #include "task-list-color-dialog.h"
 #include "task-list-notes-dialog.h"
 #include "task-list-priority-dialog.h"
@@ -39,8 +40,8 @@ struct _ErrandsTaskList {
   ErrandsTaskListPriorityDialog *priority_dialog;
   ErrandsTaskListNotesDialog *notes_dialog;
   ErrandsTaskListTagsDialog *tags_dialog;
+  ErrandsTaskListAttachmentsDialog *attachments_dialog;
 
-  ErrandsAttachmentsWindow *attachments_window;
   ErrandsDateWindow *date_window;
 
   ListData *data;

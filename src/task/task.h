@@ -18,11 +18,6 @@ G_DECLARE_FINAL_TYPE(ErrandsTimeChooser, errands_time_chooser, ERRANDS, TIME_CHO
 G_DECLARE_FINAL_TYPE(ErrandsWeekChooser, errands_week_chooser, ERRANDS, WEEK_CHOOSER, GtkListBoxRow)
 #define ERRANDS_TYPE_DATE_WINDOW (errands_date_window_get_type())
 G_DECLARE_FINAL_TYPE(ErrandsDateWindow, errands_date_window, ERRANDS, DATE_WINDOW, AdwDialog)
-#define ERRANDS_TYPE_ATTACHMENTS_WINDOW (errands_attachments_window_get_type())
-G_DECLARE_FINAL_TYPE(ErrandsAttachmentsWindow, errands_attachments_window, ERRANDS, ATTACHMENTS_WINDOW, AdwDialog)
-#define ERRANDS_TYPE_ATTACHMENTS_WINDOW_ROW (errands_attachments_window_row_get_type())
-G_DECLARE_FINAL_TYPE(ErrandsAttachmentsWindowRow, errands_attachments_window_row, ERRANDS, ATTACHMENTS_WINDOW_ROW,
-                     AdwActionRow)
 
 // --- TASK --- //
 
@@ -138,24 +133,3 @@ struct _ErrandsDateWindow {
 };
 ErrandsDateWindow *errands_date_window_new();
 void errands_date_window_show(ErrandsTask *task);
-
-// --- ATTACHMENTS WINDOW --- //
-
-struct _ErrandsAttachmentsWindow {
-  AdwDialog parent_instance;
-  GtkWidget *title;
-  GtkWidget *list_box;
-  GtkWidget *placeholder;
-  ErrandsTask *task;
-};
-ErrandsAttachmentsWindow *errands_attachments_window_new();
-void errands_attachments_window_show(ErrandsTask *task);
-
-// --- ATTACHMENTS WINDOW ROW --- //
-
-struct _ErrandsAttachmentsWindowRow {
-  AdwActionRow parent_instance;
-  GtkWidget *del_btn;
-  char *file_path;
-};
-ErrandsAttachmentsWindowRow *errands_attachments_window_row_new(const char *file_path);
