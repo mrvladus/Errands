@@ -44,7 +44,7 @@ template $ErrandsTaskListAttachmentsDialog: Adw.Dialog {
         title: _("No Attachments");
         description: _("Click \"+\" button to add new attachment or drag files here");
         vexpand: true;
-        visible: bind scrl.visible inverted;
+        visible: bind scrl.visible inverted bidirectional;
 
         styles [
           "compact",
@@ -53,7 +53,7 @@ template $ErrandsTaskListAttachmentsDialog: Adw.Dialog {
     };
 
     DropTarget {
-      formats: "G_TYPE_FILE";
+      formats: "*/*";
       actions: copy;
       drop => $on_drop_cb();
     }

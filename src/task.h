@@ -5,10 +5,10 @@
 #include <adwaita.h>
 
 #define ERRANDS_TYPE_TASK (errands_task_get_type())
-G_DECLARE_FINAL_TYPE(ErrandsTask, errands_task, ERRANDS, TASK, GtkListBoxRow)
+G_DECLARE_FINAL_TYPE(ErrandsTask, errands_task, ERRANDS, TASK, GtkBox)
 
 struct _ErrandsTask {
-  GtkListBoxRow parent_instance;
+  GtkBox parent_instance;
 
   GtkWidget *clamp;
 

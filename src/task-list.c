@@ -1,5 +1,6 @@
 #include "task-list.h"
 #include "data/data.h"
+#include "gtk/gtk.h"
 #include "settings.h"
 #include "state.h"
 #include "task-list-sort-dialog.h"
@@ -62,9 +63,9 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   self->completion_sort_model =
       gtk_sort_list_model_new(G_LIST_MODEL(self->sort_model), GTK_SORTER(self->completion_sorter));
 
-  self->search_filter = gtk_custom_filter_new((GtkCustomFilterFunc)search_filter_func, NULL, NULL);
-  self->search_filter_model =
-      gtk_filter_list_model_new(G_LIST_MODEL(self->completion_sort_model), GTK_FILTER(self->search_filter));
+  // self->search_filter = gtk_custom_filter_new((GtkCustomFilterFunc)search_filter_func, NULL, NULL);
+  // self->search_filter_model =
+  //     gtk_filter_list_model_new(G_LIST_MODEL(self->completion_sort_model), GTK_FILTER(self->search_filter));
 
   self->toplevel_tasks_filter = gtk_custom_filter_new((GtkCustomFilterFunc)toplevel_tasks_filter_func, NULL, NULL);
   self->toplevel_tasks_filter_model =
@@ -74,8 +75,9 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   g_signal_connect(tasks_factory, "setup", G_CALLBACK(setup_listitem_cb), NULL);
   g_signal_connect(tasks_factory, "bind", G_CALLBACK(bind_listitem_cb), NULL);
 
-  self->task_list = gtk_list_view_new(
-      GTK_SELECTION_MODEL(gtk_no_selection_new(G_LIST_MODEL(self->toplevel_tasks_filter_model))), tasks_factory);
+  GtkNoSelection *selection_model = gtk_no_selection_new(G_LIST_MODEL(self->toplevel_tasks_filter_model));
+  gtk_list_view_set_factory(GTK_LIST_VIEW(self->task_list), tasks_factory);
+  gtk_list_view_set_model(GTK_LIST_VIEW(self->task_list), GTK_SELECTION_MODEL(selection_model));
 
   // self->task_list = gtk_list_box_new();
   // g_object_set(self->task_list, "selection-mode", GTK_SELECTION_NONE, NULL);
@@ -184,6 +186,7 @@ void errands_task_list_load_tasks(ErrandsTaskList *self) {
     GObject *data_object = g_object_new(G_TYPE_OBJECT, NULL);
     g_object_set_data(data_object, "data", tasks->pdata[i]);
     g_list_store_append(self->tasks_model, data_object);
+    // LOG("Loaded task data %s", errands_data_get_str(tasks->pdata[i], DATA_PROP_TEXT));
     // const char *parent = errands_data_get_str(data, DATA_PROP_PARENT);
     // bool trash = errands_data_get_bool(data, DATA_PROP_TRASH);
     // bool deleted = errands_data_get_bool(data, DATA_PROP_DELETED);
@@ -191,9 +194,9 @@ void errands_task_list_load_tasks(ErrandsTaskList *self) {
     //   gtk_list_box_append(GTK_LIST_BOX(self->task_list), GTK_WIDGET(errands_task_new(tasks->pdata[i])));
   }
   g_ptr_array_free(tasks, false);
-  // if (g_list_model_get_n_items(G_LIST_MODEL(self->toplevel_tasks_filter_model)) > 0) {
-  //   // gtk_list_view_scroll_to(GTK_LIST_VIEW(self->task_list), 0, GTK_LIST_SCROLL_FOCUS, NULL);
-  // }
+  if (g_list_model_get_n_items(G_LIST_MODEL(self->toplevel_tasks_filter_model)) > 0) {
+    gtk_list_view_scroll_to(GTK_LIST_VIEW(self->task_list), 0, GTK_LIST_SCROLL_FOCUS, NULL);
+  }
   LOG("Task List: Loading tasks complete");
   // for (size_t i = 0; i < g_list_model_get_n_items(G_LIST_MODEL(self->tasks_model)); ++i) {
   //   TaskData *d = g_object_get_data(g_list_model_get_item(G_LIST_MODEL(self->tasks_model), i), "data");
@@ -281,10 +284,10 @@ static void on_task_list_entry_activated_cb(AdwEntryRow *entry, gpointer data) {
 
   TaskData *td = list_data_create_task(state.main_window->task_list->data, (char *)text, list_uid, "");
   g_hash_table_insert(tdata, g_strdup(errands_data_get_str(td, DATA_PROP_UID)), td);
-  // GObject *data_object = g_object_new(G_TYPE_OBJECT, NULL);
-  // g_object_set_data(data_object, "data", td);
-  // g_list_store_append(state.main_window->task_list->tasks_model, data_object);
-  g_list_store_append(state.main_window->task_list->tasks_model, td);
+  GObject *data_object = g_object_new(G_TYPE_OBJECT, NULL);
+  g_object_set_data(data_object, "data", td);
+  g_list_store_append(state.main_window->task_list->tasks_model, data_object);
+  // g_list_store_append(state.main_window->task_list->tasks_model, td);
   // gtk_list_view_scroll_to(GTK_LIST_VIEW(state.main_window->task_list->task_list), 0, GTK_LIST_SCROLL_FOCUS, NULL);
   errands_data_write_list(state.main_window->task_list->data);
 

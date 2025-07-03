@@ -16,6 +16,8 @@
     <file compressed="true" alias="sidebar-rename-list-dialog.ui">src/sidebar-rename-list-dialog.ui</file>
     <file compressed="true" alias="window.ui">src/window.ui</file>
     <file compressed="true" alias="task-list.ui">src/task-list.ui</file>
+    <file compressed="true" alias="task-list-attachments-dialog.ui">src/task-list-attachments-dialog.ui</file>
+    <file compressed="true" alias="task-list-attachments-dialog-attachment.ui">src/task-list-attachments-dialog-attachment.ui</file>
     <file compressed="true" alias="task-list-sort-dialog.ui">src/task-list-sort-dialog.ui</file>
     <file compressed="true" alias="task-list-color-dialog.ui">src/task-list-color-dialog.ui</file>
     <file compressed="true" alias="task-list-priority-dialog.ui">src/task-list-priority-dialog.ui</file>

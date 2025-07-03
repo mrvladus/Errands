@@ -1,5 +1,7 @@
 #include "task.h"
 #include "data/data.h"
+#include "glib-object.h"
+#include "gtk/gtk.h"
 #include "state.h"
 #include "task-list.h"
 #include "utils.h"
@@ -45,12 +47,14 @@ static GtkWidget *create_widget_func(GObject *item, gpointer user_data) {
 
 // ---------- TASK ---------- //
 
-G_DEFINE_TYPE(ErrandsTask, errands_task, GTK_TYPE_LIST_BOX_ROW)
+G_DEFINE_TYPE(ErrandsTask, errands_task, GTK_TYPE_BOX)
 static void errands_task_class_init(ErrandsTaskClass *class) {}
 
 static void errands_task_init(ErrandsTask *self) {
-  GtkWidget *vbox = g_object_new(GTK_TYPE_BOX, "orientation", GTK_ORIENTATION_VERTICAL, "spacing", 0, NULL);
-  gtk_list_box_row_set_child(GTK_LIST_BOX_ROW(self), vbox);
+  gtk_widget_add_css_class(GTK_WIDGET(self), "card");
+  g_object_set(self, "orientation", GTK_ORIENTATION_VERTICAL, NULL);
+  // GtkWidget *vbox = g_object_new(GTK_TYPE_BOX, "orientation", GTK_ORIENTATION_VERTICAL, "spacing", 0, NULL);
+  // gtk_list_box_row_set_child(GTK_LIST_BOX_ROW(self), vbox);
 
   // Top drop area
   // GtkWidget *top_drop_area = gtk_image_new_from_icon_name("errands-add-symbolic");
@@ -65,7 +69,7 @@ static void errands_task_init(ErrandsTask *self) {
   GtkWidget *title_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
   g_object_set(title_box, "height-request", 30, "margin-start", 6, "margin-end", 6, "margin-top", 6, "margin-bottom", 6,
                "cursor", gdk_cursor_new_from_name("pointer", NULL), NULL);
-  gtk_box_append(GTK_BOX(vbox), title_box);
+  gtk_box_append(GTK_BOX(self), title_box);
 
   // Expand sub-tasks controller
   GtkGesture *sub_ctrl = gtk_gesture_click_new();
@@ -108,7 +112,7 @@ static void errands_task_init(ErrandsTask *self) {
 
   // Tags revealer
   self->tags_revealer = g_object_new(GTK_TYPE_REVEALER, "child", self->tags_box, "transition-duration", 100, NULL);
-  gtk_box_append(GTK_BOX(vbox), self->tags_revealer);
+  gtk_box_append(GTK_BOX(self), self->tags_revealer);
 
   // Progress bar
   self->progress_bar = gtk_progress_bar_new();
@@ -119,12 +123,12 @@ static void errands_task_init(ErrandsTask *self) {
   // Progress bar revealer
   self->progress_revealer = gtk_revealer_new();
   g_object_set(self->progress_revealer, "child", self->progress_bar, "transition-duration", 100, NULL);
-  gtk_box_append(GTK_BOX(vbox), self->progress_revealer);
+  gtk_box_append(GTK_BOX(self), self->progress_revealer);
 
   // Toolbar revealer
   self->toolbar_revealer = gtk_revealer_new();
   g_object_bind_property(self->toolbar_btn, "active", self->toolbar_revealer, "reveal-child", G_BINDING_SYNC_CREATE);
-  gtk_box_append(GTK_BOX(vbox), self->toolbar_revealer);
+  gtk_box_append(GTK_BOX(self), self->toolbar_revealer);
 
   // Toolbar
   GtkWidget *toolbar_box = gtk_flow_box_new();
@@ -186,7 +190,7 @@ static void errands_task_init(ErrandsTask *self) {
 
   // Sub-tasks revealer
   self->sub_tasks_revealer = gtk_revealer_new();
-  gtk_box_append(GTK_BOX(vbox), self->sub_tasks_revealer);
+  gtk_box_append(GTK_BOX(self), self->sub_tasks_revealer);
 
   // Sub-tasks vbox
   GtkWidget *sub_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
