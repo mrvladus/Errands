@@ -1,10 +1,9 @@
 #include "task-list.h"
-#include "components.h"
 #include "data/data.h"
 #include "settings.h"
 #include "state.h"
 #include "task-list-sort-dialog.h"
-#include "task/task.h"
+#include "task.h"
 #include "utils.h"
 
 #include <glib/gi18n.h>
@@ -49,10 +48,8 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
 
 static void errands_task_list_init(ErrandsTaskList *self) {
   gtk_widget_init_template(GTK_WIDGET(self));
+  errands_add_actions(GTK_WIDGET(self), "task-list", "toggle_search", on_toggle_search_action_cb, NULL, NULL);
 
-  g_autoptr(GSimpleActionGroup) ag =
-      errands_action_group_new(1, "toggle_search", on_toggle_search_action_cb, self->search_btn);
-  gtk_widget_insert_action_group(GTK_WIDGET(self), "task-list", G_ACTION_GROUP(ag));
   gtk_search_bar_connect_entry(GTK_SEARCH_BAR(self->search_bar), GTK_EDITABLE(self->search_entry));
 
   // Create tasks model

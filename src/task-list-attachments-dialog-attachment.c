@@ -9,27 +9,27 @@ struct _ErrandsTaskListAttachmentsDialogAttachment {
   AdwActionRow parent_instance;
 };
 
-G_DEFINE_TYPE(ErrandsTaskListAttachmentsDialogAttachment, errands_task_attachments_dialog_attachment,
+G_DEFINE_TYPE(ErrandsTaskListAttachmentsDialogAttachment, errands_task_list_attachments_dialog_attachment,
               ADW_TYPE_ACTION_ROW)
 
-static void errands_task_attachments_dialog_attachment_dispose(GObject *gobject) {
+static void errands_task_list_attachments_dialog_attachment_dispose(GObject *gobject) {
   gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_TASK_LIST_ATTACHMENTS_DIALOG_ATTACHMENT);
-  G_OBJECT_CLASS(errands_task_attachments_dialog_attachment_parent_class)->dispose(gobject);
+  G_OBJECT_CLASS(errands_task_list_attachments_dialog_attachment_parent_class)->dispose(gobject);
 }
 
 static void
-errands_task_attachments_dialog_attachment_class_init(ErrandsTaskListAttachmentsDialogAttachmentClass *class) {
-  G_OBJECT_CLASS(class)->dispose = errands_task_attachments_dialog_attachment_dispose;
-  gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class),
-                                              "/io/github/mrvladus/Errands/ui/task-list-tags-dialog-tag.ui");
+errands_task_list_attachments_dialog_attachment_class_init(ErrandsTaskListAttachmentsDialogAttachmentClass *class) {
+  G_OBJECT_CLASS(class)->dispose = errands_task_list_attachments_dialog_attachment_dispose;
+  gtk_widget_class_set_template_from_resource(
+      GTK_WIDGET_CLASS(class), "/io/github/mrvladus/Errands/ui/task-list-attachments-dialog-attachment.ui");
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_delete_cb);
 }
 
-static void errands_task_attachments_dialog_attachment_init(ErrandsTaskListAttachmentsDialogAttachment *self) {
+static void errands_task_list_attachments_dialog_attachment_init(ErrandsTaskListAttachmentsDialogAttachment *self) {
   gtk_widget_init_template(GTK_WIDGET(self));
 }
 
-ErrandsTaskListAttachmentsDialogAttachment *errands_task_attachments_dialog_attachment_new(const char *path) {
+ErrandsTaskListAttachmentsDialogAttachment *errands_task_list_attachments_dialog_attachment_new(const char *path) {
   ErrandsTaskListAttachmentsDialogAttachment *self =
       g_object_new(ERRANDS_TYPE_TASK_LIST_ATTACHMENTS_DIALOG_ATTACHMENT, NULL);
   g_autofree gchar *basename = g_path_get_basename(path);

@@ -327,31 +327,28 @@ static inline GStrv gstrv_remove_duplicates(GStrv strv) {
   return g_strv_builder_end(builder);
 }
 
-// Generic dynamic array
-#define DECLARE_DYNAMIC_ARRAY(type, item_type, func_prefix)                                                            \
-  typedef struct type {                                                                                                \
-    size_t len;                                                                                                        \
-    size_t capacity;                                                                                                   \
-    item_type *data;                                                                                                   \
-  } type;                                                                                                              \
-                                                                                                                       \
-  static inline type func_prefix##_array_new() {                                                                       \
-    type array;                                                                                                        \
-    array.len = 0;                                                                                                     \
-    array.capacity = 2;                                                                                                \
-    array.data = malloc(sizeof(type) * array.capacity);                                                                \
-    return array;                                                                                                      \
-  }                                                                                                                    \
-                                                                                                                       \
-  static inline void func_prefix##_array_append(type *array, type data) {                                              \
-    if (array->len == array->capacity) {                                                                               \
-      array->capacity *= 2;                                                                                            \
-      type *new_data = realloc(array->data, array->capacity * sizeof(type));                                           \
-      if (!new_data) {                                                                                                 \
-        printf("Failed to reallocate memory for array");                                                               \
-        return;                                                                                                        \
-      }                                                                                                                \
-      array->data = new_data;                                                                                          \
-    }                                                                                                                  \
-    array->data[array->len++] = data;                                                                                  \
+static inline void errands_add_actions(GtkWidget *widget, const char *action_group_name, const char *action_name1,
+                                       void *cb1, void *data1, ...) {
+  g_autoptr(GSimpleActionGroup) ag = g_simple_action_group_new();
+  // Create the first action
+  g_autoptr(GSimpleAction) action = g_simple_action_new(action_name1, NULL);
+  g_signal_connect(action, "activate", G_CALLBACK(cb1), data1);
+  g_action_map_add_action(G_ACTION_MAP(ag), G_ACTION(action));
+  // Handle additional actions
+  va_list args;
+  va_start(args, data1);
+  const char *action_name;
+  void *callback;
+  void *data;
+  while ((action_name = va_arg(args, const char *)) != NULL) {
+    callback = va_arg(args, void *);
+    data = va_arg(args, void *);
+    // Create and add the new action
+    g_autoptr(GSimpleAction) new_action = g_simple_action_new(action_name, NULL);
+    g_signal_connect(new_action, "activate", G_CALLBACK(callback), data);
+    g_action_map_add_action(G_ACTION_MAP(ag), G_ACTION(new_action));
   }
+  va_end(args);
+  // Insert the action group into the widget
+  gtk_widget_insert_action_group(GTK_WIDGET(widget), action_group_name, G_ACTION_GROUP(ag));
+}

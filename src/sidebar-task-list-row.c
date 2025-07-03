@@ -1,5 +1,4 @@
 #include "sidebar-task-list-row.h"
-#include "components.h"
 #include "data/data.h"
 #include "settings.h"
 #include "state.h"
@@ -41,10 +40,8 @@ static void errands_sidebar_task_list_row_class_init(ErrandsSidebarTaskListRowCl
 static void errands_sidebar_task_list_row_init(ErrandsSidebarTaskListRow *self) {
   gtk_widget_init_template(GTK_WIDGET(self));
   // Actions
-  g_autoptr(GSimpleActionGroup) ag =
-      errands_action_group_new(4, "rename", on_action_rename, self, "delete", on_action_delete, self, "print",
-                               on_action_print, self, "export", on_action_export, self);
-  gtk_widget_insert_action_group(GTK_WIDGET(self), "task-list-row", G_ACTION_GROUP(ag));
+  errands_add_actions(GTK_WIDGET(self), "task-list-row", "rename", on_action_rename, self, "delete", on_action_delete,
+                      self, "print", on_action_print, self, "export", on_action_export, self, NULL);
 
   // DND
   // GtkDragSource *drag_source = gtk_drag_source_new();

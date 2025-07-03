@@ -1,0 +1,127 @@
+using Gtk 4.0;
+
+template $ErrandsTaskListDateDialogMonthChooser: ListBoxRow {
+  Box {
+    orientation: vertical;
+    spacing: 8;
+    margin-start: 12;
+    margin-end: 12;
+    margin-top: 6;
+    margin-bottom: 6;
+
+    Label {
+      label: _("Months");
+      halign: start;
+    }
+
+    Box month_box1 {
+      spacing: 6;
+      homogeneous: true;
+
+      ToggleButton {
+        label: _("Jan");
+        tooltip-text: _("January");
+        valign: center;
+
+        styles [
+          "weekday",
+        ]
+      }
+
+      ToggleButton {
+        label: _("Feb");
+        tooltip-text: _("February");
+        valign: center;
+
+        styles [
+          "weekday",
+        ]
+      }
+
+      ToggleButton {
+        label: _("Mar");
+        tooltip-text: _("March");
+        valign: center;
+
+        styles [
+          "weekday",
+        ]
+      }
+
+      ToggleButton {
+        label: _("Jun");
+        tooltip-text: _("June");
+        valign: center;
+
+        styles [
+          "weekday",
+        ]
+      }
+    }
+
+    Box month_box2 {
+      spacing: 6;
+      homogeneous: true;
+
+      ToggleButton {
+        label: _("Jul");
+        tooltip-text: _("July");
+        valign: center;
+
+        styles [
+          "weekday",
+        ]
+      }
+
+      ToggleButton {
+        label: _("Aug");
+        tooltip-text: _("August");
+        valign: center;
+
+        styles [
+          "weekday",
+        ]
+      }
+
+      ToggleButton {
+        label: _("Sep");
+        tooltip-text: _("September");
+        valign: center;
+
+        styles [
+          "weekday",
+        ]
+      }
+
+      ToggleButton {
+        label: _("Oct");
+        tooltip-text: _("October");
+        valign: center;
+
+        styles [
+          "weekday",
+        ]
+      }
+
+      ToggleButton {
+        label: _("Nov");
+        tooltip-text: _("November");
+        valign: center;
+
+        styles [
+          "weekday",
+        ]
+      }
+
+      ToggleButton {
+        label: _("Dec");
+        tooltip-text: _("December");
+        valign: center;
+
+        styles [
+          "weekday",
+        ]
+      }
+    }
+  }
+}

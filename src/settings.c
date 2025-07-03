@@ -1,5 +1,6 @@
 #include "settings.h"
 #include "utils.h"
+
 #define JSON_H_IMPLEMENTATION
 #include "vendor/json.h"
 

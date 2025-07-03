@@ -1,6 +1,6 @@
 #include "task-list-color-dialog.h"
 #include "state.h"
-#include "task/task.h"
+#include "task.h"
 #include "utils.h"
 
 static void on_dialog_close_cb(ErrandsTaskListColorDialog *self);

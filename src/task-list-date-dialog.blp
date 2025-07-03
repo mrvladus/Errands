@@ -1,0 +1,113 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $ErrandsTaskListDateDialog: Adw.Dialog {
+  title: _("Date and Time");
+  content-width: 360;
+  content-height: 460;
+  closed => $on_dialog_close_cb();
+
+  Adw.ToolbarView {
+    [top]
+    Adw.HeaderBar {}
+
+    content: Adw.PreferencesPage {
+      Adw.PreferencesGroup {
+        title: _("Start");
+
+        Adw.ActionRow start_date_row {
+          title: _("Date");
+
+          [suffix]
+          $ErrandsTaskListDateDialogDateChooser start_date_chooser {}
+        }
+
+        Adw.ActionRow start_time_row {
+          title: _("Time");
+
+          [suffix]
+          $ErrandsTaskListDateDialogTimeChooser start_time_chooser {}
+        }
+
+        Adw.ExpanderRow repeat_row {
+          title: _("Repeat");
+          show-enable-switch: true;
+
+          Adw.ComboRow freq_row {
+            title: _("Frequency");
+            subtitle: _("How often task will repeat");
+
+            model: StringList {
+              strings [
+                _("Minutely"),
+                _("Hourly"),
+                _("Daily"),
+                _("Weekly"),
+                _("Monthly"),
+                _("Yearly"),
+              ]
+            };
+
+            notify::selected => $on_freq_changed_cb(template) not-swapped;
+          }
+
+          Adw.SpinRow interval_row {
+            title: _("Interval");
+            numeric: true;
+
+            adjustment: Adjustment {
+              lower: 1;
+              upper: 365;
+              step-increment: 1;
+              page-increment: 10;
+            };
+
+            notify::value => $on_interval_changed_cb(template) not-swapped;
+          }
+
+          $ErrandsTaskListDateDialogWeekChooser {}
+
+          Adw.ActionRow until_row {
+            title: _("Repeat Until");
+
+            [suffix]
+            $ErrandsTaskListDateDialogDateChooser until_date_chooser {}
+          }
+
+          Adw.SpinRow count_row {
+            title: _("Count");
+            numeric: true;
+
+            adjustment: Adjustment {
+              lower: 0;
+              upper: 365;
+              step-increment: 1;
+              page-increment: 10;
+            };
+
+            notify::value => $on_count_changed_cb(template) not-swapped;
+          }
+        }
+      }
+
+      Adw.PreferencesGroup {
+        title: _("Due");
+        visible: bind repeat_row.enable-expansion inverted;
+
+        Adw.ActionRow due_date_row {
+          title: _("Date");
+
+          [suffix]
+          $ErrandsTaskListDateDialogDateChooser due_date_chooser {}
+        }
+
+        Adw.ActionRow due_time_row {
+          title: _("Time");
+
+          [suffix]
+          $ErrandsTaskListDateDialogTimeChooser due_time_chooser {}
+        }
+      }
+    };
+  }
+}

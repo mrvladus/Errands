@@ -3,11 +3,11 @@
 #include "data/data.h"
 #include "task-list-attachments-dialog.h"
 #include "task-list-color-dialog.h"
+#include "task-list-date-dialog.h"
 #include "task-list-notes-dialog.h"
 #include "task-list-priority-dialog.h"
 #include "task-list-sort-dialog.h"
 #include "task-list-tags-dialog.h"
-#include "task/task.h"
 
 #include <adwaita.h>
 
@@ -41,8 +41,7 @@ struct _ErrandsTaskList {
   ErrandsTaskListNotesDialog *notes_dialog;
   ErrandsTaskListTagsDialog *tags_dialog;
   ErrandsTaskListAttachmentsDialog *attachments_dialog;
-
-  ErrandsDateWindow *date_window;
+  ErrandsTaskListDateDialog *date_dialog;
 
   ListData *data;
 };

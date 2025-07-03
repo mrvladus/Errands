@@ -1,6 +1,6 @@
 #include "task-list-notes-dialog.h"
 #include "state.h"
-#include "task/task.h"
+#include "task.h"
 
 #define HOEDOWN_IMPLEMENTATION
 #include "vendor/hoedown.h"

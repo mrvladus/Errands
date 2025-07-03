@@ -1,9 +1,8 @@
 #include "task.h"
-#include "../components.h"
-#include "../data/data.h"
-#include "../state.h"
-#include "../task-list.h"
-#include "../utils.h"
+#include "data/data.h"
+#include "state.h"
+#include "task-list.h"
+#include "utils.h"
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>
@@ -177,11 +176,12 @@ static void errands_task_init(ErrandsTask *self) {
   gtk_flow_box_append(GTK_FLOW_BOX(toolbar_box), ebox);
 
   // Connect signals
-  g_signal_connect_swapped(self->date_btn, "clicked", G_CALLBACK(errands_date_window_show), self);
+  g_signal_connect_swapped(self->date_btn, "clicked", G_CALLBACK(errands_task_list_date_dialog_show), self);
   g_signal_connect_swapped(self->notes_btn, "clicked", G_CALLBACK(errands_task_list_notes_dialog_show), self);
   g_signal_connect_swapped(self->priority_btn, "clicked", G_CALLBACK(errands_task_list_priority_dialog_show), self);
-  g_signal_connect_swapped(self->tags_btn, "clicked", G_CALLBACK(errands_tags_window_show), self);
-  g_signal_connect_swapped(self->attachments_btn, "clicked", G_CALLBACK(errands_attachments_window_show), self);
+  g_signal_connect_swapped(self->tags_btn, "clicked", G_CALLBACK(errands_task_list_tags_dialog_show), self);
+  g_signal_connect_swapped(self->attachments_btn, "clicked", G_CALLBACK(errands_task_list_attachments_dialog_show),
+                           self);
   g_signal_connect_swapped(self->color_btn, "clicked", G_CALLBACK(errands_task_list_color_dialog_show), self);
 
   // Sub-tasks revealer
@@ -205,27 +205,25 @@ static void errands_task_init(ErrandsTask *self) {
   gtk_box_append(GTK_BOX(sub_vbox), self->task_list);
 
   // Right-click menu
-  g_autoptr(GMenu) menu = errands_menu_new(2, _("Edit"), "task.edit", _("Move to Trash"), "task.trash");
+  // g_autoptr(GMenu) menu = errands_menu_new(2, _("Edit"), "task.edit", _("Move to Trash"), "task.trash");
 
   // Menu popover
-  GtkWidget *menu_popover = gtk_popover_menu_new_from_model(G_MENU_MODEL(menu));
-  g_object_set(menu_popover, "has-arrow", false, "halign", GTK_ALIGN_START, NULL);
-  gtk_box_append(GTK_BOX(vbox), menu_popover);
+  // GtkWidget *menu_popover = gtk_popover_menu_new_from_model(G_MENU_MODEL(menu));
+  // g_object_set(menu_popover, "has-arrow", false, "halign", GTK_ALIGN_START, NULL);
+  // gtk_box_append(GTK_BOX(vbox), menu_popover);
 
   // Right-click controllers
-  GtkGesture *ctrl = gtk_gesture_click_new();
-  gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(ctrl), 3);
-  g_signal_connect(ctrl, "released", G_CALLBACK(on_right_click), menu_popover);
-  gtk_widget_add_controller(title_box, GTK_EVENT_CONTROLLER(ctrl));
-  GtkGesture *touch_ctrl = gtk_gesture_long_press_new();
-  g_signal_connect(touch_ctrl, "pressed", G_CALLBACK(on_right_click), menu_popover);
-  gtk_gesture_single_set_touch_only(GTK_GESTURE_SINGLE(touch_ctrl), true);
-  gtk_widget_add_controller(title_box, GTK_EVENT_CONTROLLER(touch_ctrl));
+  // GtkGesture *ctrl = gtk_gesture_click_new();
+  // gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(ctrl), 3);
+  // g_signal_connect(ctrl, "released", G_CALLBACK(on_right_click), menu_popover);
+  // gtk_widget_add_controller(title_box, GTK_EVENT_CONTROLLER(ctrl));
+  // GtkGesture *touch_ctrl = gtk_gesture_long_press_new();
+  // g_signal_connect(touch_ctrl, "pressed", G_CALLBACK(on_right_click), menu_popover);
+  // gtk_gesture_single_set_touch_only(GTK_GESTURE_SINGLE(touch_ctrl), true);
+  // gtk_widget_add_controller(title_box, GTK_EVENT_CONTROLLER(touch_ctrl));
 
   // Actions
-  g_autoptr(GSimpleActionGroup) ag =
-      errands_action_group_new(2, "edit", on_action_edit, self, "trash", on_action_trash, self);
-  gtk_widget_insert_action_group(GTK_WIDGET(self), "task", G_ACTION_GROUP(ag));
+  errands_add_actions(GTK_WIDGET(self), "task", "edit", on_action_edit, self, "trash", on_action_trash, self, NULL);
 
   // DND
   // GtkDragSource *drag_source = gtk_drag_source_new();

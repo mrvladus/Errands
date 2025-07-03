@@ -1,0 +1,66 @@
+using Gtk 4.0;
+
+template $ErrandsTaskListDateDialogDateChooser: Box {
+  spacing: 6;
+
+  Button reset_btn {
+    icon-name: "errands-reset-symbolic";
+    tooltip-text: _("Reset");
+    clicked => $errands_task_list_date_dialog_date_chooser_reset(template);
+
+    styles [
+      "flat",
+    ]
+  }
+
+  Label label {
+    label: _("Not Set");
+
+    styles [
+      "numeric",
+    ]
+  }
+
+  MenuButton {
+    icon-name: "errands-calendar-symbolic";
+    valign: center;
+
+    popover: Popover {
+      child: Box {
+        orientation: vertical;
+        spacing: 6;
+
+        Box {
+          spacing: 6;
+          homogeneous: true;
+
+          Button {
+            label: _("Today");
+            clicked => $on_today_btn_clicked(template);
+
+            styles [
+              "flat",
+            ]
+          }
+
+          Button {
+            label: _("Tomorrow");
+            clicked => $on_tomorrow_btn_clicked(template);
+
+            styles [
+              "flat",
+            ]
+          }
+        }
+
+        Calendar calendar {
+          day-selected => $on_date_set_cb(template);
+        }
+      };
+    };
+
+    styles [
+      "flat",
+    ]
+  }
+}

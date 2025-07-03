@@ -1,6 +1,6 @@
 #include "sidebar.h"
-#include "components.h"
 #include "data/data.h"
+#include "gtk/gtk.h"
 #include "settings.h"
 #include "state.h"
 #include "task-list.h"
@@ -44,9 +44,8 @@ static void errands_sidebar_class_init(ErrandsSidebarClass *class) {
 
 static void errands_sidebar_init(ErrandsSidebar *self) {
   gtk_widget_init_template(GTK_WIDGET(self));
-  g_autoptr(GSimpleActionGroup) ag = errands_action_group_new(2, "import", on_import_action_cb, self, "new_list",
-                                                              errands_sidebar_new_list_dialog_show, NULL);
-  gtk_widget_insert_action_group(GTK_WIDGET(self), "sidebar", G_ACTION_GROUP(ag));
+  errands_add_actions(GTK_WIDGET(self), "sidebar", "import", on_import_action_cb, self, "new_list",
+                      errands_sidebar_new_list_dialog_show, NULL, NULL);
 }
 
 ErrandsSidebar *errands_sidebar_new() { return g_object_new(ERRANDS_TYPE_SIDEBAR, NULL); }

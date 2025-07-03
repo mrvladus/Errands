@@ -1,0 +1,121 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $ErrandsTaskListDateDialogDateChooser: Box {
+  spacing: 6;
+
+  MenuButton {
+    icon-name: "errands-clock-symbolic";
+    valign: center;
+
+    styles [
+      "flat",
+    ]
+
+    popover: Popover {
+      child: Box {
+        spacing: 6;
+
+        SpinButton hours {
+          orientation: vertical;
+
+          adjustment: Adjustment {
+            lower: 0;
+            upper: 23;
+            step-increment: 1;
+          };
+
+          value-changed => $on_time_set_cb(template);
+        }
+
+        Label {
+          label: ":";
+        }
+
+        SpinButton minutes {
+          orientation: vertical;
+
+          adjustment: Adjustment {
+            lower: 0;
+            upper: 59;
+            step-increment: 1;
+          };
+
+          value-changed => $on_time_set_cb(template);
+        }
+
+        Box {
+          orientation: vertical;
+          spacing: 6;
+          homogeneous: true;
+
+          Button {
+            name: "9";
+            clicked => $on_time_preset_cb();
+
+            Adw.ButtonContent {
+              label: _("9:00");
+              icon-name: "errands-morning-symbolic";
+            }
+          }
+
+          Button {
+            name: "12";
+            clicked => $on_time_preset_cb();
+
+            Adw.ButtonContent {
+              label: _("12:00");
+              icon-name: "errands-afternoon-symbolic";
+            }
+          }
+        }
+
+        Box {
+          orientation: vertical;
+          spacing: 6;
+          homogeneous: true;
+
+          Button {
+            name: "17";
+            clicked => $on_time_preset_cb();
+
+            Adw.ButtonContent {
+              label: _("17:00");
+              icon-name: "errands-sunset-symbolic";
+            }
+          }
+
+          Button {
+            name: "20";
+            clicked => $on_time_preset_cb();
+
+            Adw.ButtonContent {
+              label: _("20:00");
+              icon-name: "errands-night-symbolic";
+            }
+          }
+        }
+      };
+    };
+  }
+
+  Button reset_btn {
+    icon-name: "errands-reset-symbolic";
+    tooltip-text: _("Reset");
+    valign: center;
+
+    styles [
+      "flat",
+    ]
+
+    clicked => $errands_task_list_time_dialog_time_chooser_reset(template);
+  }
+
+  Label {
+    label: _("Not Set");
+
+    styles [
+      "numeric",
+    ]
+  }
+}

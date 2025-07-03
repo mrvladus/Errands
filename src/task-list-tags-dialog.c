@@ -2,7 +2,7 @@
 #include "settings.h"
 #include "state.h"
 #include "task-list-tags-dialog-tag.h"
-#include "task/task.h"
+#include "task.h"
 #include "utils.h"
 
 static void on_dialog_close_cb(ErrandsTaskListTagsDialog *self);

@@ -1,6 +1,6 @@
 #include "task-list-priority-dialog.h"
 #include "state.h"
-#include "task/task.h"
+#include "task.h"
 
 static void on_dialog_close_cb(ErrandsTaskListPriorityDialog *self);
 static void on_toggle_cb(ErrandsTaskListPriorityDialog *self, GtkCheckButton *btn);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "task/task.h"
+#include "task.h"
 
 #include <adwaita.h>
 

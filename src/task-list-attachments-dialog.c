@@ -1,7 +1,7 @@
 #include "task-list-attachments-dialog.h"
 #include "state.h"
 #include "task-list-attachments-dialog-attachment.h"
-#include "task/task.h"
+#include "task.h"
 
 static void on_dialog_close_cb(ErrandsTaskListAttachmentsDialog *self);
 static void on_add_btn_clicked_cb();
