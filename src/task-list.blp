@@ -58,10 +58,14 @@ template $ErrandsTaskList: Adw.Bin {
         Adw.Clamp {
           tightening-threshold: 300;
           maximum-size: 1000;
+          margin-start: 12;
+          margin-end: 12;
 
           Adw.EntryRow {
             title: _("Add Task");
             activatable: false;
+            margin-top: 6;
+            margin-bottom: 6;
             entry-activated => $on_task_list_entry_activated_cb();
 
             styles [
