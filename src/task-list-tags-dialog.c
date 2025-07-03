@@ -19,7 +19,11 @@ static void errands_task_list_tags_dialog_class_init(ErrandsTaskListTagsDialogCl
   G_OBJECT_CLASS(class)->dispose = errands_task_list_tags_dialog_dispose;
   gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class),
                                               "/io/github/mrvladus/Errands/ui/task-list-tags-dialog.ui");
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListTagsDialog, entry);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListTagsDialog, tags_box);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListTagsDialog, placeholder);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_dialog_close_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_entry_activated_cb);
 }
 
 static void errands_task_list_tags_dialog_init(ErrandsTaskListTagsDialog *self) {
@@ -40,21 +44,9 @@ void errands_task_list_tags_dialog_show(ErrandsTask *task) {
     state.main_window->task_list->tags_dialog = errands_task_list_tags_dialog_new();
   ErrandsTaskListTagsDialog *self = state.main_window->task_list->tags_dialog;
   self->current_task = task;
-  // Remove rows
-  gtk_list_box_remove_all(GTK_LIST_BOX(self->tags_box));
   // Add rows
-  g_autoptr(GStrvBuilder) builder = g_strv_builder_new();
   g_auto(GStrv) tags = errands_settings_get_tags();
-  g_strv_builder_addv(builder, (const char **)tags);
-  GPtrArray *tasks = errands_task_list_get_all_tasks();
-  for (size_t i = 0; i < tasks->len; i++) {
-    ErrandsTask *task = tasks->pdata[i];
-    g_auto(GStrv) task_tags = errands_data_get_strv(task->data, DATA_PROP_TAGS);
-    g_strv_builder_addv(builder, (const char **)task_tags);
-  }
-  g_ptr_array_free(tasks, false);
-  g_auto(GStrv) all_tags = g_strv_builder_end(builder);
-  g_auto(GStrv) all_tags_no_dups = gstrv_remove_duplicates(all_tags);
+  g_auto(GStrv) all_tags_no_dups = gstrv_remove_duplicates(tags);
   for (size_t i = 0; i < g_strv_length(all_tags_no_dups); i++) {
     ErrandsTaskListTagsDialogTag *row = errands_task_list_tags_dialog_tag_new(all_tags_no_dups[i]);
     gtk_list_box_append(GTK_LIST_BOX(self->tags_box), GTK_WIDGET(row));
@@ -66,7 +58,10 @@ void errands_task_list_tags_dialog_show(ErrandsTask *task) {
 
 // ---------- CALLBACKS ---------- //
 
-static void on_dialog_close_cb(ErrandsTaskListTagsDialog *self) { errands_task_update_tags(self->current_task); }
+static void on_dialog_close_cb(ErrandsTaskListTagsDialog *self) {
+  gtk_list_box_remove_all(GTK_LIST_BOX(self->tags_box));
+  errands_task_update_tags(self->current_task);
+}
 
 static void on_entry_activated_cb(ErrandsTaskListTagsDialog *self, AdwEntryRow *entry) {
   const char *tag = string_trim((char *)gtk_editable_get_text(GTK_EDITABLE(entry)));

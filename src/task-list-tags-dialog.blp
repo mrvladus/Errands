@@ -17,7 +17,7 @@ template $ErrandsTaskListTagsDialog: Adw.Dialog {
       margin-start: 12;
       margin-end: 12;
       activatable: false;
-      entry-activated => $on_entry_activated_cb();
+      entry-activated => $on_entry_activated_cb(template);
 
       styles [
         "card",
