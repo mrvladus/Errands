@@ -13,6 +13,7 @@ struct _ErrandsTaskListNotesDialog {
   AdwDialog parent_instance;
   GtkSourceBuffer *source_buffer;
   GtkSourceView *source_view;
+  AdwBin *md_view_bin;
   GtkWidget *md_view;
 
   ErrandsTask *current_task;

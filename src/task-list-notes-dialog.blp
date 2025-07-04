@@ -1,6 +1,5 @@
 using Gtk 4.0;
 using Adw 1;
-using WebKit 6.0;
 using GtkSource 5;
 
 template $ErrandsTaskListNotesDialog: Adw.Dialog {
@@ -36,14 +35,13 @@ template $ErrandsTaskListNotesDialog: Adw.Dialog {
           wrap-mode: word;
 
           buffer: GtkSource.Buffer source_buffer {
-            changed => $on_text_changed_cb();
+            changed => $on_text_changed_cb(template);
           };
         }
       }
 
-      WebKit.WebView md_view {
+      Adw.Bin md_view_bin {
         visible: bind md_btn.active;
-        decide-policy => $on_web_view_decide_policy_cb();
       }
     };
   }
