@@ -3,7 +3,7 @@
 #include "caldav.h"
 
 #define XML_H_IMPLEMENTATION
-#include "xml.h"
+#include "../../vendor/xml.h"
 
 #include <curl/curl.h>
 
@@ -12,8 +12,7 @@ static bool caldav_client_autodiscover(CalDAVClient *client) {
   // Autodiscover CalDAV URL
   caldav_log("Autodiscovering CalDAV URL for %s", client->base_url);
   char *caldav_url = caldav_autodiscover(client);
-  if (!caldav_url)
-    return false;
+  if (!caldav_url) return false;
   // Get CalDAV principal URL
   caldav_log("Getting CalDAV principal URL...");
   char *principal_url = NULL;
@@ -31,8 +30,7 @@ static bool caldav_client_autodiscover(CalDAVClient *client) {
     caldav_log("Principal URL: %s", principal_url);
     free(principal_xml);
     xml_node_free(root);
-  } else
-    return false;
+  } else return false;
   // Get CalDAV calendars URL
   caldav_log("Getting CalDAV calendars URL...");
   const char *calendars_request_body = "<d:propfind xmlns:d=\"DAV:\" xmlns:c=\"urn:ietf:params:xml:ns:caldav\">"
@@ -49,15 +47,13 @@ static bool caldav_client_autodiscover(CalDAVClient *client) {
     caldav_log("Calendars URL: %s", calendars_url);
     free(calendars_xml);
     xml_node_free(root);
-  } else
-    return false;
+  } else return false;
   client->calendars_url = calendars_url;
   return true;
 }
 
 CalDAVClient *caldav_client_new(const char *base_url, const char *username, const char *password) {
-  if (!base_url || !username || !password)
-    return NULL;
+  if (!base_url || !username || !password) return NULL;
   caldav_log("Creating client");
   CalDAVClient *client = malloc(sizeof(CalDAVClient));
   client->base_url = extract_base_url(base_url);
@@ -92,25 +88,19 @@ bool caldav_client_pull_calendars(CalDAVClient *client, CalDAVComponentSet set) 
     for (size_t i = 1; i < multistatus->children->len; i++) {
       XMLNode *res = xml_node_child_at(multistatus, i);
       XMLNode *is_calendar_type = xml_node_find_by_path(res, "propstat/prop/resourcetype/calendar", false);
-      if (!is_calendar_type)
-        continue;
+      if (!is_calendar_type) continue;
       XMLNode *is_deleted = xml_node_find_by_path(res, "propstat/prop/resourcetype/deleted-calendar", false);
-      if (is_deleted)
-        continue;
+      if (is_deleted) continue;
       XMLNode *supported_set = xml_node_find_tag(res, "supported-calendar-component-set", false);
       bool set_found = false;
       for (size_t si = 0; si < supported_set->children->len; si++) {
         XMLNode *comp = xml_node_child_at(supported_set, si);
         const char *comp_set = xml_node_attr(comp, "name");
-        if (set & CALDAV_COMPONENT_SET_VTODO && !strcmp(comp_set, "VTODO"))
-          set_found = true;
-        if (set & CALDAV_COMPONENT_SET_VEVENT && !strcmp(comp_set, "VEVENT"))
-          set_found = true;
-        if (set & CALDAV_COMPONENT_SET_VJOURNAL && !strcmp(comp_set, "VJOURNAL"))
-          set_found = true;
+        if (set & CALDAV_COMPONENT_SET_VTODO && !strcmp(comp_set, "VTODO")) set_found = true;
+        if (set & CALDAV_COMPONENT_SET_VEVENT && !strcmp(comp_set, "VEVENT")) set_found = true;
+        if (set & CALDAV_COMPONENT_SET_VJOURNAL && !strcmp(comp_set, "VJOURNAL")) set_found = true;
       }
-      if (!set_found)
-        continue;
+      if (!set_found) continue;
       XMLNode *href = xml_node_find_tag(res, "href", false);
       char *url = strdup_printf("%s%s", client->base_url, href->text);
       XMLNode *name = xml_node_find_by_path(res, "propstat/prop/displayname", false);
@@ -121,8 +111,7 @@ bool caldav_client_pull_calendars(CalDAVClient *client, CalDAVComponentSet set) 
       free(url);
     }
     xml_node_free(root);
-  } else
-    return false;
+  } else return false;
   client->calendars = calendars;
   return true;
 }
@@ -133,10 +122,8 @@ CalDAVCalendar *caldav_client_create_calendar(CalDAVClient *client, const char *
   CalDAVCalendar *cal = NULL;
   char *uuid = generate_uuid4();
   char *url = strdup_printf("%s%s/", client->calendars_url, uuid);
-  if (!caldav_mkcalendar(client, url, name, color, set))
-    caldav_log("Failed to create calendar: %s", name);
-  else
-    cal = caldav_calendar_new(client, (char *)color, set, (char *)name, url);
+  if (!caldav_mkcalendar(client, url, name, color, set)) caldav_log("Failed to create calendar: %s", name);
+  else cal = caldav_calendar_new(client, (char *)color, set, (char *)name, url);
   caldav_free(uuid);
   caldav_free(url);
   return cal;

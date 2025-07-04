@@ -341,8 +341,8 @@ void errands_task_update_toolbar(ErrandsTask *task) {
   gtk_button_set_icon_name(GTK_BUTTON(task->priority_btn),
                            priority > 0 ? "errands-priority-set-symbolic" : "errands-priority-symbolic");
   if (priority > 0 && priority < 3) gtk_widget_add_css_class(task->priority_btn, "priority-low");
-  else if (priority > 3 && priority < 6) gtk_widget_add_css_class(task->priority_btn, "priority-medium");
-  else if (priority > 6 && priority < 10) gtk_widget_add_css_class(task->priority_btn, "priority-high");
+  else if (priority >= 3 && priority < 7) gtk_widget_add_css_class(task->priority_btn, "priority-medium");
+  else if (priority >= 7 && priority < 10) gtk_widget_add_css_class(task->priority_btn, "priority-high");
   // Update date button
   TaskData *data = task->data;
   // If not repeated

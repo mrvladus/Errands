@@ -5,13 +5,12 @@ project(
   version: '48.0',
 )
 
-# Dependencies
-subdir('src' / 'sync' / 'caldav') # Build 'libcaldav' to work with CalDAV servers
 dependencies = [
   dependency('libportal'), # For checking flatpak sandbox
   dependency('libical'), # For working with user data in ical format
   dependency('gtksourceview-5'), # For notes syntax highlighting
   dependency('webkitgtk-6.0'), # For markdown preview
+  dependency('libcurl'),
   dependency('gtk4'),
   dependency('libadwaita-1', version: '>=1.7'),
 ]
@@ -30,6 +29,11 @@ sources = files(
   'src/sidebar-task-list-row.c',
   'src/sidebar.c',
   'src/state.c',
+  'src/sync/caldav/caldav-calendar.c',
+  'src/sync/caldav/caldav-client.c',
+  'src/sync/caldav/caldav-event.c',
+  'src/sync/caldav/caldav-list.c',
+  'src/sync/caldav/caldav-requests.c',
   'src/sync/sync.c',
   'src/task-list-attachments-dialog-attachment.c',
   'src/task-list-attachments-dialog.c',
@@ -109,7 +113,6 @@ bin = executable(
   meson.project_name(),
   sources: [sources, resources],
   dependencies: dependencies,
-  link_with: libcaldav,
 )
 
 # Run target for building and running errands: 'meson compile run'

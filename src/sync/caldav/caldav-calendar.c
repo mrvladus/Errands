@@ -1,7 +1,7 @@
+#include "../../vendor/xml.h"
 #include "caldav-requests.h"
 #include "caldav-utils.h"
 #include "caldav.h"
-#include "xml.h"
 #include <libical/ical.h>
 
 CalDAVCalendar *caldav_calendar_new(CalDAVClient *client, char *color, CalDAVComponentSet set, char *name, char *url) {
@@ -37,12 +37,9 @@ bool caldav_calendar_pull_events(CalDAVCalendar *calendar) {
 
   char comp_set[105];
   comp_set[0] = '\0';
-  if (calendar->set & CALDAV_COMPONENT_SET_VTODO)
-    strcat(comp_set, "<c:comp-filter name=\"VTODO\"/>");
-  if (calendar->set & CALDAV_COMPONENT_SET_VEVENT)
-    strcat(comp_set, "<c:comp-filter name=\"VEVENT\"/>");
-  if (calendar->set & CALDAV_COMPONENT_SET_VJOURNAL)
-    strcat(comp_set, "<c:comp-filter name=\"VJOURNAL\"/>");
+  if (calendar->set & CALDAV_COMPONENT_SET_VTODO) strcat(comp_set, "<c:comp-filter name=\"VTODO\"/>");
+  if (calendar->set & CALDAV_COMPONENT_SET_VEVENT) strcat(comp_set, "<c:comp-filter name=\"VEVENT\"/>");
+  if (calendar->set & CALDAV_COMPONENT_SET_VJOURNAL) strcat(comp_set, "<c:comp-filter name=\"VJOURNAL\"/>");
 
   char request_body[strlen(request_template) + strlen(comp_set) + 1];
   sprintf(request_body, request_template, comp_set);
@@ -62,8 +59,7 @@ bool caldav_calendar_pull_events(CalDAVCalendar *calendar) {
       caldav_list_add(events, event);
       free(url);
     }
-  } else
-    return false;
+  } else return false;
   caldav_list_free(calendar->events, (void (*)(void *))caldav_event_free);
   calendar->events = events;
   return true;

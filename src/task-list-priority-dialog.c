@@ -16,6 +16,11 @@ static void errands_task_list_priority_dialog_class_init(ErrandsTaskListPriority
   G_OBJECT_CLASS(class)->dispose = errands_task_list_priority_dialog_dispose;
   gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class),
                                               "/io/github/mrvladus/Errands/ui/task-list-priority-dialog.ui");
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListPriorityDialog, high_row);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListPriorityDialog, medium_row);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListPriorityDialog, low_row);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListPriorityDialog, none_row);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListPriorityDialog, custom_row);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_dialog_close_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_toggle_cb);
 }
@@ -62,8 +67,8 @@ static void on_dialog_close_cb(ErrandsTaskListPriorityDialog *self) {
   gtk_widget_add_css_class(self->current_task->priority_btn, "flat");
   if (val == 0) return;
   else if (val > 0 && val < 3) gtk_widget_add_css_class(self->current_task->priority_btn, "priority-low");
-  else if (val > 3 && val < 6) gtk_widget_add_css_class(self->current_task->priority_btn, "priority-medium");
-  else if (val > 6 && val < 10) gtk_widget_add_css_class(self->current_task->priority_btn, "priority-high");
+  else if (val >= 3 && val < 7) gtk_widget_add_css_class(self->current_task->priority_btn, "priority-medium");
+  else if (val >= 7 && val < 10) gtk_widget_add_css_class(self->current_task->priority_btn, "priority-high");
 }
 
 static void on_toggle_cb(ErrandsTaskListPriorityDialog *self, GtkCheckButton *btn) {
