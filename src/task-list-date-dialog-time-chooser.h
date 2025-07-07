@@ -9,9 +9,9 @@ G_DECLARE_FINAL_TYPE(ErrandsTaskListDateDialogTimeChooser, errands_task_list_dat
 
 struct _ErrandsTaskListDateDialogTimeChooser {
   AdwActionRow parent_instance;
-  GtkWidget *hours;
-  GtkWidget *minutes;
-  GtkWidget *reset_btn;
+  GtkSpinButton *hours;
+  GtkSpinButton *minutes;
+  GtkButton *reset_btn;
 };
 
 ErrandsTaskListDateDialogTimeChooser *errands_task_list_date_dialog_time_chooser_new();

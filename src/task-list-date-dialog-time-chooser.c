@@ -1,6 +1,5 @@
 #include "task-list-date-dialog-time-chooser.h"
-#include "adwaita.h"
-#include "glib-object.h"
+#include "utils.h"
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>
@@ -74,6 +73,8 @@ static void on_time_set_cb(ErrandsTaskListDateDialogTimeChooser *self) {
 }
 
 static void on_time_preset_cb(ErrandsTaskListDateDialogTimeChooser *self, GtkButton *btn) {
-  gtk_spin_button_set_value(GTK_SPIN_BUTTON(self->minutes), 0);
-  gtk_spin_button_set_value(GTK_SPIN_BUTTON(self->hours), atoi(gtk_widget_get_name(GTK_WIDGET(btn))));
+  int hours = atoi(gtk_widget_get_name(GTK_WIDGET(btn)));
+  gtk_spin_button_set_value(self->minutes, 0);
+  gtk_spin_button_set_value(self->hours, hours);
+  LOG("TimeChooser: Select preset %d:00", hours);
 }

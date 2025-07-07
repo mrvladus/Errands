@@ -65,7 +65,7 @@ template $ErrandsTaskListDateDialogTimeChooser: Adw.ActionRow {
 
           Button {
             name: "9";
-            clicked => $on_time_preset_cb();
+            clicked => $on_time_preset_cb(template);
 
             Adw.ButtonContent {
               label: _("9:00");
@@ -75,7 +75,7 @@ template $ErrandsTaskListDateDialogTimeChooser: Adw.ActionRow {
 
           Button {
             name: "12";
-            clicked => $on_time_preset_cb();
+            clicked => $on_time_preset_cb(template);
 
             Adw.ButtonContent {
               label: _("12:00");
@@ -91,7 +91,7 @@ template $ErrandsTaskListDateDialogTimeChooser: Adw.ActionRow {
 
           Button {
             name: "17";
-            clicked => $on_time_preset_cb();
+            clicked => $on_time_preset_cb(template);
 
             Adw.ButtonContent {
               label: _("17:00");
@@ -101,7 +101,7 @@ template $ErrandsTaskListDateDialogTimeChooser: Adw.ActionRow {
 
           Button {
             name: "20";
-            clicked => $on_time_preset_cb();
+            clicked => $on_time_preset_cb(template);
 
             Adw.ButtonContent {
               label: _("20:00");
