@@ -24,6 +24,8 @@ static void errands_task_list_date_dialog_time_chooser_class_init(ErrandsTaskLis
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListDateDialogTimeChooser, label);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListDateDialogTimeChooser, reset_btn);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_list_date_dialog_time_chooser_reset);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_time_set_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_time_preset_cb);
 }
 
 static void errands_task_list_date_dialog_time_chooser_init(ErrandsTaskListDateDialogTimeChooser *self) {

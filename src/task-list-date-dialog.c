@@ -4,7 +4,6 @@
 #include "task-list-date-dialog-date-chooser.h"
 #include "task-list-date-dialog-week-chooser.h"
 #include "task.h"
-#include "utils.h"
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>
@@ -25,6 +24,7 @@ static void errands_task_list_date_dialog_class_init(ErrandsTaskListDateDialogCl
   g_type_ensure(ERRANDS_TYPE_TASK_LIST_DATE_DIALOG_DATE_CHOOSER);
   g_type_ensure(ERRANDS_TYPE_TASK_LIST_DATE_DIALOG_TIME_CHOOSER);
   g_type_ensure(ERRANDS_TYPE_TASK_LIST_DATE_DIALOG_WEEK_CHOOSER);
+  g_type_ensure(ERRANDS_TYPE_TASK_LIST_DATE_DIALOG_MONTH_CHOOSER);
   G_OBJECT_CLASS(class)->dispose = errands_task_list_date_dialog_dispose;
   gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class),
                                               "/io/github/mrvladus/Errands/ui/task-list-date-dialog.ui");

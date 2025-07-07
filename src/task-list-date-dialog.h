@@ -21,10 +21,10 @@ struct _ErrandsTaskListDateDialog {
   ErrandsTaskListDateDialogTimeChooser *start_time_chooser;
 
   GtkWidget *repeat_row;
-  ErrandsTaskListDateDialogWeekChooser *week_chooser;
-  ErrandsTaskListDateDialogMonthChooser *month_chooser;
   GtkWidget *freq_row;
   GtkWidget *interval_row;
+  ErrandsTaskListDateDialogWeekChooser *week_chooser;
+  ErrandsTaskListDateDialogMonthChooser *month_chooser;
   GtkWidget *until_row;
   ErrandsTaskListDateDialogDateChooser *until_date_chooser;
   GtkWidget *count_row;

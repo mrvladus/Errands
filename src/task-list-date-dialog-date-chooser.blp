@@ -36,7 +36,7 @@ template $ErrandsTaskListDateDialogDateChooser: Box {
 
           Button {
             label: _("Today");
-            clicked => $on_today_btn_clicked(template);
+            clicked => $on_today_btn_clicked_cb(template);
 
             styles [
               "flat",
@@ -45,7 +45,7 @@ template $ErrandsTaskListDateDialogDateChooser: Box {
 
           Button {
             label: _("Tomorrow");
-            clicked => $on_tomorrow_btn_clicked(template);
+            clicked => $on_tomorrow_btn_clicked_cb(template);
 
             styles [
               "flat",

@@ -1,8 +1,16 @@
 using Gtk 4.0;
 using Adw 1;
 
-template $ErrandsTaskListDateDialogDateChooser: Box {
+template $ErrandsTaskListDateDialogTimeChooser: Box {
   spacing: 6;
+
+  Label label {
+    label: _("Not Set");
+
+    styles [
+      "numeric",
+    ]
+  }
 
   MenuButton {
     icon-name: "errands-clock-symbolic";
@@ -108,14 +116,6 @@ template $ErrandsTaskListDateDialogDateChooser: Box {
       "flat",
     ]
 
-    clicked => $errands_task_list_time_dialog_time_chooser_reset(template);
-  }
-
-  Label {
-    label: _("Not Set");
-
-    styles [
-      "numeric",
-    ]
+    clicked => $errands_task_list_date_dialog_time_chooser_reset(template);
   }
 }

@@ -65,7 +65,9 @@ template $ErrandsTaskListDateDialog: Adw.Dialog {
             notify::value => $on_interval_changed_cb(template) not-swapped;
           }
 
-          $ErrandsTaskListDateDialogWeekChooser {}
+          $ErrandsTaskListDateDialogWeekChooser week_chooser {}
+
+          $ErrandsTaskListDateDialogMonthChooser month_chooser {}
 
           Adw.ActionRow until_row {
             title: _("Repeat Until");

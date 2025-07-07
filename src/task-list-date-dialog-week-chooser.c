@@ -2,7 +2,7 @@
 #include "utils.h"
 
 struct _ErrandsTaskListDateDialogWeekChooser {
-  GtkListBox *parent_instance;
+  GtkListBoxRow parent_instance;
   GtkWidget *week_box;
 };
 
