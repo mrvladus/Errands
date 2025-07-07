@@ -17,12 +17,7 @@ template $ErrandsTaskListDateDialog: Adw.Dialog {
 
         $ErrandsTaskListDateDialogDateChooser start_date_chooser {}
 
-        Adw.ActionRow start_time_row {
-          title: _("Time");
-
-          [suffix]
-          $ErrandsTaskListDateDialogTimeChooser start_time_chooser {}
-        }
+        $ErrandsTaskListDateDialogTimeChooser start_time_chooser {}
 
         Adw.ExpanderRow repeat_row {
           title: _("Repeat");
@@ -90,12 +85,7 @@ template $ErrandsTaskListDateDialog: Adw.Dialog {
 
         $ErrandsTaskListDateDialogDateChooser due_date_chooser {}
 
-        Adw.ActionRow due_time_row {
-          title: _("Time");
-
-          [suffix]
-          $ErrandsTaskListDateDialogTimeChooser due_time_chooser {}
-        }
+        $ErrandsTaskListDateDialogTimeChooser due_time_chooser {}
       }
     };
   }

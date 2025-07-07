@@ -1,4 +1,6 @@
 #include "task-list-date-dialog-time-chooser.h"
+#include "adwaita.h"
+#include "glib-object.h"
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>
@@ -8,7 +10,7 @@ static void on_time_preset_cb(ErrandsTaskListDateDialogTimeChooser *self, GtkBut
 
 // ---------- WIDGET TEMPLATE ---------- //
 
-G_DEFINE_TYPE(ErrandsTaskListDateDialogTimeChooser, errands_task_list_date_dialog_time_chooser, GTK_TYPE_BOX)
+G_DEFINE_TYPE(ErrandsTaskListDateDialogTimeChooser, errands_task_list_date_dialog_time_chooser, ADW_TYPE_ACTION_ROW)
 
 static void errands_task_list_date_dialog_time_chooser_dispose(GObject *gobject) {
   gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_TASK_LIST_DATE_DIALOG_TIME_CHOOSER);
@@ -21,7 +23,6 @@ static void errands_task_list_date_dialog_time_chooser_class_init(ErrandsTaskLis
                                               "/io/github/mrvladus/Errands/ui/task-list-date-dialog-time-chooser.ui");
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListDateDialogTimeChooser, hours);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListDateDialogTimeChooser, minutes);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListDateDialogTimeChooser, label);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListDateDialogTimeChooser, reset_btn);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_list_date_dialog_time_chooser_reset);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_time_set_cb);
@@ -55,7 +56,7 @@ void errands_task_list_date_dialog_time_chooser_set_time(ErrandsTaskListDateDial
 
 void errands_task_list_date_dialog_time_chooser_reset(ErrandsTaskListDateDialogTimeChooser *self) {
   errands_task_list_date_dialog_time_chooser_set_time(self, icaltime_null_time());
-  g_object_set(self->label, "label", _("Not Set"), NULL);
+  g_object_set(self, "subtitle", _("Not Set"), NULL);
   g_object_set(self->reset_btn, "visible", false, NULL);
 }
 
@@ -68,7 +69,7 @@ static void on_time_set_cb(ErrandsTaskListDateDialogTimeChooser *self) {
   sprintf(h, "%02d", gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(self->hours)));
   gtk_editable_set_text(GTK_EDITABLE(self->hours), h);
   sprintf(time, "%s:%s", h, m);
-  gtk_label_set_label(GTK_LABEL(self->label), time);
+  g_object_set(self, "subtitle", time, NULL);
   g_object_set(self->reset_btn, "visible", true, NULL);
 }
 

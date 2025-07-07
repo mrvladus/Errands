@@ -1,17 +1,23 @@
 using Gtk 4.0;
 using Adw 1;
 
-template $ErrandsTaskListDateDialogTimeChooser: Box {
-  spacing: 6;
+template $ErrandsTaskListDateDialogTimeChooser: Adw.ActionRow {
+  title: _("Time");
+  subtitle: _("Not Set");
 
-  Label label {
-    label: _("Not Set");
+  [suffix]
+  Button reset_btn {
+    icon-name: "errands-reset-symbolic";
+    tooltip-text: _("Reset");
+    valign: center;
+    clicked => $errands_task_list_date_dialog_time_chooser_reset(template);
 
     styles [
-      "numeric",
+      "flat",
     ]
   }
 
+  [suffix]
   MenuButton {
     icon-name: "errands-clock-symbolic";
     valign: center;
@@ -105,17 +111,5 @@ template $ErrandsTaskListDateDialogTimeChooser: Box {
         }
       };
     };
-  }
-
-  Button reset_btn {
-    icon-name: "errands-reset-symbolic";
-    tooltip-text: _("Reset");
-    valign: center;
-
-    styles [
-      "flat",
-    ]
-
-    clicked => $errands_task_list_date_dialog_time_chooser_reset(template);
   }
 }

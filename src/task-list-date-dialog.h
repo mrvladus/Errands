@@ -16,7 +16,6 @@ struct _ErrandsTaskListDateDialog {
   AdwDialog parent_instance;
 
   ErrandsTaskListDateDialogDateChooser *start_date_chooser;
-  GtkWidget *start_time_row;
   ErrandsTaskListDateDialogTimeChooser *start_time_chooser;
 
   GtkWidget *repeat_row;
@@ -28,7 +27,6 @@ struct _ErrandsTaskListDateDialog {
   GtkWidget *count_row;
 
   ErrandsTaskListDateDialogDateChooser *due_date_chooser;
-  GtkWidget *due_time_row;
   ErrandsTaskListDateDialogTimeChooser *due_time_chooser;
 
   ErrandsTask *current_task;
