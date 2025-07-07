@@ -7,13 +7,6 @@
 G_DECLARE_FINAL_TYPE(ErrandsTaskListDateDialogTimeChooser, errands_task_list_date_dialog_time_chooser, ERRANDS,
                      DATE_DIALOG_TIME_CHOOSER, AdwActionRow)
 
-struct _ErrandsTaskListDateDialogTimeChooser {
-  AdwActionRow parent_instance;
-  GtkSpinButton *hours;
-  GtkSpinButton *minutes;
-  GtkButton *reset_btn;
-};
-
 ErrandsTaskListDateDialogTimeChooser *errands_task_list_date_dialog_time_chooser_new();
 icaltimetype errands_task_list_date_dialog_time_chooser_get_time(ErrandsTaskListDateDialogTimeChooser *self);
 void errands_task_list_date_dialog_time_chooser_set_time(ErrandsTaskListDateDialogTimeChooser *self, icaltimetype time);

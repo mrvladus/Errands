@@ -9,6 +9,13 @@ static void on_time_preset_cb(ErrandsTaskListDateDialogTimeChooser *self, GtkBut
 
 // ---------- WIDGET TEMPLATE ---------- //
 
+struct _ErrandsTaskListDateDialogTimeChooser {
+  AdwActionRow parent_instance;
+  GtkSpinButton *hours;
+  GtkSpinButton *minutes;
+  GtkButton *reset_btn;
+};
+
 G_DEFINE_TYPE(ErrandsTaskListDateDialogTimeChooser, errands_task_list_date_dialog_time_chooser, ADW_TYPE_ACTION_ROW)
 
 static void errands_task_list_date_dialog_time_chooser_dispose(GObject *gobject) {
