@@ -1,11 +1,15 @@
 using Gtk 4.0;
+using Adw 1;
 
-template $ErrandsTaskListDateDialogDateChooser: Box {
-  spacing: 6;
+template $ErrandsTaskListDateDialogDateChooser: Adw.ActionRow {
+  title: _("Date");
+  subtitle: _("Not Set");
 
+  [suffix]
   Button reset_btn {
     icon-name: "errands-reset-symbolic";
     tooltip-text: _("Reset");
+    valign: center;
     clicked => $errands_task_list_date_dialog_date_chooser_reset(template);
 
     styles [
@@ -13,14 +17,7 @@ template $ErrandsTaskListDateDialogDateChooser: Box {
     ]
   }
 
-  Label label {
-    label: _("Not Set");
-
-    styles [
-      "numeric",
-    ]
-  }
-
+  [suffix]
   MenuButton {
     icon-name: "errands-calendar-symbolic";
     valign: center;

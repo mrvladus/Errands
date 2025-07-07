@@ -15,7 +15,6 @@ G_DECLARE_FINAL_TYPE(ErrandsTaskListDateDialog, errands_task_list_date_dialog, E
 struct _ErrandsTaskListDateDialog {
   AdwDialog parent_instance;
 
-  GtkWidget *start_date_row;
   ErrandsTaskListDateDialogDateChooser *start_date_chooser;
   GtkWidget *start_time_row;
   ErrandsTaskListDateDialogTimeChooser *start_time_chooser;
@@ -25,11 +24,9 @@ struct _ErrandsTaskListDateDialog {
   GtkWidget *interval_row;
   ErrandsTaskListDateDialogWeekChooser *week_chooser;
   ErrandsTaskListDateDialogMonthChooser *month_chooser;
-  GtkWidget *until_row;
   ErrandsTaskListDateDialogDateChooser *until_date_chooser;
   GtkWidget *count_row;
 
-  GtkWidget *due_date_row;
   ErrandsTaskListDateDialogDateChooser *due_date_chooser;
   GtkWidget *due_time_row;
   ErrandsTaskListDateDialogTimeChooser *due_time_chooser;

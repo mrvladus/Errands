@@ -8,7 +8,7 @@ static void on_today_btn_clicked_cb(ErrandsTaskListDateDialogDateChooser *self);
 static void on_tomorrow_btn_clicked_cb(ErrandsTaskListDateDialogDateChooser *self);
 static void on_date_set_cb(ErrandsTaskListDateDialogDateChooser *self);
 
-G_DEFINE_TYPE(ErrandsTaskListDateDialogDateChooser, errands_task_list_date_dialog_date_chooser, GTK_TYPE_BOX)
+G_DEFINE_TYPE(ErrandsTaskListDateDialogDateChooser, errands_task_list_date_dialog_date_chooser, ADW_TYPE_ACTION_ROW)
 
 static void errands_task_list_date_dialog_date_chooser_dispose(GObject *gobject) {
   gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_TASK_LIST_DATE_DIALOG_DATE_CHOOSER);
@@ -20,7 +20,6 @@ static void errands_task_list_date_dialog_date_chooser_class_init(ErrandsTaskLis
   gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class),
                                               "/io/github/mrvladus/Errands/ui/task-list-date-dialog-date-chooser.ui");
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListDateDialogDateChooser, calendar);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListDateDialogDateChooser, label);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListDateDialogDateChooser, reset_btn);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_today_btn_clicked_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_tomorrow_btn_clicked_cb);
@@ -68,7 +67,7 @@ void errands_task_list_date_dialog_date_chooser_set_date(ErrandsTaskListDateDial
 
 void errands_task_list_date_dialog_date_chooser_reset(ErrandsTaskListDateDialogDateChooser *self) {
   on_today_btn_clicked_cb(self);
-  g_object_set(self->label, "label", _("Not Set"), NULL);
+  g_object_set(self, "subtitle", _("Not Set"), NULL);
   g_object_set(self->reset_btn, "visible", false, NULL);
 }
 
@@ -91,6 +90,6 @@ static void on_tomorrow_btn_clicked_cb(ErrandsTaskListDateDialogDateChooser *sel
 static void on_date_set_cb(ErrandsTaskListDateDialogDateChooser *self) {
   g_autoptr(GDateTime) date = gtk_calendar_get_date(GTK_CALENDAR(self->calendar));
   g_autofree gchar *datetime = g_date_time_format(date, "%x");
-  g_object_set(self->label, "label", datetime, NULL);
+  g_object_set(self, "subtitle", datetime, NULL);
   g_object_set(self->reset_btn, "visible", true, NULL);
 }

@@ -15,12 +15,7 @@ template $ErrandsTaskListDateDialog: Adw.Dialog {
       Adw.PreferencesGroup {
         title: _("Start");
 
-        Adw.ActionRow start_date_row {
-          title: _("Date");
-
-          [suffix]
-          $ErrandsTaskListDateDialogDateChooser start_date_chooser {}
-        }
+        $ErrandsTaskListDateDialogDateChooser start_date_chooser {}
 
         Adw.ActionRow start_time_row {
           title: _("Time");
@@ -69,11 +64,8 @@ template $ErrandsTaskListDateDialog: Adw.Dialog {
 
           $ErrandsTaskListDateDialogMonthChooser month_chooser {}
 
-          Adw.ActionRow until_row {
+          $ErrandsTaskListDateDialogDateChooser until_date_chooser {
             title: _("Repeat Until");
-
-            [suffix]
-            $ErrandsTaskListDateDialogDateChooser until_date_chooser {}
           }
 
           Adw.SpinRow count_row {
@@ -96,12 +88,7 @@ template $ErrandsTaskListDateDialog: Adw.Dialog {
         title: _("Due");
         visible: bind repeat_row.enable-expansion inverted;
 
-        Adw.ActionRow due_date_row {
-          title: _("Date");
-
-          [suffix]
-          $ErrandsTaskListDateDialogDateChooser due_date_chooser {}
-        }
+        $ErrandsTaskListDateDialogDateChooser due_date_chooser {}
 
         Adw.ActionRow due_time_row {
           title: _("Time");

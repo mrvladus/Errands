@@ -5,12 +5,11 @@
 
 #define ERRANDS_TYPE_TASK_LIST_DATE_DIALOG_DATE_CHOOSER (errands_task_list_date_dialog_date_chooser_get_type())
 G_DECLARE_FINAL_TYPE(ErrandsTaskListDateDialogDateChooser, errands_task_list_date_dialog_date_chooser, ERRANDS,
-                     TASK_LIST_DATE_DIALOG_DATE_CHOOSER, GtkBox)
+                     TASK_LIST_DATE_DIALOG_DATE_CHOOSER, AdwActionRow)
 
 struct _ErrandsTaskListDateDialogDateChooser {
-  AdwDialog parent_instance;
+  AdwActionRow parent_instance;
   GtkWidget *calendar;
-  GtkWidget *label;
   GtkWidget *reset_btn;
 };
 
