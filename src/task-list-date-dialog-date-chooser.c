@@ -8,6 +8,14 @@ static void on_today_btn_clicked_cb(ErrandsTaskListDateDialogDateChooser *self);
 static void on_tomorrow_btn_clicked_cb(ErrandsTaskListDateDialogDateChooser *self);
 static void on_date_set_cb(ErrandsTaskListDateDialogDateChooser *self);
 
+// ---------- WIDGET TEMPLATE ---------- //
+
+struct _ErrandsTaskListDateDialogDateChooser {
+  AdwActionRow parent_instance;
+  GtkCalendar *calendar;
+  GtkButton *reset_btn;
+};
+
 G_DEFINE_TYPE(ErrandsTaskListDateDialogDateChooser, errands_task_list_date_dialog_date_chooser, ADW_TYPE_ACTION_ROW)
 
 static void errands_task_list_date_dialog_date_chooser_dispose(GObject *gobject) {
@@ -34,6 +42,8 @@ static void errands_task_list_date_dialog_date_chooser_init(ErrandsTaskListDateD
 ErrandsTaskListDateDialogDateChooser *errands_task_list_date_dialog_date_chooser_new() {
   return g_object_new(ERRANDS_TYPE_TASK_LIST_DATE_DIALOG_DATE_CHOOSER, NULL);
 }
+
+// ---------- PUBLIC FUNCTIONS ---------- //
 
 icaltimetype errands_task_list_date_dialog_date_chooser_get_date(ErrandsTaskListDateDialogDateChooser *self) {
   g_autoptr(GDateTime) datetime = gtk_calendar_get_date(GTK_CALENDAR(self->calendar));
@@ -77,18 +87,18 @@ static void on_today_btn_clicked_cb(ErrandsTaskListDateDialogDateChooser *self) 
   g_autoptr(GDateTime) today = g_date_time_new_now_local();
   g_autoptr(GDateTime) tomorrow = g_date_time_add_days(today, 1);
   // We need to select tomorrow first so that calendar can select today (stupid)
-  gtk_calendar_select_day(GTK_CALENDAR(self->calendar), tomorrow);
-  gtk_calendar_select_day(GTK_CALENDAR(self->calendar), today);
+  gtk_calendar_select_day(self->calendar, tomorrow);
+  gtk_calendar_select_day(self->calendar, today);
 }
 
 static void on_tomorrow_btn_clicked_cb(ErrandsTaskListDateDialogDateChooser *self) {
   g_autoptr(GDateTime) today = g_date_time_new_now_local();
   g_autoptr(GDateTime) tomorrow = g_date_time_add_days(today, 1);
-  gtk_calendar_select_day(GTK_CALENDAR(self->calendar), tomorrow);
+  gtk_calendar_select_day(self->calendar, tomorrow);
 }
 
 static void on_date_set_cb(ErrandsTaskListDateDialogDateChooser *self) {
-  g_autoptr(GDateTime) date = gtk_calendar_get_date(GTK_CALENDAR(self->calendar));
+  g_autoptr(GDateTime) date = gtk_calendar_get_date(self->calendar);
   g_autofree gchar *datetime = g_date_time_format(date, "%x");
   g_object_set(self, "subtitle", datetime, NULL);
   g_object_set(self->reset_btn, "visible", true, NULL);

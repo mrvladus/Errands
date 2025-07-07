@@ -56,8 +56,8 @@ icaltimetype errands_task_list_date_dialog_time_chooser_get_time(ErrandsTaskList
 void errands_task_list_date_dialog_time_chooser_set_time(ErrandsTaskListDateDialogTimeChooser *self,
                                                          icaltimetype time) {
   bool is_null = icaltime_is_null_time(time);
-  gtk_spin_button_set_value(GTK_SPIN_BUTTON(self->hours), is_null ? 0 : time.hour);
-  gtk_spin_button_set_value(GTK_SPIN_BUTTON(self->minutes), is_null ? 0 : time.minute);
+  gtk_spin_button_set_value(self->hours, is_null ? 0 : time.hour);
+  gtk_spin_button_set_value(self->minutes, is_null ? 0 : time.minute);
 }
 
 void errands_task_list_date_dialog_time_chooser_reset(ErrandsTaskListDateDialogTimeChooser *self) {
@@ -70,9 +70,9 @@ void errands_task_list_date_dialog_time_chooser_reset(ErrandsTaskListDateDialogT
 
 static void on_time_set_cb(ErrandsTaskListDateDialogTimeChooser *self) {
   char m[3], h[3], time[6];
-  sprintf(m, "%02d", gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(self->minutes)));
+  sprintf(m, "%02d", gtk_spin_button_get_value_as_int(self->minutes));
   gtk_editable_set_text(GTK_EDITABLE(self->minutes), m);
-  sprintf(h, "%02d", gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(self->hours)));
+  sprintf(h, "%02d", gtk_spin_button_get_value_as_int(self->hours));
   gtk_editable_set_text(GTK_EDITABLE(self->hours), h);
   sprintf(time, "%s:%s", h, m);
   g_object_set(self, "subtitle", time, NULL);

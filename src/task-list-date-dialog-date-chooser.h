@@ -7,12 +7,6 @@
 G_DECLARE_FINAL_TYPE(ErrandsTaskListDateDialogDateChooser, errands_task_list_date_dialog_date_chooser, ERRANDS,
                      TASK_LIST_DATE_DIALOG_DATE_CHOOSER, AdwActionRow)
 
-struct _ErrandsTaskListDateDialogDateChooser {
-  AdwActionRow parent_instance;
-  GtkWidget *calendar;
-  GtkWidget *reset_btn;
-};
-
 ErrandsTaskListDateDialogDateChooser *errands_task_list_date_dialog_date_chooser_new();
 icaltimetype errands_task_list_date_dialog_date_chooser_get_date(ErrandsTaskListDateDialogDateChooser *self);
 void errands_task_list_date_dialog_date_chooser_set_date(ErrandsTaskListDateDialogDateChooser *self, icaltimetype date);
