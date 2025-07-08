@@ -29,6 +29,7 @@
     <file preprocess="xml-stripblanks" compressed="true" alias="task-list-date-dialog-time-chooser.ui">src/task-list-date-dialog-time-chooser.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="task-list-date-dialog-week-chooser.ui">src/task-list-date-dialog-week-chooser.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="task-list-date-dialog-month-chooser.ui">src/task-list-date-dialog-month-chooser.ui</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="task-list-date-dialog-rrule-row.ui">src/task-list-date-dialog-rrule-row.ui</file>
   </gresource>
 
   <!-- ICONS -->

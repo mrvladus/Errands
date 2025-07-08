@@ -2,6 +2,7 @@
 
 #include "task-list-date-dialog-date-chooser.h"
 #include "task-list-date-dialog-month-chooser.h"
+#include "task-list-date-dialog-rrule-row.h"
 #include "task-list-date-dialog-time-chooser.h"
 #include "task-list-date-dialog-week-chooser.h"
 #include "task.h"
@@ -14,21 +15,11 @@ G_DECLARE_FINAL_TYPE(ErrandsTaskListDateDialog, errands_task_list_date_dialog, E
 
 struct _ErrandsTaskListDateDialog {
   AdwDialog parent_instance;
-
   ErrandsTaskListDateDialogDateChooser *start_date_chooser;
   ErrandsTaskListDateDialogTimeChooser *start_time_chooser;
-
-  GtkWidget *repeat_row;
-  GtkWidget *freq_row;
-  GtkWidget *interval_row;
-  ErrandsTaskListDateDialogWeekChooser *week_chooser;
-  ErrandsTaskListDateDialogMonthChooser *month_chooser;
-  ErrandsTaskListDateDialogDateChooser *until_date_chooser;
-  GtkWidget *count_row;
-
+  ErrandsTaskListDateDialogRruleRow *rrule_row;
   ErrandsTaskListDateDialogDateChooser *due_date_chooser;
   ErrandsTaskListDateDialogTimeChooser *due_time_chooser;
-
   ErrandsTask *current_task;
 };
 

@@ -19,69 +19,12 @@ template $ErrandsTaskListDateDialog: Adw.Dialog {
 
         $ErrandsTaskListDateDialogTimeChooser start_time_chooser {}
 
-        Adw.ExpanderRow repeat_row {
-          title: _("Repeat");
-          show-enable-switch: true;
-
-          Adw.ComboRow freq_row {
-            title: _("Frequency");
-            subtitle: _("How often task will repeat");
-
-            model: StringList {
-              strings [
-                _("Minutely"),
-                _("Hourly"),
-                _("Daily"),
-                _("Weekly"),
-                _("Monthly"),
-                _("Yearly"),
-              ]
-            };
-
-            notify::selected => $on_freq_changed_cb(template) not-swapped;
-          }
-
-          Adw.SpinRow interval_row {
-            title: _("Interval");
-            numeric: true;
-
-            adjustment: Adjustment {
-              lower: 1;
-              upper: 365;
-              step-increment: 1;
-              page-increment: 10;
-            };
-
-            notify::value => $on_interval_changed_cb(template) not-swapped;
-          }
-
-          $ErrandsTaskListDateDialogWeekChooser week_chooser {}
-
-          $ErrandsTaskListDateDialogMonthChooser month_chooser {}
-
-          $ErrandsTaskListDateDialogDateChooser until_date_chooser {
-            title: _("Repeat Until");
-          }
-
-          Adw.SpinRow count_row {
-            title: _("Count");
-            numeric: true;
-
-            adjustment: Adjustment {
-              lower: 0;
-              upper: 365;
-              step-increment: 1;
-              page-increment: 10;
-            };
-
-            notify::value => $on_count_changed_cb(template) not-swapped;
-          }
-        }
+        $ErrandsTaskListDateDialogRruleRow rrule_row {}
       }
 
       Adw.PreferencesGroup {
         title: _("Due");
-        visible: bind repeat_row.enable-expansion inverted;
+        visible: bind rrule_row.enable-expansion inverted;
 
         $ErrandsTaskListDateDialogDateChooser due_date_chooser {}
 
