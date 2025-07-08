@@ -10,6 +10,8 @@ static void on_size_changed_cb(ErrandsWindow *win);
 static void on_maximize_changed_cb(ErrandsWindow *win);
 static void on_new_list_btn_clicked_cb();
 
+// ---------- WIDGET TEMPLATE ---------- //
+
 G_DEFINE_TYPE(ErrandsWindow, errands_window, ADW_TYPE_APPLICATION_WINDOW)
 
 static void errands_window_dispose(GObject *gobject) {
@@ -42,6 +44,8 @@ ErrandsWindow *errands_window_new(GtkApplication *app) {
                       errands_settings_get("window_height", SETTING_TYPE_INT).i, NULL);
 }
 
+// ---------- PUBLIC FUNCTIONS ---------- //
+
 void errands_window_update(ErrandsWindow *win) {
   LOG("Window: Update");
   size_t count = 0;
@@ -57,7 +61,7 @@ void errands_window_add_toast(ErrandsWindow *win, const char *msg) {
   adw_toast_overlay_add_toast(ADW_TOAST_OVERLAY(win->toast_overlay), adw_toast_new(msg));
 }
 
-// --- SIGNAL HANDLERS --- //
+// ---------- CALLBACKS ---------- //
 
 static void on_size_changed_cb(ErrandsWindow *win) {
   int w, h;

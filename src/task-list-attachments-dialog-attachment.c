@@ -5,6 +5,8 @@
 
 static void on_delete_cb(ErrandsTaskListAttachmentsDialogAttachment *self, GtkButton *btn);
 
+// ---------- WIDGET TEMPLATE ---------- //
+
 struct _ErrandsTaskListAttachmentsDialogAttachment {
   AdwActionRow parent_instance;
 };

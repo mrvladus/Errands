@@ -6,6 +6,8 @@ static void on_response_cb(ErrandsSidebarNewListDialog *dialog, gchar *response,
 static void on_entry_changed_cb(AdwEntryRow *entry);
 static void on_entry_activated_cb(AdwEntryRow *entry);
 
+// ---------- WIDGET TEMPLATE ---------- //
+
 G_DEFINE_TYPE(ErrandsSidebarNewListDialog, errands_sidebar_new_list_dialog, ADW_TYPE_ALERT_DIALOG)
 
 static void errands_errands_sidebar_new_list_dialog_dispose(GObject *gobject) {
@@ -30,6 +32,8 @@ static void errands_sidebar_new_list_dialog_init(ErrandsSidebarNewListDialog *se
 ErrandsSidebarNewListDialog *errands_sidebar_new_list_dialog_new() {
   return g_object_ref_sink(g_object_new(ERRANDS_TYPE_SIDEBAR_NEW_LIST_DIALOG, NULL));
 }
+
+// ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_sidebar_new_list_dialog_show() {
   if (!state.main_window->sidebar->new_list_dialog)

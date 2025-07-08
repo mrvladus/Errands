@@ -11,6 +11,8 @@ static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x,
 static void errands_task_list_attachments_dialog_add_attachment(ErrandsTaskListAttachmentsDialog *self,
                                                                 const char *path);
 
+// ---------- WIDGET TEMPLATE ---------- //
+
 G_DEFINE_TYPE(ErrandsTaskListAttachmentsDialog, errands_task_list_attachments_dialog, ADW_TYPE_DIALOG)
 
 static void errands_task_list_attachments_dialog_dispose(GObject *gobject) {
@@ -37,6 +39,8 @@ static void errands_task_list_attachments_dialog_init(ErrandsTaskListAttachments
 ErrandsTaskListAttachmentsDialog *errands_task_list_attachments_dialog_new() {
   return g_object_ref_sink(g_object_new(ERRANDS_TYPE_TASK_LIST_ATTACHMENTS_DIALOG, NULL));
 }
+
+// ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_task_list_attachments_dialog_update_ui(ErrandsTaskListAttachmentsDialog *self) {
   g_auto(GStrv) attachments = errands_data_get_strv(self->current_task->data, DATA_PROP_ATTACHMENTS);

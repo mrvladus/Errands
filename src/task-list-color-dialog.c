@@ -6,6 +6,8 @@
 static void on_dialog_close_cb(ErrandsTaskListColorDialog *self);
 static void on_toggle_cb(ErrandsTaskListColorDialog *self, GtkCheckButton *btn);
 
+// ---------- WIDGET TEMPLATE ---------- //
+
 G_DEFINE_TYPE(ErrandsTaskListColorDialog, errands_task_list_color_dialog, ADW_TYPE_DIALOG)
 
 static void errands_task_list_color_dialog_dispose(GObject *gobject) {
@@ -29,6 +31,8 @@ static void errands_task_list_color_dialog_init(ErrandsTaskListColorDialog *self
 ErrandsTaskListColorDialog *errands_task_list_color_dialog_new() {
   return g_object_ref_sink(g_object_new(ERRANDS_TYPE_TASK_LIST_COLOR_DIALOG, NULL));
 }
+
+// ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_task_list_color_dialog_show(ErrandsTask *task) {
   if (!state.main_window->task_list->color_dialog)

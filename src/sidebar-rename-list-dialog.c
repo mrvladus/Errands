@@ -8,6 +8,8 @@ static void on_response_cb(ErrandsSidebarRenameListDialog *self, gchar *response
 static void on_entry_changed_cb(ErrandsSidebarRenameListDialog *self, AdwEntryRow *entry);
 static void on_entry_activated_cb(ErrandsSidebarRenameListDialog *self, AdwEntryRow *entry);
 
+// ---------- WIDGET TEMPLATE ---------- //
+
 G_DEFINE_TYPE(ErrandsSidebarRenameListDialog, errands_sidebar_rename_list_dialog, ADW_TYPE_ALERT_DIALOG)
 
 static void errands_errands_sidebar_rename_list_dialog_dispose(GObject *gobject) {
@@ -32,6 +34,8 @@ static void errands_sidebar_rename_list_dialog_init(ErrandsSidebarRenameListDial
 ErrandsSidebarRenameListDialog *errands_sidebar_rename_list_dialog_new() {
   return g_object_ref_sink(g_object_new(ERRANDS_TYPE_SIDEBAR_RENAME_LIST_DIALOG, NULL));
 }
+
+// ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_sidebar_rename_list_dialog_show(ErrandsSidebarTaskListRow *row) {
   if (!state.main_window->sidebar->rename_list_dialog)

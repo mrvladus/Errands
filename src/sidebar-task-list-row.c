@@ -20,6 +20,8 @@ static void on_action_print(GSimpleAction *action, GVariant *param, ErrandsSideb
 // static GdkDragAction on_hover_begin(GtkDropTarget *target, gdouble x, gdouble y,
 //                                     ErrandsSidebarTaskListRow *row);
 
+// ---------- WIDGET TEMPLATE ---------- //
+
 G_DEFINE_TYPE(ErrandsSidebarTaskListRow, errands_sidebar_task_list_row, GTK_TYPE_LIST_BOX_ROW)
 
 static void errands_sidebar_task_list_row_dispose(GObject *gobject) {
@@ -76,6 +78,8 @@ ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_new(ListData *data) {
   errands_sidebar_task_list_row_update_counter(row);
   return row;
 }
+
+// ---------- PUBLIC FUNCTIONS ---------- //
 
 ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_get(const char *uid) {
   GPtrArray *children = get_children(state.main_window->sidebar->task_lists_box);

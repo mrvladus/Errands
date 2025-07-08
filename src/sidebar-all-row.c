@@ -1,6 +1,8 @@
 #include "sidebar-all-row.h"
 #include "data/data.h"
 
+// ---------- WIDGET TEMPLATE ---------- //
+
 G_DEFINE_TYPE(ErrandsSidebarAllRow, errands_sidebar_all_row, GTK_TYPE_LIST_BOX_ROW)
 
 static void errands_sidebar_all_row_dispose(GObject *gobject) {
@@ -18,6 +20,8 @@ static void errands_sidebar_all_row_class_init(ErrandsSidebarAllRowClass *class)
 static void errands_sidebar_all_row_init(ErrandsSidebarAllRow *self) { gtk_widget_init_template(GTK_WIDGET(self)); }
 
 ErrandsSidebarAllRow *errands_sidebar_all_row_new() { return g_object_new(ERRANDS_TYPE_SIDEBAR_ALL_ROW, NULL); }
+
+// ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_sidebar_all_row_update_counter(ErrandsSidebarAllRow *row) {
   GPtrArray *tasks = g_hash_table_get_values_as_ptr_array(tdata);

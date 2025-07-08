@@ -8,6 +8,8 @@
 static void on_dialog_close_cb(ErrandsTaskListTagsDialog *self);
 static void on_entry_activated_cb(ErrandsTaskListTagsDialog *self, AdwEntryRow *entry);
 
+// ---------- WIDGET TEMPLATE ---------- //
+
 G_DEFINE_TYPE(ErrandsTaskListTagsDialog, errands_task_list_tags_dialog, ADW_TYPE_DIALOG)
 
 static void errands_task_list_tags_dialog_dispose(GObject *gobject) {
@@ -33,6 +35,8 @@ static void errands_task_list_tags_dialog_init(ErrandsTaskListTagsDialog *self) 
 ErrandsTaskListTagsDialog *errands_task_list_tags_dialog_new() {
   return g_object_ref_sink(g_object_new(ERRANDS_TYPE_TASK_LIST_TAGS_DIALOG, NULL));
 }
+
+// ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_task_list_tags_dialog_update_ui(ErrandsTaskListTagsDialog *self) {
   g_auto(GStrv) tags = errands_settings_get_tags();

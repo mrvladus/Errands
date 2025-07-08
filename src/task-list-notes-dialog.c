@@ -16,6 +16,8 @@ static gboolean on_style_toggled_cb(GBinding *binding, const GValue *from_value,
 static void on_web_view_decide_policy_cb(WebKitWebView *web_view, WebKitPolicyDecision *decision,
                                          WebKitPolicyDecisionType type, gpointer user_data);
 
+// ---------- WIDGET TEMPLATE ---------- //
+
 G_DEFINE_TYPE(ErrandsTaskListNotesDialog, errands_task_list_notes_dialog, ADW_TYPE_DIALOG)
 
 static void errands_task_list_notes_dialog_dispose(GObject *gobject) {
@@ -56,6 +58,8 @@ static void errands_task_list_notes_dialog_init(ErrandsTaskListNotesDialog *self
 ErrandsTaskListNotesDialog *errands_task_list_notes_dialog_new() {
   return g_object_ref_sink(g_object_new(ERRANDS_TYPE_TASK_LIST_NOTES_DIALOG, NULL));
 }
+
+// ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_task_list_notes_dialog_show(ErrandsTask *task) {
   if (!state.main_window->task_list->notes_dialog)

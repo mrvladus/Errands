@@ -5,6 +5,8 @@
 static void on_dialog_close_cb(ErrandsTaskListPriorityDialog *self);
 static void on_toggle_cb(ErrandsTaskListPriorityDialog *self, GtkCheckButton *btn);
 
+// ---------- WIDGET TEMPLATE ---------- //
+
 G_DEFINE_TYPE(ErrandsTaskListPriorityDialog, errands_task_list_priority_dialog, ADW_TYPE_DIALOG)
 
 static void errands_task_list_priority_dialog_dispose(GObject *gobject) {
@@ -32,6 +34,8 @@ static void errands_task_list_priority_dialog_init(ErrandsTaskListPriorityDialog
 ErrandsTaskListPriorityDialog *errands_task_list_priority_dialog_new() {
   return g_object_ref_sink(g_object_new(ERRANDS_TYPE_TASK_LIST_PRIORITY_DIALOG, NULL));
 }
+
+// ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_task_list_priority_dialog_show(ErrandsTask *task) {
   if (!state.main_window->task_list->priority_dialog)

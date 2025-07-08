@@ -1,6 +1,8 @@
 #include "task-list-date-dialog-week-chooser.h"
 #include "utils.h"
 
+// ---------- WIDGET TEMPLATE ---------- //
+
 struct _ErrandsTaskListDateDialogWeekChooser {
   GtkListBoxRow parent_instance;
   GtkWidget *week_box;
@@ -27,6 +29,8 @@ static void errands_task_list_date_dialog_week_chooser_init(ErrandsTaskListDateD
 ErrandsTaskListDateDialogWeekChooser *errands_task_list_date_dialog_week_chooser_new() {
   return g_object_new(ERRANDS_TYPE_TASK_LIST_DATE_DIALOG_WEEK_CHOOSER, NULL);
 }
+
+// ---------- PUBLIC FUNCTIONS ---------- //
 
 const char *errands_task_list_date_dialog_week_chooser_get_days(ErrandsTaskListDateDialogWeekChooser *self) {
   GPtrArray *week_days = get_children(self->week_box);

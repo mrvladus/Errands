@@ -2,6 +2,8 @@
 #include "glib.h"
 #include "utils.h"
 
+// ---------- WIDGET TEMPLATE ---------- //
+
 struct _ErrandsTaskListDateDialogMonthChooser {
   GtkListBoxRow parent_instance;
   GtkWidget *month_box1;
@@ -30,6 +32,8 @@ static void errands_task_list_date_dialog_month_chooser_init(ErrandsTaskListDate
 ErrandsTaskListDateDialogMonthChooser *errands_task_list_date_dialog_month_chooser_new() {
   return g_object_new(ERRANDS_TYPE_TASK_LIST_DATE_DIALOG_MONTH_CHOOSER, NULL);
 }
+
+// ---------- PUBLIC FUNCTIONS ---------- //
 
 const char *errands_task_list_date_dialog_month_chooser_get_months(ErrandsTaskListDateDialogMonthChooser *self) {
   static char months[35];

@@ -25,6 +25,8 @@ static bool search_filter_func(GObject *obj, gpointer user_data);
 static gint sort_func(gconstpointer a, gconstpointer b, gpointer user_data);
 static gint completion_sort_func(gconstpointer a, gconstpointer b, gpointer user_data);
 
+// ---------- WIDGET TEMPLATE ---------- //
+
 G_DEFINE_TYPE(ErrandsTaskList, errands_task_list, ADW_TYPE_BIN)
 
 static void errands_task_list_dispose(GObject *gobject) {
@@ -178,6 +180,8 @@ static gint completion_sort_func(gconstpointer a, gconstpointer b, gpointer user
 //   errands_task_set_data(task, g_object_get_data(item, "data"));
 //   return GTK_WIDGET(task);
 // }
+
+// ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_task_list_load_tasks(ErrandsTaskList *self) {
   LOG("Task List: Loading tasks");

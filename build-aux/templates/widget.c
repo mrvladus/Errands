@@ -1,6 +1,8 @@
 #include "widget.h"
 
-static void child_cb(GtkWidget *child) {}
+static void child_cb(GtkWidget *child);
+
+// ---------- WIDGET TEMPLATE ---------- //
 
 G_DEFINE_TYPE(ErrandsWidget, errands_widget, ADW_TYPE_BIN)
 
@@ -19,3 +21,9 @@ static void errands_widget_class_init(ErrandsWidgetClass *class) {
 static void errands_widget_init(ErrandsWidget *self) { gtk_widget_init_template(GTK_WIDGET(self)); }
 
 ErrandsWidget *errands_widget_new() { return g_object_new(ERRANDS_TYPE_WIDGET, NULL); }
+
+// ---------- PUBLIC FUNCTIONS ---------- //
+
+// ---------- CALLBACKS ---------- //
+
+static void child_cb(GtkWidget *child) {}

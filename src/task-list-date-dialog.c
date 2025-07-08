@@ -13,6 +13,8 @@ static void on_freq_changed_cb(AdwComboRow *row, GParamSpec *param, ErrandsTaskL
 static void on_interval_changed_cb(AdwSpinRow *row, GParamSpec *param, ErrandsTaskListDateDialog *self);
 static void on_count_changed_cb(AdwSpinRow *row, GParamSpec *param, ErrandsTaskListDateDialog *self);
 
+// ---------- WIDGET TEMPLATE ---------- //
+
 G_DEFINE_TYPE(ErrandsTaskListDateDialog, errands_task_list_date_dialog, ADW_TYPE_DIALOG)
 
 static void errands_task_list_date_dialog_dispose(GObject *gobject) {
@@ -52,6 +54,8 @@ static void errands_task_list_date_dialog_init(ErrandsTaskListDateDialog *self) 
 ErrandsTaskListDateDialog *errands_task_list_date_dialog_new() {
   return g_object_ref_sink(g_object_new(ERRANDS_TYPE_TASK_LIST_DATE_DIALOG, NULL));
 }
+
+// ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_task_list_date_dialog_show(ErrandsTask *task) {
   if (!state.main_window->task_list->date_dialog)

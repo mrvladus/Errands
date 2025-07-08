@@ -8,6 +8,8 @@ static void on_created_toggle_cb(GtkCheckButton *btn);
 static void on_due_toggle_cb(GtkCheckButton *btn);
 static void on_priority_toggle_cb(GtkCheckButton *btn);
 
+// ---------- WIDGET TEMPLATE ---------- //
+
 G_DEFINE_TYPE(ErrandsTaskListSortDialog, errands_task_list_sort_dialog, ADW_TYPE_DIALOG)
 
 static void errands_task_list_sort_dialog_dispose(GObject *gobject) {
@@ -37,6 +39,8 @@ static void errands_task_list_sort_dialog_init(ErrandsTaskListSortDialog *self) 
 ErrandsTaskListSortDialog *errands_task_list_sort_dialog_new() {
   return g_object_ref_sink(g_object_new(ERRANDS_TYPE_TASK_LIST_SORT_DIALOG, NULL));
 }
+
+// ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_task_list_sort_dialog_show() {
   if (!state.main_window->task_list->sort_dialog)

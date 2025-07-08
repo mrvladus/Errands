@@ -9,16 +9,13 @@
 
 #include <glib/gi18n.h>
 
-// --- DECLARATIONS --- //
-
 static void on_errands_sidebar_filter_row_activated(GtkListBox *box, GtkListBoxRow *row, gpointer data);
 static void on_import_action_cb(GSimpleAction *action, GVariant *param, ErrandsSidebar *self);
-
 static void on_rename_entry_changed_cb(GtkWidget *dialog, AdwEntryRow *entry);
 static void on_rename_entry_activated_cb(GtkWidget *dialog, AdwEntryRow *entry);
 static void on_rename_response_cb(GtkWidget *dialog, gchar *response, gpointer data);
 
-// --- IMPLEMENTATIONS --- //
+// ---------- WIDGET TEMPLATE ---------- //
 
 G_DEFINE_TYPE(ErrandsSidebar, errands_sidebar, ADW_TYPE_BIN)
 
@@ -49,6 +46,8 @@ static void errands_sidebar_init(ErrandsSidebar *self) {
 }
 
 ErrandsSidebar *errands_sidebar_new() { return g_object_new(ERRANDS_TYPE_SIDEBAR, NULL); }
+
+// ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_sidebar_load_lists(ErrandsSidebar *self) {
   // Add rows
