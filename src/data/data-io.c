@@ -81,17 +81,21 @@ static void errands_data_migrate_from_46() {
       JSON *uid_item = json_object_get(task_item, "uid");
       // Create iCalendar event
       icalcomponent *event = icalcomponent_new(ICAL_VTODO_COMPONENT);
-      if (completed_item) errands_data_set_str(event, DATA_PROP_COMPLETED, get_date_time());
+      if (completed_item) errands_data_set_time(event, DATA_PROP_COMPLETED_TIME, icaltime_get_date_time_now());
       if (tags) errands_data_set_strv(event, DATA_PROP_TAGS, tags);
-      if (changed_at_item) errands_data_set_str(event, DATA_PROP_CHANGED, changed_at_item->string_val);
-      if (created_at_item) errands_data_set_str(event, DATA_PROP_CREATED, created_at_item->string_val);
-      if (due_date_item) errands_data_set_str(event, DATA_PROP_DUE, due_date_item->string_val);
+      if (changed_at_item)
+        errands_data_set_time(event, DATA_PROP_CHANGED_TIME, icaltime_from_string(changed_at_item->string_val));
+      if (created_at_item)
+        errands_data_set_time(event, DATA_PROP_CREATED_TIME, icaltime_from_string(created_at_item->string_val));
+      if (due_date_item)
+        errands_data_set_time(event, DATA_PROP_DUE_TIME, icaltime_from_string(due_date_item->string_val));
       if (notes_item) errands_data_set_str(event, DATA_PROP_NOTES, notes_item->string_val);
       if (parent_item) errands_data_set_str(event, DATA_PROP_PARENT, parent_item->string_val);
       if (percent_complete_item) errands_data_set_int(event, DATA_PROP_PERCENT, percent_complete_item->int_val);
       if (priority_item) errands_data_set_int(event, DATA_PROP_PRIORITY, priority_item->int_val);
       if (rrule_item) errands_data_set_str(event, DATA_PROP_RRULE, rrule_item->string_val);
-      if (start_date_item) errands_data_set_str(event, DATA_PROP_START, start_date_item->string_val);
+      if (start_date_item)
+        errands_data_set_time(event, DATA_PROP_START_TIME, icaltime_from_string(start_date_item->string_val));
       if (text_item) errands_data_set_str(event, DATA_PROP_TEXT, text_item->string_val);
       if (uid_item) errands_data_set_str(event, DATA_PROP_UID, uid_item->string_val);
       errands_data_set_strv(event, DATA_PROP_ATTACHMENTS, attachments);

@@ -98,7 +98,7 @@ void errands_sidebar_task_list_row_update_counter(ErrandsSidebarTaskListRow *row
     TaskData *td = tasks->pdata[i];
     bool deleted = errands_data_get_bool(td, DATA_PROP_DELETED);
     bool trash = errands_data_get_bool(td, DATA_PROP_TRASH);
-    bool completed = errands_data_get_str(td, DATA_PROP_COMPLETED);
+    bool completed = !icaltime_is_null_time(errands_data_get_time(td, DATA_PROP_COMPLETED_TIME));
     if (!deleted && !trash && !completed) c++;
   }
   char num[32];

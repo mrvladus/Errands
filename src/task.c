@@ -258,7 +258,7 @@ void errands_task_set_data(ErrandsTask *self, TaskData *data) {
   // Set completion
   g_signal_handler_block(self->complete_btn, self->complete_btn_signal_id);
   gtk_check_button_set_active(GTK_CHECK_BUTTON(self->complete_btn),
-                              (bool)errands_data_get_str(data, DATA_PROP_COMPLETED));
+                              !icaltime_is_null_time(errands_data_get_time(data, DATA_PROP_COMPLETED_TIME)));
   g_signal_handler_unblock(self->complete_btn, self->complete_btn_signal_id);
   // Set toolbar
   g_signal_handler_block(self->toolbar_btn, self->toolbar_btn_signal_id);
@@ -315,7 +315,7 @@ void errands_task_update_progress(ErrandsTask *task) {
     TaskData *td = sub_task->data;
     if (!errands_data_get_bool(td, DATA_PROP_DELETED) && !errands_data_get_bool(td, DATA_PROP_TRASH)) {
       total++;
-      if (errands_data_get_str(td, DATA_PROP_COMPLETED)) completed++;
+      if (!icaltime_is_null_time(errands_data_get_time(td, DATA_PROP_COMPLETED_TIME))) completed++;
     }
   }
   gtk_revealer_set_reveal_child(GTK_REVEALER(task->progress_revealer), total > 0);
@@ -347,60 +347,64 @@ void errands_task_update_toolbar(ErrandsTask *task) {
   // Update date button
   TaskData *data = task->data;
   // If not repeated
-  if (!errands_data_get_str(data, DATA_PROP_RRULE)) {
-    // If no due date - set "Date" label
-    const char *due = errands_data_get_str(data, DATA_PROP_DUE);
-    if (!due || g_str_equal(due, "00000000T000000"))
-      adw_button_content_set_label(ADW_BUTTON_CONTENT(gtk_button_get_child(GTK_BUTTON(task->date_btn))), _("Date"));
-    // If due date is set
-    else {
-      g_autoptr(GDateTime) dt = NULL;
-      g_autofree gchar *label = NULL;
-      if (!string_contains(due, "T")) {
-        char new_dt[128];
-        sprintf(new_dt, "%sT000000Z", due);
-        dt = g_date_time_new_from_iso8601(new_dt, NULL);
-        label = g_date_time_format(dt, "%d %b");
-      } else {
-        if (!string_contains(due, "Z")) {
-          char new_dt[128];
-          sprintf(new_dt, "%sZ", due);
-          dt = g_date_time_new_from_iso8601(new_dt, NULL);
-        } else dt = g_date_time_new_from_iso8601(due, NULL);
-        label = g_date_time_format(dt, "%d %b %R");
-      }
-      adw_button_content_set_label(ADW_BUTTON_CONTENT(gtk_button_get_child(GTK_BUTTON(task->date_btn))), label);
-    }
-  }
+  // if (!errands_data_get_str(data, DATA_PROP_RRULE)) {
+  //   // If no due date - set "Date" label
+  //   const char *due = errands_data_get_str(data, DATA_PROP_DUE);
+  //   if (!due || g_str_equal(due, "00000000T000000"))
+  //     adw_button_content_set_label(ADW_BUTTON_CONTENT(gtk_button_get_child(GTK_BUTTON(task->date_btn))), _("Date"));
+  //   // If due date is set
+  //   else {
+  //     g_autoptr(GDateTime) dt = NULL;
+  //     g_autofree gchar *label = NULL;
+  //     if (!string_contains(due, "T")) {
+  //       char new_dt[128];
+  //       sprintf(new_dt, "%sT000000Z", due);
+  //       dt = g_date_time_new_from_iso8601(new_dt, NULL);
+  //       label = g_date_time_format(dt, "%d %b");
+  //     } else {
+  //       if (!string_contains(due, "Z")) {
+  //         char new_dt[128];
+  //         sprintf(new_dt, "%sZ", due);
+  //         dt = g_date_time_new_from_iso8601(new_dt, NULL);
+  //       } else dt = g_date_time_new_from_iso8601(due, NULL);
+  //       label = g_date_time_format(dt, "%d %b %R");
+  //     }
+  //     adw_button_content_set_label(ADW_BUTTON_CONTENT(gtk_button_get_child(GTK_BUTTON(task->date_btn))), label);
+  //   }
+  // }
   // If repeated
-  else {
-    g_autoptr(GString) label = g_string_new("");
-    const char *rrule = errands_data_get_str(data, DATA_PROP_RRULE);
-    // Get interval
-    char *inter = get_rrule_value(rrule, "INTERVAL");
-    int interval;
-    if (inter) {
-      interval = atoi(inter);
-      free(inter);
-    } else interval = 1;
-    // Get frequency
-    char *frequency = get_rrule_value(rrule, "FREQ");
-    if (g_str_equal(frequency, "MINUTELY"))
-      interval == 1 ? g_string_append(label, _("Every minute"))
-                    : g_string_printf(label, _("Every %d minutes"), interval);
-    else if (g_str_equal(frequency, "HOURLY"))
-      interval == 1 ? g_string_append(label, _("Every hour")) : g_string_printf(label, _("Every %d hours"), interval);
-    else if (g_str_equal(frequency, "DAILY"))
-      interval == 1 ? g_string_append(label, _("Every day")) : g_string_printf(label, _("Every %d days"), interval);
-    else if (g_str_equal(frequency, "WEEKLY"))
-      interval == 1 ? g_string_append(label, _("Every week")) : g_string_printf(label, _("Every %d weeks"), interval);
-    else if (g_str_equal(frequency, "MONTHLY"))
-      interval == 1 ? g_string_append(label, _("Every month")) : g_string_printf(label, _("Every %d months"), interval);
-    else if (g_str_equal(frequency, "YEARLY"))
-      interval == 1 ? g_string_append(label, _("Every year")) : g_string_printf(label, _("Every %d years"), interval);
-    adw_button_content_set_label(ADW_BUTTON_CONTENT(gtk_button_get_child(GTK_BUTTON(task->date_btn))), label->str);
-    free(frequency);
-  }
+  // else {
+  //   g_autoptr(GString) label = g_string_new("");
+  //   const char *rrule = errands_data_get_str(data, DATA_PROP_RRULE);
+  //   // Get interval
+  //   char *inter = get_rrule_value(rrule, "INTERVAL");
+  //   int interval;
+  //   if (inter) {
+  //     interval = atoi(inter);
+  //     free(inter);
+  //   } else interval = 1;
+  //   // Get frequency
+  //   char *frequency = get_rrule_value(rrule, "FREQ");
+  //   if (g_str_equal(frequency, "MINUTELY"))
+  //     interval == 1 ? g_string_append(label, _("Every minute"))
+  //                   : g_string_printf(label, _("Every %d minutes"), interval);
+  //   else if (g_str_equal(frequency, "HOURLY"))
+  //     interval == 1 ? g_string_append(label, _("Every hour")) : g_string_printf(label, _("Every %d hours"),
+  //     interval);
+  //   else if (g_str_equal(frequency, "DAILY"))
+  //     interval == 1 ? g_string_append(label, _("Every day")) : g_string_printf(label, _("Every %d days"), interval);
+  //   else if (g_str_equal(frequency, "WEEKLY"))
+  //     interval == 1 ? g_string_append(label, _("Every week")) : g_string_printf(label, _("Every %d weeks"),
+  //     interval);
+  //   else if (g_str_equal(frequency, "MONTHLY"))
+  //     interval == 1 ? g_string_append(label, _("Every month")) : g_string_printf(label, _("Every %d months"),
+  //     interval);
+  //   else if (g_str_equal(frequency, "YEARLY"))
+  //     interval == 1 ? g_string_append(label, _("Every year")) : g_string_printf(label, _("Every %d years"),
+  //     interval);
+  //   adw_button_content_set_label(ADW_BUTTON_CONTENT(gtk_button_get_child(GTK_BUTTON(task->date_btn))), label->str);
+  //   free(frequency);
+  // }
 }
 
 static void __append_sub_tasks(GPtrArray *arr, ErrandsTask *task) {
@@ -528,7 +532,7 @@ static void on_action_trash(GSimpleAction *action, GVariant *param, ErrandsTask 
 
 static void on_errands_task_complete_btn_toggle(GtkCheckButton *btn, ErrandsTask *task) {
   LOG("Toggle completion '%s'", errands_data_get_str(task->data, DATA_PROP_UID));
-  errands_data_set_str(task->data, DATA_PROP_COMPLETED, gtk_check_button_get_active(btn) ? get_date_time() : NULL);
+  // errands_data_set_str(task->data, DATA_PROP_COMPLETED, gtk_check_button_get_active(btn) ? get_date_time() : NULL);
   errands_data_write_list(state.main_window->task_list->data);
 
   // GtkWidget *task_list;

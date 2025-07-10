@@ -26,9 +26,10 @@ template $ErrandsTaskListDateDialogTimeChooser: Adw.ActionRow {
       "flat",
     ]
 
-    popover: Popover {
-      child: Box {
-        spacing: 6;
+    popover: Popover popover {
+      child: Grid {
+        row-spacing: 6;
+        column-spacing: 6;
 
         SpinButton hours {
           orientation: vertical;
@@ -39,11 +40,23 @@ template $ErrandsTaskListDateDialogTimeChooser: Adw.ActionRow {
             step-increment: 1;
           };
 
-          value-changed => $on_time_set_cb(template);
+          value-changed => $on_time_set_cb();
+
+          layout {
+            row: 0;
+            column: 0;
+            row-span: 2;
+          }
         }
 
         Label {
           label: ":";
+
+          layout {
+            row: 0;
+            column: 1;
+            row-span: 2;
+          }
         }
 
         SpinButton minutes {
@@ -55,58 +68,87 @@ template $ErrandsTaskListDateDialogTimeChooser: Adw.ActionRow {
             step-increment: 1;
           };
 
-          value-changed => $on_time_set_cb(template);
-        }
+          value-changed => $on_time_set_cb();
 
-        Box {
-          orientation: vertical;
-          spacing: 6;
-          homogeneous: true;
-
-          Button {
-            name: "9";
-            clicked => $on_time_preset_cb(template);
-
-            Adw.ButtonContent {
-              label: _("9:00");
-              icon-name: "errands-morning-symbolic";
-            }
-          }
-
-          Button {
-            name: "12";
-            clicked => $on_time_preset_cb(template);
-
-            Adw.ButtonContent {
-              label: _("12:00");
-              icon-name: "errands-afternoon-symbolic";
-            }
+          layout {
+            row: 0;
+            column: 2;
+            row-span: 2;
           }
         }
 
-        Box {
-          orientation: vertical;
-          spacing: 6;
-          homogeneous: true;
+        Button {
+          name: "9";
+          clicked => $on_time_preset_cb(template);
 
-          Button {
-            name: "17";
-            clicked => $on_time_preset_cb(template);
-
-            Adw.ButtonContent {
-              label: _("17:00");
-              icon-name: "errands-sunset-symbolic";
-            }
+          Adw.ButtonContent {
+            label: _("9:00");
+            icon-name: "errands-morning-symbolic";
           }
 
-          Button {
-            name: "20";
-            clicked => $on_time_preset_cb(template);
+          layout {
+            row: 0;
+            column: 3;
+          }
+        }
 
-            Adw.ButtonContent {
-              label: _("20:00");
-              icon-name: "errands-night-symbolic";
-            }
+        Button {
+          name: "12";
+          clicked => $on_time_preset_cb(template);
+
+          Adw.ButtonContent {
+            label: _("12:00");
+            icon-name: "errands-afternoon-symbolic";
+          }
+
+          layout {
+            row: 0;
+            column: 4;
+          }
+        }
+
+        Button {
+          name: "17";
+          clicked => $on_time_preset_cb(template);
+
+          Adw.ButtonContent {
+            label: _("17:00");
+            icon-name: "errands-sunset-symbolic";
+          }
+
+          layout {
+            row: 1;
+            column: 3;
+          }
+        }
+
+        Button {
+          name: "20";
+          clicked => $on_time_preset_cb(template);
+
+          Adw.ButtonContent {
+            label: _("20:00");
+            icon-name: "errands-night-symbolic";
+          }
+
+          layout {
+            row: 1;
+            column: 4;
+          }
+        }
+
+        Button {
+          icon-name: "errands-select-symbolic";
+          clicked => $on_select_btn_clicked_cb(template);
+
+          styles [
+            "suggested-action",
+          ]
+
+          layout {
+            row: 3;
+            column: 0;
+            column-span: 5;
           }
         }
       };

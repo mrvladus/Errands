@@ -16,15 +16,9 @@ typedef enum {
   DATA_PROP_COLOR,
   DATA_PROP_LIST_NAME,
   DATA_PROP_LIST_UID,
-  DATA_PROP_CHANGED,
-  DATA_PROP_COMPLETED,
-  DATA_PROP_CREATED,
-  DATA_PROP_DUE,
-  DATA_PROP_END,
   DATA_PROP_NOTES,
   DATA_PROP_PARENT,
   DATA_PROP_RRULE,
-  DATA_PROP_START,
   DATA_PROP_TEXT,
   DATA_PROP_UID,
 } DataPropStr;
@@ -70,6 +64,7 @@ void errands_data_set_str(icalcomponent *data, DataPropStr prop, const char *val
 void errands_data_set_int(icalcomponent *data, DataPropInt prop, size_t value);
 void errands_data_set_bool(icalcomponent *data, DataPropBool prop, bool value);
 void errands_data_set_strv(icalcomponent *data, DataPropStrv prop, GStrv value);
+void errands_data_set_time(icalcomponent *data, DataPropTime prop, icaltimetype value);
 
 void errands_data_add_tag(icalcomponent *data, DataPropStrv prop, const char *tag);
 void errands_data_remove_tag(icalcomponent *data, DataPropStrv prop, const char *tag);
@@ -86,3 +81,7 @@ TaskData *task_data_new(ListData *list, const char *text, const char *parent);
 void task_data_print(TaskData *data, GString *out, size_t indent);
 ListData *task_data_get_list(TaskData *data);
 GPtrArray *task_data_get_children(TaskData *data);
+
+bool icaltime_is_null_date(const struct icaltimetype t);
+icaltimetype icaltime_merge_date_and_time(const struct icaltimetype date, const struct icaltimetype time);
+icaltimetype icaltime_get_date_time_now();

@@ -1,5 +1,6 @@
 #include "data.h"
 #include "../utils.h"
+#include "glib.h"
 
 #include <libical/ical.h>
 
@@ -49,7 +50,7 @@ TaskData *list_data_create_task(ListData *list, const char *text, const char *li
   errands_data_set_str(task_data, DATA_PROP_TEXT, text);
   if (strcmp(parent, "")) errands_data_set_str(task_data, DATA_PROP_PARENT, parent);
   errands_data_set_str(task_data, DATA_PROP_LIST_UID, list_uid);
-  errands_data_set_str(task_data, DATA_PROP_CREATED, get_date_time());
+  errands_data_set_time(task_data, DATA_PROP_CREATED_TIME, icaltime_get_date_time_now());
   icalcomponent_add_component(list, task_data);
   return task_data;
 }
@@ -95,7 +96,8 @@ GPtrArray *task_data_get_children(TaskData *data) {
 void task_data_print(TaskData *data, GString *out, size_t indent) {
   const uint8_t max_line_len = 72;
   for (size_t i = 0; i < indent; i++) g_string_append(out, "  ");
-  g_string_append_printf(out, "[%s] ", errands_data_get_str(data, DATA_PROP_COMPLETED) ? "x" : " ");
+  g_string_append_printf(out, "[%s] ",
+                         !icaltime_is_null_time(errands_data_get_time(data, DATA_PROP_COMPLETED_TIME)) ? "x" : " ");
   const char *text = errands_data_get_str(data, DATA_PROP_TEXT);
   size_t count = 0;
   char c = text[0];
@@ -113,4 +115,23 @@ void task_data_print(TaskData *data, GString *out, size_t indent) {
   GPtrArray *children = task_data_get_children(data);
   indent++;
   for (size_t i = 0; i < children->len; i++) task_data_print(children->pdata[i], out, indent);
+}
+
+bool icaltime_is_null_date(const struct icaltimetype t) { return t.year == 0 && t.month == 0 && t.day == 0; }
+icaltimetype icaltime_merge_date_and_time(const struct icaltimetype date, const struct icaltimetype time) {
+  icaltimetype result = date;
+  result.hour = time.hour;
+  result.minute = time.minute;
+  result.second = time.second;
+  result.is_date = false;
+  return result;
+}
+icaltimetype icaltime_get_date_time_now() {
+  g_autoptr(GDateTime) dt = g_date_time_new_now_local();
+  icaltimetype dt_now = icaltime_today();
+  dt_now.is_date = false;
+  dt_now.hour = g_date_time_get_hour(dt);
+  dt_now.minute = g_date_time_get_minute(dt);
+  dt_now.second = g_date_time_get_second(dt);
+  return dt_now;
 }

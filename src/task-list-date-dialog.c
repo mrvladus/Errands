@@ -4,6 +4,7 @@
 #include "task-list-date-dialog-date-chooser.h"
 #include "task-list-date-dialog-rrule-row.h"
 #include "task.h"
+#include "utils.h"
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>
@@ -45,6 +46,7 @@ ErrandsTaskListDateDialog *errands_task_list_date_dialog_new() {
 // ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_task_list_date_dialog_show(ErrandsTask *task) {
+  LOG("Date Dialog: Show");
   if (!state.main_window->task_list->date_dialog)
     state.main_window->task_list->date_dialog = errands_task_list_date_dialog_new();
   ErrandsTaskListDateDialog *dialog = state.main_window->task_list->date_dialog;
@@ -75,59 +77,69 @@ void errands_task_list_date_dialog_show(ErrandsTask *task) {
 // ---------- CALLBACKS ---------- //
 
 static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
+  LOG("Date Dialog: Close");
+
   TaskData *data = self->current_task->data;
+  icaltimetype today = icaltime_today();
+  bool changed = false;
 
   // Set start datetime
-  // bool start_date_is_set =
-  //     !strcmp(gtk_label_get_label(GTK_LABEL(self->start_date_chooser->label)), _("Not Set")) ? false : true;
-  // bool start_time_is_set =
-  //     !strcmp(gtk_label_get_label(GTK_LABEL(self->start_time_chooser->label)), _("Not Set")) ? false : true;
-  // LOG("%d %d", start_date_is_set, start_time_is_set);
-  // g_autoptr(GString) s_dt = g_string_new("");
-  // if (start_date_is_set) {
-  //   const char *start_date = errands_date_chooser_get_date(self->start_date_chooser);
-  //   g_string_append(s_dt, start_date);
-  //   if (start_time_is_set) {
-  //     const char *start_time = errands_time_chooser_get_time(self->start_time_chooser);
-  //     g_string_append_printf(s_dt, "T%sZ", start_time);
-  //   }
-  //   errands_data_set_str(data, DATA_PROP_START, s_dt->str);
-  // } else {
-  //   if (start_time_is_set) {
-  //     const char *start_time = errands_time_chooser_get_time(self->start_time_chooser);
-  //     char *today = get_today_date();
-  //     g_string_append_printf(s_dt, "%sT%sZ", today, start_time);
-  //     free(today);
-  //   }
-  // }
-  // errands_data_set_str(data, DATA_PROP_START, s_dt->str);
+  icaltimetype curr_sdt = errands_data_get_time(data, DATA_PROP_START_TIME);
+  icaltimetype new_sdt = {0};
+  icaltimetype sd = errands_task_list_date_dialog_date_chooser_get_date(self->start_date_chooser);
+  if (!icaltime_is_null_date(sd)) {
+    new_sdt.year = sd.year;
+    new_sdt.month = sd.month;
+    new_sdt.day = sd.day;
+  }
+  icaltimetype st = errands_task_list_date_dialog_time_chooser_get_time(self->start_time_chooser);
+  if (!icaltime_is_null_time(st)) {
+    new_sdt.hour = st.hour;
+    new_sdt.minute = st.minute;
+    // Set today date if only time is set
+    if (icaltime_is_null_date(sd)) {
+      new_sdt.year = today.year;
+      new_sdt.month = today.month;
+      new_sdt.day = today.day;
+    }
+  } else new_sdt.is_date = true;
+  if (icaltime_compare(curr_sdt, new_sdt) != 0) {
+    LOG("Date Dialog: Start date changed. Setting to %s", icaltime_as_ical_string(new_sdt));
+    errands_data_set_time(data, DATA_PROP_START_TIME, new_sdt);
+    changed = true;
+  }
 
   // Set due datetime
-  // bool due_time_is_set =
-  //     !strcmp(gtk_label_get_label(GTK_LABEL(self->due_time_chooser->label)), _("Not Set")) ? false : true;
-  // bool due_date_is_set =
-  //     !strcmp(gtk_label_get_label(GTK_LABEL(self->due_date_chooser->label)), _("Not Set")) ? false : true;
-  // g_autoptr(GString) d_dt = g_string_new("");
-  // if (due_date_is_set) {
-  //   const char *due_date = errands_date_chooser_get_date(self->due_date_chooser);
-  //   g_string_append(d_dt, due_date);
-  //   if (due_time_is_set) {
-  //     const char *due_time = errands_time_chooser_get_time(self->due_time_chooser);
-  //     g_string_append_printf(d_dt, "T%sZ", due_time);
-  //   }
-  //   errands_data_set_str(data, DATA_PROP_DUE, d_dt->str);
-  // } else {
-  //   if (due_time_is_set) {
-  //     const char *due_time = errands_time_chooser_get_time(self->due_time_chooser);
-  //     g_string_append_printf(d_dt, "%sT%sZ", get_today_date(), due_time);
-  //   }
-  // }
-  // errands_data_set_str(data, DATA_PROP_DUE, d_dt->str);
+  icaltimetype curr_ddt = errands_data_get_time(data, DATA_PROP_DUE_TIME);
+  icaltimetype new_ddt = {0};
+  icaltimetype dd = errands_task_list_date_dialog_date_chooser_get_date(self->start_date_chooser);
+  if (!icaltime_is_null_date(dd)) {
+    new_ddt.year = dd.year;
+    new_ddt.month = dd.month;
+    new_ddt.day = dd.day;
+  }
+  icaltimetype dt = errands_task_list_date_dialog_time_chooser_get_time(self->start_time_chooser);
+  if (!icaltime_is_null_time(dt)) {
+    new_ddt.hour = dt.hour;
+    new_ddt.minute = dt.minute;
+    // Set today date if only time is set
+    if (icaltime_is_null_date(dd)) {
+      new_ddt.year = today.year;
+      new_ddt.month = today.month;
+      new_ddt.day = today.day;
+    }
+  } else new_ddt.is_date = true;
+  if (icaltime_compare(curr_ddt, new_ddt) != 0) {
+    LOG("Date Dialog: Due date changed. Setting to %s", icaltime_as_ical_string(new_ddt));
+    errands_data_set_time(data, DATA_PROP_DUE_TIME, new_ddt);
+    changed = true;
+  }
 
-  // Check if repeat is enabled
+  // Set rrule
 
-  // errands_data_write_list(task_data_get_list(data));
-  // Set date button text
-  // errands_task_update_toolbar(self->task);
-  // TODO: sync
+  if (changed) {
+    errands_data_write_list(task_data_get_list(data));
+    errands_task_update_toolbar(self->current_task);
+    // TODO: sync
+  }
 }

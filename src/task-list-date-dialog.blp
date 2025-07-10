@@ -11,24 +11,40 @@ template $ErrandsTaskListDateDialog: Adw.Dialog {
     [top]
     Adw.HeaderBar {}
 
-    content: Adw.PreferencesPage {
-      Adw.PreferencesGroup {
-        title: _("Start");
+    content: ScrolledWindow {
+      propagate-natural-height: true;
 
-        $ErrandsTaskListDateDialogDateChooser start_date_chooser {}
+      ListBox {
+        selection-mode: none;
+        margin-start: 12;
+        margin-end: 12;
+        margin-bottom: 18;
+        margin-top: 6;
+        valign: start;
 
-        $ErrandsTaskListDateDialogTimeChooser start_time_chooser {}
+        styles [
+          "boxed-list",
+        ]
+
+        $ErrandsTaskListDateDialogDateChooser start_date_chooser {
+          title: _("Start Date");
+        }
+
+        $ErrandsTaskListDateDialogTimeChooser start_time_chooser {
+          title: _("Start Time");
+        }
 
         $ErrandsTaskListDateDialogRruleRow rrule_row {}
-      }
 
-      Adw.PreferencesGroup {
-        title: _("Due");
-        visible: bind rrule_row.enable-expansion inverted;
+        $ErrandsTaskListDateDialogDateChooser due_date_chooser {
+          title: _("Due Date");
+          visible: bind rrule_row.enable-expansion inverted;
+        }
 
-        $ErrandsTaskListDateDialogDateChooser due_date_chooser {}
-
-        $ErrandsTaskListDateDialogTimeChooser due_time_chooser {}
+        $ErrandsTaskListDateDialogTimeChooser due_time_chooser {
+          title: _("Due Time");
+          visible: bind rrule_row.enable-expansion inverted;
+        }
       }
     };
   }

@@ -22,36 +22,59 @@ template $ErrandsTaskListDateDialogDateChooser: Adw.ActionRow {
     icon-name: "errands-calendar-symbolic";
     valign: center;
 
-    popover: Popover {
+    popover: Popover popover {
       child: Box {
-        orientation: vertical;
         spacing: 6;
+        orientation: vertical;
 
-        Box {
-          spacing: 6;
-          homogeneous: true;
+        SpinButton day {
+          numeric: true;
 
-          Button {
-            label: _("Today");
-            clicked => $on_today_btn_clicked_cb(template);
-
-            styles [
-              "flat",
-            ]
-          }
-
-          Button {
-            label: _("Tomorrow");
-            clicked => $on_tomorrow_btn_clicked_cb(template);
-
-            styles [
-              "flat",
-            ]
-          }
+          adjustment: Adjustment {
+            lower: 1;
+            upper: 31;
+            step-increment: 1;
+          };
         }
 
-        Calendar calendar {
-          day-selected => $on_date_set_cb(template);
+        DropDown month {
+          model: StringList {
+            strings [
+              _("January"),
+              _("February"),
+              _("March"),
+              _("April"),
+              _("May"),
+              _("June"),
+              _("July"),
+              _("August"),
+              _("September"),
+              _("October"),
+              _("November"),
+              _("December"),
+            ]
+          };
+
+          notify::selected => $on_month_set_cb(template);
+        }
+
+        SpinButton year {
+          numeric: true;
+
+          adjustment: Adjustment {
+            lower: 0;
+            upper: 9999;
+            step-increment: 1;
+          };
+        }
+
+        Button select_btn {
+          icon-name: "errands-select-symbolic";
+          clicked => $on_select_btn_clicked_cb(template);
+
+          styles [
+            "suggested-action",
+          ]
         }
       };
     };

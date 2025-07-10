@@ -29,7 +29,7 @@ void errands_sidebar_all_row_update_counter(ErrandsSidebarAllRow *row) {
   for (size_t i = 0; i < tasks->len; i++) {
     TaskData *td = tasks->pdata[i];
     if (!errands_data_get_bool(td, DATA_PROP_DELETED) && !errands_data_get_bool(td, DATA_PROP_TRASH) &&
-        !errands_data_get_str(td, DATA_PROP_COMPLETED))
+        !icaltime_is_null_time(errands_data_get_time(td, DATA_PROP_COMPLETED_TIME)))
       len++;
   }
   char num[64];

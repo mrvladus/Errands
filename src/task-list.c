@@ -169,9 +169,9 @@ static gint sort_func(gconstpointer a, gconstpointer b, gpointer user_data) {
 
 static gint completion_sort_func(gconstpointer a, gconstpointer b, gpointer user_data) {
   TaskData *data1 = g_object_get_data(G_OBJECT(a), "data");
-  int completed1 = errands_data_get_str(data1, DATA_PROP_COMPLETED) ? 1 : 0;
+  int completed1 = !icaltime_is_null_time(errands_data_get_time(data1, DATA_PROP_COMPLETED_TIME)) ? 1 : 0;
   TaskData *data2 = g_object_get_data(G_OBJECT(b), "data");
-  int completed2 = errands_data_get_str(data2, DATA_PROP_COMPLETED) ? 1 : 0;
+  int completed2 = !icaltime_is_null_time(errands_data_get_time(data2, DATA_PROP_COMPLETED_TIME)) ? 1 : 0;
   return completed1 - completed2;
 }
 
@@ -251,7 +251,7 @@ void errands_task_list_update_title() {
     // Count tasks based on conditions
     if (!deleted && !trash && (!list_uid || g_str_equal(task_list_uid, list_uid))) {
       total++;
-      if (errands_data_get_str(td, DATA_PROP_COMPLETED)) completed++;
+      if (!icaltime_is_null_time(errands_data_get_time(td, DATA_PROP_COMPLETED_TIME))) completed++;
     }
   }
   g_ptr_array_free(tasks, false);
