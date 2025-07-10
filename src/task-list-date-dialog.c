@@ -13,6 +13,16 @@ static void on_dialog_close_cb(ErrandsTaskListDateDialog *self);
 
 // ---------- WIDGET TEMPLATE ---------- //
 
+struct _ErrandsTaskListDateDialog {
+  AdwDialog parent_instance;
+  ErrandsTaskListDateDialogDateChooser *start_date_chooser;
+  ErrandsTaskListDateDialogTimeChooser *start_time_chooser;
+  ErrandsTaskListDateDialogRruleRow *rrule_row;
+  ErrandsTaskListDateDialogDateChooser *due_date_chooser;
+  ErrandsTaskListDateDialogTimeChooser *due_time_chooser;
+  ErrandsTask *current_task;
+};
+
 G_DEFINE_TYPE(ErrandsTaskListDateDialog, errands_task_list_date_dialog, ADW_TYPE_DIALOG)
 
 static void errands_task_list_date_dialog_dispose(GObject *gobject) {
@@ -70,7 +80,13 @@ void errands_task_list_date_dialog_show(ErrandsTask *task) {
   errands_task_list_date_dialog_date_chooser_set_date(dialog->due_date_chooser, due_dt);
   errands_task_list_date_dialog_time_chooser_set_time(dialog->due_time_chooser, due_dt);
 
-  // Setup repeat
+  // Set rrule
+  icalproperty *rrule_prop = icalcomponent_get_first_property(data, ICAL_RRULE_PROPERTY);
+  if (rrule_prop) {
+    struct icalrecurrencetype rrule = icalproperty_get_rrule(rrule_prop);
+    errands_task_list_date_dialog_rrule_row_set_rrule(dialog->rrule_row, rrule);
+  }
+  adw_expander_row_set_expanded(ADW_EXPANDER_ROW(dialog->rrule_row), rrule_prop != NULL);
 
   adw_dialog_present(ADW_DIALOG(dialog), GTK_WIDGET(state.main_window));
 }
@@ -104,9 +120,10 @@ static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
     }
   } else new_sdt.is_date = true;
   if (icaltime_compare(curr_sdt, new_sdt) != 0) {
-    LOG("Date Dialog: Start date changed. Setting to %s", icaltime_as_ical_string(new_sdt));
     errands_data_set_time(data, DATA_PROP_START_TIME, new_sdt);
     changed = true;
+    LOG("Date Dialog: Start date changed from %s to %s", icaltime_as_ical_string(curr_sdt),
+        icaltime_as_ical_string(new_sdt));
   }
 
   // Set due datetime

@@ -1,6 +1,5 @@
 #include "task-list-date-dialog-date-chooser.h"
 #include "data/data.h"
-#include "utils.h"
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>
@@ -12,12 +11,10 @@ static void on_select_btn_clicked_cb(ErrandsTaskListDateDialogDateChooser *self)
 
 struct _ErrandsTaskListDateDialogDateChooser {
   AdwActionRow parent_instance;
-  GtkButton *reset_btn;
-  GtkPopover *popover;
-  GtkSpinButton *day;
+  GtkButton *reset_btn, *select_btn;
   GtkDropDown *month;
-  GtkSpinButton *year;
-  GtkButton *select_btn;
+  GtkPopover *popover;
+  GtkSpinButton *day, *year;
   icaltimetype date;
 };
 
@@ -58,7 +55,7 @@ icaltimetype errands_task_list_date_dialog_date_chooser_get_date(ErrandsTaskList
 }
 
 void errands_task_list_date_dialog_date_chooser_set_date(ErrandsTaskListDateDialogDateChooser *self,
-                                                         icaltimetype date) {
+                                                         const icaltimetype date) {
   bool is_null = icaltime_is_null_date(date);
   if (is_null) self->date = icaltime_null_date();
   icaltimetype today = icaltime_today();

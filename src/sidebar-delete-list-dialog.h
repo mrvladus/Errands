@@ -8,10 +8,5 @@
 G_DECLARE_FINAL_TYPE(ErrandsSidebarDeleteListDialog, errands_sidebar_delete_list_dialog, ERRANDS,
                      SIDEBAR_DELETE_LIST_DIALOG, AdwAlertDialog)
 
-struct _ErrandsSidebarDeleteListDialog {
-  AdwAlertDialog parent_instance;
-  ErrandsSidebarTaskListRow *current_task_list_row;
-};
-
 ErrandsSidebarDeleteListDialog *errands_sidebar_delete_list_dialog_new();
 void errands_sidebar_delete_list_dialog_show(ErrandsSidebarTaskListRow *row);

@@ -9,5 +9,6 @@ G_DECLARE_FINAL_TYPE(ErrandsTaskListDateDialogTimeChooser, errands_task_list_dat
 
 ErrandsTaskListDateDialogTimeChooser *errands_task_list_date_dialog_time_chooser_new();
 icaltimetype errands_task_list_date_dialog_time_chooser_get_time(ErrandsTaskListDateDialogTimeChooser *self);
-void errands_task_list_date_dialog_time_chooser_set_time(ErrandsTaskListDateDialogTimeChooser *self, icaltimetype time);
+void errands_task_list_date_dialog_time_chooser_set_time(ErrandsTaskListDateDialogTimeChooser *self,
+                                                         const icaltimetype time);
 void errands_task_list_date_dialog_time_chooser_reset(ErrandsTaskListDateDialogTimeChooser *self);

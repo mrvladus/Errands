@@ -8,6 +8,11 @@ static void on_delete_cb(ErrandsTaskListTagsDialogTag *self, GtkButton *btn);
 
 // ---------- WIDGET TEMPLATE ---------- //
 
+struct _ErrandsTaskListTagsDialogTag {
+  AdwActionRow parent_instance;
+  GtkWidget *check_btn;
+};
+
 G_DEFINE_TYPE(ErrandsTaskListTagsDialogTag, errands_task_list_tags_dialog_tag, ADW_TYPE_ACTION_ROW)
 
 static void errands_task_list_tags_dialog_tag_dispose(GObject *gobject) {

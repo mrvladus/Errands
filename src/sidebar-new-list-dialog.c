@@ -8,6 +8,11 @@ static void on_entry_activated_cb(AdwEntryRow *entry);
 
 // ---------- WIDGET TEMPLATE ---------- //
 
+struct _ErrandsSidebarNewListDialog {
+  AdwAlertDialog parent_instance;
+  GtkWidget *entry;
+};
+
 G_DEFINE_TYPE(ErrandsSidebarNewListDialog, errands_sidebar_new_list_dialog, ADW_TYPE_ALERT_DIALOG)
 
 static void errands_errands_sidebar_new_list_dialog_dispose(GObject *gobject) {

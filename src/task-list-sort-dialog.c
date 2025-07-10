@@ -9,6 +9,15 @@ static void on_due_toggle_cb(GtkCheckButton *btn);
 static void on_priority_toggle_cb(GtkCheckButton *btn);
 
 // ---------- WIDGET TEMPLATE ---------- //
+struct _ErrandsTaskListSortDialog {
+  AdwDialog parent_instance;
+  GtkWidget *completed_toggle_row;
+  GtkWidget *creation_date_toggle_btn;
+  GtkWidget *due_date_toggle_btn;
+  GtkWidget *priority_toggle_btn;
+  bool sort_changed;
+  bool block_signals;
+};
 
 G_DEFINE_TYPE(ErrandsTaskListSortDialog, errands_task_list_sort_dialog, ADW_TYPE_DIALOG)
 

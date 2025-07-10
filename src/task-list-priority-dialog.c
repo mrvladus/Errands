@@ -7,6 +7,18 @@ static void on_toggle_cb(ErrandsTaskListPriorityDialog *self, GtkCheckButton *bt
 
 // ---------- WIDGET TEMPLATE ---------- //
 
+struct _ErrandsTaskListPriorityDialog {
+  AdwDialog parent_instance;
+  GtkWidget *high_row;
+  GtkWidget *medium_row;
+  GtkWidget *low_row;
+  GtkWidget *none_row;
+  GtkWidget *custom_row;
+
+  ErrandsTask *current_task;
+  bool block_signals;
+};
+
 G_DEFINE_TYPE(ErrandsTaskListPriorityDialog, errands_task_list_priority_dialog, ADW_TYPE_DIALOG)
 
 static void errands_task_list_priority_dialog_dispose(GObject *gobject) {

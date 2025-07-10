@@ -10,6 +10,12 @@ static void on_entry_activated_cb(ErrandsSidebarRenameListDialog *self, AdwEntry
 
 // ---------- WIDGET TEMPLATE ---------- //
 
+struct _ErrandsSidebarRenameListDialog {
+  AdwAlertDialog parent_instance;
+  GtkWidget *entry;
+  ErrandsSidebarTaskListRow *current_task_list_row;
+};
+
 G_DEFINE_TYPE(ErrandsSidebarRenameListDialog, errands_sidebar_rename_list_dialog, ADW_TYPE_ALERT_DIALOG)
 
 static void errands_errands_sidebar_rename_list_dialog_dispose(GObject *gobject) {

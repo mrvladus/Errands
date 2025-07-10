@@ -1,11 +1,7 @@
 #include "task-list-date-dialog-time-chooser.h"
-#include "gtk/gtk.h"
-#include "utils.h"
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>
-#include <stdbool.h>
-#include <stdio.h>
 
 static void on_time_set_cb(GtkSpinButton *btn);
 static void on_time_preset_cb(ErrandsTaskListDateDialogTimeChooser *self, GtkButton *btn);
@@ -58,7 +54,7 @@ icaltimetype errands_task_list_date_dialog_time_chooser_get_time(ErrandsTaskList
 }
 
 void errands_task_list_date_dialog_time_chooser_set_time(ErrandsTaskListDateDialogTimeChooser *self,
-                                                         icaltimetype time) {
+                                                         const icaltimetype time) {
 
   char m[3], h[3], t[6];
   sprintf(h, "%02d", time.hour);

@@ -1,7 +1,13 @@
 #include "sidebar-all-row.h"
 #include "data/data.h"
+#include "utils.h"
 
 // ---------- WIDGET TEMPLATE ---------- //
+
+struct _ErrandsSidebarAllRow {
+  GtkListBoxRow parent_instance;
+  GtkWidget *counter;
+};
 
 G_DEFINE_TYPE(ErrandsSidebarAllRow, errands_sidebar_all_row, GTK_TYPE_LIST_BOX_ROW)
 
@@ -28,12 +34,14 @@ void errands_sidebar_all_row_update_counter(ErrandsSidebarAllRow *row) {
   size_t len = 0;
   for (size_t i = 0; i < tasks->len; i++) {
     TaskData *td = tasks->pdata[i];
-    if (!errands_data_get_bool(td, DATA_PROP_DELETED) && !errands_data_get_bool(td, DATA_PROP_TRASH) &&
-        !icaltime_is_null_time(errands_data_get_time(td, DATA_PROP_COMPLETED_TIME)))
-      len++;
+    bool deleted = errands_data_get_bool(td, DATA_PROP_DELETED);
+    bool trash = errands_data_get_bool(td, DATA_PROP_TRASH);
+    bool completed = !icaltime_is_null_time(errands_data_get_time(td, DATA_PROP_COMPLETED_TIME));
+    if (!deleted && !trash && !completed) len++;
   }
   char num[64];
   g_snprintf(num, 64, "%zu", len);
   gtk_label_set_label(GTK_LABEL(row->counter), len > 0 ? num : "");
   g_ptr_array_free(tasks, false);
+  LOG("All Row: Update counter '%zu'", len);
 }

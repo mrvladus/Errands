@@ -8,13 +8,5 @@
 G_DECLARE_FINAL_TYPE(ErrandsTaskListColorDialog, errands_task_list_color_dialog, ERRANDS, TASK_LIST_COLOR_DIALOG,
                      AdwDialog)
 
-struct _ErrandsTaskListColorDialog {
-  AdwDialog parent_instance;
-  GtkWidget *color_box;
-
-  ErrandsTask *current_task;
-  bool block_signals;
-};
-
 ErrandsTaskListColorDialog *errands_task_list_color_dialog_new();
 void errands_task_list_color_dialog_show(ErrandsTask *task);

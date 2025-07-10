@@ -6,6 +6,11 @@ static void on_response_cb(ErrandsSidebarDeleteListDialog *dialog, gchar *respon
 
 // ---------- WIDGET TEMPLATE ---------- //
 
+struct _ErrandsSidebarDeleteListDialog {
+  AdwAlertDialog parent_instance;
+  ErrandsSidebarTaskListRow *current_task_list_row;
+};
+
 G_DEFINE_TYPE(ErrandsSidebarDeleteListDialog, errands_sidebar_delete_list_dialog, ADW_TYPE_ALERT_DIALOG)
 
 static void errands_errands_sidebar_delete_list_dialog_dispose(GObject *gobject) {

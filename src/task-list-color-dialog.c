@@ -8,6 +8,14 @@ static void on_toggle_cb(ErrandsTaskListColorDialog *self, GtkCheckButton *btn);
 
 // ---------- WIDGET TEMPLATE ---------- //
 
+struct _ErrandsTaskListColorDialog {
+  AdwDialog parent_instance;
+  GtkWidget *color_box;
+
+  ErrandsTask *current_task;
+  bool block_signals;
+};
+
 G_DEFINE_TYPE(ErrandsTaskListColorDialog, errands_task_list_color_dialog, ADW_TYPE_DIALOG)
 
 static void errands_task_list_color_dialog_dispose(GObject *gobject) {

@@ -13,15 +13,5 @@
 G_DECLARE_FINAL_TYPE(ErrandsTaskListDateDialog, errands_task_list_date_dialog, ERRANDS, TASK_LIST_DATE_DIALOG,
                      AdwDialog)
 
-struct _ErrandsTaskListDateDialog {
-  AdwDialog parent_instance;
-  ErrandsTaskListDateDialogDateChooser *start_date_chooser;
-  ErrandsTaskListDateDialogTimeChooser *start_time_chooser;
-  ErrandsTaskListDateDialogRruleRow *rrule_row;
-  ErrandsTaskListDateDialogDateChooser *due_date_chooser;
-  ErrandsTaskListDateDialogTimeChooser *due_time_chooser;
-  ErrandsTask *current_task;
-};
-
 ErrandsTaskListDateDialog *errands_task_list_date_dialog_new();
 void errands_task_list_date_dialog_show(ErrandsTask *task);
