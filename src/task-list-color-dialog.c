@@ -11,7 +11,6 @@ static void on_toggle_cb(ErrandsTaskListColorDialog *self, GtkCheckButton *btn);
 struct _ErrandsTaskListColorDialog {
   AdwDialog parent_instance;
   GtkWidget *color_box;
-
   ErrandsTask *current_task;
   bool block_signals;
 };

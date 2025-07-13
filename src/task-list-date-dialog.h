@@ -1,10 +1,5 @@
 #pragma once
 
-#include "task-list-date-dialog-date-chooser.h"
-#include "task-list-date-dialog-month-chooser.h"
-#include "task-list-date-dialog-rrule-row.h"
-#include "task-list-date-dialog-time-chooser.h"
-#include "task-list-date-dialog-week-chooser.h"
 #include "task.h"
 
 #include <adwaita.h>

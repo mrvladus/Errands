@@ -85,3 +85,4 @@ GPtrArray *task_data_get_children(TaskData *data);
 bool icaltime_is_null_date(const struct icaltimetype t);
 icaltimetype icaltime_merge_date_and_time(const struct icaltimetype date, const struct icaltimetype time);
 icaltimetype icaltime_get_date_time_now();
+bool icalrecurrencetype_compare(const struct icalrecurrencetype *a, const struct icalrecurrencetype *b);

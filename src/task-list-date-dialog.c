@@ -3,6 +3,7 @@
 #include "state.h"
 #include "task-list-date-dialog-date-chooser.h"
 #include "task-list-date-dialog-rrule-row.h"
+#include "task-list-date-dialog-time-chooser.h"
 #include "task.h"
 #include "utils.h"
 
@@ -122,8 +123,6 @@ static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
   if (icaltime_compare(curr_sdt, new_sdt) != 0) {
     errands_data_set_time(data, DATA_PROP_START_TIME, new_sdt);
     changed = true;
-    LOG("Date Dialog: Start date changed from %s to %s", icaltime_as_ical_string(curr_sdt),
-        icaltime_as_ical_string(new_sdt));
   }
 
   // Set due datetime
@@ -147,13 +146,33 @@ static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
     }
   } else new_ddt.is_date = true;
   if (icaltime_compare(curr_ddt, new_ddt) != 0) {
-    LOG("Date Dialog: Due date changed. Setting to %s", icaltime_as_ical_string(new_ddt));
     errands_data_set_time(data, DATA_PROP_DUE_TIME, new_ddt);
     changed = true;
   }
 
   // Set rrule
+  struct icalrecurrencetype old_rrule = ICALRECURRENCETYPE_INITIALIZER;
+  struct icalrecurrencetype new_rrule = ICALRECURRENCETYPE_INITIALIZER;
+  // Get old and new rrule
+  icalproperty *rrule_prop = icalcomponent_get_first_property(data, ICAL_RRULE_PROPERTY);
+  if (rrule_prop) old_rrule = icalproperty_get_rrule(rrule_prop);
+  if (adw_expander_row_get_expanded(ADW_EXPANDER_ROW(self->rrule_row)))
+    new_rrule = errands_task_list_date_dialog_rrule_row_get_rrule(self->rrule_row);
+  // Compare them and set / remove
+  if (!icalrecurrencetype_compare(&new_rrule, &old_rrule)) {
+    if (rrule_prop) {
+      // Delete rrule if new rrule is not set
+      if (new_rrule.freq == ICAL_NO_RECURRENCE) icalcomponent_remove_property(data, rrule_prop);
+      // Set new rrule
+      else icalproperty_set_rrule(rrule_prop, new_rrule);
+    } else {
+      // Set new rrule
+      if (new_rrule.freq != ICAL_NO_RECURRENCE) icalcomponent_add_property(data, icalproperty_new_rrule(new_rrule));
+    }
+    changed = true;
+  }
 
+  // Write data if changed one of the props
   if (changed) {
     errands_data_write_list(task_data_get_list(data));
     errands_task_update_toolbar(self->current_task);

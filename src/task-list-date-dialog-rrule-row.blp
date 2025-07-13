@@ -3,7 +3,6 @@ using Adw 1;
 
 template $ErrandsTaskListDateDialogRruleRow: Adw.ExpanderRow {
   title: _("Repeat");
-  subtitle: _("Not Set");
   show-enable-switch: true;
   expanded: bind template.enable-expansion bidirectional;
 
@@ -13,6 +12,7 @@ template $ErrandsTaskListDateDialogRruleRow: Adw.ExpanderRow {
 
     model: StringList {
       strings [
+        _("Secondly"),
         _("Minutely"),
         _("Hourly"),
         _("Daily"),
@@ -31,7 +31,7 @@ template $ErrandsTaskListDateDialogRruleRow: Adw.ExpanderRow {
 
     adjustment: Adjustment {
       lower: 1;
-      upper: 365;
+      upper: 32767;
       step-increment: 1;
       page-increment: 10;
     };
@@ -39,17 +39,28 @@ template $ErrandsTaskListDateDialogRruleRow: Adw.ExpanderRow {
     notify::value => $on_interval_changed_cb(template);
   }
 
-  $ErrandsTaskListDateDialogWeekChooser week_chooser {}
+  Adw.ComboRow repeat_duration {
+    title: _("Repeat Until");
 
-  $ErrandsTaskListDateDialogMonthChooser month_chooser {}
+    model: StringList {
+      strings [
+        _("Until Date"),
+        _("Count"),
+      ]
+    };
+
+    notify::selected => $on_repeat_duration_changed_cb(template);
+  }
 
   $ErrandsTaskListDateDialogDateChooser until_date_chooser {
-    title: _("Repeat Until");
+    title: _("Repeat Until Date");
+    visible: bind count_row.visible bidirectional inverted;
   }
 
   Adw.SpinRow count_row {
-    title: _("Count");
+    title: _("Repeat Count");
     numeric: true;
+    visible: false;
 
     adjustment: Adjustment {
       lower: 0;
@@ -59,5 +70,96 @@ template $ErrandsTaskListDateDialogRruleRow: Adw.ExpanderRow {
     };
 
     notify::value => $on_count_changed_cb(template);
+  }
+
+  ListBoxRow week_chooser {
+    Box {
+      orientation: vertical;
+      spacing: 8;
+      margin-start: 12;
+      margin-end: 12;
+      margin-top: 6;
+      margin-bottom: 6;
+
+      Label {
+        label: _("Week Days");
+        halign: start;
+      }
+
+      Box week_box {
+        spacing: 6;
+        homogeneous: true;
+
+        ToggleButton {
+          label: _("Mo");
+          tooltip-text: _("Monday");
+          valign: center;
+
+          styles [
+            "weekday",
+          ]
+        }
+
+        ToggleButton {
+          label: _("Tu");
+          tooltip-text: _("Tuesday");
+          valign: center;
+
+          styles [
+            "weekday",
+          ]
+        }
+
+        ToggleButton {
+          label: _("We");
+          tooltip-text: _("Wednesday");
+          valign: center;
+
+          styles [
+            "weekday",
+          ]
+        }
+
+        ToggleButton {
+          label: _("Th");
+          tooltip-text: _("Thursday");
+          valign: center;
+
+          styles [
+            "weekday",
+          ]
+        }
+
+        ToggleButton {
+          label: _("Fr");
+          tooltip-text: _("Friday");
+          valign: center;
+
+          styles [
+            "weekday",
+          ]
+        }
+
+        ToggleButton {
+          label: _("Sa");
+          tooltip-text: _("Saturday");
+          valign: center;
+
+          styles [
+            "weekday",
+          ]
+        }
+
+        ToggleButton {
+          label: _("Su");
+          tooltip-text: _("Sunday");
+          valign: center;
+
+          styles [
+            "weekday",
+          ]
+        }
+      }
+    }
   }
 }

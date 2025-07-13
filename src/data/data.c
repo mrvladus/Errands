@@ -135,3 +135,24 @@ icaltimetype icaltime_get_date_time_now() {
   dt_now.second = g_date_time_get_second(dt);
   return dt_now;
 }
+
+bool icalrecurrencetype_compare(const struct icalrecurrencetype *a, const struct icalrecurrencetype *b) {
+  if (a->freq != b->freq) return false;
+  if (a->count != b->count) return false;
+  if (a->interval != b->interval) return false;
+  if (a->week_start != b->week_start) return false;
+  if (icaltime_compare(a->until, b->until) != 0) return false;
+  if (memcmp(a->by_second, b->by_second, ICAL_BY_SECOND_SIZE * sizeof(short)) != 0) return false;
+  if (memcmp(a->by_minute, b->by_minute, ICAL_BY_MINUTE_SIZE * sizeof(short)) != 0) return false;
+  if (memcmp(a->by_hour, b->by_hour, ICAL_BY_HOUR_SIZE * sizeof(short)) != 0) return false;
+  if (memcmp(a->by_day, b->by_day, ICAL_BY_DAY_SIZE * sizeof(short)) != 0) return false;
+  if (memcmp(a->by_month_day, b->by_month_day, ICAL_BY_MONTHDAY_SIZE * sizeof(short)) != 0) return false;
+  if (memcmp(a->by_year_day, b->by_year_day, ICAL_BY_YEARDAY_SIZE * sizeof(short)) != 0) return false;
+  if (memcmp(a->by_week_no, b->by_week_no, ICAL_BY_WEEKNO_SIZE * sizeof(short)) != 0) return false;
+  if (memcmp(a->by_month, b->by_month, ICAL_BY_MONTH_SIZE * sizeof(short)) != 0) return false;
+  if (memcmp(a->by_set_pos, b->by_set_pos, ICAL_BY_SETPOS_SIZE * sizeof(short)) != 0) return false;
+  if ((a->rscale == NULL && b->rscale != NULL) || (a->rscale != NULL && b->rscale == NULL)) return false;
+  if (a->rscale != NULL && b->rscale != NULL && strcmp(a->rscale, b->rscale) != 0) return false;
+  if (a->skip != b->skip) return false;
+  return true;
+}

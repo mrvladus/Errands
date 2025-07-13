@@ -21,6 +21,7 @@ CompileFlags:
     - -I/usr/include/blkid
     - -I/usr/include/glib-2.0
     - -I/usr/lib64/glib-2.0/include
+    - -I/usr/lib/glib-2.0/include
     - -I/usr/include/sysprof-6
     - -I/usr/include/gtksourceview-5
     - -I/usr/include/evolution-data-server
@@ -30,7 +31,6 @@ CompileFlags:
     - -I/usr/include/libsecret-1
     - -I/usr/include/p11-kit-1
     - -I/usr/include/webkitgtk-6.0
+    - -pthread
     - -I../_build
-    - -DCALDAV_H_IMPLEMENTATION
-    - -DJSON_H_IMPLEMENTATION
     - -Wno-macro-redefined
