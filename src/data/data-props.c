@@ -136,6 +136,7 @@ icaltimetype errands_data_get_time(icalcomponent *data, DataPropTime prop) {
   case DATA_PROP_END_TIME: out = icalcomponent_get_dtend(data); break;
   case DATA_PROP_START_TIME: out = icalcomponent_get_dtstart(data); break;
   }
+  if (icaltime_is_null_time(out)) out.is_date = true;
   return out;
 }
 

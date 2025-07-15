@@ -226,6 +226,15 @@ calendar header {
     border: none;
 }
 
+calendar button {
+    border-radius: 9999px;
+}
+
+calendar label {
+    border-radius: 9999px;
+    padding: 5px;
+}
+
 flowboxchild {
     all: unset;
 }

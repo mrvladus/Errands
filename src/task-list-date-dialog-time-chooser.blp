@@ -33,14 +33,15 @@ template $ErrandsTaskListDateDialogTimeChooser: Adw.ActionRow {
 
         SpinButton hours {
           orientation: vertical;
+          wrap: true;
 
           adjustment: Adjustment {
-            lower: 0;
             upper: 23;
             step-increment: 1;
+            page-increment: 5;
           };
 
-          value-changed => $on_time_set_cb();
+          value-changed => $on_time_set_cb(template);
 
           layout {
             row: 0;
@@ -61,14 +62,15 @@ template $ErrandsTaskListDateDialogTimeChooser: Adw.ActionRow {
 
         SpinButton minutes {
           orientation: vertical;
+          wrap: true;
 
           adjustment: Adjustment {
-            lower: 0;
             upper: 59;
             step-increment: 1;
+            page-increment: 10;
           };
 
-          value-changed => $on_time_set_cb();
+          value-changed => $on_time_set_cb(template);
 
           layout {
             row: 0;
@@ -134,21 +136,6 @@ template $ErrandsTaskListDateDialogTimeChooser: Adw.ActionRow {
           layout {
             row: 1;
             column: 4;
-          }
-        }
-
-        Button {
-          icon-name: "errands-select-symbolic";
-          clicked => $on_select_btn_clicked_cb(template);
-
-          styles [
-            "suggested-action",
-          ]
-
-          layout {
-            row: 3;
-            column: 0;
-            column-span: 5;
           }
         }
       };

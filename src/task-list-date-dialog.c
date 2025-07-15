@@ -1,4 +1,5 @@
 #include "task-list-date-dialog.h"
+#include "adwaita.h"
 #include "data/data.h"
 #include "state.h"
 #include "task-list-date-dialog-date-chooser.h"
@@ -72,11 +73,13 @@ void errands_task_list_date_dialog_show(ErrandsTask *task) {
   errands_task_list_date_dialog_time_chooser_reset(dialog->due_time_chooser);
 
   // Set start dt
+  LOG("Date Dialog: Set start time");
   icaltimetype start_dt = errands_data_get_time(data, DATA_PROP_START_TIME);
   errands_task_list_date_dialog_date_chooser_set_date(dialog->start_date_chooser, start_dt);
   errands_task_list_date_dialog_time_chooser_set_time(dialog->start_time_chooser, start_dt);
 
   // Set due dt
+  LOG("Date Dialog: Set due time");
   icaltimetype due_dt = errands_data_get_time(data, DATA_PROP_DUE_TIME);
   errands_task_list_date_dialog_date_chooser_set_date(dialog->due_date_chooser, due_dt);
   errands_task_list_date_dialog_time_chooser_set_time(dialog->due_time_chooser, due_dt);
@@ -84,6 +87,7 @@ void errands_task_list_date_dialog_show(ErrandsTask *task) {
   // Set rrule
   icalproperty *rrule_prop = icalcomponent_get_first_property(data, ICAL_RRULE_PROPERTY);
   if (rrule_prop) {
+    LOG("Date Dialog: Set RRULE");
     struct icalrecurrencetype rrule = icalproperty_get_rrule(rrule_prop);
     errands_task_list_date_dialog_rrule_row_set_rrule(dialog->rrule_row, rrule);
   }
@@ -102,52 +106,104 @@ static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
 
   // Set start datetime
   icaltimetype curr_sdt = errands_data_get_time(data, DATA_PROP_START_TIME);
-  icaltimetype new_sdt = {0};
-  icaltimetype sd = errands_task_list_date_dialog_date_chooser_get_date(self->start_date_chooser);
-  if (!icaltime_is_null_date(sd)) {
-    new_sdt.year = sd.year;
-    new_sdt.month = sd.month;
-    new_sdt.day = sd.day;
-  }
-  icaltimetype st = errands_task_list_date_dialog_time_chooser_get_time(self->start_time_chooser);
-  if (!icaltime_is_null_time(st)) {
-    new_sdt.hour = st.hour;
-    new_sdt.minute = st.minute;
-    // Set today date if only time is set
-    if (icaltime_is_null_date(sd)) {
+  icaltimetype new_sdt = ICALTIMETYPE_INITIALIZER;
+  icaltimetype new_sd = errands_task_list_date_dialog_date_chooser_get_date(self->start_date_chooser);
+  LOG("Date Dialog: Start date is set to '%s'", icaltime_as_ical_string(new_sd));
+  icaltimetype new_st = errands_task_list_date_dialog_time_chooser_get_time(self->start_time_chooser);
+  LOG("Date Dialog: Start time is set to '%s'", icaltime_as_ical_string(new_st));
+  bool new_dd_is_null = icaltime_is_null_date(new_sd);
+  bool new_dt_is_null = icaltime_is_null_time(new_st);
+  bool curr_ddt_is_null = icaltime_is_null_time(curr_sdt) && icaltime_is_null_date(new_sdt);
+  new_sdt.year = new_sd.year;
+  new_sdt.month = new_sd.month;
+  new_sdt.day = new_sd.day;
+  new_sdt.hour = new_st.hour;
+  new_sdt.minute = new_st.minute;
+  new_sdt.second = new_st.second;
+  if (new_dd_is_null) {
+    LOG("Date Dialog: Start date is NULL");
+    if (new_dt_is_null) {
+      LOG("Date Dialog: Start time is NULL");
+      if (!curr_ddt_is_null) {
+        LOG("Date Dialog: Remove start date");
+        errands_data_set_time(data, DATA_PROP_START_TIME, new_sdt);
+        changed = true;
+      }
+    } else {
+      LOG("Date Dialog: Only start time is set. Setting date as today '%s'", icaltime_as_ical_string(today));
       new_sdt.year = today.year;
       new_sdt.month = today.month;
       new_sdt.day = today.day;
+      if (icaltime_compare(curr_sdt, new_sdt) != 0) {
+        LOG("Date Dialog: Start date is changed to '%s' => '%s'", icaltime_as_ical_string(curr_sdt),
+            icaltime_as_ical_string(new_sdt));
+        errands_data_set_time(data, DATA_PROP_START_TIME, new_sdt);
+        changed = true;
+      }
     }
-  } else new_sdt.is_date = true;
-  if (icaltime_compare(curr_sdt, new_sdt) != 0) {
-    errands_data_set_time(data, DATA_PROP_START_TIME, new_sdt);
-    changed = true;
+  } else {
+    if (new_dt_is_null) {
+      LOG("Date Dialog: Start date is date only");
+      new_sdt.is_date = true;
+    }
+    if (icaltime_compare(curr_sdt, new_sdt) != 0) {
+      LOG("Date Dialog: Start date is changed '%s' => '%s'", icaltime_as_ical_string(curr_sdt),
+          icaltime_as_ical_string(new_sdt));
+      errands_data_set_time(data, DATA_PROP_START_TIME, new_sdt);
+      changed = true;
+    }
   }
 
-  // Set due datetime
-  icaltimetype curr_ddt = errands_data_get_time(data, DATA_PROP_DUE_TIME);
-  icaltimetype new_ddt = {0};
-  icaltimetype dd = errands_task_list_date_dialog_date_chooser_get_date(self->start_date_chooser);
-  if (!icaltime_is_null_date(dd)) {
-    new_ddt.year = dd.year;
-    new_ddt.month = dd.month;
-    new_ddt.day = dd.day;
-  }
-  icaltimetype dt = errands_task_list_date_dialog_time_chooser_get_time(self->start_time_chooser);
-  if (!icaltime_is_null_time(dt)) {
-    new_ddt.hour = dt.hour;
-    new_ddt.minute = dt.minute;
-    // Set today date if only time is set
-    if (icaltime_is_null_date(dd)) {
-      new_ddt.year = today.year;
-      new_ddt.month = today.month;
-      new_ddt.day = today.day;
+  // Set due datetime if not repeated
+  if (!adw_expander_row_get_expanded(ADW_EXPANDER_ROW(self->rrule_row))) {
+    icaltimetype curr_ddt = errands_data_get_time(data, DATA_PROP_DUE_TIME);
+    icaltimetype new_ddt = ICALTIMETYPE_INITIALIZER;
+    icaltimetype new_dd = errands_task_list_date_dialog_date_chooser_get_date(self->due_date_chooser);
+    LOG("Date Dialog: Due date is set to '%s'", icaltime_as_ical_string(new_dd));
+    icaltimetype new_dt = errands_task_list_date_dialog_time_chooser_get_time(self->due_time_chooser);
+    LOG("Date Dialog: Due time is set to '%s'", icaltime_as_ical_string(new_dt));
+    bool new_dd_is_null = icaltime_is_null_date(new_dd);
+    bool new_dt_is_null = icaltime_is_null_time(new_dt);
+    bool curr_ddt_is_null = icaltime_is_null_time(curr_ddt) && icaltime_is_null_date(new_ddt);
+    new_ddt.year = new_dd.year;
+    new_ddt.month = new_dd.month;
+    new_ddt.day = new_dd.day;
+    new_ddt.hour = new_dt.hour;
+    new_ddt.minute = new_dt.minute;
+    new_ddt.second = new_dt.second;
+    if (new_dd_is_null) {
+      LOG("Date Dialog: Due date is NULL");
+      if (new_dt_is_null) {
+        LOG("Date Dialog: Due time is NULL");
+        if (!curr_ddt_is_null) {
+          LOG("Date Dialog: Remove due date");
+          errands_data_set_time(data, DATA_PROP_DUE_TIME, new_ddt);
+          changed = true;
+        }
+      } else {
+        LOG("Date Dialog: Only due time is set. Setting date as today '%s'", icaltime_as_ical_string(today));
+        new_ddt.year = today.year;
+        new_ddt.month = today.month;
+        new_ddt.day = today.day;
+        if (icaltime_compare(curr_ddt, new_ddt) != 0) {
+          LOG("Date Dialog: Due date is changed to '%s' => '%s'", icaltime_as_ical_string(curr_ddt),
+              icaltime_as_ical_string(new_ddt));
+          errands_data_set_time(data, DATA_PROP_DUE_TIME, new_ddt);
+          changed = true;
+        }
+      }
+    } else {
+      if (new_dt_is_null) {
+        LOG("Date Dialog: Due date is date only");
+        new_ddt.is_date = true;
+      }
+      if (icaltime_compare(curr_ddt, new_ddt) != 0) {
+        LOG("Date Dialog: Due date is changed '%s' => '%s'", icaltime_as_ical_string(curr_ddt),
+            icaltime_as_ical_string(new_ddt));
+        errands_data_set_time(data, DATA_PROP_DUE_TIME, new_ddt);
+        changed = true;
+      }
     }
-  } else new_ddt.is_date = true;
-  if (icaltime_compare(curr_ddt, new_ddt) != 0) {
-    errands_data_set_time(data, DATA_PROP_DUE_TIME, new_ddt);
-    changed = true;
   }
 
   // Set rrule

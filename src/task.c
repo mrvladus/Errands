@@ -9,6 +9,7 @@
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>
+#include <string.h>
 
 // ---------- SIGNALS ---------- //
 
@@ -138,11 +139,11 @@ static void errands_task_init(ErrandsTask *self) {
   gtk_revealer_set_child(GTK_REVEALER(self->toolbar_revealer), toolbar_box);
 
   // Date button
-  GtkWidget *date_btn_content = adw_button_content_new();
-  g_object_set(date_btn_content, "icon-name", "errands-calendar-symbolic", "label", _("Date"), "tooltip-text",
+  self->date_btn_content = adw_button_content_new();
+  g_object_set(self->date_btn_content, "icon-name", "errands-calendar-symbolic", "label", _("Date"), "tooltip-text",
                _("Select Date"), NULL);
   self->date_btn = gtk_button_new();
-  g_object_set(self->date_btn, "child", date_btn_content, "halign", GTK_ALIGN_START, "hexpand", true, NULL);
+  g_object_set(self->date_btn, "child", self->date_btn_content, "halign", GTK_ALIGN_START, "hexpand", true, NULL);
   gtk_widget_add_css_class(self->date_btn, "flat");
   gtk_widget_add_css_class(self->date_btn, "caption");
   gtk_flow_box_append(GTK_FLOW_BOX(toolbar_box), self->date_btn);
@@ -331,80 +332,46 @@ void errands_task_update_progress(ErrandsTask *task) {
 }
 
 void errands_task_update_toolbar(ErrandsTask *task) {
+  TaskData *data = task->data;
   // Update css for buttons
   // Notes button
-  if (errands_data_get_str(task->data, DATA_PROP_NOTES)) gtk_widget_add_css_class(task->notes_btn, "accent");
+  if (errands_data_get_str(data, DATA_PROP_NOTES)) gtk_widget_add_css_class(task->notes_btn, "accent");
   // Attachments button
-  g_auto(GStrv) attachments = errands_data_get_strv(task->data, DATA_PROP_ATTACHMENTS);
+  g_auto(GStrv) attachments = errands_data_get_strv(data, DATA_PROP_ATTACHMENTS);
   if (attachments && g_strv_length(attachments) > 0) gtk_widget_add_css_class(task->attachments_btn, "accent");
   // Priority button
-  uint8_t priority = errands_data_get_int(task->data, DATA_PROP_PRIORITY);
+  uint8_t priority = errands_data_get_int(data, DATA_PROP_PRIORITY);
   gtk_button_set_icon_name(GTK_BUTTON(task->priority_btn),
                            priority > 0 ? "errands-priority-set-symbolic" : "errands-priority-symbolic");
   if (priority > 0 && priority < 3) gtk_widget_add_css_class(task->priority_btn, "priority-low");
   else if (priority >= 3 && priority < 7) gtk_widget_add_css_class(task->priority_btn, "priority-medium");
   else if (priority >= 7 && priority < 10) gtk_widget_add_css_class(task->priority_btn, "priority-high");
   // Update date button
-  TaskData *data = task->data;
-  // If not repeated
-  // if (!errands_data_get_str(data, DATA_PROP_RRULE)) {
-  //   // If no due date - set "Date" label
-  //   const char *due = errands_data_get_str(data, DATA_PROP_DUE);
-  //   if (!due || g_str_equal(due, "00000000T000000"))
-  //     adw_button_content_set_label(ADW_BUTTON_CONTENT(gtk_button_get_child(GTK_BUTTON(task->date_btn))), _("Date"));
-  //   // If due date is set
-  //   else {
-  //     g_autoptr(GDateTime) dt = NULL;
-  //     g_autofree gchar *label = NULL;
-  //     if (!string_contains(due, "T")) {
-  //       char new_dt[128];
-  //       sprintf(new_dt, "%sT000000Z", due);
-  //       dt = g_date_time_new_from_iso8601(new_dt, NULL);
-  //       label = g_date_time_format(dt, "%d %b");
-  //     } else {
-  //       if (!string_contains(due, "Z")) {
-  //         char new_dt[128];
-  //         sprintf(new_dt, "%sZ", due);
-  //         dt = g_date_time_new_from_iso8601(new_dt, NULL);
-  //       } else dt = g_date_time_new_from_iso8601(due, NULL);
-  //       label = g_date_time_format(dt, "%d %b %R");
-  //     }
-  //     adw_button_content_set_label(ADW_BUTTON_CONTENT(gtk_button_get_child(GTK_BUTTON(task->date_btn))), label);
-  //   }
-  // }
-  // If repeated
-  // else {
-  //   g_autoptr(GString) label = g_string_new("");
-  //   const char *rrule = errands_data_get_str(data, DATA_PROP_RRULE);
-  //   // Get interval
-  //   char *inter = get_rrule_value(rrule, "INTERVAL");
-  //   int interval;
-  //   if (inter) {
-  //     interval = atoi(inter);
-  //     free(inter);
-  //   } else interval = 1;
-  //   // Get frequency
-  //   char *frequency = get_rrule_value(rrule, "FREQ");
-  //   if (g_str_equal(frequency, "MINUTELY"))
-  //     interval == 1 ? g_string_append(label, _("Every minute"))
-  //                   : g_string_printf(label, _("Every %d minutes"), interval);
-  //   else if (g_str_equal(frequency, "HOURLY"))
-  //     interval == 1 ? g_string_append(label, _("Every hour")) : g_string_printf(label, _("Every %d hours"),
-  //     interval);
-  //   else if (g_str_equal(frequency, "DAILY"))
-  //     interval == 1 ? g_string_append(label, _("Every day")) : g_string_printf(label, _("Every %d days"), interval);
-  //   else if (g_str_equal(frequency, "WEEKLY"))
-  //     interval == 1 ? g_string_append(label, _("Every week")) : g_string_printf(label, _("Every %d weeks"),
-  //     interval);
-  //   else if (g_str_equal(frequency, "MONTHLY"))
-  //     interval == 1 ? g_string_append(label, _("Every month")) : g_string_printf(label, _("Every %d months"),
-  //     interval);
-  //   else if (g_str_equal(frequency, "YEARLY"))
-  //     interval == 1 ? g_string_append(label, _("Every year")) : g_string_printf(label, _("Every %d years"),
-  //     interval);
-  //   adw_button_content_set_label(ADW_BUTTON_CONTENT(gtk_button_get_child(GTK_BUTTON(task->date_btn))), label->str);
-  //   free(frequency);
-  // }
+  icaltimetype due_dt = errands_data_get_time(data, DATA_PROP_DUE_TIME);
+  icalproperty *rrule_prop = icalcomponent_get_first_property(data, ICAL_RRULE_PROPERTY);
+  if (rrule_prop) {
+    struct icalrecurrencetype rrule = icalproperty_get_rrule(rrule_prop);
+    //...
+  } else {
+    if (icaltime_is_null_date(due_dt)) g_object_set(task->date_btn_content, "label", _("Date"), NULL);
+    else {
+      const char *due_ical_str = icaltime_as_ical_string(due_dt);
+      g_autofree gchar *due_date_str = g_strdup_printf(
+          "%s%s%s", due_ical_str, !strchr(due_ical_str, 'T') ? "T000000" : "", !strchr(due_ical_str, 'Z') ? "Z" : "");
+      g_autoptr(GTimeZone) tz = g_time_zone_new_local();
+      g_autoptr(GDateTime) dt = g_date_time_new_from_iso8601(due_date_str, tz);
+      g_autofree gchar *date_str = NULL;
+      if (strchr(due_ical_str, 'T')) date_str = g_date_time_format(dt, "%d %b %H:%M");
+      else date_str = g_date_time_format(dt, "%d %b");
+      g_object_set(task->date_btn_content, "label", date_str, NULL);
+    }
+  }
+  // Set style for date button
+  gtk_widget_remove_css_class(task->date_btn, "error");
+  LOG("Date is %d %s %s", icaltime_compare_date_only(due_dt, icaltime_today()), icaltime_as_ical_string(due_dt),
+      icaltime_as_ical_string(icaltime_today()));
+  if (!icaltime_is_null_date(due_dt) && icaltime_compare_date_only(due_dt, icaltime_today()) <= 0)
+    gtk_widget_add_css_class(task->date_btn, "error");
 }
 
 static void __append_sub_tasks(GPtrArray *arr, ErrandsTask *task) {

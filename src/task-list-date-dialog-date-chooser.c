@@ -1,21 +1,22 @@
 #include "task-list-date-dialog-date-chooser.h"
 #include "data/data.h"
+#include "utils.h"
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>
 
-static void on_month_set_cb(ErrandsTaskListDateDialogDateChooser *self);
-static void on_select_btn_clicked_cb(ErrandsTaskListDateDialogDateChooser *self);
+static void on_day_selected(ErrandsTaskListDateDialogDateChooser *self);
+static void on_today_selected(ErrandsTaskListDateDialogDateChooser *self);
+static void on_tomorrow_selected(ErrandsTaskListDateDialogDateChooser *self);
 
 // ---------- WIDGET TEMPLATE ---------- //
 
 struct _ErrandsTaskListDateDialogDateChooser {
   AdwActionRow parent_instance;
-  GtkButton *reset_btn, *select_btn;
-  GtkDropDown *month;
+  GtkCalendar *calendar;
+  GtkButton *reset_btn;
   GtkPopover *popover;
-  GtkSpinButton *day, *year;
-  icaltimetype date;
+  bool is_reset;
 };
 
 G_DEFINE_TYPE(ErrandsTaskListDateDialogDateChooser, errands_task_list_date_dialog_date_chooser, ADW_TYPE_ACTION_ROW)
@@ -31,12 +32,10 @@ static void errands_task_list_date_dialog_date_chooser_class_init(ErrandsTaskLis
                                               "/io/github/mrvladus/Errands/ui/task-list-date-dialog-date-chooser.ui");
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListDateDialogDateChooser, reset_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListDateDialogDateChooser, popover);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListDateDialogDateChooser, day);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListDateDialogDateChooser, month);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListDateDialogDateChooser, year);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListDateDialogDateChooser, select_btn);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_month_set_cb);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_select_btn_clicked_cb);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListDateDialogDateChooser, calendar);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_day_selected);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_today_selected);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_tomorrow_selected);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_list_date_dialog_date_chooser_reset);
 }
 
@@ -51,54 +50,65 @@ ErrandsTaskListDateDialogDateChooser *errands_task_list_date_dialog_date_chooser
 // ---------- PUBLIC FUNCTIONS ---------- //
 
 icaltimetype errands_task_list_date_dialog_date_chooser_get_date(ErrandsTaskListDateDialogDateChooser *self) {
-  return self->date;
+  icaltimetype date = ICALTIMETYPE_INITIALIZER;
+  date.is_date = true;
+  if (!self->is_reset) {
+    date.year = gtk_calendar_get_year(self->calendar);
+    date.month = gtk_calendar_get_month(self->calendar) + 1;
+    date.day = gtk_calendar_get_day(self->calendar);
+  }
+  LOG("Date Chooser: Get '%s'", icaltime_as_ical_string(date));
+  return date;
 }
 
 void errands_task_list_date_dialog_date_chooser_set_date(ErrandsTaskListDateDialogDateChooser *self,
                                                          const icaltimetype date) {
   bool is_null = icaltime_is_null_date(date);
-  if (is_null) self->date = icaltime_null_date();
-  icaltimetype today = icaltime_today();
-  gtk_spin_button_set_value(self->day, is_null ? today.day : date.day);
-  gtk_adjustment_set_upper(
-      gtk_spin_button_get_adjustment(self->day),
-      icaltime_days_in_month(is_null ? today.month : date.month, is_null ? today.year : date.year));
-  gtk_drop_down_set_selected(self->month, is_null ? today.month - 1 : date.month - 1);
-  gtk_spin_button_set_value(self->year, is_null ? today.year : date.year);
-  char dt[32];
-  sprintf(dt, "%02d.%02d.%d", date.day, date.month, date.year);
-  g_object_set(self, "subtitle", is_null ? _("Not Set") : dt, NULL);
+  self->is_reset = is_null;
+  if (is_null) errands_task_list_date_dialog_date_chooser_reset(self);
+  else {
+    gtk_calendar_set_year(self->calendar, date.year);
+    gtk_calendar_set_month(self->calendar, date.month - 1);
+    gtk_calendar_set_day(self->calendar, date.day);
+    g_autoptr(GDateTime) dt = gtk_calendar_get_date(self->calendar);
+    g_autofree gchar *date_str = g_date_time_format(dt, "%x");
+    g_object_set(self, "subtitle", date_str, NULL);
+  }
   g_object_set(self->reset_btn, "visible", !is_null, NULL);
 }
 
 void errands_task_list_date_dialog_date_chooser_reset(ErrandsTaskListDateDialogDateChooser *self) {
-  icaltimetype today = icaltime_today();
-  gtk_spin_button_set_value(self->day, today.day);
-  gtk_spin_button_set_value(self->year, today.year);
-  gtk_drop_down_set_selected(self->month, today.month);
-  self->date = icaltime_null_date();
+  g_autoptr(GDateTime) today = g_date_time_new_now_local();
+  gtk_calendar_select_day(self->calendar, today);
   g_object_set(self, "subtitle", _("Not Set"), NULL);
   g_object_set(self->reset_btn, "visible", false, NULL);
+  self->is_reset = true;
 }
 
 // ---------- CALLBACKS ---------- //
 
-static void on_month_set_cb(ErrandsTaskListDateDialogDateChooser *self) {
-  size_t m = gtk_drop_down_get_selected(self->month) + 1;
-  size_t y = gtk_spin_button_get_value_as_int(self->year);
-  size_t days_in_month = icaltime_days_in_month(m, y);
-  size_t curr_day = gtk_spin_button_get_value_as_int(self->day);
-  gtk_adjustment_set_upper(gtk_spin_button_get_adjustment(self->day), days_in_month);
-  if (curr_day > days_in_month) gtk_spin_button_set_value(self->day, days_in_month);
+static void on_today_selected(ErrandsTaskListDateDialogDateChooser *self) {
+  g_autoptr(GDateTime) today = g_date_time_new_now_local();
+  g_autoptr(GDateTime) tomorrow = g_date_time_add_days(today, 1);
+  gtk_calendar_select_day(self->calendar, tomorrow);
+  gtk_calendar_select_day(self->calendar, today);
+  gtk_popover_popdown(self->popover);
+  self->is_reset = false;
 }
 
-static void on_select_btn_clicked_cb(ErrandsTaskListDateDialogDateChooser *self) {
-  self->date.year = gtk_spin_button_get_value_as_int(self->year);
-  self->date.day = gtk_spin_button_get_value_as_int(self->day);
-  self->date.month = gtk_drop_down_get_selected(self->month) + 1;
-  char dt[32];
-  sprintf(dt, "%02d.%02d.%d", self->date.day, self->date.month, self->date.year);
-  g_object_set(self, "subtitle", dt, NULL);
-  g_object_set(self->reset_btn, "visible", true, NULL);
+static void on_tomorrow_selected(ErrandsTaskListDateDialogDateChooser *self) {
+  g_autoptr(GDateTime) today = g_date_time_new_now_local();
+  g_autoptr(GDateTime) tomorrow = g_date_time_add_days(today, 1);
+  gtk_calendar_select_day(self->calendar, tomorrow);
   gtk_popover_popdown(self->popover);
+  self->is_reset = false;
+}
+
+static void on_day_selected(ErrandsTaskListDateDialogDateChooser *self) {
+  g_autoptr(GDateTime) date = gtk_calendar_get_date(self->calendar);
+  g_autofree gchar *date_str = g_date_time_format(date, "%x");
+  g_object_set(self, "subtitle", date_str, NULL);
+  g_object_set(self->reset_btn, "visible", true, NULL);
+  self->is_reset = false;
+  LOG("Date Chooser: Select date %s", date_str);
 }
