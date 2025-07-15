@@ -351,7 +351,25 @@ void errands_task_update_toolbar(ErrandsTask *task) {
   icalproperty *rrule_prop = icalcomponent_get_first_property(data, ICAL_RRULE_PROPERTY);
   if (rrule_prop) {
     struct icalrecurrencetype rrule = icalproperty_get_rrule(rrule_prop);
-    //...
+    g_autoptr(GString) label = g_string_new(NULL);
+    switch (rrule.freq) {
+    case ICAL_SECONDLY_RECURRENCE: g_string_append_printf(label, _("Every %d seconds"), rrule.interval); break;
+    case ICAL_MINUTELY_RECURRENCE: g_string_append_printf(label, _("Every %d minutes"), rrule.interval); break;
+    case ICAL_HOURLY_RECURRENCE: g_string_append_printf(label, _("Every %d hours"), rrule.interval); break;
+    case ICAL_DAILY_RECURRENCE: g_string_append_printf(label, _("Every %d days"), rrule.interval); break;
+    case ICAL_WEEKLY_RECURRENCE: g_string_append_printf(label, _("Every %d weeks"), rrule.interval); break;
+    case ICAL_MONTHLY_RECURRENCE: g_string_append_printf(label, _("Every %d months"), rrule.interval); break;
+    case ICAL_YEARLY_RECURRENCE: g_string_append_printf(label, _("Every %d years"), rrule.interval); break;
+    case ICAL_NO_RECURRENCE: break;
+    }
+    if (!icaltime_is_null_time(rrule.until)) {
+      g_autoptr(GDateTime) dt = g_date_time_new_from_unix_local(icaltime_as_timet(rrule.until));
+      g_autofree gchar *dt_str = g_date_time_format(dt, "%x");
+      g_string_append_printf(label, _(" until %s"), dt_str);
+    } else {
+      if (rrule.count > 0) g_string_append_printf(label, _(" %d times"), rrule.count);
+    }
+    g_object_set(task->date_btn_content, "label", label->str ? label->str : _("Date"), NULL);
   } else {
     if (icaltime_is_null_date(due_dt)) g_object_set(task->date_btn_content, "label", _("Date"), NULL);
     else {
