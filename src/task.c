@@ -386,8 +386,6 @@ void errands_task_update_toolbar(ErrandsTask *task) {
   }
   // Set style for date button
   gtk_widget_remove_css_class(task->date_btn, "error");
-  LOG("Date is %d %s %s", icaltime_compare_date_only(due_dt, icaltime_today()), icaltime_as_ical_string(due_dt),
-      icaltime_as_ical_string(icaltime_today()));
   if (!icaltime_is_null_date(due_dt) && icaltime_compare_date_only(due_dt, icaltime_today()) <= 0)
     gtk_widget_add_css_class(task->date_btn, "error");
 }
