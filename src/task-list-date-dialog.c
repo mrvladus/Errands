@@ -1,5 +1,4 @@
 #include "task-list-date-dialog.h"
-#include "adwaita.h"
 #include "data/data.h"
 #include "state.h"
 #include "task-list-date-dialog-date-chooser.h"
@@ -108,9 +107,7 @@ static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
   icaltimetype curr_sdt = errands_data_get_time(data, DATA_PROP_START_TIME);
   icaltimetype new_sdt = ICALTIMETYPE_INITIALIZER;
   icaltimetype new_sd = errands_task_list_date_dialog_date_chooser_get_date(self->start_date_chooser);
-  LOG("Date Dialog: Start date is set to '%s'", icaltime_as_ical_string(new_sd));
   icaltimetype new_st = errands_task_list_date_dialog_time_chooser_get_time(self->start_time_chooser);
-  LOG("Date Dialog: Start time is set to '%s'", icaltime_as_ical_string(new_st));
   bool new_dd_is_null = icaltime_is_null_date(new_sd);
   bool new_dt_is_null = icaltime_is_null_time(new_st);
   bool curr_ddt_is_null = icaltime_is_null_time(curr_sdt) && icaltime_is_null_date(new_sdt);
@@ -121,16 +118,12 @@ static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
   new_sdt.minute = new_st.minute;
   new_sdt.second = new_st.second;
   if (new_dd_is_null) {
-    LOG("Date Dialog: Start date is NULL");
     if (new_dt_is_null) {
-      LOG("Date Dialog: Start time is NULL");
       if (!curr_ddt_is_null) {
-        LOG("Date Dialog: Remove start date");
         errands_data_set_time(data, DATA_PROP_START_TIME, new_sdt);
         changed = true;
       }
     } else {
-      LOG("Date Dialog: Only start time is set. Setting date as today '%s'", icaltime_as_ical_string(today));
       new_sdt.year = today.year;
       new_sdt.month = today.month;
       new_sdt.day = today.day;
@@ -142,10 +135,7 @@ static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
       }
     }
   } else {
-    if (new_dt_is_null) {
-      LOG("Date Dialog: Start date is date only");
-      new_sdt.is_date = true;
-    }
+    if (new_dt_is_null) new_sdt.is_date = true;
     if (icaltime_compare(curr_sdt, new_sdt) != 0) {
       LOG("Date Dialog: Start date is changed '%s' => '%s'", icaltime_as_ical_string(curr_sdt),
           icaltime_as_ical_string(new_sdt));
@@ -159,9 +149,7 @@ static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
     icaltimetype curr_ddt = errands_data_get_time(data, DATA_PROP_DUE_TIME);
     icaltimetype new_ddt = ICALTIMETYPE_INITIALIZER;
     icaltimetype new_dd = errands_task_list_date_dialog_date_chooser_get_date(self->due_date_chooser);
-    LOG("Date Dialog: Due date is set to '%s'", icaltime_as_ical_string(new_dd));
     icaltimetype new_dt = errands_task_list_date_dialog_time_chooser_get_time(self->due_time_chooser);
-    LOG("Date Dialog: Due time is set to '%s'", icaltime_as_ical_string(new_dt));
     bool new_dd_is_null = icaltime_is_null_date(new_dd);
     bool new_dt_is_null = icaltime_is_null_time(new_dt);
     bool curr_ddt_is_null = icaltime_is_null_time(curr_ddt) && icaltime_is_null_date(new_ddt);
@@ -172,16 +160,12 @@ static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
     new_ddt.minute = new_dt.minute;
     new_ddt.second = new_dt.second;
     if (new_dd_is_null) {
-      LOG("Date Dialog: Due date is NULL");
       if (new_dt_is_null) {
-        LOG("Date Dialog: Due time is NULL");
         if (!curr_ddt_is_null) {
-          LOG("Date Dialog: Remove due date");
           errands_data_set_time(data, DATA_PROP_DUE_TIME, new_ddt);
           changed = true;
         }
       } else {
-        LOG("Date Dialog: Only due time is set. Setting date as today '%s'", icaltime_as_ical_string(today));
         new_ddt.year = today.year;
         new_ddt.month = today.month;
         new_ddt.day = today.day;
@@ -193,10 +177,8 @@ static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
         }
       }
     } else {
-      if (new_dt_is_null) {
-        LOG("Date Dialog: Due date is date only");
-        new_ddt.is_date = true;
-      }
+      if (new_dt_is_null) new_ddt.is_date = true;
+
       if (icaltime_compare(curr_ddt, new_ddt) != 0) {
         LOG("Date Dialog: Due date is changed '%s' => '%s'", icaltime_as_ical_string(curr_ddt),
             icaltime_as_ical_string(new_ddt));
