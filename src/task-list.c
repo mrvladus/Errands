@@ -1,6 +1,5 @@
 #include "task-list.h"
 #include "data/data.h"
-#include "gtk/gtk.h"
 #include "settings.h"
 #include "state.h"
 #include "task-list-sort-dialog.h"

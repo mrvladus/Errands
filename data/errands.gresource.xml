@@ -15,6 +15,7 @@
     <file preprocess="xml-stripblanks" compressed="true" alias="sidebar-delete-list-dialog.ui">src/sidebar-delete-list-dialog.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="sidebar-rename-list-dialog.ui">src/sidebar-rename-list-dialog.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="window.ui">src/window.ui</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="task.ui">src/task.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="task-list.ui">src/task-list.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="task-list-attachments-dialog.ui">src/task-list-attachments-dialog.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="task-list-attachments-dialog-attachment.ui">src/task-list-attachments-dialog-attachment.ui</file>

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "data/data.h"
+#include "gtk/gtk.h"
 
 #include <adwaita.h>
 
@@ -10,19 +11,14 @@ G_DECLARE_FINAL_TYPE(ErrandsTask, errands_task, ERRANDS, TASK, GtkBox)
 struct _ErrandsTask {
   GtkBox parent_instance;
 
-  GtkWidget *clamp;
-
+  GtkWidget *complete_btn;
   GtkWidget *title;
   GtkWidget *edit_title;
-  GtkWidget *complete_btn;
-  gulong complete_btn_signal_id;
   GtkWidget *toolbar_btn;
-  gulong toolbar_btn_signal_id;
   GtkWidget *tags_revealer;
+  GtkWidget *tags_box;
   GtkWidget *progress_revealer;
   GtkWidget *progress_bar;
-  GtkWidget *tags_box;
-  // Toolbar
   GtkWidget *toolbar_revealer;
   GtkWidget *date_btn;
   GtkWidget *date_btn_content;
@@ -31,13 +27,14 @@ struct _ErrandsTask {
   GtkWidget *tags_btn;
   GtkWidget *attachments_btn;
   GtkWidget *color_btn;
-  // Sub-tasks
-  GtkCustomFilter *sub_tasks_filter;
-  GtkFilterListModel *sub_tasks_filter_model;
   GtkWidget *sub_tasks_revealer;
   GtkWidget *sub_entry;
   GtkWidget *task_list;
 
+  // GtkCustomFilter *sub_tasks_filter;
+  // GtkFilterListModel *sub_tasks_filter_model;
+  gulong complete_btn_signal_id;
+  gulong toolbar_btn_signal_id;
   TaskData *data;
 };
 

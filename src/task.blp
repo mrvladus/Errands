@@ -1,0 +1,200 @@
+using Gtk 4.0;
+using Gdk 4.0;
+using Adw 1;
+
+template $ErrandsTask: Box {
+  orientation: vertical;
+
+  styles [
+    "card",
+  ]
+
+  Box {
+    spacing: 6;
+    margin-start: 6;
+    margin-end: 6;
+    margin-top: 6;
+    margin-bottom: 6;
+    tooltip-text: _("Toggle Sub-Tasks");
+
+    cursor: Gdk.Cursor {
+      name: "pointer";
+    };
+
+    CheckButton complete_btn {
+      valign: center;
+      active: false;
+      tooltip-text: _("Toggle Completion");
+
+      styles [
+        "selection-mode",
+      ]
+    }
+
+    Label title {
+      hexpand: true;
+      halign: fill;
+      wrap: true;
+      wrap-mode: char;
+      xalign: 0;
+    }
+
+    EditableLabel edit_title {
+      hexpand: true;
+      halign: fill;
+      xalign: 0;
+      max-width-chars: 50;
+      visible: bind title.visible bidirectional inverted;
+      notify::editing => $on_title_edit_cb();
+    }
+
+    ToggleButton toolbar_btn {
+      icon-name: "errands-toolbar-symbolic";
+      valign: center;
+      tooltip-text: _("Toggle Toolbar");
+
+      styles [
+        "flat",
+        "circular",
+      ]
+    }
+
+    GestureClick {
+      released => $on_expand_toggle_cb(template) not-swapped;
+    }
+  }
+
+  // Tags bar
+  Revealer tags_revealer {
+    transition-duration: 100;
+
+    Adw.WrapBox tags_box {
+      margin-bottom: 6;
+      margin-start: 6;
+      margin-end: 6;
+      child-spacing: 6;
+      line-spacing: 6;
+    }
+  }
+
+  // Progress bar
+  Revealer progress_revealer {
+    transition-duration: 100;
+
+    ProgressBar progress_bar {
+      margin-start: 12;
+      margin-end: 12;
+      margin-bottom: 6;
+
+      styles [
+        "osd",
+        "dim-label",
+      ]
+    }
+  }
+
+  // Toolbar
+  Revealer toolbar_revealer {
+    reveal-child: bind toolbar_btn.active;
+
+    Adw.WrapBox {
+      margin-bottom: 6;
+      margin-start: 6;
+      margin-end: 6;
+
+      Button date_btn {
+        halign: start;
+        hexpand: true;
+
+        Adw.ButtonContent date_btn_content {
+          icon-name: "errands-calendar-symbolic";
+          label: _("Date");
+          tooltip-text: _("Select Date");
+        }
+
+        clicked => $errands_task_list_date_dialog_show(template);
+
+        styles [
+          "flat",
+          "caption",
+        ]
+      }
+
+      Button notes_btn {
+        icon-name: "errands-notes-symbolic";
+        tooltip-text: _("Notes");
+        clicked => $errands_task_list_notes_dialog_show(template);
+
+        styles [
+          "flat",
+        ]
+      }
+
+      Button priority_btn {
+        icon-name: "errands-priority-symbolic";
+        tooltip-text: _("Priority");
+        clicked => $errands_task_list_priority_dialog_show(template);
+
+        styles [
+          "flat",
+        ]
+      }
+
+      Button tags_btn {
+        icon-name: "errands-tags-symbolic";
+        tooltip-text: _("Tags");
+        clicked => $errands_task_list_tags_dialog_show(template);
+
+        styles [
+          "flat",
+        ]
+      }
+
+      Button attachments_btn {
+        icon-name: "errands-attachment-symbolic";
+        tooltip-text: _("Attachments");
+        clicked => $errands_task_list_attachments_dialog_show(template);
+
+        styles [
+          "flat",
+        ]
+      }
+
+      Button color_btn {
+        icon-name: "errands-color-symbolic";
+        tooltip-text: _("Color");
+        clicked => $errands_task_list_color_dialog_show(template);
+
+        styles [
+          "flat",
+        ]
+      }
+    }
+  }
+
+  // Sub-tasks
+  Revealer sub_tasks_revealer {
+    Box {
+      orientation: vertical;
+
+      Entry sub_entry {
+        margin-start: 6;
+        margin-end: 6;
+        placeholder-text: _("Add Sub-Task");
+        activate => $on_sub_task_entry_activated(template) not-swapped;
+      }
+
+      ListBox task_list {
+        selection-mode: none;
+        margin-start: 6;
+        margin-end: 6;
+        margin-top: 6;
+        margin-bottom: 6;
+
+        styles [
+          "boxed-list-separate",
+        ]
+      }
+    }
+  }
+}

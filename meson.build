@@ -11,7 +11,6 @@ dependencies = [
   dependency('gtksourceview-5'), # For notes syntax highlighting
   dependency('webkitgtk-6.0'), # For markdown preview
   dependency('libcurl'),
-  dependency('gtk4'),
   dependency('libadwaita-1', version: '>=1.7'),
 ]
 
@@ -84,6 +83,7 @@ blueprints = custom_target(
     'src/task-list-tags-dialog-tag.blp',
     'src/task-list-tags-dialog.blp',
     'src/task-list.blp',
+    'src/task.blp',
     'src/window.blp',
   ),
   output: '.',
