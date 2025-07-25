@@ -1,8 +1,6 @@
-#include "sidebar-rename-list-dialog.h"
-#include "sidebar-task-list-row.h"
 #include "state.h"
-#include "task-list.h"
 #include "utils.h"
+#include "widgets.h"
 
 static void on_response_cb(ErrandsSidebarRenameListDialog *self, gchar *response, gpointer data);
 static void on_entry_changed_cb(ErrandsSidebarRenameListDialog *self, AdwEntryRow *entry);

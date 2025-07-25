@@ -1,7 +1,5 @@
-#include "task-list-attachments-dialog.h"
 #include "state.h"
-#include "task-list-attachments-dialog-attachment.h"
-#include "task.h"
+#include "widgets.h"
 
 static void on_dialog_close_cb(ErrandsTaskListAttachmentsDialog *self);
 static void on_add_btn_clicked_cb();
@@ -12,6 +10,13 @@ static void errands_task_list_attachments_dialog_add_attachment(ErrandsTaskListA
                                                                 const char *path);
 
 // ---------- WIDGET TEMPLATE ---------- //
+
+struct _ErrandsTaskListAttachmentsDialog {
+  AdwDialog parent_instance;
+  GtkWidget *attachments_box;
+  GtkWidget *placeholder;
+  ErrandsTask *current_task;
+};
 
 G_DEFINE_TYPE(ErrandsTaskListAttachmentsDialog, errands_task_list_attachments_dialog, ADW_TYPE_DIALOG)
 
@@ -41,6 +46,10 @@ ErrandsTaskListAttachmentsDialog *errands_task_list_attachments_dialog_new() {
 }
 
 // ---------- PUBLIC FUNCTIONS ---------- //
+
+ErrandsTask *errands_task_list_attachments_dialog_get_task(ErrandsTaskListAttachmentsDialog *self) {
+  return self->current_task;
+}
 
 void errands_task_list_attachments_dialog_update_ui(ErrandsTaskListAttachmentsDialog *self) {
   g_auto(GStrv) attachments = errands_data_get_strv(self->current_task->data, DATA_PROP_ATTACHMENTS);

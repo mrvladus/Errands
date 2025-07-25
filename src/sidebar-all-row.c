@@ -1,6 +1,6 @@
-#include "sidebar-all-row.h"
 #include "data/data.h"
 #include "utils.h"
+#include "widgets.h"
 
 // ---------- WIDGET TEMPLATE ---------- //
 

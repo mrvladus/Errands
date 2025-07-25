@@ -8,10 +8,7 @@ e.g. GLib's g_autoptr, g_auto and g_autofree"
 #include "settings.h"
 #include "state.h"
 #include "utils.h"
-#include "window.h"
-
-#include "sidebar.h"
-#include "task-list.h"
+#include "widgets.h"
 
 #include <glib/gi18n.h>
 #include <libportal/portal.h>

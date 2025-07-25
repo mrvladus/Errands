@@ -1,13 +1,11 @@
-#include "task-list-notes-dialog.h"
-#include "adwaita.h"
-#include "glib-object.h"
 #include "state.h"
-#include "task.h"
 #include "utils.h"
+#include "widgets.h"
 
 #define HOEDOWN_IMPLEMENTATION
 #include "vendor/hoedown.h"
 
+#include <gtksourceview/gtksource.h>
 #include <webkit/webkit.h>
 
 static void on_dialog_close_cb(ErrandsTaskListNotesDialog *self);
@@ -17,6 +15,16 @@ static void on_web_view_decide_policy_cb(WebKitWebView *web_view, WebKitPolicyDe
                                          WebKitPolicyDecisionType type, gpointer user_data);
 
 // ---------- WIDGET TEMPLATE ---------- //
+
+struct _ErrandsTaskListNotesDialog {
+  AdwDialog parent_instance;
+  GtkSourceBuffer *source_buffer;
+  GtkSourceView *source_view;
+  AdwBin *md_view_bin;
+  GtkWidget *md_view;
+
+  ErrandsTask *current_task;
+};
 
 G_DEFINE_TYPE(ErrandsTaskListNotesDialog, errands_task_list_notes_dialog, ADW_TYPE_DIALOG)
 

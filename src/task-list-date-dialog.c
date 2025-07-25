@@ -1,11 +1,7 @@
-#include "task-list-date-dialog.h"
 #include "data/data.h"
 #include "state.h"
-#include "task-list-date-dialog-date-chooser.h"
-#include "task-list-date-dialog-rrule-row.h"
-#include "task-list-date-dialog-time-chooser.h"
-#include "task.h"
 #include "utils.h"
+#include "widgets.h"
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>

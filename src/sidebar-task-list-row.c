@@ -1,8 +1,8 @@
-#include "sidebar-task-list-row.h"
 #include "data/data.h"
 #include "settings.h"
 #include "state.h"
 #include "utils.h"
+#include "widgets.h"
 
 #include <libical/ical.h>
 

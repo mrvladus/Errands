@@ -1,10 +1,8 @@
-#include "task-list.h"
 #include "data/data.h"
 #include "settings.h"
 #include "state.h"
-#include "task-list-sort-dialog.h"
-#include "task.h"
 #include "utils.h"
+#include "widgets.h"
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>

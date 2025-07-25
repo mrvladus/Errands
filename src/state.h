@@ -1,6 +1,6 @@
 #pragma once
 
-#include "window.h"
+#include "widgets.h"
 
 // Structure to hold the application state
 typedef struct {

@@ -1,11 +1,8 @@
-#include "sidebar.h"
 #include "data/data.h"
-#include "gtk/gtk.h"
 #include "settings.h"
 #include "state.h"
-#include "task-list.h"
 #include "utils.h"
-#include "window.h"
+#include "widgets.h"
 
 #include <glib/gi18n.h>
 

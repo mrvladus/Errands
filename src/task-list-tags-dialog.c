@@ -1,14 +1,20 @@
-#include "task-list-tags-dialog.h"
 #include "settings.h"
 #include "state.h"
-#include "task-list-tags-dialog-tag.h"
-#include "task.h"
 #include "utils.h"
+#include "widgets.h"
 
 static void on_dialog_close_cb(ErrandsTaskListTagsDialog *self);
 static void on_entry_activated_cb(ErrandsTaskListTagsDialog *self, AdwEntryRow *entry);
 
 // ---------- WIDGET TEMPLATE ---------- //
+
+struct _ErrandsTaskListTagsDialog {
+  AdwDialog parent_instance;
+  GtkWidget *entry;
+  GtkWidget *tags_box;
+  GtkWidget *placeholder;
+  ErrandsTask *current_task;
+};
 
 G_DEFINE_TYPE(ErrandsTaskListTagsDialog, errands_task_list_tags_dialog, ADW_TYPE_DIALOG)
 
@@ -38,6 +44,8 @@ ErrandsTaskListTagsDialog *errands_task_list_tags_dialog_new() {
 
 // ---------- PUBLIC FUNCTIONS ---------- //
 
+ErrandsTask *errands_task_list_tags_dialog_get_task(ErrandsTaskListTagsDialog *self) { return self->current_task; }
+
 void errands_task_list_tags_dialog_update_ui(ErrandsTaskListTagsDialog *self) {
   g_auto(GStrv) tags = errands_settings_get_tags();
   gtk_widget_set_visible(self->placeholder, (tags ? g_strv_length(tags) : 0) == 0);
@@ -52,7 +60,7 @@ void errands_task_list_tags_dialog_show(ErrandsTask *task) {
   g_auto(GStrv) tags = errands_settings_get_tags();
   g_auto(GStrv) all_tags_no_dups = gstrv_remove_duplicates(tags);
   for (size_t i = 0; i < g_strv_length(all_tags_no_dups); i++) {
-    ErrandsTaskListTagsDialogTag *row = errands_task_list_tags_dialog_tag_new(all_tags_no_dups[i]);
+    ErrandsTaskListTagsDialogTag *row = errands_task_list_tags_dialog_tag_new(all_tags_no_dups[i], self->current_task);
     gtk_list_box_append(GTK_LIST_BOX(self->tags_box), GTK_WIDGET(row));
   }
   errands_task_list_tags_dialog_update_ui(self);
@@ -77,7 +85,7 @@ static void on_entry_activated_cb(ErrandsTaskListTagsDialog *self, AdwEntryRow *
     if (g_str_equal(tag, tags[i])) return;
   // Add tag to current list data
   errands_settings_add_tag(tag);
-  ErrandsTaskListTagsDialogTag *row = errands_task_list_tags_dialog_tag_new(tag);
+  ErrandsTaskListTagsDialogTag *row = errands_task_list_tags_dialog_tag_new(tag, self->current_task);
   gtk_list_box_append(GTK_LIST_BOX(self->tags_box), GTK_WIDGET(row));
   gtk_editable_set_text(GTK_EDITABLE(entry), "");
   errands_task_list_tags_dialog_update_ui(self);

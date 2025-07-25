@@ -1,11 +1,9 @@
-#include "task-list-date-dialog-rrule-row.h"
 #include "data/data.h"
-#include "task-list-date-dialog-date-chooser.h"
 #include "utils.h"
+#include "widgets.h"
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>
-#include <stdint.h>
 
 static void reset_week_days(ErrandsTaskListDateDialogRruleRow *self);
 static void get_week_days(ErrandsTaskListDateDialogRruleRow *self, short days[]);
