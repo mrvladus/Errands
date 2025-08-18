@@ -1,5 +1,6 @@
 #include "data/data.h"
 #include "utils.h"
+#include "vendor/toolbox.h"
 #include "widgets.h"
 
 #include <glib/gi18n.h>
@@ -161,8 +162,8 @@ static void on_interval_changed_cb(ErrandsTaskListDateDialogRruleRow *self, GPar
                                    C_("Repeat every ...", "weeks"),   C_("Repeat every ...", "months"),
                                    C_("Repeat every ...", "years")};
   const uint8_t selected_freq = adw_combo_row_get_selected(self->freq_row);
-  g_autofree gchar *subtitle =
-      g_strdup_printf(_("Repeat every %d %s"), (int)adw_spin_row_get_value(row), intervals[selected_freq]);
+  const char *subtitle =
+      tb_tmp_str_printf(_("Repeat every %d %s"), (int)adw_spin_row_get_value(row), intervals[selected_freq]);
   g_object_set(row, "subtitle", subtitle, NULL);
 }
 
@@ -170,7 +171,7 @@ static void on_count_changed_cb(ErrandsTaskListDateDialogRruleRow *self, GParamS
   const size_t value = adw_spin_row_get_value(row);
   if (value == 0) g_object_set(row, "subtitle", _("Repeat forever"), NULL);
   else {
-    g_autofree gchar *subtitle = g_strdup_printf(_("Repeat %zu times"), value);
+    const char *subtitle = tb_tmp_str_printf(_("Repeat %zu times"), value);
     g_object_set(row, "subtitle", subtitle, NULL);
   }
 }

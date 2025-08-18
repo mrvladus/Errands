@@ -2,6 +2,7 @@
 #include "settings.h"
 #include "state.h"
 #include "utils.h"
+#include "vendor/toolbox.h"
 #include "widgets.h"
 
 #include <libical/ical.h>
@@ -167,7 +168,7 @@ static void __on_export_finish(GObject *obj, GAsyncResult *res, gpointer data) {
 
 static void on_action_export(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {
   g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
-  g_autofree gchar *filename = g_strdup_printf("%s.ics", errands_data_get_str(row->data, DATA_PROP_LIST_UID));
+  const char *filename = tb_tmp_str_printf("%s.ics", errands_data_get_str(row->data, DATA_PROP_LIST_UID));
   g_object_set(dialog, "initial-name", filename, NULL);
   gtk_file_dialog_save(dialog, GTK_WINDOW(state.main_window), NULL, __on_export_finish, row->data);
 }

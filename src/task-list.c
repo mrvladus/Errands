@@ -4,6 +4,7 @@
 #include "settings.h"
 #include "state.h"
 #include "utils.h"
+#include "vendor/toolbox.h"
 #include "widgets.h"
 
 #include <glib/gi18n.h>
@@ -229,7 +230,7 @@ void errands_task_list_update_title() {
   }
   g_ptr_array_free(tasks, false);
   // Set subtitle with completed stats
-  g_autofree char *stats = g_strdup_printf("%s %zu / %zu", _("Completed:"), completed, total);
+  const char *stats = tb_tmp_str_printf("%s %zu / %zu", _("Completed:"), completed, total);
   adw_window_title_set_subtitle(ADW_WINDOW_TITLE(state.main_window->task_list->title), total > 0 ? stats : "");
 }
 

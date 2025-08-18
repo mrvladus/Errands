@@ -1,6 +1,7 @@
 #include "../settings.h"
 #include "../utils.h"
 #include "../vendor/json.h"
+#include "../vendor/toolbox.h"
 #include "data.h"
 
 #include <gio/gio.h>
@@ -110,7 +111,7 @@ static void errands_data_migrate_from_46() {
       icalcomponent_add_component(calendar, event);
     }
     // Save calendar to file
-    g_autofree gchar *calendar_filename = g_strdup_printf("%s.ics", list_uid_item->string_val);
+    const char *calendar_filename = tb_tmp_str_printf("%s.ics", list_uid_item->string_val);
     g_autofree gchar *calendar_file_path = g_build_filename(user_dir, calendar_filename, NULL);
     if (!g_file_set_contents(calendar_file_path, icalcomponent_as_ical_string(calendar), -1, &error))
       LOG("User Data: Failed to save calendar to %s: %s", calendar_file_path, error->message);
@@ -165,7 +166,7 @@ void errands_data_load_lists() {
 // Async write list data to file function
 static void errands_data_write_list_func(GTask *task, gpointer source_object, ListData *data,
                                          GCancellable *cancellable) {
-  g_autofree gchar *filename = g_strdup_printf("%s.ics", errands_data_get_str(data, DATA_PROP_LIST_UID));
+  const char *filename = tb_tmp_str_printf("%s.ics", errands_data_get_str(data, DATA_PROP_LIST_UID));
   g_autofree gchar *path = g_build_filename(user_dir, filename, NULL);
   if (!g_file_set_contents(path, icalcomponent_as_ical_string(data), -1, NULL)) {
     LOG("User Data: Failed to save list '%s'", path);

@@ -1,6 +1,7 @@
 #include "data/data.h"
 #include "state.h"
 #include "utils.h"
+#include "vendor/toolbox.h"
 #include "widgets.h"
 
 #include <glib/gi18n.h>
@@ -147,7 +148,7 @@ void errands_task_set_data(ErrandsTask *self, TaskData *data) {
 void errands_task_update_accent_color(ErrandsTask *task) {
   const char *color = errands_data_get_str(task->data, DATA_PROP_COLOR);
   if (!g_str_equal(color, "none")) {
-    g_autofree gchar *accent_style = g_strdup_printf("task-%s", color);
+    const char *accent_style = tb_tmp_str_printf("task-%s", color);
     gtk_widget_set_css_classes(GTK_WIDGET(task), (const char *[]){"card", accent_style, NULL});
   } else {
     gtk_widget_set_css_classes(GTK_WIDGET(task), (const char *[]){"card", NULL});
@@ -222,8 +223,8 @@ void errands_task_update_toolbar(ErrandsTask *task) {
     if (icaltime_is_null_date(due_dt)) g_object_set(task->date_btn_content, "label", _("Date"), NULL);
     else {
       const char *due_ical_str = icaltime_as_ical_string(due_dt);
-      g_autofree gchar *due_date_str = g_strdup_printf(
-          "%s%s%s", due_ical_str, !strchr(due_ical_str, 'T') ? "T000000" : "", !strchr(due_ical_str, 'Z') ? "Z" : "");
+      const char *due_date_str = tb_tmp_str_printf("%s%s%s", due_ical_str, !strchr(due_ical_str, 'T') ? "T000000" : "",
+                                                   !strchr(due_ical_str, 'Z') ? "Z" : "");
       g_autoptr(GTimeZone) tz = g_time_zone_new_local();
       g_autoptr(GDateTime) dt = g_date_time_new_from_iso8601(due_date_str, tz);
       g_autofree gchar *date_str = NULL;
