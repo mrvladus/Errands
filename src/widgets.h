@@ -35,10 +35,8 @@ struct _ErrandsTask {
 
   gulong complete_btn_signal_id;
   gulong toolbar_btn_signal_id;
-  TaskData *data;
 
-  GtkCustomFilter *sub_tasks_filter;
-  GtkFilterListModel *sub_tasks_model;
+  TaskData *data;
 };
 
 ErrandsTask *errands_task_new();

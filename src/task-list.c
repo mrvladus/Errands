@@ -1,4 +1,6 @@
 #include "data/data.h"
+#include "glib-object.h"
+#include "glib.h"
 #include "settings.h"
 #include "state.h"
 #include "utils.h"

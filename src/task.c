@@ -6,7 +6,9 @@
 #include <glib/gi18n.h>
 #include <libical/ical.h>
 
-// ---------- SIGNALS ---------- //
+static bool sub_tasks_filter_func(GObject *obj, ErrandsTask *task);
+
+static GtkWidget *create_widget_func(GObject *item, gpointer user_data);
 
 static void on_complete_btn_toggle_cb(GtkCheckButton *btn, ErrandsTask *task);
 static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointer user_data);
@@ -18,7 +20,6 @@ static void on_action_trash(GSimpleAction *action, GVariant *param, ErrandsTask 
 static void on_toolbar_btn_toggle_cb(GtkToggleButton *btn, ErrandsTask *task);
 static void on_errands_task_edited(GtkEditableLabel *entry, ErrandsTask *task);
 static void on_errands_task_edit_cancelled(GtkButton *btn, ErrandsTask *task);
-
 static GdkContentProvider *on_drag_prepare(GtkDragSource *source, double x, double y, ErrandsTask *task);
 static void on_drag_begin(GtkDragSource *source, GdkDrag *drag, ErrandsTask *task);
 static void on_drag_end(GtkDragSource *self, GdkDrag *drag, gboolean delete_data, ErrandsTask *task);
@@ -72,6 +73,13 @@ static void errands_task_class_init(ErrandsTaskClass *class) {
 static void errands_task_init(ErrandsTask *self) {
   gtk_widget_init_template(GTK_WIDGET(self));
 
+  // Bind sub-tasks model
+  GtkCustomFilter *sub_tasks_filter = gtk_custom_filter_new((GtkCustomFilterFunc)sub_tasks_filter_func, self, NULL);
+  GtkFilterListModel *sub_tasks_model = gtk_filter_list_model_new(
+      G_LIST_MODEL(state.main_window->task_list->completion_sort_model), GTK_FILTER(sub_tasks_filter));
+  // gtk_list_box_bind_model(GTK_LIST_BOX(self->task_list), G_LIST_MODEL(sub_tasks_model),
+  //                         (GtkListBoxCreateWidgetFunc)create_widget_func, NULL, NULL);
+
   self->complete_btn_signal_id =
       g_signal_connect(self->complete_btn, "toggled", G_CALLBACK(on_complete_btn_toggle_cb), self);
   self->toolbar_btn_signal_id =
@@ -112,7 +120,6 @@ ErrandsTask *errands_task_new() { return g_object_new(ERRANDS_TYPE_TASK, NULL); 
 
 void errands_task_set_data(ErrandsTask *self, TaskData *data) {
   self->data = data;
-
   // Set text
   gtk_label_set_label(GTK_LABEL(self->title), errands_data_get_str(data, DATA_PROP_TEXT));
   // Set completion
@@ -128,28 +135,9 @@ void errands_task_set_data(ErrandsTask *self, TaskData *data) {
   // Set sub-tasks
   gtk_revealer_set_reveal_child(GTK_REVEALER(self->sub_tasks_revealer),
                                 errands_data_get_bool(data, DATA_PROP_EXPANDED));
-  // Load sub-tasks
-  // LOG("Loading sub-tasks for %s", errands_task_as_str(task));
-  // GPtrArray *tasks = g_hash_table_get_values_as_ptr_array(tdata);
-  // const char *uid = errands_data_get_str(task->data, DATA_PROP_UID);
-  // for (size_t i = 0; i < tasks->len; i++) {
-  //   TaskData *data = tasks->pdata[i];
-  //   const char *parent = errands_data_get_str(data, DATA_PROP_PARENT);
-  //   bool trash = errands_data_get_bool(data, DATA_PROP_TRASH);
-  //   bool deleted = errands_data_get_bool(data, DATA_PROP_DELETED);
-  //   if (!deleted && !trash && (parent && g_str_equal(parent, uid)))
-  //     gtk_list_box_append(GTK_LIST_BOX(task->task_list), GTK_WIDGET(errands_task_new(tasks->pdata[i])));
-  // }
-  // g_ptr_array_free(tasks, false);
-  // task->sub_tasks_filter = gtk_custom_filter_new((GtkCustomFilterFunc)sub_tasks_filter_func, data, NULL);
-  // task->sub_tasks_filter_model =
-  // gtk_filter_list_model_new(G_LIST_MODEL(state.main_window->task_list->completion_sort_model),
-  //                                                          GTK_FILTER(task->sub_tasks_filter));
-  // gtk_list_box_bind_model(GTK_LIST_BOX(task->task_list), G_LIST_MODEL(task->sub_tasks_filter_model),
-  //                         (GtkListBoxCreateWidgetFunc)create_widget_func, NULL, NULL);
-
-  // gtk_filter_changed(GTK_FILTER(task->sub_tasks_filter), GTK_FILTER_CHANGE_DIFFERENT);
-
+  // Update sub-tasks from model
+  if (errands_data_get_str(data, DATA_PROP_PARENT)) gtk_list_box_invalidate_filter(GTK_LIST_BOX(self->task_list));
+  // Update UI
   errands_task_update_tags(self);
   errands_task_update_accent_color(self);
   errands_task_update_progress(self);
@@ -317,12 +305,29 @@ void errands_task_update_tags(ErrandsTask *task) {
 }
 
 const char *errands_task_as_str(ErrandsTask *task) {
-  static char str[512];
+  static char str[256];
   if (task) {
     const char *uid = errands_data_get_str(task->data, DATA_PROP_UID);
     snprintf(str, sizeof(str), "ErrandsTask(%s, %p)", uid ? uid : "NULL", task);
   } else sprintf(str, "ErrandsTask(NULL)");
   return str;
+}
+
+static GtkWidget *create_widget_func(GObject *item, gpointer user_data) {
+  LOG("Create widget for task %p", item);
+  TaskData *data = g_object_get_data(item, "data");
+  ErrandsTask *task = errands_task_new();
+  errands_task_set_data(task, data);
+  return GTK_WIDGET(task);
+}
+
+static bool sub_tasks_filter_func(GObject *obj, ErrandsTask *task) {
+  if (!task->data) return false;
+  TaskData *data = g_object_get_data(G_OBJECT(obj), "data");
+  const char *parent = errands_data_get_str(data, DATA_PROP_PARENT);
+  if (!parent) return false;
+  const char *uid = errands_data_get_str(task->data, DATA_PROP_UID);
+  return g_str_equal(uid, parent);
 }
 
 // ---------- CALLBACKS ---------- //
