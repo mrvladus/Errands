@@ -26,22 +26,6 @@ static gboolean on_drag_cancel(GtkDragSource *self, GdkDrag *drag, GdkDragCancel
 static gboolean on_drop(GtkDropTarget *target, const GValue *value, double x, double y, ErrandsTask *task);
 static gboolean on_top_area_drop(GtkDropTarget *target, const GValue *value, double x, double y, ErrandsTask *task);
 
-// static bool sub_tasks_filter_func(GObject *obj, TaskData *parent_data) {
-//   if (!parent_data) return false;
-//   TaskData *child_data = g_object_get_data(G_OBJECT(obj), "data");
-//   const char *child_parent = errands_data_get_str(child_data, DATA_PROP_PARENT);
-//   const char *parent_uid = errands_data_get_str(parent_data, DATA_PROP_UID);
-//   bool deleted = errands_data_get_bool(child_data, DATA_PROP_DELETED);
-//   bool trash = errands_data_get_bool(child_data, DATA_PROP_TRASH);
-//   return child_parent && g_str_equal(child_parent, parent_uid) && !deleted && !trash;
-// }
-
-// static GtkWidget *create_widget_func(GObject *item, gpointer user_data) {
-//   ErrandsTask *task = errands_task_new();
-//   errands_task_set_data(task, g_object_get_data(item, "data"));
-//   return GTK_WIDGET(task);
-// }
-
 // ---------- WIDGET TEMPLATE ---------- //
 
 G_DEFINE_TYPE(ErrandsTask, errands_task, GTK_TYPE_BOX)
@@ -75,6 +59,7 @@ static void errands_task_class_init(ErrandsTaskClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, task_list);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_title_edit_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_expand_toggle_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_right_click);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_list_date_dialog_show);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_list_notes_dialog_show);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_list_priority_dialog_show);
@@ -87,6 +72,16 @@ static void errands_task_class_init(ErrandsTaskClass *class) {
 static void errands_task_init(ErrandsTask *self) {
   gtk_widget_init_template(GTK_WIDGET(self));
 
+  self->complete_btn_signal_id =
+      g_signal_connect(self->complete_btn, "toggled", G_CALLBACK(on_complete_btn_toggle_cb), self);
+  self->toolbar_btn_signal_id =
+      g_signal_connect(self->toolbar_btn, "toggled", G_CALLBACK(on_toolbar_btn_toggle_cb), self);
+
+  // Actions
+  errands_add_actions(GTK_WIDGET(self), "task", "edit", on_action_edit, self, "trash", on_action_trash, self, NULL);
+
+  // DND
+  //
   // Top drop area
   // GtkWidget *top_drop_area = gtk_image_new_from_icon_name("errands-add-symbolic");
   // gtk_widget_add_css_class(top_drop_area, "task-top-drop-area");
@@ -95,34 +90,7 @@ static void errands_task_init(ErrandsTask *self) {
   // gtk_widget_add_controller(GTK_WIDGET(top_drop_area), GTK_EVENT_CONTROLLER(top_drop_area_target));
   // g_object_set(top_drop_area, "margin-start", 12, "margin-end", 12, NULL);
   // gtk_box_append(GTK_BOX(main_box), top_drop_area);
-
-  self->complete_btn_signal_id =
-      g_signal_connect(self->complete_btn, "toggled", G_CALLBACK(on_complete_btn_toggle_cb), self);
-  self->toolbar_btn_signal_id =
-      g_signal_connect(self->toolbar_btn, "toggled", G_CALLBACK(on_toolbar_btn_toggle_cb), self);
-
-  // Right-click menu
-  // g_autoptr(GMenu) menu = errands_menu_new(2, _("Edit"), "task.edit", _("Move to Trash"), "task.trash");
-
-  // Menu popover
-  // GtkWidget *menu_popover = gtk_popover_menu_new_from_model(G_MENU_MODEL(menu));
-  // g_object_set(menu_popover, "has-arrow", false, "halign", GTK_ALIGN_START, NULL);
-  // gtk_box_append(GTK_BOX(vbox), menu_popover);
-
-  // Right-click controllers
-  // GtkGesture *ctrl = gtk_gesture_click_new();
-  // gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(ctrl), 3);
-  // g_signal_connect(ctrl, "released", G_CALLBACK(on_right_click), menu_popover);
-  // gtk_widget_add_controller(title_box, GTK_EVENT_CONTROLLER(ctrl));
-  // GtkGesture *touch_ctrl = gtk_gesture_long_press_new();
-  // g_signal_connect(touch_ctrl, "pressed", G_CALLBACK(on_right_click), menu_popover);
-  // gtk_gesture_single_set_touch_only(GTK_GESTURE_SINGLE(touch_ctrl), true);
-  // gtk_widget_add_controller(title_box, GTK_EVENT_CONTROLLER(touch_ctrl));
-
-  // Actions
-  errands_add_actions(GTK_WIDGET(self), "task", "edit", on_action_edit, self, "trash", on_action_trash, self, NULL);
-
-  // DND
+  //
   // GtkDragSource *drag_source = gtk_drag_source_new();
   // gtk_drag_source_set_actions(drag_source, GDK_ACTION_MOVE);
   // g_signal_connect(drag_source, "prepare", G_CALLBACK(on_drag_prepare), self);
@@ -459,12 +427,12 @@ static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *task) {
 }
 
 static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x, gdouble y, GtkPopover *popover) {
-  gtk_popover_set_pointing_to(popover, &(GdkRectangle){.x = x, .y = y});
+  gtk_popover_set_pointing_to(popover, &(GdkRectangle){x, y});
   gtk_popover_popup(popover);
 }
 
 static void on_action_edit(GSimpleAction *action, GVariant *param, ErrandsTask *task) {
-  // gtk_editable_label_start_editing(GTK_EDITABLE_LABEL(task->edit_title));
+  gtk_editable_label_start_editing(GTK_EDITABLE_LABEL(task->edit_title));
 }
 
 static void on_action_trash(GSimpleAction *action, GVariant *param, ErrandsTask *task) {

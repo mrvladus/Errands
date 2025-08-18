@@ -33,11 +33,12 @@ struct _ErrandsTask {
   GtkWidget *sub_entry;
   GtkWidget *task_list;
 
-  // GtkCustomFilter *sub_tasks_filter;
-  // GtkFilterListModel *sub_tasks_filter_model;
   gulong complete_btn_signal_id;
   gulong toolbar_btn_signal_id;
   TaskData *data;
+
+  GtkCustomFilter *sub_tasks_filter;
+  GtkFilterListModel *sub_tasks_model;
 };
 
 ErrandsTask *errands_task_new();
@@ -282,7 +283,6 @@ struct _ErrandsSidebar {
   ErrandsSidebarAllRow *all_row;
   GtkWidget *task_lists_box;
   ErrandsSidebarTaskListRow *current_task_list_row;
-
   ErrandsSidebarDeleteListDialog *delete_list_dialog;
   ErrandsSidebarNewListDialog *new_list_dialog;
   ErrandsSidebarRenameListDialog *rename_list_dialog;
@@ -300,12 +300,12 @@ G_DECLARE_FINAL_TYPE(ErrandsWindow, errands_window, ERRANDS, WINDOW, AdwApplicat
 
 struct _ErrandsWindow {
   AdwApplicationWindow parent_instance;
-  GtkWidget *toast_overlay;
-  GtkWidget *split_view;
-  ErrandsSidebar *sidebar;
-  ErrandsTaskList *task_list;
-  GtkWidget *stack;
   GtkWidget *no_lists_page;
+  ErrandsTaskList *task_list;
+  GtkWidget *toast_overlay;
+  ErrandsSidebar *sidebar;
+  GtkWidget *split_view;
+  GtkWidget *stack;
 };
 
 ErrandsWindow *errands_window_new(GtkApplication *app);
