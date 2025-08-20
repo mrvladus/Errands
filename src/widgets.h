@@ -2,6 +2,7 @@
 #pragma once
 
 #include "data/data.h"
+#include "gio/gio.h"
 
 #include <adwaita.h>
 
@@ -29,9 +30,7 @@ struct _ErrandsTask {
   GtkWidget *tags_btn;
   GtkWidget *attachments_btn;
   GtkWidget *color_btn;
-  GtkWidget *sub_tasks_revealer;
   GtkWidget *sub_entry;
-  GtkWidget *task_list;
 
   gulong complete_btn_signal_id;
   gulong toolbar_btn_signal_id;
@@ -184,16 +183,23 @@ struct _ErrandsTaskList {
   GtkWidget *search_entry;
   GtkWidget *entry_rev;
 
+  // GListStore *tasks_model;
+  // GtkCustomFilter *toplevel_tasks_filter;
+  // GtkFilterListModel *toplevel_tasks_filter_model;
+  // GtkCustomSorter *tasks_sorter;
+  // GtkSortListModel *sort_model;
+  // GtkCustomSorter *completion_sorter;
+  // GtkSortListModel *completion_sort_model;
+  // GtkCustomFilter *search_filter;
+  // GtkFilterListModel *search_filter_model;
+  // const char *search_query;
   GListStore *tasks_model;
+  GtkTreeListModel *tree_model;
+  GtkTreeListRowSorter *tree_sorter;
+  GtkSortListModel *sorted_model;
   GtkCustomFilter *toplevel_tasks_filter;
   GtkFilterListModel *toplevel_tasks_filter_model;
-  GtkCustomSorter *tasks_sorter;
-  GtkSortListModel *sort_model;
-  GtkCustomSorter *completion_sorter;
-  GtkSortListModel *completion_sort_model;
-  GtkCustomFilter *search_filter;
-  GtkFilterListModel *search_filter_model;
-  const char *search_query;
+  GtkCustomSorter *sorter;
 
   ErrandsTaskListAttachmentsDialog *attachments_dialog;
   ErrandsTaskListColorDialog *color_dialog;
@@ -210,7 +216,8 @@ ErrandsTaskList *errands_task_list_new();
 void errands_task_list_load_tasks(ErrandsTaskList *self);
 void errands_task_list_add(TaskData *td);
 void errands_task_list_update_title();
-GPtrArray *errands_task_list_get_all_tasks();
+void setup_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item);
+void bind_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item);
 
 // --- SIDEBAR TASK LIST ROW --- //
 

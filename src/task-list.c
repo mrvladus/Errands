@@ -1,11 +1,12 @@
 #include "data/data.h"
-#include "glib-object.h"
-#include "glib.h"
+#include "gtk/gtk.h"
 #include "settings.h"
 #include "state.h"
 #include "utils.h"
-#include "vendor/toolbox.h"
 #include "widgets.h"
+
+// #define TB_ENABLE_PROFILING
+#include "vendor/toolbox.h"
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>
@@ -17,11 +18,8 @@ static void on_test_btn_clicked_cb();
 
 static void on_toggle_search_action_cb(GSimpleAction *action, GVariant *param, GtkToggleButton *btn);
 
-static void setup_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item);
-static void bind_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item);
-
 static bool toplevel_tasks_filter_func(GObject *obj, gpointer user_data);
-static bool search_filter_func(GObject *obj, gpointer user_data);
+// static bool search_filter_func(GObject *obj, gpointer user_data);
 static gint sort_func(gconstpointer a, gconstpointer b, gpointer user_data);
 static gint completion_sort_func(gconstpointer a, gconstpointer b, gpointer user_data);
 
@@ -49,138 +47,212 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_search_cb);
 }
 
+// Callback to create child models
+static GListModel *create_child_model_func(gpointer item, gpointer user_data) {
+  TaskData *parent_data = g_object_get_data(G_OBJECT(item), "data");
+  LOG("Create sub-tasks models for %s", errands_data_get_str(parent_data, DATA_PROP_TEXT));
+  if (!parent_data) return NULL;
+  const char *parent_uid = errands_data_get_str(parent_data, DATA_PROP_UID);
+  GListStore *children_store = g_list_store_new(G_TYPE_OBJECT);
+  // Find all tasks that have this parent
+  GPtrArray *all_tasks = g_hash_table_get_values_as_ptr_array(tdata);
+  for (size_t i = 0; i < all_tasks->len; i++) {
+    TaskData *task = all_tasks->pdata[i];
+    const char *task_parent = errands_data_get_str(task, DATA_PROP_PARENT);
+    if (task_parent && g_str_equal(task_parent, parent_uid)) {
+      GObject *obj = g_object_new(G_TYPE_OBJECT, NULL);
+      g_object_set_data(obj, "data", task);
+      g_list_store_append(children_store, obj);
+      g_object_unref(obj);
+      LOG("%s", errands_data_get_str(task, DATA_PROP_TEXT));
+    }
+  }
+  g_ptr_array_free(all_tasks, false);
+
+  return G_LIST_MODEL(children_store);
+}
+
 static void errands_task_list_init(ErrandsTaskList *self) {
   gtk_widget_init_template(GTK_WIDGET(self));
   errands_add_actions(GTK_WIDGET(self), "task-list", "toggle_search", on_toggle_search_action_cb, NULL, NULL);
 
   gtk_search_bar_connect_entry(GTK_SEARCH_BAR(self->search_bar), GTK_EDITABLE(self->search_entry));
 
-  // Create tasks model
+  // Create main items model
   self->tasks_model = g_list_store_new(G_TYPE_OBJECT);
-
-  self->tasks_sorter = gtk_custom_sorter_new(sort_func, NULL, NULL);
-  self->sort_model = gtk_sort_list_model_new(G_LIST_MODEL(self->tasks_model), GTK_SORTER(self->tasks_sorter));
-
-  self->completion_sorter = gtk_custom_sorter_new(completion_sort_func, NULL, NULL);
-  self->completion_sort_model =
-      gtk_sort_list_model_new(G_LIST_MODEL(self->sort_model), GTK_SORTER(self->completion_sorter));
-
-  // self->search_filter = gtk_custom_filter_new((GtkCustomFilterFunc)search_filter_func, NULL, NULL);
-  // self->search_filter_model =
-  //     gtk_filter_list_model_new(G_LIST_MODEL(self->completion_sort_model), GTK_FILTER(self->search_filter));
-
-  self->toplevel_tasks_filter = gtk_custom_filter_new((GtkCustomFilterFunc)toplevel_tasks_filter_func, NULL, NULL);
-  self->toplevel_tasks_filter_model =
-      gtk_filter_list_model_new(G_LIST_MODEL(self->completion_sort_model), GTK_FILTER(self->toplevel_tasks_filter));
+  // Create tree list model
+  self->tree_model =
+      gtk_tree_list_model_new(G_LIST_MODEL(self->tasks_model), false, false, create_child_model_func, NULL, NULL);
+  // Create sorter for the tree
+  // self->tree_sorter = gtk_tree_list_row_sorter_new(GTK_SORTER(gtk_custom_sorter_new(completion_sort_func, NULL,
+  // NULL))); Create sorted model self->sorted_model = gtk_sort_list_model_new(G_LIST_MODEL(self->tree_model),
+  // GTK_SORTER(self->tree_sorter)); Create filter for top-level tasks only self->toplevel_tasks_filter =
+  // gtk_custom_filter_new((GtkCustomFilterFunc)toplevel_tasks_filter_func, NULL, NULL);
+  // self->toplevel_tasks_filter_model =
+  //     gtk_filter_list_model_new(G_LIST_MODEL(self->sorted_model), GTK_FILTER(self->toplevel_tasks_filter));
 
   GtkListItemFactory *tasks_factory = gtk_signal_list_item_factory_new();
   g_signal_connect(tasks_factory, "setup", G_CALLBACK(setup_listitem_cb), NULL);
   g_signal_connect(tasks_factory, "bind", G_CALLBACK(bind_listitem_cb), NULL);
 
-  GtkNoSelection *selection_model = gtk_no_selection_new(G_LIST_MODEL(self->toplevel_tasks_filter_model));
+  gtk_list_view_set_model(GTK_LIST_VIEW(self->task_list),
+                          GTK_SELECTION_MODEL(gtk_no_selection_new(G_LIST_MODEL(self->tree_model))));
   gtk_list_view_set_factory(GTK_LIST_VIEW(self->task_list), tasks_factory);
-  gtk_list_view_set_model(GTK_LIST_VIEW(self->task_list), GTK_SELECTION_MODEL(selection_model));
 
   LOG("Task List: Created");
 }
 
 ErrandsTaskList *errands_task_list_new() { return g_object_new(ERRANDS_TYPE_TASK_LIST, NULL); }
 
-static void setup_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item) {
-  gtk_list_item_set_child(list_item, GTK_WIDGET(errands_task_new()));
+void setup_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item) {
+  GtkWidget *expander = gtk_tree_expander_new();
+  ErrandsTask *task = errands_task_new();
+  gtk_tree_expander_set_child(GTK_TREE_EXPANDER(expander), GTK_WIDGET(task));
+  g_object_set_data(G_OBJECT(expander), "task-widget", task);
+  gtk_list_item_set_child(list_item, expander);
   gtk_list_item_set_activatable(list_item, false);
 }
 
-static void bind_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item) {
-  ErrandsTask *task = ERRANDS_TASK(gtk_list_item_get_child(list_item));
-  TaskData *data = g_object_get_data(gtk_list_item_get_item(list_item), "data");
-  errands_task_set_data(task, data);
+void bind_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item) {
+  GtkTreeListRow *row = GTK_TREE_LIST_ROW(gtk_list_item_get_item(list_item));
+  GObject *item = gtk_tree_list_row_get_item(row);
+  if (!item) return;
+
+  // Get the expander and its child task widget
+  GtkWidget *expander = gtk_list_item_get_child(list_item);
+  ErrandsTask *task = ERRANDS_TASK(g_object_get_data(G_OBJECT(expander), "task-widget"));
+
+  // Set the row on the expander
+  gtk_tree_expander_set_list_row(GTK_TREE_EXPANDER(expander), row);
+
+  // Set the task data
+  TaskData *task_data = g_object_get_data(item, "data");
+  errands_task_set_data(task, task_data);
+  // gtk_tree_list_row_set_expanded(row, errands_data_get_bool(task_data, DATA_PROP_EXPANDED));
+
+  // GListModel *children = gtk_tree_list_row_get_children(row);
+  // errands_task_set_sub_tasks_model(task, children);
 }
 
 // --- SORT AND FILTER CALLBACKS --- //
 
-static bool toplevel_tasks_filter_func(GObject *obj, gpointer user_data) {
-  TaskData *data = g_object_get_data(G_OBJECT(obj), "data");
-  const char *parent = errands_data_get_str(data, DATA_PROP_PARENT);
-  const char *list_uid = errands_data_get_str(data, DATA_PROP_LIST_UID);
-  bool deleted = errands_data_get_bool(data, DATA_PROP_DELETED);
-  bool trash = errands_data_get_bool(data, DATA_PROP_TRASH);
-  bool visible = true;
-  if (state.main_window->task_list->data) {
-    const char *curr_list_uid = errands_data_get_str(state.main_window->task_list->data, DATA_PROP_LIST_UID);
-    visible = g_str_equal(curr_list_uid, list_uid);
-  }
-  return !parent && !deleted && !trash && visible;
-}
+// static bool search_filter_func(GObject *obj, gpointer user_data) {
+//   if (!state.main_window->task_list->search_query || g_str_equal(state.main_window->task_list->search_query, ""))
+//     return true;
 
-static bool search_filter_func(GObject *obj, gpointer user_data) {
-  if (!state.main_window->task_list->search_query || g_str_equal(state.main_window->task_list->search_query, ""))
-    return true;
+//   TaskData *data = g_object_get_data(G_OBJECT(obj), "data");
+//   const char *text = errands_data_get_str(data, DATA_PROP_TEXT);
+//   const char *notes = errands_data_get_str(data, DATA_PROP_NOTES);
+//   g_auto(GStrv) tags = errands_data_get_strv(data, DATA_PROP_TAGS);
 
-  TaskData *data = g_object_get_data(G_OBJECT(obj), "data");
-  const char *text = errands_data_get_str(data, DATA_PROP_TEXT);
-  const char *notes = errands_data_get_str(data, DATA_PROP_NOTES);
-  g_auto(GStrv) tags = errands_data_get_strv(data, DATA_PROP_TAGS);
+//   return (text && string_contains(text, state.main_window->task_list->search_query)) ||
+//          (notes && string_contains(notes, state.main_window->task_list->search_query)) ||
+//          (tags && g_strv_contains((const gchar *const *)tags, state.main_window->task_list->search_query));
+// }
 
-  return (text && string_contains(text, state.main_window->task_list->search_query)) ||
-         (notes && string_contains(notes, state.main_window->task_list->search_query)) ||
-         (tags && g_strv_contains((const gchar *const *)tags, state.main_window->task_list->search_query));
-}
+// static gint sort_func(gconstpointer a, gconstpointer b, gpointer user_data) {
+//   size_t sort_by = errands_settings_get("sort_by", SETTING_TYPE_INT).i;
 
-static gint sort_func(gconstpointer a, gconstpointer b, gpointer user_data) {
-  size_t sort_by = errands_settings_get("sort_by", SETTING_TYPE_INT).i;
+//   TaskData *data1 = g_object_get_data(G_OBJECT(a), "data");
+//   TaskData *data2 = g_object_get_data(G_OBJECT(b), "data");
 
-  TaskData *data1 = g_object_get_data(G_OBJECT(a), "data");
-  TaskData *data2 = g_object_get_data(G_OBJECT(b), "data");
+//   icaltimetype creation_date1 = errands_data_get_time(data1, DATA_PROP_CREATED_TIME);
+//   icaltimetype creation_date2 = errands_data_get_time(data2, DATA_PROP_CREATED_TIME);
 
-  icaltimetype creation_date1 = errands_data_get_time(data1, DATA_PROP_CREATED_TIME);
-  icaltimetype creation_date2 = errands_data_get_time(data2, DATA_PROP_CREATED_TIME);
+//   gint result = 0;
 
-  switch (sort_by) {
-  case SORT_TYPE_CREATION_DATE: return icaltime_compare(creation_date2, creation_date1);
-  case SORT_TYPE_DUE_DATE: {
-    icaltimetype due_date1 = errands_data_get_time(data1, DATA_PROP_DUE_TIME);
-    bool due_date1_null = icaltime_is_null_time(due_date1);
-    icaltimetype due_date2 = errands_data_get_time(data2, DATA_PROP_DUE_TIME);
-    bool due_date2_null = icaltime_is_null_time(due_date2);
-    if (!due_date1_null && !due_date2_null) return icaltime_compare(due_date2, due_date1);
-    else return icaltime_compare(creation_date2, creation_date1);
-  }
-  case SORT_TYPE_PRIORITY: {
-    uint8_t p1 = errands_data_get_int(data1, DATA_PROP_PRIORITY);
-    uint8_t p2 = errands_data_get_int(data2, DATA_PROP_PRIORITY);
-    if (p2 == p1) return 0;
-    else if (p2 > p1) return 1;
-    else return -1;
-  }
-  }
+//   switch (sort_by) {
+//   case SORT_TYPE_CREATION_DATE: result = icaltime_compare(creation_date2, creation_date1); break;
+//   case SORT_TYPE_DUE_DATE: {
+//     icaltimetype due_date1 = errands_data_get_time(data1, DATA_PROP_DUE_TIME);
+//     bool due_date1_null = icaltime_is_null_time(due_date1);
+//     icaltimetype due_date2 = errands_data_get_time(data2, DATA_PROP_DUE_TIME);
+//     bool due_date2_null = icaltime_is_null_time(due_date2);
 
-  return 0;
-}
+//     if (!due_date1_null && !due_date2_null) {
+//       result = icaltime_compare(due_date2, due_date1);
+//     } else if (due_date1_null && !due_date2_null) {
+//       result = 1; // b has due date, a doesn't
+//     } else if (!due_date1_null && due_date2_null) {
+//       result = -1; // a has due date, b doesn't
+//     } else {
+//       result = icaltime_compare(creation_date2, creation_date1);
+//     }
+//     break;
+//   }
+//   case SORT_TYPE_PRIORITY: {
+//     uint8_t p1 = errands_data_get_int(data1, DATA_PROP_PRIORITY);
+//     uint8_t p2 = errands_data_get_int(data2, DATA_PROP_PRIORITY);
+//     if (p2 > p1) return 1;
+//     if (p2 < p1) return -1;
+//     result = 0;
+//     break;
+//   }
+//   default: result = 0;
+//   }
 
-static gint completion_sort_func(gconstpointer a, gconstpointer b, gpointer user_data) {
-  TaskData *data1 = g_object_get_data(G_OBJECT(a), "data");
-  int completed1 = !icaltime_is_null_time(errands_data_get_time(data1, DATA_PROP_COMPLETED_TIME)) ? 1 : 0;
-  TaskData *data2 = g_object_get_data(G_OBJECT(b), "data");
-  int completed2 = !icaltime_is_null_time(errands_data_get_time(data2, DATA_PROP_COMPLETED_TIME)) ? 1 : 0;
-  return completed1 - completed2;
-}
+//   // For stable sorting, use creation date as secondary sort criteria
+//   if (result == 0) { result = icaltime_compare(creation_date2, creation_date1); }
+
+//   // Final fallback: use UID for absolute stability
+//   if (result == 0) {
+//     const char *uid1 = errands_data_get_str(data1, DATA_PROP_UID);
+//     const char *uid2 = errands_data_get_str(data2, DATA_PROP_UID);
+//     result = g_strcmp0(uid1, uid2);
+//   }
+
+//   return result;
+// }
+
+// static gint completion_sort_func(gconstpointer a, gconstpointer b, gpointer user_data) {
+//   TaskData *data_a = g_object_get_data(G_OBJECT(a), "data");
+//   TaskData *data_b = g_object_get_data(G_OBJECT(b), "data");
+
+//   if (!data_a || !data_b) return 0;
+
+//   // Completion status: incomplete first, complete last
+//   int completed1 = !icaltime_is_null_time(errands_data_get_time(data_a, DATA_PROP_COMPLETED_TIME)) ? 1 : 0;
+//   int completed2 = !icaltime_is_null_time(errands_data_get_time(data_b, DATA_PROP_COMPLETED_TIME)) ? 1 : 0;
+
+//   gint result = completed1 - completed2;
+
+//   // If completion status is the same, use creation date (newest first)
+//   if (result == 0) {
+//     icaltimetype created1 = errands_data_get_time(data_a, DATA_PROP_CREATED_TIME);
+//     icaltimetype created2 = errands_data_get_time(data_b, DATA_PROP_CREATED_TIME);
+//     result = icaltime_compare(created2, created1);
+//   }
+
+//   // Final fallback: use UID for absolute stability
+//   if (result == 0) {
+//     const char *uid1 = errands_data_get_str(data_a, DATA_PROP_UID);
+//     const char *uid2 = errands_data_get_str(data_b, DATA_PROP_UID);
+//     result = g_strcmp0(uid1, uid2);
+//   }
+
+//   return result;
+// }
 
 // ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_task_list_load_tasks(ErrandsTaskList *self) {
-  LOG("Task List: Loading tasks");
+  LOG("Task List: Loading tasks to model");
+  // Add only top-level tasks to the root model
   GPtrArray *tasks = g_hash_table_get_values_as_ptr_array(tdata);
   for (size_t i = 0; i < tasks->len; i++) {
-    GObject *data_object = g_object_new(G_TYPE_OBJECT, NULL);
-    g_object_set_data(data_object, "data", tasks->pdata[i]);
-    g_list_store_append(self->tasks_model, data_object);
+    TaskData *task = tasks->pdata[i];
+    const char *parent = errands_data_get_str(task, DATA_PROP_PARENT);
+    bool deleted = errands_data_get_bool(task, DATA_PROP_DELETED);
+    // Only add non-deleted, top-level tasks to root model
+    if (!parent && !deleted) {
+      GObject *obj = g_object_new(G_TYPE_OBJECT, NULL);
+      g_object_set_data(obj, "data", task);
+      g_list_store_append(self->tasks_model, obj);
+      g_object_unref(obj);
+    }
   }
   g_ptr_array_free(tasks, false);
-  if (g_list_model_get_n_items(G_LIST_MODEL(self->toplevel_tasks_filter_model)) > 0) {
-    gtk_list_view_scroll_to(GTK_LIST_VIEW(self->task_list), 0, GTK_LIST_SCROLL_FOCUS, NULL);
-  }
-  LOG("Task List: Loading tasks complete");
+  LOG("Task List: Loaded %d top-level tasks", g_list_model_get_n_items(G_LIST_MODEL(self->tasks_model)));
 }
 
 // ---------- CALLBACKS ---------- //
@@ -234,21 +306,6 @@ void errands_task_list_update_title() {
   adw_window_title_set_subtitle(ADW_WINDOW_TITLE(state.main_window->task_list->title), total > 0 ? stats : "");
 }
 
-static void __append_tasks(GPtrArray *arr, GtkWidget *task_list) {
-  GPtrArray *tasks = get_children(task_list);
-  for (size_t i = 0; i < tasks->len; i++) {
-    ErrandsTask *t = tasks->pdata[i];
-    g_ptr_array_add(arr, t);
-    __append_tasks(arr, t->task_list);
-  }
-}
-
-GPtrArray *errands_task_list_get_all_tasks() {
-  GPtrArray *arr = g_ptr_array_new();
-  __append_tasks(arr, state.main_window->task_list->task_list);
-  return arr;
-}
-
 // --- SIGNAL HANDLERS --- //
 
 static void on_task_list_entry_activated_cb(AdwEntryRow *entry, gpointer data) {
@@ -265,7 +322,6 @@ static void on_task_list_entry_activated_cb(AdwEntryRow *entry, gpointer data) {
   GObject *data_object = g_object_new(G_TYPE_OBJECT, NULL);
   g_object_set_data(data_object, "data", td);
   g_list_store_append(state.main_window->task_list->tasks_model, data_object);
-  // g_list_store_append(state.main_window->task_list->tasks_model, td);
   // gtk_list_view_scroll_to(GTK_LIST_VIEW(state.main_window->task_list->task_list), 0, GTK_LIST_SCROLL_FOCUS, NULL);
   errands_data_write_list(state.main_window->task_list->data);
 
@@ -283,10 +339,10 @@ static void on_task_list_entry_activated_cb(AdwEntryRow *entry, gpointer data) {
 }
 
 static void on_task_list_search_cb(GtkSearchEntry *entry, gpointer user_data) {
-  const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
-  LOG("Task List: Search '%s'", text);
-  state.main_window->task_list->search_query = text;
-  gtk_filter_changed(GTK_FILTER(state.main_window->task_list->search_filter), GTK_FILTER_CHANGE_DIFFERENT);
+  // const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
+  // LOG("Task List: Search '%s'", text);
+  // state.main_window->task_list->search_query = text;
+  // gtk_filter_changed(GTK_FILTER(state.main_window->task_list->search_filter), GTK_FILTER_CHANGE_DIFFERENT);
   // gtk_list_view_scroll_to(GTK_LIST_VIEW(state.main_window->task_list->task_list), 0, GTK_LIST_SCROLL_FOCUS, NULL);
 }
 

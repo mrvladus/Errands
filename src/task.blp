@@ -1,9 +1,8 @@
 using Gtk 4.0;
-using Gdk 4.0;
 using Adw 1;
 
 menu rc_menu {
-  item (_("Rename"), "task.edit")
+  item (_("Edit"), "task.edit")
   item (_("Move to Trash"), "task.trash")
   // item (_("Export"), "task-list-row.export")
   // item (_("Print"), "task-list-row.print")
@@ -11,8 +10,7 @@ menu rc_menu {
 
 template $ErrandsTask: Box {
   orientation: vertical;
-  margin-start: 12;
-  margin-end: 12;
+  margin-top: 6;
 
   styles [
     "card",
@@ -24,11 +22,6 @@ template $ErrandsTask: Box {
     margin-end: 6;
     margin-top: 6;
     margin-bottom: 6;
-    tooltip-text: _("Toggle Sub-Tasks");
-
-    cursor: Gdk.Cursor {
-      name: "pointer";
-    };
 
     CheckButton complete_btn {
       valign: center;
@@ -83,10 +76,6 @@ template $ErrandsTask: Box {
       touch-only: true;
       pressed => $on_right_click(popover_menu) not-swapped;
     }
-
-    GestureClick {
-      released => $on_expand_toggle_cb(template) not-swapped;
-    }
   }
 
   // Tags bar
@@ -122,14 +111,20 @@ template $ErrandsTask: Box {
   Revealer toolbar_revealer {
     reveal-child: bind toolbar_btn.active;
 
-    Adw.WrapBox {
-      margin-bottom: 6;
+    Box {
       margin-start: 6;
       margin-end: 6;
+      margin-bottom: 6;
+      spacing: 4;
+
+      Entry sub_entry {
+        hexpand: true;
+        placeholder-text: _("Add Sub-Task");
+        activate => $on_sub_task_entry_activated(template) not-swapped;
+      }
 
       Button date_btn {
-        halign: start;
-        hexpand: true;
+        valign: center;
 
         Adw.ButtonContent date_btn_content {
           icon-name: "errands-calendar-symbolic";
@@ -140,14 +135,15 @@ template $ErrandsTask: Box {
         clicked => $errands_task_list_date_dialog_show(template);
 
         styles [
-          "flat",
           "caption",
+          "flat",
         ]
       }
 
       Button notes_btn {
         icon-name: "errands-notes-symbolic";
         tooltip-text: _("Notes");
+        valign: center;
         clicked => $errands_task_list_notes_dialog_show(template);
 
         styles [
@@ -158,6 +154,7 @@ template $ErrandsTask: Box {
       Button priority_btn {
         icon-name: "errands-priority-symbolic";
         tooltip-text: _("Priority");
+        valign: center;
         clicked => $errands_task_list_priority_dialog_show(template);
 
         styles [
@@ -168,6 +165,7 @@ template $ErrandsTask: Box {
       Button tags_btn {
         icon-name: "errands-tags-symbolic";
         tooltip-text: _("Tags");
+        valign: center;
         clicked => $errands_task_list_tags_dialog_show(template);
 
         styles [
@@ -178,6 +176,7 @@ template $ErrandsTask: Box {
       Button attachments_btn {
         icon-name: "errands-attachment-symbolic";
         tooltip-text: _("Attachments");
+        valign: center;
         clicked => $errands_task_list_attachments_dialog_show(template);
 
         styles [
@@ -188,36 +187,11 @@ template $ErrandsTask: Box {
       Button color_btn {
         icon-name: "errands-color-symbolic";
         tooltip-text: _("Color");
+        valign: center;
         clicked => $errands_task_list_color_dialog_show(template);
 
         styles [
           "flat",
-        ]
-      }
-    }
-  }
-
-  // Sub-tasks
-  Revealer sub_tasks_revealer {
-    Box {
-      orientation: vertical;
-
-      Entry sub_entry {
-        margin-start: 6;
-        margin-end: 6;
-        placeholder-text: _("Add Sub-Task");
-        activate => $on_sub_task_entry_activated(template) not-swapped;
-      }
-
-      ListBox task_list {
-        selection-mode: none;
-        margin-start: 6;
-        margin-end: 6;
-        margin-top: 6;
-        margin-bottom: 6;
-
-        styles [
-          "boxed-list-separate",
         ]
       }
     }

@@ -1,7 +1,10 @@
 #include "../settings.h"
 #include "../utils.h"
 #include "../vendor/json.h"
+
+#define TB_ENABLE_PROFILING
 #include "../vendor/toolbox.h"
+
 #include "data.h"
 
 #include <gio/gio.h>
