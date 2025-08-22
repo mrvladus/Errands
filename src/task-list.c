@@ -1,6 +1,8 @@
 #include "data/data.h"
+#include "gio/gio.h"
+#include "glib-object.h"
+#include "glib.h"
 #include "gtk/gtk.h"
-#include "settings.h"
 #include "state.h"
 #include "utils.h"
 #include "widgets.h"
@@ -10,11 +12,17 @@
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>
+#include <stdbool.h>
+#include <stddef.h>
+
+static void on_list_view_activate(GtkListView *self, guint position, gpointer user_data);
+static GListModel *create_child_model_func(gpointer item, gpointer user_data);
 
 static void on_task_list_entry_activated_cb(AdwEntryRow *entry, gpointer data);
 static void on_task_list_search_cb(GtkSearchEntry *entry, gpointer user_data);
 static void on_sort_dialog_show_cb();
 static void on_test_btn_clicked_cb();
+static void on_list_view_activate(GtkListView *self, guint position, gpointer user_data);
 
 static void on_toggle_search_action_cb(GSimpleAction *action, GVariant *param, GtkToggleButton *btn);
 
@@ -45,31 +53,7 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_sort_dialog_show_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_entry_activated_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_search_cb);
-}
-
-// Callback to create child models
-static GListModel *create_child_model_func(gpointer item, gpointer user_data) {
-  TaskData *parent_data = g_object_get_data(G_OBJECT(item), "data");
-  LOG("Create sub-tasks models for %s", errands_data_get_str(parent_data, DATA_PROP_TEXT));
-  if (!parent_data) return NULL;
-  const char *parent_uid = errands_data_get_str(parent_data, DATA_PROP_UID);
-  GListStore *children_store = g_list_store_new(G_TYPE_OBJECT);
-  // Find all tasks that have this parent
-  GPtrArray *all_tasks = g_hash_table_get_values_as_ptr_array(tdata);
-  for (size_t i = 0; i < all_tasks->len; i++) {
-    TaskData *task = all_tasks->pdata[i];
-    const char *task_parent = errands_data_get_str(task, DATA_PROP_PARENT);
-    if (task_parent && g_str_equal(task_parent, parent_uid)) {
-      GObject *obj = g_object_new(G_TYPE_OBJECT, NULL);
-      g_object_set_data(obj, "data", task);
-      g_list_store_append(children_store, obj);
-      g_object_unref(obj);
-      LOG("%s", errands_data_get_str(task, DATA_PROP_TEXT));
-    }
-  }
-  g_ptr_array_free(all_tasks, false);
-
-  return G_LIST_MODEL(children_store);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_list_view_activate);
 }
 
 static void errands_task_list_init(ErrandsTaskList *self) {
@@ -83,13 +67,6 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   // Create tree list model
   self->tree_model =
       gtk_tree_list_model_new(G_LIST_MODEL(self->tasks_model), false, false, create_child_model_func, NULL, NULL);
-  // Create sorter for the tree
-  // self->tree_sorter = gtk_tree_list_row_sorter_new(GTK_SORTER(gtk_custom_sorter_new(completion_sort_func, NULL,
-  // NULL))); Create sorted model self->sorted_model = gtk_sort_list_model_new(G_LIST_MODEL(self->tree_model),
-  // GTK_SORTER(self->tree_sorter)); Create filter for top-level tasks only self->toplevel_tasks_filter =
-  // gtk_custom_filter_new((GtkCustomFilterFunc)toplevel_tasks_filter_func, NULL, NULL);
-  // self->toplevel_tasks_filter_model =
-  //     gtk_filter_list_model_new(G_LIST_MODEL(self->sorted_model), GTK_FILTER(self->toplevel_tasks_filter));
 
   GtkListItemFactory *tasks_factory = gtk_signal_list_item_factory_new();
   g_signal_connect(tasks_factory, "setup", G_CALLBACK(setup_listitem_cb), NULL);
@@ -105,34 +82,134 @@ static void errands_task_list_init(ErrandsTaskList *self) {
 ErrandsTaskList *errands_task_list_new() { return g_object_new(ERRANDS_TYPE_TASK_LIST, NULL); }
 
 void setup_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item) {
-  GtkWidget *expander = gtk_tree_expander_new();
+  GtkTreeExpander *expander =
+      g_object_new(GTK_TYPE_TREE_EXPANDER, "margin-top", 3, "margin-bottom", 3, "focusable", false, NULL);
   ErrandsTask *task = errands_task_new();
-  gtk_tree_expander_set_child(GTK_TREE_EXPANDER(expander), GTK_WIDGET(task));
-  g_object_set_data(G_OBJECT(expander), "task-widget", task);
-  gtk_list_item_set_child(list_item, expander);
-  gtk_list_item_set_activatable(list_item, false);
+  gtk_tree_expander_set_child(expander, GTK_WIDGET(task));
+  gtk_list_item_set_child(list_item, GTK_WIDGET(expander));
 }
+
+static void expand_row_idle_cb(GtkTreeListRow *row) { gtk_tree_list_row_set_expanded(row, true); }
 
 void bind_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item) {
   GtkTreeListRow *row = GTK_TREE_LIST_ROW(gtk_list_item_get_item(list_item));
+
   GObject *item = gtk_tree_list_row_get_item(row);
   if (!item) return;
-
   // Get the expander and its child task widget
-  GtkWidget *expander = gtk_list_item_get_child(list_item);
-  ErrandsTask *task = ERRANDS_TASK(g_object_get_data(G_OBJECT(expander), "task-widget"));
-
+  GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_list_item_get_child(list_item));
+  ErrandsTask *task = ERRANDS_TASK(gtk_tree_expander_get_child(expander));
   // Set the row on the expander
-  gtk_tree_expander_set_list_row(GTK_TREE_EXPANDER(expander), row);
-
+  gtk_tree_expander_set_list_row(expander, row);
+  g_object_set_data(G_OBJECT(item), "task-widget", task);
   // Set the task data
   TaskData *task_data = g_object_get_data(item, "data");
   errands_task_set_data(task, task_data);
-  // gtk_tree_list_row_set_expanded(row, errands_data_get_bool(task_data, DATA_PROP_EXPANDED));
-
-  // GListModel *children = gtk_tree_list_row_get_children(row);
-  // errands_task_set_sub_tasks_model(task, children);
+  bool expanded = errands_data_get_bool(task_data, DATA_PROP_EXPANDED);
+  bool is_expandable = gtk_tree_list_row_is_expandable(row);
+  if (is_expandable && expanded) g_idle_add_once((GSourceOnceFunc)expand_row_idle_cb, row);
 }
+
+static void on_list_view_activate(GtkListView *self, guint position, gpointer user_data) {
+  // Get row
+  GListModel *selection_model = G_LIST_MODEL(gtk_list_view_get_model(self));
+  GtkTreeListRow *row = GTK_TREE_LIST_ROW(g_list_model_get_item(selection_model, position));
+  if (!row) return;
+  if (!gtk_tree_list_row_is_expandable(row)) return;
+
+  // Set new expanded state
+  bool expanded = !gtk_tree_list_row_get_expanded(row);
+  gtk_tree_list_row_set_expanded(row, expanded);
+
+  GObject *item = gtk_tree_list_row_get_item(row);
+
+  TaskData *task_data = g_object_get_data(item, "data");
+  errands_data_set_bool(task_data, DATA_PROP_EXPANDED, expanded);
+
+  ErrandsTask *task = g_object_get_data(item, "task-widget");
+  errands_task_set_data(task, task_data);
+  errands_data_write_list(task_data_get_list(task_data));
+}
+
+static GListModel *create_child_model_func(gpointer item, gpointer user_data) {
+  // Check if we already created and cached a child model
+  GListModel *cached = g_object_get_data(G_OBJECT(item), "children-model");
+  if (cached) {
+    return g_object_ref(cached); // return new ref
+  }
+
+  TaskData *parent_data = g_object_get_data(G_OBJECT(item), "data");
+  if (!parent_data) return NULL;
+
+  const char *parent_uid = errands_data_get_str(parent_data, DATA_PROP_UID);
+  if (!parent_uid) return NULL;
+
+  // Build child store
+  GListStore *children_store = g_list_store_new(G_TYPE_OBJECT);
+  GPtrArray *all_tasks = g_hash_table_get_values_as_ptr_array(tdata);
+  size_t children_n = 0;
+
+  for (size_t i = 0; i < all_tasks->len; i++) {
+    TaskData *task = all_tasks->pdata[i];
+    const char *task_parent = errands_data_get_str(task, DATA_PROP_PARENT);
+
+    if (task_parent && g_str_equal(task_parent, parent_uid)) {
+      GObject *obj = g_object_new(G_TYPE_OBJECT, NULL);
+      g_object_set_data(obj, "data", task);
+      g_list_store_append(children_store, obj);
+      g_object_unref(obj);
+      children_n++;
+    }
+  }
+  g_ptr_array_free(all_tasks, false);
+
+  if (children_n == 0) {
+    g_object_unref(children_store);
+    return NULL;
+  }
+
+  // Cache the model on the item
+  g_object_set_data_full(G_OBJECT(item), "children-model", children_store, g_object_unref);
+
+  LOG("Created sub-tasks model with %zu sub-tasks for %s", children_n,
+      errands_data_get_str(parent_data, DATA_PROP_TEXT));
+
+  return G_LIST_MODEL(g_object_ref(children_store));
+}
+
+// Callback to create child models
+// static GListModel *create_child_model_func(gpointer item, gpointer user_data) {
+//   TaskData *parent_data = g_object_get_data(G_OBJECT(item), "data");
+//   if (!parent_data) return NULL;
+//   const char *parent_uid = errands_data_get_str(parent_data, DATA_PROP_UID);
+//   if (!parent_uid) return NULL;
+//   // Find all tasks that have this parent
+//   GListStore *children_store = g_list_store_new(G_TYPE_OBJECT);
+//   GPtrArray *all_tasks = g_hash_table_get_values_as_ptr_array(tdata);
+//   size_t children_n = 0;
+//   for (size_t i = 0; i < all_tasks->len; i++) {
+//     TaskData *task = all_tasks->pdata[i];
+//     const char *task_parent = errands_data_get_str(task, DATA_PROP_PARENT);
+//     if (task_parent && g_str_equal(task_parent, parent_uid)) {
+//       GObject *obj = g_object_new(G_TYPE_OBJECT, NULL);
+//       g_object_set_data(obj, "data", task);
+//       g_list_store_append(children_store, obj);
+//       g_object_unref(obj);
+//       children_n++;
+//     }
+//   }
+//   g_ptr_array_free(all_tasks, false);
+
+//   // If no children found, free store and return NULL
+//   if (children_n == 0) {
+//     g_object_unref(children_store);
+//     return NULL;
+//   }
+
+//   LOG("Created sub-tasks model with %zu sub-tasks for %s", children_n,
+//       errands_data_get_str(parent_data, DATA_PROP_TEXT));
+//   return G_LIST_MODEL(children_store);
+// }
 
 // --- SORT AND FILTER CALLBACKS --- //
 
@@ -253,6 +330,55 @@ void errands_task_list_load_tasks(ErrandsTaskList *self) {
   }
   g_ptr_array_free(tasks, false);
   LOG("Task List: Loaded %d top-level tasks", g_list_model_get_n_items(G_LIST_MODEL(self->tasks_model)));
+}
+
+void errands_task_list_add_task(TaskData *task) {
+  const char *parent_uid = errands_data_get_str(task, DATA_PROP_PARENT);
+  if (parent_uid) {
+    // Find parent item
+    GObject *parent_item = g_hash_table_lookup(tdata, parent_uid);
+    if (parent_item) {
+      GListStore *children_store = g_object_get_data(parent_item, "children-model");
+      if (!children_store) {
+        children_store = g_list_store_new(G_TYPE_OBJECT);
+        g_object_set_data_full(parent_item, "children-model", children_store, g_object_unref);
+      }
+      GObject *obj = g_object_new(G_TYPE_OBJECT, NULL);
+      g_object_set_data(obj, "data", task);
+      g_list_store_append(children_store, obj);
+      g_object_unref(obj);
+    }
+  } else {
+    // Top-level task → append directly to root model
+    GObject *obj = g_object_new(G_TYPE_OBJECT, NULL);
+    g_object_set_data(obj, "data", task);
+    g_list_store_append(state.main_window->task_list->tasks_model, obj);
+    g_object_unref(obj);
+  }
+}
+
+void errands_task_list_remove_task(TaskData *task) {
+  const char *uid = errands_data_get_str(task, DATA_PROP_UID);
+  const char *parent_uid = errands_data_get_str(task, DATA_PROP_PARENT);
+  GListStore *store = NULL;
+  if (parent_uid) {
+    GObject *parent_item = g_hash_table_lookup(tdata, parent_uid);
+    if (!parent_item) return;
+    store = g_object_get_data(parent_item, "children-model");
+  } else store = state.main_window->task_list->tasks_model; // root list
+  if (store) {
+    guint n = g_list_model_get_n_items(G_LIST_MODEL(store));
+    for (guint i = 0; i < n; i++) {
+      GObject *child = g_list_model_get_item(G_LIST_MODEL(store), i);
+      TaskData *child_data = g_object_get_data(child, "data");
+      if (child_data == task) {
+        g_list_store_remove(store, i);
+        g_object_unref(child);
+        break;
+      }
+      g_object_unref(child);
+    }
+  }
 }
 
 // ---------- CALLBACKS ---------- //

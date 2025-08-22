@@ -11,7 +11,6 @@
 
 static void on_complete_btn_toggle_cb(GtkCheckButton *btn, ErrandsTask *task);
 static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointer user_data);
-// static void on_expand_toggle_cb(GtkGestureClick *self, gint n_press, gdouble x, gdouble y, ErrandsTask *task);
 static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *task);
 static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x, gdouble y, GtkPopover *popover);
 static void on_action_edit(GSimpleAction *action, GVariant *param, ErrandsTask *task);
@@ -56,7 +55,6 @@ static void errands_task_class_init(ErrandsTaskClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, color_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, sub_entry);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_title_edit_cb);
-  // gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_expand_toggle_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_right_click);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_list_date_dialog_show);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_list_notes_dialog_show);
@@ -124,7 +122,6 @@ void errands_task_set_data(ErrandsTask *self, TaskData *data) {
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(self->toolbar_btn),
                                errands_data_get_bool(data, DATA_PROP_TOOLBAR_SHOWN));
   g_signal_handler_unblock(self->toolbar_btn, self->toolbar_btn_signal_id);
-  TODO("Handle expand task");
   // Update UI
   errands_task_update_tags(self);
   errands_task_update_accent_color(self);
@@ -379,15 +376,8 @@ static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointe
   }
 }
 
-// static void on_expand_toggle_cb(GtkGestureClick *self, gint n_press, gdouble x, gdouble y, ErrandsTask *task) {
-//   const bool expanded = errands_data_get_bool(task->data, DATA_PROP_EXPANDED);
-//   errands_data_set_bool(task->data, DATA_PROP_EXPANDED, !expanded);
-//   errands_data_write_list(task_data_get_list(task->data));
-//   gtk_revealer_set_reveal_child(GTK_REVEALER(task->sub_tasks_revealer), !expanded);
-// }
-
 static void on_toolbar_btn_toggle_cb(GtkToggleButton *btn, ErrandsTask *task) {
-  LOG("Task %s: Toggle toolbar", errands_data_get_str(task->data, DATA_PROP_UID));
+  LOG("Task '%s': Toggle toolbar", errands_data_get_str(task->data, DATA_PROP_UID));
   errands_data_set_bool(task->data, DATA_PROP_TOOLBAR_SHOWN, gtk_toggle_button_get_active(btn));
   errands_data_write_list(task_data_get_list(task->data));
 }

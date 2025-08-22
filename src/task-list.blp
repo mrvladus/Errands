@@ -77,8 +77,14 @@ template $ErrandsTaskList: Adw.Bin {
 
       ScrolledWindow {
         propagate-natural-height: true;
+        vexpand: true;
 
-        ListView task_list {}
+        ListView task_list {
+          margin-start: 12;
+          margin-end: 12;
+          single-click-activate: true;
+          activate => $on_list_view_activate();
+        }
       }
     };
   }

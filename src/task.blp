@@ -10,7 +10,6 @@ menu rc_menu {
 
 template $ErrandsTask: Box {
   orientation: vertical;
-  margin-top: 6;
 
   styles [
     "card",
@@ -111,11 +110,12 @@ template $ErrandsTask: Box {
   Revealer toolbar_revealer {
     reveal-child: bind toolbar_btn.active;
 
-    Box {
+    Adw.WrapBox {
       margin-start: 6;
       margin-end: 6;
       margin-bottom: 6;
-      spacing: 4;
+      line-spacing: 6;
+      child-spacing: 3;
 
       Entry sub_entry {
         hexpand: true;
@@ -123,76 +123,78 @@ template $ErrandsTask: Box {
         activate => $on_sub_task_entry_activated(template) not-swapped;
       }
 
-      Button date_btn {
-        valign: center;
+      Box {
+        Button date_btn {
+          valign: center;
 
-        Adw.ButtonContent date_btn_content {
-          icon-name: "errands-calendar-symbolic";
-          label: _("Date");
-          tooltip-text: _("Select Date");
+          Adw.ButtonContent date_btn_content {
+            icon-name: "errands-calendar-symbolic";
+            label: _("Date");
+            tooltip-text: _("Select Date");
+          }
+
+          clicked => $errands_task_list_date_dialog_show(template);
+
+          styles [
+            "caption",
+            "flat",
+          ]
         }
 
-        clicked => $errands_task_list_date_dialog_show(template);
+        Button notes_btn {
+          icon-name: "errands-notes-symbolic";
+          tooltip-text: _("Notes");
+          valign: center;
+          clicked => $errands_task_list_notes_dialog_show(template);
 
-        styles [
-          "caption",
-          "flat",
-        ]
-      }
+          styles [
+            "flat",
+          ]
+        }
 
-      Button notes_btn {
-        icon-name: "errands-notes-symbolic";
-        tooltip-text: _("Notes");
-        valign: center;
-        clicked => $errands_task_list_notes_dialog_show(template);
+        Button priority_btn {
+          icon-name: "errands-priority-symbolic";
+          tooltip-text: _("Priority");
+          valign: center;
+          clicked => $errands_task_list_priority_dialog_show(template);
 
-        styles [
-          "flat",
-        ]
-      }
+          styles [
+            "flat",
+          ]
+        }
 
-      Button priority_btn {
-        icon-name: "errands-priority-symbolic";
-        tooltip-text: _("Priority");
-        valign: center;
-        clicked => $errands_task_list_priority_dialog_show(template);
+        Button tags_btn {
+          icon-name: "errands-tags-symbolic";
+          tooltip-text: _("Tags");
+          valign: center;
+          clicked => $errands_task_list_tags_dialog_show(template);
 
-        styles [
-          "flat",
-        ]
-      }
+          styles [
+            "flat",
+          ]
+        }
 
-      Button tags_btn {
-        icon-name: "errands-tags-symbolic";
-        tooltip-text: _("Tags");
-        valign: center;
-        clicked => $errands_task_list_tags_dialog_show(template);
+        Button attachments_btn {
+          icon-name: "errands-attachment-symbolic";
+          tooltip-text: _("Attachments");
+          valign: center;
+          clicked => $errands_task_list_attachments_dialog_show(template);
 
-        styles [
-          "flat",
-        ]
-      }
+          styles [
+            "flat",
+          ]
+        }
 
-      Button attachments_btn {
-        icon-name: "errands-attachment-symbolic";
-        tooltip-text: _("Attachments");
-        valign: center;
-        clicked => $errands_task_list_attachments_dialog_show(template);
+        Button color_btn {
+          icon-name: "errands-color-symbolic";
+          tooltip-text: _("Color");
+          valign: center;
+          clicked => $errands_task_list_color_dialog_show(template);
 
-        styles [
-          "flat",
-        ]
-      }
-
-      Button color_btn {
-        icon-name: "errands-color-symbolic";
-        tooltip-text: _("Color");
-        valign: center;
-        clicked => $errands_task_list_color_dialog_show(template);
-
-        styles [
-          "flat",
-        ]
+          styles [
+            "flat",
+          ]
+        }
       }
     }
   }

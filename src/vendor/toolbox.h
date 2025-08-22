@@ -14,6 +14,9 @@
 
 // -------------------- MACROS -------------------- //
 
+// #define LOG_FMT(format, ...) fprintf(stderr, format "\n", ##__VA_ARGS__)
+// #define LOG(msg) LOG_FMT("%s", msg)
+
 /*
 
 Debug messages macros.
@@ -22,16 +25,16 @@ To disable debug messages put '#define TB_DISABLE_DEBUG' before including 'toolb
 
 */
 
-// Print debug message
-#define DEBUG_LOG(msg) fprintf(stderr, "%s:%d:%s: " msg "\n", __FILE__, __LINE__, __FUNCTION__)
-// Formatted message version of DEBUG_LOG macro.
+// Print formatted message with filename, line number and function name.
 #define DEBUG_LOG_FMT(format, ...)                                                                                     \
-  fprintf(stderr, "%s:%d:%s: " format "\n", __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__)
+  fprintf(stderr, "%s:%d:%s: " format "\n", tb_path_base_name(__FILE__), __LINE__, __FUNCTION__, ##__VA_ARGS__)
+// Print unformatted debug message
+#define DEBUG_LOG(msg) DEBUG_LOG_FMT("%s", msg)
 
 // Dummy macros when debug is disabled.
 #ifdef TB_DISABLE_DEBUG
-#define DEBUG_LOG(msg)
 #define DEBUG_LOG_FMT(format, ...)
+#define DEBUG_LOG(msg)
 #endif // TB_DISABLE_DEBUG
 
 // The best debug method. Improved. :)
@@ -99,9 +102,7 @@ void func() {
 // Start profile timer.
 #define PROFILE_FUNC_START clock_t __start_time = clock()
 // Stop profile timer and write time of execution to stderr.
-#define PROFILE_FUNC_END                                                                                               \
-  fprintf(stderr, "%s:%d:%s: %f sec.\n", __FILE__, __LINE__, __FUNCTION__,                                             \
-          (double)(clock() - __start_time) / CLOCKS_PER_SEC)
+#define PROFILE_FUNC_END DEBUG_LOG_FMT("%f sec.", (double)(clock() - __start_time) / CLOCKS_PER_SEC)
 
 // Profile block of code
 #define PROFILE_BLOCK(code_block)                                                                                      \
@@ -154,6 +155,14 @@ TOOLBOX_API const char *tb_tmp_str_printf(const char *format, ...) {
   tb_tmp_str_offset += len + 1;
   va_end(args);
   return result;
+}
+
+// -------------------- PATH FUNCTIONS -------------------- //
+
+TOOLBOX_API const char *tb_path_base_name(const char *path) {
+  const char *last_sep = strrchr(path, '/');
+  if (!last_sep) last_sep = strrchr(path, '\\');
+  return last_sep ? last_sep + 1 : path;
 }
 
 #endif // TOOLBOX_H

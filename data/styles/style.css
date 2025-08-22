@@ -238,3 +238,19 @@ calendar label {
 flowboxchild {
     all: unset;
 }
+
+/*treeexpander {
+    margin-left: 6px;
+    margin-right: 12px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
+
+treeexpander expander {
+    border-radius: 14px;
+    transition: 200ms;
+}
+
+treeexpander expander:hover {
+    background-color: @shade_color;
+}*/
