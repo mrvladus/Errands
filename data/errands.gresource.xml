@@ -2,64 +2,64 @@
 <gresources>
   <!-- STYLES -->
   <gresource prefix="/io/github/mrvladus/Errands">
-    <file compressed="true" alias="style.css">styles/style.css</file>
-    <file compressed="true" alias="style-dark.css">styles/style-dark.css</file>
+    <file compressed="true" alias="style.css">data/styles/style.css</file>
+    <file compressed="true" alias="style-dark.css">data/styles/style-dark.css</file>
   </gresource>
 
   <!-- UI -->
   <gresource prefix="/io/github/mrvladus/Errands/ui">
-    <file preprocess="xml-stripblanks" compressed="true" alias="sidebar-all-row.ui">src/sidebar-all-row.ui</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="sidebar-task-list-row.ui">src/sidebar-task-list-row.ui</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="sidebar.ui">src/sidebar.ui</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="sidebar-new-list-dialog.ui">src/sidebar-new-list-dialog.ui</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="sidebar-delete-list-dialog.ui">src/sidebar-delete-list-dialog.ui</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="sidebar-rename-list-dialog.ui">src/sidebar-rename-list-dialog.ui</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="window.ui">src/window.ui</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="task.ui">src/task.ui</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="task-list.ui">src/task-list.ui</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="task-list-attachments-dialog.ui">src/task-list-attachments-dialog.ui</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="task-list-attachments-dialog-attachment.ui">src/task-list-attachments-dialog-attachment.ui</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="task-list-sort-dialog.ui">src/task-list-sort-dialog.ui</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="task-list-color-dialog.ui">src/task-list-color-dialog.ui</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="task-list-priority-dialog.ui">src/task-list-priority-dialog.ui</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="task-list-notes-dialog.ui">src/task-list-notes-dialog.ui</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="task-list-tags-dialog.ui">src/task-list-tags-dialog.ui</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="task-list-tags-dialog-tag.ui">src/task-list-tags-dialog-tag.ui</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="task-list-date-dialog.ui">src/task-list-date-dialog.ui</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="task-list-date-dialog-date-chooser.ui">src/task-list-date-dialog-date-chooser.ui</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="task-list-date-dialog-time-chooser.ui">src/task-list-date-dialog-time-chooser.ui</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="task-list-date-dialog-rrule-row.ui">src/task-list-date-dialog-rrule-row.ui</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="sidebar-all-row.ui">build/sidebar-all-row.ui</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="sidebar-task-list-row.ui">build/sidebar-task-list-row.ui</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="sidebar.ui">build/sidebar.ui</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="sidebar-new-list-dialog.ui">build/sidebar-new-list-dialog.ui</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="sidebar-delete-list-dialog.ui">build/sidebar-delete-list-dialog.ui</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="sidebar-rename-list-dialog.ui">build/sidebar-rename-list-dialog.ui</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="window.ui">build/window.ui</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="task.ui">build/task.ui</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="task-list.ui">build/task-list.ui</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="task-list-attachments-dialog.ui">build/task-list-attachments-dialog.ui</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="task-list-attachments-dialog-attachment.ui">build/task-list-attachments-dialog-attachment.ui</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="task-list-sort-dialog.ui">build/task-list-sort-dialog.ui</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="task-list-color-dialog.ui">build/task-list-color-dialog.ui</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="task-list-priority-dialog.ui">build/task-list-priority-dialog.ui</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="task-list-notes-dialog.ui">build/task-list-notes-dialog.ui</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="task-list-tags-dialog.ui">build/task-list-tags-dialog.ui</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="task-list-tags-dialog-tag.ui">build/task-list-tags-dialog-tag.ui</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="task-list-date-dialog.ui">build/task-list-date-dialog.ui</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="task-list-date-dialog-date-chooser.ui">build/task-list-date-dialog-date-chooser.ui</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="task-list-date-dialog-time-chooser.ui">build/task-list-date-dialog-time-chooser.ui</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="task-list-date-dialog-rrule-row.ui">build/task-list-date-dialog-rrule-row.ui</file>
   </gresource>
 
   <!-- ICONS -->
   <gresource prefix="/io/github/mrvladus/Errands/icons/scalable/actions/">
-    <file preprocess="xml-stripblanks" compressed="true" alias="errands-add-symbolic.svg">icons/errands-add-symbolic.svg</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="errands-all-tasks-symbolic.svg">icons/errands-all-tasks-symbolic.svg</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="errands-today-symbolic.svg">icons/errands-today-symbolic.svg</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="errands-trash-symbolic.svg">icons/errands-trash-symbolic.svg</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="errands-trash-full-symbolic.svg">icons/errands-trash-full-symbolic.svg</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="errands-tag-symbolic.svg">icons/errands-tag-symbolic.svg</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="errands-search-symbolic.svg">icons/errands-search-symbolic.svg</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="errands-toolbar-symbolic.svg">icons/errands-toolbar-symbolic.svg</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="errands-calendar-symbolic.svg">icons/errands-calendar-symbolic.svg</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="errands-notes-symbolic.svg">icons/errands-notes-symbolic.svg</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="errands-tags-symbolic.svg">icons/errands-tags-symbolic.svg</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="errands-attachment-symbolic.svg">icons/errands-attachment-symbolic.svg</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="errands-priority-symbolic.svg">icons/errands-priority-symbolic.svg</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="errands-priority-set-symbolic.svg">icons/errands-priority-set-symbolic.svg</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="errands-priority-none-symbolic.svg">icons/errands-priority-none-symbolic.svg</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="errands-cancel-symbolic.svg">icons/errands-cancel-symbolic.svg</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="errands-color-symbolic.svg">icons/errands-color-symbolic.svg</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="errands-select-symbolic.svg">icons/errands-select-symbolic.svg</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="errands-close-symbolic.svg">icons/errands-close-symbolic.svg</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="errands-clock-symbolic.svg">icons/errands-clock-symbolic.svg</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="errands-morning-symbolic.svg">icons/errands-morning-symbolic.svg</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="errands-afternoon-symbolic.svg">icons/errands-afternoon-symbolic.svg</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="errands-sunset-symbolic.svg">icons/errands-sunset-symbolic.svg</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="errands-night-symbolic.svg">icons/errands-night-symbolic.svg</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="errands-reset-symbolic.svg">icons/errands-reset-symbolic.svg</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="errands-more-symbolic.svg">icons/errands-more-symbolic.svg</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="errands-md-symbolic.svg">icons/errands-md-symbolic.svg</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="errands-sort-symbolic.svg">icons/errands-sort-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="errands-add-symbolic.svg">data/icons/errands-add-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="errands-all-tasks-symbolic.svg">data/icons/errands-all-tasks-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="errands-today-symbolic.svg">data/icons/errands-today-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="errands-trash-symbolic.svg">data/icons/errands-trash-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="errands-trash-full-symbolic.svg">data/icons/errands-trash-full-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="errands-tag-symbolic.svg">data/icons/errands-tag-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="errands-search-symbolic.svg">data/icons/errands-search-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="errands-toolbar-symbolic.svg">data/icons/errands-toolbar-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="errands-calendar-symbolic.svg">data/icons/errands-calendar-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="errands-notes-symbolic.svg">data/icons/errands-notes-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="errands-tags-symbolic.svg">data/icons/errands-tags-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="errands-attachment-symbolic.svg">data/icons/errands-attachment-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="errands-priority-symbolic.svg">data/icons/errands-priority-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="errands-priority-set-symbolic.svg">data/icons/errands-priority-set-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="errands-priority-none-symbolic.svg">data/icons/errands-priority-none-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="errands-cancel-symbolic.svg">data/icons/errands-cancel-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="errands-color-symbolic.svg">data/icons/errands-color-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="errands-select-symbolic.svg">data/icons/errands-select-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="errands-close-symbolic.svg">data/icons/errands-close-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="errands-clock-symbolic.svg">data/icons/errands-clock-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="errands-morning-symbolic.svg">data/icons/errands-morning-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="errands-afternoon-symbolic.svg">data/icons/errands-afternoon-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="errands-sunset-symbolic.svg">data/icons/errands-sunset-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="errands-night-symbolic.svg">data/icons/errands-night-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="errands-reset-symbolic.svg">data/icons/errands-reset-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="errands-more-symbolic.svg">data/icons/errands-more-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="errands-md-symbolic.svg">data/icons/errands-md-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="errands-sort-symbolic.svg">data/icons/errands-sort-symbolic.svg</file>
   </gresource>
 </gresources>

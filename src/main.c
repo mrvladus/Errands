@@ -3,7 +3,16 @@
 e.g. GLib's g_autoptr, g_auto and g_autofree"
 #endif
 
-#include "config.h"
+#ifndef APP_ID
+#define APP_ID ""
+#endif
+#ifndef VERSION
+#define VERSION ""
+#endif
+#ifndef LOCALE_DIR
+#define LOCALE_DIR ""
+#endif
+
 #include "data/data.h"
 #include "settings.h"
 #include "state.h"

@@ -49,31 +49,32 @@ template $ErrandsTaskList: Adw.Bin {
       }
     }
 
-    content: Box {
-      orientation: vertical;
+    [top]
+    Revealer entry_rev {
+      transition-type: swing_down;
 
-      Revealer entry_rev {
-        transition-type: swing_down;
+      Adw.Clamp {
+        tightening-threshold: 300;
+        maximum-size: 1000;
+        margin-start: 12;
+        margin-end: 12;
 
-        Adw.Clamp {
-          tightening-threshold: 300;
-          maximum-size: 1000;
-          margin-start: 12;
-          margin-end: 12;
+        Adw.EntryRow {
+          title: _("Add Task");
+          activatable: false;
+          margin-top: 6;
+          margin-bottom: 6;
+          entry-activated => $on_task_list_entry_activated_cb();
 
-          Adw.EntryRow {
-            title: _("Add Task");
-            activatable: false;
-            margin-top: 6;
-            margin-bottom: 6;
-            entry-activated => $on_task_list_entry_activated_cb();
-
-            styles [
-              "card",
-            ]
-          }
+          styles [
+            "card",
+          ]
         }
       }
+    }
+
+    content: Box {
+      orientation: vertical;
 
       ScrolledWindow {
         propagate-natural-height: true;

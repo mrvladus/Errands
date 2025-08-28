@@ -183,16 +183,6 @@ struct _ErrandsTaskList {
   GtkWidget *search_entry;
   GtkWidget *entry_rev;
 
-  // GListStore *tasks_model;
-  // GtkCustomFilter *toplevel_tasks_filter;
-  // GtkFilterListModel *toplevel_tasks_filter_model;
-  // GtkCustomSorter *tasks_sorter;
-  // GtkSortListModel *sort_model;
-  // GtkCustomSorter *completion_sorter;
-  // GtkSortListModel *completion_sort_model;
-  // GtkCustomFilter *search_filter;
-  // GtkFilterListModel *search_filter_model;
-  // const char *search_query;
   GListStore *tasks_model;
   GtkTreeListModel *tree_model;
   GtkTreeListRowSorter *tree_sorter;

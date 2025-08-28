@@ -79,7 +79,6 @@ static void on_dialog_close_cb(ErrandsTaskListPriorityDialog *self) {
   // Add css class to priority button
   gtk_widget_set_css_classes(self->current_task->priority_btn, (const char **){NULL});
   gtk_widget_add_css_class(self->current_task->priority_btn, "image-button");
-  gtk_widget_add_css_class(self->current_task->priority_btn, "flat");
   if (val == 0) return;
   else if (val > 0 && val < 3) gtk_widget_add_css_class(self->current_task->priority_btn, "priority-low");
   else if (val >= 3 && val < 7) gtk_widget_add_css_class(self->current_task->priority_btn, "priority-medium");

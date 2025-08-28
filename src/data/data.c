@@ -1,8 +1,5 @@
 #include "data.h"
 #include "../utils.h"
-#include "glib.h"
-
-#include <libical/ical.h>
 
 GHashTable *ldata = NULL;
 GHashTable *tdata = NULL;

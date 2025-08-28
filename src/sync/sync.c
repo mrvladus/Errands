@@ -4,7 +4,6 @@
 #include "caldav/caldav.h"
 
 #include <glib.h>
-
 #include <libical/ical.h>
 
 CalDAVClient *client;

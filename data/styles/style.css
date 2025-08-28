@@ -45,7 +45,7 @@
     border-radius: 50%;
     min-width: 26px;
     min-height: 26px;
-    color: @light_2;
+    color: var(--light-2);
 }
 
 .accent-color-btn radio:hover {
@@ -58,41 +58,41 @@
 }
 
 .accent-color-btn-none radio {
-    border-color: alpha(@view_fg_color, 0.3);
+    border-color: alpha(var(--view-fg-color), 0.3);
 }
 
 .accent-color-btn-none radio:checked {
-    color: @window_fg_color;
+    color: var(--window-fg-color);
 }
 
 .accent-color-btn-blue radio {
-    background-color: @blue_2;
+    background-color: var(--blue-2);
 }
 
 .accent-color-btn-green radio {
-    background-color: @green_2;
+    background-color: var(--green-2);
 }
 
 .accent-color-btn-yellow radio {
-    background-color: @yellow_2;
-    color: @window_fg_color;
+    background-color: var(--yellow-2);
+    color: var(--window-fg-color);
 }
 
 .accent-color-btn-orange radio {
-    background-color: @orange_2;
-    color: @window_fg_color;
+    background-color: var(--orange-2);
+    color: var(--window-fg-color);
 }
 
 .accent-color-btn-red radio {
-    background-color: @red_2;
+    background-color: var(--red-2);
 }
 
 .accent-color-btn-purple radio {
-    background-color: @purple_2;
+    background-color: var(--purple-2);
 }
 
 .accent-color-btn-brown radio {
-    background-color: @brown_2;
+    background-color: var(--brown-2);
 }
 
 /* Task accent colors */
@@ -103,7 +103,7 @@
 
 .progressbar-blue progress,
 .checkbtn-blue check:checked {
-    background-color: @blue_2;
+    background-color: var(--blue-2);
 }
 
 .task-green {
@@ -112,7 +112,7 @@
 
 .progressbar-green progress,
 .checkbtn-green check:checked {
-    background-color: @green_3;
+    background-color: var(--green-3);
 }
 
 .task-yellow {
@@ -121,7 +121,7 @@
 
 .progressbar-yellow progress,
 .checkbtn-yellow check:checked {
-    background-color: @yellow_4;
+    background-color: var(--yellow-4);
 }
 
 .task-orange {
@@ -130,7 +130,7 @@
 
 .progressbar-orange progress,
 .checkbtn-orange check:checked {
-    background-color: @orange_2;
+    background-color: var(--orange-2);
 }
 
 .task-red {
@@ -139,7 +139,7 @@
 
 .progressbar-red progress,
 .checkbtn-red check:checked {
-    background-color: @red_1;
+    background-color: var(--red-1);
 }
 
 .task-purple {
@@ -148,7 +148,7 @@
 
 .progressbar-purple progress,
 .checkbtn-purple check:checked {
-    background-color: @purple_2;
+    background-color: var(--purple-2);
 }
 
 .task-brown {
@@ -157,7 +157,7 @@
 
 .progressbar-brown progress,
 .checkbtn-brown check:checked {
-    background-color: @brown_2;
+    background-color: var(--brown-2);
 }
 
 .task-top-drop-area {
@@ -214,11 +214,11 @@ colorbutton button colorswatch {
 }
 
 progressbar.osd {
-    background-color: @shade_color;
+    background-color: var(--shade-color);
 }
 
 calendar {
-    background: @background;
+    background: var(--view-bg-color);
 }
 
 calendar,
@@ -235,22 +235,6 @@ calendar label {
     padding: 5px;
 }
 
-flowboxchild {
-    all: unset;
+editablelabel > stack > text {
+    background-color: transparent;
 }
-
-/*treeexpander {
-    margin-left: 6px;
-    margin-right: 12px;
-    margin-top: 3px;
-    margin-bottom: 3px;
-}
-
-treeexpander expander {
-    border-radius: 14px;
-    transition: 200ms;
-}
-
-treeexpander expander:hover {
-    background-color: @shade_color;
-}*/

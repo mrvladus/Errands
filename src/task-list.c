@@ -93,7 +93,6 @@ static void expand_row_idle_cb(GtkTreeListRow *row) { gtk_tree_list_row_set_expa
 
 void bind_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item) {
   GtkTreeListRow *row = GTK_TREE_LIST_ROW(gtk_list_item_get_item(list_item));
-
   GObject *item = gtk_tree_list_row_get_item(row);
   if (!item) return;
   // Get the expander and its child task widget
@@ -107,6 +106,7 @@ void bind_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item) {
   errands_task_set_data(task, task_data);
   bool expanded = errands_data_get_bool(task_data, DATA_PROP_EXPANDED);
   bool is_expandable = gtk_tree_list_row_is_expandable(row);
+  // Add at idle because otherwise will srew-up all list
   if (is_expandable && expanded) g_idle_add_once((GSourceOnceFunc)expand_row_idle_cb, row);
 }
 
