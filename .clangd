@@ -32,5 +32,5 @@ CompileFlags:
     - -I/usr/include/p11-kit-1
     - -I/usr/include/webkitgtk-6.0
     - -pthread
-    - -I../_build
     - -Wno-macro-redefined
+    - -DPUG_IMPLEMENTATION

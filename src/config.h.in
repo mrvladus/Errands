@@ -1,5 +1,0 @@
-#pragma once
-
-#define APP_ID "io.github.mrvladus.Errands"
-#define VERSION "@VERSION@"
-#define LOCALE_DIR ""

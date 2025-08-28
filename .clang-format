@@ -4,3 +4,4 @@ AllowShortFunctionsOnASingleLine: true
 AllowShortIfStatementsOnASingleLine: AllIfsAndElse
 AllowShortBlocksOnASingleLine: Always
 AllowShortLoopsOnASingleLine: true
+AlignConsecutiveMacros: true
