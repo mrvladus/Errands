@@ -226,6 +226,7 @@ static void pug__array_add_many_v(PugArray *array, ...) {
 
 // Convert array to string with separator
 static const char *pug__array_to_string(PugArray *array, const char *separator) {
+  if (!array || !array->data || array->size == 0) return NULL;
   size_t separator_len = separator ? strlen(separator) : 0;
   size_t len = 1;
   for (size_t i = 0; i < array->size; i++) len += strlen(array->data[i]) + separator_len;
@@ -342,7 +343,7 @@ bool pug_cmd(const char *fmt, ...) {
   va_start(args, fmt);
   const char *cmd = pug__vsprintf(fmt, args);
   va_end(args);
-  // pug_log("%s",cmd);
+  pug_log("%s", cmd);
   int res = system(cmd);
 
   return 0 == res;
@@ -511,7 +512,7 @@ static bool pug__build_object_files(PugTarget *target, bool *need_linking) {
       // Add pkg-config cflags if needed
       const char *pkg_config_flags = "";
 #ifndef _WIN32 // Skip pkg-config on Windows
-      pkg_config_flags = pug__sprintf("$(pkg-config --cflags %s)", pkg_config_libs);
+      if (pkg_config_libs) pkg_config_flags = pug__sprintf("$(pkg-config --cflags %s)", pkg_config_libs);
 #endif
       // Run command
       bool res = pug_cmd(PUG_CC " -c %s -o %s %s %s", source_file, obj_file, cflags, pkg_config_flags);
@@ -526,15 +527,17 @@ static bool pug__link_object_files(PugTarget *target) {
   const char *path = pug__sprintf("%s/%s", target->build_dir, target->name);
   const char *obj_str = pug__array_to_string(&target->objects, " ");
   const char *pkg_config_libs = pug__array_to_string(&target->pkg_config_libs, " ");
+  const char *ldflags = pug__array_to_string(&target->ldflags, " ");
   // Add pkg-config ldflags if needed
   const char *pkg_config_flags = "";
 #ifndef _WIN32 // Skip pkg-config on Windows
-  pkg_config_flags = pug__sprintf("$(pkg-config --libs %s)", pkg_config_libs);
+  if (pkg_config_libs) pkg_config_flags = pug__sprintf("$(pkg-config --libs %s)", pkg_config_libs);
 #endif
   // Link executable
   if (target->type & PUG_TARGET_TYPE_EXECUTABLE) {
     pug_log("Linking executable -> %s", path);
-    bool res = pug_cmd(PUG_CC " %s" PUG_CC_EXE_EXT " -o %s %s", obj_str, path, pkg_config_flags);
+    bool res =
+        pug_cmd(PUG_CC " %s" PUG_CC_EXE_EXT " -o %s %s %s", obj_str, path, ldflags ? ldflags : "", pkg_config_flags);
     if (!res) return false;
   } else {
     // Link static library
@@ -546,7 +549,8 @@ static bool pug__link_object_files(PugTarget *target) {
     // Link dynamic library
     if (target->type & PUG_TARGET_TYPE_SHARED_LIBRARY) {
       pug_log("Linking dynamic library -> %s", path);
-      bool res = pug_cmd(PUG_CC " -shared %s -o %s" PUG_CC_SHARED_LIB_EXT " %s", obj_str, path, pkg_config_flags);
+      bool res = pug_cmd(PUG_CC " -shared %s -o %s" PUG_CC_SHARED_LIB_EXT " %s %s", obj_str, path,
+                         ldflags ? ldflags : "", pkg_config_flags);
       if (!res) return false;
     }
   }
