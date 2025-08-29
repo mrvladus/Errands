@@ -1,17 +1,19 @@
 #define PUG_IMPLEMENTATION
 #include "pug.h"
 
+#define BIN_NAME   "errands"
 #define APP_ID     "io.github.mrvladus.Errands"
 #define VERSION    "48.0"
 #define LOCALE_DIR ""
-#define BUILD_DIR  "build"
 
-static void compile_resources() {
+#define BUILD_DIR "build"
+
+static bool compile_resources() {
   const char *gresource_xml = "data/errands.gresource.xml";
   const char *resoures_c = "src/resources.c";
 
-  bool blp_files_changed = pug_files_changed_after(
-      gresource_xml, "src/sidebar.blp", "src/sidebar-all-row.blp", "src/sidebar-delete-list-dialog.blp",
+  bool blp_files_changed = pug_file_is_older_than_files(
+      resoures_c, "src/sidebar.blp", "src/sidebar-all-row.blp", "src/sidebar-delete-list-dialog.blp",
       "src/sidebar-new-list-dialog.blp", "src/sidebar-rename-list-dialog.blp", "src/sidebar-task-list-row.blp",
       "src/task.blp", "src/task-list.blp", "src/task-list-attachments-dialog.blp",
       "src/task-list-attachments-dialog-attachment.blp", "src/task-list-color-dialog.blp",
@@ -20,35 +22,66 @@ static void compile_resources() {
       "src/task-list-notes-dialog.blp", "src/task-list-priority-dialog.blp", "src/task-list-sort-dialog.blp",
       "src/task-list-tags-dialog.blp", "src/task-list-tags-dialog-tag.blp", "src/window.blp", NULL);
 
-  bool gresource_xml_changed = pug_file_changed_after(gresource_xml, resoures_c);
+  bool gresource_xml_changed = pug_file1_is_older_than_file2(resoures_c, gresource_xml);
 
   if (blp_files_changed || gresource_xml_changed) {
     pug_log("Compiling resources.");
-    if (!pug_cmd("blueprint-compiler batch-compile %s src src/*.blp", BUILD_DIR)) exit(1);
+    if (!pug_cmd("blueprint-compiler batch-compile %s src src/*.blp", BUILD_DIR)) return false;
     if (!pug_cmd("glib-compile-resources --generate-source --target=%s --c-name=errands %s", resoures_c, gresource_xml))
-      exit(1);
+      return false;
   }
+
+  return true;
 }
 
 static bool build_errands() {
-  PugTarget errands = pug_target_new("errands", PUG_TARGET_TYPE_EXECUTABLE, "build");
-  pug_target_add_sources(
-      &errands, "src/data/data.c", "src/data/data-io.c", "src/data/data-props.c", "src/sync/sync.c",
-      "src/sync/caldav/caldav-calendar.c", "src/sync/caldav/caldav-client.c", "src/sync/caldav/caldav-event.c",
-      "src/sync/caldav/caldav-list.c", "src/sync/caldav/caldav-requests.c", "src/main.c", "src/resources.c",
-      "src/settings.c", "src/sidebar.c", "src/sidebar-all-row.c", "src/sidebar-delete-list-dialog.c",
-      "src/sidebar-new-list-dialog.c", "src/sidebar-rename-list-dialog.c", "src/sidebar-task-list-row.c", "src/state.c",
-      "src/task.c", "src/task-list.c", "src/task-list-attachments-dialog.c",
-      "src/task-list-attachments-dialog-attachment.c", "src/task-list-color-dialog.c", "src/task-list-date-dialog.c",
-      "src/task-list-date-dialog-date-chooser.c", "src/task-list-date-dialog-time-chooser.c",
-      "src/task-list-date-dialog-rrule-row.c", "src/task-list-notes-dialog.c", "src/task-list-priority-dialog.c",
-      "src/task-list-sort-dialog.c", "src/task-list-tags-dialog.c", "src/task-list-tags-dialog-tag.c", "src/window.c",
-      NULL);
+  PugTarget errands = pug_target_new(BIN_NAME, PUG_TARGET_TYPE_EXECUTABLE, BUILD_DIR);
 
-  pug_target_add_cflags(&errands, CFLAG_DEFINE_STR(APP_ID), CFLAG_DEFINE_STR(VERSION), CFLAG_DEFINE_STR(LOCALE_DIR),
-                        NULL);
+  // Sources
+  pug_target_add_source(&errands, "src/data/data.c");
+  pug_target_add_source(&errands, "src/data/data-io.c");
+  pug_target_add_source(&errands, "src/data/data-props.c");
+  pug_target_add_source(&errands, "src/sync/sync.c");
+  pug_target_add_source(&errands, "src/sync/caldav/caldav-calendar.c");
+  pug_target_add_source(&errands, "src/sync/caldav/caldav-client.c");
+  pug_target_add_source(&errands, "src/sync/caldav/caldav-event.c");
+  pug_target_add_source(&errands, "src/sync/caldav/caldav-list.c");
+  pug_target_add_source(&errands, "src/sync/caldav/caldav-requests.c");
+  pug_target_add_source(&errands, "src/main.c");
+  pug_target_add_source(&errands, "src/resources.c");
+  pug_target_add_source(&errands, "src/settings.c");
+  pug_target_add_source(&errands, "src/sidebar.c");
+  pug_target_add_source(&errands, "src/sidebar-all-row.c");
+  pug_target_add_source(&errands, "src/sidebar-delete-list-dialog.c");
+  pug_target_add_source(&errands, "src/sidebar-new-list-dialog.c");
+  pug_target_add_source(&errands, "src/sidebar-rename-list-dialog.c");
+  pug_target_add_source(&errands, "src/sidebar-task-list-row.c");
+  pug_target_add_source(&errands, "src/state.c");
+  pug_target_add_source(&errands, "src/task.c");
+  pug_target_add_source(&errands, "src/task-list.c");
+  pug_target_add_source(&errands, "src/task-list-attachments-dialog.c");
+  pug_target_add_source(&errands, "src/task-list-attachments-dialog-attachment.c");
+  pug_target_add_source(&errands, "src/task-list-color-dialog.c");
+  pug_target_add_source(&errands, "src/task-list-date-dialog.c");
+  pug_target_add_source(&errands, "src/task-list-date-dialog-date-chooser.c");
+  pug_target_add_source(&errands, "src/task-list-date-dialog-time-chooser.c");
+  pug_target_add_source(&errands, "src/task-list-date-dialog-rrule-row.c");
+  pug_target_add_source(&errands, "src/task-list-notes-dialog.c");
+  pug_target_add_source(&errands, "src/task-list-priority-dialog.c");
+  pug_target_add_source(&errands, "src/task-list-sort-dialog.c");
+  pug_target_add_source(&errands, "src/task-list-tags-dialog.c");
+  pug_target_add_source(&errands, "src/task-list-tags-dialog-tag.c");
+  pug_target_add_source(&errands, "src/window.c");
+
+  // CFLAGS
+  pug_target_add_cflags(&errands, "-Wall", "-Wextra");
+  pug_target_add_cflag(&errands, PUG_CFLAG_FROM_DEFINE_STR(APP_ID));
+  pug_target_add_cflag(&errands, PUG_CFLAG_FROM_DEFINE_STR(VERSION));
+  pug_target_add_cflag(&errands, PUG_CFLAG_FROM_DEFINE_STR(LOCALE_DIR));
+
+  // pkg-config libraries
   pug_target_add_pkg_config_libs(&errands, "libadwaita-1", "libcurl", "libical", "gtksourceview-5", "webkitgtk-6.0",
-                                 "libportal", NULL);
+                                 "libportal");
 
   return pug_target_build(&errands);
 }
@@ -63,9 +96,10 @@ int main(int argc, char **argv) {
   }
 
   compile_resources();
-  bool res = build_errands();
+  if (!build_errands()) return 1;
+
   // Run if `run` argument provided
-  if (res && pug_arg_bool("run")) pug_cmd(BUILD_DIR "/errands");
+  if (pug_arg_bool("run")) pug_cmd(BUILD_DIR "/" BIN_NAME);
 
   return 0;
 }

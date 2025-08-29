@@ -1,22 +1,7 @@
 #ifndef PUG_H
 #define PUG_H
 
-// ---------- INCLUDES ---------- //
-
-#include <ctype.h>
-#include <stdarg.h>
 #include <stdbool.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/stat.h>
-
-#ifdef _WIN32
-#include <direct.h>
-#else
-#include <unistd.h>
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,9 +19,8 @@ extern "C" {
 typedef struct _PugTarget PugTarget;
 
 // Target type flags.
-// You can pass multiple flags, but only two types of libraries can be build together.
-// e. g. PUG_TARGET_TYPE_STATIC_LIBRARY | PUG_TARGET_TYPE_SHARED_LIBRARY will create both static and shared libraries.
-// But PUG_TARGET_TYPE_EXECUTABLE | PUG_TARGET_TYPE_STATIC_LIBRARY | PUG_TARGET_TYPE_SHARED_LIBRARY will only build
+// PUG_TARGET_TYPE_STATIC_LIBRARY | PUG_TARGET_TYPE_SHARED_LIBRARY will build both static and shared libraries.
+// PUG_TARGET_TYPE_EXECUTABLE | PUG_TARGET_TYPE_STATIC_LIBRARY | PUG_TARGET_TYPE_SHARED_LIBRARY will only build
 // executable.
 typedef enum {
   PUG_TARGET_TYPE_EXECUTABLE = 1 << 0,
@@ -46,23 +30,40 @@ typedef enum {
 
 // Create a new target with the given name, type, and build directory.
 PugTarget pug_target_new(const char *name, PugTargetType type, const char *build_dir);
-// Add sources to `target`
-void pug_target_add_sources(PugTarget *target, ...);
-// Add C flags to `target`
-void pug_target_add_cflags(PugTarget *target, ...);
-// Add linker flags to `target`
-void pug_target_add_ldflags(PugTarget *target, ...);
-// Add pkg-config libraries to `target`
-void pug_target_add_pkg_config_libs(PugTarget *target, ...);
+
+// Add source file path to `target`.
+void pug_target_add_source(PugTarget *target, const char *source);
+// Add multiple sources to `target`. Convinience macro.
+#define pug_target_add_sources(target_ptr, ...)                                                                        \
+  for (const char *_s[] = {__VA_ARGS__, NULL}, **_p = _s; *_p; pug_target_add_source(target_ptr, *_p), _p++)
+
+// Add C flag to `target`.
+void pug_target_add_cflag(PugTarget *target, const char *cflag);
+// Add cflags to `target`. Convinience macro.
+#define pug_target_add_cflags(target_ptr, ...)                                                                         \
+  for (const char *_s[] = {__VA_ARGS__, NULL}, **_p = _s; *_p; pug_target_add_cflag(target_ptr, *_p), _p++)
+
+// Add linker flag to `target`.
+void pug_target_add_ldflag(PugTarget *target, const char *ldflag);
+// Add ldflags to `target`. Convinience macro.
+#define pug_target_add_ldflags(target_ptr, ...)                                                                        \
+  for (const char *_s[] = {__VA_ARGS__, NULL}, **_p = _s; *_p; pug_target_add_ldflag(target_ptr, *_p), _p++)
+
+// Add pkg-config library name to `target`.
+void pug_target_add_pkg_config_lib(PugTarget *target, const char *pkg_config_lib);
+// Add multiple pkg-config libraries to `target`. Convinience macro.
+#define pug_target_add_pkg_config_libs(target_ptr, ...)                                                                \
+  for (const char *_s[] = {__VA_ARGS__, NULL}, **_p = _s; *_p; pug_target_add_pkg_config_lib(target_ptr, *_p), _p++)
+
 // Build `target`
 bool pug_target_build(PugTarget *target);
 
 // ---------- UTILS ---------- //
 
-// Check if `file1` is NEWER than `file2`
-bool pug_file_changed_after(const char *file1, const char *file2);
-// Check if `file` is OLDER than any of NULL-terminated list of files
-bool pug_files_changed_after(const char *file, ...);
+// Check if `file1` is older than `file2`
+bool pug_file1_is_older_than_file2(const char *file1, const char *file2);
+// Check if `file` is older than any of files in NULL-terminated list of file paths
+bool pug_file_is_older_than_files(const char *file, ...);
 // Run formatted command. Returns `true` on success.
 bool pug_cmd(const char *fmt, ...);
 // Check if argument `arg` is present in command line arguments
@@ -75,14 +76,14 @@ bool pug_arg_bool(const char *arg);
 // #define ENABLE_FEATURE
 // Using this will turn it into "-DENABLE_FEATURE".
 // Use in pug_target_add_cflags().
-#define CFLAG_DEFINE(define) "-D" #define
+#define PUG_CFLAG_FROM_DEFINE(define) "-D" #define
 
 // Convert `define` to "-Ddefine='"<define value>"'".
 // For example we have macro:
 // #define VERSION "1.0"
 // Using this will turn it into "-DVERSION='\"1.0\"'"
 // Use in pug_target_add_cflags().
-#define CFLAG_DEFINE_STR(define) "-D" #define "='\"" define "\"'"
+#define PUG_CFLAG_FROM_DEFINE_STR(define) "-D" #define "='\"" define "\"'"
 
 // ---------- DEBUG ---------- //
 
@@ -113,6 +114,22 @@ bool pug_arg_bool(const char *arg);
 // ------------------------------ IMPLEMENTATION ------------------------------ //
 
 #ifdef PUG_IMPLEMENTATION
+
+#include <ctype.h>
+#include <stdarg.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+
+#ifdef _WIN32
+#include <direct.h>
+#define stat   _stat
+#define getcwd _getcwd
+#else
+#include <unistd.h>
+#endif // _WIN32
 
 // ---------- WINDOWS ---------- //
 
@@ -214,18 +231,6 @@ static bool pug__array_add(PugArray *array, void *value) {
   return true;
 }
 
-static void pug__array_add_many(PugArray *array, va_list args) {
-  void *value;
-  while ((value = va_arg(args, void *))) pug__array_add(array, value);
-}
-
-static void pug__array_add_many_v(PugArray *array, ...) {
-  va_list args;
-  va_start(args, array);
-  pug__array_add_many(array, args);
-  va_end(args);
-}
-
 // Convert array to string with separator
 static const char *pug__array_to_string(PugArray *array, const char *separator) {
   if (!array || !array->data || array->size == 0) return NULL;
@@ -324,18 +329,13 @@ PugTarget pug_target_new(const char *name, PugTargetType type, const char *build
   return target;
 }
 
-#define PUG__TARGET_ADD_IMPL(field)                                                                                    \
-  void pug_target_add_##field(PugTarget *target, ...) {                                                                \
-    va_list args;                                                                                                      \
-    va_start(args, target);                                                                                            \
-    pug__array_add_many(&target->field, args);                                                                         \
-    va_end(args);                                                                                                      \
-  }
+#define PUG__TARGET_ADD_FUNC_IMPL(arr, arg)                                                                            \
+  void pug_target_add_##arg(PugTarget *target, const char *arg) { pug__array_add(&target->arr, (void *)arg); }
 
-PUG__TARGET_ADD_IMPL(sources);
-PUG__TARGET_ADD_IMPL(cflags);
-PUG__TARGET_ADD_IMPL(ldflags);
-PUG__TARGET_ADD_IMPL(pkg_config_libs);
+PUG__TARGET_ADD_FUNC_IMPL(sources, source);
+PUG__TARGET_ADD_FUNC_IMPL(cflags, cflag);
+PUG__TARGET_ADD_FUNC_IMPL(ldflags, ldflag);
+PUG__TARGET_ADD_FUNC_IMPL(pkg_config_libs, pkg_config_lib);
 
 // ---------- CMD TOOLS ---------- //
 
@@ -366,12 +366,7 @@ static bool pug__mkdir(const char *path) {
 static bool pug__dir_exists(const char *path) {
   pug_assert(path != NULL);
   struct stat statbuf;
-#ifdef _WIN32
-  bool res = _stat(path, &statbuf) == 0;
-#else
-  bool res = stat(path, &statbuf) == 0;
-#endif
-  if (res && S_ISDIR(statbuf.st_mode)) return true;
+  if (stat(path, &statbuf) == 0 && S_ISDIR(statbuf.st_mode)) return true;
 
   return false;
 }
@@ -379,32 +374,29 @@ static bool pug__dir_exists(const char *path) {
 static bool pug__file_exists(const char *path) {
   pug_assert(path != NULL);
   FILE *fp = fopen(path, "r");
-  if (fp == NULL) return false;
+  if (!fp) return false;
   fclose(fp);
 
   return true;
 }
 
-bool pug_file_changed_after(const char *file1, const char *file2) {
-  pug_assert(file1 != NULL && file2 != NULL);
+bool pug_file1_is_older_than_file2(const char *file1, const char *file2) {
+  if (!file1 || !file2) return false;
   struct stat stat1, stat2;
-#ifdef _WIN32
-  if (_stat(file1, &stat1) != 0 || _stat(file2, &stat2) != 0) return false;
-#else
   if (stat(file1, &stat1) != 0 || stat(file2, &stat2) != 0) return false;
-#endif
 
-  return stat1.st_mtime > stat2.st_mtime;
+  return stat1.st_mtime < stat2.st_mtime;
 }
 
-bool pug_files_changed_after(const char *file, ...) {
+bool pug_file_is_older_than_files(const char *file, ...) {
   pug_assert(file != NULL);
   va_list args;
   va_start(args, file);
   bool changed = false;
-  while (file) {
-    changed |= pug_file_changed_after(va_arg(args, const char *), file);
-    file = va_arg(args, const char *);
+  const char *file_to_check = va_arg(args, const char *);
+  while (file_to_check) {
+    changed |= pug_file1_is_older_than_file2(file, file_to_check);
+    file_to_check = va_arg(args, const char *);
   }
   va_end(args);
 
@@ -431,11 +423,7 @@ static const char *pug__dirname(const char *path) {
 }
 
 static const char *pug__cwd() {
-#ifdef _WIN32
-  char *tmp = _getcwd(NULL, 0);
-#else
   char *tmp = getcwd(NULL, 0);
-#endif
   if (!tmp) return NULL;
   const char *cwd = pug__sprintf("%s", tmp);
   free(tmp);
@@ -482,7 +470,7 @@ static PugArray pug__find_headers(const char *source_file_path) {
 static void pug__init(int argc, char **argv, const char *build_file_path) {
   pug_argc = argc;
   pug_argv = argv;
-  if (pug_file_changed_after(build_file_path, argv[0])) {
+  if (pug_file1_is_older_than_file2(argv[0], build_file_path)) {
     pug_log("%s -> %s", build_file_path, argv[0]);
     bool res = pug_cmd(PUG_CC " %s -o %s", build_file_path, argv[0]);
     if (!res) exit(EXIT_FAILURE);
@@ -513,11 +501,11 @@ static bool pug__build_object_files(PugTarget *target, bool *need_linking) {
     // Check if source file needs building
     bool source_needs_build = false;
     if (!pug__file_exists(obj_file)) source_needs_build = true;
-    if (pug_file_changed_after(source_file, obj_file)) source_needs_build = true;
+    if (pug_file1_is_older_than_file2(obj_file, source_file)) source_needs_build = true;
     // Check for changed headers
     PugArray headers = pug__find_headers(source_file);
     for (size_t i = 0; i < headers.size; i++)
-      if (pug_file_changed_after(headers.data[i], obj_file)) source_needs_build = true;
+      if (pug_file1_is_older_than_file2(obj_file, headers.data[i])) source_needs_build = true;
     // Build obj file if needed
     if (source_needs_build) {
       *need_linking = true;
