@@ -59,9 +59,11 @@ bool pug_target_build(PugTarget *target);
 
 // ---------- UTILS ---------- //
 
-// Check if `file1` is newer than `file2`
+// Check if `file1` is NEWER than `file2`
 bool pug_file_changed_after(const char *file1, const char *file2);
-// Run formatted command. Returns exit code of the command.
+// Check if `file` is OLDER than any of NULL-terminated list of files
+bool pug_files_changed_after(const char *file, ...);
+// Run formatted command. Returns `true` on success.
 bool pug_cmd(const char *fmt, ...);
 // Check if argument `arg` is present in command line arguments
 bool pug_arg_bool(const char *arg);
@@ -383,7 +385,6 @@ static bool pug__file_exists(const char *path) {
   return true;
 }
 
-// Check if file1 was changed after file2.
 bool pug_file_changed_after(const char *file1, const char *file2) {
   pug_assert(file1 != NULL && file2 != NULL);
   struct stat stat1, stat2;
@@ -394,6 +395,20 @@ bool pug_file_changed_after(const char *file1, const char *file2) {
 #endif
 
   return stat1.st_mtime > stat2.st_mtime;
+}
+
+bool pug_files_changed_after(const char *file, ...) {
+  pug_assert(file != NULL);
+  va_list args;
+  va_start(args, file);
+  bool changed = false;
+  while (file) {
+    changed |= pug_file_changed_after(va_arg(args, const char *), file);
+    file = va_arg(args, const char *);
+  }
+  va_end(args);
+
+  return changed;
 }
 
 static const char *pug__basename(const char *path) {

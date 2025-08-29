@@ -8,11 +8,24 @@
 
 static void compile_resources() {
   const char *gresource_xml = "data/errands.gresource.xml";
-  const char *resoure_c = "src/resources.c";
-  if (pug_file_changed_after(gresource_xml, resoure_c)) {
-    pug_log("'%s' is changed. Compiling resources.", gresource_xml);
+  const char *resoures_c = "src/resources.c";
+
+  bool blp_files_changed = pug_files_changed_after(
+      gresource_xml, "src/sidebar.blp", "src/sidebar-all-row.blp", "src/sidebar-delete-list-dialog.blp",
+      "src/sidebar-new-list-dialog.blp", "src/sidebar-rename-list-dialog.blp", "src/sidebar-task-list-row.blp",
+      "src/task.blp", "src/task-list.blp", "src/task-list-attachments-dialog.blp",
+      "src/task-list-attachments-dialog-attachment.blp", "src/task-list-color-dialog.blp",
+      "src/task-list-date-dialog.blp", "src/task-list-date-dialog-date-chooser.blp",
+      "src/task-list-date-dialog-rrule-row.blp", "src/task-list-date-dialog-time-chooser.blp",
+      "src/task-list-notes-dialog.blp", "src/task-list-priority-dialog.blp", "src/task-list-sort-dialog.blp",
+      "src/task-list-tags-dialog.blp", "src/task-list-tags-dialog-tag.blp", "src/window.blp", NULL);
+
+  bool gresource_xml_changed = pug_file_changed_after(gresource_xml, resoures_c);
+
+  if (blp_files_changed || gresource_xml_changed) {
+    pug_log("Compiling resources.");
     if (!pug_cmd("blueprint-compiler batch-compile %s src src/*.blp", BUILD_DIR)) exit(1);
-    if (!pug_cmd("glib-compile-resources --generate-source --target=%s --c-name=errands %s", resoure_c, gresource_xml))
+    if (!pug_cmd("glib-compile-resources --generate-source --target=%s --c-name=errands %s", resoures_c, gresource_xml))
       exit(1);
   }
 }

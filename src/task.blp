@@ -121,8 +121,15 @@ template $ErrandsTask: Box {
       margin-start: 6;
       margin-end: 6;
       margin-bottom: 6;
-      line-spacing: 6;
-      child-spacing: 6;
+      line-spacing: 3;
+      child-spacing: 3;
+
+      Entry sub_entry {
+        hexpand: true;
+        placeholder-text: _("Add Sub-Task");
+        width-request: 200;
+        activate => $on_sub_task_entry_activated(template) not-swapped;
+      }
 
       Button date_btn {
         valign: center;
@@ -137,19 +144,20 @@ template $ErrandsTask: Box {
 
         styles [
           "caption",
+          "flat",
         ]
       }
 
       Box {
-        styles [
-          "linked",
-        ]
-
         Button priority_btn {
           icon-name: "errands-priority-symbolic";
           tooltip-text: _("Priority");
           valign: center;
           clicked => $errands_task_list_priority_dialog_show(template);
+
+          styles [
+            "flat",
+          ]
         }
 
         Button notes_btn {
@@ -157,6 +165,10 @@ template $ErrandsTask: Box {
           tooltip-text: _("Notes");
           valign: center;
           clicked => $errands_task_list_notes_dialog_show(template);
+
+          styles [
+            "flat",
+          ]
         }
 
         Button tags_btn {
@@ -164,6 +176,10 @@ template $ErrandsTask: Box {
           tooltip-text: _("Tags");
           valign: center;
           clicked => $errands_task_list_tags_dialog_show(template);
+
+          styles [
+            "flat",
+          ]
         }
 
         Button attachments_btn {
@@ -171,6 +187,10 @@ template $ErrandsTask: Box {
           tooltip-text: _("Attachments");
           valign: center;
           clicked => $errands_task_list_attachments_dialog_show(template);
+
+          styles [
+            "flat",
+          ]
         }
 
         Button color_btn {
@@ -178,14 +198,11 @@ template $ErrandsTask: Box {
           tooltip-text: _("Color");
           valign: center;
           clicked => $errands_task_list_color_dialog_show(template);
-        }
-      }
 
-      Entry sub_entry {
-        hexpand: true;
-        placeholder-text: _("Add Sub-Task");
-        width-request: 200;
-        activate => $on_sub_task_entry_activated(template) not-swapped;
+          styles [
+            "flat",
+          ]
+        }
       }
     }
   }
