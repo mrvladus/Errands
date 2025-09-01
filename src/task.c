@@ -274,6 +274,7 @@ static GtkWidget *errands_task_tag_new(const char *tag) {
 
   // Button
   GtkWidget *btn = gtk_button_new_from_icon_name("errands-close-symbolic");
+  g_object_set(btn, "tooltip-text", _("Delete Tag"), NULL);
   g_signal_connect_swapped(btn, "clicked", G_CALLBACK(errands_task_tag_delete), label);
   gtk_box_append(GTK_BOX(box), btn);
 

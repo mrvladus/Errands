@@ -131,23 +131,6 @@ template $ErrandsTask: Box {
         activate => $on_sub_task_entry_activated(template) not-swapped;
       }
 
-      Button date_btn {
-        valign: center;
-
-        Adw.ButtonContent date_btn_content {
-          icon-name: "errands-calendar-symbolic";
-          label: _("Date");
-          tooltip-text: _("Select Date");
-        }
-
-        clicked => $errands_task_list_date_dialog_show(template);
-
-        styles [
-          "caption",
-          "flat",
-        ]
-      }
-
       Box {
         Button priority_btn {
           icon-name: "errands-priority-symbolic";
@@ -200,6 +183,23 @@ template $ErrandsTask: Box {
           clicked => $errands_task_list_color_dialog_show(template);
 
           styles [
+            "flat",
+          ]
+        }
+
+        Button date_btn {
+          valign: center;
+
+          Adw.ButtonContent date_btn_content {
+            icon-name: "errands-calendar-symbolic";
+            label: _("Date");
+            tooltip-text: _("Select Date");
+          }
+
+          clicked => $errands_task_list_date_dialog_show(template);
+
+          styles [
+            "caption",
             "flat",
           ]
         }
