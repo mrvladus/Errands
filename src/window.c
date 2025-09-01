@@ -1,7 +1,7 @@
 #include "data/data.h"
 #include "settings.h"
 #include "state.h"
-#include "utils.h"
+#include "vendor/toolbox.h"
 #include "widgets.h"
 
 static void on_size_changed_cb(ErrandsWindow *win);
@@ -45,7 +45,7 @@ ErrandsWindow *errands_window_new(GtkApplication *app) {
 // ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_window_update(ErrandsWindow *win) {
-  LOG("Window: Update");
+  tb_log("Window: Update");
   size_t count = 0;
   GPtrArray *lists = g_hash_table_get_values_as_ptr_array(ldata);
   for (int i = 0; i < lists->len; i++)
@@ -55,7 +55,7 @@ void errands_window_update(ErrandsWindow *win) {
 }
 
 void errands_window_add_toast(ErrandsWindow *win, const char *msg) {
-  LOG("Window: Add Toast '%s'", msg);
+  tb_log("Window: Add Toast '%s'", msg);
   adw_toast_overlay_add_toast(ADW_TOAST_OVERLAY(win->toast_overlay), adw_toast_new(msg));
 }
 

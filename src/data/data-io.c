@@ -16,13 +16,13 @@ const char *user_dir;
 static void errands_data_migrate_from_46() {
   g_autofree gchar *old_data_file = g_build_filename(user_dir, "data.json", NULL);
   if (!g_file_test(old_data_file, G_FILE_TEST_EXISTS)) return;
-  LOG("User Data: Migrate");
+  tb_log("User Data: Migrate");
   g_autoptr(GError) error = NULL;
   gsize length;
   g_autofree gchar *contents = NULL;
   // Read file contents
   if (!g_file_get_contents(old_data_file, &contents, &length, &error)) {
-    LOG("User Data: Failed to read old data file: %s", error->message);
+    tb_log("User Data: Failed to read old data file: %s", error->message);
     return;
   }
   // Parse JSON
@@ -117,7 +117,7 @@ static void errands_data_migrate_from_46() {
     const char *calendar_filename = tb_tmp_str_printf("%s.ics", list_uid_item->string_val);
     g_autofree gchar *calendar_file_path = g_build_filename(user_dir, calendar_filename, NULL);
     if (!g_file_set_contents(calendar_file_path, icalcomponent_as_ical_string(calendar), -1, &error))
-      LOG("User Data: Failed to save calendar to %s: %s", calendar_file_path, error->message);
+      tb_log("User Data: Failed to save calendar to %s: %s", calendar_file_path, error->message);
   }
   // Clean up
   json_free(root);
@@ -127,10 +127,10 @@ static void errands_data_migrate_from_46() {
 void errands_data_load_lists() {
   user_dir = g_build_filename(g_get_user_data_dir(), "errands", NULL);
   if (!directory_exists(user_dir)) {
-    LOG("User Data: Creating user data directory at %s", user_dir);
+    tb_log("User Data: Creating user data directory at %s", user_dir);
     g_mkdir_with_parents(user_dir, 0755);
   }
-  LOG("User Data: Loading at %s", user_dir);
+  tb_log("User Data: Loading at %s", user_dir);
   errands_data_migrate_from_46();
   ldata = g_hash_table_new_full(NULL, NULL, NULL, (GDestroyNotify)errands_data_free);
   tdata = g_hash_table_new_full(NULL, NULL, NULL, (GDestroyNotify)errands_data_free);
@@ -143,13 +143,13 @@ void errands_data_load_lists() {
       g_autofree gchar *path = g_build_filename(user_dir, filename, NULL);
       g_autofree gchar *content = read_file_to_string(path);
       if (content) {
-        LOG("User Data: Loading calendar %s", path);
+        tb_log("User Data: Loading calendar %s", path);
         icalcomponent *calendar = icalparser_parse_string(content);
         if (calendar) {
           // Delete file if calendar deleted and sync is off
           if (!errands_settings_get("sync", SETTING_TYPE_BOOL).b &&
               errands_data_get_bool(calendar, DATA_PROP_DELETED)) {
-            LOG("User Data: Calendar was deleted. Removing %s", path);
+            tb_log("User Data: Calendar was deleted. Removing %s", path);
             icalcomponent_free(calendar);
             remove(path);
             continue;
@@ -172,10 +172,10 @@ static void errands_data_write_list_func(GTask *task, gpointer source_object, Li
   const char *filename = tb_tmp_str_printf("%s.ics", errands_data_get_str(data, DATA_PROP_LIST_UID));
   g_autofree gchar *path = g_build_filename(user_dir, filename, NULL);
   if (!g_file_set_contents(path, icalcomponent_as_ical_string(data), -1, NULL)) {
-    LOG("User Data: Failed to save list '%s'", path);
+    tb_log("User Data: Failed to save list '%s'", path);
     return;
   }
-  LOG("User Data: Saved list '%s'", path);
+  tb_log("User Data: Saved list '%s'", path);
   g_object_unref(task);
 }
 

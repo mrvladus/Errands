@@ -1,6 +1,6 @@
 #include "data/data.h"
 #include "state.h"
-#include "utils.h"
+#include "vendor/toolbox.h"
 #include "widgets.h"
 
 #include <glib/gi18n.h>
@@ -53,7 +53,7 @@ ErrandsTaskListDateDialog *errands_task_list_date_dialog_new() {
 // ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_task_list_date_dialog_show(ErrandsTask *task) {
-  LOG("Date Dialog: Show");
+  tb_log("Date Dialog: Show");
   if (!state.main_window->task_list->date_dialog)
     state.main_window->task_list->date_dialog = errands_task_list_date_dialog_new();
   ErrandsTaskListDateDialog *dialog = state.main_window->task_list->date_dialog;
@@ -68,13 +68,13 @@ void errands_task_list_date_dialog_show(ErrandsTask *task) {
   errands_task_list_date_dialog_time_chooser_reset(dialog->due_time_chooser);
 
   // Set start dt
-  LOG("Date Dialog: Set start time");
+  tb_log("Date Dialog: Set start time");
   icaltimetype start_dt = errands_data_get_time(data, DATA_PROP_START_TIME);
   errands_task_list_date_dialog_date_chooser_set_date(dialog->start_date_chooser, start_dt);
   errands_task_list_date_dialog_time_chooser_set_time(dialog->start_time_chooser, start_dt);
 
   // Set due dt
-  LOG("Date Dialog: Set due time");
+  tb_log("Date Dialog: Set due time");
   icaltimetype due_dt = errands_data_get_time(data, DATA_PROP_DUE_TIME);
   errands_task_list_date_dialog_date_chooser_set_date(dialog->due_date_chooser, due_dt);
   errands_task_list_date_dialog_time_chooser_set_time(dialog->due_time_chooser, due_dt);
@@ -82,7 +82,7 @@ void errands_task_list_date_dialog_show(ErrandsTask *task) {
   // Set rrule
   icalproperty *rrule_prop = icalcomponent_get_first_property(data, ICAL_RRULE_PROPERTY);
   if (rrule_prop) {
-    LOG("Date Dialog: Set RRULE");
+    tb_log("Date Dialog: Set RRULE");
     struct icalrecurrencetype rrule = icalproperty_get_rrule(rrule_prop);
     errands_task_list_date_dialog_rrule_row_set_rrule(dialog->rrule_row, rrule);
   }
@@ -93,7 +93,7 @@ void errands_task_list_date_dialog_show(ErrandsTask *task) {
 // ---------- CALLBACKS ---------- //
 
 static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
-  LOG("Date Dialog: Close");
+  tb_log("Date Dialog: Close");
 
   TaskData *data = self->current_task->data;
   icaltimetype today = icaltime_today();
@@ -124,8 +124,8 @@ static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
       new_sdt.month = today.month;
       new_sdt.day = today.day;
       if (icaltime_compare(curr_sdt, new_sdt) != 0) {
-        LOG("Date Dialog: Start date is changed to '%s' => '%s'", icaltime_as_ical_string(curr_sdt),
-            icaltime_as_ical_string(new_sdt));
+        tb_log("Date Dialog: Start date is changed to '%s' => '%s'", icaltime_as_ical_string(curr_sdt),
+               icaltime_as_ical_string(new_sdt));
         errands_data_set_time(data, DATA_PROP_START_TIME, new_sdt);
         changed = true;
       }
@@ -133,8 +133,8 @@ static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
   } else {
     if (new_dt_is_null) new_sdt.is_date = true;
     if (icaltime_compare(curr_sdt, new_sdt) != 0) {
-      LOG("Date Dialog: Start date is changed '%s' => '%s'", icaltime_as_ical_string(curr_sdt),
-          icaltime_as_ical_string(new_sdt));
+      tb_log("Date Dialog: Start date is changed '%s' => '%s'", icaltime_as_ical_string(curr_sdt),
+             icaltime_as_ical_string(new_sdt));
       errands_data_set_time(data, DATA_PROP_START_TIME, new_sdt);
       changed = true;
     }
@@ -166,8 +166,8 @@ static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
         new_ddt.month = today.month;
         new_ddt.day = today.day;
         if (icaltime_compare(curr_ddt, new_ddt) != 0) {
-          LOG("Date Dialog: Due date is changed to '%s' => '%s'", icaltime_as_ical_string(curr_ddt),
-              icaltime_as_ical_string(new_ddt));
+          tb_log("Date Dialog: Due date is changed to '%s' => '%s'", icaltime_as_ical_string(curr_ddt),
+                 icaltime_as_ical_string(new_ddt));
           errands_data_set_time(data, DATA_PROP_DUE_TIME, new_ddt);
           changed = true;
         }
@@ -176,8 +176,8 @@ static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
       if (new_dt_is_null) new_ddt.is_date = true;
 
       if (icaltime_compare(curr_ddt, new_ddt) != 0) {
-        LOG("Date Dialog: Due date is changed '%s' => '%s'", icaltime_as_ical_string(curr_ddt),
-            icaltime_as_ical_string(new_ddt));
+        tb_log("Date Dialog: Due date is changed '%s' => '%s'", icaltime_as_ical_string(curr_ddt),
+               icaltime_as_ical_string(new_ddt));
         errands_data_set_time(data, DATA_PROP_DUE_TIME, new_ddt);
         changed = true;
       }

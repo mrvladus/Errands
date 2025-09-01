@@ -1,5 +1,5 @@
 #include "state.h"
-#include "utils.h"
+#include "vendor/toolbox.h"
 #include "widgets.h"
 
 #define HOEDOWN_IMPLEMENTATION
@@ -73,7 +73,7 @@ void errands_task_list_notes_dialog_show(ErrandsTask *task) {
   if (!state.main_window->task_list->notes_dialog)
     state.main_window->task_list->notes_dialog = errands_task_list_notes_dialog_new();
   ErrandsTaskListNotesDialog *dialog = state.main_window->task_list->notes_dialog;
-  LOG("NotesDialog: Show");
+  tb_log("NotesDialog: Show");
   dialog->current_task = task;
   const char *notes = errands_data_get_str(task->data, DATA_PROP_NOTES);
   if (notes) {

@@ -1,4 +1,4 @@
-#include "utils.h"
+#include "vendor/toolbox.h"
 #include "widgets.h"
 
 #include <glib/gi18n.h>
@@ -66,7 +66,7 @@ void errands_task_list_date_dialog_time_chooser_set_time(ErrandsTaskListDateDial
   sprintf(t, "%02d:%02d", time.hour, time.minute);
   g_object_set(self, "subtitle", is_null ? _("Not Set") : t, NULL);
   g_object_set(self->reset_btn, "visible", !is_null, NULL);
-  LOG("Time Chooser: Set '%s'", is_null ? "NULL" : t);
+  tb_log("Time Chooser: Set '%s'", is_null ? "NULL" : t);
 }
 
 void errands_task_list_date_dialog_time_chooser_reset(ErrandsTaskListDateDialogTimeChooser *self) {

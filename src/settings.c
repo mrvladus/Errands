@@ -23,7 +23,7 @@ const char *const settings_keys[] = {
 // --- LOADING --- //
 
 void errands_settings_load_default() {
-  LOG("Settings: Create default configuration");
+  tb_log("Settings: Create default configuration");
   settings = json_object_new();
   json_object_add(settings, settings_keys[0], json_string_new(""));
   json_object_add(settings, settings_keys[1], json_bool_new(false));
@@ -39,7 +39,7 @@ void errands_settings_load_default() {
 }
 
 void errands_settings_load_user() {
-  LOG("Settings: Load user configuration");
+  tb_log("Settings: Load user configuration");
   char *json = read_file_to_string(settings_path);
   if (!json) return;
   JSON *json_parsed = json_parse(json);
@@ -54,10 +54,10 @@ void errands_settings_load_user() {
 }
 
 // TODO: Migrate from GSettings to settings.json
-void errands_settings_migrate() { LOG("Settings: Migrate to settings.json"); }
+void errands_settings_migrate() { tb_log("Settings: Migrate to settings.json"); }
 
 void errands_settings_init() {
-  LOG("Settings: Initialize");
+  tb_log("Settings: Initialize");
   settings_path = g_build_filename(g_get_user_data_dir(), "errands", "settings.json", NULL);
   errands_settings_load_default();
   if (g_file_test(settings_path, G_FILE_TEST_EXISTS)) errands_settings_load_user();
@@ -135,11 +135,11 @@ void errands_settings_remove_tag(const char *tag) {
 // --- SAVING SETTINGS --- //
 
 static void perform_save() {
-  LOG("Settings: Save");
+  tb_log("Settings: Save");
   g_autoptr(GError) error = NULL;
   char *json = json_print(settings);
   if (!g_file_set_contents(settings_path, json, -1, &error))
-    LOG("Settings: Failed to save settings: %s", error->message);
+    tb_log("Settings: Failed to save settings: %s", error->message);
   last_save_time = time(NULL);
   pending_save = false;
   free(json);

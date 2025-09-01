@@ -1,5 +1,5 @@
 #include "data/data.h"
-#include "utils.h"
+#include "vendor/toolbox.h"
 #include "widgets.h"
 
 #include <glib/gi18n.h>
@@ -57,7 +57,7 @@ icaltimetype errands_task_list_date_dialog_date_chooser_get_date(ErrandsTaskList
     date.month = gtk_calendar_get_month(self->calendar) + 1;
     date.day = gtk_calendar_get_day(self->calendar);
   }
-  LOG("Date Chooser: Get '%s'", icaltime_as_ical_string(date));
+  tb_log("Date Chooser: Get '%s'", icaltime_as_ical_string(date));
   return date;
 }
 
@@ -110,5 +110,5 @@ static void on_day_selected(ErrandsTaskListDateDialogDateChooser *self) {
   g_object_set(self, "subtitle", date_str, NULL);
   g_object_set(self->reset_btn, "visible", true, NULL);
   self->is_reset = false;
-  LOG("Date Chooser: Select date %s", date_str);
+  tb_log("Date Chooser: Select date %s", date_str);
 }

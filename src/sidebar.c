@@ -64,7 +64,7 @@ void errands_sidebar_load_lists(ErrandsSidebar *self) {
 }
 
 ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(ErrandsSidebar *sb, ListData *data) {
-  LOG("Sidebar: Add task list '%s'", errands_data_get_str(data, DATA_PROP_LIST_UID));
+  tb_log("Sidebar: Add task list '%s'", errands_data_get_str(data, DATA_PROP_LIST_UID));
   ErrandsSidebarTaskListRow *row = errands_sidebar_task_list_row_new(data);
   gtk_list_box_append(GTK_LIST_BOX(sb->task_lists_box), GTK_WIDGET(row));
   return row;
@@ -73,7 +73,7 @@ ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(ErrandsSidebar *sb, Lis
 void errands_sidebar_select_last_opened_page() {
   GPtrArray *rows = get_children(state.main_window->sidebar->task_lists_box);
   const char *last_uid = errands_settings_get("last_list_uid", SETTING_TYPE_STRING).s;
-  LOG("Sidebar: Selecting last opened list: '%s'", last_uid);
+  tb_log("Sidebar: Selecting last opened list: '%s'", last_uid);
   for (size_t i = 0; i < rows->len; i++) {
     ErrandsSidebarTaskListRow *row = rows->pdata[i];
     if (g_str_equal(last_uid, errands_data_get_str(row->data, DATA_PROP_LIST_UID)))
@@ -86,7 +86,7 @@ void errands_sidebar_select_last_opened_page() {
 static void on_errands_sidebar_filter_row_activated(GtkListBox *box, GtkListBoxRow *row, gpointer data) {
   gtk_list_box_unselect_all(GTK_LIST_BOX(state.main_window->sidebar->task_lists_box));
   if (GTK_WIDGET(row) == GTK_WIDGET(state.main_window->sidebar->all_row)) {
-    LOG("Sidebar: Switch to all tasks page");
+    tb_log("Sidebar: Switch to all tasks page");
     adw_view_stack_set_visible_child_name(ADW_VIEW_STACK(state.main_window->stack), "errands_task_list_page");
     errands_task_list_update_title();
     gtk_revealer_set_reveal_child(GTK_REVEALER(state.main_window->task_list->entry_rev), false);
@@ -109,7 +109,7 @@ static void __on_open_finish(GObject *obj, GAsyncResult *res, ErrandsSidebar *sb
     // Check if uid exists
     bool exists = g_hash_table_contains(ldata, errands_data_get_str(data, DATA_PROP_LIST_UID));
     if (!exists) {
-      LOG("Sidebar: List already exists");
+      tb_log("Sidebar: List already exists");
       errands_window_add_toast(state.main_window, _("List already exists"));
       errands_data_free(data);
       return;

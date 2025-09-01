@@ -66,7 +66,7 @@ static void errands_sidebar_task_list_row_init(ErrandsSidebarTaskListRow *self) 
 }
 
 ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_new(ListData *data) {
-  LOG("Task List Row '%s': Create", errands_data_get_str(data, DATA_PROP_LIST_UID));
+  tb_log("Task List Row '%s': Create", errands_data_get_str(data, DATA_PROP_LIST_UID));
   ErrandsSidebarTaskListRow *row = g_object_new(ERRANDS_TYPE_SIDEBAR_TASK_LIST_ROW, NULL);
   row->data = data;
   // Set color
@@ -106,7 +106,7 @@ void errands_sidebar_task_list_row_update_counter(ErrandsSidebarTaskListRow *row
   sprintf(num, "%zu", c);
   gtk_label_set_label(GTK_LABEL(row->counter), c > 0 ? num : "");
   g_ptr_array_free(tasks, false);
-  LOG("Sidebar Task List Row: Updated counter '%s'", num);
+  tb_log("Sidebar Task List Row: Updated counter '%s'", num);
 }
 
 void errands_sidebar_task_list_row_update_title(ErrandsSidebarTaskListRow *row) {
@@ -132,7 +132,7 @@ void on_errands_sidebar_task_list_row_activate(GtkListBox *box, ErrandsSidebarTa
     gtk_revealer_set_reveal_child(GTK_REVEALER(state.main_window->task_list->entry_rev), true);
   // Update title
   errands_task_list_update_title();
-  LOG("Switch to list '%s'", list_uid);
+  tb_log("Switch to list '%s'", list_uid);
 }
 
 static void on_right_click(GtkPopover *popover, gint n_press, gdouble x, gdouble y, GtkGestureClick *ctrl) {
@@ -163,7 +163,7 @@ static void __on_export_finish(GObject *obj, GAsyncResult *res, gpointer data) {
   fprintf(file, "%s", ical);
   fclose(file);
   free(ical);
-  LOG("Export task list %s", errands_data_get_str(data, DATA_PROP_LIST_UID));
+  tb_log("Export task list %s", errands_data_get_str(data, DATA_PROP_LIST_UID));
 }
 
 static void on_action_export(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {
@@ -179,8 +179,8 @@ static void on_action_delete(GSimpleAction *action, GVariant *param, ErrandsSide
 
 // - PRINTING - //
 
-#define FONT_SIZE 12
-#define LINE_HEIGHT 20
+#define FONT_SIZE      12
+#define LINE_HEIGHT    20
 #define LINES_PER_PAGE 40
 
 // Function to calculate number of pages and handle pagination
@@ -253,7 +253,7 @@ void start_print(const char *str) {
 }
 
 static void on_action_print(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {
-  LOG("Start printing of the list '%s'", errands_data_get_str(row->data, DATA_PROP_LIST_UID));
+  tb_log("Start printing of the list '%s'", errands_data_get_str(row->data, DATA_PROP_LIST_UID));
   g_autofree gchar *str = list_data_print(row->data);
   start_print(str);
 }
@@ -280,7 +280,7 @@ static void on_action_print(GSimpleAction *action, GVariant *param, ErrandsSideb
 //     ErrandsSidebarTaskListRow *row = ERRANDS_SIDEBAR_TASK_LIST_ROW(object);
 //     if (row == target_row)
 //       return false;
-//     LOG("Reorder task lists");
+//     tb_log("Reorder task lists");
 //     // Move widget
 //     int idx = gtk_list_box_row_get_index(GTK_LIST_BOX_ROW(target_row));
 //     GtkListBox *box = (GtkListBox *)gtk_widget_get_parent(GTK_WIDGET(row));
@@ -301,7 +301,7 @@ static void on_action_print(GSimpleAction *action, GVariant *param, ErrandsSideb
 //     ErrandsTask *task = ERRANDS_TASK(object);
 //     if (!strcmp(task->data->list_uid, target_row->data->uid))
 //       return false;
-//     LOG("Move task '%s' to list '%s'", task->data->uid, target_row->data->uid);
+//     tb_log("Move task '%s' to list '%s'", task->data->uid, target_row->data->uid);
 //     ErrandsSidebarTaskListRow *task_row =
 //     errands_sidebar_task_list_row_get(task->data->list_uid);
 //     // Move widget

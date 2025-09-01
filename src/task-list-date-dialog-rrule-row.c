@@ -77,7 +77,7 @@ struct icalrecurrencetype errands_task_list_date_dialog_rrule_row_get_rrule(Erra
 void errands_task_list_date_dialog_rrule_row_set_rrule(ErrandsTaskListDateDialogRruleRow *self,
                                                        struct icalrecurrencetype rrule) {
   if (rrule.freq == ICAL_NO_RECURRENCE) return;
-  LOG("Set RRULE: %s", icalrecurrencetype_as_string(&rrule));
+  tb_log("Set RRULE: %s", icalrecurrencetype_as_string(&rrule));
   adw_combo_row_set_selected(self->freq_row, rrule.freq < 7 ? rrule.freq : 3);
   adw_spin_row_set_value(self->interval_row, rrule.interval);
   set_week_days(self, rrule.by_day);

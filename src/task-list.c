@@ -1,8 +1,4 @@
 #include "data/data.h"
-#include "gio/gio.h"
-#include "glib-object.h"
-#include "glib.h"
-#include "gtk/gtk.h"
 #include "state.h"
 #include "utils.h"
 #include "widgets.h"
@@ -76,7 +72,7 @@ static void errands_task_list_init(ErrandsTaskList *self) {
                           GTK_SELECTION_MODEL(gtk_no_selection_new(G_LIST_MODEL(self->tree_model))));
   gtk_list_view_set_factory(GTK_LIST_VIEW(self->task_list), tasks_factory);
 
-  LOG("Task List: Created");
+  tb_log("Task List: Created");
 }
 
 ErrandsTaskList *errands_task_list_new() { return g_object_new(ERRANDS_TYPE_TASK_LIST, NULL); }
@@ -171,8 +167,8 @@ static GListModel *create_child_model_func(gpointer item, gpointer user_data) {
   // Cache the model on the item
   g_object_set_data_full(G_OBJECT(item), "children-model", children_store, g_object_unref);
 
-  LOG("Created sub-tasks model with %zu sub-tasks for %s", children_n,
-      errands_data_get_str(parent_data, DATA_PROP_TEXT));
+  tb_log("Created sub-tasks model with %zu sub-tasks for %s", children_n,
+         errands_data_get_str(parent_data, DATA_PROP_TEXT));
 
   return G_LIST_MODEL(g_object_ref(children_store));
 }
@@ -206,7 +202,7 @@ static GListModel *create_child_model_func(gpointer item, gpointer user_data) {
 //     return NULL;
 //   }
 
-//   LOG("Created sub-tasks model with %zu sub-tasks for %s", children_n,
+//   tb_log("Created sub-tasks model with %zu sub-tasks for %s", children_n,
 //       errands_data_get_str(parent_data, DATA_PROP_TEXT));
 //   return G_LIST_MODEL(children_store);
 // }
@@ -313,7 +309,7 @@ static GListModel *create_child_model_func(gpointer item, gpointer user_data) {
 // ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_task_list_load_tasks(ErrandsTaskList *self) {
-  LOG("Task List: Loading tasks to model");
+  tb_log("Task List: Loading tasks to model");
   // Add only top-level tasks to the root model
   GPtrArray *tasks = g_hash_table_get_values_as_ptr_array(tdata);
   for (size_t i = 0; i < tasks->len; i++) {
@@ -329,7 +325,7 @@ void errands_task_list_load_tasks(ErrandsTaskList *self) {
     }
   }
   g_ptr_array_free(tasks, false);
-  LOG("Task List: Loaded %d top-level tasks", g_list_model_get_n_items(G_LIST_MODEL(self->tasks_model)));
+  tb_log("Task List: Loaded %d top-level tasks", g_list_model_get_n_items(G_LIST_MODEL(self->tasks_model)));
 }
 
 void errands_task_list_add_task(TaskData *task) {
@@ -460,13 +456,13 @@ static void on_task_list_entry_activated_cb(AdwEntryRow *entry, gpointer data) {
 
   errands_task_list_update_title();
 
-  LOG("Add task '%s' to task list '%s'", errands_data_get_str(td, DATA_PROP_UID),
-      errands_data_get_str(td, DATA_PROP_LIST_UID));
+  tb_log("Add task '%s' to task list '%s'", errands_data_get_str(td, DATA_PROP_UID),
+         errands_data_get_str(td, DATA_PROP_LIST_UID));
 }
 
 static void on_task_list_search_cb(GtkSearchEntry *entry, gpointer user_data) {
   // const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
-  // LOG("Task List: Search '%s'", text);
+  // tb_log("Task List: Search '%s'", text);
   // state.main_window->task_list->search_query = text;
   // gtk_filter_changed(GTK_FILTER(state.main_window->task_list->search_filter), GTK_FILTER_CHANGE_DIFFERENT);
   // gtk_list_view_scroll_to(GTK_LIST_VIEW(state.main_window->task_list->task_list), 0, GTK_LIST_SCROLL_FOCUS, NULL);
@@ -474,7 +470,7 @@ static void on_task_list_search_cb(GtkSearchEntry *entry, gpointer user_data) {
 
 static void on_toggle_search_action_cb(GSimpleAction *action, GVariant *param, GtkToggleButton *btn) {
   bool active = gtk_toggle_button_get_active(btn);
-  LOG("Task List: Toggle search %s", active ? "on" : "off");
+  tb_log("Task List: Toggle search %s", active ? "on" : "off");
   gtk_revealer_set_reveal_child(GTK_REVEALER(state.main_window->task_list->entry_rev),
                                 state.main_window->task_list->data ? !active : false);
 }

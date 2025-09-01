@@ -1,6 +1,7 @@
 #pragma once
 
-#include "glib.h"
+#include "vendor/toolbox.h"
+
 #include <gtk/gtk.h>
 
 #include <ctype.h>
@@ -9,7 +10,6 @@
 #include <time.h>
 
 // Log formatted message
-#define LOG(format, ...) fprintf(stderr, "\033[0;32m[Errands] \033[0m" format "\n", ##__VA_ARGS__)
 #define ERROR(format, ...) fprintf(stderr, "\033[1;31m[Errands Error] " format "\033[0m\n", ##__VA_ARGS__)
 
 // For range from start to end - 1
@@ -69,7 +69,7 @@ static inline const char *generate_hex() {
   int green = rand() % 256;
   int blue = rand() % 256;
   sprintf(color, "#%02X%02X%02X", red, green, blue);
-  LOG("Generate color '%s'", color);
+  tb_log("Generate color '%s'", color);
   return color;
 }
 
@@ -197,7 +197,7 @@ static inline GDateTime *parse_date(const char *date) {
 static inline char *read_file_to_string(const char *path) {
   FILE *file = fopen(path, "r"); // Open the file in read mode
   if (!file) {
-    LOG("Could not open file"); // Print error if file cannot be opened
+    tb_log("Could not open file"); // Print error if file cannot be opened
     return NULL;
   }
   // Move the file pointer to the end of the file to get the size

@@ -47,7 +47,7 @@ void errands_sidebar_delete_list_dialog_show(ErrandsSidebarTaskListRow *row) {
 static void on_response_cb(ErrandsSidebarDeleteListDialog *dialog, gchar *response, gpointer data) {
   if (g_str_equal(response, "delete")) {
     ErrandsSidebarTaskListRow *row = state.main_window->sidebar->delete_list_dialog->current_task_list_row;
-    LOG("Delete List Dialog: Deleting task list %s", errands_data_get_str(row->data, DATA_PROP_LIST_UID));
+    tb_log("Delete List Dialog: Deleting task list %s", errands_data_get_str(row->data, DATA_PROP_LIST_UID));
     // Delete tasks widgets
     GPtrArray *tasks = get_children(state.main_window->task_list->task_list);
     for (size_t i = 0; i < tasks->len; i++) {

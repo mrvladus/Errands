@@ -1,10 +1,6 @@
 #ifndef TOOLBOX_H
 #define TOOLBOX_H
 
-#ifndef TOOLBOX_API
-#define TOOLBOX_API static inline
-#endif // TOOLBOX_API
-
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -12,63 +8,36 @@
 #include <string.h>
 #include <time.h>
 
-// -------------------- MACROS -------------------- //
+// -------------------- LOG AND DEBUG -------------------- //
 
-// #define LOG_FMT(format, ...) fprintf(stderr, format "\n", ##__VA_ARGS__)
-// #define LOG(msg) LOG_FMT("%s", msg)
+// Set log message prefix.
+void tb_log_set_prefix(const char *prefix);
 
-/*
-
-Debug messages macros.
-Enabled by default.
-To disable debug messages put '#define TB_DISABLE_DEBUG' before including 'toolbox.h'
-
-*/
+// Print formatted message.
+void tb_log(const char *format, ...);
 
 // Print formatted message with filename, line number and function name.
-#define DEBUG_LOG_FMT(format, ...)                                                                                     \
-  fprintf(stderr, "%s:%d:%s: " format "\n", tb_path_base_name(__FILE__), __LINE__, __FUNCTION__, ##__VA_ARGS__)
-// Print unformatted debug message
-#define DEBUG_LOG(msg) DEBUG_LOG_FMT("%s", msg)
-
-// Dummy macros when debug is disabled.
-#ifdef TB_DISABLE_DEBUG
-#define DEBUG_LOG_FMT(format, ...)
-#define DEBUG_LOG(msg)
-#endif // TB_DISABLE_DEBUG
+#define TB_LOG_DEBUG(format, ...)                                                                                      \
+  tb_log("%s:%d:%s: " format "\n", tb_path_base_name(__FILE__), __LINE__, __func__, ##__VA_ARGS__)
 
 // The best debug method. Improved. :)
-#define HERE DEBUG_LOG("HERE")
-// Formatted message version of HERE macro.
-#define HERE_FMT(format, ...) DEBUG_LOG_FMT("HERE: " format, ##__VA_ARGS__)
+#define HERE TB_LOG_DEBUG("HERE")
 
 // Print TODO formatted message.
-#define TODO(format, ...) DEBUG_LOG_FMT("TODO: " format, ##__VA_ARGS__)
+#define TODO(format, ...) TB_LOG_DEBUG("TODO: " format, ##__VA_ARGS__)
 
 // Prints 'UNIMPLEMENTED' message and exits with error code 1.
 #define UNIMPLEMENTED                                                                                                  \
   do {                                                                                                                 \
-    DEBUG_LOG("UNIMPLEMENTED");                                                                                        \
-    exit(1);                                                                                                           \
-  } while (0)
-// Formatted message version of UNIMPLEMENTED macro.
-#define UNIMPLEMENTED_FMT(format, ...)                                                                                 \
-  do {                                                                                                                 \
-    DEBUG_LOG_FMT("UNIMPLEMENTED: " format, ##__VA_ARGS__);                                                            \
-    exit(1);                                                                                                           \
+    LOG_DEBUG("UNIMPLEMENTED");                                                                                        \
+    exit(EXIT_FAILURE);                                                                                                \
   } while (0)
 
 // Print PANIC and exit with error code 1.
 #define PANIC                                                                                                          \
   do {                                                                                                                 \
-    DEBUG_LOG("PANIC");                                                                                                \
-    exit(1);                                                                                                           \
-  } while (0)
-// Formatted message version of PANIC macro.
-#define PANIC_FMT(format, ...)                                                                                         \
-  do {                                                                                                                 \
-    DEBUG_LOG_FMT("PANIC: " format, ##__VA_ARGS__);                                                                    \
-    exit(1);                                                                                                           \
+    LOG_DEBUG("PANIC");                                                                                                \
+    exit(EXIT_FAILURE);                                                                                                \
   } while (0)
 
 /*
@@ -102,7 +71,7 @@ void func() {
 // Start profile timer.
 #define PROFILE_FUNC_START clock_t __start_time = clock()
 // Stop profile timer and write time of execution to stderr.
-#define PROFILE_FUNC_END DEBUG_LOG_FMT("%f sec.", (double)(clock() - __start_time) / CLOCKS_PER_SEC)
+#define PROFILE_FUNC_END LOG_DEBUG("%f sec.", (double)(clock() - __start_time) / CLOCKS_PER_SEC)
 
 // Profile block of code
 #define PROFILE_BLOCK(code_block)                                                                                      \
@@ -133,10 +102,42 @@ When buffer is full - start override buffer from the beginning.
 #define TB_TMP_STR_BUFFER_SIZE 8192
 #endif // TB_TMP_STR_BUFFER_SIZE
 
-static char tb_tmp_str_buffer[TB_TMP_STR_BUFFER_SIZE];
-static size_t tb_tmp_str_offset = 0;
+const char *tb_tmp_str_printf(const char *format, ...);
 
-TOOLBOX_API const char *tb_tmp_str_printf(const char *format, ...) {
+// -------------------- PATH FUNCTIONS -------------------- //
+
+// Get path base name. e. g. "/home/user/file.txt" -> "file.txt".
+// Returns pointer to the beginning of the base name in the path or NULL on error.
+const char *tb_path_base_name(const char *path);
+
+// Get path extension. e. g. "/home/user/file.txt" -> "txt".
+// Returns pointer to the beginning of the extension in the path or NULL on error.
+const char *tb_path_ext(const char *path);
+
+#endif // TOOLBOX_H
+
+#ifdef TOOLBOX_IMPLEMENTATION
+
+// -------------------- LOG AND DEBUG -------------------- //
+
+const char *tb__log_prefix = "";
+
+void tb_log(const char *format, ...) {
+  fprintf(stderr, "%s", tb__log_prefix);
+  va_list args;
+  va_start(args, format);
+  vfprintf(stderr, format, args);
+  va_end(args);
+  fprintf(stderr, "\n");
+}
+
+void tb_log_set_prefix(const char *prefix) { tb__log_prefix = prefix; }
+
+// -------------------- TEMPORARY STRING -------------------- //
+
+const char *tb_tmp_str_printf(const char *format, ...) {
+  static char tb_tmp_str_buffer[TB_TMP_STR_BUFFER_SIZE];
+  static size_t tb_tmp_str_offset = 0;
   if (!format) return NULL;
   va_list args;
   va_start(args, format);
@@ -159,10 +160,15 @@ TOOLBOX_API const char *tb_tmp_str_printf(const char *format, ...) {
 
 // -------------------- PATH FUNCTIONS -------------------- //
 
-TOOLBOX_API const char *tb_path_base_name(const char *path) {
+const char *tb_path_base_name(const char *path) {
   const char *last_sep = strrchr(path, '/');
   if (!last_sep) last_sep = strrchr(path, '\\');
   return last_sep ? last_sep + 1 : path;
 }
 
-#endif // TOOLBOX_H
+const char *tb_path_ext(const char *path) {
+  const char *last_dot = strrchr(path, '.');
+  return last_dot ? last_dot + 1 : NULL;
+}
+
+#endif // TOOLBOX_IMPLEMENTATION

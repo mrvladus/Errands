@@ -305,7 +305,7 @@ const char *errands_task_as_str(ErrandsTask *task) {
 // ---------- CALLBACKS ---------- //
 
 static void on_complete_btn_toggle_cb(GtkCheckButton *btn, ErrandsTask *task) {
-  LOG("Toggle completion '%s'", errands_data_get_str(task->data, DATA_PROP_UID));
+  tb_log("Toggle completion '%s'", errands_data_get_str(task->data, DATA_PROP_UID));
   // errands_data_set_str(task->data, DATA_PROP_COMPLETED, gtk_check_button_get_active(btn) ? get_date_time() : NULL);
   // errands_data_write_list(state.main_window->task_list->data);
 
@@ -352,7 +352,7 @@ static void on_complete_btn_toggle_cb(GtkCheckButton *btn, ErrandsTask *task) {
 
 static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointer user_data) {
   bool editing = gtk_editable_label_get_editing(label);
-  LOG("Task: Edit '%s'", editing ? "on" : "off");
+  tb_log("Task: Edit '%s'", editing ? "on" : "off");
   ErrandsTask *task = user_data;
   const char *curr_text = errands_data_get_str(task->data, DATA_PROP_TEXT);
   if (editing) {
@@ -378,7 +378,7 @@ static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointe
 }
 
 static void on_toolbar_btn_toggle_cb(GtkToggleButton *btn, ErrandsTask *task) {
-  LOG("Task '%s': Toggle toolbar", errands_data_get_str(task->data, DATA_PROP_UID));
+  tb_log("Task '%s': Toggle toolbar", errands_data_get_str(task->data, DATA_PROP_UID));
   errands_data_set_bool(task->data, DATA_PROP_TOOLBAR_SHOWN, gtk_toggle_button_get_active(btn));
   errands_data_write_list(task_data_get_list(task->data));
 }
@@ -394,8 +394,8 @@ static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *task) {
   g_object_set_data(data_object, "data", new_td);
   g_list_store_append(state.main_window->task_list->tasks_model, data_object);
   gtk_editable_set_text(GTK_EDITABLE(entry), "");
-  LOG("Task '%s': Add sub-task '%s'", errands_data_get_str(task->data, DATA_PROP_UID),
-      errands_data_get_str(new_td, DATA_PROP_UID));
+  tb_log("Task '%s': Add sub-task '%s'", errands_data_get_str(task->data, DATA_PROP_UID),
+         errands_data_get_str(new_td, DATA_PROP_UID));
 }
 
 static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x, gdouble y, GtkPopover *popover) {

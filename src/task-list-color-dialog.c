@@ -73,7 +73,7 @@ static void on_dialog_close_cb(ErrandsTaskListColorDialog *self) {
         return;
       }
       const char *uid = errands_data_get_str(self->current_task->data, DATA_PROP_UID);
-      LOG("Set accent color '%s' to task '%s'", name, uid);
+      tb_log("Set accent color '%s' to task '%s'", name, uid);
       errands_data_set_str(self->current_task->data, DATA_PROP_COLOR, name);
       errands_task_update_accent_color(self->current_task);
       break;

@@ -16,8 +16,10 @@ e.g. GLib's g_autoptr, g_auto and g_autofree"
 #include "data/data.h"
 #include "settings.h"
 #include "state.h"
-#include "utils.h"
 #include "widgets.h"
+
+#define TOOLBOX_IMPLEMENTATION
+#include "vendor/toolbox.h"
 
 #include <glib/gi18n.h>
 #include <libportal/portal.h>
@@ -33,8 +35,8 @@ static void activate(GtkApplication *app) {
 }
 
 int main(int argc, char **argv) {
-  state.is_flatpak = xdp_portal_running_under_flatpak();
-  LOG("Starting Errands %s %s", VERSION, state.is_flatpak ? "(flatpak)" : "(not flatpak)");
+  tb_log_set_prefix("\033[0;32m[Errands] \033[0m");
+  tb_log("Starting Errands %s %s", VERSION, xdp_portal_running_under_flatpak() ? "(flatpak)" : "(not flatpak)");
   // Generate random seed
   srand((unsigned int)(time(NULL) ^ getpid()));
 

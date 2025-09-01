@@ -9,7 +9,7 @@ void errands_data_free(icalcomponent *data) { icalcomponent_free(data); }
 // --- LIST DATA --- //
 
 ListData *list_data_new(const char *uid, const char *name, const char *color, bool deleted, bool synced, int position) {
-  LOG("List Data: Create '%s'", name);
+  tb_log("List Data: Create '%s'", name);
   icalcomponent *calendar = icalcomponent_new(ICAL_VCALENDAR_COMPONENT);
   icalcomponent_add_property(calendar, icalproperty_new_version("2.0"));
   icalcomponent_add_property(calendar, icalproperty_new_prodid("~//Errands"));
@@ -21,7 +21,7 @@ ListData *list_data_new(const char *uid, const char *name, const char *color, bo
   if (!color) errands_data_set_str(calendar, DATA_PROP_COLOR, generate_hex());
   errands_data_set_bool(calendar, DATA_PROP_DELETED, deleted);
   errands_data_set_bool(calendar, DATA_PROP_SYNCED, synced);
-  LOG("List Data: Created");
+  tb_log("List Data: Created");
   return calendar;
 }
 

@@ -10,42 +10,42 @@ CalDAVClient *client;
 
 // void sync_list(ListData *list) {
 //   if (!errands_settings_get("sync", SETTING_TYPE_BOOL).b) {
-//     LOG("Sync: Sync is disabled");
+//     tb_log("Sync: Sync is disabled");
 //     return;
 //   }
 // }
 // void sync_task(TaskData *task) {
 //   if (!errands_settings_get("sync", SETTING_TYPE_BOOL).b) {
-//     LOG("Sync: Sync is disabled");
+//     tb_log("Sync: Sync is disabled");
 //     return;
 //   }
 // }
 
 // This is the asynchronous work function that runs in a separate thread.
 static void initial_sync(GTask *task, gpointer source_object, gpointer task_data, GCancellable *cancellable) {
-  LOG("Sync: Initialize");
+  tb_log("Sync: Initialize");
   // Check if sync is disabled.
   if (!errands_settings_get("sync", SETTING_TYPE_BOOL).b) {
-    LOG("Sync: Sync is disabled");
+    tb_log("Sync: Sync is disabled");
     g_task_return_boolean(task, FALSE);
     return;
   }
   // Create client
   client = caldav_client_new("http://localhost:8080", "vlad", "1710");
   if (!client) {
-    LOG("Sync: Unable to connect to CalDAV server");
+    tb_log("Sync: Unable to connect to CalDAV server");
     g_task_return_boolean(task, FALSE);
     return;
   }
   // Get calendars
   bool res = caldav_client_pull_calendars(client, CALDAV_COMPONENT_SET_VTODO);
   if (!res || !client->calendars) {
-    LOG("Sync: Unable to get calendars");
+    tb_log("Sync: Unable to get calendars");
     caldav_client_free(client);
     g_task_return_boolean(task, FALSE);
     return;
   }
-  LOG("Sync: Loaded %zu calendars", client->calendars->len);
+  tb_log("Sync: Loaded %zu calendars", client->calendars->len);
   // Get events
   for (size_t i = 0; i < client->calendars->len; i++) {
     CalDAVCalendar *calendar = caldav_list_at(client->calendars, i);
@@ -66,7 +66,7 @@ static void initial_sync(GTask *task, gpointer source_object, gpointer task_data
 static void initial_sync_finished_cb(GObject *source_object, GAsyncResult *res, gpointer user_data) {
   gboolean success = g_task_propagate_boolean(G_TASK(res), NULL);
   if (success) {
-    LOG("Sync: Completed successfully");
+    tb_log("Sync: Completed successfully");
     bool changed = false;
     for (size_t i = 0; i < client->calendars->len; i++) {
       CalDAVCalendar *calendar = caldav_list_at(client->calendars, i);
@@ -97,7 +97,7 @@ static void initial_sync_finished_cb(GObject *source_object, GAsyncResult *res, 
       }
     }
   } else {
-    LOG("Sync: Failed or canceled");
+    tb_log("Sync: Failed or canceled");
   }
 }
 

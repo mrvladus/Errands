@@ -1,5 +1,5 @@
 #include "state.h"
-#include "utils.h"
+#include "vendor/toolbox.h"
 #include "widgets.h"
 
 static void on_response_cb(ErrandsSidebarRenameListDialog *self, gchar *response, gpointer data);
@@ -56,7 +56,7 @@ void errands_sidebar_rename_list_dialog_show(ErrandsSidebarTaskListRow *row) {
 static void on_response_cb(ErrandsSidebarRenameListDialog *self, gchar *response, gpointer data) {
   if (g_str_equal(response, "rename")) {
     const char *text = gtk_editable_get_text(GTK_EDITABLE(self->entry));
-    LOG("SidebarRenameListDialog: Rename to '%s'", text);
+    tb_log("SidebarRenameListDialog: Rename to '%s'", text);
     errands_data_set_str(self->current_task_list_row->data, DATA_PROP_LIST_NAME, text);
     errands_data_write_list(self->current_task_list_row->data);
     errands_sidebar_task_list_row_update_title(self->current_task_list_row);

@@ -4,7 +4,6 @@
 
 // Structure to hold the application state
 typedef struct {
-  bool is_flatpak;
   AdwApplication *app;
   ErrandsWindow *main_window;
 } State;

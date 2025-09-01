@@ -1,5 +1,5 @@
 #include "state.h"
-#include "utils.h"
+#include "vendor/toolbox.h"
 #include "widgets.h"
 
 static void on_response_cb(ErrandsSidebarNewListDialog *dialog, gchar *response, gpointer data);
@@ -59,7 +59,7 @@ static void on_response_cb(ErrandsSidebarNewListDialog *dialog, gchar *response,
     ErrandsSidebarTaskListRow *row = errands_sidebar_add_task_list(state.main_window->sidebar, tld);
     g_signal_emit_by_name(row, "activate", NULL);
     g_object_set(state.main_window->no_lists_page, "visible", false, NULL);
-    LOG("SidebarNewListDialog: Create new list: '%s'", errands_data_get_str(tld, DATA_PROP_LIST_UID));
+    tb_log("SidebarNewListDialog: Create new list: '%s'", errands_data_get_str(tld, DATA_PROP_LIST_UID));
   }
 }
 
