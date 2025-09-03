@@ -8,6 +8,27 @@
 
 #define BUILD_DIR "build"
 
+// Errands caldav backend
+static bool build_libcaldav() {
+  PugTarget libcaldav = pug_target_new("libcaldav", PUG_TARGET_TYPE_STATIC_LIBRARY, BUILD_DIR);
+
+  // Sources
+  pug_target_add_source(&libcaldav, "src/libcaldav/caldav-calendar.c");
+  pug_target_add_source(&libcaldav, "src/libcaldav/caldav-client.c");
+  pug_target_add_source(&libcaldav, "src/libcaldav/caldav-event.c");
+  pug_target_add_source(&libcaldav, "src/libcaldav/caldav-list.c");
+  pug_target_add_source(&libcaldav, "src/libcaldav/caldav-requests.c");
+
+  // CFLAGS
+  pug_target_add_cflags(&libcaldav, "-Wall");
+
+  // pkg-config libraries
+  pug_target_add_pkg_config_lib(&libcaldav, "libcurl");
+  pug_target_add_pkg_config_lib(&libcaldav, "libical");
+
+  return pug_target_build(&libcaldav);
+}
+
 static bool compile_resources() {
   const char *gresource_xml = "data/errands.gresource.xml";
   const char *resoures_c = "src/resources.c";
@@ -41,12 +62,7 @@ static bool build_errands() {
   pug_target_add_source(&errands, "src/data/data.c");
   pug_target_add_source(&errands, "src/data/data-io.c");
   pug_target_add_source(&errands, "src/data/data-props.c");
-  pug_target_add_source(&errands, "src/sync/sync.c");
-  pug_target_add_source(&errands, "src/sync/caldav/caldav-calendar.c");
-  pug_target_add_source(&errands, "src/sync/caldav/caldav-client.c");
-  pug_target_add_source(&errands, "src/sync/caldav/caldav-event.c");
-  pug_target_add_source(&errands, "src/sync/caldav/caldav-list.c");
-  pug_target_add_source(&errands, "src/sync/caldav/caldav-requests.c");
+  pug_target_add_source(&errands, "src/sync.c");
   pug_target_add_source(&errands, "src/main.c");
   pug_target_add_source(&errands, "src/resources.c");
   pug_target_add_source(&errands, "src/settings.c");
@@ -74,14 +90,21 @@ static bool build_errands() {
   pug_target_add_source(&errands, "src/window.c");
 
   // CFLAGS
-  pug_target_add_cflags(&errands, "-Wall", "-Wextra");
-  pug_target_add_cflag(&errands, PUG_CFLAG_FROM_DEFINE_STR(APP_ID));
-  pug_target_add_cflag(&errands, PUG_CFLAG_FROM_DEFINE_STR(VERSION));
-  pug_target_add_cflag(&errands, PUG_CFLAG_FROM_DEFINE_STR(LOCALE_DIR));
+  pug_target_add_cflags(&errands, "-Wall");
+  pug_target_add_cflag(&errands, PUG_CFLAG_DEFINE_STR(APP_ID));
+  pug_target_add_cflag(&errands, PUG_CFLAG_DEFINE_STR(VERSION));
+  pug_target_add_cflag(&errands, PUG_CFLAG_DEFINE_STR(LOCALE_DIR));
+
+  // LDFLAGS
+  pug_target_add_ldflags(&errands, PUG_LDFLAG_LIB_DIR(BUILD_DIR), PUG_LDFLAG_LIB("caldav"));
 
   // pkg-config libraries
-  pug_target_add_pkg_config_libs(&errands, "libadwaita-1", "libcurl", "libical", "gtksourceview-5", "webkitgtk-6.0",
-                                 "libportal");
+  pug_target_add_pkg_config_lib(&errands, "gtksourceview-5");
+  pug_target_add_pkg_config_lib(&errands, "libadwaita-1");
+  pug_target_add_pkg_config_lib(&errands, "libical");
+  pug_target_add_pkg_config_lib(&errands, "libportal");
+  pug_target_add_pkg_config_lib(&errands, "libcurl");
+  pug_target_add_pkg_config_lib(&errands, "webkitgtk-6.0");
 
   return pug_target_build(&errands);
 }
@@ -95,7 +118,8 @@ int main(int argc, char **argv) {
     return 0;
   }
 
-  compile_resources();
+  if (!build_libcaldav()) return 1;
+  if (!compile_resources()) return 1;
   if (!build_errands()) return 1;
 
   // Run if `run` argument provided

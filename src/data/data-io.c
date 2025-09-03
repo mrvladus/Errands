@@ -1,14 +1,12 @@
 #include "../settings.h"
 #include "../utils.h"
 #include "../vendor/json.h"
+#include "data.h"
 
 #define TB_ENABLE_PROFILING
 #include "../vendor/toolbox.h"
 
-#include "data.h"
-
 #include <gio/gio.h>
-#include <glib.h>
 #include <libical/ical.h>
 
 const char *user_dir;

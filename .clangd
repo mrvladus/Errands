@@ -34,4 +34,3 @@ CompileFlags:
     - -pthread
     - -Wno-macro-redefined
     - -DPUG_IMPLEMENTATION
-    - -DTOOLBOX_IMPLEMENTATION

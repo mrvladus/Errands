@@ -10,31 +10,30 @@
 
 // -------------------- LOG AND DEBUG -------------------- //
 
-// Set log message prefix.
-void tb_log_set_prefix(const char *prefix);
+extern const char *tb_log_prefix;
 
 // Print formatted message.
 void tb_log(const char *format, ...);
 
 // Print formatted message with filename, line number and function name.
 #define TB_LOG_DEBUG(format, ...)                                                                                      \
-  tb_log("%s:%d:%s: " format "\n", tb_path_base_name(__FILE__), __LINE__, __func__, ##__VA_ARGS__)
+  tb_log("%s:%d:%s: " format, tb_path_base_name(__FILE__), __LINE__, __func__, ##__VA_ARGS__)
 
 // The best debug method. Improved. :)
-#define HERE TB_LOG_DEBUG("HERE")
+#define TB_HERE TB_LOG_DEBUG("HERE")
 
 // Print TODO formatted message.
-#define TODO(format, ...) TB_LOG_DEBUG("TODO: " format, ##__VA_ARGS__)
+#define TB_TODO(format, ...) TB_LOG_DEBUG("TODO: " format, ##__VA_ARGS__)
 
 // Prints 'UNIMPLEMENTED' message and exits with error code 1.
-#define UNIMPLEMENTED                                                                                                  \
+#define TB_UNIMPLEMENTED                                                                                               \
   do {                                                                                                                 \
-    LOG_DEBUG("UNIMPLEMENTED");                                                                                        \
+    TB_LOG_DEBUG("UNIMPLEMENTED");                                                                                     \
     exit(EXIT_FAILURE);                                                                                                \
   } while (0)
 
 // Print PANIC and exit with error code 1.
-#define PANIC                                                                                                          \
+#define TB_PANIC                                                                                                       \
   do {                                                                                                                 \
     LOG_DEBUG("PANIC");                                                                                                \
     exit(EXIT_FAILURE);                                                                                                \
@@ -69,22 +68,22 @@ void func() {
 #ifdef TB_ENABLE_PROFILING
 
 // Start profile timer.
-#define PROFILE_FUNC_START clock_t __start_time = clock()
+#define TB_PROFILE_FUNC_START clock_t __start_time = clock()
 // Stop profile timer and write time of execution to stderr.
-#define PROFILE_FUNC_END LOG_DEBUG("%f sec.", (double)(clock() - __start_time) / CLOCKS_PER_SEC)
+#define TB_PROFILE_FUNC_END TB_LOG_DEBUG("%f sec.", (double)(clock() - __start_time) / CLOCKS_PER_SEC)
 
 // Profile block of code
-#define PROFILE_BLOCK(code_block)                                                                                      \
+#define TB_PROFILE_BLOCK(code_block)                                                                                   \
   do {                                                                                                                 \
-    PROFILE_FUNC_START;                                                                                                \
+    TB_PROFILE_FUNC_START;                                                                                             \
     code_block;                                                                                                        \
-    PROFILE_FUNC_END;                                                                                                  \
+    TB_PROFILE_FUNC_END;                                                                                               \
   } while (0)
 
 #else // Dummy macros when profiling is disabled.
-#define PROFILE_FUNC_START
-#define PROFILE_FUNC_END
-#define PROFILE_BLOCK(code_block) code_block
+#define TB_PROFILE_FUNC_START
+#define TB_PROFILE_FUNC_END
+#define TB_PROFILE_BLOCK(code_block) code_block
 #endif // TB_ENABLE_PROFILING
 
 // -------------------- TEMPORARY STRING -------------------- //
@@ -120,18 +119,16 @@ const char *tb_path_ext(const char *path);
 
 // -------------------- LOG AND DEBUG -------------------- //
 
-const char *tb__log_prefix = "";
+const char *tb_log_prefix = "";
 
 void tb_log(const char *format, ...) {
-  fprintf(stderr, "%s", tb__log_prefix);
+  fprintf(stderr, "%s", tb_log_prefix);
   va_list args;
   va_start(args, format);
   vfprintf(stderr, format, args);
   va_end(args);
   fprintf(stderr, "\n");
 }
-
-void tb_log_set_prefix(const char *prefix) { tb__log_prefix = prefix; }
 
 // -------------------- TEMPORARY STRING -------------------- //
 
@@ -149,9 +146,9 @@ const char *tb_tmp_str_printf(const char *format, ...) {
     va_end(args);
     return "";
   }
-  if (len >= TB_TMP_STR_BUFFER_SIZE - tb_tmp_str_offset - 1) tb_tmp_str_offset = 0;
+  if (len >= (size_t)TB_TMP_STR_BUFFER_SIZE - tb_tmp_str_offset - 1) tb_tmp_str_offset = 0;
   // Print the string
-  vsnprintf(tb_tmp_str_buffer + tb_tmp_str_offset, TB_TMP_STR_BUFFER_SIZE - tb_tmp_str_offset, format, args);
+  vsnprintf(tb_tmp_str_buffer + tb_tmp_str_offset, (size_t)TB_TMP_STR_BUFFER_SIZE - tb_tmp_str_offset, format, args);
   const char *result = tb_tmp_str_buffer + tb_tmp_str_offset;
   tb_tmp_str_offset += len + 1;
   va_end(args);

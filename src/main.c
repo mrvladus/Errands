@@ -35,7 +35,8 @@ static void activate(GtkApplication *app) {
 }
 
 int main(int argc, char **argv) {
-  tb_log_set_prefix("\033[0;32m[Errands] \033[0m");
+  // tb_log_set_prefix("\033[0;32m[Errands] \033[0m");
+  tb_log_prefix = "\033[0;32m[Errands] \033[0m";
   tb_log("Starting Errands %s %s", VERSION, xdp_portal_running_under_flatpak() ? "(flatpak)" : "(not flatpak)");
   // Generate random seed
   srand((unsigned int)(time(NULL) ^ getpid()));
