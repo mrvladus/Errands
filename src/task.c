@@ -389,19 +389,22 @@ static void on_toolbar_btn_toggle_cb(GtkToggleButton *btn, ErrandsTask *task) {
 static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *task) {
   const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
   if (g_str_equal(text, "")) return;
+  // Add new task data
   TaskData *new_td = list_data_create_task(state.main_window->task_list->data, (char *)text,
                                            errands_data_get_str(task->data, DATA_PROP_LIST_UID),
                                            errands_data_get_str(task->data, DATA_PROP_UID));
-  errands_data_write_list(state.main_window->task_list->data);
   g_hash_table_insert(tdata, g_strdup(errands_data_get_str(new_td, DATA_PROP_UID)), new_td);
-
-  GObject *data_object = task_data_as_gobject(new_td);
-
+  // Add new model item
   GObject *model_item = g_object_get_data(G_OBJECT(task), "model-item");
   GObject *children_model = g_object_get_data(G_OBJECT(model_item), "children-model");
-
+  GObject *data_object = task_data_as_gobject(new_td);
   g_list_store_append(G_LIST_STORE(children_model), data_object);
-
+  // Expand task row
+  errands_data_set_bool(task->data, DATA_PROP_EXPANDED, true);
+  GtkTreeListRow *row = g_object_get_data(G_OBJECT(task), "row");
+  gtk_tree_list_row_set_expanded(row, true);
+  errands_data_write_list(state.main_window->task_list->data);
+  // Reset text
   gtk_editable_set_text(GTK_EDITABLE(entry), "");
   tb_log("Task '%s': Add sub-task '%s'", errands_data_get_str(task->data, DATA_PROP_UID),
          errands_data_get_str(new_td, DATA_PROP_UID));

@@ -91,14 +91,15 @@ void bind_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item) {
   if (!model_item) return;
   // Get the expander and its child task widget
   GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_list_item_get_child(list_item));
-  // Set the row on the expander
   ErrandsTask *task = ERRANDS_TASK(gtk_tree_expander_get_child(expander));
   g_object_set_data(G_OBJECT(task), "model-item", model_item);
+  g_object_set_data(G_OBJECT(task), "row", row);
   // Set task widget so we can access it in on_list_view_activate()
   g_object_set_data(G_OBJECT(model_item), "task", task);
   // Set the task data
   TaskData *task_data = g_object_get_data(model_item, "data");
   errands_task_set_data(task, task_data);
+  // Set the row on the expander
   gtk_tree_expander_set_list_row(expander, row); // create_child_model_func is called here
   // Expand row
   bool expanded = errands_data_get_bool(task_data, DATA_PROP_EXPANDED);
@@ -147,7 +148,6 @@ static GListModel *create_child_model_func(gpointer item, gpointer user_data) {
 
     if (task_parent && g_str_equal(task_parent, parent_uid)) {
       g_autoptr(GObject) obj = task_data_as_gobject(task);
-      // g_object_set_data(item, "model", children_store);
       g_list_store_append(children_store, obj);
       children_n++;
     }

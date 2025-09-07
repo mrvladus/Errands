@@ -73,19 +73,15 @@ template $ErrandsTaskList: Adw.Bin {
       }
     }
 
-    content: Box {
-      orientation: vertical;
+    content: ScrolledWindow {
+      propagate-natural-height: true;
+      vexpand: true;
 
-      ScrolledWindow {
-        propagate-natural-height: true;
-        vexpand: true;
-
-        ListView task_list {
-          margin-start: 6;
-          margin-end: 6;
-          single-click-activate: true;
-          activate => $on_list_view_activate();
-        }
+      ListView task_list {
+        margin-start: 6;
+        margin-end: 6;
+        single-click-activate: true;
+        activate => $on_list_view_activate();
       }
     };
   }
