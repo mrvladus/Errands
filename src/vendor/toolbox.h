@@ -2,6 +2,7 @@
 #define TOOLBOX_H
 
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -113,6 +114,10 @@ const char *tb_path_base_name(const char *path);
 // Returns pointer to the beginning of the extension in the path or NULL on error.
 const char *tb_path_ext(const char *path);
 
+// -------------------- STRING FUNCTIONS -------------------- //
+
+bool tb_str_contains(const char *str, const char *sub_str);
+
 #endif // TOOLBOX_H
 
 #ifdef TOOLBOX_IMPLEMENTATION
@@ -167,5 +172,9 @@ const char *tb_path_ext(const char *path) {
   const char *last_dot = strrchr(path, '.');
   return last_dot ? last_dot + 1 : NULL;
 }
+
+// -------------------- STRING FUNCTIONS -------------------- //
+
+bool tb_str_contains(const char *str, const char *sub_str) { return strstr(str, sub_str) != NULL; }
 
 #endif // TOOLBOX_IMPLEMENTATION
