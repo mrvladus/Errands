@@ -169,6 +169,8 @@ void errands_task_update_progress(ErrandsTask *task) {
 
 void errands_task_update_toolbar(ErrandsTask *task) {
   TaskData *data = task->data;
+  // Show sub-tasks entry
+  gtk_widget_set_visible(task->sub_entry, errands_data_get_bool(data, DATA_PROP_EXPANDED));
   // Update css for buttons
   // Notes button
   if (errands_data_get_str(data, DATA_PROP_NOTES)) gtk_widget_add_css_class(task->notes_btn, "accent");

@@ -124,11 +124,23 @@ template $ErrandsTask: Box {
       line-spacing: 3;
       child-spacing: 3;
 
-      Entry sub_entry {
+      Button date_btn {
+        valign: center;
+        halign: start;
         hexpand: true;
-        placeholder-text: _("Add Sub-Task");
-        width-request: 200;
-        activate => $on_sub_task_entry_activated(template) not-swapped;
+
+        Adw.ButtonContent date_btn_content {
+          icon-name: "errands-calendar-symbolic";
+          label: _("Date");
+          tooltip-text: _("Select Date");
+        }
+
+        clicked => $errands_task_list_date_dialog_show(template);
+
+        styles [
+          "caption",
+          "flat",
+        ]
       }
 
       Box {
@@ -186,24 +198,20 @@ template $ErrandsTask: Box {
             "flat",
           ]
         }
-
-        Button date_btn {
-          valign: center;
-
-          Adw.ButtonContent date_btn_content {
-            icon-name: "errands-calendar-symbolic";
-            label: _("Date");
-            tooltip-text: _("Select Date");
-          }
-
-          clicked => $errands_task_list_date_dialog_show(template);
-
-          styles [
-            "caption",
-            "flat",
-          ]
-        }
       }
+    }
+  }
+
+  Revealer sub_tasks_entry_revealer {
+    transition-duration: 100;
+    reveal-child: bind sub_entry.visible;
+
+    Entry sub_entry {
+      margin-start: 6;
+      margin-end: 6;
+      margin-bottom: 6;
+      placeholder-text: _("Add Sub-Task");
+      activate => $on_sub_task_entry_activated(template) not-swapped;
     }
   }
 }
