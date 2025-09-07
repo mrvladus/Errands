@@ -33,6 +33,9 @@ static bool compile_resources() {
   const char *gresource_xml = "data/errands.gresource.xml";
   const char *resoures_c = "src/resources.c";
 
+  bool styles_changed =
+      pug_file_is_older_than_files(resoures_c, "data/styles/style.css", "data/styles/style-dark.css", NULL);
+
   bool blp_files_changed = pug_file_is_older_than_files(
       resoures_c, "src/sidebar.blp", "src/sidebar-all-row.blp", "src/sidebar-delete-list-dialog.blp",
       "src/sidebar-new-list-dialog.blp", "src/sidebar-rename-list-dialog.blp", "src/sidebar-task-list-row.blp",
@@ -45,7 +48,7 @@ static bool compile_resources() {
 
   bool gresource_xml_changed = pug_file1_is_older_than_file2(resoures_c, gresource_xml);
 
-  if (blp_files_changed || gresource_xml_changed) {
+  if (styles_changed || blp_files_changed || gresource_xml_changed) {
     pug_log("Compiling resources.");
     if (!pug_cmd("blueprint-compiler batch-compile %s src src/*.blp", BUILD_DIR)) return false;
     if (!pug_cmd("glib-compile-resources --generate-source --target=%s --c-name=errands %s", resoures_c, gresource_xml))
