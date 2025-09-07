@@ -1,4 +1,6 @@
 #include "data/data.h"
+#include "gio/gio.h"
+#include "glib-object.h"
 #include "glib.h"
 #include "gtk/gtk.h"
 #include "state.h"
@@ -392,11 +394,14 @@ static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *task) {
                                            errands_data_get_str(task->data, DATA_PROP_UID));
   errands_data_write_list(state.main_window->task_list->data);
   g_hash_table_insert(tdata, g_strdup(errands_data_get_str(new_td, DATA_PROP_UID)), new_td);
-  GObject *data_object = g_object_new(G_TYPE_OBJECT, NULL);
-  g_object_set_data(data_object, "data", new_td);
-  // g_list_store_append(state.main_window->task_list->tasks_model, data_object);
-  // In errands_task_list_load_tasks(), you're only adding top-level tasks to the root model, but when creating new
-  // subtasks, you're adding them directly to the root model instead of their parent's child model.
+
+  GObject *data_object = task_data_as_gobject(new_td);
+
+  GObject *model_item = g_object_get_data(G_OBJECT(task), "model-item");
+  GObject *children_model = g_object_get_data(G_OBJECT(model_item), "children-model");
+
+  g_list_store_append(G_LIST_STORE(children_model), data_object);
+
   gtk_editable_set_text(GTK_EDITABLE(entry), "");
   tb_log("Task '%s': Add sub-task '%s'", errands_data_get_str(task->data, DATA_PROP_UID),
          errands_data_get_str(new_td, DATA_PROP_UID));

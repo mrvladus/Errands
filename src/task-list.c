@@ -1,4 +1,5 @@
 #include "data/data.h"
+#include "glib.h"
 #include "state.h"
 #include "utils.h"
 #include "widgets.h"
@@ -90,13 +91,16 @@ void bind_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item) {
   if (!model_item) return;
   // Get the expander and its child task widget
   GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_list_item_get_child(list_item));
-  ErrandsTask *task = ERRANDS_TASK(gtk_tree_expander_get_child(expander));
   // Set the row on the expander
-  gtk_tree_expander_set_list_row(expander, row);
-  g_object_set_data(G_OBJECT(model_item), "task-widget", task);
+  ErrandsTask *task = ERRANDS_TASK(gtk_tree_expander_get_child(expander));
+  g_object_set_data(G_OBJECT(task), "model-item", model_item);
+  // Set task widget so we can access it in on_list_view_activate()
+  g_object_set_data(G_OBJECT(model_item), "task", task);
   // Set the task data
   TaskData *task_data = g_object_get_data(model_item, "data");
   errands_task_set_data(task, task_data);
+  gtk_tree_expander_set_list_row(expander, row); // create_child_model_func is called here
+  // Expand row
   bool expanded = errands_data_get_bool(task_data, DATA_PROP_EXPANDED);
   bool is_expandable = gtk_tree_list_row_is_expandable(row);
   // Add at idle because otherwise will srew-up all list
@@ -116,7 +120,7 @@ static void on_list_view_activate(GtkListView *self, guint position, gpointer us
   GObject *item = gtk_tree_list_row_get_item(row);
   TaskData *task_data = g_object_get_data(item, "data");
   errands_data_set_bool(task_data, DATA_PROP_EXPANDED, expanded);
-  ErrandsTask *task = g_object_get_data(item, "task-widget");
+  ErrandsTask *task = g_object_get_data(item, "task");
   errands_task_set_data(task, task_data);
   errands_data_write_list(task_data_get_list(task_data));
 }
@@ -124,7 +128,7 @@ static void on_list_view_activate(GtkListView *self, guint position, gpointer us
 static GListModel *create_child_model_func(gpointer item, gpointer user_data) {
   // Check if we already created and cached a child model
   GListModel *cached = g_object_get_data(G_OBJECT(item), "children-model");
-  if (cached) return g_object_ref(cached); // return new ref
+  if (cached) return g_object_ref(cached);
 
   TaskData *parent_data = g_object_get_data(G_OBJECT(item), "data");
   if (!parent_data) return NULL;
@@ -142,19 +146,18 @@ static GListModel *create_child_model_func(gpointer item, gpointer user_data) {
     const char *task_parent = errands_data_get_str(task, DATA_PROP_PARENT);
 
     if (task_parent && g_str_equal(task_parent, parent_uid)) {
-      GObject *obj = g_object_new(G_TYPE_OBJECT, NULL);
-      g_object_set_data(obj, "data", task);
+      g_autoptr(GObject) obj = task_data_as_gobject(task);
+      // g_object_set_data(item, "model", children_store);
       g_list_store_append(children_store, obj);
-      g_object_unref(obj);
       children_n++;
     }
   }
   g_ptr_array_free(all_tasks, false);
 
-  if (children_n == 0) {
-    g_object_unref(children_store);
-    return NULL;
-  }
+  // if (children_n == 0) {
+  //   g_object_unref(children_store);
+  //   return NULL;
+  // }
 
   // Cache the model on the item
   g_object_set_data_full(G_OBJECT(item), "children-model", children_store, g_object_unref);
@@ -276,10 +279,8 @@ void errands_task_list_load_tasks(ErrandsTaskList *self) {
     bool deleted = errands_data_get_bool(task, DATA_PROP_DELETED);
     // Only add non-deleted, top-level tasks to root model
     if (!parent && !deleted) {
-      GObject *obj = g_object_new(G_TYPE_OBJECT, NULL);
-      g_object_set_data(obj, "data", task);
+      g_autoptr(GObject) obj = task_data_as_gobject(task);
       g_list_store_append(self->tasks_model, obj);
-      g_object_unref(obj);
     }
   }
   g_ptr_array_free(tasks, false);

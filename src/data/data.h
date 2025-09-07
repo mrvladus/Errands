@@ -1,5 +1,6 @@
 #pragma once
 
+#include "glib-object.h"
 #include <glib.h>
 #include <libical/ical.h>
 
@@ -81,6 +82,8 @@ TaskData *task_data_new(ListData *list, const char *text, const char *parent);
 void task_data_print(TaskData *data, GString *out, size_t indent);
 ListData *task_data_get_list(TaskData *data);
 GPtrArray *task_data_get_children(TaskData *data);
+
+GObject *task_data_as_gobject(TaskData *data);
 
 bool icaltime_is_null_date(const struct icaltimetype t);
 icaltimetype icaltime_merge_date_and_time(const struct icaltimetype date, const struct icaltimetype time);

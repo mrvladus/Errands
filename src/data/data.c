@@ -1,5 +1,6 @@
 #include "data.h"
 #include "../utils.h"
+#include "glib-object.h"
 
 GHashTable *ldata = NULL;
 GHashTable *tdata = NULL;
@@ -112,6 +113,12 @@ void task_data_print(TaskData *data, GString *out, size_t indent) {
   GPtrArray *children = task_data_get_children(data);
   indent++;
   for (size_t i = 0; i < children->len; i++) task_data_print(children->pdata[i], out, indent);
+}
+
+GObject *task_data_as_gobject(TaskData *data) {
+  GObject *obj = g_object_new(G_TYPE_OBJECT, NULL);
+  g_object_set_data(obj, "data", data);
+  return obj;
 }
 
 bool icaltime_is_null_date(const struct icaltimetype t) { return t.year == 0 && t.month == 0 && t.day == 0; }

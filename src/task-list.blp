@@ -54,8 +54,8 @@ template $ErrandsTaskList: Adw.Bin {
       transition-type: swing_down;
 
       Adw.Clamp {
-        tightening-threshold: 300;
-        maximum-size: 1000;
+        // tightening-threshold: 300;
+        // maximum-size: 1000;
         margin-start: 12;
         margin-end: 12;
 
@@ -81,8 +81,8 @@ template $ErrandsTaskList: Adw.Bin {
         vexpand: true;
 
         ListView task_list {
-          margin-start: 12;
-          margin-end: 12;
+          margin-start: 6;
+          margin-end: 6;
           single-click-activate: true;
           activate => $on_list_view_activate();
         }
