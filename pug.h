@@ -93,9 +93,11 @@ PugResult pug_arg_bool(const char *arg);
 
 #define pug_log(fmt, ...) fprintf(stderr, "[PUG] " fmt "\n", ##__VA_ARGS__)
 
+#define pug_info(fmt, ...) fprintf(stderr, "\033[32m[PUG INFO] " fmt "\n\033[0m", ##__VA_ARGS__)
+
 #define pug_error(fmt, ...)                                                                                            \
   do {                                                                                                                 \
-    fprintf(stderr, "[PUG ERROR] " fmt "\n", ##__VA_ARGS__);                                                           \
+    fprintf(stderr, "\033[31m[PUG ERROR] " fmt "\n\033[0m", ##__VA_ARGS__);                                            \
     exit(EXIT_FAILURE);                                                                                                \
   } while (0)
 
@@ -256,7 +258,7 @@ static const char *pug__array_to_string(PugArray *array, const char *separator) 
   char *str = pug__alloc(len);
   for (size_t i = 0; i < array->size; i++) {
     strcat(str, array->data[i]);
-    strcat(str, separator);
+    if (i < array->size - 1) strcat(str, separator);
   }
 
   return str;
@@ -396,6 +398,15 @@ static PugResult pug__file_exists(const char *path) {
   return PUG_SUCCESS;
 }
 
+static PugResult pug__create_file(const char *path) {
+  pug_assert(path != NULL);
+  FILE *fp = fopen(path, "w");
+  if (!fp) return PUG_FAILURE;
+  fclose(fp);
+
+  return PUG_SUCCESS;
+}
+
 PugResult pug_file1_is_older_than_file2(const char *file1, const char *file2) {
   if (!file1 || !file2) return PUG_FAILURE;
   struct stat stat1, stat2;
@@ -487,7 +498,7 @@ static void pug__init(int argc, char **argv, const char *build_file_path) {
   pug__argc = argc;
   pug__argv = argv;
   if (pug_file1_is_older_than_file2(argv[0], build_file_path)) {
-    pug_log("%s -> %s", build_file_path, argv[0]);
+    pug_info("%s -> %s", build_file_path, argv[0]);
     PugResult res = pug_cmd(PUG_CC " %s -o %s", build_file_path, argv[0]);
     if (!res) exit(EXIT_FAILURE);
     execv(argv[0], argv);
@@ -506,6 +517,23 @@ PugResult pug_arg_bool(const char *arg) {
 }
 
 // ---------- BUILD ---------- //
+
+static void pug__check_pkg_config_libs(PugTarget *target) {
+#ifdef _WIN32
+  return;
+#endif
+  const char *pkg_config_checked_file =
+      pug__sprintf("%s/pug_target_%s_pkg_config_checked", target->build_dir, target->name);
+  if (pug__file_exists(pkg_config_checked_file)) return;
+  if (target->pkg_config_libs.size == 0) return;
+  pug_info("Checking pkg-config libraries for target '%s'", target->name);
+  for (size_t i = 0; i < target->pkg_config_libs.size; ++i) {
+    const char *lib_name = target->pkg_config_libs.data[i];
+    PugResult not_exists = pug_cmd("pkg-config --exists %s", lib_name);
+    if (!not_exists) pug_error("Library '%s' is not found", lib_name);
+  }
+  pug__create_file(pkg_config_checked_file);
+}
 
 static PugResult pug__build_object_files(PugTarget *target, bool *need_linking) {
   for (size_t i = 0; i < target->sources.size; i++) {
@@ -554,20 +582,20 @@ static PugResult pug__link_object_files(PugTarget *target) {
 #endif
   // Link executable
   if (target->type & PUG_TARGET_TYPE_EXECUTABLE) {
-    pug_log("Linking executable -> %s", path);
+    pug_info("Linking executable -> %s", path);
     PugResult res =
         pug_cmd(PUG_CC " %s" PUG_CC_EXE_EXT " -o %s %s %s", obj_str, path, ldflags ? ldflags : "", pkg_config_flags);
     if (!res) return PUG_FAILURE;
   } else {
     // Link static library
     if (target->type & PUG_TARGET_TYPE_STATIC_LIBRARY) {
-      pug_log("Linking static library -> %s", path);
+      pug_info("Linking static library -> %s", path);
       PugResult res = pug_cmd(PUG_CC_AR_CMD_FORMAT, path, obj_str);
       if (!res) return PUG_FAILURE;
     }
     // Link dynamic library
     if (target->type & PUG_TARGET_TYPE_SHARED_LIBRARY) {
-      pug_log("Linking dynamic library -> %s", path);
+      pug_info("Linking dynamic library -> %s", path);
       PugResult res = pug_cmd(PUG_CC " -shared %s -o %s" PUG_CC_SHARED_LIB_EXT " %s %s", obj_str, path,
                               ldflags ? ldflags : "", pkg_config_flags);
       if (!res) return PUG_FAILURE;
@@ -583,11 +611,13 @@ PugResult pug_target_build(PugTarget *target) {
   pug_assert_msg(target->build_dir != NULL, "Build directory is not set");
   // Create build directory
   if (!pug__dir_exists(target->build_dir)) {
-    pug_log("Creating build directory '%s'", target->build_dir);
+    pug_info("Creating build directory '%s'", target->build_dir);
     pug__mkdir(target->build_dir);
   }
-  pug_log("Building target '%s'", target->name);
+  // Check pkg-config libs
+  pug__check_pkg_config_libs(target);
   // Build
+  pug_info("Building target '%s'", target->name);
   bool needs_linking = false;
   if (!pug__build_object_files(target, &needs_linking)) return PUG_FAILURE;
   if (needs_linking)
