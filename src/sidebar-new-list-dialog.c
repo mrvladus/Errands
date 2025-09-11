@@ -1,6 +1,6 @@
+#include "sidebar.h"
 #include "state.h"
 #include "vendor/toolbox.h"
-#include "widgets.h"
 
 static void on_response_cb(ErrandsSidebarNewListDialog *dialog, gchar *response, gpointer data);
 static void on_entry_changed_cb(AdwEntryRow *entry);

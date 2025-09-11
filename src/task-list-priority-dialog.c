@@ -1,5 +1,5 @@
 #include "state.h"
-#include "widgets.h"
+#include "task-list.h"
 
 static void on_dialog_close_cb(ErrandsTaskListPriorityDialog *self);
 static void on_toggle_cb(ErrandsTaskListPriorityDialog *self, GtkCheckButton *btn);

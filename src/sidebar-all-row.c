@@ -1,6 +1,6 @@
 #include "data/data.h"
+#include "sidebar.h"
 #include "vendor/toolbox.h"
-#include "widgets.h"
 
 // ---------- WIDGET TEMPLATE ---------- //
 

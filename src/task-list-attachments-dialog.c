@@ -1,5 +1,5 @@
 #include "state.h"
-#include "widgets.h"
+#include "task-list.h"
 
 static void on_dialog_close_cb(ErrandsTaskListAttachmentsDialog *self);
 static void on_add_btn_clicked_cb();

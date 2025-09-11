@@ -1,6 +1,6 @@
 #include "state.h"
+#include "task-list.h"
 #include "utils.h"
-#include "widgets.h"
 
 static void on_dialog_close_cb(ErrandsTaskListColorDialog *self);
 static void on_toggle_cb(ErrandsTaskListColorDialog *self, GtkCheckButton *btn);

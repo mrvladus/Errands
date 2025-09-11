@@ -1,8 +1,7 @@
+#include "task-list.h"
 #include "data/data.h"
-#include "glib.h"
 #include "state.h"
 #include "utils.h"
-#include "widgets.h"
 
 #include "vendor/toolbox.h"
 

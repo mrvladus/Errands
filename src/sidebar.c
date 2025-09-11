@@ -1,8 +1,8 @@
+#include "sidebar.h"
 #include "data/data.h"
 #include "settings.h"
 #include "state.h"
 #include "utils.h"
-#include "widgets.h"
 
 #include <glib/gi18n.h>
 

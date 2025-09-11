@@ -1,6 +1,6 @@
 #include "data/data.h"
+#include "task-list.h"
 #include "vendor/toolbox.h"
-#include "widgets.h"
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>

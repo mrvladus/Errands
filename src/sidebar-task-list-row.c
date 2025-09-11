@@ -1,9 +1,9 @@
 #include "data/data.h"
 #include "settings.h"
+#include "sidebar.h"
 #include "state.h"
 #include "utils.h"
 #include "vendor/toolbox.h"
-#include "widgets.h"
 
 #include <libical/ical.h>
 

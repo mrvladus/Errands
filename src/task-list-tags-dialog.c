@@ -1,7 +1,7 @@
 #include "settings.h"
 #include "state.h"
+#include "task-list.h"
 #include "utils.h"
-#include "widgets.h"
 
 static void on_dialog_close_cb(ErrandsTaskListTagsDialog *self);
 static void on_entry_activated_cb(ErrandsTaskListTagsDialog *self, AdwEntryRow *entry);

@@ -1,6 +1,6 @@
 #include "state.h"
+#include "task-list.h"
 #include "vendor/toolbox.h"
-#include "widgets.h"
 
 #define HOEDOWN_IMPLEMENTATION
 #include "vendor/hoedown.h"

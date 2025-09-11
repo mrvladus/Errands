@@ -1,6 +1,6 @@
 #include "data/data.h"
 #include "state.h"
-#include "widgets.h"
+#include "task-list.h"
 
 static void on_delete_cb(ErrandsTaskListAttachmentsDialogAttachment *self, GtkButton *btn);
 

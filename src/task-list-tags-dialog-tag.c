@@ -1,6 +1,6 @@
 #include "data/data.h"
 #include "settings.h"
-#include "widgets.h"
+#include "task-list.h"
 
 static void on_toggle_cb(ErrandsTaskListTagsDialogTag *self, GtkCheckButton *btn);
 static void on_delete_cb(ErrandsTaskListTagsDialogTag *self, GtkButton *btn);

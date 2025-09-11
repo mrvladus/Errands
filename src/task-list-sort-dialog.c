@@ -1,6 +1,6 @@
 #include "settings.h"
 #include "state.h"
-#include "widgets.h"
+#include "task-list.h"
 
 static void on_dialog_close_cb();
 static void on_show_completed_toggle_cb(AdwSwitchRow *row);

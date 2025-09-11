@@ -1,8 +1,8 @@
+#include "window.h"
 #include "data/data.h"
 #include "settings.h"
 #include "state.h"
 #include "vendor/toolbox.h"
-#include "widgets.h"
 
 static void on_size_changed_cb(ErrandsWindow *win);
 static void on_maximize_changed_cb(ErrandsWindow *win);

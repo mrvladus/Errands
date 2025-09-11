@@ -1,11 +1,7 @@
+#include "task.h"
 #include "data/data.h"
-#include "gio/gio.h"
-#include "glib-object.h"
-#include "glib.h"
-#include "gtk/gtk.h"
 #include "state.h"
 #include "utils.h"
-#include "widgets.h"
 
 #include "vendor/toolbox.h"
 

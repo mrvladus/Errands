@@ -1,6 +1,6 @@
+#include "sidebar.h"
 #include "state.h"
 #include "utils.h"
-#include "widgets.h"
 
 static void on_response_cb(ErrandsSidebarDeleteListDialog *dialog, gchar *response, gpointer data);
 
