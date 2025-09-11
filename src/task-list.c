@@ -80,7 +80,7 @@ ErrandsTaskList *errands_task_list_new() { return g_object_new(ERRANDS_TYPE_TASK
 
 void setup_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item) {
   GtkTreeExpander *expander = g_object_new(GTK_TYPE_TREE_EXPANDER, "child", errands_task_new(), "margin-top", 3,
-                                           "margin-bottom", 3, "focusable", false, NULL);
+                                           "margin-bottom", 3, "hide-expander", true, "indent-for-icon", false, NULL);
   gtk_list_item_set_child(list_item, GTK_WIDGET(expander));
 }
 
@@ -101,8 +101,6 @@ void bind_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item) {
   errands_task_set_data(task, task_data);
   // Set the row on the expander
   gtk_tree_expander_set_list_row(expander, row); // create_child_model_func is called here
-  gtk_tree_expander_set_hide_expander(expander, true);
-  gtk_tree_expander_set_indent_for_icon(expander, false);
   // Expand row
   bool expanded = errands_data_get_bool(task_data, DATA_PROP_EXPANDED);
   bool is_expandable = gtk_tree_list_row_is_expandable(row);
