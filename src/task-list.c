@@ -1,5 +1,7 @@
 #include "task-list.h"
 #include "data/data.h"
+#include "gio/gio.h"
+#include "gtk/gtk.h"
 #include "state.h"
 #include "utils.h"
 
@@ -92,7 +94,6 @@ void bind_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item) {
   GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_list_item_get_child(list_item));
   ErrandsTask *task = ERRANDS_TASK(gtk_tree_expander_get_child(expander));
   g_object_set_data(G_OBJECT(task), "model-item", model_item);
-  g_object_set_data(G_OBJECT(task), "row", row);
   // Set task widget so we can access it in on_list_view_activate()
   g_object_set_data(G_OBJECT(model_item), "task", task);
   // Set the task data
@@ -100,6 +101,8 @@ void bind_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item) {
   errands_task_set_data(task, task_data);
   // Set the row on the expander
   gtk_tree_expander_set_list_row(expander, row); // create_child_model_func is called here
+  gtk_tree_expander_set_hide_expander(expander, true);
+  gtk_tree_expander_set_indent_for_icon(expander, false);
   // Expand row
   bool expanded = errands_data_get_bool(task_data, DATA_PROP_EXPANDED);
   bool is_expandable = gtk_tree_list_row_is_expandable(row);

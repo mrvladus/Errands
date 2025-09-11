@@ -197,8 +197,11 @@
 listview {
     background-color: transparent;
 }
+
 listview row {
-    border-radius: 12px;
+    padding: 0px 4px;
+    margin: 2px 0px;
+    border-radius: 14px;
 }
 
 colorbutton button {
