@@ -1,3 +1,59 @@
+/*
+
+LICENSE:
+
+SPDX-License-Identifier: Zlib
+
+Copyright (c) 2025 Vlad Krupinskii <mrvladus@yandex.ru>
+
+This software is provided 'as-is', without any express or implied
+warranty. In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not
+   claim that you wrote the original software. If you use this software
+   in a product, an acknowledgment in the product documentation would be
+   appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be
+   misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+
+DESCRIPTION:
+
+    pug.h is a simple build system designed for C/C++ projects.
+    It consists of a single stb-style header file that you can copy into your project.
+    It requires **only** a C compiler to build itself, making it portable, lightweight and straightforward to use.
+
+USAGE:
+
+    // Define PUG_IMPLEMENTATION in ONE file to include the functions implementation.
+    #define PUG_IMPLEMENTATION
+    #include "pug.h"
+
+    int main(int argc, char **argv) {
+        // Initialize PUG library.
+        // This will auto-rebuild this file if it changes and enable parsing of command line arguments.
+        pug_init(argc, argv);
+
+        // Create target for your executable with name, target type and build directory.
+        // Build directory will be created if it doesn't exist.
+        PugTarget hello_bin = pug_target_new("hello", PUG_TARGET_TYPE_EXECUTABLE, "build");
+        // Add sources files.
+        pug_target_add_source(&hello_bin, "src/main.c");
+        // Add compiler flags.
+        pug_target_add_cflags(&hello_bin, "-Wall", "-Wextra");
+        // Build target executable.
+        if(!pug_target_build(&hello_bin)) return 1;
+
+        return 0;
+    }
+
+*/
+
 #ifndef PUG_H
 #define PUG_H
 
