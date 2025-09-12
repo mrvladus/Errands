@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <time.h>
 
 // -------------------- LOG AND DEBUG -------------------- //
@@ -104,6 +105,16 @@ When buffer is full - start override buffer from the beginning.
 
 const char *tb_tmp_str_printf(const char *format, ...);
 
+// -------------------- FILE FUNCTIONS -------------------- //
+
+bool tb_file_exists(const char *path);
+
+bool tb_dir_exists(const char *path);
+
+char *tb_read_file_to_string(const char *path);
+
+void tb_write_string_to_file(const char *path, const char *str);
+
 // -------------------- PATH FUNCTIONS -------------------- //
 
 // Get path base name. e. g. "/home/user/file.txt" -> "file.txt".
@@ -118,9 +129,53 @@ const char *tb_path_ext(const char *path);
 
 bool tb_str_contains(const char *str, const char *sub_str);
 
+// -------------------- TIME FUNCTIONS -------------------- //
+
+time_t tb_time_now();
+
 #endif // TOOLBOX_H
 
 #ifdef TOOLBOX_IMPLEMENTATION
+
+// -------------------- FILE FUNCTIONS -------------------- //
+
+bool tb_file_exists(const char *path) {
+  FILE *file = fopen(path, "r");
+  if (file) {
+    fclose(file);
+    return true;
+  }
+  return false;
+}
+
+bool tb_dir_exists(const char *path) {
+  struct stat statbuf;
+  return (stat(path, &statbuf) == 0 && S_ISDIR(statbuf.st_mode));
+}
+
+char *tb_read_file_to_string(const char *path) {
+  FILE *file = fopen(path, "r"); // Open the file in read mode
+  if (!file) {
+    tb_log("Could not open file '%s'", path); // Print error if file cannot be opened
+    return NULL;
+  }
+  fseek(file, 0, SEEK_END);
+  long file_size = ftell(file);
+  fseek(file, 0, SEEK_SET);
+  char *buf = (char *)malloc(file_size + 1);
+  fread(buf, 1, file_size, file);
+  buf[file_size] = '\0';
+  fclose(file);
+  return buf;
+}
+
+void tb_write_string_to_file(const char *path, const char *str) {
+  FILE *file = fopen(path, "w");
+  if (file) {
+    fprintf(file, "%s", str);
+    fclose(file);
+  }
+}
 
 // -------------------- LOG AND DEBUG -------------------- //
 
@@ -176,5 +231,9 @@ const char *tb_path_ext(const char *path) {
 // -------------------- STRING FUNCTIONS -------------------- //
 
 bool tb_str_contains(const char *str, const char *sub_str) { return strstr(str, sub_str) != NULL; }
+
+// -------------------- TIME FUNCTIONS -------------------- //
+
+time_t tb_time_now() { return time(NULL); }
 
 #endif // TOOLBOX_IMPLEMENTATION

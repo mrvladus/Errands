@@ -9,9 +9,6 @@
 #include <sys/stat.h>
 #include <time.h>
 
-// Log formatted message
-#define ERROR(format, ...) fprintf(stderr, "\033[1;31m[Errands Error] " format "\033[0m\n", ##__VA_ARGS__)
-
 // For range from start to end - 1
 #define for_range(var, start, end) for (int var = start; var < end; var++)
 
@@ -93,9 +90,8 @@ static inline void errands_add_shortcut(GtkWidget *widget, const char *trigger, 
 }
 
 static inline void generate_uuid(char *uuid) {
-  gchar *uid = g_uuid_string_random();
+  g_autofree gchar *uid = g_uuid_string_random();
   strcpy(uuid, uid);
-  g_free(uid);
 }
 
 static inline void g_ptr_array_move_before(GPtrArray *array, gpointer element, gpointer target) {
@@ -154,142 +150,6 @@ static inline void g_ptr_array_move_after(GPtrArray *array, gpointer element, gp
 
   // Insert the element after the target
   g_ptr_array_insert(array, target_index + 1, temp);
-}
-
-static inline const char *get_date_time() {
-  static char out[17];
-  g_autoptr(GDateTime) dt = g_date_time_new_now_local();
-  g_autofree gchar *tmp = g_date_time_format(dt, "%Y%m%dT%H%M%SZ");
-  strcpy(out, tmp);
-  return out;
-}
-
-static inline char *get_today_date() {
-  GDateTime *dt = g_date_time_new_now_local();
-  static char date[9];
-  char *tmp = g_date_time_format(dt, "%Y%m%d");
-  strcpy(date, tmp);
-  g_free(tmp);
-  g_date_time_unref(dt);
-  return date;
-}
-
-// Helper function to parse the due date into a GDateTime
-static inline GDateTime *parse_date(const char *date) {
-  if (!date) return NULL;
-  if (strlen(date) == 8) { // Format: "YYYYMMDD"
-    char year[5], month[3], day[3];
-    strncpy(year, date, 4);
-    strncpy(month, date + 4, 2);
-    strncpy(day, date + 6, 2);
-    year[4] = '\0';
-    month[2] = '\0';
-    day[2] = '\0';
-    char dt[17];
-    sprintf(dt, "%s%s%sT000000Z", year, month, day);
-    return g_date_time_new_from_iso8601(dt, NULL);
-  } else if (strlen(date) == 16) { // Format: "YYYYMMDDTHHMMSSZ"
-    return g_date_time_new_from_iso8601(date, NULL);
-  }
-  return NULL;
-}
-
-static inline char *read_file_to_string(const char *path) {
-  FILE *file = fopen(path, "r"); // Open the file in read mode
-  if (!file) {
-    tb_log("Could not open file"); // Print error if file cannot be opened
-    return NULL;
-  }
-  // Move the file pointer to the end of the file to get the size
-  fseek(file, 0, SEEK_END);
-  long file_size = ftell(file); // Get the current position (file size)
-  fseek(file, 0, SEEK_SET);     // Move back to the beginning of the file
-  // Allocate memory for the string (+1 for the null terminator)
-  char *buf = (char *)malloc(file_size + 1);
-  fread(buf, 1, file_size, file);
-  buf[file_size] = '\0'; // Null-terminate the string
-  fclose(file);
-  return buf;
-}
-
-static inline void write_string_to_file(const char *path, const char *str) {
-  FILE *file = fopen(path, "w");
-  if (file) {
-    fprintf(file, "%s", str);
-    fclose(file);
-  }
-}
-
-static inline bool file_exists(const char *filename) {
-  FILE *file = fopen(filename, "r");
-  if (file) {
-    fclose(file);
-    return true;
-  }
-  return false;
-}
-
-static inline bool directory_exists(const char *path) {
-  struct stat statbuf;
-  return (stat(path, &statbuf) == 0 && S_ISDIR(statbuf.st_mode));
-}
-
-// ---------- ICAL ---------- //
-
-static inline char *get_rrule_value(const char *rrule, const char *key) {
-  const char *value_start = strstr(rrule, key);
-  if (!value_start) return NULL;
-  value_start += strlen(key) + 1;
-  const char *value_end = strchr(value_start, ';');
-  if (!value_end) return NULL;
-  int length = value_end - value_start;
-  char *out = malloc(length);
-  out[length] = '\0';
-  strncpy(out, value_start, length);
-  return out;
-}
-
-static inline char *get_ical_value(const char *ical, const char *key) {
-  const char *val_start = strstr(ical, key);
-  if (!val_start) return NULL;
-  val_start += strlen(key) + 1;
-  const char *val_end = strchr(val_start, '\n');
-  if (!val_end) return NULL;
-  const int val_len = val_end - val_start;
-  char *value = malloc(val_len);
-  value[val_len] = '\0';
-  strncpy(value, val_start, val_len);
-  return value;
-}
-
-static inline GPtrArray *get_vtodos(const char *ical) {
-  GPtrArray *vtodo_array = g_ptr_array_new();
-  const char *vtodo_start = "BEGIN:VTODO";
-  const char *vtodo_end = "END:VTODO";
-  const char *current_pos = ical;
-  while ((current_pos = strstr(current_pos, vtodo_start)) != NULL) {
-    const char *end_pos = strstr(current_pos, vtodo_end);
-    if (end_pos == NULL) {
-      break; // No matching END found
-    }
-    // Calculate the length of the VTODO entry
-    size_t vtodo_length = end_pos + strlen(vtodo_end) - current_pos;
-    // Allocate memory for the VTODO string
-    char *vtodo_entry = (char *)malloc(vtodo_length + 1);
-    if (vtodo_entry == NULL) {
-      g_ptr_array_free(vtodo_array, TRUE);
-      return NULL; // Memory allocation failed
-    }
-    // Copy the VTODO entry into the allocated memory
-    strncpy(vtodo_entry, current_pos, vtodo_length);
-    vtodo_entry[vtodo_length] = '\0'; // Null-terminate the string
-    // Add the VTODO entry to the GPtrArray
-    g_ptr_array_add(vtodo_array, vtodo_entry);
-    // Move the current position past the end of the current VTODO entry
-    current_pos = end_pos + strlen(vtodo_end);
-  }
-
-  return vtodo_array;
 }
 
 static inline int *string_to_int_array(const char *str) {

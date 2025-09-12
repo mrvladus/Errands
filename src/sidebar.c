@@ -100,7 +100,7 @@ static void __on_open_finish(GObject *obj, GAsyncResult *res, ErrandsSidebar *sb
   g_autoptr(GFile) file = gtk_file_dialog_open_finish(GTK_FILE_DIALOG(obj), res, NULL);
   if (!file) return;
   g_autofree gchar *path = g_file_get_path(file);
-  char *ical = read_file_to_string(path);
+  char *ical = tb_read_file_to_string(path);
   if (ical) {
     g_autofree gchar *basename = g_file_get_basename(file);
     *(strrchr(basename, '.')) = '\0';

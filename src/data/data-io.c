@@ -124,7 +124,7 @@ static void errands_data_migrate_from_46() {
 
 void errands_data_load_lists() {
   user_dir = g_build_filename(g_get_user_data_dir(), "errands", NULL);
-  if (!directory_exists(user_dir)) {
+  if (!tb_dir_exists(user_dir)) {
     tb_log("User Data: Creating user data directory at %s", user_dir);
     g_mkdir_with_parents(user_dir, 0755);
   }
@@ -139,7 +139,7 @@ void errands_data_load_lists() {
     char *is_ics = strstr(filename, ".ics");
     if (is_ics) {
       g_autofree gchar *path = g_build_filename(user_dir, filename, NULL);
-      g_autofree gchar *content = read_file_to_string(path);
+      g_autofree gchar *content = tb_read_file_to_string(path);
       if (content) {
         tb_log("User Data: Loading calendar %s", path);
         icalcomponent *calendar = icalparser_parse_string(content);

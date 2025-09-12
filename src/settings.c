@@ -40,7 +40,7 @@ void errands_settings_load_default() {
 
 void errands_settings_load_user() {
   tb_log("Settings: Load user configuration");
-  char *json = read_file_to_string(settings_path);
+  char *json = tb_read_file_to_string(settings_path);
   if (!json) return;
   JSON *json_parsed = json_parse(json);
   if (!json_parsed) return;

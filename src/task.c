@@ -1,5 +1,9 @@
 #include "task.h"
 #include "data/data.h"
+#include "gio/gio.h"
+#include "glib-object.h"
+#include "glib.h"
+#include "gtk/gtk.h"
 #include "state.h"
 #include "utils.h"
 
@@ -7,6 +11,7 @@
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>
+#include <stdbool.h>
 
 static void on_complete_btn_toggle_cb(GtkCheckButton *btn, ErrandsTask *task);
 static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointer user_data);
@@ -129,31 +134,43 @@ void errands_task_set_data(ErrandsTask *self, TaskData *data) {
 }
 
 void errands_task_update_accent_color(ErrandsTask *task) {
+  if (!task) return;
   const char *color = errands_data_get_str(task->data, DATA_PROP_COLOR);
   if (!g_str_equal(color, "none")) {
-    const char *accent_style = tb_tmp_str_printf("task-%s", color);
-    gtk_widget_set_css_classes(GTK_WIDGET(task), (const char *[]){"card", accent_style, NULL});
+    const char *card_style = tb_tmp_str_printf("task-%s", color);
+    const char *progress_style = tb_tmp_str_printf("progressbar-%s", color);
+    const char *check_style = tb_tmp_str_printf("checkbtn-%s", color);
+    gtk_widget_set_css_classes(GTK_WIDGET(task), (const char *[]){"card", card_style, NULL});
+    gtk_widget_set_css_classes(GTK_WIDGET(task->complete_btn), (const char *[]){"selection-mode", check_style, NULL});
+    gtk_widget_set_css_classes(GTK_WIDGET(task->progress_bar),
+                               (const char *[]){"osd", "horizontal", progress_style, NULL});
   } else {
     gtk_widget_set_css_classes(GTK_WIDGET(task), (const char *[]){"card", NULL});
+    gtk_widget_set_css_classes(GTK_WIDGET(task->complete_btn), (const char *[]){"selection-mode", NULL});
+    gtk_widget_set_css_classes(GTK_WIDGET(task->progress_bar), (const char *[]){"osd", "horizontal", NULL});
   }
 }
 
 void errands_task_update_progress(ErrandsTask *task) {
-  // GPtrArray *sub_tasks = get_children(task->task_list);
-  // size_t total = 0;
-  // size_t completed = 0;
-  // for (size_t i = 0; i < sub_tasks->len; i++) {
-  //   ErrandsTask *sub_task = sub_tasks->pdata[i];
-  //   TaskData *td = sub_task->data;
-  //   if (!errands_data_get_bool(td, DATA_PROP_DELETED) && !errands_data_get_bool(td, DATA_PROP_TRASH)) {
-  //     total++;
-  //     if (!icaltime_is_null_time(errands_data_get_time(td, DATA_PROP_COMPLETED_TIME))) completed++;
-  //   }
-  // }
-  // gtk_revealer_set_reveal_child(GTK_REVEALER(task->progress_revealer), total > 0);
-  // gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(task->progress_bar), total > 0 ? (float)completed / (float)total :
-  // 0);
+  if (!task) return;
+  GObject *model_item = g_object_get_data(G_OBJECT(task), "model-item");
+  if (!model_item) return;
+  GListModel *model = g_object_get_data(model_item, "children-model");
+  if (!model) return;
+  size_t total = 0;
+  size_t completed = 0;
+  for (size_t i = 0; i < g_list_model_get_n_items(model); ++i) {
+    GObject *item = g_list_model_get_item(model, i);
+    TaskData *td = g_object_get_data(item, "data");
+    if (!errands_data_get_bool(td, DATA_PROP_DELETED) && !errands_data_get_bool(td, DATA_PROP_TRASH)) {
+      total++;
+      if (!icaltime_is_null_time(errands_data_get_time(td, DATA_PROP_COMPLETED_TIME))) completed++;
+    }
+  }
+  gtk_revealer_set_reveal_child(GTK_REVEALER(task->progress_revealer), total > 0);
+  gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(task->progress_bar), total > 0 ? (float)completed / (float)total : 0);
 
+  // TB_LOG_DEBUG("Task '%s' %d/%d", errands_data_get_str(task->data, DATA_PROP_TEXT), completed, total);
   // // Set sub-title
   // // if (total == 0) g_object_set(task->title_row, "subtitle", "", NULL);
   // // else {
@@ -253,6 +270,17 @@ GPtrArray *errands_task_get_parents(ErrandsTask *task) {
 
 // ---------- PRIVATE FUNCTIONS ---------- //
 
+static ErrandsTask *get_parent_task(ErrandsTask *task) {
+  GtkTreeListRow *row = g_object_get_data(G_OBJECT(task), "row");
+  if (!row) return NULL;
+  GtkTreeListRow *parent_row = gtk_tree_list_row_get_parent(row);
+  if (!parent_row) return NULL;
+  GObject *model_item = gtk_tree_list_row_get_item(parent_row);
+  if (!model_item) return NULL;
+  ErrandsTask *parent_task = g_object_get_data(model_item, "task");
+  return parent_task;
+}
+
 // --- TAGS --- //
 
 static void errands_task_tag_delete(GtkWidget *label) {
@@ -307,8 +335,12 @@ const char *errands_task_as_str(ErrandsTask *task) {
 
 static void on_complete_btn_toggle_cb(GtkCheckButton *btn, ErrandsTask *task) {
   tb_log("Toggle completion '%s'", errands_data_get_str(task->data, DATA_PROP_UID));
-  // errands_data_set_str(task->data, DATA_PROP_COMPLETED, gtk_check_button_get_active(btn) ? get_date_time() : NULL);
-  // errands_data_write_list(state.main_window->task_list->data);
+  bool active = gtk_check_button_get_active(btn);
+  errands_data_set_time(task->data, DATA_PROP_COMPLETED_TIME,
+                        active ? icaltime_get_date_time_now() : icaltime_null_time());
+  errands_data_write_list(state.main_window->task_list->data);
+
+  errands_task_update_progress(get_parent_task(task));
 
   // GtkWidget *task_list;
   // if (!strcmp(errands_data_get_str(task->data, DATA_PROP_PARENT), "")) task_list =
@@ -404,6 +436,7 @@ static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *task) {
   gtk_editable_set_text(GTK_EDITABLE(entry), "");
   tb_log("Task '%s': Add sub-task '%s'", errands_data_get_str(task->data, DATA_PROP_UID),
          errands_data_get_str(new_td, DATA_PROP_UID));
+  errands_task_update_progress(task);
 }
 
 static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x, gdouble y, GtkPopover *popover) {

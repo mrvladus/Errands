@@ -1,7 +1,5 @@
 #include "task-list.h"
 #include "data/data.h"
-#include "gio/gio.h"
-#include "gtk/gtk.h"
 #include "state.h"
 #include "utils.h"
 
@@ -9,6 +7,7 @@
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>
+
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -92,15 +91,16 @@ void bind_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item) {
   if (!model_item) return;
   // Get the expander and its child task widget
   GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_list_item_get_child(list_item));
+  // Set the row on the expander
+  gtk_tree_expander_set_list_row(expander, row); // create_child_model_func is called here
   ErrandsTask *task = ERRANDS_TASK(gtk_tree_expander_get_child(expander));
   g_object_set_data(G_OBJECT(task), "model-item", model_item);
+  g_object_set_data(G_OBJECT(task), "row", row);
   // Set task widget so we can access it in on_list_view_activate()
   g_object_set_data(G_OBJECT(model_item), "task", task);
   // Set the task data
   TaskData *task_data = g_object_get_data(model_item, "data");
   errands_task_set_data(task, task_data);
-  // Set the row on the expander
-  gtk_tree_expander_set_list_row(expander, row); // create_child_model_func is called here
   // Expand row
   bool expanded = errands_data_get_bool(task_data, DATA_PROP_EXPANDED);
   bool is_expandable = gtk_tree_list_row_is_expandable(row);
@@ -130,18 +130,14 @@ static GListModel *create_child_model_func(gpointer item, gpointer user_data) {
   // Check if we already created and cached a child model
   GListModel *cached = g_object_get_data(G_OBJECT(item), "children-model");
   if (cached) return g_object_ref(cached);
-
   TaskData *parent_data = g_object_get_data(G_OBJECT(item), "data");
   if (!parent_data) return NULL;
-
   const char *parent_uid = errands_data_get_str(parent_data, DATA_PROP_UID);
   if (!parent_uid) return NULL;
-
   // Build child store
   GListStore *children_store = g_list_store_new(G_TYPE_OBJECT);
   GPtrArray *all_tasks = g_hash_table_get_values_as_ptr_array(tdata);
   size_t children_n = 0;
-
   for (size_t i = 0; i < all_tasks->len; i++) {
     TaskData *task = all_tasks->pdata[i];
     const char *task_parent = errands_data_get_str(task, DATA_PROP_PARENT);
@@ -153,18 +149,8 @@ static GListModel *create_child_model_func(gpointer item, gpointer user_data) {
     }
   }
   g_ptr_array_free(all_tasks, false);
-
-  // if (children_n == 0) {
-  //   g_object_unref(children_store);
-  //   return NULL;
-  // }
-
   // Cache the model on the item
   g_object_set_data_full(G_OBJECT(item), "children-model", children_store, g_object_unref);
-
-  tb_log("Created sub-tasks model with %zu sub-tasks for %s", children_n,
-         errands_data_get_str(parent_data, DATA_PROP_TEXT));
-
   return G_LIST_MODEL(g_object_ref(children_store));
 }
 
