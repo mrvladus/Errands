@@ -355,11 +355,11 @@ static void on_complete_btn_toggle_cb(GtkCheckButton *btn, ErrandsTask *task) {
         }
     } else {
       // Un-check parent task
-      GtkTreeListRow *parent_row = gtk_tree_list_row_get_parent(row);
-      GObject *item = gtk_tree_list_row_get_item(parent_row);
-      ErrandsTask *parent_task = g_object_get_data(item, "task");
-      bool btn_active = gtk_check_button_get_active(GTK_CHECK_BUTTON(parent_task->complete_btn));
-      if (btn_active) gtk_check_button_set_active(GTK_CHECK_BUTTON(parent_task->complete_btn), false);
+      ErrandsTask *parent_task = get_parent_task(task);
+      if (parent_task) {
+        bool btn_active = gtk_check_button_get_active(GTK_CHECK_BUTTON(parent_task->complete_btn));
+        if (btn_active) gtk_check_button_set_active(GTK_CHECK_BUTTON(parent_task->complete_btn), false);
+      }
     }
   }
   // Update progressbar of the parent task
