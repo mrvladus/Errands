@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #define PUG_IMPLEMENTATION
 #include "pug.h"
 
@@ -21,6 +22,10 @@ static bool build_libcaldav() {
 
   // CFLAGS
   pug_target_add_cflags(&libcaldav, "-Wall");
+  if (!pug_arg_bool("debug")) pug_target_add_cflags(&libcaldav, "-O3", "-flto=auto");
+
+  // LDFLAGS
+  if (!pug_arg_bool("debug")) pug_target_add_ldflags(&libcaldav, "-O3", "-flto=auto");
 
   // pkg-config libraries
   pug_target_add_pkg_config_lib(&libcaldav, "libcurl");
@@ -97,9 +102,11 @@ static bool build_errands() {
   pug_target_add_cflag(&errands, PUG_CFLAG_DEFINE_STR(APP_ID));
   pug_target_add_cflag(&errands, PUG_CFLAG_DEFINE_STR(VERSION));
   pug_target_add_cflag(&errands, PUG_CFLAG_DEFINE_STR(LOCALE_DIR));
+  if (!pug_arg_bool("debug")) pug_target_add_cflags(&errands, "-O3", "-flto=auto");
 
   // LDFLAGS
   pug_target_add_ldflags(&errands, PUG_LDFLAG_LIB_DIR(BUILD_DIR), PUG_LDFLAG_LIB("caldav"));
+  if (!pug_arg_bool("debug")) pug_target_add_ldflags(&errands, "-O3", "-flto=auto");
 
   // pkg-config libraries
   pug_target_add_pkg_config_lib(&errands, "gtksourceview-5");
@@ -111,6 +118,8 @@ static bool build_errands() {
 
   return pug_target_build(&errands);
 }
+
+bool install() { return true; }
 
 int main(int argc, char **argv) {
   pug_init(argc, argv);
@@ -124,6 +133,9 @@ int main(int argc, char **argv) {
   if (!build_libcaldav()) return 1;
   if (!compile_resources()) return 1;
   if (!build_errands()) return 1;
+
+  // Install if `install` argument provided
+  if (pug_arg_bool("install")) return install();
 
   // Run if `run` argument provided
   if (pug_arg_bool("run")) pug_cmd(BUILD_DIR "/" BIN_NAME);
