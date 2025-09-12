@@ -106,7 +106,6 @@ void errands_sidebar_task_list_row_update_counter(ErrandsSidebarTaskListRow *row
   sprintf(num, "%zu", c);
   gtk_label_set_label(GTK_LABEL(row->counter), c > 0 ? num : "");
   g_ptr_array_free(tasks, false);
-  tb_log("Sidebar Task List Row: Updated counter '%s'", num);
 }
 
 void errands_sidebar_task_list_row_update_title(ErrandsSidebarTaskListRow *row) {

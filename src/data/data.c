@@ -1,6 +1,7 @@
 #include "data.h"
 #include "../utils.h"
 #include "glib-object.h"
+#include "glib.h"
 
 GHashTable *ldata = NULL;
 GHashTable *tdata = NULL;
@@ -84,11 +85,23 @@ GPtrArray *task_data_get_children(TaskData *data) {
   ListData *list = task_data_get_list(data);
   GPtrArray *tasks = list_data_get_tasks(list);
   GPtrArray *children = g_ptr_array_new();
-  for (size_t i = 0; i < tasks->len; i++)
-    if (!strcmp(uid, errands_data_get_str(tasks->pdata[i], DATA_PROP_PARENT)))
-      g_ptr_array_add(children, tasks->pdata[i]);
+  for (size_t i = 0; i < tasks->len; i++) {
+    TaskData *td = tasks->pdata[i];
+    const char *parent_uid = errands_data_get_str(td, DATA_PROP_PARENT);
+    if (parent_uid && g_str_equal(uid, parent_uid)) g_ptr_array_add(children, td);
+  }
   g_ptr_array_free(tasks, false);
   return children;
+}
+
+void task_data_get_sub_tasks_tree(TaskData *data, GPtrArray *arr) {
+  GPtrArray *sub_tasks = task_data_get_children(data);
+  for (size_t i = 0; i < sub_tasks->len; i++) {
+    TaskData *child = sub_tasks->pdata[i];
+    g_ptr_array_add(arr, child);
+    task_data_get_sub_tasks_tree(child, arr);
+  }
+  g_ptr_array_free(sub_tasks, false);
 }
 
 void task_data_print(TaskData *data, GString *out, size_t indent) {

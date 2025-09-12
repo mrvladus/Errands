@@ -40,6 +40,5 @@ void errands_task_update_accent_color(ErrandsTask *task);
 void errands_task_update_progress(ErrandsTask *task);
 void errands_task_update_tags(ErrandsTask *task);
 void errands_task_update_toolbar(ErrandsTask *task);
-GPtrArray *errands_task_get_parents(ErrandsTask *task);
-GPtrArray *errands_task_get_sub_tasks(ErrandsTask *task);
+void errands_task_get_sub_tasks_tree(ErrandsTask *task, GPtrArray *array);
 const char *errands_task_as_str(ErrandsTask *task);

@@ -12,7 +12,6 @@
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>
-#include <stdbool.h>
 
 static void on_complete_btn_toggle_cb(GtkCheckButton *btn, ErrandsTask *task);
 static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointer user_data);
@@ -243,30 +242,20 @@ void errands_task_update_toolbar(ErrandsTask *task) {
     gtk_widget_add_css_class(task->date_btn, "error");
 }
 
-static void __append_sub_tasks(GPtrArray *arr, ErrandsTask *task) {
-  // GPtrArray *sub_tasks = get_children(task->task_list);
-  // for (size_t i = 0; i < sub_tasks->len; i++) {
-  //   ErrandsTask *t = sub_tasks->pdata[i];
-  //   g_ptr_array_add(arr, t);
-  //   __append_sub_tasks(arr, t);
-  // }
-}
-
-GPtrArray *errands_task_get_sub_tasks(ErrandsTask *task) {
-  GPtrArray *arr = g_ptr_array_new();
-  __append_sub_tasks(arr, task);
-  return arr;
-}
-
-GPtrArray *errands_task_get_parents(ErrandsTask *task) {
-  GPtrArray *parents = g_ptr_array_new();
-  ErrandsTask *parent =
-      ERRANDS_TASK(gtk_widget_get_ancestor(gtk_widget_get_parent(GTK_WIDGET(task)), ERRANDS_TYPE_TASK));
-  while (parent) {
-    g_ptr_array_add(parents, parent);
-    parent = ERRANDS_TASK(gtk_widget_get_ancestor(gtk_widget_get_parent(GTK_WIDGET(parent)), ERRANDS_TYPE_TASK));
+void errands_task_get_sub_tasks_tree(ErrandsTask *task, GPtrArray *array) {
+  GtkTreeListRow *row = g_object_get_data(G_OBJECT(task), "row");
+  if (!row) return;
+  GListModel *children = gtk_tree_list_row_get_children(row);
+  if (!children) return;
+  for (size_t i = 0; i < g_list_model_get_n_items(children); ++i) {
+    GObject *item = g_list_model_get_item(children, i);
+    ErrandsTask *sub_task = g_object_get_data(item, "task");
+    GtkTreeListRow *sub_row = g_object_get_data(G_OBJECT(sub_task), "row");
+    if (sub_row) {
+      g_ptr_array_add(array, sub_task);
+      errands_task_get_sub_tasks_tree(sub_task, array);
+    }
   }
-  return parents;
 }
 
 // ---------- PRIVATE FUNCTIONS ---------- //
@@ -280,6 +269,14 @@ static ErrandsTask *get_parent_task(ErrandsTask *task) {
   if (!model_item) return NULL;
   ErrandsTask *parent_task = g_object_get_data(model_item, "task");
   return parent_task;
+}
+
+static void errands_task_get_parents(ErrandsTask *task, GPtrArray *array) {
+  ErrandsTask *parent = get_parent_task(task);
+  if (parent) {
+    g_ptr_array_add(array, parent);
+    errands_task_get_parents(parent, array);
+  }
 }
 
 // --- TAGS --- //
@@ -334,39 +331,50 @@ const char *errands_task_as_str(ErrandsTask *task) {
 
 // ---------- CALLBACKS ---------- //
 
+// NOTE: maybe this function is not optimized, but it always been the case.
+// Maybe need to look into it more.
 static void on_complete_btn_toggle_cb(GtkCheckButton *btn, ErrandsTask *task) {
   tb_log("Toggle completion '%s'", errands_data_get_str(task->data, DATA_PROP_UID));
   bool active = gtk_check_button_get_active(btn);
-  // Set data
   errands_data_set_time(task->data, DATA_PROP_COMPLETED_TIME,
                         active ? icaltime_get_date_time_now() : icaltime_null_time());
-  errands_data_write_list(state.main_window->task_list->data);
-  GtkTreeListRow *row = g_object_get_data(G_OBJECT(task), "row");
-  if (row) {
-    if (active) {
-      // Complete all sub-tasks if task is completed
-      GListModel *sub_tasks_model = gtk_tree_list_row_get_children(row);
-      if (sub_tasks_model)
-        for (size_t i = 0; i < g_list_model_get_n_items(sub_tasks_model); ++i) {
-          GObject *item = g_list_model_get_item(sub_tasks_model, i);
-          ErrandsTask *sub_task = g_object_get_data(item, "task");
-          bool btn_active = gtk_check_button_get_active(GTK_CHECK_BUTTON(sub_task->complete_btn));
-          if (!btn_active) gtk_check_button_set_active(GTK_CHECK_BUTTON(sub_task->complete_btn), true);
-        }
-    } else {
-      // Un-check parent task
-      ErrandsTask *parent_task = get_parent_task(task);
-      if (parent_task) {
-        bool btn_active = gtk_check_button_get_active(GTK_CHECK_BUTTON(parent_task->complete_btn));
-        if (btn_active) gtk_check_button_set_active(GTK_CHECK_BUTTON(parent_task->complete_btn), false);
-      }
+  // Complete all sub-tasks if checked
+  if (active) {
+    GPtrArray *sub_tasks_tree = g_ptr_array_new();
+    task_data_get_sub_tasks_tree(task->data, sub_tasks_tree);
+    for (size_t i = 0; i < sub_tasks_tree->len; ++i) {
+      TaskData *sub_task_data = sub_tasks_tree->pdata[i];
+      errands_data_set_time(sub_task_data, DATA_PROP_COMPLETED_TIME, icaltime_get_date_time_now());
     }
+    g_ptr_array_free(sub_tasks_tree, false);
+    sub_tasks_tree = g_ptr_array_new();
+    errands_task_get_sub_tasks_tree(task, sub_tasks_tree);
+    for (size_t i = 0; i < sub_tasks_tree->len; ++i) {
+      ErrandsTask *sub_task = sub_tasks_tree->pdata[i];
+      errands_task_set_data(sub_task, sub_task->data);
+    }
+    g_ptr_array_free(sub_tasks_tree, false);
   }
-  // Update progressbar of the parent task
+  // Uncomplete parent tasks if unchecked
+  else {
+    GPtrArray *parents = g_ptr_array_new();
+    errands_task_get_parents(task, parents);
+    for (size_t i = 0; i < parents->len; ++i) {
+      ErrandsTask *parent = parents->pdata[i];
+      bool completed = gtk_check_button_get_active(GTK_CHECK_BUTTON(parent->complete_btn));
+      if (completed) {
+        errands_data_set_time(parent->data, DATA_PROP_COMPLETED_TIME, icaltime_null_time());
+        errands_task_set_data(parent, parent->data);
+      }
+      errands_task_update_progress(parent);
+    }
+    g_ptr_array_free(parents, false);
+  }
+  errands_data_write_list(state.main_window->task_list->data);
+  errands_task_update_progress(task);
   errands_task_update_progress(get_parent_task(task));
 
-  // Sort parent task list by completion
-  // TODO
+  // TODO: Sort parent task list by completion
 
   // Update task list
   errands_task_list_update_title();

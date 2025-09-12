@@ -7,8 +7,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-extern bool errands_data_needs_write;
-
 extern GHashTable *ldata;
 extern GHashTable *tdata;
 
@@ -84,6 +82,7 @@ TaskData *task_data_new(ListData *list, const char *text, const char *parent);
 void task_data_print(TaskData *data, GString *out, size_t indent);
 ListData *task_data_get_list(TaskData *data);
 GPtrArray *task_data_get_children(TaskData *data);
+void task_data_get_sub_tasks_tree(TaskData *data, GPtrArray *arr);
 
 GObject *task_data_as_gobject(TaskData *data);
 

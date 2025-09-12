@@ -43,5 +43,4 @@ void errands_sidebar_all_row_update_counter(ErrandsSidebarAllRow *row) {
   g_snprintf(num, 64, "%zu", len);
   gtk_label_set_label(GTK_LABEL(row->counter), len > 0 ? num : "");
   g_ptr_array_free(tasks, false);
-  tb_log("All Row: Update counter '%zu'", len);
 }

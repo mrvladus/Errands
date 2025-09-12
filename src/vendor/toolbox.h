@@ -88,6 +88,20 @@ void func() {
 #define TB_PROFILE_BLOCK(code_block) code_block
 #endif // TB_ENABLE_PROFILING
 
+// -------------------- DYNAMIC ARRAY OF POINTERS -------------------- //
+
+typedef struct {
+  void **items;
+  size_t size;
+  size_t capacity;
+} tb_ptr_array;
+
+void tb_ptr_array_init(tb_ptr_array *array);
+void tb_ptr_array_free(tb_ptr_array *array);
+void tb_ptr_array_add(tb_ptr_array *array, void *item);
+void tb_ptr_array_remove(tb_ptr_array *array, size_t index);
+void tb_ptr_array_reset(tb_ptr_array *array);
+
 // -------------------- TEMPORARY STRING -------------------- //
 
 /*
@@ -108,11 +122,8 @@ const char *tb_tmp_str_printf(const char *format, ...);
 // -------------------- FILE FUNCTIONS -------------------- //
 
 bool tb_file_exists(const char *path);
-
 bool tb_dir_exists(const char *path);
-
 char *tb_read_file_to_string(const char *path);
-
 void tb_write_string_to_file(const char *path, const char *str);
 
 // -------------------- PATH FUNCTIONS -------------------- //
@@ -120,7 +131,6 @@ void tb_write_string_to_file(const char *path, const char *str);
 // Get path base name. e. g. "/home/user/file.txt" -> "file.txt".
 // Returns pointer to the beginning of the base name in the path or NULL on error.
 const char *tb_path_base_name(const char *path);
-
 // Get path extension. e. g. "/home/user/file.txt" -> "txt".
 // Returns pointer to the beginning of the extension in the path or NULL on error.
 const char *tb_path_ext(const char *path);
@@ -136,6 +146,32 @@ time_t tb_time_now();
 #endif // TOOLBOX_H
 
 #ifdef TOOLBOX_IMPLEMENTATION
+
+// -------------------- DYNAMIC ARRAY -------------------- //
+
+void tb_ptr_array_init(tb_ptr_array *array) {
+  array->size = 0;
+  array->capacity = 8;
+  array->items = malloc(array->capacity * sizeof(void *));
+}
+
+void tb_ptr_array_free(tb_ptr_array *array) { free(array->items); }
+
+void tb_ptr_array_add(tb_ptr_array *array, void *item) {
+  if (array->size >= array->capacity) {
+    array->capacity *= 2;
+    array->items = realloc(array->items, array->capacity * sizeof(void *));
+  }
+  array->items[array->size++] = item;
+}
+
+void tb_ptr_array_remove(tb_ptr_array *array, size_t index) {
+  if (index >= array->size) return;
+  for (size_t i = index; i < array->size - 1; i++) { array->items[i] = array->items[i + 1]; }
+  array->size--;
+}
+
+void tb_ptr_array_reset(tb_ptr_array *array) { array->size = 0; }
 
 // -------------------- FILE FUNCTIONS -------------------- //
 

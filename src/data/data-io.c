@@ -1,15 +1,14 @@
 #include "../settings.h"
 #include "../utils.h"
-#include "../vendor/json.h"
 #include "data.h"
 
-#define TB_ENABLE_PROFILING
+#include "../vendor/json.h"
 #include "../vendor/toolbox.h"
 
 #include <gio/gio.h>
 #include <libical/ical.h>
 
-bool errands_data_needs_write = false; // TODO
+static tb_ptr_array lists_to_write = {0};
 
 static const char *user_dir;
 
@@ -124,6 +123,30 @@ static void errands_data_migrate_from_46() {
   remove(old_data_file);
 }
 
+static void write_lists() {
+  for (size_t i = 0; i < lists_to_write.size; ++i) {
+    icalcomponent *list_data = lists_to_write.items[i];
+    const char *filename = tb_tmp_str_printf("%s.ics", errands_data_get_str(list_data, DATA_PROP_LIST_UID));
+    g_autofree gchar *path = g_build_filename(user_dir, filename, NULL);
+    if (!g_file_set_contents(path, icalcomponent_as_ical_string(list_data), -1, NULL)) {
+      tb_log("User Data: Failed to save list '%s'", path);
+      return;
+    }
+    tb_log("User Data: Saved list '%s'", path);
+  }
+  tb_ptr_array_reset(&lists_to_write);
+}
+
+static void write_list(ListData *list_data) {
+  const char *filename = tb_tmp_str_printf("%s.ics", errands_data_get_str(list_data, DATA_PROP_LIST_UID));
+  g_autofree gchar *path = g_build_filename(user_dir, filename, NULL);
+  if (!g_file_set_contents(path, icalcomponent_as_ical_string(list_data), -1, NULL)) {
+    tb_log("User Data: Failed to save list '%s'", path);
+    return;
+  }
+  tb_log("User Data: Saved list '%s'", path);
+}
+
 void errands_data_load_lists() {
   user_dir = g_build_filename(g_get_user_data_dir(), "errands", NULL);
   if (!tb_dir_exists(user_dir)) {
@@ -164,24 +187,10 @@ void errands_data_load_lists() {
       }
     }
   }
+  // g_timeout_add_seconds(10, G_SOURCE_FUNC(write_lists), NULL);
 }
 
-// Async write list data to file function
-static void errands_data_write_list_func(GTask *task, gpointer source_object, ListData *data,
-                                         GCancellable *cancellable) {
-  const char *filename = tb_tmp_str_printf("%s.ics", errands_data_get_str(data, DATA_PROP_LIST_UID));
-  g_autofree gchar *path = g_build_filename(user_dir, filename, NULL);
-  if (!g_file_set_contents(path, icalcomponent_as_ical_string(data), -1, NULL)) {
-    tb_log("User Data: Failed to save list '%s'", path);
-    return;
-  }
-  tb_log("User Data: Saved list '%s'", path);
-  g_object_unref(task);
-}
-
-// Async write list data to file
 void errands_data_write_list(ListData *data) {
-  GTask *task = g_task_new(NULL, NULL, NULL, NULL);
-  g_task_set_task_data(task, data, NULL);
-  g_task_run_in_thread(task, (gpointer)errands_data_write_list_func);
+  // tb_ptr_array_add(&lists_to_write, data);
+  g_idle_add_once((GSourceOnceFunc)write_list, data);
 }
