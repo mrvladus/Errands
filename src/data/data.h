@@ -7,6 +7,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+extern bool errands_data_needs_write;
+
 extern GHashTable *ldata;
 extern GHashTable *tdata;
 

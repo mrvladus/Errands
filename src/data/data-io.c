@@ -9,7 +9,9 @@
 #include <gio/gio.h>
 #include <libical/ical.h>
 
-const char *user_dir;
+bool errands_data_needs_write = false; // TODO
+
+static const char *user_dir;
 
 static void errands_data_migrate_from_46() {
   g_autofree gchar *old_data_file = g_build_filename(user_dir, "data.json", NULL);
