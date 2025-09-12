@@ -204,6 +204,10 @@ listview row {
     border-radius: 14px;
 }
 
+listview row:last-child {
+    margin-bottom: 24px;
+}
+
 colorbutton button {
     border-radius: 9999px;
     padding: 0px;
