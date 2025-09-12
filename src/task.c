@@ -374,7 +374,7 @@ static void on_complete_btn_toggle_cb(GtkCheckButton *btn, ErrandsTask *task) {
   errands_task_update_progress(task);
   errands_task_update_progress(get_parent_task(task));
 
-  // Sort parent task list by completion
+  // Sort task list by completion
   gtk_sorter_changed(GTK_SORTER(state.main_window->task_list->completion_sorter), GTK_SORTER_CHANGE_MORE_STRICT);
 
   // Update task list
