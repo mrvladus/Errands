@@ -142,11 +142,8 @@ struct _ErrandsTaskList {
 
   GListStore *tasks_model;
   GtkTreeListModel *tree_model;
-  GtkTreeListRowSorter *tree_sorter;
-  GtkSortListModel *sorted_model;
-  GtkCustomFilter *toplevel_tasks_filter;
-  GtkFilterListModel *toplevel_tasks_filter_model;
-  GtkCustomSorter *sorter;
+  GtkTreeListRowSorter *completion_sorter;
+  GtkSortListModel *completion_sorted_model;
 
   ErrandsTaskListAttachmentsDialog *attachments_dialog;
   ErrandsTaskListColorDialog *color_dialog;

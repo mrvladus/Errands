@@ -370,11 +370,12 @@ static void on_complete_btn_toggle_cb(GtkCheckButton *btn, ErrandsTask *task) {
     }
     g_ptr_array_free(parents, false);
   }
-  errands_data_write_list(state.main_window->task_list->data);
+  errands_data_write_list(task_data_get_list(task->data));
   errands_task_update_progress(task);
   errands_task_update_progress(get_parent_task(task));
 
-  // TODO: Sort parent task list by completion
+  // Sort parent task list by completion
+  gtk_sorter_changed(GTK_SORTER(state.main_window->task_list->completion_sorter), GTK_SORTER_CHANGE_MORE_STRICT);
 
   // Update task list
   errands_task_list_update_title();

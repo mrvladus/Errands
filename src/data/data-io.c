@@ -138,7 +138,8 @@ static void write_lists() {
 }
 
 static void write_list(ListData *list_data) {
-  const char *filename = tb_tmp_str_printf("%s.ics", errands_data_get_str(list_data, DATA_PROP_LIST_UID));
+  const char *uid = errands_data_get_str(list_data, DATA_PROP_LIST_UID);
+  const char *filename = tb_tmp_str_printf("%s.ics", uid);
   g_autofree gchar *path = g_build_filename(user_dir, filename, NULL);
   if (!g_file_set_contents(path, icalcomponent_as_ical_string(list_data), -1, NULL)) {
     tb_log("User Data: Failed to save list '%s'", path);

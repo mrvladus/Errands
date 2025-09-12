@@ -1,5 +1,7 @@
 #include "task-list.h"
 #include "data/data.h"
+#include "glib-object.h"
+#include "gtk/gtk.h"
 #include "state.h"
 #include "utils.h"
 
@@ -10,6 +12,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <unistd.h>
 
 static void on_list_view_activate(GtkListView *self, guint position, gpointer user_data);
 static GListModel *create_child_model_func(gpointer item, gpointer user_data);
@@ -22,7 +25,6 @@ static void on_list_view_activate(GtkListView *self, guint position, gpointer us
 
 static void on_toggle_search_action_cb(GSimpleAction *action, GVariant *param, GtkToggleButton *btn);
 
-static bool toplevel_tasks_filter_func(GObject *obj, gpointer user_data);
 // static bool search_filter_func(GObject *obj, gpointer user_data);
 static gint sort_func(gconstpointer a, gconstpointer b, gpointer user_data);
 static gint completion_sort_func(gconstpointer a, gconstpointer b, gpointer user_data);
@@ -63,13 +65,18 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   // Create tree list model
   self->tree_model =
       gtk_tree_list_model_new(G_LIST_MODEL(self->tasks_model), false, false, create_child_model_func, NULL, NULL);
+  // Completion sort model
+  self->completion_sorter = gtk_tree_list_row_sorter_new(
+      GTK_SORTER(gtk_custom_sorter_new((GCompareDataFunc)completion_sort_func, NULL, NULL)));
+  self->completion_sorted_model =
+      gtk_sort_list_model_new(G_LIST_MODEL(self->tree_model), GTK_SORTER(self->completion_sorter));
 
   GtkListItemFactory *tasks_factory = gtk_signal_list_item_factory_new();
   g_signal_connect(tasks_factory, "setup", G_CALLBACK(setup_listitem_cb), NULL);
   g_signal_connect(tasks_factory, "bind", G_CALLBACK(bind_listitem_cb), NULL);
 
   gtk_list_view_set_model(GTK_LIST_VIEW(self->task_list),
-                          GTK_SELECTION_MODEL(gtk_no_selection_new(G_LIST_MODEL(self->tree_model))));
+                          GTK_SELECTION_MODEL(gtk_no_selection_new(G_LIST_MODEL(self->completion_sorted_model))));
   gtk_list_view_set_factory(GTK_LIST_VIEW(self->task_list), tasks_factory);
 
   tb_log("Task List: Created");
@@ -156,6 +163,17 @@ static GListModel *create_child_model_func(gpointer item, gpointer user_data) {
 
 // --- SORT AND FILTER CALLBACKS --- //
 
+static gint completion_sort_func(gconstpointer a, gconstpointer b, gpointer user_data) {
+  TaskData *data_a = g_object_get_data(G_OBJECT(a), "data");
+  TaskData *data_b = g_object_get_data(G_OBJECT(b), "data");
+  icaltimetype completed_a_t = errands_data_get_time(data_a, DATA_PROP_COMPLETED_TIME);
+  icaltimetype completed_b_t = errands_data_get_time(data_b, DATA_PROP_COMPLETED_TIME);
+  bool completed_a = !icaltime_is_null_date(completed_a_t);
+  bool completed_b = !icaltime_is_null_date(completed_b_t);
+
+  return completed_a - completed_b;
+}
+
 // static bool search_filter_func(GObject *obj, gpointer user_data) {
 //   if (!state.main_window->task_list->search_query || g_str_equal(state.main_window->task_list->search_query, ""))
 //     return true;
@@ -218,35 +236,6 @@ static GListModel *create_child_model_func(gpointer item, gpointer user_data) {
 //   if (result == 0) {
 //     const char *uid1 = errands_data_get_str(data1, DATA_PROP_UID);
 //     const char *uid2 = errands_data_get_str(data2, DATA_PROP_UID);
-//     result = g_strcmp0(uid1, uid2);
-//   }
-
-//   return result;
-// }
-
-// static gint completion_sort_func(gconstpointer a, gconstpointer b, gpointer user_data) {
-//   TaskData *data_a = g_object_get_data(G_OBJECT(a), "data");
-//   TaskData *data_b = g_object_get_data(G_OBJECT(b), "data");
-
-//   if (!data_a || !data_b) return 0;
-
-//   // Completion status: incomplete first, complete last
-//   int completed1 = !icaltime_is_null_time(errands_data_get_time(data_a, DATA_PROP_COMPLETED_TIME)) ? 1 : 0;
-//   int completed2 = !icaltime_is_null_time(errands_data_get_time(data_b, DATA_PROP_COMPLETED_TIME)) ? 1 : 0;
-
-//   gint result = completed1 - completed2;
-
-//   // If completion status is the same, use creation date (newest first)
-//   if (result == 0) {
-//     icaltimetype created1 = errands_data_get_time(data_a, DATA_PROP_CREATED_TIME);
-//     icaltimetype created2 = errands_data_get_time(data_b, DATA_PROP_CREATED_TIME);
-//     result = icaltime_compare(created2, created1);
-//   }
-
-//   // Final fallback: use UID for absolute stability
-//   if (result == 0) {
-//     const char *uid1 = errands_data_get_str(data_a, DATA_PROP_UID);
-//     const char *uid2 = errands_data_get_str(data_b, DATA_PROP_UID);
 //     result = g_strcmp0(uid1, uid2);
 //   }
 
