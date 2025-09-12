@@ -6,6 +6,8 @@
 #include <glib.h>
 #include <libical/ical.h>
 
+bool needs_sync = false;
+
 CalDAVClient *client;
 
 // void sync_list(ListData *list) {
@@ -101,4 +103,13 @@ static void initial_sync_finished_cb(GObject *source_object, GAsyncResult *res, 
   }
 }
 
-void sync_init(void) { RUN_THREAD_FUNC(initial_sync, initial_sync_finished_cb); }
+void sync_init(void) {
+  RUN_THREAD_FUNC(initial_sync, initial_sync_finished_cb);
+  g_timeout_add_seconds(10, G_SOURCE_FUNC(sync), NULL);
+}
+
+void sync() {
+  if (!needs_sync) return;
+  if (!errands_settings_get("sync", SETTING_TYPE_BOOL).b) return;
+  tb_log("Sync: synchronize");
+}
