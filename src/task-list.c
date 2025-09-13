@@ -1,7 +1,7 @@
 #include "task-list.h"
 #include "data/data.h"
-#include "glib-object.h"
 #include "gtk/gtk.h"
+#include "settings.h"
 #include "state.h"
 #include "utils.h"
 
@@ -9,10 +9,6 @@
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>
-
-#include <stdbool.h>
-#include <stddef.h>
-#include <unistd.h>
 
 static void on_list_view_activate(GtkListView *self, guint position, gpointer user_data);
 static GListModel *create_child_model_func(gpointer item, gpointer user_data);
@@ -65,18 +61,20 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   // Create tree list model
   self->tree_model =
       gtk_tree_list_model_new(G_LIST_MODEL(self->tasks_model), false, false, create_child_model_func, NULL, NULL);
-  // Completion sort model
-  self->completion_sorter = gtk_tree_list_row_sorter_new(
-      GTK_SORTER(gtk_custom_sorter_new((GCompareDataFunc)completion_sort_func, NULL, NULL)));
-  self->completion_sorted_model =
-      gtk_sort_list_model_new(G_LIST_MODEL(self->tree_model), GTK_SORTER(self->completion_sorter));
+  // Sort model
+  GtkMultiSorter *multi_sorter = gtk_multi_sorter_new();
+  gtk_multi_sorter_append(multi_sorter,
+                          GTK_SORTER(gtk_custom_sorter_new((GCompareDataFunc)completion_sort_func, NULL, NULL)));
+  gtk_multi_sorter_append(multi_sorter, GTK_SORTER(gtk_custom_sorter_new((GCompareDataFunc)sort_func, NULL, NULL)));
+  self->sorter = gtk_tree_list_row_sorter_new(GTK_SORTER(multi_sorter));
+  GtkSortListModel *sort_model = gtk_sort_list_model_new(G_LIST_MODEL(self->tree_model), GTK_SORTER(self->sorter));
 
   GtkListItemFactory *tasks_factory = gtk_signal_list_item_factory_new();
   g_signal_connect(tasks_factory, "setup", G_CALLBACK(setup_listitem_cb), NULL);
   g_signal_connect(tasks_factory, "bind", G_CALLBACK(bind_listitem_cb), NULL);
 
   gtk_list_view_set_model(GTK_LIST_VIEW(self->task_list),
-                          GTK_SELECTION_MODEL(gtk_no_selection_new(G_LIST_MODEL(self->completion_sorted_model))));
+                          GTK_SELECTION_MODEL(gtk_no_selection_new(G_LIST_MODEL(sort_model))));
   gtk_list_view_set_factory(GTK_LIST_VIEW(self->task_list), tasks_factory);
 
   tb_log("Task List: Created");
@@ -174,6 +172,34 @@ static gint completion_sort_func(gconstpointer a, gconstpointer b, gpointer user
   return completed_a - completed_b;
 }
 
+static gint sort_func(gconstpointer a, gconstpointer b, gpointer user_data) {
+  TaskData *data_a = g_object_get_data(G_OBJECT(a), "data");
+  TaskData *data_b = g_object_get_data(G_OBJECT(b), "data");
+  switch (errands_settings_get("sort_by", SETTING_TYPE_INT).i) {
+  case SORT_TYPE_CREATION_DATE: {
+    icaltimetype creation_date_a = errands_data_get_time(data_a, DATA_PROP_CREATED_TIME);
+    icaltimetype creation_date_b = errands_data_get_time(data_b, DATA_PROP_CREATED_TIME);
+
+    return icaltime_compare(creation_date_b, creation_date_a);
+  }
+  case SORT_TYPE_DUE_DATE: {
+    icaltimetype due_date_a = errands_data_get_time(data_a, DATA_PROP_DUE_TIME);
+    icaltimetype due_date_b = errands_data_get_time(data_b, DATA_PROP_DUE_TIME);
+    bool due_date_a_null = icaltime_is_null_time(due_date_a);
+    bool due_date_b_null = icaltime_is_null_time(due_date_b);
+
+    return due_date_b_null - due_date_a_null;
+  }
+  case SORT_TYPE_PRIORITY: {
+    uint8_t p_a = errands_data_get_int(data_a, DATA_PROP_PRIORITY);
+    uint8_t p_b = errands_data_get_int(data_b, DATA_PROP_PRIORITY);
+
+    return p_b - p_a;
+  }
+  default: return 0;
+  }
+}
+
 // static bool search_filter_func(GObject *obj, gpointer user_data) {
 //   if (!state.main_window->task_list->search_query || g_str_equal(state.main_window->task_list->search_query, ""))
 //     return true;
@@ -186,60 +212,6 @@ static gint completion_sort_func(gconstpointer a, gconstpointer b, gpointer user
 //   return (text && string_contains(text, state.main_window->task_list->search_query)) ||
 //          (notes && string_contains(notes, state.main_window->task_list->search_query)) ||
 //          (tags && g_strv_contains((const gchar *const *)tags, state.main_window->task_list->search_query));
-// }
-
-// static gint sort_func(gconstpointer a, gconstpointer b, gpointer user_data) {
-//   size_t sort_by = errands_settings_get("sort_by", SETTING_TYPE_INT).i;
-
-//   TaskData *data1 = g_object_get_data(G_OBJECT(a), "data");
-//   TaskData *data2 = g_object_get_data(G_OBJECT(b), "data");
-
-//   icaltimetype creation_date1 = errands_data_get_time(data1, DATA_PROP_CREATED_TIME);
-//   icaltimetype creation_date2 = errands_data_get_time(data2, DATA_PROP_CREATED_TIME);
-
-//   gint result = 0;
-
-//   switch (sort_by) {
-//   case SORT_TYPE_CREATION_DATE: result = icaltime_compare(creation_date2, creation_date1); break;
-//   case SORT_TYPE_DUE_DATE: {
-//     icaltimetype due_date1 = errands_data_get_time(data1, DATA_PROP_DUE_TIME);
-//     bool due_date1_null = icaltime_is_null_time(due_date1);
-//     icaltimetype due_date2 = errands_data_get_time(data2, DATA_PROP_DUE_TIME);
-//     bool due_date2_null = icaltime_is_null_time(due_date2);
-
-//     if (!due_date1_null && !due_date2_null) {
-//       result = icaltime_compare(due_date2, due_date1);
-//     } else if (due_date1_null && !due_date2_null) {
-//       result = 1; // b has due date, a doesn't
-//     } else if (!due_date1_null && due_date2_null) {
-//       result = -1; // a has due date, b doesn't
-//     } else {
-//       result = icaltime_compare(creation_date2, creation_date1);
-//     }
-//     break;
-//   }
-//   case SORT_TYPE_PRIORITY: {
-//     uint8_t p1 = errands_data_get_int(data1, DATA_PROP_PRIORITY);
-//     uint8_t p2 = errands_data_get_int(data2, DATA_PROP_PRIORITY);
-//     if (p2 > p1) return 1;
-//     if (p2 < p1) return -1;
-//     result = 0;
-//     break;
-//   }
-//   default: result = 0;
-//   }
-
-//   // For stable sorting, use creation date as secondary sort criteria
-//   if (result == 0) { result = icaltime_compare(creation_date2, creation_date1); }
-
-//   // Final fallback: use UID for absolute stability
-//   if (result == 0) {
-//     const char *uid1 = errands_data_get_str(data1, DATA_PROP_UID);
-//     const char *uid2 = errands_data_get_str(data2, DATA_PROP_UID);
-//     result = g_strcmp0(uid1, uid2);
-//   }
-
-//   return result;
 // }
 
 // ---------- PUBLIC FUNCTIONS ---------- //
