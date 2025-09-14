@@ -1,5 +1,6 @@
 #include "task.h"
 #include "data/data.h"
+#include "gdk/gdk.h"
 #include "gio/gio.h"
 #include "glib-object.h"
 #include "glib.h"
@@ -9,19 +10,26 @@
 #include "utils.h"
 
 #include "vendor/toolbox.h"
+#include "window.h"
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>
 
+// Callbacks
 static void on_complete_btn_toggle_cb(GtkCheckButton *btn, ErrandsTask *task);
 static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointer user_data);
 static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *task);
 static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x, gdouble y, GtkPopover *popover);
-static void on_action_edit(GSimpleAction *action, GVariant *param, ErrandsTask *task);
-static void on_action_trash(GSimpleAction *action, GVariant *param, ErrandsTask *task);
 static void on_toolbar_btn_toggle_cb(GtkToggleButton *btn, ErrandsTask *task);
 static void on_errands_task_edited(GtkEditableLabel *entry, ErrandsTask *task);
 static void on_errands_task_edit_cancelled(GtkButton *btn, ErrandsTask *task);
+
+// Actions callbacks
+static void on_action_edit(GSimpleAction *action, GVariant *param, ErrandsTask *task);
+static void on_action_trash(GSimpleAction *action, GVariant *param, ErrandsTask *task);
+static void on_action_clipboard(GSimpleAction *action, GVariant *param, ErrandsTask *task);
+static void on_action_export(GSimpleAction *action, GVariant *param, ErrandsTask *task);
+
 static GdkContentProvider *on_drag_prepare(GtkDragSource *source, double x, double y, ErrandsTask *task);
 static void on_drag_begin(GtkDragSource *source, GdkDrag *drag, ErrandsTask *task);
 static void on_drag_end(GtkDragSource *self, GdkDrag *drag, gboolean delete_data, ErrandsTask *task);
@@ -78,7 +86,8 @@ static void errands_task_init(ErrandsTask *self) {
       g_signal_connect(self->toolbar_btn, "toggled", G_CALLBACK(on_toolbar_btn_toggle_cb), self);
 
   // Actions
-  errands_add_actions(GTK_WIDGET(self), "task", "edit", on_action_edit, self, "trash", on_action_trash, self, NULL);
+  errands_add_actions(GTK_WIDGET(self), "task", "edit", on_action_edit, self, "trash", on_action_trash, self,
+                      "clipboard", on_action_clipboard, self, "export", on_action_export, self, NULL);
 
   // DND
   //
@@ -449,6 +458,8 @@ static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x, gdoub
   gtk_popover_popup(popover);
 }
 
+// --- ACTIONS CALLBACKS --- //
+
 static void on_action_edit(GSimpleAction *action, GVariant *param, ErrandsTask *task) {
   gtk_editable_label_start_editing(GTK_EDITABLE_LABEL(task->edit_title));
 }
@@ -461,6 +472,22 @@ static void on_action_trash(GSimpleAction *action, GVariant *param, ErrandsTask 
   errands_sidebar_all_row_update_counter(state.main_window->sidebar->all_row);
   errands_sidebar_task_list_row_update_counter(
       errands_sidebar_task_list_row_get(errands_data_get_str(task->data, DATA_PROP_LIST_UID)));
+}
+
+static void on_action_clipboard(GSimpleAction *action, GVariant *param, ErrandsTask *task) {
+  const char *text = errands_data_get_str(task->data, DATA_PROP_TEXT);
+  g_autoptr(GdkClipboard) clipboard = gdk_display_get_clipboard(gtk_widget_get_display(GTK_WIDGET(task)));
+  gdk_clipboard_set(clipboard, G_TYPE_STRING, text);
+  errands_window_add_toast(state.main_window, _("Copied to Clipboard"));
+}
+
+static void on_action_export(GSimpleAction *action, GVariant *param, ErrandsTask *task) {
+  icalcomponent *cal = icalcomponent_new_vcalendar();
+  icalcomponent *dup = icalcomponent_new_clone(task->data);
+  icalcomponent_add_component(cal, task->data);
+  TB_TODO("Show export dialog here");
+  icalcomponent_free(dup);
+  icalcomponent_free(cal);
 }
 
 static GdkContentProvider *on_drag_prepare(GtkDragSource *source, double x, double y, ErrandsTask *task) {
