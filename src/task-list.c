@@ -1,6 +1,5 @@
 #include "task-list.h"
 #include "data/data.h"
-#include "gtk/gtk.h"
 #include "settings.h"
 #include "state.h"
 #include "utils.h"
@@ -12,11 +11,12 @@
 
 static void on_list_view_activate(GtkListView *self, guint position, gpointer user_data);
 static GListModel *create_child_model_func(gpointer item, gpointer user_data);
+static void setup_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item);
+static void bind_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item);
 
 static void on_task_list_entry_activated_cb(AdwEntryRow *entry, gpointer data);
 static void on_task_list_search_cb(GtkSearchEntry *entry, gpointer user_data);
 static void on_sort_dialog_show_cb();
-static void on_test_btn_clicked_cb();
 static void on_list_view_activate(GtkListView *self, guint position, gpointer user_data);
 
 static void on_toggle_search_action_cb(GSimpleAction *action, GVariant *param, GtkToggleButton *btn);
@@ -43,7 +43,6 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, search_entry);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, entry_rev);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, task_list);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_test_btn_clicked_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_sort_dialog_show_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_entry_activated_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_search_cb);
@@ -82,7 +81,7 @@ static void errands_task_list_init(ErrandsTaskList *self) {
 
 ErrandsTaskList *errands_task_list_new() { return g_object_new(ERRANDS_TYPE_TASK_LIST, NULL); }
 
-void setup_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item) {
+static void setup_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item) {
   GtkTreeExpander *expander = g_object_new(GTK_TYPE_TREE_EXPANDER, "child", errands_task_new(), "margin-top", 3,
                                            "margin-bottom", 3, "hide-expander", true, "indent-for-icon", false, NULL);
   gtk_list_item_set_child(list_item, GTK_WIDGET(expander));
@@ -90,7 +89,7 @@ void setup_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item) {
 
 static void expand_row_idle_cb(GtkTreeListRow *row) { gtk_tree_list_row_set_expanded(row, true); }
 
-void bind_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item) {
+static void bind_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item) {
   GtkTreeListRow *row = GTK_TREE_LIST_ROW(gtk_list_item_get_item(list_item));
   GObject *model_item = gtk_tree_list_row_get_item(row);
   if (!model_item) return;
@@ -235,21 +234,6 @@ void errands_task_list_load_tasks(ErrandsTaskList *self) {
 }
 
 // ---------- CALLBACKS ---------- //
-
-static void on_test_btn_clicked_cb() {
-  char buff[10];
-  for (size_t i = 0; i < 1000; ++i) {
-    sprintf(buff, "task %zu", i);
-    TaskData *data =
-        list_data_create_task(state.main_window->task_list->data, buff,
-                              errands_data_get_str(state.main_window->task_list->data, DATA_PROP_LIST_UID), "");
-    GObject *data_object = g_object_new(G_TYPE_OBJECT, NULL);
-    g_object_set_data(data_object, "data", data);
-    g_list_store_append(state.main_window->task_list->tasks_model, data_object);
-  }
-  errands_sidebar_all_row_update_counter(state.main_window->sidebar->all_row);
-  gtk_list_view_scroll_to(GTK_LIST_VIEW(state.main_window->task_list->task_list), 0, GTK_LIST_SCROLL_FOCUS, NULL);
-}
 
 static void on_sort_dialog_show_cb() { errands_task_list_sort_dialog_show(); }
 

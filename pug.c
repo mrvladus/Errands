@@ -99,6 +99,7 @@ static bool build_errands() {
 
   // CFLAGS
   pug_target_add_cflags(&errands, "-Wall");
+  pug_target_add_cflags(&errands, "-Wno-unknown-pragmas", "-Wno-enum-int-mismatch");
   pug_target_add_cflag(&errands, PUG_CFLAG_DEFINE_STR(APP_ID));
   pug_target_add_cflag(&errands, PUG_CFLAG_DEFINE_STR(VERSION));
   pug_target_add_cflag(&errands, PUG_CFLAG_DEFINE_STR(LOCALE_DIR));

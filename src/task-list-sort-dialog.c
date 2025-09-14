@@ -1,6 +1,9 @@
+#include "gtk/gtk.h"
 #include "settings.h"
 #include "state.h"
 #include "task-list.h"
+#include "utils.h"
+#include <stdbool.h>
 
 static void on_dialog_close_cb();
 static void on_show_completed_toggle_cb(AdwSwitchRow *row);
@@ -60,9 +63,9 @@ void errands_task_list_sort_dialog_show() {
   adw_switch_row_set_active(ADW_SWITCH_ROW(dialog->completed_toggle_row),
                             errands_settings_get("show_completed", SETTING_TYPE_STRING).b);
   ErrandsSortType sort_by = errands_settings_get("sort_by", SETTING_TYPE_INT).i;
-  if (sort_by == SORT_TYPE_CREATION_DATE) adw_action_row_activate(ADW_ACTION_ROW(dialog->creation_date_toggle_btn));
-  else if (sort_by == SORT_TYPE_DUE_DATE) adw_action_row_activate(ADW_ACTION_ROW(dialog->due_date_toggle_btn));
-  else if (sort_by == SORT_TYPE_PRIORITY) adw_action_row_activate(ADW_ACTION_ROW(dialog->priority_toggle_btn));
+  gtk_check_button_set_active(GTK_CHECK_BUTTON(dialog->creation_date_toggle_btn), sort_by == SORT_TYPE_CREATION_DATE);
+  gtk_check_button_set_active(GTK_CHECK_BUTTON(dialog->due_date_toggle_btn), sort_by == SORT_TYPE_DUE_DATE);
+  gtk_check_button_set_active(GTK_CHECK_BUTTON(dialog->priority_toggle_btn), sort_by == SORT_TYPE_PRIORITY);
   adw_dialog_present(ADW_DIALOG(dialog), GTK_WIDGET(state.main_window));
   dialog->block_signals = false;
 }
@@ -71,8 +74,8 @@ void errands_task_list_sort_dialog_show() {
 
 static void on_dialog_close_cb() {
   if (!state.main_window->task_list->sort_dialog->sort_changed) return;
-  // gtk_sorter_changed(GTK_SORTER(state.main_window->task_list->tasks_sorter), GTK_SORTER_CHANGE_MORE_STRICT);
-  // gtk_list_view_scroll_to(GTK_LIST_VIEW(state.main_window->task_list->task_list), 0, GTK_LIST_SCROLL_FOCUS, NULL);
+  gtk_sorter_changed(GTK_SORTER(state.main_window->task_list->sorter), GTK_SORTER_CHANGE_MORE_STRICT);
+  gtk_list_view_scroll_to(GTK_LIST_VIEW(state.main_window->task_list->task_list), 0, GTK_LIST_SCROLL_FOCUS, NULL);
   state.main_window->task_list->sort_dialog->sort_changed = false;
 }
 

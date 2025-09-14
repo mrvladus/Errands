@@ -157,7 +157,4 @@ struct _ErrandsTaskList {
 
 ErrandsTaskList *errands_task_list_new();
 void errands_task_list_load_tasks(ErrandsTaskList *self);
-void errands_task_list_add(TaskData *td);
 void errands_task_list_update_title();
-void setup_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item);
-void bind_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item);

@@ -1,5 +1,7 @@
 #include "state.h"
+#include "sync.h"
 #include "task-list.h"
+#include "task.h"
 
 static void on_dialog_close_cb(ErrandsTaskListPriorityDialog *self);
 static void on_toggle_cb(ErrandsTaskListPriorityDialog *self, GtkCheckButton *btn);
@@ -71,18 +73,11 @@ static void on_dialog_close_cb(ErrandsTaskListPriorityDialog *self) {
   if (errands_data_get_int(self->current_task->data, DATA_PROP_PRIORITY) != val) {
     errands_data_set_int(self->current_task->data, DATA_PROP_PRIORITY, val);
     errands_data_write_list(task_data_get_list(self->current_task->data));
-    // TODO: SYNC
+    gtk_sorter_changed(GTK_SORTER(state.main_window->task_list->sorter), GTK_SORTER_CHANGE_MORE_STRICT);
+    gtk_list_view_scroll_to(GTK_LIST_VIEW(state.main_window->task_list->task_list), 0, GTK_LIST_SCROLL_FOCUS, NULL);
+    needs_sync = true;
   }
-  // Change icon of priority button
-  gtk_button_set_icon_name(GTK_BUTTON(self->current_task->priority_btn),
-                           val > 0 ? "errands-priority-set-symbolic" : "errands-priority-symbolic");
-  // Add css class to priority button
-  gtk_widget_set_css_classes(self->current_task->priority_btn, (const char **){NULL});
-  gtk_widget_add_css_class(self->current_task->priority_btn, "image-button");
-  if (val == 0) return;
-  else if (val > 0 && val < 3) gtk_widget_add_css_class(self->current_task->priority_btn, "priority-low");
-  else if (val >= 3 && val < 7) gtk_widget_add_css_class(self->current_task->priority_btn, "priority-medium");
-  else if (val >= 7 && val < 10) gtk_widget_add_css_class(self->current_task->priority_btn, "priority-high");
+  errands_task_update_toolbar(self->current_task);
 }
 
 static void on_toggle_cb(ErrandsTaskListPriorityDialog *self, GtkCheckButton *btn) {

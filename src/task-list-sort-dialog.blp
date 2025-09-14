@@ -2,53 +2,59 @@ using Gtk 4.0;
 using Adw 1;
 
 template $ErrandsTaskListSortDialog: Adw.Dialog {
+  title: _("Sorting and Filtering");
   content-width: 360;
   closed => $on_dialog_close_cb();
 
-  child: Adw.PreferencesPage {
-    Adw.PreferencesGroup {
-      title: _("Filter");
+  Adw.ToolbarView {
+    [top]
+    Adw.HeaderBar {}
 
-      Adw.SwitchRow completed_toggle_row {
-        title: _("Show Completed Tasks");
-        notify::active => $on_show_completed_toggle_cb();
-      }
-    }
+    content: Adw.PreferencesPage {
+      Adw.PreferencesGroup {
+        title: _("Filter");
 
-    Adw.PreferencesGroup {
-      title: _("Sort By");
-
-      Adw.ActionRow {
-        title: _("Creation Date");
-        activatable-widget: creation_date_toggle_btn;
-
-        [suffix]
-        CheckButton creation_date_toggle_btn {
-          toggled => $on_created_toggle_cb();
+        Adw.SwitchRow completed_toggle_row {
+          title: _("Show Completed Tasks");
+          notify::active => $on_show_completed_toggle_cb();
         }
       }
 
-      Adw.ActionRow {
-        title: _("Due Date");
-        activatable-widget: due_date_toggle_btn;
+      Adw.PreferencesGroup {
+        title: _("Sort By");
 
-        [suffix]
-        CheckButton due_date_toggle_btn {
-          group: creation_date_toggle_btn;
-          toggled => $on_due_toggle_cb();
+        Adw.ActionRow {
+          title: _("Creation Date");
+          activatable-widget: creation_date_toggle_btn;
+
+          [suffix]
+          CheckButton creation_date_toggle_btn {
+            toggled => $on_created_toggle_cb();
+          }
+        }
+
+        Adw.ActionRow {
+          title: _("Due Date");
+          activatable-widget: due_date_toggle_btn;
+
+          [suffix]
+          CheckButton due_date_toggle_btn {
+            group: creation_date_toggle_btn;
+            toggled => $on_due_toggle_cb();
+          }
+        }
+
+        Adw.ActionRow {
+          title: _("Priority");
+          activatable-widget: priority_toggle_btn;
+
+          [suffix]
+          CheckButton priority_toggle_btn {
+            group: creation_date_toggle_btn;
+            toggled => $on_priority_toggle_cb();
+          }
         }
       }
-
-      Adw.ActionRow {
-        title: _("Priority");
-        activatable-widget: priority_date_toggle_btn;
-
-        [suffix]
-        CheckButton priority_date_toggle_btn {
-          group: creation_date_toggle_btn;
-          toggled => $on_priority_toggle_cb();
-        }
-      }
-    }
-  };
+    };
+  }
 }
