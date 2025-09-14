@@ -1,6 +1,7 @@
 #pragma once
 
 #include "data/data.h"
+#include "gtk/gtk.h"
 #include "task.h"
 
 #include <adwaita.h>
@@ -143,6 +144,7 @@ struct _ErrandsTaskList {
   GListStore *tasks_model;
   GtkTreeListModel *tree_model;
   GtkTreeListRowSorter *sorter;
+  GtkCustomFilter *completed_filter;
 
   ErrandsTaskListAttachmentsDialog *attachments_dialog;
   ErrandsTaskListColorDialog *color_dialog;

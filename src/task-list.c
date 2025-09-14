@@ -1,5 +1,8 @@
 #include "task-list.h"
 #include "data/data.h"
+#include "glib-object.h"
+#include "glib.h"
+#include "gtk/gtk.h"
 #include "settings.h"
 #include "state.h"
 #include "utils.h"
@@ -22,6 +25,7 @@ static void on_list_view_activate(GtkListView *self, guint position, gpointer us
 static void on_toggle_search_action_cb(GSimpleAction *action, GVariant *param, GtkToggleButton *btn);
 
 // static bool search_filter_func(GObject *obj, gpointer user_data);
+static gboolean completed_filter_func(GObject *item, gpointer user_data);
 static gint sort_func(gconstpointer a, gconstpointer b, gpointer user_data);
 static gint completion_sort_func(gconstpointer a, gconstpointer b, gpointer user_data);
 
@@ -67,13 +71,17 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   gtk_multi_sorter_append(multi_sorter, GTK_SORTER(gtk_custom_sorter_new((GCompareDataFunc)sort_func, NULL, NULL)));
   self->sorter = gtk_tree_list_row_sorter_new(GTK_SORTER(multi_sorter));
   GtkSortListModel *sort_model = gtk_sort_list_model_new(G_LIST_MODEL(self->tree_model), GTK_SORTER(self->sorter));
+  // Filter model
+  self->completed_filter = gtk_custom_filter_new((GtkCustomFilterFunc)completed_filter_func, NULL, NULL);
+  GtkFilterListModel *completed_filter_model =
+      gtk_filter_list_model_new(G_LIST_MODEL(sort_model), GTK_FILTER(self->completed_filter));
 
   GtkListItemFactory *tasks_factory = gtk_signal_list_item_factory_new();
   g_signal_connect(tasks_factory, "setup", G_CALLBACK(setup_listitem_cb), NULL);
   g_signal_connect(tasks_factory, "bind", G_CALLBACK(bind_listitem_cb), NULL);
 
   gtk_list_view_set_model(GTK_LIST_VIEW(self->task_list),
-                          GTK_SELECTION_MODEL(gtk_no_selection_new(G_LIST_MODEL(sort_model))));
+                          GTK_SELECTION_MODEL(gtk_no_selection_new(G_LIST_MODEL(completed_filter_model))));
   gtk_list_view_set_factory(GTK_LIST_VIEW(self->task_list), tasks_factory);
 
   tb_log("Task List: Created");
@@ -110,6 +118,7 @@ static void bind_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item
   bool is_expandable = gtk_tree_list_row_is_expandable(row);
   // Add at idle because otherwise will srew-up all list
   if (is_expandable && expanded) g_idle_add_once((GSourceOnceFunc)expand_row_idle_cb, row);
+  // gtk_filter_changed(GTK_FILTER(state.main_window->task_list->completed_filter), GTK_FILTER_CHANGE_DIFFERENT);
 }
 
 // Expand task on click on row
@@ -199,6 +208,14 @@ static gint sort_func(gconstpointer a, gconstpointer b, gpointer user_data) {
   }
 }
 
+static gboolean completed_filter_func(GObject *item, gpointer user_data) {
+  bool show_completed = errands_settings_get("show_completed", SETTING_TYPE_BOOL).b;
+  TaskData *data = g_object_get_data(G_OBJECT(gtk_tree_list_row_get_item(GTK_TREE_LIST_ROW(item))), "data");
+  bool is_completed = !icaltime_is_null_date(errands_data_get_time(data, DATA_PROP_COMPLETED_TIME));
+  if (!show_completed && is_completed) return false;
+  return true;
+}
+
 // static bool search_filter_func(GObject *obj, gpointer user_data) {
 //   if (!state.main_window->task_list->search_query || g_str_equal(state.main_window->task_list->search_query, ""))
 //     return true;
@@ -226,6 +243,7 @@ void errands_task_list_load_tasks(ErrandsTaskList *self) {
     // Only add non-deleted, top-level tasks to root model
     if (!parent && !deleted) {
       g_autoptr(GObject) obj = task_data_as_gobject(task);
+      tb_log("Task List: Adding task '%s' %p", errands_data_get_str(task, DATA_PROP_TEXT), obj);
       g_list_store_append(self->tasks_model, obj);
     }
   }
