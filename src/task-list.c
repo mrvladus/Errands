@@ -102,11 +102,10 @@ static void expand_row_idle_cb(GtkTreeListRow *row) { gtk_tree_list_row_set_expa
 
 static void bind_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item) {
   GtkTreeListRow *row = GTK_TREE_LIST_ROW(gtk_list_item_get_item(list_item));
-  GObject *model_item = gtk_tree_list_row_get_item(row);
+  g_autoptr(GObject) model_item = gtk_tree_list_row_get_item(row);
   if (!model_item) return;
   // Get the expander and its child task widget
   GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_list_item_get_child(list_item));
-  g_object_set_data(G_OBJECT(row), "expander", expander);
   // Set the row on the expander
   gtk_tree_expander_set_list_row(expander, row); // create_child_model_func is called here
   ErrandsTask *task = ERRANDS_TASK(gtk_tree_expander_get_child(expander));
@@ -128,13 +127,13 @@ static void bind_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item
 static void on_list_view_activate_cb(GtkListView *self, guint position, gpointer user_data) {
   // Get row
   GListModel *selection_model = G_LIST_MODEL(gtk_list_view_get_model(self));
-  GtkTreeListRow *row = GTK_TREE_LIST_ROW(g_list_model_get_item(selection_model, position));
+  g_autoptr(GtkTreeListRow) row = GTK_TREE_LIST_ROW(g_list_model_get_item(selection_model, position));
   if (!row) return;
   if (!gtk_tree_list_row_is_expandable(row)) return;
   // Set new expanded state
   bool expanded = !gtk_tree_list_row_get_expanded(row);
   gtk_tree_list_row_set_expanded(row, expanded);
-  GObject *item = gtk_tree_list_row_get_item(row);
+  g_autoptr(GObject) item = gtk_tree_list_row_get_item(row);
   TaskData *task_data = g_object_get_data(item, "data");
   errands_data_set_bool(task_data, DATA_PROP_EXPANDED, expanded);
   ErrandsTask *task = g_object_get_data(item, "task");
@@ -157,7 +156,6 @@ static GListModel *create_child_model_func(gpointer item, gpointer user_data) {
   for (size_t i = 0; i < all_tasks->len; i++) {
     TaskData *task = all_tasks->pdata[i];
     const char *task_parent = errands_data_get_str(task, DATA_PROP_PARENT);
-
     if (task_parent && g_str_equal(task_parent, parent_uid)) {
       g_autoptr(GObject) obj = task_data_as_gobject(task);
       g_list_store_append(children_store, obj);
@@ -213,49 +211,11 @@ static gint sort_func(gconstpointer a, gconstpointer b, gpointer user_data) {
 
 static gboolean completed_filter_func(GObject *item, gpointer user_data) {
   bool show_completed = errands_settings_get("show_completed", SETTING_TYPE_BOOL).b;
-  TaskData *data = g_object_get_data(G_OBJECT(gtk_tree_list_row_get_item(GTK_TREE_LIST_ROW(item))), "data");
+  g_autoptr(GObject) model_item = gtk_tree_list_row_get_item(GTK_TREE_LIST_ROW(item));
+  TaskData *data = g_object_get_data(model_item, "data");
   bool is_completed = !icaltime_is_null_date(errands_data_get_time(data, DATA_PROP_COMPLETED_TIME));
   if (!show_completed && is_completed) return false;
   return true;
-}
-
-static gboolean task_matches_query(TaskData *data, const char *query) {
-  if (!query || g_str_equal(query, "")) return true;
-  const char *text = errands_data_get_str(data, DATA_PROP_TEXT);
-  const char *notes = errands_data_get_str(data, DATA_PROP_NOTES);
-  g_auto(GStrv) tags = errands_data_get_strv(data, DATA_PROP_TAGS);
-  if ((text && tb_str_contains_case(text, query)) || (notes && tb_str_contains_case(notes, query)) ||
-      (tags && g_strv_contains((const gchar *const *)tags, query))) {
-    return true;
-  }
-  return false;
-}
-
-static gboolean task_or_descendants_match(TaskData *data, const char *query) {
-  if (task_matches_query(data, query)) return true;
-  const char *uid = errands_data_get_str(data, DATA_PROP_UID);
-  GPtrArray *all_tasks = g_hash_table_get_values_as_ptr_array(tdata);
-  for (size_t i = 0; i < all_tasks->len; i++) {
-    TaskData *child = all_tasks->pdata[i];
-    const char *parent = errands_data_get_str(child, DATA_PROP_PARENT);
-    if (parent && g_str_equal(parent, uid)) {
-      if (task_or_descendants_match(child, query)) {
-        g_ptr_array_free(all_tasks, false);
-        return true;
-      }
-    }
-  }
-  g_ptr_array_free(all_tasks, false);
-  return false;
-}
-
-static gboolean search_filter_func(GtkTreeListRow *row, ErrandsTaskList *self) {
-  if (!self->search_query || g_str_equal(self->search_query, "")) return true;
-  GObject *item = gtk_tree_list_row_get_item(row);
-  if (!item) return false;
-  TaskData *data = g_object_get_data(item, "data");
-  if (!data) return false;
-  return task_or_descendants_match(data, self->search_query);
 }
 
 // ---------- PUBLIC FUNCTIONS ---------- //
@@ -334,9 +294,73 @@ static void on_task_list_entry_activated_cb(AdwEntryRow *entry, gpointer data) {
          errands_data_get_str(td, DATA_PROP_LIST_UID));
 }
 
+// --- SEARCH FUNCTIONS --- //
+
+static gboolean task_matches_query(TaskData *data, const char *query) {
+  if (!query || g_str_equal(query, "")) return true;
+  const char *text = errands_data_get_str(data, DATA_PROP_TEXT);
+  const char *notes = errands_data_get_str(data, DATA_PROP_NOTES);
+  g_auto(GStrv) tags = errands_data_get_strv(data, DATA_PROP_TAGS);
+  if ((text && tb_str_contains_case(text, query)) || (notes && tb_str_contains_case(notes, query)) ||
+      (tags && g_strv_contains((const gchar *const *)tags, query))) {
+    return true;
+  }
+  return false;
+}
+
+static gboolean task_or_descendants_match(TaskData *data, const char *query) {
+  if (task_matches_query(data, query)) return true;
+  const char *uid = errands_data_get_str(data, DATA_PROP_UID);
+  GPtrArray *all_tasks = g_hash_table_get_values_as_ptr_array(tdata);
+  for (size_t i = 0; i < all_tasks->len; i++) {
+    TaskData *child = all_tasks->pdata[i];
+    const char *parent = errands_data_get_str(child, DATA_PROP_PARENT);
+    if (parent && g_str_equal(parent, uid)) {
+      if (task_or_descendants_match(child, query)) {
+        g_ptr_array_free(all_tasks, false);
+        return true;
+      }
+    }
+  }
+  g_ptr_array_free(all_tasks, false);
+  return false;
+}
+
+static gboolean search_filter_func(GtkTreeListRow *row, ErrandsTaskList *self) {
+  if (!self->search_query || g_str_equal(self->search_query, "")) return true;
+  g_autoptr(GObject) item = gtk_tree_list_row_get_item(row);
+  if (!item) return false;
+  TaskData *data = g_object_get_data(item, "data");
+  if (!data) return false;
+  return task_or_descendants_match(data, self->search_query);
+}
+
+static void restore_expanded_state(ErrandsTaskList *self) {
+  guint n = g_list_model_get_n_items(G_LIST_MODEL(self->search_filter_model));
+  for (guint i = 0; i < n; i++) {
+    g_autoptr(GtkTreeListRow) row = g_list_model_get_item(G_LIST_MODEL(self->search_filter_model), i);
+    if (!row) continue;
+    g_autoptr(GObject) row_item = gtk_tree_list_row_get_item(row);
+    TaskData *data = g_object_get_data(row_item, "data");
+    if (data) gtk_tree_list_row_set_expanded(row, errands_data_get_bool(data, DATA_PROP_EXPANDED));
+  }
+}
+
+static void expand_matching_rows(ErrandsTaskList *self, const char *query) {
+  guint n = g_list_model_get_n_items(G_LIST_MODEL(self->search_filter_model));
+  for (guint i = 0; i < n; i++) {
+    g_autoptr(GtkTreeListRow) row = g_list_model_get_item(G_LIST_MODEL(self->search_filter_model), i);
+    if (!row) continue;
+    g_autoptr(GObject) row_item = gtk_tree_list_row_get_item(row);
+    TaskData *data = g_object_get_data(row_item, "data");
+    if (data && task_or_descendants_match(data, query)) gtk_tree_list_row_set_expanded(row, TRUE);
+  }
+  if (n > 0) gtk_list_view_scroll_to(GTK_LIST_VIEW(self->task_list), 0, GTK_LIST_SCROLL_FOCUS, NULL);
+}
+
 static void on_task_list_search_cb(ErrandsTaskList *self, GtkSearchEntry *entry) {
   self->search_query = gtk_editable_get_text(GTK_EDITABLE(entry));
   gtk_filter_changed(GTK_FILTER(self->search_filter), GTK_FILTER_CHANGE_DIFFERENT);
-  if (g_list_model_get_n_items(G_LIST_MODEL(self->search_filter_model)))
-    gtk_list_view_scroll_to(GTK_LIST_VIEW(self->task_list), 0, GTK_LIST_SCROLL_FOCUS, NULL);
+  if (!self->search_query || g_str_equal(self->search_query, "")) restore_expanded_state(self);
+  else expand_matching_rows(self, self->search_query);
 }

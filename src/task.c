@@ -263,9 +263,9 @@ void errands_task_get_sub_tasks_tree(ErrandsTask *task, GPtrArray *array) {
 static ErrandsTask *get_parent_task(ErrandsTask *task) {
   GtkTreeListRow *row = g_object_get_data(G_OBJECT(task), "row");
   if (!row) return NULL;
-  GtkTreeListRow *parent_row = gtk_tree_list_row_get_parent(row);
+  g_autoptr(GtkTreeListRow) parent_row = gtk_tree_list_row_get_parent(row);
   if (!parent_row) return NULL;
-  GObject *model_item = gtk_tree_list_row_get_item(parent_row);
+  g_autoptr(GObject) model_item = gtk_tree_list_row_get_item(parent_row);
   if (!model_item) return NULL;
   ErrandsTask *parent_task = g_object_get_data(model_item, "task");
   return parent_task;
