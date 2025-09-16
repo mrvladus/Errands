@@ -137,7 +137,10 @@ const char *tb_path_ext(const char *path);
 
 // -------------------- STRING FUNCTIONS -------------------- //
 
+// Check if string contains substring.
 bool tb_str_contains(const char *str, const char *sub_str);
+// Check if string contains substring (case-insensitive).
+bool tb_str_contains_case(const char *str, const char *sub_str);
 
 // -------------------- TIME FUNCTIONS -------------------- //
 
@@ -267,6 +270,7 @@ const char *tb_path_ext(const char *path) {
 // -------------------- STRING FUNCTIONS -------------------- //
 
 bool tb_str_contains(const char *str, const char *sub_str) { return strstr(str, sub_str) != NULL; }
+bool tb_str_contains_case(const char *str, const char *sub_str) { return strcasestr(str, sub_str) != NULL; }
 
 // -------------------- TIME FUNCTIONS -------------------- //
 

@@ -139,12 +139,15 @@ struct _ErrandsTaskList {
   GtkWidget *search_btn;
   GtkWidget *search_bar;
   GtkWidget *search_entry;
+  const char *search_query;
   GtkWidget *entry_rev;
 
   GListStore *tasks_model;
   GtkTreeListModel *tree_model;
   GtkTreeListRowSorter *sorter;
   GtkCustomFilter *completed_filter;
+  GtkCustomFilter *search_filter;
+  GtkFilterListModel *search_filter_model;
 
   ErrandsTaskListAttachmentsDialog *attachments_dialog;
   ErrandsTaskListColorDialog *color_dialog;

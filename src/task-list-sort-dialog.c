@@ -1,17 +1,14 @@
-#include "gtk/gtk.h"
 #include "settings.h"
 #include "state.h"
 #include "task-list.h"
-#include "utils.h"
-#include <stdbool.h>
 
-static void on_dialog_close_cb();
 static void on_show_completed_toggle_cb(AdwSwitchRow *row);
 static void on_created_toggle_cb(GtkCheckButton *btn);
 static void on_due_toggle_cb(GtkCheckButton *btn);
 static void on_priority_toggle_cb(GtkCheckButton *btn);
 
 // ---------- WIDGET TEMPLATE ---------- //
+
 struct _ErrandsTaskListSortDialog {
   AdwDialog parent_instance;
   GtkWidget *completed_toggle_row;

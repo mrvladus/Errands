@@ -4,7 +4,7 @@
 
 #define BIN_NAME   "errands"
 #define APP_ID     "io.github.mrvladus.Errands"
-#define VERSION    "48.0"
+#define VERSION    "49.0"
 #define LOCALE_DIR ""
 
 #define BUILD_DIR "build"

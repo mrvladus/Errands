@@ -34,8 +34,6 @@ template $ErrandsTask: Box {
     CheckButton complete_btn {
       valign: center;
       tooltip-text: _("Toggle Completion");
-      can-focus: true;
-      receives-default: false;
 
       styles [
         "selection-mode",
@@ -206,17 +204,12 @@ template $ErrandsTask: Box {
   }
 
   // Sub-Tasks Entry
-  Revealer {
-    transition-duration: 100;
-    reveal-child: bind sub_entry.visible;
-
-    Entry sub_entry {
-      margin-start: 6;
-      margin-end: 6;
-      margin-bottom: 6;
-      opacity: 0.65;
-      placeholder-text: _("Add Sub-Task");
-      activate => $on_sub_task_entry_activated(template) not-swapped;
-    }
+  Entry sub_entry {
+    margin-start: 6;
+    margin-end: 6;
+    margin-bottom: 6;
+    opacity: 0.7;
+    placeholder-text: _("Add Sub-Task");
+    activate => $on_sub_task_entry_activated(template) not-swapped;
   }
 }

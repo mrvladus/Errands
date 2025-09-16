@@ -13,22 +13,30 @@ template $ErrandsTaskList: Adw.Bin {
       Button {
         icon-name: "errands-sort-symbolic";
         tooltip-text: _("Filter and Sort");
-        clicked => $on_sort_dialog_show_cb();
+        clicked => $errands_task_list_sort_dialog_show();
+
+        ShortcutController {
+          scope: global;
+
+          Shortcut {
+            trigger: "<Control><Shift>F";
+            action: "activate";
+          }
+        }
       }
 
       [end]
       ToggleButton search_btn {
         icon-name: "errands-search-symbolic";
         tooltip-text: _("Search (Ctrl+F)");
-        action-name: "task-list.toggle_search";
 
         ShortcutController {
+          scope: global;
+
           Shortcut {
             trigger: "<Control>F";
-            action: "action(task-list.toggle_search)";
+            action: "activate";
           }
-
-          scope: global;
         }
       }
     }
@@ -39,17 +47,16 @@ template $ErrandsTaskList: Adw.Bin {
       key-capture-widget: search_entry;
 
       SearchEntry search_entry {
-        search-changed => $on_task_list_search_cb();
+        search-changed => $on_task_list_search_cb(template);
       }
     }
 
     [top]
     Revealer entry_rev {
       transition-type: swing_down;
+      reveal-child: bind search_btn.active inverted;
 
       Adw.Clamp {
-        // tightening-threshold: 300;
-        // maximum-size: 1000;
         margin-start: 12;
         margin-end: 12;
 
@@ -63,6 +70,12 @@ template $ErrandsTaskList: Adw.Bin {
           styles [
             "card",
           ]
+
+          // [suffix]
+          // MenuButton {
+          //   icon-name: "errands-calendar-symbolic";
+          //   valign: center;
+          // }
         }
       }
     }
@@ -75,7 +88,7 @@ template $ErrandsTaskList: Adw.Bin {
         margin-start: 8;
         margin-end: 8;
         single-click-activate: true;
-        activate => $on_list_view_activate();
+        activate => $on_list_view_activate_cb();
       }
     };
   }

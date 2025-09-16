@@ -127,6 +127,8 @@ void errands_task_set_data(ErrandsTask *self, TaskData *data) {
                                errands_data_get_bool(data, DATA_PROP_TOOLBAR_SHOWN));
   g_signal_handler_unblock(self->toolbar_btn, self->toolbar_btn_signal_id);
   // Update UI
+  // Show sub-tasks entry
+  gtk_widget_set_visible(self->sub_entry, errands_data_get_bool(data, DATA_PROP_EXPANDED));
   errands_task_update_tags(self);
   errands_task_update_accent_color(self);
   errands_task_update_progress(self);
@@ -182,8 +184,6 @@ void errands_task_update_progress(ErrandsTask *task) {
 
 void errands_task_update_toolbar(ErrandsTask *task) {
   TaskData *data = task->data;
-  // Show sub-tasks entry
-  gtk_widget_set_visible(task->sub_entry, errands_data_get_bool(data, DATA_PROP_EXPANDED));
   // Update css for buttons
   // Notes button
   if (errands_data_get_str(data, DATA_PROP_NOTES)) gtk_widget_add_css_class(task->notes_btn, "accent");
