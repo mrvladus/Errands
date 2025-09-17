@@ -11,6 +11,7 @@
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>
+#include <stdbool.h>
 
 // List View
 static void setup_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item);
@@ -108,6 +109,7 @@ static void bind_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item
   GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_list_item_get_child(list_item));
   // Set the row on the expander
   gtk_tree_expander_set_list_row(expander, row); // create_child_model_func is called here
+  g_object_set_data(G_OBJECT(row), "list-item", list_item);
   ErrandsTask *task = ERRANDS_TASK(gtk_tree_expander_get_child(expander));
   g_object_set_data(G_OBJECT(task), "model-item", model_item);
   g_object_set_data(G_OBJECT(task), "row", row);
@@ -342,7 +344,14 @@ static void restore_expanded_state(ErrandsTaskList *self) {
     if (!row) continue;
     g_autoptr(GObject) row_item = gtk_tree_list_row_get_item(row);
     TaskData *data = g_object_get_data(row_item, "data");
-    if (data) gtk_tree_list_row_set_expanded(row, errands_data_get_bool(data, DATA_PROP_EXPANDED));
+    if (data) {
+      bool expanded = errands_data_get_bool(data, DATA_PROP_EXPANDED);
+      gtk_tree_list_row_set_expanded(row, expanded);
+      GtkListItem *list_item = g_object_get_data(G_OBJECT(row), "list-item");
+      gtk_list_item_set_activatable(list_item, true);
+      ErrandsTask *task = g_object_get_data(row_item, "task");
+      gtk_widget_set_visible(task->sub_entry, expanded);
+    }
   }
 }
 
@@ -353,7 +362,13 @@ static void expand_matching_rows(ErrandsTaskList *self, const char *query) {
     if (!row) continue;
     g_autoptr(GObject) row_item = gtk_tree_list_row_get_item(row);
     TaskData *data = g_object_get_data(row_item, "data");
-    if (data && task_or_descendants_match(data, query)) gtk_tree_list_row_set_expanded(row, TRUE);
+    if (data && task_or_descendants_match(data, query)) {
+      gtk_tree_list_row_set_expanded(row, true);
+      GtkListItem *list_item = g_object_get_data(G_OBJECT(row), "list-item");
+      gtk_list_item_set_activatable(list_item, false);
+      ErrandsTask *task = g_object_get_data(row_item, "task");
+      gtk_widget_set_visible(task->sub_entry, false);
+    }
   }
   if (n > 0) gtk_list_view_scroll_to(GTK_LIST_VIEW(self->task_list), 0, GTK_LIST_SCROLL_FOCUS, NULL);
 }
