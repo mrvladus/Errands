@@ -1,10 +1,5 @@
 #include "task.h"
 #include "data/data.h"
-#include "gdk/gdk.h"
-#include "gio/gio.h"
-#include "glib-object.h"
-#include "glib.h"
-#include "gtk/gtk.h"
 #include "state.h"
 #include "sync.h"
 #include "utils.h"
@@ -458,7 +453,6 @@ static void on_action_edit(GSimpleAction *action, GVariant *param, ErrandsTask *
 static void on_action_trash(GSimpleAction *action, GVariant *param, ErrandsTask *task) {
   errands_data_set_bool(task->data, DATA_PROP_TRASH, true);
   errands_data_write_list(task_data_get_list(task->data));
-  gtk_widget_set_visible(GTK_WIDGET(task), false);
   errands_task_list_update_title();
   errands_sidebar_all_row_update_counter(state.main_window->sidebar->all_row);
   errands_sidebar_task_list_row_update_counter(

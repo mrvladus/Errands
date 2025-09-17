@@ -128,6 +128,12 @@ void errands_task_list_sort_dialog_show();
 
 // --- TASK LIST --- //
 
+typedef enum {
+  ERRANDS_TASK_LIST_PAGE_DEFAULT,
+  ERRANDS_TASK_LIST_PAGE_TRASH,
+  ERRANDS_TASK_LIST_PAGE_TODAY,
+} ErrandsTaskListPage;
+
 #define ERRANDS_TYPE_TASK_LIST (errands_task_list_get_type())
 G_DECLARE_FINAL_TYPE(ErrandsTaskList, errands_task_list, ERRANDS, TASK_LIST, AdwBin)
 
@@ -148,6 +154,7 @@ struct _ErrandsTaskList {
   GtkCustomFilter *completed_filter;
   GtkCustomFilter *search_filter;
   GtkFilterListModel *search_filter_model;
+  GtkCustomFilter *toplevel_filter;
 
   ErrandsTaskListAttachmentsDialog *attachments_dialog;
   ErrandsTaskListColorDialog *color_dialog;
@@ -158,6 +165,7 @@ struct _ErrandsTaskList {
   ErrandsTaskListTagsDialog *tags_dialog;
 
   ListData *data;
+  ErrandsTaskListPage page;
 };
 
 ErrandsTaskList *errands_task_list_new();

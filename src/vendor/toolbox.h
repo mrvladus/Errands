@@ -88,6 +88,10 @@ void func() {
 #define TB_PROFILE_BLOCK(code_block) code_block
 #endif // TB_ENABLE_PROFILING
 
+// -------------------- LOOPS MACROS -------------------- //
+
+#define for_range(idx, idx_start, idx_end) for (int64_t idx = idx_start; idx < idx_end; ++idx)
+
 // -------------------- DYNAMIC ARRAY OF POINTERS -------------------- //
 
 typedef struct {

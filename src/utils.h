@@ -9,9 +9,6 @@
 #include <sys/stat.h>
 #include <time.h>
 
-// For range from start to end - 1
-#define for_range(var, start, end) for (int var = start; var < end; var++)
-
 #define RUN_THREAD_FUNC(func, on_finish_cb)                                                                            \
   g_autoptr(GTask) task = g_task_new(NULL, NULL, on_finish_cb, NULL);                                                  \
   g_task_run_in_thread(task, func);

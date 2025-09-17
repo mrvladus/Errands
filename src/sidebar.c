@@ -1,5 +1,6 @@
 #include "sidebar.h"
 #include "data/data.h"
+#include "gtk/gtk.h"
 #include "settings.h"
 #include "state.h"
 #include "utils.h"
@@ -92,7 +93,7 @@ static void on_errands_sidebar_filter_row_activated(GtkListBox *box, GtkListBoxR
     gtk_revealer_set_reveal_child(GTK_REVEALER(state.main_window->task_list->entry_rev), false);
     // Filter task list
     state.main_window->task_list->data = NULL;
-    // gtk_filter_changed(GTK_FILTER(state.task_list->toplevel_tasks_filter), GTK_FILTER_CHANGE_LESS_STRICT);
+    gtk_filter_changed(GTK_FILTER(state.main_window->task_list->toplevel_filter), GTK_FILTER_CHANGE_DIFFERENT);
   }
 }
 

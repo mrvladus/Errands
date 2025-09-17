@@ -1,4 +1,5 @@
 #include "data/data.h"
+#include "gtk/gtk.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "state.h"
@@ -125,7 +126,7 @@ void on_errands_sidebar_task_list_row_activate(GtkListBox *box, ErrandsSidebarTa
   // Set task list data
   state.main_window->task_list->data = row->data;
   // Filter task list
-  // gtk_filter_changed(GTK_FILTER(state.main_window->task_list->toplevel_tasks_filter), GTK_FILTER_CHANGE_DIFFERENT);
+  gtk_filter_changed(GTK_FILTER(state.main_window->task_list->toplevel_filter), GTK_FILTER_CHANGE_DIFFERENT);
   // Show entry
   if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(state.main_window->task_list->search_btn)))
     gtk_revealer_set_reveal_child(GTK_REVEALER(state.main_window->task_list->entry_rev), true);
