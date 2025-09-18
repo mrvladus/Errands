@@ -1,16 +1,16 @@
 using Gtk 4.0;
 
-template $ErrandsSidebarAllRow: ListBoxRow {
+template $ErrandsSidebarTodayRow: ListBoxRow {
   Box {
     spacing: 12;
-    tooltip-text: _("All Tasks");
+    tooltip-text: _("Tasks for Today");
 
     Image {
-      icon-name: "errands-all-tasks-symbolic";
+      icon-name: "errands-calendar-symbolic";
     }
 
     Label {
-      label: C_("All Tasks", "All");
+      label: _("Today");
     }
 
     Label counter {

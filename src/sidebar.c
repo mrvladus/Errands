@@ -1,6 +1,5 @@
 #include "sidebar.h"
 #include "data/data.h"
-#include "gtk/gtk.h"
 #include "settings.h"
 #include "state.h"
 #include "utils.h"
@@ -26,11 +25,13 @@ static void errands_sidebar_class_init(ErrandsSidebarClass *class) {
   G_OBJECT_CLASS(class)->dispose = errands_sidebar_dispose;
 
   g_type_ensure(ERRANDS_TYPE_SIDEBAR_ALL_ROW);
+  g_type_ensure(ERRANDS_TYPE_SIDEBAR_TODAY_ROW);
   g_type_ensure(ERRANDS_TYPE_SIDEBAR_TASK_LIST_ROW);
 
   gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), "/io/github/mrvladus/Errands/ui/sidebar.ui");
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, filters_box);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, all_row);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, today_row);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, task_lists_box);
 
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_errands_sidebar_filter_row_activated);
@@ -59,6 +60,7 @@ void errands_sidebar_load_lists(ErrandsSidebar *self) {
   }
   g_ptr_array_free(lists, false);
   errands_sidebar_all_row_update_counter(self->all_row);
+  errands_sidebar_today_row_update_counter(self->today_row);
   errands_window_update(state.main_window);
   // Select last opened page
   g_signal_connect(state.main_window, "realize", G_CALLBACK(errands_sidebar_select_last_opened_page), NULL);
