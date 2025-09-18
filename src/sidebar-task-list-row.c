@@ -157,7 +157,8 @@ static void on_action_rename(GSimpleAction *action, GVariant *param, ErrandsSide
 static void __on_export_finish(GObject *obj, GAsyncResult *res, gpointer data) {
   g_autoptr(GFile) f = gtk_file_dialog_save_finish(GTK_FILE_DIALOG(obj), res, NULL);
   if (!f) return;
-  FILE *file = fopen(g_file_get_path(f), "w");
+  g_autofree char *path = g_file_get_path(f);
+  FILE *file = fopen(path, "w");
   if (!file) return; // TODO: error toast
   char *ical = icalcomponent_as_ical_string(data);
   fprintf(file, "%s", ical);

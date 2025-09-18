@@ -468,13 +468,30 @@ static void on_action_clipboard(GSimpleAction *action, GVariant *param, ErrandsT
   errands_window_add_toast(state.main_window, _("Copied to Clipboard"));
 }
 
-static void on_action_export(GSimpleAction *action, GVariant *param, ErrandsTask *task) {
+static void on_export_action_finish_cb(GObject *obj, GAsyncResult *res, gpointer data) {
+  g_autoptr(GFile) f = gtk_file_dialog_save_finish(GTK_FILE_DIALOG(obj), res, NULL);
+  if (!f) return;
+  g_autofree char *path = g_file_get_path(f);
+  FILE *file = fopen(path, "w");
+  if (!file) return; // TODO: error toast
+  TaskData *task_data = data;
   icalcomponent *cal = icalcomponent_new_vcalendar();
-  icalcomponent *dup = icalcomponent_new_clone(task->data);
-  icalcomponent_add_component(cal, task->data);
-  TB_TODO("Show export dialog here");
+  icalcomponent *dup = icalcomponent_new_clone(task_data);
+  icalcomponent_add_component(cal, dup);
+  char *ical = icalcomponent_as_ical_string(cal);
+  fprintf(file, "%s", ical);
+  fclose(file);
+  tb_log("Exported Task to '%s'", path);
+  free(ical);
   icalcomponent_free(dup);
   icalcomponent_free(cal);
+}
+
+static void on_action_export(GSimpleAction *action, GVariant *param, ErrandsTask *task) {
+  g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
+  const char *filename = tb_tmp_str_printf("%s.ics", errands_data_get_str(task->data, DATA_PROP_UID));
+  g_object_set(dialog, "initial-name", filename, NULL);
+  gtk_file_dialog_save(dialog, GTK_WINDOW(state.main_window), NULL, on_export_action_finish_cb, task->data);
 }
 
 static GdkContentProvider *on_drag_prepare(GtkDragSource *source, double x, double y, ErrandsTask *task) {
