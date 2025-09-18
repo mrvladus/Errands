@@ -456,6 +456,7 @@ static void on_action_trash(GSimpleAction *action, GVariant *param, ErrandsTask 
   errands_data_write_list(task_data_get_list(task->data));
   errands_task_list_update_title();
   errands_sidebar_all_row_update_counter(state.main_window->sidebar->all_row);
+  errands_sidebar_today_row_update_counter(state.main_window->sidebar->today_row);
   errands_sidebar_task_list_row_update_counter(
       errands_sidebar_task_list_row_get(errands_data_get_str(task->data, DATA_PROP_LIST_UID)));
 }

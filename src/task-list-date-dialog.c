@@ -1,5 +1,6 @@
 #include "data/data.h"
 #include "state.h"
+#include "sync.h"
 #include "task-list.h"
 #include "vendor/toolbox.h"
 
@@ -210,6 +211,7 @@ static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
   if (changed) {
     errands_data_write_list(task_data_get_list(data));
     errands_task_update_toolbar(self->current_task);
-    // TODO: sync
+    errands_sidebar_today_row_update_counter(state.main_window->sidebar->today_row);
+    needs_sync = true;
   }
 }
