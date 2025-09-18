@@ -9,6 +9,8 @@
 
 #define BUILD_DIR "build"
 
+static bool is_debug = false;
+
 // Errands caldav backend
 static bool build_libcaldav() {
   PugTarget libcaldav = pug_target_new("libcaldav", PUG_TARGET_TYPE_STATIC_LIBRARY, BUILD_DIR);
@@ -22,10 +24,11 @@ static bool build_libcaldav() {
 
   // CFLAGS
   pug_target_add_cflags(&libcaldav, "-Wall");
-  if (!pug_arg_bool("debug")) pug_target_add_cflags(&libcaldav, "-O3", "-flto=auto");
+  if (!is_debug) pug_target_add_cflags(&libcaldav, "-O3", "-flto=auto");
+  else pug_target_add_cflag(&libcaldav, "-g");
 
   // LDFLAGS
-  if (!pug_arg_bool("debug")) pug_target_add_ldflags(&libcaldav, "-O3", "-flto=auto");
+  if (!is_debug) pug_target_add_ldflags(&libcaldav, "-O3", "-flto=auto");
 
   // pkg-config libraries
   pug_target_add_pkg_config_lib(&libcaldav, "libcurl");
@@ -103,11 +106,12 @@ static bool build_errands() {
   pug_target_add_cflag(&errands, PUG_CFLAG_DEFINE_STR(APP_ID));
   pug_target_add_cflag(&errands, PUG_CFLAG_DEFINE_STR(VERSION));
   pug_target_add_cflag(&errands, PUG_CFLAG_DEFINE_STR(LOCALE_DIR));
-  if (!pug_arg_bool("debug")) pug_target_add_cflags(&errands, "-O3", "-flto=auto");
+  if (!is_debug) pug_target_add_cflags(&errands, "-O3", "-flto=auto");
+  else pug_target_add_cflag(&errands, "-g");
 
   // LDFLAGS
   pug_target_add_ldflags(&errands, PUG_LDFLAG_LIB_DIR(BUILD_DIR), PUG_LDFLAG_LIB("caldav"));
-  if (!pug_arg_bool("debug")) pug_target_add_ldflags(&errands, "-O3", "-flto=auto");
+  if (!is_debug) pug_target_add_ldflags(&errands, "-O3", "-flto=auto");
 
   // pkg-config libraries
   pug_target_add_pkg_config_lib(&errands, "gtksourceview-5");
@@ -130,6 +134,9 @@ int main(int argc, char **argv) {
     pug_cmd("rm -rf " BUILD_DIR);
     return 0;
   }
+
+  // Check if build is in debug mode
+  is_debug = pug_arg_bool("debug");
 
   if (!build_libcaldav()) return 1;
   if (!compile_resources()) return 1;

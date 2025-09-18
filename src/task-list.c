@@ -63,20 +63,25 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   GtkFilterListModel *toplevel_filter_model =
       gtk_filter_list_model_new(G_LIST_MODEL(self->tasks_model), GTK_FILTER(self->toplevel_filter));
 
-  // Create tree list model
+  // Tree list model
   self->tree_model =
       gtk_tree_list_model_new(G_LIST_MODEL(toplevel_filter_model), false, false, create_child_model_func, NULL, NULL);
+
   // Sort model
   GtkMultiSorter *multi_sorter = gtk_multi_sorter_new();
+  // Completion sorter
   gtk_multi_sorter_append(multi_sorter,
                           GTK_SORTER(gtk_custom_sorter_new((GCompareDataFunc)completion_sort_func, NULL, NULL)));
+  // Global sorter
   gtk_multi_sorter_append(multi_sorter, GTK_SORTER(gtk_custom_sorter_new((GCompareDataFunc)sort_func, NULL, NULL)));
   self->sorter = gtk_tree_list_row_sorter_new(GTK_SORTER(multi_sorter));
   GtkSortListModel *sort_model = gtk_sort_list_model_new(G_LIST_MODEL(self->tree_model), GTK_SORTER(self->sorter));
+
   // Filter model
   self->completed_filter = gtk_custom_filter_new((GtkCustomFilterFunc)completed_filter_func, NULL, NULL);
   GtkFilterListModel *completed_filter_model =
       gtk_filter_list_model_new(G_LIST_MODEL(sort_model), GTK_FILTER(self->completed_filter));
+
   // Search filter
   self->search_filter = gtk_custom_filter_new((GtkCustomFilterFunc)search_filter_func, self, NULL);
   self->search_filter_model =
@@ -86,6 +91,7 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   GtkListItemFactory *tasks_factory = gtk_signal_list_item_factory_new();
   g_signal_connect(tasks_factory, "setup", G_CALLBACK(setup_listitem_cb), NULL);
   g_signal_connect(tasks_factory, "bind", G_CALLBACK(bind_listitem_cb), NULL);
+
   // List View
   gtk_list_view_set_model(GTK_LIST_VIEW(self->task_list),
                           GTK_SELECTION_MODEL(gtk_no_selection_new(G_LIST_MODEL(self->search_filter_model))));
@@ -105,7 +111,11 @@ static void setup_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_ite
   gtk_list_item_set_child(list_item, GTK_WIDGET(expander));
 }
 
-static void expand_row_idle_cb(GtkTreeListRow *row) { gtk_tree_list_row_set_expanded(row, true); }
+static void expand_row_idle_cb(gpointer data) {
+  GtkTreeListRow *row = GTK_TREE_LIST_ROW(data);
+  gtk_tree_list_row_set_expanded(row, true);
+  g_object_unref(row);
+}
 
 static void bind_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item) {
   GtkTreeListRow *row = GTK_TREE_LIST_ROW(gtk_list_item_get_item(list_item));
@@ -128,7 +138,7 @@ static void bind_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item
   bool expanded = errands_data_get_bool(task_data, DATA_PROP_EXPANDED);
   bool is_expandable = gtk_tree_list_row_is_expandable(row);
   // Add at idle because otherwise will srew-up all list
-  if (is_expandable && expanded) g_idle_add_once((GSourceOnceFunc)expand_row_idle_cb, row);
+  if (is_expandable && expanded) g_idle_add_once((GSourceOnceFunc)expand_row_idle_cb, g_object_ref(row));
 }
 
 // Expand task on click on row
@@ -218,21 +228,24 @@ static gint sort_func(gconstpointer a, gconstpointer b, gpointer user_data) {
 }
 
 static gboolean toplevel_filter_func(GObject *item, gpointer user_data) {
+  // TB_LOG_DEBUG("%s", G_OBJECT_TYPE_NAME(item));
   ErrandsTaskList *self = user_data;
   if (!self->data) return true;
   TaskData *data = g_object_get_data(item, "data");
   if (!data) return true;
   ListData *list_data = task_data_get_list(data);
   if (!list_data) return true;
+
   return list_data == state.main_window->task_list->data;
 }
 
 static gboolean completed_filter_func(GObject *item, gpointer user_data) {
   bool show_completed = errands_settings_get("show_completed", SETTING_TYPE_BOOL).b;
-  g_autoptr(GObject) model_item = gtk_tree_list_row_get_item(GTK_TREE_LIST_ROW(item));
+  GObject *model_item = gtk_tree_list_row_get_item(GTK_TREE_LIST_ROW(item));
   TaskData *data = g_object_get_data(model_item, "data");
   bool is_completed = !icaltime_is_null_date(errands_data_get_time(data, DATA_PROP_COMPLETED_TIME));
   if (!show_completed && is_completed) return false;
+
   return true;
 }
 
