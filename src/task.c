@@ -1,5 +1,6 @@
 #include "task.h"
 #include "data/data.h"
+#include "sidebar.h"
 #include "state.h"
 #include "sync.h"
 #include "utils.h"
@@ -457,6 +458,7 @@ static void on_action_trash(GSimpleAction *action, GVariant *param, ErrandsTask 
   errands_task_list_update_title();
   errands_sidebar_all_row_update_counter(state.main_window->sidebar->all_row);
   errands_sidebar_today_row_update_counter(state.main_window->sidebar->today_row);
+  errands_sidebar_trash_row_update(state.main_window->sidebar->trash_row);
   errands_sidebar_task_list_row_update_counter(
       errands_sidebar_task_list_row_get(errands_data_get_str(task->data, DATA_PROP_LIST_UID)));
 }

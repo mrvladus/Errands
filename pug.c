@@ -47,9 +47,9 @@ static bool compile_resources() {
   bool blp_files_changed = pug_file_is_older_than_files(
       resoures_c, "src/sidebar.blp", "src/sidebar-all-row.blp", "src/sidebar-delete-list-dialog.blp",
       "src/sidebar-new-list-dialog.blp", "src/sidebar-rename-list-dialog.blp", "src/sidebar-task-list-row.blp",
-      "src/sidebar-today-row.blp", "src/task.blp", "src/task-list.blp", "src/task-list-attachments-dialog.blp",
-      "src/task-list-attachments-dialog-attachment.blp", "src/task-list-color-dialog.blp",
-      "src/task-list-date-dialog.blp", "src/task-list-date-dialog-date-chooser.blp",
+      "src/sidebar-today-row.blp", "src/sidebar-trash-row.blp", "src/task.blp", "src/task-list.blp",
+      "src/task-list-attachments-dialog.blp", "src/task-list-attachments-dialog-attachment.blp",
+      "src/task-list-color-dialog.blp", "src/task-list-date-dialog.blp", "src/task-list-date-dialog-date-chooser.blp",
       "src/task-list-date-dialog-rrule-row.blp", "src/task-list-date-dialog-time-chooser.blp",
       "src/task-list-notes-dialog.blp", "src/task-list-priority-dialog.blp", "src/task-list-sort-dialog.blp",
       "src/task-list-tags-dialog.blp", "src/task-list-tags-dialog-tag.blp", "src/window.blp", NULL);
@@ -84,6 +84,7 @@ static bool build_errands() {
   pug_target_add_source(&errands, "src/sidebar-rename-list-dialog.c");
   pug_target_add_source(&errands, "src/sidebar-task-list-row.c");
   pug_target_add_source(&errands, "src/sidebar-today-row.c");
+  pug_target_add_source(&errands, "src/sidebar-trash-row.c");
   pug_target_add_source(&errands, "src/state.c");
   pug_target_add_source(&errands, "src/task.c");
   pug_target_add_source(&errands, "src/task-list.c");

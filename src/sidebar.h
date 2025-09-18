@@ -42,6 +42,14 @@ G_DECLARE_FINAL_TYPE(ErrandsSidebarTodayRow, errands_sidebar_today_row, ERRANDS,
 ErrandsSidebarTodayRow *errands_sidebar_today_row_new();
 void errands_sidebar_today_row_update_counter(ErrandsSidebarTodayRow *row);
 
+// --- SIDEBAR TRASH ROW --- //
+
+#define ERRANDS_TYPE_SIDEBAR_TRASH_ROW (errands_sidebar_trash_row_get_type())
+G_DECLARE_FINAL_TYPE(ErrandsSidebarTrashRow, errands_sidebar_trash_row, ERRANDS, SIDEBAR_TRASH_ROW, GtkListBoxRow)
+
+ErrandsSidebarTrashRow *errands_sidebar_trash_row_new();
+void errands_sidebar_trash_row_update(ErrandsSidebarTrashRow *row);
+
 // --- SIDEBAR DELETE LIST DIALOG --- //
 
 #define ERRANDS_TYPE_SIDEBAR_DELETE_LIST_DIALOG (errands_sidebar_delete_list_dialog_get_type())
@@ -80,6 +88,7 @@ struct _ErrandsSidebar {
   GtkWidget *filters_box;
   ErrandsSidebarAllRow *all_row;
   ErrandsSidebarTodayRow *today_row;
+  ErrandsSidebarTrashRow *trash_row;
   GtkWidget *task_lists_box;
   ErrandsSidebarTaskListRow *current_task_list_row;
   ErrandsSidebarDeleteListDialog *delete_list_dialog;

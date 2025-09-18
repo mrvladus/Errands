@@ -1,0 +1,27 @@
+using Gtk 4.0;
+
+template $ErrandsSidebarTrashRow: ListBoxRow {
+  Box {
+    spacing: 12;
+    tooltip-text: _("Trash");
+
+    Image icon {
+      icon-name: "errands-trash-symbolic";
+    }
+
+    Label {
+      label: _("Trash");
+    }
+
+    Label counter {
+      label: "";
+      hexpand: true;
+      halign: end;
+
+      styles [
+        "dim-label",
+        "caption",
+      ]
+    }
+  }
+}

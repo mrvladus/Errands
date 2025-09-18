@@ -26,12 +26,14 @@ static void errands_sidebar_class_init(ErrandsSidebarClass *class) {
 
   g_type_ensure(ERRANDS_TYPE_SIDEBAR_ALL_ROW);
   g_type_ensure(ERRANDS_TYPE_SIDEBAR_TODAY_ROW);
+  g_type_ensure(ERRANDS_TYPE_SIDEBAR_TRASH_ROW);
   g_type_ensure(ERRANDS_TYPE_SIDEBAR_TASK_LIST_ROW);
 
   gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), "/io/github/mrvladus/Errands/ui/sidebar.ui");
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, filters_box);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, all_row);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, today_row);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, trash_row);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, task_lists_box);
 
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_errands_sidebar_filter_row_activated);

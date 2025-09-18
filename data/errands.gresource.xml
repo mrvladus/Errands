@@ -11,6 +11,7 @@
     <file preprocess="xml-stripblanks" compressed="true" alias="sidebar-all-row.ui">build/sidebar-all-row.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="sidebar-task-list-row.ui">build/sidebar-task-list-row.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="sidebar-today-row.ui">build/sidebar-today-row.ui</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="sidebar-trash-row.ui">build/sidebar-trash-row.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="sidebar.ui">build/sidebar.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="sidebar-new-list-dialog.ui">build/sidebar-new-list-dialog.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="sidebar-delete-list-dialog.ui">build/sidebar-delete-list-dialog.ui</file>
