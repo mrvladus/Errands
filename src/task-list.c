@@ -11,6 +11,7 @@
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>
+#include <stdbool.h>
 
 // List View
 static void setup_listitem_cb(GtkListItemFactory *factory, GtkListItem *list_item);
@@ -21,13 +22,16 @@ static void on_task_list_entry_activated_cb(AdwEntryRow *entry, ErrandsTaskList 
 
 static gboolean toplevel_filter_func(GObject *item, ErrandsTaskList *self);
 static gboolean completed_filter_func(GObject *item, gpointer user_data);
-static gint sort_func(gconstpointer a, gconstpointer b, gpointer user_data);
-static gint completion_sort_func(gconstpointer a, gconstpointer b, gpointer user_data);
 static gboolean today_filter_func(GtkTreeListRow *row, ErrandsTaskList *self);
 
 // Search callbacks
 static void on_task_list_search_cb(ErrandsTaskList *self, GtkSearchEntry *entry);
 static gboolean search_filter_func(GtkTreeListRow *row, ErrandsTaskList *self);
+
+static gint master_sort_func(gconstpointer a, gconstpointer b, gpointer user_data);
+static gboolean master_filter_func(GObject *item, ErrandsTaskList *self);
+static gboolean task_or_descendants_match(TaskData *data, const char *query);
+static bool task_or_descendants_is_due(TaskData *data);
 
 // ---------- WIDGET TEMPLATE ---------- //
 
@@ -68,30 +72,29 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   self->tree_model =
       gtk_tree_list_model_new(G_LIST_MODEL(toplevel_filter_model), false, false, create_child_model_func, NULL, NULL);
 
+  // Filter model
+  // self->completed_filter = gtk_custom_filter_new((GtkCustomFilterFunc)completed_filter_func, NULL, NULL);
+  // self->completed_filter_model =
+  //     gtk_filter_list_model_new(G_LIST_MODEL(sort_model), GTK_FILTER(self->completed_filter));
+
+  // // Today filter
+  // self->today_filter = gtk_custom_filter_new((GtkCustomFilterFunc)today_filter_func, self, NULL);
+  // self->today_filter_model =
+  //     gtk_filter_list_model_new(G_LIST_MODEL(self->completed_filter_model), GTK_FILTER(self->today_filter));
+
+  // // Search filter
+  // self->search_filter = gtk_custom_filter_new((GtkCustomFilterFunc)search_filter_func, self, NULL);
+  // self->search_filter_model =
+  //     gtk_filter_list_model_new(G_LIST_MODEL(self->today_filter_model), GTK_FILTER(self->search_filter));
+
   // Sort model
-  GtkMultiSorter *multi_sorter = gtk_multi_sorter_new();
-  // Completion sorter
-  gtk_multi_sorter_append(multi_sorter,
-                          GTK_SORTER(gtk_custom_sorter_new((GCompareDataFunc)completion_sort_func, NULL, NULL)));
-  // Global sorter
-  gtk_multi_sorter_append(multi_sorter, GTK_SORTER(gtk_custom_sorter_new((GCompareDataFunc)sort_func, NULL, NULL)));
-  self->sorter = gtk_tree_list_row_sorter_new(GTK_SORTER(multi_sorter));
-  GtkSortListModel *sort_model = gtk_sort_list_model_new(G_LIST_MODEL(self->tree_model), GTK_SORTER(self->sorter));
+  self->master_sorter = gtk_tree_list_row_sorter_new(GTK_SORTER(gtk_custom_sorter_new(master_sort_func, NULL, NULL)));
+  self->master_sort_model = gtk_sort_list_model_new(G_LIST_MODEL(self->tree_model), GTK_SORTER(self->master_sorter));
 
   // Filter model
-  self->completed_filter = gtk_custom_filter_new((GtkCustomFilterFunc)completed_filter_func, NULL, NULL);
-  self->completed_filter_model =
-      gtk_filter_list_model_new(G_LIST_MODEL(sort_model), GTK_FILTER(self->completed_filter));
-
-  // Today filter
-  self->today_filter = gtk_custom_filter_new((GtkCustomFilterFunc)today_filter_func, self, NULL);
-  self->today_filter_model =
-      gtk_filter_list_model_new(G_LIST_MODEL(self->completed_filter_model), GTK_FILTER(self->today_filter));
-
-  // Search filter
-  self->search_filter = gtk_custom_filter_new((GtkCustomFilterFunc)search_filter_func, self, NULL);
-  self->search_filter_model =
-      gtk_filter_list_model_new(G_LIST_MODEL(self->today_filter_model), GTK_FILTER(self->search_filter));
+  self->master_filter = gtk_custom_filter_new((GtkCustomFilterFunc)master_filter_func, self, NULL);
+  self->master_filter_model =
+      gtk_filter_list_model_new(G_LIST_MODEL(self->master_sort_model), GTK_FILTER(self->master_filter));
 
   // Factory
   GtkListItemFactory *tasks_factory = gtk_signal_list_item_factory_new();
@@ -100,7 +103,7 @@ static void errands_task_list_init(ErrandsTaskList *self) {
 
   // List View
   gtk_list_view_set_model(GTK_LIST_VIEW(self->task_list),
-                          GTK_SELECTION_MODEL(gtk_no_selection_new(G_LIST_MODEL(self->search_filter_model))));
+                          GTK_SELECTION_MODEL(gtk_no_selection_new(G_LIST_MODEL(self->master_filter_model))));
   gtk_list_view_set_factory(GTK_LIST_VIEW(self->task_list), tasks_factory);
 
   tb_log("Task List: Created");
@@ -194,45 +197,6 @@ static GListModel *create_child_model_func(gpointer item, gpointer user_data) {
 
 // --- SORT AND FILTER CALLBACKS --- //
 
-static gint completion_sort_func(gconstpointer a, gconstpointer b, gpointer user_data) {
-  TaskData *data_a = g_object_get_data(G_OBJECT(a), "data");
-  TaskData *data_b = g_object_get_data(G_OBJECT(b), "data");
-  icaltimetype completed_a_t = errands_data_get_time(data_a, DATA_PROP_COMPLETED_TIME);
-  icaltimetype completed_b_t = errands_data_get_time(data_b, DATA_PROP_COMPLETED_TIME);
-  bool completed_a = !icaltime_is_null_date(completed_a_t);
-  bool completed_b = !icaltime_is_null_date(completed_b_t);
-
-  return completed_a - completed_b;
-}
-
-static gint sort_func(gconstpointer a, gconstpointer b, gpointer user_data) {
-  TaskData *data_a = g_object_get_data(G_OBJECT(a), "data");
-  TaskData *data_b = g_object_get_data(G_OBJECT(b), "data");
-  switch (errands_settings_get("sort_by", SETTING_TYPE_INT).i) {
-  case SORT_TYPE_CREATION_DATE: {
-    icaltimetype creation_date_a = errands_data_get_time(data_a, DATA_PROP_CREATED_TIME);
-    icaltimetype creation_date_b = errands_data_get_time(data_b, DATA_PROP_CREATED_TIME);
-
-    return icaltime_compare(creation_date_b, creation_date_a);
-  }
-  case SORT_TYPE_DUE_DATE: {
-    icaltimetype due_date_a = errands_data_get_time(data_a, DATA_PROP_DUE_TIME);
-    icaltimetype due_date_b = errands_data_get_time(data_b, DATA_PROP_DUE_TIME);
-    bool due_date_a_null = icaltime_is_null_time(due_date_a);
-    bool due_date_b_null = icaltime_is_null_time(due_date_b);
-
-    return due_date_b_null - due_date_a_null;
-  }
-  case SORT_TYPE_PRIORITY: {
-    uint8_t p_a = errands_data_get_int(data_a, DATA_PROP_PRIORITY);
-    uint8_t p_b = errands_data_get_int(data_b, DATA_PROP_PRIORITY);
-
-    return p_b - p_a;
-  }
-  default: return 0;
-  }
-}
-
 static gboolean toplevel_filter_func(GObject *item, ErrandsTaskList *self) {
   if (self->page == ERRANDS_TASK_LIST_PAGE_ALL) return true;
   TaskData *data = g_object_get_data(item, "data");
@@ -249,6 +213,66 @@ static gboolean completed_filter_func(GObject *item, gpointer user_data) {
   TaskData *data = g_object_get_data(model_item, "data");
   bool is_completed = !icaltime_is_null_date(errands_data_get_time(data, DATA_PROP_COMPLETED_TIME));
   if (!show_completed && is_completed) return false;
+
+  return true;
+}
+
+// TODO: fix toplevel func is still used
+
+static gint master_sort_func(gconstpointer a, gconstpointer b, gpointer user_data) {
+  TaskData *data_a = g_object_get_data(G_OBJECT(a), "data");
+  TaskData *data_b = g_object_get_data(G_OBJECT(b), "data");
+
+  if (!data_a || !data_b) return 0;
+
+  // Completion sort first
+  gboolean completed_a = !icaltime_is_null_date(errands_data_get_time(data_a, DATA_PROP_COMPLETED_TIME));
+  gboolean completed_b = !icaltime_is_null_date(errands_data_get_time(data_b, DATA_PROP_COMPLETED_TIME));
+  if (completed_a != completed_b) return completed_a - completed_b; // incomplete before completed
+
+  // Then apply global sort
+  switch (errands_settings_get("sort_by", SETTING_TYPE_INT).i) {
+  case SORT_TYPE_CREATION_DATE: {
+    icaltimetype creation_date_a = errands_data_get_time(data_a, DATA_PROP_CREATED_TIME);
+    icaltimetype creation_date_b = errands_data_get_time(data_b, DATA_PROP_CREATED_TIME);
+    return icaltime_compare(creation_date_b, creation_date_a); // newest first
+  }
+  case SORT_TYPE_DUE_DATE: {
+    icaltimetype due_a = errands_data_get_time(data_a, DATA_PROP_DUE_TIME);
+    icaltimetype due_b = errands_data_get_time(data_b, DATA_PROP_DUE_TIME);
+    bool null_a = icaltime_is_null_time(due_a);
+    bool null_b = icaltime_is_null_time(due_b);
+    if (null_a != null_b) return null_a - null_b; // tasks with due dates first
+    return icaltime_compare(due_a, due_b);        // earlier due dates first
+  }
+  case SORT_TYPE_PRIORITY: {
+    int p_a = errands_data_get_int(data_a, DATA_PROP_PRIORITY);
+    int p_b = errands_data_get_int(data_b, DATA_PROP_PRIORITY);
+    return p_b - p_a; // higher priority first
+  }
+  default: return 0;
+  }
+}
+
+static gboolean master_filter_func(GObject *item, ErrandsTaskList *self) {
+  GObject *model_item = gtk_tree_list_row_get_item(GTK_TREE_LIST_ROW(item));
+  if (!model_item) return false;
+  TaskData *data = g_object_get_data(model_item, "data");
+  if (!data) return false;
+  // Top-level filter
+  if (self->page == ERRANDS_TASK_LIST_PAGE_TASK_LIST) {
+    ListData *list_data = task_data_get_list(data);
+    if (list_data != self->data) return false;
+  }
+  // Today filter
+  if (self->page == ERRANDS_TASK_LIST_PAGE_TODAY)
+    if (!task_or_descendants_is_due(data)) return false;
+  // Completed filter
+  if (!errands_settings_get("show_completed", SETTING_TYPE_BOOL).b)
+    if (!icaltime_is_null_date(errands_data_get_time(data, DATA_PROP_COMPLETED_TIME))) return false;
+  // Search filter
+  if (self->search_query && !g_str_equal(self->search_query, ""))
+    if (!task_or_descendants_match(data, self->search_query)) return false;
 
   return true;
 }
@@ -478,7 +502,7 @@ static gboolean today_filter_func(GtkTreeListRow *row, ErrandsTaskList *self) {
 void errands_task_list_show_today_tasks(ErrandsTaskList *self) {
   errands_task_list_show_all_tasks(self);
   self->page = ERRANDS_TASK_LIST_PAGE_TODAY;
-  gtk_filter_changed(GTK_FILTER(self->today_filter), GTK_FILTER_CHANGE_DIFFERENT);
+  gtk_filter_changed(GTK_FILTER(self->master_filter), GTK_FILTER_CHANGE_DIFFERENT);
   errands_task_list_update_title(self);
   TB_TODO("Combine filters");
   // TODO: probably use toplevel filter for both all and today just by checking task_list->page in the filter func/
@@ -487,7 +511,7 @@ void errands_task_list_show_today_tasks(ErrandsTaskList *self) {
 
 void errands_task_list_show_all_tasks(ErrandsTaskList *self) {
   self->page = ERRANDS_TASK_LIST_PAGE_ALL;
-  gtk_filter_changed(GTK_FILTER(self->toplevel_filter), GTK_FILTER_CHANGE_DIFFERENT);
+  gtk_filter_changed(GTK_FILTER(self->master_filter), GTK_FILTER_CHANGE_DIFFERENT);
   gtk_revealer_set_reveal_child(GTK_REVEALER(self->entry_rev), false);
   errands_task_list_update_title(self);
 }
@@ -497,7 +521,7 @@ void errands_task_list_show_task_list(ErrandsTaskList *self, ListData *data) {
   self->data = data;
   // Filter task list
   self->page = ERRANDS_TASK_LIST_PAGE_TASK_LIST;
-  gtk_filter_changed(GTK_FILTER(self->toplevel_filter), GTK_FILTER_CHANGE_DIFFERENT);
+  gtk_filter_changed(GTK_FILTER(self->master_filter), GTK_FILTER_CHANGE_DIFFERENT);
   // Show entry
   if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(self->search_btn)))
     gtk_revealer_set_reveal_child(GTK_REVEALER(self->entry_rev), true);
