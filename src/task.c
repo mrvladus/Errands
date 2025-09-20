@@ -17,8 +17,6 @@ static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointe
 static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *task);
 static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x, gdouble y, GtkPopover *popover);
 static void on_toolbar_btn_toggle_cb(GtkToggleButton *btn, ErrandsTask *task);
-static void on_errands_task_edited(GtkEditableLabel *entry, ErrandsTask *task);
-static void on_errands_task_edit_cancelled(GtkButton *btn, ErrandsTask *task);
 
 // Actions callbacks
 static void on_action_edit(GSimpleAction *action, GVariant *param, ErrandsTask *task);
@@ -375,7 +373,7 @@ static void on_complete_btn_toggle_cb(GtkCheckButton *btn, ErrandsTask *task) {
   // TODO: remember next row and scroll to it
 
   // Update task list
-  errands_task_list_update_title();
+  errands_task_list_update_title(state.main_window->task_list);
   errands_sidebar_all_row_update_counter(state.main_window->sidebar->all_row);
   errands_sidebar_today_row_update_counter(state.main_window->sidebar->today_row);
   errands_sidebar_task_list_row_update_counter(
@@ -455,7 +453,7 @@ static void on_action_edit(GSimpleAction *action, GVariant *param, ErrandsTask *
 static void on_action_trash(GSimpleAction *action, GVariant *param, ErrandsTask *task) {
   errands_data_set_bool(task->data, DATA_PROP_TRASH, true);
   errands_data_write_list(task_data_get_list(task->data));
-  errands_task_list_update_title();
+  errands_task_list_update_title(state.main_window->task_list);
   errands_sidebar_all_row_update_counter(state.main_window->sidebar->all_row);
   errands_sidebar_today_row_update_counter(state.main_window->sidebar->today_row);
   errands_sidebar_trash_row_update(state.main_window->sidebar->trash_row);

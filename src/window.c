@@ -25,7 +25,6 @@ static void errands_window_class_init(ErrandsWindowClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsWindow, toast_overlay);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsWindow, split_view);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsWindow, sidebar);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsWindow, stack);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsWindow, task_list);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsWindow, no_lists_page);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_maximize_changed_cb);

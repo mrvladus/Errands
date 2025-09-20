@@ -129,9 +129,10 @@ void errands_task_list_sort_dialog_show();
 // --- TASK LIST --- //
 
 typedef enum {
-  ERRANDS_TASK_LIST_PAGE_DEFAULT,
-  ERRANDS_TASK_LIST_PAGE_TRASH,
+  ERRANDS_TASK_LIST_PAGE_ALL,
   ERRANDS_TASK_LIST_PAGE_TODAY,
+  ERRANDS_TASK_LIST_PAGE_TRASH,
+  ERRANDS_TASK_LIST_PAGE_TASK_LIST,
 } ErrandsTaskListPage;
 
 #define ERRANDS_TYPE_TASK_LIST (errands_task_list_get_type())
@@ -152,8 +153,11 @@ struct _ErrandsTaskList {
   GtkTreeListModel *tree_model;
   GtkTreeListRowSorter *sorter;
   GtkCustomFilter *completed_filter;
+  GtkFilterListModel *completed_filter_model;
   GtkCustomFilter *search_filter;
   GtkFilterListModel *search_filter_model;
+  GtkCustomFilter *today_filter;
+  GtkFilterListModel *today_filter_model;
   GtkCustomFilter *toplevel_filter;
 
   ErrandsTaskListAttachmentsDialog *attachments_dialog;
@@ -170,4 +174,7 @@ struct _ErrandsTaskList {
 
 ErrandsTaskList *errands_task_list_new();
 void errands_task_list_load_tasks(ErrandsTaskList *self);
-void errands_task_list_update_title();
+void errands_task_list_update_title(ErrandsTaskList *self);
+void errands_task_list_show_all_tasks(ErrandsTaskList *self);
+void errands_task_list_show_today_tasks(ErrandsTaskList *self);
+void errands_task_list_show_task_list(ErrandsTaskList *self, ListData *data);

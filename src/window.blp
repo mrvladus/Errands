@@ -19,13 +19,7 @@ template $ErrandsWindow: Adw.ApplicationWindow {
         content: Adw.NavigationPage {
           title: _("Content");
 
-          child: Adw.ViewStack stack {
-            Adw.ViewStackPage {
-              name: "errands_task_list_page";
-
-              child: $ErrandsTaskList task_list {};
-            }
-          };
+          child: $ErrandsTaskList task_list {};
         };
       }
 

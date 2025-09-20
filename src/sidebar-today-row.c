@@ -40,7 +40,7 @@ void errands_sidebar_today_row_update_counter(ErrandsSidebarTodayRow *row) {
     bool completed = !icaltime_is_null_time(errands_data_get_time(td, DATA_PROP_COMPLETED_TIME));
     icaltimetype due_date = errands_data_get_time(td, DATA_PROP_DUE_TIME);
     bool is_today = false;
-    if (!icaltime_is_null_time(due_date)) is_today = (icaltime_compare_date_only(due_date, icaltime_today()) == 0);
+    if (!icaltime_is_null_time(due_date)) is_today = (icaltime_compare_date_only(due_date, icaltime_today()) <= 0);
     if (!deleted && !trash && !completed && is_today) len++;
   }
   char num[64];

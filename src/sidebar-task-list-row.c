@@ -3,8 +3,10 @@
 #include "settings.h"
 #include "sidebar.h"
 #include "state.h"
+#include "task-list.h"
 #include "utils.h"
 #include "vendor/toolbox.h"
+#include "window.h"
 
 #include <libical/ical.h>
 
@@ -116,22 +118,13 @@ void errands_sidebar_task_list_row_update_title(ErrandsSidebarTaskListRow *row) 
 // ---------- CALLBACKS ---------- //
 
 void on_errands_sidebar_task_list_row_activate(GtkListBox *box, ErrandsSidebarTaskListRow *row, gpointer user_data) {
+  ErrandsTaskList *task_list = state.main_window->task_list;
   // Unselect filter rows
   gtk_list_box_unselect_all(GTK_LIST_BOX(state.main_window->sidebar->filters_box));
-  // Switch to Task List view
-  adw_view_stack_set_visible_child_name(ADW_VIEW_STACK(state.main_window->stack), "errands_task_list_page");
   // Set setting
-  g_autofree gchar *list_uid = g_strdup(errands_data_get_str(row->data, DATA_PROP_LIST_UID));
+  const char *list_uid = tb_tmp_str_printf(errands_data_get_str(row->data, DATA_PROP_LIST_UID));
   errands_settings_set_string("last_list_uid", list_uid);
-  // Set task list data
-  state.main_window->task_list->data = row->data;
-  // Filter task list
-  gtk_filter_changed(GTK_FILTER(state.main_window->task_list->toplevel_filter), GTK_FILTER_CHANGE_DIFFERENT);
-  // Show entry
-  if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(state.main_window->task_list->search_btn)))
-    gtk_revealer_set_reveal_child(GTK_REVEALER(state.main_window->task_list->entry_rev), true);
-  // Update title
-  errands_task_list_update_title();
+  errands_task_list_show_task_list(task_list, row->data);
   tb_log("Switch to list '%s'", list_uid);
 }
 
@@ -154,12 +147,15 @@ static void on_action_rename(GSimpleAction *action, GVariant *param, ErrandsSide
 
 // - EXPORT - //
 
-static void __on_export_finish(GObject *obj, GAsyncResult *res, gpointer data) {
+static void on_action_export_finish_cb(GObject *obj, GAsyncResult *res, gpointer data) {
   g_autoptr(GFile) f = gtk_file_dialog_save_finish(GTK_FILE_DIALOG(obj), res, NULL);
   if (!f) return;
   g_autofree char *path = g_file_get_path(f);
   FILE *file = fopen(path, "w");
-  if (!file) return; // TODO: error toast
+  if (!file) {
+    errands_window_add_toast(state.main_window, "Export failed");
+    return;
+  }
   char *ical = icalcomponent_as_ical_string(data);
   fprintf(file, "%s", ical);
   fclose(file);
@@ -171,7 +167,7 @@ static void on_action_export(GSimpleAction *action, GVariant *param, ErrandsSide
   g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
   const char *filename = tb_tmp_str_printf("%s.ics", errands_data_get_str(row->data, DATA_PROP_LIST_UID));
   g_object_set(dialog, "initial-name", filename, NULL);
-  gtk_file_dialog_save(dialog, GTK_WINDOW(state.main_window), NULL, __on_export_finish, row->data);
+  gtk_file_dialog_save(dialog, GTK_WINDOW(state.main_window), NULL, on_action_export_finish_cb, row->data);
 }
 
 static void on_action_delete(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {

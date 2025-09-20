@@ -1,5 +1,6 @@
 #include "sidebar.h"
 #include "state.h"
+#include "sync.h"
 #include "vendor/toolbox.h"
 
 static void on_response_cb(ErrandsSidebarRenameListDialog *self, gchar *response, gpointer data);
@@ -60,8 +61,8 @@ static void on_response_cb(ErrandsSidebarRenameListDialog *self, gchar *response
     errands_data_set_str(self->current_task_list_row->data, DATA_PROP_LIST_NAME, text);
     errands_data_write_list(self->current_task_list_row->data);
     errands_sidebar_task_list_row_update_title(self->current_task_list_row);
-    errands_task_list_update_title();
-    // TODO: sync
+    errands_task_list_update_title(state.main_window->task_list);
+    needs_sync = true;
   }
 }
 
