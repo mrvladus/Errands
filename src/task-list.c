@@ -21,8 +21,6 @@ static void on_list_view_activate_cb(GtkListView *self, guint position, gpointer
 static void on_task_list_entry_activated_cb(AdwEntryRow *entry, ErrandsTaskList *self);
 
 static gboolean toplevel_filter_func(GObject *item, ErrandsTaskList *self);
-static gboolean completed_filter_func(GObject *item, gpointer user_data);
-static gboolean today_filter_func(GtkTreeListRow *row, ErrandsTaskList *self);
 
 // Search callbacks
 static void on_task_list_search_cb(ErrandsTaskList *self, GtkSearchEntry *entry);
@@ -205,16 +203,6 @@ static gboolean toplevel_filter_func(GObject *item, ErrandsTaskList *self) {
   if (!list_data) return true;
 
   return list_data == self->data;
-}
-
-static gboolean completed_filter_func(GObject *item, gpointer user_data) {
-  bool show_completed = errands_settings_get("show_completed", SETTING_TYPE_BOOL).b;
-  GObject *model_item = gtk_tree_list_row_get_item(GTK_TREE_LIST_ROW(item));
-  TaskData *data = g_object_get_data(model_item, "data");
-  bool is_completed = !icaltime_is_null_date(errands_data_get_time(data, DATA_PROP_COMPLETED_TIME));
-  if (!show_completed && is_completed) return false;
-
-  return true;
 }
 
 // TODO: fix toplevel func is still used
