@@ -1,6 +1,7 @@
 #pragma once
 
 #include "data/data.h"
+#include "glib.h"
 #include "task.h"
 
 #include <adwaita.h>
@@ -150,12 +151,7 @@ struct _ErrandsTaskList {
 
   GListStore *tasks_model;
   GtkTreeListModel *tree_model;
-  GtkCustomFilter *completed_filter;
-  GtkFilterListModel *completed_filter_model;
-  GtkCustomFilter *search_filter;
-  GtkFilterListModel *search_filter_model;
-  GtkCustomFilter *today_filter;
-  GtkFilterListModel *today_filter_model;
+
   GtkCustomFilter *toplevel_filter;
 
   GtkTreeListRowSorter *master_sorter;
@@ -173,6 +169,7 @@ struct _ErrandsTaskList {
 
   ListData *data;
   ErrandsTaskListPage page;
+  GPtrArray *all_tasks;
 };
 
 ErrandsTaskList *errands_task_list_new();
