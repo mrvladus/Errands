@@ -1,5 +1,6 @@
 #include "task-list.h"
 #include "data/data.h"
+#include "gio/gio.h"
 #include "settings.h"
 #include "state.h"
 #include "utils.h"
@@ -8,6 +9,7 @@
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>
+#include <stdio.h>
 
 typedef enum {
   EXPAND_DUE,
@@ -32,6 +34,17 @@ static gboolean toplevel_filter_func(GObject *item, ErrandsTaskList *self);
 static gint master_sort_func(gconstpointer a, gconstpointer b, gpointer user_data);
 static gboolean master_filter_func(GObject *item, ErrandsTaskList *self);
 
+static void on_test_cb() {
+  // GListStore *model = state.main_window->task_list->tasks_model;
+  // for_range(i, 0, 1000) {
+  //   char num[64];
+  //   sprintf(num, "%zu", i);
+  //   TaskData *td = task_data_new(state.main_window->task_list->data, num, NULL);
+  //   // g_hash_table_insert(tdata, g_strdup(errands_data_get_str(td, DATA_PROP_UID)), td);
+  //   g_list_store_append(model, task_data_as_gobject(td));
+  // }
+}
+
 // ---------- WIDGET TEMPLATE ---------- //
 
 G_DEFINE_TYPE(ErrandsTaskList, errands_task_list, ADW_TYPE_BIN)
@@ -54,6 +67,7 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_entry_activated_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_search_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_list_view_activate_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_test_cb);
 }
 
 static void errands_task_list_init(ErrandsTaskList *self) {
@@ -273,7 +287,7 @@ void errands_task_list_update_title(ErrandsTaskList *self) {
   } break;
   }
   // Retrieve tasks and count completed and total tasks
-  GPtrArray *tasks = g_hash_table_get_values_as_ptr_array(tdata);
+  GPtrArray *tasks = reload_all_tasks(self);
   for_range(i, 0, tasks->len) {
     TaskData *td = tasks->pdata[i];
     bool deleted = errands_data_get_bool(td, DATA_PROP_DELETED);
@@ -285,7 +299,6 @@ void errands_task_list_update_title(ErrandsTaskList *self) {
       if (!icaltime_is_null_time(errands_data_get_time(td, DATA_PROP_COMPLETED_TIME))) completed++;
     }
   }
-  g_ptr_array_free(tasks, false);
   // Set subtitle with completed stats
   const char *stats = tb_tmp_str_printf("%s %zu / %zu", _("Completed:"), completed, total);
   adw_window_title_set_subtitle(ADW_WINDOW_TITLE(self->title), total > 0 ? stats : "");
@@ -295,6 +308,7 @@ void errands_task_list_show_today_tasks(ErrandsTaskList *self) {
   errands_task_list_show_all_tasks(self);
   self->page = ERRANDS_TASK_LIST_PAGE_TODAY;
   gtk_filter_changed(GTK_FILTER(self->master_filter), GTK_FILTER_CHANGE_DIFFERENT);
+  expand_rows(self, EXPAND_DUE);
   errands_task_list_update_title(self);
 }
 
@@ -380,12 +394,20 @@ static void expand_rows(ErrandsTaskList *self, ExpandType type) {
     TaskData *data = g_object_get_data(row_item, "data");
     switch (type) {
     case EXPAND_DUE: {
-      if (data && task_or_descendants_is_due(data, all_tasks)) gtk_tree_list_row_set_expanded(row, true);
+      if (data && task_or_descendants_is_due(data, all_tasks)) {
+        gtk_tree_list_row_set_expanded(row, true);
+        GtkListItem *list_item = g_object_get_data(G_OBJECT(row), "list-item");
+        if (!list_item) continue;
+        gtk_list_item_set_activatable(list_item, false);
+        ErrandsTask *task = g_object_get_data(row_item, "task");
+        gtk_widget_set_visible(task->sub_entry, false);
+      }
     } break;
     case EXPAND_SEARCH: {
       if (data && task_or_descendants_match_search_query(data, self->search_query, all_tasks)) {
         gtk_tree_list_row_set_expanded(row, true);
         GtkListItem *list_item = g_object_get_data(G_OBJECT(row), "list-item");
+        if (!list_item) continue;
         gtk_list_item_set_activatable(list_item, false);
         ErrandsTask *task = g_object_get_data(row_item, "task");
         gtk_widget_set_visible(task->sub_entry, false);
@@ -408,6 +430,7 @@ static void restore_expanded_rows(ErrandsTaskList *self) {
     gtk_tree_list_row_set_expanded(row, expanded);
     GtkListItem *list_item = g_object_get_data(G_OBJECT(row), "list-item");
     gtk_list_item_set_activatable(list_item, true);
+    if (!list_item) continue;
     ErrandsTask *task = g_object_get_data(row_item, "task");
     gtk_widget_set_visible(task->sub_entry, expanded);
   }

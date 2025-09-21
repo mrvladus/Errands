@@ -25,6 +25,11 @@ template $ErrandsTaskList: Adw.Bin {
         }
       }
 
+      Button {
+        label: _("Test");
+        clicked => $on_test_cb();
+      }
+
       [end]
       ToggleButton search_btn {
         icon-name: "errands-search-symbolic";

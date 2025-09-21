@@ -1,8 +1,12 @@
 #include "task.h"
 #include "data/data.h"
+#include "gio/gio.h"
+#include "glib-object.h"
+#include "gtk/gtk.h"
 #include "sidebar.h"
 #include "state.h"
 #include "sync.h"
+#include "task-list.h"
 #include "utils.h"
 
 #include "vendor/toolbox.h"
@@ -237,18 +241,18 @@ void errands_task_update_toolbar(ErrandsTask *task) {
 }
 
 void errands_task_get_sub_tasks_tree(ErrandsTask *task, GPtrArray *array) {
+  if (!task) return;
   GtkTreeListRow *row = g_object_get_data(G_OBJECT(task), "row");
   if (!row) return;
   GListModel *children = gtk_tree_list_row_get_children(row);
   if (!children) return;
   for (size_t i = 0; i < g_list_model_get_n_items(children); ++i) {
-    GObject *item = g_list_model_get_item(children, i);
+    g_autoptr(GObject) item = g_list_model_get_item(children, i);
+    if (!item) return;
     ErrandsTask *sub_task = g_object_get_data(item, "task");
-    GtkTreeListRow *sub_row = g_object_get_data(G_OBJECT(sub_task), "row");
-    if (sub_row) {
-      g_ptr_array_add(array, sub_task);
-      errands_task_get_sub_tasks_tree(sub_task, array);
-    }
+    if (!sub_task) return;
+    g_ptr_array_add(array, sub_task);
+    errands_task_get_sub_tasks_tree(sub_task, array);
   }
 }
 
@@ -332,6 +336,7 @@ static void on_complete_btn_toggle_cb(GtkCheckButton *btn, ErrandsTask *task) {
   bool active = gtk_check_button_get_active(btn);
   errands_data_set_time(task->data, DATA_PROP_COMPLETED_TIME,
                         active ? icaltime_get_date_time_now() : icaltime_null_time());
+  ErrandsTaskListPage page = state.main_window->task_list->page;
   // Complete all sub-tasks if checked
   if (active) {
     GPtrArray *sub_tasks_tree = g_ptr_array_new();
@@ -341,11 +346,12 @@ static void on_complete_btn_toggle_cb(GtkCheckButton *btn, ErrandsTask *task) {
       errands_data_set_time(sub_task_data, DATA_PROP_COMPLETED_TIME, icaltime_get_date_time_now());
     }
     g_ptr_array_free(sub_tasks_tree, false);
+    if (page == ERRANDS_TASK_LIST_PAGE_TODAY) errands_task_list_show_all_tasks(state.main_window->task_list);
     sub_tasks_tree = g_ptr_array_new();
     errands_task_get_sub_tasks_tree(task, sub_tasks_tree);
     for (size_t i = 0; i < sub_tasks_tree->len; ++i) {
       ErrandsTask *sub_task = sub_tasks_tree->pdata[i];
-      errands_task_set_data(sub_task, sub_task->data);
+      if (sub_task && ERRANDS_IS_TASK(sub_task)) errands_task_set_data(sub_task, sub_task->data);
     }
     g_ptr_array_free(sub_tasks_tree, false);
   }
@@ -364,6 +370,8 @@ static void on_complete_btn_toggle_cb(GtkCheckButton *btn, ErrandsTask *task) {
     }
     g_ptr_array_free(parents, false);
   }
+  if (page == ERRANDS_TASK_LIST_PAGE_TODAY) errands_task_list_show_today_tasks(state.main_window->task_list);
+
   errands_data_write_list(task_data_get_list(task->data));
   errands_task_update_progress(task);
   errands_task_update_progress(get_parent_task(task));
