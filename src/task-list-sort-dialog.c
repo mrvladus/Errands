@@ -14,6 +14,7 @@ struct _ErrandsTaskListSortDialog {
   AdwDialog parent_instance;
   GtkWidget *completed_toggle_row;
   GtkWidget *creation_date_toggle_btn;
+  GtkWidget *start_date_toggle_btn;
   GtkWidget *due_date_toggle_btn;
   GtkWidget *priority_toggle_btn;
   bool block_signals;
@@ -32,6 +33,7 @@ static void errands_task_list_sort_dialog_class_init(ErrandsTaskListSortDialogCl
                                               "/io/github/mrvladus/Errands/ui/task-list-sort-dialog.ui");
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListSortDialog, completed_toggle_row);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListSortDialog, creation_date_toggle_btn);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListSortDialog, start_date_toggle_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListSortDialog, due_date_toggle_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListSortDialog, priority_toggle_btn);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_show_completed_toggle_cb);
@@ -60,6 +62,7 @@ void errands_task_list_sort_dialog_show() {
                             errands_settings_get("show_completed", SETTING_TYPE_STRING).b);
   ErrandsSortType sort_by = errands_settings_get("sort_by", SETTING_TYPE_INT).i;
   gtk_check_button_set_active(GTK_CHECK_BUTTON(dialog->creation_date_toggle_btn), sort_by == SORT_TYPE_CREATION_DATE);
+  gtk_check_button_set_active(GTK_CHECK_BUTTON(dialog->start_date_toggle_btn), sort_by == SORT_TYPE_START_DATE);
   gtk_check_button_set_active(GTK_CHECK_BUTTON(dialog->due_date_toggle_btn), sort_by == SORT_TYPE_DUE_DATE);
   gtk_check_button_set_active(GTK_CHECK_BUTTON(dialog->priority_toggle_btn), sort_by == SORT_TYPE_PRIORITY);
   adw_dialog_present(ADW_DIALOG(dialog), GTK_WIDGET(state.main_window));
