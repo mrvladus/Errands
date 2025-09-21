@@ -151,9 +151,6 @@ struct _ErrandsTaskList {
 
   GListStore *tasks_model;
   GtkTreeListModel *tree_model;
-
-  GtkCustomFilter *toplevel_filter;
-
   GtkTreeListRowSorter *master_sorter;
   GtkSortListModel *master_sort_model;
   GtkCustomFilter *master_filter;

@@ -62,13 +62,9 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   reload_all_tasks(self);
   // Create main items model
   self->tasks_model = g_list_store_new(G_TYPE_OBJECT);
-  // Toplevel filter model
-  self->toplevel_filter = gtk_custom_filter_new((GtkCustomFilterFunc)toplevel_filter_func, self, NULL);
-  GtkFilterListModel *toplevel_filter_model =
-      gtk_filter_list_model_new(G_LIST_MODEL(self->tasks_model), GTK_FILTER(self->toplevel_filter));
   // Tree list model
   self->tree_model =
-      gtk_tree_list_model_new(G_LIST_MODEL(toplevel_filter_model), false, false, create_child_model_func, NULL, NULL);
+      gtk_tree_list_model_new(G_LIST_MODEL(self->tasks_model), false, false, create_child_model_func, NULL, NULL);
   // Sort model
   self->master_sorter = gtk_tree_list_row_sorter_new(GTK_SORTER(gtk_custom_sorter_new(master_sort_func, NULL, NULL)));
   self->master_sort_model = gtk_sort_list_model_new(G_LIST_MODEL(self->tree_model), GTK_SORTER(self->master_sorter));
@@ -175,18 +171,6 @@ static GListModel *create_child_model_func(gpointer item, gpointer user_data) {
 }
 
 // --- SORT AND FILTER CALLBACKS --- //
-
-static gboolean toplevel_filter_func(GObject *item, ErrandsTaskList *self) {
-  if (self->page == ERRANDS_TASK_LIST_PAGE_ALL) return true;
-  TaskData *data = g_object_get_data(item, "data");
-  if (!data) return true;
-  ListData *list_data = task_data_get_list(data);
-  if (!list_data) return true;
-
-  return list_data == self->data;
-}
-
-// TODO: fix toplevel func is still used
 
 static gint master_sort_func(gconstpointer a, gconstpointer b, gpointer user_data) {
   TaskData *data_a = g_object_get_data(G_OBJECT(a), "data");
