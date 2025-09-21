@@ -4,9 +4,18 @@
 
 #include <stdbool.h>
 
-typedef enum { SETTING_TYPE_BOOL, SETTING_TYPE_INT, SETTING_TYPE_STRING } ErrandsSettingType;
+typedef enum {
+  SETTING_TYPE_BOOL,
+  SETTING_TYPE_INT,
+  SETTING_TYPE_STRING,
+} ErrandsSettingType;
 
-typedef enum { SORT_TYPE_CREATION_DATE, SORT_TYPE_DUE_DATE, SORT_TYPE_PRIORITY } ErrandsSortType;
+typedef enum {
+  SORT_TYPE_CREATION_DATE,
+  SORT_TYPE_DUE_DATE,
+  SORT_TYPE_PRIORITY,
+  SORT_TYPE_START_DATE,
+} ErrandsSortType;
 
 typedef union {
   int i;

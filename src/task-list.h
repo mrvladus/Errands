@@ -1,7 +1,6 @@
 #pragma once
 
 #include "data/data.h"
-#include "gtk/gtk.h"
 #include "task.h"
 
 #include <adwaita.h>

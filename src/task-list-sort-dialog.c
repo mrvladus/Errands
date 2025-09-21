@@ -4,6 +4,7 @@
 
 static void on_show_completed_toggle_cb(AdwSwitchRow *row);
 static void on_created_toggle_cb(GtkCheckButton *btn);
+static void on_start_toggle_cb(GtkCheckButton *btn);
 static void on_due_toggle_cb(GtkCheckButton *btn);
 static void on_priority_toggle_cb(GtkCheckButton *btn);
 
@@ -35,6 +36,7 @@ static void errands_task_list_sort_dialog_class_init(ErrandsTaskListSortDialogCl
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListSortDialog, priority_toggle_btn);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_show_completed_toggle_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_created_toggle_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_start_toggle_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_due_toggle_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_priority_toggle_cb);
 }
@@ -84,6 +86,8 @@ static void set_sort_by(GtkCheckButton *btn, size_t sort_by) {
 }
 
 static void on_created_toggle_cb(GtkCheckButton *btn) { set_sort_by(btn, SORT_TYPE_CREATION_DATE); }
+
+static void on_start_toggle_cb(GtkCheckButton *btn) { set_sort_by(btn, SORT_TYPE_START_DATE); }
 
 static void on_due_toggle_cb(GtkCheckButton *btn) { set_sort_by(btn, SORT_TYPE_DUE_DATE); }
 

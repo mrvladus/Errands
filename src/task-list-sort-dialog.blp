@@ -33,6 +33,17 @@ template $ErrandsTaskListSortDialog: Adw.Dialog {
         }
 
         Adw.ActionRow {
+          title: _("Start Date");
+          activatable-widget: start_date_toggle_btn;
+
+          [suffix]
+          CheckButton start_date_toggle_btn {
+            group: creation_date_toggle_btn;
+            toggled => $on_start_toggle_cb();
+          }
+        }
+
+        Adw.ActionRow {
           title: _("Due Date");
           activatable-widget: due_date_toggle_btn;
 
