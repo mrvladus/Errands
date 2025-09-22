@@ -433,7 +433,7 @@ static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *task) {
   g_hash_table_insert(tdata, g_strdup(errands_data_get_str(new_td, DATA_PROP_UID)), new_td);
   // Add new model item
   GObject *model_item = g_object_get_data(G_OBJECT(task), "model-item");
-  GObject *children_model = g_object_get_data(G_OBJECT(model_item), "children-model");
+  GObject *children_model = g_object_get_data(G_OBJECT(model_item), "children");
   GObject *data_object = task_data_as_gobject(new_td);
   g_list_store_append(G_LIST_STORE(children_model), data_object);
   // Expand task row

@@ -25,7 +25,7 @@ static bool build_libcaldav() {
   // CFLAGS
   pug_target_add_cflags(&libcaldav, "-Wall");
   if (!is_debug) pug_target_add_cflags(&libcaldav, "-O3", "-flto=auto");
-  else pug_target_add_cflag(&libcaldav, "-g");
+  else pug_target_add_cflags(&libcaldav, "-g", "-fno-omit-frame-pointer");
 
   // LDFLAGS
   if (!is_debug) pug_target_add_ldflags(&libcaldav, "-O3", "-flto=auto");
@@ -109,7 +109,7 @@ static bool build_errands() {
   pug_target_add_cflag(&errands, PUG_CFLAG_DEFINE_STR(VERSION));
   pug_target_add_cflag(&errands, PUG_CFLAG_DEFINE_STR(LOCALE_DIR));
   if (!is_debug) pug_target_add_cflags(&errands, "-O3", "-flto=auto");
-  else pug_target_add_cflag(&errands, "-g");
+  else pug_target_add_cflags(&errands, "-g", "-fno-omit-frame-pointer");
 
   // LDFLAGS
   pug_target_add_ldflags(&errands, PUG_LDFLAG_LIB_DIR(BUILD_DIR), PUG_LDFLAG_LIB("caldav"));

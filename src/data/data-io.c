@@ -9,8 +9,6 @@
 #include <gio/gio.h>
 #include <libical/ical.h>
 
-static tb_ptr_array lists_to_write = {0};
-
 static const char *user_dir;
 
 static void errands_data_migrate_from_46() {
@@ -124,20 +122,6 @@ static void errands_data_migrate_from_46() {
   remove(old_data_file);
 }
 
-static void write_lists() {
-  for (size_t i = 0; i < lists_to_write.size; ++i) {
-    icalcomponent *list_data = lists_to_write.items[i];
-    const char *filename = tb_tmp_str_printf("%s.ics", errands_data_get_str(list_data, DATA_PROP_LIST_UID));
-    g_autofree gchar *path = g_build_filename(user_dir, filename, NULL);
-    if (!g_file_set_contents(path, icalcomponent_as_ical_string(list_data), -1, NULL)) {
-      tb_log("User Data: Failed to save list '%s'", path);
-      return;
-    }
-    tb_log("User Data: Saved list '%s'", path);
-  }
-  tb_ptr_array_reset(&lists_to_write);
-}
-
 static void write_list(ListData *list_data) {
   if (!list_data) return;
   g_autofree gchar *path = g_strdup_printf("%s/%s.ics", user_dir, errands_data_get_str(list_data, DATA_PROP_LIST_UID));
@@ -156,8 +140,8 @@ void errands_data_load_lists() {
   }
   tb_log("User Data: Loading at %s", user_dir);
   errands_data_migrate_from_46();
-  ldata = g_hash_table_new_full(NULL, NULL, NULL, (GDestroyNotify)errands_data_free);
-  tdata = g_hash_table_new_full(NULL, NULL, NULL, (GDestroyNotify)errands_data_free);
+  ldata = g_hash_table_new_full(NULL, NULL, g_free, (GDestroyNotify)errands_data_free);
+  tdata = g_hash_table_new_full(NULL, NULL, g_free, (GDestroyNotify)errands_data_free);
   g_autoptr(GDir) dir = g_dir_open(user_dir, 0, NULL);
   if (!dir) return;
   const char *filename;
@@ -178,20 +162,16 @@ void errands_data_load_lists() {
             remove(path);
             continue;
           }
-          g_hash_table_insert(ldata, strdup(errands_data_get_str(calendar, DATA_PROP_LIST_UID)), calendar);
+          g_hash_table_insert(ldata, g_strdup(errands_data_get_str(calendar, DATA_PROP_LIST_UID)), calendar);
           // Load tasks
           icalcomponent *c;
           for (c = icalcomponent_get_first_component(calendar, ICAL_VTODO_COMPONENT); c != 0;
                c = icalcomponent_get_next_component(calendar, ICAL_VTODO_COMPONENT))
-            g_hash_table_insert(tdata, strdup(errands_data_get_str(c, DATA_PROP_LIST_UID)), c);
+            g_hash_table_insert(tdata, g_strdup(errands_data_get_str(c, DATA_PROP_LIST_UID)), c);
         }
       }
     }
   }
-  // g_timeout_add_seconds(10, G_SOURCE_FUNC(write_lists), NULL);
 }
 
-void errands_data_write_list(ListData *data) {
-  // tb_ptr_array_add(&lists_to_write, data);
-  g_idle_add_once((GSourceOnceFunc)write_list, data);
-}
+void errands_data_write_list(ListData *data) { g_idle_add_once((GSourceOnceFunc)write_list, data); }

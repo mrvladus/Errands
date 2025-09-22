@@ -131,6 +131,8 @@ void task_data_print(TaskData *data, GString *out, size_t indent) {
 GObject *task_data_as_gobject(TaskData *data) {
   GObject *obj = g_object_new(G_TYPE_OBJECT, NULL);
   g_object_set_data(obj, "data", data);
+  GListStore *children = g_list_store_new(G_TYPE_OBJECT);
+  g_object_set_data_full(obj, "children", children, g_object_unref);
   return obj;
 }
 

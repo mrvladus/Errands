@@ -29,8 +29,8 @@ extern GResource *errands_get_resource(void);
 static void activate(GtkApplication *app) {
   state.main_window = errands_window_new(app);
   errands_sidebar_load_lists(ERRANDS_SIDEBAR(state.main_window->sidebar));
-  errands_task_list_load_tasks(state.main_window->task_list);
   gtk_window_present(GTK_WINDOW(state.main_window));
+  errands_task_list_load_tasks(state.main_window->task_list);
   // sync_init();
 }
 

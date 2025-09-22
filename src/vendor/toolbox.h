@@ -44,8 +44,6 @@ void tb_log(const char *format, ...);
 /*
 
 Profiling macros.
-Disabled by default.
-To enable profiling put '#define TB_ENABLE_PROFILING' before including 'toolbox.h'
 
 Usage:
 
@@ -67,8 +65,6 @@ void func() {
 
 */
 
-#ifdef TB_ENABLE_PROFILING
-
 // Start profile timer.
 #define TB_PROFILE_FUNC_START clock_t __start_time = clock()
 // Stop profile timer and write time of execution to stderr.
@@ -81,12 +77,6 @@ void func() {
     code_block;                                                                                                        \
     TB_PROFILE_FUNC_END;                                                                                               \
   } while (0)
-
-#else // Dummy macros when profiling is disabled.
-#define TB_PROFILE_FUNC_START
-#define TB_PROFILE_FUNC_END
-#define TB_PROFILE_BLOCK(code_block) code_block
-#endif // TB_ENABLE_PROFILING
 
 // -------------------- LOOPS MACROS -------------------- //
 

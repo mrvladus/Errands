@@ -3,6 +3,16 @@
     background-color: transparent;
 }
 
+.sub-task-entry {
+    opacity: 0.5;
+    transition: 0.2s;
+}
+
+.sub-task-entry:hover,
+.sub-task-entry:focus-within {
+    opacity: 1;
+}
+
 /* Tag */
 
 .tag {
