@@ -1,11 +1,5 @@
 #include "task-list.h"
 #include "data/data.h"
-#include "gio/gio.h"
-#include "glib-object.h"
-#include "glib.h"
-#include "gtk/gtk.h"
-#include "gtk/gtknoselection.h"
-#include "gtk/gtkshortcut.h"
 #include "settings.h"
 #include "state.h"
 #include "task.h"
@@ -15,9 +9,6 @@
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <unistd.h>
 
 typedef enum {
   EXPAND_DUE,
@@ -76,7 +67,7 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, search_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, search_bar);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, search_entry);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, entry_rev);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, entry_clamp);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, task_list);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_list_sort_dialog_show);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_entry_activated_cb);
@@ -364,39 +355,6 @@ void errands_task_list_load_tasks(ErrandsTaskList *self) {
   tb_log("Task List: Loaded %zu tasks into model", len);
 }
 
-// void errands_task_list_load_tasks(ErrandsTaskList *self) {
-//   tb_log("Task List: Loading tasks into model");
-//   TB_PROFILE_FUNC_START;
-//   self->tasks_items = g_hash_table_new_full(NULL, NULL, g_free, g_object_unref);
-//   GPtrArray *tasks = g_hash_table_get_values_as_ptr_array(tdata);
-//   size_t len = tasks->len;
-//   for_range(i, 0, len) {
-//     TaskData *td = tasks->pdata[i];
-//     const char *task_uid = errands_data_get_str(td, DATA_PROP_UID);
-//     GObject *item = task_data_as_gobject(td);
-//     g_hash_table_insert(self->tasks_items, g_strdup(task_uid), item);
-//     const char *parent_uid = errands_data_get_str(td, DATA_PROP_PARENT);
-//     if (!parent_uid) g_list_store_append(self->base_model, item);
-//   }
-//   g_ptr_array_free(tasks, false);
-//   tasks = g_hash_table_get_values_as_ptr_array(self->tasks_items);
-//   for_range(i, 0, tasks->len) {
-//     GObject *item = tasks->pdata[i];
-//     TaskData *td = g_object_get_data(item, "data");
-//     const char *uid = errands_data_get_str(td, DATA_PROP_UID);
-//     GListStore *children = g_object_get_data(item, "children");
-//     for_range(j, 0, tasks->len) {
-//       GObject *child = tasks->pdata[j];
-//       TaskData *td = g_object_get_data(child, "data");
-//       const char *parent = errands_data_get_str(td, DATA_PROP_PARENT);
-//       if (parent && g_str_equal(parent, uid)) g_list_store_append(children, child);
-//     }
-//   }
-//   g_ptr_array_free(tasks, false);
-//   TB_PROFILE_FUNC_END;
-//   tb_log("Task List: Loaded %zu tasks into model", len);
-// }
-
 void errands_task_list_update_title(ErrandsTaskList *self) {
   // Initialize completed and total counters
   size_t completed = 0, total = 0;
@@ -448,7 +406,7 @@ static void show_all_tasks_cb(ErrandsTaskList *self) {
 
 void errands_task_list_show_all_tasks(ErrandsTaskList *self) {
   gtk_widget_set_sensitive(GTK_WIDGET(self), false);
-  gtk_revealer_set_reveal_child(GTK_REVEALER(self->entry_rev), false);
+  gtk_widget_set_visible(self->entry_clamp, false);
   self->page = ERRANDS_TASK_LIST_PAGE_ALL;
   g_idle_add_once((GSourceOnceFunc)show_all_tasks_cb, self);
 }
@@ -463,13 +421,12 @@ static void show_task_list_cb(ErrandsTaskList *self) {
 
 void errands_task_list_show_task_list(ErrandsTaskList *self, ListData *data) {
   gtk_widget_set_sensitive(GTK_WIDGET(self), false);
-  // if (self->page != ERRANDS_TASK_LIST_PAGE_TASK_LIST) restore_expanded_rows(self);
   self->data = data;
   // Filter task list
   self->page = ERRANDS_TASK_LIST_PAGE_TASK_LIST;
   // Show entry
   if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(self->search_btn)))
-    gtk_revealer_set_reveal_child(GTK_REVEALER(self->entry_rev), true);
+    gtk_widget_set_visible(self->entry_clamp, true);
   g_idle_add_once((GSourceOnceFunc)show_task_list_cb, self);
 }
 
@@ -588,10 +545,9 @@ static void on_task_list_entry_activated_cb(AdwEntryRow *entry, ErrandsTaskList 
   if (g_str_equal(text, "")) return;
   if (g_str_equal(list_uid, "")) return;
   TaskData *td = list_data_create_task(self->data, (char *)text, list_uid, "");
-  g_hash_table_insert(tdata, g_strdup(errands_data_get_str(td, DATA_PROP_UID)), td);
-  g_autoptr(GObject) data_object = g_object_new(G_TYPE_OBJECT, NULL);
-  g_object_set_data(data_object, "data", td);
-  g_list_store_append(self->base_model, data_object);
+  GObject *obj = task_data_as_gobject(td);
+  g_hash_table_insert(self->tasks_items, g_strdup(errands_data_get_str(td, DATA_PROP_UID)), obj);
+  g_list_store_append(self->base_model, obj);
   gtk_list_view_scroll_to(GTK_LIST_VIEW(self->task_list), 0, GTK_LIST_SCROLL_FOCUS, NULL);
   errands_data_write_list(self->data);
   // Clear text

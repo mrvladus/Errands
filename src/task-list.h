@@ -1,7 +1,6 @@
 #pragma once
 
 #include "data/data.h"
-#include "gtk/gtk.h"
 #include "task.h"
 
 #include <adwaita.h>
@@ -147,7 +146,7 @@ struct _ErrandsTaskList {
   GtkWidget *search_bar;
   GtkWidget *search_entry;
   const char *search_query;
-  GtkWidget *entry_rev;
+  GtkWidget *entry_clamp;
 
   GListStore *base_model;
   GtkCustomFilter *base_toplevel_filter;

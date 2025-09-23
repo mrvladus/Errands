@@ -1,5 +1,4 @@
 #include "data/data.h"
-#include "gtk/gtk.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "state.h"

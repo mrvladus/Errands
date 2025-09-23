@@ -57,25 +57,21 @@ template $ErrandsTaskList: Adw.Bin {
     }
 
     [top]
-    Revealer entry_rev {
-      transition-type: swing_down;
-      reveal-child: bind search_btn.active inverted;
+    Adw.Clamp entry_clamp {
+      margin-start: 12;
+      margin-end: 12;
+      visible: bind search_btn.active inverted;
 
-      Adw.Clamp {
-        margin-start: 12;
-        margin-end: 12;
+      Adw.EntryRow {
+        title: _("Add Task");
+        activatable: false;
+        margin-top: 5;
+        margin-bottom: 5;
+        entry-activated => $on_task_list_entry_activated_cb(template) not-swapped;
 
-        Adw.EntryRow {
-          title: _("Add Task");
-          activatable: false;
-          margin-top: 5;
-          margin-bottom: 5;
-          entry-activated => $on_task_list_entry_activated_cb(template) not-swapped;
-
-          styles [
-            "card",
-          ]
-        }
+        styles [
+          "card",
+        ]
       }
     }
 

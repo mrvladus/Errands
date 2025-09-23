@@ -1,6 +1,5 @@
 #include "sidebar.h"
 #include "data/data.h"
-#include "glib.h"
 #include "settings.h"
 #include "state.h"
 #include "task-list.h"

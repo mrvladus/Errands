@@ -73,9 +73,9 @@ void func() {
 // Profile block of code
 #define TB_PROFILE_BLOCK(code_block)                                                                                   \
   do {                                                                                                                 \
-    TB_PROFILE_FUNC_START;                                                                                             \
+    clock_t __start_time = clock();                                                                                    \
     code_block;                                                                                                        \
-    TB_PROFILE_FUNC_END;                                                                                               \
+    TB_LOG_DEBUG("%f sec.", (double)(clock() - __start_time) / CLOCKS_PER_SEC);                                        \
   } while (0)
 
 // -------------------- LOOPS MACROS -------------------- //
