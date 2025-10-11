@@ -1,7 +1,9 @@
 #include "sync.h"
-#include "libcaldav/caldav.h"
 #include "settings.h"
 #include "utils.h"
+
+#define CALDAV_IMPLEMENTATION
+#include "vendor/caldav.h"
 
 #include <glib.h>
 #include <libical/ical.h>
@@ -51,7 +53,6 @@ static void initial_sync(GTask *task, gpointer source_object, gpointer task_data
   // Get events
   for (size_t i = 0; i < client->calendars->len; i++) {
     CalDAVCalendar *calendar = caldav_list_at(client->calendars, i);
-    caldav_calendar_print(calendar);
     bool res = caldav_calendar_pull_events(calendar);
     // if (res && calendar->events) {
     //   for (size_t idx = 0; idx < calendar->events->len; idx++) {

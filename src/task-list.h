@@ -147,6 +147,9 @@ struct _ErrandsTaskList {
   GtkWidget *search_entry;
   const char *search_query;
   GtkWidget *entry_clamp;
+  GtkWidget *scrl;
+  GtkWidget *custom_task_list;
+  GtkAdjustment *adj;
 
   GListStore *base_model;
   GtkCustomFilter *base_toplevel_filter;

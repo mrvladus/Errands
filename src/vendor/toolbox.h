@@ -21,80 +21,119 @@ void tb_log(const char *format, ...);
 #define TB_LOG_DEBUG(format, ...)                                                                                      \
   tb_log("%s:%d:%s: " format, tb_path_base_name(__FILE__), __LINE__, __func__, ##__VA_ARGS__)
 
-// The best debug method. Improved. :)
+// The best debug method.
 #define TB_HERE TB_LOG_DEBUG("HERE")
 
 // Print TODO formatted message.
 #define TB_TODO(format, ...) TB_LOG_DEBUG("TODO: " format, ##__VA_ARGS__)
 
-// Prints 'UNIMPLEMENTED' message and exits with error code 1.
-#define TB_UNIMPLEMENTED                                                                                               \
+// Prints message and aborts.
+#define TB_ABORT(msg)                                                                                                  \
   do {                                                                                                                 \
-    TB_LOG_DEBUG("UNIMPLEMENTED");                                                                                     \
-    exit(EXIT_FAILURE);                                                                                                \
+    TB_LOG_DEBUG(msg);                                                                                                 \
+    abort();                                                                                                           \
   } while (0)
 
-// Print PANIC and exit with error code 1.
-#define TB_PANIC                                                                                                       \
-  do {                                                                                                                 \
-    LOG_DEBUG("PANIC");                                                                                                \
-    exit(EXIT_FAILURE);                                                                                                \
-  } while (0)
+// Prints 'UNIMPLEMENTED' message and aborts.
+#define TB_UNIMPLEMENTED TB_ABORT("UNIMPLEMENTED")
 
-/*
+// Prints 'PANIC' message and aborts.
+#define TB_PANIC TB_ABORT("PANIC")
 
-Profiling macros.
-
-Usage:
-
-Using PROFILE_FUNC_START and PROFILE_FUNC_END macros:
-
-void func() {
-    PROFILE_FUNC_START;
-    do_stuff();
-    PROFILE_FUNC_END;
-}
-
-Using PROFILE_BLOCK macro:
-
-void func() {
-    PROFILE_BLOCK({
-        do_stuff();
-    })
-}
-
-*/
-
-// Start profile timer.
-#define TB_PROFILE_FUNC_START clock_t __start_time = clock()
-// Stop profile timer and write time of execution to stderr.
-#define TB_PROFILE_FUNC_END TB_LOG_DEBUG("%f sec.", (double)(clock() - __start_time) / CLOCKS_PER_SEC)
+// Prints 'UNREACHABLE' message and aborts.
+#define TB_UNREACHABLE TB_ABORT("UNREACHABLE")
 
 // Profile block of code
-#define TB_PROFILE_BLOCK(code_block)                                                                                   \
-  do {                                                                                                                 \
-    clock_t __start_time = clock();                                                                                    \
-    code_block;                                                                                                        \
-    TB_LOG_DEBUG("%f sec.", (double)(clock() - __start_time) / CLOCKS_PER_SEC);                                        \
-  } while (0)
+//
+//   Usage:
+//
+//   TB_PROFILE {
+//       code();
+//        to();
+//       profile();
+//   }
+#define TB_PROFILE                                                                                                     \
+  for (clock_t __start_time = clock(), i = 0; i < 1;                                                                   \
+       ++i, TB_LOG_DEBUG("%f sec.", (double)(clock() - __start_time) / CLOCKS_PER_SEC))
 
 // -------------------- LOOPS MACROS -------------------- //
 
 #define for_range(idx, idx_start, idx_end) for (int64_t idx = idx_start; idx < idx_end; ++idx)
 
-// -------------------- DYNAMIC ARRAY OF POINTERS -------------------- //
+// -------------------- DYNAMIC ARRAY -------------------- //
 
+// Dynamic array struct
 typedef struct {
   void **items;
-  size_t size;
+  size_t len;
   size_t capacity;
-} tb_ptr_array;
+  void (*item_free_func)(void *);
+} tb_array;
 
-void tb_ptr_array_init(tb_ptr_array *array);
-void tb_ptr_array_free(tb_ptr_array *array);
-void tb_ptr_array_add(tb_ptr_array *array, void *item);
-void tb_ptr_array_remove(tb_ptr_array *array, size_t index);
-void tb_ptr_array_reset(tb_ptr_array *array);
+// Create new array struct with `initial_capacity`
+static inline tb_array tb_array_new(size_t initial_capacity) {
+  tb_array array = {
+      .items = calloc(1, sizeof(void *) * initial_capacity),
+      .len = 0,
+      .capacity = initial_capacity,
+      .item_free_func = NULL,
+  };
+  return array;
+}
+
+// Create new array struct with `initial_capacity` and `item_free_func`
+static inline tb_array tb_array_new_full(size_t initial_capacity, void (*item_free_func)(void *)) {
+  tb_array array = tb_array_new(initial_capacity);
+  array.item_free_func = item_free_func;
+  return array;
+}
+
+// Free `array` and its items if `item_free_func` is provided
+static inline void tb_array_free(tb_array *array) {
+  if (array->item_free_func)
+    for (size_t i = 0; i < array->len; i++) array->item_free_func(array->items[i]);
+  if (array->items) free(array->items);
+}
+
+// Add `item` to `array`
+static inline void tb_array_add(tb_array *array, void *item) {
+  if (array->capacity == array->len) {
+    array->capacity *= 2;
+    array->items = realloc(array->items, array->capacity * sizeof(void *));
+  }
+  array->items[array->len++] = item;
+}
+
+// Remove and free last item from `array`
+static inline void tb_array_pop(tb_array *array) {
+  if (array->item_free_func) array->item_free_func(array->items[array->len - 1]);
+  array->len--;
+}
+
+// Remove last item from `array` and return it without freeing it.
+// User is responsible for freeing the returned item.
+static inline void *tb_array_steal(tb_array *array) {
+  if (array->len == 0) return NULL;
+  void *item = array->items[array->len - 1];
+  array->len--;
+  return item;
+}
+
+// Remove item at `idx` from `array` and return it without freeing it.
+// Move items after idx.
+// User is responsible for freeing the returned item.
+static inline void *tb_array_steal_idx(tb_array *array, size_t idx) {
+  if (array->len == 0) return NULL;
+  void *item = array->items[idx];
+  for (size_t i = idx; i < array->len - 1; i++) array->items[i] = array->items[i + 1];
+  array->len--;
+  return item;
+}
+
+static inline void *tb_array_last(tb_array *array) {
+  if (array->len == 0) return NULL;
+  return array->items[array->len - 1];
+}
 
 // -------------------- TEMPORARY STRING -------------------- //
 
@@ -143,32 +182,6 @@ time_t tb_time_now();
 #endif // TOOLBOX_H
 
 #ifdef TOOLBOX_IMPLEMENTATION
-
-// -------------------- DYNAMIC ARRAY -------------------- //
-
-void tb_ptr_array_init(tb_ptr_array *array) {
-  array->size = 0;
-  array->capacity = 8;
-  array->items = malloc(array->capacity * sizeof(void *));
-}
-
-void tb_ptr_array_free(tb_ptr_array *array) { free(array->items); }
-
-void tb_ptr_array_add(tb_ptr_array *array, void *item) {
-  if (array->size >= array->capacity) {
-    array->capacity *= 2;
-    array->items = realloc(array->items, array->capacity * sizeof(void *));
-  }
-  array->items[array->size++] = item;
-}
-
-void tb_ptr_array_remove(tb_ptr_array *array, size_t index) {
-  if (index >= array->size) return;
-  for (size_t i = index; i < array->size - 1; i++) { array->items[i] = array->items[i + 1]; }
-  array->size--;
-}
-
-void tb_ptr_array_reset(tb_ptr_array *array) { array->size = 0; }
 
 // -------------------- FILE FUNCTIONS -------------------- //
 

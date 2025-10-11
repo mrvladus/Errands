@@ -1,4 +1,3 @@
-#include <stdbool.h>
 #define PUG_IMPLEMENTATION
 #include "pug.h"
 
@@ -10,32 +9,6 @@
 #define BUILD_DIR "build"
 
 static bool is_debug = false;
-
-// Errands caldav backend
-static bool build_libcaldav() {
-  PugTarget libcaldav = pug_target_new("libcaldav", PUG_TARGET_TYPE_STATIC_LIBRARY, BUILD_DIR);
-
-  // Sources
-  pug_target_add_source(&libcaldav, "src/libcaldav/caldav-calendar.c");
-  pug_target_add_source(&libcaldav, "src/libcaldav/caldav-client.c");
-  pug_target_add_source(&libcaldav, "src/libcaldav/caldav-event.c");
-  pug_target_add_source(&libcaldav, "src/libcaldav/caldav-list.c");
-  pug_target_add_source(&libcaldav, "src/libcaldav/caldav-requests.c");
-
-  // CFLAGS
-  pug_target_add_cflags(&libcaldav, "-Wall");
-  if (!is_debug) pug_target_add_cflags(&libcaldav, "-O3", "-flto=auto");
-  else pug_target_add_cflags(&libcaldav, "-g", "-fno-omit-frame-pointer");
-
-  // LDFLAGS
-  if (!is_debug) pug_target_add_ldflags(&libcaldav, "-O3", "-flto=auto");
-
-  // pkg-config libraries
-  pug_target_add_pkg_config_lib(&libcaldav, "libcurl");
-  pug_target_add_pkg_config_lib(&libcaldav, "libical");
-
-  return pug_target_build(&libcaldav);
-}
 
 static bool compile_resources() {
   const char *gresource_xml = "data/errands.gresource.xml";
@@ -109,10 +82,9 @@ static bool build_errands() {
   pug_target_add_cflag(&errands, PUG_CFLAG_DEFINE_STR(VERSION));
   pug_target_add_cflag(&errands, PUG_CFLAG_DEFINE_STR(LOCALE_DIR));
   if (!is_debug) pug_target_add_cflags(&errands, "-O3", "-flto=auto");
-  else pug_target_add_cflags(&errands, "-g", "-fno-omit-frame-pointer");
+  else pug_target_add_cflags(&errands, "-g");
 
   // LDFLAGS
-  pug_target_add_ldflags(&errands, PUG_LDFLAG_LIB_DIR(BUILD_DIR), PUG_LDFLAG_LIB("caldav"));
   if (!is_debug) pug_target_add_ldflags(&errands, "-O3", "-flto=auto");
 
   // pkg-config libraries
@@ -140,7 +112,6 @@ int main(int argc, char **argv) {
   // Check if build is in debug mode
   is_debug = pug_arg_bool("debug");
 
-  if (!build_libcaldav()) return 1;
   if (!compile_resources()) return 1;
   if (!build_errands()) return 1;
 

@@ -111,6 +111,8 @@ ErrandsTask *errands_task_new() { return g_object_new(ERRANDS_TYPE_TASK, NULL); 
 // ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_task_set_data(ErrandsTask *self, TaskData *data) {
+  gtk_widget_set_visible(GTK_WIDGET(self), data ? true : false);
+  if (!data) return;
   self->data = data;
   // Set text
   gtk_label_set_label(GTK_LABEL(self->title), errands_data_get_str(data, DATA_PROP_TEXT));

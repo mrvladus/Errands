@@ -25,11 +25,6 @@ template $ErrandsTaskList: Adw.Bin {
         }
       }
 
-      Button {
-        label: _("Test");
-        clicked => $on_test_cb();
-      }
-
       [end]
       ToggleButton search_btn {
         icon-name: "errands-search-symbolic";
@@ -75,15 +70,37 @@ template $ErrandsTaskList: Adw.Bin {
       }
     }
 
-    content: ScrolledWindow {
-      propagate-natural-height: true;
-      vexpand: true;
+    content: Box {
+      orientation: vertical;
 
-      ListView task_list {
-        margin-start: 8;
-        margin-end: 8;
-        single-click-activate: true;
-        activate => $on_list_view_activate_cb();
+      ScrolledWindow {
+        propagate-natural-height: true;
+        vexpand: true;
+        visible: false;
+
+        ListView task_list {
+          margin-start: 8;
+          margin-end: 8;
+          single-click-activate: true;
+          activate => $on_list_view_activate_cb();
+        }
+      }
+
+      ScrolledWindow scrl {
+        vexpand: true;
+
+        vadjustment: Adjustment adj {
+          value-changed => $on_adjustment_value_changed(template) not-swapped;
+        };
+
+        child: Box custom_task_list {
+          orientation: vertical;
+          spacing: 8;
+          margin-start: 8;
+          margin-end: 8;
+          margin-top: 4;
+          margin-bottom: 18;
+        };
       }
     };
   }

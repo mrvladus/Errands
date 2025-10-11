@@ -40,16 +40,7 @@ static gint master_sort_func(gconstpointer a, gconstpointer b, gpointer user_dat
 static gboolean master_filter_func(GObject *item, ErrandsTaskList *self);
 static gboolean all_tasks_filter_func(GObject *item, ErrandsTaskList *self);
 
-static void on_test_cb() {
-  // GListStore *model = state.main_window->task_list->tasks_model;
-  // for_range(i, 0, 1000) {
-  //   char num[64];
-  //   sprintf(num, "%zu", i);
-  //   TaskData *td = task_data_new(state.main_window->task_list->data, num, NULL);
-  //   // g_hash_table_insert(tdata, g_strdup(errands_data_get_str(td, DATA_PROP_UID)), td);
-  //   g_list_store_append(model, task_data_as_gobject(td));
-  // }
-}
+static void on_adjustment_value_changed(GtkAdjustment *adj, ErrandsTaskList *self);
 
 // ---------- WIDGET TEMPLATE ---------- //
 
@@ -69,11 +60,14 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, search_entry);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, entry_clamp);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, task_list);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, adj);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, scrl);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, custom_task_list);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_list_sort_dialog_show);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_entry_activated_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_search_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_list_view_activate_cb);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_test_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_adjustment_value_changed);
 }
 
 static void errands_task_list_init(ErrandsTaskList *self) {
@@ -312,48 +306,74 @@ static gint master_sort_func(gconstpointer a, gconstpointer b, gpointer user_dat
   }
 }
 
-// ---------- PUBLIC FUNCTIONS ---------- //
+// ---------- TASKS RECYCLER ---------- //
 
-void errands_task_list_load_tasks(ErrandsTaskList *self) {
-  tb_log("Task List: Loading tasks into model");
-  // Create hash table for quick task lookup
-  self->tasks_items = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_object_unref);
-  // Single pass to populate hash table and identify root tasks
-  GPtrArray *root_tasks = g_ptr_array_new_with_free_func(g_object_unref);
-  GPtrArray *tasks = g_hash_table_get_values_as_ptr_array(tdata);
-  const size_t len = tasks->len;
-  for (size_t i = 0; i < len; i++) {
-    TaskData *td = tasks->pdata[i];
-    const char *task_uid = errands_data_get_str(td, DATA_PROP_UID);
-    GObject *item = task_data_as_gobject(td);
-    g_hash_table_insert(self->tasks_items, g_strdup(task_uid), item);
-    // Identify root tasks (no parent)
-    const char *parent_uid = errands_data_get_str(td, DATA_PROP_PARENT);
-    if (!parent_uid) g_ptr_array_add(root_tasks, g_object_ref(item));
+#define TASKS_STACK_SIZE 20
+
+static tb_array free_tasks, used_tasks;
+size_t upper_tasks, lower_tasks;
+
+static void init_tasks_stacks() {
+  free_tasks = tb_array_new_full(TASKS_STACK_SIZE, g_object_unref);
+  used_tasks = tb_array_new_full(TASKS_STACK_SIZE, g_object_unref);
+  for (size_t i = 0; i < TASKS_STACK_SIZE; ++i) tb_array_add(&free_tasks, g_object_ref(errands_task_new()));
+}
+
+static void redraw_tasks(ErrandsTaskList *self) {
+  gtk_box_remove_all(self->custom_task_list);
+  for (size_t i = 0; i < used_tasks.len; ++i) {
+    gtk_box_append(GTK_BOX(self->custom_task_list), GTK_WIDGET(used_tasks.items[i]));
   }
-  // Single pass to build parent-child relationships using hash table lookup
-  GHashTableIter iter;
-  gpointer key, value;
-  g_hash_table_iter_init(&iter, self->tasks_items);
-  while (g_hash_table_iter_next(&iter, &key, &value)) {
-    GObject *child_item = value;
-    TaskData *child_td = g_object_get_data(child_item, "data");
-    const char *parent_uid = errands_data_get_str(child_td, DATA_PROP_PARENT);
-    if (parent_uid) {
-      GObject *parent_item = g_hash_table_lookup(self->tasks_items, parent_uid);
-      if (parent_item) {
-        GListStore *parent_children = g_object_get_data(parent_item, "children");
-        g_list_store_append(parent_children, child_item);
+}
+
+static void on_adjustment_value_changed(GtkAdjustment *adj, ErrandsTaskList *self) {
+  double val = gtk_adjustment_get_value(adj);
+  int viewport_height = gtk_widget_get_height(self->scrl);
+  graphene_rect_t bounds = {0};
+  for (int64_t i = 0; i < used_tasks.len; ++i) {
+    ErrandsTask *widget = used_tasks.items[i];
+    bool res = gtk_widget_compute_bounds(GTK_WIDGET(widget), self->custom_task_list, &bounds);
+    double offset = val - bounds.origin.y;
+    double height = bounds.size.height;
+    if (height * 2 < offset) {
+      // Above upper border
+      // tb_log("NEGATIVE %s offset: %f y:%f", errands_data_get_str(widget->data, DATA_PROP_TEXT), offset,
+      // bounds.origin.y);
+    } else {
+      bool res = gtk_widget_compute_bounds(GTK_WIDGET(widget), self->scrl, &bounds);
+      if (bounds.origin.y - bounds.size.height * 2 > viewport_height) {
+        // Below lower border
+        // tb_log("POSITIVE %s y: %f", errands_data_get_str(widget->data, DATA_PROP_TEXT), bounds.origin.y);
       }
     }
   }
-  // Add root tasks to base model
-  for (size_t i = 0; i < root_tasks->len; i++) g_list_store_append(self->base_model, g_ptr_array_index(root_tasks, i));
-  // Cleanup
-  g_ptr_array_free(tasks, false);
-  g_ptr_array_free(root_tasks, true);
-  tb_log("Task List: Loaded %zu tasks into model", len);
+  redraw_tasks(self);
 }
+
+static gint sort(gconstpointer a, gconstpointer b, gpointer user_data) {
+  TaskData *ta = (TaskData *)a;
+  TaskData *tb = (TaskData *)b;
+  long la = strtol(errands_data_get_str(ta, DATA_PROP_TEXT), NULL, 10);
+  long lb = strtol(errands_data_get_str(tb, DATA_PROP_TEXT), NULL, 10);
+
+  return la - lb;
+}
+
+void errands_task_list_load_tasks(ErrandsTaskList *self) {
+  init_tasks_stacks();
+  GPtrArray *tasks = g_hash_table_get_values_as_ptr_array(tdata);
+  g_ptr_array_sort_values(tasks, (GCompareFunc)sort);
+  for (size_t i = 0; i < tasks->len; ++i) {
+    ErrandsTask *task = tb_array_steal(&free_tasks);
+    if (!task) break;
+    // tb_log("Load: %s", errands_data_get_str(tasks->pdata[i], DATA_PROP_TEXT));
+    errands_task_set_data(task, tasks->pdata[i]);
+    tb_array_add(&used_tasks, task);
+  }
+  redraw_tasks(self);
+}
+
+// ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_task_list_update_title(ErrandsTaskList *self) {
   // Initialize completed and total counters
@@ -566,3 +586,54 @@ static void on_task_list_search_cb(ErrandsTaskList *self, GtkSearchEntry *entry)
   if (!self->search_query || g_str_equal(self->search_query, "")) restore_expanded_rows(self);
   else expand_rows(self, EXPAND_SEARCH);
 }
+
+// ---------- CUSTOM TASK LIST EXPERIMENT ---------- //
+
+// static void rebuild_visible_rows(gboolean hide_completed, gboolean sort_due) {
+//   if (visible_rows) { g_ptr_array_free(visible_rows, TRUE); }
+//   visible_rows = g_ptr_array_new_with_free_func(g_free);
+
+//   for (guint i = 0; i < all_tasks->len; i++) {
+//     TaskData *td = g_ptr_array_index(all_tasks, i);
+
+//     if (hide_completed && !filter_hide_completed(td)) continue;
+
+//     VisibleRow *row = g_new0(VisibleRow, 1);
+//     row->data = td;
+//     row->depth = 0;
+//     row->expanded = FALSE;
+//     g_ptr_array_add(visible_rows, row);
+//   }
+
+//   if (sort_due) g_ptr_array_sort(visible_rows, sort_by_due_date);
+//   else g_ptr_array_sort(visible_rows, sort_by_title);
+
+//   // Update canvas size
+//   gtk_widget_set_size_request(canvas, -1, visible_rows->len * ROW_HEIGHT);
+// }
+
+// static void bind_task_widget(TaskWidget *tw, VisibleRow *row) {
+//   TaskData *td = row->data;
+//   char buf[256];
+//   snprintf(buf, sizeof(buf), "%s %s (due %d)", td->title, td->completed ? "[done]" : "", td->due_date);
+
+//   gtk_label_set_text(GTK_LABEL(tw->widget), buf);
+// }
+
+// static void update_visible_widgets(ErrandsTaskList *self) {
+//   int first_row = (int)(gtk_adjustment_get_value(self->adj) / ROW_HEIGHT);
+
+//   for (int i = 0; i < TASK_POOL_SIZE; i++) {
+//     int row_index = first_row + i;
+//     if (row_index >= (int)visible_rows->len) {
+//       gtk_widget_hide(task_pool[i].widget);
+//       continue;
+//     }
+//     gtk_widget_show(task_pool[i].widget);
+
+//     VisibleRow *row = g_ptr_array_index(visible_rows, row_index);
+//     bind_task_widget(&task_pool[i], row);
+
+//     gtk_fixed_move(GTK_FIXED(canvas), task_pool[i].widget, 8, row_index * ROW_HEIGHT);
+//   }
+// }

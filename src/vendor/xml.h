@@ -1,26 +1,53 @@
-// MIT License
+/*
 
-// Copyright (c) 2024 Vlad Krupinskii <mrvladus@yandex.ru>
+MIT License
 
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
+Copyright (c) 2024-2025 Vlad Krupinskii <mrvladus@yandex.ru>
 
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
 
-// xml.h - Header-only C/C++ library to parse XML.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+------------------------------------------------------------------------------
+
+xml.h - Header-only C/C++ library to parse XML.
+
+------------------------------------------------------------------------------
+
+Features:
+
+- One tiny header file (~400 lines of code)
+- Parses regular (`<tag>Tag Text</tag>`) and self-closing tags (`<tag/>`)
+- Parses tags attributes (`<tag attribute="value" />`)
+- Ignores comments and processing instructions
+
+------------------------------------------------------------------------------
+
+Usage:
+
+Define XML_H_IMPLEMENTATION in ONE file before including "xml.h" to pull functions implementations.
+In other files just include "xml.h".
+
+#define XML_H_IMPLEMENTATION
+#include "xml.h"
+
+------------------------------------------------------------------------------
+
+*/
 
 #ifndef XML_H
 #define XML_H
@@ -31,6 +58,10 @@
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
+
+#ifndef XML_H_API
+#define XML_H_API extern
+#endif // XML_H_API
 
 typedef struct XMLNode XMLNode;
 typedef struct XMLList XMLList;
@@ -61,23 +92,23 @@ struct XMLList {
 
 // Parse XML string and return root XMLNode.
 // Returns NULL for error.
-XMLNode *xml_parse_string(const char *xml);
+XML_H_API XMLNode *xml_parse_string(const char *xml);
 // Parse XML file for given path and return root XMLNode.
 // Returns NULL for error.
-XMLNode *xml_parse_file(const char *path);
+XML_H_API XMLNode *xml_parse_file(const char *path);
 // Get child of the node at index.
 // Returns NULL if not found.
-XMLNode *xml_node_child_at(XMLNode *node, size_t idx);
+XML_H_API XMLNode *xml_node_child_at(XMLNode *node, size_t idx);
 // Find xml tag by path like "div/p/href"
-XMLNode *xml_node_find_by_path(XMLNode *root, const char *path, bool exact);
+XML_H_API XMLNode *xml_node_find_by_path(XMLNode *root, const char *path, bool exact);
 // Get first matching tag in the tree.
 // If exact is "false" - will return first tag which name contains "tag"
-XMLNode *xml_node_find_tag(XMLNode *node, const char *tag, bool exact);
+XML_H_API XMLNode *xml_node_find_tag(XMLNode *node, const char *tag, bool exact);
 // Get value of the tag attribute.
 // Returns NULL if not found.
-const char *xml_node_attr(XMLNode *node, const char *attr_key);
+XML_H_API const char *xml_node_attr(XMLNode *node, const char *attr_key);
 // Cleanup node and all it's children.
-void xml_node_free(XMLNode *node);
+XML_H_API void xml_node_free(XMLNode *node);
 
 #ifdef __cplusplus
 }
@@ -98,7 +129,7 @@ void xml_node_free(XMLNode *node);
 
 // Print debug message.
 // Only if XML_H_DEBUG is defined.
-void log_debug(const char *format, ...) {
+static void log_debug(const char *format, ...) {
 #ifdef XML_H_DEBUG
   va_list args;
   printf("[XML.H DEBUG] ");
@@ -109,19 +140,10 @@ void log_debug(const char *format, ...) {
 #endif
 }
 
-void log_error(const char *format, ...) {
-  va_list args;
-  printf("[XML.H ERROR] ");
-  va_start(args, format);
-  vprintf(format, args);
-  va_end(args);
-  printf("\n");
-}
-
 // ------ LIST ------ //
 
 // Create new dynamic array
-XMLList *xml_list_new() {
+XML_H_API XMLList *xml_list_new() {
   XMLList *list = malloc(sizeof(XMLList));
   list->len = 0;
   list->size = 1;
@@ -130,7 +152,7 @@ XMLList *xml_list_new() {
 }
 
 // Add element to the end of the array. Grow if needed.
-void xml_list_add(XMLList *list, void *data) {
+XML_H_API void xml_list_add(XMLList *list, void *data) {
   if (list->len >= list->size) {
     list->size *= 2; // Exponential growth
     list->data = realloc(list->data, list->size * sizeof(void *));
@@ -160,12 +182,12 @@ static void xml_node_add_attr(XMLNode *node, char *key, char *value) {
   xml_list_add(node->attrs, attr);
 }
 
-XMLNode *xml_node_child_at(XMLNode *node, size_t index) {
+XML_H_API XMLNode *xml_node_child_at(XMLNode *node, size_t index) {
   if (index > node->children->len - 1) return NULL;
   return (XMLNode *)node->children->data[index];
 }
 
-XMLNode *xml_node_find_tag(XMLNode *node, const char *tag, bool exact) {
+XML_H_API XMLNode *xml_node_find_tag(XMLNode *node, const char *tag, bool exact) {
   if (!node || !tag) return NULL; // Invalid input
   // Check if the current node matches the tag
   if (node->tag && ((exact && strcmp(node->tag, tag) == 0) || (!exact && strstr(node->tag, tag) != NULL))) return node;
@@ -178,7 +200,7 @@ XMLNode *xml_node_find_tag(XMLNode *node, const char *tag, bool exact) {
   return NULL;
 }
 
-XMLNode *xml_node_find_by_path(XMLNode *root, const char *path, bool exact) {
+XML_H_API XMLNode *xml_node_find_by_path(XMLNode *root, const char *path, bool exact) {
   if (!root || !path) return NULL;
   char *tokenized_path = strdup(path);
   if (!tokenized_path) return NULL;
@@ -204,7 +226,7 @@ XMLNode *xml_node_find_by_path(XMLNode *root, const char *path, bool exact) {
   return current;
 }
 
-const char *xml_node_attr(XMLNode *node, const char *attr_key) {
+XML_H_API const char *xml_node_attr(XMLNode *node, const char *attr_key) {
   if (!node || !attr_key) return NULL;
   for (size_t i = 0; i < node->attrs->len; i++) {
     XMLAttr *attr = (XMLAttr *)node->attrs->data[i];
@@ -213,7 +235,7 @@ const char *xml_node_attr(XMLNode *node, const char *attr_key) {
   return NULL;
 }
 
-void xml_node_free(XMLNode *node) {
+XML_H_API void xml_node_free(XMLNode *node) {
   if (node == NULL) return;
   // Free text
   if (node->text) free(node->text);
@@ -372,7 +394,7 @@ static bool parse_tag(const char *xml, size_t *idx, XMLNode **curr_node) {
   return true;
 }
 
-XMLNode *xml_parse_string(const char *xml) {
+XML_H_API XMLNode *xml_parse_string(const char *xml) {
   log_debug("Parse string: %s", xml);
   XMLNode *root = xml_node_new(NULL);
   XMLNode *curr_node = root;
@@ -392,7 +414,7 @@ XMLNode *xml_parse_string(const char *xml) {
   return root;
 }
 
-XMLNode *xml_parse_file(const char *path) {
+XML_H_API XMLNode *xml_parse_file(const char *path) {
   FILE *file = fopen(path, "rb");
   if (!file) return NULL;
   fseek(file, 0, SEEK_END);
@@ -417,65 +439,3 @@ XMLNode *xml_parse_file(const char *path) {
 }
 
 #endif // XML_H_IMPLEMENTATION
-
-#ifdef XML_H_TEST
-
-// To run tests compile with:
-// $ cp xml.h xml.c && cc -DXML_H_IMPLEMENTATION -DXML_H_TEST -DXML_H_DEBUG -o test xml.c && rm xml.c
-// $ ./test
-
-const char test_xml[] = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>"
-                        "<!-- Test comment -->"
-                        "<library>"
-                        "    <book id=\"1\">"
-                        "        <title>The Great Gatsby</title>"
-                        "        <author>F. Scott Fitzgerald</author>"
-                        "        <rating value=\"4.5\" />"
-                        "    </book>"
-                        "    <book id=\"2\">"
-                        "        <title>1984</title>"
-                        "        <author>George Orwell</author>"
-                        "        <rating value=\"4.9\" />"
-                        "        <bestseller />"
-                        "    </book>"
-                        "</library>";
-
-const char xml[] =
-    "<?xml version=\"1.0\"?><d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" "
-    "xmlns:oc=\"http://owncloud.org/ns\" "
-    "xmlns:nc=\"http://nextcloud.org/ns\"><d:response><d:href>/remote.php/dav/</"
-    "d:href><d:propstat><d:prop><d:current-user-principal><d:href>/remote.php/dav/principals/users/vlad/</d:href></"
-    "d:current-user-principal></d:prop><d:status>HTTP/1.1 200 OK</d:status></d:propstat></d:response></d:multistatus>";
-
-int main() {
-  XMLNode *root = xml_parse_string(xml);
-
-  // printf("Test XML:\n%s\n", test_xml);
-  // // Parse XML file and get root node
-  // XMLNode *root = xml_parse_string(test_xml);
-  // // Get first child of the root node
-  // XMLNode *library = xml_node_child_at(root, 0);
-  // // Print ratings of all books
-  // for (size_t i = 0; i < library->children->len; i++) {
-  //   // Get book
-  //   XMLNode *book = xml_node_child_at(library, i);
-  //   for (size_t j = 0; j < book->children->len; j++) {
-  //     // Get book child tag
-  //     XMLNode *sub_tag = xml_node_child_at(book, j);
-  //     // If tag name is "rating" - print its value
-  //     if (!strcmp(sub_tag->tag, "rating")) {
-  //       // Get rating value
-  //       const char *rating = xml_node_attr(sub_tag, "value");
-  //       printf("Rating is %s\n", rating);
-  //     }
-  //   }
-  // }
-  // // Find 1st matching tag
-  // XMLNode *matching_tag = xml_node_find_tag(root, "title", true);
-  // printf("Matching tag for 'title' = '%s'\n", matching_tag->tag);
-  // // Cleanup and exit
-  // xml_node_free(root);
-  return 0;
-}
-
-#endif // XML_H_TEST
