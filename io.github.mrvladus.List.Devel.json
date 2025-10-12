@@ -1,7 +1,7 @@
 {
   "id": "io.github.mrvladus.List.Devel",
   "runtime": "org.gnome.Platform",
-  "runtime-version": "47",
+  "runtime-version": "49",
   "sdk": "org.gnome.Sdk",
   "command": "errands",
   "finish-args": [
@@ -28,28 +28,6 @@
   ],
   "modules": [
     {
-      "name": "gnome-online-accounts",
-      "buildsystem": "meson",
-      "config-opts": [
-        "-Dgoabackend=false",
-        "-Dexchange=false",
-        "-Dgoogle=false",
-        "-Dimap_smtp=false",
-        "-Dwebdav=false",
-        "-Dkerberos=false",
-        "-Dwindows_live=false",
-        "-Dms_graph=false",
-        "-Dvapi=false"
-      ],
-      "sources": [
-        {
-          "type": "git",
-          "url": "https://gitlab.gnome.org/GNOME/gnome-online-accounts.git",
-          "branch": "master"
-        }
-      ]
-    },
-    {
       "name": "libportal",
       "buildsystem": "meson",
       "config-opts": [
@@ -62,10 +40,32 @@
         {
           "type": "git",
           "url": "https://github.com/flatpak/libportal.git",
-          "tag": "0.7.1"
+          "tag": "0.9.1"
         }
       ]
     },
+    {
+      "name": "gnome-online-accounts",
+      "buildsystem": "meson",
+      "config-opts": [
+        "-Dgoabackend=false",
+        "-Dexchange=false",
+        "-Dgoogle=false",
+        "-Dimap_smtp=false",
+        "-Dwebdav=false",
+        "-Dkerberos=false",
+        "-Dms_graph=false",
+        "-Dvapi=false"
+      ],
+      "sources": [
+        {
+          "type": "git",
+          "url": "https://gitlab.gnome.org/GNOME/gnome-online-accounts.git",
+          "branch": "master"
+        }
+      ]
+    },
+
     "build-aux/python3-caldav.json",
     {
       "name": "errands",

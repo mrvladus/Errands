@@ -2,48 +2,57 @@
   "name": "python3-caldav",
   "buildsystem": "simple",
   "build-commands": [
-    "pip3 install --verbose --exists-action=i --no-index --ignore-installed --find-links=\"file://${PWD}\" --prefix=${FLATPAK_DEST} --no-build-isolation caldav certifi charset-normalizer icalendar idna lxml python-dateutil pytz recurring-ical-events requests six tzlocal urllib3 vobject x-wr-timezone"
+    "pip3 install --verbose --exists-action=i --no-index --find-links=\"file://${PWD}\" --prefix=${FLATPAK_DEST} --no-build-isolation caldav certifi charset-normalizer click icalendar idna lxml python-dateutil recurring-ical-events requests six tzdata urllib3 x-wr-timezone"
   ],
   "sources": [
     {
       "type": "file",
-      "url": "https://files.pythonhosted.org/packages/77/86/c8fff55bd0ab9410cca9dbfa92e91ebcf3cc1a7266e33888364e7aaa1222/caldav-1.4.0-py3-none-any.whl",
-      "sha256": "e75e84824092e33a9e03ac693de3d01133a3e044fd50a1c542c7f78d1aff0cb2"
+      "url": "https://files.pythonhosted.org/packages/c9/fd/dc7e9760ba647eb619267ece751d1a9220fd79743d3bbc654a61f9151182/caldav-2.0.1-py2.py3-none-any.whl",
+      "sha256": "86ef0e308ce75745e04805aaede76b3c182b91b5d1a6862ed53dcf48dc56538b"
     },
     {
       "type": "file",
-      "url": "https://files.pythonhosted.org/packages/ba/06/a07f096c664aeb9f01624f858c3add0a4e913d6c96257acb4fce61e7de14/certifi-2024.2.2-py3-none-any.whl",
-      "sha256": "dc383c07b76109f368f6106eee2b593b04a011ea4d55f652c6ca24a754d1cdd1"
+      "url": "https://files.pythonhosted.org/packages/e4/37/af0d2ef3967ac0d6113837b44a4f0bfe1328c2b9763bd5b1744520e5cfed/certifi-2025.10.5-py3-none-any.whl",
+      "sha256": "0f212c2744a9bb6de0c56639a6f68afe01ecd92d91f14ae897c4fe7bbeeef0de"
     },
     {
       "type": "file",
-      "url": "https://files.pythonhosted.org/packages/99/b0/9c365f6d79a9f0f3c379ddb40a256a67aa69c59609608fe7feb6235896e1/charset_normalizer-3.3.2-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl",
-      "sha256": "8f4a014bc36d3c57402e2977dada34f9c12300af536839dc38c0beab8878f38a"
+      "url": "https://files.pythonhosted.org/packages/71/11/98a04c3c97dd34e49c7d247083af03645ca3730809a5509443f3c37f7c99/charset_normalizer-3.4.3-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl",
+      "sha256": "41d1fc408ff5fdfb910200ec0e74abc40387bccb3252f3f27c0676731df2b2c8",
+      "only-arches": ["aarch64"]
     },
     {
       "type": "file",
-      "url": "https://files.pythonhosted.org/packages/ee/fb/14d30eb4956408ee3ae09ad34299131fb383c47df355ddb428a7331cfa1e/charset_normalizer-3.3.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
-      "sha256": "90d558489962fd4918143277a773316e56c72da56ec7aa3dc3dbbe20fdfed15b"
+      "url": "https://files.pythonhosted.org/packages/7e/95/42aa2156235cbc8fa61208aded06ef46111c4d3f0de233107b3f38631803/charset_normalizer-3.4.3-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl",
+      "sha256": "416175faf02e4b0810f1f38bcb54682878a4af94059a1cd63b8747244420801f",
+      "only-arches": ["x86_64"]
     },
     {
       "type": "file",
-      "url": "https://files.pythonhosted.org/packages/fb/89/badc6427111cffabb6a462bf447cfff5e9e4c856527ddc030c11020b6cc5/icalendar-5.0.12-py3-none-any.whl",
-      "sha256": "d873bb859df9c6d0e597b16d247436e0f83f7ac1b90a06429b8393fe8afeba40"
+      "url": "https://files.pythonhosted.org/packages/db/d3/9dcc0f5797f070ec8edf30fbadfb200e71d9db6b84d211e3b2085a7589a0/click-8.3.0-py3-none-any.whl",
+      "sha256": "9b9f285302c6e3064f4330c05f05b81945b2a39544279343e6e7c5f27a9baddc"
     },
     {
       "type": "file",
-      "url": "https://files.pythonhosted.org/packages/e5/3e/741d8c82801c347547f8a2a06aa57dbb1992be9e948df2ea0eda2c8b79e8/idna-3.7-py3-none-any.whl",
-      "sha256": "82fee1fc78add43492d3a1898bfa6d8a904cc97d8427f683ed8e798d07761aa0"
+      "url": "https://files.pythonhosted.org/packages/6c/25/b5fc00e85d2dfaf5c806ac8b5f1de072fa11630c5b15b4ae5bbc228abd51/icalendar-6.3.1-py3-none-any.whl",
+      "sha256": "7ea1d1b212df685353f74cdc6ec9646bf42fa557d1746ea645ce8779fdfbecdd"
     },
     {
       "type": "file",
-      "url": "https://files.pythonhosted.org/packages/d0/f1/3a0bd5064c764966e5d1dd0e75048960a7f38c833422ff5e10c8f4ad8363/lxml-5.2.1-cp312-cp312-manylinux_2_28_aarch64.whl",
-      "sha256": "f9737bf36262046213a28e789cc82d82c6ef19c85a0cf05e75c670a33342ac2c"
+      "url": "https://files.pythonhosted.org/packages/76/c6/c88e154df9c4e1a2a66ccf0005a88dfb2650c1dffb6f5ce603dfbd452ce3/idna-3.10-py3-none-any.whl",
+      "sha256": "946d195a0d259cbba61165e88e65941f16e9b36ea6ddb97f00452bae8b1287d3"
     },
     {
       "type": "file",
-      "url": "https://files.pythonhosted.org/packages/ac/9b/f97fac2e2bacbc91d1a15f24e3bdbb52e418591109393144a943bd502d2c/lxml-5.2.1-cp312-cp312-manylinux_2_28_x86_64.whl",
-      "sha256": "f0a1bc63a465b6d72569a9bba9f2ef0334c4e03958e043da1920299100bc7c08"
+      "url": "https://files.pythonhosted.org/packages/81/76/99de58d81fa702cc0ea7edae4f4640416c2062813a00ff24bd70ac1d9c9b/lxml-6.0.2-cp313-cp313-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl",
+      "sha256": "eb2a12d704f180a902d7fa778c6d71f36ceb7b0d317f34cdc76a5d05aa1dd1df",
+      "only-arches": ["aarch64"]
+    },
+    {
+      "type": "file",
+      "url": "https://files.pythonhosted.org/packages/d0/34/9e591954939276bb679b73773836c6684c22e56d05980e31d52a9a8deb18/lxml-6.0.2-cp313-cp313-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl",
+      "sha256": "ef9266d2aa545d7374938fb5c484531ef5a2ec7f2d573e62f8ce722c735685fd",
+      "only-arches": ["x86_64"]
     },
     {
       "type": "file",
@@ -52,43 +61,33 @@
     },
     {
       "type": "file",
-      "url": "https://files.pythonhosted.org/packages/9c/3d/a121f284241f08268b21359bd425f7d4825cffc5ac5cd0e1b3d82ffd2b10/pytz-2024.1-py2.py3-none-any.whl",
-      "sha256": "328171f4e3623139da4983451950b28e95ac706e13f3f2630a879749e7a8b319"
+      "url": "https://files.pythonhosted.org/packages/36/25/88a4218cccae06ce6b15e41d2f263dd4a73e8e8cbe41537cd7784a17479b/recurring_ical_events-3.8.0-py3-none-any.whl",
+      "sha256": "cf958eb17c92d4dca5c621e44c2b3fffd4ba700dca0db66287c5dc11438f63ba"
     },
     {
       "type": "file",
-      "url": "https://files.pythonhosted.org/packages/8a/3c/c1e8d2fb47dfb091d2552ca8bee98aefa7593db3bc713a2d40826547f6ef/recurring_ical_events-2.2.1-py3-none-any.whl",
-      "sha256": "9e8e0390e7cfe2e7425690e6b858eed635bf7560b44cb52260cd3466fec9cec5"
+      "url": "https://files.pythonhosted.org/packages/1e/db/4254e3eabe8020b458f1a747140d32277ec7a271daf1d235b70dc0b4e6e3/requests-2.32.5-py3-none-any.whl",
+      "sha256": "2462f94637a34fd532264295e186976db0f5d453d1cdd31473c85a6a161affb6"
     },
     {
       "type": "file",
-      "url": "https://files.pythonhosted.org/packages/70/8e/0e2d847013cb52cd35b38c009bb167a1a26b2ce6cd6965bf26b47bc0bf44/requests-2.31.0-py3-none-any.whl",
-      "sha256": "58cd2187c01e70e6e26505bca751777aa9f2ee0b7f4300988b709f44e013003f"
+      "url": "https://files.pythonhosted.org/packages/b7/ce/149a00dd41f10bc29e5921b496af8b574d8413afcd5e30dfa0ed46c2cc5e/six-1.17.0-py2.py3-none-any.whl",
+      "sha256": "4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274"
     },
     {
       "type": "file",
-      "url": "https://files.pythonhosted.org/packages/d9/5a/e7c31adbe875f2abbb91bd84cf2dc52d792b5a01506781dbcf25c91daf11/six-1.16.0-py2.py3-none-any.whl",
-      "sha256": "8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"
+      "url": "https://files.pythonhosted.org/packages/5c/23/c7abc0ca0a1526a0774eca151daeb8de62ec457e77262b66b359c3c7679e/tzdata-2025.2-py2.py3-none-any.whl",
+      "sha256": "1a403fada01ff9221ca8044d701868fa132215d84beb92242d9acd2147f667a8"
     },
     {
       "type": "file",
-      "url": "https://files.pythonhosted.org/packages/97/3f/c4c51c55ff8487f2e6d0e618dba917e3c3ee2caae6cf0fbb59c9b1876f2e/tzlocal-5.2-py3-none-any.whl",
-      "sha256": "49816ef2fe65ea8ac19d19aa7a1ae0551c834303d5014c6d5a62e4cbda8047b8"
+      "url": "https://files.pythonhosted.org/packages/a7/c2/fe1e52489ae3122415c51f387e221dd0773709bad6c6cdaa599e8a2c5185/urllib3-2.5.0-py3-none-any.whl",
+      "sha256": "e6b01673c0fa6a13e374b50871808eb3bf7046c4b125b216f6bf1cc604cff0dc"
     },
     {
       "type": "file",
-      "url": "https://files.pythonhosted.org/packages/a2/73/a68704750a7679d0b6d3ad7aa8d4da8e14e151ae82e6fee774e6e0d05ec8/urllib3-2.2.1-py3-none-any.whl",
-      "sha256": "450b20ec296a467077128bff42b73080516e71b56ff59a60a02bef2232c4fa9d"
-    },
-    {
-      "type": "file",
-      "url": "https://files.pythonhosted.org/packages/a2/f2/ea094c009f962bd2fda9851bd54cd32b20721c9228842df2eefc1122aa40/vobject-0.9.7-py2.py3-none-any.whl",
-      "sha256": "67ebec81ee39fc60b7355ce077f850d5f13d99d08b110fa1abcfdbb516205e20"
-    },
-    {
-      "type": "file",
-      "url": "https://files.pythonhosted.org/packages/9d/c6/53227e391c641b891e173b0454f137a21cb969dd58b5171e487e4da7e87e/x_wr_timezone-0.0.7-py3-none-any.whl",
-      "sha256": "0b5e16f677c8f51ce41087a0b3d4f786c5fdcf78af4f8a75d4d960107dcb6d3a"
+      "url": "https://files.pythonhosted.org/packages/0f/b7/4bac35b4079b76c07d8faddf89467e9891b1610cfe8d03b0ebb5610e4423/x_wr_timezone-2.0.1-py3-none-any.whl",
+      "sha256": "e74a53b9f4f7def8138455c240e65e47c224778bce3c024fcd6da2cbe91ca038"
     }
   ]
 }
