@@ -23,18 +23,17 @@ if TYPE_CHECKING:
     from errands.widgets.task import Task
 
 
-class ErrandsTaskToolbar(Gtk.FlowBox):
+class ErrandsTaskToolbar(Adw.WrapBox):
     def __init__(self, task: Task) -> None:
         super().__init__()
         self.task: Task = task
         self.__build_ui()
 
     def __build_ui(self) -> None:
-        self.set_margin_bottom(2)
+        self.set_margin_bottom(6)
         self.set_margin_start(9)
         self.set_margin_end(9)
-        self.set_max_children_per_line(2)
-        self.set_selection_mode(Gtk.SelectionMode.NONE)
+        self.set_line_spacing(6)
 
         # Date and Time button
         self.date_time_btn: ErrandsButton = ErrandsButton(
@@ -259,7 +258,7 @@ class ErrandsTaskToolbar(Gtk.FlowBox):
         elif priority == 9:
             self.priority_btn.add_css_class("accent")
         self.priority_btn.set_icon_name(
-            f"errands-priority{'-set' if priority>0 else ''}-symbolic"
+            f"errands-priority{'-set' if priority > 0 else ''}-symbolic"
         )
 
         # Update attachments button css
