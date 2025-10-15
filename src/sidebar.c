@@ -1,5 +1,5 @@
 #include "sidebar.h"
-#include "data/data.h"
+#include "data.h"
 #include "settings.h"
 #include "state.h"
 #include "task-list.h"

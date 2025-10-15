@@ -71,69 +71,23 @@ typedef struct {
 } tb_array;
 
 // Create new array struct with `initial_capacity`
-static inline tb_array tb_array_new(size_t initial_capacity) {
-  tb_array array = {
-      .items = calloc(1, sizeof(void *) * initial_capacity),
-      .len = 0,
-      .capacity = initial_capacity,
-      .item_free_func = NULL,
-  };
-  return array;
-}
-
+tb_array tb_array_new(size_t initial_capacity);
 // Create new array struct with `initial_capacity` and `item_free_func`
-static inline tb_array tb_array_new_full(size_t initial_capacity, void (*item_free_func)(void *)) {
-  tb_array array = tb_array_new(initial_capacity);
-  array.item_free_func = item_free_func;
-  return array;
-}
-
+tb_array tb_array_new_full(size_t initial_capacity, void (*item_free_func)(void *));
 // Free `array` and its items if `item_free_func` is provided
-static inline void tb_array_free(tb_array *array) {
-  if (array->item_free_func)
-    for (size_t i = 0; i < array->len; i++) array->item_free_func(array->items[i]);
-  if (array->items) free(array->items);
-}
-
+void tb_array_free(tb_array *array);
 // Add `item` to `array`
-static inline void tb_array_add(tb_array *array, void *item) {
-  if (array->capacity == array->len) {
-    array->capacity *= 2;
-    array->items = realloc(array->items, array->capacity * sizeof(void *));
-  }
-  array->items[array->len++] = item;
-}
-
+void tb_array_add(tb_array *array, void *item);
 // Remove and free last item from `array`
-static inline void tb_array_pop(tb_array *array) {
-  if (array->item_free_func) array->item_free_func(array->items[array->len - 1]);
-  array->len--;
-}
-
+void tb_array_pop(tb_array *array);
 // Remove last item from `array` and return it without freeing it.
 // User is responsible for freeing the returned item.
-static inline void *tb_array_steal(tb_array *array) {
-  if (array->len == 0) return NULL;
-  void *item = array->items[array->len - 1];
-  array->len--;
-  return item;
-}
-
+void *tb_array_steal(tb_array *array);
 // Remove item at `idx` from `array` and return it without freeing it.
 // Move items after idx.
 // User is responsible for freeing the returned item.
-static inline void *tb_array_steal_idx(tb_array *array, size_t idx) {
-  if (array->len == 0) return NULL;
-  void *item = array->items[idx];
-  for (size_t i = idx; i < array->len - 1; i++) array->items[i] = array->items[i + 1];
-  array->len--;
-  return item;
-}
-
-static inline void *tb_array_last(tb_array *array) {
-  if (array->len == 0) return NULL;
-  return array->items[array->len - 1];
-}
+void *tb_array_steal_idx(tb_array *array, size_t idx);
+void *tb_array_last(tb_array *array);
 
 // -------------------- TEMPORARY STRING -------------------- //
 
@@ -182,6 +136,63 @@ time_t tb_time_now();
 #endif // TOOLBOX_H
 
 #ifdef TOOLBOX_IMPLEMENTATION
+
+// -------------------- DYNAMIC ARRAY -------------------- //
+
+tb_array tb_array_new(size_t initial_capacity) {
+  tb_array array = {
+      .items = calloc(1, sizeof(void *) * initial_capacity),
+      .len = 0,
+      .capacity = initial_capacity,
+      .item_free_func = NULL,
+  };
+  return array;
+}
+
+tb_array tb_array_new_full(size_t initial_capacity, void (*item_free_func)(void *)) {
+  tb_array array = tb_array_new(initial_capacity);
+  array.item_free_func = item_free_func;
+  return array;
+}
+
+void tb_array_free(tb_array *array) {
+  if (array->item_free_func)
+    for (size_t i = 0; i < array->len; i++) array->item_free_func(array->items[i]);
+  if (array->items) free(array->items);
+}
+
+void tb_array_add(tb_array *array, void *item) {
+  if (array->capacity == array->len) {
+    array->capacity *= 2;
+    array->items = realloc(array->items, array->capacity * sizeof(void *));
+  }
+  array->items[array->len++] = item;
+}
+
+void tb_array_pop(tb_array *array) {
+  if (array->item_free_func) array->item_free_func(array->items[array->len - 1]);
+  array->len--;
+}
+
+void *tb_array_steal(tb_array *array) {
+  if (array->len == 0) return NULL;
+  void *item = array->items[array->len - 1];
+  array->len--;
+  return item;
+}
+
+void *tb_array_steal_idx(tb_array *array, size_t idx) {
+  if (array->len == 0) return NULL;
+  void *item = array->items[idx];
+  for (size_t i = idx; i < array->len - 1; i++) array->items[i] = array->items[i + 1];
+  array->len--;
+  return item;
+}
+
+void *tb_array_last(tb_array *array) {
+  if (array->len == 0) return NULL;
+  return array->items[array->len - 1];
+}
 
 // -------------------- FILE FUNCTIONS -------------------- //
 

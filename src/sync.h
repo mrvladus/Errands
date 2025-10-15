@@ -1,6 +1,6 @@
 #pragma once
 
-#include "data/data.h"
+#include "data.h"
 
 extern bool needs_sync;
 

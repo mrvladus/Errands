@@ -1,6 +1,6 @@
 #pragma once
 
-#include "data/data.h"
+#include "data.h"
 #include "task.h"
 
 #include <adwaita.h>
@@ -151,32 +151,6 @@ struct _ErrandsTaskList {
   GtkWidget *custom_task_list;
   GtkAdjustment *adj;
 
-  GListStore *base_model;
-  GtkCustomFilter *base_toplevel_filter;
-  GtkFilterListModel *base_toplevel_filter_model;
-
-  GtkCustomFilter *base_today_filter;
-  GtkFilterListModel *base_today_filter_model;
-
-  GtkTreeListModel *tree_model;
-
-  GtkCustomFilter *today_filter;
-  GtkFilterListModel *today_filter_model;
-
-  GtkTreeListRowSorter *master_sorter;
-  GtkSortListModel *master_sort_model;
-
-  GtkCustomFilter *master_filter;
-  GtkFilterListModel *master_filter_model;
-
-  GtkCustomFilter *search_filter;
-  GtkFilterListModel *search_filter_model;
-
-  GtkNoSelection *selection_model;
-
-  GtkListItemFactory *flat_tasks_factory;
-  GtkListItemFactory *tree_tasks_factory;
-
   ErrandsTaskListAttachmentsDialog *attachments_dialog;
   ErrandsTaskListColorDialog *color_dialog;
   ErrandsTaskListDateDialog *date_dialog;
@@ -190,6 +164,8 @@ struct _ErrandsTaskList {
   GPtrArray *all_tasks;
   GHashTable *tasks_items;
   GHashTable *lists;
+
+  int scroll_pos_old;
 };
 
 ErrandsTaskList *errands_task_list_new();

@@ -1,5 +1,5 @@
 #include "window.h"
-#include "data/data.h"
+#include "data.h"
 #include "settings.h"
 #include "state.h"
 #include "vendor/toolbox.h"

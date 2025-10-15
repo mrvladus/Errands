@@ -5,28 +5,20 @@
 
 ### Building
 
-Errands use my own build system called **[pug.h](https://github.com/mrvladus/pug.h)**. It needs no external build tools. Only C compiler.
-
-Bootstrap build system:
-
-```sh
-cc -o pug pug.c
-```
-
 Build:
 
 ```sh
-./pug
+make
 ```
 
 Run:
 
 ```sh
-./pug run
+make run
 ```
 
 Clean:
 
 ```sh
-./pug clean
+make clean
 ```

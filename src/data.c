@@ -1,7 +1,7 @@
 #include "data.h"
-#include "../utils.h"
-#include "glib-object.h"
-#include "glib.h"
+#include "utils.h"
+
+#include <glib.h>
 
 GHashTable *ldata = NULL;
 GHashTable *tdata = NULL;

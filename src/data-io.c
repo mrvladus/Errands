@@ -1,10 +1,9 @@
-#include "../settings.h"
-#include "../utils.h"
 #include "data.h"
+#include "settings.h"
+#include "utils.h"
 
-#include "../vendor/json.h"
-#include "../vendor/toolbox.h"
-#include "glib.h"
+#include "vendor/json.h"
+#include "vendor/toolbox.h"
 
 #include <gio/gio.h>
 #include <libical/ical.h>

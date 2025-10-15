@@ -1,5 +1,5 @@
 #include "task.h"
-#include "data/data.h"
+#include "data.h"
 #include "gio/gio.h"
 #include "glib-object.h"
 #include "gtk/gtk.h"
@@ -379,7 +379,7 @@ static void on_complete_btn_toggle_cb(GtkCheckButton *btn, ErrandsTask *task) {
   errands_task_update_progress(get_parent_task(task));
 
   // Sort task list by completion
-  gtk_sorter_changed(GTK_SORTER(state.main_window->task_list->master_sorter), GTK_SORTER_CHANGE_MORE_STRICT);
+  // gtk_sorter_changed(GTK_SORTER(state.main_window->task_list->master_sorter), GTK_SORTER_CHANGE_MORE_STRICT);
   // TODO: remember next row and scroll to it
 
   // Update task list

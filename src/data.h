@@ -1,7 +1,6 @@
 #pragma once
 
-#include "glib-object.h"
-#include <glib.h>
+#include <glib-object.h>
 #include <libical/ical.h>
 
 #include <stdbool.h>

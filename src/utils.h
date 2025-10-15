@@ -29,8 +29,8 @@ static inline GPtrArray *get_children(GtkWidget *parent) {
 }
 
 static inline void gtk_box_remove_all(GtkWidget *box) {
-  GPtrArray *children = get_children(box);
-  for (int i = 0; i < children->len; i++) gtk_box_remove(GTK_BOX(box), GTK_WIDGET(children->pdata[i]));
+  GtkWidget *child;
+  while ((child = gtk_widget_get_first_child(box))) gtk_box_remove(GTK_BOX(box), child);
 }
 
 static inline bool string_contains(const char *haystack, const char *needle) {

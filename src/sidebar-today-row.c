@@ -1,4 +1,4 @@
-#include "data/data.h"
+#include "data.h"
 #include "sidebar.h"
 #include "vendor/toolbox.h"
 #include <libical/ical.h>

@@ -1,4 +1,4 @@
-#include "data/data.h"
+#include "data.h"
 #include "task-list.h"
 #include "vendor/toolbox.h"
 

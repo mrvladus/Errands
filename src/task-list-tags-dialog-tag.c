@@ -1,4 +1,4 @@
-#include "data/data.h"
+#include "data.h"
 #include "settings.h"
 #include "task-list.h"
 

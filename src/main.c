@@ -13,7 +13,7 @@ e.g. GLib's g_autoptr, g_auto and g_autofree"
 #define LOCALE_DIR ""
 #endif
 
-#include "data/data.h"
+#include "data.h"
 #include "settings.h"
 #include "state.h"
 #include "window.h"
