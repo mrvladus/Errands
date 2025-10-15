@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-10-10 12:25+0300\n"
-"PO-Revision-Date: 2024-05-20 13:02+0200\n"
+"PO-Revision-Date: 2025-08-14 17:46+0200\n"
 "Last-Translator: Philipp Kiemle <philipp.kiemle@gmail.com>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.4.3\n"
+"X-Generator: Poedit 3.6\n"
 
 #: errands/widgets/shared/components/buttons.py:45
 msgid "Info"
@@ -409,9 +409,8 @@ msgid "Content"
 msgstr "Inhalt"
 
 #: errands/widgets/window.py:66
-#, fuzzy
 msgid "Loading Tasks"
-msgstr "Neue Aufgaben hinzufügen"
+msgstr "Läd Aufgaben"
 
 #: errands/widgets/window.py:88
 msgid "No Task Lists"
@@ -430,13 +429,12 @@ msgid "Create new List"
 msgstr "Neue Liste erstellen"
 
 #: errands/widgets/window.py:115 errands/widgets/window.py:123
-#, fuzzy
 msgid "Syncing"
-msgstr "Synchronisieren …"
+msgstr "Synchronisiert …"
 
 #: errands/widgets/window.py:116
 msgid "First synchronization is running"
-msgstr ""
+msgstr "Erste Synchronisierung läuft"
 
 #: errands/widgets/window.py:172
 msgid "translator-credits"
@@ -444,7 +442,8 @@ msgstr ""
 "Christoph Bähr\n"
 "Philipp Kiemle <philipp.kiemle@gmail.com>\n"
 "Milo Ivir <mail@milotype.de>\n"
-"Otmar Grünn <ogruenn@me.com>"
+"Otmar Grünn <ogruenn@me.com>\n"
+"Astrid Schühle<astridschuehle@gmail.com>"
 
 #: errands/widgets/window.py:178
 msgid "Sync is disabled"
