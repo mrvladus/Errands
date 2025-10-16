@@ -35,7 +35,7 @@ Errands is available as a Flatpak on Flathub:
 
 <a href="https://flathub.org/apps/details/io.github.mrvladus.List"><img alt='Download on Flathub' src='https://flathub.org/api/badge?svg&locale=en'/></a>
 
-It's the **only** supported verion.
+It's the **only** supported version.
 
 ### Build flatpak using GNOME Builder
 1. Install [GNOME Builder](https://flathub.org/apps/org.gnome.Builder).
