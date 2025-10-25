@@ -78,6 +78,8 @@ tb_array tb_array_new_full(size_t initial_capacity, void (*item_free_func)(void 
 void tb_array_free(tb_array *array);
 // Add `item` to `array`
 void tb_array_add(tb_array *array, void *item);
+// Insert `item` at `idx` in `array`
+void tb_array_insert(tb_array *array, size_t idx, void *item);
 // Remove and free last item from `array`
 void tb_array_pop(tb_array *array);
 // Remove last item from `array` and return it without freeing it.
@@ -167,6 +169,16 @@ void tb_array_add(tb_array *array, void *item) {
     array->items = realloc(array->items, array->capacity * sizeof(void *));
   }
   array->items[array->len++] = item;
+}
+
+void tb_array_insert(tb_array *array, size_t idx, void *item) {
+  if (array->capacity == array->len) {
+    array->capacity *= 2;
+    array->items = realloc(array->items, array->capacity * sizeof(void *));
+  }
+  for (size_t i = array->len; i > idx; i--) array->items[i] = array->items[i - 1];
+  array->items[idx] = item;
+  array->len++;
 }
 
 void tb_array_pop(tb_array *array) {
