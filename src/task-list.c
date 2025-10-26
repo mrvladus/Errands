@@ -207,9 +207,20 @@ static tb_array free_tasks, used_tasks;
 size_t upper_tasks, lower_tasks;
 
 static void init_tasks_stacks() {
+  // initialize arrays: free_tasks contains pre-created ErrandsTask widgets
   free_tasks = tb_array_new_full(TASKS_STACK_SIZE, g_object_unref);
   used_tasks = tb_array_new_full(TASKS_STACK_SIZE, g_object_unref);
-  for (size_t i = 0; i < TASKS_STACK_SIZE; ++i) tb_array_add(&free_tasks, g_object_ref(errands_task_new()));
+
+  // fill free stack with new tasks (keep references so they can be reused)
+  for (size_t i = 0; i < TASKS_STACK_SIZE; ++i) {
+    ErrandsTask *t = errands_task_new();
+    tb_array_add(&free_tasks, g_object_ref(t));
+    g_object_unref(t);
+  }
+
+  // start indices (no tasks displayed)
+  upper_tasks = 0;
+  lower_tasks = 0;
 }
 
 static void redraw_tasks(ErrandsTaskList *self) {

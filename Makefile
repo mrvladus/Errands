@@ -6,9 +6,10 @@ DESTDIR ?=
 prefix ?= /usr/local
 bindir = $(prefix)/bin
 
-BUILD_DIR = build
-SRC_DIR = src
-DATA_DIR = data
+CWD := $(shell pwd)
+BUILD_DIR = $(CWD)/build
+SRC_DIR = $(CWD)/src
+DATA_DIR = $(CWD)/data
 
 SRCS = $(wildcard $(SRC_DIR)/*.c)
 OBJS = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRCS))
