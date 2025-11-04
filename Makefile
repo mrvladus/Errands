@@ -6,10 +6,9 @@ DESTDIR ?=
 prefix ?= /usr/local
 bindir = $(prefix)/bin
 
-CWD := $(shell pwd)
-BUILD_DIR = $(CWD)/build
-SRC_DIR = $(CWD)/src
-DATA_DIR = $(CWD)/data
+BUILD_DIR = build
+SRC_DIR = src
+DATA_DIR = data
 
 SRCS = $(wildcard $(SRC_DIR)/*.c)
 OBJS = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRCS))
@@ -18,7 +17,7 @@ BLPS = $(wildcard $(SRC_DIR)/*.blp)
 
 PKG_CONFIG_LIBS = libadwaita-1 gtksourceview-5 libical libportal libcurl webkitgtk-6.0
 
-CFLAGS = -Wall -Wno-enum-int-mismatch -Wno-unknown-pragmas \
+CFLAGS = -Wall -Wno-enum-int-mismatch -Wno-unknown-pragmas -g\
 		 `pkg-config --cflags $(PKG_CONFIG_LIBS)` \
 		 -DVERSION='"$(VERSION)"' \
 		 -DAPP_ID='"$(APP_ID)"' \
@@ -51,7 +50,7 @@ install: $(BUILD_DIR)/$(NAME)
 uninstall:
 	rm -f $(DESTDIR)/$(bindir)/$(NAME)
 
-run: $(BUILD_DIR)/$(NAME)
+run: all
 	@./$(BUILD_DIR)/$(NAME)
 
 clean:
