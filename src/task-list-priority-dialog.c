@@ -74,7 +74,7 @@ static void on_dialog_close_cb(ErrandsTaskListPriorityDialog *self) {
     errands_data_set_int(self->current_task->data, DATA_PROP_PRIORITY, val);
     errands_data_write_list(task_data_get_list(self->current_task->data));
     // gtk_sorter_changed(GTK_SORTER(state.main_window->task_list->master_sorter), GTK_SORTER_CHANGE_MORE_STRICT);
-    gtk_list_view_scroll_to(GTK_LIST_VIEW(state.main_window->task_list->task_list), 0, GTK_LIST_SCROLL_FOCUS, NULL);
+    // gtk_list_view_scroll_to(GTK_LIST_VIEW(state.main_window->task_list->task_list), 0, GTK_LIST_SCROLL_FOCUS, NULL);
     needs_sync = true;
   }
   errands_task_update_toolbar(self->current_task);

@@ -10,6 +10,16 @@
 #include <sys/stat.h>
 #include <time.h>
 
+// -------------------- MACROS -------------------- //
+
+#ifndef MIN
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#endif
+
+#ifndef MAX
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+#endif
+
 // -------------------- LOG AND DEBUG -------------------- //
 
 extern const char *tb_log_prefix;

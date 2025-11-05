@@ -1,3 +1,4 @@
+#include "task-list.h"
 #if !(defined(__GNUC__) || defined(__clang__))
 #error "This code requires GCC or Clang compiler because it uses features not supported by other compilers.\
 e.g. GLib's g_autoptr, g_auto and g_autofree"

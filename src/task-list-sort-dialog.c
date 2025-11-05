@@ -85,7 +85,7 @@ static void set_sort_by(GtkCheckButton *btn, size_t sort_by) {
   if (!gtk_check_button_get_active(btn) || sort_by_current == sort_by) return;
   errands_settings_set_int("sort_by", sort_by);
   // gtk_sorter_changed(GTK_SORTER(state.main_window->task_list->master_sorter), GTK_SORTER_CHANGE_MORE_STRICT);
-  gtk_list_view_scroll_to(GTK_LIST_VIEW(state.main_window->task_list->task_list), 0, GTK_LIST_SCROLL_FOCUS, NULL);
+  // gtk_list_view_scroll_to(GTK_LIST_VIEW(state.main_window->task_list->task_list), 0, GTK_LIST_SCROLL_FOCUS, NULL);
 }
 
 static void on_created_toggle_cb(GtkCheckButton *btn) { set_sort_by(btn, SORT_TYPE_CREATION_DATE); }

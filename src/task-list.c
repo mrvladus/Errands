@@ -1,8 +1,9 @@
 #include "task-list.h"
 #include "data.h"
+#include "glib.h"
 #include "gtk/gtk.h"
-#include "gtk/gtkshortcut.h"
 #include "settings.h"
+#include "state.h"
 #include "task.h"
 #include "utils.h"
 
@@ -10,6 +11,8 @@
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>
+#include <math.h>
+#include <stddef.h>
 
 typedef enum {
   EXPAND_DUE,
@@ -55,7 +58,6 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, search_bar);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, search_entry);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, entry_clamp);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, task_list);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, adj);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, scrl);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, custom_task_list);
@@ -201,63 +203,79 @@ static gint master_sort_func(gconstpointer a, gconstpointer b, gpointer user_dat
 
 // ---------- TASKS RECYCLER ---------- //
 
-#define TASKS_STACK_SIZE 30
+static GPtrArray *current_task_list;
+static size_t current_start;
 
-static tb_array free_tasks, used_tasks;
-size_t upper_tasks, lower_tasks;
-
-static void init_tasks_stacks() {
-  // initialize arrays: free_tasks contains pre-created ErrandsTask widgets
-  free_tasks = tb_array_new_full(TASKS_STACK_SIZE, g_object_unref);
-  used_tasks = tb_array_new_full(TASKS_STACK_SIZE, g_object_unref);
-
-  // fill free stack with new tasks (keep references so they can be reused)
-  for (size_t i = 0; i < TASKS_STACK_SIZE; ++i) {
-    ErrandsTask *t = errands_task_new();
-    tb_array_add(&free_tasks, g_object_ref(t));
-    g_object_unref(t);
-  }
-
-  // start indices (no tasks displayed)
-  upper_tasks = 0;
-  lower_tasks = 0;
-}
+#define TASKS_STACK_SIZE 20
+static ErrandsTask *tasks[TASKS_STACK_SIZE];
 
 static void redraw_tasks(ErrandsTaskList *self) {
-  gtk_box_remove_all(self->custom_task_list);
-  for (size_t i = 0; i < used_tasks.len; ++i) {
-    gtk_box_append(GTK_BOX(self->custom_task_list), GTK_WIDGET(used_tasks.items[i]));
-  }
+  if (current_task_list->len == 0) return;
+  g_autoptr(GPtrArray) children = get_children(self->custom_task_list);
+  for (size_t i = 0, j = current_start; i < MIN(TASKS_STACK_SIZE, current_task_list->len - current_start); ++i, j++)
+    errands_task_set_data((ErrandsTask *)children->pdata[i], current_task_list->pdata[j]);
 }
 
 static void on_adjustment_value_changed(GtkAdjustment *adj, ErrandsTaskList *self) {
   double val = gtk_adjustment_get_value(adj);
   bool scroll_down = val < self->scroll_pos_old;
   self->scroll_pos_old = val;
-  int viewport_height = gtk_widget_get_height(self->scrl);
+
   graphene_rect_t bounds = {0};
-  for (int64_t i = 0; i < used_tasks.len; ++i) {
-    GtkWidget *widget = used_tasks.items[i];
-    bool res = gtk_widget_compute_bounds(widget, self->custom_task_list, &bounds);
-    double offset = val - bounds.origin.y;
-    double height = bounds.size.height;
-    if (height * 2 < offset) {
-      // Above upper border
-      if (!scroll_down) {
-        GtkWidget *last_child = gtk_widget_get_last_child(self->custom_task_list);
-        if (last_child && last_child != widget) {
-          tb_array_steal_idx(&used_tasks, i--);
-          tb_array_add(&free_tasks, widget);
-        }
-      }
-    } else {
-      bool res = gtk_widget_compute_bounds(GTK_WIDGET(widget), self->scrl, &bounds);
-      if (bounds.origin.y - bounds.size.height * 2 > viewport_height) {
-        // Below lower border
-      }
+  bool res;
+  GtkWidget *widget;
+
+  if (scroll_down) {
+    // // Scrolling up - check if first visible item is above viewport
+    // GtkWidget *first_child = gtk_widget_get_first_child(self->custom_task_list);
+    // if (!first_child) return;
+
+    // bool res = gtk_widget_compute_bounds(first_child, GTK_WIDGET(self->scrl), &bounds);
+    // if (!res) return;
+
+    // float height = bounds.size.height;
+    // float y = bounds.origin.y;
+
+    // if (y + height < 0) {
+    //   // Move first child to end and update data
+    //   GtkWidget *widget = first_child;
+    //   gtk_box_reorder_child_after(GTK_BOX(self->custom_task_list), widget,
+    //                               gtk_widget_get_last_child(self->custom_task_list));
+    //   current_start--;
+    //   redraw_tasks(self);
+    //   // Adjust scroll position to maintain visual continuity
+    //   gtk_adjustment_set_value(adj, val - height);
+    // }
+  } else {
+    widget = gtk_widget_get_first_child(self->custom_task_list);
+    res = gtk_widget_compute_bounds(widget, GTK_WIDGET(self->scrl), &bounds);
+    if (bounds.origin.y < -200.0f) {
+      // printf("Pos: y=%f\n", bounds.origin.y);
+      gtk_widget_insert_after(widget, self->custom_task_list, gtk_widget_get_last_child(self->custom_task_list));
+      gtk_adjustment_set_value(adj, val - bounds.size.height);
     }
+
+    // // Scrolling down - check if last visible item is below viewport
+    // GtkWidget *last_child = gtk_widget_get_last_child(self->custom_task_list);
+    // if (!last_child) return;
+
+    // int window_height = gtk_widget_get_height(GTK_WIDGET(self->scrl));
+    // bool res = gtk_widget_compute_bounds(last_child, GTK_WIDGET(self->scrl), &bounds);
+    // if (!res) return;
+
+    // float height = bounds.size.height;
+    // float y = bounds.origin.y;
+
+    // if (y > window_height) {
+    //   // Move first child to end and update data
+    //   GtkWidget *widget = gtk_widget_get_first_child(self->custom_task_list);
+    //   gtk_box_reorder_child_after(GTK_BOX(self->custom_task_list), widget, last_child);
+    //   current_start++;
+    //   redraw_tasks(self);
+    //   // Adjust scroll position to maintain visual continuity
+    //   gtk_adjustment_set_value(adj, val + height);
+    // }
   }
-  redraw_tasks(self);
 }
 
 static gint sort(gconstpointer a, gconstpointer b, gpointer user_data) {
@@ -265,20 +283,16 @@ static gint sort(gconstpointer a, gconstpointer b, gpointer user_data) {
   TaskData *tb = (TaskData *)b;
   long la = strtol(errands_data_get_str(ta, DATA_PROP_TEXT), NULL, 10);
   long lb = strtol(errands_data_get_str(tb, DATA_PROP_TEXT), NULL, 10);
-
   return la - lb;
 }
 
 void errands_task_list_load_tasks(ErrandsTaskList *self) {
-  init_tasks_stacks();
-  GPtrArray *tasks = g_hash_table_get_values_as_ptr_array(tdata);
-  g_ptr_array_sort_values(tasks, (GCompareFunc)sort);
-  for (size_t i = 0; i < tasks->len; ++i) {
-    ErrandsTask *task = tb_array_steal(&free_tasks);
-    if (!task) break;
-    // tb_log("Load: %s", errands_data_get_str(tasks->pdata[i], DATA_PROP_TEXT));
-    errands_task_set_data(task, tasks->pdata[i]);
-    tb_array_add(&used_tasks, task);
+  if (current_task_list) g_ptr_array_unref(current_task_list);
+  current_task_list = g_hash_table_get_values_as_ptr_array(tdata);
+  g_ptr_array_sort_values(current_task_list, (GCompareFunc)sort);
+  for (size_t i = 0; i < TASKS_STACK_SIZE; ++i) {
+    tasks[i] = errands_task_new();
+    gtk_box_append(GTK_BOX(self->custom_task_list), GTK_WIDGET(tasks[i]));
   }
   redraw_tasks(self);
 }
@@ -469,25 +483,25 @@ static void restore_expanded_rows(ErrandsTaskList *self) {
 // ---------- CALLBACKS ---------- //
 
 static void on_task_list_entry_activated_cb(AdwEntryRow *entry, ErrandsTaskList *self) {
-  // const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
-  // const char *list_uid = errands_data_get_str(self->data, DATA_PROP_LIST_UID);
-  // // Skip empty text
-  // if (g_str_equal(text, "")) return;
-  // if (g_str_equal(list_uid, "")) return;
-  // TaskData *td = list_data_create_task(self->data, (char *)text, list_uid, "");
-  // GObject *obj = task_data_as_gobject(td);
-  // g_hash_table_insert(self->tasks_items, g_strdup(errands_data_get_str(td, DATA_PROP_UID)), obj);
+  const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
+  const char *list_uid = errands_data_get_str(self->data, DATA_PROP_LIST_UID);
+  // Skip empty text
+  if (g_str_equal(text, "")) return;
+  if (g_str_equal(list_uid, "")) return;
+  TaskData *td = list_data_create_task(self->data, (char *)text, list_uid, "");
+  GObject *obj = task_data_as_gobject(td);
+  g_hash_table_insert(self->tasks_items, g_strdup(errands_data_get_str(td, DATA_PROP_UID)), obj);
   // g_list_store_append(self->base_model, obj);
   // gtk_list_view_scroll_to(GTK_LIST_VIEW(self->task_list), 0, GTK_LIST_SCROLL_FOCUS, NULL);
-  // errands_data_write_list(self->data);
-  // // Clear text
-  // gtk_editable_set_text(GTK_EDITABLE(entry), "");
-  // // Update counter
-  // errands_sidebar_task_list_row_update_counter(errands_sidebar_task_list_row_get(list_uid));
-  // errands_sidebar_all_row_update_counter(state.main_window->sidebar->all_row);
-  // errands_task_list_update_title(self);
-  // tb_log("Add task '%s' to task list '%s'", errands_data_get_str(td, DATA_PROP_UID),
-  //        errands_data_get_str(td, DATA_PROP_LIST_UID));
+  errands_data_write_list(self->data);
+  // Clear text
+  gtk_editable_set_text(GTK_EDITABLE(entry), "");
+  // Update counter
+  errands_sidebar_task_list_row_update_counter(errands_sidebar_task_list_row_get(list_uid));
+  errands_sidebar_all_row_update_counter(state.main_window->sidebar->all_row);
+  errands_task_list_update_title(self);
+  tb_log("Add task '%s' to task list '%s'", errands_data_get_str(td, DATA_PROP_UID),
+         errands_data_get_str(td, DATA_PROP_LIST_UID));
 }
 
 static void on_task_list_search_cb(ErrandsTaskList *self, GtkSearchEntry *entry) {

@@ -73,21 +73,9 @@ template $ErrandsTaskList: Adw.Bin {
     content: Box {
       orientation: vertical;
 
-      ScrolledWindow {
-        propagate-natural-height: true;
-        vexpand: true;
-        visible: false;
-
-        ListView task_list {
-          margin-start: 8;
-          margin-end: 8;
-          single-click-activate: true;
-          activate => $on_list_view_activate_cb();
-        }
-      }
-
       ScrolledWindow scrl {
         vexpand: true;
+        vscrollbar-policy: external;
 
         vadjustment: Adjustment adj {
           value-changed => $on_adjustment_value_changed(template) not-swapped;

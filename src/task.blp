@@ -100,90 +100,87 @@ template $ErrandsTask: Box {
   }
 
   // Toolbar
-  Revealer toolbar_revealer {
-    reveal-child: bind toolbar_btn.active;
+  Adw.WrapBox {
+    visible: bind toolbar_btn.active;
+    margin-start: 6;
+    margin-end: 6;
+    margin-bottom: 6;
+    line-spacing: 3;
+    child-spacing: 3;
 
-    Adw.WrapBox {
-      margin-start: 6;
-      margin-end: 6;
-      margin-bottom: 6;
-      line-spacing: 3;
-      child-spacing: 3;
+    Button date_btn {
+      valign: center;
+      halign: start;
+      hexpand: true;
 
-      Button date_btn {
+      Adw.ButtonContent date_btn_content {
+        icon-name: "errands-calendar-symbolic";
+        label: _("Date");
+        tooltip-text: _("Select Date");
+      }
+
+      clicked => $errands_task_list_date_dialog_show(template);
+
+      styles [
+        "caption",
+        "flat",
+      ]
+    }
+
+    Box {
+      Button priority_btn {
+        icon-name: "errands-priority-symbolic";
+        tooltip-text: _("Priority");
         valign: center;
-        halign: start;
-        hexpand: true;
-
-        Adw.ButtonContent date_btn_content {
-          icon-name: "errands-calendar-symbolic";
-          label: _("Date");
-          tooltip-text: _("Select Date");
-        }
-
-        clicked => $errands_task_list_date_dialog_show(template);
+        clicked => $errands_task_list_priority_dialog_show(template);
 
         styles [
-          "caption",
           "flat",
         ]
       }
 
-      Box {
-        Button priority_btn {
-          icon-name: "errands-priority-symbolic";
-          tooltip-text: _("Priority");
-          valign: center;
-          clicked => $errands_task_list_priority_dialog_show(template);
+      Button notes_btn {
+        icon-name: "errands-notes-symbolic";
+        tooltip-text: _("Notes");
+        valign: center;
+        clicked => $errands_task_list_notes_dialog_show(template);
 
-          styles [
-            "flat",
-          ]
-        }
+        styles [
+          "flat",
+        ]
+      }
 
-        Button notes_btn {
-          icon-name: "errands-notes-symbolic";
-          tooltip-text: _("Notes");
-          valign: center;
-          clicked => $errands_task_list_notes_dialog_show(template);
+      Button tags_btn {
+        icon-name: "errands-tags-symbolic";
+        tooltip-text: _("Tags");
+        valign: center;
+        clicked => $errands_task_list_tags_dialog_show(template);
 
-          styles [
-            "flat",
-          ]
-        }
+        styles [
+          "flat",
+        ]
+      }
 
-        Button tags_btn {
-          icon-name: "errands-tags-symbolic";
-          tooltip-text: _("Tags");
-          valign: center;
-          clicked => $errands_task_list_tags_dialog_show(template);
+      Button attachments_btn {
+        icon-name: "errands-attachment-symbolic";
+        tooltip-text: _("Attachments");
+        valign: center;
+        clicked => $errands_task_list_attachments_dialog_show(template);
 
-          styles [
-            "flat",
-          ]
-        }
+        styles [
+          "flat",
+        ]
+      }
 
-        Button attachments_btn {
-          icon-name: "errands-attachment-symbolic";
-          tooltip-text: _("Attachments");
-          valign: center;
-          clicked => $errands_task_list_attachments_dialog_show(template);
+      Button color_btn {
+        icon-name: "errands-color-symbolic";
+        tooltip-text: _("Color");
+        valign: center;
+        clicked => $errands_task_list_color_dialog_show(template);
 
-          styles [
-            "flat",
-          ]
-        }
-
-        Button color_btn {
-          icon-name: "errands-color-symbolic";
-          tooltip-text: _("Color");
-          valign: center;
-          clicked => $errands_task_list_color_dialog_show(template);
-
-          styles [
-            "flat",
-          ]
-        }
+        styles [
+          "flat",
+        ]
       }
     }
   }
