@@ -12,6 +12,7 @@
 #include <glib/gi18n.h>
 #include <libical/ical.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 
 typedef enum {
@@ -206,7 +207,7 @@ static gint master_sort_func(gconstpointer a, gconstpointer b, gpointer user_dat
 static GPtrArray *current_task_list;
 static size_t current_start;
 
-#define TASKS_STACK_SIZE 20
+#define TASKS_STACK_SIZE 40
 
 static void redraw_tasks(ErrandsTaskList *self) {
   if (current_task_list->len == 0) return;
@@ -216,38 +217,41 @@ static void redraw_tasks(ErrandsTaskList *self) {
 }
 
 static void on_adjustment_value_changed(GtkAdjustment *adj, ErrandsTaskList *self) {
-  double old_val = self->scroll_pos_old;
-  double val = gtk_adjustment_get_value(adj);
-  bool scroll_down = val < old_val;
-  if ((!scroll_down && (int)val <= (int)old_val + 30) || (scroll_down && (int)val >= (int)old_val - 30)) return;
-  printf("Scroll %s, Value changed: %f -> %f\n", scroll_down ? "down" : "up", old_val, val);
+  int old_val = self->scroll_pos_old;
+  int val = gtk_adjustment_get_value(adj);
+  double diff = fabs((double)(val - old_val));
+  if (diff < 30.0) return;
   self->scroll_pos_old = val;
-  graphene_rect_t bounds = {0};
+  bool scroll_down = val < old_val;
+  printf("Scroll %s, Value changed: %d -> %d\n", scroll_down ? "down" : "up", old_val, val);
   g_autoptr(GPtrArray) children = get_children(self->custom_task_list);
-  GtkWidget *widget = children->pdata[0];
-  bool res = gtk_widget_compute_bounds(widget, self->scrl, &bounds);
-  printf("Widget bounds: %f, %f, %f, %f\n", bounds.origin.x, bounds.origin.y, bounds.size.width, bounds.size.height);
+  if (children->len < 3) return;
+  GtkWidget *first_widget = children->pdata[0];
+  GtkWidget *last_widget = children->pdata[children->len - 1];
+  graphene_rect_t first_bounds, second_bounds = {0};
+  bool res = gtk_widget_compute_bounds(first_widget, self->scrl, &first_bounds);
+  float offset = -300.0f;
+  g_signal_handlers_block_by_func(adj, on_adjustment_value_changed, self);
   if (scroll_down) {
-    if (bounds.origin.y >= -200.0f && current_start > 0) {
-      GtkWidget *last_widget = children->pdata[children->len - 1];
-      gtk_widget_insert_before(last_widget, self->custom_task_list, widget);
-      gtk_widget_set_visible(widget, false);
-      self->scroll_pos_old = val + bounds.size.height + 4;
+    if (first_bounds.origin.y >= offset && current_start > 0) {
+      gtk_widget_insert_before(last_widget, self->custom_task_list, first_widget);
+      gtk_widget_set_visible(first_widget, false);
+      self->scroll_pos_old = val + first_bounds.size.height + 8;
       gtk_adjustment_set_value(adj, self->scroll_pos_old);
       current_start--;
       redraw_tasks(self);
     }
   } else {
-    if (bounds.origin.y <= -200.0f && current_start < current_task_list->len) {
-      gtk_widget_insert_after(widget, self->custom_task_list, gtk_widget_get_last_child(self->custom_task_list));
-      gtk_widget_set_visible(widget, false);
-      self->scroll_pos_old = val - bounds.size.height - 4;
+    if (first_bounds.origin.y <= offset && current_start < current_task_list->len) {
+      gtk_widget_insert_after(first_widget, self->custom_task_list, last_widget);
+      gtk_widget_set_visible(first_widget, false);
+      self->scroll_pos_old = (int)(val - first_bounds.size.height - 8);
       gtk_adjustment_set_value(adj, self->scroll_pos_old);
-      printf("New val: %f\n", gtk_adjustment_get_value(adj));
       current_start++;
       redraw_tasks(self);
     }
   }
+  g_signal_handlers_unblock_by_func(adj, on_adjustment_value_changed, self);
 }
 
 static gint sort(gconstpointer a, gconstpointer b, gpointer user_data) {

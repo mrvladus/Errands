@@ -4,6 +4,7 @@
 #include "task.h"
 
 #include <adwaita.h>
+#include <stdint.h>
 
 // --- TASK LIST ATTACHMENTS DIALOG --- //
 
@@ -164,7 +165,7 @@ struct _ErrandsTaskList {
   GHashTable *tasks_items;
   GHashTable *lists;
 
-  double scroll_pos_old;
+  int scroll_pos_old;
 };
 
 ErrandsTaskList *errands_task_list_new();
