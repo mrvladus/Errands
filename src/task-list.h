@@ -164,7 +164,7 @@ struct _ErrandsTaskList {
   GHashTable *tasks_items;
   GHashTable *lists;
 
-  int scroll_pos_old;
+  double scroll_pos_old;
 };
 
 ErrandsTaskList *errands_task_list_new();

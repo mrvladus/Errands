@@ -11,8 +11,8 @@
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>
-#include <math.h>
 #include <stddef.h>
+#include <stdio.h>
 
 typedef enum {
   EXPAND_DUE,
@@ -207,7 +207,6 @@ static GPtrArray *current_task_list;
 static size_t current_start;
 
 #define TASKS_STACK_SIZE 20
-static ErrandsTask *tasks[TASKS_STACK_SIZE];
 
 static void redraw_tasks(ErrandsTaskList *self) {
   if (current_task_list->len == 0) return;
@@ -217,64 +216,37 @@ static void redraw_tasks(ErrandsTaskList *self) {
 }
 
 static void on_adjustment_value_changed(GtkAdjustment *adj, ErrandsTaskList *self) {
+  double old_val = self->scroll_pos_old;
   double val = gtk_adjustment_get_value(adj);
-  bool scroll_down = val < self->scroll_pos_old;
+  bool scroll_down = val < old_val;
+  if ((!scroll_down && (int)val <= (int)old_val + 30) || (scroll_down && (int)val >= (int)old_val - 30)) return;
+  printf("Scroll %s, Value changed: %f -> %f\n", scroll_down ? "down" : "up", old_val, val);
   self->scroll_pos_old = val;
-
   graphene_rect_t bounds = {0};
-  bool res;
-  GtkWidget *widget;
-
+  g_autoptr(GPtrArray) children = get_children(self->custom_task_list);
+  GtkWidget *widget = children->pdata[0];
+  bool res = gtk_widget_compute_bounds(widget, self->scrl, &bounds);
+  printf("Widget bounds: %f, %f, %f, %f\n", bounds.origin.x, bounds.origin.y, bounds.size.width, bounds.size.height);
   if (scroll_down) {
-    // // Scrolling up - check if first visible item is above viewport
-    // GtkWidget *first_child = gtk_widget_get_first_child(self->custom_task_list);
-    // if (!first_child) return;
-
-    // bool res = gtk_widget_compute_bounds(first_child, GTK_WIDGET(self->scrl), &bounds);
-    // if (!res) return;
-
-    // float height = bounds.size.height;
-    // float y = bounds.origin.y;
-
-    // if (y + height < 0) {
-    //   // Move first child to end and update data
-    //   GtkWidget *widget = first_child;
-    //   gtk_box_reorder_child_after(GTK_BOX(self->custom_task_list), widget,
-    //                               gtk_widget_get_last_child(self->custom_task_list));
-    //   current_start--;
-    //   redraw_tasks(self);
-    //   // Adjust scroll position to maintain visual continuity
-    //   gtk_adjustment_set_value(adj, val - height);
-    // }
-  } else {
-    widget = gtk_widget_get_first_child(self->custom_task_list);
-    res = gtk_widget_compute_bounds(widget, GTK_WIDGET(self->scrl), &bounds);
-    if (bounds.origin.y < -200.0f) {
-      // printf("Pos: y=%f\n", bounds.origin.y);
-      gtk_widget_insert_after(widget, self->custom_task_list, gtk_widget_get_last_child(self->custom_task_list));
-      gtk_adjustment_set_value(adj, val - bounds.size.height);
+    if (bounds.origin.y >= -200.0f && current_start > 0) {
+      GtkWidget *last_widget = children->pdata[children->len - 1];
+      gtk_widget_insert_before(last_widget, self->custom_task_list, widget);
+      gtk_widget_set_visible(widget, false);
+      self->scroll_pos_old = val + bounds.size.height + 4;
+      gtk_adjustment_set_value(adj, self->scroll_pos_old);
+      current_start--;
+      redraw_tasks(self);
     }
-
-    // // Scrolling down - check if last visible item is below viewport
-    // GtkWidget *last_child = gtk_widget_get_last_child(self->custom_task_list);
-    // if (!last_child) return;
-
-    // int window_height = gtk_widget_get_height(GTK_WIDGET(self->scrl));
-    // bool res = gtk_widget_compute_bounds(last_child, GTK_WIDGET(self->scrl), &bounds);
-    // if (!res) return;
-
-    // float height = bounds.size.height;
-    // float y = bounds.origin.y;
-
-    // if (y > window_height) {
-    //   // Move first child to end and update data
-    //   GtkWidget *widget = gtk_widget_get_first_child(self->custom_task_list);
-    //   gtk_box_reorder_child_after(GTK_BOX(self->custom_task_list), widget, last_child);
-    //   current_start++;
-    //   redraw_tasks(self);
-    //   // Adjust scroll position to maintain visual continuity
-    //   gtk_adjustment_set_value(adj, val + height);
-    // }
+  } else {
+    if (bounds.origin.y <= -200.0f && current_start < current_task_list->len) {
+      gtk_widget_insert_after(widget, self->custom_task_list, gtk_widget_get_last_child(self->custom_task_list));
+      gtk_widget_set_visible(widget, false);
+      self->scroll_pos_old = val - bounds.size.height - 4;
+      gtk_adjustment_set_value(adj, self->scroll_pos_old);
+      printf("New val: %f\n", gtk_adjustment_get_value(adj));
+      current_start++;
+      redraw_tasks(self);
+    }
   }
 }
 
@@ -291,8 +263,9 @@ void errands_task_list_load_tasks(ErrandsTaskList *self) {
   current_task_list = g_hash_table_get_values_as_ptr_array(tdata);
   g_ptr_array_sort_values(current_task_list, (GCompareFunc)sort);
   for (size_t i = 0; i < TASKS_STACK_SIZE; ++i) {
-    tasks[i] = errands_task_new();
-    gtk_box_append(GTK_BOX(self->custom_task_list), GTK_WIDGET(tasks[i]));
+    ErrandsTask *task = errands_task_new();
+    gtk_box_append(GTK_BOX(self->custom_task_list), GTK_WIDGET(task));
+    gtk_widget_set_visible(GTK_WIDGET(task), false);
   }
   redraw_tasks(self);
 }
