@@ -1,3 +1,4 @@
+#include "gtk/gtk.h"
 #include "task-list.h"
 #if !(defined(__GNUC__) || defined(__clang__))
 #error "This code requires GCC or Clang compiler because it uses features not supported by other compilers.\

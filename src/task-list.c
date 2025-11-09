@@ -1,5 +1,6 @@
 #include "task-list.h"
 #include "data.h"
+#include "glib-object.h"
 #include "glib.h"
 #include "gtk/gtk.h"
 #include "settings.h"
@@ -61,7 +62,8 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, entry_clamp);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, adj);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, scrl);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, custom_task_list);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, top_spacer);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, task_list);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_list_sort_dialog_show);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_entry_activated_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_search_cb);
@@ -202,6 +204,14 @@ static gint master_sort_func(gconstpointer a, gconstpointer b, gpointer user_dat
   }
 }
 
+static gint sort(gconstpointer a, gconstpointer b, gpointer user_data) {
+  TaskData *ta = (TaskData *)a;
+  TaskData *tb = (TaskData *)b;
+  long la = strtol(errands_data_get_str(ta, DATA_PROP_TEXT), NULL, 10);
+  long lb = strtol(errands_data_get_str(tb, DATA_PROP_TEXT), NULL, 10);
+  return la - lb;
+}
+
 // ---------- TASKS RECYCLER ---------- //
 
 static GPtrArray *current_task_list;
@@ -211,64 +221,72 @@ static size_t current_start;
 
 static void redraw_tasks(ErrandsTaskList *self) {
   if (current_task_list->len == 0) return;
-  g_autoptr(GPtrArray) children = get_children(self->custom_task_list);
+  g_autoptr(GPtrArray) children = get_children(self->task_list);
   for (size_t i = 0, j = current_start; i < MIN(TASKS_STACK_SIZE, current_task_list->len - current_start); ++i, j++)
     errands_task_set_data((ErrandsTask *)children->pdata[i], current_task_list->pdata[j]);
 }
 
 static void on_adjustment_value_changed(GtkAdjustment *adj, ErrandsTaskList *self) {
-  int old_val = self->scroll_pos_old;
-  int val = gtk_adjustment_get_value(adj);
-  double diff = fabs((double)(val - old_val));
-  if (diff < 30.0) return;
-  self->scroll_pos_old = val;
+  double old_val = self->scroll_pos_old;
+  double val = gtk_adjustment_get_value(adj);
+  // double diff = fabs(val - old_val);
+  // if (diff < 30.0) return;
   bool scroll_down = val < old_val;
-  printf("Scroll %s, Value changed: %d -> %d\n", scroll_down ? "down" : "up", old_val, val);
-  g_autoptr(GPtrArray) children = get_children(self->custom_task_list);
+  self->scroll_pos_old = val;
+  g_autoptr(GPtrArray) children = get_children(self->task_list);
   if (children->len < 3) return;
   GtkWidget *first_widget = children->pdata[0];
   GtkWidget *last_widget = children->pdata[children->len - 1];
-  graphene_rect_t first_bounds, second_bounds = {0};
+  graphene_rect_t first_bounds;
   bool res = gtk_widget_compute_bounds(first_widget, self->scrl, &first_bounds);
-  float offset = -300.0f;
-  g_signal_handlers_block_by_func(adj, on_adjustment_value_changed, self);
+  float offset = -(MAX(300.0f, first_bounds.origin.y + first_bounds.size.height));
   if (scroll_down) {
     if (first_bounds.origin.y >= offset && current_start > 0) {
-      gtk_widget_insert_before(last_widget, self->custom_task_list, first_widget);
+      gtk_widget_set_size_request(self->top_spacer, -1,
+                                  MAX(0, gtk_widget_get_height(self->top_spacer) - first_bounds.size.height - 8));
+      gtk_widget_set_size_request(self->task_list, -1,
+                                  gtk_widget_get_height(self->task_list) + first_bounds.size.height + 8);
+      gtk_widget_insert_before(last_widget, self->task_list, first_widget);
       gtk_widget_set_visible(first_widget, false);
-      self->scroll_pos_old = val + first_bounds.size.height + 8;
-      gtk_adjustment_set_value(adj, self->scroll_pos_old);
       current_start--;
       redraw_tasks(self);
     }
   } else {
     if (first_bounds.origin.y <= offset && current_start < current_task_list->len) {
-      gtk_widget_insert_after(first_widget, self->custom_task_list, last_widget);
+      gtk_widget_set_size_request(self->top_spacer, -1,
+                                  gtk_widget_get_height(self->top_spacer) + first_bounds.size.height + 8);
+      gtk_widget_set_size_request(self->task_list, -1,
+                                  gtk_widget_get_height(self->task_list) - first_bounds.size.height - 8);
+      gtk_widget_insert_after(first_widget, self->task_list, last_widget);
       gtk_widget_set_visible(first_widget, false);
-      self->scroll_pos_old = (int)(val - first_bounds.size.height - 8);
-      gtk_adjustment_set_value(adj, self->scroll_pos_old);
       current_start++;
       redraw_tasks(self);
     }
   }
-  g_signal_handlers_unblock_by_func(adj, on_adjustment_value_changed, self);
 }
 
-static gint sort(gconstpointer a, gconstpointer b, gpointer user_data) {
-  TaskData *ta = (TaskData *)a;
-  TaskData *tb = (TaskData *)b;
-  long la = strtol(errands_data_get_str(ta, DATA_PROP_TEXT), NULL, 10);
-  long lb = strtol(errands_data_get_str(tb, DATA_PROP_TEXT), NULL, 10);
-  return la - lb;
+static int calculate_task_list_height(ErrandsTaskList *self) {
+  ErrandsTask *task = errands_task_new();
+  int height = 0;
+  GtkRequisition min_size, nat_size;
+  for (size_t i = 0; i < current_task_list->len; ++i) {
+    errands_task_set_data(task, current_task_list->pdata[i]);
+    gtk_widget_get_preferred_size(GTK_WIDGET(task), &min_size, &nat_size);
+    height += nat_size.height;
+  }
+  g_object_ref_sink(task);
+  return height;
 }
 
 void errands_task_list_load_tasks(ErrandsTaskList *self) {
   if (current_task_list) g_ptr_array_unref(current_task_list);
   current_task_list = g_hash_table_get_values_as_ptr_array(tdata);
   g_ptr_array_sort_values(current_task_list, (GCompareFunc)sort);
+  int height = calculate_task_list_height(self);
+  gtk_widget_set_size_request(self->task_list, -1, height);
   for (size_t i = 0; i < TASKS_STACK_SIZE; ++i) {
     ErrandsTask *task = errands_task_new();
-    gtk_box_append(GTK_BOX(self->custom_task_list), GTK_WIDGET(task));
+    gtk_box_append(GTK_BOX(self->task_list), GTK_WIDGET(task));
     gtk_widget_set_visible(GTK_WIDGET(task), false);
   }
   redraw_tasks(self);

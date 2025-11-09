@@ -1,3 +1,4 @@
+
 #pragma once
 
 #include "data.h"
@@ -148,7 +149,8 @@ struct _ErrandsTaskList {
   const char *search_query;
   GtkWidget *entry_clamp;
   GtkWidget *scrl;
-  GtkWidget *custom_task_list;
+  GtkWidget *top_spacer;
+  GtkWidget *task_list;
   GtkAdjustment *adj;
 
   ErrandsTaskListAttachmentsDialog *attachments_dialog;
@@ -165,7 +167,7 @@ struct _ErrandsTaskList {
   GHashTable *tasks_items;
   GHashTable *lists;
 
-  int scroll_pos_old;
+  double scroll_pos_old;
 };
 
 ErrandsTaskList *errands_task_list_new();
