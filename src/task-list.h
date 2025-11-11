@@ -151,6 +151,7 @@ struct _ErrandsTaskList {
   GtkWidget *scrl;
   GtkWidget *top_spacer;
   GtkWidget *task_list;
+  GtkWidget *bottom_spacer;
   GtkAdjustment *adj;
 
   ErrandsTaskListAttachmentsDialog *attachments_dialog;
@@ -167,7 +168,7 @@ struct _ErrandsTaskList {
   GHashTable *tasks_items;
   GHashTable *lists;
 
-  double scroll_pos_old;
+  double scroll_position;
 };
 
 ErrandsTaskList *errands_task_list_new();

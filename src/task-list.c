@@ -217,7 +217,7 @@ static gint sort(gconstpointer a, gconstpointer b, gpointer user_data) {
 static GPtrArray *current_task_list;
 static size_t current_start;
 
-#define TASKS_STACK_SIZE 40
+#define TASKS_STACK_SIZE 30
 
 static void redraw_tasks(ErrandsTaskList *self) {
   if (current_task_list->len == 0) return;
@@ -227,42 +227,63 @@ static void redraw_tasks(ErrandsTaskList *self) {
 }
 
 static void on_adjustment_value_changed(GtkAdjustment *adj, ErrandsTaskList *self) {
-  double old_val = self->scroll_pos_old;
-  double val = gtk_adjustment_get_value(adj);
-  // double diff = fabs(val - old_val);
-  // if (diff < 30.0) return;
-  bool scroll_down = val < old_val;
-  self->scroll_pos_old = val;
+  double old_scroll_position = self->scroll_position;
+  self->scroll_position = gtk_adjustment_get_value(adj);
+  bool scrolling_down = self->scroll_position > old_scroll_position;
   g_autoptr(GPtrArray) children = get_children(self->task_list);
-  if (children->len < 3) return;
+  if (!children || children->len < 3) return;
   GtkWidget *first_widget = children->pdata[0];
   GtkWidget *last_widget = children->pdata[children->len - 1];
-  graphene_rect_t first_bounds;
-  bool res = gtk_widget_compute_bounds(first_widget, self->scrl, &first_bounds);
-  float offset = -(MAX(300.0f, first_bounds.origin.y + first_bounds.size.height));
-  if (scroll_down) {
-    if (first_bounds.origin.y >= offset && current_start > 0) {
-      gtk_widget_set_size_request(self->top_spacer, -1,
-                                  MAX(0, gtk_widget_get_height(self->top_spacer) - first_bounds.size.height - 8));
-      gtk_widget_set_size_request(self->task_list, -1,
-                                  gtk_widget_get_height(self->task_list) + first_bounds.size.height + 8);
-      gtk_widget_insert_before(last_widget, self->task_list, first_widget);
-      gtk_widget_set_visible(first_widget, false);
-      current_start--;
+  graphene_rect_t first_bounds, last_bounds;
+  if (!gtk_widget_compute_bounds(first_widget, self->scrl, &first_bounds)) return;
+  if (!gtk_widget_compute_bounds(last_widget, self->scrl, &last_bounds)) return;
+  const float page_size = gtk_adjustment_get_page_size(adj);
+  const float recycle_threshold_down = -page_size * 0.5f;
+  const float recycle_threshold_up = page_size * 1.5f;
+  int spacer_height = gtk_widget_get_height(self->top_spacer);
+  if (scrolling_down) {
+    int recycled = 0;
+    int moved_height = 0;
+    for (size_t i = 0; i < children->len; ++i) {
+      GtkWidget *child = children->pdata[i];
+      graphene_rect_t bounds;
+      if (!gtk_widget_compute_bounds(child, self->scrl, &bounds)) continue;
+      if (bounds.origin.y + bounds.size.height <= recycle_threshold_down &&
+          current_start + children->len < current_task_list->len) {
+        moved_height += gtk_widget_get_height(child) + 8;
+        gtk_box_reorder_child_after(GTK_BOX(self->task_list), child, last_widget);
+        gtk_widget_set_visible(child, false);
+        recycled++;
+        current_start++;
+      } else break;
+    }
+    if (recycled > 0) {
+      gtk_widget_set_size_request(self->top_spacer, -1, spacer_height + moved_height);
+      gtk_widget_set_size_request(self->task_list, -1, gtk_widget_get_height(self->task_list) - moved_height);
       redraw_tasks(self);
     }
   } else {
-    if (first_bounds.origin.y <= offset && current_start < current_task_list->len) {
-      gtk_widget_set_size_request(self->top_spacer, -1,
-                                  gtk_widget_get_height(self->top_spacer) + first_bounds.size.height + 8);
-      gtk_widget_set_size_request(self->task_list, -1,
-                                  gtk_widget_get_height(self->task_list) - first_bounds.size.height - 8);
-      gtk_widget_insert_after(first_widget, self->task_list, last_widget);
-      gtk_widget_set_visible(first_widget, false);
-      current_start++;
+    int recycled = 0;
+    int moved_height = 0;
+    for (ssize_t i = children->len - 1; i >= 0; --i) {
+      GtkWidget *child = children->pdata[i];
+      graphene_rect_t bounds;
+      if (!gtk_widget_compute_bounds(child, self->scrl, &bounds)) continue;
+      if (bounds.origin.y >= recycle_threshold_up && current_start > 0) {
+        moved_height += gtk_widget_get_height(child) + 8;
+        gtk_box_reorder_child_after(GTK_BOX(self->task_list), child, NULL);
+        gtk_widget_set_visible(child, false);
+        recycled++;
+        current_start--;
+      } else break;
+    }
+    if (recycled > 0) {
+      gtk_widget_set_size_request(self->top_spacer, -1, MAX(0, spacer_height - moved_height));
+      gtk_widget_set_size_request(self->task_list, -1, gtk_widget_get_height(self->task_list) + moved_height);
       redraw_tasks(self);
     }
   }
+  if (current_start == 0) gtk_widget_set_size_request(self->top_spacer, -1, 0);
 }
 
 static int calculate_task_list_height(ErrandsTaskList *self) {
@@ -278,6 +299,8 @@ static int calculate_task_list_height(ErrandsTaskList *self) {
   return height;
 }
 
+// ---------- PUBLIC FUNCTIONS ---------- //
+
 void errands_task_list_load_tasks(ErrandsTaskList *self) {
   if (current_task_list) g_ptr_array_unref(current_task_list);
   current_task_list = g_hash_table_get_values_as_ptr_array(tdata);
@@ -291,8 +314,6 @@ void errands_task_list_load_tasks(ErrandsTaskList *self) {
   }
   redraw_tasks(self);
 }
-
-// ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_task_list_update_title(ErrandsTaskList *self) {
   // Initialize completed and total counters
