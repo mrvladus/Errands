@@ -10,20 +10,20 @@ msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-10-10 12:25+0300\n"
-"PO-Revision-Date: 2024-03-03 14:25+0200\n"
+"PO-Revision-Date: 2025-11-21 23:50+0300\n"
 "Last-Translator: علي <a.teama3317@gmail.com>\n"
 "Language-Team: Arabic <>\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural= n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 "X-DL-Lang: Arabic\n"
 "X-DL-Module: ar\n"
 "X-DL-Branch: \n"
 "X-DL-Domain: \n"
-"X-Generator: Gtranslator 45.3\n"
-"Plural-Forms: nplurals=6; plural= n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
-"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+"X-Generator: Poedit 3.6\n"
 
 #: errands/widgets/shared/components/buttons.py:45
 msgid "Info"
@@ -31,7 +31,7 @@ msgstr ""
 
 #: errands/widgets/shared/components/dialogs.py:31
 msgid "Are you sure?"
-msgstr "أَ متأكد أنت؟"
+msgstr "هل أنت متأكد؟"
 
 #: errands/widgets/shared/components/dialogs.py:35
 #: errands/widgets/sidebar.py:300 errands/widgets/task.py:250
@@ -43,35 +43,35 @@ msgstr "ألغ"
 #: errands/widgets/shared/color_selector.py:32
 #: errands/widgets/shared/task_toolbar/toolbar.py:100
 msgid "None"
-msgstr ""
+msgstr "لا لون"
 
 #: errands/widgets/shared/color_selector.py:41
 msgid "Blue"
-msgstr ""
+msgstr "أزرق"
 
 #: errands/widgets/shared/color_selector.py:50
 msgid "Green"
-msgstr ""
+msgstr "أخضر"
 
 #: errands/widgets/shared/color_selector.py:61
 msgid "Yellow"
-msgstr ""
+msgstr "أصفر"
 
 #: errands/widgets/shared/color_selector.py:72
 msgid "Orange"
-msgstr ""
+msgstr "برتقالي"
 
 #: errands/widgets/shared/color_selector.py:81
 msgid "Red"
-msgstr ""
+msgstr "أحمر"
 
 #: errands/widgets/shared/color_selector.py:92
 msgid "Purple"
-msgstr ""
+msgstr "أرجواني"
 
 #: errands/widgets/shared/color_selector.py:101
 msgid "Brown"
-msgstr ""
+msgstr "بني"
 
 #: errands/widgets/shared/datetime_picker.py:138
 #: errands/widgets/today/today.py:57
@@ -99,12 +99,11 @@ msgstr "حدد تاريخا"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:44
 msgid "Start / Due Date"
-msgstr ""
+msgstr "تاريخ البدء والاستحقاق"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:49 errands/lib/utils.py:24
-#, fuzzy
 msgid "Date"
-msgstr "حدد تاريخا"
+msgstr "التاريخ"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:59
 #: errands/widgets/shared/task_toolbar/notes_window.py:29
@@ -117,25 +116,23 @@ msgstr "الأهمية"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:90
 msgid "High"
-msgstr ""
+msgstr "عالية"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:94
 msgid "Medium"
-msgstr ""
+msgstr "متوسطة"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:98
-#, fuzzy
 msgid "Low"
-msgstr "الآن"
+msgstr "منخفضة"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:103
 msgid "Custom"
-msgstr ""
+msgstr "مخصصة"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:113
-#, fuzzy
 msgid "No Tags"
-msgstr "الوسوم"
+msgstr "لا وسوم"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:134
 #: errands/widgets/tags/tags.py:63 errands/widgets/tags/tags_sidebar_row.py:32
@@ -146,34 +143,33 @@ msgstr "الوسوم"
 #: errands/widgets/shared/task_toolbar/toolbar.py:157
 #: errands/widgets/shared/task_toolbar/attachments_window.py:30
 msgid "Attachments"
-msgstr ""
+msgstr "المرفقات"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:191
 #: errands/widgets/shared/task_toolbar/toolbar.py:294
-#, fuzzy
 msgid "Created:"
-msgstr "مكمَّل"
+msgstr "أنشئ:"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:202
 #: errands/widgets/shared/task_toolbar/toolbar.py:295
 msgid "Changed:"
-msgstr ""
+msgstr "عدِّل:"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:215
 msgid "More"
-msgstr ""
+msgstr "المزيد"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:33
 msgid "No Files Attached"
-msgstr ""
+msgstr "لم يرفق ملف"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:56
 msgid "Add Attachment"
-msgstr ""
+msgstr "أضف مرفقا"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:119
 msgid "Open File"
-msgstr ""
+msgstr "افتح الملف"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:123
 #: errands/widgets/tags/tags.py:140
@@ -185,11 +181,11 @@ msgstr "احذف"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:132
 msgid "Open Containing Folder"
-msgstr ""
+msgstr "افتح المجلد الحاوي"
 
 #: errands/widgets/shared/task_toolbar/datetime_window.py:29
 msgid "Date and Time"
-msgstr ""
+msgstr "التاريخ والوقت"
 
 #: errands/widgets/shared/task_toolbar/datetime_window.py:39
 #: errands/widgets/shared/task_toolbar/datetime_window.py:41
@@ -199,11 +195,11 @@ msgstr "الاستحقاق"
 #: errands/widgets/shared/task_toolbar/datetime_window.py:54
 #: errands/widgets/shared/task_toolbar/datetime_window.py:56
 msgid "Start"
-msgstr "ابدأ"
+msgstr "البدء"
 
 #: errands/widgets/sidebar.py:42
 msgid "Add List (Ctrl+Shift+A)"
-msgstr "إضافة قائمة"
+msgstr "أضف قائمة (Ctrl+Shift+A)"
 
 #: errands/widgets/sidebar.py:61
 msgid "Syncing..."
@@ -211,7 +207,7 @@ msgstr "يُزامَن..."
 
 #: errands/widgets/sidebar.py:67
 msgid "Add new List"
-msgstr "إضافة قائمة جديدة"
+msgstr "أضف قائمة جديدة"
 
 #: errands/widgets/sidebar.py:68
 msgid "Click \"+\" button"
@@ -219,9 +215,8 @@ msgstr "إضغط زر الـ \"+\""
 
 #. Task lists group
 #: errands/widgets/sidebar.py:94 errands/widgets/preferences.py:66
-#, fuzzy
 msgid "Task Lists"
-msgstr "لا قوائم تطبيقات"
+msgstr "قوائم المهام"
 
 #: errands/widgets/sidebar.py:106 errands/widgets/window.py:44
 #: errands/widgets/window.py:167 data/io.github.mrvladus.List.desktop.in.in:3
@@ -235,12 +230,11 @@ msgstr "القائمة الرئيسة"
 
 #: errands/widgets/sidebar.py:121 data/resources/gtk/help-overlay.ui:42
 msgid "Sync / Fetch Tasks"
-msgstr "زامن / استع المهام"
+msgstr "زامن / استعد المهام"
 
 #: errands/widgets/sidebar.py:128
-#, fuzzy
 msgid "Import Task List"
-msgstr "استيراد قائمة"
+msgstr "استورد قائمة مهام"
 
 #: errands/widgets/sidebar.py:135 data/resources/gtk/help-overlay.ui:20
 msgid "Preferences"
@@ -319,9 +313,8 @@ msgid "Move to Trash"
 msgstr ""
 
 #: errands/widgets/task.py:212 errands/widgets/today/today_task.py:119
-#, fuzzy
 msgid "Copy to Clipboard"
-msgstr "نُسِخَ إلى الحافظة"
+msgstr "انسخ إلى الحافظة"
 
 #: errands/widgets/task.py:213
 #: errands/widgets/task_list/task_list_sidebar_row.py:192
@@ -330,7 +323,6 @@ msgid "Export"
 msgstr "صدِّر"
 
 #: errands/widgets/task.py:306 errands/widgets/task_list/task_list.py:84
-#, fuzzy
 msgid "Completed"
 msgstr "مكمَّل"
 
@@ -340,12 +332,11 @@ msgstr "أضف مهمة فرعية جديدة"
 
 #: errands/widgets/task.py:552 errands/widgets/task_list/task_list.py:238
 msgid "Completed:"
-msgstr "مكمَّل"
+msgstr "أُكمل:"
 
 #: errands/widgets/task.py:945
-#, fuzzy
 msgid "Delete Tag"
-msgstr "احذف"
+msgstr "احذف الوسم"
 
 #: errands/widgets/task_list/task_list.py:50
 #, fuzzy
@@ -362,7 +353,7 @@ msgstr "مرِّر للأعلى"
 
 #: errands/widgets/task_list/task_list.py:143
 msgid "Add new Task"
-msgstr "إضافة مهمة جديدة"
+msgstr "أضف مهمة جديدة"
 
 #: errands/widgets/task_list/task_list_sidebar_row.py:59
 msgid "List will be permanently deleted"
@@ -394,7 +385,7 @@ msgstr "أعد التسمية"
 
 #: errands/widgets/today/today.py:31
 msgid "No Tasks for Today"
-msgstr ""
+msgstr "لا مهام لليوم"
 
 #: errands/widgets/trash/trash.py:31
 msgid "Empty Trash"
@@ -407,7 +398,7 @@ msgstr "لا عناصر محذوفة"
 #: errands/widgets/trash/trash.py:55 errands/widgets/trash/trash.py:189
 #: errands/widgets/trash/trash_sidebar_row.py:69
 msgid "Restore"
-msgstr "استعادة"
+msgstr "استعد"
 
 #: errands/widgets/trash/trash.py:89
 #: errands/widgets/trash/trash_sidebar_row.py:43 errands/widgets/window.py:75
@@ -428,9 +419,8 @@ msgid "Content"
 msgstr ""
 
 #: errands/widgets/window.py:66
-#, fuzzy
 msgid "Loading Tasks"
-msgstr "إضافة مهمة جديدة"
+msgstr "يحمل المهام"
 
 #: errands/widgets/window.py:88
 msgid "No Task Lists"
@@ -445,14 +435,12 @@ msgid "Create List"
 msgstr "أنشئ قائمة"
 
 #: errands/widgets/window.py:102
-#, fuzzy
 msgid "Create new List"
-msgstr "أنشئ قائمة"
+msgstr "أنشئ قائمة جديدة"
 
 #: errands/widgets/window.py:115 errands/widgets/window.py:123
-#, fuzzy
 msgid "Syncing"
-msgstr "يُزامَن..."
+msgstr "يُزامن"
 
 #: errands/widgets/window.py:116
 msgid "First synchronization is running"
@@ -494,35 +482,35 @@ msgstr "إضافة مهمة جديدة"
 
 #: errands/widgets/preferences.py:71
 msgid "At the Bottom"
-msgstr ""
+msgstr "في الأسفل"
 
 #: errands/widgets/preferences.py:71
 msgid "At the Top"
-msgstr ""
+msgstr "في الأعلى"
 
 #: errands/widgets/preferences.py:87
 msgid "Show Notifications"
-msgstr ""
+msgstr "أظهر الإشعارات"
 
 #: errands/widgets/preferences.py:94
 msgid "Run in Background"
-msgstr ""
+msgstr "شغِّل في الخلفية"
 
 #: errands/widgets/preferences.py:95
 msgid "Hide the application window instead of closing it"
-msgstr ""
+msgstr "أخف نافذة التطبيق بدلا من إغلاقه"
 
 #: errands/widgets/preferences.py:102
 msgid "Launch on Startup"
-msgstr ""
+msgstr "أطلق عند البدء"
 
 #: errands/widgets/preferences.py:103
 msgid "Launch application when user logs in"
-msgstr ""
+msgstr "أطلق التطبيق عندما يلج المستخدم"
 
 #: errands/widgets/preferences.py:112
 msgid "Notifications and Background"
-msgstr ""
+msgstr "الإشعارات والخلفية"
 
 #: errands/widgets/preferences.py:120 errands/widgets/preferences.py:181
 #: data/resources/gtk/help-overlay.ui:38
@@ -599,35 +587,32 @@ msgid "Can't connect to CalDAV server at:"
 msgstr "فشل الاتصال بخادم CalDAV في:"
 
 #: errands/lib/data.py:92
-#, fuzzy
 msgid "New Task List"
-msgstr "لا قوائم تطبيقات"
+msgstr "قائمة تطبيقات جديدة"
 
 #: errands/lib/notifications.py:74
-#, fuzzy
 msgid "Task is Due"
-msgstr "المهام"
+msgstr "المهمة مستحقة"
 
 #: errands/application.py:78
 msgid "Errands was updated"
-msgstr ""
+msgstr "حُدِّث إيراندس"
 
 #: errands/application.py:79
 msgid "Restart is required"
-msgstr ""
+msgstr "إعادة التشغيل مطلوبة"
 
 #: errands/application.py:82
-#, fuzzy
 msgid "Restart"
-msgstr "استعادة"
+msgstr "أعد التشغيل"
 
 #: errands/application.py:111
 msgid "Errands need to run in the background for notifications"
-msgstr ""
+msgstr "يحتاج إيراندس إلى التشغيل في الخلفية من أجل الإشعارات"
 
 #: data/resources/gtk/help-overlay.ui:13
 msgid "Show keyboard shortcuts"
-msgstr "اعرض اختصارات لوحة المفاتيح"
+msgstr "عرض اختصارات لوحة المفاتيح"
 
 #: data/resources/gtk/help-overlay.ui:53
 msgid "Lists"
@@ -668,7 +653,7 @@ msgstr "دعم قوائم مهمات عدَّة"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:16
 msgid "Add, remove, edit tasks and sub-tasks"
-msgstr "إضافة,حذف,تعديل المهام الرئيسية والفرعية"
+msgstr "إضافة وحذف وتعديل المهام الرئيسية والفرعية"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:17
 msgid "Mark task and sub-tasks as completed"
