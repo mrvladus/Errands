@@ -1,5 +1,6 @@
 #include "task-list.h"
 #include "data.h"
+#include "glib-object.h"
 #include "glib.h"
 #include "gtk/gtk.h"
 #include "sidebar.h"
@@ -17,6 +18,7 @@
 
 static GPtrArray *current_task_list;
 static size_t current_start;
+static ErrandsTask *measuring_task = NULL;
 
 static void on_task_list_entry_activated_cb(AdwEntryRow *entry, ErrandsTaskList *self);
 static void on_task_list_search_cb(ErrandsTaskList *self, GtkSearchEntry *entry);
@@ -27,6 +29,8 @@ static void on_adjustment_value_changed_cb(GtkAdjustment *adj, ErrandsTaskList *
 G_DEFINE_TYPE(ErrandsTaskList, errands_task_list, ADW_TYPE_BIN)
 
 static void errands_task_list_dispose(GObject *gobject) {
+  g_object_run_dispose(G_OBJECT(measuring_task));
+  g_ptr_array_free(current_task_list, true);
   gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_TASK_LIST);
   G_OBJECT_CLASS(errands_task_list_parent_class)->dispose(gobject);
 }
@@ -58,6 +62,7 @@ static void errands_task_list_init(ErrandsTaskList *self) {
     gtk_box_append(GTK_BOX(self->task_list), GTK_WIDGET(task));
     gtk_widget_set_visible(GTK_WIDGET(task), false);
   }
+  measuring_task = errands_task_new();
   LOG_NO_PREFIX("Success");
 }
 
@@ -67,17 +72,16 @@ ErrandsTaskList *errands_task_list_new() { return g_object_new(ERRANDS_TYPE_TASK
 
 static int errands_task_list__calculate_height(ErrandsTaskList *self) {
   LOG_NO_LN("Task List: Calculating height ... ");
-  ErrandsTask *task = errands_task_new();
+  TIMER_START;
   int height = 0;
   GtkRequisition min_size, nat_size;
   for_range(i, 0, current_task_list->len) {
     TaskData2 *data = g_ptr_array_index(current_task_list, i);
-    errands_task_set_data(task, data);
-    gtk_widget_get_preferred_size(GTK_WIDGET(task), &min_size, &nat_size);
+    errands_task_set_data(measuring_task, data);
+    gtk_widget_get_preferred_size(GTK_WIDGET(measuring_task), &min_size, &nat_size);
     height += nat_size.height;
   }
-  g_object_ref_sink(task);
-  LOG_NO_PREFIX("%d", height);
+  LOG_NO_PREFIX("%d (%f sec.)", height, TIMER_ELAPSED_MS);
   return height;
 }
 
@@ -85,8 +89,8 @@ static void errands_task_list__reset_scroll_cb(ErrandsTaskList *self) { gtk_adju
 
 static void errands_task_list__reload(ErrandsTaskList *self) {
   current_start = 0;
-  if (current_task_list) g_ptr_array_free(current_task_list, true);
-  current_task_list = g_ptr_array_new();
+  if (current_task_list) g_ptr_array_set_size(current_task_list, 0);
+  else current_task_list = g_ptr_array_new();
   if (self->data) errands_list_data_get_flat_list(self->data, current_task_list);
   else errands_data_get_flat_list(current_task_list);
   gtk_widget_set_size_request(self->top_spacer, -1, 0);
@@ -228,22 +232,17 @@ void errands_task_list_show_task_list(ErrandsTaskList *self, ListData2 *data) {
 static void on_task_list_entry_activated_cb(AdwEntryRow *entry, ErrandsTaskList *self) {
   const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
   const char *list_uid = errands_data_get_str(self->data->data, DATA_PROP_LIST_UID);
-  // Skip empty text
   if (STR_EQUAL(text, "") || STR_EQUAL(list_uid, "")) return;
   TaskData2 *data = errands_task_data_create_task(self->data, NULL, text);
   g_ptr_array_add(self->data->children, data);
   errands_list_data_sort(self->data);
   errands_data_write_list(self->data);
-  current_start = 0;
-  // Clear text
   gtk_editable_set_text(GTK_EDITABLE(entry), "");
-  // Update counter
   errands_sidebar_task_list_row_update_counter(errands_sidebar_task_list_row_get(list_uid));
   errands_sidebar_all_row_update_counter(state.main_window->sidebar->all_row);
-  errands_task_list_update_title(self);
   LOG("Add task '%s' to task list '%s'", errands_data_get_str(data->data, DATA_PROP_UID),
       errands_data_get_str(data->data, DATA_PROP_LIST_UID));
-  errands_task_list_redraw_tasks(self);
+  errands_task_list__reload(self);
 }
 
 static void on_task_list_search_cb(ErrandsTaskList *self, GtkSearchEntry *entry) {
