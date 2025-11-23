@@ -1,22 +1,31 @@
+# Project info
+
 NAME = errands
 VERSION = 49.0
 APP_ID = io.github.mrvladus.Errands
+
+# Installation directories
 
 DESTDIR ?=
 prefix ?= /usr/local
 bindir = $(prefix)/bin
 
+# Project directories
+
 BUILD_DIR = build
 SRC_DIR = src
 DATA_DIR = data
+
+# Project sources
 
 SRCS = $(wildcard $(SRC_DIR)/*.c)
 OBJS = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRCS))
 DEPS = $(OBJS:.o=.d)
 BLPS = $(wildcard $(SRC_DIR)/*.blp)
 
-CC = gcc
+# Compilation variables
 
+CC = gcc
 PKG_CONFIG_LIBS = libadwaita-1 gtksourceview-5 libical libportal libcurl webkitgtk-6.0
 CFLAGS = -Wall -Wno-enum-int-mismatch -Wno-unknown-pragmas -g \
 		 `pkg-config --cflags $(PKG_CONFIG_LIBS)` \
@@ -25,7 +34,7 @@ CFLAGS = -Wall -Wno-enum-int-mismatch -Wno-unknown-pragmas -g \
 	 	 -DLOCALE_DIR='""'
 LDFLAGS = `pkg-config --libs $(PKG_CONFIG_LIBS)`
 
-# ---------- TARGETS ---------- #
+# Targets
 
 all: $(BUILD_DIR)/$(NAME)
 
