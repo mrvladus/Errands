@@ -27,14 +27,11 @@ struct _ErrandsTask {
   GtkWidget *color_btn;
   GtkWidget *sub_entry;
 
-  gulong complete_btn_signal_id;
-  gulong toolbar_btn_signal_id;
-
-  TaskData *data;
+  TaskData2 *data;
 };
 
 ErrandsTask *errands_task_new();
-void errands_task_set_data(ErrandsTask *self, TaskData *data);
+void errands_task_set_data(ErrandsTask *self, TaskData2 *data);
 void errands_task_update_accent_color(ErrandsTask *task);
 void errands_task_update_progress(ErrandsTask *task);
 void errands_task_update_tags(ErrandsTask *task);

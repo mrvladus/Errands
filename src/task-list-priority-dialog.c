@@ -3,6 +3,8 @@
 #include "task-list.h"
 #include "task.h"
 
+#include "vendor/toolbox.h"
+
 static void on_dialog_close_cb(ErrandsTaskListPriorityDialog *self);
 static void on_toggle_cb(ErrandsTaskListPriorityDialog *self, GtkCheckButton *btn);
 
@@ -56,7 +58,7 @@ void errands_task_list_priority_dialog_show(ErrandsTask *task) {
   ErrandsTaskListPriorityDialog *self = state.main_window->task_list->priority_dialog;
   self->current_task = task;
   self->block_signals = true;
-  const uint8_t priority = errands_data_get_int(task->data, DATA_PROP_PRIORITY);
+  const uint8_t priority = errands_data_get_int(task->data->data, DATA_PROP_PRIORITY);
   if (priority == 0) adw_action_row_activate(ADW_ACTION_ROW(self->none_row));
   else if (priority == 1) adw_action_row_activate(ADW_ACTION_ROW(self->low_row));
   else if (priority > 1 && priority < 6) adw_action_row_activate(ADW_ACTION_ROW(self->medium_row));
@@ -70,9 +72,9 @@ void errands_task_list_priority_dialog_show(ErrandsTask *task) {
 
 static void on_dialog_close_cb(ErrandsTaskListPriorityDialog *self) {
   const uint8_t val = adw_spin_row_get_value(ADW_SPIN_ROW(self->custom_row));
-  if (errands_data_get_int(self->current_task->data, DATA_PROP_PRIORITY) != val) {
-    errands_data_set_int(self->current_task->data, DATA_PROP_PRIORITY, val);
-    errands_data_write_list(task_data_get_list(self->current_task->data));
+  if (errands_data_get_int(self->current_task->data->data, DATA_PROP_PRIORITY) != val) {
+    errands_data_set_int(self->current_task->data->data, DATA_PROP_PRIORITY, val);
+    // errands_data_write_list(task_data_get_list(self->current_task->data));
     // gtk_sorter_changed(GTK_SORTER(state.main_window->task_list->master_sorter), GTK_SORTER_CHANGE_MORE_STRICT);
     // gtk_list_view_scroll_to(GTK_LIST_VIEW(state.main_window->task_list->task_list), 0, GTK_LIST_SCROLL_FOCUS, NULL);
     needs_sync = true;
@@ -84,9 +86,9 @@ static void on_toggle_cb(ErrandsTaskListPriorityDialog *self, GtkCheckButton *bt
   if (!gtk_check_button_get_active(btn) || self->block_signals) return;
   const char *name = gtk_widget_get_name(GTK_WIDGET(btn));
   uint8_t val = 0;
-  if (g_str_equal(name, "none")) val = 0;
-  else if (g_str_equal(name, "low")) val = 1;
-  else if (g_str_equal(name, "medium")) val = 5;
-  else if (g_str_equal(name, "high")) val = 9;
+  if (STR_EQUAL(name, "none")) val = 0;
+  else if (STR_EQUAL(name, "low")) val = 1;
+  else if (STR_EQUAL(name, "medium")) val = 5;
+  else if (STR_EQUAL(name, "high")) val = 9;
   adw_spin_row_set_value(ADW_SPIN_ROW(self->custom_row), val);
 }

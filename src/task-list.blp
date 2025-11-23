@@ -78,7 +78,7 @@ template $ErrandsTaskList: Adw.Bin {
         kinetic-scrolling: false;
 
         vadjustment: Adjustment adj {
-          value-changed => $on_adjustment_value_changed(template) not-swapped;
+          value-changed => $on_adjustment_value_changed_cb(template) not-swapped;
         };
 
         child: Box {

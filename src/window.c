@@ -1,6 +1,5 @@
 #include "window.h"
 #include "data.h"
-#include "glib-object.h"
 #include "settings.h"
 #include "state.h"
 #include "task-list.h"
@@ -34,30 +33,35 @@ static void errands_window_class_init(ErrandsWindowClass *class) {
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_new_list_btn_clicked_cb);
 }
 
-static void errands_window_init(ErrandsWindow *self) { gtk_widget_init_template(GTK_WIDGET(self)); }
+static void errands_window_init(ErrandsWindow *self) {
+  LOG("Window: Create");
+  gtk_widget_init_template(GTK_WIDGET(self));
+  LOG("Window: Created");
+}
 
 ErrandsWindow *errands_window_new(GtkApplication *app) {
-  return g_object_new(ERRANDS_TYPE_WINDOW, "application", app, "maximized",
-                      errands_settings_get("maximized", SETTING_TYPE_BOOL).b, "default-width",
-                      errands_settings_get("window_width", SETTING_TYPE_INT).i, "default-height",
-                      errands_settings_get("window_height", SETTING_TYPE_INT).i, NULL);
+  return g_object_new(ERRANDS_TYPE_WINDOW, "application", app, "maximized", errands_settings_get(SETTING_MAXIMIZED).b,
+                      "default-width", errands_settings_get(SETTING_WINDOW_WIDTH).i, "default-height",
+                      errands_settings_get(SETTING_WINDOW_HEIGHT).i, NULL);
 }
 
 // ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_window_update(ErrandsWindow *win) {
-  tb_log("Window: Update");
-  size_t count = 0;
-  GPtrArray *lists = g_hash_table_get_values_as_ptr_array(ldata);
-  for (int i = 0; i < lists->len; i++)
-    if (!errands_data_get_bool(lists->pdata[i], DATA_PROP_DELETED)) count++;
-  g_ptr_array_free(lists, false);
-  g_object_set(state.main_window->no_lists_page, "visible", count == 0, NULL);
+  LOG("Window: Update");
+  size_t total = 0;
+  for_range(i, 0, errands_data_lists->len) {
+    ListData2 *data = errands_data_lists->pdata[i];
+    bool deleted = errands_data_get_bool(data->data, DATA_PROP_DELETED);
+    if (!deleted) total++;
+  }
+  g_object_set(state.main_window->no_lists_page, "visible", total == 0, NULL);
 }
 
 void errands_window_add_toast(ErrandsWindow *win, const char *msg) {
-  tb_log("Window: Add Toast '%s'", msg);
-  adw_toast_overlay_add_toast(ADW_TOAST_OVERLAY(win->toast_overlay), adw_toast_new(msg));
+  LOG("Window: Add Toast '%s'", msg);
+  g_autoptr(AdwToast) toast = adw_toast_new(msg);
+  adw_toast_overlay_add_toast(win->toast_overlay, toast);
 }
 
 // ---------- CALLBACKS ---------- //
@@ -65,12 +69,13 @@ void errands_window_add_toast(ErrandsWindow *win, const char *msg) {
 static void on_size_changed_cb(ErrandsWindow *win) {
   int w, h;
   gtk_window_get_default_size(GTK_WINDOW(win), &w, &h);
-  errands_settings_set_int("window_width", w);
-  errands_settings_set_int("window_height", h);
+  errands_settings_set("window_width", SETTING_TYPE_INT, &w);
+  errands_settings_set("window_height", SETTING_TYPE_INT, &h);
 }
 
 static void on_maximize_changed_cb(ErrandsWindow *win) {
-  errands_settings_set_bool("maximized", gtk_window_is_maximized(GTK_WINDOW(win)));
+  bool is_maximized = gtk_window_is_maximized(GTK_WINDOW(win));
+  errands_settings_set("maximized", SETTING_TYPE_BOOL, &is_maximized);
 }
 
 static void on_new_list_btn_clicked_cb() { errands_sidebar_new_list_dialog_show(); }

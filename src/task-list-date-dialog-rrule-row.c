@@ -77,7 +77,7 @@ struct icalrecurrencetype errands_task_list_date_dialog_rrule_row_get_rrule(Erra
 void errands_task_list_date_dialog_rrule_row_set_rrule(ErrandsTaskListDateDialogRruleRow *self,
                                                        struct icalrecurrencetype rrule) {
   if (rrule.freq == ICAL_NO_RECURRENCE) return;
-  tb_log("Set RRULE: %s", icalrecurrencetype_as_string(&rrule));
+  LOG("Set RRULE: %s", icalrecurrencetype_as_string(&rrule));
   adw_combo_row_set_selected(self->freq_row, rrule.freq < 7 ? rrule.freq : 3);
   adw_spin_row_set_value(self->interval_row, rrule.interval);
   set_week_days(self, rrule.by_day);
@@ -163,7 +163,7 @@ static void on_interval_changed_cb(ErrandsTaskListDateDialogRruleRow *self, GPar
                                    C_("Repeat every ...", "years")};
   const uint8_t selected_freq = adw_combo_row_get_selected(self->freq_row);
   const char *subtitle =
-      tb_tmp_str_printf(_("Repeat every %d %s"), (int)adw_spin_row_get_value(row), intervals[selected_freq]);
+      tmp_str_printf(_("Repeat every %d %s"), (int)adw_spin_row_get_value(row), intervals[selected_freq]);
   g_object_set(row, "subtitle", subtitle, NULL);
 }
 
@@ -171,7 +171,7 @@ static void on_count_changed_cb(ErrandsTaskListDateDialogRruleRow *self, GParamS
   const size_t value = adw_spin_row_get_value(row);
   if (value == 0) g_object_set(row, "subtitle", _("Repeat forever"), NULL);
   else {
-    const char *subtitle = tb_tmp_str_printf(_("Repeat %zu times"), value);
+    const char *subtitle = tmp_str_printf(_("Repeat %zu times"), value);
     g_object_set(row, "subtitle", subtitle, NULL);
   }
 }

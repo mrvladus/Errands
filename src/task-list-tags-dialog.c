@@ -78,11 +78,11 @@ static void on_dialog_close_cb(ErrandsTaskListTagsDialog *self) {
 static void on_entry_activated_cb(ErrandsTaskListTagsDialog *self, AdwEntryRow *entry) {
   const char *tag = string_trim((char *)gtk_editable_get_text(GTK_EDITABLE(entry)));
   // Return if empty
-  if (g_str_equal(tag, "")) return;
+  if (STR_EQUAL(tag, "")) return;
   // Return if exists
   g_auto(GStrv) tags = errands_settings_get_tags();
   for (size_t i = 0; i < g_strv_length(tags); i++)
-    if (g_str_equal(tag, tags[i])) return;
+    if (STR_EQUAL(tag, tags[i])) return;
   // Add tag to current list data
   errands_settings_add_tag(tag);
   ErrandsTaskListTagsDialogTag *row = errands_task_list_tags_dialog_tag_new(tag, self->current_task);

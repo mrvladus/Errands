@@ -73,9 +73,9 @@ void errands_task_list_notes_dialog_show(ErrandsTask *task) {
   if (!state.main_window->task_list->notes_dialog)
     state.main_window->task_list->notes_dialog = errands_task_list_notes_dialog_new();
   ErrandsTaskListNotesDialog *dialog = state.main_window->task_list->notes_dialog;
-  tb_log("NotesDialog: Show");
+  LOG("NotesDialog: Show");
   dialog->current_task = task;
-  const char *notes = errands_data_get_str(task->data, DATA_PROP_NOTES);
+  const char *notes = errands_data_get_str(task->data->data, DATA_PROP_NOTES);
   if (notes) {
     g_autofree gchar *text = gtk_source_utils_unescape_search_text(notes);
     gtk_text_buffer_set_text(gtk_text_view_get_buffer(GTK_TEXT_VIEW(dialog->source_view)), text, -1);
@@ -87,7 +87,7 @@ void errands_task_list_notes_dialog_show(ErrandsTask *task) {
 // ---------- CALLBACKS ---------- //
 
 static void on_dialog_close_cb(ErrandsTaskListNotesDialog *self) {
-  TaskData *data = self->current_task->data;
+  TaskData2 *data = self->current_task->data;
   GtkTextBuffer *buf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(self->source_view));
   // Get the start and end iterators of the text buffer
   GtkTextIter start, end;
@@ -95,16 +95,16 @@ static void on_dialog_close_cb(ErrandsTaskListNotesDialog *self) {
   gtk_text_buffer_get_end_iter(buf, &end);
   g_autofree char *text = gtk_text_buffer_get_text(buf, &start, &end, FALSE);
   // If text is different then save it
-  const char *notes = errands_data_get_str(data, DATA_PROP_NOTES);
-  if (notes && !g_str_equal(text, notes)) {
-    errands_data_set_str(data, DATA_PROP_NOTES, text);
-    errands_data_write_list(task_data_get_list(data));
-  } else if (!notes && text && !g_str_equal(text, "")) {
-    errands_data_set_str(data, DATA_PROP_NOTES, text);
-    errands_data_write_list(task_data_get_list(data));
+  const char *notes = errands_data_get_str(data->data, DATA_PROP_NOTES);
+  if (notes && !STR_EQUAL(text, notes)) {
+    errands_data_set_str(data->data, DATA_PROP_NOTES, text);
+    // errands_data_write_list(task_data_get_list(data));
+  } else if (!notes && text && !STR_EQUAL(text, "")) {
+    errands_data_set_str(data->data, DATA_PROP_NOTES, text);
+    // errands_data_write_list(task_data_get_list(data));
   }
   // Add css class to button if notes not empty
-  if (!g_str_equal(text, "")) gtk_widget_add_css_class(self->current_task->notes_btn, "accent");
+  if (!STR_EQUAL(text, "")) gtk_widget_add_css_class(self->current_task->notes_btn, "accent");
   else gtk_widget_remove_css_class(self->current_task->notes_btn, "accent");
   adw_dialog_close(ADW_DIALOG(self));
   // TODO: sync

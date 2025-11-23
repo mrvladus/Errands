@@ -1,5 +1,6 @@
 #pragma once
 
+#include "glib.h"
 #include "vendor/toolbox.h"
 
 #include <gtk/gtk.h>
@@ -63,7 +64,7 @@ static inline const char *generate_hex() {
   int green = rand() % 256;
   int blue = rand() % 256;
   sprintf(color, "#%02X%02X%02X", red, green, blue);
-  tb_log("Generate color '%s'", color);
+  LOG("Generate color '%s'", color);
   return color;
 }
 

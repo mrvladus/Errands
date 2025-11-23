@@ -15,14 +15,14 @@ OBJS = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRCS))
 DEPS = $(OBJS:.o=.d)
 BLPS = $(wildcard $(SRC_DIR)/*.blp)
 
-PKG_CONFIG_LIBS = libadwaita-1 gtksourceview-5 libical libportal libcurl webkitgtk-6.0
+CC = gcc
 
-CFLAGS = -Wall -Wno-enum-int-mismatch -Wno-unknown-pragmas -g\
+PKG_CONFIG_LIBS = libadwaita-1 gtksourceview-5 libical libportal libcurl webkitgtk-6.0
+CFLAGS = -Wall -Wno-enum-int-mismatch -Wno-unknown-pragmas -g \
 		 `pkg-config --cflags $(PKG_CONFIG_LIBS)` \
 		 -DVERSION='"$(VERSION)"' \
 		 -DAPP_ID='"$(APP_ID)"' \
 	 	 -DLOCALE_DIR='""'
-
 LDFLAGS = `pkg-config --libs $(PKG_CONFIG_LIBS)`
 
 # ---------- TARGETS ---------- #
@@ -43,9 +43,7 @@ $(SRC_DIR)/resources.c: $(DATA_DIR)/$(NAME).gresource.xml $(BLPS)
 	@glib-compile-resources --generate-source --target=$@ --c-name=$(NAME) $<
 
 install: $(BUILD_DIR)/$(NAME)
-	@mkdir -p $(DESTDIR)/$(bindir)
-	cp $(BUILD_DIR)/$(NAME) $(DESTDIR)/$(bindir)/$(NAME)
-	@strip $(DESTDIR)/$(bindir)/$(NAME)
+	install -d -s -m 755 $(BUILD_DIR)/$(NAME) $(DESTDIR)/$(bindir)/$(NAME)
 
 uninstall:
 	rm -f $(DESTDIR)/$(bindir)/$(NAME)

@@ -4,6 +4,7 @@
 #include "state.h"
 #include "task-list.h"
 #include "utils.h"
+#include "vendor/toolbox.h"
 
 #include <glib/gi18n.h>
 
@@ -39,6 +40,7 @@ static void errands_sidebar_class_init(ErrandsSidebarClass *class) {
 }
 
 static void errands_sidebar_init(ErrandsSidebar *self) {
+  LOG("Sidebar: Create");
   gtk_widget_init_template(GTK_WIDGET(self));
   errands_add_actions(GTK_WIDGET(self), "sidebar", "import", on_import_action_cb, self, "new_list",
                       errands_sidebar_new_list_dialog_show, NULL, NULL);
@@ -49,37 +51,38 @@ ErrandsSidebar *errands_sidebar_new() { return g_object_new(ERRANDS_TYPE_SIDEBAR
 // ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_sidebar_load_lists(ErrandsSidebar *self) {
+  LOG("Sidebar: Create Task List Rows");
   // Add rows
-  GPtrArray *lists = g_hash_table_get_values_as_ptr_array(ldata);
-  for (size_t i = 0; i < lists->len; i++) {
-    ListData *ld = lists->pdata[i];
-    if (!errands_data_get_bool(ld, DATA_PROP_DELETED)) {
+  for (size_t i = 0; i < errands_data_lists->len; i++) {
+    ListData2 *ld = errands_data_lists->pdata[i];
+    if (!errands_data_get_bool(ld->data, DATA_PROP_DELETED)) {
       ErrandsSidebarTaskListRow *row = errands_sidebar_task_list_row_new(ld);
       gtk_list_box_append(GTK_LIST_BOX(self->task_lists_box), GTK_WIDGET(row));
     }
   }
-  g_ptr_array_free(lists, false);
+
   errands_sidebar_all_row_update_counter(self->all_row);
   errands_sidebar_today_row_update_counter(self->today_row);
   errands_window_update(state.main_window);
   // Select last opened page
   g_signal_connect(state.main_window, "realize", G_CALLBACK(errands_sidebar_select_last_opened_page), NULL);
+  LOG("Sidebar: Created %d Task List Rows", errands_data_lists->len);
 }
 
-ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(ErrandsSidebar *sb, ListData *data) {
-  tb_log("Sidebar: Add task list '%s'", errands_data_get_str(data, DATA_PROP_LIST_UID));
+ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(ErrandsSidebar *sb, ListData2 *data) {
+  LOG("Sidebar: Add task list '%s'", errands_data_get_str(data->data, DATA_PROP_LIST_UID));
   ErrandsSidebarTaskListRow *row = errands_sidebar_task_list_row_new(data);
   gtk_list_box_append(GTK_LIST_BOX(sb->task_lists_box), GTK_WIDGET(row));
   return row;
 }
 
 void errands_sidebar_select_last_opened_page() {
-  GPtrArray *rows = get_children(state.main_window->sidebar->task_lists_box);
-  const char *last_uid = errands_settings_get("last_list_uid", SETTING_TYPE_STRING).s;
-  tb_log("Sidebar: Selecting last opened list: '%s'", last_uid);
-  for (size_t i = 0; i < rows->len; i++) {
-    ErrandsSidebarTaskListRow *row = rows->pdata[i];
-    if (g_str_equal(last_uid, errands_data_get_str(row->data, DATA_PROP_LIST_UID)))
+  g_autoptr(GPtrArray) rows = get_children(state.main_window->sidebar->task_lists_box);
+  const char *last_uid = errands_settings_get(SETTING_LAST_LIST_UID).s;
+  LOG("Sidebar: Selecting last opened list: '%s'", last_uid);
+  for_range(i, 0, rows->len) {
+    ErrandsSidebarTaskListRow *row = g_ptr_array_index(rows, i);
+    if (STR_EQUAL(last_uid, errands_data_get_str(row->data->data, DATA_PROP_LIST_UID)))
       g_signal_emit_by_name(row, "activate", NULL);
   }
 }
@@ -90,10 +93,10 @@ static void on_errands_sidebar_filter_row_activated(GtkListBox *box, GtkListBoxR
   gtk_list_box_unselect_all(GTK_LIST_BOX(self->task_lists_box));
   ErrandsTaskList *task_list = state.main_window->task_list;
   if (GTK_WIDGET(row) == GTK_WIDGET(self->all_row)) {
-    tb_log("Sidebar: Show to all tasks");
+    LOG("Sidebar: Show to all tasks");
     errands_task_list_show_all_tasks(task_list);
   } else if (GTK_WIDGET(row) == GTK_WIDGET(self->today_row)) {
-    tb_log("Sidebar: Show today tasks");
+    LOG("Sidebar: Show today tasks");
     errands_task_list_show_today_tasks(task_list);
   }
 }
@@ -102,34 +105,34 @@ static void __on_open_finish(GObject *obj, GAsyncResult *res, ErrandsSidebar *sb
   g_autoptr(GFile) file = gtk_file_dialog_open_finish(GTK_FILE_DIALOG(obj), res, NULL);
   if (!file) return;
   g_autofree gchar *path = g_file_get_path(file);
-  char *ical = tb_read_file_to_string(path);
-  if (ical) {
-    TB_TODO("Use toolbox path funcs here");
-    g_autofree gchar *basename = g_file_get_basename(file);
-    *(strrchr(basename, '.')) = '\0';
-    ListData *data = list_data_new_from_ical(ical, basename, g_hash_table_size(ldata));
-    free(ical);
-    // Check if uid exists
-    bool exists = g_hash_table_contains(ldata, errands_data_get_str(data, DATA_PROP_LIST_UID));
-    if (!exists) {
-      tb_log("Sidebar: List already exists");
-      errands_window_add_toast(state.main_window, _("List already exists"));
-      errands_data_free(data);
-      return;
-    }
-    g_hash_table_insert(ldata, strdup(errands_data_get_str(data, DATA_PROP_LIST_UID)), data);
-    errands_sidebar_add_task_list(sb, data);
-    GPtrArray *tasks = list_data_get_tasks(data);
-    for (size_t i = 0; i < tasks->len; i++) {
-      TaskData *td = tasks->pdata[i];
-      g_hash_table_insert(tdata, g_strdup(errands_data_get_str(data, DATA_PROP_UID)), td);
-      // TODO
-      // errands_task_list_add(td);
-    }
-    errands_data_write_list(data);
-    g_ptr_array_free(tasks, false);
-    // errands_task_list_filter_by_uid(basename);
-  }
+  // char *ical = tb_read_file_to_string(path);
+  // if (ical) {
+  //   TB_TODO("Use toolbox path funcs here");
+  //   g_autofree gchar *basename = g_file_get_basename(file);
+  //   *(strrchr(basename, '.')) = '\0';
+  //   ListData *data = list_data_new_from_ical(ical, basename, g_hash_table_size(ldata));
+  //   free(ical);
+  //   // Check if uid exists
+  //   bool exists = g_hash_table_contains(ldata, errands_data_get_str(data, DATA_PROP_LIST_UID));
+  //   if (!exists) {
+  //     LOG("Sidebar: List already exists");
+  //     errands_window_add_toast(state.main_window, _("List already exists"));
+  //     errands_data_free(data);
+  //     return;
+  //   }
+  //   g_hash_table_insert(ldata, strdup(errands_data_get_str(data, DATA_PROP_LIST_UID)), data);
+  //   errands_sidebar_add_task_list(sb, data);
+  //   GPtrArray *tasks = list_data_get_tasks(data);
+  //   for (size_t i = 0; i < tasks->len; i++) {
+  //     TaskData *td = tasks->pdata[i];
+  //     g_hash_table_insert(tdata, g_strdup(errands_data_get_str(data, DATA_PROP_UID)), td);
+  //     // TODO
+  //     // errands_task_list_add(td);
+  //   }
+  //   errands_data_write_list(data);
+  //   g_ptr_array_free(tasks, false);
+  //   // errands_task_list_filter_by_uid(basename);
+  // }
   // TODO: sync
 }
 

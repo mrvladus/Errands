@@ -5,6 +5,22 @@
 #include <stdbool.h>
 
 typedef enum {
+  SETTING_LAST_LIST_UID,
+  SETTING_MAXIMIZED,
+  SETTING_SHOW_COMPLETED,
+  SETTING_SORT_BY,
+  SETTING_SYNC,
+  SETTING_SYNC_PROVIDER,
+  SETTING_SYNC_URL,
+  SETTING_SYNC_USERNAME,
+  SETTING_TAGS,
+  SETTING_WINDOW_HEIGHT,
+  SETTING_WINDOW_WIDTH,
+
+  SETTINGS_COUNT
+} ErrandsSettingsKey;
+
+typedef enum {
   SETTING_TYPE_BOOL,
   SETTING_TYPE_INT,
   SETTING_TYPE_STRING,
@@ -24,11 +40,8 @@ typedef union {
 } ErrandsSetting;
 
 void errands_settings_init();
-ErrandsSetting errands_settings_get(const char *key, ErrandsSettingType type);
-
-void errands_settings_set_string(const char *key, const char *value);
-void errands_settings_set_int(const char *key, int value);
-void errands_settings_set_bool(const char *key, bool value);
+ErrandsSetting errands_settings_get(ErrandsSettingsKey key);
+void errands_settings_set(const char *key, ErrandsSettingType type, void *value);
 
 // Global tags
 

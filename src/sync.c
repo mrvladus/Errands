@@ -14,42 +14,42 @@ CalDAVClient *client;
 
 // void sync_list(ListData *list) {
 //   if (!errands_settings_get("sync", SETTING_TYPE_BOOL).b) {
-//     tb_log("Sync: Sync is disabled");
+//     LOG("Sync: Sync is disabled");
 //     return;
 //   }
 // }
 // void sync_task(TaskData *task) {
 //   if (!errands_settings_get("sync", SETTING_TYPE_BOOL).b) {
-//     tb_log("Sync: Sync is disabled");
+//     LOG("Sync: Sync is disabled");
 //     return;
 //   }
 // }
 
 // This is the asynchronous work function that runs in a separate thread.
 static void initial_sync(GTask *task, gpointer source_object, gpointer task_data, GCancellable *cancellable) {
-  tb_log("Sync: Initialize");
+  LOG("Sync: Initialize");
   // Check if sync is disabled.
-  if (!errands_settings_get("sync", SETTING_TYPE_BOOL).b) {
-    tb_log("Sync: Sync is disabled");
+  if (!errands_settings_get(SETTING_SYNC).b) {
+    LOG("Sync: Sync is disabled");
     g_task_return_boolean(task, FALSE);
     return;
   }
   // Create client
   client = caldav_client_new("http://localhost:8080", "vlad", "1710");
   if (!client) {
-    tb_log("Sync: Unable to connect to CalDAV server");
+    LOG("Sync: Unable to connect to CalDAV server");
     g_task_return_boolean(task, FALSE);
     return;
   }
   // Get calendars
   bool res = caldav_client_pull_calendars(client, CALDAV_COMPONENT_SET_VTODO);
   if (!res || !client->calendars) {
-    tb_log("Sync: Unable to get calendars");
+    LOG("Sync: Unable to get calendars");
     caldav_client_free(client);
     g_task_return_boolean(task, FALSE);
     return;
   }
-  tb_log("Sync: Loaded %zu calendars", client->calendars->len);
+  LOG("Sync: Loaded %zu calendars", client->calendars->len);
   // Get events
   for (size_t i = 0; i < client->calendars->len; i++) {
     CalDAVCalendar *calendar = caldav_list_at(client->calendars, i);
@@ -69,7 +69,7 @@ static void initial_sync(GTask *task, gpointer source_object, gpointer task_data
 static void initial_sync_finished_cb(GObject *source_object, GAsyncResult *res, gpointer user_data) {
   gboolean success = g_task_propagate_boolean(G_TASK(res), NULL);
   if (success) {
-    tb_log("Sync: Completed successfully");
+    LOG("Sync: Completed successfully");
     bool changed = false;
     for (size_t i = 0; i < client->calendars->len; i++) {
       CalDAVCalendar *calendar = caldav_list_at(client->calendars, i);
@@ -79,9 +79,9 @@ static void initial_sync_finished_cb(GObject *source_object, GAsyncResult *res, 
         // Get UID and DTSTAMP
         const char *uid = icalcomponent_get_uid(event->ical);
         icaltimetype dtstamp = icalcomponent_get_dtstamp(event->ical);
-        if (g_hash_table_contains(tdata, uid)) {
-          // TaskData *td = task_data_new_from_ical(event->ical);
-        }
+        // if (g_hash_table_contains(tdata, uid)) {
+        // TaskData *td = task_data_new_from_ical(event->ical);
+        // }
         // bool found = false;
         // GPtrArray* tasks = g_hash_table_get_values_as_ptr_array(tdata);
         // for (size_t j = 0; j < tasks->len; ++j) {
@@ -100,7 +100,7 @@ static void initial_sync_finished_cb(GObject *source_object, GAsyncResult *res, 
       }
     }
   } else {
-    tb_log("Sync: Failed or canceled");
+    LOG("Sync: Failed or canceled");
   }
 }
 
@@ -111,6 +111,6 @@ void sync_init(void) {
 
 void sync() {
   if (!needs_sync) return;
-  if (!errands_settings_get("sync", SETTING_TYPE_BOOL).b) return;
-  tb_log("Sync: synchronize");
+  if (!errands_settings_get(SETTING_SYNC).b) return;
+  LOG("Sync: synchronize");
 }

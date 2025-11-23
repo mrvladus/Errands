@@ -8,9 +8,10 @@
 #include "window.h"
 
 #include <libical/ical.h>
+#include <stddef.h>
 
 static void on_right_click(GtkPopover *popover, gint n_press, gdouble x, gdouble y, GtkGestureClick *ctrl);
-static void on_color_changed(GtkColorDialogButton *btn, GParamSpec *pspec, ListData *data);
+static void on_color_changed(GtkColorDialogButton *btn, GParamSpec *pspec, ListData2 *data);
 static void on_action_rename(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row);
 static void on_action_export(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row);
 static void on_action_delete(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row);
@@ -67,51 +68,47 @@ static void errands_sidebar_task_list_row_init(ErrandsSidebarTaskListRow *self) 
   // gtk_widget_add_controller(GTK_WIDGET(self), GTK_EVENT_CONTROLLER(self->hover_ctrl));
 }
 
-ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_new(ListData *data) {
-  tb_log("Task List Row '%s': Create", errands_data_get_str(data, DATA_PROP_LIST_UID));
+ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_new(ListData2 *data) {
+  LOG_NO_LN("Task List Row '%s': Create ... ", errands_data_get_str(data->data, DATA_PROP_LIST_UID));
+
   ErrandsSidebarTaskListRow *row = g_object_new(ERRANDS_TYPE_SIDEBAR_TASK_LIST_ROW, NULL);
   row->data = data;
   // Set color
   GdkRGBA color;
-  gdk_rgba_parse(&color, errands_data_get_str(data, DATA_PROP_COLOR));
+  gdk_rgba_parse(&color, errands_data_get_str(data->data, DATA_PROP_COLOR));
   gtk_color_dialog_button_set_rgba(GTK_COLOR_DIALOG_BUTTON(row->color_btn), &color);
   g_signal_connect(row->color_btn, "notify::rgba", G_CALLBACK(on_color_changed), data);
   // Update
   errands_sidebar_task_list_row_update_title(row);
   errands_sidebar_task_list_row_update_counter(row);
+
+  LOG_NO_PREFIX("Success");
+
   return row;
 }
 
 // ---------- PUBLIC FUNCTIONS ---------- //
 
 ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_get(const char *uid) {
-  GPtrArray *children = get_children(state.main_window->sidebar->task_lists_box);
+  g_autoptr(GPtrArray) children = get_children(state.main_window->sidebar->task_lists_box);
   for (size_t i = 0; i < children->len; i++) {
-    ListData *data = ((ErrandsSidebarTaskListRow *)children->pdata[i])->data;
-    if (g_str_equal(errands_data_get_str(data, DATA_PROP_LIST_UID), uid)) return children->pdata[i];
+    ListData2 *data = ((ErrandsSidebarTaskListRow *)children->pdata[i])->data;
+    if (STR_EQUAL(errands_data_get_str(data->data, DATA_PROP_LIST_UID), uid)) return children->pdata[i];
   }
-  g_ptr_array_free(children, false);
   return NULL;
 }
 
 void errands_sidebar_task_list_row_update_counter(ErrandsSidebarTaskListRow *row) {
-  size_t c = 0;
-  GPtrArray *tasks = list_data_get_tasks(row->data);
-  for (size_t i = 0; i < tasks->len; i++) {
-    TaskData *td = tasks->pdata[i];
-    bool deleted = errands_data_get_bool(td, DATA_PROP_DELETED);
-    bool trash = errands_data_get_bool(td, DATA_PROP_TRASH);
-    bool completed = !icaltime_is_null_time(errands_data_get_time(td, DATA_PROP_COMPLETED_TIME));
-    if (!deleted && !trash && !completed) c++;
-  }
+  size_t total = 0, completed = 0;
+  errands_list_data_get_stats(row->data, &total, &completed);
+  size_t uncompleted = total - completed;
   char num[32];
-  sprintf(num, "%zu", c);
-  gtk_label_set_label(GTK_LABEL(row->counter), c > 0 ? num : "");
-  g_ptr_array_free(tasks, false);
+  sprintf(num, "%zu", uncompleted);
+  gtk_label_set_label(GTK_LABEL(row->counter), uncompleted > 0 ? num : "");
 }
 
 void errands_sidebar_task_list_row_update_title(ErrandsSidebarTaskListRow *row) {
-  gtk_label_set_label(GTK_LABEL(row->label), errands_data_get_str(row->data, DATA_PROP_LIST_NAME));
+  gtk_label_set_label(GTK_LABEL(row->label), errands_data_get_str(row->data->data, DATA_PROP_LIST_NAME));
 }
 
 // ---------- CALLBACKS ---------- //
@@ -121,10 +118,10 @@ void on_errands_sidebar_task_list_row_activate(GtkListBox *box, ErrandsSidebarTa
   // Unselect filter rows
   gtk_list_box_unselect_all(GTK_LIST_BOX(state.main_window->sidebar->filters_box));
   // Set setting
-  const char *list_uid = tb_tmp_str_printf(errands_data_get_str(row->data, DATA_PROP_LIST_UID));
-  errands_settings_set_string("last_list_uid", list_uid);
+  const char *list_uid = tmp_str_printf(errands_data_get_str(row->data->data, DATA_PROP_LIST_UID));
+  LOG("Switch to list '%s'", list_uid);
+  errands_settings_set("last_list_uid", SETTING_TYPE_STRING, (void *)list_uid);
   errands_task_list_show_task_list(task_list, row->data);
-  tb_log("Switch to list '%s'", list_uid);
 }
 
 static void on_right_click(GtkPopover *popover, gint n_press, gdouble x, gdouble y, GtkGestureClick *ctrl) {
@@ -132,12 +129,12 @@ static void on_right_click(GtkPopover *popover, gint n_press, gdouble x, gdouble
   gtk_popover_popup(popover);
 }
 
-static void on_color_changed(GtkColorDialogButton *btn, GParamSpec *pspec, ListData *data) {
+static void on_color_changed(GtkColorDialogButton *btn, GParamSpec *pspec, ListData2 *data) {
   const GdkRGBA *color_rgba = gtk_color_dialog_button_get_rgba(btn);
   char new_color[8];
   gdk_rgba_to_hex_string(color_rgba, new_color);
-  errands_data_set_str(data, DATA_PROP_COLOR, new_color);
-  errands_data_write_list(data);
+  errands_data_set_str(data->data, DATA_PROP_COLOR, new_color);
+  // errands_data_write_list(data);
 }
 
 static void on_action_rename(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {
@@ -159,12 +156,12 @@ static void on_action_export_finish_cb(GObject *obj, GAsyncResult *res, gpointer
   fprintf(file, "%s", ical);
   fclose(file);
   free(ical);
-  tb_log("Export task list %s", errands_data_get_str(data, DATA_PROP_LIST_UID));
+  LOG("Export task list %s", errands_data_get_str(data, DATA_PROP_LIST_UID));
 }
 
 static void on_action_export(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {
   g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
-  const char *filename = tb_tmp_str_printf("%s.ics", errands_data_get_str(row->data, DATA_PROP_LIST_UID));
+  const char *filename = tmp_str_printf("%s.ics", errands_data_get_str(row->data->data, DATA_PROP_LIST_UID));
   g_object_set(dialog, "initial-name", filename, NULL);
   gtk_file_dialog_save(dialog, GTK_WINDOW(state.main_window), NULL, on_action_export_finish_cb, row->data);
 }
@@ -249,9 +246,9 @@ void start_print(const char *str) {
 }
 
 static void on_action_print(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {
-  tb_log("Start printing of the list '%s'", errands_data_get_str(row->data, DATA_PROP_LIST_UID));
-  g_autofree gchar *str = list_data_print(row->data);
-  start_print(str);
+  LOG("Start printing of the list '%s'", errands_data_get_str(row->data->data, DATA_PROP_LIST_UID));
+  // g_autofree gchar *str = list_data_print(row->data->data);
+  // start_print(str);
 }
 
 // // --- DND --- //
@@ -276,7 +273,7 @@ static void on_action_print(GSimpleAction *action, GVariant *param, ErrandsSideb
 //     ErrandsSidebarTaskListRow *row = ERRANDS_SIDEBAR_TASK_LIST_ROW(object);
 //     if (row == target_row)
 //       return false;
-//     tb_log("Reorder task lists");
+//     LOG("Reorder task lists");
 //     // Move widget
 //     int idx = gtk_list_box_row_get_index(GTK_LIST_BOX_ROW(target_row));
 //     GtkListBox *box = (GtkListBox *)gtk_widget_get_parent(GTK_WIDGET(row));
@@ -297,7 +294,7 @@ static void on_action_print(GSimpleAction *action, GVariant *param, ErrandsSideb
 //     ErrandsTask *task = ERRANDS_TASK(object);
 //     if (!strcmp(task->data->list_uid, target_row->data->uid))
 //       return false;
-//     tb_log("Move task '%s' to list '%s'", task->data->uid, target_row->data->uid);
+//     LOG("Move task '%s' to list '%s'", task->data->uid, target_row->data->uid);
 //     ErrandsSidebarTaskListRow *task_row =
 //     errands_sidebar_task_list_row_get(task->data->list_uid);
 //     // Move widget

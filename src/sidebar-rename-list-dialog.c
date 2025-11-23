@@ -1,6 +1,6 @@
 #include "sidebar.h"
 #include "state.h"
-#include "sync.h"
+
 #include "vendor/toolbox.h"
 
 static void on_response_cb(ErrandsSidebarRenameListDialog *self, gchar *response, gpointer data);
@@ -47,7 +47,7 @@ void errands_sidebar_rename_list_dialog_show(ErrandsSidebarTaskListRow *row) {
     state.main_window->sidebar->rename_list_dialog = errands_sidebar_rename_list_dialog_new();
   state.main_window->sidebar->rename_list_dialog->current_task_list_row = row;
   gtk_editable_set_text(GTK_EDITABLE(state.main_window->sidebar->rename_list_dialog->entry),
-                        errands_data_get_str(row->data, DATA_PROP_LIST_NAME));
+                        errands_data_get_str(row->data->data, DATA_PROP_LIST_NAME));
   adw_dialog_present(ADW_DIALOG(state.main_window->sidebar->rename_list_dialog), GTK_WIDGET(state.main_window));
   gtk_widget_grab_focus(state.main_window->sidebar->rename_list_dialog->entry);
 }
@@ -55,27 +55,27 @@ void errands_sidebar_rename_list_dialog_show(ErrandsSidebarTaskListRow *row) {
 // ---------- CALLBACKS ---------- //
 
 static void on_response_cb(ErrandsSidebarRenameListDialog *self, gchar *response, gpointer data) {
-  if (g_str_equal(response, "rename")) {
-    const char *text = gtk_editable_get_text(GTK_EDITABLE(self->entry));
-    tb_log("SidebarRenameListDialog: Rename to '%s'", text);
-    errands_data_set_str(self->current_task_list_row->data, DATA_PROP_LIST_NAME, text);
-    errands_data_write_list(self->current_task_list_row->data);
-    errands_sidebar_task_list_row_update_title(self->current_task_list_row);
-    errands_task_list_update_title(state.main_window->task_list);
-    needs_sync = true;
-  }
+  // if (STR_EQUAL(response, "rename")) {
+  //   const char *text = gtk_editable_get_text(GTK_EDITABLE(self->entry));
+  //   LOG("SidebarRenameListDialog: Rename to '%s'", text);
+  //   errands_data_set_str(self->current_task_list_row->data, DATA_PROP_LIST_NAME, text);
+  //   errands_data_write_list(self->current_task_list_row->data);
+  //   errands_sidebar_task_list_row_update_title(self->current_task_list_row);
+  //   errands_task_list_update_title(state.main_window->task_list);
+  //   needs_sync = true;
+  // }
 }
 
 static void on_entry_changed_cb(ErrandsSidebarRenameListDialog *self, AdwEntryRow *entry) {
   const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
-  const char *list_name = errands_data_get_str(self->current_task_list_row->data, DATA_PROP_LIST_NAME);
-  const bool enable = !g_str_equal("", text) && !g_str_equal(text, list_name);
+  const char *list_name = errands_data_get_str(self->current_task_list_row->data->data, DATA_PROP_LIST_NAME);
+  const bool enable = !STR_EQUAL("", text) && !STR_EQUAL(text, list_name);
   adw_alert_dialog_set_response_enabled(ADW_ALERT_DIALOG(self), "rename", enable);
 }
 
 static void on_entry_activated_cb(ErrandsSidebarRenameListDialog *self, AdwEntryRow *entry) {
   const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
-  if (g_str_equal(text, "")) return;
+  if (STR_EQUAL(text, "")) return;
   on_response_cb(self, "rename", NULL);
   adw_dialog_close(ADW_DIALOG(self));
 }

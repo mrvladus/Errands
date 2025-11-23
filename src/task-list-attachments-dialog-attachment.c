@@ -2,6 +2,8 @@
 #include "state.h"
 #include "task-list.h"
 
+#include "vendor/toolbox.h"
+
 static void on_delete_cb(ErrandsTaskListAttachmentsDialogAttachment *self, GtkButton *btn);
 
 // ---------- WIDGET TEMPLATE ---------- //
@@ -45,14 +47,14 @@ static void on_delete_cb(ErrandsTaskListAttachmentsDialogAttachment *self, GtkBu
   ErrandsTask *task = errands_task_list_attachments_dialog_get_task(state.main_window->task_list->attachments_dialog);
   ErrandsTaskListAttachmentsDialog *dialog = ERRANDS_TASK_LIST_ATTACHMENTS_DIALOG(
       gtk_widget_get_ancestor(GTK_WIDGET(self), ERRANDS_TYPE_TASK_LIST_ATTACHMENTS_DIALOG));
-  g_auto(GStrv) cur_attachments = errands_data_get_strv(task->data, DATA_PROP_ATTACHMENTS);
+  g_auto(GStrv) cur_attachments = errands_data_get_strv(task->data->data, DATA_PROP_ATTACHMENTS);
   g_autoptr(GStrvBuilder) builder = g_strv_builder_new();
   for (size_t i = 0; i < g_strv_length(cur_attachments); i++)
-    if (!g_str_equal(cur_attachments[i], adw_action_row_get_subtitle(ADW_ACTION_ROW(self))))
+    if (!STR_EQUAL(cur_attachments[i], adw_action_row_get_subtitle(ADW_ACTION_ROW(self))))
       g_strv_builder_add(builder, cur_attachments[i]);
   g_auto(GStrv) attachments = g_strv_builder_end(builder);
-  errands_data_set_strv(task->data, DATA_PROP_ATTACHMENTS, attachments);
-  errands_data_write_list(task_data_get_list(task->data));
+  errands_data_set_strv(task->data->data, DATA_PROP_ATTACHMENTS, attachments);
+  // errands_data_write_list(task_data_get_list(task->data));
   gtk_list_box_remove(GTK_LIST_BOX(gtk_widget_get_ancestor(GTK_WIDGET(self), GTK_TYPE_LIST_BOX)), GTK_WIDGET(self));
   errands_task_list_attachments_dialog_update_ui(dialog);
 }

@@ -3,7 +3,7 @@ using Adw 1;
 
 template $ErrandsSidebarNewListDialog: Adw.AlertDialog {
   default-response: "create";
-  response => $on_response_cb();
+  response => $on_response_cb(template);
 
   responses [
     close: _("Cancel"),
@@ -17,8 +17,8 @@ template $ErrandsSidebarNewListDialog: Adw.AlertDialog {
 
     Adw.EntryRow entry {
       title: _("New List Name");
-      changed => $on_entry_changed_cb();
-      entry-activated => $on_entry_activated_cb();
+      changed => $on_entry_changed_cb(template);
+      entry-activated => $on_entry_activated_cb(template);
     }
   };
 }

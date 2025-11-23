@@ -1,10 +1,14 @@
+#include "data.h"
+#include "glib.h"
 #include "sidebar.h"
 #include "state.h"
 #include "vendor/toolbox.h"
+#include "window.h"
+#include <unistd.h>
 
-static void on_response_cb(ErrandsSidebarNewListDialog *dialog, gchar *response, gpointer data);
-static void on_entry_changed_cb(AdwEntryRow *entry);
-static void on_entry_activated_cb(AdwEntryRow *entry);
+static void on_response_cb(ErrandsSidebarNewListDialog *self, gchar *response, gpointer data);
+static void on_entry_changed_cb(ErrandsSidebarNewListDialog *self, AdwEntryRow *entry);
+static void on_entry_activated_cb(ErrandsSidebarNewListDialog *self, AdwEntryRow *entry);
 
 // ---------- WIDGET TEMPLATE ---------- //
 
@@ -41,36 +45,36 @@ ErrandsSidebarNewListDialog *errands_sidebar_new_list_dialog_new() {
 // ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_sidebar_new_list_dialog_show() {
-  if (!state.main_window->sidebar->new_list_dialog)
-    state.main_window->sidebar->new_list_dialog = errands_sidebar_new_list_dialog_new();
-  adw_dialog_present(ADW_DIALOG(state.main_window->sidebar->new_list_dialog), GTK_WIDGET(state.main_window));
-  gtk_editable_set_text(GTK_EDITABLE(state.main_window->sidebar->new_list_dialog->entry), "");
-  gtk_widget_grab_focus(state.main_window->sidebar->new_list_dialog->entry);
+  ErrandsSidebarNewListDialog *self = state.main_window->sidebar->new_list_dialog;
+  if (!self) state.main_window->sidebar->new_list_dialog = self = errands_sidebar_new_list_dialog_new();
+  adw_dialog_present(ADW_DIALOG(self), GTK_WIDGET(state.main_window));
+  gtk_editable_set_text(GTK_EDITABLE(self->entry), "");
+  gtk_widget_grab_focus(self->entry);
 }
 
 // ---------- CALLBACKS ---------- //
 
-static void on_response_cb(ErrandsSidebarNewListDialog *dialog, gchar *response, gpointer data) {
-  if (g_str_equal(response, "create")) {
-    ListData *tld = list_data_new(NULL, gtk_editable_get_text(GTK_EDITABLE(dialog->entry)), NULL, false, false,
-                                  g_hash_table_size(ldata));
-    g_hash_table_insert(ldata, strdup(errands_data_get_str(tld, DATA_PROP_LIST_UID)), tld);
-    errands_data_write_list(tld);
-    ErrandsSidebarTaskListRow *row = errands_sidebar_add_task_list(state.main_window->sidebar, tld);
+static void on_response_cb(ErrandsSidebarNewListDialog *self, gchar *response, gpointer data) {
+  if (STR_EQUAL(response, "create")) {
+    ListData2 *list =
+        errands_list_data_create(NULL, gtk_editable_get_text(GTK_EDITABLE(self->entry)), NULL, false, false);
+    g_ptr_array_add(errands_data_lists, list);
+    ErrandsSidebarTaskListRow *row = errands_sidebar_add_task_list(state.main_window->sidebar, list);
     g_signal_emit_by_name(row, "activate", NULL);
-    g_object_set(state.main_window->no_lists_page, "visible", false, NULL);
-    tb_log("SidebarNewListDialog: Create new list: '%s'", errands_data_get_str(tld, DATA_PROP_LIST_UID));
+    errands_window_update(state.main_window);
+    errands_data_write_list(list);
+    LOG("SidebarNewListDialog: Create new list: '%s'", errands_data_get_str(list->data, DATA_PROP_LIST_UID));
   }
 }
 
-static void on_entry_changed_cb(AdwEntryRow *entry) {
-  adw_alert_dialog_set_response_enabled(ADW_ALERT_DIALOG(state.main_window->sidebar->new_list_dialog), "create",
-                                        !g_str_equal("", gtk_editable_get_text(GTK_EDITABLE(entry))));
+static void on_entry_changed_cb(ErrandsSidebarNewListDialog *self, AdwEntryRow *entry) {
+  adw_alert_dialog_set_response_enabled(ADW_ALERT_DIALOG(self), "create",
+                                        !STR_EQUAL("", gtk_editable_get_text(GTK_EDITABLE(entry))));
 }
 
-static void on_entry_activated_cb(AdwEntryRow *entry) {
+static void on_entry_activated_cb(ErrandsSidebarNewListDialog *self, AdwEntryRow *entry) {
   const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
-  if (g_str_equal(text, "")) return;
-  on_response_cb(state.main_window->sidebar->new_list_dialog, "create", NULL);
-  adw_dialog_close(ADW_DIALOG(state.main_window->sidebar->new_list_dialog));
+  if (STR_EQUAL(text, "")) return;
+  on_response_cb(self, "create", NULL);
+  adw_dialog_close(ADW_DIALOG(self));
 }

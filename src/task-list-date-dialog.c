@@ -54,12 +54,12 @@ ErrandsTaskListDateDialog *errands_task_list_date_dialog_new() {
 // ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_task_list_date_dialog_show(ErrandsTask *task) {
-  tb_log("Date Dialog: Show");
+  LOG("Date Dialog: Show");
   if (!state.main_window->task_list->date_dialog)
     state.main_window->task_list->date_dialog = errands_task_list_date_dialog_new();
   ErrandsTaskListDateDialog *dialog = state.main_window->task_list->date_dialog;
   dialog->current_task = task;
-  TaskData *data = task->data;
+  TaskData2 *data = task->data;
 
   // Reset all rows
   errands_task_list_date_dialog_date_chooser_reset(dialog->start_date_chooser);
@@ -69,21 +69,21 @@ void errands_task_list_date_dialog_show(ErrandsTask *task) {
   errands_task_list_date_dialog_time_chooser_reset(dialog->due_time_chooser);
 
   // Set start dt
-  tb_log("Date Dialog: Set start time");
-  icaltimetype start_dt = errands_data_get_time(data, DATA_PROP_START_TIME);
+  LOG("Date Dialog: Set start time");
+  icaltimetype start_dt = errands_data_get_time(data->data, DATA_PROP_START_TIME);
   errands_task_list_date_dialog_date_chooser_set_date(dialog->start_date_chooser, start_dt);
   errands_task_list_date_dialog_time_chooser_set_time(dialog->start_time_chooser, start_dt);
 
   // Set due dt
-  tb_log("Date Dialog: Set due time");
-  icaltimetype due_dt = errands_data_get_time(data, DATA_PROP_DUE_TIME);
+  LOG("Date Dialog: Set due time");
+  icaltimetype due_dt = errands_data_get_time(data->data, DATA_PROP_DUE_TIME);
   errands_task_list_date_dialog_date_chooser_set_date(dialog->due_date_chooser, due_dt);
   errands_task_list_date_dialog_time_chooser_set_time(dialog->due_time_chooser, due_dt);
 
   // Set rrule
-  icalproperty *rrule_prop = icalcomponent_get_first_property(data, ICAL_RRULE_PROPERTY);
+  icalproperty *rrule_prop = icalcomponent_get_first_property(data->data, ICAL_RRULE_PROPERTY);
   if (rrule_prop) {
-    tb_log("Date Dialog: Set RRULE");
+    LOG("Date Dialog: Set RRULE");
     struct icalrecurrencetype rrule = icalproperty_get_rrule(rrule_prop);
     errands_task_list_date_dialog_rrule_row_set_rrule(dialog->rrule_row, rrule);
   }
@@ -94,14 +94,14 @@ void errands_task_list_date_dialog_show(ErrandsTask *task) {
 // ---------- CALLBACKS ---------- //
 
 static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
-  tb_log("Date Dialog: Close");
+  LOG("Date Dialog: Close");
 
-  TaskData *data = self->current_task->data;
+  TaskData2 *data = self->current_task->data;
   icaltimetype today = icaltime_today();
   bool changed = false;
 
   // Set start datetime
-  icaltimetype curr_sdt = errands_data_get_time(data, DATA_PROP_START_TIME);
+  icaltimetype curr_sdt = errands_data_get_time(data->data, DATA_PROP_START_TIME);
   icaltimetype new_sdt = ICALTIMETYPE_INITIALIZER;
   icaltimetype new_sd = errands_task_list_date_dialog_date_chooser_get_date(self->start_date_chooser);
   icaltimetype new_st = errands_task_list_date_dialog_time_chooser_get_time(self->start_time_chooser);
@@ -117,7 +117,7 @@ static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
   if (new_dd_is_null) {
     if (new_dt_is_null) {
       if (!curr_ddt_is_null) {
-        errands_data_set_time(data, DATA_PROP_START_TIME, new_sdt);
+        errands_data_set_time(data->data, DATA_PROP_START_TIME, new_sdt);
         changed = true;
       }
     } else {
@@ -125,25 +125,25 @@ static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
       new_sdt.month = today.month;
       new_sdt.day = today.day;
       if (icaltime_compare(curr_sdt, new_sdt) != 0) {
-        tb_log("Date Dialog: Start date is changed to '%s' => '%s'", icaltime_as_ical_string(curr_sdt),
-               icaltime_as_ical_string(new_sdt));
-        errands_data_set_time(data, DATA_PROP_START_TIME, new_sdt);
+        LOG("Date Dialog: Start date is changed to '%s' => '%s'", icaltime_as_ical_string(curr_sdt),
+            icaltime_as_ical_string(new_sdt));
+        errands_data_set_time(data->data, DATA_PROP_START_TIME, new_sdt);
         changed = true;
       }
     }
   } else {
     if (new_dt_is_null) new_sdt.is_date = true;
     if (icaltime_compare(curr_sdt, new_sdt) != 0) {
-      tb_log("Date Dialog: Start date is changed '%s' => '%s'", icaltime_as_ical_string(curr_sdt),
-             icaltime_as_ical_string(new_sdt));
-      errands_data_set_time(data, DATA_PROP_START_TIME, new_sdt);
+      LOG("Date Dialog: Start date is changed '%s' => '%s'", icaltime_as_ical_string(curr_sdt),
+          icaltime_as_ical_string(new_sdt));
+      errands_data_set_time(data->data, DATA_PROP_START_TIME, new_sdt);
       changed = true;
     }
   }
 
   // Set due datetime if not repeated
   if (!adw_expander_row_get_expanded(ADW_EXPANDER_ROW(self->rrule_row))) {
-    icaltimetype curr_ddt = errands_data_get_time(data, DATA_PROP_DUE_TIME);
+    icaltimetype curr_ddt = errands_data_get_time(data->data, DATA_PROP_DUE_TIME);
     icaltimetype new_ddt = ICALTIMETYPE_INITIALIZER;
     icaltimetype new_dd = errands_task_list_date_dialog_date_chooser_get_date(self->due_date_chooser);
     icaltimetype new_dt = errands_task_list_date_dialog_time_chooser_get_time(self->due_time_chooser);
@@ -159,7 +159,7 @@ static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
     if (new_dd_is_null) {
       if (new_dt_is_null) {
         if (!curr_ddt_is_null) {
-          errands_data_set_time(data, DATA_PROP_DUE_TIME, new_ddt);
+          errands_data_set_time(data->data, DATA_PROP_DUE_TIME, new_ddt);
           changed = true;
         }
       } else {
@@ -167,9 +167,9 @@ static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
         new_ddt.month = today.month;
         new_ddt.day = today.day;
         if (icaltime_compare(curr_ddt, new_ddt) != 0) {
-          tb_log("Date Dialog: Due date is changed to '%s' => '%s'", icaltime_as_ical_string(curr_ddt),
-                 icaltime_as_ical_string(new_ddt));
-          errands_data_set_time(data, DATA_PROP_DUE_TIME, new_ddt);
+          LOG("Date Dialog: Due date is changed to '%s' => '%s'", icaltime_as_ical_string(curr_ddt),
+              icaltime_as_ical_string(new_ddt));
+          errands_data_set_time(data->data, DATA_PROP_DUE_TIME, new_ddt);
           changed = true;
         }
       }
@@ -177,9 +177,9 @@ static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
       if (new_dt_is_null) new_ddt.is_date = true;
 
       if (icaltime_compare(curr_ddt, new_ddt) != 0) {
-        tb_log("Date Dialog: Due date is changed '%s' => '%s'", icaltime_as_ical_string(curr_ddt),
-               icaltime_as_ical_string(new_ddt));
-        errands_data_set_time(data, DATA_PROP_DUE_TIME, new_ddt);
+        LOG("Date Dialog: Due date is changed '%s' => '%s'", icaltime_as_ical_string(curr_ddt),
+            icaltime_as_ical_string(new_ddt));
+        errands_data_set_time(data->data, DATA_PROP_DUE_TIME, new_ddt);
         changed = true;
       }
     }
@@ -189,7 +189,7 @@ static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
   struct icalrecurrencetype old_rrule = ICALRECURRENCETYPE_INITIALIZER;
   struct icalrecurrencetype new_rrule = ICALRECURRENCETYPE_INITIALIZER;
   // Get old and new rrule
-  icalproperty *rrule_prop = icalcomponent_get_first_property(data, ICAL_RRULE_PROPERTY);
+  icalproperty *rrule_prop = icalcomponent_get_first_property(data->data, ICAL_RRULE_PROPERTY);
   if (rrule_prop) old_rrule = icalproperty_get_rrule(rrule_prop);
   if (adw_expander_row_get_expanded(ADW_EXPANDER_ROW(self->rrule_row)))
     new_rrule = errands_task_list_date_dialog_rrule_row_get_rrule(self->rrule_row);
@@ -197,19 +197,20 @@ static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
   if (!icalrecurrencetype_compare(&new_rrule, &old_rrule)) {
     if (rrule_prop) {
       // Delete rrule if new rrule is not set
-      if (new_rrule.freq == ICAL_NO_RECURRENCE) icalcomponent_remove_property(data, rrule_prop);
+      if (new_rrule.freq == ICAL_NO_RECURRENCE) icalcomponent_remove_property(data->data, rrule_prop);
       // Set new rrule
       else icalproperty_set_rrule(rrule_prop, new_rrule);
     } else {
       // Set new rrule
-      if (new_rrule.freq != ICAL_NO_RECURRENCE) icalcomponent_add_property(data, icalproperty_new_rrule(new_rrule));
+      if (new_rrule.freq != ICAL_NO_RECURRENCE)
+        icalcomponent_add_property(data->data, icalproperty_new_rrule(new_rrule));
     }
     changed = true;
   }
 
   // Write data if changed one of the props
   if (changed) {
-    errands_data_write_list(task_data_get_list(data));
+    // errands_data_write_list(task_data_get_list(data));
     errands_task_update_toolbar(self->current_task);
     errands_sidebar_today_row_update_counter(state.main_window->sidebar->today_row);
     needs_sync = true;

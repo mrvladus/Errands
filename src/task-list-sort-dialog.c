@@ -59,8 +59,8 @@ void errands_task_list_sort_dialog_show() {
   ErrandsTaskListSortDialog *dialog = state.main_window->task_list->sort_dialog;
   dialog->block_signals = true;
   adw_switch_row_set_active(ADW_SWITCH_ROW(dialog->completed_toggle_row),
-                            errands_settings_get("show_completed", SETTING_TYPE_STRING).b);
-  ErrandsSortType sort_by = errands_settings_get("sort_by", SETTING_TYPE_INT).i;
+                            errands_settings_get(SETTING_SHOW_COMPLETED).b);
+  ErrandsSortType sort_by = errands_settings_get(SETTING_SORT_BY).i;
   gtk_check_button_set_active(GTK_CHECK_BUTTON(dialog->creation_date_toggle_btn), sort_by == SORT_TYPE_CREATION_DATE);
   gtk_check_button_set_active(GTK_CHECK_BUTTON(dialog->start_date_toggle_btn), sort_by == SORT_TYPE_START_DATE);
   gtk_check_button_set_active(GTK_CHECK_BUTTON(dialog->due_date_toggle_btn), sort_by == SORT_TYPE_DUE_DATE);
@@ -74,16 +74,16 @@ void errands_task_list_sort_dialog_show() {
 static void on_show_completed_toggle_cb(AdwSwitchRow *row) {
   if (state.main_window->task_list->sort_dialog->block_signals) return;
   bool show_completed = adw_switch_row_get_active(row);
-  errands_settings_set_bool("show_completed", show_completed);
+  errands_settings_set("show_completed", SETTING_TYPE_BOOL, &show_completed);
   // gtk_filter_changed(GTK_FILTER(state.main_window->task_list->master_filter),
   //                    show_completed ? GTK_FILTER_CHANGE_LESS_STRICT : GTK_FILTER_CHANGE_MORE_STRICT);
 }
 
 static void set_sort_by(GtkCheckButton *btn, size_t sort_by) {
   if (state.main_window->task_list->sort_dialog->block_signals) return;
-  size_t sort_by_current = errands_settings_get("sort_by", SETTING_TYPE_INT).i;
+  size_t sort_by_current = errands_settings_get(SETTING_SORT_BY).i;
   if (!gtk_check_button_get_active(btn) || sort_by_current == sort_by) return;
-  errands_settings_set_int("sort_by", sort_by);
+  errands_settings_set("sort_by", SETTING_TYPE_INT, &sort_by);
   // gtk_sorter_changed(GTK_SORTER(state.main_window->task_list->master_sorter), GTK_SORTER_CHANGE_MORE_STRICT);
   // gtk_list_view_scroll_to(GTK_LIST_VIEW(state.main_window->task_list->task_list), 0, GTK_LIST_SCROLL_FOCUS, NULL);
 }

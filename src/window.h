@@ -12,7 +12,7 @@ struct _ErrandsWindow {
   AdwApplicationWindow parent_instance;
   GtkWidget *no_lists_page;
   ErrandsTaskList *task_list;
-  GtkWidget *toast_overlay;
+  AdwToastOverlay *toast_overlay;
   ErrandsSidebar *sidebar;
   GtkWidget *split_view;
 };

@@ -1,6 +1,8 @@
 #include "data.h"
+#include "glib.h"
 #include "sidebar.h"
 #include "vendor/toolbox.h"
+#include <stddef.h>
 
 // ---------- WIDGET TEMPLATE ---------- //
 
@@ -23,24 +25,21 @@ static void errands_sidebar_all_row_class_init(ErrandsSidebarAllRowClass *class)
   G_OBJECT_CLASS(class)->dispose = errands_sidebar_all_row_dispose;
 }
 
-static void errands_sidebar_all_row_init(ErrandsSidebarAllRow *self) { gtk_widget_init_template(GTK_WIDGET(self)); }
+static void errands_sidebar_all_row_init(ErrandsSidebarAllRow *self) {
+  LOG("Sidebar All Row: Create");
+  gtk_widget_init_template(GTK_WIDGET(self));
+}
 
 ErrandsSidebarAllRow *errands_sidebar_all_row_new() { return g_object_new(ERRANDS_TYPE_SIDEBAR_ALL_ROW, NULL); }
 
 // ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_sidebar_all_row_update_counter(ErrandsSidebarAllRow *row) {
-  GPtrArray *tasks = g_hash_table_get_values_as_ptr_array(tdata);
-  size_t len = 0;
-  for (size_t i = 0; i < tasks->len; i++) {
-    TaskData *td = tasks->pdata[i];
-    bool deleted = errands_data_get_bool(td, DATA_PROP_DELETED);
-    bool trash = errands_data_get_bool(td, DATA_PROP_TRASH);
-    bool completed = !icaltime_is_null_time(errands_data_get_time(td, DATA_PROP_COMPLETED_TIME));
-    if (!deleted && !trash && !completed) len++;
-  }
-  char num[64];
-  g_snprintf(num, 64, "%zu", len);
-  gtk_label_set_label(GTK_LABEL(row->counter), len > 0 ? num : "");
-  g_ptr_array_free(tasks, false);
+  size_t total = 0;
+  size_t completed = 0;
+  errands_data_get_stats(&total, &completed);
+  size_t uncompleted = total - completed;
+  const char *num = tmp_str_printf("%zu", uncompleted);
+  gtk_label_set_label(GTK_LABEL(row->counter), uncompleted > 0 ? num : "");
+  LOG("Sidebar All Row: Update counter: %zu", uncompleted);
 }
