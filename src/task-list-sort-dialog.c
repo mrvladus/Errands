@@ -74,7 +74,7 @@ void errands_task_list_sort_dialog_show() {
 static void on_show_completed_toggle_cb(AdwSwitchRow *row) {
   if (state.main_window->task_list->sort_dialog->block_signals) return;
   bool show_completed = adw_switch_row_get_active(row);
-  errands_settings_set("show_completed", SETTING_TYPE_BOOL, &show_completed);
+  errands_settings_set(SETTING_SHOW_COMPLETED, &show_completed);
   // gtk_filter_changed(GTK_FILTER(state.main_window->task_list->master_filter),
   //                    show_completed ? GTK_FILTER_CHANGE_LESS_STRICT : GTK_FILTER_CHANGE_MORE_STRICT);
 }
@@ -83,7 +83,7 @@ static void set_sort_by(GtkCheckButton *btn, size_t sort_by) {
   if (state.main_window->task_list->sort_dialog->block_signals) return;
   size_t sort_by_current = errands_settings_get(SETTING_SORT_BY).i;
   if (!gtk_check_button_get_active(btn) || sort_by_current == sort_by) return;
-  errands_settings_set("sort_by", SETTING_TYPE_INT, &sort_by);
+  errands_settings_set(SETTING_SORT_BY, &sort_by);
   // gtk_sorter_changed(GTK_SORTER(state.main_window->task_list->master_sorter), GTK_SORTER_CHANGE_MORE_STRICT);
   // gtk_list_view_scroll_to(GTK_LIST_VIEW(state.main_window->task_list->task_list), 0, GTK_LIST_SCROLL_FOCUS, NULL);
 }

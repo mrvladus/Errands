@@ -1,9 +1,11 @@
 #include "sidebar.h"
 #include "data.h"
+#include "settings-dialog.h"
 #include "settings.h"
 #include "state.h"
 #include "task-list.h"
 #include "utils.h"
+
 #include "vendor/toolbox.h"
 
 #include <glib/gi18n.h>
@@ -43,7 +45,8 @@ static void errands_sidebar_init(ErrandsSidebar *self) {
   LOG("Sidebar: Create");
   gtk_widget_init_template(GTK_WIDGET(self));
   errands_add_actions(GTK_WIDGET(self), "sidebar", "import", on_import_action_cb, self, "new_list",
-                      errands_sidebar_new_list_dialog_show, NULL, NULL);
+                      errands_sidebar_new_list_dialog_show, NULL, "preferences", errands_settings_dialog_show, NULL,
+                      NULL);
 }
 
 ErrandsSidebar *errands_sidebar_new() { return g_object_new(ERRANDS_TYPE_SIDEBAR, NULL); }

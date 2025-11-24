@@ -36,6 +36,13 @@ static void errands_window_class_init(ErrandsWindowClass *class) {
 static void errands_window_init(ErrandsWindow *self) {
   LOG("Window: Create");
   gtk_widget_init_template(GTK_WIDGET(self));
+  // Set theme
+  AdwStyleManager *style_manager = adw_style_manager_get_default();
+  switch (errands_settings_get(SETTING_THEME).i) {
+  case SETTING_THEME_SYSTEM: adw_style_manager_set_color_scheme(style_manager, ADW_COLOR_SCHEME_DEFAULT); break;
+  case SETTING_THEME_LIGHT: adw_style_manager_set_color_scheme(style_manager, ADW_COLOR_SCHEME_FORCE_LIGHT); break;
+  case SETTING_THEME_DARK: adw_style_manager_set_color_scheme(style_manager, ADW_COLOR_SCHEME_FORCE_DARK); break;
+  }
   LOG("Window: Created");
 }
 
@@ -69,13 +76,13 @@ void errands_window_add_toast(ErrandsWindow *win, const char *msg) {
 static void on_size_changed_cb(ErrandsWindow *win) {
   int w, h;
   gtk_window_get_default_size(GTK_WINDOW(win), &w, &h);
-  errands_settings_set("window_width", SETTING_TYPE_INT, &w);
-  errands_settings_set("window_height", SETTING_TYPE_INT, &h);
+  errands_settings_set(SETTING_WINDOW_WIDTH, &w);
+  errands_settings_set(SETTING_WINDOW_HEIGHT, &h);
 }
 
 static void on_maximize_changed_cb(ErrandsWindow *win) {
   bool is_maximized = gtk_window_is_maximized(GTK_WINDOW(win));
-  errands_settings_set("maximized", SETTING_TYPE_BOOL, &is_maximized);
+  errands_settings_set(SETTING_MAXIMIZED, &is_maximized);
 }
 
 static void on_new_list_btn_clicked_cb() { errands_sidebar_new_list_dialog_show(); }

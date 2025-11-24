@@ -8,6 +8,7 @@
 
   <!-- UI -->
   <gresource prefix="/io/github/mrvladus/Errands/ui">
+    <file preprocess="xml-stripblanks" compressed="true" alias="settings-dialog.ui">build/settings-dialog.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="sidebar-all-row.ui">build/sidebar-all-row.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="sidebar-task-list-row.ui">build/sidebar-task-list-row.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="sidebar-today-row.ui">build/sidebar-today-row.ui</file>
@@ -63,5 +64,6 @@
     <file preprocess="xml-stripblanks" compressed="true" alias="errands-more-symbolic.svg">data/icons/errands-more-symbolic.svg</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="errands-md-symbolic.svg">data/icons/errands-md-symbolic.svg</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="errands-sort-symbolic.svg">data/icons/errands-sort-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="errands-cog-symbolic.svg">data/icons/errands-cog-symbolic.svg</file>
   </gresource>
 </gresources>

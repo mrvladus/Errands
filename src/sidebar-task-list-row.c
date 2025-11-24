@@ -120,7 +120,7 @@ void on_errands_sidebar_task_list_row_activate(GtkListBox *box, ErrandsSidebarTa
   // Set setting
   const char *list_uid = tmp_str_printf(errands_data_get_str(row->data->data, DATA_PROP_LIST_UID));
   LOG("Switch to list '%s'", list_uid);
-  errands_settings_set("last_list_uid", SETTING_TYPE_STRING, (void *)list_uid);
+  errands_settings_set(SETTING_LAST_LIST_UID, (void *)list_uid);
   errands_task_list_show_task_list(task_list, row->data);
 }
 

@@ -28,6 +28,10 @@ static const char *const settings_keys_strs[SETTINGS_COUNT] = {
     [SETTING_TAGS] = "tags",
     [SETTING_WINDOW_HEIGHT] = "window_height",
     [SETTING_WINDOW_WIDTH] = "window_width",
+    [SETTING_NOTIFICATIONS] = "notifications",
+    [SETTING_BACKGROUND] = "background",
+    [SETTING_STARTUP] = "startup",
+    [SETTING_THEME] = "theme",
 };
 
 #define SETTING(key) settings_keys_strs[key]
@@ -48,6 +52,10 @@ void errands_settings_load_default() {
   json_object_add(settings, SETTING(SETTING_TAGS), json_string_new(""));
   json_object_add(settings, SETTING(SETTING_WINDOW_HEIGHT), json_int_new(600));
   json_object_add(settings, SETTING(SETTING_WINDOW_WIDTH), json_int_new(800));
+  json_object_add(settings, SETTING(SETTING_NOTIFICATIONS), json_bool_new(true));
+  json_object_add(settings, SETTING(SETTING_BACKGROUND), json_bool_new(true));
+  json_object_add(settings, SETTING(SETTING_STARTUP), json_bool_new(false));
+  json_object_add(settings, SETTING(SETTING_THEME), json_int_new(SETTING_THEME_SYSTEM));
 }
 
 void errands_settings_load_user() {
@@ -56,8 +64,8 @@ void errands_settings_load_user() {
   if (!json) return;
   autoptr(JSON) json_parsed = json_parse(json);
   if (!json_parsed) return;
-  for (size_t i = 0; i < SETTINGS_COUNT; i++) {
-    JSON *node = json_object_get(json_parsed, settings_keys_strs[i]);
+  JSON *node;
+  for (size_t i = 0; (node = json_object_get(json_parsed, settings_keys_strs[i])); i++) {
     JSON *dup = json_dup(node);
     json_object_add(settings, settings_keys_strs[i], dup);
   }
@@ -92,17 +100,34 @@ ErrandsSetting errands_settings_get(ErrandsSettingsKey key) {
   case SETTING_TAGS: out.s = res->string_val; break;
   case SETTING_WINDOW_HEIGHT: out.i = res->int_val; break;
   case SETTING_WINDOW_WIDTH: out.i = res->int_val; break;
+  case SETTING_NOTIFICATIONS: out.b = res->bool_val; break;
+  case SETTING_BACKGROUND: out.b = res->bool_val; break;
+  case SETTING_STARTUP: out.b = res->bool_val; break;
+  case SETTING_THEME: out.i = res->int_val; break;
   case SETTINGS_COUNT: break;
   }
   return out;
 }
 
-void errands_settings_set(const char *key, ErrandsSettingType type, void *value) {
-  JSON *res = json_object_get(settings, key);
-  switch (type) {
-  case SETTING_TYPE_BOOL: res->bool_val = *(bool *)value; break;
-  case SETTING_TYPE_INT: res->int_val = *(int *)value; break;
-  case SETTING_TYPE_STRING: json_replace_string(&res->string_val, value); break;
+void errands_settings_set(ErrandsSettingsKey key, void *value) {
+  JSON *res = json_object_get(settings, SETTING(key));
+  switch (key) {
+  case SETTING_LAST_LIST_UID: json_replace_string(&res->string_val, value); break;
+  case SETTING_MAXIMIZED: res->bool_val = *(bool *)value; break;
+  case SETTING_SHOW_COMPLETED: res->bool_val = *(bool *)value; break;
+  case SETTING_SORT_BY: res->int_val = *(int *)value; break;
+  case SETTING_SYNC: res->bool_val = *(bool *)value; break;
+  case SETTING_SYNC_PROVIDER: json_replace_string(&res->string_val, value); break;
+  case SETTING_SYNC_URL: json_replace_string(&res->string_val, value); break;
+  case SETTING_SYNC_USERNAME: json_replace_string(&res->string_val, value); break;
+  case SETTING_TAGS: json_replace_string(&res->string_val, value); break;
+  case SETTING_WINDOW_HEIGHT: res->int_val = *(int *)value; break;
+  case SETTING_WINDOW_WIDTH: res->int_val = *(int *)value; break;
+  case SETTING_NOTIFICATIONS: res->bool_val = *(bool *)value; break;
+  case SETTING_BACKGROUND: res->bool_val = *(bool *)value; break;
+  case SETTING_STARTUP: res->bool_val = *(bool *)value; break;
+  case SETTING_THEME: res->int_val = *(int *)value; break;
+  case SETTINGS_COUNT: break;
   }
   errands_settings_save();
 }
@@ -156,7 +181,7 @@ static void perform_save() {
 }
 
 void errands_settings_save() {
-  double diff = difftime(time(NULL), last_save_time);
+  double diff = difftime(TIME_NOW, last_save_time);
   if (pending_save) return;
   if (diff < 1.0f) {
     pending_save = true;

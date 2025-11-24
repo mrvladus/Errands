@@ -28,12 +28,12 @@ template $ErrandsSidebar: Adw.Bin {
         action-name: "sidebar.new_list";
 
         ShortcutController {
+          scope: global;
+
           Shortcut {
             trigger: "<Control><Shift>L";
             action: "action(sidebar.new_list)";
           }
-
-          scope: global;
         }
       }
 
@@ -41,6 +41,15 @@ template $ErrandsSidebar: Adw.Bin {
       MenuButton {
         icon-name: "open-menu-symbolic";
         menu-model: main_menu;
+
+        ShortcutController {
+          scope: global;
+
+          Shortcut {
+            trigger: "<Control>comma";
+            action: "action(sidebar.preferences)";
+          }
+        }
       }
     }
 

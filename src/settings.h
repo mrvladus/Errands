@@ -16,6 +16,10 @@ typedef enum {
   SETTING_TAGS,
   SETTING_WINDOW_HEIGHT,
   SETTING_WINDOW_WIDTH,
+  SETTING_NOTIFICATIONS,
+  SETTING_BACKGROUND,
+  SETTING_STARTUP,
+  SETTING_THEME,
 
   SETTINGS_COUNT
 } ErrandsSettingsKey;
@@ -33,6 +37,12 @@ typedef enum {
   SORT_TYPE_START_DATE,
 } ErrandsSortType;
 
+typedef enum {
+  SETTING_THEME_SYSTEM,
+  SETTING_THEME_LIGHT,
+  SETTING_THEME_DARK,
+} ErrandsSettingTheme;
+
 typedef union {
   int i;
   bool b;
@@ -41,7 +51,7 @@ typedef union {
 
 void errands_settings_init();
 ErrandsSetting errands_settings_get(ErrandsSettingsKey key);
-void errands_settings_set(const char *key, ErrandsSettingType type, void *value);
+void errands_settings_set(ErrandsSettingsKey key, void *value);
 
 // Global tags
 
