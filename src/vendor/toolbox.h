@@ -17,6 +17,7 @@
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -130,88 +131,87 @@ extern const char *toolbox_log_prefix;
 
 // Dynamic array struct
 typedef struct {
-  void **items;
   size_t len;
   size_t capacity;
   void (*item_free_func)(void *);
-} tb_array;
+  void **items;
+} array;
 
-// Create new array struct with `initial_capacity`
-static inline tb_array tb_array_new(size_t initial_capacity) {
-  tb_array array = {
-      .items = calloc(1, sizeof(void *) * initial_capacity),
-      .len = 0,
-      .capacity = initial_capacity,
-      .item_free_func = NULL,
-  };
-  return array;
-}
-
-// Free `array` and its items if `item_free_func` is provided
-static inline void tb_array_free(tb_array *array) {
-  if (array->item_free_func)
-    for (size_t i = 0; i < array->len; i++) array->item_free_func(array->items[i]);
-  if (array->items) free(array->items);
+// Create new array with `initial_capacity`
+static inline array *array_new(size_t initial_capacity) {
+  array *a = calloc(1, sizeof(array));
+  a->capacity = initial_capacity;
+  a->items = calloc(1, sizeof(void *) * initial_capacity);
+  return a;
 }
 
 // Create new array struct with `initial_capacity` and `item_free_func`
-static inline tb_array tb_array_new_with_free_func(size_t initial_capacity, void (*item_free_func)(void *)) {
-  tb_array array = tb_array_new(initial_capacity);
-  array.item_free_func = item_free_func;
-  return array;
+static inline array *array_new_with_free_func(size_t initial_capacity, void (*item_free_func)(void *)) {
+  array *a = calloc(1, sizeof(array));
+  a->capacity = initial_capacity;
+  a->item_free_func = item_free_func;
+  a->items = calloc(1, sizeof(void *) * initial_capacity);
+  return a;
 }
 
-// Add `item` to `array`
-static inline void tb_array_add(tb_array *array, void *item) {
-  if (array->capacity == array->len) {
-    array->capacity *= 2;
-    array->items = realloc(array->items, array->capacity * sizeof(void *));
+// Free array and its items if `item_free_func` is provided
+static inline void array_free(array *a) {
+  if (a->item_free_func) for_range(i, 0, a->len) a->item_free_func(a->items[i]);
+  if (a->items) free(a->items);
+}
+
+// Add `item` to array
+static inline void array_add(array *a, void *item) {
+  if (a->capacity == a->len) {
+    a->capacity *= 2;
+    a->items = realloc(a->items, a->capacity * sizeof(void *));
   }
-  array->items[array->len++] = item;
+  a->items[a->len++] = item;
 }
 
-// Insert `item` at `idx` in `array`
-static inline void tb_array_insert(tb_array *array, size_t idx, void *item) {
-  if (array->capacity == array->len) {
-    array->capacity *= 2;
-    array->items = realloc(array->items, array->capacity * sizeof(void *));
+// Insert `item` at `idx` in array. If `idx` is -1 - append to end.
+static inline void array_insert(array *a, int64_t idx, void *item) {
+  if (idx == -1) {
+    array_add(a, item);
+    return;
   }
-  for (size_t i = array->len; i > idx; i--) array->items[i] = array->items[i - 1];
-  array->items[idx] = item;
-  array->len++;
+  if (a->capacity == a->len) {
+    a->capacity *= 2;
+    a->items = realloc(a->items, a->capacity * sizeof(void *));
+  }
+  for (size_t i = a->len; i > idx; i--) a->items[i] = a->items[i - 1];
+  a->items[idx] = item;
+  a->len++;
 }
 
-// Remove and free last item from `array`
-static inline void tb_array_pop(tb_array *array) {
-  if (array->item_free_func) array->item_free_func(array->items[array->len - 1]);
-  array->len--;
+// Remove and free last item from array
+static inline void array_pop(array *a) {
+  if (a->item_free_func) a->item_free_func(a->items[a->len - 1]);
+  a->len--;
 }
 
-// Remove last item from `array` and return it without freeing it.
+// Remove last item from array and return it without freeing it.
 // User is responsible for freeing the returned item.
-static inline void *tb_array_steal(tb_array *array) {
-  if (array->len == 0) return NULL;
-  void *item = array->items[array->len - 1];
-  array->len--;
+static inline void *array_steal(array *a) {
+  if (a->len == 0) return NULL;
+  void *item = a->items[a->len - 1];
+  a->len--;
   return item;
 }
 
-// Remove item at `idx` from `array` and return it without freeing it.
+// Remove item at `idx` from array and return it without freeing it.
 // Move items after idx.
 // User is responsible for freeing the returned item.
-static inline void *tb_array_steal_idx(tb_array *array, size_t idx) {
-  if (array->len == 0) return NULL;
-  void *item = array->items[idx];
-  for (size_t i = idx; i < array->len - 1; i++) array->items[i] = array->items[i + 1];
-  array->len--;
+static inline void *array_steal_idx(array *a, size_t idx) {
+  if (a->len == 0) return NULL;
+  void *item = a->items[idx];
+  for (size_t i = idx; i < a->len - 1; i++) a->items[i] = a->items[i + 1];
+  a->len--;
   return item;
 }
 
-// Get last item of the `array`
-static inline void *tb_array_last(tb_array *array) {
-  if (array->len == 0) return NULL;
-  return array->items[array->len - 1];
-}
+// Get last item of the array or NULL if array is empty.
+static inline void *array_last(array *a) { return a->len == 0 ? NULL : a->items[a->len - 1]; }
 
 // -------------------- TEMPORARY STRING -------------------- //
 
@@ -302,14 +302,14 @@ static inline bool write_string_to_file(const char *path, const char *str) {
 
 // Get path base name. e. g. "/home/user/file.txt" -> "file.txt".
 // Returns pointer to the beginning of the base name in the path or NULL on error.
-static inline const char *tb_path_base_name(const char *path) {
+static inline const char *path_base_name(const char *path) {
   const char *last_sep = strrchr(path, '/');
   if (!last_sep) last_sep = strrchr(path, '\\');
   return last_sep ? last_sep + 1 : path;
 }
 // Get path extension. e. g. "/home/user/file.txt" -> "txt".
 // Returns pointer to the beginning of the extension in the path or NULL on error.
-static inline const char *tb_path_ext(const char *path) {
+static inline const char *path_ext(const char *path) {
   const char *last_dot = strrchr(path, '.');
   return last_dot ? last_dot + 1 : NULL;
 }
