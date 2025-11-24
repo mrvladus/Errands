@@ -1,4 +1,5 @@
 using Gtk 4.0;
+using Gdk 4.0;
 using Adw 1;
 
 menu rc_menu {
@@ -11,8 +12,13 @@ menu rc_menu {
 template $ErrandsTask: Box {
   orientation: vertical;
 
+  cursor: Gdk.Cursor {
+    name: "pointer";
+  };
+
   styles [
     "card",
+    "task",
   ]
 
   accessibility {
@@ -215,5 +221,10 @@ template $ErrandsTask: Box {
     styles [
       "sub-task-entry",
     ]
+  }
+
+  GestureClick {
+    button: 1;
+    released => $on_expand_toggle_cb(template);
   }
 }

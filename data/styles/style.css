@@ -1,10 +1,14 @@
+.task:hover {
+    box-shadow: 0 0 0 3px var(--shade-color);
+}
+
 .task-title-row {
     border-radius: 12px;
     background-color: transparent;
 }
 
 .sub-task-entry {
-    opacity: 0.5;
+    opacity: 0.6;
     transition: 0.2s;
 }
 
@@ -27,12 +31,6 @@
 .tag > button {
     all: unset;
     margin-left: 4px;
-}
-
-/* Sub tasks */
-
-.sub-tasks:last-child {
-    margin-bottom: 6px;
 }
 
 .priority-low {
@@ -203,16 +201,6 @@
 }
 
 /* Overrides */
-
-listview {
-    background-color: transparent;
-}
-
-listview row {
-    padding: 0px 4px;
-    margin: 2px 0px;
-    border-radius: 14px;
-}
 
 colorbutton button {
     border-radius: 9999px;

@@ -175,3 +175,4 @@ void errands_task_list_show_all_tasks(ErrandsTaskList *self);
 void errands_task_list_show_today_tasks(ErrandsTaskList *self);
 void errands_task_list_show_task_list(ErrandsTaskList *self, ListData2 *data);
 void errands_task_list_redraw_tasks(ErrandsTaskList *self);
+void errands_task_list_reload(ErrandsTaskList *self);

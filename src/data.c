@@ -1,4 +1,5 @@
 #include "data.h"
+#include "glib.h"
 #include "settings.h"
 
 #include "vendor/json.h"
@@ -207,11 +208,7 @@ void errands_data_get_stats(size_t *total, size_t *completed) {
 void errands_data_get_flat_list(GPtrArray *tasks) {
   for_range(i, 0, errands_data_lists->len) {
     ListData2 *list = g_ptr_array_index(errands_data_lists, i);
-    g_ptr_array_extend(tasks, list->children, NULL, NULL);
-    for_range(j, 0, list->children->len) {
-      TaskData2 *task_data = g_ptr_array_index(list->children, j);
-      errands_task_data_get_flat_list(task_data, tasks);
-    }
+    errands_list_data_get_flat_list(list, tasks);
   }
 }
 
@@ -295,8 +292,11 @@ void errands_list_data_print(ListData2 *data) {
 }
 
 void errands_list_data_get_flat_list(ListData2 *data, GPtrArray *tasks) {
-  g_ptr_array_extend(tasks, data->children, NULL, NULL);
-  for_range(i, 0, data->children->len) errands_task_data_get_flat_list(g_ptr_array_index(data->children, i), tasks);
+  for_range(i, 0, data->children->len) {
+    TaskData2 *task_data = g_ptr_array_index(data->children, i);
+    g_ptr_array_add(tasks, task_data);
+    errands_task_data_get_flat_list(task_data, tasks);
+  }
 }
 
 static void errands_data__write_list(ListData2 *data) {
@@ -346,9 +346,13 @@ void errands_task_data_free(TaskData2 *data) {
 }
 
 size_t errands_task_data_get_indent_level(TaskData2 *data) {
+  if (!data) return 0;
   size_t indent = 0;
-  TaskData2 *parent;
-  while ((parent = data->parent)) indent++;
+  TaskData2 *parent = data->parent;
+  while (parent) {
+    indent++;
+    parent = parent->parent;
+  }
   return indent;
 }
 
@@ -372,8 +376,11 @@ void errands_task_data_print(TaskData2 *data) {
 }
 
 void errands_task_data_get_flat_list(TaskData2 *parent, GPtrArray *array) {
-  g_ptr_array_extend(array, parent->children, NULL, NULL);
-  for_range(i, 0, parent->children->len) errands_task_data_get_flat_list(g_ptr_array_index(parent->children, i), array);
+  for_range(i, 0, parent->children->len) {
+    TaskData2 *sub_task = g_ptr_array_index(parent->children, i);
+    g_ptr_array_add(array, sub_task);
+    errands_task_data_get_flat_list(sub_task, array);
+  }
 }
 
 // ---------- SAVING DATA ---------- //
