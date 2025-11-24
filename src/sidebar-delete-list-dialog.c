@@ -1,6 +1,9 @@
+#include "data.h"
 #include "sidebar.h"
 #include "state.h"
+#include "sync.h"
 #include "vendor/toolbox.h"
+#include <libical/ical.h>
 
 static void on_response_cb(ErrandsSidebarDeleteListDialog *dialog, gchar *response, gpointer data);
 
@@ -48,21 +51,11 @@ static void on_response_cb(ErrandsSidebarDeleteListDialog *dialog, gchar *respon
   if (STR_EQUAL(response, "delete")) {
     ErrandsSidebarTaskListRow *row = state.main_window->sidebar->delete_list_dialog->current_task_list_row;
     LOG("Delete List Dialog: Deleting task list %s", errands_data_get_str(row->data->data, DATA_PROP_LIST_UID));
-    // Delete tasks widgets
-    // GPtrArray *tasks = get_children(state.main_window->task_list->task_list);
-    // for (size_t i = 0; i < tasks->len; i++) {
-    //   ErrandsTask *task = tasks->pdata[i];
-    //   if (STR_EQUAL(errands_data_get_str(row->data, DATA_PROP_LIST_UID),
-    //                   errands_data_get_str(task->data, DATA_PROP_LIST_UID)))
-    //     // gtk_list_box_remove(GTK_LIST_BOX(state.main_window->task_list->task_list), GTK_WIDGET(task));
-    // }
-    // g_ptr_array_free(tasks, false);
     // Delete data
     errands_data_set_bool(row->data->data, DATA_PROP_DELETED, true);
     errands_data_set_bool(row->data->data, DATA_PROP_SYNCED, false);
-    // g_ptr_array_remove(ldata, dialog->current_task_list_row->data);
-    // errands_data_write_list(row->data);
-
+    errands_data_write_list(row->data);
+    needs_sync = true;
     GtkWidget *prev = gtk_widget_get_prev_sibling(GTK_WIDGET(row));
     GtkWidget *next = gtk_widget_get_next_sibling(GTK_WIDGET(row));
     // Delete sidebar row
@@ -77,6 +70,5 @@ static void on_response_cb(ErrandsSidebarDeleteListDialog *dialog, gchar *respon
       return;
     }
     errands_window_update(state.main_window);
-    // TODO: sync
   }
 }
