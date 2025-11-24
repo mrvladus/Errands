@@ -1,7 +1,7 @@
 #include "task-list.h"
 #include "data.h"
-#include "glib-object.h"
-#include "glib.h"
+#include "gdk/gdk.h"
+#include "gio/gio.h"
 #include "gtk/gtk.h"
 #include "sidebar.h"
 #include "state.h"
@@ -12,10 +12,10 @@
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>
-#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
-#define TASKS_STACK_SIZE 30
-
+static size_t tasks_stack_size = 0;
 static GPtrArray *current_task_list;
 static size_t current_start;
 static ErrandsTask *measuring_task = NULL;
@@ -54,16 +54,29 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
 }
 
 static void errands_task_list_init(ErrandsTaskList *self) {
-  LOG_NO_LN("Task List: Create ... ");
+  LOG("Task List: Create");
   gtk_widget_init_template(GTK_WIDGET(self));
   gtk_search_bar_connect_entry(GTK_SEARCH_BAR(self->search_bar), GTK_EDITABLE(self->search_entry));
-  for_range(i, 0, TASKS_STACK_SIZE) {
+  measuring_task = errands_task_new();
+  // Get maximum monitor height
+  GdkDisplay *display = gdk_display_get_default();
+  GListModel *monitors = gdk_display_get_monitors(display);
+  int max_height = 0;
+  GdkRectangle rect = {0};
+  for_range(i, 0, g_list_model_get_n_items(monitors)) {
+    GdkMonitor *monitor = g_list_model_get_item(monitors, i);
+    gdk_monitor_get_geometry(monitor, &rect);
+    if (rect.height > max_height) max_height = rect.height;
+  }
+  int max_tasks = max_height / (46 + 8);        // Get number of maximum tasks on the screen
+  tasks_stack_size = max_tasks + max_tasks / 2; // Add half of that as margin and set stack size
+  // Create Tasks widgets
+  for_range(i, 0, tasks_stack_size) {
     ErrandsTask *task = errands_task_new();
     gtk_box_append(GTK_BOX(self->task_list), GTK_WIDGET(task));
     gtk_widget_set_visible(GTK_WIDGET(task), false);
   }
-  measuring_task = errands_task_new();
-  LOG_NO_PREFIX("Success");
+  LOG("Task List: Created %zu Tasks", tasks_stack_size);
 }
 
 ErrandsTaskList *errands_task_list_new() { return g_object_new(ERRANDS_TYPE_TASK_LIST, NULL); }
@@ -108,7 +121,7 @@ void errands_task_list_redraw_tasks(ErrandsTaskList *self) {
   LOG("Task List: Redraw Tasks");
   if (current_task_list->len == 0) return;
   g_autoptr(GPtrArray) children = get_children(self->task_list);
-  for (size_t i = 0, j = current_start; i < MIN(TASKS_STACK_SIZE, current_task_list->len - current_start);) {
+  for (size_t i = 0, j = current_start; i < MIN(tasks_stack_size, current_task_list->len - current_start);) {
     ErrandsTask *task = g_ptr_array_index(children, i++);
     TaskData2 *data = g_ptr_array_index(current_task_list, j++);
     errands_task_set_data(task, data);
