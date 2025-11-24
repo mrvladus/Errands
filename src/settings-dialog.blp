@@ -1,0 +1,84 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $ErrandsSettingsDialog: Adw.PreferencesDialog {
+  search-enabled: true;
+
+  Adw.PreferencesPage {
+    Adw.PreferencesGroup {
+      title: _("Appearance");
+
+      Adw.ActionRow {
+        title: _("Theme");
+
+        [suffix]
+        Adw.ToggleGroup theme {
+          valign: center;
+          notify::active => $on_theme_toggled_cb(template);
+
+          Adw.Toggle system {
+            label: _("System");
+            icon-name: "errands-cog-symbolic";
+          }
+
+          Adw.Toggle light {
+            label: _("Light");
+            icon-name: "errands-afternoon-symbolic";
+          }
+
+          Adw.Toggle dark {
+            label: _("Dark");
+            icon-name: "errands-night-symbolic";
+          }
+
+          styles [
+            "round",
+          ]
+        }
+      }
+    }
+
+    Adw.PreferencesGroup {
+      title: _("Miscellaneous");
+
+      Adw.SwitchRow notifications {
+        title: _("Show Notifications");
+        notify::active => $on_notifications_toggled_cb(template);
+      }
+
+      Adw.SwitchRow background {
+        title: _("Work in the Background");
+        notify::active => $on_background_toggled_cb(template);
+      }
+
+      Adw.SwitchRow startup {
+        title: _("Launch at Startup");
+        notify::active => $on_startup_toggled_cb(template);
+      }
+    }
+
+    Adw.PreferencesGroup {
+      title: _("Sync");
+
+      Adw.SwitchRow sync_enabled {
+        title: _("Enabled");
+        notify::active => $on_sync_toggled_cb(template);
+      }
+
+      Adw.EntryRow sync_url {
+        title: _("CalDAV Server URL");
+        visible: bind sync_enabled.active;
+      }
+
+      Adw.EntryRow sync_username {
+        title: _("Username");
+        visible: bind sync_enabled.active;
+      }
+
+      Adw.PasswordEntryRow sync_password {
+        title: _("Password");
+        visible: bind sync_enabled.active;
+      }
+    }
+  }
+}
