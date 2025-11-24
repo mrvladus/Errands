@@ -432,7 +432,7 @@ static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *self) {
   LOG("Task '%s': Add sub-task '%s'", errands_data_get_str(new_data->data, DATA_PROP_UID),
       errands_data_get_str(new_data->data, DATA_PROP_UID));
   needs_sync = true;
-  errands_task_list_reload(state.main_window->task_list);
+  errands_task_list_reload(state.main_window->task_list, true);
 }
 
 static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x, gdouble y, GtkPopover *popover) {
@@ -443,10 +443,9 @@ static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x, gdoub
 static void on_expand_toggle_cb(ErrandsTask *self, GtkGestureClick *ctrl, gint n_press, gdouble x, gdouble y) {
   bool new_expanded = !errands_data_get_bool(self->data->data, DATA_PROP_EXPANDED);
   LOG("Task '%s': Toggle expand: %d", errands_data_get_str(self->data->data, DATA_PROP_UID), new_expanded);
-  gtk_widget_set_visible(self->sub_entry, new_expanded);
   errands_data_set_bool(self->data->data, DATA_PROP_EXPANDED, new_expanded);
   errands_data_write_list(self->data->list);
-  errands_task_list_redraw_tasks(state.main_window->task_list);
+  errands_task_list_reload(state.main_window->task_list, true);
 }
 
 // --- ACTIONS CALLBACKS --- //
