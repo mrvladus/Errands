@@ -22,6 +22,8 @@ SRCS = $(wildcard $(SRC_DIR)/*.c)
 OBJS = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRCS))
 DEPS = $(OBJS:.o=.d)
 BLPS = $(wildcard $(SRC_DIR)/*.blp)
+CSS = $(wildcard $(DATA_DIR)/styles/*.css)
+ICONS = $(wildcard $(DATA_DIR)/icons/*.svg)
 
 # Compilation variables
 
@@ -47,7 +49,7 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
 $(BUILD_DIR)/$(NAME): $(OBJS)
 	@$(CC) -o $@ $^ $(LDFLAGS)
 
-$(SRC_DIR)/resources.c: $(DATA_DIR)/$(NAME).gresource.xml $(BLPS)
+$(SRC_DIR)/resources.c: $(DATA_DIR)/$(NAME).gresource.xml $(BLPS) $(CSS) $(ICONS)
 	@blueprint-compiler batch-compile $(BUILD_DIR) $(SRC_DIR) $(BLPS)
 	@glib-compile-resources --generate-source --target=$@ --c-name=$(NAME) $<
 

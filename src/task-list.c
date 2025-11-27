@@ -1,9 +1,5 @@
 #include "task-list.h"
 #include "data.h"
-#include "gdk/gdk.h"
-#include "gio/gio.h"
-#include "glib.h"
-#include "gtk/gtk.h"
 #include "sidebar.h"
 #include "state.h"
 #include "task.h"
@@ -14,7 +10,6 @@
 #include <glib/gi18n.h>
 #include <libical/ical.h>
 #include <stdbool.h>
-#include <stddef.h>
 #include <stdint.h>
 
 static size_t tasks_stack_size = 0;
@@ -104,19 +99,30 @@ static int errands_task_list__calculate_height(ErrandsTaskList *self) {
 
 static void errands_task_list__reset_scroll_cb(ErrandsTaskList *self) { gtk_adjustment_set_value(self->adj, 0.0); }
 
+static bool errands_task_list__task_has_any_collapsed_parent(TaskData2 *data) {
+  bool out = false;
+  TaskData2 *task = data->parent;
+  while (task) {
+    if (!errands_data_get_bool(task->data, DATA_PROP_EXPANDED)) {
+      out = true;
+      break;
+    }
+    task = task->parent;
+  }
+  return out;
+}
+
 // ---------- TASKS RECYCLER ---------- //
 
 void errands_task_list_redraw_tasks(ErrandsTaskList *self) {
-  // TODO: correct expanded parents. while loop
-
   LOG("Task List: Redraw Tasks");
-  static size_t indent_px = 15;
+  static uint8_t indent_px = 15;
   if (current_task_list->len == 0) return;
   g_autoptr(GPtrArray) children = get_children(self->task_list);
   for (size_t i = 0, j = current_start; i < MIN(tasks_stack_size, current_task_list->len - current_start);) {
     ErrandsTask *task = g_ptr_array_index(children, i++);
     TaskData2 *data = g_ptr_array_index(current_task_list, j++);
-    if (data->parent) CONTINUE_IF(!errands_data_get_bool(data->parent->data, DATA_PROP_EXPANDED))
+    CONTINUE_IF(errands_task_list__task_has_any_collapsed_parent(data));
     errands_task_set_data(task, data);
     gtk_widget_set_margin_start(GTK_WIDGET(task), errands_task_data_get_indent_level(data) * indent_px);
   }
