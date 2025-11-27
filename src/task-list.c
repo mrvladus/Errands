@@ -80,25 +80,6 @@ ErrandsTaskList *errands_task_list_new() { return g_object_new(ERRANDS_TYPE_TASK
 
 // ---------- PRIVATE FUNCTIONS ---------- //
 
-static int errands_task_list__calculate_height(ErrandsTaskList *self) {
-  // TODO: correct expanded parents. while loop
-  LOG_NO_LN("Task List: Calculating height ... ");
-  TIMER_START;
-  int height = 0;
-  GtkRequisition min_size, nat_size;
-  for_range(i, 0, current_task_list->len) {
-    TaskData2 *data = g_ptr_array_index(current_task_list, i);
-    if (data->parent) CONTINUE_IF(!errands_data_get_bool(data->parent->data, DATA_PROP_EXPANDED))
-    errands_task_set_data(measuring_task, data);
-    gtk_widget_get_preferred_size(GTK_WIDGET(measuring_task), &min_size, &nat_size);
-    height += nat_size.height;
-  }
-  LOG_NO_PREFIX("%d (%f sec.)", height, TIMER_ELAPSED_MS);
-  return height;
-}
-
-static void errands_task_list__reset_scroll_cb(ErrandsTaskList *self) { gtk_adjustment_set_value(self->adj, 0.0); }
-
 static bool errands_task_list__task_has_any_collapsed_parent(TaskData2 *data) {
   bool out = false;
   TaskData2 *task = data->parent;
@@ -111,6 +92,25 @@ static bool errands_task_list__task_has_any_collapsed_parent(TaskData2 *data) {
   }
   return out;
 }
+
+static int errands_task_list__calculate_height(ErrandsTaskList *self) {
+  // TODO: correct expanded parents. while loop
+  LOG_NO_LN("Task List: Calculating height ... ");
+  TIMER_START;
+  int height = 0;
+  GtkRequisition min_size, nat_size;
+  for_range(i, 0, current_task_list->len) {
+    TaskData2 *data = g_ptr_array_index(current_task_list, i);
+    CONTINUE_IF(errands_task_list__task_has_any_collapsed_parent(data));
+    errands_task_set_data(measuring_task, data);
+    gtk_widget_get_preferred_size(GTK_WIDGET(measuring_task), &min_size, &nat_size);
+    height += nat_size.height;
+  }
+  LOG_NO_PREFIX("%d (%f sec.)", height, TIMER_ELAPSED_MS);
+  return height;
+}
+
+static void errands_task_list__reset_scroll_cb(ErrandsTaskList *self) { gtk_adjustment_set_value(self->adj, 0.0); }
 
 // ---------- TASKS RECYCLER ---------- //
 
