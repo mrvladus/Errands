@@ -190,16 +190,31 @@ template $ErrandsTask: Box {
     }
   }
 
-  // Progress bar
-  ProgressBar progress_bar {
+  Box progress_box {
+    spacing: 12;
     margin-start: 12;
     margin-end: 12;
-    margin-bottom: 6;
-    opacity: 0.5;
+    margin-bottom: 3;
 
-    styles [
-      "osd",
-    ]
+    Label subtitle {
+      halign: start;
+
+      styles [
+        "dimmed",
+        "caption",
+        "numeric",
+      ]
+    }
+
+    ProgressBar progress_bar {
+      opacity: 0.5;
+      hexpand: true;
+      valign: center;
+
+      styles [
+        "osd",
+      ]
+    }
   }
 
   // Sub-Tasks Entry

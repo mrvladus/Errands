@@ -51,6 +51,8 @@ static void errands_task_class_init(ErrandsTaskClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, edit_title);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, toolbar_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, tags_box);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, progress_box);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, subtitle);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, progress_bar);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, date_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, date_btn_content);
@@ -156,14 +158,14 @@ void errands_task_update_progress(ErrandsTask *self) {
       total++;
     }
   }
-  gtk_widget_set_visible(self->progress_bar, total > 0);
+  gtk_widget_set_visible(self->progress_box, total > 0);
   gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(self->progress_bar), total > 0 ? (float)completed / (float)total : 0);
-  // Set sub-title
-  // if (total == 0) g_object_set(self->title, "subtitle", "", NULL);
-  // else {
-  //   g_autofree gchar *subtitle = g_strdup_printf(_("Completed: %zu / %zu"), completed, total);
-  //   g_object_set(task->title_row, "subtitle", subtitle, NULL);
-  // }
+  // Set subtitle
+  if (total == 0) gtk_label_set_label(GTK_LABEL(self->subtitle), "");
+  else {
+    const char *subtitle = tmp_str_printf(_("Completed: %zu / %zu"), completed, total);
+    gtk_label_set_label(GTK_LABEL(self->subtitle), subtitle);
+  }
 }
 
 void errands_task_update_toolbar(ErrandsTask *task) {
