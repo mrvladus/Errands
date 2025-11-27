@@ -50,9 +50,7 @@ static void errands_task_class_init(ErrandsTaskClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, title);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, edit_title);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, toolbar_btn);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, tags_revealer);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, tags_box);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, progress_revealer);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, progress_bar);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, date_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, date_btn_content);
@@ -148,34 +146,24 @@ void errands_task_update_accent_color(ErrandsTask *task) {
   }
 }
 
-void errands_task_update_progress(ErrandsTask *task) {
-  // if (!task) return;
-  // GObject *model_item = g_object_get_data(G_OBJECT(task), "model-item");
-  // if (!model_item) return;
-  // GListModel *model = g_object_get_data(model_item, "children-model");
-  // if (!model) return;
-  // size_t total = 0;
-  // size_t completed = 0;
-  // for (size_t i = 0; i < g_list_model_get_n_items(model); ++i) {
-  //   GObject *item = g_list_model_get_item(model, i);
-  //   TaskData *td = g_object_get_data(item, "data");
-  //   if (!errands_data_get_bool(td, DATA_PROP_DELETED) && !errands_data_get_bool(td, DATA_PROP_TRASH)) {
-  //     total++;
-  //     if (!icaltime_is_null_time(errands_data_get_time(td, DATA_PROP_COMPLETED_TIME))) completed++;
-  //   }
+void errands_task_update_progress(ErrandsTask *self) {
+  if (!self) return;
+  size_t total = 0, completed = 0;
+  for_range(i, 0, self->data->children->len) {
+    TaskData2 *data = g_ptr_array_index(self->data->children, i);
+    if (!errands_data_get_bool(data->data, DATA_PROP_DELETED) && !errands_data_get_bool(data->data, DATA_PROP_TRASH)) {
+      if (!icaltime_is_null_time(errands_data_get_time(data->data, DATA_PROP_COMPLETED_TIME))) completed++;
+      total++;
+    }
+  }
+  gtk_widget_set_visible(self->progress_bar, total > 0);
+  gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(self->progress_bar), total > 0 ? (float)completed / (float)total : 0);
+  // Set sub-title
+  // if (total == 0) g_object_set(self->title, "subtitle", "", NULL);
+  // else {
+  //   g_autofree gchar *subtitle = g_strdup_printf(_("Completed: %zu / %zu"), completed, total);
+  //   g_object_set(task->title_row, "subtitle", subtitle, NULL);
   // }
-  // gtk_revealer_set_reveal_child(GTK_REVEALER(task->progress_revealer), total > 0);
-  // gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(task->progress_bar), total > 0 ? (float)completed / (float)total :
-  // 0);
-
-  // TB_LOG_DEBUG("Task '%s' %d/%d", errands_data_get_str(task->data, DATA_PROP_TEXT), completed, total);
-  // // Set sub-title
-  // // if (total == 0) g_object_set(task->title_row, "subtitle", "", NULL);
-  // // else {
-  // //   g_autofree gchar *subtitle = g_strdup_printf(_("Completed: %zu / %zu"), completed, total);
-  // //   g_object_set(task->title_row, "subtitle", subtitle, NULL);
-  // // }
-  // g_ptr_array_free(sub_tasks, false);
 }
 
 void errands_task_update_toolbar(ErrandsTask *task) {
@@ -238,49 +226,14 @@ void errands_task_update_toolbar(ErrandsTask *task) {
     gtk_widget_add_css_class(task->date_btn, "error");
 }
 
-void errands_task_get_sub_tasks_tree(ErrandsTask *task, GPtrArray *array) {
-  if (!task) return;
-  GtkTreeListRow *row = g_object_get_data(G_OBJECT(task), "row");
-  if (!row) return;
-  GListModel *children = gtk_tree_list_row_get_children(row);
-  if (!children) return;
-  for (size_t i = 0; i < g_list_model_get_n_items(children); ++i) {
-    g_autoptr(GObject) item = g_list_model_get_item(children, i);
-    if (!item) return;
-    ErrandsTask *sub_task = g_object_get_data(item, "task");
-    if (!sub_task) return;
-    g_ptr_array_add(array, sub_task);
-    errands_task_get_sub_tasks_tree(sub_task, array);
-  }
-}
-
 // ---------- PRIVATE FUNCTIONS ---------- //
-
-static ErrandsTask *get_parent_task(ErrandsTask *task) {
-  GtkTreeListRow *row = g_object_get_data(G_OBJECT(task), "row");
-  if (!row) return NULL;
-  g_autoptr(GtkTreeListRow) parent_row = gtk_tree_list_row_get_parent(row);
-  if (!parent_row) return NULL;
-  g_autoptr(GObject) model_item = gtk_tree_list_row_get_item(parent_row);
-  if (!model_item) return NULL;
-  ErrandsTask *parent_task = g_object_get_data(model_item, "task");
-  return parent_task;
-}
-
-static void errands_task_get_parents(ErrandsTask *task, GPtrArray *array) {
-  ErrandsTask *parent = get_parent_task(task);
-  if (parent) {
-    g_ptr_array_add(array, parent);
-    errands_task_get_parents(parent, array);
-  }
-}
 
 // --- TAGS --- //
 
 static void errands_task_tag_delete(GtkWidget *label) {
   ErrandsTask *task = (ErrandsTask *)gtk_widget_get_ancestor(label, ERRANDS_TYPE_TASK);
   errands_data_remove_tag(task->data->data, DATA_PROP_TAGS, gtk_label_get_label(GTK_LABEL(label)));
-  // errands_data_write_list(task_data_get_list(task->data));
+  errands_data_write_list(task->data->list);
   errands_task_update_tags(task);
 }
 
@@ -304,16 +257,16 @@ static GtkWidget *errands_task_tag_new(const char *tag) {
   return box;
 }
 
-void errands_task_update_tags(ErrandsTask *task) {
+void errands_task_update_tags(ErrandsTask *self) {
   // Remove all tags
-  for (GtkWidget *child = gtk_widget_get_first_child(task->tags_box); child;
-       child = gtk_widget_get_first_child(task->tags_box))
-    adw_wrap_box_remove(ADW_WRAP_BOX(task->tags_box), child);
+  for (GtkWidget *child = gtk_widget_get_first_child(self->tags_box); child;
+       child = gtk_widget_get_first_child(self->tags_box))
+    adw_wrap_box_remove(ADW_WRAP_BOX(self->tags_box), child);
   // Add tags
-  g_auto(GStrv) tags = errands_data_get_strv(task->data->data, DATA_PROP_TAGS);
+  g_auto(GStrv) tags = errands_data_get_strv(self->data->data, DATA_PROP_TAGS);
   const size_t len = tags ? g_strv_length(tags) : 0;
-  for_range(i, 0, len) adw_wrap_box_append(ADW_WRAP_BOX(task->tags_box), errands_task_tag_new(tags[i]));
-  gtk_revealer_set_reveal_child(GTK_REVEALER(task->tags_revealer), len > 0);
+  for_range(i, 0, len) adw_wrap_box_append(ADW_WRAP_BOX(self->tags_box), errands_task_tag_new(tags[i]));
+  gtk_widget_set_visible(self->tags_box, len > 0);
 }
 
 const char *errands_task_as_str(ErrandsTask *task) {
@@ -330,62 +283,62 @@ const char *errands_task_as_str(ErrandsTask *task) {
 // NOTE: maybe this function is not optimized, but it always been the case.
 // Maybe need to look into it more.
 static void on_complete_btn_toggle_cb(ErrandsTask *self, GtkCheckButton *btn) {
-  LOG("Toggle completion '%s'", errands_data_get_str(self->data->data, DATA_PROP_UID));
-  bool active = gtk_check_button_get_active(btn);
-  errands_data_set_time(self->data->data, DATA_PROP_COMPLETED_TIME,
-                        active ? icaltime_get_date_time_now() : icaltime_null_time());
-  ErrandsTaskListPage page = state.main_window->task_list->page;
-  // Complete all sub-tasks if checked
-  if (active) {
-    GPtrArray *sub_tasks_tree = g_ptr_array_new();
-    // task_data_get_sub_tasks_tree(task->data->data, sub_tasks_tree, false);
-    // for (size_t i = 0; i < sub_tasks_tree->len; ++i) {
-    //   TaskData *sub_task_data = sub_tasks_tree->pdata[i];
-    //   errands_data_set_time(sub_task_data, DATA_PROP_COMPLETED_TIME, icaltime_get_date_time_now());
-    // }
-    g_ptr_array_free(sub_tasks_tree, false);
-    if (page == ERRANDS_TASK_LIST_PAGE_TODAY) errands_task_list_show_all_tasks(state.main_window->task_list);
-    sub_tasks_tree = g_ptr_array_new();
-    errands_task_get_sub_tasks_tree(self, sub_tasks_tree);
-    for (size_t i = 0; i < sub_tasks_tree->len; ++i) {
-      ErrandsTask *sub_task = sub_tasks_tree->pdata[i];
-      if (sub_task && ERRANDS_IS_TASK(sub_task)) errands_task_set_data(sub_task, sub_task->data);
-    }
-    g_ptr_array_free(sub_tasks_tree, false);
-  }
-  // Uncomplete parent tasks if unchecked
-  else {
-    GPtrArray *parents = g_ptr_array_new();
-    errands_task_get_parents(self, parents);
-    for (size_t i = 0; i < parents->len; ++i) {
-      ErrandsTask *parent = parents->pdata[i];
-      bool completed = gtk_check_button_get_active(GTK_CHECK_BUTTON(parent->complete_btn));
-      if (completed) {
-        errands_data_set_time(parent->data->data, DATA_PROP_COMPLETED_TIME, icaltime_null_time());
-        errands_task_set_data(parent, parent->data);
-      }
-      errands_task_update_progress(parent);
-    }
-    g_ptr_array_free(parents, false);
-  }
-  if (page == ERRANDS_TASK_LIST_PAGE_TODAY) errands_task_list_show_today_tasks(state.main_window->task_list);
+  // LOG("Toggle completion '%s'", errands_data_get_str(self->data->data, DATA_PROP_UID));
+  // bool active = gtk_check_button_get_active(btn);
+  // errands_data_set_time(self->data->data, DATA_PROP_COMPLETED_TIME,
+  //                       active ? icaltime_get_date_time_now() : icaltime_null_time());
+  // ErrandsTaskListPage page = state.main_window->task_list->page;
+  // // Complete all sub-tasks if checked
+  // if (active) {
+  //   GPtrArray *sub_tasks_tree = g_ptr_array_new();
+  //   // task_data_get_sub_tasks_tree(task->data->data, sub_tasks_tree, false);
+  //   // for (size_t i = 0; i < sub_tasks_tree->len; ++i) {
+  //   //   TaskData *sub_task_data = sub_tasks_tree->pdata[i];
+  //   //   errands_data_set_time(sub_task_data, DATA_PROP_COMPLETED_TIME, icaltime_get_date_time_now());
+  //   // }
+  //   g_ptr_array_free(sub_tasks_tree, false);
+  //   if (page == ERRANDS_TASK_LIST_PAGE_TODAY) errands_task_list_show_all_tasks(state.main_window->task_list);
+  //   sub_tasks_tree = g_ptr_array_new();
+  //   errands_task_get_sub_tasks_tree(self, sub_tasks_tree);
+  //   for (size_t i = 0; i < sub_tasks_tree->len; ++i) {
+  //     ErrandsTask *sub_task = sub_tasks_tree->pdata[i];
+  //     if (sub_task && ERRANDS_IS_TASK(sub_task)) errands_task_set_data(sub_task, sub_task->data);
+  //   }
+  //   g_ptr_array_free(sub_tasks_tree, false);
+  // }
+  // // Uncomplete parent tasks if unchecked
+  // else {
+  //   GPtrArray *parents = g_ptr_array_new();
+  //   errands_task_get_parents(self, parents);
+  //   for (size_t i = 0; i < parents->len; ++i) {
+  //     ErrandsTask *parent = parents->pdata[i];
+  //     bool completed = gtk_check_button_get_active(GTK_CHECK_BUTTON(parent->complete_btn));
+  //     if (completed) {
+  //       errands_data_set_time(parent->data->data, DATA_PROP_COMPLETED_TIME, icaltime_null_time());
+  //       errands_task_set_data(parent, parent->data);
+  //     }
+  //     errands_task_update_progress(parent);
+  //   }
+  //   g_ptr_array_free(parents, false);
+  // }
+  // if (page == ERRANDS_TASK_LIST_PAGE_TODAY) errands_task_list_show_today_tasks(state.main_window->task_list);
 
-  // errands_data_write_list(task_data_get_list(task->data));
-  errands_task_update_progress(self);
-  errands_task_update_progress(get_parent_task(self));
+  // // errands_data_write_list(task_data_get_list(task->data));
+  // errands_task_update_progress(self);
+  // errands_task_update_progress(get_parent_task(self));
 
-  // Sort task list by completion
-  // gtk_sorter_changed(GTK_SORTER(state.main_window->task_list->master_sorter), GTK_SORTER_CHANGE_MORE_STRICT);
-  // TODO: remember next row and scroll to it
+  // // Sort task list by completion
+  // // gtk_sorter_changed(GTK_SORTER(state.main_window->task_list->master_sorter), GTK_SORTER_CHANGE_MORE_STRICT);
+  // // TODO: remember next row and scroll to it
 
-  // Update task list
-  errands_task_list_update_title(state.main_window->task_list);
-  errands_sidebar_all_row_update_counter(state.main_window->sidebar->all_row);
-  errands_sidebar_today_row_update_counter(state.main_window->sidebar->today_row);
-  errands_sidebar_task_list_row_update_counter(
-      errands_sidebar_task_list_row_get(errands_data_get_str(self->data->data, DATA_PROP_LIST_UID)));
+  // // Update task list
+  // errands_task_list_update_title(state.main_window->task_list);
+  // errands_sidebar_all_row_update_counter(state.main_window->sidebar->all_row);
+  // errands_sidebar_today_row_update_counter(state.main_window->sidebar->today_row);
+  // errands_sidebar_task_list_row_update_counter(
+  //     errands_sidebar_task_list_row_get(errands_data_get_str(self->data->data, DATA_PROP_LIST_UID)));
 
-  needs_sync = true;
+  // needs_sync = true;
 }
 
 static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointer user_data) {

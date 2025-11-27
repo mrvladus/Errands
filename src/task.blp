@@ -96,16 +96,12 @@ template $ErrandsTask: Box {
   }
 
   // Tags bar
-  Revealer tags_revealer {
-    transition-duration: 100;
-
-    Adw.WrapBox tags_box {
-      margin-bottom: 6;
-      margin-start: 6;
-      margin-end: 6;
-      child-spacing: 6;
-      line-spacing: 6;
-    }
+  Adw.WrapBox tags_box {
+    margin-bottom: 6;
+    margin-start: 6;
+    margin-end: 6;
+    child-spacing: 6;
+    line-spacing: 6;
   }
 
   // Toolbar
@@ -195,19 +191,15 @@ template $ErrandsTask: Box {
   }
 
   // Progress bar
-  Revealer progress_revealer {
-    transition-duration: 100;
+  ProgressBar progress_bar {
+    margin-start: 12;
+    margin-end: 12;
+    margin-bottom: 6;
+    opacity: 0.5;
 
-    ProgressBar progress_bar {
-      margin-start: 12;
-      margin-end: 12;
-      margin-bottom: 6;
-      opacity: 0.5;
-
-      styles [
-        "osd",
-      ]
-    }
+    styles [
+      "osd",
+    ]
   }
 
   // Sub-Tasks Entry
