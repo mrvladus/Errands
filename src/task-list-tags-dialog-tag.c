@@ -2,6 +2,10 @@
 #include "settings.h"
 #include "task-list.h"
 
+#include "vendor/toolbox.h"
+
+#include <libical/ical.h>
+
 static void on_toggle_cb(ErrandsTaskListTagsDialogTag *self, GtkCheckButton *btn);
 static void on_delete_cb(ErrandsTaskListTagsDialogTag *self, GtkButton *btn);
 
@@ -10,6 +14,7 @@ static void on_delete_cb(ErrandsTaskListTagsDialogTag *self, GtkButton *btn);
 struct _ErrandsTaskListTagsDialogTag {
   AdwActionRow parent_instance;
   GtkWidget *check_btn;
+  ErrandsTaskListTagsDialog *dialog;
 };
 
 G_DEFINE_TYPE(ErrandsTaskListTagsDialogTag, errands_task_list_tags_dialog_tag, ADW_TYPE_ACTION_ROW)
@@ -31,8 +36,10 @@ static void errands_task_list_tags_dialog_tag_init(ErrandsTaskListTagsDialogTag 
   gtk_widget_init_template(GTK_WIDGET(self));
 }
 
-ErrandsTaskListTagsDialogTag *errands_task_list_tags_dialog_tag_new(const char *tag, ErrandsTask *task) {
+ErrandsTaskListTagsDialogTag *errands_task_list_tags_dialog_tag_new(ErrandsTaskListTagsDialog *dialog, const char *tag,
+                                                                    ErrandsTask *task) {
   ErrandsTaskListTagsDialogTag *self = g_object_new(ERRANDS_TYPE_TASK_LIST_TAGS_DIALOG_TAG, NULL);
+  self->dialog = dialog;
   adw_preferences_row_set_title(ADW_PREFERENCES_ROW(self), tag);
   g_auto(GStrv) tags = errands_data_get_strv(task->data->data, DATA_PROP_TAGS);
   const bool has_tag = tags && g_strv_contains((const gchar *const *)tags, tag);
@@ -49,32 +56,23 @@ static void on_toggle_cb(ErrandsTaskListTagsDialogTag *self, GtkCheckButton *btn
       ERRANDS_TASK_LIST_TAGS_DIALOG(gtk_widget_get_ancestor(GTK_WIDGET(self), ERRANDS_TYPE_TASK_LIST_TAGS_DIALOG)));
   gtk_check_button_get_active(btn) ? errands_data_add_tag(task->data->data, DATA_PROP_TAGS, tag)
                                    : errands_data_remove_tag(task->data->data, DATA_PROP_TAGS, tag);
-  // errands_data_write_list(task_data_get_list(task->data));
+  errands_data_write_list(task->data->list);
 }
 
 static void on_delete_cb(ErrandsTaskListTagsDialogTag *self, GtkButton *btn) {
-  ErrandsTaskListTagsDialog *dialog =
-      ERRANDS_TASK_LIST_TAGS_DIALOG(gtk_widget_get_ancestor(GTK_WIDGET(self), ERRANDS_TYPE_TASK_LIST_TAGS_DIALOG));
   // Delete tag from lists and all tasks
   const char *tag = adw_preferences_row_get_title(ADW_PREFERENCES_ROW(self));
+  LOG("Tags Dialog: Deleting tag: %s", tag);
   errands_settings_remove_tag(tag);
+  for_range(i, 0, errands_data_lists->len) {
+    ListData2 *list = g_ptr_array_index(errands_data_lists, i);
+    g_autoptr(GPtrArray) tasks = errands_list_data_get_all_tasks_as_icalcomponents(list);
+    for_range(j, 0, tasks->len) {
+      icalcomponent *task = g_ptr_array_index(tasks, j);
+      errands_data_remove_tag(task, DATA_PROP_TAGS, tag);
+    }
+  }
   // Delete tag widget row
   gtk_list_box_remove(GTK_LIST_BOX(gtk_widget_get_ancestor(GTK_WIDGET(self), GTK_TYPE_LIST_BOX)), GTK_WIDGET(self));
-  // Update all tasks and remove tag from their tags
-  // TODO: change model data here
-  // GPtrArray *tasks = errands_task_list_get_all_tasks();
-  // GPtrArray *lists_to_save = g_ptr_array_new();
-  // for (size_t i = 0; i < tasks->len; i++) {
-  //   ErrandsTask *task = tasks->pdata[i];
-  //   g_auto(GStrv) task_tags = errands_data_get_strv(task->data, DATA_PROP_TAGS);
-  //   if (g_strv_contains((const gchar *const *)task_tags, tag)) {
-  //     errands_data_remove_tag(task->data, DATA_PROP_TAGS, tag);
-  //     errands_task_update_tags(task);
-  //     g_ptr_array_add(lists_to_save, task_data_get_list(task->data));
-  //   }
-  // }
-  // for (size_t i = 0; i < lists_to_save->len; i++) errands_data_write_list(lists_to_save->pdata[i]);
-  // g_ptr_array_free(tasks, false);
-  // g_ptr_array_free(lists_to_save, false);
-  errands_task_list_tags_dialog_update_ui(dialog);
+  errands_task_list_tags_dialog_update_ui(self->dialog);
 }

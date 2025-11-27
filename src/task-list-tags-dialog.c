@@ -60,7 +60,8 @@ void errands_task_list_tags_dialog_show(ErrandsTask *task) {
   g_auto(GStrv) tags = errands_settings_get_tags();
   g_auto(GStrv) all_tags_no_dups = gstrv_remove_duplicates(tags);
   for (size_t i = 0; i < g_strv_length(all_tags_no_dups); i++) {
-    ErrandsTaskListTagsDialogTag *row = errands_task_list_tags_dialog_tag_new(all_tags_no_dups[i], self->current_task);
+    ErrandsTaskListTagsDialogTag *row =
+        errands_task_list_tags_dialog_tag_new(self, all_tags_no_dups[i], self->current_task);
     gtk_list_box_append(GTK_LIST_BOX(self->tags_box), GTK_WIDGET(row));
   }
   errands_task_list_tags_dialog_update_ui(self);
@@ -73,6 +74,7 @@ void errands_task_list_tags_dialog_show(ErrandsTask *task) {
 static void on_dialog_close_cb(ErrandsTaskListTagsDialog *self) {
   gtk_list_box_remove_all(GTK_LIST_BOX(self->tags_box));
   errands_task_update_tags(self->current_task);
+  errands_task_list_redraw_tasks(state.main_window->task_list);
 }
 
 static void on_entry_activated_cb(ErrandsTaskListTagsDialog *self, AdwEntryRow *entry) {
@@ -85,7 +87,7 @@ static void on_entry_activated_cb(ErrandsTaskListTagsDialog *self, AdwEntryRow *
     if (STR_EQUAL(tag, tags[i])) return;
   // Add tag to current list data
   errands_settings_add_tag(tag);
-  ErrandsTaskListTagsDialogTag *row = errands_task_list_tags_dialog_tag_new(tag, self->current_task);
+  ErrandsTaskListTagsDialogTag *row = errands_task_list_tags_dialog_tag_new(self, tag, self->current_task);
   gtk_list_box_append(GTK_LIST_BOX(self->tags_box), GTK_WIDGET(row));
   gtk_editable_set_text(GTK_EDITABLE(entry), "");
   errands_task_list_tags_dialog_update_ui(self);

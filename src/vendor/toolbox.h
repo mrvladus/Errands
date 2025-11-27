@@ -27,10 +27,12 @@
 // -------------------- AUTOMATIC CLEANUP -------------------- //
 
 #if defined(__GNUC__) || defined(__clang__)
+
 // Automatically free memory with custom free function.
 // Usage:
 //      autofree_f(my_free) char *str = my_malloc(69);
 #define autofree_f(free_func) __attribute__((cleanup(free_func)))
+
 // Automatically free memory allocated by malloc, calloc, realloc, strdup, etc.
 // Usage:
 //      autofree char *str = strdup("Hello, World!");
@@ -39,12 +41,14 @@ static inline void __autofree_free_func(void *p) {
   void **pp = (void **)p;
   if (*pp) free(*pp);
 }
+
 // If you have custom free func for your type you need to define this once like this:
 //      AUTOPTR_DEFINE(my_type, my_type_free_func)
 #define AUTOPTR_DEFINE(type, free_func)                                                                                \
   static inline void autoptr_##type##_free_func(type **_ptr) {                                                         \
     if (*_ptr) free_func(*_ptr);                                                                                       \
   }
+
 // After using `AUTOPTR_DEFINE` you can use it like this:
 //      autoptr(my_type) foo = my_type_new();
 #define autoptr(type) autofree_f(autoptr_##type##_free_func) type *
@@ -122,8 +126,10 @@ extern const char *toolbox_log_prefix;
 
 // Check if strings are equal.
 #define STR_EQUAL(s1, s2) (strcmp((const char *)(s1), (const char *)(s2)) == 0)
+
 // Check if string contains substring.
 #define STR_CONTAINS(s1, s2) (strstr((const char *)(s1), (const char *)(s2)) != NULL)
+
 // Check if string contains substring (case-insensitive).
 #define STR_CONTAINS_CASE(s1, s2) (strcasestr((const char *)(s1), (const char *)(s2)) != NULL)
 
@@ -159,6 +165,8 @@ static inline void array_free(array *a) {
   if (a->item_free_func) for_range(i, 0, a->len) a->item_free_func(a->items[i]);
   if (a->items) free(a->items);
 }
+
+AUTOPTR_DEFINE(array, array_free)
 
 // Add `item` to array
 static inline void array_add(array *a, void *item) {

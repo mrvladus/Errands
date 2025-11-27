@@ -12,10 +12,6 @@ menu rc_menu {
 template $ErrandsTask: Box {
   orientation: vertical;
 
-  cursor: Gdk.Cursor {
-    name: "pointer";
-  };
-
   styles [
     "card",
     "task",
@@ -54,6 +50,10 @@ template $ErrandsTask: Box {
       wrap: true;
       wrap-mode: char;
       xalign: 0;
+
+      cursor: Gdk.Cursor {
+        name: "pointer";
+      };
     }
 
     EditableLabel edit_title {

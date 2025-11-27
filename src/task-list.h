@@ -115,7 +115,8 @@ void errands_task_list_tags_dialog_show(ErrandsTask *task);
 G_DECLARE_FINAL_TYPE(ErrandsTaskListTagsDialogTag, errands_task_list_tags_dialog_tag, ERRANDS,
                      TASK_LIST_TAGS_DIALOG_TAG, AdwActionRow)
 
-ErrandsTaskListTagsDialogTag *errands_task_list_tags_dialog_tag_new(const char *tag, ErrandsTask *task);
+ErrandsTaskListTagsDialogTag *errands_task_list_tags_dialog_tag_new(ErrandsTaskListTagsDialog *dialog, const char *tag,
+                                                                    ErrandsTask *task);
 
 // --- TASK LIST SORT DIALOG --- //
 

@@ -5,6 +5,7 @@
 #include "vendor/json.h"
 #include "vendor/toolbox.h"
 
+#include <assert.h>
 #include <libical/ical.h>
 
 AUTOPTR_DEFINE(JSON, json_free)
@@ -888,11 +889,12 @@ void errands_data_add_tag(icalcomponent *data, DataPropStrv prop, const char *ta
 
 void errands_data_remove_tag(icalcomponent *data, DataPropStrv prop, const char *tag) {
   switch (prop) {
-  case DATA_PROP_TAGS:
-    for (icalproperty *p = icalcomponent_get_first_property(data, ICAL_CATEGORIES_PROPERTY); p != 0;
-         p = icalcomponent_get_next_property(data, ICAL_CATEGORIES_PROPERTY))
-      if (!strcmp(tag, icalproperty_get_value_as_string(p))) icalcomponent_remove_property(data, p);
-    break;
+  case DATA_PROP_TAGS: {
+    for (icalproperty *p = icalcomponent_get_first_property(data, ICAL_CATEGORIES_PROPERTY); p;
+         p = icalcomponent_get_next_property(data, ICAL_CATEGORIES_PROPERTY)) {
+      if (STR_EQUAL(tag, icalproperty_get_value_as_string(p))) icalcomponent_remove_property(data, p);
+    }
+  } break;
   case DATA_PROP_ATTACHMENTS: break;
   }
   errands_data_set_time(data, DATA_PROP_CHANGED_TIME, icaltime_get_date_time_now());
