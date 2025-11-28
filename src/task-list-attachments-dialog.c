@@ -1,5 +1,8 @@
+#include "gio/gio.h"
+#include "glib.h"
 #include "state.h"
 #include "task-list.h"
+#include "task.h"
 
 static void on_dialog_close_cb(ErrandsTaskListAttachmentsDialog *self);
 static void on_add_btn_clicked_cb();
@@ -97,18 +100,17 @@ static void errands_task_list_attachments_dialog_add_attachment(ErrandsTaskListA
 // ---------- CALLBACKS ---------- //
 
 static void on_dialog_close_cb(ErrandsTaskListAttachmentsDialog *self) {
-  gtk_widget_remove_css_class(self->current_task->attachments_btn, "accent");
-  g_auto(GStrv) attachments = errands_data_get_strv(self->current_task->data->data, DATA_PROP_ATTACHMENTS);
-  if ((attachments ? g_strv_length(attachments) : 0) > 0)
-    gtk_widget_add_css_class(self->current_task->attachments_btn, "accent");
+  errands_task_update_toolbar(self->current_task);
 }
 
 static void __on_open_finish(GObject *obj, GAsyncResult *res, gpointer data) {
   g_autoptr(GFile) file = gtk_file_dialog_open_finish(GTK_FILE_DIALOG(obj), res, NULL);
   if (!file) return;
+  GFileInfo *info = g_file_query_info(file, "xattr::document-portal.host-path", G_FILE_QUERY_INFO_NONE, NULL, NULL);
+  const char *real_path = g_file_info_get_attribute_as_string(info, "xattr::document-portal.host-path");
   g_autofree char *path = g_file_get_path(file);
-  // TODO: get real path if under flatpak using getfattr ?
-  errands_task_list_attachments_dialog_add_attachment(state.main_window->task_list->attachments_dialog, path);
+  errands_task_list_attachments_dialog_add_attachment(state.main_window->task_list->attachments_dialog,
+                                                      real_path ? real_path : path);
 }
 
 static void on_add_btn_clicked_cb() {

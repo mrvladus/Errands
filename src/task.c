@@ -175,8 +175,9 @@ void errands_task_update_toolbar(ErrandsTask *task) {
   if (errands_data_get_str(data->data, DATA_PROP_NOTES)) gtk_widget_add_css_class(task->notes_btn, "accent");
   // Attachments button
   g_auto(GStrv) attachments = errands_data_get_strv(data->data, DATA_PROP_ATTACHMENTS);
-  if (attachments && g_strv_length(attachments) > 0)
-    gtk_widget_add_css_class(GTK_WIDGET(task->attachments_btn), "accent");
+  gtk_widget_set_css_classes(
+      task->priority_btn,
+      (const char *[]){"image-button", "flat", attachments && g_strv_length(attachments) > 0 ? "accent" : NULL, NULL});
   // Priority button
   uint8_t priority = errands_data_get_int(data->data, DATA_PROP_PRIORITY);
   gtk_button_set_icon_name(GTK_BUTTON(task->priority_btn),

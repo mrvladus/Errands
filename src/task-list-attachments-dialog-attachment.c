@@ -54,7 +54,7 @@ static void on_delete_cb(ErrandsTaskListAttachmentsDialogAttachment *self, GtkBu
       g_strv_builder_add(builder, cur_attachments[i]);
   g_auto(GStrv) attachments = g_strv_builder_end(builder);
   errands_data_set_strv(task->data->data, DATA_PROP_ATTACHMENTS, attachments);
-  // errands_data_write_list(task_data_get_list(task->data));
+  errands_data_write_list(task->data->list);
   gtk_list_box_remove(GTK_LIST_BOX(gtk_widget_get_ancestor(GTK_WIDGET(self), GTK_TYPE_LIST_BOX)), GTK_WIDGET(self));
   errands_task_list_attachments_dialog_update_ui(dialog);
 }
