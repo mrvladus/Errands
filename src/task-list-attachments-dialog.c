@@ -1,5 +1,3 @@
-#include "gio/gio.h"
-#include "glib.h"
 #include "state.h"
 #include "task-list.h"
 #include "task.h"
