@@ -213,6 +213,13 @@ void errands_data_get_flat_list(GPtrArray *tasks) {
   }
 }
 
+void errands_data_sort() {
+  for_range(i, 0, errands_data_lists->len) {
+    ListData2 *list = g_ptr_array_index(errands_data_lists, i);
+    errands_list_data_sort(list);
+  }
+}
+
 // ---------- LIST DATA ---------- //
 
 ListData2 *errands_list_data_new(icalcomponent *data) {

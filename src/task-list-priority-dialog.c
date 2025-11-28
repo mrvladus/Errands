@@ -4,6 +4,7 @@
 #include "task.h"
 
 #include "vendor/toolbox.h"
+#include <stdbool.h>
 
 static void on_dialog_close_cb(ErrandsTaskListPriorityDialog *self);
 static void on_toggle_cb(ErrandsTaskListPriorityDialog *self, GtkCheckButton *btn);
@@ -74,9 +75,9 @@ static void on_dialog_close_cb(ErrandsTaskListPriorityDialog *self) {
   const uint8_t val = adw_spin_row_get_value(ADW_SPIN_ROW(self->custom_row));
   if (errands_data_get_int(self->current_task->data->data, DATA_PROP_PRIORITY) != val) {
     errands_data_set_int(self->current_task->data->data, DATA_PROP_PRIORITY, val);
-    // errands_data_write_list(task_data_get_list(self->current_task->data));
-    // gtk_sorter_changed(GTK_SORTER(state.main_window->task_list->master_sorter), GTK_SORTER_CHANGE_MORE_STRICT);
-    // gtk_list_view_scroll_to(GTK_LIST_VIEW(state.main_window->task_list->task_list), 0, GTK_LIST_SCROLL_FOCUS, NULL);
+    errands_data_write_list(self->current_task->data->list);
+    errands_data_sort();
+    errands_task_list_reload(state.main_window->task_list, true);
     needs_sync = true;
   }
   errands_task_update_toolbar(self->current_task);

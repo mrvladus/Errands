@@ -181,9 +181,11 @@ void errands_task_update_toolbar(ErrandsTask *task) {
   uint8_t priority = errands_data_get_int(data->data, DATA_PROP_PRIORITY);
   gtk_button_set_icon_name(GTK_BUTTON(task->priority_btn),
                            priority > 0 ? "errands-priority-set-symbolic" : "errands-priority-symbolic");
-  if (priority > 0 && priority < 3) gtk_widget_add_css_class(task->priority_btn, "priority-low");
-  else if (priority >= 3 && priority < 7) gtk_widget_add_css_class(task->priority_btn, "priority-medium");
-  else if (priority >= 7 && priority < 10) gtk_widget_add_css_class(task->priority_btn, "priority-high");
+  const char *priority_class = NULL;
+  if (priority > 0 && priority < 3) priority_class = "priority-low";
+  else if (priority >= 3 && priority < 7) priority_class = "priority-medium";
+  else if (priority >= 7 && priority < 10) priority_class = "priority-high";
+  gtk_widget_set_css_classes(task->priority_btn, (const char *[]){"image-button", "flat", priority_class, NULL});
   // Update date button
   icaltimetype due_dt = errands_data_get_time(data->data, DATA_PROP_DUE_TIME);
   icalproperty *rrule_prop = icalcomponent_get_first_property(data->data, ICAL_RRULE_PROPERTY);

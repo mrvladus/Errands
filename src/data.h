@@ -16,6 +16,7 @@ extern GPtrArray *errands_data_lists;
 void errands_data_get_flat_list(GPtrArray *tasks);
 // Get the total number of tasks and completed tasks
 void errands_data_get_stats(size_t *total, size_t *completed);
+void errands_data_sort();
 
 // --- LIST DATA --- //
 
