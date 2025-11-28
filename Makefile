@@ -44,12 +44,15 @@ $(BUILD_DIR):
 	@mkdir -p $(BUILD_DIR)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
+	@echo "Compiling $<"
 	@$(CC) $(CFLAGS) -MMD -MP -c -o $@ $<
 
 $(BUILD_DIR)/$(NAME): $(OBJS)
+	@echo "Linking $@"
 	@$(CC) -o $@ $^ $(LDFLAGS)
 
 $(SRC_DIR)/resources.c: $(DATA_DIR)/$(NAME).gresource.xml $(BLPS) $(CSS) $(ICONS)
+	@echo "Building $@"
 	@blueprint-compiler batch-compile $(BUILD_DIR) $(SRC_DIR) $(BLPS)
 	@glib-compile-resources --generate-source --target=$@ --c-name=$(NAME) $<
 

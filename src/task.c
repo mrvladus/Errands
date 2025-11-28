@@ -137,12 +137,12 @@ void errands_task_update_accent_color(ErrandsTask *task) {
     const char *card_style = tmp_str_printf("task-%s", color);
     const char *progress_style = tmp_str_printf("progressbar-%s", color);
     const char *check_style = tmp_str_printf("checkbtn-%s", color);
-    gtk_widget_set_css_classes(GTK_WIDGET(task), (const char *[]){"card", "task", card_style, NULL});
+    gtk_widget_set_css_classes(GTK_WIDGET(task), (const char *[]){"card", card_style, NULL});
     gtk_widget_set_css_classes(GTK_WIDGET(task->complete_btn), (const char *[]){"selection-mode", check_style, NULL});
     gtk_widget_set_css_classes(GTK_WIDGET(task->progress_bar),
                                (const char *[]){"osd", "horizontal", progress_style, NULL});
   } else {
-    gtk_widget_set_css_classes(GTK_WIDGET(task), (const char *[]){"card", "task", NULL});
+    gtk_widget_set_css_classes(GTK_WIDGET(task), (const char *[]){"card", NULL});
     gtk_widget_set_css_classes(GTK_WIDGET(task->complete_btn), (const char *[]){"selection-mode", NULL});
     gtk_widget_set_css_classes(GTK_WIDGET(task->progress_bar), (const char *[]){"osd", "horizontal", NULL});
   }
@@ -388,6 +388,7 @@ static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *self) {
       errands_data_get_str(new_data->data, DATA_PROP_UID));
   needs_sync = true;
   errands_task_list_reload(state.main_window->task_list, true);
+  gtk_widget_grab_focus(GTK_WIDGET(entry));
 }
 
 static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x, gdouble y, GtkPopover *popover) {
@@ -401,6 +402,7 @@ static void on_expand_toggle_cb(ErrandsTask *self, GtkGestureClick *ctrl, gint n
   errands_data_set_bool(self->data->data, DATA_PROP_EXPANDED, new_expanded);
   errands_data_write_list(self->data->list);
   errands_task_list_reload(state.main_window->task_list, true);
+  gtk_widget_grab_focus(GTK_WIDGET(self->sub_entry));
 }
 
 // --- ACTIONS CALLBACKS --- //
