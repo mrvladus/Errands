@@ -90,7 +90,7 @@ static void errands_task_list_attachments_dialog_add_attachment(ErrandsTaskListA
   errands_data_set_strv(self->current_task->data->data, DATA_PROP_ATTACHMENTS, attachments);
   ErrandsTaskListAttachmentsDialogAttachment *attachment = errands_task_list_attachments_dialog_attachment_new(path);
   gtk_list_box_append(GTK_LIST_BOX(self->attachments_box), GTK_WIDGET(attachment));
-  // errands_data_write_list(task_data_get_list(self->current_task->data));
+  errands_data_write_list(self->current_task->data->list);
   errands_task_list_attachments_dialog_update_ui(self);
 }
 

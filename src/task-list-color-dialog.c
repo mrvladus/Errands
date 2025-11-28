@@ -41,12 +41,11 @@ ErrandsTaskListColorDialog *errands_task_list_color_dialog_new() {
 // ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_task_list_color_dialog_show(ErrandsTask *task) {
-  if (!state.main_window->task_list->color_dialog)
-    state.main_window->task_list->color_dialog = errands_task_list_color_dialog_new();
-  ErrandsTaskListColorDialog *dialog = state.main_window->task_list->color_dialog;
-  dialog->block_signals = true;
-  dialog->current_task = task;
-  GPtrArray *colors = get_children(dialog->color_box);
+  ErrandsTaskListColorDialog *self = state.main_window->task_list->color_dialog;
+  if (!self) state.main_window->task_list->color_dialog = self = errands_task_list_color_dialog_new();
+  self->block_signals = true;
+  self->current_task = task;
+  g_autoptr(GPtrArray) colors = get_children(self->color_box);
   for (size_t i = 0; i < colors->len; i++) {
     const char *name = gtk_widget_get_name(colors->pdata[i]);
     const char *color = errands_data_get_str(task->data->data, DATA_PROP_COLOR);
@@ -55,15 +54,14 @@ void errands_task_list_color_dialog_show(ErrandsTask *task) {
       break;
     }
   }
-  g_ptr_array_free(colors, false);
-  dialog->block_signals = false;
-  adw_dialog_present(ADW_DIALOG(dialog), GTK_WIDGET(state.main_window));
+  self->block_signals = false;
+  adw_dialog_present(ADW_DIALOG(self), GTK_WIDGET(state.main_window));
 }
 
 // ---------- CALLBACKS ---------- //
 
 static void on_dialog_close_cb(ErrandsTaskListColorDialog *self) {
-  GPtrArray *colors = get_children(self->color_box);
+  g_autoptr(GPtrArray) colors = get_children(self->color_box);
   for (size_t i = 0; i < colors->len; i++) {
     GtkCheckButton *btn = GTK_CHECK_BUTTON(colors->pdata[i]);
     if (gtk_check_button_get_active(btn)) {
@@ -79,10 +77,8 @@ static void on_dialog_close_cb(ErrandsTaskListColorDialog *self) {
       break;
     }
   }
-  g_ptr_array_free(colors, false);
-  // errands_data_write_list(task_data_get_list(self->current_task->data));
+  errands_data_write_list(self->current_task->data->list);
   adw_dialog_close(ADW_DIALOG(self));
-  // TODO: sync
 }
 
 static void on_toggle_cb(ErrandsTaskListColorDialog *self, GtkCheckButton *btn) {

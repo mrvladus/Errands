@@ -1,5 +1,7 @@
 #include "state.h"
+#include "sync.h"
 #include "task-list.h"
+#include "task.h"
 #include "vendor/toolbox.h"
 
 #define HOEDOWN_IMPLEMENTATION
@@ -98,16 +100,15 @@ static void on_dialog_close_cb(ErrandsTaskListNotesDialog *self) {
   const char *notes = errands_data_get_str(data->data, DATA_PROP_NOTES);
   if (notes && !STR_EQUAL(text, notes)) {
     errands_data_set_str(data->data, DATA_PROP_NOTES, text);
-    // errands_data_write_list(task_data_get_list(data));
+    errands_data_write_list(data->list);
+    needs_sync = true;
   } else if (!notes && text && !STR_EQUAL(text, "")) {
     errands_data_set_str(data->data, DATA_PROP_NOTES, text);
-    // errands_data_write_list(task_data_get_list(data));
+    errands_data_write_list(data->list);
+    needs_sync = true;
   }
-  // Add css class to button if notes not empty
-  if (!STR_EQUAL(text, "")) gtk_widget_add_css_class(self->current_task->notes_btn, "accent");
-  else gtk_widget_remove_css_class(self->current_task->notes_btn, "accent");
+  errands_task_update_toolbar(self->current_task);
   adw_dialog_close(ADW_DIALOG(self));
-  // TODO: sync
 }
 
 static void on_text_changed_cb(ErrandsTaskListNotesDialog *self) {
@@ -161,7 +162,7 @@ static void on_web_view_decide_policy_cb(WebKitWebView *web_view, WebKitPolicyDe
     WebKitURIRequest *request = webkit_navigation_action_get_request(nav_action);
     const char *uri = webkit_uri_request_get_uri(request);
     // If user clicked on url - open link in browser
-    if (uri && strstr(uri, "http")) {
+    if (uri && STR_CONTAINS(uri, "http")) {
       g_autoptr(GtkUriLauncher) launcher = gtk_uri_launcher_new(uri);
       gtk_uri_launcher_launch(launcher, GTK_WINDOW(state.main_window), NULL, NULL, NULL);
       webkit_policy_decision_ignore(decision);
