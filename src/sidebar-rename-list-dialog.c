@@ -1,3 +1,4 @@
+#include "data.h"
 #include "sidebar.h"
 #include "state.h"
 
@@ -58,14 +59,15 @@ void errands_sidebar_rename_list_dialog_show(ErrandsSidebarTaskListRow *row) {
 
 static void on_response_cb(ErrandsSidebarRenameListDialog *self, gchar *response, gpointer data) {
   if (STR_EQUAL(response, "rename")) {
+    ListData2 *list_data = self->current_task_list_row->data;
     const char *text = gtk_editable_get_text(GTK_EDITABLE(self->entry));
     LOG("Sidebar Rename List Dialog: Rename to '%s'", text);
-    errands_data_set_str(self->current_task_list_row->data->data, DATA_PROP_LIST_NAME, text);
-    errands_data_set_bool(self->current_task_list_row->data->data, DATA_PROP_SYNCED, false);
+    errands_data_set_str(list_data->data, DATA_PROP_LIST_NAME, text);
+    errands_data_set_bool(list_data->data, DATA_PROP_SYNCED, false);
     errands_data_write_list(self->current_task_list_row->data);
     errands_sidebar_task_list_row_update_title(self->current_task_list_row);
     errands_task_list_update_title(state.main_window->task_list);
-    needs_sync = true;
+    errands_sync_schedule_list(list_data);
   }
 }
 

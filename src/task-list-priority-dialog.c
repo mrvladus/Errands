@@ -85,7 +85,7 @@ static void on_dialog_close_cb(ErrandsTaskListPriorityDialog *self) {
     case ERRANDS_TASK_LIST_PAGE_TRASH: break;
     }
     errands_task_list_reload(state.main_window->task_list, true);
-    needs_sync = true;
+    errands_sync_schedule_task(data);
   }
   errands_task_update_toolbar(self->current_task);
 }

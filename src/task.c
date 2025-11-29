@@ -369,7 +369,7 @@ static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointe
     errands_data_set_str(task->data->data, DATA_PROP_TEXT, text);
     errands_data_write_list(task->data->list);
     gtk_label_set_label(GTK_LABEL(task->title), text);
-    needs_sync = true;
+    errands_sync_schedule_task(task->data);
   }
 }
 
@@ -389,7 +389,7 @@ static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *self) {
   gtk_editable_set_text(GTK_EDITABLE(entry), "");
   LOG("Task '%s': Add sub-task '%s'", errands_data_get_str(new_data->data, DATA_PROP_UID),
       errands_data_get_str(new_data->data, DATA_PROP_UID));
-  needs_sync = true;
+  errands_sync_schedule_task(self->data);
   errands_task_list_reload(state.main_window->task_list, true);
   gtk_widget_grab_focus(GTK_WIDGET(entry));
 }

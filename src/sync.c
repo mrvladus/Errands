@@ -1,4 +1,5 @@
 #include "sync.h"
+#include "data.h"
 #include "settings.h"
 #include "utils.h"
 
@@ -8,7 +9,9 @@
 #include <glib.h>
 #include <libical/ical.h>
 
-bool needs_sync = false;
+static bool sync_scheduled = false;
+static ListData2 *list_data = NULL;
+static TaskData2 *task_data = NULL;
 
 CalDAVClient *client;
 
@@ -102,6 +105,7 @@ static void initial_sync_finished_cb(GObject *source_object, GAsyncResult *res, 
   } else {
     LOG("Sync: Failed or canceled");
   }
+  sync_scheduled = false;
 }
 
 void sync_init(void) {
@@ -110,7 +114,19 @@ void sync_init(void) {
 }
 
 void sync() {
-  if (!needs_sync) return;
+  if (!sync_scheduled) return;
   if (!errands_settings_get(SETTING_SYNC).b) return;
   LOG("Sync: synchronize");
+}
+
+void errands_sync_schedule() { sync_scheduled = true; }
+
+void errands_sync_schedule_list(ListData2 *data) {
+  sync_scheduled = true;
+  list_data = data;
+}
+
+void errands_sync_schedule_task(TaskData2 *data) {
+  sync_scheduled = true;
+  task_data = data;
 }

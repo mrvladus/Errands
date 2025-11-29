@@ -55,7 +55,7 @@ static void on_response_cb(ErrandsSidebarDeleteListDialog *dialog, gchar *respon
     errands_data_set_bool(row->data->data, DATA_PROP_DELETED, true);
     errands_data_set_bool(row->data->data, DATA_PROP_SYNCED, false);
     errands_data_write_list(row->data);
-    needs_sync = true;
+    errands_sync_schedule_list(row->data);
     GtkWidget *prev = gtk_widget_get_prev_sibling(GTK_WIDGET(row));
     GtkWidget *next = gtk_widget_get_next_sibling(GTK_WIDGET(row));
     // Delete sidebar row

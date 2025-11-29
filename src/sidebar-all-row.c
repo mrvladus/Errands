@@ -1,8 +1,7 @@
 #include "data.h"
-#include "glib.h"
 #include "sidebar.h"
+
 #include "vendor/toolbox.h"
-#include <stddef.h>
 
 // ---------- WIDGET TEMPLATE ---------- //
 

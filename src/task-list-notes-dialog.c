@@ -101,11 +101,11 @@ static void on_dialog_close_cb(ErrandsTaskListNotesDialog *self) {
   if (notes && !STR_EQUAL(text, notes)) {
     errands_data_set_str(data->data, DATA_PROP_NOTES, text);
     errands_data_write_list(data->list);
-    needs_sync = true;
+    errands_sync_schedule_task(data);
   } else if (!notes && text && !STR_EQUAL(text, "")) {
     errands_data_set_str(data->data, DATA_PROP_NOTES, text);
     errands_data_write_list(data->list);
-    needs_sync = true;
+    errands_sync_schedule_task(data);
   }
   errands_task_update_toolbar(self->current_task);
   adw_dialog_close(ADW_DIALOG(self));

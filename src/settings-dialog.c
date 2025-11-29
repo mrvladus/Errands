@@ -1,6 +1,4 @@
 #include "settings-dialog.h"
-#include "adwaita.h"
-#include "glib-object.h"
 #include "settings.h"
 #include "state.h"
 
