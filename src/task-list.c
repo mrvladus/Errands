@@ -244,7 +244,29 @@ static void on_adjustment_value_changed_cb(GtkAdjustment *adj, ErrandsTaskList *
 void errands_task_list_update_title(ErrandsTaskList *self) {
   switch (self->page) {
   case ERRANDS_TASK_LIST_PAGE_ALL: adw_window_title_set_title(ADW_WINDOW_TITLE(self->title), _("All Tasks")); break;
-  case ERRANDS_TASK_LIST_PAGE_TODAY: adw_window_title_set_title(ADW_WINDOW_TITLE(self->title), _("Today Tasks")); break;
+  case ERRANDS_TASK_LIST_PAGE_TODAY: {
+    adw_window_title_set_title(ADW_WINDOW_TITLE(self->title), _("Today Tasks"));
+    // TODO: separate func?
+    size_t total = 0, completed = 0;
+    icaltimetype today = icaltime_today();
+    for_range(i, 0, errands_data_lists->len) {
+      ListData *list = g_ptr_array_index(errands_data_lists, i);
+      g_autoptr(GPtrArray) tasks = errands_list_data_get_all_tasks_as_icalcomponents(list);
+      for_range(j, 0, tasks->len) {
+        icalcomponent *data = g_ptr_array_index(tasks, j);
+        bool deleted = errands_data_get_bool(data, DATA_PROP_DELETED);
+        bool trash = errands_data_get_bool(data, DATA_PROP_TRASH);
+        icaltimetype due_date = errands_data_get_time(data, DATA_PROP_DUE_TIME);
+        if (!deleted && !trash && !icaltime_is_null_time(due_date) && icaltime_compare_date_only(due_date, today) < 1) {
+          if (!icaltime_is_null_time(errands_data_get_time(data, DATA_PROP_COMPLETED_TIME))) completed++;
+          total++;
+        }
+      }
+    }
+    const char *stats = tmp_str_printf("%s %zu / %zu", _("Completed:"), completed, total);
+    adw_window_title_set_subtitle(ADW_WINDOW_TITLE(self->title), total > 0 ? stats : "");
+    return;
+  } break;
   case ERRANDS_TASK_LIST_PAGE_TRASH: {
     adw_window_title_set_title(ADW_WINDOW_TITLE(self->title), _("Trash"));
     adw_window_title_set_subtitle(ADW_WINDOW_TITLE(self->title), "");
