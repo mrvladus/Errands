@@ -163,9 +163,6 @@ struct _ErrandsTaskList {
 
   ListData2 *data;
   ErrandsTaskListPage page;
-  GPtrArray *all_tasks;
-  GHashTable *tasks_items;
-  GHashTable *lists;
 
   double scroll_position;
 };

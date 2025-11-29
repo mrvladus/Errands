@@ -1,3 +1,4 @@
+#include "data.h"
 #include "state.h"
 #include "sync.h"
 #include "task-list.h"
@@ -73,10 +74,16 @@ void errands_task_list_priority_dialog_show(ErrandsTask *task) {
 
 static void on_dialog_close_cb(ErrandsTaskListPriorityDialog *self) {
   const uint8_t val = adw_spin_row_get_value(ADW_SPIN_ROW(self->custom_row));
-  if (errands_data_get_int(self->current_task->data->data, DATA_PROP_PRIORITY) != val) {
-    errands_data_set_int(self->current_task->data->data, DATA_PROP_PRIORITY, val);
-    errands_data_write_list(self->current_task->data->list);
-    errands_data_sort();
+  TaskData2 *data = self->current_task->data;
+  if (errands_data_get_int(data->data, DATA_PROP_PRIORITY) != val) {
+    errands_data_set_int(data->data, DATA_PROP_PRIORITY, val);
+    errands_data_write_list(data->list);
+    switch (state.main_window->task_list->page) {
+    case ERRANDS_TASK_LIST_PAGE_ALL:
+    case ERRANDS_TASK_LIST_PAGE_TODAY: errands_data_sort(); break;
+    case ERRANDS_TASK_LIST_PAGE_TASK_LIST: errands_list_data_sort(data->list); break;
+    case ERRANDS_TASK_LIST_PAGE_TRASH: break;
+    }
     errands_task_list_reload(state.main_window->task_list, true);
     needs_sync = true;
   }
