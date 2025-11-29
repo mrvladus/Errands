@@ -2,6 +2,7 @@
 #include "sidebar.h"
 #include "state.h"
 #include "sync.h"
+#include "task-list.h"
 #include "vendor/toolbox.h"
 #include <libical/ical.h>
 
@@ -63,10 +64,12 @@ static void on_response_cb(ErrandsSidebarDeleteListDialog *dialog, gchar *respon
     // Switch row
     if (prev) {
       g_signal_emit_by_name(prev, "activate", NULL);
+      errands_task_list_reload(state.main_window->task_list, false);
       return;
     }
     if (next) {
       g_signal_emit_by_name(next, "activate", NULL);
+      errands_task_list_reload(state.main_window->task_list, false);
       return;
     }
     errands_window_update(state.main_window);
