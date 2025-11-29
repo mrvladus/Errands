@@ -626,7 +626,7 @@ bool caldav_event_delete(CalDAVEvent *event) {
 }
 
 bool caldav_event_pull(CalDAVEvent *event) {
-  if (!event) false;
+  if (!event) return false;
   caldav_log("Pull event at %s", event->url);
   char *res = caldav_get(event->calendar->client, event->url);
   if (!res) return false;
