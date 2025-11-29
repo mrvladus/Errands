@@ -245,7 +245,11 @@ void errands_task_list_update_title(ErrandsTaskList *self) {
   switch (self->page) {
   case ERRANDS_TASK_LIST_PAGE_ALL: adw_window_title_set_title(ADW_WINDOW_TITLE(self->title), _("All Tasks")); break;
   case ERRANDS_TASK_LIST_PAGE_TODAY: adw_window_title_set_title(ADW_WINDOW_TITLE(self->title), _("Today Tasks")); break;
-  case ERRANDS_TASK_LIST_PAGE_TRASH: break;
+  case ERRANDS_TASK_LIST_PAGE_TRASH: {
+    adw_window_title_set_title(ADW_WINDOW_TITLE(self->title), _("Trash"));
+    adw_window_title_set_subtitle(ADW_WINDOW_TITLE(self->title), "");
+    return;
+  } break;
   case ERRANDS_TASK_LIST_PAGE_TASK_LIST:
     adw_window_title_set_title(ADW_WINDOW_TITLE(self->title),
                                errands_data_get_str(self->data->data, DATA_PROP_LIST_NAME));
