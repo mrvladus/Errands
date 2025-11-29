@@ -5,7 +5,6 @@
 #include "vendor/json.h"
 #include "vendor/toolbox.h"
 
-#include <assert.h>
 #include <libical/ical.h>
 
 AUTOPTR_DEFINE(JSON, json_free)
@@ -198,11 +197,11 @@ void errands_data_init() {
   LOG("User Data: Loaded %d tasks from %d lists in %f sec.", all_tasks->len, errands_data_lists->len, TIMER_ELAPSED_MS);
 }
 
-void errands_data_get_stats(size_t *total, size_t *completed) {
+void errands_data_get_stats(size_t *total, size_t *completed, size_t *trash) {
   for_range(i, 0, errands_data_lists->len) {
     ListData *data = g_ptr_array_index(errands_data_lists, i);
     CONTINUE_IF(errands_data_get_bool(data->data, DATA_PROP_DELETED))
-    errands_list_data_get_stats(data, total, completed);
+    errands_list_data_get_stats(data, total, completed, trash);
   }
 }
 
@@ -270,16 +269,15 @@ void errands_list_data_sort(ListData *data) {
   }
 }
 
-void errands_list_data_get_stats(ListData *data, size_t *total, size_t *completed) {
+void errands_list_data_get_stats(ListData *data, size_t *total, size_t *completed, size_t *trash) {
   for_range(i, 0, data->children->len) {
     TaskData *child = g_ptr_array_index(data->children, i);
     bool deleted = errands_data_get_bool(child->data, DATA_PROP_DELETED);
-    bool trash = errands_data_get_bool(child->data, DATA_PROP_TRASH);
-    CONTINUE_IF(deleted || trash);
-    bool is_completed = !icaltime_is_null_date(errands_data_get_time(child->data, DATA_PROP_COMPLETED_TIME));
-    if (is_completed) (*completed)++;
+    CONTINUE_IF(deleted);
+    if (errands_data_get_bool(child->data, DATA_PROP_TRASH)) (*trash)++;
+    if (!icaltime_is_null_date(errands_data_get_time(child->data, DATA_PROP_COMPLETED_TIME))) (*completed)++;
     (*total)++;
-    errands_task_data_get_stats_recursive(child, total, completed);
+    errands_task_data_get_stats_recursive(child, total, completed, trash);
   }
 }
 
@@ -364,16 +362,15 @@ size_t errands_task_data_get_indent_level(TaskData *data) {
   return indent;
 }
 
-void errands_task_data_get_stats_recursive(TaskData *data, size_t *total, size_t *completed) {
+void errands_task_data_get_stats_recursive(TaskData *data, size_t *total, size_t *completed, size_t *trash) {
   for_range(i, 0, data->children->len) {
     TaskData *child = g_ptr_array_index(data->children, i);
     bool deleted = errands_data_get_bool(child->data, DATA_PROP_DELETED);
-    bool trash = errands_data_get_bool(child->data, DATA_PROP_TRASH);
-    CONTINUE_IF(deleted || trash);
-    bool is_completed = !icaltime_is_null_date(errands_data_get_time(child->data, DATA_PROP_COMPLETED_TIME));
-    if (is_completed) (*completed)++;
+    CONTINUE_IF(deleted);
+    if (errands_data_get_bool(child->data, DATA_PROP_TRASH)) (*trash)++;
+    if (!icaltime_is_null_date(errands_data_get_time(child->data, DATA_PROP_COMPLETED_TIME))) (*completed)++;
     (*total)++;
-    errands_task_data_get_stats_recursive(child, total, completed);
+    errands_task_data_get_stats_recursive(child, total, completed, trash);
   }
 }
 

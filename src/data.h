@@ -15,7 +15,7 @@ extern GPtrArray *errands_data_lists;
 // Get all tasks as flat list
 void errands_data_get_flat_list(GPtrArray *tasks);
 // Get the total number of tasks and completed tasks
-void errands_data_get_stats(size_t *total, size_t *completed);
+void errands_data_get_stats(size_t *total, size_t *completed, size_t *trash);
 void errands_data_sort();
 
 // --- LIST DATA --- //
@@ -37,7 +37,7 @@ ListData *errands_list_data_create(const char *uid, const char *name, const char
 void errands_list_data_sort(ListData *data);
 // Get all tasks as flat list
 void errands_list_data_get_flat_list(ListData *data, GPtrArray *tasks);
-void errands_list_data_get_stats(ListData *data, size_t *total, size_t *completed);
+void errands_list_data_get_stats(ListData *data, size_t *total, size_t *completed, size_t *trash);
 GPtrArray *errands_list_data_get_all_tasks_as_icalcomponents(ListData *data);
 void errands_list_data_print(ListData *data);
 
@@ -57,7 +57,7 @@ TaskData *errands_task_data_create_task(ListData *list, TaskData *parent, const 
 void errands_task_data_free(TaskData *data);
 size_t errands_task_data_get_indent_level(TaskData *data);
 // Get the total number of sub-tasks and completed tasks
-void errands_task_data_get_stats_recursive(TaskData *data, size_t *total, size_t *completed);
+void errands_task_data_get_stats_recursive(TaskData *data, size_t *total, size_t *completed, size_t *trash);
 void errands_task_data_get_flat_list(TaskData *parent, GPtrArray *array);
 void errands_task_data_print(TaskData *data);
 

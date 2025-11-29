@@ -63,9 +63,9 @@ void errands_sidebar_load_lists(ErrandsSidebar *self) {
       gtk_list_box_append(GTK_LIST_BOX(self->task_lists_box), GTK_WIDGET(row));
     }
   }
-
   errands_sidebar_all_row_update_counter(self->all_row);
   errands_sidebar_today_row_update_counter(self->today_row);
+  errands_sidebar_trash_row_update(self->trash_row);
   errands_window_update(state.main_window);
   // Select last opened page
   g_signal_connect(state.main_window, "realize", G_CALLBACK(errands_sidebar_select_last_opened_page), NULL);
@@ -96,11 +96,11 @@ static void on_errands_sidebar_filter_row_activated(GtkListBox *box, GtkListBoxR
   gtk_list_box_unselect_all(GTK_LIST_BOX(self->task_lists_box));
   ErrandsTaskList *task_list = state.main_window->task_list;
   if (GTK_WIDGET(row) == GTK_WIDGET(self->all_row)) {
-    LOG("Sidebar: Show to all tasks");
     errands_task_list_show_all_tasks(task_list);
   } else if (GTK_WIDGET(row) == GTK_WIDGET(self->today_row)) {
-    LOG("Sidebar: Show today tasks");
     errands_task_list_show_today_tasks(task_list);
+  } else if (GTK_WIDGET(row) == GTK_WIDGET(self->trash_row)) {
+    errands_task_list_show_trash(task_list);
   }
 }
 

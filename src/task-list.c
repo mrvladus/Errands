@@ -85,6 +85,7 @@ static bool errands_task_list__task_has_any_collapsed_parent(TaskData *data) {
   bool out = false;
   TaskData *task = data->parent;
   while (task) {
+    if (errands_data_get_bool(task->data, DATA_PROP_TRASH)) break;
     if (!errands_data_get_bool(task->data, DATA_PROP_EXPANDED)) {
       out = true;
       break;
@@ -99,8 +100,22 @@ static bool errands_task_list__task_has_any_due_parent(TaskData *data) {
   TaskData *task = data->parent;
   icaltimetype today = icaltime_today();
   while (task) {
+    if (errands_data_get_bool(task->data, DATA_PROP_TRASH)) break;
     icaltimetype due = errands_data_get_time(task->data, DATA_PROP_DUE_TIME);
     if (icaltime_compare_date_only(due, today) < 1) {
+      out = true;
+      break;
+    }
+    task = task->parent;
+  }
+  return out;
+}
+
+static bool errands_task_list__task_has_any_trash_parent(TaskData *data) {
+  bool out = false;
+  TaskData *task = data->parent;
+  while (task) {
+    if (errands_data_get_bool(task->data, DATA_PROP_TRASH)) {
       out = true;
       break;
     }
@@ -118,6 +133,8 @@ static int errands_task_list__calculate_height(ErrandsTaskList *self) {
   for_range(i, 0, current_task_list->len) {
     TaskData *data = g_ptr_array_index(current_task_list, i);
     CONTINUE_IF(errands_task_list__task_has_any_collapsed_parent(data));
+    CONTINUE_IF(errands_task_list__task_has_any_trash_parent(data));
+    CONTINUE_IF(errands_data_get_bool(data->data, DATA_PROP_TRASH));
     errands_task_set_data(measuring_task, data);
     gtk_widget_get_preferred_size(GTK_WIDGET(measuring_task), &min_size, &nat_size);
     height += nat_size.height;
@@ -149,6 +166,11 @@ void errands_task_list_redraw_tasks(ErrandsTaskList *self) {
         CONTINUE_IF(icaltime_is_null_date(due));
         CONTINUE_IF(icaltime_compare_date_only(due, today) == 1);
       }
+    }
+    // Show only today tasks for trash page
+    else if (self->page == ERRANDS_TASK_LIST_PAGE_TRASH) {
+      if (!errands_task_list__task_has_any_trash_parent(data))
+        CONTINUE_IF(!errands_data_get_bool(data->data, DATA_PROP_TRASH));
     }
     errands_task_set_data(task, data);
     // Set indent for sub-tasks
@@ -264,6 +286,14 @@ void errands_task_list_show_task_list(ErrandsTaskList *self, ListData *data) {
   self->page = ERRANDS_TASK_LIST_PAGE_TASK_LIST;
   if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(self->search_btn)))
     gtk_widget_set_visible(self->entry_clamp, true);
+  errands_task_list_reload(self, false);
+}
+
+void errands_task_list_show_trash(ErrandsTaskList *self) {
+  LOG("Task List: Show trash");
+  self->data = NULL;
+  self->page = ERRANDS_TASK_LIST_PAGE_TRASH;
+  gtk_widget_set_visible(self->entry_clamp, false);
   errands_task_list_reload(self, false);
 }
 

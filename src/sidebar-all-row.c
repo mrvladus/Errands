@@ -34,9 +34,8 @@ ErrandsSidebarAllRow *errands_sidebar_all_row_new() { return g_object_new(ERRAND
 // ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_sidebar_all_row_update_counter(ErrandsSidebarAllRow *row) {
-  size_t total = 0;
-  size_t completed = 0;
-  errands_data_get_stats(&total, &completed);
+  size_t total = 0, completed = 0, trash = 0;
+  errands_data_get_stats(&total, &completed, &trash);
   size_t uncompleted = total - completed;
   const char *num = tmp_str_printf("%zu", uncompleted);
   gtk_label_set_label(GTK_LABEL(row->counter), uncompleted > 0 ? num : "");

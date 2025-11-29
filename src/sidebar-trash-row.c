@@ -33,18 +33,11 @@ ErrandsSidebarTrashRow *errands_sidebar_trash_row_new() { return g_object_new(ER
 // ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_sidebar_trash_row_update(ErrandsSidebarTrashRow *row) {
-  // GPtrArray *tasks = g_hash_table_get_values_as_ptr_array(tdata);
-  // size_t len = 0;
-  // for (size_t i = 0; i < tasks->len; i++) {
-  //   TaskData *td = tasks->pdata[i];
-  //   bool deleted = errands_data_get_bool(td, DATA_PROP_DELETED);
-  //   bool trash = errands_data_get_bool(td, DATA_PROP_TRASH);
-  //   if (!deleted && trash) len++;
-  // }
-  // g_ptr_array_free(tasks, false);
-  // char num[64];
-  // g_snprintf(num, 64, "%zu", len);
-  // gtk_label_set_label(GTK_LABEL(row->counter), len > 0 ? num : "");
-  // const char *icon_name = len > 0 ? "errands-trash-full-symbolic" : "errands-trash-symbolic";
-  // gtk_image_set_from_icon_name(GTK_IMAGE(row->icon), icon_name);
+  size_t total = 0, completed = 0, trash = 0;
+  errands_data_get_stats(&total, &completed, &trash);
+  const char *num = tmp_str_printf("%zu", trash);
+  gtk_label_set_label(GTK_LABEL(row->counter), trash > 0 ? num : "");
+  const char *icon_name = trash > 0 ? "errands-trash-full-symbolic" : "errands-trash-symbolic";
+  gtk_image_set_from_icon_name(GTK_IMAGE(row->icon), icon_name);
+  LOG("Sidebar Trash Row: Update counter: %zu", trash);
 }

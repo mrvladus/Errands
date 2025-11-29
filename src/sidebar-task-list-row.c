@@ -99,8 +99,8 @@ ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_get(const char *uid) {
 }
 
 void errands_sidebar_task_list_row_update_counter(ErrandsSidebarTaskListRow *row) {
-  size_t total = 0, completed = 0;
-  errands_list_data_get_stats(row->data, &total, &completed);
+  size_t total = 0, completed = 0, trash = 0;
+  errands_list_data_get_stats(row->data, &total, &completed, &trash);
   size_t uncompleted = total - completed;
   char num[32];
   sprintf(num, "%zu", uncompleted);

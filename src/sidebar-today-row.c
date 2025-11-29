@@ -1,7 +1,5 @@
 #include "data.h"
 #include "sidebar.h"
-#include "vendor/toolbox.h"
-#include <libical/ical.h>
 
 // ---------- WIDGET TEMPLATE ---------- //
 
@@ -31,20 +29,22 @@ ErrandsSidebarTodayRow *errands_sidebar_today_row_new() { return g_object_new(ER
 // ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_sidebar_today_row_update_counter(ErrandsSidebarTodayRow *row) {
-  // GPtrArray *tasks = g_hash_table_get_values_as_ptr_array(tdata);
-  // size_t len = 0;
-  // for (size_t i = 0; i < tasks->len; i++) {
-  //   TaskData *td = tasks->pdata[i];
-  //   bool deleted = errands_data_get_bool(td, DATA_PROP_DELETED);
-  //   bool trash = errands_data_get_bool(td, DATA_PROP_TRASH);
-  //   bool completed = !icaltime_is_null_time(errands_data_get_time(td, DATA_PROP_COMPLETED_TIME));
-  //   icaltimetype due_date = errands_data_get_time(td, DATA_PROP_DUE_TIME);
-  //   bool is_today = false;
-  //   if (!icaltime_is_null_time(due_date)) is_today = (icaltime_compare_date_only(due_date, icaltime_today()) <= 0);
-  //   if (!deleted && !trash && !completed && is_today) len++;
-  // }
-  // char num[64];
-  // g_snprintf(num, 64, "%zu", len);
-  // gtk_label_set_label(GTK_LABEL(row->counter), len > 0 ? num : "");
-  // g_ptr_array_free(tasks, false);
+  size_t counter = 0;
+  icaltimetype today = icaltime_today();
+  for_range(i, 0, errands_data_lists->len) {
+    ListData *list = g_ptr_array_index(errands_data_lists, i);
+    g_autoptr(GPtrArray) tasks = errands_list_data_get_all_tasks_as_icalcomponents(list);
+    for_range(j, 0, tasks->len) {
+      icalcomponent *data = g_ptr_array_index(tasks, j);
+      bool deleted = errands_data_get_bool(data, DATA_PROP_DELETED);
+      bool trash = errands_data_get_bool(data, DATA_PROP_TRASH);
+      bool completed = !icaltime_is_null_time(errands_data_get_time(data, DATA_PROP_COMPLETED_TIME));
+      icaltimetype due_date = errands_data_get_time(data, DATA_PROP_DUE_TIME);
+      if (!deleted && !trash && !completed && !icaltime_is_null_time(due_date) &&
+          icaltime_compare_date_only(due_date, today) < 1)
+        counter++;
+    }
+  }
+  gtk_label_set_label(GTK_LABEL(row->counter), counter > 0 ? tmp_str_printf("%zu", counter) : "");
+  LOG("Sidebar Today Row: Update counter: %zu", counter);
 }
