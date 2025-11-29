@@ -94,6 +94,21 @@ static bool errands_task_list__task_has_any_collapsed_parent(TaskData *data) {
   return out;
 }
 
+static bool errands_task_list__task_has_any_due_parent(TaskData *data) {
+  bool out = false;
+  TaskData *task = data->parent;
+  icaltimetype today = icaltime_today();
+  while (task) {
+    icaltimetype due = errands_data_get_time(task->data, DATA_PROP_DUE_TIME);
+    if (icaltime_compare_date_only(due, today) < 1) {
+      out = true;
+      break;
+    }
+    task = task->parent;
+  }
+  return out;
+}
+
 static int errands_task_list__calculate_height(ErrandsTaskList *self) {
   // TODO: correct expanded parents. while loop
   LOG_NO_LN("Task List: Calculating height ... ");
@@ -119,12 +134,24 @@ void errands_task_list_redraw_tasks(ErrandsTaskList *self) {
   LOG("Task List: Redraw Tasks");
   static uint8_t indent_px = 15;
   if (current_task_list->len == 0) return;
+  icaltimetype today = icaltime_today();
   g_autoptr(GPtrArray) children = get_children(self->task_list);
   for (size_t i = 0, j = current_start; i < MIN(tasks_stack_size, current_task_list->len - current_start);) {
     ErrandsTask *task = g_ptr_array_index(children, i++);
     TaskData *data = g_ptr_array_index(current_task_list, j++);
+    // Don't show sub-tasks of collapsed parents
     CONTINUE_IF(errands_task_list__task_has_any_collapsed_parent(data));
+    // Show only today tasks for today page
+    if (self->page == ERRANDS_TASK_LIST_PAGE_TODAY) {
+      // Check if any parent is due - then show task anyway, else check due date of the task
+      if (!errands_task_list__task_has_any_due_parent(data)) {
+        icaltimetype due = errands_data_get_time(data->data, DATA_PROP_DUE_TIME);
+        CONTINUE_IF(icaltime_is_null_date(due));
+        CONTINUE_IF(icaltime_compare_date_only(due, today) == 1);
+      }
+    }
     errands_task_set_data(task, data);
+    // Set indent for sub-tasks
     gtk_widget_set_margin_start(GTK_WIDGET(task), errands_task_data_get_indent_level(data) * indent_px);
   }
 }
@@ -242,7 +269,6 @@ void errands_task_list_show_task_list(ErrandsTaskList *self, ListData *data) {
 
 void errands_task_list_reload(ErrandsTaskList *self, bool save_scroll_pos) {
   // TODO: correct scroll position
-  // TODO: pass diff to add/remove from self->task_list height
   if (!save_scroll_pos) current_start = 0;
   if (current_task_list) g_ptr_array_set_size(current_task_list, 0);
   else current_task_list = g_ptr_array_new();
