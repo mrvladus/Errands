@@ -161,7 +161,7 @@ struct _ErrandsTaskList {
   ErrandsTaskListSortDialog *sort_dialog;
   ErrandsTaskListTagsDialog *tags_dialog;
 
-  ListData2 *data;
+  ListData *data;
   ErrandsTaskListPage page;
 
   double scroll_position;
@@ -171,6 +171,6 @@ ErrandsTaskList *errands_task_list_new();
 void errands_task_list_update_title(ErrandsTaskList *self);
 void errands_task_list_show_all_tasks(ErrandsTaskList *self);
 void errands_task_list_show_today_tasks(ErrandsTaskList *self);
-void errands_task_list_show_task_list(ErrandsTaskList *self, ListData2 *data);
+void errands_task_list_show_task_list(ErrandsTaskList *self, ListData *data);
 void errands_task_list_redraw_tasks(ErrandsTaskList *self);
 void errands_task_list_reload(ErrandsTaskList *self, bool save_scroll_pos);

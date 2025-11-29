@@ -58,7 +58,7 @@ void errands_window_update(ErrandsWindow *win) {
   LOG("Window: Update");
   size_t total = 0;
   for_range(i, 0, errands_data_lists->len) {
-    ListData2 *data = errands_data_lists->pdata[i];
+    ListData *data = errands_data_lists->pdata[i];
     bool deleted = errands_data_get_bool(data->data, DATA_PROP_DELETED);
     if (!deleted) total++;
   }

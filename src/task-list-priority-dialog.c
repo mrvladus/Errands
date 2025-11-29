@@ -74,7 +74,7 @@ void errands_task_list_priority_dialog_show(ErrandsTask *task) {
 
 static void on_dialog_close_cb(ErrandsTaskListPriorityDialog *self) {
   const uint8_t val = adw_spin_row_get_value(ADW_SPIN_ROW(self->custom_row));
-  TaskData2 *data = self->current_task->data;
+  TaskData *data = self->current_task->data;
   if (errands_data_get_int(data->data, DATA_PROP_PRIORITY) != val) {
     errands_data_set_int(data->data, DATA_PROP_PRIORITY, val);
     errands_data_write_list(data->list);

@@ -59,7 +59,7 @@ void errands_sidebar_rename_list_dialog_show(ErrandsSidebarTaskListRow *row) {
 
 static void on_response_cb(ErrandsSidebarRenameListDialog *self, gchar *response, gpointer data) {
   if (STR_EQUAL(response, "rename")) {
-    ListData2 *list_data = self->current_task_list_row->data;
+    ListData *list_data = self->current_task_list_row->data;
     const char *text = gtk_editable_get_text(GTK_EDITABLE(self->entry));
     LOG("Sidebar Rename List Dialog: Rename to '%s'", text);
     errands_data_set_str(list_data->data, DATA_PROP_LIST_NAME, text);

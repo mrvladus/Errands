@@ -59,7 +59,7 @@ void errands_task_list_date_dialog_show(ErrandsTask *task) {
     state.main_window->task_list->date_dialog = errands_task_list_date_dialog_new();
   ErrandsTaskListDateDialog *dialog = state.main_window->task_list->date_dialog;
   dialog->current_task = task;
-  TaskData2 *data = task->data;
+  TaskData *data = task->data;
 
   // Reset all rows
   errands_task_list_date_dialog_date_chooser_reset(dialog->start_date_chooser);
@@ -96,7 +96,7 @@ void errands_task_list_date_dialog_show(ErrandsTask *task) {
 static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
   LOG("Date Dialog: Close");
 
-  TaskData2 *data = self->current_task->data;
+  TaskData *data = self->current_task->data;
   icaltimetype today = icaltime_today();
   bool changed = false;
 

@@ -81,9 +81,9 @@ ErrandsTaskList *errands_task_list_new() { return g_object_new(ERRANDS_TYPE_TASK
 
 // ---------- PRIVATE FUNCTIONS ---------- //
 
-static bool errands_task_list__task_has_any_collapsed_parent(TaskData2 *data) {
+static bool errands_task_list__task_has_any_collapsed_parent(TaskData *data) {
   bool out = false;
-  TaskData2 *task = data->parent;
+  TaskData *task = data->parent;
   while (task) {
     if (!errands_data_get_bool(task->data, DATA_PROP_EXPANDED)) {
       out = true;
@@ -101,7 +101,7 @@ static int errands_task_list__calculate_height(ErrandsTaskList *self) {
   int height = 0;
   GtkRequisition min_size, nat_size;
   for_range(i, 0, current_task_list->len) {
-    TaskData2 *data = g_ptr_array_index(current_task_list, i);
+    TaskData *data = g_ptr_array_index(current_task_list, i);
     CONTINUE_IF(errands_task_list__task_has_any_collapsed_parent(data));
     errands_task_set_data(measuring_task, data);
     gtk_widget_get_preferred_size(GTK_WIDGET(measuring_task), &min_size, &nat_size);
@@ -122,7 +122,7 @@ void errands_task_list_redraw_tasks(ErrandsTaskList *self) {
   g_autoptr(GPtrArray) children = get_children(self->task_list);
   for (size_t i = 0, j = current_start; i < MIN(tasks_stack_size, current_task_list->len - current_start);) {
     ErrandsTask *task = g_ptr_array_index(children, i++);
-    TaskData2 *data = g_ptr_array_index(current_task_list, j++);
+    TaskData *data = g_ptr_array_index(current_task_list, j++);
     CONTINUE_IF(errands_task_list__task_has_any_collapsed_parent(data));
     errands_task_set_data(task, data);
     gtk_widget_set_margin_start(GTK_WIDGET(task), errands_task_data_get_indent_level(data) * indent_px);
@@ -205,7 +205,7 @@ void errands_task_list_update_title(ErrandsTaskList *self) {
   // Retrieve tasks and count completed and total tasks
   size_t total = 0, completed = 0;
   for_range(i, 0, current_task_list->len) {
-    TaskData2 *data = g_ptr_array_index(current_task_list, i);
+    TaskData *data = g_ptr_array_index(current_task_list, i);
     bool is_completed = !icaltime_is_null_date(errands_data_get_time(data->data, DATA_PROP_COMPLETED_TIME));
     if (is_completed) completed++;
     total++;
@@ -231,7 +231,7 @@ void errands_task_list_show_all_tasks(ErrandsTaskList *self) {
   errands_task_list_reload(self, false);
 }
 
-void errands_task_list_show_task_list(ErrandsTaskList *self, ListData2 *data) {
+void errands_task_list_show_task_list(ErrandsTaskList *self, ListData *data) {
   LOG("Task List: Show list '%s'", errands_data_get_str(data->data, DATA_PROP_LIST_UID));
   self->data = data;
   self->page = ERRANDS_TASK_LIST_PAGE_TASK_LIST;
@@ -263,7 +263,7 @@ static void on_task_list_entry_activated_cb(AdwEntryRow *entry, ErrandsTaskList 
   const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
   const char *list_uid = errands_data_get_str(self->data->data, DATA_PROP_LIST_UID);
   if (STR_EQUAL(text, "") || STR_EQUAL(list_uid, "")) return;
-  TaskData2 *data = errands_task_data_create_task(self->data, NULL, text);
+  TaskData *data = errands_task_data_create_task(self->data, NULL, text);
   g_ptr_array_add(self->data->children, data);
   errands_list_data_sort(self->data);
   errands_data_write_list(self->data);

@@ -105,7 +105,7 @@ ErrandsTask *errands_task_new() { return g_object_new(ERRANDS_TYPE_TASK, NULL); 
 
 // ---------- PUBLIC FUNCTIONS ---------- //
 
-void errands_task_set_data(ErrandsTask *self, TaskData2 *data) {
+void errands_task_set_data(ErrandsTask *self, TaskData *data) {
   gtk_widget_set_visible(GTK_WIDGET(self), data ? true : false);
   if (!data) return;
   self->data = data;
@@ -152,7 +152,7 @@ void errands_task_update_progress(ErrandsTask *self) {
   if (!self) return;
   size_t total = 0, completed = 0;
   for_range(i, 0, self->data->children->len) {
-    TaskData2 *data = g_ptr_array_index(self->data->children, i);
+    TaskData *data = g_ptr_array_index(self->data->children, i);
     if (!errands_data_get_bool(data->data, DATA_PROP_DELETED) && !errands_data_get_bool(data->data, DATA_PROP_TRASH)) {
       if (!icaltime_is_null_time(errands_data_get_time(data->data, DATA_PROP_COMPLETED_TIME))) completed++;
       total++;
@@ -169,7 +169,7 @@ void errands_task_update_progress(ErrandsTask *self) {
 }
 
 void errands_task_update_toolbar(ErrandsTask *task) {
-  TaskData2 *data = task->data;
+  TaskData *data = task->data;
   // Update css for buttons
   // Notes button
   if (errands_data_get_str(data->data, DATA_PROP_NOTES)) gtk_widget_add_css_class(task->notes_btn, "accent");
@@ -382,7 +382,7 @@ static void on_toolbar_btn_toggle_cb(ErrandsTask *self, GtkToggleButton *btn) {
 static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *self) {
   const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
   if (STR_EQUAL(text, "")) return;
-  TaskData2 *new_data = errands_task_data_create_task(self->data->list, self->data, text);
+  TaskData *new_data = errands_task_data_create_task(self->data->list, self->data, text);
   g_ptr_array_add(self->data->children, new_data);
   errands_data_write_list(self->data->list);
   // Reset text
@@ -438,7 +438,7 @@ static void on_export_action_finish_cb(GObject *obj, GAsyncResult *res, gpointer
   g_autofree char *path = g_file_get_path(f);
   FILE *file = fopen(path, "w");
   if (!file) return; // TODO: error toast
-  TaskData2 *task_data = data;
+  TaskData *task_data = data;
   icalcomponent *cal = icalcomponent_new_vcalendar();
   icalcomponent *dup = icalcomponent_new_clone(task_data->data);
   icalcomponent_add_component(cal, dup);

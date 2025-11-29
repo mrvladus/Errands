@@ -8,7 +8,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-typedef struct TaskData2 TaskData2;
+typedef struct TaskData TaskData;
 
 extern GPtrArray *errands_data_lists;
 
@@ -23,48 +23,48 @@ void errands_data_sort();
 typedef struct {
   icalcomponent *data;
   GPtrArray *children;
-} ListData2;
+} ListData;
 
-#define LIST_DATA(ptr) ((ListData2 *)(ptr))
+#define LIST_DATA(ptr) ((ListData *)(ptr))
 
-ListData2 *errands_list_data_new(icalcomponent *data);
-void errands_list_data_free(ListData2 *data);
-AUTOPTR_DEFINE(ListData2, errands_list_data_free)
+ListData *errands_list_data_new(icalcomponent *data);
+void errands_list_data_free(ListData *data);
+AUTOPTR_DEFINE(ListData, errands_list_data_free)
 // Create new `ListData`.
 // `uid` - Pass `NULL` to generate a new UID.
 // `color` - Pass `NULL` to generate color.
-ListData2 *errands_list_data_create(const char *uid, const char *name, const char *color, bool deleted, bool synced);
-void errands_list_data_sort(ListData2 *data);
+ListData *errands_list_data_create(const char *uid, const char *name, const char *color, bool deleted, bool synced);
+void errands_list_data_sort(ListData *data);
 // Get all tasks as flat list
-void errands_list_data_get_flat_list(ListData2 *data, GPtrArray *tasks);
-void errands_list_data_get_stats(ListData2 *data, size_t *total, size_t *completed);
-GPtrArray *errands_list_data_get_all_tasks_as_icalcomponents(ListData2 *data);
-void errands_list_data_print(ListData2 *data);
+void errands_list_data_get_flat_list(ListData *data, GPtrArray *tasks);
+void errands_list_data_get_stats(ListData *data, size_t *total, size_t *completed);
+GPtrArray *errands_list_data_get_all_tasks_as_icalcomponents(ListData *data);
+void errands_list_data_print(ListData *data);
 
 // --- TASK DATA --- //
 
-struct TaskData2 {
+struct TaskData {
   icalcomponent *data;
   GPtrArray *children;
-  TaskData2 *parent;
-  ListData2 *list;
+  TaskData *parent;
+  ListData *list;
 };
 
-#define TASK_DATA(ptr) ((TaskData2 *)(ptr))
+#define TASK_DATA(ptr) ((TaskData *)(ptr))
 
-TaskData2 *errands_task_data_new(icalcomponent *data, TaskData2 *parent, ListData2 *list);
-TaskData2 *errands_task_data_create_task(ListData2 *list, TaskData2 *parent, const char *text);
-void errands_task_data_free(TaskData2 *data);
-size_t errands_task_data_get_indent_level(TaskData2 *data);
+TaskData *errands_task_data_new(icalcomponent *data, TaskData *parent, ListData *list);
+TaskData *errands_task_data_create_task(ListData *list, TaskData *parent, const char *text);
+void errands_task_data_free(TaskData *data);
+size_t errands_task_data_get_indent_level(TaskData *data);
 // Get the total number of sub-tasks and completed tasks
-void errands_task_data_get_stats_recursive(TaskData2 *data, size_t *total, size_t *completed);
-void errands_task_data_get_flat_list(TaskData2 *parent, GPtrArray *array);
-void errands_task_data_print(TaskData2 *data);
+void errands_task_data_get_stats_recursive(TaskData *data, size_t *total, size_t *completed);
+void errands_task_data_get_flat_list(TaskData *parent, GPtrArray *array);
+void errands_task_data_print(TaskData *data);
 
 // --- LOAD & SAVE & CLEANUP --- //
 
 void errands_data_init(void);
-void errands_data_write_list(ListData2 *data);
+void errands_data_write_list(ListData *data);
 void errands_data_cleanup(void);
 
 // --- SORT AND FILTER FUNCTIONS --- //

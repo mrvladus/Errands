@@ -17,10 +17,10 @@ struct _ErrandsSidebarTaskListRow {
   GtkWidget *label;
   GtkEventController *hover_ctrl;
 
-  ListData2 *data;
+  ListData *data;
 };
 
-ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_new(ListData2 *data);
+ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_new(ListData *data);
 void errands_sidebar_task_list_row_update_counter(ErrandsSidebarTaskListRow *row);
 void errands_sidebar_task_list_row_update_title(ErrandsSidebarTaskListRow *row);
 ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_get(const char *uid);
@@ -98,5 +98,5 @@ struct _ErrandsSidebar {
 
 ErrandsSidebar *errands_sidebar_new();
 void errands_sidebar_load_lists(ErrandsSidebar *self);
-ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(ErrandsSidebar *sb, ListData2 *data);
+ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(ErrandsSidebar *sb, ListData *data);
 void errands_sidebar_select_last_opened_page();

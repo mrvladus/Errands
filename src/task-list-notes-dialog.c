@@ -89,7 +89,7 @@ void errands_task_list_notes_dialog_show(ErrandsTask *task) {
 // ---------- CALLBACKS ---------- //
 
 static void on_dialog_close_cb(ErrandsTaskListNotesDialog *self) {
-  TaskData2 *data = self->current_task->data;
+  TaskData *data = self->current_task->data;
   GtkTextBuffer *buf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(self->source_view));
   // Get the start and end iterators of the text buffer
   GtkTextIter start, end;

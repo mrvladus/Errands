@@ -57,7 +57,7 @@ void errands_sidebar_load_lists(ErrandsSidebar *self) {
   LOG("Sidebar: Create Task List Rows");
   // Add rows
   for (size_t i = 0; i < errands_data_lists->len; i++) {
-    ListData2 *ld = errands_data_lists->pdata[i];
+    ListData *ld = errands_data_lists->pdata[i];
     if (!errands_data_get_bool(ld->data, DATA_PROP_DELETED)) {
       ErrandsSidebarTaskListRow *row = errands_sidebar_task_list_row_new(ld);
       gtk_list_box_append(GTK_LIST_BOX(self->task_lists_box), GTK_WIDGET(row));
@@ -72,7 +72,7 @@ void errands_sidebar_load_lists(ErrandsSidebar *self) {
   LOG("Sidebar: Created %d Task List Rows", errands_data_lists->len);
 }
 
-ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(ErrandsSidebar *sb, ListData2 *data) {
+ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(ErrandsSidebar *sb, ListData *data) {
   LOG("Sidebar: Add task list '%s'", errands_data_get_str(data->data, DATA_PROP_LIST_UID));
   ErrandsSidebarTaskListRow *row = errands_sidebar_task_list_row_new(data);
   gtk_list_box_append(GTK_LIST_BOX(sb->task_lists_box), GTK_WIDGET(row));

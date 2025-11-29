@@ -40,7 +40,7 @@ static void errands_data_migrate_from_46() {
     JSON *name_item = json_object_get(cal_item, "name");
     JSON *list_uid_item = json_object_get(cal_item, "uid");
 
-    autoptr(ListData2) calendar =
+    autoptr(ListData) calendar =
         errands_list_data_create(list_uid_item->string_val, name_item->string_val, color_item->string_val,
                                  deleted_item->bool_val, synced_item->bool_val);
 
@@ -125,13 +125,13 @@ static void errands_data_migrate_from_46() {
   remove(old_data_file);
 }
 
-static void collect_and_sort_children_recursive(TaskData2 *parent, GPtrArray *all_tasks) {
+static void collect_and_sort_children_recursive(TaskData *parent, GPtrArray *all_tasks) {
   const char *uid = errands_data_get_str(parent->data, DATA_PROP_UID);
   for_range(i, 0, all_tasks->len) {
     icalcomponent *comp = TASK_DATA(all_tasks->pdata[i])->data;
     const char *parent_uid = errands_data_get_str(comp, DATA_PROP_PARENT);
     if (parent_uid && STR_EQUAL(uid, parent_uid)) {
-      TaskData2 *child = errands_task_data_new(comp, parent, parent->list);
+      TaskData *child = errands_task_data_new(comp, parent, parent->list);
       g_ptr_array_add(parent->children, child);
       collect_and_sort_children_recursive(child, all_tasks);
     }
@@ -174,11 +174,11 @@ void errands_data_init() {
   // Collect all tasks and add toplevel tasks to lists
   g_autoptr(GPtrArray) all_tasks = g_ptr_array_new();
   for_range(i, 0, errands_data_lists->len) {
-    ListData2 *data = g_ptr_array_index(errands_data_lists, i);
+    ListData *data = g_ptr_array_index(errands_data_lists, i);
     for (icalcomponent *c = icalcomponent_get_first_component(data->data, ICAL_VTODO_COMPONENT); c != 0;
          c = icalcomponent_get_next_component(data->data, ICAL_VTODO_COMPONENT)) {
       if (errands_data_get_bool(c, DATA_PROP_DELETED)) continue;
-      TaskData2 *task_data = errands_task_data_new(c, NULL, data);
+      TaskData *task_data = errands_task_data_new(c, NULL, data);
       g_ptr_array_add(all_tasks, task_data);
       if (errands_data_get_str(c, DATA_PROP_PARENT)) continue;
       g_ptr_array_add(data->children, task_data);
@@ -188,9 +188,9 @@ void errands_data_init() {
 
   // Collect children recursively
   for_range(i, 0, errands_data_lists->len) {
-    ListData2 *data = g_ptr_array_index(errands_data_lists, i);
+    ListData *data = g_ptr_array_index(errands_data_lists, i);
     for_range(j, 0, data->children->len) {
-      TaskData2 *toplevel_task = g_ptr_array_index(data->children, j);
+      TaskData *toplevel_task = g_ptr_array_index(data->children, j);
       collect_and_sort_children_recursive(toplevel_task, all_tasks);
     }
   }
@@ -200,7 +200,7 @@ void errands_data_init() {
 
 void errands_data_get_stats(size_t *total, size_t *completed) {
   for_range(i, 0, errands_data_lists->len) {
-    ListData2 *data = g_ptr_array_index(errands_data_lists, i);
+    ListData *data = g_ptr_array_index(errands_data_lists, i);
     CONTINUE_IF(errands_data_get_bool(data->data, DATA_PROP_DELETED))
     errands_list_data_get_stats(data, total, completed);
   }
@@ -208,28 +208,28 @@ void errands_data_get_stats(size_t *total, size_t *completed) {
 
 void errands_data_get_flat_list(GPtrArray *tasks) {
   for_range(i, 0, errands_data_lists->len) {
-    ListData2 *list = g_ptr_array_index(errands_data_lists, i);
+    ListData *list = g_ptr_array_index(errands_data_lists, i);
     errands_list_data_get_flat_list(list, tasks);
   }
 }
 
 void errands_data_sort() {
   for_range(i, 0, errands_data_lists->len) {
-    ListData2 *list = g_ptr_array_index(errands_data_lists, i);
+    ListData *list = g_ptr_array_index(errands_data_lists, i);
     errands_list_data_sort(list);
   }
 }
 
 // ---------- LIST DATA ---------- //
 
-ListData2 *errands_list_data_new(icalcomponent *data) {
-  ListData2 *list = malloc(sizeof(ListData2));
+ListData *errands_list_data_new(icalcomponent *data) {
+  ListData *list = malloc(sizeof(ListData));
   list->data = data;
   list->children = g_ptr_array_new_with_free_func((GDestroyNotify)errands_task_data_free);
   return list;
 }
 
-ListData2 *errands_list_data_create(const char *uid, const char *name, const char *color, bool deleted, bool synced) {
+ListData *errands_list_data_create(const char *uid, const char *name, const char *color, bool deleted, bool synced) {
   if (!name) return NULL;
   icalcomponent *calendar = icalcomponent_new(ICAL_VCALENDAR_COMPONENT);
   icalcomponent_add_property(calendar, icalproperty_new_version("2.0"));
@@ -242,12 +242,12 @@ ListData2 *errands_list_data_create(const char *uid, const char *name, const cha
   if (!color) errands_data_set_str(calendar, DATA_PROP_COLOR, generate_hex_as_str());
   errands_data_set_bool(calendar, DATA_PROP_DELETED, deleted);
   errands_data_set_bool(calendar, DATA_PROP_SYNCED, synced);
-  ListData2 *data = errands_list_data_new(calendar);
+  ListData *data = errands_list_data_new(calendar);
   LOG("Data: Created '%s'", errands_data_get_str(calendar, DATA_PROP_LIST_UID));
   return data;
 }
 
-void errands_list_data_free(ListData2 *data) {
+void errands_list_data_free(ListData *data) {
   if (!data) return;
   if (data->data) icalcomponent_free(data->data);
   g_ptr_array_free(data->children, true);
@@ -257,22 +257,22 @@ void errands_list_data_free(ListData2 *data) {
 static void errands_list_data_sort_recursive(GPtrArray *array) {
   g_ptr_array_sort_values(array, errands_data_sort_func);
   for_range(i, 0, array->len) {
-    TaskData2 *task_data = g_ptr_array_index(array, i);
+    TaskData *task_data = g_ptr_array_index(array, i);
     errands_list_data_sort_recursive(task_data->children);
   }
 }
 
-void errands_list_data_sort(ListData2 *data) {
+void errands_list_data_sort(ListData *data) {
   g_ptr_array_sort_values(data->children, errands_data_sort_func);
   for_range(i, 0, data->children->len) {
-    TaskData2 *task_data = g_ptr_array_index(data->children, i);
+    TaskData *task_data = g_ptr_array_index(data->children, i);
     errands_list_data_sort_recursive(task_data->children);
   }
 }
 
-void errands_list_data_get_stats(ListData2 *data, size_t *total, size_t *completed) {
+void errands_list_data_get_stats(ListData *data, size_t *total, size_t *completed) {
   for_range(i, 0, data->children->len) {
-    TaskData2 *child = g_ptr_array_index(data->children, i);
+    TaskData *child = g_ptr_array_index(data->children, i);
     bool deleted = errands_data_get_bool(child->data, DATA_PROP_DELETED);
     bool trash = errands_data_get_bool(child->data, DATA_PROP_TRASH);
     CONTINUE_IF(deleted || trash);
@@ -283,7 +283,7 @@ void errands_list_data_get_stats(ListData2 *data, size_t *total, size_t *complet
   }
 }
 
-GPtrArray *errands_list_data_get_all_tasks_as_icalcomponents(ListData2 *data) {
+GPtrArray *errands_list_data_get_all_tasks_as_icalcomponents(ListData *data) {
   if (icalcomponent_isa(data->data) != ICAL_VCALENDAR_COMPONENT) return NULL;
   GPtrArray *tasks = g_ptr_array_new();
   for (icalcomponent *c = icalcomponent_get_first_component(data->data, ICAL_VTODO_COMPONENT); c != 0;
@@ -292,22 +292,22 @@ GPtrArray *errands_list_data_get_all_tasks_as_icalcomponents(ListData2 *data) {
   return tasks;
 }
 
-void errands_list_data_print(ListData2 *data) {
+void errands_list_data_print(ListData *data) {
   for_range(i, 0, data->children->len) {
-    TaskData2 *task_data = g_ptr_array_index(data->children, i);
+    TaskData *task_data = g_ptr_array_index(data->children, i);
     errands_task_data_print(task_data);
   }
 }
 
-void errands_list_data_get_flat_list(ListData2 *data, GPtrArray *tasks) {
+void errands_list_data_get_flat_list(ListData *data, GPtrArray *tasks) {
   for_range(i, 0, data->children->len) {
-    TaskData2 *task_data = g_ptr_array_index(data->children, i);
+    TaskData *task_data = g_ptr_array_index(data->children, i);
     g_ptr_array_add(tasks, task_data);
     errands_task_data_get_flat_list(task_data, tasks);
   }
 }
 
-static void errands_data__write_list(ListData2 *data) {
+static void errands_data__write_list(ListData *data) {
   if (!data || !data->data) return;
   g_autofree gchar *path = g_strdup_printf("%s/%s.ics", user_dir, errands_data_get_str(data->data, DATA_PROP_LIST_UID));
   if (!g_file_set_contents(path, icalcomponent_as_ical_string(data->data), -1, NULL)) {
@@ -317,12 +317,12 @@ static void errands_data__write_list(ListData2 *data) {
   LOG("User Data: Saved list '%s'", path);
 }
 
-void errands_data_write_list(ListData2 *data) { g_idle_add_once((GSourceOnceFunc)errands_data__write_list, data); }
+void errands_data_write_list(ListData *data) { g_idle_add_once((GSourceOnceFunc)errands_data__write_list, data); }
 
 // ---------- TASK DATA ---------- //
 
-TaskData2 *errands_task_data_new(icalcomponent *data, TaskData2 *parent, ListData2 *list) {
-  TaskData2 *task = malloc(sizeof(TaskData2));
+TaskData *errands_task_data_new(icalcomponent *data, TaskData *parent, ListData *list) {
+  TaskData *task = malloc(sizeof(TaskData));
   task->data = data;
   task->parent = parent;
   task->list = list;
@@ -330,7 +330,7 @@ TaskData2 *errands_task_data_new(icalcomponent *data, TaskData2 *parent, ListDat
   return task;
 }
 
-TaskData2 *errands_task_data_create_task(ListData2 *list, TaskData2 *parent, const char *text) {
+TaskData *errands_task_data_create_task(ListData *list, TaskData *parent, const char *text) {
   icalcomponent *task_data = icalcomponent_new(ICAL_VTODO_COMPONENT);
   g_autofree gchar *uid = g_uuid_string_random();
   errands_data_set_str(task_data, DATA_PROP_UID, uid);
@@ -343,20 +343,20 @@ TaskData2 *errands_task_data_create_task(ListData2 *list, TaskData2 *parent, con
   }
   errands_data_set_time(task_data, DATA_PROP_CREATED_TIME, icaltime_get_date_time_now());
   icalcomponent_add_component(list->data, task_data);
-  TaskData2 *task = errands_task_data_new(task_data, parent, list);
+  TaskData *task = errands_task_data_new(task_data, parent, list);
   return task;
 }
 
-void errands_task_data_free(TaskData2 *data) {
+void errands_task_data_free(TaskData *data) {
   if (!data) return;
   g_ptr_array_free(data->children, true);
   free(data);
 }
 
-size_t errands_task_data_get_indent_level(TaskData2 *data) {
+size_t errands_task_data_get_indent_level(TaskData *data) {
   if (!data) return 0;
   size_t indent = 0;
-  TaskData2 *parent = data->parent;
+  TaskData *parent = data->parent;
   while (parent) {
     indent++;
     parent = parent->parent;
@@ -364,9 +364,9 @@ size_t errands_task_data_get_indent_level(TaskData2 *data) {
   return indent;
 }
 
-void errands_task_data_get_stats_recursive(TaskData2 *data, size_t *total, size_t *completed) {
+void errands_task_data_get_stats_recursive(TaskData *data, size_t *total, size_t *completed) {
   for_range(i, 0, data->children->len) {
-    TaskData2 *child = g_ptr_array_index(data->children, i);
+    TaskData *child = g_ptr_array_index(data->children, i);
     bool deleted = errands_data_get_bool(child->data, DATA_PROP_DELETED);
     bool trash = errands_data_get_bool(child->data, DATA_PROP_TRASH);
     CONTINUE_IF(deleted || trash);
@@ -377,15 +377,15 @@ void errands_task_data_get_stats_recursive(TaskData2 *data, size_t *total, size_
   }
 }
 
-void errands_task_data_print(TaskData2 *data) {
+void errands_task_data_print(TaskData *data) {
   const char *text = errands_data_get_str(data->data, DATA_PROP_TEXT);
   bool completed = !icaltime_is_null_date(errands_data_get_time(data->data, DATA_PROP_COMPLETED_TIME));
   LOG("[%s] %s", completed ? "x" : " ", text);
 }
 
-void errands_task_data_get_flat_list(TaskData2 *parent, GPtrArray *array) {
+void errands_task_data_get_flat_list(TaskData *parent, GPtrArray *array) {
   for_range(i, 0, parent->children->len) {
-    TaskData2 *sub_task = g_ptr_array_index(parent->children, i);
+    TaskData *sub_task = g_ptr_array_index(parent->children, i);
     g_ptr_array_add(array, sub_task);
     errands_task_data_get_flat_list(sub_task, array);
   }
@@ -542,8 +542,8 @@ bool icalrecurrencetype_compare(const struct icalrecurrencetype *a, const struct
 
 gint errands_data_sort_func(gconstpointer a, gconstpointer b) {
   if (!a || !b) return 0;
-  TaskData2 *td_a = (TaskData2 *)a;
-  TaskData2 *td_b = (TaskData2 *)b;
+  TaskData *td_a = (TaskData *)a;
+  TaskData *td_b = (TaskData *)b;
   icalcomponent *data_a = td_a->data;
   icalcomponent *data_b = td_b->data;
 

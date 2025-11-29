@@ -10,8 +10,8 @@
 #include <libical/ical.h>
 
 static bool sync_scheduled = false;
-static ListData2 *list_data = NULL;
-static TaskData2 *task_data = NULL;
+static ListData *list_data = NULL;
+static TaskData *task_data = NULL;
 
 CalDAVClient *client;
 
@@ -121,12 +121,12 @@ void sync() {
 
 void errands_sync_schedule() { sync_scheduled = true; }
 
-void errands_sync_schedule_list(ListData2 *data) {
+void errands_sync_schedule_list(ListData *data) {
   sync_scheduled = true;
   list_data = data;
 }
 
-void errands_sync_schedule_task(TaskData2 *data) {
+void errands_sync_schedule_task(TaskData *data) {
   sync_scheduled = true;
   task_data = data;
 }

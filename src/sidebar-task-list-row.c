@@ -11,7 +11,7 @@
 #include <stddef.h>
 
 static void on_right_click(GtkPopover *popover, gint n_press, gdouble x, gdouble y, GtkGestureClick *ctrl);
-static void on_color_changed(GtkColorDialogButton *btn, GParamSpec *pspec, ListData2 *data);
+static void on_color_changed(GtkColorDialogButton *btn, GParamSpec *pspec, ListData *data);
 static void on_action_rename(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row);
 static void on_action_export(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row);
 static void on_action_delete(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row);
@@ -68,7 +68,7 @@ static void errands_sidebar_task_list_row_init(ErrandsSidebarTaskListRow *self) 
   // gtk_widget_add_controller(GTK_WIDGET(self), GTK_EVENT_CONTROLLER(self->hover_ctrl));
 }
 
-ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_new(ListData2 *data) {
+ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_new(ListData *data) {
   LOG_NO_LN("Task List Row '%s': Create ... ", errands_data_get_str(data->data, DATA_PROP_LIST_UID));
 
   ErrandsSidebarTaskListRow *row = g_object_new(ERRANDS_TYPE_SIDEBAR_TASK_LIST_ROW, NULL);
@@ -92,7 +92,7 @@ ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_new(ListData2 *data) {
 ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_get(const char *uid) {
   g_autoptr(GPtrArray) children = get_children(state.main_window->sidebar->task_lists_box);
   for (size_t i = 0; i < children->len; i++) {
-    ListData2 *data = ((ErrandsSidebarTaskListRow *)children->pdata[i])->data;
+    ListData *data = ((ErrandsSidebarTaskListRow *)children->pdata[i])->data;
     if (STR_EQUAL(errands_data_get_str(data->data, DATA_PROP_LIST_UID), uid)) return children->pdata[i];
   }
   return NULL;
@@ -129,7 +129,7 @@ static void on_right_click(GtkPopover *popover, gint n_press, gdouble x, gdouble
   gtk_popover_popup(popover);
 }
 
-static void on_color_changed(GtkColorDialogButton *btn, GParamSpec *pspec, ListData2 *data) {
+static void on_color_changed(GtkColorDialogButton *btn, GParamSpec *pspec, ListData *data) {
   const GdkRGBA *color_rgba = gtk_color_dialog_button_get_rgba(btn);
   char new_color[8];
   gdk_rgba_to_hex_string(color_rgba, new_color);

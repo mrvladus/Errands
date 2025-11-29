@@ -65,7 +65,7 @@ static void on_delete_cb(ErrandsTaskListTagsDialogTag *self, GtkButton *btn) {
   LOG("Tags Dialog: Deleting tag: %s", tag);
   errands_settings_remove_tag(tag);
   for_range(i, 0, errands_data_lists->len) {
-    ListData2 *list = g_ptr_array_index(errands_data_lists, i);
+    ListData *list = g_ptr_array_index(errands_data_lists, i);
     g_autoptr(GPtrArray) tasks = errands_list_data_get_all_tasks_as_icalcomponents(list);
     for_range(j, 0, tasks->len) {
       icalcomponent *task = g_ptr_array_index(tasks, j);
