@@ -285,65 +285,39 @@ const char *errands_task_as_str(ErrandsTask *task) {
 
 // ---------- CALLBACKS ---------- //
 
-// NOTE: maybe this function is not optimized, but it always been the case.
-// Maybe need to look into it more.
 static void on_complete_btn_toggle_cb(ErrandsTask *self, GtkCheckButton *btn) {
-  // LOG("Toggle completion '%s'", errands_data_get_str(self->data->data, DATA_PROP_UID));
-  // bool active = gtk_check_button_get_active(btn);
-  // errands_data_set_time(self->data->data, DATA_PROP_COMPLETED_TIME,
-  //                       active ? icaltime_get_date_time_now() : icaltime_null_time());
-  // ErrandsTaskListPage page = state.main_window->task_list->page;
-  // // Complete all sub-tasks if checked
-  // if (active) {
-  //   GPtrArray *sub_tasks_tree = g_ptr_array_new();
-  //   // task_data_get_sub_tasks_tree(task->data->data, sub_tasks_tree, false);
-  //   // for (size_t i = 0; i < sub_tasks_tree->len; ++i) {
-  //   //   TaskData *sub_task_data = sub_tasks_tree->pdata[i];
-  //   //   errands_data_set_time(sub_task_data, DATA_PROP_COMPLETED_TIME, icaltime_get_date_time_now());
-  //   // }
-  //   g_ptr_array_free(sub_tasks_tree, false);
-  //   if (page == ERRANDS_TASK_LIST_PAGE_TODAY) errands_task_list_show_all_tasks(state.main_window->task_list);
-  //   sub_tasks_tree = g_ptr_array_new();
-  //   errands_task_get_sub_tasks_tree(self, sub_tasks_tree);
-  //   for (size_t i = 0; i < sub_tasks_tree->len; ++i) {
-  //     ErrandsTask *sub_task = sub_tasks_tree->pdata[i];
-  //     if (sub_task && ERRANDS_IS_TASK(sub_task)) errands_task_set_data(sub_task, sub_task->data);
-  //   }
-  //   g_ptr_array_free(sub_tasks_tree, false);
-  // }
-  // // Uncomplete parent tasks if unchecked
-  // else {
-  //   GPtrArray *parents = g_ptr_array_new();
-  //   errands_task_get_parents(self, parents);
-  //   for (size_t i = 0; i < parents->len; ++i) {
-  //     ErrandsTask *parent = parents->pdata[i];
-  //     bool completed = gtk_check_button_get_active(GTK_CHECK_BUTTON(parent->complete_btn));
-  //     if (completed) {
-  //       errands_data_set_time(parent->data->data, DATA_PROP_COMPLETED_TIME, icaltime_null_time());
-  //       errands_task_set_data(parent, parent->data);
-  //     }
-  //     errands_task_update_progress(parent);
-  //   }
-  //   g_ptr_array_free(parents, false);
-  // }
-  // if (page == ERRANDS_TASK_LIST_PAGE_TODAY) errands_task_list_show_today_tasks(state.main_window->task_list);
-
-  // // errands_data_write_list(task_data_get_list(task->data));
-  // errands_task_update_progress(self);
-  // errands_task_update_progress(get_parent_task(self));
-
-  // // Sort task list by completion
-  // // gtk_sorter_changed(GTK_SORTER(state.main_window->task_list->master_sorter), GTK_SORTER_CHANGE_MORE_STRICT);
-  // // TODO: remember next row and scroll to it
-
-  // // Update task list
-  // errands_task_list_update_title(state.main_window->task_list);
-  // errands_sidebar_all_row_update_counter(state.main_window->sidebar->all_row);
-  // errands_sidebar_today_row_update_counter(state.main_window->sidebar->today_row);
-  // errands_sidebar_task_list_row_update_counter(
-  //     errands_sidebar_task_list_row_get(errands_data_get_str(self->data->data, DATA_PROP_LIST_UID)));
-
-  // needs_sync = true;
+  LOG("Toggle completion '%s'", errands_data_get_str(self->data->data, DATA_PROP_UID));
+  bool active = gtk_check_button_get_active(btn);
+  icaltimetype now = icaltime_get_date_time_now();
+  errands_data_set_time(self->data->data, DATA_PROP_COMPLETED_TIME, active ? now : icaltime_null_time());
+  // Complete all sub-tasks if completed
+  if (active) {
+    g_autoptr(GPtrArray) sub_tasks = g_ptr_array_new();
+    errands_task_data_get_flat_list(self->data, sub_tasks);
+    for_range(i, 0, sub_tasks->len) {
+      TaskData *sub_task = g_ptr_array_index(sub_tasks, i);
+      errands_data_set_time(sub_task->data, DATA_PROP_COMPLETED_TIME, now);
+    }
+  }
+  // Uncomplete parents tasks if unchecked
+  else {
+    TaskData *parent = self->data->parent;
+    while (parent) {
+      errands_data_set_time(parent->data, DATA_PROP_COMPLETED_TIME, icaltime_null_time());
+      parent = parent->parent;
+    }
+  }
+  errands_data_write_list(self->data->list);
+  errands_list_data_sort(self->data->list);
+  errands_task_list_reload(state.main_window->task_list, true);
+  // Update task list
+  errands_task_list_update_title(state.main_window->task_list);
+  errands_sidebar_all_row_update_counter(state.main_window->sidebar->all_row);
+  errands_sidebar_today_row_update_counter(state.main_window->sidebar->today_row);
+  errands_sidebar_task_list_row_update_counter(
+      errands_sidebar_task_list_row_get(errands_data_get_str(self->data->data, DATA_PROP_LIST_UID)));
+  // Sync
+  errands_sync_schedule_list(self->data->list);
 }
 
 static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointer user_data) {
