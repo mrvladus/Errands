@@ -413,16 +413,13 @@ static void on_export_action_finish_cb(GObject *obj, GAsyncResult *res, gpointer
   FILE *file = fopen(path, "w");
   if (!file) return; // TODO: error toast
   TaskData *task_data = data;
-  icalcomponent *cal = icalcomponent_new_vcalendar();
-  icalcomponent *dup = icalcomponent_new_clone(task_data->data);
+  autoptr(icalcomponent) cal = icalcomponent_new_vcalendar();
+  autoptr(icalcomponent) dup = icalcomponent_new_clone(task_data->data);
   icalcomponent_add_component(cal, dup);
-  char *ical = icalcomponent_as_ical_string(cal);
+  autofree char *ical = icalcomponent_as_ical_string(cal);
   fprintf(file, "%s", ical);
   fclose(file);
   LOG("Exported Task to '%s'", path);
-  free(ical);
-  icalcomponent_free(dup);
-  icalcomponent_free(cal);
 }
 
 static void on_action_export(GSimpleAction *action, GVariant *param, ErrandsTask *task) {

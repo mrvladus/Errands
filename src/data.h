@@ -5,8 +5,7 @@
 #include <glib-object.h>
 #include <libical/ical.h>
 
-#include <stdbool.h>
-#include <stddef.h>
+AUTOPTR_DEFINE(icalcomponent, icalcomponent_free)
 
 typedef struct TaskData TaskData;
 
