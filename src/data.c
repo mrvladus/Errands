@@ -1,18 +1,14 @@
 #include "data.h"
-#include "glib.h"
 #include "settings.h"
 
 #include "vendor/json.h"
-#include "vendor/toolbox.h"
-
-#include <libical/ical.h>
 
 AUTOPTR_DEFINE(JSON, json_free)
 
 // ---------- GLOBALS ---------- //
 
 GPtrArray *errands_data_lists;
-static char *user_dir;
+static gchar *user_dir, *calendars_dir;
 
 // ---------- LOADING DATA ---------- //
 
@@ -117,7 +113,7 @@ static void errands_data_migrate_from_46() {
     }
     // Save calendar to file
     const char *calendar_filename = tmp_str_printf("%s.ics", list_uid_item->string_val);
-    g_autofree gchar *calendar_file_path = g_build_filename(user_dir, calendar_filename, NULL);
+    g_autofree gchar *calendar_file_path = g_build_filename(calendars_dir, calendar_filename, NULL);
     bool res = write_string_to_file(calendar_file_path, icalcomponent_as_ical_string(calendar->data));
     if (!res) LOG("User Data: Failed to save calendar to %s", calendar_file_path);
   }
@@ -141,18 +137,19 @@ static void collect_and_sort_children_recursive(TaskData *parent, GPtrArray *all
 void errands_data_init() {
   errands_data_lists = g_ptr_array_new_with_free_func((GDestroyNotify)errands_list_data_free);
   user_dir = g_build_filename(g_get_user_data_dir(), "errands", NULL);
+  calendars_dir = g_build_filename(user_dir, "calendars", NULL);
 
-  g_mkdir_with_parents(user_dir, 0755);
+  g_mkdir_with_parents(calendars_dir, 0755);
   errands_data_migrate_from_46();
 
   // Load lists
-  g_autoptr(GDir) dir = g_dir_open(user_dir, 0, NULL);
+  g_autoptr(GDir) dir = g_dir_open(calendars_dir, 0, NULL);
   if (!dir) return;
   const char *filename;
   TIMER_START;
   while ((filename = g_dir_read_name(dir))) {
     if (!g_str_has_suffix(filename, ".ics")) continue;
-    g_autofree gchar *path = g_build_filename(user_dir, filename, NULL);
+    g_autofree gchar *path = g_build_filename(calendars_dir, filename, NULL);
     g_autofree gchar *content = read_file_to_string(path);
     if (!content) continue;
     icalcomponent *calendar = icalparser_parse_string(content);
@@ -307,7 +304,8 @@ void errands_list_data_get_flat_list(ListData *data, GPtrArray *tasks) {
 
 static void errands_data__write_list(ListData *data) {
   if (!data || !data->data) return;
-  g_autofree gchar *path = g_strdup_printf("%s/%s.ics", user_dir, errands_data_get_str(data->data, DATA_PROP_LIST_UID));
+  g_autofree gchar *path =
+      g_strdup_printf("%s/%s.ics", calendars_dir, errands_data_get_str(data->data, DATA_PROP_LIST_UID));
   if (!g_file_set_contents(path, icalcomponent_as_ical_string(data->data), -1, NULL)) {
     LOG("User Data: Failed to save list '%s'", path);
     return;
@@ -394,30 +392,11 @@ void errands_task_data_get_flat_list(TaskData *parent, GPtrArray *array) {
 
 void errands_data_cleanup(void) {
   g_free(user_dir);
+  g_free(calendars_dir);
   g_ptr_array_free(errands_data_lists, true);
 }
 
-// ---------- LIST DATA ---------- //
-
-// GPtrArray *list_data_get_tasks(ListData *data) {
-//   GPtrArray *tasks = g_ptr_array_new();
-//   for (icalcomponent *c = icalcomponent_get_first_component(data, ICAL_VTODO_COMPONENT); c != 0;
-//        c = icalcomponent_get_next_component(data, ICAL_VTODO_COMPONENT))
-//     g_ptr_array_add(tasks, c);
-//   return tasks;
-// }
-
-// TaskData *list_data_create_task(ListData *list, const char *text, const char *list_uid, const char *parent) {
-//   TaskData *task_data = icalcomponent_new(ICAL_VTODO_COMPONENT);
-//   g_autofree gchar *uid = g_uuid_string_random();
-//   errands_data_set_str(task_data, DATA_PROP_UID, uid);
-//   errands_data_set_str(task_data, DATA_PROP_TEXT, text);
-//   if (!STR_EQUAL(parent, "")) errands_data_set_str(task_data, DATA_PROP_PARENT, parent);
-//   errands_data_set_str(task_data, DATA_PROP_LIST_UID, list_uid);
-//   errands_data_set_time(task_data, DATA_PROP_CREATED_TIME, icaltime_get_date_time_now());
-//   icalcomponent_add_component(list, task_data);
-//   return task_data;
-// }
+// ---------- PRINTING ---------- //
 
 // gchar *list_data_print(ListData *data) {
 //   const char *name = errands_data_get_str(data, DATA_PROP_LIST_NAME);
@@ -432,40 +411,6 @@ void errands_data_cleanup(void) {
 //   g_ptr_array_free(tasks, false);
 //   return g_string_free(out, false);
 // }
-
-// ---------- TASK DATA ---------- //
-
-// TaskData *task_data_new(ListData *list, const char *text, const char *list_uid) {
-//   icalcomponent *task = icalcomponent_new(ICAL_VTODO_COMPONENT);
-//   return task;
-// }
-
-// void task_data_free(TaskData *data) { free(data); }
-
-// ListData *task_data_get_list(TaskData *data) { return icalcomponent_get_parent(data); }
-
-// GPtrArray *errands_task_data_get_children(TaskData *data) {
-//   const char *uid = errands_data_get_str(data, DATA_PROP_UID);
-//   g_autoptr(GPtrArray) tasks = list_data_get_tasks(task_data_get_list(data));
-//   GPtrArray *children = g_ptr_array_new();
-//   for (size_t i = 0; i < tasks->len; i++) {
-//     TaskData *td = tasks->pdata[i];
-//     const char *parent_uid = errands_data_get_str(td, DATA_PROP_PARENT);
-//     if (parent_uid && STR_EQUAL(uid, parent_uid)) g_ptr_array_add(children, td);
-//   }
-//   return children;
-// }
-
-// void task_data_get_sub_tasks_tree(TaskData *data, GPtrArray *arr, bool sort) {
-//   g_autoptr(GPtrArray) sub_tasks = errands_task_data_get_children(data);
-//   for (size_t i = 0; i < sub_tasks->len; i++) {
-//     TaskData *child = sub_tasks->pdata[i];
-//     g_ptr_array_add(arr, child);
-//     task_data_get_sub_tasks_tree(child, arr, sort);
-//   }
-// }
-
-// ---------- PRINTING ---------- //
 
 // void task_data_print(TaskData *data, GString *out, size_t indent) {
 //   const uint8_t max_line_len = 72;
@@ -543,8 +488,6 @@ gint errands_data_sort_func(gconstpointer a, gconstpointer b) {
   TaskData *td_b = (TaskData *)b;
   icalcomponent *data_a = td_a->data;
   icalcomponent *data_b = td_b->data;
-
-  // LOG("Text %s %s", errands_data_get_str(data_a, DATA_PROP_TEXT), errands_data_get_str(data_b, DATA_PROP_TEXT));
 
   // Completion sort first
   gboolean completed_a = !icaltime_is_null_date(errands_data_get_time(data_a, DATA_PROP_COMPLETED_TIME));

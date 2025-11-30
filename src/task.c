@@ -401,7 +401,7 @@ static void on_action_trash(GSimpleAction *action, GVariant *param, ErrandsTask 
 
 static void on_action_clipboard(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
   const char *text = errands_data_get_str(self->data->data, DATA_PROP_TEXT);
-  g_autoptr(GdkClipboard) clipboard = gdk_display_get_clipboard(gtk_widget_get_display(GTK_WIDGET(self)));
+  GdkClipboard *clipboard = gdk_display_get_clipboard(gtk_widget_get_display(GTK_WIDGET(self)));
   gdk_clipboard_set(clipboard, G_TYPE_STRING, text);
   errands_window_add_toast(state.main_window, _("Copied to Clipboard"));
 }

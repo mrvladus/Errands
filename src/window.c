@@ -3,6 +3,7 @@
 #include "settings.h"
 #include "state.h"
 #include "task-list.h"
+
 #include "vendor/toolbox.h"
 
 static void on_size_changed_cb(ErrandsWindow *win);
@@ -67,8 +68,7 @@ void errands_window_update(ErrandsWindow *win) {
 
 void errands_window_add_toast(ErrandsWindow *win, const char *msg) {
   LOG("Window: Add Toast '%s'", msg);
-  g_autoptr(AdwToast) toast = adw_toast_new(msg);
-  adw_toast_overlay_add_toast(win->toast_overlay, toast);
+  adw_toast_overlay_add_toast(win->toast_overlay, adw_toast_new(msg));
 }
 
 // ---------- CALLBACKS ---------- //
