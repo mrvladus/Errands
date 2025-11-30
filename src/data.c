@@ -2,6 +2,8 @@
 #include "settings.h"
 
 #include "vendor/json.h"
+#include <libical/ical.h>
+#include <stdbool.h>
 
 AUTOPTR_DEFINE(JSON, json_free)
 
@@ -223,6 +225,38 @@ ListData *errands_list_data_new(icalcomponent *data) {
   list->data = data;
   list->children = g_ptr_array_new_with_free_func((GDestroyNotify)errands_task_data_free);
   return list;
+}
+
+ListData *errands_list_data_new_from_ical(const char *ical, const char *uid, const char *name, const char *color) {
+  if (!ical) return NULL;
+  icalcomponent *calendar = icalparser_parse_string(ical);
+  if (!calendar) return NULL;
+  if (icalcomponent_isa(calendar) != ICAL_VCALENDAR_COMPONENT) return NULL;
+  ListData *data = errands_list_data_new(calendar);
+  g_autofree gchar *_uid = g_uuid_string_random();
+  errands_data_set(calendar, DATA_PROP_LIST_UID, uid ? uid : _uid);
+  errands_data_set(calendar, DATA_PROP_LIST_NAME, name ? name : _uid);
+  errands_data_set(calendar, DATA_PROP_DELETED, false);
+  errands_data_set(calendar, DATA_PROP_SYNCED, false);
+  errands_data_set(calendar, DATA_PROP_COLOR, color ? color : generate_hex_as_str());
+  // Collect all tasks and add toplevel tasks to lists
+  g_autoptr(GPtrArray) all_tasks = g_ptr_array_new();
+  for (icalcomponent *c = icalcomponent_get_first_component(data->data, ICAL_VTODO_COMPONENT); c != 0;
+       c = icalcomponent_get_next_component(data->data, ICAL_VTODO_COMPONENT)) {
+    if (errands_data_get_bool(c, DATA_PROP_DELETED)) continue;
+    TaskData *task_data = errands_task_data_new(c, NULL, data);
+    g_ptr_array_add(all_tasks, task_data);
+    if (errands_data_get_str(c, DATA_PROP_PARENT)) continue;
+    g_ptr_array_add(data->children, task_data);
+  }
+  g_ptr_array_sort_values(data->children, errands_data_sort_func);
+  // Collect children recursively
+  for_range(i, 0, data->children->len) {
+    TaskData *toplevel_task = g_ptr_array_index(data->children, i);
+    collect_and_sort_children_recursive(toplevel_task, all_tasks);
+  }
+
+  return data;
 }
 
 ListData *errands_list_data_create(const char *uid, const char *name, const char *color, bool deleted, bool synced) {

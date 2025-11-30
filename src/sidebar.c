@@ -3,6 +3,7 @@
 #include "settings-dialog.h"
 #include "settings.h"
 #include "state.h"
+#include "sync.h"
 #include "task-list.h"
 #include "utils.h"
 
@@ -104,42 +105,34 @@ static void on_errands_sidebar_filter_row_activated(GtkListBox *box, GtkListBoxR
   }
 }
 
-static void __on_open_finish(GObject *obj, GAsyncResult *res, ErrandsSidebar *sb) {
+static void __on_open_finish(GObject *obj, GAsyncResult *res, ErrandsSidebar *self) {
   g_autoptr(GFile) file = gtk_file_dialog_open_finish(GTK_FILE_DIALOG(obj), res, NULL);
   if (!file) return;
   g_autofree gchar *path = g_file_get_path(file);
-  // char *ical = tb_read_file_to_string(path);
-  // if (ical) {
-  //   TB_TODO("Use toolbox path funcs here");
-  //   g_autofree gchar *basename = g_file_get_basename(file);
-  //   *(strrchr(basename, '.')) = '\0';
-  //   ListData *data = list_data_new_from_ical(ical, basename, g_hash_table_size(ldata));
-  //   free(ical);
-  //   // Check if uid exists
-  //   bool exists = g_hash_table_contains(ldata, errands_data_get_str(data, DATA_PROP_LIST_UID));
-  //   if (!exists) {
-  //     LOG("Sidebar: List already exists");
-  //     errands_window_add_toast(state.main_window, _("List already exists"));
-  //     errands_data_free(data);
-  //     return;
-  //   }
-  //   g_hash_table_insert(ldata, strdup(errands_data_get_str(data, DATA_PROP_LIST_UID)), data);
-  //   errands_sidebar_add_task_list(sb, data);
-  //   GPtrArray *tasks = list_data_get_tasks(data);
-  //   for (size_t i = 0; i < tasks->len; i++) {
-  //     TaskData *td = tasks->pdata[i];
-  //     g_hash_table_insert(tdata, g_strdup(errands_data_get_str(data, DATA_PROP_UID)), td);
-  //     // TODO
-  //     // errands_task_list_add(td);
-  //   }
-  //   errands_data_write_list(data);
-  //   g_ptr_array_free(tasks, false);
-  //   // errands_task_list_filter_by_uid(basename);
-  // }
-  // TODO: sync
+  autofree char *ical = read_file_to_string(path);
+  if (!ical) return;
+  char *uid = (char *)path_base_name(path);
+  *(strrchr(uid, '.')) = '\0';
+  // Check if uid exists
+  for_range(i, 0, errands_data_lists->len) {
+    ListData *data = g_ptr_array_index(errands_data_lists, i);
+    if (STR_EQUAL(uid, errands_data_get_str(data->data, DATA_PROP_LIST_UID))) {
+      errands_window_add_toast(state.main_window, _("List already exists"));
+      return;
+    }
+  }
+  ListData *data = errands_list_data_new_from_ical(ical, uid, uid, NULL);
+  errands_data_write_list(data);
+  g_ptr_array_add(errands_data_lists, data);
+  ErrandsSidebarTaskListRow *row = errands_sidebar_add_task_list(self, data);
+  g_signal_emit_by_name(row, "activate", NULL);
+  errands_sync_schedule_list(data);
 }
 
 static void on_import_action_cb(GSimpleAction *action, GVariant *param, ErrandsSidebar *self) {
   g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
+  g_autoptr(GtkFileFilter) filter = gtk_file_filter_new();
+  gtk_file_filter_add_pattern(filter, "*.ics");
+  gtk_file_dialog_set_default_filter(dialog, filter);
   gtk_file_dialog_open(dialog, GTK_WINDOW(state.main_window), NULL, (GAsyncReadyCallback)__on_open_finish, self);
 }

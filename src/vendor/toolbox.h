@@ -333,7 +333,7 @@ static inline const char *path_ext(const char *path) {
 
 // -------------------- COLORS -------------------- //
 
-static inline char *generate_hex_as_str() {
+static inline const char *generate_hex_as_str() {
   static char hex[8] = {0};
   sprintf(hex, "#%06x", rand() % 0xFFFFFF);
   return hex;

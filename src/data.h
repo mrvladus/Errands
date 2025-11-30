@@ -27,6 +27,7 @@ typedef struct {
 #define LIST_DATA(ptr) ((ListData *)(ptr))
 
 ListData *errands_list_data_new(icalcomponent *data);
+ListData *errands_list_data_new_from_ical(const char *ical, const char *uid, const char *name, const char *color);
 void errands_list_data_free(ListData *data);
 AUTOPTR_DEFINE(ListData, errands_list_data_free)
 // Create new `ListData`.
@@ -136,6 +137,7 @@ void errands_data_set_time(icalcomponent *data, DataPropTime prop, icaltimetype 
 #define errands_data_set(data, DataProp, value)                                                                        \
   _Generic((value),                                                                                                    \
       const char *: errands_data_set_str,                                                                              \
+      char *: errands_data_set_str,                                                                                    \
       size_t: errands_data_set_int,                                                                                    \
       bool: errands_data_set_bool,                                                                                     \
       int: errands_data_set_bool,                                                                                      \
