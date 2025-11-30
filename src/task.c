@@ -289,21 +289,21 @@ static void on_complete_btn_toggle_cb(ErrandsTask *self, GtkCheckButton *btn) {
   LOG("Toggle completion '%s'", errands_data_get_str(self->data->data, DATA_PROP_UID));
   bool active = gtk_check_button_get_active(btn);
   icaltimetype now = icaltime_get_date_time_now();
-  errands_data_set_time(self->data->data, DATA_PROP_COMPLETED_TIME, active ? now : icaltime_null_time());
+  errands_data_set(self->data->data, DATA_PROP_COMPLETED_TIME, active ? now : icaltime_null_time());
   // Complete all sub-tasks if completed
   if (active) {
     g_autoptr(GPtrArray) sub_tasks = g_ptr_array_new();
     errands_task_data_get_flat_list(self->data, sub_tasks);
     for_range(i, 0, sub_tasks->len) {
       TaskData *sub_task = g_ptr_array_index(sub_tasks, i);
-      errands_data_set_time(sub_task->data, DATA_PROP_COMPLETED_TIME, now);
+      errands_data_set(sub_task->data, DATA_PROP_COMPLETED_TIME, now);
     }
   }
   // Uncomplete parents tasks if unchecked
   else {
     TaskData *parent = self->data->parent;
     while (parent) {
-      errands_data_set_time(parent->data, DATA_PROP_COMPLETED_TIME, icaltime_null_time());
+      errands_data_set(parent->data, DATA_PROP_COMPLETED_TIME, icaltime_null_time());
       parent = parent->parent;
     }
   }
@@ -340,7 +340,7 @@ static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointe
       return;
     }
     gtk_widget_set_visible(task->title, true);
-    errands_data_set_str(task->data->data, DATA_PROP_TEXT, text);
+    errands_data_set(task->data->data, DATA_PROP_TEXT, text);
     errands_data_write_list(task->data->list);
     gtk_label_set_label(GTK_LABEL(task->title), text);
     errands_sync_schedule_task(task->data);
@@ -349,7 +349,7 @@ static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointe
 
 static void on_toolbar_btn_toggle_cb(ErrandsTask *self, GtkToggleButton *btn) {
   LOG("Task '%s': Toggle toolbar", errands_data_get_str(self->data->data, DATA_PROP_UID));
-  errands_data_set_bool(self->data->data, DATA_PROP_TOOLBAR_SHOWN, gtk_toggle_button_get_active(btn));
+  errands_data_set(self->data->data, DATA_PROP_TOOLBAR_SHOWN, gtk_toggle_button_get_active(btn));
   errands_data_write_list(self->data->list);
 }
 
@@ -376,7 +376,7 @@ static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x, gdoub
 static void on_expand_toggle_cb(ErrandsTask *self, GtkGestureClick *ctrl, gint n_press, gdouble x, gdouble y) {
   bool new_expanded = !errands_data_get_bool(self->data->data, DATA_PROP_EXPANDED);
   LOG("Task '%s': Toggle expand: %d", errands_data_get_str(self->data->data, DATA_PROP_UID), new_expanded);
-  errands_data_set_bool(self->data->data, DATA_PROP_EXPANDED, new_expanded);
+  errands_data_set(self->data->data, DATA_PROP_EXPANDED, new_expanded);
   errands_data_write_list(self->data->list);
   errands_task_list_reload(state.main_window->task_list, true);
   gtk_widget_grab_focus(GTK_WIDGET(self->sub_entry));
@@ -389,7 +389,7 @@ static void on_action_edit(GSimpleAction *action, GVariant *param, ErrandsTask *
 }
 
 static void on_action_trash(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
-  errands_data_set_bool(self->data->data, DATA_PROP_TRASH, true);
+  errands_data_set(self->data->data, DATA_PROP_TRASH, true);
   errands_data_write_list(self->data->list);
   errands_task_list_update_title(state.main_window->task_list);
   errands_sidebar_all_row_update_counter(state.main_window->sidebar->all_row);

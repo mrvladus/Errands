@@ -134,5 +134,14 @@ typedef enum {
 icaltimetype errands_data_get_time(icalcomponent *data, DataPropTime prop);
 void errands_data_set_time(icalcomponent *data, DataPropTime prop, icaltimetype value);
 
+#define errands_data_set(data, DataProp, value)                                                                        \
+  _Generic((value),                                                                                                    \
+      const char *: errands_data_set_str,                                                                              \
+      size_t: errands_data_set_int,                                                                                    \
+      bool: errands_data_set_bool,                                                                                     \
+      int: errands_data_set_bool,                                                                                      \
+      GStrv: errands_data_set_strv,                                                                                    \
+      icaltimetype: errands_data_set_time)(data, DataProp, value)
+
 void errands_data_add_tag(icalcomponent *data, DataPropStrv prop, const char *tag);
 void errands_data_remove_tag(icalcomponent *data, DataPropStrv prop, const char *tag);
