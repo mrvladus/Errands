@@ -122,7 +122,9 @@ extern const char *toolbox_log_prefix;
 #define CONTINUE_IF(statement)                                                                                         \
   if (statement) continue;
 
-// -------------------- STRING -------------------- //
+// -------------------- STRINGS -------------------- //
+
+#define MULTILINE_STRING(...) #__VA_ARGS__
 
 // Check if strings are equal.
 #define STR_EQUAL(s1, s2) (strcmp((const char *)(s1), (const char *)(s2)) == 0)

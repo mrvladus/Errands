@@ -3,29 +3,20 @@
 e.g. GLib's g_autoptr, g_auto and g_autofree"
 #endif
 
-#ifndef APP_ID
-#define APP_ID ""
-#endif
-#ifndef VERSION
-#define VERSION ""
-#endif
-#ifndef LOCALE_DIR
-#define LOCALE_DIR ""
-#endif
-
+#include "config.h"
 #include "data.h"
 #include "settings.h"
 #include "state.h"
 #include "window.h"
 
 #include "vendor/toolbox.h"
-TOOLBOX_TMP_STR;
-const char *toolbox_log_prefix = "\033[0;32m[Errands] \033[0m";
 
 #include <glib/gi18n.h>
 #include <libportal/portal.h>
 
 extern GResource *errands_get_resource(void);
+TOOLBOX_TMP_STR;
+const char *toolbox_log_prefix = "\033[0;32m[Errands] \033[0m";
 State state = {0};
 
 static void activate(GtkApplication *app) {
