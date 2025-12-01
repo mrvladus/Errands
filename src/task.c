@@ -19,12 +19,13 @@ static void on_complete_btn_toggle_cb(ErrandsTask *self, GtkCheckButton *btn);
 static void on_toolbar_btn_toggle_cb(ErrandsTask *self, GtkToggleButton *btn);
 static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointer user_data);
 static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *self);
-static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x, gdouble y, GtkPopover *popover);
+static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x, gdouble y, ErrandsTask *self);
 static void on_expand_toggle_cb(ErrandsTask *self, GtkGestureClick *ctrl, gint n_press, gdouble x, gdouble y);
 
 // Actions callbacks
 static void on_action_edit(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_action_trash(GSimpleAction *action, GVariant *param, ErrandsTask *self);
+static void on_action_restore(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_action_clipboard(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_action_export(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 
@@ -61,6 +62,8 @@ static void errands_task_class_init(ErrandsTaskClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, tags_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, attachments_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, color_btn);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, popover_menu);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, popover_menu_trash);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, sub_entry);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_title_edit_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_right_click);
@@ -78,8 +81,9 @@ static void errands_task_class_init(ErrandsTaskClass *class) {
 
 static void errands_task_init(ErrandsTask *self) {
   gtk_widget_init_template(GTK_WIDGET(self));
-  errands_add_actions(GTK_WIDGET(self), "task", "edit", on_action_edit, self, "trash", on_action_trash, self,
-                      "clipboard", on_action_clipboard, self, "export", on_action_export, self, NULL);
+  errands_add_actions(GTK_WIDGET(self), "task", "edit", on_action_edit, self, "trash", on_action_trash, self, "restore",
+                      on_action_restore, self, "clipboard", on_action_clipboard, self, "export", on_action_export, self,
+                      NULL);
 
   // DND
 
@@ -129,6 +133,8 @@ void errands_task_set_data(ErrandsTask *self, TaskData *data) {
   errands_task_update_progress(self);
   errands_task_update_toolbar(self);
 }
+
+void errands_task_set_data_as_trash(ErrandsTask *self, TaskData *data) { errands_task_set_data(self, data); }
 
 void errands_task_update_accent_color(ErrandsTask *task) {
   if (!task) return;
@@ -369,7 +375,9 @@ static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *self) {
   gtk_widget_grab_focus(GTK_WIDGET(entry));
 }
 
-static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x, gdouble y, GtkPopover *popover) {
+static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x, gdouble y, ErrandsTask *self) {
+  GtkPopover *popover = errands_data_get_bool(self->data->data, DATA_PROP_TRASH) ? GTK_POPOVER(self->popover_menu_trash)
+                                                                                 : GTK_POPOVER(self->popover_menu);
   gtk_popover_set_pointing_to(popover, &(GdkRectangle){x, y});
   gtk_popover_popup(popover);
 }
@@ -390,14 +398,31 @@ static void on_action_edit(GSimpleAction *action, GVariant *param, ErrandsTask *
 }
 
 static void on_action_trash(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
-  errands_data_set(self->data->data, DATA_PROP_TRASH, true);
-  errands_data_write_list(self->data->list);
+  errands_data_set_and_write(self->data->data, DATA_PROP_TRASH, true, self->data->list);
   errands_task_list_update_title(state.main_window->task_list);
-  errands_sidebar_all_row_update_counter(state.main_window->sidebar->all_row);
-  errands_sidebar_today_row_update_counter(state.main_window->sidebar->today_row);
+  if (errands_task_data_is_due(self->data))
+    errands_sidebar_today_row_update_counter(state.main_window->sidebar->today_row);
+  if (!errands_task_data_is_completed(self->data)) {
+    errands_sidebar_all_row_update_counter(state.main_window->sidebar->all_row);
+    errands_sidebar_task_list_row_update_counter(
+        errands_sidebar_task_list_row_get(errands_data_get_str(self->data->data, DATA_PROP_LIST_UID)));
+  }
   errands_sidebar_trash_row_update(state.main_window->sidebar->trash_row);
-  errands_sidebar_task_list_row_update_counter(
-      errands_sidebar_task_list_row_get(errands_data_get_str(self->data->data, DATA_PROP_LIST_UID)));
+  errands_task_list_reload(state.main_window->task_list, true);
+}
+
+static void on_action_restore(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
+  errands_data_set_and_write(self->data->data, DATA_PROP_TRASH, false, self->data->list);
+  errands_task_list_update_title(state.main_window->task_list);
+  if (!errands_task_data_is_completed(self->data)) {
+    errands_sidebar_all_row_update_counter(state.main_window->sidebar->all_row);
+    errands_sidebar_task_list_row_update_counter(
+        errands_sidebar_task_list_row_get(errands_data_get_str(self->data->data, DATA_PROP_LIST_UID)));
+  }
+  if (errands_task_data_is_due(self->data))
+    errands_sidebar_today_row_update_counter(state.main_window->sidebar->today_row);
+  errands_sidebar_trash_row_update(state.main_window->sidebar->trash_row);
+  errands_task_list_reload(state.main_window->task_list, true);
 }
 
 static void on_action_clipboard(GSimpleAction *action, GVariant *param, ErrandsTask *self) {

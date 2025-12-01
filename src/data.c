@@ -429,6 +429,17 @@ void errands_task_data_get_flat_list(TaskData *parent, GPtrArray *array) {
   }
 }
 
+bool errands_task_data_is_due(TaskData *data) {
+  icaltimetype due_time = errands_data_get_time(data->data, DATA_PROP_DUE_TIME);
+  icaltimetype now = icaltime_today();
+  bool is_due = !icaltime_is_null_date(due_time) && icaltime_compare_date_only(due_time, now) < 1;
+  return is_due;
+}
+
+bool errands_task_data_is_completed(TaskData *data) {
+  return !icaltime_is_null_date(errands_data_get_time(data->data, DATA_PROP_COMPLETED_TIME));
+}
+
 // ---------- SAVING DATA ---------- //
 
 // ---------- CLEANUP ---------- //

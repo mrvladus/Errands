@@ -9,6 +9,10 @@ menu rc_menu {
   item (_("Export"), "task.export")
 }
 
+menu rc_menu_trash {
+  item (_("Restore from Trash"), "task.restore")
+}
+
 template $ErrandsTask: Box {
   orientation: vertical;
 
@@ -79,16 +83,22 @@ template $ErrandsTask: Box {
 
     GestureClick {
       button: 3;
-      released => $on_right_click(popover_menu) not-swapped;
+      released => $on_right_click(template) not-swapped;
     }
 
     GestureLongPress {
       touch-only: true;
-      pressed => $on_right_click(popover_menu) not-swapped;
+      pressed => $on_right_click(template) not-swapped;
     }
 
     PopoverMenu popover_menu {
       menu-model: rc_menu;
+      has-arrow: false;
+      halign: start;
+    }
+
+    PopoverMenu popover_menu_trash {
+      menu-model: rc_menu_trash;
       has-arrow: false;
       halign: start;
     }

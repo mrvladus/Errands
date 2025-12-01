@@ -143,6 +143,7 @@ struct _ErrandsTaskList {
   AdwBin parent_instance;
 
   GtkWidget *title;
+  GtkWidget *clear_trash_btn;
   GtkWidget *search_btn;
   GtkWidget *search_bar;
   GtkWidget *search_entry;

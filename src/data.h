@@ -62,6 +62,8 @@ size_t errands_task_data_get_indent_level(TaskData *data);
 void errands_task_data_get_stats_recursive(TaskData *data, size_t *total, size_t *completed, size_t *trash);
 void errands_task_data_get_flat_list(TaskData *parent, GPtrArray *array);
 void errands_task_data_print(TaskData *data);
+bool errands_task_data_is_due(TaskData *data);
+bool errands_task_data_is_completed(TaskData *data);
 
 // --- LOAD & SAVE & CLEANUP --- //
 
@@ -136,6 +138,9 @@ typedef enum {
 icaltimetype errands_data_get_time(icalcomponent *data, DataPropTime prop);
 void errands_data_set_time(icalcomponent *data, DataPropTime prop, icaltimetype value);
 
+void errands_data_add_tag(icalcomponent *data, DataPropStrv prop, const char *tag);
+void errands_data_remove_tag(icalcomponent *data, DataPropStrv prop, const char *tag);
+
 #define errands_data_set(data, DataProp, value)                                                                        \
   _Generic((value),                                                                                                    \
       const char *: errands_data_set_str,                                                                              \
@@ -146,5 +151,6 @@ void errands_data_set_time(icalcomponent *data, DataPropTime prop, icaltimetype 
       GStrv: errands_data_set_strv,                                                                                    \
       icaltimetype: errands_data_set_time)(data, DataProp, value)
 
-void errands_data_add_tag(icalcomponent *data, DataPropStrv prop, const char *tag);
-void errands_data_remove_tag(icalcomponent *data, DataPropStrv prop, const char *tag);
+#define errands_data_set_and_write(data, DataProp, value, ListData)                                                    \
+  errands_data_set(data, DataProp, value);                                                                             \
+  errands_data_write_list(ListData);

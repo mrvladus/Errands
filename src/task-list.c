@@ -1,6 +1,7 @@
 #include "task-list.h"
 #include "data.h"
 #include "glib.h"
+#include "gtk/gtk.h"
 #include "sidebar.h"
 #include "state.h"
 #include "task.h"
@@ -11,6 +12,7 @@
 #include <glib/gi18n.h>
 #include <libical/ical.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 static size_t tasks_stack_size = 0, current_start = 0;
 static GPtrArray *current_task_list = NULL;
@@ -21,6 +23,8 @@ static double scroll_position = 0.0f;
 static void on_task_list_entry_activated_cb(AdwEntryRow *entry, ErrandsTaskList *self);
 static void on_task_list_search_cb(ErrandsTaskList *self, GtkSearchEntry *entry);
 static void on_adjustment_value_changed_cb(GtkAdjustment *adj, ErrandsTaskList *self);
+static void on_action_clear_trash_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
+static void on_action_restore_trash_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
 
 // ---------- WIDGET TEMPLATE ---------- //
 
@@ -37,6 +41,7 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
   G_OBJECT_CLASS(class)->dispose = errands_task_list_dispose;
   gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), "/io/github/mrvladus/Errands/ui/task-list.ui");
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, title);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, clear_trash_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, search_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, search_bar);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, search_entry);
@@ -55,6 +60,9 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   LOG("Task List: Create");
   gtk_widget_init_template(GTK_WIDGET(self));
   gtk_search_bar_connect_entry(GTK_SEARCH_BAR(self->search_bar), GTK_EDITABLE(self->search_entry));
+  errands_add_actions(GTK_WIDGET(self), "task-list", "clear_trash", on_action_clear_trash_cb, self, "restore_trash",
+                      on_action_restore_trash_cb, self, NULL);
+
   measuring_task = errands_task_new();
   // Get maximum monitor height
   GdkDisplay *display = gdk_display_get_default();
@@ -180,6 +188,7 @@ void errands_task_list_redraw_tasks(ErrandsTaskList *self) {
     if (self->page == ERRANDS_TASK_LIST_PAGE_TODAY) {
       // Check if any parent is due - then show task anyway, else check due date of the task
       if (!errands_task_list__task_has_any_due_parent(data)) {
+        // errands_task_data_is_due(data);
         icaltimetype due = errands_data_get_time(data->data, DATA_PROP_DUE_TIME);
         CONTINUE_IF(icaltime_is_null_date(due));
         CONTINUE_IF(icaltime_compare_date_only(due, today) == 1);
@@ -189,13 +198,15 @@ void errands_task_list_redraw_tasks(ErrandsTaskList *self) {
     else if (self->page == ERRANDS_TASK_LIST_PAGE_TRASH) {
       if (!errands_task_list__task_has_any_trash_parent(data))
         CONTINUE_IF(!errands_data_get_bool(data->data, DATA_PROP_TRASH));
+      errands_task_set_data_as_trash(task, data);
+      gtk_widget_set_margin_start(GTK_WIDGET(task), errands_task_data_get_indent_level(data) * indent_px);
+      continue;
     }
     CONTINUE_IF(self->page != ERRANDS_TASK_LIST_PAGE_TRASH && errands_data_get_bool(data->data, DATA_PROP_TRASH));
     // Search query
     if (search_query && !STR_EQUAL(search_query, ""))
       CONTINUE_IF(!errands_task_list__task_match_search_or_has_matched_child(data));
     errands_task_set_data(task, data);
-    // Set indent for sub-tasks
     gtk_widget_set_margin_start(GTK_WIDGET(task), errands_task_data_get_indent_level(data) * indent_px);
   }
 }
@@ -287,11 +298,13 @@ void errands_task_list_update_title(ErrandsTaskList *self) {
     }
     const char *stats = tmp_str_printf("%s %zu / %zu", _("Completed:"), completed, total);
     adw_window_title_set_subtitle(ADW_WINDOW_TITLE(self->title), total > 0 ? stats : "");
+    gtk_widget_set_visible(self->scrl, total > 0);
     return;
   } break;
   case ERRANDS_TASK_LIST_PAGE_TRASH: {
     adw_window_title_set_title(ADW_WINDOW_TITLE(self->title), _("Trash"));
     adw_window_title_set_subtitle(ADW_WINDOW_TITLE(self->title), "");
+    gtk_widget_set_visible(self->scrl, current_task_list && current_task_list->len > 0);
     return;
   } break;
   case ERRANDS_TASK_LIST_PAGE_TASK_LIST:
@@ -310,6 +323,7 @@ void errands_task_list_update_title(ErrandsTaskList *self) {
   // Set subtitle with completed stats
   const char *stats = tmp_str_printf("%s %zu / %zu", _("Completed:"), completed, total);
   adw_window_title_set_subtitle(ADW_WINDOW_TITLE(self->title), total > 0 ? stats : "");
+  gtk_widget_set_visible(self->scrl, total > 0);
 }
 
 void errands_task_list_show_today_tasks(ErrandsTaskList *self) {
@@ -317,6 +331,7 @@ void errands_task_list_show_today_tasks(ErrandsTaskList *self) {
   self->data = NULL;
   self->page = ERRANDS_TASK_LIST_PAGE_TODAY;
   gtk_widget_set_visible(self->entry_clamp, false);
+  gtk_widget_set_visible(self->clear_trash_btn, false);
   errands_task_list_reload(self, false);
 }
 
@@ -325,6 +340,7 @@ void errands_task_list_show_all_tasks(ErrandsTaskList *self) {
   self->data = NULL;
   self->page = ERRANDS_TASK_LIST_PAGE_ALL;
   gtk_widget_set_visible(self->entry_clamp, false);
+  gtk_widget_set_visible(self->clear_trash_btn, false);
   errands_task_list_reload(self, false);
 }
 
@@ -333,6 +349,7 @@ void errands_task_list_show_task_list(ErrandsTaskList *self, ListData *data) {
   self->page = ERRANDS_TASK_LIST_PAGE_TASK_LIST;
   if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(self->search_btn)))
     gtk_widget_set_visible(self->entry_clamp, true);
+  gtk_widget_set_visible(self->clear_trash_btn, false);
   errands_task_list_reload(self, false);
 }
 
@@ -341,6 +358,7 @@ void errands_task_list_show_trash(ErrandsTaskList *self) {
   self->data = NULL;
   self->page = ERRANDS_TASK_LIST_PAGE_TRASH;
   gtk_widget_set_visible(self->entry_clamp, false);
+  gtk_widget_set_visible(self->clear_trash_btn, true);
   errands_task_list_reload(self, false);
 }
 
@@ -381,4 +399,39 @@ static void on_task_list_entry_activated_cb(AdwEntryRow *entry, ErrandsTaskList 
 static void on_task_list_search_cb(ErrandsTaskList *self, GtkSearchEntry *entry) {
   search_query = gtk_editable_get_text(GTK_EDITABLE(entry));
   LOG("Search query changed to '%s'", search_query);
+}
+
+static void on_action_clear_trash_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
+  size_t deleted = 0;
+  for_range(i, 0, current_task_list->len) {
+    TaskData *data = g_ptr_array_index(current_task_list, i);
+    errands_data_set(data->data, DATA_PROP_DELETED, true);
+    errands_data_set(data->data, DATA_PROP_SYNCED, false);
+  }
+  if (deleted > 0) {
+    for_range(i, 0, errands_data_lists->len) errands_data_write_list(g_ptr_array_index(errands_data_lists, i));
+    errands_sidebar_trash_row_update(state.main_window->sidebar->trash_row);
+    errands_task_list_reload(state.main_window->task_list, false);
+  }
+}
+
+static void on_action_restore_trash_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
+  bool update_today = false, update_all = false;
+  size_t restored = 0;
+  for_range(i, 0, current_task_list->len) {
+    TaskData *data = g_ptr_array_index(current_task_list, i);
+    bool trash = errands_data_get_bool(data->data, DATA_PROP_TRASH);
+    CONTINUE_IF(!trash);
+    errands_data_set(data->data, DATA_PROP_TRASH, false);
+    if (errands_task_data_is_completed(data)) update_all = true;
+    if (errands_task_data_is_due(data)) update_today = true;
+    restored++;
+  }
+  if (restored > 0) {
+    if (update_all) errands_sidebar_all_row_update_counter(state.main_window->sidebar->all_row);
+    if (update_today) errands_sidebar_today_row_update_counter(state.main_window->sidebar->today_row);
+    errands_sidebar_trash_row_update(state.main_window->sidebar->trash_row);
+    for_range(i, 0, errands_data_lists->len) errands_data_write_list(g_ptr_array_index(errands_data_lists, i));
+    errands_task_list_reload(state.main_window->task_list, false);
+  }
 }
