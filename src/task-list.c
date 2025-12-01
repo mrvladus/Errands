@@ -1,7 +1,6 @@
 #include "task-list.h"
 #include "data.h"
 #include "glib.h"
-#include "gtk/gtk.h"
 #include "sidebar.h"
 #include "state.h"
 #include "task.h"
@@ -32,7 +31,7 @@ G_DEFINE_TYPE(ErrandsTaskList, errands_task_list, ADW_TYPE_BIN)
 
 static void errands_task_list_dispose(GObject *gobject) {
   g_object_run_dispose(G_OBJECT(measuring_task));
-  g_ptr_array_free(current_task_list, true);
+  if (current_task_list) g_ptr_array_free(current_task_list, true);
   gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_TASK_LIST);
   G_OBJECT_CLASS(errands_task_list_parent_class)->dispose(gobject);
 }
@@ -198,9 +197,6 @@ void errands_task_list_redraw_tasks(ErrandsTaskList *self) {
     else if (self->page == ERRANDS_TASK_LIST_PAGE_TRASH) {
       if (!errands_task_list__task_has_any_trash_parent(data))
         CONTINUE_IF(!errands_data_get_bool(data->data, DATA_PROP_TRASH));
-      errands_task_set_data_as_trash(task, data);
-      gtk_widget_set_margin_start(GTK_WIDGET(task), errands_task_data_get_indent_level(data) * indent_px);
-      continue;
     }
     CONTINUE_IF(self->page != ERRANDS_TASK_LIST_PAGE_TRASH && errands_data_get_bool(data->data, DATA_PROP_TRASH));
     // Search query
@@ -279,7 +275,6 @@ void errands_task_list_update_title(ErrandsTaskList *self) {
   case ERRANDS_TASK_LIST_PAGE_ALL: adw_window_title_set_title(ADW_WINDOW_TITLE(self->title), _("All Tasks")); break;
   case ERRANDS_TASK_LIST_PAGE_TODAY: {
     adw_window_title_set_title(ADW_WINDOW_TITLE(self->title), _("Today Tasks"));
-    // TODO: separate func?
     size_t total = 0, completed = 0;
     icaltimetype today = icaltime_today();
     for_range(i, 0, errands_data_lists->len) {
@@ -304,7 +299,13 @@ void errands_task_list_update_title(ErrandsTaskList *self) {
   case ERRANDS_TASK_LIST_PAGE_TRASH: {
     adw_window_title_set_title(ADW_WINDOW_TITLE(self->title), _("Trash"));
     adw_window_title_set_subtitle(ADW_WINDOW_TITLE(self->title), "");
-    gtk_widget_set_visible(self->scrl, current_task_list && current_task_list->len > 0);
+    size_t trashed = 0;
+    for_range(i, 0, current_task_list->len) {
+      TaskData *data = g_ptr_array_index(current_task_list, i);
+      if (errands_data_get_bool(data->data, DATA_PROP_TRASH)) trashed++;
+    }
+    gtk_widget_set_visible(self->scrl, trashed > 0);
+    gtk_widget_set_visible(self->clear_trash_btn, trashed > 0);
     return;
   } break;
   case ERRANDS_TASK_LIST_PAGE_TASK_LIST:
@@ -316,8 +317,9 @@ void errands_task_list_update_title(ErrandsTaskList *self) {
   size_t total = 0, completed = 0;
   for_range(i, 0, current_task_list->len) {
     TaskData *data = g_ptr_array_index(current_task_list, i);
-    bool is_completed = !icaltime_is_null_date(errands_data_get_time(data->data, DATA_PROP_COMPLETED_TIME));
-    if (is_completed) completed++;
+    CONTINUE_IF(errands_data_get_bool(data->data, DATA_PROP_TRASH) ||
+                errands_data_get_bool(data->data, DATA_PROP_DELETED));
+    if (!icaltime_is_null_date(errands_data_get_time(data->data, DATA_PROP_COMPLETED_TIME))) completed++;
     total++;
   }
   // Set subtitle with completed stats

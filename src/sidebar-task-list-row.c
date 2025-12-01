@@ -1,4 +1,5 @@
 #include "data.h"
+#include "glib.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "state.h"
@@ -91,20 +92,24 @@ ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_new(ListData *data) {
 
 ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_get(const char *uid) {
   g_autoptr(GPtrArray) children = get_children(state.main_window->sidebar->task_lists_box);
-  for (size_t i = 0; i < children->len; i++) {
-    ListData *data = ((ErrandsSidebarTaskListRow *)children->pdata[i])->data;
+  for_range(i, 0, children->len) {
+    ListData *data = ((ErrandsSidebarTaskListRow *)g_ptr_array_index(children, i))->data;
     if (STR_EQUAL(errands_data_get_str(data->data, DATA_PROP_LIST_UID), uid)) return children->pdata[i];
   }
   return NULL;
 }
 
-void errands_sidebar_task_list_row_update_counter(ErrandsSidebarTaskListRow *row) {
-  size_t total = 0, completed = 0, trash = 0;
-  errands_list_data_get_stats(row->data, &total, &completed, &trash);
+void errands_sidebar_task_list_row_update_counter(ErrandsSidebarTaskListRow *self) {
+  size_t total = 0, completed = 0;
+  g_autoptr(GPtrArray) tasks = errands_list_data_get_all_tasks_as_icalcomponents(self->data);
+  for_range(i, 0, tasks->len) {
+    icalcomponent *task = g_ptr_array_index(tasks, i);
+    CONTINUE_IF(errands_data_get_bool(task, DATA_PROP_TRASH) || errands_data_get_bool(task, DATA_PROP_DELETED));
+    if (!icaltime_is_null_date(errands_data_get_time(task, DATA_PROP_COMPLETED_TIME))) completed++;
+    total++;
+  }
   size_t uncompleted = total - completed;
-  char num[32];
-  sprintf(num, "%zu", uncompleted);
-  gtk_label_set_label(GTK_LABEL(row->counter), uncompleted > 0 ? num : "");
+  gtk_label_set_label(GTK_LABEL(self->counter), uncompleted > 0 ? tmp_str_printf("%zu", uncompleted) : "");
 }
 
 void errands_sidebar_task_list_row_update_title(ErrandsSidebarTaskListRow *row) {

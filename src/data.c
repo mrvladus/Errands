@@ -447,7 +447,7 @@ bool errands_task_data_is_completed(TaskData *data) {
 void errands_data_cleanup(void) {
   g_free(user_dir);
   g_free(calendars_dir);
-  g_ptr_array_free(errands_data_lists, true);
+  if (errands_data_lists) g_ptr_array_free(errands_data_lists, true);
 }
 
 // ---------- PRINTING ---------- //

@@ -36,6 +36,8 @@
 
   <!-- ICONS -->
   <gresource prefix="/io/github/mrvladus/Errands/icons/scalable/actions/">
+    <file preprocess="xml-stripblanks" compressed="true" alias="io.github.mrvladus.Errands.svg">data/icons/io.github.mrvladus.Errands.svg</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="io.github.mrvladus.Errands.Devel.svg">data/icons/io.github.mrvladus.Errands.Devel.svg</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="errands-add-symbolic.svg">data/icons/errands-add-symbolic.svg</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="errands-all-tasks-symbolic.svg">data/icons/errands-all-tasks-symbolic.svg</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="errands-today-symbolic.svg">data/icons/errands-today-symbolic.svg</file>

@@ -16,7 +16,7 @@ template $ErrandsSidebarNewListDialog: Adw.AlertDialog {
     ]
 
     Adw.EntryRow entry {
-      title: _("New List Name");
+      title: _("Task List Name");
       changed => $on_entry_changed_cb(template);
       entry-activated => $on_entry_activated_cb(template);
     }

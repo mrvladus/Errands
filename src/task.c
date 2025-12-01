@@ -1,7 +1,5 @@
 #include "task.h"
 #include "data.h"
-#include "glib.h"
-#include "gtk/gtk.h"
 #include "sidebar.h"
 #include "state.h"
 #include "sync.h"
@@ -133,8 +131,6 @@ void errands_task_set_data(ErrandsTask *self, TaskData *data) {
   errands_task_update_progress(self);
   errands_task_update_toolbar(self);
 }
-
-void errands_task_set_data_as_trash(ErrandsTask *self, TaskData *data) { errands_task_set_data(self, data); }
 
 void errands_task_update_accent_color(ErrandsTask *task) {
   if (!task) return;
@@ -437,7 +433,10 @@ static void on_export_action_finish_cb(GObject *obj, GAsyncResult *res, gpointer
   if (!f) return;
   g_autofree char *path = g_file_get_path(f);
   FILE *file = fopen(path, "w");
-  if (!file) return; // TODO: error toast
+  if (!file) {
+    errands_window_add_toast(state.main_window, _("Failed to Export"));
+    return;
+  }
   TaskData *task_data = data;
   autoptr(icalcomponent) cal = icalcomponent_new_vcalendar();
   autoptr(icalcomponent) dup = icalcomponent_new_clone(task_data->data);
