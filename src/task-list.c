@@ -1,6 +1,6 @@
 #include "task-list.h"
 #include "data.h"
-#include "gtk/gtk.h"
+#include "glib.h"
 #include "sidebar.h"
 #include "state.h"
 #include "task.h"
@@ -11,12 +11,12 @@
 #include <glib/gi18n.h>
 #include <libical/ical.h>
 #include <stdbool.h>
-#include <stdint.h>
 
-static size_t tasks_stack_size = 0;
-static GPtrArray *current_task_list;
-static size_t current_start;
+static size_t tasks_stack_size = 0, current_start = 0;
+static GPtrArray *current_task_list = NULL;
+static const char *search_query = NULL;
 static ErrandsTask *measuring_task = NULL;
+static double scroll_position = 0.0f;
 
 static void on_task_list_entry_activated_cb(AdwEntryRow *entry, ErrandsTaskList *self);
 static void on_task_list_search_cb(ErrandsTaskList *self, GtkSearchEntry *entry);
@@ -124,10 +124,28 @@ static bool errands_task_list__task_has_any_trash_parent(TaskData *data) {
   return out;
 }
 
+static bool errands_task_list__task_match_search_query(TaskData *data) {
+  if (STR_CONTAINS_CASE(errands_data_get_str(data->data, DATA_PROP_TEXT), search_query)) return true;
+  if (STR_CONTAINS_CASE(errands_data_get_str(data->data, DATA_PROP_NOTES), search_query)) return true;
+  g_auto(GStrv) tags = errands_data_get_strv(data->data, DATA_PROP_TAGS);
+  if (g_strv_contains((const gchar *const *)tags, search_query)) return true;
+  return false;
+}
+
+static bool errands_task_list__task_match_search_or_has_matched_child(TaskData *data) {
+  if (errands_task_list__task_match_search_query(data)) return true;
+  g_autoptr(GPtrArray) sub_tasks = g_ptr_array_new();
+  errands_task_data_get_flat_list(data, sub_tasks);
+  for_range(i, 0, sub_tasks->len) {
+    TaskData *sub_task = g_ptr_array_index(sub_tasks, i);
+    if (errands_task_list__task_match_search_query(sub_task)) return true;
+  }
+  return false;
+}
+
 static int errands_task_list__calculate_height(ErrandsTaskList *self) {
-  // TODO: correct expanded parents. while loop
-  LOG_NO_LN("Task List: Calculating height ... ");
-  TIMER_START;
+  // LOG_NO_LN("Task List: Calculating height ... ");
+  // TIMER_START;
   int height = 0;
   GtkRequisition min_size, nat_size;
   for_range(i, 0, current_task_list->len) {
@@ -139,7 +157,7 @@ static int errands_task_list__calculate_height(ErrandsTaskList *self) {
     gtk_widget_get_preferred_size(GTK_WIDGET(measuring_task), &min_size, &nat_size);
     height += nat_size.height;
   }
-  LOG_NO_PREFIX("%d (%f sec.)", height, TIMER_ELAPSED_MS);
+  // LOG_NO_PREFIX("%d (%f sec.)", height, TIMER_ELAPSED_MS);
   return height;
 }
 
@@ -148,7 +166,7 @@ static void errands_task_list__reset_scroll_cb(ErrandsTaskList *self) { gtk_adju
 // ---------- TASKS RECYCLER ---------- //
 
 void errands_task_list_redraw_tasks(ErrandsTaskList *self) {
-  LOG("Task List: Redraw Tasks");
+  // LOG("Task List: Redraw Tasks");
   static uint8_t indent_px = 15;
   if (current_task_list->len == 0) return;
   icaltimetype today = icaltime_today();
@@ -173,6 +191,9 @@ void errands_task_list_redraw_tasks(ErrandsTaskList *self) {
         CONTINUE_IF(!errands_data_get_bool(data->data, DATA_PROP_TRASH));
     }
     CONTINUE_IF(self->page != ERRANDS_TASK_LIST_PAGE_TRASH && errands_data_get_bool(data->data, DATA_PROP_TRASH));
+    // Search query
+    if (search_query && !STR_EQUAL(search_query, ""))
+      CONTINUE_IF(!errands_task_list__task_match_search_or_has_matched_child(data));
     errands_task_set_data(task, data);
     // Set indent for sub-tasks
     gtk_widget_set_margin_start(GTK_WIDGET(task), errands_task_data_get_indent_level(data) * indent_px);
@@ -181,9 +202,9 @@ void errands_task_list_redraw_tasks(ErrandsTaskList *self) {
 
 static void on_adjustment_value_changed_cb(GtkAdjustment *adj, ErrandsTaskList *self) {
   // TODO("Recycle by 5 tasks");
-  double old_scroll_position = self->scroll_position;
-  self->scroll_position = gtk_adjustment_get_value(adj);
-  bool scrolling_down = self->scroll_position > old_scroll_position;
+  double old_scroll_position = scroll_position;
+  scroll_position = gtk_adjustment_get_value(adj);
+  bool scrolling_down = scroll_position > old_scroll_position;
   g_autoptr(GPtrArray) children = get_children(self->task_list);
   if (!children || children->len < 3) return;
   GtkWidget *first_widget = children->pdata[0];
@@ -308,7 +329,6 @@ void errands_task_list_show_all_tasks(ErrandsTaskList *self) {
 }
 
 void errands_task_list_show_task_list(ErrandsTaskList *self, ListData *data) {
-  LOG("Task List: Show list '%s'", errands_data_get_str(data->data, DATA_PROP_LIST_UID));
   self->data = data;
   self->page = ERRANDS_TASK_LIST_PAGE_TASK_LIST;
   if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(self->search_btn)))
@@ -359,8 +379,6 @@ static void on_task_list_entry_activated_cb(AdwEntryRow *entry, ErrandsTaskList 
 }
 
 static void on_task_list_search_cb(ErrandsTaskList *self, GtkSearchEntry *entry) {
-  // self->search_query = gtk_editable_get_text(GTK_EDITABLE(entry));
-  // gtk_filter_changed(GTK_FILTER(self->search_filter_model), GTK_FILTER_CHANGE_DIFFERENT);
-  // if (!self->search_query || STR_EQUAL(self->search_query, "")) restore_expanded_rows(self);
-  // else expand_rows(self, EXPAND_SEARCH);
+  search_query = gtk_editable_get_text(GTK_EDITABLE(entry));
+  LOG("Search query changed to '%s'", search_query);
 }

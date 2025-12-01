@@ -359,6 +359,7 @@ static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *self) {
   TaskData *new_data = errands_task_data_create_task(self->data->list, self->data, text);
   g_ptr_array_add(self->data->children, new_data);
   errands_data_write_list(self->data->list);
+  errands_task_data_sort_sub_tasks(self->data);
   // Reset text
   gtk_editable_set_text(GTK_EDITABLE(entry), "");
   LOG("Task '%s': Add sub-task '%s'", errands_data_get_str(new_data->data, DATA_PROP_UID),

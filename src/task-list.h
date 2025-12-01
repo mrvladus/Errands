@@ -146,7 +146,6 @@ struct _ErrandsTaskList {
   GtkWidget *search_btn;
   GtkWidget *search_bar;
   GtkWidget *search_entry;
-  const char *search_query;
   GtkWidget *entry_clamp;
   GtkWidget *scrl;
   GtkWidget *top_spacer;
@@ -163,8 +162,6 @@ struct _ErrandsTaskList {
 
   ListData *data;
   ErrandsTaskListPage page;
-
-  double scroll_position;
 };
 
 ErrandsTaskList *errands_task_list_new();

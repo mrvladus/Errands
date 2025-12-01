@@ -35,6 +35,7 @@ AUTOPTR_DEFINE(ListData, errands_list_data_free)
 // `color` - Pass `NULL` to generate color.
 ListData *errands_list_data_create(const char *uid, const char *name, const char *color, bool deleted, bool synced);
 void errands_list_data_sort(ListData *data);
+void errands_list_data_sort_toplevel(ListData *data);
 // Get all tasks as flat list
 void errands_list_data_get_flat_list(ListData *data, GPtrArray *tasks);
 void errands_list_data_get_stats(ListData *data, size_t *total, size_t *completed, size_t *trash);
@@ -55,6 +56,7 @@ struct TaskData {
 TaskData *errands_task_data_new(icalcomponent *data, TaskData *parent, ListData *list);
 TaskData *errands_task_data_create_task(ListData *list, TaskData *parent, const char *text);
 void errands_task_data_free(TaskData *data);
+void errands_task_data_sort_sub_tasks(TaskData *data);
 size_t errands_task_data_get_indent_level(TaskData *data);
 // Get the total number of sub-tasks and completed tasks
 void errands_task_data_get_stats_recursive(TaskData *data, size_t *total, size_t *completed, size_t *trash);

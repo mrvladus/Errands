@@ -173,7 +173,6 @@ void errands_settings_remove_tag(const char *tag) {
 // --- SAVING SETTINGS --- //
 
 static void perform_save() {
-  LOG("Settings: Save");
   autofree char *json = json_print(settings);
   if (!write_string_to_file(settings_path, json)) LOG("Settings: Failed to save settings");
   last_save_time = TIME_NOW;

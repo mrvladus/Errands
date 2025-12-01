@@ -1,4 +1,5 @@
 #include "data.h"
+#include "glib.h"
 #include "settings.h"
 
 #include "vendor/json.h"
@@ -292,8 +293,12 @@ static void errands_list_data_sort_recursive(GPtrArray *array) {
   }
 }
 
-void errands_list_data_sort(ListData *data) {
+void errands_list_data_sort_toplevel(ListData *data) {
   g_ptr_array_sort_values(data->children, errands_data_sort_func);
+}
+
+void errands_list_data_sort(ListData *data) {
+  errands_list_data_sort_toplevel(data);
   for_range(i, 0, data->children->len) {
     TaskData *task_data = g_ptr_array_index(data->children, i);
     errands_list_data_sort_recursive(task_data->children);
@@ -381,6 +386,10 @@ void errands_task_data_free(TaskData *data) {
   if (!data) return;
   g_ptr_array_free(data->children, true);
   free(data);
+}
+
+void errands_task_data_sort_sub_tasks(TaskData *data) {
+  g_ptr_array_sort_values(data->children, errands_data_sort_func);
 }
 
 size_t errands_task_data_get_indent_level(TaskData *data) {

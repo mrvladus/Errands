@@ -210,9 +210,12 @@ static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
 
   // Write data if changed one of the props
   if (changed) {
-    errands_data_write_list(data->list);
+    if (self->current_task->data->parent) errands_task_data_sort_sub_tasks(self->current_task->data->parent);
+    else errands_data_sort();
     errands_task_update_toolbar(self->current_task);
     errands_sidebar_today_row_update_counter(state.main_window->sidebar->today_row);
+    errands_task_list_reload(state.main_window->task_list, true);
+    errands_data_write_list(data->list);
     errands_sync_schedule_task(data);
   }
 }
