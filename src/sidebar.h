@@ -42,13 +42,12 @@ G_DECLARE_FINAL_TYPE(ErrandsSidebarTodayRow, errands_sidebar_today_row, ERRANDS,
 ErrandsSidebarTodayRow *errands_sidebar_today_row_new();
 void errands_sidebar_today_row_update_counter(ErrandsSidebarTodayRow *row);
 
-// --- SIDEBAR TRASH ROW --- //
+// --- SIDEBAR PINNED ROW --- //
 
-#define ERRANDS_TYPE_SIDEBAR_TRASH_ROW (errands_sidebar_trash_row_get_type())
-G_DECLARE_FINAL_TYPE(ErrandsSidebarTrashRow, errands_sidebar_trash_row, ERRANDS, SIDEBAR_TRASH_ROW, GtkListBoxRow)
+#define ERRANDS_TYPE_SIDEBAR_PINNED_ROW (errands_sidebar_pinned_row_get_type())
+G_DECLARE_FINAL_TYPE(ErrandsSidebarPinnedRow, errands_sidebar_pinned_row, ERRANDS, SIDEBAR_PINNED_ROW, GtkListBoxRow)
 
-ErrandsSidebarTrashRow *errands_sidebar_trash_row_new();
-void errands_sidebar_trash_row_update(ErrandsSidebarTrashRow *row);
+ErrandsSidebarPinnedRow *errands_sidebar_pinned_row_new();
 
 // --- SIDEBAR DELETE LIST DIALOG --- //
 
@@ -88,7 +87,7 @@ struct _ErrandsSidebar {
   GtkWidget *filters_box;
   ErrandsSidebarAllRow *all_row;
   ErrandsSidebarTodayRow *today_row;
-  ErrandsSidebarTrashRow *trash_row;
+  ErrandsSidebarPinnedRow *pinned_row;
   GtkWidget *task_lists_box;
   ErrandsSidebarTaskListRow *current_task_list_row;
   ErrandsSidebarDeleteListDialog *delete_list_dialog;

@@ -25,44 +25,6 @@ template $ErrandsTaskList: Adw.Bin {
         }
       }
 
-      [start]
-      Button clear_trash_btn {
-        icon-name: "errands-trash-symbolic";
-        tooltip-text: _("Clear Trash (Ctrl+Delete)");
-        action-name: "task-list.clear_trash";
-
-        ShortcutController {
-          scope: global;
-
-          Shortcut {
-            trigger: "<Control>Delete";
-            action: "activate";
-          }
-        }
-
-        styles [
-          "destructive-action",
-          "flat",
-        ]
-      }
-
-      [start]
-      Button {
-        icon-name: "errands-reset-symbolic";
-        tooltip-text: _("Restore Trash (Ctrl+Shift+Delete)");
-        action-name: "task-list.restore_trash";
-        visible: bind clear_trash_btn.visible;
-
-        ShortcutController {
-          scope: global;
-
-          Shortcut {
-            trigger: "<Control><Shift>Delete";
-            action: "activate";
-          }
-        }
-      }
-
       [end]
       ToggleButton search_btn {
         icon-name: "errands-search-symbolic";

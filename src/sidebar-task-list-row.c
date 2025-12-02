@@ -1,15 +1,12 @@
 #include "data.h"
-#include "glib.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "state.h"
 #include "task-list.h"
 #include "utils.h"
-#include "vendor/toolbox.h"
 #include "window.h"
 
 #include <libical/ical.h>
-#include <stddef.h>
 
 static void on_right_click(GtkPopover *popover, gint n_press, gdouble x, gdouble y, GtkGestureClick *ctrl);
 static void on_color_changed(GtkColorDialogButton *btn, GParamSpec *pspec, ListData *data);
@@ -104,7 +101,7 @@ void errands_sidebar_task_list_row_update_counter(ErrandsSidebarTaskListRow *sel
   g_autoptr(GPtrArray) tasks = errands_list_data_get_all_tasks_as_icalcomponents(self->data);
   for_range(i, 0, tasks->len) {
     icalcomponent *task = g_ptr_array_index(tasks, i);
-    CONTINUE_IF(errands_data_get_bool(task, DATA_PROP_TRASH) || errands_data_get_bool(task, DATA_PROP_DELETED));
+    CONTINUE_IF(errands_data_get_bool(task, DATA_PROP_DELETED));
     if (!icaltime_is_null_date(errands_data_get_time(task, DATA_PROP_COMPLETED_TIME))) completed++;
     total++;
   }

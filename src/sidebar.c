@@ -30,14 +30,14 @@ static void errands_sidebar_class_init(ErrandsSidebarClass *class) {
 
   g_type_ensure(ERRANDS_TYPE_SIDEBAR_ALL_ROW);
   g_type_ensure(ERRANDS_TYPE_SIDEBAR_TODAY_ROW);
-  g_type_ensure(ERRANDS_TYPE_SIDEBAR_TRASH_ROW);
+  g_type_ensure(ERRANDS_TYPE_SIDEBAR_PINNED_ROW);
   g_type_ensure(ERRANDS_TYPE_SIDEBAR_TASK_LIST_ROW);
 
   gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), "/io/github/mrvladus/Errands/ui/sidebar.ui");
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, filters_box);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, all_row);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, today_row);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, trash_row);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, pinned_row);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, task_lists_box);
 
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_errands_sidebar_filter_row_activated);
@@ -68,7 +68,6 @@ void errands_sidebar_load_lists(ErrandsSidebar *self) {
   }
   errands_sidebar_all_row_update_counter(self->all_row);
   errands_sidebar_today_row_update_counter(self->today_row);
-  errands_sidebar_trash_row_update(self->trash_row);
   errands_window_update(state.main_window);
   // Select last opened page
   g_signal_connect(state.main_window, "realize", G_CALLBACK(errands_sidebar_select_last_opened_page), NULL);
@@ -98,13 +97,9 @@ void errands_sidebar_select_last_opened_page() {
 static void on_errands_sidebar_filter_row_activated(GtkListBox *box, GtkListBoxRow *row, ErrandsSidebar *self) {
   gtk_list_box_unselect_all(GTK_LIST_BOX(self->task_lists_box));
   ErrandsTaskList *task_list = state.main_window->task_list;
-  if (GTK_WIDGET(row) == GTK_WIDGET(self->all_row)) {
-    errands_task_list_show_all_tasks(task_list);
-  } else if (GTK_WIDGET(row) == GTK_WIDGET(self->today_row)) {
-    errands_task_list_show_today_tasks(task_list);
-  } else if (GTK_WIDGET(row) == GTK_WIDGET(self->trash_row)) {
-    errands_task_list_show_trash(task_list);
-  }
+  if (GTK_WIDGET(row) == GTK_WIDGET(self->all_row)) errands_task_list_show_all_tasks(task_list);
+  else if (GTK_WIDGET(row) == GTK_WIDGET(self->today_row)) errands_task_list_show_today_tasks(task_list);
+  else if (GTK_WIDGET(row) == GTK_WIDGET(self->pinned_row)) errands_task_list_show_pinned(task_list);
 }
 
 static void __on_open_finish(GObject *obj, GAsyncResult *res, ErrandsSidebar *self) {

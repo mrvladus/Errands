@@ -37,11 +37,9 @@ void errands_sidebar_today_row_update_counter(ErrandsSidebarTodayRow *row) {
     for_range(j, 0, tasks->len) {
       icalcomponent *data = g_ptr_array_index(tasks, j);
       bool deleted = errands_data_get_bool(data, DATA_PROP_DELETED);
-      bool trash = errands_data_get_bool(data, DATA_PROP_TRASH);
       bool completed = !icaltime_is_null_time(errands_data_get_time(data, DATA_PROP_COMPLETED_TIME));
       icaltimetype due_date = errands_data_get_time(data, DATA_PROP_DUE_TIME);
-      if (!deleted && !trash && !completed && !icaltime_is_null_time(due_date) &&
-          icaltime_compare_date_only(due_date, today) < 1)
+      if (!deleted && !completed && !icaltime_is_null_time(due_date) && icaltime_compare_date_only(due_date, today) < 1)
         counter++;
     }
   }

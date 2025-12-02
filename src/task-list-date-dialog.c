@@ -2,6 +2,7 @@
 #include "state.h"
 #include "sync.h"
 #include "task-list.h"
+
 #include "vendor/toolbox.h"
 
 #include <glib/gi18n.h>

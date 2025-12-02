@@ -82,7 +82,7 @@ static void on_dialog_close_cb(ErrandsTaskListPriorityDialog *self) {
     case ERRANDS_TASK_LIST_PAGE_ALL:
     case ERRANDS_TASK_LIST_PAGE_TODAY: errands_data_sort(); break;
     case ERRANDS_TASK_LIST_PAGE_TASK_LIST: errands_list_data_sort(data->list); break;
-    case ERRANDS_TASK_LIST_PAGE_TRASH: break;
+    case ERRANDS_TASK_LIST_PAGE_PINNED: break;
     }
     errands_task_list_reload(state.main_window->task_list, true);
     errands_sync_schedule_task(data);

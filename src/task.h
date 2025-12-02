@@ -27,7 +27,6 @@ struct _ErrandsTask {
   GtkWidget *color_btn;
   GtkWidget *sub_entry;
   GtkWidget *popover_menu;
-  GtkWidget *popover_menu_trash;
 
   TaskData *data;
 };

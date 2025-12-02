@@ -1,16 +1,16 @@
 using Gtk 4.0;
 
-template $ErrandsSidebarTrashRow: ListBoxRow {
+template $ErrandsSidebarPinnedRow: ListBoxRow {
   Box {
     spacing: 12;
-    tooltip-text: _("Trash");
+    tooltip-text: _("Pinned");
 
     Image icon {
-      icon-name: "errands-trash-symbolic";
+      icon-name: "errands-pin-symbolic";
     }
 
     Label {
-      label: _("Trash");
+      label: _("Pinned");
     }
 
     Label counter {

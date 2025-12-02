@@ -1,10 +1,7 @@
 #include "data.h"
-#include "glib.h"
 #include "settings.h"
 
 #include "vendor/json.h"
-#include <libical/ical.h>
-#include <stdbool.h>
 
 AUTOPTR_DEFINE(JSON, json_free)
 
@@ -82,7 +79,6 @@ static void errands_data_migrate_from_46() {
       JSON *synced_item = json_object_get(task_item, "synced");
       JSON *text_item = json_object_get(task_item, "text");
       JSON *toolbar_shown_item = json_object_get(task_item, "toolbar_shown");
-      JSON *trash_item = json_object_get(task_item, "trash");
       JSON *uid_item = json_object_get(task_item, "uid");
       // Create iCalendar event
       icalcomponent *event = icalcomponent_new(ICAL_VTODO_COMPONENT);
@@ -110,7 +106,6 @@ static void errands_data_migrate_from_46() {
       errands_data_set_bool(event, DATA_PROP_NOTIFIED, notified_item->bool_val);
       errands_data_set_bool(event, DATA_PROP_SYNCED, synced_item->bool_val);
       errands_data_set_bool(event, DATA_PROP_TOOLBAR_SHOWN, toolbar_shown_item->bool_val);
-      errands_data_set_bool(event, DATA_PROP_TRASH, trash_item->bool_val);
       errands_data_set_str(event, DATA_PROP_LIST_UID, task_list_uid_item->string_val);
       icalcomponent_add_component(calendar->data, event);
     }
@@ -305,15 +300,15 @@ void errands_list_data_sort(ListData *data) {
   }
 }
 
-void errands_list_data_get_stats(ListData *data, size_t *total, size_t *completed, size_t *trash) {
+void errands_list_data_get_stats(ListData *data, size_t *total, size_t *completed, size_t *pinned) {
   for_range(i, 0, data->children->len) {
     TaskData *child = g_ptr_array_index(data->children, i);
     bool deleted = errands_data_get_bool(child->data, DATA_PROP_DELETED);
     CONTINUE_IF(deleted);
-    if (errands_data_get_bool(child->data, DATA_PROP_TRASH)) (*trash)++;
+    if (errands_data_get_bool(child->data, DATA_PROP_PINNED)) (*pinned)++;
     if (!icaltime_is_null_date(errands_data_get_time(child->data, DATA_PROP_COMPLETED_TIME))) (*completed)++;
     (*total)++;
-    errands_task_data_get_stats_recursive(child, total, completed, trash);
+    errands_task_data_get_stats_recursive(child, total, completed, pinned);
   }
 }
 
@@ -403,15 +398,15 @@ size_t errands_task_data_get_indent_level(TaskData *data) {
   return indent;
 }
 
-void errands_task_data_get_stats_recursive(TaskData *data, size_t *total, size_t *completed, size_t *trash) {
+void errands_task_data_get_stats_recursive(TaskData *data, size_t *total, size_t *completed, size_t *pinned) {
   for_range(i, 0, data->children->len) {
     TaskData *child = g_ptr_array_index(data->children, i);
     bool deleted = errands_data_get_bool(child->data, DATA_PROP_DELETED);
     CONTINUE_IF(deleted);
-    if (errands_data_get_bool(child->data, DATA_PROP_TRASH)) (*trash)++;
+    if (errands_data_get_bool(child->data, DATA_PROP_PINNED)) (*pinned)++;
     if (!icaltime_is_null_date(errands_data_get_time(child->data, DATA_PROP_COMPLETED_TIME))) (*completed)++;
     (*total)++;
-    errands_task_data_get_stats_recursive(child, total, completed, trash);
+    errands_task_data_get_stats_recursive(child, total, completed, pinned);
   }
 }
 
@@ -658,7 +653,7 @@ bool errands_data_get_bool(icalcomponent *data, DataPropBool prop) {
   case DATA_PROP_EXPANDED: out = (bool)atoi(get_x_prop_value(data, "X-ERRANDS-EXPANDED", "0")); break;
   case DATA_PROP_NOTIFIED: out = (bool)atoi(get_x_prop_value(data, "X-ERRANDS-NOTIFIED", "0")); break;
   case DATA_PROP_TOOLBAR_SHOWN: out = (bool)atoi(get_x_prop_value(data, "X-ERRANDS-TOOLBAR-SHOWN", "0")); break;
-  case DATA_PROP_TRASH: out = (bool)atoi(get_x_prop_value(data, "X-ERRANDS-TRASH", "0")); break;
+  case DATA_PROP_PINNED: out = (bool)atoi(get_x_prop_value(data, "X-ERRANDS-PINNED", "0")); break;
   case DATA_PROP_SYNCED: out = (bool)atoi(get_x_prop_value(data, "X-ERRANDS-SYNCED", "0")); break;
   }
   return out;
@@ -794,7 +789,7 @@ void errands_data_set_bool(icalcomponent *data, DataPropBool prop, bool value) {
   case DATA_PROP_EXPANDED: set_x_prop_value(data, "X-ERRANDS-EXPANDED", str); break;
   case DATA_PROP_NOTIFIED: set_x_prop_value(data, "X-ERRANDS-NOTIFIED", str); break;
   case DATA_PROP_TOOLBAR_SHOWN: set_x_prop_value(data, "X-ERRANDS-TOOLBAR-SHOWN", str); break;
-  case DATA_PROP_TRASH: set_x_prop_value(data, "X-ERRANDS-TRASH", str); break;
+  case DATA_PROP_PINNED: set_x_prop_value(data, "X-ERRANDS-PINNED", str); break;
   case DATA_PROP_SYNCED: set_x_prop_value(data, "X-ERRANDS-SYNCED", str); break;
   }
   if (icalcomponent_isa(data) == ICAL_VTODO_COMPONENT)

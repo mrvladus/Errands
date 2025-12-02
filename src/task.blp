@@ -4,13 +4,8 @@ using Adw 1;
 
 menu rc_menu {
   item (_("Edit"), "task.edit")
-  item (_("Move to Trash"), "task.trash")
   item (_("Copy to Clipboard"), "task.clipboard")
   item (_("Export"), "task.export")
-}
-
-menu rc_menu_trash {
-  item (_("Restore from Trash"), "task.restore")
 }
 
 template $ErrandsTask: Box {
@@ -93,12 +88,6 @@ template $ErrandsTask: Box {
 
     PopoverMenu popover_menu {
       menu-model: rc_menu;
-      has-arrow: false;
-      halign: start;
-    }
-
-    PopoverMenu popover_menu_trash {
-      menu-model: rc_menu_trash;
       has-arrow: false;
       halign: start;
     }

@@ -132,7 +132,7 @@ void errands_task_list_sort_dialog_show();
 typedef enum {
   ERRANDS_TASK_LIST_PAGE_ALL,
   ERRANDS_TASK_LIST_PAGE_TODAY,
-  ERRANDS_TASK_LIST_PAGE_TRASH,
+  ERRANDS_TASK_LIST_PAGE_PINNED,
   ERRANDS_TASK_LIST_PAGE_TASK_LIST,
 } ErrandsTaskListPage;
 
@@ -143,7 +143,6 @@ struct _ErrandsTaskList {
   AdwBin parent_instance;
 
   GtkWidget *title;
-  GtkWidget *clear_trash_btn;
   GtkWidget *search_btn;
   GtkWidget *search_bar;
   GtkWidget *search_entry;
@@ -170,6 +169,6 @@ void errands_task_list_update_title(ErrandsTaskList *self);
 void errands_task_list_show_all_tasks(ErrandsTaskList *self);
 void errands_task_list_show_today_tasks(ErrandsTaskList *self);
 void errands_task_list_show_task_list(ErrandsTaskList *self, ListData *data);
-void errands_task_list_show_trash(ErrandsTaskList *self);
+void errands_task_list_show_pinned(ErrandsTaskList *self);
 void errands_task_list_redraw_tasks(ErrandsTaskList *self);
 void errands_task_list_reload(ErrandsTaskList *self, bool save_scroll_pos);
