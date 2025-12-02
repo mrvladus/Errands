@@ -250,7 +250,7 @@ void errands_task_list_update_title(ErrandsTaskList *self) {
   switch (self->page) {
   case ERRANDS_TASK_LIST_PAGE_ALL: adw_window_title_set_title(ADW_WINDOW_TITLE(self->title), _("All Tasks")); break;
   case ERRANDS_TASK_LIST_PAGE_TODAY: {
-    adw_window_title_set_title(ADW_WINDOW_TITLE(self->title), _("Today Tasks"));
+    adw_window_title_set_title(ADW_WINDOW_TITLE(self->title), _("Tasks for Today"));
     size_t total = 0, completed = 0;
     icaltimetype today = icaltime_today();
     for_range(i, 0, errands_data_lists->len) {

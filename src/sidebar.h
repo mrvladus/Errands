@@ -27,18 +27,6 @@ void errands_sidebar_task_list_row_update_title(ErrandsSidebarTaskListRow *row);
 ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_get(const char *uid);
 void on_errands_sidebar_task_list_row_activate(GtkListBox *box, ErrandsSidebarTaskListRow *row, gpointer user_data);
 
-// --- SIDEBAR ALL ROW --- //
-
-#define ERRANDS_TYPE_SIDEBAR_ALL_ROW (errands_sidebar_all_row_get_type())
-G_DECLARE_FINAL_TYPE(ErrandsSidebarAllRow, errands_sidebar_all_row, ERRANDS, SIDEBAR_ALL_ROW, GtkListBoxRow)
-
-struct _ErrandsSidebarAllRow {
-  GtkListBoxRow parent_instance;
-  GtkLabel *counter;
-};
-
-ErrandsSidebarAllRow *errands_sidebar_all_row_new();
-
 // --- SIDEBAR TODAY ROW --- //
 
 #define ERRANDS_TYPE_SIDEBAR_TODAY_ROW (errands_sidebar_today_row_get_type())
@@ -50,18 +38,6 @@ struct _ErrandsSidebarTodayRow {
 };
 
 ErrandsSidebarTodayRow *errands_sidebar_today_row_new();
-
-// --- SIDEBAR PINNED ROW --- //
-
-#define ERRANDS_TYPE_SIDEBAR_PINNED_ROW (errands_sidebar_pinned_row_get_type())
-G_DECLARE_FINAL_TYPE(ErrandsSidebarPinnedRow, errands_sidebar_pinned_row, ERRANDS, SIDEBAR_PINNED_ROW, GtkListBoxRow)
-
-struct _ErrandsSidebarPinnedRow {
-  GtkListBoxRow parent_instance;
-  GtkLabel *counter;
-};
-
-ErrandsSidebarPinnedRow *errands_sidebar_pinned_row_new();
 
 // --- SIDEBAR DELETE LIST DIALOG --- //
 
@@ -99,11 +75,16 @@ struct _ErrandsSidebar {
   AdwBin parent_instance;
   GtkWidget *add_btn;
   GtkWidget *filters_box;
-  ErrandsSidebarAllRow *all_row;
-  ErrandsSidebarTodayRow *today_row;
-  ErrandsSidebarPinnedRow *pinned_row;
+  GtkListBoxRow *all_row;
+  GtkLabel *all_counter;
+  GtkListBoxRow *today_row;
+  GtkLabel *today_counter;
+  GtkListBoxRow *pinned_row;
+  GtkLabel *pinned_counter;
   GtkWidget *task_lists_box;
+
   ErrandsSidebarTaskListRow *current_task_list_row;
+
   ErrandsSidebarDeleteListDialog *delete_list_dialog;
   ErrandsSidebarNewListDialog *new_list_dialog;
   ErrandsSidebarRenameListDialog *rename_list_dialog;

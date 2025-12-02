@@ -12,6 +12,7 @@
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>
+#include <stdbool.h>
 
 // Callbacks
 static void on_complete_btn_toggle_cb(ErrandsTask *self, GtkCheckButton *btn);
@@ -26,6 +27,7 @@ static void on_expand_toggle_cb(ErrandsTask *self, GtkGestureClick *ctrl, gint n
 static void on_action_edit(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_action_clipboard(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_action_export(GSimpleAction *action, GVariant *param, ErrandsTask *self);
+static void on_action_delete(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 
 static GdkContentProvider *on_drag_prepare(GtkDragSource *source, double x, double y, ErrandsTask *self);
 static void on_drag_begin(GtkDragSource *source, GdkDrag *drag, ErrandsTask *self);
@@ -81,7 +83,7 @@ static void errands_task_class_init(ErrandsTaskClass *class) {
 static void errands_task_init(ErrandsTask *self) {
   gtk_widget_init_template(GTK_WIDGET(self));
   errands_add_actions(GTK_WIDGET(self), "task", "edit", on_action_edit, self, "clipboard", on_action_clipboard, self,
-                      "export", on_action_export, self, NULL);
+                      "export", on_action_export, self, "delete", on_action_delete, self, NULL);
 
   // DND
 
@@ -359,6 +361,7 @@ static void on_toolbar_btn_toggle_cb(ErrandsTask *self, GtkToggleButton *btn) {
 static void on_pin_btn_toggle_cb(ErrandsTask *self, GtkToggleButton *btn) {
   errands_data_set_and_write(self->data->data, DATA_PROP_PINNED,
                              !errands_data_get_bool(self->data->data, DATA_PROP_PINNED), self->data->list);
+  errands_sidebar_update_filter_rows(state.main_window->sidebar);
 }
 
 static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *self) {
@@ -428,6 +431,15 @@ static void on_action_export(GSimpleAction *action, GVariant *param, ErrandsTask
   const char *filename = tmp_str_printf("%s.ics", errands_data_get_str(task->data->data, DATA_PROP_UID));
   g_object_set(dialog, "initial-name", filename, NULL);
   gtk_file_dialog_save(dialog, GTK_WINDOW(state.main_window), NULL, on_export_action_finish_cb, task->data);
+}
+
+static void on_action_delete(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
+  errands_data_set(self->data->data, DATA_PROP_DELETED, true);
+  errands_data_set(self->data->data, DATA_PROP_SYNCED, false);
+  errands_data_write_list(self->data->list);
+  errands_window_add_toast(state.main_window, _("Task is Deleted"));
+  errands_task_list_reload(state.main_window->task_list, true);
+  errands_sync_schedule_task(self->data);
 }
 
 static GdkContentProvider *on_drag_prepare(GtkDragSource *source, double x, double y, ErrandsTask *task) {

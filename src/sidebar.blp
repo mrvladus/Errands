@@ -64,11 +64,83 @@ template $ErrandsSidebar: Adw.Bin {
             "navigation-sidebar",
           ]
 
-          $ErrandsSidebarAllRow all_row {}
+          ListBoxRow all_row {
+            Box {
+              spacing: 12;
+              tooltip-text: _("All Tasks");
 
-          $ErrandsSidebarTodayRow today_row {}
+              Image {
+                icon-name: "errands-all-tasks-symbolic";
+              }
 
-          $ErrandsSidebarPinnedRow pinned_row {}
+              Label {
+                label: C_("All Tasks", "All");
+              }
+
+              Label all_counter {
+                label: "";
+                hexpand: true;
+                halign: end;
+
+                styles [
+                  "dim-label",
+                  "caption",
+                ]
+              }
+            }
+          }
+
+          ListBoxRow today_row {
+            Box {
+              spacing: 12;
+              tooltip-text: _("Tasks for Today");
+
+              Image {
+                icon-name: "errands-calendar-symbolic";
+              }
+
+              Label {
+                label: _("Today");
+              }
+
+              Label today_counter {
+                label: "";
+                hexpand: true;
+                halign: end;
+
+                styles [
+                  "dim-label",
+                  "caption",
+                ]
+              }
+            }
+          }
+
+          ListBoxRow pinned_row {
+            Box {
+              spacing: 12;
+              tooltip-text: _("Pinned Tasks");
+
+              Image {
+                icon-name: "errands-pin-symbolic";
+              }
+
+              Label {
+                label: _("Pinned");
+              }
+
+              Label pinned_counter {
+                label: "";
+                hexpand: true;
+                halign: end;
+
+                styles [
+                  "dim-label",
+                  "caption",
+                ]
+              }
+            }
+          }
         }
 
         Separator {

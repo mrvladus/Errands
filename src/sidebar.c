@@ -11,7 +11,7 @@
 #include "vendor/toolbox.h"
 
 #include <glib/gi18n.h>
-#include <stddef.h>
+#include <libical/ical.h>
 
 static void on_errands_sidebar_filter_row_activated(GtkListBox *box, GtkListBoxRow *row, ErrandsSidebar *self);
 static void on_import_action_cb(GSimpleAction *action, GVariant *param, ErrandsSidebar *self);
@@ -23,21 +23,22 @@ G_DEFINE_TYPE(ErrandsSidebar, errands_sidebar, ADW_TYPE_BIN)
 static void errands_sidebar_dispose(GObject *gobject) {
   gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_SIDEBAR);
   G_OBJECT_CLASS(errands_sidebar_parent_class)->dispose(gobject);
+  // TODO: unref dialogs
 }
 
 static void errands_sidebar_class_init(ErrandsSidebarClass *class) {
   G_OBJECT_CLASS(class)->dispose = errands_sidebar_dispose;
 
-  g_type_ensure(ERRANDS_TYPE_SIDEBAR_ALL_ROW);
-  g_type_ensure(ERRANDS_TYPE_SIDEBAR_TODAY_ROW);
-  g_type_ensure(ERRANDS_TYPE_SIDEBAR_PINNED_ROW);
   g_type_ensure(ERRANDS_TYPE_SIDEBAR_TASK_LIST_ROW);
 
   gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), "/io/github/mrvladus/Errands/ui/sidebar.ui");
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, filters_box);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, all_row);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, all_counter);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, today_row);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, today_counter);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, pinned_row);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, pinned_counter);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, task_lists_box);
 
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_errands_sidebar_filter_row_activated);
@@ -97,24 +98,27 @@ void errands_sidebar_update_filter_rows(ErrandsSidebar *self) {
     ListData *list = g_ptr_array_index(errands_data_lists, l);
     g_autoptr(GPtrArray) tasks = errands_list_data_get_all_tasks_as_icalcomponents(list);
     for_range(t, 0, tasks->len) {
-      TaskData *task = g_ptr_array_index(errands_data_lists, t);
-      CONTINUE_IF(errands_data_get_bool(task->data, DATA_PROP_DELETED));
-      bool is_completed = errands_task_data_is_completed(task);
+      icalcomponent *task = g_ptr_array_index(tasks, t);
+      CONTINUE_IF(errands_data_get_bool(task, DATA_PROP_DELETED));
+      bool is_completed = !icaltime_is_null_date(errands_data_get_time(task, DATA_PROP_COMPLETED_TIME));
+      icaltimetype due = errands_data_get_time(task, DATA_PROP_DUE_TIME);
+      bool is_due = !icaltime_is_null_time(due) && icaltime_compare_date_only(due, icaltime_today()) < 1;
+      bool is_pinned = errands_data_get_bool(task, DATA_PROP_PINNED);
       if (is_completed) completed++;
-      if (errands_task_data_is_due(task)) {
+      if (is_due) {
         today++;
         if (is_completed) today_completed++;
       }
-      if (errands_data_get_bool(task->data, DATA_PROP_PINNED)) pinned++;
+      if (is_pinned) pinned++;
       total++;
     }
   }
   const char *all_label = total - completed > 0 ? tmp_str_printf("%zu", total - completed) : "";
-  gtk_label_set_label(self->all_row->counter, all_label);
+  gtk_label_set_label(self->all_counter, all_label);
   const char *today_label = today - today_completed > 0 ? tmp_str_printf("%zu", today - today_completed) : "";
-  gtk_label_set_label(self->today_row->counter, today_label);
+  gtk_label_set_label(self->today_counter, today_label);
   const char *pinned_label = pinned > 0 ? tmp_str_printf("%zu", pinned) : "";
-  gtk_label_set_label(self->pinned_row->counter, pinned_label);
+  gtk_label_set_label(self->pinned_counter, pinned_label);
 }
 
 // --- SIGNAL HANDLERS --- //
