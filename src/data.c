@@ -649,6 +649,7 @@ size_t errands_data_get_int(icalcomponent *data, DataPropInt prop) {
 bool errands_data_get_bool(icalcomponent *data, DataPropBool prop) {
   bool out = false;
   switch (prop) {
+  case DATA_PROP_CANCELLED: out = (bool)atoi(get_x_prop_value(data, "X-ERRANDS-CANCELLED", "0")); break;
   case DATA_PROP_DELETED: out = (bool)atoi(get_x_prop_value(data, "X-ERRANDS-DELETED", "0")); break;
   case DATA_PROP_EXPANDED: out = (bool)atoi(get_x_prop_value(data, "X-ERRANDS-EXPANDED", "0")); break;
   case DATA_PROP_NOTIFIED: out = (bool)atoi(get_x_prop_value(data, "X-ERRANDS-NOTIFIED", "0")); break;
@@ -785,6 +786,7 @@ void errands_data_set_int(icalcomponent *data, DataPropInt prop, size_t value) {
 void errands_data_set_bool(icalcomponent *data, DataPropBool prop, bool value) {
   const char *str = value ? "1" : "0";
   switch (prop) {
+  case DATA_PROP_CANCELLED: set_x_prop_value(data, "X-ERRANDS-CANCELLED", str); break;
   case DATA_PROP_DELETED: set_x_prop_value(data, "X-ERRANDS-DELETED", str); break;
   case DATA_PROP_EXPANDED: set_x_prop_value(data, "X-ERRANDS-EXPANDED", str); break;
   case DATA_PROP_NOTIFIED: set_x_prop_value(data, "X-ERRANDS-NOTIFIED", str); break;

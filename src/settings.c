@@ -19,6 +19,7 @@ static JSON *settings = NULL;
 static const char *const settings_keys_strs[SETTINGS_COUNT] = {
     [SETTING_LAST_LIST_UID] = "last_list_uid",
     [SETTING_MAXIMIZED] = "maximized",
+    [SETTING_SHOW_CANCELLED] = "show_cancelled",
     [SETTING_SHOW_COMPLETED] = "show_completed",
     [SETTING_SORT_BY] = "sort_by",
     [SETTING_SYNC] = "sync",
@@ -43,6 +44,7 @@ void errands_settings_load_default() {
   settings = json_object_new();
   json_object_add(settings, SETTING(SETTING_LAST_LIST_UID), json_string_new(""));
   json_object_add(settings, SETTING(SETTING_MAXIMIZED), json_bool_new(false));
+  json_object_add(settings, SETTING(SETTING_SHOW_CANCELLED), json_bool_new(true));
   json_object_add(settings, SETTING(SETTING_SHOW_COMPLETED), json_bool_new(true));
   json_object_add(settings, SETTING(SETTING_SORT_BY), json_int_new(SORT_TYPE_CREATION_DATE));
   json_object_add(settings, SETTING(SETTING_SYNC), json_bool_new(false));
@@ -91,6 +93,7 @@ ErrandsSetting errands_settings_get(ErrandsSettingsKey key) {
   switch (key) {
   case SETTING_LAST_LIST_UID: out.s = res->string_val; break;
   case SETTING_MAXIMIZED: out.b = res->bool_val; break;
+  case SETTING_SHOW_CANCELLED: out.b = res->bool_val; break;
   case SETTING_SHOW_COMPLETED: out.b = res->bool_val; break;
   case SETTING_SORT_BY: out.i = res->int_val; break;
   case SETTING_SYNC: out.b = res->bool_val; break;
@@ -114,6 +117,7 @@ void errands_settings_set(ErrandsSettingsKey key, void *value) {
   switch (key) {
   case SETTING_LAST_LIST_UID: json_replace_string(&res->string_val, value); break;
   case SETTING_MAXIMIZED: res->bool_val = *(bool *)value; break;
+  case SETTING_SHOW_CANCELLED: res->bool_val = *(bool *)value; break;
   case SETTING_SHOW_COMPLETED: res->bool_val = *(bool *)value; break;
   case SETTING_SORT_BY: res->int_val = *(int *)value; break;
   case SETTING_SYNC: res->bool_val = *(bool *)value; break;

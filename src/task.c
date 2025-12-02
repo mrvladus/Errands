@@ -1,6 +1,6 @@
 #include "task.h"
 #include "data.h"
-#include "gtk/gtk.h"
+#include "glib.h"
 #include "sidebar.h"
 #include "state.h"
 #include "sync.h"
@@ -28,6 +28,7 @@ static void on_action_edit(GSimpleAction *action, GVariant *param, ErrandsTask *
 static void on_action_clipboard(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_action_export(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_action_delete(GSimpleAction *action, GVariant *param, ErrandsTask *self);
+static void on_action_cancel(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 
 static GdkContentProvider *on_drag_prepare(GtkDragSource *source, double x, double y, ErrandsTask *self);
 static void on_drag_begin(GtkDragSource *source, GdkDrag *drag, ErrandsTask *self);
@@ -83,7 +84,8 @@ static void errands_task_class_init(ErrandsTaskClass *class) {
 static void errands_task_init(ErrandsTask *self) {
   gtk_widget_init_template(GTK_WIDGET(self));
   errands_add_actions(GTK_WIDGET(self), "task", "edit", on_action_edit, self, "clipboard", on_action_clipboard, self,
-                      "export", on_action_export, self, "delete", on_action_delete, self, NULL);
+                      "export", on_action_export, self, "delete", on_action_delete, self, "cancel", on_action_cancel,
+                      self, NULL);
 
   // DND
 
@@ -440,6 +442,18 @@ static void on_action_delete(GSimpleAction *action, GVariant *param, ErrandsTask
   errands_window_add_toast(state.main_window, _("Task is Deleted"));
   errands_task_list_reload(state.main_window->task_list, true);
   errands_sync_schedule_task(self->data);
+}
+
+static void on_action_cancel(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
+  errands_data_set(self->data->data, DATA_PROP_CANCELLED, true);
+  g_autoptr(GPtrArray) sub_tasks = g_ptr_array_new();
+  errands_task_data_get_flat_list(self->data, sub_tasks);
+  for_range(i, 0, sub_tasks->len) {
+    TaskData *sub_task = g_ptr_array_index(sub_tasks, i);
+    errands_data_set(sub_task->data, DATA_PROP_CANCELLED, true);
+  }
+  errands_data_write_list(self->data->list);
+  errands_task_list_reload(state.main_window->task_list, true);
 }
 
 static GdkContentProvider *on_drag_prepare(GtkDragSource *source, double x, double y, ErrandsTask *task) {

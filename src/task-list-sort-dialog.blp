@@ -14,8 +14,13 @@ template $ErrandsTaskListSortDialog: Adw.Dialog {
         title: _("Filter");
 
         Adw.SwitchRow completed_toggle_row {
-          title: _("Show Completed Tasks");
+          title: _("Completed Tasks");
           notify::active => $on_show_completed_toggle_cb();
+        }
+
+        Adw.SwitchRow cancelled_toggle_row {
+          title: _("Cancelled Tasks");
+          notify::active => $on_show_cancelled_toggle_cb();
         }
       }
 

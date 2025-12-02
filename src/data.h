@@ -107,6 +107,7 @@ size_t errands_data_get_int(icalcomponent *data, DataPropInt prop);
 void errands_data_set_int(icalcomponent *data, DataPropInt prop, size_t value);
 
 typedef enum {
+  DATA_PROP_CANCELLED,
   DATA_PROP_DELETED,
   DATA_PROP_EXPANDED,
   DATA_PROP_NOTIFIED,
