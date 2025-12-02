@@ -16,6 +16,7 @@
 // Callbacks
 static void on_complete_btn_toggle_cb(ErrandsTask *self, GtkCheckButton *btn);
 static void on_toolbar_btn_toggle_cb(ErrandsTask *self, GtkToggleButton *btn);
+static void on_pin_btn_toggle_cb(ErrandsTask *self, GtkToggleButton *btn);
 static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointer user_data);
 static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *self);
 static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x, gdouble y, ErrandsTask *self);
@@ -53,6 +54,7 @@ static void errands_task_class_init(ErrandsTaskClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, subtitle);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, progress_bar);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, date_btn);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, pin_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, date_btn_content);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, notes_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, priority_btn);
@@ -64,6 +66,7 @@ static void errands_task_class_init(ErrandsTaskClass *class) {
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_title_edit_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_right_click);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_toolbar_btn_toggle_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_pin_btn_toggle_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_complete_btn_toggle_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_list_date_dialog_show);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_list_notes_dialog_show);
@@ -120,6 +123,9 @@ void errands_task_set_data(ErrandsTask *self, TaskData *data) {
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(self->toolbar_btn),
                                errands_data_get_bool(data->data, DATA_PROP_TOOLBAR_SHOWN));
   g_signal_handlers_unblock_by_func(self->toolbar_btn, on_toolbar_btn_toggle_cb, self);
+  g_signal_handlers_block_by_func(self->pin_btn, on_pin_btn_toggle_cb, self);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(self->pin_btn), errands_data_get_bool(data->data, DATA_PROP_PINNED));
+  g_signal_handlers_unblock_by_func(self->pin_btn, on_pin_btn_toggle_cb, self);
   // Update UI
   // Show sub-tasks entry
   gtk_widget_set_visible(self->sub_entry, errands_data_get_bool(data->data, DATA_PROP_EXPANDED));
@@ -311,8 +317,7 @@ static void on_complete_btn_toggle_cb(ErrandsTask *self, GtkCheckButton *btn) {
   errands_task_list_reload(state.main_window->task_list, true);
   // Update task list
   errands_task_list_update_title(state.main_window->task_list);
-  errands_sidebar_all_row_update_counter(state.main_window->sidebar->all_row);
-  errands_sidebar_today_row_update_counter(state.main_window->sidebar->today_row);
+  errands_sidebar_update_filter_rows(state.main_window->sidebar);
   errands_sidebar_task_list_row_update_counter(
       errands_sidebar_task_list_row_get(errands_data_get_str(self->data->data, DATA_PROP_LIST_UID)));
   // Sync
@@ -347,9 +352,13 @@ static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointe
 }
 
 static void on_toolbar_btn_toggle_cb(ErrandsTask *self, GtkToggleButton *btn) {
-  LOG("Task '%s': Toggle toolbar", errands_data_get_str(self->data->data, DATA_PROP_UID));
-  errands_data_set(self->data->data, DATA_PROP_TOOLBAR_SHOWN, gtk_toggle_button_get_active(btn));
-  errands_data_write_list(self->data->list);
+  errands_data_set_and_write(self->data->data, DATA_PROP_TOOLBAR_SHOWN, gtk_toggle_button_get_active(btn),
+                             self->data->list);
+}
+
+static void on_pin_btn_toggle_cb(ErrandsTask *self, GtkToggleButton *btn) {
+  errands_data_set_and_write(self->data->data, DATA_PROP_PINNED,
+                             !errands_data_get_bool(self->data->data, DATA_PROP_PINNED), self->data->list);
 }
 
 static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *self) {

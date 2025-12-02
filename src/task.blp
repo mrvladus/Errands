@@ -131,6 +131,17 @@ template $ErrandsTask: Box {
     }
 
     Box {
+      ToggleButton pin_btn {
+        icon-name: "errands-pin-symbolic";
+        tooltip-text: _("Pin");
+        valign: center;
+        clicked => $on_pin_btn_toggle_cb(template);
+
+        styles [
+          "flat",
+        ]
+      }
+
       Button priority_btn {
         icon-name: "errands-priority-symbolic";
         tooltip-text: _("Priority");

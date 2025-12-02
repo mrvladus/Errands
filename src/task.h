@@ -20,6 +20,7 @@ struct _ErrandsTask {
   GtkWidget *progress_bar;
   GtkWidget *date_btn;
   GtkWidget *date_btn_content;
+  GtkWidget *pin_btn;
   GtkWidget *notes_btn;
   GtkWidget *priority_btn;
   GtkWidget *tags_btn;

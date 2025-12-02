@@ -362,7 +362,7 @@ static void on_task_list_entry_activated_cb(AdwEntryRow *entry, ErrandsTaskList 
   errands_data_write_list(self->data);
   gtk_editable_set_text(GTK_EDITABLE(entry), "");
   errands_sidebar_task_list_row_update_counter(errands_sidebar_task_list_row_get(list_uid));
-  errands_sidebar_all_row_update_counter(state.main_window->sidebar->all_row);
+  errands_sidebar_update_filter_rows(state.main_window->sidebar);
   LOG("Add task '%s' to task list '%s'", errands_data_get_str(data->data, DATA_PROP_UID),
       errands_data_get_str(data->data, DATA_PROP_LIST_UID));
   errands_task_list_reload(self, false);

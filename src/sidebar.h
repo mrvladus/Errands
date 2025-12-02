@@ -1,6 +1,7 @@
 #pragma once
 
 #include "data.h"
+#include "gtk/gtk.h"
 
 #include <adwaita.h>
 
@@ -31,21 +32,34 @@ void on_errands_sidebar_task_list_row_activate(GtkListBox *box, ErrandsSidebarTa
 #define ERRANDS_TYPE_SIDEBAR_ALL_ROW (errands_sidebar_all_row_get_type())
 G_DECLARE_FINAL_TYPE(ErrandsSidebarAllRow, errands_sidebar_all_row, ERRANDS, SIDEBAR_ALL_ROW, GtkListBoxRow)
 
+struct _ErrandsSidebarAllRow {
+  GtkListBoxRow parent_instance;
+  GtkLabel *counter;
+};
+
 ErrandsSidebarAllRow *errands_sidebar_all_row_new();
-void errands_sidebar_all_row_update_counter(ErrandsSidebarAllRow *row);
 
 // --- SIDEBAR TODAY ROW --- //
 
 #define ERRANDS_TYPE_SIDEBAR_TODAY_ROW (errands_sidebar_today_row_get_type())
 G_DECLARE_FINAL_TYPE(ErrandsSidebarTodayRow, errands_sidebar_today_row, ERRANDS, SIDEBAR_TODAY_ROW, GtkListBoxRow)
 
+struct _ErrandsSidebarTodayRow {
+  GtkListBoxRow parent_instance;
+  GtkLabel *counter;
+};
+
 ErrandsSidebarTodayRow *errands_sidebar_today_row_new();
-void errands_sidebar_today_row_update_counter(ErrandsSidebarTodayRow *row);
 
 // --- SIDEBAR PINNED ROW --- //
 
 #define ERRANDS_TYPE_SIDEBAR_PINNED_ROW (errands_sidebar_pinned_row_get_type())
 G_DECLARE_FINAL_TYPE(ErrandsSidebarPinnedRow, errands_sidebar_pinned_row, ERRANDS, SIDEBAR_PINNED_ROW, GtkListBoxRow)
+
+struct _ErrandsSidebarPinnedRow {
+  GtkListBoxRow parent_instance;
+  GtkLabel *counter;
+};
 
 ErrandsSidebarPinnedRow *errands_sidebar_pinned_row_new();
 
@@ -97,5 +111,6 @@ struct _ErrandsSidebar {
 
 ErrandsSidebar *errands_sidebar_new();
 void errands_sidebar_load_lists(ErrandsSidebar *self);
+void errands_sidebar_update_filter_rows(ErrandsSidebar *self);
 ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(ErrandsSidebar *sb, ListData *data);
 void errands_sidebar_select_last_opened_page();

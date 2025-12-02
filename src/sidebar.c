@@ -1,7 +1,6 @@
 #include "sidebar.h"
 #include "about-dialog.h"
 #include "data.h"
-#include "glib.h"
 #include "settings-dialog.h"
 #include "settings.h"
 #include "state.h"
@@ -12,6 +11,7 @@
 #include "vendor/toolbox.h"
 
 #include <glib/gi18n.h>
+#include <stddef.h>
 
 static void on_errands_sidebar_filter_row_activated(GtkListBox *box, GtkListBoxRow *row, ErrandsSidebar *self);
 static void on_import_action_cb(GSimpleAction *action, GVariant *param, ErrandsSidebar *self);
@@ -66,8 +66,7 @@ void errands_sidebar_load_lists(ErrandsSidebar *self) {
       gtk_list_box_append(GTK_LIST_BOX(self->task_lists_box), GTK_WIDGET(row));
     }
   }
-  errands_sidebar_all_row_update_counter(self->all_row);
-  errands_sidebar_today_row_update_counter(self->today_row);
+  errands_sidebar_update_filter_rows(self);
   errands_window_update(state.main_window);
   // Select last opened page
   g_signal_connect(state.main_window, "realize", G_CALLBACK(errands_sidebar_select_last_opened_page), NULL);
@@ -90,6 +89,32 @@ void errands_sidebar_select_last_opened_page() {
     if (STR_EQUAL(last_uid, errands_data_get_str(row->data->data, DATA_PROP_LIST_UID)))
       g_signal_emit_by_name(row, "activate", NULL);
   }
+}
+
+void errands_sidebar_update_filter_rows(ErrandsSidebar *self) {
+  size_t total = 0, completed = 0, today = 0, today_completed = 0, pinned = 0;
+  for_range(l, 0, errands_data_lists->len) {
+    ListData *list = g_ptr_array_index(errands_data_lists, l);
+    g_autoptr(GPtrArray) tasks = errands_list_data_get_all_tasks_as_icalcomponents(list);
+    for_range(t, 0, tasks->len) {
+      TaskData *task = g_ptr_array_index(errands_data_lists, t);
+      CONTINUE_IF(errands_data_get_bool(task->data, DATA_PROP_DELETED));
+      bool is_completed = errands_task_data_is_completed(task);
+      if (is_completed) completed++;
+      if (errands_task_data_is_due(task)) {
+        today++;
+        if (is_completed) today_completed++;
+      }
+      if (errands_data_get_bool(task->data, DATA_PROP_PINNED)) pinned++;
+      total++;
+    }
+  }
+  const char *all_label = total - completed > 0 ? tmp_str_printf("%zu", total - completed) : "";
+  gtk_label_set_label(self->all_row->counter, all_label);
+  const char *today_label = today - today_completed > 0 ? tmp_str_printf("%zu", today - today_completed) : "";
+  gtk_label_set_label(self->today_row->counter, today_label);
+  const char *pinned_label = pinned > 0 ? tmp_str_printf("%zu", pinned) : "";
+  gtk_label_set_label(self->pinned_row->counter, pinned_label);
 }
 
 // --- SIGNAL HANDLERS --- //
