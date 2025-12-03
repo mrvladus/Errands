@@ -1,6 +1,7 @@
 #include "task.h"
 #include "data.h"
 #include "glib.h"
+#include "gtk/gtk.h"
 #include "sidebar.h"
 #include "state.h"
 #include "sync.h"
@@ -115,6 +116,7 @@ void errands_task_set_data(ErrandsTask *self, TaskData *data) {
   gtk_widget_set_visible(GTK_WIDGET(self), data ? true : false);
   if (!data) return;
   self->data = data;
+  gtk_widget_set_sensitive(GTK_WIDGET(self), !errands_data_get_bool(data->data, DATA_PROP_CANCELLED));
   // Set text
   gtk_label_set_label(GTK_LABEL(self->title), errands_data_get_str(data->data, DATA_PROP_TEXT));
   // Set completion
