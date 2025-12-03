@@ -10,6 +10,7 @@ typedef enum {
   SETTING_SHOW_CANCELLED,
   SETTING_SHOW_COMPLETED,
   SETTING_SORT_BY,
+  SETTING_SORT_ORDER,
   SETTING_SYNC,
   SETTING_SYNC_PROVIDER,
   SETTING_SYNC_URL,
@@ -37,6 +38,11 @@ typedef enum {
   SORT_TYPE_PRIORITY,
   SORT_TYPE_START_DATE,
 } ErrandsSortType;
+
+typedef enum {
+  SORT_ORDER_DESC,
+  SORT_ORDER_ASC,
+} ErrandsSortOrder;
 
 typedef enum {
   SETTING_THEME_SYSTEM,

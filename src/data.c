@@ -2,6 +2,8 @@
 #include "settings.h"
 
 #include "vendor/json.h"
+#include <stddef.h>
+#include <stdint.h>
 
 AUTOPTR_DEFINE(JSON, json_free)
 
@@ -544,28 +546,29 @@ gint errands_data_sort_func(gconstpointer a, gconstpointer b) {
   if (completed_a != completed_b) return completed_a - completed_b;
 
   // Then apply global sort
+  bool asc_order = errands_settings_get(SETTING_SORT_ORDER).i;
   switch (errands_settings_get(SETTING_SORT_BY).i) {
   case SORT_TYPE_CREATION_DATE: {
-    icaltimetype creation_date_a = errands_data_get_time(data_a, DATA_PROP_CREATED_TIME);
-    icaltimetype creation_date_b = errands_data_get_time(data_b, DATA_PROP_CREATED_TIME);
+    icaltimetype creation_date_a = errands_data_get_time(asc_order ? data_b : data_a, DATA_PROP_CREATED_TIME);
+    icaltimetype creation_date_b = errands_data_get_time(asc_order ? data_a : data_b, DATA_PROP_CREATED_TIME);
     return icaltime_compare(creation_date_b, creation_date_a);
   }
   case SORT_TYPE_DUE_DATE: {
-    icaltimetype due_a = errands_data_get_time(data_a, DATA_PROP_DUE_TIME);
-    icaltimetype due_b = errands_data_get_time(data_b, DATA_PROP_DUE_TIME);
+    icaltimetype due_a = errands_data_get_time(asc_order ? data_b : data_a, DATA_PROP_DUE_TIME);
+    icaltimetype due_b = errands_data_get_time(asc_order ? data_a : data_b, DATA_PROP_DUE_TIME);
     bool null_a = icaltime_is_null_time(due_a);
     bool null_b = icaltime_is_null_time(due_b);
     if (null_a != null_b) return null_a - null_b;
     return icaltime_compare(due_a, due_b);
   }
   case SORT_TYPE_PRIORITY: {
-    int p_a = errands_data_get_int(data_a, DATA_PROP_PRIORITY);
-    int p_b = errands_data_get_int(data_b, DATA_PROP_PRIORITY);
+    int p_a = errands_data_get_int(asc_order ? data_b : data_a, DATA_PROP_PRIORITY);
+    int p_b = errands_data_get_int(asc_order ? data_a : data_b, DATA_PROP_PRIORITY);
     return p_b - p_a;
   }
   case SORT_TYPE_START_DATE: {
-    icaltimetype start_a = errands_data_get_time(data_a, DATA_PROP_START_TIME);
-    icaltimetype start_b = errands_data_get_time(data_b, DATA_PROP_START_TIME);
+    icaltimetype start_a = errands_data_get_time(asc_order ? data_b : data_a, DATA_PROP_START_TIME);
+    icaltimetype start_b = errands_data_get_time(asc_order ? data_a : data_b, DATA_PROP_START_TIME);
     bool null_a = icaltime_is_null_time(start_a);
     bool null_b = icaltime_is_null_time(start_b);
     if (null_a != null_b) return null_a - null_b;

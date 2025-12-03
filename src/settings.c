@@ -22,6 +22,7 @@ static const char *const settings_keys_strs[SETTINGS_COUNT] = {
     [SETTING_SHOW_CANCELLED] = "show_cancelled",
     [SETTING_SHOW_COMPLETED] = "show_completed",
     [SETTING_SORT_BY] = "sort_by",
+    [SETTING_SORT_ORDER] = "sort_order",
     [SETTING_SYNC] = "sync",
     [SETTING_SYNC_PROVIDER] = "sync_provider",
     [SETTING_SYNC_URL] = "sync_url",
@@ -47,6 +48,7 @@ void errands_settings_load_default() {
   json_object_add(settings, SETTING(SETTING_SHOW_CANCELLED), json_bool_new(true));
   json_object_add(settings, SETTING(SETTING_SHOW_COMPLETED), json_bool_new(true));
   json_object_add(settings, SETTING(SETTING_SORT_BY), json_int_new(SORT_TYPE_CREATION_DATE));
+  json_object_add(settings, SETTING(SETTING_SORT_ORDER), json_int_new(SORT_ORDER_DESC));
   json_object_add(settings, SETTING(SETTING_SYNC), json_bool_new(false));
   json_object_add(settings, SETTING(SETTING_SYNC_PROVIDER), json_string_new("caldav"));
   json_object_add(settings, SETTING(SETTING_SYNC_URL), json_string_new(""));
@@ -96,6 +98,7 @@ ErrandsSetting errands_settings_get(ErrandsSettingsKey key) {
   case SETTING_SHOW_CANCELLED: out.b = res->bool_val; break;
   case SETTING_SHOW_COMPLETED: out.b = res->bool_val; break;
   case SETTING_SORT_BY: out.i = res->int_val; break;
+  case SETTING_SORT_ORDER: out.i = res->int_val; break;
   case SETTING_SYNC: out.b = res->bool_val; break;
   case SETTING_SYNC_PROVIDER: out.s = res->string_val; break;
   case SETTING_SYNC_URL: out.s = res->string_val; break;
@@ -120,6 +123,7 @@ void errands_settings_set(ErrandsSettingsKey key, void *value) {
   case SETTING_SHOW_CANCELLED: res->bool_val = *(bool *)value; break;
   case SETTING_SHOW_COMPLETED: res->bool_val = *(bool *)value; break;
   case SETTING_SORT_BY: res->int_val = *(int *)value; break;
+  case SETTING_SORT_ORDER: res->int_val = *(int *)value; break;
   case SETTING_SYNC: res->bool_val = *(bool *)value; break;
   case SETTING_SYNC_PROVIDER: json_replace_string(&res->string_val, value); break;
   case SETTING_SYNC_URL: json_replace_string(&res->string_val, value); break;

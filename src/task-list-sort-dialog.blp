@@ -27,6 +27,24 @@ template $ErrandsTaskListSortDialog: Adw.Dialog {
       Adw.PreferencesGroup {
         title: _("Sort By");
 
+        header-suffix: Adw.ToggleGroup sort_order {
+          styles [
+            "round",
+          ]
+
+          notify::active => $on_sort_order_changed_cb(template);
+
+          Adw.Toggle {
+            icon-name: "errands-sort-symbolic";
+            tooltip: _("Descending");
+          }
+
+          Adw.Toggle {
+            icon-name: "errands-sort-asc-symbolic";
+            tooltip: _("Ascending");
+          }
+        };
+
         Adw.ActionRow {
           title: _("Creation Date");
           activatable-widget: creation_date_toggle_btn;
