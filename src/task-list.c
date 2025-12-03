@@ -160,8 +160,13 @@ void errands_task_list_redraw_tasks(ErrandsTaskList *self) {
     }
     // Show only pinned tasks
     else if (self->page == ERRANDS_TASK_LIST_PAGE_PINNED) {
-      if (!errands_data_get_bool(data->data, DATA_PROP_PINNED))
-        CONTINUE_IF(!errands_task_list__task_has_any_pinned_parent(data));
+      bool is_pinned = errands_data_get_bool(data->data, DATA_PROP_PINNED);
+      if (!errands_task_list__task_has_any_pinned_parent(data)) {
+        CONTINUE_IF(!is_pinned);
+        gtk_widget_set_margin_start(GTK_WIDGET(task), 0);
+      } else gtk_widget_set_margin_start(GTK_WIDGET(task), errands_task_data_get_indent_level(data) * indent_px);
+      errands_task_set_data(task, data);
+      continue;
     }
     // Search query
     if (search_query && !STR_EQUAL(search_query, ""))
