@@ -140,7 +140,6 @@ void errands_task_list_redraw_tasks(ErrandsTaskList *self) {
   // LOG("Task List: Redraw Tasks");
   static uint8_t indent_px = 15;
   if (current_task_list->len == 0) return;
-  icaltimetype today = icaltime_today();
   g_autoptr(GPtrArray) children = get_children(self->task_list);
   for (size_t i = 0, j = current_start; i < MIN(tasks_stack_size, current_task_list->len - current_start);) {
     ErrandsTask *task = g_ptr_array_index(children, i++);
