@@ -1,4 +1,5 @@
 #include "data.h"
+#include "glib/gi18n.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "state.h"
@@ -151,13 +152,13 @@ static void on_action_export_finish_cb(GObject *obj, GAsyncResult *res, gpointer
   g_autofree char *path = g_file_get_path(f);
   FILE *file = fopen(path, "w");
   if (!file) {
-    errands_window_add_toast(state.main_window, "Export failed");
+    errands_window_add_toast(state.main_window, _("Export failed"));
     return;
   }
-  char *ical = icalcomponent_as_ical_string(data);
+  autofree char *ical = icalcomponent_as_ical_string(data);
   fprintf(file, "%s", ical);
   fclose(file);
-  free(ical);
+  errands_window_add_toast(state.main_window, _("Exported"));
   LOG("Export task list %s", errands_data_get_str(data, DATA_PROP_LIST_UID));
 }
 
@@ -165,7 +166,7 @@ static void on_action_export(GSimpleAction *action, GVariant *param, ErrandsSide
   g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
   const char *filename = tmp_str_printf("%s.ics", errands_data_get_str(row->data->data, DATA_PROP_LIST_UID));
   g_object_set(dialog, "initial-name", filename, NULL);
-  gtk_file_dialog_save(dialog, GTK_WINDOW(state.main_window), NULL, on_action_export_finish_cb, row->data);
+  gtk_file_dialog_save(dialog, GTK_WINDOW(state.main_window), NULL, on_action_export_finish_cb, row->data->data);
 }
 
 static void on_action_delete(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {
