@@ -130,10 +130,10 @@ extern const char *toolbox_log_prefix;
 #define STR_EQUAL(s1, s2) (strcmp((const char *)(s1), (const char *)(s2)) == 0)
 
 // Check if string contains substring.
-#define STR_CONTAINS(s1, s2) (strstr((const char *)(s1), (const char *)(s2)) != NULL)
+#define STR_CONTAINS(s1, s2) ((s1 && s2) ? strstr((const char *)(s1), (const char *)(s2)) != NULL : false)
 
 // Check if string contains substring (case-insensitive).
-#define STR_CONTAINS_CASE(s1, s2) (strcasestr((const char *)(s1), (const char *)(s2)) != NULL)
+#define STR_CONTAINS_CASE(s1, s2) ((s1 && s2) ? strcasestr((const char *)(s1), (const char *)(s2)) != NULL : false)
 
 // -------------------- DYNAMIC ARRAY -------------------- //
 
