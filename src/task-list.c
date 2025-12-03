@@ -120,8 +120,6 @@ static bool errands_task_list__task_match_search_or_has_matched_child(TaskData *
 }
 
 static int errands_task_list__calculate_height(ErrandsTaskList *self) {
-  // LOG_NO_LN("Task List: Calculating height ... ");
-  // TIMER_START;
   int height = 0;
   GtkRequisition min_size, nat_size;
   for_range(i, 0, current_task_list->len) {
@@ -131,7 +129,6 @@ static int errands_task_list__calculate_height(ErrandsTaskList *self) {
     gtk_widget_get_preferred_size(GTK_WIDGET(measuring_task), &min_size, &nat_size);
     height += nat_size.height;
   }
-  // LOG_NO_PREFIX("%d (%f sec.)", height, TIMER_ELAPSED_MS);
   return height;
 }
 
@@ -153,12 +150,13 @@ void errands_task_list_redraw_tasks(ErrandsTaskList *self) {
     // Show only today tasks for today page
     if (self->page == ERRANDS_TASK_LIST_PAGE_TODAY) {
       // Check if any parent is due - then show task anyway, else check due date of the task
+      bool is_due = errands_task_data_is_due(data);
       if (!errands_task_list__task_has_any_due_parent(data)) {
-        // errands_task_data_is_due(data);
-        icaltimetype due = errands_data_get_time(data->data, DATA_PROP_DUE_TIME);
-        CONTINUE_IF(icaltime_is_null_date(due));
-        CONTINUE_IF(icaltime_compare_date_only(due, today) == 1);
-      }
+        CONTINUE_IF(!is_due);
+        gtk_widget_set_margin_start(GTK_WIDGET(task), 0);
+      } else gtk_widget_set_margin_start(GTK_WIDGET(task), errands_task_data_get_indent_level(data) * indent_px);
+      errands_task_set_data(task, data);
+      continue;
     }
     // Show only pinned tasks
     else if (self->page == ERRANDS_TASK_LIST_PAGE_PINNED) {
