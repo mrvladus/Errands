@@ -363,9 +363,10 @@ static void on_toolbar_btn_toggle_cb(ErrandsTask *self, GtkToggleButton *btn) {
 }
 
 static void on_pin_btn_toggle_cb(ErrandsTask *self, GtkToggleButton *btn) {
-  errands_data_set_and_write(self->data->data, DATA_PROP_PINNED,
-                             !errands_data_get_bool(self->data->data, DATA_PROP_PINNED), self->data->list);
+  bool new_pinned = !errands_data_get_bool(self->data->data, DATA_PROP_PINNED);
+  errands_data_set_and_write(self->data->data, DATA_PROP_PINNED, new_pinned, self->data->list);
   errands_sidebar_update_filter_rows(state.main_window->sidebar);
+  if (!new_pinned) errands_task_list_reload(state.main_window->task_list, true);
 }
 
 static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *self) {
@@ -382,6 +383,7 @@ static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *self) {
   errands_sync_schedule_task(self->data);
   errands_task_list_reload(state.main_window->task_list, true);
   gtk_widget_grab_focus(GTK_WIDGET(entry));
+  errands_sidebar_update_filter_rows(state.main_window->sidebar);
 }
 
 static void on_right_click(GtkGestureClick *ctrl, gint n_press, gdouble x, gdouble y, ErrandsTask *self) {
