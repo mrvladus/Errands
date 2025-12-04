@@ -16,24 +16,26 @@ static time_t last_save_time = 0;
 static bool pending_save = false;
 static JSON *settings = NULL;
 
-static const char *const settings_keys_strs[SETTINGS_COUNT] = {
-    [SETTING_LAST_LIST_UID] = "last_list_uid",
-    [SETTING_MAXIMIZED] = "maximized",
-    [SETTING_SHOW_CANCELLED] = "show_cancelled",
-    [SETTING_SHOW_COMPLETED] = "show_completed",
-    [SETTING_SORT_BY] = "sort_by",
-    [SETTING_SORT_ORDER] = "sort_order",
-    [SETTING_SYNC] = "sync",
-    [SETTING_SYNC_PROVIDER] = "sync_provider",
-    [SETTING_SYNC_URL] = "sync_url",
-    [SETTING_SYNC_USERNAME] = "sync_username",
-    [SETTING_TAGS] = "tags",
-    [SETTING_WINDOW_HEIGHT] = "window_height",
-    [SETTING_WINDOW_WIDTH] = "window_width",
-    [SETTING_NOTIFICATIONS] = "notifications",
-    [SETTING_BACKGROUND] = "background",
-    [SETTING_STARTUP] = "startup",
-    [SETTING_THEME] = "theme",
+#define SETTING_KEY_STR(ErrandsSettingsKey, key_str) [ErrandsSettingsKey] = key_str
+
+static const char *const settings_keys_strs[] = {
+    SETTING_KEY_STR(SETTING_LAST_LIST_UID, "last_list_uid"),
+    SETTING_KEY_STR(SETTING_MAXIMIZED, "maximized"),
+    SETTING_KEY_STR(SETTING_SHOW_CANCELLED, "show_cancelled"),
+    SETTING_KEY_STR(SETTING_SHOW_COMPLETED, "show_completed"),
+    SETTING_KEY_STR(SETTING_SORT_BY, "sort_by"),
+    SETTING_KEY_STR(SETTING_SORT_ORDER, "sort_order"),
+    SETTING_KEY_STR(SETTING_SYNC, "sync"),
+    SETTING_KEY_STR(SETTING_SYNC_PROVIDER, "sync_provider"),
+    SETTING_KEY_STR(SETTING_SYNC_URL, "sync_url"),
+    SETTING_KEY_STR(SETTING_SYNC_USERNAME, "sync_username"),
+    SETTING_KEY_STR(SETTING_TAGS, "tags"),
+    SETTING_KEY_STR(SETTING_WINDOW_HEIGHT, "window_height"),
+    SETTING_KEY_STR(SETTING_WINDOW_WIDTH, "window_width"),
+    SETTING_KEY_STR(SETTING_NOTIFICATIONS, "notifications"),
+    SETTING_KEY_STR(SETTING_BACKGROUND, "background"),
+    SETTING_KEY_STR(SETTING_STARTUP, "startup"),
+    SETTING_KEY_STR(SETTING_THEME, "theme"),
 };
 
 #define SETTING(key) settings_keys_strs[key]
@@ -41,25 +43,32 @@ static const char *const settings_keys_strs[SETTINGS_COUNT] = {
 // --- LOADING --- //
 
 void errands_settings_load_default() {
-  LOG("Settings: Create default configuration");
+#define SETTING_ADD(ErrandsSettingsKey, json_type, value)                                                              \
+  json_object_add(settings, SETTING(ErrandsSettingsKey), json_##json_type##_new(value));
+
   settings = json_object_new();
-  json_object_add(settings, SETTING(SETTING_LAST_LIST_UID), json_string_new(""));
-  json_object_add(settings, SETTING(SETTING_MAXIMIZED), json_bool_new(false));
-  json_object_add(settings, SETTING(SETTING_SHOW_CANCELLED), json_bool_new(true));
-  json_object_add(settings, SETTING(SETTING_SHOW_COMPLETED), json_bool_new(true));
-  json_object_add(settings, SETTING(SETTING_SORT_BY), json_int_new(SORT_TYPE_CREATION_DATE));
-  json_object_add(settings, SETTING(SETTING_SORT_ORDER), json_int_new(SORT_ORDER_DESC));
-  json_object_add(settings, SETTING(SETTING_SYNC), json_bool_new(false));
-  json_object_add(settings, SETTING(SETTING_SYNC_PROVIDER), json_string_new("caldav"));
-  json_object_add(settings, SETTING(SETTING_SYNC_URL), json_string_new(""));
-  json_object_add(settings, SETTING(SETTING_SYNC_USERNAME), json_string_new(""));
-  json_object_add(settings, SETTING(SETTING_TAGS), json_string_new(""));
-  json_object_add(settings, SETTING(SETTING_WINDOW_HEIGHT), json_int_new(600));
-  json_object_add(settings, SETTING(SETTING_WINDOW_WIDTH), json_int_new(800));
-  json_object_add(settings, SETTING(SETTING_NOTIFICATIONS), json_bool_new(true));
-  json_object_add(settings, SETTING(SETTING_BACKGROUND), json_bool_new(true));
-  json_object_add(settings, SETTING(SETTING_STARTUP), json_bool_new(false));
-  json_object_add(settings, SETTING(SETTING_THEME), json_int_new(SETTING_THEME_SYSTEM));
+
+  SETTING_ADD(SETTING_MAXIMIZED, bool, false);
+  SETTING_ADD(SETTING_SHOW_CANCELLED, bool, true);
+  SETTING_ADD(SETTING_SHOW_COMPLETED, bool, true);
+  SETTING_ADD(SETTING_SYNC, bool, false);
+  SETTING_ADD(SETTING_BACKGROUND, bool, true);
+  SETTING_ADD(SETTING_NOTIFICATIONS, bool, true);
+  SETTING_ADD(SETTING_STARTUP, bool, false);
+
+  SETTING_ADD(SETTING_THEME, int, SETTING_THEME_SYSTEM);
+  SETTING_ADD(SETTING_WINDOW_HEIGHT, int, 600);
+  SETTING_ADD(SETTING_WINDOW_WIDTH, int, 800);
+  SETTING_ADD(SETTING_SORT_BY, int, SORT_TYPE_CREATION_DATE);
+  SETTING_ADD(SETTING_SORT_ORDER, int, SORT_ORDER_DESC);
+
+  SETTING_ADD(SETTING_LAST_LIST_UID, string, "");
+  SETTING_ADD(SETTING_SYNC_PROVIDER, string, "caldav");
+  SETTING_ADD(SETTING_SYNC_URL, string, "");
+  SETTING_ADD(SETTING_SYNC_USERNAME, string, "");
+  SETTING_ADD(SETTING_TAGS, string, "");
+
+  LOG("Settings: Created default configuration");
 }
 
 void errands_settings_load_user() {
@@ -90,57 +99,67 @@ void errands_settings_init() {
 // --- GET / SET SETTINGS --- //
 
 ErrandsSetting errands_settings_get(ErrandsSettingsKey key) {
+#define SETTING_GET_STR  out.s = res->string_val
+#define SETTING_GET_INT  out.i = res->int_val
+#define SETTING_GET_BOOL out.b = res->bool_val
+
   JSON *res = json_object_get(settings, SETTING(key));
   ErrandsSetting out = {0};
   switch (key) {
-  case SETTING_LAST_LIST_UID: out.s = res->string_val; break;
-  case SETTING_MAXIMIZED: out.b = res->bool_val; break;
-  case SETTING_SHOW_CANCELLED: out.b = res->bool_val; break;
-  case SETTING_SHOW_COMPLETED: out.b = res->bool_val; break;
-  case SETTING_SORT_BY: out.i = res->int_val; break;
-  case SETTING_SORT_ORDER: out.i = res->int_val; break;
-  case SETTING_SYNC: out.b = res->bool_val; break;
-  case SETTING_SYNC_PROVIDER: out.s = res->string_val; break;
-  case SETTING_SYNC_URL: out.s = res->string_val; break;
-  case SETTING_SYNC_USERNAME: out.s = res->string_val; break;
-  case SETTING_TAGS: out.s = res->string_val; break;
-  case SETTING_WINDOW_HEIGHT: out.i = res->int_val; break;
-  case SETTING_WINDOW_WIDTH: out.i = res->int_val; break;
-  case SETTING_NOTIFICATIONS: out.b = res->bool_val; break;
-  case SETTING_BACKGROUND: out.b = res->bool_val; break;
-  case SETTING_STARTUP: out.b = res->bool_val; break;
-  case SETTING_THEME: out.i = res->int_val; break;
-  case SETTINGS_COUNT: break;
+  case SETTING_BACKGROUND: SETTING_GET_BOOL; break;
+  case SETTING_MAXIMIZED: SETTING_GET_BOOL; break;
+  case SETTING_NOTIFICATIONS: SETTING_GET_BOOL; break;
+  case SETTING_SHOW_CANCELLED: SETTING_GET_BOOL; break;
+  case SETTING_SHOW_COMPLETED: SETTING_GET_BOOL; break;
+  case SETTING_STARTUP: SETTING_GET_BOOL; break;
+  case SETTING_SYNC: SETTING_GET_BOOL; break;
+
+  case SETTING_SORT_BY: SETTING_GET_INT; break;
+  case SETTING_SORT_ORDER: SETTING_GET_INT; break;
+  case SETTING_THEME: SETTING_GET_INT; break;
+  case SETTING_WINDOW_HEIGHT: SETTING_GET_INT; break;
+  case SETTING_WINDOW_WIDTH: SETTING_GET_INT; break;
+
+  case SETTING_LAST_LIST_UID: SETTING_GET_STR; break;
+  case SETTING_SYNC_PROVIDER: SETTING_GET_STR; break;
+  case SETTING_SYNC_URL: SETTING_GET_STR; break;
+  case SETTING_SYNC_USERNAME: SETTING_GET_STR; break;
+  case SETTING_TAGS: SETTING_GET_STR; break;
   }
   return out;
 }
 
 void errands_settings_set(ErrandsSettingsKey key, void *value) {
+#define SETTING_SET_STR  json_replace_string(&res->string_val, value)
+#define SETTING_SET_INT  res->int_val = *(int *)value
+#define SETTING_SET_BOOL res->bool_val = *(bool *)value
+
   JSON *res = json_object_get(settings, SETTING(key));
   switch (key) {
-  case SETTING_LAST_LIST_UID: json_replace_string(&res->string_val, value); break;
-  case SETTING_MAXIMIZED: res->bool_val = *(bool *)value; break;
-  case SETTING_SHOW_CANCELLED: res->bool_val = *(bool *)value; break;
-  case SETTING_SHOW_COMPLETED: res->bool_val = *(bool *)value; break;
-  case SETTING_SORT_BY: res->int_val = *(int *)value; break;
-  case SETTING_SORT_ORDER: res->int_val = *(int *)value; break;
-  case SETTING_SYNC: res->bool_val = *(bool *)value; break;
-  case SETTING_SYNC_PROVIDER: json_replace_string(&res->string_val, value); break;
-  case SETTING_SYNC_URL: json_replace_string(&res->string_val, value); break;
-  case SETTING_SYNC_USERNAME: json_replace_string(&res->string_val, value); break;
-  case SETTING_TAGS: json_replace_string(&res->string_val, value); break;
-  case SETTING_WINDOW_HEIGHT: res->int_val = *(int *)value; break;
-  case SETTING_WINDOW_WIDTH: res->int_val = *(int *)value; break;
-  case SETTING_NOTIFICATIONS: res->bool_val = *(bool *)value; break;
-  case SETTING_BACKGROUND: res->bool_val = *(bool *)value; break;
-  case SETTING_STARTUP: res->bool_val = *(bool *)value; break;
-  case SETTING_THEME: res->int_val = *(int *)value; break;
-  case SETTINGS_COUNT: break;
+  case SETTING_MAXIMIZED: SETTING_SET_BOOL; break;
+  case SETTING_SHOW_CANCELLED: SETTING_SET_BOOL; break;
+  case SETTING_SHOW_COMPLETED: SETTING_SET_BOOL; break;
+  case SETTING_SYNC: SETTING_SET_BOOL; break;
+  case SETTING_NOTIFICATIONS: SETTING_SET_BOOL; break;
+  case SETTING_BACKGROUND: SETTING_SET_BOOL; break;
+  case SETTING_STARTUP: SETTING_SET_BOOL; break;
+
+  case SETTING_SORT_BY: SETTING_SET_INT; break;
+  case SETTING_SORT_ORDER: SETTING_SET_INT; break;
+  case SETTING_WINDOW_HEIGHT: SETTING_SET_INT; break;
+  case SETTING_WINDOW_WIDTH: SETTING_SET_INT; break;
+  case SETTING_THEME: SETTING_SET_INT; break;
+
+  case SETTING_LAST_LIST_UID: SETTING_SET_STR; break;
+  case SETTING_SYNC_PROVIDER: SETTING_SET_STR; break;
+  case SETTING_SYNC_URL: SETTING_SET_STR; break;
+  case SETTING_SYNC_USERNAME: SETTING_SET_STR; break;
+  case SETTING_TAGS: SETTING_SET_STR; break;
   }
   errands_settings_save();
 }
 
-// Global tags
+// --- TAGS --- //
 
 GStrv errands_settings_get_tags() {
   JSON *res = json_object_get(settings, "tags");
@@ -187,7 +206,7 @@ static void perform_save() {
   pending_save = false;
 }
 
-void errands_settings_save() {
+static void errands_settings_save() {
   double diff = difftime(TIME_NOW, last_save_time);
   if (pending_save) return;
   if (diff < 1.0f) {

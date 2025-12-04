@@ -72,7 +72,7 @@ void errands_task_list_sort_dialog_show() {
   adw_switch_row_set_active(ADW_SWITCH_ROW(dialog->cancelled_toggle_row),
                             errands_settings_get(SETTING_SHOW_CANCELLED).b);
   adw_toggle_group_set_active(dialog->sort_order, errands_settings_get(SETTING_SORT_ORDER).i);
-  ErrandsSortType sort_by = errands_settings_get(SETTING_SORT_BY).i;
+  ErrandsSettingSortType sort_by = errands_settings_get(SETTING_SORT_BY).i;
   gtk_check_button_set_active(GTK_CHECK_BUTTON(dialog->creation_date_toggle_btn), sort_by == SORT_TYPE_CREATION_DATE);
   gtk_check_button_set_active(GTK_CHECK_BUTTON(dialog->start_date_toggle_btn), sort_by == SORT_TYPE_START_DATE);
   gtk_check_button_set_active(GTK_CHECK_BUTTON(dialog->due_date_toggle_btn), sort_by == SORT_TYPE_DUE_DATE);
