@@ -1,27 +1,27 @@
 # Turkish translation for io.github.mrvladus.errands.
-# Copyright (C) 2023 io.github.mrvladus.errands's copyright holder
+# Copyright (C) 2023, 2025 io.github.mrvladus.errands's copyright holder
 # This file is distributed under the same license as the io.github.mrvladus.errands package.
 #
-# Sabri Ünal <libreajans@gmail.com>, 2023.
+# Sabri Ünal <yakushabb@gmail.com>, 2023, 2025.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-10-10 12:25+0300\n"
-"PO-Revision-Date: 2023-12-29 18:59+0300\n"
-"Last-Translator: Sabri Ünal <libreajans@gmail.com>\n"
+"PO-Revision-Date: 2025-12-04 23:04+0300\n"
+"Last-Translator: Sabri Ünal <yakushabb@gmail.com>\n"
 "Language-Team: Turkish <takim@gnome.org.tr>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Poedit 3.4.2\n"
+"X-Generator: Poedit 3.8\n"
 
 #: errands/widgets/shared/components/buttons.py:45
 msgid "Info"
-msgstr ""
+msgstr "Bilgi"
 
 #: errands/widgets/shared/components/dialogs.py:31
 msgid "Are you sure?"
@@ -37,35 +37,35 @@ msgstr "İptal"
 #: errands/widgets/shared/color_selector.py:32
 #: errands/widgets/shared/task_toolbar/toolbar.py:100
 msgid "None"
-msgstr ""
+msgstr "Hiçbiri"
 
 #: errands/widgets/shared/color_selector.py:41
 msgid "Blue"
-msgstr ""
+msgstr "Mavi"
 
 #: errands/widgets/shared/color_selector.py:50
 msgid "Green"
-msgstr ""
+msgstr "Yeşil"
 
 #: errands/widgets/shared/color_selector.py:61
 msgid "Yellow"
-msgstr ""
+msgstr "Sarı"
 
 #: errands/widgets/shared/color_selector.py:72
 msgid "Orange"
-msgstr ""
+msgstr "Turuncu"
 
 #: errands/widgets/shared/color_selector.py:81
 msgid "Red"
-msgstr ""
+msgstr "Kırmızı"
 
 #: errands/widgets/shared/color_selector.py:92
 msgid "Purple"
-msgstr ""
+msgstr "Mor"
 
 #: errands/widgets/shared/color_selector.py:101
 msgid "Brown"
-msgstr ""
+msgstr "Kahverengi"
 
 #: errands/widgets/shared/datetime_picker.py:138
 #: errands/widgets/today/today.py:57
@@ -93,12 +93,11 @@ msgstr "Tarih Ayarla"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:44
 msgid "Start / Due Date"
-msgstr ""
+msgstr "Başlangıç / Bitiş Tarihi"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:49 errands/lib/utils.py:24
-#, fuzzy
 msgid "Date"
-msgstr "Tarih Ayarla"
+msgstr "Tarih"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:59
 #: errands/widgets/shared/task_toolbar/notes_window.py:29
@@ -111,25 +110,23 @@ msgstr "Öncelik"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:90
 msgid "High"
-msgstr ""
+msgstr "Yüksek"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:94
 msgid "Medium"
-msgstr ""
+msgstr "Orta"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:98
-#, fuzzy
 msgid "Low"
-msgstr "Şimdi"
+msgstr "Düşük"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:103
 msgid "Custom"
-msgstr ""
+msgstr "Özel"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:113
-#, fuzzy
 msgid "No Tags"
-msgstr "Etiketler"
+msgstr "Etiket Yok"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:134
 #: errands/widgets/tags/tags.py:63 errands/widgets/tags/tags_sidebar_row.py:32
@@ -140,34 +137,33 @@ msgstr "Etiketler"
 #: errands/widgets/shared/task_toolbar/toolbar.py:157
 #: errands/widgets/shared/task_toolbar/attachments_window.py:30
 msgid "Attachments"
-msgstr ""
+msgstr "Ekler"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:191
 #: errands/widgets/shared/task_toolbar/toolbar.py:294
-#, fuzzy
 msgid "Created:"
-msgstr "Oluştur"
+msgstr "Oluşturuldu:"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:202
 #: errands/widgets/shared/task_toolbar/toolbar.py:295
 msgid "Changed:"
-msgstr ""
+msgstr "Değişti:"
 
 #: errands/widgets/shared/task_toolbar/toolbar.py:215
 msgid "More"
-msgstr ""
+msgstr "Daha Çok"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:33
 msgid "No Files Attached"
-msgstr ""
+msgstr "Ekli Dosya Yok"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:56
 msgid "Add Attachment"
-msgstr ""
+msgstr "Dosya Ekle"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:119
 msgid "Open File"
-msgstr ""
+msgstr "Dosya Aç"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:123
 #: errands/widgets/tags/tags.py:140
@@ -179,16 +175,16 @@ msgstr "Sil"
 
 #: errands/widgets/shared/task_toolbar/attachments_window.py:132
 msgid "Open Containing Folder"
-msgstr ""
+msgstr "İçeren Klasörü Aç"
 
 #: errands/widgets/shared/task_toolbar/datetime_window.py:29
 msgid "Date and Time"
-msgstr ""
+msgstr "Tarih ve Saat"
 
 #: errands/widgets/shared/task_toolbar/datetime_window.py:39
 #: errands/widgets/shared/task_toolbar/datetime_window.py:41
 msgid "Due"
-msgstr "Tamamlanma"
+msgstr "Bitiş"
 
 #: errands/widgets/shared/task_toolbar/datetime_window.py:54
 #: errands/widgets/shared/task_toolbar/datetime_window.py:56
@@ -196,13 +192,12 @@ msgid "Start"
 msgstr "Başlangıç"
 
 #: errands/widgets/sidebar.py:42
-#, fuzzy
 msgid "Add List (Ctrl+Shift+A)"
-msgstr "Liste Ekle"
+msgstr "Liste Ekle (Ctrl+Shift+A)"
 
 #: errands/widgets/sidebar.py:61
 msgid "Syncing..."
-msgstr ""
+msgstr "Eşzamanlanıyor..."
 
 #: errands/widgets/sidebar.py:67
 msgid "Add new List"
@@ -214,9 +209,8 @@ msgstr "\"+\" düğmesine tıklayın"
 
 #. Task lists group
 #: errands/widgets/sidebar.py:94 errands/widgets/preferences.py:66
-#, fuzzy
 msgid "Task Lists"
-msgstr "Görev Listesi Yok"
+msgstr "Görev Listesi"
 
 #: errands/widgets/sidebar.py:106 errands/widgets/window.py:44
 #: errands/widgets/window.py:167 data/io.github.mrvladus.List.desktop.in.in:3
@@ -233,9 +227,8 @@ msgid "Sync / Fetch Tasks"
 msgstr "Görevleri Eşzamanla/Getir"
 
 #: errands/widgets/sidebar.py:128
-#, fuzzy
 msgid "Import Task List"
-msgstr "Listeyi İçe Aktar"
+msgstr "Görev Listesini İçe Aktar"
 
 #: errands/widgets/sidebar.py:135 data/resources/gtk/help-overlay.ui:20
 msgid "Preferences"
@@ -267,16 +260,15 @@ msgstr "Ekle"
 
 #: errands/widgets/tags/tags.py:32
 msgid "No Tags Found"
-msgstr ""
+msgstr "Etiket Bulunamadı"
 
 #: errands/widgets/tags/tags.py:33
 msgid "Add new Tags in the entry above"
-msgstr ""
+msgstr "Yukarıdaki girişe yeni Etiketler ekle"
 
 #: errands/widgets/tags/tags.py:82
-#, fuzzy
 msgid "Add new Tag"
-msgstr "Yeni Görev Ekle"
+msgstr "Yeni Etiket Ekle"
 
 #: errands/widgets/task.py:79
 #: errands/widgets/task_list/task_list_sidebar_row.py:125
@@ -289,19 +281,16 @@ msgid "Copied to Clipboard"
 msgstr "Panoya Kopyalandı"
 
 #: errands/widgets/task.py:153
-#, fuzzy
 msgid "Toggle Sub-Tasks"
-msgstr "Yeni Alt Görev Ekle"
+msgstr "Alt Görevleri Aç/Kapat"
 
 #: errands/widgets/task.py:161 errands/widgets/today/today_task.py:100
-#, fuzzy
 msgid "Toggle Completion"
-msgstr "Ayrıntı Yok"
+msgstr "Tamamlamayı Aç/Kapat"
 
 #: errands/widgets/task.py:191
-#, fuzzy
 msgid "Toggle Toolbar"
-msgstr "Kenar Çubuğunu Aç/Kapat"
+msgstr "Araç Çubuğunu Aç/Kapat"
 
 #: errands/widgets/task.py:210 errands/widgets/task.py:230
 #: errands/widgets/today/today_task.py:117
@@ -314,9 +303,8 @@ msgid "Move to Trash"
 msgstr "Çöpe Taşı"
 
 #: errands/widgets/task.py:212 errands/widgets/today/today_task.py:119
-#, fuzzy
 msgid "Copy to Clipboard"
-msgstr "Panoya Kopyalandı"
+msgstr "Panoya Kopyala"
 
 #: errands/widgets/task.py:213
 #: errands/widgets/task_list/task_list_sidebar_row.py:192
@@ -325,9 +313,8 @@ msgid "Export"
 msgstr "Dışa Aktar"
 
 #: errands/widgets/task.py:306 errands/widgets/task_list/task_list.py:84
-#, fuzzy
 msgid "Completed"
-msgstr "Tamamlandı:"
+msgstr "Tamamlandı"
 
 #: errands/widgets/task.py:330
 msgid "Add new Sub-Task"
@@ -338,14 +325,12 @@ msgid "Completed:"
 msgstr "Tamamlandı:"
 
 #: errands/widgets/task.py:945
-#, fuzzy
 msgid "Delete Tag"
-msgstr "Silinmiş Görevler"
+msgstr "Etiketi Sil"
 
 #: errands/widgets/task_list/task_list.py:50
-#, fuzzy
 msgid "Toggle Completed Tasks"
-msgstr "Tamamlanan Görevleri Sil"
+msgstr "Tamamlanan Görevleri Aç/Kapat"
 
 #: errands/widgets/task_list/task_list.py:58
 msgid "Delete Completed Tasks"
@@ -381,7 +366,7 @@ msgstr "Dışa aktarılamadı"
 
 #: errands/widgets/task_list/task_list_sidebar_row.py:158
 msgid "Color"
-msgstr ""
+msgstr "Renk"
 
 #: errands/widgets/task_list/task_list_sidebar_row.py:190
 msgid "Rename"
@@ -389,7 +374,7 @@ msgstr "Yeniden Adlandır"
 
 #: errands/widgets/today/today.py:31
 msgid "No Tasks for Today"
-msgstr ""
+msgstr "Bugün İçin Görev Yok"
 
 #: errands/widgets/trash/trash.py:31
 msgid "Empty Trash"
@@ -414,18 +399,16 @@ msgid "Tasks will be permanently deleted"
 msgstr "Görevler kalıcı olarak silinecek"
 
 #: errands/widgets/window.py:57
-#, fuzzy
 msgid "Sidebar"
-msgstr "Kenar Çubuğunu Aç/Kapat"
+msgstr "Kenar Çubuğu"
 
 #: errands/widgets/window.py:59
 msgid "Content"
-msgstr ""
+msgstr "İçerik"
 
 #: errands/widgets/window.py:66
-#, fuzzy
 msgid "Loading Tasks"
-msgstr "Yeni Görev Ekle"
+msgstr "Görevler Yükleniyor"
 
 #: errands/widgets/window.py:88
 msgid "No Task Lists"
@@ -433,30 +416,27 @@ msgstr "Görev Listesi Yok"
 
 #: errands/widgets/window.py:89
 msgid "Create new or import existing one"
-msgstr ""
+msgstr "Yeni oluştur ya da var olanı içe aktar"
 
 #: errands/widgets/window.py:93
-#, fuzzy
 msgid "Create List"
-msgstr "Listeyi Yeniden Adlandır"
+msgstr "Liste Oluştur"
 
 #: errands/widgets/window.py:102
-#, fuzzy
 msgid "Create new List"
-msgstr "Listeyi Yeniden Adlandır"
+msgstr "Yeni Liste Oluştur"
 
 #: errands/widgets/window.py:115 errands/widgets/window.py:123
-#, fuzzy
 msgid "Syncing"
-msgstr "Eşzamanla"
+msgstr "Eşzamanlanıyor"
 
 #: errands/widgets/window.py:116
 msgid "First synchronization is running"
-msgstr ""
+msgstr "İlk eşzamanlama çalışıyor"
 
 #: errands/widgets/window.py:172
 msgid "translator-credits"
-msgstr "Sabri Ünal <libreajans@gmail.com>"
+msgstr "Sabri Ünal <yakushabb@gmail.com>"
 
 #: errands/widgets/window.py:178
 msgid "Sync is disabled"
@@ -483,41 +463,40 @@ msgid "Dark"
 msgstr "Koyu"
 
 #: errands/widgets/preferences.py:70
-#, fuzzy
 msgid "Add new Tasks"
-msgstr "Yeni Görev Ekle"
+msgstr "Yeni Görevler Ekle"
 
 #: errands/widgets/preferences.py:71
 msgid "At the Bottom"
-msgstr ""
+msgstr "Altta"
 
 #: errands/widgets/preferences.py:71
 msgid "At the Top"
-msgstr ""
+msgstr "Üstte"
 
 #: errands/widgets/preferences.py:87
 msgid "Show Notifications"
-msgstr ""
+msgstr "Bildirimleri Göster"
 
 #: errands/widgets/preferences.py:94
 msgid "Run in Background"
-msgstr ""
+msgstr "Arka Planda Çalıştır"
 
 #: errands/widgets/preferences.py:95
 msgid "Hide the application window instead of closing it"
-msgstr ""
+msgstr "Uygulama penceresini kapatmak yerine gizle"
 
 #: errands/widgets/preferences.py:102
 msgid "Launch on Startup"
-msgstr ""
+msgstr "Başlangıçta Başlat"
 
 #: errands/widgets/preferences.py:103
 msgid "Launch application when user logs in"
-msgstr ""
+msgstr "Kullanıcı oturum açtığında uygulamayı başlat"
 
 #: errands/widgets/preferences.py:112
 msgid "Notifications and Background"
-msgstr ""
+msgstr "Bildirimler ve Arka Plan"
 
 #: errands/widgets/preferences.py:120 errands/widgets/preferences.py:181
 #: data/resources/gtk/help-overlay.ui:38
@@ -542,6 +521,8 @@ msgid ""
 "URL needs to include protocol, like <b>http://</b> or <b>https://</b>. If "
 "you have problems with connection - try to change protocol first."
 msgstr ""
+"URL, <b>http://</b> ya da <b>https://</b> gibi protokolü içermelidir. "
+"Bağlantı sorunları yaşıyorsanız, önce protokolü değiştirmeyi deneyin."
 
 #: errands/widgets/preferences.py:147
 msgid "Username"
@@ -568,13 +549,12 @@ msgid "Connected"
 msgstr "Bağlandı"
 
 #: errands/widgets/preferences.py:221
-#, fuzzy
 msgid "Authorization failed"
-msgstr "Dışa aktarılamadı"
+msgstr "Yetkilendirme başarısız oldu"
 
 #: errands/widgets/preferences.py:223
 msgid "Could not locate server. Check network and url."
-msgstr ""
+msgstr "Sunucu bulunamadı. Ağ ve URLʼyi denetleyin."
 
 #: errands/widgets/preferences.py:225
 msgid "Can't connect"
@@ -583,7 +563,7 @@ msgstr "Bağlanamadı"
 #. NOTE: Also catches invalid credentials
 #: errands/widgets/preferences.py:227
 msgid "Can't connect. Check credentials"
-msgstr ""
+msgstr "Bağlanamıyor. Kimlik bilgilerini denetleyin"
 
 #: errands/lib/sync/providers/caldav.py:66
 msgid "Not all sync credentials provided. Please check settings."
@@ -595,54 +575,48 @@ msgid "Can't connect to CalDAV server at:"
 msgstr "CalDAV sunucusuna bağlanılamıyor:"
 
 #: errands/lib/data.py:92
-#, fuzzy
 msgid "New Task List"
-msgstr "Görev Listesi Yok"
+msgstr "Yeni Görev Listesi"
 
 #: errands/lib/notifications.py:74
-#, fuzzy
 msgid "Task is Due"
-msgstr "Görevler"
+msgstr "Görevin Bitiş Tarihi Gelmiş"
 
 #: errands/application.py:78
 msgid "Errands was updated"
-msgstr ""
+msgstr "Errands güncellendi"
 
 #: errands/application.py:79
 msgid "Restart is required"
-msgstr ""
+msgstr "Yeniden başlatma gerekli"
 
 #: errands/application.py:82
-#, fuzzy
 msgid "Restart"
-msgstr "Geri Yükle"
+msgstr "Yeniden Başlat"
 
 #: errands/application.py:111
 msgid "Errands need to run in the background for notifications"
-msgstr ""
+msgstr "Errandsʼın bildirimler için arka planda çalışması gerekir"
 
 #: data/resources/gtk/help-overlay.ui:13
 msgid "Show keyboard shortcuts"
 msgstr "Klavye kısayollarını göster"
 
 #: data/resources/gtk/help-overlay.ui:53
-#, fuzzy
 msgid "Lists"
-msgstr "Liste Ekle"
+msgstr "Listeler"
 
 #: data/resources/gtk/help-overlay.ui:64
 msgid "Import List"
 msgstr "Listeyi İçe Aktar"
 
 #: data/resources/gtk/help-overlay.ui:75
-#, fuzzy
 msgid "Details"
-msgstr "Ayrıntı Yok"
+msgstr "Ayrıntılar"
 
 #: data/resources/gtk/help-overlay.ui:79
-#, fuzzy
 msgid "Toggle Details"
-msgstr "Ayrıntı Yok"
+msgstr "Ayrıntıları Aç/Kapat"
 
 #: data/io.github.mrvladus.List.desktop.in.in:4
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:7
@@ -691,127 +665,4 @@ msgstr ".ics dosyalarını içe aktarma"
 
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:41
 msgid "Main Window View"
-msgstr ""
-
-#~ msgid "Not Set"
-#~ msgstr "Ayarlanmadı"
-
-#, fuzzy
-#~ msgid "Click Action"
-#~ msgstr "\"+\" düğmesine tıklayın"
-
-#, fuzzy
-#~ msgid "Complete Button Size"
-#~ msgstr "Tamamlanma Yüzdesi"
-
-#, fuzzy
-#~ msgid "Details Panel"
-#~ msgstr "Ayrıntı Yok"
-
-#, fuzzy
-#~ msgid "Right"
-#~ msgstr "Açık"
-
-#~ msgid "More Options"
-#~ msgstr "Daha Çok Seçenek"
-
-#~ msgid "Menu"
-#~ msgstr "Menü"
-
-#~ msgid "No Details"
-#~ msgstr "Ayrıntı Yok"
-
-#~ msgid "Click on task to show more info"
-#~ msgstr "Daha fazla bilgi için göreve tıklayın"
-
-#~ msgid "Clear Style"
-#~ msgstr "Biçemi Temizle"
-
-#~ msgid "Text"
-#~ msgstr "Metin"
-
-#~ msgid "Copy Text"
-#~ msgstr "Metni Kopyala"
-
-#~ msgid "Properties"
-#~ msgstr "Özellikler"
-
-#~ msgid "Complete %"
-#~ msgstr "Tamamlanma Yüzdesi"
-
-#~ msgid "Add Tag"
-#~ msgstr "Etiket Ekle"
-
-#~ msgid "Save Task as .ics file"
-#~ msgstr "Görevi .ics dosyası olarak kaydet"
-
-#~ msgid "Mark as Completed"
-#~ msgstr "Tamamlanmadı Olarak İmle"
-
-#~ msgid "Expand / Fold"
-#~ msgstr "Genişlet / Katla"
-
-#~ msgid "Restore All"
-#~ msgstr "Tümünü Geri Yükle"
-
-#~ msgid "Load"
-#~ msgstr "Yükle"
-
-#~ msgid "Click for Details"
-#~ msgstr "Ayrıntılar İçin Tıklayın"
-
-#~ msgid "Toggle sidebar"
-#~ msgstr "Kenar çubuğu aç/kapat"
-
-#~ msgid "End"
-#~ msgstr "Bitiş"
-
-#, fuzzy
-#~| msgid "Errands"
-#~ msgid "errands"
-#~ msgstr "Errands"
-
-#~ msgid "Export Cancelled"
-#~ msgstr "Dışa Aktarma İptal Edildi"
-
-#~ msgid "Error"
-#~ msgstr "Hata"
-
-#~ msgid "Import Cancelled"
-#~ msgstr "İçe Aktarma İptal Edildi"
-
-#~ msgid "Invalid File"
-#~ msgstr "Geçersiz Dosya"
-
-#~ msgid "Show Deleted Tasks"
-#~ msgstr "Silinmiş Görevleri Göster"
-
-#~ msgid "Delete Completed Tasks (Ctrl+Delete)"
-#~ msgstr "Tamamlanmış Görevleri Sil (Ctrl+Delete)"
-
-#~ msgid "Sync/Fetch Tasks (Ctrl+S)"
-#~ msgstr "Görevleri Eşzamanla/Getir (Ctrl+S)"
-
-#~ msgid "Export Tasks..."
-#~ msgstr "Görevleri Dışa Aktar..."
-
-#~ msgid "Import Tasks..."
-#~ msgstr "Görevleri İçe Aktar..."
-
-#~ msgid "Import and Export"
-#~ msgstr "Aktarma"
-
-#~ msgid "Exit edit mode"
-#~ msgstr "Düzenleme kipinden çık"
-
-#~ msgid "Expand Sub-Tasks on Startup"
-#~ msgstr "Başlangıçta Alt Görevleri Genişlet"
-
-#~ msgid "Calendar Name (\"Errands\" by Default)"
-#~ msgstr "Takvim Adı (\"Errands\" Öntanımlı)"
-
-#~ msgid "Token"
-#~ msgstr "Jeton"
-
-#~ msgid "Cancel (Escape)"
-#~ msgstr "İptal (Esc)"
+msgstr "Ana Pencere Görünümü"
