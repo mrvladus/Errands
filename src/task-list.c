@@ -82,25 +82,25 @@ ErrandsTaskList *errands_task_list_new() { return g_object_new(ERRANDS_TYPE_TASK
 
 // ---------- PRIVATE FUNCTIONS ---------- //
 
-static bool errands_task_list__task_has_any_collapsed_parent(TaskData *data) {
+static bool __task_has_any_collapsed_parent(TaskData *data) {
   for (TaskData *task = data->parent; task; task = task->parent)
     if (!errands_data_get_bool(task->data, DATA_PROP_EXPANDED)) return true;
   return false;
 }
 
-static bool errands_task_list__task_has_any_pinned_parent(TaskData *data) {
+static bool __task_has_any_pinned_parent(TaskData *data) {
   for (TaskData *task = data->parent; task; task = task->parent)
     if (errands_data_get_bool(task->data, DATA_PROP_PINNED)) return true;
   return false;
 }
 
-static bool errands_task_list__task_has_any_due_parent(TaskData *data) {
+static bool __task_has_any_due_parent(TaskData *data) {
   for (TaskData *task = data->parent; task; task = task->parent)
     if (errands_task_data_is_due(task)) return true;
   return false;
 }
 
-static bool errands_task_list__task_match_search_query(TaskData *data) {
+static bool __task_match_search_query(TaskData *data) {
   if (STR_CONTAINS_CASE(errands_data_get_str(data->data, DATA_PROP_TEXT), search_query)) return true;
   if (STR_CONTAINS_CASE(errands_data_get_str(data->data, DATA_PROP_NOTES), search_query)) return true;
   g_auto(GStrv) tags = errands_data_get_strv(data->data, DATA_PROP_TAGS);
@@ -108,29 +108,18 @@ static bool errands_task_list__task_match_search_query(TaskData *data) {
   return false;
 }
 
-static bool errands_task_list__task_has_any_search_matched_parent(TaskData *data) {
+static bool __task_has_any_search_matched_parent(TaskData *data) {
   for (TaskData *task = data->parent; task; task = task->parent)
-    if (errands_task_list__task_match_search_query(task)) return true;
+    if (__task_match_search_query(task)) return true;
   return false;
 }
 
-static bool errands_task_list__task_match_search_or_has_matched_child(TaskData *data) {
-  if (errands_task_list__task_match_search_query(data)) return true;
-  g_autoptr(GPtrArray) sub_tasks = g_ptr_array_new();
-  errands_task_data_get_flat_list(data, sub_tasks);
-  for_range(i, 0, sub_tasks->len) {
-    TaskData *sub_task = g_ptr_array_index(sub_tasks, i);
-    if (errands_task_list__task_match_search_query(sub_task)) return true;
-  }
-  return false;
-}
-
-static int errands_task_list__calculate_height(ErrandsTaskList *self) {
+static int __calculate_height(ErrandsTaskList *self) {
   int height = 0;
   GtkRequisition min_size, nat_size;
   for_range(i, 0, current_task_list->len) {
     TaskData *data = g_ptr_array_index(current_task_list, i);
-    CONTINUE_IF(errands_task_list__task_has_any_collapsed_parent(data));
+    CONTINUE_IF(__task_has_any_collapsed_parent(data));
     errands_task_set_data(measuring_task, data);
     gtk_widget_get_preferred_size(GTK_WIDGET(measuring_task), &min_size, &nat_size);
     height += nat_size.height;
@@ -138,57 +127,91 @@ static int errands_task_list__calculate_height(ErrandsTaskList *self) {
   return height;
 }
 
-static void errands_task_list__reset_scroll_cb(ErrandsTaskList *self) { gtk_adjustment_set_value(self->adj, 0.0); }
+static void __reset_scroll_cb(ErrandsTaskList *self) { gtk_adjustment_set_value(self->adj, 0.0); }
 
 // ---------- TASKS RECYCLER ---------- //
 
 void errands_task_list_redraw_tasks(ErrandsTaskList *self) {
-  static uint8_t indent_px = 15;
+  static const uint8_t indent_px = 15;
   if (current_task_list->len == 0) return;
   g_autoptr(GPtrArray) children = get_children(self->task_list);
-  for (size_t i = 0, j = current_start; i < MIN(tasks_stack_size, current_task_list->len - current_start);) {
-    ErrandsTask *task = g_ptr_array_index(children, i++);
-    TaskData *data = g_ptr_array_index(current_task_list, j++);
-    // Search query
-    if (search_query && !STR_EQUAL(search_query, "")) {
-      bool is_matched = errands_task_list__task_match_search_query(data);
-      if (!errands_task_list__task_has_any_search_matched_parent(data)) {
-        CONTINUE_IF(!is_matched);
-        gtk_widget_set_margin_start(GTK_WIDGET(task), 0);
-      } else gtk_widget_set_margin_start(GTK_WIDGET(task), errands_task_data_get_indent_level(data) * indent_px);
-      errands_task_set_data(task, data);
-      continue;
+  size_t indent_offset = 0;
+  for (size_t i = 0, j = current_start; i < MIN(tasks_stack_size, current_task_list->len - current_start); ++i, ++j) {
+    ErrandsTask *task = g_ptr_array_index(children, i);
+    TaskData *data = g_ptr_array_index(current_task_list, j);
+    size_t indent = errands_task_data_get_indent_level(data);
+    bool show = true;
+    // Search
+    if (search_query && !STR_EQUAL(search_query, "") && !__task_has_any_search_matched_parent(data)) {
+      show = __task_match_search_query(data);
+      indent_offset = -indent;
     }
-    // Don't show sub-tasks of collapsed parents
-    CONTINUE_IF(errands_task_list__task_has_any_collapsed_parent(data));
-    switch (self->page) {
-    case ERRANDS_TASK_LIST_PAGE_TODAY: {
-      // Check if any parent is due - then show task anyway, else check due date of the task
-      bool is_due = errands_task_data_is_due(data);
-      if (!errands_task_list__task_has_any_due_parent(data)) {
-        CONTINUE_IF(!is_due);
-        gtk_widget_set_margin_start(GTK_WIDGET(task), 0);
-      } else gtk_widget_set_margin_start(GTK_WIDGET(task), errands_task_data_get_indent_level(data) * indent_px);
-      errands_task_set_data(task, data);
-      continue;
+    // Filter pages
+    else {
+      if (self->page == ERRANDS_TASK_LIST_PAGE_TODAY) {
+        if (!__task_has_any_due_parent(data) && (show = errands_task_data_is_due(data))) indent_offset = -indent;
+      } else if (self->page == ERRANDS_TASK_LIST_PAGE_PINNED)
+        if (!__task_has_any_pinned_parent(data) && (show = errands_data_get_bool(data->data, DATA_PROP_PINNED)))
+          indent_offset = -indent;
     }
-    case ERRANDS_TASK_LIST_PAGE_PINNED: {
-      bool is_pinned = errands_data_get_bool(data->data, DATA_PROP_PINNED);
-      if (!errands_task_list__task_has_any_pinned_parent(data)) {
-        CONTINUE_IF(!is_pinned);
-        gtk_widget_set_margin_start(GTK_WIDGET(task), 0);
-      } else gtk_widget_set_margin_start(GTK_WIDGET(task), errands_task_data_get_indent_level(data) * indent_px);
-      errands_task_set_data(task, data);
-      continue;
-    }
-    case ERRANDS_TASK_LIST_PAGE_ALL:
-    case ERRANDS_TASK_LIST_PAGE_TASK_LIST:
-      errands_task_set_data(task, data);
-      gtk_widget_set_margin_start(GTK_WIDGET(task), errands_task_data_get_indent_level(data) * indent_px);
-      break;
-    }
+    CONTINUE_IF(!show || __task_has_any_collapsed_parent(data));
+    gtk_widget_set_margin_start(GTK_WIDGET(task), (indent + indent_offset) * indent_px);
+    errands_task_set_data(task, data);
   }
 }
+
+// void errands_task_list_redraw_tasks(ErrandsTaskList *self) {
+//   static uint8_t indent_px = 15;
+//   if (current_task_list->len == 0) return;
+//   g_autoptr(GPtrArray) children = get_children(self->task_list);
+//   size_t indent_offset = 0;
+//   for (size_t i = 0, j = current_start; i < MIN(tasks_stack_size, current_task_list->len - current_start);) {
+//     ErrandsTask *task = g_ptr_array_index(children, i++);
+//     TaskData *data = g_ptr_array_index(current_task_list, j++);
+//     size_t indent_level = errands_task_data_get_indent_level(data);
+//     // Search query
+//     if (search_query && !STR_EQUAL(search_query, "")) {
+//       bool is_matched = errands_task_list__task_match_search_query(data);
+//       if (!errands_task_list__task_has_any_search_matched_parent(data)) {
+//         CONTINUE_IF(!is_matched);
+//         gtk_widget_set_margin_start(GTK_WIDGET(task), 0);
+//       } else gtk_widget_set_margin_start(GTK_WIDGET(task), indent_level * indent_px);
+//       errands_task_set_data(task, data);
+//       continue;
+//     }
+//     switch (self->page) {
+//     case ERRANDS_TASK_LIST_PAGE_TODAY: {
+//       // Check if any parent is due - then show task anyway, else check due date of the task
+//       bool is_due = errands_task_data_is_due(data);
+//       if (!errands_task_list__task_has_any_due_parent(data)) {
+//         CONTINUE_IF(!is_due);
+//         indent_offset = -indent_level;
+//       }
+//       CONTINUE_IF(errands_task_list__task_has_any_collapsed_parent(data));
+//       gtk_widget_set_margin_start(GTK_WIDGET(task), (indent_level + indent_offset) * indent_px);
+//       errands_task_set_data(task, data);
+//       continue;
+//     }
+//     case ERRANDS_TASK_LIST_PAGE_PINNED: {
+//       bool is_pinned = errands_data_get_bool(data->data, DATA_PROP_PINNED);
+//       if (!errands_task_list__task_has_any_pinned_parent(data)) {
+//         CONTINUE_IF(!is_pinned);
+//         indent_offset = -indent_level;
+//       }
+//       CONTINUE_IF(errands_task_list__task_has_any_collapsed_parent(data));
+//       gtk_widget_set_margin_start(GTK_WIDGET(task), (indent_level + indent_offset) * indent_px);
+//       errands_task_set_data(task, data);
+//       continue;
+//     }
+//     case ERRANDS_TASK_LIST_PAGE_ALL:
+//     case ERRANDS_TASK_LIST_PAGE_TASK_LIST:
+//       CONTINUE_IF(errands_task_list__task_has_any_collapsed_parent(data));
+//       gtk_widget_set_margin_start(GTK_WIDGET(task), (indent_level + indent_offset) * indent_px);
+//       errands_task_set_data(task, data);
+//       break;
+//     }
+//   }
+// }
 
 static void on_adjustment_value_changed_cb(GtkAdjustment *adj, ErrandsTaskList *self) {
   // TODO("Recycle by 5 tasks");
@@ -348,9 +371,9 @@ void errands_task_list_reload(ErrandsTaskList *self, bool save_scroll_pos) {
   if (self->data) errands_list_data_get_flat_list(self->data, current_task_list);
   else errands_data_get_flat_list(current_task_list);
   gtk_widget_set_size_request(self->top_spacer, -1, 0);
-  gtk_widget_set_size_request(self->task_list, -1, errands_task_list__calculate_height(self));
+  gtk_widget_set_size_request(self->task_list, -1, __calculate_height(self));
   errands_task_list_update_title(self);
-  if (!save_scroll_pos) g_idle_add_once((GSourceOnceFunc)errands_task_list__reset_scroll_cb, self);
+  if (!save_scroll_pos) g_idle_add_once((GSourceOnceFunc)__reset_scroll_cb, self);
   g_autoptr(GPtrArray) children = get_children(self->task_list);
   for_range(i, 0, children->len) gtk_widget_set_visible(g_ptr_array_index(children, i), false);
   errands_task_list_redraw_tasks(self);
