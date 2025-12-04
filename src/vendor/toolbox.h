@@ -61,7 +61,7 @@ static inline void __autofree_free_func(void *p) {
 #define autoptr(type) type *
 #endif
 
-// -------------------- MATH -------------------- //
+// -------------------- LOGIC -------------------- //
 
 #ifndef MIN
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
@@ -69,6 +69,10 @@ static inline void __autofree_free_func(void *p) {
 #ifndef MAX
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #endif
+
+#define elif else if
+#define and  &&
+#define or   ||
 
 // -------------------- LOG AND DEBUG -------------------- //
 

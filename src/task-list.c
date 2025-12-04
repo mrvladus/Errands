@@ -28,7 +28,7 @@ static void on_adjustment_value_changed_cb(GtkAdjustment *adj, ErrandsTaskList *
 G_DEFINE_TYPE(ErrandsTaskList, errands_task_list, ADW_TYPE_BIN)
 
 static void errands_task_list_dispose(GObject *gobject) {
-  g_object_run_dispose(G_OBJECT(measuring_task));
+  if (measuring_task) g_object_run_dispose(G_OBJECT(measuring_task));
   if (current_task_list) g_ptr_array_free(current_task_list, true);
   gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_TASK_LIST);
   G_OBJECT_CLASS(errands_task_list_parent_class)->dispose(gobject);
@@ -143,19 +143,26 @@ void errands_task_list_redraw_tasks(ErrandsTaskList *self) {
     TaskData *data = g_ptr_array_index(current_task_list, j);
     size_t indent = errands_task_data_get_indent_level(data);
     bool show = true;
-    // Search
-    if (search_query && !STR_EQUAL(search_query, "") && !__task_has_any_search_matched_parent(data)) {
-      show = __task_match_search_query(data);
-      indent_offset = -indent;
+    bool match_search = true;
+    bool match_page = true;
+    if (search_query && !STR_EQUAL(search_query, "")) {
+      if (!__task_has_any_search_matched_parent(data)) {
+        match_search = __task_match_search_query(data);
+        if (match_search) indent_offset = -indent;
+      }
     }
-    // Filter pages
-    else {
-      if (self->page == ERRANDS_TASK_LIST_PAGE_TODAY) {
-        if (!__task_has_any_due_parent(data) && (show = errands_task_data_is_due(data))) indent_offset = -indent;
-      } else if (self->page == ERRANDS_TASK_LIST_PAGE_PINNED)
-        if (!__task_has_any_pinned_parent(data) && (show = errands_data_get_bool(data->data, DATA_PROP_PINNED)))
-          indent_offset = -indent;
+    if (self->page == ERRANDS_TASK_LIST_PAGE_TODAY) {
+      if (!__task_has_any_due_parent(data)) {
+        match_page = errands_task_data_is_due(data);
+        if (match_page) indent_offset = -indent;
+      }
+    } else if (self->page == ERRANDS_TASK_LIST_PAGE_PINNED) {
+      if (!__task_has_any_pinned_parent(data)) {
+        match_page = errands_data_get_bool(data->data, DATA_PROP_PINNED);
+        if (match_page) indent_offset = -indent;
+      }
     }
+    show = match_search && match_page;
     CONTINUE_IF(!show || __task_has_any_collapsed_parent(data));
     gtk_widget_set_margin_start(GTK_WIDGET(task), (indent + indent_offset) * indent_px);
     errands_task_set_data(task, data);
