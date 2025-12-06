@@ -1,8 +1,5 @@
 #include "task.h"
-#include "adwaita.h"
 #include "data.h"
-#include "glib-object.h"
-#include "gtk/gtk.h"
 #include "sidebar.h"
 #include "state.h"
 #include "sync.h"
@@ -18,7 +15,7 @@ static GtkWidget *errands_task_tag_new(ErrandsTask *self, const char *tag);
 
 // Callbacks
 static void on_complete_btn_toggle_cb(ErrandsTask *self, GtkCheckButton *btn);
-static void on_pin_btn_clicked_cb(ErrandsTask *self, GtkToggleButton *btn);
+static void on_unpin_btn_clicked_cb(ErrandsTask *self, GtkToggleButton *btn);
 static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointer user_data);
 static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *self);
 static void on_expand_toggle_cb(ErrandsTask *self, GtkGestureClick *ctrl, gint n_press, gdouble x, gdouble y);
@@ -50,7 +47,7 @@ static void errands_task_class_init(ErrandsTaskClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, subtitle);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, progress_bar);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, date_btn);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, pin_btn);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, unpin_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, date_btn_content);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, notes_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, priority_btn);
@@ -58,7 +55,7 @@ static void errands_task_class_init(ErrandsTaskClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, attachments_count);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, sub_entry);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_title_edit_cb);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_pin_btn_clicked_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_unpin_btn_clicked_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_complete_btn_toggle_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_list_date_dialog_show);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_list_notes_dialog_show);
@@ -158,7 +155,7 @@ void errands_task_update_progress(ErrandsTask *self) {
 
 void errands_task_update_toolbar(ErrandsTask *task) {
   TaskData *data = task->data;
-  gtk_widget_set_visible(task->pin_btn, errands_data_get_bool(data->data, DATA_PROP_PINNED));
+  gtk_widget_set_visible(task->unpin_btn, errands_data_get_bool(data->data, DATA_PROP_PINNED));
   // Notes button
   bool has_notes = errands_data_get_str(data->data, DATA_PROP_NOTES) != NULL;
   gtk_widget_set_visible(task->notes_btn, has_notes);
@@ -312,7 +309,7 @@ static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointe
   }
 }
 
-static void on_pin_btn_clicked_cb(ErrandsTask *self, GtkToggleButton *btn) {
+static void on_unpin_btn_clicked_cb(ErrandsTask *self, GtkToggleButton *btn) {
   errands_data_set_and_write(self->data->data, DATA_PROP_PINNED, false, self->data->list);
   errands_sidebar_update_filter_rows(state.main_window->sidebar);
   errands_task_list_reload(state.main_window->task_list, true);

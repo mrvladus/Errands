@@ -63,12 +63,11 @@ template $ErrandsTask: Box {
       notify::editing => $on_title_edit_cb();
     }
 
-    // Pin
-    Button pin_btn {
+    Button unpin_btn {
       icon-name: "errands-pin-symbolic";
       tooltip-text: _("Unpin");
       valign: center;
-      clicked => $on_pin_btn_clicked_cb(template);
+      clicked => $on_unpin_btn_clicked_cb(template);
 
       styles [
         "flat",
