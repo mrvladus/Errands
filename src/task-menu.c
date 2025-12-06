@@ -1,4 +1,5 @@
 #include "data.h"
+#include "gtk/gtk.h"
 #include "state.h"
 #include "sync.h"
 #include "task-list.h"
@@ -18,6 +19,7 @@ static void on_notes_clicked_cb(ErrandsTaskMenu *self);
 static void on_priority_clicked_cb(ErrandsTaskMenu *self);
 static void on_date_clicked_cb(ErrandsTaskMenu *self);
 static void on_pin_clicked_cb(ErrandsTaskMenu *self);
+static void on_subtasks_clicked_cb(ErrandsTaskMenu *self);
 
 // ---------- WIDGET TEMPLATE ---------- //
 
@@ -36,6 +38,7 @@ static void errands_task_menu_dispose(GObject *gobject) {
 static void errands_task_menu_class_init(ErrandsTaskMenuClass *class) {
   G_OBJECT_CLASS(class)->dispose = errands_task_menu_dispose;
   gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), "/io/github/mrvladus/Errands/ui/task-menu.ui");
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_subtasks_clicked_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_edit_clicked_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_clipboard_clicked_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_export_clicked_cb);
@@ -166,4 +169,12 @@ static void on_pin_clicked_cb(ErrandsTaskMenu *self) {
                              !errands_data_get_bool(self->task->data->data, DATA_PROP_PINNED), self->task->data->list);
   errands_sidebar_update_filter_rows(state.main_window->sidebar);
   errands_task_list_reload(state.main_window->task_list, true);
+}
+
+static void on_subtasks_clicked_cb(ErrandsTaskMenu *self) {
+  gtk_popover_popdown(GTK_POPOVER(self));
+  bool new_expanded = !errands_data_get_bool(self->task->data->data, DATA_PROP_EXPANDED);
+  errands_data_set_and_write(self->task->data->data, DATA_PROP_EXPANDED, new_expanded, self->task->data->list);
+  errands_task_list_reload(state.main_window->task_list, true);
+  gtk_widget_grab_focus(self->task->sub_entry);
 }

@@ -143,10 +143,7 @@
     background-color: var(--brown-2);
 }
 
-.task-toolbar-btn > button {
-    padding: 0px 4px;
-}
-
+.task-toolbar-btn > button,
 .tag {
     padding: 0px 4px;
 }

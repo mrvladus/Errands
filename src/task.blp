@@ -47,6 +47,11 @@ template $ErrandsTask: Box {
       cursor: Gdk.Cursor {
         name: "pointer";
       };
+
+      GestureClick {
+        button: 1;
+        released => $on_expand_toggle_cb(template);
+      }
     }
 
     EditableLabel edit_title {
@@ -61,7 +66,7 @@ template $ErrandsTask: Box {
     // Pin
     Button pin_btn {
       icon-name: "errands-pin-symbolic";
-      tooltip-text: _("Pin");
+      tooltip-text: _("Unpin");
       valign: center;
       clicked => $on_pin_btn_clicked_cb(template);
 
@@ -190,10 +195,5 @@ template $ErrandsTask: Box {
     styles [
       "sub-task-entry",
     ]
-  }
-
-  GestureClick {
-    button: 1;
-    released => $on_expand_toggle_cb(template);
   }
 }
