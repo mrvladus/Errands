@@ -13,7 +13,7 @@ struct _ErrandsTask {
   GtkWidget *complete_btn;
   GtkWidget *title;
   GtkWidget *edit_title;
-  GtkWidget *toolbar_btn;
+  GtkWidget *toolbar;
   GtkWidget *tags_box;
   GtkWidget *progress_box;
   GtkWidget *subtitle;
@@ -23,11 +23,9 @@ struct _ErrandsTask {
   GtkWidget *pin_btn;
   GtkWidget *notes_btn;
   GtkWidget *priority_btn;
-  GtkWidget *tags_btn;
   GtkWidget *attachments_btn;
-  GtkWidget *color_btn;
+  GtkLabel *attachments_count;
   GtkWidget *sub_entry;
-  GtkWidget *popover_menu;
 
   TaskData *data;
 };
@@ -36,5 +34,4 @@ ErrandsTask *errands_task_new();
 void errands_task_set_data(ErrandsTask *self, TaskData *data);
 void errands_task_update_accent_color(ErrandsTask *task);
 void errands_task_update_progress(ErrandsTask *task);
-void errands_task_update_tags(ErrandsTask *task);
 void errands_task_update_toolbar(ErrandsTask *task);

@@ -16,6 +16,7 @@
     <file preprocess="xml-stripblanks" compressed="true" alias="sidebar-rename-list-dialog.ui">build/sidebar-rename-list-dialog.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="window.ui">build/window.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="task.ui">build/task.ui</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="task-menu.ui">build/task-menu.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="task-list.ui">build/task-list.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="task-list-attachments-dialog.ui">build/task-list-attachments-dialog.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="task-list-attachments-dialog-attachment.ui">build/task-list-attachments-dialog-attachment.ui</file>
@@ -67,5 +68,7 @@
     <file preprocess="xml-stripblanks" compressed="true" alias="errands-cog-symbolic.svg">data/icons/errands-cog-symbolic.svg</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="errands-pin-symbolic.svg">data/icons/errands-pin-symbolic.svg</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="errands-edit-symbolic.svg">data/icons/errands-edit-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="errands-export-symbolic.svg">data/icons/errands-export-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="errands-clipboard-symbolic.svg">data/icons/errands-clipboard-symbolic.svg</file>
   </gresource>
 </gresources>

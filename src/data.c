@@ -107,7 +107,6 @@ static void errands_data_migrate_from_46() {
       errands_data_set_bool(event, DATA_PROP_EXPANDED, expanded_item->bool_val);
       errands_data_set_bool(event, DATA_PROP_NOTIFIED, notified_item->bool_val);
       errands_data_set_bool(event, DATA_PROP_SYNCED, synced_item->bool_val);
-      errands_data_set_bool(event, DATA_PROP_TOOLBAR_SHOWN, toolbar_shown_item->bool_val);
       errands_data_set_str(event, DATA_PROP_LIST_UID, task_list_uid_item->string_val);
       icalcomponent_add_component(calendar->data, event);
     }
@@ -656,7 +655,6 @@ bool errands_data_get_bool(icalcomponent *data, DataPropBool prop) {
   case DATA_PROP_DELETED: out = (bool)atoi(get_x_prop_value(data, "X-ERRANDS-DELETED", "0")); break;
   case DATA_PROP_EXPANDED: out = (bool)atoi(get_x_prop_value(data, "X-ERRANDS-EXPANDED", "0")); break;
   case DATA_PROP_NOTIFIED: out = (bool)atoi(get_x_prop_value(data, "X-ERRANDS-NOTIFIED", "0")); break;
-  case DATA_PROP_TOOLBAR_SHOWN: out = (bool)atoi(get_x_prop_value(data, "X-ERRANDS-TOOLBAR-SHOWN", "0")); break;
   case DATA_PROP_PINNED: out = (bool)atoi(get_x_prop_value(data, "X-ERRANDS-PINNED", "0")); break;
   case DATA_PROP_SYNCED: out = (bool)atoi(get_x_prop_value(data, "X-ERRANDS-SYNCED", "0")); break;
   }
@@ -793,7 +791,6 @@ void errands_data_set_bool(icalcomponent *data, DataPropBool prop, bool value) {
   case DATA_PROP_DELETED: set_x_prop_value(data, "X-ERRANDS-DELETED", str); break;
   case DATA_PROP_EXPANDED: set_x_prop_value(data, "X-ERRANDS-EXPANDED", str); break;
   case DATA_PROP_NOTIFIED: set_x_prop_value(data, "X-ERRANDS-NOTIFIED", str); break;
-  case DATA_PROP_TOOLBAR_SHOWN: set_x_prop_value(data, "X-ERRANDS-TOOLBAR-SHOWN", str); break;
   case DATA_PROP_PINNED: set_x_prop_value(data, "X-ERRANDS-PINNED", str); break;
   case DATA_PROP_SYNCED: set_x_prop_value(data, "X-ERRANDS-SYNCED", str); break;
   }

@@ -8,22 +8,6 @@
     opacity: 1;
 }
 
-/* Tag */
-
-.tag {
-    border-radius: 5px;
-    padding-top: 3px;
-    padding-bottom: 3px;
-    padding-left: 5px;
-    padding-right: 3px;
-    background-color: alpha(black, 0.07);
-}
-
-.tag > button {
-    all: unset;
-    margin-left: 4px;
-}
-
 .priority-low {
     color: var(--accent-blue);
 }
@@ -159,9 +143,12 @@
     background-color: var(--brown-2);
 }
 
-.task-top-drop-area {
-    border-radius: 6px;
-    padding: 4px;
+.task-toolbar-btn > button {
+    padding: 0px 4px;
+}
+
+.tag {
+    padding: 0px 4px;
 }
 
 /* Date and time widndow */
@@ -178,17 +165,6 @@
 
 .sidebar-task-list-row:drop(active) {
     background-color: var(--blue-1);
-}
-
-/* Menus */
-
-.menu-item {
-    padding: 4px;
-    border-radius: 6px;
-}
-
-.menu-item:hover {
-    background-color: var(--shade-color);
 }
 
 /* Overrides */

@@ -1,6 +1,7 @@
 #include "settings.h"
 #include "state.h"
 #include "task-list.h"
+#include "task.h"
 #include "utils.h"
 
 static void on_dialog_close_cb(ErrandsTaskListTagsDialog *self);
@@ -73,7 +74,7 @@ void errands_task_list_tags_dialog_show(ErrandsTask *task) {
 
 static void on_dialog_close_cb(ErrandsTaskListTagsDialog *self) {
   gtk_list_box_remove_all(GTK_LIST_BOX(self->tags_box));
-  errands_task_update_tags(self->current_task);
+  errands_task_update_toolbar(self->current_task);
   errands_task_list_redraw_tasks(state.main_window->task_list);
 }
 

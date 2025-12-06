@@ -22,6 +22,7 @@ static double scroll_position = 0.0f;
 static void on_task_list_entry_activated_cb(AdwEntryRow *entry, ErrandsTaskList *self);
 static void on_task_list_search_cb(ErrandsTaskList *self, GtkSearchEntry *entry);
 static void on_adjustment_value_changed_cb(GtkAdjustment *adj, ErrandsTaskList *self);
+static void on_motion_cb(GtkEventControllerMotion *ctrl, gdouble x, gdouble y, ErrandsTaskList *self);
 
 // ---------- WIDGET TEMPLATE ---------- //
 
@@ -35,6 +36,8 @@ static void errands_task_list_dispose(GObject *gobject) {
 }
 
 static void errands_task_list_class_init(ErrandsTaskListClass *class) {
+  g_type_ensure(ERRANDS_TYPE_TASK_MENU);
+
   G_OBJECT_CLASS(class)->dispose = errands_task_list_dispose;
   gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), "/io/github/mrvladus/Errands/ui/task-list.ui");
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, title);
@@ -43,6 +46,8 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, search_entry);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, entry_clamp);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, adj);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, task_menu);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, motion_ctrl);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, scrl);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, top_spacer);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, task_list);
@@ -50,6 +55,7 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_entry_activated_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_search_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_adjustment_value_changed_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_motion_cb);
 }
 
 static void errands_task_list_init(ErrandsTaskList *self) {
@@ -228,6 +234,11 @@ static void on_adjustment_value_changed_cb(GtkAdjustment *adj, ErrandsTaskList *
     }
   }
   if (current_start == 0) gtk_widget_set_size_request(self->top_spacer, -1, 0);
+}
+
+static void on_motion_cb(GtkEventControllerMotion *ctrl, gdouble x, gdouble y, ErrandsTaskList *self) {
+  self->x = x;
+  self->y = y;
 }
 
 // ---------- PUBLIC FUNCTIONS ---------- //

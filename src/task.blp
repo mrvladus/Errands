@@ -2,14 +2,6 @@ using Gtk 4.0;
 using Gdk 4.0;
 using Adw 1;
 
-menu rc_menu {
-  item (_("Edit"), "task.edit")
-  item (_("Copy to Clipboard"), "task.clipboard")
-  item (_("Export"), "task.export")
-  item (_("Cancel"), "task.cancel")
-  item (_("Delete"), "task.delete")
-}
-
 template $ErrandsTask: Box {
   orientation: vertical;
 
@@ -66,85 +58,56 @@ template $ErrandsTask: Box {
       notify::editing => $on_title_edit_cb();
     }
 
-    ToggleButton toolbar_btn {
-      icon-name: "errands-toolbar-symbolic";
+    // Pin
+    Button pin_btn {
+      icon-name: "errands-pin-symbolic";
+      tooltip-text: _("Pin");
       valign: center;
-      tooltip-text: _("Toggle Toolbar");
+      clicked => $on_pin_btn_clicked_cb(template);
+
+      styles [
+        "flat",
+        "error",
+        "circular",
+      ]
+    }
+
+    // Menu
+    Button {
+      icon-name: "errands-more-symbolic";
 
       styles [
         "flat",
         "circular",
       ]
 
-      toggled => $on_toolbar_btn_toggle_cb(template);
+      clicked => $errands_task_menu_show(template);
     }
-
-    GestureClick {
-      button: 3;
-      released => $on_right_click(template) not-swapped;
-    }
-
-    GestureLongPress {
-      touch-only: true;
-      pressed => $on_right_click(template) not-swapped;
-    }
-
-    PopoverMenu popover_menu {
-      menu-model: rc_menu;
-      has-arrow: false;
-      halign: start;
-    }
-  }
-
-  // Tags bar
-  Adw.WrapBox tags_box {
-    margin-bottom: 6;
-    margin-start: 6;
-    margin-end: 6;
-    child-spacing: 6;
-    line-spacing: 6;
   }
 
   // Toolbar
-  Adw.WrapBox {
-    visible: bind toolbar_btn.active;
+  Adw.WrapBox toolbar {
     margin-start: 6;
     margin-end: 6;
     margin-bottom: 6;
     line-spacing: 3;
     child-spacing: 3;
 
-    Button date_btn {
-      valign: center;
-      halign: start;
-      hexpand: true;
-
-      Adw.ButtonContent date_btn_content {
-        icon-name: "errands-calendar-symbolic";
-        label: _("Date");
-        tooltip-text: _("Select Date");
-      }
-
-      clicked => $errands_task_list_date_dialog_show(template);
-
-      styles [
-        "caption",
-        "flat",
-      ]
-    }
-
     Box {
-      spacing: 2;
+      styles [
+        "linked",
+        "task-toolbar-btn",
+      ]
 
-      ToggleButton pin_btn {
-        icon-name: "errands-pin-symbolic";
-        tooltip-text: _("Pin");
+      Button date_btn {
         valign: center;
-        clicked => $on_pin_btn_toggle_cb(template);
+        clicked => $errands_task_list_date_dialog_show(template);
 
-        styles [
-          "flat",
-        ]
+        Adw.ButtonContent date_btn_content {
+          icon-name: "errands-calendar-symbolic";
+          label: _("Date");
+          tooltip-text: _("Select Date");
+        }
       }
 
       Button priority_btn {
@@ -152,10 +115,6 @@ template $ErrandsTask: Box {
         tooltip-text: _("Priority");
         valign: center;
         clicked => $errands_task_list_priority_dialog_show(template);
-
-        styles [
-          "flat",
-        ]
       }
 
       Button notes_btn {
@@ -163,44 +122,33 @@ template $ErrandsTask: Box {
         tooltip-text: _("Notes");
         valign: center;
         clicked => $errands_task_list_notes_dialog_show(template);
-
-        styles [
-          "flat",
-        ]
-      }
-
-      Button tags_btn {
-        icon-name: "errands-tags-symbolic";
-        tooltip-text: _("Tags");
-        valign: center;
-        clicked => $errands_task_list_tags_dialog_show(template);
-
-        styles [
-          "flat",
-        ]
       }
 
       Button attachments_btn {
-        icon-name: "errands-attachment-symbolic";
         tooltip-text: _("Attachments");
         valign: center;
         clicked => $errands_task_list_attachments_dialog_show(template);
 
-        styles [
-          "flat",
-        ]
-      }
+        Box {
+          spacing: 4;
 
-      Button color_btn {
-        icon-name: "errands-color-symbolic";
-        tooltip-text: _("Color");
-        valign: center;
-        clicked => $errands_task_list_color_dialog_show(template);
+          Image {
+            icon-name: "errands-attachment-symbolic";
+          }
 
-        styles [
-          "flat",
-        ]
+          Label attachments_count {
+            styles [
+              "caption-heading",
+            ]
+          }
+        }
       }
+    }
+
+    // Tags box
+    Adw.WrapBox tags_box {
+      child-spacing: 3;
+      line-spacing: 3;
     }
   }
 

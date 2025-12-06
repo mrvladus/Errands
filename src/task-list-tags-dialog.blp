@@ -48,7 +48,7 @@ template $ErrandsTaskListTagsDialog: Adw.Dialog {
         icon-name: "errands-tag-symbolic";
         title: _("No Tags");
         vexpand: true;
-        visible: bind scrl.visible inverted;
+        visible: bind scrl.visible inverted bidirectional;
 
         styles [
           "compact",

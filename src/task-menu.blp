@@ -1,0 +1,298 @@
+using Gtk 4.0;
+
+template $ErrandsTaskMenu: Popover {
+  has-arrow: false;
+
+  styles [
+    "menu",
+  ]
+
+  ScrolledWindow {
+    propagate-natural-height: true;
+    propagate-natural-width: true;
+
+    Box {
+      orientation: vertical;
+      margin-start: 6;
+      margin-end: 6;
+      margin-top: 6;
+      margin-bottom: 6;
+      // Date and Time
+      Button {
+        clicked => $on_date_clicked_cb(template);
+
+        styles [
+          "flat",
+          "body",
+        ]
+
+        Box {
+          spacing: 12;
+
+          Image {
+            icon-name: "errands-calendar-symbolic";
+          }
+
+          Label {
+            label: _("Date and Time");
+          }
+        }
+      }
+
+      // Priority
+      Button {
+        clicked => $on_priority_clicked_cb(template);
+
+        styles [
+          "flat",
+          "body",
+        ]
+
+        Box {
+          spacing: 12;
+
+          Image {
+            icon-name: "errands-priority-symbolic";
+          }
+
+          Label {
+            label: _("Priority");
+          }
+        }
+      }
+
+      // Notes
+      Button {
+        clicked => $on_notes_clicked_cb(template);
+
+        styles [
+          "flat",
+          "body",
+        ]
+
+        Box {
+          spacing: 12;
+
+          Image {
+            icon-name: "errands-notes-symbolic";
+          }
+
+          Label {
+            label: _("Notes");
+          }
+        }
+      }
+
+      // Attachments
+      Button {
+        clicked => $on_attachments_clicked_cb(template);
+
+        styles [
+          "flat",
+          "body",
+        ]
+
+        Box {
+          spacing: 12;
+
+          Image {
+            icon-name: "errands-attachment-symbolic";
+          }
+
+          Label {
+            label: _("Attachments");
+          }
+        }
+      }
+
+      // Tags
+      Button {
+        clicked => $on_tags_clicked_cb(template);
+
+        styles [
+          "flat",
+          "body",
+        ]
+
+        Box {
+          spacing: 12;
+
+          Image {
+            icon-name: "errands-tag-symbolic";
+          }
+
+          Label {
+            label: _("Tags");
+          }
+        }
+      }
+
+      // Color
+      Button {
+        clicked => $on_color_clicked_cb(template);
+
+        styles [
+          "flat",
+          "body",
+        ]
+
+        Box {
+          spacing: 12;
+
+          Image {
+            icon-name: "errands-color-symbolic";
+          }
+
+          Label {
+            label: _("Color");
+          }
+        }
+      }
+
+      Separator {}
+
+      // Pin
+      Button {
+        clicked => $on_pin_clicked_cb(template);
+
+        styles [
+          "flat",
+          "body",
+        ]
+
+        Box {
+          spacing: 12;
+
+          Image {
+            icon-name: "errands-pin-symbolic";
+          }
+
+          Label {
+            label: _("Pin / Unpin");
+          }
+        }
+      }
+
+      Separator {}
+
+      // Edit
+      Button {
+        clicked => $on_edit_clicked_cb(template);
+
+        styles [
+          "flat",
+          "body",
+        ]
+
+        Box {
+          spacing: 12;
+
+          Image {
+            icon-name: "errands-edit-symbolic";
+          }
+
+          Label {
+            label: _("Edit Text");
+          }
+        }
+      }
+
+      // Copy Text
+      Button {
+        clicked => $on_clipboard_clicked_cb(template);
+
+        styles [
+          "flat",
+          "body",
+        ]
+
+        Box {
+          spacing: 12;
+
+          Image {
+            icon-name: "errands-clipboard-symbolic";
+          }
+
+          Label {
+            label: _("Copy Text");
+          }
+        }
+      }
+
+      Separator {}
+
+      // Export
+      Button {
+        clicked => $on_export_clicked_cb(template);
+
+        styles [
+          "flat",
+          "body",
+        ]
+
+        Box {
+          spacing: 12;
+
+          Image {
+            icon-name: "errands-export-symbolic";
+          }
+
+          Label {
+            label: _("Export");
+          }
+        }
+      }
+
+      Separator {}
+
+      // Cancel
+      Button {
+        clicked => $on_cancel_clicked_cb(template);
+
+        styles [
+          "flat",
+          "body",
+        ]
+
+        Box {
+          spacing: 12;
+
+          Image {
+            icon-name: "errands-cancel-symbolic";
+          }
+
+          Label {
+            label: _("Cancel");
+          }
+        }
+      }
+
+      // Delete
+      Button {
+        clicked => $on_delete_clicked_cb(template);
+
+        styles [
+          "flat",
+          "body",
+          "error",
+        ]
+
+        Box {
+          spacing: 12;
+
+          styles [
+            "error",
+          ]
+
+          Image {
+            icon-name: "errands-trash-symbolic";
+          }
+
+          Label {
+            label: _("Delete");
+          }
+        }
+      }
+    }
+  }
+}

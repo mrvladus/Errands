@@ -2,6 +2,7 @@
 #pragma once
 
 #include "data.h"
+#include "gtk/gtk.h"
 #include "task.h"
 
 #include <adwaita.h>
@@ -127,6 +128,14 @@ G_DECLARE_FINAL_TYPE(ErrandsTaskListSortDialog, errands_task_list_sort_dialog, E
 ErrandsTaskListSortDialog *errands_task_list_sort_dialog_new();
 void errands_task_list_sort_dialog_show();
 
+// --- TASK MENU --- //
+
+#define ERRANDS_TYPE_TASK_MENU (errands_task_menu_get_type())
+G_DECLARE_FINAL_TYPE(ErrandsTaskMenu, errands_task_menu, ERRANDS, TASK_MENU, GtkPopover)
+
+ErrandsTaskMenu *errands_task_menu_new();
+void errands_task_menu_show(ErrandsTask *task);
+
 // --- TASK LIST --- //
 
 typedef enum {
@@ -147,6 +156,7 @@ struct _ErrandsTaskList {
   GtkWidget *search_bar;
   GtkWidget *search_entry;
   GtkWidget *entry_clamp;
+  ErrandsTaskMenu *task_menu;
   GtkWidget *scrl;
   GtkWidget *top_spacer;
   GtkWidget *task_list;
@@ -159,6 +169,9 @@ struct _ErrandsTaskList {
   ErrandsTaskListPriorityDialog *priority_dialog;
   ErrandsTaskListSortDialog *sort_dialog;
   ErrandsTaskListTagsDialog *tags_dialog;
+
+  GtkEventControllerMotion *motion_ctrl;
+  gdouble x, y;
 
   ListData *data;
   ErrandsTaskListPage page;

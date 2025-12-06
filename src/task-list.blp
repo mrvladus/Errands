@@ -73,6 +73,12 @@ template $ErrandsTaskList: Adw.Bin {
     content: Box {
       orientation: vertical;
 
+      $ErrandsTaskMenu task_menu {}
+
+      EventControllerMotion motion_ctrl {
+        motion => $on_motion_cb(template) not-swapped;
+      }
+
       Adw.StatusPage {
         title: _("No Tasks");
         icon-name: "errands-select-symbolic";
