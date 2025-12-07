@@ -7,9 +7,9 @@
 
 AUTOPTR_DEFINE(icalcomponent, icalcomponent_free)
 
-typedef struct TaskData TaskData;
-
 extern GPtrArray *errands_data_lists;
+
+typedef struct TaskData TaskData;
 
 // Get all tasks as flat list
 void errands_data_get_flat_list(GPtrArray *tasks);

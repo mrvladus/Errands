@@ -53,7 +53,7 @@ static inline void __autofree_free_func(void *p) {
 //      autoptr(my_type) foo = my_type_new();
 #define autoptr(type) autofree_f(autoptr_##type##_free_func) type *
 
-// Placeholders if compiler doesn't support automatic cleanup
+// Placeholders when compiler doesn't support automatic cleanup
 #else
 #define autofree_f(free_func)
 #define autofree autofree_f(free)
@@ -128,6 +128,11 @@ extern const char *toolbox_log_prefix;
 
 // -------------------- STRINGS -------------------- //
 
+// Create multiline string.
+// const char *str = MULTILINE_STRING(
+//                   Hello,
+//                   World!
+//                   );
 #define MULTILINE_STRING(...) #__VA_ARGS__
 
 // Check if strings are equal.
@@ -138,6 +143,8 @@ extern const char *toolbox_log_prefix;
 
 // Check if string contains substring (case-insensitive).
 #define STR_CONTAINS_CASE(s1, s2) ((s1 && s2) ? strcasestr((const char *)(s1), (const char *)(s2)) != NULL : false)
+
+#define STR_TO_UL(str) strtoul(str, NULL, 10)
 
 // -------------------- DYNAMIC ARRAY -------------------- //
 
@@ -336,6 +343,70 @@ static inline const char *path_ext(const char *path) {
 #define TIMER_START clock_t __timer_start = clock();
 // Get elapsed time in milliseconds
 #define TIMER_ELAPSED_MS ((double)(clock() - __timer_start) / CLOCKS_PER_SEC)
+
+// -------------------- SYSTEM COMMANDS -------------------- //
+
+static inline int cmd_run_stdout(const char *cmd, char **std_out) {
+  if (!cmd || !std_out) return -1;
+  *std_out = NULL;
+  FILE *fp = popen(cmd, "r");
+  if (!fp) return -1;
+  size_t cap = 4096;
+  size_t len = 0;
+  char *buf = malloc(cap);
+  if (!buf) {
+    pclose(fp);
+    return -1;
+  }
+  // Read in chunks
+  while (1) {
+    // Ensure we have space for at least 1 more byte plus null terminator
+    if (cap - len < 2) {
+      size_t newcap = cap * 2;
+      char *tmp = realloc(buf, newcap);
+      if (!tmp) {
+        free(buf);
+        pclose(fp);
+        return -1;
+      }
+      buf = tmp;
+      cap = newcap;
+    }
+    size_t to_read = cap - len - 1; // Leave room for null terminator
+    size_t nread = fread(buf + len, 1, to_read, fp);
+    if (nread == 0) break;
+    len += nread;
+    if (ferror(fp)) {
+      free(buf);
+      pclose(fp);
+      return -1;
+    }
+  }
+  buf[len] = '\0';
+  int status = pclose(fp);
+  if (status == -1) {
+    free(buf);
+    return -1;
+  }
+  // Convert wait status to exit code
+#ifdef WIFEXITED
+  if (WIFEXITED(status)) {
+    status = WEXITSTATUS(status);
+  } else if (WIFSIGNALED(status)) {
+    // Command terminated by signal, return negative signal number
+    status = -WTERMSIG(status);
+  }
+  // else keep the raw status
+#endif
+  // Shrink buffer to actual size if significantly smaller
+  if (len + 1 < cap / 2) {
+    char *tmp = realloc(buf, len + 1);
+    if (tmp) buf = tmp;
+    // If realloc fails, we keep the original buffer (not a critical error)
+  }
+  *std_out = buf;
+  return status;
+}
 
 // -------------------- COLORS -------------------- //
 

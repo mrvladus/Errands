@@ -2,15 +2,16 @@
 #include "settings.h"
 
 #include "vendor/json.h"
-#include <stddef.h>
-#include <stdint.h>
+#include "vendor/toolbox.h"
+
+static void errands_data_create_backup();
 
 AUTOPTR_DEFINE(JSON, json_free)
 
 // ---------- GLOBALS ---------- //
 
 GPtrArray *errands_data_lists;
-static gchar *user_dir, *calendars_dir;
+static gchar *user_dir, *calendars_dir, *backups_dir;
 
 // ---------- LOADING DATA ---------- //
 
@@ -137,9 +138,12 @@ void errands_data_init() {
   errands_data_lists = g_ptr_array_new_with_free_func((GDestroyNotify)errands_list_data_free);
   user_dir = g_build_filename(g_get_user_data_dir(), "errands", NULL);
   calendars_dir = g_build_filename(user_dir, "calendars", NULL);
+  backups_dir = g_build_filename(user_dir, "backups", NULL);
 
   g_mkdir_with_parents(calendars_dir, 0755);
   errands_data_migrate_from_46();
+
+  errands_data_create_backup();
 
   // Load lists
   g_autoptr(GDir) dir = g_dir_open(calendars_dir, 0, NULL);
@@ -213,6 +217,31 @@ void errands_data_sort() {
     ListData *list = g_ptr_array_index(errands_data_lists, i);
     errands_list_data_sort(list);
   }
+}
+
+static void errands_data_create_backup() {
+  g_mkdir_with_parents(backups_dir, 0755);
+  // Count files in backups_dir
+  autofree char *out = NULL;
+  int res = cmd_run_stdout(tmp_str_printf("ls %s | wc -l", backups_dir), &out);
+  if (res != 0) return;
+  // Remove oldest backup
+  if (STR_TO_UL(out) > 19) system(tmp_str_printf("rm -f $(find %s/* -type f | sort | head -n 1)", backups_dir));
+  // Create backup
+  time_t t = TIME_NOW;
+  struct tm *tm = localtime(&t);
+  char time_str[15];
+  strftime(time_str, sizeof(time_str), "%Y%m%d%H%M%S", tm);
+  res = system(tmp_str_printf("cd %s && tar -cJf backups/%s.tar.xz calendars", user_dir, time_str));
+  LOG("User Data: %s backup at %s", res == 0 ? "Created" : "Failed to create",
+      tmp_str_printf("%s/%s.tar.xz", backups_dir, time_str));
+}
+
+void errands_data_cleanup(void) {
+  g_free(user_dir);
+  g_free(calendars_dir);
+  g_free(backups_dir);
+  if (errands_data_lists) g_ptr_array_free(errands_data_lists, true);
 }
 
 // ---------- LIST DATA ---------- //
@@ -434,16 +463,6 @@ bool errands_task_data_is_due(TaskData *data) {
 
 bool errands_task_data_is_completed(TaskData *data) {
   return !icaltime_is_null_date(errands_data_get_time(data->data, DATA_PROP_COMPLETED_TIME));
-}
-
-// ---------- SAVING DATA ---------- //
-
-// ---------- CLEANUP ---------- //
-
-void errands_data_cleanup(void) {
-  g_free(user_dir);
-  g_free(calendars_dir);
-  if (errands_data_lists) g_ptr_array_free(errands_data_lists, true);
 }
 
 // ---------- PRINTING ---------- //
