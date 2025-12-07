@@ -1,4 +1,5 @@
 #include "settings.h"
+#include <stddef.h>
 
 #define JSON_H_IMPLEMENTATION
 #include "vendor/json.h"
@@ -77,10 +78,11 @@ void errands_settings_load_user() {
   if (!json) return;
   autoptr(JSON) json_parsed = json_parse(json);
   if (!json_parsed) return;
-  JSON *node;
-  for (size_t i = 0; (node = json_object_get(json_parsed, settings_keys_strs[i])); i++) {
-    JSON *dup = json_dup(node);
-    json_object_add(settings, settings_keys_strs[i], dup);
+  for (size_t i = 0; i < STATIC_ARRAY_SIZE(settings_keys_strs); i++) {
+    const char *key = settings_keys_strs[i];
+    JSON *node = json_object_get(json_parsed, key);
+    if (!node) continue;
+    json_object_add(settings, key, json_dup(node));
   }
 }
 
@@ -103,7 +105,7 @@ ErrandsSetting errands_settings_get(ErrandsSettingsKey key) {
 #define SETTING_GET_INT  out.i = res->int_val
 #define SETTING_GET_BOOL out.b = res->bool_val
 
-  JSON *res = json_object_get(settings, SETTING(key));
+  const JSON *res = json_object_get(settings, SETTING(key));
   ErrandsSetting out = {0};
   switch (key) {
   case SETTING_BACKGROUND: SETTING_GET_BOOL; break;

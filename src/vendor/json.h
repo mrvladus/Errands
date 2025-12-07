@@ -77,7 +77,7 @@ extern "C" {
 #include <stdlib.h>
 #define JSON_H_MALLOC malloc
 #define JSON_H_CALLOC calloc
-#define JSON_H_FREE free
+#define JSON_H_FREE   free
 #endif
 
 // ------------------------------------------------------------------------- //
@@ -191,9 +191,9 @@ void json_replace_string(char **old_string, const char *new_string);
 #ifdef JSON_H_IMPLEMENTATION
 
 #ifdef JSON_H_DEBUG
-#define LOG_DEBUG(fmt, ...) fprintf(stderr, "[JSON.H DEBUG] " fmt "\n", ##__VA_ARGS__);
+#define JSON_LOG_DEBUG(fmt, ...) fprintf(stderr, "[JSON.H DEBUG] " fmt "\n", ##__VA_ARGS__);
 #else
-#define LOG_DEBUG(fmt, ...)
+#define JSON_LOG_DEBUG(fmt, ...)
 #endif
 
 // ------------------------------------------------------------------------- //
@@ -368,7 +368,7 @@ static bool json__parse_key(const char *json, size_t *idx, JSON *node) {
   while (json[*idx] != '"') (*idx)++;
   node->key = json__strndup(json + start, *idx - start);
   (*idx)++; // Skip '"'
-  LOG_DEBUG("Parsed key: \"%s\"", node->key);
+  JSON_LOG_DEBUG("Parsed key: \"%s\"", node->key);
   return true;
 }
 
@@ -376,7 +376,7 @@ static bool json__parse_key(const char *json, size_t *idx, JSON *node) {
 static void json__parse_null_value(const char *json, size_t *idx, JSON *node) {
   node->type = JSON_TYPE_NULL;
   (*idx) += 4;
-  LOG_DEBUG("Parsed NULL");
+  JSON_LOG_DEBUG("Parsed NULL");
 }
 
 // Private function.
@@ -385,12 +385,12 @@ static void json__parse_bool_value(const char *json, size_t *idx, JSON *node) {
     node->bool_val = true;
     node->type = JSON_TYPE_BOOL;
     (*idx) += 4;
-    LOG_DEBUG("Parsed BOOL: true");
+    JSON_LOG_DEBUG("Parsed BOOL: true");
   } else if (json[*idx] == 'f') {
     node->bool_val = false;
     node->type = JSON_TYPE_BOOL;
     (*idx) += 5;
-    LOG_DEBUG("Parsed BOOL: false");
+    JSON_LOG_DEBUG("Parsed BOOL: false");
   }
 }
 
@@ -405,11 +405,11 @@ static void json__parse_number_value(const char *json, size_t *idx, JSON *node) 
   if (is_double) {
     node->double_val = strtod(json + (*idx), NULL);
     node->type = JSON_TYPE_DOUBLE;
-    LOG_DEBUG("Parsed DOUBLE: %f", node->double_val);
+    JSON_LOG_DEBUG("Parsed DOUBLE: %f", node->double_val);
   } else {
     node->int_val = strtol(json + (*idx), NULL, 10);
     node->type = JSON_TYPE_INT;
-    LOG_DEBUG("Parsed INT: %ld", node->int_val);
+    JSON_LOG_DEBUG("Parsed INT: %ld", node->int_val);
   }
   (*idx) = tmp;
 }
@@ -427,12 +427,12 @@ static void json__parse_string_value(const char *json, size_t *idx, JSON *node) 
   json__unescape(val);
   node->string_val = val;
   (*idx)++; // Skip '"'
-  LOG_DEBUG("Parsed STRING: \"%s\"", node->string_val);
+  JSON_LOG_DEBUG("Parsed STRING: \"%s\"", node->string_val);
 }
 
 // Private function.
 static void json__parse_array_value(const char *json, size_t *idx, JSON *node) {
-  LOG_DEBUG("Parse array: [");
+  JSON_LOG_DEBUG("Parse array: [");
   node->type = JSON_TYPE_ARRAY;
   (*idx)++; // Skip '['
   JSON *last_child = NULL;
@@ -452,12 +452,12 @@ static void json__parse_array_value(const char *json, size_t *idx, JSON *node) {
     if (json[*idx] == ',') (*idx)++; // Skip ','
   }
   (*idx)++; // Skip ']'
-  LOG_DEBUG("]");
+  JSON_LOG_DEBUG("]");
 }
 
 // Private function.
 static void json__parse_object_value(const char *json, size_t *idx, JSON *node) {
-  LOG_DEBUG("Parse object: {");
+  JSON_LOG_DEBUG("Parse object: {");
   node->type = JSON_TYPE_OBJECT;
   (*idx)++; // Skip '{'
   json__skip_whitespace(json, idx);
@@ -475,7 +475,7 @@ static void json__parse_object_value(const char *json, size_t *idx, JSON *node) 
     if (json[*idx] == ',') (*idx)++; // Skip ','
   }
   (*idx)++; // Skip '}'
-  LOG_DEBUG("}");
+  JSON_LOG_DEBUG("}");
 }
 
 // Private function.
@@ -758,7 +758,7 @@ JSON *json_string_new(const char *value) {
 
 void json_free(JSON *node) {
   if (!node) return;
-  LOG_DEBUG("Node free: %p", node);
+  JSON_LOG_DEBUG("Node free: %p", node);
   if (!node->key) {
     JSON_H_FREE(node->key);
     node->key = NULL;

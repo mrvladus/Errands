@@ -12,19 +12,12 @@ template $ErrandsTaskListNotesDialog: Adw.Dialog {
     top-bar-style: raised;
 
     [top]
-    Adw.HeaderBar {
-      [start]
-      ToggleButton md_btn {
-        icon-name: "errands-md-symbolic";
-        tooltip-markup: _("Toggle Markdown View");
-      }
-    }
+    Adw.HeaderBar {}
 
     content: Box {
       orientation: vertical;
 
       ScrolledWindow {
-        visible: bind md_btn.active inverted;
         vexpand: true;
 
         GtkSource.View source_view {
@@ -34,14 +27,8 @@ template $ErrandsTaskListNotesDialog: Adw.Dialog {
           left-margin: 6;
           wrap-mode: word;
 
-          buffer: GtkSource.Buffer source_buffer {
-            changed => $on_text_changed_cb(template);
-          };
+          buffer: GtkSource.Buffer source_buffer {};
         }
-      }
-
-      Adw.Bin md_view_bin {
-        visible: bind md_btn.active;
       }
     };
   }

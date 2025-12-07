@@ -81,7 +81,6 @@ static void errands_data_migrate_from_46() {
       JSON *start_date_item = json_object_get(task_item, "start_date");
       JSON *synced_item = json_object_get(task_item, "synced");
       JSON *text_item = json_object_get(task_item, "text");
-      JSON *toolbar_shown_item = json_object_get(task_item, "toolbar_shown");
       JSON *uid_item = json_object_get(task_item, "uid");
       // Create iCalendar event
       icalcomponent *event = icalcomponent_new(ICAL_VTODO_COMPONENT);

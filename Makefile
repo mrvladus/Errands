@@ -28,8 +28,8 @@ ICONS = $(wildcard $(DATA_DIR)/icons/*.svg)
 # Compilation variables
 
 CC = gcc
-PKG_CONFIG_LIBS = libadwaita-1 gtksourceview-5 libical libportal libcurl webkitgtk-6.0
-CFLAGS = -Wall -Wno-enum-int-mismatch -Wno-unknown-pragmas -g \
+PKG_CONFIG_LIBS = libadwaita-1 gtksourceview-5 libical libportal libcurl
+CFLAGS = -Wall -g \
 		 `pkg-config --cflags $(PKG_CONFIG_LIBS)` \
 		 -DVERSION='"$(VERSION)"' \
 		 -DAPP_ID='"$(APP_ID)"' \

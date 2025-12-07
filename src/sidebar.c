@@ -84,6 +84,7 @@ ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(ErrandsSidebar *sb, Lis
 void errands_sidebar_select_last_opened_page() {
   g_autoptr(GPtrArray) rows = get_children(state.main_window->sidebar->task_lists_box);
   const char *last_uid = errands_settings_get(SETTING_LAST_LIST_UID).s;
+  if (!last_uid) return;
   LOG("Sidebar: Selecting last opened list: '%s'", last_uid);
   for_range(i, 0, rows->len) {
     ErrandsSidebarTaskListRow *row = g_ptr_array_index(rows, i);

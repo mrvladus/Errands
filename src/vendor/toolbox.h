@@ -159,7 +159,9 @@ extern const char *toolbox_log_prefix;
 
 #define STR_TO_UL(str) strtoul(str, NULL, 10)
 
-// -------------------- DYNAMIC ARRAY -------------------- //
+// -------------------- ARRAYS -------------------- //
+
+#define STATIC_ARRAY_SIZE(arr) sizeof(arr) / sizeof(arr[0])
 
 // Dynamic array struct
 typedef struct {

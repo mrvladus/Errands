@@ -1,8 +1,6 @@
-
 #pragma once
 
 #include "data.h"
-#include "gtk/gtk.h"
 #include "task.h"
 
 #include <adwaita.h>
