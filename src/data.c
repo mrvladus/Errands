@@ -224,9 +224,12 @@ static void errands_data_create_backup() {
   // Count files in backups_dir
   autofree char *out = NULL;
   int res = cmd_run_stdout(tmp_str_printf("ls %s | wc -l", backups_dir), &out);
-  if (res != 0) return;
+  if (res != 0 && !out) return;
   // Remove oldest backup
-  if (STR_TO_UL(out) > 19) system(tmp_str_printf("rm -f $(find %s/* -type f | sort | head -n 1)", backups_dir));
+  if (STR_TO_UL(out) > 19) {
+    LOG("User Data: Removing oldest backup");
+    system(tmp_str_printf("rm -f $(find %s/* -type f | sort | head -n 1)", backups_dir));
+  }
   // Create backup
   time_t t = TIME_NOW;
   struct tm *tm = localtime(&t);

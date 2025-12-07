@@ -61,6 +61,16 @@ static inline void __autofree_free_func(void *p) {
 #define autoptr(type) type *
 #endif
 
+// -------------------- C++ -------------------- //
+
+#ifdef __cplusplus
+#define EXTERN_C_START extern "C" {
+#define EXTERN_C_END   }
+#else
+#define EXTERN_C_START
+#define EXTERN_C_END
+#endif
+
 // -------------------- LOGIC -------------------- //
 
 #ifndef MIN
@@ -127,6 +137,9 @@ extern const char *toolbox_log_prefix;
   if (statement) continue;
 
 // -------------------- STRINGS -------------------- //
+
+// Stringify
+#define STR(macro_or_string) #macro_or_string
 
 // Create multiline string.
 // const char *str = MULTILINE_STRING(
