@@ -7,6 +7,7 @@ template $ErrandsTask: Box {
 
   styles [
     "card",
+    "task",
   ]
 
   accessibility {
@@ -79,6 +80,7 @@ template $ErrandsTask: Box {
     // Menu
     Button {
       icon-name: "errands-more-symbolic";
+      valign: center;
 
       styles [
         "flat",
@@ -91,13 +93,16 @@ template $ErrandsTask: Box {
 
   // Toolbar
   Adw.WrapBox toolbar {
+    child-spacing: 3;
+    line-spacing: 3;
     margin-start: 6;
     margin-end: 6;
     margin-bottom: 6;
-    line-spacing: 3;
-    child-spacing: 3;
+    // Task Properies Bar
+    Box props_bar {
+      hexpand: true;
+      halign: start;
 
-    Box {
       styles [
         "linked",
         "task-toolbar-btn",
@@ -115,7 +120,7 @@ template $ErrandsTask: Box {
       }
 
       Button priority_btn {
-        icon-name: "errands-priority-symbolic";
+        icon-name: "errands-priority-set-symbolic";
         tooltip-text: _("Priority");
         valign: center;
         clicked => $errands_task_list_priority_dialog_show(template);
@@ -156,31 +161,10 @@ template $ErrandsTask: Box {
     }
   }
 
-  Box progress_box {
-    spacing: 6;
-    margin-start: 12;
-    margin-end: 12;
-    margin-bottom: 3;
-
-    Label subtitle {
-      halign: start;
-
-      styles [
-        "dimmed",
-        "caption",
-        "numeric",
-      ]
-    }
-
-    ProgressBar progress_bar {
-      opacity: 0.5;
-      hexpand: true;
-      valign: center;
-
-      styles [
-        "osd",
-      ]
-    }
+  ProgressBar progress_bar {
+    opacity: 0.5;
+    margin-start: 8;
+    margin-end: 8;
   }
 
   // Sub-Tasks Entry
@@ -188,11 +172,12 @@ template $ErrandsTask: Box {
     margin-start: 6;
     margin-end: 6;
     margin-bottom: 6;
+    margin-top: 6;
     placeholder-text: _("Add Sub-Task");
     activate => $on_sub_task_entry_activated(template) not-swapped;
 
     styles [
-      "sub-task-entry",
+      "sub-tasks-entry",
     ]
   }
 }

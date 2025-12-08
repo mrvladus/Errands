@@ -1,5 +1,6 @@
 #include "task.h"
 #include "data.h"
+#include "gtk/gtk.h"
 #include "sidebar.h"
 #include "state.h"
 #include "sync.h"
@@ -42,9 +43,8 @@ static void errands_task_class_init(ErrandsTaskClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, title);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, edit_title);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, toolbar);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, props_bar);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, tags_box);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, progress_box);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, subtitle);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, progress_bar);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, date_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, unpin_btn);
@@ -138,19 +138,14 @@ void errands_task_update_progress(ErrandsTask *self) {
   size_t total = 0, completed = 0;
   for_range(i, 0, self->data->children->len) {
     TaskData *data = g_ptr_array_index(self->data->children, i);
-    if (!errands_data_get_bool(data->data, DATA_PROP_DELETED)) {
-      if (!icaltime_is_null_time(errands_data_get_time(data->data, DATA_PROP_COMPLETED_TIME))) completed++;
-      total++;
-    }
+    CONTINUE_IF(errands_data_get_bool(data->data, DATA_PROP_DELETED));
+    if (!icaltime_is_null_time(errands_data_get_time(data->data, DATA_PROP_COMPLETED_TIME))) completed++;
+    total++;
   }
-  gtk_widget_set_visible(self->progress_box, total > 0);
+  gtk_widget_set_visible(self->progress_bar, total > 0);
   gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(self->progress_bar), total > 0 ? (float)completed / (float)total : 0);
-  // Set subtitle
-  if (total == 0) gtk_label_set_label(GTK_LABEL(self->subtitle), "");
-  else {
-    const char *subtitle = tmp_str_printf(_("Completed: %zu / %zu"), completed, total);
-    gtk_label_set_label(GTK_LABEL(self->subtitle), subtitle);
-  }
+  gtk_widget_set_tooltip_text(self->progress_bar,
+                              total == 0 ? "" : tmp_str_printf(_("Completed: %zu / %zu"), completed, total));
 }
 
 void errands_task_update_toolbar(ErrandsTask *task) {
@@ -217,17 +212,18 @@ void errands_task_update_toolbar(ErrandsTask *task) {
   gtk_widget_set_css_classes(
       task->date_btn, (const char *[]){"image-button", "caption", errands_task_data_is_due(data) ? "error" : "", NULL});
 
+  bool props_bar_visible = has_notes || has_attachments || has_due_date;
+  gtk_widget_set_visible(task->props_bar, props_bar_visible);
+
   // Update tags
   for (GtkWidget *child = gtk_widget_get_first_child(task->tags_box); child;
        child = gtk_widget_get_first_child(task->tags_box))
     adw_wrap_box_remove(ADW_WRAP_BOX(task->tags_box), child);
   g_auto(GStrv) tags = errands_data_get_strv(task->data->data, DATA_PROP_TAGS);
-  const size_t len = tags ? g_strv_length(tags) : 0;
-  for_range(i, 0, len) adw_wrap_box_append(ADW_WRAP_BOX(task->tags_box), errands_task_tag_new(task, tags[i]));
-  gtk_widget_set_visible(task->tags_box, len > 0);
+  const size_t tags_n = tags ? g_strv_length(tags) : 0;
+  for_range(i, 0, tags_n) adw_wrap_box_append(ADW_WRAP_BOX(task->tags_box), errands_task_tag_new(task, tags[i]));
 
-  // Set toolbar visibility
-  gtk_widget_set_visible(task->toolbar, has_notes || has_attachments || priority > 0 || has_due_date);
+  gtk_widget_set_visible(task->toolbar, props_bar_visible || tags_n > 0);
 }
 
 // ---------- PRIVATE FUNCTIONS ---------- //

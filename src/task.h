@@ -14,9 +14,8 @@ struct _ErrandsTask {
   GtkWidget *title;
   GtkWidget *edit_title;
   GtkWidget *toolbar;
+  GtkWidget *props_bar;
   GtkWidget *tags_box;
-  GtkWidget *progress_box;
-  GtkWidget *subtitle;
   GtkWidget *progress_bar;
   GtkWidget *date_btn;
   GtkWidget *date_btn_content;

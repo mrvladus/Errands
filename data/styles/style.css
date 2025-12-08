@@ -8,18 +8,6 @@
     opacity: 1;
 }
 
-.priority-low {
-    color: var(--accent-blue);
-}
-
-.priority-medium {
-    color: var(--accent-orange);
-}
-
-.priority-high {
-    color: var(--accent-red);
-}
-
 /* Accent color buttons */
 
 .accent-color-btn radio {
