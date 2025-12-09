@@ -1,3 +1,7 @@
+.task {
+    padding: 0 0 6px 0;
+}
+
 .sub-task-entry {
     opacity: 0.6;
     transition: 0.2s;
@@ -72,7 +76,6 @@
     background: #dde9f7;
 }
 
-.progressbar-blue progress,
 .checkbtn-blue check:checked {
     background-color: var(--blue-2);
 }
@@ -81,7 +84,6 @@
     background: #daf7e0;
 }
 
-.progressbar-green progress,
 .checkbtn-green check:checked {
     background-color: var(--green-3);
 }
@@ -90,7 +92,6 @@
     background: #faf7cf;
 }
 
-.progressbar-yellow progress,
 .checkbtn-yellow check:checked {
     background-color: var(--yellow-4);
 }
@@ -99,7 +100,6 @@
     background: #fce8d0;
 }
 
-.progressbar-orange progress,
 .checkbtn-orange check:checked {
     background-color: var(--orange-2);
 }
@@ -108,7 +108,6 @@
     background: #f9ccc7;
 }
 
-.progressbar-red progress,
 .checkbtn-red check:checked {
     background-color: var(--red-1);
 }
@@ -117,7 +116,6 @@
     background: #f1d8f1;
 }
 
-.progressbar-purple progress,
 .checkbtn-purple check:checked {
     background-color: var(--purple-2);
 }
@@ -126,7 +124,6 @@
     background: #ece2da;
 }
 
-.progressbar-brown progress,
 .checkbtn-brown check:checked {
     background-color: var(--brown-2);
 }
@@ -164,10 +161,6 @@ colorbutton button {
 colorbutton button colorswatch {
     border-radius: 9999px;
     transform: scale(0.8);
-}
-
-progressbar.osd {
-    background-color: var(--shade-color);
 }
 
 calendar {

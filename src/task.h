@@ -12,11 +12,11 @@ struct _ErrandsTask {
 
   GtkWidget *complete_btn;
   GtkWidget *title;
+  GtkWidget *subtitle;
   GtkWidget *edit_title;
   GtkWidget *toolbar;
   GtkWidget *props_bar;
   GtkWidget *tags_box;
-  GtkWidget *progress_bar;
   GtkWidget *date_btn;
   GtkWidget *date_btn_content;
   GtkWidget *unpin_btn;

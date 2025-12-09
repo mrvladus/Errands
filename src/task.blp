@@ -5,11 +5,6 @@ using Adw 1;
 template $ErrandsTask: Box {
   orientation: vertical;
 
-  styles [
-    "card",
-    "task",
-  ]
-
   accessibility {
     labelled-by: title;
   }
@@ -37,12 +32,11 @@ template $ErrandsTask: Box {
       toggled => $on_complete_btn_toggle_cb(template);
     }
 
-    Label title {
-      hexpand: true;
-      halign: fill;
-      wrap: true;
-      wrap-mode: char;
-      xalign: 0;
+    // Title
+    Box {
+      orientation: vertical;
+      valign: center;
+      spacing: 0;
       tooltip-text: _("Toggle Sub-Tasks");
 
       cursor: Gdk.Cursor {
@@ -52,6 +46,24 @@ template $ErrandsTask: Box {
       GestureClick {
         button: 1;
         released => $on_expand_toggle_cb(template);
+      }
+
+      Label title {
+        hexpand: true;
+        halign: fill;
+        valign: center;
+        wrap: true;
+        wrap-mode: char;
+        xalign: 0;
+      }
+
+      Label subtitle {
+        xalign: 0;
+
+        styles [
+          "dimmed",
+          "caption",
+        ]
       }
     }
 
@@ -161,23 +173,30 @@ template $ErrandsTask: Box {
     }
   }
 
-  ProgressBar progress_bar {
-    opacity: 0.5;
-    margin-start: 8;
-    margin-end: 8;
-  }
-
   // Sub-Tasks Entry
   Entry sub_entry {
     margin-start: 6;
     margin-end: 6;
     margin-bottom: 6;
-    margin-top: 6;
     placeholder-text: _("Add Sub-Task");
     activate => $on_sub_task_entry_activated(template) not-swapped;
 
     styles [
       "sub-tasks-entry",
     ]
+  }
+
+  DragSource {
+    actions: move;
+    prepare => $on_drag_prepare_cb(template) not-swapped;
+    drag-begin => $on_drag_begin_cb(template) not-swapped;
+    drag-end => $on_drag_end_cb(template) not-swapped;
+    drag-cancel => $on_drag_cancel_cb(template) not-swapped;
+  }
+
+  DropTarget {
+    formats: "GObject";
+    actions: move;
+    drop => $on_drop_cb(template) not-swapped;
   }
 }
