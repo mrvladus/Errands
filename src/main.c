@@ -27,7 +27,7 @@ static void activate(GtkApplication *app) {
 }
 
 int main(int argc, char **argv) {
-  LOG("Starting Errands %s %s", VERSION, xdp_portal_running_under_flatpak() ? "(flatpak)" : "(not flatpak)");
+  LOG("Starting Errands %s (%s) %sFlatpak", VERSION, VERSION_COMMIT, xdp_portal_running_under_flatpak() ? "" : "not ");
   // Generate random seed
   srand((unsigned int)(TIME_NOW ^ getpid()));
 

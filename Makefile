@@ -32,6 +32,7 @@ PKG_CONFIG_LIBS = libadwaita-1 gtksourceview-5 libical libportal libcurl
 CFLAGS = -Wall -g \
 		 `pkg-config --cflags $(PKG_CONFIG_LIBS)` \
 		 -DVERSION='"$(VERSION)"' \
+		 -DVERSION_COMMIT='"$(shell git rev-parse --short HEAD)"' \
 		 -DAPP_ID='"$(APP_ID)"' \
 	 	 -DLOCALE_DIR='""'
 LDFLAGS = `pkg-config --libs $(PKG_CONFIG_LIBS)`
