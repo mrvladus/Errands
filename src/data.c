@@ -469,7 +469,7 @@ bool errands_task_data_is_completed(TaskData *data) {
 }
 
 TaskData *errands_task_data_move_to_list(TaskData *data, ListData *list, TaskData *parent) {
-  if (!data || !list || data->list == list) return NULL;
+  if (!data || !list) return NULL;
   GPtrArray *arr_to_remove_from = data->parent ? data->parent->children : data->list->children;
   GPtrArray *arr_to_add_to = parent ? parent->children : list->children;
   icalcomponent *clone = icalcomponent_new_clone(data->data);

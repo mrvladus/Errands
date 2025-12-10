@@ -138,9 +138,9 @@ static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x,
   if (!drop_data) return false;
   ListData *old_list_data = drop_data->list;
   GPtrArray *arr = drop_data->parent ? drop_data->parent->children : drop_data->list->children;
-  guint idx = 0;
-  if (!g_ptr_array_find(arr, drop_data, &idx)) return false;
+  if (!g_ptr_array_find(arr, drop_data, NULL)) return false;
   TaskData *new_data = errands_task_data_move_to_list(drop_data, self->data, NULL);
+  if (!new_data) return false;
   errands_list_data_sort(old_list_data);
   errands_list_data_sort(self->data);
   errands_data_write_list(self->data);
