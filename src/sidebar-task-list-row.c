@@ -1,3 +1,4 @@
+#include "adwaita.h"
 #include "data.h"
 #include "glib.h"
 #include "glib/gi18n.h"
@@ -115,6 +116,7 @@ void on_errands_sidebar_task_list_row_activate(GtkListBox *box, ErrandsSidebarTa
   LOG("Switch to list '%s'", list_uid);
   errands_settings_set(SETTING_LAST_LIST_UID, (void *)list_uid);
   errands_task_list_show_task_list(task_list, row->data);
+  adw_navigation_split_view_set_show_content(state.main_window->split_view, true);
 }
 
 static void on_right_click(GtkPopover *popover, gint n_press, gdouble x, gdouble y, GtkGestureClick *ctrl) {

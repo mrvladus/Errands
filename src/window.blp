@@ -3,13 +3,27 @@ using Adw 1;
 
 template $ErrandsWindow: Adw.ApplicationWindow {
   title: _("Errands");
+  default-width: 360;
+  default-height: 294;
   notify::default-width => $on_size_changed_cb();
   notify::default-height => $on_size_changed_cb();
   notify::maximized => $on_maximize_changed_cb();
 
+  Adw.Breakpoint {
+    condition ("max-width: 620px")
+
+    setters {
+      split_view.collapsed: true;
+      split_view.show-content: true;
+    }
+  }
+
   Adw.ToastOverlay toast_overlay {
     Overlay {
       Adw.NavigationSplitView split_view {
+        min-sidebar-width: 250;
+        max-sidebar-width: 300;
+
         sidebar: Adw.NavigationPage {
           title: _("Sidebar");
 
@@ -17,6 +31,7 @@ template $ErrandsWindow: Adw.ApplicationWindow {
         };
 
         content: Adw.NavigationPage {
+          width-request: 360;
           title: _("Content");
 
           child: $ErrandsTaskList task_list {};

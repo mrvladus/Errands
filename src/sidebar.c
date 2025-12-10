@@ -130,6 +130,7 @@ static void on_errands_sidebar_filter_row_activated(GtkListBox *box, GtkListBoxR
   if (GTK_WIDGET(row) == GTK_WIDGET(self->all_row)) errands_task_list_show_all_tasks(task_list);
   else if (GTK_WIDGET(row) == GTK_WIDGET(self->today_row)) errands_task_list_show_today_tasks(task_list);
   else if (GTK_WIDGET(row) == GTK_WIDGET(self->pinned_row)) errands_task_list_show_pinned(task_list);
+  adw_navigation_split_view_set_show_content(state.main_window->split_view, true);
 }
 
 static void __on_open_finish(GObject *obj, GAsyncResult *res, ErrandsSidebar *self) {

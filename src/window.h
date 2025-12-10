@@ -14,7 +14,7 @@ struct _ErrandsWindow {
   ErrandsTaskList *task_list;
   AdwToastOverlay *toast_overlay;
   ErrandsSidebar *sidebar;
-  GtkWidget *split_view;
+  AdwNavigationSplitView *split_view;
 };
 
 ErrandsWindow *errands_window_new(GtkApplication *app);
