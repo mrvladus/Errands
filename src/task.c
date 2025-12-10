@@ -13,6 +13,7 @@
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>
+#include <stddef.h>
 
 static GtkWidget *errands_task_tag_new(ErrandsTask *self, const char *tag);
 
@@ -253,8 +254,7 @@ static void on_complete_btn_toggle_cb(ErrandsTask *self, GtkCheckButton *btn) {
   // Update task list
   errands_task_list_update_title(state.main_window->task_list);
   errands_sidebar_update_filter_rows(state.main_window->sidebar);
-  errands_sidebar_task_list_row_update_counter(
-      errands_sidebar_task_list_row_get(errands_data_get_str(self->data->data, DATA_PROP_LIST_UID)));
+  errands_sidebar_task_list_row_update(errands_sidebar_task_list_row_get(self->data->list));
   // Sync
   errands_sync_schedule_list(self->data->list);
 }
@@ -343,6 +343,12 @@ static gboolean on_drag_cancel_cb(GtkDragSource *self, GdkDrag *drag, GdkDragCan
   return false;
 }
 
+static bool __task_data_is_sub_task_of(TaskData *data, TaskData *possible_parent) {
+  g_autoptr(GPtrArray) subs = g_ptr_array_new();
+  errands_task_data_get_flat_list(possible_parent, subs);
+  return g_ptr_array_find(subs, data, NULL);
+}
+
 static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x, double y, ErrandsTask *task) {
   g_autoptr(GObject) obj = g_value_get_object(value);
   if (!obj) return false;
@@ -350,6 +356,10 @@ static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x,
   if (!drop_data) return false;
   TaskData *tgt_data = task->data;
   if (drop_data == tgt_data) return false;
+  if (__task_data_is_sub_task_of(tgt_data, drop_data)) {
+    errands_window_add_toast(_("Can't add task as a child of itself"));
+    return false;
+  }
   GPtrArray *arr = drop_data->parent ? drop_data->parent->children : drop_data->list->children;
   guint idx = 0;
   if (!g_ptr_array_find(arr, drop_data, &idx)) return false;

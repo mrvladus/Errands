@@ -55,7 +55,7 @@ ErrandsWindow *errands_window_new(GtkApplication *app) {
 
 // ---------- PUBLIC FUNCTIONS ---------- //
 
-void errands_window_update(ErrandsWindow *win) {
+void errands_window_update() {
   LOG("Window: Update");
   size_t total = 0;
   for_range(i, 0, errands_data_lists->len) {
@@ -66,9 +66,9 @@ void errands_window_update(ErrandsWindow *win) {
   g_object_set(state.main_window->no_lists_page, "visible", total == 0, NULL);
 }
 
-void errands_window_add_toast(ErrandsWindow *win, const char *msg) {
+void errands_window_add_toast(const char *msg) {
   LOG("Window: Add Toast '%s'", msg);
-  adw_toast_overlay_add_toast(win->toast_overlay, adw_toast_new(msg));
+  adw_toast_overlay_add_toast(state.main_window->toast_overlay, adw_toast_new(msg));
 }
 
 // ---------- CALLBACKS ---------- //

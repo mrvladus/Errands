@@ -62,7 +62,7 @@ static void on_response_cb(ErrandsSidebarNewListDialog *self, gchar *response, g
     g_ptr_array_add(errands_data_lists, list);
     ErrandsSidebarTaskListRow *row = errands_sidebar_add_task_list(state.main_window->sidebar, list);
     g_signal_emit_by_name(row, "activate", NULL);
-    errands_window_update(state.main_window);
+    errands_window_update();
     errands_data_write_list(list);
     errands_sync_schedule();
     LOG("SidebarNewListDialog: Create new list: '%s'", errands_data_get_str(list->data, DATA_PROP_LIST_UID));

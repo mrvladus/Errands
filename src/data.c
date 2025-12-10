@@ -1,4 +1,5 @@
 #include "data.h"
+#include "glib.h"
 #include "settings.h"
 
 #include "vendor/json.h"
@@ -465,6 +466,24 @@ bool errands_task_data_is_due(TaskData *data) {
 
 bool errands_task_data_is_completed(TaskData *data) {
   return !icaltime_is_null_date(errands_data_get_time(data->data, DATA_PROP_COMPLETED_TIME));
+}
+
+TaskData *errands_task_data_move_to_list(TaskData *data, ListData *list, TaskData *parent) {
+  if (!data || !list || data->list == list) return NULL;
+  GPtrArray *arr_to_remove_from = data->parent ? data->parent->children : data->list->children;
+  GPtrArray *arr_to_add_to = parent ? parent->children : list->children;
+  icalcomponent *clone = icalcomponent_new_clone(data->data);
+  icalcomponent_remove_component(data->list->data, data->data);
+  errands_data_set(clone, DATA_PROP_UID, generate_uuid4());
+  errands_data_set(clone, DATA_PROP_PARENT, parent ? errands_data_get_str(parent->data, DATA_PROP_UID) : NULL);
+  errands_data_set(clone, DATA_PROP_SYNCED, false);
+  icalcomponent_add_component(list->data, clone);
+  TaskData *new_data = errands_task_data_new(clone, parent, list);
+  g_ptr_array_add(arr_to_add_to, new_data);
+  for_range(i, 0, data->children->len)
+      errands_task_data_move_to_list(g_ptr_array_index(data->children, i), list, new_data);
+  g_ptr_array_remove(arr_to_remove_from, data);
+  return new_data;
 }
 
 // ---------- PRINTING ---------- //

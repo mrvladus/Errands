@@ -64,6 +64,9 @@ void errands_task_data_get_flat_list(TaskData *parent, GPtrArray *array);
 void errands_task_data_print(TaskData *data);
 bool errands_task_data_is_due(TaskData *data);
 bool errands_task_data_is_completed(TaskData *data);
+// Move task and sub-tasks recursively to another list.
+// Returns the moved task.
+TaskData *errands_task_data_move_to_list(TaskData *data, ListData *list, TaskData *parent);
 
 // --- LOAD & SAVE & CLEANUP --- //
 
@@ -144,6 +147,7 @@ void errands_data_remove_tag(icalcomponent *data, DataPropStrv prop, const char 
 #define errands_data_set(data, DataProp, value)                                                                        \
   _Generic((value),                                                                                                    \
       const char *: errands_data_set_str,                                                                              \
+      void *: errands_data_set_str,                                                                                    \
       char *: errands_data_set_str,                                                                                    \
       size_t: errands_data_set_int,                                                                                    \
       bool: errands_data_set_bool,                                                                                     \

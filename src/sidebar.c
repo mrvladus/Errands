@@ -68,7 +68,7 @@ void errands_sidebar_load_lists(ErrandsSidebar *self) {
     }
   }
   errands_sidebar_update_filter_rows(self);
-  errands_window_update(state.main_window);
+  errands_window_update();
   // Select last opened page
   g_signal_connect(state.main_window, "realize", G_CALLBACK(errands_sidebar_select_last_opened_page), NULL);
   LOG("Sidebar: Created %d Task List Rows", errands_data_lists->len);
@@ -144,7 +144,7 @@ static void __on_open_finish(GObject *obj, GAsyncResult *res, ErrandsSidebar *se
   for_range(i, 0, errands_data_lists->len) {
     ListData *data = g_ptr_array_index(errands_data_lists, i);
     if (STR_EQUAL(uid, errands_data_get_str(data->data, DATA_PROP_LIST_UID))) {
-      errands_window_add_toast(state.main_window, _("List already exists"));
+      errands_window_add_toast(_("List already exists"));
       return;
     }
   }

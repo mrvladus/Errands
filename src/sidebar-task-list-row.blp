@@ -48,4 +48,10 @@ template $ErrandsSidebarTaskListRow: Gtk.ListBoxRow {
       released => $on_right_click(popover_menu);
     }
   }
+
+  DropTarget {
+    formats: "GObject";
+    actions: move;
+    drop => $on_drop_cb(template) not-swapped;
+  }
 }

@@ -1,8 +1,9 @@
 # Project info
 
 NAME = errands
-VERSION = 49.0
 APP_ID = io.github.mrvladus.Errands
+VERSION = 49.0
+VERSION_COMMIT = $(shell git rev-parse --short HEAD)
 
 # Installation directories
 
@@ -32,7 +33,7 @@ PKG_CONFIG_LIBS = libadwaita-1 gtksourceview-5 libical libportal libcurl
 CFLAGS = -Wall -g \
 		 `pkg-config --cflags $(PKG_CONFIG_LIBS)` \
 		 -DVERSION='"$(VERSION)"' \
-		 -DVERSION_COMMIT='"$(shell git rev-parse --short HEAD)"' \
+		 -DVERSION_COMMIT='"$(VERSION_COMMIT)"' \
 		 -DAPP_ID='"$(APP_ID)"' \
 	 	 -DLOCALE_DIR='""'
 LDFLAGS = `pkg-config --libs $(PKG_CONFIG_LIBS)`

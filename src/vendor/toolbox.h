@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <threads.h>
 #include <time.h>
 
 // -------------------- AUTOMATIC CLEANUP -------------------- //
@@ -114,6 +115,8 @@ extern const char *toolbox_log_prefix;
 #define UNREACHABLE ABORT("UNREACHABLE")
 // Breakpoint for debugger
 #define BREAKPOINT asm("int3")
+// Unused variable
+#define UNUSED(var) (void)(var)
 
 // -------------------- PROFILING -------------------- //
 
@@ -159,6 +162,25 @@ extern const char *toolbox_log_prefix;
 
 #define STR_TO_UL(str) strtoul(str, NULL, 10)
 
+static inline const char *generate_uuid4() {
+  static thread_local char uuid[37];
+  const char *hex = "0123456789abcdef";
+  static thread_local int seeded = 0;
+  if (!seeded) {
+    srand(time(NULL) ^ (unsigned long)&seeded);
+    seeded = 1;
+  }
+  for (int i = 0; i < 36; i++) {
+    if (i == 8 || i == 13 || i == 18 || i == 23) uuid[i] = '-';
+    else if (i == 14) uuid[i] = '4';
+    else if (i == 19) {
+      int r = rand() % 4;
+      uuid[i] = (r == 0) ? '8' : (r == 1) ? '9' : (r == 2) ? 'a' : 'b';
+    } else uuid[i] = hex[rand() % 16];
+  }
+  uuid[36] = '\0';
+  return uuid;
+}
 // -------------------- ARRAYS -------------------- //
 
 #define STATIC_ARRAY_SIZE(arr) sizeof(arr) / sizeof(arr[0])

@@ -18,5 +18,5 @@ struct _ErrandsWindow {
 };
 
 ErrandsWindow *errands_window_new(GtkApplication *app);
-void errands_window_update(ErrandsWindow *win);
-void errands_window_add_toast(ErrandsWindow *win, const char *msg);
+void errands_window_update(void);
+void errands_window_add_toast(const char *msg);
