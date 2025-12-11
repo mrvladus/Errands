@@ -4,6 +4,7 @@
 
 #include "vendor/json.h"
 #include "vendor/toolbox.h"
+#include <libical/ical.h>
 
 static void errands_data_create_backup();
 
@@ -195,14 +196,6 @@ void errands_data_init() {
   }
 
   LOG("User Data: Loaded %d tasks from %d lists in %f sec.", all_tasks->len, errands_data_lists->len, TIMER_ELAPSED_MS);
-}
-
-void errands_data_get_stats(size_t *total, size_t *completed, size_t *trash) {
-  for_range(i, 0, errands_data_lists->len) {
-    ListData *data = g_ptr_array_index(errands_data_lists, i);
-    CONTINUE_IF(errands_data_get_bool(data->data, DATA_PROP_DELETED))
-    errands_list_data_get_stats(data, total, completed, trash);
-  }
 }
 
 void errands_data_get_flat_list(GPtrArray *tasks) {
@@ -459,8 +452,10 @@ void errands_task_data_get_flat_list(TaskData *parent, GPtrArray *array) {
 
 bool errands_task_data_is_due(TaskData *data) {
   icaltimetype due_time = errands_data_get_time(data->data, DATA_PROP_DUE_TIME);
-  icaltimetype now = icaltime_today();
-  bool is_due = !icaltime_is_null_date(due_time) && icaltime_compare_date_only(due_time, now) < 1;
+  if (icaltime_is_null_time(due_time)) return false;
+  bool is_due = false;
+  if (due_time.is_date) is_due = icaltime_compare_date_only(due_time, icaltime_today()) < 1;
+  else is_due = icaltime_compare(due_time, icaltime_get_date_time_now()) < 1;
   return is_due;
 }
 

@@ -1,4 +1,5 @@
 #include "settings-dialog.h"
+#include "notifications.h"
 #include "settings.h"
 #include "state.h"
 
@@ -89,6 +90,7 @@ static void on_theme_toggled_cb(ErrandsSettingsDialog *self) {
 
 static void on_notifications_toggled_cb(ErrandsSettingsDialog *self) {
   bool enabled = adw_switch_row_get_active(ADW_SWITCH_ROW(self->notifications));
+  enabled ? errands_notifications_start() : errands_notifications_stop();
   errands_settings_set(SETTING_NOTIFICATIONS, &enabled);
 }
 

@@ -1,5 +1,4 @@
 #include "settings.h"
-#include <stddef.h>
 
 #define JSON_H_IMPLEMENTATION
 #include "vendor/json.h"
@@ -12,7 +11,7 @@ static void errands_settings_save();
 
 // --- GLOBAL SETTINGS VARIABLES --- //
 
-static const char *settings_path;
+static char *settings_path;
 static time_t last_save_time = 0;
 static bool pending_save = false;
 static JSON *settings = NULL;
@@ -96,6 +95,11 @@ void errands_settings_init() {
   if (file_exists(settings_path)) errands_settings_load_user();
   else errands_settings_migrate();
   errands_settings_save();
+}
+
+void errands_settings_cleanup() {
+  if (settings_path) g_free(settings_path);
+  if (settings) json_free(settings);
 }
 
 // --- GET / SET SETTINGS --- //

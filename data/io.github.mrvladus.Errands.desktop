@@ -1,0 +1,13 @@
+[Desktop Entry]
+Name=Errands
+Comment=Manage your tasks
+Exec=errands
+Icon=io.github.mrvladus.Errands
+Terminal=false
+Type=Application
+Categories=GNOME;GTK;Utility;
+Keywords=errands;tasks;list;todo;todos;caldav;nextcloud;sync;
+DBusActivatable=true
+StartupNotify=true
+X-GNOME-UsesNotifications=true
+X-Purism-FormFactor=Workstation;Mobile;

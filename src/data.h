@@ -13,8 +13,6 @@ typedef struct TaskData TaskData;
 
 // Get all tasks as flat list
 void errands_data_get_flat_list(GPtrArray *tasks);
-// Get the total number of tasks and completed tasks
-void errands_data_get_stats(size_t *total, size_t *completed, size_t *trash);
 void errands_data_sort();
 
 // --- LIST DATA --- //

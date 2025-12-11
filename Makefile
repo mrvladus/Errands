@@ -10,12 +10,20 @@ VERSION_COMMIT = $(shell git rev-parse --short HEAD)
 DESTDIR ?=
 prefix ?= /usr/local
 bindir = $(prefix)/bin
+datarootdir = $(prefix)/share
+localedir = $(datarootdir)/locale
+desktopdir = $(datarootdir)/applications
 
 # Project directories
 
 BUILD_DIR = build
 SRC_DIR = src
 DATA_DIR = data
+
+# Project data files
+
+DESKTOP_FILE = io.github.mrvladus.Errands.desktop
+
 
 # Project sources
 
@@ -59,10 +67,12 @@ $(SRC_DIR)/resources.c: $(DATA_DIR)/$(NAME).gresource.xml $(BLPS) $(CSS) $(ICONS
 	@glib-compile-resources --generate-source --target=$@ --c-name=$(NAME) $<
 
 install: $(BUILD_DIR)/$(NAME)
-	install -d -s -m 755 $(BUILD_DIR)/$(NAME) $(DESTDIR)/$(bindir)/$(NAME)
+	install -D -s -m 755 $(BUILD_DIR)/$(NAME) $(DESTDIR)/$(bindir)/$(NAME)
+	install -D -m 755 $(DATA_DIR)/$(DESKTOP_FILE) $(DESTDIR)/$(desktopdir)/$(DESKTOP_FILE)
 
 uninstall:
 	rm -f $(DESTDIR)/$(bindir)/$(NAME)
+	rm -f $(DESTDIR)/$(desktopdir)/$(DESKTOP_FILE)
 
 run: all
 	@./$(BUILD_DIR)/$(NAME)

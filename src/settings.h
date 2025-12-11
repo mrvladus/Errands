@@ -52,6 +52,7 @@ typedef union {
 } ErrandsSetting;
 
 void errands_settings_init();
+void errands_settings_cleanup();
 ErrandsSetting errands_settings_get(ErrandsSettingsKey key);
 void errands_settings_set(ErrandsSettingsKey key, void *value);
 
