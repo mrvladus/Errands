@@ -1,14 +1,11 @@
 #include "notifications.h"
 #include "data.h"
-#include "glib.h"
 #include "settings.h"
 #include "state.h"
 
 #include "vendor/toolbox.h"
 
 #include <glib/gi18n.h>
-#include <libical/ical.h>
-#include <stddef.h>
 
 static const uint8_t check_interval = 10;
 static GPtrArray *queue = NULL;
