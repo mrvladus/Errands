@@ -10,7 +10,7 @@
 #include <libical/ical.h>
 #include <stddef.h>
 
-static const uint8_t check_interval = 1;
+static const uint8_t check_interval = 10;
 static GPtrArray *queue = NULL;
 static GPtrArray *save_lists = NULL;
 static bool initialized = false;
