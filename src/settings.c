@@ -8,6 +8,8 @@ AUTOPTR_DEFINE(JSON, json_free)
 
 // Save settings with cooldown period of 1s.
 static void errands_settings_save();
+const SecretSchema *errands_get_schema(void) G_GNUC_CONST;
+#define ERRANDS_SCHEMA errands_get_schema()
 
 // --- GLOBAL SETTINGS VARIABLES --- //
 
@@ -85,15 +87,19 @@ void errands_settings_load_user() {
   }
 }
 
-// TODO: Migrate from GSettings to settings.json
-void errands_settings_migrate() { LOG("Settings: Migrate to settings.json"); }
+static void errands_settings_migrate_from_46() {
+  g_autofree gchar *password = secret_password_lookup_sync(ERRANDS_SCHEMA, NULL, NULL, "account", "Nextcloud", NULL);
+  if (!password) return;
+  errands_settings_set_password(password);
+  // TODO: Migrate from GSettings to settings.json
+}
 
 void errands_settings_init() {
   LOG("Settings: Initialize");
   settings_path = g_build_filename(g_get_user_data_dir(), "errands", "settings.json", NULL);
   errands_settings_load_default();
   if (file_exists(settings_path)) errands_settings_load_user();
-  else errands_settings_migrate();
+  else errands_settings_migrate_from_46();
   errands_settings_save();
 }
 
@@ -228,10 +234,6 @@ static void errands_settings_save() {
 
 // --- PASSWORDS --- //
 
-const SecretSchema *errands_get_schema(void) G_GNUC_CONST;
-
-#define ERRANDS_SCHEMA errands_get_schema()
-
 const SecretSchema *errands_get_schema(void) {
   static const SecretSchema schema = {APP_ID,
                                       SECRET_SCHEMA_NONE,
@@ -240,12 +242,6 @@ const SecretSchema *errands_get_schema(void) {
                                           {"NULL", 0},
                                       }};
   return &schema;
-}
-
-static void errands_settings_migrate_from_46() {
-  g_autofree gchar *password = secret_password_lookup_sync(ERRANDS_SCHEMA, NULL, NULL, "account", "Nextcloud", NULL);
-  if (!password) return;
-  errands_settings_set_password(password);
 }
 
 gchar *errands_settings_get_password() {
