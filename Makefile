@@ -20,11 +20,6 @@ BUILD_DIR = build
 SRC_DIR = src
 DATA_DIR = data
 
-# Project data files
-
-DESKTOP_FILE = io.github.mrvladus.Errands.desktop
-
-
 # Project sources
 
 SRCS = $(wildcard $(SRC_DIR)/*.c)
@@ -37,7 +32,7 @@ ICONS = $(wildcard $(DATA_DIR)/icons/*.svg)
 # Compilation variables
 
 CC = gcc
-PKG_CONFIG_LIBS = libadwaita-1 gtksourceview-5 libical libportal libcurl
+PKG_CONFIG_LIBS = libadwaita-1 gtksourceview-5 libical libportal libcurl libsecret-1
 CFLAGS = -Wall -g \
 		 `pkg-config --cflags $(PKG_CONFIG_LIBS)` \
 		 -DVERSION='"$(VERSION)"' \
@@ -49,6 +44,8 @@ LDFLAGS = `pkg-config --libs $(PKG_CONFIG_LIBS)`
 # Targets
 
 all: $(BUILD_DIR)/$(NAME)
+
+# Compile targets
 
 $(BUILD_DIR):
 	@mkdir -p $(BUILD_DIR)
@@ -66,20 +63,31 @@ $(SRC_DIR)/resources.c: $(DATA_DIR)/$(NAME).gresource.xml $(BLPS) $(CSS) $(ICONS
 	@blueprint-compiler batch-compile $(BUILD_DIR) $(SRC_DIR) $(BLPS)
 	@glib-compile-resources --generate-source --target=$@ --c-name=$(NAME) $<
 
+-include $(DEPS)
+
+# Installation related targets
+
 install: $(BUILD_DIR)/$(NAME)
-	install -D -s -m 755 $(BUILD_DIR)/$(NAME) $(DESTDIR)/$(bindir)/$(NAME)
-	install -D -m 755 $(DATA_DIR)/$(DESKTOP_FILE) $(DESTDIR)/$(desktopdir)/$(DESKTOP_FILE)
+	# Executable
+	install -Dsm 755 $(BUILD_DIR)/$(NAME) $(DESTDIR)/$(bindir)/$(NAME)
+	# Desktop file
+	cp $(DATA_DIR)/io.github.mrvladus.Errands.desktop.in $(BUILD_DIR)/$(APP_ID).desktop
+	sed -i "s/APP_ID/$(APP_ID)/g" $(BUILD_DIR)/$(APP_ID).desktop
+	install -Dm 755 $(BUILD_DIR)/$(DESKTOP_FILE) $(DESTDIR)/$(desktopdir)/$(APP_ID).desktop
 
 uninstall:
 	rm -f $(DESTDIR)/$(bindir)/$(NAME)
-	rm -f $(DESTDIR)/$(desktopdir)/$(DESKTOP_FILE)
+	rm -f $(DESTDIR)/$(desktopdir)/$(APP_ID).desktop
+
+# Development targets
 
 run: all
 	@./$(BUILD_DIR)/$(NAME)
 
+count-lines:
+	@find $(SRC_DIR) -name '*.c' -o -name '*.h' | xargs wc -l
+
 clean:
 	@rm -rf $(BUILD_DIR)
-
--include $(DEPS)
 
 .PHONY: all install uninstall run clean

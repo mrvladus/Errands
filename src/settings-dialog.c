@@ -1,4 +1,6 @@
 #include "settings-dialog.h"
+#include "adwaita.h"
+#include "gtk/gtk.h"
 #include "notifications.h"
 #include "settings.h"
 #include "state.h"
@@ -10,6 +12,9 @@ static void on_notifications_toggled_cb(ErrandsSettingsDialog *self);
 static void on_background_toggled_cb(ErrandsSettingsDialog *self);
 static void on_startup_toggled_cb(ErrandsSettingsDialog *self);
 static void on_sync_toggled_cb(ErrandsSettingsDialog *self);
+static void on_sync_url_activated_cb(ErrandsSettingsDialog *self, AdwEntryRow *row);
+static void on_sync_username_activated_cb(ErrandsSettingsDialog *self, AdwEntryRow *row);
+static void on_sync_password_activated_cb(ErrandsSettingsDialog *self, AdwEntryRow *row);
 
 // ---------- WIDGET TEMPLATE ---------- //
 
@@ -53,6 +58,9 @@ static void errands_settings_dialog_class_init(ErrandsSettingsDialogClass *class
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_background_toggled_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_startup_toggled_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_sync_toggled_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_sync_url_activated_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_sync_username_activated_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_sync_password_activated_cb);
 }
 
 static void errands_settings_dialog_init(ErrandsSettingsDialog *self) { gtk_widget_init_template(GTK_WIDGET(self)); }
@@ -71,6 +79,10 @@ void errands_settings_dialog_show() {
   adw_switch_row_set_active(ADW_SWITCH_ROW(settings_dialog->startup), errands_settings_get(SETTING_STARTUP).b);
   adw_switch_row_set_active(ADW_SWITCH_ROW(settings_dialog->sync_enabled), errands_settings_get(SETTING_SYNC).b);
   adw_toggle_group_set_active(ADW_TOGGLE_GROUP(settings_dialog->theme), errands_settings_get(SETTING_THEME).i);
+  gtk_editable_set_text(GTK_EDITABLE(settings_dialog->sync_url), errands_settings_get(SETTING_SYNC_URL).s);
+  gtk_editable_set_text(GTK_EDITABLE(settings_dialog->sync_username), errands_settings_get(SETTING_SYNC_USERNAME).s);
+  g_autofree gchar *password = errands_settings_get_password();
+  if (password) gtk_editable_set_text(GTK_EDITABLE(settings_dialog->sync_password), password);
 
   adw_dialog_present(ADW_DIALOG(settings_dialog), GTK_WIDGET(state.main_window));
 }
@@ -107,4 +119,16 @@ static void on_startup_toggled_cb(ErrandsSettingsDialog *self) {
 static void on_sync_toggled_cb(ErrandsSettingsDialog *self) {
   bool enabled = adw_switch_row_get_active(ADW_SWITCH_ROW(self->sync_enabled));
   errands_settings_set(SETTING_SYNC, &enabled);
+}
+
+static void on_sync_url_activated_cb(ErrandsSettingsDialog *self, AdwEntryRow *row) {
+  errands_settings_set(SETTING_SYNC_URL, (void *)gtk_editable_get_text(GTK_EDITABLE(row)));
+}
+
+static void on_sync_username_activated_cb(ErrandsSettingsDialog *self, AdwEntryRow *row) {
+  errands_settings_set(SETTING_SYNC_USERNAME, (void *)gtk_editable_get_text(GTK_EDITABLE(row)));
+}
+
+static void on_sync_password_activated_cb(ErrandsSettingsDialog *self, AdwEntryRow *row) {
+  errands_settings_set_password(gtk_editable_get_text(GTK_EDITABLE(row)));
 }

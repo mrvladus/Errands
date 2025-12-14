@@ -2,7 +2,7 @@
 Name=Errands
 Comment=Manage your tasks
 Exec=errands
-Icon=io.github.mrvladus.Errands
+Icon=APP_ID
 Terminal=false
 Type=Application
 Categories=GNOME;GTK;Utility;

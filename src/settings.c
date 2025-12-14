@@ -225,3 +225,36 @@ static void errands_settings_save() {
     return;
   }
 }
+
+// --- PASSWORDS --- //
+
+const SecretSchema *errands_get_schema(void) G_GNUC_CONST;
+
+#define ERRANDS_SCHEMA errands_get_schema()
+
+const SecretSchema *errands_get_schema(void) {
+  static const SecretSchema schema = {APP_ID,
+                                      SECRET_SCHEMA_NONE,
+                                      {
+                                          {"account", SECRET_SCHEMA_ATTRIBUTE_STRING},
+                                          {"NULL", 0},
+                                      }};
+  return &schema;
+}
+
+static void errands_settings_migrate_from_46() {
+  g_autofree gchar *password = secret_password_lookup_sync(ERRANDS_SCHEMA, NULL, NULL, "account", "Nextcloud", NULL);
+  if (!password) return;
+  errands_settings_set_password(password);
+}
+
+gchar *errands_settings_get_password() {
+  g_autoptr(GError) error = NULL;
+  gchar *password = secret_password_lookup_sync(ERRANDS_SCHEMA, NULL, NULL, "account", "CalDAV", NULL);
+  return password;
+}
+
+void errands_settings_set_password(const char *password) {
+  secret_password_store_sync(ERRANDS_SCHEMA, SECRET_COLLECTION_DEFAULT, "Errands CalDAV credentials", password, NULL,
+                             NULL, "account", "CalDAV", NULL);
+}

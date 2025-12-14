@@ -1,6 +1,9 @@
 #pragma once
 
+#include "config.h"
+
 #include <glib.h>
+#include <libsecret/secret.h>
 
 #include <stdbool.h>
 
@@ -60,3 +63,6 @@ GStrv errands_settings_get_tags();
 void errands_settings_set_tags(GStrv tags);
 void errands_settings_add_tag(const char *tag);
 void errands_settings_remove_tag(const char *tag);
+
+gchar *errands_settings_get_password();
+void errands_settings_set_password(const char *password);

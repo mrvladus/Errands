@@ -1,6 +1,5 @@
 #include "task-list.h"
 #include "data.h"
-#include "glib.h"
 #include "sidebar.h"
 #include "state.h"
 #include "task.h"
@@ -9,9 +8,6 @@
 #include "vendor/toolbox.h"
 
 #include <glib/gi18n.h>
-#include <libical/ical.h>
-#include <stdbool.h>
-#include <stddef.h>
 
 static size_t tasks_stack_size = 0, current_start = 0;
 static GPtrArray *current_task_list = NULL;

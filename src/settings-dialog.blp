@@ -68,16 +68,22 @@ template $ErrandsSettingsDialog: Adw.PreferencesDialog {
       Adw.EntryRow sync_url {
         title: _("CalDAV Server URL");
         visible: bind sync_enabled.active;
+        show-apply-button: true;
+        apply => $on_sync_url_activated_cb(template);
       }
 
       Adw.EntryRow sync_username {
         title: _("Username");
         visible: bind sync_enabled.active;
+        show-apply-button: true;
+        apply => $on_sync_username_activated_cb(template);
       }
 
       Adw.PasswordEntryRow sync_password {
         title: _("Password");
         visible: bind sync_enabled.active;
+        show-apply-button: true;
+        apply => $on_sync_password_activated_cb(template);
       }
     }
   }
