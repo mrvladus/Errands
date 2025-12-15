@@ -3,7 +3,6 @@
 #include "config.h"
 
 #include <glib.h>
-#include <libsecret/secret.h>
 
 #include <stdbool.h>
 

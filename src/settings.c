@@ -4,19 +4,27 @@
 #include "vendor/json.h"
 #include "vendor/toolbox.h"
 
+#include <libsecret/secret.h>
+
 AUTOPTR_DEFINE(JSON, json_free)
 
 // Save settings with cooldown period of 1s.
-static void errands_settings_save();
-const SecretSchema *errands_get_schema(void) G_GNUC_CONST;
-#define ERRANDS_SCHEMA errands_get_schema()
+static void errands__settings_save();
 
-// --- GLOBAL SETTINGS VARIABLES --- //
+// --- GLOBAL VARIABLES --- //
 
 static char *settings_path;
 static time_t last_save_time = 0;
 static bool pending_save = false;
 static JSON *settings = NULL;
+static const SecretSchema secret_schema = {
+    APP_ID,
+    SECRET_SCHEMA_NONE,
+    {
+        {"account", SECRET_SCHEMA_ATTRIBUTE_STRING},
+        {"NULL", 0},
+    },
+};
 
 #define SETTING_KEY_STR(ErrandsSettingsKey, key_str) [ErrandsSettingsKey] = key_str
 
@@ -88,7 +96,7 @@ void errands_settings_load_user() {
 }
 
 static void errands_settings_migrate_from_46() {
-  g_autofree gchar *password = secret_password_lookup_sync(ERRANDS_SCHEMA, NULL, NULL, "account", "Nextcloud", NULL);
+  g_autofree gchar *password = secret_password_lookup_sync(&secret_schema, NULL, NULL, "account", "Nextcloud", NULL);
   if (!password) return;
   errands_settings_set_password(password);
   // TODO: Migrate from GSettings to settings.json
@@ -100,7 +108,7 @@ void errands_settings_init() {
   errands_settings_load_default();
   if (file_exists(settings_path)) errands_settings_load_user();
   else errands_settings_migrate_from_46();
-  errands_settings_save();
+  errands__settings_save();
 }
 
 void errands_settings_cleanup() {
@@ -168,7 +176,7 @@ void errands_settings_set(ErrandsSettingsKey key, void *value) {
   case SETTING_SYNC_USERNAME: SETTING_SET_STR; break;
   case SETTING_TAGS: SETTING_SET_STR; break;
   }
-  errands_settings_save();
+  errands__settings_save();
 }
 
 // --- TAGS --- //
@@ -182,7 +190,7 @@ void errands_settings_set_tags(GStrv tags) {
   g_autofree char *value = g_strjoinv(",", tags);
   JSON *res = json_object_get(settings, "tags");
   json_replace_string(&res->string_val, value);
-  errands_settings_save();
+  errands__settings_save();
 }
 
 void errands_settings_add_tag(const char *tag) {
@@ -211,46 +219,34 @@ void errands_settings_remove_tag(const char *tag) {
 
 // --- SAVING SETTINGS --- //
 
-static void perform_save() {
+static void errands__perform_save() {
   autofree char *json = json_print(settings);
   if (!write_string_to_file(settings_path, json)) LOG("Settings: Failed to save settings");
   last_save_time = TIME_NOW;
   pending_save = false;
 }
 
-static void errands_settings_save() {
+static void errands__settings_save() {
   double diff = difftime(TIME_NOW, last_save_time);
   if (pending_save) return;
   if (diff < 1.0f) {
     pending_save = true;
-    g_timeout_add_seconds_once(1, (GSourceOnceFunc)perform_save, NULL);
+    g_timeout_add_seconds_once(1, (GSourceOnceFunc)errands__perform_save, NULL);
     return;
   } else {
     pending_save = true;
-    perform_save();
+    errands__perform_save();
     return;
   }
 }
 
 // --- PASSWORDS --- //
 
-const SecretSchema *errands_get_schema(void) {
-  static const SecretSchema schema = {APP_ID,
-                                      SECRET_SCHEMA_NONE,
-                                      {
-                                          {"account", SECRET_SCHEMA_ATTRIBUTE_STRING},
-                                          {"NULL", 0},
-                                      }};
-  return &schema;
-}
-
 gchar *errands_settings_get_password() {
-  g_autoptr(GError) error = NULL;
-  gchar *password = secret_password_lookup_sync(ERRANDS_SCHEMA, NULL, NULL, "account", "CalDAV", NULL);
-  return password;
+  return secret_password_lookup_sync(&secret_schema, NULL, NULL, "account", "CalDAV", NULL);
 }
 
 void errands_settings_set_password(const char *password) {
-  secret_password_store_sync(ERRANDS_SCHEMA, SECRET_COLLECTION_DEFAULT, "Errands CalDAV credentials", password, NULL,
+  secret_password_store_sync(&secret_schema, SECRET_COLLECTION_DEFAULT, "Errands CalDAV credentials", password, NULL,
                              NULL, "account", "CalDAV", NULL);
 }
