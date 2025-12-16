@@ -73,7 +73,7 @@ $(RESOURCES_C): $(GRESOURCE_XML) $(BLPS) $(STYLES) $(ICONS)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
 	@echo "Compiling $<"
-	@$(CC) $(CFLAGS) -MMD -MP -c -o $@ $<
+	@$(CC) $(ALL_CFLAGS) -MMD -MP -c -o $@ $<
 
 $(BUILD_DIR)/$(NAME): $(OBJS)
 		@echo "Linking executable $@"
@@ -103,4 +103,4 @@ run: all
 count-sloc:
 	@find $(SRC_DIR) -name '*.c' -o -name '*.h' | sort | xargs wc -l
 
-.PHONY: all install uninstall run clean
+.PHONY: all install uninstall run clean count-sloc
