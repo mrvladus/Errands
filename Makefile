@@ -45,6 +45,9 @@ LDFLAGS = `pkg-config --libs $(PKG_CONFIG_LIBS)`
 
 all: $(BUILD_DIR)/$(NAME)
 
+clean:
+	@rm -rf $(BUILD_DIR)
+
 # Compile targets
 
 $(BUILD_DIR):
@@ -84,10 +87,7 @@ uninstall:
 run: all
 	@./$(BUILD_DIR)/$(NAME)
 
-count-lines:
-	@find $(SRC_DIR) -name '*.c' -o -name '*.h' | xargs wc -l
-
-clean:
-	@rm -rf $(BUILD_DIR)
+count-sloc:
+	@find $(SRC_DIR) -name '*.c' -o -name '*.h' | sort | xargs wc -l
 
 .PHONY: all install uninstall run clean
