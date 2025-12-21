@@ -112,6 +112,7 @@ void errands_settings_init() {
 }
 
 void errands_settings_cleanup() {
+  LOG("Settings: Cleanup");
   if (settings_path) g_free(settings_path);
   if (settings) json_free(settings);
 }

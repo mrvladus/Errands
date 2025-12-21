@@ -139,6 +139,11 @@ extern const char *toolbox_log_prefix;
 #define CONTINUE_IF(statement)                                                                                         \
   if (statement) continue;
 
+// -------------------- TYPE CONVERSION -------------------- //
+
+#define BOOL_TO_STR(val)     val ? "true" : "false"
+#define BOOL_TO_STR_NUM(val) val ? "1" : "0"
+
 // -------------------- STRINGS -------------------- //
 
 // Stringify
@@ -380,6 +385,8 @@ static inline const char *path_ext(const char *path) {
 #define TIMER_START clock_t __timer_start = clock();
 // Get elapsed time in milliseconds
 #define TIMER_ELAPSED_MS ((double)(clock() - __timer_start) / CLOCKS_PER_SEC)
+// Generate random seed
+#define RANDOM_SEED() srand((unsigned int)(TIME_NOW ^ getpid()));
 
 // -------------------- SYSTEM COMMANDS -------------------- //
 

@@ -33,4 +33,4 @@ CompileFlags:
     - -I/usr/include/webkitgtk-6.0
     - -pthread
     - -Wno-macro-redefined
-    - -DPUG_IMPLEMENTATION
+    - -DCALDAV_IMPLEMENTATION

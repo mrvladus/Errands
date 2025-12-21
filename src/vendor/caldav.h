@@ -325,12 +325,11 @@ void *caldav_list_at(CalDAVList *list, size_t index) {
 }
 
 void caldav_list_free(CalDAVList *list, void (*data_free_func)(void *)) {
-  if (list != NULL) {
-    if (data_free_func != NULL)
-      for (size_t i = 0; i < list->len; i++) data_free_func(list->data[i]);
-    caldav_free(list->data);
-    caldav_free(list);
-  }
+  if (!list) return;
+  if (data_free_func != NULL)
+    for (size_t i = 0; i < list->len; i++) data_free_func(list->data[i]);
+  caldav_free(list->data);
+  caldav_free(list);
 }
 
 // ---------- CLIENT ---------- //
@@ -488,6 +487,7 @@ CalDAVCalendar *caldav_client_create_calendar(CalDAVClient *client, const char *
 }
 
 void caldav_client_free(CalDAVClient *client) {
+  if (!client) return;
   caldav_log("Free CalDAVClient");
   caldav_free(client->username);
   caldav_free(client->password);

@@ -8,6 +8,7 @@ e.g. GLib's g_autoptr, g_auto and g_autofree"
 #include "notifications.h"
 #include "settings.h"
 #include "state.h"
+#include "sync.h"
 #include "window.h"
 
 #include "vendor/toolbox.h"
@@ -24,13 +25,12 @@ static void activate(GtkApplication *app) {
   state.main_window = errands_window_new(app);
   errands_sidebar_load_lists(ERRANDS_SIDEBAR(state.main_window->sidebar));
   gtk_window_present(GTK_WINDOW(state.main_window));
-  // sync_init();
+  errands_sync_init();
 }
 
 int main(int argc, char **argv) {
+  RANDOM_SEED();
   LOG("Starting Errands %s (%s) %sFlatpak", VERSION, VERSION_COMMIT, xdp_portal_running_under_flatpak() ? "" : "not ");
-  // Generate random seed
-  srand((unsigned int)(TIME_NOW ^ getpid()));
 
   bindtextdomain("errands", LOCALE_DIR);
   bind_textdomain_codeset("errands", "UTF-8");
@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
 
   errands_data_cleanup();
   errands_settings_cleanup();
-  // errands_sync_cleanup();
+  errands_sync_cleanup();
   errands_notifications_cleanup();
 
   return status;

@@ -2,75 +2,132 @@
 
 #include "vendor/toolbox.h"
 
-#include <glib-object.h>
+#include <glib.h>
 #include <libical/ical.h>
 
 AUTOPTR_DEFINE(icalcomponent, icalcomponent_free)
 
 extern GPtrArray *errands_data_lists;
 
-typedef struct TaskData TaskData;
+// ------ ERRANDS DATA ------ //
 
+typedef struct ErrandsData ErrandsData;
+struct ErrandsData {
+  icalcomponent *ical; // iCal component
+  GPtrArray *children; // List of children
+  // Type of data
+  enum {
+    ERRANDS_DATA_TYPE_LIST,
+    ERRANDS_DATA_TYPE_TASK,
+  } type;
+  // Properties for each type of data
+  union {
+    // Properties for list data
+    struct {
+      char *uid;   // List UID
+      char *name;  // List display name
+      char *color; // List HEX color
+    } list;
+    // Properties for task data
+    struct {
+      ErrandsData *parent; // Parent task data
+      ErrandsData *list;   // List data
+    } task;
+  } as;
+};
+
+#define ERRANDS_DATA_ICAL_WRAPPER(icalcomponent_ptr) ((ErrandsData){.ical = icalcomponent_ptr})
+
+// Initialize user data
+void errands_data_init(void);
+// Cleanup user data
+void errands_data_cleanup(void);
 // Get all tasks as flat list
 void errands_data_get_flat_list(GPtrArray *tasks);
-void errands_data_sort();
+// Sort all tasks
+void errands_data_sort(void);
 
 // --- LIST DATA --- //
 
-typedef struct {
-  icalcomponent *data;
-  GPtrArray *children;
-} ListData;
-
-#define LIST_DATA(ptr) ((ListData *)(ptr))
-
-ListData *errands_list_data_new(icalcomponent *data);
-ListData *errands_list_data_new_from_ical(const char *ical, const char *uid, const char *name, const char *color);
-void errands_list_data_free(ListData *data);
-AUTOPTR_DEFINE(ListData, errands_list_data_free)
-// Create new `ListData`.
-// `uid` - Pass `NULL` to generate a new UID.
-// `color` - Pass `NULL` to generate color.
-ListData *errands_list_data_create(const char *uid, const char *name, const char *color, bool deleted, bool synced);
-void errands_list_data_sort(ListData *data);
-void errands_list_data_sort_toplevel(ListData *data);
+ErrandsData *errands_list_data_new(icalcomponent *ical, const char *uid, const char *name, const char *color);
+// Load ErrandsData from iCal component
+ErrandsData *errands_list_data_load_from_ical(icalcomponent *ical, const char *uid, const char *name,
+                                              const char *color);
+ErrandsData *errands_list_data_create(const char *uid, const char *name, const char *color, bool deleted, bool synced);
+void errands_list_data_sort(ErrandsData *data);
 // Get all tasks as flat list
-void errands_list_data_get_flat_list(ListData *data, GPtrArray *tasks);
-void errands_list_data_get_stats(ListData *data, size_t *total, size_t *completed, size_t *trash);
-GPtrArray *errands_list_data_get_all_tasks_as_icalcomponents(ListData *data);
-void errands_list_data_print(ListData *data);
+void errands_list_data_get_flat_list(ErrandsData *data, GPtrArray *tasks);
+GPtrArray *errands_list_data_get_all_tasks_as_icalcomponents(ErrandsData *data);
+void errands_list_data_print(ErrandsData *data);
+
+void errands_list_data_save(ErrandsData *data);
 
 // --- TASK DATA --- //
 
-struct TaskData {
-  icalcomponent *data;
-  GPtrArray *children;
-  TaskData *parent;
-  ListData *list;
-};
-
-#define TASK_DATA(ptr) ((TaskData *)(ptr))
-
-TaskData *errands_task_data_new(icalcomponent *data, TaskData *parent, ListData *list);
-TaskData *errands_task_data_create_task(ListData *list, TaskData *parent, const char *text);
-void errands_task_data_free(TaskData *data);
-void errands_task_data_sort_sub_tasks(TaskData *data);
-size_t errands_task_data_get_indent_level(TaskData *data);
-// Get the total number of sub-tasks and completed tasks
-void errands_task_data_get_stats_recursive(TaskData *data, size_t *total, size_t *completed, size_t *trash);
-void errands_task_data_get_flat_list(TaskData *parent, GPtrArray *array);
-void errands_task_data_print(TaskData *data);
-bool errands_task_data_is_due(TaskData *data);
-bool errands_task_data_is_completed(TaskData *data);
+// Create new task and add it to parent or list children.
+ErrandsData *errands_task_data_new(icalcomponent *ical, ErrandsData *parent, ErrandsData *list);
+ErrandsData *errands_task_data_new_from_ical(icalcomponent *ical, ErrandsData *parent, ErrandsData *list);
+ErrandsData *errands_task_data_create_task(ErrandsData *list, ErrandsData *parent, const char *text);
+void errands_task_data_sort_sub_tasks(ErrandsData *data);
+size_t errands_task_data_get_indent_level(ErrandsData *data);
+void errands_task_data_get_flat_list(ErrandsData *parent, GPtrArray *array);
+void errands_task_data_print(ErrandsData *data);
+bool errands_task_data_is_due(ErrandsData *data);
+bool errands_task_data_is_completed(ErrandsData *data);
 // Move task and sub-tasks recursively to another list.
 // Returns the moved task.
-TaskData *errands_task_data_move_to_list(TaskData *data, ListData *list, TaskData *parent);
+ErrandsData *errands_task_data_move_to_list(ErrandsData *data, ErrandsData *list, ErrandsData *parent);
 
-// --- LOAD & SAVE & CLEANUP --- //
+// --- PROPERTIES --- //
 
-void errands_data_init(void);
-void errands_data_write_list(ListData *data);
-void errands_data_cleanup(void);
+// Property type
+typedef enum {
+  // Bool
+  PROP_CANCELLED,
+  PROP_DELETED,
+  PROP_EXPANDED,
+  PROP_NOTIFIED,
+  PROP_PINNED,
+  PROP_SYNCED,
+  // Integer
+  PROP_PERCENT,
+  PROP_PRIORITY,
+  // String
+  PROP_COLOR,
+  PROP_LIST_NAME,
+  PROP_NOTES,
+  PROP_PARENT,
+  PROP_RRULE,
+  PROP_TEXT,
+  PROP_UID,
+  // Strv
+  PROP_ATTACHMENTS,
+  PROP_TAGS,
+  // Time
+  PROP_CHANGED_TIME,
+  PROP_COMPLETED_TIME,
+  PROP_CREATED_TIME,
+  PROP_DUE_TIME,
+  PROP_END_TIME,
+  PROP_START_TIME,
+} ErrandsProp;
+
+// Property return value
+typedef union {
+  bool b;
+  int i;
+  const char *s;
+  GStrv sv;
+  icaltimetype t;
+} ErrandsPropRes;
+
+ErrandsPropRes errands_data_get_prop(const ErrandsData *data, ErrandsProp prop);
+void errands_data_set_prop(ErrandsData *data, ErrandsProp prop, void *value);
+void errands_data_add_tag(ErrandsData *data, const char *tag);
+void errands_data_remove_tag(ErrandsData *data, const char *tag);
+
+void errands_data_free(ErrandsData *data);
+AUTOPTR_DEFINE(ErrandsData, errands_data_free);
 
 // --- SORT AND FILTER FUNCTIONS --- //
 
@@ -80,79 +137,5 @@ gint errands_data_sort_func(gconstpointer a, gconstpointer b);
 
 bool icaltime_is_null_date(const struct icaltimetype t);
 icaltimetype icaltime_merge_date_and_time(const struct icaltimetype date, const struct icaltimetype time);
-icaltimetype icaltime_get_date_time_now();
+icaltimetype icaltime_get_date_time_now(void);
 bool icalrecurrencetype_compare(const struct icalrecurrencetype *a, const struct icalrecurrencetype *b);
-
-// --- PROPERTIES --- //
-
-typedef enum {
-  DATA_PROP_COLOR,
-  DATA_PROP_LIST_NAME,
-  DATA_PROP_LIST_UID,
-  DATA_PROP_NOTES,
-  DATA_PROP_PARENT,
-  DATA_PROP_RRULE,
-  DATA_PROP_TEXT,
-  DATA_PROP_UID,
-} DataPropStr;
-
-const char *errands_data_get_str(icalcomponent *data, DataPropStr prop);
-void errands_data_set_str(icalcomponent *data, DataPropStr prop, const char *value);
-
-typedef enum {
-  DATA_PROP_PERCENT,
-  DATA_PROP_PRIORITY,
-} DataPropInt;
-
-size_t errands_data_get_int(icalcomponent *data, DataPropInt prop);
-void errands_data_set_int(icalcomponent *data, DataPropInt prop, size_t value);
-
-typedef enum {
-  DATA_PROP_CANCELLED,
-  DATA_PROP_DELETED,
-  DATA_PROP_EXPANDED,
-  DATA_PROP_NOTIFIED,
-  DATA_PROP_PINNED,
-  DATA_PROP_SYNCED,
-} DataPropBool;
-
-bool errands_data_get_bool(icalcomponent *data, DataPropBool prop);
-void errands_data_set_bool(icalcomponent *data, DataPropBool prop, bool value);
-
-typedef enum {
-  DATA_PROP_ATTACHMENTS,
-  DATA_PROP_TAGS,
-} DataPropStrv;
-
-GStrv errands_data_get_strv(icalcomponent *data, DataPropStrv prop);
-void errands_data_set_strv(icalcomponent *data, DataPropStrv prop, GStrv value);
-
-typedef enum {
-  DATA_PROP_CHANGED_TIME,
-  DATA_PROP_COMPLETED_TIME,
-  DATA_PROP_CREATED_TIME,
-  DATA_PROP_DUE_TIME,
-  DATA_PROP_END_TIME,
-  DATA_PROP_START_TIME,
-} DataPropTime;
-
-icaltimetype errands_data_get_time(icalcomponent *data, DataPropTime prop);
-void errands_data_set_time(icalcomponent *data, DataPropTime prop, icaltimetype value);
-
-void errands_data_add_tag(icalcomponent *data, DataPropStrv prop, const char *tag);
-void errands_data_remove_tag(icalcomponent *data, DataPropStrv prop, const char *tag);
-
-#define errands_data_set(data, DataProp, value)                                                                        \
-  _Generic((value),                                                                                                    \
-      const char *: errands_data_set_str,                                                                              \
-      void *: errands_data_set_str,                                                                                    \
-      char *: errands_data_set_str,                                                                                    \
-      size_t: errands_data_set_int,                                                                                    \
-      bool: errands_data_set_bool,                                                                                     \
-      int: errands_data_set_bool,                                                                                      \
-      GStrv: errands_data_set_strv,                                                                                    \
-      icaltimetype: errands_data_set_time)(data, DataProp, value)
-
-#define errands_data_set_and_write(data, DataProp, value, ListData)                                                    \
-  errands_data_set(data, DataProp, value);                                                                             \
-  errands_data_write_list(ListData);

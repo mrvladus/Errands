@@ -1,19 +1,24 @@
 #include "sync.h"
 #include "data.h"
 #include "settings.h"
+#include "sidebar.h"
+#include "state.h"
+#include "task-list.h"
 #include "utils.h"
+#include <libical/ical.h>
+#include <stdbool.h>
+#include <unistd.h>
 
 #define CALDAV_IMPLEMENTATION
+// #define CALDAV_DEBUG
 #include "vendor/caldav.h"
+#include "vendor/toolbox.h"
 
-#include <glib.h>
-#include <libical/ical.h>
-
+static bool sync_initialized = false;
 static bool sync_scheduled = false;
 static ListData *list_data = NULL;
 static TaskData *task_data = NULL;
-
-CalDAVClient *client;
+static CalDAVClient *client = NULL;
 
 // void sync_list(ListData *list) {
 //   if (!errands_settings_get("sync", SETTING_TYPE_BOOL).b) {
@@ -28,7 +33,6 @@ CalDAVClient *client;
 //   }
 // }
 
-// This is the asynchronous work function that runs in a separate thread.
 static void initial_sync(GTask *task, gpointer source_object, gpointer task_data, GCancellable *cancellable) {
   LOG("Sync: Initialize");
   // Check if sync is disabled.
@@ -37,87 +41,66 @@ static void initial_sync(GTask *task, gpointer source_object, gpointer task_data
     g_task_return_boolean(task, FALSE);
     return;
   }
-  // Create client
-  client = caldav_client_new("http://localhost:8080", "vlad", "1710");
+  const char *url = errands_settings_get(SETTING_SYNC_URL).s;
+  const char *username = errands_settings_get(SETTING_SYNC_USERNAME).s;
+  const char *password = errands_settings_get_password();
+  if (!url || !username || !password) {
+    LOG("Sync: Missing required CalDAV credentials");
+    g_task_return_boolean(task, FALSE);
+    return;
+  }
+  client = caldav_client_new(url, username, password);
   if (!client) {
     LOG("Sync: Unable to connect to CalDAV server");
     g_task_return_boolean(task, FALSE);
     return;
   }
+  bool res = caldav_client_connect(client, true);
+  if (!res) {
+    LOG("Sync: Unable to connect to CalDAV server");
+    caldav_client_free(client);
+    g_task_return_boolean(task, FALSE);
+    return;
+  }
   // Get calendars
-  bool res = caldav_client_pull_calendars(client, CALDAV_COMPONENT_SET_VTODO);
+  res = caldav_client_pull_calendars(client, CALDAV_COMPONENT_SET_VTODO);
   if (!res || !client->calendars) {
     LOG("Sync: Unable to get calendars");
     caldav_client_free(client);
     g_task_return_boolean(task, FALSE);
     return;
   }
-  LOG("Sync: Loaded %zu calendars", client->calendars->len);
   // Get events
-  for (size_t i = 0; i < client->calendars->len; i++) {
-    CalDAVCalendar *calendar = caldav_list_at(client->calendars, i);
-    bool res = caldav_calendar_pull_events(calendar);
-    // if (res && calendar->events) {
-    //   for (size_t idx = 0; idx < calendar->events->len; idx++) {
-    //     CalDAVEvent *event = caldav_list_at(calendar->events, idx);
-    //     caldav_event_print(event);
-    //   }
-    // }
-  }
-  // Return TRUE if sync was successful
+  for (size_t i = 0; i < client->calendars->len; i++) caldav_calendar_pull_events(caldav_list_at(client->calendars, i));
   g_task_return_boolean(task, TRUE);
 }
 
 // Callback that runs on the main (UI) thread when the task is complete.
 static void initial_sync_finished_cb(GObject *source_object, GAsyncResult *res, gpointer user_data) {
   gboolean success = g_task_propagate_boolean(G_TASK(res), NULL);
-  if (success) {
-    LOG("Sync: Completed successfully");
-    bool changed = false;
-    for (size_t i = 0; i < client->calendars->len; i++) {
-      CalDAVCalendar *calendar = caldav_list_at(client->calendars, i);
-      for (size_t idx = 0; idx < calendar->events->len; idx++) {
-        // Get event
-        CalDAVEvent *event = caldav_list_at(calendar->events, idx);
-        // Get UID and DTSTAMP
-        const char *uid = icalcomponent_get_uid(event->ical);
-        icaltimetype dtstamp = icalcomponent_get_dtstamp(event->ical);
-        // if (g_hash_table_contains(tdata, uid)) {
-        // TaskData *td = task_data_new_from_ical(event->ical);
-        // }
-        // bool found = false;
-        // GPtrArray* tasks = g_hash_table_get_values_as_ptr_array(tdata);
-        // for (size_t j = 0; j < tasks->len; ++j) {
-        //   const char *td_uid = icalcomponent_get_uid((TaskData *)tasks->pdata[j]);
-        //   if (!strcmp(uid, td_uid)) {
-        //     found = true;
-        //     icaltimetype td_dtstamp = icalcomponent_get_dtstamp((TaskData *)tasks->pdata[j]);
-        //     // If remote task changed after local - replace it
-        //     if (icaltime_compare(dtstamp, td_dtstamp) == 1) {}
-        //   }
-        // }
-        // if (!found) {
-        //     const char *td_parent = icalcomponent_get_uid(tdata->pdata);
-        //   errands_task_list_add(event->ical);
-        // }
-      }
+  for (size_t i = 0; i < client->calendars->len; i++) {
+    CalDAVCalendar *calendar = caldav_list_at(client->calendars, i);
+    // TODO: use errands_list_data_new
+    ListData *list = errands_list_data_create(calendar->uuid, calendar->name, calendar->color, false, false);
+    g_ptr_array_add(errands_data_lists, list);
+    ErrandsSidebarTaskListRow *row = errands_sidebar_add_task_list(state.main_window->sidebar, list);
+    for_range(j, 0, calendar->events->len) {
+      CalDAVEvent *event = caldav_list_at(calendar->events, j);
+      icalcomponent *ical = caldav_event_get_ical_event(event);
+      errands_task_data_new(ical, NULL, list);
     }
-  } else {
-    LOG("Sync: Failed or canceled");
+    errands_sidebar_task_list_row_update(row);
   }
-  sync_scheduled = false;
+  errands_data_sort();
+  errands_task_list_reload(state.main_window->task_list, false);
 }
 
-void sync_init(void) {
+void errands_sync_init(void) {
   RUN_THREAD_FUNC(initial_sync, initial_sync_finished_cb);
-  g_timeout_add_seconds(10, G_SOURCE_FUNC(sync), NULL);
+  // g_timeout_add_seconds(10, G_SOURCE_FUNC(sync), NULL);
 }
 
-void sync() {
-  if (!sync_scheduled) return;
-  if (!errands_settings_get(SETTING_SYNC).b) return;
-  LOG("Sync: synchronize");
-}
+void errands_sync_cleanup() { caldav_client_free(client); }
 
 void errands_sync_schedule() { sync_scheduled = true; }
 

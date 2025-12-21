@@ -11,7 +11,6 @@
 #include "window.h"
 
 #include <libical/ical.h>
-#include <unistd.h>
 
 static void on_right_click(GtkPopover *popover, gint n_press, gdouble x, gdouble y, GtkGestureClick *ctrl);
 static void on_color_changed(GtkColorDialogButton *btn, GParamSpec *pspec, ListData *data);
@@ -64,7 +63,7 @@ static void errands_sidebar_task_list_row_init(ErrandsSidebarTaskListRow *self) 
 }
 
 ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_new(ListData *data) {
-  LOG_NO_LN("Task List Row '%s': Create ... ", errands_data_get_str(data->data, DATA_PROP_LIST_UID));
+  LOG_NO_LN("Task List Row '%s': Create ... ", data->uid);
 
   ErrandsSidebarTaskListRow *row = g_object_new(ERRANDS_TYPE_SIDEBAR_TASK_LIST_ROW, NULL);
   row->data = data;
@@ -112,9 +111,8 @@ void on_errands_sidebar_task_list_row_activate(GtkListBox *box, ErrandsSidebarTa
   // Unselect filter rows
   gtk_list_box_unselect_all(GTK_LIST_BOX(state.main_window->sidebar->filters_box));
   // Set setting
-  const char *list_uid = tmp_str_printf(errands_data_get_str(row->data->data, DATA_PROP_LIST_UID));
-  LOG("Switch to list '%s'", list_uid);
-  errands_settings_set(SETTING_LAST_LIST_UID, (void *)list_uid);
+  LOG("Switch to list '%s'", row->data->uid);
+  errands_settings_set(SETTING_LAST_LIST_UID, (void *)row->data->uid);
   errands_task_list_show_task_list(task_list, row->data);
   adw_navigation_split_view_set_show_content(state.main_window->split_view, true);
 }
@@ -157,7 +155,7 @@ static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x,
   return true;
 }
 
-static void on_action_export_finish_cb(GObject *obj, GAsyncResult *res, gpointer data) {
+static void on_action_export_finish_cb(GObject *obj, GAsyncResult *res, ListData *data) {
   g_autoptr(GFile) f = gtk_file_dialog_save_finish(GTK_FILE_DIALOG(obj), res, NULL);
   if (!f) return;
   g_autofree char *path = g_file_get_path(f);
@@ -166,18 +164,19 @@ static void on_action_export_finish_cb(GObject *obj, GAsyncResult *res, gpointer
     errands_window_add_toast(_("Export failed"));
     return;
   }
-  autofree char *ical = icalcomponent_as_ical_string(data);
+  autofree char *ical = icalcomponent_as_ical_string(data->data);
   fprintf(file, "%s", ical);
   fclose(file);
   errands_window_add_toast(_("Exported"));
-  LOG("Export task list %s", errands_data_get_str(data, DATA_PROP_LIST_UID));
+  LOG("Export task list %s", data->uid);
 }
 
 static void on_action_export(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {
   g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
-  const char *filename = tmp_str_printf("%s.ics", errands_data_get_str(row->data->data, DATA_PROP_LIST_UID));
+  const char *filename = tmp_str_printf("%s.ics", row->data->uid);
   g_object_set(dialog, "initial-name", filename, NULL);
-  gtk_file_dialog_save(dialog, GTK_WINDOW(state.main_window), NULL, on_action_export_finish_cb, row->data->data);
+  gtk_file_dialog_save(dialog, GTK_WINDOW(state.main_window), NULL, (GAsyncReadyCallback)on_action_export_finish_cb,
+                       row->data);
 }
 
 // - PRINTING - //
@@ -256,7 +255,7 @@ void start_print(const char *str) {
 }
 
 static void on_action_print(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {
-  LOG("Start printing of the list '%s'", errands_data_get_str(row->data->data, DATA_PROP_LIST_UID));
+  LOG("Start printing of the list '%s'", row->data->uid);
   // g_autofree gchar *str = list_data_print(row->data->data);
   // start_print(str);
 }
