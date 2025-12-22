@@ -1,14 +1,14 @@
 # Copyright 2023-2024 Vlad Krupinskii <mrvladus@yandex.ru>
 # SPDX-License-Identifier: MIT
 
-from copy import deepcopy
 import datetime
 import time
+from copy import deepcopy
 from dataclasses import asdict, dataclass, field
 from typing import Any
 
-import urllib3
 import caldav
+import urllib3
 from caldav import Calendar, DAVClient, Principal, Todo
 from caldav.elements import dav, ical
 
@@ -86,7 +86,6 @@ class SyncProviderCalDAV:
             url=self.url,
             username=self.username,
             password=self.password,
-            ssl_verify_cert=False,
         ) as client:
             try:
                 self.principal: Principal = client.principal()
