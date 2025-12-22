@@ -41,7 +41,7 @@ ErrandsTaskListTagsDialogTag *errands_task_list_tags_dialog_tag_new(ErrandsTaskL
   ErrandsTaskListTagsDialogTag *self = g_object_new(ERRANDS_TYPE_TASK_LIST_TAGS_DIALOG_TAG, NULL);
   self->dialog = dialog;
   adw_preferences_row_set_title(ADW_PREFERENCES_ROW(self), tag);
-  g_auto(GStrv) tags = errands_data_get_strv(task->data->data, DATA_PROP_TAGS);
+  g_auto(GStrv) tags = errands_data_get_prop(task->data, PROP_TAGS).sv;
   const bool has_tag = tags && g_strv_contains((const gchar *const *)tags, tag);
   gtk_check_button_set_active(GTK_CHECK_BUTTON(self->check_btn), has_tag);
   g_signal_connect_swapped(self->check_btn, "toggled", G_CALLBACK(on_toggle_cb), self);
@@ -54,9 +54,8 @@ static void on_toggle_cb(ErrandsTaskListTagsDialogTag *self, GtkCheckButton *btn
   const char *tag = adw_preferences_row_get_title(ADW_PREFERENCES_ROW(self));
   ErrandsTask *task = errands_task_list_tags_dialog_get_task(
       ERRANDS_TASK_LIST_TAGS_DIALOG(gtk_widget_get_ancestor(GTK_WIDGET(self), ERRANDS_TYPE_TASK_LIST_TAGS_DIALOG)));
-  gtk_check_button_get_active(btn) ? errands_data_add_tag(task->data->data, DATA_PROP_TAGS, tag)
-                                   : errands_data_remove_tag(task->data->data, DATA_PROP_TAGS, tag);
-  errands_data_write_list(task->data->list);
+  gtk_check_button_get_active(btn) ? errands_data_add_tag(task->data, tag) : errands_data_remove_tag(task->data, tag);
+  errands_list_data_save(task->data->as.task.list);
 }
 
 static void on_delete_cb(ErrandsTaskListTagsDialogTag *self, GtkButton *btn) {
@@ -64,12 +63,13 @@ static void on_delete_cb(ErrandsTaskListTagsDialogTag *self, GtkButton *btn) {
   const char *tag = adw_preferences_row_get_title(ADW_PREFERENCES_ROW(self));
   LOG("Tags Dialog: Deleting tag: %s", tag);
   errands_settings_remove_tag(tag);
+  ErrandsData data = {0};
   for_range(i, 0, errands_data_lists->len) {
-    ListData *list = g_ptr_array_index(errands_data_lists, i);
+    ErrandsData *list = g_ptr_array_index(errands_data_lists, i);
     g_autoptr(GPtrArray) tasks = errands_list_data_get_all_tasks_as_icalcomponents(list);
     for_range(j, 0, tasks->len) {
-      icalcomponent *task = g_ptr_array_index(tasks, j);
-      errands_data_remove_tag(task, DATA_PROP_TAGS, tag);
+      data.ical = g_ptr_array_index(tasks, j);
+      errands_data_remove_tag(&data, tag);
     }
   }
   // Delete tag widget row

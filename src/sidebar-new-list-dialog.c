@@ -57,15 +57,15 @@ void errands_sidebar_new_list_dialog_show() {
 
 static void on_response_cb(ErrandsSidebarNewListDialog *self, gchar *response, gpointer data) {
   if (STR_EQUAL(response, "create")) {
-    ListData *list =
+    ErrandsData *list =
         errands_list_data_create(NULL, gtk_editable_get_text(GTK_EDITABLE(self->entry)), NULL, false, false);
     g_ptr_array_add(errands_data_lists, list);
     ErrandsSidebarTaskListRow *row = errands_sidebar_add_task_list(state.main_window->sidebar, list);
     g_signal_emit_by_name(row, "activate", NULL);
     errands_window_update();
-    errands_data_write_list(list);
+    errands_list_data_save(list);
     errands_sync_schedule();
-    LOG("SidebarNewListDialog: Create new list: '%s'", errands_data_get_str(list->data, DATA_PROP_LIST_UID));
+    LOG("SidebarNewListDialog: Create new list: '%s'", errands_data_get_prop(list->data, PROP_LIST_UID));
   }
 }
 

@@ -51,11 +51,11 @@ void errands_sidebar_delete_list_dialog_show(ErrandsSidebarTaskListRow *row) {
 static void on_response_cb(ErrandsSidebarDeleteListDialog *dialog, gchar *response, gpointer data) {
   if (STR_EQUAL(response, "delete")) {
     ErrandsSidebarTaskListRow *row = state.main_window->sidebar->delete_list_dialog->current_task_list_row;
-    LOG("Delete List Dialog: Deleting task list %s", errands_data_get_str(row->data->data, DATA_PROP_LIST_UID));
+    LOG("Delete List Dialog: Deleting task list %s", errands_data_get_prop(row->data, PROP_LIST_UID));
     // Delete data
-    errands_data_set_bool(row->data->data, DATA_PROP_DELETED, true);
-    errands_data_set_bool(row->data->data, DATA_PROP_SYNCED, false);
-    errands_data_write_list(row->data);
+    errands_data_set_prop(row->data, PROP_DELETED, true);
+    errands_data_set_prop(row->data, PROP_SYNCED, false);
+    errands_list_data_save(row->data);
     errands_sync_schedule_list(row->data);
     GtkWidget *prev = gtk_widget_get_prev_sibling(GTK_WIDGET(row));
     GtkWidget *next = gtk_widget_get_next_sibling(GTK_WIDGET(row));

@@ -84,34 +84,34 @@ ErrandsTaskList *errands_task_list_new() { return g_object_new(ERRANDS_TYPE_TASK
 
 // ---------- PRIVATE FUNCTIONS ---------- //
 
-static bool __task_has_any_collapsed_parent(TaskData *data) {
-  for (TaskData *task = data->parent; task; task = task->parent)
-    if (!errands_data_get_bool(task->data, DATA_PROP_EXPANDED)) return true;
+static bool __task_has_any_collapsed_parent(ErrandsData *data) {
+  for (ErrandsData *task = data->parent; task; task = task->parent)
+    if (!errands_data_get_prop(task->data, PROP_EXPANDED)) return true;
   return false;
 }
 
-static bool __task_has_any_pinned_parent(TaskData *data) {
-  for (TaskData *task = data->parent; task; task = task->parent)
-    if (errands_data_get_bool(task->data, DATA_PROP_PINNED)) return true;
+static bool __task_has_any_pinned_parent(ErrandsData *data) {
+  for (ErrandsData *task = data->parent; task; task = task->parent)
+    if (errands_data_get_prop(task->data, PROP_PINNED)) return true;
   return false;
 }
 
-static bool __task_has_any_due_parent(TaskData *data) {
-  for (TaskData *task = data->parent; task; task = task->parent)
+static bool __task_has_any_due_parent(ErrandsData *data) {
+  for (ErrandsData *task = data->parent; task; task = task->parent)
     if (errands_task_data_is_due(task)) return true;
   return false;
 }
 
-static bool __task_match_search_query(TaskData *data) {
-  if (STR_CONTAINS_CASE(errands_data_get_str(data->data, DATA_PROP_TEXT), search_query)) return true;
-  if (STR_CONTAINS_CASE(errands_data_get_str(data->data, DATA_PROP_NOTES), search_query)) return true;
-  g_auto(GStrv) tags = errands_data_get_strv(data->data, DATA_PROP_TAGS);
+static bool __task_match_search_query(ErrandsData *data) {
+  if (STR_CONTAINS_CASE(errands_data_get_prop(data, PROP_TEXT), search_query)) return true;
+  if (STR_CONTAINS_CASE(errands_data_get_prop(data, PROP_NOTES), search_query)) return true;
+  g_auto(GStrv) tags = errands_data_get_strv(data, PROP_TAGS);
   if (tags && g_strv_contains((const gchar *const *)tags, search_query)) return true;
   return false;
 }
 
-static bool __task_has_any_search_matched_parent(TaskData *data) {
-  for (TaskData *task = data->parent; task; task = task->parent)
+static bool __task_has_any_search_matched_parent(ErrandsData *data) {
+  for (ErrandsData *task = data->parent; task; task = task->parent)
     if (__task_match_search_query(task)) return true;
   return false;
 }
@@ -120,7 +120,7 @@ static int __calculate_height(ErrandsTaskList *self) {
   int height = 0;
   GtkRequisition min_size, nat_size;
   for_range(i, 0, current_task_list->len) {
-    TaskData *data = g_ptr_array_index(current_task_list, i);
+    ErrandsData *data = g_ptr_array_index(current_task_list, i);
     CONTINUE_IF(__task_has_any_collapsed_parent(data));
     CONTINUE_IF(self->page == ERRANDS_TASK_LIST_PAGE_PINNED && !__task_has_any_pinned_parent(data))
     CONTINUE_IF(self->page == ERRANDS_TASK_LIST_PAGE_TODAY && !__task_has_any_due_parent(data))
@@ -142,7 +142,7 @@ void errands_task_list_redraw_tasks(ErrandsTaskList *self) {
   size_t indent_offset = 0;
   for (size_t i = 0, j = current_start; i < MIN(tasks_stack_size, current_task_list->len - current_start); ++i, ++j) {
     ErrandsTask *task = g_ptr_array_index(children, i);
-    TaskData *data = g_ptr_array_index(current_task_list, j);
+    ErrandsData *data = g_ptr_array_index(current_task_list, j);
     size_t indent = errands_task_data_get_indent_level(data);
     bool show = true;
     bool match_search = true;
@@ -160,7 +160,7 @@ void errands_task_list_redraw_tasks(ErrandsTaskList *self) {
       }
     } else if (self->page == ERRANDS_TASK_LIST_PAGE_PINNED) {
       if (!__task_has_any_pinned_parent(data)) {
-        match_page = errands_data_get_bool(data->data, DATA_PROP_PINNED);
+        match_page = errands_data_get_prop(data, PROP_PINNED);
         if (match_page) indent_offset = -indent;
       }
     }
@@ -247,14 +247,14 @@ void errands_task_list_update_title(ErrandsTaskList *self) {
     size_t total = 0, completed = 0;
     icaltimetype today = icaltime_today();
     for_range(i, 0, errands_data_lists->len) {
-      ListData *list = g_ptr_array_index(errands_data_lists, i);
+      ErrandsData *list = g_ptr_array_index(errands_data_lists, i);
       g_autoptr(GPtrArray) tasks = errands_list_data_get_all_tasks_as_icalcomponents(list);
       for_range(j, 0, tasks->len) {
         icalcomponent *data = g_ptr_array_index(tasks, j);
-        bool deleted = errands_data_get_bool(data, DATA_PROP_DELETED);
-        icaltimetype due_date = errands_data_get_time(data, DATA_PROP_DUE_TIME);
+        bool deleted = errands_data_get_prop(data, PROP_DELETED);
+        icaltimetype due_date = errands_data_get_prop(data, PROP_DUE_TIME);
         if (!deleted && !icaltime_is_null_time(due_date) && icaltime_compare_date_only(due_date, today) < 1) {
-          if (!icaltime_is_null_time(errands_data_get_time(data, DATA_PROP_COMPLETED_TIME))) completed++;
+          if (!icaltime_is_null_time(errands_data_get_prop(data, PROP_COMPLETED_TIME))) completed++;
           total++;
         }
       }
@@ -269,23 +269,22 @@ void errands_task_list_update_title(ErrandsTaskList *self) {
     adw_window_title_set_subtitle(ADW_WINDOW_TITLE(self->title), "");
     size_t pinned = 0;
     for_range(i, 0, current_task_list->len) {
-      TaskData *data = g_ptr_array_index(current_task_list, i);
-      if (errands_data_get_bool(data->data, DATA_PROP_PINNED)) pinned++;
+      ErrandsData *data = g_ptr_array_index(current_task_list, i);
+      if (errands_data_get_prop(data, PROP_PINNED)) pinned++;
     }
     gtk_widget_set_visible(self->scrl, pinned > 0);
     return;
   } break;
   case ERRANDS_TASK_LIST_PAGE_TASK_LIST:
-    adw_window_title_set_title(ADW_WINDOW_TITLE(self->title),
-                               errands_data_get_str(self->data->data, DATA_PROP_LIST_NAME));
+    adw_window_title_set_title(ADW_WINDOW_TITLE(self->title), errands_data_get_prop(self->data, PROP_LIST_NAME));
     break;
   }
   // Retrieve tasks and count completed and total tasks
   size_t total = 0, completed = 0;
   for_range(i, 0, current_task_list->len) {
-    TaskData *data = g_ptr_array_index(current_task_list, i);
-    CONTINUE_IF(errands_data_get_bool(data->data, DATA_PROP_DELETED));
-    if (!icaltime_is_null_date(errands_data_get_time(data->data, DATA_PROP_COMPLETED_TIME))) completed++;
+    ErrandsData *data = g_ptr_array_index(current_task_list, i);
+    CONTINUE_IF(errands_data_get_prop(data, PROP_DELETED));
+    if (!icaltime_is_null_date(errands_data_get_prop(data, PROP_COMPLETED_TIME))) completed++;
     total++;
   }
   // Set subtitle with completed stats
@@ -310,7 +309,7 @@ void errands_task_list_show_all_tasks(ErrandsTaskList *self) {
   errands_task_list_reload(self, false);
 }
 
-void errands_task_list_show_task_list(ErrandsTaskList *self, ListData *data) {
+void errands_task_list_show_task_list(ErrandsTaskList *self, ErrandsData *data) {
   self->data = data;
   self->page = ERRANDS_TASK_LIST_PAGE_TASK_LIST;
   if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(self->search_btn)))
@@ -346,17 +345,17 @@ void errands_task_list_reload(ErrandsTaskList *self, bool save_scroll_pos) {
 
 static void on_task_list_entry_activated_cb(AdwEntryRow *entry, ErrandsTaskList *self) {
   const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
-  const char *list_uid = errands_data_get_str(self->data->data, DATA_PROP_LIST_UID);
+  const char *list_uid = errands_data_get_prop(self->data, PROP_LIST_UID);
   if (STR_EQUAL(text, "") || STR_EQUAL(list_uid, "")) return;
-  TaskData *data = errands_task_data_create_task(self->data, NULL, text);
+  ErrandsData *data = errands_task_data_create_task(self->data, NULL, text);
   g_ptr_array_add(self->data->children, data);
   errands_list_data_sort(self->data);
-  errands_data_write_list(self->data);
+  errands_list_data_save(self->data);
   gtk_editable_set_text(GTK_EDITABLE(entry), "");
   errands_sidebar_task_list_row_update(errands_sidebar_task_list_row_get(data->list));
   errands_sidebar_update_filter_rows(state.main_window->sidebar);
-  LOG("Add task '%s' to task list '%s'", errands_data_get_str(data->data, DATA_PROP_UID),
-      errands_data_get_str(data->data, DATA_PROP_LIST_UID));
+  LOG("Add task '%s' to task list '%s'", errands_data_get_prop(data, PROP_UID),
+      errands_data_get_prop(data, PROP_LIST_UID));
   errands_task_list_reload(self, false);
 }
 

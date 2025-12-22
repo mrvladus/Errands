@@ -475,8 +475,8 @@ ErrandsData *errands_task_data_move_to_list(ErrandsData *data, ErrandsData *list
 
 // ---------- PRINTING ---------- //
 
-// gchar *list_data_print(ListData *data) {
-//   const char *name = errands_data_get_str(data, PROP_LIST_NAME);
+// gchar *list_data_print(ErrandsData *data) {
+//   const char *name = errands_data_get_prop(data, PROP_LIST_NAME);
 //   size_t len = strlen(name);
 //   g_autofree gchar *list_name = g_strndup(name, len > 72 ? 72 : len);
 //   // Print list name
@@ -494,7 +494,7 @@ ErrandsData *errands_task_data_move_to_list(ErrandsData *data, ErrandsData *list
 //   for (size_t i = 0; i < indent; i++) g_string_append(out, "  ");
 //   g_string_append_printf(out, "[%s] ",
 //                          !icaltime_is_null_time(errands_data_get_prop(data, PROP_COMPLETED_TIME)) ? "x" : " ");
-//   const char *text = errands_data_get_str(data, PROP_TEXT);
+//   const char *text = errands_data_get_prop(data, PROP_TEXT);
 //   size_t count = 0;
 //   char c = text[0];
 //   while (c != '\0') {
@@ -523,7 +523,7 @@ static void errands__list_data_save_cb(ErrandsData *data) {
 }
 
 void errands_list_data_save(ErrandsData *data) {
-  if (!data || data->type != ERRANDS_DATA_TYPE_LIST) return;
+  if (!data || data->type != ERRANDS_DATA_TYPE_LIST) UNREACHABLE;
   g_idle_add_once((GSourceOnceFunc)errands__list_data_save_cb, data);
 }
 
@@ -634,7 +634,7 @@ void errands_data_set_prop(ErrandsData *data, ErrandsProp prop, void *value) {
   icalcomponent *ical = data->ical;
 
   bool bool_value = *(bool *)value;
-  int int_value = *(int *)value;
+  long int_value = VOIDP_TO_I32(value);
   const char *str_value = value;
   icaltimetype time_value = *(icaltimetype *)value;
   GStrv strv_value = (GStrv)value;

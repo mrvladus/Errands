@@ -171,7 +171,7 @@ struct _ErrandsTaskList {
   GtkEventControllerMotion *motion_ctrl;
   gdouble x, y;
 
-  ListData *data;
+  ErrandsData *data;
   ErrandsTaskListPage page;
 };
 
@@ -179,7 +179,7 @@ ErrandsTaskList *errands_task_list_new();
 void errands_task_list_update_title(ErrandsTaskList *self);
 void errands_task_list_show_all_tasks(ErrandsTaskList *self);
 void errands_task_list_show_today_tasks(ErrandsTaskList *self);
-void errands_task_list_show_task_list(ErrandsTaskList *self, ListData *data);
+void errands_task_list_show_task_list(ErrandsTaskList *self, ErrandsData *data);
 void errands_task_list_show_pinned(ErrandsTaskList *self);
 void errands_task_list_redraw_tasks(ErrandsTaskList *self);
 void errands_task_list_reload(ErrandsTaskList *self, bool save_scroll_pos);

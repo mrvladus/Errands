@@ -141,8 +141,14 @@ extern const char *toolbox_log_prefix;
 
 // -------------------- TYPE CONVERSION -------------------- //
 
-#define BOOL_TO_STR(val)     val ? "true" : "false"
-#define BOOL_TO_STR_NUM(val) val ? "1" : "0"
+#define BOOL_TO_STR(val)     (val) ? "true" : "false"
+#define BOOL_TO_STR_NUM(val) (val) ? "1" : "0"
+#define STR_TO_BOOL(str)     (!strcmp((const char *)(str), "1") || !strcmp((const char *)(str), "true"))
+#define STR_TO_UL(str)       strtoul(str, NULL, 10)
+#define I32_TO_VOIDP(val)    ((void *)(long)(val))
+#define U32_TO_VOIDP(val)    ((void *)(unsigned long)(val))
+#define VOIDP_TO_I32(ptr)    ((int)(long)(ptr))
+#define VOIDP_TO_U32(ptr)    ((unsigned int)(unsigned long)(ptr))
 
 // -------------------- STRINGS -------------------- //
 
@@ -164,8 +170,6 @@ extern const char *toolbox_log_prefix;
 
 // Check if string contains substring (case-insensitive).
 #define STR_CONTAINS_CASE(s1, s2) ((s1 && s2) ? strcasestr((const char *)(s1), (const char *)(s2)) != NULL : false)
-
-#define STR_TO_UL(str) strtoul(str, NULL, 10)
 
 static inline const char *generate_uuid4() {
   static thread_local char uuid[37];

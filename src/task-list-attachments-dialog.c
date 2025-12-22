@@ -53,7 +53,7 @@ ErrandsTask *errands_task_list_attachments_dialog_get_task(ErrandsTaskListAttach
 }
 
 void errands_task_list_attachments_dialog_update_ui(ErrandsTaskListAttachmentsDialog *self) {
-  g_auto(GStrv) attachments = errands_data_get_strv(self->current_task->data->data, DATA_PROP_ATTACHMENTS);
+  g_auto(GStrv) attachments = errands_data_get_strv(self->current_task->data, PROP_ATTACHMENTS);
   gtk_widget_set_visible(self->placeholder, (attachments ? g_strv_length(attachments) : 0) == 0);
 }
 
@@ -64,7 +64,7 @@ void errands_task_list_attachments_dialog_show(ErrandsTask *task) {
   self->current_task = task;
   // Remove rows
   gtk_list_box_remove_all(GTK_LIST_BOX(self->attachments_box));
-  g_auto(GStrv) attachments = errands_data_get_strv(task->data->data, DATA_PROP_ATTACHMENTS);
+  g_auto(GStrv) attachments = errands_data_get_strv(task->data, PROP_ATTACHMENTS);
   // Add rows
   if (attachments)
     for (size_t i = 0; i < g_strv_length(attachments); i++) {
@@ -80,7 +80,7 @@ void errands_task_list_attachments_dialog_show(ErrandsTask *task) {
 static void errands_task_list_attachments_dialog_add_attachment(ErrandsTaskListAttachmentsDialog *self,
                                                                 const char *path) {
   // Get current attachments
-  g_auto(GStrv) cur_attachments = errands_data_get_strv(self->current_task->data->data, DATA_PROP_ATTACHMENTS);
+  g_auto(GStrv) cur_attachments = errands_data_get_strv(self->current_task->data, PROP_ATTACHMENTS);
   // If already contains - return
   if (cur_attachments && g_strv_contains((const gchar *const *)cur_attachments, path)) return;
   // Add attachment
@@ -88,10 +88,10 @@ static void errands_task_list_attachments_dialog_add_attachment(ErrandsTaskListA
   if (cur_attachments) g_strv_builder_addv(builder, (const char **)cur_attachments);
   g_strv_builder_add(builder, path);
   g_auto(GStrv) attachments = g_strv_builder_end(builder);
-  errands_data_set_strv(self->current_task->data->data, DATA_PROP_ATTACHMENTS, attachments);
+  errands_data_set_strv(self->current_task->data, PROP_ATTACHMENTS, attachments);
   ErrandsTaskListAttachmentsDialogAttachment *attachment = errands_task_list_attachments_dialog_attachment_new(path);
   gtk_list_box_append(GTK_LIST_BOX(self->attachments_box), GTK_WIDGET(attachment));
-  errands_data_write_list(self->current_task->data->list);
+  errands_list_data_save(self->current_task->data->list);
   errands_task_list_attachments_dialog_update_ui(self);
 }
 

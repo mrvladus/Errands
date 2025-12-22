@@ -16,17 +16,17 @@
 
 static bool sync_initialized = false;
 static bool sync_scheduled = false;
-static ListData *list_data = NULL;
-static TaskData *task_data = NULL;
+static ErrandsData *list_data = NULL;
+static ErrandsData *task_data = NULL;
 static CalDAVClient *client = NULL;
 
-// void sync_list(ListData *list) {
+// void sync_list(ErrandsData *list) {
 //   if (!errands_settings_get("sync", SETTING_TYPE_BOOL).b) {
 //     LOG("Sync: Sync is disabled");
 //     return;
 //   }
 // }
-// void sync_task(TaskData *task) {
+// void sync_task(ErrandsData *task) {
 //   if (!errands_settings_get("sync", SETTING_TYPE_BOOL).b) {
 //     LOG("Sync: Sync is disabled");
 //     return;
@@ -81,7 +81,7 @@ static void initial_sync_finished_cb(GObject *source_object, GAsyncResult *res, 
   for (size_t i = 0; i < client->calendars->len; i++) {
     CalDAVCalendar *calendar = caldav_list_at(client->calendars, i);
     // TODO: use errands_list_data_new
-    ListData *list = errands_list_data_create(calendar->uuid, calendar->name, calendar->color, false, false);
+    ErrandsData *list = errands_list_data_create(calendar->uuid, calendar->name, calendar->color, false, false);
     g_ptr_array_add(errands_data_lists, list);
     ErrandsSidebarTaskListRow *row = errands_sidebar_add_task_list(state.main_window->sidebar, list);
     for_range(j, 0, calendar->events->len) {
@@ -104,12 +104,12 @@ void errands_sync_cleanup() { caldav_client_free(client); }
 
 void errands_sync_schedule() { sync_scheduled = true; }
 
-void errands_sync_schedule_list(ListData *data) {
+void errands_sync_schedule_list(ErrandsData *data) {
   sync_scheduled = true;
   list_data = data;
 }
 
-void errands_sync_schedule_task(TaskData *data) {
+void errands_sync_schedule_task(ErrandsData *data) {
   sync_scheduled = true;
   task_data = data;
 }
