@@ -57,6 +57,12 @@
   </requires>
 
   <releases>
+  <release version="46.2.10" date="2025-12-22">
+   <description translate="no">
+     <p>Enable SSL certificate verification</p>
+     <p>Update translations</p>
+   </description>
+ </release>
   <release version="46.2.9" date="2025-10-11">
    <description translate="no">
      <p>Update runtime to version 49</p>
