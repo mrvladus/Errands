@@ -3,6 +3,7 @@
 #include "sync.h"
 #include "task-list.h"
 #include "task.h"
+#include "vendor/toolbox.h"
 
 #include <glib/gi18n.h>
 
@@ -71,8 +72,8 @@ void errands_task_menu_show(ErrandsTask *task) {
 
 static void on_delete_clicked_cb(ErrandsTaskMenu *self) {
   gtk_popover_popdown(GTK_POPOVER(self));
-  errands_data_set_prop(self->task->data, PROP_DELETED, true);
-  errands_data_set_prop(self->task->data, PROP_SYNCED, false);
+  errands_data_set_prop(self->task->data, PROP_DELETED, I32_TO_VOIDP(true));
+  errands_data_set_prop(self->task->data, PROP_SYNCED, I32_TO_VOIDP(false));
   errands_list_data_save(self->task->data->as.task.list);
   errands_task_list_reload(state.main_window->task_list, true);
   errands_window_add_toast(_("Task is Deleted"));
@@ -121,12 +122,12 @@ static void on_export_clicked_cb(ErrandsTaskMenu *self) {
 
 static void on_cancel_clicked_cb(ErrandsTaskMenu *self) {
   gtk_popover_popdown(GTK_POPOVER(self));
-  errands_data_set_prop(self->task->data, PROP_CANCELLED, true);
+  errands_data_set_prop(self->task->data, PROP_CANCELLED, I32_TO_VOIDP(true));
   g_autoptr(GPtrArray) sub_tasks = g_ptr_array_new();
   errands_task_data_get_flat_list(self->task->data, sub_tasks);
   for_range(i, 0, sub_tasks->len) {
     ErrandsData *sub_task = g_ptr_array_index(sub_tasks, i);
-    errands_data_set_prop(sub_task, PROP_CANCELLED, true);
+    errands_data_set_prop(sub_task, PROP_CANCELLED, I32_TO_VOIDP(true));
   }
   errands_list_data_save(self->task->data->as.task.list);
   errands_task_list_reload(state.main_window->task_list, true);

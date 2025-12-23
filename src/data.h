@@ -24,9 +24,7 @@ struct ErrandsData {
   union {
     // Properties for list data
     struct {
-      char *uid;   // List UID
-      char *name;  // List display name
-      char *color; // List HEX color
+      char *uid; // List UID
     } list;
     // Properties for task data
     struct {
@@ -49,10 +47,9 @@ void errands_data_sort(void);
 
 // --- LIST DATA --- //
 
-ErrandsData *errands_list_data_new(icalcomponent *ical, const char *uid, const char *name, const char *color);
+ErrandsData *errands_list_data_new(icalcomponent *ical, const char *uid);
 // Load ErrandsData from iCal component
-ErrandsData *errands_list_data_load_from_ical(icalcomponent *ical, const char *uid, const char *name,
-                                              const char *color);
+ErrandsData *errands_list_data_load_from_ical(icalcomponent *ical, const char *uid);
 ErrandsData *errands_list_data_create(const char *uid, const char *name, const char *color, bool deleted, bool synced);
 void errands_list_data_sort(ErrandsData *data);
 // Get all tasks as flat list
@@ -66,7 +63,6 @@ void errands_list_data_save(ErrandsData *data);
 
 // Create new task and add it to parent or list children.
 ErrandsData *errands_task_data_new(icalcomponent *ical, ErrandsData *parent, ErrandsData *list);
-ErrandsData *errands_task_data_new_from_ical(icalcomponent *ical, ErrandsData *parent, ErrandsData *list);
 ErrandsData *errands_task_data_create_task(ErrandsData *list, ErrandsData *parent, const char *text);
 void errands_task_data_sort_sub_tasks(ErrandsData *data);
 size_t errands_task_data_get_indent_level(ErrandsData *data);

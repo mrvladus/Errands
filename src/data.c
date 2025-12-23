@@ -225,7 +225,7 @@ void errands_data_init() {
       }
     }
     // TODO: pass filename as uid
-    g_ptr_array_add(errands_data_lists, errands_list_data_load_from_ical(cal, NULL, NULL, NULL));
+    g_ptr_array_add(errands_data_lists, errands_list_data_load_from_ical(cal, NULL));
     LOG("User Data: Loaded calendar %s", path);
   }
 
@@ -238,7 +238,7 @@ void errands_data_init() {
     for (icalcomponent *c = icalcomponent_get_first_component(list_data->ical, ICAL_VTODO_COMPONENT); c != 0;
          c = icalcomponent_get_next_component(list_data->ical, ICAL_VTODO_COMPONENT)) {
       if (errands_data_get_prop(&ERRANDS_DATA_ICAL_WRAPPER(c), PROP_DELETED).b) continue;
-      ErrandsData *task_data = errands_task_data_new_from_ical(c, NULL, list_data);
+      ErrandsData *task_data = errands_task_data_new(c, NULL, list_data);
       g_ptr_array_add(all_tasks, task_data);
     }
     g_ptr_array_sort_values(list_data->children, errands_data_sort_func);
@@ -280,31 +280,24 @@ void errands_data_sort() {
 
 // ---------- LIST DATA ---------- //
 
-ErrandsData *errands_list_data_new(icalcomponent *ical, const char *uid, const char *name, const char *color) {
+ErrandsData *errands_list_data_new(icalcomponent *ical, const char *uid) {
   ErrandsData *data = calloc(1, sizeof(ErrandsData));
   data->type = ERRANDS_DATA_TYPE_TASK;
   data->ical = ical;
+  data->children = g_ptr_array_new_with_free_func((GDestroyNotify)errands_data_free);
   data->as.list.uid = strdup(uid);
-  data->as.list.name = strdup(name);
-  data->as.list.color = strdup(color);
 
   return data;
 }
 
-ErrandsData *errands_list_data_load_from_ical(icalcomponent *ical, const char *uid, const char *name,
-                                              const char *color) {
+ErrandsData *errands_list_data_load_from_ical(icalcomponent *ical, const char *uid) {
   if (ical && icalcomponent_isa(ical) != ICAL_VCALENDAR_COMPONENT) return NULL;
-  const char *_uid = NULL;
-  const char *_name = NULL;
-  const char *_color = NULL;
-  if (ical && icalcomponent_isa(ical) == ICAL_VCALENDAR_COMPONENT) {
-    _uid = icalcomponent_get_uid(ical);
-    if (!_uid) _uid = generate_uuid4();
-    _name = get_x_prop_value(ical, "X-ERRANDS-LIST-NAME", _uid);
-    _color = get_x_prop_value(ical, "X-ERRANDS-COLOR", generate_hex_as_str());
-  };
+  const char *_uid = uid;
+  if (!_uid) _uid = generate_uuid4();
+  const char *_name = get_x_prop_value(ical, "X-ERRANDS-LIST-NAME", _uid);
+  const char *_color = get_x_prop_value(ical, "X-ERRANDS-COLOR", generate_hex_as_str());
 
-  ErrandsData *list_data = errands_list_data_new(ical, _uid, _name, _color);
+  ErrandsData *list_data = errands_list_data_new(ical, _uid);
 
   // Collect all tasks and add toplevel tasks to lists
   g_autoptr(GPtrArray) all_tasks = g_ptr_array_new();
@@ -333,7 +326,9 @@ ErrandsData *errands_list_data_create(const char *uid, const char *name, const c
   icalcomponent_add_property(ical, icalproperty_new_prodid("~//Errands"));
   set_x_prop_value(ical, "X-ERRANDS-DELETED", BOOL_TO_STR_NUM(deleted));
   set_x_prop_value(ical, "X-ERRANDS-SYNCED", BOOL_TO_STR_NUM(synced));
-  ErrandsData *list_data = errands_list_data_new(ical, uid, name, color);
+  set_x_prop_value(ical, "X-ERRANDS-LIST-NAME", name);
+  set_x_prop_value(ical, "X-ERRANDS-COLOR", color);
+  ErrandsData *list_data = errands_list_data_new(ical, uid);
 
   return list_data;
 }
@@ -532,8 +527,6 @@ void errands_data_free(ErrandsData *data) {
   if (data->type == ERRANDS_DATA_TYPE_LIST) {
     if (data->ical) icalcomponent_free(data->ical);
     if (data->as.list.uid) free(data->as.list.uid);
-    if (data->as.list.color) free(data->as.list.color);
-    if (data->as.list.name) free(data->as.list.name);
   }
   if (data->children) g_ptr_array_free(data->children, true);
   free(data);

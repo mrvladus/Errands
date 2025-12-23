@@ -29,9 +29,9 @@ static bool notify_cb() {
     ErrandsData *data = g_ptr_array_index(queue, i);
     if (errands_task_data_is_due(data)) {
       g_ptr_array_remove_index(queue, i);
-      errands_data_set_prop(data, PROP_NOTIFIED, true);
-      if (!g_ptr_array_find(save_lists, data->list, NULL)) g_ptr_array_add(save_lists, data->list);
-      send_due(errands_data_get_prop(data, PROP_TEXT));
+      errands_data_set_prop(data, PROP_NOTIFIED, I32_TO_VOIDP(true));
+      if (!g_ptr_array_find(save_lists, data->as.task.list, NULL)) g_ptr_array_add(save_lists, data->as.task.list);
+      send_due(errands_data_get_prop(data, PROP_TEXT).s);
       sended++;
     }
   }
@@ -55,8 +55,8 @@ void errands_notifications_init(void) {
   errands_data_get_flat_list(tasks);
   for_range(i, 0, tasks->len) {
     ErrandsData *data = g_ptr_array_index(tasks, i);
-    bool has_due_date = !icaltime_is_null_time(errands_data_get_prop(data, PROP_DUE_TIME));
-    if (has_due_date && !errands_data_get_prop(data, PROP_NOTIFIED)) errands_notifications_add(data);
+    bool has_due_date = !icaltime_is_null_time(errands_data_get_prop(data, PROP_DUE_TIME).t);
+    if (has_due_date && !errands_data_get_prop(data, PROP_NOTIFIED).b) errands_notifications_add(data);
   }
   initialized = true;
   LOG("Notifications: Added %d tasks to the notifications queue (%f sec.)", queue->len, TIMER_ELAPSED_MS);
@@ -81,7 +81,7 @@ void errands_notifications_stop(void) {
 void errands_notifications_add(ErrandsData *data) {
   if (!data || g_ptr_array_find(queue, data, NULL)) return;
   g_ptr_array_add(queue, data);
-  LOG("Notifications: Added task '%s' to the notifications queue", errands_data_get_prop(data, PROP_UID));
+  LOG("Notifications: Added task '%s' to the notifications queue", errands_data_get_prop(data, PROP_UID).s);
 }
 
 // Cleanup notifications system

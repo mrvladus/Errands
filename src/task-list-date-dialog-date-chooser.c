@@ -1,4 +1,5 @@
 #include "data.h"
+#include "gtk/gtk.h"
 #include "task-list.h"
 #include "vendor/toolbox.h"
 
@@ -79,7 +80,7 @@ void errands_task_list_date_dialog_date_chooser_set_date(ErrandsTaskListDateDial
 
 void errands_task_list_date_dialog_date_chooser_reset(ErrandsTaskListDateDialogDateChooser *self) {
   g_autoptr(GDateTime) today = g_date_time_new_now_local();
-  gtk_calendar_select_day(self->calendar, today);
+  gtk_calendar_set_date(self->calendar, today);
   g_object_set(self, "subtitle", _("Not Set"), NULL);
   g_object_set(self->reset_btn, "visible", false, NULL);
   self->is_reset = true;
@@ -90,8 +91,8 @@ void errands_task_list_date_dialog_date_chooser_reset(ErrandsTaskListDateDialogD
 static void on_today_selected(ErrandsTaskListDateDialogDateChooser *self) {
   g_autoptr(GDateTime) today = g_date_time_new_now_local();
   g_autoptr(GDateTime) tomorrow = g_date_time_add_days(today, 1);
-  gtk_calendar_select_day(self->calendar, tomorrow);
-  gtk_calendar_select_day(self->calendar, today);
+  gtk_calendar_set_date(self->calendar, tomorrow);
+  gtk_calendar_set_date(self->calendar, today);
   gtk_popover_popdown(self->popover);
   self->is_reset = false;
 }
@@ -99,7 +100,7 @@ static void on_today_selected(ErrandsTaskListDateDialogDateChooser *self) {
 static void on_tomorrow_selected(ErrandsTaskListDateDialogDateChooser *self) {
   g_autoptr(GDateTime) today = g_date_time_new_now_local();
   g_autoptr(GDateTime) tomorrow = g_date_time_add_days(today, 1);
-  gtk_calendar_select_day(self->calendar, tomorrow);
+  gtk_calendar_set_date(self->calendar, tomorrow);
   gtk_popover_popdown(self->popover);
   self->is_reset = false;
 }

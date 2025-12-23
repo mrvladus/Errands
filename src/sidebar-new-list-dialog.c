@@ -65,7 +65,7 @@ static void on_response_cb(ErrandsSidebarNewListDialog *self, gchar *response, g
     errands_window_update();
     errands_list_data_save(list);
     errands_sync_schedule();
-    LOG("SidebarNewListDialog: Create new list: '%s'", errands_data_get_prop(list->data, PROP_LIST_UID));
+    LOG("SidebarNewListDialog: Create new list: '%s'", list->as.list.uid);
   }
 }
 

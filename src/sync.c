@@ -5,9 +5,6 @@
 #include "state.h"
 #include "task-list.h"
 #include "utils.h"
-#include <libical/ical.h>
-#include <stdbool.h>
-#include <unistd.h>
 
 #define CALDAV_IMPLEMENTATION
 // #define CALDAV_DEBUG
@@ -37,8 +34,8 @@ static void initial_sync(GTask *task, gpointer source_object, gpointer task_data
   LOG("Sync: Initialize");
   // Check if sync is disabled.
   if (!errands_settings_get(SETTING_SYNC).b) {
-    LOG("Sync: Sync is disabled");
     g_task_return_boolean(task, FALSE);
+    LOG("Sync: Sync is disabled");
     return;
   }
   const char *url = errands_settings_get(SETTING_SYNC_URL).s;
@@ -78,6 +75,7 @@ static void initial_sync(GTask *task, gpointer source_object, gpointer task_data
 // Callback that runs on the main (UI) thread when the task is complete.
 static void initial_sync_finished_cb(GObject *source_object, GAsyncResult *res, gpointer user_data) {
   gboolean success = g_task_propagate_boolean(G_TASK(res), NULL);
+  if (!success) return;
   for (size_t i = 0; i < client->calendars->len; i++) {
     CalDAVCalendar *calendar = caldav_list_at(client->calendars, i);
     // TODO: use errands_list_data_new

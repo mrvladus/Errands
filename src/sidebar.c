@@ -62,7 +62,7 @@ void errands_sidebar_load_lists(ErrandsSidebar *self) {
   // Add rows
   for (size_t i = 0; i < errands_data_lists->len; i++) {
     ErrandsData *ld = errands_data_lists->pdata[i];
-    if (!errands_data_get_prop(ld->data, PROP_DELETED)) {
+    if (!errands_data_get_prop(ld, PROP_DELETED).b) {
       ErrandsSidebarTaskListRow *row = errands_sidebar_task_list_row_new(ld);
       gtk_list_box_append(GTK_LIST_BOX(self->task_lists_box), GTK_WIDGET(row));
     }
@@ -75,7 +75,7 @@ void errands_sidebar_load_lists(ErrandsSidebar *self) {
 }
 
 ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(ErrandsSidebar *sb, ErrandsData *data) {
-  LOG("Sidebar: Add task list '%s'", errands_data_get_prop(data, PROP_LIST_UID));
+  LOG("Sidebar: Add task list '%s'", data->as.list.uid);
   ErrandsSidebarTaskListRow *row = errands_sidebar_task_list_row_new(data);
   gtk_list_box_append(GTK_LIST_BOX(sb->task_lists_box), GTK_WIDGET(row));
   return row;
@@ -88,8 +88,7 @@ void errands_sidebar_select_last_opened_page() {
   LOG("Sidebar: Selecting last opened list: '%s'", last_uid);
   for_range(i, 0, rows->len) {
     ErrandsSidebarTaskListRow *row = g_ptr_array_index(rows, i);
-    if (STR_EQUAL(last_uid, errands_data_get_prop(row->data, PROP_LIST_UID)))
-      g_signal_emit_by_name(row, "activate", NULL);
+    if (STR_EQUAL(last_uid, row->data->as.list.uid)) g_signal_emit_by_name(row, "activate", NULL);
   }
 }
 
@@ -98,13 +97,14 @@ void errands_sidebar_update_filter_rows(ErrandsSidebar *self) {
   for_range(l, 0, errands_data_lists->len) {
     ErrandsData *list = g_ptr_array_index(errands_data_lists, l);
     g_autoptr(GPtrArray) tasks = errands_list_data_get_all_tasks_as_icalcomponents(list);
+    ErrandsData task = {0};
     for_range(t, 0, tasks->len) {
-      icalcomponent *task = g_ptr_array_index(tasks, t);
-      CONTINUE_IF(errands_data_get_prop(task, PROP_DELETED));
-      bool is_completed = !icaltime_is_null_date(errands_data_get_prop(task, PROP_COMPLETED_TIME));
-      icaltimetype due = errands_data_get_prop(task, PROP_DUE_TIME);
+      task.ical = g_ptr_array_index(tasks, t);
+      CONTINUE_IF(errands_data_get_prop(&task, PROP_DELETED).b);
+      bool is_completed = !icaltime_is_null_date(errands_data_get_prop(&task, PROP_COMPLETED_TIME).t);
+      icaltimetype due = errands_data_get_prop(&task, PROP_DUE_TIME).t;
       bool is_due = !icaltime_is_null_time(due) && icaltime_compare_date_only(due, icaltime_today()) < 1;
-      bool is_pinned = errands_data_get_prop(task, PROP_PINNED);
+      bool is_pinned = errands_data_get_prop(&task, PROP_PINNED).b;
       if (is_completed) completed++;
       if (is_due) {
         today++;
@@ -144,12 +144,14 @@ static void __on_open_finish(GObject *obj, GAsyncResult *res, ErrandsSidebar *se
   // Check if uid exists
   for_range(i, 0, errands_data_lists->len) {
     ErrandsData *data = g_ptr_array_index(errands_data_lists, i);
-    if (STR_EQUAL(uid, errands_data_get_prop(data, PROP_LIST_UID))) {
+    if (STR_EQUAL(uid, data->as.list.uid)) {
       errands_window_add_toast(_("List already exists"));
       return;
     }
   }
-  ErrandsData *data = errands_list_data_new_from_ical(ical, uid, uid, NULL);
+  icalcomponent *ical_comp = icalparser_parse_string(ical);
+  if (!ical_comp) return;
+  ErrandsData *data = errands_list_data_load_from_ical(ical_comp, uid);
   errands_list_data_save(data);
   g_ptr_array_add(errands_data_lists, data);
   ErrandsSidebarTaskListRow *row = errands_sidebar_add_task_list(self, data);
