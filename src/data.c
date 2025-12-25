@@ -99,7 +99,6 @@ static void errands_data_migrate_from_46() {
       JSON *priority_item = json_object_get(task_item, "priority");
       JSON *rrule_item = json_object_get(task_item, "rrule");
       JSON *start_date_item = json_object_get(task_item, "start_date");
-      JSON *synced_item = json_object_get(task_item, "synced");
       JSON *text_item = json_object_get(task_item, "text");
       JSON *uid_item = json_object_get(task_item, "uid");
       // Create iCalendar event
@@ -277,8 +276,8 @@ ListData *errands_list_data_load_from_ical(icalcomponent *ical, const char *uid)
   if (ical && icalcomponent_isa(ical) != ICAL_VCALENDAR_COMPONENT) return NULL;
   const char *_uid = uid;
   if (!_uid) _uid = generate_uuid4();
-  const char *_name = get_x_prop_value(ical, "X-ERRANDS-LIST-NAME", _uid);
-  const char *_color = get_x_prop_value(ical, "X-ERRANDS-COLOR", generate_hex_as_str());
+  get_x_prop_value(ical, "X-ERRANDS-LIST-NAME", _uid);
+  get_x_prop_value(ical, "X-ERRANDS-COLOR", generate_hex_as_str());
 
   ListData *list_data = errands_list_data_new(ical, _uid);
 

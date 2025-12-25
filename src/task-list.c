@@ -244,7 +244,6 @@ void errands_task_list_update_title(ErrandsTaskList *self) {
   case ERRANDS_TASK_LIST_PAGE_TODAY: {
     adw_window_title_set_title(ADW_WINDOW_TITLE(self->title), _("Tasks for Today"));
     size_t total = 0, completed = 0;
-    icaltimetype today = icaltime_today();
     for_range(i, 0, errands_data_lists->len) {
       ListData *list = g_ptr_array_index(errands_data_lists, i);
       g_autoptr(GPtrArray) tasks = errands_list_data_get_all_tasks_as_icalcomponents(list);

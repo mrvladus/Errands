@@ -11,7 +11,7 @@
 #include "vendor/caldav.h"
 #include "vendor/toolbox.h"
 
-static bool sync_initialized = false;
+// static bool sync_initialized = false;
 static bool sync_scheduled = false;
 static ListData *list_data = NULL;
 static TaskData *task_data = NULL;

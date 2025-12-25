@@ -14,9 +14,7 @@ static void on_right_click(GtkPopover *popover, gint n_press, gdouble x, gdouble
 static void on_color_changed(GtkColorDialogButton *btn, GParamSpec *pspec, ListData *data);
 static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x, double y,
                            ErrandsSidebarTaskListRow *row);
-static void on_action_rename(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row);
 static void on_action_export(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row);
-static void on_action_delete(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row);
 static void on_action_print(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row);
 // static GdkDragAction on_hover_begin(GtkDropTarget *target, gdouble x, gdouble y,
 //                                     ErrandsSidebarTaskListRow *row);
