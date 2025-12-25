@@ -1,10 +1,7 @@
 #include "data.h"
-#include "gtk/gtk.h"
 #include "task-list.h"
-#include "vendor/toolbox.h"
 
 #include <glib/gi18n.h>
-#include <libical/ical.h>
 
 static void on_day_selected(ErrandsTaskListDateDialogDateChooser *self);
 static void on_today_selected(ErrandsTaskListDateDialogDateChooser *self);

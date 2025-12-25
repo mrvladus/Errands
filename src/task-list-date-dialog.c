@@ -5,10 +5,7 @@
 #include "sync.h"
 #include "task-list.h"
 
-#include "vendor/toolbox.h"
-
 #include <glib/gi18n.h>
-#include <libical/ical.h>
 
 static void on_dialog_close_cb(ErrandsTaskListDateDialog *self);
 
@@ -62,7 +59,7 @@ void errands_task_list_date_dialog_show(ErrandsTask *task) {
     state.main_window->task_list->date_dialog = errands_task_list_date_dialog_new();
   ErrandsTaskListDateDialog *dialog = state.main_window->task_list->date_dialog;
   dialog->current_task = task;
-  ErrandsData *data = task->data;
+  ListData *data = task->data->list;
 
   // Reset all rows
   errands_task_list_date_dialog_date_chooser_reset(dialog->start_date_chooser);
@@ -73,13 +70,13 @@ void errands_task_list_date_dialog_show(ErrandsTask *task) {
 
   // Set start dt
   LOG("Date Dialog: Set start time");
-  icaltimetype start_dt = errands_data_get_prop(data, PROP_START_TIME).t;
+  icaltimetype start_dt = errands_data_get_start(data->ical);
   errands_task_list_date_dialog_date_chooser_set_date(dialog->start_date_chooser, start_dt);
   errands_task_list_date_dialog_time_chooser_set_time(dialog->start_time_chooser, start_dt);
 
   // Set due dt
   LOG("Date Dialog: Set due time");
-  icaltimetype due_dt = errands_data_get_prop(data, PROP_DUE_TIME).t;
+  icaltimetype due_dt = errands_data_get_due(data->ical);
   errands_task_list_date_dialog_date_chooser_set_date(dialog->due_date_chooser, due_dt);
   errands_task_list_date_dialog_time_chooser_set_time(dialog->due_time_chooser, due_dt);
 
@@ -99,12 +96,12 @@ void errands_task_list_date_dialog_show(ErrandsTask *task) {
 static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
   LOG("Date Dialog: Close");
 
-  ErrandsData *data = self->current_task->data;
+  TaskData *data = self->current_task->data;
   icaltimetype today = icaltime_today();
   bool changed = false;
 
   // Set start datetime
-  icaltimetype curr_sdt = errands_data_get_prop(data, PROP_START_TIME).t;
+  icaltimetype curr_sdt = errands_data_get_start(data->ical);
   icaltimetype new_sdt = ICALTIMETYPE_INITIALIZER;
   icaltimetype new_sd = errands_task_list_date_dialog_date_chooser_get_date(self->start_date_chooser);
   icaltimetype new_st = errands_task_list_date_dialog_time_chooser_get_time(self->start_time_chooser);
@@ -120,7 +117,7 @@ static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
   if (new_dd_is_null) {
     if (new_dt_is_null) {
       if (!curr_ddt_is_null) {
-        errands_data_set_prop(data, PROP_START_TIME, &new_sdt);
+        errands_data_set_start(data->ical, new_sdt);
         changed = true;
       }
     } else {
@@ -130,7 +127,7 @@ static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
       if (icaltime_compare(curr_sdt, new_sdt) != 0) {
         LOG("Date Dialog: Start date is changed to '%s' => '%s'", icaltime_as_ical_string(curr_sdt),
             icaltime_as_ical_string(new_sdt));
-        errands_data_set_prop(data, PROP_START_TIME, &new_sdt);
+        errands_data_set_start(data->ical, new_sdt);
         changed = true;
       }
     }
@@ -139,14 +136,14 @@ static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
     if (icaltime_compare(curr_sdt, new_sdt) != 0) {
       LOG("Date Dialog: Start date is changed '%s' => '%s'", icaltime_as_ical_string(curr_sdt),
           icaltime_as_ical_string(new_sdt));
-      errands_data_set_prop(data, PROP_START_TIME, &new_sdt);
+      errands_data_set_start(data->ical, new_sdt);
       changed = true;
     }
   }
 
   // Set due datetime if not repeated
   if (!adw_expander_row_get_expanded(ADW_EXPANDER_ROW(self->rrule_row))) {
-    icaltimetype curr_ddt = errands_data_get_prop(data, PROP_DUE_TIME).t;
+    icaltimetype curr_ddt = errands_data_get_due(data->ical);
     icaltimetype new_ddt = ICALTIMETYPE_INITIALIZER;
     icaltimetype new_dd = errands_task_list_date_dialog_date_chooser_get_date(self->due_date_chooser);
     icaltimetype new_dt = errands_task_list_date_dialog_time_chooser_get_time(self->due_time_chooser);
@@ -162,7 +159,7 @@ static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
     if (new_dd_is_null) {
       if (new_dt_is_null) {
         if (!curr_ddt_is_null) {
-          errands_data_set_prop(data, PROP_DUE_TIME, &new_ddt);
+          errands_data_set_due(data->ical, new_ddt);
           changed = true;
         }
       } else {
@@ -172,7 +169,7 @@ static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
         if (icaltime_compare(curr_ddt, new_ddt) != 0) {
           LOG("Date Dialog: Due date is changed to '%s' => '%s'", icaltime_as_ical_string(curr_ddt),
               icaltime_as_ical_string(new_ddt));
-          errands_data_set_prop(data, PROP_DUE_TIME, &new_ddt);
+          errands_data_set_due(data->ical, new_ddt);
           changed = true;
         }
       }
@@ -182,7 +179,7 @@ static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
       if (icaltime_compare(curr_ddt, new_ddt) != 0) {
         LOG("Date Dialog: Due date is changed '%s' => '%s'", icaltime_as_ical_string(curr_ddt),
             icaltime_as_ical_string(new_ddt));
-        errands_data_set_prop(data, PROP_DUE_TIME, &new_ddt);
+        errands_data_set_due(data->ical, new_ddt);
         changed = true;
       }
     }
@@ -213,14 +210,13 @@ static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
 
   // Write data if changed one of the props
   if (changed) {
-    if (!icaltime_is_null_time(errands_data_get_prop(data, PROP_DUE_TIME).t)) {
-      errands_data_set_prop(data, PROP_NOTIFIED, false);
+    if (!icaltime_is_null_time(errands_data_get_due(data->ical))) {
+      errands_data_set_notified(data->ical, false);
       errands_notifications_add(data);
     }
-    errands_data_set_prop(data, PROP_SYNCED, false);
-    errands_list_data_save(data->as.task.list);
-    if (self->current_task->data->as.task.parent)
-      errands_task_data_sort_sub_tasks(self->current_task->data->as.task.parent);
+    errands_data_set_synced(data->ical, false);
+    errands_list_data_save(data->list);
+    if (self->current_task->data->parent) errands_task_data_sort_sub_tasks(self->current_task->data->parent);
     else errands_data_sort();
     errands_task_update_toolbar(self->current_task);
     errands_sidebar_update_filter_rows(state.main_window->sidebar);

@@ -18,12 +18,12 @@ struct _ErrandsSidebarTaskListRow {
   GtkWidget *label;
   GtkEventController *hover_ctrl;
 
-  ErrandsData *data;
+  ListData *data;
 };
 
-ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_new(ErrandsData *data);
+ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_new(ListData *data);
 void errands_sidebar_task_list_row_update(ErrandsSidebarTaskListRow *self);
-ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_get(ErrandsData *data);
+ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_get(ListData *data);
 void on_errands_sidebar_task_list_row_activate(GtkListBox *box, ErrandsSidebarTaskListRow *row, gpointer user_data);
 
 // --- SIDEBAR TODAY ROW --- //
@@ -92,5 +92,5 @@ struct _ErrandsSidebar {
 ErrandsSidebar *errands_sidebar_new();
 void errands_sidebar_load_lists(ErrandsSidebar *self);
 void errands_sidebar_update_filter_rows(ErrandsSidebar *self);
-ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(ErrandsSidebar *sb, ErrandsData *data);
+ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(ErrandsSidebar *sb, ListData *data);
 void errands_sidebar_select_last_opened_page();

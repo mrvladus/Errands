@@ -59,8 +59,8 @@ void errands_window_update() {
   LOG("Window: Update");
   size_t total = 0;
   for_range(i, 0, errands_data_lists->len) {
-    ErrandsData *data = errands_data_lists->pdata[i];
-    bool deleted = errands_data_get_prop(data, PROP_DELETED).b;
+    ListData *data = errands_data_lists->pdata[i];
+    bool deleted = errands_data_get_deleted(data->ical);
     if (!deleted) total++;
   }
   g_object_set(state.main_window->no_lists_page, "visible", total == 0, NULL);

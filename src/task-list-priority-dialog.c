@@ -4,9 +4,6 @@
 #include "task-list.h"
 #include "task.h"
 
-#include "vendor/toolbox.h"
-#include <stdbool.h>
-
 static void on_dialog_close_cb(ErrandsTaskListPriorityDialog *self);
 static void on_toggle_cb(ErrandsTaskListPriorityDialog *self, GtkCheckButton *btn);
 
@@ -60,7 +57,7 @@ void errands_task_list_priority_dialog_show(ErrandsTask *task) {
   ErrandsTaskListPriorityDialog *self = state.main_window->task_list->priority_dialog;
   self->current_task = task;
   self->block_signals = true;
-  const uint8_t priority = errands_data_get_prop(task->data, PROP_PRIORITY).i;
+  const uint8_t priority = errands_data_get_priority(task->data->ical);
   if (priority == 0) adw_action_row_activate(ADW_ACTION_ROW(self->none_row));
   else if (priority == 1) adw_action_row_activate(ADW_ACTION_ROW(self->low_row));
   else if (priority > 1 && priority < 6) adw_action_row_activate(ADW_ACTION_ROW(self->medium_row));
@@ -74,14 +71,14 @@ void errands_task_list_priority_dialog_show(ErrandsTask *task) {
 
 static void on_dialog_close_cb(ErrandsTaskListPriorityDialog *self) {
   const uint8_t val = adw_spin_row_get_value(ADW_SPIN_ROW(self->custom_row));
-  ErrandsData *data = self->current_task->data;
-  if (errands_data_get_prop(data, PROP_PRIORITY).i != val) {
-    errands_data_set_prop(data, PROP_PRIORITY, I32_TO_VOIDP(val));
-    errands_list_data_save(data->as.task.list);
+  TaskData *data = self->current_task->data;
+  if (errands_data_get_priority(data->ical) != val) {
+    errands_data_set_priority(data->ical, val);
+    errands_list_data_save(data->list);
     switch (state.main_window->task_list->page) {
     case ERRANDS_TASK_LIST_PAGE_ALL:
     case ERRANDS_TASK_LIST_PAGE_TODAY: errands_data_sort(); break;
-    case ERRANDS_TASK_LIST_PAGE_TASK_LIST: errands_list_data_sort(data->as.task.list); break;
+    case ERRANDS_TASK_LIST_PAGE_TASK_LIST: errands_list_data_sort(data->list); break;
     case ERRANDS_TASK_LIST_PAGE_PINNED: break;
     }
     errands_task_list_reload(state.main_window->task_list, true);

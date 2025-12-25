@@ -11,13 +11,13 @@ e.g. GLib's g_autoptr, g_auto and g_autofree"
 #include "sync.h"
 #include "window.h"
 
+#define TOOLBOX_IMPLEMENTATION
 #include "vendor/toolbox.h"
 
 #include <glib/gi18n.h>
 #include <libportal/portal.h>
 
 extern GResource *errands_get_resource(void);
-TOOLBOX_TMP_STR;
 const char *toolbox_log_prefix = "\033[0;32m[Errands] \033[0m";
 State state = {0};
 

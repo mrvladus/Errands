@@ -78,21 +78,20 @@ ErrandsTask *errands_task_new() { return g_object_new(ERRANDS_TYPE_TASK, NULL); 
 
 // ---------- PUBLIC FUNCTIONS ---------- //
 
-void errands_task_set_data(ErrandsTask *self, ErrandsData *data) {
+void errands_task_set_data(ErrandsTask *self, TaskData *data) {
   gtk_widget_set_visible(GTK_WIDGET(self), data ? true : false);
   if (!data) return;
   self->data = data;
-  gtk_widget_set_sensitive(GTK_WIDGET(self), !errands_data_get_prop(data, PROP_CANCELLED).b);
+  gtk_widget_set_sensitive(GTK_WIDGET(self), !errands_data_get_cancelled(data->ical));
   // Set text
-  gtk_label_set_label(GTK_LABEL(self->title), errands_data_get_prop(data, PROP_TEXT).s);
+  gtk_label_set_label(GTK_LABEL(self->title), errands_data_get_text(data->ical));
   // Set completion
   g_signal_handlers_block_by_func(self->complete_btn, on_complete_btn_toggle_cb, self);
-  gtk_check_button_set_active(GTK_CHECK_BUTTON(self->complete_btn),
-                              !icaltime_is_null_time(errands_data_get_prop(data, PROP_COMPLETED_TIME).t));
+  gtk_check_button_set_active(GTK_CHECK_BUTTON(self->complete_btn), errands_data_is_completed(data->ical));
   g_signal_handlers_unblock_by_func(self->complete_btn, on_complete_btn_toggle_cb, self);
   // Update UI
   // Show sub-tasks entry
-  gtk_widget_set_visible(self->sub_entry, errands_data_get_prop(data, PROP_EXPANDED).b);
+  gtk_widget_set_visible(self->sub_entry, errands_data_get_expanded(data->ical));
   errands_task_update_accent_color(self);
   errands_task_update_progress(self);
   errands_task_update_toolbar(self);
@@ -100,7 +99,7 @@ void errands_task_set_data(ErrandsTask *self, ErrandsData *data) {
 
 void errands_task_update_accent_color(ErrandsTask *task) {
   if (!task) return;
-  const char *color = errands_data_get_prop(task->data, PROP_COLOR).s;
+  const char *color = errands_data_get_color(task->data->ical);
   if (!STR_EQUAL(color, "none")) {
     const char *card_style = tmp_str_printf("task-%s", color);
     const char *check_style = tmp_str_printf("checkbtn-%s", color);
@@ -116,9 +115,9 @@ void errands_task_update_progress(ErrandsTask *self) {
   if (!self) return;
   size_t total = 0, completed = 0;
   for_range(i, 0, self->data->children->len) {
-    ErrandsData *data = g_ptr_array_index(self->data->children, i);
-    CONTINUE_IF(errands_data_get_prop(data, PROP_DELETED).b);
-    if (!icaltime_is_null_time(errands_data_get_prop(data, PROP_COMPLETED_TIME).t)) completed++;
+    TaskData *data = g_ptr_array_index(self->data->children, i);
+    CONTINUE_IF(errands_data_get_deleted(data->ical));
+    if (errands_data_is_completed(data->ical)) completed++;
     total++;
   }
   gtk_widget_set_visible(self->subtitle, total > 0);
@@ -127,19 +126,19 @@ void errands_task_update_progress(ErrandsTask *self) {
 }
 
 void errands_task_update_toolbar(ErrandsTask *task) {
-  ErrandsData *data = task->data;
-  gtk_widget_set_visible(task->unpin_btn, errands_data_get_prop(data, PROP_PINNED).b);
+  TaskData *data = task->data;
+  gtk_widget_set_visible(task->unpin_btn, errands_data_get_pinned(data->ical));
   // Notes button
-  bool has_notes = errands_data_get_prop(data, PROP_NOTES).s != NULL;
+  bool has_notes = errands_data_get_notes(data->ical) != NULL;
   gtk_widget_set_visible(task->notes_btn, has_notes);
   // Attachments button
-  g_auto(GStrv) attachments = errands_data_get_prop(data, PROP_ATTACHMENTS).sv;
+  g_auto(GStrv) attachments = errands_data_get_attachments(data->ical);
   bool has_attachments = attachments && g_strv_length(attachments) > 0;
   gtk_widget_set_visible(task->attachments_btn, has_attachments);
   gtk_label_set_label(task->attachments_count,
                       has_attachments ? tmp_str_printf("%zu", g_strv_length(attachments)) : "");
   // Priority button
-  uint8_t priority = errands_data_get_prop(data, PROP_PRIORITY).i;
+  uint8_t priority = errands_data_get_priority(data->ical);
   const char *priority_class = NULL;
   if (priority < 3) priority_class = "accent";
   else if (priority >= 3 && priority < 7) priority_class = "warning";
@@ -147,7 +146,7 @@ void errands_task_update_toolbar(ErrandsTask *task) {
   gtk_widget_set_css_classes(task->priority_btn, (const char *[]){"image-button", priority_class, NULL});
   gtk_widget_set_visible(task->priority_btn, priority > 0);
   // Update date button text
-  icaltimetype due_dt = errands_data_get_prop(data, PROP_DUE_TIME).t;
+  icaltimetype due_dt = errands_data_get_due(data->ical);
   bool has_due_date = !icaltime_is_null_date(due_dt);
   gtk_widget_set_visible(task->date_btn, has_due_date);
   icalproperty *rrule_prop = icalcomponent_get_first_property(data->ical, ICAL_RRULE_PROPERTY);
@@ -187,8 +186,8 @@ void errands_task_update_toolbar(ErrandsTask *task) {
     }
   }
   // Set style for date button
-  gtk_widget_set_css_classes(
-      task->date_btn, (const char *[]){"image-button", "caption", errands_task_data_is_due(data) ? "error" : "", NULL});
+  gtk_widget_set_css_classes(task->date_btn, (const char *[]){"image-button", "caption",
+                                                              errands_data_is_due(data->ical) ? "error" : "", NULL});
 
   bool props_bar_visible = has_notes || has_attachments || has_due_date;
   gtk_widget_set_visible(task->props_bar, props_bar_visible);
@@ -197,7 +196,7 @@ void errands_task_update_toolbar(ErrandsTask *task) {
   for (GtkWidget *child = gtk_widget_get_first_child(task->tags_box); child;
        child = gtk_widget_get_first_child(task->tags_box))
     adw_wrap_box_remove(ADW_WRAP_BOX(task->tags_box), child);
-  g_auto(GStrv) tags = errands_data_get_prop(task->data, PROP_TAGS).sv;
+  g_auto(GStrv) tags = errands_data_get_tags(task->data->ical);
   const size_t tags_n = tags ? g_strv_length(tags) : 0;
   for_range(i, 0, tags_n) adw_wrap_box_append(ADW_WRAP_BOX(task->tags_box), errands_task_tag_new(task, tags[i]));
 
@@ -223,45 +222,43 @@ static GtkWidget *errands_task_tag_new(ErrandsTask *self, const char *tag) {
 // ---------- CALLBACKS ---------- //
 
 static void on_complete_btn_toggle_cb(ErrandsTask *self, GtkCheckButton *btn) {
-  LOG("Toggle completion '%s'", errands_data_get_prop(self->data, PROP_UID).s);
+  LOG("Toggle completion '%s'", errands_data_get_uid(self->data->ical));
   bool active = gtk_check_button_get_active(btn);
   icaltimetype now = icaltime_get_date_time_now();
-  icaltimetype time = active ? now : icaltime_null_time();
-  errands_data_set_prop(self->data, PROP_COMPLETED_TIME, &time);
+  errands_data_set_completed(self->data->ical, active ? now : icaltime_null_time());
   // Complete all sub-tasks if completed
   if (active) {
     g_autoptr(GPtrArray) sub_tasks = g_ptr_array_new();
     errands_task_data_get_flat_list(self->data, sub_tasks);
     for_range(i, 0, sub_tasks->len) {
-      ErrandsData *sub_task = g_ptr_array_index(sub_tasks, i);
-      errands_data_set_prop(sub_task, PROP_COMPLETED_TIME, &now);
+      TaskData *sub_task = g_ptr_array_index(sub_tasks, i);
+      errands_data_set_completed(sub_task->ical, now);
     }
   }
   // Uncomplete parents tasks if unchecked
   else {
-    ErrandsData *parent = self->data->as.task.parent;
+    TaskData *parent = self->data->parent;
     while (parent) {
-      icaltimetype null_dt = icaltime_null_time();
-      errands_data_set_prop(parent, PROP_COMPLETED_TIME, &null_dt);
-      parent = parent->as.task.parent;
+      errands_data_set_completed(parent->ical, icaltime_null_time());
+      parent = parent->parent;
     }
   }
-  errands_list_data_save(self->data->as.task.list);
-  errands_list_data_sort(self->data->as.task.list);
+  errands_list_data_save(self->data->list);
+  errands_list_data_sort(self->data->list);
   errands_task_list_reload(state.main_window->task_list, true);
   // Update task list
   errands_task_list_update_title(state.main_window->task_list);
   errands_sidebar_update_filter_rows(state.main_window->sidebar);
-  errands_sidebar_task_list_row_update(errands_sidebar_task_list_row_get(self->data->as.task.list));
+  errands_sidebar_task_list_row_update(errands_sidebar_task_list_row_get(self->data->list));
   // Sync
-  errands_sync_schedule_list(self->data->as.task.list);
+  errands_sync_schedule_list(self->data->list);
 }
 
 static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointer user_data) {
   bool editing = gtk_editable_label_get_editing(label);
   LOG("Task: Edit '%s'", editing ? "on" : "off");
   ErrandsTask *task = user_data;
-  const char *curr_text = errands_data_get_prop(task->data, PROP_TEXT).s;
+  const char *curr_text = errands_data_get_text(task->data->ical);
   if (editing) {
     gtk_widget_set_visible(GTK_WIDGET(label), true);
     gtk_editable_set_text(GTK_EDITABLE(task->edit_title), curr_text);
@@ -277,16 +274,16 @@ static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointe
       return;
     }
     gtk_widget_set_visible(task->title, true);
-    errands_data_set_prop(task->data, PROP_TEXT, (void *)text);
-    errands_list_data_save(task->data->as.task.list);
+    errands_data_set_text(task->data->ical, text);
+    errands_list_data_save(task->data->list);
     gtk_label_set_label(GTK_LABEL(task->title), text);
     errands_sync_schedule_task(task->data);
   }
 }
 
 static void on_unpin_btn_clicked_cb(ErrandsTask *self, GtkToggleButton *btn) {
-  errands_data_set_prop(self->data, PROP_PINNED, I32_TO_VOIDP(false));
-  errands_list_data_save(self->data->as.task.list);
+  errands_data_set_pinned(self->data->ical, false);
+  errands_list_data_save(self->data->list);
   errands_sidebar_update_filter_rows(state.main_window->sidebar);
   errands_task_list_reload(state.main_window->task_list, true);
 }
@@ -294,9 +291,9 @@ static void on_unpin_btn_clicked_cb(ErrandsTask *self, GtkToggleButton *btn) {
 static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *self) {
   const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
   if (STR_EQUAL(text, "")) return;
-  ErrandsData *new_data = errands_task_data_create_task(self->data->as.task.list, self->data, text);
+  TaskData *new_data = errands_task_data_create_task(self->data->list, self->data, text);
   g_ptr_array_add(self->data->children, new_data);
-  errands_list_data_save(self->data->as.task.list);
+  errands_list_data_save(self->data->list);
   errands_task_data_sort_sub_tasks(self->data);
   // Reset text
   gtk_editable_set_text(GTK_EDITABLE(entry), "");
@@ -307,10 +304,10 @@ static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *self) {
 }
 
 static void on_expand_toggle_cb(ErrandsTask *self, GtkGestureClick *ctrl, gint n_press, gdouble x, gdouble y) {
-  bool new_expanded = !errands_data_get_prop(self->data, PROP_EXPANDED).b;
-  LOG("Task '%s': Toggle expand: %d", errands_data_get_prop(self->data, PROP_UID).s, new_expanded);
-  errands_data_set_prop(self->data, PROP_EXPANDED, &new_expanded);
-  errands_list_data_save(self->data->as.task.list);
+  bool new_expanded = !errands_data_get_expanded(self->data->ical);
+  LOG("Task '%s': Toggle expand: %d", errands_data_get_uid(self->data->ical), new_expanded);
+  errands_data_set_expanded(self->data->ical, new_expanded);
+  errands_list_data_save(self->data->list);
   errands_task_list_reload(state.main_window->task_list, true);
   gtk_widget_grab_focus(GTK_WIDGET(self->sub_entry));
 }
@@ -327,7 +324,7 @@ static GdkContentProvider *on_drag_prepare_cb(GtkDragSource *source, double x, d
 }
 
 static void on_drag_begin_cb(GtkDragSource *source, GdkDrag *drag, ErrandsTask *task) {
-  const char *text = errands_data_get_prop(task->data, PROP_TEXT).s;
+  const char *text = errands_data_get_text(task->data->ical);
   char label[21];
   if (strlen(text) > 20) snprintf(label, 17, "%s...", text);
   else strcpy(label, text);
@@ -340,7 +337,7 @@ static gboolean on_drag_cancel_cb(GtkDragSource *self, GdkDrag *drag, GdkDragCan
   return false;
 }
 
-static bool __task_data_is_sub_task_of(ErrandsData *data, ErrandsData *possible_parent) {
+static bool __task_data_is_sub_task_of(TaskData *data, TaskData *possible_parent) {
   g_autoptr(GPtrArray) subs = g_ptr_array_new();
   errands_task_data_get_flat_list(possible_parent, subs);
   return g_ptr_array_find(subs, data, NULL);
@@ -349,15 +346,15 @@ static bool __task_data_is_sub_task_of(ErrandsData *data, ErrandsData *possible_
 static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x, double y, ErrandsTask *task) {
   g_autoptr(GObject) obj = g_value_get_object(value);
   if (!obj) return false;
-  ErrandsData *drop_data = g_object_get_data(obj, "data");
+  TaskData *drop_data = g_object_get_data(obj, "data");
   if (!drop_data) return false;
-  ErrandsData *tgt_data = task->data;
+  TaskData *tgt_data = task->data;
   if (drop_data == tgt_data) return false;
   if (__task_data_is_sub_task_of(tgt_data, drop_data)) {
     errands_window_add_toast(_("Can't add task as a child of itself"));
     return false;
   }
-  GPtrArray *arr = drop_data->as.task.parent ? drop_data->as.task.parent->children : drop_data->as.task.list->children;
+  GPtrArray *arr = drop_data->parent ? drop_data->parent->children : drop_data->list->children;
   guint idx = 0;
   if (!g_ptr_array_find(arr, drop_data, &idx)) return false;
   g_ptr_array_add(tgt_data->children, g_ptr_array_steal_index(arr, idx));
@@ -367,10 +364,10 @@ static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x,
   //   errands_data_set_prop(drop_data->data, PROP_LIST_UID, errands_data_get_prop(tgt_data->data,
   //   PROP_LIST_UID)); errands_list_data_save(drop_data->list); drop_data->list = tgt_data->list;
   // }
-  drop_data->as.task.parent = tgt_data;
-  errands_data_set_prop(drop_data, PROP_PARENT, (void *)errands_data_get_prop(tgt_data, PROP_UID).s);
+  drop_data->parent = tgt_data;
+  errands_data_set_parent(drop_data->ical, errands_data_get_parent(tgt_data->ical));
   errands_task_data_sort_sub_tasks(tgt_data);
-  errands_list_data_save(tgt_data->as.task.list);
+  errands_list_data_save(tgt_data->list);
   errands_task_list_reload(state.main_window->task_list, true);
   return true;
 }

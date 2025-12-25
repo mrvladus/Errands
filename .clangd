@@ -34,3 +34,4 @@ CompileFlags:
     - -pthread
     - -Wno-macro-redefined
     - -DCALDAV_IMPLEMENTATION
+    # - -DTOOLBOX_IMPLEMENTATION

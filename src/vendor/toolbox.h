@@ -25,6 +25,29 @@
 #include <threads.h>
 #include <time.h>
 
+// -------------------- TYPES -------------------- //
+
+typedef uint8_t u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+typedef uint64_t u64;
+
+typedef int8_t i8;
+typedef int16_t i16;
+typedef int32_t i32;
+typedef int64_t i64;
+
+// -------------------- TYPE CONVERSION -------------------- //
+
+#define BOOL_TO_STR(val)     (val) ? "true" : "false"
+#define BOOL_TO_STR_NUM(val) (val) ? "1" : "0"
+#define STR_TO_BOOL(str)     (!strcmp((const char *)(str), "1") || !strcmp((const char *)(str), "true"))
+#define STR_TO_UL(str)       strtoul(str, NULL, 10)
+#define I32_TO_VOIDP(val)    ((void *)(i32)(val))
+#define U32_TO_VOIDP(val)    ((void *)(u32)(val))
+#define VOIDP_TO_I32(ptr)    ((int)(i32)(ptr))
+#define VOIDP_TO_U32(ptr)    ((unsigned int)(u32)(ptr))
+
 // -------------------- AUTOMATIC CLEANUP -------------------- //
 
 #if defined(__GNUC__) || defined(__clang__)
@@ -139,57 +162,40 @@ extern const char *toolbox_log_prefix;
 #define CONTINUE_IF(statement)                                                                                         \
   if (statement) continue;
 
-// -------------------- TYPE CONVERSION -------------------- //
-
-#define BOOL_TO_STR(val)     (val) ? "true" : "false"
-#define BOOL_TO_STR_NUM(val) (val) ? "1" : "0"
-#define STR_TO_BOOL(str)     (!strcmp((const char *)(str), "1") || !strcmp((const char *)(str), "true"))
-#define STR_TO_UL(str)       strtoul(str, NULL, 10)
-#define I32_TO_VOIDP(val)    ((void *)(long)(val))
-#define U32_TO_VOIDP(val)    ((void *)(unsigned long)(val))
-#define VOIDP_TO_I32(ptr)    ((int)(long)(ptr))
-#define VOIDP_TO_U32(ptr)    ((unsigned int)(unsigned long)(ptr))
-
 // -------------------- STRINGS -------------------- //
 
 // Stringify
 #define STR(macro_or_string) #macro_or_string
-
 // Create multiline string.
 // const char *str = MULTILINE_STRING(
 //                   Hello,
 //                   World!
 //                   );
 #define MULTILINE_STRING(...) #__VA_ARGS__
-
 // Check if strings are equal.
 #define STR_EQUAL(s1, s2) (strcmp((const char *)(s1), (const char *)(s2)) == 0)
-
 // Check if string contains substring.
 #define STR_CONTAINS(s1, s2) ((s1 && s2) ? strstr((const char *)(s1), (const char *)(s2)) != NULL : false)
-
 // Check if string contains substring (case-insensitive).
 #define STR_CONTAINS_CASE(s1, s2) ((s1 && s2) ? strcasestr((const char *)(s1), (const char *)(s2)) != NULL : false)
 
-static inline const char *generate_uuid4() {
-  static thread_local char uuid[37];
-  const char *hex = "0123456789abcdef";
-  static thread_local int seeded = 0;
-  if (!seeded) {
-    srand(time(NULL) ^ (unsigned long)&seeded);
-    seeded = 1;
-  }
-  for (int i = 0; i < 36; i++) {
-    if (i == 8 || i == 13 || i == 18 || i == 23) uuid[i] = '-';
-    else if (i == 14) uuid[i] = '4';
-    else if (i == 19) {
-      int r = rand() % 4;
-      uuid[i] = (r == 0) ? '8' : (r == 1) ? '9' : (r == 2) ? 'a' : 'b';
-    } else uuid[i] = hex[rand() % 16];
-  }
-  uuid[36] = '\0';
-  return uuid;
-}
+// -------------------- UUID -------------------- //
+
+const char *generate_uuid4();
+
+// -------------------- STRING ARRAY -------------------- //
+
+// NULL-terminated array of strings.
+typedef char **strv;
+
+strv strv_new(const char *first, ...);
+void strv_add(strv s, const char *add);
+void strv_add_strv(strv s, strv add);
+size_t strv_len(strv s);
+char *strv_merge(strv s, const char *separator);
+void strv_free(strv *s);
+AUTOPTR_DEFINE(strv, strv_free);
+
 // -------------------- ARRAYS -------------------- //
 
 #define STATIC_ARRAY_SIZE(arr) sizeof(arr) / sizeof(arr[0])
@@ -282,49 +288,11 @@ static inline void *array_last(array *a) { return a->len == 0 ? NULL : a->items[
 
 // -------------------- TEMPORARY STRING -------------------- //
 
-/*
-
-This is temporary buffer for printing formatted strings.
-If you need to get formatted string but not wanting to use malloc, use this.
-Default size is 8192 bytes. You can change it by defining TB_TMP_STR_BUFFER_SIZE.
-When buffer is full - starts overriding buffer from the beginning.
-
-To use this define TOOLBOX_TMP_STR in one file AFTER #include "toolbox.h"
-
-*/
-
-#ifndef TB_TMP_STR_BUFFER_SIZE
-#define TB_TMP_STR_BUFFER_SIZE 8192
-#endif // TB_TMP_STR_BUFFER_SIZE
-
-#define TOOLBOX_TMP_STR                                                                                                \
-  char toolbox_tmp_str[TB_TMP_STR_BUFFER_SIZE];                                                                        \
-  size_t toolbox_tmp_str_offset = 0;
-
-extern char toolbox_tmp_str[TB_TMP_STR_BUFFER_SIZE];
-extern size_t toolbox_tmp_str_offset;
-
-static inline const char *tmp_str_printf(const char *format, ...) {
-  if (!format) return NULL;
-  va_list args;
-  va_start(args, format);
-  va_list args_copy;
-  va_copy(args_copy, args);
-  int len = vsnprintf(NULL, 0, format, args_copy);
-  va_end(args_copy);
-  if (len < 0) {
-    va_end(args);
-    return "";
-  }
-  if (len >= (size_t)TB_TMP_STR_BUFFER_SIZE - toolbox_tmp_str_offset - 1) toolbox_tmp_str_offset = 0;
-  // Print the string
-  vsnprintf(toolbox_tmp_str + toolbox_tmp_str_offset, (size_t)TB_TMP_STR_BUFFER_SIZE - toolbox_tmp_str_offset, format,
-            args);
-  const char *result = toolbox_tmp_str + toolbox_tmp_str_offset;
-  toolbox_tmp_str_offset += len + 1;
-  va_end(args);
-  return result;
-}
+// This is temporary buffer for printing formatted strings.
+// If you need to get formatted string but not wanting to use malloc, use this.
+// Default size is 8192 bytes. You can change it by defining TB_TMP_STR_BUFFER_SIZE.
+// When buffer is full - starts overriding buffer from the beginning.
+const char *tmp_str_printf(const char *format, ...);
 
 // -------------------- FILE FUNCTIONS -------------------- //
 
@@ -394,7 +362,149 @@ static inline const char *path_ext(const char *path) {
 
 // -------------------- SYSTEM COMMANDS -------------------- //
 
-static inline int cmd_run_stdout(const char *cmd, char **std_out) {
+int cmd_run_stdout(const char *cmd, char **std_out);
+
+// -------------------- COLORS -------------------- //
+
+const char *generate_hex_as_str();
+
+#endif // TOOLBOX_H
+
+// -------------------------------------------------------- //
+//                      IMPLEMENTATION                      //
+// -------------------------------------------------------- //
+
+#ifdef TOOLBOX_IMPLEMENTATION
+
+// -------------------- TEMPORARY STRING -------------------- //
+
+#ifndef TB_TMP_STR_BUFFER_SIZE
+#define TB_TMP_STR_BUFFER_SIZE 8192
+#endif // TB_TMP_STR_BUFFER_SIZE
+
+static char toolbox_tmp_str[TB_TMP_STR_BUFFER_SIZE];
+static size_t toolbox_tmp_str_offset = 0;
+
+const char *tmp_str_printf(const char *format, ...) {
+  if (!format) return NULL;
+  va_list args;
+  va_start(args, format);
+  va_list args_copy;
+  va_copy(args_copy, args);
+  int len = vsnprintf(NULL, 0, format, args_copy);
+  va_end(args_copy);
+  if (len < 0) {
+    va_end(args);
+    return "";
+  }
+  if (len >= (size_t)TB_TMP_STR_BUFFER_SIZE - toolbox_tmp_str_offset - 1) toolbox_tmp_str_offset = 0;
+  // Print the string
+  vsnprintf(toolbox_tmp_str + toolbox_tmp_str_offset, (size_t)TB_TMP_STR_BUFFER_SIZE - toolbox_tmp_str_offset, format,
+            args);
+  const char *result = toolbox_tmp_str + toolbox_tmp_str_offset;
+  toolbox_tmp_str_offset += len + 1;
+  va_end(args);
+  return result;
+}
+
+// -------------------- UUID -------------------- //
+
+const char *generate_uuid4() {
+  static thread_local char uuid[37];
+  const char *hex = "0123456789abcdef";
+  static thread_local int seeded = 0;
+  if (!seeded) {
+    srand(time(NULL) ^ (unsigned long)&seeded);
+    seeded = 1;
+  }
+  for (int i = 0; i < 36; i++) {
+    if (i == 8 || i == 13 || i == 18 || i == 23) uuid[i] = '-';
+    else if (i == 14) uuid[i] = '4';
+    else if (i == 19) {
+      int r = rand() % 4;
+      uuid[i] = (r == 0) ? '8' : (r == 1) ? '9' : (r == 2) ? 'a' : 'b';
+    } else uuid[i] = hex[rand() % 16];
+  }
+  uuid[36] = '\0';
+  return uuid;
+}
+
+// -------------------- STRING ARRAY -------------------- //
+
+strv strv_new(const char *first, ...) {
+  strv s = malloc(sizeof(char *));
+  if (!s) return NULL;
+  s[0] = NULL;
+  va_list args;
+  va_start(args, first);
+  while (first) {
+    strv_add(s, first);
+    first = va_arg(args, const char *);
+  }
+  va_end(args);
+  return s;
+}
+
+void strv_add(strv s, const char *add) {
+  if (!s) return;
+  size_t len = strv_len(s);
+  s = realloc(s, (len + 2) * sizeof(char *));
+  if (!s) return;
+  s[len] = strdup(add);
+  s[len + 1] = NULL;
+}
+
+void strv_add_strv(strv s, strv add) {
+  if (!s || !add) return;
+  size_t len = strv_len(s);
+  size_t add_len = strv_len(add);
+  s = realloc(s, (len + add_len + 1) * sizeof(char *));
+  if (!s) return;
+  for (size_t i = 0; i < add_len; i++) { s[len + i] = strdup(add[i]); }
+  s[len + add_len] = NULL;
+}
+
+size_t strv_len(strv s) {
+  size_t len = 0;
+  for (size_t i = 0; s[i]; i++) len++;
+  return len;
+}
+
+char *strv_merge(strv s, const char *separator) {
+  if (!s || !separator) return NULL;
+  size_t len = 0, sep_len = 0;
+  for (size_t i = 0; s[i]; i++) {
+    len += strlen(s[i]);
+    if (s[i + 1]) len += sep_len;
+  }
+  char *merged = malloc(len + 1);
+  if (!merged) return NULL;
+  merged[0] = '\0';
+  for (size_t i = 0; s[i]; i++) {
+    strcat(merged, s[i]);
+    if (s[i + 1]) strcat(merged, separator);
+  }
+  return merged;
+}
+
+void strv_free(strv *s) {
+  if (!s || !*s) return;
+  for (size_t i = 0; (*s)[i]; i++) free((*s)[i]);
+  free(*s);
+  *s = NULL;
+}
+
+// -------------------- COLORS -------------------- //
+
+const char *generate_hex_as_str() {
+  static char hex[8] = {0};
+  sprintf(hex, "#%06x", rand() % 0xFFFFFF);
+  return hex;
+}
+
+// -------------------- SYSTEM COMMANDS -------------------- //
+
+int cmd_run_stdout(const char *cmd, char **std_out) {
   if (!cmd || !std_out) return -1;
   *std_out = NULL;
   FILE *fp = popen(cmd, "r");
@@ -456,12 +566,4 @@ static inline int cmd_run_stdout(const char *cmd, char **std_out) {
   return status;
 }
 
-// -------------------- COLORS -------------------- //
-
-static inline const char *generate_hex_as_str() {
-  static char hex[8] = {0};
-  sprintf(hex, "#%06x", rand() % 0xFFFFFF);
-  return hex;
-}
-
-#endif // TOOLBOX_H
+#endif // TOOLBOX_IMPLEMENTATION

@@ -3,7 +3,6 @@
 #include "sync.h"
 #include "task-list.h"
 #include "task.h"
-#include "vendor/toolbox.h"
 
 #include <glib/gi18n.h>
 
@@ -72,9 +71,8 @@ void errands_task_menu_show(ErrandsTask *task) {
 
 static void on_delete_clicked_cb(ErrandsTaskMenu *self) {
   gtk_popover_popdown(GTK_POPOVER(self));
-  errands_data_set_prop(self->task->data, PROP_DELETED, I32_TO_VOIDP(true));
-  errands_data_set_prop(self->task->data, PROP_SYNCED, I32_TO_VOIDP(false));
-  errands_list_data_save(self->task->data->as.task.list);
+  errands_data_set_deleted(self->task->data->ical, true);
+  errands_list_data_save(self->task->data->list);
   errands_task_list_reload(state.main_window->task_list, true);
   errands_window_add_toast(_("Task is Deleted"));
   errands_sync_schedule_task(self->task->data);
@@ -87,7 +85,7 @@ static void on_edit_clicked_cb(ErrandsTaskMenu *self) {
 
 static void on_clipboard_clicked_cb(ErrandsTaskMenu *self) {
   gtk_popover_popdown(GTK_POPOVER(self));
-  const char *text = errands_data_get_prop(self->task->data, PROP_TEXT).s;
+  const char *text = errands_data_get_text(self->task->data->ical);
   GdkClipboard *clipboard = gdk_display_get_clipboard(gtk_widget_get_display(GTK_WIDGET(self)));
   gdk_clipboard_set(clipboard, G_TYPE_STRING, text);
   errands_window_add_toast(_("Copied to Clipboard"));
@@ -102,7 +100,7 @@ static void on_export_finish_cb(GObject *obj, GAsyncResult *res, gpointer data) 
     errands_window_add_toast(_("Failed to Export"));
     return;
   }
-  ErrandsData *task_data = data;
+  TaskData *task_data = data;
   autoptr(icalcomponent) cal = icalcomponent_new_vcalendar();
   autoptr(icalcomponent) dup = icalcomponent_new_clone(task_data->ical);
   icalcomponent_add_component(cal, dup);
@@ -115,21 +113,21 @@ static void on_export_finish_cb(GObject *obj, GAsyncResult *res, gpointer data) 
 static void on_export_clicked_cb(ErrandsTaskMenu *self) {
   gtk_popover_popdown(GTK_POPOVER(self));
   g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
-  const char *filename = tmp_str_printf("%s.ics", errands_data_get_prop(self->task->data, PROP_UID));
+  const char *filename = tmp_str_printf("%s.ics", errands_data_get_uid(self->task->data->ical));
   g_object_set(dialog, "initial-name", filename, NULL);
   gtk_file_dialog_save(dialog, GTK_WINDOW(state.main_window), NULL, on_export_finish_cb, self->task->data);
 }
 
 static void on_cancel_clicked_cb(ErrandsTaskMenu *self) {
   gtk_popover_popdown(GTK_POPOVER(self));
-  errands_data_set_prop(self->task->data, PROP_CANCELLED, I32_TO_VOIDP(true));
+  errands_data_set_cancelled(self->task->data->ical, true);
   g_autoptr(GPtrArray) sub_tasks = g_ptr_array_new();
   errands_task_data_get_flat_list(self->task->data, sub_tasks);
   for_range(i, 0, sub_tasks->len) {
-    ErrandsData *sub_task = g_ptr_array_index(sub_tasks, i);
-    errands_data_set_prop(sub_task, PROP_CANCELLED, I32_TO_VOIDP(true));
+    TaskData *sub_task = g_ptr_array_index(sub_tasks, i);
+    errands_data_set_cancelled(sub_task->ical, true);
   }
-  errands_list_data_save(self->task->data->as.task.list);
+  errands_list_data_save(self->task->data->list);
   errands_task_list_reload(state.main_window->task_list, true);
 }
 
@@ -165,18 +163,18 @@ static void on_date_clicked_cb(ErrandsTaskMenu *self) {
 
 static void on_pin_clicked_cb(ErrandsTaskMenu *self) {
   gtk_popover_popdown(GTK_POPOVER(self));
-  bool new_pinned = !errands_data_get_prop(self->task->data, PROP_PINNED).b;
-  errands_data_set_prop(self->task->data, PROP_PINNED, &new_pinned);
-  errands_list_data_save(self->task->data->as.task.list);
+  bool new_pinned = !errands_data_get_pinned(self->task->data->ical);
+  errands_data_set_pinned(self->task->data->ical, new_pinned);
+  errands_list_data_save(self->task->data->list);
   errands_sidebar_update_filter_rows(state.main_window->sidebar);
   errands_task_list_reload(state.main_window->task_list, true);
 }
 
 static void on_subtasks_clicked_cb(ErrandsTaskMenu *self) {
   gtk_popover_popdown(GTK_POPOVER(self));
-  bool new_expanded = !errands_data_get_prop(self->task->data, PROP_EXPANDED).b;
-  errands_data_set_prop(self->task->data, PROP_EXPANDED, &new_expanded);
-  errands_list_data_save(self->task->data->as.task.list);
+  bool new_expanded = !errands_data_get_expanded(self->task->data->ical);
+  errands_data_set_expanded(self->task->data->ical, new_expanded);
+  errands_list_data_save(self->task->data->list);
   errands_task_list_reload(state.main_window->task_list, true);
   gtk_widget_grab_focus(self->task->sub_entry);
 }

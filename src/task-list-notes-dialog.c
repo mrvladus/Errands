@@ -1,3 +1,4 @@
+#include "data.h"
 #include "state.h"
 #include "sync.h"
 #include "task-list.h"
@@ -62,7 +63,7 @@ void errands_task_list_notes_dialog_show(ErrandsTask *task) {
   ErrandsTaskListNotesDialog *dialog = state.main_window->task_list->notes_dialog;
   LOG("Notes Dialog: Show");
   dialog->current_task = task;
-  const char *notes = errands_data_get_prop(task->data, PROP_NOTES).s;
+  const char *notes = errands_data_get_notes(task->data->ical);
   if (notes) {
     g_autofree gchar *text = gtk_source_utils_unescape_search_text(notes);
     gtk_text_buffer_set_text(gtk_text_view_get_buffer(GTK_TEXT_VIEW(dialog->source_view)), text, -1);
@@ -74,7 +75,7 @@ void errands_task_list_notes_dialog_show(ErrandsTask *task) {
 // ---------- CALLBACKS ---------- //
 
 static void on_dialog_close_cb(ErrandsTaskListNotesDialog *self) {
-  ErrandsData *data = self->current_task->data;
+  TaskData *data = self->current_task->data;
   GtkTextBuffer *buf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(self->source_view));
   // Get the start and end iterators of the text buffer
   GtkTextIter start, end;
@@ -82,14 +83,14 @@ static void on_dialog_close_cb(ErrandsTaskListNotesDialog *self) {
   gtk_text_buffer_get_end_iter(buf, &end);
   g_autofree char *text = gtk_text_buffer_get_text(buf, &start, &end, FALSE);
   // If text is different then save it
-  const char *notes = errands_data_get_prop(data, PROP_NOTES).s;
+  const char *notes = errands_data_get_notes(data->ical);
   if (notes && !STR_EQUAL(text, notes)) {
-    errands_data_set_prop(data, PROP_NOTES, text);
-    errands_list_data_save(data->as.task.list);
+    errands_data_set_notes(data->ical, text);
+    errands_list_data_save(data->list);
     errands_sync_schedule_task(data);
   } else if (!notes && text && !STR_EQUAL(text, "")) {
-    errands_data_set_prop(data, PROP_NOTES, text);
-    errands_list_data_save(data->as.task.list);
+    errands_data_set_notes(data->ical, text);
+    errands_list_data_save(data->list);
     errands_sync_schedule_task(data);
   }
   errands_task_update_toolbar(self->current_task);

@@ -1,6 +1,4 @@
 #include "settings-dialog.h"
-#include "adwaita.h"
-#include "gtk/gtk.h"
 #include "notifications.h"
 #include "settings.h"
 #include "state.h"

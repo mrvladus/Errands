@@ -14,6 +14,7 @@ struct _ErrandsTaskListTagsDialog {
   GtkWidget *entry;
   GtkWidget *tags_box;
   GtkWidget *placeholder;
+
   ErrandsTask *current_task;
 };
 
