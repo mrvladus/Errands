@@ -140,6 +140,14 @@ extern const char *toolbox_log_prefix;
 #define BREAKPOINT asm("int3")
 // Unused variable
 #define UNUSED(var) (void)(var)
+// Asserts that a condition is true, aborts if false.
+#define ASSERT(condition)                                                                                              \
+  do {                                                                                                                 \
+    if (!(condition)) {                                                                                                \
+      LOG_DEBUG("ASSERTION FAILED: %s", #condition);                                                                   \
+      abort();                                                                                                         \
+    }                                                                                                                  \
+  } while (0)
 
 // -------------------- PROFILING -------------------- //
 

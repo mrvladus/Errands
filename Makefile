@@ -81,7 +81,7 @@ $(BUILD_DIR)/$(NAME): $(OBJS)
 
 -include $(DEPS)
 
-# Installation related targets
+# Installation targets
 
 install: $(BUILD_DIR)/$(NAME)
 	# Executable

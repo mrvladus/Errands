@@ -9,7 +9,6 @@
 #include "utils.h"
 
 #include <glib/gi18n.h>
-#include <libical/ical.h>
 
 static void on_errands_sidebar_filter_row_activated(GtkListBox *box, GtkListBoxRow *row, ErrandsSidebar *self);
 static void on_import_action_cb(GSimpleAction *action, GVariant *param, ErrandsSidebar *self);
@@ -72,10 +71,11 @@ void errands_sidebar_load_lists(ErrandsSidebar *self) {
   LOG("Sidebar: Created %d Task List Rows", errands_data_lists->len);
 }
 
-ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(ErrandsSidebar *sb, ListData *data) {
+ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(ErrandsSidebar *self, ListData *data) {
+  ASSERT(data);
   LOG("Sidebar: Add task list '%s'", data->uid);
   ErrandsSidebarTaskListRow *row = errands_sidebar_task_list_row_new(data);
-  gtk_list_box_append(GTK_LIST_BOX(sb->task_lists_box), GTK_WIDGET(row));
+  gtk_list_box_append(GTK_LIST_BOX(self->task_lists_box), GTK_WIDGET(row));
   return row;
 }
 

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "data.h"
-#include "gtk/gtk.h"
 
 #include <adwaita.h>
 
@@ -92,5 +91,5 @@ struct _ErrandsSidebar {
 ErrandsSidebar *errands_sidebar_new();
 void errands_sidebar_load_lists(ErrandsSidebar *self);
 void errands_sidebar_update_filter_rows(ErrandsSidebar *self);
-ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(ErrandsSidebar *sb, ListData *data);
+ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(ErrandsSidebar *self, ListData *data);
 void errands_sidebar_select_last_opened_page();
