@@ -276,7 +276,7 @@ ListData *errands_list_data_load_from_ical(icalcomponent *ical, const char *uid)
     CONTINUE_IF(errands_data_get_deleted(c)); // TODO: check sync
     g_ptr_array_add(all_tasks, c);
     CONTINUE_IF(errands_data_get_parent(c));
-    TaskData *task_data = errands_task_data_new(c, NULL, list_data);
+    errands_task_data_new(c, NULL, list_data);
   }
   g_ptr_array_sort_values(list_data->children, errands_data_sort_func);
   // Collect children recursively

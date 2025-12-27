@@ -11,20 +11,22 @@ AUTOPTR_DEFINE(JSON, json_free)
 // Save settings with cooldown period of 1s.
 static void errands__settings_save();
 
+#define SECRET_SCHEMA                                                                                                  \
+  ((SecretSchema){                                                                                                     \
+      APP_ID,                                                                                                          \
+      SECRET_SCHEMA_NONE,                                                                                              \
+      {                                                                                                                \
+          {"account", SECRET_SCHEMA_ATTRIBUTE_STRING},                                                                 \
+          {"NULL", 0},                                                                                                 \
+      },                                                                                                               \
+  })
+
 // --- GLOBAL VARIABLES --- //
 
 static char *settings_path;
 static time_t last_save_time = 0;
 static bool pending_save = false;
 static JSON *settings = NULL;
-static const SecretSchema secret_schema = {
-    APP_ID,
-    SECRET_SCHEMA_NONE,
-    {
-        {"account", SECRET_SCHEMA_ATTRIBUTE_STRING},
-        {"NULL", 0},
-    },
-};
 
 #define SETTING_KEY_STR(ErrandsSettingsKey, key_str) [ErrandsSettingsKey] = key_str
 
@@ -96,7 +98,7 @@ void errands_settings_load_user() {
 }
 
 static void errands_settings_migrate_from_46() {
-  g_autofree gchar *password = secret_password_lookup_sync(&secret_schema, NULL, NULL, "account", "Nextcloud", NULL);
+  g_autofree gchar *password = secret_password_lookup_sync(&SECRET_SCHEMA, NULL, NULL, "account", "Nextcloud", NULL);
   if (!password) return;
   errands_settings_set_password(password);
   // TODO: Migrate from GSettings to settings.json
@@ -244,10 +246,10 @@ static void errands__settings_save() {
 // --- PASSWORDS --- //
 
 gchar *errands_settings_get_password() {
-  return secret_password_lookup_sync(&secret_schema, NULL, NULL, "account", "CalDAV", NULL);
+  return secret_password_lookup_sync(&SECRET_SCHEMA, NULL, NULL, "account", "CalDAV", NULL);
 }
 
 void errands_settings_set_password(const char *password) {
-  secret_password_store_sync(&secret_schema, SECRET_COLLECTION_DEFAULT, "Errands CalDAV credentials", password, NULL,
+  secret_password_store_sync(&SECRET_SCHEMA, SECRET_COLLECTION_DEFAULT, "Errands CalDAV credentials", password, NULL,
                              NULL, "account", "CalDAV", NULL);
 }

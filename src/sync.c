@@ -74,8 +74,7 @@ static void initial_sync(GTask *task, gpointer source_object, gpointer task_data
 
 // Callback that runs on the main (UI) thread when the task is complete.
 static void initial_sync_finished_cb(GObject *source_object, GAsyncResult *res, gpointer user_data) {
-  gboolean success = g_task_propagate_boolean(G_TASK(res), NULL);
-  if (!success) return;
+  if (!g_task_propagate_boolean(G_TASK(res), NULL)) return;
   for (size_t i = 0; i < client->calendars->len; i++) {
     CalDAVCalendar *calendar = caldav_list_at(client->calendars, i);
     ListData *list = errands_list_data_create(calendar->uuid, calendar->name, calendar->color, false, false);
@@ -93,7 +92,7 @@ static void initial_sync_finished_cb(GObject *source_object, GAsyncResult *res, 
 }
 
 void errands_sync_init(void) {
-  RUN_THREAD_FUNC(initial_sync, initial_sync_finished_cb);
+  // RUN_THREAD_FUNC(initial_sync, initial_sync_finished_cb);
   // g_timeout_add_seconds(10, G_SOURCE_FUNC(sync), NULL);
 }
 

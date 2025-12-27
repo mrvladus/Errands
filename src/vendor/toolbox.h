@@ -158,12 +158,13 @@ extern const char *toolbox_log_prefix;
 
 // --- FOR LOOPS --- //
 
-#define for_ever                                      for (;;)
-#define for_range(idx, idx_start, idx_end)            for (int64_t idx = idx_start; idx < idx_end; ++idx)
-#define for_range_reverse(idx, idx_start, idx_end)    for (int64_t idx = idx_end - 1; idx >= idx_start; --idx)
-#define for_range_step(idx, idx_start, idx_end, step) for (int64_t idx = idx_start; idx < idx_end; idx += step)
+#define for_ever                                   for (;;)
+#define for_range(idx, idx_start, idx_end)         for (i64 idx = (i64)(idx_start); idx < (i64)(idx_end); ++idx)
+#define for_range_reverse(idx, idx_start, idx_end) for (i64 idx = (i64)(idx_end) - 1; idx >= (i64)(idx_start); --idx)
+#define for_range_step(idx, idx_start, idx_end, step)                                                                  \
+  for (i64 idx = (i64)(idx_start); idx < (i64)(idx_end); idx += (i64)(step))
 #define for_range_step_reverse(idx, idx_start, idx_end, step)                                                          \
-  for (int64_t idx = idx_end - 1; idx >= idx_start; idx -= step)
+  for (i64 idx = (i64)(idx_end) - 1; idx >= (i64)(idx_start); idx -= (i64)(step))
 
 // --- INSIDE LOOPS --- //
 
@@ -206,8 +207,6 @@ AUTOPTR_DEFINE(strv, strv_free);
 
 // -------------------- ARRAYS -------------------- //
 
-#define STATIC_ARRAY_SIZE(arr) sizeof(arr) / sizeof(arr[0])
-
 // Dynamic array struct
 typedef struct {
   size_t len;
@@ -216,83 +215,30 @@ typedef struct {
   void **items;
 } array;
 
+#define STATIC_ARRAY_SIZE(arr) sizeof(arr) / sizeof(arr[0])
+
 // Create new array with `initial_capacity`
-static inline array *array_new(size_t initial_capacity) {
-  array *a = calloc(1, sizeof(array));
-  a->capacity = initial_capacity;
-  a->items = calloc(1, sizeof(void *) * initial_capacity);
-  return a;
-}
-
+array *array_new(size_t initial_capacity);
 // Create new array struct with `initial_capacity` and `item_free_func`
-static inline array *array_new_with_free_func(size_t initial_capacity, void (*item_free_func)(void *)) {
-  array *a = calloc(1, sizeof(array));
-  a->capacity = initial_capacity;
-  a->item_free_func = item_free_func;
-  a->items = calloc(1, sizeof(void *) * initial_capacity);
-  return a;
-}
-
-// Free array and its items if `item_free_func` is provided
-static inline void array_free(array *a) {
-  if (a->item_free_func) for_range(i, 0, a->len) a->item_free_func(a->items[i]);
-  if (a->items) free(a->items);
-}
-
-AUTOPTR_DEFINE(array, array_free)
-
+array *array_new_with_free_func(size_t initial_capacity, void (*item_free_func)(void *));
 // Add `item` to array
-static inline void array_add(array *a, void *item) {
-  if (a->capacity == a->len) {
-    a->capacity *= 2;
-    a->items = realloc(a->items, a->capacity * sizeof(void *));
-  }
-  a->items[a->len++] = item;
-}
-
+void array_add(array *a, void *item);
 // Insert `item` at `idx` in array. If `idx` is -1 - append to end.
-static inline void array_insert(array *a, int64_t idx, void *item) {
-  if (idx == -1) {
-    array_add(a, item);
-    return;
-  }
-  if (a->capacity == a->len) {
-    a->capacity *= 2;
-    a->items = realloc(a->items, a->capacity * sizeof(void *));
-  }
-  for (size_t i = a->len; i > idx; i--) a->items[i] = a->items[i - 1];
-  a->items[idx] = item;
-  a->len++;
-}
-
+void array_insert(array *a, i64 idx, void *item);
 // Remove and free last item from array
-static inline void array_pop(array *a) {
-  if (a->item_free_func) a->item_free_func(a->items[a->len - 1]);
-  a->len--;
-}
-
+void array_pop(array *a);
 // Remove last item from array and return it without freeing it.
 // User is responsible for freeing the returned item.
-static inline void *array_steal(array *a) {
-  if (a->len == 0) return NULL;
-  void *item = a->items[a->len - 1];
-  a->len--;
-  return item;
-}
-
+void *array_steal(array *a);
 // Remove item at `idx` from array and return it without freeing it.
 // Move items after idx.
 // User is responsible for freeing the returned item.
-static inline void *array_steal_idx(array *a, size_t idx) {
-  if (a->len == 0) return NULL;
-  void *item = a->items[idx];
-  for (size_t i = idx; i < a->len - 1; i++) a->items[i] = a->items[i + 1];
-  a->len--;
-  return item;
-}
-
+void *array_steal_idx(array *a, size_t idx);
 // Get last item of the array or NULL if array is empty.
-static inline void *array_last(array *a) { return a->len == 0 ? NULL : a->items[a->len - 1]; }
+void *array_last(array *a);
+// Free array and its items if `item_free_func` is provided
+void array_free(array *a);
+AUTOPTR_DEFINE(array, array_free)
 
 // -------------------- TEMPORARY STRING -------------------- //
 
@@ -304,67 +250,20 @@ const char *tmp_str_printf(const char *format, ...);
 
 // -------------------- FILE FUNCTIONS -------------------- //
 
-static inline bool file_exists(const char *path) {
-  FILE *file = fopen(path, "r");
-  if (file) {
-    fclose(file);
-    return true;
-  }
-  return false;
-}
-
-static inline bool dir_exists(const char *path) {
-  struct stat statbuf;
-  return (stat(path, &statbuf) == 0 && S_ISDIR(statbuf.st_mode));
-}
-
-static inline char *read_file_to_string(const char *path) {
-  FILE *file = fopen(path, "r");
-  if (!file) return NULL;
-  fseek(file, 0, SEEK_END);
-  long file_size = ftell(file);
-  fseek(file, 0, SEEK_SET);
-  char *buf = (char *)malloc(file_size + 1);
-  fread(buf, 1, file_size, file);
-  buf[file_size] = '\0';
-  fclose(file);
-  return buf;
-}
-
-static inline bool write_string_to_file(const char *path, const char *str) {
-  FILE *file = fopen(path, "w");
-  if (file) {
-    fprintf(file, "%s", str);
-    fclose(file);
-    return true;
-  }
-  return false;
-}
+bool file_exists(const char *path);
+bool dir_exists(const char *path);
+char *read_file_to_string(const char *path);
+bool write_string_to_file(const char *path, const char *str);
 
 // -------------------- PATH FUNCTIONS -------------------- //
 
 // Get path base name. e. g. "/home/user/file.txt" -> "file.txt".
-static inline const char *path_base_name(const char *path) {
-  const char *last_sep = strrchr(path, '/');
-  if (!last_sep) last_sep = strrchr(path, '\\');
-  return last_sep ? last_sep + 1 : path;
-}
+const char *path_base_name(const char *path);
 // Get path extension. e. g. "/home/user/file.txt" -> "txt".
-static inline const char *path_ext(const char *path) {
-  const char *last_dot = strrchr(path, '.');
-  return last_dot ? last_dot + 1 : NULL;
-}
+const char *path_ext(const char *path);
 // Get path file name. e. g. "/home/user/file.txt" -> "file".
-static inline const char *path_file_name(const char *path) {
-  const char *dot = strrchr(path, '.');
-  if (!dot) return NULL;
-  const char *base_name = path_base_name(path);
-  size_t len = dot - base_name;
-  char filename[len + 1];
-  strncpy(filename, base_name, len);
-  filename[len] = '\0';
-  return tmp_str_printf("%s", filename);
-}
+// Returns string allocated with tmp_str_printf().
+const char *path_file_name(const char *path);
 
 // -------------------- TIME -------------------- //
 
@@ -379,6 +278,8 @@ static inline const char *path_file_name(const char *path) {
 
 // -------------------- SYSTEM COMMANDS -------------------- //
 
+// Run command and capture stdout.
+// `std_out` is allocated with malloc and must be freed by the caller.
 int cmd_run_stdout(const char *cmd, char **std_out);
 
 // -------------------- COLORS -------------------- //
@@ -414,7 +315,7 @@ const char *tmp_str_printf(const char *format, ...) {
     va_end(args);
     return "";
   }
-  if (len >= (size_t)TB_TMP_STR_BUFFER_SIZE - toolbox_tmp_str_offset - 1) toolbox_tmp_str_offset = 0;
+  if ((size_t)len >= (size_t)TB_TMP_STR_BUFFER_SIZE - toolbox_tmp_str_offset - 1) toolbox_tmp_str_offset = 0;
   // Print the string
   vsnprintf(toolbox_tmp_str + toolbox_tmp_str_offset, (size_t)TB_TMP_STR_BUFFER_SIZE - toolbox_tmp_str_offset, format,
             args);
@@ -429,16 +330,16 @@ const char *tmp_str_printf(const char *format, ...) {
 const char *generate_uuid4() {
   static thread_local char uuid[37];
   const char *hex = "0123456789abcdef";
-  static thread_local int seeded = 0;
+  static thread_local i64 seeded = 0;
   if (!seeded) {
     srand(time(NULL) ^ (unsigned long)&seeded);
     seeded = 1;
   }
-  for (int i = 0; i < 36; i++) {
+  for (i64 i = 0; i < 36; i++) {
     if (i == 8 || i == 13 || i == 18 || i == 23) uuid[i] = '-';
     else if (i == 14) uuid[i] = '4';
     else if (i == 19) {
-      int r = rand() % 4;
+      i64 r = rand() % 4;
       uuid[i] = (r == 0) ? '8' : (r == 1) ? '9' : (r == 2) ? 'a' : 'b';
     } else uuid[i] = hex[rand() % 16];
   }
@@ -582,5 +483,134 @@ int cmd_run_stdout(const char *cmd, char **std_out) {
   *std_out = buf;
   return status;
 }
+
+// -------------------- FILE FUNCTIONS -------------------- //
+
+bool file_exists(const char *path) {
+  FILE *file = fopen(path, "r");
+  if (file) {
+    fclose(file);
+    return true;
+  }
+  return false;
+}
+
+bool dir_exists(const char *path) {
+  struct stat statbuf;
+  return (stat(path, &statbuf) == 0 && S_ISDIR(statbuf.st_mode));
+}
+
+char *read_file_to_string(const char *path) {
+  FILE *file = fopen(path, "r");
+  if (!file) return NULL;
+  fseek(file, 0, SEEK_END);
+  long file_size = ftell(file);
+  fseek(file, 0, SEEK_SET);
+  char *buf = (char *)malloc(file_size + 1);
+  fread(buf, 1, file_size, file);
+  buf[file_size] = '\0';
+  fclose(file);
+  return buf;
+}
+
+bool write_string_to_file(const char *path, const char *str) {
+  FILE *file = fopen(path, "w");
+  if (file) {
+    fprintf(file, "%s", str);
+    fclose(file);
+    return true;
+  }
+  return false;
+}
+
+// -------------------- PATH FUNCTIONS -------------------- //
+
+const char *path_base_name(const char *path) {
+  const char *last_sep = strrchr(path, '/');
+  if (!last_sep) last_sep = strrchr(path, '\\');
+  return last_sep ? last_sep + 1 : path;
+}
+
+const char *path_ext(const char *path) {
+  const char *last_dot = strrchr(path, '.');
+  return last_dot ? last_dot + 1 : NULL;
+}
+
+const char *path_file_name(const char *path) {
+  const char *dot = strrchr(path, '.');
+  if (!dot) return NULL;
+  const char *base_name = path_base_name(path);
+  size_t len = dot - base_name;
+  char filename[len + 1];
+  strncpy(filename, base_name, len);
+  filename[len] = '\0';
+  return tmp_str_printf("%s", filename);
+}
+
+// -------------------- ARRAYS -------------------- //
+
+array *array_new(size_t initial_capacity) {
+  array *a = calloc(1, sizeof(array));
+  a->capacity = initial_capacity;
+  a->items = calloc(1, sizeof(void *) * initial_capacity);
+  return a;
+}
+
+array *array_new_with_free_func(size_t initial_capacity, void (*item_free_func)(void *)) {
+  array *a = calloc(1, sizeof(array));
+  a->capacity = initial_capacity;
+  a->item_free_func = item_free_func;
+  a->items = calloc(1, sizeof(void *) * initial_capacity);
+  return a;
+}
+
+void array_free(array *a) {
+  if (a->item_free_func) for_range(i, 0, a->len) a->item_free_func(a->items[i]);
+  if (a->items) free(a->items);
+}
+
+void array_add(array *a, void *item) {
+  if (a->capacity == a->len) {
+    a->capacity *= 2;
+    a->items = realloc(a->items, a->capacity * sizeof(void *));
+  }
+  a->items[a->len++] = item;
+}
+
+void array_insert(array *a, i64 idx, void *item) {
+  if (idx == -1) {
+    array_add(a, item);
+    return;
+  }
+  if (a->capacity == a->len) {
+    a->capacity *= 2;
+    a->items = realloc(a->items, a->capacity * sizeof(void *));
+  }
+  for (i64 i = a->len; i > idx; i--) a->items[i] = a->items[i - 1];
+  a->items[idx] = item;
+  a->len++;
+}
+
+void array_pop(array *a) {
+  if (a->item_free_func) a->item_free_func(a->items[a->len - 1]);
+  a->len--;
+}
+
+void *array_steal(array *a) {
+  if (a->len == 0) return NULL;
+  void *item = a->items[a->len - 1];
+  a->len--;
+  return item;
+}
+
+void *array_steal_idx(array *a, size_t idx) {
+  if (a->len == 0) return NULL;
+  void *item = a->items[idx];
+  for (size_t i = idx; i < a->len - 1; i++) a->items[i] = a->items[i + 1];
+  a->len--;
+  return item;
+}
+
+void *array_last(array *a) { return a->len == 0 ? NULL : a->items[a->len - 1]; }
 
 #endif // TOOLBOX_IMPLEMENTATION
