@@ -1,8 +1,10 @@
 #include "data.h"
+#include "glib.h"
 #include "settings.h"
 
 #include "vendor/json.h"
 #include "vendor/toolbox.h"
+#include <libical/ical.h>
 
 static void errands_data_create_backup();
 
@@ -135,14 +137,23 @@ static void errands_data_migrate_from_46() {
 static void collect_and_sort_children_recursive(TaskData *parent, GPtrArray *all_tasks) {
   const char *uid = errands_data_get_uid(parent->ical);
   for_range(i, 0, all_tasks->len) {
-    TaskData *task = g_ptr_array_index(all_tasks, i);
-    const char *parent_uid = errands_data_get_uid(task->ical);
+    icalcomponent *ical = g_ptr_array_index(all_tasks, i);
+    const char *parent_uid = errands_data_get_parent(ical);
     if (parent_uid && STR_EQUAL(uid, parent_uid)) {
-      TaskData *child = errands_task_data_new(task->ical, parent, parent->list);
-      collect_and_sort_children_recursive(child, all_tasks);
+      TaskData *new_task = errands_task_data_new(ical, parent, parent->list);
+      collect_and_sort_children_recursive(new_task, all_tasks);
     }
   }
   g_ptr_array_sort_values(parent->children, errands_data_sort_func);
+}
+
+static void errands__list_data_save_cb(ListData *data) {
+  const char *path = tmp_str_printf("%s/%s.ics", calendars_dir, data->uid);
+  if (!g_file_set_contents(path, icalcomponent_as_ical_string(data->ical), -1, NULL)) {
+    LOG("User Data: Failed to save list '%s'", path);
+    return;
+  }
+  LOG("User Data: Saved list '%s'", path);
 }
 
 static icalproperty *get_x_prop(icalcomponent *ical, const char *xprop, const char *default_val) {
@@ -207,43 +218,21 @@ void errands_data_init() {
         continue;
       }
     }
-    // TODO: pass filename as uid
-    g_ptr_array_add(errands_data_lists, errands_list_data_load_from_ical(cal, NULL));
+    const char *uid = path_file_name(filename);
+    ListData *list_data = errands_list_data_load_from_ical(cal, uid);
+    CONTINUE_IF(!list_data);
+    g_ptr_array_add(errands_data_lists, list_data);
     LOG("User Data: Loaded calendar %s", path);
   }
 
-  // --- Load tasks --- //
-
-  // Collect all tasks and add toplevel tasks to lists
-  g_autoptr(GPtrArray) all_tasks = g_ptr_array_new();
-  for_range(i, 0, errands_data_lists->len) {
-    ListData *list_data = g_ptr_array_index(errands_data_lists, i);
-    for (icalcomponent *c = icalcomponent_get_first_component(list_data->ical, ICAL_VTODO_COMPONENT); c != 0;
-         c = icalcomponent_get_next_component(list_data->ical, ICAL_VTODO_COMPONENT)) {
-      if (errands_data_get_deleted(c)) continue;
-      TaskData *task_data = errands_task_data_new(c, NULL, list_data);
-      g_ptr_array_add(all_tasks, task_data);
-    }
-    g_ptr_array_sort_values(list_data->children, errands_data_sort_func);
-  }
-
-  // Collect children recursively
-  for_range(i, 0, errands_data_lists->len) {
-    TaskData *list_data = g_ptr_array_index(errands_data_lists, i);
-    for_range(j, 0, list_data->children->len) {
-      TaskData *toplevel_task = g_ptr_array_index(list_data->children, j);
-      collect_and_sort_children_recursive(toplevel_task, all_tasks);
-    }
-  }
-
-  LOG("User Data: Loaded %d tasks from %d lists in %f sec.", all_tasks->len, errands_data_lists->len, TIMER_ELAPSED_MS);
+  LOG("User Data: Loaded %d task-lists in %f sec.", errands_data_lists->len, TIMER_ELAPSED_MS);
 }
 
 void errands_data_cleanup(void) {
   LOG("User Data: Cleanup");
-  g_free(user_dir);
-  g_free(calendars_dir);
-  g_free(backups_dir);
+  if (user_dir) g_free(user_dir);
+  if (calendars_dir) g_free(calendars_dir);
+  if (backups_dir) g_free(backups_dir);
   if (errands_data_lists) g_ptr_array_free(errands_data_lists, true);
 }
 
@@ -266,29 +255,28 @@ void errands_data_sort() {
 ListData *errands_list_data_new(icalcomponent *ical, const char *uid) {
   ListData *data = calloc(1, sizeof(ListData));
   data->ical = ical;
-  data->children = g_ptr_array_new_with_free_func((GDestroyNotify)errands_list_data_free);
+  data->children = g_ptr_array_new_with_free_func((GDestroyNotify)errands_task_data_free);
   data->uid = strdup(uid);
 
   return data;
 }
 
 ListData *errands_list_data_load_from_ical(icalcomponent *ical, const char *uid) {
+  if (!ical || !uid) return NULL;
   if (ical && icalcomponent_isa(ical) != ICAL_VCALENDAR_COMPONENT) return NULL;
-  const char *_uid = uid;
-  if (!_uid) _uid = generate_uuid4();
-  get_x_prop_value(ical, "X-ERRANDS-LIST-NAME", _uid);
+  get_x_prop_value(ical, "X-ERRANDS-LIST-NAME", uid);
   get_x_prop_value(ical, "X-ERRANDS-COLOR", generate_hex_as_str());
 
-  ListData *list_data = errands_list_data_new(ical, _uid);
+  ListData *list_data = errands_list_data_new(ical, uid);
 
   // Collect all tasks and add toplevel tasks to lists
   g_autoptr(GPtrArray) all_tasks = g_ptr_array_new();
   for (icalcomponent *c = icalcomponent_get_first_component(ical, ICAL_VTODO_COMPONENT); c != 0;
        c = icalcomponent_get_next_component(ical, ICAL_VTODO_COMPONENT)) {
-    if (errands_data_get_deleted(c)) continue;
+    CONTINUE_IF(errands_data_get_deleted(c)); // TODO: check sync
+    g_ptr_array_add(all_tasks, c);
+    CONTINUE_IF(errands_data_get_parent(c));
     TaskData *task_data = errands_task_data_new(c, NULL, list_data);
-    g_ptr_array_add(all_tasks, task_data);
-    if (errands_data_get_parent(task_data->ical)) continue;
   }
   g_ptr_array_sort_values(list_data->children, errands_data_sort_func);
   // Collect children recursively
@@ -357,6 +345,16 @@ void errands_list_data_get_flat_list(ListData *data, GPtrArray *tasks) {
     g_ptr_array_add(tasks, task_data);
     errands_task_data_get_flat_list(task_data, tasks);
   }
+}
+
+void errands_list_data_save(ListData *data) { g_idle_add_once((GSourceOnceFunc)errands__list_data_save_cb, data); }
+
+void errands_list_data_free(ListData *data) {
+  if (!data) return;
+  if (data->ical) icalcomponent_free(data->ical);
+  if (data->uid) free(data->uid);
+  if (data->children) g_ptr_array_free(data->children, true);
+  free(data);
 }
 
 // ---------- TASK DATA ---------- //
@@ -475,25 +473,6 @@ void errands_task_data_free(TaskData *data) {
 //   indent++;
 //   for (size_t i = 0; i < children->len; i++) task_data_print(children->pdata[i], out, indent);
 // }
-
-static void errands__list_data_save_cb(ListData *data) {
-  const char *path = tmp_str_printf("%s/%s.ics", calendars_dir, data->uid);
-  if (!g_file_set_contents(path, icalcomponent_as_ical_string(data->ical), -1, NULL)) {
-    LOG("User Data: Failed to save list '%s'", path);
-    return;
-  }
-  LOG("User Data: Saved list '%s'", path);
-}
-
-void errands_list_data_save(ListData *data) { g_idle_add_once((GSourceOnceFunc)errands__list_data_save_cb, data); }
-
-void errands_list_data_free(ListData *data) {
-  if (!data) return;
-  if (data->ical) icalcomponent_free(data->ical);
-  if (data->uid) free(data->uid);
-  if (data->children) g_ptr_array_free(data->children, true);
-  free(data);
-}
 
 // ---------- PROPERTIES ---------- //
 

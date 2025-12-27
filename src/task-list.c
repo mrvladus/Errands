@@ -344,7 +344,7 @@ static void on_task_list_entry_activated_cb(AdwEntryRow *entry, ErrandsTaskList 
   const char *list_uid = self->data->uid;
   if (STR_EQUAL(text, "") || STR_EQUAL(list_uid, "")) return;
   TaskData *data = errands_task_data_create_task(self->data, NULL, text);
-  g_ptr_array_add(self->data->children, data);
+  // g_ptr_array_add(self->data->children, data);
   errands_list_data_sort(self->data);
   errands_list_data_save(self->data);
   gtk_editable_set_text(GTK_EDITABLE(entry), "");

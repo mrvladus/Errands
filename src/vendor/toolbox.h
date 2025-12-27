@@ -344,17 +344,26 @@ static inline bool write_string_to_file(const char *path, const char *str) {
 // -------------------- PATH FUNCTIONS -------------------- //
 
 // Get path base name. e. g. "/home/user/file.txt" -> "file.txt".
-// Returns pointer to the beginning of the base name in the path or NULL on error.
 static inline const char *path_base_name(const char *path) {
   const char *last_sep = strrchr(path, '/');
   if (!last_sep) last_sep = strrchr(path, '\\');
   return last_sep ? last_sep + 1 : path;
 }
 // Get path extension. e. g. "/home/user/file.txt" -> "txt".
-// Returns pointer to the beginning of the extension in the path or NULL on error.
 static inline const char *path_ext(const char *path) {
   const char *last_dot = strrchr(path, '.');
   return last_dot ? last_dot + 1 : NULL;
+}
+// Get path file name. e. g. "/home/user/file.txt" -> "file".
+static inline const char *path_file_name(const char *path) {
+  const char *dot = strrchr(path, '.');
+  if (!dot) return NULL;
+  const char *base_name = path_base_name(path);
+  size_t len = dot - base_name;
+  char filename[len + 1];
+  strncpy(filename, base_name, len);
+  filename[len] = '\0';
+  return tmp_str_printf("%s", filename);
 }
 
 // -------------------- TIME -------------------- //

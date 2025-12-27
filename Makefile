@@ -1,11 +1,10 @@
-# Project info
+# --- Project info --- #
 
 NAME = errands
 APP_ID = io.github.mrvladus.Errands
 VERSION = 49.0
-VERSION_COMMIT = $(shell git rev-parse --short HEAD)
 
-# Installation directories
+# --- Installation directories --- #
 
 DESTDIR ?=
 prefix ?= /usr/local
@@ -14,13 +13,13 @@ datarootdir = $(prefix)/share
 localedir = $(datarootdir)/locale
 desktopdir = $(datarootdir)/applications
 
-# Project directories
+# --- Project directories --- #
 
 BUILD_DIR = build
 SRC_DIR = src
 DATA_DIR = data
 
-# Resources
+# --- Resources --- #
 
 BLPS = $(wildcard $(SRC_DIR)/*.blp)
 STYLES = $(wildcard $(DATA_DIR)/styles/*.css)
@@ -29,13 +28,13 @@ GRESOURCE_XML = $(DATA_DIR)/$(NAME).gresource.xml
 RESOURCES_C = $(BUILD_DIR)/resources.c
 RESOURCES_O = $(BUILD_DIR)/resources.o
 
-# Sources
+# --- Sources --- #
 
 SRCS = $(wildcard $(SRC_DIR)/*.c)
 OBJS = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRCS)) $(RESOURCES_O)
 DEPS = $(OBJS:.o=.d)
 
-# Compilation variables
+# --- Compilation variables --- #
 
 CC = gcc
 PKG_CONFIG_LIBS = libadwaita-1 gtksourceview-5 libical libportal libcurl libsecret-1
@@ -43,12 +42,12 @@ CFLAGS = -Wall -g
 ALL_CFLAGS = $(CFLAGS) \
 			`pkg-config --cflags $(PKG_CONFIG_LIBS)` \
 			-DVERSION='"$(VERSION)"' \
-			-DVERSION_COMMIT='"$(VERSION_COMMIT)"' \
+			-DVERSION_COMMIT='"$(shell git rev-parse --short HEAD)"' \
 			-DAPP_ID='"$(APP_ID)"' \
 			-DLOCALE_DIR='""'
 LDFLAGS = `pkg-config --libs $(PKG_CONFIG_LIBS)`
 
-# Targets
+# --- Targets --- #
 
 all: $(BUILD_DIR)/$(NAME)
 
@@ -58,7 +57,7 @@ clean:
 $(BUILD_DIR):
 	@mkdir -p $(BUILD_DIR)
 
-# Resources targets
+# --- Resources targets --- #
 
 $(RESOURCES_O): $(RESOURCES_C) | $(BUILD_DIR)
 	@echo "Compiling $<"
@@ -69,7 +68,7 @@ $(RESOURCES_C): $(GRESOURCE_XML) $(BLPS) $(STYLES) $(ICONS)
 	@blueprint-compiler batch-compile $(BUILD_DIR) $(SRC_DIR) $(BLPS)
 	@glib-compile-resources --generate-source --target=$@ --c-name=$(NAME) $<
 
-# Sources targets
+# --- Sources targets --- #
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
 	@echo "Compiling $<"
@@ -81,7 +80,7 @@ $(BUILD_DIR)/$(NAME): $(OBJS)
 
 -include $(DEPS)
 
-# Installation targets
+# --- Installation targets --- #
 
 install: $(BUILD_DIR)/$(NAME)
 	# Executable
@@ -95,12 +94,17 @@ uninstall:
 	rm -f $(DESTDIR)/$(bindir)/$(NAME)
 	rm -f $(DESTDIR)/$(desktopdir)/$(APP_ID).desktop
 
-# Development targets
+# --- Development targets --- #
 
+# Run the application
 run: all
 	@./$(BUILD_DIR)/$(NAME)
 
-count-sloc:
+run-gdb: all
+	@gdb ./$(BUILD_DIR)/$(NAME)
+
+# Count source lines of code
+sloc:
 	@find $(SRC_DIR) -name '*.c' -o -name '*.h' | sort | xargs wc -l
 
-.PHONY: all install uninstall run clean count-sloc
+.PHONY: all install uninstall run clean sloc
