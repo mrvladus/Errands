@@ -48,7 +48,7 @@ ErrandsTaskListDateDialogTimeChooser *errands_task_list_date_dialog_time_chooser
 // ---------- PUBLIC FUNCTIONS ---------- //
 
 icaltimetype errands_task_list_date_dialog_time_chooser_get_time(ErrandsTaskListDateDialogTimeChooser *self) {
-  icaltimetype time = ICALTIMETYPE_INITIALIZER;
+  icaltimetype time = icaltime_null_time();
   if (!self->is_reset) {
     time.hour = gtk_spin_button_get_value_as_int(self->hours);
     time.minute = gtk_spin_button_get_value_as_int(self->minutes);
@@ -60,7 +60,7 @@ void errands_task_list_date_dialog_time_chooser_set_time(ErrandsTaskListDateDial
                                                          const icaltimetype time) {
   gtk_spin_button_set_value(self->hours, time.hour);
   gtk_spin_button_set_value(self->minutes, time.minute);
-  bool is_null = time.is_date;
+  bool is_null = icaltime_is_null_time(time);
   self->is_reset = is_null;
   char t[6];
   sprintf(t, "%02d:%02d", time.hour, time.minute);

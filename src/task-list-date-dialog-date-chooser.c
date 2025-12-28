@@ -2,6 +2,7 @@
 #include "task-list.h"
 
 #include <glib/gi18n.h>
+#include <libical/ical.h>
 
 static void on_day_selected(ErrandsTaskListDateDialogDateChooser *self);
 static void on_today_selected(ErrandsTaskListDateDialogDateChooser *self);
@@ -48,8 +49,7 @@ ErrandsTaskListDateDialogDateChooser *errands_task_list_date_dialog_date_chooser
 // ---------- PUBLIC FUNCTIONS ---------- //
 
 icaltimetype errands_task_list_date_dialog_date_chooser_get_date(ErrandsTaskListDateDialogDateChooser *self) {
-  icaltimetype date = ICALTIMETYPE_INITIALIZER;
-  date.is_date = true;
+  icaltimetype date = icaltime_null_date();
   if (!self->is_reset) {
     date.year = gtk_calendar_get_year(self->calendar);
     date.month = gtk_calendar_get_month(self->calendar) + 1;
@@ -62,6 +62,7 @@ icaltimetype errands_task_list_date_dialog_date_chooser_get_date(ErrandsTaskList
 void errands_task_list_date_dialog_date_chooser_set_date(ErrandsTaskListDateDialogDateChooser *self,
                                                          const icaltimetype date) {
   bool is_null = icaltime_is_null_date(date);
+  LOG("Date Chooser: Set '%s'", is_null ? "NULL" : icaltime_as_ical_string(date));
   self->is_reset = is_null;
   if (is_null) errands_task_list_date_dialog_date_chooser_reset(self);
   else {

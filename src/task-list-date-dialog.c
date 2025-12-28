@@ -6,6 +6,7 @@
 #include "task-list.h"
 
 #include <glib/gi18n.h>
+#include <libical/ical.h>
 
 static void on_dialog_close_cb(ErrandsTaskListDateDialog *self);
 
@@ -59,7 +60,7 @@ void errands_task_list_date_dialog_show(ErrandsTask *task) {
     state.main_window->task_list->date_dialog = errands_task_list_date_dialog_new();
   ErrandsTaskListDateDialog *dialog = state.main_window->task_list->date_dialog;
   dialog->current_task = task;
-  ListData *data = task->data->list;
+  TaskData *data = task->data;
 
   // Reset all rows
   errands_task_list_date_dialog_date_chooser_reset(dialog->start_date_chooser);
@@ -72,13 +73,13 @@ void errands_task_list_date_dialog_show(ErrandsTask *task) {
   LOG("Date Dialog: Set start time");
   icaltimetype start_dt = errands_data_get_start(data->ical);
   errands_task_list_date_dialog_date_chooser_set_date(dialog->start_date_chooser, start_dt);
-  errands_task_list_date_dialog_time_chooser_set_time(dialog->start_time_chooser, start_dt);
+  if (!start_dt.is_date) errands_task_list_date_dialog_time_chooser_set_time(dialog->start_time_chooser, start_dt);
 
   // Set due dt
   LOG("Date Dialog: Set due time");
   icaltimetype due_dt = errands_data_get_due(data->ical);
   errands_task_list_date_dialog_date_chooser_set_date(dialog->due_date_chooser, due_dt);
-  errands_task_list_date_dialog_time_chooser_set_time(dialog->due_time_chooser, due_dt);
+  if (!due_dt.is_date) errands_task_list_date_dialog_time_chooser_set_time(dialog->due_time_chooser, due_dt);
 
   // Set rrule
   icalproperty *rrule_prop = icalcomponent_get_first_property(data->ical, ICAL_RRULE_PROPERTY);
@@ -214,7 +215,6 @@ static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
       errands_data_set_notified(data->ical, false);
       errands_notifications_add(data);
     }
-    errands_data_set_synced(data->ical, false);
     errands_list_data_save(data->list);
     if (self->current_task->data->parent) errands_task_data_sort_sub_tasks(self->current_task->data->parent);
     else errands_data_sort();
