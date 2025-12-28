@@ -17,8 +17,17 @@ template $ErrandsTask: Box {
     margin-top: 6;
     margin-bottom: 6;
 
+    cursor: Gdk.Cursor {
+      name: "pointer";
+    };
+
     accessibility {
       labelled-by: title;
+    }
+
+    GestureClick {
+      button: 1;
+      released => $on_expand_toggle_cb(template);
     }
 
     CheckButton complete_btn {
@@ -38,15 +47,6 @@ template $ErrandsTask: Box {
       valign: center;
       spacing: 0;
       tooltip-text: _("Toggle Sub-Tasks");
-
-      cursor: Gdk.Cursor {
-        name: "pointer";
-      };
-
-      GestureClick {
-        button: 1;
-        released => $on_expand_toggle_cb(template);
-      }
 
       Label title {
         hexpand: true;
