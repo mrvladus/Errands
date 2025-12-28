@@ -4,4 +4,4 @@ Template files for creating new widgets in GTK and Blueprint:
 - widget.c
 - widget.h
 
-After creating widget remember to add files to `meson.build` and `data/errands.gresource.xml`.
+After creating widget remember to add UI files to `data/errands.gresource.xml`.

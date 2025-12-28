@@ -1,8 +1,8 @@
 [Desktop Entry]
 Name=Errands
 Comment=Manage your tasks
-Exec=errands
-Icon=APP_ID
+Exec=@BIN_DIR@/errands
+Icon=@APP_ID@
 Terminal=false
 Type=Application
 Categories=GNOME;GTK;Utility;
