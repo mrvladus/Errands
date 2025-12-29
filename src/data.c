@@ -219,7 +219,7 @@ void errands_data_init() {
       }
     }
     const char *uid = path_file_name(filename);
-    ListData *list_data = errands_list_data_load_from_ical(cal, uid);
+    ListData *list_data = errands_list_data_load_from_ical(cal, uid, NULL, NULL);
     CONTINUE_IF(!list_data);
     g_ptr_array_add(errands_data_lists, list_data);
     LOG("User Data: Loaded calendar %s", path);
@@ -261,11 +261,11 @@ ListData *errands_list_data_new(icalcomponent *ical, const char *uid) {
   return data;
 }
 
-ListData *errands_list_data_load_from_ical(icalcomponent *ical, const char *uid) {
+ListData *errands_list_data_load_from_ical(icalcomponent *ical, const char *uid, const char *name, const char *color) {
   if (!ical || !uid) return NULL;
   if (ical && icalcomponent_isa(ical) != ICAL_VCALENDAR_COMPONENT) return NULL;
-  get_x_prop_value(ical, "X-ERRANDS-LIST-NAME", uid);
-  get_x_prop_value(ical, "X-ERRANDS-COLOR", generate_hex_as_str());
+  get_x_prop_value(ical, "X-ERRANDS-LIST-NAME", name ? name : uid);
+  get_x_prop_value(ical, "X-ERRANDS-COLOR", color ? color : generate_hex_as_str());
 
   ListData *list_data = errands_list_data_new(ical, uid);
 
@@ -289,7 +289,7 @@ ListData *errands_list_data_load_from_ical(icalcomponent *ical, const char *uid)
 }
 
 ListData *errands_list_data_create(const char *uid, const char *name, const char *color, bool deleted, bool synced) {
-  if (!name || !uid || !color) return NULL;
+  ASSERT(uid != NULL && name != NULL && color != NULL);
 
   icalcomponent *ical = icalcomponent_new(ICAL_VCALENDAR_COMPONENT);
   icalcomponent_add_property(ical, icalproperty_new_version("2.0"));

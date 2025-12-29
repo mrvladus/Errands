@@ -22,9 +22,9 @@ typedef enum {
 
 // Simple dynamic array of pointers that can only grow in size
 typedef struct {
-  void **data; // Pointer to data array
   size_t size; // List capacity
   size_t len;  // Number of list elements
+  void **data; // Pointer to data array
 } CalDAVList;
 
 // Client object
@@ -43,29 +43,16 @@ typedef struct {
   char *color;            // Calendar color
   char *url;              // URL
   char *uuid;             // UUID
-  bool deleted;           // Is deleted
   CalDAVComponentSet set; // Supported component set
-  CalDAVList *events;     // List of events
-} CalDAVCalendar;
-
-// Event object
-typedef struct {
-  // Parent calendar.
-  CalDAVCalendar *calendar;
-  // icalcomponent of type VCALENDAR.
   icalcomponent *ical;
-  // URL of event.
-  char *url;
-  // Is event deleted.
-  bool deleted;
-} CalDAVEvent;
+} CalDAVCalendar;
 
 // --- CLIENT --- //
 
 // Initialize caldav client with url, username and password
 CalDAVClient *caldav_client_new(const char *base_url, const char *username, const char *password);
 // Autodiscover calendars URL from base URL.
-// Server must support autodiscovery at http://base.url/.well-known/caldav.
+// Server must support autodiscovery at `http://base.url/.well-known/caldav`
 bool caldav_client_connect(CalDAVClient *client, bool autodiscover);
 // Fetch calendars from server.
 // All previous calendars are freed and replaced with new ones.
@@ -85,10 +72,7 @@ CalDAVCalendar *caldav_calendar_new(CalDAVClient *client, const char *color, Cal
                                     const char *url);
 // Free calendar object.
 void caldav_calendar_free(CalDAVCalendar *calendar);
-// Create new event in calendar on server.
-// Adds the event to the calendar->events array on success and returns pointer to the event.
-// Returns NULL on failure.
-CalDAVEvent *caldav_calendar_create_event(CalDAVCalendar *calendar, icalcomponent *ical);
+
 // Delete calendar on server.
 // Returns "true" on success and "false" on failure.
 bool caldav_calendar_delete(CalDAVCalendar *calendar);
@@ -96,27 +80,6 @@ bool caldav_calendar_delete(CalDAVCalendar *calendar);
 // All previous events are freed and replaced with new ones.
 // This invalidates pointers to old events.
 bool caldav_calendar_pull_events(CalDAVCalendar *calendar);
-
-// --- EVENT --- //
-
-// Create new CalDAVEvent.
-// Wraps it in VCALENDAR component if needed and adds UID property if it not exists.
-CalDAVEvent *caldav_event_new(CalDAVCalendar *calendar, icalcomponent *ical);
-// Cleanup event
-void caldav_event_free(CalDAVEvent *event);
-// Delete event on the server.
-// Sets event->deleted to "true" on success.
-// Returns "true" on success and "false" on failure.
-bool caldav_event_delete(CalDAVEvent *event);
-// Replace ical data of the event with new, pulled from the server.
-// Returns "true" on success and "false" on failure.
-bool caldav_event_pull(CalDAVEvent *event);
-// Update event on the server with event->ical
-// Returns "true" on success and "false" on failure.
-bool caldav_event_push(CalDAVEvent *event);
-// Get the inner event (VEVENT, VTODO, VJOURNAL etc.) from event->ical.
-// Because event->ical it's wrapped in VCALENDAR element.
-icalcomponent *caldav_event_get_ical_event(CalDAVEvent *event);
 
 // --- LIST --- //
 
@@ -509,29 +472,18 @@ CalDAVCalendar *caldav_calendar_new(CalDAVClient *client, const char *color, Cal
   calendar->name = strdup(name);
   calendar->url = strdup(url);
   calendar->uuid = extract_uuid(url);
-  calendar->deleted = false;
-  calendar->events = caldav_list_new();
   return calendar;
 }
 
-CalDAVEvent *caldav_calendar_create_event(CalDAVCalendar *calendar, icalcomponent *ical) {
-  CalDAVEvent *new_event = caldav_event_new(calendar, ical);
-  bool res = caldav_event_push(new_event);
-  if (!res) {
-    caldav_event_free(new_event);
-    return NULL;
-  }
-  caldav_list_add(calendar->events, new_event);
-  return new_event;
-}
-
 bool caldav_calendar_delete(CalDAVCalendar *calendar) {
-  calendar->deleted = caldav_delete(calendar->client, calendar->url);
-  return calendar->deleted;
+  return true;
+  // calendar->deleted = caldav_delete(calendar->client, calendar->url);
+  // return calendar->deleted;
 }
 
 bool caldav_calendar_pull_events(CalDAVCalendar *calendar) {
   caldav_log("Getting events for calendar '%s'", calendar->url);
+  caldav_free(calendar->ical);
   const char *request_template = "<c:calendar-query xmlns:d=\"DAV:\" xmlns:c=\"urn:ietf:params:xml:ns:caldav\">"
                                  "  <d:prop>"
                                  "    <c:calendar-data/>"
@@ -551,14 +503,13 @@ bool caldav_calendar_pull_events(CalDAVCalendar *calendar) {
 
   char request_body[strlen(request_template) + strlen(comp_set) + 1];
   sprintf(request_body, request_template, comp_set);
-  CalDAVList *events = NULL;
   char *xml = caldav_request_report(calendar->client, calendar->url, request_body);
   if (!xml) return false;
   XMLNode *root = xml_parse_string(xml);
   if (!root) return false;
   XMLNode *multistatus = xml_node_child_at(root, 0);
   if (!multistatus) return false;
-  events = caldav_list_new();
+  icalcomponent *icalendar = icalcomponent_new(ICAL_VCALENDAR_COMPONENT);
   for (size_t i = 0; i < multistatus->children->len; i++) {
     XMLNode *res = xml_node_child_at(multistatus, i);
     if (!res) continue;
@@ -568,13 +519,14 @@ bool caldav_calendar_pull_events(CalDAVCalendar *calendar) {
     if (!cal_data || !cal_data->text) continue;
     char *url = strdup_printf("%s%s", calendar->client->base_url, href->text);
     icalcomponent *ical = icalcomponent_new_from_string(cal_data->text);
-    CalDAVEvent *event = caldav_event_new(calendar, ical);
-    caldav_list_add(events, event);
+    icalcomponent *vtodo = icalcomponent_new_clone(icalcomponent_get_inner(ical));
+    icalcomponent_strip_errors(vtodo);
+    icalcomponent_add_component(icalendar, vtodo);
+    icalcomponent_free(ical);
     caldav_log("Found event at %s", url);
     caldav_free(url);
   }
-  caldav_list_free(calendar->events, (void (*)(void *))caldav_event_free);
-  calendar->events = events;
+  calendar->ical = icalendar;
   return true;
 }
 
@@ -583,76 +535,8 @@ void caldav_calendar_free(CalDAVCalendar *calendar) {
   caldav_free(calendar->name);
   caldav_free(calendar->url);
   caldav_free(calendar->uuid);
-  caldav_list_free(calendar->events, (void (*)(void *))caldav_event_free);
   caldav_free(calendar);
 }
-
-// ---------- EVENT ---------- //
-
-CalDAVEvent *caldav_event_new(CalDAVCalendar *calendar, icalcomponent *ical) {
-  if (!calendar || !ical || !icalcomponent_is_valid(ical)) return NULL;
-  CalDAVEvent *event = malloc(sizeof(CalDAVEvent));
-  event->calendar = calendar;
-  const char *uid = NULL;
-  if (icalcomponent_isa(ical) != ICAL_VCALENDAR_COMPONENT) {
-    icalcomponent *wrapper = caldav_create_vcalendar();
-    icalcomponent_add_component(wrapper, event->ical);
-    uid = icalcomponent_get_uid(ical);
-    if (!uid) {
-      uid = caldav_generate_uuid4();
-      icalcomponent_set_uid(ical, uid);
-    }
-    event->ical = wrapper;
-  } else {
-    icalcomponent *inner = icalcomponent_get_inner(ical);
-    if (inner) uid = icalcomponent_get_uid(inner);
-    if (!uid) {
-      uid = caldav_generate_uuid4();
-      icalcomponent_set_uid(inner, uid);
-    }
-    event->ical = ical;
-  }
-  event->url = strdup_printf("%s%s.ics", calendar->url, uid);
-  event->deleted = false;
-  return event;
-}
-
-bool caldav_event_delete(CalDAVEvent *event) {
-  if (!event) return false;
-  caldav_log("Delete event at %s", event->url);
-  bool res = caldav_delete(event->calendar->client, event->url);
-  event->deleted = res;
-  return res;
-}
-
-bool caldav_event_pull(CalDAVEvent *event) {
-  if (!event) return false;
-  caldav_log("Pull event at %s", event->url);
-  char *res = caldav_get(event->calendar->client, event->url);
-  if (!res) return false;
-  icalcomponent *comp = icalcomponent_new_from_string(res);
-  if (!comp) return false;
-  icalcomponent_free(event->ical);
-  event->ical = comp;
-  caldav_free(res);
-  return true;
-}
-
-bool caldav_event_push(CalDAVEvent *event) {
-  if (!event || !event->ical || !icalcomponent_is_valid(event->ical)) return false;
-  caldav_log("Push event at %s", event->url);
-  return caldav_put(event->calendar->client, event->url, icalcomponent_as_ical_string(event->ical));
-}
-
-void caldav_event_free(CalDAVEvent *event) {
-  if (!event) return;
-  caldav_log("Free CalDAVEvent '%s'", event->url);
-  caldav_free(event->url);
-  icalcomponent_free(event->ical);
-  caldav_free(event);
-}
-
-icalcomponent *caldav_event_get_ical_event(CalDAVEvent *event) { return icalcomponent_get_inner(event->ical); }
 
 // ---------- REQUESTS ---------- //
 
@@ -729,7 +613,6 @@ static char *caldav_request_propfind(CalDAVClient *client, const char *url, size
   if (res != CURLE_OK) {
     caldav_log("%s", curl_easy_strerror(res));
     caldav_free(response.data);
-    response.data = NULL;
   }
   caldav_free(__depth);
   curl_slist_free_all(headers);

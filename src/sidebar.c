@@ -148,7 +148,7 @@ static void __on_open_finish(GObject *obj, GAsyncResult *res, ErrandsSidebar *se
   }
   icalcomponent *ical_comp = icalparser_parse_string(ical);
   if (!ical_comp) return;
-  ListData *data = errands_list_data_load_from_ical(ical_comp, uid);
+  ListData *data = errands_list_data_load_from_ical(ical_comp, uid, NULL, NULL);
   errands_list_data_save(data);
   g_ptr_array_add(errands_data_lists, data);
   ErrandsSidebarTaskListRow *row = errands_sidebar_add_task_list(self, data);

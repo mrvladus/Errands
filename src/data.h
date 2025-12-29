@@ -41,7 +41,7 @@ void errands_data_sort(void);
 
 ListData *errands_list_data_new(icalcomponent *ical, const char *uid);
 // Load TaskData from iCal component
-ListData *errands_list_data_load_from_ical(icalcomponent *ical, const char *uid);
+ListData *errands_list_data_load_from_ical(icalcomponent *ical, const char *uid, const char *name, const char *color);
 ListData *errands_list_data_create(const char *uid, const char *name, const char *color, bool deleted, bool synced);
 void errands_list_data_sort(ListData *data);
 // Get all tasks as flat list

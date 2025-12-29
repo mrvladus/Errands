@@ -148,6 +148,7 @@ extern const char *toolbox_log_prefix;
       abort();                                                                                                         \
     }                                                                                                                  \
   } while (0)
+#define ASSERT_NOT_NULL(condition) ASSERT((condition) != NULL)
 
 // -------------------- PROFILING -------------------- //
 
