@@ -9,15 +9,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-10 12:25+0300\n"
-"PO-Revision-Date: 2025-04-04 23:34+0200\n"
-"Last-Translator: Jose Riha <jose1711@gmail.com>\n"
+"POT-Creation-Date: 2025-05-16 13:01+0300\n"
+"PO-Revision-Date: 2025-12-29 23:15+0100\n"
+"Last-Translator: terist86 <terist86@users.noreply.github.com>\n"
 "Language-Team: \n"
 "Language: sk_SK\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.4.4\n"
+"X-Generator: Poedit 3.8\n"
 
 #: errands/widgets/shared/components/buttons.py:45
 msgid "Info"
@@ -27,15 +27,13 @@ msgstr "Informácie"
 msgid "Are you sure?"
 msgstr "Ste si istý?"
 
-#: errands/widgets/shared/components/dialogs.py:35
-#: errands/widgets/sidebar.py:300 errands/widgets/task.py:250
-#: errands/widgets/task_list/task_list_sidebar_row.py:99
+#: errands/widgets/shared/components/dialogs.py:35 errands/widgets/sidebar.py:300
+#: errands/widgets/task.py:250 errands/widgets/task_list/task_list_sidebar_row.py:99
 #: errands/widgets/today/today_task.py:146
 msgid "Cancel"
 msgstr "Zrušiť"
 
-#: errands/widgets/shared/color_selector.py:32
-#: errands/widgets/shared/task_toolbar/toolbar.py:100
+#: errands/widgets/shared/color_selector.py:32 errands/widgets/shared/task_toolbar/toolbar.py:100
 msgid "None"
 msgstr "Žiadna"
 
@@ -67,8 +65,7 @@ msgstr "Fialová"
 msgid "Brown"
 msgstr "Hnedá"
 
-#: errands/widgets/shared/datetime_picker.py:138
-#: errands/widgets/today/today.py:57
+#: errands/widgets/shared/datetime_picker.py:138 errands/widgets/today/today.py:57
 #: errands/widgets/today/today_sidebar_row.py:30 errands/widgets/window.py:69
 msgid "Today"
 msgstr "Dnes"
@@ -81,8 +78,7 @@ msgstr "Zajtra"
 msgid "Now"
 msgstr "Teraz"
 
-#: errands/widgets/shared/datetime_picker.py:160
-#: errands/widgets/trash/trash.py:40
+#: errands/widgets/shared/datetime_picker.py:160 errands/widgets/trash/trash.py:40
 #: errands/widgets/trash/trash_sidebar_row.py:68
 msgid "Clear"
 msgstr "Vyčistiť"
@@ -128,9 +124,8 @@ msgstr "Vlastná"
 msgid "No Tags"
 msgstr "Bez štítkov"
 
-#: errands/widgets/shared/task_toolbar/toolbar.py:134
-#: errands/widgets/tags/tags.py:63 errands/widgets/tags/tags_sidebar_row.py:32
-#: errands/widgets/window.py:72
+#: errands/widgets/shared/task_toolbar/toolbar.py:134 errands/widgets/tags/tags.py:63
+#: errands/widgets/tags/tags_sidebar_row.py:32 errands/widgets/window.py:72
 msgid "Tags"
 msgstr "Štítky"
 
@@ -165,11 +160,9 @@ msgstr "Pridať prílohu"
 msgid "Open File"
 msgstr "Otvoriť súbor"
 
-#: errands/widgets/shared/task_toolbar/attachments_window.py:123
-#: errands/widgets/tags/tags.py:140
+#: errands/widgets/shared/task_toolbar/attachments_window.py:123 errands/widgets/tags/tags.py:140
 #: errands/widgets/task_list/task_list_sidebar_row.py:60
-#: errands/widgets/task_list/task_list_sidebar_row.py:191
-#: errands/widgets/trash/trash.py:159
+#: errands/widgets/task_list/task_list_sidebar_row.py:191 errands/widgets/trash/trash.py:159
 msgid "Delete"
 msgstr "Zmazať"
 
@@ -212,9 +205,8 @@ msgstr "Kliknite na tlačidlo „+“"
 msgid "Task Lists"
 msgstr "Zoznamy úloh"
 
-#: errands/widgets/sidebar.py:106 errands/widgets/window.py:44
-#: errands/widgets/window.py:167 data/io.github.mrvladus.List.desktop.in.in:3
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:6
+#: errands/widgets/sidebar.py:106 errands/widgets/window.py:44 errands/widgets/window.py:167
+#: data/io.github.mrvladus.List.desktop.in.in:3 data/io.github.mrvladus.List.metainfo.xml.in.in:6
 msgid "Errands"
 msgstr "Pokyny"
 
@@ -270,8 +262,7 @@ msgstr "Pridať nové štítky do položky vyššie"
 msgid "Add new Tag"
 msgstr "Pridať nový štítok"
 
-#: errands/widgets/task.py:79
-#: errands/widgets/task_list/task_list_sidebar_row.py:125
+#: errands/widgets/task.py:79 errands/widgets/task_list/task_list_sidebar_row.py:125
 #: errands/widgets/today/today_task.py:73
 msgid "Exported"
 msgstr "Exportované"
@@ -293,8 +284,7 @@ msgid "Toggle Toolbar"
 msgstr "Prepnúť nástrojovú lištu"
 
 #: errands/widgets/task.py:210 errands/widgets/task.py:230
-#: errands/widgets/today/today_task.py:117
-#: errands/widgets/today/today_task.py:127
+#: errands/widgets/today/today_task.py:117 errands/widgets/today/today_task.py:127
 msgid "Edit"
 msgstr "Upraviť"
 
@@ -389,8 +379,8 @@ msgstr "Kôš je prázdny"
 msgid "Restore"
 msgstr "Obnoviť"
 
-#: errands/widgets/trash/trash.py:89
-#: errands/widgets/trash/trash_sidebar_row.py:43 errands/widgets/window.py:75
+#: errands/widgets/trash/trash.py:89 errands/widgets/trash/trash_sidebar_row.py:43
+#: errands/widgets/window.py:75
 msgid "Trash"
 msgstr "Kôš"
 
@@ -518,11 +508,11 @@ msgstr "Adresa URL servera"
 
 #: errands/widgets/preferences.py:140
 msgid ""
-"URL needs to include protocol, like <b>http://</b> or <b>https://</b>. If "
-"you have problems with connection - try to change protocol first."
+"URL needs to include protocol, like <b>http://</b> or <b>https://</b>. If you have problems "
+"with connection - try to change protocol first."
 msgstr ""
-"Adresa URL musí obsahovať protokol ako je <b>http://</b> alebo <b>https://</b>. Ak "
-"máte problémy s pripojením, skúste najskôr zmeniť protokol."
+"Adresa URL musí obsahovať protokol ako je <b>http://</b> alebo <b>https://</b>. Ak máte "
+"problémy s pripojením, skúste najskôr zmeniť protokol."
 
 #: errands/widgets/preferences.py:147
 msgid "Username"
@@ -567,8 +557,7 @@ msgstr "Nedá sa pripojiť. Skontrolujte prihlasovacie údaje"
 
 #: errands/lib/sync/providers/caldav.py:66
 msgid "Not all sync credentials provided. Please check settings."
-msgstr ""
-"Neposkytli ste všetky údaje na synchronizáciu. Skontrolujte nastavenia."
+msgstr "Neposkytli ste všetky údaje na synchronizáciu. Skontrolujte nastavenia."
 
 #: errands/lib/sync/providers/caldav.py:110
 msgid "Can't connect to CalDAV server at:"
@@ -582,19 +571,7 @@ msgstr "Nový zoznam úloh"
 msgid "Task is Due"
 msgstr "Termín splnenia úlohy"
 
-#: errands/application.py:78
-msgid "Errands was updated"
-msgstr "Pokyny boli aktualizované"
-
-#: errands/application.py:79
-msgid "Restart is required"
-msgstr "Je potrebné reštartovať"
-
-#: errands/application.py:82
-msgid "Restart"
-msgstr "Reštart"
-
-#: errands/application.py:111
+#: errands/application.py:41
 msgid "Errands need to run in the background for notifications"
 msgstr "Pokyny musí bežať na pozadí pre zobrazenie notifikácií"
 
@@ -618,8 +595,7 @@ msgstr "Podrobnosti"
 msgid "Toggle Details"
 msgstr "Prepnúť podrobnosti"
 
-#: data/io.github.mrvladus.List.desktop.in.in:4
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:7
+#: data/io.github.mrvladus.List.desktop.in.in:4 data/io.github.mrvladus.List.metainfo.xml.in.in:7
 msgid "Manage your tasks"
 msgstr "Spravujte svoje úlohy"
 
@@ -666,6 +642,15 @@ msgstr "Import .ics súborov"
 #: data/io.github.mrvladus.List.metainfo.xml.in.in:41
 msgid "Main Window View"
 msgstr "Vzhľad hlavného okna"
+
+#~ msgid "Errands was updated"
+#~ msgstr "Pokyny boli aktualizované"
+
+#~ msgid "Restart is required"
+#~ msgstr "Je potrebné reštartovať"
+
+#~ msgid "Restart"
+#~ msgstr "Reštart"
 
 #~ msgid "Loading..."
 #~ msgstr "Načítavam..."
