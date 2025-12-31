@@ -1,6 +1,7 @@
 #include "sync.h"
 #include "data.h"
 #include "glib.h"
+#include "gtk/gtk.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "state.h"
@@ -100,9 +101,10 @@ static void errands__sync_cb(GTask *task, gpointer source_object, gpointer task_
 }
 
 static void errands__sync_finished_cb(GObject *source_object, GAsyncResult *res, gpointer user_data) {
+  gtk_widget_set_visible(state.main_window->sidebar->sync_indicator, false);
   if (!g_task_propagate_boolean(G_TASK(res), NULL)) return;
 
-  bool reload_task_list = false;
+  bool reload = false;
   for_range(i, 0, client->calendars->len) {
     CalDAVCalendar *cal = caldav_list_at(client->calendars, i);
     CONTINUE_IF_NOT(cal->set & CALDAV_COMPONENT_SET_VTODO);
@@ -122,15 +124,18 @@ static void errands__sync_finished_cb(GObject *source_object, GAsyncResult *res,
     } else {
       ListData *data = errands_list_data_load_from_ical(cal->ical, cal->uuid, cal->name, cal->color);
       g_ptr_array_add(errands_data_lists, data);
-      errands_sidebar_add_task_list(data);
-      reload_task_list = true;
+      reload = true;
     }
   }
 
-  if (reload_task_list) errands_task_list_reload(state.main_window->task_list, false);
+  if (reload) {
+    errands_sidebar_load_lists();
+    errands_task_list_reload(state.main_window->task_list, false);
+  }
 }
 
 void errands_sync_init(void) {
+  gtk_widget_set_visible(state.main_window->sidebar->sync_indicator, true);
   caldav_init();
   RUN_THREAD_FUNC(errands__sync_cb, errands__sync_finished_cb);
   // g_timeout_add_seconds(10, G_SOURCE_FUNC(sync), NULL);

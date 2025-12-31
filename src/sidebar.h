@@ -72,6 +72,7 @@ G_DECLARE_FINAL_TYPE(ErrandsSidebar, errands_sidebar, ERRANDS, SIDEBAR, AdwBin)
 struct _ErrandsSidebar {
   AdwBin parent_instance;
   GtkWidget *add_btn;
+  GtkWidget *sync_indicator;
   GtkWidget *filters_box;
   GtkListBoxRow *all_row;
   GtkLabel *all_counter;
