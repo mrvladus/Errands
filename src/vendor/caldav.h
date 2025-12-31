@@ -5,6 +5,7 @@
 #include <libical/ical.h>
 
 #include <stdbool.h>
+#include <string.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -191,17 +192,24 @@ const char *caldav_generate_uuid4() {
 
 // Extract last part of the URL path
 static inline char *extract_uuid(const char *url) {
-  if (!url || *url == '\0') return strdup(""); // Return an empty string if the path is empty
-  size_t len = strlen(url);
-  size_t end = len - 1;
-  if (url[end] == '/') end--;
-  size_t start = end;
-  while (url[start] != '/') start--;
-  start++;
-  char *out = malloc(end - start + 1);
-  strncpy(out, url + start, end - start);
-  out[end - start] = '\0';
-  return out;
+  if (!url || *url == '\0') return NULL;
+  // Skip trailing slashes and whitespace
+  const char *end = url + strlen(url) - 1;
+  while (end > url && (*end == '/' || *end == ' ' || *end == '\t' || *end == '\n')) { end--; }
+  // Find the last slash before the end
+  const char *start = end;
+  while (start > url && *start != '/') start--;
+  // If we found a slash, move past it
+  if (*start == '/') start++;
+  // Calculate length
+  size_t length = end - start + 1;
+  if (length == 0) return NULL;
+  // Allocate and copy
+  char *result = malloc(length + 1);
+  if (!result) { return NULL; }
+  strncpy(result, start, length);
+  result[length] = '\0';
+  return result;
 }
 
 // Generate a random hexadecimal color code.
@@ -456,7 +464,8 @@ CalDAVCalendar *caldav_calendar_new(CalDAVClient *client, const char *color, Cal
   calendar->set = set;
   calendar->name = strdup(name);
   calendar->url = strdup(url);
-  calendar->uuid = extract_uuid(url);
+  char *uuid = extract_uuid(url);
+  calendar->uuid = uuid ? uuid : strdup(name);
   return calendar;
 }
 

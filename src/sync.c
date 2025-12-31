@@ -23,22 +23,6 @@ static ListData *list_data = NULL;
 static TaskData *task_data = NULL;
 static CalDAVClient *client = NULL;
 
-static void errands__sync_in_thread(GTask *task, gpointer source_object, gpointer task_data,
-                                    GCancellable *cancellable) {
-  for_range(i, 0, client->calendars->len) {
-    CalDAVCalendar *cal = caldav_list_at(client->calendars, i);
-    bool pulled = caldav_calendar_pull_events(cal);
-    if (!pulled) LOG("Sync: Failed to pull events for calendar '%s'", cal->url);
-  }
-}
-
-// static void initial_sync(GTask *task, gpointer source_object, gpointer task_data, GCancellable *cancellable) {
-
-//   LOG("Sync: Found %zu calendars on server", client->calendars->len);
-
-//
-// }
-
 static bool errands__sync_init(void) {
   // Check if sync is disabled.
   if (!errands_settings_get(SETTING_SYNC).b) {
@@ -122,6 +106,7 @@ static void errands__sync_finished_cb(GObject *source_object, GAsyncResult *res,
     if (existing_list) {
       icalcomponent_merge_component(existing_list->ical, cal->ical);
     } else {
+      LOG("Sync: Create new list '%s'", cal->uuid);
       ListData *data = errands_list_data_load_from_ical(cal->ical, cal->uuid, cal->name, cal->color);
       g_ptr_array_add(errands_data_lists, data);
       reload = true;
