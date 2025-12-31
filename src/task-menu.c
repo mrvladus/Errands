@@ -166,7 +166,7 @@ static void on_pin_clicked_cb(ErrandsTaskMenu *self) {
   bool new_pinned = !errands_data_get_pinned(self->task->data->ical);
   errands_data_set_pinned(self->task->data->ical, new_pinned);
   errands_list_data_save(self->task->data->list);
-  errands_sidebar_update_filter_rows(state.main_window->sidebar);
+  errands_sidebar_update_filter_rows();
   errands_task_list_reload(state.main_window->task_list, true);
 }
 

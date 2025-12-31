@@ -1,10 +1,8 @@
 #include "data.h"
-#include "glib.h"
 #include "settings.h"
 
 #include "vendor/json.h"
 #include "vendor/toolbox.h"
-#include <libical/ical.h>
 
 static void errands_data_create_backup();
 

@@ -1,12 +1,10 @@
 #include "task-list.h"
 #include "data.h"
 #include "sidebar.h"
-#include "state.h"
 #include "task.h"
 #include "utils.h"
 
 #include <glib/gi18n.h>
-#include <libical/ical.h>
 
 static size_t tasks_stack_size = 0, current_start = 0;
 static GPtrArray *current_task_list = NULL;
@@ -121,8 +119,8 @@ static int __calculate_height(ErrandsTaskList *self) {
   for_range(i, 0, current_task_list->len) {
     TaskData *data = g_ptr_array_index(current_task_list, i);
     CONTINUE_IF(__task_has_any_collapsed_parent(data));
-    CONTINUE_IF(self->page == ERRANDS_TASK_LIST_PAGE_PINNED && !__task_has_any_pinned_parent(data))
-    CONTINUE_IF(self->page == ERRANDS_TASK_LIST_PAGE_TODAY && !__task_has_any_due_parent(data))
+    CONTINUE_IF(self->page == ERRANDS_TASK_LIST_PAGE_PINNED && !__task_has_any_pinned_parent(data));
+    CONTINUE_IF(self->page == ERRANDS_TASK_LIST_PAGE_TODAY && !__task_has_any_due_parent(data));
     errands_task_set_data(measuring_task, data);
     gtk_widget_get_preferred_size(GTK_WIDGET(measuring_task), &min_size, &nat_size);
     height += nat_size.height;
@@ -349,7 +347,7 @@ static void on_task_list_entry_activated_cb(AdwEntryRow *entry, ErrandsTaskList 
   errands_list_data_save(self->data);
   gtk_editable_set_text(GTK_EDITABLE(entry), "");
   errands_sidebar_task_list_row_update(errands_sidebar_task_list_row_get(data->list));
-  errands_sidebar_update_filter_rows(state.main_window->sidebar);
+  errands_sidebar_update_filter_rows();
   LOG("Add task '%s' to task list '%s'", errands_data_get_uid(data->ical), list_uid);
   errands_task_list_reload(self, false);
 }

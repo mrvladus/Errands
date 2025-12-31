@@ -10,8 +10,10 @@
 
 #include <glib/gi18n.h>
 
-static void on_errands_sidebar_filter_row_activated(GtkListBox *box, GtkListBoxRow *row, ErrandsSidebar *self);
-static void on_import_action_cb(GSimpleAction *action, GVariant *param, ErrandsSidebar *self);
+static void on_errands_sidebar_filter_row_activated(GtkListBox *box, GtkListBoxRow *row);
+static void on_import_action_cb(GSimpleAction *action, GVariant *param);
+
+static ErrandsSidebar *self = NULL;
 
 // ---------- WIDGET TEMPLATE ---------- //
 
@@ -42,20 +44,22 @@ static void errands_sidebar_class_init(ErrandsSidebarClass *class) {
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_errands_sidebar_task_list_row_activate);
 }
 
-static void errands_sidebar_init(ErrandsSidebar *self) {
+static void errands_sidebar_init(ErrandsSidebar *sidebar) {
   LOG("Sidebar: Create");
-  gtk_widget_init_template(GTK_WIDGET(self));
-  errands_add_actions(GTK_WIDGET(self), "sidebar", "import", on_import_action_cb, self, "new_list",
+  gtk_widget_init_template(GTK_WIDGET(sidebar));
+  errands_add_actions(GTK_WIDGET(sidebar), "sidebar", "import", on_import_action_cb, NULL, "new_list",
                       errands_sidebar_new_list_dialog_show, NULL, "preferences", errands_settings_dialog_show, NULL,
                       "about", errands_about_dialog_show, NULL, NULL);
+  self = sidebar;
 }
 
 ErrandsSidebar *errands_sidebar_new() { return g_object_new(ERRANDS_TYPE_SIDEBAR, NULL); }
 
 // ---------- PUBLIC FUNCTIONS ---------- //
 
-void errands_sidebar_load_lists(ErrandsSidebar *self) {
+void errands_sidebar_load_lists(void) {
   LOG("Sidebar: Create Task List Rows");
+  gtk_list_box_remove_all(GTK_LIST_BOX(self->task_lists_box));
   // Add rows
   for (size_t i = 0; i < errands_data_lists->len; i++) {
     ListData *ld = errands_data_lists->pdata[i];
@@ -64,14 +68,15 @@ void errands_sidebar_load_lists(ErrandsSidebar *self) {
       gtk_list_box_append(GTK_LIST_BOX(self->task_lists_box), GTK_WIDGET(row));
     }
   }
-  errands_sidebar_update_filter_rows(self);
+  errands_sidebar_update_filter_rows();
   errands_window_update();
   // Select last opened page
-  g_signal_connect(state.main_window, "realize", G_CALLBACK(errands_sidebar_select_last_opened_page), NULL);
+  if (gtk_widget_get_realized(GTK_WIDGET(state.main_window))) errands_sidebar_select_last_opened_page();
+  else g_signal_connect(state.main_window, "realize", G_CALLBACK(errands_sidebar_select_last_opened_page), NULL);
   LOG("Sidebar: Created %d Task List Rows", errands_data_lists->len);
 }
 
-ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(ErrandsSidebar *self, ListData *data) {
+ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(ListData *data) {
   ASSERT(data);
   LOG("Sidebar: Add task list '%s'", data->uid);
   ErrandsSidebarTaskListRow *row = errands_sidebar_task_list_row_new(data);
@@ -90,7 +95,7 @@ void errands_sidebar_select_last_opened_page() {
   }
 }
 
-void errands_sidebar_update_filter_rows(ErrandsSidebar *self) {
+void errands_sidebar_update_filter_rows() {
   size_t total = 0, completed = 0, today = 0, today_completed = 0, pinned = 0;
   for_range(l, 0, errands_data_lists->len) {
     ListData *list = g_ptr_array_index(errands_data_lists, l);
@@ -121,7 +126,7 @@ void errands_sidebar_update_filter_rows(ErrandsSidebar *self) {
 
 // --- SIGNAL HANDLERS --- //
 
-static void on_errands_sidebar_filter_row_activated(GtkListBox *box, GtkListBoxRow *row, ErrandsSidebar *self) {
+static void on_errands_sidebar_filter_row_activated(GtkListBox *box, GtkListBoxRow *row) {
   gtk_list_box_unselect_all(GTK_LIST_BOX(self->task_lists_box));
   ErrandsTaskList *task_list = state.main_window->task_list;
   if (GTK_WIDGET(row) == GTK_WIDGET(self->all_row)) errands_task_list_show_all_tasks(task_list);
@@ -130,7 +135,7 @@ static void on_errands_sidebar_filter_row_activated(GtkListBox *box, GtkListBoxR
   adw_navigation_split_view_set_show_content(state.main_window->split_view, true);
 }
 
-static void __on_open_finish(GObject *obj, GAsyncResult *res, ErrandsSidebar *self) {
+static void __on_open_finish(GObject *obj, GAsyncResult *res) {
   g_autoptr(GFile) file = gtk_file_dialog_open_finish(GTK_FILE_DIALOG(obj), res, NULL);
   if (!file) return;
   g_autofree gchar *path = g_file_get_path(file);
@@ -151,12 +156,12 @@ static void __on_open_finish(GObject *obj, GAsyncResult *res, ErrandsSidebar *se
   ListData *data = errands_list_data_load_from_ical(ical_comp, uid, NULL, NULL);
   errands_list_data_save(data);
   g_ptr_array_add(errands_data_lists, data);
-  ErrandsSidebarTaskListRow *row = errands_sidebar_add_task_list(self, data);
+  ErrandsSidebarTaskListRow *row = errands_sidebar_add_task_list(data);
   g_signal_emit_by_name(row, "activate", NULL);
   errands_sync_schedule_list(data);
 }
 
-static void on_import_action_cb(GSimpleAction *action, GVariant *param, ErrandsSidebar *self) {
+static void on_import_action_cb(GSimpleAction *action, GVariant *param) {
   g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
   g_autoptr(GtkFileFilter) filter = gtk_file_filter_new();
   gtk_file_filter_add_pattern(filter, "*.ics");

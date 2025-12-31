@@ -141,13 +141,7 @@ extern const char *toolbox_log_prefix;
 // Unused variable
 #define UNUSED(var) (void)(var)
 // Asserts that a condition is true, aborts if false.
-#define ASSERT(condition)                                                                                              \
-  do {                                                                                                                 \
-    if (!(condition)) {                                                                                                \
-      LOG_DEBUG("ASSERTION FAILED: %s", #condition);                                                                   \
-      abort();                                                                                                         \
-    }                                                                                                                  \
-  } while (0)
+#define ASSERT(condition)          assert((condition))
 #define ASSERT_NOT_NULL(condition) ASSERT((condition) != NULL)
 
 // -------------------- PROFILING -------------------- //
@@ -170,7 +164,9 @@ extern const char *toolbox_log_prefix;
 // --- INSIDE LOOPS --- //
 
 #define CONTINUE_IF(statement)                                                                                         \
-  if (statement) continue;
+  if (statement) continue
+#define CONTINUE_IF_NOT(statement)                                                                                     \
+  if (!(statement)) continue
 
 // -------------------- STRINGS -------------------- //
 

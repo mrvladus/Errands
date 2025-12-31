@@ -58,7 +58,7 @@ template $ErrandsSidebar: Adw.Bin {
         orientation: vertical;
 
         ListBox filters_box {
-          row-activated => $on_errands_sidebar_filter_row_activated(template) not-swapped;
+          row-activated => $on_errands_sidebar_filter_row_activated();
 
           styles [
             "navigation-sidebar",

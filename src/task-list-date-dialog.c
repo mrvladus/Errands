@@ -219,7 +219,7 @@ static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
     if (self->current_task->data->parent) errands_task_data_sort_sub_tasks(self->current_task->data->parent);
     else errands_data_sort();
     errands_task_update_toolbar(self->current_task);
-    errands_sidebar_update_filter_rows(state.main_window->sidebar);
+    errands_sidebar_update_filter_rows();
     errands_task_list_reload(state.main_window->task_list, true);
     errands_sync_schedule_task(data);
   }

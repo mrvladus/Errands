@@ -57,7 +57,7 @@ static void on_response_cb(ErrandsSidebarNewListDialog *self, gchar *response, g
     ListData *list = errands_list_data_create(generate_uuid4(), gtk_editable_get_text(GTK_EDITABLE(self->entry)),
                                               generate_hex_as_str(), false, false);
     g_ptr_array_add(errands_data_lists, list);
-    ErrandsSidebarTaskListRow *row = errands_sidebar_add_task_list(state.main_window->sidebar, list);
+    ErrandsSidebarTaskListRow *row = errands_sidebar_add_task_list(list);
     g_signal_emit_by_name(row, "activate", NULL);
     errands_window_update();
     errands_list_data_save(list);
