@@ -450,7 +450,7 @@ void caldav_client_free(CalDAVClient *client) {
 
 CalDAVCalendar *caldav_calendar_new(CalDAVClient *client, const char *color, CalDAVComponentSet set, const char *name,
                                     const char *url) {
-  CalDAVCalendar *calendar = malloc(sizeof(CalDAVCalendar));
+  CalDAVCalendar *calendar = calloc(1, sizeof(CalDAVCalendar));
   calendar->client = client;
   calendar->color = strdup(color);
   calendar->set = set;
@@ -468,7 +468,7 @@ bool caldav_calendar_delete(CalDAVCalendar *calendar) {
 
 bool caldav_calendar_pull_events(CalDAVCalendar *calendar) {
   caldav_log("Getting events for calendar '%s'", calendar->url);
-  CALDAV_FREE(calendar->ical);
+  if (calendar->ical) icalcomponent_free(calendar->ical);
   const char *request_template = "<c:calendar-query xmlns:d=\"DAV:\" xmlns:c=\"urn:ietf:params:xml:ns:caldav\">"
                                  "  <d:prop>"
                                  "    <c:calendar-data/>"
