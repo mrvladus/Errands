@@ -1,6 +1,7 @@
 #include "task-list.h"
 #include "data.h"
 #include "sidebar.h"
+#include "sync.h"
 #include "task.h"
 #include "utils.h"
 
@@ -342,7 +343,6 @@ static void on_task_list_entry_activated_cb(AdwEntryRow *entry, ErrandsTaskList 
   const char *list_uid = self->data->uid;
   if (STR_EQUAL(text, "") || STR_EQUAL(list_uid, "")) return;
   TaskData *data = errands_task_data_create_task(self->data, NULL, text);
-  // g_ptr_array_add(self->data->children, data);
   errands_list_data_sort(self->data);
   errands_list_data_save(self->data);
   gtk_editable_set_text(GTK_EDITABLE(entry), "");
@@ -350,6 +350,7 @@ static void on_task_list_entry_activated_cb(AdwEntryRow *entry, ErrandsTaskList 
   errands_sidebar_update_filter_rows();
   LOG("Add task '%s' to task list '%s'", errands_data_get_uid(data->ical), list_uid);
   errands_task_list_reload(self, false);
+  errands_sync_schedule_task(data);
 }
 
 static void on_task_list_search_cb(ErrandsTaskList *self, GtkSearchEntry *entry) {

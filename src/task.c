@@ -99,7 +99,7 @@ void errands_task_set_data(ErrandsTask *self, TaskData *data) {
 
 void errands_task_update_accent_color(ErrandsTask *task) {
   if (!task) return;
-  const char *color = errands_data_get_color(task->data->ical);
+  const char *color = errands_data_get_color(task->data->ical, false);
   if (!STR_EQUAL(color, "none")) {
     const char *card_style = tmp_str_printf("task-%s", color);
     const char *check_style = tmp_str_printf("checkbtn-%s", color);

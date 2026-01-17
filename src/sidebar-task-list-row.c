@@ -65,7 +65,7 @@ ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_new(ListData *data) {
   row->data = data;
   // Set color
   GdkRGBA color;
-  gdk_rgba_parse(&color, errands_data_get_color(data->ical));
+  gdk_rgba_parse(&color, errands_data_get_color(data->ical, true));
   gtk_color_dialog_button_set_rgba(GTK_COLOR_DIALOG_BUTTON(row->color_btn), &color);
   g_signal_connect(row->color_btn, "notify::rgba", G_CALLBACK(on_color_changed), data);
   // Update
@@ -122,7 +122,7 @@ static void on_color_changed(GtkColorDialogButton *btn, GParamSpec *pspec, ListD
   const GdkRGBA *color_rgba = gtk_color_dialog_button_get_rgba(btn);
   char new_color[8];
   gdk_rgba_to_hex_string(color_rgba, new_color);
-  errands_data_set_color(data->ical, new_color);
+  errands_data_set_color(data->ical, new_color, true);
   errands_list_data_save(data);
 }
 

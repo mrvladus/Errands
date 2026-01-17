@@ -117,7 +117,7 @@ static void errands_data_migrate_from_46() {
       if (text_item) errands_data_set_text(ical, text_item->string_val);
       if (uid_item) errands_data_set_uid(ical, uid_item->string_val);
       errands_data_set_attachments(ical, attachments);
-      errands_data_set_color(ical, color_item->string_val);
+      errands_data_set_color(ical, color_item->string_val, false);
       errands_data_set_deleted(ical, deleted_item->bool_val);
       errands_data_set_expanded(ical, expanded_item->bool_val);
       errands_data_set_notified(ical, notified_item->bool_val);
@@ -248,6 +248,14 @@ void errands_data_sort() {
   }
 }
 
+ListData *errands_data_find_list_data_by_uid(const char *uid) {
+  for_range(i, 0, errands_data_lists->len) {
+    ListData *list = g_ptr_array_index(errands_data_lists, i);
+    if (strcmp(list->uid, uid) == 0) return list;
+  }
+  return NULL;
+}
+
 // ---------- LIST DATA ---------- //
 
 ListData *errands_list_data_new(icalcomponent *ical, const char *uid) {
@@ -262,8 +270,8 @@ ListData *errands_list_data_new(icalcomponent *ical, const char *uid) {
 ListData *errands_list_data_load_from_ical(icalcomponent *ical, const char *uid, const char *name, const char *color) {
   if (!ical || !uid) return NULL;
   if (ical && icalcomponent_isa(ical) != ICAL_VCALENDAR_COMPONENT) return NULL;
-  get_x_prop_value(ical, "X-ERRANDS-LIST-NAME", name ? name : uid);
-  get_x_prop_value(ical, "X-ERRANDS-COLOR", color ? color : generate_hex_as_str());
+  get_x_prop_value(ical, "X-WR-CALNAME", name ? name : uid);
+  get_x_prop_value(ical, "X-APPLE-CALENDAR-COLOR", color ? color : generate_hex_as_str());
 
   ListData *list_data = errands_list_data_new(ical, uid);
 
@@ -294,8 +302,8 @@ ListData *errands_list_data_create(const char *uid, const char *name, const char
   icalcomponent_add_property(ical, icalproperty_new_prodid("~//Errands"));
   set_x_prop_value(ical, "X-ERRANDS-DELETED", BOOL_TO_STR_NUM(deleted));
   set_x_prop_value(ical, "X-ERRANDS-SYNCED", BOOL_TO_STR_NUM(synced));
-  set_x_prop_value(ical, "X-ERRANDS-LIST-NAME", name);
-  set_x_prop_value(ical, "X-ERRANDS-COLOR", color);
+  set_x_prop_value(ical, "X-WR-CALNAME", name);
+  set_x_prop_value(ical, "X-APPLE-CALENDAR-COLOR", color);
 
   return errands_list_data_new(ical, uid);
 }
@@ -426,6 +434,14 @@ TaskData *errands_task_data_move_to_list(TaskData *data, ListData *list, TaskDat
   return new_data;
 }
 
+TaskData *errands_task_data_find_by_uid(ListData *list, const char *uid) {
+  for_range(i, 0, list->children->len) {
+    TaskData *task = g_ptr_array_index(list->children, i);
+    if (STR_EQUAL(errands_data_get_uid(task->ical), uid)) return task;
+  }
+  return NULL;
+}
+
 void errands_task_data_free(TaskData *data) {
   if (!data) return;
   if (data->children) g_ptr_array_free(data->children, true);
@@ -548,9 +564,11 @@ void errands_data_set_priority(icalcomponent *ical, int value) {
 
 // --- STRING --- //
 
-const char *errands_data_get_color(icalcomponent *ical) { return get_x_prop_value(ical, "X-ERRANDS-COLOR", "none"); }
+const char *errands_data_get_color(icalcomponent *ical, bool list) {
+  return get_x_prop_value(ical, list ? "X-APPLE-CALENDAR-COLOR" : "X-ERRANDS-COLOR", "none");
+}
 const char *errands_data_get_list_name(icalcomponent *ical) {
-  return get_x_prop_value(ical, "X-ERRANDS-LIST-NAME", "Untitled");
+  return get_x_prop_value(ical, "X-WR-CALNAME", "Untitled");
 }
 const char *errands_data_get_notes(icalcomponent *ical) { return icalcomponent_get_description(ical); }
 const char *errands_data_get_parent(icalcomponent *ical) {
@@ -565,11 +583,11 @@ void errands_data_set_notes(icalcomponent *ical, const char *value) {
     icalcomponent_remove_property(ical, icalcomponent_get_first_property(ical, ICAL_DESCRIPTION_PROPERTY));
   else icalcomponent_set_description(ical, value);
 }
-void errands_data_set_color(icalcomponent *ical, const char *value) {
-  set_x_prop_value(ical, "X-ERRANDS-COLOR", value);
+void errands_data_set_color(icalcomponent *ical, const char *value, bool list) {
+  set_x_prop_value(ical, list ? "X-APPLE-CALENDAR-COLOR" : "X-ERRANDS-COLOR", value);
 }
 void errands_data_set_list_name(icalcomponent *ical, const char *value) {
-  set_x_prop_value(ical, "X-ERRANDS-LIST-NAME", value);
+  set_x_prop_value(ical, "X-WR-CALNAME", value);
 }
 void errands_data_set_parent(icalcomponent *ical, const char *value) {
   if (!value || STR_EQUAL(value, ""))

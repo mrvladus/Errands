@@ -36,6 +36,7 @@ void errands_data_cleanup(void);
 void errands_data_get_flat_list(GPtrArray *tasks);
 // Sort all tasks
 void errands_data_sort(void);
+ListData *errands_data_find_list_data_by_uid(const char *uid);
 
 // --- LIST DATA --- //
 
@@ -64,6 +65,7 @@ void errands_task_data_print(TaskData *data);
 // Move task and sub-tasks recursively to another list.
 // Returns the moved task.
 TaskData *errands_task_data_move_to_list(TaskData *data, ListData *list, TaskData *parent);
+TaskData *errands_task_data_find_by_uid(ListData *list, const char *uid);
 void errands_task_data_free(TaskData *data);
 AUTOPTR_DEFINE(TaskData, errands_task_data_free);
 
@@ -98,14 +100,14 @@ void errands_data_set_priority(icalcomponent *ical, int value);
 
 // --- STRING --- //
 
-const char *errands_data_get_color(icalcomponent *ical);
+const char *errands_data_get_color(icalcomponent *ical, bool list);
 const char *errands_data_get_list_name(icalcomponent *ical);
 const char *errands_data_get_notes(icalcomponent *ical);
 const char *errands_data_get_parent(icalcomponent *ical);
 const char *errands_data_get_text(icalcomponent *ical);
 const char *errands_data_get_uid(icalcomponent *ical);
 
-void errands_data_set_color(icalcomponent *ical, const char *value);
+void errands_data_set_color(icalcomponent *ical, const char *value, bool list);
 void errands_data_set_list_name(icalcomponent *ical, const char *value);
 void errands_data_set_notes(icalcomponent *ical, const char *value);
 void errands_data_set_parent(icalcomponent *ical, const char *value);

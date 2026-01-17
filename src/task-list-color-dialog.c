@@ -49,7 +49,7 @@ void errands_task_list_color_dialog_show(ErrandsTask *task) {
   g_autoptr(GPtrArray) colors = get_children(self->color_box);
   for (size_t i = 0; i < colors->len; i++) {
     const char *name = gtk_widget_get_name(colors->pdata[i]);
-    const char *color = errands_data_get_color(task->data->ical);
+    const char *color = errands_data_get_color(task->data->ical, false);
     if (STR_EQUAL(name, color)) {
       gtk_check_button_set_active(GTK_CHECK_BUTTON(colors->pdata[i]), true);
       break;
@@ -67,13 +67,13 @@ static void on_dialog_close_cb(ErrandsTaskListColorDialog *self) {
     GtkCheckButton *btn = GTK_CHECK_BUTTON(colors->pdata[i]);
     if (gtk_check_button_get_active(btn)) {
       const char *name = gtk_widget_get_name(GTK_WIDGET(btn));
-      if (STR_EQUAL(name, errands_data_get_color(self->current_task->data->ical))) {
+      if (STR_EQUAL(name, errands_data_get_color(self->current_task->data->ical, false))) {
         adw_dialog_close(ADW_DIALOG(self));
         return;
       }
       const char *uid = errands_data_get_uid(self->current_task->data->ical);
       LOG("Set accent color '%s' to task '%s'", name, uid);
-      errands_data_set_color(self->current_task->data->ical, name);
+      errands_data_set_color(self->current_task->data->ical, name, false);
       errands_task_update_accent_color(self->current_task);
       break;
     }
