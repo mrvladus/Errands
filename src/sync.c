@@ -7,6 +7,7 @@
 #include "utils.h"
 #include "window.h"
 #include <libical/ical.h>
+#include <stdio.h>
 
 #define CALDAV_DEBUG
 #define CALDAV_IMPLEMENTATION
@@ -65,6 +66,22 @@ static CalDAVEvent *find_event_by_uid(CalDAVCalendar *c, const char *uid) {
     if (STR_EQUAL(uid, uid_prop)) return e;
   }
   return NULL;
+}
+
+static icalcomponent *caldav_calendar_to_icalcomponent(CalDAVCalendar *c) {
+  icalcomponent *ical = icalcomponent_new(ICAL_VCALENDAR_COMPONENT);
+  icalcomponent_add_property(ical, icalproperty_new_version("2.0"));
+  icalcomponent_add_property(ical, icalproperty_new_prodid("~//Errands"));
+  errands_data_set_synced(ical, true);
+  errands_data_set_list_name(ical, c->display_name);
+  errands_data_set_list_description(ical, c->description);
+  errands_data_set_color(ical, c->color, true);
+  for_range(i, 0, c->events->count) {
+    CalDAVEvent *e = c->events->items[i];
+    icalcomponent *event = icalcomponent_new_from_string(e->ical);
+    if (event) icalcomponent_merge_component(ical, event);
+  }
+  return ical;
 }
 
 // --- SYNC --- //
@@ -145,6 +162,7 @@ static void errands__sync_cb(GTask *task, gpointer source_object, gpointer task_
 
 static void errands__sync_finished_cb(GObject *source_object, GAsyncResult *res, gpointer user_data) {
   gtk_widget_set_visible(state.main_window->sidebar->sync_indicator, false);
+  if (!g_task_propagate_boolean(G_TASK(res), NULL)) return;
   // Cleanup synced tasks
   for_range(i, 0, tasks_pushed->len) {
     TaskData *data = g_ptr_array_index(tasks_pushed, i);
@@ -153,7 +171,6 @@ static void errands__sync_finished_cb(GObject *source_object, GAsyncResult *res,
     if (found) g_ptr_array_remove_index_fast(tasks_to_push, idx);
   }
   g_ptr_array_set_size(tasks_pushed, 0);
-  if (!g_task_propagate_boolean(G_TASK(res), NULL)) return;
 
   bool reload = false;
   for_range(i, 0, client->calendars->count) {
@@ -162,25 +179,18 @@ static void errands__sync_finished_cb(GObject *source_object, GAsyncResult *res,
     const char *uid = get_calendar_uid_from_href(cal->href);
     ListData *existing_list = errands_data_find_list_data_by_uid(uid);
     if (!existing_list) {
-      LOG("Sync: Create new list '%s'", uid);
-      reload = true;
-      ListData *new_list = errands_list_data_create(uid, cal->display_name, cal->color, false, true);
+      LOG("Sync: Create new list: %s", uid);
+      icalcomponent *ical = caldav_calendar_to_icalcomponent(cal);
+      ListData *new_list = errands_list_data_load_from_ical(ical, uid, cal->display_name, cal->color);
       g_ptr_array_add(errands_data_lists, new_list);
-      // Add tasks
-      for_range(j, 0, cal->events->count) {
-        CalDAVEvent *e = cal->events->items[j];
-        icalcomponent *event = icalcomponent_new_from_string(e->ical);
-        CONTINUE_IF_NOT(event);
-        if (icalcomponent_isa(event) == ICAL_VCALENDAR_COMPONENT) {
-          icalcomponent *inner = icalcomponent_get_first_component(event, ICAL_VTODO_COMPONENT);
-          CONTINUE_IF_NOT(inner);
-          const char *parent = errands_data_get_parent(inner);
-          TaskData *parent_task = NULL;
-          if (parent) parent_task = errands_task_data_find_by_uid(new_list, parent);
-          errands_task_data_new(inner, parent_task, new_list);
-        }
+    } else {
+      if (cal->properties_changed) {
+        LOG("Sync: Update list properties: %s", uid);
+        errands_data_set_color(existing_list->ical, cal->color, true);
+        errands_data_set_list_name(existing_list->ical, cal->display_name);
       }
     }
+    reload = true;
     // Merge calendar data into existing list or create a new one
     // if (existing_list) {
     //   icalcomponent_merge_component(existing_list->ical, cal->ical);
@@ -230,6 +240,7 @@ void errands_sync_schedule_list(ListData *data) {
 }
 
 void errands_sync_schedule_task(TaskData *data) {
-  sync_scheduled = true;
+  LOG("Sync: Schedule Task %s", errands_data_get_uid(data->ical));
   g_ptr_array_add(tasks_to_push, data);
+  sync_scheduled = true;
 }

@@ -1,4 +1,5 @@
 #include "data.h"
+#include "glib.h"
 #include "settings.h"
 
 #include "vendor/json.h"
@@ -60,7 +61,7 @@ static void errands_data_migrate_from_46() {
     JSON *list_uid_item = json_object_get(cal_item, "uid");
 
     autoptr(ListData) calendar =
-        errands_list_data_create(list_uid_item->string_val, name_item->string_val, color_item->string_val,
+        errands_list_data_create(list_uid_item->string_val, name_item->string_val, NULL, color_item->string_val,
                                  deleted_item->bool_val, synced_item->bool_val);
 
     // Process tasks
@@ -294,7 +295,9 @@ ListData *errands_list_data_load_from_ical(icalcomponent *ical, const char *uid,
   return list_data;
 }
 
-ListData *errands_list_data_create(const char *uid, const char *name, const char *color, bool deleted, bool synced) {
+// TODO: why we need synced?
+ListData *errands_list_data_create(const char *uid, const char *name, const char *description, const char *color,
+                                   bool deleted, bool synced) {
   ASSERT(uid != NULL && name != NULL && color != NULL);
 
   icalcomponent *ical = icalcomponent_new(ICAL_VCALENDAR_COMPONENT);
@@ -303,6 +306,7 @@ ListData *errands_list_data_create(const char *uid, const char *name, const char
   set_x_prop_value(ical, "X-ERRANDS-DELETED", BOOL_TO_STR_NUM(deleted));
   set_x_prop_value(ical, "X-ERRANDS-SYNCED", BOOL_TO_STR_NUM(synced));
   set_x_prop_value(ical, "X-WR-CALNAME", name);
+  set_x_prop_value(ical, "X-WR-CALDESC", description);
   set_x_prop_value(ical, "X-APPLE-CALENDAR-COLOR", color);
 
   return errands_list_data_new(ical, uid);
@@ -435,8 +439,10 @@ TaskData *errands_task_data_move_to_list(TaskData *data, ListData *list, TaskDat
 }
 
 TaskData *errands_task_data_find_by_uid(ListData *list, const char *uid) {
-  for_range(i, 0, list->children->len) {
-    TaskData *task = g_ptr_array_index(list->children, i);
+  g_autoptr(GPtrArray) tasks = g_ptr_array_sized_new(list->children->len);
+  errands_list_data_get_flat_list(list, tasks);
+  for_range(i, 0, tasks->len) {
+    TaskData *task = g_ptr_array_index(tasks, i);
     if (STR_EQUAL(errands_data_get_uid(task->ical), uid)) return task;
   }
   return NULL;
@@ -570,6 +576,9 @@ const char *errands_data_get_color(icalcomponent *ical, bool list) {
 const char *errands_data_get_list_name(icalcomponent *ical) {
   return get_x_prop_value(ical, "X-WR-CALNAME", "Untitled");
 }
+const char *errands_data_get_list_description(icalcomponent *ical) {
+  return get_x_prop_value(ical, "X-WR-CALDESC", NULL);
+}
 const char *errands_data_get_notes(icalcomponent *ical) { return icalcomponent_get_description(ical); }
 const char *errands_data_get_parent(icalcomponent *ical) {
   icalproperty *property = icalcomponent_get_first_property(ical, ICAL_RELATEDTO_PROPERTY);
@@ -588,6 +597,9 @@ void errands_data_set_color(icalcomponent *ical, const char *value, bool list) {
 }
 void errands_data_set_list_name(icalcomponent *ical, const char *value) {
   set_x_prop_value(ical, "X-WR-CALNAME", value);
+}
+void errands_data_set_list_description(icalcomponent *ical, const char *value) {
+  set_x_prop_value(ical, "X-WR-CALDESC", value);
 }
 void errands_data_set_parent(icalcomponent *ical, const char *value) {
   if (!value || STR_EQUAL(value, ""))

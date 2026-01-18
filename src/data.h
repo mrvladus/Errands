@@ -43,7 +43,8 @@ ListData *errands_data_find_list_data_by_uid(const char *uid);
 ListData *errands_list_data_new(icalcomponent *ical, const char *uid);
 // Load TaskData from iCal component
 ListData *errands_list_data_load_from_ical(icalcomponent *ical, const char *uid, const char *name, const char *color);
-ListData *errands_list_data_create(const char *uid, const char *name, const char *color, bool deleted, bool synced);
+ListData *errands_list_data_create(const char *uid, const char *name, const char *description, const char *color,
+                                   bool deleted, bool synced);
 void errands_list_data_sort(ListData *data);
 // Get all tasks as flat list
 void errands_list_data_get_flat_list(ListData *data, GPtrArray *tasks);
@@ -102,6 +103,7 @@ void errands_data_set_priority(icalcomponent *ical, int value);
 
 const char *errands_data_get_color(icalcomponent *ical, bool list);
 const char *errands_data_get_list_name(icalcomponent *ical);
+const char *errands_data_get_list_description(icalcomponent *ical);
 const char *errands_data_get_notes(icalcomponent *ical);
 const char *errands_data_get_parent(icalcomponent *ical);
 const char *errands_data_get_text(icalcomponent *ical);
@@ -109,6 +111,7 @@ const char *errands_data_get_uid(icalcomponent *ical);
 
 void errands_data_set_color(icalcomponent *ical, const char *value, bool list);
 void errands_data_set_list_name(icalcomponent *ical, const char *value);
+void errands_data_set_list_description(icalcomponent *ical, const char *value);
 void errands_data_set_notes(icalcomponent *ical, const char *value);
 void errands_data_set_parent(icalcomponent *ical, const char *value);
 void errands_data_set_text(icalcomponent *ical, const char *value);
