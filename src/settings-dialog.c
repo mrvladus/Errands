@@ -1,4 +1,5 @@
 #include "settings-dialog.h"
+#include "adwaita.h"
 #include "notifications.h"
 #include "settings.h"
 #include "state.h"
@@ -10,6 +11,7 @@ static void on_notifications_toggled_cb(ErrandsSettingsDialog *self);
 static void on_background_toggled_cb(ErrandsSettingsDialog *self);
 static void on_startup_toggled_cb(ErrandsSettingsDialog *self);
 static void on_sync_toggled_cb(ErrandsSettingsDialog *self);
+static void on_sync_interval_activated_cb(ErrandsSettingsDialog *self, AdwSpinRow *row);
 static void on_sync_url_activated_cb(ErrandsSettingsDialog *self, AdwEntryRow *row);
 static void on_sync_username_activated_cb(ErrandsSettingsDialog *self, AdwEntryRow *row);
 static void on_sync_password_activated_cb(ErrandsSettingsDialog *self, AdwEntryRow *row);
@@ -25,6 +27,7 @@ struct _ErrandsSettingsDialog {
   GtkWidget *background;
   GtkWidget *startup;
   GtkWidget *sync_enabled;
+  GtkWidget *sync_interval;
   GtkWidget *sync_url;
   GtkWidget *sync_username;
   GtkWidget *sync_password;
@@ -48,6 +51,7 @@ static void errands_settings_dialog_class_init(ErrandsSettingsDialogClass *class
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSettingsDialog, background);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSettingsDialog, startup);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSettingsDialog, sync_enabled);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSettingsDialog, sync_interval);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSettingsDialog, sync_url);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSettingsDialog, sync_username);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSettingsDialog, sync_password);
@@ -55,8 +59,9 @@ static void errands_settings_dialog_class_init(ErrandsSettingsDialogClass *class
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_notifications_toggled_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_background_toggled_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_startup_toggled_cb);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_sync_toggled_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_sync_url_activated_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_sync_toggled_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_sync_interval_activated_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_sync_username_activated_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_sync_password_activated_cb);
 }
@@ -76,6 +81,7 @@ void errands_settings_dialog_show() {
   adw_switch_row_set_active(ADW_SWITCH_ROW(settings_dialog->background), errands_settings_get(SETTING_BACKGROUND).b);
   adw_switch_row_set_active(ADW_SWITCH_ROW(settings_dialog->startup), errands_settings_get(SETTING_STARTUP).b);
   adw_switch_row_set_active(ADW_SWITCH_ROW(settings_dialog->sync_enabled), errands_settings_get(SETTING_SYNC).b);
+  adw_spin_row_set_value(ADW_SPIN_ROW(settings_dialog->sync_interval), errands_settings_get(SETTING_SYNC_INTERVAL).i);
   adw_toggle_group_set_active(ADW_TOGGLE_GROUP(settings_dialog->theme), errands_settings_get(SETTING_THEME).i);
   gtk_editable_set_text(GTK_EDITABLE(settings_dialog->sync_url), errands_settings_get(SETTING_SYNC_URL).s);
   gtk_editable_set_text(GTK_EDITABLE(settings_dialog->sync_username), errands_settings_get(SETTING_SYNC_USERNAME).s);
@@ -117,6 +123,11 @@ static void on_startup_toggled_cb(ErrandsSettingsDialog *self) {
 static void on_sync_toggled_cb(ErrandsSettingsDialog *self) {
   bool enabled = adw_switch_row_get_active(ADW_SWITCH_ROW(self->sync_enabled));
   errands_settings_set(SETTING_SYNC, &enabled);
+}
+
+static void on_sync_interval_activated_cb(ErrandsSettingsDialog *self, AdwSpinRow *row) {
+  int val = (int)adw_spin_row_get_value(row);
+  errands_settings_set(SETTING_SYNC_INTERVAL, &val);
 }
 
 static void on_sync_url_activated_cb(ErrandsSettingsDialog *self, AdwEntryRow *row) {

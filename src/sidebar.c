@@ -50,7 +50,7 @@ static void errands_sidebar_init(ErrandsSidebar *sidebar) {
   gtk_widget_init_template(GTK_WIDGET(sidebar));
   errands_add_actions(GTK_WIDGET(sidebar), "sidebar", "import", on_import_action_cb, NULL, "new_list",
                       errands_sidebar_new_list_dialog_show, NULL, "preferences", errands_settings_dialog_show, NULL,
-                      "about", errands_about_dialog_show, NULL, NULL);
+                      "about", errands_about_dialog_show, NULL, "sync", errands_sync_schedule_now, NULL, NULL);
   self = sidebar;
 }
 

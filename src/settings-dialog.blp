@@ -65,6 +65,21 @@ template $ErrandsSettingsDialog: Adw.PreferencesDialog {
         notify::active => $on_sync_toggled_cb(template);
       }
 
+      Adw.SpinRow sync_interval {
+        title: _("Sync Interval");
+        subtitle: _("Seconds between pulling events from the server");
+        visible: bind sync_enabled.active;
+        numeric: true;
+
+        adjustment: Adjustment {
+          lower: 0;
+          upper: 300;
+          step-increment: 1;
+        };
+
+        changed => $on_sync_interval_activated_cb(template);
+      }
+
       Adw.EntryRow sync_url {
         title: _("CalDAV Server URL");
         visible: bind sync_enabled.active;

@@ -6,8 +6,14 @@ menu add_menu {
 }
 
 menu main_menu {
-  item (_("Preferences"), "sidebar.preferences")
-  item (_("About Errands"), "sidebar.about")
+  section {
+    item (_("Sync"), "sidebar.sync")
+  }
+
+  section {
+    item (_("Preferences"), "sidebar.preferences")
+    item (_("About Errands"), "sidebar.about")
+  }
 }
 
 template $ErrandsSidebar: Adw.Bin {
@@ -34,6 +40,11 @@ template $ErrandsSidebar: Adw.Bin {
             trigger: "<Control><Shift>L";
             action: "action(sidebar.new_list)";
           }
+
+          Shortcut {
+            trigger: "<Control><Shift>I";
+            action: "action(sidebar.import)";
+          }
         }
       }
 
@@ -48,6 +59,11 @@ template $ErrandsSidebar: Adw.Bin {
           Shortcut {
             trigger: "<Control>comma";
             action: "action(sidebar.preferences)";
+          }
+
+          Shortcut {
+            trigger: "<Control><Shift>S";
+            action: "action(sidebar.sync)";
           }
         }
       }

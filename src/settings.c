@@ -41,6 +41,7 @@ static const char *const settings_keys_strs[] = {
     SETTING_KEY_STR(SETTING_SYNC_PROVIDER, "sync_provider"),
     SETTING_KEY_STR(SETTING_SYNC_URL, "sync_url"),
     SETTING_KEY_STR(SETTING_SYNC_USERNAME, "sync_username"),
+    SETTING_KEY_STR(SETTING_SYNC_INTERVAL, "sync_interval"),
     SETTING_KEY_STR(SETTING_TAGS, "tags"),
     SETTING_KEY_STR(SETTING_WINDOW_HEIGHT, "window_height"),
     SETTING_KEY_STR(SETTING_WINDOW_WIDTH, "window_width"),
@@ -73,6 +74,7 @@ void errands_settings_load_default() {
   SETTING_ADD(SETTING_WINDOW_WIDTH, int, 800);
   SETTING_ADD(SETTING_SORT_BY, int, SORT_TYPE_CREATION_DATE);
   SETTING_ADD(SETTING_SORT_ORDER, int, SORT_ORDER_DESC);
+  SETTING_ADD(SETTING_SYNC_INTERVAL, int, 30);
 
   SETTING_ADD(SETTING_LAST_LIST_UID, string, "");
   SETTING_ADD(SETTING_SYNC_PROVIDER, string, "caldav");
@@ -142,6 +144,7 @@ ErrandsSetting errands_settings_get(ErrandsSettingsKey key) {
   case SETTING_THEME: SETTING_GET_INT; break;
   case SETTING_WINDOW_HEIGHT: SETTING_GET_INT; break;
   case SETTING_WINDOW_WIDTH: SETTING_GET_INT; break;
+  case SETTING_SYNC_INTERVAL: SETTING_GET_INT; break;
 
   case SETTING_LAST_LIST_UID: SETTING_GET_STR; break;
   case SETTING_SYNC_PROVIDER: SETTING_GET_STR; break;
@@ -172,6 +175,7 @@ void errands_settings_set(ErrandsSettingsKey key, void *value) {
   case SETTING_WINDOW_HEIGHT: SETTING_SET_INT; break;
   case SETTING_WINDOW_WIDTH: SETTING_SET_INT; break;
   case SETTING_THEME: SETTING_SET_INT; break;
+  case SETTING_SYNC_INTERVAL: SETTING_SET_INT; break;
 
   case SETTING_LAST_LIST_UID: SETTING_SET_STR; break;
   case SETTING_SYNC_PROVIDER: SETTING_SET_STR; break;

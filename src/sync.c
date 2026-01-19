@@ -223,7 +223,7 @@ void errands_sync_init(void) {
   tasks_pushed = g_ptr_array_new_full(16, NULL);
   gtk_widget_set_visible(state.main_window->sidebar->sync_indicator, true);
   RUN_THREAD_FUNC(errands__sync_cb, errands__sync_finished_cb);
-  g_timeout_add_seconds(10, G_SOURCE_FUNC(errands__sync), NULL);
+  g_timeout_add_seconds(errands_settings_get(SETTING_SYNC_INTERVAL).i, G_SOURCE_FUNC(errands__sync), NULL);
 }
 
 void errands_sync_cleanup(void) {
@@ -232,7 +232,10 @@ void errands_sync_cleanup(void) {
   if (tasks_pushed) g_ptr_array_free(tasks_pushed, true);
 }
 
-void errands_sync_schedule(void) { sync_scheduled = true; }
+void errands_sync_schedule_now(void) {
+  sync_scheduled = true;
+  errands__sync();
+}
 
 void errands_sync_schedule_list(ListData *data) {
   sync_scheduled = true;
