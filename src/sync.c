@@ -1,10 +1,13 @@
 #include "sync.h"
 #include "data.h"
+#include "glib.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "state.h"
 #include "utils.h"
 #include "window.h"
+#include <libical/ical.h>
+#include <stddef.h>
 
 #define CALDAV_DEBUG
 #define CALDAV_IMPLEMENTATION
@@ -22,33 +25,12 @@ static GPtrArray *tasks_to_push = NULL, *tasks_to_push_copy = NULL, *tasks_pushe
 
 // --- UTILS --- //
 
-// TODO: move to caldav.h
-// TODO: calendar should have uid
-static const char *get_calendar_uid_from_href(const char *href) {
-  char *last_slash = strchr(href, '/');
-  bool ends_with_slash = false;
-  while (last_slash) {
-    char *next_slash = strchr(last_slash + 1, '/');
-    if (!next_slash) break;
-    if (*(next_slash + 1) == '\0') {
-      ends_with_slash = true;
-      break;
-    }
-    last_slash = next_slash;
-  }
-  char *out = (char *)tmp_str_printf("%s", last_slash + 1);
-  if (ends_with_slash) out[strlen(out) - 1] = '\0';
-
-  return (const char *)out;
-}
-
 static CalDAVCalendar *find_calendar_by_uid(const char *uid) {
   for_range(i, 0, client->calendars->count) {
     CalDAVCalendar *c = client->calendars->items[i];
-    // TODO: use c->uid
-    if (strstr(c->href, uid)) return c;
+    LOG("%s == %s", uid, c->uid);
+    if (STR_EQUAL(c->uid, uid)) return c;
   }
-
   return NULL;
 }
 
@@ -124,7 +106,6 @@ static void errands__sync_cb(GTask *task, gpointer source_object, gpointer task_
   }
   // Get calendars
   caldav_client_pull_calendars(client);
-  LOG("Sync: Loaded %zu calendars", client->calendars->count);
   // Get events
   for (size_t i = 0; i < client->calendars->count; i++) {
     CalDAVCalendar *cal = client->calendars->items[i];
@@ -132,12 +113,22 @@ static void errands__sync_cb(GTask *task, gpointer source_object, gpointer task_
     if (cal->events_changed) caldav_calendar_pull_events(cal);
   }
 
-  // Create/Update calendars on server
+  // Delete/Create/Update calendars on server
   for_range(i, 0, lists_to_push_copy->len) {
     ListData *list = g_ptr_array_index(lists_to_push_copy, i);
+    bool deleted = errands_data_get_deleted(list->ical);
     CalDAVCalendar *c = find_calendar_by_uid(list->uid);
+    if (deleted) {
+      if (c) {
+        LOG("Sync: Deleting calendar on server %s", list->uid);
+        bool res = caldav_calendar_delete(c);
+        errands_data_set_synced(list->ical, res);
+        errands_list_data_save(list);
+      }
+      continue;
+    }
     if (!c) {
-      LOG("Sync: Creating list on server: %s", list->uid);
+      LOG("Sync: Creating calendar on server: %s", list->uid);
       bool created =
           caldav_client_create_calendar(client, list->uid, errands_data_get_list_name(list->ical), NULL,
                                         errands_data_get_color(list->ical, true), CALDAV_COMPONENT_SET_VTODO);
@@ -162,19 +153,34 @@ static void errands__sync_cb(GTask *task, gpointer source_object, gpointer task_
     }
     g_ptr_array_add(lists_pushed, list);
   }
+
   // Create/Update tasks on server
   for_range(i, 0, tasks_to_push_copy->len) {
     TaskData *data = g_ptr_array_index(tasks_to_push_copy, i);
-    const char *uid = errands_data_get_uid(data->ical);
+
     autoptr(icalcomponent) wrapper = icalcomponent_new_vcalendar();
     icalcomponent_add_component(wrapper, icalcomponent_new_clone(data->ical));
     const char *ical = icalcomponent_as_ical_string(wrapper);
+
     CalDAVCalendar *cal = find_calendar_by_uid(data->list->uid);
+    g_assert(cal);
+    const char *uid = errands_data_get_uid(data->ical);
     CalDAVEvent *existing_event = find_event_by_uid(cal, uid);
+
+    // Update task on server
     if (existing_event) {
-      LOG("Sync: Updating event on server: %s", uid);
-      caldav_event_update(existing_event, ical);
-    } else {
+      autoptr(icalcomponent) vcalendar = icalcomponent_new_from_string(existing_event->ical);
+      icalcomponent *vtodo = icalcomponent_get_first_component(vcalendar, ICAL_VTODO_COMPONENT);
+      CONTINUE_IF_NOT(vtodo);
+      icaltimetype changed_on_server = errands_data_get_changed(vtodo);
+      icaltimetype changed_on_client = errands_data_get_changed(data->ical);
+      if (icaltime_compare(changed_on_client, changed_on_server) == 1) {
+        LOG("Sync: Updating event on server: %s", uid);
+        caldav_event_update(existing_event, ical);
+      }
+    }
+    // Create task on server
+    else {
       LOG("Sync: Creating event on server: %s", uid);
       caldav_calendar_create_event(cal, uid, ical);
     }
@@ -203,27 +209,36 @@ static void errands__sync_finished_cb(GObject *source_object, GAsyncResult *res,
   for_range(i, 0, client->calendars->count) {
     CalDAVCalendar *cal = client->calendars->items[i];
     CONTINUE_IF_NOT(cal->component_set & CALDAV_COMPONENT_SET_VTODO);
-    const char *uid = get_calendar_uid_from_href(cal->href);
-    ListData *existing_list = errands_data_find_list_data_by_uid(uid);
+    ListData *existing_list = errands_data_find_list_data_by_uid(cal->uid);
     if (!existing_list) {
-      LOG("Sync: Create new list: %s", uid);
+      LOG("Sync: Create new list: %s", cal->uid);
       icalcomponent *ical = caldav_calendar_to_icalcomponent(cal);
-      ListData *new_list = errands_list_data_load_from_ical(ical, uid, cal->display_name, cal->color);
+      ListData *new_list = errands_list_data_load_from_ical(ical, cal->uid, cal->display_name, cal->color);
       g_ptr_array_add(errands_data_lists, new_list);
       errands_list_data_save(new_list);
     } else {
+      // Update local properties
       if (cal->properties_changed) {
-        LOG("Sync: Update list properties: %s", uid);
-        errands_data_set_color(existing_list->ical, cal->color, true);
-        errands_data_set_list_name(existing_list->ical, cal->display_name);
-        errands_list_data_save(existing_list);
+        bool props_changed = false;
+        const char *curr_name = errands_data_get_list_name(existing_list->ical);
+        const char *curr_color = errands_data_get_color(existing_list->ical, true);
+        if (!STR_EQUAL(curr_name, cal->display_name)) {
+          errands_data_set_list_name(existing_list->ical, cal->display_name);
+          props_changed = true;
+        }
+        if (!STR_EQUAL(curr_color, cal->color)) {
+          errands_data_set_color(existing_list->ical, cal->color, true);
+          props_changed = true;
+        }
+        if (props_changed) {
+          LOG("Sync: Update list properties: %s", cal->uid);
+          errands_list_data_save(existing_list);
+        }
       }
+      // Create local tasks
+      // Update local tasks
     }
     reload = true;
-    // Merge calendar data into existing list or create a new one
-    // if (existing_list) {
-    //   icalcomponent_merge_component(existing_list->ical, cal->ical);
-    // }
   }
 
   if (reload) {

@@ -101,6 +101,8 @@ struct CalDAVCalendar {
   CalDAVClient *client;
   // URL of the calendar resource on the server
   char *href;
+  // UID of the calendar
+  char *uid;
   // Human-readable name of the calendar
   char *display_name;
   // Optional description of the calendar
@@ -910,6 +912,24 @@ static inline char *caldav__extract_base_url(const char *url) {
   return host_end ? caldav__strdup_printf("%.*s", host_end - url, url) : CALDAV_STRDUP_FUNC(url);
 }
 
+static char *caldav__calendar_uid_from_href(const char *href) {
+  char *last_slash = strchr(href, '/');
+  bool ends_with_slash = false;
+  while (last_slash) {
+    char *next_slash = strchr(last_slash + 1, '/');
+    if (!next_slash) break;
+    if (*(next_slash + 1) == '\0') {
+      ends_with_slash = true;
+      break;
+    }
+    last_slash = next_slash;
+  }
+  char *out = caldav__strdup_printf("%s", last_slash + 1);
+  if (ends_with_slash) out[strlen(out) - 1] = '\0';
+
+  return out;
+}
+
 // ---------- FIND FUNCTIONS ---------- //
 
 static CalDAVCalendar *caldav__find_calendar_by_href(CalDAVCalendars *cals, const char *href) {
@@ -976,6 +996,7 @@ static char *caldav_request(CalDAVClient *c, const char *url, const char *method
   if (c->password) curl_easy_setopt(curl, CURLOPT_PASSWORD, c->password);
   if (body) curl_easy_setopt(curl, CURLOPT_POSTFIELDS, body);
   CURLcode res = curl_easy_perform(curl);
+  caldav__log("Status code: %d", res);
   if (res != CURLE_OK) {
     caldav__log("Request failed: %s", curl_easy_strerror(res));
     curl_easy_cleanup(curl);
@@ -1503,6 +1524,7 @@ static CalDAVCalendar *caldav__calendar_new(CalDAVClient *client, CalDAVComponen
   calendar->color = color ? CALDAV_STRDUP_FUNC(color) : NULL;
   calendar->ctag = ctag ? CALDAV_STRDUP_FUNC(ctag) : NULL;
   calendar->events = CALDAV_CALLOC_FUNC(1, sizeof(*(calendar->events)));
+  calendar->uid = caldav__calendar_uid_from_href(calendar->href);
 
   return calendar;
 }
@@ -1538,12 +1560,13 @@ void caldav_calendar_print(CalDAVCalendar *c) {
 
 bool caldav_calendar_delete(CalDAVCalendar *c) {
   if (!c) return false;
-  bool success = false;
-  char *response = caldav_request(c->client, c->href, "DELETE", NULL, NULL, &success);
+  caldav__log("Deleting calendar %s", c->href);
+  bool res = false;
+  char *response = caldav_request(c->client, c->href, "DELETE", NULL, NULL, &res);
   CALDAV_FREE(response);
-  if (!success) return false;
+  if (!res) return false;
   c->deleted = true;
-  return false;
+  return true;
 }
 
 void caldav_calendar_pull_events(CalDAVCalendar *c) {
@@ -1736,7 +1759,7 @@ bool caldav_event_update(CalDAVEvent *e, const char *ical) {
   if (!res) return false;
   CalDAVEvents evs = {0};
   da_add(&evs, e);
-  char *response = caldav_request_calendar_multiget(e->calendar, NULL);
+  char *response = caldav_request_calendar_multiget(e->calendar, &evs);
   da_free(&evs);
   if (!response) return false;
   XMLNode *root = xml_parse_string(response);
