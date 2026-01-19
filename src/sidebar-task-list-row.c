@@ -4,11 +4,11 @@
 #include "state.h"
 #include "task-list.h"
 #include "utils.h"
-#include "vendor/toolbox.h"
 #include "window.h"
 
+#include "vendor/toolbox.h"
+
 #include <glib/gi18n.h>
-#include <libical/ical.h>
 
 static void on_right_click(GtkPopover *popover, gint n_press, gdouble x, gdouble y, GtkGestureClick *ctrl);
 static void on_color_changed(GtkColorDialogButton *btn, GParamSpec *pspec, ListData *data);
@@ -16,6 +16,8 @@ static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x,
                            ErrandsSidebarTaskListRow *row);
 static void on_action_export(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row);
 static void on_action_print(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row);
+static void on_action_rename(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row);
+static void on_action_delete(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row);
 // static GdkDragAction on_hover_begin(GtkDropTarget *target, gdouble x, gdouble y,
 //                                     ErrandsSidebarTaskListRow *row);
 
@@ -42,9 +44,8 @@ static void errands_sidebar_task_list_row_class_init(ErrandsSidebarTaskListRowCl
 static void errands_sidebar_task_list_row_init(ErrandsSidebarTaskListRow *self) {
   gtk_widget_init_template(GTK_WIDGET(self));
   // Actions
-  errands_add_actions(GTK_WIDGET(self), "task-list-row", "rename", errands_sidebar_rename_list_dialog_show, self,
-                      "delete", errands_sidebar_delete_list_dialog_show, self, "print", on_action_print, self, "export",
-                      on_action_export, self, NULL);
+  errands_add_actions(GTK_WIDGET(self), "task-list-row", "rename", on_action_rename, self, "delete", on_action_delete,
+                      self, "print", on_action_print, self, "export", on_action_export, self, NULL);
 
   // Drop target setup
   // GtkDropTarget *drop_target = gtk_drop_target_new(G_TYPE_OBJECT, GDK_ACTION_MOVE);
@@ -59,8 +60,8 @@ static void errands_sidebar_task_list_row_init(ErrandsSidebarTaskListRow *self) 
 }
 
 ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_new(ListData *data) {
+  g_assert(data);
   LOG_NO_LN("Task List Row '%s': Create ... ", data->uid);
-
   ErrandsSidebarTaskListRow *row = g_object_new(ERRANDS_TYPE_SIDEBAR_TASK_LIST_ROW, NULL);
   row->data = data;
   // Set color
@@ -173,6 +174,14 @@ static void on_action_export(GSimpleAction *action, GVariant *param, ErrandsSide
   g_object_set(dialog, "initial-name", filename, NULL);
   gtk_file_dialog_save(dialog, GTK_WINDOW(state.main_window), NULL, (GAsyncReadyCallback)on_action_export_finish_cb,
                        row->data);
+}
+
+static void on_action_rename(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {
+  errands_sidebar_rename_list_dialog_show(row);
+}
+
+static void on_action_delete(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {
+  errands_sidebar_delete_list_dialog_show(row);
 }
 
 // - PRINTING - //

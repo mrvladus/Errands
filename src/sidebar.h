@@ -84,9 +84,7 @@ struct _ErrandsSidebar {
 
   ErrandsSidebarTaskListRow *current_task_list_row;
 
-  ErrandsSidebarDeleteListDialog *delete_list_dialog;
   ErrandsSidebarNewListDialog *new_list_dialog;
-  ErrandsSidebarRenameListDialog *rename_list_dialog;
 };
 
 ErrandsSidebar *errands_sidebar_new(void);

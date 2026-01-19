@@ -1,4 +1,5 @@
 #include "data.h"
+#include "glib.h"
 #include "sidebar.h"
 #include "state.h"
 #include "sync.h"
@@ -6,6 +7,8 @@
 static void on_response_cb(ErrandsSidebarRenameListDialog *self, gchar *response, gpointer data);
 static void on_entry_changed_cb(ErrandsSidebarRenameListDialog *self, AdwEntryRow *entry);
 static void on_entry_activated_cb(ErrandsSidebarRenameListDialog *self, AdwEntryRow *entry);
+
+static ErrandsSidebarRenameListDialog *self = NULL;
 
 // ---------- WIDGET TEMPLATE ---------- //
 
@@ -32,8 +35,8 @@ static void errands_sidebar_rename_list_dialog_class_init(ErrandsSidebarRenameLi
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_entry_activated_cb);
 }
 
-static void errands_sidebar_rename_list_dialog_init(ErrandsSidebarRenameListDialog *self) {
-  gtk_widget_init_template(GTK_WIDGET(self));
+static void errands_sidebar_rename_list_dialog_init(ErrandsSidebarRenameListDialog *dialog) {
+  gtk_widget_init_template(GTK_WIDGET(dialog));
 }
 
 ErrandsSidebarRenameListDialog *errands_sidebar_rename_list_dialog_new() {
@@ -43,14 +46,12 @@ ErrandsSidebarRenameListDialog *errands_sidebar_rename_list_dialog_new() {
 // ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_sidebar_rename_list_dialog_show(ErrandsSidebarTaskListRow *row) {
-  LOG("Sidebar Rename List Dialog: Show");
-  if (!state.main_window->sidebar->rename_list_dialog)
-    state.main_window->sidebar->rename_list_dialog = errands_sidebar_rename_list_dialog_new();
-  state.main_window->sidebar->rename_list_dialog->current_task_list_row = row;
-  gtk_editable_set_text(GTK_EDITABLE(state.main_window->sidebar->rename_list_dialog->entry),
-                        errands_data_get_list_name(row->data->ical));
-  adw_dialog_present(ADW_DIALOG(state.main_window->sidebar->rename_list_dialog), GTK_WIDGET(state.main_window));
-  gtk_widget_grab_focus(state.main_window->sidebar->rename_list_dialog->entry);
+  if (!self) self = errands_sidebar_rename_list_dialog_new();
+  self->current_task_list_row = row;
+  LOG("Sidebar Rename List Dialog: Show %p %p", row, self->current_task_list_row);
+  gtk_editable_set_text(GTK_EDITABLE(self->entry), errands_data_get_list_name(row->data->ical));
+  adw_dialog_present(ADW_DIALOG(self), GTK_WIDGET(state.main_window));
+  gtk_widget_grab_focus(self->entry);
 }
 
 // ---------- CALLBACKS ---------- //

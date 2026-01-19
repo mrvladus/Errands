@@ -1,10 +1,13 @@
 #include "data.h"
+#include "glib.h"
 #include "sidebar.h"
 #include "state.h"
 #include "sync.h"
 #include "task-list.h"
 
 static void on_response_cb(ErrandsSidebarDeleteListDialog *dialog, gchar *response, gpointer data);
+
+static ErrandsSidebarDeleteListDialog *self = NULL;
 
 // ---------- WIDGET TEMPLATE ---------- //
 
@@ -27,8 +30,8 @@ static void errands_sidebar_delete_list_dialog_class_init(ErrandsSidebarDeleteLi
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_response_cb);
 }
 
-static void errands_sidebar_delete_list_dialog_init(ErrandsSidebarDeleteListDialog *self) {
-  gtk_widget_init_template(GTK_WIDGET(self));
+static void errands_sidebar_delete_list_dialog_init(ErrandsSidebarDeleteListDialog *dialog) {
+  gtk_widget_init_template(GTK_WIDGET(dialog));
 }
 
 ErrandsSidebarDeleteListDialog *errands_sidebar_delete_list_dialog_new() {
@@ -38,17 +41,16 @@ ErrandsSidebarDeleteListDialog *errands_sidebar_delete_list_dialog_new() {
 // ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_sidebar_delete_list_dialog_show(ErrandsSidebarTaskListRow *row) {
-  if (!state.main_window->sidebar->delete_list_dialog)
-    state.main_window->sidebar->delete_list_dialog = errands_sidebar_delete_list_dialog_new();
-  state.main_window->sidebar->delete_list_dialog->current_task_list_row = row;
-  adw_dialog_present(ADW_DIALOG(state.main_window->sidebar->delete_list_dialog), GTK_WIDGET(state.main_window));
+  if (!self) self = errands_sidebar_delete_list_dialog_new();
+  self->current_task_list_row = row;
+  adw_dialog_present(ADW_DIALOG(self), GTK_WIDGET(state.main_window));
 }
 
 // ---------- CALLBACKS ---------- //
 
 static void on_response_cb(ErrandsSidebarDeleteListDialog *dialog, gchar *response, gpointer data) {
   if (STR_EQUAL(response, "delete")) {
-    ErrandsSidebarTaskListRow *row = state.main_window->sidebar->delete_list_dialog->current_task_list_row;
+    ErrandsSidebarTaskListRow *row = dialog->current_task_list_row;
     LOG("Delete List Dialog: Deleting task list %s", row->data->uid);
     // Delete data
     errands_data_set_deleted(row->data->ical, true);
