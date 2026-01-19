@@ -91,4 +91,5 @@ ErrandsSidebar *errands_sidebar_new(void);
 void errands_sidebar_load_lists(void);
 void errands_sidebar_update_filter_rows(void);
 void errands_sidebar_select_last_opened_page(void);
+void errands_sidebar_toggle_sync_indicator(bool on);
 ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(ListData *data);

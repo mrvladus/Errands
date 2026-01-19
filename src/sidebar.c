@@ -125,6 +125,8 @@ void errands_sidebar_update_filter_rows() {
   gtk_label_set_label(self->pinned_counter, pinned_label);
 }
 
+void errands_sidebar_toggle_sync_indicator(bool on) { gtk_widget_set_visible(self->sync_indicator, on); }
+
 // --- SIGNAL HANDLERS --- //
 
 static void on_errands_sidebar_filter_row_activated(GtkListBox *box, GtkListBoxRow *row) {

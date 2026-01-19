@@ -8,13 +8,13 @@ VERSION = 49.0
 
 DESTDIR    ?=
 prefix     ?= /usr/local
-bindir       = $(prefix)/bin
-datarootdir  = $(prefix)/share
-localedir    = $(datarootdir)/locale
-desktopdir   = $(datarootdir)/applications
-dbusdir      = $(datarootdir)/dbus-1/services
-appicondir   = $(datarootdir)/icons/hicolor/scalable/apps
-symbolicdir  = $(datarootdir)/icons/hicolor/symbolic/apps
+bindir      = $(prefix)/bin
+datarootdir = $(prefix)/share
+localedir   = $(datarootdir)/locale
+desktopdir  = $(datarootdir)/applications
+dbusdir     = $(datarootdir)/dbus-1/services
+appicondir  = $(datarootdir)/icons/hicolor/scalable/apps
+symbolicdir = $(datarootdir)/icons/hicolor/symbolic/apps
 
 # --- Project directories --- #
 
@@ -93,31 +93,38 @@ install: $(BUILD_DIR)/$(NAME)
 	@cp $(DATA_DIR)/io.github.mrvladus.Errands.desktop.in $(BUILD_DIR)/$(APP_ID).desktop
 	@sed -i "s/@APP_ID@/$(APP_ID)/g" $(BUILD_DIR)/$(APP_ID).desktop
 	@sed -i "s|@BIN_DIR@|$(bindir)|g" $(BUILD_DIR)/$(APP_ID).desktop
-	install -Dm 644 $(BUILD_DIR)/$(APP_ID).desktop $(DESTDIR)$(desktopdir)/$(APP_ID).desktop
+	install -Dm 644 $(BUILD_DIR)/$(APP_ID).desktop $(DESTDIR)/$(desktopdir)/$(APP_ID).desktop
 	# Icons
-	install -Dm 644 $(DATA_DIR)/icons/$(APP_ID).svg $(DESTDIR)$(appicondir)/$(APP_ID).svg
-	install -Dm 644 $(DATA_DIR)/icons/io.github.mrvladus.Errands-symbolic.svg $(DESTDIR)$(symbolicdir)/io.github.mrvladus.Errands-symbolic.svg
+	install -Dm 644 $(DATA_DIR)/icons/$(APP_ID).svg $(DESTDIR)/$(appicondir)/$(APP_ID).svg
+	install -Dm 644 $(DATA_DIR)/icons/io.github.mrvladus.Errands-symbolic.svg $(DESTDIR)/$(symbolicdir)/io.github.mrvladus.Errands-symbolic.svg
 	# D-Bus service
 	@cp $(DATA_DIR)/io.github.mrvladus.Errands.service.in $(BUILD_DIR)/$(APP_ID).service
 	@sed -i "s/@APP_ID@/$(APP_ID)/g" $(BUILD_DIR)/$(APP_ID).service
 	@sed -i "s|@BIN_DIR@|$(bindir)|g" $(BUILD_DIR)/$(APP_ID).service
-	install -Dm 644 $(BUILD_DIR)/$(APP_ID).service $(DESTDIR)$(dbusdir)/$(APP_ID).service
+	install -Dm 644 $(BUILD_DIR)/$(APP_ID).service $(DESTDIR)/$(dbusdir)/$(APP_ID).service
 
 uninstall:
-	rm -f $(DESTDIR)$(bindir)/$(NAME)
-	rm -f $(DESTDIR)$(desktopdir)/$(APP_ID).desktop
-	rm -f $(DESTDIR)$(appicondir)/$(APP_ID).svg
-	rm -f $(DESTDIR)$(symbolicdir)/io.github.mrvladus.Errands-symbolic.svg
-	rm -f $(DESTDIR)$(dbusdir)/$(APP_ID).service
+	rm -f $(DESTDIR)/$(bindir)/$(NAME)
+	rm -f $(DESTDIR)/$(desktopdir)/$(APP_ID).desktop
+	rm -f $(DESTDIR)/$(appicondir)/$(APP_ID).svg
+	rm -f $(DESTDIR)/$(symbolicdir)/io.github.mrvladus.Errands-symbolic.svg
+	rm -f $(DESTDIR)/$(dbusdir)/$(APP_ID).service
 
 # --- Development targets --- #
 
+RUN_CMD := $(BUILD_DIR)/$(NAME)
+
+# Debug mode: GDB, GF2.
+DEBUG ?=
+ifeq ($(DEBUG),GDB)
+    RUN_CMD := gdb $(RUN_CMD)
+else ifeq ($(DEBUG),GF2)
+    RUN_CMD := gf2 $(RUN_CMD)
+endif
+
 # Run the application
 run: all
-	@./$(BUILD_DIR)/$(NAME)
-
-run-gdb: all
-	@gdb ./$(BUILD_DIR)/$(NAME)
+	@$(RUN_CMD)
 
 # Count source lines of code
 sloc:

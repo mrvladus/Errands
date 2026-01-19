@@ -48,7 +48,7 @@ ErrandsSidebarRenameListDialog *errands_sidebar_rename_list_dialog_new() {
 void errands_sidebar_rename_list_dialog_show(ErrandsSidebarTaskListRow *row) {
   if (!self) self = errands_sidebar_rename_list_dialog_new();
   self->current_task_list_row = row;
-  LOG("Sidebar Rename List Dialog: Show %p %p", row, self->current_task_list_row);
+  LOG("Sidebar Rename List Dialog: Show");
   gtk_editable_set_text(GTK_EDITABLE(self->entry), errands_data_get_list_name(row->data->ical));
   adw_dialog_present(ADW_DIALOG(self), GTK_WIDGET(state.main_window));
   gtk_widget_grab_focus(self->entry);
@@ -63,7 +63,7 @@ static void on_response_cb(ErrandsSidebarRenameListDialog *self, gchar *response
     LOG("Sidebar Rename List Dialog: Rename to '%s'", text);
     errands_data_set_list_name(list_data->ical, text);
     errands_data_set_synced(list_data->ical, false);
-    errands_list_data_save(self->current_task_list_row->data);
+    errands_list_data_save(list_data);
     errands_sidebar_task_list_row_update(self->current_task_list_row);
     errands_task_list_update_title(state.main_window->task_list);
     errands_sync_schedule_list(list_data);
