@@ -146,40 +146,40 @@ struct CalDAVEvent {
 // ---------- API ---------- //
 
 // Create a new CalDAV client instance
+// note: The client must be freed with `caldav_client_free()`
 // `base_url`: URL of the CalDAV server (e.g., "https://caldav.example.com" or "example.com")
 // `username`: Authentication username
 // `password`: Authentication password
 // return: New `CalDAVClient` instance, or `NULL` on failure
-// note: The client must be freed with `caldav_client_free()`
 CalDAVClient *caldav_client_new(const char *base_url, const char *username, const char *password);
 
 // Free a CalDAV client and all associated resources
-// `c`: Client instance to free
 // note: This also frees all calendars and events managed by this client
+// `c`: Client instance to free
 void caldav_client_free(CalDAVClient *c);
 
 // Synchronize calendars with the server
 // Downloads calendar list and updates local state
-// `c`: Client instance
 // note: This resets the `properties_changed` and `events_changed` flags on calendars and removes calendars marked as
+// `c`: Client instance
 // `deleted`
 void caldav_client_pull_calendars(CalDAVClient *c);
 
 // Create a new calendar on the server
+// note: The calendar will be added to the client's calendars list on success
 // `c`: Client instance
 // `uid`: Unique identifier for the new calendar
 // `display_name`: Human-readable name for the calendar
 // `description`: Optional description of the calendar (can be `NULL`)
 // `color`: Optional color in hex format (e.g., "#FF0000FF") (can be `NULL`)
 // return: `true` if successful, `false` on failure
-// note: The calendar will be added to the client's calendars list on success
 bool caldav_client_create_calendar(CalDAVClient *c, const char *uid, const char *display_name, const char *description,
                                    const char *color, CalDAVComponentSet set);
 
 // Synchronize events for a specific calendar with the server
 // Downloads event list and updates local state
-// `c`: Calendar instance
 // note: Marked as `deleted` events are removed from the calendar's events list
+// `c`: Calendar instance
 void caldav_calendar_pull_events(CalDAVCalendar *c);
 
 // Update calendar information on the server
@@ -191,9 +191,9 @@ void caldav_calendar_pull_events(CalDAVCalendar *c);
 bool caldav_calendar_update(CalDAVCalendar *c, const char *display_name, const char *description, const char *color);
 
 // Delete a calendar from the server
+// note: The calendar will be marked as deleted and removed on next pull
 // `c`: Calendar instance to delete
 // return: `true` if successful, `false` on failure
-// note: The calendar will be marked as deleted and removed on next pull
 bool caldav_calendar_delete(CalDAVCalendar *c);
 
 // Print calendar information to stdout for debugging
@@ -201,11 +201,11 @@ bool caldav_calendar_delete(CalDAVCalendar *c);
 void caldav_calendar_print(CalDAVCalendar *c);
 
 // Create a new event in a calendar on the server
+// note: The event will be added to the calendar's events list on success
 // `c`: Calendar instance
 // `uid`: Unique identifier for the new event
 // `ical`: iCalendar data for the event (RFC 5545 format)
 // return: `true` if successful, `false` on failure
-// note: The event will be added to the calendar's events list on success
 bool caldav_calendar_create_event(CalDAVCalendar *c, const char *uid, const char *ical);
 
 // Update an event on the server
@@ -215,9 +215,10 @@ bool caldav_calendar_create_event(CalDAVCalendar *c, const char *uid, const char
 bool caldav_event_update(CalDAVEvent *e, const char *ical);
 
 // Delete an event from the server and mark it as deleted if successful
-// `e`: Event instance to delete
 // note: The event will be removed on next pull
-void caldav_event_delete(CalDAVEvent *e);
+// `e`: Event instance to delete
+// return: `true` if successful, `false` on failure
+bool caldav_event_delete(CalDAVEvent *e);
 
 // Print event information to stdout for debugging
 // `e`: Event instance to print
@@ -1742,13 +1743,14 @@ void caldav_event_print(CalDAVEvent *e) {
          e->href, e->etag, e->deleted ? "true" : "false", e->ical);
 }
 
-void caldav_event_delete(CalDAVEvent *e) {
-  if (!e) return;
+bool caldav_event_delete(CalDAVEvent *e) {
+  if (!e) return false;
   caldav__log("Deleting event: %s", e->href);
   bool res = false;
   caldav_request(e->calendar->client, e->href, "DELETE", NULL, NULL, &res);
-  if (!res) return;
+  if (!res) return false;
   e->deleted = true;
+  return true;
 }
 
 bool caldav_event_update(CalDAVEvent *e, const char *ical) {

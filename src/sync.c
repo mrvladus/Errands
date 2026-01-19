@@ -28,7 +28,6 @@ static GPtrArray *tasks_to_push = NULL, *tasks_to_push_copy = NULL, *tasks_pushe
 static CalDAVCalendar *find_calendar_by_uid(const char *uid) {
   for_range(i, 0, client->calendars->count) {
     CalDAVCalendar *c = client->calendars->items[i];
-    LOG("%s == %s", uid, c->uid);
     if (STR_EQUAL(c->uid, uid)) return c;
   }
   return NULL;
@@ -154,18 +153,26 @@ static void errands__sync_cb(GTask *task, gpointer source_object, gpointer task_
     g_ptr_array_add(lists_pushed, list);
   }
 
-  // Create/Update tasks on server
+  // Delete/Create/Update tasks on server
   for_range(i, 0, tasks_to_push_copy->len) {
     TaskData *data = g_ptr_array_index(tasks_to_push_copy, i);
+    CalDAVCalendar *cal = find_calendar_by_uid(data->list->uid);
+    const char *uid = errands_data_get_uid(data->ical);
 
+    // Delete task on server
+    if (errands_data_get_deleted(data->ical)) {
+      CalDAVEvent *e = find_event_by_uid(cal, uid);
+      if (e) {
+        LOG("Sync: Deleting task on server: %s", uid);
+        caldav_event_delete(e);
+      }
+      continue;
+    }
+
+    CalDAVEvent *existing_event = find_event_by_uid(cal, uid);
     autoptr(icalcomponent) wrapper = icalcomponent_new_vcalendar();
     icalcomponent_add_component(wrapper, icalcomponent_new_clone(data->ical));
     const char *ical = icalcomponent_as_ical_string(wrapper);
-
-    CalDAVCalendar *cal = find_calendar_by_uid(data->list->uid);
-    g_assert(cal);
-    const char *uid = errands_data_get_uid(data->ical);
-    CalDAVEvent *existing_event = find_event_by_uid(cal, uid);
 
     // Update task on server
     if (existing_event) {
