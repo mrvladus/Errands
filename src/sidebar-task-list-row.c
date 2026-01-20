@@ -126,7 +126,7 @@ static void on_color_changed(GtkColorDialogButton *btn, GParamSpec *pspec, ListD
   gdk_rgba_to_hex_string(color_rgba, new_color);
   errands_data_set_color(data->ical, new_color, true);
   errands_list_data_save(data);
-  errands_sync_schedule_list(data);
+  // errands_sync_schedule_list(data);
 }
 
 static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x, double y,

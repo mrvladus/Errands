@@ -87,11 +87,11 @@ static void on_dialog_close_cb(ErrandsTaskListNotesDialog *self) {
   if (notes && !STR_EQUAL(text, notes)) {
     errands_data_set_notes(data->ical, text);
     errands_list_data_save(data->list);
-    errands_sync_schedule_task(data);
+    // errands_sync_schedule_task(data);
   } else if (!notes && text && !STR_EQUAL(text, "")) {
     errands_data_set_notes(data->ical, text);
     errands_list_data_save(data->list);
-    errands_sync_schedule_task(data);
+    // errands_sync_schedule_task(data);
   }
   errands_task_update_toolbar(self->current_task);
   adw_dialog_close(ADW_DIALOG(self));

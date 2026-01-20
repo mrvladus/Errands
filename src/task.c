@@ -251,7 +251,7 @@ static void on_complete_btn_toggle_cb(ErrandsTask *self, GtkCheckButton *btn) {
   errands_sidebar_update_filter_rows();
   errands_sidebar_task_list_row_update(errands_sidebar_task_list_row_get(self->data->list));
   // Sync
-  errands_sync_schedule_list(self->data->list);
+  // errands_sync_schedule_list(self->data->list);
 }
 
 static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointer user_data) {
@@ -277,7 +277,7 @@ static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointe
     errands_data_set_text(task->data->ical, text);
     errands_list_data_save(task->data->list);
     gtk_label_set_label(GTK_LABEL(task->title), text);
-    errands_sync_schedule_task(task->data);
+    // errands_sync_schedule_task(task->data);
   }
 }
 
@@ -297,7 +297,7 @@ static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *self) {
   errands_task_data_sort_sub_tasks(self->data);
   // Reset text
   gtk_editable_set_text(GTK_EDITABLE(entry), "");
-  errands_sync_schedule_task(self->data);
+  // errands_sync_schedule_task(self->data);
   errands_task_list_reload(state.main_window->task_list, true);
   gtk_widget_grab_focus(GTK_WIDGET(entry));
   errands_sidebar_update_filter_rows();

@@ -66,7 +66,7 @@ static void on_response_cb(ErrandsSidebarRenameListDialog *self, gchar *response
     errands_list_data_save(list_data);
     errands_sidebar_task_list_row_update(self->current_task_list_row);
     errands_task_list_update_title(state.main_window->task_list);
-    errands_sync_schedule_list(list_data);
+    // errands_sync_schedule_list(list_data);
   }
 }
 

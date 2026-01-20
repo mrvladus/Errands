@@ -77,7 +77,7 @@ static void on_delete_clicked_cb(ErrandsTaskMenu *self) {
   errands_list_data_save(self->task->data->list);
   errands_task_list_reload(state.main_window->task_list, true);
   errands_window_add_toast(_("Task is Deleted"));
-  errands_sync_schedule_task(self->task->data);
+  // errands_sync_schedule_task(self->task->data);
   errands_sidebar_update_filter_rows();
   errands_sidebar_task_list_row_update(errands_sidebar_task_list_row_get(self->task->data->list));
 }

@@ -4,6 +4,7 @@
 
 #include "vendor/json.h"
 #include "vendor/toolbox.h"
+#include <stdio.h>
 
 static void errands_data_create_backup();
 
@@ -147,12 +148,32 @@ static void collect_and_sort_children_recursive(TaskData *parent, GPtrArray *all
 }
 
 static void errands__list_data_save_cb(ListData *data) {
-  const char *path = tmp_str_printf("%s/%s.ics", calendars_dir, data->uid);
-  if (!g_file_set_contents(path, icalcomponent_as_ical_string(data->ical), -1, NULL)) {
-    LOG("User Data: Failed to save list '%s'", path);
-    return;
+  if (data) {
+    const char *path = tmp_str_printf("%s/%s.ics", calendars_dir, data->uid);
+    const char *ical = icalcomponent_as_ical_string(data->ical);
+    if (ical && !g_file_set_contents(path, ical, -1, NULL)) {
+      LOG("User Data: Failed to save list '%s'", path);
+      return;
+    }
+    LOG("User Data: Saved list '%s'", path);
   }
-  LOG("User Data: Saved list '%s'", path);
+  // for_range(i, 0, errands_data_lists->len) {
+  //   ListData *list = g_ptr_array_index(errands_data_lists, i);
+  //   bool need_remove = false;
+  //   if (errands_data_get_deleted(list->ical)) {
+  //     if (errands_settings_get(SETTING_SYNC).b) {
+  //       if (errands_data_get_synced(list->ical)) need_remove = true;
+  //     } else need_remove = true;
+  //   }
+  //   if (need_remove) {
+  //     const char *list_path = tmp_str_printf("%s/%s.ics", calendars_dir, list->uid);
+  //     LOG("Data: Remove: %s", list_path);
+  //     g_ptr_array_remove(errands_data_lists, list);
+  //     list = NULL;
+  //     i--;
+  //     remove(list_path);
+  //   }
+  // }
 }
 
 static icalproperty *get_x_prop(icalcomponent *ical, const char *xprop, const char *default_val) {

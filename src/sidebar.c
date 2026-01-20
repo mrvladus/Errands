@@ -50,7 +50,7 @@ static void errands_sidebar_init(ErrandsSidebar *sidebar) {
   gtk_widget_init_template(GTK_WIDGET(sidebar));
   errands_add_actions(GTK_WIDGET(sidebar), "sidebar", "import", on_import_action_cb, NULL, "new_list",
                       errands_sidebar_new_list_dialog_show, NULL, "preferences", errands_settings_dialog_show, NULL,
-                      "about", errands_about_dialog_show, NULL, "sync", errands_sync_schedule_now, NULL, NULL);
+                      "about", errands_about_dialog_show, NULL, "sync", errands_sync, NULL, NULL);
   self = sidebar;
 }
 
@@ -161,7 +161,7 @@ static void __on_open_finish(GObject *obj, GAsyncResult *res) {
   g_ptr_array_add(errands_data_lists, data);
   ErrandsSidebarTaskListRow *row = errands_sidebar_add_task_list(data);
   g_signal_emit_by_name(row, "activate", NULL);
-  errands_sync_schedule_list(data);
+  // errands_sync_schedule_list(data);
 }
 
 static void on_import_action_cb(GSimpleAction *action, GVariant *param) {

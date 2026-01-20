@@ -61,8 +61,9 @@ static void on_response_cb(ErrandsSidebarNewListDialog *self, gchar *response, g
     g_signal_emit_by_name(row, "activate", NULL);
     errands_window_update();
     LOG("SidebarNewListDialog: Create new list: '%s'", list->uid);
-    errands_sync_schedule_list(list);
     errands_list_data_save(list);
+    // errands_sync_schedule_list(list);
+    // errands_sync_schedule_now();
   }
 }
 
