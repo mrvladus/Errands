@@ -78,7 +78,7 @@ static icalcomponent *caldav_calendar_to_icalcomponent(CalDAVCalendar *c) {
 static bool errands__sync_init(void) {
   // Check if sync is disabled.
   if (!errands_settings_get(SETTING_SYNC).b) {
-    LOG("Sync: Sync is disabled. Do nothing.");
+    // LOG("Sync: Sync is disabled. Do nothing.");
     return false;
   }
   LOG("Sync: Initialize");
@@ -207,10 +207,18 @@ static void errands__sync_cb(GTask *task, gpointer source_object, gpointer task_
     }
   // Get calendars from the server
   caldav_client_pull_calendars(client);
+
+  // Get deleted lists on server while the app was not running
+  for (size_t i = 0; i < errands_data_lists->len; i++) {
+    ListData *l = g_ptr_array_index(errands_data_lists, i);
+    CalDAVCalendar *c = find_calendar_by_uid(l->uid);
+    if (!c) g_ptr_array_add(lists_to_delete, l);
+  }
+
   for (size_t i = 0; i < client->calendars->count; i++) {
     CalDAVCalendar *c = client->calendars->items[i];
     CONTINUE_IF_NOT(calendar_is_vtodo(c));
-    // Get deleted lists
+    // Get deleted lists on server
     if (c->deleted) {
       ListData *list = errands_data_find_list_data_by_uid(c->uid);
       if (list) {
@@ -241,7 +249,8 @@ static void errands__sync_finished_cb(GObject *source_object, GAsyncResult *res,
     errands_data_set_deleted(list->ical, true);
     errands_data_set_synced(list->ical, true);
     errands_list_data_save(list);
-    const char *msg = tmp_str_printf(_("Task List was deleted on server: %s"), errands_data_get_list_name(list->ical));
+    const char *msg =
+        tmp_str_printf("%s: %s", _("Task List was deleted on server"), errands_data_get_list_name(list->ical));
     errands_window_add_toast(msg);
   }
 
