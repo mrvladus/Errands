@@ -241,6 +241,8 @@ static void errands__sync_finished_cb(GObject *source_object, GAsyncResult *res,
     errands_data_set_deleted(list->ical, true);
     errands_data_set_synced(list->ical, true);
     errands_list_data_save(list);
+    const char *msg = tmp_str_printf(_("Task List was deleted on server: %s"), errands_data_get_list_name(list->ical));
+    errands_window_add_toast(msg);
   }
 
   bool reload = false;
