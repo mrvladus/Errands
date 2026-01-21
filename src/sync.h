@@ -1,13 +1,9 @@
 #pragma once
 
-// #include "data.h"
-
-#include <glib.h>
-
-extern GPtrArray *lists_to_delete_on_server;
+#include "data.h"
 
 void errands_sync_init(void);
 void errands_sync_cleanup(void);
-void errands_sync(void);
-// void errands_sync_schedule_list(ListData *data);
+bool errands_sync(void);
+void errands_sync_push_list(ListData *data);
 // void errands_sync_schedule_task(TaskData *data);

@@ -1484,9 +1484,13 @@ void caldav_client_pull_calendars(CalDAVClient *c) {
     CALDAV_FREE(url);
   }
   // Deleted calendars
-  for (size_t i = 0; i < new_calendars.count; ++i) {
-    CalDAVCalendar *cal = da_at(&new_calendars, i);
-    if (!caldav__find_calendar_by_href(c->calendars, cal->href)) cal->deleted = true;
+  for (size_t i = 0; i < c->calendars->count; ++i) {
+    CalDAVCalendar *cal = da_at(c->calendars, i);
+    CalDAVCalendar *existing_cal = caldav__find_calendar_by_href(&new_calendars, cal->href);
+    if (!existing_cal) {
+      caldav__log("Calendar was deleted: %s", cal->href);
+      cal->deleted = true;
+    }
   }
   da_free(&new_calendars);
   xml_node_free(root);
