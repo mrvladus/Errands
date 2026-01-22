@@ -1,10 +1,8 @@
 #include "sync.h"
 #include "data.h"
-#include "glib.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "state.h"
-#include "utils.h"
 #include "window.h"
 
 #define CALDAV_DEBUG
@@ -78,10 +76,7 @@ static icalcomponent *caldav_calendar_to_icalcomponent(CalDAVCalendar *c) {
 
 static bool errands__sync_init(void) {
   // Check if sync is disabled.
-  if (!errands_settings_get(SETTING_SYNC).b) {
-    // LOG("Sync: Sync is disabled. Do nothing.");
-    return false;
-  }
+  if (!errands_settings_get(SETTING_SYNC).b) return false;
   LOG("Sync: Initialize");
   // Get credentials
   const char *url = errands_settings_get(SETTING_SYNC_URL).s;
@@ -104,70 +99,15 @@ static bool errands__sync_init(void) {
   return true;
 }
 
-// static void errands__sync_update_lists_on_server(void) {
-//   for_range(i, 0, lists_to_update_on_server_copy->len) {
-//     ListData *list = g_ptr_array_index(lists_to_update_on_server_copy, i);
-//     CalDAVCalendar *c = find_calendar_by_uid(list->uid);
-//     CONTINUE_IF(!c || errands_data_get_synced(list->ical));
-//     bool needs_update = false;
-//     const char *name = errands_data_get_list_name(list->ical);
-//     const char *color = errands_data_get_color(list->ical, true);
-//     if (!STR_EQUAL(name, c->display_name)) needs_update = true;
-//     if (!STR_EQUAL(color, c->color)) needs_update = true;
-//     if (needs_update) {
-//       LOG("Sync: Updating list properties on server: %s", list->uid);
-//       caldav_calendar_update(c, name, NULL, color);
-//     }
-//   }
-// }
-
-// static void errands__sync_cb_push_tasks(void) {
-//   for_range(i, 0, tasks_to_push_copy->len) {
-//     TaskData *data = g_ptr_array_index(tasks_to_push_copy, i);
-//     if (!data->list) continue;
-//     const char *uid = errands_data_get_uid(data->ical);
-//     CalDAVCalendar *c = find_calendar_by_uid(data->list->uid);
-//     g_assert(c);
-//     // Delete task
-//     if (errands_data_get_deleted(data->ical)) {
-//       CalDAVEvent *e = find_event_by_uid(c, uid);
-//       if (e) {
-//         LOG("Sync: Deleting task on server: %s", uid);
-//         caldav_event_delete(e);
-//       }
-//       continue;
-//     }
-//     CalDAVEvent *existing_event = find_event_by_uid(c, uid);
-//     autoptr(icalcomponent) ical = icalcomponent_new_vcalendar();
-//     icalcomponent_add_component(ical, icalcomponent_new_clone(data->ical));
-//     // Create task
-//     if (!existing_event) {
-//       LOG("Sync: Creating event on server: %s", uid);
-//       caldav_calendar_create_event(c, uid, icalcomponent_as_ical_string(ical));
-//     }
-//     // Update task on server
-//     else {
-//       autoptr(icalcomponent) vcalendar = icalcomponent_new_from_string(existing_event->ical);
-//       icalcomponent *vtodo = icalcomponent_get_first_component(vcalendar, ICAL_VTODO_COMPONENT);
-//       CONTINUE_IF_NOT(vtodo);
-//       icaltimetype changed_on_server = errands_data_get_changed(vtodo);
-//       icaltimetype changed_on_client = errands_data_get_changed(data->ical);
-//       if (icaltime_compare(changed_on_client, changed_on_server) == 1) {
-//         LOG("Sync: Updating event on server: %s", uid);
-//         caldav_event_update(existing_event, icalcomponent_as_ical_string(ical));
-//       }
-//     }
-//     g_ptr_array_add(tasks_pushed, data);
-//   }
-// }
-
-// Runs in separate thread to not block the UI
+// Pulls calendars and events and pushing changes to the server.
+// Runs in separate thread to not block the UI.
 static void errands__sync_cb(GTask *task, gpointer source_object, gpointer task_data, GCancellable *cancellable) {
   if (!sync_initialized)
     if (!errands__sync_init()) {
       g_task_return_boolean(task, false);
       return;
     }
+
   // Get calendars from the server
   caldav_client_pull_calendars(client);
 
@@ -209,12 +149,12 @@ static void errands__sync_cb(GTask *task, gpointer source_object, gpointer task_
     errands_data_set_synced(list->ical, caldav_calendar_delete(c));
     errands_list_data_save(list);
     g_ptr_array_add(lists_pushed, list);
-    g_ptr_array_remove_index_fast(lists_to_push_copy, i--);
   }
 
   // Create lists on server
   for_range(i, 0, lists_to_push_copy->len) {
     ListData *list = g_ptr_array_index(lists_to_push_copy, i);
+    CONTINUE_IF(errands_data_get_deleted(list->ical));
     CalDAVCalendar *c = find_calendar_by_uid(list->uid);
     CONTINUE_IF(c);
     LOG("Sync: Creating calendar on server: %s", list->uid);
@@ -228,7 +168,70 @@ static void errands__sync_cb(GTask *task, gpointer source_object, gpointer task_
       errands_data_set_synced(list->ical, true);
       errands_list_data_save(list);
     }
-    g_ptr_array_remove_index_fast(lists_to_push_copy, i--);
+    g_ptr_array_add(lists_pushed, list);
+  }
+
+  // Update lists on server
+  for_range(i, 0, lists_to_push_copy->len) {
+    ListData *list = g_ptr_array_index(lists_to_push_copy, i);
+    CONTINUE_IF(errands_data_get_deleted(list->ical));
+    CalDAVCalendar *c = find_calendar_by_uid(list->uid);
+    CONTINUE_IF(!c || errands_data_get_synced(list->ical));
+    const char *name = errands_data_get_list_name(list->ical);
+    const char *color = errands_data_get_color(list->ical, true);
+    if (!STR_EQUAL(name, c->display_name) || !STR_EQUAL(color, c->color)) {
+      LOG("Sync: Updating list properties on server: %s", list->uid);
+      caldav_calendar_update(c, name, NULL, color);
+      errands_data_set_synced(list->ical, true);
+      errands_list_data_save(list);
+    }
+    g_ptr_array_add(lists_pushed, list);
+  }
+
+  // Delete tasks on server
+  for_range(i, 0, tasks_to_push_copy->len) {
+    TaskData *task = g_ptr_array_index(tasks_to_push_copy, i);
+    CONTINUE_IF_NOT(errands_data_get_deleted(task->ical));
+    CalDAVCalendar *c = find_calendar_by_uid(task->list->uid);
+    CONTINUE_IF_NOT(c);
+    const char *uid = errands_data_get_uid(task->ical);
+    CalDAVEvent *e = find_event_by_uid(c, uid);
+    CONTINUE_IF_NOT(e);
+    LOG("Sync: Deleting task on server: %s", uid);
+    caldav_event_delete(e);
+    g_ptr_array_add(tasks_pushed, task);
+  }
+
+  // Create tasks on server
+  for_range(i, 0, tasks_to_push_copy->len) {
+    TaskData *task = g_ptr_array_index(tasks_to_push_copy, i);
+    CONTINUE_IF(errands_data_get_deleted(task->ical));
+    CalDAVCalendar *c = find_calendar_by_uid(task->list->uid);
+    CONTINUE_IF_NOT(c);
+    const char *uid = errands_data_get_uid(task->ical);
+    CalDAVEvent *e = find_event_by_uid(c, uid);
+    CONTINUE_IF(e);
+    LOG("Sync: Creating event on server: %s", uid);
+    autoptr(icalcomponent) ical = icalcomponent_new_vcalendar();
+    icalcomponent_add_component(ical, icalcomponent_new_clone(task->ical));
+    caldav_calendar_create_event(c, uid, icalcomponent_as_ical_string(ical));
+    g_ptr_array_add(tasks_pushed, task);
+  }
+
+  // Update tasks on server
+  for_range(i, 0, tasks_to_push_copy->len) {
+    TaskData *task = g_ptr_array_index(tasks_to_push_copy, i);
+    CONTINUE_IF(errands_data_get_deleted(task->ical));
+    CalDAVCalendar *c = find_calendar_by_uid(task->list->uid);
+    CONTINUE_IF_NOT(c);
+    const char *uid = errands_data_get_uid(task->ical);
+    CalDAVEvent *e = find_event_by_uid(c, uid);
+    CONTINUE_IF_NOT(e);
+    LOG("Sync: Updating event on server: %s", uid);
+    autoptr(icalcomponent) ical = icalcomponent_new_vcalendar();
+    icalcomponent_add_component(ical, icalcomponent_new_clone(task->ical));
+    caldav_event_update(e, icalcomponent_as_ical_string(ical));
+    g_ptr_array_add(tasks_pushed, task);
   }
 
   g_task_return_boolean(task, true);
@@ -239,8 +242,10 @@ static void errands__sync_finished_cb(GObject *source_object, GAsyncResult *res,
   errands_sidebar_toggle_sync_indicator(false);
   if (!g_task_propagate_boolean(G_TASK(res), NULL)) return;
 
-  // Remove pushed lists from `lists_to_push` in main thread
+  // Remove pushed lists from `lists_to_push`
   for_range(i, 0, lists_pushed->len) g_ptr_array_remove_fast(lists_to_push, g_ptr_array_index(lists_pushed, i));
+  // Remove pushed tasks from `tasks_to_push`
+  for_range(i, 0, tasks_pushed->len) g_ptr_array_remove_fast(tasks_to_push, g_ptr_array_index(tasks_pushed, i));
 
   bool reload = false;
 
@@ -303,6 +308,8 @@ static void errands__sync_finished_cb(GObject *source_object, GAsyncResult *res,
 }
 
 bool errands_sync() {
+  if (!errands_settings_get(SETTING_SYNC).b) return false;
+
   if (sync_in_progress) return true;
   LOG("Sync: Started");
   // Reset and copy data
@@ -318,12 +325,17 @@ bool errands_sync() {
 
   errands_sidebar_toggle_sync_indicator(true);
   sync_in_progress = true;
-  RUN_THREAD_FUNC(errands__sync_cb, errands__sync_finished_cb);
+  g_autoptr(GTask) task = g_task_new(NULL, NULL, errands__sync_finished_cb, NULL);
+  g_task_run_in_thread(task, errands__sync_cb);
 
   return true;
 }
 
 void errands_sync_init(void) {
+  if (!errands_settings_get(SETTING_SYNC).b) return;
+
+  LOG("Sync: Initialize");
+
   lists_to_push = g_ptr_array_sized_new(8);
   lists_to_push_copy = g_ptr_array_sized_new(8);
   lists_pushed = g_ptr_array_sized_new(8);
@@ -334,22 +346,28 @@ void errands_sync_init(void) {
   tasks_pushed = g_ptr_array_sized_new(8);
   tasks_to_delete = g_ptr_array_sized_new(8);
 
-  RUN_THREAD_FUNC(errands__sync_cb, errands__sync_finished_cb);
+  g_autoptr(GTask) task = g_task_new(NULL, NULL, errands__sync_finished_cb, NULL);
+  g_task_run_in_thread(task, errands__sync_cb);
+
   int interval = errands_settings_get(SETTING_SYNC_INTERVAL).i;
   g_timeout_add_seconds(interval >= 10 ? interval : 10, G_SOURCE_FUNC(errands_sync), NULL);
 }
 
-void errands_sync_cleanup(void) {
-  if (client) caldav_client_free(client);
-}
-
 void errands_sync_push_list(ListData *data) {
+  if (!errands_settings_get(SETTING_SYNC).b) return;
+
   LOG("Sync: Push list: %s", data->uid);
   g_ptr_array_add(lists_to_push, data);
 }
 
-// void errands_sync_schedule_task(TaskData *data) {
-//   LOG("Sync: Schedule Task: %s", errands_data_get_uid(data->ical));
-//   g_ptr_array_add(tasks_to_push, data);
-//   sync_scheduled = true;
-// }
+void errands_sync_push_task(TaskData *data) {
+  if (!errands_settings_get(SETTING_SYNC).b) return;
+
+  LOG("Sync: Push task: %s", errands_data_get_uid(data->ical));
+  g_ptr_array_add(tasks_to_push, data);
+}
+
+void errands_sync_cleanup(void) {
+  LOG("Sync: Cleanup");
+  if (client) caldav_client_free(client);
+}
