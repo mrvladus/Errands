@@ -4,10 +4,6 @@
 
 #include <ctype.h>
 
-#define RUN_THREAD_FUNC(func, on_finish_cb)                                                                            \
-  g_autoptr(GTask) task = g_task_new(NULL, NULL, on_finish_cb, NULL);                                                  \
-  g_task_run_in_thread(task, func);
-
 // Get children of the widget
 static inline GPtrArray *get_children(GtkWidget *parent) {
   GPtrArray *children = g_ptr_array_new();
