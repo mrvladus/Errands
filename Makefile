@@ -42,8 +42,9 @@ DEPS = $(OBJS:.o=.d)
 
 CC = gcc
 PKG_CONFIG_LIBS = libadwaita-1 gtksourceview-5 libical libportal libcurl libsecret-1
-CFLAGS = -Wall -g
+CFLAGS ?=
 ALL_CFLAGS = $(CFLAGS) \
+			-Wall -g -std=c11 -D_GNU_SOURCE \
 			`pkg-config --cflags $(PKG_CONFIG_LIBS)` \
 			-DVERSION='"$(VERSION)"' \
 			-DVERSION_COMMIT='"$(shell git rev-parse --short HEAD)"' \
@@ -117,12 +118,12 @@ RUN_CMD := $(BUILD_DIR)/$(NAME)
 # Debug mode: GDB, GF2.
 DEBUG ?=
 ifeq ($(DEBUG),GDB)
-    RUN_CMD := gdb $(RUN_CMD)
+    RUN_CMD := gdb -q -ex run $(RUN_CMD)
 else ifeq ($(DEBUG),GF2)
     RUN_CMD := gf2 $(RUN_CMD)
 endif
 
-# Run the application
+# Build and run the application
 run: all
 	@$(RUN_CMD)
 
