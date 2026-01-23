@@ -16,6 +16,8 @@ template $ErrandsSidebarTaskListRow: Gtk.ListBoxRow {
     ]
 
     Gtk.ColorDialogButton color_btn {
+      hexpand: false;
+      halign: start;
       tooltip-text: _("Task List Color");
 
       dialog: Gtk.ColorDialog {};

@@ -1184,7 +1184,7 @@ static bool caldav_request_create_calendar(CalDAVClient *c, const char *uid, con
   headers = curl_slist_append(headers, "Content-Type: application/xml; charset=utf-8");
   const char *body_template =
       "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-      "<create xmlns:d=\"DAV:\" xmlns:c=\"urn:ietf:params:xml:ns:caldav\" xmlns:ical=\"http://apple.com/ns/ical/\" "
+      "<d:mkcol xmlns:d=\"DAV:\" xmlns:c=\"urn:ietf:params:xml:ns:caldav\" xmlns:ical=\"http://apple.com/ns/ical/\" "
       "xmlns:oc=\"http://owncloud.org/ns\">"
       "  <d:set>"
       "    <d:prop>"
@@ -1199,7 +1199,7 @@ static bool caldav_request_create_calendar(CalDAVClient *c, const char *uid, con
       "      <oc:calendar-enabled>1</oc:calendar-enabled>"
       "    </d:prop>"
       "  </d:set>"
-      "</create>";
+      "</d:mkcol>";
   StringBuilder sb = {0};
   if (set & CALDAV_COMPONENT_SET_VEVENT) sb_append(&sb, "<c:comp name=\"VEVENT\"/>");
   if (set & CALDAV_COMPONENT_SET_VTODO) sb_append(&sb, "<c:comp name=\"VTODO\"/>");
@@ -1412,7 +1412,8 @@ void caldav_client_pull_calendars(CalDAVClient *c) {
   CalDAVCalendars new_calendars = {0};
   for (size_t i = 0; i < multistatus->children->len; ++i) {
     XMLNode *res = xml_node_child_at(multistatus, i);
-    if (!xml_node_find_tag(res, "propstat/prop/resourcetype/calendar", false)) continue; // Not a calendar
+    if (!xml_node_find_tag(res, "propstat/prop/resourcetype/calendar", false)) continue;        // Not a calendar
+    if (xml_node_find_tag(res, "propstat/prop/resourcetype/deleted-calendar", false)) continue; // Deleted
     XMLNode *status = xml_node_find_tag(res, "propstat/status", false);
     if (!status || strcmp(status->text, "HTTP/1.1 200 OK") != 0) continue;
     XMLNode *component_set = xml_node_find_tag(res, "propstat/prop/supported-calendar-component-set", false);
