@@ -10,7 +10,6 @@
 // #define CALDAV_DEBUG
 #define CALDAV_IMPLEMENTATION
 #include "vendor/caldav.h"
-#include "vendor/da.h"
 #include "vendor/toolbox.h"
 
 #include <glib/gi18n.h>
@@ -52,8 +51,6 @@ typedef enum {
 
   ERRANDS_SYNC_LIST_TYPE_N
 } ErrandsSyncListType;
-
-// TODO: Maybe use 1 array with struct as child {type,ptr} and copy
 
 static GPtrArray *lists[ERRANDS_SYNC_LIST_TYPE_N] = {0};
 
