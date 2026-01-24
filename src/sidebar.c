@@ -1,6 +1,7 @@
 #include "sidebar.h"
 #include "about-dialog.h"
 #include "data.h"
+#include "gtk/gtk.h"
 #include "settings-dialog.h"
 #include "settings.h"
 #include "state.h"

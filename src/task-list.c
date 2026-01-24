@@ -120,7 +120,7 @@ static int __calculate_height(ErrandsTaskList *self) {
   GtkRequisition min_size, nat_size;
   for_range(i, 0, current_task_list->len) {
     TaskData *data = g_ptr_array_index(current_task_list, i);
-    CONTINUE_IF(errands_data_get_deleted(data->ical));
+    CONTINUE_IF(errands_data_get_deleted(data->ical) || errands_data_get_deleted(data->list->ical));
     CONTINUE_IF(__task_has_any_collapsed_parent(data));
     CONTINUE_IF(self->page == ERRANDS_TASK_LIST_PAGE_PINNED && !__task_has_any_pinned_parent(data));
     CONTINUE_IF(self->page == ERRANDS_TASK_LIST_PAGE_TODAY && !__task_has_any_due_parent(data));

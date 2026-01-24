@@ -5,6 +5,8 @@
 #include "sidebar.h"
 #include "state.h"
 #include "window.h"
+#include <libical/ical.h>
+#include <unistd.h>
 
 #define CALDAV_DEBUG
 #define CALDAV_IMPLEMENTATION
@@ -100,6 +102,16 @@ static icalcomponent *caldav_calendar_to_icalcomponent(CalDAVCalendar *c) {
   }
 
   return ical;
+}
+
+static bool task_uid_exists(const char *uid) {
+  for_range(i, 0, errands_data_lists->len) {
+    ListData *list = g_ptr_array_index(errands_data_lists, i);
+    for (icalcomponent *c = icalcomponent_get_first_component(list->ical, ICAL_VTODO_COMPONENT); c != 0;
+         c = icalcomponent_get_next_component(list->ical, ICAL_VTODO_COMPONENT))
+      if (STR_EQUAL(uid, icalcomponent_get_uid(c))) return true;
+  }
+  return false;
 }
 
 // --- SYNC --- //
@@ -217,20 +229,21 @@ static void errands__sync_cb(GTask *task, gpointer source_object, gpointer task_
     }
     g_ptr_array_add(lists[LISTS_UPDATED], list);
   }
+  g_ptr_array_set_size(lists[LISTS_TO_UPDATE_COPY], 0);
 
   // Delete tasks on server
-  // for_range(i, 0, tasks_to_push_copy->len) {
-  //   TaskData *task = g_ptr_array_index(tasks_to_push_copy, i);
-  //   CONTINUE_IF_NOT(errands_data_get_deleted(task->ical));
-  //   CalDAVCalendar *c = find_calendar_by_uid(task->list->uid);
-  //   CONTINUE_IF_NOT(c);
-  //   const char *uid = errands_data_get_uid(task->ical);
-  //   CalDAVEvent *e = find_event_by_uid(c, uid);
-  //   CONTINUE_IF_NOT(e);
-  //   LOG("Sync: Deleting task on server: %s", uid);
-  //   caldav_event_delete(e);
-  //   g_ptr_array_add(tasks_pushed, task);
-  // }
+  for_range(i, 0, lists[TASKS_TO_DELETE_COPY]->len) {
+    TaskData *task = g_ptr_array_index(lists[TASKS_TO_DELETE_COPY], i);
+    CalDAVCalendar *c = find_calendar_by_uid(task->list->uid);
+    CONTINUE_IF_NOT(c);
+    const char *uid = errands_data_get_uid(task->ical);
+    CalDAVEvent *e = find_event_by_uid(c, uid);
+    CONTINUE_IF_NOT(e);
+    LOG("Sync: Deleting task on server: %s", uid);
+    caldav_event_delete(e);
+    g_ptr_array_add(lists[TASKS_DELETED], task);
+  }
+  g_ptr_array_set_size(lists[TASKS_TO_DELETE_COPY], 0);
 
   // Create tasks on server
   for_range(i, 0, lists[TASKS_TO_CREATE_COPY]->len) {
@@ -246,11 +259,11 @@ static void errands__sync_cb(GTask *task, gpointer source_object, gpointer task_
     caldav_calendar_create_event(c, uid, icalcomponent_as_ical_string(ical));
     g_ptr_array_add(lists[TASKS_CREATED], task);
   }
+  g_ptr_array_set_size(lists[TASKS_TO_CREATE_COPY], 0);
 
   // Update tasks on server
-  // for_range(i, 0, tasks_to_push_copy->len) {
-  //   TaskData *task = g_ptr_array_index(tasks_to_push_copy, i);
-  //   CONTINUE_IF(errands_data_get_deleted(task->ical));
+  // for_range(i, 0, lists[TASKS_TO_UPDATE_COPY]->len) {
+  //   TaskData *task = g_ptr_array_index(lists[TASKS_TO_UPDATE_COPY], i);
   //   CalDAVCalendar *c = find_calendar_by_uid(task->list->uid);
   //   CONTINUE_IF_NOT(c);
   //   const char *uid = errands_data_get_uid(task->ical);
@@ -260,8 +273,9 @@ static void errands__sync_cb(GTask *task, gpointer source_object, gpointer task_
   //   autoptr(icalcomponent) ical = icalcomponent_new_vcalendar();
   //   icalcomponent_add_component(ical, icalcomponent_new_clone(task->ical));
   //   caldav_event_update(e, icalcomponent_as_ical_string(ical));
-  //   g_ptr_array_add(tasks_pushed, task);
+  //   g_ptr_array_add(lists[TASKS_UPDATED], task);
   // }
+  // g_ptr_array_set_size(lists[TASKS_TO_UPDATE_COPY], 0);
 
   g_task_return_boolean(task, true);
 }
@@ -340,10 +354,38 @@ static void errands__sync_finished_cb(GObject *source_object, GAsyncResult *res,
     }
   }
 
+  // TODO: probably hash map needed here
+  // Create local tasks
+  for_range(i, 0, client->calendars->count) {
+    CalDAVCalendar *c = client->calendars->items[i];
+    CONTINUE_IF_NOT(calendar_is_vtodo(c));
+    ListData *list = errands_data_find_list_data_by_uid(c->uid);
+    CONTINUE_IF_NOT(list);
+    for_range(j, 0, c->events->count) {
+      CalDAVEvent *e = c->events->items[j];
+      autoptr(icalcomponent) vcalendar = icalcomponent_new_from_string(e->ical);
+      CONTINUE_IF_NOT(vcalendar);
+      icalcomponent *vtodo = icalcomponent_get_first_component(vcalendar, ICAL_VTODO_COMPONENT);
+      CONTINUE_IF_NOT(vtodo);
+      const char *task_uid = icalcomponent_get_uid(vtodo);
+      CONTINUE_IF(task_uid_exists(task_uid));
+      const char *parent_uid = errands_data_get_parent(vtodo);
+      // TODO: use parent_uid
+      CONTINUE_IF(parent_uid);
+      LOG("Sync: Create local task: %s", task_uid);
+      icalcomponent *clone = icalcomponent_new_clone(vtodo);
+      icalcomponent_add_component(list->ical, clone);
+      TaskData *new_task = errands_task_data_new(clone, NULL, list);
+      errands_list_data_save(list);
+      reload = true;
+    }
+  }
+
   if (reload) {
     errands_sidebar_load_lists();
     errands_task_list_reload(state.main_window->task_list, false);
   }
+
   sync_in_progress = false;
   LOG("Sync: Finished");
   if (sync_again) {
