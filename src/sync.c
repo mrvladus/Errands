@@ -6,9 +6,8 @@
 #include "state.h"
 #include "window.h"
 #include <libical/ical.h>
-#include <unistd.h>
 
-#define CALDAV_DEBUG
+// #define CALDAV_DEBUG
 #define CALDAV_IMPLEMENTATION
 #include "vendor/caldav.h"
 #include "vendor/toolbox.h"
@@ -104,14 +103,15 @@ static icalcomponent *caldav_calendar_to_icalcomponent(CalDAVCalendar *c) {
   return ical;
 }
 
-static bool task_uid_exists(const char *uid) {
-  for_range(i, 0, errands_data_lists->len) {
-    ListData *list = g_ptr_array_index(errands_data_lists, i);
-    for (icalcomponent *c = icalcomponent_get_first_component(list->ical, ICAL_VTODO_COMPONENT); c != 0;
-         c = icalcomponent_get_next_component(list->ical, ICAL_VTODO_COMPONENT))
-      if (STR_EQUAL(uid, icalcomponent_get_uid(c))) return true;
+static TaskData *find_task_data_by_uid(ListData *list, const char *uid) {
+  if (!list || !uid) return NULL;
+  g_autoptr(GPtrArray) tasks = g_ptr_array_sized_new(list->children->len);
+  errands_list_data_get_flat_list(list, tasks);
+  for_range(i, 0, tasks->len) {
+    TaskData *task = g_ptr_array_index(tasks, i);
+    if (STR_EQUAL(uid, errands_data_get_uid(task->ical))) return task;
   }
-  return false;
+  return NULL;
 }
 
 // --- SYNC --- //
@@ -119,7 +119,6 @@ static bool task_uid_exists(const char *uid) {
 static bool errands__sync_init(void) {
   // Check if sync is disabled.
   if (!errands_settings_get(SETTING_SYNC).b) return false;
-  LOG("Sync: Initialize");
   // Get credentials
   const char *url = errands_settings_get(SETTING_SYNC_URL).s;
   const char *username = errands_settings_get(SETTING_SYNC_USERNAME).s;
@@ -361,6 +360,7 @@ static void errands__sync_finished_cb(GObject *source_object, GAsyncResult *res,
     CONTINUE_IF_NOT(calendar_is_vtodo(c));
     ListData *list = errands_data_find_list_data_by_uid(c->uid);
     CONTINUE_IF_NOT(list);
+    bool save_list = false;
     for_range(j, 0, c->events->count) {
       CalDAVEvent *e = c->events->items[j];
       autoptr(icalcomponent) vcalendar = icalcomponent_new_from_string(e->ical);
@@ -368,17 +368,33 @@ static void errands__sync_finished_cb(GObject *source_object, GAsyncResult *res,
       icalcomponent *vtodo = icalcomponent_get_first_component(vcalendar, ICAL_VTODO_COMPONENT);
       CONTINUE_IF_NOT(vtodo);
       const char *task_uid = icalcomponent_get_uid(vtodo);
-      CONTINUE_IF(task_uid_exists(task_uid));
-      icalcomponent *clone = icalcomponent_new_clone(vtodo);
-      icalcomponent_add_component(list->ical, clone);
-      const char *parent_uid = errands_data_get_parent(vtodo);
-      // TODO: use parent_uid to add task to a parent
-      CONTINUE_IF(parent_uid);
-      LOG("Sync: Create local task: %s", task_uid);
-      TaskData *new_task = errands_task_data_new(clone, NULL, list);
-      errands_list_data_save(list);
-      reload = true;
+      TaskData *task = find_task_data_by_uid(list, task_uid);
+      // Update existing task
+      if (task) {
+        icaltimetype local = errands_data_get_changed(task->ical);
+        icaltimetype remote = errands_data_get_changed(vtodo);
+        CONTINUE_IF(icaltime_compare(local, remote) > -1);
+        LOG("Sync: Update local task: %s", task_uid);
+        icalcomponent *clone = icalcomponent_new_clone(vtodo);
+        icalcomponent_remove_component(task->list->ical, task->ical);
+        icalcomponent_add_component(task->list->ical, clone);
+        task->ical = clone;
+        errands_data_set_synced(task->ical, true);
+        save_list = true;
+        reload = true;
+      }
+      // Create new task
+      else {
+        LOG("Sync: Create local task: %s", task_uid);
+        const char *parent_uid = errands_data_get_parent(vtodo);
+        icalcomponent *clone = icalcomponent_new_clone(vtodo);
+        icalcomponent_add_component(list->ical, clone);
+        errands_task_data_new(clone, find_task_data_by_uid(list, parent_uid), list);
+        save_list = true;
+        reload = true;
+      }
     }
+    if (save_list) errands_list_data_save(list);
   }
 
   if (reload) {
