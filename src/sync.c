@@ -369,12 +369,12 @@ static void errands__sync_finished_cb(GObject *source_object, GAsyncResult *res,
       CONTINUE_IF_NOT(vtodo);
       const char *task_uid = icalcomponent_get_uid(vtodo);
       CONTINUE_IF(task_uid_exists(task_uid));
-      const char *parent_uid = errands_data_get_parent(vtodo);
-      // TODO: use parent_uid
-      CONTINUE_IF(parent_uid);
-      LOG("Sync: Create local task: %s", task_uid);
       icalcomponent *clone = icalcomponent_new_clone(vtodo);
       icalcomponent_add_component(list->ical, clone);
+      const char *parent_uid = errands_data_get_parent(vtodo);
+      // TODO: use parent_uid to add task to a parent
+      CONTINUE_IF(parent_uid);
+      LOG("Sync: Create local task: %s", task_uid);
       TaskData *new_task = errands_task_data_new(clone, NULL, list);
       errands_list_data_save(list);
       reload = true;
