@@ -90,10 +90,15 @@ void errands_sidebar_select_last_opened_page() {
   const char *last_uid = errands_settings_get(SETTING_LAST_LIST_UID).s;
   if (!last_uid) return;
   LOG("Sidebar: Selecting last opened list: '%s'", last_uid);
+  bool selected = false;
   for_range(i, 0, rows->len) {
     ErrandsSidebarTaskListRow *row = g_ptr_array_index(rows, i);
-    if (STR_EQUAL(last_uid, row->data->uid)) g_signal_emit_by_name(row, "activate", NULL);
+    if (STR_EQUAL(last_uid, row->data->uid)) {
+      g_signal_emit_by_name(row, "activate", NULL);
+      selected = true;
+    }
   }
+  if (!selected) g_signal_emit_by_name(self->all_row, "activate", NULL);
 }
 
 void errands_sidebar_update_filter_rows() {

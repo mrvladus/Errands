@@ -1,5 +1,6 @@
 #include "task-list.h"
 #include "data.h"
+#include "glib.h"
 #include "sidebar.h"
 #include "sync.h"
 #include "task.h"
@@ -277,6 +278,7 @@ void errands_task_list_update_title(ErrandsTaskList *self) {
     break;
   }
   // Retrieve tasks and count completed and total tasks
+  g_assert(current_task_list);
   size_t total = 0, completed = 0;
   for_range(i, 0, current_task_list->len) {
     TaskData *data = g_ptr_array_index(current_task_list, i);
