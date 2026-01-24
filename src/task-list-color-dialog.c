@@ -1,5 +1,6 @@
 #include "data.h"
 #include "state.h"
+#include "sync.h"
 #include "task-list.h"
 #include "utils.h"
 
@@ -76,7 +77,9 @@ static void on_dialog_close_cb(ErrandsTaskListColorDialog *self) {
       const char *uid = errands_data_get_uid(self->current_task->data->ical);
       LOG("Set accent color '%s' to task '%s'", new_color, uid);
       errands_data_set_color(self->current_task->data->ical, new_color, false);
+      errands_data_set_synced(self->current_task->data->ical, false);
       errands_task_update_accent_color(self->current_task);
+      errands_sync_update_task(self->current_task->data);
       break;
     }
   }

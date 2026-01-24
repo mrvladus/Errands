@@ -262,20 +262,20 @@ static void errands__sync_cb(GTask *task, gpointer source_object, gpointer task_
   g_ptr_array_set_size(lists[TASKS_TO_CREATE_COPY], 0);
 
   // Update tasks on server
-  // for_range(i, 0, lists[TASKS_TO_UPDATE_COPY]->len) {
-  //   TaskData *task = g_ptr_array_index(lists[TASKS_TO_UPDATE_COPY], i);
-  //   CalDAVCalendar *c = find_calendar_by_uid(task->list->uid);
-  //   CONTINUE_IF_NOT(c);
-  //   const char *uid = errands_data_get_uid(task->ical);
-  //   CalDAVEvent *e = find_event_by_uid(c, uid);
-  //   CONTINUE_IF_NOT(e);
-  //   LOG("Sync: Updating event on server: %s", uid);
-  //   autoptr(icalcomponent) ical = icalcomponent_new_vcalendar();
-  //   icalcomponent_add_component(ical, icalcomponent_new_clone(task->ical));
-  //   caldav_event_update(e, icalcomponent_as_ical_string(ical));
-  //   g_ptr_array_add(lists[TASKS_UPDATED], task);
-  // }
-  // g_ptr_array_set_size(lists[TASKS_TO_UPDATE_COPY], 0);
+  for_range(i, 0, lists[TASKS_TO_UPDATE_COPY]->len) {
+    TaskData *task = g_ptr_array_index(lists[TASKS_TO_UPDATE_COPY], i);
+    CalDAVCalendar *c = find_calendar_by_uid(task->list->uid);
+    CONTINUE_IF_NOT(c);
+    const char *uid = errands_data_get_uid(task->ical);
+    CalDAVEvent *e = find_event_by_uid(c, uid);
+    CONTINUE_IF_NOT(e);
+    LOG("Sync: Updating event on server: %s", uid);
+    autoptr(icalcomponent) ical = icalcomponent_new_vcalendar();
+    icalcomponent_add_component(ical, icalcomponent_new_clone(task->ical));
+    caldav_event_update(e, icalcomponent_as_ical_string(ical));
+    g_ptr_array_add(lists[TASKS_UPDATED], task);
+  }
+  g_ptr_array_set_size(lists[TASKS_TO_UPDATE_COPY], 0);
 
   g_task_return_boolean(task, true);
 }

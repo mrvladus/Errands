@@ -277,7 +277,7 @@ static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointe
     errands_data_set_text(task->data->ical, text);
     errands_list_data_save(task->data->list);
     gtk_label_set_label(GTK_LABEL(task->title), text);
-    // errands_sync_schedule_task(task->data);
+    errands_sync_update_task(task->data);
   }
 }
 
