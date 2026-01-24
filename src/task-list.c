@@ -278,7 +278,6 @@ void errands_task_list_update_title(ErrandsTaskList *self) {
     break;
   }
   // Retrieve tasks and count completed and total tasks
-  g_assert(current_task_list);
   size_t total = 0, completed = 0;
   for_range(i, 0, current_task_list->len) {
     TaskData *data = g_ptr_array_index(current_task_list, i);
@@ -353,8 +352,7 @@ static void on_task_list_entry_activated_cb(AdwEntryRow *entry, ErrandsTaskList 
   errands_sidebar_task_list_row_update(errands_sidebar_task_list_row_get(data->list));
   errands_sidebar_update_filter_rows();
   LOG("Add task '%s' to task list '%s'", errands_data_get_uid(data->ical), list_uid);
-  // errands_sync_push_task(data);
-  // errands_sync();
+  errands_sync_create_task(data);
   errands_task_list_reload(self, false);
 }
 

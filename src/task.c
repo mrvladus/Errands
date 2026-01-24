@@ -297,10 +297,10 @@ static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *self) {
   errands_task_data_sort_sub_tasks(self->data);
   // Reset text
   gtk_editable_set_text(GTK_EDITABLE(entry), "");
-  // errands_sync_schedule_task(self->data);
   errands_task_list_reload(state.main_window->task_list, true);
   gtk_widget_grab_focus(GTK_WIDGET(entry));
   errands_sidebar_update_filter_rows();
+  errands_sync_create_task(self->data);
 }
 
 static void on_expand_toggle_cb(ErrandsTask *self, GtkGestureClick *ctrl, gint n_press, gdouble x, gdouble y) {
