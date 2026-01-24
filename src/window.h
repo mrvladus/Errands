@@ -10,7 +10,6 @@ G_DECLARE_FINAL_TYPE(ErrandsWindow, errands_window, ERRANDS, WINDOW, AdwApplicat
 
 struct _ErrandsWindow {
   AdwApplicationWindow parent_instance;
-  GtkWidget *no_lists_page;
   ErrandsTaskList *task_list;
   AdwToastOverlay *toast_overlay;
   ErrandsSidebar *sidebar;
@@ -18,5 +17,4 @@ struct _ErrandsWindow {
 };
 
 ErrandsWindow *errands_window_new(GtkApplication *app);
-void errands_window_update(void);
 void errands_window_add_toast(const char *msg);

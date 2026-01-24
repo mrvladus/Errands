@@ -19,55 +19,22 @@ template $ErrandsWindow: Adw.ApplicationWindow {
   }
 
   Adw.ToastOverlay toast_overlay {
-    Overlay {
-      Adw.NavigationSplitView split_view {
-        min-sidebar-width: 250;
-        max-sidebar-width: 300;
+    Adw.NavigationSplitView split_view {
+      min-sidebar-width: 250;
+      max-sidebar-width: 300;
 
-        sidebar: Adw.NavigationPage {
-          title: _("Sidebar");
+      sidebar: Adw.NavigationPage {
+        title: _("Sidebar");
 
-          child: $ErrandsSidebar sidebar {};
-        };
+        child: $ErrandsSidebar sidebar {};
+      };
 
-        content: Adw.NavigationPage {
-          width-request: 360;
-          title: _("Content");
+      content: Adw.NavigationPage {
+        width-request: 360;
+        title: _("Content");
 
-          child: $ErrandsTaskList task_list {};
-        };
-      }
-
-      [overlay]
-      Adw.Bin no_lists_page {
-        styles [
-          "background",
-        ]
-
-        Adw.ToolbarView {
-          [top]
-          Adw.HeaderBar {
-            show-title: false;
-          }
-
-          content: Adw.StatusPage {
-            title: _("Create new Task List");
-            icon-name: "io.github.mrvladus.Errands";
-
-            Button {
-              icon-name: "errands-add-symbolic";
-              halign: center;
-              tooltip-text: _("Create new Task List");
-              clicked => $on_new_list_btn_clicked_cb();
-
-              styles [
-                "pill",
-                "suggested-action",
-              ]
-            }
-          };
-        }
-      }
+        child: $ErrandsTaskList task_list {};
+      };
     }
   }
 }

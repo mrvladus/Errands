@@ -72,6 +72,5 @@ static void on_response_cb(ErrandsSidebarDeleteListDialog *dialog, gchar *respon
       errands_task_list_reload(state.main_window->task_list, false);
       return;
     }
-    errands_window_update();
   }
 }

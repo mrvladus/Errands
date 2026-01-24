@@ -28,7 +28,6 @@ static void errands_window_class_init(ErrandsWindowClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsWindow, split_view);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsWindow, sidebar);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsWindow, task_list);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsWindow, no_lists_page);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_maximize_changed_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_size_changed_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_new_list_btn_clicked_cb);
@@ -54,17 +53,6 @@ ErrandsWindow *errands_window_new(GtkApplication *app) {
 }
 
 // ---------- PUBLIC FUNCTIONS ---------- //
-
-void errands_window_update() {
-  LOG("Window: Update");
-  size_t total = 0;
-  for_range(i, 0, errands_data_lists->len) {
-    ListData *data = errands_data_lists->pdata[i];
-    bool deleted = errands_data_get_deleted(data->ical);
-    if (!deleted) total++;
-  }
-  g_object_set(state.main_window->no_lists_page, "visible", total == 0, NULL);
-}
 
 void errands_window_add_toast(const char *msg) {
   LOG("Window: Add Toast '%s'", msg);

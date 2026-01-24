@@ -70,7 +70,6 @@ void errands_sidebar_load_lists(void) {
     }
   }
   errands_sidebar_update_filter_rows();
-  errands_window_update();
   // Select last opened page
   if (gtk_widget_get_realized(GTK_WIDGET(state.main_window))) errands_sidebar_select_last_opened_page();
   else g_signal_connect(state.main_window, "realize", G_CALLBACK(errands_sidebar_select_last_opened_page), NULL);
