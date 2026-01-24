@@ -10,6 +10,7 @@
 // #define CALDAV_DEBUG
 #define CALDAV_IMPLEMENTATION
 #include "vendor/caldav.h"
+#include "vendor/da.h"
 #include "vendor/toolbox.h"
 
 #include <glib/gi18n.h>
@@ -36,6 +37,7 @@ typedef enum {
   LISTS_TO_UPDATE_COPY,
   LISTS_UPDATED,
 
+  TASKS_TO_DELETE_LOCAL,
   TASKS_TO_DELETE,
   TASKS_TO_DELETE_COPY,
   TASKS_DELETED,
@@ -50,6 +52,8 @@ typedef enum {
 
   ERRANDS_SYNC_LIST_TYPE_N
 } ErrandsSyncListType;
+
+// TODO: Maybe use 1 array with struct as child {type,ptr} and copy
 
 static GPtrArray *lists[ERRANDS_SYNC_LIST_TYPE_N] = {0};
 
@@ -152,17 +156,6 @@ static void errands__sync_cb(GTask *task, gpointer source_object, gpointer task_
   // Get calendars from the server
   caldav_client_pull_calendars(client);
 
-  // Get lists deleted on server while the app was not running
-  for_range(i, 0, errands_data_lists->len) {
-    ListData *l = g_ptr_array_index(errands_data_lists, i);
-    CONTINUE_IF_NOT(errands_data_get_synced(l->ical));
-    CONTINUE_IF(errands_data_get_deleted(l->ical));
-    if (!find_calendar_by_uid(l->uid)) {
-      LOG("Sync: List was deleted while app was not running: %s", l->uid);
-      g_ptr_array_add(lists[LISTS_TO_DELETE_LOCAL], l);
-    }
-  }
-
   // Update events and get deleted lists
   for_range(i, 0, client->calendars->count) {
     CalDAVCalendar *c = client->calendars->items[i];
@@ -177,6 +170,29 @@ static void errands__sync_cb(GTask *task, gpointer source_object, gpointer task_
     }
     // Get events
     if (c->events_changed) caldav_calendar_pull_events(c);
+  }
+
+  // Get lists and tasks deleted on server while the app was not running
+  for_range(i, 0, errands_data_lists->len) {
+    // Lists
+    ListData *l = g_ptr_array_index(errands_data_lists, i);
+    CONTINUE_IF_NOT(errands_data_get_synced(l->ical));
+    CONTINUE_IF(errands_data_get_deleted(l->ical));
+    CalDAVCalendar *c = find_calendar_by_uid(l->uid);
+    if (!c) {
+      LOG("Sync: List was deleted while app was not running: %s", l->uid);
+      g_ptr_array_add(lists[LISTS_TO_DELETE_LOCAL], l);
+      continue;
+    }
+    // Tasks
+    g_autoptr(GPtrArray) tasks = g_ptr_array_sized_new(l->children->len);
+    errands_list_data_get_flat_list(l, tasks);
+    for_range(j, 0, tasks->len) {
+      TaskData *task = g_ptr_array_index(tasks, j);
+      CONTINUE_IF_NOT(errands_data_get_synced(task->ical));
+      CalDAVEvent *e = find_event_by_uid(c, errands_data_get_uid(task->ical));
+      if (!e) g_ptr_array_add(lists[TASKS_TO_DELETE_LOCAL], task);
+    }
   }
 
   // Delete lists on server
@@ -292,6 +308,7 @@ static void errands__sync_finished_cb(GObject *source_object, GAsyncResult *res,
   errands__cleanup_list(LISTS_DELETED, LISTS_TO_DELETE);
   errands__cleanup_list(LISTS_CREATED, LISTS_TO_CREATE);
   errands__cleanup_list(LISTS_UPDATED, LISTS_TO_UPDATE);
+
   errands__cleanup_list(TASKS_DELETED, TASKS_TO_DELETE);
   errands__cleanup_list(TASKS_CREATED, TASKS_TO_CREATE);
   errands__cleanup_list(TASKS_UPDATED, TASKS_TO_UPDATE);
@@ -345,16 +362,27 @@ static void errands__sync_finished_cb(GObject *source_object, GAsyncResult *res,
     }
     if (props_changed) {
       LOG("Sync: Update local list properties: %s", c->uid);
-      const char *msg =
-          tmp_str_printf("%s: %s", _("Task List was updated on server"), errands_data_get_list_name(list->ical));
-      errands_window_add_toast(msg);
       errands_list_data_save(list);
       reload = true;
     }
   }
 
+  // Delete local tasks
+  g_autoptr(GPtrArray) lists_to_save = g_ptr_array_sized_new(errands_data_lists->len);
+  for_range(i, 0, lists[TASKS_TO_DELETE_LOCAL]->len) {
+    TaskData *task = g_ptr_array_index(lists[TASKS_TO_DELETE_LOCAL], i);
+    CONTINUE_IF(errands_data_get_deleted(task->list->ical));
+    LOG("Sync: Delete local task: %s", errands_data_get_uid(task->ical));
+    errands_data_set_deleted(task->ical, true);
+    errands_data_set_synced(task->ical, true);
+    if (!g_ptr_array_find(lists_to_save, task->list, NULL)) g_ptr_array_add(lists_to_save, task->list);
+    reload = true;
+  }
+  g_ptr_array_set_size(lists[TASKS_TO_DELETE_LOCAL], 0);
+  for_range(i, 0, lists_to_save->len) errands_list_data_save(g_ptr_array_index(lists_to_save, i));
+
   // TODO: probably hash map needed here
-  // Create local tasks
+  // Create/Update local tasks
   for_range(i, 0, client->calendars->count) {
     CalDAVCalendar *c = client->calendars->items[i];
     CONTINUE_IF_NOT(calendar_is_vtodo(c));
