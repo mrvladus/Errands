@@ -138,7 +138,6 @@ static void on_cancel_clicked_cb(ErrandsTaskMenu *self) {
   gtk_popover_popdown(GTK_POPOVER(self));
   bool new_cancelled = !errands_data_get_cancelled(self->task->data->ical);
   errands_data_set_cancelled(self->task->data->ical, new_cancelled);
-  errands_data_set_synced(self->task->data->ical, false);
   g_autoptr(GPtrArray) sub_tasks = g_ptr_array_new();
   errands_task_data_get_flat_list(self->task->data, sub_tasks);
   for_range(i, 0, sub_tasks->len) {
@@ -147,6 +146,7 @@ static void on_cancel_clicked_cb(ErrandsTaskMenu *self) {
     errands_sync_update_task(sub_task);
   }
   errands_list_data_save(self->task->data->list);
+  errands_list_data_sort(self->task->data->list);
   errands_task_list_reload(state.main_window->task_list, true);
   errands_sync_update_task(self->task->data);
 }

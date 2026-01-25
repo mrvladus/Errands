@@ -266,6 +266,8 @@ static void on_restore_btn_clicked_cb(ErrandsTask *self, GtkButton *btn) {
   errands_data_set_cancelled(self->data->ical, false);
   errands_list_data_save(self->data->list);
   errands_task_set_data(self, self->data);
+  errands_list_data_sort(self->data->list);
+  errands_task_list_reload(state.main_window->task_list, true);
   errands_sync_update_task(self->data);
 }
 
