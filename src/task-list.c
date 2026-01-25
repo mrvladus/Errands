@@ -351,6 +351,7 @@ void errands_task_list_reload(ErrandsTaskList *self, bool save_scroll_pos) {
 // ---------- CALLBACKS ---------- //
 
 static void on_task_list_entry_activated_cb(AdwEntryRow *entry, ErrandsTaskList *self) {
+  if (!self->data) return;
   const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
   const char *list_uid = self->data->uid;
   if (STR_EQUAL(text, "") || STR_EQUAL(list_uid, "")) return;
