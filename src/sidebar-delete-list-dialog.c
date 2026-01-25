@@ -54,7 +54,6 @@ static void on_response_cb(ErrandsSidebarDeleteListDialog *dialog, gchar *respon
     LOG("Delete List Dialog: Deleting task list %s", row->data->uid);
     // Delete data
     errands_data_set_deleted(row->data->ical, true);
-    errands_data_set_synced(row->data->ical, false);
     errands_list_data_save(row->data);
     errands_sync_delete_list(row->data);
     GtkWidget *prev = gtk_widget_get_prev_sibling(GTK_WIDGET(row));

@@ -1,5 +1,6 @@
 #include "data.h"
 #include "state.h"
+#include "sync.h"
 #include "task-list.h"
 
 #include "vendor/toolbox.h"
@@ -57,4 +58,5 @@ static void on_delete_cb(ErrandsTaskListAttachmentsDialogAttachment *self, GtkBu
   errands_list_data_save(task->data->list);
   gtk_list_box_remove(GTK_LIST_BOX(gtk_widget_get_ancestor(GTK_WIDGET(self), GTK_TYPE_LIST_BOX)), GTK_WIDGET(self));
   errands_task_list_attachments_dialog_update_ui(dialog);
+  errands_sync_update_task(task->data);
 }

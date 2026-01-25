@@ -1,11 +1,9 @@
 #include "sync.h"
 #include "data.h"
-#include "glib.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "state.h"
 #include "window.h"
-#include <libical/ical.h>
 
 // #define CALDAV_DEBUG
 #define CALDAV_IMPLEMENTATION
@@ -439,7 +437,7 @@ bool errands_sync() {
   if (!errands_settings_get(SETTING_SYNC).b) return false;
 
   if (sync_in_progress) {
-    LOG("Sync: In progress");
+    LOG("Sync: In progress. Scheduling another one.");
     sync_again = true;
     return true;
   }
@@ -463,7 +461,7 @@ bool errands_sync() {
 
 void errands_sync_init(void) {
   LOG("Sync: Initialize");
-  for_range(i, 0, ERRANDS_SYNC_LIST_TYPE_N) lists[i] = g_ptr_array_sized_new(8);
+  for_range(i, 0, ERRANDS_SYNC_LIST_TYPE_N) lists[i] = g_ptr_array_sized_new(4);
 
   g_autoptr(GTask) task = g_task_new(NULL, NULL, errands__sync_finished_cb, NULL);
   g_task_run_in_thread(task, errands__sync_cb);
@@ -473,33 +471,38 @@ void errands_sync_init(void) {
 }
 
 void errands_sync_delete_list(ListData *data) {
+  if (!errands_settings_get(SETTING_SYNC).b) return;
   g_ptr_array_add(lists[LISTS_TO_DELETE], data);
   errands_sync();
 }
 
 void errands_sync_create_list(ListData *data) {
+  if (!errands_settings_get(SETTING_SYNC).b) return;
   g_ptr_array_add(lists[LISTS_TO_CREATE], data);
   errands_sync();
 }
 
 void errands_sync_update_list(ListData *data) {
+  if (!errands_settings_get(SETTING_SYNC).b) return;
   g_ptr_array_add(lists[LISTS_TO_UPDATE], data);
   errands_sync();
 }
 
 void errands_sync_delete_task(TaskData *data) {
+  if (!errands_settings_get(SETTING_SYNC).b) return;
   g_ptr_array_add(lists[TASKS_TO_DELETE], data);
   errands_sync();
 }
 
 void errands_sync_create_task(TaskData *data) {
+  if (!errands_settings_get(SETTING_SYNC).b) return;
   g_ptr_array_add(lists[TASKS_TO_CREATE], data);
   errands_sync();
 }
 
 void errands_sync_update_task(TaskData *data) {
+  if (!errands_settings_get(SETTING_SYNC).b) return;
   g_ptr_array_add(lists[TASKS_TO_UPDATE], data);
-  errands_sync();
 }
 
 void errands_sync_cleanup(void) {

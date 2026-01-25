@@ -221,6 +221,6 @@ static void on_dialog_close_cb(ErrandsTaskListDateDialog *self) {
     errands_task_update_toolbar(self->current_task);
     errands_sidebar_update_filter_rows();
     errands_task_list_reload(state.main_window->task_list, true);
-    // errands_sync_schedule_task(data);
+    errands_sync_update_task(data);
   }
 }

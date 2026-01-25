@@ -16,6 +16,7 @@ template $ErrandsTask: Box {
     margin-end: 6;
     margin-top: 6;
     margin-bottom: 6;
+    tooltip-text: _("Toggle Sub-Tasks");
 
     cursor: Gdk.Cursor {
       name: "pointer";
@@ -41,12 +42,26 @@ template $ErrandsTask: Box {
       toggled => $on_complete_btn_toggle_cb(template);
     }
 
+    // Cancelled label
+    Button {
+      icon-name: "errands-cancel-symbolic";
+      tooltip-text: _("Restore");
+      valign: center;
+      visible: bind complete_btn.visible inverted;
+      clicked => $on_restore_btn_clicked_cb(template);
+
+      styles [
+        "flat",
+        "error",
+        "circular",
+      ]
+    }
+
     // Title
     Box {
       orientation: vertical;
       valign: center;
       spacing: 0;
-      tooltip-text: _("Toggle Sub-Tasks");
 
       Label title {
         hexpand: true;

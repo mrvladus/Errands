@@ -1,5 +1,6 @@
 #include "task.h"
 #include "data.h"
+#include "gtk/gtk.h"
 #include "sidebar.h"
 #include "state.h"
 #include "sync.h"
@@ -15,6 +16,7 @@ static GtkWidget *errands_task_tag_new(ErrandsTask *self, const char *tag);
 
 // Callbacks
 static void on_complete_btn_toggle_cb(ErrandsTask *self, GtkCheckButton *btn);
+static void on_restore_btn_clicked_cb(ErrandsTask *self, GtkButton *btn);
 static void on_unpin_btn_clicked_cb(ErrandsTask *self, GtkToggleButton *btn);
 static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointer user_data);
 static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *self);
@@ -56,6 +58,7 @@ static void errands_task_class_init(ErrandsTaskClass *class) {
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_title_edit_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_unpin_btn_clicked_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_complete_btn_toggle_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_restore_btn_clicked_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_list_date_dialog_show);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_list_notes_dialog_show);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_list_priority_dialog_show);
@@ -82,7 +85,6 @@ void errands_task_set_data(ErrandsTask *self, TaskData *data) {
   gtk_widget_set_visible(GTK_WIDGET(self), data ? true : false);
   if (!data) return;
   self->data = data;
-  gtk_widget_set_sensitive(GTK_WIDGET(self), !errands_data_get_cancelled(data->ical));
   // Set text
   gtk_label_set_label(GTK_LABEL(self->title), errands_data_get_text(data->ical));
   // Set completion
@@ -90,6 +92,10 @@ void errands_task_set_data(ErrandsTask *self, TaskData *data) {
   gtk_check_button_set_active(GTK_CHECK_BUTTON(self->complete_btn), errands_data_is_completed(data->ical));
   g_signal_handlers_unblock_by_func(self->complete_btn, on_complete_btn_toggle_cb, self);
   // Update UI
+  // Cancelled state
+  bool cancelled = errands_data_get_cancelled(data->ical);
+  gtk_widget_set_visible(self->complete_btn, !cancelled);
+  gtk_widget_set_visible(self->sub_entry, !cancelled);
   // Show sub-tasks entry
   gtk_widget_set_visible(self->sub_entry, errands_data_get_expanded(data->ical));
   errands_task_update_accent_color(self);
@@ -233,6 +239,7 @@ static void on_complete_btn_toggle_cb(ErrandsTask *self, GtkCheckButton *btn) {
     for_range(i, 0, sub_tasks->len) {
       TaskData *sub_task = g_ptr_array_index(sub_tasks, i);
       errands_data_set_completed(sub_task->ical, now);
+      errands_sync_update_task(sub_task);
     }
   }
   // Uncomplete parents tasks if unchecked
@@ -240,6 +247,7 @@ static void on_complete_btn_toggle_cb(ErrandsTask *self, GtkCheckButton *btn) {
     TaskData *parent = self->data->parent;
     while (parent) {
       errands_data_set_completed(parent->ical, icaltime_null_time());
+      errands_sync_update_task(parent);
       parent = parent->parent;
     }
   }
@@ -251,7 +259,14 @@ static void on_complete_btn_toggle_cb(ErrandsTask *self, GtkCheckButton *btn) {
   errands_sidebar_update_filter_rows();
   errands_sidebar_task_list_row_update(errands_sidebar_task_list_row_get(self->data->list));
   // Sync
-  // errands_sync_schedule_list(self->data->list);
+  errands_sync_update_task(self->data);
+}
+
+static void on_restore_btn_clicked_cb(ErrandsTask *self, GtkButton *btn) {
+  errands_data_set_cancelled(self->data->ical, false);
+  errands_list_data_save(self->data->list);
+  errands_task_set_data(self, self->data);
+  errands_sync_update_task(self->data);
 }
 
 static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointer user_data) {
@@ -304,12 +319,14 @@ static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *self) {
 }
 
 static void on_expand_toggle_cb(ErrandsTask *self, GtkGestureClick *ctrl, gint n_press, gdouble x, gdouble y) {
+  if (errands_data_get_cancelled(self->data->ical)) return;
   bool new_expanded = !errands_data_get_expanded(self->data->ical);
   LOG("Task '%s': Toggle expand: %d", errands_data_get_uid(self->data->ical), new_expanded);
   errands_data_set_expanded(self->data->ical, new_expanded);
   errands_list_data_save(self->data->list);
   errands_task_list_reload(state.main_window->task_list, true);
   gtk_widget_grab_focus(GTK_WIDGET(self->sub_entry));
+  errands_sync_update_task(self->data);
 }
 
 // --- DND CALLBACKS --- //

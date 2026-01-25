@@ -20,8 +20,6 @@ struct TaskData {
   ListData *list;
 };
 
-#define TASK_DATA(ptr) ((TaskData *)ptr)
-
 struct ListData {
   icalcomponent *ical;
   GPtrArray *children;
@@ -131,7 +129,7 @@ void errands_data_set_attachments(icalcomponent *ical, GStrv value);
 void errands_data_set_tags(icalcomponent *ical, GStrv value);
 
 void errands_data_add_tag(icalcomponent *ical, const char *tag);
-void errands_data_remove_tag(icalcomponent *ical, const char *tag);
+bool errands_data_remove_tag(icalcomponent *ical, const char *tag);
 
 // --- TIME --- //
 

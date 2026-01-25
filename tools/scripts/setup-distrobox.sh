@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-if ! command -v distrobox-create >/dev/null 2>&1
-then
+if ! command -v distrobox-create >/dev/null 2>&1; then
     echo "Distrobox is not installed. Look for it here: https://github.com/89luca89/distrobox"
     exit 1
 fi

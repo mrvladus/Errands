@@ -1,10 +1,9 @@
 #include "data.h"
 #include "settings.h"
+#include "sync.h"
 #include "task-list.h"
 
 #include "vendor/toolbox.h"
-
-#include <libical/ical.h>
 
 static void on_toggle_cb(ErrandsTaskListTagsDialogTag *self, GtkCheckButton *btn);
 static void on_delete_cb(ErrandsTaskListTagsDialogTag *self, GtkButton *btn);
@@ -57,6 +56,7 @@ static void on_toggle_cb(ErrandsTaskListTagsDialogTag *self, GtkCheckButton *btn
   gtk_check_button_get_active(btn) ? errands_data_add_tag(task->data->ical, tag)
                                    : errands_data_remove_tag(task->data->ical, tag);
   errands_list_data_save(task->data->list);
+  errands_sync_update_task(task->data);
 }
 
 static void on_delete_cb(ErrandsTaskListTagsDialogTag *self, GtkButton *btn) {
@@ -66,8 +66,12 @@ static void on_delete_cb(ErrandsTaskListTagsDialogTag *self, GtkButton *btn) {
   errands_settings_remove_tag(tag);
   for_range(i, 0, errands_data_lists->len) {
     ListData *list = g_ptr_array_index(errands_data_lists, i);
-    g_autoptr(GPtrArray) tasks = errands_list_data_get_all_tasks_as_icalcomponents(list);
-    for_range(j, 0, tasks->len) errands_data_remove_tag(g_ptr_array_index(tasks, j), tag);
+    g_autoptr(GPtrArray) tasks = g_ptr_array_sized_new(list->children->len);
+    errands_list_data_get_flat_list(list, tasks);
+    for_range(j, 0, tasks->len) {
+      TaskData *task = g_ptr_array_index(tasks, j);
+      if (errands_data_remove_tag(task->ical, tag)) errands_sync_update_task(task);
+    }
   }
   // Delete tag widget row
   gtk_list_box_remove(GTK_LIST_BOX(gtk_widget_get_ancestor(GTK_WIDGET(self), GTK_TYPE_LIST_BOX)), GTK_WIDGET(self));

@@ -1,5 +1,6 @@
 #include "data.h"
 #include "state.h"
+#include "sync.h"
 #include "task-list.h"
 #include "task.h"
 
@@ -90,10 +91,11 @@ static void errands_task_list_attachments_dialog_add_attachment(ErrandsTaskListA
   g_strv_builder_add(builder, path);
   g_auto(GStrv) attachments = g_strv_builder_end(builder);
   errands_data_set_attachments(self->current_task->data->ical, attachments);
+  errands_list_data_save(self->current_task->data->list);
   ErrandsTaskListAttachmentsDialogAttachment *attachment = errands_task_list_attachments_dialog_attachment_new(path);
   gtk_list_box_append(GTK_LIST_BOX(self->attachments_box), GTK_WIDGET(attachment));
-  errands_list_data_save(self->current_task->data->list);
   errands_task_list_attachments_dialog_update_ui(self);
+  errands_sync_update_task(self->current_task->data);
 }
 
 // ---------- CALLBACKS ---------- //

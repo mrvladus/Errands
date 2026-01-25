@@ -125,7 +125,6 @@ static void on_color_changed(GtkColorDialogButton *btn, GParamSpec *pspec, ListD
   char new_color[8];
   gdk_rgba_to_hex_string(color_rgba, new_color);
   errands_data_set_color(data->ical, new_color, true);
-  errands_data_set_synced(data->ical, false);
   errands_list_data_save(data);
   errands_sync_update_list(data);
 }

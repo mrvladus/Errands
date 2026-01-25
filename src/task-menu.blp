@@ -167,9 +167,7 @@ template $ErrandsTaskMenu: Popover {
             icon-name: "errands-add-symbolic";
           }
 
-          Label {
-            label: _("Toggle Sub-Tasks");
-          }
+          Label sub_tasks_label {}
         }
       }
 
@@ -189,9 +187,7 @@ template $ErrandsTaskMenu: Popover {
             icon-name: "errands-pin-symbolic";
           }
 
-          Label {
-            label: _("Toggle Pin");
-          }
+          Label pin_label {}
         }
       }
 
@@ -260,7 +256,7 @@ template $ErrandsTaskMenu: Popover {
           }
 
           Label {
-            label: _("Export");
+            label: _("Export as \".ics\"");
           }
         }
       }
@@ -274,6 +270,7 @@ template $ErrandsTaskMenu: Popover {
         styles [
           "flat",
           "body",
+          "warning",
         ]
 
         Box {
@@ -283,9 +280,7 @@ template $ErrandsTaskMenu: Popover {
             icon-name: "errands-cancel-symbolic";
           }
 
-          Label {
-            label: _("Cancel");
-          }
+          Label cancel_label {}
         }
       }
 

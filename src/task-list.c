@@ -1,6 +1,5 @@
 #include "task-list.h"
 #include "data.h"
-#include "glib.h"
 #include "sidebar.h"
 #include "sync.h"
 #include "task.h"
