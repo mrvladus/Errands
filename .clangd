@@ -31,6 +31,8 @@ CompileFlags:
     - -I/usr/include/libsecret-1
     - -I/usr/include/p11-kit-1
     - -I/usr/include/webkitgtk-6.0
+    - -I/usr/include/libportal
+    - -I/usr/include/libportal-gtk4
     - -pthread
     - -Wno-macro-redefined
     - -DCALDAV_IMPLEMENTATION

@@ -42,7 +42,7 @@ DEPS = $(OBJS:.o=.d)
 # --- Compilation variables --- #
 
 CC = gcc
-PKG_CONFIG_LIBS = libadwaita-1 gtksourceview-5 libical libportal libcurl libsecret-1
+PKG_CONFIG_LIBS = libadwaita-1 gtksourceview-5 libical libportal libportal-gtk4 libcurl libsecret-1
 CFLAGS    ?=
 ALL_CFLAGS = $(CFLAGS) \
 			-Wall -g -std=c11 -D_GNU_SOURCE \
@@ -90,27 +90,27 @@ $(BUILD_DIR)/$(NAME): $(OBJS)
 
 install: $(BUILD_DIR)/$(NAME)
 	# Executable
-	install -Dsm 755 $(BUILD_DIR)/$(NAME) $(DESTDIR)/$(bindir)/$(NAME)
+	install -Dsm 755 $(BUILD_DIR)/$(NAME) $(DESTDIR)$(bindir)/$(NAME)
 	# Desktop file
 	@cp $(DATA_DIR)/io.github.mrvladus.Errands.desktop.in $(BUILD_DIR)/$(APP_ID).desktop
 	@sed -i "s/@APP_ID@/$(APP_ID)/g" $(BUILD_DIR)/$(APP_ID).desktop
 	@sed -i "s|@BIN_DIR@|$(bindir)|g" $(BUILD_DIR)/$(APP_ID).desktop
-	install -Dm 644 $(BUILD_DIR)/$(APP_ID).desktop $(DESTDIR)/$(desktopdir)/$(APP_ID).desktop
+	install -Dm 644 $(BUILD_DIR)/$(APP_ID).desktop $(DESTDIR)$(desktopdir)/$(APP_ID).desktop
 	# Icons
-	install -Dm 644 $(DATA_DIR)/icons/$(APP_ID).svg $(DESTDIR)/$(scalableicondir)/$(APP_ID).svg
-	install -Dm 644 $(DATA_DIR)/icons/io.github.mrvladus.Errands-symbolic.svg $(DESTDIR)/$(symbolicicondir)/io.github.mrvladus.Errands-symbolic.svg
+	install -Dm 644 $(DATA_DIR)/icons/$(APP_ID).svg $(DESTDIR)$(scalableicondir)/$(APP_ID).svg
+	install -Dm 644 $(DATA_DIR)/icons/io.github.mrvladus.Errands-symbolic.svg $(DESTDIR)$(symbolicicondir)/io.github.mrvladus.Errands-symbolic.svg
 	# D-Bus service
 	@cp $(DATA_DIR)/io.github.mrvladus.Errands.service.in $(BUILD_DIR)/$(APP_ID).service
 	@sed -i "s/@APP_ID@/$(APP_ID)/g" $(BUILD_DIR)/$(APP_ID).service
 	@sed -i "s|@BIN_DIR@|$(bindir)|g" $(BUILD_DIR)/$(APP_ID).service
-	install -Dm 644 $(BUILD_DIR)/$(APP_ID).service $(DESTDIR)/$(dbusdir)/$(APP_ID).service
+	install -Dm 644 $(BUILD_DIR)/$(APP_ID).service $(DESTDIR)$(dbusdir)/$(APP_ID).service
 
 uninstall:
-	rm -f $(DESTDIR)/$(bindir)/$(NAME)
-	rm -f $(DESTDIR)/$(desktopdir)/$(APP_ID).desktop
-	rm -f $(DESTDIR)/$(scalableicondir)/$(APP_ID).svg
-	rm -f $(DESTDIR)/$(symbolicicondir)/io.github.mrvladus.Errands-symbolic.svg
-	rm -f $(DESTDIR)/$(dbusdir)/$(APP_ID).service
+	rm -f $(DESTDIR)$(bindir)/$(NAME)
+	rm -f $(DESTDIR)$(desktopdir)/$(APP_ID).desktop
+	rm -f $(DESTDIR)$(scalableicondir)/$(APP_ID).svg
+	rm -f $(DESTDIR)$(symbolicicondir)/io.github.mrvladus.Errands-symbolic.svg
+	rm -f $(DESTDIR)$(dbusdir)/$(APP_ID).service
 
 # --- Development targets --- #
 

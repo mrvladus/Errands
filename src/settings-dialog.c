@@ -1,8 +1,10 @@
 #include "settings-dialog.h"
-#include "adwaita.h"
 #include "notifications.h"
 #include "settings.h"
 #include "state.h"
+
+#include <libportal-gtk4/portal-gtk4.h>
+#include <libportal/portal.h>
 
 static ErrandsSettingsDialog *settings_dialog = NULL;
 
@@ -118,6 +120,15 @@ static void on_background_toggled_cb(ErrandsSettingsDialog *self) {
 static void on_startup_toggled_cb(ErrandsSettingsDialog *self) {
   bool enabled = adw_switch_row_get_active(ADW_SWITCH_ROW(self->startup));
   errands_settings_set(SETTING_STARTUP, &enabled);
+  g_autoptr(XdpPortal) portal = xdp_portal_new();
+  g_autoptr(XdpParent) parent = xdp_parent_new_gtk(GTK_WINDOW(state.main_window));
+  if (enabled) {
+    g_autoptr(GPtrArray) cmdline = g_ptr_array_sized_new(2);
+    g_ptr_array_add(cmdline, "errands");
+    g_ptr_array_add(cmdline, "--gapplication-service");
+    xdp_portal_request_background(portal, parent, "Errands needs to run in the background for sending notifications",
+                                  cmdline, XDP_BACKGROUND_FLAG_AUTOSTART, NULL, NULL, NULL);
+  } else xdp_portal_request_background(portal, parent, NULL, NULL, XDP_BACKGROUND_FLAG_NONE, NULL, NULL, NULL);
 }
 
 static void on_sync_toggled_cb(ErrandsSettingsDialog *self) {
