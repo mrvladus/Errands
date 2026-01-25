@@ -3,7 +3,6 @@
 
 #include "vendor/json.h"
 #include "vendor/toolbox.h"
-#include <libical/ical.h>
 
 static void errands_data_create_backup();
 

@@ -6,15 +6,16 @@ VERSION = 49.0
 
 # --- Installation directories --- #
 
-DESTDIR    ?=
-prefix     ?= /usr/local
-bindir      = $(prefix)/bin
-datarootdir = $(prefix)/share
-localedir   = $(datarootdir)/locale
-desktopdir  = $(datarootdir)/applications
-dbusdir     = $(datarootdir)/dbus-1/services
-appicondir  = $(datarootdir)/icons/hicolor/scalable/apps
-symbolicdir = $(datarootdir)/icons/hicolor/symbolic/apps
+DESTDIR        ?=
+prefix         ?= /usr/local
+bindir          = $(prefix)/bin
+datarootdir     = $(prefix)/share
+localedir       = $(datarootdir)/locale
+desktopdir      = $(datarootdir)/applications
+dbusdir         = $(datarootdir)/dbus-1/services
+icondir         = $(datarootdir)/icons/hicolor
+scalableicondir = $(icondir)/scalable/apps
+symbolicicondir = $(icondir)/symbolic/apps
 
 # --- Project directories --- #
 
@@ -42,7 +43,7 @@ DEPS = $(OBJS:.o=.d)
 
 CC = gcc
 PKG_CONFIG_LIBS = libadwaita-1 gtksourceview-5 libical libportal libcurl libsecret-1
-CFLAGS ?=
+CFLAGS    ?=
 ALL_CFLAGS = $(CFLAGS) \
 			-Wall -g -std=c11 -D_GNU_SOURCE \
 			`pkg-config --cflags $(PKG_CONFIG_LIBS)` \
@@ -96,8 +97,8 @@ install: $(BUILD_DIR)/$(NAME)
 	@sed -i "s|@BIN_DIR@|$(bindir)|g" $(BUILD_DIR)/$(APP_ID).desktop
 	install -Dm 644 $(BUILD_DIR)/$(APP_ID).desktop $(DESTDIR)/$(desktopdir)/$(APP_ID).desktop
 	# Icons
-	install -Dm 644 $(DATA_DIR)/icons/$(APP_ID).svg $(DESTDIR)/$(appicondir)/$(APP_ID).svg
-	install -Dm 644 $(DATA_DIR)/icons/io.github.mrvladus.Errands-symbolic.svg $(DESTDIR)/$(symbolicdir)/io.github.mrvladus.Errands-symbolic.svg
+	install -Dm 644 $(DATA_DIR)/icons/$(APP_ID).svg $(DESTDIR)/$(scalableicondir)/$(APP_ID).svg
+	install -Dm 644 $(DATA_DIR)/icons/io.github.mrvladus.Errands-symbolic.svg $(DESTDIR)/$(symbolicicondir)/io.github.mrvladus.Errands-symbolic.svg
 	# D-Bus service
 	@cp $(DATA_DIR)/io.github.mrvladus.Errands.service.in $(BUILD_DIR)/$(APP_ID).service
 	@sed -i "s/@APP_ID@/$(APP_ID)/g" $(BUILD_DIR)/$(APP_ID).service
@@ -107,8 +108,8 @@ install: $(BUILD_DIR)/$(NAME)
 uninstall:
 	rm -f $(DESTDIR)/$(bindir)/$(NAME)
 	rm -f $(DESTDIR)/$(desktopdir)/$(APP_ID).desktop
-	rm -f $(DESTDIR)/$(appicondir)/$(APP_ID).svg
-	rm -f $(DESTDIR)/$(symbolicdir)/io.github.mrvladus.Errands-symbolic.svg
+	rm -f $(DESTDIR)/$(scalableicondir)/$(APP_ID).svg
+	rm -f $(DESTDIR)/$(symbolicicondir)/io.github.mrvladus.Errands-symbolic.svg
 	rm -f $(DESTDIR)/$(dbusdir)/$(APP_ID).service
 
 # --- Development targets --- #
