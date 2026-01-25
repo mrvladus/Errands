@@ -1,6 +1,7 @@
 #include "sidebar.h"
 #include "about-dialog.h"
 #include "data.h"
+#include "gtk/gtk.h"
 #include "settings-dialog.h"
 #include "settings.h"
 #include "state.h"
@@ -100,10 +101,11 @@ void errands_sidebar_select_last_opened_page() {
 }
 
 void errands_sidebar_update_filter_rows() {
-  size_t total = 0, completed = 0, today = 0, today_completed = 0, pinned = 0;
+  size_t total = 0, completed = 0, today = 0, today_completed = 0, pinned = 0, n_lists = 0;
   for_range(l, 0, errands_data_lists->len) {
     ListData *list = g_ptr_array_index(errands_data_lists, l);
     CONTINUE_IF(errands_data_get_deleted(list->ical));
+    n_lists++;
     g_autoptr(GPtrArray) tasks = errands_list_data_get_all_tasks_as_icalcomponents(list);
     for_range(t, 0, tasks->len) {
       icalcomponent *ical = g_ptr_array_index(tasks, t);
@@ -127,6 +129,7 @@ void errands_sidebar_update_filter_rows() {
   gtk_label_set_label(self->today_counter, today_label);
   const char *pinned_label = pinned > 0 ? tmp_str_printf("%zu", pinned) : "";
   gtk_label_set_label(self->pinned_counter, pinned_label);
+  gtk_widget_set_visible(self->task_lists_box, n_lists > 0);
 }
 
 void errands_sidebar_toggle_sync_indicator(bool on) { gtk_widget_set_visible(self->sync_indicator, on); }

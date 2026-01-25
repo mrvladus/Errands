@@ -29,7 +29,7 @@ template $ErrandsSidebar: Adw.Bin {
       [start]
       Adw.SplitButton add_btn {
         icon-name: "errands-add-symbolic";
-        tooltip-text: _("Add Task List (Ctrl+Shift+L)");
+        tooltip-text: _("Create Task List (Ctrl+Shift+L)");
         menu-model: add_menu;
         action-name: "sidebar.new_list";
 
@@ -178,6 +178,19 @@ template $ErrandsSidebar: Adw.Bin {
 
           styles [
             "navigation-sidebar",
+          ]
+        }
+
+        Adw.StatusPage {
+          title: _("No Task Lists");
+          description: _("Create new or import \".ics\"");
+          icon-name: "errands-list-symbolic";
+          valign: center;
+          vexpand: true;
+          visible: bind task_lists_box.visible inverted;
+
+          styles [
+            "compact",
           ]
         }
       }
