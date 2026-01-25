@@ -78,7 +78,6 @@ void errands_sidebar_load_lists(void) {
 }
 
 ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(ListData *data) {
-  ASSERT(data);
   LOG("Sidebar: Add task list '%s'", data->uid);
   ErrandsSidebarTaskListRow *row = errands_sidebar_task_list_row_new(data);
   gtk_list_box_append(GTK_LIST_BOX(self->task_lists_box), GTK_WIDGET(row));
@@ -166,7 +165,7 @@ static void __on_open_finish(GObject *obj, GAsyncResult *res) {
   g_ptr_array_add(errands_data_lists, data);
   ErrandsSidebarTaskListRow *row = errands_sidebar_add_task_list(data);
   g_signal_emit_by_name(row, "activate", NULL);
-  // errands_sync_schedule_list(data);
+  errands_sync_create_list(data);
 }
 
 static void on_import_action_cb(GSimpleAction *action, GVariant *param) {

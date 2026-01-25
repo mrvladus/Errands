@@ -833,7 +833,12 @@ gint errands_data_sort_func(gconstpointer a, gconstpointer b) {
   TaskData *td_a = (TaskData *)a;
   TaskData *td_b = (TaskData *)b;
 
-  // Completion sort first
+  // Cancelled sort
+  gboolean cancelled_a = errands_data_get_cancelled(td_a->ical);
+  gboolean cancelled_b = errands_data_get_cancelled(td_b->ical);
+  if (cancelled_a != cancelled_b) return cancelled_a - cancelled_b;
+
+  // Completion sort
   gboolean completed_a = !icaltime_is_null_date(errands_data_get_completed(td_a->ical));
   gboolean completed_b = !icaltime_is_null_date(errands_data_get_completed(td_b->ical));
   if (completed_a != completed_b) return completed_a - completed_b;

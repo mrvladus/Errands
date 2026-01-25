@@ -1,5 +1,6 @@
 #include "task-list.h"
 #include "data.h"
+#include "settings.h"
 #include "sidebar.h"
 #include "sync.h"
 #include "task.h"
@@ -117,9 +118,13 @@ static bool __task_has_any_search_matched_parent(TaskData *data) {
 static int __calculate_height(ErrandsTaskList *self) {
   int height = 0;
   GtkRequisition min_size, nat_size;
+  bool show_completed = errands_settings_get(SETTING_SHOW_COMPLETED).b;
+  bool show_cancelled = errands_settings_get(SETTING_SHOW_CANCELLED).b;
   for_range(i, 0, current_task_list->len) {
     TaskData *data = g_ptr_array_index(current_task_list, i);
     CONTINUE_IF(errands_data_get_deleted(data->ical) || errands_data_get_deleted(data->list->ical));
+    CONTINUE_IF(errands_data_is_completed(data->ical) && !show_completed);
+    CONTINUE_IF(errands_data_get_cancelled(data->ical) && !show_cancelled);
     CONTINUE_IF(__task_has_any_collapsed_parent(data));
     CONTINUE_IF(self->page == ERRANDS_TASK_LIST_PAGE_PINNED && !__task_has_any_pinned_parent(data));
     CONTINUE_IF(self->page == ERRANDS_TASK_LIST_PAGE_TODAY && !__task_has_any_due_parent(data));
@@ -137,12 +142,16 @@ static void __reset_scroll_cb(ErrandsTaskList *self) { gtk_adjustment_set_value(
 void errands_task_list_redraw_tasks(ErrandsTaskList *self) {
   static const uint8_t indent_px = 15;
   if (current_task_list->len == 0) return;
+  bool show_completed = errands_settings_get(SETTING_SHOW_COMPLETED).b;
+  bool show_cancelled = errands_settings_get(SETTING_SHOW_CANCELLED).b;
   g_autoptr(GPtrArray) children = get_children(self->task_list);
   size_t indent_offset = 0;
   for (size_t i = 0, j = current_start; i < MIN(tasks_stack_size, current_task_list->len - current_start); ++i, ++j) {
     ErrandsTask *task = g_ptr_array_index(children, i);
     TaskData *data = g_ptr_array_index(current_task_list, j);
     CONTINUE_IF(errands_data_get_deleted(data->ical));
+    CONTINUE_IF(errands_data_is_completed(data->ical) && !show_completed);
+    CONTINUE_IF(errands_data_get_cancelled(data->ical) && !show_cancelled);
     size_t indent = errands_task_data_get_indent_level(data);
     bool show = true;
     bool match_search = true;
