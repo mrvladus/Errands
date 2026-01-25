@@ -1,7 +1,6 @@
 #include "sidebar.h"
 #include "about-dialog.h"
 #include "data.h"
-#include "gtk/gtk.h"
 #include "settings-dialog.h"
 #include "settings.h"
 #include "state.h"
@@ -104,6 +103,7 @@ void errands_sidebar_update_filter_rows() {
   size_t total = 0, completed = 0, today = 0, today_completed = 0, pinned = 0;
   for_range(l, 0, errands_data_lists->len) {
     ListData *list = g_ptr_array_index(errands_data_lists, l);
+    CONTINUE_IF(errands_data_get_deleted(list->ical));
     g_autoptr(GPtrArray) tasks = errands_list_data_get_all_tasks_as_icalcomponents(list);
     for_range(t, 0, tasks->len) {
       icalcomponent *ical = g_ptr_array_index(tasks, t);

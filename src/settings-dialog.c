@@ -4,7 +4,6 @@
 #include "state.h"
 
 #include <libportal-gtk4/portal-gtk4.h>
-#include <libportal/portal.h>
 
 static ErrandsSettingsDialog *settings_dialog = NULL;
 

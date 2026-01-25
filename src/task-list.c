@@ -149,7 +149,7 @@ void errands_task_list_redraw_tasks(ErrandsTaskList *self) {
   for (size_t i = 0, j = current_start; i < MIN(tasks_stack_size, current_task_list->len - current_start); ++i, ++j) {
     ErrandsTask *task = g_ptr_array_index(children, i);
     TaskData *data = g_ptr_array_index(current_task_list, j);
-    CONTINUE_IF(errands_data_get_deleted(data->ical));
+    CONTINUE_IF(errands_data_get_deleted(data->ical) || errands_data_get_deleted(data->list->ical));
     CONTINUE_IF(errands_data_is_completed(data->ical) && !show_completed);
     CONTINUE_IF(errands_data_get_cancelled(data->ical) && !show_cancelled);
     size_t indent = errands_task_data_get_indent_level(data);
@@ -256,6 +256,7 @@ void errands_task_list_update_title(ErrandsTaskList *self) {
     size_t total = 0, completed = 0;
     for_range(i, 0, errands_data_lists->len) {
       ListData *list = g_ptr_array_index(errands_data_lists, i);
+      CONTINUE_IF(errands_data_get_deleted(list->ical));
       g_autoptr(GPtrArray) tasks = errands_list_data_get_all_tasks_as_icalcomponents(list);
       for_range(j, 0, tasks->len) {
         icalcomponent *ical = g_ptr_array_index(tasks, j);
@@ -289,7 +290,7 @@ void errands_task_list_update_title(ErrandsTaskList *self) {
   size_t total = 0, completed = 0;
   for_range(i, 0, current_task_list->len) {
     TaskData *data = g_ptr_array_index(current_task_list, i);
-    CONTINUE_IF(errands_data_get_deleted(data->ical));
+    CONTINUE_IF(errands_data_get_deleted(data->ical) || errands_data_get_deleted(data->list->ical));
     if (!icaltime_is_null_date(errands_data_get_completed(data->ical))) completed++;
     total++;
   }

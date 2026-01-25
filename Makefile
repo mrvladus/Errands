@@ -42,7 +42,7 @@ DEPS = $(OBJS:.o=.d)
 # --- Compilation variables --- #
 
 CC = gcc
-PKG_CONFIG_LIBS = libadwaita-1 gtksourceview-5 libical libportal libportal-gtk4 libcurl libsecret-1
+PKG_CONFIG_LIBS = libadwaita-1 gtksourceview-5 libical libportal-gtk4 libcurl libsecret-1
 CFLAGS    ?=
 ALL_CFLAGS = $(CFLAGS) \
 			-Wall -g -std=c11 -D_GNU_SOURCE \

@@ -62,8 +62,8 @@ void errands_settings_load_default() {
   settings = json_object_new();
 
   SETTING_ADD(SETTING_MAXIMIZED, bool, false);
-  SETTING_ADD(SETTING_SHOW_CANCELLED, bool, true);
-  SETTING_ADD(SETTING_SHOW_COMPLETED, bool, true);
+  SETTING_ADD(SETTING_SHOW_CANCELLED, bool, false);
+  SETTING_ADD(SETTING_SHOW_COMPLETED, bool, false);
   SETTING_ADD(SETTING_SYNC, bool, false);
   SETTING_ADD(SETTING_BACKGROUND, bool, true);
   SETTING_ADD(SETTING_NOTIFICATIONS, bool, true);

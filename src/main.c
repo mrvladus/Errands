@@ -16,7 +16,6 @@ e.g. GLib's g_autoptr, g_auto and g_autofree"
 
 #include <glib/gi18n.h>
 #include <libportal-gtk4/portal-gtk4.h>
-#include <libportal/portal.h>
 
 extern GResource *errands_get_resource(void);
 const char *toolbox_log_prefix = "\033[0;32m[Errands] \033[0m";

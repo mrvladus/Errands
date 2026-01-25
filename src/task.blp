@@ -16,7 +16,6 @@ template $ErrandsTask: Box {
     margin-end: 6;
     margin-top: 6;
     margin-bottom: 6;
-    tooltip-text: _("Toggle Sub-Tasks");
 
     cursor: Gdk.Cursor {
       name: "pointer";
@@ -62,6 +61,7 @@ template $ErrandsTask: Box {
       orientation: vertical;
       valign: center;
       spacing: 0;
+      tooltip-text: _("Toggle Sub-Tasks");
 
       Label title {
         hexpand: true;
@@ -85,6 +85,7 @@ template $ErrandsTask: Box {
     EditableLabel edit_title {
       hexpand: true;
       halign: fill;
+      valign: center;
       xalign: 0;
       max-width-chars: 50;
       visible: bind title.visible bidirectional inverted;
