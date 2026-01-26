@@ -128,13 +128,18 @@
     <file
             preprocess="xml-stripblanks"
             compressed="true"
-            alias="io.github.mrvladus.Errands.svg"
-        >data/icons/io.github.mrvladus.Errands.svg</file>
+            alias="io.github.mrvladus.List.svg"
+        >data/icons/io.github.mrvladus.List.svg</file>
     <file
             preprocess="xml-stripblanks"
             compressed="true"
-            alias="io.github.mrvladus.Errands.Devel.svg"
-        >data/icons/io.github.mrvladus.Errands.Devel.svg</file>
+            alias="io.github.mrvladus.List.Devel.svg"
+        >data/icons/io.github.mrvladus.List.Devel.svg</file>
+        <file
+            preprocess="xml-stripblanks"
+            compressed="true"
+            alias="io.github.mrvladus.List-symbolic.svg"
+        >data/icons/io.github.mrvladus.List-symbolic.svg</file>
     <file
             preprocess="xml-stripblanks"
             compressed="true"

@@ -8,7 +8,8 @@ fi
 distrobox-create \
     --name errands-distrobox \
     --image archlinux:latest \
-    --additional-packages "gcc make pkgconf git neovim zed curl libadwaita libportal libical libsecret gtksourceview-5 blueprint-compiler clang"
+    --init \
+    --additional-packages "systemd gcc make pkgconf git neovim zed curl libadwaita libportal-gtk4 libical libsecret gtksourceview5 blueprint-compiler clang flatpak-builder"
 
 if [ $? -ne 0 ]; then
     echo "Failed to create distrobox"

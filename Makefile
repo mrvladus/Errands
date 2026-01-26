@@ -1,8 +1,8 @@
 # --- Project info --- #
 
 NAME    = errands
-APP_ID  = io.github.mrvladus.Errands
 VERSION = 49.0
+APP_ID := io.github.mrvladus.List
 
 # --- Installation directories --- #
 
@@ -43,6 +43,7 @@ DEPS = $(OBJS:.o=.d)
 
 CC = gcc
 PKG_CONFIG_LIBS = libadwaita-1 gtksourceview-5 libical libportal-gtk4 libcurl libsecret-1
+LDFLAGS    = `pkg-config --libs $(PKG_CONFIG_LIBS)`
 CFLAGS    ?=
 ALL_CFLAGS = $(CFLAGS) \
 			-Wall -g -std=c11 -D_GNU_SOURCE \
@@ -50,8 +51,7 @@ ALL_CFLAGS = $(CFLAGS) \
 			-DVERSION='"$(VERSION)"' \
 			-DVERSION_COMMIT='"$(shell git rev-parse --short HEAD)"' \
 			-DAPP_ID='"$(APP_ID)"' \
-			-DLOCALE_DIR='""'
-LDFLAGS = `pkg-config --libs $(PKG_CONFIG_LIBS)`
+			-DLOCALE_DIR='"$(localedir)"'
 
 # --- Targets --- #
 
@@ -92,15 +92,15 @@ install: $(BUILD_DIR)/$(NAME)
 	# Executable
 	install -Dsm 755 $(BUILD_DIR)/$(NAME) $(DESTDIR)$(bindir)/$(NAME)
 	# Desktop file
-	@cp $(DATA_DIR)/io.github.mrvladus.Errands.desktop.in $(BUILD_DIR)/$(APP_ID).desktop
+	@cp $(DATA_DIR)/$(NAME).desktop.in $(BUILD_DIR)/$(APP_ID).desktop
 	@sed -i "s/@APP_ID@/$(APP_ID)/g" $(BUILD_DIR)/$(APP_ID).desktop
 	@sed -i "s|@BIN_DIR@|$(bindir)|g" $(BUILD_DIR)/$(APP_ID).desktop
 	install -Dm 644 $(BUILD_DIR)/$(APP_ID).desktop $(DESTDIR)$(desktopdir)/$(APP_ID).desktop
 	# Icons
 	install -Dm 644 $(DATA_DIR)/icons/$(APP_ID).svg $(DESTDIR)$(scalableicondir)/$(APP_ID).svg
-	install -Dm 644 $(DATA_DIR)/icons/io.github.mrvladus.Errands-symbolic.svg $(DESTDIR)$(symbolicicondir)/io.github.mrvladus.Errands-symbolic.svg
+	install -Dm 644 $(DATA_DIR)/icons/io.github.mrvladus.List-symbolic.svg $(DESTDIR)$(symbolicicondir)/io.github.mrvladus.List-symbolic.svg
 	# D-Bus service
-	@cp $(DATA_DIR)/io.github.mrvladus.Errands.service.in $(BUILD_DIR)/$(APP_ID).service
+	@cp $(DATA_DIR)/$(NAME).service.in $(BUILD_DIR)/$(APP_ID).service
 	@sed -i "s/@APP_ID@/$(APP_ID)/g" $(BUILD_DIR)/$(APP_ID).service
 	@sed -i "s|@BIN_DIR@|$(bindir)|g" $(BUILD_DIR)/$(APP_ID).service
 	install -Dm 644 $(BUILD_DIR)/$(APP_ID).service $(DESTDIR)$(dbusdir)/$(APP_ID).service
@@ -109,10 +109,16 @@ uninstall:
 	rm -f $(DESTDIR)$(bindir)/$(NAME)
 	rm -f $(DESTDIR)$(desktopdir)/$(APP_ID).desktop
 	rm -f $(DESTDIR)$(scalableicondir)/$(APP_ID).svg
-	rm -f $(DESTDIR)$(symbolicicondir)/io.github.mrvladus.Errands-symbolic.svg
+	rm -f $(DESTDIR)$(symbolicicondir)/io.github.mrvladus.List-symbolic.svg
 	rm -f $(DESTDIR)$(dbusdir)/$(APP_ID).service
 
 # --- Development targets --- #
+
+# Devel mode: TRUE, FALSE.
+DEVEL ?= FALSE
+ifeq ($(DEVEL),TRUE)
+	APP_ID := io.github.mrvladus.List.Devel
+endif
 
 RUN_CMD := $(BUILD_DIR)/$(NAME)
 

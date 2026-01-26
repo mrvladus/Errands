@@ -1,5 +1,5 @@
 #ifndef APP_ID
-#define APP_ID "io.github.mrvladus.Errands"
+#define APP_ID "io.github.mrvladus.List"
 #endif
 #ifndef VERSION
 #define VERSION ""

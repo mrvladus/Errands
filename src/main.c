@@ -58,6 +58,7 @@ int main(int argc, char **argv) {
   state.app = adw_application_new(APP_ID, G_APPLICATION_DEFAULT_FLAGS);
   g_signal_connect(state.app, "activate", G_CALLBACK(activate), NULL);
   g_resources_register(errands_get_resource());
+  g_application_set_resource_base_path(G_APPLICATION(state.app), "/io/github/mrvladus/Errands");
   const int status = g_application_run(G_APPLICATION(state.app), argc, argv);
   g_object_unref(state.app);
 
