@@ -4,6 +4,12 @@ NAME    = errands
 VERSION = 49.0
 APP_ID := io.github.mrvladus.List
 
+# Development mode: TRUE, FALSE. Default: FALSE.
+DEVEL ?= FALSE
+ifeq ($(DEVEL),TRUE)
+	APP_ID := io.github.mrvladus.List.Devel
+endif
+
 # --- Installation directories --- #
 
 DESTDIR        ?=
@@ -19,9 +25,12 @@ symbolicicondir = $(icondir)/symbolic/apps
 
 # --- Project directories --- #
 
-BUILD_DIR = build
 SRC_DIR   = src
 DATA_DIR  = data
+
+BUILD_DIR = .build
+FLATPAK_BUILD_DIR = .flatpak-build
+FLATPAK_REPO_DIR  = .flatpak-repo
 
 # --- Resources --- #
 
@@ -43,9 +52,10 @@ DEPS = $(OBJS:.o=.d)
 
 CC = gcc
 PKG_CONFIG_LIBS = libadwaita-1 gtksourceview-5 libical libportal-gtk4 libcurl libsecret-1
-LDFLAGS    = `pkg-config --libs $(PKG_CONFIG_LIBS)`
-CFLAGS    ?=
-ALL_CFLAGS = $(CFLAGS) \
+LDFLAGS    ?=
+ALL_LDFLAGS = $(LDFLAGS) `pkg-config --libs $(PKG_CONFIG_LIBS)`
+CFLAGS     ?=
+ALL_CFLAGS  = $(CFLAGS) \
 			-Wall -g -std=c11 -D_GNU_SOURCE \
 			`pkg-config --cflags $(PKG_CONFIG_LIBS)` \
 			-DVERSION='"$(VERSION)"' \
@@ -58,7 +68,7 @@ ALL_CFLAGS = $(CFLAGS) \
 all: $(BUILD_DIR)/$(NAME)
 
 clean:
-	@rm -rf $(BUILD_DIR)
+	@rm -rf $(BUILD_DIR) .flatpak*
 
 $(BUILD_DIR):
 	@mkdir -p $(BUILD_DIR)
@@ -82,7 +92,7 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
 
 $(BUILD_DIR)/$(NAME): $(OBJS)
 		@echo "Linking executable $@"
-		@$(CC) -o $@ $^ $(LDFLAGS)
+		@$(CC) -o $@ $^ $(ALL_LDFLAGS)
 
 -include $(DEPS)
 
@@ -112,18 +122,23 @@ uninstall:
 	rm -f $(DESTDIR)$(symbolicicondir)/io.github.mrvladus.List-symbolic.svg
 	rm -f $(DESTDIR)$(dbusdir)/$(APP_ID).service
 
-# --- Development targets --- #
+# --- Flatpak targets --- #
 
-# Devel mode: TRUE, FALSE.
-DEVEL ?= FALSE
-ifeq ($(DEVEL),TRUE)
-	APP_ID := io.github.mrvladus.List.Devel
-endif
+$(FLATPAK_BUILD_DIR):
+	flatpak-builder --ccache --force-clean --repo=$(FLATPAK_REPO_DIR) $@ tools/flatpak/$(APP_ID).json
+
+flatpak-run: $(FLATPAK_BUILD_DIR)
+	flatpak-builder --run $< tools/flatpak/$(APP_ID).json $(NAME)
+
+flatpak-bundle: $(FLATPAK_BUILD_DIR) | $(BUILD_DIR)
+	flatpak build-bundle $(FLATPAK_REPO_DIR) $(BUILD_DIR)/$(APP_ID).flatpak $(APP_ID) --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo
+
+# --- Development targets --- #
 
 RUN_CMD := $(BUILD_DIR)/$(NAME)
 
-# Debug mode: GDB, GF2.
-DEBUG ?=
+# Debug mode: GDB, GF2, FALSE
+DEBUG ?= FALSE
 ifeq ($(DEBUG),GDB)
     RUN_CMD := gdb -q -ex run $(RUN_CMD)
 else ifeq ($(DEBUG),GF2)
@@ -138,4 +153,4 @@ run: all
 sloc:
 	@find $(SRC_DIR) -name '*.c' -o -name '*.h' | sort | xargs wc -l
 
-.PHONY: all install uninstall run clean sloc
+.PHONY: all install uninstall run clean sloc flatpak-run flatpak-bundle

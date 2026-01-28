@@ -1,8 +1,6 @@
-_build/
 build/
-.flatpak/
-.flatpak-builder/
+.build/
+.flatpak*/
 .vscode/
 .idea/
 .zed/
-pug

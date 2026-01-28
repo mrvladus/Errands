@@ -15,112 +15,112 @@
             preprocess="xml-stripblanks"
             compressed="true"
             alias="settings-dialog.ui"
-        >build/settings-dialog.ui</file>
+        >.build/settings-dialog.ui</file>
     <file
             preprocess="xml-stripblanks"
             compressed="true"
             alias="sidebar-task-list-row.ui"
-        >build/sidebar-task-list-row.ui</file>
+        >.build/sidebar-task-list-row.ui</file>
     <file
             preprocess="xml-stripblanks"
             compressed="true"
             alias="sidebar.ui"
-        >build/sidebar.ui</file>
+        >.build/sidebar.ui</file>
     <file
             preprocess="xml-stripblanks"
             compressed="true"
             alias="sidebar-new-list-dialog.ui"
-        >build/sidebar-new-list-dialog.ui</file>
+        >.build/sidebar-new-list-dialog.ui</file>
     <file
             preprocess="xml-stripblanks"
             compressed="true"
             alias="sidebar-delete-list-dialog.ui"
-        >build/sidebar-delete-list-dialog.ui</file>
+        >.build/sidebar-delete-list-dialog.ui</file>
     <file
             preprocess="xml-stripblanks"
             compressed="true"
             alias="sidebar-rename-list-dialog.ui"
-        >build/sidebar-rename-list-dialog.ui</file>
+        >.build/sidebar-rename-list-dialog.ui</file>
     <file
             preprocess="xml-stripblanks"
             compressed="true"
             alias="window.ui"
-        >build/window.ui</file>
+        >.build/window.ui</file>
     <file
             preprocess="xml-stripblanks"
             compressed="true"
             alias="task.ui"
-        >build/task.ui</file>
+        >.build/task.ui</file>
     <file
             preprocess="xml-stripblanks"
             compressed="true"
             alias="task-menu.ui"
-        >build/task-menu.ui</file>
+        >.build/task-menu.ui</file>
     <file
             preprocess="xml-stripblanks"
             compressed="true"
             alias="task-list.ui"
-        >build/task-list.ui</file>
+        >.build/task-list.ui</file>
     <file
             preprocess="xml-stripblanks"
             compressed="true"
             alias="task-list-attachments-dialog.ui"
-        >build/task-list-attachments-dialog.ui</file>
+        >.build/task-list-attachments-dialog.ui</file>
     <file
             preprocess="xml-stripblanks"
             compressed="true"
             alias="task-list-attachments-dialog-attachment.ui"
-        >build/task-list-attachments-dialog-attachment.ui</file>
+        >.build/task-list-attachments-dialog-attachment.ui</file>
     <file
             preprocess="xml-stripblanks"
             compressed="true"
             alias="task-list-sort-dialog.ui"
-        >build/task-list-sort-dialog.ui</file>
+        >.build/task-list-sort-dialog.ui</file>
     <file
             preprocess="xml-stripblanks"
             compressed="true"
             alias="task-list-color-dialog.ui"
-        >build/task-list-color-dialog.ui</file>
+        >.build/task-list-color-dialog.ui</file>
     <file
             preprocess="xml-stripblanks"
             compressed="true"
             alias="task-list-priority-dialog.ui"
-        >build/task-list-priority-dialog.ui</file>
+        >.build/task-list-priority-dialog.ui</file>
     <file
             preprocess="xml-stripblanks"
             compressed="true"
             alias="task-list-notes-dialog.ui"
-        >build/task-list-notes-dialog.ui</file>
+        >.build/task-list-notes-dialog.ui</file>
     <file
             preprocess="xml-stripblanks"
             compressed="true"
             alias="task-list-tags-dialog.ui"
-        >build/task-list-tags-dialog.ui</file>
+        >.build/task-list-tags-dialog.ui</file>
     <file
             preprocess="xml-stripblanks"
             compressed="true"
             alias="task-list-tags-dialog-tag.ui"
-        >build/task-list-tags-dialog-tag.ui</file>
+        >.build/task-list-tags-dialog-tag.ui</file>
     <file
             preprocess="xml-stripblanks"
             compressed="true"
             alias="task-list-date-dialog.ui"
-        >build/task-list-date-dialog.ui</file>
+        >.build/task-list-date-dialog.ui</file>
     <file
             preprocess="xml-stripblanks"
             compressed="true"
             alias="task-list-date-dialog-date-chooser.ui"
-        >build/task-list-date-dialog-date-chooser.ui</file>
+        >.build/task-list-date-dialog-date-chooser.ui</file>
     <file
             preprocess="xml-stripblanks"
             compressed="true"
             alias="task-list-date-dialog-time-chooser.ui"
-        >build/task-list-date-dialog-time-chooser.ui</file>
+        >.build/task-list-date-dialog-time-chooser.ui</file>
     <file
             preprocess="xml-stripblanks"
             compressed="true"
             alias="task-list-date-dialog-rrule-row.ui"
-        >build/task-list-date-dialog-rrule-row.ui</file>
+        >.build/task-list-date-dialog-rrule-row.ui</file>
   </gresource>
 
   <!-- ICONS -->

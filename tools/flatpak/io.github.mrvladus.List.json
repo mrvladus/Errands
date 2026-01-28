@@ -52,11 +52,12 @@
       "buildsystem": "cmake",
       "config-opts": [
         "-DCMAKE_BUILD_TYPE=Release",
-        "-DLIBICAL_BUILD_DOCS=False",
-        "-DLIBICAL_GLIB=False",
-        "-DLIBICAL_GLIB_BUILD_DOCS=False",
-        "-DLIBICAL_CXX_BINDINGS=False",
-        "-DLIBICAL_JAVA_BINDINGS=False",
+        "-DWITH_CXX_BINDINGS=False",
+        "-DGOBJECT_INTROSPECTION=False",
+        "-DICAL_BUILD_DOCS=False",
+        "-DICAL_GLIB=False",
+        "-DENABLE_GTK_DOC=False",
+        "-DLIBICAL_BUILD_TESTING=False",
         "-DLIBICAL_BUILD_EXAMPLES=False"
       ],
       "sources": [
