@@ -7,6 +7,11 @@
             compressed="true"
             alias="style-dark.css"
         >data/styles/style-dark.css</file>
+    <file
+            preprocess="xml-stripblanks"
+            compressed="true"
+            alias="shortcuts-dialog.ui"
+        >.build/shortcuts-dialog.ui</file>
   </gresource>
 
   <!-- UI -->
@@ -140,6 +145,11 @@
             compressed="true"
             alias="io.github.mrvladus.List-symbolic.svg"
         >data/icons/io.github.mrvladus.List-symbolic.svg</file>
+    <file
+            preprocess="xml-stripblanks"
+            compressed="true"
+            alias="errands-menu-symbolic.svg"
+        >data/icons/errands-menu-symbolic.svg</file>
     <file
             preprocess="xml-stripblanks"
             compressed="true"

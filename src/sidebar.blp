@@ -2,7 +2,7 @@ using Gtk 4.0;
 using Adw 1;
 
 menu add_menu {
-  item (_("Import .ics"), "sidebar.import")
+  item (_("Import \".ics\""), "sidebar.import")
 }
 
 menu main_menu {
@@ -12,6 +12,7 @@ menu main_menu {
 
   section {
     item (_("Preferences"), "sidebar.preferences")
+    item (_("Shortcuts"), "app.shortcuts")
     item (_("About Errands"), "sidebar.about")
   }
 }
@@ -29,7 +30,7 @@ template $ErrandsSidebar: Adw.Bin {
       [start]
       Adw.SplitButton add_btn {
         icon-name: "errands-add-symbolic";
-        tooltip-text: _("Create Task List (Ctrl+Shift+L)");
+        tooltip-text: _("Create Task List (Shift+Ctrl+L)");
         menu-model: add_menu;
         action-name: "sidebar.new_list";
 
@@ -50,8 +51,10 @@ template $ErrandsSidebar: Adw.Bin {
 
       [end]
       MenuButton {
-        icon-name: "open-menu-symbolic";
+        icon-name: "errands-menu-symbolic";
         menu-model: main_menu;
+        primary: true;
+        tooltip-text: _("Main Menu (F10)");
 
         ShortcutController {
           scope: global;

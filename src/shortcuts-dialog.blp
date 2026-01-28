@@ -1,0 +1,61 @@
+using Gtk 4.0;
+using Adw 1;
+
+Adw.ShortcutsDialog shortcuts_dialog {
+  Adw.ShortcutsSection {
+    title: _("General");
+
+    Adw.ShortcutsItem {
+      title: _("Preferences");
+      accelerator: "<Control>comma";
+    }
+
+    Adw.ShortcutsItem {
+      title: _("Open Menu");
+      accelerator: "F10";
+    }
+
+    Adw.ShortcutsItem {
+      title: _("Close Window");
+      accelerator: "<Control>W";
+    }
+
+    Adw.ShortcutsItem {
+      title: _("Quit");
+      accelerator: "<Control>Q";
+    }
+  }
+
+  Adw.ShortcutsSection {
+    title: _("Task List");
+
+    Adw.ShortcutsItem {
+      title: _("Create Task List");
+      accelerator: "<Control><Shift>L";
+    }
+
+    Adw.ShortcutsItem {
+      title: _("Import Task List");
+      accelerator: "<Control><Shift>I";
+    }
+
+    Adw.ShortcutsItem {
+      title: _("Sorting and Filtering Options");
+      accelerator: "<Control><Shift>F";
+    }
+
+    Adw.ShortcutsItem {
+      title: _("Search");
+      accelerator: "<Control>F";
+    }
+  }
+
+  Adw.ShortcutsSection {
+    title: _("Sync");
+
+    Adw.ShortcutsItem {
+      title: _("Sync Now");
+      accelerator: "<Control><Shift>S";
+    }
+  }
+}
