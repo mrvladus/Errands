@@ -71,8 +71,8 @@ DEPS = $(OBJS:.o=.d)
 
 # --- Compilation variables --- #
 
-CC = gcc
 PKG_CONFIG_LIBS = libadwaita-1 gtksourceview-5 libical libportal-gtk4 libcurl libsecret-1
+
 LDFLAGS    ?=
 ALL_LDFLAGS = $(LDFLAGS) `pkg-config --libs $(PKG_CONFIG_LIBS)`
 CFLAGS     ?=
