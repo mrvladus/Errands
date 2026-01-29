@@ -5,7 +5,7 @@ VERSION = 49.0
 
 # --- Configuration options --- #
 
-# Pass them to make command like this: `make OPTION=VALUE`.
+# Pass them to `make` command like this: `make OPTION=VALUE`.
 
 # Development mode: TRUE, FALSE. Default: FALSE.
 # This option will set development APP_ID and change runtime directories and app icons.
