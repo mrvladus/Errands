@@ -8,8 +8,6 @@
 #include "utils.h"
 
 #include <glib/gi18n.h>
-#include <libical/ical.h>
-#include <unistd.h>
 
 static size_t tasks_stack_size = 0, current_start = 0;
 static GPtrArray *current_task_list = NULL;
@@ -17,11 +15,11 @@ static const char *search_query = NULL;
 static ErrandsTask *measuring_task = NULL;
 static double scroll_position = 0.0f;
 
-static void on_task_list_entry_activated_cb(ErrandsTaskList *self, AdwEntryRow *entry);
+static void on_task_list_entry_activated_cb(ErrandsTaskList *self, GtkEntry *entry);
 static void on_task_list_search_cb(ErrandsTaskList *self, GtkSearchEntry *entry);
-// static void on_date_btn_clicked_cb(ErrandsTaskList *self, GtkButton *btn);
 static void on_adjustment_value_changed_cb(GtkAdjustment *adj, ErrandsTaskList *self);
 static void on_motion_cb(GtkEventControllerMotion *ctrl, gdouble x, gdouble y, ErrandsTaskList *self);
+static void on_focus_entry_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
 
 // ---------- WIDGET TEMPLATE ---------- //
 
@@ -59,11 +57,9 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
 }
 
 static void errands_task_list_init(ErrandsTaskList *self) {
-  g_type_ensure(ERRANDS_TYPE_TASK_LIST_DATE_DIALOG_DATE_CHOOSER);
-  g_type_ensure(ERRANDS_TYPE_TASK_LIST_DATE_DIALOG_TIME_CHOOSER);
-  g_type_ensure(ERRANDS_TYPE_TASK_LIST_DATE_DIALOG_RRULE_ROW);
   LOG("Task List: Create");
   gtk_widget_init_template(GTK_WIDGET(self));
+  errands_add_actions(GTK_WIDGET(self), "task-list", "focus-entry", on_focus_entry_action_cb, self, NULL);
   gtk_search_bar_connect_entry(GTK_SEARCH_BAR(self->search_bar), GTK_EDITABLE(self->search_entry));
   measuring_task = errands_task_new();
   // Get maximum monitor height
@@ -254,6 +250,10 @@ static void on_motion_cb(GtkEventControllerMotion *ctrl, gdouble x, gdouble y, E
   self->y = y;
 }
 
+static void on_focus_entry_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
+  gtk_widget_grab_focus(GTK_WIDGET(self->entry));
+}
+
 // ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_task_list_update_title(ErrandsTaskList *self) {
@@ -357,7 +357,7 @@ void errands_task_list_reload(ErrandsTaskList *self, bool save_scroll_pos) {
 
 // ---------- CALLBACKS ---------- //
 
-static void on_task_list_entry_activated_cb(ErrandsTaskList *self, AdwEntryRow *entry) {
+static void on_task_list_entry_activated_cb(ErrandsTaskList *self, GtkEntry *entry) {
   if (!self->data) return;
   const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
   const char *list_uid = self->data->uid;
