@@ -1,4 +1,5 @@
 #include "task-list.h"
+#include "adwaita.h"
 #include "data.h"
 #include "gtk/gtk.h"
 #include "settings.h"
@@ -41,6 +42,7 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, search_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, search_bar);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, search_entry);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, entry_box);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, entry);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, adj);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, task_menu);
@@ -49,7 +51,6 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, top_spacer);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, task_list);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_list_sort_dialog_show);
-  // gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_date_btn_clicked_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_entry_activated_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_search_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_adjustment_value_changed_cb);
@@ -312,30 +313,33 @@ void errands_task_list_show_today_tasks(ErrandsTaskList *self) {
   LOG("Task List: Show today tasks");
   self->data = NULL;
   self->page = ERRANDS_TASK_LIST_PAGE_TODAY;
-  gtk_widget_set_visible(self->entry, false);
+  gtk_widget_set_visible(self->entry_box, false);
   errands_task_list_reload(self, false);
+  LOG("VISIBLE: %d", gtk_widget_get_visible(self->entry_box));
 }
 
 void errands_task_list_show_all_tasks(ErrandsTaskList *self) {
   LOG("Task List: Show all tasks");
   self->data = NULL;
   self->page = ERRANDS_TASK_LIST_PAGE_ALL;
-  gtk_widget_set_visible(self->entry, false);
+  gtk_widget_set_visible(self->entry_box, false);
   errands_task_list_reload(self, false);
+  LOG("VISIBLE: %d", gtk_widget_get_visible(self->entry_box));
 }
 
 void errands_task_list_show_task_list(ErrandsTaskList *self, ListData *data) {
   self->data = data;
   self->page = ERRANDS_TASK_LIST_PAGE_TASK_LIST;
-  if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(self->search_btn))) gtk_widget_set_visible(self->entry, true);
+  gtk_widget_set_visible(self->entry_box, true);
   errands_task_list_reload(self, false);
+  LOG("VISIBLE: %d", gtk_widget_get_visible(self->entry_box));
 }
 
 void errands_task_list_show_pinned(ErrandsTaskList *self) {
   LOG("Task List: Show pinned");
   self->data = NULL;
   self->page = ERRANDS_TASK_LIST_PAGE_PINNED;
-  gtk_widget_set_visible(self->entry, false);
+  gtk_widget_set_visible(self->entry_box, false);
   errands_task_list_reload(self, false);
 }
 
@@ -378,9 +382,3 @@ static void on_task_list_search_cb(ErrandsTaskList *self, GtkSearchEntry *entry)
   LOG("Search query changed to '%s'", search_query);
   errands_task_list_reload(self, false);
 }
-
-// static void on_date_btn_clicked_cb(ErrandsTaskList *self, GtkButton *btn) {
-//   const char *text = gtk_editable_get_text(GTK_EDITABLE(self->entry));
-//   if (!text || STR_EQUAL(text, "")) return;
-//   // errands_task_list_date_dialog_show(NULL);
-// }

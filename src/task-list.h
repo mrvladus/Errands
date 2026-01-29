@@ -153,6 +153,7 @@ struct _ErrandsTaskList {
   GtkWidget *search_btn;
   GtkWidget *search_bar;
   GtkWidget *search_entry;
+  GtkWidget *entry_box;
   GtkWidget *entry;
   ErrandsTaskMenu *task_menu;
   GtkWidget *scrl;

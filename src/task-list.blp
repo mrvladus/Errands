@@ -53,28 +53,42 @@ template $ErrandsTaskList: Adw.Bin {
     }
 
     [bottom]
-    Entry entry {
-      placeholder-text: _("New Task");
-      tooltip-text: _("Add New Task (Ctrl+T)");
+    Box entry_box {
       margin-start: 12;
       margin-end: 12;
       margin-top: 8;
       margin-bottom: 8;
-      height-request: 46;
-      activate => $on_task_list_entry_activated_cb(template);
+      spacing: 8;
 
-      styles [
-        "card",
-      ]
+      Entry entry {
+        placeholder-text: _("New Task");
+        tooltip-text: _("Add New Task (Ctrl+T)");
+        height-request: 46;
+        hexpand: true;
+        activate => $on_task_list_entry_activated_cb(template);
 
-      ShortcutController {
-        scope: global;
+        styles [
+          "card",
+        ]
 
-        Shortcut {
-          trigger: "<Control>T";
-          action: "action(task-list.focus-entry)";
+        ShortcutController {
+          scope: global;
+
+          Shortcut {
+            trigger: "<Control>T";
+            action: "action(task-list.focus-entry)";
+          }
         }
       }
+
+      // ToggleButton {
+      //   icon-name: "errands-calendar-symbolic";
+      //   valign: center;
+      //   tooltip-text: _("More Options");
+      //   styles [
+      //     "circular",
+      //   ]
+      // }
     }
 
     content: Box {

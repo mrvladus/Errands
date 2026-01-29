@@ -1,6 +1,2 @@
-build/
-.build/
-.flatpak*/
-.vscode/
-.idea/
-.zed/
+_*/
+.*/

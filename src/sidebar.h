@@ -25,18 +25,6 @@ void errands_sidebar_task_list_row_update(ErrandsSidebarTaskListRow *self);
 ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_get(ListData *data);
 void on_errands_sidebar_task_list_row_activate(GtkListBox *box, ErrandsSidebarTaskListRow *row, gpointer user_data);
 
-// --- SIDEBAR TODAY ROW --- //
-
-#define ERRANDS_TYPE_SIDEBAR_TODAY_ROW (errands_sidebar_today_row_get_type())
-G_DECLARE_FINAL_TYPE(ErrandsSidebarTodayRow, errands_sidebar_today_row, ERRANDS, SIDEBAR_TODAY_ROW, GtkListBoxRow)
-
-struct _ErrandsSidebarTodayRow {
-  GtkListBoxRow parent_instance;
-  GtkLabel *counter;
-};
-
-ErrandsSidebarTodayRow *errands_sidebar_today_row_new();
-
 // --- SIDEBAR DELETE LIST DIALOG --- //
 
 #define ERRANDS_TYPE_SIDEBAR_DELETE_LIST_DIALOG (errands_sidebar_delete_list_dialog_get_type())

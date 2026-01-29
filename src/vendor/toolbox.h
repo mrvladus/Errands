@@ -137,7 +137,7 @@ extern const char *toolbox_log_prefix;
 // Prints 'UNREACHABLE' message and aborts.
 #define UNREACHABLE ABORT("UNREACHABLE")
 // Breakpoint for debugger
-#define BREAKPOINT asm("int3")
+#define BREAKPOINT __asm__("int3")
 // Unused variable
 #define UNUSED(var) (void)(var)
 // Asserts that a condition is true, aborts if false.

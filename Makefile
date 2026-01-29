@@ -3,6 +3,15 @@
 NAME    = errands
 VERSION = 49.0
 
+# --- Project directories --- #
+
+SRC_DIR  = src
+DATA_DIR = data
+
+BUILD_DIR         = _build
+FLATPAK_BUILD_DIR = _flatpak-build
+FLATPAK_REPO_DIR  = _flatpak-repo
+
 # --- Configuration options --- #
 
 # Pass them to `make` command like this: `make OPTION=VALUE`.
@@ -43,15 +52,6 @@ dbusdir         = $(datarootdir)/dbus-1/services
 icondir         = $(datarootdir)/icons/hicolor
 scalableicondir = $(icondir)/scalable/apps
 symbolicicondir = $(icondir)/symbolic/apps
-
-# --- Project directories --- #
-
-SRC_DIR  = src
-DATA_DIR = data
-
-BUILD_DIR         = .build
-FLATPAK_BUILD_DIR = .flatpak-build
-FLATPAK_REPO_DIR  = .flatpak-repo
 
 # --- Resources --- #
 
@@ -162,7 +162,7 @@ distrobox-setup:
 
 # Build and run the application.
 run: all
-	@$(RUN_CMD)
+	$(RUN_CMD)
 
 # Count source lines of code.
 sloc:
