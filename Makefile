@@ -2,18 +2,37 @@
 
 NAME    = errands
 VERSION = 49.0
-APP_ID := io.github.mrvladus.List
+
+# --- Configuration options --- #
+
+# Pass them to make command like this: `make OPTION=VALUE`
 
 # Development mode: TRUE, FALSE. Default: FALSE.
+# This option will set development APP_ID and change runtime directories and app icons
 DEVEL ?= FALSE
 ifeq ($(DEVEL),TRUE)
-	APP_ID := io.github.mrvladus.List.Devel
+	APP_ID = io.github.mrvladus.List.Devel
+else
+	APP_ID = io.github.mrvladus.List
 endif
+
+# Debug mode: GDB, GF2, FALSE
+DEBUG ?= FALSE
+ifeq ($(DEBUG),GDB)
+    RUN_CMD = gdb -q -ex run $(BUILD_DIR)/$(NAME)
+else ifeq ($(DEBUG),GF2)
+    RUN_CMD = gf2 $(BUILD_DIR)/$(NAME)
+else
+	RUN_CMD = $(BUILD_DIR)/$(NAME)
+endif
+
+# Installation prefix directory. Default: /usr/local
+prefix  ?= /usr/local
+# Installation destination directory. Default: not set.
+DESTDIR ?=
 
 # --- Installation directories --- #
 
-DESTDIR        ?=
-prefix         ?= /usr/local
 bindir          = $(prefix)/bin
 datarootdir     = $(prefix)/share
 localedir       = $(datarootdir)/locale
@@ -135,15 +154,6 @@ flatpak-bundle: $(FLATPAK_BUILD_DIR) | $(BUILD_DIR)
 
 # --- Development targets --- #
 
-RUN_CMD := $(BUILD_DIR)/$(NAME)
-
-# Debug mode: GDB, GF2, FALSE
-DEBUG ?= FALSE
-ifeq ($(DEBUG),GDB)
-    RUN_CMD := gdb -q -ex run $(RUN_CMD)
-else ifeq ($(DEBUG),GF2)
-    RUN_CMD := gf2 $(RUN_CMD)
-endif
 
 # Build and run the application
 run: all
