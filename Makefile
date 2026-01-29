@@ -5,10 +5,10 @@ VERSION = 49.0
 
 # --- Configuration options --- #
 
-# Pass them to make command like this: `make OPTION=VALUE`
+# Pass them to make command like this: `make OPTION=VALUE`.
 
 # Development mode: TRUE, FALSE. Default: FALSE.
-# This option will set development APP_ID and change runtime directories and app icons
+# This option will set development APP_ID and change runtime directories and app icons.
 DEVEL ?= FALSE
 ifeq ($(DEVEL),TRUE)
 	APP_ID = io.github.mrvladus.List.Devel
@@ -16,7 +16,8 @@ else
 	APP_ID = io.github.mrvladus.List
 endif
 
-# Debug mode: GDB, GF2, FALSE
+# Debug mode: GDB, GF2, FALSE.
+# Run errands in the debugger.
 DEBUG ?= FALSE
 ifeq ($(DEBUG),GDB)
     RUN_CMD = gdb -q -ex run $(BUILD_DIR)/$(NAME)
@@ -26,7 +27,8 @@ else
 	RUN_CMD = $(BUILD_DIR)/$(NAME)
 endif
 
-# Installation prefix directory. Default: /usr/local
+# Installation prefix directory. Default: /usr/local.
+# For Flatpak builds, set `prefix=/app`.
 prefix  ?= /usr/local
 # Installation destination directory. Default: not set.
 DESTDIR ?=
@@ -155,11 +157,11 @@ flatpak-bundle: $(FLATPAK_BUILD_DIR) | $(BUILD_DIR)
 # --- Development targets --- #
 
 
-# Build and run the application
+# Build and run the application.
 run: all
 	@$(RUN_CMD)
 
-# Count source lines of code
+# Count source lines of code.
 sloc:
 	@find $(SRC_DIR) -name '*.c' -o -name '*.h' | sort | xargs wc -l
 
