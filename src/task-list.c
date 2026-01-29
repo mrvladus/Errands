@@ -1,7 +1,5 @@
 #include "task-list.h"
-#include "adwaita.h"
 #include "data.h"
-#include "gtk/gtk.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "sync.h"
@@ -16,10 +14,13 @@ static const char *search_query = NULL;
 static ErrandsTask *measuring_task = NULL;
 static double scroll_position = 0.0f;
 
+static int __get_tasks_stack_size();
+
 static void on_task_list_entry_activated_cb(ErrandsTaskList *self, GtkEntry *entry);
 static void on_task_list_search_cb(ErrandsTaskList *self, GtkSearchEntry *entry);
 static void on_adjustment_value_changed_cb(GtkAdjustment *adj, ErrandsTaskList *self);
 static void on_motion_cb(GtkEventControllerMotion *ctrl, gdouble x, gdouble y, ErrandsTaskList *self);
+
 static void on_focus_entry_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
 
 // ---------- WIDGET TEMPLATE ---------- //
@@ -63,25 +64,14 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   errands_add_actions(GTK_WIDGET(self), "task-list", "focus-entry", on_focus_entry_action_cb, self, NULL);
   gtk_search_bar_connect_entry(GTK_SEARCH_BAR(self->search_bar), GTK_EDITABLE(self->search_entry));
   measuring_task = errands_task_new();
-  // Get maximum monitor height
-  GdkDisplay *display = gdk_display_get_default();
-  GListModel *monitors = gdk_display_get_monitors(display);
-  int max_height = 0;
-  GdkRectangle rect = {0};
-  for_range(i, 0, g_list_model_get_n_items(monitors)) {
-    GdkMonitor *monitor = g_list_model_get_item(monitors, i);
-    gdk_monitor_get_geometry(monitor, &rect);
-    if (rect.height > max_height) max_height = rect.height;
-  }
-  int max_tasks = max_height / (46 + 8);        // Get number of maximum tasks on the screen
-  tasks_stack_size = max_tasks + max_tasks / 2; // Add half of that as margin and set stack size
+  tasks_stack_size = __get_tasks_stack_size();
   // Create Tasks widgets
   for_range(i, 0, tasks_stack_size) {
     ErrandsTask *task = errands_task_new();
     gtk_box_append(GTK_BOX(self->task_list), GTK_WIDGET(task));
     gtk_widget_set_visible(GTK_WIDGET(task), false);
   }
-  LOG("Task List: Created %zu Tasks", tasks_stack_size);
+  LOG("Task List: Created %zu Tasks widgets in the stack", tasks_stack_size);
 }
 
 ErrandsTaskList *errands_task_list_new() { return g_object_new(ERRANDS_TYPE_TASK_LIST, NULL); }
@@ -141,6 +131,21 @@ static int __calculate_height(ErrandsTaskList *self) {
 }
 
 static void __reset_scroll_cb(ErrandsTaskList *self) { gtk_adjustment_set_value(self->adj, 0.0); }
+
+static int __get_tasks_stack_size() {
+  // Get maximum monitor height
+  GdkDisplay *display = gdk_display_get_default();
+  GListModel *monitors = gdk_display_get_monitors(display);
+  int max_height = 0;
+  GdkRectangle rect = {0};
+  for_range(i, 0, g_list_model_get_n_items(monitors)) {
+    GdkMonitor *monitor = g_list_model_get_item(monitors, i);
+    gdk_monitor_get_geometry(monitor, &rect);
+    if (rect.height > max_height) max_height = rect.height;
+  }
+  int max_tasks = max_height / (46 + 8); // Get number of maximum tasks on the screen
+  return max_tasks + max_tasks / 2;      // Add half of that as margin and set stack size
+}
 
 // ---------- TASKS RECYCLER ---------- //
 
