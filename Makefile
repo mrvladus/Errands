@@ -156,6 +156,9 @@ flatpak-bundle: $(FLATPAK_BUILD_DIR) | $(BUILD_DIR)
 
 # --- Development targets --- #
 
+# Setup distrobox environment.
+distrobox-setup:
+	bash tools/distrobox/setup.sh
 
 # Build and run the application.
 run: all
