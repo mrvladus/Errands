@@ -57,11 +57,12 @@ static void on_response_cb(ErrandsSidebarNewListDialog *self, gchar *response, g
   if (STR_EQUAL(response, "create")) {
     ListData *list = errands_list_data_create(generate_uuid4(), gtk_editable_get_text(GTK_EDITABLE(self->entry)), NULL,
                                               generate_hex_as_str(), false, false);
-    g_ptr_array_add(errands_data_lists, list);
-    ErrandsSidebarTaskListRow *row = errands_sidebar_add_task_list(list);
-    g_signal_emit_by_name(row, "activate", NULL);
     LOG("New List Dialog: Create new list: '%s'", list->uid);
     errands_list_data_save(list);
+    g_ptr_array_add(errands_data_lists, list);
+    errands_sidebar_load_lists();
+    ErrandsSidebarTaskListRow *row = errands_sidebar_find_row(list);
+    if (row) g_signal_emit_by_name(row, "activate", NULL);
     errands_sidebar_update_filter_rows();
     errands_sync_create_list(list);
   }

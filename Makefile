@@ -25,10 +25,10 @@ symbolicicondir = $(icondir)/symbolic/apps
 
 # --- Project directories --- #
 
-SRC_DIR   = src
-DATA_DIR  = data
+SRC_DIR  = src
+DATA_DIR = data
 
-BUILD_DIR = .build
+BUILD_DIR         = .build
 FLATPAK_BUILD_DIR = .flatpak-build
 FLATPAK_REPO_DIR  = .flatpak-repo
 
@@ -124,7 +124,7 @@ uninstall:
 
 # --- Flatpak targets --- #
 
-$(FLATPAK_BUILD_DIR):
+$(FLATPAK_BUILD_DIR): $(OBJS)
 	flatpak-builder --ccache --force-clean --repo=$(FLATPAK_REPO_DIR) $@ tools/flatpak/$(APP_ID).json
 
 flatpak-run: $(FLATPAK_BUILD_DIR)

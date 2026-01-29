@@ -1,7 +1,6 @@
 #include "sidebar.h"
 #include "about-dialog.h"
 #include "data.h"
-#include "gtk/gtk.h"
 #include "settings-dialog.h"
 #include "settings.h"
 #include "state.h"
@@ -59,9 +58,18 @@ ErrandsSidebar *errands_sidebar_new() { return g_object_new(ERRANDS_TYPE_SIDEBAR
 
 // ---------- PUBLIC FUNCTIONS ---------- //
 
+static gint __sort_func(gconstpointer a, gconstpointer b) {
+  ListData *ld_a = (ListData *)a;
+  ListData *ld_b = (ListData *)b;
+  g_autofree gchar *folded1 = g_utf8_casefold(errands_data_get_list_name(ld_a->ical), -1);
+  g_autofree gchar *folded2 = g_utf8_casefold(errands_data_get_list_name(ld_b->ical), -1);
+  return g_utf8_collate(folded1, folded2);
+}
+
 void errands_sidebar_load_lists(void) {
   LOG("Sidebar: Create Task List Rows");
   gtk_list_box_remove_all(GTK_LIST_BOX(self->task_lists_box));
+  g_ptr_array_sort_values(errands_data_lists, __sort_func);
   // Add rows
   for (size_t i = 0; i < errands_data_lists->len; i++) {
     ListData *ld = errands_data_lists->pdata[i];
@@ -77,11 +85,13 @@ void errands_sidebar_load_lists(void) {
   LOG("Sidebar: Created %d Task List Rows", errands_data_lists->len);
 }
 
-ErrandsSidebarTaskListRow *errands_sidebar_add_task_list(ListData *data) {
-  LOG("Sidebar: Add task list '%s'", data->uid);
-  ErrandsSidebarTaskListRow *row = errands_sidebar_task_list_row_new(data);
-  gtk_list_box_append(GTK_LIST_BOX(self->task_lists_box), GTK_WIDGET(row));
-  return row;
+ErrandsSidebarTaskListRow *errands_sidebar_find_row(ListData *data) {
+  g_autoptr(GPtrArray) rows = get_children(state.main_window->sidebar->task_lists_box);
+  for_range(i, 0, rows->len) {
+    ErrandsSidebarTaskListRow *row = g_ptr_array_index(rows, i);
+    if (row->data == data) return row;
+  }
+  return NULL;
 }
 
 void errands_sidebar_select_last_opened_page() {
@@ -166,8 +176,9 @@ static void __on_open_finish(GObject *obj, GAsyncResult *res) {
   ListData *data = errands_list_data_load_from_ical(ical_comp, uid, NULL, NULL);
   errands_list_data_save(data);
   g_ptr_array_add(errands_data_lists, data);
-  ErrandsSidebarTaskListRow *row = errands_sidebar_add_task_list(data);
-  g_signal_emit_by_name(row, "activate", NULL);
+  errands_sidebar_load_lists();
+  ErrandsSidebarTaskListRow *row = errands_sidebar_find_row(data);
+  if (row) g_signal_emit_by_name(row, "activate", NULL);
   errands_sync_create_list(data);
 }
 
