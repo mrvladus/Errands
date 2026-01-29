@@ -45,27 +45,37 @@ template $ErrandsTaskList: Adw.Bin {
       key-capture-widget: search_entry;
 
       SearchEntry search_entry {
+        margin-start: 6;
+        margin-end: 6;
+        hexpand: true;
         search-changed => $on_task_list_search_cb(template);
       }
     }
 
-    [top]
-    Adw.Clamp entry_clamp {
+    [bottom]
+    Adw.EntryRow entry {
+      title: _("Add Task");
+      activatable: false;
       margin-start: 12;
       margin-end: 12;
-      visible: bind search_btn.active inverted;
+      margin-top: 12;
+      margin-bottom: 12;
+      entry-activated => $on_task_list_entry_activated_cb(template);
 
-      Adw.EntryRow {
-        title: _("Add Task");
-        activatable: false;
-        margin-top: 5;
-        margin-bottom: 1;
-        entry-activated => $on_task_list_entry_activated_cb(template) not-swapped;
+      styles [
+        "card",
+      ]
 
-        styles [
-          "card",
-        ]
-      }
+      // [suffix]
+      // Button {
+      //   valign: center;
+      //   icon-name: "errands-calendar-symbolic";
+      //   tooltip-text: _("Set Date and Time");
+      //   styles [
+      //     "flat",
+      //   ]
+      //   clicked => $on_date_btn_clicked_cb(template);
+      // }
     }
 
     content: Box {
