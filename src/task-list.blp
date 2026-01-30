@@ -23,6 +23,12 @@ template $ErrandsTaskList: Adw.Bin {
         }
       }
 
+      [start]
+      Button {
+        icon-name: "errands-add-symbolic";
+        clicked => $errands_task_properties_dialog_show();
+      }
+
       [end]
       ToggleButton search_btn {
         icon-name: "errands-search-symbolic";

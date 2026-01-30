@@ -1,0 +1,95 @@
+using Gtk 4.0;
+using GtkSource 5;
+using Adw 1;
+
+template $ErrandsTaskPropertiesDialog: Adw.Dialog {
+  title: _("Properties");
+  content-height: 600;
+  closed => $on_dialog_close_cb(template);
+
+  Adw.ToolbarView tbv {
+    [top]
+    Adw.HeaderBar {}
+
+    content: Adw.ViewStack stack {
+      // Date and Time
+      Adw.ViewStackPage {
+        name: "date";
+        title: _("Date and Time");
+        icon-name: "errands-calendar-symbolic";
+
+        child: Adw.StatusPage {
+          title: _("Hello");
+        };
+      }
+
+      // Notes
+      Adw.ViewStackPage {
+        name: "notes";
+        title: _("Notes");
+        icon-name: "errands-notes-symbolic";
+
+        child: Box {
+          orientation: vertical;
+
+          Separator {}
+
+          ScrolledWindow {
+            vexpand: true;
+
+            GtkSource.View notes_view {
+              top-margin: 6;
+              bottom-margin: 6;
+              right-margin: 6;
+              left-margin: 6;
+              wrap-mode: word;
+
+              buffer: GtkSource.Buffer notes_buffer {};
+            }
+          }
+
+          Separator {}
+        };
+      }
+
+      // Priority
+      Adw.ViewStackPage {
+        name: "priority";
+        title: _("Priority");
+        icon-name: "errands-priority-symbolic";
+
+        child: Adw.StatusPage {
+          title: _("Hello");
+        };
+      }
+
+      // Attachments
+      Adw.ViewStackPage {
+        name: "attachments";
+        title: _("Attachments");
+        icon-name: "errands-attachment-symbolic";
+
+        child: Adw.StatusPage {
+          title: _("Hello");
+        };
+      }
+
+      // Tags
+      Adw.ViewStackPage {
+        name: "tags";
+        title: _("Tags");
+        icon-name: "errands-tag-symbolic";
+
+        child: Adw.StatusPage {
+          title: _("Hello");
+        };
+      }
+    };
+
+    [bottom]
+    Adw.ViewSwitcherBar {
+      reveal: true;
+      stack: stack;
+    }
+  }
+}

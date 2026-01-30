@@ -3,6 +3,7 @@
 #include "settings.h"
 #include "sidebar.h"
 #include "sync.h"
+#include "task-properties-dialog.h"
 #include "task.h"
 #include "utils.h"
 
@@ -52,6 +53,7 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, top_spacer);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, task_list);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_list_sort_dialog_show);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_properties_dialog_show);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_entry_activated_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_search_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_adjustment_value_changed_cb);
@@ -320,7 +322,6 @@ void errands_task_list_show_today_tasks(ErrandsTaskList *self) {
   self->page = ERRANDS_TASK_LIST_PAGE_TODAY;
   gtk_widget_set_visible(self->entry_box, false);
   errands_task_list_reload(self, false);
-  LOG("VISIBLE: %d", gtk_widget_get_visible(self->entry_box));
 }
 
 void errands_task_list_show_all_tasks(ErrandsTaskList *self) {
@@ -329,7 +330,6 @@ void errands_task_list_show_all_tasks(ErrandsTaskList *self) {
   self->page = ERRANDS_TASK_LIST_PAGE_ALL;
   gtk_widget_set_visible(self->entry_box, false);
   errands_task_list_reload(self, false);
-  LOG("VISIBLE: %d", gtk_widget_get_visible(self->entry_box));
 }
 
 void errands_task_list_show_task_list(ErrandsTaskList *self, ListData *data) {
@@ -337,7 +337,6 @@ void errands_task_list_show_task_list(ErrandsTaskList *self, ListData *data) {
   self->page = ERRANDS_TASK_LIST_PAGE_TASK_LIST;
   gtk_widget_set_visible(self->entry_box, true);
   errands_task_list_reload(self, false);
-  LOG("VISIBLE: %d", gtk_widget_get_visible(self->entry_box));
 }
 
 void errands_task_list_show_pinned(ErrandsTaskList *self) {
@@ -349,7 +348,7 @@ void errands_task_list_show_pinned(ErrandsTaskList *self) {
 }
 
 void errands_task_list_reload(ErrandsTaskList *self, bool save_scroll_pos) {
-  // TODO: correct scroll position
+  // FIXME: correct scroll position
   if (!save_scroll_pos) current_start = 0;
   if (current_task_list) g_ptr_array_set_size(current_task_list, 0);
   else current_task_list = g_ptr_array_new();

@@ -94,11 +94,6 @@
     <file
             preprocess="xml-stripblanks"
             compressed="true"
-            alias="task-list-notes-dialog.ui"
-        >_build/task-list-notes-dialog.ui</file>
-    <file
-            preprocess="xml-stripblanks"
-            compressed="true"
             alias="task-list-tags-dialog.ui"
         >_build/task-list-tags-dialog.ui</file>
     <file
@@ -126,6 +121,11 @@
             compressed="true"
             alias="task-list-date-dialog-rrule-row.ui"
         >_build/task-list-date-dialog-rrule-row.ui</file>
+    <file
+            preprocess="xml-stripblanks"
+            compressed="true"
+            alias="task-properties-dialog.ui"
+        >_build/task-properties-dialog.ui</file>
   </gresource>
 
   <!-- ICONS -->

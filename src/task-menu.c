@@ -4,6 +4,7 @@
 #include "state.h"
 #include "sync.h"
 #include "task-list.h"
+#include "task-properties-dialog.h"
 #include "task.h"
 
 #include <glib/gi18n.h>
@@ -168,7 +169,7 @@ static void on_attachments_clicked_cb(ErrandsTaskMenu *self) {
 
 static void on_notes_clicked_cb(ErrandsTaskMenu *self) {
   gtk_popover_popdown(GTK_POPOVER(self));
-  errands_task_list_notes_dialog_show(self->task);
+  gtk_widget_activate_action(GTK_WIDGET(self->task), "task.notes", NULL, NULL);
 }
 
 static void on_priority_clicked_cb(ErrandsTaskMenu *self) {

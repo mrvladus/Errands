@@ -5,6 +5,8 @@
 #include "state.h"
 #include "sync.h"
 #include "task-list.h"
+#include "task-properties-dialog.h"
+#include "utils.h"
 #include "window.h"
 
 #include "vendor/toolbox.h"
@@ -13,6 +15,8 @@
 #include <libical/ical.h>
 
 static GtkWidget *errands_task_tag_new(ErrandsTask *self, const char *tag);
+
+static void on_notes_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 
 // Callbacks
 static void on_complete_btn_toggle_cb(ErrandsTask *self, GtkCheckButton *btn);
@@ -60,7 +64,6 @@ static void errands_task_class_init(ErrandsTaskClass *class) {
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_complete_btn_toggle_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_restore_btn_clicked_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_list_date_dialog_show);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_list_notes_dialog_show);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_list_priority_dialog_show);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_list_tags_dialog_show);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_list_attachments_dialog_show);
@@ -75,7 +78,10 @@ static void errands_task_class_init(ErrandsTaskClass *class) {
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_drop_cb);
 }
 
-static void errands_task_init(ErrandsTask *self) { gtk_widget_init_template(GTK_WIDGET(self)); }
+static void errands_task_init(ErrandsTask *self) {
+  gtk_widget_init_template(GTK_WIDGET(self));
+  errands_add_actions(GTK_WIDGET(self), "task", "notes", on_notes_action_cb, self, NULL);
+}
 
 ErrandsTask *errands_task_new() { return g_object_new(ERRANDS_TYPE_TASK, NULL); }
 
@@ -223,6 +229,12 @@ static GtkWidget *errands_task_tag_new(ErrandsTask *self, const char *tag) {
   g_signal_connect_swapped(button, "clicked", G_CALLBACK(errands_task_list_tags_dialog_show), self);
 
   return button;
+}
+
+// ---------- ACTION CALLBACKS ---------- //
+
+static void on_notes_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
+  errands_task_properties_dialog_show(ERRANDS_TASK_PROPERTY_DIALOG_PAGE_NOTES, self);
 }
 
 // ---------- CALLBACKS ---------- //
