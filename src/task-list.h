@@ -79,15 +79,6 @@ void errands_task_list_date_dialog_time_chooser_set_time(ErrandsTaskListDateDial
                                                          const icaltimetype time);
 void errands_task_list_date_dialog_time_chooser_reset(ErrandsTaskListDateDialogTimeChooser *self);
 
-// --- TASK LIST PRIORITY DIALOG --- //
-
-#define ERRANDS_TYPE_TASK_LIST_PRIORITY_DIALOG (errands_task_list_priority_dialog_get_type())
-G_DECLARE_FINAL_TYPE(ErrandsTaskListPriorityDialog, errands_task_list_priority_dialog, ERRANDS,
-                     TASK_LIST_PRIORITY_DIALOG, AdwDialog)
-
-ErrandsTaskListPriorityDialog *errands_task_list_priority_dialog_new();
-void errands_task_list_priority_dialog_show(ErrandsTask *task);
-
 // --- TASK LIST TAGS DIALOG --- //
 
 #define ERRANDS_TYPE_TASK_LIST_TAGS_DIALOG (errands_task_list_tags_dialog_get_type())
@@ -155,7 +146,6 @@ struct _ErrandsTaskList {
   ErrandsTaskListAttachmentsDialog *attachments_dialog;
   ErrandsTaskListColorDialog *color_dialog;
   ErrandsTaskListDateDialog *date_dialog;
-  ErrandsTaskListPriorityDialog *priority_dialog;
   ErrandsTaskListSortDialog *sort_dialog;
   ErrandsTaskListTagsDialog *tags_dialog;
 

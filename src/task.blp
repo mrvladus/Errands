@@ -151,7 +151,7 @@ template $ErrandsTask: Box {
         icon-name: "errands-priority-set-symbolic";
         tooltip-text: _("Priority");
         valign: center;
-        clicked => $errands_task_list_priority_dialog_show(template);
+        action-name: "task.priority";
       }
 
       Button notes_btn {

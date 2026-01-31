@@ -89,11 +89,6 @@
     <file
             preprocess="xml-stripblanks"
             compressed="true"
-            alias="task-list-priority-dialog.ui"
-        >_build/task-list-priority-dialog.ui</file>
-    <file
-            preprocess="xml-stripblanks"
-            compressed="true"
             alias="task-list-tags-dialog.ui"
         >_build/task-list-tags-dialog.ui</file>
     <file
