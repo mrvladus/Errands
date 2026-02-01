@@ -15,7 +15,7 @@ template $ErrandsTaskPropertiesDialog: Adw.Dialog {
       // Date and Time
       Adw.ViewStackPage {
         name: "date";
-        title: _("Date and Time");
+        title: _("Date");
         icon-name: "errands-calendar-symbolic";
 
         child: Adw.StatusPage {
@@ -60,6 +60,8 @@ template $ErrandsTaskPropertiesDialog: Adw.Dialog {
 
         child: Adw.PreferencesPage {
           Adw.PreferencesGroup {
+            title: _("Preset");
+
             Adw.ActionRow high_row {
               title: C_("Priority level", "High");
               activatable-widget: high_toggle_btn;
@@ -141,8 +143,10 @@ template $ErrandsTaskPropertiesDialog: Adw.Dialog {
           }
 
           Adw.PreferencesGroup {
+            title: _("Custom");
+
             Adw.SpinRow custom_row {
-              title: _("Custom Priority");
+              title: _("Priority");
               subtitle: _("Value in range 0-9");
               climb-rate: 1;
               digits: 0;
@@ -166,8 +170,31 @@ template $ErrandsTaskPropertiesDialog: Adw.Dialog {
         title: _("Attachments");
         icon-name: "errands-attachment-symbolic";
 
-        child: Adw.StatusPage {
-          title: _("Hello");
+        child: Adw.PreferencesPage {
+          Adw.PreferencesGroup {
+            visible: bind attachments.visible inverted;
+
+            Adw.StatusPage {
+              icon-name: "errands-tag-symbolic";
+              title: _("No Attachments");
+              description: _("Click \"+\" button to add new attachment");
+              vexpand: true;
+
+              styles [
+                "compact",
+              ]
+            }
+          }
+
+          Adw.PreferencesGroup {
+            Adw.ButtonRow {
+              title: _("Add");
+              start-icon-name: "errands-add-symbolic";
+              activated => $on_add_attachment_btn_clicked_cb();
+            }
+          }
+
+          Adw.PreferencesGroup attachments {}
         };
       }
 

@@ -5,26 +5,6 @@
 
 #include <adwaita.h>
 
-// --- TASK LIST ATTACHMENTS DIALOG --- //
-
-#define ERRANDS_TYPE_TASK_LIST_ATTACHMENTS_DIALOG (errands_task_list_attachments_dialog_get_type())
-G_DECLARE_FINAL_TYPE(ErrandsTaskListAttachmentsDialog, errands_task_list_attachments_dialog, ERRANDS,
-                     TASK_LIST_ATTACHMENTS_DIALOG, AdwDialog)
-
-ErrandsTaskListAttachmentsDialog *errands_task_list_attachments_dialog_new();
-ErrandsTask *errands_task_list_attachments_dialog_get_task(ErrandsTaskListAttachmentsDialog *self);
-void errands_task_list_attachments_dialog_update_ui(ErrandsTaskListAttachmentsDialog *self);
-void errands_task_list_attachments_dialog_show(ErrandsTask *task);
-
-// --- TASK LIST ATTACHMENTS DIALOG ATTACHMENT --- //
-
-#define ERRANDS_TYPE_TASK_LIST_ATTACHMENTS_DIALOG_ATTACHMENT                                                           \
-  (errands_task_list_attachments_dialog_attachment_get_type())
-G_DECLARE_FINAL_TYPE(ErrandsTaskListAttachmentsDialogAttachment, errands_task_list_attachments_dialog_attachment,
-                     ERRANDS, TASK_LIST_ATTACHMENTS_DIALOG_ATTACHMENT, AdwActionRow)
-
-ErrandsTaskListAttachmentsDialogAttachment *errands_task_list_attachments_dialog_attachment_new(const char *path);
-
 // --- TASK LIST COLOR DIALOG --- //
 
 #define ERRANDS_TYPE_TASK_LIST_COLOR_DIALOG (errands_task_list_color_dialog_get_type())
@@ -143,7 +123,6 @@ struct _ErrandsTaskList {
   GtkWidget *task_list;
   GtkAdjustment *adj;
 
-  ErrandsTaskListAttachmentsDialog *attachments_dialog;
   ErrandsTaskListColorDialog *color_dialog;
   ErrandsTaskListDateDialog *date_dialog;
   ErrandsTaskListSortDialog *sort_dialog;

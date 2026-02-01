@@ -3,7 +3,6 @@
 #include "settings.h"
 #include "sidebar.h"
 #include "sync.h"
-#include "task-properties-dialog.h"
 #include "task.h"
 #include "utils.h"
 
@@ -53,7 +52,6 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, top_spacer);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, task_list);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_list_sort_dialog_show);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_properties_dialog_show);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_entry_activated_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_search_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_adjustment_value_changed_cb);

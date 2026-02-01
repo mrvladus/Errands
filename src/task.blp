@@ -164,7 +164,7 @@ template $ErrandsTask: Box {
       Button attachments_btn {
         tooltip-text: _("Attachments");
         valign: center;
-        clicked => $errands_task_list_attachments_dialog_show(template);
+        action-name: "task.attachments";
 
         Box {
           spacing: 4;

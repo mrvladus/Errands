@@ -1,14 +1,26 @@
 #include "task-properties-dialog.h"
+#include "adwaita.h"
 #include "data.h"
+#include "glib.h"
+#include "gtk/gtk.h"
 #include "state.h"
 #include "sync.h"
 
+#include <glib/gi18n.h>
 #include <gtksourceview/gtksource.h>
-#include <stddef.h>
+
+static GtkWidget *errands_task_properties_dialog_attachment_new(const char *path);
+static void errands_task_properties_dialog_add_attachment(const char *path);
+#define ATTACHMENTS_LIST_BOX                                                                                           \
+  gtk_widget_get_first_child(gtk_widget_get_last_child(gtk_widget_get_first_child(GTK_WIDGET(self->attachments))))
 
 static gboolean on_style_toggled_cb(GBinding *binding, const GValue *from_value, GValue *to_value, gpointer user_data);
 static void on_dialog_close_cb(ErrandsTaskPropertiesDialog *self);
 static void on_priority_toggled_cb(ErrandsTaskPropertiesDialog *self, GtkCheckButton *btn);
+
+static void on_add_attachment_btn_clicked_cb(AdwButtonRow *row);
+static void on_attachment_clicked_cb(GtkListBox *box, AdwActionRow *attachment);
+static void on_attachment_delete_cb(GtkButton *btn, AdwActionRow *attachment);
 
 static ErrandsTaskPropertiesDialog *self = NULL;
 static char *page_names[] = {"date", "notes", "priority", "attachments", "tags"};
@@ -28,6 +40,8 @@ struct _ErrandsTaskPropertiesDialog {
   AdwActionRow *low_row;
   AdwActionRow *none_row;
   AdwSpinRow *custom_row;
+  // Attachments
+  AdwPreferencesGroup *attachments;
 
   ErrandsTask *task;
 };
@@ -52,8 +66,10 @@ static void errands_task_properties_dialog_class_init(ErrandsTaskPropertiesDialo
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, low_row);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, none_row);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, custom_row);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, attachments);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_dialog_close_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_priority_toggled_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_add_attachment_btn_clicked_cb);
 }
 
 static void errands_task_properties_dialog_init(ErrandsTaskPropertiesDialog *dialog) {
@@ -93,13 +109,63 @@ void errands_task_properties_dialog_show(ErrandsTaskPropertiesDialogPage page, E
   if (page_n == ERRANDS_TASK_PROPERTY_DIALOG_PAGE_NOTES) gtk_widget_grab_focus(GTK_WIDGET(self->notes_view));
 
   // Priority
-  const size_t priority = errands_data_get_priority(task->data->ical);
+  const int priority = errands_data_get_priority(task->data->ical);
   if (priority == 0) adw_action_row_activate(self->none_row);
   else if (priority == 1) adw_action_row_activate(self->low_row);
   else if (priority > 1 && priority < 6) adw_action_row_activate(self->medium_row);
   else if (priority > 5) adw_action_row_activate(self->high_row);
 
+  // Attachments
+  GtkWidget *box = ATTACHMENTS_LIST_BOX;
+  gtk_list_box_remove_all(GTK_LIST_BOX(box));
+  g_auto(GStrv) attachments = errands_data_get_attachments(task->data->ical);
+  if (attachments)
+    for (size_t i = 0; i < g_strv_length(attachments); i++) {
+      GtkWidget *attachment = errands_task_properties_dialog_attachment_new(attachments[i]);
+      gtk_list_box_append(GTK_LIST_BOX(box), GTK_WIDGET(attachment));
+    }
+  gtk_widget_set_visible(GTK_WIDGET(self->attachments), attachments && g_strv_length(attachments) > 0);
+
   adw_dialog_present(ADW_DIALOG(self), GTK_WIDGET(state.main_window));
+}
+
+// ---------- PRIVATE FUNCTIONS ---------- //
+
+// --- ATTACHMENTS --- //
+
+static GtkWidget *errands_task_properties_dialog_attachment_new(const char *path) {
+  GtkWidget *attachment = adw_action_row_new();
+  GtkWidget *btn = gtk_button_new_from_icon_name("errands-trash-symbolic");
+  gtk_widget_set_tooltip_text(btn, _("Remove Attachment"));
+  gtk_widget_add_css_class(btn, "error");
+  gtk_widget_add_css_class(btn, "flat");
+  gtk_widget_set_valign(btn, GTK_ALIGN_CENTER);
+  g_signal_connect(btn, "clicked", G_CALLBACK(on_attachment_delete_cb), attachment);
+  adw_action_row_add_suffix(ADW_ACTION_ROW(attachment), btn);
+  g_autofree gchar *basename = g_path_get_basename(path);
+  adw_action_row_set_subtitle(ADW_ACTION_ROW(attachment), path);
+  adw_preferences_row_set_title(ADW_PREFERENCES_ROW(attachment), basename);
+  g_signal_connect(attachment, "activated", G_CALLBACK(on_attachment_clicked_cb), attachment);
+
+  return attachment;
+}
+
+static void errands_task_properties_dialog_add_attachment(const char *path) {
+  // Get current attachments
+  g_auto(GStrv) cur_attachments = errands_data_get_attachments(self->task->data->ical);
+  // If already contains - return
+  if (cur_attachments && g_strv_contains((const gchar *const *)cur_attachments, path)) return;
+  // Add attachment
+  g_autoptr(GStrvBuilder) builder = g_strv_builder_new();
+  if (cur_attachments) g_strv_builder_addv(builder, (const char **)cur_attachments);
+  g_strv_builder_add(builder, path);
+  g_auto(GStrv) attachments = g_strv_builder_end(builder);
+  errands_data_set_attachments(self->task->data->ical, attachments);
+  errands_list_data_save(self->task->data->list);
+  GtkWidget *attachment = errands_task_properties_dialog_attachment_new(path);
+  gtk_list_box_append(GTK_LIST_BOX(ATTACHMENTS_LIST_BOX), attachment);
+  gtk_widget_set_visible(GTK_WIDGET(self->attachments), true);
+  errands_sync_update_task(self->task->data);
 }
 
 // ---------- CALLBACKS ---------- //
@@ -114,7 +180,7 @@ static void on_dialog_close_cb(ErrandsTaskPropertiesDialog *self) {
   gtk_text_buffer_get_end_iter(GTK_TEXT_BUFFER(self->notes_buffer), &end);
   g_autofree char *text = gtk_text_buffer_get_text(GTK_TEXT_BUFFER(self->notes_buffer), &start, &end, FALSE);
   const char *notes = errands_data_get_notes(data->ical);
-  if (text && (!notes || !STR_EQUAL(text, notes))) {
+  if (text && (!notes || !g_str_equal(text, notes))) {
     errands_data_set_notes(data->ical, text);
     changed = true;
   }
@@ -140,6 +206,8 @@ static void on_dialog_close_cb(ErrandsTaskPropertiesDialog *self) {
   }
 }
 
+// --- NOTES --- //
+
 static gboolean on_style_toggled_cb(GBinding *binding, const GValue *from_value, GValue *to_value, gpointer user_data) {
   if (!self) return false;
   GtkSourceStyleSchemeManager *style_scheme_mgr = gtk_source_style_scheme_manager_get_default();
@@ -150,13 +218,52 @@ static gboolean on_style_toggled_cb(GBinding *binding, const GValue *from_value,
   return false;
 }
 
+// --- PRIORITY --- //
+
 static void on_priority_toggled_cb(ErrandsTaskPropertiesDialog *self, GtkCheckButton *btn) {
   if (!gtk_check_button_get_active(btn)) return;
   const char *name = gtk_widget_get_name(GTK_WIDGET(btn));
   uint8_t val = 0;
-  if (STR_EQUAL(name, "none")) val = 0;
-  else if (STR_EQUAL(name, "low")) val = 1;
-  else if (STR_EQUAL(name, "medium")) val = 5;
-  else if (STR_EQUAL(name, "high")) val = 9;
+  if (g_str_equal(name, "none")) val = 0;
+  else if (g_str_equal(name, "low")) val = 1;
+  else if (g_str_equal(name, "medium")) val = 5;
+  else if (g_str_equal(name, "high")) val = 9;
   adw_spin_row_set_value(self->custom_row, val);
+}
+
+// --- ATTACHMENTS --- //
+
+static void __on_attachment_open_finish(GObject *obj, GAsyncResult *res, gpointer data) {
+  g_autoptr(GFile) file = gtk_file_dialog_open_finish(GTK_FILE_DIALOG(obj), res, NULL);
+  if (!file) return;
+  GFileInfo *info = g_file_query_info(file, "xattr::document-portal.host-path", G_FILE_QUERY_INFO_NONE, NULL, NULL);
+  const char *real_path = g_file_info_get_attribute_as_string(info, "xattr::document-portal.host-path");
+  g_autofree char *path = g_file_get_path(file);
+  errands_task_properties_dialog_add_attachment(real_path ? real_path : path);
+}
+
+static void on_add_attachment_btn_clicked_cb(AdwButtonRow *row) {
+  g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
+  gtk_file_dialog_open(dialog, GTK_WINDOW(state.main_window), NULL, __on_attachment_open_finish, NULL);
+}
+
+static void on_attachment_clicked_cb(GtkListBox *box, AdwActionRow *attachment) {
+  g_autoptr(GFile) file = g_file_new_for_path(adw_action_row_get_subtitle(attachment));
+  g_autoptr(GtkFileLauncher) l = gtk_file_launcher_new(file);
+  gtk_file_launcher_launch(l, GTK_WINDOW(state.main_window), NULL, NULL, NULL);
+}
+
+static void on_attachment_delete_cb(GtkButton *btn, AdwActionRow *attachment) {
+  ErrandsTask *task = self->task;
+  g_auto(GStrv) cur_attachments = errands_data_get_attachments(task->data->ical);
+  g_autoptr(GStrvBuilder) builder = g_strv_builder_new();
+  for (size_t i = 0; i < g_strv_length(cur_attachments); i++)
+    if (!g_str_equal(cur_attachments[i], adw_action_row_get_subtitle(attachment)))
+      g_strv_builder_add(builder, cur_attachments[i]);
+  g_auto(GStrv) attachments = g_strv_builder_end(builder);
+  errands_data_set_attachments(task->data->ical, attachments);
+  errands_list_data_save(task->data->list);
+  gtk_list_box_remove(GTK_LIST_BOX(ATTACHMENTS_LIST_BOX), GTK_WIDGET(attachment));
+  gtk_widget_set_visible(GTK_WIDGET(self->attachments), g_strv_length(attachments) > 0);
+  errands_sync_update_task(task->data);
 }

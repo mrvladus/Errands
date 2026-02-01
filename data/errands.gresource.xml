@@ -69,16 +69,6 @@
     <file
             preprocess="xml-stripblanks"
             compressed="true"
-            alias="task-list-attachments-dialog.ui"
-        >_build/task-list-attachments-dialog.ui</file>
-    <file
-            preprocess="xml-stripblanks"
-            compressed="true"
-            alias="task-list-attachments-dialog-attachment.ui"
-        >_build/task-list-attachments-dialog-attachment.ui</file>
-    <file
-            preprocess="xml-stripblanks"
-            compressed="true"
             alias="task-list-sort-dialog.ui"
         >_build/task-list-sort-dialog.ui</file>
     <file

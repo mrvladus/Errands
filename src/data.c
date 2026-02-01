@@ -578,7 +578,7 @@ int errands_data_get_percent(icalcomponent *ical) {
 }
 int errands_data_get_priority(icalcomponent *ical) {
   icalproperty *property = icalcomponent_get_first_property(ical, ICAL_PRIORITY_PROPERTY);
-  return property ? icalproperty_get_percentcomplete(property) : 0;
+  return property ? icalproperty_get_priority(property) : 0;
 }
 
 void errands_data_set_percent(icalcomponent *ical, int value) {
@@ -591,7 +591,7 @@ void errands_data_set_percent(icalcomponent *ical, int value) {
 void errands_data_set_priority(icalcomponent *ical, int value) {
   icalproperty *property = icalcomponent_get_first_property(ical, ICAL_PRIORITY_PROPERTY);
   if (property) icalproperty_set_percentcomplete(property, value);
-  else icalcomponent_add_property(ical, icalproperty_new_percentcomplete(value));
+  else icalcomponent_add_property(ical, icalproperty_new_priority(value));
   errands_data_set_synced(ical, false);
   errands_data_set_changed(ical, icaltime_get_date_time_now());
 }
