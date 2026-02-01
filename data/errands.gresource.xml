@@ -74,11 +74,6 @@
     <file
             preprocess="xml-stripblanks"
             compressed="true"
-            alias="task-list-color-dialog.ui"
-        >_build/task-list-color-dialog.ui</file>
-    <file
-            preprocess="xml-stripblanks"
-            compressed="true"
             alias="task-list-date-dialog.ui"
         >_build/task-list-date-dialog.ui</file>
     <file

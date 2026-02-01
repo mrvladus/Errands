@@ -17,6 +17,110 @@ template $ErrandsTaskMenu: Popover {
       margin-end: 6;
       margin-top: 6;
       margin-bottom: 6;
+      // Color
+      FlowBox color_box {
+        max-children-per-line: 4;
+        selection-mode: none;
+        hexpand: true;
+
+        CheckButton color_none {
+          name: "none";
+          tooltip-text: _("No Color");
+          toggled => $on_color_toggle_cb(template);
+
+          styles [
+            "accent-color-btn",
+            "accent-color-btn-none",
+          ]
+        }
+
+        CheckButton {
+          name: "blue";
+          group: color_none;
+          tooltip-text: _("Blue");
+          toggled => $on_color_toggle_cb(template);
+
+          styles [
+            "accent-color-btn",
+            "accent-color-btn-blue",
+          ]
+        }
+
+        CheckButton {
+          name: "green";
+          group: color_none;
+          tooltip-text: _("Green");
+          toggled => $on_color_toggle_cb(template);
+
+          styles [
+            "accent-color-btn",
+            "accent-color-btn-green",
+          ]
+        }
+
+        CheckButton {
+          name: "yellow";
+          group: color_none;
+          tooltip-text: _("Yellow");
+          toggled => $on_color_toggle_cb(template);
+
+          styles [
+            "accent-color-btn",
+            "accent-color-btn-yellow",
+          ]
+        }
+
+        CheckButton {
+          name: "orange";
+          group: color_none;
+          tooltip-text: _("Orange");
+          toggled => $on_color_toggle_cb(template);
+
+          styles [
+            "accent-color-btn",
+            "accent-color-btn-orange",
+          ]
+        }
+
+        CheckButton {
+          name: "red";
+          group: color_none;
+          tooltip-text: _("Red");
+          toggled => $on_color_toggle_cb(template);
+
+          styles [
+            "accent-color-btn",
+            "accent-color-btn-red",
+          ]
+        }
+
+        CheckButton {
+          name: "purple";
+          group: color_none;
+          tooltip-text: _("Purple");
+          toggled => $on_color_toggle_cb(template);
+
+          styles [
+            "accent-color-btn",
+            "accent-color-btn-purple",
+          ]
+        }
+
+        CheckButton {
+          name: "brown";
+          group: color_none;
+          tooltip-text: _("Brown");
+          toggled => $on_color_toggle_cb(template);
+
+          styles [
+            "accent-color-btn",
+            "accent-color-btn-brown",
+          ]
+        }
+      }
+
+      Separator {}
+
       // Date and Time
       Button {
         clicked => $on_date_clicked_cb(template);
@@ -123,28 +227,6 @@ template $ErrandsTaskMenu: Popover {
 
           Label {
             label: _("Tags");
-          }
-        }
-      }
-
-      // Color
-      Button {
-        clicked => $on_color_clicked_cb(template);
-
-        styles [
-          "flat",
-          "body",
-        ]
-
-        Box {
-          spacing: 12;
-
-          Image {
-            icon-name: "errands-color-symbolic";
-          }
-
-          Label {
-            label: _("Color");
           }
         }
       }
