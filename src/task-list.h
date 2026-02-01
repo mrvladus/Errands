@@ -59,26 +59,6 @@ void errands_task_list_date_dialog_time_chooser_set_time(ErrandsTaskListDateDial
                                                          const icaltimetype time);
 void errands_task_list_date_dialog_time_chooser_reset(ErrandsTaskListDateDialogTimeChooser *self);
 
-// --- TASK LIST TAGS DIALOG --- //
-
-#define ERRANDS_TYPE_TASK_LIST_TAGS_DIALOG (errands_task_list_tags_dialog_get_type())
-G_DECLARE_FINAL_TYPE(ErrandsTaskListTagsDialog, errands_task_list_tags_dialog, ERRANDS, TASK_LIST_TAGS_DIALOG,
-                     AdwDialog)
-
-ErrandsTaskListTagsDialog *errands_task_list_tags_dialog_new();
-ErrandsTask *errands_task_list_tags_dialog_get_task(ErrandsTaskListTagsDialog *self);
-void errands_task_list_tags_dialog_update_ui(ErrandsTaskListTagsDialog *self);
-void errands_task_list_tags_dialog_show(ErrandsTask *task);
-
-// --- TASK LIST TAGS DIALOG TAG --- //
-
-#define ERRANDS_TYPE_TASK_LIST_TAGS_DIALOG_TAG (errands_task_list_tags_dialog_tag_get_type())
-G_DECLARE_FINAL_TYPE(ErrandsTaskListTagsDialogTag, errands_task_list_tags_dialog_tag, ERRANDS,
-                     TASK_LIST_TAGS_DIALOG_TAG, AdwActionRow)
-
-ErrandsTaskListTagsDialogTag *errands_task_list_tags_dialog_tag_new(ErrandsTaskListTagsDialog *dialog, const char *tag,
-                                                                    ErrandsTask *task);
-
 // --- TASK LIST SORT DIALOG --- //
 
 #define ERRANDS_TYPE_TASK_LIST_SORT_DIALOG (errands_task_list_sort_dialog_get_type())
@@ -126,7 +106,6 @@ struct _ErrandsTaskList {
   ErrandsTaskListColorDialog *color_dialog;
   ErrandsTaskListDateDialog *date_dialog;
   ErrandsTaskListSortDialog *sort_dialog;
-  ErrandsTaskListTagsDialog *tags_dialog;
 
   GtkEventControllerMotion *motion_ctrl;
   gdouble x, y;

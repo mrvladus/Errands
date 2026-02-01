@@ -9,7 +9,16 @@ template $ErrandsTaskPropertiesDialog: Adw.Dialog {
 
   Adw.ToolbarView tbv {
     [top]
-    Adw.HeaderBar {}
+    Adw.HeaderBar {
+      title-widget: Label title {
+        ellipsize: end;
+        max-width-chars: 50;
+
+        styles [
+          "heading",
+        ]
+      };
+    }
 
     content: Adw.ViewStack stack {
       // Date and Time
@@ -204,8 +213,30 @@ template $ErrandsTaskPropertiesDialog: Adw.Dialog {
         title: _("Tags");
         icon-name: "errands-tag-symbolic";
 
-        child: Adw.StatusPage {
-          title: _("Hello");
+        child: Adw.PreferencesPage {
+          Adw.PreferencesGroup {
+            Adw.EntryRow {
+              title: _("New Tag");
+              activatable: false;
+              entry-activated => $on_tag_entry_activated_cb();
+            }
+          }
+
+          Adw.PreferencesGroup {
+            visible: bind tags.visible inverted bidirectional;
+
+            Adw.StatusPage {
+              icon-name: "errands-tag-symbolic";
+              title: _("No Tags");
+              vexpand: true;
+
+              styles [
+                "compact",
+              ]
+            }
+          }
+
+          Adw.PreferencesGroup tags {}
         };
       }
     };

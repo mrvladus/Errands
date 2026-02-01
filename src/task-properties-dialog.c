@@ -1,26 +1,35 @@
 #include "task-properties-dialog.h"
 #include "adwaita.h"
 #include "data.h"
-#include "glib.h"
 #include "gtk/gtk.h"
+#include "settings.h"
 #include "state.h"
 #include "sync.h"
+#include "utils.h"
+
+#include "vendor/toolbox.h"
 
 #include <glib/gi18n.h>
 #include <gtksourceview/gtksource.h>
 
-static GtkWidget *errands_task_properties_dialog_attachment_new(const char *path);
-static void errands_task_properties_dialog_add_attachment(const char *path);
-#define ATTACHMENTS_LIST_BOX                                                                                           \
-  gtk_widget_get_first_child(gtk_widget_get_last_child(gtk_widget_get_first_child(GTK_WIDGET(self->attachments))))
-
-static gboolean on_style_toggled_cb(GBinding *binding, const GValue *from_value, GValue *to_value, gpointer user_data);
 static void on_dialog_close_cb(ErrandsTaskPropertiesDialog *self);
+static gboolean on_style_toggled_cb(GBinding *binding, const GValue *from_value, GValue *to_value, gpointer user_data);
+
 static void on_priority_toggled_cb(ErrandsTaskPropertiesDialog *self, GtkCheckButton *btn);
 
+#define ATTACHMENTS_LIST_BOX                                                                                           \
+  gtk_widget_get_first_child(gtk_widget_get_last_child(gtk_widget_get_first_child(GTK_WIDGET(self->attachments))))
+static GtkWidget *errands_task_properties_dialog_attachment_new(const char *path);
+static void errands_task_properties_dialog_add_attachment(const char *path);
 static void on_add_attachment_btn_clicked_cb(AdwButtonRow *row);
 static void on_attachment_clicked_cb(GtkListBox *box, AdwActionRow *attachment);
 static void on_attachment_delete_cb(GtkButton *btn, AdwActionRow *attachment);
+
+#define TAGS_LIST_BOX                                                                                                  \
+  gtk_widget_get_first_child(gtk_widget_get_last_child(gtk_widget_get_first_child(GTK_WIDGET(self->tags))))
+static void errands_task_properties_dialog_add_tag(const char *tag);
+static void on_tag_entry_activated_cb(AdwEntryRow *entry);
+static void on_tag_delete_cb(GtkButton *btn, AdwActionRow *row);
 
 static ErrandsTaskPropertiesDialog *self = NULL;
 static char *page_names[] = {"date", "notes", "priority", "attachments", "tags"};
@@ -30,6 +39,7 @@ static char *page_names[] = {"date", "notes", "priority", "attachments", "tags"}
 struct _ErrandsTaskPropertiesDialog {
   AdwDialog parent_instance;
   AdwToolbarView *tbv;
+  GtkLabel *title;
   AdwViewStack *stack;
   // Notes
   GtkSourceView *notes_view;
@@ -42,6 +52,8 @@ struct _ErrandsTaskPropertiesDialog {
   AdwSpinRow *custom_row;
   // Attachments
   AdwPreferencesGroup *attachments;
+  // Tags
+  AdwPreferencesGroup *tags;
 
   ErrandsTask *task;
 };
@@ -58,6 +70,7 @@ static void errands_task_properties_dialog_class_init(ErrandsTaskPropertiesDialo
   gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class),
                                               "/io/github/mrvladus/Errands/ui/task-properties-dialog.ui");
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, tbv);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, title);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, stack);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, notes_view);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, notes_buffer);
@@ -67,9 +80,11 @@ static void errands_task_properties_dialog_class_init(ErrandsTaskPropertiesDialo
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, none_row);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, custom_row);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, attachments);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, tags);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_dialog_close_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_priority_toggled_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_add_attachment_btn_clicked_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_tag_entry_activated_cb);
 }
 
 static void errands_task_properties_dialog_init(ErrandsTaskPropertiesDialog *dialog) {
@@ -100,6 +115,9 @@ void errands_task_properties_dialog_show(ErrandsTaskPropertiesDialogPage page, E
   int page_n = CLAMP(page, 0, ERRANDS_TASK_PROPERTY_DIALOG_N_PAGES - 1);
   adw_view_stack_set_visible_child_name(self->stack, page_names[page_n]);
 
+  // Title
+  gtk_label_set_label(self->title, errands_data_get_text(task->data->ical));
+
   // Notes
   const char *notes = errands_data_get_notes(task->data->ical);
   if (notes) {
@@ -116,15 +134,24 @@ void errands_task_properties_dialog_show(ErrandsTaskPropertiesDialogPage page, E
   else if (priority > 5) adw_action_row_activate(self->high_row);
 
   // Attachments
-  GtkWidget *box = ATTACHMENTS_LIST_BOX;
-  gtk_list_box_remove_all(GTK_LIST_BOX(box));
+  gtk_list_box_remove_all(GTK_LIST_BOX(ATTACHMENTS_LIST_BOX));
   g_auto(GStrv) attachments = errands_data_get_attachments(task->data->ical);
   if (attachments)
     for (size_t i = 0; i < g_strv_length(attachments); i++) {
+      // TODO: Use add func?
       GtkWidget *attachment = errands_task_properties_dialog_attachment_new(attachments[i]);
-      gtk_list_box_append(GTK_LIST_BOX(box), GTK_WIDGET(attachment));
+      gtk_list_box_append(GTK_LIST_BOX(ATTACHMENTS_LIST_BOX), GTK_WIDGET(attachment));
     }
   gtk_widget_set_visible(GTK_WIDGET(self->attachments), attachments && g_strv_length(attachments) > 0);
+
+  // Tags
+  gtk_list_box_remove_all(GTK_LIST_BOX(TAGS_LIST_BOX));
+  g_auto(GStrv) tags = errands_settings_get_tags();
+  g_auto(GStrv) all_tags_no_dups = gstrv_remove_duplicates(tags);
+  if (all_tags_no_dups)
+    for (size_t i = 0; i < g_strv_length(all_tags_no_dups); i++)
+      errands_task_properties_dialog_add_tag(all_tags_no_dups[i]);
+  gtk_widget_set_visible(GTK_WIDGET(self->tags), all_tags_no_dups && g_strv_length(all_tags_no_dups) > 0);
 
   adw_dialog_present(ADW_DIALOG(self), GTK_WIDGET(state.main_window));
 }
@@ -168,6 +195,38 @@ static void errands_task_properties_dialog_add_attachment(const char *path) {
   errands_sync_update_task(self->task->data);
 }
 
+// --- TAGS --- //
+
+static GtkWidget *errands_task_properties_dialog_tag_new(const char *tag) {
+  GtkWidget *row = adw_action_row_new();
+
+  GtkWidget *check_btn = gtk_check_button_new();
+  gtk_widget_set_tooltip_text(check_btn, _("Enable Tag"));
+  adw_action_row_add_prefix(ADW_ACTION_ROW(row), check_btn);
+  adw_action_row_set_activatable_widget(ADW_ACTION_ROW(row), check_btn);
+
+  GtkWidget *delete_btn = gtk_button_new_from_icon_name("errands-trash-symbolic");
+  gtk_widget_set_tooltip_text(delete_btn, _("Remove Tag"));
+  gtk_widget_add_css_class(delete_btn, "error");
+  gtk_widget_add_css_class(delete_btn, "flat");
+  gtk_widget_set_valign(delete_btn, GTK_ALIGN_CENTER);
+  g_signal_connect(delete_btn, "clicked", G_CALLBACK(on_tag_delete_cb), row);
+  adw_action_row_add_suffix(ADW_ACTION_ROW(row), delete_btn);
+
+  adw_preferences_row_set_title(ADW_PREFERENCES_ROW(row), tag);
+
+  return row;
+}
+
+static void errands_task_properties_dialog_add_tag(const char *tag) {
+  GtkWidget *row = errands_task_properties_dialog_tag_new(tag);
+  g_auto(GStrv) tags = errands_data_get_tags(self->task->data->ical);
+  const bool has_tag = tags && g_strv_contains((const gchar *const *)tags, tag);
+  GtkWidget *check_btn = adw_action_row_get_activatable_widget(ADW_ACTION_ROW(row));
+  gtk_check_button_set_active(GTK_CHECK_BUTTON(check_btn), has_tag);
+  gtk_list_box_append(GTK_LIST_BOX(TAGS_LIST_BOX), GTK_WIDGET(row));
+}
+
 // ---------- CALLBACKS ---------- //
 
 static void on_dialog_close_cb(ErrandsTaskPropertiesDialog *self) {
@@ -198,6 +257,24 @@ static void on_dialog_close_cb(ErrandsTaskPropertiesDialog *self) {
     }
   }
 
+  // Tags
+  g_autoptr(GPtrArray) tag_rows = get_children(TAGS_LIST_BOX);
+  g_auto(GStrv) old_tags = errands_data_get_tags(data->ical);
+  for_range(i, 0, tag_rows->len) {
+    AdwActionRow *row = g_ptr_array_index(tag_rows, i);
+    const char *tag = adw_preferences_row_get_title(ADW_PREFERENCES_ROW(row));
+    bool active = gtk_check_button_get_active(GTK_CHECK_BUTTON(adw_action_row_get_activatable_widget(row)));
+    bool exists = g_strv_contains((const gchar *const *)old_tags, tag);
+    if (active && !exists) {
+      errands_data_add_tag(data->ical, tag);
+      changed = true;
+    } else if (!active && exists) {
+      errands_data_remove_tag(data->ical, tag);
+      changed = true;
+    }
+  }
+
+  // Save if changed
   if (changed) {
     errands_list_data_save(data->list);
     errands_task_update_toolbar(self->task);
@@ -266,4 +343,35 @@ static void on_attachment_delete_cb(GtkButton *btn, AdwActionRow *attachment) {
   gtk_list_box_remove(GTK_LIST_BOX(ATTACHMENTS_LIST_BOX), GTK_WIDGET(attachment));
   gtk_widget_set_visible(GTK_WIDGET(self->attachments), g_strv_length(attachments) > 0);
   errands_sync_update_task(task->data);
+}
+
+// --- TAGS --- //
+
+static void on_tag_entry_activated_cb(AdwEntryRow *entry) {
+  const char *tag = string_trim((char *)gtk_editable_get_text(GTK_EDITABLE(entry)));
+  if (g_str_equal(tag, "")) return;
+  g_auto(GStrv) tags = errands_settings_get_tags();
+  for (size_t i = 0; i < g_strv_length(tags); i++)
+    if (g_str_equal(tag, tags[i])) return;
+  errands_settings_add_tag(tag);
+  errands_task_properties_dialog_add_tag(tag);
+  gtk_editable_set_text(GTK_EDITABLE(entry), "");
+  gtk_widget_set_visible(GTK_WIDGET(self->tags), true);
+}
+
+static void on_tag_delete_cb(GtkButton *btn, AdwActionRow *row) {
+  const char *tag = adw_preferences_row_get_title(ADW_PREFERENCES_ROW(row));
+  errands_settings_remove_tag(tag);
+  for_range(i, 0, errands_data_lists->len) {
+    ListData *list = g_ptr_array_index(errands_data_lists, i);
+    g_autoptr(GPtrArray) tasks = g_ptr_array_sized_new(list->children->len);
+    errands_list_data_get_flat_list(list, tasks);
+    for_range(j, 0, tasks->len) {
+      TaskData *task = g_ptr_array_index(tasks, j);
+      if (errands_data_remove_tag(task->ical, tag)) errands_sync_update_task(task);
+    }
+  }
+  gtk_list_box_remove(GTK_LIST_BOX(TAGS_LIST_BOX), GTK_WIDGET(row));
+  g_auto(GStrv) tags = errands_settings_get_tags();
+  gtk_widget_set_visible(GTK_WIDGET(self->tags), tags && g_strv_length(tags) > 0);
 }
