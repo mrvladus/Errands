@@ -233,26 +233,6 @@ template $ErrandsTaskMenu: Popover {
 
       Separator {}
 
-      // Subtasks
-      Button {
-        clicked => $on_subtasks_clicked_cb(template);
-
-        styles [
-          "flat",
-          "body",
-        ]
-
-        Box {
-          spacing: 12;
-
-          Image {
-            icon-name: "errands-add-symbolic";
-          }
-
-          Label sub_tasks_label {}
-        }
-      }
-
       // Pin
       Button {
         clicked => $on_pin_clicked_cb(template);

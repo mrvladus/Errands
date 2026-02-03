@@ -298,6 +298,7 @@ void errands_task_list_update_title(ErrandsTaskList *self) {
     size_t pinned = 0;
     for_range(i, 0, current_task_list->len) {
       TaskData *data = g_ptr_array_index(current_task_list, i);
+      CONTINUE_IF(errands_data_get_deleted(data->ical));
       if (errands_data_get_pinned(data->ical)) pinned++;
     }
     gtk_widget_set_visible(self->scrl, pinned > 0);

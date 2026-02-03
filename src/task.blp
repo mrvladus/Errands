@@ -92,6 +92,7 @@ template $ErrandsTask: Box {
       notify::editing => $on_title_edit_cb();
     }
 
+    // Unpin
     Button unpin_btn {
       icon-name: "errands-pin-symbolic";
       tooltip-text: _("Unpin");
@@ -105,17 +106,33 @@ template $ErrandsTask: Box {
       ]
     }
 
-    // Menu
-    Button {
-      icon-name: "errands-more-symbolic";
-      valign: center;
+    Box {
+      // Toggle Sub-Tasks button
+      Button sub_toggle_btn {
+        icon-name: "errands-down-symbolic";
+        valign: center;
+        tooltip-text: _("Toggle Sub-Tasks");
 
-      styles [
-        "flat",
-        "circular",
-      ]
+        styles [
+          "flat",
+          "circular",
+        ]
 
-      clicked => $errands_task_menu_show(template);
+        clicked => $on_expand_toggle_cb(template);
+      }
+
+      // Menu
+      Button {
+        icon-name: "errands-more-symbolic";
+        valign: center;
+
+        styles [
+          "flat",
+          "circular",
+        ]
+
+        clicked => $errands_task_menu_show(template);
+      }
     }
   }
 

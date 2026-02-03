@@ -1,5 +1,6 @@
 #include "task.h"
 #include "data.h"
+#include "gtk/gtk.h"
 #include "sidebar.h"
 #include "state.h"
 #include "sync.h"
@@ -29,7 +30,7 @@ static void on_restore_btn_clicked_cb(ErrandsTask *self, GtkButton *btn);
 static void on_unpin_btn_clicked_cb(ErrandsTask *self, GtkToggleButton *btn);
 static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointer user_data);
 static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *self);
-static void on_expand_toggle_cb(ErrandsTask *self, GtkGestureClick *ctrl, gint n_press, gdouble x, gdouble y);
+static void on_expand_toggle_cb(ErrandsTask *self);
 
 static GdkContentProvider *on_drag_prepare_cb(GtkDragSource *source, double x, double y, ErrandsTask *self);
 static void on_drag_begin_cb(GtkDragSource *source, GdkDrag *drag, ErrandsTask *self);
@@ -53,6 +54,7 @@ static void errands_task_class_init(ErrandsTaskClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, title);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, subtitle);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, edit_title);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, sub_toggle_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, toolbar);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, props_bar);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, tags_box);
@@ -108,7 +110,9 @@ void errands_task_set_data(ErrandsTask *self, TaskData *data) {
   gtk_widget_set_visible(self->complete_btn, !cancelled);
   gtk_widget_set_visible(self->sub_entry, !cancelled);
   // Show sub-tasks entry
-  gtk_widget_set_visible(self->sub_entry, errands_data_get_expanded(data->ical));
+  bool expanded = errands_data_get_expanded(data->ical);
+  gtk_widget_set_visible(self->sub_entry, expanded);
+  gtk_button_set_icon_name(self->sub_toggle_btn, expanded ? "errands-up-symbolic" : "errands-down-symbolic");
   errands_task_update_accent_color(self);
   errands_task_update_progress(self);
   errands_task_update_toolbar(self);
@@ -359,12 +363,13 @@ static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *self) {
   errands_sync_create_task(self->data);
 }
 
-static void on_expand_toggle_cb(ErrandsTask *self, GtkGestureClick *ctrl, gint n_press, gdouble x, gdouble y) {
+static void on_expand_toggle_cb(ErrandsTask *self) {
   if (errands_data_get_cancelled(self->data->ical)) return;
   bool new_expanded = !errands_data_get_expanded(self->data->ical);
   LOG("Task '%s': Toggle expand: %d", errands_data_get_uid(self->data->ical), new_expanded);
   errands_data_set_expanded(self->data->ical, new_expanded);
   errands_list_data_save(self->data->list);
+  gtk_button_set_icon_name(self->sub_toggle_btn, new_expanded ? "errands-up-symbolic" : "errands-down-symbolic");
   errands_task_list_reload(state.main_window->task_list, true);
   gtk_widget_grab_focus(GTK_WIDGET(self->sub_entry));
   errands_sync_update_task(self->data);

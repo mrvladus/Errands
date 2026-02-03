@@ -123,6 +123,7 @@ void errands_sidebar_update_filter_rows() {
     for_range(t, 0, tasks->len) {
       icalcomponent *ical = g_ptr_array_index(tasks, t);
       CONTINUE_IF(errands_data_get_deleted(ical));
+      CONTINUE_IF(errands_data_get_cancelled(ical));
       bool is_completed = !icaltime_is_null_date(errands_data_get_completed(ical));
       icaltimetype due = errands_data_get_due(ical);
       bool is_due = !icaltime_is_null_time(due) && icaltime_compare_date_only(due, icaltime_today()) < 1;

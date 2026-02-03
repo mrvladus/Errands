@@ -21,13 +21,11 @@ static void on_notes_clicked_cb(ErrandsTaskMenu *self);
 static void on_priority_clicked_cb(ErrandsTaskMenu *self);
 static void on_date_clicked_cb(ErrandsTaskMenu *self);
 static void on_pin_clicked_cb(ErrandsTaskMenu *self);
-static void on_subtasks_clicked_cb(ErrandsTaskMenu *self);
 
 // ---------- WIDGET TEMPLATE ---------- //
 
 struct _ErrandsTaskMenu {
   GtkPopover parent_instance;
-  GtkLabel *sub_tasks_label;
   GtkLabel *pin_label;
   GtkLabel *cancel_label;
   GtkFlowBox *color_box;
@@ -47,10 +45,8 @@ static void errands_task_menu_class_init(ErrandsTaskMenuClass *class) {
   G_OBJECT_CLASS(class)->dispose = errands_task_menu_dispose;
   gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), "/io/github/mrvladus/Errands/ui/task-menu.ui");
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskMenu, color_box);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskMenu, sub_tasks_label);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskMenu, pin_label);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskMenu, cancel_label);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_subtasks_clicked_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_edit_clicked_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_clipboard_clicked_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_export_clicked_cb);
@@ -90,8 +86,6 @@ void errands_task_menu_show(ErrandsTask *task) {
     }
   }
   // Set labels
-  gtk_label_set_label(self->sub_tasks_label,
-                      errands_data_get_expanded(task->data->ical) ? _("Hide Sub Tasks") : _("Show Sub Tasks"));
   gtk_label_set_label(self->pin_label, errands_data_get_pinned(task->data->ical) ? _("Unpin") : _("Pin"));
   gtk_label_set_label(self->cancel_label, errands_data_get_cancelled(task->data->ical) ? _("Restore") : _("Cancel"));
 
@@ -238,16 +232,5 @@ static void on_pin_clicked_cb(ErrandsTaskMenu *self) {
   errands_list_data_save(self->task->data->list);
   errands_sidebar_update_filter_rows();
   errands_task_list_reload(state.main_window->task_list, true);
-  errands_sync_update_task(self->task->data);
-}
-
-static void on_subtasks_clicked_cb(ErrandsTaskMenu *self) {
-  if (errands_data_get_cancelled(self->task->data->ical)) return;
-  gtk_popover_popdown(GTK_POPOVER(self));
-  bool new_expanded = !errands_data_get_expanded(self->task->data->ical);
-  errands_data_set_expanded(self->task->data->ical, new_expanded);
-  errands_list_data_save(self->task->data->list);
-  errands_task_list_reload(state.main_window->task_list, true);
-  gtk_widget_grab_focus(self->task->sub_entry);
   errands_sync_update_task(self->task->data);
 }
