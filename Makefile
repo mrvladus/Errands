@@ -108,7 +108,7 @@ $(GRESOURCE_XML): $(BLPS) $(STYLES) $(ICONS)
 		filename=$$(basename "$$file"); \
 		echo "    <file compressed=\"true\" alias=\"$$filename\">$(DATA_DIR)/styles/$$filename</file>"; \
 	done >> $@
-	@echo '    <file preprocess="xml-stripblanks" compressed="true" alias="shortcuts-dialog.blp">$(BUILD_DIR)/shortcuts-dialog.ui</file>' >> $@
+	@echo '    <file preprocess="xml-stripblanks" compressed="true" alias="shortcuts-dialog.ui">$(BUILD_DIR)/shortcuts-dialog.ui</file>' >> $@
 	@echo '  </gresource>' >> $@
 	@echo '  <!-- UI -->' >> $@
 	@echo '  <gresource prefix="/io/github/mrvladus/Errands/ui">' >> $@

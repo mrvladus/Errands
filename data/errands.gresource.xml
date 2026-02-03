@@ -5,7 +5,7 @@
   <gresource prefix="/io/github/mrvladus/Errands">
     <file compressed="true" alias="style.css">data/styles/style.css</file>
     <file compressed="true" alias="style-dark.css">data/styles/style-dark.css</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="shortcuts-dialog.blp">_build/shortcuts-dialog.ui</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="shortcuts-dialog.ui">_build/shortcuts-dialog.ui</file>
   </gresource>
   <!-- UI -->
   <gresource prefix="/io/github/mrvladus/Errands/ui">
