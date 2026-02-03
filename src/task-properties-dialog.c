@@ -1,7 +1,6 @@
 #include "task-properties-dialog.h"
 #include "data.h"
 #include "date-chooser.h"
-#include "glib-object.h"
 #include "notifications.h"
 #include "settings.h"
 #include "state.h"
@@ -13,7 +12,8 @@
 
 #include <glib/gi18n.h>
 #include <gtksourceview/gtksource.h>
-#include <libical/ical.h>
+
+static void on_add_attachment_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 
 static void on_dialog_close_cb(ErrandsTaskPropertiesDialog *self);
 static gboolean on_style_toggled_cb(GBinding *binding, const GValue *from_value, GValue *to_value, gpointer user_data);
@@ -24,7 +24,6 @@ static void on_priority_toggled_cb(ErrandsTaskPropertiesDialog *self, GtkCheckBu
   gtk_widget_get_first_child(gtk_widget_get_last_child(gtk_widget_get_first_child(GTK_WIDGET(self->attachments))))
 static GtkWidget *errands_task_properties_dialog_attachment_new(const char *path);
 static void errands_task_properties_dialog_add_attachment(const char *path);
-static void on_add_attachment_btn_clicked_cb(AdwButtonRow *row);
 static void on_attachment_clicked_cb(GtkListBox *box, AdwActionRow *attachment);
 static void on_attachment_delete_cb(GtkButton *btn, AdwActionRow *attachment);
 
@@ -96,12 +95,13 @@ static void errands_task_properties_dialog_class_init(ErrandsTaskPropertiesDialo
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, tags);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_dialog_close_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_priority_toggled_cb);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_add_attachment_btn_clicked_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_tag_entry_activated_cb);
 }
 
 static void errands_task_properties_dialog_init(ErrandsTaskPropertiesDialog *dialog) {
   gtk_widget_init_template(GTK_WIDGET(dialog));
+  GSimpleActionGroup *ag = errands_add_action_group(dialog, "task-properties");
+  errands_add_action(ag, "add-attachment", on_add_attachment_action_cb, dialog, NULL);
 
   // Notes
   gtk_source_init();
@@ -250,6 +250,22 @@ static void errands_task_properties_dialog_add_tag(const char *tag) {
   gtk_list_box_append(GTK_LIST_BOX(TAGS_LIST_BOX), GTK_WIDGET(row));
 }
 
+// ---------- ACTIONS ---------- //
+
+static void __on_attachment_open_finish(GObject *obj, GAsyncResult *res, gpointer data) {
+  g_autoptr(GFile) file = gtk_file_dialog_open_finish(GTK_FILE_DIALOG(obj), res, NULL);
+  if (!file) return;
+  GFileInfo *info = g_file_query_info(file, "xattr::document-portal.host-path", G_FILE_QUERY_INFO_NONE, NULL, NULL);
+  const char *real_path = g_file_info_get_attribute_as_string(info, "xattr::document-portal.host-path");
+  g_autofree char *path = g_file_get_path(file);
+  errands_task_properties_dialog_add_attachment(real_path ? real_path : path);
+}
+
+static void on_add_attachment_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
+  g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
+  gtk_file_dialog_open(dialog, GTK_WINDOW(state.main_window), NULL, __on_attachment_open_finish, NULL);
+}
+
 // ---------- CALLBACKS ---------- //
 
 static void on_dialog_close_cb(ErrandsTaskPropertiesDialog *self) {
@@ -377,20 +393,6 @@ static void on_priority_toggled_cb(ErrandsTaskPropertiesDialog *self, GtkCheckBu
 }
 
 // --- ATTACHMENTS --- //
-
-static void __on_attachment_open_finish(GObject *obj, GAsyncResult *res, gpointer data) {
-  g_autoptr(GFile) file = gtk_file_dialog_open_finish(GTK_FILE_DIALOG(obj), res, NULL);
-  if (!file) return;
-  GFileInfo *info = g_file_query_info(file, "xattr::document-portal.host-path", G_FILE_QUERY_INFO_NONE, NULL, NULL);
-  const char *real_path = g_file_info_get_attribute_as_string(info, "xattr::document-portal.host-path");
-  g_autofree char *path = g_file_get_path(file);
-  errands_task_properties_dialog_add_attachment(real_path ? real_path : path);
-}
-
-static void on_add_attachment_btn_clicked_cb(AdwButtonRow *row) {
-  g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
-  gtk_file_dialog_open(dialog, GTK_WINDOW(state.main_window), NULL, __on_attachment_open_finish, NULL);
-}
 
 static void on_attachment_clicked_cb(GtkListBox *box, AdwActionRow *attachment) {
   g_autoptr(GFile) file = g_file_new_for_path(adw_action_row_get_subtitle(attachment));

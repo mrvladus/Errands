@@ -214,9 +214,19 @@ template $ErrandsTaskPropertiesDialog: Adw.Dialog {
 
           Adw.PreferencesGroup {
             Adw.ButtonRow {
-              title: _("Add");
+              title: _("Add Attachment");
+              tooltip-text: _("Ctrl+N");
               start-icon-name: "errands-add-symbolic";
-              activated => $on_add_attachment_btn_clicked_cb();
+              action-name: "task-properties.add-attachment";
+
+              ShortcutController {
+                scope: managed;
+
+                Shortcut {
+                  trigger: "<Control>N";
+                  action: "activate";
+                }
+              }
             }
           }
 
