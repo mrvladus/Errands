@@ -1,5 +1,6 @@
 #include "task-list.h"
 #include "data.h"
+#include "glib.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "sync.h"
@@ -7,6 +8,7 @@
 #include "utils.h"
 
 #include <glib/gi18n.h>
+#include <string.h>
 
 static size_t tasks_stack_size = 0, current_start = 0;
 static GPtrArray *current_task_list = NULL;
@@ -98,10 +100,14 @@ static bool __task_has_any_due_parent(TaskData *data) {
 }
 
 static bool __task_match_search_query(TaskData *data) {
-  if (STR_CONTAINS_CASE(errands_data_get_text(data->ical), search_query)) return true;
-  if (STR_CONTAINS_CASE(errands_data_get_notes(data->ical), search_query)) return true;
+  const char *text = errands_data_get_text(data->ical);
+  const char *notes = errands_data_get_notes(data->ical);
+  if (text && g_strstr_len(text, -1, search_query)) return true;
+  if (notes && g_strstr_len(notes, -1, search_query)) return true;
   g_auto(GStrv) tags = errands_data_get_tags(data->ical);
-  if (tags && g_strv_contains((const gchar *const *)tags, search_query)) return true;
+  if (tags) for_range(i, 0, g_strv_length(tags)) {
+      if (g_strstr_len(tags[i], -1, search_query)) return true;
+    }
   return false;
 }
 
