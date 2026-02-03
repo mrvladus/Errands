@@ -677,7 +677,7 @@ void errands_data_set_uid(icalcomponent *ical, const char *value) {
 
 struct icalrecurrencetype errands_data_get_rrule(icalcomponent *ical) {
   icalproperty *property = icalcomponent_get_first_property(ical, ICAL_RRULE_PROPERTY);
-  return property ? icalproperty_get_rrule(property) : (struct icalrecurrencetype){0};
+  return property ? icalproperty_get_rrule(property) : (struct icalrecurrencetype)ICALRECURRENCETYPE_INITIALIZER;
 }
 void errands_data_set_rrule(icalcomponent *ical, struct icalrecurrencetype value) {
   struct icalrecurrencetype null = ICALRECURRENCETYPE_INITIALIZER;

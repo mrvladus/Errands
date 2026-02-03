@@ -4,7 +4,6 @@
 #include "sync.h"
 #include "task-list.h"
 #include "task.h"
-#include "utils.h"
 
 #include <glib/gi18n.h>
 
@@ -229,7 +228,7 @@ static void on_priority_clicked_cb(ErrandsTaskMenu *self) {
 
 static void on_date_clicked_cb(ErrandsTaskMenu *self) {
   gtk_popover_popdown(GTK_POPOVER(self));
-  errands_task_list_date_dialog_show(self->task);
+  gtk_widget_activate_action(GTK_WIDGET(self->task), "task.date", NULL, NULL);
 }
 
 static void on_pin_clicked_cb(ErrandsTaskMenu *self) {

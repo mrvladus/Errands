@@ -61,7 +61,8 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
 static void errands_task_list_init(ErrandsTaskList *self) {
   LOG("Task List: Create");
   gtk_widget_init_template(GTK_WIDGET(self));
-  errands_add_actions(GTK_WIDGET(self), "task-list", "focus-entry", on_focus_entry_action_cb, self, NULL);
+  GSimpleActionGroup *ag = errands_add_action_group(self, "task-list");
+  errands_add_action(ag, "focus-entry", on_focus_entry_action_cb, self, NULL);
   gtk_search_bar_connect_entry(GTK_SEARCH_BAR(self->search_bar), GTK_EDITABLE(self->search_entry));
   measuring_task = errands_task_new();
   tasks_stack_size = __get_tasks_stack_size();

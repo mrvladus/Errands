@@ -1,16 +1,16 @@
 using Gtk 4.0;
 using Adw 1;
 
-template $ErrandsTaskListDateDialogTimeChooser: Adw.ActionRow {
-  title: _("Time");
-  subtitle: _("Not Set");
+template $ErrandsDateChooser: Adw.ActionRow {
+  title: _("Not Set");
 
   [suffix]
+  // Reset
   Button reset_btn {
     icon-name: "errands-reset-symbolic";
     tooltip-text: _("Reset");
     valign: center;
-    clicked => $errands_task_list_date_dialog_time_chooser_reset(template);
+    action-name: "date-chooser.reset";
 
     styles [
       "flat",
@@ -18,15 +18,75 @@ template $ErrandsTaskListDateDialogTimeChooser: Adw.ActionRow {
   }
 
   [suffix]
+  // Date
+  MenuButton {
+    icon-name: "errands-calendar-symbolic";
+    valign: center;
+    tooltip-text: _("Date");
+
+    popover: Popover date_popover {
+      child: Grid {
+        row-spacing: 6;
+        column-spacing: 6;
+        column-homogeneous: true;
+
+        Button {
+          label: _("Today");
+          action-name: "date-chooser.today";
+
+          styles [
+            "flat",
+          ]
+
+          layout {
+            row: 0;
+            column: 0;
+          }
+        }
+
+        Button {
+          label: _("Tomorrow");
+          action-name: "date-chooser.tomorrow";
+
+          styles [
+            "flat",
+          ]
+
+          layout {
+            row: 0;
+            column: 1;
+          }
+        }
+
+        Calendar calendar {
+          day-selected => $on_day_selected(template);
+
+          layout {
+            row: 1;
+            column: 0;
+            column-span: 2;
+          }
+        }
+      };
+    };
+
+    styles [
+      "flat",
+    ]
+  }
+
+  [suffix]
+  // Time
   MenuButton {
     icon-name: "errands-clock-symbolic";
     valign: center;
+    tooltip-text: _("Time");
 
     styles [
       "flat",
     ]
 
-    popover: Popover popover {
+    popover: Popover time_popover {
       child: Grid {
         row-spacing: 6;
         column-spacing: 6;
@@ -80,8 +140,8 @@ template $ErrandsTaskListDateDialogTimeChooser: Adw.ActionRow {
         }
 
         Button {
-          name: "9";
-          clicked => $on_time_preset_cb(template);
+          action-name: "date-chooser.time-preset";
+          action-target: "9";
 
           Adw.ButtonContent {
             label: _("9:00");
@@ -95,8 +155,8 @@ template $ErrandsTaskListDateDialogTimeChooser: Adw.ActionRow {
         }
 
         Button {
-          name: "12";
-          clicked => $on_time_preset_cb(template);
+          action-name: "date-chooser.time-preset";
+          action-target: "12";
 
           Adw.ButtonContent {
             label: _("12:00");
@@ -110,8 +170,8 @@ template $ErrandsTaskListDateDialogTimeChooser: Adw.ActionRow {
         }
 
         Button {
-          name: "17";
-          clicked => $on_time_preset_cb(template);
+          action-name: "date-chooser.time-preset";
+          action-target: "17";
 
           Adw.ButtonContent {
             label: _("17:00");
@@ -125,8 +185,8 @@ template $ErrandsTaskListDateDialogTimeChooser: Adw.ActionRow {
         }
 
         Button {
-          name: "20";
-          clicked => $on_time_preset_cb(template);
+          action-name: "date-chooser.time-preset";
+          action-target: "20";
 
           Adw.ButtonContent {
             label: _("20:00");

@@ -1,16 +1,19 @@
 #include "task-properties-dialog.h"
-#include "adwaita.h"
 #include "data.h"
-#include "gtk/gtk.h"
+#include "date-chooser.h"
+#include "glib-object.h"
+#include "notifications.h"
 #include "settings.h"
 #include "state.h"
 #include "sync.h"
+#include "task-list.h"
 #include "utils.h"
 
 #include "vendor/toolbox.h"
 
 #include <glib/gi18n.h>
 #include <gtksourceview/gtksource.h>
+#include <libical/ical.h>
 
 static void on_dialog_close_cb(ErrandsTaskPropertiesDialog *self);
 static gboolean on_style_toggled_cb(GBinding *binding, const GValue *from_value, GValue *to_value, gpointer user_data);
@@ -41,6 +44,10 @@ struct _ErrandsTaskPropertiesDialog {
   AdwToolbarView *tbv;
   GtkLabel *title;
   AdwViewStack *stack;
+  // Date
+  ErrandsDateChooser *start_date_chooser;
+  ErrandsDateChooser *due_date_chooser;
+  ErrandsTaskListDateDialogRruleRow *rrule_row;
   // Notes
   GtkSourceView *notes_view;
   GtkSourceBuffer *notes_buffer;
@@ -66,12 +73,18 @@ static void errands_task_properties_dialog_dispose(GObject *gobject) {
 }
 
 static void errands_task_properties_dialog_class_init(ErrandsTaskPropertiesDialogClass *class) {
+  g_type_ensure(ERRANDS_TYPE_DATE_CHOOSER);
+  g_type_ensure(ERRANDS_TYPE_TASK_LIST_DATE_DIALOG_RRULE_ROW);
+
   G_OBJECT_CLASS(class)->dispose = errands_task_properties_dialog_dispose;
   gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class),
                                               "/io/github/mrvladus/Errands/ui/task-properties-dialog.ui");
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, tbv);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, title);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, stack);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, start_date_chooser);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, due_date_chooser);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, rrule_row);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, notes_view);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, notes_buffer);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, high_row);
@@ -117,6 +130,16 @@ void errands_task_properties_dialog_show(ErrandsTaskPropertiesDialogPage page, E
 
   // Title
   gtk_label_set_label(self->title, errands_data_get_text(task->data->ical));
+
+  // Date
+  errands_date_chooser_reset(self->start_date_chooser);
+  errands_date_chooser_reset(self->due_date_chooser);
+  errands_task_list_date_dialog_rrule_row_reset(self->rrule_row);
+  errands_date_chooser_set_dt(self->start_date_chooser, errands_data_get_start(task->data->ical));
+  errands_date_chooser_set_dt(self->due_date_chooser, errands_data_get_due(task->data->ical));
+  struct icalrecurrencetype rrule = errands_data_get_rrule(task->data->ical);
+  errands_task_list_date_dialog_rrule_row_set_rrule(self->rrule_row, rrule);
+  adw_expander_row_set_expanded(ADW_EXPANDER_ROW(self->rrule_row), rrule.freq != ICAL_NO_RECURRENCE);
 
   // Notes
   const char *notes = errands_data_get_notes(task->data->ical);
@@ -233,6 +256,43 @@ static void on_dialog_close_cb(ErrandsTaskPropertiesDialog *self) {
   TaskData *data = self->task->data;
   bool changed = false;
 
+  // Date
+  icaltimetype curr_sdt = errands_data_get_start(data->ical);
+  icaltimetype new_sdt = errands_date_chooser_get_dt(self->start_date_chooser);
+  if (!icaltime_is_null_time(new_sdt) && icaltime_compare(curr_sdt, new_sdt)) {
+    errands_data_set_start(data->ical, new_sdt);
+    changed = true;
+  }
+  bool rrule_is_set = adw_expander_row_get_expanded(ADW_EXPANDER_ROW(self->rrule_row));
+  icaltimetype curr_ddt = errands_data_get_due(data->ical);
+  icaltimetype new_ddt = errands_date_chooser_get_dt(self->due_date_chooser);
+  if (!rrule_is_set && !icaltime_is_null_time(new_ddt) && icaltime_compare(curr_ddt, new_ddt)) {
+    errands_data_set_due(data->ical, new_ddt);
+    changed = true;
+  }
+  // Set rrule
+  struct icalrecurrencetype old_rrule = ICALRECURRENCETYPE_INITIALIZER;
+  struct icalrecurrencetype new_rrule = ICALRECURRENCETYPE_INITIALIZER;
+  // Get old and new rrule
+  icalproperty *rrule_prop = icalcomponent_get_first_property(data->ical, ICAL_RRULE_PROPERTY);
+  if (rrule_prop) old_rrule = icalproperty_get_rrule(rrule_prop);
+  if (adw_expander_row_get_expanded(ADW_EXPANDER_ROW(self->rrule_row)))
+    new_rrule = errands_task_list_date_dialog_rrule_row_get_rrule(self->rrule_row);
+  // Compare them and set / remove
+  if (!icalrecurrencetype_compare(&new_rrule, &old_rrule)) {
+    if (rrule_prop) {
+      // Delete rrule if new rrule is not set
+      if (new_rrule.freq == ICAL_NO_RECURRENCE) icalcomponent_remove_property(data->ical, rrule_prop);
+      // Set new rrule
+      else icalproperty_set_rrule(rrule_prop, new_rrule);
+    } else {
+      // Set new rrule
+      if (new_rrule.freq != ICAL_NO_RECURRENCE)
+        icalcomponent_add_property(data->ical, icalproperty_new_rrule(new_rrule));
+    }
+    changed = true;
+  }
+
   // Notes
   GtkTextIter start, end;
   gtk_text_buffer_get_start_iter(GTK_TEXT_BUFFER(self->notes_buffer), &start);
@@ -276,10 +336,18 @@ static void on_dialog_close_cb(ErrandsTaskPropertiesDialog *self) {
 
   // Save if changed
   if (changed) {
+    if (!icaltime_is_null_time(errands_data_get_due(data->ical))) {
+      errands_data_set_notified(data->ical, false);
+      errands_notifications_add(data);
+    }
+    errands_list_data_save(data->list);
+    if (self->task->data->parent) errands_task_data_sort_sub_tasks(self->task->data->parent);
+    else errands_data_sort();
     errands_list_data_save(data->list);
     errands_task_update_toolbar(self->task);
     errands_sync_update_task(data);
     errands_task_list_reload(state.main_window->task_list, true);
+    errands_sidebar_update_filter_rows();
   }
 }
 

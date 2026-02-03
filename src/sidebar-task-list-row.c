@@ -45,8 +45,11 @@ static void errands_sidebar_task_list_row_class_init(ErrandsSidebarTaskListRowCl
 static void errands_sidebar_task_list_row_init(ErrandsSidebarTaskListRow *self) {
   gtk_widget_init_template(GTK_WIDGET(self));
   // Actions
-  errands_add_actions(GTK_WIDGET(self), "task-list-row", "rename", on_action_rename, self, "delete", on_action_delete,
-                      self, "print", on_action_print, self, "export", on_action_export, self, NULL);
+  GSimpleActionGroup *ag = errands_add_action_group(self, "task-list-row");
+  errands_add_action(ag, "rename", on_action_rename, self, NULL);
+  errands_add_action(ag, "delete", on_action_delete, self, NULL);
+  errands_add_action(ag, "print", on_action_print, self, NULL);
+  errands_add_action(ag, "export", on_action_export, self, NULL);
 
   // Drop target setup
   // GtkDropTarget *drop_target = gtk_drop_target_new(G_TYPE_OBJECT, GDK_ACTION_MOVE);

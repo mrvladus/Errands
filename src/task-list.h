@@ -1,30 +1,9 @@
 #pragma once
 
 #include "data.h"
-#include "task.h"
+#include "task-menu.h"
 
 #include <adwaita.h>
-
-// --- TASK LIST DATE DIALOG --- //
-
-#define ERRANDS_TYPE_TASK_LIST_DATE_DIALOG (errands_task_list_date_dialog_get_type())
-G_DECLARE_FINAL_TYPE(ErrandsTaskListDateDialog, errands_task_list_date_dialog, ERRANDS, TASK_LIST_DATE_DIALOG,
-                     AdwDialog)
-
-ErrandsTaskListDateDialog *errands_task_list_date_dialog_new();
-void errands_task_list_date_dialog_show(ErrandsTask *task);
-
-// --- TASK LIST DATE DIALOG DATE CHOOSER --- //
-
-#define ERRANDS_TYPE_TASK_LIST_DATE_DIALOG_DATE_CHOOSER (errands_task_list_date_dialog_date_chooser_get_type())
-G_DECLARE_FINAL_TYPE(ErrandsTaskListDateDialogDateChooser, errands_task_list_date_dialog_date_chooser, ERRANDS,
-                     TASK_LIST_DATE_DIALOG_DATE_CHOOSER, AdwActionRow)
-
-ErrandsTaskListDateDialogDateChooser *errands_task_list_date_dialog_date_chooser_new();
-icaltimetype errands_task_list_date_dialog_date_chooser_get_date(ErrandsTaskListDateDialogDateChooser *self);
-void errands_task_list_date_dialog_date_chooser_set_date(ErrandsTaskListDateDialogDateChooser *self,
-                                                         const icaltimetype date);
-void errands_task_list_date_dialog_date_chooser_reset(ErrandsTaskListDateDialogDateChooser *self);
 
 // --- TASK LIST DATE DIALOG RRULE ROW --- //
 
@@ -38,18 +17,6 @@ void errands_task_list_date_dialog_rrule_row_set_rrule(ErrandsTaskListDateDialog
                                                        const struct icalrecurrencetype rrule);
 void errands_task_list_date_dialog_rrule_row_reset(ErrandsTaskListDateDialogRruleRow *self);
 
-// --- TASK LIST DATE DIALOG TIME CHOOSER --- //
-
-#define ERRANDS_TYPE_TASK_LIST_DATE_DIALOG_TIME_CHOOSER (errands_task_list_date_dialog_time_chooser_get_type())
-G_DECLARE_FINAL_TYPE(ErrandsTaskListDateDialogTimeChooser, errands_task_list_date_dialog_time_chooser, ERRANDS,
-                     DATE_DIALOG_TIME_CHOOSER, AdwActionRow)
-
-ErrandsTaskListDateDialogTimeChooser *errands_task_list_date_dialog_time_chooser_new();
-icaltimetype errands_task_list_date_dialog_time_chooser_get_time(ErrandsTaskListDateDialogTimeChooser *self);
-void errands_task_list_date_dialog_time_chooser_set_time(ErrandsTaskListDateDialogTimeChooser *self,
-                                                         const icaltimetype time);
-void errands_task_list_date_dialog_time_chooser_reset(ErrandsTaskListDateDialogTimeChooser *self);
-
 // --- TASK LIST SORT DIALOG --- //
 
 #define ERRANDS_TYPE_TASK_LIST_SORT_DIALOG (errands_task_list_sort_dialog_get_type())
@@ -58,14 +25,6 @@ G_DECLARE_FINAL_TYPE(ErrandsTaskListSortDialog, errands_task_list_sort_dialog, E
 
 ErrandsTaskListSortDialog *errands_task_list_sort_dialog_new();
 void errands_task_list_sort_dialog_show();
-
-// --- TASK MENU --- //
-
-#define ERRANDS_TYPE_TASK_MENU (errands_task_menu_get_type())
-G_DECLARE_FINAL_TYPE(ErrandsTaskMenu, errands_task_menu, ERRANDS, TASK_MENU, GtkPopover)
-
-ErrandsTaskMenu *errands_task_menu_new();
-void errands_task_menu_show(ErrandsTask *task);
 
 // --- TASK LIST --- //
 
@@ -88,13 +47,12 @@ struct _ErrandsTaskList {
   GtkWidget *search_entry;
   GtkWidget *entry_box;
   GtkWidget *entry;
-  ErrandsTaskMenu *task_menu;
   GtkWidget *scrl;
   GtkWidget *top_spacer;
   GtkWidget *task_list;
   GtkAdjustment *adj;
 
-  ErrandsTaskListDateDialog *date_dialog;
+  ErrandsTaskMenu *task_menu;
   ErrandsTaskListSortDialog *sort_dialog;
 
   GtkEventControllerMotion *motion_ctrl;

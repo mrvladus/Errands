@@ -1,4 +1,5 @@
 #include "data.h"
+#include "date-chooser.h"
 #include "task-list.h"
 #include "utils.h"
 
@@ -21,7 +22,7 @@ struct _ErrandsTaskListDateDialogRruleRow {
   AdwSpinRow *interval_row, *count_row;
   GtkBox *week_box;
   GtkListBoxRow *week_chooser;
-  ErrandsTaskListDateDialogDateChooser *until_date_chooser;
+  ErrandsDateChooser *until_date_chooser;
 };
 
 G_DEFINE_TYPE(ErrandsTaskListDateDialogRruleRow, errands_task_list_date_dialog_rrule_row, ADW_TYPE_EXPANDER_ROW)
@@ -32,7 +33,7 @@ static void errands_task_list_date_dialog_rrule_row_dispose(GObject *gobject) {
 }
 
 static void errands_task_list_date_dialog_rrule_row_class_init(ErrandsTaskListDateDialogRruleRowClass *class) {
-  g_type_ensure(ERRANDS_TYPE_TASK_LIST_DATE_DIALOG_DATE_CHOOSER);
+  g_type_ensure(ERRANDS_TYPE_DATE_CHOOSER);
   G_OBJECT_CLASS(class)->dispose = errands_task_list_date_dialog_rrule_row_dispose;
   gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class),
                                               "/io/github/mrvladus/Errands/ui/task-list-date-dialog-rrule-row.ui");
@@ -66,7 +67,7 @@ struct icalrecurrencetype errands_task_list_date_dialog_rrule_row_get_rrule(Erra
   rrule.interval = adw_spin_row_get_value(self->interval_row);
   if (rrule.freq >= 4) get_week_days(self, rrule.by_day);
   if (adw_combo_row_get_selected(self->repeat_duration) == 0)
-    rrule.until = errands_task_list_date_dialog_date_chooser_get_date(self->until_date_chooser);
+    rrule.until = errands_date_chooser_get_dt(self->until_date_chooser);
   else rrule.count = adw_spin_row_get_value(self->count_row);
 
   return rrule;
@@ -80,7 +81,7 @@ void errands_task_list_date_dialog_rrule_row_set_rrule(ErrandsTaskListDateDialog
   adw_spin_row_set_value(self->interval_row, rrule.interval);
   set_week_days(self, rrule.by_day);
   if (icaltime_is_null_date(rrule.until)) adw_spin_row_set_value(self->count_row, rrule.count);
-  else errands_task_list_date_dialog_date_chooser_set_date(self->until_date_chooser, rrule.until);
+  else errands_date_chooser_set_dt(self->until_date_chooser, rrule.until);
 }
 
 void errands_task_list_date_dialog_rrule_row_reset(ErrandsTaskListDateDialogRruleRow *self) {
@@ -88,7 +89,7 @@ void errands_task_list_date_dialog_rrule_row_reset(ErrandsTaskListDateDialogRrul
   adw_spin_row_set_value(self->interval_row, 1);
   adw_combo_row_set_selected(self->repeat_duration, 0);
   reset_week_days(self);
-  errands_task_list_date_dialog_date_chooser_reset(self->until_date_chooser);
+  errands_date_chooser_reset(self->until_date_chooser);
 }
 
 // ---------- PRIVATE FUNCTIONS ---------- //

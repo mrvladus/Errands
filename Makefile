@@ -72,7 +72,7 @@ ALL_CFLAGS  = $(CFLAGS) \
 all: $(BUILD_DIR)/$(NAME)
 
 clean:
-	@rm -rf _*
+	@rm -rf _* core.*
 
 $(BUILD_DIR):
 	@mkdir -p $(BUILD_DIR)

@@ -20,6 +20,7 @@ static void on_notes_action_cb(GSimpleAction *action, GVariant *param, ErrandsTa
 static void on_priority_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_attachments_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_tags_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
+static void on_date_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 
 // Callbacks
 static void on_tag_clicked_cb(ErrandsTask *self);
@@ -63,14 +64,13 @@ static void errands_task_class_init(ErrandsTaskClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, attachments_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, attachments_count);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, sub_entry);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_menu_show);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_title_edit_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_unpin_btn_clicked_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_complete_btn_toggle_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_restore_btn_clicked_cb);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_list_date_dialog_show);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_sub_task_entry_activated);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_expand_toggle_cb);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_menu_show);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_drag_prepare_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_drag_begin_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_drag_end_cb);
@@ -80,8 +80,12 @@ static void errands_task_class_init(ErrandsTaskClass *class) {
 
 static void errands_task_init(ErrandsTask *self) {
   gtk_widget_init_template(GTK_WIDGET(self));
-  errands_add_actions(GTK_WIDGET(self), "task", "notes", on_notes_action_cb, self, "priority", on_priority_action_cb,
-                      self, "attachments", on_attachments_action_cb, self, "tags", on_tags_action_cb, self, NULL);
+  GSimpleActionGroup *ag = errands_add_action_group(self, "task");
+  errands_add_action(ag, "notes", on_notes_action_cb, self, NULL);
+  errands_add_action(ag, "priority", on_priority_action_cb, self, NULL);
+  errands_add_action(ag, "attachments", on_attachments_action_cb, self, NULL);
+  errands_add_action(ag, "tags", on_tags_action_cb, self, NULL);
+  errands_add_action(ag, "date", on_date_action_cb, self, NULL);
 }
 
 ErrandsTask *errands_task_new() { return g_object_new(ERRANDS_TYPE_TASK, NULL); }
@@ -252,6 +256,10 @@ static void on_attachments_action_cb(GSimpleAction *action, GVariant *param, Err
 
 static void on_tags_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
   errands_task_properties_dialog_show(ERRANDS_TASK_PROPERTY_DIALOG_PAGE_TAGS, self);
+}
+
+static void on_date_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
+  errands_task_properties_dialog_show(ERRANDS_TASK_PROPERTY_DIALOG_PAGE_DATE, self);
 }
 
 // ---------- CALLBACKS ---------- //

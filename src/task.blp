@@ -138,7 +138,7 @@ template $ErrandsTask: Box {
 
       Button date_btn {
         valign: center;
-        clicked => $errands_task_list_date_dialog_show(template);
+        action-name: "task.date";
 
         Adw.ButtonContent date_btn_content {
           icon-name: "errands-calendar-symbolic";

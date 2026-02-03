@@ -1,5 +1,6 @@
 #pragma once
 
+#include "gio/gio.h"
 #include <gtk/gtk.h>
 
 #include <ctype.h>
@@ -66,28 +67,16 @@ static inline GStrv gstrv_remove_duplicates(GStrv strv) {
   return g_strv_builder_end(builder);
 }
 
-static inline void errands_add_actions(GtkWidget *widget, const char *action_group_name, const char *action_name1,
-                                       void *cb1, void *data1, ...) {
+static inline GSimpleActionGroup *errands_add_action_group(void *widget, const char *group_name) {
   g_autoptr(GSimpleActionGroup) ag = g_simple_action_group_new();
-  // Create the first action
-  g_autoptr(GSimpleAction) action = g_simple_action_new(action_name1, NULL);
-  g_signal_connect(action, "activate", G_CALLBACK(cb1), data1);
+  gtk_widget_insert_action_group(GTK_WIDGET(widget), group_name, G_ACTION_GROUP(ag));
+  return ag;
+}
+
+static inline void errands_add_action(GSimpleActionGroup *ag, const char *name, void *cb, void *data,
+                                      const char *param_str) {
+  g_autoptr(GVariantType) vtype = param_str ? g_variant_type_new(param_str) : NULL;
+  g_autoptr(GSimpleAction) action = g_simple_action_new(name, vtype);
+  g_signal_connect(action, "activate", G_CALLBACK(cb), data);
   g_action_map_add_action(G_ACTION_MAP(ag), G_ACTION(action));
-  // Handle additional actions
-  va_list args;
-  va_start(args, data1);
-  const char *action_name;
-  void *callback;
-  void *data;
-  while ((action_name = va_arg(args, const char *)) != NULL) {
-    callback = va_arg(args, void *);
-    data = va_arg(args, void *);
-    // Create and add the new action
-    g_autoptr(GSimpleAction) new_action = g_simple_action_new(action_name, NULL);
-    g_signal_connect(new_action, "activate", G_CALLBACK(callback), data);
-    g_action_map_add_action(G_ACTION_MAP(ag), G_ACTION(new_action));
-  }
-  va_end(args);
-  // Insert the action group into the widget
-  gtk_widget_insert_action_group(GTK_WIDGET(widget), action_group_name, G_ACTION_GROUP(ag));
 }

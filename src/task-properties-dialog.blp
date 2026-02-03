@@ -27,8 +27,25 @@ template $ErrandsTaskPropertiesDialog: Adw.Dialog {
         title: _("Date");
         icon-name: "errands-calendar-symbolic";
 
-        child: Adw.StatusPage {
-          title: _("Hello");
+        child: Adw.PreferencesPage {
+          Adw.PreferencesGroup {
+            title: _("Start");
+
+            $ErrandsDateChooser start_date_chooser {}
+          }
+
+          Adw.PreferencesGroup {
+            title: _("Due");
+            visible: bind rrule_row.enable-expansion inverted;
+
+            $ErrandsDateChooser due_date_chooser {}
+          }
+
+          Adw.PreferencesGroup {
+            title: _("Repeat");
+
+            $ErrandsTaskListDateDialogRruleRow rrule_row {}
+          }
         };
       }
 

@@ -52,7 +52,7 @@ template $ErrandsTaskListDateDialogRruleRow: Adw.ExpanderRow {
     notify::selected => $on_repeat_duration_changed_cb(template);
   }
 
-  $ErrandsTaskListDateDialogDateChooser until_date_chooser {
+  $ErrandsDateChooser until_date_chooser {
     title: _("Repeat Until Date");
     visible: bind count_row.visible bidirectional inverted;
   }
