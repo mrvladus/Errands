@@ -3,6 +3,7 @@
 #include "utils.h"
 
 #include <glib/gi18n.h>
+#include <libical/ical.h>
 
 static void on_reset_action_cb(GSimpleAction *action, GVariant *param, ErrandsDateChooser *self);
 static void on_today_action_cb(GSimpleAction *action, GVariant *param, ErrandsDateChooser *self);
@@ -22,7 +23,7 @@ struct _ErrandsDateChooser {
   GtkPopover *time_popover;
   GtkSpinButton *hours, *minutes;
 
-  bool is_reset;
+  icaltimetype dt;
 };
 
 G_DEFINE_TYPE(ErrandsDateChooser, errands_date_chooser, ADW_TYPE_ACTION_ROW)
@@ -66,27 +67,17 @@ void errands_date_chooser_reset(ErrandsDateChooser *self) {
   g_autoptr(GDateTime) today = g_date_time_new_now_local();
   gtk_calendar_set_date(self->calendar, today);
   g_object_set(self, "subtitle", "", NULL);
+  g_object_set(self, "title", _("Not Set"), NULL);
   g_object_set(self->reset_btn, "visible", false, NULL);
-  self->is_reset = true;
+  self->dt = icaltime_null_date();
+  self->dt.is_date = true;
 }
 
-icaltimetype errands_date_chooser_get_dt(ErrandsDateChooser *self) {
-  icaltimetype dt = icaltime_null_date();
-  if (!self->is_reset) {
-    dt.year = gtk_calendar_get_year(self->calendar);
-    dt.month = gtk_calendar_get_month(self->calendar) + 1;
-    dt.day = gtk_calendar_get_day(self->calendar);
-    dt.hour = gtk_spin_button_get_value_as_int(self->hours);
-    dt.minute = gtk_spin_button_get_value_as_int(self->minutes);
-    // TODO: checkmark for date only
-    dt.is_date = dt.hour == 0 && dt.minute == 0;
-  }
-  return dt;
-}
+icaltimetype errands_date_chooser_get_dt(ErrandsDateChooser *self) { return self->dt; }
 
 void errands_date_chooser_set_dt(ErrandsDateChooser *self, const icaltimetype dt) {
+  self->dt = dt;
   bool is_null = icaltime_is_null_date(dt);
-  self->is_reset = is_null;
   if (is_null) errands_date_chooser_reset(self);
   else {
     gtk_calendar_set_year(self->calendar, dt.year);
@@ -117,7 +108,10 @@ static void on_today_action_cb(GSimpleAction *action, GVariant *param, ErrandsDa
   gtk_calendar_set_date(self->calendar, tomorrow);
   gtk_calendar_set_date(self->calendar, today);
   gtk_popover_popdown(self->date_popover);
-  self->is_reset = false;
+  icaltimetype today_date = icaltime_today();
+  self->dt.year = today_date.year;
+  self->dt.month = today_date.month;
+  self->dt.day = today_date.day;
 }
 
 static void on_tomorrow_action_cb(GSimpleAction *action, GVariant *param, ErrandsDateChooser *self) {
@@ -125,7 +119,11 @@ static void on_tomorrow_action_cb(GSimpleAction *action, GVariant *param, Errand
   g_autoptr(GDateTime) tomorrow = g_date_time_add_days(today, 1);
   gtk_calendar_set_date(self->calendar, tomorrow);
   gtk_popover_popdown(self->date_popover);
-  self->is_reset = false;
+  icaltimetype today_date = icaltime_today();
+  icaltime_adjust(&today_date, 1, 0, 0, 0);
+  self->dt.year = today_date.year;
+  self->dt.month = today_date.month;
+  self->dt.day = today_date.day;
 }
 
 static void on_time_preset_action_cb(GSimpleAction *action, GVariant *param, ErrandsDateChooser *self) {
@@ -140,15 +138,20 @@ static void on_day_selected(ErrandsDateChooser *self) {
   g_autofree gchar *date_str = g_date_time_format(date, "%x");
   g_object_set(self, "subtitle", date_str, NULL);
   g_object_set(self->reset_btn, "visible", true, NULL);
-  self->is_reset = false;
+  self->dt.year = g_date_time_get_year(date);
+  self->dt.month = g_date_time_get_month(date);
+  self->dt.day = g_date_time_get_day_of_month(date);
 }
 
 static void on_time_set_cb(ErrandsDateChooser *self, GtkSpinButton *btn) {
   int hour = gtk_spin_button_get_value_as_int(self->hours);
   int minute = gtk_spin_button_get_value_as_int(self->minutes);
+  self->dt.is_date = false;
+  self->dt.hour = hour;
+  self->dt.minute = minute;
   gtk_editable_set_text(GTK_EDITABLE(self->hours), tmp_str_printf("%02d", hour));
   gtk_editable_set_text(GTK_EDITABLE(self->minutes), tmp_str_printf("%02d", minute));
   g_object_set(self, "title", tmp_str_printf("%02d:%02d", hour, minute), NULL);
   g_object_set(self->reset_btn, "visible", true, NULL);
-  self->is_reset = false;
+  on_today_action_cb(NULL, NULL, self);
 }
