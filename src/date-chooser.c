@@ -73,7 +73,10 @@ void errands_date_chooser_reset(ErrandsDateChooser *self) {
   self->dt.is_date = true;
 }
 
-icaltimetype errands_date_chooser_get_dt(ErrandsDateChooser *self) { return self->dt; }
+icaltimetype errands_date_chooser_get_dt(ErrandsDateChooser *self) {
+  self->dt = icaltime_normalize(self->dt);
+  return self->dt;
+}
 
 void errands_date_chooser_set_dt(ErrandsDateChooser *self, const icaltimetype dt) {
   self->dt = dt;
@@ -146,12 +149,13 @@ static void on_day_selected(ErrandsDateChooser *self) {
 static void on_time_set_cb(ErrandsDateChooser *self, GtkSpinButton *btn) {
   int hour = gtk_spin_button_get_value_as_int(self->hours);
   int minute = gtk_spin_button_get_value_as_int(self->minutes);
+  if (icaltime_is_null_date(self->dt)) on_today_action_cb(NULL, NULL, self);
   self->dt.is_date = false;
   self->dt.hour = hour;
   self->dt.minute = minute;
+  self->dt.second = 0;
   gtk_editable_set_text(GTK_EDITABLE(self->hours), tmp_str_printf("%02d", hour));
   gtk_editable_set_text(GTK_EDITABLE(self->minutes), tmp_str_printf("%02d", minute));
   g_object_set(self, "title", tmp_str_printf("%02d:%02d", hour, minute), NULL);
   g_object_set(self->reset_btn, "visible", true, NULL);
-  on_today_action_cb(NULL, NULL, self);
 }

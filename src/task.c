@@ -1,5 +1,7 @@
 #include "task.h"
+#include "adwaita.h"
 #include "data.h"
+#include "glib.h"
 #include "gtk/gtk.h"
 #include "sidebar.h"
 #include "state.h"
@@ -13,7 +15,6 @@
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>
-#include <unistd.h>
 
 static GtkWidget *errands_task_tag_new(ErrandsTask *self, const char *tag);
 
@@ -174,9 +175,8 @@ void errands_task_update_toolbar(ErrandsTask *task) {
   icaltimetype due_dt = errands_data_get_due(data->ical);
   bool has_due_date = !icaltime_is_null_date(due_dt);
   gtk_widget_set_visible(task->date_btn, has_due_date);
-  icalproperty *rrule_prop = icalcomponent_get_first_property(data->ical, ICAL_RRULE_PROPERTY);
-  if (rrule_prop) {
-    struct icalrecurrencetype rrule = icalproperty_get_rrule(rrule_prop);
+  struct icalrecurrencetype rrule = errands_data_get_rrule(data->ical);
+  if (rrule.freq != ICAL_NO_RECURRENCE) {
     g_autoptr(GString) label = g_string_new(NULL);
     switch (rrule.freq) {
     case ICAL_SECONDLY_RECURRENCE: g_string_append_printf(label, _("Every %d seconds"), rrule.interval); break;
@@ -197,13 +197,10 @@ void errands_task_update_toolbar(ErrandsTask *task) {
     }
     g_object_set(task->date_btn_content, "label", label->str ? label->str : _("Date"), NULL);
   } else {
-    if (icaltime_is_null_date(due_dt)) g_object_set(task->date_btn_content, "label", _("Date"), NULL);
+    if (!has_due_date) g_object_set(task->date_btn_content, "label", _("Date"), NULL);
     else {
       const char *due_ical_str = icaltime_as_ical_string(due_dt);
-      const char *due_date_str = tmp_str_printf("%s%s%s", due_ical_str, !strchr(due_ical_str, 'T') ? "T000000" : "",
-                                                !strchr(due_ical_str, 'Z') ? "Z" : "");
-      g_autoptr(GTimeZone) tz = g_time_zone_new_local();
-      g_autoptr(GDateTime) dt = g_date_time_new_from_iso8601(due_date_str, tz);
+      g_autoptr(GDateTime) dt = g_date_time_new_from_unix_local(icaltime_as_timet(due_dt));
       g_autofree gchar *date_str = NULL;
       if (strchr(due_ical_str, 'T')) date_str = g_date_time_format(dt, "%d %b %H:%M");
       else date_str = g_date_time_format(dt, "%d %b");
@@ -217,10 +214,8 @@ void errands_task_update_toolbar(ErrandsTask *task) {
   bool props_bar_visible = has_notes || has_attachments || has_due_date || priority > 0;
   gtk_widget_set_visible(task->props_bar, props_bar_visible);
 
-  // Update tags
-  for (GtkWidget *child = gtk_widget_get_first_child(task->tags_box); child;
-       child = gtk_widget_get_first_child(task->tags_box))
-    adw_wrap_box_remove(ADW_WRAP_BOX(task->tags_box), child);
+  // Tags
+  adw_wrap_box_remove_all(ADW_WRAP_BOX(task->tags_box));
   g_auto(GStrv) tags = errands_data_get_tags(task->data->ical);
   const size_t tags_n = tags ? g_strv_length(tags) : 0;
   for_range(i, 0, tags_n) adw_wrap_box_append(ADW_WRAP_BOX(task->tags_box), errands_task_tag_new(task, tags[i]));

@@ -3,6 +3,7 @@
 
 #include "vendor/json.h"
 #include "vendor/toolbox.h"
+#include <libical/ical.h>
 
 static void errands_data_create_backup();
 
@@ -286,6 +287,7 @@ ListData *errands_list_data_load_from_ical(icalcomponent *ical, const char *uid,
   if (ical && icalcomponent_isa(ical) != ICAL_VCALENDAR_COMPONENT) return NULL;
   get_x_prop_value(ical, "X-WR-CALNAME", name ? name : uid);
   get_x_prop_value(ical, "X-APPLE-CALENDAR-COLOR", color ? color : generate_hex_as_str());
+  icalcomponent_strip_errors(ical);
 
   ListData *list_data = errands_list_data_new(ical, uid);
 
