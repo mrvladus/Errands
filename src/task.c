@@ -199,10 +199,9 @@ void errands_task_update_toolbar(ErrandsTask *task) {
   } else {
     if (!has_due_date) g_object_set(task->date_btn_content, "label", _("Date"), NULL);
     else {
-      const char *due_ical_str = icaltime_as_ical_string(due_dt);
       g_autoptr(GDateTime) dt = g_date_time_new_from_unix_local(icaltime_as_timet(due_dt));
       g_autofree gchar *date_str = NULL;
-      if (strchr(due_ical_str, 'T')) date_str = g_date_time_format(dt, "%d %b %H:%M");
+      if (!due_dt.is_date) date_str = g_date_time_format(dt, "%d %b %H:%M");
       else date_str = g_date_time_format(dt, "%d %b");
       g_object_set(task->date_btn_content, "label", date_str, NULL);
     }

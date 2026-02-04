@@ -356,7 +356,6 @@ static void on_dialog_close_cb(ErrandsTaskPropertiesDialog *self) {
       errands_data_set_notified(data->ical, false);
       errands_notifications_add(data);
     }
-    errands_list_data_save(data->list);
     if (self->task->data->parent) errands_task_data_sort_sub_tasks(self->task->data->parent);
     else errands_data_sort();
     errands_list_data_save(data->list);
