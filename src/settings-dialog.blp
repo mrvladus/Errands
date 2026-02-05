@@ -17,17 +17,17 @@ template $ErrandsSettingsDialog: Adw.PreferencesDialog {
           notify::active => $on_theme_toggled_cb(template);
 
           Adw.Toggle system {
-            label: _("System");
+            tooltip: _("System");
             icon-name: "errands-cog-symbolic";
           }
 
           Adw.Toggle light {
-            label: _("Light");
+            tooltip: _("Light");
             icon-name: "errands-afternoon-symbolic";
           }
 
           Adw.Toggle dark {
-            label: _("Dark");
+            tooltip: _("Dark");
             icon-name: "errands-night-symbolic";
           }
 

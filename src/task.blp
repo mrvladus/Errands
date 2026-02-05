@@ -106,7 +106,7 @@ template $ErrandsTask: Box {
       ]
     }
 
-    Box {
+    Box task_menu_box {
       // Toggle Sub-Tasks button
       Button sub_toggle_btn {
         icon-name: "errands-down-symbolic";
@@ -203,6 +203,8 @@ template $ErrandsTask: Box {
     Adw.WrapBox tags_box {
       child-spacing: 3;
       line-spacing: 3;
+      halign: end;
+      hexpand: true;
     }
   }
 
