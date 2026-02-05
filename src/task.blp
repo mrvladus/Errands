@@ -47,7 +47,7 @@ template $ErrandsTask: Box {
       tooltip-text: _("Restore");
       valign: center;
       visible: bind complete_btn.visible inverted;
-      clicked => $on_restore_btn_clicked_cb(template);
+      action-name: "task.cancel";
 
       styles [
         "flat",

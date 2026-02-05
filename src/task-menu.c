@@ -185,19 +185,7 @@ static void on_export_clicked_cb(ErrandsTaskMenu *self) {
 
 static void on_cancel_clicked_cb(ErrandsTaskMenu *self) {
   gtk_popover_popdown(GTK_POPOVER(self));
-  bool new_cancelled = !errands_data_get_cancelled(self->task->data->ical);
-  errands_data_set_cancelled(self->task->data->ical, new_cancelled);
-  g_autoptr(GPtrArray) sub_tasks = g_ptr_array_new();
-  errands_task_data_get_flat_list(self->task->data, sub_tasks);
-  for_range(i, 0, sub_tasks->len) {
-    TaskData *sub_task = g_ptr_array_index(sub_tasks, i);
-    errands_data_set_cancelled(sub_task->ical, new_cancelled);
-    errands_sync_update_task(sub_task);
-  }
-  errands_list_data_save(self->task->data->list);
-  errands_list_data_sort(self->task->data->list);
-  errands_task_list_reload(state.main_window->task_list, true);
-  errands_sync_update_task(self->task->data);
+  gtk_widget_activate_action(GTK_WIDGET(self->task), "task.cancel", NULL, NULL);
 }
 
 static void on_tags_clicked_cb(ErrandsTaskMenu *self) {
@@ -227,10 +215,5 @@ static void on_date_clicked_cb(ErrandsTaskMenu *self) {
 
 static void on_pin_clicked_cb(ErrandsTaskMenu *self) {
   gtk_popover_popdown(GTK_POPOVER(self));
-  bool new_pinned = !errands_data_get_pinned(self->task->data->ical);
-  errands_data_set_pinned(self->task->data->ical, new_pinned);
-  errands_list_data_save(self->task->data->list);
-  errands_sidebar_update_filter_rows();
-  errands_task_list_reload(state.main_window->task_list, true);
-  errands_sync_update_task(self->task->data);
+  gtk_widget_activate_action(GTK_WIDGET(self->task), "task.pin", NULL, NULL);
 }
