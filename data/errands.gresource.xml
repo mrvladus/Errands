@@ -10,11 +10,11 @@
   <!-- UI -->
   <gresource prefix="/io/github/mrvladus/Errands/ui">
     <file preprocess="xml-stripblanks" compressed="true" alias="date-chooser.ui">_build/date-chooser.ui</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="delete-list-dialog.ui">_build/delete-list-dialog.ui</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="new-list-dialog.ui">_build/new-list-dialog.ui</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="rename-list-dialog.ui">_build/rename-list-dialog.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="settings-dialog.ui">_build/settings-dialog.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="sidebar.ui">_build/sidebar.ui</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="sidebar-delete-list-dialog.ui">_build/sidebar-delete-list-dialog.ui</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="sidebar-new-list-dialog.ui">_build/sidebar-new-list-dialog.ui</file>
-    <file preprocess="xml-stripblanks" compressed="true" alias="sidebar-rename-list-dialog.ui">_build/sidebar-rename-list-dialog.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="sidebar-task-list-row.ui">_build/sidebar-task-list-row.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="task.ui">_build/task.ui</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="task-list.ui">_build/task-list.ui</file>

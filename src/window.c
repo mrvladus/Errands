@@ -73,4 +73,4 @@ static void on_maximize_changed_cb(ErrandsWindow *win) {
   errands_settings_set(SETTING_MAXIMIZED, &is_maximized);
 }
 
-static void on_new_list_btn_clicked_cb() { errands_sidebar_new_list_dialog_show(); }
+static void on_new_list_btn_clicked_cb() { errands_new_list_dialog_show(); }

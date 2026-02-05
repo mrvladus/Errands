@@ -1,5 +1,6 @@
 #include "data.h"
-#include "glib.h"
+#include "delete-list-dialog.h"
+#include "rename-list-dialog.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "state.h"
@@ -185,7 +186,7 @@ static void on_action_export(GSimpleAction *action, GVariant *param, ErrandsSide
 
 static void on_action_rename(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {
   gtk_popover_popdown(row->popover);
-  errands_sidebar_rename_list_dialog_show(row);
+  errands_rename_list_dialog_show(row);
 }
 
 static void on_action_delete_completed(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {
@@ -228,7 +229,7 @@ static void on_action_delete_cancelled(GSimpleAction *action, GVariant *param, E
 
 static void on_action_delete(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {
   gtk_popover_popdown(row->popover);
-  errands_sidebar_delete_list_dialog_show(row);
+  errands_delete_list_dialog_show(row);
 }
 
 // - PRINTING - //

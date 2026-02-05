@@ -1,58 +1,10 @@
 #pragma once
 
 #include "data.h"
+#include "new-list-dialog.h"
+#include "sidebar-task-list-row.h"
 
 #include <adwaita.h>
-
-// --- SIDEBAR TASK LIST ROW --- //
-
-#define ERRANDS_TYPE_SIDEBAR_TASK_LIST_ROW (errands_sidebar_task_list_row_get_type())
-G_DECLARE_FINAL_TYPE(ErrandsSidebarTaskListRow, errands_sidebar_task_list_row, ERRANDS, SIDEBAR_TASK_LIST_ROW,
-                     GtkListBoxRow)
-
-struct _ErrandsSidebarTaskListRow {
-  GtkListBoxRow parent_instance;
-  GtkWidget *color_btn;
-  GtkWidget *counter;
-  GtkWidget *label;
-  GtkPopover *popover;
-
-  ListData *data;
-};
-
-ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_new(ListData *data);
-void errands_sidebar_task_list_row_update(ErrandsSidebarTaskListRow *self);
-ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_get(ListData *data);
-void on_errands_sidebar_task_list_row_activate(GtkListBox *box, ErrandsSidebarTaskListRow *row, gpointer user_data);
-
-// --- SIDEBAR DELETE LIST DIALOG --- //
-
-#define ERRANDS_TYPE_SIDEBAR_DELETE_LIST_DIALOG (errands_sidebar_delete_list_dialog_get_type())
-G_DECLARE_FINAL_TYPE(ErrandsSidebarDeleteListDialog, errands_sidebar_delete_list_dialog, ERRANDS,
-                     SIDEBAR_DELETE_LIST_DIALOG, AdwAlertDialog)
-
-ErrandsSidebarDeleteListDialog *errands_sidebar_delete_list_dialog_new();
-void errands_sidebar_delete_list_dialog_show(ErrandsSidebarTaskListRow *row);
-
-// --- SIDEBAR NEW LIST DIALOG --- //
-
-#define ERRANDS_TYPE_SIDEBAR_NEW_LIST_DIALOG (errands_sidebar_new_list_dialog_get_type())
-G_DECLARE_FINAL_TYPE(ErrandsSidebarNewListDialog, errands_sidebar_new_list_dialog, ERRANDS, SIDEBAR_NEW_LIST_DIALOG,
-                     AdwAlertDialog)
-
-ErrandsSidebarNewListDialog *errands_sidebar_new_list_dialog_new();
-void errands_sidebar_new_list_dialog_show();
-
-// --- SIDEBAR RENAME LIST DIALOG --- //
-
-#define ERRANDS_TYPE_SIDEBAR_RENAME_LIST_DIALOG (errands_sidebar_rename_list_dialog_get_type())
-G_DECLARE_FINAL_TYPE(ErrandsSidebarRenameListDialog, errands_sidebar_rename_list_dialog, ERRANDS,
-                     SIDEBAR_RENAME_LIST_DIALOG, AdwAlertDialog)
-
-ErrandsSidebarRenameListDialog *errands_sidebar_rename_list_dialog_new();
-void errands_sidebar_rename_list_dialog_show(ErrandsSidebarTaskListRow *row);
-
-// --- SIDEBAR --- //
 
 #define ERRANDS_TYPE_SIDEBAR (errands_sidebar_get_type())
 G_DECLARE_FINAL_TYPE(ErrandsSidebar, errands_sidebar, ERRANDS, SIDEBAR, AdwBin)
@@ -71,8 +23,7 @@ struct _ErrandsSidebar {
   GtkWidget *task_lists_box;
 
   ErrandsSidebarTaskListRow *current_task_list_row;
-
-  ErrandsSidebarNewListDialog *new_list_dialog;
+  ErrandsNewListDialog *new_list_dialog;
 };
 
 ErrandsSidebar *errands_sidebar_new(void);

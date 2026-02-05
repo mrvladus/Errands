@@ -51,7 +51,7 @@ static void errands_sidebar_init(ErrandsSidebar *sidebar) {
   gtk_widget_init_template(GTK_WIDGET(sidebar));
   GSimpleActionGroup *ag = errands_add_action_group(self, "sidebar");
   errands_add_action(ag, "import", on_import_action_cb, self, NULL);
-  errands_add_action(ag, "new_list", errands_sidebar_new_list_dialog_show, self, NULL);
+  errands_add_action(ag, "new_list", errands_new_list_dialog_show, self, NULL);
   errands_add_action(ag, "preferences", errands_settings_dialog_show, self, NULL);
   errands_add_action(ag, "about", errands_about_dialog_show, self, NULL);
   errands_add_action(ag, "sync", errands_sync, self, NULL);
