@@ -125,8 +125,7 @@ void errands_sidebar_update_filter_rows() {
       CONTINUE_IF(errands_data_get_deleted(ical));
       CONTINUE_IF(errands_data_get_cancelled(ical));
       bool is_completed = !icaltime_is_null_date(errands_data_get_completed(ical));
-      icaltimetype due = errands_data_get_due(ical);
-      bool is_due = !icaltime_is_null_time(due) && icaltime_compare_date_only(due, icaltime_today()) < 1;
+      bool is_due = errands_data_is_due(ical);
       bool is_pinned = errands_data_get_pinned(ical);
       if (is_completed) completed++;
       if (is_due) {
