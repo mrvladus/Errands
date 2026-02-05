@@ -201,7 +201,10 @@ static void on_action_delete_completed(GSimpleAction *action, GVariant *param, E
       deleted = true;
     }
   }
-  if (deleted) errands_task_list_reload(state.main_window->task_list, true);
+  if (deleted) {
+    errands_list_data_save(row->data);
+    errands_task_list_reload(state.main_window->task_list, true);
+  }
 }
 
 static void on_action_delete_cancelled(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {
@@ -217,7 +220,10 @@ static void on_action_delete_cancelled(GSimpleAction *action, GVariant *param, E
       deleted = true;
     }
   }
-  if (deleted) errands_task_list_reload(state.main_window->task_list, true);
+  if (deleted) {
+    errands_list_data_save(row->data);
+    errands_task_list_reload(state.main_window->task_list, true);
+  }
 }
 
 static void on_action_delete(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {
