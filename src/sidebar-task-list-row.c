@@ -1,4 +1,5 @@
 #include "data.h"
+#include "glib.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "state.h"
@@ -10,15 +11,18 @@
 #include "vendor/toolbox.h"
 
 #include <glib/gi18n.h>
+#include <libical/ical.h>
 
-static void on_right_click(GtkPopover *popover, gint n_press, gdouble x, gdouble y, GtkGestureClick *ctrl);
-static void on_color_changed(GtkColorDialogButton *btn, GParamSpec *pspec, ListData *data);
-static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x, double y,
-                           ErrandsSidebarTaskListRow *row);
 static void on_action_export(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row);
 static void on_action_print(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row);
 static void on_action_rename(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row);
+static void on_action_delete_completed(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row);
+static void on_action_delete_cancelled(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row);
 static void on_action_delete(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row);
+
+static void on_color_changed(GtkColorDialogButton *btn, GParamSpec *pspec, ListData *data);
+static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x, double y,
+                           ErrandsSidebarTaskListRow *row);
 // static GdkDragAction on_hover_begin(GtkDropTarget *target, gdouble x, gdouble y,
 //                                     ErrandsSidebarTaskListRow *row);
 
@@ -37,7 +41,7 @@ static void errands_sidebar_task_list_row_class_init(ErrandsSidebarTaskListRowCl
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebarTaskListRow, color_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebarTaskListRow, counter);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebarTaskListRow, label);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_right_click);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebarTaskListRow, popover);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_drop_cb);
   G_OBJECT_CLASS(class)->dispose = errands_sidebar_task_list_row_dispose;
 }
@@ -47,9 +51,11 @@ static void errands_sidebar_task_list_row_init(ErrandsSidebarTaskListRow *self) 
   // Actions
   GSimpleActionGroup *ag = errands_add_action_group(self, "task-list-row");
   errands_add_action(ag, "rename", on_action_rename, self, NULL);
-  errands_add_action(ag, "delete", on_action_delete, self, NULL);
   errands_add_action(ag, "print", on_action_print, self, NULL);
   errands_add_action(ag, "export", on_action_export, self, NULL);
+  errands_add_action(ag, "delete-completed", on_action_delete_completed, self, NULL);
+  errands_add_action(ag, "delete-cancelled", on_action_delete_cancelled, self, NULL);
+  errands_add_action(ag, "delete", on_action_delete, self, NULL);
 
   // Drop target setup
   // GtkDropTarget *drop_target = gtk_drop_target_new(G_TYPE_OBJECT, GDK_ACTION_MOVE);
@@ -118,11 +124,6 @@ void on_errands_sidebar_task_list_row_activate(GtkListBox *box, ErrandsSidebarTa
   adw_navigation_split_view_set_show_content(state.main_window->split_view, true);
 }
 
-static void on_right_click(GtkPopover *popover, gint n_press, gdouble x, gdouble y, GtkGestureClick *ctrl) {
-  gtk_popover_set_pointing_to(popover, &(GdkRectangle){.x = x, .y = y});
-  gtk_popover_popup(popover);
-}
-
 static void on_color_changed(GtkColorDialogButton *btn, GParamSpec *pspec, ListData *data) {
   const GdkRGBA *color_rgba = gtk_color_dialog_button_get_rgba(btn);
   char new_color[8];
@@ -174,6 +175,7 @@ static void on_action_export_finish_cb(GObject *obj, GAsyncResult *res, ListData
 }
 
 static void on_action_export(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {
+  gtk_popover_popdown(row->popover);
   g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
   const char *filename = tmp_str_printf("%s.ics", row->data->uid);
   g_object_set(dialog, "initial-name", filename, NULL);
@@ -182,10 +184,44 @@ static void on_action_export(GSimpleAction *action, GVariant *param, ErrandsSide
 }
 
 static void on_action_rename(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {
+  gtk_popover_popdown(row->popover);
   errands_sidebar_rename_list_dialog_show(row);
 }
 
+static void on_action_delete_completed(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {
+  gtk_popover_popdown(row->popover);
+  bool deleted = false;
+  g_autoptr(GPtrArray) tasks = g_ptr_array_sized_new(row->data->children->len);
+  errands_list_data_get_flat_list(row->data, tasks);
+  for_range(i, 0, tasks->len) {
+    TaskData *task = g_ptr_array_index(tasks, i);
+    if (errands_data_is_completed(task->ical)) {
+      errands_data_set_deleted(task->ical, true);
+      errands_sync_delete_task(task);
+      deleted = true;
+    }
+  }
+  if (deleted) errands_task_list_reload(state.main_window->task_list, true);
+}
+
+static void on_action_delete_cancelled(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {
+  gtk_popover_popdown(row->popover);
+  bool deleted = false;
+  g_autoptr(GPtrArray) tasks = g_ptr_array_sized_new(row->data->children->len);
+  errands_list_data_get_flat_list(row->data, tasks);
+  for_range(i, 0, tasks->len) {
+    TaskData *task = g_ptr_array_index(tasks, i);
+    if (errands_data_get_cancelled(task->ical)) {
+      errands_data_set_deleted(task->ical, true);
+      errands_sync_delete_task(task);
+      deleted = true;
+    }
+  }
+  if (deleted) errands_task_list_reload(state.main_window->task_list, true);
+}
+
 static void on_action_delete(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {
+  gtk_popover_popdown(row->popover);
   errands_sidebar_delete_list_dialog_show(row);
 }
 
@@ -265,6 +301,7 @@ void start_print(const char *str) {
 }
 
 static void on_action_print(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {
+  gtk_popover_popdown(row->popover);
   LOG("Start printing of the list '%s'", row->data->uid);
   TODO("PRINT");
   // g_autofree gchar *str = list_data_print(row->data);

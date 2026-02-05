@@ -1,12 +1,5 @@
 using Gtk 4.0;
 
-menu rc_menu {
-  item (_("Rename"), "task-list-row.rename")
-  item (_("Delete"), "task-list-row.delete")
-  item (_("Export"), "task-list-row.export")
-  item (_("Print"), "task-list-row.print")
-}
-
 template $ErrandsSidebarTaskListRow: Gtk.ListBoxRow {
   Box {
     spacing: 6;
@@ -17,7 +10,8 @@ template $ErrandsSidebarTaskListRow: Gtk.ListBoxRow {
 
     Gtk.ColorDialogButton color_btn {
       hexpand: false;
-      halign: start;
+      halign: center;
+      valign: center;
       tooltip-text: _("Task List Color");
 
       dialog: Gtk.ColorDialog {};
@@ -39,15 +33,165 @@ template $ErrandsSidebarTaskListRow: Gtk.ListBoxRow {
       ]
     }
 
-    PopoverMenu popover_menu {
-      menu-model: rc_menu;
-      has-arrow: false;
-      halign: start;
-    }
+    MenuButton {
+      icon-name: "errands-more-symbolic";
+      margin-top: 3;
+      margin-bottom: 3;
+      valign: center;
 
-    GestureClick {
-      button: 3;
-      released => $on_right_click(popover_menu);
+      popover: Popover popover {
+        has-arrow: false;
+
+        styles [
+          "menu",
+        ]
+
+        Box {
+          orientation: vertical;
+          margin-start: 6;
+          margin-end: 6;
+          margin-top: 6;
+          margin-bottom: 6;
+
+          Button {
+            action-name: "task-list-row.rename";
+
+            styles [
+              "flat",
+              "body",
+            ]
+
+            Box {
+              spacing: 12;
+
+              Image {
+                icon-name: "errands-edit-symbolic";
+              }
+
+              Label {
+                label: _("Rename");
+              }
+            }
+          }
+
+          Separator {}
+
+          Button {
+            action-name: "task-list-row.export";
+
+            styles [
+              "flat",
+              "body",
+            ]
+
+            Box {
+              spacing: 12;
+
+              Image {
+                icon-name: "errands-export-symbolic";
+              }
+
+              Label {
+                label: _("Export");
+              }
+            }
+          }
+
+          Button {
+            action-name: "task-list-row.print";
+
+            styles [
+              "flat",
+              "body",
+            ]
+
+            Box {
+              spacing: 12;
+
+              Image {
+                icon-name: "errands-print-symbolic";
+              }
+
+              Label {
+                label: _("Print");
+              }
+            }
+          }
+
+          Separator {}
+
+          Button {
+            action-name: "task-list-row.delete-completed";
+
+            styles [
+              "flat",
+              "body",
+              "warning",
+            ]
+
+            Box {
+              spacing: 12;
+
+              Image {
+                icon-name: "errands-select-symbolic";
+              }
+
+              Label {
+                label: _("Delete Completed");
+              }
+            }
+          }
+
+          Button {
+            action-name: "task-list-row.delete-cancelled";
+
+            styles [
+              "flat",
+              "body",
+              "warning",
+            ]
+
+            Box {
+              spacing: 12;
+
+              Image {
+                icon-name: "errands-cancel-symbolic";
+              }
+
+              Label {
+                label: _("Delete Cancelled");
+              }
+            }
+          }
+
+          Button {
+            action-name: "task-list-row.delete";
+
+            styles [
+              "flat",
+              "body",
+              "error",
+            ]
+
+            Box {
+              spacing: 12;
+
+              Image {
+                icon-name: "errands-trash-symbolic";
+              }
+
+              Label {
+                label: _("Delete List");
+              }
+            }
+          }
+        }
+      };
+
+      styles [
+        "flat",
+        "circular",
+      ]
     }
   }
 

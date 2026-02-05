@@ -48,6 +48,7 @@
     <file preprocess="xml-stripblanks" compressed="true" alias="errands-night-symbolic.svg">data/icons/errands-night-symbolic.svg</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="errands-notes-symbolic.svg">data/icons/errands-notes-symbolic.svg</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="errands-pin-symbolic.svg">data/icons/errands-pin-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" compressed="true" alias="errands-print-symbolic.svg">data/icons/errands-print-symbolic.svg</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="errands-priority-none-symbolic.svg">data/icons/errands-priority-none-symbolic.svg</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="errands-priority-set-symbolic.svg">data/icons/errands-priority-set-symbolic.svg</file>
     <file preprocess="xml-stripblanks" compressed="true" alias="errands-priority-symbolic.svg">data/icons/errands-priority-symbolic.svg</file>
