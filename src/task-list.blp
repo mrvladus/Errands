@@ -62,10 +62,11 @@ template $ErrandsTaskList: Adw.Bin {
 
       Entry entry {
         placeholder-text: _("New Task");
-        tooltip-text: _("Add New Task (Ctrl+T)");
+        tooltip-text: _("Add New Task (Ctrl+N)");
         height-request: 46;
         hexpand: true;
         activate => $on_task_list_entry_activated_cb(template);
+        changed => $on_task_list_entry_text_changed_cb(template);
 
         styles [
           "card",
@@ -81,14 +82,48 @@ template $ErrandsTaskList: Adw.Bin {
         }
       }
 
-      // ToggleButton {
-      //   icon-name: "errands-calendar-symbolic";
-      //   valign: center;
-      //   tooltip-text: _("More Options");
-      //   styles [
-      //     "circular",
-      //   ]
-      // }
+      Button {
+        icon-name: "errands-more-symbolic";
+        valign: center;
+        tooltip-text: _("Task Properties (Shift+Ctrl+P)");
+        action-name: "task-list.task-properties";
+
+        styles [
+          "circular",
+          "flat",
+        ]
+
+        ShortcutController {
+          scope: global;
+
+          Shortcut {
+            trigger: "<Shift><Control>P";
+            action: "activate";
+          }
+        }
+      }
+
+      Button entry_apply_btn {
+        icon-name: "errands-select-symbolic";
+        valign: center;
+        tooltip-text: _("Add Task (Shift+Ctrl+Return)");
+        sensitive: false;
+        clicked => $on_task_list_entry_activated_cb(template);
+
+        styles [
+          "circular",
+          "suggested-action",
+        ]
+
+        ShortcutController {
+          scope: global;
+
+          Shortcut {
+            trigger: "<Shift><Control>Return";
+            action: "activate";
+          }
+        }
+      }
     }
 
     content: Box {

@@ -47,6 +47,7 @@ struct _ErrandsTaskList {
   GtkWidget *search_entry;
   GtkWidget *entry_box;
   GtkWidget *entry;
+  GtkWidget *entry_apply_btn;
   GtkWidget *scrl;
   GtkWidget *top_spacer;
   GtkWidget *task_list;

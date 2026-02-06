@@ -1,13 +1,16 @@
 #include "task-list.h"
 #include "data.h"
 #include "glib.h"
+#include "gtk/gtk.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "sync.h"
+#include "task-properties-dialog.h"
 #include "task.h"
 #include "utils.h"
 
 #include <glib/gi18n.h>
+#include <libical/ical.h>
 #include <string.h>
 
 static size_t tasks_stack_size = 0, current_start = 0;
@@ -16,20 +19,27 @@ static const char *search_query = NULL;
 static ErrandsTask *measuring_task = NULL;
 static double scroll_position = 0.0f;
 
+static ErrandsTask *entry_task = NULL;
+static TaskData *entry_task_data = NULL;
+
 static int __get_tasks_stack_size();
 
-static void on_task_list_entry_activated_cb(ErrandsTaskList *self, GtkEntry *entry);
+static void on_task_list_entry_activated_cb(ErrandsTaskList *self);
+static void on_task_list_entry_text_changed_cb(ErrandsTaskList *self);
 static void on_task_list_search_cb(ErrandsTaskList *self, GtkSearchEntry *entry);
 static void on_adjustment_value_changed_cb(GtkAdjustment *adj, ErrandsTaskList *self);
 static void on_motion_cb(GtkEventControllerMotion *ctrl, gdouble x, gdouble y, ErrandsTaskList *self);
 
 static void on_focus_entry_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
+static void on_task_properties_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
 
 // ---------- WIDGET TEMPLATE ---------- //
 
 G_DEFINE_TYPE(ErrandsTaskList, errands_task_list, ADW_TYPE_BIN)
 
 static void errands_task_list_dispose(GObject *gobject) {
+  if (entry_task) g_object_run_dispose(G_OBJECT(entry_task));
+  errands_task_data_free(entry_task_data);
   if (measuring_task) g_object_run_dispose(G_OBJECT(measuring_task));
   if (current_task_list) g_ptr_array_free(current_task_list, true);
   gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_TASK_LIST);
@@ -47,6 +57,7 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, search_entry);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, entry_box);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, entry);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, entry_apply_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, adj);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, task_menu);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, motion_ctrl);
@@ -55,20 +66,27 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, task_list);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_list_sort_dialog_show);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_entry_activated_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_entry_text_changed_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_search_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_adjustment_value_changed_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_motion_cb);
 }
 
 static void errands_task_list_init(ErrandsTaskList *self) {
-  LOG("Task List: Create");
   gtk_widget_init_template(GTK_WIDGET(self));
+
   GSimpleActionGroup *ag = errands_add_action_group(self, "task-list");
   errands_add_action(ag, "focus-entry", on_focus_entry_action_cb, self, NULL);
+  errands_add_action(ag, "task-properties", on_task_properties_action_cb, self, NULL);
+
   gtk_search_bar_connect_entry(GTK_SEARCH_BAR(self->search_bar), GTK_EDITABLE(self->search_entry));
   measuring_task = errands_task_new();
-  tasks_stack_size = __get_tasks_stack_size();
+  // Create entry task
+  entry_task = errands_task_new();
+  entry_task_data = errands_task_data_create_task(NULL, NULL, "");
+  errands_task_set_data(entry_task, entry_task_data);
   // Create Tasks widgets
+  tasks_stack_size = __get_tasks_stack_size();
   for_range(i, 0, tasks_stack_size) {
     ErrandsTask *task = errands_task_new();
     gtk_box_append(GTK_BOX(self->task_list), GTK_WIDGET(task));
@@ -267,6 +285,10 @@ static void on_focus_entry_action_cb(GSimpleAction *action, GVariant *param, Err
   gtk_widget_grab_focus(GTK_WIDGET(self->entry));
 }
 
+static void on_task_properties_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
+  errands_task_properties_dialog_show(ERRANDS_TASK_PROPERTY_DIALOG_PAGE_DATE, entry_task);
+}
+
 // ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_task_list_update_title(ErrandsTaskList *self) {
@@ -371,20 +393,35 @@ void errands_task_list_reload(ErrandsTaskList *self, bool save_scroll_pos) {
 
 // ---------- CALLBACKS ---------- //
 
-static void on_task_list_entry_activated_cb(ErrandsTaskList *self, GtkEntry *entry) {
+static void on_task_list_entry_activated_cb(ErrandsTaskList *self) {
   if (!self->data) return;
-  const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
+  const char *text = gtk_editable_get_text(GTK_EDITABLE(self->entry));
   const char *list_uid = self->data->uid;
   if (STR_EQUAL(text, "") || STR_EQUAL(list_uid, "")) return;
-  TaskData *data = errands_task_data_create_task(self->data, NULL, text);
-  errands_list_data_sort(self->data);
+
+  // Create new top-level task from entry task
+  TaskData *data = errands_task_data_new(entry_task_data->ical, NULL, self->data);
+  errands_data_set_uid(data->ical, generate_uuid4());
+  errands_data_set_text(data->ical, text);
+  errands_data_set_created(data->ical, icaltime_get_date_time_now());
+  icalcomponent_add_component(self->data->ical, data->ical);
   errands_list_data_save(self->data);
-  gtk_editable_set_text(GTK_EDITABLE(entry), "");
+
+  // Reload entry task
+  entry_task->data->ical = icalcomponent_new(ICAL_VTODO_COMPONENT);
+
+  gtk_editable_set_text(GTK_EDITABLE(self->entry), "");
   errands_sidebar_task_list_row_update(errands_sidebar_task_list_row_get(data->list));
   errands_sidebar_update_filter_rows();
   LOG("Add task '%s' to task list '%s'", errands_data_get_uid(data->ical), list_uid);
-  errands_sync_create_task(data);
+  errands_list_data_sort(self->data);
   errands_task_list_reload(self, false);
+  errands_sync_create_task(data);
+}
+
+static void on_task_list_entry_text_changed_cb(ErrandsTaskList *self) {
+  const char *text = gtk_editable_get_text(GTK_EDITABLE(self->entry));
+  gtk_widget_set_sensitive(self->entry_apply_btn, text && !STR_EQUAL(text, ""));
 }
 
 static void on_task_list_search_cb(ErrandsTaskList *self, GtkSearchEntry *entry) {

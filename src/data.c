@@ -23,7 +23,7 @@ static void errands_data_create_backup() {
   int res = cmd_run_stdout(tmp_str_printf("ls %s | wc -l", backups_dir), &out);
   if (res != 0 && !out) return;
   // Remove oldest backup
-  if (STR_TO_UL(out) > 19) {
+  if (STR_TO_UL(out) >= 20) {
     LOG("User Data: Removing oldest backup");
     system(tmp_str_printf("rm -f $(find %s/* -type f | sort | head -n 1)", backups_dir));
   }
@@ -385,28 +385,28 @@ void errands_list_data_free(ListData *data) {
 // ---------- TASK DATA ---------- //
 
 TaskData *errands_task_data_new(icalcomponent *ical, TaskData *parent, ListData *list) {
-  if (!list) return NULL;
-
   TaskData *task = calloc(1, sizeof(TaskData));
   task->ical = ical;
   task->parent = parent;
   task->list = list;
   task->children = g_ptr_array_new_with_free_func((GDestroyNotify)errands_task_data_free);
-  if (errands_data_get_parent(ical) && parent) g_ptr_array_add(parent->children, task);
-  else g_ptr_array_add(list->children, task);
+  if (errands_data_get_parent(ical) && parent) {
+    g_ptr_array_add(parent->children, task);
+  } else {
+    if (list) g_ptr_array_add(list->children, task);
+  }
 
   return task;
 }
 
 TaskData *errands_task_data_create_task(ListData *list, TaskData *parent, const char *text) {
-  if (!list || !text) return NULL;
 
   TaskData *task = errands_task_data_new(icalcomponent_new(ICAL_VTODO_COMPONENT), parent, list);
   errands_data_set_uid(task->ical, generate_uuid4());
   errands_data_set_text(task->ical, text);
   if (parent) errands_data_set_parent(task->ical, errands_data_get_uid(parent->ical));
   errands_data_set_created(task->ical, icaltime_get_date_time_now());
-  icalcomponent_add_component(list->ical, task->ical);
+  if (list) icalcomponent_add_component(list->ical, task->ical);
 
   return task;
 }

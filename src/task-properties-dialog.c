@@ -129,7 +129,8 @@ void errands_task_properties_dialog_show(ErrandsTaskPropertiesDialogPage page, E
   adw_view_stack_set_visible_child_name(self->stack, page_names[page_n]);
 
   // Title
-  gtk_label_set_label(self->title, errands_data_get_text(task->data->ical));
+  const char *text = errands_data_get_text(task->data->ical);
+  gtk_label_set_label(self->title, text ? text : _("Task Properties"));
 
   // Date
   errands_date_chooser_reset(self->start_date_chooser);

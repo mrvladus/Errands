@@ -104,6 +104,7 @@ template $ErrandsTaskPropertiesDialog: Adw.Dialog {
               [suffix]
               CheckButton high_toggle_btn {
                 name: "high";
+                valign: center;
                 toggled => $on_priority_toggled_cb(template);
               }
             }
@@ -125,6 +126,7 @@ template $ErrandsTaskPropertiesDialog: Adw.Dialog {
               CheckButton medium_toggle_btn {
                 name: "medium";
                 group: high_toggle_btn;
+                valign: center;
                 toggled => $on_priority_toggled_cb(template);
               }
             }
@@ -146,6 +148,7 @@ template $ErrandsTaskPropertiesDialog: Adw.Dialog {
               CheckButton low_toggle_btn {
                 name: "low";
                 group: high_toggle_btn;
+                valign: center;
                 toggled => $on_priority_toggled_cb(template);
               }
             }
@@ -163,6 +166,7 @@ template $ErrandsTaskPropertiesDialog: Adw.Dialog {
               CheckButton none_toggle_btn {
                 name: "none";
                 group: high_toggle_btn;
+                valign: center;
                 toggled => $on_priority_toggled_cb(template);
               }
             }
