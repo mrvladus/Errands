@@ -231,144 +231,148 @@ template $ErrandsTaskMenu: Popover {
         }
       }
 
-      Separator {}
+      Box task_mode_box {
+        orientation: vertical;
 
-      // Pin
-      Button {
-        clicked => $on_pin_clicked_cb(template);
+        Separator {}
 
-        styles [
-          "flat",
-          "body",
-        ]
-
-        Box {
-          spacing: 12;
-
-          Image {
-            icon-name: "errands-pin-symbolic";
-          }
-
-          Label pin_label {}
-        }
-      }
-
-      Separator {}
-
-      // Edit
-      Button {
-        clicked => $on_edit_clicked_cb(template);
-
-        styles [
-          "flat",
-          "body",
-        ]
-
-        Box {
-          spacing: 12;
-
-          Image {
-            icon-name: "errands-edit-symbolic";
-          }
-
-          Label {
-            label: _("Edit Text");
-          }
-        }
-      }
-
-      // Copy Text
-      Button {
-        clicked => $on_clipboard_clicked_cb(template);
-
-        styles [
-          "flat",
-          "body",
-        ]
-
-        Box {
-          spacing: 12;
-
-          Image {
-            icon-name: "errands-clipboard-symbolic";
-          }
-
-          Label {
-            label: _("Copy Text");
-          }
-        }
-      }
-
-      Separator {}
-
-      // Export
-      Button {
-        clicked => $on_export_clicked_cb(template);
-
-        styles [
-          "flat",
-          "body",
-        ]
-
-        Box {
-          spacing: 12;
-
-          Image {
-            icon-name: "errands-export-symbolic";
-          }
-
-          Label {
-            label: _("Export as \".ics\"");
-          }
-        }
-      }
-
-      Separator {}
-
-      // Cancel
-      Button {
-        clicked => $on_cancel_clicked_cb(template);
-
-        styles [
-          "flat",
-          "body",
-          "warning",
-        ]
-
-        Box {
-          spacing: 12;
-
-          Image {
-            icon-name: "errands-cancel-symbolic";
-          }
-
-          Label cancel_label {}
-        }
-      }
-
-      // Delete
-      Button {
-        clicked => $on_delete_clicked_cb(template);
-
-        styles [
-          "flat",
-          "body",
-          "error",
-        ]
-
-        Box {
-          spacing: 12;
+        // Pin
+        Button {
+          clicked => $on_pin_clicked_cb(template);
 
           styles [
+            "flat",
+            "body",
+          ]
+
+          Box {
+            spacing: 12;
+
+            Image {
+              icon-name: "errands-pin-symbolic";
+            }
+
+            Label pin_label {}
+          }
+        }
+
+        Separator {}
+
+        // Edit
+        Button {
+          clicked => $on_edit_clicked_cb(template);
+
+          styles [
+            "flat",
+            "body",
+          ]
+
+          Box {
+            spacing: 12;
+
+            Image {
+              icon-name: "errands-edit-symbolic";
+            }
+
+            Label {
+              label: _("Edit Text");
+            }
+          }
+        }
+
+        // Copy Text
+        Button {
+          clicked => $on_clipboard_clicked_cb(template);
+
+          styles [
+            "flat",
+            "body",
+          ]
+
+          Box {
+            spacing: 12;
+
+            Image {
+              icon-name: "errands-clipboard-symbolic";
+            }
+
+            Label {
+              label: _("Copy Text");
+            }
+          }
+        }
+
+        Separator {}
+
+        // Export
+        Button {
+          clicked => $on_export_clicked_cb(template);
+
+          styles [
+            "flat",
+            "body",
+          ]
+
+          Box {
+            spacing: 12;
+
+            Image {
+              icon-name: "errands-export-symbolic";
+            }
+
+            Label {
+              label: _("Export as \".ics\"");
+            }
+          }
+        }
+
+        Separator {}
+
+        // Cancel
+        Button {
+          clicked => $on_cancel_clicked_cb(template);
+
+          styles [
+            "flat",
+            "body",
+            "warning",
+          ]
+
+          Box {
+            spacing: 12;
+
+            Image {
+              icon-name: "errands-cancel-symbolic";
+            }
+
+            Label cancel_label {}
+          }
+        }
+
+        // Delete
+        Button {
+          clicked => $on_delete_clicked_cb(template);
+
+          styles [
+            "flat",
+            "body",
             "error",
           ]
 
-          Image {
-            icon-name: "errands-trash-symbolic";
-          }
+          Box {
+            spacing: 12;
 
-          Label {
-            label: _("Delete");
+            styles [
+              "error",
+            ]
+
+            Image {
+              icon-name: "errands-trash-symbolic";
+            }
+
+            Label {
+              label: _("Delete");
+            }
           }
         }
       }

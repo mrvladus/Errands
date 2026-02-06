@@ -47,6 +47,7 @@ struct _ErrandsTaskList {
   GtkWidget *search_entry;
   GtkWidget *entry_box;
   GtkWidget *entry;
+  GtkWidget *entry_menu_btn;
   GtkWidget *entry_apply_btn;
   GtkWidget *scrl;
   GtkWidget *top_spacer;
@@ -57,8 +58,8 @@ struct _ErrandsTaskList {
   ErrandsTaskListSortDialog *sort_dialog;
 
   GtkEventControllerMotion *motion_ctrl;
-  gdouble x, y;
 
+  float x, y;
   ListData *data;
   ErrandsTaskListPage page;
 };

@@ -5,7 +5,7 @@
 #include "settings.h"
 #include "sidebar.h"
 #include "sync.h"
-#include "task-properties-dialog.h"
+#include "task-menu.h"
 #include "task.h"
 #include "utils.h"
 
@@ -31,7 +31,7 @@ static void on_adjustment_value_changed_cb(GtkAdjustment *adj, ErrandsTaskList *
 static void on_motion_cb(GtkEventControllerMotion *ctrl, gdouble x, gdouble y, ErrandsTaskList *self);
 
 static void on_focus_entry_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
-static void on_task_properties_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
+static void on_entry_task_menu_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
 
 // ---------- WIDGET TEMPLATE ---------- //
 
@@ -58,6 +58,7 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, entry_box);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, entry);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, entry_apply_btn);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, entry_menu_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, adj);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, task_menu);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, motion_ctrl);
@@ -77,7 +78,7 @@ static void errands_task_list_init(ErrandsTaskList *self) {
 
   GSimpleActionGroup *ag = errands_add_action_group(self, "task-list");
   errands_add_action(ag, "focus-entry", on_focus_entry_action_cb, self, NULL);
-  errands_add_action(ag, "task-properties", on_task_properties_action_cb, self, NULL);
+  errands_add_action(ag, "show-entry-task-menu", on_entry_task_menu_action_cb, self, NULL);
 
   gtk_search_bar_connect_entry(GTK_SEARCH_BAR(self->search_bar), GTK_EDITABLE(self->search_entry));
   measuring_task = errands_task_new();
@@ -281,12 +282,17 @@ static void on_motion_cb(GtkEventControllerMotion *ctrl, gdouble x, gdouble y, E
   self->y = y;
 }
 
+// ---------- ACTIONS ---------- //
+
 static void on_focus_entry_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
   gtk_widget_grab_focus(GTK_WIDGET(self->entry));
 }
 
-static void on_task_properties_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
-  errands_task_properties_dialog_show(ERRANDS_TASK_PROPERTY_DIALOG_PAGE_DATE, entry_task);
+static void on_entry_task_menu_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
+  graphene_rect_t rect = {0};
+  bool res = gtk_widget_compute_bounds(GTK_WIDGET(self->entry_menu_btn), GTK_WIDGET(self), &rect);
+  UNUSED(res);
+  errands_task_menu_show(entry_task, rect.origin.x, rect.origin.y - rect.size.height, ERRANDS_TASK_MENU_MODE_ENTRY);
 }
 
 // ---------- PUBLIC FUNCTIONS ---------- //

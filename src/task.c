@@ -1,8 +1,10 @@
 #include "task.h"
+#include "gtk/gtk.h"
 #include "sidebar.h"
 #include "state.h"
 #include "sync.h"
 #include "task-list.h"
+#include "task-menu.h"
 #include "task-properties-dialog.h"
 #include "utils.h"
 #include "window.h"
@@ -14,6 +16,7 @@
 
 static GtkWidget *errands_task_tag_new(ErrandsTask *self, const char *tag);
 
+static void on_menu_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_notes_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_priority_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_attachments_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
@@ -52,6 +55,7 @@ static void errands_task_class_init(ErrandsTaskClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, title);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, subtitle);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, edit_title);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, menu_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, sub_toggle_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, toolbar);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, props_bar);
@@ -80,6 +84,7 @@ static void errands_task_class_init(ErrandsTaskClass *class) {
 static void errands_task_init(ErrandsTask *self) {
   gtk_widget_init_template(GTK_WIDGET(self));
   GSimpleActionGroup *ag = errands_add_action_group(self, "task");
+  errands_add_action(ag, "menu", on_menu_action_cb, self, NULL);
   errands_add_action(ag, "notes", on_notes_action_cb, self, NULL);
   errands_add_action(ag, "priority", on_priority_action_cb, self, NULL);
   errands_add_action(ag, "attachments", on_attachments_action_cb, self, NULL);
@@ -237,6 +242,11 @@ static GtkWidget *errands_task_tag_new(ErrandsTask *self, const char *tag) {
 }
 
 // ---------- ACTION CALLBACKS ---------- //
+
+static void on_menu_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
+  ErrandsTaskList *task_list = (ErrandsTaskList *)gtk_widget_get_ancestor(GTK_WIDGET(self), ERRANDS_TYPE_TASK_LIST);
+  errands_task_menu_show(self, task_list->x, task_list->y, ERRANDS_TASK_MENU_MODE_TASK);
+}
 
 static void on_notes_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
   errands_task_properties_dialog_show(ERRANDS_TASK_PROPERTY_DIALOG_PAGE_NOTES, self);

@@ -121,17 +121,17 @@ template $ErrandsTask: Box {
         clicked => $on_expand_toggle_cb(template);
       }
 
-      // Menu
-      Button {
+      // Properties menu
+      Button menu_btn {
+        tooltip-text: _("Properties");
         icon-name: "errands-more-symbolic";
         valign: center;
+        action-name: "task.menu";
 
         styles [
           "flat",
           "circular",
         ]
-
-        clicked => $errands_task_menu_show(template);
       }
     }
   }

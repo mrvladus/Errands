@@ -82,11 +82,11 @@ template $ErrandsTaskList: Adw.Bin {
         }
       }
 
-      Button {
+      Button entry_menu_btn {
         icon-name: "errands-more-symbolic";
         valign: center;
-        tooltip-text: _("Task Properties (Shift+Ctrl+P)");
-        action-name: "task-list.task-properties";
+        tooltip-text: _("Properties");
+        action-name: "task-list.show-entry-task-menu";
 
         styles [
           "circular",
@@ -129,11 +129,11 @@ template $ErrandsTaskList: Adw.Bin {
     content: Box {
       orientation: vertical;
 
-      $ErrandsTaskMenu task_menu {}
-
       EventControllerMotion motion_ctrl {
         motion => $on_motion_cb(template) not-swapped;
       }
+
+      $ErrandsTaskMenu task_menu {}
 
       Adw.StatusPage {
         title: _("No Tasks");

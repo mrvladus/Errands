@@ -26,6 +26,7 @@ static void on_pin_clicked_cb(ErrandsTaskMenu *self);
 
 struct _ErrandsTaskMenu {
   GtkPopover parent_instance;
+  GtkWidget *task_mode_box;
   GtkLabel *pin_label;
   GtkLabel *cancel_label;
   GtkFlowBox *color_box;
@@ -47,6 +48,7 @@ static void errands_task_menu_class_init(ErrandsTaskMenuClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskMenu, color_box);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskMenu, pin_label);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskMenu, cancel_label);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskMenu, task_mode_box);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_edit_clicked_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_clipboard_clicked_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_export_clicked_cb);
@@ -67,30 +69,29 @@ ErrandsTaskMenu *errands_task_menu_new() { return g_object_new(ERRANDS_TYPE_TASK
 
 // ---------- PUBLIC FUNCTIONS ---------- //
 
-void errands_task_menu_show(ErrandsTask *task) {
+void errands_task_menu_show(ErrandsTask *task, float x, float y, ErrandsTaskMenuMode mode) {
   ErrandsTaskList *task_list = state.main_window->task_list;
   ErrandsTaskMenu *self = task_list->task_menu;
   self->task = task;
-  GdkRectangle rect = {task_list->x, task_list->y, 0, 0};
+  GdkRectangle rect = {x, y, 0, 0};
   gtk_popover_set_pointing_to(GTK_POPOVER(self), &rect);
   self->block_signals = true;
-
   // Set color
   g_autoptr(GPtrArray) colors = __get_color_buttons(self);
   const char *color = errands_data_get_color(task->data->ical, false);
   if (!color) gtk_check_button_set_active(GTK_CHECK_BUTTON(colors->pdata[0]), true);
-  else {
+  else
     for (size_t i = 0; i < colors->len; i++) {
       const char *name = gtk_widget_get_name(colors->pdata[i]);
       if (STR_EQUAL(name, color)) gtk_check_button_set_active(GTK_CHECK_BUTTON(colors->pdata[i]), true);
     }
-  }
   // Set labels
   gtk_label_set_label(self->pin_label, errands_data_get_pinned(task->data->ical) ? _("Unpin") : _("Pin"));
   gtk_label_set_label(self->cancel_label, errands_data_get_cancelled(task->data->ical) ? _("Restore") : _("Cancel"));
+  // Set mode
+  gtk_widget_set_visible(self->task_mode_box, mode == ERRANDS_TASK_MENU_MODE_TASK);
 
   self->block_signals = false;
-
   gtk_popover_popup(GTK_POPOVER(self));
 }
 
