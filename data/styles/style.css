@@ -23,10 +23,6 @@
     color: var(--light-2);
 }
 
-.accent-color-btn radio:hover {
-    filter: brightness(1.2);
-}
-
 .accent-color-btn radio:checked {
     -gtk-icon-transform: scale(0.7);
     -gtk-icon-source: -gtk-icontheme("errands-select-symbolic");
