@@ -54,23 +54,39 @@ template $ErrandsTaskList: Adw.Bin {
 
     [bottom]
     Box entry_box {
-      margin-start: 12;
-      margin-end: 12;
-      margin-top: 8;
-      margin-bottom: 8;
-      spacing: 8;
+      margin-start: 6;
+      margin-end: 6;
+      margin-top: 6;
+      margin-bottom: 6;
+      spacing: 6;
 
-      Entry entry {
-        placeholder-text: _("New Task");
-        tooltip-text: _("Add New Task (Ctrl+N)");
-        height-request: 46;
-        hexpand: true;
-        activate => $on_task_list_entry_activated_cb(template);
-        changed => $on_task_list_entry_text_changed_cb(template);
+      ToggleButton multiline_btn {
+        icon-name: "errands-multiline-symbolic";
+        tooltip-text: _("Toggle Multiline (Ctrl+M)");
+        valign: center;
 
         styles [
-          "card",
+          "flat",
+          "circular",
         ]
+
+        ShortcutController {
+          scope: global;
+
+          Shortcut {
+            trigger: "<Control>M";
+            action: "activate";
+          }
+        }
+      }
+
+      Entry entry {
+        placeholder-text: _("Add Task");
+        tooltip-text: _("Add Task (Ctrl+N)");
+        hexpand: true;
+        visible: bind multiline_btn.active inverted;
+        activate => $on_task_list_entry_activated_cb(template);
+        changed => $on_task_list_entry_text_changed_cb(template);
 
         ShortcutController {
           scope: global;
@@ -82,10 +98,37 @@ template $ErrandsTaskList: Adw.Bin {
         }
       }
 
+      ScrolledWindow {
+        max-content-height: 120;
+        propagate-natural-height: true;
+        visible: bind multiline_btn.active;
+
+        TextView entry_multiline {
+          hexpand: true;
+          left-margin: 6;
+          right-margin: 6;
+          top-margin: 6;
+          bottom-margin: 6;
+          height-request: 120;
+
+          buffer: TextBuffer {
+            text: bind entry.text bidirectional;
+          };
+
+          styles [
+            "card",
+          ]
+
+          EventControllerKey {
+            key-pressed => $on_entry_multiline_eventcontrollerkey_key_pressed(template);
+          }
+        }
+      }
+
       Button entry_menu_btn {
         icon-name: "errands-more-symbolic";
         valign: center;
-        tooltip-text: _("Properties");
+        tooltip-text: _("Properties (Ctrl+P)");
         action-name: "task-list.show-entry-task-menu";
 
         styles [
@@ -97,7 +140,7 @@ template $ErrandsTaskList: Adw.Bin {
           scope: global;
 
           Shortcut {
-            trigger: "<Shift><Control>P";
+            trigger: "<Control>P";
             action: "activate";
           }
         }
@@ -106,7 +149,7 @@ template $ErrandsTaskList: Adw.Bin {
       Button entry_apply_btn {
         icon-name: "errands-select-symbolic";
         valign: center;
-        tooltip-text: _("Add Task (Shift+Ctrl+Return)");
+        tooltip-text: _("Add Task (Ctrl+Return)");
         sensitive: false;
         clicked => $on_task_list_entry_activated_cb(template);
 
@@ -119,7 +162,7 @@ template $ErrandsTaskList: Adw.Bin {
           scope: global;
 
           Shortcut {
-            trigger: "<Shift><Control>Return";
+            trigger: "<Control>Return";
             action: "activate";
           }
         }
