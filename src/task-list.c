@@ -2,6 +2,7 @@
 #include "data.h"
 #include "glib.h"
 #include "gtk/gtk.h"
+#include "gtk/gtkshortcut.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "sync.h"
@@ -297,7 +298,8 @@ static bool on_entry_multiline_eventcontrollerkey_key_pressed(ErrandsTaskList *s
 // ---------- ACTIONS ---------- //
 
 static void on_focus_entry_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
-  gtk_widget_grab_focus(GTK_WIDGET(self->entry));
+  GtkWidget *widget = gtk_widget_get_visible(self->entry) ? self->entry : self->entry_multiline;
+  gtk_widget_grab_focus(widget);
 }
 
 static void on_entry_task_menu_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
