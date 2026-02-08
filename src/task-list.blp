@@ -58,31 +58,10 @@ template $ErrandsTaskList: Adw.Bin {
         "toolbar",
       ]
 
-      ToggleButton multiline_btn {
-        icon-name: "errands-multiline-symbolic";
-        tooltip-text: _("Toggle Multiline (Ctrl+M)");
-        valign: center;
-
-        styles [
-          "flat",
-          "circular",
-        ]
-
-        ShortcutController {
-          scope: global;
-
-          Shortcut {
-            trigger: "<Control>M";
-            action: "activate";
-          }
-        }
-      }
-
       Entry entry {
         placeholder-text: _("Add Task");
         tooltip-text: _("Add Task (Ctrl+N)");
         hexpand: true;
-        visible: bind multiline_btn.active inverted;
         activate => $on_task_list_entry_activated_cb(template);
         changed => $on_task_list_entry_text_changed_cb(template);
 
@@ -92,33 +71,6 @@ template $ErrandsTaskList: Adw.Bin {
           Shortcut {
             trigger: "<Control>N";
             action: "action(task-list.focus-entry)";
-          }
-        }
-      }
-
-      ScrolledWindow {
-        max-content-height: 120;
-        propagate-natural-height: true;
-        visible: bind multiline_btn.active;
-
-        TextView entry_multiline {
-          hexpand: true;
-          left-margin: 6;
-          right-margin: 6;
-          top-margin: 6;
-          bottom-margin: 6;
-          height-request: 120;
-
-          buffer: TextBuffer {
-            text: bind entry.text bidirectional;
-          };
-
-          styles [
-            "card",
-          ]
-
-          EventControllerKey {
-            key-pressed => $on_entry_multiline_eventcontrollerkey_key_pressed(template);
           }
         }
       }

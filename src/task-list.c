@@ -1,8 +1,5 @@
 #include "task-list.h"
 #include "data.h"
-#include "glib.h"
-#include "gtk/gtk.h"
-#include "gtk/gtkshortcut.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "sync.h"
@@ -17,7 +14,6 @@ static size_t tasks_stack_size = 0, current_start = 0;
 static GPtrArray *current_task_list = NULL;
 static const char *search_query = NULL;
 static ErrandsTask *measuring_task = NULL;
-static double scroll_position = 0.0f;
 
 static ErrandsTask *entry_task = NULL;
 static TaskData *entry_task_data = NULL;
@@ -29,8 +25,6 @@ static void on_task_list_entry_text_changed_cb(ErrandsTaskList *self);
 static void on_task_list_search_cb(ErrandsTaskList *self, GtkSearchEntry *entry);
 static void on_adjustment_value_changed_cb(GtkAdjustment *adj, ErrandsTaskList *self);
 static void on_motion_cb(GtkEventControllerMotion *ctrl, gdouble x, gdouble y, ErrandsTaskList *self);
-static bool on_entry_multiline_eventcontrollerkey_key_pressed(ErrandsTaskList *self, guint keyval, guint keycode,
-                                                              GdkModifierType state);
 
 static void on_focus_entry_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
 static void on_entry_task_menu_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
@@ -59,7 +53,6 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, search_entry);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, entry_box);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, entry);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, entry_multiline);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, entry_apply_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, entry_menu_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, adj);
@@ -71,7 +64,6 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_list_sort_dialog_show);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_entry_activated_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_entry_text_changed_cb);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_entry_multiline_eventcontrollerkey_key_pressed);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_search_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_adjustment_value_changed_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_motion_cb);
@@ -179,6 +171,9 @@ static int __get_tasks_stack_size() {
 
 // ---------- TASKS RECYCLER ---------- //
 
+#define ERRANDS_TASK_LIST_BOX_SPACING 10
+static double old_scroll_position = 0.0f, scroll_position = 0.0f, page_size = 0.0f;
+
 void errands_task_list_redraw_tasks(ErrandsTaskList *self) {
   static const uint8_t indent_px = 15;
   if (current_task_list->len == 0) return;
@@ -220,32 +215,28 @@ void errands_task_list_redraw_tasks(ErrandsTaskList *self) {
   }
 }
 
-static void on_adjustment_value_changed_cb(GtkAdjustment *adj, ErrandsTaskList *self) {
-  // TODO("Recycle by 5 tasks");
-  double old_scroll_position = scroll_position;
-  scroll_position = gtk_adjustment_get_value(adj);
-  bool scrolling_down = scroll_position > old_scroll_position;
+static bool __adjustment_changed_cb(ErrandsTaskList *self) {
+  const bool scrolling_down = scroll_position > old_scroll_position;
   g_autoptr(GPtrArray) children = get_children(self->task_list);
-  if (!children || children->len < 3) return;
+  if (!children || children->len < 3) return G_SOURCE_REMOVE;
   GtkWidget *first_widget = children->pdata[0];
   GtkWidget *last_widget = children->pdata[children->len - 1];
   graphene_rect_t first_bounds, last_bounds;
-  if (!gtk_widget_compute_bounds(first_widget, self->scrl, &first_bounds)) return;
-  if (!gtk_widget_compute_bounds(last_widget, self->scrl, &last_bounds)) return;
-  const float page_size = gtk_adjustment_get_page_size(adj);
+  if (!gtk_widget_compute_bounds(first_widget, self->scrl, &first_bounds)) return G_SOURCE_REMOVE;
+  if (!gtk_widget_compute_bounds(last_widget, self->scrl, &last_bounds)) return G_SOURCE_REMOVE;
   const float recycle_threshold_down = -page_size * 0.5f;
   const float recycle_threshold_up = page_size * 1.5f;
-  int spacer_height = gtk_widget_get_height(self->top_spacer);
+  const int spacer_height = gtk_widget_get_height(self->top_spacer);
   if (scrolling_down) {
     int recycled = 0;
     int moved_height = 0;
     for (size_t i = 0; i < children->len; ++i) {
-      GtkWidget *child = children->pdata[i];
-      graphene_rect_t bounds;
+      GtkWidget *child = g_ptr_array_index(children, i);
+      graphene_rect_t bounds = {0};
       if (!gtk_widget_compute_bounds(child, self->scrl, &bounds)) continue;
       if (bounds.origin.y + bounds.size.height <= recycle_threshold_down &&
           current_start + children->len < current_task_list->len) {
-        moved_height += gtk_widget_get_height(child) + 8;
+        moved_height += (int)bounds.size.height + ERRANDS_TASK_LIST_BOX_SPACING / 2;
         gtk_box_reorder_child_after(GTK_BOX(self->task_list), child, last_widget);
         gtk_widget_set_visible(child, false);
         recycled++;
@@ -260,12 +251,12 @@ static void on_adjustment_value_changed_cb(GtkAdjustment *adj, ErrandsTaskList *
   } else {
     int recycled = 0;
     int moved_height = 0;
-    for (ssize_t i = children->len - 1; i >= 0; --i) {
+    for (int i = children->len - 1; i >= 0; --i) {
       GtkWidget *child = children->pdata[i];
       graphene_rect_t bounds;
       if (!gtk_widget_compute_bounds(child, self->scrl, &bounds)) continue;
-      if (bounds.origin.y >= recycle_threshold_up && current_start > 0) {
-        moved_height += gtk_widget_get_height(child) + 8;
+      if (current_start > 0 && bounds.origin.y >= recycle_threshold_up) {
+        moved_height += (int)bounds.size.height + ERRANDS_TASK_LIST_BOX_SPACING / 2;
         gtk_box_reorder_child_after(GTK_BOX(self->task_list), child, NULL);
         gtk_widget_set_visible(child, false);
         recycled++;
@@ -279,6 +270,17 @@ static void on_adjustment_value_changed_cb(GtkAdjustment *adj, ErrandsTaskList *
     }
   }
   if (current_start == 0) gtk_widget_set_size_request(self->top_spacer, -1, 0);
+  LOG("Task list height: %d, Spacer height: %d", gtk_widget_get_height(self->task_list),
+      gtk_widget_get_height(self->top_spacer));
+  return G_SOURCE_REMOVE;
+}
+
+static void on_adjustment_value_changed_cb(GtkAdjustment *adj, ErrandsTaskList *self) {
+  old_scroll_position = scroll_position;
+  scroll_position = gtk_adjustment_get_value(adj);
+  page_size = gtk_adjustment_get_page_size(adj);
+  LOG("Scroll pos: %f -> %f", old_scroll_position, scroll_position);
+  g_idle_add_once((GSourceOnceFunc)__adjustment_changed_cb, self);
 }
 
 static void on_motion_cb(GtkEventControllerMotion *ctrl, gdouble x, gdouble y, ErrandsTaskList *self) {
@@ -286,20 +288,10 @@ static void on_motion_cb(GtkEventControllerMotion *ctrl, gdouble x, gdouble y, E
   self->y = y;
 }
 
-static bool on_entry_multiline_eventcontrollerkey_key_pressed(ErrandsTaskList *self, guint keyval, guint keycode,
-                                                              GdkModifierType state) {
-  if ((state & GDK_CONTROL_MASK) != 0 && keyval == GDK_KEY_Return) {
-    on_task_list_entry_activated_cb(self);
-    return true;
-  }
-  return false;
-}
-
 // ---------- ACTIONS ---------- //
 
 static void on_focus_entry_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
-  GtkWidget *widget = gtk_widget_get_visible(self->entry) ? self->entry : self->entry_multiline;
-  gtk_widget_grab_focus(widget);
+  gtk_widget_grab_focus(self->entry);
 }
 
 static void on_entry_task_menu_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
@@ -315,6 +307,7 @@ void errands_task_list_update_title(ErrandsTaskList *self) {
   switch (self->page) {
   case ERRANDS_TASK_LIST_PAGE_ALL: adw_window_title_set_title(ADW_WINDOW_TITLE(self->title), _("All Tasks")); break;
   case ERRANDS_TASK_LIST_PAGE_TODAY: {
+    // TODO: use current_task_list?
     adw_window_title_set_title(ADW_WINDOW_TITLE(self->title), _("Tasks for Today"));
     size_t total = 0, completed = 0;
     for_range(i, 0, errands_data_lists->len) {
@@ -416,11 +409,7 @@ void errands_task_list_reload(ErrandsTaskList *self, bool save_scroll_pos) {
 static void on_task_list_entry_activated_cb(ErrandsTaskList *self) {
   if (!self->data) return;
   // Get text
-  const char *text = NULL;
-  GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(self->entry_multiline));
-  if (gtk_widget_get_visible(self->entry)) text = gtk_editable_get_text(GTK_EDITABLE(self->entry));
-  else g_object_get(buffer, "text", &text, NULL);
-
+  const char *text = gtk_editable_get_text(GTK_EDITABLE(self->entry));
   g_autofree gchar *dup = g_strdup(text);
   char *stripped = g_strstrip(dup);
 
@@ -438,7 +427,6 @@ static void on_task_list_entry_activated_cb(ErrandsTaskList *self) {
   entry_task->data->ical = icalcomponent_new(ICAL_VTODO_COMPONENT);
   // Reset text
   g_object_set(self->entry, "text", "", NULL);
-  g_object_set(buffer, "text", "", NULL);
   // Update UI
   errands_sidebar_task_list_row_update(errands_sidebar_task_list_row_get(data->list));
   errands_sidebar_update_filter_rows();
