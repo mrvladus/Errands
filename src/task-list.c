@@ -1,5 +1,6 @@
 #include "task-list.h"
 #include "data.h"
+#include "gtk/gtkshortcut.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "sync.h"
@@ -133,6 +134,14 @@ static bool __task_has_any_search_matched_parent(TaskData *data) {
 }
 
 static int __calculate_height(ErrandsTaskList *self) {
+  static int cached_height = 0;
+  static GPtrArray *last_task_list = NULL;
+  static ErrandsTaskListPage last_page = ERRANDS_TASK_LIST_PAGE_ALL;
+  static const char *last_search_query = NULL;
+  // Check if we can use cached value
+  if (last_task_list == current_task_list && last_page == self->page && last_search_query == search_query)
+    return cached_height;
+  // Calculate fresh height
   int height = 0;
   GtkRequisition min_size, nat_size;
   bool show_completed = errands_settings_get(SETTING_SHOW_COMPLETED).b;
@@ -145,16 +154,25 @@ static int __calculate_height(ErrandsTaskList *self) {
     CONTINUE_IF(__task_has_any_collapsed_parent(data));
     CONTINUE_IF(self->page == ERRANDS_TASK_LIST_PAGE_PINNED && !__task_has_any_pinned_parent(data));
     CONTINUE_IF(self->page == ERRANDS_TASK_LIST_PAGE_TODAY && !__task_has_any_due_parent(data));
+    if (search_query && !STR_EQUAL(search_query, "")) {
+      CONTINUE_IF(!__task_match_search_query(data) && !__task_has_any_search_matched_parent(data));
+    }
     errands_task_set_data(measuring_task, data);
     gtk_widget_get_preferred_size(GTK_WIDGET(measuring_task), &min_size, &nat_size);
     height += nat_size.height;
   }
+  // Cache the result
+  cached_height = height;
+  last_task_list = current_task_list;
+  last_page = self->page;
+  last_search_query = search_query;
+
   return height;
 }
 
-static void __reset_scroll_cb(ErrandsTaskList *self) { gtk_adjustment_set_value(self->adj, 0.0); }
-
 static int __get_tasks_stack_size() {
+  static int cached_size = 0; // Cache the result
+  if (cached_size != 0) return cached_size;
   // Get maximum monitor height
   GdkDisplay *display = gdk_display_get_default();
   GListModel *monitors = gdk_display_get_monitors(display);
@@ -165,14 +183,13 @@ static int __get_tasks_stack_size() {
     gdk_monitor_get_geometry(monitor, &rect);
     if (rect.height > max_height) max_height = rect.height;
   }
-  int max_tasks = max_height / (46 + 8); // Get number of maximum tasks on the screen
-  return max_tasks + max_tasks / 2;      // Add half of that as margin and set stack size
+  int max_tasks = max_height / (46 + 5);   // Get number of maximum tasks on the screen
+  cached_size = max_tasks + max_tasks / 2; // Add half of that as margin and set stack size
+
+  return cached_size;
 }
 
 // ---------- TASKS RECYCLER ---------- //
-
-#define ERRANDS_TASK_LIST_BOX_SPACING 10
-static double old_scroll_position = 0.0f, scroll_position = 0.0f, page_size = 0.0f;
 
 void errands_task_list_redraw_tasks(ErrandsTaskList *self) {
   static const uint8_t indent_px = 15;
@@ -215,72 +232,191 @@ void errands_task_list_redraw_tasks(ErrandsTaskList *self) {
   }
 }
 
-static bool __adjustment_changed_cb(ErrandsTaskList *self) {
-  const bool scrolling_down = scroll_position > old_scroll_position;
-  g_autoptr(GPtrArray) children = get_children(self->task_list);
-  if (!children || children->len < 3) return G_SOURCE_REMOVE;
-  GtkWidget *first_widget = children->pdata[0];
-  GtkWidget *last_widget = children->pdata[children->len - 1];
-  graphene_rect_t first_bounds, last_bounds;
-  if (!gtk_widget_compute_bounds(first_widget, self->scrl, &first_bounds)) return G_SOURCE_REMOVE;
-  if (!gtk_widget_compute_bounds(last_widget, self->scrl, &last_bounds)) return G_SOURCE_REMOVE;
-  const float recycle_threshold_down = -page_size * 0.5f;
-  const float recycle_threshold_up = page_size * 1.5f;
-  const int spacer_height = gtk_widget_get_height(self->top_spacer);
-  if (scrolling_down) {
-    int recycled = 0;
-    int moved_height = 0;
-    for (size_t i = 0; i < children->len; ++i) {
-      GtkWidget *child = g_ptr_array_index(children, i);
-      graphene_rect_t bounds = {0};
-      if (!gtk_widget_compute_bounds(child, self->scrl, &bounds)) continue;
-      if (bounds.origin.y + bounds.size.height <= recycle_threshold_down &&
-          current_start + children->len < current_task_list->len) {
-        moved_height += (int)bounds.size.height + ERRANDS_TASK_LIST_BOX_SPACING / 2;
-        gtk_box_reorder_child_after(GTK_BOX(self->task_list), child, last_widget);
-        gtk_widget_set_visible(child, false);
-        recycled++;
-        current_start++;
-      } else break;
+static void on_adjustment_value_changed_cb(GtkAdjustment *adj, ErrandsTaskList *self) {
+  // Get current scroll position
+  static double old_scroll_position = 0.0f;
+  const double new_scroll_position = gtk_adjustment_get_value(adj);
+  const double delta = new_scroll_position - old_scroll_position;
+  const bool scrolling_down = delta > 0;
+
+  // Handle large jumps (scrollbar clicks)
+  const double page_size = gtk_adjustment_get_page_size(adj);
+  const double total_height = gtk_adjustment_get_upper(adj);
+  const bool is_large_jump = fabs(delta) > page_size * 1.5;
+
+  if (is_large_jump) {
+    LOG("Large jump detected: delta=%f, page_size=%f", delta, page_size);
+
+    // Calculate which task should be at the top based on scroll position
+    int total_visible_height = __calculate_height(self);
+    if (total_visible_height <= 0) return;
+
+    // Estimate which task index should be at the top
+    double scroll_ratio = new_scroll_position / (total_height - page_size);
+    scroll_ratio = CLAMP(scroll_ratio, 0.0, 1.0);
+
+    // Count visible tasks (tasks that match filters)
+    int visible_count = 0;
+    bool show_completed = errands_settings_get(SETTING_SHOW_COMPLETED).b;
+    bool show_cancelled = errands_settings_get(SETTING_SHOW_CANCELLED).b;
+    for (size_t i = 0; i < current_task_list->len; i++) {
+      TaskData *data = g_ptr_array_index(current_task_list, i);
+      if (errands_data_get_deleted(data->ical) || errands_data_get_deleted(data->list->ical)) continue;
+      if (errands_data_is_completed(data->ical) && !show_completed) continue;
+      if (errands_data_get_cancelled(data->ical) && !show_cancelled) continue;
+      if (__task_has_any_collapsed_parent(data)) continue;
+      if (self->page == ERRANDS_TASK_LIST_PAGE_PINNED && !__task_has_any_pinned_parent(data)) continue;
+      if (self->page == ERRANDS_TASK_LIST_PAGE_TODAY && !__task_has_any_due_parent(data)) continue;
+      if (search_query && !STR_EQUAL(search_query, ""))
+        if (!__task_match_search_query(data) && !__task_has_any_search_matched_parent(data)) continue;
+      visible_count++;
     }
-    if (recycled > 0) {
-      gtk_widget_set_size_request(self->top_spacer, -1, spacer_height + moved_height);
-      gtk_widget_set_size_request(self->task_list, -1, gtk_widget_get_height(self->task_list) - moved_height);
+
+    if (visible_count > 0) {
+      // Calculate new start index
+      size_t new_start = (size_t)(scroll_ratio * (visible_count - 1));
+      new_start = MIN(new_start, current_task_list->len - tasks_stack_size);
+      new_start = MAX(new_start, 0);
+
+      LOG("Large jump: scroll_ratio=%f, new_start=%zu, visible_count=%d", scroll_ratio, new_start, visible_count);
+
+      // Update current_start
+      current_start = new_start;
+
+      // Reset all widgets
+      g_autoptr(GPtrArray) children = get_children(self->task_list);
+      for (size_t i = 0; i < children->len; i++) { gtk_widget_set_visible(g_ptr_array_index(children, i), false); }
+
+      // Update spacer height based on new start position
+      int spacer_height = 0;
+      int counted = 0;
+
+      for (size_t i = 0; i < current_start && counted < current_start; i++) {
+        TaskData *data = g_ptr_array_index(current_task_list, i);
+        if (errands_data_get_deleted(data->ical) || errands_data_get_deleted(data->list->ical)) continue;
+        if (errands_data_is_completed(data->ical) && !show_completed) continue;
+        if (errands_data_get_cancelled(data->ical) && !show_cancelled) continue;
+        if (__task_has_any_collapsed_parent(data)) continue;
+        if (self->page == ERRANDS_TASK_LIST_PAGE_PINNED && !__task_has_any_pinned_parent(data)) continue;
+        if (self->page == ERRANDS_TASK_LIST_PAGE_TODAY && !__task_has_any_due_parent(data)) continue;
+        if (search_query && !STR_EQUAL(search_query, "")) {
+          if (!__task_match_search_query(data) && !__task_has_any_search_matched_parent(data)) continue;
+        }
+
+        errands_task_set_data(measuring_task, data);
+        GtkRequisition min_size, nat_size;
+        gtk_widget_get_preferred_size(GTK_WIDGET(measuring_task), &min_size, &nat_size);
+        spacer_height += nat_size.height;
+        counted++;
+      }
+
+      gtk_widget_set_size_request(self->top_spacer, -1, spacer_height);
+      gtk_widget_set_size_request(self->task_list, -1, total_visible_height - spacer_height);
+
+      // Redraw tasks
       errands_task_list_redraw_tasks(self);
     }
   } else {
-    int recycled = 0;
-    int moved_height = 0;
-    for (int i = children->len - 1; i >= 0; --i) {
-      GtkWidget *child = children->pdata[i];
-      graphene_rect_t bounds;
-      if (!gtk_widget_compute_bounds(child, self->scrl, &bounds)) continue;
-      if (current_start > 0 && bounds.origin.y >= recycle_threshold_up) {
-        moved_height += (int)bounds.size.height + ERRANDS_TASK_LIST_BOX_SPACING / 2;
-        gtk_box_reorder_child_after(GTK_BOX(self->task_list), child, NULL);
-        gtk_widget_set_visible(child, false);
-        recycled++;
-        current_start--;
-      } else break;
-    }
-    if (recycled > 0) {
-      gtk_widget_set_size_request(self->top_spacer, -1, MAX(0, spacer_height - moved_height));
-      gtk_widget_set_size_request(self->task_list, -1, gtk_widget_get_height(self->task_list) + moved_height);
-      errands_task_list_redraw_tasks(self);
+    // Normal incremental scrolling
+    g_autoptr(GPtrArray) children = get_children(self->task_list);
+    if (!children || children->len < 3) return;
+
+    const double viewport_height = page_size;
+    const double recycle_threshold_down = -viewport_height * 0.5f;
+    const double recycle_threshold_up = viewport_height * 1.5f;
+
+    const int current_spacer_height = gtk_widget_get_height(self->top_spacer);
+    const int total_list_height = __calculate_height(self);
+
+    if (scrolling_down) {
+      // Scrolling down: recycle widgets that have scrolled above the viewport
+      bool recycled = false;
+      int moved_height = 0;
+
+      for (size_t i = 0; i < children->len; ++i) {
+        GtkWidget *child = g_ptr_array_index(children, i);
+        if (!gtk_widget_get_visible(child)) continue;
+
+        graphene_rect_t bounds = {0};
+        if (!gtk_widget_compute_bounds(child, self->scrl, &bounds)) continue;
+
+        // If widget is above the viewport and we have more tasks to show
+        if (bounds.origin.y + bounds.size.height <= recycle_threshold_down &&
+            current_start + children->len < current_task_list->len) {
+          moved_height += (int)bounds.size.height;
+
+          // Move widget to the end of the list
+          GtkWidget *last_widget = children->pdata[children->len - 1];
+          gtk_box_reorder_child_after(GTK_BOX(self->task_list), child, last_widget);
+          gtk_widget_set_visible(child, false);
+
+          recycled = true;
+          current_start++;
+        } else {
+          break;
+        }
+      }
+
+      if (recycled) {
+        // Update spacer height
+        gtk_widget_set_size_request(self->top_spacer, -1, MAX(0, current_spacer_height + moved_height));
+
+        // Update task list height
+        int visible_height = total_list_height - (current_spacer_height + moved_height);
+        gtk_widget_set_size_request(self->task_list, -1, MAX(0, visible_height));
+
+        errands_task_list_redraw_tasks(self);
+      }
+    } else {
+      // Scrolling up: recycle widgets that have scrolled below the viewport
+      bool recycled = false;
+      int moved_height = 0;
+
+      for (int i = children->len - 1; i >= 0; --i) {
+        GtkWidget *child = children->pdata[i];
+        if (!gtk_widget_get_visible(child)) continue;
+
+        graphene_rect_t bounds = {0};
+        if (!gtk_widget_compute_bounds(child, self->scrl, &bounds)) continue;
+
+        // If widget is below the viewport and we can scroll up
+        if (current_start > 0 && bounds.origin.y >= recycle_threshold_up) {
+          moved_height += (int)bounds.size.height;
+
+          // Move widget to the beginning of the list
+          gtk_box_reorder_child_after(GTK_BOX(self->task_list), child, NULL);
+          gtk_widget_set_visible(child, false);
+
+          recycled = true;
+          current_start--;
+        } else {
+          break;
+        }
+      }
+
+      if (recycled) {
+        // Update spacer height
+        gtk_widget_set_size_request(self->top_spacer, -1, MAX(0, current_spacer_height - moved_height));
+
+        // Update task list height
+        int visible_height = total_list_height - MAX(0, current_spacer_height - moved_height);
+        gtk_widget_set_size_request(self->task_list, -1, MAX(0, visible_height));
+
+        errands_task_list_redraw_tasks(self);
+      }
     }
   }
-  if (current_start == 0) gtk_widget_set_size_request(self->top_spacer, -1, 0);
-  LOG("Task list height: %d, Spacer height: %d", gtk_widget_get_height(self->task_list),
-      gtk_widget_get_height(self->top_spacer));
-  return G_SOURCE_REMOVE;
-}
 
-static void on_adjustment_value_changed_cb(GtkAdjustment *adj, ErrandsTaskList *self) {
-  old_scroll_position = scroll_position;
-  scroll_position = gtk_adjustment_get_value(adj);
-  page_size = gtk_adjustment_get_page_size(adj);
-  LOG("Scroll pos: %f -> %f", old_scroll_position, scroll_position);
-  g_idle_add_once((GSourceOnceFunc)__adjustment_changed_cb, self);
+  old_scroll_position = new_scroll_position;
+
+  // Reset spacer when at the top
+  if (new_scroll_position <= 1.0) { // Use small epsilon instead of exact 0
+    gtk_widget_set_size_request(self->top_spacer, -1, 0);
+    int total_height = __calculate_height(self);
+    gtk_widget_set_size_request(self->task_list, -1, total_height);
+    current_start = 0;
+    errands_task_list_redraw_tasks(self);
+  }
 }
 
 static void on_motion_cb(GtkEventControllerMotion *ctrl, gdouble x, gdouble y, ErrandsTaskList *self) {
@@ -388,6 +524,8 @@ void errands_task_list_show_pinned(ErrandsTaskList *self) {
   errands_task_list_reload(self, false);
 }
 
+static void __reset_scroll_cb(ErrandsTaskList *self) { gtk_adjustment_set_value(self->adj, 0.0); }
+
 void errands_task_list_reload(ErrandsTaskList *self, bool save_scroll_pos) {
   // FIXME: correct scroll position
   if (!save_scroll_pos) current_start = 0;
@@ -399,8 +537,7 @@ void errands_task_list_reload(ErrandsTaskList *self, bool save_scroll_pos) {
   gtk_widget_set_size_request(self->task_list, -1, __calculate_height(self));
   errands_task_list_update_title(self);
   if (!save_scroll_pos) g_idle_add_once((GSourceOnceFunc)__reset_scroll_cb, self);
-  g_autoptr(GPtrArray) children = get_children(self->task_list);
-  for_range(i, 0, children->len) gtk_widget_set_visible(g_ptr_array_index(children, i), false);
+  for_child_in_parent(child, self->task_list) gtk_widget_set_visible(child, false);
   errands_task_list_redraw_tasks(self);
 }
 

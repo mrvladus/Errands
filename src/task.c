@@ -1,5 +1,4 @@
 #include "task.h"
-#include "gtk/gtk.h"
 #include "sidebar.h"
 #include "state.h"
 #include "sync.h"
@@ -24,6 +23,7 @@ static void on_tags_action_cb(GSimpleAction *action, GVariant *param, ErrandsTas
 static void on_date_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_cancel_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_pin_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
+static void on_expand_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 
 // Callbacks
 static void on_tag_clicked_cb(ErrandsTask *self);
@@ -31,7 +31,6 @@ static void on_complete_btn_toggle_cb(ErrandsTask *self, GtkCheckButton *btn);
 static void on_unpin_btn_clicked_cb(ErrandsTask *self, GtkToggleButton *btn);
 static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointer user_data);
 static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *self);
-static void on_expand_toggle_cb(ErrandsTask *self);
 
 static GdkContentProvider *on_drag_prepare_cb(GtkDragSource *source, double x, double y, ErrandsTask *self);
 static void on_drag_begin_cb(GtkDragSource *source, GdkDrag *drag, ErrandsTask *self);
@@ -73,7 +72,6 @@ static void errands_task_class_init(ErrandsTaskClass *class) {
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_unpin_btn_clicked_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_complete_btn_toggle_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_sub_task_entry_activated);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_expand_toggle_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_drag_prepare_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_drag_begin_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_drag_end_cb);
@@ -92,6 +90,7 @@ static void errands_task_init(ErrandsTask *self) {
   errands_add_action(ag, "date", on_date_action_cb, self, NULL);
   errands_add_action(ag, "cancel", on_cancel_action_cb, self, NULL);
   errands_add_action(ag, "pin", on_pin_action_cb, self, NULL);
+  errands_add_action(ag, "expand", on_expand_action_cb, self, NULL);
 }
 
 ErrandsTask *errands_task_new() { return g_object_new(ERRANDS_TYPE_TASK, NULL); }
@@ -295,6 +294,18 @@ static void on_pin_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask
   errands_sync_update_task(self->data);
 }
 
+static void on_expand_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
+  // if (errands_data_get_cancelled(self->data->ical)) return;
+  bool new_expanded = !errands_data_get_expanded(self->data->ical);
+  LOG("Task '%s': Toggle expand: %d", errands_data_get_uid(self->data->ical), new_expanded);
+  errands_data_set_expanded(self->data->ical, new_expanded);
+  errands_list_data_save(self->data->list);
+  gtk_button_set_icon_name(self->sub_toggle_btn, new_expanded ? "errands-up-symbolic" : "errands-down-symbolic");
+  errands_task_list_redraw_tasks(state.main_window->task_list);
+  gtk_widget_grab_focus(GTK_WIDGET(self->sub_entry));
+  // errands_sync_update_task(self->data);
+}
+
 // ---------- CALLBACKS ---------- //
 
 static void on_tag_clicked_cb(ErrandsTask *self) { on_tags_action_cb(NULL, NULL, self); }
@@ -381,18 +392,6 @@ static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *self) {
   gtk_widget_grab_focus(GTK_WIDGET(entry));
   errands_sidebar_update_filter_rows();
   errands_sync_create_task(self->data);
-}
-
-static void on_expand_toggle_cb(ErrandsTask *self) {
-  if (errands_data_get_cancelled(self->data->ical)) return;
-  bool new_expanded = !errands_data_get_expanded(self->data->ical);
-  LOG("Task '%s': Toggle expand: %d", errands_data_get_uid(self->data->ical), new_expanded);
-  errands_data_set_expanded(self->data->ical, new_expanded);
-  errands_list_data_save(self->data->list);
-  gtk_button_set_icon_name(self->sub_toggle_btn, new_expanded ? "errands-up-symbolic" : "errands-down-symbolic");
-  errands_task_list_reload(state.main_window->task_list, true);
-  gtk_widget_grab_focus(GTK_WIDGET(self->sub_entry));
-  errands_sync_update_task(self->data);
 }
 
 // --- DND CALLBACKS --- //

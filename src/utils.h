@@ -4,6 +4,7 @@
 #include <gtk/gtk.h>
 
 #include <ctype.h>
+#include <stddef.h>
 
 // Get children of the widget
 static inline GPtrArray *get_children(GtkWidget *parent) {
@@ -19,6 +20,21 @@ static inline GPtrArray *get_children(GtkWidget *parent) {
   }
   return children;
 }
+
+static inline void get_children_sized(GtkWidget *parent, GtkWidget **children, size_t n) {
+  GtkWidget *first_child = gtk_widget_get_first_child(parent);
+  if (first_child) {
+    children[0] = first_child;
+    GtkWidget *next_child = gtk_widget_get_next_sibling(first_child);
+    for (size_t i = 1; i < n && next_child; i++) {
+      children[i] = next_child;
+      next_child = gtk_widget_get_next_sibling(next_child);
+    }
+  }
+}
+
+#define for_child_in_parent(child, parent)                                                                             \
+  for (GtkWidget *child = gtk_widget_get_first_child(parent); child; child = gtk_widget_get_next_sibling(child))
 
 static inline void gtk_box_remove_all(GtkWidget *box) {
   GtkWidget *child;

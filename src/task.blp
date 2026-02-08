@@ -1,5 +1,4 @@
 using Gtk 4.0;
-using Gdk 4.0;
 using Adw 1;
 
 template $ErrandsTask: Box {
@@ -17,17 +16,8 @@ template $ErrandsTask: Box {
     margin-top: 6;
     margin-bottom: 6;
 
-    cursor: Gdk.Cursor {
-      name: "pointer";
-    };
-
     accessibility {
       labelled-by: title;
-    }
-
-    GestureClick {
-      button: 1;
-      released => $on_expand_toggle_cb(template);
     }
 
     CheckButton complete_btn {
@@ -112,13 +102,12 @@ template $ErrandsTask: Box {
         icon-name: "errands-down-symbolic";
         valign: center;
         tooltip-text: _("Toggle Sub-Tasks");
+        action-name: "task.expand";
 
         styles [
           "flat",
           "circular",
         ]
-
-        clicked => $on_expand_toggle_cb(template);
       }
 
       // Properties menu
