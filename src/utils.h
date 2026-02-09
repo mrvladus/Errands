@@ -21,6 +21,18 @@ static inline GPtrArray *get_children(GtkWidget *parent) {
   return children;
 }
 
+static inline void get_children_to_array(GtkWidget *parent, GPtrArray *children) {
+  GtkWidget *first_child = gtk_widget_get_first_child(parent);
+  if (first_child) {
+    g_ptr_array_add(children, first_child);
+    GtkWidget *next_child = gtk_widget_get_next_sibling(first_child);
+    while (next_child) {
+      g_ptr_array_add(children, next_child);
+      next_child = gtk_widget_get_next_sibling(next_child);
+    }
+  }
+}
+
 static inline void get_children_sized(GtkWidget *parent, GtkWidget **children, size_t n) {
   GtkWidget *first_child = gtk_widget_get_first_child(parent);
   if (first_child) {
