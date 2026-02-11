@@ -301,7 +301,7 @@ static void on_expand_action_cb(GSimpleAction *action, GVariant *param, ErrandsT
   errands_data_set_expanded(self->data->ical, new_expanded);
   errands_list_data_save(self->data->list);
   gtk_button_set_icon_name(self->sub_toggle_btn, new_expanded ? "errands-up-symbolic" : "errands-down-symbolic");
-  errands_task_list_redraw_tasks(state.main_window->task_list);
+  // errands_task_list_redraw_tasks(state.main_window->task_list);
   gtk_widget_grab_focus(GTK_WIDGET(self->sub_entry));
   // errands_sync_update_task(self->data);
 }

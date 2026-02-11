@@ -182,3 +182,11 @@ calendar label {
 editablelabel > stack > text {
     background-color: transparent;
 }
+
+listview {
+    background-color: transparent;
+}
+
+listview > row {
+    padding: 4px 12px;
+}

@@ -137,26 +137,8 @@ template $ErrandsTaskList: Adw.Bin {
 
       ScrolledWindow scrl {
         vexpand: true;
-        kinetic-scrolling: false;
 
-        vadjustment: Adjustment adj {
-          value-changed => $on_adjustment_value_changed_cb(template) not-swapped;
-        };
-
-        child: Box {
-          orientation: vertical;
-          margin-bottom: 18;
-          margin-top: 4;
-
-          Adw.Bin top_spacer {}
-
-          Box task_list {
-            orientation: vertical;
-            margin-start: 12;
-            margin-end: 12;
-            spacing: 10;
-          }
-        };
+        ListView list_view {}
       }
     };
   }
