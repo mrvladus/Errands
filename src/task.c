@@ -1,4 +1,5 @@
 #include "task.h"
+#include "gio/gio.h"
 #include "sidebar.h"
 #include "state.h"
 #include "sync.h"
@@ -302,6 +303,7 @@ static void on_expand_action_cb(GSimpleAction *action, GVariant *param, ErrandsT
   errands_list_data_save(self->data->list);
   gtk_button_set_icon_name(self->sub_toggle_btn, new_expanded ? "errands-up-symbolic" : "errands-down-symbolic");
   // errands_task_list_redraw_tasks(state.main_window->task_list);
+  gtk_widget_set_visible(GTK_WIDGET(self->sub_entry), new_expanded);
   gtk_widget_grab_focus(GTK_WIDGET(self->sub_entry));
   // errands_sync_update_task(self->data);
 }
@@ -383,13 +385,14 @@ static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *self) {
   const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
   if (STR_EQUAL(text, "")) return;
   TaskData *new_data = errands_task_data_create_task(self->data->list, self->data, text);
-  g_ptr_array_add(self->data->children, new_data);
   errands_list_data_save(self->data->list);
-  errands_task_data_sort_sub_tasks(self->data);
+
+  GListStore *model = G_LIST_STORE(errands_task_item_get_children_model(self->item));
+  g_autoptr(ErrandsTaskItem) new_item = errands_task_item_new(new_data);
+  g_list_store_append(model, new_item);
+
   // Reset text
   gtk_editable_set_text(GTK_EDITABLE(entry), "");
-  errands_task_list_reload(state.main_window->task_list, true);
-  gtk_widget_grab_focus(GTK_WIDGET(entry));
   errands_sidebar_update_filter_rows();
   errands_sync_create_task(self->data);
 }

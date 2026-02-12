@@ -1,6 +1,7 @@
 #include "task-list.h"
 #include "data.h"
 #include "gio/gio.h"
+#include "glib-object.h"
 #include "glib.h"
 #include "gtk/gtk.h"
 #include "gtk/gtknoselection.h"
@@ -16,7 +17,6 @@
 #include <libical/ical.h>
 #include <stddef.h>
 
-static size_t current_start = 0;
 static GPtrArray *current_task_list = NULL;
 static const char *search_query = NULL;
 
@@ -71,34 +71,47 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_motion_cb);
 }
 
-static GtkWidget *create_widget_func(ErrandsTaskItem *item, gpointer user_data) {
-  ErrandsTask *task = errands_task_new();
-  errands_task_set_data(task, item->data);
-
-  return GTK_WIDGET(task);
-}
-
-gboolean filter_func(ErrandsTaskItem *item, ErrandsTaskList *self) {
+static gboolean filter_func(GtkTreeListRow *row, ErrandsTaskList *self) {
+  ErrandsTaskItem *item = ERRANDS_TASK_ITEM(gtk_tree_list_row_get_item(row));
   bool result = false;
 
   switch (self->page) {
   case ERRANDS_TASK_LIST_PAGE_TODAY: break;
   case ERRANDS_TASK_LIST_PAGE_PINNED: break;
   case ERRANDS_TASK_LIST_PAGE_ALL: result = true; break;
-  case ERRANDS_TASK_LIST_PAGE_TASK_LIST: result = item->data->list == self->data; break;
+  case ERRANDS_TASK_LIST_PAGE_TASK_LIST: result = errands_task_item_get_task_data(item)->list == self->data; break;
   }
 
   return result;
 }
 
+static GListModel *task_children_func(gpointer item, gpointer user_data) {
+  ErrandsTaskItem *task_item = ERRANDS_TASK_ITEM(item);
+  GListModel *model = errands_task_item_get_children_model(task_item);
+  if (!model) return NULL;
+  return g_object_ref(model);
+}
+
 static void on_setup_item(GtkSignalListItemFactory *self, GtkListItem *list_item) {
-  gtk_list_item_set_child(list_item, GTK_WIDGET(errands_task_new()));
+  GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_tree_expander_new());
+
+  ErrandsTask *task = errands_task_new();
+  gtk_tree_expander_set_child(expander, GTK_WIDGET(task));
+
+  gtk_list_item_set_child(list_item, GTK_WIDGET(expander));
 }
 
 static void on_bind_item(GtkListItemFactory *factory, GtkListItem *list_item) {
-  ErrandsTask *task = ERRANDS_TASK(gtk_list_item_get_child(list_item));
-  ErrandsTaskItem *item = gtk_list_item_get_item(list_item);
-  errands_task_set_data(task, item->data);
+  GtkTreeListRow *row = gtk_list_item_get_item(list_item);
+  GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_list_item_get_child(list_item));
+
+  gtk_tree_expander_set_list_row(expander, row);
+
+  ErrandsTask *task = ERRANDS_TASK(gtk_tree_expander_get_child(expander));
+  ErrandsTaskItem *item = gtk_tree_list_row_get_item(row);
+
+  errands_task_set_data(task, errands_task_item_get_task_data(item));
+  task->item = item;
 }
 
 static void errands_task_list_init(ErrandsTaskList *self) {
@@ -113,22 +126,30 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   entry_task = errands_task_new();
   entry_task_data = errands_task_data_create_task(NULL, NULL, "");
   errands_task_set_data(entry_task, entry_task_data);
-  // Create Tasks widgets
+
   model = g_list_store_new(ERRANDS_TYPE_TASK_ITEM);
   for_range(i, 0, errands_data_lists->len) {
     ListData *list = g_ptr_array_index(errands_data_lists, i);
     for_range(j, 0, list->children->len) {
       TaskData *data = g_ptr_array_index(list->children, j);
-      g_autoptr(ErrandsTaskItem) item = errands_task_item_new(data);
-      g_list_store_append(model, item);
+      if (!data->parent) {
+        g_autoptr(ErrandsTaskItem) item = errands_task_item_new(data);
+        g_list_store_append(model, item);
+      }
     }
   }
+  GtkTreeListModel *tree_model =
+      gtk_tree_list_model_new(G_LIST_MODEL(model), FALSE, FALSE, task_children_func, NULL, NULL);
+
   filter = GTK_FILTER(gtk_custom_filter_new((GtkCustomFilterFunc)filter_func, self, NULL));
-  GtkFilterListModel *filter_model = gtk_filter_list_model_new(G_LIST_MODEL(model), filter);
+  GtkFilterListModel *filter_model = gtk_filter_list_model_new(G_LIST_MODEL(tree_model), filter);
+
   GtkListItemFactory *factory = gtk_signal_list_item_factory_new();
   g_signal_connect(factory, "setup", G_CALLBACK(on_setup_item), self);
   g_signal_connect(factory, "bind", G_CALLBACK(on_bind_item), self);
+
   GtkSelectionModel *selection_model = GTK_SELECTION_MODEL(gtk_no_selection_new(G_LIST_MODEL(filter_model)));
+
   gtk_list_view_set_model(GTK_LIST_VIEW(self->list_view), selection_model);
   gtk_list_view_set_factory(GTK_LIST_VIEW(self->list_view), factory);
   gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(self->scrl), self->list_view);
@@ -250,24 +271,19 @@ void errands_task_list_update_title(ErrandsTaskList *self) {
   gtk_widget_set_visible(self->scrl, total > 0);
 }
 
-static void __filter_cb(gpointer change) {
-  gtk_filter_changed(filter, GPOINTER_TO_INT(change));
-  gtk_widget_set_sensitive(GTK_WIDGET(state.main_window->task_list), true);
-}
+static void __filter_cb(gpointer change) { gtk_filter_changed(filter, GPOINTER_TO_INT(change)); }
 
 void errands_task_list_show_today_tasks(ErrandsTaskList *self) {
   LOG("Task List: Show today tasks");
   self->data = NULL;
   self->page = ERRANDS_TASK_LIST_PAGE_TODAY;
   gtk_widget_set_visible(self->entry_box, false);
-  errands_task_list_reload(self, false);
 }
 
 void errands_task_list_show_all_tasks(ErrandsTaskList *self) {
   LOG("Task List: Show all tasks");
   self->data = NULL;
   self->page = ERRANDS_TASK_LIST_PAGE_ALL;
-  gtk_widget_set_sensitive(GTK_WIDGET(self), false);
   gtk_widget_set_visible(self->entry_box, false);
   g_idle_add_once((GSourceOnceFunc)__filter_cb, GINT_TO_POINTER(GTK_FILTER_CHANGE_LESS_STRICT));
 }
@@ -276,7 +292,6 @@ void errands_task_list_show_task_list(ErrandsTaskList *self, ListData *data) {
   self->data = data;
   self->page = ERRANDS_TASK_LIST_PAGE_TASK_LIST;
   gtk_widget_set_visible(self->entry_box, true);
-  gtk_widget_set_sensitive(GTK_WIDGET(self), false);
   g_idle_add_once((GSourceOnceFunc)__filter_cb, GINT_TO_POINTER(GTK_FILTER_CHANGE_DIFFERENT));
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "data.h"
+#include "task-item.h"
 
 #include <gtk/gtk.h>
 
@@ -29,6 +30,7 @@ struct _ErrandsTask {
   GtkWidget *sub_entry;
 
   TaskData *data;
+  ErrandsTaskItem *item;
 };
 
 ErrandsTask *errands_task_new();
