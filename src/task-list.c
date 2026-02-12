@@ -98,6 +98,7 @@ static void on_setup_item(GtkSignalListItemFactory *self, GtkListItem *list_item
   ErrandsTask *task = errands_task_new();
   gtk_tree_expander_set_child(expander, GTK_WIDGET(task));
 
+  gtk_list_item_set_focusable(list_item, false);
   gtk_list_item_set_child(list_item, GTK_WIDGET(expander));
 }
 
