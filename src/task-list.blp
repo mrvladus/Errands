@@ -138,7 +138,24 @@ template $ErrandsTaskList: Adw.Bin {
       ScrolledWindow scrl {
         vexpand: true;
 
-        ListView list_view {}
+        ListView list_view {
+          margin-end: 6;
+          enable-rubberband: false;
+
+          factory: BuilderListItemFactory {
+            template ListItem {
+              focusable: true;
+
+              child: TreeExpander expander {
+                list-row: bind template.item;
+
+                child: $ErrandsTask {
+                  data: bind expander.item as <$ErrandsTaskItem>.task-data;
+                };
+              };
+            }
+          };
+        }
       }
     };
   }

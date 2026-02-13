@@ -98,7 +98,7 @@ static void on_setup_item(GtkSignalListItemFactory *self, GtkListItem *list_item
   ErrandsTask *task = errands_task_new();
   gtk_tree_expander_set_child(expander, GTK_WIDGET(task));
 
-  gtk_list_item_set_focusable(list_item, false);
+  gtk_list_item_set_focusable(list_item, true);
   gtk_list_item_set_child(list_item, GTK_WIDGET(expander));
 }
 
@@ -141,18 +141,10 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   }
   GtkTreeListModel *tree_model =
       gtk_tree_list_model_new(G_LIST_MODEL(model), FALSE, FALSE, task_children_func, NULL, NULL);
-
   filter = GTK_FILTER(gtk_custom_filter_new((GtkCustomFilterFunc)filter_func, self, NULL));
   GtkFilterListModel *filter_model = gtk_filter_list_model_new(G_LIST_MODEL(tree_model), filter);
-
-  GtkListItemFactory *factory = gtk_signal_list_item_factory_new();
-  g_signal_connect(factory, "setup", G_CALLBACK(on_setup_item), self);
-  g_signal_connect(factory, "bind", G_CALLBACK(on_bind_item), self);
-
   GtkSelectionModel *selection_model = GTK_SELECTION_MODEL(gtk_no_selection_new(G_LIST_MODEL(filter_model)));
-
   gtk_list_view_set_model(GTK_LIST_VIEW(self->list_view), selection_model);
-  gtk_list_view_set_factory(GTK_LIST_VIEW(self->list_view), factory);
   gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(self->scrl), self->list_view);
 }
 

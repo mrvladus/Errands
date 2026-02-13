@@ -1,5 +1,4 @@
 #include "task.h"
-#include "gio/gio.h"
 #include "sidebar.h"
 #include "state.h"
 #include "sync.h"
@@ -43,41 +42,79 @@ static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x,
 
 G_DEFINE_TYPE(ErrandsTask, errands_task, GTK_TYPE_BOX)
 
+enum {
+  PROP_0,
+  PROP_DATA,
+  N_PROPERTIES,
+};
+
+static GParamSpec *obj_properties[N_PROPERTIES] = {NULL};
+
+static void errands_task_set_property(GObject *object, guint prop_id, const GValue *value, GParamSpec *pspec) {
+  ErrandsTask *self = ERRANDS_TASK(object);
+  switch (prop_id) {
+  case PROP_DATA: {
+    self->data = g_value_get_pointer(value);
+    errands_task_set_data(self, self->data);
+  } break;
+  default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
+  }
+}
+
+static void errands_task_get_property(GObject *object, guint prop_id, GValue *value, GParamSpec *pspec) {
+  ErrandsTask *self = ERRANDS_TASK(object);
+  switch (prop_id) {
+  case PROP_DATA: g_value_set_pointer(value, self->data); break;
+  default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
+  }
+}
+
 static void errands_task_dispose(GObject *gobject) {
   gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_TASK);
   G_OBJECT_CLASS(errands_task_parent_class)->dispose(gobject);
 }
 
-static void errands_task_class_init(ErrandsTaskClass *class) {
-  G_OBJECT_CLASS(class)->dispose = errands_task_dispose;
-  gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), "/io/github/mrvladus/Errands/ui/task.ui");
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, complete_btn);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, title);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, subtitle);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, edit_title);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, menu_btn);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, sub_toggle_btn);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, toolbar);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, props_bar);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, tags_box);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, date_btn);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, unpin_btn);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, date_btn_content);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, notes_btn);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, priority_btn);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, attachments_btn);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, attachments_count);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTask, sub_entry);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_menu_show);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_title_edit_cb);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_unpin_btn_clicked_cb);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_complete_btn_toggle_cb);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_sub_task_entry_activated);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_drag_prepare_cb);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_drag_begin_cb);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_drag_end_cb);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_drag_cancel_cb);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_drop_cb);
+static void errands_task_class_init(ErrandsTaskClass *klass) {
+  GObjectClass *object_class = G_OBJECT_CLASS(klass);
+
+  object_class->dispose = errands_task_dispose;
+
+  object_class->set_property = errands_task_set_property;
+  object_class->get_property = errands_task_get_property;
+
+  obj_properties[PROP_DATA] =
+      g_param_spec_pointer("data", "Task Data", "Data associated with the task.", G_PARAM_READWRITE);
+  g_object_class_install_properties(object_class, N_PROPERTIES, obj_properties);
+
+  gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(klass), "/io/github/mrvladus/Errands/ui/task.ui");
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, complete_btn);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, title);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, subtitle);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, edit_title);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, menu_btn);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, sub_toggle_btn);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, toolbar);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, props_bar);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, tags_box);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, date_btn);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, unpin_btn);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, date_btn_content);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, notes_btn);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, priority_btn);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, attachments_btn);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, attachments_count);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, sub_entry);
+
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), errands_task_menu_show);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_title_edit_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_unpin_btn_clicked_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_complete_btn_toggle_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_sub_task_entry_activated);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_drag_prepare_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_drag_begin_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_drag_end_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_drag_cancel_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_drop_cb);
 }
 
 static void errands_task_init(ErrandsTask *self) {

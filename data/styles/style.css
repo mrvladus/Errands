@@ -135,16 +135,6 @@
     padding: 2px;
 }
 
-/* Sidebar */
-
-.sidebar-task-list-row {
-    transition: 0.2s;
-}
-
-.sidebar-task-list-row:drop(active) {
-    background-color: var(--blue-1);
-}
-
 /* Overrides */
 
 colorbutton button {
@@ -183,7 +173,7 @@ editablelabel > stack > text {
     background-color: transparent;
 }
 
-listview {
+/*listview {
     background-color: transparent;
 }
 
@@ -192,4 +182,4 @@ listview > row {
     margin-top: 3px;
     margin-bottom: 3px;
     margin-right: 6px;
-}
+}*/
