@@ -140,10 +140,12 @@ template $ErrandsTaskList: Adw.Bin {
 
         ListView list_view {
           enable-rubberband: false;
+          activate => $on_listview_activate_cb(template);
 
           factory: BuilderListItemFactory {
             template ListItem {
               focusable: true;
+              activatable: true;
 
               child: TreeExpander expander {
                 list-row: bind template.item;

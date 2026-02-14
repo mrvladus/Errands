@@ -173,7 +173,7 @@ editablelabel > stack > text {
     background-color: transparent;
 }
 
-/*listview {
+listview {
     background-color: transparent;
 }
 
@@ -181,5 +181,6 @@ listview > row {
     border-radius: var(--window-radius);
     margin-top: 3px;
     margin-bottom: 3px;
+    margin-left: 3px;
     margin-right: 6px;
-}*/
+}

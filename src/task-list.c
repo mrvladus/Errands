@@ -1,5 +1,7 @@
 #include "task-list.h"
 #include "data.h"
+#include "gio/gio.h"
+#include "gtk/gtk.h"
 #include "sidebar.h"
 #include "sync.h"
 #include "task-item.h"
@@ -24,6 +26,7 @@ static void on_task_list_entry_activated_cb(ErrandsTaskList *self);
 static void on_task_list_entry_text_changed_cb(ErrandsTaskList *self);
 static void on_task_list_search_cb(ErrandsTaskList *self, GtkSearchEntry *entry);
 static void on_motion_cb(GtkEventControllerMotion *ctrl, gdouble x, gdouble y, ErrandsTaskList *self);
+static void on_listview_activate_cb(ErrandsTaskList *self, guint position, GtkListView *list_view);
 
 static void on_focus_entry_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
 static void on_entry_task_menu_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
@@ -63,6 +66,7 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_entry_text_changed_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_search_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_motion_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_listview_activate_cb);
 }
 
 static gboolean filter_func(GtkTreeListRow *row, ErrandsTaskList *self) {
@@ -110,10 +114,9 @@ static void errands_task_list_init(ErrandsTaskList *self) {
       }
     }
   }
-  GtkTreeListModel *tree_model =
-      gtk_tree_list_model_new(G_LIST_MODEL(model), FALSE, FALSE, task_children_func, NULL, NULL);
+  self->tree_model = gtk_tree_list_model_new(G_LIST_MODEL(model), FALSE, FALSE, task_children_func, NULL, NULL);
   filter = GTK_FILTER(gtk_custom_filter_new((GtkCustomFilterFunc)filter_func, self, NULL));
-  GtkFilterListModel *filter_model = gtk_filter_list_model_new(G_LIST_MODEL(tree_model), filter);
+  GtkFilterListModel *filter_model = gtk_filter_list_model_new(G_LIST_MODEL(self->tree_model), filter);
   GtkSelectionModel *selection_model = GTK_SELECTION_MODEL(gtk_no_selection_new(G_LIST_MODEL(filter_model)));
   gtk_list_view_set_model(GTK_LIST_VIEW(self->list_view), selection_model);
   gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(self->scrl), self->list_view);
@@ -308,4 +311,15 @@ static void on_task_list_search_cb(ErrandsTaskList *self, GtkSearchEntry *entry)
   search_query = gtk_editable_get_text(GTK_EDITABLE(entry));
   LOG("Search query changed to '%s'", search_query);
   errands_task_list_reload(self, false);
+}
+
+static void on_listview_activate_cb(ErrandsTaskList *self, guint position, GtkListView *list_view) {
+  GtkSelectionModel *selection_model = gtk_list_view_get_model(list_view);
+  gpointer item = g_list_model_get_item(G_LIST_MODEL(selection_model), position);
+  if (!item) return;
+  if (GTK_IS_TREE_LIST_ROW(item)) {
+    GtkTreeListRow *row = GTK_TREE_LIST_ROW(item);
+    gtk_tree_list_row_set_expanded(row, !gtk_tree_list_row_get_expanded(row));
+  }
+  g_object_unref(item);
 }

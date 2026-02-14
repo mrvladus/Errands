@@ -1,6 +1,7 @@
 #pragma once
 
 #include "data.h"
+#include "gtk/gtk.h"
 #include "task-menu.h"
 
 #include <adwaita.h>
@@ -60,6 +61,8 @@ struct _ErrandsTaskList {
   float x, y;
   ListData *data;
   ErrandsTaskListPage page;
+
+  GtkTreeListModel *tree_model;
 };
 
 ErrandsTaskList *errands_task_list_new();
