@@ -1,12 +1,6 @@
 #include "task-list.h"
 #include "data.h"
-#include "gio/gio.h"
-#include "glib-object.h"
-#include "glib.h"
-#include "gtk/gtk.h"
-#include "gtk/gtknoselection.h"
 #include "sidebar.h"
-#include "state.h"
 #include "sync.h"
 #include "task-item.h"
 #include "task-menu.h"
@@ -79,7 +73,7 @@ static gboolean filter_func(GtkTreeListRow *row, ErrandsTaskList *self) {
   case ERRANDS_TASK_LIST_PAGE_TODAY: break;
   case ERRANDS_TASK_LIST_PAGE_PINNED: break;
   case ERRANDS_TASK_LIST_PAGE_ALL: result = true; break;
-  case ERRANDS_TASK_LIST_PAGE_TASK_LIST: result = errands_task_item_get_task_data(item)->list == self->data; break;
+  case ERRANDS_TASK_LIST_PAGE_TASK_LIST: result = errands_task_item_get_data(item)->list == self->data; break;
   }
 
   return result;
@@ -90,29 +84,6 @@ static GListModel *task_children_func(gpointer item, gpointer user_data) {
   GListModel *model = errands_task_item_get_children_model(task_item);
   if (!model) return NULL;
   return g_object_ref(model);
-}
-
-static void on_setup_item(GtkSignalListItemFactory *self, GtkListItem *list_item) {
-  GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_tree_expander_new());
-
-  ErrandsTask *task = errands_task_new();
-  gtk_tree_expander_set_child(expander, GTK_WIDGET(task));
-
-  gtk_list_item_set_focusable(list_item, true);
-  gtk_list_item_set_child(list_item, GTK_WIDGET(expander));
-}
-
-static void on_bind_item(GtkListItemFactory *factory, GtkListItem *list_item) {
-  GtkTreeListRow *row = gtk_list_item_get_item(list_item);
-  GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_list_item_get_child(list_item));
-
-  gtk_tree_expander_set_list_row(expander, row);
-
-  ErrandsTask *task = ERRANDS_TASK(gtk_tree_expander_get_child(expander));
-  ErrandsTaskItem *item = gtk_tree_list_row_get_item(row);
-
-  errands_task_set_data(task, errands_task_item_get_task_data(item));
-  task->item = item;
 }
 
 static void errands_task_list_init(ErrandsTaskList *self) {
@@ -325,8 +296,6 @@ static void on_task_list_entry_activated_cb(ErrandsTaskList *self) {
   errands_sidebar_task_list_row_update(errands_sidebar_task_list_row_get(data->list));
   errands_sidebar_update_filter_rows();
   LOG("Add task '%s' to task list '%s'", errands_data_get_uid(data->ical), list_uid);
-  // errands_list_data_sort(self->data);
-  // errands_task_list_reload(self, false);
   errands_sync_create_task(data);
 }
 

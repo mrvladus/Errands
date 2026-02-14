@@ -2,7 +2,6 @@
 #include "data.h"
 #include "settings.h"
 #include "sidebar.h"
-#include "state.h"
 #include "window.h"
 
 // #define CALDAV_DEBUG
@@ -420,10 +419,7 @@ static void errands__sync_finished_cb(GObject *source_object, GAsyncResult *res,
     if (save_list) errands_list_data_save(list);
   }
 
-  if (reload) {
-    errands_sidebar_load_lists();
-    errands_task_list_reload(state.main_window->task_list, false);
-  }
+  if (reload) { errands_sidebar_load_lists(); }
 
   sync_in_progress = false;
   LOG("Sync: Finished");

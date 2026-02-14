@@ -1,7 +1,10 @@
 #include "task.h"
+#include "glib-object.h"
+#include "glib.h"
 #include "sidebar.h"
 #include "state.h"
 #include "sync.h"
+#include "task-item.h"
 #include "task-list.h"
 #include "task-menu.h"
 #include "task-properties-dialog.h"
@@ -45,6 +48,7 @@ G_DEFINE_TYPE(ErrandsTask, errands_task, GTK_TYPE_BOX)
 enum {
   PROP_0,
   PROP_DATA,
+  PROP_TASK_ITEM,
   N_PROPERTIES,
 };
 
@@ -57,6 +61,9 @@ static void errands_task_set_property(GObject *object, guint prop_id, const GVal
     self->data = g_value_get_pointer(value);
     errands_task_set_data(self, self->data);
   } break;
+  case PROP_TASK_ITEM: {
+    self->item = g_value_get_object(value);
+  } break;
   default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
   }
 }
@@ -65,6 +72,7 @@ static void errands_task_get_property(GObject *object, guint prop_id, GValue *va
   ErrandsTask *self = ERRANDS_TASK(object);
   switch (prop_id) {
   case PROP_DATA: g_value_set_pointer(value, self->data); break;
+  case PROP_TASK_ITEM: g_value_set_object(value, self->item); break;
   default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
   }
 }
@@ -84,6 +92,9 @@ static void errands_task_class_init(ErrandsTaskClass *klass) {
 
   obj_properties[PROP_DATA] =
       g_param_spec_pointer("data", "Task Data", "Data associated with the task.", G_PARAM_READWRITE);
+  obj_properties[PROP_TASK_ITEM] = g_param_spec_object("task-item", "Task Item", "Task item associated with the task.",
+                                                       ERRANDS_TYPE_TASK_ITEM, G_PARAM_READWRITE);
+
   g_object_class_install_properties(object_class, N_PROPERTIES, obj_properties);
 
   gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(klass), "/io/github/mrvladus/Errands/ui/task.ui");
@@ -318,8 +329,6 @@ static void on_cancel_action_cb(GSimpleAction *action, GVariant *param, ErrandsT
     }
   }
   errands_list_data_save(self->data->list);
-  errands_list_data_sort(self->data->list);
-  errands_task_list_reload(state.main_window->task_list, true);
   errands_sync_update_task(self->data);
 }
 
@@ -328,7 +337,6 @@ static void on_pin_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask
   errands_data_set_pinned(self->data->ical, new_pinned);
   errands_list_data_save(self->data->list);
   errands_sidebar_update_filter_rows();
-  errands_task_list_reload(state.main_window->task_list, true);
   errands_sync_update_task(self->data);
 }
 
@@ -375,7 +383,6 @@ static void on_complete_btn_toggle_cb(ErrandsTask *self, GtkCheckButton *btn) {
   }
   errands_list_data_save(self->data->list);
   errands_list_data_sort(self->data->list);
-  errands_task_list_reload(state.main_window->task_list, true);
   // Update task list
   errands_task_list_update_title(state.main_window->task_list);
   errands_sidebar_update_filter_rows();
@@ -415,7 +422,6 @@ static void on_unpin_btn_clicked_cb(ErrandsTask *self, GtkToggleButton *btn) {
   errands_data_set_pinned(self->data->ical, false);
   errands_list_data_save(self->data->list);
   errands_sidebar_update_filter_rows();
-  errands_task_list_reload(state.main_window->task_list, true);
 }
 
 static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *self) {
@@ -423,11 +429,7 @@ static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *self) {
   if (STR_EQUAL(text, "")) return;
   TaskData *new_data = errands_task_data_create_task(self->data->list, self->data, text);
   errands_list_data_save(self->data->list);
-
-  GListStore *model = G_LIST_STORE(errands_task_item_get_children_model(self->item));
-  g_autoptr(ErrandsTaskItem) new_item = errands_task_item_new(new_data);
-  g_list_store_append(model, new_item);
-
+  errands_task_item_add_child(self->item, new_data);
   // Reset text
   gtk_editable_set_text(GTK_EDITABLE(entry), "");
   errands_sidebar_update_filter_rows();
@@ -490,6 +492,5 @@ static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x,
   errands_data_set_parent(drop_data->ical, errands_data_get_parent(tgt_data->ical));
   errands_task_data_sort_sub_tasks(tgt_data);
   errands_list_data_save(tgt_data->list);
-  errands_task_list_reload(state.main_window->task_list, true);
   return true;
 }

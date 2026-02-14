@@ -154,7 +154,6 @@ static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x,
     ErrandsSidebarTaskListRow *row = errands_sidebar_task_list_row_get(old_list_data);
     errands_sidebar_task_list_row_update(row);
   }
-  errands_task_list_reload(state.main_window->task_list, false);
 
   return true;
 }
@@ -202,10 +201,7 @@ static void on_action_delete_completed(GSimpleAction *action, GVariant *param, E
       deleted = true;
     }
   }
-  if (deleted) {
-    errands_list_data_save(row->data);
-    errands_task_list_reload(state.main_window->task_list, true);
-  }
+  if (deleted) { errands_list_data_save(row->data); }
 }
 
 static void on_action_delete_cancelled(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {
@@ -221,10 +217,7 @@ static void on_action_delete_cancelled(GSimpleAction *action, GVariant *param, E
       deleted = true;
     }
   }
-  if (deleted) {
-    errands_list_data_save(row->data);
-    errands_task_list_reload(state.main_window->task_list, true);
-  }
+  if (deleted) { errands_list_data_save(row->data); }
 }
 
 static void on_action_delete(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {

@@ -139,7 +139,6 @@ template $ErrandsTaskList: Adw.Bin {
         vexpand: true;
 
         ListView list_view {
-          margin-end: 6;
           enable-rubberband: false;
 
           factory: BuilderListItemFactory {
@@ -148,9 +147,11 @@ template $ErrandsTaskList: Adw.Bin {
 
               child: TreeExpander expander {
                 list-row: bind template.item;
+                hide-expander: bind (expander.item as <$ErrandsTaskItem>).children-model-is-empty;
 
                 child: $ErrandsTask {
-                  data: bind expander.item as <$ErrandsTaskItem>.task-data;
+                  data: bind expander.item as <$ErrandsTaskItem>.data;
+                  task-item: bind expander.item as <$ErrandsTaskItem>;
                 };
               };
             }

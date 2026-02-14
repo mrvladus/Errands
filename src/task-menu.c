@@ -137,7 +137,6 @@ static void on_delete_clicked_cb(ErrandsTaskMenu *self) {
   gtk_popover_popdown(GTK_POPOVER(self));
   errands_data_set_deleted(self->task->data->ical, true);
   errands_list_data_save(self->task->data->list);
-  errands_task_list_reload(state.main_window->task_list, true);
   errands_window_add_toast(_("Task is Deleted"));
   errands_sync_delete_task(self->task->data);
   errands_sidebar_update_filter_rows();

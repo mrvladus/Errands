@@ -362,7 +362,6 @@ static void on_dialog_close_cb(ErrandsTaskPropertiesDialog *self) {
     errands_list_data_save(data->list);
     errands_task_update_toolbar(self->task);
     errands_sync_update_task(data);
-    errands_task_list_reload(state.main_window->task_list, true);
     errands_sidebar_update_filter_rows();
   }
 }

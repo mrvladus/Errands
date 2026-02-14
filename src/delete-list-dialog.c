@@ -2,7 +2,6 @@
 #include "data.h"
 #include "state.h"
 #include "sync.h"
-#include "task-list.h"
 
 static void on_response_cb(ErrandsDeleteListDialog *dialog, gchar *response, gpointer data);
 
@@ -55,7 +54,6 @@ static void on_response_cb(ErrandsDeleteListDialog *dialog, gchar *response, gpo
     errands_data_set_deleted(row->data->ical, true);
     errands_list_data_save(row->data);
     errands_sync_delete_list(row->data);
-    errands_task_list_reload(state.main_window->task_list, false);
     errands_sidebar_update_filter_rows();
     GtkWidget *prev = gtk_widget_get_prev_sibling(GTK_WIDGET(row));
     GtkWidget *next = gtk_widget_get_next_sibling(GTK_WIDGET(row));
@@ -64,12 +62,10 @@ static void on_response_cb(ErrandsDeleteListDialog *dialog, gchar *response, gpo
     // Switch row
     if (prev) {
       g_signal_emit_by_name(prev, "activate", NULL);
-      errands_task_list_reload(state.main_window->task_list, false);
       return;
     }
     if (next) {
       g_signal_emit_by_name(next, "activate", NULL);
-      errands_task_list_reload(state.main_window->task_list, false);
       return;
     }
     g_signal_emit_by_name(state.main_window->sidebar->all_row, "activate", NULL);

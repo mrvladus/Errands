@@ -87,14 +87,12 @@ static void on_show_completed_toggle_cb(AdwSwitchRow *row) {
   if (state.main_window->task_list->sort_dialog->block_signals) return;
   bool show_completed = adw_switch_row_get_active(row);
   errands_settings_set(SETTING_SHOW_COMPLETED, &show_completed);
-  errands_task_list_reload(state.main_window->task_list, false);
 }
 
 static void on_show_cancelled_toggle_cb(AdwSwitchRow *row) {
   if (state.main_window->task_list->sort_dialog->block_signals) return;
   bool show_cancelled = adw_switch_row_get_active(row);
   errands_settings_set(SETTING_SHOW_CANCELLED, &show_cancelled);
-  errands_task_list_reload(state.main_window->task_list, false);
 }
 
 static void set_sort_by(GtkCheckButton *btn, size_t sort_by) {
@@ -103,7 +101,6 @@ static void set_sort_by(GtkCheckButton *btn, size_t sort_by) {
   if (!gtk_check_button_get_active(btn) || sort_by_current == sort_by) return;
   errands_settings_set(SETTING_SORT_BY, &sort_by);
   errands_data_sort();
-  errands_task_list_reload(state.main_window->task_list, false);
 }
 
 static void on_created_toggle_cb(GtkCheckButton *btn) { set_sort_by(btn, SORT_TYPE_CREATION_DATE); }
@@ -121,5 +118,4 @@ static void on_sort_order_changed_cb(ErrandsTaskListSortDialog *self) {
   if (new == sort_by_current) return;
   errands_settings_set(SETTING_SORT_ORDER, &new);
   errands_data_sort();
-  errands_task_list_reload(state.main_window->task_list, false);
 }
