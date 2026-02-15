@@ -32,7 +32,6 @@ void errands_task_list_sort_dialog_show();
 typedef enum {
   ERRANDS_TASK_LIST_PAGE_ALL,
   ERRANDS_TASK_LIST_PAGE_TODAY,
-  ERRANDS_TASK_LIST_PAGE_PINNED,
   ERRANDS_TASK_LIST_PAGE_TASK_LIST,
 } ErrandsTaskListPage;
 
@@ -70,4 +69,3 @@ void errands_task_list_update_title(ErrandsTaskList *self);
 void errands_task_list_show_all_tasks(ErrandsTaskList *self);
 void errands_task_list_show_today_tasks(ErrandsTaskList *self);
 void errands_task_list_show_task_list(ErrandsTaskList *self, ListData *data);
-void errands_task_list_show_pinned(ErrandsTaskList *self);

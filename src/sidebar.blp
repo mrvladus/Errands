@@ -142,32 +142,6 @@ template $ErrandsSidebar: Adw.Bin {
               }
             }
           }
-
-          ListBoxRow pinned_row {
-            Box {
-              spacing: 12;
-              tooltip-text: _("Pinned Tasks");
-
-              Image {
-                icon-name: "errands-pin-symbolic";
-              }
-
-              Label {
-                label: _("Pinned");
-              }
-
-              Label pinned_counter {
-                label: "";
-                hexpand: true;
-                halign: end;
-
-                styles [
-                  "dim-label",
-                  "caption",
-                ]
-              }
-            }
-          }
         }
 
         Separator {

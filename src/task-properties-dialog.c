@@ -330,7 +330,6 @@ static void on_dialog_close_cb(ErrandsTaskPropertiesDialog *self) {
     case ERRANDS_TASK_LIST_PAGE_ALL:
     case ERRANDS_TASK_LIST_PAGE_TODAY: errands_data_sort(); break;
     case ERRANDS_TASK_LIST_PAGE_TASK_LIST: errands_list_data_sort(data->list); break;
-    case ERRANDS_TASK_LIST_PAGE_PINNED: break;
     }
   }
 

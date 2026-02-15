@@ -82,12 +82,22 @@ static gboolean filter_func(GtkTreeListRow *row, ErrandsTaskList *self) {
 
   switch (self->page) {
   case ERRANDS_TASK_LIST_PAGE_TODAY: break;
-  case ERRANDS_TASK_LIST_PAGE_PINNED: break;
   case ERRANDS_TASK_LIST_PAGE_ALL: result = true; break;
   case ERRANDS_TASK_LIST_PAGE_TASK_LIST: result = errands_task_item_get_data(item)->list == self->data; break;
   }
 
   return result;
+}
+
+static int sort_func(ErrandsTaskItem *a, ErrandsTaskItem *b, ErrandsTaskList *self) {
+  TaskData *td_a = errands_task_item_get_data(a);
+  TaskData *td_b = errands_task_item_get_data(b);
+
+  bool pinned_a = errands_data_get_pinned(td_a->ical);
+  bool pinned_b = errands_data_get_pinned(td_b->ical);
+  if (pinned_a != pinned_b) return pinned_b - pinned_a;
+
+  return 0;
 }
 
 static GListModel *task_children_func(gpointer item, gpointer user_data) {
@@ -122,8 +132,14 @@ static void errands_task_list_init(ErrandsTaskList *self) {
     }
   }
   self->tree_model = gtk_tree_list_model_new(G_LIST_MODEL(model), false, true, task_children_func, NULL, NULL);
+
+  GtkSorter *base_sorter = GTK_SORTER(gtk_custom_sorter_new((GCompareDataFunc)sort_func, self, NULL));
+  GtkTreeListRowSorter *tree_sorter = gtk_tree_list_row_sorter_new(base_sorter);
+  GtkSortListModel *sort_model = gtk_sort_list_model_new(G_LIST_MODEL(self->tree_model), GTK_SORTER(tree_sorter));
+
   filter = GTK_FILTER(gtk_custom_filter_new((GtkCustomFilterFunc)filter_func, self, NULL));
-  GtkFilterListModel *filter_model = gtk_filter_list_model_new(G_LIST_MODEL(self->tree_model), filter);
+  GtkFilterListModel *filter_model = gtk_filter_list_model_new(G_LIST_MODEL(sort_model), filter);
+
   GtkSelectionModel *selection_model = GTK_SELECTION_MODEL(gtk_no_selection_new(G_LIST_MODEL(filter_model)));
   gtk_list_view_set_model(GTK_LIST_VIEW(self->list_view), selection_model);
   gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(self->scrl), self->list_view);
@@ -226,18 +242,6 @@ void errands_task_list_update_title(ErrandsTaskList *self) {
     gtk_widget_set_visible(self->scrl, total > 0);
     return;
   } break;
-  case ERRANDS_TASK_LIST_PAGE_PINNED: {
-    adw_window_title_set_title(ADW_WINDOW_TITLE(self->title), _("Pinned Tasks"));
-    adw_window_title_set_subtitle(ADW_WINDOW_TITLE(self->title), "");
-    size_t pinned = 0;
-    for_range(i, 0, current_task_list->len) {
-      TaskData *data = g_ptr_array_index(current_task_list, i);
-      CONTINUE_IF(errands_data_get_deleted(data->ical));
-      if (errands_data_get_pinned(data->ical)) pinned++;
-    }
-    gtk_widget_set_visible(self->scrl, pinned > 0);
-    return;
-  } break;
   case ERRANDS_TASK_LIST_PAGE_TASK_LIST:
     adw_window_title_set_title(ADW_WINDOW_TITLE(self->title), errands_data_get_list_name(self->data->ical));
     break;
@@ -278,13 +282,6 @@ void errands_task_list_show_task_list(ErrandsTaskList *self, ListData *data) {
   self->page = ERRANDS_TASK_LIST_PAGE_TASK_LIST;
   gtk_widget_set_visible(self->entry_box, true);
   g_idle_add_once((GSourceOnceFunc)__filter_cb, GINT_TO_POINTER(GTK_FILTER_CHANGE_DIFFERENT));
-}
-
-void errands_task_list_show_pinned(ErrandsTaskList *self) {
-  LOG("Task List: Show pinned");
-  self->data = NULL;
-  self->page = ERRANDS_TASK_LIST_PAGE_PINNED;
-  gtk_widget_set_visible(self->entry_box, false);
 }
 
 void errands_task_list_reload(ErrandsTaskList *self, bool save_scroll_pos) {}
