@@ -140,7 +140,7 @@ template $ErrandsTaskList: Adw.Bin {
 
         ListView list_view {
           enable-rubberband: false;
-          activate => $on_listview_activate_cb(template);
+          activate => $on_listview_activate_cb();
 
           factory: BuilderListItemFactory {
             template ListItem {

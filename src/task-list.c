@@ -1,6 +1,8 @@
 #include "task-list.h"
 #include "data.h"
 #include "gio/gio.h"
+#include "glib-object.h"
+#include "glib.h"
 #include "gtk/gtk.h"
 #include "sidebar.h"
 #include "sync.h"
@@ -26,7 +28,7 @@ static void on_task_list_entry_activated_cb(ErrandsTaskList *self);
 static void on_task_list_entry_text_changed_cb(ErrandsTaskList *self);
 static void on_task_list_search_cb(ErrandsTaskList *self, GtkSearchEntry *entry);
 static void on_motion_cb(GtkEventControllerMotion *ctrl, gdouble x, gdouble y, ErrandsTaskList *self);
-static void on_listview_activate_cb(ErrandsTaskList *self, guint position, GtkListView *list_view);
+static void on_listview_activate_cb(GtkListView *list_view, guint position);
 
 static void on_focus_entry_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
 static void on_entry_task_menu_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
@@ -313,13 +315,8 @@ static void on_task_list_search_cb(ErrandsTaskList *self, GtkSearchEntry *entry)
   errands_task_list_reload(self, false);
 }
 
-static void on_listview_activate_cb(ErrandsTaskList *self, guint position, GtkListView *list_view) {
-  GtkSelectionModel *selection_model = gtk_list_view_get_model(list_view);
-  gpointer item = g_list_model_get_item(G_LIST_MODEL(selection_model), position);
-  if (!item) return;
-  if (GTK_IS_TREE_LIST_ROW(item)) {
-    GtkTreeListRow *row = GTK_TREE_LIST_ROW(item);
-    gtk_tree_list_row_set_expanded(row, !gtk_tree_list_row_get_expanded(row));
-  }
-  g_object_unref(item);
+static void on_listview_activate_cb(GtkListView *list_view, guint position) {
+  g_autoptr(GtkTreeListRow) row = g_list_model_get_item(G_LIST_MODEL(gtk_list_view_get_model(list_view)), position);
+  if (!row) return;
+  if (GTK_IS_TREE_LIST_ROW(row)) gtk_tree_list_row_set_expanded(row, !gtk_tree_list_row_get_expanded(row));
 }

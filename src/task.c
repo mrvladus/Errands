@@ -1,6 +1,8 @@
 #include "task.h"
+#include "data.h"
 #include "glib-object.h"
 #include "glib.h"
+#include "gtk/gtk.h"
 #include "sidebar.h"
 #include "state.h"
 #include "sync.h"
@@ -103,7 +105,6 @@ static void errands_task_class_init(ErrandsTaskClass *klass) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, subtitle);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, edit_title);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, menu_btn);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, sub_toggle_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, toolbar);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, props_bar);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, tags_box);
@@ -130,6 +131,7 @@ static void errands_task_class_init(ErrandsTaskClass *klass) {
 
 static void errands_task_init(ErrandsTask *self) {
   gtk_widget_init_template(GTK_WIDGET(self));
+
   GSimpleActionGroup *ag = errands_add_action_group(self, "task");
   errands_add_action(ag, "menu", on_menu_action_cb, self, NULL);
   errands_add_action(ag, "notes", on_notes_action_cb, self, NULL);
@@ -160,11 +162,13 @@ void errands_task_set_data(ErrandsTask *self, TaskData *data) {
   // Cancelled state
   bool cancelled = errands_data_get_cancelled(data->ical);
   gtk_widget_set_visible(self->complete_btn, !cancelled);
-  gtk_widget_set_visible(self->sub_entry, !cancelled);
-  // Show sub-tasks entry
-  bool expanded = errands_data_get_expanded(data->ical);
-  gtk_widget_set_visible(self->sub_entry, expanded);
-  gtk_button_set_icon_name(self->sub_toggle_btn, expanded ? "errands-up-symbolic" : "errands-down-symbolic");
+  // Expand
+  // GtkWidget *tree_expander = gtk_widget_get_ancestor(GTK_WIDGET(self), GTK_TYPE_TREE_EXPANDER);
+  // if (tree_expander) {
+  //   GtkTreeListRow *row = gtk_tree_expander_get_list_row(GTK_TREE_EXPANDER(tree_expander));
+  //   gtk_tree_list_row_set_expanded(row, errands_data_get_expanded(data->ical));
+  // }
+
   errands_task_update_accent_color(self);
   errands_task_update_progress(self);
   errands_task_update_toolbar(self);
@@ -346,11 +350,7 @@ static void on_expand_action_cb(GSimpleAction *action, GVariant *param, ErrandsT
   LOG("Task '%s': Toggle expand: %d", errands_data_get_uid(self->data->ical), new_expanded);
   errands_data_set_expanded(self->data->ical, new_expanded);
   errands_list_data_save(self->data->list);
-  gtk_button_set_icon_name(self->sub_toggle_btn, new_expanded ? "errands-up-symbolic" : "errands-down-symbolic");
-  // errands_task_list_redraw_tasks(state.main_window->task_list);
-  gtk_widget_set_visible(GTK_WIDGET(self->sub_entry), new_expanded);
-  gtk_widget_grab_focus(GTK_WIDGET(self->sub_entry));
-  // errands_sync_update_task(self->data);
+  // gtk_widget_grab_focus(GTK_WIDGET(self->sub_entry));
 }
 
 // ---------- CALLBACKS ---------- //

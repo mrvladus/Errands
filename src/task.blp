@@ -95,17 +95,16 @@ template $ErrandsTask: Box {
       ]
     }
 
-    Box task_menu_box {
-      // Toggle Sub-Tasks button
-      Button sub_toggle_btn {
-        icon-name: "errands-down-symbolic";
+    Box {
+      ToggleButton sub_toggle_btn {
+        tooltip-text: _("Toggle Sub-Tasks Entry");
+        icon-name: "errands-add-symbolic";
         valign: center;
-        tooltip-text: _("Toggle Sub-Tasks");
-        action-name: "task.expand";
 
         styles [
           "flat",
           "circular",
+          "sub-toggle-btn",
         ]
       }
 
@@ -196,17 +195,17 @@ template $ErrandsTask: Box {
     }
   }
 
-  // Sub-Tasks Entry
-  Entry sub_entry {
-    margin-start: 6;
-    margin-end: 6;
-    margin-bottom: 6;
-    placeholder-text: _("Add Sub-Task");
-    activate => $on_sub_task_entry_activated(template) not-swapped;
-
-    styles [
-      "sub-tasks-entry",
-    ]
+  Revealer sub_entry_revealer {
+    transition-type: swing_down;
+    reveal-child: bind sub_toggle_btn.active;
+    // Sub-Tasks Entry
+    Entry sub_entry {
+      margin-start: 6;
+      margin-end: 6;
+      margin-bottom: 6;
+      placeholder-text: _("Add Sub-Task");
+      activate => $on_sub_task_entry_activated(template) not-swapped;
+    }
   }
 
   DragSource {

@@ -1,15 +1,15 @@
-.task {
-    padding: 0 0 6px 0;
-}
-
-.sub-task-entry {
-    opacity: 0.6;
+.sub-toggle-btn > image {
+    transform: scale(0.6);
     transition: 0.2s;
 }
 
-.sub-task-entry:hover,
-.sub-task-entry:focus-within {
-    opacity: 1;
+.sub-toggle-btn:hover > image {
+    transform: scale(1);
+}
+
+.sub-toggle-btn:checked > image {
+    transform: scale(1);
+    color: var(--accent-color);
 }
 
 /* Accent color buttons */
