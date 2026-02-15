@@ -142,21 +142,9 @@ template $ErrandsTaskList: Adw.Bin {
           enable-rubberband: false;
           activate => $on_listview_activate_cb();
 
-          factory: BuilderListItemFactory {
-            template ListItem {
-              focusable: true;
-              activatable: true;
-
-              child: TreeExpander expander {
-                list-row: bind template.item;
-                hide-expander: bind (expander.item as <$ErrandsTaskItem>).children-model-is-empty;
-
-                child: $ErrandsTask {
-                  data: bind expander.item as <$ErrandsTaskItem>.data;
-                  task-item: bind expander.item as <$ErrandsTaskItem>;
-                };
-              };
-            }
+          factory: SignalListItemFactory {
+            setup => $on_setup_item_cb();
+            bind => $on_bind_item_cb();
           };
         }
       }

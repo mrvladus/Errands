@@ -5,8 +5,6 @@
 #include "vendor/toolbox.h"
 #include <libical/ical.h>
 
-static void errands_data_create_backup();
-
 AUTOPTR_DEFINE(JSON, json_free)
 
 // ---------- GLOBALS ---------- //
@@ -92,7 +90,6 @@ static void errands_data_migrate_from_46() {
       JSON *created_at_item = json_object_get(task_item, "created_at");
       JSON *deleted_item = json_object_get(task_item, "deleted");
       JSON *due_date_item = json_object_get(task_item, "due_date");
-      JSON *expanded_item = json_object_get(task_item, "expanded");
       JSON *notes_item = json_object_get(task_item, "notes");
       JSON *notified_item = json_object_get(task_item, "notified");
       JSON *parent_item = json_object_get(task_item, "parent");
@@ -120,7 +117,6 @@ static void errands_data_migrate_from_46() {
       errands_data_set_attachments(ical, attachments);
       errands_data_set_color(ical, color_item->string_val, false);
       errands_data_set_deleted(ical, deleted_item->bool_val);
-      errands_data_set_expanded(ical, expanded_item->bool_val);
       errands_data_set_notified(ical, notified_item->bool_val);
       icalcomponent_add_component(calendar->ical, ical);
     }
@@ -520,9 +516,6 @@ bool errands_data_get_cancelled(icalcomponent *ical) {
 bool errands_data_get_deleted(icalcomponent *ical) {
   return STR_TO_BOOL(get_x_prop_value(ical, "X-ERRANDS-DELETED", "0"));
 }
-bool errands_data_get_expanded(icalcomponent *ical) {
-  return STR_TO_BOOL(get_x_prop_value(ical, "X-ERRANDS-EXPANDED", "0"));
-}
 bool errands_data_get_notified(icalcomponent *ical) {
   return STR_TO_BOOL(get_x_prop_value(ical, "X-ERRANDS-NOTIFIED", "0"));
 }
@@ -550,11 +543,6 @@ void errands_data_set_cancelled(icalcomponent *ical, bool value) {
 }
 void errands_data_set_deleted(icalcomponent *ical, bool value) {
   set_x_prop_value(ical, "X-ERRANDS-DELETED", BOOL_TO_STR_NUM(value));
-  errands_data_set_synced(ical, false);
-  errands_data_set_changed(ical, icaltime_get_date_time_now());
-}
-void errands_data_set_expanded(icalcomponent *ical, bool value) {
-  set_x_prop_value(ical, "X-ERRANDS-EXPANDED", BOOL_TO_STR_NUM(value));
   errands_data_set_synced(ical, false);
   errands_data_set_changed(ical, icaltime_get_date_time_now());
 }

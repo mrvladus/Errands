@@ -28,7 +28,6 @@ static void on_tags_action_cb(GSimpleAction *action, GVariant *param, ErrandsTas
 static void on_date_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_cancel_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_pin_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
-static void on_expand_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 
 // Callbacks
 static void on_tag_clicked_cb(ErrandsTask *self);
@@ -65,6 +64,7 @@ static void errands_task_set_property(GObject *object, guint prop_id, const GVal
   } break;
   case PROP_TASK_ITEM: {
     self->item = g_value_get_object(value);
+    errands_task_set_data(self, errands_task_item_get_data(self->item));
   } break;
   default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
   }
@@ -141,7 +141,6 @@ static void errands_task_init(ErrandsTask *self) {
   errands_add_action(ag, "date", on_date_action_cb, self, NULL);
   errands_add_action(ag, "cancel", on_cancel_action_cb, self, NULL);
   errands_add_action(ag, "pin", on_pin_action_cb, self, NULL);
-  errands_add_action(ag, "expand", on_expand_action_cb, self, NULL);
 }
 
 ErrandsTask *errands_task_new() { return g_object_new(ERRANDS_TYPE_TASK, NULL); }
@@ -163,11 +162,6 @@ void errands_task_set_data(ErrandsTask *self, TaskData *data) {
   bool cancelled = errands_data_get_cancelled(data->ical);
   gtk_widget_set_visible(self->complete_btn, !cancelled);
   // Expand
-  // GtkWidget *tree_expander = gtk_widget_get_ancestor(GTK_WIDGET(self), GTK_TYPE_TREE_EXPANDER);
-  // if (tree_expander) {
-  //   GtkTreeListRow *row = gtk_tree_expander_get_list_row(GTK_TREE_EXPANDER(tree_expander));
-  //   gtk_tree_list_row_set_expanded(row, errands_data_get_expanded(data->ical));
-  // }
 
   errands_task_update_accent_color(self);
   errands_task_update_progress(self);
@@ -344,15 +338,6 @@ static void on_pin_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask
   errands_sync_update_task(self->data);
 }
 
-static void on_expand_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
-  // if (errands_data_get_cancelled(self->data->ical)) return;
-  bool new_expanded = !errands_data_get_expanded(self->data->ical);
-  LOG("Task '%s': Toggle expand: %d", errands_data_get_uid(self->data->ical), new_expanded);
-  errands_data_set_expanded(self->data->ical, new_expanded);
-  errands_list_data_save(self->data->list);
-  // gtk_widget_grab_focus(GTK_WIDGET(self->sub_entry));
-}
-
 // ---------- CALLBACKS ---------- //
 
 static void on_tag_clicked_cb(ErrandsTask *self) { on_tags_action_cb(NULL, NULL, self); }
@@ -430,6 +415,7 @@ static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *self) {
   TaskData *new_data = errands_task_data_create_task(self->data->list, self->data, text);
   errands_list_data_save(self->data->list);
   errands_task_item_add_child(self->item, new_data);
+
   // Reset text
   gtk_editable_set_text(GTK_EDITABLE(entry), "");
   errands_sidebar_update_filter_rows();

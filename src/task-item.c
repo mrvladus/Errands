@@ -24,6 +24,7 @@ static void errands_task_item_set_property(GObject *object, guint prop_id, const
   switch (prop_id) {
   case PROP_DATA: self->data = g_value_get_pointer(value); break;
   case PROP_CHILDREN_MODEL: self->children_model = g_value_get_object(value); break;
+  case PROP_CHILDREN_MODEL_IS_EMPTY: g_object_notify_by_pspec(object, pspec); break;
   default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
   }
 }
@@ -62,7 +63,7 @@ static void errands_task_item_class_init(ErrandsTaskItemClass *klass) {
       "children-model", "Children Model", "Model containing child tasks.", G_TYPE_LIST_MODEL, G_PARAM_READWRITE);
   obj_properties[PROP_CHILDREN_MODEL_IS_EMPTY] =
       g_param_spec_boolean("children-model-is-empty", "Children Model Is Empty", "Whether the task has child tasks.",
-                           FALSE, G_PARAM_READABLE);
+                           FALSE, G_PARAM_READWRITE);
   g_object_class_install_properties(object_class, N_PROPERTIES, obj_properties);
 }
 
@@ -102,4 +103,5 @@ void errands_task_item_add_child(ErrandsTaskItem *self, TaskData *data) {
   if (!self || !data) return;
   g_autoptr(ErrandsTaskItem) item = errands_task_item_new(data);
   g_list_store_append(self->children_model, item);
+  g_object_set(self, "children-model-is-empty", false, NULL);
 }
