@@ -129,11 +129,12 @@ static void errands_task_list_init(ErrandsTaskList *self) {
       }
     }
   }
-  self->tree_model = gtk_tree_list_model_new(G_LIST_MODEL(model), false, true, task_children_func, NULL, NULL);
+  GtkTreeListModel *tree_model =
+      gtk_tree_list_model_new(G_LIST_MODEL(model), false, true, task_children_func, NULL, NULL);
 
-  GtkSorter *base_sorter = GTK_SORTER(gtk_custom_sorter_new((GCompareDataFunc)sort_func, self, NULL));
-  GtkTreeListRowSorter *tree_sorter = gtk_tree_list_row_sorter_new(base_sorter);
-  GtkSortListModel *sort_model = gtk_sort_list_model_new(G_LIST_MODEL(self->tree_model), GTK_SORTER(tree_sorter));
+  self->base_sorter = GTK_SORTER(gtk_custom_sorter_new((GCompareDataFunc)sort_func, self, NULL));
+  GtkTreeListRowSorter *tree_sorter = gtk_tree_list_row_sorter_new(self->base_sorter);
+  GtkSortListModel *sort_model = gtk_sort_list_model_new(G_LIST_MODEL(tree_model), GTK_SORTER(tree_sorter));
 
   filter = GTK_FILTER(gtk_custom_filter_new((GtkCustomFilterFunc)filter_func, self, NULL));
   GtkFilterListModel *filter_model = gtk_filter_list_model_new(G_LIST_MODEL(sort_model), filter);
@@ -288,7 +289,9 @@ void errands_task_list_show_task_list(ErrandsTaskList *self, ListData *data) {
   g_idle_add_once((GSourceOnceFunc)__filter_cb, GINT_TO_POINTER(GTK_FILTER_CHANGE_DIFFERENT));
 }
 
-void errands_task_list_reload(ErrandsTaskList *self, bool save_scroll_pos) {}
+void errands_task_list_sort(ErrandsTaskList *self, GtkSorterChange change) {
+  gtk_sorter_changed(self->base_sorter, change);
+}
 
 // ---------- CALLBACKS ---------- //
 
@@ -329,7 +332,7 @@ static void on_task_list_entry_text_changed_cb(ErrandsTaskList *self) {
 static void on_task_list_search_cb(ErrandsTaskList *self, GtkSearchEntry *entry) {
   search_query = gtk_editable_get_text(GTK_EDITABLE(entry));
   LOG("Search query changed to '%s'", search_query);
-  errands_task_list_reload(self, false);
+  // errands_task_list_reload(self, false);
 }
 
 static void on_motion_cb(GtkEventControllerMotion *ctrl, gdouble x, gdouble y, ErrandsTaskList *self) {

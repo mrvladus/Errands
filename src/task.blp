@@ -89,7 +89,7 @@ template $ErrandsTask: Box {
       icon-name: "errands-pin-symbolic";
       tooltip-text: _("Unpin");
       valign: center;
-      clicked => $on_unpin_btn_clicked_cb(template);
+      action-name: "task.pin";
 
       styles [
         "flat",

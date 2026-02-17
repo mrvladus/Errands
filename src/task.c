@@ -33,7 +33,6 @@ static void on_pin_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask
 // Callbacks
 static void on_tag_clicked_cb(ErrandsTask *self);
 static void on_complete_btn_toggle_cb(ErrandsTask *self, GtkCheckButton *btn);
-static void on_unpin_btn_clicked_cb(ErrandsTask *self, GtkToggleButton *btn);
 static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointer user_data);
 static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *self);
 
@@ -120,7 +119,6 @@ static void errands_task_class_init(ErrandsTaskClass *klass) {
 
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), errands_task_menu_show);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_title_edit_cb);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_unpin_btn_clicked_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_complete_btn_toggle_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_sub_task_entry_activated);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_drag_prepare_cb);
@@ -339,8 +337,9 @@ static void on_pin_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask
   bool new_pinned = !errands_data_get_pinned(self->data->ical);
   errands_data_set_pinned(self->data->ical, new_pinned);
   errands_list_data_save(self->data->list);
-  errands_sidebar_update_filter_rows();
-  errands_sync_update_task(self->data);
+  errands_task_set_data(self, self->data);
+  errands_task_list_sort(state.main_window->task_list,
+                         new_pinned ? GTK_SORTER_CHANGE_MORE_STRICT : GTK_SORTER_CHANGE_LESS_STRICT);
 }
 
 // ---------- CALLBACKS ---------- //
@@ -407,12 +406,6 @@ static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointe
     gtk_label_set_markup(GTK_LABEL(task->title), markup);
     errands_sync_update_task(task->data);
   }
-}
-
-static void on_unpin_btn_clicked_cb(ErrandsTask *self, GtkToggleButton *btn) {
-  errands_data_set_pinned(self->data->ical, false);
-  errands_list_data_save(self->data->list);
-  errands_sidebar_update_filter_rows();
 }
 
 static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *self) {

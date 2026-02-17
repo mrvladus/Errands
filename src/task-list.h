@@ -57,11 +57,11 @@ struct _ErrandsTaskList {
 
   GtkEventControllerMotion *motion_ctrl;
 
+  GtkSorter *base_sorter;
+
   float x, y;
   ListData *data;
   ErrandsTaskListPage page;
-
-  GtkTreeListModel *tree_model;
 };
 
 ErrandsTaskList *errands_task_list_new();
@@ -69,3 +69,4 @@ void errands_task_list_update_title(ErrandsTaskList *self);
 void errands_task_list_show_all_tasks(ErrandsTaskList *self);
 void errands_task_list_show_today_tasks(ErrandsTaskList *self);
 void errands_task_list_show_task_list(ErrandsTaskList *self, ListData *data);
+void errands_task_list_sort(ErrandsTaskList *self, GtkSorterChange change);
