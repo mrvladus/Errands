@@ -15,7 +15,6 @@
 #include <libical/ical.h>
 #include <stddef.h>
 
-static GPtrArray *current_task_list = NULL;
 static const char *search_query = NULL;
 
 static ErrandsTask *entry_task = NULL;
@@ -43,7 +42,6 @@ G_DEFINE_TYPE(ErrandsTaskList, errands_task_list, ADW_TYPE_BIN)
 static void errands_task_list_dispose(GObject *gobject) {
   if (entry_task) g_object_run_dispose(G_OBJECT(entry_task));
   errands_task_data_free(entry_task_data);
-  if (current_task_list) g_ptr_array_free(current_task_list, true);
 
   gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_TASK_LIST);
   G_OBJECT_CLASS(errands_task_list_parent_class)->dispose(gobject);
@@ -191,6 +189,7 @@ static void on_setup_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_i
   GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_tree_expander_new());
   gtk_tree_expander_set_child(expander, GTK_WIDGET(errands_task_new()));
   gtk_list_item_set_child(list_item, GTK_WIDGET(expander));
+  gtk_list_item_set_focusable(list_item, true);
 }
 
 static void on_bind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_item) {
@@ -222,7 +221,6 @@ void errands_task_list_update_title(ErrandsTaskList *self) {
   switch (self->page) {
   case ERRANDS_TASK_LIST_PAGE_ALL: adw_window_title_set_title(ADW_WINDOW_TITLE(self->title), _("All Tasks")); break;
   case ERRANDS_TASK_LIST_PAGE_TODAY: {
-    // TODO: use current_task_list?
     adw_window_title_set_title(ADW_WINDOW_TITLE(self->title), _("Tasks for Today"));
     size_t total = 0, completed = 0;
     for_range(i, 0, errands_data_lists->len) {
@@ -231,33 +229,36 @@ void errands_task_list_update_title(ErrandsTaskList *self) {
       g_autoptr(GPtrArray) tasks = errands_list_data_get_all_tasks_as_icalcomponents(list);
       for_range(j, 0, tasks->len) {
         icalcomponent *ical = g_ptr_array_index(tasks, j);
-        if (!errands_data_get_deleted(ical) && errands_data_is_due(ical)) {
-          if (errands_data_is_completed(ical)) completed++;
+        CONTINUE_IF(errands_data_get_deleted(ical) || errands_data_get_cancelled(ical));
+        if (errands_data_is_due(ical)) {
           total++;
+          if (errands_data_is_completed(ical)) completed++;
         }
       }
     }
     const char *stats = tmp_str_printf("%s %zu / %zu", _("Completed:"), completed, total);
     adw_window_title_set_subtitle(ADW_WINDOW_TITLE(self->title), total > 0 ? stats : "");
     gtk_widget_set_visible(self->scrl, total > 0);
-    return;
   } break;
   case ERRANDS_TASK_LIST_PAGE_TASK_LIST:
     adw_window_title_set_title(ADW_WINDOW_TITLE(self->title), errands_data_get_list_name(self->data->ical));
+    size_t total = 0, completed = 0;
+    for_range(i, 0, errands_data_lists->len) {
+      ListData *list = g_ptr_array_index(errands_data_lists, i);
+      CONTINUE_IF(errands_data_get_deleted(list->ical));
+      g_autoptr(GPtrArray) tasks = errands_list_data_get_all_tasks_as_icalcomponents(list);
+      for_range(j, 0, tasks->len) {
+        icalcomponent *ical = g_ptr_array_index(tasks, j);
+        CONTINUE_IF(errands_data_get_deleted(ical) || errands_data_get_cancelled(ical));
+        total++;
+        if (errands_data_is_completed(ical)) completed++;
+      }
+    }
+    const char *stats = tmp_str_printf("%s %zu / %zu", _("Completed:"), completed, total);
+    adw_window_title_set_subtitle(ADW_WINDOW_TITLE(self->title), total > 0 ? stats : "");
+    gtk_widget_set_visible(self->scrl, total > 0);
     break;
   }
-  // Retrieve tasks and count completed and total tasks
-  size_t total = 0, completed = 0;
-  for_range(i, 0, current_task_list->len) {
-    TaskData *data = g_ptr_array_index(current_task_list, i);
-    CONTINUE_IF(errands_data_get_deleted(data->ical) || errands_data_get_deleted(data->list->ical));
-    if (!icaltime_is_null_date(errands_data_get_completed(data->ical))) completed++;
-    total++;
-  }
-  // Set subtitle with completed stats
-  const char *stats = tmp_str_printf("%s %zu / %zu", _("Completed:"), completed, total);
-  adw_window_title_set_subtitle(ADW_WINDOW_TITLE(self->title), total > 0 ? stats : "");
-  gtk_widget_set_visible(self->scrl, total > 0);
 }
 
 static void __filter_cb(gpointer change) { gtk_filter_changed(filter, GPOINTER_TO_INT(change)); }
@@ -266,6 +267,7 @@ void errands_task_list_show_today_tasks(ErrandsTaskList *self) {
   LOG("Task List: Show today tasks");
   self->data = NULL;
   self->page = ERRANDS_TASK_LIST_PAGE_TODAY;
+  errands_task_list_update_title(self);
   gtk_widget_set_visible(self->entry_box, false);
 }
 
@@ -274,6 +276,7 @@ void errands_task_list_show_all_tasks(ErrandsTaskList *self) {
   self->data = NULL;
   self->page = ERRANDS_TASK_LIST_PAGE_ALL;
   gtk_widget_set_visible(self->entry_box, false);
+  errands_task_list_update_title(self);
   g_idle_add_once((GSourceOnceFunc)__filter_cb, GINT_TO_POINTER(GTK_FILTER_CHANGE_LESS_STRICT));
 }
 
@@ -281,6 +284,7 @@ void errands_task_list_show_task_list(ErrandsTaskList *self, ListData *data) {
   self->data = data;
   self->page = ERRANDS_TASK_LIST_PAGE_TASK_LIST;
   gtk_widget_set_visible(self->entry_box, true);
+  errands_task_list_update_title(self);
   g_idle_add_once((GSourceOnceFunc)__filter_cb, GINT_TO_POINTER(GTK_FILTER_CHANGE_DIFFERENT));
 }
 
