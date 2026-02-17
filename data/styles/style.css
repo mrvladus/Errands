@@ -193,6 +193,7 @@ expander {
 
 expander:hover {
     -gtk-icon-transform: scale(1.5);
+    color: var(--accent-color);
 }
 
 expander:checked {
