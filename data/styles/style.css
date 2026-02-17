@@ -188,6 +188,11 @@ listview > row {
 
 expander {
     -gtk-icon-source: -gtk-icontheme("errands-right-symbolic");
+    transition: 0.2s;
+}
+
+expander:hover {
+    -gtk-icon-transform: scale(1.5);
 }
 
 expander:checked {
