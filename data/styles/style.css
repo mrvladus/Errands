@@ -3,11 +3,8 @@
     transition: 0.2s;
 }
 
+.sub-toggle-btn:checked > image,
 .sub-toggle-btn:hover > image {
-    transform: scale(1);
-}
-
-.sub-toggle-btn:checked > image {
     transform: scale(1);
     color: var(--accent-color);
 }
@@ -198,4 +195,5 @@ expander:hover {
 
 expander:checked {
     -gtk-icon-source: -gtk-icontheme("errands-down-symbolic");
+    color: var(--accent-color);
 }
