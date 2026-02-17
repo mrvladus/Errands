@@ -152,7 +152,8 @@ void errands_task_set_data(ErrandsTask *self, TaskData *data) {
   if (!data) return;
   self->data = data;
   // Set text
-  gtk_label_set_label(GTK_LABEL(self->title), errands_data_get_text(data->ical));
+  g_autofree gchar *markup = str_to_markup(errands_data_get_text(data->ical));
+  gtk_label_set_markup(GTK_LABEL(self->title), markup);
   // Set completion
   g_signal_handlers_block_by_func(self->complete_btn, on_complete_btn_toggle_cb, self);
   gtk_check_button_set_active(GTK_CHECK_BUTTON(self->complete_btn), errands_data_is_completed(data->ical));
@@ -161,7 +162,6 @@ void errands_task_set_data(ErrandsTask *self, TaskData *data) {
   // Cancelled state
   bool cancelled = errands_data_get_cancelled(data->ical);
   gtk_widget_set_visible(self->complete_btn, !cancelled);
-  // Expand
 
   errands_task_update_accent_color(self);
   errands_task_update_progress(self);
@@ -398,7 +398,8 @@ static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointe
     gtk_widget_set_visible(task->title, true);
     errands_data_set_text(task->data->ical, text);
     errands_list_data_save(task->data->list);
-    gtk_label_set_label(GTK_LABEL(task->title), text);
+    g_autofree gchar *markup = str_to_markup(text);
+    gtk_label_set_markup(GTK_LABEL(task->title), markup);
     errands_sync_update_task(task->data);
   }
 }
@@ -415,6 +416,10 @@ static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *self) {
   TaskData *new_data = errands_task_data_create_task(self->data->list, self->data, text);
   errands_list_data_save(self->data->list);
   errands_task_item_add_child(self->item, new_data);
+
+  GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_widget_get_ancestor(GTK_WIDGET(self), GTK_TYPE_TREE_EXPANDER));
+  GtkTreeListRow *row = gtk_tree_expander_get_list_row(expander);
+  gtk_tree_list_row_set_expanded(row, true);
 
   // Reset text
   gtk_editable_set_text(GTK_EDITABLE(entry), "");

@@ -108,3 +108,17 @@ static inline void errands_add_action(GSimpleActionGroup *ag, const char *name, 
   g_signal_connect(action, "activate", G_CALLBACK(cb), data);
   g_action_map_add_action(G_ACTION_MAP(ag), G_ACTION(action));
 }
+
+static inline gchar *str_to_markup(const char *str) {
+  if (!str) return NULL;
+
+  g_autoptr(GError) error = NULL;
+  g_autofree gchar *escaped_text = g_markup_escape_text(str, -1);
+  const char *pattern = "(http[s]?://[\\w\\-\\.]+(:\\d+)?(/\\S*)?)";
+  g_autoptr(GRegex) regex = g_regex_new(pattern, G_REGEX_CASELESS, 0, &error);
+  if (error) return NULL;
+  gchar *markup = g_regex_replace(regex, escaped_text, -1, 0, "<a href=\"\\0\">\\0</a>", 0, &error);
+  if (error) return NULL;
+
+  return markup;
+}

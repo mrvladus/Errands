@@ -59,26 +59,29 @@ template $ErrandsTask: Box {
         wrap: true;
         wrap-mode: char;
         xalign: 0;
+        use-markup: true;
+      }
+
+      EditableLabel edit_title {
+        hexpand: true;
+        vexpand: true;
+        halign: fill;
+        valign: center;
+        xalign: 0;
+        max-width-chars: 50;
+        visible: bind title.visible bidirectional inverted;
+        notify::editing => $on_title_edit_cb();
       }
 
       Label subtitle {
         xalign: 0;
+        visible: bind title.visible;
 
         styles [
           "dimmed",
           "caption",
         ]
       }
-    }
-
-    EditableLabel edit_title {
-      hexpand: true;
-      halign: fill;
-      valign: center;
-      xalign: 0;
-      max-width-chars: 50;
-      visible: bind title.visible bidirectional inverted;
-      notify::editing => $on_title_edit_cb();
     }
 
     // Unpin
