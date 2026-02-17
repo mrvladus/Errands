@@ -57,7 +57,7 @@ struct _ErrandsTaskList {
 
   GtkEventControllerMotion *motion_ctrl;
 
-  GtkSorter *base_sorter;
+  GtkTreeListRowSorter *tree_sorter;
 
   float x, y;
   ListData *data;
