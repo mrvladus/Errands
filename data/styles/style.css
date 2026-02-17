@@ -184,3 +184,11 @@ listview > row {
     margin-left: 3px;
     margin-right: 6px;
 }
+
+expander {
+    -gtk-icon-source: -gtk-icontheme("errands-right-symbolic");
+}
+
+expander:checked {
+    -gtk-icon-source: -gtk-icontheme("errands-down-symbolic");
+}
