@@ -177,6 +177,10 @@ listview {
     background-color: transparent;
 }
 
+listview > row:last-child {
+    margin-bottom: 18px;
+}
+
 listview > row {
     border-radius: var(--window-radius);
     margin-top: 3px;
