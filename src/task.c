@@ -1,5 +1,6 @@
 #include "task.h"
 #include "data.h"
+#include "gio/gio.h"
 #include "glib-object.h"
 #include "glib.h"
 #include "gtk/gtk.h"
@@ -183,11 +184,15 @@ void errands_task_update_accent_color(ErrandsTask *task) {
 }
 
 void errands_task_update_progress(ErrandsTask *self) {
-  if (!self) return;
+  if (!self || !self->item) return;
+  GListModel *model = errands_task_item_get_children_model(self->item);
+  if (!model) return;
   size_t total = 0, completed = 0;
-  for_range(i, 0, self->data->children->len) {
-    TaskData *data = g_ptr_array_index(self->data->children, i);
+  for_range(i, 0, g_list_model_get_n_items(model)) {
+    ErrandsTaskItem *item = g_list_model_get_item(model, i);
+    TaskData *data = errands_task_item_get_data(item);
     CONTINUE_IF(errands_data_get_deleted(data->ical));
+    CONTINUE_IF(errands_data_get_cancelled(data->ical));
     if (errands_data_is_completed(data->ical)) completed++;
     total++;
   }
@@ -423,6 +428,7 @@ static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *self) {
 
   // Reset text
   gtk_editable_set_text(GTK_EDITABLE(entry), "");
+  errands_task_update_progress(self);
   errands_sidebar_update_filter_rows();
   errands_sync_create_task(self->data);
 }
