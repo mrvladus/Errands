@@ -1,9 +1,9 @@
 #include "task-list.h"
 #include "data.h"
-#include "gio/gio.h"
 #include "glib-object.h"
 #include "glib.h"
 #include "gtk/gtk.h"
+#include "settings.h"
 #include "sidebar.h"
 #include "sync.h"
 #include "task-item.h"
@@ -12,19 +12,17 @@
 #include "utils.h"
 
 #include <glib/gi18n.h>
-#include <libical/ical.h>
-#include <stddef.h>
 
 static const char *search_query = NULL;
 
 static ErrandsTask *entry_task = NULL;
 static TaskData *entry_task_data = NULL;
 
-static GListStore *model = NULL;
 static GtkFilter *filter = NULL;
 
 static void on_setup_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_item);
 static void on_bind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_item);
+static void on_unbind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_item);
 
 static void on_task_list_entry_activated_cb(ErrandsTaskList *self);
 static void on_task_list_entry_text_changed_cb(ErrandsTaskList *self);
@@ -72,6 +70,7 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_listview_activate_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_setup_item_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_bind_item_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_unbind_item_cb);
 }
 
 static gboolean filter_func(GtkTreeListRow *row, ErrandsTaskList *self) {
@@ -91,17 +90,59 @@ static int sort_func(ErrandsTaskItem *a, ErrandsTaskItem *b, ErrandsTaskList *se
   TaskData *td_a = errands_task_item_get_data(a);
   TaskData *td_b = errands_task_item_get_data(b);
 
+  // Pinned
   bool pinned_a = errands_data_get_pinned(td_a->ical);
   bool pinned_b = errands_data_get_pinned(td_b->ical);
   if (pinned_a != pinned_b) return pinned_b - pinned_a;
 
-  return 0;
+  // Cancelled
+  gboolean cancelled_a = errands_data_get_cancelled(td_a->ical);
+  gboolean cancelled_b = errands_data_get_cancelled(td_b->ical);
+  if (cancelled_a != cancelled_b) return cancelled_a - cancelled_b;
+
+  // Completed
+  gboolean completed_a = errands_data_is_completed(td_a->ical);
+  gboolean completed_b = errands_data_is_completed(td_b->ical);
+  if (completed_a != completed_b) return completed_a - completed_b;
+
+  bool asc_order = errands_settings_get(SETTING_SORT_ORDER).i;
+  switch (errands_settings_get(SETTING_SORT_BY).i) {
+  case SORT_TYPE_CREATION_DATE: {
+    icaltimetype creation_date_a = errands_data_get_created(asc_order ? td_b->ical : td_a->ical);
+    icaltimetype creation_date_b = errands_data_get_created(asc_order ? td_a->ical : td_b->ical);
+    return icaltime_compare(creation_date_b, creation_date_a);
+  }
+  case SORT_TYPE_DUE_DATE: {
+    icaltimetype due_a = errands_data_get_due(asc_order ? td_b->ical : td_a->ical);
+    icaltimetype due_b = errands_data_get_due(asc_order ? td_a->ical : td_b->ical);
+    bool null_a = icaltime_is_null_time(due_a);
+    bool null_b = icaltime_is_null_time(due_b);
+    if (null_a != null_b) return null_a - null_b;
+    return icaltime_compare(due_a, due_b);
+  }
+  case SORT_TYPE_PRIORITY: {
+    int p_a = errands_data_get_priority(asc_order ? td_b->ical : td_a->ical);
+    int p_b = errands_data_get_priority(asc_order ? td_a->ical : td_b->ical);
+    return p_b - p_a;
+  }
+  case SORT_TYPE_START_DATE: {
+    icaltimetype start_a = errands_data_get_start(asc_order ? td_b->ical : td_a->ical);
+    icaltimetype start_b = errands_data_get_start(asc_order ? td_a->ical : td_b->ical);
+    bool null_a = icaltime_is_null_time(start_a);
+    bool null_b = icaltime_is_null_time(start_b);
+    if (null_a != null_b) return null_a - null_b;
+    return icaltime_compare(start_a, start_b);
+  }
+  default: return 0;
+  }
 }
 
 static GListModel *task_children_func(gpointer item, gpointer user_data) {
   ErrandsTaskItem *task_item = ERRANDS_TASK_ITEM(item);
   GListModel *model = errands_task_item_get_children_model(task_item);
+
   if (!model) return NULL;
+
   return g_object_ref(model);
 }
 
@@ -118,19 +159,19 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   entry_task_data = errands_task_data_create_task(NULL, NULL, "");
   errands_task_set_data(entry_task, entry_task_data);
 
-  model = g_list_store_new(ERRANDS_TYPE_TASK_ITEM);
+  self->task_model = g_list_store_new(ERRANDS_TYPE_TASK_ITEM);
   for_range(i, 0, errands_data_lists->len) {
     ListData *list = g_ptr_array_index(errands_data_lists, i);
     for_range(j, 0, list->children->len) {
       TaskData *data = g_ptr_array_index(list->children, j);
       if (!data->parent) {
-        g_autoptr(ErrandsTaskItem) item = errands_task_item_new(data);
-        g_list_store_append(model, item);
+        g_autoptr(ErrandsTaskItem) item = errands_task_item_new(data, NULL);
+        g_list_store_append(self->task_model, item);
       }
     }
   }
   GtkTreeListModel *tree_model =
-      gtk_tree_list_model_new(G_LIST_MODEL(model), false, true, task_children_func, NULL, NULL);
+      gtk_tree_list_model_new(G_LIST_MODEL(self->task_model), false, false, task_children_func, NULL, NULL);
 
   GtkSorter *base_sorter = GTK_SORTER(gtk_custom_sorter_new((GCompareDataFunc)sort_func, self, NULL));
   self->tree_sorter = gtk_tree_list_row_sorter_new(base_sorter);
@@ -193,6 +234,11 @@ static void on_setup_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_i
   gtk_list_item_set_focusable(list_item, true);
 }
 
+// Bind expanded property after row is set at idle
+static void __expand_cb(ErrandsTask *task) {
+  g_object_bind_property(task, "expanded", task->row, "expanded", G_BINDING_SYNC_CREATE | G_BINDING_BIDIRECTIONAL);
+}
+
 static void on_bind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_item) {
   GtkTreeListRow *row = gtk_list_item_get_item(list_item);
   GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_list_item_get_child(list_item));
@@ -200,7 +246,16 @@ static void on_bind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_it
   ErrandsTask *task = ERRANDS_TASK(gtk_tree_expander_get_child(expander));
   ErrandsTaskItem *item = gtk_tree_list_row_get_item(row);
   g_object_set(task, "task-item", item, NULL);
+  g_object_set(item, "task-widget", task, NULL);
   g_object_bind_property(item, "children-model-is-empty", expander, "hide-expander", G_BINDING_SYNC_CREATE);
+  task->row = row;
+  g_idle_add_once((GSourceOnceFunc)__expand_cb, task);
+}
+
+static void on_unbind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_item) {
+  GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_list_item_get_child(list_item));
+  ErrandsTask *task = ERRANDS_TASK(gtk_tree_expander_get_child(expander));
+  task->row = NULL;
 }
 
 // ---------- ACTIONS ---------- //
@@ -312,7 +367,7 @@ static void on_task_list_entry_activated_cb(ErrandsTaskList *self) {
   errands_data_set_created(data->ical, icaltime_get_date_time_now());
   icalcomponent_add_component(self->data->ical, data->ical);
   errands_list_data_save(self->data);
-  g_list_store_insert(model, 0, errands_task_item_new(data));
+  g_list_store_append(self->task_model, errands_task_item_new(data, NULL));
   // Reload entry task
   entry_task->data->ical = icalcomponent_new(ICAL_VTODO_COMPONENT);
   // Reset text
@@ -332,7 +387,6 @@ static void on_task_list_entry_text_changed_cb(ErrandsTaskList *self) {
 static void on_task_list_search_cb(ErrandsTaskList *self, GtkSearchEntry *entry) {
   search_query = gtk_editable_get_text(GTK_EDITABLE(entry));
   LOG("Search query changed to '%s'", search_query);
-  // errands_task_list_reload(self, false);
 }
 
 static void on_motion_cb(GtkEventControllerMotion *ctrl, gdouble x, gdouble y, ErrandsTaskList *self) {

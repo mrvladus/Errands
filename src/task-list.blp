@@ -145,6 +145,7 @@ template $ErrandsTaskList: Adw.Bin {
           factory: SignalListItemFactory {
             setup => $on_setup_item_cb();
             bind => $on_bind_item_cb();
+            unbind => $on_unbind_item_cb();
           };
         }
       }

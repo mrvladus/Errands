@@ -30,6 +30,7 @@ struct _ErrandsTask {
 
   TaskData *data;
   ErrandsTaskItem *item;
+  GtkTreeListRow *row;
 };
 
 ErrandsTask *errands_task_new();

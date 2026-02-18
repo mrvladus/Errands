@@ -1,6 +1,7 @@
 #pragma once
 
 #include "data.h"
+#include "gio/gio.h"
 #include "gtk/gtk.h"
 #include "task-menu.h"
 
@@ -57,6 +58,7 @@ struct _ErrandsTaskList {
 
   GtkEventControllerMotion *motion_ctrl;
 
+  GListStore *task_model;
   GtkTreeListRowSorter *tree_sorter;
 
   float x, y;

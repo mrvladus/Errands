@@ -1,12 +1,16 @@
 .sub-toggle-btn > image {
-    transform: scale(0.6);
+    -gtk-icon-transform: scale(0.6);
     transition: 0.2s;
 }
 
 .sub-toggle-btn:checked > image,
 .sub-toggle-btn:hover > image {
-    transform: scale(1);
+    -gtk-icon-transform: scale(1);
     color: var(--accent-color);
+}
+
+.sub-toggle-btn:checked > image {
+    -gtk-icon-transform: rotate(45deg);
 }
 
 /* Accent color buttons */
@@ -134,6 +138,10 @@
 
 /* Overrides */
 
+checkbutton > check {
+    transition: 0s;
+}
+
 colorbutton button {
     border-radius: 9999px;
     padding: 0px;
@@ -172,7 +180,6 @@ editablelabel > stack > text {
 
 listview {
     background-color: transparent;
-    padding-bottom: 18px;
 }
 
 listview > row {
