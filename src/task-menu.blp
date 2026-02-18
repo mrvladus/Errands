@@ -17,15 +17,85 @@ template $ErrandsTaskMenu: Popover {
       margin-end: 6;
       margin-top: 6;
       margin-bottom: 6;
+
+      Box task_mode_box {
+        homogeneous: true;
+
+        Button {
+          icon-name: "errands-edit-symbolic";
+          tooltip-text: _("Edit Text");
+          action-name: "task-menu.edit";
+
+          styles [
+            "flat",
+          ]
+        }
+
+        Button {
+          icon-name: "errands-pin-symbolic";
+          tooltip-text: _("Pin");
+          action-name: "task-menu.pin";
+
+          styles [
+            "flat",
+          ]
+        }
+
+        Button {
+          icon-name: "errands-clipboard-symbolic";
+          tooltip-text: _("Copy Text");
+          action-name: "task-menu.copy";
+
+          styles [
+            "flat",
+          ]
+        }
+
+        Button {
+          icon-name: "errands-export-symbolic";
+          tooltip-text: _("Export as \".ics\"");
+          action-name: "task-menu.export";
+
+          styles [
+            "flat",
+          ]
+        }
+
+        Button {
+          icon-name: "errands-cancel-symbolic";
+          tooltip-text: _("Cancel");
+          action-name: "task-menu.cancel";
+
+          styles [
+            "flat",
+            "warning",
+          ]
+        }
+
+        Button {
+          icon-name: "errands-trash-symbolic";
+          tooltip-text: _("Delete");
+          action-name: "task-menu.delete";
+
+          styles [
+            "flat",
+            "error",
+          ]
+        }
+      }
+
+      Separator {
+        visible: bind task_mode_box.visible;
+      }
+
       // Color
-      FlowBox color_box {
-        max-children-per-line: 4;
-        selection-mode: none;
+      Box color_box {
         hexpand: true;
 
         CheckButton color_none {
           name: "none";
           tooltip-text: _("No Color");
+          halign: center;
           toggled => $on_color_toggle_cb(template);
 
           styles [
@@ -35,6 +105,7 @@ template $ErrandsTaskMenu: Popover {
         }
 
         CheckButton {
+          halign: center;
           name: "blue";
           group: color_none;
           tooltip-text: _("Blue");
@@ -47,6 +118,7 @@ template $ErrandsTaskMenu: Popover {
         }
 
         CheckButton {
+          halign: center;
           name: "green";
           group: color_none;
           tooltip-text: _("Green");
@@ -59,6 +131,7 @@ template $ErrandsTaskMenu: Popover {
         }
 
         CheckButton {
+          halign: center;
           name: "yellow";
           group: color_none;
           tooltip-text: _("Yellow");
@@ -71,6 +144,7 @@ template $ErrandsTaskMenu: Popover {
         }
 
         CheckButton {
+          halign: center;
           name: "orange";
           group: color_none;
           tooltip-text: _("Orange");
@@ -83,6 +157,7 @@ template $ErrandsTaskMenu: Popover {
         }
 
         CheckButton {
+          halign: center;
           name: "red";
           group: color_none;
           tooltip-text: _("Red");
@@ -95,6 +170,7 @@ template $ErrandsTaskMenu: Popover {
         }
 
         CheckButton {
+          halign: center;
           name: "purple";
           group: color_none;
           tooltip-text: _("Purple");
@@ -107,6 +183,7 @@ template $ErrandsTaskMenu: Popover {
         }
 
         CheckButton {
+          halign: center;
           name: "brown";
           group: color_none;
           tooltip-text: _("Brown");
@@ -123,7 +200,7 @@ template $ErrandsTaskMenu: Popover {
 
       // Date and Time
       Button {
-        clicked => $on_date_clicked_cb(template);
+        action-name: "task-menu.date";
 
         styles [
           "flat",
@@ -145,7 +222,7 @@ template $ErrandsTaskMenu: Popover {
 
       // Priority
       Button {
-        clicked => $on_priority_clicked_cb(template);
+        action-name: "task-menu.priority";
 
         styles [
           "flat",
@@ -167,7 +244,7 @@ template $ErrandsTaskMenu: Popover {
 
       // Notes
       Button {
-        clicked => $on_notes_clicked_cb(template);
+        action-name: "task-menu.notes";
 
         styles [
           "flat",
@@ -189,7 +266,7 @@ template $ErrandsTaskMenu: Popover {
 
       // Attachments
       Button {
-        clicked => $on_attachments_clicked_cb(template);
+        action-name: "task-menu.attachments";
 
         styles [
           "flat",
@@ -211,7 +288,7 @@ template $ErrandsTaskMenu: Popover {
 
       // Tags
       Button {
-        clicked => $on_tags_clicked_cb(template);
+        action-name: "task-menu.tags";
 
         styles [
           "flat",
@@ -227,152 +304,6 @@ template $ErrandsTaskMenu: Popover {
 
           Label {
             label: _("Tags");
-          }
-        }
-      }
-
-      Box task_mode_box {
-        orientation: vertical;
-
-        Separator {}
-
-        // Pin
-        Button {
-          clicked => $on_pin_clicked_cb(template);
-
-          styles [
-            "flat",
-            "body",
-          ]
-
-          Box {
-            spacing: 12;
-
-            Image {
-              icon-name: "errands-pin-symbolic";
-            }
-
-            Label pin_label {}
-          }
-        }
-
-        Separator {}
-
-        // Edit
-        Button {
-          clicked => $on_edit_clicked_cb(template);
-
-          styles [
-            "flat",
-            "body",
-          ]
-
-          Box {
-            spacing: 12;
-
-            Image {
-              icon-name: "errands-edit-symbolic";
-            }
-
-            Label {
-              label: _("Edit Text");
-            }
-          }
-        }
-
-        // Copy Text
-        Button {
-          clicked => $on_clipboard_clicked_cb(template);
-
-          styles [
-            "flat",
-            "body",
-          ]
-
-          Box {
-            spacing: 12;
-
-            Image {
-              icon-name: "errands-clipboard-symbolic";
-            }
-
-            Label {
-              label: _("Copy Text");
-            }
-          }
-        }
-
-        Separator {}
-
-        // Export
-        Button {
-          clicked => $on_export_clicked_cb(template);
-
-          styles [
-            "flat",
-            "body",
-          ]
-
-          Box {
-            spacing: 12;
-
-            Image {
-              icon-name: "errands-export-symbolic";
-            }
-
-            Label {
-              label: _("Export as \".ics\"");
-            }
-          }
-        }
-
-        Separator {}
-
-        // Cancel
-        Button {
-          clicked => $on_cancel_clicked_cb(template);
-
-          styles [
-            "flat",
-            "body",
-            "warning",
-          ]
-
-          Box {
-            spacing: 12;
-
-            Image {
-              icon-name: "errands-cancel-symbolic";
-            }
-
-            Label cancel_label {}
-          }
-        }
-
-        // Delete
-        Button {
-          clicked => $on_delete_clicked_cb(template);
-
-          styles [
-            "flat",
-            "body",
-            "error",
-          ]
-
-          Box {
-            spacing: 12;
-
-            styles [
-              "error",
-            ]
-
-            Image {
-              icon-name: "errands-trash-symbolic";
-            }
-
-            Label {
-              label: _("Delete");
-            }
           }
         }
       }

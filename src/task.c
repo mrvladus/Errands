@@ -1,9 +1,5 @@
 #include "task.h"
 #include "data.h"
-#include "gio/gio.h"
-#include "glib-object.h"
-#include "glib.h"
-#include "gtk/gtk.h"
 #include "sidebar.h"
 #include "state.h"
 #include "sync.h"
@@ -17,8 +13,6 @@
 #include "vendor/toolbox.h"
 
 #include <glib/gi18n.h>
-#include <libical/ical.h>
-#include <stddef.h>
 
 static GtkWidget *errands_task_tag_new(ErrandsTask *self, const char *tag);
 

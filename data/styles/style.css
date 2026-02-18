@@ -19,9 +19,14 @@
     all: unset;
     border: 2px solid transparent;
     border-radius: 50%;
-    min-width: 26px;
-    min-height: 26px;
+    min-width: 16px;
+    min-height: 16px;
     color: var(--light-2);
+    transition: 0.2s;
+}
+
+.accent-color-btn radio:hover {
+    transform: scale(1.1);
 }
 
 .accent-color-btn radio:checked {
