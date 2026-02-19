@@ -21,7 +21,7 @@ struct _ErrandsTask {
   GtkWidget *tags_box;
   GtkWidget *date_btn;
   GtkWidget *date_btn_content;
-  GtkWidget *unpin_btn;
+  GtkWidget *favorite_btn;
   GtkWidget *notes_btn;
   GtkWidget *priority_btn;
   GtkWidget *attachments_btn;

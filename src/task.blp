@@ -23,12 +23,11 @@ template $ErrandsTask: Box {
     CheckButton complete_btn {
       valign: center;
       tooltip-text: _("Toggle Completion");
+      action-name: "task.complete";
 
       styles [
         "selection-mode",
       ]
-
-      toggled => $on_complete_btn_toggle_cb(template);
     }
 
     // Cancelled
@@ -84,12 +83,12 @@ template $ErrandsTask: Box {
       }
     }
 
-    // Unpin
-    Button unpin_btn {
-      icon-name: "errands-pin-symbolic";
-      tooltip-text: _("Unpin");
+    // Favorite
+    Button favorite_btn {
+      icon-name: "errands-favorite-symbolic";
+      tooltip-text: _("Favorite");
       valign: center;
-      action-name: "task.pin";
+      action-name: "task.favorite";
 
       styles [
         "flat",

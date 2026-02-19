@@ -90,11 +90,6 @@ static int sort_func(ErrandsTaskItem *a, ErrandsTaskItem *b, ErrandsTaskList *se
   TaskData *td_a = errands_task_item_get_data(a);
   TaskData *td_b = errands_task_item_get_data(b);
 
-  // Pinned
-  bool pinned_a = errands_data_get_pinned(td_a->ical);
-  bool pinned_b = errands_data_get_pinned(td_b->ical);
-  if (pinned_a != pinned_b) return pinned_b - pinned_a;
-
   // Cancelled
   gboolean cancelled_a = errands_data_get_cancelled(td_a->ical);
   gboolean cancelled_b = errands_data_get_cancelled(td_b->ical);
