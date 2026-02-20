@@ -1,5 +1,6 @@
 #include "task-list.h"
 #include "data.h"
+#include "gio/gio.h"
 #include "glib-object.h"
 #include "glib.h"
 #include "gtk/gtk.h"
@@ -32,6 +33,9 @@ static void on_listview_activate_cb(GtkListView *list_view, guint position);
 
 static void on_focus_entry_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
 static void on_entry_task_menu_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
+
+static bool __task_or_descendants_match_search_query(TaskData *data, const char *query);
+static bool __task_ancestor_match_search_query(TaskData *data, const char *query);
 
 // ---------- WIDGET TEMPLATE ---------- //
 
@@ -73,14 +77,22 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_unbind_item_cb);
 }
 
-static gboolean filter_func(GtkTreeListRow *row, ErrandsTaskList *self) {
+gboolean filter_func(GtkTreeListRow *row, ErrandsTaskList *self) {
   ErrandsTaskItem *item = ERRANDS_TASK_ITEM(gtk_tree_list_row_get_item(row));
+  TaskData *data = errands_task_item_get_data(item);
   bool result = false;
 
-  switch (self->page) {
-  case ERRANDS_TASK_LIST_PAGE_TODAY: break;
-  case ERRANDS_TASK_LIST_PAGE_ALL: result = true; break;
-  case ERRANDS_TASK_LIST_PAGE_TASK_LIST: result = errands_task_item_get_data(item)->list == self->data; break;
+  if (search_query && *search_query) {
+    // If searching, show tasks that match or have matching descendants
+    result = __task_or_descendants_match_search_query(data, search_query) ||
+             __task_ancestor_match_search_query(data, search_query);
+  } else {
+    // Normal page-based filtering
+    switch (self->page) {
+    case ERRANDS_TASK_LIST_PAGE_TODAY: break; // TODO: Implement today filter if needed
+    case ERRANDS_TASK_LIST_PAGE_ALL: result = true; break;
+    case ERRANDS_TASK_LIST_PAGE_TASK_LIST: result = data->list == self->data; break;
+    }
   }
 
   return result;
@@ -165,12 +177,12 @@ static void errands_task_list_init(ErrandsTaskList *self) {
       }
     }
   }
-  GtkTreeListModel *tree_model =
+  self->tree_model =
       gtk_tree_list_model_new(G_LIST_MODEL(self->task_model), false, false, task_children_func, NULL, NULL);
 
   GtkSorter *base_sorter = GTK_SORTER(gtk_custom_sorter_new((GCompareDataFunc)sort_func, self, NULL));
   self->tree_sorter = gtk_tree_list_row_sorter_new(base_sorter);
-  GtkSortListModel *sort_model = gtk_sort_list_model_new(G_LIST_MODEL(tree_model), GTK_SORTER(self->tree_sorter));
+  GtkSortListModel *sort_model = gtk_sort_list_model_new(G_LIST_MODEL(self->tree_model), GTK_SORTER(self->tree_sorter));
 
   filter = GTK_FILTER(gtk_custom_filter_new((GtkCustomFilterFunc)filter_func, self, NULL));
   GtkFilterListModel *filter_model = gtk_filter_list_model_new(G_LIST_MODEL(sort_model), filter);
@@ -190,35 +202,72 @@ ErrandsTaskList *errands_task_list_new() { return g_object_new(ERRANDS_TYPE_TASK
 //   return false;
 // }
 
-// static bool __task_has_any_pinned_parent(TaskData *data) {
-//   for (TaskData *task = data->parent; task; task = task->parent)
-//     if (errands_data_get_pinned(task->ical)) return true;
-//   return false;
-// }
-
 // static bool __task_has_any_due_parent(TaskData *data) {
 //   for (TaskData *task = data->parent; task; task = task->parent)
 //     if (errands_data_is_due(task->ical)) return true;
 //   return false;
 // }
 
-// static bool __task_match_search_query(TaskData *data) {
-//   const char *text = errands_data_get_text(data->ical);
-//   const char *notes = errands_data_get_notes(data->ical);
-//   if (text && g_strstr_len(text, -1, search_query)) return true;
-//   if (notes && g_strstr_len(notes, -1, search_query)) return true;
-//   g_auto(GStrv) tags = errands_data_get_tags(data->ical);
-//   if (tags) for_range(i, 0, g_strv_length(tags)) {
-//       if (g_strstr_len(tags[i], -1, search_query)) return true;
-//     }
-//   return false;
-// }
+static bool __task_match_search_query(TaskData *data, const char *query) {
+  if (!query || !*query) return false;
+  g_autofree char *folded_query = g_utf8_casefold(query, -1);
+  const char *text = errands_data_get_text(data->ical);
+  if (text) {
+    g_autofree char *folded_text = g_utf8_casefold(text, -1);
+    if (g_strstr_len(folded_text, -1, folded_query)) return true;
+  }
+  const char *notes = errands_data_get_notes(data->ical);
+  if (notes) {
+    g_autofree char *folded_notes = g_utf8_casefold(notes, -1);
+    if (g_strstr_len(folded_notes, -1, folded_query)) return true;
+  }
+  g_auto(GStrv) tags = errands_data_get_tags(data->ical);
+  if (tags) for_range(i, 0, g_strv_length(tags)) {
+      g_autofree char *folded_tag = g_utf8_casefold(tags[i], -1);
+      if (g_strstr_len(folded_tag, -1, folded_query)) return true;
+    }
 
-// static bool __task_has_any_search_matched_parent(TaskData *data) {
-//   for (TaskData *task = data->parent; task; task = task->parent)
-//     if (__task_match_search_query(task)) return true;
-//   return false;
-// }
+  return false;
+}
+
+static bool __task_or_descendants_match_search_query(TaskData *data, const char *query) {
+  if (__task_match_search_query(data, query)) return true;
+  for (guint i = 0; i < data->children->len; i++) {
+    TaskData *child = g_ptr_array_index(data->children, i);
+    if (__task_or_descendants_match_search_query(child, query)) return true;
+  }
+
+  return false;
+}
+
+static bool __task_ancestor_match_search_query(TaskData *data, const char *query) {
+  TaskData *parent = data->parent;
+  while (parent) {
+    if (__task_match_search_query(parent, query)) return true;
+    parent = parent->parent;
+  }
+
+  return false;
+}
+
+static void __expand_all_visible_rows_idle_cb(GtkTreeListRow *row) { gtk_tree_list_row_set_expanded(row, true); }
+
+static void __expand_all_visible_rows(ErrandsTaskList *self) {
+  GListModel *model = G_LIST_MODEL(gtk_list_view_get_model(GTK_LIST_VIEW(self->list_view)));
+  bool expanded_any = false;
+  for (guint i = 0; i < g_list_model_get_n_items(model); i++) {
+    g_autoptr(GObject) obj = g_list_model_get_item(model, i);
+    if (GTK_IS_TREE_LIST_ROW(obj)) {
+      GtkTreeListRow *row = GTK_TREE_LIST_ROW(obj);
+      if (gtk_tree_list_row_is_expandable(row) && !gtk_tree_list_row_get_expanded(row)) {
+        g_idle_add_once((GSourceOnceFunc)__expand_all_visible_rows_idle_cb, row);
+        expanded_any = true;
+      }
+    }
+  }
+  // If we expanded something, schedule another check to expand newly visible rows
+  if (expanded_any) g_idle_add_once((GSourceOnceFunc)__expand_all_visible_rows, self);
+}
 
 // ---------- TASKS RECYCLER ---------- //
 
@@ -382,6 +431,8 @@ static void on_task_list_entry_text_changed_cb(ErrandsTaskList *self) {
 static void on_task_list_search_cb(ErrandsTaskList *self, GtkSearchEntry *entry) {
   search_query = gtk_editable_get_text(GTK_EDITABLE(entry));
   LOG("Search query changed to '%s'", search_query);
+  gtk_filter_changed(filter, GTK_FILTER_CHANGE_DIFFERENT);
+  if (search_query && *search_query) __expand_all_visible_rows(self);
 }
 
 static void on_motion_cb(GtkEventControllerMotion *ctrl, gdouble x, gdouble y, ErrandsTaskList *self) {
