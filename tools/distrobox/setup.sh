@@ -17,7 +17,7 @@ distrobox-rm errands-distrobox --force
 distrobox-create \
     --name errands-distrobox \
     --image archlinux:latest \
-    --additional-packages "gcc make gdb pkgconf git neovim zed curl libadwaita libportal-gtk4 libical libsecret gtksourceview5 blueprint-compiler clang flatpak-builder"
+    --additional-packages "gcc make meson cmake gdb pkgconf git neovim zed curl glib2-devel libadwaita libportal-gtk4 libical libsecret gtksourceview5 blueprint-compiler clang flatpak-builder"
 
 if [ $? -ne 0 ]; then
     echo "Failed to create distrobox"
