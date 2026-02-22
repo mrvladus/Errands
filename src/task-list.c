@@ -1,9 +1,5 @@
 #include "task-list.h"
 #include "data.h"
-#include "gio/gio.h"
-#include "glib-object.h"
-#include "glib.h"
-#include "gtk/gtk.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "sync.h"
@@ -19,8 +15,6 @@ static const char *search_query = NULL;
 static ErrandsTask *entry_task = NULL;
 static TaskData *entry_task_data = NULL;
 
-static GtkFilter *filter = NULL;
-
 static void on_setup_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_item);
 static void on_bind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_item);
 static void on_unbind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_item);
@@ -34,6 +28,8 @@ static void on_listview_activate_cb(GtkListView *list_view, guint position);
 static void on_focus_entry_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
 static void on_entry_task_menu_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
 
+static bool __task_today_parent_match_func(TaskData *data);
+static bool __task_today_child_match_func(TaskData *data);
 static bool __task_or_descendants_match_search_query(TaskData *data, const char *query);
 static bool __task_ancestor_match_search_query(TaskData *data, const char *query);
 
@@ -89,7 +85,9 @@ gboolean filter_func(GtkTreeListRow *row, ErrandsTaskList *self) {
   } else {
     // Normal page-based filtering
     switch (self->page) {
-    case ERRANDS_TASK_LIST_PAGE_TODAY: break; // TODO: Implement today filter if needed
+    case ERRANDS_TASK_LIST_PAGE_TODAY: {
+      result = __task_today_parent_match_func(data) || __task_today_child_match_func(data);
+    } break;
     case ERRANDS_TASK_LIST_PAGE_ALL: result = true; break;
     case ERRANDS_TASK_LIST_PAGE_TASK_LIST: result = data->list == self->data; break;
     }
@@ -167,46 +165,44 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   errands_task_set_data(entry_task, entry_task_data);
 
   self->task_model = g_list_store_new(ERRANDS_TYPE_TASK_ITEM);
+
   for_range(i, 0, errands_data_lists->len) {
     ListData *list = g_ptr_array_index(errands_data_lists, i);
     for_range(j, 0, list->children->len) {
       TaskData *data = g_ptr_array_index(list->children, j);
-      if (!data->parent) {
-        g_autoptr(ErrandsTaskItem) item = errands_task_item_new(data, NULL);
-        g_list_store_append(self->task_model, item);
-      }
+      g_autoptr(ErrandsTaskItem) item = errands_task_item_new(data, NULL);
+      g_list_store_append(self->task_model, item);
     }
   }
-  self->tree_model =
-      gtk_tree_list_model_new(G_LIST_MODEL(self->task_model), false, false, task_children_func, NULL, NULL);
 
-  GtkSorter *base_sorter = GTK_SORTER(gtk_custom_sorter_new((GCompareDataFunc)sort_func, self, NULL));
-  self->tree_sorter = gtk_tree_list_row_sorter_new(base_sorter);
-  GtkSortListModel *sort_model = gtk_sort_list_model_new(G_LIST_MODEL(self->tree_model), GTK_SORTER(self->tree_sorter));
-
-  filter = GTK_FILTER(gtk_custom_filter_new((GtkCustomFilterFunc)filter_func, self, NULL));
-  GtkFilterListModel *filter_model = gtk_filter_list_model_new(G_LIST_MODEL(sort_model), filter);
-
+  GtkTreeListModel *tree_model =
+      gtk_tree_list_model_new(G_LIST_MODEL(self->task_model), false, true, task_children_func, NULL, NULL);
+  self->tree_sorter =
+      gtk_tree_list_row_sorter_new(GTK_SORTER(gtk_custom_sorter_new((GCompareDataFunc)sort_func, self, NULL)));
+  GtkSortListModel *sort_model = gtk_sort_list_model_new(G_LIST_MODEL(tree_model), GTK_SORTER(self->tree_sorter));
+  self->filter = GTK_FILTER(gtk_custom_filter_new((GtkCustomFilterFunc)filter_func, self, NULL));
+  GtkFilterListModel *filter_model = gtk_filter_list_model_new(G_LIST_MODEL(sort_model), self->filter);
   GtkSelectionModel *selection_model = GTK_SELECTION_MODEL(gtk_no_selection_new(G_LIST_MODEL(filter_model)));
   gtk_list_view_set_model(GTK_LIST_VIEW(self->list_view), selection_model);
-  gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(self->scrl), self->list_view);
 }
 
 ErrandsTaskList *errands_task_list_new() { return g_object_new(ERRANDS_TYPE_TASK_LIST, NULL); }
 
 // ---------- PRIVATE FUNCTIONS ---------- //
 
-// static bool __task_has_any_collapsed_parent(TaskData *data) {
-//   for (TaskData *task = data->parent; task; task = task->parent)
-//     if (!errands_data_get_expanded(task->ical)) return true;
-//   return false;
-// }
+static bool __task_today_parent_match_func(TaskData *data) {
+  for (TaskData *task = data->parent; task; task = task->parent)
+    if (errands_data_is_due(task->ical)) return true;
+  return false;
+}
 
-// static bool __task_has_any_due_parent(TaskData *data) {
-//   for (TaskData *task = data->parent; task; task = task->parent)
-//     if (errands_data_is_due(task->ical)) return true;
-//   return false;
-// }
+static bool __task_today_child_match_func(TaskData *data) {
+  if (errands_data_is_due(data->ical)) return true;
+  for (size_t i = 0; i < data->children->len; ++i)
+    if (__task_today_child_match_func(g_ptr_array_index(data->children, i))) return true;
+
+  return false;
+}
 
 static bool __task_match_search_query(TaskData *data, const char *query) {
   if (!query || !*query) return false;
@@ -278,11 +274,6 @@ static void on_setup_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_i
   gtk_list_item_set_focusable(list_item, true);
 }
 
-// Bind expanded property after row is set at idle
-static void __expand_cb(ErrandsTask *task) {
-  g_object_bind_property(task, "expanded", task->row, "expanded", G_BINDING_SYNC_CREATE | G_BINDING_BIDIRECTIONAL);
-}
-
 static void on_bind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_item) {
   GtkTreeListRow *row = gtk_list_item_get_item(list_item);
   GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_list_item_get_child(list_item));
@@ -293,7 +284,6 @@ static void on_bind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_it
   g_object_set(item, "task-widget", task, NULL);
   g_object_bind_property(item, "children-model-is-empty", expander, "hide-expander", G_BINDING_SYNC_CREATE);
   task->row = row;
-  g_idle_add_once((GSourceOnceFunc)__expand_cb, task);
 }
 
 static void on_unbind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_item) {
@@ -361,7 +351,23 @@ void errands_task_list_update_title(ErrandsTaskList *self) {
   }
 }
 
-static void __filter_cb(gpointer change) { gtk_filter_changed(filter, GPOINTER_TO_INT(change)); }
+typedef struct {
+  ErrandsTaskList *self;
+  GtkFilterChange change;
+} _FilterCallbackData;
+
+static _FilterCallbackData *__filter_cb_data_new(ErrandsTaskList *self, GtkFilterChange change) {
+  _FilterCallbackData *cb_data = g_new0(_FilterCallbackData, 1);
+  cb_data->self = self;
+  cb_data->change = change;
+
+  return cb_data;
+}
+
+static void __filter_cb(_FilterCallbackData *cb_data) {
+  gtk_filter_changed(cb_data->self->filter, cb_data->change);
+  g_free(cb_data);
+}
 
 void errands_task_list_show_today_tasks(ErrandsTaskList *self) {
   LOG("Task List: Show today tasks");
@@ -369,6 +375,8 @@ void errands_task_list_show_today_tasks(ErrandsTaskList *self) {
   self->page = ERRANDS_TASK_LIST_PAGE_TODAY;
   errands_task_list_update_title(self);
   gtk_widget_set_visible(self->entry_box, false);
+  g_idle_add_once((GSourceOnceFunc)__filter_cb, __filter_cb_data_new(self, GTK_FILTER_CHANGE_DIFFERENT));
+  __expand_all_visible_rows(self);
 }
 
 void errands_task_list_show_all_tasks(ErrandsTaskList *self) {
@@ -377,7 +385,7 @@ void errands_task_list_show_all_tasks(ErrandsTaskList *self) {
   self->page = ERRANDS_TASK_LIST_PAGE_ALL;
   gtk_widget_set_visible(self->entry_box, false);
   errands_task_list_update_title(self);
-  g_idle_add_once((GSourceOnceFunc)__filter_cb, GINT_TO_POINTER(GTK_FILTER_CHANGE_LESS_STRICT));
+  g_idle_add_once((GSourceOnceFunc)__filter_cb, __filter_cb_data_new(self, GTK_FILTER_CHANGE_LESS_STRICT));
 }
 
 void errands_task_list_show_task_list(ErrandsTaskList *self, ListData *data) {
@@ -385,7 +393,7 @@ void errands_task_list_show_task_list(ErrandsTaskList *self, ListData *data) {
   self->page = ERRANDS_TASK_LIST_PAGE_TASK_LIST;
   gtk_widget_set_visible(self->entry_box, true);
   errands_task_list_update_title(self);
-  g_idle_add_once((GSourceOnceFunc)__filter_cb, GINT_TO_POINTER(GTK_FILTER_CHANGE_DIFFERENT));
+  g_idle_add_once((GSourceOnceFunc)__filter_cb, __filter_cb_data_new(self, GTK_FILTER_CHANGE_DIFFERENT));
 }
 
 void errands_task_list_sort(ErrandsTaskList *self, GtkSorterChange change) {
@@ -431,7 +439,7 @@ static void on_task_list_entry_text_changed_cb(ErrandsTaskList *self) {
 static void on_task_list_search_cb(ErrandsTaskList *self, GtkSearchEntry *entry) {
   search_query = gtk_editable_get_text(GTK_EDITABLE(entry));
   LOG("Search query changed to '%s'", search_query);
-  gtk_filter_changed(filter, GTK_FILTER_CHANGE_DIFFERENT);
+  gtk_filter_changed(self->filter, GTK_FILTER_CHANGE_DIFFERENT);
   if (search_query && *search_query) __expand_all_visible_rows(self);
 }
 

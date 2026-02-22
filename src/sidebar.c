@@ -37,8 +37,6 @@ static void errands_sidebar_class_init(ErrandsSidebarClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, all_counter);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, today_row);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, today_counter);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, favorite_row);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, favorite_counter);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, task_lists_box);
 
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_errands_sidebar_filter_row_activated);
@@ -114,7 +112,7 @@ void errands_sidebar_select_last_opened_page() {
 }
 
 void errands_sidebar_update_filter_rows() {
-  size_t total = 0, completed = 0, favorite = 0, today = 0, today_completed = 0, n_lists = 0;
+  size_t total = 0, completed = 0, today = 0, today_completed = 0, n_lists = 0;
   for_range(l, 0, errands_data_lists->len) {
     ListData *list = g_ptr_array_index(errands_data_lists, l);
     CONTINUE_IF(errands_data_get_deleted(list->ical));
@@ -132,15 +130,12 @@ void errands_sidebar_update_filter_rows() {
         if (is_completed) today_completed++;
       }
       total++;
-      if (errands_data_get_favorite(ical)) favorite++;
     }
   }
   const char *all_label = total - completed > 0 ? tmp_str_printf("%zu", total - completed) : "";
   gtk_label_set_label(self->all_counter, all_label);
   const char *today_label = today - today_completed > 0 ? tmp_str_printf("%zu", today - today_completed) : "";
   gtk_label_set_label(self->today_counter, today_label);
-  const char *favorite_label = favorite > 0 ? tmp_str_printf("%zu", favorite) : "";
-  gtk_label_set_label(self->favorite_counter, favorite_label);
   gtk_widget_set_visible(self->task_lists_box, n_lists > 0);
 }
 

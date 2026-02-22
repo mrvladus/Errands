@@ -18,8 +18,6 @@ struct _ErrandsSidebar {
   GtkLabel *all_counter;
   GtkListBoxRow *today_row;
   GtkLabel *today_counter;
-  GtkListBoxRow *favorite_row;
-  GtkLabel *favorite_counter;
   GtkWidget *task_lists_box;
 
   ErrandsSidebarTaskListRow *current_task_list_row;

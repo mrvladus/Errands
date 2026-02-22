@@ -521,9 +521,6 @@ bool errands_data_get_expanded(icalcomponent *ical) {
 bool errands_data_get_notified(icalcomponent *ical) {
   return STR_TO_BOOL(get_x_prop_value(ical, "X-ERRANDS-NOTIFIED", "0"));
 }
-bool errands_data_get_favorite(icalcomponent *ical) {
-  return STR_TO_BOOL(get_x_prop_value(ical, "X-ERRANDS-FAVORITE", "0"));
-}
 bool errands_data_get_synced(icalcomponent *ical) {
   return STR_TO_BOOL(get_x_prop_value(ical, "X-ERRANDS-SYNCED", "0"));
 }
@@ -555,11 +552,6 @@ void errands_data_set_expanded(icalcomponent *ical, bool value) {
 }
 void errands_data_set_notified(icalcomponent *ical, bool value) {
   set_x_prop_value(ical, "X-ERRANDS-NOTIFIED", BOOL_TO_STR_NUM(value));
-  errands_data_set_synced(ical, false);
-  errands_data_set_changed(ical, icaltime_get_date_time_now());
-}
-void errands_data_set_favorite(icalcomponent *ical, bool value) {
-  set_x_prop_value(ical, "X-ERRANDS-FAVORITE", BOOL_TO_STR_NUM(value));
   errands_data_set_synced(ical, false);
   errands_data_set_changed(ical, icaltime_get_date_time_now());
 }

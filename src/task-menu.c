@@ -9,7 +9,6 @@
 #include <glib/gi18n.h>
 
 static void on_edit_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskMenu *self);
-static void on_favorite_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskMenu *self);
 static void on_copy_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskMenu *self);
 static void on_export_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskMenu *self);
 static void on_cancel_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskMenu *self);
@@ -52,7 +51,6 @@ static void errands_task_menu_init(ErrandsTaskMenu *self) {
   gtk_widget_init_template(GTK_WIDGET(self));
   GSimpleActionGroup *ag = errands_add_action_group(self, "task-menu");
   errands_add_action(ag, "edit", on_edit_action_cb, self, NULL);
-  errands_add_action(ag, "favorite", on_favorite_action_cb, self, NULL);
   errands_add_action(ag, "copy", on_copy_action_cb, self, NULL);
   errands_add_action(ag, "export", on_export_action_cb, self, NULL);
   errands_add_action(ag, "cancel", on_cancel_action_cb, self, NULL);
@@ -96,11 +94,6 @@ void errands_task_menu_show(ErrandsTask *task, float x, float y, ErrandsTaskMenu
 static void on_edit_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskMenu *self) {
   gtk_popover_popdown(GTK_POPOVER(self));
   gtk_editable_label_start_editing(GTK_EDITABLE_LABEL(self->task->edit_title));
-}
-
-static void on_favorite_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskMenu *self) {
-  gtk_popover_popdown(GTK_POPOVER(self));
-  gtk_widget_activate_action(GTK_WIDGET(self->task), "task.favorite", NULL, NULL);
 }
 
 static void on_copy_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskMenu *self) {

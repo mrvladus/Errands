@@ -83,20 +83,6 @@ template $ErrandsTask: Box {
       }
     }
 
-    // Favorite
-    Button favorite_btn {
-      icon-name: "errands-favorite-symbolic";
-      tooltip-text: _("Favorite");
-      valign: center;
-      action-name: "task.favorite";
-
-      styles [
-        "flat",
-        "error",
-        "circular",
-      ]
-    }
-
     Box {
       ToggleButton sub_toggle_btn {
         tooltip-text: _("Toggle Sub-Tasks Entry");

@@ -25,7 +25,6 @@ static void on_attachments_action_cb(GSimpleAction *action, GVariant *param, Err
 static void on_tags_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_date_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_cancel_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
-static void on_favorite_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_complete_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 
 // Callbacks
@@ -116,7 +115,6 @@ static void errands_task_class_init(ErrandsTaskClass *klass) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, props_bar);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, tags_box);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, date_btn);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, favorite_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, date_btn_content);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, notes_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, priority_btn);
@@ -145,7 +143,6 @@ static void errands_task_init(ErrandsTask *self) {
   errands_add_action(ag, "tags", on_tags_action_cb, self, NULL);
   errands_add_action(ag, "date", on_date_action_cb, self, NULL);
   errands_add_action(ag, "cancel", on_cancel_action_cb, self, NULL);
-  errands_add_action(ag, "favorite", on_favorite_action_cb, self, NULL);
   errands_add_action(ag, "complete", on_complete_action_cb, self, NULL);
 }
 
@@ -206,7 +203,6 @@ void errands_task_update_progress(ErrandsTask *self) {
 
 void errands_task_update_toolbar(ErrandsTask *task) {
   TaskData *data = task->data;
-  gtk_widget_set_visible(task->favorite_btn, errands_data_get_favorite(data->ical));
 
   // Notes button
   bool has_notes = errands_data_get_notes(data->ical) != NULL;
@@ -390,13 +386,6 @@ static void on_cancel_action_cb(GSimpleAction *action, GVariant *param, ErrandsT
   }
   errands_list_data_save(self->data->list);
   errands_task_list_sort(state.main_window->task_list, GTK_SORTER_CHANGE_MORE_STRICT);
-}
-
-static void on_favorite_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
-  bool favorite = !errands_data_get_favorite(self->data->ical);
-  errands_data_set_favorite(self->data->ical, favorite);
-  errands_list_data_save(self->data->list);
-  errands_task_set_data(self, self->data);
 }
 
 static void on_complete_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {

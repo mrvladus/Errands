@@ -140,13 +140,14 @@ template $ErrandsTaskList: Adw.Bin {
 
         ListView list_view {
           enable-rubberband: false;
-          activate => $on_listview_activate_cb();
 
           factory: SignalListItemFactory {
             setup => $on_setup_item_cb();
             bind => $on_bind_item_cb();
             unbind => $on_unbind_item_cb();
           };
+
+          activate => $on_listview_activate_cb();
         }
       }
     };

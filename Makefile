@@ -22,6 +22,8 @@ ifeq ($(DEVEL),TRUE)
 	APP_ID = io.github.mrvladus.List.Devel
 else
 	APP_ID = io.github.mrvladus.List
+	ALL_CFLAGS = -O3 -flto
+	ALL_LDFLAGS = -O3 -flto
 endif
 
 # Debug mode: GDB, GF2, FALSE.
@@ -56,10 +58,10 @@ symbolicicondir = $(icondir)/symbolic/apps
 
 PKG_CONFIG_LIBS = libadwaita-1 gtksourceview-5 libical libcurl libsecret-1 libportal-gtk4
 
-LDFLAGS    ?=
-ALL_LDFLAGS = $(LDFLAGS) `pkg-config --libs $(PKG_CONFIG_LIBS)`
-CFLAGS     ?=
-ALL_CFLAGS  = $(CFLAGS) \
+LDFLAGS     ?=
+ALL_LDFLAGS += $(LDFLAGS) `pkg-config --libs $(PKG_CONFIG_LIBS)`
+CFLAGS      ?=
+ALL_CFLAGS  += $(CFLAGS) \
 			-Wall -g -std=c11 -D_GNU_SOURCE \
 			`pkg-config --cflags $(PKG_CONFIG_LIBS)` \
 			-DVERSION='"$(VERSION)"' \

@@ -76,7 +76,6 @@ bool errands_data_get_cancelled(icalcomponent *ical);
 bool errands_data_get_deleted(icalcomponent *ical);
 bool errands_data_get_expanded(icalcomponent *ical);
 bool errands_data_get_notified(icalcomponent *ical);
-bool errands_data_get_favorite(icalcomponent *ical);
 bool errands_data_get_synced(icalcomponent *ical);
 
 bool errands_data_is_completed(icalcomponent *ical);
@@ -86,7 +85,6 @@ void errands_data_set_cancelled(icalcomponent *ical, bool value);
 void errands_data_set_deleted(icalcomponent *ical, bool value);
 void errands_data_set_expanded(icalcomponent *ical, bool value);
 void errands_data_set_notified(icalcomponent *ical, bool value);
-void errands_data_set_favorite(icalcomponent *ical, bool value);
 void errands_data_set_synced(icalcomponent *ical, bool value);
 
 // --- INT --- //

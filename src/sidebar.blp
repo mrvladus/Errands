@@ -142,32 +142,6 @@ template $ErrandsSidebar: Adw.Bin {
               }
             }
           }
-
-          ListBoxRow favorite_row {
-            Box {
-              spacing: 12;
-              tooltip-text: _("Favorite Tasks");
-
-              Image {
-                icon-name: "errands-favorite-symbolic";
-              }
-
-              Label {
-                label: C_("Favorite Tasks", "Favorites");
-              }
-
-              Label favorite_counter {
-                label: "";
-                hexpand: true;
-                halign: end;
-
-                styles [
-                  "dim-label",
-                  "caption",
-                ]
-              }
-            }
-          }
         }
 
         Separator {
