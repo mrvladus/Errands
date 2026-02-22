@@ -37,11 +37,11 @@ else
 	RUN_CMD = $(BUILD_DIR)/$(NAME)
 endif
 
+# Installation destination directory. Default: not set.
+DESTDIR ?=
 # Installation prefix directory. Default: /usr/local.
 # For Flatpak builds, set `prefix=/app`.
 prefix  ?= /usr/local
-# Installation destination directory. Default: not set.
-DESTDIR ?=
 
 # --- Installation directories --- #
 
@@ -193,6 +193,6 @@ run: all
 
 # Count source lines of code.
 sloc:
-	@find $(SRC_DIR) -name '*.c' -o -name '*.h' | sort | xargs wc -l
+	@find $(SRC_DIR) -type f \( -name '*.c' -o -name '*.h' -o -name '*.blp' \) -exec wc -l {} +
 
 .PHONY: all install uninstall distrobox-setup run clean sloc flatpak-run flatpak-bundle

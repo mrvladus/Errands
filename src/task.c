@@ -45,7 +45,6 @@ enum {
   PROP_0,
   PROP_DATA,
   PROP_TASK_ITEM,
-  PROP_EXPANDED,
   N_PROPERTIES,
 };
 
@@ -62,13 +61,6 @@ static void errands_task_set_property(GObject *object, guint prop_id, const GVal
     self->item = g_value_get_object(value);
     errands_task_set_data(self, errands_task_item_get_data(self->item));
   } break;
-  case PROP_EXPANDED: {
-    bool expanded = g_value_get_boolean(value);
-    if (expanded != errands_data_get_expanded(self->data->ical)) {
-      errands_data_set_expanded(self->data->ical, expanded);
-      errands_list_data_save(self->data->list);
-    }
-  } break;
   default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
   }
 }
@@ -78,7 +70,6 @@ static void errands_task_get_property(GObject *object, guint prop_id, GValue *va
   switch (prop_id) {
   case PROP_DATA: g_value_set_pointer(value, self->data); break;
   case PROP_TASK_ITEM: g_value_set_object(value, self->item); break;
-  case PROP_EXPANDED: g_value_set_boolean(value, errands_data_get_expanded(self->data->ical)); break;
   default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
   }
 }
@@ -100,8 +91,6 @@ static void errands_task_class_init(ErrandsTaskClass *klass) {
       g_param_spec_pointer("data", "Task Data", "Data associated with the task.", G_PARAM_READWRITE);
   obj_properties[PROP_TASK_ITEM] = g_param_spec_object("task-item", "Task Item", "Task item associated with the task.",
                                                        ERRANDS_TYPE_TASK_ITEM, G_PARAM_READWRITE);
-  obj_properties[PROP_EXPANDED] =
-      g_param_spec_boolean("expanded", "Expanded", "Whether the task is expanded.", false, G_PARAM_READWRITE);
 
   g_object_class_install_properties(object_class, N_PROPERTIES, obj_properties);
 
