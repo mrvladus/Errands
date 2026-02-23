@@ -9,10 +9,6 @@
     color: var(--accent-color);
 }
 
-.sub-toggle-btn:checked > image {
-    -gtk-icon-transform: rotate(45deg);
-}
-
 /* Accent color buttons */
 
 .accent-color-btn radio {

@@ -5,6 +5,7 @@
 #include "sidebar.h"
 #include "state.h"
 #include "sync.h"
+#include "task-item.h"
 #include "task-list.h"
 #include "utils.h"
 #include "window.h"
@@ -190,18 +191,19 @@ static void on_action_rename(GSimpleAction *action, GVariant *param, ErrandsSide
 
 static void on_action_delete_completed(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {
   gtk_popover_popdown(row->popover);
-  bool deleted = false;
-  g_autoptr(GPtrArray) tasks = g_ptr_array_sized_new(row->data->children->len);
-  errands_list_data_get_flat_list(row->data, tasks);
-  for_range(i, 0, tasks->len) {
-    TaskData *task = g_ptr_array_index(tasks, i);
-    if (errands_data_is_completed(task->ical)) {
-      errands_data_set_deleted(task->ical, true);
-      errands_sync_delete_task(task);
-      deleted = true;
-    }
-  }
-  if (deleted) { errands_list_data_save(row->data); }
+  // errands_task_item_delete(ErrandsTaskItem *self, GListStore *delete_from_model, ErrandsTaskItemDeleteKind kind)
+  // bool deleted = false;
+  // g_autoptr(GPtrArray) tasks = g_ptr_array_sized_new(row->data->children->len);
+  // errands_list_data_get_flat_list(row->data, tasks);
+  // for_range(i, 0, tasks->len) {
+  //   TaskData *task = g_ptr_array_index(tasks, i);
+  //   if (errands_data_is_completed(task->ical)) {
+  //     errands_data_set_deleted(task->ical, true);
+  //     errands_sync_delete_task(task);
+  //     deleted = true;
+  //   }
+  // }
+  // if (deleted) errands_list_data_save(row->data);
 }
 
 static void on_action_delete_cancelled(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {
@@ -217,7 +219,7 @@ static void on_action_delete_cancelled(GSimpleAction *action, GVariant *param, E
       deleted = true;
     }
   }
-  if (deleted) { errands_list_data_save(row->data); }
+  if (deleted) errands_list_data_save(row->data);
 }
 
 static void on_action_delete(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {

@@ -8,6 +8,8 @@ template $ErrandsTask: Box {
     labelled-by: title;
   }
 
+  EventControllerMotion motion_ctrl {}
+
   // Title Box
   Box {
     spacing: 6;
@@ -84,16 +86,23 @@ template $ErrandsTask: Box {
     }
 
     Box {
-      ToggleButton sub_toggle_btn {
-        tooltip-text: _("Toggle Sub-Tasks Entry");
-        icon-name: "errands-add-symbolic";
-        valign: center;
+      Revealer {
+        transition-type: swing_left;
+        transition-duration: 300;
+        reveal-child: bind motion_ctrl.contains-pointer;
 
-        styles [
-          "flat",
-          "circular",
-          "sub-toggle-btn",
-        ]
+        ToggleButton sub_toggle_btn {
+          tooltip-text: _("Toggle Sub-Tasks Entry");
+          icon-name: "errands-add-symbolic";
+          valign: center;
+          visible: bind edit_title.editing inverted;
+
+          styles [
+            "flat",
+            "circular",
+            "sub-toggle-btn",
+          ]
+        }
       }
 
       // Properties menu
@@ -191,7 +200,7 @@ template $ErrandsTask: Box {
       margin-end: 6;
       margin-bottom: 6;
       placeholder-text: _("Add Sub-Task");
-      activate => $on_sub_task_entry_activated(template) not-swapped;
+      activate => $on_sub_task_entry_activated_cb(template) not-swapped;
     }
   }
 

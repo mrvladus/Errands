@@ -138,12 +138,7 @@ static void on_cancel_action_cb(GSimpleAction *action, GVariant *param, ErrandsT
 
 static void on_delete_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskMenu *self) {
   gtk_popover_popdown(GTK_POPOVER(self));
-  errands_data_set_deleted(self->task->data->ical, true);
-  errands_list_data_save(self->task->data->list);
-  errands_window_add_toast(_("Task is Deleted"));
-  errands_sync_delete_task(self->task->data);
-  errands_sidebar_update_filter_rows();
-  errands_sidebar_task_list_row_update(errands_sidebar_task_list_row_get(self->task->data->list));
+  gtk_widget_activate_action(GTK_WIDGET(self->task), "task.delete", NULL, NULL);
 }
 
 static void on_notes_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskMenu *self) {

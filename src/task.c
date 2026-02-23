@@ -1,5 +1,7 @@
 #include "task.h"
 #include "data.h"
+#include "gio/gio.h"
+#include "glib.h"
 #include "gtk/gtk.h"
 #include "sidebar.h"
 #include "state.h"
@@ -26,10 +28,11 @@ static void on_tags_action_cb(GSimpleAction *action, GVariant *param, ErrandsTas
 static void on_date_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_cancel_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_complete_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
+static void on_delete_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 
 // Callbacks
 static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointer user_data);
-static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *self);
+static void on_sub_task_entry_activated_cb(GtkEntry *entry, ErrandsTask *self);
 
 static GdkContentProvider *on_drag_prepare_cb(GtkDragSource *source, double x, double y, ErrandsTask *self);
 static void on_drag_begin_cb(GtkDragSource *source, GdkDrag *drag, ErrandsTask *self);
@@ -113,7 +116,7 @@ static void errands_task_class_init(ErrandsTaskClass *klass) {
 
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), errands_task_menu_show);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_title_edit_cb);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_sub_task_entry_activated);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_sub_task_entry_activated_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_drag_prepare_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_drag_begin_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_drag_end_cb);
@@ -133,6 +136,7 @@ static void errands_task_init(ErrandsTask *self) {
   errands_add_action(ag, "date", on_date_action_cb, self, NULL);
   errands_add_action(ag, "cancel", on_cancel_action_cb, self, NULL);
   errands_add_action(ag, "complete", on_complete_action_cb, self, NULL);
+  errands_add_action(ag, "delete", on_delete_action_cb, self, NULL);
 }
 
 ErrandsTask *errands_task_new() { return g_object_new(ERRANDS_TYPE_TASK, NULL); }
@@ -439,6 +443,29 @@ static void on_complete_action_cb(GSimpleAction *action, GVariant *param, Errand
   errands_task_list_sort(state.main_window->task_list, GTK_SORTER_CHANGE_MORE_STRICT);
 }
 
+static void on_delete_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
+  errands_data_set_deleted(self->data->ical, true);
+  errands_sync_delete_task(self->data);
+  g_autoptr(GPtrArray) children = g_ptr_array_sized_new(self->data->children->len);
+  errands_task_data_get_flat_list(self->data, children);
+  for_range(i, 0, children->len) {
+    TaskData *child = g_ptr_array_index(children, i);
+    errands_data_set_deleted(child->ical, true);
+    errands_sync_delete_task(child);
+  }
+  errands_list_data_save(self->data->list);
+
+  GListStore *parent_model = NULL;
+  ErrandsTaskItem *parent = errands_task_item_get_parent(self->item);
+  if (parent) parent_model = G_LIST_STORE(errands_task_item_get_children_model(parent));
+  else parent_model = state.main_window->task_list->task_model;
+  guint pos;
+  if (g_list_store_find(parent_model, self->item, &pos)) g_list_store_remove(parent_model, pos);
+
+  errands_sidebar_update_filter_rows();
+  errands_sidebar_task_list_row_update(errands_sidebar_task_list_row_get(self->data->list));
+}
+
 // ---------- CALLBACKS ---------- //
 
 static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointer user_data) {
@@ -468,7 +495,7 @@ static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointe
   }
 }
 
-static void on_sub_task_entry_activated(GtkEntry *entry, ErrandsTask *self) {
+static void on_sub_task_entry_activated_cb(GtkEntry *entry, ErrandsTask *self) {
   const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
   if (STR_EQUAL(text, "")) return;
   TaskData *new_data = errands_task_data_create_task(self->data->list, self->data, text);
