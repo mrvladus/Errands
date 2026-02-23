@@ -5,7 +5,6 @@
 #include "sidebar.h"
 #include "state.h"
 #include "sync.h"
-#include "task-item.h"
 #include "task-list.h"
 #include "utils.h"
 #include "window.h"
@@ -13,7 +12,6 @@
 #include "vendor/toolbox.h"
 
 #include <glib/gi18n.h>
-#include <libical/ical.h>
 
 static void on_action_export(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row);
 static void on_action_print(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row);
@@ -191,35 +189,12 @@ static void on_action_rename(GSimpleAction *action, GVariant *param, ErrandsSide
 
 static void on_action_delete_completed(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {
   gtk_popover_popdown(row->popover);
-  // errands_task_item_delete(ErrandsTaskItem *self, GListStore *delete_from_model, ErrandsTaskItemDeleteKind kind)
-  // bool deleted = false;
-  // g_autoptr(GPtrArray) tasks = g_ptr_array_sized_new(row->data->children->len);
-  // errands_list_data_get_flat_list(row->data, tasks);
-  // for_range(i, 0, tasks->len) {
-  //   TaskData *task = g_ptr_array_index(tasks, i);
-  //   if (errands_data_is_completed(task->ical)) {
-  //     errands_data_set_deleted(task->ical, true);
-  //     errands_sync_delete_task(task);
-  //     deleted = true;
-  //   }
-  // }
-  // if (deleted) errands_list_data_save(row->data);
+  errands_task_list_delete_completed(state.main_window->task_list, row->data);
 }
 
 static void on_action_delete_cancelled(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {
   gtk_popover_popdown(row->popover);
-  bool deleted = false;
-  g_autoptr(GPtrArray) tasks = g_ptr_array_sized_new(row->data->children->len);
-  errands_list_data_get_flat_list(row->data, tasks);
-  for_range(i, 0, tasks->len) {
-    TaskData *task = g_ptr_array_index(tasks, i);
-    if (errands_data_get_cancelled(task->ical)) {
-      errands_data_set_deleted(task->ical, true);
-      errands_sync_delete_task(task);
-      deleted = true;
-    }
-  }
-  if (deleted) errands_list_data_save(row->data);
+  errands_task_list_delete_cancelled(state.main_window->task_list, row->data);
 }
 
 static void on_action_delete(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {
