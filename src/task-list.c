@@ -314,7 +314,24 @@ static void on_entry_task_menu_action_cb(GSimpleAction *action, GVariant *param,
 
 void errands_task_list_update_title(ErrandsTaskList *self) {
   switch (self->page) {
-  case ERRANDS_TASK_LIST_PAGE_ALL: adw_window_title_set_title(ADW_WINDOW_TITLE(self->title), _("All Tasks")); break;
+  case ERRANDS_TASK_LIST_PAGE_ALL: {
+    adw_window_title_set_title(ADW_WINDOW_TITLE(self->title), _("All Tasks"));
+    size_t total = 0, completed = 0;
+    for_range(i, 0, errands_data_lists->len) {
+      ListData *list = g_ptr_array_index(errands_data_lists, i);
+      CONTINUE_IF(errands_data_get_deleted(list->ical));
+      g_autoptr(GPtrArray) tasks = errands_list_data_get_all_tasks_as_icalcomponents(list);
+      for_range(j, 0, tasks->len) {
+        icalcomponent *ical = g_ptr_array_index(tasks, j);
+        CONTINUE_IF(errands_data_get_deleted(ical) || errands_data_get_cancelled(ical));
+        total++;
+        if (errands_data_is_completed(ical)) completed++;
+      }
+    }
+    const char *stats = tmp_str_printf("%s %zu / %zu", _("Completed:"), completed, total);
+    adw_window_title_set_subtitle(ADW_WINDOW_TITLE(self->title), total > 0 ? stats : "");
+    gtk_widget_set_visible(self->scrl, total > 0);
+  } break;
   case ERRANDS_TASK_LIST_PAGE_TODAY: {
     adw_window_title_set_title(ADW_WINDOW_TITLE(self->title), _("Tasks for Today"));
     size_t total = 0, completed = 0;
@@ -335,7 +352,7 @@ void errands_task_list_update_title(ErrandsTaskList *self) {
     adw_window_title_set_subtitle(ADW_WINDOW_TITLE(self->title), total > 0 ? stats : "");
     gtk_widget_set_visible(self->scrl, total > 0);
   } break;
-  case ERRANDS_TASK_LIST_PAGE_TASK_LIST:
+  case ERRANDS_TASK_LIST_PAGE_TASK_LIST: {
     adw_window_title_set_title(ADW_WINDOW_TITLE(self->title), errands_data_get_list_name(self->data->ical));
     size_t total = 0, completed = 0;
     for_range(i, 0, errands_data_lists->len) {
@@ -352,7 +369,7 @@ void errands_task_list_update_title(ErrandsTaskList *self) {
     const char *stats = tmp_str_printf("%s %zu / %zu", _("Completed:"), completed, total);
     adw_window_title_set_subtitle(ADW_WINDOW_TITLE(self->title), total > 0 ? stats : "");
     gtk_widget_set_visible(self->scrl, total > 0);
-    break;
+  } break;
   }
 }
 
