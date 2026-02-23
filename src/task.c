@@ -464,6 +464,7 @@ static void on_delete_action_cb(GSimpleAction *action, GVariant *param, ErrandsT
 
   errands_sidebar_update_filter_rows();
   errands_sidebar_task_list_row_update(errands_sidebar_task_list_row_get(self->data->list));
+  errands_task_list_update_title(state.main_window->task_list);
 }
 
 // ---------- CALLBACKS ---------- //
