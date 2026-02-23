@@ -205,3 +205,7 @@ expander:checked {
     -gtk-icon-source: -gtk-icontheme("errands-down-symbolic");
     color: var(--accent-color);
 }
+
+splitbutton > menubutton > button > arrow {
+    -gtk-icon-source: -gtk-icontheme("errands-down-symbolic");
+}

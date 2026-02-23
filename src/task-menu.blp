@@ -21,34 +21,26 @@ template $ErrandsTaskMenu: Popover {
       Box task_mode_box {
         homogeneous: true;
 
+        styles [
+          "linked",
+        ]
+
         Button {
           icon-name: "errands-edit-symbolic";
           tooltip-text: _("Edit Text");
           action-name: "task-menu.edit";
-
-          styles [
-            "flat",
-          ]
         }
 
         Button {
           icon-name: "errands-clipboard-symbolic";
           tooltip-text: _("Copy Text");
           action-name: "task-menu.copy";
-
-          styles [
-            "flat",
-          ]
         }
 
         Button {
           icon-name: "errands-export-symbolic";
           tooltip-text: _("Export as \".ics\"");
           action-name: "task-menu.export";
-
-          styles [
-            "flat",
-          ]
         }
 
         Button {
@@ -57,7 +49,6 @@ template $ErrandsTaskMenu: Popover {
           action-name: "task-menu.cancel";
 
           styles [
-            "flat",
             "warning",
           ]
         }
@@ -68,7 +59,6 @@ template $ErrandsTaskMenu: Popover {
           action-name: "task-menu.delete";
 
           styles [
-            "flat",
             "error",
           ]
         }
