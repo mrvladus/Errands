@@ -141,6 +141,12 @@ void errands_sidebar_update_filter_rows() {
 
 void errands_sidebar_toggle_sync_indicator(bool on) { gtk_widget_set_visible(self->sync_indicator, on); }
 
+bool errands_sidebar_row_is_selected(ErrandsSidebarTaskListRow *row) {
+  GtkListBoxRow *selected_row = gtk_list_box_get_selected_row(GTK_LIST_BOX(self->task_lists_box));
+
+  return selected_row == GTK_LIST_BOX_ROW(row);
+}
+
 // --- SIGNAL HANDLERS --- //
 
 static void on_errands_sidebar_filter_row_activated(GtkListBox *box, GtkListBoxRow *row) {

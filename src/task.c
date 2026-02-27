@@ -1,8 +1,9 @@
 #include "task.h"
 #include "data.h"
-#include "gio/gio.h"
+#include "glib-object.h"
 #include "glib.h"
 #include "gtk/gtk.h"
+#include "sidebar-task-list-row.h"
 #include "sidebar.h"
 #include "state.h"
 #include "sync.h"
@@ -33,11 +34,10 @@ static void on_delete_action_cb(GSimpleAction *action, GVariant *param, ErrandsT
 // Callbacks
 static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointer user_data);
 static void on_sub_task_entry_activated_cb(GtkEntry *entry, ErrandsTask *self);
+static void on_drop_motion_ctrl_enter_cb(ErrandsTask *self);
 
 static GdkContentProvider *on_drag_prepare_cb(GtkDragSource *source, double x, double y, ErrandsTask *self);
 static void on_drag_begin_cb(GtkDragSource *source, GdkDrag *drag, ErrandsTask *self);
-static void on_drag_end_cb(GtkDragSource *source, GdkDrag *drag, gboolean delete_data, ErrandsTask *self);
-static gboolean on_drag_cancel_cb(GtkDragSource *source, GdkDrag *drag, GdkDragCancelReason *reason, ErrandsTask *self);
 static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x, double y, ErrandsTask *self);
 
 // ---------- WIDGET TEMPLATE ---------- //
@@ -113,14 +113,14 @@ static void errands_task_class_init(ErrandsTaskClass *klass) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, attachments_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, attachments_count);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, sub_entry);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, drop_motion_ctrl);
 
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), errands_task_menu_show);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_title_edit_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_sub_task_entry_activated_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_drop_motion_ctrl_enter_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_drag_prepare_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_drag_begin_cb);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_drag_end_cb);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_drag_cancel_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_drop_cb);
 }
 
@@ -516,27 +516,38 @@ static void on_sub_task_entry_activated_cb(GtkEntry *entry, ErrandsTask *self) {
 
 // --- DND CALLBACKS --- //
 
+static guint on_drop_motion_ctrl_enter_timeout_cb(ErrandsTask *self) {
+  if (!self || !GTK_IS_WIDGET(self)) return G_SOURCE_REMOVE;
+
+  GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_widget_get_ancestor(GTK_WIDGET(self), GTK_TYPE_TREE_EXPANDER));
+  GtkTreeListRow *row = gtk_tree_expander_get_list_row(expander);
+  bool expanded = gtk_tree_list_row_get_expanded(row);
+  if (!expanded && gtk_drop_controller_motion_contains_pointer(self->drop_motion_ctrl))
+    gtk_tree_list_row_set_expanded(row, true);
+
+  return G_SOURCE_REMOVE;
+}
+
+static void on_drop_motion_ctrl_enter_cb(ErrandsTask *self) {
+  g_timeout_add_once(500, (GSourceOnceFunc)on_drop_motion_ctrl_enter_timeout_cb, self);
+}
+
 static GdkContentProvider *on_drag_prepare_cb(GtkDragSource *source, double x, double y, ErrandsTask *task) {
-  g_autoptr(GObject) obj = g_object_new(G_TYPE_OBJECT, NULL);
-  g_object_set_data(obj, "data", task->data);
   GValue value = G_VALUE_INIT;
-  g_value_init(&value, G_TYPE_OBJECT);
-  g_value_set_object(&value, obj);
+  g_value_init(&value, ERRANDS_TYPE_TASK_ITEM);
+  g_value_set_object(&value, task->item);
+
   return gdk_content_provider_new_for_value(&value);
 }
 
 static void on_drag_begin_cb(GtkDragSource *source, GdkDrag *drag, ErrandsTask *task) {
   const char *text = errands_data_get_text(task->data->ical);
-  char label[21];
-  if (strlen(text) > 20) snprintf(label, 17, "%s...", text);
-  else strcpy(label, text);
+  g_autofree gchar *label;
+  if (strlen(text) > 20) {
+    g_autofree gchar *truncated = g_strndup(text, 17);
+    label = g_strconcat(truncated, "...", NULL);
+  } else label = g_strdup(text);
   g_object_set(gtk_drag_icon_get_for_drag(drag), "child", g_object_new(GTK_TYPE_BUTTON, "label", label, NULL), NULL);
-}
-
-static void on_drag_end_cb(GtkDragSource *self, GdkDrag *drag, gboolean delete_data, ErrandsTask *task) {}
-
-static gboolean on_drag_cancel_cb(GtkDragSource *self, GdkDrag *drag, GdkDragCancelReason *reason, ErrandsTask *task) {
-  return false;
 }
 
 static bool __task_data_is_sub_task_of(TaskData *data, TaskData *possible_parent) {
@@ -546,29 +557,79 @@ static bool __task_data_is_sub_task_of(TaskData *data, TaskData *possible_parent
 }
 
 static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x, double y, ErrandsTask *task) {
-  g_autoptr(GObject) obj = g_value_get_object(value);
-  if (!obj) return false;
-  TaskData *drop_data = g_object_get_data(obj, "data");
-  if (!drop_data) return false;
-  TaskData *tgt_data = task->data;
-  if (drop_data == tgt_data) return false;
+  // Check items
+  ErrandsTaskItem *drop_item = g_value_get_object(value);
+  ErrandsTaskItem *tgt_item = task->item;
+  if (!tgt_item || !drop_item || tgt_item == drop_item) return false;
+  TaskData *drop_data = errands_task_item_get_data(drop_item);
+  TaskData *tgt_data = errands_task_item_get_data(tgt_item);
   if (__task_data_is_sub_task_of(tgt_data, drop_data)) {
     errands_window_add_toast(_("Can't add task as a child of itself"));
     return false;
   }
-  GPtrArray *arr = drop_data->parent ? drop_data->parent->children : drop_data->list->children;
-  guint idx = 0;
-  if (!g_ptr_array_find(arr, drop_data, &idx)) return false;
-  g_ptr_array_add(tgt_data->children, g_ptr_array_steal_index(arr, idx));
-  // if (drop_data->list != tgt_data->list) {
-  //   // TODO: we don't need LIST_UID ???
-  //   // TODO: move ical data to the list
-  //   errands_data_set_prop(drop_data->data, PROP_LIST_UID, errands_data_get_prop(tgt_data->data,
-  //   PROP_LIST_UID)); errands_list_data_save(drop_data->list); drop_data->list = tgt_data->list;
-  // }
+
+  // Get old parent task
+  ErrandsTask *old_parent_task = NULL;
+  if (drop_data->parent) {
+    ErrandsTaskItem *drop_item_parent = errands_task_item_get_parent(drop_item);
+    if (drop_item_parent) g_object_get(drop_item_parent, "task-widget", &old_parent_task, NULL);
+  }
+
+  // Move task data
+  // Remove from parent list
+  errands_data_set_parent(drop_data->ical, errands_data_get_uid(tgt_data->ical));
+  GPtrArray *parent_arr = drop_data->parent ? drop_data->parent->children : drop_data->list->children;
+  guint idx;
+  g_ptr_array_find(parent_arr, drop_data, &idx);
+  drop_data = g_ptr_array_steal_index_fast(parent_arr, idx);
+  // Add data as child
+  g_ptr_array_add(tgt_data->children, drop_data);
   drop_data->parent = tgt_data;
-  errands_data_set_parent(drop_data->ical, errands_data_get_parent(tgt_data->ical));
-  errands_task_data_sort_sub_tasks(tgt_data);
+  // Change list if needed
+  bool moved_list = false;
+  if (drop_data->list != tgt_data->list) {
+    ListData *old_list = drop_data->list;
+    icalcomponent_remove_component(old_list->ical, drop_data->ical);
+    drop_data->list = tgt_data->list;
+    icalcomponent_add_component(tgt_data->list->ical, drop_data->ical);
+    // Move sub-tasks
+    g_autoptr(GPtrArray) children = g_ptr_array_sized_new(drop_data->children->len);
+    errands_task_data_get_flat_list(drop_data, children);
+    for_range(i, 0, children->len) {
+      TaskData *child = g_ptr_array_index(children, i);
+      child->list = tgt_data->list;
+      icalcomponent_add_component(tgt_data->list->ical, child->ical);
+      icalcomponent_remove_component(old_list->ical, child->ical);
+    }
+    errands_list_data_save(old_list);
+    errands_sidebar_task_list_row_update(errands_sidebar_task_list_row_get(old_list));
+    moved_list = true;
+  }
   errands_list_data_save(tgt_data->list);
+  if (moved_list) {
+    errands_sidebar_task_list_row_update(errands_sidebar_task_list_row_get(tgt_data->list));
+    errands_task_list_update_title(state.main_window->task_list);
+  }
+
+  // Add child to target model
+  GListStore *tgt_children_model = G_LIST_STORE(errands_task_item_get_children_model(tgt_item));
+  g_list_store_append(tgt_children_model, drop_item);
+
+  // Remove from parent model
+  ErrandsTaskItem *drop_parent_item = errands_task_item_get_parent(drop_item);
+  GListStore *drop_parent_model = NULL;
+  if (drop_parent_item) drop_parent_model = G_LIST_STORE(errands_task_item_get_children_model(drop_parent_item));
+  else drop_parent_model = state.main_window->task_list->task_model;
+  if (g_list_store_find(drop_parent_model, drop_item, &idx)) g_list_store_remove(drop_parent_model, idx);
+  errands_task_item_set_parent(drop_item, tgt_item);
+
+  // Notify expanders
+  if (drop_parent_item) g_object_notify(G_OBJECT(drop_parent_item), "children-model-is-empty");
+  g_object_notify(G_OBJECT(tgt_item), "children-model-is-empty");
+
+  // Update progress
+  errands_task_update_progress(task);
+  if (!moved_list && old_parent_task) errands_task_update_progress(old_parent_task);
+
   return true;
 }

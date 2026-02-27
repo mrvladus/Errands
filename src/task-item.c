@@ -117,6 +117,8 @@ bool errands_task_item_is_children_model_empty(ErrandsTaskItem *self) {
 
 ErrandsTaskItem *errands_task_item_get_parent(ErrandsTaskItem *self) { return self->parent; }
 
+void errands_task_item_set_parent(ErrandsTaskItem *self, ErrandsTaskItem *parent) { self->parent = parent; }
+
 void errands_task_item_add_child(ErrandsTaskItem *self, TaskData *data) {
   if (!self || !data) return;
   g_autoptr(ErrandsTaskItem) item = errands_task_item_new(data, self);

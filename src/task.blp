@@ -10,6 +10,10 @@ template $ErrandsTask: Box {
 
   EventControllerMotion motion_ctrl {}
 
+  DropControllerMotion drop_motion_ctrl {
+    enter => $on_drop_motion_ctrl_enter_cb(template);
+  }
+
   // Title Box
   Box {
     spacing: 6;
@@ -208,12 +212,10 @@ template $ErrandsTask: Box {
     actions: move;
     prepare => $on_drag_prepare_cb(template) not-swapped;
     drag-begin => $on_drag_begin_cb(template) not-swapped;
-    drag-end => $on_drag_end_cb(template) not-swapped;
-    drag-cancel => $on_drag_cancel_cb(template) not-swapped;
   }
 
   DropTarget {
-    formats: "GObject";
+    formats: "ErrandsTaskItem";
     actions: move;
     drop => $on_drop_cb(template) not-swapped;
   }

@@ -30,3 +30,4 @@ void errands_sidebar_update_filter_rows(void);
 void errands_sidebar_select_last_opened_page(void);
 void errands_sidebar_toggle_sync_indicator(bool on);
 ErrandsSidebarTaskListRow *errands_sidebar_find_row(ListData *data);
+bool errands_sidebar_row_is_selected(ErrandsSidebarTaskListRow *row);

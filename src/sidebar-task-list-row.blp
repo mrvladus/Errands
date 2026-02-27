@@ -1,6 +1,10 @@
 using Gtk 4.0;
 
 template $ErrandsSidebarTaskListRow: Gtk.ListBoxRow {
+  DropControllerMotion drop_motion_ctrl {
+    enter => $on_drop_motion_ctrl_enter_cb(template);
+  }
+
   Box {
     spacing: 6;
 
@@ -198,7 +202,7 @@ template $ErrandsSidebarTaskListRow: Gtk.ListBoxRow {
   }
 
   DropTarget {
-    formats: "GObject";
+    formats: "ErrandsTaskItem";
     actions: move;
     drop => $on_drop_cb(template) not-swapped;
   }

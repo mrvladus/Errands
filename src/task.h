@@ -27,6 +27,8 @@ struct _ErrandsTask {
   GtkLabel *attachments_count;
   GtkWidget *sub_entry;
 
+  GtkDropControllerMotion *drop_motion_ctrl;
+
   TaskData *data;
   ErrandsTaskItem *item;
   GtkTreeListRow *row;

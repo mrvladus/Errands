@@ -1,8 +1,5 @@
 #include "task-list.h"
 #include "data.h"
-#include "gio/gio.h"
-#include "glib.h"
-#include "gtk/gtk.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "sync.h"
@@ -12,8 +9,6 @@
 #include "utils.h"
 
 #include <glib/gi18n.h>
-#include <libical/ical.h>
-#include <stdbool.h>
 
 static const char *search_query = NULL;
 
@@ -288,6 +283,8 @@ static void on_bind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_it
   g_object_set(task, "task-item", item, NULL);
   g_object_set(item, "task-widget", task, NULL);
   g_object_bind_property(item, "children-model-is-empty", expander, "hide-expander", G_BINDING_SYNC_CREATE);
+  // g_object_bind_property(row, "expandable", expander, "hide-expander",
+  // G_BINDING_SYNC_CREATE | G_BINDING_INVERT_BOOLEAN);
   task->row = row;
 }
 
@@ -420,6 +417,10 @@ void errands_task_list_show_task_list(ErrandsTaskList *self, ListData *data) {
 
 void errands_task_list_sort(ErrandsTaskList *self, GtkSorterChange change) {
   gtk_sorter_changed(GTK_SORTER(self->tree_sorter), change);
+}
+
+void errands_task_list_filter(ErrandsTaskList *self, GtkFilterChange change) {
+  gtk_filter_changed(self->filter, change);
 }
 
 static void __remove_deleted_tasks(ErrandsTaskList *self, GListStore *model) {
