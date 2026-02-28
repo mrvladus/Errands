@@ -1,5 +1,6 @@
 #include "task-list.h"
 #include "data.h"
+#include "gtk/gtk.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "sync.h"
@@ -488,6 +489,8 @@ static void on_task_list_entry_activated_cb(ErrandsTaskList *self) {
   LOG("Add task '%s' to task list '%s'", errands_data_get_uid(data->ical), list_uid);
   errands_sync_create_task(data);
   errands_task_list_update_title(self);
+
+  gtk_list_view_scroll_to(GTK_LIST_VIEW(self->list_view), 0, 0, NULL);
 }
 
 static void on_task_list_entry_text_changed_cb(ErrandsTaskList *self) {
