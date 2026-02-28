@@ -1,4 +1,5 @@
 #include "data.h"
+#include "glib.h"
 #include "settings.h"
 
 #include "vendor/json.h"
@@ -150,18 +151,6 @@ static void errands__list_data_save_cb(ListData *data) {
     return;
   }
   LOG("User Data: Saved list '%s'", path);
-  // bool need_remove = false;
-  // if (errands_data_get_deleted(data->ical)) {
-  //   if (errands_settings_get(SETTING_SYNC).b) {
-  //     if (errands_data_get_synced(data->ical)) need_remove = true;
-  //   } else need_remove = true;
-  // }
-  // if (need_remove) {
-  //   LOG("Data: Remove: %s", path);
-  //   g_ptr_array_remove(errands_data_lists, data);
-  //   data = NULL;
-  //   remove(path);
-  // }
 }
 
 static icalproperty *get_x_prop(icalcomponent *ical, const char *xprop, const char *default_val) {
@@ -433,19 +422,35 @@ void errands_task_data_get_flat_list(TaskData *parent, GPtrArray *array) {
   }
 }
 
-TaskData *errands_task_data_move_to_list(TaskData *data, ListData *list, TaskData *parent) {
-  if (!data || !list) return NULL;
+bool errands_task_data_move_to_list(TaskData *data, ListData *list, TaskData *parent) {
+  if (!data || !list || (data->parent && data->parent == parent)) return false;
+
   GPtrArray *arr_to_remove_from = data->parent ? data->parent->children : data->list->children;
   icalcomponent *clone = icalcomponent_new_clone(data->ical);
   icalcomponent_remove_component(data->list->ical, data->ical);
   icalcomponent_add_component(list->ical, clone);
-  TaskData *new_data = errands_task_data_new(clone, parent, list);
-  errands_data_set_uid(new_data->ical, generate_uuid4());
-  errands_data_set_parent(new_data->ical, parent ? errands_data_get_parent(parent->ical) : NULL);
-  for_range(i, 0, data->children->len)
-      errands_task_data_move_to_list(g_ptr_array_index(data->children, i), list, new_data);
-  g_ptr_array_remove(arr_to_remove_from, data);
-  return new_data;
+  data->ical = clone;
+  data->parent = parent;
+  errands_data_set_parent(clone, parent ? errands_data_get_uid(parent->ical) : NULL);
+
+  g_autoptr(GPtrArray) children = g_ptr_array_sized_new(data->children->len);
+  errands_task_data_get_flat_list(data, children);
+  for_range(i, 0, children->len) {
+    TaskData *child = g_ptr_array_index(children, i);
+    icalcomponent *child_clone = icalcomponent_new_clone(child->ical);
+    icalcomponent_remove_component(data->list->ical, child->ical);
+    icalcomponent_add_component(list->ical, child_clone);
+    child->ical = child_clone;
+    child->list = list;
+  }
+  data->list = list;
+
+  GPtrArray *arr_to_move_to = parent ? parent->children : list->children;
+  guint idx;
+  g_ptr_array_find(arr_to_remove_from, data, &idx);
+  g_ptr_array_add(arr_to_move_to, g_ptr_array_steal_index_fast(arr_to_remove_from, idx));
+
+  return true;
 }
 
 TaskData *errands_task_data_find_by_uid(ListData *list, const char *uid) {

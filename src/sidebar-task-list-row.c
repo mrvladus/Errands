@@ -194,8 +194,9 @@ static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x,
   ErrandsTaskItem *drop_item = g_value_get_object(value);
   TaskData *drop_data = errands_task_item_get_data(drop_item);
   ListData *list_data = self->data;
+  ListData *old_list_data = drop_data->list;
 
-  bool changing_list = drop_data->list != list_data;
+  bool changing_list = old_list_data != list_data;
 
   ErrandsTaskItem *drop_item_parent = errands_task_item_get_parent(drop_item);
 
@@ -207,37 +208,11 @@ static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x,
   if (drop_data->parent && drop_item_parent) g_object_get(drop_item_parent, "task-widget", &old_parent_task, NULL);
 
   // Move data
-  ListData *old_list = drop_data->list;
-  errands_data_set_parent(drop_data->ical, NULL);
-  // Move ical
-  if (changing_list) {
-    icalcomponent *drop_data_dup_ical = icalcomponent_new_clone(drop_data->ical);
-    icalcomponent_remove_component(old_list->ical, drop_data->ical);
-    icalcomponent_add_component(list_data->ical, drop_data_dup_ical);
-    drop_data->ical = drop_data_dup_ical;
-    drop_data->list = list_data;
-  }
-  // Move TaskData
-  GPtrArray *parent_arr = drop_data->parent ? drop_data->parent->children : old_list->children;
-  guint idx;
-  g_ptr_array_find(parent_arr, drop_data, &idx);
-  drop_data = g_ptr_array_steal_index_fast(parent_arr, idx);
-  g_ptr_array_add(list_data->children, drop_data);
-  // Move sub-tasks
-  if (changing_list) {
-    g_autoptr(GPtrArray) children = g_ptr_array_sized_new(drop_data->children->len);
-    errands_task_data_get_flat_list(drop_data, children);
-    for_range(i, 0, children->len) {
-      TaskData *child = g_ptr_array_index(children, i);
-      icalcomponent *child_data_dup_ical = icalcomponent_new_clone(child->ical);
-      icalcomponent_remove_component(old_list->ical, child->ical);
-      icalcomponent_add_component(list_data->ical, child_data_dup_ical);
-      child->ical = child_data_dup_ical;
-      child->list = list_data;
-    }
-    errands_list_data_save(old_list);
-  }
+  bool moved = errands_task_data_move_to_list(drop_data, list_data, NULL);
+  if (!moved) return false;
+
   errands_list_data_save(list_data);
+  if (changing_list) errands_list_data_save(old_list_data);
 
   // Update task model if necessary
   if (drop_data->parent) {
@@ -245,8 +220,8 @@ static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x,
     g_list_store_append(state.main_window->task_list->task_model, drop_item);
     GListModel *parent_model = errands_task_item_get_children_model(drop_item_parent);
     guint idx;
-    g_list_store_find(G_LIST_STORE(parent_model), drop_item, &idx);
-    g_list_store_remove(G_LIST_STORE(parent_model), idx);
+    if (g_list_store_find(G_LIST_STORE(parent_model), drop_item, &idx))
+      g_list_store_remove(G_LIST_STORE(parent_model), idx);
     if (drop_item_parent) g_object_notify(G_OBJECT(drop_item_parent), "children-model-is-empty");
     // Set parent to NULL
     drop_data->parent = NULL;
@@ -260,7 +235,7 @@ static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x,
   if (old_parent_task) errands_task_update_progress(old_parent_task);
 
   // Update the UI after the operation
-  errands_sidebar_task_list_row_update(errands_sidebar_task_list_row_get(old_list));
+  errands_sidebar_task_list_row_update(errands_sidebar_task_list_row_get(old_list_data));
   errands_sidebar_task_list_row_update(self);
 
   return true;

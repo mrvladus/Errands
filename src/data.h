@@ -62,8 +62,8 @@ size_t errands_task_data_get_indent_level(TaskData *data);
 void errands_task_data_get_flat_list(TaskData *parent, GPtrArray *array);
 void errands_task_data_print(TaskData *data);
 // Move task and sub-tasks recursively to another list.
-// Returns the moved task.
-TaskData *errands_task_data_move_to_list(TaskData *data, ListData *list, TaskData *parent);
+// Returns true if the task was successfully moved.
+bool errands_task_data_move_to_list(TaskData *data, ListData *list, TaskData *parent);
 TaskData *errands_task_data_find_by_uid(ListData *list, const char *uid);
 void errands_task_data_free(TaskData *data);
 AUTOPTR_DEFINE(TaskData, errands_task_data_free);

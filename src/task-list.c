@@ -283,8 +283,6 @@ static void on_bind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_it
   g_object_set(task, "task-item", item, NULL);
   g_object_set(item, "task-widget", task, NULL);
   g_object_bind_property(item, "children-model-is-empty", expander, "hide-expander", G_BINDING_SYNC_CREATE);
-  // g_object_bind_property(row, "expandable", expander, "hide-expander",
-  // G_BINDING_SYNC_CREATE | G_BINDING_INVERT_BOOLEAN);
   task->row = row;
 }
 
@@ -325,8 +323,6 @@ void errands_task_list_update_title(ErrandsTaskList *self) {
         if (errands_data_is_completed(ical)) completed++;
       }
     }
-    const char *stats = tmp_str_printf("%s %zu / %zu", _("Completed:"), completed, total);
-    adw_window_title_set_subtitle(ADW_WINDOW_TITLE(self->title), total > 0 ? stats : "");
     gtk_widget_set_visible(self->scrl, total > 0);
   } break;
   case ERRANDS_TASK_LIST_PAGE_TODAY: {
@@ -345,8 +341,6 @@ void errands_task_list_update_title(ErrandsTaskList *self) {
         }
       }
     }
-    const char *stats = tmp_str_printf("%s %zu / %zu", _("Completed:"), completed, total);
-    adw_window_title_set_subtitle(ADW_WINDOW_TITLE(self->title), total > 0 ? stats : "");
     gtk_widget_set_visible(self->scrl, total > 0);
   } break;
   case ERRANDS_TASK_LIST_PAGE_TASK_LIST: {
@@ -363,8 +357,6 @@ void errands_task_list_update_title(ErrandsTaskList *self) {
         if (errands_data_is_completed(ical)) completed++;
       }
     }
-    const char *stats = tmp_str_printf("%s %zu / %zu", _("Completed:"), completed, total);
-    adw_window_title_set_subtitle(ADW_WINDOW_TITLE(self->title), total > 0 ? stats : "");
     gtk_widget_set_visible(self->scrl, total > 0);
   } break;
   }
@@ -420,7 +412,7 @@ void errands_task_list_sort(ErrandsTaskList *self, GtkSorterChange change) {
 }
 
 void errands_task_list_filter(ErrandsTaskList *self, GtkFilterChange change) {
-  gtk_filter_changed(self->filter, change);
+  g_idle_add_once((GSourceOnceFunc)__filter_cb, __filter_cb_data_new(self, change));
 }
 
 static void __remove_deleted_tasks(ErrandsTaskList *self, GListStore *model) {

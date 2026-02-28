@@ -1,17 +1,14 @@
 #include "task-item.h"
 #include "data.h"
-#include "gio/gio.h"
-#include "glib-object.h"
-#include "glib.h"
-#include "sync.h"
 #include "task.h"
-#include <stddef.h>
 
 struct _ErrandsTaskItem {
   GObject parent_instance;
+
   TaskData *data;
   ErrandsTaskItem *parent;
   GListStore *children_model;
+
   ErrandsTask *task_widget;
 };
 
