@@ -74,5 +74,3 @@ void errands_task_list_show_today_tasks(ErrandsTaskList *self);
 void errands_task_list_show_task_list(ErrandsTaskList *self, ListData *data);
 void errands_task_list_sort(ErrandsTaskList *self, GtkSorterChange change);
 void errands_task_list_filter(ErrandsTaskList *self, GtkFilterChange change);
-void errands_task_list_delete_completed(ErrandsTaskList *self, ListData *list);
-void errands_task_list_delete_cancelled(ErrandsTaskList *self, ListData *list);

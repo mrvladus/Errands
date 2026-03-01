@@ -47,11 +47,12 @@ static void errands_task_item_get_property(GObject *object, guint prop_id, GValu
     bool show_completed = errands_settings_get(SETTING_SHOW_COMPLETED).b;
     bool show_cancelled = errands_settings_get(SETTING_SHOW_CANCELLED).b;
     size_t total = self->data->children->len;
-    for (size_t i = 0; i < total; ++i) {
+    for (size_t i = 0; i < self->data->children->len; ++i) {
       TaskData *child_data = g_ptr_array_index(self->data->children, i);
-      if (errands_data_get_deleted(child_data->ical)) total--;
-      if (!show_completed && errands_data_is_completed(child_data->ical)) total--;
-      if (!show_cancelled && errands_data_get_cancelled(child_data->ical)) total--;
+      bool deleted = errands_data_get_deleted(child_data->ical);
+      bool completed = errands_data_is_completed(child_data->ical);
+      bool cancelled = errands_data_get_cancelled(child_data->ical);
+      if (deleted || (!show_completed && completed) || (!show_cancelled && cancelled)) total--;
     }
     g_value_set_boolean(value, !self->children_model || total == 0);
   } break;

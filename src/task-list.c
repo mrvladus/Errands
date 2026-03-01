@@ -367,14 +367,51 @@ static void on_action_rename_cb(GSimpleAction *action, GVariant *param, ErrandsT
   errands_rename_list_dialog_show(errands_sidebar_task_list_row_get(self->data));
 }
 
+static void __remove_deleted_tasks(ErrandsTaskList *self, GListStore *model) {
+  for_range(i, 0, g_list_model_get_n_items(G_LIST_MODEL(model))) {
+    g_autoptr(ErrandsTaskItem) child = g_list_model_get_item(G_LIST_MODEL(model), i);
+    __remove_deleted_tasks(self, G_LIST_STORE(errands_task_item_get_children_model(child)));
+    TaskData *data = errands_task_item_get_data(child);
+    if (errands_data_get_deleted(data->ical)) g_list_store_remove(model, i--);
+  }
+}
+
 static void on_action_delete_completed_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
   gtk_popover_popdown(self->menu_popover);
-  errands_task_list_delete_completed(self, self->data);
+  if (!self->data) return;
+  g_autoptr(GPtrArray) tasks = g_ptr_array_sized_new(self->data->children->len);
+  errands_list_data_get_flat_list(self->data, tasks);
+  bool deleted = false;
+  for_range(i, 0, tasks->len) {
+    TaskData *task = g_ptr_array_index(tasks, i);
+    if (errands_data_is_completed(task->ical) && !errands_data_get_deleted(task->ical)) {
+      errands_data_set_deleted(task->ical, true);
+      errands_sync_delete_task(task);
+      deleted = true;
+    }
+  }
+  if (deleted) errands_list_data_save(self->data);
+  __remove_deleted_tasks(self, self->task_model);
+  errands_task_list_filter(self, GTK_FILTER_CHANGE_DIFFERENT);
 }
 
 static void on_action_delete_cancelled_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
   gtk_popover_popdown(self->menu_popover);
-  errands_task_list_delete_cancelled(self, self->data);
+  if (!self->data) return;
+  g_autoptr(GPtrArray) tasks = g_ptr_array_sized_new(self->data->children->len);
+  errands_list_data_get_flat_list(self->data, tasks);
+  bool deleted = false;
+  for_range(i, 0, tasks->len) {
+    TaskData *task = g_ptr_array_index(tasks, i);
+    if (errands_data_get_cancelled(task->ical) && !errands_data_get_deleted(task->ical)) {
+      errands_data_set_deleted(task->ical, true);
+      errands_sync_delete_task(task);
+      deleted = true;
+    }
+  }
+  if (deleted) errands_list_data_save(self->data);
+  __remove_deleted_tasks(self, self->task_model);
+  errands_task_list_filter(self, GTK_FILTER_CHANGE_DIFFERENT);
 }
 
 static void on_action_delete_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
@@ -573,49 +610,6 @@ void errands_task_list_sort(ErrandsTaskList *self, GtkSorterChange change) {
 
 void errands_task_list_filter(ErrandsTaskList *self, GtkFilterChange change) {
   g_idle_add_once((GSourceOnceFunc)__filter_cb, __filter_cb_data_new(self, change));
-}
-
-static void __remove_deleted_tasks(ErrandsTaskList *self, GListStore *model) {
-  for_range(i, 0, g_list_model_get_n_items(G_LIST_MODEL(model))) {
-    g_autoptr(ErrandsTaskItem) child = g_list_model_get_item(G_LIST_MODEL(model), i);
-    __remove_deleted_tasks(self, G_LIST_STORE(errands_task_item_get_children_model(child)));
-    TaskData *data = errands_task_item_get_data(child);
-    if (errands_data_get_deleted(data->ical)) g_list_store_remove(model, i--);
-  }
-}
-
-void errands_task_list_delete_completed(ErrandsTaskList *self, ListData *list) {
-  if (!self->data) return;
-  g_autoptr(GPtrArray) tasks = g_ptr_array_sized_new(list->children->len);
-  errands_list_data_get_flat_list(list, tasks);
-  bool deleted = false;
-  for_range(i, 0, tasks->len) {
-    TaskData *task = g_ptr_array_index(tasks, i);
-    if (errands_data_is_completed(task->ical) && !errands_data_get_deleted(task->ical)) {
-      errands_data_set_deleted(task->ical, true);
-      errands_sync_delete_task(task);
-      deleted = true;
-    }
-  }
-  if (deleted) errands_list_data_save(list);
-  __remove_deleted_tasks(self, self->task_model);
-}
-
-void errands_task_list_delete_cancelled(ErrandsTaskList *self, ListData *list) {
-  if (!self->data) return;
-  g_autoptr(GPtrArray) tasks = g_ptr_array_sized_new(list->children->len);
-  errands_list_data_get_flat_list(list, tasks);
-  bool deleted = false;
-  for_range(i, 0, tasks->len) {
-    TaskData *task = g_ptr_array_index(tasks, i);
-    if (errands_data_get_cancelled(task->ical) && !errands_data_get_deleted(task->ical)) {
-      errands_data_set_deleted(task->ical, true);
-      errands_sync_delete_task(task);
-      deleted = true;
-    }
-  }
-  if (deleted) errands_list_data_save(list);
-  __remove_deleted_tasks(self, self->task_model);
 }
 
 // ---------- CALLBACKS ---------- //
