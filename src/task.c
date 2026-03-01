@@ -185,8 +185,8 @@ void errands_task_update_progress(ErrandsTask *self) {
     if (errands_data_is_completed(data->ical)) completed++;
     total++;
   }
-  gtk_widget_set_visible(self->subtitle, total > 0);
-  const char *subtitle = tmp_str_printf(_("Completed: %zu / %zu"), completed, total);
+  gtk_widget_set_visible(self->subtitle, total - completed > 0);
+  const char *subtitle = tmp_str_printf("%zu", total - completed);
   gtk_label_set_label(GTK_LABEL(self->subtitle), subtitle);
 }
 

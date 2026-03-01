@@ -77,19 +77,19 @@ template $ErrandsTask: Box {
         visible: bind title.visible bidirectional inverted;
         notify::editing => $on_title_edit_cb();
       }
+    }
 
+    Box {
       Label subtitle {
-        xalign: 0;
         visible: bind title.visible;
+        margin-end: 12;
 
         styles [
           "dimmed",
           "caption",
         ]
       }
-    }
 
-    Box {
       Revealer {
         transition-type: swing_left;
         transition-duration: 300;
