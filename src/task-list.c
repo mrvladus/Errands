@@ -1,6 +1,7 @@
 #include "task-list.h"
 #include "data.h"
 #include "delete-list-dialog.h"
+#include "glib-object.h"
 #include "gtk/gtk.h"
 #include "rename-list-dialog.h"
 #include "settings.h"
@@ -92,6 +93,15 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
 gboolean filter_func(GtkTreeListRow *row, ErrandsTaskList *self) {
   ErrandsTaskItem *item = ERRANDS_TASK_ITEM(gtk_tree_list_row_get_item(row));
   TaskData *data = errands_task_item_get_data(item);
+
+  g_object_notify(G_OBJECT(item), "children-model-is-empty");
+
+  bool show_completed = errands_settings_get(SETTING_SHOW_COMPLETED).b;
+  if (!show_completed && errands_data_is_completed(data->ical)) return false;
+
+  bool show_cancelled = errands_settings_get(SETTING_SHOW_CANCELLED).b;
+  if (!show_cancelled && errands_data_get_cancelled(data->ical)) return false;
+
   bool result = false;
 
   if (search_query && *search_query) {

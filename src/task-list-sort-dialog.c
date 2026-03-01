@@ -1,5 +1,3 @@
-#include "data.h"
-#include "gtk/gtk.h"
 #include "settings.h"
 #include "state.h"
 #include "task-list.h"
@@ -88,12 +86,15 @@ static void on_show_completed_toggle_cb(AdwSwitchRow *row) {
   if (state.main_window->task_list->sort_dialog->block_signals) return;
   bool show_completed = adw_switch_row_get_active(row);
   errands_settings_set(SETTING_SHOW_COMPLETED, &show_completed);
+  errands_task_list_filter(state.main_window->task_list, GTK_FILTER_CHANGE_DIFFERENT);
 }
 
 static void on_show_cancelled_toggle_cb(AdwSwitchRow *row) {
   if (state.main_window->task_list->sort_dialog->block_signals) return;
   bool show_cancelled = adw_switch_row_get_active(row);
   errands_settings_set(SETTING_SHOW_CANCELLED, &show_cancelled);
+  errands_task_list_filter(state.main_window->task_list,
+                           show_cancelled ? GTK_FILTER_CHANGE_LESS_STRICT : GTK_FILTER_CHANGE_MORE_STRICT);
 }
 
 static void set_sort_by(GtkCheckButton *btn, size_t sort_by) {
