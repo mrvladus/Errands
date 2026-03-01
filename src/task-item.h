@@ -12,5 +12,4 @@ TaskData *errands_task_item_get_data(ErrandsTaskItem *self);
 GListModel *errands_task_item_get_children_model(ErrandsTaskItem *self);
 ErrandsTaskItem *errands_task_item_get_parent(ErrandsTaskItem *self);
 void errands_task_item_set_parent(ErrandsTaskItem *self, ErrandsTaskItem *parent);
-bool errands_task_item_is_children_model_empty(ErrandsTaskItem *self);
 void errands_task_item_add_child(ErrandsTaskItem *self, TaskData *data);

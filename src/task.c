@@ -1,5 +1,7 @@
 #include "task.h"
 #include "data.h"
+#include "glib-object.h"
+#include "gtk/gtk.h"
 #include "sidebar-task-list-row.h"
 #include "sidebar.h"
 #include "state.h"
@@ -464,6 +466,7 @@ static void on_delete_action_cb(GSimpleAction *action, GVariant *param, ErrandsT
   else parent_model = state.main_window->task_list->task_model;
   guint pos;
   if (g_list_store_find(parent_model, self->item, &pos)) g_list_store_remove(parent_model, pos);
+  g_object_notify(G_OBJECT(parent), "children-model-is-empty");
 
   errands_sidebar_update_filter_rows();
   errands_sidebar_task_list_row_update(errands_sidebar_task_list_row_get(self->data->list));

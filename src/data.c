@@ -374,11 +374,8 @@ TaskData *errands_task_data_new(icalcomponent *ical, TaskData *parent, ListData 
   task->parent = parent;
   task->list = list;
   task->children = g_ptr_array_new_with_free_func((GDestroyNotify)errands_task_data_free);
-  if (errands_data_get_parent(ical) && parent) {
-    g_ptr_array_add(parent->children, task);
-  } else {
-    if (list) g_ptr_array_add(list->children, task);
-  }
+  if (parent) g_ptr_array_add(parent->children, task);
+  else if (list) g_ptr_array_add(list->children, task);
 
   return task;
 }

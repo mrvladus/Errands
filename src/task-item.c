@@ -1,9 +1,8 @@
 #include "task-item.h"
 #include "data.h"
-#include "glib.h"
+#include "glib-object.h"
 #include "settings.h"
 #include "task.h"
-#include <stddef.h>
 
 struct _ErrandsTaskItem {
   GObject parent_instance;
@@ -45,14 +44,14 @@ static void errands_task_item_get_property(GObject *object, guint prop_id, GValu
   case PROP_DATA: g_value_set_pointer(value, self->data); break;
   case PROP_CHILDREN_MODEL: g_value_set_object(value, self->children_model); break;
   case PROP_CHILDREN_MODEL_IS_EMPTY: {
-    size_t total = 0;
     bool show_completed = errands_settings_get(SETTING_SHOW_COMPLETED).b;
     bool show_cancelled = errands_settings_get(SETTING_SHOW_CANCELLED).b;
-    for (size_t i = 0; i < self->data->children->len; ++i) {
+    size_t total = self->data->children->len;
+    for (size_t i = 0; i < total; ++i) {
       TaskData *child_data = g_ptr_array_index(self->data->children, i);
-      if (!show_completed && errands_data_is_completed(child_data->ical)) continue;
-      if (!show_cancelled && errands_data_get_cancelled(child_data->ical)) continue;
-      total++;
+      if (errands_data_get_deleted(child_data->ical)) total--;
+      if (!show_completed && errands_data_is_completed(child_data->ical)) total--;
+      if (!show_cancelled && errands_data_get_cancelled(child_data->ical)) total--;
     }
     g_value_set_boolean(value, !self->children_model || total == 0);
   } break;
@@ -82,7 +81,7 @@ static void errands_task_item_class_init(ErrandsTaskItemClass *klass) {
       "children-model", "Children Model", "Model containing child tasks.", G_TYPE_LIST_MODEL, G_PARAM_READWRITE);
   obj_properties[PROP_CHILDREN_MODEL_IS_EMPTY] =
       g_param_spec_boolean("children-model-is-empty", "Children Model Is Empty", "Whether the task has child tasks.",
-                           FALSE, G_PARAM_READWRITE);
+                           true, G_PARAM_READWRITE);
   obj_properties[PROP_TASK_WIDGET] =
       g_param_spec_pointer("task-widget", "Task Widget", "Widget associated with the task item.", G_PARAM_READWRITE);
 
@@ -116,13 +115,6 @@ GListModel *errands_task_item_get_children_model(ErrandsTaskItem *self) {
 
 TaskData *errands_task_item_get_data(ErrandsTaskItem *self) { return self->data; }
 
-bool errands_task_item_is_children_model_empty(ErrandsTaskItem *self) {
-  GValue value = {0};
-  g_object_get_property(G_OBJECT(self), "children-model-is-empty", &value);
-
-  return g_value_get_boolean(&value);
-}
-
 ErrandsTaskItem *errands_task_item_get_parent(ErrandsTaskItem *self) { return self->parent; }
 
 void errands_task_item_set_parent(ErrandsTaskItem *self, ErrandsTaskItem *parent) { self->parent = parent; }
@@ -131,5 +123,5 @@ void errands_task_item_add_child(ErrandsTaskItem *self, TaskData *data) {
   if (!self || !data) return;
   g_autoptr(ErrandsTaskItem) item = errands_task_item_new(data, self);
   g_list_store_append(self->children_model, item);
-  g_object_set(self, "children-model-is-empty", false, NULL);
+  g_object_notify(G_OBJECT(self), "children-model-is-empty");
 }
