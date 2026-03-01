@@ -1,6 +1,5 @@
 #include "task.h"
 #include "data.h"
-#include "glib.h"
 #include "sidebar-task-list-row.h"
 #include "sidebar.h"
 #include "state.h"
@@ -407,6 +406,13 @@ static void on_complete_action_cb(GSimpleAction *action, GVariant *param, Errand
           errands_task_set_data(child_task, child_task->data);
           errands_task_update_progress(child_task);
         }
+      }
+      // Update parent
+      ErrandsTaskItem *parent_item = errands_task_item_get_parent(self->item);
+      if (parent_item) {
+        ErrandsTask *parent_task = NULL;
+        g_object_get(parent_item, "task-widget", &parent_task, NULL);
+        if (parent_task) errands_task_update_progress(parent_task);
       }
     }
   } else {
