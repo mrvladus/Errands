@@ -911,7 +911,7 @@ static inline char *caldav__extract_base_url(const char *url) {
 }
 
 static char *caldav__calendar_uid_from_href(const char *href) {
-  char *last_slash = strchr(href, '/');
+  char *last_slash = (char *)strchr(href, '/');
   bool ends_with_slash = false;
   while (last_slash) {
     char *next_slash = strchr(last_slash + 1, '/');

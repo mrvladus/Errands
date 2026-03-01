@@ -16,6 +16,7 @@
 #include "window.h"
 
 #include <glib/gi18n.h>
+#include <stddef.h>
 
 static const char *search_query = NULL;
 
@@ -382,17 +383,21 @@ static void on_action_delete_completed_cb(GSimpleAction *action, GVariant *param
   g_autoptr(GPtrArray) tasks = g_ptr_array_sized_new(self->data->children->len);
   errands_list_data_get_flat_list(self->data, tasks);
   bool deleted = false;
+  size_t deleted_n = 0;
   for_range(i, 0, tasks->len) {
     TaskData *task = g_ptr_array_index(tasks, i);
     if (errands_data_is_completed(task->ical) && !errands_data_get_deleted(task->ical)) {
       errands_data_set_deleted(task->ical, true);
       errands_sync_delete_task(task);
       deleted = true;
+      deleted_n++;
     }
   }
   if (deleted) errands_list_data_save(self->data);
   __remove_deleted_tasks(self, self->task_model);
   errands_task_list_filter(self, GTK_FILTER_CHANGE_DIFFERENT);
+  const char *msg = tmp_str_printf(_("Deleted %zu tasks"), deleted_n);
+  errands_window_add_toast(msg);
 }
 
 static void on_action_delete_cancelled_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
@@ -401,17 +406,21 @@ static void on_action_delete_cancelled_cb(GSimpleAction *action, GVariant *param
   g_autoptr(GPtrArray) tasks = g_ptr_array_sized_new(self->data->children->len);
   errands_list_data_get_flat_list(self->data, tasks);
   bool deleted = false;
+  size_t deleted_n = 0;
   for_range(i, 0, tasks->len) {
     TaskData *task = g_ptr_array_index(tasks, i);
     if (errands_data_get_cancelled(task->ical) && !errands_data_get_deleted(task->ical)) {
       errands_data_set_deleted(task->ical, true);
       errands_sync_delete_task(task);
       deleted = true;
+      deleted_n++;
     }
   }
   if (deleted) errands_list_data_save(self->data);
   __remove_deleted_tasks(self, self->task_model);
   errands_task_list_filter(self, GTK_FILTER_CHANGE_DIFFERENT);
+  const char *msg = tmp_str_printf(_("Deleted %zu tasks"), deleted_n);
+  errands_window_add_toast(msg);
 }
 
 static void on_action_delete_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
