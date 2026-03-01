@@ -20,6 +20,7 @@ FLATPAK_REPO_DIR  = _flatpak-repo
 DEVEL ?= FALSE
 ifeq ($(DEVEL),TRUE)
 	APP_ID = io.github.mrvladus.List.Devel
+	ALL_CFLAGS = -Wall -g
 else
 	APP_ID = io.github.mrvladus.List
 	ALL_CFLAGS = -O3 -flto
@@ -62,7 +63,7 @@ LDFLAGS     ?=
 ALL_LDFLAGS += $(LDFLAGS) `pkg-config --libs $(PKG_CONFIG_LIBS)`
 CFLAGS      ?=
 ALL_CFLAGS  += $(CFLAGS) \
-			-Wall -g -std=c11 -D_GNU_SOURCE \
+			-std=c11 -D_GNU_SOURCE \
 			`pkg-config --cflags $(PKG_CONFIG_LIBS)` \
 			-DVERSION='"$(VERSION)"' \
 			-DVERSION_COMMIT='"$(shell git rev-parse --short HEAD)"' \
@@ -85,7 +86,7 @@ BLPS   = $(wildcard $(SRC_DIR)/*.blp)
 STYLES = $(wildcard $(DATA_DIR)/styles/*.css)
 ICONS  = $(wildcard $(DATA_DIR)/icons/*.svg)
 
-GRESOURCE_XML = $(DATA_DIR)/$(NAME).gresource.xml
+GRESOURCE_XML = $(BUILD_DIR)/$(NAME).gresource.xml
 RESOURCES_C   = $(BUILD_DIR)/resources.c
 RESOURCES_O   = $(BUILD_DIR)/resources.o
 
