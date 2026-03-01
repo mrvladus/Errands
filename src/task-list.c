@@ -1,13 +1,18 @@
 #include "task-list.h"
 #include "data.h"
+#include "delete-list-dialog.h"
 #include "gtk/gtk.h"
+#include "rename-list-dialog.h"
 #include "settings.h"
+#include "sidebar-task-list-row.h"
 #include "sidebar.h"
+#include "state.h"
 #include "sync.h"
 #include "task-item.h"
 #include "task-menu.h"
 #include "task.h"
 #include "utils.h"
+#include "window.h"
 
 #include <glib/gi18n.h>
 
@@ -28,6 +33,12 @@ static void on_listview_activate_cb(GtkListView *list_view, guint position);
 
 static void on_focus_entry_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
 static void on_entry_task_menu_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
+static void on_action_export_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
+static void on_action_print_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
+static void on_action_rename_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
+static void on_action_delete_completed_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
+static void on_action_delete_cancelled_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
+static void on_action_delete_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
 
 static bool __task_today_parent_match_func(TaskData *data);
 static bool __task_today_child_match_func(TaskData *data);
@@ -50,8 +61,11 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
   g_type_ensure(ERRANDS_TYPE_TASK_MENU);
 
   G_OBJECT_CLASS(class)->dispose = errands_task_list_dispose;
+
   gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), "/io/github/mrvladus/Errands/ui/task-list.ui");
+
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, title);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, menu_popover);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, search_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, search_bar);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, search_entry);
@@ -63,6 +77,7 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, motion_ctrl);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, scrl);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, list_view);
+
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_list_sort_dialog_show);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_entry_activated_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_entry_text_changed_cb);
@@ -158,6 +173,12 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   GSimpleActionGroup *ag = errands_add_action_group(self, "task-list");
   errands_add_action(ag, "focus-entry", on_focus_entry_action_cb, self, NULL);
   errands_add_action(ag, "show-entry-task-menu", on_entry_task_menu_action_cb, self, NULL);
+  errands_add_action(ag, "rename", on_action_rename_cb, self, NULL);
+  errands_add_action(ag, "print", on_action_print_cb, self, NULL);
+  errands_add_action(ag, "export", on_action_export_cb, self, NULL);
+  errands_add_action(ag, "delete-completed", on_action_delete_completed_cb, self, NULL);
+  errands_add_action(ag, "delete-cancelled", on_action_delete_cancelled_cb, self, NULL);
+  errands_add_action(ag, "delete", on_action_delete_cb, self, NULL);
 
   gtk_search_bar_connect_entry(GTK_SEARCH_BAR(self->search_bar), GTK_EDITABLE(self->search_entry));
   // Create entry task
@@ -304,6 +325,134 @@ static void on_entry_task_menu_action_cb(GSimpleAction *action, GVariant *param,
   bool res = gtk_widget_compute_bounds(GTK_WIDGET(self->entry_menu_btn), GTK_WIDGET(self), &rect);
   UNUSED(res);
   errands_task_menu_show(entry_task, rect.origin.x, rect.origin.y - rect.size.height, ERRANDS_TASK_MENU_MODE_ENTRY);
+}
+
+static void on_action_export_finish_cb(GObject *obj, GAsyncResult *res, ListData *data) {
+  g_autoptr(GFile) f = gtk_file_dialog_save_finish(GTK_FILE_DIALOG(obj), res, NULL);
+  if (!f) return;
+  g_autofree char *path = g_file_get_path(f);
+  FILE *file = fopen(path, "w");
+  if (!file) {
+    errands_window_add_toast(_("Export failed"));
+    return;
+  }
+  autofree char *ical = icalcomponent_as_ical_string(data->ical);
+  fprintf(file, "%s", ical);
+  fclose(file);
+  errands_window_add_toast(_("Exported"));
+  LOG("Export task list %s", data->uid);
+}
+
+static void on_action_export_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
+  gtk_popover_popdown(self->menu_popover);
+  g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
+  const char *filename = tmp_str_printf("%s.ics", self->data->uid);
+  g_object_set(dialog, "initial-name", filename, NULL);
+  gtk_file_dialog_save(dialog, GTK_WINDOW(state.main_window), NULL, (GAsyncReadyCallback)on_action_export_finish_cb,
+                       self->data);
+}
+
+static void on_action_rename_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
+  gtk_popover_popdown(self->menu_popover);
+  errands_rename_list_dialog_show(errands_sidebar_task_list_row_get(self->data));
+}
+
+static void on_action_delete_completed_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
+  gtk_popover_popdown(self->menu_popover);
+  errands_task_list_delete_completed(self, self->data);
+}
+
+static void on_action_delete_cancelled_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
+  gtk_popover_popdown(self->menu_popover);
+  errands_task_list_delete_cancelled(self, self->data);
+}
+
+static void on_action_delete_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
+  gtk_popover_popdown(self->menu_popover);
+  errands_delete_list_dialog_show(errands_sidebar_task_list_row_get(self->data));
+}
+
+// - PRINTING - //
+
+#define FONT_SIZE      12
+#define LINE_HEIGHT    20
+#define LINES_PER_PAGE 40
+
+// Function to calculate number of pages and handle pagination
+static void begin_print(GtkPrintOperation *operation, GtkPrintContext *context, const char *text) {
+  size_t num_lines = 0;
+  char c;
+  size_t len = 0;
+  for (size_t i = 0; i < strlen(text); i++) {
+    c = text[i];
+    if (c == '\n') {
+      num_lines++;
+      len = 0;
+      continue;
+    }
+    if (len > 73 && c != '\n') {
+      num_lines++;
+      len = 0;
+    }
+    len++;
+  }
+  const size_t total_pages = (num_lines + LINES_PER_PAGE - 1) / LINES_PER_PAGE;
+  gtk_print_operation_set_n_pages(operation, total_pages);
+}
+
+// Function to draw the text, handling LINES_PER_PAGE
+static void print_draw_page(GtkPrintOperation *operation, GtkPrintContext *context, int page_nr, gpointer user_data) {
+  cairo_t *cr = gtk_print_context_get_cairo_context(context);
+  const char *text = (const char *)user_data;
+  // Set the font to monospace and size to 12
+  cairo_select_font_face(cr, "Monospace", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+  cairo_set_font_size(cr, FONT_SIZE);
+  // Split the text into lines
+  g_autofree gchar *text_copy = g_strdup(text); // Duplicate text to safely tokenize
+  char *line = strtok(text_copy, "\n");
+  // Calculate the start and end lines for the current page
+  size_t start_line = page_nr * LINES_PER_PAGE;
+  size_t end_line = start_line + LINES_PER_PAGE;
+
+  const uint8_t x = 10; // Starting x position
+  double y = 10;        // Starting y position for the first line
+
+  // Iterate over each line and draw it if it belongs to the current page
+  size_t current_line = 0;
+  while (line) {
+    if (current_line >= start_line && current_line < end_line) {
+      cairo_move_to(cr, x, y);   // Move to the next line's position
+      cairo_show_text(cr, line); // Draw the current line
+      y += LINE_HEIGHT;          // Move down for the next line (LINE_HEIGHT between
+                                 // lines)
+    }
+    current_line++;
+    line = strtok(NULL, "\n"); // Get the next line
+  }
+  // Ensure everything is drawn
+  cairo_stroke(cr);
+}
+
+void start_print(const char *str) {
+  // Create a new print operation
+  g_autoptr(GtkPrintOperation) print = gtk_print_operation_new();
+  // Connect signal to draw on page
+  g_signal_connect(print, "draw-page", G_CALLBACK(print_draw_page), (gpointer)str);
+  g_signal_connect(print, "begin-print", G_CALLBACK(begin_print), (gpointer)str);
+  // Set default print settings if needed
+  GtkPrintOperationResult result =
+      gtk_print_operation_run(print, GTK_PRINT_OPERATION_ACTION_PRINT_DIALOG, GTK_WINDOW(state.main_window), NULL);
+  // Check the result (if user cancels or accepts the dialog)
+  if (result == GTK_PRINT_OPERATION_RESULT_ERROR) g_print("An error occurred during the print operation.\n");
+  else if (result == GTK_PRINT_OPERATION_RESULT_APPLY) g_print("Print operation successful.\n");
+}
+
+static void on_action_print_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
+  gtk_popover_popdown(self->menu_popover);
+  LOG("Start printing of the list '%s'", self->data->uid);
+  TODO("PRINT");
+  // g_autofree gchar *str = list_data_print(row->data);
+  // start_print(str);
 }
 
 // ---------- PUBLIC FUNCTIONS ---------- //

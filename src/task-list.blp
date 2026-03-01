@@ -24,6 +24,163 @@ template $ErrandsTaskList: Adw.Bin {
       }
 
       [end]
+      MenuButton {
+        icon-name: "errands-more-symbolic";
+        valign: center;
+
+        popover: Popover menu_popover {
+          has-arrow: false;
+
+          styles [
+            "menu",
+          ]
+
+          Box {
+            orientation: vertical;
+            margin-start: 6;
+            margin-end: 6;
+            margin-top: 6;
+            margin-bottom: 6;
+
+            Button {
+              action-name: "task-list.rename";
+
+              styles [
+                "flat",
+                "body",
+              ]
+
+              Box {
+                spacing: 12;
+
+                Image {
+                  icon-name: "errands-edit-symbolic";
+                }
+
+                Label {
+                  label: _("Rename");
+                }
+              }
+            }
+
+            Separator {}
+
+            Button {
+              action-name: "task-list.export";
+
+              styles [
+                "flat",
+                "body",
+              ]
+
+              Box {
+                spacing: 12;
+
+                Image {
+                  icon-name: "errands-export-symbolic";
+                }
+
+                Label {
+                  label: _("Export");
+                }
+              }
+            }
+
+            Button {
+              action-name: "task-list.print";
+
+              styles [
+                "flat",
+                "body",
+              ]
+
+              Box {
+                spacing: 12;
+
+                Image {
+                  icon-name: "errands-print-symbolic";
+                }
+
+                Label {
+                  label: _("Print");
+                }
+              }
+            }
+
+            Separator {}
+
+            Button {
+              action-name: "task-list.delete-completed";
+
+              styles [
+                "flat",
+                "body",
+                "warning",
+              ]
+
+              Box {
+                spacing: 12;
+
+                Image {
+                  icon-name: "errands-select-symbolic";
+                }
+
+                Label {
+                  label: _("Delete Completed");
+                }
+              }
+            }
+
+            Button {
+              action-name: "task-list.delete-cancelled";
+
+              styles [
+                "flat",
+                "body",
+                "warning",
+              ]
+
+              Box {
+                spacing: 12;
+
+                Image {
+                  icon-name: "errands-cancel-symbolic";
+                }
+
+                Label {
+                  label: _("Delete Cancelled");
+                }
+              }
+            }
+
+            Separator {}
+
+            Button {
+              action-name: "task-list.delete";
+
+              styles [
+                "flat",
+                "body",
+                "error",
+              ]
+
+              Box {
+                spacing: 12;
+
+                Image {
+                  icon-name: "errands-trash-symbolic";
+                }
+
+                Label {
+                  label: _("Delete List");
+                }
+              }
+            }
+          }
+        };
+      }
+
+      [end]
       ToggleButton search_btn {
         icon-name: "errands-search-symbolic";
         tooltip-text: _("Search (Ctrl+F)");

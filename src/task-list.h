@@ -1,7 +1,6 @@
 #pragma once
 
 #include "data.h"
-#include "gio/gio.h"
 #include "gtk/gtk.h"
 #include "task-menu.h"
 
@@ -44,6 +43,7 @@ struct _ErrandsTaskList {
 
   GtkWidget *title;
   GtkWidget *search_btn;
+  GtkPopover *menu_popover;
   GtkWidget *search_bar;
   GtkWidget *search_entry;
   GtkWidget *entry_box;

@@ -13,7 +13,6 @@ struct _ErrandsSidebarTaskListRow {
   GtkWidget *color_btn;
   GtkWidget *counter;
   GtkWidget *label;
-  GtkPopover *popover;
 
   GtkDropControllerMotion *drop_motion_ctrl;
 

@@ -1,6 +1,4 @@
 #include "data.h"
-#include "delete-list-dialog.h"
-#include "rename-list-dialog.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "state.h"
@@ -15,19 +13,10 @@
 
 #include <glib/gi18n.h>
 
-static void on_action_export(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row);
-static void on_action_print(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row);
-static void on_action_rename(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row);
-static void on_action_delete_completed(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row);
-static void on_action_delete_cancelled(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row);
-static void on_action_delete(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row);
-
 static void on_color_changed(GtkColorDialogButton *btn, GParamSpec *pspec, ListData *data);
 static void on_drop_motion_ctrl_enter_cb(ErrandsSidebarTaskListRow *self);
 static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x, double y,
                            ErrandsSidebarTaskListRow *row);
-// static GdkDragAction on_hover_begin(GtkDropTarget *target, gdouble x, gdouble y,
-//                                     ErrandsSidebarTaskListRow *row);
 
 // ---------- WIDGET TEMPLATE ---------- //
 
@@ -47,7 +36,6 @@ static void errands_sidebar_task_list_row_class_init(ErrandsSidebarTaskListRowCl
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsSidebarTaskListRow, color_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsSidebarTaskListRow, counter);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsSidebarTaskListRow, label);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsSidebarTaskListRow, popover);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsSidebarTaskListRow, drop_motion_ctrl);
 
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_drop_motion_ctrl_enter_cb);
@@ -56,14 +44,6 @@ static void errands_sidebar_task_list_row_class_init(ErrandsSidebarTaskListRowCl
 
 static void errands_sidebar_task_list_row_init(ErrandsSidebarTaskListRow *self) {
   gtk_widget_init_template(GTK_WIDGET(self));
-  // Actions
-  GSimpleActionGroup *ag = errands_add_action_group(self, "task-list-row");
-  errands_add_action(ag, "rename", on_action_rename, self, NULL);
-  errands_add_action(ag, "print", on_action_print, self, NULL);
-  errands_add_action(ag, "export", on_action_export, self, NULL);
-  errands_add_action(ag, "delete-completed", on_action_delete_completed, self, NULL);
-  errands_add_action(ag, "delete-cancelled", on_action_delete_cancelled, self, NULL);
-  errands_add_action(ag, "delete", on_action_delete, self, NULL);
 }
 
 ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_new(ListData *data) {
@@ -130,51 +110,6 @@ static void on_color_changed(GtkColorDialogButton *btn, GParamSpec *pspec, ListD
   errands_sync_update_list(data);
 }
 
-static void on_action_export_finish_cb(GObject *obj, GAsyncResult *res, ListData *data) {
-  g_autoptr(GFile) f = gtk_file_dialog_save_finish(GTK_FILE_DIALOG(obj), res, NULL);
-  if (!f) return;
-  g_autofree char *path = g_file_get_path(f);
-  FILE *file = fopen(path, "w");
-  if (!file) {
-    errands_window_add_toast(_("Export failed"));
-    return;
-  }
-  autofree char *ical = icalcomponent_as_ical_string(data->ical);
-  fprintf(file, "%s", ical);
-  fclose(file);
-  errands_window_add_toast(_("Exported"));
-  LOG("Export task list %s", data->uid);
-}
-
-static void on_action_export(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {
-  gtk_popover_popdown(row->popover);
-  g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
-  const char *filename = tmp_str_printf("%s.ics", row->data->uid);
-  g_object_set(dialog, "initial-name", filename, NULL);
-  gtk_file_dialog_save(dialog, GTK_WINDOW(state.main_window), NULL, (GAsyncReadyCallback)on_action_export_finish_cb,
-                       row->data);
-}
-
-static void on_action_rename(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {
-  gtk_popover_popdown(row->popover);
-  errands_rename_list_dialog_show(row);
-}
-
-static void on_action_delete_completed(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {
-  gtk_popover_popdown(row->popover);
-  errands_task_list_delete_completed(state.main_window->task_list, row->data);
-}
-
-static void on_action_delete_cancelled(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {
-  gtk_popover_popdown(row->popover);
-  errands_task_list_delete_cancelled(state.main_window->task_list, row->data);
-}
-
-static void on_action_delete(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {
-  gtk_popover_popdown(row->popover);
-  errands_delete_list_dialog_show(row);
-}
-
 // --- DND --- //
 
 static guint on_drop_motion_ctrl_enter_timeout_cb(ErrandsSidebarTaskListRow *self) {
@@ -239,87 +174,4 @@ static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x,
   errands_sidebar_task_list_row_update(self);
 
   return true;
-}
-
-// - PRINTING - //
-
-#define FONT_SIZE      12
-#define LINE_HEIGHT    20
-#define LINES_PER_PAGE 40
-
-// Function to calculate number of pages and handle pagination
-static void begin_print(GtkPrintOperation *operation, GtkPrintContext *context, const char *text) {
-  size_t num_lines = 0;
-  char c;
-  size_t len = 0;
-  for (size_t i = 0; i < strlen(text); i++) {
-    c = text[i];
-    if (c == '\n') {
-      num_lines++;
-      len = 0;
-      continue;
-    }
-    if (len > 73 && c != '\n') {
-      num_lines++;
-      len = 0;
-    }
-    len++;
-  }
-  const size_t total_pages = (num_lines + LINES_PER_PAGE - 1) / LINES_PER_PAGE;
-  gtk_print_operation_set_n_pages(operation, total_pages);
-}
-
-// Function to draw the text, handling LINES_PER_PAGE
-static void print_draw_page(GtkPrintOperation *operation, GtkPrintContext *context, int page_nr, gpointer user_data) {
-  cairo_t *cr = gtk_print_context_get_cairo_context(context);
-  const char *text = (const char *)user_data;
-  // Set the font to monospace and size to 12
-  cairo_select_font_face(cr, "Monospace", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
-  cairo_set_font_size(cr, FONT_SIZE);
-  // Split the text into lines
-  g_autofree gchar *text_copy = g_strdup(text); // Duplicate text to safely tokenize
-  char *line = strtok(text_copy, "\n");
-  // Calculate the start and end lines for the current page
-  size_t start_line = page_nr * LINES_PER_PAGE;
-  size_t end_line = start_line + LINES_PER_PAGE;
-
-  const uint8_t x = 10; // Starting x position
-  double y = 10;        // Starting y position for the first line
-
-  // Iterate over each line and draw it if it belongs to the current page
-  size_t current_line = 0;
-  while (line) {
-    if (current_line >= start_line && current_line < end_line) {
-      cairo_move_to(cr, x, y);   // Move to the next line's position
-      cairo_show_text(cr, line); // Draw the current line
-      y += LINE_HEIGHT;          // Move down for the next line (LINE_HEIGHT between
-                                 // lines)
-    }
-    current_line++;
-    line = strtok(NULL, "\n"); // Get the next line
-  }
-  // Ensure everything is drawn
-  cairo_stroke(cr);
-}
-
-void start_print(const char *str) {
-  // Create a new print operation
-  g_autoptr(GtkPrintOperation) print = gtk_print_operation_new();
-  // Connect signal to draw on page
-  g_signal_connect(print, "draw-page", G_CALLBACK(print_draw_page), (gpointer)str);
-  g_signal_connect(print, "begin-print", G_CALLBACK(begin_print), (gpointer)str);
-  // Set default print settings if needed
-  GtkPrintOperationResult result =
-      gtk_print_operation_run(print, GTK_PRINT_OPERATION_ACTION_PRINT_DIALOG, GTK_WINDOW(state.main_window), NULL);
-  // Check the result (if user cancels or accepts the dialog)
-  if (result == GTK_PRINT_OPERATION_RESULT_ERROR) g_print("An error occurred during the print operation.\n");
-  else if (result == GTK_PRINT_OPERATION_RESULT_APPLY) g_print("Print operation successful.\n");
-}
-
-static void on_action_print(GSimpleAction *action, GVariant *param, ErrandsSidebarTaskListRow *row) {
-  gtk_popover_popdown(row->popover);
-  LOG("Start printing of the list '%s'", row->data->uid);
-  TODO("PRINT");
-  // g_autofree gchar *str = list_data_print(row->data);
-  // start_print(str);
 }
