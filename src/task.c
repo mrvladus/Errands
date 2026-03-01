@@ -16,6 +16,7 @@
 #include "vendor/toolbox.h"
 
 #include <glib/gi18n.h>
+#include <stddef.h>
 
 static GtkWidget *errands_task_tag_new(ErrandsTask *self, const char *tag);
 
@@ -187,8 +188,8 @@ void errands_task_update_progress(ErrandsTask *self) {
     if (errands_data_is_completed(data->ical)) completed++;
     total++;
   }
-  gtk_widget_set_visible(self->subtitle, total - completed > 0);
-  const char *subtitle = tmp_str_printf("%zu", total - completed);
+  total -= completed;
+  const char *subtitle = total > 0 ? tmp_str_printf("%zu", total) : "";
   gtk_label_set_label(GTK_LABEL(self->subtitle), subtitle);
 }
 
