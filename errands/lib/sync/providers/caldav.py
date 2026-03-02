@@ -122,6 +122,18 @@ class SyncProviderCalDAV:
                 task: TaskData = TaskData.from_ical(todo.data, calendar.id)
                 task.text = str(todo.icalendar_component.get("summary", ""))
                 task.notes = str(todo.icalendar_component.get("description", ""))
+                rrule = todo.icalendar_component.get("rrule")
+                if rrule:
+                    task.rrule = rrule.to_ical().decode("utf-8")
+                # Read first VALARM trigger as reminder
+                for sub in todo.icalendar_component.subcomponents:
+                    if sub.name == "VALARM":
+                        trigger = sub.get("trigger")
+                        if trigger:
+                            from icalendar import vDuration
+
+                            task.reminder = vDuration(trigger.dt).to_ical().decode("utf-8")
+                        break
                 tasks.append(task)
             return tasks
         except BaseException as e:
@@ -436,6 +448,27 @@ class SyncProviderCalDAV:
                 task.toolbar_shown
             )
             todo.icalendar_component["x-errands-expanded"] = int(task.expanded)
+            if task.rrule:
+                from icalendar import vRecur
+
+                todo.icalendar_component["rrule"] = vRecur.from_ical(task.rrule)
+            else:
+                try:
+                    del todo.icalendar_component["rrule"]
+                except (KeyError, AttributeError):
+                    pass
+            # Update VALARM for reminder
+            todo.icalendar_component.subcomponents = [
+                s for s in todo.icalendar_component.subcomponents if s.name != "VALARM"
+            ]
+            if task.reminder:
+                from icalendar import Alarm, vDuration
+
+                alarm = Alarm()
+                alarm.add("action", "DISPLAY")
+                alarm.add("description", task.text)
+                alarm.add("trigger", vDuration.from_ical(task.reminder))
+                todo.icalendar_component.add_component(alarm)
             todo.save()
             todo.uncomplete()
             if task.completed:
@@ -472,6 +505,20 @@ class SyncProviderCalDAV:
                     "x-errands-toolbar-shown": int(task.toolbar_shown),
                 }
             )
+            if task.rrule:
+                from icalendar import vRecur
+
+                new_todo.icalendar_component["rrule"] = vRecur.from_ical(task.rrule)
+            if task.reminder:
+                from icalendar import Alarm, vDuration
+
+                alarm = Alarm()
+                alarm.add("action", "DISPLAY")
+                alarm.add("description", task.text)
+                alarm.add("trigger", vDuration.from_ical(task.reminder))
+                new_todo.icalendar_component.add_component(alarm)
+            if task.rrule or task.reminder:
+                new_todo.save()
             if task.completed:
                 new_todo.complete()
             UserData.update_props(calendar.id, task.uid, ["synced"], [True])

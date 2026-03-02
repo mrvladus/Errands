@@ -548,9 +548,26 @@ class Task(Gtk.Revealer):
 
         # Update subtitle
         n_total, n_completed = self.get_status()
-        self.title_row.set_subtitle(
+        subtitle = (
             _("Completed:") + f" {n_completed} / {n_total}" if n_total > 0 else ""
         )
+        if self.task_data.rrule:
+            from errands.lib.recurrence import get_human_recurrence
+
+            recurrence_label = get_human_recurrence(self.task_data.rrule)
+            if recurrence_label:
+                subtitle = (
+                    f"{subtitle} | {recurrence_label}" if subtitle else recurrence_label
+                )
+        if self.task_data.reminder:
+            from errands.lib.reminder import get_human_reminder
+
+            reminder_label = get_human_reminder(self.task_data.reminder)
+            if reminder_label:
+                subtitle = (
+                    f"{subtitle} | {reminder_label}" if subtitle else reminder_label
+                )
+        self.title_row.set_subtitle(subtitle)
 
         # Update toolbar button
         self.toolbar_toggle_btn.set_active(self.task_data.toolbar_shown)
@@ -684,6 +701,47 @@ class Task(Gtk.Revealer):
         self.add_rm_crossline(btn.get_active())
         if self.block_signals:
             return
+
+        # Handle recurring task: advance due date instead of completing
+        if (
+            btn.get_active()
+            and self.task_data.rrule
+            and self.task_data.due_date
+        ):
+            from errands.lib.recurrence import get_next_occurrence
+
+            next_due = get_next_occurrence(
+                self.task_data.rrule, self.task_data.due_date
+            )
+            if next_due:
+                Log.debug(
+                    f"Task '{self.uid}': Recurring — advancing due_date to '{next_due}'"
+                )
+                props = ["due_date", "completed", "notified", "reminder_notified", "synced"]
+                values = [next_due, False, False, False, False]
+                if self.task_data.start_date:
+                    next_start = get_next_occurrence(
+                        self.task_data.rrule, self.task_data.start_date
+                    )
+                    if next_start:
+                        props.append("start_date")
+                        values.append(next_start)
+                self.update_props(props, values)
+
+                # Reset checkbox without triggering signals
+                self.block_signals = True
+                btn.set_active(False)
+                self.block_signals = False
+                self.add_rm_crossline(False)
+
+                self.update_title()
+                self.update_toolbar()
+                if isinstance(self.parent, Task):
+                    self.parent.update_progress_bar()
+                self.task_list.update_title()
+                State.today_page.update_ui()
+                Sync.sync()
+                return
 
         Log.debug(f"Task '{self.uid}': Set completed to '{btn.get_active()}'")
 
