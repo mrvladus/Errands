@@ -1,22 +1,6 @@
 using Gtk 4.0;
 using Adw 1;
 
-menu add_menu {
-  item (_("Import \".ics\""), "sidebar.import")
-}
-
-menu main_menu {
-  section {
-    item (_("Sync"), "sidebar.sync")
-  }
-
-  section {
-    item (_("Preferences"), "sidebar.preferences")
-    item (_("Shortcuts"), "app.shortcuts")
-    item (_("About Errands"), "sidebar.about")
-  }
-}
-
 template $ErrandsSidebar: Adw.Bin {
   Adw.ToolbarView {
     width-request: 200;
@@ -31,7 +15,11 @@ template $ErrandsSidebar: Adw.Bin {
       Adw.SplitButton add_btn {
         icon-name: "errands-add-symbolic";
         tooltip-text: _("Create Task List (Shift+Ctrl+L)");
-        menu-model: add_menu;
+
+        menu-model: menu {
+          item (_("Import \".ics\""), "sidebar.import")
+        };
+
         action-name: "sidebar.new_list";
 
         ShortcutController {
@@ -52,7 +40,19 @@ template $ErrandsSidebar: Adw.Bin {
       [end]
       MenuButton {
         icon-name: "errands-menu-symbolic";
-        menu-model: main_menu;
+
+        menu-model: menu {
+          section {
+            item (_("Sync"), "sidebar.sync")
+          }
+
+          section {
+            item (_("Preferences"), "sidebar.preferences")
+            item (_("Shortcuts"), "app.shortcuts")
+            item (_("About Errands"), "sidebar.about")
+          }
+        };
+
         primary: true;
         tooltip-text: _("Main Menu (F10)");
 
@@ -144,10 +144,16 @@ template $ErrandsSidebar: Adw.Bin {
           }
         }
 
-        Separator {
-          orientation: vertical;
+        Label {
+          label: _("Task Lists");
+          halign: start;
           margin-start: 8;
-          margin-end: 8;
+          visible: bind task_lists_box.visible;
+
+          styles [
+            "caption-heading",
+            "dimmed",
+          ]
         }
 
         ListBox task_lists_box {
