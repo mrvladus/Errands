@@ -625,7 +625,7 @@ void errands_task_list_show_all_tasks(ErrandsTaskList *self) {
   self->page = ERRANDS_TASK_LIST_PAGE_ALL;
   gtk_widget_set_visible(self->entry_box, false);
   errands_task_list_update_title(self);
-  g_idle_add_once((GSourceOnceFunc)__filter_cb, __filter_cb_data_new(self, GTK_FILTER_CHANGE_LESS_STRICT));
+  g_idle_add_once((GSourceOnceFunc)__filter_cb, __filter_cb_data_new(self, GTK_FILTER_CHANGE_DIFFERENT));
 }
 
 void errands_task_list_show_task_list(ErrandsTaskList *self, ListData *data) {
