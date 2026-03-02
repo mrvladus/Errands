@@ -101,7 +101,7 @@ gboolean filter_func(GtkTreeListRow *row, ErrandsTaskList *self) {
   if (expander && GTK_IS_WIDGET(expander)) {
     gtk_widget_set_sensitive(expander, true);
     g_object_get(item, "list-item", &list_item, NULL);
-    if (list_item) gtk_list_item_set_activatable(list_item, true);
+    if (list_item && GTK_IS_LIST_ITEM(list_item)) gtk_list_item_set_activatable(list_item, true);
   }
 
   g_object_notify(G_OBJECT(item), "children-model-is-empty");
@@ -130,7 +130,7 @@ gboolean filter_func(GtkTreeListRow *row, ErrandsTaskList *self) {
         result = true;
         if (expander && GTK_IS_WIDGET(expander)) {
           gtk_widget_set_sensitive(expander, false);
-          if (list_item) gtk_list_item_set_activatable(list_item, false);
+          if (list_item && GTK_IS_LIST_ITEM(list_item)) gtk_list_item_set_activatable(list_item, false);
         }
         break;
       }
