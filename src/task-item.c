@@ -1,6 +1,5 @@
 #include "task-item.h"
 #include "data.h"
-#include "glib-object.h"
 #include "settings.h"
 #include "task.h"
 
@@ -12,6 +11,8 @@ struct _ErrandsTaskItem {
   GListStore *children_model;
 
   ErrandsTask *task_widget;
+  GtkTreeExpander *expander_widget;
+  GtkListItem *list_item;
 };
 
 G_DEFINE_TYPE(ErrandsTaskItem, errands_task_item, G_TYPE_OBJECT)
@@ -22,6 +23,8 @@ enum {
   PROP_CHILDREN_MODEL,
   PROP_CHILDREN_MODEL_IS_EMPTY,
   PROP_TASK_WIDGET,
+  PROP_EXPANDER_WIDGET,
+  PROP_LIST_ITEM,
   N_PROPERTIES,
 };
 
@@ -34,6 +37,8 @@ static void errands_task_item_set_property(GObject *object, guint prop_id, const
   case PROP_CHILDREN_MODEL: self->children_model = g_value_get_object(value); break;
   case PROP_CHILDREN_MODEL_IS_EMPTY: g_object_notify_by_pspec(object, pspec); break;
   case PROP_TASK_WIDGET: self->task_widget = g_value_get_pointer(value); break;
+  case PROP_EXPANDER_WIDGET: self->expander_widget = g_value_get_pointer(value); break;
+  case PROP_LIST_ITEM: self->list_item = g_value_get_pointer(value); break;
   default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
   }
 }
@@ -57,6 +62,8 @@ static void errands_task_item_get_property(GObject *object, guint prop_id, GValu
     g_value_set_boolean(value, !self->children_model || total == 0);
   } break;
   case PROP_TASK_WIDGET: g_value_set_pointer(value, self->task_widget); break;
+  case PROP_EXPANDER_WIDGET: g_value_set_pointer(value, self->expander_widget); break;
+  case PROP_LIST_ITEM: g_value_set_pointer(value, self->list_item); break;
   default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
   }
 }
@@ -85,6 +92,10 @@ static void errands_task_item_class_init(ErrandsTaskItemClass *klass) {
                            true, G_PARAM_READWRITE);
   obj_properties[PROP_TASK_WIDGET] =
       g_param_spec_pointer("task-widget", "Task Widget", "Widget associated with the task item.", G_PARAM_READWRITE);
+  obj_properties[PROP_EXPANDER_WIDGET] = g_param_spec_pointer(
+      "expander-widget", "Expander Widget", "Widget associated with the task item.", G_PARAM_READWRITE);
+  obj_properties[PROP_LIST_ITEM] =
+      g_param_spec_pointer("list-item", "List Item", "List item associated with the task item.", G_PARAM_READWRITE);
 
   g_object_class_install_properties(object_class, N_PROPERTIES, obj_properties);
 }

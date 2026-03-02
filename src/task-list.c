@@ -3,6 +3,7 @@
 #include "delete-list-dialog.h"
 #include "glib-object.h"
 #include "gtk/gtk.h"
+#include "gtk/gtkshortcut.h"
 #include "rename-list-dialog.h"
 #include "settings.h"
 #include "sidebar-task-list-row.h"
@@ -16,7 +17,7 @@
 #include "window.h"
 
 #include <glib/gi18n.h>
-#include <stddef.h>
+#include <stdbool.h>
 
 static const char *search_query = NULL;
 
@@ -94,6 +95,14 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
 gboolean filter_func(GtkTreeListRow *row, ErrandsTaskList *self) {
   ErrandsTaskItem *item = ERRANDS_TASK_ITEM(gtk_tree_list_row_get_item(row));
   TaskData *data = errands_task_item_get_data(item);
+  GtkWidget *expander = NULL;
+  g_object_get(item, "expander-widget", &expander, NULL);
+  GtkListItem *list_item = NULL;
+  if (expander && GTK_IS_WIDGET(expander)) {
+    gtk_widget_set_sensitive(expander, true);
+    g_object_get(item, "list-item", &list_item, NULL);
+    if (list_item) gtk_list_item_set_activatable(list_item, true);
+  }
 
   g_object_notify(G_OBJECT(item), "children-model-is-empty");
 
@@ -113,7 +122,19 @@ gboolean filter_func(GtkTreeListRow *row, ErrandsTaskList *self) {
     // Normal page-based filtering
     switch (self->page) {
     case ERRANDS_TASK_LIST_PAGE_TODAY: {
-      result = __task_today_parent_match_func(data) || __task_today_child_match_func(data);
+      if (errands_data_is_due(data->ical)) {
+        result = true;
+        break;
+      }
+      if (__task_today_child_match_func(data)) {
+        result = true;
+        if (expander && GTK_IS_WIDGET(expander)) {
+          gtk_widget_set_sensitive(expander, false);
+          if (list_item) gtk_list_item_set_activatable(list_item, false);
+        }
+        break;
+      }
+      result = __task_today_parent_match_func(data);
     } break;
     case ERRANDS_TASK_LIST_PAGE_ALL: result = true; break;
     case ERRANDS_TASK_LIST_PAGE_TASK_LIST: result = data->list == self->data; break;
@@ -315,6 +336,8 @@ static void on_bind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_it
   ErrandsTaskItem *item = gtk_tree_list_row_get_item(row);
   g_object_set(task, "task-item", item, NULL);
   g_object_set(item, "task-widget", task, NULL);
+  g_object_set(item, "expander-widget", expander, NULL);
+  g_object_set(item, "list-item", list_item, NULL);
   g_object_bind_property(item, "children-model-is-empty", expander, "hide-expander", G_BINDING_SYNC_CREATE);
   task->row = row;
 }
