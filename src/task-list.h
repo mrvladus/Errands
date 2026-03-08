@@ -43,6 +43,7 @@ struct _ErrandsTaskList {
 
   GtkWidget *title;
   GtkWidget *search_btn;
+  GtkWidget *menu_btn;
   GtkPopover *menu_popover;
   GtkWidget *search_bar;
   GtkWidget *search_entry;
@@ -58,9 +59,15 @@ struct _ErrandsTaskList {
 
   GtkEventControllerMotion *motion_ctrl;
 
-  GListStore *task_model;
+  GListStore *all_tasks_model;
+  GtkFilter *toplevel_filter;
+  GtkFilterListModel *toplevel_filter_model;
+
+  GtkTreeListModel *tree_model;
+  GtkFilter *tree_filter;
+  GtkFilterListModel *tree_filter_model;
+
   GtkTreeListRowSorter *tree_sorter;
-  GtkFilter *filter;
 
   float x, y;
   ListData *data;
@@ -73,4 +80,5 @@ void errands_task_list_show_all_tasks(ErrandsTaskList *self);
 void errands_task_list_show_today_tasks(ErrandsTaskList *self);
 void errands_task_list_show_task_list(ErrandsTaskList *self, ListData *data);
 void errands_task_list_sort(ErrandsTaskList *self, GtkSorterChange change);
-void errands_task_list_filter(ErrandsTaskList *self, GtkFilterChange change);
+void errands_task_list_filter_toplevel(ErrandsTaskList *self, GtkFilterChange change);
+void errands_task_list_filter_tree(ErrandsTaskList *self, GtkFilterChange change);

@@ -1,5 +1,6 @@
 #include "task.h"
 #include "data.h"
+#include "gio/gio.h"
 #include "glib-object.h"
 #include "glib.h"
 #include "gtk/gtk.h"
@@ -345,7 +346,7 @@ static void on_cancel_action_cb(GSimpleAction *action, GVariant *param, ErrandsT
         if (child_task) errands_task_set_data(child_task, child_task->data);
       }
     }
-    errands_task_list_filter(state.main_window->task_list, GTK_FILTER_CHANGE_MORE_STRICT);
+    errands_task_list_filter_tree(state.main_window->task_list, GTK_FILTER_CHANGE_MORE_STRICT);
   } else {
     TaskData *parent = self->data->parent;
     while (parent) {
@@ -409,7 +410,7 @@ static void on_complete_action_cb(GSimpleAction *action, GVariant *param, Errand
         if (parent_task) errands_task_update_progress(parent_task);
       }
     }
-    errands_task_list_filter(state.main_window->task_list, GTK_FILTER_CHANGE_MORE_STRICT);
+    errands_task_list_filter_tree(state.main_window->task_list, GTK_FILTER_CHANGE_MORE_STRICT);
   } else {
     TaskData *parent = self->data->parent;
     while (parent) {
@@ -457,8 +458,12 @@ static void on_delete_action_cb(GSimpleAction *action, GVariant *param, ErrandsT
 
   GListStore *parent_model = NULL;
   ErrandsTaskItem *parent = errands_task_item_get_parent(self->item);
-  if (parent) parent_model = G_LIST_STORE(errands_task_item_get_children_model(parent));
-  else parent_model = state.main_window->task_list->task_model;
+  if (parent) {
+    parent_model = G_LIST_STORE(errands_task_item_get_children_model(parent));
+    ErrandsTask *parent_task = NULL;
+    g_object_get(G_OBJECT(parent), "task-widget", &parent_task, NULL);
+    if (parent_task && GTK_IS_WIDGET(parent_task)) errands_task_update_progress(parent_task);
+  } else parent_model = state.main_window->task_list->all_tasks_model;
   guint pos;
   if (g_list_store_find(parent_model, self->item, &pos)) g_list_store_remove(parent_model, pos);
   g_object_notify(G_OBJECT(parent), "children-model-is-empty");
@@ -502,7 +507,8 @@ static void on_sub_task_entry_activated_cb(GtkEntry *entry, ErrandsTask *self) {
   if (STR_EQUAL(text, "")) return;
   TaskData *new_data = errands_task_data_create_task(self->data->list, self->data, text);
   errands_list_data_save(self->data->list);
-  errands_task_item_add_child(self->item, new_data);
+  ErrandsTaskItem *new_item = errands_task_item_add_child(self->item, new_data);
+  g_list_store_append(state.main_window->task_list->all_tasks_model, new_item);
 
   GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_widget_get_ancestor(GTK_WIDGET(self), GTK_TYPE_TREE_EXPANDER));
   GtkTreeListRow *row = gtk_tree_expander_get_list_row(expander);
@@ -598,11 +604,14 @@ static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x,
 
   // Remove from parent model
   ErrandsTaskItem *drop_parent_item = errands_task_item_get_parent(drop_item);
-  GListStore *drop_parent_model = NULL;
-  if (drop_parent_item) drop_parent_model = G_LIST_STORE(errands_task_item_get_children_model(drop_parent_item));
-  else drop_parent_model = state.main_window->task_list->task_model;
-  guint idx;
-  if (g_list_store_find(drop_parent_model, drop_item, &idx)) g_list_store_remove(drop_parent_model, idx);
+  if (drop_parent_item) {
+    GListStore *drop_parent_model = G_LIST_STORE(errands_task_item_get_children_model(drop_parent_item));
+    guint idx;
+    if (drop_parent_model && g_list_store_find(drop_parent_model, drop_item, &idx))
+      g_list_store_remove(drop_parent_model, idx);
+  } else {
+    errands_task_list_filter_toplevel(state.main_window->task_list, GTK_FILTER_CHANGE_DIFFERENT);
+  }
   errands_task_item_set_parent(drop_item, tgt_item);
 
   // Notify expanders

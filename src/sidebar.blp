@@ -40,6 +40,8 @@ template $ErrandsSidebar: Adw.Bin {
       [end]
       MenuButton {
         icon-name: "errands-menu-symbolic";
+        primary: true;
+        tooltip-text: _("Main Menu (F10)");
 
         menu-model: menu {
           section {
@@ -52,9 +54,6 @@ template $ErrandsSidebar: Adw.Bin {
             item (_("About Errands"), "sidebar.about")
           }
         };
-
-        primary: true;
-        tooltip-text: _("Main Menu (F10)");
 
         ShortcutController {
           scope: global;

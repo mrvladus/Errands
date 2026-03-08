@@ -1,4 +1,5 @@
 #include "data.h"
+#include "gio/gio.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "state.h"
@@ -145,32 +146,25 @@ static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x,
   // Move data
   bool moved = errands_task_data_move_to_list(drop_data, list_data, NULL);
   if (!moved) return false;
-
   errands_list_data_save(list_data);
   if (changing_list) errands_list_data_save(old_list_data);
 
   // Update task model if necessary
-  if (drop_data->parent) {
+  if (drop_item_parent) {
     // Add the item to the current task model
-    g_list_store_append(state.main_window->task_list->task_model, drop_item);
-    GListModel *parent_model = errands_task_item_get_children_model(drop_item_parent);
+    GListStore *parent_model = G_LIST_STORE(errands_task_item_get_children_model(drop_item_parent));
     guint idx;
-    if (g_list_store_find(G_LIST_STORE(parent_model), drop_item, &idx))
-      g_list_store_remove(G_LIST_STORE(parent_model), idx);
-    if (drop_item_parent) g_object_notify(G_OBJECT(drop_item_parent), "children-model-is-empty");
-    // Set parent to NULL
-    drop_data->parent = NULL;
+    if (g_list_store_find(parent_model, drop_item, &idx)) g_list_store_remove(parent_model, idx);
+    g_object_notify(G_OBJECT(drop_item_parent), "children-model-is-empty");
     errands_task_item_set_parent(drop_item, NULL);
   }
 
   // Update filter
-  bool selected = errands_sidebar_row_is_selected(self);
-  errands_task_list_filter(state.main_window->task_list,
-                           selected ? GTK_FILTER_CHANGE_MORE_STRICT : GTK_FILTER_CHANGE_DIFFERENT);
+  errands_task_list_filter_toplevel(state.main_window->task_list, GTK_FILTER_CHANGE_DIFFERENT);
   if (old_parent_task) errands_task_update_progress(old_parent_task);
 
   // Update the UI after the operation
-  errands_sidebar_task_list_row_update(errands_sidebar_task_list_row_get(old_list_data));
+  if (changing_list) errands_sidebar_task_list_row_update(errands_sidebar_task_list_row_get(old_list_data));
   errands_sidebar_task_list_row_update(self);
 
   return true;

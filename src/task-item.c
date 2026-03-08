@@ -131,9 +131,11 @@ ErrandsTaskItem *errands_task_item_get_parent(ErrandsTaskItem *self) { return se
 
 void errands_task_item_set_parent(ErrandsTaskItem *self, ErrandsTaskItem *parent) { self->parent = parent; }
 
-void errands_task_item_add_child(ErrandsTaskItem *self, TaskData *data) {
-  if (!self || !data) return;
+ErrandsTaskItem *errands_task_item_add_child(ErrandsTaskItem *self, TaskData *data) {
+  if (!self || !data) return NULL;
   g_autoptr(ErrandsTaskItem) item = errands_task_item_new(data, self);
   g_list_store_append(self->children_model, item);
   g_object_notify(G_OBJECT(self), "children-model-is-empty");
+
+  return item;
 }
