@@ -218,6 +218,7 @@ void errands_data_init() {
     const char *uid = path_file_name(filename);
     ListData *list_data = errands_list_data_load_from_ical(cal, uid, NULL, NULL);
     CONTINUE_IF(!list_data);
+    errands_list_data_remove_deleted(list_data);
     g_ptr_array_add(errands_data_lists, list_data);
     LOG("User Data: Loaded calendar %s", path);
   }
@@ -364,6 +365,30 @@ void errands_list_data_free(ListData *data) {
   if (data->uid) free(data->uid);
   if (data->children) g_ptr_array_free(data->children, true);
   free(data);
+}
+
+void errands_list_data_remove_deleted(ListData *data) {
+  bool sync_enabled = errands_settings_get(SETTING_SYNC).b;
+  g_autoptr(GPtrArray) to_delete = g_ptr_array_sized_new(32);
+  for (icalcomponent *c = icalcomponent_get_first_component(data->ical, ICAL_VTODO_COMPONENT); c != 0;
+       c = icalcomponent_get_next_component(data->ical, ICAL_VTODO_COMPONENT)) {
+    bool deleted = errands_data_get_deleted(c);
+    bool synced = errands_data_get_synced(c);
+    if (deleted && (synced || !sync_enabled)) g_ptr_array_add(to_delete, c);
+  }
+  bool deleted = to_delete->len > 0;
+  for (size_t i = 0; i < to_delete->len; i++) {
+    icalcomponent *c = g_ptr_array_index(to_delete, i);
+    icalcomponent_remove_component(data->ical, c);
+  }
+  for (size_t i = 0; i < data->children->len; ++i) {
+    TaskData *task = g_ptr_array_index(data->children, i);
+    if (errands_data_get_deleted(task->ical)) {
+      g_ptr_array_remove_index(data->children, i);
+      i--;
+    }
+  }
+  if (deleted) errands_list_data_save(data);
 }
 
 // ---------- TASK DATA ---------- //

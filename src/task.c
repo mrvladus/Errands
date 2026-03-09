@@ -1,8 +1,5 @@
 #include "task.h"
 #include "data.h"
-#include "gio/gio.h"
-#include "glib-object.h"
-#include "glib.h"
 #include "gtk/gtk.h"
 #include "sidebar-task-list-row.h"
 #include "sidebar.h"
@@ -18,7 +15,6 @@
 #include "vendor/toolbox.h"
 
 #include <glib/gi18n.h>
-#include <stddef.h>
 
 static GtkWidget *errands_task_tag_new(ErrandsTask *self, const char *tag);
 
@@ -613,6 +609,12 @@ static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x,
     errands_task_list_filter_toplevel(state.main_window->task_list, GTK_FILTER_CHANGE_DIFFERENT);
   }
   errands_task_item_set_parent(drop_item, tgt_item);
+
+  // Uncomplete and uncancel
+  if (errands_data_is_completed(tgt_data->ical) && !errands_data_is_completed(drop_data->ical))
+    gtk_widget_activate_action(GTK_WIDGET(task), "task.complete", NULL, NULL);
+  if (errands_data_get_cancelled(tgt_data->ical) && !errands_data_get_cancelled(drop_data->ical))
+    gtk_widget_activate_action(GTK_WIDGET(task), "task.cancel", NULL, NULL);
 
   // Notify expanders
   if (drop_parent_item) g_object_notify(G_OBJECT(drop_parent_item), "children-model-is-empty");

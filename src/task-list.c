@@ -1,10 +1,6 @@
 #include "task-list.h"
 #include "data.h"
 #include "delete-list-dialog.h"
-#include "glib-object.h"
-#include "glib.h"
-#include "gtk/gtk.h"
-#include "gtk/gtkshortcut.h"
 #include "rename-list-dialog.h"
 #include "settings.h"
 #include "sidebar-task-list-row.h"
@@ -18,7 +14,6 @@
 #include "window.h"
 
 #include <glib/gi18n.h>
-#include <stdbool.h>
 
 static const char *search_query = NULL;
 

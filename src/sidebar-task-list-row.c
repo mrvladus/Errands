@@ -1,5 +1,4 @@
 #include "data.h"
-#include "gio/gio.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "state.h"

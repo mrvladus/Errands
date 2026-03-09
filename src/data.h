@@ -47,6 +47,7 @@ void errands_list_data_sort(ListData *data);
 // Get all tasks as flat list
 void errands_list_data_get_flat_list(ListData *data, GPtrArray *tasks);
 GPtrArray *errands_list_data_get_all_tasks_as_icalcomponents(ListData *data);
+void errands_list_data_remove_deleted(ListData *data);
 void errands_list_data_print(ListData *data);
 void errands_list_data_save(ListData *data);
 void errands_list_data_free(ListData *data);
