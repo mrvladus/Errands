@@ -188,6 +188,18 @@ flatpak-bundle: $(FLATPAK_BUILD_DIR) | $(BUILD_DIR)
 distrobox-setup:
 	bash tools/distrobox/setup.sh
 
+# Setup Nextcloud container for testing sync.
+nextcloud-setup:
+	podman volume create nextcloud-errands
+	podman run --detach \
+	  --env NEXTCLOUD_ADMIN_USER=errands \
+	  --env NEXTCLOUD_ADMIN_PASSWORD=errands \
+	  --volume nextcloud-errands:/var/www/html \
+	  --restart on-failure \
+	  --name nextcloud-errands \
+	  --publish 8080:80 \
+	  docker.io/library/nextcloud:latest
+
 # Build and run the application.
 run: all
 	$(RUN_CMD)
@@ -196,4 +208,4 @@ run: all
 sloc:
 	@find $(SRC_DIR) -type f \( -name '*.c' -o -name '*.h' -o -name '*.blp' \) -exec wc -l {} +
 
-.PHONY: all install uninstall distrobox-setup run clean sloc flatpak-run flatpak-bundle
+.PHONY: all install uninstall distrobox-setup nextcloud-setup run clean sloc flatpak-run flatpak-bundle
