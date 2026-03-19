@@ -13,9 +13,12 @@
 
 #include <stdatomic.h>
 
+#define MAX_SYNC_ATTEMPTS 3
+
 static atomic_bool sync_initialized = false;
 static bool sync_in_progress = false;
 static bool sync_again = false;
+static int sync_attempt_count = 0;
 
 static CalDAVClient *client = NULL;
 
@@ -146,6 +149,8 @@ static void errands__sync_cb(GTask *task, gpointer source_object, gpointer task_
       g_task_return_boolean(task, false);
       return;
     }
+
+  LOG("Sync: Started");
 
   // Get calendars from the server
   caldav_client_pull_calendars(client);
@@ -297,7 +302,13 @@ static void errands__sync_finished_cb(GObject *source_object, GAsyncResult *res,
   g_ptr_array_set_size(lists[with], 0)
 
   errands_sidebar_toggle_sync_indicator(false);
-  if (!g_task_propagate_boolean(G_TASK(res), NULL)) return;
+  if (!g_task_propagate_boolean(G_TASK(res), NULL)) {
+    sync_in_progress = false;
+    const char *msg = tmp_str_printf(_("Sync attempt %d failed."), sync_attempt_count + 1);
+    errands_window_add_toast(msg);
+    sync_attempt_count++;
+    return;
+  }
 
   errands__cleanup_list(LISTS_DELETED, LISTS_TO_DELETE);
   errands__cleanup_list(LISTS_CREATED, LISTS_TO_CREATE);
@@ -437,7 +448,11 @@ bool errands_sync() {
     sync_again = true;
     return true;
   }
-  LOG("Sync: Started");
+
+  if (sync_attempt_count >= MAX_SYNC_ATTEMPTS) {
+    errands_window_add_toast(_("Too many sync attempts. Giving up."));
+    return false;
+  }
 
   g_ptr_array_extend(lists[LISTS_TO_DELETE_COPY], lists[LISTS_TO_DELETE], NULL, NULL);
   g_ptr_array_extend(lists[LISTS_TO_CREATE_COPY], lists[LISTS_TO_CREATE], NULL, NULL);
