@@ -294,12 +294,11 @@ static void errands__sync_cb(GTask *task, gpointer source_object, gpointer task_
   g_task_return_boolean(task, true);
 }
 
-// Runs in main thread on sync finish
-static void errands__sync_finished_cb(GObject *source_object, GAsyncResult *res, gpointer user_data) {
-
 #define errands__cleanup_list(with, from)                                                                              \
   for_range(i, 0, lists[with]->len) g_ptr_array_remove_fast(lists[from], g_ptr_array_index(lists[with], i));           \
   g_ptr_array_set_size(lists[with], 0)
+// Runs in main thread on sync finish
+static void errands__sync_finished_cb(GObject *source_object, GAsyncResult *res, gpointer user_data) {
 
   errands_sidebar_toggle_sync_indicator(false);
   if (!g_task_propagate_boolean(G_TASK(res), NULL)) {
