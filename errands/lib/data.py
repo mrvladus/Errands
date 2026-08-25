@@ -112,9 +112,11 @@ class TaskData:
     list_uid: str = ""
     notes: str = ""
     notified: bool = False
+    reminder_notified: bool = False
     parent: str = ""
     percent_complete: int = 0
     priority: int = 0
+    reminder: str = ""  # iCal duration, e.g. "-PT30M"
     rrule: str = ""
     start_date: str = ""
     synced: bool = False
@@ -154,7 +156,15 @@ class TaskData:
         ical += f"CATEGORIES:{','.join(self.tags)}\n"
         ical += f"SUMMARY:{self.text}\n"
         ical += f"X-ERRANDS-TOOLBAR-SHOWN:{int(self.toolbar_shown)}\n"
+        if self.rrule:
+            ical += f"RRULE:{self.rrule}\n"
         ical += f"UID:{self.uid}\n"
+        if self.reminder:
+            ical += "BEGIN:VALARM\n"
+            ical += "ACTION:DISPLAY\n"
+            ical += f"DESCRIPTION:{self.text}\n"
+            ical += f"TRIGGER:{self.reminder}\n"
+            ical += "END:VALARM\n"
         ical += "END:VTODO\n"
 
         if as_calendar:
@@ -202,8 +212,12 @@ class TaskData:
                 task.color = value
             elif "X-ERRANDS-EXPANDED" in prop:
                 task.expanded = bool(int(value))
+            elif "RRULE" in prop:
+                task.rrule = value
             elif "X-ERRANDS-TOOLBAR-SHOWN" in prop:
                 task.toolbar_shown = bool(int(value))
+            elif "TRIGGER" in prop:
+                task.reminder = value
 
         return task
 

@@ -10,6 +10,9 @@ from gi.repository import Adw, Gio, GLib, GObject, Gtk  # type:ignore
 
 from errands.lib.data import UserData
 from errands.lib.logging import Log
+from errands.lib.recurrence import PRESETS as RECURRENCE_PRESETS
+from errands.lib.recurrence import build_rrule, parse_rrule_parts
+from errands.lib.reminder import PRESETS as REMINDER_PRESETS
 from errands.lib.sync.sync import Sync
 from errands.lib.utils import get_children, get_human_datetime
 from errands.state import State
@@ -50,6 +53,113 @@ class ErrandsTaskToolbar(Adw.WrapBox):
             on_click=lambda *_: State.datetime_window.show(self.task),
         )
         self.append(self.date_time_btn)
+
+        # Recurrence button
+        self.recurrence_custom_interval: Gtk.SpinButton = Gtk.SpinButton(
+            valign=Gtk.Align.CENTER,
+            adjustment=Gtk.Adjustment(value=1, upper=99, lower=1, step_increment=1),
+        )
+        self.recurrence_custom_freq: Gtk.DropDown = Gtk.DropDown.new_from_strings(
+            [_("Days"), _("Weeks"), _("Months"), _("Years")]
+        )
+        self.recurrence_custom_freq.set_valign(Gtk.Align.CENTER)
+        self.recurrence_btn: Gtk.MenuButton = Gtk.MenuButton(
+            valign=Gtk.Align.CENTER,
+            icon_name="errands-sync-symbolic",
+            tooltip_text=_("Recurrence"),
+            css_classes=["flat"],
+            popover=Gtk.Popover(
+                css_classes=["menu"],
+                child=ErrandsBox(
+                    orientation=Gtk.Orientation.VERTICAL,
+                    margin_bottom=6,
+                    margin_top=6,
+                    margin_end=6,
+                    margin_start=6,
+                    spacing=3,
+                    children=[
+                        ErrandsListBox(
+                            on_row_activated=self._on_recurrence_preset_selected,
+                            selection_mode=Gtk.SelectionMode.NONE,
+                            children=[
+                                Gtk.ListBoxRow(
+                                    child=Gtk.Label(label=_("Daily"))
+                                ),
+                                Gtk.ListBoxRow(
+                                    child=Gtk.Label(label=_("Weekly"))
+                                ),
+                                Gtk.ListBoxRow(
+                                    child=Gtk.Label(label=_("Biweekly"))
+                                ),
+                                Gtk.ListBoxRow(
+                                    child=Gtk.Label(label=_("Monthly"))
+                                ),
+                                Gtk.ListBoxRow(
+                                    child=Gtk.Label(label=_("Yearly"))
+                                ),
+                            ],
+                        ),
+                        TitledSeparator(title=_("Custom")),
+                        ErrandsBox(
+                            spacing=6,
+                            children=[
+                                Gtk.Label(label=_("Every")),
+                                self.recurrence_custom_interval,
+                                self.recurrence_custom_freq,
+                            ],
+                        ),
+                        ErrandsButton(
+                            label=_("Clear"),
+                            css_classes=["flat"],
+                            on_click=self._on_recurrence_clear,
+                        ),
+                    ],
+                ),
+            ),
+        )
+        self._recurrence_skip_toggle = False
+        self.recurrence_btn.connect(
+            "notify::active", self._on_recurrence_btn_toggled
+        )
+        self.append(self.recurrence_btn)
+
+        # Reminder button
+        self.reminder_btn: Gtk.MenuButton = Gtk.MenuButton(
+            valign=Gtk.Align.CENTER,
+            icon_name="errands-notification-symbolic",
+            tooltip_text=_("Reminder"),
+            css_classes=["flat"],
+            popover=Gtk.Popover(
+                css_classes=["menu"],
+                child=ErrandsBox(
+                    orientation=Gtk.Orientation.VERTICAL,
+                    margin_bottom=6,
+                    margin_top=6,
+                    margin_end=6,
+                    margin_start=6,
+                    spacing=3,
+                    children=[
+                        ErrandsListBox(
+                            on_row_activated=self._on_reminder_preset_selected,
+                            selection_mode=Gtk.SelectionMode.NONE,
+                            children=[
+                                Gtk.ListBoxRow(
+                                    child=Gtk.Label(label=label)
+                                )
+                                for label, dur in REMINDER_PRESETS
+                                if dur  # skip "None" entry
+                            ],
+                        ),
+                        ErrandsButton(
+                            label=_("Clear"),
+                            css_classes=["flat"],
+                            on_click=self._on_reminder_clear,
+                        ),
+                    ],
+                ),
+            ),
+        )
+        self.append(self.reminder_btn)
 
         # Notes button
         self.notes_btn: ErrandsButton = ErrandsButton(
@@ -261,6 +371,18 @@ class ErrandsTaskToolbar(Adw.WrapBox):
             f"errands-priority{'-set' if priority > 0 else ''}-symbolic"
         )
 
+        # Update recurrence button css
+        if self.task.task_data.rrule:
+            self.recurrence_btn.add_css_class("accent")
+        else:
+            self.recurrence_btn.remove_css_class("accent")
+
+        # Update reminder button css
+        if self.task.task_data.reminder:
+            self.reminder_btn.add_css_class("accent")
+        else:
+            self.reminder_btn.remove_css_class("accent")
+
         # Update attachments button css
         self.attachments_btn.remove_css_class("accent")
         if len(self.task.task_data.attachments) > 0:
@@ -353,6 +475,92 @@ class ErrandsTaskToolbar(Adw.WrapBox):
             t.block_signals = False
 
         self.tags_list.set_visible(len(get_children(self.tags_list)) > 0)
+
+    def _on_recurrence_preset_selected(
+        self, box: Gtk.ListBox, row: Gtk.ListBoxRow
+    ) -> None:
+        rows = get_children(box)
+        preset_keys = ["daily", "weekly", "biweekly", "monthly", "yearly"]
+        for i, r in enumerate(rows):
+            if r == row:
+                rrule_str = RECURRENCE_PRESETS[preset_keys[i]]
+                break
+        else:
+            return
+        Log.debug(f"Task Toolbar: Set recurrence to preset '{rrule_str}'")
+        self.task.update_props(["rrule", "synced"], [rrule_str, False])
+        self.task.update_title()
+        self.update_ui()
+        self._recurrence_skip_toggle = True
+        self.recurrence_btn.popdown()
+        Sync.sync()
+
+    def _on_recurrence_clear(self, *_) -> None:
+        if self.task.task_data.rrule:
+            Log.debug("Task Toolbar: Clear recurrence")
+            self.task.update_props(["rrule", "synced"], ["", False])
+            self.task.update_title()
+            self.update_ui()
+            Sync.sync()
+        self._recurrence_skip_toggle = True
+        self.recurrence_btn.popdown()
+
+    def _on_recurrence_btn_toggled(self, btn: Gtk.MenuButton, *_) -> None:
+        if btn.get_active():
+            self._recurrence_skip_toggle = False
+            # Populate custom controls from current rrule
+            rrule_str = self.task.task_data.rrule
+            if rrule_str:
+                freq, interval = parse_rrule_parts(rrule_str)
+                self.recurrence_custom_interval.set_value(interval)
+                freq_index = {"DAILY": 0, "WEEKLY": 1, "MONTHLY": 2, "YEARLY": 3}.get(freq, 0)
+                self.recurrence_custom_freq.set_selected(freq_index)
+            else:
+                self.recurrence_custom_interval.set_value(1)
+                self.recurrence_custom_freq.set_selected(0)
+        else:
+            # Skip if a preset or clear already handled the change
+            if self._recurrence_skip_toggle:
+                return
+            # On close: apply custom values if they differ from current rrule
+            freq_map = {0: "DAILY", 1: "WEEKLY", 2: "MONTHLY", 3: "YEARLY"}
+            freq = freq_map.get(self.recurrence_custom_freq.get_selected(), "DAILY")
+            interval = self.recurrence_custom_interval.get_value_as_int()
+            new_rrule = build_rrule(freq, interval)
+            if new_rrule != self.task.task_data.rrule:
+                Log.debug(f"Task Toolbar: Set custom recurrence to '{new_rrule}'")
+                self.task.update_props(["rrule", "synced"], [new_rrule, False])
+                self.task.update_title()
+                self.update_ui()
+                Sync.sync()
+
+    def _on_reminder_preset_selected(
+        self, box: Gtk.ListBox, row: Gtk.ListBoxRow
+    ) -> None:
+        rows = get_children(box)
+        # Build list of durations skipping the "None" entry
+        durations = [dur for _, dur in REMINDER_PRESETS if dur]
+        for i, r in enumerate(rows):
+            if r == row:
+                new_reminder = durations[i]
+                break
+        else:
+            return
+        Log.debug(f"Task Toolbar: Set reminder to '{new_reminder}'")
+        self.task.update_props(["reminder", "synced"], [new_reminder, False])
+        self.task.update_title()
+        self.update_ui()
+        self.reminder_btn.popdown()
+        Sync.sync()
+
+    def _on_reminder_clear(self, *_) -> None:
+        if self.task.task_data.reminder:
+            Log.debug("Task Toolbar: Clear reminder")
+            self.task.update_props(["reminder", "synced"], ["", False])
+            self.task.update_title()
+            self.update_ui()
+            Sync.sync()
+        self.reminder_btn.popdown()
 
 
 class ErrandsToolbarTagsListItem(Gtk.Box):

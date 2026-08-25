@@ -35,6 +35,8 @@ errands/lib/animation.py
 errands/lib/goa.py
 errands/lib/markup.py
 errands/lib/data.py
+errands/lib/recurrence.py
+errands/lib/reminder.py
 errands/lib/gsettings.py
 errands/lib/logging.py
 errands/lib/notifications.py
