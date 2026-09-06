@@ -70,60 +70,93 @@
 
 /* Task accent colors */
 
-.task-blue {
-    background: #dde9f7;
+:root {
+    --task-blue: #dde9f7;
+    --task-green: #daf7e0;
+    --task-yellow: #faf7cf;
+    --task-orange: #fce8d0;
+    --task-red: #f9ccc7;
+    --task-purple: #f1d8f1;
+    --task-brown: #ece2da;
+    --check-blue: var(--blue-2);
+    --check-green: var(--green-3);
+    --check-yellow: var(--yellow-4);
+    --check-orange: var(--orange-2);
+    --check-red: var(--red-1);
+    --check-purple: var(--purple-2);
+    --check-brown: var(--brown-2);
 }
 
+@media (prefers-color-scheme: dark) {
+    :root {
+        --task-blue: darker(#3584e4);
+        --task-green: darker(#33d17a);
+        --task-yellow: darker(#f5c211);
+        --task-orange: darker(#ff7800);
+        --task-red: darker(#e01b24);
+        --task-purple: darker(#9141ac);
+        --task-brown: #986a44;
+    }
+    link {
+        color: white;
+    }
+}
+
+.task-blue {
+    background: var(--task-blue);
+}
+
+.progressbar-blue progress,
 .checkbtn-blue check:checked {
-    background-color: var(--blue-2);
+    background-color: var(--check-blue);
 }
 
 .task-green {
-    background: #daf7e0;
+    background: var(--task-green);
 }
 
 .checkbtn-green check:checked {
-    background-color: var(--green-3);
+    background-color: var(--check-green);
 }
 
 .task-yellow {
-    background: #faf7cf;
+    background: var(--task-yellow);
 }
 
 .checkbtn-yellow check:checked {
-    background-color: var(--yellow-4);
+    background-color: var(--check-yellow);
 }
 
 .task-orange {
-    background: #fce8d0;
+    background: var(--task-orange);
 }
 
 .checkbtn-orange check:checked {
-    background-color: var(--orange-2);
+    background-color: var(--check-orange);
 }
 
 .task-red {
-    background: #f9ccc7;
+    background: var(--task-red);
 }
 
 .checkbtn-red check:checked {
-    background-color: var(--red-1);
+    background-color: var(--check-red);
 }
 
 .task-purple {
-    background: #f1d8f1;
+    background: var(--task-purple);
 }
 
 .checkbtn-purple check:checked {
-    background-color: var(--purple-2);
+    background-color: var(--check-purple);
 }
 
 .task-brown {
-    background: #ece2da;
+    background: var(--task-brown);
 }
 
 .checkbtn-brown check:checked {
-    background-color: var(--brown-2);
+    background-color: var(--check-brown);
 }
 
 .task-toolbar-btn > button,
