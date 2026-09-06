@@ -141,7 +141,7 @@ void errands_task_properties_dialog_show(ErrandsTaskPropertiesDialogPage page, E
   errands_date_chooser_set_dt(self->due_date_chooser, errands_data_get_due(task->data->ical));
   struct icalrecurrencetype *rrule = errands_data_get_rrule(task->data->ical);
   errands_task_list_date_dialog_rrule_row_set_rrule(self->rrule_row, rrule);
-  adw_expander_row_set_expanded(ADW_EXPANDER_ROW(self->rrule_row), rrule->freq != ICAL_NO_RECURRENCE);
+  adw_expander_row_set_expanded(ADW_EXPANDER_ROW(self->rrule_row), rrule && rrule->freq != ICAL_NO_RECURRENCE);
 
   // Notes
   const char *notes = errands_data_get_notes(task->data->ical);
