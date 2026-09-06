@@ -193,6 +193,11 @@ distrobox-setup:
 
 # Setup Nextcloud container for testing sync.
 nextcloud-setup:
+	@if ! command -v podman >/dev/null 2>&1; then \
+		echo "Podman is required to run Nextcloud container"; \
+		exit 1; \
+	fi
+	podman volume rm nextcloud-errands --force
 	podman volume create nextcloud-errands
 	podman run --detach \
 	  --env NEXTCLOUD_ADMIN_USER=errands \
@@ -202,6 +207,8 @@ nextcloud-setup:
 	  --name nextcloud-errands \
 	  --publish 8080:80 \
 	  docker.io/library/nextcloud:latest
+	@echo "Nextcloud container is running on http://localhost:8080"
+	@echo "Username: 'errands', Password: 'errands'"
 
 # Build and run the application.
 run: all
