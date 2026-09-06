@@ -4,6 +4,7 @@
 #include "utils.h"
 
 #include <glib/gi18n.h>
+#include <libical/ical.h>
 
 static void reset_week_days(ErrandsTaskListDateDialogRruleRow *self);
 static void get_week_days(ErrandsTaskListDateDialogRruleRow *self, short days[]);
@@ -60,28 +61,25 @@ ErrandsTaskListDateDialogRruleRow *errands_task_list_date_dialog_rrule_row_new()
 
 // ---------- PUBLIC FUNCTIONS ---------- //
 
-struct icalrecurrencetype errands_task_list_date_dialog_rrule_row_get_rrule(ErrandsTaskListDateDialogRruleRow *self) {
-  struct icalrecurrencetype rrule = ICALRECURRENCETYPE_INITIALIZER;
-  icalrecurrencetype_clear(&rrule);
-  rrule.freq = adw_combo_row_get_selected(self->freq_row);
-  rrule.interval = adw_spin_row_get_value(self->interval_row);
-  if (rrule.freq >= 4) get_week_days(self, rrule.by_day);
+void errands_task_list_date_dialog_rrule_row_get_rrule(ErrandsTaskListDateDialogRruleRow *self,
+                                                       struct icalrecurrencetype *rrule) {
+  rrule->freq = adw_combo_row_get_selected(self->freq_row);
+  rrule->interval = adw_spin_row_get_value(self->interval_row);
+  // if (rrule->freq >= 4) get_week_days(self, rrule->by[ICAL_BY_DAY]);
   if (adw_combo_row_get_selected(self->repeat_duration) == 0)
-    rrule.until = errands_date_chooser_get_dt(self->until_date_chooser);
-  else rrule.count = adw_spin_row_get_value(self->count_row);
-
-  return rrule;
+    rrule->until = errands_date_chooser_get_dt(self->until_date_chooser);
+  else rrule->count = adw_spin_row_get_value(self->count_row);
 }
 
 void errands_task_list_date_dialog_rrule_row_set_rrule(ErrandsTaskListDateDialogRruleRow *self,
-                                                       struct icalrecurrencetype rrule) {
-  if (rrule.freq == ICAL_NO_RECURRENCE) return;
-  LOG("Set RRULE: %s", icalrecurrencetype_as_string(&rrule));
-  adw_combo_row_set_selected(self->freq_row, rrule.freq < 7 ? rrule.freq : 3);
-  adw_spin_row_set_value(self->interval_row, rrule.interval);
-  set_week_days(self, rrule.by_day);
-  if (icaltime_is_null_date(rrule.until)) adw_spin_row_set_value(self->count_row, rrule.count);
-  else errands_date_chooser_set_dt(self->until_date_chooser, rrule.until);
+                                                       struct icalrecurrencetype *rrule) {
+  if (rrule->freq == ICAL_NO_RECURRENCE) return;
+  LOG("Set RRULE: %s", icalrecurrencetype_as_string(rrule));
+  adw_combo_row_set_selected(self->freq_row, rrule->freq < 7 ? rrule->freq : 3);
+  adw_spin_row_set_value(self->interval_row, rrule->interval);
+  // set_week_days(self, rrule->by_day);
+  if (icaltime_is_null_date(rrule->until)) adw_spin_row_set_value(self->count_row, rrule->count);
+  else errands_date_chooser_set_dt(self->until_date_chooser, rrule->until);
 }
 
 void errands_task_list_date_dialog_rrule_row_reset(ErrandsTaskListDateDialogRruleRow *self) {
@@ -101,49 +99,50 @@ static void reset_week_days(ErrandsTaskListDateDialogRruleRow *self) {
 }
 
 static void get_week_days(ErrandsTaskListDateDialogRruleRow *self, short days[]) {
-  GPtrArray *week_days_btns = get_children(GTK_WIDGET(self->week_box));
-  uint8_t curr = 0;
-  for (size_t i = 0; i < week_days_btns->len; ++i) {
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(week_days_btns->pdata[i]))) {
-      if (i == 0) days[curr] = ICAL_MONDAY_WEEKDAY;
-      else if (i == 1) days[curr] = ICAL_TUESDAY_WEEKDAY;
-      else if (i == 2) days[curr] = ICAL_WEDNESDAY_WEEKDAY;
-      else if (i == 3) days[curr] = ICAL_THURSDAY_WEEKDAY;
-      else if (i == 4) days[curr] = ICAL_FRIDAY_WEEKDAY;
-      else if (i == 5) days[curr] = ICAL_SATURDAY_WEEKDAY;
-      else if (i == 6) days[curr] = ICAL_SUNDAY_WEEKDAY;
-      curr++;
-    }
-  }
-  days[curr] = ICAL_RECURRENCE_ARRAY_MAX;
-  g_ptr_array_free(week_days_btns, false);
+  // GPtrArray *week_days_btns = get_children(GTK_WIDGET(self->week_box));
+  // uint8_t curr = 0;
+  // for (size_t i = 0; i < week_days_btns->len; ++i) {
+  //   if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(week_days_btns->pdata[i]))) {
+  //     if (i == 0) days[curr] = ICAL_MONDAY_WEEKDAY;
+  //     else if (i == 1) days[curr] = ICAL_TUESDAY_WEEKDAY;
+  //     else if (i == 2) days[curr] = ICAL_WEDNESDAY_WEEKDAY;
+  //     else if (i == 3) days[curr] = ICAL_THURSDAY_WEEKDAY;
+  //     else if (i == 4) days[curr] = ICAL_FRIDAY_WEEKDAY;
+  //     else if (i == 5) days[curr] = ICAL_SATURDAY_WEEKDAY;
+  //     else if (i == 6) days[curr] = ICAL_SUNDAY_WEEKDAY;
+  //     curr++;
+  //   }
+  // }
+  // days[curr] = ICAL_RECURRENCE_ARRAY_MAX;
+  // g_ptr_array_free(week_days_btns, false);
 }
 
 static void set_week_days(ErrandsTaskListDateDialogRruleRow *self, short days[]) {
-  if (days[0] != ICAL_RECURRENCE_ARRAY_MAX) {
-    reset_week_days(self);
-    GPtrArray *week_days_btns = get_children(GTK_WIDGET(self->week_box));
-    for (size_t i = 0; i < ICAL_BY_DAY_SIZE && days[i] != ICAL_RECURRENCE_ARRAY_MAX; i++) {
-      icalrecurrencetype_weekday day = icalrecurrencetype_day_day_of_week(days[i]);
-      switch (day) {
-      case ICAL_NO_WEEKDAY: break;
-      case ICAL_SUNDAY_WEEKDAY: gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(week_days_btns->pdata[6]), true); break;
-      case ICAL_MONDAY_WEEKDAY: gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(week_days_btns->pdata[0]), true); break;
-      case ICAL_TUESDAY_WEEKDAY: gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(week_days_btns->pdata[1]), true); break;
-      case ICAL_WEDNESDAY_WEEKDAY:
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(week_days_btns->pdata[2]), true);
-        break;
-      case ICAL_THURSDAY_WEEKDAY:
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(week_days_btns->pdata[3]), true);
-        break;
-      case ICAL_FRIDAY_WEEKDAY: gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(week_days_btns->pdata[4]), true); break;
-      case ICAL_SATURDAY_WEEKDAY:
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(week_days_btns->pdata[5]), true);
-        break;
-      }
-    }
-    g_ptr_array_free(week_days_btns, false);
-  };
+  // if (days[0] != ICAL_RECURRENCE_ARRAY_MAX) {
+  //   reset_week_days(self);
+  //   GPtrArray *week_days_btns = get_children(GTK_WIDGET(self->week_box));
+  //   for (size_t i = 0; i < ICAL_BY_DAY_SIZE && days[i] != ICAL_RECURRENCE_ARRAY_MAX; i++) {
+  //     icalrecurrencetype_weekday day = icalrecurrencetype_day_day_of_week(days[i]);
+  //     switch (day) {
+  //     case ICAL_NO_WEEKDAY: break;
+  //     case ICAL_SUNDAY_WEEKDAY: gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(week_days_btns->pdata[6]), true);
+  //     break; case ICAL_MONDAY_WEEKDAY: gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(week_days_btns->pdata[0]),
+  //     true); break; case ICAL_TUESDAY_WEEKDAY:
+  //     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(week_days_btns->pdata[1]), true); break; case
+  //     ICAL_WEDNESDAY_WEEKDAY:
+  //       gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(week_days_btns->pdata[2]), true);
+  //       break;
+  //     case ICAL_THURSDAY_WEEKDAY:
+  //       gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(week_days_btns->pdata[3]), true);
+  //       break;
+  //     case ICAL_FRIDAY_WEEKDAY: gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(week_days_btns->pdata[4]), true);
+  //     break; case ICAL_SATURDAY_WEEKDAY:
+  //       gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(week_days_btns->pdata[5]), true);
+  //       break;
+  //     }
+  //   }
+  //   g_ptr_array_free(week_days_btns, false);
+  // };
 }
 
 // ---------- CALLBACKS ---------- //

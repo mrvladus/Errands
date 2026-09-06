@@ -115,7 +115,7 @@ static void on_export_finish_cb(GObject *obj, GAsyncResult *res, gpointer data) 
   }
   TaskData *task_data = data;
   autoptr(icalcomponent) cal = icalcomponent_new_vcalendar();
-  autoptr(icalcomponent) dup = icalcomponent_new_clone(task_data->ical);
+  autoptr(icalcomponent) dup = icalcomponent_clone(task_data->ical);
   icalcomponent_add_component(cal, dup);
   autofree char *ical = icalcomponent_as_ical_string(cal);
   fprintf(file, "%s", ical);

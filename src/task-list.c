@@ -1,6 +1,7 @@
 #include "task-list.h"
 #include "data.h"
 #include "delete-list-dialog.h"
+#include "gtk/gtk.h"
 #include "rename-list-dialog.h"
 #include "settings.h"
 #include "sidebar-task-list-row.h"
@@ -644,6 +645,11 @@ void errands_task_list_filter_tree(ErrandsTaskList *self, GtkFilterChange change
 
 // ---------- CALLBACKS ---------- //
 
+static void on_entry_timeout_cb(GtkWidget *entry) {
+  gtk_widget_set_sensitive(entry, true);
+  gtk_widget_grab_focus(entry);
+}
+
 static void on_task_list_entry_activated_cb(ErrandsTaskList *self) {
   if (!self->data) return;
   // Get text
@@ -672,8 +678,9 @@ static void on_task_list_entry_activated_cb(ErrandsTaskList *self) {
   LOG("Add task '%s' to task list '%s'", errands_data_get_uid(data->ical), list_uid);
   errands_sync_create_task(data);
   errands_task_list_update_title(self);
-
   gtk_list_view_scroll_to(GTK_LIST_VIEW(self->list_view), 0, 0, NULL);
+  gtk_widget_set_sensitive(self->entry, false);
+  g_timeout_add_once(1000, (GSourceOnceFunc)on_entry_timeout_cb, self->entry);
 }
 
 static void on_task_list_entry_text_changed_cb(ErrandsTaskList *self) {

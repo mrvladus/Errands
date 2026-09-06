@@ -5,6 +5,8 @@
 #include "vendor/json.h"
 #include "vendor/toolbox.h"
 
+#include <assert.h>
+
 AUTOPTR_DEFINE(JSON, json_free)
 
 // ---------- GLOBALS ---------- //
@@ -110,7 +112,7 @@ static void errands_data_migrate_from_46() {
       if (parent_item) errands_data_set_parent(ical, parent_item->string_val);
       if (percent_complete_item) errands_data_set_percent(ical, percent_complete_item->int_val);
       if (priority_item) errands_data_set_priority(ical, priority_item->int_val);
-      if (rrule_item) errands_data_set_rrule(ical, icalrecurrencetype_from_string(rrule_item->string_val));
+      if (rrule_item) errands_data_set_rrule(ical, *icalrecurrencetype_new_from_string(rrule_item->string_val));
       if (start_date_item) errands_data_set_start(ical, icaltime_from_string(start_date_item->string_val));
       if (text_item) errands_data_set_text(ical, text_item->string_val);
       if (uid_item) errands_data_set_uid(ical, uid_item->string_val);
@@ -298,7 +300,7 @@ ListData *errands_list_data_load_from_ical(icalcomponent *ical, const char *uid,
 // TODO: why we need synced?
 ListData *errands_list_data_create(const char *uid, const char *name, const char *description, const char *color,
                                    bool deleted, bool synced) {
-  ASSERT(uid != NULL && name != NULL && color != NULL);
+  assert(uid != NULL && name != NULL && color != NULL);
 
   icalcomponent *ical = icalcomponent_new(ICAL_VCALENDAR_COMPONENT);
   icalcomponent_add_property(ical, icalproperty_new_version("2.0"));
@@ -448,7 +450,7 @@ bool errands_task_data_move_to_list(TaskData *data, ListData *list, TaskData *pa
   if (!data || !list || (data->parent && data->parent == parent)) return false;
 
   GPtrArray *arr_to_remove_from = data->parent ? data->parent->children : data->list->children;
-  icalcomponent *clone = icalcomponent_new_clone(data->ical);
+  icalcomponent *clone = icalcomponent_clone(data->ical);
   icalcomponent_remove_component(data->list->ical, data->ical);
   icalcomponent_add_component(list->ical, clone);
   data->ical = clone;
@@ -459,7 +461,7 @@ bool errands_task_data_move_to_list(TaskData *data, ListData *list, TaskData *pa
   errands_task_data_get_flat_list(data, children);
   for_range(i, 0, children->len) {
     TaskData *child = g_ptr_array_index(children, i);
-    icalcomponent *child_clone = icalcomponent_new_clone(child->ical);
+    icalcomponent *child_clone = icalcomponent_clone(child->ical);
     icalcomponent_remove_component(data->list->ical, child->ical);
     icalcomponent_add_component(list->ical, child_clone);
     child->ical = child_clone;
@@ -683,17 +685,17 @@ void errands_data_set_uid(icalcomponent *ical, const char *value) {
 
 // --- RRULE --- //
 
-struct icalrecurrencetype errands_data_get_rrule(icalcomponent *ical) {
+struct icalrecurrencetype *errands_data_get_rrule(icalcomponent *ical) {
   icalproperty *property = icalcomponent_get_first_property(ical, ICAL_RRULE_PROPERTY);
-  return property ? icalproperty_get_rrule(property) : (struct icalrecurrencetype)ICALRECURRENCETYPE_INITIALIZER;
+  return property ? icalproperty_get_rrule(property) : NULL;
 }
 void errands_data_set_rrule(icalcomponent *ical, struct icalrecurrencetype value) {
-  struct icalrecurrencetype null = ICALRECURRENCETYPE_INITIALIZER;
+  struct icalrecurrencetype null = {0};
   if (icalrecurrencetype_compare(&value, &null))
     icalcomponent_remove_property(ical, icalcomponent_get_first_property(ical, ICAL_RRULE_PROPERTY));
   else {
     icalproperty *property = icalcomponent_get_first_property(ical, ICAL_RRULE_PROPERTY);
-    if (property) icalproperty_set_rrule(property, value);
+    if (property) icalproperty_set_rrule(property, &value);
     else icalcomponent_add_property(ical, property);
   }
   errands_data_set_synced(ical, false);
@@ -908,22 +910,5 @@ icaltimetype icaltime_get_date_time_now() {
 }
 
 bool icalrecurrencetype_compare(const struct icalrecurrencetype *a, const struct icalrecurrencetype *b) {
-  if (a->freq != b->freq) return false;
-  if (a->count != b->count) return false;
-  if (a->interval != b->interval) return false;
-  if (a->week_start != b->week_start) return false;
-  if (icaltime_compare(a->until, b->until) != 0) return false;
-  if (memcmp(a->by_second, b->by_second, ICAL_BY_SECOND_SIZE * sizeof(short)) != 0) return false;
-  if (memcmp(a->by_minute, b->by_minute, ICAL_BY_MINUTE_SIZE * sizeof(short)) != 0) return false;
-  if (memcmp(a->by_hour, b->by_hour, ICAL_BY_HOUR_SIZE * sizeof(short)) != 0) return false;
-  if (memcmp(a->by_day, b->by_day, ICAL_BY_DAY_SIZE * sizeof(short)) != 0) return false;
-  if (memcmp(a->by_month_day, b->by_month_day, ICAL_BY_MONTHDAY_SIZE * sizeof(short)) != 0) return false;
-  if (memcmp(a->by_year_day, b->by_year_day, ICAL_BY_YEARDAY_SIZE * sizeof(short)) != 0) return false;
-  if (memcmp(a->by_week_no, b->by_week_no, ICAL_BY_WEEKNO_SIZE * sizeof(short)) != 0) return false;
-  if (memcmp(a->by_month, b->by_month, ICAL_BY_MONTH_SIZE * sizeof(short)) != 0) return false;
-  if (memcmp(a->by_set_pos, b->by_set_pos, ICAL_BY_SETPOS_SIZE * sizeof(short)) != 0) return false;
-  if ((a->rscale == NULL && b->rscale != NULL) || (a->rscale != NULL && b->rscale == NULL)) return false;
-  if (a->rscale != NULL && b->rscale != NULL && strcmp(a->rscale, b->rscale) != 0) return false;
-  if (a->skip != b->skip) return false;
-  return true;
+  return memcmp(a, b, sizeof(*a)) == 0;
 }

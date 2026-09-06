@@ -12,6 +12,7 @@
 
 #include <glib/gi18n.h>
 #include <gtksourceview/gtksource.h>
+#include <libical/ical.h>
 
 static void on_add_attachment_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 
@@ -138,9 +139,9 @@ void errands_task_properties_dialog_show(ErrandsTaskPropertiesDialogPage page, E
   errands_task_list_date_dialog_rrule_row_reset(self->rrule_row);
   errands_date_chooser_set_dt(self->start_date_chooser, errands_data_get_start(task->data->ical));
   errands_date_chooser_set_dt(self->due_date_chooser, errands_data_get_due(task->data->ical));
-  struct icalrecurrencetype rrule = errands_data_get_rrule(task->data->ical);
+  struct icalrecurrencetype *rrule = errands_data_get_rrule(task->data->ical);
   errands_task_list_date_dialog_rrule_row_set_rrule(self->rrule_row, rrule);
-  adw_expander_row_set_expanded(ADW_EXPANDER_ROW(self->rrule_row), rrule.freq != ICAL_NO_RECURRENCE);
+  adw_expander_row_set_expanded(ADW_EXPANDER_ROW(self->rrule_row), rrule->freq != ICAL_NO_RECURRENCE);
 
   // Notes
   const char *notes = errands_data_get_notes(task->data->ical);
@@ -288,27 +289,28 @@ static void on_dialog_close_cb(ErrandsTaskPropertiesDialog *self) {
     changed = true;
   }
   // Set rrule
-  struct icalrecurrencetype old_rrule = ICALRECURRENCETYPE_INITIALIZER;
-  struct icalrecurrencetype new_rrule = ICALRECURRENCETYPE_INITIALIZER;
+  struct icalrecurrencetype *old_rrule = NULL;
+  struct icalrecurrencetype *new_rrule = icalrecurrencetype_new();
   // Get old and new rrule
   icalproperty *rrule_prop = icalcomponent_get_first_property(data->ical, ICAL_RRULE_PROPERTY);
   if (rrule_prop) old_rrule = icalproperty_get_rrule(rrule_prop);
   if (adw_expander_row_get_expanded(ADW_EXPANDER_ROW(self->rrule_row)))
-    new_rrule = errands_task_list_date_dialog_rrule_row_get_rrule(self->rrule_row);
+    errands_task_list_date_dialog_rrule_row_get_rrule(self->rrule_row, new_rrule);
   // Compare them and set / remove
-  if (!icalrecurrencetype_compare(&new_rrule, &old_rrule)) {
+  if (new_rrule && old_rrule && !icalrecurrencetype_compare(new_rrule, old_rrule)) {
     if (rrule_prop) {
       // Delete rrule if new rrule is not set
-      if (new_rrule.freq == ICAL_NO_RECURRENCE) icalcomponent_remove_property(data->ical, rrule_prop);
+      if (new_rrule->freq == ICAL_NO_RECURRENCE) icalcomponent_remove_property(data->ical, rrule_prop);
       // Set new rrule
       else icalproperty_set_rrule(rrule_prop, new_rrule);
     } else {
       // Set new rrule
-      if (new_rrule.freq != ICAL_NO_RECURRENCE)
+      if (new_rrule->freq != ICAL_NO_RECURRENCE)
         icalcomponent_add_property(data->ical, icalproperty_new_rrule(new_rrule));
     }
     changed = true;
   }
+  icalrecurrencetype_unref(old_rrule);
 
   // Notes
   GtkTextIter start, end;

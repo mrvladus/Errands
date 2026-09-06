@@ -269,7 +269,7 @@ static void errands__sync_cb(GTask *task, gpointer source_object, gpointer task_
     CONTINUE_IF(e);
     LOG("Sync: Creating event on server: %s", uid);
     autoptr(icalcomponent) ical = icalcomponent_new_vcalendar();
-    icalcomponent_add_component(ical, icalcomponent_new_clone(task->ical));
+    icalcomponent_add_component(ical, icalcomponent_clone(task->ical));
     caldav_calendar_create_event(c, uid, icalcomponent_as_ical_string(ical));
     g_ptr_array_add(lists[TASKS_CREATED], task);
   }
@@ -285,7 +285,7 @@ static void errands__sync_cb(GTask *task, gpointer source_object, gpointer task_
     CONTINUE_IF_NOT(e);
     LOG("Sync: Updating event on server: %s", uid);
     autoptr(icalcomponent) ical = icalcomponent_new_vcalendar();
-    icalcomponent_add_component(ical, icalcomponent_new_clone(task->ical));
+    icalcomponent_add_component(ical, icalcomponent_clone(task->ical));
     caldav_event_update(e, icalcomponent_as_ical_string(ical));
     g_ptr_array_add(lists[TASKS_UPDATED], task);
   }
@@ -407,7 +407,7 @@ static void errands__sync_finished_cb(GObject *source_object, GAsyncResult *res,
         icaltimetype remote = errands_data_get_changed(vtodo);
         CONTINUE_IF(icaltime_compare(local, remote) > -1);
         LOG("Sync: Update local task: %s", task_uid);
-        icalcomponent *clone = icalcomponent_new_clone(vtodo);
+        icalcomponent *clone = icalcomponent_clone(vtodo);
         icalcomponent_remove_component(task->list->ical, task->ical);
         icalcomponent_add_component(task->list->ical, clone);
         task->ical = clone;
@@ -419,7 +419,7 @@ static void errands__sync_finished_cb(GObject *source_object, GAsyncResult *res,
       else {
         LOG("Sync: Create local task: %s", task_uid);
         const char *parent_uid = errands_data_get_parent(vtodo);
-        icalcomponent *clone = icalcomponent_new_clone(vtodo);
+        icalcomponent *clone = icalcomponent_clone(vtodo);
         icalcomponent_add_component(list->ical, clone);
         errands_task_data_new(clone, find_task_data_by_uid(list, parent_uid), list);
         save_list = true;

@@ -225,8 +225,6 @@ void caldav_event_print(CalDAVEvent *e);
 }
 #endif // __cplusplus
 
-#endif // CALDAV_H
-
 // ------------------------------------------------------------ //
 //                         IMPLEMENTATION                       //
 // ------------------------------------------------------------ //
@@ -1782,3 +1780,5 @@ bool caldav_event_update(CalDAVEvent *e, const char *ical) {
 }
 
 #endif // CALDAV_IMPLEMENTATION
+
+#endif // CALDAV_H

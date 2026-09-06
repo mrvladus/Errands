@@ -114,7 +114,7 @@ void errands_data_set_uid(icalcomponent *ical, const char *value);
 
 // --- RRULE --- //
 
-struct icalrecurrencetype errands_data_get_rrule(icalcomponent *ical);
+struct icalrecurrencetype *errands_data_get_rrule(icalcomponent *ical);
 void errands_data_set_rrule(icalcomponent *ical, struct icalrecurrencetype value);
 
 // --- STRV --- //
