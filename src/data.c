@@ -2,6 +2,7 @@
 #include "glib.h"
 #include "settings.h"
 
+#include "sync.h"
 #include "vendor/json.h"
 #include "vendor/toolbox.h"
 

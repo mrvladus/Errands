@@ -1,7 +1,9 @@
 #include "sync.h"
 #include "data.h"
+#include "gtk/gtk.h"
 #include "settings.h"
 #include "sidebar.h"
+#include "state.h"
 #include "window.h"
 
 // #define CALDAV_DEBUG
@@ -15,7 +17,7 @@
 
 #define MAX_SYNC_ATTEMPTS 3
 
-static atomic_bool sync_initialized = false;
+static bool sync_initialized = false;
 static bool sync_in_progress = false;
 static bool sync_again = false;
 static int sync_attempt_count = 0;
@@ -297,6 +299,7 @@ static void errands__sync_cb(GTask *task, gpointer source_object, gpointer task_
 #define errands__cleanup_list(with, from)                                                                              \
   for_range(i, 0, lists[with]->len) g_ptr_array_remove_fast(lists[from], g_ptr_array_index(lists[with], i));           \
   g_ptr_array_set_size(lists[with], 0)
+
 // Runs in main thread on sync finish
 static void errands__sync_finished_cb(GObject *source_object, GAsyncResult *res, gpointer user_data) {
 
@@ -308,6 +311,7 @@ static void errands__sync_finished_cb(GObject *source_object, GAsyncResult *res,
     sync_attempt_count++;
     return;
   }
+  sync_attempt_count = 0;
 
   errands__cleanup_list(LISTS_DELETED, LISTS_TO_DELETE);
   errands__cleanup_list(LISTS_CREATED, LISTS_TO_CREATE);
@@ -429,7 +433,11 @@ static void errands__sync_finished_cb(GObject *source_object, GAsyncResult *res,
     if (save_list) errands_list_data_save(list);
   }
 
-  if (reload) { errands_sidebar_load_lists(); }
+  if (reload) {
+    LOG("Sync: Lists changed. Reload.");
+    errands_sidebar_load_lists();
+  }
+  errands_task_list_sort(state.main_window->task_list, GTK_SORTER_CHANGE_DIFFERENT);
 
   sync_in_progress = false;
   LOG("Sync: Finished");
@@ -470,12 +478,21 @@ bool errands_sync() {
 }
 
 void errands_sync_init(void) {
-  LOG("Sync: Initialize");
+  if (sync_initialized) return;
   for_range(i, 0, ERRANDS_SYNC_LIST_TYPE_N) lists[i] = g_ptr_array_sized_new(4);
+  if (!errands_settings_get(SETTING_SYNC).b) {
+    LOG("Sync: Disabled");
+    return;
+  }
 
+  // for_range(i, 0, errands_data_lists->len) {
+  //   ListData *data = g_ptr_array_index(errands_data_lists, i);
+  //   if (!errands_data_get_synced(data->ical)) errands_sync_create_list(data);
+  // }
+
+  LOG("Sync: Initializing");
   g_autoptr(GTask) task = g_task_new(NULL, NULL, errands__sync_finished_cb, NULL);
   g_task_run_in_thread(task, errands__sync_cb);
-
   int interval = errands_settings_get(SETTING_SYNC_INTERVAL).i;
   g_timeout_add_seconds(interval >= 10 ? interval : 10, G_SOURCE_FUNC(errands_sync), NULL);
 }
@@ -518,5 +535,5 @@ void errands_sync_update_task(TaskData *data) {
 void errands_sync_cleanup(void) {
   LOG("Sync: Cleanup");
   if (client) caldav_client_free(client);
-  for_range(i, 0, ERRANDS_SYNC_LIST_TYPE_N) g_ptr_array_free(lists[i], true);
+  for_range(i, 0, ERRANDS_SYNC_LIST_TYPE_N) if (lists[i]) g_ptr_array_free(lists[i], true);
 }

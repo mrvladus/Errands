@@ -1,7 +1,6 @@
 #include "task-list.h"
 #include "data.h"
 #include "delete-list-dialog.h"
-#include "gtk/gtk.h"
 #include "rename-list-dialog.h"
 #include "settings.h"
 #include "sidebar-task-list-row.h"

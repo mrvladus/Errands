@@ -66,7 +66,6 @@ struct _ErrandsTaskList {
   GtkTreeListModel *tree_model;
   GtkFilter *tree_filter;
   GtkFilterListModel *tree_filter_model;
-
   GtkTreeListRowSorter *tree_sorter;
 
   float x, y;

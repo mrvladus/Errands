@@ -1,6 +1,7 @@
 #include "sidebar.h"
 #include "about-dialog.h"
 #include "data.h"
+#include "gio/gio.h"
 #include "settings-dialog.h"
 #include "settings.h"
 #include "state.h"
@@ -68,7 +69,6 @@ static gint __sort_func(gconstpointer a, gconstpointer b) {
 }
 
 void errands_sidebar_load_lists(void) {
-  LOG("Sidebar: Create Task List Rows");
   gtk_list_box_remove_all(GTK_LIST_BOX(self->task_lists_box));
   g_ptr_array_sort_values(errands_data_lists, __sort_func);
   // Add rows
@@ -83,7 +83,6 @@ void errands_sidebar_load_lists(void) {
   // Select last opened page
   if (gtk_widget_get_realized(GTK_WIDGET(state.main_window))) errands_sidebar_select_last_opened_page();
   else g_signal_connect(state.main_window, "realize", G_CALLBACK(errands_sidebar_select_last_opened_page), NULL);
-  LOG("Sidebar: Created %d Task List Rows", errands_data_lists->len);
 }
 
 ErrandsSidebarTaskListRow *errands_sidebar_find_row(ListData *data) {
