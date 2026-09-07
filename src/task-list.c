@@ -3,11 +3,11 @@
 #include "delete-list-dialog.h"
 #include "rename-list-dialog.h"
 #include "settings.h"
-#include "sidebar-task-list-row.h"
 #include "sidebar.h"
 #include "state.h"
 #include "sync.h"
 #include "task-item.h"
+#include "task-list-row.h"
 #include "task-menu.h"
 #include "task.h"
 #include "utils.h"
@@ -375,7 +375,7 @@ static void on_action_export_cb(GSimpleAction *action, GVariant *param, ErrandsT
 
 static void on_action_rename_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
   gtk_popover_popdown(self->menu_popover);
-  errands_rename_list_dialog_show(errands_sidebar_task_list_row_get(self->data));
+  errands_rename_list_dialog_show(errands_task_list_row_get(self->data));
 }
 
 static void __remove_deleted_tasks(ErrandsTaskList *self, GListStore *model) {
@@ -439,7 +439,7 @@ static void on_action_delete_cancelled_cb(GSimpleAction *action, GVariant *param
 
 static void on_action_delete_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
   gtk_popover_popdown(self->menu_popover);
-  errands_delete_list_dialog_show(errands_sidebar_task_list_row_get(self->data));
+  errands_delete_list_dialog_show(errands_task_list_row_get(self->data));
 }
 
 // - PRINTING - //
@@ -672,7 +672,7 @@ static void on_task_list_entry_activated_cb(ErrandsTaskList *self) {
   // Reset text
   g_object_set(self->entry, "text", "", NULL);
   // Update UI
-  errands_sidebar_task_list_row_update(errands_sidebar_task_list_row_get(data->list));
+  errands_task_list_row_update(errands_task_list_row_get(data->list));
   errands_sidebar_update_filter_rows();
   LOG("Add task '%s' to task list '%s'", errands_data_get_uid(data->ical), list_uid);
   errands_sync_create_task(data);

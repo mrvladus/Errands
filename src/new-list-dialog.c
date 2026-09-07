@@ -57,7 +57,7 @@ static void on_response_cb(ErrandsNewListDialog *self, gchar *response, gpointer
     errands_list_data_save(list);
     g_ptr_array_add(errands_data_lists, list);
     errands_sidebar_load_lists();
-    ErrandsSidebarTaskListRow *row = errands_sidebar_find_row(list);
+    ErrandsTaskListRow *row = errands_sidebar_find_row(list);
     if (row) g_signal_emit_by_name(row, "activate", NULL);
     errands_sidebar_update_filter_rows();
     errands_sync_create_list(list);

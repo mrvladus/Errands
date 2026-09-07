@@ -14,42 +14,39 @@
 #include <glib/gi18n.h>
 
 static void on_color_changed(GtkColorDialogButton *btn, GParamSpec *pspec, ListData *data);
-static void on_drop_motion_ctrl_enter_cb(ErrandsSidebarTaskListRow *self);
-static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x, double y,
-                           ErrandsSidebarTaskListRow *row);
+static void on_drop_motion_ctrl_enter_cb(ErrandsTaskListRow *self);
+static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x, double y, ErrandsTaskListRow *row);
 
 // ---------- WIDGET TEMPLATE ---------- //
 
-G_DEFINE_TYPE(ErrandsSidebarTaskListRow, errands_sidebar_task_list_row, GTK_TYPE_LIST_BOX_ROW)
+G_DEFINE_TYPE(ErrandsTaskListRow, errands_task_list_row, GTK_TYPE_LIST_BOX_ROW)
 
-static void errands_sidebar_task_list_row_dispose(GObject *gobject) {
-  gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_SIDEBAR_TASK_LIST_ROW);
-  G_OBJECT_CLASS(errands_sidebar_task_list_row_parent_class)->dispose(gobject);
+static void errands_task_list_row_dispose(GObject *gobject) {
+  gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_TASK_LIST_ROW);
+  G_OBJECT_CLASS(errands_task_list_row_parent_class)->dispose(gobject);
 }
 
-static void errands_sidebar_task_list_row_class_init(ErrandsSidebarTaskListRowClass *klass) {
-  G_OBJECT_CLASS(klass)->dispose = errands_sidebar_task_list_row_dispose;
+static void errands_task_list_row_class_init(ErrandsTaskListRowClass *klass) {
+  G_OBJECT_CLASS(klass)->dispose = errands_task_list_row_dispose;
 
   gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(klass),
-                                              "/io/github/mrvladus/Errands/ui/sidebar-task-list-row.ui");
+                                              "/io/github/mrvladus/Errands/ui/task-list-row.ui");
 
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsSidebarTaskListRow, color_btn);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsSidebarTaskListRow, counter);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsSidebarTaskListRow, label);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsSidebarTaskListRow, drop_motion_ctrl);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTaskListRow, color_btn);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTaskListRow, counter);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTaskListRow, label);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTaskListRow, drop_motion_ctrl);
 
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_drop_motion_ctrl_enter_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_drop_cb);
 }
 
-static void errands_sidebar_task_list_row_init(ErrandsSidebarTaskListRow *self) {
-  gtk_widget_init_template(GTK_WIDGET(self));
-}
+static void errands_task_list_row_init(ErrandsTaskListRow *self) { gtk_widget_init_template(GTK_WIDGET(self)); }
 
-ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_new(ListData *data) {
+ErrandsTaskListRow *errands_task_list_row_new(ListData *data) {
   g_assert(data);
   LOG_NO_LN("Task List Row '%s': Create ... ", data->uid);
-  ErrandsSidebarTaskListRow *row = g_object_new(ERRANDS_TYPE_SIDEBAR_TASK_LIST_ROW, NULL);
+  ErrandsTaskListRow *row = g_object_new(ERRANDS_TYPE_TASK_LIST_ROW, NULL);
   row->data = data;
   // Set color
   GdkRGBA color;
@@ -57,23 +54,23 @@ ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_new(ListData *data) {
   gtk_color_dialog_button_set_rgba(GTK_COLOR_DIALOG_BUTTON(row->color_btn), &color);
   g_signal_connect(row->color_btn, "notify::rgba", G_CALLBACK(on_color_changed), data);
   // Update
-  errands_sidebar_task_list_row_update(row);
+  errands_task_list_row_update(row);
   LOG_NO_PREFIX("Success");
   return row;
 }
 
 // ---------- PUBLIC FUNCTIONS ---------- //
 
-ErrandsSidebarTaskListRow *errands_sidebar_task_list_row_get(ListData *data) {
+ErrandsTaskListRow *errands_task_list_row_get(ListData *data) {
   g_autoptr(GPtrArray) children = get_children(state.main_window->sidebar->task_lists_box);
   for_range(i, 0, children->len) {
-    ListData *child_data = ((ErrandsSidebarTaskListRow *)g_ptr_array_index(children, i))->data;
+    ListData *child_data = ((ErrandsTaskListRow *)g_ptr_array_index(children, i))->data;
     if (child_data == data) return children->pdata[i];
   }
   return NULL;
 }
 
-void errands_sidebar_task_list_row_update(ErrandsSidebarTaskListRow *self) {
+void errands_task_list_row_update(ErrandsTaskListRow *self) {
   if (!self) return;
   size_t total = 0, completed = 0;
   g_autoptr(GPtrArray) tasks = errands_list_data_get_all_tasks_as_icalcomponents(self->data);
@@ -90,7 +87,7 @@ void errands_sidebar_task_list_row_update(ErrandsSidebarTaskListRow *self) {
 
 // ---------- CALLBACKS ---------- //
 
-void on_errands_sidebar_task_list_row_activate(GtkListBox *box, ErrandsSidebarTaskListRow *row, gpointer user_data) {
+void on_errands_task_list_row_activate(GtkListBox *box, ErrandsTaskListRow *row, gpointer user_data) {
   ErrandsTaskList *task_list = state.main_window->task_list;
   // Unselect filter rows
   gtk_list_box_unselect_all(GTK_LIST_BOX(state.main_window->sidebar->filters_box));
@@ -112,7 +109,7 @@ static void on_color_changed(GtkColorDialogButton *btn, GParamSpec *pspec, ListD
 
 // --- DND --- //
 
-static guint on_drop_motion_ctrl_enter_timeout_cb(ErrandsSidebarTaskListRow *self) {
+static guint on_drop_motion_ctrl_enter_timeout_cb(ErrandsTaskListRow *self) {
   if (!gtk_drop_controller_motion_contains_pointer(self->drop_motion_ctrl)) return G_SOURCE_REMOVE;
   if (errands_sidebar_row_is_selected(self)) return G_SOURCE_REMOVE;
   gtk_widget_activate(GTK_WIDGET(self));
@@ -120,12 +117,11 @@ static guint on_drop_motion_ctrl_enter_timeout_cb(ErrandsSidebarTaskListRow *sel
   return G_SOURCE_REMOVE;
 }
 
-static void on_drop_motion_ctrl_enter_cb(ErrandsSidebarTaskListRow *self) {
+static void on_drop_motion_ctrl_enter_cb(ErrandsTaskListRow *self) {
   g_timeout_add_once(500, (GSourceOnceFunc)on_drop_motion_ctrl_enter_timeout_cb, self);
 }
 
-static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x, double y,
-                           ErrandsSidebarTaskListRow *self) {
+static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x, double y, ErrandsTaskListRow *self) {
   ErrandsTaskItem *drop_item = g_value_get_object(value);
   TaskData *drop_data = errands_task_item_get_data(drop_item);
   ListData *list_data = self->data;
@@ -163,8 +159,8 @@ static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x,
   if (old_parent_task) errands_task_update_progress(old_parent_task);
 
   // Update the UI after the operation
-  if (changing_list) errands_sidebar_task_list_row_update(errands_sidebar_task_list_row_get(old_list_data));
-  errands_sidebar_task_list_row_update(self);
+  if (changing_list) errands_task_list_row_update(errands_task_list_row_get(old_list_data));
+  errands_task_list_row_update(self);
 
   return true;
 }

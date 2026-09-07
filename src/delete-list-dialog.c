@@ -11,7 +11,7 @@ static ErrandsDeleteListDialog *self = NULL;
 
 struct _ErrandsDeleteListDialog {
   AdwAlertDialog parent_instance;
-  ErrandsSidebarTaskListRow *current_task_list_row;
+  ErrandsTaskListRow *current_task_list_row;
 };
 
 G_DEFINE_TYPE(ErrandsDeleteListDialog, errands_delete_list_dialog, ADW_TYPE_ALERT_DIALOG)
@@ -38,7 +38,7 @@ ErrandsDeleteListDialog *errands_delete_list_dialog_new() {
 
 // ---------- PUBLIC FUNCTIONS ---------- //
 
-void errands_delete_list_dialog_show(ErrandsSidebarTaskListRow *row) {
+void errands_delete_list_dialog_show(ErrandsTaskListRow *row) {
   if (!self) self = errands_delete_list_dialog_new();
   self->current_task_list_row = row;
   adw_dialog_present(ADW_DIALOG(self), GTK_WIDGET(state.main_window));
@@ -48,7 +48,7 @@ void errands_delete_list_dialog_show(ErrandsSidebarTaskListRow *row) {
 
 static void on_response_cb(ErrandsDeleteListDialog *dialog, gchar *response, gpointer data) {
   if (STR_EQUAL(response, "delete")) {
-    ErrandsSidebarTaskListRow *row = dialog->current_task_list_row;
+    ErrandsTaskListRow *row = dialog->current_task_list_row;
     LOG("Delete List Dialog: Deleting task list %s", row->data->uid);
     // Delete data
     errands_data_set_deleted(row->data->ical, true);

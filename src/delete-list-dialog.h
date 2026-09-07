@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sidebar-task-list-row.h"
+#include "task-list-row.h"
 
 #include <adwaita.h>
 
@@ -8,4 +8,4 @@
 G_DECLARE_FINAL_TYPE(ErrandsDeleteListDialog, errands_delete_list_dialog, ERRANDS, DELETE_LIST_DIALOG, AdwAlertDialog)
 
 ErrandsDeleteListDialog *errands_delete_list_dialog_new();
-void errands_delete_list_dialog_show(ErrandsSidebarTaskListRow *row);
+void errands_delete_list_dialog_show(ErrandsTaskListRow *row);

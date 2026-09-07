@@ -29,7 +29,7 @@ static void errands_sidebar_dispose(GObject *gobject) {
 static void errands_sidebar_class_init(ErrandsSidebarClass *class) {
   G_OBJECT_CLASS(class)->dispose = errands_sidebar_dispose;
 
-  g_type_ensure(ERRANDS_TYPE_SIDEBAR_TASK_LIST_ROW);
+  g_type_ensure(ERRANDS_TYPE_TASK_LIST_ROW);
 
   gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), "/io/github/mrvladus/Errands/ui/sidebar.ui");
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, sync_indicator);
@@ -41,7 +41,7 @@ static void errands_sidebar_class_init(ErrandsSidebarClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSidebar, task_lists_box);
 
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_errands_sidebar_filter_row_activated);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_errands_sidebar_task_list_row_activate);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_errands_task_list_row_activate);
 }
 
 static void errands_sidebar_init(ErrandsSidebar *sidebar) {
@@ -75,7 +75,7 @@ void errands_sidebar_load_lists(void) {
   for (size_t i = 0; i < errands_data_lists->len; i++) {
     ListData *ld = errands_data_lists->pdata[i];
     if (!errands_data_get_deleted(ld->ical)) {
-      ErrandsSidebarTaskListRow *row = errands_sidebar_task_list_row_new(ld);
+      ErrandsTaskListRow *row = errands_task_list_row_new(ld);
       gtk_list_box_append(GTK_LIST_BOX(self->task_lists_box), GTK_WIDGET(row));
     }
   }
@@ -85,10 +85,10 @@ void errands_sidebar_load_lists(void) {
   else g_signal_connect(state.main_window, "realize", G_CALLBACK(errands_sidebar_select_last_opened_page), NULL);
 }
 
-ErrandsSidebarTaskListRow *errands_sidebar_find_row(ListData *data) {
+ErrandsTaskListRow *errands_sidebar_find_row(ListData *data) {
   g_autoptr(GPtrArray) rows = get_children(state.main_window->sidebar->task_lists_box);
   for_range(i, 0, rows->len) {
-    ErrandsSidebarTaskListRow *row = g_ptr_array_index(rows, i);
+    ErrandsTaskListRow *row = g_ptr_array_index(rows, i);
     if (row->data == data) return row;
   }
   return NULL;
@@ -101,7 +101,7 @@ void errands_sidebar_select_last_opened_page() {
   LOG("Sidebar: Selecting last opened list: '%s'", last_uid);
   bool selected = false;
   for_range(i, 0, rows->len) {
-    ErrandsSidebarTaskListRow *row = g_ptr_array_index(rows, i);
+    ErrandsTaskListRow *row = g_ptr_array_index(rows, i);
     if (STR_EQUAL(last_uid, row->data->uid)) {
       g_signal_emit_by_name(row, "activate", NULL);
       selected = true;
@@ -140,7 +140,7 @@ void errands_sidebar_update_filter_rows() {
 
 void errands_sidebar_toggle_sync_indicator(bool on) { gtk_widget_set_visible(self->sync_indicator, on); }
 
-bool errands_sidebar_row_is_selected(ErrandsSidebarTaskListRow *row) {
+bool errands_sidebar_row_is_selected(ErrandsTaskListRow *row) {
   GtkListBoxRow *selected_row = gtk_list_box_get_selected_row(GTK_LIST_BOX(self->task_lists_box));
 
   return selected_row == GTK_LIST_BOX_ROW(row);
@@ -178,7 +178,7 @@ static void __on_open_finish(GObject *obj, GAsyncResult *res) {
   errands_list_data_save(data);
   g_ptr_array_add(errands_data_lists, data);
   errands_sidebar_load_lists();
-  ErrandsSidebarTaskListRow *row = errands_sidebar_find_row(data);
+  ErrandsTaskListRow *row = errands_sidebar_find_row(data);
   if (row) g_signal_emit_by_name(row, "activate", NULL);
   errands_sync_create_list(data);
 }

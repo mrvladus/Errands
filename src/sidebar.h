@@ -2,7 +2,7 @@
 
 #include "data.h"
 #include "new-list-dialog.h"
-#include "sidebar-task-list-row.h"
+#include "task-list-row.h"
 
 #include <adwaita.h>
 
@@ -20,7 +20,7 @@ struct _ErrandsSidebar {
   GtkLabel *today_counter;
   GtkWidget *task_lists_box;
 
-  ErrandsSidebarTaskListRow *current_task_list_row;
+  ErrandsTaskListRow *current_task_list_row;
   ErrandsNewListDialog *new_list_dialog;
 };
 
@@ -29,5 +29,5 @@ void errands_sidebar_load_lists(void);
 void errands_sidebar_update_filter_rows(void);
 void errands_sidebar_select_last_opened_page(void);
 void errands_sidebar_toggle_sync_indicator(bool on);
-ErrandsSidebarTaskListRow *errands_sidebar_find_row(ListData *data);
-bool errands_sidebar_row_is_selected(ErrandsSidebarTaskListRow *row);
+ErrandsTaskListRow *errands_sidebar_find_row(ListData *data);
+bool errands_sidebar_row_is_selected(ErrandsTaskListRow *row);

@@ -14,7 +14,7 @@ static ErrandsRenameListDialog *self = NULL;
 struct _ErrandsRenameListDialog {
   AdwAlertDialog parent_instance;
   GtkWidget *entry;
-  ErrandsSidebarTaskListRow *current_task_list_row;
+  ErrandsTaskListRow *current_task_list_row;
 };
 
 G_DEFINE_TYPE(ErrandsRenameListDialog, errands_rename_list_dialog, ADW_TYPE_ALERT_DIALOG)
@@ -44,7 +44,7 @@ ErrandsRenameListDialog *errands_rename_list_dialog_new() {
 
 // ---------- PUBLIC FUNCTIONS ---------- //
 
-void errands_rename_list_dialog_show(ErrandsSidebarTaskListRow *row) {
+void errands_rename_list_dialog_show(ErrandsTaskListRow *row) {
   if (!self) self = errands_rename_list_dialog_new();
   self->current_task_list_row = row;
   LOG("Sidebar Rename List Dialog: Show");
@@ -62,7 +62,7 @@ static void on_response_cb(ErrandsRenameListDialog *self, gchar *response, gpoin
     LOG("Sidebar Rename List Dialog: Rename to '%s'", text);
     errands_data_set_list_name(list_data->ical, text);
     errands_list_data_save(list_data);
-    errands_sidebar_task_list_row_update(self->current_task_list_row);
+    errands_task_list_row_update(self->current_task_list_row);
     errands_task_list_update_title(state.main_window->task_list);
     errands_sync_update_list(list_data);
   }
