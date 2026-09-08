@@ -12,6 +12,7 @@ struct _ErrandsTaskItem {
   // Properties
   const char *title;
   gboolean completed;
+  gboolean cancelled;
 
   TaskData *data;
   ErrandsTaskItem *parent;
@@ -29,6 +30,7 @@ enum {
 
   PROP_TITLE,
   PROP_COMPLETED,
+  PROP_CANCELLED,
 
   PROP_DATA,
   PROP_CHILDREN_MODEL,
@@ -81,6 +83,30 @@ static void errands_task_item_set_property(GObject *object, guint prop_id, const
     errands_task_list_sort(state.main_window->task_list, GTK_SORTER_CHANGE_MORE_STRICT);
     errands_task_list_filter_tree(state.main_window->task_list, GTK_FILTER_CHANGE_MORE_STRICT);
   } break;
+  case PROP_CANCELLED: {
+    gboolean old = self->cancelled;
+    self->cancelled = g_value_get_boolean(value);
+    if (old == self->cancelled) break;
+    update_task_list_count++;
+    errands_data_set_cancelled(self->data->ical, self->cancelled);
+    if (self->cancelled) {
+      GListStore *sub_tasks = self->children_model;
+      for (guint i = 0; i < g_list_model_get_n_items(G_LIST_MODEL(sub_tasks)); i++) {
+        ErrandsTaskItem *sub_task = g_list_model_get_item(G_LIST_MODEL(sub_tasks), i);
+        g_object_set(sub_task, "cancelled", true, NULL);
+      }
+    } else {
+      if (self->parent) g_object_set(self->parent, "cancelled", false, NULL);
+    }
+    if (update_task_list_count > 0) update_task_list_count--;
+    if (update_task_list_count > 0) break;
+    errands_list_data_save(self->data->list);
+    errands_sidebar_update_filter_rows();
+    ErrandsTaskListRow *row = errands_task_list_row_get(self->data->list);
+    if (row) errands_task_list_row_update(row);
+    errands_task_list_sort(state.main_window->task_list, GTK_SORTER_CHANGE_MORE_STRICT);
+    errands_task_list_filter_tree(state.main_window->task_list, GTK_FILTER_CHANGE_MORE_STRICT);
+  } break;
 
   case PROP_DATA: self->data = g_value_get_pointer(value); break;
   case PROP_CHILDREN_MODEL: self->children_model = g_value_get_object(value); break;
@@ -97,6 +123,7 @@ static void errands_task_item_get_property(GObject *object, guint prop_id, GValu
   switch (prop_id) {
   case PROP_TITLE: g_value_set_string(value, self->title); break;
   case PROP_COMPLETED: g_value_set_boolean(value, self->completed); break;
+  case PROP_CANCELLED: g_value_set_boolean(value, self->cancelled); break;
 
   case PROP_DATA: g_value_set_pointer(value, self->data); break;
   case PROP_CHILDREN_MODEL: g_value_set_object(value, self->children_model); break;
@@ -136,6 +163,8 @@ static void errands_task_item_class_init(ErrandsTaskItemClass *klass) {
   obj_properties[PROP_TITLE] = g_param_spec_string("title", "Title", "Title of the task.", NULL, G_PARAM_READWRITE);
   obj_properties[PROP_COMPLETED] =
       g_param_spec_boolean("completed", "Completed", "Whether the task is completed.", false, G_PARAM_READWRITE);
+  obj_properties[PROP_CANCELLED] =
+      g_param_spec_boolean("cancelled", "Cancelled", "Whether the task is cancelled.", false, G_PARAM_READWRITE);
 
   obj_properties[PROP_DATA] =
       g_param_spec_pointer("data", "Task Data", "Data associated with the task.", G_PARAM_READWRITE);
@@ -161,6 +190,7 @@ ErrandsTaskItem *errands_task_item_new(TaskData *data, ErrandsTaskItem *parent) 
 
   self->title = errands_data_get_text(data->ical);
   self->completed = errands_data_is_completed(data->ical);
+  self->cancelled = errands_data_get_cancelled(data->ical);
 
   self->data = data;
   self->children_model = NULL;
