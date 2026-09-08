@@ -65,7 +65,7 @@ static inline char *string_trim(char *str) {
   return str;
 }
 
-static inline void gdk_rgba_to_hex_string(const GdkRGBA *rgba, char *hex_string) {
+static inline void gdk_rgba_to_hex_string(const GdkRGBA *rgba, char hex_string[8]) {
   // Convert the RGBA components to integers in the range [0, 255]
   int r = (int)(rgba->red * 255);
   int g = (int)(rgba->green * 255);

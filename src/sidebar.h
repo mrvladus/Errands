@@ -20,6 +20,8 @@ struct _ErrandsSidebar {
   GtkLabel *today_counter;
   GtkWidget *task_lists_box;
 
+  GListStore *task_lists_model;
+
   ErrandsTaskListRow *current_task_list_row;
   ErrandsNewListDialog *new_list_dialog;
 };

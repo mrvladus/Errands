@@ -1,13 +1,6 @@
 #include "task-list-item.h"
-
-struct _ErrandsTaskListItem {
-  GObject parent_instance;
-
-  const gchar *uid;
-  const gchar *title;
-  const gchar *color;
-  // GListStore *children_model;
-};
+#include "data.h"
+#include "utils.h"
 
 G_DEFINE_TYPE(ErrandsTaskListItem, errands_task_list_item, G_TYPE_OBJECT)
 
@@ -25,12 +18,23 @@ static void errands_task_list_item_set_property(GObject *object, guint prop_id, 
                                                 GParamSpec *pspec) {
   ErrandsTaskListItem *self = ERRANDS_TASK_LIST_ITEM(object);
   switch (prop_id) {
-  case PROP_UID: self->uid = g_value_get_string(value); break;
+  case PROP_UID: {
+    self->uid = g_value_get_string(value);
+    errands_data_set_uid(self->data->ical, self->uid);
+    errands_list_data_save(self->data);
+  } break;
   case PROP_TITLE: {
     self->title = g_value_get_string(value);
+    errands_data_set_list_name(self->data->ical, self->title);
+    errands_list_data_save(self->data);
   } break;
   case PROP_COLOR: {
-    self->color = g_value_get_string(value);
+    GdkRGBA *color = g_value_get_boxed(value);
+    if (color) self->color = *color;
+    char hex_string[8];
+    gdk_rgba_to_hex_string(&self->color, hex_string);
+    errands_data_set_color(self->data->ical, hex_string, true);
+    errands_list_data_save(self->data);
   } break;
   default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
   }
@@ -39,9 +43,15 @@ static void errands_task_list_item_set_property(GObject *object, guint prop_id, 
 static void errands_task_list_item_get_property(GObject *object, guint prop_id, GValue *value, GParamSpec *pspec) {
   ErrandsTaskListItem *self = ERRANDS_TASK_LIST_ITEM(object);
   switch (prop_id) {
-  case PROP_UID: g_value_set_string(value, self->uid); break;
-  case PROP_TITLE: g_value_set_string(value, self->title); break;
-  case PROP_COLOR: g_value_set_string(value, self->color); break;
+  case PROP_UID: {
+    g_value_set_string(value, self->uid);
+  } break;
+  case PROP_TITLE: {
+    g_value_set_string(value, self->title);
+  } break;
+  case PROP_COLOR: {
+    g_value_set_boxed(value, &self->color);
+  } break;
   default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
   }
 }
@@ -66,18 +76,18 @@ static void errands_task_list_item_class_init(ErrandsTaskListItemClass *klass) {
   obj_properties[PROP_TITLE] =
       g_param_spec_string("title", "Task List Title", "Title of the task list", NULL, G_PARAM_READWRITE);
   obj_properties[PROP_COLOR] =
-      g_param_spec_string("color", "Task List Color", "Color of the task list", NULL, G_PARAM_READWRITE);
+      g_param_spec_boxed("color", "Task List Color", "Color of the task list", GDK_TYPE_RGBA, G_PARAM_READWRITE);
 
   g_object_class_install_properties(object_class, N_PROPERTIES, obj_properties);
 }
 
 static void errands_task_list_item_init(ErrandsTaskListItem *self) {}
 
-ErrandsTaskListItem *errands_task_list_item_new() {
+ErrandsTaskListItem *errands_task_list_item_new(ListData *data) {
   ErrandsTaskListItem *self = g_object_new(ERRANDS_TYPE_TASK_LIST_ITEM, NULL);
-  // self->data = data;
-  // self->children_model = NULL;
-  // self->parent = parent;
-
+  self->data = data;
+  self->uid = errands_data_get_uid(data->ical);
+  self->title = errands_data_get_list_name(data->ical);
+  gdk_rgba_parse(&self->color, errands_data_get_color(data->ical, true));
   return self;
 }

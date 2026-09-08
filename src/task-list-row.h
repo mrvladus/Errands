@@ -1,6 +1,7 @@
 #pragma once
 
 #include "data.h"
+#include "task-list-item.h"
 
 #include <adwaita.h>
 
@@ -16,10 +17,11 @@ struct _ErrandsTaskListRow {
 
   GtkDropControllerMotion *drop_motion_ctrl;
 
-  ListData *data;
+  ErrandsTaskListItem *item;
 };
 
-ErrandsTaskListRow *errands_task_list_row_new(ListData *data);
+ErrandsTaskListRow *errands_task_list_row_new(ErrandsTaskListItem *item);
 void errands_task_list_row_update(ErrandsTaskListRow *self);
 ErrandsTaskListRow *errands_task_list_row_get(ListData *data);
+
 void on_errands_task_list_row_activate(GtkListBox *box, ErrandsTaskListRow *row, gpointer user_data);

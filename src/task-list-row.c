@@ -1,8 +1,8 @@
 #include "data.h"
+#include "glib-object.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "state.h"
-#include "sync.h"
 #include "task-item.h"
 #include "task-list.h"
 #include "task.h"
@@ -13,7 +13,6 @@
 
 #include <glib/gi18n.h>
 
-static void on_color_changed(GtkColorDialogButton *btn, GParamSpec *pspec, ListData *data);
 static void on_drop_motion_ctrl_enter_cb(ErrandsTaskListRow *self);
 static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x, double y, ErrandsTaskListRow *row);
 
@@ -43,20 +42,14 @@ static void errands_task_list_row_class_init(ErrandsTaskListRowClass *klass) {
 
 static void errands_task_list_row_init(ErrandsTaskListRow *self) { gtk_widget_init_template(GTK_WIDGET(self)); }
 
-ErrandsTaskListRow *errands_task_list_row_new(ListData *data) {
-  g_assert(data);
-  LOG_NO_LN("Task List Row '%s': Create ... ", data->uid);
-  ErrandsTaskListRow *row = g_object_new(ERRANDS_TYPE_TASK_LIST_ROW, NULL);
-  row->data = data;
-  // Set color
-  GdkRGBA color;
-  gdk_rgba_parse(&color, errands_data_get_color(data->ical, true));
-  gtk_color_dialog_button_set_rgba(GTK_COLOR_DIALOG_BUTTON(row->color_btn), &color);
-  g_signal_connect(row->color_btn, "notify::rgba", G_CALLBACK(on_color_changed), data);
+ErrandsTaskListRow *errands_task_list_row_new(ErrandsTaskListItem *item) {
+  ErrandsTaskListRow *self = g_object_new(ERRANDS_TYPE_TASK_LIST_ROW, NULL);
+  self->item = item;
+  g_object_bind_property(item, "title", self->label, "label", G_BINDING_SYNC_CREATE | G_BINDING_BIDIRECTIONAL);
+  g_object_bind_property(item, "color", self->color_btn, "rgba", G_BINDING_SYNC_CREATE | G_BINDING_BIDIRECTIONAL);
   // Update
-  errands_task_list_row_update(row);
-  LOG_NO_PREFIX("Success");
-  return row;
+  errands_task_list_row_update(self);
+  return self;
 }
 
 // ---------- PUBLIC FUNCTIONS ---------- //
@@ -64,7 +57,7 @@ ErrandsTaskListRow *errands_task_list_row_new(ListData *data) {
 ErrandsTaskListRow *errands_task_list_row_get(ListData *data) {
   g_autoptr(GPtrArray) children = get_children(state.main_window->sidebar->task_lists_box);
   for_range(i, 0, children->len) {
-    ListData *child_data = ((ErrandsTaskListRow *)g_ptr_array_index(children, i))->data;
+    ListData *child_data = ((ErrandsTaskListRow *)g_ptr_array_index(children, i))->item->data;
     if (child_data == data) return children->pdata[i];
   }
   return NULL;
@@ -73,7 +66,7 @@ ErrandsTaskListRow *errands_task_list_row_get(ListData *data) {
 void errands_task_list_row_update(ErrandsTaskListRow *self) {
   if (!self) return;
   size_t total = 0, completed = 0;
-  g_autoptr(GPtrArray) tasks = errands_list_data_get_all_tasks_as_icalcomponents(self->data);
+  g_autoptr(GPtrArray) tasks = errands_list_data_get_all_tasks_as_icalcomponents(self->item->data);
   for_range(i, 0, tasks->len) {
     icalcomponent *ical = g_ptr_array_index(tasks, i);
     CONTINUE_IF(errands_data_get_deleted(ical));
@@ -82,7 +75,6 @@ void errands_task_list_row_update(ErrandsTaskListRow *self) {
   }
   size_t uncompleted = total - completed;
   gtk_label_set_label(GTK_LABEL(self->counter), uncompleted > 0 ? tmp_str_printf("%zu", uncompleted) : "");
-  gtk_label_set_label(GTK_LABEL(self->label), errands_data_get_list_name(self->data->ical));
 }
 
 // ---------- CALLBACKS ---------- //
@@ -92,19 +84,10 @@ void on_errands_task_list_row_activate(GtkListBox *box, ErrandsTaskListRow *row,
   // Unselect filter rows
   gtk_list_box_unselect_all(GTK_LIST_BOX(state.main_window->sidebar->filters_box));
   // Set setting
-  LOG("Switch to list '%s'", row->data->uid);
-  errands_settings_set(SETTING_LAST_LIST_UID, (void *)row->data->uid);
-  errands_task_list_show_task_list(task_list, row->data);
+  LOG("Switch to list '%s'", row->item->uid);
+  errands_settings_set(SETTING_LAST_LIST_UID, (void *)row->item->uid);
+  errands_task_list_show_task_list(task_list, row->item->data);
   adw_navigation_split_view_set_show_content(state.main_window->split_view, true);
-}
-
-static void on_color_changed(GtkColorDialogButton *btn, GParamSpec *pspec, ListData *data) {
-  const GdkRGBA *color_rgba = gtk_color_dialog_button_get_rgba(btn);
-  char new_color[8];
-  gdk_rgba_to_hex_string(color_rgba, new_color);
-  errands_data_set_color(data->ical, new_color, true);
-  errands_list_data_save(data);
-  errands_sync_update_list(data);
 }
 
 // --- DND --- //
@@ -124,7 +107,7 @@ static void on_drop_motion_ctrl_enter_cb(ErrandsTaskListRow *self) {
 static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x, double y, ErrandsTaskListRow *self) {
   ErrandsTaskItem *drop_item = g_value_get_object(value);
   TaskData *drop_data = errands_task_item_get_data(drop_item);
-  ListData *list_data = self->data;
+  ListData *list_data = self->item->data;
   ListData *old_list_data = drop_data->list;
 
   bool changing_list = old_list_data != list_data;

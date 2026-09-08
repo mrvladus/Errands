@@ -2,10 +2,15 @@
 #include "about-dialog.h"
 #include "data.h"
 #include "gio/gio.h"
+#include "glib.h"
+#include "gtk/gtk.h"
+#include "gtk/gtkshortcut.h"
 #include "settings-dialog.h"
 #include "settings.h"
 #include "state.h"
 #include "sync.h"
+#include "task-list-item.h"
+#include "task-list-row.h"
 #include "task-list.h"
 #include "utils.h"
 
@@ -44,16 +49,24 @@ static void errands_sidebar_class_init(ErrandsSidebarClass *class) {
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_errands_task_list_row_activate);
 }
 
+static GtkWidget *create_task_list_row_func(ErrandsTaskListItem *item, gpointer data) {
+  return GTK_WIDGET(errands_task_list_row_new(item));
+}
+
 static void errands_sidebar_init(ErrandsSidebar *sidebar) {
   LOG("Sidebar: Create");
   self = sidebar;
-  gtk_widget_init_template(GTK_WIDGET(sidebar));
+  gtk_widget_init_template(GTK_WIDGET(self));
   GSimpleActionGroup *ag = errands_add_action_group(self, "sidebar");
   errands_add_action(ag, "import", on_import_action_cb, self, NULL);
   errands_add_action(ag, "new_list", errands_new_list_dialog_show, self, NULL);
   errands_add_action(ag, "preferences", errands_settings_dialog_show, self, NULL);
   errands_add_action(ag, "about", errands_about_dialog_show, self, NULL);
   errands_add_action(ag, "sync", errands_sync, self, NULL);
+
+  self->task_lists_model = g_list_store_new(ERRANDS_TYPE_TASK_LIST_ITEM);
+  gtk_list_box_bind_model(GTK_LIST_BOX(sidebar->task_lists_box), G_LIST_MODEL(self->task_lists_model),
+                          (GtkListBoxCreateWidgetFunc)create_task_list_row_func, NULL, NULL);
 }
 
 ErrandsSidebar *errands_sidebar_new() { return g_object_new(ERRANDS_TYPE_SIDEBAR, NULL); }
@@ -69,14 +82,13 @@ static gint __sort_func(gconstpointer a, gconstpointer b) {
 }
 
 void errands_sidebar_load_lists(void) {
-  gtk_list_box_remove_all(GTK_LIST_BOX(self->task_lists_box));
   g_ptr_array_sort_values(errands_data_lists, __sort_func);
   // Add rows
   for (size_t i = 0; i < errands_data_lists->len; i++) {
     ListData *ld = errands_data_lists->pdata[i];
     if (!errands_data_get_deleted(ld->ical)) {
-      ErrandsTaskListRow *row = errands_task_list_row_new(ld);
-      gtk_list_box_append(GTK_LIST_BOX(self->task_lists_box), GTK_WIDGET(row));
+      ErrandsTaskListItem *list_item = errands_task_list_item_new(ld);
+      g_list_store_append(self->task_lists_model, list_item);
     }
   }
   errands_sidebar_update_filter_rows();
@@ -89,7 +101,7 @@ ErrandsTaskListRow *errands_sidebar_find_row(ListData *data) {
   g_autoptr(GPtrArray) rows = get_children(state.main_window->sidebar->task_lists_box);
   for_range(i, 0, rows->len) {
     ErrandsTaskListRow *row = g_ptr_array_index(rows, i);
-    if (row->data == data) return row;
+    if (row->item->data == data) return row;
   }
   return NULL;
 }
@@ -102,7 +114,7 @@ void errands_sidebar_select_last_opened_page() {
   bool selected = false;
   for_range(i, 0, rows->len) {
     ErrandsTaskListRow *row = g_ptr_array_index(rows, i);
-    if (STR_EQUAL(last_uid, row->data->uid)) {
+    if (STR_EQUAL(last_uid, row->item->uid)) {
       g_signal_emit_by_name(row, "activate", NULL);
       selected = true;
     }

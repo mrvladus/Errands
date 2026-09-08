@@ -49,11 +49,11 @@ void errands_delete_list_dialog_show(ErrandsTaskListRow *row) {
 static void on_response_cb(ErrandsDeleteListDialog *dialog, gchar *response, gpointer data) {
   if (STR_EQUAL(response, "delete")) {
     ErrandsTaskListRow *row = dialog->current_task_list_row;
-    LOG("Delete List Dialog: Deleting task list %s", row->data->uid);
+    LOG("Delete List Dialog: Deleting task list %s", row->item->uid);
     // Delete data
-    errands_data_set_deleted(row->data->ical, true);
-    errands_list_data_save(row->data);
-    errands_sync_delete_list(row->data);
+    errands_data_set_deleted(row->item->data->ical, true);
+    errands_list_data_save(row->item->data);
+    errands_sync_delete_list(row->item->data);
     errands_sidebar_update_filter_rows();
     GtkWidget *prev = gtk_widget_get_prev_sibling(GTK_WIDGET(row));
     GtkWidget *next = gtk_widget_get_next_sibling(GTK_WIDGET(row));

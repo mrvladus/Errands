@@ -1,7 +1,6 @@
 #include "rename-list-dialog.h"
 #include "data.h"
 #include "state.h"
-#include "sync.h"
 
 static void on_response_cb(ErrandsRenameListDialog *self, gchar *response, gpointer data);
 static void on_entry_changed_cb(ErrandsRenameListDialog *self, AdwEntryRow *entry);
@@ -48,7 +47,7 @@ void errands_rename_list_dialog_show(ErrandsTaskListRow *row) {
   if (!self) self = errands_rename_list_dialog_new();
   self->current_task_list_row = row;
   LOG("Sidebar Rename List Dialog: Show");
-  gtk_editable_set_text(GTK_EDITABLE(self->entry), errands_data_get_list_name(row->data->ical));
+  gtk_editable_set_text(GTK_EDITABLE(self->entry), row->item->title);
   adw_dialog_present(ADW_DIALOG(self), GTK_WIDGET(state.main_window));
   gtk_widget_grab_focus(self->entry);
 }
@@ -56,28 +55,23 @@ void errands_rename_list_dialog_show(ErrandsTaskListRow *row) {
 // ---------- CALLBACKS ---------- //
 
 static void on_response_cb(ErrandsRenameListDialog *self, gchar *response, gpointer data) {
-  if (STR_EQUAL(response, "rename")) {
-    ListData *list_data = self->current_task_list_row->data;
+  if (g_str_equal(response, "rename")) {
     const char *text = gtk_editable_get_text(GTK_EDITABLE(self->entry));
     LOG("Sidebar Rename List Dialog: Rename to '%s'", text);
-    errands_data_set_list_name(list_data->ical, text);
-    errands_list_data_save(list_data);
-    errands_task_list_row_update(self->current_task_list_row);
+    gtk_label_set_label(GTK_LABEL(self->current_task_list_row->label), text);
     errands_task_list_update_title(state.main_window->task_list);
-    errands_sync_update_list(list_data);
   }
 }
 
 static void on_entry_changed_cb(ErrandsRenameListDialog *self, AdwEntryRow *entry) {
   const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
-  const char *list_name = errands_data_get_list_name(self->current_task_list_row->data->ical);
-  const bool enable = !STR_EQUAL("", text) && !STR_EQUAL(text, list_name);
+  const bool enable = !g_str_equal("", text) && !g_str_equal(text, self->current_task_list_row->item->title);
   adw_alert_dialog_set_response_enabled(ADW_ALERT_DIALOG(self), "rename", enable);
 }
 
 static void on_entry_activated_cb(ErrandsRenameListDialog *self, AdwEntryRow *entry) {
   const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
-  if (STR_EQUAL(text, "")) return;
+  if (g_str_equal(text, "")) return;
   on_response_cb(self, "rename", NULL);
   adw_dialog_close(ADW_DIALOG(self));
 }
