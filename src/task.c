@@ -24,7 +24,6 @@ static void on_attachments_action_cb(GSimpleAction *action, GVariant *param, Err
 static void on_tags_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_date_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_cancel_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
-static void on_complete_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_delete_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 
 // Callbacks
@@ -131,7 +130,6 @@ static void errands_task_init(ErrandsTask *self) {
   errands_add_action(ag, "tags", on_tags_action_cb, self, NULL);
   errands_add_action(ag, "date", on_date_action_cb, self, NULL);
   errands_add_action(ag, "cancel", on_cancel_action_cb, self, NULL);
-  errands_add_action(ag, "complete", on_complete_action_cb, self, NULL);
   errands_add_action(ag, "delete", on_delete_action_cb, self, NULL);
 }
 
@@ -142,10 +140,7 @@ ErrandsTask *errands_task_new() { return g_object_new(ERRANDS_TYPE_TASK, NULL); 
 void errands_task_set_data(ErrandsTask *self, TaskData *data) {
   if (!data) return;
   self->data = data;
-  g_autofree gchar *markup = str_to_markup(errands_data_get_text(data->ical));
-  gtk_label_set_markup(GTK_LABEL(self->title), markup);
-  gtk_check_button_set_active(GTK_CHECK_BUTTON(self->complete_btn), errands_data_is_completed(data->ical));
-  gtk_widget_set_visible(self->complete_btn, !errands_data_get_cancelled(data->ical));
+  // gtk_widget_set_visible(self->complete_btn, !errands_data_get_cancelled(data->ical));
   errands_task_update_accent_color(self);
   errands_task_update_progress(self);
   errands_task_update_toolbar(self);
@@ -368,77 +363,6 @@ static void on_cancel_action_cb(GSimpleAction *action, GVariant *param, ErrandsT
   errands_task_list_sort(state.main_window->task_list, GTK_SORTER_CHANGE_MORE_STRICT);
 }
 
-static void on_complete_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
-  bool completed = !errands_data_is_completed(self->data->ical);
-  icaltimetype now = icaltime_get_date_time_now();
-  errands_data_set_completed(self->data->ical, completed ? now : icaltime_null_time());
-  errands_task_set_data(self, self->data);
-  errands_sync_update_task(self->data);
-  if (completed) {
-    g_autoptr(GPtrArray) children = g_ptr_array_new();
-    errands_task_data_get_flat_list(self->data, children);
-    for_range(i, 0, children->len) {
-      TaskData *child = g_ptr_array_index(children, i);
-      if (!errands_data_is_completed(child->ical)) {
-        errands_data_set_completed(child->ical, now);
-        errands_sync_update_task(self->data);
-      }
-    }
-    if (self->row) {
-      g_ptr_array_set_size(children, 0);
-      __get_children_tree_list_rows(self->row, children);
-      for_range(i, 0, children->len) {
-        GtkTreeListRow *child = g_ptr_array_index(children, i);
-        ErrandsTaskItem *child_item = gtk_tree_list_row_get_item(child);
-        ErrandsTask *child_task = NULL;
-        g_object_get(child_item, "task-widget", &child_task, NULL);
-        if (child_task) {
-          errands_task_set_data(child_task, child_task->data);
-          errands_task_update_progress(child_task);
-        }
-      }
-      // Update parent
-      ErrandsTaskItem *parent_item = errands_task_item_get_parent(self->item);
-      if (parent_item) {
-        ErrandsTask *parent_task = NULL;
-        g_object_get(parent_item, "task-widget", &parent_task, NULL);
-        if (parent_task) errands_task_update_progress(parent_task);
-      }
-    }
-    errands_task_list_filter_tree(state.main_window->task_list, GTK_FILTER_CHANGE_MORE_STRICT);
-  } else {
-    TaskData *parent = self->data->parent;
-    while (parent) {
-      if (errands_data_is_completed(parent->ical)) {
-        errands_data_set_completed(parent->ical, icaltime_null_time());
-        errands_sync_update_task(parent);
-        parent = parent->parent;
-      } else {
-        break;
-      }
-    }
-    if (self->row) {
-      g_autoptr(GPtrArray) parents = g_ptr_array_new();
-      __get_parents_tree_list_rows(self->row, parents);
-      for_range(i, 0, parents->len) {
-        GtkTreeListRow *parent = g_ptr_array_index(parents, i);
-        ErrandsTaskItem *parent_item = gtk_tree_list_row_get_item(parent);
-        ErrandsTask *parent_task = NULL;
-        g_object_get(parent_item, "task-widget", &parent_task, NULL);
-        if (parent_task && !errands_data_is_completed(parent_task->data->ical)) {
-          errands_task_set_data(parent_task, parent_task->data);
-          errands_task_update_progress(parent_task);
-        }
-      }
-    }
-  }
-  errands_list_data_save(self->data->list);
-  errands_task_list_update_title(state.main_window->task_list);
-  errands_sidebar_update_filter_rows();
-  errands_task_list_row_update(errands_task_list_row_get(self->data->list));
-  errands_task_list_sort(state.main_window->task_list, GTK_SORTER_CHANGE_MORE_STRICT);
-}
-
 static void on_delete_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
   errands_data_set_deleted(self->data->ical, true);
   errands_sync_delete_task(self->data);
@@ -489,11 +413,8 @@ static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointe
       return;
     }
     gtk_widget_set_visible(task->title, true);
-    errands_data_set_text(task->data->ical, text);
-    errands_list_data_save(task->data->list);
     g_autofree gchar *markup = str_to_markup(text);
     gtk_label_set_markup(GTK_LABEL(task->title), markup);
-    errands_sync_update_task(task->data);
   }
 }
 

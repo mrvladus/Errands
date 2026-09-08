@@ -1,10 +1,17 @@
 #include "task-item.h"
 #include "data.h"
+#include "glib.h"
 #include "settings.h"
+#include "state.h"
+#include "task-list-row.h"
 #include "task.h"
 
 struct _ErrandsTaskItem {
   GObject parent_instance;
+
+  // Properties
+  const char *title;
+  gboolean completed;
 
   TaskData *data;
   ErrandsTaskItem *parent;
@@ -19,6 +26,10 @@ G_DEFINE_TYPE(ErrandsTaskItem, errands_task_item, G_TYPE_OBJECT)
 
 enum {
   PROP_0,
+
+  PROP_TITLE,
+  PROP_COMPLETED,
+
   PROP_DATA,
   PROP_CHILDREN_MODEL,
   PROP_CHILDREN_MODEL_IS_EMPTY,
@@ -29,10 +40,48 @@ enum {
 };
 
 static GParamSpec *obj_properties[N_PROPERTIES] = {NULL};
+static int update_task_list_count = 0;
 
 static void errands_task_item_set_property(GObject *object, guint prop_id, const GValue *value, GParamSpec *pspec) {
   ErrandsTaskItem *self = ERRANDS_TASK_ITEM(object);
   switch (prop_id) {
+  case PROP_TITLE: {
+    self->title = g_value_get_string(value);
+    errands_data_set_text(self->data->ical, self->title);
+    errands_list_data_save(self->data->list);
+  } break;
+  case PROP_COMPLETED: {
+    gboolean old = self->completed;
+    self->completed = g_value_get_boolean(value);
+    if (old == self->completed) break;
+    update_task_list_count++;
+    errands_data_set_completed(self->data->ical, self->completed ? icaltime_get_date_time_now() : icaltime_null_time());
+    // Complete all sub-tasks if the task is completed
+    if (self->completed) {
+      GListStore *sub_tasks = self->children_model;
+      for (guint i = 0; i < g_list_model_get_n_items(G_LIST_MODEL(sub_tasks)); i++) {
+        ErrandsTaskItem *sub_task = g_list_model_get_item(G_LIST_MODEL(sub_tasks), i);
+        g_object_set(sub_task, "completed", true, NULL);
+      }
+      errands_task_update_progress(self->task_widget);
+    }
+    // Uncomplete all parents
+    else {
+      if (self->parent) {
+        g_object_set(self->parent, "completed", false, NULL);
+        errands_task_update_progress(self->parent->task_widget);
+      }
+    }
+    if (update_task_list_count > 0) update_task_list_count--;
+    if (update_task_list_count > 0) break;
+    errands_list_data_save(self->data->list);
+    errands_sidebar_update_filter_rows();
+    ErrandsTaskListRow *row = errands_task_list_row_get(self->data->list);
+    if (row) errands_task_list_row_update(row);
+    errands_task_list_sort(state.main_window->task_list, GTK_SORTER_CHANGE_MORE_STRICT);
+    errands_task_list_filter_tree(state.main_window->task_list, GTK_FILTER_CHANGE_MORE_STRICT);
+  } break;
+
   case PROP_DATA: self->data = g_value_get_pointer(value); break;
   case PROP_CHILDREN_MODEL: self->children_model = g_value_get_object(value); break;
   case PROP_CHILDREN_MODEL_IS_EMPTY: g_object_notify_by_pspec(object, pspec); break;
@@ -46,6 +95,9 @@ static void errands_task_item_set_property(GObject *object, guint prop_id, const
 static void errands_task_item_get_property(GObject *object, guint prop_id, GValue *value, GParamSpec *pspec) {
   ErrandsTaskItem *self = ERRANDS_TASK_ITEM(object);
   switch (prop_id) {
+  case PROP_TITLE: g_value_set_string(value, self->title); break;
+  case PROP_COMPLETED: g_value_set_boolean(value, self->completed); break;
+
   case PROP_DATA: g_value_set_pointer(value, self->data); break;
   case PROP_CHILDREN_MODEL: g_value_set_object(value, self->children_model); break;
   case PROP_CHILDREN_MODEL_IS_EMPTY: {
@@ -70,9 +122,7 @@ static void errands_task_item_get_property(GObject *object, guint prop_id, GValu
 
 static void errands_task_item_dispose(GObject *object) {
   ErrandsTaskItem *self = ERRANDS_TASK_ITEM(object);
-
   if (self->children_model) g_object_unref(self->children_model);
-
   G_OBJECT_CLASS(errands_task_item_parent_class)->dispose(object);
 }
 
@@ -82,6 +132,10 @@ static void errands_task_item_class_init(ErrandsTaskItemClass *klass) {
 
   object_class->set_property = errands_task_item_set_property;
   object_class->get_property = errands_task_item_get_property;
+
+  obj_properties[PROP_TITLE] = g_param_spec_string("title", "Title", "Title of the task.", NULL, G_PARAM_READWRITE);
+  obj_properties[PROP_COMPLETED] =
+      g_param_spec_boolean("completed", "Completed", "Whether the task is completed.", false, G_PARAM_READWRITE);
 
   obj_properties[PROP_DATA] =
       g_param_spec_pointer("data", "Task Data", "Data associated with the task.", G_PARAM_READWRITE);
@@ -104,6 +158,10 @@ static void errands_task_item_init(ErrandsTaskItem *self) {}
 
 ErrandsTaskItem *errands_task_item_new(TaskData *data, ErrandsTaskItem *parent) {
   ErrandsTaskItem *self = g_object_new(ERRANDS_TYPE_TASK_ITEM, NULL);
+
+  self->title = errands_data_get_text(data->ical);
+  self->completed = errands_data_is_completed(data->ical);
+
   self->data = data;
   self->children_model = NULL;
   self->parent = parent;

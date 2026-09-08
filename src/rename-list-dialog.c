@@ -1,5 +1,4 @@
 #include "rename-list-dialog.h"
-#include "data.h"
 #include "state.h"
 
 static void on_response_cb(ErrandsRenameListDialog *self, gchar *response, gpointer data);
@@ -55,12 +54,9 @@ void errands_rename_list_dialog_show(ErrandsTaskListRow *row) {
 // ---------- CALLBACKS ---------- //
 
 static void on_response_cb(ErrandsRenameListDialog *self, gchar *response, gpointer data) {
-  if (g_str_equal(response, "rename")) {
-    const char *text = gtk_editable_get_text(GTK_EDITABLE(self->entry));
-    LOG("Sidebar Rename List Dialog: Rename to '%s'", text);
-    gtk_label_set_label(GTK_LABEL(self->current_task_list_row->label), text);
-    errands_task_list_update_title(state.main_window->task_list);
-  }
+  if (!g_str_equal(response, "rename")) return;
+  gtk_label_set_label(GTK_LABEL(self->current_task_list_row->label), gtk_editable_get_text(GTK_EDITABLE(self->entry)));
+  errands_task_list_update_title(state.main_window->task_list);
 }
 
 static void on_entry_changed_cb(ErrandsRenameListDialog *self, AdwEntryRow *entry) {

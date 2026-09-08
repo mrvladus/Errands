@@ -43,6 +43,7 @@ static void errands_window_init(ErrandsWindow *self) {
   case SETTING_THEME_LIGHT: adw_style_manager_set_color_scheme(style_manager, ADW_COLOR_SCHEME_FORCE_LIGHT); break;
   case SETTING_THEME_DARK: adw_style_manager_set_color_scheme(style_manager, ADW_COLOR_SCHEME_FORCE_DARK); break;
   }
+  g_signal_connect(self, "realize", G_CALLBACK(errands_sidebar_load_lists), NULL);
   LOG("Window: Created");
 }
 

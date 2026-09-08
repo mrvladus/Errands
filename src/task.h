@@ -30,8 +30,9 @@ struct _ErrandsTask {
   GtkDropControllerMotion *drop_motion_ctrl;
 
   TaskData *data;
-  ErrandsTaskItem *item;
   GtkTreeListRow *row;
+
+  ErrandsTaskItem *item;
 };
 
 ErrandsTask *errands_task_new();

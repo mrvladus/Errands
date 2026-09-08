@@ -1,5 +1,6 @@
 #include "data.h"
 #include "glib-object.h"
+#include "glib.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "state.h"
@@ -55,6 +56,7 @@ ErrandsTaskListRow *errands_task_list_row_new(ErrandsTaskListItem *item) {
 // ---------- PUBLIC FUNCTIONS ---------- //
 
 ErrandsTaskListRow *errands_task_list_row_get(ListData *data) {
+  if (!data) return NULL;
   g_autoptr(GPtrArray) children = get_children(state.main_window->sidebar->task_lists_box);
   for_range(i, 0, children->len) {
     ListData *child_data = ((ErrandsTaskListRow *)g_ptr_array_index(children, i))->item->data;

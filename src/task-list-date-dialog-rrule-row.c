@@ -4,7 +4,6 @@
 #include "utils.h"
 
 #include <glib/gi18n.h>
-#include <libical/ical.h>
 
 static void reset_week_days(ErrandsTaskListDateDialogRruleRow *self);
 static void get_week_days(ErrandsTaskListDateDialogRruleRow *self, short days[]);

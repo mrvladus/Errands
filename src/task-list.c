@@ -321,11 +321,17 @@ static void on_bind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_it
   gtk_tree_expander_set_list_row(expander, row);
   ErrandsTask *task = ERRANDS_TASK(gtk_tree_expander_get_child(expander));
   ErrandsTaskItem *item = gtk_tree_list_row_get_item(row);
+
+  g_object_bind_property(item, "title", task->title, "label", G_BINDING_SYNC_CREATE | G_BINDING_BIDIRECTIONAL);
+  g_object_bind_property(item, "completed", task->complete_btn, "active",
+                         G_BINDING_SYNC_CREATE | G_BINDING_BIDIRECTIONAL);
+
   g_object_set(task, "task-item", item, NULL);
   g_object_set(item, "task-widget", task, NULL);
   g_object_set(item, "expander-widget", expander, NULL);
   g_object_set(item, "list-item", list_item, NULL);
   g_object_bind_property(item, "children-model-is-empty", expander, "hide-expander", G_BINDING_SYNC_CREATE);
+  task->item = item;
   task->row = row;
 }
 
@@ -333,6 +339,7 @@ static void on_unbind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_
   GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_list_item_get_child(list_item));
   ErrandsTask *task = ERRANDS_TASK(gtk_tree_expander_get_child(expander));
   task->row = NULL;
+  g_object_set(task->item, "task-widget", NULL, NULL);
 }
 
 // ---------- ACTIONS ---------- //

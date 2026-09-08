@@ -23,7 +23,6 @@ State state = {0};
 
 static void activate(GtkApplication *app) {
   state.main_window = errands_window_new(app);
-  errands_sidebar_load_lists();
   gtk_window_present(GTK_WINDOW(state.main_window));
   errands_sync_init();
 
