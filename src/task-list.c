@@ -1,7 +1,6 @@
 #include "task-list.h"
 #include "data.h"
 #include "delete-list-dialog.h"
-#include "glib-object.h"
 #include "rename-list-dialog.h"
 #include "settings.h"
 #include "sidebar.h"
@@ -332,8 +331,6 @@ static void on_bind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_it
 
   g_object_set(task, "task-item", item, NULL);
   g_object_set(item, "task-widget", task, NULL);
-  g_object_set(item, "expander-widget", expander, NULL);
-  g_object_set(item, "list-item", list_item, NULL);
   task->item = item;
   task->row = row;
 }
