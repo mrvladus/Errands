@@ -1,6 +1,5 @@
 #include "task-item.h"
 #include "data.h"
-#include "glib.h"
 #include "settings.h"
 #include "state.h"
 #include "task-list-row.h"
