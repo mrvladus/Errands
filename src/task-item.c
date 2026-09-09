@@ -65,7 +65,7 @@ static void errands_task_item_set_property(GObject *object, guint prop_id, const
     }
     // Uncomplete all parents
     else {
-      if (self->parent) {
+      if (self->parent && self->parent->completed) {
         g_object_set(self->parent, "completed", false, NULL);
         errands_task_update_progress(self->parent->task_widget);
       }
@@ -92,7 +92,7 @@ static void errands_task_item_set_property(GObject *object, guint prop_id, const
         g_object_set(sub_task, "cancelled", true, NULL);
       }
     } else {
-      if (self->parent) g_object_set(self->parent, "cancelled", false, NULL);
+      if (self->parent && self->parent->cancelled) g_object_set(self->parent, "cancelled", false, NULL);
     }
     if (update_task_list_count > 0) update_task_list_count--;
     if (update_task_list_count > 0) break;

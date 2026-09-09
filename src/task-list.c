@@ -331,14 +331,11 @@ static void on_bind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_it
 
   g_object_set(task, "task-item", item, NULL);
   g_object_set(item, "task-widget", task, NULL);
-  task->item = item;
-  task->row = row;
 }
 
 static void on_unbind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_item) {
   GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_list_item_get_child(list_item));
   ErrandsTask *task = ERRANDS_TASK(gtk_tree_expander_get_child(expander));
-  task->row = NULL;
   g_object_set(task->item, "task-widget", NULL, NULL);
 }
 
