@@ -1,13 +1,13 @@
 #include "task-list.h"
 #include "data.h"
 #include "delete-list-dialog.h"
+#include "glib.h"
 #include "rename-list-dialog.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "state.h"
 #include "sync.h"
 #include "task-item.h"
-#include "task-list-row.h"
 #include "task-menu.h"
 #include "task.h"
 #include "utils.h"
@@ -365,13 +365,13 @@ static void on_action_export_finish_cb(GObject *obj, GAsyncResult *res, ListData
   fprintf(file, "%s", ical);
   fclose(file);
   errands_window_add_toast(_("Exported"));
-  LOG("Export task list %s", data->uid);
+  LOG("Export task list %s", errands_data_get_uid(data->ical));
 }
 
 static void on_action_export_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
   gtk_popover_popdown(self->menu_popover);
   g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
-  const char *filename = tmp_str_printf("%s.ics", self->data->uid);
+  const char *filename = tmp_str_printf("%s.ics", errands_data_get_uid(self->data->ical));
   g_object_set(dialog, "initial-name", filename, NULL);
   gtk_file_dialog_save(dialog, GTK_WINDOW(state.main_window), NULL, (GAsyncReadyCallback)on_action_export_finish_cb,
                        self->data);
@@ -379,7 +379,8 @@ static void on_action_export_cb(GSimpleAction *action, GVariant *param, ErrandsT
 
 static void on_action_rename_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
   gtk_popover_popdown(self->menu_popover);
-  errands_rename_list_dialog_show(errands_task_list_row_get(self->data));
+  ErrandsTaskListItem *item = errands_sidebar_find_list(errands_data_get_uid(self->data->ical));
+  errands_rename_list_dialog_show(item);
 }
 
 static void __remove_deleted_tasks(ErrandsTaskList *self, GListStore *model) {
@@ -443,7 +444,7 @@ static void on_action_delete_cancelled_cb(GSimpleAction *action, GVariant *param
 
 static void on_action_delete_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
   gtk_popover_popdown(self->menu_popover);
-  errands_delete_list_dialog_show(errands_task_list_row_get(self->data));
+  errands_delete_list_dialog_show(errands_sidebar_find_list(errands_data_get_uid(self->data->ical)));
 }
 
 // - PRINTING - //
@@ -523,7 +524,7 @@ void start_print(const char *str) {
 
 static void on_action_print_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
   gtk_popover_popdown(self->menu_popover);
-  LOG("Start printing of the list '%s'", self->data->uid);
+  LOG("Start printing of the list '%s'", errands_data_get_uid(self->data->ical));
   TODO("PRINT");
   // g_autofree gchar *str = list_data_print(row->data);
   // start_print(str);
@@ -660,12 +661,13 @@ static void on_task_list_entry_activated_cb(ErrandsTaskList *self) {
   g_autofree gchar *dup = g_strdup(text);
   char *stripped = g_strstrip(dup);
 
-  const char *list_uid = self->data->uid;
+  const char *list_uid = errands_data_get_uid(self->data->ical);
   if (STR_EQUAL(stripped, "") || STR_EQUAL(list_uid, "")) return;
 
   // Create new top-level task from entry task
   TaskData *data = errands_task_data_new(entry_task_data->ical, NULL, self->data);
-  errands_data_set_uid(data->ical, generate_uuid4());
+  g_autofree gchar *uid = g_uuid_string_random();
+  errands_data_set_uid(data->ical, uid);
   errands_data_set_text(data->ical, stripped);
   errands_data_set_created(data->ical, icaltime_get_date_time_now());
   icalcomponent_add_component(self->data->ical, data->ical);
@@ -676,7 +678,7 @@ static void on_task_list_entry_activated_cb(ErrandsTaskList *self) {
   // Reset text
   g_object_set(self->entry, "text", "", NULL);
   // Update UI
-  errands_task_list_row_update(errands_task_list_row_get(data->list));
+  errands_sidebar_task_list_update_counter(list_uid);
   errands_sidebar_update_filter_rows();
   LOG("Add task '%s' to task list '%s'", errands_data_get_uid(data->ical), list_uid);
   errands_sync_create_task(data);

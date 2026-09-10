@@ -1,14 +1,19 @@
 #include "task-list-item.h"
 #include "data.h"
+#include "glib.h"
 #include "utils.h"
 
 G_DEFINE_TYPE(ErrandsTaskListItem, errands_task_list_item, G_TYPE_OBJECT)
 
 enum {
   PROP_0,
+
   PROP_UID,
   PROP_TITLE,
   PROP_COLOR,
+  PROP_COUNT,
+  PROP_COUNT_STRING,
+
   N_PROPERTIES,
 };
 
@@ -36,6 +41,11 @@ static void errands_task_list_item_set_property(GObject *object, guint prop_id, 
     errands_data_set_color(self->data->ical, hex_string, true);
     errands_list_data_save(self->data);
   } break;
+  case PROP_COUNT: {
+    self->count = g_value_get_int(value);
+    if (self->count == 0) strcpy(self->count_string, "");
+    else sprintf(self->count_string, "%d", self->count);
+  } break;
   default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
   }
 }
@@ -43,15 +53,11 @@ static void errands_task_list_item_set_property(GObject *object, guint prop_id, 
 static void errands_task_list_item_get_property(GObject *object, guint prop_id, GValue *value, GParamSpec *pspec) {
   ErrandsTaskListItem *self = ERRANDS_TASK_LIST_ITEM(object);
   switch (prop_id) {
-  case PROP_UID: {
-    g_value_set_string(value, self->uid);
-  } break;
-  case PROP_TITLE: {
-    g_value_set_string(value, self->title);
-  } break;
-  case PROP_COLOR: {
-    g_value_set_boxed(value, &self->color);
-  } break;
+  case PROP_UID: g_value_set_string(value, self->uid); break;
+  case PROP_TITLE: g_value_set_string(value, self->title); break;
+  case PROP_COLOR: g_value_set_boxed(value, &self->color); break;
+  case PROP_COUNT: g_value_set_int(value, self->count); break;
+  case PROP_COUNT_STRING: g_value_set_string(value, self->count_string); break;
   default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
   }
 }
@@ -77,11 +83,17 @@ static void errands_task_list_item_class_init(ErrandsTaskListItemClass *klass) {
       g_param_spec_string("title", "Task List Title", "Title of the task list", NULL, G_PARAM_READWRITE);
   obj_properties[PROP_COLOR] =
       g_param_spec_boxed("color", "Task List Color", "Color of the task list", GDK_TYPE_RGBA, G_PARAM_READWRITE);
+  obj_properties[PROP_COUNT] =
+      g_param_spec_int("count", "Task List Count", "Number of uncompleted tasks", 0, G_MAXINT, 0, G_PARAM_READWRITE);
+  obj_properties[PROP_COUNT_STRING] = g_param_spec_string(
+      "count-string", "Task List Count String", "Number of uncompleted tasks as string", NULL, G_PARAM_READABLE);
 
   g_object_class_install_properties(object_class, N_PROPERTIES, obj_properties);
 }
 
 static void errands_task_list_item_init(ErrandsTaskListItem *self) {}
+
+static gint errands_task_list_item_get_uncompleted_count(ErrandsTaskListItem *self) {}
 
 ErrandsTaskListItem *errands_task_list_item_new(ListData *data) {
   ErrandsTaskListItem *self = g_object_new(ERRANDS_TYPE_TASK_LIST_ITEM, NULL);
@@ -89,5 +101,20 @@ ErrandsTaskListItem *errands_task_list_item_new(ListData *data) {
   self->uid = errands_data_get_uid(data->ical);
   self->title = errands_data_get_list_name(data->ical);
   gdk_rgba_parse(&self->color, errands_data_get_color(data->ical, true));
+  errands_task_list_item_update_counter(self);
   return self;
+}
+
+void errands_task_list_item_update_counter(ErrandsTaskListItem *self) {
+  if (!self || !self->data) return;
+  icalcomponent *ical = self->data->ical;
+  size_t total = 0, completed = 0;
+  for (icalcomponent *c = icalcomponent_get_first_component(ical, ICAL_VTODO_COMPONENT); c != 0;
+       c = icalcomponent_get_next_component(ical, ICAL_VTODO_COMPONENT)) {
+    CONTINUE_IF(errands_data_get_deleted(c) || errands_data_get_cancelled(c));
+    if (errands_data_is_completed(c)) completed++;
+    total++;
+  }
+  gint count = total - completed;
+  g_object_set(self, "count", count, NULL);
 }

@@ -1,8 +1,7 @@
 #pragma once
 
-#include "data.h"
 #include "new-list-dialog.h"
-#include "task-list-row.h"
+#include "task-list-item.h"
 
 #include <adwaita.h>
 
@@ -13,17 +12,12 @@ struct _ErrandsSidebar {
   AdwBin parent_instance;
   GtkWidget *add_btn;
   GtkWidget *sync_indicator;
-  GtkWidget *filters_box;
-  GtkListBoxRow *all_row;
   GtkLabel *all_counter;
-  GtkListBoxRow *today_row;
   GtkLabel *today_counter;
-  GtkWidget *task_lists_box;
+  GtkWidget *sidebar;
+  AdwSidebarSection *task_lists_section;
 
   GListStore *task_lists_model;
-
-  ErrandsTaskListRow *current_task_list_row;
-  ErrandsNewListDialog *new_list_dialog;
 };
 
 ErrandsSidebar *errands_sidebar_new(void);
@@ -31,5 +25,5 @@ void errands_sidebar_load_lists(void);
 void errands_sidebar_update_filter_rows(void);
 void errands_sidebar_select_last_opened_page(void);
 void errands_sidebar_toggle_sync_indicator(bool on);
-ErrandsTaskListRow *errands_sidebar_find_row(ListData *data);
-bool errands_sidebar_row_is_selected(ErrandsTaskListRow *row);
+void errands_sidebar_task_list_update_counter(const char *uid);
+ErrandsTaskListItem *errands_sidebar_find_list(const char *uid);

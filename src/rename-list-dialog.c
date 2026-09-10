@@ -12,7 +12,7 @@ static ErrandsRenameListDialog *self = NULL;
 struct _ErrandsRenameListDialog {
   AdwAlertDialog parent_instance;
   GtkWidget *entry;
-  ErrandsTaskListRow *current_task_list_row;
+  ErrandsTaskListItem *item;
 };
 
 G_DEFINE_TYPE(ErrandsRenameListDialog, errands_rename_list_dialog, ADW_TYPE_ALERT_DIALOG)
@@ -42,11 +42,11 @@ ErrandsRenameListDialog *errands_rename_list_dialog_new() {
 
 // ---------- PUBLIC FUNCTIONS ---------- //
 
-void errands_rename_list_dialog_show(ErrandsTaskListRow *row) {
+void errands_rename_list_dialog_show(ErrandsTaskListItem *item) {
+  LOG("Rename List Dialog: Show");
   if (!self) self = errands_rename_list_dialog_new();
-  self->current_task_list_row = row;
-  LOG("Sidebar Rename List Dialog: Show");
-  gtk_editable_set_text(GTK_EDITABLE(self->entry), row->item->title);
+  self->item = item;
+  gtk_editable_set_text(GTK_EDITABLE(self->entry), item->title);
   adw_dialog_present(ADW_DIALOG(self), GTK_WIDGET(state.main_window));
   gtk_widget_grab_focus(self->entry);
 }
@@ -55,13 +55,13 @@ void errands_rename_list_dialog_show(ErrandsTaskListRow *row) {
 
 static void on_response_cb(ErrandsRenameListDialog *self, gchar *response, gpointer data) {
   if (!g_str_equal(response, "rename")) return;
-  gtk_label_set_label(GTK_LABEL(self->current_task_list_row->label), gtk_editable_get_text(GTK_EDITABLE(self->entry)));
+  g_object_set(self->item, "title", gtk_editable_get_text(GTK_EDITABLE(self->entry)), NULL);
   errands_task_list_update_title(state.main_window->task_list);
 }
 
 static void on_entry_changed_cb(ErrandsRenameListDialog *self, AdwEntryRow *entry) {
   const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
-  const bool enable = !g_str_equal("", text) && !g_str_equal(text, self->current_task_list_row->item->title);
+  const bool enable = !g_str_equal("", text) && !g_str_equal(text, self->item->title);
   adw_alert_dialog_set_response_enabled(ADW_ALERT_DIALOG(self), "rename", enable);
 }
 

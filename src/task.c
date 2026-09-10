@@ -4,7 +4,6 @@
 #include "state.h"
 #include "sync.h"
 #include "task-item.h"
-#include "task-list-row.h"
 #include "task-list.h"
 #include "task-menu.h"
 #include "task-properties-dialog.h"
@@ -339,7 +338,7 @@ static void on_delete_action_cb(GSimpleAction *action, GVariant *param, ErrandsT
   g_object_notify(G_OBJECT(parent), "children-model-is-empty");
 
   errands_sidebar_update_filter_rows();
-  errands_task_list_row_update(errands_task_list_row_get(self->data->list));
+  errands_sidebar_task_list_update_counter(errands_data_get_uid(self->data->list->ical));
   errands_task_list_update_title(state.main_window->task_list);
 }
 
@@ -460,10 +459,10 @@ static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x,
   errands_list_data_save(tgt_data->list);
   if (changing_list) {
     errands_list_data_save(drop_data_old_list);
-    errands_task_list_row_update(errands_task_list_row_get(drop_data_old_list));
+    errands_sidebar_task_list_update_counter(errands_data_get_uid(drop_data_old_list->ical));
     errands_task_list_update_title(state.main_window->task_list);
   }
-  errands_task_list_row_update(errands_task_list_row_get(tgt_data->list));
+  errands_sidebar_task_list_update_counter(errands_data_get_uid(tgt_data->list->ical));
 
   // Add child to target model
   GListStore *tgt_children_model = G_LIST_STORE(errands_task_item_get_children_model(tgt_item));

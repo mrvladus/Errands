@@ -1,8 +1,8 @@
 #include "task-item.h"
 #include "data.h"
 #include "settings.h"
+#include "sidebar.h"
 #include "state.h"
-#include "task-list-row.h"
 #include "task.h"
 
 struct _ErrandsTaskItem {
@@ -73,8 +73,7 @@ static void errands_task_item_set_property(GObject *object, guint prop_id, const
     if (update_task_list_count > 0) break;
     errands_list_data_save(self->data->list);
     errands_sidebar_update_filter_rows();
-    ErrandsTaskListRow *row = errands_task_list_row_get(self->data->list);
-    if (row) errands_task_list_row_update(row);
+    errands_sidebar_task_list_update_counter(errands_data_get_uid(self->data->ical));
     errands_task_list_sort(state.main_window->task_list, GTK_SORTER_CHANGE_MORE_STRICT);
     errands_task_list_filter_tree(state.main_window->task_list, GTK_FILTER_CHANGE_MORE_STRICT);
   } break;
@@ -97,8 +96,7 @@ static void errands_task_item_set_property(GObject *object, guint prop_id, const
     if (update_task_list_count > 0) break;
     errands_list_data_save(self->data->list);
     errands_sidebar_update_filter_rows();
-    ErrandsTaskListRow *row = errands_task_list_row_get(self->data->list);
-    if (row) errands_task_list_row_update(row);
+    errands_sidebar_task_list_update_counter(errands_data_get_uid(self->data->ical));
     errands_task_list_sort(state.main_window->task_list, GTK_SORTER_CHANGE_MORE_STRICT);
     errands_task_list_filter_tree(state.main_window->task_list, GTK_FILTER_CHANGE_MORE_STRICT);
   } break;

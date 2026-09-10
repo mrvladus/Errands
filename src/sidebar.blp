@@ -83,84 +83,40 @@ template $ErrandsSidebar: Adw.Bin {
       Box {
         orientation: vertical;
 
-        ListBox filters_box {
-          row-activated => $on_errands_sidebar_filter_row_activated();
+        Adw.Sidebar sidebar {
+          activated => $on_sidebar_activated_cb();
 
-          styles [
-            "navigation-sidebar",
-          ]
+          Adw.SidebarSection {
+            Adw.SidebarItem {
+              title: C_("All Tasks", "All");
+              tooltip: _("All Tasks");
+              icon-name: "errands-all-tasks-symbolic";
 
-          ListBoxRow all_row {
-            Box {
-              spacing: 12;
-              tooltip-text: _("All Tasks");
-
-              Image {
-                icon-name: "errands-all-tasks-symbolic";
-              }
-
-              Label {
-                label: C_("All Tasks", "All");
-              }
-
-              Label all_counter {
-                label: "";
-                hexpand: true;
-                halign: end;
-
+              suffix: Label all_counter {
                 styles [
                   "dim-label",
                   "caption",
                 ]
-              }
+              };
             }
-          }
 
-          ListBoxRow today_row {
-            Box {
-              spacing: 12;
-              tooltip-text: _("Tasks for Today");
+            Adw.SidebarItem {
+              title: C_("Tasks for Today", "Today");
+              tooltip: _("Tasks for Today");
+              icon-name: "errands-calendar-symbolic";
 
-              Image {
-                icon-name: "errands-calendar-symbolic";
-              }
-
-              Label {
-                label: _("Today");
-              }
-
-              Label today_counter {
-                label: "";
-                hexpand: true;
-                halign: end;
-
+              suffix: Label today_counter {
                 styles [
                   "dim-label",
                   "caption",
                 ]
-              }
+              };
             }
           }
-        }
 
-        Label {
-          label: _("Task Lists");
-          halign: start;
-          margin-start: 8;
-          visible: bind task_lists_box.visible;
-
-          styles [
-            "caption-heading",
-            "dimmed",
-          ]
-        }
-
-        ListBox task_lists_box {
-          row-activated => $on_errands_task_list_row_activate();
-
-          styles [
-            "navigation-sidebar",
-          ]
+          Adw.SidebarSection task_lists_section {
+            title: _("Task Lists");
+          }
         }
 
         Adw.StatusPage {
@@ -169,7 +125,7 @@ template $ErrandsSidebar: Adw.Bin {
           icon-name: "errands-list-symbolic";
           valign: center;
           vexpand: true;
-          visible: bind task_lists_box.visible inverted;
+          visible: bind sidebar.visible inverted;
 
           styles [
             "compact",

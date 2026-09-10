@@ -12,9 +12,12 @@ struct _ErrandsTaskListItem {
 
   const char *uid;
   const char *title;
+  gint count;            // Number of uncompleted tasks
+  char count_string[16]; // Number of uncompleted tasks as a string
   GdkRGBA color;
 
   ListData *data;
 };
 
 ErrandsTaskListItem *errands_task_list_item_new(ListData *data);
+void errands_task_list_item_update_counter(ErrandsTaskListItem *self);

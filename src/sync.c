@@ -177,11 +177,12 @@ static void errands__sync_cb(GTask *task, gpointer source_object, gpointer task_
   for_range(i, 0, errands_data_lists->len) {
     // Lists
     ListData *l = g_ptr_array_index(errands_data_lists, i);
+    const char *uid = errands_data_get_uid(l->ical);
     CONTINUE_IF_NOT(errands_data_get_synced(l->ical));
     CONTINUE_IF(errands_data_get_deleted(l->ical));
-    CalDAVCalendar *c = find_calendar_by_uid(l->uid);
+    CalDAVCalendar *c = find_calendar_by_uid(uid);
     if (!c) {
-      LOG("Sync: List was deleted while app was not running: %s", l->uid);
+      LOG("Sync: List was deleted while app was not running: %s", uid);
       g_ptr_array_add(lists[LISTS_TO_DELETE_LOCAL], l);
       continue;
     }
@@ -199,9 +200,10 @@ static void errands__sync_cb(GTask *task, gpointer source_object, gpointer task_
   // Delete lists on server
   for_range(i, 0, lists[LISTS_TO_DELETE_COPY]->len) {
     ListData *list = g_ptr_array_index(lists[LISTS_TO_DELETE_COPY], i);
-    CalDAVCalendar *c = find_calendar_by_uid(list->uid);
+    const char *uid = errands_data_get_uid(list->ical);
+    CalDAVCalendar *c = find_calendar_by_uid(uid);
     CONTINUE_IF_NOT(c);
-    LOG("Sync: Deleting calendar on server: %s", list->uid);
+    LOG("Sync: Deleting calendar on server: %s", uid);
     errands_data_set_synced(list->ical, caldav_calendar_delete(c));
     errands_list_data_save(list);
     g_ptr_array_add(lists[LISTS_DELETED], list);
@@ -211,13 +213,14 @@ static void errands__sync_cb(GTask *task, gpointer source_object, gpointer task_
   // Create lists on server
   for_range(i, 0, lists[LISTS_TO_CREATE_COPY]->len) {
     ListData *list = g_ptr_array_index(lists[LISTS_TO_CREATE_COPY], i);
-    CalDAVCalendar *c = find_calendar_by_uid(list->uid);
+    const char *uid = errands_data_get_uid(list->ical);
+    CalDAVCalendar *c = find_calendar_by_uid(uid);
     CONTINUE_IF(c);
     const char *name = errands_data_get_list_name(list->ical);
     const char *color = errands_data_get_color(list->ical, true);
-    bool created = caldav_client_create_calendar(client, list->uid, name, NULL, color, CALDAV_COMPONENT_SET_VTODO);
+    bool created = caldav_client_create_calendar(client, uid, name, NULL, color, CALDAV_COMPONENT_SET_VTODO);
     if (created) {
-      LOG("Sync: Created calendar on server: %s", list->uid);
+      LOG("Sync: Created calendar on server: %s", uid);
       caldav_client_pull_calendars(client);
       g_autoptr(GPtrArray) tasks = g_ptr_array_sized_new(list->children->len);
       errands_data_get_flat_list(tasks);
@@ -232,13 +235,14 @@ static void errands__sync_cb(GTask *task, gpointer source_object, gpointer task_
   // Update lists on server
   for_range(i, 0, lists[LISTS_TO_UPDATE_COPY]->len) {
     ListData *list = g_ptr_array_index(lists[LISTS_TO_UPDATE_COPY], i);
+    const char *uid = errands_data_get_uid(list->ical);
     CONTINUE_IF(errands_data_get_deleted(list->ical));
-    CalDAVCalendar *c = find_calendar_by_uid(list->uid);
+    CalDAVCalendar *c = find_calendar_by_uid(uid);
     CONTINUE_IF(!c || errands_data_get_synced(list->ical));
     const char *name = errands_data_get_list_name(list->ical);
     const char *color = errands_data_get_color(list->ical, true);
     if (!STR_EQUAL(name, c->display_name) || !STR_EQUAL(color, c->color)) {
-      LOG("Sync: Updating list properties on server: %s", list->uid);
+      LOG("Sync: Updating list properties on server: %s", uid);
       caldav_calendar_update(c, name, NULL, color);
       errands_data_set_synced(list->ical, true);
       errands_list_data_save(list);
@@ -250,7 +254,7 @@ static void errands__sync_cb(GTask *task, gpointer source_object, gpointer task_
   // Delete tasks on server
   for_range(i, 0, lists[TASKS_TO_DELETE_COPY]->len) {
     TaskData *task = g_ptr_array_index(lists[TASKS_TO_DELETE_COPY], i);
-    CalDAVCalendar *c = find_calendar_by_uid(task->list->uid);
+    CalDAVCalendar *c = find_calendar_by_uid(errands_data_get_uid(task->list->ical));
     CONTINUE_IF_NOT(c);
     const char *uid = errands_data_get_uid(task->ical);
     CalDAVEvent *e = find_event_by_uid(c, uid);
@@ -264,7 +268,7 @@ static void errands__sync_cb(GTask *task, gpointer source_object, gpointer task_
   // Create tasks on server
   for_range(i, 0, lists[TASKS_TO_CREATE_COPY]->len) {
     TaskData *task = g_ptr_array_index(lists[TASKS_TO_CREATE_COPY], i);
-    CalDAVCalendar *c = find_calendar_by_uid(task->list->uid);
+    CalDAVCalendar *c = find_calendar_by_uid(errands_data_get_uid(task->list->ical));
     CONTINUE_IF_NOT(c);
     const char *uid = errands_data_get_uid(task->ical);
     CalDAVEvent *e = find_event_by_uid(c, uid);
@@ -280,7 +284,7 @@ static void errands__sync_cb(GTask *task, gpointer source_object, gpointer task_
   // Update tasks on server
   for_range(i, 0, lists[TASKS_TO_UPDATE_COPY]->len) {
     TaskData *task = g_ptr_array_index(lists[TASKS_TO_UPDATE_COPY], i);
-    CalDAVCalendar *c = find_calendar_by_uid(task->list->uid);
+    CalDAVCalendar *c = find_calendar_by_uid(errands_data_get_uid(task->list->ical));
     CONTINUE_IF_NOT(c);
     const char *uid = errands_data_get_uid(task->ical);
     CalDAVEvent *e = find_event_by_uid(c, uid);

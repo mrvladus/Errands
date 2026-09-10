@@ -2,11 +2,11 @@
 #include "glib.h"
 #include "settings.h"
 
-#include "sync.h"
 #include "vendor/json.h"
 #include "vendor/toolbox.h"
 
 #include <assert.h>
+#include <libical/ical.h>
 
 AUTOPTR_DEFINE(JSON, json_free)
 
@@ -147,7 +147,7 @@ static void collect_and_sort_children_recursive(TaskData *parent, GPtrArray *all
 
 static void errands__list_data_save_cb(ListData *data) {
   if (!data) return;
-  const char *path = tmp_str_printf("%s/%s.ics", calendars_dir, data->uid);
+  const char *path = tmp_str_printf("%s/%s.ics", calendars_dir, errands_data_get_uid(data->ical));
   const char *ical = icalcomponent_as_ical_string(data->ical);
   if (ical && !g_file_set_contents(path, ical, -1, NULL)) {
     LOG("User Data: Failed to save list '%s'", path);
@@ -254,30 +254,29 @@ void errands_data_sort() {
 ListData *errands_data_find_list_data_by_uid(const char *uid) {
   for_range(i, 0, errands_data_lists->len) {
     ListData *list = g_ptr_array_index(errands_data_lists, i);
-    if (strcmp(list->uid, uid) == 0) return list;
+    if (strcmp(errands_data_get_uid(list->ical), uid) == 0) return list;
   }
   return NULL;
 }
 
 // ---------- LIST DATA ---------- //
 
-ListData *errands_list_data_new(icalcomponent *ical, const char *uid) {
+ListData *errands_list_data_new(icalcomponent *ical) {
   ListData *data = calloc(1, sizeof(ListData));
   data->ical = ical;
   data->children = g_ptr_array_new_with_free_func((GDestroyNotify)errands_task_data_free);
-  data->uid = strdup(uid);
-
   return data;
 }
 
 ListData *errands_list_data_load_from_ical(icalcomponent *ical, const char *uid, const char *name, const char *color) {
-  if (!ical || !uid) return NULL;
+  assert(ical && uid);
   if (ical && icalcomponent_isa(ical) != ICAL_VCALENDAR_COMPONENT) return NULL;
   get_x_prop_value(ical, "X-WR-CALNAME", name ? name : uid);
   get_x_prop_value(ical, "X-APPLE-CALENDAR-COLOR", color ? color : generate_hex_as_str());
+  errands_data_set_uid(ical, uid);
   icalcomponent_strip_errors(ical);
 
-  ListData *list_data = errands_list_data_new(ical, uid);
+  ListData *list_data = errands_list_data_new(ical);
 
   // Collect all tasks and add toplevel tasks to lists
   g_autoptr(GPtrArray) all_tasks = g_ptr_array_new();
@@ -301,18 +300,17 @@ ListData *errands_list_data_load_from_ical(icalcomponent *ical, const char *uid,
 // TODO: why we need synced?
 ListData *errands_list_data_create(const char *uid, const char *name, const char *description, const char *color,
                                    bool deleted, bool synced) {
-  assert(uid != NULL && name != NULL && color != NULL);
-
+  g_assert(uid && name && color);
   icalcomponent *ical = icalcomponent_new(ICAL_VCALENDAR_COMPONENT);
   icalcomponent_add_property(ical, icalproperty_new_version("2.0"));
   icalcomponent_add_property(ical, icalproperty_new_prodid("~//Errands"));
-  set_x_prop_value(ical, "X-ERRANDS-DELETED", BOOL_TO_STR_NUM(deleted));
-  set_x_prop_value(ical, "X-ERRANDS-SYNCED", BOOL_TO_STR_NUM(synced));
-  set_x_prop_value(ical, "X-WR-CALNAME", name);
   set_x_prop_value(ical, "X-WR-CALDESC", description);
-  set_x_prop_value(ical, "X-APPLE-CALENDAR-COLOR", color);
-
-  return errands_list_data_new(ical, uid);
+  errands_data_set_uid(ical, uid);
+  errands_data_set_color(ical, color, true);
+  errands_data_set_list_name(ical, name);
+  errands_data_set_synced(ical, synced);
+  errands_data_set_deleted(ical, deleted);
+  return errands_list_data_new(ical);
 }
 
 static void errands_list_data_sort_recursive(GPtrArray *array) {
@@ -365,7 +363,6 @@ void errands_list_data_save(ListData *data) { g_idle_add_once((GSourceOnceFunc)e
 void errands_list_data_free(ListData *data) {
   if (!data) return;
   if (data->ical) icalcomponent_free(data->ical);
-  if (data->uid) free(data->uid);
   if (data->children) g_ptr_array_free(data->children, true);
   free(data);
 }
@@ -409,14 +406,13 @@ TaskData *errands_task_data_new(icalcomponent *ical, TaskData *parent, ListData 
 }
 
 TaskData *errands_task_data_create_task(ListData *list, TaskData *parent, const char *text) {
-
   TaskData *task = errands_task_data_new(icalcomponent_new(ICAL_VTODO_COMPONENT), parent, list);
-  errands_data_set_uid(task->ical, generate_uuid4());
+  g_autofree gchar *uid = g_uuid_string_random();
+  errands_data_set_uid(task->ical, uid);
   errands_data_set_text(task->ical, text);
   if (parent) errands_data_set_parent(task->ical, errands_data_get_uid(parent->ical));
   errands_data_set_created(task->ical, icaltime_get_date_time_now());
   if (list) icalcomponent_add_component(list->ical, task->ical);
-
   return task;
 }
 
@@ -628,7 +624,10 @@ const char *errands_data_get_parent(icalcomponent *ical) {
   return property ? icalproperty_get_relatedto(property) : NULL;
 }
 const char *errands_data_get_text(icalcomponent *ical) { return icalcomponent_get_summary(ical); }
-const char *errands_data_get_uid(icalcomponent *ical) { return icalcomponent_get_uid(ical); }
+const char *errands_data_get_uid(icalcomponent *ical) {
+  icalproperty *property = icalcomponent_get_first_property(ical, ICAL_UID_PROPERTY);
+  return property ? icalproperty_get_uid(property) : NULL;
+}
 
 void errands_data_set_notes(icalcomponent *ical, const char *value) {
   if (!value || STR_EQUAL(value, ""))
@@ -679,7 +678,7 @@ void errands_data_set_text(icalcomponent *ical, const char *value) {
 void errands_data_set_uid(icalcomponent *ical, const char *value) {
   if (!value || STR_EQUAL(value, ""))
     icalcomponent_remove_property(ical, icalcomponent_get_first_property(ical, ICAL_UID_PROPERTY));
-  else icalcomponent_set_uid(ical, value);
+  else icalcomponent_add_property(ical, icalproperty_new_uid(value));
   errands_data_set_synced(ical, false);
   errands_data_set_changed(ical, icaltime_get_date_time_now());
 }

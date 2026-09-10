@@ -115,7 +115,7 @@ extern const char *toolbox_log_prefix;
 // Print formatted message.
 #define LOG(format, ...) fprintf(stderr, "%s" format "\n", toolbox_log_prefix ? toolbox_log_prefix : "", ##__VA_ARGS__)
 // Print formatted message without newline.
-#define LOG_NO_LN(format, ...)           fprintf(stderr, "%s" format, toolbox_log_prefix ? toolbox_log_prefix : "", ##__VA_ARGS__)
+#define LOG_NO_LN(format, ...) fprintf(stderr, "%s" format, toolbox_log_prefix ? toolbox_log_prefix : "", ##__VA_ARGS__)
 #define LOG_NO_PREFIX(format, ...)       fprintf(stderr, format "\n", ##__VA_ARGS__)
 #define LOG_NO_PREFIX_NO_LN(format, ...) fprintf(stderr, format, ##__VA_ARGS__)
 // Print formatted message with filename, line number and function name.
@@ -187,10 +187,6 @@ extern const char *toolbox_log_prefix;
                         : false)
 // Check if string contains substring (case-insensitive).
 #define STR_CONTAINS_CASE(s1, s2) ((s1 && s2) ? strcasestr((const char *)(s1), (const char *)(s2)) != NULL : false)
-
-// -------------------- UUID -------------------- //
-
-const char *generate_uuid4();
 
 // -------------------- STRING ARRAY -------------------- //
 
@@ -323,28 +319,6 @@ const char *tmp_str_printf(const char *format, ...) {
   toolbox_tmp_str_offset += len + 1;
   va_end(args);
   return result;
-}
-
-// -------------------- UUID -------------------- //
-
-const char *generate_uuid4() {
-  static thread_local char uuid[37];
-  const char *hex = "0123456789abcdef";
-  static thread_local i64 seeded = 0;
-  if (!seeded) {
-    srand(time(NULL) ^ (unsigned long)&seeded);
-    seeded = 1;
-  }
-  for (i64 i = 0; i < 36; i++) {
-    if (i == 8 || i == 13 || i == 18 || i == 23) uuid[i] = '-';
-    else if (i == 14) uuid[i] = '4';
-    else if (i == 19) {
-      i64 r = rand() % 4;
-      uuid[i] = (r == 0) ? '8' : (r == 1) ? '9' : (r == 2) ? 'a' : 'b';
-    } else uuid[i] = hex[rand() % 16];
-  }
-  uuid[36] = '\0';
-  return uuid;
 }
 
 // -------------------- STRING ARRAY -------------------- //

@@ -1,11 +1,16 @@
 #include "new-list-dialog.h"
 #include "data.h"
+#include "glib.h"
+#include "settings.h"
+#include "sidebar.h"
 #include "state.h"
 #include "sync.h"
 
 static void on_response_cb(ErrandsNewListDialog *self, gchar *response, gpointer data);
 static void on_entry_changed_cb(ErrandsNewListDialog *self, AdwEntryRow *entry);
 static void on_entry_activated_cb(ErrandsNewListDialog *self, AdwEntryRow *entry);
+
+static ErrandsNewListDialog *self = NULL;
 
 // ---------- WIDGET TEMPLATE ---------- //
 
@@ -40,8 +45,7 @@ ErrandsNewListDialog *errands_new_list_dialog_new() {
 // ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_new_list_dialog_show() {
-  ErrandsNewListDialog *self = state.main_window->sidebar->new_list_dialog;
-  if (!self) state.main_window->sidebar->new_list_dialog = self = errands_new_list_dialog_new();
+  if (!self) self = errands_new_list_dialog_new();
   adw_dialog_present(ADW_DIALOG(self), GTK_WIDGET(state.main_window));
   gtk_editable_set_text(GTK_EDITABLE(self->entry), "");
   gtk_widget_grab_focus(self->entry);
@@ -51,16 +55,18 @@ void errands_new_list_dialog_show() {
 
 static void on_response_cb(ErrandsNewListDialog *self, gchar *response, gpointer data) {
   if (STR_EQUAL(response, "create")) {
-    ListData *list = errands_list_data_create(generate_uuid4(), gtk_editable_get_text(GTK_EDITABLE(self->entry)), NULL,
+    g_autofree gchar *uid = g_uuid_string_random();
+    ListData *list = errands_list_data_create(uid, gtk_editable_get_text(GTK_EDITABLE(self->entry)), NULL,
                                               generate_hex_as_str(), false, false);
-    LOG("New List Dialog: Create new list: '%s'", list->uid);
+    LOG("New List Dialog: Create new list: '%s'", errands_data_get_uid(list->ical));
     errands_list_data_save(list);
     g_ptr_array_add(errands_data_lists, list);
-    errands_sidebar_load_lists();
-    ErrandsTaskListRow *row = errands_sidebar_find_row(list);
-    if (row) g_signal_emit_by_name(row, "activate", NULL);
+    ErrandsTaskListItem *list_item = errands_task_list_item_new(list);
+    g_list_store_append(state.main_window->sidebar->task_lists_model, list_item);
     errands_sidebar_update_filter_rows();
     errands_sync_create_list(list);
+    errands_settings_set(SETTING_LAST_LIST_UID, (void *)list_item->uid);
+    errands_sidebar_select_last_opened_page();
   }
 }
 

@@ -23,7 +23,6 @@ struct TaskData {
 struct ListData {
   icalcomponent *ical;
   GPtrArray *children;
-  char *uid;
 };
 
 // Initialize user data
@@ -38,7 +37,7 @@ ListData *errands_data_find_list_data_by_uid(const char *uid);
 
 // --- LIST DATA --- //
 
-ListData *errands_list_data_new(icalcomponent *ical, const char *uid);
+ListData *errands_list_data_new(icalcomponent *ical);
 // Load TaskData from iCal component
 ListData *errands_list_data_load_from_ical(icalcomponent *ical, const char *uid, const char *name, const char *color);
 ListData *errands_list_data_create(const char *uid, const char *name, const char *description, const char *color,
