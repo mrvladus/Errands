@@ -25,12 +25,12 @@ template $ErrandsTaskMenu: Popover {
       Box task_mode_box {
         hexpand: true;
         homogeneous: true;
+        spacing: 6;
 
         Button {
           icon-name: "errands-edit-symbolic";
           tooltip-text: _("Edit Text");
           action-name: "task-menu.edit";
-          halign: center;
 
           styles [
             "circular",
@@ -41,7 +41,6 @@ template $ErrandsTaskMenu: Popover {
           icon-name: "errands-clipboard-symbolic";
           tooltip-text: _("Copy Text");
           action-name: "task-menu.copy";
-          halign: center;
 
           styles [
             "circular",
@@ -52,7 +51,6 @@ template $ErrandsTaskMenu: Popover {
           icon-name: "errands-color-symbolic";
           tooltip-text: _("Task Color");
           action-name: "task-menu.color";
-          halign: center;
 
           styles [
             "circular",
