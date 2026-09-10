@@ -627,6 +627,7 @@ void errands_task_list_show_all_tasks(ErrandsTaskList *self) {
 }
 
 void errands_task_list_show_task_list(ErrandsTaskList *self, ListData *data) {
+  if (data == self->data) return;
   self->data = data;
   self->page = ERRANDS_TASK_LIST_PAGE_TASK_LIST;
   gtk_widget_set_visible(self->entry_box, true);

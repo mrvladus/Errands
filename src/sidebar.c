@@ -110,7 +110,6 @@ void errands_sidebar_load_lists(void) {
 
 ErrandsTaskListItem *errands_sidebar_find_list(const char *uid) {
   if (!uid) return NULL;
-  LOG("Sidebar: Finding list: '%s'", uid);
   GListModel *model = G_LIST_MODEL(self->task_lists_model);
   for (size_t i = 0; i < g_list_model_get_n_items(model); i++) {
     ErrandsTaskListItem *item = g_list_model_get_item(model, i);
@@ -121,7 +120,6 @@ ErrandsTaskListItem *errands_sidebar_find_list(const char *uid) {
 
 void errands_sidebar_select_last_opened_page(void) {
   const char *last_uid = errands_settings_get(SETTING_LAST_LIST_UID).s;
-  // LOG("Sidebar: Selecting last opened list: '%s'", last_uid);
   int idx = -1;
   GListModel *model = G_LIST_MODEL(self->task_lists_model);
   for (size_t i = 0; i < g_list_model_get_n_items(model); i++) {
@@ -175,7 +173,6 @@ static void on_sidebar_activated_cb(AdwSidebar *self, guint index, gpointer user
     AdwSidebarItem *item = adw_sidebar_get_item(self, index);
     g_assert(item);
     ErrandsTaskListItem *tl_item = g_object_get_data(G_OBJECT(item), "item");
-    LOG("Switch to list '%s'", tl_item->uid);
     errands_settings_set(SETTING_LAST_LIST_UID, (void *)tl_item->uid);
     errands_task_list_show_task_list(task_list, tl_item->data);
   }

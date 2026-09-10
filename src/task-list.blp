@@ -215,40 +215,41 @@ template $ErrandsTaskList: Adw.Bin {
         "toolbar",
       ]
 
-      Entry entry {
-        placeholder-text: _("Add Task");
-        tooltip-text: _("Add Task (Ctrl+N)");
-        hexpand: true;
-        activate => $on_task_list_entry_activated_cb(template);
-        changed => $on_task_list_entry_text_changed_cb(template);
-
-        ShortcutController {
-          scope: global;
-
-          Shortcut {
-            trigger: "<Control>N";
-            action: "action(task-list.focus-entry)";
-          }
-        }
-      }
-
-      Button entry_menu_btn {
-        icon-name: "errands-more-symbolic";
-        valign: center;
-        tooltip-text: _("Properties (Ctrl+P)");
-        action-name: "task-list.show-entry-task-menu";
-
+      Box {
         styles [
-          "circular",
-          "flat",
+          "linked",
         ]
 
-        ShortcutController {
-          scope: global;
+        Entry entry {
+          placeholder-text: _("Add Task");
+          tooltip-text: _("Add Task (Ctrl+N)");
+          hexpand: true;
+          activate => $on_task_list_entry_activated_cb(template);
+          changed => $on_task_list_entry_text_changed_cb(template);
 
-          Shortcut {
-            trigger: "<Control>P";
-            action: "activate";
+          ShortcutController {
+            scope: global;
+
+            Shortcut {
+              trigger: "<Control>N";
+              action: "action(task-list.focus-entry)";
+            }
+          }
+        }
+
+        Button entry_menu_btn {
+          icon-name: "errands-more-symbolic";
+          valign: center;
+          tooltip-text: _("Properties (Ctrl+P)");
+          action-name: "task-list.show-entry-task-menu";
+
+          ShortcutController {
+            scope: global;
+
+            Shortcut {
+              trigger: "<Control>P";
+              action: "activate";
+            }
           }
         }
       }
