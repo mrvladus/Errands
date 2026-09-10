@@ -144,7 +144,6 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   self->tree_filter_model = gtk_filter_list_model_new(G_LIST_MODEL(sort_model), self->tree_filter);
 
   GtkNoSelection *selection_model = gtk_no_selection_new(G_LIST_MODEL(self->tree_filter_model));
-
   gtk_list_view_set_model(GTK_LIST_VIEW(self->list_view), GTK_SELECTION_MODEL(selection_model));
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gio/gio.h"
+#include "glib.h"
 #include <gtk/gtk.h>
 
 #include <ctype.h>
@@ -121,4 +122,18 @@ static inline gchar *str_to_markup(const char *str) {
   if (error) return NULL;
 
   return markup;
+}
+
+static inline void gtk_widget_set_color(GtkWidget *widget, const char *color) {
+  g_assert(widget && color);
+  g_auto(GStrv) classes = gtk_widget_get_css_classes(widget);
+  for (int i = 0; classes[i]; i++)
+    if (g_str_has_prefix(classes[i], "custom-color-")) gtk_widget_remove_css_class(widget, classes[i]);
+  g_autofree gchar *css_class = g_strdup_printf("custom-color-%s", g_str_has_prefix(color, "#") ? color + 1 : color);
+  gtk_widget_add_css_class(widget, css_class);
+  g_autofree gchar *css = g_strdup_printf(".%s { background-color: %s; }", css_class, color);
+  g_autoptr(GtkCssProvider) provider = gtk_css_provider_new();
+  gtk_css_provider_load_from_string(provider, css);
+  gtk_style_context_add_provider_for_display(gdk_display_get_default(), GTK_STYLE_PROVIDER(provider),
+                                             GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 }
