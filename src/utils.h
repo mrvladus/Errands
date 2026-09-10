@@ -1,9 +1,10 @@
 #pragma once
 
-#include "gio/gio.h"
-#include "glib.h"
+#include "data.h"
+
 #include <gtk/gtk.h>
 
+#include <assert.h>
 #include <ctype.h>
 #include <stddef.h>
 
@@ -125,15 +126,39 @@ static inline gchar *str_to_markup(const char *str) {
 }
 
 static inline void gtk_widget_set_color(GtkWidget *widget, const char *color) {
-  g_assert(widget && color);
+  ASSERT(widget);
+  // Remove any existing custom color classes
   g_auto(GStrv) classes = gtk_widget_get_css_classes(widget);
   for (int i = 0; classes[i]; i++)
     if (g_str_has_prefix(classes[i], "custom-color-")) gtk_widget_remove_css_class(widget, classes[i]);
-  g_autofree gchar *css_class = g_strdup_printf("custom-color-%s", g_str_has_prefix(color, "#") ? color + 1 : color);
+
+  // Remove previously-installed provider for this widget
+  GtkCssProvider *old_provider = g_object_get_data(G_OBJECT(widget), "custom-color-provider");
+  if (old_provider) {
+    gtk_style_context_remove_provider_for_display(gdk_display_get_default(), GTK_STYLE_PROVIDER(old_provider));
+    g_object_set_data(G_OBJECT(widget), "custom-color-provider", NULL);
+  }
+
+  if (!color) return;
+
+  // Parse color string
+  GdkRGBA rgba = {0};
+  gboolean res = gdk_rgba_parse(&rgba, color);
+  if (!res) return;
+  char bg[8];
+  gdk_rgba_to_hex_string(&rgba, bg);
+  g_autofree gchar *css_class = g_strdup_printf("custom-color-%s", bg + 1);
   gtk_widget_add_css_class(widget, css_class);
-  g_autofree gchar *css = g_strdup_printf(".%s { background-color: %s; }", css_class, color);
+
+  // Determine contrasting foreground color usinng YIQ formula
+  double brightness = (rgba.red * 0.299) + (rgba.green * 0.587) + (rgba.blue * 0.114);
+  const char *fg = brightness < 0.6 ? "white" : "black";
+
+  // Build CSS rule and load it into a fresh provider
+  g_autofree gchar *css = g_strdup_printf(".%s { background-color: %s; color: %s; }", css_class, bg, fg);
   g_autoptr(GtkCssProvider) provider = gtk_css_provider_new();
   gtk_css_provider_load_from_string(provider, css);
   gtk_style_context_add_provider_for_display(gdk_display_get_default(), GTK_STYLE_PROVIDER(provider),
                                              GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+  g_object_set_data(G_OBJECT(widget), "custom-color-provider", provider);
 }

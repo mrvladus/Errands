@@ -1,9 +1,13 @@
 #include "task-item.h"
 #include "data.h"
+#include "gdk/gdk.h"
+#include "glib-object.h"
+#include "glib.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "state.h"
 #include "task.h"
+#include "utils.h"
 
 struct _ErrandsTaskItem {
   GObject parent_instance;
@@ -12,6 +16,7 @@ struct _ErrandsTaskItem {
   const char *title;
   gboolean completed;
   gboolean cancelled;
+  GdkRGBA color;
 
   TaskData *data;
   ErrandsTaskItem *parent;
@@ -28,6 +33,7 @@ enum {
   PROP_TITLE,
   PROP_COMPLETED,
   PROP_CANCELLED,
+  PROP_COLOR,
 
   PROP_DATA,
   PROP_CHILDREN_MODEL,
@@ -100,6 +106,15 @@ static void errands_task_item_set_property(GObject *object, guint prop_id, const
     errands_task_list_sort(state.main_window->task_list, GTK_SORTER_CHANGE_MORE_STRICT);
     errands_task_list_filter_tree(state.main_window->task_list, GTK_FILTER_CHANGE_MORE_STRICT);
   } break;
+  case PROP_COLOR: {
+    GdkRGBA *color = g_value_get_boxed(value);
+    if (!color) return;
+    self->color = *color;
+    char hex_string[8];
+    gdk_rgba_to_hex_string(color, hex_string);
+    errands_data_set_color(self->data->ical, hex_string, false);
+    errands_list_data_save(self->data->list);
+  } break;
 
   case PROP_DATA: self->data = g_value_get_pointer(value); break;
   case PROP_CHILDREN_MODEL: self->children_model = g_value_get_object(value); break;
@@ -115,6 +130,7 @@ static void errands_task_item_get_property(GObject *object, guint prop_id, GValu
   case PROP_TITLE: g_value_set_string(value, self->title); break;
   case PROP_COMPLETED: g_value_set_boolean(value, self->completed); break;
   case PROP_CANCELLED: g_value_set_boolean(value, self->cancelled); break;
+  case PROP_COLOR: g_value_set_boxed(value, &self->color); break;
 
   case PROP_DATA: g_value_set_pointer(value, self->data); break;
   case PROP_CHILDREN_MODEL: g_value_set_object(value, self->children_model); break;
@@ -154,6 +170,8 @@ static void errands_task_item_class_init(ErrandsTaskItemClass *klass) {
       g_param_spec_boolean("completed", "Completed", "Whether the task is completed.", false, G_PARAM_READWRITE);
   obj_properties[PROP_CANCELLED] =
       g_param_spec_boolean("cancelled", "Cancelled", "Whether the task is cancelled.", false, G_PARAM_READWRITE);
+  obj_properties[PROP_COLOR] =
+      g_param_spec_boxed("color", "Task Color", "Color of the task", GDK_TYPE_RGBA, G_PARAM_READWRITE);
 
   obj_properties[PROP_DATA] =
       g_param_spec_pointer("data", "Task Data", "Data associated with the task.", G_PARAM_READWRITE);
@@ -176,6 +194,8 @@ ErrandsTaskItem *errands_task_item_new(TaskData *data, ErrandsTaskItem *parent) 
   self->title = errands_data_get_text(data->ical);
   self->completed = errands_data_is_completed(data->ical);
   self->cancelled = errands_data_get_cancelled(data->ical);
+  const char *color = errands_data_get_color(data->ical, false);
+  gdk_rgba_parse(&self->color, color ? color : "transparent");
 
   self->data = data;
   self->children_model = NULL;
@@ -211,4 +231,12 @@ ErrandsTaskItem *errands_task_item_add_child(ErrandsTaskItem *self, TaskData *da
   g_object_notify(G_OBJECT(self), "children-model-is-empty");
 
   return item;
+}
+
+// ---------- PROPERTIES ---------- //
+
+GdkRGBA errands_task_item_get_color(ErrandsTaskItem *self) { return self->color; }
+
+void errands_task_item_set_color(ErrandsTaskItem *self, const GdkRGBA *color) {
+  g_object_set(self, "color", color, NULL);
 }

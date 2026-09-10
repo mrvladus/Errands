@@ -1,6 +1,5 @@
 #include "task-list-item.h"
 #include "data.h"
-#include "glib.h"
 #include "utils.h"
 
 G_DEFINE_TYPE(ErrandsTaskListItem, errands_task_list_item, G_TYPE_OBJECT)

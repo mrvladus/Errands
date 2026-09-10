@@ -60,7 +60,7 @@ symbolicicondir = $(icondir)/symbolic/apps
 PKG_CONFIG_LIBS = libadwaita-1 gtksourceview-5 libical libcurl libsecret-1 libportal-gtk4
 
 LDFLAGS     ?=
-ALL_LDFLAGS += $(LDFLAGS) `pkg-config --libs $(PKG_CONFIG_LIBS)`
+ALL_LDFLAGS += $(LDFLAGS) -lm `pkg-config --libs $(PKG_CONFIG_LIBS)`
 CFLAGS      ?=
 ALL_CFLAGS  += $(CFLAGS) \
 			-std=c11 -D_GNU_SOURCE \

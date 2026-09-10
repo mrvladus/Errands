@@ -637,14 +637,22 @@ void errands_data_set_notes(icalcomponent *ical, const char *value) {
   errands_data_set_changed(ical, icaltime_get_date_time_now());
 }
 void errands_data_set_color(icalcomponent *ical, const char *value, bool list) {
+  const char *color = value;
+  g_autofree char *fixed_color = NULL;
+  if (g_str_has_prefix(value, "#")) {
+    if (strlen(value) != 7) {
+      fixed_color = g_strndup(value, 7);
+      color = fixed_color;
+    }
+  }
   if (list) {
-    set_x_prop_value(ical, "X-APPLE-CALENDAR-COLOR", value);
+    set_x_prop_value(ical, "X-APPLE-CALENDAR-COLOR", color && !g_str_equal(color, "") ? color : NULL);
   } else {
-    if (!value || STR_EQUAL(value, ""))
+    if (!value || g_str_equal(value, ""))
       icalcomponent_remove_property(ical, icalcomponent_get_first_property(ical, ICAL_COLOR_PROPERTY));
     icalproperty *property = icalcomponent_get_first_property(ical, ICAL_COLOR_PROPERTY);
-    if (property) icalproperty_set_color(property, value);
-    else icalcomponent_add_property(ical, icalproperty_new_color(value));
+    if (property) icalproperty_set_color(property, color);
+    else icalcomponent_add_property(ical, icalproperty_new_color(color));
     errands_data_set_changed(ical, icaltime_get_date_time_now());
   }
   errands_data_set_synced(ical, false);
@@ -658,7 +666,7 @@ void errands_data_set_list_description(icalcomponent *ical, const char *value) {
   errands_data_set_synced(ical, false);
 }
 void errands_data_set_parent(icalcomponent *ical, const char *value) {
-  if (!value || STR_EQUAL(value, ""))
+  if (!value || g_str_equal(value, ""))
     icalcomponent_remove_property(ical, icalcomponent_get_first_property(ical, ICAL_RELATEDTO_PROPERTY));
   else {
     icalproperty *property = icalcomponent_get_first_property(ical, ICAL_RELATEDTO_PROPERTY);
@@ -669,16 +677,20 @@ void errands_data_set_parent(icalcomponent *ical, const char *value) {
   errands_data_set_changed(ical, icaltime_get_date_time_now());
 }
 void errands_data_set_text(icalcomponent *ical, const char *value) {
-  if (!value || STR_EQUAL(value, ""))
+  if (!value || g_str_equal(value, ""))
     icalcomponent_remove_property(ical, icalcomponent_get_first_property(ical, ICAL_SUMMARY_PROPERTY));
   else icalcomponent_set_summary(ical, value);
   errands_data_set_synced(ical, false);
   errands_data_set_changed(ical, icaltime_get_date_time_now());
 }
 void errands_data_set_uid(icalcomponent *ical, const char *value) {
-  if (!value || STR_EQUAL(value, ""))
+  if (!value || g_str_equal(value, ""))
     icalcomponent_remove_property(ical, icalcomponent_get_first_property(ical, ICAL_UID_PROPERTY));
-  else icalcomponent_add_property(ical, icalproperty_new_uid(value));
+  else {
+    icalproperty *prop = icalcomponent_get_first_property(ical, ICAL_UID_PROPERTY);
+    if (prop) return;
+    icalcomponent_add_property(ical, icalproperty_new_uid(value));
+  }
   errands_data_set_synced(ical, false);
   errands_data_set_changed(ical, icaltime_get_date_time_now());
 }

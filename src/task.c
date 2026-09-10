@@ -148,15 +148,7 @@ void errands_task_set_data(ErrandsTask *self, TaskData *data) {
 void errands_task_update_accent_color(ErrandsTask *task) {
   if (!task) return;
   const char *color = errands_data_get_color(task->data->ical, false);
-  if (color) {
-    const char *card_style = tmp_str_printf("task-%s", color);
-    const char *check_style = tmp_str_printf("checkbtn-%s", color);
-    gtk_widget_set_css_classes(GTK_WIDGET(task), (const char *[]){"card", card_style, NULL});
-    gtk_widget_set_css_classes(GTK_WIDGET(task->complete_btn), (const char *[]){"selection-mode", check_style, NULL});
-  } else {
-    gtk_widget_set_css_classes(GTK_WIDGET(task), (const char *[]){"card", NULL});
-    gtk_widget_set_css_classes(GTK_WIDGET(task->complete_btn), (const char *[]){"selection-mode", NULL});
-  }
+  gtk_widget_set_color(GTK_WIDGET(task), color);
 }
 
 void errands_task_update_progress(ErrandsTask *self) {

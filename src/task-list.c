@@ -684,8 +684,8 @@ static void on_task_list_entry_activated_cb(ErrandsTaskList *self) {
   errands_sync_create_task(data);
   errands_task_list_update_title(self);
   gtk_list_view_scroll_to(GTK_LIST_VIEW(self->list_view), 0, 0, NULL);
-  gtk_widget_set_sensitive(self->entry, false);
-  g_timeout_add_once(1000, (GSourceOnceFunc)on_entry_timeout_cb, self->entry);
+  // gtk_widget_set_sensitive(self->entry, false);
+  // g_timeout_add_once(1000, (GSourceOnceFunc)on_entry_timeout_cb, self->entry);
 }
 
 static void on_task_list_entry_text_changed_cb(ErrandsTaskList *self) {

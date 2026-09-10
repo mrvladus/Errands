@@ -1,5 +1,9 @@
 using Gtk 4.0;
 
+ColorDialog color_dialog {
+  with-alpha: false;
+}
+
 template $ErrandsTaskMenu: Popover {
   has-arrow: false;
 
@@ -19,159 +23,39 @@ template $ErrandsTaskMenu: Popover {
       margin-bottom: 6;
 
       Box task_mode_box {
+        hexpand: true;
         homogeneous: true;
-
-        styles [
-          "linked",
-        ]
 
         Button {
           icon-name: "errands-edit-symbolic";
           tooltip-text: _("Edit Text");
           action-name: "task-menu.edit";
+          halign: center;
+
+          styles [
+            "circular",
+          ]
         }
 
         Button {
           icon-name: "errands-clipboard-symbolic";
           tooltip-text: _("Copy Text");
           action-name: "task-menu.copy";
-        }
-
-        Button {
-          icon-name: "errands-export-symbolic";
-          tooltip-text: _("Export as \".ics\"");
-          action-name: "task-menu.export";
-        }
-
-        Button {
-          icon-name: "errands-cancel-symbolic";
-          tooltip-text: _("Toggle Cancel");
-          action-name: "task-menu.cancel";
-
-          styles [
-            "warning",
-          ]
-        }
-
-        Button {
-          icon-name: "errands-trash-symbolic";
-          tooltip-text: _("Delete");
-          action-name: "task-menu.delete";
-
-          styles [
-            "error",
-          ]
-        }
-      }
-
-      Separator {
-        visible: bind task_mode_box.visible;
-      }
-
-      // Color
-      Box color_box {
-        hexpand: true;
-
-        CheckButton color_none {
-          name: "none";
-          tooltip-text: _("No Color");
           halign: center;
-          toggled => $on_color_toggle_cb(template);
 
           styles [
-            "accent-color-btn",
-            "accent-color-btn-none",
+            "circular",
           ]
         }
 
-        CheckButton {
+        Button color_btn {
+          icon-name: "errands-color-symbolic";
+          tooltip-text: _("Task Color");
+          action-name: "task-menu.color";
           halign: center;
-          name: "blue";
-          group: color_none;
-          tooltip-text: _("Blue");
-          toggled => $on_color_toggle_cb(template);
 
           styles [
-            "accent-color-btn",
-            "accent-color-btn-blue",
-          ]
-        }
-
-        CheckButton {
-          halign: center;
-          name: "green";
-          group: color_none;
-          tooltip-text: _("Green");
-          toggled => $on_color_toggle_cb(template);
-
-          styles [
-            "accent-color-btn",
-            "accent-color-btn-green",
-          ]
-        }
-
-        CheckButton {
-          halign: center;
-          name: "yellow";
-          group: color_none;
-          tooltip-text: _("Yellow");
-          toggled => $on_color_toggle_cb(template);
-
-          styles [
-            "accent-color-btn",
-            "accent-color-btn-yellow",
-          ]
-        }
-
-        CheckButton {
-          halign: center;
-          name: "orange";
-          group: color_none;
-          tooltip-text: _("Orange");
-          toggled => $on_color_toggle_cb(template);
-
-          styles [
-            "accent-color-btn",
-            "accent-color-btn-orange",
-          ]
-        }
-
-        CheckButton {
-          halign: center;
-          name: "red";
-          group: color_none;
-          tooltip-text: _("Red");
-          toggled => $on_color_toggle_cb(template);
-
-          styles [
-            "accent-color-btn",
-            "accent-color-btn-red",
-          ]
-        }
-
-        CheckButton {
-          halign: center;
-          name: "purple";
-          group: color_none;
-          tooltip-text: _("Purple");
-          toggled => $on_color_toggle_cb(template);
-
-          styles [
-            "accent-color-btn",
-            "accent-color-btn-purple",
-          ]
-        }
-
-        CheckButton {
-          halign: center;
-          name: "brown";
-          group: color_none;
-          tooltip-text: _("Brown");
-          toggled => $on_color_toggle_cb(template);
-
-          styles [
-            "accent-color-btn",
-            "accent-color-btn-brown",
+            "circular",
           ]
         }
       }
@@ -284,6 +168,78 @@ template $ErrandsTaskMenu: Popover {
 
           Label {
             label: _("Tags");
+          }
+        }
+      }
+
+      Separator {}
+
+      // Export
+      Button {
+        action-name: "task-menu.export";
+
+        styles [
+          "flat",
+          "body",
+        ]
+
+        Box {
+          spacing: 12;
+
+          Image {
+            icon-name: "errands-export-symbolic";
+          }
+
+          Label {
+            label: _("Export as \".ics\"");
+          }
+        }
+      }
+
+      Separator {}
+
+      // Cancel
+      Button {
+        action-name: "task-menu.cancel";
+
+        styles [
+          "flat",
+          "body",
+          "warning",
+        ]
+
+        Box {
+          spacing: 12;
+
+          Image {
+            icon-name: "errands-cancel-symbolic";
+          }
+
+          Label {
+            label: _("Cancel");
+          }
+        }
+      }
+
+      // Delete
+      Button {
+        action-name: "task-menu.delete";
+
+        styles [
+          "flat",
+          "body",
+          "error",
+        ]
+
+        Box {
+          spacing: 12;
+
+          Image {
+            icon-name: "errands-trash-symbolic";
+          }
+
+          Label {
+            label: _("Delete");
           }
         }
       }
