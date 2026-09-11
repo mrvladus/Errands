@@ -112,7 +112,7 @@ static void errands_task_item_set_property(GObject *object, guint prop_id, const
     self->color = *color;
     char hex_string[8];
     gdk_rgba_to_hex_string(color, hex_string);
-    errands_data_set_color(self->data->ical, hex_string, false);
+    errands_data_set_color(self->data->ical, hex_string);
     errands_list_data_save(self->data->list);
   } break;
 
@@ -194,8 +194,9 @@ ErrandsTaskItem *errands_task_item_new(TaskData *data, ErrandsTaskItem *parent) 
   self->title = errands_data_get_text(data->ical);
   self->completed = errands_data_is_completed(data->ical);
   self->cancelled = errands_data_get_cancelled(data->ical);
-  const char *color = errands_data_get_color(data->ical, false);
-  gdk_rgba_parse(&self->color, color ? color : "transparent");
+  const char *color = errands_data_get_color(data->ical);
+  if (color) gdk_rgba_parse(&self->color, color);
+  else self->color = (GdkRGBA){0, 0, 0, 0};
 
   self->data = data;
   self->children_model = NULL;

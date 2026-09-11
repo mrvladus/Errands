@@ -95,7 +95,7 @@ void errands_data_set_priority(icalcomponent *ical, int value);
 
 // --- STRING --- //
 
-const char *errands_data_get_color(icalcomponent *ical, bool list);
+const char *errands_data_get_color(icalcomponent *ical);
 const char *errands_data_get_list_name(icalcomponent *ical);
 const char *errands_data_get_list_description(icalcomponent *ical);
 const char *errands_data_get_notes(icalcomponent *ical);
@@ -103,7 +103,7 @@ const char *errands_data_get_parent(icalcomponent *ical);
 const char *errands_data_get_text(icalcomponent *ical);
 const char *errands_data_get_uid(icalcomponent *ical);
 
-void errands_data_set_color(icalcomponent *ical, const char *value, bool list);
+void errands_data_set_color(icalcomponent *ical, const char *value);
 void errands_data_set_list_name(icalcomponent *ical, const char *value);
 void errands_data_set_list_description(icalcomponent *ical, const char *value);
 void errands_data_set_notes(icalcomponent *ical, const char *value);

@@ -96,7 +96,7 @@ static icalcomponent *caldav_calendar_to_icalcomponent(CalDAVCalendar *c) {
   errands_data_set_synced(ical, true);
   errands_data_set_list_name(ical, c->display_name);
   errands_data_set_list_description(ical, c->description);
-  errands_data_set_color(ical, c->color, true);
+  errands_data_set_color(ical, c->color);
   for_range(i, 0, c->events->count) {
     CalDAVEvent *e = c->events->items[i];
     icalcomponent *event = icalcomponent_new_from_string(e->ical);
@@ -217,7 +217,7 @@ static void errands__sync_cb(GTask *task, gpointer source_object, gpointer task_
     CalDAVCalendar *c = find_calendar_by_uid(uid);
     CONTINUE_IF(c);
     const char *name = errands_data_get_list_name(list->ical);
-    const char *color = errands_data_get_color(list->ical, true);
+    const char *color = errands_data_get_color(list->ical);
     bool created = caldav_client_create_calendar(client, uid, name, NULL, color, CALDAV_COMPONENT_SET_VTODO);
     if (created) {
       LOG("Sync: Created calendar on server: %s", uid);
@@ -240,7 +240,7 @@ static void errands__sync_cb(GTask *task, gpointer source_object, gpointer task_
     CalDAVCalendar *c = find_calendar_by_uid(uid);
     CONTINUE_IF(!c || errands_data_get_synced(list->ical));
     const char *name = errands_data_get_list_name(list->ical);
-    const char *color = errands_data_get_color(list->ical, true);
+    const char *color = errands_data_get_color(list->ical);
     if (!STR_EQUAL(name, c->display_name) || !STR_EQUAL(color, c->color)) {
       LOG("Sync: Updating list properties on server: %s", uid);
       caldav_calendar_update(c, name, NULL, color);
@@ -363,13 +363,13 @@ static void errands__sync_finished_cb(GObject *source_object, GAsyncResult *res,
     CONTINUE_IF_NOT(list);
     bool props_changed = false;
     const char *curr_name = errands_data_get_list_name(list->ical);
-    const char *curr_color = errands_data_get_color(list->ical, true);
+    const char *curr_color = errands_data_get_color(list->ical);
     if (!STR_EQUAL(curr_name, c->display_name)) {
       errands_data_set_list_name(list->ical, c->display_name);
       props_changed = true;
     }
     if (!STR_EQUAL(curr_color, c->color)) {
-      errands_data_set_color(list->ical, c->color, true);
+      errands_data_set_color(list->ical, c->color);
       props_changed = true;
     }
     if (props_changed) {

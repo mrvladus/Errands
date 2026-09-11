@@ -1,5 +1,6 @@
 #include "task-list-item.h"
 #include "data.h"
+#include "glib-object.h"
 #include "utils.h"
 
 G_DEFINE_TYPE(ErrandsTaskListItem, errands_task_list_item, G_TYPE_OBJECT)
@@ -34,16 +35,18 @@ static void errands_task_list_item_set_property(GObject *object, guint prop_id, 
   } break;
   case PROP_COLOR: {
     GdkRGBA *color = g_value_get_boxed(value);
-    if (color) self->color = *color;
+    if (!color) return;
+    self->color = *color;
     char hex_string[8];
     gdk_rgba_to_hex_string(&self->color, hex_string);
-    errands_data_set_color(self->data->ical, hex_string, true);
+    errands_data_set_color(self->data->ical, hex_string);
     errands_list_data_save(self->data);
   } break;
   case PROP_COUNT: {
     self->count = g_value_get_int(value);
     if (self->count == 0) strcpy(self->count_string, "");
     else sprintf(self->count_string, "%d", self->count);
+    g_object_notify(object, "count-string");
   } break;
   default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
   }
@@ -92,20 +95,22 @@ static void errands_task_list_item_class_init(ErrandsTaskListItemClass *klass) {
 
 static void errands_task_list_item_init(ErrandsTaskListItem *self) {}
 
-static gint errands_task_list_item_get_uncompleted_count(ErrandsTaskListItem *self) {}
-
 ErrandsTaskListItem *errands_task_list_item_new(ListData *data) {
   ErrandsTaskListItem *self = g_object_new(ERRANDS_TYPE_TASK_LIST_ITEM, NULL);
   self->data = data;
   self->uid = errands_data_get_uid(data->ical);
   self->title = errands_data_get_list_name(data->ical);
-  gdk_rgba_parse(&self->color, errands_data_get_color(data->ical, true));
+  const char *color = errands_data_get_color(data->ical);
+  if (color) gdk_rgba_parse(&self->color, color);
+  else self->color = (GdkRGBA){0, 0, 0, 0};
   errands_task_list_item_update_counter(self);
   return self;
 }
 
 void errands_task_list_item_update_counter(ErrandsTaskListItem *self) {
   if (!self || !self->data) return;
+  LOG_DEBUG("Update for %s", errands_data_get_uid(self->data->ical));
+
   icalcomponent *ical = self->data->ical;
   size_t total = 0, completed = 0;
   for (icalcomponent *c = icalcomponent_get_first_component(ical, ICAL_VTODO_COMPONENT); c != 0;

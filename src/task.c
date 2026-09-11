@@ -147,8 +147,8 @@ void errands_task_set_data(ErrandsTask *self, TaskData *data) {
 
 void errands_task_update_accent_color(ErrandsTask *task) {
   if (!task) return;
-  const char *color = errands_data_get_color(task->data->ical, false);
-  gtk_widget_set_color(GTK_WIDGET(task), color);
+  const char *color = errands_data_get_color(task->data->ical);
+  if (color) gtk_widget_set_color(GTK_WIDGET(task), color);
 }
 
 void errands_task_update_progress(ErrandsTask *self) {

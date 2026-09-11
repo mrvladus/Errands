@@ -75,7 +75,8 @@ void errands_task_menu_show(ErrandsTask *task, float x, float y, ErrandsTaskMenu
   self->task = task;
   GdkRectangle rect = {x, y, 0, 0};
   gtk_popover_set_pointing_to(GTK_POPOVER(self), &rect);
-  gtk_widget_set_color(self->color_btn, errands_data_get_color(task->data->ical, false));
+  const char *color = errands_data_get_color(task->data->ical);
+  if (color) gtk_widget_set_color(self->color_btn, color);
   gtk_widget_set_visible(self->task_mode_box, mode == ERRANDS_TASK_MENU_MODE_TASK);
   gtk_popover_popup(GTK_POPOVER(self));
 }
@@ -161,17 +162,16 @@ static void on_finish_cb(GObject *source_object, GAsyncResult *res, gpointer dat
   ErrandsTaskMenu *self = data;
   GdkRGBA *rgba = gtk_color_dialog_choose_rgba_finish(GTK_COLOR_DIALOG(source_object), res, NULL);
   if (!rgba) return;
-
   char hex_string[8];
   gdk_rgba_to_hex_string(rgba, hex_string);
-  gtk_widget_set_color(GTK_WIDGET(self->task), hex_string);
   errands_task_item_set_color(self->task->item, rgba);
+  errands_task_update_accent_color(self->task);
 }
 
 static void on_color_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskMenu *self) {
   gtk_popover_popdown(GTK_POPOVER(self));
-  const char *color = errands_data_get_color(self->task->data->ical, false);
-  GdkRGBA rgba = {0};
-  gdk_rgba_parse(&rgba, color ? color : "transparent");
+  const char *color = errands_data_get_color(self->task->data->ical);
+  GdkRGBA rgba = {1, 1, 1, 1};
+  if (color) gdk_rgba_parse(&rgba, color);
   gtk_color_dialog_choose_rgba(self->color_dialog, GTK_WINDOW(state.main_window), &rgba, NULL, on_finish_cb, self);
 }

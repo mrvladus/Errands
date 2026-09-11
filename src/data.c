@@ -118,7 +118,7 @@ static void errands_data_migrate_from_46() {
       if (text_item) errands_data_set_text(ical, text_item->string_val);
       if (uid_item) errands_data_set_uid(ical, uid_item->string_val);
       errands_data_set_attachments(ical, attachments);
-      errands_data_set_color(ical, color_item->string_val, false);
+      errands_data_set_color(ical, color_item->string_val);
       errands_data_set_deleted(ical, deleted_item->bool_val);
       errands_data_set_notified(ical, notified_item->bool_val);
       icalcomponent_add_component(calendar->ical, ical);
@@ -306,7 +306,7 @@ ListData *errands_list_data_create(const char *uid, const char *name, const char
   icalcomponent_add_property(ical, icalproperty_new_prodid("~//Errands"));
   set_x_prop_value(ical, "X-WR-CALDESC", description);
   errands_data_set_uid(ical, uid);
-  errands_data_set_color(ical, color, true);
+  errands_data_set_color(ical, color);
   errands_data_set_list_name(ical, name);
   errands_data_set_synced(ical, synced);
   errands_data_set_deleted(ical, deleted);
@@ -605,8 +605,9 @@ void errands_data_set_priority(icalcomponent *ical, int value) {
 
 // --- STRING --- //
 
-const char *errands_data_get_color(icalcomponent *ical, bool list) {
-  if (list) return get_x_prop_value(ical, "X-APPLE-CALENDAR-COLOR", NULL);
+const char *errands_data_get_color(icalcomponent *ical) {
+  if (icalcomponent_isa(ical) == ICAL_VCALENDAR_COMPONENT)
+    return get_x_prop_value(ical, "X-APPLE-CALENDAR-COLOR", NULL);
   else {
     icalproperty *property = icalcomponent_get_first_property(ical, ICAL_COLOR_PROPERTY);
     return property ? icalproperty_get_color(property) : NULL;
@@ -636,7 +637,7 @@ void errands_data_set_notes(icalcomponent *ical, const char *value) {
   errands_data_set_synced(ical, false);
   errands_data_set_changed(ical, icaltime_get_date_time_now());
 }
-void errands_data_set_color(icalcomponent *ical, const char *value, bool list) {
+void errands_data_set_color(icalcomponent *ical, const char *value) {
   const char *color = value;
   g_autofree char *fixed_color = NULL;
   if (g_str_has_prefix(value, "#")) {
@@ -645,7 +646,7 @@ void errands_data_set_color(icalcomponent *ical, const char *value, bool list) {
       color = fixed_color;
     }
   }
-  if (list) {
+  if (icalcomponent_isa(ical) == ICAL_VCALENDAR_COMPONENT) {
     set_x_prop_value(ical, "X-APPLE-CALENDAR-COLOR", color && !g_str_equal(color, "") ? color : NULL);
   } else {
     if (!value || g_str_equal(value, ""))
