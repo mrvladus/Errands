@@ -55,9 +55,11 @@ ErrandsWindow *errands_window_new(GtkApplication *app) {
 
 // ---------- PUBLIC FUNCTIONS ---------- //
 
-void errands_window_add_toast(const char *msg) {
+void errands_window_add_toast(const char *msg, int timeout) {
   LOG("Window: Add Toast '%s'", msg);
-  adw_toast_overlay_add_toast(state.main_window->toast_overlay, adw_toast_new(msg));
+  AdwToast *toast = adw_toast_new(msg);
+  adw_toast_set_timeout(toast, timeout);
+  adw_toast_overlay_add_toast(state.main_window->toast_overlay, toast);
 }
 
 // ---------- CALLBACKS ---------- //

@@ -359,13 +359,13 @@ static void on_action_export_finish_cb(GObject *obj, GAsyncResult *res, ListData
   g_autofree char *path = g_file_get_path(f);
   FILE *file = fopen(path, "w");
   if (!file) {
-    errands_window_add_toast(_("Export failed"));
+    errands_window_add_toast(_("Export failed"), 2);
     return;
   }
   autofree char *ical = icalcomponent_as_ical_string(data->ical);
   fprintf(file, "%s", ical);
   fclose(file);
-  errands_window_add_toast(_("Exported"));
+  errands_window_add_toast(_("Exported"), 1);
   LOG("Export task list %s", errands_data_get_uid(data->ical));
 }
 
@@ -417,7 +417,7 @@ static void on_action_delete_completed_cb(GSimpleAction *action, GVariant *param
   __remove_deleted_tasks(self, self->all_tasks_model);
   errands_task_list_filter_tree(self, GTK_FILTER_CHANGE_DIFFERENT);
   const char *msg = tmp_str_printf(_("Deleted %zu tasks"), deleted_n);
-  errands_window_add_toast(msg);
+  errands_window_add_toast(msg, 2);
 }
 
 static void on_action_delete_cancelled_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
@@ -440,7 +440,7 @@ static void on_action_delete_cancelled_cb(GSimpleAction *action, GVariant *param
   __remove_deleted_tasks(self, self->all_tasks_model);
   errands_task_list_filter_tree(self, GTK_FILTER_CHANGE_DIFFERENT);
   const char *msg = tmp_str_printf(_("Deleted %zu tasks"), deleted_n);
-  errands_window_add_toast(msg);
+  errands_window_add_toast(msg, 2);
 }
 
 static void on_action_delete_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {

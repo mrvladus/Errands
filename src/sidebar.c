@@ -191,7 +191,7 @@ static void __on_open_finish(GObject *obj, GAsyncResult *res) {
   for_range(i, 0, errands_data_lists->len) {
     ListData *data = g_ptr_array_index(errands_data_lists, i);
     if (g_str_equal(uid, errands_data_get_uid(data->ical))) {
-      errands_window_add_toast(_("List already exists"));
+      errands_window_add_toast(_("List already exists"), 2);
       return;
     }
   }

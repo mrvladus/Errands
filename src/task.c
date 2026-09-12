@@ -359,7 +359,6 @@ static void on_sub_task_entry_activated_cb(GtkEntry *entry, ErrandsTask *self) {
 
   // Reset text
   gtk_editable_set_text(GTK_EDITABLE(entry), "");
-  errands_task_item_update_sub_task_count(self->item);
   errands_sidebar_update_filter_rows();
   errands_sync_create_task(self->data);
 }
@@ -414,7 +413,7 @@ static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x,
   TaskData *drop_data = errands_task_item_get_data(drop_item);
   TaskData *tgt_data = errands_task_item_get_data(tgt_item);
   if (__task_data_is_sub_task_of(tgt_data, drop_data)) {
-    errands_window_add_toast(_("Can't add task as a child of itself"));
+    errands_window_add_toast(_("Can't add task as a child of itself"), 2);
     return false;
   }
 

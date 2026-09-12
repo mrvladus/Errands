@@ -12,6 +12,11 @@
     opacity: 1;
 }
 
+.task-toolbar-btn > button,
+.tag {
+    padding: 0px 4px;
+}
+
 /* Date and time widndow */
 
 .weekday {

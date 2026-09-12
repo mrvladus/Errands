@@ -88,7 +88,7 @@ static void on_copy_action_cb(GSimpleAction *action, GVariant *param, ErrandsTas
   const char *text = errands_data_get_text(self->task->data->ical);
   GdkClipboard *clipboard = gdk_display_get_clipboard(gtk_widget_get_display(GTK_WIDGET(self)));
   gdk_clipboard_set(clipboard, G_TYPE_STRING, text);
-  errands_window_add_toast(_("Copied to Clipboard"));
+  errands_window_add_toast(_("Copied to Clipboard"), 1);
 }
 
 static void on_export_finish_cb(GObject *obj, GAsyncResult *res, gpointer data) {
@@ -97,7 +97,7 @@ static void on_export_finish_cb(GObject *obj, GAsyncResult *res, gpointer data) 
   g_autofree char *path = g_file_get_path(f);
   FILE *file = fopen(path, "w");
   if (!file) {
-    errands_window_add_toast(_("Failed to Export"));
+    errands_window_add_toast(_("Failed to Export"), 2);
     return;
   }
   TaskData *task_data = data;

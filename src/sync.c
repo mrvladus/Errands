@@ -311,7 +311,7 @@ static void errands__sync_finished_cb(GObject *source_object, GAsyncResult *res,
   if (!g_task_propagate_boolean(G_TASK(res), NULL)) {
     sync_in_progress = false;
     const char *msg = tmp_str_printf(_("Sync attempt %d failed."), sync_attempt_count + 1);
-    errands_window_add_toast(msg);
+    errands_window_add_toast(msg, 1);
     sync_attempt_count++;
     return;
   }
@@ -335,7 +335,7 @@ static void errands__sync_finished_cb(GObject *source_object, GAsyncResult *res,
     errands_list_data_save(list);
     const char *msg =
         tmp_str_printf("%s: %s", _("Task List was deleted on server"), errands_data_get_list_name(list->ical));
-    errands_window_add_toast(msg);
+    errands_window_add_toast(msg, 2);
     reload = true;
   }
   g_ptr_array_set_size(lists[LISTS_TO_DELETE_LOCAL], 0);
@@ -461,7 +461,7 @@ bool errands_sync() {
   }
 
   if (sync_attempt_count >= MAX_SYNC_ATTEMPTS) {
-    errands_window_add_toast(_("Too many sync attempts. Giving up."));
+    errands_window_add_toast(_("Too many sync attempts. Giving up."), 2);
     return false;
   }
 

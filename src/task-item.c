@@ -225,6 +225,7 @@ ErrandsTaskItem *errands_task_item_add_child(ErrandsTaskItem *self, TaskData *da
   g_autoptr(ErrandsTaskItem) item = errands_task_item_new(data, self);
   g_list_store_append(self->children_model, item);
   g_object_notify(G_OBJECT(self), "children-model-is-empty");
+  errands_task_item_update_sub_task_count(self);
 
   return item;
 }
