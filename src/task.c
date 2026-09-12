@@ -1,5 +1,6 @@
 #include "task.h"
 #include "data.h"
+#include "gtk/gtk.h"
 #include "sidebar.h"
 #include "state.h"
 #include "sync.h"
@@ -42,6 +43,7 @@ enum {
   PROP_0,
   PROP_DATA,
   PROP_TASK_ITEM,
+  PROP_COLOR,
   N_PROPERTIES,
 };
 
@@ -58,6 +60,10 @@ static void errands_task_set_property(GObject *object, guint prop_id, const GVal
     self->item = g_value_get_object(value);
     errands_task_set_data(self, errands_task_item_get_data(self->item));
   } break;
+  case PROP_COLOR: {
+    self->color = g_value_get_string(value);
+    gtk_widget_set_color(GTK_WIDGET(self), self->color);
+  } break;
   default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
   }
 }
@@ -67,6 +73,7 @@ static void errands_task_get_property(GObject *object, guint prop_id, GValue *va
   switch (prop_id) {
   case PROP_DATA: g_value_set_pointer(value, self->data); break;
   case PROP_TASK_ITEM: g_value_set_object(value, self->item); break;
+  case PROP_COLOR: g_value_set_string(value, self->color); break;
   default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
   }
 }
@@ -88,6 +95,7 @@ static void errands_task_class_init(ErrandsTaskClass *klass) {
       g_param_spec_pointer("data", "Task Data", "Data associated with the task.", G_PARAM_READWRITE);
   obj_properties[PROP_TASK_ITEM] = g_param_spec_object("task-item", "Task Item", "Task item associated with the task.",
                                                        ERRANDS_TYPE_TASK_ITEM, G_PARAM_READWRITE);
+  obj_properties[PROP_COLOR] = g_param_spec_string("color", "Color", "Color of the task.", NULL, G_PARAM_READWRITE);
 
   g_object_class_install_properties(object_class, N_PROPERTIES, obj_properties);
 
@@ -140,15 +148,8 @@ void errands_task_set_data(ErrandsTask *self, TaskData *data) {
   if (!data) return;
   self->data = data;
   gtk_widget_set_visible(self->complete_btn, !errands_data_get_cancelled(data->ical));
-  errands_task_update_accent_color(self);
   errands_task_update_progress(self);
   errands_task_update_toolbar(self);
-}
-
-void errands_task_update_accent_color(ErrandsTask *task) {
-  if (!task) return;
-  const char *color = errands_data_get_color(task->data->ical);
-  if (color) gtk_widget_set_color(GTK_WIDGET(task), color);
 }
 
 void errands_task_update_progress(ErrandsTask *self) {

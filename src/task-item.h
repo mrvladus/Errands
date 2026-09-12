@@ -14,5 +14,5 @@ ErrandsTaskItem *errands_task_item_get_parent(ErrandsTaskItem *self);
 void errands_task_item_set_parent(ErrandsTaskItem *self, ErrandsTaskItem *parent);
 ErrandsTaskItem *errands_task_item_add_child(ErrandsTaskItem *self, TaskData *data);
 
-GdkRGBA errands_task_item_get_color(ErrandsTaskItem *self);
-void errands_task_item_set_color(ErrandsTaskItem *self, const GdkRGBA *color);
+const char *errands_task_item_get_color(ErrandsTaskItem *self);
+void errands_task_item_set_color(ErrandsTaskItem *self, const char *color);

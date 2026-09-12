@@ -31,10 +31,10 @@ struct _ErrandsTask {
   // GObject Properties
   ErrandsTaskItem *item;
   TaskData *data;
+  const char *color;
 };
 
 ErrandsTask *errands_task_new();
 void errands_task_set_data(ErrandsTask *self, TaskData *data);
-void errands_task_update_accent_color(ErrandsTask *task);
 void errands_task_update_progress(ErrandsTask *task);
 void errands_task_update_toolbar(ErrandsTask *task);

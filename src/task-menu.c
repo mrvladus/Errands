@@ -1,8 +1,4 @@
 #include "data.h"
-#include "gdk/gdk.h"
-#include "glib-object.h"
-#include "gtk/gtk.h"
-#include "gtk/gtkshortcut.h"
 #include "state.h"
 #include "task-item.h"
 #include "task-list.h"
@@ -75,8 +71,7 @@ void errands_task_menu_show(ErrandsTask *task, float x, float y, ErrandsTaskMenu
   self->task = task;
   GdkRectangle rect = {x, y, 0, 0};
   gtk_popover_set_pointing_to(GTK_POPOVER(self), &rect);
-  const char *color = errands_data_get_color(task->data->ical);
-  if (color) gtk_widget_set_color(self->color_btn, color);
+  gtk_widget_set_color(self->color_btn, errands_data_get_color(task->data->ical));
   gtk_widget_set_visible(self->task_mode_box, mode == ERRANDS_TASK_MENU_MODE_TASK);
   gtk_popover_popup(GTK_POPOVER(self));
 }
@@ -164,8 +159,7 @@ static void on_finish_cb(GObject *source_object, GAsyncResult *res, gpointer dat
   if (!rgba) return;
   char hex_string[8];
   gdk_rgba_to_hex_string(rgba, hex_string);
-  errands_task_item_set_color(self->task->item, rgba);
-  errands_task_update_accent_color(self->task);
+  errands_task_item_set_color(self->task->item, hex_string);
 }
 
 static void on_color_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskMenu *self) {
