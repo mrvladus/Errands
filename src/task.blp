@@ -61,6 +61,7 @@ template $ErrandsTask: Box {
       spacing: 0;
 
       Label title {
+        label: bind template.task-item as <$ErrandsTaskItem>.title;
         hexpand: true;
         halign: fill;
         valign: center;
@@ -84,6 +85,7 @@ template $ErrandsTask: Box {
 
     Box {
       Label counter {
+        label: bind template.task-item as <$ErrandsTaskItem>.subtask-count;
         margin-end: 12;
 
         styles [
