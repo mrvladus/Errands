@@ -11,7 +11,6 @@ enum {
   PROP_UID,
   PROP_TITLE,
   PROP_COLOR,
-  PROP_COUNT,
   PROP_COUNT_STRING,
 
   N_PROPERTIES,
@@ -42,11 +41,9 @@ static void errands_task_list_item_set_property(GObject *object, guint prop_id, 
     errands_data_set_color(self->data->ical, hex_string);
     errands_list_data_save(self->data);
   } break;
-  case PROP_COUNT: {
-    self->count = g_value_get_int(value);
-    if (self->count == 0) strcpy(self->count_string, "");
-    else sprintf(self->count_string, "%d", self->count);
-    g_object_notify(object, "count-string");
+  case PROP_COUNT_STRING: {
+    const char *str = g_value_get_string(value);
+    self->count_string = str;
   } break;
   default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
   }
@@ -58,7 +55,6 @@ static void errands_task_list_item_get_property(GObject *object, guint prop_id, 
   case PROP_UID: g_value_set_string(value, self->uid); break;
   case PROP_TITLE: g_value_set_string(value, self->title); break;
   case PROP_COLOR: g_value_set_boxed(value, &self->color); break;
-  case PROP_COUNT: g_value_set_int(value, self->count); break;
   case PROP_COUNT_STRING: g_value_set_string(value, self->count_string); break;
   default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
   }
@@ -85,10 +81,8 @@ static void errands_task_list_item_class_init(ErrandsTaskListItemClass *klass) {
       g_param_spec_string("title", "Task List Title", "Title of the task list", NULL, G_PARAM_READWRITE);
   obj_properties[PROP_COLOR] =
       g_param_spec_boxed("color", "Task List Color", "Color of the task list", GDK_TYPE_RGBA, G_PARAM_READWRITE);
-  obj_properties[PROP_COUNT] =
-      g_param_spec_int("count", "Task List Count", "Number of uncompleted tasks", 0, G_MAXINT, 0, G_PARAM_READWRITE);
   obj_properties[PROP_COUNT_STRING] = g_param_spec_string(
-      "count-string", "Task List Count String", "Number of uncompleted tasks as string", NULL, G_PARAM_READABLE);
+      "count-string", "Task List Count String", "Number of uncompleted tasks as string", NULL, G_PARAM_READWRITE);
 
   g_object_class_install_properties(object_class, N_PROPERTIES, obj_properties);
 }
@@ -109,8 +103,6 @@ ErrandsTaskListItem *errands_task_list_item_new(ListData *data) {
 
 void errands_task_list_item_update_counter(ErrandsTaskListItem *self) {
   if (!self || !self->data) return;
-  LOG_DEBUG("Update for %s", errands_data_get_uid(self->data->ical));
-
   icalcomponent *ical = self->data->ical;
   size_t total = 0, completed = 0;
   for (icalcomponent *c = icalcomponent_get_first_component(ical, ICAL_VTODO_COMPONENT); c != 0;
@@ -120,5 +112,8 @@ void errands_task_list_item_update_counter(ErrandsTaskListItem *self) {
     total++;
   }
   gint count = total - completed;
-  g_object_set(self, "count", count, NULL);
+  char str[16];
+  if (count == 0) strcpy(str, "");
+  else sprintf(str, "%d", count);
+  g_object_set(self, "count-string", str, NULL);
 }

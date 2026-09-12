@@ -93,7 +93,7 @@ template $ErrandsTask: Box {
       }
 
       Revealer {
-        transition-type: swing_left;
+        transition-type: slide_left;
         transition-duration: 300;
         reveal-child: bind motion_ctrl.contains-pointer;
 
@@ -207,6 +207,10 @@ template $ErrandsTask: Box {
       margin-bottom: 6;
       placeholder-text: _("Add Sub-Task");
       activate => $on_sub_task_entry_activated_cb(template) not-swapped;
+
+      styles [
+        "sub-entry",
+      ]
     }
   }
 

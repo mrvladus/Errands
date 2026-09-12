@@ -155,10 +155,15 @@ static inline void gtk_widget_set_color(GtkWidget *widget, const char *color) {
   const char *fg = brightness < 0.6 ? "white" : "black";
 
   // Build CSS rule and load it into a fresh provider
-  g_autofree gchar *css = g_strdup_printf(".%s { background-color: %s; color: %s; }", css_class, bg, fg);
+  const char *css_fmt = ".%s { background-color: %s; color: %s; }";
+  g_autofree gchar *css = g_strdup_printf(css_fmt, css_class, bg, fg);
   g_autoptr(GtkCssProvider) provider = gtk_css_provider_new();
   gtk_css_provider_load_from_string(provider, css);
   gtk_style_context_add_provider_for_display(gdk_display_get_default(), GTK_STYLE_PROVIDER(provider),
                                              GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
   g_object_set_data(G_OBJECT(widget), "custom-color-provider", provider);
 }
+
+// .checkbtn-blue check:checked {
+//     background-color: var(--check-blue);
+// }
