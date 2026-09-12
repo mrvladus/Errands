@@ -327,9 +327,9 @@ static void on_bind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_it
   ErrandsTask *task = ERRANDS_TASK(gtk_tree_expander_get_child(expander));
   ErrandsTaskItem *item = gtk_tree_list_row_get_item(row);
 
+  g_object_bind_property(item, "color", task, "color", G_BINDING_SYNC_CREATE);
   g_object_bind_property(item, "completed", task->complete_btn, "active",
                          G_BINDING_SYNC_CREATE | G_BINDING_BIDIRECTIONAL);
-  g_object_bind_property(item, "color", task, "color", G_BINDING_SYNC_CREATE);
   g_object_bind_property(item, "cancelled", task->complete_btn, "visible",
                          G_BINDING_SYNC_CREATE | G_BINDING_INVERT_BOOLEAN);
   g_object_bind_property_full(item, "subtask-count", expander, "hide-expander", G_BINDING_SYNC_CREATE,

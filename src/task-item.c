@@ -1,7 +1,5 @@
 #include "task-item.h"
 #include "data.h"
-#include "gio/gio.h"
-#include "settings.h"
 #include "sidebar.h"
 #include "state.h"
 #include "task.h"
