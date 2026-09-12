@@ -58,7 +58,9 @@ template $ErrandsTaskMenu: Popover {
         }
       }
 
-      Separator {}
+      Separator {
+        visible: bind task_mode_box.visible;
+      }
 
       // Date and Time
       Button {
@@ -170,74 +172,79 @@ template $ErrandsTaskMenu: Popover {
         }
       }
 
-      Separator {}
+      Box {
+        orientation: vertical;
+        visible: bind task_mode_box.visible;
 
-      // Export
-      Button {
-        action-name: "task-menu.export";
+        Separator {}
 
-        styles [
-          "flat",
-          "body",
-        ]
+        // Export
+        Button {
+          action-name: "task-menu.export";
 
-        Box {
-          spacing: 12;
+          styles [
+            "flat",
+            "body",
+          ]
 
-          Image {
-            icon-name: "errands-export-symbolic";
-          }
+          Box {
+            spacing: 12;
 
-          Label {
-            label: _("Export as \".ics\"");
-          }
-        }
-      }
+            Image {
+              icon-name: "errands-export-symbolic";
+            }
 
-      Separator {}
-
-      // Cancel
-      Button {
-        action-name: "task-menu.cancel";
-
-        styles [
-          "flat",
-          "body",
-          "warning",
-        ]
-
-        Box {
-          spacing: 12;
-
-          Image {
-            icon-name: "errands-cancel-symbolic";
-          }
-
-          Label {
-            label: _("Cancel");
+            Label {
+              label: _("Export as \".ics\"");
+            }
           }
         }
-      }
 
-      // Delete
-      Button {
-        action-name: "task-menu.delete";
+        Separator {}
 
-        styles [
-          "flat",
-          "body",
-          "error",
-        ]
+        // Cancel
+        Button {
+          action-name: "task-menu.cancel";
 
-        Box {
-          spacing: 12;
+          styles [
+            "flat",
+            "body",
+            "warning",
+          ]
 
-          Image {
-            icon-name: "errands-trash-symbolic";
+          Box {
+            spacing: 12;
+
+            Image {
+              icon-name: "errands-cancel-symbolic";
+            }
+
+            Label {
+              label: _("Cancel");
+            }
           }
+        }
 
-          Label {
-            label: _("Delete");
+        // Delete
+        Button {
+          action-name: "task-menu.delete";
+
+          styles [
+            "flat",
+            "body",
+            "error",
+          ]
+
+          Box {
+            spacing: 12;
+
+            Image {
+              icon-name: "errands-trash-symbolic";
+            }
+
+            Label {
+              label: _("Delete");
+            }
           }
         }
       }
