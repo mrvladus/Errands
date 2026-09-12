@@ -13,7 +13,7 @@ struct _ErrandsTask {
 
   GtkWidget *complete_btn;
   GtkWidget *title;
-  GtkWidget *subtitle;
+  GtkWidget *counter;
   GtkWidget *edit_title;
   GtkWidget *menu_btn;
   GtkWidget *toolbar;

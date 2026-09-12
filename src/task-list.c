@@ -333,7 +333,7 @@ static void on_bind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_it
   g_object_bind_property(item, "color", task, "color", G_BINDING_SYNC_CREATE);
   g_object_bind_property(item, "cancelled", task->complete_btn, "visible",
                          G_BINDING_SYNC_CREATE | G_BINDING_INVERT_BOOLEAN);
-  g_object_bind_property(item, "subtask-count", task->subtitle, "label", G_BINDING_SYNC_CREATE);
+  g_object_bind_property(item, "subtask-count", task->counter, "label", G_BINDING_SYNC_CREATE);
   g_object_bind_property_full(item, "subtask-count", expander, "hide-expander", G_BINDING_SYNC_CREATE,
                               expander_binding_transform_func, NULL, NULL, NULL);
 

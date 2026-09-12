@@ -102,7 +102,7 @@ static void errands_task_class_init(ErrandsTaskClass *klass) {
   gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(klass), RESOURCE_PATH "/ui/task.ui");
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, complete_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, title);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, subtitle);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, counter);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, edit_title);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, menu_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, toolbar);
