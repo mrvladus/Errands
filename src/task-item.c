@@ -36,7 +36,6 @@ enum {
 
   PROP_DATA,
   PROP_CHILDREN_MODEL,
-  PROP_CHILDREN_MODEL_IS_EMPTY,
   PROP_TASK_WIDGET,
   N_PROPERTIES,
 };
@@ -114,7 +113,6 @@ static void errands_task_item_set_property(GObject *object, guint prop_id, const
 
   case PROP_DATA: self->data = g_value_get_pointer(value); break;
   case PROP_CHILDREN_MODEL: self->children_model = g_value_get_object(value); break;
-  case PROP_CHILDREN_MODEL_IS_EMPTY: g_object_notify_by_pspec(object, pspec); break;
   case PROP_TASK_WIDGET: self->task_widget = g_value_get_pointer(value); break;
   default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
   }
@@ -131,19 +129,7 @@ static void errands_task_item_get_property(GObject *object, guint prop_id, GValu
 
   case PROP_DATA: g_value_set_pointer(value, self->data); break;
   case PROP_CHILDREN_MODEL: g_value_set_object(value, self->children_model); break;
-  case PROP_CHILDREN_MODEL_IS_EMPTY: {
-    bool show_completed = errands_settings_get(SETTING_SHOW_COMPLETED).b;
-    bool show_cancelled = errands_settings_get(SETTING_SHOW_CANCELLED).b;
-    size_t total = self->data->children->len;
-    for (size_t i = 0; i < self->data->children->len; ++i) {
-      TaskData *child_data = g_ptr_array_index(self->data->children, i);
-      bool deleted = errands_data_get_deleted(child_data->ical);
-      bool completed = errands_data_is_completed(child_data->ical);
-      bool cancelled = errands_data_get_cancelled(child_data->ical);
-      if (deleted || (!show_completed && completed) || (!show_cancelled && cancelled)) total--;
-    }
-    g_value_set_boolean(value, !self->children_model || total == 0);
-  } break;
+
   case PROP_TASK_WIDGET: g_value_set_pointer(value, self->task_widget); break;
   default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
   }
@@ -175,9 +161,6 @@ static void errands_task_item_class_init(ErrandsTaskItemClass *klass) {
       g_param_spec_pointer("data", "Task Data", "Data associated with the task.", G_PARAM_READWRITE);
   obj_properties[PROP_CHILDREN_MODEL] = g_param_spec_object(
       "children-model", "Children Model", "Model containing child tasks.", G_TYPE_LIST_MODEL, G_PARAM_READWRITE);
-  obj_properties[PROP_CHILDREN_MODEL_IS_EMPTY] =
-      g_param_spec_boolean("children-model-is-empty", "Children Model Is Empty", "Whether the task has child tasks.",
-                           true, G_PARAM_READWRITE);
   obj_properties[PROP_TASK_WIDGET] =
       g_param_spec_pointer("task-widget", "Task Widget", "Widget associated with the task item.", G_PARAM_READWRITE);
 
@@ -202,35 +185,29 @@ ErrandsTaskItem *errands_task_item_new(TaskData *data, ErrandsTaskItem *parent) 
   return self;
 }
 
-GListModel *errands_task_item_get_children_model(ErrandsTaskItem *self) {
-  if (self->children_model) return G_LIST_MODEL(self->children_model);
-  self->children_model = g_list_store_new(ERRANDS_TYPE_TASK_ITEM);
-  for_range(i, 0, self->data->children->len) {
-    TaskData *child = g_ptr_array_index(self->data->children, i);
-    g_autoptr(ErrandsTaskItem) item = errands_task_item_new(child, self);
-    g_list_store_append(self->children_model, item);
-  }
-  errands_task_item_update_sub_task_count(self);
-  return G_LIST_MODEL(self->children_model);
-}
-
-TaskData *errands_task_item_get_data(ErrandsTaskItem *self) { return self->data; }
-
-ErrandsTaskItem *errands_task_item_get_parent(ErrandsTaskItem *self) { return self->parent; }
-
-void errands_task_item_set_parent(ErrandsTaskItem *self, ErrandsTaskItem *parent) { self->parent = parent; }
-
 ErrandsTaskItem *errands_task_item_add_child(ErrandsTaskItem *self, TaskData *data) {
   if (!self || !data) return NULL;
+
   g_autoptr(ErrandsTaskItem) item = errands_task_item_new(data, self);
   g_list_store_append(self->children_model, item);
-  g_object_notify(G_OBJECT(self), "children-model-is-empty");
   errands_task_item_update_sub_task_count(self);
 
   return item;
 }
 
 void errands_task_item_update_sub_task_count(ErrandsTaskItem *self) {
+  // bool show_completed = errands_settings_get(SETTING_SHOW_COMPLETED).b;
+  // bool show_cancelled = errands_settings_get(SETTING_SHOW_CANCELLED).b;
+  // size_t total = self->data->children->len;
+  // for (size_t i = 0; i < self->data->children->len; ++i) {
+  //   TaskData *child_data = g_ptr_array_index(self->data->children, i);
+  //   bool deleted = errands_data_get_deleted(child_data->ical);
+  //   bool completed = errands_data_is_completed(child_data->ical);
+  //   bool cancelled = errands_data_get_cancelled(child_data->ical);
+  //   if (deleted || (!show_completed && completed) || (!show_cancelled && cancelled)) total--;
+  // }
+  // g_value_set_boolean(value, !self->children_model || total == 0);
+
   if (!self || !self->children_model) return;
   GListModel *children_model = G_LIST_MODEL(self->children_model);
   size_t total = 0, completed = 0;
@@ -247,5 +224,30 @@ void errands_task_item_update_sub_task_count(ErrandsTaskItem *self) {
 
 // ---------- PROPERTIES ---------- //
 
-const char *errands_task_item_get_color(ErrandsTaskItem *self) { return self->color; }
+const char *errands_task_item_get_color(ErrandsTaskItem *self) {
+  if (!self) return NULL;
+  return self->color;
+}
+TaskData *errands_task_item_get_data(ErrandsTaskItem *self) {
+  if (!self) return NULL;
+  return self->data;
+}
+ErrandsTaskItem *errands_task_item_get_parent(ErrandsTaskItem *self) {
+  if (!self) return NULL;
+  return self->parent;
+}
+GListModel *errands_task_item_get_children_model(ErrandsTaskItem *self) {
+  if (!self) return NULL;
+  if (self->children_model) return G_LIST_MODEL(self->children_model);
+  self->children_model = g_list_store_new(ERRANDS_TYPE_TASK_ITEM);
+  for_range(i, 0, self->data->children->len) {
+    TaskData *child = g_ptr_array_index(self->data->children, i);
+    g_autoptr(ErrandsTaskItem) item = errands_task_item_new(child, self);
+    g_list_store_append(self->children_model, item);
+  }
+  errands_task_item_update_sub_task_count(self);
+  return G_LIST_MODEL(self->children_model);
+}
+
 void errands_task_item_set_color(ErrandsTaskItem *self, const char *color) { g_object_set(self, "color", color, NULL); }
+void errands_task_item_set_parent(ErrandsTaskItem *self, ErrandsTaskItem *parent) { self->parent = parent; }

@@ -1,6 +1,7 @@
 #include "task-list.h"
 #include "data.h"
 #include "delete-list-dialog.h"
+#include "glib-object.h"
 #include "rename-list-dialog.h"
 #include "settings.h"
 #include "sidebar.h"
@@ -180,7 +181,7 @@ static bool __tree_filter_func(GtkTreeListRow *row, ErrandsTaskList *self) {
   bool show_cancelled = errands_settings_get(SETTING_SHOW_CANCELLED).b;
   if (!show_cancelled && errands_data_get_cancelled(data->ical)) result = false;
 
-  g_object_notify(G_OBJECT(item), "children-model-is-empty");
+  // g_object_notify(G_OBJECT(item), "children-model-is-empty");
 
   return result;
 }
@@ -304,7 +305,13 @@ static void __expand_all_visible_rows(ErrandsTaskList *self) {
   if (expanded_any) g_idle_add_once((GSourceOnceFunc)__expand_all_visible_rows, self);
 }
 
-// ---------- TASKS RECYCLER ---------- //
+// ---------- TASKS LIST ---------- //
+
+static gboolean expander_binding_transform_func(GBinding *binding, const GValue *from_value, GValue *to_value,
+                                                gpointer user_data) {
+  g_value_set_boolean(to_value, strcmp(g_value_get_string(from_value), "") == 0);
+  return true;
+}
 
 static void on_setup_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_item) {
   GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_tree_expander_new());
@@ -326,8 +333,9 @@ static void on_bind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_it
   g_object_bind_property(item, "color", task, "color", G_BINDING_SYNC_CREATE);
   g_object_bind_property(item, "cancelled", task->complete_btn, "visible",
                          G_BINDING_SYNC_CREATE | G_BINDING_INVERT_BOOLEAN);
-  g_object_bind_property(item, "children-model-is-empty", expander, "hide-expander", G_BINDING_SYNC_CREATE);
   g_object_bind_property(item, "subtask-count", task->subtitle, "label", G_BINDING_SYNC_CREATE);
+  g_object_bind_property_full(item, "subtask-count", expander, "hide-expander", G_BINDING_SYNC_CREATE,
+                              expander_binding_transform_func, NULL, NULL, NULL);
 
   g_object_set(item, "task-widget", task, NULL);
 
@@ -392,7 +400,7 @@ static void __remove_deleted_tasks(ErrandsTaskList *self, GListStore *model) {
     TaskData *data = errands_task_item_get_data(child);
     if (errands_data_get_deleted(data->ical)) {
       g_list_store_remove(model, i--);
-      if (parent && G_IS_OBJECT(parent)) g_object_notify(G_OBJECT(parent), "children-model-is-empty");
+      // if (parent && G_IS_OBJECT(parent)) g_object_notify(G_OBJECT(parent), "children-model-is-empty");
     }
   }
 }

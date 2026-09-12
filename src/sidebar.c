@@ -1,10 +1,6 @@
 #include "sidebar.h"
 #include "about-dialog.h"
-#include "adwaita.h"
 #include "data.h"
-#include "gio/gio.h"
-#include "glib-object.h"
-#include "glib.h"
 #include "settings-dialog.h"
 #include "settings.h"
 #include "state.h"
@@ -43,12 +39,20 @@ static void errands_sidebar_class_init(ErrandsSidebarClass *klass) {
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_sidebar_activated_cb);
 }
 
+static gboolean counter_binding_transform_func(GBinding *binding, const GValue *from_value, GValue *to_value,
+                                               gpointer user_data) {
+  gint count = g_value_get_int(from_value);
+  g_value_set_string(to_value, count <= 0 ? "" : g_strdup_printf("%d", count));
+  return true;
+}
+
 static AdwSidebarItem *create_sidebar_task_list_item_create_func(ErrandsTaskListItem *item, gpointer data) {
   AdwSidebarItem *self = adw_sidebar_item_new(item->title);
   g_object_set_data(G_OBJECT(self), "item", item);
   g_object_bind_property(item, "title", self, "title", G_BINDING_SYNC_CREATE);
   GtkWidget *counter = gtk_label_new(NULL);
-  g_object_bind_property(item, "count-string", counter, "label", G_BINDING_SYNC_CREATE);
+  g_object_bind_property_full(item, "count", counter, "label", G_BINDING_SYNC_CREATE, counter_binding_transform_func,
+                              NULL, NULL, NULL);
   gtk_widget_add_css_class(counter, "dim-label");
   gtk_widget_add_css_class(counter, "caption");
   GtkColorDialog *dialog = gtk_color_dialog_new();
@@ -60,10 +64,6 @@ static AdwSidebarItem *create_sidebar_task_list_item_create_func(ErrandsTaskList
   adw_sidebar_item_set_suffix(self, box);
   errands_sidebar_task_list_update_counter(item->uid);
   return self;
-}
-
-void errands_sidebar_task_list_update_counter(const char *uid) {
-  errands_task_list_item_update_counter(errands_sidebar_find_list(uid));
 }
 
 static void errands_sidebar_init(ErrandsSidebar *sidebar) {
@@ -162,6 +162,10 @@ void errands_sidebar_update_filter_rows(void) {
 }
 
 void errands_sidebar_toggle_sync_indicator(bool on) { gtk_widget_set_visible(self->sync_indicator, on); }
+
+void errands_sidebar_task_list_update_counter(const char *uid) {
+  errands_task_list_item_update_count(errands_sidebar_find_list(uid));
+}
 
 // --- SIGNAL HANDLERS --- //
 

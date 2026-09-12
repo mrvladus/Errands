@@ -312,7 +312,7 @@ static void on_delete_action_cb(GSimpleAction *action, GVariant *param, ErrandsT
   } else parent_model = state.main_window->task_list->all_tasks_model;
   guint pos;
   if (g_list_store_find(parent_model, self->item, &pos)) g_list_store_remove(parent_model, pos);
-  g_object_notify(G_OBJECT(parent), "children-model-is-empty");
+  // g_object_notify(G_OBJECT(parent), "children-model-is-empty");
 
   errands_sidebar_update_filter_rows();
   errands_sidebar_task_list_update_counter(errands_data_get_uid(self->data->list->ical));
@@ -461,10 +461,6 @@ static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x,
     gtk_widget_activate_action(GTK_WIDGET(task), "task.complete", NULL, NULL);
   if (errands_data_get_cancelled(tgt_data->ical) && !errands_data_get_cancelled(drop_data->ical))
     gtk_widget_activate_action(GTK_WIDGET(task), "task.cancel", NULL, NULL);
-
-  // Notify expanders
-  if (drop_parent_item) g_object_notify(G_OBJECT(drop_parent_item), "children-model-is-empty");
-  g_object_notify(G_OBJECT(tgt_item), "children-model-is-empty");
 
   // Update progress
   errands_task_item_update_sub_task_count(tgt_item);
