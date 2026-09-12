@@ -59,6 +59,7 @@ void errands_notifications_init(void) {
     if (has_due_date && !errands_data_get_notified(data->ical)) errands_notifications_add(data);
   }
   initialized = true;
+  if (queue->len == 0) return;
   LOG("Notifications: Added %d tasks to the notifications queue (%f sec.)", queue->len, TIMER_ELAPSED_MS);
 }
 
