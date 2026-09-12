@@ -3,7 +3,7 @@ using Adw 1;
 
 template $ErrandsTask: Box {
   orientation: vertical;
-
+  // color: bind template.task-item as <$ErrandsTaskItem>.color;
   styles [
     "card",
   ]
@@ -84,7 +84,7 @@ template $ErrandsTask: Box {
     }
 
     Box {
-      Label counter {
+      Label {
         label: bind template.task-item as <$ErrandsTaskItem>.subtask-count;
         margin-end: 12;
 
