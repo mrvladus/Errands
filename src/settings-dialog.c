@@ -43,8 +43,7 @@ static void errands_settings_dialog_dispose(GObject *gobject) {
 
 static void errands_settings_dialog_class_init(ErrandsSettingsDialogClass *class) {
   G_OBJECT_CLASS(class)->dispose = errands_settings_dialog_dispose;
-  gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class),
-                                              "/io/github/mrvladus/Errands/ui/settings-dialog.ui");
+  gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), RESOURCE_PATH "/ui/settings-dialog.ui");
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSettingsDialog, theme);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSettingsDialog, light);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSettingsDialog, dark);

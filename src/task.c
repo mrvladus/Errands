@@ -1,6 +1,6 @@
 #include "task.h"
+#include "config.h"
 #include "data.h"
-#include "gtk/gtk.h"
 #include "sidebar.h"
 #include "state.h"
 #include "sync.h"
@@ -99,7 +99,7 @@ static void errands_task_class_init(ErrandsTaskClass *klass) {
 
   g_object_class_install_properties(object_class, N_PROPERTIES, obj_properties);
 
-  gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(klass), "/io/github/mrvladus/Errands/ui/task.ui");
+  gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(klass), RESOURCE_PATH "/ui/task.ui");
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, complete_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, title);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, subtitle);

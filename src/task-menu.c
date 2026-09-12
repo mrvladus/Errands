@@ -1,3 +1,4 @@
+#include "config.h"
 #include "data.h"
 #include "state.h"
 #include "task-item.h"
@@ -39,7 +40,7 @@ static void errands_task_menu_dispose(GObject *gobject) {
 
 static void errands_task_menu_class_init(ErrandsTaskMenuClass *class) {
   G_OBJECT_CLASS(class)->dispose = errands_task_menu_dispose;
-  gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), "/io/github/mrvladus/Errands/ui/task-menu.ui");
+  gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), RESOURCE_PATH "/ui/task-menu.ui");
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskMenu, color_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskMenu, color_dialog);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskMenu, task_mode_box);

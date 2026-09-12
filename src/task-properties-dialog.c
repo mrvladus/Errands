@@ -77,8 +77,7 @@ static void errands_task_properties_dialog_class_init(ErrandsTaskPropertiesDialo
   g_type_ensure(ERRANDS_TYPE_TASK_LIST_DATE_DIALOG_RRULE_ROW);
 
   G_OBJECT_CLASS(class)->dispose = errands_task_properties_dialog_dispose;
-  gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class),
-                                              "/io/github/mrvladus/Errands/ui/task-properties-dialog.ui");
+  gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), RESOURCE_PATH "/ui/task-properties-dialog.ui");
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, tbv);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, title);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, stack);

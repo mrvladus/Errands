@@ -1,3 +1,4 @@
+#include "config.h"
 #include "data.h"
 #include "date-chooser.h"
 #include "task-list.h"
@@ -36,7 +37,7 @@ static void errands_task_list_date_dialog_rrule_row_class_init(ErrandsTaskListDa
   g_type_ensure(ERRANDS_TYPE_DATE_CHOOSER);
   G_OBJECT_CLASS(class)->dispose = errands_task_list_date_dialog_rrule_row_dispose;
   gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class),
-                                              "/io/github/mrvladus/Errands/ui/task-list-date-dialog-rrule-row.ui");
+                                              RESOURCE_PATH "/ui/task-list-date-dialog-rrule-row.ui");
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListDateDialogRruleRow, freq_row);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListDateDialogRruleRow, interval_row);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListDateDialogRruleRow, repeat_duration);

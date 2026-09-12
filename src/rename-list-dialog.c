@@ -1,4 +1,5 @@
 #include "rename-list-dialog.h"
+#include "config.h"
 #include "state.h"
 
 static void on_response_cb(ErrandsRenameListDialog *self, gchar *response, gpointer data);
@@ -24,8 +25,7 @@ static void errands_rename_list_dialog_dispose(GObject *gobject) {
 
 static void errands_rename_list_dialog_class_init(ErrandsRenameListDialogClass *class) {
   G_OBJECT_CLASS(class)->dispose = errands_rename_list_dialog_dispose;
-  gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class),
-                                              "/io/github/mrvladus/Errands/ui/rename-list-dialog.ui");
+  gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), RESOURCE_PATH "/ui/rename-list-dialog.ui");
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsRenameListDialog, entry);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_response_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_entry_changed_cb);

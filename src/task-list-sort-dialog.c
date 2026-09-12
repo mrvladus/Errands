@@ -36,8 +36,7 @@ static void errands_task_list_sort_dialog_dispose(GObject *gobject) {
 static void errands_task_list_sort_dialog_class_init(ErrandsTaskListSortDialogClass *class) {
   G_OBJECT_CLASS(class)->dispose = errands_task_list_sort_dialog_dispose;
 
-  gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class),
-                                              "/io/github/mrvladus/Errands/ui/task-list-sort-dialog.ui");
+  gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), RESOURCE_PATH "/ui/task-list-sort-dialog.ui");
 
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListSortDialog, completed_toggle_row);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListSortDialog, cancelled_toggle_row);

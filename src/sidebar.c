@@ -33,7 +33,7 @@ static void errands_sidebar_dispose(GObject *gobject) {
 static void errands_sidebar_class_init(ErrandsSidebarClass *klass) {
   G_OBJECT_CLASS(klass)->dispose = errands_sidebar_dispose;
 
-  gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(klass), "/io/github/mrvladus/Errands/ui/sidebar.ui");
+  gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(klass), RESOURCE_PATH "/ui/sidebar.ui");
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsSidebar, sync_indicator);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsSidebar, sidebar);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsSidebar, all_counter);

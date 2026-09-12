@@ -1,7 +1,7 @@
 # --- Project info --- #
 
 NAME    = errands
-VERSION = 49.0
+VERSION = 50.0
 
 # --- Project directories --- #
 
@@ -20,9 +20,11 @@ FLATPAK_REPO_DIR  = _flatpak-repo
 DEVEL ?= FALSE
 ifeq ($(DEVEL),TRUE)
 	APP_ID = io.github.mrvladus.List.Devel
+	RESOURCE_PATH = /io/github/mrvladus/Errands/Devel
 	ALL_CFLAGS = -Wall -g
 else
 	APP_ID = io.github.mrvladus.List
+	RESOURCE_PATH = /io/github/mrvladus/Errands
 	ALL_CFLAGS = -O3 -flto
 	ALL_LDFLAGS = -O3 -flto
 endif
@@ -68,7 +70,8 @@ ALL_CFLAGS  += $(CFLAGS) \
 			-DVERSION='"$(VERSION)"' \
 			-DVERSION_COMMIT='"$(shell git rev-parse --short HEAD)"' \
 			-DAPP_ID='"$(APP_ID)"' \
-			-DLOCALE_DIR='"$(localedir)"'
+			-DRESOURCE_PATH='"$(RESOURCE_PATH)"' \
+			-DLOCALE_DIR='"$(localedir)"' \
 
 # --- Targets --- #
 
@@ -106,19 +109,19 @@ $(GRESOURCE_XML): $(BLPS) $(STYLES) $(ICONS)
 	@echo '<?xml version="1.0" encoding="UTF-8" ?>' >> $@
 	@echo '<gresources>' >> $@
 	@echo '  <!-- STYLES -->' >> $@
-	@echo '  <gresource prefix="/io/github/mrvladus/Errands">' >> $@
+	@echo '  <gresource prefix="$(RESOURCE_PATH)">' >> $@
 	@echo "    <file compressed=\"true\" alias=\"style.css\">$(DATA_DIR)/style.css</file>" >> $@
 	@echo '    <file preprocess="xml-stripblanks" compressed="true" alias="shortcuts-dialog.ui">$(BUILD_DIR)/shortcuts-dialog.ui</file>' >> $@
 	@echo '  </gresource>' >> $@
 	@echo '  <!-- UI -->' >> $@
-	@echo '  <gresource prefix="/io/github/mrvladus/Errands/ui">' >> $@
+	@echo '  <gresource prefix="$(RESOURCE_PATH)/ui">' >> $@
 	@ls $(SRC_DIR)/*.blp 2>/dev/null | grep -v "shortcuts-dialog.blp" | while read file; do \
 	    basename=$$(basename "$$file" .blp); \
 	    echo "    <file preprocess=\"xml-stripblanks\" compressed=\"true\" alias=\"$$basename.ui\">$(BUILD_DIR)/$$basename.ui</file>"; \
 	done >> $@
 	@echo '  </gresource>' >> $@
 	@echo '  <!-- ICONS -->' >> $@
-	@echo '  <gresource prefix="/io/github/mrvladus/Errands/icons/scalable/actions/">' >> $@
+	@echo '  <gresource prefix="$(RESOURCE_PATH)/icons/scalable/actions/">' >> $@
 	@for file in $(DATA_DIR)/icons/*.svg; do \
 		filename=$$(basename "$$file"); \
 		echo "    <file preprocess=\"xml-stripblanks\" compressed=\"true\" alias=\"$$filename\">$(DATA_DIR)/icons/$$filename</file>"; \

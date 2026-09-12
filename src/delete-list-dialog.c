@@ -1,4 +1,5 @@
 #include "delete-list-dialog.h"
+#include "config.h"
 #include "data.h"
 #include "state.h"
 // #include "sync.h"
@@ -23,8 +24,7 @@ static void errands_delete_list_dialog_dispose(GObject *gobject) {
 
 static void errands_delete_list_dialog_class_init(ErrandsDeleteListDialogClass *class) {
   G_OBJECT_CLASS(class)->dispose = errands_delete_list_dialog_dispose;
-  gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class),
-                                              "/io/github/mrvladus/Errands/ui/delete-list-dialog.ui");
+  gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), RESOURCE_PATH "/ui/delete-list-dialog.ui");
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_response_cb);
 }
 

@@ -23,7 +23,7 @@ static void errands_window_class_init(ErrandsWindowClass *class) {
   G_OBJECT_CLASS(class)->dispose = errands_window_dispose;
   g_type_ensure(ERRANDS_TYPE_SIDEBAR);
   g_type_ensure(ERRANDS_TYPE_TASK_LIST);
-  gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), "/io/github/mrvladus/Errands/ui/window.ui");
+  gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), RESOURCE_PATH "/ui/window.ui");
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsWindow, toast_overlay);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsWindow, split_view);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsWindow, sidebar);

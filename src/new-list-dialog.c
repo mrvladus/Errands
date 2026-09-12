@@ -28,8 +28,7 @@ static void errands_new_list_dialog_dispose(GObject *gobject) {
 
 static void errands_new_list_dialog_class_init(ErrandsNewListDialogClass *class) {
   G_OBJECT_CLASS(class)->dispose = errands_new_list_dialog_dispose;
-  gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class),
-                                              "/io/github/mrvladus/Errands/ui/new-list-dialog.ui");
+  gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), RESOURCE_PATH "/ui/new-list-dialog.ui");
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsNewListDialog, entry);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_response_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_entry_changed_cb);

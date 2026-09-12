@@ -63,7 +63,7 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
 
   G_OBJECT_CLASS(class)->dispose = errands_task_list_dispose;
 
-  gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), "/io/github/mrvladus/Errands/ui/task-list.ui");
+  gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), RESOURCE_PATH "/ui/task-list.ui");
 
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, title);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, menu_btn);

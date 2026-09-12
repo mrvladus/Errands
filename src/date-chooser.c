@@ -1,4 +1,5 @@
 #include "date-chooser.h"
+#include "config.h"
 #include "data.h"
 #include "utils.h"
 
@@ -35,8 +36,7 @@ static void errands_date_chooser_dispose(GObject *gobject) {
 
 static void errands_date_chooser_class_init(ErrandsDateChooserClass *class) {
   G_OBJECT_CLASS(class)->dispose = errands_date_chooser_dispose;
-  gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class),
-                                              "/io/github/mrvladus/Errands/ui/date-chooser.ui");
+  gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), RESOURCE_PATH "/ui/date-chooser.ui");
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsDateChooser, reset_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsDateChooser, date_popover);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsDateChooser, time_popover);
