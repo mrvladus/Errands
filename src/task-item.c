@@ -1,5 +1,6 @@
 #include "task-item.h"
 #include "data.h"
+#include "gio/gio.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "state.h"
@@ -13,6 +14,7 @@ struct _ErrandsTaskItem {
   gboolean completed;
   gboolean cancelled;
   const char *color;
+  const char *subtask_count;
 
   TaskData *data;
   ErrandsTaskItem *parent;
@@ -30,6 +32,7 @@ enum {
   PROP_COMPLETED,
   PROP_CANCELLED,
   PROP_COLOR,
+  PROP_SUBTASK_COUNT,
 
   PROP_DATA,
   PROP_CHILDREN_MODEL,
@@ -62,13 +65,13 @@ static void errands_task_item_set_property(GObject *object, guint prop_id, const
         ErrandsTaskItem *sub_task = g_list_model_get_item(G_LIST_MODEL(sub_tasks), i);
         g_object_set(sub_task, "completed", true, NULL);
       }
-      errands_task_update_progress(self->task_widget);
+      errands_task_item_update_sub_task_count(self);
     }
     // Uncomplete all parents
     else {
       if (self->parent && self->parent->completed) {
         g_object_set(self->parent, "completed", false, NULL);
-        errands_task_update_progress(self->parent->task_widget);
+        errands_task_item_update_sub_task_count(self->parent);
       }
     }
     if (update_task_list_count > 0) update_task_list_count--;
@@ -107,6 +110,7 @@ static void errands_task_item_set_property(GObject *object, guint prop_id, const
     errands_data_set_color(self->data->ical, self->color);
     errands_list_data_save(self->data->list);
   } break;
+  case PROP_SUBTASK_COUNT: self->subtask_count = g_value_get_string(value); break;
 
   case PROP_DATA: self->data = g_value_get_pointer(value); break;
   case PROP_CHILDREN_MODEL: self->children_model = g_value_get_object(value); break;
@@ -123,6 +127,7 @@ static void errands_task_item_get_property(GObject *object, guint prop_id, GValu
   case PROP_COMPLETED: g_value_set_boolean(value, self->completed); break;
   case PROP_CANCELLED: g_value_set_boolean(value, self->cancelled); break;
   case PROP_COLOR: g_value_set_string(value, self->color); break;
+  case PROP_SUBTASK_COUNT: g_value_set_string(value, self->subtask_count); break;
 
   case PROP_DATA: g_value_set_pointer(value, self->data); break;
   case PROP_CHILDREN_MODEL: g_value_set_object(value, self->children_model); break;
@@ -157,12 +162,14 @@ static void errands_task_item_class_init(ErrandsTaskItemClass *klass) {
   object_class->set_property = errands_task_item_set_property;
   object_class->get_property = errands_task_item_get_property;
 
-  obj_properties[PROP_TITLE] = g_param_spec_string("title", "Title", "Title of the task.", NULL, G_PARAM_READWRITE);
+  obj_properties[PROP_TITLE] = g_param_spec_string("title", "Title", "Title of the task", NULL, G_PARAM_READWRITE);
   obj_properties[PROP_COMPLETED] =
-      g_param_spec_boolean("completed", "Completed", "Whether the task is completed.", false, G_PARAM_READWRITE);
+      g_param_spec_boolean("completed", "Completed", "Whether the task is completed", false, G_PARAM_READWRITE);
   obj_properties[PROP_CANCELLED] =
-      g_param_spec_boolean("cancelled", "Cancelled", "Whether the task is cancelled.", false, G_PARAM_READWRITE);
+      g_param_spec_boolean("cancelled", "Cancelled", "Whether the task is cancelled", false, G_PARAM_READWRITE);
   obj_properties[PROP_COLOR] = g_param_spec_string("color", "Task Color", "Color of the task", NULL, G_PARAM_READWRITE);
+  obj_properties[PROP_SUBTASK_COUNT] =
+      g_param_spec_string("subtask-count", "Subtask Count", "Number of subtasks", NULL, G_PARAM_READWRITE);
 
   obj_properties[PROP_DATA] =
       g_param_spec_pointer("data", "Task Data", "Data associated with the task.", G_PARAM_READWRITE);
@@ -186,6 +193,7 @@ ErrandsTaskItem *errands_task_item_new(TaskData *data, ErrandsTaskItem *parent) 
   self->completed = errands_data_is_completed(data->ical);
   self->cancelled = errands_data_get_cancelled(data->ical);
   self->color = errands_data_get_color(data->ical);
+  errands_task_item_update_sub_task_count(self);
 
   self->data = data;
   self->children_model = NULL;
@@ -196,15 +204,13 @@ ErrandsTaskItem *errands_task_item_new(TaskData *data, ErrandsTaskItem *parent) 
 
 GListModel *errands_task_item_get_children_model(ErrandsTaskItem *self) {
   if (self->children_model) return G_LIST_MODEL(self->children_model);
-
   self->children_model = g_list_store_new(ERRANDS_TYPE_TASK_ITEM);
-
   for_range(i, 0, self->data->children->len) {
     TaskData *child = g_ptr_array_index(self->data->children, i);
     g_autoptr(ErrandsTaskItem) item = errands_task_item_new(child, self);
     g_list_store_append(self->children_model, item);
   }
-
+  errands_task_item_update_sub_task_count(self);
   return G_LIST_MODEL(self->children_model);
 }
 
@@ -221,6 +227,21 @@ ErrandsTaskItem *errands_task_item_add_child(ErrandsTaskItem *self, TaskData *da
   g_object_notify(G_OBJECT(self), "children-model-is-empty");
 
   return item;
+}
+
+void errands_task_item_update_sub_task_count(ErrandsTaskItem *self) {
+  if (!self || !self->children_model) return;
+  GListModel *children_model = G_LIST_MODEL(self->children_model);
+  size_t total = 0, completed = 0;
+  for_range(i, 0, g_list_model_get_n_items(children_model)) {
+    ErrandsTaskItem *item = g_list_model_get_item(children_model, i);
+    CONTINUE_IF(errands_data_get_deleted(item->data->ical) || errands_data_get_cancelled(item->data->ical));
+    if (errands_data_is_completed(item->data->ical)) completed++;
+    total++;
+  }
+  total -= completed;
+  const char *subtask_count = total > 0 ? tmp_str_printf("%zu", total) : "";
+  g_object_set(self, "subtask-count", subtask_count, NULL);
 }
 
 // ---------- PROPERTIES ---------- //

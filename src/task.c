@@ -148,23 +148,7 @@ void errands_task_set_data(ErrandsTask *self, TaskData *data) {
   if (!data) return;
   self->data = data;
   gtk_widget_set_visible(self->complete_btn, !errands_data_get_cancelled(data->ical));
-  errands_task_update_progress(self);
   errands_task_update_toolbar(self);
-}
-
-void errands_task_update_progress(ErrandsTask *self) {
-  if (!self || !self->item) return;
-  size_t total = 0, completed = 0;
-  for_range(i, 0, self->data->children->len) {
-    TaskData *data = g_ptr_array_index(self->data->children, i);
-    CONTINUE_IF(errands_data_get_deleted(data->ical));
-    CONTINUE_IF(errands_data_get_cancelled(data->ical));
-    if (errands_data_is_completed(data->ical)) completed++;
-    total++;
-  }
-  total -= completed;
-  const char *subtitle = total > 0 ? tmp_str_printf("%zu", total) : "";
-  gtk_label_set_label(GTK_LABEL(self->subtitle), subtitle);
 }
 
 void errands_task_update_toolbar(ErrandsTask *task) {
@@ -324,7 +308,7 @@ static void on_delete_action_cb(GSimpleAction *action, GVariant *param, ErrandsT
     parent_model = G_LIST_STORE(errands_task_item_get_children_model(parent));
     ErrandsTask *parent_task = NULL;
     g_object_get(G_OBJECT(parent), "task-widget", &parent_task, NULL);
-    if (parent_task && GTK_IS_WIDGET(parent_task)) errands_task_update_progress(parent_task);
+    // if (parent_task && GTK_IS_WIDGET(parent_task)) errands_task_update_progress(parent_task);
   } else parent_model = state.main_window->task_list->all_tasks_model;
   guint pos;
   if (g_list_store_find(parent_model, self->item, &pos)) g_list_store_remove(parent_model, pos);
@@ -375,7 +359,7 @@ static void on_sub_task_entry_activated_cb(GtkEntry *entry, ErrandsTask *self) {
 
   // Reset text
   gtk_editable_set_text(GTK_EDITABLE(entry), "");
-  errands_task_update_progress(self);
+  errands_task_item_update_sub_task_count(self->item);
   errands_sidebar_update_filter_rows();
   errands_sync_create_task(self->data);
 }
@@ -484,8 +468,8 @@ static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x,
   g_object_notify(G_OBJECT(tgt_item), "children-model-is-empty");
 
   // Update progress
-  errands_task_update_progress(task);
-  if (!changing_list && old_parent_task) errands_task_update_progress(old_parent_task);
+  errands_task_item_update_sub_task_count(tgt_item);
+  if (!changing_list && old_parent_task) errands_task_item_update_sub_task_count(old_parent_task->item);
 
   return true;
 }
