@@ -462,8 +462,8 @@ static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x,
     gtk_widget_activate_action(GTK_WIDGET(task), "task.cancel", NULL, NULL);
 
   // Update progress
-  errands_task_item_update_sub_task_count(tgt_item);
-  if (!changing_list && old_parent_task) errands_task_item_update_sub_task_count(old_parent_task->item);
+  errands_task_item_update(tgt_item);
+  if (!changing_list && old_parent_task) errands_task_item_update(old_parent_task->item);
 
   return true;
 }
