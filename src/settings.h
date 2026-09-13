@@ -32,9 +32,9 @@ typedef enum {
 
 typedef enum {
   SORT_TYPE_CREATION_DATE,
+  SORT_TYPE_START_DATE,
   SORT_TYPE_DUE_DATE,
   SORT_TYPE_PRIORITY,
-  SORT_TYPE_START_DATE,
 } ErrandsSettingSortType;
 
 typedef enum {

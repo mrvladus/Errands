@@ -11,81 +11,46 @@ template $ErrandsTaskListSortDialog: Adw.Dialog {
 
     content: Adw.PreferencesPage {
       Adw.PreferencesGroup {
-        title: _("Show");
+        title: _("Sort");
 
-        Adw.SwitchRow completed_toggle_row {
-          title: _("Completed Tasks");
-          notify::active => $on_show_completed_toggle_cb();
+        Adw.ComboRow {
+          title: _("Sort Order");
+          selected: bind template.sort-order bidirectional;
+
+          model: StringList {
+            strings [
+              _("Descending"),
+              _("Ascending"),
+            ]
+          };
         }
 
-        Adw.SwitchRow cancelled_toggle_row {
-          title: _("Cancelled Tasks");
-          notify::active => $on_show_cancelled_toggle_cb();
+        Adw.ComboRow {
+          title: _("Sort By");
+          selected: bind template.sort-by bidirectional;
+
+          model: StringList {
+            strings [
+              _("Creation Date"),
+              _("Start Date"),
+              _("Due Date"),
+              _("Priority"),
+            ]
+          };
         }
       }
 
       Adw.PreferencesGroup {
-        title: _("Sort By");
+        title: _("Filter");
 
-        header-suffix: Adw.ToggleGroup sort_order {
-          styles [
-            "round",
-          ]
-
-          notify::active => $on_sort_order_changed_cb(template);
-
-          Adw.Toggle {
-            icon-name: "errands-sort-symbolic";
-            tooltip: _("Descending");
-          }
-
-          Adw.Toggle {
-            icon-name: "errands-sort-asc-symbolic";
-            tooltip: _("Ascending");
-          }
-        };
-
-        Adw.ActionRow {
-          title: _("Creation Date");
-          activatable-widget: creation_date_toggle_btn;
-
-          [suffix]
-          CheckButton creation_date_toggle_btn {
-            toggled => $on_created_toggle_cb();
-          }
+        Adw.SwitchRow {
+          title: _("Completed Tasks");
+          active: bind template.show-completed bidirectional;
         }
 
-        Adw.ActionRow {
-          title: _("Start Date");
-          activatable-widget: start_date_toggle_btn;
-
-          [suffix]
-          CheckButton start_date_toggle_btn {
-            group: creation_date_toggle_btn;
-            toggled => $on_start_toggle_cb();
-          }
-        }
-
-        Adw.ActionRow {
-          title: _("Due Date");
-          activatable-widget: due_date_toggle_btn;
-
-          [suffix]
-          CheckButton due_date_toggle_btn {
-            group: creation_date_toggle_btn;
-            toggled => $on_due_toggle_cb();
-          }
-        }
-
-        Adw.ActionRow {
-          title: _("Priority");
-          activatable-widget: priority_toggle_btn;
-
-          [suffix]
-          CheckButton priority_toggle_btn {
-            group: creation_date_toggle_btn;
-            toggled => $on_priority_toggle_cb();
-          }
+        Adw.SwitchRow {
+          title: _("Cancelled Tasks");
+          active: bind template.show-cancelled bidirectional;
         }
       }
     };

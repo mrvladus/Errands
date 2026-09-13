@@ -204,32 +204,25 @@ ErrandsTaskItem *errands_task_item_add_child(ErrandsTaskItem *self, TaskData *da
 }
 
 void errands_task_item_update(ErrandsTaskItem *self) {
-  // bool show_completed = errands_settings_get(SETTING_SHOW_COMPLETED).b;
-  // bool show_cancelled = errands_settings_get(SETTING_SHOW_CANCELLED).b;
-  // size_t total = self->data->children->len;
-  // for (size_t i = 0; i < self->data->children->len; ++i) {
-  //   TaskData *child_data = g_ptr_array_index(self->data->children, i);
-  //   bool deleted = errands_data_get_deleted(child_data->ical);
-  //   bool completed = errands_data_is_completed(child_data->ical);
-  //   bool cancelled = errands_data_get_cancelled(child_data->ical);
-  //   if (deleted || (!show_completed && completed) || (!show_cancelled && cancelled)) total--;
-  // }
-  // g_value_set_boolean(value, !self->children_model || total == 0);
-
   if (!self || !self->children_model) return;
+  bool show_completed = errands_settings_get(SETTING_SHOW_COMPLETED).b;
+  bool show_cancelled = errands_settings_get(SETTING_SHOW_CANCELLED).b;
   GListModel *children_model = G_LIST_MODEL(self->children_model);
-  gint total = 0;
+  gint visible = 0;
+  gint uncompleted = 0;
   for_range(i, 0, g_list_model_get_n_items(children_model)) {
-    ErrandsTaskItem *item = g_list_model_get_item(children_model, i);
+    g_autoptr(ErrandsTaskItem) item = g_list_model_get_item(children_model, i);
     icalcomponent *ical = item->data->ical;
-    CONTINUE_IF(errands_data_get_deleted(ical));
-    CONTINUE_IF(errands_data_get_cancelled(ical));
-    // CONTINUE_IF(errands_data_is_completed(ical));
-    total++;
+    bool deleted = errands_data_get_deleted(ical);
+    bool completed = errands_data_is_completed(ical);
+    bool cancelled = errands_data_get_cancelled(ical);
+    if (deleted) continue;
+    if (!completed && !cancelled) uncompleted++;
+    if ((!show_completed && completed) || (!show_cancelled && cancelled)) continue;
+    visible++;
   }
-  const char *subtask_count = total > 0 ? tmp_str_printf("%d", total) : "";
-  g_object_set(self, "uncompleted-count", subtask_count, NULL);
-  g_object_set(self, "has-no-children", total == 0, NULL);
+  g_object_set(self, "uncompleted-count", uncompleted > 0 ? tmp_str_printf("%d", uncompleted) : "", "has-no-children",
+               visible == 0, NULL);
 }
 
 // ---------- PROPERTIES ---------- //
