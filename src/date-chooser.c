@@ -1,10 +1,10 @@
 #include "date-chooser.h"
 #include "config.h"
 #include "data.h"
+#include "glib-object.h"
 #include "utils.h"
 
 #include <glib/gi18n.h>
-#include <libical/ical.h>
 
 static void on_reset_action_cb(GSimpleAction *action, GVariant *param, ErrandsDateChooser *self);
 static void on_today_action_cb(GSimpleAction *action, GVariant *param, ErrandsDateChooser *self);
@@ -25,9 +25,38 @@ struct _ErrandsDateChooser {
   GtkSpinButton *hours, *minutes;
 
   icaltimetype dt;
+
+  // Properties
+  const char *date_string;
 };
 
 G_DEFINE_TYPE(ErrandsDateChooser, errands_date_chooser, ADW_TYPE_ACTION_ROW)
+
+enum {
+  PROP_0,
+
+  PROP_DATE_STRING,
+
+  N_PROPERTIES,
+};
+
+static GParamSpec *obj_properties[N_PROPERTIES] = {NULL};
+
+static void get_property(GObject *object, guint prop_id, GValue *value, GParamSpec *pspec) {
+  ErrandsDateChooser *self = ERRANDS_DATE_CHOOSER(object);
+  switch (prop_id) {
+  case PROP_DATE_STRING: g_value_set_string(value, self->date_string); break;
+  default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
+  }
+}
+
+static void set_property(GObject *object, guint prop_id, const GValue *value, GParamSpec *pspec) {
+  ErrandsDateChooser *self = ERRANDS_DATE_CHOOSER(object);
+  switch (prop_id) {
+  case PROP_DATE_STRING: self->date_string = g_value_get_string(value); break;
+  default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
+  }
+}
 
 static void errands_date_chooser_dispose(GObject *gobject) {
   gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_DATE_CHOOSER);
@@ -35,7 +64,16 @@ static void errands_date_chooser_dispose(GObject *gobject) {
 }
 
 static void errands_date_chooser_class_init(ErrandsDateChooserClass *class) {
-  G_OBJECT_CLASS(class)->dispose = errands_date_chooser_dispose;
+  GObjectClass *object_class = G_OBJECT_CLASS(class);
+  object_class->dispose = errands_date_chooser_dispose;
+  object_class->get_property = get_property;
+  object_class->set_property = set_property;
+
+  obj_properties[PROP_DATE_STRING] =
+      g_param_spec_string("date-string", "Date String", "Date string", NULL, G_PARAM_READWRITE);
+
+  g_object_class_install_properties(object_class, N_PROPERTIES, obj_properties);
+
   gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), RESOURCE_PATH "/ui/date-chooser.ui");
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsDateChooser, reset_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsDateChooser, date_popover);

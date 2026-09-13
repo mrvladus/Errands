@@ -175,8 +175,10 @@ void errands_task_update_toolbar(ErrandsTask *task) {
 
   // Update date button text
   icaltimetype due_dt = errands_data_get_due(data->ical);
+  icaltimetype start_dt = errands_data_get_start(data->ical);
   bool has_due_date = !icaltime_is_null_date(due_dt);
-  gtk_widget_set_visible(task->date_btn, has_due_date);
+  bool has_start_date = !icaltime_is_null_date(start_dt);
+  gtk_widget_set_visible(task->date_btn, has_due_date || has_start_date);
   struct icalrecurrencetype *rrule = errands_data_get_rrule(data->ical);
   if (rrule && rrule->freq != ICAL_NO_RECURRENCE) {
     g_autoptr(GString) label = g_string_new(NULL);
@@ -199,14 +201,26 @@ void errands_task_update_toolbar(ErrandsTask *task) {
     }
     g_object_set(task->date_btn_content, "label", label->str ? label->str : _("Date"), NULL);
   } else {
-    if (!has_due_date) g_object_set(task->date_btn_content, "label", _("Date"), NULL);
-    else {
-      g_autoptr(GDateTime) dt = g_date_time_new_from_unix_local(icaltime_as_timet(due_dt));
-      g_autofree gchar *date_str = NULL;
-      if (!due_dt.is_date) date_str = g_date_time_format(dt, "%d %b %H:%M");
-      else date_str = g_date_time_format(dt, "%d %b");
-      g_object_set(task->date_btn_content, "label", date_str, NULL);
+    g_autofree gchar *due_date_str = NULL;
+    if (has_due_date) {
+      g_autoptr(GDateTime) ddt = g_date_time_new_from_unix_local(icaltime_as_timet(due_dt));
+      if (!due_dt.is_date) due_date_str = g_date_time_format(ddt, "%d %b %H:%M");
+      else due_date_str = g_date_time_format(ddt, "%d %b");
     }
+
+    g_autofree gchar *start_date_str = NULL;
+    if (has_start_date) {
+      g_autoptr(GDateTime) sdt = g_date_time_new_from_unix_local(icaltime_as_timet(start_dt));
+      if (!start_dt.is_date) start_date_str = g_date_time_format(sdt, "%d %b %H:%M");
+      else start_date_str = g_date_time_format(sdt, "%d %b");
+    }
+
+    const char *label = tmp_str_printf(
+        "%s%s%s%s", C_("Starting from ... date. Keep spaces!!!", "From "), start_date_str ? start_date_str : "",
+        start_date_str && due_date_str ? C_("Until ... date. Keep spaces!!!", " to ") : "",
+        due_date_str ? due_date_str : "");
+
+    g_object_set(task->date_btn_content, "label", label, NULL);
   }
   // Set style for date button
   gtk_widget_set_css_classes(task->date_btn, (const char *[]){"image-button", "caption",
