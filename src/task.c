@@ -1,5 +1,7 @@
 #include "task.h"
 #include "config.h"
+#include "glib-object.h"
+#include "gtk/gtk.h"
 #include "sidebar.h"
 #include "state.h"
 #include "sync.h"
@@ -364,20 +366,20 @@ static void on_export_action_cb(GSimpleAction *action, GVariant *param, ErrandsT
 }
 
 static void on_finish_cb(GObject *source_object, GAsyncResult *res, gpointer data) {
-  ErrandsTask *self = data;
-  GdkRGBA *rgba = gtk_color_dialog_choose_rgba_finish(GTK_COLOR_DIALOG(source_object), res, NULL);
+  ErrandsTaskItem *item = data;
+  g_autoptr(GdkRGBA) rgba = gtk_color_dialog_choose_rgba_finish(GTK_COLOR_DIALOG(source_object), res, NULL);
   if (!rgba) return;
   char hex_string[8];
   gdk_rgba_to_hex_string(rgba, hex_string);
-  errands_task_item_set_color(self->item, hex_string);
+  errands_task_item_set_color(item, hex_string);
 }
 
 static void on_color_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
-  gtk_popover_popdown(GTK_POPOVER(self));
-  const char *color = errands_data_get_color(self->data->ical);
-  GdkRGBA rgba = {1, 1, 1, 1};
+  g_autoptr(GtkColorDialog) color_dialog = g_object_new(GTK_TYPE_COLOR_DIALOG, "with-alpha", false, NULL);
+  const char *color = errands_task_item_get_color(self->item);
+  GdkRGBA rgba = {1};
   if (color) gdk_rgba_parse(&rgba, color);
-  // gtk_color_dialog_choose_rgba(self->color_dialog, GTK_WINDOW(state.main_window), &rgba, NULL, on_finish_cb, self);
+  gtk_color_dialog_choose_rgba(color_dialog, GTK_WINDOW(state.main_window), &rgba, NULL, on_finish_cb, self->item);
 }
 
 // ---------- CALLBACKS ---------- //
