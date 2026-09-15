@@ -45,7 +45,7 @@ template $ErrandsTask: Box {
       icon-name: "errands-cancel-symbolic";
       tooltip-text: _("Restore");
       valign: center;
-      visible: bind template.task-item as <$ErrandsTaskItem>.cancelled;
+      visible: bind template.item as <$ErrandsTaskItem>.cancelled;
       action-name: "task.cancel";
 
       styles [
@@ -62,7 +62,7 @@ template $ErrandsTask: Box {
       spacing: 0;
 
       Label title {
-        label: bind template.task-item as <$ErrandsTaskItem>.title;
+        label: bind template.item as <$ErrandsTaskItem>.title;
         hexpand: true;
         halign: fill;
         valign: center;
@@ -86,7 +86,7 @@ template $ErrandsTask: Box {
 
     Box {
       Label {
-        label: bind template.task-item as <$ErrandsTaskItem>.uncompleted-count;
+        label: bind template.item as <$ErrandsTaskItem>.uncompleted-count;
         margin-end: 12;
 
         styles [

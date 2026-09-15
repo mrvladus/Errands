@@ -309,7 +309,7 @@ static void on_bind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_it
   ErrandsTask *task = ERRANDS_TASK(gtk_tree_expander_get_child(expander));
   ErrandsTaskItem *item = gtk_tree_list_row_get_item(row);
   g_object_set(item, "task-widget", task, NULL);
-  g_object_set(task, "task-item", item, NULL);
+  g_object_set(task, "item", item, NULL);
 
   g_object_bind_property(item, "color", task, "color", G_BINDING_SYNC_CREATE);
   g_object_bind_property(item, "priority", task, "priority", G_BINDING_SYNC_CREATE);

@@ -1,10 +1,5 @@
 #include "task.h"
 #include "config.h"
-#include "data.h"
-#include "gio/gio.h"
-#include "glib-object.h"
-#include "glib.h"
-#include "gtk/gtk.h"
 #include "sidebar.h"
 #include "state.h"
 #include "sync.h"
@@ -49,8 +44,7 @@ G_DEFINE_TYPE(ErrandsTask, errands_task, GTK_TYPE_BOX)
 enum {
   PROP_0,
 
-  PROP_DATA,
-  PROP_TASK_ITEM,
+  PROP_ITEM,
   PROP_COLOR,
   PROP_PRIORITY,
 
@@ -62,13 +56,10 @@ static GParamSpec *obj_properties[N_PROPERTIES] = {NULL};
 static void errands_task_set_property(GObject *object, guint prop_id, const GValue *value, GParamSpec *pspec) {
   ErrandsTask *self = ERRANDS_TASK(object);
   switch (prop_id) {
-  case PROP_DATA: {
-    self->data = g_value_get_pointer(value);
-    errands_task_set_data(self, self->data);
-  } break;
-  case PROP_TASK_ITEM: {
+  case PROP_ITEM: {
     self->item = g_value_get_object(value);
-    errands_task_set_data(self, errands_task_item_get_data(self->item));
+    self->data = errands_task_item_get_data(self->item);
+    errands_task_update_toolbar(self);
   } break;
   case PROP_COLOR: {
     self->color = g_value_get_string(value);
@@ -104,8 +95,7 @@ static void errands_task_set_property(GObject *object, guint prop_id, const GVal
 static void errands_task_get_property(GObject *object, guint prop_id, GValue *value, GParamSpec *pspec) {
   ErrandsTask *self = ERRANDS_TASK(object);
   switch (prop_id) {
-  case PROP_DATA: g_value_set_pointer(value, self->data); break;
-  case PROP_TASK_ITEM: g_value_set_object(value, self->item); break;
+  case PROP_ITEM: g_value_set_object(value, self->item); break;
   case PROP_COLOR: g_value_set_string(value, self->color); break;
   case PROP_PRIORITY: g_value_set_int(value, self->priority); break;
   default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
@@ -125,10 +115,8 @@ static void errands_task_class_init(ErrandsTaskClass *klass) {
   object_class->set_property = errands_task_set_property;
   object_class->get_property = errands_task_get_property;
 
-  obj_properties[PROP_DATA] =
-      g_param_spec_pointer("data", "Task Data", "Data associated with the task.", G_PARAM_READWRITE);
-  obj_properties[PROP_TASK_ITEM] = g_param_spec_object("task-item", "Task Item", "Task item associated with the task.",
-                                                       ERRANDS_TYPE_TASK_ITEM, G_PARAM_READWRITE);
+  obj_properties[PROP_ITEM] = g_param_spec_object("item", "Task Item", "Task item associated with the task.",
+                                                  ERRANDS_TYPE_TASK_ITEM, G_PARAM_READWRITE);
   obj_properties[PROP_COLOR] = g_param_spec_string("color", "Color", "Color of the task.", NULL, G_PARAM_READWRITE);
   obj_properties[PROP_PRIORITY] =
       g_param_spec_int("priority", "Priority", "Priority of the task.", 0, 10, 0, G_PARAM_READWRITE);
@@ -182,13 +170,6 @@ static void errands_task_init(ErrandsTask *self) {
 ErrandsTask *errands_task_new() { return g_object_new(ERRANDS_TYPE_TASK, NULL); }
 
 // ---------- PUBLIC FUNCTIONS ---------- //
-
-void errands_task_set_data(ErrandsTask *self, TaskData *data) {
-  if (!data) return;
-  self->data = data;
-
-  errands_task_update_toolbar(self);
-}
 
 void errands_task_update_toolbar(ErrandsTask *task) {
   TaskData *data = task->data;
