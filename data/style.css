@@ -15,6 +15,13 @@
 .task-toolbar-btn > button,
 .tag {
     padding: 0px 4px;
+    border-radius: 24px;
+}
+
+.priority-label {
+    background-color: var(--shade-color);
+    border-radius: 24px;
+    padding: 3px 6px;
 }
 
 /* Date and time widndow */

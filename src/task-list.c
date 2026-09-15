@@ -13,11 +13,9 @@
 #include "window.h"
 
 #include <glib/gi18n.h>
+#include <unistd.h>
 
 static const char *search_query = NULL;
-
-static ErrandsTask *entry_task = NULL;
-static TaskData *entry_task_data = NULL;
 
 static void on_setup_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_item);
 static void on_bind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_item);
@@ -50,9 +48,6 @@ static bool __task_ancestor_match_search_query(TaskData *data, const char *query
 G_DEFINE_TYPE(ErrandsTaskList, errands_task_list, ADW_TYPE_BIN)
 
 static void errands_task_list_dispose(GObject *gobject) {
-  if (entry_task) g_object_run_dispose(G_OBJECT(entry_task));
-  errands_task_data_free(entry_task_data);
-
   gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_TASK_LIST);
   G_OBJECT_CLASS(errands_task_list_parent_class)->dispose(gobject);
 }
@@ -106,10 +101,6 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   errands_add_action(ag, "delete", on_action_delete_cb, self, NULL);
 
   gtk_search_bar_connect_entry(GTK_SEARCH_BAR(self->search_bar), GTK_EDITABLE(self->search_entry));
-  // Create entry task
-  entry_task = errands_task_new();
-  entry_task_data = errands_task_data_create_task(NULL, NULL, "");
-  errands_task_set_data(entry_task, entry_task_data);
 
   self->all_tasks_model = g_list_store_new(ERRANDS_TYPE_TASK_ITEM);
   for_range(i, 0, errands_data_lists->len) {
@@ -317,14 +308,15 @@ static void on_bind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_it
   gtk_tree_expander_set_list_row(expander, row);
   ErrandsTask *task = ERRANDS_TASK(gtk_tree_expander_get_child(expander));
   ErrandsTaskItem *item = gtk_tree_list_row_get_item(row);
+  g_object_set(item, "task-widget", task, NULL);
+  g_object_set(task, "task-item", item, NULL);
 
   g_object_bind_property(item, "color", task, "color", G_BINDING_SYNC_CREATE);
-  g_object_bind_property(item, "has-no-children", expander, "hide-expander", G_BINDING_SYNC_CREATE);
+  g_object_bind_property(item, "priority", task, "priority", G_BINDING_SYNC_CREATE);
   g_object_bind_property(item, "completed", task->complete_btn, "active",
                          G_BINDING_SYNC_CREATE | G_BINDING_BIDIRECTIONAL);
 
-  g_object_set(item, "task-widget", task, NULL);
-  g_object_set(task, "task-item", item, NULL);
+  g_object_bind_property(item, "has-no-children", expander, "hide-expander", G_BINDING_SYNC_CREATE);
 }
 
 static void on_unbind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_item) {
@@ -653,16 +645,9 @@ static void on_task_list_entry_activated_cb(ErrandsTaskList *self) {
   if (STR_EQUAL(stripped, "") || STR_EQUAL(list_uid, "")) return;
 
   // Create new top-level task from entry task
-  TaskData *data = errands_task_data_new(entry_task_data->ical, NULL, self->data);
-  g_autofree gchar *uid = g_uuid_string_random();
-  errands_data_set_uid(data->ical, uid);
-  errands_data_set_text(data->ical, stripped);
-  errands_data_set_created(data->ical, icaltime_get_date_time_now());
-  icalcomponent_add_component(self->data->ical, data->ical);
+  TaskData *data = errands_task_data_create_task(self->data, NULL, stripped);
   errands_list_data_save(self->data);
   g_list_store_append(self->all_tasks_model, errands_task_item_new(data, NULL));
-  // Reload entry task
-  entry_task->data->ical = icalcomponent_new(ICAL_VTODO_COMPONENT);
   // Reset text
   g_object_set(self->entry, "text", "", NULL);
   // Update UI

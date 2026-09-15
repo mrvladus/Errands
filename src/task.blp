@@ -191,6 +191,25 @@ template $ErrandsTask: Box {
     margin-start: 6;
     margin-end: 6;
     margin-bottom: 6;
+
+    Box priority_box {
+      spacing: 3;
+      tooltip-text: _("Priority");
+
+      styles [
+        "caption",
+        "priority-label",
+      ]
+
+      Image {
+        icon-name: "errands-priority-symbolic";
+      }
+
+      Label priority_label {
+        label: _("");
+      }
+    }
+
     // Task Properies Bar
     Box props_bar {
       hexpand: true;
@@ -200,13 +219,6 @@ template $ErrandsTask: Box {
       styles [
         "task-toolbar-btn",
       ]
-
-      Button priority_btn {
-        icon-name: "errands-priority-set-symbolic";
-        tooltip-text: _("Priority");
-        valign: center;
-        // action-name: "task.priority";
-      }
 
       Button date_btn {
         valign: center;

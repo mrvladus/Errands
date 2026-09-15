@@ -2,6 +2,7 @@
 #include "data.h"
 #include "glib-object.h"
 #include "glib.h"
+#include "glib/gi18n.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "state.h"
@@ -115,13 +116,19 @@ static void errands_task_item_set_property(GObject *object, guint prop_id, const
     errands_data_set_color(self->data->ical, self->color);
     errands_list_data_save(self->data->list);
   } break;
-  case PROP_PRIORITY: self->priority = g_value_get_int(value); break;
+  case PROP_PRIORITY: {
+    self->priority = g_value_get_int(value);
+    errands_data_set_priority(self->data->ical, self->priority);
+    errands_list_data_save(self->data->list);
+  } break;
   case PROP_UNCOMPLETED_COUNT: self->uncompleted_count = g_value_get_string(value); break;
   case PROP_HAS_NO_CHILDREN: self->has_no_children = g_value_get_boolean(value); break;
 
   case PROP_DATA: self->data = g_value_get_pointer(value); break;
   case PROP_CHILDREN_MODEL: self->children_model = g_value_get_object(value); break;
-  case PROP_TASK_WIDGET: self->task_widget = g_value_get_pointer(value); break;
+  case PROP_TASK_WIDGET: {
+    self->task_widget = g_value_get_pointer(value);
+  } break;
   default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
   }
 }
@@ -235,18 +242,40 @@ void errands_task_item_update(ErrandsTaskItem *self) {
 // ---------- PROPERTIES ---------- //
 
 gint errands_task_item_get_priority(ErrandsTaskItem *self) { return self->priority; }
+
+const char *errands_task_item_get_priority_as_string(ErrandsTaskItem *self) {
+  gint priority = self->priority;
+  if (priority == 0) return "none";
+  if (priority > 0 && priority <= 3) return "low";
+  if (priority > 3 && priority <= 6) return "medium";
+  if (priority > 6) return "high";
+  return "none";
+}
+
+const char *errands_task_item_get_priority_as_tstring(ErrandsTaskItem *self) {
+  gint priority = self->priority;
+  if (priority == 0) return C_("Priority", "None");
+  if (priority > 0 && priority <= 3) return C_("Priority", "Low");
+  if (priority > 3 && priority <= 6) return C_("Priority", "Medium");
+  if (priority > 6) return C_("Priority", "High");
+  return C_("Priority", "None");
+}
+
 const char *errands_task_item_get_color(ErrandsTaskItem *self) {
   if (!self) return NULL;
   return self->color;
 }
+
 TaskData *errands_task_item_get_data(ErrandsTaskItem *self) {
   if (!self) return NULL;
   return self->data;
 }
+
 ErrandsTaskItem *errands_task_item_get_parent(ErrandsTaskItem *self) {
   if (!self) return NULL;
   return self->parent;
 }
+
 GListModel *errands_task_item_get_children_model(ErrandsTaskItem *self) {
   if (!self) return NULL;
   if (self->children_model) return G_LIST_MODEL(self->children_model);
@@ -263,5 +292,16 @@ GListModel *errands_task_item_get_children_model(ErrandsTaskItem *self) {
 void errands_task_item_set_priority(ErrandsTaskItem *self, gint priority) {
   g_object_set(self, "priority", priority, NULL);
 }
+
+void errands_task_item_set_priority_from_string(ErrandsTaskItem *self, const char *priority) {
+  gint p = 0;
+  if (!priority || g_str_equal(priority, "none")) p = 0;
+  else if (g_str_equal(priority, "low")) p = 3;
+  else if (g_str_equal(priority, "medium")) p = 6;
+  else if (g_str_equal(priority, "high")) p = 10;
+  g_object_set(self, "priority", p, NULL);
+}
+
 void errands_task_item_set_color(ErrandsTaskItem *self, const char *color) { g_object_set(self, "color", color, NULL); }
+
 void errands_task_item_set_parent(ErrandsTaskItem *self, ErrandsTaskItem *parent) { self->parent = parent; }

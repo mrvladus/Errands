@@ -1,6 +1,7 @@
 #include "task.h"
 #include "config.h"
 #include "data.h"
+#include "gio/gio.h"
 #include "glib-object.h"
 #include "glib.h"
 #include "gtk/gtk.h"
@@ -47,9 +48,12 @@ G_DEFINE_TYPE(ErrandsTask, errands_task, GTK_TYPE_BOX)
 
 enum {
   PROP_0,
+
   PROP_DATA,
   PROP_TASK_ITEM,
   PROP_COLOR,
+  PROP_PRIORITY,
+
   N_PROPERTIES,
 };
 
@@ -70,6 +74,29 @@ static void errands_task_set_property(GObject *object, guint prop_id, const GVal
     self->color = g_value_get_string(value);
     gtk_widget_set_color(GTK_WIDGET(self), self->color);
   } break;
+  case PROP_PRIORITY: {
+    self->priority = g_value_get_int(value);
+    // Update action state
+    GSimpleAction *priority_action = G_SIMPLE_ACTION(g_action_map_lookup_action(G_ACTION_MAP(self->ag), "priority"));
+    GVariant *value = g_variant_new_string(errands_task_item_get_priority_as_string(self->item));
+    g_simple_action_set_state(priority_action, value);
+    // UI
+    gtk_label_set_label(GTK_LABEL(self->priority_label), errands_task_item_get_priority_as_tstring(self->item));
+    gtk_widget_set_visible(self->priority_box, self->priority > 0);
+
+    errands_task_update_toolbar(self);
+
+    //  const uint8_t priority = adw_spin_row_get_value(self->custom_row);
+    // if (errands_data_get_priority(data->ical) != priority) {
+    //   changed = true;
+    //   errands_data_set_priority(data->ical, priority);
+    //   switch (state.main_window->task_list->page) {
+    //   case ERRANDS_TASK_LIST_PAGE_ALL:
+    //   case ERRANDS_TASK_LIST_PAGE_TODAY: errands_data_sort(); break;
+    //   case ERRANDS_TASK_LIST_PAGE_TASK_LIST: errands_list_data_sort(data->list); break;
+    //   }
+    // }
+  } break;
   default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
   }
 }
@@ -80,6 +107,7 @@ static void errands_task_get_property(GObject *object, guint prop_id, GValue *va
   case PROP_DATA: g_value_set_pointer(value, self->data); break;
   case PROP_TASK_ITEM: g_value_set_object(value, self->item); break;
   case PROP_COLOR: g_value_set_string(value, self->color); break;
+  case PROP_PRIORITY: g_value_set_int(value, self->priority); break;
   default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
   }
 }
@@ -102,6 +130,8 @@ static void errands_task_class_init(ErrandsTaskClass *klass) {
   obj_properties[PROP_TASK_ITEM] = g_param_spec_object("task-item", "Task Item", "Task item associated with the task.",
                                                        ERRANDS_TYPE_TASK_ITEM, G_PARAM_READWRITE);
   obj_properties[PROP_COLOR] = g_param_spec_string("color", "Color", "Color of the task.", NULL, G_PARAM_READWRITE);
+  obj_properties[PROP_PRIORITY] =
+      g_param_spec_int("priority", "Priority", "Priority of the task.", 0, 10, 0, G_PARAM_READWRITE);
 
   g_object_class_install_properties(object_class, N_PROPERTIES, obj_properties);
 
@@ -112,11 +142,12 @@ static void errands_task_class_init(ErrandsTaskClass *klass) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, popover_menu);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, toolbar);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, props_bar);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, priority_box);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, priority_label);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, tags_box);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, date_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, date_btn_content);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, notes_btn);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, priority_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, attachments_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, attachments_count);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, sub_entry);
@@ -133,18 +164,18 @@ static void errands_task_class_init(ErrandsTaskClass *klass) {
 static void errands_task_init(ErrandsTask *self) {
   gtk_widget_init_template(GTK_WIDGET(self));
 
-  GSimpleActionGroup *ag = errands_add_action_group(self, "task");
-  errands_add_action(ag, "edit", on_edit_action_cb, self, NULL);
-  errands_add_action(ag, "copy", on_copy_action_cb, self, NULL);
-  errands_add_action(ag, "color", on_color_action_cb, self, NULL);
-  errands_add_action(ag, "notes", on_notes_action_cb, self, NULL);
-  errands_add_action(ag, "attachments", on_attachments_action_cb, self, NULL);
-  errands_add_action(ag, "tags", on_tags_action_cb, self, NULL);
-  errands_add_action(ag, "date", on_date_action_cb, self, NULL);
-  errands_add_action(ag, "cancel", on_cancel_action_cb, self, NULL);
-  errands_add_action(ag, "delete", on_delete_action_cb, self, NULL);
-  errands_add_action(ag, "export", on_export_action_cb, self, NULL);
-  errands_add_stateful_action(ag, "priority", G_VARIANT_TYPE_STRING, g_variant_new_string("none"),
+  self->ag = errands_add_action_group(self, "task");
+  errands_add_action(self->ag, "edit", on_edit_action_cb, self, NULL);
+  errands_add_action(self->ag, "copy", on_copy_action_cb, self, NULL);
+  errands_add_action(self->ag, "color", on_color_action_cb, self, NULL);
+  errands_add_action(self->ag, "notes", on_notes_action_cb, self, NULL);
+  errands_add_action(self->ag, "attachments", on_attachments_action_cb, self, NULL);
+  errands_add_action(self->ag, "tags", on_tags_action_cb, self, NULL);
+  errands_add_action(self->ag, "date", on_date_action_cb, self, NULL);
+  errands_add_action(self->ag, "cancel", on_cancel_action_cb, self, NULL);
+  errands_add_action(self->ag, "delete", on_delete_action_cb, self, NULL);
+  errands_add_action(self->ag, "export", on_export_action_cb, self, NULL);
+  errands_add_stateful_action(self->ag, "priority", G_VARIANT_TYPE_STRING, g_variant_new_string("none"),
                               on_priority_action_cb, self);
 }
 
@@ -155,6 +186,7 @@ ErrandsTask *errands_task_new() { return g_object_new(ERRANDS_TYPE_TASK, NULL); 
 void errands_task_set_data(ErrandsTask *self, TaskData *data) {
   if (!data) return;
   self->data = data;
+
   errands_task_update_toolbar(self);
 }
 
@@ -172,14 +204,8 @@ void errands_task_update_toolbar(ErrandsTask *task) {
   gtk_label_set_label(task->attachments_count,
                       has_attachments ? tmp_str_printf("%zu", g_strv_length(attachments)) : "");
 
-  // Priority button
-  uint8_t priority = errands_data_get_priority(data->ical);
-  const char *priority_class = NULL;
-  if (priority < 3) priority_class = "accent";
-  else if (priority >= 3 && priority < 7) priority_class = "warning";
-  else if (priority >= 7 && priority < 10) priority_class = "error";
-  gtk_widget_set_css_classes(task->priority_btn, (const char *[]){"image-button", priority_class, NULL});
-  gtk_widget_set_visible(task->priority_btn, priority > 0);
+  // Priority
+  gint p = errands_task_item_get_priority(task->item);
 
   // Update date button text
   icaltimetype due_dt = errands_data_get_due(data->ical);
@@ -215,7 +241,7 @@ void errands_task_update_toolbar(ErrandsTask *task) {
   bool is_due = errands_data_is_due(data->ical);
   gtk_widget_set_css_classes(task->date_btn, (const char *[]){"image-button", "caption", is_due ? "error" : "", NULL});
 
-  bool props_bar_visible = has_notes || has_attachments || has_due_date || priority > 0;
+  bool props_bar_visible = has_notes || has_attachments || has_due_date || p > 0;
   gtk_widget_set_visible(task->props_bar, props_bar_visible);
 
   // Tags
@@ -264,35 +290,7 @@ static void on_notes_action_cb(GSimpleAction *action, GVariant *param, ErrandsTa
 
 static void on_priority_action_cb(GSimpleAction *action, GVariant *value, ErrandsTask *self) {
   g_simple_action_set_state(action, value);
-  const char *state = g_variant_get_string(value, NULL);
-
-  // Priority
-  //
-  // if (!gtk_check_button_get_active(btn)) return;
-  // const char *name = gtk_widget_get_name(GTK_WIDGET(btn));
-  // uint8_t val = 0;
-  // if (g_str_equal(name, "none")) val = 0;
-  // else if (g_str_equal(name, "low")) val = 1;
-  // else if (g_str_equal(name, "medium")) val = 5;
-  // else if (g_str_equal(name, "high")) val = 9;
-  // adw_spin_row_set_value(self->custom_row, val);
-
-  // const int priority = errands_data_get_priority(task->data->ical);
-  // if (priority == 0) adw_action_row_activate(self->none_row);
-  // else if (priority == 1) adw_action_row_activate(self->low_row);
-  // else if (priority > 1 && priority < 6) adw_action_row_activate(self->medium_row);
-  // else if (priority > 5) adw_action_row_activate(self->high_row);
-  //
-  //  const uint8_t priority = adw_spin_row_get_value(self->custom_row);
-  // if (errands_data_get_priority(data->ical) != priority) {
-  //   changed = true;
-  //   errands_data_set_priority(data->ical, priority);
-  //   switch (state.main_window->task_list->page) {
-  //   case ERRANDS_TASK_LIST_PAGE_ALL:
-  //   case ERRANDS_TASK_LIST_PAGE_TODAY: errands_data_sort(); break;
-  //   case ERRANDS_TASK_LIST_PAGE_TASK_LIST: errands_list_data_sort(data->list); break;
-  //   }
-  // }
+  errands_task_item_set_priority_from_string(self->item, g_variant_get_string(value, NULL));
 }
 
 static void on_attachments_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
