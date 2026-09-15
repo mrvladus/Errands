@@ -9,6 +9,9 @@
 }
 
 .sub-entry {
+    background-color: var(--border-color);
+}
+.sub-entry > text > placeholder {
     opacity: 1;
 }
 
@@ -19,7 +22,7 @@
 }
 
 .priority-label {
-    background-color: var(--shade-color);
+    background-color: var(--border-color);
     border-radius: 24px;
     padding: 3px 6px;
 }
