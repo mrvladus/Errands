@@ -1,4 +1,5 @@
 #include "task-properties-dialog.h"
+#include "adwaita.h"
 #include "data.h"
 #include "date-chooser.h"
 #include "notifications.h"
@@ -18,8 +19,6 @@ static void on_add_attachment_action_cb(GSimpleAction *action, GVariant *param, 
 
 static void on_dialog_close_cb(ErrandsTaskPropertiesDialog *self);
 static gboolean on_style_toggled_cb(GBinding *binding, const GValue *from_value, GValue *to_value, gpointer user_data);
-
-static void on_priority_toggled_cb(ErrandsTaskPropertiesDialog *self, GtkCheckButton *btn);
 
 #define ATTACHMENTS_LIST_BOX                                                                                           \
   gtk_widget_get_first_child(gtk_widget_get_last_child(gtk_widget_get_first_child(GTK_WIDGET(self->attachments))))
@@ -51,12 +50,6 @@ struct _ErrandsTaskPropertiesDialog {
   // Notes
   GtkSourceView *notes_view;
   GtkSourceBuffer *notes_buffer;
-  // Priority
-  AdwActionRow *high_row;
-  AdwActionRow *medium_row;
-  AdwActionRow *low_row;
-  AdwActionRow *none_row;
-  AdwSpinRow *custom_row;
   // Attachments
   AdwPreferencesGroup *attachments;
   // Tags
@@ -86,15 +79,9 @@ static void errands_task_properties_dialog_class_init(ErrandsTaskPropertiesDialo
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, rrule_row);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, notes_view);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, notes_buffer);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, high_row);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, medium_row);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, low_row);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, none_row);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, custom_row);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, attachments);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskPropertiesDialog, tags);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_dialog_close_cb);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_priority_toggled_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_tag_entry_activated_cb);
 }
 
@@ -149,13 +136,6 @@ void errands_task_properties_dialog_show(ErrandsTaskPropertiesDialogPage page, E
     gtk_text_buffer_set_text(gtk_text_view_get_buffer(GTK_TEXT_VIEW(self->notes_view)), text, -1);
   } else gtk_text_buffer_set_text(gtk_text_view_get_buffer(GTK_TEXT_VIEW(self->notes_view)), "", -1);
   if (page_n == ERRANDS_TASK_PROPERTY_DIALOG_PAGE_NOTES) gtk_widget_grab_focus(GTK_WIDGET(self->notes_view));
-
-  // Priority
-  const int priority = errands_data_get_priority(task->data->ical);
-  if (priority == 0) adw_action_row_activate(self->none_row);
-  else if (priority == 1) adw_action_row_activate(self->low_row);
-  else if (priority > 1 && priority < 6) adw_action_row_activate(self->medium_row);
-  else if (priority > 5) adw_action_row_activate(self->high_row);
 
   // Attachments
   gtk_list_box_remove_all(GTK_LIST_BOX(ATTACHMENTS_LIST_BOX));
@@ -287,29 +267,13 @@ static void on_dialog_close_cb(ErrandsTaskPropertiesDialog *self) {
     errands_data_set_due(data->ical, new_ddt);
     changed = true;
   }
+
   // Set rrule
-  struct icalrecurrencetype *old_rrule = NULL;
   struct icalrecurrencetype *new_rrule = icalrecurrencetype_new();
-  // Get old and new rrule
-  icalproperty *rrule_prop = icalcomponent_get_first_property(data->ical, ICAL_RRULE_PROPERTY);
-  if (rrule_prop) old_rrule = icalproperty_get_rrule(rrule_prop);
   if (adw_expander_row_get_expanded(ADW_EXPANDER_ROW(self->rrule_row)))
     errands_task_list_date_dialog_rrule_row_get_rrule(self->rrule_row, new_rrule);
-  // Compare them and set / remove
-  if (new_rrule && old_rrule && !icalrecurrencetype_compare(new_rrule, old_rrule)) {
-    if (rrule_prop) {
-      // Delete rrule if new rrule is not set
-      if (new_rrule->freq == ICAL_NO_RECURRENCE) icalcomponent_remove_property(data->ical, rrule_prop);
-      // Set new rrule
-      else icalproperty_set_rrule(rrule_prop, new_rrule);
-    } else {
-      // Set new rrule
-      if (new_rrule->freq != ICAL_NO_RECURRENCE)
-        icalcomponent_add_property(data->ical, icalproperty_new_rrule(new_rrule));
-    }
-    changed = true;
-  }
-  icalrecurrencetype_unref(old_rrule);
+  if (errands_data_set_rrule(data->ical, new_rrule)) changed = true;
+  icalrecurrencetype_unref(new_rrule);
 
   // Notes
   GtkTextIter start, end;
@@ -320,18 +284,6 @@ static void on_dialog_close_cb(ErrandsTaskPropertiesDialog *self) {
   if (text && (!notes || !g_str_equal(text, notes))) {
     errands_data_set_notes(data->ical, text);
     changed = true;
-  }
-
-  // Priority
-  const uint8_t priority = adw_spin_row_get_value(self->custom_row);
-  if (errands_data_get_priority(data->ical) != priority) {
-    changed = true;
-    errands_data_set_priority(data->ical, priority);
-    switch (state.main_window->task_list->page) {
-    case ERRANDS_TASK_LIST_PAGE_ALL:
-    case ERRANDS_TASK_LIST_PAGE_TODAY: errands_data_sort(); break;
-    case ERRANDS_TASK_LIST_PAGE_TASK_LIST: errands_list_data_sort(data->list); break;
-    }
   }
 
   // Tags
@@ -363,6 +315,9 @@ static void on_dialog_close_cb(ErrandsTaskPropertiesDialog *self) {
     errands_task_update_toolbar(self->task);
     errands_sync_update_task(data);
     errands_sidebar_update_filter_rows();
+
+    g_autofree gchar *rrule_label = errands_data_get_rrule_as_string(data->ical);
+    LOG_DEBUG("%s", rrule_label);
   }
 }
 
@@ -376,19 +331,6 @@ static gboolean on_style_toggled_cb(GBinding *binding, const GValue *from_value,
   gtk_source_buffer_set_style_scheme(self->notes_buffer, scheme);
 
   return false;
-}
-
-// --- PRIORITY --- //
-
-static void on_priority_toggled_cb(ErrandsTaskPropertiesDialog *self, GtkCheckButton *btn) {
-  if (!gtk_check_button_get_active(btn)) return;
-  const char *name = gtk_widget_get_name(GTK_WIDGET(btn));
-  uint8_t val = 0;
-  if (g_str_equal(name, "none")) val = 0;
-  else if (g_str_equal(name, "low")) val = 1;
-  else if (g_str_equal(name, "medium")) val = 5;
-  else if (g_str_equal(name, "high")) val = 9;
-  adw_spin_row_set_value(self->custom_row, val);
 }
 
 // --- ATTACHMENTS --- //

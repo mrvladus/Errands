@@ -1,7 +1,6 @@
 #pragma once
 
 #include "data.h"
-#include "task-menu.h"
 
 #include <adwaita.h>
 
@@ -49,12 +48,10 @@ struct _ErrandsTaskList {
   GtkWidget *search_entry;
   GtkWidget *entry_box;
   GtkWidget *entry;
-  GtkWidget *entry_menu_btn;
   GtkWidget *entry_apply_btn;
   GtkWidget *scrl;
   GtkWidget *list_view;
 
-  ErrandsTaskMenu *task_menu;
   ErrandsTaskListSortDialog *sort_dialog;
 
   GtkEventControllerMotion *motion_ctrl;

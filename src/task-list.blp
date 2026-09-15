@@ -215,41 +215,19 @@ template $ErrandsTaskList: Adw.Bin {
         "toolbar",
       ]
 
-      Box {
-        styles [
-          "linked",
-        ]
+      Entry entry {
+        placeholder-text: _("Add Task");
+        tooltip-text: _("Add Task (Ctrl+N)");
+        hexpand: true;
+        activate => $on_task_list_entry_activated_cb(template);
+        changed => $on_task_list_entry_text_changed_cb(template);
 
-        Entry entry {
-          placeholder-text: _("Add Task");
-          tooltip-text: _("Add Task (Ctrl+N)");
-          hexpand: true;
-          activate => $on_task_list_entry_activated_cb(template);
-          changed => $on_task_list_entry_text_changed_cb(template);
+        ShortcutController {
+          scope: global;
 
-          ShortcutController {
-            scope: global;
-
-            Shortcut {
-              trigger: "<Control>N";
-              action: "action(task-list.focus-entry)";
-            }
-          }
-        }
-
-        Button entry_menu_btn {
-          icon-name: "errands-more-symbolic";
-          valign: center;
-          tooltip-text: _("Properties (Ctrl+P)");
-          action-name: "task-list.show-entry-task-menu";
-
-          ShortcutController {
-            scope: global;
-
-            Shortcut {
-              trigger: "<Control>P";
-              action: "activate";
-            }
+          Shortcut {
+            trigger: "<Control>N";
+            action: "action(task-list.focus-entry)";
           }
         }
       }
@@ -283,8 +261,6 @@ template $ErrandsTaskList: Adw.Bin {
       EventControllerMotion motion_ctrl {
         motion => $on_motion_cb(template) not-swapped;
       }
-
-      $ErrandsTaskMenu task_menu {}
 
       Adw.StatusPage {
         title: _("No Tasks");

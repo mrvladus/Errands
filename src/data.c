@@ -1,5 +1,6 @@
 #include "data.h"
 #include "glib.h"
+#include "glib/gi18n.h"
 #include "settings.h"
 
 #include "vendor/json.h"
@@ -113,7 +114,11 @@ static void errands_data_migrate_from_46() {
       if (parent_item) errands_data_set_parent(ical, parent_item->string_val);
       if (percent_complete_item) errands_data_set_percent(ical, percent_complete_item->int_val);
       if (priority_item) errands_data_set_priority(ical, priority_item->int_val);
-      if (rrule_item) errands_data_set_rrule(ical, *icalrecurrencetype_new_from_string(rrule_item->string_val));
+      if (rrule_item) {
+        struct icalrecurrencetype *rrule = icalrecurrencetype_new_from_string(rrule_item->string_val);
+        errands_data_set_rrule(ical, rrule);
+        icalrecurrencetype_unref(rrule);
+      }
       if (start_date_item) errands_data_set_start(ical, icaltime_from_string(start_date_item->string_val));
       if (text_item) errands_data_set_text(ical, text_item->string_val);
       if (uid_item) errands_data_set_uid(ical, uid_item->string_val);
@@ -702,17 +707,53 @@ struct icalrecurrencetype *errands_data_get_rrule(icalcomponent *ical) {
   icalproperty *property = icalcomponent_get_first_property(ical, ICAL_RRULE_PROPERTY);
   return property ? icalproperty_get_rrule(property) : NULL;
 }
-void errands_data_set_rrule(icalcomponent *ical, struct icalrecurrencetype value) {
-  struct icalrecurrencetype null = {0};
-  if (icalrecurrencetype_compare(&value, &null))
-    icalcomponent_remove_property(ical, icalcomponent_get_first_property(ical, ICAL_RRULE_PROPERTY));
-  else {
-    icalproperty *property = icalcomponent_get_first_property(ical, ICAL_RRULE_PROPERTY);
-    if (property) icalproperty_set_rrule(property, &value);
-    else icalcomponent_add_property(ical, property);
+
+bool errands_data_set_rrule(icalcomponent *ical, struct icalrecurrencetype *value) {
+  struct icalrecurrencetype *old_rrule = errands_data_get_rrule(ical);
+  if (icalrecurrencetype_compare(value, old_rrule)) return false;
+  bool is_no_recurrence = value && value->freq == ICAL_NO_RECURRENCE;
+  icalproperty *prop = icalcomponent_get_first_property(ical, ICAL_RRULE_PROPERTY);
+  if (is_no_recurrence) {
+    if (prop) icalcomponent_remove_property(ical, prop);
+  } else {
+    if (prop) icalproperty_set_rrule(prop, value);
+    else icalcomponent_add_property(ical, icalproperty_new_rrule(value));
   }
   errands_data_set_synced(ical, false);
   errands_data_set_changed(ical, icaltime_get_date_time_now());
+
+  return true;
+}
+
+gchar *errands_data_get_rrule_as_string(icalcomponent *ical) {
+  if (!ical) return NULL;
+
+  struct icalrecurrencetype *r = errands_data_get_rrule(ical);
+  if (!r || r->freq == ICAL_NO_RECURRENCE) return NULL;
+
+  GString *s = g_string_new(NULL);
+  const int n = r->interval;
+
+  switch (r->freq) {
+  case ICAL_SECONDLY_RECURRENCE: g_string_append_printf(s, ngettext("Every second", "Every %d seconds", n), n); break;
+  case ICAL_MINUTELY_RECURRENCE: g_string_append_printf(s, ngettext("Every minute", "Every %d minutes", n), n); break;
+  case ICAL_HOURLY_RECURRENCE: g_string_append_printf(s, ngettext("Every hour", "Every %d hours", n), n); break;
+  case ICAL_DAILY_RECURRENCE: g_string_append_printf(s, ngettext("Every day", "Every %d days", n), n); break;
+  case ICAL_WEEKLY_RECURRENCE: g_string_append_printf(s, ngettext("Every week", "Every %d weeks", n), n); break;
+  case ICAL_MONTHLY_RECURRENCE: g_string_append_printf(s, ngettext("Every month", "Every %d months", n), n); break;
+  case ICAL_YEARLY_RECURRENCE: g_string_append_printf(s, ngettext("Every year", "Every %d years", n), n); break;
+  case ICAL_NO_RECURRENCE: return NULL;
+  }
+
+  if (!icaltime_is_null_time(r->until)) {
+    g_autoptr(GDateTime) d = g_date_time_new_from_unix_local(icaltime_as_timet(r->until));
+    g_autofree gchar *ds = g_date_time_format(d, "%x");
+    g_string_append_printf(s, _(" until %s"), ds);
+  } else if (r->count > 0) {
+    g_string_append_printf(s, ngettext(" once", " %d times", r->count), r->count);
+  }
+
+  return g_string_free(s, FALSE);
 }
 
 // --- STRV --- //
@@ -923,5 +964,6 @@ icaltimetype icaltime_get_date_time_now() {
 }
 
 bool icalrecurrencetype_compare(const struct icalrecurrencetype *a, const struct icalrecurrencetype *b) {
+  if (!a || !b) return false;
   return memcmp(a, b, sizeof(*a)) == 0;
 }

@@ -8,7 +8,6 @@
 #include "state.h"
 #include "sync.h"
 #include "task-item.h"
-#include "task-menu.h"
 #include "task.h"
 #include "utils.h"
 #include "window.h"
@@ -31,7 +30,6 @@ static void on_motion_cb(GtkEventControllerMotion *ctrl, gdouble x, gdouble y, E
 static void on_listview_activate_cb(GtkListView *list_view, guint position);
 
 static void on_focus_entry_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
-static void on_entry_task_menu_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
 static void on_action_export_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
 static void on_action_print_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
 static void on_action_rename_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
@@ -60,8 +58,6 @@ static void errands_task_list_dispose(GObject *gobject) {
 }
 
 static void errands_task_list_class_init(ErrandsTaskListClass *class) {
-  g_type_ensure(ERRANDS_TYPE_TASK_MENU);
-
   G_OBJECT_CLASS(class)->dispose = errands_task_list_dispose;
 
   gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), RESOURCE_PATH "/ui/task-list.ui");
@@ -75,8 +71,6 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, entry_box);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, entry);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, entry_apply_btn);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, entry_menu_btn);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, task_menu);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, motion_ctrl);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, scrl);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, list_view);
@@ -104,7 +98,6 @@ static void errands_task_list_init(ErrandsTaskList *self) {
 
   GSimpleActionGroup *ag = errands_add_action_group(self, "task-list");
   errands_add_action(ag, "focus-entry", on_focus_entry_action_cb, self, NULL);
-  errands_add_action(ag, "show-entry-task-menu", on_entry_task_menu_action_cb, self, NULL);
   errands_add_action(ag, "rename", on_action_rename_cb, self, NULL);
   errands_add_action(ag, "print", on_action_print_cb, self, NULL);
   errands_add_action(ag, "export", on_action_export_cb, self, NULL);
@@ -329,8 +322,6 @@ static void on_bind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_it
   g_object_bind_property(item, "has-no-children", expander, "hide-expander", G_BINDING_SYNC_CREATE);
   g_object_bind_property(item, "completed", task->complete_btn, "active",
                          G_BINDING_SYNC_CREATE | G_BINDING_BIDIRECTIONAL);
-  g_object_bind_property(item, "cancelled", task->complete_btn, "visible",
-                         G_BINDING_SYNC_CREATE | G_BINDING_INVERT_BOOLEAN);
 
   g_object_set(item, "task-widget", task, NULL);
   g_object_set(task, "task-item", item, NULL);
@@ -346,13 +337,6 @@ static void on_unbind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_
 
 static void on_focus_entry_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
   gtk_widget_grab_focus(self->entry);
-}
-
-static void on_entry_task_menu_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
-  graphene_rect_t rect = {0};
-  bool res = gtk_widget_compute_bounds(GTK_WIDGET(self->entry_menu_btn), GTK_WIDGET(self), &rect);
-  UNUSED(res);
-  errands_task_menu_show(entry_task, rect.origin.x, rect.origin.y - rect.size.height, ERRANDS_TASK_MENU_MODE_ENTRY);
 }
 
 static void on_action_export_finish_cb(GObject *obj, GAsyncResult *res, ListData *data) {

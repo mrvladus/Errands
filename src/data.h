@@ -114,7 +114,11 @@ void errands_data_set_uid(icalcomponent *ical, const char *value);
 // --- RRULE --- //
 
 struct icalrecurrencetype *errands_data_get_rrule(icalcomponent *ical);
-void errands_data_set_rrule(icalcomponent *ical, struct icalrecurrencetype value);
+// Sets the rrule on the ical component, returns true if the rrule was set
+bool errands_data_set_rrule(icalcomponent *ical, struct icalrecurrencetype *value);
+// Returns the rrule as a human-readable string, or NULL if no rrule is set.
+// The caller owns the returned string and must free it with g_free().
+gchar *errands_data_get_rrule_as_string(icalcomponent *ical);
 
 // --- STRV --- //
 

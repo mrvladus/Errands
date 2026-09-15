@@ -16,6 +16,7 @@ struct _ErrandsTaskItem {
   gboolean completed;
   gboolean cancelled;
   const char *color;
+  gint priority;
   const char *uncompleted_count; // The number of uncompleted subtasks
   gboolean has_no_children;      // If the task can be expanded (has any children)
 
@@ -35,6 +36,7 @@ enum {
   PROP_COMPLETED,
   PROP_CANCELLED,
   PROP_COLOR,
+  PROP_PRIORITY,
   PROP_UNCOMPLETED_COUNT,
   PROP_HAS_NO_CHILDREN,
 
@@ -113,6 +115,7 @@ static void errands_task_item_set_property(GObject *object, guint prop_id, const
     errands_data_set_color(self->data->ical, self->color);
     errands_list_data_save(self->data->list);
   } break;
+  case PROP_PRIORITY: self->priority = g_value_get_int(value); break;
   case PROP_UNCOMPLETED_COUNT: self->uncompleted_count = g_value_get_string(value); break;
   case PROP_HAS_NO_CHILDREN: self->has_no_children = g_value_get_boolean(value); break;
 
@@ -130,6 +133,7 @@ static void errands_task_item_get_property(GObject *object, guint prop_id, GValu
   case PROP_COMPLETED: g_value_set_boolean(value, self->completed); break;
   case PROP_CANCELLED: g_value_set_boolean(value, self->cancelled); break;
   case PROP_COLOR: g_value_set_string(value, self->color); break;
+  case PROP_PRIORITY: g_value_set_int(value, self->priority); break;
   case PROP_UNCOMPLETED_COUNT: g_value_set_string(value, self->uncompleted_count); break;
   case PROP_HAS_NO_CHILDREN: g_value_set_boolean(value, self->has_no_children); break;
 
@@ -160,6 +164,8 @@ static void errands_task_item_class_init(ErrandsTaskItemClass *klass) {
   obj_properties[PROP_CANCELLED] =
       g_param_spec_boolean("cancelled", "Cancelled", "Whether the task is cancelled", false, G_PARAM_READWRITE);
   obj_properties[PROP_COLOR] = g_param_spec_string("color", "Task Color", "Color of the task", NULL, G_PARAM_READWRITE);
+  obj_properties[PROP_PRIORITY] =
+      g_param_spec_int("priority", "Priority", "Priority of the task", 0, 10, 0, G_PARAM_READWRITE);
   obj_properties[PROP_UNCOMPLETED_COUNT] = g_param_spec_string(
       "uncompleted-count", "Uncompleted Count", "Number of uncompleted subtasks", NULL, G_PARAM_READWRITE);
   obj_properties[PROP_HAS_NO_CHILDREN] = g_param_spec_boolean(
@@ -184,6 +190,7 @@ ErrandsTaskItem *errands_task_item_new(TaskData *data, ErrandsTaskItem *parent) 
   self->completed = errands_data_is_completed(data->ical);
   self->cancelled = errands_data_get_cancelled(data->ical);
   self->color = errands_data_get_color(data->ical);
+  self->priority = errands_data_get_priority(data->ical);
   errands_task_item_update(self);
 
   self->data = data;
@@ -227,6 +234,7 @@ void errands_task_item_update(ErrandsTaskItem *self) {
 
 // ---------- PROPERTIES ---------- //
 
+gint errands_task_item_get_priority(ErrandsTaskItem *self) { return self->priority; }
 const char *errands_task_item_get_color(ErrandsTaskItem *self) {
   if (!self) return NULL;
   return self->color;
@@ -252,5 +260,8 @@ GListModel *errands_task_item_get_children_model(ErrandsTaskItem *self) {
   return G_LIST_MODEL(self->children_model);
 }
 
+void errands_task_item_set_priority(ErrandsTaskItem *self, gint priority) {
+  g_object_set(self, "priority", priority, NULL);
+}
 void errands_task_item_set_color(ErrandsTaskItem *self, const char *color) { g_object_set(self, "color", color, NULL); }
 void errands_task_item_set_parent(ErrandsTaskItem *self, ErrandsTaskItem *parent) { self->parent = parent; }

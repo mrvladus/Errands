@@ -33,6 +33,7 @@ template $ErrandsTask: Box {
     CheckButton complete_btn {
       valign: center;
       tooltip-text: _("Toggle Completion");
+      visible: bind cancel_btn.visible inverted;
 
       styles [
         "selection-mode",
@@ -40,11 +41,11 @@ template $ErrandsTask: Box {
     }
 
     // Cancelled
-    Button {
+    Button cancel_btn {
       icon-name: "errands-cancel-symbolic";
       tooltip-text: _("Restore");
       valign: center;
-      visible: bind complete_btn.visible inverted;
+      visible: bind template.task-item as <$ErrandsTaskItem>.cancelled;
       action-name: "task.cancel";
 
       styles [
@@ -114,15 +115,70 @@ template $ErrandsTask: Box {
       }
 
       // Properties menu
-      Button menu_btn {
-        tooltip-text: _("Properties");
+      MenuButton {
         icon-name: "errands-more-symbolic";
-        valign: center;
-        action-name: "task.menu";
+
+        popover: PopoverMenu popover_menu {
+          has-arrow: false;
+
+          menu-model: menu {
+            section {
+              item (_("Edit Text"), "task.edit")
+              item (_("Copy Text"), "task.copy")
+              item (_("Task Color"), "task.color")
+            }
+
+            section {
+              submenu {
+                label: _("Priority");
+
+                item {
+                  label: _("None");
+                  action: "task.priority";
+                  target: "none";
+                }
+
+                item {
+                  label: _("Low");
+                  action: "task.priority";
+                  target: "low";
+                }
+
+                item {
+                  label: _("Medium");
+                  action: "task.priority";
+                  target: "medium";
+                }
+
+                item {
+                  label: _("High");
+                  action: "task.priority";
+                  target: "high";
+                }
+              }
+            }
+
+            section {
+              item (_("Date and Time"), "task.date")
+              item (_("Notes"), "task.notes")
+              item (_("Tags"), "task.tags")
+              item (_("Attachments"), "task.attachments")
+            }
+
+            section {
+              item (_("Export as \".ics\""), "task.export")
+            }
+
+            section {
+              item (_("Cancel / Restore"), "task.cancel")
+              item (_("Delete"), "task.delete")
+            }
+          };
+        };
 
         styles [
-          "flat",
           "circular",
+          "flat",
         ]
       }
     }
@@ -139,11 +195,18 @@ template $ErrandsTask: Box {
     Box props_bar {
       hexpand: true;
       halign: start;
+      spacing: 3;
 
       styles [
-        "linked",
         "task-toolbar-btn",
       ]
+
+      Button priority_btn {
+        icon-name: "errands-priority-set-symbolic";
+        tooltip-text: _("Priority");
+        valign: center;
+        // action-name: "task.priority";
+      }
 
       Button date_btn {
         valign: center;
@@ -154,13 +217,6 @@ template $ErrandsTask: Box {
           label: _("Date");
           tooltip-text: _("Select Date");
         }
-      }
-
-      Button priority_btn {
-        icon-name: "errands-priority-set-symbolic";
-        tooltip-text: _("Priority");
-        valign: center;
-        action-name: "task.priority";
       }
 
       Button notes_btn {

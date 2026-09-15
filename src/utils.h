@@ -1,6 +1,7 @@
 #pragma once
 
 #include "data.h"
+#include "glib.h"
 
 #include <gtk/gtk.h>
 
@@ -108,6 +109,16 @@ static inline void errands_add_action(GSimpleActionGroup *ag, const char *name, 
   g_autoptr(GVariantType) vtype = param_str ? g_variant_type_new(param_str) : NULL;
   g_autoptr(GSimpleAction) action = g_simple_action_new(name, vtype);
   g_signal_connect(action, "activate", G_CALLBACK(cb), data);
+  g_action_map_add_action(G_ACTION_MAP(ag), G_ACTION(action));
+}
+
+// Adds a stateful action to the action group.
+// Callback is called when the state changes.
+// Its type is `void (*cb)(GSimpleAction *action, GVariant *value, gpointer cb_data)`
+static inline void errands_add_stateful_action(GSimpleActionGroup *ag, const char *name, const GVariantType *param_type,
+                                               GVariant *initial_state, void *cb, void *cb_data) {
+  g_autoptr(GSimpleAction) action = g_simple_action_new_stateful(name, param_type, initial_state);
+  g_signal_connect(action, "change-state", G_CALLBACK(cb), cb_data);
   g_action_map_add_action(G_ACTION_MAP(ag), G_ACTION(action));
 }
 

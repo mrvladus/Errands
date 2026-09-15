@@ -1,6 +1,7 @@
 #pragma once
 
 #include "data.h"
+#include "glib.h"
 
 #include <gdk/gdk.h>
 
@@ -12,10 +13,12 @@ ErrandsTaskItem *errands_task_item_add_child(ErrandsTaskItem *self, TaskData *da
 
 void errands_task_item_update(ErrandsTaskItem *self);
 
+gint errands_task_item_get_priority(ErrandsTaskItem *self);
 const char *errands_task_item_get_color(ErrandsTaskItem *self);
 ErrandsTaskItem *errands_task_item_get_parent(ErrandsTaskItem *self);
 GListModel *errands_task_item_get_children_model(ErrandsTaskItem *self);
 TaskData *errands_task_item_get_data(ErrandsTaskItem *self);
 
+void errands_task_item_set_priority(ErrandsTaskItem *self, gint priority);
 void errands_task_item_set_color(ErrandsTaskItem *self, const char *color);
 void errands_task_item_set_parent(ErrandsTaskItem *self, ErrandsTaskItem *parent);
