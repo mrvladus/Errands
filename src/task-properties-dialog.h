@@ -1,6 +1,6 @@
 #pragma once
 
-#include "task.h"
+#include "task-item.h"
 
 #include <adwaita.h>
 
@@ -18,4 +18,4 @@ typedef enum {
 } ErrandsTaskPropertiesDialogPage;
 
 ErrandsTaskPropertiesDialog *errands_task_properties_dialog_new();
-void errands_task_properties_dialog_show(ErrandsTaskPropertiesDialogPage page, ErrandsTask *task);
+void errands_task_properties_dialog_show(ErrandsTaskPropertiesDialogPage page, ErrandsTaskItem *item);

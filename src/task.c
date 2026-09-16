@@ -287,7 +287,7 @@ static void on_copy_action_cb(GSimpleAction *action, GVariant *param, ErrandsTas
 }
 
 static void on_notes_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
-  errands_task_properties_dialog_show(ERRANDS_TASK_PROPERTY_DIALOG_PAGE_NOTES, self);
+  errands_task_properties_dialog_show(ERRANDS_TASK_PROPERTY_DIALOG_PAGE_NOTES, self->item);
 }
 
 static void on_priority_action_cb(GSimpleAction *action, GVariant *value, ErrandsTask *self) {
@@ -296,15 +296,15 @@ static void on_priority_action_cb(GSimpleAction *action, GVariant *value, Errand
 }
 
 static void on_attachments_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
-  errands_task_properties_dialog_show(ERRANDS_TASK_PROPERTY_DIALOG_PAGE_ATTACHMENTS, self);
+  errands_task_properties_dialog_show(ERRANDS_TASK_PROPERTY_DIALOG_PAGE_ATTACHMENTS, self->item);
 }
 
 static void on_tags_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
-  errands_task_properties_dialog_show(ERRANDS_TASK_PROPERTY_DIALOG_PAGE_TAGS, self);
+  errands_task_properties_dialog_show(ERRANDS_TASK_PROPERTY_DIALOG_PAGE_TAGS, self->item);
 }
 
 static void on_date_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
-  errands_task_properties_dialog_show(ERRANDS_TASK_PROPERTY_DIALOG_PAGE_DATE, self);
+  errands_task_properties_dialog_show(ERRANDS_TASK_PROPERTY_DIALOG_PAGE_DATE, self->item);
 }
 
 static void __get_children_tree_list_rows(GtkTreeListRow *parent, GPtrArray *array) {
