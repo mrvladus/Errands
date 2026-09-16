@@ -111,14 +111,11 @@ void errands_date_chooser_reset(ErrandsDateChooser *self) {
   self->dt.is_date = true;
 }
 
-icaltimetype errands_date_chooser_get_dt(ErrandsDateChooser *self) {
-  self->dt = icaltime_normalize(self->dt);
-  return self->dt;
-}
+icaltimetype errands_date_chooser_get_dt(ErrandsDateChooser *self) { return self->dt; }
 
 void errands_date_chooser_set_dt(ErrandsDateChooser *self, const icaltimetype dt) {
   self->dt = dt;
-  bool is_null = icaltime_is_null_date(dt);
+  bool is_null = icaltime_is_null_time(dt) || icaltime_is_null_date(dt);
   if (is_null) errands_date_chooser_reset(self);
   else {
     gtk_calendar_set_year(self->calendar, dt.year);

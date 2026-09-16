@@ -117,7 +117,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
   case PROP_DTSTART: {
     icaltimetype *dt = g_value_get_pointer(value);
     self->dtstart = *dt;
-    bool is_null = icaltime_is_null_time(self->dtstart);
+    bool is_null = icaltime_is_null_date(self->dtstart);
     gtk_widget_set_visible(self->dtstart_btn, !is_null);
     errands_task_update_toolbar(self);
     if (is_null) break;
@@ -132,7 +132,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
   case PROP_DTEND: {
     icaltimetype *dt = g_value_get_pointer(value);
     self->dtend = *dt;
-    bool is_null = icaltime_is_null_time(self->dtend);
+    bool is_null = icaltime_is_null_date(self->dtend);
     gtk_widget_set_visible(self->dtend_btn, !is_null);
     errands_task_update_toolbar(self);
     if (is_null) break;
@@ -245,8 +245,8 @@ ErrandsTask *errands_task_new() { return g_object_new(ERRANDS_TYPE_TASK, NULL); 
 // ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_task_update_toolbar(ErrandsTask *self) {
-  bool has_dtstart = !icaltime_is_null_time(self->dtstart);
-  bool has_dtend = !icaltime_is_null_time(self->dtend);
+  bool has_dtstart = !icaltime_is_null_date(self->dtstart);
+  bool has_dtend = !icaltime_is_null_date(self->dtend);
   bool has_tags = self->tags && g_strv_length(self->tags) > 0;
   bool has_attachments = self->attachments && g_strv_length(self->attachments) > 0;
   bool has_priority = self->priority > 0;

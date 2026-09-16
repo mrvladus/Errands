@@ -251,19 +251,11 @@ static void on_dialog_close_cb(ErrandsTaskPropertiesDialog *self) {
   bool changed = false;
 
   // Date
-  icaltimetype curr_sdt = errands_task_item_get_dtstart(self->item);
   icaltimetype new_sdt = errands_date_chooser_get_dt(self->start_date_chooser);
-  if (!icaltime_is_null_time(new_sdt) && icaltime_compare(curr_sdt, new_sdt)) {
-    errands_task_item_set_dtstart(self->item, new_sdt);
-    changed = true;
-  }
-  bool rrule_is_set = adw_expander_row_get_expanded(ADW_EXPANDER_ROW(self->rrule_row));
-  icaltimetype curr_ddt = errands_task_item_get_dtend(self->item);
+  errands_task_item_set_dtstart(self->item, new_sdt);
   icaltimetype new_ddt = errands_date_chooser_get_dt(self->due_date_chooser);
-  if (!rrule_is_set && !icaltime_is_null_time(new_ddt) && icaltime_compare(curr_ddt, new_ddt)) {
-    errands_task_item_set_dtend(self->item, new_ddt);
-    changed = true;
-  }
+  errands_task_item_set_dtend(self->item, new_ddt);
+  bool rrule_is_set = adw_expander_row_get_expanded(ADW_EXPANDER_ROW(self->rrule_row));
 
   // Set rrule
   // struct icalrecurrencetype *new_rrule = icalrecurrencetype_new();

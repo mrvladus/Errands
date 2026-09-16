@@ -1,12 +1,10 @@
 #include "task-item.h"
 #include "data.h"
-#include "glib-object.h"
-#include "glib.h"
-#include "glib/gi18n.h"
 #include "settings.h"
-#include "sidebar.h"
 #include "state.h"
 #include "task.h"
+
+#include <glib/gi18n.h>
 #include <libical/ical.h>
 
 struct _ErrandsTaskItem {
@@ -160,7 +158,9 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     errands_list_data_save(self->data->list);
   } break;
   case PROP_PRIORITY: {
-    self->priority = CLAMP(g_value_get_int(value), 0, 10);
+    gint new_priority = g_value_get_int(value);
+    if (new_priority == self->priority) break;
+    self->priority = CLAMP(new_priority, 0, 10);
     errands_data_set_priority(self->data->ical, self->priority);
     errands_list_data_save(self->data->list);
   } break;
@@ -175,14 +175,16 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
   } break;
   case PROP_DTSTART: {
     icaltimetype *dtstart = g_value_get_pointer(value);
-    if (icaltime_compare(*dtstart, self->dtstart)) break;
+    if (icaltime_is_null_time(self->dtstart)) self->dtstart.is_date = true;
+    if (icaltime_compare(*dtstart, self->dtstart) == 0) break;
     self->dtstart = *dtstart;
     errands_data_set_start(self->data->ical, self->dtstart);
     errands_list_data_save(self->data->list);
   } break;
   case PROP_DTEND: {
     icaltimetype *dtend = g_value_get_pointer(value);
-    if (icaltime_compare(*dtend, self->dtend)) break;
+    if (icaltime_is_null_time(self->dtend)) self->dtend.is_date = true;
+    if (icaltime_compare(*dtend, self->dtend) == 0) break;
     self->dtend = *dtend;
     errands_data_set_due(self->data->ical, self->dtend);
     errands_list_data_save(self->data->list);
