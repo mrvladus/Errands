@@ -120,6 +120,7 @@ template $ErrandsTask: Box {
 
         popover: PopoverMenu popover_menu {
           has-arrow: false;
+          position: bottom;
 
           menu-model: menu {
             section {
@@ -191,10 +192,12 @@ template $ErrandsTask: Box {
     margin-start: 6;
     margin-end: 6;
     margin-bottom: 6;
+    valign: center;
 
     Box priority_box {
       spacing: 3;
       tooltip-text: _("Priority");
+      valign: center;
 
       styles [
         "caption",
@@ -210,53 +213,63 @@ template $ErrandsTask: Box {
       }
     }
 
-    // Task Properies Bar
-    Box props_bar {
-      hexpand: true;
-      halign: start;
-      spacing: 3;
+    Button dtstart_btn {
+      valign: center;
+      action-name: "task.date";
+
+      styles [
+        "caption",
+        "task-toolbar-btn",
+      ]
+
+      Adw.ButtonContent dtstart_btn_content {
+        icon-name: "errands-calendar-symbolic";
+        label: _("Start");
+        tooltip-text: _("Start Date");
+      }
+    }
+
+    Button dtend_btn {
+      valign: center;
+      action-name: "task.date";
+
+      styles [
+        "caption",
+        "task-toolbar-btn",
+      ]
+
+      Adw.ButtonContent dtend_btn_content {
+        icon-name: "errands-calendar-symbolic";
+        label: _("Due");
+        tooltip-text: _("Due Date");
+      }
+    }
+
+    Button notes_btn {
+      icon-name: "errands-notes-symbolic";
+      tooltip-text: _("Notes");
+      valign: center;
+      action-name: "task.notes";
 
       styles [
         "task-toolbar-btn",
       ]
+    }
 
-      Button date_btn {
-        valign: center;
-        action-name: "task.date";
+    Button attachments_btn {
+      tooltip-text: _("Attachments");
+      valign: center;
+      action-name: "task.attachments";
 
-        Adw.ButtonContent date_btn_content {
-          icon-name: "errands-calendar-symbolic";
-          label: _("Date");
-          tooltip-text: _("Select Date");
-        }
-      }
-
-      Button notes_btn {
-        icon-name: "errands-notes-symbolic";
-        tooltip-text: _("Notes");
-        valign: center;
-        action-name: "task.notes";
-      }
-
-      Button attachments_btn {
+      Adw.ButtonContent attachments_btn_content {
+        icon-name: "errands-attachment-symbolic";
         tooltip-text: _("Attachments");
-        valign: center;
-        action-name: "task.attachments";
-
-        Box {
-          spacing: 4;
-
-          Image {
-            icon-name: "errands-attachment-symbolic";
-          }
-
-          Label attachments_count {
-            styles [
-              "caption-heading",
-            ]
-          }
-        }
       }
+
+      styles [
+        "caption",
+        "task-toolbar-btn",
+      ]
     }
 
     // Tags box

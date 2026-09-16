@@ -313,6 +313,12 @@ static void on_bind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_it
 
   g_object_bind_property(item, "color", task, "color", G_BINDING_SYNC_CREATE);
   g_object_bind_property(item, "priority", task, "priority", G_BINDING_SYNC_CREATE);
+  g_object_bind_property(item, "notes", task, "notes", G_BINDING_SYNC_CREATE);
+  g_object_bind_property(item, "dtstart", task, "dtstart", G_BINDING_SYNC_CREATE);
+  g_object_bind_property(item, "dtend", task, "dtend", G_BINDING_SYNC_CREATE);
+  g_object_bind_property(item, "tags", task, "tags", G_BINDING_SYNC_CREATE);
+  g_object_bind_property(item, "attachments", task, "attachments", G_BINDING_SYNC_CREATE);
+
   g_object_bind_property(item, "completed", task->complete_btn, "active",
                          G_BINDING_SYNC_CREATE | G_BINDING_BIDIRECTIONAL);
 

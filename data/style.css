@@ -2,7 +2,6 @@
     -gtk-icon-transform: scale(0.6);
     transition: 0.2s;
 }
-
 .sub-toggle-btn:checked > image,
 .sub-toggle-btn:hover > image {
     -gtk-icon-transform: scale(1);
@@ -15,9 +14,9 @@
     opacity: 0.9;
 }
 
-.task-toolbar-btn > button,
+.task-toolbar-btn,
 .tag {
-    padding: 0px 4px;
+    padding: 0px 6px;
     border-radius: 24px;
 }
 

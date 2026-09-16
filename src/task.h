@@ -5,6 +5,7 @@
 #include "task-item.h"
 
 #include <gtk/gtk.h>
+#include <libical/ical.h>
 
 #define ERRANDS_TYPE_TASK (errands_task_get_type())
 G_DECLARE_FINAL_TYPE(ErrandsTask, errands_task, ERRANDS, TASK, GtkBox)
@@ -19,15 +20,16 @@ struct _ErrandsTask {
   GtkWidget *edit_title;
   GtkWidget *popover_menu;
   GtkWidget *toolbar;
-  GtkWidget *props_bar;
   GtkWidget *priority_box;
   GtkWidget *priority_label;
   GtkWidget *tags_box;
-  GtkWidget *date_btn;
-  GtkWidget *date_btn_content;
+  GtkWidget *dtstart_btn;
+  GtkWidget *dtstart_btn_content;
+  GtkWidget *dtend_btn;
+  GtkWidget *dtend_btn_content;
   GtkWidget *notes_btn;
   GtkWidget *attachments_btn;
-  GtkLabel *attachments_count;
+  GtkWidget *attachments_btn_content;
   GtkWidget *sub_entry;
   GtkDropControllerMotion *drop_motion_ctrl;
 
@@ -35,7 +37,12 @@ struct _ErrandsTask {
   ErrandsTaskItem *item;
   TaskData *data;
   const char *color;
+  const char *notes;
+  icaltimetype dtstart;
+  icaltimetype dtend;
   gint priority;
+  GStrv tags;
+  GStrv attachments;
 };
 
 ErrandsTask *errands_task_new();

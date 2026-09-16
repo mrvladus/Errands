@@ -6,6 +6,7 @@
 #include "settings.h"
 #include "state.h"
 #include "sync.h"
+#include "task-item.h"
 #include "task-list.h"
 #include "utils.h"
 
@@ -34,7 +35,7 @@ static void on_tag_entry_activated_cb(AdwEntryRow *entry);
 static void on_tag_delete_cb(GtkButton *btn, AdwActionRow *row);
 
 static ErrandsTaskPropertiesDialog *self = NULL;
-static char *page_names[] = {"date", "notes", "priority", "attachments", "tags"};
+static char *page_names[] = {"date", "notes", "attachments", "tags"};
 
 // ---------- WIDGET TEMPLATE ---------- //
 
@@ -130,7 +131,7 @@ void errands_task_properties_dialog_show(ErrandsTaskPropertiesDialogPage page, E
   adw_expander_row_set_expanded(ADW_EXPANDER_ROW(self->rrule_row), rrule && rrule->freq != ICAL_NO_RECURRENCE);
 
   // Notes
-  const char *notes = errands_data_get_notes(task->data->ical);
+  const char *notes = errands_task_item_get_notes(task->item);
   if (notes) {
     g_autofree gchar *text = gtk_source_utils_unescape_search_text(notes);
     gtk_text_buffer_set_text(gtk_text_view_get_buffer(GTK_TEXT_VIEW(self->notes_view)), text, -1);
@@ -279,10 +280,10 @@ static void on_dialog_close_cb(ErrandsTaskPropertiesDialog *self) {
   GtkTextIter start, end;
   gtk_text_buffer_get_start_iter(GTK_TEXT_BUFFER(self->notes_buffer), &start);
   gtk_text_buffer_get_end_iter(GTK_TEXT_BUFFER(self->notes_buffer), &end);
-  g_autofree char *text = gtk_text_buffer_get_text(GTK_TEXT_BUFFER(self->notes_buffer), &start, &end, FALSE);
-  const char *notes = errands_data_get_notes(data->ical);
-  if (text && (!notes || !g_str_equal(text, notes))) {
-    errands_data_set_notes(data->ical, text);
+  g_autofree char *new_notes = gtk_text_buffer_get_text(GTK_TEXT_BUFFER(self->notes_buffer), &start, &end, FALSE);
+  const char *old_notes = errands_task_item_get_notes(self->task->item);
+  if (new_notes && (!old_notes || !g_str_equal(new_notes, old_notes))) {
+    errands_task_item_set_notes(self->task->item, new_notes);
     changed = true;
   }
 
