@@ -123,10 +123,11 @@ void errands_task_properties_dialog_show(ErrandsTaskPropertiesDialogPage page, E
   errands_date_chooser_reset(self->start_date_chooser);
   errands_date_chooser_reset(self->due_date_chooser);
   errands_task_list_date_dialog_rrule_row_reset(self->rrule_row);
+
   errands_date_chooser_set_dt(self->start_date_chooser, errands_task_item_get_dtstart(item));
   errands_date_chooser_set_dt(self->due_date_chooser, errands_task_item_get_dtend(item));
 
-  struct icalrecurrencetype *rrule = errands_data_get_rrule(errands_task_item_get_data(item)->ical);
+  const struct icalrecurrencetype *rrule = errands_task_item_get_rrule(item);
   errands_task_list_date_dialog_rrule_row_set_rrule(self->rrule_row, rrule);
   adw_expander_row_set_expanded(ADW_EXPANDER_ROW(self->rrule_row), rrule && rrule->freq != ICAL_NO_RECURRENCE);
 
@@ -254,13 +255,13 @@ static void on_dialog_close_cb(ErrandsTaskPropertiesDialog *self) {
   errands_task_item_set_dtstart(self->item, new_sdt);
   icaltimetype new_ddt = errands_date_chooser_get_dt(self->due_date_chooser);
   errands_task_item_set_dtend(self->item, new_ddt);
-  bool rrule_is_set = adw_expander_row_get_expanded(ADW_EXPANDER_ROW(self->rrule_row));
 
   // Set rrule
   struct icalrecurrencetype *new_rrule = icalrecurrencetype_new();
   if (adw_expander_row_get_expanded(ADW_EXPANDER_ROW(self->rrule_row)))
     errands_task_list_date_dialog_rrule_row_get_rrule(self->rrule_row, new_rrule);
   errands_task_item_set_rrule(self->item, new_rrule);
+  LOG("rrule: %s", icalrecurrencetype_as_string(new_rrule));
   icalrecurrencetype_unref(new_rrule);
 
   // Notes

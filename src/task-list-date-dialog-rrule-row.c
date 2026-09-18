@@ -68,7 +68,9 @@ void errands_task_list_date_dialog_rrule_row_get_rrule(ErrandsTaskListDateDialog
 
   rrule->freq = adw_combo_row_get_selected(self->freq_row);
   rrule->interval = adw_spin_row_get_value(self->interval_row);
-
+  const guint dur = adw_combo_row_get_selected(self->repeat_duration);
+  if (dur == 1) rrule->until = errands_date_chooser_get_dt(self->until_date_chooser);
+  else if (dur == 2) rrule->count = adw_spin_row_get_value(self->count_row);
   if (rrule->freq >= 4) {
     short *days = NULL;
     int n_days = 0;
@@ -79,24 +81,25 @@ void errands_task_list_date_dialog_rrule_row_get_rrule(ErrandsTaskListDateDialog
       by_day->size = n_days;
     }
   }
-
-  if (adw_combo_row_get_selected(self->repeat_duration) == 0)
-    rrule->until = errands_date_chooser_get_dt(self->until_date_chooser);
-  else rrule->count = adw_spin_row_get_value(self->count_row);
 }
 
 void errands_task_list_date_dialog_rrule_row_set_rrule(ErrandsTaskListDateDialogRruleRow *self,
-                                                       struct icalrecurrencetype *rrule) {
+                                                       const struct icalrecurrencetype *rrule) {
   if (!rrule || rrule->freq == ICAL_NO_RECURRENCE) return;
   adw_combo_row_set_selected(self->freq_row, rrule->freq < 7 ? rrule->freq : 3);
   adw_spin_row_set_value(self->interval_row, rrule->interval);
-
-  icalrecurrence_by_data *by_day = &rrule->by[ICAL_BY_DAY];
+  const icalrecurrence_by_data *by_day = &rrule->by[ICAL_BY_DAY];
   if (by_day->size > 0) set_week_days(self, by_day->data, by_day->size);
   else reset_week_days(self);
-
-  if (icaltime_is_null_date(rrule->until)) adw_spin_row_set_value(self->count_row, rrule->count);
-  else errands_date_chooser_set_dt(self->until_date_chooser, rrule->until);
+  if (!icaltime_is_null_date(rrule->until)) {
+    adw_combo_row_set_selected(self->repeat_duration, 1);
+    errands_date_chooser_set_dt(self->until_date_chooser, rrule->until);
+  } else if (rrule->count > 0) {
+    adw_combo_row_set_selected(self->repeat_duration, 2);
+    adw_spin_row_set_value(self->count_row, rrule->count);
+  } else {
+    adw_combo_row_set_selected(self->repeat_duration, 0);
+  }
 }
 
 void errands_task_list_date_dialog_rrule_row_reset(ErrandsTaskListDateDialogRruleRow *self) {
@@ -105,6 +108,10 @@ void errands_task_list_date_dialog_rrule_row_reset(ErrandsTaskListDateDialogRrul
   adw_combo_row_set_selected(self->repeat_duration, 0);
   reset_week_days(self);
   errands_date_chooser_reset(self->until_date_chooser);
+  adw_spin_row_set_value(self->count_row, 0);
+  adw_combo_row_set_selected(self->repeat_duration, 0);
+  gtk_widget_set_visible(GTK_WIDGET(self->until_date_chooser), false);
+  gtk_widget_set_visible(GTK_WIDGET(self->count_row), false);
 }
 
 // ---------- PRIVATE FUNCTIONS ---------- //
@@ -148,7 +155,6 @@ static void get_week_days(ErrandsTaskListDateDialogRruleRow *self, short **days,
 static void set_week_days(ErrandsTaskListDateDialogRruleRow *self, short *days, int n_days) {
   reset_week_days(self);
   GPtrArray *week_days_btns = get_children(GTK_WIDGET(self->week_box));
-
   for (int i = 0; i < n_days; i++) {
     icalrecurrencetype_weekday day = icalrecurrencetype_day_day_of_week(days[i]);
     switch (day) {
@@ -162,7 +168,6 @@ static void set_week_days(ErrandsTaskListDateDialogRruleRow *self, short *days, 
     case ICAL_SATURDAY_WEEKDAY: gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(week_days_btns->pdata[5]), true); break;
     }
   }
-
   g_ptr_array_free(week_days_btns, false);
 }
 
@@ -180,7 +185,7 @@ static void on_interval_changed_cb(ErrandsTaskListDateDialogRruleRow *self, GPar
                                    C_("Repeat every ...", "hours"),   C_("Repeat every ...", "days"),
                                    C_("Repeat every ...", "weeks"),   C_("Repeat every ...", "months"),
                                    C_("Repeat every ...", "years")};
-  const uint8_t selected_freq = adw_combo_row_get_selected(self->freq_row);
+  const guint selected_freq = adw_combo_row_get_selected(self->freq_row);
   const char *subtitle =
       tmp_str_printf(_("Repeat every %d %s"), (int)adw_spin_row_get_value(row), intervals[selected_freq]);
   g_object_set(row, "subtitle", subtitle, NULL);
@@ -188,15 +193,13 @@ static void on_interval_changed_cb(ErrandsTaskListDateDialogRruleRow *self, GPar
 
 static void on_count_changed_cb(ErrandsTaskListDateDialogRruleRow *self, GParamSpec *param, AdwSpinRow *row) {
   const size_t value = adw_spin_row_get_value(row);
-  if (value == 0) g_object_set(row, "subtitle", _("Repeat forever"), NULL);
-  else {
-    const char *subtitle = tmp_str_printf(_("Repeat %zu times"), value);
-    g_object_set(row, "subtitle", subtitle, NULL);
-  }
+  const char *subtitle = value == 0 ? _("Repeat forever") : tmp_str_printf(_("Repeat %zu times"), value);
+  g_object_set(row, "subtitle", subtitle, NULL);
 }
 
 static void on_repeat_duration_changed_cb(ErrandsTaskListDateDialogRruleRow *self, GParamSpec *param,
                                           AdwComboRow *row) {
-  const uint8_t selected_dur = adw_combo_row_get_selected(self->repeat_duration);
-  gtk_widget_set_visible(GTK_WIDGET(self->until_date_chooser), selected_dur == 0);
+  const guint selected_dur = adw_combo_row_get_selected(row);
+  gtk_widget_set_visible(GTK_WIDGET(self->until_date_chooser), selected_dur == 1);
+  gtk_widget_set_visible(GTK_WIDGET(self->count_row), selected_dur == 2);
 }

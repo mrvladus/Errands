@@ -45,7 +45,8 @@ template $ErrandsTaskListDateDialogRruleRow: Adw.ExpanderRow {
 
     model: StringList {
       strings [
-        _("Until Date"),
+        _("Indefinitely"),
+        _("Date"),
         _("Count"),
       ]
     };
@@ -55,13 +56,11 @@ template $ErrandsTaskListDateDialogRruleRow: Adw.ExpanderRow {
 
   $ErrandsDateChooser until_date_chooser {
     title: _("Repeat Until Date");
-    visible: bind count_row.visible bidirectional inverted;
   }
 
   Adw.SpinRow count_row {
     title: _("Repeat Count");
     numeric: true;
-    visible: false;
 
     adjustment: Adjustment {
       lower: 0;

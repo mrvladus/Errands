@@ -456,7 +456,7 @@ gchar *errands_task_item_get_rrule_as_string(ErrandsTaskItem *self) {
   case ICAL_YEARLY_RECURRENCE: g_string_append_printf(s, ngettext("Every year", "Every %d years", n), n); break;
   case ICAL_NO_RECURRENCE: return NULL;
   }
-  if (!icaltime_is_null_time(r->until)) {
+  if (!icaltime_is_null_date(r->until)) {
     g_autoptr(GDateTime) d = g_date_time_new_from_unix_local(icaltime_as_timet(r->until));
     g_autofree gchar *ds = g_date_time_format(d, "%x");
     g_string_append_printf(s, _(" until %s"), ds);
