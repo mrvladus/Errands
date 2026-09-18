@@ -1,7 +1,8 @@
 #include "task-list.h"
 #include "data.h"
 #include "delete-list-dialog.h"
-#include "glib-object.h"
+#include "gio/gio.h"
+#include "glib.h"
 #include "rename-list-dialog.h"
 #include "settings.h"
 #include "sidebar.h"
@@ -13,7 +14,8 @@
 #include "window.h"
 
 #include <glib/gi18n.h>
-#include <unistd.h>
+#include <stdbool.h>
+#include <string.h>
 
 static const char *search_query = NULL;
 
@@ -34,6 +36,10 @@ static void on_action_rename_cb(GSimpleAction *action, GVariant *param, ErrandsT
 static void on_action_delete_completed_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
 static void on_action_delete_cancelled_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
 static void on_action_delete_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
+static void on_action_show_completed_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
+static void on_action_show_cancelled_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
+static void on_action_sort_order_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
+static void on_action_sort_by_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
 
 static bool __toplevel_filter_func(ErrandsTaskItem *item, ErrandsTaskList *self);
 static bool __tree_filter_func(GtkTreeListRow *row, ErrandsTaskList *self);
@@ -70,7 +76,6 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, scrl);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, list_view);
 
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_task_list_sort_dialog_show);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_entry_activated_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_entry_text_changed_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_search_cb);
@@ -99,6 +104,24 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   errands_add_action(ag, "delete-completed", on_action_delete_completed_cb, self, NULL);
   errands_add_action(ag, "delete-cancelled", on_action_delete_cancelled_cb, self, NULL);
   errands_add_action(ag, "delete", on_action_delete_cb, self, NULL);
+  errands_add_stateful_action(ag, "show-completed", NULL,
+                              g_variant_new_boolean(errands_settings_get(SETTING_SHOW_COMPLETED).b),
+                              on_action_show_completed_cb, self);
+  errands_add_stateful_action(ag, "show-cancelled", NULL,
+                              g_variant_new_boolean(errands_settings_get(SETTING_SHOW_CANCELLED).b),
+                              on_action_show_cancelled_cb, self);
+  errands_add_stateful_action(ag, "sort-order", G_VARIANT_TYPE_STRING,
+                              g_variant_new_string(errands_settings_get(SETTING_SORT_ORDER).s == 0 ? "desc" : "asc"),
+                              on_action_sort_order_cb, self);
+  const char *sort_by_str = NULL;
+  switch (errands_settings_get(SETTING_SORT_BY).i) {
+  case SORT_TYPE_CREATION_DATE: sort_by_str = "created"; break;
+  case SORT_TYPE_START_DATE: sort_by_str = "start"; break;
+  case SORT_TYPE_DUE_DATE: sort_by_str = "due"; break;
+  case SORT_TYPE_PRIORITY: sort_by_str = "priority"; break;
+  }
+  errands_add_stateful_action(ag, "sort-by", G_VARIANT_TYPE_STRING, g_variant_new_string(sort_by_str),
+                              on_action_sort_by_cb, self);
 
   gtk_search_bar_connect_entry(GTK_SEARCH_BAR(self->search_bar), GTK_EDITABLE(self->search_entry));
 
@@ -430,6 +453,41 @@ static void on_action_delete_cancelled_cb(GSimpleAction *action, GVariant *param
 static void on_action_delete_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
   gtk_popover_popdown(self->menu_popover);
   errands_delete_list_dialog_show(errands_sidebar_find_list(errands_data_get_uid(self->data->ical)));
+}
+
+static void on_action_show_completed_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
+  gboolean state = g_variant_get_boolean(param);
+  g_simple_action_set_state(action, param);
+  errands_settings_set(SETTING_SHOW_COMPLETED, &state);
+  errands_task_list_filter_tree(self, GTK_FILTER_CHANGE_DIFFERENT);
+  TODO("call errands_task_item_update() on every task list item to show/hide expander");
+}
+
+static void on_action_show_cancelled_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
+  gboolean state = g_variant_get_boolean(param);
+  g_simple_action_set_state(action, param);
+  errands_settings_set(SETTING_SHOW_CANCELLED, &state);
+  errands_task_list_filter_tree(self, state ? GTK_FILTER_CHANGE_LESS_STRICT : GTK_FILTER_CHANGE_MORE_STRICT);
+  TODO("call errands_task_item_update() on every task list item to show/hide expander");
+}
+
+static void on_action_sort_order_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
+  g_simple_action_set_state(action, param);
+  const char *new = g_variant_get_string(param, NULL);
+  errands_settings_set(SETTING_SORT_ORDER, g_str_equal(new, "desc") ? "desc" : "asc");
+  errands_task_list_sort(state.main_window->task_list, GTK_SORTER_CHANGE_INVERTED);
+}
+
+static void on_action_sort_by_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
+  g_simple_action_set_state(action, param);
+  const char *new = g_variant_get_string(param, NULL);
+  int by = 0;
+  if (g_str_equal(new, "created")) by = 0;
+  else if (g_str_equal(new, "start")) by = 1;
+  else if (g_str_equal(new, "due")) by = 2;
+  else if (g_str_equal(new, "priority")) by = 3;
+  errands_settings_set(SETTING_SORT_BY, &by);
+  errands_task_list_sort(state.main_window->task_list, GTK_SORTER_CHANGE_DIFFERENT);
 }
 
 // - PRINTING - //

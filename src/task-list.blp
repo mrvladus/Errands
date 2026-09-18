@@ -8,19 +8,72 @@ template $ErrandsTaskList: Adw.Bin {
       title-widget: Adw.WindowTitle title {};
 
       [start]
-      Button {
+      MenuButton {
         icon-name: "errands-sort-symbolic";
-        tooltip-text: _("Filter and Sort (Shift+Ctrl+F)");
-        clicked => $errands_task_list_sort_dialog_show();
 
-        ShortcutController {
-          scope: global;
+        popover: PopoverMenu {
+          has-arrow: false;
 
-          Shortcut {
-            trigger: "<Control><Shift>F";
-            action: "activate";
-          }
-        }
+          menu-model: menu {
+            section {
+              label: _("Show Tasks");
+
+              item {
+                label: _("Completed");
+                action: "task-list.show-completed";
+              }
+
+              item {
+                label: _("Cancelled");
+                action: "task-list.show-cancelled";
+              }
+            }
+
+            section {
+              label: _("Sort Order");
+
+              item {
+                label: _("Descending");
+                action: "task-list.sort-order";
+                target: "asc";
+              }
+
+              item {
+                label: _("Ascending");
+                action: "task-list.sort-order";
+                target: "desc";
+              }
+            }
+
+            section {
+              label: _("Sort By");
+
+              item {
+                label: _("Created");
+                action: "task-list.sort-by";
+                target: "created";
+              }
+
+              item {
+                label: _("Start Date");
+                action: "task-list.sort-by";
+                target: "start";
+              }
+
+              item {
+                label: _("Due Date");
+                action: "task-list.sort-by";
+                target: "due";
+              }
+
+              item {
+                label: _("Priority");
+                action: "task-list.sort-by";
+                target: "priority";
+              }
+            }
+          };
+        };
       }
 
       [end]

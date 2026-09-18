@@ -17,15 +17,6 @@ void errands_task_list_date_dialog_rrule_row_set_rrule(ErrandsTaskListDateDialog
                                                        const struct icalrecurrencetype *rrule);
 void errands_task_list_date_dialog_rrule_row_reset(ErrandsTaskListDateDialogRruleRow *self);
 
-// --- TASK LIST SORT DIALOG --- //
-
-#define ERRANDS_TYPE_TASK_LIST_SORT_DIALOG (errands_task_list_sort_dialog_get_type())
-G_DECLARE_FINAL_TYPE(ErrandsTaskListSortDialog, errands_task_list_sort_dialog, ERRANDS, TASK_LIST_SORT_DIALOG,
-                     AdwDialog)
-
-ErrandsTaskListSortDialog *errands_task_list_sort_dialog_new();
-void errands_task_list_sort_dialog_show();
-
 // --- TASK LIST --- //
 
 typedef enum {
@@ -51,8 +42,6 @@ struct _ErrandsTaskList {
   GtkWidget *entry_apply_btn;
   GtkWidget *scrl;
   GtkWidget *list_view;
-
-  ErrandsTaskListSortDialog *sort_dialog;
 
   GtkEventControllerMotion *motion_ctrl;
 
