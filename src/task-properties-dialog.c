@@ -1,7 +1,6 @@
 #include "task-properties-dialog.h"
 #include "data.h"
 #include "date-chooser.h"
-#include "glib.h"
 #include "notifications.h"
 #include "settings.h"
 #include "state.h"
@@ -258,11 +257,11 @@ static void on_dialog_close_cb(ErrandsTaskPropertiesDialog *self) {
   bool rrule_is_set = adw_expander_row_get_expanded(ADW_EXPANDER_ROW(self->rrule_row));
 
   // Set rrule
-  // struct icalrecurrencetype *new_rrule = icalrecurrencetype_new();
-  // if (adw_expander_row_get_expanded(ADW_EXPANDER_ROW(self->rrule_row)))
-  //   errands_task_list_date_dialog_rrule_row_get_rrule(self->rrule_row, new_rrule);
-  // if (errands_data_set_rrule(data->ical, new_rrule)) changed = true;
-  // icalrecurrencetype_unref(new_rrule);
+  struct icalrecurrencetype *new_rrule = icalrecurrencetype_new();
+  if (adw_expander_row_get_expanded(ADW_EXPANDER_ROW(self->rrule_row)))
+    errands_task_list_date_dialog_rrule_row_get_rrule(self->rrule_row, new_rrule);
+  errands_task_item_set_rrule(self->item, new_rrule);
+  icalrecurrencetype_unref(new_rrule);
 
   // Notes
   GtkTextIter start, end;

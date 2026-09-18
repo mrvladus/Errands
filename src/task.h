@@ -27,6 +27,8 @@ struct _ErrandsTask {
   GtkWidget *dtstart_btn_content;
   GtkWidget *dtend_btn;
   GtkWidget *dtend_btn_content;
+  GtkWidget *rrule_btn;
+  GtkWidget *rrule_btn_content;
   GtkWidget *notes_btn;
   GtkWidget *attachments_btn;
   GtkWidget *attachments_btn_content;
@@ -43,6 +45,7 @@ struct _ErrandsTask {
   gint priority;
   GStrv tags;
   GStrv attachments;
+  struct icalrecurrencetype *rrule;
 };
 
 ErrandsTask *errands_task_new();

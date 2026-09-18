@@ -21,6 +21,7 @@ struct _ErrandsTaskItem {
   icaltimetype dtend;
   GStrv tags;
   GStrv attachments;
+  struct icalrecurrencetype *rrule;
 
   const char *uncompleted_count; // The number of uncompleted subtasks
   gboolean has_no_children;      // If the task can be expanded (has any children)
@@ -47,6 +48,7 @@ enum {
   PROP_DTEND,
   PROP_TAGS,
   PROP_ATTACHMENTS,
+  PROP_RRULE,
 
   PROP_UNCOMPLETED_COUNT,
   PROP_HAS_NO_CHILDREN,
@@ -73,6 +75,7 @@ static void get_property(GObject *object, guint prop_id, GValue *value, GParamSp
   case PROP_DTEND: g_value_set_pointer(value, &self->dtend); break;
   case PROP_TAGS: g_value_set_pointer(value, self->tags); break;
   case PROP_ATTACHMENTS: g_value_set_pointer(value, self->attachments); break;
+  case PROP_RRULE: g_value_set_pointer(value, self->rrule); break;
 
   case PROP_UNCOMPLETED_COUNT: g_value_set_string(value, self->uncompleted_count); break;
   case PROP_HAS_NO_CHILDREN: g_value_set_boolean(value, self->has_no_children); break;
@@ -203,6 +206,15 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     self->attachments = g_value_get_pointer(value);
     errands_list_data_save(self->data->list);
   } break;
+  case PROP_RRULE: {
+    struct icalrecurrencetype *new_rrule = g_value_get_pointer(value);
+    if (icalrecurrencetype_compare(self->rrule, new_rrule)) break;
+    if (self->rrule) icalrecurrencetype_unref(self->rrule);
+    if (!new_rrule || (new_rrule && new_rrule->freq == ICAL_NO_RECURRENCE)) self->rrule = NULL;
+    else self->rrule = icalrecurrencetype_clone(new_rrule);
+    errands_data_set_rrule(self->data->ical, self->rrule);
+    errands_list_data_save(self->data->list);
+  } break;
 
   case PROP_UNCOMPLETED_COUNT: self->uncompleted_count = g_value_get_string(value); break;
   case PROP_HAS_NO_CHILDREN: self->has_no_children = g_value_get_boolean(value); break;
@@ -249,6 +261,7 @@ static void errands_task_item_class_init(ErrandsTaskItemClass *klass) {
   obj_properties[PROP_TAGS] = g_param_spec_pointer("tags", "Tags", "Tags of the task", G_PARAM_READWRITE);
   obj_properties[PROP_ATTACHMENTS] =
       g_param_spec_pointer("attachments", "Attachments", "Attachments of the task", G_PARAM_READWRITE);
+  obj_properties[PROP_RRULE] = g_param_spec_pointer("rrule", "RRule", "Recurrence rule of the task", G_PARAM_READWRITE);
 
   obj_properties[PROP_UNCOMPLETED_COUNT] = g_param_spec_string(
       "uncompleted-count", "Uncompleted Count", "Number of uncompleted subtasks", NULL, G_PARAM_READWRITE);
@@ -280,6 +293,7 @@ ErrandsTaskItem *errands_task_item_new(TaskData *data, ErrandsTaskItem *parent) 
   self->dtend = errands_data_get_due(data->ical);
   self->tags = errands_data_get_tags(data->ical);
   self->attachments = errands_data_get_attachments(data->ical);
+  self->rrule = errands_data_get_rrule(data->ical);
   errands_task_item_update(self);
 
   self->data = data;
@@ -419,6 +433,37 @@ GStrv errands_task_item_get_attachments(ErrandsTaskItem *self) {
   return self->attachments;
 }
 
+const struct icalrecurrencetype *errands_task_item_get_rrule(ErrandsTaskItem *self) {
+  if (!self) return NULL;
+  return self->rrule;
+}
+
+gchar *errands_task_item_get_rrule_as_string(ErrandsTaskItem *self) {
+  if (!self) return NULL;
+
+  const struct icalrecurrencetype *r = self->rrule;
+  if (!r || r->freq == ICAL_NO_RECURRENCE) return NULL;
+
+  GString *s = g_string_new(NULL);
+  const int n = r->interval;
+  switch (r->freq) {
+  case ICAL_SECONDLY_RECURRENCE: g_string_append_printf(s, ngettext("Every second", "Every %d seconds", n), n); break;
+  case ICAL_MINUTELY_RECURRENCE: g_string_append_printf(s, ngettext("Every minute", "Every %d minutes", n), n); break;
+  case ICAL_HOURLY_RECURRENCE: g_string_append_printf(s, ngettext("Every hour", "Every %d hours", n), n); break;
+  case ICAL_DAILY_RECURRENCE: g_string_append_printf(s, ngettext("Every day", "Every %d days", n), n); break;
+  case ICAL_WEEKLY_RECURRENCE: g_string_append_printf(s, ngettext("Every week", "Every %d weeks", n), n); break;
+  case ICAL_MONTHLY_RECURRENCE: g_string_append_printf(s, ngettext("Every month", "Every %d months", n), n); break;
+  case ICAL_YEARLY_RECURRENCE: g_string_append_printf(s, ngettext("Every year", "Every %d years", n), n); break;
+  case ICAL_NO_RECURRENCE: return NULL;
+  }
+  if (!icaltime_is_null_time(r->until)) {
+    g_autoptr(GDateTime) d = g_date_time_new_from_unix_local(icaltime_as_timet(r->until));
+    g_autofree gchar *ds = g_date_time_format(d, "%x");
+    g_string_append_printf(s, _(" until %s"), ds);
+  } else if (r->count > 0) g_string_append_printf(s, ngettext(" once", " %d times", r->count), r->count);
+  return g_string_free(s, FALSE);
+}
+
 // --- SETTERS --- //
 
 void errands_task_item_set_title(ErrandsTaskItem *self, const char *title) { g_object_set(self, "title", title, NULL); }
@@ -445,5 +490,8 @@ void errands_task_item_set_dtend(ErrandsTaskItem *self, icaltimetype dtend) {
 void errands_task_item_set_tags(ErrandsTaskItem *self, GStrv tags) { g_object_set(self, "tags", tags, NULL); }
 void errands_task_item_set_attachments(ErrandsTaskItem *self, GStrv attachments) {
   g_object_set(self, "attachments", attachments, NULL);
+}
+void errands_task_item_set_rrule(ErrandsTaskItem *self, const struct icalrecurrencetype *rrule) {
+  g_object_set(self, "rrule", rrule, NULL);
 }
 void errands_task_item_set_parent(ErrandsTaskItem *self, ErrandsTaskItem *parent) { self->parent = parent; }

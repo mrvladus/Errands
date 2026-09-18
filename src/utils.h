@@ -174,7 +174,3 @@ static inline void gtk_widget_set_color(GtkWidget *widget, const char *color) {
                                              GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
   g_object_set_data(G_OBJECT(widget), "custom-color-provider", provider);
 }
-
-// .checkbtn-blue check:checked {
-//     background-color: var(--check-blue);
-// }

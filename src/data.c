@@ -725,37 +725,6 @@ bool errands_data_set_rrule(icalcomponent *ical, struct icalrecurrencetype *valu
   return true;
 }
 
-gchar *errands_data_get_rrule_as_string(icalcomponent *ical) {
-  if (!ical) return NULL;
-
-  struct icalrecurrencetype *r = errands_data_get_rrule(ical);
-  if (!r || r->freq == ICAL_NO_RECURRENCE) return NULL;
-
-  GString *s = g_string_new(NULL);
-  const int n = r->interval;
-
-  switch (r->freq) {
-  case ICAL_SECONDLY_RECURRENCE: g_string_append_printf(s, ngettext("Every second", "Every %d seconds", n), n); break;
-  case ICAL_MINUTELY_RECURRENCE: g_string_append_printf(s, ngettext("Every minute", "Every %d minutes", n), n); break;
-  case ICAL_HOURLY_RECURRENCE: g_string_append_printf(s, ngettext("Every hour", "Every %d hours", n), n); break;
-  case ICAL_DAILY_RECURRENCE: g_string_append_printf(s, ngettext("Every day", "Every %d days", n), n); break;
-  case ICAL_WEEKLY_RECURRENCE: g_string_append_printf(s, ngettext("Every week", "Every %d weeks", n), n); break;
-  case ICAL_MONTHLY_RECURRENCE: g_string_append_printf(s, ngettext("Every month", "Every %d months", n), n); break;
-  case ICAL_YEARLY_RECURRENCE: g_string_append_printf(s, ngettext("Every year", "Every %d years", n), n); break;
-  case ICAL_NO_RECURRENCE: return NULL;
-  }
-
-  if (!icaltime_is_null_time(r->until)) {
-    g_autoptr(GDateTime) d = g_date_time_new_from_unix_local(icaltime_as_timet(r->until));
-    g_autofree gchar *ds = g_date_time_format(d, "%x");
-    g_string_append_printf(s, _(" until %s"), ds);
-  } else if (r->count > 0) {
-    g_string_append_printf(s, ngettext(" once", " %d times", r->count), r->count);
-  }
-
-  return g_string_free(s, FALSE);
-}
-
 // --- STRV --- //
 
 GStrv errands_data_get_attachments(icalcomponent *ical) {

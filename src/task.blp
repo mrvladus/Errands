@@ -245,6 +245,21 @@ template $ErrandsTask: Box {
       }
     }
 
+    Button rrule_btn {
+      valign: center;
+      action-name: "task.date";
+
+      styles [
+        "caption",
+        "task-toolbar-btn",
+      ]
+
+      Adw.ButtonContent rrule_btn_content {
+        icon-name: "errands-calendar-symbolic";
+        tooltip-text: _("Repeat");
+      }
+    }
+
     Button notes_btn {
       icon-name: "errands-notes-symbolic";
       tooltip-text: _("Notes");

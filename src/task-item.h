@@ -28,6 +28,10 @@ icaltimetype errands_task_item_get_dtstart(ErrandsTaskItem *self);
 icaltimetype errands_task_item_get_dtend(ErrandsTaskItem *self);
 GStrv errands_task_item_get_tags(ErrandsTaskItem *self);
 GStrv errands_task_item_get_attachments(ErrandsTaskItem *self);
+const struct icalrecurrencetype *errands_task_item_get_rrule(ErrandsTaskItem *self);
+// Returns the rrule as a human-readable string, or NULL if no rrule is set.
+// The caller owns the returned string and must free it with g_free().
+gchar *errands_task_item_get_rrule_as_string(ErrandsTaskItem *self);
 
 ErrandsTaskItem *errands_task_item_get_parent(ErrandsTaskItem *self);
 GListModel *errands_task_item_get_children_model(ErrandsTaskItem *self);
@@ -44,4 +48,6 @@ void errands_task_item_set_dtend(ErrandsTaskItem *self, icaltimetype dtend);
 void errands_task_item_set_tags(ErrandsTaskItem *self, GStrv tags);
 // Set the attachments for the task item. Item takes ownership of the attachments array.
 void errands_task_item_set_attachments(ErrandsTaskItem *self, GStrv attachments);
+void errands_task_item_set_rrule(ErrandsTaskItem *self, const struct icalrecurrencetype *rrule);
+
 void errands_task_item_set_parent(ErrandsTaskItem *self, ErrandsTaskItem *parent);

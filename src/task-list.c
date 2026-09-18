@@ -318,7 +318,7 @@ static void on_bind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_it
   g_object_bind_property(item, "dtend", task, "dtend", G_BINDING_SYNC_CREATE);
   g_object_bind_property(item, "tags", task, "tags", G_BINDING_SYNC_CREATE);
   g_object_bind_property(item, "attachments", task, "attachments", G_BINDING_SYNC_CREATE);
-
+  g_object_bind_property(item, "rrule", task, "rrule", G_BINDING_SYNC_CREATE);
   g_object_bind_property(item, "completed", task->complete_btn, "active",
                          G_BINDING_SYNC_CREATE | G_BINDING_BIDIRECTIONAL);
 

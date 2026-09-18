@@ -58,6 +58,7 @@ enum {
   PROP_DTEND,
   PROP_TAGS,
   PROP_ATTACHMENTS,
+  PROP_RRULE,
 
   N_PROPERTIES,
 };
@@ -70,7 +71,6 @@ static void get_property(GObject *object, guint prop_id, GValue *value, GParamSp
   case PROP_ITEM: g_value_set_object(value, self->item); break;
   case PROP_COLOR: g_value_set_string(value, self->color); break;
   case PROP_PRIORITY: g_value_set_int(value, self->priority); break;
-  case PROP_NOTES: g_value_set_string(value, self->notes); break;
   default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
   }
 }
@@ -132,10 +132,11 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
   case PROP_DTEND: {
     icaltimetype *dt = g_value_get_pointer(value);
     self->dtend = *dt;
-    bool is_null = icaltime_is_null_date(self->dtend);
-    gtk_widget_set_visible(self->dtend_btn, !is_null);
+    bool has_dt = !icaltime_is_null_date(self->dtend);
+    g_autofree gchar *rrule = errands_task_item_get_rrule_as_string(self->item);
+    gtk_widget_set_visible(self->dtend_btn, has_dt && !rrule);
     errands_task_update_toolbar(self);
-    if (is_null) break;
+    if (!has_dt) break;
 
     g_autofree gchar *date_str = NULL;
     g_autoptr(GDateTime) sdt = g_date_time_new_from_unix_local(icaltime_as_timet(self->dtend));
@@ -162,6 +163,14 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     const char *label = tmp_str_printf("%ud", g_strv_length(self->attachments));
     adw_button_content_set_label(ADW_BUTTON_CONTENT(self->attachments_btn_content), label);
   } break;
+  case PROP_RRULE: {
+    self->rrule = g_value_get_pointer(value);
+    g_autofree gchar *label = errands_task_item_get_rrule_as_string(self->item);
+    if (label) gtk_widget_set_visible(self->dtend_btn, false);
+    gtk_widget_set_visible(self->rrule_btn, label != NULL);
+    errands_task_update_toolbar(self);
+    if (label) adw_button_content_set_label(ADW_BUTTON_CONTENT(self->rrule_btn_content), label);
+  } break;
 
   default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
   }
@@ -185,13 +194,14 @@ static void errands_task_class_init(ErrandsTaskClass *klass) {
   obj_properties[PROP_COLOR] = g_param_spec_string("color", "Color", "Color of the task.", NULL, G_PARAM_READWRITE);
   obj_properties[PROP_PRIORITY] =
       g_param_spec_int("priority", "Priority", "Priority of the task.", 0, 10, 0, G_PARAM_READWRITE);
-  obj_properties[PROP_NOTES] = g_param_spec_string("notes", "Notes", "Notes of the task.", NULL, G_PARAM_READWRITE);
+  obj_properties[PROP_NOTES] = g_param_spec_string("notes", "Notes", "Notes of the task.", NULL, G_PARAM_WRITABLE);
   obj_properties[PROP_DTSTART] =
       g_param_spec_pointer("dtstart", "Start Date", "Start date of the task.", G_PARAM_WRITABLE);
   obj_properties[PROP_DTEND] = g_param_spec_pointer("dtend", "End Date", "End date of the task.", G_PARAM_WRITABLE);
   obj_properties[PROP_TAGS] = g_param_spec_pointer("tags", "Tags", "Tags of the task.", G_PARAM_WRITABLE);
   obj_properties[PROP_ATTACHMENTS] =
       g_param_spec_pointer("attachments", "Attachments", "Attachments of the task.", G_PARAM_WRITABLE);
+  obj_properties[PROP_RRULE] = g_param_spec_pointer("rrule", "RRule", "RRule of the task.", G_PARAM_WRITABLE);
 
   g_object_class_install_properties(object_class, N_PROPERTIES, obj_properties);
 
@@ -208,6 +218,8 @@ static void errands_task_class_init(ErrandsTaskClass *klass) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, dtstart_btn_content);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, dtend_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, dtend_btn_content);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, rrule_btn);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, rrule_btn_content);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, notes_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, attachments_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, attachments_btn_content);
@@ -249,10 +261,11 @@ void errands_task_update_toolbar(ErrandsTask *self) {
   bool has_dtend = !icaltime_is_null_date(self->dtend);
   bool has_tags = self->tags && g_strv_length(self->tags) > 0;
   bool has_attachments = self->attachments && g_strv_length(self->attachments) > 0;
-  bool has_priority = self->priority > 0;
-  bool has_notes = self->notes && !g_str_equal(self->notes, "");
+  bool has_priority = self->priority != 0;
+  bool has_notes = self->notes != NULL;
+  bool has_rrule = self->rrule != NULL;
 
-  bool visible = has_dtstart || has_dtend || has_tags || has_attachments || has_priority || has_notes;
+  bool visible = has_dtstart || has_dtend || has_tags || has_attachments || has_priority || has_notes || has_rrule;
   gtk_widget_set_visible(self->toolbar, visible);
 }
 
