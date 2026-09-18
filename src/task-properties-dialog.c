@@ -261,7 +261,8 @@ static void on_dialog_close_cb(ErrandsTaskPropertiesDialog *self) {
   if (adw_expander_row_get_expanded(ADW_EXPANDER_ROW(self->rrule_row)))
     errands_task_list_date_dialog_rrule_row_get_rrule(self->rrule_row, new_rrule);
   errands_task_item_set_rrule(self->item, new_rrule);
-  LOG("rrule: %s", icalrecurrencetype_as_string(new_rrule));
+  if (icaltime_is_null_date(new_sdt) && new_rrule->freq != ICAL_NO_RECURRENCE)
+    errands_task_item_set_dtstart(self->item, icaltime_get_date_time_now());
   icalrecurrencetype_unref(new_rrule);
 
   // Notes
