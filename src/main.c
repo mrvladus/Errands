@@ -41,7 +41,8 @@ static void activate(GtkApplication *app) {
 
 int main(int argc, char **argv) {
   RANDOM_SEED();
-  LOG("Starting Errands %s (%s) %sFlatpak", VERSION, VERSION_COMMIT, xdp_portal_running_under_flatpak() ? "" : "not ");
+  g_message("Starting version %s (%s) %sFlatpak", VERSION, VERSION_COMMIT,
+            xdp_portal_running_under_flatpak() ? "" : "not ");
 
   // Setup locales
   bindtextdomain("errands", LOCALE_DIR);

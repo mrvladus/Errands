@@ -43,7 +43,7 @@ ErrandsRenameListDialog *errands_rename_list_dialog_new() {
 // ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_rename_list_dialog_show(ErrandsTaskListItem *item) {
-  LOG("Rename List Dialog: Show");
+  g_message("Rename List Dialog: Show");
   if (!self) self = errands_rename_list_dialog_new();
   self->item = item;
   gtk_editable_set_text(GTK_EDITABLE(self->entry), item->title);

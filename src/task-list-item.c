@@ -58,9 +58,7 @@ static void errands_task_list_item_get_property(GObject *object, guint prop_id, 
 
 static void errands_task_list_item_dispose(GObject *object) {
   // ErrandsTaskListItem *self = ERRANDS_TASK_LIST_ITEM(object);
-
   // if (self->children_model) g_object_unref(self->children_model);
-
   G_OBJECT_CLASS(errands_task_list_item_parent_class)->dispose(object);
 }
 

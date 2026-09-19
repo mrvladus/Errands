@@ -1,6 +1,5 @@
 #include "data.h"
 #include "glib.h"
-#include "glib/gi18n.h"
 #include "settings.h"
 
 #include "vendor/json.h"
@@ -26,7 +25,7 @@ static void errands_data_create_backup() {
   if (res != 0 && !out) return;
   // Remove oldest backup
   if (STR_TO_UL(out) >= 20) {
-    LOG("User Data: Removing oldest backup");
+    g_message("User Data: Removing oldest backup");
     system(tmp_str_printf("rm -f $(find %s/* -type f | sort | head -n 1)", backups_dir));
   }
   // Create backup
@@ -35,18 +34,18 @@ static void errands_data_create_backup() {
   char time_str[15];
   strftime(time_str, sizeof(time_str), "%Y%m%d%H%M%S", tm);
   res = system(tmp_str_printf("cd %s && tar -cJf backups/%s.tar.xz calendars", user_dir, time_str));
-  LOG("User Data: %s backup at %s", res == 0 ? "Created" : "Failed to create",
-      tmp_str_printf("%s/%s.tar.xz", backups_dir, time_str));
+  g_message("User Data: %s backup at %s", res == 0 ? "Created" : "Failed to create",
+            tmp_str_printf("%s/%s.tar.xz", backups_dir, time_str));
 }
 
 static void errands_data_migrate_from_46() {
   g_autofree gchar *old_data_file = g_build_filename(user_dir, "data.json", NULL);
   if (!g_file_test(old_data_file, G_FILE_TEST_EXISTS)) return;
-  LOG("User Data: Migrate from 46.x");
+  g_message("User Data: Migrate from 46.x");
   autofree char *contents = read_file_to_string(old_data_file);
   // Read file contents
   if (!contents) {
-    LOG("User Data: Failed to read old data file at %s", old_data_file);
+    g_message("User Data: Failed to read old data file at %s", old_data_file);
     return;
   }
   // Parse JSON
@@ -132,7 +131,7 @@ static void errands_data_migrate_from_46() {
     const char *calendar_filename = tmp_str_printf("%s.ics", list_uid_item->string_val);
     g_autofree gchar *calendar_file_path = g_build_filename(calendars_dir, calendar_filename, NULL);
     bool res = write_string_to_file(calendar_file_path, icalcomponent_as_ical_string(calendar->ical));
-    if (!res) LOG("User Data: Failed to save calendar to %s", calendar_file_path);
+    if (!res) g_message("User Data: Failed to save calendar to %s", calendar_file_path);
   }
   remove(old_data_file);
 }
@@ -155,10 +154,10 @@ static void errands__list_data_save_cb(ListData *data) {
   const char *path = tmp_str_printf("%s/%s.ics", calendars_dir, errands_data_get_uid(data->ical));
   const char *ical = icalcomponent_as_ical_string(data->ical);
   if (ical && !g_file_set_contents(path, ical, -1, NULL)) {
-    LOG("User Data: Failed to save list '%s'", path);
+    g_message("User Data: Failed to save list '%s'", path);
     return;
   }
-  LOG("User Data: Saved list '%s'", path);
+  g_message("User Data: Saved list '%s'", path);
 }
 
 static icalproperty *get_x_prop(icalcomponent *ical, const char *xprop, const char *default_val) {
@@ -217,7 +216,7 @@ void errands_data_init() {
     if (errands_data_get_deleted(cal)) {
       if ((errands_settings_get(SETTING_SYNC).b && errands_data_get_synced(cal)) ||
           !errands_settings_get(SETTING_SYNC).b) {
-        LOG("User Data: Calendar was deleted. Removing %s", path);
+        g_message("User Data: Calendar was deleted. Removing %s", path);
         icalcomponent_free(cal);
         remove(path);
         continue;
@@ -228,14 +227,14 @@ void errands_data_init() {
     CONTINUE_IF(!list_data);
     errands_list_data_remove_deleted(list_data);
     g_ptr_array_add(errands_data_lists, list_data);
-    LOG("User Data: Loaded calendar %s", path);
+    g_message("User Data: Loaded calendar %s", path);
   }
 
-  LOG("User Data: Loaded %d task-lists in %f sec.", errands_data_lists->len, TIMER_ELAPSED_MS);
+  g_message("User Data: Loaded %d task-lists in %f sec.", errands_data_lists->len, TIMER_ELAPSED_MS);
 }
 
 void errands_data_cleanup(void) {
-  LOG("User Data: Cleanup");
+  g_message("User Data: Cleanup");
   if (user_dir) g_free(user_dir);
   if (calendars_dir) g_free(calendars_dir);
   if (backups_dir) g_free(backups_dir);
@@ -437,7 +436,7 @@ size_t errands_task_data_get_indent_level(TaskData *data) {
 }
 
 void errands_task_data_print(TaskData *data) {
-  LOG("[%s] %s", errands_data_is_completed(data->ical) ? "x" : " ", errands_data_get_uid(data->ical));
+  g_message("[%s] %s", errands_data_is_completed(data->ical) ? "x" : " ", errands_data_get_uid(data->ical));
 }
 
 void errands_task_data_get_flat_list(TaskData *parent, GPtrArray *array) {

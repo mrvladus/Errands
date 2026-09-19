@@ -38,7 +38,7 @@ static bool notify_cb() {
   // Save lists
   for_range(i, 0, save_lists->len) errands_list_data_save(g_ptr_array_index(save_lists, i));
   g_ptr_array_set_size(save_lists, 0);
-  if (sended > 0) LOG("Notifications: Sent %zu notifications", sended);
+  if (sended > 0) g_message("Notifications: Sent %zu notifications", sended);
   return true;
 }
 
@@ -46,7 +46,7 @@ static bool notify_cb() {
 void errands_notifications_init(void) {
   if (initialized) return;
   if (!errands_settings_get(SETTING_NOTIFICATIONS).b) return;
-  LOG("Notifications: Initialize");
+  g_message("Notifications: Initialize");
   TIMER_START;
   queue = g_ptr_array_new();
   save_lists = g_ptr_array_new();
@@ -60,7 +60,7 @@ void errands_notifications_init(void) {
   }
   initialized = true;
   if (queue->len == 0) return;
-  LOG("Notifications: Added %d tasks to the notifications queue (%f sec.)", queue->len, TIMER_ELAPSED_MS);
+  g_message("Notifications: Added %d tasks to the notifications queue (%f sec.)", queue->len, TIMER_ELAPSED_MS);
 }
 
 // Start sending notification
@@ -69,25 +69,25 @@ void errands_notifications_start(void) {
   if (!initialized) return;
   sending = true;
   g_timeout_add_seconds(check_interval, G_SOURCE_FUNC(notify_cb), NULL);
-  LOG("Notifications: Started sending notifications");
+  g_message("Notifications: Started sending notifications");
 }
 
 // Stop sending notification
 void errands_notifications_stop(void) {
   sending = false;
-  LOG("Notifications: Stopped sending notifications");
+  g_message("Notifications: Stopped sending notifications");
 }
 
 // Add a task to notifications queue
 void errands_notifications_add(TaskData *data) {
   if (!data || g_ptr_array_find(queue, data, NULL)) return;
   g_ptr_array_add(queue, data);
-  LOG("Notifications: Added task '%s' to the notifications queue", errands_data_get_uid(data->ical));
+  g_message("Notifications: Added task '%s' to the notifications queue", errands_data_get_uid(data->ical));
 }
 
 // Cleanup notifications system
 void errands_notifications_cleanup(void) {
-  LOG("Notifications: Cleanup");
+  g_message("Notifications: Cleanup");
   g_ptr_array_free(queue, true);
   g_ptr_array_free(save_lists, true);
   queue = NULL;

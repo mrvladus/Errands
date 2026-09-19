@@ -72,6 +72,7 @@ ALL_CFLAGS  += $(CFLAGS) \
 			-DAPP_ID='"$(APP_ID)"' \
 			-DRESOURCE_PATH='"$(RESOURCE_PATH)"' \
 			-DLOCALE_DIR='"$(localedir)"' \
+			-DG_LOG_DOMAIN='"Errands"'
 
 # --- Targets --- #
 

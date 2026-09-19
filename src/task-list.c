@@ -369,7 +369,7 @@ static void on_action_export_finish_cb(GObject *obj, GAsyncResult *res, ListData
   fprintf(file, "%s", ical);
   fclose(file);
   errands_window_add_toast(_("Exported"), 1);
-  LOG("Export task list %s", errands_data_get_uid(data->ical));
+  g_message("Export task list %s", errands_data_get_uid(data->ical));
 }
 
 static void on_action_export_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
@@ -557,7 +557,7 @@ void start_print(const char *str) {
 }
 
 static void on_action_print_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
-  LOG("Start printing of the list '%s'", errands_data_get_uid(self->data->ical));
+  g_message("Start printing of the list '%s'", errands_data_get_uid(self->data->ical));
   TODO("PRINT");
   // g_autofree gchar *str = list_data_print(row->data);
   // start_print(str);
@@ -639,7 +639,7 @@ static void __filter_cb(_FilterCallbackData *cb_data) {
 }
 
 void errands_task_list_show_today_tasks(ErrandsTaskList *self) {
-  LOG("Task List: Show today tasks");
+  g_message("Task List: Show today tasks");
   self->data = NULL;
   self->page = ERRANDS_TASK_LIST_PAGE_TODAY;
   errands_task_list_update_title(self);
@@ -650,7 +650,7 @@ void errands_task_list_show_today_tasks(ErrandsTaskList *self) {
 }
 
 void errands_task_list_show_all_tasks(ErrandsTaskList *self) {
-  LOG("Task List: Show all tasks");
+  g_message("Task List: Show all tasks");
   self->data = NULL;
   self->page = ERRANDS_TASK_LIST_PAGE_ALL;
   gtk_widget_set_visible(self->entry_box, false);
@@ -707,7 +707,7 @@ static void on_task_list_entry_activated_cb(ErrandsTaskList *self) {
   // Update UI
   errands_sidebar_task_list_update_counter(list_uid);
   errands_sidebar_update_filter_rows();
-  LOG("Add task '%s' to task list '%s'", errands_data_get_uid(data->ical), list_uid);
+  g_message("Add task '%s' to task list '%s'", errands_data_get_uid(data->ical), list_uid);
   errands_sync_create_task(data);
   errands_task_list_update_title(self);
   gtk_list_view_scroll_to(GTK_LIST_VIEW(self->list_view), 0, 0, NULL);
@@ -722,7 +722,7 @@ static void on_task_list_entry_text_changed_cb(ErrandsTaskList *self) {
 
 static void on_task_list_search_cb(ErrandsTaskList *self, GtkSearchEntry *entry) {
   search_query = gtk_editable_get_text(GTK_EDITABLE(entry));
-  LOG("Search query changed to '%s'", search_query);
+  g_message("Search query changed to '%s'", search_query);
   gtk_filter_changed(self->toplevel_filter, GTK_FILTER_CHANGE_DIFFERENT);
   if (search_query && *search_query) __expand_all_visible_rows(self);
 }

@@ -82,11 +82,11 @@ void errands_settings_load_default() {
   SETTING_ADD(SETTING_SYNC_USERNAME, string, "");
   SETTING_ADD(SETTING_TAGS, string, "");
 
-  LOG("Settings: Created default configuration");
+  g_message("Settings: Created default configuration");
 }
 
 void errands_settings_load_user() {
-  LOG("Settings: Load user configuration");
+  g_message("Settings: Load user configuration");
   autofree char *json = read_file_to_string(settings_path);
   if (!json) return;
   autoptr(JSON) json_parsed = json_parse(json);
@@ -107,7 +107,7 @@ static void errands_settings_migrate_from_46() {
 }
 
 void errands_settings_init() {
-  LOG("Settings: Initialize");
+  g_message("Settings: Initialize");
   settings_path = g_build_filename(g_get_user_data_dir(), "errands", "settings.json", NULL);
   errands_settings_load_default();
   if (file_exists(settings_path)) errands_settings_load_user();
@@ -116,7 +116,7 @@ void errands_settings_init() {
 }
 
 void errands_settings_cleanup() {
-  LOG("Settings: Cleanup");
+  g_message("Settings: Cleanup");
   if (settings_path) g_free(settings_path);
   if (settings) json_free(settings);
 }
@@ -228,7 +228,7 @@ void errands_settings_remove_tag(const char *tag) {
 
 static void errands__perform_save() {
   autofree char *json = json_print(settings);
-  if (!write_string_to_file(settings_path, json)) LOG("Settings: Failed to save settings");
+  if (!write_string_to_file(settings_path, json)) g_message("Settings: Failed to save settings");
   last_save_time = TIME_NOW;
   pending_save = false;
 }

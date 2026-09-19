@@ -57,7 +57,7 @@ static void on_response_cb(ErrandsNewListDialog *self, gchar *response, gpointer
     g_autofree gchar *uid = g_uuid_string_random();
     ListData *list = errands_list_data_create(uid, gtk_editable_get_text(GTK_EDITABLE(self->entry)), NULL,
                                               generate_hex_as_str(), false, false);
-    LOG("New List Dialog: Create new list: '%s'", errands_data_get_uid(list->ical));
+    g_message("New List Dialog: Create new list: '%s'", errands_data_get_uid(list->ical));
     errands_list_data_save(list);
     g_ptr_array_add(errands_data_lists, list);
     ErrandsTaskListItem *list_item = errands_task_list_item_new(list);

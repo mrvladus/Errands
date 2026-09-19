@@ -169,7 +169,7 @@ void errands_sidebar_task_list_update_counter(const char *uid) {
 }
 
 void errands_sidebar_delete_list(const char *uid) {
-  LOG("Sidebar: Deleting list %s", uid);
+  g_message("Sidebar: Deleting list %s", uid);
   GListModel *model = G_LIST_MODEL(self->task_lists_model);
   for_range(i, 0, g_list_model_get_n_items(model)) {
     g_autoptr(ErrandsTaskListItem) item = g_list_model_get_item(model, i);

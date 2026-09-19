@@ -1,5 +1,4 @@
 #include "window.h"
-#include "data.h"
 #include "settings.h"
 #include "state.h"
 #include "task-list.h"
@@ -34,7 +33,7 @@ static void errands_window_class_init(ErrandsWindowClass *class) {
 }
 
 static void errands_window_init(ErrandsWindow *self) {
-  LOG("Window: Create");
+  g_message("Window: Create");
   gtk_widget_init_template(GTK_WIDGET(self));
   // Set theme
   AdwStyleManager *style_manager = adw_style_manager_get_default();
@@ -44,7 +43,7 @@ static void errands_window_init(ErrandsWindow *self) {
   case SETTING_THEME_DARK: adw_style_manager_set_color_scheme(style_manager, ADW_COLOR_SCHEME_FORCE_DARK); break;
   }
   g_signal_connect(self, "realize", G_CALLBACK(errands_sidebar_load_lists), NULL);
-  LOG("Window: Created");
+  g_message("Window: Created");
 }
 
 ErrandsWindow *errands_window_new(GtkApplication *app) {
@@ -56,7 +55,7 @@ ErrandsWindow *errands_window_new(GtkApplication *app) {
 // ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_window_add_toast(const char *msg, int timeout) {
-  LOG("Window: Add Toast '%s'", msg);
+  g_message("Window: Add Toast '%s'", msg);
   AdwToast *toast = adw_toast_new(msg);
   adw_toast_set_timeout(toast, timeout);
   adw_toast_overlay_add_toast(state.main_window->toast_overlay, toast);

@@ -109,7 +109,7 @@ ErrandsTaskPropertiesDialog *errands_task_properties_dialog_new() {
 // ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_task_properties_dialog_show(ErrandsTaskPropertiesDialogPage page, ErrandsTaskItem *item) {
-  LOG("Task Properties: Open");
+  g_message("Task Properties: Open");
   if (!self) self = errands_task_properties_dialog_new();
   self->item = item;
   int page_n = CLAMP(page, 0, ERRANDS_TASK_PROPERTY_DIALOG_N_PAGES - 1);
@@ -247,7 +247,7 @@ static void on_add_attachment_action_cb(GSimpleAction *action, GVariant *param, 
 // ---------- CALLBACKS ---------- //
 
 static void on_dialog_close_cb(ErrandsTaskPropertiesDialog *self) {
-  LOG("Task Properties: Close");
+  g_message("Task Properties: Close");
   bool changed = false;
 
   // Date
