@@ -10,15 +10,15 @@ G_DECLARE_FINAL_TYPE(ErrandsTaskListItem, errands_task_list_item, ERRANDS, TASK_
 struct _ErrandsTaskListItem {
   GObject parent_instance;
 
+  ListData *data;
+
+  // GObject Properties
   const char *uid;
   const char *title;
-  gint count; // Number of uncompleted tasks
   GdkRGBA color;
-
-  ListData *data;
+  gint count; // Number of uncompleted tasks
 };
 
 ErrandsTaskListItem *errands_task_list_item_new(ListData *data);
-
 void errands_task_list_item_update_count(ErrandsTaskListItem *self);
 void errands_task_list_item_delete(ErrandsTaskListItem *self);

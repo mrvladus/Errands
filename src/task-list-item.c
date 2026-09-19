@@ -1,5 +1,6 @@
 #include "task-list-item.h"
 #include "data.h"
+#include "glib-object.h"
 #include "utils.h"
 
 G_DEFINE_TYPE(ErrandsTaskListItem, errands_task_list_item, G_TYPE_OBJECT)
@@ -16,6 +17,17 @@ enum {
 };
 
 static GParamSpec *obj_properties[N_PROPERTIES] = {NULL};
+
+static void errands_task_list_item_get_property(GObject *object, guint prop_id, GValue *value, GParamSpec *pspec) {
+  ErrandsTaskListItem *self = ERRANDS_TASK_LIST_ITEM(object);
+  switch (prop_id) {
+  case PROP_UID: g_value_set_string(value, self->uid); break;
+  case PROP_TITLE: g_value_set_string(value, self->title); break;
+  case PROP_COLOR: g_value_set_boxed(value, &self->color); break;
+  case PROP_COUNT: g_value_set_int(value, self->count); break;
+  default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
+  }
+}
 
 static void errands_task_list_item_set_property(GObject *object, guint prop_id, const GValue *value,
                                                 GParamSpec *pspec) {
@@ -40,18 +52,6 @@ static void errands_task_list_item_set_property(GObject *object, guint prop_id, 
     errands_data_set_color(self->data->ical, hex_string);
     errands_list_data_save(self->data);
   } break;
-  case PROP_COUNT: self->count = g_value_get_int(value); break;
-  default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
-  }
-}
-
-static void errands_task_list_item_get_property(GObject *object, guint prop_id, GValue *value, GParamSpec *pspec) {
-  ErrandsTaskListItem *self = ERRANDS_TASK_LIST_ITEM(object);
-  switch (prop_id) {
-  case PROP_UID: g_value_set_string(value, self->uid); break;
-  case PROP_TITLE: g_value_set_string(value, self->title); break;
-  case PROP_COLOR: g_value_set_boxed(value, &self->color); break;
-  case PROP_COUNT: g_value_set_int(value, self->count); break;
   default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
   }
 }
@@ -66,8 +66,8 @@ static void errands_task_list_item_class_init(ErrandsTaskListItemClass *klass) {
   GObjectClass *object_class = G_OBJECT_CLASS(klass);
   object_class->dispose = errands_task_list_item_dispose;
 
-  object_class->set_property = errands_task_list_item_set_property;
   object_class->get_property = errands_task_list_item_get_property;
+  object_class->set_property = errands_task_list_item_set_property;
 
   obj_properties[PROP_UID] =
       g_param_spec_pointer("uid", "Task List UID", "Unique identifier for the task list", G_PARAM_READWRITE);
@@ -76,7 +76,7 @@ static void errands_task_list_item_class_init(ErrandsTaskListItemClass *klass) {
   obj_properties[PROP_COLOR] =
       g_param_spec_boxed("color", "Task List Color", "Color of the task list", GDK_TYPE_RGBA, G_PARAM_READWRITE);
   obj_properties[PROP_COUNT] =
-      g_param_spec_int("count", "Task List Count", "Number of uncompleted tasks", 0, G_MAXINT, 0, G_PARAM_READWRITE);
+      g_param_spec_int("count", "Task List Count", "Number of uncompleted tasks", 0, G_MAXINT, 0, G_PARAM_READABLE);
 
   g_object_class_install_properties(object_class, N_PROPERTIES, obj_properties);
 }
@@ -105,7 +105,8 @@ void errands_task_list_item_update_count(ErrandsTaskListItem *self) {
     if (errands_data_is_completed(c)) completed++;
     total++;
   }
-  g_object_set(self, "count", total - completed, NULL);
+  self->count = total - completed;
+  g_object_notify(G_OBJECT(self), "count");
 }
 
 void errands_task_list_item_delete(ErrandsTaskListItem *self) {
