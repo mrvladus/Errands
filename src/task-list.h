@@ -34,7 +34,6 @@ struct _ErrandsTaskList {
   GtkWidget *title;
   GtkWidget *search_btn;
   GtkWidget *menu_btn;
-  GtkPopover *menu_popover;
   GtkWidget *search_bar;
   GtkWidget *search_entry;
   GtkWidget *entry_box;

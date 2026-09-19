@@ -64,9 +64,8 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
   gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), RESOURCE_PATH "/ui/task-list.ui");
 
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, title);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, menu_btn);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, menu_popover);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, search_btn);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, menu_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, search_bar);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, search_entry);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, entry_box);
@@ -377,7 +376,6 @@ static void on_action_export_finish_cb(GObject *obj, GAsyncResult *res, ListData
 }
 
 static void on_action_export_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
-  gtk_popover_popdown(self->menu_popover);
   g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
   const char *filename = tmp_str_printf("%s.ics", errands_data_get_uid(self->data->ical));
   g_object_set(dialog, "initial-name", filename, NULL);
@@ -386,7 +384,6 @@ static void on_action_export_cb(GSimpleAction *action, GVariant *param, ErrandsT
 }
 
 static void on_action_rename_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
-  gtk_popover_popdown(self->menu_popover);
   ErrandsTaskListItem *item = errands_sidebar_find_list(errands_data_get_uid(self->data->ical));
   errands_rename_list_dialog_show(item);
 }
@@ -405,7 +402,6 @@ static void __remove_deleted_tasks(ErrandsTaskList *self, GListStore *model) {
 }
 
 static void on_action_delete_completed_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
-  gtk_popover_popdown(self->menu_popover);
   if (!self->data) return;
   g_autoptr(GPtrArray) tasks = g_ptr_array_sized_new(self->data->children->len);
   errands_list_data_get_flat_list(self->data, tasks);
@@ -428,7 +424,6 @@ static void on_action_delete_completed_cb(GSimpleAction *action, GVariant *param
 }
 
 static void on_action_delete_cancelled_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
-  gtk_popover_popdown(self->menu_popover);
   if (!self->data) return;
   g_autoptr(GPtrArray) tasks = g_ptr_array_sized_new(self->data->children->len);
   errands_list_data_get_flat_list(self->data, tasks);
@@ -451,7 +446,6 @@ static void on_action_delete_cancelled_cb(GSimpleAction *action, GVariant *param
 }
 
 static void on_action_delete_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
-  gtk_popover_popdown(self->menu_popover);
   errands_delete_list_dialog_show(errands_sidebar_find_list(errands_data_get_uid(self->data->ical)));
 }
 
@@ -566,7 +560,6 @@ void start_print(const char *str) {
 }
 
 static void on_action_print_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
-  gtk_popover_popdown(self->menu_popover);
   LOG("Start printing of the list '%s'", errands_data_get_uid(self->data->ical));
   TODO("PRINT");
   // g_autofree gchar *str = list_data_print(row->data);
@@ -721,8 +714,8 @@ static void on_task_list_entry_activated_cb(ErrandsTaskList *self) {
   errands_sync_create_task(data);
   errands_task_list_update_title(self);
   gtk_list_view_scroll_to(GTK_LIST_VIEW(self->list_view), 0, 0, NULL);
-  gtk_widget_set_sensitive(self->entry, false);
-  g_timeout_add_once(1050, (GSourceOnceFunc)on_entry_timeout_cb, self->entry);
+  // gtk_widget_set_sensitive(self->entry, false);
+  // g_timeout_add_once(1050, (GSourceOnceFunc)on_entry_timeout_cb, self->entry);
 }
 
 static void on_task_list_entry_text_changed_cb(ErrandsTaskList *self) {

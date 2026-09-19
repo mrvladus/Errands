@@ -11,68 +11,64 @@ template $ErrandsTaskList: Adw.Bin {
       MenuButton {
         icon-name: "errands-sort-symbolic";
 
-        popover: PopoverMenu {
-          has-arrow: false;
+        menu-model: menu {
+          section {
+            label: _("Show Tasks");
 
-          menu-model: menu {
-            section {
-              label: _("Show Tasks");
-
-              item {
-                label: _("Completed");
-                action: "task-list.show-completed";
-              }
-
-              item {
-                label: _("Cancelled");
-                action: "task-list.show-cancelled";
-              }
+            item {
+              label: _("Completed");
+              action: "task-list.show-completed";
             }
 
-            section {
-              label: _("Sort Order");
+            item {
+              label: _("Cancelled");
+              action: "task-list.show-cancelled";
+            }
+          }
 
-              item {
-                label: _("Descending");
-                action: "task-list.sort-order";
-                target: "asc";
-              }
+          section {
+            label: _("Sort Order");
 
-              item {
-                label: _("Ascending");
-                action: "task-list.sort-order";
-                target: "desc";
-              }
+            item {
+              label: _("Descending");
+              action: "task-list.sort-order";
+              target: "asc";
             }
 
-            section {
-              label: _("Sort By");
-
-              item {
-                label: _("Created");
-                action: "task-list.sort-by";
-                target: "created";
-              }
-
-              item {
-                label: _("Start Date");
-                action: "task-list.sort-by";
-                target: "start";
-              }
-
-              item {
-                label: _("Due Date");
-                action: "task-list.sort-by";
-                target: "due";
-              }
-
-              item {
-                label: _("Priority");
-                action: "task-list.sort-by";
-                target: "priority";
-              }
+            item {
+              label: _("Ascending");
+              action: "task-list.sort-order";
+              target: "desc";
             }
-          };
+          }
+
+          section {
+            label: _("Sort By");
+
+            item {
+              label: _("Created");
+              action: "task-list.sort-by";
+              target: "created";
+            }
+
+            item {
+              label: _("Start Date");
+              action: "task-list.sort-by";
+              target: "start";
+            }
+
+            item {
+              label: _("Due Date");
+              action: "task-list.sort-by";
+              target: "due";
+            }
+
+            item {
+              label: _("Priority");
+              action: "task-list.sort-by";
+              target: "priority";
+            }
+          }
         };
       }
 
@@ -81,28 +77,24 @@ template $ErrandsTaskList: Adw.Bin {
         icon-name: "errands-more-symbolic";
         valign: center;
 
-        popover: PopoverMenu menu_popover {
-          has-arrow: false;
+        menu-model: menu {
+          section {
+            item (_("Rename List"), "task-list.rename")
+          }
 
-          menu-model: menu {
-            section {
-              item (_("Rename List"), "task-list.rename")
-            }
+          section {
+            item (_("Export as \".ics\""), "task-list.export")
+            item (_("Print"), "task-list.print")
+          }
 
-            section {
-              item (_("Export as \".ics\""), "task-list.export")
-              item (_("Print"), "task-list.print")
-            }
+          section {
+            item (_("Delete Completed"), "task-list.delete-completed")
+            item (_("Delete Cancelled"), "task-list.delete-cancelled")
+          }
 
-            section {
-              item (_("Delete Completed"), "task-list.delete-completed")
-              item (_("Delete Cancelled"), "task-list.delete-cancelled")
-            }
-
-            section {
-              item (_("Delete List"), "task-list.delete")
-            }
-          };
+          section {
+            item (_("Delete List"), "task-list.delete")
+          }
         };
       }
 
