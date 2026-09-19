@@ -1,6 +1,7 @@
 #include "sidebar.h"
 #include "about-dialog.h"
 #include "data.h"
+#include "gio/gio.h"
 #include "settings-dialog.h"
 #include "settings.h"
 #include "state.h"
@@ -165,6 +166,20 @@ void errands_sidebar_toggle_sync_indicator(bool on) { gtk_widget_set_visible(sel
 
 void errands_sidebar_task_list_update_counter(const char *uid) {
   errands_task_list_item_update_count(errands_sidebar_find_list(uid));
+}
+
+void errands_sidebar_delete_list(const char *uid) {
+  LOG("Sidebar: Deleting list %s", uid);
+  GListModel *model = G_LIST_MODEL(self->task_lists_model);
+  for_range(i, 0, g_list_model_get_n_items(model)) {
+    g_autoptr(ErrandsTaskListItem) item = g_list_model_get_item(model, i);
+    if (item->uid && g_str_equal(uid, item->uid)) {
+      errands_task_list_item_delete(item);
+      g_list_store_remove(self->task_lists_model, i);
+      break;
+    }
+  }
+  errands_sidebar_update_filter_rows();
 }
 
 // --- SIGNAL HANDLERS --- //

@@ -57,7 +57,7 @@ static void errands_task_list_item_get_property(GObject *object, guint prop_id, 
 }
 
 static void errands_task_list_item_dispose(GObject *object) {
-  ErrandsTaskListItem *self = ERRANDS_TASK_LIST_ITEM(object);
+  // ErrandsTaskListItem *self = ERRANDS_TASK_LIST_ITEM(object);
 
   // if (self->children_model) g_object_unref(self->children_model);
 
@@ -108,4 +108,11 @@ void errands_task_list_item_update_count(ErrandsTaskListItem *self) {
     total++;
   }
   g_object_set(self, "count", total - completed, NULL);
+}
+
+void errands_task_list_item_delete(ErrandsTaskListItem *self) {
+  if (!self) return;
+  errands_data_set_deleted(self->data->ical, true);
+  errands_list_data_save(self->data);
+  // errands_sync_delete_list(self->data);
 }

@@ -1,8 +1,8 @@
 #include "delete-list-dialog.h"
 #include "config.h"
 #include "data.h"
+#include "sidebar.h"
 #include "state.h"
-// #include "sync.h"
 
 static void on_response_cb(ErrandsDeleteListDialog *dialog, gchar *response, gpointer data);
 
@@ -47,27 +47,5 @@ void errands_delete_list_dialog_show(ErrandsTaskListItem *item) {
 // ---------- CALLBACKS ---------- //
 
 static void on_response_cb(ErrandsDeleteListDialog *dialog, gchar *response, gpointer data) {
-  if (STR_EQUAL(response, "delete")) {
-    ErrandsTaskListItem *item = dialog->item;
-    LOG("Delete List Dialog: Deleting task list %s", item->uid);
-    // // Delete data
-    // errands_data_set_deleted(item->data->ical, true);
-    // errands_list_data_save(item->data);
-    // errands_sync_delete_list(item->data);
-    // errands_sidebar_update_filter_rows();
-    // GtkWidget *prev = gtk_widget_get_prev_sibling(GTK_WIDGET(item));
-    // GtkWidget *next = gtk_widget_get_next_sibling(GTK_WIDGET(item));
-    // // Delete sidebar row
-    // gtk_list_box_remove(GTK_LIST_BOX(state.main_window->sidebar->task_lists_box), GTK_WIDGET(item));
-    // // Switch row
-    // if (prev) {
-    //   g_signal_emit_by_name(prev, "activate", NULL);
-    //   return;
-    // }
-    // if (next) {
-    //   g_signal_emit_by_name(next, "activate", NULL);
-    //   return;
-    // }
-    // g_signal_emit_by_name(state.main_window->sidebar->all_row, "activate", NULL);
-  }
+  if (STR_EQUAL(response, "delete")) errands_sidebar_delete_list(dialog->item->uid);
 }

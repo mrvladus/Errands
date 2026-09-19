@@ -42,8 +42,6 @@ struct _ErrandsTaskList {
   GtkWidget *scrl;
   GtkWidget *list_view;
 
-  GtkEventControllerMotion *motion_ctrl;
-
   GListStore *all_tasks_model;
   GtkFilter *toplevel_filter;
   GtkFilterListModel *toplevel_filter_model;
@@ -53,7 +51,6 @@ struct _ErrandsTaskList {
   GtkFilterListModel *tree_filter_model;
   GtkTreeListRowSorter *tree_sorter;
 
-  float x, y;
   ListData *data;
   ErrandsTaskListPage page;
 };

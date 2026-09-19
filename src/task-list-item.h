@@ -21,3 +21,4 @@ struct _ErrandsTaskListItem {
 ErrandsTaskListItem *errands_task_list_item_new(ListData *data);
 
 void errands_task_list_item_update_count(ErrandsTaskListItem *self);
+void errands_task_list_item_delete(ErrandsTaskListItem *self);
