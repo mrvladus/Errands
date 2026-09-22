@@ -88,17 +88,6 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     gtk_widget_set_visible(self->priority_box, self->priority > 0);
 
     errands_task_update_toolbar(self);
-
-    //  const uint8_t priority = adw_spin_row_get_value(self->custom_row);
-    // if (errands_data_get_priority(data->ical) != priority) {
-    //   changed = true;
-    //   errands_data_set_priority(data->ical, priority);
-    //   switch (state.main_window->task_list->page) {
-    //   case ERRANDS_TASK_LIST_PAGE_ALL:
-    //   case ERRANDS_TASK_LIST_PAGE_TODAY: errands_data_sort(); break;
-    //   case ERRANDS_TASK_LIST_PAGE_TASK_LIST: errands_list_data_sort(data->list); break;
-    //   }
-    // }
   } break;
   case PROP_NOTES: {
     self->notes = g_value_get_string(value);
@@ -107,7 +96,6 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
   } break;
   case PROP_DTSTART: {
     icaltimetype *dt = g_value_get_pointer(value);
-    self->dtstart = *dt;
     bool is_null = icaltime_is_null_date(self->dtstart);
     gtk_widget_set_visible(self->dtstart_btn, !is_null);
     errands_task_update_toolbar(self);
@@ -147,7 +135,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
   } break;
   case PROP_ATTACHMENTS: {
     self->attachments = g_value_get_pointer(value);
-    bool has_attachments = self->attachments && g_strv_length(self->attachments) > 0;
+    bool has_attachments = self->attachments && self->attachments[0] != NULL;
     gtk_widget_set_visible(self->attachments_btn, has_attachments);
     errands_task_update_toolbar(self);
     if (!has_attachments) break;
@@ -168,6 +156,11 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
 }
 
 static void errands_task_dispose(GObject *gobject) {
+  ErrandsTask *self = ERRANDS_TASK(gobject);
+  if (self->toolbar_update_id) {
+    g_source_remove(self->toolbar_update_id);
+    self->toolbar_update_id = 0;
+  }
   gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_TASK);
   G_OBJECT_CLASS(errands_task_parent_class)->dispose(gobject);
 }
@@ -247,17 +240,23 @@ ErrandsTask *errands_task_new() { return g_object_new(ERRANDS_TYPE_TASK, NULL); 
 
 // ---------- PUBLIC FUNCTIONS ---------- //
 
-void errands_task_update_toolbar(ErrandsTask *self) {
+static gboolean update_toolbar_cb(ErrandsTask *self) {
+  self->toolbar_update_id = 0;
   bool has_dtstart = !icaltime_is_null_date(self->dtstart);
   bool has_dtend = !icaltime_is_null_date(self->dtend);
-  bool has_tags = self->tags && g_strv_length(self->tags) > 0;
-  bool has_attachments = self->attachments && g_strv_length(self->attachments) > 0;
+  bool has_tags = self->tags && self->tags[0];
+  bool has_attachments = self->attachments && self->attachments[0];
   bool has_priority = self->priority != 0;
   bool has_notes = self->notes != NULL;
   bool has_rrule = self->rrule != NULL;
+  gtk_widget_set_visible(self->toolbar, has_dtstart || has_dtend || has_tags || has_attachments || has_priority ||
+                                            has_notes || has_rrule);
+  return G_SOURCE_REMOVE;
+}
 
-  bool visible = has_dtstart || has_dtend || has_tags || has_attachments || has_priority || has_notes || has_rrule;
-  gtk_widget_set_visible(self->toolbar, visible);
+void errands_task_update_toolbar(ErrandsTask *self) {
+  if (self->toolbar_update_id) return; // Already scheduled
+  self->toolbar_update_id = g_idle_add_full(G_PRIORITY_HIGH_IDLE, (GSourceFunc)update_toolbar_cb, self, NULL);
 }
 
 // ---------- PRIVATE FUNCTIONS ---------- //

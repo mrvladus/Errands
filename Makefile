@@ -2,7 +2,7 @@
 
 NAME    = errands
 VERSION = 50.0
-
+CC = gcc
 # --- Project directories --- #
 
 SRC_DIR           = src
@@ -21,7 +21,8 @@ DEVEL ?= FALSE
 ifeq ($(DEVEL),TRUE)
 	APP_ID = io.github.mrvladus.List.Devel
 	RESOURCE_PATH = /io/github/mrvladus/Errands/Devel
-	ALL_CFLAGS = -Wall -g
+	ALL_CFLAGS  = -Wall -g -fno-omit-frame-pointer -pg
+	ALL_LDFLAGS = -pg
 else
 	APP_ID = io.github.mrvladus.List
 	RESOURCE_PATH = /io/github/mrvladus/Errands

@@ -44,14 +44,15 @@ struct _ErrandsTaskList {
   GtkWidget *list_view;
 
   GListStore *toplevel_tasks_models; // Model of task models
-  GtkFlattenListModel *flatten_tasks_model;
-  GtkFilter *toplevel_filter;
-  GtkFilterListModel *toplevel_filter_model;
+  GtkFlattenListModel *all_tasks_model;
+  GtkFilterListModel *today_tasks_model;
 
   GtkTreeListModel *tree_model;
   GtkFilter *tree_filter;
   GtkFilterListModel *tree_filter_model;
   GtkTreeListRowSorter *tree_sorter;
+
+  GtkFilterListModel *current_model;
 
   ErrandsTaskListItem *item;
   ErrandsTaskListPage page;
@@ -64,5 +65,4 @@ void errands_task_list_show_all_tasks(ErrandsTaskList *self);
 void errands_task_list_show_today_tasks(ErrandsTaskList *self);
 void errands_task_list_show_task_list(ErrandsTaskList *self, ErrandsTaskListItem *item);
 void errands_task_list_sort(ErrandsTaskList *self, GtkSorterChange change);
-void errands_task_list_filter_toplevel(ErrandsTaskList *self, GtkFilterChange change);
 void errands_task_list_filter_tree(ErrandsTaskList *self, GtkFilterChange change);

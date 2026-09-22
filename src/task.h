@@ -13,6 +13,8 @@ G_DECLARE_FINAL_TYPE(ErrandsTask, errands_task, ERRANDS, TASK, GtkBox)
 struct _ErrandsTask {
   GtkBox parent_instance;
 
+  guint toolbar_update_id;
+
   GSimpleActionGroup *ag;
 
   GtkWidget *complete_btn;
