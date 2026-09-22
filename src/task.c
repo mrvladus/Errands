@@ -2,19 +2,13 @@
 #include "adwaita.h"
 #include "config.h"
 #include "data.h"
-#include "glib-object.h"
-#include "glib.h"
-#include "gtk/gtk.h"
 #include "sidebar.h"
 #include "state.h"
-#include "sync.h"
 #include "task-item.h"
 #include "task-list.h"
 #include "task-properties-dialog.h"
 #include "utils.h"
 #include "window.h"
-
-#include "vendor/toolbox.h"
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>
@@ -78,10 +72,7 @@ static void get_property(GObject *object, guint prop_id, GValue *value, GParamSp
 static void set_property(GObject *object, guint prop_id, const GValue *value, GParamSpec *pspec) {
   ErrandsTask *self = ERRANDS_TASK(object);
   switch (prop_id) {
-  case PROP_ITEM: {
-    self->item = g_value_get_object(value);
-    self->data = errands_task_item_get_data(self->item);
-  } break;
+  case PROP_ITEM: self->item = g_value_get_object(value); break;
   case PROP_COLOR: {
     self->color = g_value_get_string(value);
     gtk_widget_set_color(GTK_WIDGET(self), self->color);
@@ -293,7 +284,7 @@ static void on_edit_action_cb(GSimpleAction *action, GVariant *param, ErrandsTas
 
 static void on_copy_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
   gtk_popover_popdown(GTK_POPOVER(self->popover_menu));
-  const char *text = errands_data_get_text(self->data->ical);
+  const char *text = errands_task_item_get_title(self->item);
   GdkClipboard *clipboard = gdk_display_get_clipboard(gtk_widget_get_display(GTK_WIDGET(self)));
   gdk_clipboard_set(clipboard, G_TYPE_STRING, text);
   errands_window_add_toast(_("Copied to Clipboard"), 1);
@@ -339,62 +330,58 @@ static void __get_parents_tree_list_rows(GtkTreeListRow *child, GPtrArray *array
 }
 
 static void on_cancel_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
-  g_object_set(self->item, "cancelled", !errands_data_get_cancelled(self->data->ical), NULL);
+  errands_task_item_set_cancelled(self->item, !errands_task_item_get_cancelled(self->item));
 }
 
 static void on_delete_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
-  errands_data_set_deleted(self->data->ical, true);
-  errands_sync_delete_task(self->data);
-  g_autoptr(GPtrArray) children = g_ptr_array_sized_new(self->data->children->len);
-  errands_task_data_get_flat_list(self->data, children);
-  for_range(i, 0, children->len) {
-    TaskData *child = g_ptr_array_index(children, i);
-    errands_data_set_deleted(child->ical, true);
-    errands_sync_delete_task(child);
-  }
-  errands_list_data_save(self->data->list);
+  errands_task_item_delete(self->item);
+  // errands_task_list_item_remove_deleted_tasks();
 
-  GListStore *parent_model = NULL;
-  ErrandsTaskItem *parent = errands_task_item_get_parent(self->item);
-  if (parent) {
-    parent_model = G_LIST_STORE(errands_task_item_get_children_model(parent));
-    ErrandsTask *parent_task = NULL;
-    g_object_get(G_OBJECT(parent), "task-widget", &parent_task, NULL);
-    // if (parent_task && GTK_IS_WIDGET(parent_task)) errands_task_update_progress(parent_task);
-  } else parent_model = state.main_window->task_list->all_tasks_model;
-  guint pos;
-  if (g_list_store_find(parent_model, self->item, &pos)) g_list_store_remove(parent_model, pos);
-  // g_object_notify(G_OBJECT(parent), "children-model-is-empty");
+  // errands_data_set_deleted(self->data->ical, true);
+  // errands_sync_delete_task(self->data);
+  // g_autoptr(GPtrArray) children = g_ptr_array_sized_new(self->data->children->len);
+  // errands_task_data_get_flat_list(self->data, children);
+  // for_range(i, 0, children->len) {
+  //   TaskData *child = g_ptr_array_index(children, i);
+  //   errands_data_set_deleted(child->ical, true);
+  //   errands_sync_delete_task(child);
+  // }
+  // errands_list_data_save(self->data->list);
+
+  // GListStore *parent_model = NULL;
+  // ErrandsTaskItem *parent = errands_task_item_get_parent(self->item);
+  // if (parent) {
+  //   parent_model = G_LIST_STORE(errands_task_item_get_children_model(parent));
+  //   ErrandsTask *parent_task = NULL;
+  //   g_object_get(G_OBJECT(parent), "task-widget", &parent_task, NULL);
+  //   // if (parent_task && GTK_IS_WIDGET(parent_task)) errands_task_update_progress(parent_task);
+  // } else parent_model = state.main_window->task_list->all_tasks_model;
+  // guint pos;
+  // if (g_list_store_find(parent_model, self->item, &pos)) g_list_store_remove(parent_model, pos);
+  // // g_object_notify(G_OBJECT(parent), "children-model-is-empty");
 
   errands_sidebar_update_filter_rows();
-  errands_sidebar_task_list_update_counter(errands_data_get_uid(self->data->list->ical));
-  errands_task_list_update_title(state.main_window->task_list);
+  errands_sidebar_task_list_update_counter(errands_task_item_get_uid(errands_task_item_get_parent(self->item)));
+  errands_task_list_update(state.main_window->task_list);
 }
 
-static void on_export_finish_cb(GObject *obj, GAsyncResult *res, gpointer data) {
+static void on_export_finish_cb(GObject *obj, GAsyncResult *res, ErrandsTaskItem *item) {
   g_autoptr(GFile) f = gtk_file_dialog_save_finish(GTK_FILE_DIALOG(obj), res, NULL);
   if (!f) return;
   g_autofree char *path = g_file_get_path(f);
-  FILE *file = fopen(path, "w");
-  if (!file) {
+  if (!errands_task_item_export(item, path)) {
     errands_window_add_toast(_("Failed to Export"), 2);
     return;
   }
-  TaskData *task_data = data;
-  autoptr(icalcomponent) cal = icalcomponent_new_vcalendar();
-  autoptr(icalcomponent) dup = icalcomponent_clone(task_data->ical);
-  icalcomponent_add_component(cal, dup);
-  autofree char *ical = icalcomponent_as_ical_string(cal);
-  fprintf(file, "%s", ical);
-  fclose(file);
   errands_window_add_toast(_("Exported"), 1);
 }
 
 static void on_export_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
   g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
-  const char *filename = tmp_str_printf("%s.ics", errands_data_get_uid(self->data->ical));
+  const char *filename = tmp_str_printf("%s.ics", errands_task_item_get_uid(self->item));
   g_object_set(dialog, "initial-name", filename, NULL);
-  gtk_file_dialog_save(dialog, GTK_WINDOW(state.main_window), NULL, on_export_finish_cb, self->data);
+  gtk_file_dialog_save(dialog, GTK_WINDOW(state.main_window), NULL, (GAsyncReadyCallback)on_export_finish_cb,
+                       self->item);
 }
 
 static void on_finish_cb(GObject *source_object, GAsyncResult *res, gpointer data) {
@@ -419,7 +406,7 @@ static void on_color_action_cb(GSimpleAction *action, GVariant *param, ErrandsTa
 static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointer user_data) {
   bool editing = gtk_editable_label_get_editing(label);
   ErrandsTask *self = user_data;
-  const char *curr_text = errands_data_get_text(self->data->ical);
+  const char *curr_text = errands_task_item_get_title(self->item);
   if (editing) {
     gtk_widget_set_visible(GTK_WIDGET(label), true);
     gtk_editable_set_text(GTK_EDITABLE(self->edit_title), curr_text);
@@ -443,19 +430,13 @@ static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointe
 static void on_sub_task_entry_activated_cb(GtkEntry *entry, ErrandsTask *self) {
   const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
   if (STR_EQUAL(text, "")) return;
-  TaskData *new_data = errands_task_data_create_task(self->data->list, self->data, text);
-  errands_list_data_save(self->data->list);
-  ErrandsTaskItem *new_item = errands_task_item_add_child(self->item, new_data);
-  g_list_store_append(state.main_window->task_list->all_tasks_model, new_item);
-
+  ErrandsTaskItem *task = (ErrandsTaskItem *)errands_task_item_create_task(self->item, text);
+  // g_list_store_append(state.main_window->task_list->all_tasks_model, task);
   GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_widget_get_ancestor(GTK_WIDGET(self), GTK_TYPE_TREE_EXPANDER));
-  GtkTreeListRow *row = gtk_tree_expander_get_list_row(expander);
-  gtk_tree_list_row_set_expanded(row, true);
-
+  gtk_tree_list_row_set_expanded(gtk_tree_expander_get_list_row(expander), true);
   // Reset text
   gtk_editable_set_text(GTK_EDITABLE(entry), "");
   errands_sidebar_update_filter_rows();
-  errands_sync_create_task(self->data);
 }
 
 // --- DND CALLBACKS --- //
@@ -485,7 +466,7 @@ static GdkContentProvider *on_drag_prepare_cb(GtkDragSource *source, double x, d
 }
 
 static void on_drag_begin_cb(GtkDragSource *source, GdkDrag *drag, ErrandsTask *task) {
-  const char *text = errands_data_get_text(task->data->ical);
+  const char *text = errands_task_item_get_title(task->item);
   g_autofree gchar *label;
   if (strlen(text) > 20) {
     g_autofree gchar *truncated = g_strndup(text, 17);
@@ -494,72 +475,72 @@ static void on_drag_begin_cb(GtkDragSource *source, GdkDrag *drag, ErrandsTask *
   g_object_set(gtk_drag_icon_get_for_drag(drag), "child", g_object_new(GTK_TYPE_BUTTON, "label", label, NULL), NULL);
 }
 
-static bool __task_data_is_sub_task_of(TaskData *data, TaskData *possible_parent) {
-  g_autoptr(GPtrArray) subs = g_ptr_array_new();
-  errands_task_data_get_flat_list(possible_parent, subs);
-  return g_ptr_array_find(subs, data, NULL);
-}
+// static bool __task_data_is_sub_task_of(TaskData *data, TaskData *possible_parent) {
+//   g_autoptr(GPtrArray) subs = g_ptr_array_new();
+//   errands_task_data_get_flat_list(possible_parent, subs);
+//   return g_ptr_array_find(subs, data, NULL);
+// }
 
 static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x, double y, ErrandsTask *task) {
-  // Check items
-  ErrandsTaskItem *drop_item = g_value_get_object(value);
-  ErrandsTaskItem *tgt_item = task->item;
-  if (!tgt_item || !drop_item || tgt_item == drop_item) return false;
-  TaskData *drop_data = errands_task_item_get_data(drop_item);
-  TaskData *tgt_data = errands_task_item_get_data(tgt_item);
-  if (__task_data_is_sub_task_of(tgt_data, drop_data)) {
-    errands_window_add_toast(_("Can't add task as a child of itself"), 2);
-    return false;
-  }
+  //   // Check items
+  //   ErrandsTaskItem *drop_item = g_value_get_object(value);
+  //   ErrandsTaskItem *tgt_item = task->item;
+  //   if (!tgt_item || !drop_item || tgt_item == drop_item) return false;
+  //   TaskData *drop_data = errands_task_item_get_data(drop_item);
+  //   TaskData *tgt_data = errands_task_item_get_data(tgt_item);
+  //   if (__task_data_is_sub_task_of(tgt_data, drop_data)) {
+  //     errands_window_add_toast(_("Can't add task as a child of itself"), 2);
+  //     return false;
+  //   }
 
-  bool changing_list = tgt_data->list != drop_data->list;
+  //   bool changing_list = tgt_data->list != drop_data->list;
 
-  ListData *drop_data_old_list = drop_data->list;
+  //   ListData *drop_data_old_list = drop_data->list;
 
-  // Get old parent task
-  ErrandsTask *old_parent_task = NULL;
-  if (drop_data->parent) {
-    ErrandsTaskItem *drop_item_parent = errands_task_item_get_parent(drop_item);
-    if (drop_item_parent) g_object_get(drop_item_parent, "task-widget", &old_parent_task, NULL);
-  }
+  //   // Get old parent task
+  //   ErrandsTask *old_parent_task = NULL;
+  //   if (drop_data->parent) {
+  //     ErrandsTaskItem *drop_item_parent = errands_task_item_get_parent(drop_item);
+  //     if (drop_item_parent) g_object_get(drop_item_parent, "task-widget", &old_parent_task, NULL);
+  //   }
 
-  // Move task data
-  bool moved = errands_task_data_move_to_list(drop_data, tgt_data->list, tgt_data);
-  if (!moved) return false;
+  //   // Move task data
+  //   bool moved = errands_task_data_move_to_list(drop_data, tgt_data->list, tgt_data);
+  //   if (!moved) return false;
 
-  errands_list_data_save(tgt_data->list);
-  if (changing_list) {
-    errands_list_data_save(drop_data_old_list);
-    errands_sidebar_task_list_update_counter(errands_data_get_uid(drop_data_old_list->ical));
-    errands_task_list_update_title(state.main_window->task_list);
-  }
-  errands_sidebar_task_list_update_counter(errands_data_get_uid(tgt_data->list->ical));
+  //   errands_list_data_save(tgt_data->list);
+  //   if (changing_list) {
+  //     errands_list_data_save(drop_data_old_list);
+  //     errands_sidebar_task_list_update_counter(errands_data_get_uid(drop_data_old_list->ical));
+  //     errands_task_list_update_title(state.main_window->task_list);
+  //   }
+  //   errands_sidebar_task_list_update_counter(errands_data_get_uid(tgt_data->list->ical));
 
-  // Add child to target model
-  GListStore *tgt_children_model = G_LIST_STORE(errands_task_item_get_children_model(tgt_item));
-  g_list_store_append(tgt_children_model, drop_item);
+  //   // Add child to target model
+  //   GListStore *tgt_children_model = G_LIST_STORE(errands_task_item_get_children_model(tgt_item));
+  //   g_list_store_append(tgt_children_model, drop_item);
 
-  // Remove from parent model
-  ErrandsTaskItem *drop_parent_item = errands_task_item_get_parent(drop_item);
-  if (drop_parent_item) {
-    GListStore *drop_parent_model = G_LIST_STORE(errands_task_item_get_children_model(drop_parent_item));
-    guint idx;
-    if (drop_parent_model && g_list_store_find(drop_parent_model, drop_item, &idx))
-      g_list_store_remove(drop_parent_model, idx);
-  } else {
-    errands_task_list_filter_toplevel(state.main_window->task_list, GTK_FILTER_CHANGE_DIFFERENT);
-  }
-  errands_task_item_set_parent(drop_item, tgt_item);
+  //   // Remove from parent model
+  //   ErrandsTaskItem *drop_parent_item = errands_task_item_get_parent(drop_item);
+  //   if (drop_parent_item) {
+  //     GListStore *drop_parent_model = G_LIST_STORE(errands_task_item_get_children_model(drop_parent_item));
+  //     guint idx;
+  //     if (drop_parent_model && g_list_store_find(drop_parent_model, drop_item, &idx))
+  //       g_list_store_remove(drop_parent_model, idx);
+  //   } else {
+  //     errands_task_list_filter_toplevel(state.main_window->task_list, GTK_FILTER_CHANGE_DIFFERENT);
+  //   }
+  //   errands_task_item_set_parent(drop_item, tgt_item);
 
-  // Uncomplete and uncancel
-  if (errands_data_is_completed(tgt_data->ical) && !errands_data_is_completed(drop_data->ical))
-    gtk_widget_activate_action(GTK_WIDGET(task), "task.complete", NULL, NULL);
-  if (errands_data_get_cancelled(tgt_data->ical) && !errands_data_get_cancelled(drop_data->ical))
-    gtk_widget_activate_action(GTK_WIDGET(task), "task.cancel", NULL, NULL);
+  //   // Uncomplete and uncancel
+  //   if (errands_data_is_completed(tgt_data->ical) && !errands_data_is_completed(drop_data->ical))
+  //     gtk_widget_activate_action(GTK_WIDGET(task), "task.complete", NULL, NULL);
+  //   if (errands_data_get_cancelled(tgt_data->ical) && !errands_data_get_cancelled(drop_data->ical))
+  //     gtk_widget_activate_action(GTK_WIDGET(task), "task.cancel", NULL, NULL);
 
-  // Update progress
-  errands_task_item_update(tgt_item);
-  if (!changing_list && old_parent_task) errands_task_item_update(old_parent_task->item);
+  //   // Update progress
+  //   errands_task_item_update(tgt_item);
+  //   if (!changing_list && old_parent_task) errands_task_item_update(old_parent_task->item);
 
   return true;
 }

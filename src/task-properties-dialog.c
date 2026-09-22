@@ -1,10 +1,10 @@
 #include "task-properties-dialog.h"
 #include "data.h"
 #include "date-chooser.h"
-#include "notifications.h"
+// #include "notifications.h"
 #include "settings.h"
 #include "state.h"
-#include "sync.h"
+// #include "sync.h"
 #include "task-item.h"
 #include "task-list.h"
 #include "utils.h"
@@ -255,6 +255,7 @@ static void on_dialog_close_cb(ErrandsTaskPropertiesDialog *self) {
   errands_task_item_set_dtstart(self->item, new_sdt);
   icaltimetype new_ddt = errands_date_chooser_get_dt(self->due_date_chooser);
   errands_task_item_set_dtend(self->item, new_ddt);
+  if (errands_task_item_is_due(self->item)) changed = true;
 
   // Set rrule
   struct icalrecurrencetype *new_rrule = icalrecurrencetype_new();
@@ -289,17 +290,14 @@ static void on_dialog_close_cb(ErrandsTaskPropertiesDialog *self) {
     }
   }
 
-  // Save if changed
-  if (changed) {
-    if (!icaltime_is_null_time(errands_task_item_get_dtend(self->item))) {
-      TaskData *data = errands_task_item_get_data(self->item);
-      errands_data_set_notified(data->ical, false);
-      errands_notifications_add(data);
-    }
-    errands_sidebar_update_filter_rows();
-    // g_autofree gchar *rrule_label = errands_data_get_rrule_as_string(data->ical);
-    // LOG_DEBUG("%s", rrule_label);
-  }
+  // if (!icaltime_is_null_time(errands_task_item_get_dtend(self->item))) {
+  //   icalcomponent *ical = errands_task_item_get_ical(self->item);
+  //   errands_data_set_notified(ical, false);
+  //   // errands_notifications_add(data);
+  // }
+  if (changed) errands_sidebar_update_filter_rows();
+  // g_autofree gchar *rrule_label = errands_data_get_rrule_as_string(data->ical);
+  // LOG_DEBUG("%s", rrule_label);
 }
 
 // --- NOTES --- //
@@ -350,18 +348,18 @@ static void on_tag_entry_activated_cb(AdwEntryRow *entry) {
 }
 
 static void on_tag_delete_cb(GtkButton *btn, AdwActionRow *row) {
-  const char *tag = adw_preferences_row_get_title(ADW_PREFERENCES_ROW(row));
-  errands_settings_remove_tag(tag);
-  for_range(i, 0, errands_data_lists->len) {
-    ListData *list = g_ptr_array_index(errands_data_lists, i);
-    g_autoptr(GPtrArray) tasks = g_ptr_array_sized_new(list->children->len);
-    errands_list_data_get_flat_list(list, tasks);
-    for_range(j, 0, tasks->len) {
-      TaskData *task = g_ptr_array_index(tasks, j);
-      if (errands_data_remove_tag(task->ical, tag)) errands_sync_update_task(task);
-    }
-  }
-  gtk_list_box_remove(GTK_LIST_BOX(TAGS_LIST_BOX), GTK_WIDGET(row));
-  g_auto(GStrv) tags = errands_settings_get_tags();
-  gtk_widget_set_visible(GTK_WIDGET(self->tags), tags && g_strv_length(tags) > 0);
+  // const char *tag = adw_preferences_row_get_title(ADW_PREFERENCES_ROW(row));
+  // errands_settings_remove_tag(tag);
+  // for_range(i, 0, errands_data_lists->len) {
+  //   ListData *list = g_ptr_array_index(errands_data_lists, i);
+  //   g_autoptr(GPtrArray) tasks = g_ptr_array_sized_new(list->children->len);
+  //   errands_list_data_get_flat_list(list, tasks);
+  //   for_range(j, 0, tasks->len) {
+  //     TaskData *task = g_ptr_array_index(tasks, j);
+  //     if (errands_data_remove_tag(task->ical, tag)) errands_sync_update_task(task);
+  //   }
+  // }
+  // gtk_list_box_remove(GTK_LIST_BOX(TAGS_LIST_BOX), GTK_WIDGET(row));
+  // g_auto(GStrv) tags = errands_settings_get_tags();
+  // gtk_widget_set_visible(GTK_WIDGET(self->tags), tags && g_strv_length(tags) > 0);
 }

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "data.h"
+#include "gtk/gtk.h"
+#include "task-list-item.h"
 
 #include <adwaita.h>
 
@@ -42,7 +43,8 @@ struct _ErrandsTaskList {
   GtkWidget *scrl;
   GtkWidget *list_view;
 
-  GListStore *all_tasks_model;
+  GListStore *toplevel_tasks_models; // Model of task models
+  GtkFlattenListModel *flatten_tasks_model;
   GtkFilter *toplevel_filter;
   GtkFilterListModel *toplevel_filter_model;
 
@@ -51,15 +53,16 @@ struct _ErrandsTaskList {
   GtkFilterListModel *tree_filter_model;
   GtkTreeListRowSorter *tree_sorter;
 
-  ListData *data;
+  ErrandsTaskListItem *item;
   ErrandsTaskListPage page;
 };
 
 ErrandsTaskList *errands_task_list_new();
-void errands_task_list_update_title(ErrandsTaskList *self);
+// Update title and placeholder
+void errands_task_list_update(ErrandsTaskList *self);
 void errands_task_list_show_all_tasks(ErrandsTaskList *self);
 void errands_task_list_show_today_tasks(ErrandsTaskList *self);
-void errands_task_list_show_task_list(ErrandsTaskList *self, ListData *data);
+void errands_task_list_show_task_list(ErrandsTaskList *self, ErrandsTaskListItem *item);
 void errands_task_list_sort(ErrandsTaskList *self, GtkSorterChange change);
 void errands_task_list_filter_toplevel(ErrandsTaskList *self, GtkFilterChange change);
 void errands_task_list_filter_tree(ErrandsTaskList *self, GtkFilterChange change);

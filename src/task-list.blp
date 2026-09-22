@@ -32,13 +32,13 @@ template $ErrandsTaskList: Adw.Bin {
             item {
               label: _("Descending");
               action: "task-list.sort-order";
-              target: "asc";
+              target: "desc";
             }
 
             item {
               label: _("Ascending");
               action: "task-list.sort-order";
-              target: "desc";
+              target: "asc";
             }
           }
 
@@ -195,6 +195,10 @@ template $ErrandsTaskList: Adw.Bin {
             unbind => $on_unbind_item_cb();
           };
 
+          // header-factory: SignalListItemFactory {
+          //   setup => $on_header_setup_item_cb();
+          //   bind => $on_header_bind_item_cb();
+          // };
           activate => $on_listview_activate_cb();
         }
       }

@@ -1,3 +1,4 @@
+#include "sidebar.h"
 #include <libical/ical.h>
 #if !(defined(__GNUC__) || defined(__clang__))
 #error "This code requires GCC or Clang compiler because it uses features not supported by other compilers.\
@@ -9,7 +10,7 @@ e.g. GLib's g_autoptr, g_auto and g_autofree"
 #include "notifications.h"
 #include "settings.h"
 #include "state.h"
-#include "sync.h"
+// #include "sync.h"
 #include "window.h"
 
 #define TOOLBOX_IMPLEMENTATION
@@ -25,7 +26,8 @@ State state = {0};
 static void activate(GtkApplication *app) {
   state.main_window = errands_window_new(app);
   gtk_window_present(GTK_WINDOW(state.main_window));
-  errands_sync_init();
+  errands_sidebar_select_last_opened_page();
+  // errands_sync_init();
 
   // Request background
   g_autoptr(XdpPortal) portal = xdp_portal_new();
@@ -66,7 +68,7 @@ int main(int argc, char **argv) {
   // Cleanup
   errands_data_cleanup();
   errands_settings_cleanup();
-  errands_sync_cleanup();
+  // errands_sync_cleanup();
   errands_notifications_cleanup();
 
   return status;

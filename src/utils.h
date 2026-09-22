@@ -7,7 +7,10 @@
 
 #include <assert.h>
 #include <ctype.h>
+#include <libical/ical.h>
 #include <stddef.h>
+
+#define for_item_in_gptrarray(T, item, arr) for (T *item = (T *)arr->pdata; item < arr->pdata + arr->len; item++)
 
 // Get children of the widget
 static inline GPtrArray *get_children(GtkWidget *parent) {
@@ -173,4 +176,55 @@ static inline void gtk_widget_set_color(GtkWidget *widget, const char *color) {
   gtk_style_context_add_provider_for_display(gdk_display_get_default(), GTK_STYLE_PROVIDER(provider),
                                              GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
   g_object_set_data(G_OBJECT(widget), "custom-color-provider", provider);
+}
+
+// ---------- ICAL UTILS ---------- //
+
+#define for_vtodo_in_vcalendar(var, calendar)                                                                          \
+  for (icalcomponent *var = icalcomponent_get_first_component((calendar), ICAL_VTODO_COMPONENT); var;                  \
+       var = icalcomponent_get_next_component((calendar), ICAL_VTODO_COMPONENT))
+
+static inline GPtrArray *vcalendar_to_array(icalcomponent *calendar) {
+  g_assert(icalcomponent_isa(calendar) == ICAL_VCALENDAR_COMPONENT);
+  GPtrArray *array = g_ptr_array_new();
+  for_vtodo_in_vcalendar(var, calendar) g_ptr_array_add(array, var);
+  return array;
+}
+
+static inline icalcomponent *find_vtodo_by_uid(icalcomponent *ical, const char *uid) {
+  icalcomponent *vtodo = icalcomponent_get_first_component(ical, ICAL_VTODO_COMPONENT);
+  while (vtodo) {
+    if (g_str_equal(uid, errands_data_get_uid(vtodo))) return vtodo;
+    vtodo = icalcomponent_get_next_component(vtodo, ICAL_VTODO_COMPONENT);
+  }
+  return NULL;
+}
+
+static inline bool icaltime_is_null_date(const struct icaltimetype t) {
+  return t.year == 0 && t.month == 0 && t.day == 0;
+}
+
+static inline icaltimetype icaltime_merge_date_and_time(const struct icaltimetype date,
+                                                        const struct icaltimetype time) {
+  icaltimetype result = date;
+  result.hour = time.hour;
+  result.minute = time.minute;
+  result.second = time.second;
+  result.is_date = false;
+  return result;
+}
+
+static inline icaltimetype icaltime_get_date_time_now() {
+  g_autoptr(GDateTime) dt = g_date_time_new_now_local();
+  icaltimetype dt_now = icaltime_today();
+  dt_now.is_date = false;
+  dt_now.hour = g_date_time_get_hour(dt);
+  dt_now.minute = g_date_time_get_minute(dt);
+  dt_now.second = g_date_time_get_second(dt);
+  return dt_now;
+}
+
+static inline bool icalrecurrencetype_compare(const struct icalrecurrencetype *a, const struct icalrecurrencetype *b) {
+  if (!a || !b) return false;
+  return memcmp(a, b, sizeof(*a)) == 0;
 }

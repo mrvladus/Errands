@@ -37,7 +37,6 @@ struct _ErrandsTask {
 
   // GObject Properties
   ErrandsTaskItem *item;
-  TaskData *data;
   const char *color;
   const char *notes;
   icaltimetype dtstart;

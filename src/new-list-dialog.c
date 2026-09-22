@@ -1,10 +1,10 @@
 #include "new-list-dialog.h"
 #include "data.h"
-#include "glib.h"
+#include "gio/gio.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "state.h"
-#include "sync.h"
+#include "task-list-item.h"
 
 static void on_response_cb(ErrandsNewListDialog *self, gchar *response, gpointer data);
 static void on_entry_changed_cb(ErrandsNewListDialog *self, AdwEntryRow *entry);
@@ -44,6 +44,7 @@ ErrandsNewListDialog *errands_new_list_dialog_new() {
 // ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_new_list_dialog_show() {
+  g_message("New List Dialog: Open");
   if (!self) self = errands_new_list_dialog_new();
   adw_dialog_present(ADW_DIALOG(self), GTK_WIDGET(state.main_window));
   gtk_editable_set_text(GTK_EDITABLE(self->entry), "");
@@ -53,30 +54,28 @@ void errands_new_list_dialog_show() {
 // ---------- CALLBACKS ---------- //
 
 static void on_response_cb(ErrandsNewListDialog *self, gchar *response, gpointer data) {
-  if (STR_EQUAL(response, "create")) {
+  if (g_str_equal(response, "create")) {
     g_autofree gchar *uid = g_uuid_string_random();
-    ListData *list = errands_list_data_create(uid, gtk_editable_get_text(GTK_EDITABLE(self->entry)), NULL,
-                                              generate_hex_as_str(), false, false);
-    g_message("New List Dialog: Create new list: '%s'", errands_data_get_uid(list->ical));
-    errands_list_data_save(list);
-    g_ptr_array_add(errands_data_lists, list);
-    ErrandsTaskListItem *list_item = errands_task_list_item_new(list);
-    g_list_store_append(state.main_window->sidebar->task_lists_model, list_item);
+    g_autoptr(ErrandsTaskListItem) item =
+        errands_task_list_item_create(uid, gtk_editable_get_text(GTK_EDITABLE(self->entry)), NULL, false, false);
+    g_message("New List Dialog: Create new list: '%s'", item->uid);
+    g_list_store_append(task_lists_model, item);
+    errands_task_list_item_save(item);
     errands_sidebar_update_filter_rows();
-    errands_sync_create_list(list);
-    errands_settings_set(SETTING_LAST_LIST_UID, (void *)list_item->uid);
+    // errands_sync_create_list(item);
+    errands_settings_set(SETTING_LAST_LIST_UID, (void *)item->uid);
     errands_sidebar_select_last_opened_page();
   }
 }
 
 static void on_entry_changed_cb(ErrandsNewListDialog *self, AdwEntryRow *entry) {
   adw_alert_dialog_set_response_enabled(ADW_ALERT_DIALOG(self), "create",
-                                        !STR_EQUAL("", gtk_editable_get_text(GTK_EDITABLE(entry))));
+                                        !g_str_equal("", gtk_editable_get_text(GTK_EDITABLE(entry))));
 }
 
 static void on_entry_activated_cb(ErrandsNewListDialog *self, AdwEntryRow *entry) {
   const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
-  if (STR_EQUAL(text, "")) return;
+  if (g_str_equal(text, "")) return;
   on_response_cb(self, "create", NULL);
   adw_dialog_close(ADW_DIALOG(self));
 }

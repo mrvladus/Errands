@@ -1,6 +1,5 @@
 #pragma once
 
-#include "new-list-dialog.h"
 #include "task-list-item.h"
 
 #include <adwaita.h>
@@ -16,12 +15,9 @@ struct _ErrandsSidebar {
   GtkLabel *today_counter;
   GtkWidget *sidebar;
   AdwSidebarSection *task_lists_section;
-
-  GListStore *task_lists_model;
 };
 
 ErrandsSidebar *errands_sidebar_new(void);
-void errands_sidebar_load_lists(void);
 void errands_sidebar_update_filter_rows(void);
 void errands_sidebar_select_last_opened_page(void);
 void errands_sidebar_toggle_sync_indicator(bool on);

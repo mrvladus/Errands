@@ -2,15 +2,20 @@
 #include "about-dialog.h"
 #include "data.h"
 #include "gio/gio.h"
+#include "glib-object.h"
+#include "glib.h"
+#include "new-list-dialog.h"
 #include "settings-dialog.h"
 #include "settings.h"
 #include "state.h"
-#include "sync.h"
 #include "task-list-item.h"
 #include "task-list.h"
 #include "utils.h"
 
 #include <glib/gi18n.h>
+#include <libical/ical.h>
+
+static gint sort_func(gconstpointer a, gconstpointer b, gpointer data);
 
 static void on_import_action_cb(GSimpleAction *action, GVariant *param);
 static void on_sidebar_activated_cb(AdwSidebar *self, guint index, gpointer user_data);
@@ -75,45 +80,34 @@ static void errands_sidebar_init(ErrandsSidebar *sidebar) {
   errands_add_action(ag, "new_list", errands_new_list_dialog_show, self, NULL);
   errands_add_action(ag, "preferences", errands_settings_dialog_show, self, NULL);
   errands_add_action(ag, "about", errands_about_dialog_show, self, NULL);
-  errands_add_action(ag, "sync", errands_sync, self, NULL);
+  // errands_add_action(ag, "sync", errands_sync, self, NULL);
 
-  self->task_lists_model = g_list_store_new(ERRANDS_TYPE_TASK_LIST_ITEM);
-  adw_sidebar_section_bind_model(self->task_lists_section, G_LIST_MODEL(self->task_lists_model),
+  adw_sidebar_section_bind_model(self->task_lists_section, G_LIST_MODEL(task_lists_model),
                                  (AdwSidebarSectionCreateItemFunc)create_sidebar_task_list_item_create_func, NULL,
                                  NULL);
+  g_list_store_sort(task_lists_model, sort_func, NULL);
+  errands_sidebar_update_filter_rows();
 }
 
 ErrandsSidebar *errands_sidebar_new() { return g_object_new(ERRANDS_TYPE_SIDEBAR, NULL); }
 
-// ---------- PUBLIC FUNCTIONS ---------- //
+// ---------- PRIVATE ---------- //
 
-static gint __sort_func(gconstpointer a, gconstpointer b) {
-  ListData *ld_a = (ListData *)a;
-  ListData *ld_b = (ListData *)b;
-  g_autofree gchar *folded1 = g_utf8_casefold(errands_data_get_list_name(ld_a->ical), -1);
-  g_autofree gchar *folded2 = g_utf8_casefold(errands_data_get_list_name(ld_b->ical), -1);
+static gint sort_func(gconstpointer a, gconstpointer b, gpointer data) {
+  ErrandsTaskListItem *item_a = (ErrandsTaskListItem *)a;
+  ErrandsTaskListItem *item_b = (ErrandsTaskListItem *)b;
+  g_autofree gchar *folded1 = g_utf8_casefold(item_a->title, -1);
+  g_autofree gchar *folded2 = g_utf8_casefold(item_b->title, -1);
   return g_utf8_collate(folded1, folded2);
 }
 
-void errands_sidebar_load_lists(void) {
-  g_ptr_array_sort_values(errands_data_lists, __sort_func);
-  // Add rows
-  for (size_t i = 0; i < errands_data_lists->len; i++) {
-    ListData *ld = errands_data_lists->pdata[i];
-    if (!errands_data_get_deleted(ld->ical)) {
-      ErrandsTaskListItem *list_item = errands_task_list_item_new(ld);
-      g_list_store_append(self->task_lists_model, list_item);
-    }
-  }
-  errands_sidebar_update_filter_rows();
-  errands_sidebar_select_last_opened_page();
-}
+// ---------- PUBLIC ---------- //
 
 ErrandsTaskListItem *errands_sidebar_find_list(const char *uid) {
   if (!uid) return NULL;
-  GListModel *model = G_LIST_MODEL(self->task_lists_model);
+  GListModel *model = G_LIST_MODEL(task_lists_model);
   for (size_t i = 0; i < g_list_model_get_n_items(model); i++) {
-    ErrandsTaskListItem *item = g_list_model_get_item(model, i);
+    g_autoptr(ErrandsTaskListItem) item = g_list_model_get_item(model, i);
     if (g_str_equal(uid, item->uid)) return item;
   }
   return NULL;
@@ -122,9 +116,9 @@ ErrandsTaskListItem *errands_sidebar_find_list(const char *uid) {
 void errands_sidebar_select_last_opened_page(void) {
   const char *last_uid = errands_settings_get(SETTING_LAST_LIST_UID).s;
   int idx = -1;
-  GListModel *model = G_LIST_MODEL(self->task_lists_model);
+  GListModel *model = G_LIST_MODEL(task_lists_model);
   for (size_t i = 0; i < g_list_model_get_n_items(model); i++) {
-    ErrandsTaskListItem *item = g_list_model_get_item(model, i);
+    g_autoptr(ErrandsTaskListItem) item = g_list_model_get_item(model, i);
     if (item->uid && g_str_equal(last_uid, item->uid)) {
       idx = i;
       break;
@@ -136,29 +130,30 @@ void errands_sidebar_select_last_opened_page(void) {
 }
 
 void errands_sidebar_update_filter_rows(void) {
-  size_t total = 0, completed = 0, today = 0, today_completed = 0, n_lists = 0;
-  for_range(l, 0, errands_data_lists->len) {
-    ListData *list = g_ptr_array_index(errands_data_lists, l);
-    CONTINUE_IF(errands_data_get_deleted(list->ical));
-    n_lists++;
-    g_autoptr(GPtrArray) tasks = errands_list_data_get_all_tasks_as_icalcomponents(list);
-    for_range(t, 0, tasks->len) {
-      icalcomponent *ical = g_ptr_array_index(tasks, t);
-      CONTINUE_IF(errands_data_get_deleted(ical) || errands_data_get_cancelled(ical));
-      bool is_completed = !icaltime_is_null_date(errands_data_get_completed(ical));
-      bool is_due = errands_data_is_due(ical);
+  bool show_completed = errands_settings_get(SETTING_SHOW_COMPLETED).b;
+  bool show_cancelled = errands_settings_get(SETTING_SHOW_CANCELLED).b;
+  GListModel *model = G_LIST_MODEL(task_lists_model);
+  int total = 0, completed = 0, today = 0, today_completed = 0, n_lists = g_list_model_get_n_items(model);
+  for_range(i, 0, n_lists) {
+    g_autoptr(ErrandsTaskListItem) item = g_list_model_get_item(model, i);
+    CONTINUE_IF(errands_data_get_deleted(item->ical));
+    for_vtodo_in_vcalendar(c, item->ical) {
+      CONTINUE_IF(errands_data_get_deleted(c));
+      bool is_completed = errands_data_is_completed(c);
+      CONTINUE_IF(!show_completed && is_completed);
+      bool is_cancelled = errands_data_get_cancelled(c);
+      CONTINUE_IF(!show_cancelled && is_cancelled);
       if (is_completed) completed++;
-      if (is_due) {
+      if (errands_data_is_due(c)) {
         today++;
         if (is_completed) today_completed++;
       }
       total++;
     }
   }
-  const char *all_label = total - completed > 0 ? tmp_str_printf("%zu", total - completed) : "";
-  const char *today_label = today - today_completed > 0 ? tmp_str_printf("%zu", today - today_completed) : "";
-  gtk_label_set_label(self->all_counter, all_label);
-  gtk_label_set_label(self->today_counter, today_label);
+  gtk_label_set_label(self->all_counter, total - completed > 0 ? tmp_str_printf("%d", total - completed) : "");
+  gtk_label_set_label(self->today_counter,
+                      today - today_completed > 0 ? tmp_str_printf("%d", today - today_completed) : "");
   gtk_widget_set_visible(self->sidebar, n_lists > 0);
 }
 
@@ -170,12 +165,12 @@ void errands_sidebar_task_list_update_counter(const char *uid) {
 
 void errands_sidebar_delete_list(const char *uid) {
   g_message("Sidebar: Deleting list %s", uid);
-  GListModel *model = G_LIST_MODEL(self->task_lists_model);
+  GListModel *model = G_LIST_MODEL(task_lists_model);
   for_range(i, 0, g_list_model_get_n_items(model)) {
     g_autoptr(ErrandsTaskListItem) item = g_list_model_get_item(model, i);
     if (item->uid && g_str_equal(uid, item->uid)) {
       errands_task_list_item_delete(item);
-      g_list_store_remove(self->task_lists_model, i);
+      g_list_store_remove(task_lists_model, i);
       break;
     }
   }
@@ -193,7 +188,7 @@ static void on_sidebar_activated_cb(AdwSidebar *self, guint index, gpointer user
     g_assert(item);
     ErrandsTaskListItem *tl_item = g_object_get_data(G_OBJECT(item), "item");
     errands_settings_set(SETTING_LAST_LIST_UID, (void *)tl_item->uid);
-    errands_task_list_show_task_list(task_list, tl_item->data);
+    errands_task_list_show_task_list(task_list, tl_item);
   }
   adw_navigation_split_view_set_show_content(state.main_window->split_view, true);
 }
@@ -202,28 +197,12 @@ static void __on_open_finish(GObject *obj, GAsyncResult *res) {
   g_autoptr(GFile) file = gtk_file_dialog_open_finish(GTK_FILE_DIALOG(obj), res, NULL);
   if (!file) return;
   g_autofree gchar *path = g_file_get_path(file);
-  autofree char *ical = read_file_to_string(path);
-  if (!ical) return;
-  char *uid = (char *)path_base_name(path);
-  *(strrchr(uid, '.')) = '\0';
-  // Check if uid exists
-  for_range(i, 0, errands_data_lists->len) {
-    ListData *data = g_ptr_array_index(errands_data_lists, i);
-    if (g_str_equal(uid, errands_data_get_uid(data->ical))) {
-      errands_window_add_toast(_("List already exists"), 2);
-      return;
-    }
-  }
-  icalcomponent *ical_comp = icalparser_parse_string(ical);
-  if (!ical_comp) return;
-  ListData *data = errands_list_data_load_from_ical(ical_comp, uid, NULL, NULL);
-  errands_list_data_save(data);
-  g_ptr_array_add(errands_data_lists, data);
-  ErrandsTaskListItem *list_item = errands_task_list_item_new(data);
-  g_list_store_append(self->task_lists_model, list_item);
-  errands_sync_create_list(data);
+  ErrandsTaskListItem *item = errands_task_list_item_load_from_ics(path);
+  if (!item) return;
+  errands_task_list_item_save(item);
+  // errands_sync_create_list(data);
   errands_sidebar_update_filter_rows();
-  errands_settings_set(SETTING_LAST_LIST_UID, (void *)uid);
+  errands_settings_set(SETTING_LAST_LIST_UID, (void *)item->uid);
   errands_sidebar_select_last_opened_page();
 }
 

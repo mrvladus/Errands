@@ -1,9 +1,5 @@
 #include "notifications.h"
-#include "data.h"
-#include "settings.h"
 #include "state.h"
-
-#include "vendor/toolbox.h"
 
 #include <glib/gi18n.h>
 
@@ -23,44 +19,44 @@ static void send_due(const char *text) {
 }
 
 static bool notify_cb() {
-  if (!sending || !errands_settings_get(SETTING_NOTIFICATIONS).b) return false;
-  size_t sended = 0;
-  for (int i = queue->len - 1; i >= 0; i--) {
-    TaskData *data = g_ptr_array_index(queue, i);
-    if (errands_data_is_due(data->ical)) {
-      g_ptr_array_remove_index(queue, i);
-      errands_data_set_notified(data->ical, true);
-      if (!g_ptr_array_find(save_lists, data->list, NULL)) g_ptr_array_add(save_lists, data->list);
-      send_due(errands_data_get_text(data->ical));
-      sended++;
-    }
-  }
-  // Save lists
-  for_range(i, 0, save_lists->len) errands_list_data_save(g_ptr_array_index(save_lists, i));
-  g_ptr_array_set_size(save_lists, 0);
-  if (sended > 0) g_message("Notifications: Sent %zu notifications", sended);
+  // if (!sending || !errands_settings_get(SETTING_NOTIFICATIONS).b) return false;
+  // size_t sended = 0;
+  // for (int i = queue->len - 1; i >= 0; i--) {
+  //   TaskData *data = g_ptr_array_index(queue, i);
+  //   if (errands_data_is_due(data->ical)) {
+  //     g_ptr_array_remove_index(queue, i);
+  //     errands_data_set_notified(data->ical, true);
+  //     if (!g_ptr_array_find(save_lists, data->list, NULL)) g_ptr_array_add(save_lists, data->list);
+  //     send_due(errands_data_get_text(data->ical));
+  //     sended++;
+  //   }
+  // }
+  // // Save lists
+  // for_range(i, 0, save_lists->len) errands_list_data_save(g_ptr_array_index(save_lists, i));
+  // g_ptr_array_set_size(save_lists, 0);
+  // if (sended > 0) g_message("Notifications: Sent %zu notifications", sended);
   return true;
 }
 
 // Initialize notifications system
 void errands_notifications_init(void) {
-  if (initialized) return;
-  if (!errands_settings_get(SETTING_NOTIFICATIONS).b) return;
-  g_message("Notifications: Initialize");
-  TIMER_START;
-  queue = g_ptr_array_new();
-  save_lists = g_ptr_array_new();
-  // Add all due tasks which are not notified yet to the queue
-  g_autoptr(GPtrArray) tasks = g_ptr_array_new();
-  errands_data_get_flat_list(tasks);
-  for_range(i, 0, tasks->len) {
-    TaskData *data = g_ptr_array_index(tasks, i);
-    bool has_due_date = !icaltime_is_null_time(errands_data_get_due(data->ical));
-    if (has_due_date && !errands_data_get_notified(data->ical)) errands_notifications_add(data);
-  }
-  initialized = true;
-  if (queue->len == 0) return;
-  g_message("Notifications: Added %d tasks to the notifications queue (%f sec.)", queue->len, TIMER_ELAPSED_MS);
+  // if (initialized) return;
+  // if (!errands_settings_get(SETTING_NOTIFICATIONS).b) return;
+  // g_message("Notifications: Initialize");
+  // TIMER_START;
+  // queue = g_ptr_array_new();
+  // save_lists = g_ptr_array_new();
+  // // Add all due tasks which are not notified yet to the queue
+  // g_autoptr(GPtrArray) tasks = g_ptr_array_new();
+  // errands_data_get_flat_list(tasks);
+  // for_range(i, 0, tasks->len) {
+  //   TaskData *data = g_ptr_array_index(tasks, i);
+  //   bool has_due_date = !icaltime_is_null_time(errands_data_get_due(data->ical));
+  //   if (has_due_date && !errands_data_get_notified(data->ical)) errands_notifications_add(data);
+  // }
+  // initialized = true;
+  // if (queue->len == 0) return;
+  // g_message("Notifications: Added %d tasks to the notifications queue (%f sec.)", queue->len, TIMER_ELAPSED_MS);
 }
 
 // Start sending notification
@@ -79,17 +75,17 @@ void errands_notifications_stop(void) {
 }
 
 // Add a task to notifications queue
-void errands_notifications_add(TaskData *data) {
-  if (!data || g_ptr_array_find(queue, data, NULL)) return;
-  g_ptr_array_add(queue, data);
-  g_message("Notifications: Added task '%s' to the notifications queue", errands_data_get_uid(data->ical));
+void errands_notifications_add(ErrandsTaskItem *item) {
+  if (!item || g_ptr_array_find(queue, item, NULL)) return;
+  g_ptr_array_add(queue, item);
+  g_message("Notifications: Added task '%s' to the notifications queue", errands_task_item_get_uid(item));
 }
 
 // Cleanup notifications system
 void errands_notifications_cleanup(void) {
-  g_message("Notifications: Cleanup");
-  g_ptr_array_free(queue, true);
-  g_ptr_array_free(save_lists, true);
-  queue = NULL;
-  save_lists = NULL;
+  // g_message("Notifications: Cleanup");
+  // g_ptr_array_free(queue, true);
+  // g_ptr_array_free(save_lists, true);
+  // queue = NULL;
+  // save_lists = NULL;
 }

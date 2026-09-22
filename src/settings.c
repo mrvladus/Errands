@@ -184,6 +184,10 @@ void errands_settings_set(ErrandsSettingsKey key, void *value) {
   case SETTING_TAGS: SETTING_SET_STR; break;
   }
   errands__settings_save();
+
+#undef SETTING_SET_STR
+#undef SETTING_SET_INT
+#undef SETTING_SET_BOOL
 }
 
 // --- TAGS --- //
