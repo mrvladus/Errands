@@ -134,7 +134,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     errands_sidebar_update_filter_rows();
     errands_sidebar_task_list_update_counter(errands_data_get_uid(self->ical));
     errands_task_list_sort(state.main_window->task_list, GTK_SORTER_CHANGE_MORE_STRICT);
-    errands_task_list_filter_tree(state.main_window->task_list, GTK_FILTER_CHANGE_MORE_STRICT);
+    errands_task_list_filter(state.main_window->task_list, GTK_FILTER_CHANGE_MORE_STRICT);
   } break;
   case PROP_CANCELLED: {
     gboolean old = self->cancelled;
@@ -157,7 +157,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     errands_sidebar_update_filter_rows();
     errands_sidebar_task_list_update_counter(errands_data_get_uid(self->ical));
     errands_task_list_sort(state.main_window->task_list, GTK_SORTER_CHANGE_MORE_STRICT);
-    errands_task_list_filter_tree(state.main_window->task_list, GTK_FILTER_CHANGE_MORE_STRICT);
+    errands_task_list_filter(state.main_window->task_list, GTK_FILTER_CHANGE_MORE_STRICT);
   } break;
   case PROP_COLOR: {
     const char *new_color = g_value_get_string(value);
@@ -449,6 +449,7 @@ ErrandsTaskListItem *errands_task_item_create_task(ErrandsTaskItem *parent, cons
   g_autofree gchar *uid = g_uuid_string_random();
   errands_data_set_uid(ical, uid);
   errands_data_set_created(ical, icaltime_get_date_time_now());
+  errands_data_set_parent(ical, errands_data_get_uid(parent->ical));
   icalcomponent_add_component(parent->list->ical, ical);
   ErrandsTaskItem *task = errands_task_item_new(ical, parent->list, parent);
   g_list_store_append(parent->children_model, task);

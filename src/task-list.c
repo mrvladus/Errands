@@ -45,7 +45,8 @@ static void on_action_sort_order_cb(GSimpleAction *action, GVariant *param, Erra
 static void on_action_sort_by_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
 
 static bool today_filter_func(ErrandsTaskItem *item, ErrandsTaskList *self);
-static bool __tree_filter_func(GtkTreeListRow *row, ErrandsTaskList *self);
+static bool toplevel_filter_func(ErrandsTaskItem *item, ErrandsTaskList *self);
+static bool tree_filter_func(GtkTreeListRow *row, ErrandsTaskList *self);
 static int __sort_func(ErrandsTaskItem *a, ErrandsTaskItem *b, ErrandsTaskList *self);
 static bool task_today_parent_match_func(ErrandsTaskItem *item);
 // static bool __task_today_child_match_func(TaskData *data);
@@ -130,38 +131,38 @@ static void errands_task_list_init(ErrandsTaskList *self) {
     g_list_store_append(self->toplevel_tasks_models, item->tasks);
   }
   self->all_tasks_model = gtk_flatten_list_model_new(G_LIST_MODEL(self->toplevel_tasks_models));
-  GtkFilter *today_filter = GTK_FILTER(gtk_custom_filter_new((GtkCustomFilterFunc)today_filter_func, self, NULL));
-  self->today_tasks_model = gtk_filter_list_model_new(G_LIST_MODEL(self->all_tasks_model), today_filter);
-
-  self->current_model = gtk_filter_list_model_new(NULL, NULL);
-
   self->tree_model =
-      gtk_tree_list_model_new(G_LIST_MODEL(self->current_model), false, true, task_children_func, NULL, NULL);
+      gtk_tree_list_model_new(G_LIST_MODEL(self->all_tasks_model), false, true, task_children_func, NULL, NULL);
   self->tree_sorter =
       gtk_tree_list_row_sorter_new(GTK_SORTER(gtk_custom_sorter_new((GCompareDataFunc)__sort_func, self, NULL)));
   GtkSortListModel *sort_model = gtk_sort_list_model_new(G_LIST_MODEL(self->tree_model), GTK_SORTER(self->tree_sorter));
-  self->tree_filter = GTK_FILTER(gtk_custom_filter_new((GtkCustomFilterFunc)__tree_filter_func, self, NULL));
-  self->tree_filter_model = gtk_filter_list_model_new(G_LIST_MODEL(sort_model), self->tree_filter);
+  self->tree_filter = GTK_FILTER(gtk_custom_filter_new((GtkCustomFilterFunc)tree_filter_func, self, NULL));
+  GtkFilterListModel *filter_model = gtk_filter_list_model_new(G_LIST_MODEL(sort_model), self->tree_filter);
 
   gtk_list_view_set_model(GTK_LIST_VIEW(self->list_view),
-                          GTK_SELECTION_MODEL(gtk_no_selection_new(G_LIST_MODEL(self->tree_filter_model))));
+                          GTK_SELECTION_MODEL(gtk_no_selection_new(G_LIST_MODEL(filter_model))));
 }
 
 ErrandsTaskList *errands_task_list_new() { return g_object_new(ERRANDS_TYPE_TASK_LIST, NULL); }
 
 // ---------- PRIVATE FUNCTIONS ---------- //
 
-static bool today_filter_func(ErrandsTaskItem *item, ErrandsTaskList *self) {
-  bool match_parent = task_today_parent_match_func(item);
-  bool is_due = errands_task_item_is_due(item);
-  return (is_due || match_parent);
-}
-
-static bool __tree_filter_func(GtkTreeListRow *row, ErrandsTaskList *self) {
-  ErrandsTaskItem *item = gtk_tree_list_row_get_item(row);
+static bool tree_filter_func(GtkTreeListRow *row, ErrandsTaskList *self) {
+  g_autoptr(ErrandsTaskItem) item = gtk_tree_list_row_get_item(row);
   if (!errands_settings_get(SETTING_SHOW_COMPLETED).b && errands_task_item_get_completed(item)) return false;
   if (!errands_settings_get(SETTING_SHOW_CANCELLED).b && errands_task_item_get_cancelled(item)) return false;
-  return true;
+  bool result = false;
+  switch (self->page) {
+  case ERRANDS_TASK_LIST_PAGE_ALL: result = true; break;
+  case ERRANDS_TASK_LIST_PAGE_TODAY:
+    result = (errands_task_item_is_due(item) || task_today_parent_match_func(item));
+    break;
+  case ERRANDS_TASK_LIST_PAGE_TASK_LIST: {
+    result = self->item == errands_task_item_get_list(item);
+    break;
+  }
+  }
+  return result;
 }
 
 static int __sort_func(ErrandsTaskItem *a, ErrandsTaskItem *b, ErrandsTaskList *self) {
@@ -381,7 +382,7 @@ static void on_action_delete_completed_cb(GSimpleAction *action, GVariant *param
     return;
   }
   errands_task_list_item_remove_deleted_tasks(self->item);
-  errands_task_list_filter_tree(self, GTK_FILTER_CHANGE_DIFFERENT);
+  errands_task_list_filter(self, GTK_FILTER_CHANGE_DIFFERENT);
   errands_window_add_toast(tmp_str_printf(_("Deleted %zu tasks"), deleted_n), 2);
 }
 
@@ -393,7 +394,7 @@ static void on_action_delete_cancelled_cb(GSimpleAction *action, GVariant *param
     return;
   }
   errands_task_list_item_remove_deleted_tasks(self->item);
-  errands_task_list_filter_tree(self, GTK_FILTER_CHANGE_DIFFERENT);
+  errands_task_list_filter(self, GTK_FILTER_CHANGE_DIFFERENT);
   errands_window_add_toast(tmp_str_printf(_("Deleted %zu tasks"), deleted_n), 2);
 }
 
@@ -405,7 +406,7 @@ static void on_action_show_completed_cb(GSimpleAction *action, GVariant *param, 
   gboolean state = g_variant_get_boolean(param);
   g_simple_action_set_state(action, param);
   errands_settings_set(SETTING_SHOW_COMPLETED, &state);
-  errands_task_list_filter_tree(self, GTK_FILTER_CHANGE_DIFFERENT);
+  errands_task_list_filter(self, GTK_FILTER_CHANGE_DIFFERENT);
   TODO("call errands_task_item_update() on every task list item to show/hide expander");
 }
 
@@ -413,7 +414,7 @@ static void on_action_show_cancelled_cb(GSimpleAction *action, GVariant *param, 
   gboolean state = g_variant_get_boolean(param);
   g_simple_action_set_state(action, param);
   errands_settings_set(SETTING_SHOW_CANCELLED, &state);
-  errands_task_list_filter_tree(self, state ? GTK_FILTER_CHANGE_LESS_STRICT : GTK_FILTER_CHANGE_MORE_STRICT);
+  errands_task_list_filter(self, state ? GTK_FILTER_CHANGE_LESS_STRICT : GTK_FILTER_CHANGE_MORE_STRICT);
   TODO("call errands_task_item_update() on every task list item to show/hide expander");
 }
 
@@ -540,27 +541,27 @@ void errands_task_list_update(ErrandsTaskList *self) {
   } break;
   case ERRANDS_TASK_LIST_PAGE_TODAY: {
     adw_window_title_set_title(ADW_WINDOW_TITLE(self->title), _("Tasks for Today"));
-    guint total = 0;
-    GListModel *model = G_LIST_MODEL(self->today_tasks_model);
-    for_range(i, 0, g_list_model_get_n_items(model)) {
-      g_autoptr(ErrandsTaskItem) item = g_list_model_get_item(model, i);
-      if (errands_task_item_get_completed(item) && !show_completed) continue;
-      if (errands_task_item_get_cancelled(item) && !show_cancelled) continue;
-      if (errands_task_item_is_due(item)) total++;
-    }
-    gtk_widget_set_visible(self->scrl, total > 0);
+    // guint total = 0;
+    // GListModel *model = G_LIST_MODEL(self->today_tasks_model);
+    // for_range(i, 0, g_list_model_get_n_items(model)) {
+    //   g_autoptr(ErrandsTaskItem) item = g_list_model_get_item(model, i);
+    //   if (errands_task_item_get_completed(item) && !show_completed) continue;
+    //   if (errands_task_item_get_cancelled(item) && !show_cancelled) continue;
+    //   if (errands_task_item_is_due(item)) total++;
+    // }
+    // gtk_widget_set_visible(self->scrl, total > 0);
   } break;
   case ERRANDS_TASK_LIST_PAGE_TASK_LIST: {
     adw_window_title_set_title(ADW_WINDOW_TITLE(self->title), self->item->title);
-    guint total = 0;
-    GListModel *model = G_LIST_MODEL(self->current_model);
-    for_range(i, 0, g_list_model_get_n_items(model)) {
-      g_autoptr(ErrandsTaskItem) item = g_list_model_get_item(model, i);
-      if (errands_task_item_get_completed(item) && !show_completed) continue;
-      if (errands_task_item_get_cancelled(item) && !show_cancelled) continue;
-      total++;
-    }
-    gtk_widget_set_visible(self->scrl, total > 0);
+    // guint total = 0;
+    // GListModel *model = G_LIST_MODEL(self->current_model);
+    // for_range(i, 0, g_list_model_get_n_items(model)) {
+    //   g_autoptr(ErrandsTaskItem) item = g_list_model_get_item(model, i);
+    //   if (errands_task_item_get_completed(item) && !show_completed) continue;
+    //   if (errands_task_item_get_cancelled(item) && !show_cancelled) continue;
+    //   total++;
+    // }
+    // gtk_widget_set_visible(self->scrl, total > 0);
   } break;
   }
 }
@@ -589,7 +590,7 @@ void errands_task_list_show_today_tasks(ErrandsTaskList *self) {
   self->page = ERRANDS_TASK_LIST_PAGE_TODAY;
   gtk_widget_set_visible(self->entry_box, false);
   gtk_widget_set_visible(self->menu_btn, false);
-  gtk_filter_list_model_set_model(self->current_model, G_LIST_MODEL(self->today_tasks_model));
+  errands_task_list_filter(self, GTK_FILTER_CHANGE_DIFFERENT);
   errands_task_list_update(self);
   __expand_all_visible_rows(self);
 }
@@ -600,9 +601,29 @@ void errands_task_list_show_all_tasks(ErrandsTaskList *self) {
   self->page = ERRANDS_TASK_LIST_PAGE_ALL;
   gtk_widget_set_visible(self->entry_box, false);
   gtk_widget_set_visible(self->menu_btn, false);
-  gtk_filter_list_model_set_model(self->current_model, G_LIST_MODEL(self->all_tasks_model));
+  errands_task_list_filter(self, GTK_FILTER_CHANGE_LESS_STRICT);
   errands_task_list_update(self);
 }
+
+// void errands_task_list_show_task_list(ErrandsTaskList *self, ErrandsTaskListItem *item) {
+//   if (item == self->item) return;
+
+//   gint64 t0 = g_get_monotonic_time();
+
+//   self->item = item;
+//   self->page = ERRANDS_TASK_LIST_PAGE_TASK_LIST;
+//   gtk_widget_set_visible(self->entry_box, true);
+//   gtk_widget_set_visible(self->menu_btn, true);
+
+//   gint64 t1 = g_get_monotonic_time();
+//   errands_task_list_filter(self, GTK_FILTER_CHANGE_DIFFERENT);
+//   gint64 t2 = g_get_monotonic_time();
+//   errands_task_list_update(self);
+
+//   gint64 t3 = g_get_monotonic_time();
+//   g_message("switch: setup=%.2fms filter=%.2fms update=%.2fms", (t1 - t0) / 1000.0, (t2 - t1) / 1000.0,
+//             (t3 - t2) / 1000.0);
+// }
 
 void errands_task_list_show_task_list(ErrandsTaskList *self, ErrandsTaskListItem *item) {
   if (item == self->item) return;
@@ -610,7 +631,7 @@ void errands_task_list_show_task_list(ErrandsTaskList *self, ErrandsTaskListItem
   self->page = ERRANDS_TASK_LIST_PAGE_TASK_LIST;
   gtk_widget_set_visible(self->entry_box, true);
   gtk_widget_set_visible(self->menu_btn, true);
-  gtk_filter_list_model_set_model(self->current_model, G_LIST_MODEL(item->tasks));
+  gtk_filter_changed(self->tree_filter, GTK_FILTER_CHANGE_DIFFERENT);
   errands_task_list_update(self);
   g_message("Task List: Show task list %s", item->uid);
 }
@@ -619,7 +640,7 @@ void errands_task_list_sort(ErrandsTaskList *self, GtkSorterChange change) {
   gtk_sorter_changed(GTK_SORTER(self->tree_sorter), change);
 }
 
-void errands_task_list_filter_tree(ErrandsTaskList *self, GtkFilterChange change) {
+void errands_task_list_filter(ErrandsTaskList *self, GtkFilterChange change) {
   g_idle_add_once((GSourceOnceFunc)__filter_cb, __filter_cb_data_new(self->tree_filter, change));
 }
 
