@@ -131,8 +131,9 @@ static void errands_task_list_init(ErrandsTaskList *self) {
     g_list_store_append(self->toplevel_tasks_models, item->tasks);
   }
   self->all_tasks_model = gtk_flatten_list_model_new(G_LIST_MODEL(self->toplevel_tasks_models));
+  self->current_model = gtk_filter_list_model_new(NULL, NULL);
   self->tree_model =
-      gtk_tree_list_model_new(G_LIST_MODEL(self->all_tasks_model), false, true, task_children_func, NULL, NULL);
+      gtk_tree_list_model_new(G_LIST_MODEL(self->current_model), false, true, task_children_func, NULL, NULL);
   self->tree_sorter =
       gtk_tree_list_row_sorter_new(GTK_SORTER(gtk_custom_sorter_new((GCompareDataFunc)__sort_func, self, NULL)));
   GtkSortListModel *sort_model = gtk_sort_list_model_new(G_LIST_MODEL(self->tree_model), GTK_SORTER(self->tree_sorter));
@@ -153,14 +154,14 @@ static bool tree_filter_func(GtkTreeListRow *row, ErrandsTaskList *self) {
   if (!errands_settings_get(SETTING_SHOW_CANCELLED).b && errands_task_item_get_cancelled(item)) return false;
   bool result = false;
   switch (self->page) {
-  case ERRANDS_TASK_LIST_PAGE_ALL: result = true; break;
-  case ERRANDS_TASK_LIST_PAGE_TODAY:
-    result = (errands_task_item_is_due(item) || task_today_parent_match_func(item));
-    break;
   case ERRANDS_TASK_LIST_PAGE_TASK_LIST: {
     result = self->item == errands_task_item_get_list(item);
     break;
   }
+  case ERRANDS_TASK_LIST_PAGE_ALL: result = true; break;
+  case ERRANDS_TASK_LIST_PAGE_TODAY:
+    result = (errands_task_item_is_due(item) || task_today_parent_match_func(item));
+    break;
   }
   return result;
 }
@@ -323,22 +324,6 @@ static void on_unbind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_
   ErrandsTask *task = ERRANDS_TASK(gtk_tree_expander_get_child(expander));
   g_object_set(task->item, "task-widget", NULL, NULL);
 }
-
-// static void on_header_setup_item_cb(GtkSignalListItemFactory *self, GtkListHeader *header) {
-//   GtkWidget *label = gtk_label_new(NULL);
-//   gtk_widget_add_css_class(label, "heading");
-//   gtk_widget_set_halign(label, GTK_ALIGN_START);
-
-//   gtk_list_header_set_child(header, label);
-// }
-
-// static void on_header_bind_item_cb(GtkSignalListItemFactory *self, GtkListHeader *header) {
-//   GtkTreeListRow *row = gtk_list_header_get_item(header);
-//   g_autoptr(ErrandsTaskItem) item = gtk_tree_list_row_get_item(row);
-//   guint start = gtk_list_header_get_start(header);
-//   GtkWidget *header_child = gtk_list_header_get_child(header);
-//   gtk_label_set_text(GTK_LABEL(header_child), errands_task_item_get_list(item)->title);
-// }
 
 // ---------- ACTIONS ---------- //
 
@@ -601,29 +586,9 @@ void errands_task_list_show_all_tasks(ErrandsTaskList *self) {
   self->page = ERRANDS_TASK_LIST_PAGE_ALL;
   gtk_widget_set_visible(self->entry_box, false);
   gtk_widget_set_visible(self->menu_btn, false);
-  errands_task_list_filter(self, GTK_FILTER_CHANGE_LESS_STRICT);
+  gtk_filter_list_model_set_model(self->current_model, G_LIST_MODEL(self->all_tasks_model));
   errands_task_list_update(self);
 }
-
-// void errands_task_list_show_task_list(ErrandsTaskList *self, ErrandsTaskListItem *item) {
-//   if (item == self->item) return;
-
-//   gint64 t0 = g_get_monotonic_time();
-
-//   self->item = item;
-//   self->page = ERRANDS_TASK_LIST_PAGE_TASK_LIST;
-//   gtk_widget_set_visible(self->entry_box, true);
-//   gtk_widget_set_visible(self->menu_btn, true);
-
-//   gint64 t1 = g_get_monotonic_time();
-//   errands_task_list_filter(self, GTK_FILTER_CHANGE_DIFFERENT);
-//   gint64 t2 = g_get_monotonic_time();
-//   errands_task_list_update(self);
-
-//   gint64 t3 = g_get_monotonic_time();
-//   g_message("switch: setup=%.2fms filter=%.2fms update=%.2fms", (t1 - t0) / 1000.0, (t2 - t1) / 1000.0,
-//             (t3 - t2) / 1000.0);
-// }
 
 void errands_task_list_show_task_list(ErrandsTaskList *self, ErrandsTaskListItem *item) {
   if (item == self->item) return;
@@ -631,7 +596,7 @@ void errands_task_list_show_task_list(ErrandsTaskList *self, ErrandsTaskListItem
   self->page = ERRANDS_TASK_LIST_PAGE_TASK_LIST;
   gtk_widget_set_visible(self->entry_box, true);
   gtk_widget_set_visible(self->menu_btn, true);
-  gtk_filter_changed(self->tree_filter, GTK_FILTER_CHANGE_DIFFERENT);
+  gtk_filter_list_model_set_model(self->current_model, G_LIST_MODEL(item->tasks));
   errands_task_list_update(self);
   g_message("Task List: Show task list %s", item->uid);
 }

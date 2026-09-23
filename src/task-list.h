@@ -45,6 +45,7 @@ struct _ErrandsTaskList {
 
   GListStore *toplevel_tasks_models; // Model of task models
   GtkFlattenListModel *all_tasks_model;
+  GtkFilterListModel *current_model;
   GtkTreeListModel *tree_model;
   GtkTreeListRowSorter *tree_sorter;
   GtkFilter *tree_filter;
