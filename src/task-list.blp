@@ -186,20 +186,16 @@ template $ErrandsTaskList: Adw.Bin {
       ScrolledWindow scrl {
         vexpand: true;
 
-        Box list_view_box {
-          orientation: vertical;
+        ListView list_view {
+          enable-rubberband: false;
 
-          ListView list_view {
-            enable-rubberband: false;
+          factory: SignalListItemFactory {
+            setup => $on_setup_item_cb();
+            bind => $on_bind_item_cb();
+            unbind => $on_unbind_item_cb();
+          };
 
-            factory: SignalListItemFactory {
-              setup => $on_setup_item_cb();
-              bind => $on_bind_item_cb();
-              unbind => $on_unbind_item_cb();
-            };
-
-            activate => $on_listview_activate_cb();
-          }
+          activate => $on_listview_activate_cb();
         }
       }
     };
