@@ -204,11 +204,13 @@ template $ErrandsTaskList: Adw.Bin {
 
     [overlay]
     Adw.StatusPage loading_page {
-      title: _("Loading...");
+      icon-name: "errands-loading-symbolic";
+      title: _("Loading Tasks");
       visible: false;
 
       styles [
         "background",
+        "compact",
       ]
     }
   }
