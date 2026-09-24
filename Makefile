@@ -26,7 +26,7 @@ ifeq ($(DEVEL),TRUE)
 else
 	APP_ID = io.github.mrvladus.List
 	RESOURCE_PATH = /io/github/mrvladus/Errands
-	ALL_CFLAGS = -O3 -flto
+	ALL_CFLAGS = -O3 -flto -DG_DISABLE_CAST_CHECKS -DG_DISABLE_CHECKS -DG_DISABLE_ASSERT -fomit-frame-pointer
 	ALL_LDFLAGS = -O3 -flto
 endif
 
@@ -151,7 +151,7 @@ $(BUILD_DIR)/$(NAME): $(OBJS)
 
 install: $(BUILD_DIR)/$(NAME)
 	# Executable
-	install -Dsm 755 $(BUILD_DIR)/$(NAME) $(DESTDIR)$(bindir)/$(NAME)
+	install -Dm 755 $(BUILD_DIR)/$(NAME) $(DESTDIR)$(bindir)/$(NAME)
 	# Desktop file
 	@cp $(DATA_DIR)/$(NAME).desktop.in $(BUILD_DIR)/$(APP_ID).desktop
 	@sed -i "s/@APP_ID@/$(APP_ID)/g" $(BUILD_DIR)/$(APP_ID).desktop
