@@ -19,8 +19,6 @@
 #include <glib/gi18n.h>
 #include <libical/ical.h>
 
-static const char *search_query = NULL;
-
 static void on_setup_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_item);
 static void on_bind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_item);
 static void on_unbind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_item);
@@ -47,7 +45,6 @@ static void on_action_sort_by_cb(GSimpleAction *action, GVariant *param, Errands
 static bool today_filter_func(ErrandsTaskItem *item, ErrandsTaskList *self);
 static bool tree_filter_func(GtkTreeListRow *row, ErrandsTaskList *self);
 static int sort_func(ErrandsTaskItem *a, ErrandsTaskItem *b, ErrandsTaskList *self);
-static bool task_today_parent_match_func(ErrandsTaskItem *item);
 // static bool __task_today_child_match_func(TaskData *data);
 // static bool __task_or_descendants_match_search_query(TaskData *data, const char *query);
 // static bool __task_ancestor_match_search_query(TaskData *data, const char *query);
@@ -147,7 +144,13 @@ ErrandsTaskList *errands_task_list_new() { return g_object_new(ERRANDS_TYPE_TASK
 // ---------- PRIVATE FUNCTIONS ---------- //
 
 static bool today_filter_func(ErrandsTaskItem *item, ErrandsTaskList *self) {
-  return errands_task_item_is_due(item) || task_today_parent_match_func(item);
+  // Match task
+  if (errands_task_item_is_due(item)) return true;
+  // Match parent tasks
+  for (ErrandsTaskItem *parent = errands_task_item_get_parent(item); parent; parent = errands_task_item_get_parent(parent))
+    if (errands_task_item_is_due(parent)) return true;
+  // Match children tasks
+  return false;
 }
 
 static bool tree_filter_func(GtkTreeListRow *row, ErrandsTaskList *self) {
@@ -201,12 +204,6 @@ static int sort_func(ErrandsTaskItem *a, ErrandsTaskItem *b, ErrandsTaskList *se
   }
   default: return 0;
   }
-}
-
-static bool task_today_parent_match_func(ErrandsTaskItem *item) {
-  for (ErrandsTaskItem *parent = errands_task_item_get_parent(item); parent; parent = errands_task_item_get_parent(parent))
-    if (errands_task_item_is_due(parent)) return true;
-  return false;
 }
 
 // static bool __task_today_child_match_func(TaskData *data) {
@@ -290,7 +287,7 @@ static void on_bind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_it
   GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_list_item_get_child(list_item));
   gtk_tree_expander_set_list_row(expander, row);
   ErrandsTask *task = ERRANDS_TASK(gtk_tree_expander_get_child(expander));
-  ErrandsTaskItem *item = gtk_tree_list_row_get_item(row);
+  g_autoptr(ErrandsTaskItem) item = gtk_tree_list_row_get_item(row);
 
   g_object_set(item, "task-widget", task, NULL);
   g_object_set(task, "item", item, NULL);
@@ -594,21 +591,14 @@ void errands_task_list_filter(ErrandsTaskList *self, GtkFilterChange change) {
 
 // ---------- CALLBACKS ---------- //
 
-// static void on_entry_timeout_cb(GtkWidget *entry) {
-//   gtk_widget_set_sensitive(entry, true);
-//   gtk_widget_grab_focus(entry);
-// }
-
 static void on_task_list_entry_activated_cb(ErrandsTaskList *self) {
   if (!self->item) return;
   // Get text
   const char *text = gtk_editable_get_text(GTK_EDITABLE(self->entry));
   g_autofree gchar *dup = g_strdup(text);
-  char *stripped = g_strstrip(dup);
-
+  g_autofree gchar *stripped = g_strstrip(dup);
   const char *list_uid = self->item->uid;
   if (STR_EQUAL(stripped, "") || STR_EQUAL(list_uid, "")) return;
-
   g_autoptr(ErrandsTaskItem) task = (ErrandsTaskItem *)errands_task_list_item_create_task(self->item, NULL, stripped);
   // Reset text
   g_object_set(self->entry, "text", "", NULL);
@@ -618,8 +608,6 @@ static void on_task_list_entry_activated_cb(ErrandsTaskList *self) {
   g_message("Add task '%s' to task list '%s'", errands_task_item_get_uid(task), list_uid);
   errands_task_list_update(self);
   gtk_list_view_scroll_to(GTK_LIST_VIEW(self->list_view), 0, 0, NULL);
-  // gtk_widget_set_sensitive(self->entry, false);
-  // g_timeout_add_once(1050, (GSourceOnceFunc)on_entry_timeout_cb, self->entry);
 }
 
 static void on_task_list_entry_text_changed_cb(ErrandsTaskList *self) {
@@ -628,10 +616,10 @@ static void on_task_list_entry_text_changed_cb(ErrandsTaskList *self) {
 }
 
 static void on_task_list_search_cb(ErrandsTaskList *self, GtkSearchEntry *entry) {
-  search_query = gtk_editable_get_text(GTK_EDITABLE(entry));
-  g_message("Search query changed to '%s'", search_query);
+  self->search_query = gtk_editable_get_text(GTK_EDITABLE(entry));
+  g_message("Task List: Search '%s'", self->search_query);
   // gtk_filter_changed(self->toplevel_filter, GTK_FILTER_CHANGE_DIFFERENT);
-  if (search_query && *search_query) __expand_all_visible_rows(self);
+  if (self->search_query && *self->search_query) __expand_all_visible_rows(self);
 }
 
 static void on_listview_activate_cb(GtkListView *list_view, guint position) {

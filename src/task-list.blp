@@ -6,7 +6,9 @@ template $ErrandsTaskList: Adw.Bin {
     child: Adw.ToolbarView {
       [top]
       Adw.HeaderBar {
-        title-widget: Adw.WindowTitle title {};
+        title-widget: Adw.WindowTitle title {
+          title: _("Task List");
+        };
 
         [start]
         MenuButton {

@@ -43,6 +43,8 @@ struct _ErrandsTaskList {
   GtkWidget *scrl;
   GtkWidget *list_view;
 
+  const char *search_query;
+
   GListStore *toplevel_tasks_models; // Model of task models
   GtkFlattenListModel *all_tasks_model;
   GtkFilterListModel *today_model;
