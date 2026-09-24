@@ -46,7 +46,7 @@ static void on_action_sort_by_cb(GSimpleAction *action, GVariant *param, Errands
 
 static bool today_filter_func(ErrandsTaskItem *item, ErrandsTaskList *self);
 static bool tree_filter_func(GtkTreeListRow *row, ErrandsTaskList *self);
-static int __sort_func(ErrandsTaskItem *a, ErrandsTaskItem *b, ErrandsTaskList *self);
+static int sort_func(ErrandsTaskItem *a, ErrandsTaskItem *b, ErrandsTaskList *self);
 static bool task_today_parent_match_func(ErrandsTaskItem *item);
 // static bool __task_today_child_match_func(TaskData *data);
 // static bool __task_or_descendants_match_search_query(TaskData *data, const char *query);
@@ -132,12 +132,14 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   self->today_model = gtk_filter_list_model_new(G_LIST_MODEL(self->all_tasks_model), today_filter);
   self->current_model = gtk_filter_list_model_new(NULL, NULL);
   self->tree_model = gtk_tree_list_model_new(G_LIST_MODEL(self->current_model), false, true, task_children_func, NULL, NULL);
-  self->tree_sorter = gtk_tree_list_row_sorter_new(GTK_SORTER(gtk_custom_sorter_new((GCompareDataFunc)__sort_func, self, NULL)));
+  self->tree_sorter = gtk_tree_list_row_sorter_new(GTK_SORTER(gtk_custom_sorter_new((GCompareDataFunc)sort_func, self, NULL)));
   GtkSortListModel *sort_model = gtk_sort_list_model_new(G_LIST_MODEL(self->tree_model), GTK_SORTER(self->tree_sorter));
+  // gtk_sort_list_model_set_incremental(sort_model, true);
   self->tree_filter = GTK_FILTER(gtk_custom_filter_new((GtkCustomFilterFunc)tree_filter_func, self, NULL));
-  GtkFilterListModel *filter_model = gtk_filter_list_model_new(G_LIST_MODEL(sort_model), self->tree_filter);
+  self->tree_filter_model = gtk_filter_list_model_new(G_LIST_MODEL(sort_model), self->tree_filter);
 
-  gtk_list_view_set_model(GTK_LIST_VIEW(self->list_view), GTK_SELECTION_MODEL(gtk_no_selection_new(G_LIST_MODEL(filter_model))));
+  gtk_list_view_set_model(GTK_LIST_VIEW(self->list_view),
+                          GTK_SELECTION_MODEL(gtk_no_selection_new(G_LIST_MODEL(self->tree_filter_model))));
 }
 
 ErrandsTaskList *errands_task_list_new() { return g_object_new(ERRANDS_TYPE_TASK_LIST, NULL); }
@@ -155,7 +157,7 @@ static bool tree_filter_func(GtkTreeListRow *row, ErrandsTaskList *self) {
   return true;
 }
 
-static int __sort_func(ErrandsTaskItem *a, ErrandsTaskItem *b, ErrandsTaskList *self) {
+static int sort_func(ErrandsTaskItem *a, ErrandsTaskItem *b, ErrandsTaskList *self) {
   icalcomponent *td_a = errands_task_item_get_ical(a);
   icalcomponent *td_b = errands_task_item_get_ical(b);
 
@@ -541,6 +543,7 @@ static _ModelSwitchData *model_switch_data_new(ErrandsTaskList *self, GtkFilterL
 static void switch_model_idle_cb(_ModelSwitchData *data) {
   gtk_filter_list_model_set_model(data->filter_model, data->new_source_model);
   gtk_widget_set_visible(data->self->loading_page, false);
+  errands_task_list_update(data->self);
   g_free(data);
 }
 
@@ -550,12 +553,9 @@ void errands_task_list_show_today_tasks(ErrandsTaskList *self) {
   self->page = ERRANDS_TASK_LIST_PAGE_TODAY;
   gtk_widget_set_visible(self->entry_box, false);
   gtk_widget_set_visible(self->menu_btn, false);
-
   _ModelSwitchData *data = model_switch_data_new(self, self->current_model, G_LIST_MODEL(self->today_model));
   gtk_widget_set_visible(self->loading_page, true);
   g_idle_add_once((GSourceOnceFunc)switch_model_idle_cb, data);
-
-  errands_task_list_update(self);
   __expand_all_visible_rows(self);
 }
 
@@ -566,11 +566,8 @@ void errands_task_list_show_all_tasks(ErrandsTaskList *self) {
   gtk_widget_set_visible(self->entry_box, false);
   gtk_widget_set_visible(self->menu_btn, false);
   gtk_widget_set_visible(self->loading_page, true);
-
   _ModelSwitchData *data = model_switch_data_new(self, self->current_model, G_LIST_MODEL(self->all_tasks_model));
   g_idle_add_once((GSourceOnceFunc)switch_model_idle_cb, data);
-
-  errands_task_list_update(self);
   g_message("Task List: Show All Tasks");
 }
 
@@ -581,12 +578,9 @@ void errands_task_list_show_task_list(ErrandsTaskList *self, ErrandsTaskListItem
   self->page = ERRANDS_TASK_LIST_PAGE_TASK_LIST;
   gtk_widget_set_visible(self->entry_box, true);
   gtk_widget_set_visible(self->menu_btn, true);
-  gtk_widget_set_visible(self->loading_page, self->item->count >= 50 || !old_item || old_item->count >= 50);
-
+  gtk_widget_set_visible(self->loading_page, self->item->count >= 100 || !old_item || old_item->count >= 100);
   _ModelSwitchData *data = model_switch_data_new(self, self->current_model, G_LIST_MODEL(item->tasks));
   g_idle_add_once((GSourceOnceFunc)switch_model_idle_cb, data);
-
-  errands_task_list_update(self);
   g_message("Task List: Show task list %s", item->uid);
 }
 

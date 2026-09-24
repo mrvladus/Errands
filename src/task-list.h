@@ -12,8 +12,7 @@ G_DECLARE_FINAL_TYPE(ErrandsTaskListDateDialogRruleRow, errands_task_list_date_d
                      TASK_LIST_DATE_DIALOG_RRULE_ROW, AdwExpanderRow)
 
 ErrandsTaskListDateDialogRruleRow *errands_task_list_date_dialog_rrule_row_new();
-void errands_task_list_date_dialog_rrule_row_get_rrule(ErrandsTaskListDateDialogRruleRow *self,
-                                                       struct icalrecurrencetype *rrule);
+void errands_task_list_date_dialog_rrule_row_get_rrule(ErrandsTaskListDateDialogRruleRow *self, struct icalrecurrencetype *rrule);
 void errands_task_list_date_dialog_rrule_row_set_rrule(ErrandsTaskListDateDialogRruleRow *self,
                                                        const struct icalrecurrencetype *rrule);
 void errands_task_list_date_dialog_rrule_row_reset(ErrandsTaskListDateDialogRruleRow *self);
@@ -51,6 +50,7 @@ struct _ErrandsTaskList {
   GtkTreeListModel *tree_model;
   GtkTreeListRowSorter *tree_sorter;
   GtkFilter *tree_filter;
+  GtkFilterListModel *tree_filter_model;
 
   ErrandsTaskListItem *item;
   ErrandsTaskListPage page;
