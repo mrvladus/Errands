@@ -1,4 +1,4 @@
-ColumnLimit: 120
+ColumnLimit: 135
 AllowShortCaseLabelsOnASingleLine: true
 AllowShortFunctionsOnASingleLine: true
 AllowShortIfStatementsOnASingleLine: AllIfsAndElse
