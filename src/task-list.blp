@@ -2,202 +2,214 @@ using Gtk 4.0;
 using Adw 1;
 
 template $ErrandsTaskList: Adw.Bin {
-  Adw.ToolbarView {
-    [top]
-    Adw.HeaderBar {
-      title-widget: Adw.WindowTitle title {};
+  Overlay {
+    child: Adw.ToolbarView {
+      [top]
+      Adw.HeaderBar {
+        title-widget: Adw.WindowTitle title {};
 
-      [start]
-      MenuButton {
-        icon-name: "errands-sort-symbolic";
+        [start]
+        MenuButton {
+          icon-name: "errands-sort-symbolic";
 
-        menu-model: menu {
-          section {
-            label: _("Show Tasks");
+          menu-model: menu {
+            section {
+              label: _("Show Tasks");
 
-            item {
-              label: _("Completed");
-              action: "task-list.show-completed";
+              item {
+                label: _("Completed");
+                action: "task-list.show-completed";
+              }
+
+              item {
+                label: _("Cancelled");
+                action: "task-list.show-cancelled";
+              }
             }
 
-            item {
-              label: _("Cancelled");
-              action: "task-list.show-cancelled";
-            }
-          }
+            section {
+              label: _("Sort Order");
 
-          section {
-            label: _("Sort Order");
+              item {
+                label: _("Descending");
+                action: "task-list.sort-order";
+                target: "desc";
+              }
 
-            item {
-              label: _("Descending");
-              action: "task-list.sort-order";
-              target: "desc";
-            }
-
-            item {
-              label: _("Ascending");
-              action: "task-list.sort-order";
-              target: "asc";
-            }
-          }
-
-          section {
-            label: _("Sort By");
-
-            item {
-              label: _("Created");
-              action: "task-list.sort-by";
-              target: "created";
+              item {
+                label: _("Ascending");
+                action: "task-list.sort-order";
+                target: "asc";
+              }
             }
 
-            item {
-              label: _("Start Date");
-              action: "task-list.sort-by";
-              target: "start";
+            section {
+              label: _("Sort By");
+
+              item {
+                label: _("Created");
+                action: "task-list.sort-by";
+                target: "created";
+              }
+
+              item {
+                label: _("Start Date");
+                action: "task-list.sort-by";
+                target: "start";
+              }
+
+              item {
+                label: _("Due Date");
+                action: "task-list.sort-by";
+                target: "due";
+              }
+
+              item {
+                label: _("Priority");
+                action: "task-list.sort-by";
+                target: "priority";
+              }
             }
-
-            item {
-              label: _("Due Date");
-              action: "task-list.sort-by";
-              target: "due";
-            }
-
-            item {
-              label: _("Priority");
-              action: "task-list.sort-by";
-              target: "priority";
-            }
-          }
-        };
-      }
-
-      [end]
-      MenuButton menu_btn {
-        icon-name: "errands-more-symbolic";
-        valign: center;
-
-        menu-model: menu {
-          section {
-            item (_("Rename List"), "task-list.rename")
-          }
-
-          section {
-            item (_("Export as \".ics\""), "task-list.export")
-            item (_("Print"), "task-list.print")
-          }
-
-          section {
-            item (_("Delete Completed"), "task-list.delete-completed")
-            item (_("Delete Cancelled"), "task-list.delete-cancelled")
-          }
-
-          section {
-            item (_("Delete List"), "task-list.delete")
-          }
-        };
-      }
-
-      [end]
-      ToggleButton search_btn {
-        icon-name: "errands-search-symbolic";
-        tooltip-text: _("Search (Ctrl+F)");
-
-        ShortcutController {
-          scope: global;
-
-          Shortcut {
-            trigger: "<Control>F";
-            action: "activate";
-          }
+          };
         }
-      }
-    }
 
-    [top]
-    SearchBar search_bar {
-      search-mode-enabled: bind search_btn.active bidirectional;
-      key-capture-widget: search_entry;
+        [end]
+        MenuButton menu_btn {
+          icon-name: "errands-more-symbolic";
+          valign: center;
 
-      SearchEntry search_entry {
-        margin-start: 6;
-        margin-end: 6;
-        hexpand: true;
-        search-changed => $on_task_list_search_cb(template);
-      }
-    }
+          menu-model: menu {
+            section {
+              item (_("Rename List"), "task-list.rename")
+            }
 
-    [bottom]
-    Box entry_box {
-      styles [
-        "toolbar",
-      ]
+            section {
+              item (_("Export as \".ics\""), "task-list.export")
+              item (_("Print"), "task-list.print")
+            }
 
-      Entry entry {
-        placeholder-text: _("Add Task");
-        tooltip-text: _("Add Task (Ctrl+N)");
-        hexpand: true;
-        activate => $on_task_list_entry_activated_cb(template);
-        changed => $on_task_list_entry_text_changed_cb(template);
+            section {
+              item (_("Delete Completed"), "task-list.delete-completed")
+              item (_("Delete Cancelled"), "task-list.delete-cancelled")
+            }
 
-        ShortcutController {
-          scope: global;
+            section {
+              item (_("Delete List"), "task-list.delete")
+            }
+          };
+        }
 
-          Shortcut {
-            trigger: "<Control>N";
-            action: "action(task-list.focus-entry)";
+        [end]
+        ToggleButton search_btn {
+          icon-name: "errands-search-symbolic";
+          tooltip-text: _("Search (Ctrl+F)");
+
+          ShortcutController {
+            scope: global;
+
+            Shortcut {
+              trigger: "<Control>F";
+              action: "activate";
+            }
           }
         }
       }
 
-      Button entry_apply_btn {
-        icon-name: "errands-select-symbolic";
-        valign: center;
-        tooltip-text: _("Add Task (Ctrl+Return)");
-        sensitive: false;
-        clicked => $on_task_list_entry_activated_cb(template);
+      [top]
+      SearchBar search_bar {
+        search-mode-enabled: bind search_btn.active bidirectional;
+        key-capture-widget: search_entry;
 
+        SearchEntry search_entry {
+          margin-start: 6;
+          margin-end: 6;
+          hexpand: true;
+          search-changed => $on_task_list_search_cb(template);
+        }
+      }
+
+      [bottom]
+      Box entry_box {
         styles [
-          "circular",
-          "suggested-action",
+          "toolbar",
         ]
 
-        ShortcutController {
-          scope: global;
+        Entry entry {
+          placeholder-text: _("Add Task");
+          tooltip-text: _("Add Task (Ctrl+N)");
+          hexpand: true;
+          activate => $on_task_list_entry_activated_cb(template);
+          changed => $on_task_list_entry_text_changed_cb(template);
 
-          Shortcut {
-            trigger: "<Control>Return";
-            action: "activate";
+          ShortcutController {
+            scope: global;
+
+            Shortcut {
+              trigger: "<Control>N";
+              action: "action(task-list.focus-entry)";
+            }
+          }
+        }
+
+        Button entry_apply_btn {
+          icon-name: "errands-select-symbolic";
+          valign: center;
+          tooltip-text: _("Add Task (Ctrl+Return)");
+          sensitive: false;
+          clicked => $on_task_list_entry_activated_cb(template);
+
+          styles [
+            "circular",
+            "suggested-action",
+          ]
+
+          ShortcutController {
+            scope: global;
+
+            Shortcut {
+              trigger: "<Control>Return";
+              action: "activate";
+            }
           }
         }
       }
-    }
 
-    content: Box {
-      orientation: vertical;
+      content: Box {
+        orientation: vertical;
 
-      Adw.StatusPage {
-        title: _("No Tasks");
-        icon-name: "errands-select-symbolic";
-        vexpand: true;
-        visible: bind scrl.visible inverted;
-      }
-
-      ScrolledWindow scrl {
-        vexpand: true;
-
-        ListView list_view {
-          enable-rubberband: false;
-
-          factory: SignalListItemFactory {
-            setup => $on_setup_item_cb();
-            bind => $on_bind_item_cb();
-            unbind => $on_unbind_item_cb();
-          };
-
-          activate => $on_listview_activate_cb();
+        Adw.StatusPage {
+          title: _("No Tasks");
+          icon-name: "errands-select-symbolic";
+          vexpand: true;
+          visible: bind scrl.visible inverted;
         }
-      }
+
+        ScrolledWindow scrl {
+          vexpand: true;
+
+          ListView list_view {
+            enable-rubberband: false;
+
+            factory: SignalListItemFactory {
+              setup => $on_setup_item_cb();
+              bind => $on_bind_item_cb();
+              unbind => $on_unbind_item_cb();
+            };
+
+            activate => $on_listview_activate_cb();
+          }
+        }
+      };
     };
+
+    [overlay]
+    Adw.StatusPage loading_page {
+      title: _("Loading...");
+      visible: false;
+
+      styles [
+        "background",
+      ]
+    }
   }
 }

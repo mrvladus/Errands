@@ -32,6 +32,7 @@ G_DECLARE_FINAL_TYPE(ErrandsTaskList, errands_task_list, ERRANDS, TASK_LIST, Adw
 struct _ErrandsTaskList {
   AdwBin parent_instance;
 
+  GtkWidget *loading_page;
   GtkWidget *title;
   GtkWidget *search_btn;
   GtkWidget *menu_btn;
@@ -45,6 +46,7 @@ struct _ErrandsTaskList {
 
   GListStore *toplevel_tasks_models; // Model of task models
   GtkFlattenListModel *all_tasks_model;
+  GtkFilterListModel *today_model;
   GtkFilterListModel *current_model;
   GtkTreeListModel *tree_model;
   GtkTreeListRowSorter *tree_sorter;
