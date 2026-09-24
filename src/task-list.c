@@ -149,7 +149,7 @@ static bool today_filter_func(ErrandsTaskItem *item, ErrandsTaskList *self) {
   // Match parent tasks
   for (ErrandsTaskItem *parent = errands_task_item_get_parent(item); parent; parent = errands_task_item_get_parent(parent))
     if (errands_task_item_is_due(parent)) return true;
-  // Match children tasks
+  // TODO: Match children tasks
   return false;
 }
 
