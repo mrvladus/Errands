@@ -131,9 +131,9 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   self->tree_model = gtk_tree_list_model_new(G_LIST_MODEL(self->current_model), false, true, task_children_func, NULL, NULL);
   self->tree_sorter = gtk_tree_list_row_sorter_new(GTK_SORTER(gtk_custom_sorter_new((GCompareDataFunc)sort_func, self, NULL)));
   GtkSortListModel *sort_model = gtk_sort_list_model_new(G_LIST_MODEL(self->tree_model), GTK_SORTER(self->tree_sorter));
-  // gtk_sort_list_model_set_incremental(sort_model, true);
   self->tree_filter = GTK_FILTER(gtk_custom_filter_new((GtkCustomFilterFunc)tree_filter_func, self, NULL));
   self->tree_filter_model = gtk_filter_list_model_new(G_LIST_MODEL(sort_model), self->tree_filter);
+  // TODO: search filter. maybe incremental
 
   gtk_list_view_set_model(GTK_LIST_VIEW(self->list_view),
                           GTK_SELECTION_MODEL(gtk_no_selection_new(G_LIST_MODEL(self->tree_filter_model))));
@@ -142,6 +142,29 @@ static void errands_task_list_init(ErrandsTaskList *self) {
 ErrandsTaskList *errands_task_list_new() { return g_object_new(ERRANDS_TYPE_TASK_LIST, NULL); }
 
 // ---------- PRIVATE FUNCTIONS ---------- //
+
+static inline bool match_search_query(ErrandsTaskItem *item, const char *query) {
+  const char *search_blob = errands_task_item_get_search_blob(item);
+  if (!search_blob) return false;
+  return g_strstr_len(search_blob, -1, query) != NULL;
+}
+
+static gboolean task_match_search(ErrandsTaskItem *item, const char *query, gboolean ancestor_matched) {
+  gboolean self_matched = match_search_query(item, query);
+  gboolean matched = self_matched || ancestor_matched;
+  errands_task_item_set_search_matched(item, matched);
+  GListModel *children = errands_task_item_get_children_model(item);
+  gboolean descendant_matched = false;
+  for (guint i = 0; i < g_list_model_get_n_items(children); i++) {
+    g_autoptr(ErrandsTaskItem) child = g_list_model_get_item(children, i);
+    if (task_match_search(child, query, matched)) descendant_matched = true;
+  }
+  if (descendant_matched) {
+    matched = true;
+    errands_task_item_set_search_matched(item, true);
+  }
+  return matched;
+}
 
 static bool today_filter_func(ErrandsTaskItem *item, ErrandsTaskList *self) {
   // Match task
@@ -157,6 +180,7 @@ static bool tree_filter_func(GtkTreeListRow *row, ErrandsTaskList *self) {
   g_autoptr(ErrandsTaskItem) item = gtk_tree_list_row_get_item(row);
   if (!errands_settings_get(SETTING_SHOW_COMPLETED).b && errands_task_item_get_completed(item)) return false;
   if (!errands_settings_get(SETTING_SHOW_CANCELLED).b && errands_task_item_get_cancelled(item)) return false;
+  if (self->search_query && !errands_task_item_get_search_matched(item)) return false;
   return true;
 }
 
@@ -210,48 +234,6 @@ static int sort_func(ErrandsTaskItem *a, ErrandsTaskItem *b, ErrandsTaskList *se
 //   for (size_t i = 0; i < data->children->len; ++i)
 //     if (__task_today_child_match_func(g_ptr_array_index(data->children, i))) return true;
 //   return errands_data_is_due(data->ical);
-// }
-
-// static bool __task_match_search_query(TaskData *data, const char *query) {
-//   if (!query || !*query) return false;
-//   g_autofree char *folded_query = g_utf8_casefold(query, -1);
-//   const char *text = errands_data_get_text(data->ical);
-//   if (text) {
-//     g_autofree char *folded_text = g_utf8_casefold(text, -1);
-//     if (g_strstr_len(folded_text, -1, folded_query)) return true;
-//   }
-//   const char *notes = errands_data_get_notes(data->ical);
-//   if (notes) {
-//     g_autofree char *folded_notes = g_utf8_casefold(notes, -1);
-//     if (g_strstr_len(folded_notes, -1, folded_query)) return true;
-//   }
-//   g_auto(GStrv) tags = errands_data_get_tags(data->ical);
-//   if (tags) for_range(i, 0, g_strv_length(tags)) {
-//       g_autofree char *folded_tag = g_utf8_casefold(tags[i], -1);
-//       if (g_strstr_len(folded_tag, -1, folded_query)) return true;
-//     }
-
-//   return false;
-// }
-
-// static bool __task_or_descendants_match_search_query(TaskData *data, const char *query) {
-//   if (__task_match_search_query(data, query)) return true;
-//   for (guint i = 0; i < data->children->len; i++) {
-//     TaskData *child = g_ptr_array_index(data->children, i);
-//     if (__task_or_descendants_match_search_query(child, query)) return true;
-//   }
-
-//   return false;
-// }
-
-// static bool __task_ancestor_match_search_query(TaskData *data, const char *query) {
-//   TaskData *parent = data->parent;
-//   while (parent) {
-//     if (__task_match_search_query(parent, query)) return true;
-//     parent = parent->parent;
-//   }
-
-//   return false;
 // }
 
 static void __expand_all_visible_rows_idle_cb(GtkTreeListRow *row) { gtk_tree_list_row_set_expanded(row, true); }
@@ -596,7 +578,7 @@ static void on_task_list_entry_activated_cb(ErrandsTaskList *self) {
   // Get text
   const char *text = gtk_editable_get_text(GTK_EDITABLE(self->entry));
   g_autofree gchar *dup = g_strdup(text);
-  g_autofree gchar *stripped = g_strstrip(dup);
+  const char *stripped = g_strstrip(dup);
   const char *list_uid = self->item->uid;
   if (STR_EQUAL(stripped, "") || STR_EQUAL(list_uid, "")) return;
   g_autoptr(ErrandsTaskItem) task = (ErrandsTaskItem *)errands_task_list_item_create_task(self->item, NULL, stripped);
@@ -616,10 +598,21 @@ static void on_task_list_entry_text_changed_cb(ErrandsTaskList *self) {
 }
 
 static void on_task_list_search_cb(ErrandsTaskList *self, GtkSearchEntry *entry) {
-  self->search_query = gtk_editable_get_text(GTK_EDITABLE(entry));
-  g_message("Task List: Search '%s'", self->search_query);
-  // gtk_filter_changed(self->toplevel_filter, GTK_FILTER_CHANGE_DIFFERENT);
-  if (self->search_query && *self->search_query) __expand_all_visible_rows(self);
+  const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
+  // Clear previous query
+  g_clear_pointer(&self->search_query, g_free);
+  // Only search when the query is at least 2 chars
+  if (text && *text && strlen(text) >= 2) self->search_query = g_utf8_casefold(text, -1);
+  g_message("Task List: Search '%s'", self->search_query ? self->search_query : "");
+  if (self->search_query) {
+    // Mark matching tasks (and their ancestors) across the entire tree
+    for (guint i = 0; i < g_list_model_get_n_items(G_LIST_MODEL(self->current_model)); i++) {
+      g_autoptr(ErrandsTaskItem) item = g_list_model_get_item(G_LIST_MODEL(self->current_model), i);
+      task_match_search(item, self->search_query, false);
+    }
+  }
+  gtk_filter_changed(self->tree_filter, GTK_FILTER_CHANGE_DIFFERENT);
+  if (self->search_query) g_idle_add_once((GSourceOnceFunc)__expand_all_visible_rows, self);
 }
 
 static void on_listview_activate_cb(GtkListView *list_view, guint position) {
