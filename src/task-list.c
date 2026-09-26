@@ -172,7 +172,11 @@ static bool today_filter_func(ErrandsTaskItem *item, ErrandsTaskList *self) {
   // Match parent tasks
   for (ErrandsTaskItem *parent = errands_task_item_get_parent(item); parent; parent = errands_task_item_get_parent(parent))
     if (errands_task_item_is_due(parent)) return true;
-  // TODO: Match children tasks
+  GListModel *children = errands_task_item_get_children_model(item);
+  for (guint i = 0; i < g_list_model_get_n_items(children); i++) {
+    g_autoptr(ErrandsTaskItem) child = g_list_model_get_item(children, i);
+    if (today_filter_func(child, self)) return true;
+  }
   return false;
 }
 
@@ -229,12 +233,6 @@ static int sort_func(ErrandsTaskItem *a, ErrandsTaskItem *b, ErrandsTaskList *se
   default: return 0;
   }
 }
-
-// static bool __task_today_child_match_func(TaskData *data) {
-//   for (size_t i = 0; i < data->children->len; ++i)
-//     if (__task_today_child_match_func(g_ptr_array_index(data->children, i))) return true;
-//   return errands_data_is_due(data->ical);
-// }
 
 static void __expand_all_visible_rows_idle_cb(GtkTreeListRow *row) { gtk_tree_list_row_set_expanded(row, true); }
 
