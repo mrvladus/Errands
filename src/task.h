@@ -1,11 +1,8 @@
 #pragma once
 
-#include "data.h"
-#include "gio/gio.h"
 #include "task-item.h"
 
 #include <gtk/gtk.h>
-#include <libical/ical.h>
 
 #define ERRANDS_TYPE_TASK (errands_task_get_type())
 G_DECLARE_FINAL_TYPE(ErrandsTask, errands_task, ERRANDS, TASK, GtkBox)

@@ -1,11 +1,10 @@
 #include "window.h"
+#include "config.h"
 #include "new-list-dialog.h"
 #include "settings.h"
 #include "state.h"
 #include "task-list.h"
 
-static void on_size_changed_cb(ErrandsWindow *win);
-static void on_maximize_changed_cb(ErrandsWindow *win);
 static void on_new_list_btn_clicked_cb();
 
 // ---------- WIDGET TEMPLATE ---------- //
@@ -26,8 +25,6 @@ static void errands_window_class_init(ErrandsWindowClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsWindow, split_view);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsWindow, sidebar);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsWindow, task_list);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_maximize_changed_cb);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_size_changed_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_new_list_btn_clicked_cb);
 }
 
@@ -36,18 +33,20 @@ static void errands_window_init(ErrandsWindow *self) {
   gtk_widget_init_template(GTK_WIDGET(self));
   // Set theme
   AdwStyleManager *style_manager = adw_style_manager_get_default();
-  switch (errands_settings_get(SETTING_THEME).i) {
-  case SETTING_THEME_SYSTEM: adw_style_manager_set_color_scheme(style_manager, ADW_COLOR_SCHEME_DEFAULT); break;
-  case SETTING_THEME_LIGHT: adw_style_manager_set_color_scheme(style_manager, ADW_COLOR_SCHEME_FORCE_LIGHT); break;
-  case SETTING_THEME_DARK: adw_style_manager_set_color_scheme(style_manager, ADW_COLOR_SCHEME_FORCE_DARK); break;
-  }
+  g_object_set(style_manager, "color-scheme", errands_settings_get_theme(state.settings), NULL);
+  g_object_bind_property(state.settings, "theme", style_manager, "color-scheme", G_BINDING_DEFAULT);
   g_message("Window: Created");
 }
 
 ErrandsWindow *errands_window_new(GtkApplication *app) {
-  return g_object_new(ERRANDS_TYPE_WINDOW, "application", app, "maximized", errands_settings_get(SETTING_MAXIMIZED).b,
-                      "default-width", errands_settings_get(SETTING_WINDOW_WIDTH).i, "default-height",
-                      errands_settings_get(SETTING_WINDOW_HEIGHT).i, NULL);
+  ErrandsWindow *win =
+      g_object_new(ERRANDS_TYPE_WINDOW, "application", app, "default-width", errands_settings_get_window_width(state.settings),
+                   "default-height", errands_settings_get_window_height(state.settings), "maximized",
+                   errands_settings_get_maximized(state.settings), NULL);
+  g_object_bind_property(state.settings, "maximized", win, "maximized", G_BINDING_DEFAULT | G_BINDING_BIDIRECTIONAL);
+  g_object_bind_property(state.settings, "window-width", win, "default-width", G_BINDING_DEFAULT | G_BINDING_BIDIRECTIONAL);
+  g_object_bind_property(state.settings, "window-height", win, "default-height", G_BINDING_DEFAULT | G_BINDING_BIDIRECTIONAL);
+  return win;
 }
 
 // ---------- PUBLIC FUNCTIONS ---------- //
@@ -60,17 +59,5 @@ void errands_window_add_toast(const char *msg, int timeout) {
 }
 
 // ---------- CALLBACKS ---------- //
-
-static void on_size_changed_cb(ErrandsWindow *win) {
-  int w, h;
-  gtk_window_get_default_size(GTK_WINDOW(win), &w, &h);
-  errands_settings_set(SETTING_WINDOW_WIDTH, &w);
-  errands_settings_set(SETTING_WINDOW_HEIGHT, &h);
-}
-
-static void on_maximize_changed_cb(ErrandsWindow *win) {
-  bool is_maximized = gtk_window_is_maximized(GTK_WINDOW(win));
-  errands_settings_set(SETTING_MAXIMIZED, &is_maximized);
-}
 
 static void on_new_list_btn_clicked_cb() { errands_new_list_dialog_show(); }

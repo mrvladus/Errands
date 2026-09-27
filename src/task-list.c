@@ -1,10 +1,7 @@
 #include "task-list.h"
+#include "config.h"
 #include "data.h"
 #include "delete-list-dialog.h"
-#include "gio/gio.h"
-#include "glib-object.h"
-#include "glib.h"
-#include "gtk/gtk.h"
 #include "rename-list-dialog.h"
 #include "settings.h"
 #include "sidebar.h"
@@ -101,21 +98,24 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   errands_add_action(ag, "delete-completed", on_action_delete_completed_cb, self, NULL);
   errands_add_action(ag, "delete-cancelled", on_action_delete_cancelled_cb, self, NULL);
   errands_add_action(ag, "delete", on_action_delete_cb, self, NULL);
-  errands_add_stateful_action(ag, "show-completed", NULL, g_variant_new_boolean(errands_settings_get(SETTING_SHOW_COMPLETED).b),
+  errands_add_stateful_action(ag, "show-completed", NULL,
+                              g_variant_new_boolean(errands_settings_get_show_completed(state.settings)),
                               on_action_show_completed_cb, self);
-  errands_add_stateful_action(ag, "show-cancelled", NULL, g_variant_new_boolean(errands_settings_get(SETTING_SHOW_CANCELLED).b),
+  errands_add_stateful_action(ag, "show-cancelled", NULL,
+                              g_variant_new_boolean(errands_settings_get_show_cancelled(state.settings)),
                               on_action_show_cancelled_cb, self);
   errands_add_stateful_action(ag, "sort-order", G_VARIANT_TYPE_STRING,
-                              g_variant_new_string(errands_settings_get(SETTING_SORT_ORDER).s == 0 ? "desc" : "asc"),
+                              g_variant_new_string(errands_settings_get_sort_order(state.settings) == 0 ? "desc" : "asc"),
                               on_action_sort_order_cb, self);
   const char *sort_by_str = NULL;
-  switch (errands_settings_get(SETTING_SORT_BY).i) {
+  switch (errands_settings_get_sort_by(state.settings)) {
   case SORT_TYPE_CREATION_DATE: sort_by_str = "created"; break;
   case SORT_TYPE_START_DATE: sort_by_str = "start"; break;
   case SORT_TYPE_DUE_DATE: sort_by_str = "due"; break;
   case SORT_TYPE_PRIORITY: sort_by_str = "priority"; break;
   }
-  errands_add_stateful_action(ag, "sort-by", G_VARIANT_TYPE_STRING, g_variant_new_string(sort_by_str), on_action_sort_by_cb, self);
+  errands_add_stateful_action(ag, "sort-by", G_VARIANT_TYPE_STRING, g_variant_new_string(sort_by_str), on_action_sort_by_cb,
+                              self);
 
   gtk_search_bar_connect_entry(GTK_SEARCH_BAR(self->search_bar), GTK_EDITABLE(self->search_entry));
 
@@ -133,7 +133,6 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   GtkSortListModel *sort_model = gtk_sort_list_model_new(G_LIST_MODEL(self->tree_model), GTK_SORTER(self->tree_sorter));
   self->tree_filter = GTK_FILTER(gtk_custom_filter_new((GtkCustomFilterFunc)tree_filter_func, self, NULL));
   self->tree_filter_model = gtk_filter_list_model_new(G_LIST_MODEL(sort_model), self->tree_filter);
-  // TODO: search filter. maybe incremental
 
   gtk_list_view_set_model(GTK_LIST_VIEW(self->list_view),
                           GTK_SELECTION_MODEL(gtk_no_selection_new(G_LIST_MODEL(self->tree_filter_model))));
@@ -182,49 +181,45 @@ static bool today_filter_func(ErrandsTaskItem *item, ErrandsTaskList *self) {
 
 static bool tree_filter_func(GtkTreeListRow *row, ErrandsTaskList *self) {
   g_autoptr(ErrandsTaskItem) item = gtk_tree_list_row_get_item(row);
-  if (!errands_settings_get(SETTING_SHOW_COMPLETED).b && errands_task_item_get_completed(item)) return false;
-  if (!errands_settings_get(SETTING_SHOW_CANCELLED).b && errands_task_item_get_cancelled(item)) return false;
+  if (!errands_settings_get_show_completed(state.settings) && errands_task_item_get_completed(item)) return false;
+  if (!errands_settings_get_show_cancelled(state.settings) && errands_task_item_get_cancelled(item)) return false;
   if (self->search_query && !errands_task_item_get_search_matched(item)) return false;
   return true;
 }
 
 static int sort_func(ErrandsTaskItem *a, ErrandsTaskItem *b, ErrandsTaskList *self) {
-  icalcomponent *td_a = errands_task_item_get_ical(a);
-  icalcomponent *td_b = errands_task_item_get_ical(b);
-
   // Cancelled
-  gboolean cancelled_a = errands_data_get_cancelled(td_a);
-  gboolean cancelled_b = errands_data_get_cancelled(td_b);
+  gboolean cancelled_a = errands_task_item_get_cancelled(a);
+  gboolean cancelled_b = errands_task_item_get_cancelled(b);
   if (cancelled_a != cancelled_b) return cancelled_a - cancelled_b;
 
   // Completed
-  gboolean completed_a = errands_data_is_completed(td_a);
-  gboolean completed_b = errands_data_is_completed(td_b);
+  gboolean completed_a = errands_task_item_get_completed(a);
+  gboolean completed_b = errands_task_item_get_completed(b);
   if (completed_a != completed_b) return completed_a - completed_b;
 
-  bool asc_order = errands_settings_get(SETTING_SORT_ORDER).i;
-  switch (errands_settings_get(SETTING_SORT_BY).i) {
+  bool asc_order = errands_settings_get_sort_order(state.settings) == SORT_ORDER_ASC;
+  switch (errands_settings_get_sort_by(state.settings)) {
   case SORT_TYPE_CREATION_DATE: {
+    icalcomponent *td_a = errands_task_item_get_ical(a);
+    icalcomponent *td_b = errands_task_item_get_ical(b);
     icaltimetype creation_date_a = errands_data_get_created(asc_order ? td_b : td_a);
     icaltimetype creation_date_b = errands_data_get_created(asc_order ? td_a : td_b);
     return icaltime_compare(creation_date_b, creation_date_a);
   }
   case SORT_TYPE_DUE_DATE: {
-    icaltimetype due_a = errands_data_get_due(asc_order ? td_b : td_a);
-    icaltimetype due_b = errands_data_get_due(asc_order ? td_a : td_b);
+    icaltimetype due_a = errands_task_item_get_dtend(asc_order ? b : a);
+    icaltimetype due_b = errands_task_item_get_dtend(asc_order ? a : b);
     bool null_a = icaltime_is_null_time(due_a);
     bool null_b = icaltime_is_null_time(due_b);
     if (null_a != null_b) return null_a - null_b;
     return icaltime_compare(due_a, due_b);
   }
-  case SORT_TYPE_PRIORITY: {
-    int p_a = errands_data_get_priority(asc_order ? td_b : td_a);
-    int p_b = errands_data_get_priority(asc_order ? td_a : td_b);
-    return p_b - p_a;
-  }
+  case SORT_TYPE_PRIORITY:
+    return errands_task_item_get_priority(asc_order ? a : b) - errands_task_item_get_priority(asc_order ? b : a);
   case SORT_TYPE_START_DATE: {
-    icaltimetype start_a = errands_data_get_start(asc_order ? td_b : td_a);
-    icaltimetype start_b = errands_data_get_start(asc_order ? td_a : td_b);
+    icaltimetype start_a = errands_task_item_get_dtstart(asc_order ? b : a);
+    icaltimetype start_b = errands_task_item_get_dtstart(asc_order ? a : b);
     bool null_a = icaltime_is_null_time(start_a);
     bool null_b = icaltime_is_null_time(start_b);
     if (null_a != null_b) return null_a - null_b;
@@ -353,26 +348,26 @@ static void on_action_delete_cb(GSimpleAction *action, GVariant *param, ErrandsT
 }
 
 static void on_action_show_completed_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
-  gboolean state = g_variant_get_boolean(param);
+  gboolean value = g_variant_get_boolean(param);
   g_simple_action_set_state(action, param);
-  errands_settings_set(SETTING_SHOW_COMPLETED, &state);
+  errands_settings_set_show_completed(state.settings, value);
   errands_task_list_filter(self, GTK_FILTER_CHANGE_DIFFERENT);
   TODO("call errands_task_item_update() on every task list item to show/hide expander");
 }
 
 static void on_action_show_cancelled_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
-  gboolean state = g_variant_get_boolean(param);
+  gboolean value = g_variant_get_boolean(param);
   g_simple_action_set_state(action, param);
-  errands_settings_set(SETTING_SHOW_CANCELLED, &state);
-  errands_task_list_filter(self, state ? GTK_FILTER_CHANGE_LESS_STRICT : GTK_FILTER_CHANGE_MORE_STRICT);
+  errands_settings_set_show_cancelled(state.settings, value);
+  errands_task_list_filter(self, value ? GTK_FILTER_CHANGE_LESS_STRICT : GTK_FILTER_CHANGE_MORE_STRICT);
   TODO("call errands_task_item_update() on every task list item to show/hide expander");
 }
 
 static void on_action_sort_order_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
   g_simple_action_set_state(action, param);
   const char *new = g_variant_get_string(param, NULL);
-  ErrandsSettingSortOrder order = g_str_equal(new, "desc") ? SORT_ORDER_DESC : SORT_ORDER_ASC;
-  errands_settings_set(SETTING_SORT_ORDER, &order);
+  ErrandsSettingsSortOrder order = g_str_equal(new, "desc") ? SORT_ORDER_DESC : SORT_ORDER_ASC;
+  errands_settings_set_sort_order(state.settings, order);
   errands_task_list_sort(state.main_window->task_list, GTK_SORTER_CHANGE_INVERTED);
   g_message("Task List: Set sort order: %s", new);
 }
@@ -380,12 +375,12 @@ static void on_action_sort_order_cb(GSimpleAction *action, GVariant *param, Erra
 static void on_action_sort_by_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
   g_simple_action_set_state(action, param);
   const char *new = g_variant_get_string(param, NULL);
-  ErrandsSettingSortType by = SORT_TYPE_CREATION_DATE;
+  ErrandsSettingsSortType by = SORT_TYPE_CREATION_DATE;
   if (g_str_equal(new, "created")) by = SORT_TYPE_CREATION_DATE;
   else if (g_str_equal(new, "start")) by = SORT_TYPE_START_DATE;
   else if (g_str_equal(new, "due")) by = SORT_TYPE_DUE_DATE;
   else if (g_str_equal(new, "priority")) by = SORT_TYPE_PRIORITY;
-  errands_settings_set(SETTING_SORT_BY, &by);
+  errands_settings_set_sort_by(state.settings, by);
   errands_task_list_sort(state.main_window->task_list, GTK_SORTER_CHANGE_DIFFERENT);
 }
 
@@ -509,7 +504,8 @@ typedef struct {
   GListModel *new_source_model;
 } _ModelSwitchData;
 
-static _ModelSwitchData *model_switch_data_new(ErrandsTaskList *self, GtkFilterListModel *filter_model, GListModel *new_source_model) {
+static _ModelSwitchData *model_switch_data_new(ErrandsTaskList *self, GtkFilterListModel *filter_model,
+                                               GListModel *new_source_model) {
   _ModelSwitchData *data = g_new0(_ModelSwitchData, 1);
   data->self = self;
   data->filter_model = filter_model;

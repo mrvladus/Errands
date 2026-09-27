@@ -1,9 +1,10 @@
 #include "data.h"
-#include "glib.h"
 #include "settings.h"
+#include "state.h"
 #include "task-list-item.h"
 #include "utils.h"
 
+#define JSON_H_IMPLEMENTATION
 #include "vendor/json.h"
 
 AUTOPTR_DEFINE(JSON, json_free)
@@ -59,9 +60,8 @@ static void migrate_from_46() {
     JSON *list_uid_item = json_object_get(cal_item, "uid");
 
     g_autoptr(ErrandsTaskListItem) item = errands_task_list_item_create(
-        list_uid_item->string_val, json_object_get(cal_item, "name")->string_val,
-        json_object_get(cal_item, "color")->string_val, json_object_get(cal_item, "deleted")->bool_val,
-        json_object_get(cal_item, "synced")->bool_val);
+        list_uid_item->string_val, json_object_get(cal_item, "name")->string_val, json_object_get(cal_item, "color")->string_val,
+        json_object_get(cal_item, "deleted")->bool_val, json_object_get(cal_item, "synced")->bool_val);
 
     // Process tasks
     JSON *tasks_arr = json_object_get(root, "tasks");
@@ -73,8 +73,7 @@ static void migrate_from_46() {
       // Process attachments
       JSON *task_attachments_arr = json_object_get(task_item, "attachments");
       g_autoptr(GStrvBuilder) builder = g_strv_builder_new();
-      for (JSON *attachment_item = task_attachments_arr->child; attachment_item;
-           attachment_item = attachment_item->next)
+      for (JSON *attachment_item = task_attachments_arr->child; attachment_item; attachment_item = attachment_item->next)
         g_strv_builder_add(builder, attachment_item->string_val);
       g_auto(GStrv) attachments = g_strv_builder_end(builder);
       // Process tags
@@ -182,8 +181,8 @@ void errands_data_init() {
     if (!item) continue;
     // Delete file if calendar deleted
     if (errands_data_get_deleted(item->ical)) {
-      if ((errands_settings_get(SETTING_SYNC).b && errands_data_get_synced(item->ical)) ||
-          !errands_settings_get(SETTING_SYNC).b) {
+      if ((errands_settings_get_sync_enabled(state.settings) && errands_data_get_synced(item->ical)) ||
+          !errands_settings_get_sync_enabled(state.settings)) {
         g_message("User Data: Calendar was deleted. Removing %s", path);
         remove(path);
         continue;
@@ -214,15 +213,9 @@ bool errands_data_get_cancelled(icalcomponent *ical) {
   icalproperty_status status = icalcomponent_get_status(ical);
   return status == ICAL_STATUS_CANCELLED;
 }
-bool errands_data_get_deleted(icalcomponent *ical) {
-  return STR_TO_BOOL(get_x_prop_value(ical, "X-ERRANDS-DELETED", "0"));
-}
-bool errands_data_get_notified(icalcomponent *ical) {
-  return STR_TO_BOOL(get_x_prop_value(ical, "X-ERRANDS-NOTIFIED", "0"));
-}
-bool errands_data_get_synced(icalcomponent *ical) {
-  return STR_TO_BOOL(get_x_prop_value(ical, "X-ERRANDS-SYNCED", "0"));
-}
+bool errands_data_get_deleted(icalcomponent *ical) { return STR_TO_BOOL(get_x_prop_value(ical, "X-ERRANDS-DELETED", "0")); }
+bool errands_data_get_notified(icalcomponent *ical) { return STR_TO_BOOL(get_x_prop_value(ical, "X-ERRANDS-NOTIFIED", "0")); }
+bool errands_data_get_synced(icalcomponent *ical) { return STR_TO_BOOL(get_x_prop_value(ical, "X-ERRANDS-SYNCED", "0")); }
 
 bool errands_data_is_completed(icalcomponent *ical) { return !icaltime_is_null_time(errands_data_get_completed(ical)); }
 bool errands_data_is_due(icalcomponent *ical) {
@@ -282,19 +275,14 @@ void errands_data_set_priority(icalcomponent *ical, int value) {
 // --- STRING --- //
 
 const char *errands_data_get_color(icalcomponent *ical) {
-  if (icalcomponent_isa(ical) == ICAL_VCALENDAR_COMPONENT)
-    return get_x_prop_value(ical, "X-APPLE-CALENDAR-COLOR", NULL);
+  if (icalcomponent_isa(ical) == ICAL_VCALENDAR_COMPONENT) return get_x_prop_value(ical, "X-APPLE-CALENDAR-COLOR", NULL);
   else {
     icalproperty *property = icalcomponent_get_first_property(ical, ICAL_COLOR_PROPERTY);
     return property ? icalproperty_get_color(property) : NULL;
   }
 }
-const char *errands_data_get_list_name(icalcomponent *ical) {
-  return get_x_prop_value(ical, "X-WR-CALNAME", "Untitled");
-}
-const char *errands_data_get_list_description(icalcomponent *ical) {
-  return get_x_prop_value(ical, "X-WR-CALDESC", NULL);
-}
+const char *errands_data_get_list_name(icalcomponent *ical) { return get_x_prop_value(ical, "X-WR-CALNAME", "Untitled"); }
+const char *errands_data_get_list_description(icalcomponent *ical) { return get_x_prop_value(ical, "X-WR-CALDESC", NULL); }
 const char *errands_data_get_notes(icalcomponent *ical) { return icalcomponent_get_description(ical); }
 const char *errands_data_get_parent(icalcomponent *ical) {
   icalproperty *property = icalcomponent_get_first_property(ical, ICAL_RELATEDTO_PROPERTY);
@@ -421,8 +409,7 @@ void errands_data_set_tags(icalcomponent *ical, GStrv value) {
   for (icalproperty *p = icalcomponent_get_first_property(ical, ICAL_CATEGORIES_PROPERTY); p != 0;
        p = icalcomponent_get_next_property(ical, ICAL_CATEGORIES_PROPERTY))
     icalcomponent_remove_property(ical, p);
-  for (size_t i = 0; i < g_strv_length(value); i++)
-    icalcomponent_add_property(ical, icalproperty_new_categories(value[i]));
+  for (size_t i = 0; i < g_strv_length(value); i++) icalcomponent_add_property(ical, icalproperty_new_categories(value[i]));
   errands_data_set_synced(ical, false);
   errands_data_set_changed(ical, icaltime_get_date_time_now());
 }

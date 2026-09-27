@@ -1,7 +1,5 @@
 #include "task-item.h"
 #include "data.h"
-#include "glib-object.h"
-#include "glib.h"
 #include "settings.h"
 #include "state.h"
 #include "task-list-item.h"
@@ -9,7 +7,6 @@
 #include "utils.h"
 
 #include <glib/gi18n.h>
-#include <libical/ical.h>
 
 static void update_search_blob(ErrandsTaskItem *self);
 
@@ -278,7 +275,8 @@ static void errands_task_item_class_init(ErrandsTaskItemClass *klass) {
   obj_properties[PROP_DTSTART] = g_param_spec_pointer("dtstart", "DTStart", "Start time of the task", G_PARAM_READWRITE);
   obj_properties[PROP_DTEND] = g_param_spec_pointer("dtend", "DTEnd", "End time of the task", G_PARAM_READWRITE);
   obj_properties[PROP_TAGS] = g_param_spec_pointer("tags", "Tags", "Tags of the task", G_PARAM_READWRITE);
-  obj_properties[PROP_ATTACHMENTS] = g_param_spec_pointer("attachments", "Attachments", "Attachments of the task", G_PARAM_READWRITE);
+  obj_properties[PROP_ATTACHMENTS] =
+      g_param_spec_pointer("attachments", "Attachments", "Attachments of the task", G_PARAM_READWRITE);
   obj_properties[PROP_RRULE] = g_param_spec_pointer("rrule", "RRule", "Recurrence rule of the task", G_PARAM_READWRITE);
   obj_properties[PROP_SEARCH_BLOB] =
       g_param_spec_string("search-blob", "Search Blob", "Search blob of the task", NULL, G_PARAM_READABLE);
@@ -292,8 +290,8 @@ static void errands_task_item_class_init(ErrandsTaskItemClass *klass) {
 
   obj_properties[PROP_ICAL] =
       g_param_spec_pointer("ical", "ICAL Component", "ICAL component associated with the task.", G_PARAM_READWRITE);
-  obj_properties[PROP_CHILDREN_MODEL] =
-      g_param_spec_object("children-model", "Children Model", "Model containing child tasks.", G_TYPE_LIST_MODEL, G_PARAM_READWRITE);
+  obj_properties[PROP_CHILDREN_MODEL] = g_param_spec_object("children-model", "Children Model", "Model containing child tasks.",
+                                                            G_TYPE_LIST_MODEL, G_PARAM_READWRITE);
   obj_properties[PROP_TASK_WIDGET] =
       g_param_spec_pointer("task-widget", "Task Widget", "Widget associated with the task item.", G_PARAM_READWRITE);
 
@@ -359,8 +357,8 @@ ErrandsTaskItem *errands_task_item_new(icalcomponent *ical, ErrandsTaskListItem 
 void errands_task_item_update(ErrandsTaskItem *self) {
   g_return_if_fail(self);
 
-  bool show_completed = errands_settings_get(SETTING_SHOW_COMPLETED).b;
-  bool show_cancelled = errands_settings_get(SETTING_SHOW_CANCELLED).b;
+  bool show_completed = errands_settings_get_show_completed(state.settings);
+  bool show_cancelled = errands_settings_get_show_cancelled(state.settings);
   GListModel *children_model = G_LIST_MODEL(self->children_model);
   gint visible = 0;
   gint uncompleted = 0;
@@ -375,8 +373,8 @@ void errands_task_item_update(ErrandsTaskItem *self) {
     if ((!show_completed && completed) || (!show_cancelled && cancelled)) continue;
     visible++;
   }
-  g_object_set(self, "uncompleted-count", uncompleted > 0 ? tmp_str_printf("%d", uncompleted) : "", "has-no-children", visible == 0,
-               NULL);
+  g_object_set(self, "uncompleted-count", uncompleted > 0 ? tmp_str_printf("%d", uncompleted) : "", "has-no-children",
+               visible == 0, NULL);
 }
 
 void errands_task_item_add_tag(ErrandsTaskItem *self, const char *tag) {
@@ -452,7 +450,7 @@ int errands_task_item_delete_cancelled(ErrandsTaskItem *self) {
 int errands_task_item_remove_deleted_tasks(ErrandsTaskItem *self) {
   g_return_val_if_fail(self, 0);
 
-  bool sync_enabled = errands_settings_get(SETTING_SYNC).b;
+  bool sync_enabled = errands_settings_get_sync_enabled(state.settings);
   GListModel *model = G_LIST_MODEL(self->children_model);
   int deleted_n = 0;
   for_range(i, 0, g_list_model_get_n_items(model)) {
@@ -587,8 +585,12 @@ gchar *errands_task_item_get_rrule_as_string(ErrandsTaskItem *self) {
 // --- SETTERS --- //
 
 void errands_task_item_set_title(ErrandsTaskItem *self, const char *title) { g_object_set(self, "title", title, NULL); }
-void errands_task_item_set_completed(ErrandsTaskItem *self, gboolean completed) { g_object_set(self, "completed", completed, NULL); }
-void errands_task_item_set_cancelled(ErrandsTaskItem *self, gboolean cancelled) { g_object_set(self, "cancelled", cancelled, NULL); }
+void errands_task_item_set_completed(ErrandsTaskItem *self, gboolean completed) {
+  g_object_set(self, "completed", completed, NULL);
+}
+void errands_task_item_set_cancelled(ErrandsTaskItem *self, gboolean cancelled) {
+  g_object_set(self, "cancelled", cancelled, NULL);
+}
 void errands_task_item_set_search_matched(ErrandsTaskItem *self, gboolean matched) {
   g_object_set(self, "search-matched", matched, NULL);
 }

@@ -3,6 +3,7 @@
 #include "gio/gio.h"
 #include "glib.h"
 #include "settings.h"
+#include "state.h"
 #include "task-item.h"
 #include "utils.h"
 
@@ -81,8 +82,7 @@ static void errands_task_list_item_class_init(ErrandsTaskListItemClass *klass) {
 
   obj_properties[PROP_UID] =
       g_param_spec_pointer("uid", "Task List UID", "Unique identifier for the task list", G_PARAM_READWRITE);
-  obj_properties[PROP_TITLE] =
-      g_param_spec_string("title", "Task List Title", "Title of the task list", NULL, G_PARAM_READWRITE);
+  obj_properties[PROP_TITLE] = g_param_spec_string("title", "Task List Title", "Title of the task list", NULL, G_PARAM_READWRITE);
   obj_properties[PROP_COLOR] =
       g_param_spec_boxed("color", "Task List Color", "Color of the task list", GDK_TYPE_RGBA, G_PARAM_READWRITE);
   obj_properties[PROP_COUNT] =
@@ -263,7 +263,7 @@ int errands_task_list_item_delete_cancelled(ErrandsTaskListItem *self) {
 void errands_task_list_item_remove_deleted_tasks(ErrandsTaskListItem *self) {
   g_return_if_fail(self);
 
-  bool sync_enabled = errands_settings_get(SETTING_SYNC).b;
+  bool sync_enabled = errands_settings_get_sync_enabled(state.settings);
   GListModel *model = G_LIST_MODEL(self->tasks);
   int deleted_n = 0;
   for_range(i, 0, g_list_model_get_n_items(model)) {

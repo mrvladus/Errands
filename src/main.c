@@ -1,5 +1,3 @@
-#include "sidebar.h"
-#include <libical/ical.h>
 #if !(defined(__GNUC__) || defined(__clang__))
 #error "This code requires GCC or Clang compiler because it uses features not supported by other compilers.\
 e.g. GLib's g_autoptr, g_auto and g_autofree"
@@ -9,6 +7,7 @@ e.g. GLib's g_autoptr, g_auto and g_autofree"
 #include "data.h"
 #include "notifications.h"
 #include "settings.h"
+#include "sidebar.h"
 #include "state.h"
 // #include "sync.h"
 #include "window.h"
@@ -32,19 +31,18 @@ static void activate(GtkApplication *app) {
   // Request background
   g_autoptr(XdpPortal) portal = xdp_portal_new();
   g_autoptr(XdpParent) parent = xdp_parent_new_gtk(GTK_WINDOW(state.main_window));
-  if (errands_settings_get(SETTING_STARTUP).b) {
+  if (errands_settings_get_startup(state.settings)) {
     g_autoptr(GPtrArray) cmdline = g_ptr_array_sized_new(2);
     g_ptr_array_add(cmdline, "errands");
     g_ptr_array_add(cmdline, "--gapplication-service");
-    xdp_portal_request_background(portal, parent, "Errands needs to run in the background for sending notifications",
-                                  cmdline, XDP_BACKGROUND_FLAG_AUTOSTART, NULL, NULL, NULL);
+    xdp_portal_request_background(portal, parent, "Errands needs to run in the background for sending notifications", cmdline,
+                                  XDP_BACKGROUND_FLAG_AUTOSTART, NULL, NULL, NULL);
   } else xdp_portal_request_background(portal, NULL, NULL, NULL, XDP_BACKGROUND_FLAG_NONE, NULL, NULL, NULL);
 }
 
 int main(int argc, char **argv) {
   RANDOM_SEED();
-  g_message("Starting version %s (%s) %sFlatpak", VERSION, VERSION_COMMIT,
-            xdp_portal_running_under_flatpak() ? "" : "not ");
+  g_message("Starting version %s (%s) %sFlatpak", VERSION, VERSION_COMMIT, xdp_portal_running_under_flatpak() ? "" : "not ");
 
   // Setup locales
   bindtextdomain("errands", LOCALE_DIR);
@@ -52,7 +50,7 @@ int main(int argc, char **argv) {
   textdomain("errands");
 
   // Initialize systems
-  errands_settings_init();
+  state.settings = errands_settings_new();
   errands_data_init();
   errands_notifications_init();
   errands_notifications_start();
@@ -63,13 +61,13 @@ int main(int argc, char **argv) {
   g_resources_register(errands_get_resource());
   g_application_set_resource_base_path(G_APPLICATION(state.app), RESOURCE_PATH);
   const int status = g_application_run(G_APPLICATION(state.app), argc, argv);
-  g_object_unref(state.app);
 
   // Cleanup
+  g_object_unref(state.app);
   errands_data_cleanup();
-  errands_settings_cleanup();
-  // errands_sync_cleanup();
   errands_notifications_cleanup();
+  g_object_unref(state.settings);
+  // errands_sync_cleanup();
 
   return status;
 }

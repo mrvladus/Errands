@@ -14,7 +14,6 @@ template $ErrandsSettingsDialog: Adw.PreferencesDialog {
         [suffix]
         Adw.ToggleGroup theme {
           valign: center;
-          notify::active => $on_theme_toggled_cb(template);
 
           Adw.Toggle system {
             tooltip: _("System");
@@ -43,12 +42,10 @@ template $ErrandsSettingsDialog: Adw.PreferencesDialog {
 
       Adw.SwitchRow notifications {
         title: _("Show Notifications");
-        notify::active => $on_notifications_toggled_cb(template);
       }
 
       Adw.SwitchRow background {
         title: _("Work in the Background");
-        notify::active => $on_background_toggled_cb(template);
       }
 
       Adw.SwitchRow startup {
@@ -62,7 +59,6 @@ template $ErrandsSettingsDialog: Adw.PreferencesDialog {
 
       Adw.SwitchRow sync_enabled {
         title: _("Enabled");
-        notify::active => $on_sync_toggled_cb(template);
       }
 
       Adw.SpinRow sync_interval {
@@ -76,29 +72,24 @@ template $ErrandsSettingsDialog: Adw.PreferencesDialog {
           upper: 300;
           step-increment: 1;
         };
-
-        changed => $on_sync_interval_activated_cb(template);
       }
 
       Adw.EntryRow sync_url {
         title: _("CalDAV Server URL");
         visible: bind sync_enabled.active;
         show-apply-button: true;
-        apply => $on_sync_url_activated_cb(template);
       }
 
       Adw.EntryRow sync_username {
         title: _("Username");
         visible: bind sync_enabled.active;
         show-apply-button: true;
-        apply => $on_sync_username_activated_cb(template);
       }
 
       Adw.PasswordEntryRow sync_password {
         title: _("Password");
         visible: bind sync_enabled.active;
         show-apply-button: true;
-        apply => $on_sync_password_activated_cb(template);
       }
     }
   }

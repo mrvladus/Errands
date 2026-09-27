@@ -1,7 +1,7 @@
 #include "task-properties-dialog.h"
+#include "config.h"
 #include "data.h"
 #include "date-chooser.h"
-// #include "notifications.h"
 #include "settings.h"
 #include "state.h"
 // #include "sync.h"
@@ -19,15 +19,14 @@ static void on_add_attachment_action_cb(GSimpleAction *action, GVariant *param, 
 static void on_dialog_close_cb(ErrandsTaskPropertiesDialog *self);
 static gboolean on_style_toggled_cb(GBinding *binding, const GValue *from_value, GValue *to_value, gpointer user_data);
 
-#define ATTACHMENTS_LIST_BOX                                                                                           \
+#define ATTACHMENTS_LIST_BOX                                                                                                     \
   gtk_widget_get_first_child(gtk_widget_get_last_child(gtk_widget_get_first_child(GTK_WIDGET(self->attachments))))
 static GtkWidget *errands_task_properties_dialog_attachment_new(const char *path);
 static void errands_task_properties_dialog_add_attachment(const char *path);
 static void on_attachment_clicked_cb(GtkListBox *box, AdwActionRow *attachment);
 static void on_attachment_delete_cb(GtkButton *btn, AdwActionRow *attachment);
 
-#define TAGS_LIST_BOX                                                                                                  \
-  gtk_widget_get_first_child(gtk_widget_get_last_child(gtk_widget_get_first_child(GTK_WIDGET(self->tags))))
+#define TAGS_LIST_BOX gtk_widget_get_first_child(gtk_widget_get_last_child(gtk_widget_get_first_child(GTK_WIDGET(self->tags))))
 static void errands_task_properties_dialog_add_tag(const char *tag);
 static void on_tag_entry_activated_cb(AdwEntryRow *entry);
 static void on_tag_delete_cb(GtkButton *btn, AdwActionRow *row);
@@ -98,8 +97,8 @@ static void errands_task_properties_dialog_init(ErrandsTaskPropertiesDialog *dia
   GtkSourceStyleSchemeManager *style_scheme_mgr = gtk_source_style_scheme_manager_get_default();
   GtkSourceStyleScheme *style_scheme = gtk_source_style_scheme_manager_get_scheme(style_scheme_mgr, theme);
   gtk_source_buffer_set_style_scheme(dialog->notes_buffer, style_scheme);
-  g_object_bind_property_full(style_mgr, "dark", dialog->notes_buffer, "style-scheme", G_BINDING_SYNC_CREATE,
-                              on_style_toggled_cb, NULL, NULL, NULL);
+  g_object_bind_property_full(style_mgr, "dark", dialog->notes_buffer, "style-scheme", G_BINDING_SYNC_CREATE, on_style_toggled_cb,
+                              NULL, NULL, NULL);
 }
 
 ErrandsTaskPropertiesDialog *errands_task_properties_dialog_new() {
@@ -149,12 +148,10 @@ void errands_task_properties_dialog_show(ErrandsTaskPropertiesDialogPage page, E
 
   // Tags
   gtk_list_box_remove_all(GTK_LIST_BOX(TAGS_LIST_BOX));
-  g_auto(GStrv) tags = errands_settings_get_tags();
-  g_auto(GStrv) all_tags_no_dups = gstrv_remove_duplicates(tags);
-  if (all_tags_no_dups)
-    for (size_t i = 0; i < g_strv_length(all_tags_no_dups); i++)
-      errands_task_properties_dialog_add_tag(all_tags_no_dups[i]);
-  gtk_widget_set_visible(GTK_WIDGET(self->tags), all_tags_no_dups && g_strv_length(all_tags_no_dups) > 0);
+  GStrv tags = errands_settings_get_tags(state.settings);
+  if (tags)
+    for (size_t i = 0; i < g_strv_length(tags); i++) errands_task_properties_dialog_add_tag(tags[i]);
+  gtk_widget_set_visible(GTK_WIDGET(self->tags), tags && g_strv_length(tags) > 0);
 
   adw_dialog_present(ADW_DIALOG(self), GTK_WIDGET(state.main_window));
 }
@@ -338,10 +335,10 @@ static void on_attachment_delete_cb(GtkButton *btn, AdwActionRow *attachment) {
 static void on_tag_entry_activated_cb(AdwEntryRow *entry) {
   const char *tag = string_trim((char *)gtk_editable_get_text(GTK_EDITABLE(entry)));
   if (g_str_equal(tag, "")) return;
-  g_auto(GStrv) tags = errands_settings_get_tags();
+  GStrv tags = errands_settings_get_tags(state.settings);
   for (size_t i = 0; i < g_strv_length(tags); i++)
     if (g_str_equal(tag, tags[i])) return;
-  errands_settings_add_tag(tag);
+  errands_settings_add_tag(state.settings, tag);
   errands_task_properties_dialog_add_tag(tag);
   gtk_editable_set_text(GTK_EDITABLE(entry), "");
   gtk_widget_set_visible(GTK_WIDGET(self->tags), true);

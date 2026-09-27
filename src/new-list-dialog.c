@@ -1,7 +1,6 @@
 #include "new-list-dialog.h"
+#include "config.h"
 #include "data.h"
-#include "gio/gio.h"
-#include "settings.h"
 #include "sidebar.h"
 #include "state.h"
 #include "task-list-item.h"
@@ -63,7 +62,7 @@ static void on_response_cb(ErrandsNewListDialog *self, gchar *response, gpointer
     errands_task_list_item_save(item);
     errands_sidebar_update_filter_rows();
     // errands_sync_create_list(item);
-    errands_settings_set(SETTING_LAST_LIST_UID, (void *)item->uid);
+    errands_settings_set_last_list_uid(state.settings, item->uid);
     errands_sidebar_select_last_opened_page();
   }
 }

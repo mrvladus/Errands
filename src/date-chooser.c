@@ -1,7 +1,6 @@
 #include "date-chooser.h"
 #include "config.h"
 #include "data.h"
-#include "glib-object.h"
 #include "utils.h"
 
 #include <glib/gi18n.h>
@@ -69,8 +68,7 @@ static void errands_date_chooser_class_init(ErrandsDateChooserClass *class) {
   object_class->get_property = get_property;
   object_class->set_property = set_property;
 
-  obj_properties[PROP_DATE_STRING] =
-      g_param_spec_string("date-string", "Date String", "Date string", NULL, G_PARAM_READWRITE);
+  obj_properties[PROP_DATE_STRING] = g_param_spec_string("date-string", "Date String", "Date string", NULL, G_PARAM_READWRITE);
 
   g_object_class_install_properties(object_class, N_PROPERTIES, obj_properties);
 

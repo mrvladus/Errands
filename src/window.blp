@@ -5,9 +5,6 @@ template $ErrandsWindow: Adw.ApplicationWindow {
   title: _("Errands");
   default-width: 360;
   default-height: 294;
-  notify::default-width => $on_size_changed_cb();
-  notify::default-height => $on_size_changed_cb();
-  notify::maximized => $on_maximize_changed_cb();
 
   Adw.Breakpoint {
     condition ("max-width: 620px")

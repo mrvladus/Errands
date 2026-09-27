@@ -1,9 +1,7 @@
 #include "sidebar.h"
 #include "about-dialog.h"
+#include "config.h"
 #include "data.h"
-#include "gio/gio.h"
-#include "glib-object.h"
-#include "glib.h"
 #include "new-list-dialog.h"
 #include "settings-dialog.h"
 #include "settings.h"
@@ -57,8 +55,8 @@ static AdwSidebarItem *create_sidebar_task_list_item_create_func(ErrandsTaskList
   g_object_set_data(G_OBJECT(self), "item", item);
   g_object_bind_property(item, "title", self, "title", G_BINDING_SYNC_CREATE);
   GtkWidget *counter = gtk_label_new(NULL);
-  g_object_bind_property_full(item, "count", counter, "label", G_BINDING_SYNC_CREATE, counter_binding_transform_func,
-                              NULL, NULL, NULL);
+  g_object_bind_property_full(item, "count", counter, "label", G_BINDING_SYNC_CREATE, counter_binding_transform_func, NULL, NULL,
+                              NULL);
   gtk_widget_add_css_class(counter, "dim-label");
   gtk_widget_add_css_class(counter, "caption");
   GtkColorDialog *dialog = gtk_color_dialog_new();
@@ -83,8 +81,7 @@ static void errands_sidebar_init(ErrandsSidebar *sidebar) {
   // errands_add_action(ag, "sync", errands_sync, self, NULL);
 
   adw_sidebar_section_bind_model(self->task_lists_section, G_LIST_MODEL(task_lists_model),
-                                 (AdwSidebarSectionCreateItemFunc)create_sidebar_task_list_item_create_func, NULL,
-                                 NULL);
+                                 (AdwSidebarSectionCreateItemFunc)create_sidebar_task_list_item_create_func, NULL, NULL);
   g_list_store_sort(task_lists_model, sort_func, NULL);
   errands_sidebar_update_filter_rows();
 }
@@ -114,7 +111,7 @@ ErrandsTaskListItem *errands_sidebar_find_list(const char *uid) {
 }
 
 void errands_sidebar_select_last_opened_page(void) {
-  const char *last_uid = errands_settings_get(SETTING_LAST_LIST_UID).s;
+  const char *last_uid = errands_settings_get_last_list_uid(state.settings);
   int idx = -1;
   GListModel *model = G_LIST_MODEL(task_lists_model);
   for (size_t i = 0; i < g_list_model_get_n_items(model); i++) {
@@ -130,8 +127,8 @@ void errands_sidebar_select_last_opened_page(void) {
 }
 
 void errands_sidebar_update_filter_rows(void) {
-  bool show_completed = errands_settings_get(SETTING_SHOW_COMPLETED).b;
-  bool show_cancelled = errands_settings_get(SETTING_SHOW_CANCELLED).b;
+  bool show_completed = errands_settings_get_show_completed(state.settings);
+  bool show_cancelled = errands_settings_get_show_cancelled(state.settings);
   GListModel *model = G_LIST_MODEL(task_lists_model);
   int total = 0, completed = 0, today = 0, today_completed = 0, n_lists = g_list_model_get_n_items(model);
   for_range(i, 0, n_lists) {
@@ -152,8 +149,7 @@ void errands_sidebar_update_filter_rows(void) {
     }
   }
   gtk_label_set_label(self->all_counter, total - completed > 0 ? tmp_str_printf("%d", total - completed) : "");
-  gtk_label_set_label(self->today_counter,
-                      today - today_completed > 0 ? tmp_str_printf("%d", today - today_completed) : "");
+  gtk_label_set_label(self->today_counter, today - today_completed > 0 ? tmp_str_printf("%d", today - today_completed) : "");
   gtk_widget_set_visible(self->sidebar, n_lists > 0);
 }
 
@@ -187,7 +183,7 @@ static void on_sidebar_activated_cb(AdwSidebar *self, guint index, gpointer user
     AdwSidebarItem *item = adw_sidebar_get_item(self, index);
     g_assert(item);
     ErrandsTaskListItem *tl_item = g_object_get_data(G_OBJECT(item), "item");
-    errands_settings_set(SETTING_LAST_LIST_UID, (void *)tl_item->uid);
+    errands_settings_set_last_list_uid(state.settings, tl_item->uid);
     errands_task_list_show_task_list(task_list, tl_item);
   }
   adw_navigation_split_view_set_show_content(state.main_window->split_view, true);
@@ -202,7 +198,7 @@ static void __on_open_finish(GObject *obj, GAsyncResult *res) {
   errands_task_list_item_save(item);
   // errands_sync_create_list(data);
   errands_sidebar_update_filter_rows();
-  errands_settings_set(SETTING_LAST_LIST_UID, (void *)item->uid);
+  errands_settings_set_last_list_uid(state.settings, item->uid);
   errands_sidebar_select_last_opened_page();
 }
 

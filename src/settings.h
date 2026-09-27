@@ -1,68 +1,73 @@
 #pragma once
 
-#include "config.h"
-
-#include <glib.h>
-
-#include <stdbool.h>
-
-typedef enum {
-  // BOOL
-  SETTING_MAXIMIZED,
-  SETTING_SHOW_CANCELLED,
-  SETTING_SHOW_COMPLETED,
-  SETTING_NOTIFICATIONS,
-  SETTING_BACKGROUND,
-  SETTING_STARTUP,
-  SETTING_SYNC,
-  // INT
-  SETTING_THEME,
-  SETTING_SORT_BY,
-  SETTING_SORT_ORDER,
-  SETTING_SYNC_INTERVAL,
-  SETTING_WINDOW_HEIGHT,
-  SETTING_WINDOW_WIDTH,
-  // STRING
-  SETTING_LAST_LIST_UID,
-  SETTING_SYNC_PROVIDER,
-  SETTING_SYNC_URL,
-  SETTING_SYNC_USERNAME,
-  SETTING_TAGS,
-} ErrandsSettingsKey;
+#include <glib-object.h>
 
 typedef enum {
   SORT_TYPE_CREATION_DATE,
   SORT_TYPE_START_DATE,
   SORT_TYPE_DUE_DATE,
   SORT_TYPE_PRIORITY,
-} ErrandsSettingSortType;
+} ErrandsSettingsSortType;
 
 typedef enum {
   SORT_ORDER_DESC,
   SORT_ORDER_ASC,
-} ErrandsSettingSortOrder;
+} ErrandsSettingsSortOrder;
 
 typedef enum {
   SETTING_THEME_SYSTEM,
   SETTING_THEME_LIGHT,
   SETTING_THEME_DARK,
-} ErrandsSettingTheme;
+} ErrandsSettingsTheme;
 
-typedef union {
-  int i;
-  bool b;
-  const char *s;
-} ErrandsSetting;
+#define ERRANDS_TYPE_SETTINGS errands_settings_get_type()
+G_DECLARE_FINAL_TYPE(ErrandsSettings, errands_settings, ERRANDS, SETTINGS, GObject)
 
-void errands_settings_init();
-void errands_settings_cleanup();
-ErrandsSetting errands_settings_get(ErrandsSettingsKey key);
-void errands_settings_set(ErrandsSettingsKey key, void *value);
+ErrandsSettings *errands_settings_new();
 
-GStrv errands_settings_get_tags();
-void errands_settings_set_tags(GStrv tags);
-void errands_settings_add_tag(const char *tag);
-void errands_settings_remove_tag(const char *tag);
+// --- METHODS --- //
 
-gchar *errands_settings_get_password();
-void errands_settings_set_password(const char *password);
+void errands_settings_add_tag(ErrandsSettings *self, const gchar *tag);
+void errands_settings_remove_tag(ErrandsSettings *self, const gchar *tag);
+
+// --- GETTERS --- //
+
+gboolean errands_settings_get_maximized(ErrandsSettings *self);
+gboolean errands_settings_get_show_completed(ErrandsSettings *self);
+gboolean errands_settings_get_show_cancelled(ErrandsSettings *self);
+gboolean errands_settings_get_background(ErrandsSettings *self);
+gboolean errands_settings_get_startup(ErrandsSettings *self);
+gboolean errands_settings_get_sync_enabled(ErrandsSettings *self);
+gint errands_settings_get_theme(ErrandsSettings *self);
+gint errands_settings_get_sort_by(ErrandsSettings *self);
+gint errands_settings_get_sort_order(ErrandsSettings *self);
+gint errands_settings_get_sync_interval(ErrandsSettings *self);
+gint errands_settings_get_window_width(ErrandsSettings *self);
+gint errands_settings_get_window_height(ErrandsSettings *self);
+const gchar *errands_settings_get_last_list_uid(ErrandsSettings *self);
+const gchar *errands_settings_get_sync_provider(ErrandsSettings *self);
+const gchar *errands_settings_get_sync_url(ErrandsSettings *self);
+const gchar *errands_settings_get_sync_username(ErrandsSettings *self);
+const gchar *errands_settings_get_sync_password(ErrandsSettings *self);
+const GStrv errands_settings_get_tags(ErrandsSettings *self);
+
+// --- SETTERS --- //
+
+void errands_settings_set_maximized(ErrandsSettings *self, gboolean maximized);
+void errands_settings_set_show_completed(ErrandsSettings *self, gboolean show_completed);
+void errands_settings_set_show_cancelled(ErrandsSettings *self, gboolean show_cancelled);
+void errands_settings_set_background(ErrandsSettings *self, gboolean background);
+void errands_settings_set_startup(ErrandsSettings *self, gboolean startup);
+void errands_settings_set_sync_enabled(ErrandsSettings *self, gboolean sync_enabled);
+void errands_settings_set_theme(ErrandsSettings *self, gint theme);
+void errands_settings_set_sort_by(ErrandsSettings *self, gint sort_by);
+void errands_settings_set_sort_order(ErrandsSettings *self, gint sort_order);
+void errands_settings_set_sync_interval(ErrandsSettings *self, gint sync_interval);
+void errands_settings_set_window_width(ErrandsSettings *self, gint window_width);
+void errands_settings_set_window_height(ErrandsSettings *self, gint window_height);
+void errands_settings_set_last_list_uid(ErrandsSettings *self, const gchar *last_list_uid);
+void errands_settings_set_sync_provider(ErrandsSettings *self, const gchar *sync_provider);
+void errands_settings_set_sync_url(ErrandsSettings *self, const gchar *sync_url);
+void errands_settings_set_sync_username(ErrandsSettings *self, const gchar *sync_username);
+void errands_settings_set_sync_password(ErrandsSettings *self, const gchar *sync_password);
+void errands_settings_set_tags(ErrandsSettings *self, GStrv tags);
