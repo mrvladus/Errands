@@ -85,6 +85,33 @@ clean:
 $(BUILD_DIR):
 	@mkdir -p $(BUILD_DIR)
 
+# --- Dependency check --- #
+
+DEPS_CHECKED = $(BUILD_DIR)/deps-checked
+
+$(DEPS_CHECKED): Makefile | $(BUILD_DIR)
+	@echo "Checking installed libraries with pkg-config..."
+	@if ! command -v pkg-config >/dev/null 2>&1; then \
+		echo "Error: pkg-config is not installed"; \
+		exit 1; \
+	fi
+	@missing=""; \
+	for lib in $(PKG_CONFIG_LIBS); do \
+		echo "Checking $$lib"; \
+		if ! pkg-config --exists $$lib; then \
+			missing="$$missing $$lib"; \
+		fi; \
+	done; \
+	if [ -n "$$missing" ]; then \
+		echo "Error: missing required libraries:"; \
+		for lib in $$missing; do echo "  - $$lib"; done; \
+		echo ""; \
+		echo "Install them and run 'make' again"; \
+		exit 1; \
+	fi
+	@echo "All dependencies found"
+	@touch $@
+
 # --- Resources targets --- #
 
 BLPS   = $(wildcard $(SRC_DIR)/*.blp)
@@ -141,7 +168,7 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
 	@echo "Compiling $<"
 	@$(CC) $(ALL_CFLAGS) -MMD -MP -c -o $@ $<
 
-$(BUILD_DIR)/$(NAME): $(OBJS)
+$(BUILD_DIR)/$(NAME): $(DEPS_CHECKED) $(OBJS)
 		@echo "Linking executable $@"
 		@$(CC) -o $@ $^ $(ALL_LDFLAGS)
 
