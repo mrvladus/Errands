@@ -93,20 +93,6 @@ static void errands_task_list_item_class_init(ErrandsTaskListItemClass *klass) {
 
 static void errands_task_list_item_init(ErrandsTaskListItem *self) {}
 
-// ---------- PRIVATE ---------- //
-
-static void errands__task_list_item_save_cb(ErrandsTaskListItem *self) {
-  g_return_if_fail(self);
-
-  const char *path = tmp_str_printf("%s/%s.ics", calendars_dir, self->uid);
-  const char *ical_str = icalcomponent_as_ical_string(self->ical);
-  if (ical_str && !g_file_set_contents(path, ical_str, -1, NULL)) {
-    g_message("Task List Item: Failed to save list '%s'", path);
-    return;
-  }
-  g_message("Task List Item: Saved list '%s'", path);
-}
-
 // ---------- PUBLIC ---------- //
 
 ErrandsTaskListItem *errands_task_list_item_new(icalcomponent *ical) {
@@ -207,7 +193,13 @@ void errands_task_list_item_update_count(ErrandsTaskListItem *self) {
 void errands_task_list_item_save(ErrandsTaskListItem *self) {
   g_return_if_fail(self);
 
-  g_idle_add_once((GSourceOnceFunc)errands__task_list_item_save_cb, self);
+  const char *path = tmp_str_printf("%s/%s.ics", calendars_dir, self->uid);
+  const char *ical_str = icalcomponent_as_ical_string(self->ical);
+  if (ical_str && !g_file_set_contents(path, ical_str, -1, NULL)) {
+    g_message("Task List Item: Failed to save list '%s'", path);
+    return;
+  }
+  g_message("Task List Item: Saved list '%s'", path);
 }
 
 void errands_task_list_item_delete(ErrandsTaskListItem *self) {

@@ -1,13 +1,12 @@
 #include "data.h"
+#include "glib.h"
 #include "settings.h"
 #include "state.h"
 #include "task-list-item.h"
 #include "utils.h"
 
-#define JSON_H_IMPLEMENTATION
-#include "vendor/json.h"
-
-AUTOPTR_DEFINE(JSON, json_free)
+#include <json-glib/json-glib.h>
+#include <libical/ical.h>
 
 // ---------- GLOBALS ---------- //
 
@@ -39,94 +38,107 @@ static void create_backup() {
 }
 
 static void migrate_from_46() {
-  g_autofree gchar *old_data_file = g_build_filename(user_dir, "data.json", NULL);
-  if (!g_file_test(old_data_file, G_FILE_TEST_EXISTS)) return;
+  g_autofree gchar *filename = g_build_filename(user_dir, "data.json", NULL);
+  if (!g_file_test(filename, G_FILE_TEST_EXISTS)) return;
   g_message("User Data: Migrate from 46.x");
-  g_autofree gchar *contents = read_file_to_string(old_data_file);
   g_autoptr(GError) error = NULL;
-  g_file_get_contents(old_data_file, &contents, NULL, &error);
-  // Read file contents
-  if (!contents) {
-    g_message("User Data: Failed to read old data file at %s. %s", old_data_file, error->message);
+  g_autoptr(JsonParser) parser = json_parser_new();
+  json_parser_load_from_file(parser, filename, &error);
+  if (error != NULL) {
+    g_critical("Unable to parse '%s': %s", filename, error->message);
     return;
   }
-  // Parse JSON
-  autoptr(JSON) root = json_parse(contents);
-  if (!root) return;
-  // Process lists
-  JSON *cal_arr = json_object_get(root, "lists");
-  JSON *cal_item = NULL;
-  for (cal_item = cal_arr->child; cal_item; cal_item = cal_item->next) {
-    JSON *list_uid_item = json_object_get(cal_item, "uid");
 
-    g_autoptr(ErrandsTaskListItem) item = errands_task_list_item_create(
-        list_uid_item->string_val, json_object_get(cal_item, "name")->string_val, json_object_get(cal_item, "color")->string_val,
-        json_object_get(cal_item, "deleted")->bool_val, json_object_get(cal_item, "synced")->bool_val);
+  JsonObject *root = json_node_get_object(json_parser_get_root(parser));
+
+  // Process tags
+  JsonArray *tags_arr = json_object_get_array_member(root, "tags");
+  g_autoptr(GStrvBuilder) tags_builder = g_strv_builder_new();
+  for_range(i, 0, json_array_get_length(tags_arr)) g_strv_builder_add(tags_builder, json_array_get_string_element(tags_arr, i));
+  GStrv tags = g_strv_builder_end(tags_builder);
+  errands_settings_set_tags(state.settings, tags);
+
+  // Process lists
+  JsonArray *lists = json_object_get_array_member(root, "lists");
+  for_range(i, 0, json_array_get_length(lists)) {
+    JsonObject *list = json_node_get_object(json_array_get_element(lists, i));
+    const gchar *list_uid = json_object_get_string_member(list, "uid");
+    const gchar *list_name = json_object_get_string_member(list, "name");
+    const gchar *list_color = json_object_get_string_member(list, "color");
+    gboolean list_deleted = json_object_get_boolean_member(list, "deleted");
+    gboolean list_synced = json_object_get_boolean_member(list, "synced");
+
+    g_autoptr(ErrandsTaskListItem) list_item =
+        errands_task_list_item_create(list_uid, list_name, list_color, list_deleted, list_synced);
 
     // Process tasks
-    JSON *tasks_arr = json_object_get(root, "tasks");
-    if (tasks_arr->type != JSON_TYPE_ARRAY) continue;
-    for (JSON *task_item = tasks_arr->child; task_item; task_item = task_item->next) {
-      JSON *task_list_uid_item = json_object_get(task_item, "list_uid");
-      const gchar *task_list_uid = task_list_uid_item ? task_list_uid_item->string_val : NULL;
-      if (!task_list_uid || !STR_EQUAL(task_list_uid, list_uid_item->string_val)) continue;
+    JsonArray *tasks = json_object_get_array_member(root, "tasks");
+    for_range(j, 0, json_array_get_length(tasks)) {
+      JsonObject *task = json_node_get_object(json_array_get_element(tasks, j));
+      const gchar *task_list_uid = json_object_get_string_member(task, "list_uid");
+      if (!g_str_equal(task_list_uid, list_uid)) continue;
+
       // Process attachments
-      JSON *task_attachments_arr = json_object_get(task_item, "attachments");
-      g_autoptr(GStrvBuilder) builder = g_strv_builder_new();
-      for (JSON *attachment_item = task_attachments_arr->child; attachment_item; attachment_item = attachment_item->next)
-        g_strv_builder_add(builder, attachment_item->string_val);
-      g_auto(GStrv) attachments = g_strv_builder_end(builder);
+      JsonArray *task_attachments_arr = json_object_get_array_member(task, "attachments");
+      g_autoptr(GStrvBuilder) attachments_builder = g_strv_builder_new();
+      for_range(k, 0, json_array_get_length(task_attachments_arr))
+          g_strv_builder_add(attachments_builder, json_array_get_string_element(task_attachments_arr, k));
+      g_auto(GStrv) attachments = g_strv_builder_end(attachments_builder);
+
       // Process tags
-      JSON *task_tags_arr = json_object_get(task_item, "tags");
+      JsonArray *task_tags_arr = json_object_get_array_member(task, "tags");
       g_autoptr(GStrvBuilder) tags_builder = g_strv_builder_new();
-      JSON *tags_item = NULL;
-      for (tags_item = task_tags_arr->child; tags_item; tags_item = tags_item->next)
-        g_strv_builder_add(builder, tags_item->string_val);
-      g_auto(GStrv) tags = g_strv_builder_end(builder);
-      // Extract task properties
-      JSON *color_item = json_object_get(task_item, "color");
-      JSON *completed_item = json_object_get(task_item, "completed");
-      JSON *changed_at_item = json_object_get(task_item, "changed_at");
-      JSON *created_at_item = json_object_get(task_item, "created_at");
-      JSON *deleted_item = json_object_get(task_item, "deleted");
-      JSON *due_date_item = json_object_get(task_item, "due_date");
-      JSON *notes_item = json_object_get(task_item, "notes");
-      JSON *notified_item = json_object_get(task_item, "notified");
-      JSON *parent_item = json_object_get(task_item, "parent");
-      JSON *percent_complete_item = json_object_get(task_item, "percent_complete");
-      JSON *priority_item = json_object_get(task_item, "priority");
-      JSON *rrule_item = json_object_get(task_item, "rrule");
-      JSON *start_date_item = json_object_get(task_item, "start_date");
-      JSON *text_item = json_object_get(task_item, "text");
-      JSON *uid_item = json_object_get(task_item, "uid");
+      for_range(k, 0, json_array_get_length(task_tags_arr))
+          g_strv_builder_add(tags_builder, json_array_get_string_element(task_tags_arr, k));
+      g_auto(GStrv) tags = g_strv_builder_end(tags_builder);
+
+      // Process properties
+      const gchar *uid = json_object_get_string_member(task, "uid");
+      const gchar *text = json_object_get_string_member(task, "text");
+      const gchar *color = json_object_get_string_member(task, "color");
+      const gchar *parent = json_object_get_string_member(task, "parent");
+      const gchar *changed = json_object_get_string_member(task, "changed_at");
+      const gchar *created = json_object_get_string_member(task, "created_at");
+      const gchar *due = json_object_get_string_member(task, "due_date");
+      const gchar *notes = json_object_get_string_member(task, "notes");
+      const gchar *rrule = json_object_get_string_member(task, "rrule");
+      const gchar *start = json_object_get_string_member(task, "start_date");
+      gboolean completed = json_object_get_boolean_member(task, "completed");
+      gboolean deleted = json_object_get_boolean_member(task, "deleted");
+      gboolean notified = json_object_get_boolean_member(task, "notified");
+      gboolean synced = json_object_get_boolean_member(task, "synced");
+      gint64 priority = json_object_get_int_member(task, "priority");
+      gint64 percent_complete = json_object_get_int_member(task, "percent_complete");
+
       // Create iCalendar event
       icalcomponent *ical = icalcomponent_new(ICAL_VTODO_COMPONENT);
-      if (completed_item) errands_data_set_completed(ical, icaltime_get_date_time_now());
+      if (completed) errands_data_set_completed(ical, icaltime_get_date_time_now());
       if (tags) errands_data_set_tags(ical, tags);
-      if (changed_at_item) errands_data_set_changed(ical, icaltime_from_string(changed_at_item->string_val));
-      if (created_at_item) errands_data_set_created(ical, icaltime_from_string(created_at_item->string_val));
-      if (due_date_item) errands_data_set_due(ical, icaltime_from_string(due_date_item->string_val));
-      if (notes_item) errands_data_set_notes(ical, notes_item->string_val);
-      if (parent_item) errands_data_set_parent(ical, parent_item->string_val);
-      if (percent_complete_item) errands_data_set_percent(ical, percent_complete_item->int_val);
-      if (priority_item) errands_data_set_priority(ical, priority_item->int_val);
-      if (rrule_item) {
-        struct icalrecurrencetype *rrule = icalrecurrencetype_new_from_string(rrule_item->string_val);
-        errands_data_set_rrule(ical, rrule);
-        icalrecurrencetype_unref(rrule);
+      if (changed) errands_data_set_changed(ical, icaltime_from_string(changed));
+      if (created) errands_data_set_created(ical, icaltime_from_string(created));
+      if (due) errands_data_set_due(ical, icaltime_from_string(due));
+      if (notes) errands_data_set_notes(ical, notes);
+      if (parent) errands_data_set_parent(ical, parent);
+      if (percent_complete) errands_data_set_percent(ical, percent_complete);
+      if (priority) errands_data_set_priority(ical, priority);
+      if (rrule) {
+        struct icalrecurrencetype *rrule_ = icalrecurrencetype_new_from_string(rrule);
+        errands_data_set_rrule(ical, rrule_);
+        icalrecurrencetype_unref(rrule_);
       }
-      if (start_date_item) errands_data_set_start(ical, icaltime_from_string(start_date_item->string_val));
-      if (text_item) errands_data_set_text(ical, text_item->string_val);
-      if (uid_item) errands_data_set_uid(ical, uid_item->string_val);
+      if (start) errands_data_set_start(ical, icaltime_from_string(start));
+      if (text) errands_data_set_text(ical, text);
+      if (uid) errands_data_set_uid(ical, uid);
       errands_data_set_attachments(ical, attachments);
-      errands_data_set_color(ical, color_item->string_val);
-      errands_data_set_deleted(ical, deleted_item->bool_val);
-      errands_data_set_notified(ical, notified_item->bool_val);
-      icalcomponent_add_component(item->ical, ical);
+      errands_data_set_color(ical, color);
+      errands_data_set_deleted(ical, deleted);
+      errands_data_set_notified(ical, notified);
+      errands_data_set_synced(ical, synced);
+      icalcomponent_add_component(list_item->ical, ical);
     }
-    errands_task_list_item_save(item);
+    errands_task_list_item_save(list_item);
   }
-  remove(old_data_file);
+  // remove(filename);
 }
 
 static icalproperty *get_x_prop(icalcomponent *ical, const char *xprop, const char *default_val) {
@@ -303,16 +315,16 @@ void errands_data_set_notes(icalcomponent *ical, const char *value) {
 }
 void errands_data_set_color(icalcomponent *ical, const char *value) {
   const char *color = value;
-  if (!color || g_str_equal(color, "")) color = generate_hex_as_str();
   g_autofree char *fixed_color = NULL;
-  if (!g_str_has_prefix(color, "#")) {
+  if (color && !g_str_has_prefix(color, "#")) {
     if (strlen(color) != 7) {
       fixed_color = g_strndup(color, 7);
       color = fixed_color;
     }
   }
   if (icalcomponent_isa(ical) == ICAL_VCALENDAR_COMPONENT) {
-    set_x_prop_value(ical, "X-APPLE-CALENDAR-COLOR", color && !g_str_equal(color, "") ? color : NULL);
+    if (!color || g_str_equal(color, "")) color = generate_hex_as_str();
+    set_x_prop_value(ical, "X-APPLE-CALENDAR-COLOR", color);
   } else {
     if (!value || g_str_equal(value, ""))
       icalcomponent_remove_property(ical, icalcomponent_get_first_property(ical, ICAL_COLOR_PROPERTY));
