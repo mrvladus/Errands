@@ -1,7 +1,5 @@
 #include "settings-dialog.h"
 #include "config.h"
-#include "glib-object.h"
-#include "glib.h"
 #include "settings.h"
 #include "state.h"
 
