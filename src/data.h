@@ -8,7 +8,7 @@
 
 extern GListStore *task_lists_model;
 
-extern gchar *user_dir, *calendars_dir, *backups_dir;
+extern gchar *user_dir, *calendars_dir;
 
 // Initialize user data
 void errands_data_init(void);

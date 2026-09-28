@@ -12,11 +12,12 @@
 
 GListStore *task_lists_model = NULL;
 
-gchar *user_dir, *calendars_dir, *backups_dir;
+gchar *user_dir, *calendars_dir;
 
 // ---------- PRIVATE FUNCTIONS ---------- //
 
 static void create_backup() {
+  g_autofree gchar *backups_dir = g_build_filename(user_dir, "backups", NULL);
   g_mkdir_with_parents(backups_dir, 0755);
   // Count files in backups_dir
   autofree char *out = NULL;
@@ -174,7 +175,6 @@ void errands_data_init() {
   task_lists_model = g_list_store_new(ERRANDS_TYPE_TASK_LIST_ITEM);
   user_dir = g_build_filename(g_get_user_data_dir(), "errands", NULL);
   calendars_dir = g_build_filename(user_dir, "calendars", NULL);
-  backups_dir = g_build_filename(user_dir, "backups", NULL);
 
   g_mkdir_with_parents(calendars_dir, 0755);
   migrate_from_46();
@@ -213,7 +213,6 @@ void errands_data_cleanup(void) {
   g_message("User Data: Cleanup");
   if (user_dir) g_free(user_dir);
   if (calendars_dir) g_free(calendars_dir);
-  if (backups_dir) g_free(backups_dir);
   g_list_store_remove_all(task_lists_model);
   g_object_unref(task_lists_model);
 }
