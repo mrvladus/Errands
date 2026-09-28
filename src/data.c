@@ -138,7 +138,8 @@ static void migrate_from_46() {
     }
     errands_task_list_item_save(list_item);
   }
-  // remove(filename);
+  remove(filename);
+  g_message("User Data: Migrated successfully");
 }
 
 static icalproperty *get_x_prop(icalcomponent *ical, const char *xprop, const char *default_val) {
