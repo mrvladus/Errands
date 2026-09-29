@@ -31,25 +31,13 @@ else
 	ALL_LDFLAGS = -O3 -flto
 endif
 
-# Debug mode: GDB, GF2, FALSE.
-# Run Errands in the debugger.
-DEBUG ?= FALSE
-ifeq ($(DEBUG),GDB)
-    RUN_CMD = gdb -q -ex run $(BUILD_DIR)/$(NAME)
-else ifeq ($(DEBUG),GF2)
-    RUN_CMD = gf2 $(BUILD_DIR)/$(NAME)
-else
-	RUN_CMD = $(BUILD_DIR)/$(NAME)
-endif
-
-# Installation destination directory. Default: not set.
-DESTDIR ?=
-# Installation prefix directory. Default: /usr/local.
-# For Flatpak builds, set `prefix=/app`.
-prefix  ?= /usr/local
-
 # --- Installation directories --- #
 
+# Installation destination directory. Default: not set.
+DESTDIR        ?=
+# Installation prefix directory. Default: /usr/local.
+# For Flatpak builds, set `prefix=/app`.
+prefix         ?= /usr/local
 bindir          = $(prefix)/bin
 datarootdir     = $(prefix)/share
 localedir       = $(datarootdir)/locale
@@ -201,6 +189,23 @@ uninstall:
 	rm -f $(DESTDIR)$(symbolicicondir)/io.github.mrvladus.List-symbolic.svg
 	rm -f $(DESTDIR)$(dbusdir)/$(APP_ID).service
 
+# --- Run targets --- #
+
+# Debug mode: GDB, GF2, FALSE.
+# Run Errands in the debugger.
+DEBUG ?= FALSE
+ifeq ($(DEBUG),GDB)
+    RUN_CMD = gdb -q -ex run $(BUILD_DIR)/$(NAME)
+else ifeq ($(DEBUG),GF2)
+    RUN_CMD = gf2 $(BUILD_DIR)/$(NAME)
+else
+	RUN_CMD = $(BUILD_DIR)/$(NAME)
+endif
+
+# Build and run the application.
+run: all
+	$(RUN_CMD)
+
 # --- Flatpak targets --- #
 
 $(FLATPAK_BUILD_DIR): $(OBJS)
@@ -242,10 +247,6 @@ nextcloud-setup:
 	  docker.io/library/nextcloud:latest
 	@echo "Nextcloud container is running on http://localhost:8080"
 	@echo "Username: 'errands', Password: 'errands'"
-
-# Build and run the application.
-run: all
-	$(RUN_CMD)
 
 # Count source lines of code.
 sloc:
