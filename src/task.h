@@ -47,4 +47,4 @@ struct _ErrandsTask {
 };
 
 ErrandsTask *errands_task_new();
-void errands_task_update_toolbar(ErrandsTask *task);
+void errands_task_set_item(ErrandsTask *task, ErrandsTaskItem *item);

@@ -19,8 +19,6 @@
 static void on_setup_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_item);
 static void on_bind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_item);
 static void on_unbind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_item);
-// static void on_header_setup_item_cb(GtkSignalListItemFactory *self, GtkListHeader *header);
-// static void on_header_bind_item_cb(GtkSignalListItemFactory *self, GtkListHeader *header);
 
 static void on_task_list_entry_activated_cb(ErrandsTaskList *self);
 static void on_task_list_entry_text_changed_cb(ErrandsTaskList *self);
@@ -42,9 +40,6 @@ static void on_action_sort_by_cb(GSimpleAction *action, GVariant *param, Errands
 static bool today_filter_func(ErrandsTaskItem *item, ErrandsTaskList *self);
 static bool tree_filter_func(GtkTreeListRow *row, ErrandsTaskList *self);
 static int sort_func(ErrandsTaskItem *a, ErrandsTaskItem *b, ErrandsTaskList *self);
-// static bool __task_today_child_match_func(TaskData *data);
-// static bool __task_or_descendants_match_search_query(TaskData *data, const char *query);
-// static bool __task_ancestor_match_search_query(TaskData *data, const char *query);
 
 // ---------- WIDGET TEMPLATE ---------- //
 
@@ -79,8 +74,6 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_setup_item_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_bind_item_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_unbind_item_cb);
-  // gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_header_setup_item_cb);
-  // gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_header_bind_item_cb);
 }
 
 static GListModel *task_children_func(gpointer item, gpointer user_data) {
@@ -263,20 +256,7 @@ static void on_bind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_it
   gtk_tree_expander_set_list_row(expander, row);
   ErrandsTask *task = ERRANDS_TASK(gtk_tree_expander_get_child(expander));
   g_autoptr(ErrandsTaskItem) item = gtk_tree_list_row_get_item(row);
-
-  g_object_set(item, "task-widget", task, NULL);
-  g_object_set(task, "item", item, NULL);
-
-  g_object_bind_property(item, "color", task, "color", G_BINDING_SYNC_CREATE);
-  g_object_bind_property(item, "priority", task, "priority", G_BINDING_SYNC_CREATE);
-  g_object_bind_property(item, "notes", task, "notes", G_BINDING_SYNC_CREATE);
-  g_object_bind_property(item, "dtstart", task, "dtstart", G_BINDING_SYNC_CREATE);
-  g_object_bind_property(item, "dtend", task, "dtend", G_BINDING_SYNC_CREATE);
-  g_object_bind_property(item, "tags", task, "tags", G_BINDING_SYNC_CREATE);
-  g_object_bind_property(item, "attachments", task, "attachments", G_BINDING_SYNC_CREATE);
-  g_object_bind_property(item, "rrule", task, "rrule", G_BINDING_SYNC_CREATE);
-  g_object_bind_property(item, "completed", task->complete_btn, "active", G_BINDING_SYNC_CREATE | G_BINDING_BIDIRECTIONAL);
-
+  errands_task_set_item(task, item);
   g_object_bind_property(item, "has-no-children", expander, "hide-expander", G_BINDING_SYNC_CREATE);
 }
 

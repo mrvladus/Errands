@@ -12,6 +12,7 @@
 #include <glib/gi18n.h>
 #include <libical/ical.h>
 
+static void errands_task_update_toolbar(ErrandsTask *task);
 static GtkWidget *errands_task_tag_new(const char *tag);
 
 static void on_edit_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
@@ -236,7 +237,20 @@ static void errands_task_init(ErrandsTask *self) {
 
 ErrandsTask *errands_task_new() { return g_object_new(ERRANDS_TYPE_TASK, NULL); }
 
-// ---------- PUBLIC FUNCTIONS ---------- //
+// ---------- PRIVATE FUNCTIONS ---------- //
+
+static GtkWidget *errands_task_tag_new(const char *tag) {
+  GtkWidget *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
+  gtk_box_append(GTK_BOX(box), g_object_new(GTK_TYPE_IMAGE, "icon-name", "errands-tag-symbolic", NULL));
+  GtkWidget *label = g_object_new(GTK_TYPE_LABEL, "label", tag, "max-width-chars", 15, "halign", GTK_ALIGN_START, "ellipsize",
+                                  PANGO_ELLIPSIZE_END, NULL);
+  gtk_box_append(GTK_BOX(box), label);
+  GtkWidget *button = g_object_new(GTK_TYPE_BUTTON, "child", box, "action-name", "task.tags", NULL);
+  gtk_widget_add_css_class(button, "caption-heading");
+  gtk_widget_add_css_class(button, "tag");
+
+  return button;
+}
 
 static gboolean update_toolbar_cb(ErrandsTask *self) {
   self->toolbar_update_id = 0;
@@ -252,24 +266,25 @@ static gboolean update_toolbar_cb(ErrandsTask *self) {
   return G_SOURCE_REMOVE;
 }
 
-void errands_task_update_toolbar(ErrandsTask *self) {
+static void errands_task_update_toolbar(ErrandsTask *self) {
   if (self->toolbar_update_id) return; // Already scheduled
   self->toolbar_update_id = g_idle_add_full(G_PRIORITY_HIGH_IDLE, (GSourceFunc)update_toolbar_cb, self, NULL);
 }
 
-// ---------- PRIVATE FUNCTIONS ---------- //
+// ---------- PUBLIC FUNCTIONS ---------- //
 
-static GtkWidget *errands_task_tag_new(const char *tag) {
-  GtkWidget *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
-  gtk_box_append(GTK_BOX(box), g_object_new(GTK_TYPE_IMAGE, "icon-name", "errands-tag-symbolic", NULL));
-  GtkWidget *label = g_object_new(GTK_TYPE_LABEL, "label", tag, "max-width-chars", 15, "halign", GTK_ALIGN_START, "ellipsize",
-                                  PANGO_ELLIPSIZE_END, NULL);
-  gtk_box_append(GTK_BOX(box), label);
-  GtkWidget *button = g_object_new(GTK_TYPE_BUTTON, "child", box, "action-name", "task.tags", NULL);
-  gtk_widget_add_css_class(button, "caption-heading");
-  gtk_widget_add_css_class(button, "tag");
-
-  return button;
+void errands_task_set_item(ErrandsTask *self, ErrandsTaskItem *item) {
+  g_object_set(self, "item", item, NULL);
+  g_object_set(item, "task-widget", self, NULL);
+  g_object_bind_property(item, "color", self, "color", G_BINDING_SYNC_CREATE);
+  g_object_bind_property(item, "priority", self, "priority", G_BINDING_SYNC_CREATE);
+  g_object_bind_property(item, "notes", self, "notes", G_BINDING_SYNC_CREATE);
+  g_object_bind_property(item, "dtstart", self, "dtstart", G_BINDING_SYNC_CREATE);
+  g_object_bind_property(item, "dtend", self, "dtend", G_BINDING_SYNC_CREATE);
+  g_object_bind_property(item, "tags", self, "tags", G_BINDING_SYNC_CREATE);
+  g_object_bind_property(item, "attachments", self, "attachments", G_BINDING_SYNC_CREATE);
+  g_object_bind_property(item, "rrule", self, "rrule", G_BINDING_SYNC_CREATE);
+  g_object_bind_property(item, "completed", self->complete_btn, "active", G_BINDING_SYNC_CREATE | G_BINDING_BIDIRECTIONAL);
 }
 
 // ---------- ACTION CALLBACKS ---------- //

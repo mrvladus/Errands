@@ -2,7 +2,8 @@
 
 NAME    = errands
 VERSION = 50.0
-CC = gcc
+CC 		= gcc
+
 # --- Project directories --- #
 
 SRC_DIR           = src
