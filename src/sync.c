@@ -1,5 +1,7 @@
 #include "sync.h"
 
+static bool task_is_changed(ErrandsTaskItem *task) { return true; }
+
 // ---------- PUBLIC ---------- //
 
 void errands_sync_init(void) {}
