@@ -9,11 +9,9 @@ e.g. GLib's g_autoptr, g_auto and g_autofree"
 #include "settings.h"
 #include "sidebar.h"
 #include "state.h"
+#include "utils.h"
 // #include "sync.h"
 #include "window.h"
-
-#define TOOLBOX_IMPLEMENTATION
-#include "vendor/toolbox.h"
 
 #include <glib/gi18n.h>
 #include <libportal-gtk4/portal-gtk4.h>

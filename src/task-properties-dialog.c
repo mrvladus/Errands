@@ -1,6 +1,5 @@
 #include "task-properties-dialog.h"
 #include "config.h"
-#include "data.h"
 #include "date-chooser.h"
 #include "settings.h"
 #include "state.h"
@@ -8,8 +7,6 @@
 #include "task-item.h"
 #include "task-list.h"
 #include "utils.h"
-
-#include "vendor/toolbox.h"
 
 #include <glib/gi18n.h>
 #include <gtksourceview/gtksource.h>

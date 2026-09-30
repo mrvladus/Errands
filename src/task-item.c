@@ -391,7 +391,7 @@ void errands_task_item_remove_tag(ErrandsTaskItem *self, const char *tag) {
 
   for (icalproperty *p = icalcomponent_get_first_property(self->ical, ICAL_CATEGORIES_PROPERTY); p;
        p = icalcomponent_get_next_property(self->ical, ICAL_CATEGORIES_PROPERTY)) {
-    if (STR_EQUAL(tag, icalproperty_get_value_as_string(p))) {
+    if (g_str_equal(tag, icalproperty_get_value_as_string(p))) {
       icalcomponent_remove_property(self->ical, p);
       errands_data_set_synced(self->ical, false);
       errands_data_set_changed(self->ical, icaltime_get_date_time_now());

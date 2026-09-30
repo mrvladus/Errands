@@ -7,6 +7,7 @@
 
 #include <json-glib/json-glib.h>
 #include <libical/ical.h>
+#include <stdlib.h>
 
 // ---------- GLOBALS ---------- //
 
@@ -20,14 +21,15 @@ static void create_backup() {
   g_autofree gchar *backups_dir = g_build_filename(user_dir, "backups", NULL);
   g_mkdir_with_parents(backups_dir, 0755);
   // Count files in backups_dir
-  autofree char *out = NULL;
+  char *out = NULL;
   int res = cmd_run_stdout(tmp_str_printf("ls %s | wc -l", backups_dir), &out);
   if (res != 0 && !out) return;
   // Remove oldest backup
-  if (STR_TO_UL(out) >= 20) {
+  if (strtoul(out, NULL, 10) >= 20) {
     g_message("User Data: Removing oldest backup");
     system(tmp_str_printf("rm -f $(find %s/* -type f | sort | head -n 1)", backups_dir));
   }
+  free(out);
   // Create backup
   time_t t = TIME_NOW;
   struct tm *tm = localtime(&t);
@@ -307,7 +309,7 @@ const char *errands_data_get_uid(icalcomponent *ical) {
 }
 
 void errands_data_set_notes(icalcomponent *ical, const char *value) {
-  if (!value || STR_EQUAL(value, ""))
+  if (!value || g_str_equal(value, ""))
     icalcomponent_remove_property(ical, icalcomponent_get_first_property(ical, ICAL_DESCRIPTION_PROPERTY));
   else icalcomponent_set_description(ical, value);
   errands_data_set_synced(ical, false);
@@ -434,7 +436,7 @@ void errands_data_add_tag(icalcomponent *ical, const char *tag) {
 bool errands_data_remove_tag(icalcomponent *ical, const char *tag) {
   for (icalproperty *p = icalcomponent_get_first_property(ical, ICAL_CATEGORIES_PROPERTY); p;
        p = icalcomponent_get_next_property(ical, ICAL_CATEGORIES_PROPERTY)) {
-    if (STR_EQUAL(tag, icalproperty_get_value_as_string(p))) {
+    if (g_str_equal(tag, icalproperty_get_value_as_string(p))) {
       icalcomponent_remove_property(ical, p);
       errands_data_set_synced(ical, false);
       errands_data_set_changed(ical, icaltime_get_date_time_now());

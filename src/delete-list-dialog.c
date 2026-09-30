@@ -1,6 +1,6 @@
 #include "delete-list-dialog.h"
 #include "config.h"
-#include "data.h"
+#include "glib.h"
 #include "sidebar.h"
 #include "state.h"
 
@@ -28,9 +28,7 @@ static void errands_delete_list_dialog_class_init(ErrandsDeleteListDialogClass *
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_response_cb);
 }
 
-static void errands_delete_list_dialog_init(ErrandsDeleteListDialog *dialog) {
-  gtk_widget_init_template(GTK_WIDGET(dialog));
-}
+static void errands_delete_list_dialog_init(ErrandsDeleteListDialog *dialog) { gtk_widget_init_template(GTK_WIDGET(dialog)); }
 
 ErrandsDeleteListDialog *errands_delete_list_dialog_new() {
   return g_object_ref_sink(g_object_new(ERRANDS_TYPE_DELETE_LIST_DIALOG, NULL));
@@ -47,5 +45,5 @@ void errands_delete_list_dialog_show(ErrandsTaskListItem *item) {
 // ---------- CALLBACKS ---------- //
 
 static void on_response_cb(ErrandsDeleteListDialog *dialog, gchar *response, gpointer data) {
-  if (STR_EQUAL(response, "delete")) errands_sidebar_delete_list(dialog->item->uid);
+  if (g_str_equal(response, "delete")) errands_sidebar_delete_list(dialog->item->uid);
 }

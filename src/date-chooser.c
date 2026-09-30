@@ -1,6 +1,5 @@
 #include "date-chooser.h"
 #include "config.h"
-#include "data.h"
 #include "utils.h"
 
 #include <glib/gi18n.h>

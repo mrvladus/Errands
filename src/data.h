@@ -1,7 +1,5 @@
 #pragma once
 
-#include "vendor/toolbox.h"
-
 #include <gio/gio.h>
 #include <glib.h>
 #include <libical/ical.h>

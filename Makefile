@@ -55,7 +55,7 @@ LDFLAGS     ?=
 ALL_LDFLAGS += $(LDFLAGS) -lm `pkg-config --libs $(PKG_CONFIG_LIBS)`
 CFLAGS      ?=
 ALL_CFLAGS  += $(CFLAGS) \
-			-std=c11 -D_GNU_SOURCE \
+			-MMD -MP -std=c11 -D_GNU_SOURCE \
 			`pkg-config --cflags $(PKG_CONFIG_LIBS)` \
 			-DVERSION='"$(VERSION)"' \
 			-DVERSION_COMMIT='"$(shell git rev-parse --short HEAD)"' \
@@ -113,7 +113,7 @@ RESOURCES_O   = $(BUILD_DIR)/resources.o
 
 $(RESOURCES_O): $(RESOURCES_C) | $(BUILD_DIR)
 	@echo "Compiling $<"
-	@$(CC) $(ALL_CFLAGS) -MMD -MP -c -o $@ $<
+	@$(CC) $(ALL_CFLAGS) -c -o $@ $<
 
 $(RESOURCES_C): $(GRESOURCE_XML) $(BLPS) $(STYLES) $(ICONS)
 	@echo "Embedding resources into $@"
@@ -155,7 +155,7 @@ DEPS = $(OBJS:.o=.d)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
 	@echo "Compiling $<"
-	@$(CC) $(ALL_CFLAGS) -MMD -MP -c -o $@ $<
+	@$(CC) $(ALL_CFLAGS) -c -o $@ $<
 
 $(BUILD_DIR)/$(NAME): $(DEPS_CHECKED) $(OBJS)
 		@echo "Linking executable $@"

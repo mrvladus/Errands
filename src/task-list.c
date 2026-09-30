@@ -2,6 +2,7 @@
 #include "config.h"
 #include "data.h"
 #include "delete-list-dialog.h"
+#include "glib.h"
 #include "rename-list-dialog.h"
 #include "settings.h"
 #include "sidebar.h"
@@ -15,6 +16,7 @@
 
 #include <glib/gi18n.h>
 #include <libical/ical.h>
+#include <stdlib.h>
 
 static void on_setup_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_item);
 static void on_bind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_item);
@@ -281,7 +283,7 @@ static void on_action_export_finish_cb(GObject *obj, GAsyncResult *res, ErrandsT
     errands_window_add_toast(_("Export failed"), 2);
     return;
   }
-  autofree char *ical = icalcomponent_as_ical_string(item->ical);
+  const char *ical = icalcomponent_as_ical_string(item->ical);
   fprintf(file, "%s", ical);
   fclose(file);
   errands_window_add_toast(_("Exported"), 1);
@@ -554,7 +556,7 @@ static void on_task_list_entry_activated_cb(ErrandsTaskList *self) {
   g_autofree gchar *dup = g_strdup(text);
   const char *stripped = g_strstrip(dup);
   const char *list_uid = self->item->uid;
-  if (STR_EQUAL(stripped, "") || STR_EQUAL(list_uid, "")) return;
+  if (g_str_equal(stripped, "") || g_str_equal(list_uid, "")) return;
   g_autoptr(ErrandsTaskItem) task = (ErrandsTaskItem *)errands_task_list_item_create_task(self->item, NULL, stripped);
   // Reset text
   g_object_set(self->entry, "text", "", NULL);
@@ -568,7 +570,7 @@ static void on_task_list_entry_activated_cb(ErrandsTaskList *self) {
 
 static void on_task_list_entry_text_changed_cb(ErrandsTaskList *self) {
   const char *text = gtk_editable_get_text(GTK_EDITABLE(self->entry));
-  gtk_widget_set_sensitive(self->entry_apply_btn, text && !STR_EQUAL(text, ""));
+  gtk_widget_set_sensitive(self->entry_apply_btn, text && !g_str_equal(text, ""));
 }
 
 static void on_task_list_search_cb(ErrandsTaskList *self, GtkSearchEntry *entry) {

@@ -1,6 +1,5 @@
 #include "settings.h"
 #include "config.h"
-#include "glib.h"
 
 #include <libsecret/secret.h>
 

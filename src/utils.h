@@ -1,16 +1,137 @@
 #pragma once
 
 #include "data.h"
-#include "glib.h"
+
+#include <ctype.h>
+#include <stdio.h>
 
 #include <gtk/gtk.h>
-
-#include <assert.h>
-#include <ctype.h>
 #include <libical/ical.h>
-#include <stddef.h>
 
+#define STR_TO_BOOL(str)     (g_str_equal((str), "1") || g_str_equal((str), "true"))
+#define BOOL_TO_STR_NUM(val) ((val) ? "1" : "0")
+
+// Print TODO formatted message.
+#define TODO(format, ...) fprintf(stderr, "%s:%d:%s: " format, __FILE__, __LINE__, __func__, ##__VA_ARGS__)
+
+#define for_range(idx, idx_start, idx_end)  for (int idx = (int)(idx_start); idx < (int)(idx_end); ++idx)
 #define for_item_in_gptrarray(T, item, arr) for (T *item = (T *)arr->pdata; item < arr->pdata + arr->len; item++)
+#define CONTINUE_IF(statement)                                                                                                   \
+  if (statement) continue
+#define CONTINUE_IF_NOT(statement)                                                                                               \
+  if (!(statement)) continue
+
+// Get current time
+#define TIME_NOW time(NULL)
+// Start timer
+#define TIMER_START clock_t __timer_start = clock();
+// Get elapsed time in milliseconds
+#define TIMER_ELAPSED_MS ((double)(clock() - __timer_start) / CLOCKS_PER_SEC)
+// Generate random seed
+#define RANDOM_SEED() srand((unsigned int)(TIME_NOW ^ getpid()));
+
+// This is temporary buffer for printing formatted strings.
+// If you need to get formatted string but not wanting to use malloc, use this.
+// Default size is 8192 bytes. You can change it by defining TB_TMP_STR_BUFFER_SIZE.
+// When buffer is full - starts overriding buffer from the beginning.
+static inline const char *tmp_str_printf(const char *format, ...) {
+#define BUFFER_SIZE 4096
+
+  static char buffer[BUFFER_SIZE];
+  static size_t offset = 0;
+
+  if (!format) return NULL;
+
+  va_list args;
+  va_start(args, format);
+  va_list args_copy;
+  va_copy(args_copy, args);
+  int len = vsnprintf(NULL, 0, format, args_copy);
+  va_end(args_copy);
+  if (len < 0) {
+    va_end(args);
+    return "";
+  }
+
+  if ((size_t)len >= BUFFER_SIZE - offset - 1) offset = 0;
+  // Print the string
+  vsnprintf(buffer + offset, BUFFER_SIZE - offset, format, args);
+  const char *result = buffer + offset;
+  offset += len + 1;
+  va_end(args);
+
+  return result;
+
+#undef BUFFER_SIZE
+}
+
+static inline const char *generate_hex_as_str() {
+  static char hex[8] = {0};
+  sprintf(hex, "#%06x", rand() % 0xFFFFFF);
+  return hex;
+}
+
+static inline int cmd_run_stdout(const char *cmd, char **std_out) {
+  if (!cmd || !std_out) return -1;
+  *std_out = NULL;
+  FILE *fp = popen(cmd, "r");
+  if (!fp) return -1;
+  size_t cap = 4096;
+  size_t len = 0;
+  char *buf = malloc(cap);
+  if (!buf) {
+    pclose(fp);
+    return -1;
+  }
+  // Read in chunks
+  while (1) {
+    // Ensure we have space for at least 1 more byte plus null terminator
+    if (cap - len < 2) {
+      size_t newcap = cap * 2;
+      char *tmp = realloc(buf, newcap);
+      if (!tmp) {
+        free(buf);
+        pclose(fp);
+        return -1;
+      }
+      buf = tmp;
+      cap = newcap;
+    }
+    size_t to_read = cap - len - 1; // Leave room for null terminator
+    size_t nread = fread(buf + len, 1, to_read, fp);
+    if (nread == 0) break;
+    len += nread;
+    if (ferror(fp)) {
+      free(buf);
+      pclose(fp);
+      return -1;
+    }
+  }
+  buf[len] = '\0';
+  int status = pclose(fp);
+  if (status == -1) {
+    free(buf);
+    return -1;
+  }
+  // Convert wait status to exit code
+#ifdef WIFEXITED
+  if (WIFEXITED(status)) {
+    status = WEXITSTATUS(status);
+  } else if (WIFSIGNALED(status)) {
+    // Command terminated by signal, return negative signal number
+    status = -WTERMSIG(status);
+  }
+  // else keep the raw status
+#endif
+  // Shrink buffer to actual size if significantly smaller
+  if (len + 1 < cap / 2) {
+    char *tmp = realloc(buf, len + 1);
+    if (tmp) buf = tmp;
+    // If realloc fails, we keep the original buffer (not a critical error)
+  }
+  *std_out = buf;
+  return status;
+}
 
 // Get children of the widget
 static inline GPtrArray *get_children(GtkWidget *parent) {
@@ -51,7 +172,7 @@ static inline void get_children_sized(GtkWidget *parent, GtkWidget **children, s
   }
 }
 
-#define for_child_in_parent(child, parent)                                                                             \
+#define for_child_in_parent(child, parent)                                                                                       \
   for (GtkWidget *child = gtk_widget_get_first_child(parent); child; child = gtk_widget_get_next_sibling(child))
 
 static inline void gtk_box_remove_all(GtkWidget *box) {
@@ -84,8 +205,7 @@ static inline void gdk_rgba_to_hex_string(const GdkRGBA *rgba, char hex_string[8
 static inline void errands_add_shortcut(GtkWidget *widget, const char *trigger, const char *action) {
   GtkEventController *ctrl = gtk_shortcut_controller_new();
   gtk_shortcut_controller_set_scope(GTK_SHORTCUT_CONTROLLER(ctrl), GTK_SHORTCUT_SCOPE_GLOBAL);
-  GtkShortcut *sc =
-      gtk_shortcut_new(gtk_shortcut_trigger_parse_string(trigger), gtk_shortcut_action_parse_string(action));
+  GtkShortcut *sc = gtk_shortcut_new(gtk_shortcut_trigger_parse_string(trigger), gtk_shortcut_action_parse_string(action));
   gtk_shortcut_controller_add_shortcut(GTK_SHORTCUT_CONTROLLER(ctrl), sc);
   gtk_widget_add_controller(widget, ctrl);
 }
@@ -107,8 +227,7 @@ static inline GSimpleActionGroup *errands_add_action_group(void *widget, const c
   return ag;
 }
 
-static inline void errands_add_action(GSimpleActionGroup *ag, const char *name, void *cb, void *data,
-                                      const char *param_str) {
+static inline void errands_add_action(GSimpleActionGroup *ag, const char *name, void *cb, void *data, const char *param_str) {
   g_autoptr(GVariantType) vtype = param_str ? g_variant_type_new(param_str) : NULL;
   g_autoptr(GSimpleAction) action = g_simple_action_new(name, vtype);
   g_signal_connect(action, "activate", G_CALLBACK(cb), data);
@@ -140,7 +259,8 @@ static inline gchar *str_to_markup(const char *str) {
 }
 
 static inline void gtk_widget_set_color(GtkWidget *widget, const char *color) {
-  ASSERT(widget);
+  g_assert_nonnull(widget);
+
   // Remove any existing custom color classes
   g_auto(GStrv) classes = gtk_widget_get_css_classes(widget);
   for (int i = 0; classes[i]; i++)
@@ -180,8 +300,8 @@ static inline void gtk_widget_set_color(GtkWidget *widget, const char *color) {
 
 // ---------- ICAL UTILS ---------- //
 
-#define for_vtodo_in_vcalendar(var, calendar)                                                                          \
-  for (icalcomponent *var = icalcomponent_get_first_component((calendar), ICAL_VTODO_COMPONENT); var;                  \
+#define for_vtodo_in_vcalendar(var, calendar)                                                                                    \
+  for (icalcomponent *var = icalcomponent_get_first_component((calendar), ICAL_VTODO_COMPONENT); var;                            \
        var = icalcomponent_get_next_component((calendar), ICAL_VTODO_COMPONENT))
 
 static inline GPtrArray *vcalendar_to_array(icalcomponent *calendar) {
@@ -200,12 +320,9 @@ static inline icalcomponent *find_vtodo_by_uid(icalcomponent *ical, const char *
   return NULL;
 }
 
-static inline bool icaltime_is_null_date(const struct icaltimetype t) {
-  return t.year == 0 && t.month == 0 && t.day == 0;
-}
+static inline bool icaltime_is_null_date(const struct icaltimetype t) { return t.year == 0 && t.month == 0 && t.day == 0; }
 
-static inline icaltimetype icaltime_merge_date_and_time(const struct icaltimetype date,
-                                                        const struct icaltimetype time) {
+static inline icaltimetype icaltime_merge_date_and_time(const struct icaltimetype date, const struct icaltimetype time) {
   icaltimetype result = date;
   result.hour = time.hour;
   result.minute = time.minute;

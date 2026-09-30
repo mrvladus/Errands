@@ -1,5 +1,4 @@
 #include "config.h"
-#include "data.h"
 #include "date-chooser.h"
 #include "task-list.h"
 #include "utils.h"
@@ -37,8 +36,7 @@ static void errands_task_list_date_dialog_rrule_row_dispose(GObject *gobject) {
 static void errands_task_list_date_dialog_rrule_row_class_init(ErrandsTaskListDateDialogRruleRowClass *class) {
   g_type_ensure(ERRANDS_TYPE_DATE_CHOOSER);
   G_OBJECT_CLASS(class)->dispose = errands_task_list_date_dialog_rrule_row_dispose;
-  gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class),
-                                              RESOURCE_PATH "/ui/task-list-date-dialog-rrule-row.ui");
+  gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), RESOURCE_PATH "/ui/task-list-date-dialog-rrule-row.ui");
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListDateDialogRruleRow, freq_row);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListDateDialogRruleRow, interval_row);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskListDateDialogRruleRow, repeat_duration);
@@ -186,8 +184,7 @@ static void on_interval_changed_cb(ErrandsTaskListDateDialogRruleRow *self, GPar
                                    C_("Repeat every ...", "weeks"),   C_("Repeat every ...", "months"),
                                    C_("Repeat every ...", "years")};
   const guint selected_freq = adw_combo_row_get_selected(self->freq_row);
-  const char *subtitle =
-      tmp_str_printf(_("Repeat every %d %s"), (int)adw_spin_row_get_value(row), intervals[selected_freq]);
+  const char *subtitle = tmp_str_printf(_("Repeat every %d %s"), (int)adw_spin_row_get_value(row), intervals[selected_freq]);
   g_object_set(row, "subtitle", subtitle, NULL);
 }
 
@@ -197,8 +194,7 @@ static void on_count_changed_cb(ErrandsTaskListDateDialogRruleRow *self, GParamS
   g_object_set(row, "subtitle", subtitle, NULL);
 }
 
-static void on_repeat_duration_changed_cb(ErrandsTaskListDateDialogRruleRow *self, GParamSpec *param,
-                                          AdwComboRow *row) {
+static void on_repeat_duration_changed_cb(ErrandsTaskListDateDialogRruleRow *self, GParamSpec *param, AdwComboRow *row) {
   const guint selected_dur = adw_combo_row_get_selected(row);
   gtk_widget_set_visible(GTK_WIDGET(self->until_date_chooser), selected_dur == 1);
   gtk_widget_set_visible(GTK_WIDGET(self->count_row), selected_dur == 2);

@@ -1,6 +1,5 @@
 #include "task.h"
 #include "config.h"
-#include "data.h"
 #include "sidebar.h"
 #include "state.h"
 #include "task-item.h"
@@ -10,7 +9,6 @@
 #include "window.h"
 
 #include <glib/gi18n.h>
-#include <libical/ical.h>
 
 static void errands_task_update_toolbar(ErrandsTask *task);
 static GtkWidget *errands_task_tag_new(const char *tag);
@@ -424,11 +422,11 @@ static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointe
     gtk_widget_grab_focus(self->edit_title);
   } else {
     const char *text = gtk_editable_get_text(GTK_EDITABLE(self->edit_title));
-    if (!text || STR_EQUAL("", text)) {
+    if (!text || g_str_equal("", text)) {
       gtk_widget_set_visible(self->title, true);
       return;
     }
-    if (STR_EQUAL(text, curr_text)) {
+    if (g_str_equal(text, curr_text)) {
       gtk_widget_set_visible(self->title, true);
       return;
     }
@@ -440,7 +438,7 @@ static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointe
 
 static void on_sub_task_entry_activated_cb(GtkEntry *entry, ErrandsTask *self) {
   const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
-  if (STR_EQUAL(text, "")) return;
+  if (g_str_equal(text, "")) return;
   ErrandsTaskItem *task = (ErrandsTaskItem *)errands_task_item_create_task(self->item, text);
   // g_list_store_append(state.main_window->task_list->all_tasks_model, task);
   GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_widget_get_ancestor(GTK_WIDGET(self), GTK_TYPE_TREE_EXPANDER));
