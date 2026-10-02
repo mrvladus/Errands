@@ -270,9 +270,24 @@ class TodayTask(Gtk.Revealer):
         self.title_row.set_title(Markup.find_url(Markup.escape(self.task_data.text)))
 
         # Update subtitle
-        self.title_row.set_subtitle(
-            UserData.get_list_prop(self.task_data.list_uid, "name")
-        )
+        subtitle = UserData.get_list_prop(self.task_data.list_uid, "name") or ""
+        if self.task_data.rrule:
+            from errands.lib.recurrence import get_human_recurrence
+
+            recurrence_label = get_human_recurrence(self.task_data.rrule)
+            if recurrence_label:
+                subtitle = (
+                    f"{subtitle} | {recurrence_label}" if subtitle else recurrence_label
+                )
+        if self.task_data.reminder:
+            from errands.lib.reminder import get_human_reminder
+
+            reminder_label = get_human_reminder(self.task_data.reminder)
+            if reminder_label:
+                subtitle = (
+                    f"{subtitle} | {reminder_label}" if subtitle else reminder_label
+                )
+        self.title_row.set_subtitle(subtitle)
 
         # Update completion
         completed: bool = self.task_data.completed
@@ -336,7 +351,24 @@ class TodayTask(Gtk.Revealer):
         if self.block_signals:
             return
 
+        # Delegate to the underlying Task widget (handles recurring logic)
         self.task.complete_btn.set_active(btn.get_active())
+
+        # If recurring, the Task widget advanced the due date instead of completing.
+        # Reset TodayTask checkbox and purge (task is now due in the future).
+        if (
+            btn.get_active()
+            and self.task_data.rrule
+            and self.task_data.due_date
+        ):
+            self.block_signals = True
+            btn.set_active(False)
+            self.block_signals = False
+            self.add_rm_crossline(False)
+            self.purge()
+            State.today_page.update_status()
+            return
+
         if btn.get_active():
             self.purge()
             State.today_page.update_status()
