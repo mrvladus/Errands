@@ -2,12 +2,10 @@
 
 #include "task-list-item.h"
 
-#include <libical/ical.h>
-
 #define ERRANDS_TYPE_TASK_ITEM (errands_task_item_get_type())
 G_DECLARE_FINAL_TYPE(ErrandsTaskItem, errands_task_item, ERRANDS, TASK_ITEM, GObject)
 
-ErrandsTaskItem *errands_task_item_new(icalcomponent *ical, ErrandsTaskListItem *list, ErrandsTaskItem *parent);
+ErrandsTaskItem *errands_task_item_new(ICalComponent *ical, ErrandsTaskListItem *list, ErrandsTaskItem *parent);
 ErrandsTaskListItem *errands_task_item_create_task(ErrandsTaskItem *parent, const char *text);
 
 // Update "uncompleted-count" and "has-no-children" properties
@@ -26,7 +24,7 @@ bool errands_task_item_export(ErrandsTaskItem *self, const char *path);
 ErrandsTaskListItem *errands_task_item_get_list(ErrandsTaskItem *self);
 const char *errands_task_item_get_uid(ErrandsTaskItem *self);
 const char *errands_task_item_get_title(ErrandsTaskItem *self);
-icalcomponent *errands_task_item_get_ical(ErrandsTaskItem *self);
+ICalComponent *errands_task_item_get_ical(ErrandsTaskItem *self);
 gboolean errands_task_item_get_completed(ErrandsTaskItem *self);
 gboolean errands_task_item_get_cancelled(ErrandsTaskItem *self);
 gint errands_task_item_get_priority(ErrandsTaskItem *self);
@@ -36,11 +34,11 @@ const char *errands_task_item_get_priority_as_tstring(ErrandsTaskItem *self);
 const char *errands_task_item_get_color(ErrandsTaskItem *self);
 const char *errands_task_item_get_notes(ErrandsTaskItem *self);
 const char *errands_task_item_get_search_blob(ErrandsTaskItem *self);
-icaltimetype errands_task_item_get_dtstart(ErrandsTaskItem *self);
-icaltimetype errands_task_item_get_dtend(ErrandsTaskItem *self);
+ICalTime *errands_task_item_get_dtstart(ErrandsTaskItem *self);
+ICalTime *errands_task_item_get_dtend(ErrandsTaskItem *self);
 GStrv errands_task_item_get_tags(ErrandsTaskItem *self);
 GStrv errands_task_item_get_attachments(ErrandsTaskItem *self);
-const struct icalrecurrencetype *errands_task_item_get_rrule(ErrandsTaskItem *self);
+ICalRecurrence *errands_task_item_get_rrule(ErrandsTaskItem *self);
 // Returns the rrule as a human-readable string, or NULL if no rrule is set.
 // The caller owns the returned string and must free it with g_free().
 gchar *errands_task_item_get_rrule_as_string(ErrandsTaskItem *self);
@@ -60,13 +58,13 @@ void errands_task_item_set_priority(ErrandsTaskItem *self, gint priority);
 void errands_task_item_set_priority_from_string(ErrandsTaskItem *self, const char *priority);
 void errands_task_item_set_notes(ErrandsTaskItem *self, const char *notes);
 void errands_task_item_set_color(ErrandsTaskItem *self, const char *color);
-void errands_task_item_set_dtstart(ErrandsTaskItem *self, icaltimetype dtstart);
-void errands_task_item_set_dtend(ErrandsTaskItem *self, icaltimetype dtend);
+void errands_task_item_set_dtstart(ErrandsTaskItem *self, ICalTime *dtstart);
+void errands_task_item_set_dtend(ErrandsTaskItem *self, ICalTime *dtend);
 // Set the tags for the task item. Item takes ownership of the tags array.
 void errands_task_item_set_tags(ErrandsTaskItem *self, GStrv tags);
 // Set the attachments for the task item. Item takes ownership of the attachments array.
 void errands_task_item_set_attachments(ErrandsTaskItem *self, GStrv attachments);
-void errands_task_item_set_rrule(ErrandsTaskItem *self, const struct icalrecurrencetype *rrule);
+void errands_task_item_set_rrule(ErrandsTaskItem *self, const ICalRecurrence *rrule);
 void errands_task_item_set_search_matched(ErrandsTaskItem *self, gboolean matched);
 
 // void errands_task_data_get_flat_list(TaskData *parent, GPtrArray *array) {

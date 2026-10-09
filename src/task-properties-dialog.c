@@ -123,9 +123,11 @@ void errands_task_properties_dialog_show(ErrandsTaskPropertiesDialogPage page, E
   errands_date_chooser_set_dt(self->start_date_chooser, errands_task_item_get_dtstart(item));
   errands_date_chooser_set_dt(self->due_date_chooser, errands_task_item_get_dtend(item));
 
-  const struct icalrecurrencetype *rrule = errands_task_item_get_rrule(item);
+  ICalRecurrence *rrule = errands_task_item_get_rrule(item);
   errands_task_list_date_dialog_rrule_row_set_rrule(self->rrule_row, rrule);
-  adw_expander_row_set_expanded(ADW_EXPANDER_ROW(self->rrule_row), rrule && rrule->freq != ICAL_NO_RECURRENCE);
+  adw_expander_row_set_expanded(ADW_EXPANDER_ROW(self->rrule_row),
+                                rrule && i_cal_recurrence_get_freq(rrule) != I_CAL_NO_RECURRENCE);
+  i_cal_recurrence_unref(rrule);
 
   // Notes
   const char *notes = errands_task_item_get_notes(item);
@@ -245,20 +247,20 @@ static void on_dialog_close_cb(ErrandsTaskPropertiesDialog *self) {
   bool changed = false;
 
   // Date
-  icaltimetype new_sdt = errands_date_chooser_get_dt(self->start_date_chooser);
+  ICalTime *new_sdt = errands_date_chooser_get_dt(self->start_date_chooser);
   errands_task_item_set_dtstart(self->item, new_sdt);
-  icaltimetype new_ddt = errands_date_chooser_get_dt(self->due_date_chooser);
+  ICalTime *new_ddt = errands_date_chooser_get_dt(self->due_date_chooser);
   errands_task_item_set_dtend(self->item, new_ddt);
   if (errands_task_item_is_due(self->item)) changed = true;
 
   // Set rrule
-  struct icalrecurrencetype *new_rrule = icalrecurrencetype_new();
+  ICalRecurrence *new_rrule = i_cal_recurrence_new();
   if (adw_expander_row_get_expanded(ADW_EXPANDER_ROW(self->rrule_row)))
     errands_task_list_date_dialog_rrule_row_get_rrule(self->rrule_row, new_rrule);
   errands_task_item_set_rrule(self->item, new_rrule);
-  if (icaltime_is_null_date(new_sdt) && new_rrule->freq != ICAL_NO_RECURRENCE)
-    errands_task_item_set_dtstart(self->item, icaltime_get_date_time_now());
-  icalrecurrencetype_unref(new_rrule);
+  if (i_cal_time_is_null_date(new_sdt) && i_cal_recurrence_get_freq(new_rrule) != I_CAL_NO_RECURRENCE)
+    errands_task_item_set_dtstart(self->item, i_cal_time_get_date_time_now());
+  i_cal_recurrence_unref(new_rrule);
 
   // Notes
   GtkTextIter start, end;

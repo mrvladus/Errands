@@ -22,7 +22,7 @@ struct _ErrandsDateChooser {
   GtkPopover *time_popover;
   GtkSpinButton *hours, *minutes;
 
-  icaltimetype dt;
+  ICalTime *dt;
 
   // Properties
   const char *date_string;
@@ -104,27 +104,27 @@ void errands_date_chooser_reset(ErrandsDateChooser *self) {
   g_object_set(self, "subtitle", "", NULL);
   g_object_set(self, "title", _("Not Set"), NULL);
   g_object_set(self->reset_btn, "visible", false, NULL);
-  self->dt = icaltime_null_date();
-  self->dt.is_date = true;
+  self->dt = i_cal_time_new_null_date();
 }
 
-icaltimetype errands_date_chooser_get_dt(ErrandsDateChooser *self) { return self->dt; }
+ICalTime *errands_date_chooser_get_dt(ErrandsDateChooser *self) { return i_cal_time_clone(self->dt); }
 
-void errands_date_chooser_set_dt(ErrandsDateChooser *self, const icaltimetype dt) {
+void errands_date_chooser_set_dt(ErrandsDateChooser *self, ICalTime *dt) {
+  g_clear_object(&dt);
   self->dt = dt;
-  bool is_null = icaltime_is_null_time(dt) || icaltime_is_null_date(dt);
+  bool is_null = i_cal_time_is_null_time(dt) || i_cal_time_is_null_date(dt);
   if (is_null) errands_date_chooser_reset(self);
   else {
-    gtk_calendar_set_year(self->calendar, dt.year);
-    gtk_calendar_set_month(self->calendar, dt.month - 1);
-    gtk_calendar_set_day(self->calendar, dt.day);
+    gtk_calendar_set_year(self->calendar, i_cal_time_get_year(dt));
+    gtk_calendar_set_month(self->calendar, i_cal_time_get_month(dt) - 1);
+    gtk_calendar_set_day(self->calendar, i_cal_time_get_day(dt));
     g_autoptr(GDateTime) date = gtk_calendar_get_date(self->calendar);
     g_autofree gchar *date_str = g_date_time_format(date, "%x");
     g_object_set(self, "subtitle", date_str, NULL);
-    if (!dt.is_date) {
-      gtk_spin_button_set_value(self->hours, dt.hour);
-      gtk_spin_button_set_value(self->minutes, dt.minute);
-      const char *time_str = tmp_str_printf("%02d:%02d", dt.hour, dt.minute);
+    if (!i_cal_time_is_date(dt)) {
+      gtk_spin_button_set_value(self->hours, i_cal_time_get_hour(dt));
+      gtk_spin_button_set_value(self->minutes, i_cal_time_get_minute(dt));
+      const char *time_str = tmp_str_printf("%02d:%02d", i_cal_time_get_hour(dt), i_cal_time_get_minute(dt));
       g_object_set(self, "title", is_null ? _("Not Set") : time_str, NULL);
     }
   }
@@ -143,10 +143,8 @@ static void on_today_action_cb(GSimpleAction *action, GVariant *param, ErrandsDa
   gtk_calendar_set_date(self->calendar, tomorrow);
   gtk_calendar_set_date(self->calendar, today);
   gtk_popover_popdown(self->date_popover);
-  icaltimetype today_date = icaltime_today();
-  self->dt.year = today_date.year;
-  self->dt.month = today_date.month;
-  self->dt.day = today_date.day;
+  g_clear_object(&self->dt);
+  self->dt = i_cal_time_new_today();
 }
 
 static void on_tomorrow_action_cb(GSimpleAction *action, GVariant *param, ErrandsDateChooser *self) {
@@ -154,11 +152,9 @@ static void on_tomorrow_action_cb(GSimpleAction *action, GVariant *param, Errand
   g_autoptr(GDateTime) tomorrow = g_date_time_add_days(today, 1);
   gtk_calendar_set_date(self->calendar, tomorrow);
   gtk_popover_popdown(self->date_popover);
-  icaltimetype today_date = icaltime_today();
-  icaltime_adjust(&today_date, 1, 0, 0, 0);
-  self->dt.year = today_date.year;
-  self->dt.month = today_date.month;
-  self->dt.day = today_date.day;
+  g_clear_object(&self->dt);
+  self->dt = i_cal_time_new_today();
+  i_cal_time_adjust(self->dt, 1, 0, 0, 0);
 }
 
 static void on_time_preset_action_cb(GSimpleAction *action, GVariant *param, ErrandsDateChooser *self) {
@@ -173,19 +169,19 @@ static void on_day_selected(ErrandsDateChooser *self) {
   g_autofree gchar *date_str = g_date_time_format(date, "%x");
   g_object_set(self, "subtitle", date_str, NULL);
   g_object_set(self->reset_btn, "visible", true, NULL);
-  self->dt.year = g_date_time_get_year(date);
-  self->dt.month = g_date_time_get_month(date);
-  self->dt.day = g_date_time_get_day_of_month(date);
+  i_cal_time_set_year(self->dt, g_date_time_get_year(date));
+  i_cal_time_set_month(self->dt, g_date_time_get_month(date));
+  i_cal_time_set_day(self->dt, g_date_time_get_day_of_month(date));
 }
 
 static void on_time_set_cb(ErrandsDateChooser *self, GtkSpinButton *btn) {
   int hour = gtk_spin_button_get_value_as_int(self->hours);
   int minute = gtk_spin_button_get_value_as_int(self->minutes);
-  if (icaltime_is_null_date(self->dt)) on_today_action_cb(NULL, NULL, self);
-  self->dt.is_date = false;
-  self->dt.hour = hour;
-  self->dt.minute = minute;
-  self->dt.second = 0;
+  if (i_cal_time_is_null_date(self->dt)) on_today_action_cb(NULL, NULL, self);
+  i_cal_time_set_is_date(self->dt, false);
+  i_cal_time_set_hour(self->dt, hour);
+  i_cal_time_set_minute(self->dt, minute);
+  i_cal_time_set_second(self->dt, 0);
   gtk_editable_set_text(GTK_EDITABLE(self->hours), tmp_str_printf("%02d", hour));
   gtk_editable_set_text(GTK_EDITABLE(self->minutes), tmp_str_printf("%02d", minute));
   g_object_set(self, "title", tmp_str_printf("%02d:%02d", hour, minute), NULL);

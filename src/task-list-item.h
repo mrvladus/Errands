@@ -2,7 +2,7 @@
 
 #include <gdk/gdk.h>
 #include <gio/gio.h>
-#include <libical/ical.h>
+#include <libical-glib/libical-glib.h>
 
 #define ERRANDS_TYPE_TASK_LIST_ITEM (errands_task_list_item_get_type())
 G_DECLARE_FINAL_TYPE(ErrandsTaskListItem, errands_task_list_item, ERRANDS, TASK_LIST_ITEM, GObject)
@@ -13,14 +13,14 @@ struct _ErrandsTaskListItem {
   GListStore *tasks;
 
   // GObject Properties
-  icalcomponent *ical;
+  ICalComponent *ical;
   gchar *uid;
   gchar *title;
   GdkRGBA color;
   gint count; // Number of uncompleted tasks
 };
 
-ErrandsTaskListItem *errands_task_list_item_new(icalcomponent *ical);
+ErrandsTaskListItem *errands_task_list_item_new(ICalComponent *ical);
 ErrandsTaskListItem *errands_task_list_item_create(const char *uid, const char *name, const char *color, bool deleted,
                                                    bool synced);
 ErrandsTaskListItem *errands_task_list_item_load_from_ics(const char *path);

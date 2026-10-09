@@ -1,8 +1,10 @@
 #pragma once
 
 #include "data.h"
+#include "glib.h"
 
 #include <ctype.h>
+#include <libical-glib/libical-glib.h>
 #include <stdio.h>
 
 #include <gtk/gtk.h>
@@ -301,26 +303,29 @@ static inline void gtk_widget_set_color(GtkWidget *widget, const char *color) {
 // ---------- ICAL UTILS ---------- //
 
 #define for_vtodo_in_vcalendar(var, calendar)                                                                                    \
-  for (icalcomponent *var = icalcomponent_get_first_component((calendar), ICAL_VTODO_COMPONENT); var;                            \
-       var = icalcomponent_get_next_component((calendar), ICAL_VTODO_COMPONENT))
+  for (ICalComponent *var = i_cal_component_get_first_component((calendar), I_CAL_VTODO_COMPONENT); var;                         \
+       var = i_cal_component_get_next_component((calendar), I_CAL_VTODO_COMPONENT))
 
-static inline GPtrArray *vcalendar_to_array(icalcomponent *calendar) {
-  g_assert(icalcomponent_isa(calendar) == ICAL_VCALENDAR_COMPONENT);
+static inline GPtrArray *vcalendar_to_array(ICalComponent *calendar) {
+  g_assert(i_cal_component_isa(calendar) == I_CAL_VCALENDAR_COMPONENT);
   GPtrArray *array = g_ptr_array_new();
   for_vtodo_in_vcalendar(var, calendar) g_ptr_array_add(array, var);
   return array;
 }
 
-static inline icalcomponent *find_vtodo_by_uid(icalcomponent *ical, const char *uid) {
-  icalcomponent *vtodo = icalcomponent_get_first_component(ical, ICAL_VTODO_COMPONENT);
+static inline ICalComponent *find_vtodo_by_uid(ICalComponent *ical, const char *uid) {
+  ICalComponent *vtodo = i_cal_component_get_first_component(ical, I_CAL_VTODO_COMPONENT);
   while (vtodo) {
     if (g_str_equal(uid, errands_data_get_uid(vtodo))) return vtodo;
-    vtodo = icalcomponent_get_next_component(vtodo, ICAL_VTODO_COMPONENT);
+    vtodo = i_cal_component_get_next_component(vtodo, I_CAL_VTODO_COMPONENT);
   }
   return NULL;
 }
 
-static inline bool icaltime_is_null_date(const struct icaltimetype t) { return t.year == 0 && t.month == 0 && t.day == 0; }
+static inline bool i_cal_time_is_null_date(const ICalTime *t) {
+  if (!t) return true;
+  return i_cal_time_get_year(t) == 0 && i_cal_time_get_month(t) == 0 && i_cal_time_get_day(t) == 0;
+}
 
 static inline icaltimetype icaltime_merge_date_and_time(const struct icaltimetype date, const struct icaltimetype time) {
   icaltimetype result = date;
@@ -331,17 +336,19 @@ static inline icaltimetype icaltime_merge_date_and_time(const struct icaltimetyp
   return result;
 }
 
-static inline icaltimetype icaltime_get_date_time_now() {
+static inline ICalTime *i_cal_time_get_date_time_now() {
   g_autoptr(GDateTime) dt = g_date_time_new_now_local();
-  icaltimetype dt_now = icaltime_today();
-  dt_now.is_date = false;
-  dt_now.hour = g_date_time_get_hour(dt);
-  dt_now.minute = g_date_time_get_minute(dt);
-  dt_now.second = g_date_time_get_second(dt);
-  return dt_now;
+  ICalTime *now = i_cal_time_new_today();
+  i_cal_time_set_is_date(now, false);
+  i_cal_time_set_hour(now, g_date_time_get_hour(dt));
+  i_cal_time_set_minute(now, g_date_time_get_minute(dt));
+  i_cal_time_set_second(now, g_date_time_get_second(dt));
+  return now;
 }
 
-static inline bool icalrecurrencetype_compare(const struct icalrecurrencetype *a, const struct icalrecurrencetype *b) {
+static inline bool i_cal_recurrence_compare(ICalRecurrence *a, ICalRecurrence *b) {
   if (!a || !b) return false;
-  return memcmp(a, b, sizeof(*a)) == 0;
+  g_autofree gchar *as = i_cal_recurrence_to_string(a);
+  g_autofree gchar *bs = i_cal_recurrence_to_string(b);
+  return g_strcmp0(as, bs) == 0;
 }

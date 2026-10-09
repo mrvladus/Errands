@@ -11,7 +11,6 @@
 #include "utils.h"
 
 #include <glib/gi18n.h>
-#include <libical/ical.h>
 
 static gint sort_func(gconstpointer a, gconstpointer b, gpointer data);
 

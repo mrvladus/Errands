@@ -1,13 +1,15 @@
 #include "config.h"
 #include "date-chooser.h"
+#include "glib.h"
 #include "task-list.h"
 #include "utils.h"
 
 #include <glib/gi18n.h>
+#include <libical-glib/libical-glib.h>
 #include <libical/ical.h>
 
 static void reset_week_days(ErrandsTaskListDateDialogRruleRow *self);
-static void get_week_days(ErrandsTaskListDateDialogRruleRow *self, short **days, int *n_days);
+static GArray *get_week_days(ErrandsTaskListDateDialogRruleRow *self);
 static void set_week_days(ErrandsTaskListDateDialogRruleRow *self, short *days, int n_days);
 
 static void on_freq_changed_cb(ErrandsTaskListDateDialogRruleRow *self, GParamSpec *param, AdwComboRow *row);
@@ -60,41 +62,36 @@ ErrandsTaskListDateDialogRruleRow *errands_task_list_date_dialog_rrule_row_new(v
 
 // ---------- PUBLIC FUNCTIONS ---------- //
 
-void errands_task_list_date_dialog_rrule_row_get_rrule(ErrandsTaskListDateDialogRruleRow *self,
-                                                       struct icalrecurrencetype *rrule) {
+void errands_task_list_date_dialog_rrule_row_get_rrule(ErrandsTaskListDateDialogRruleRow *self, ICalRecurrence *rrule) {
   g_return_if_fail(rrule != NULL);
 
-  rrule->freq = adw_combo_row_get_selected(self->freq_row);
-  rrule->interval = adw_spin_row_get_value(self->interval_row);
+  i_cal_recurrence_set_freq(rrule, adw_combo_row_get_selected(self->freq_row));
+  i_cal_recurrence_set_interval(rrule, adw_spin_row_get_value(self->interval_row));
   const guint dur = adw_combo_row_get_selected(self->repeat_duration);
-  if (dur == 1) rrule->until = errands_date_chooser_get_dt(self->until_date_chooser);
-  else if (dur == 2) rrule->count = adw_spin_row_get_value(self->count_row);
-  if (rrule->freq >= 4) {
-    short *days = NULL;
-    int n_days = 0;
-    get_week_days(self, &days, &n_days);
-    if (n_days > 0) {
-      icalrecurrence_by_data *by_day = &rrule->by[ICAL_BY_DAY];
-      by_day->data = days;
-      by_day->size = n_days;
-    }
+  if (dur == 1) i_cal_recurrence_set_until(rrule, errands_date_chooser_get_dt(self->until_date_chooser));
+  else if (dur == 2) i_cal_recurrence_set_count(rrule, adw_spin_row_get_value(self->count_row));
+  if (i_cal_recurrence_get_freq(rrule) >= 4) {
+    g_autoptr(GArray) days = get_week_days(self);
+    i_cal_recurrence_set_by_array(rrule, I_CAL_BY_DAY, days);
   }
 }
 
-void errands_task_list_date_dialog_rrule_row_set_rrule(ErrandsTaskListDateDialogRruleRow *self,
-                                                       const struct icalrecurrencetype *rrule) {
-  if (!rrule || rrule->freq == ICAL_NO_RECURRENCE) return;
-  adw_combo_row_set_selected(self->freq_row, rrule->freq < 7 ? rrule->freq : 3);
-  adw_spin_row_set_value(self->interval_row, rrule->interval);
-  const icalrecurrence_by_data *by_day = &rrule->by[ICAL_BY_DAY];
-  if (by_day->size > 0) set_week_days(self, by_day->data, by_day->size);
+void errands_task_list_date_dialog_rrule_row_set_rrule(ErrandsTaskListDateDialogRruleRow *self, ICalRecurrence *rrule) {
+  if (!rrule) return;
+  ICalRecurrenceFrequency freq = i_cal_recurrence_get_freq(rrule);
+  if (freq == I_CAL_NO_RECURRENCE) return;
+  adw_combo_row_set_selected(self->freq_row, freq < 7 ? freq : 3);
+  adw_spin_row_set_value(self->interval_row, i_cal_recurrence_get_interval(rrule));
+  g_autoptr(GArray) by_day = i_cal_recurrence_get_by_array(rrule, I_CAL_BY_DAY);
+  if (by_day->len > 0) set_week_days(self, (short *)by_day->data, by_day->len);
   else reset_week_days(self);
-  if (!icaltime_is_null_date(rrule->until)) {
+  ICalTime *until = i_cal_recurrence_get_until(rrule);
+  if (!i_cal_time_is_null_date(until)) {
     adw_combo_row_set_selected(self->repeat_duration, 1);
-    errands_date_chooser_set_dt(self->until_date_chooser, rrule->until);
-  } else if (rrule->count > 0) {
+    errands_date_chooser_set_dt(self->until_date_chooser, until);
+  } else if (i_cal_recurrence_get_count(rrule) > 0) {
     adw_combo_row_set_selected(self->repeat_duration, 2);
-    adw_spin_row_set_value(self->count_row, rrule->count);
+    adw_spin_row_set_value(self->count_row, i_cal_recurrence_get_count(rrule));
   } else {
     adw_combo_row_set_selected(self->repeat_duration, 0);
   }
@@ -121,33 +118,24 @@ static void reset_week_days(ErrandsTaskListDateDialogRruleRow *self) {
   g_ptr_array_free(week_days_btns, false);
 }
 
-static void get_week_days(ErrandsTaskListDateDialogRruleRow *self, short **days, int *n_days) {
+static GArray *get_week_days(ErrandsTaskListDateDialogRruleRow *self) {
   GPtrArray *week_days_btns = get_children(GTK_WIDGET(self->week_box));
   GArray *array = g_array_new(FALSE, FALSE, sizeof(short));
-
   for (guint i = 0; i < week_days_btns->len; i++) {
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(week_days_btns->pdata[i]))) {
       short day;
-      if (i == 0) day = ICAL_MONDAY_WEEKDAY;
-      else if (i == 1) day = ICAL_TUESDAY_WEEKDAY;
-      else if (i == 2) day = ICAL_WEDNESDAY_WEEKDAY;
-      else if (i == 3) day = ICAL_THURSDAY_WEEKDAY;
-      else if (i == 4) day = ICAL_FRIDAY_WEEKDAY;
-      else if (i == 5) day = ICAL_SATURDAY_WEEKDAY;
-      else day = ICAL_SUNDAY_WEEKDAY;
+      if (i == 0) day = I_CAL_MONDAY_WEEKDAY;
+      else if (i == 1) day = I_CAL_TUESDAY_WEEKDAY;
+      else if (i == 2) day = I_CAL_WEDNESDAY_WEEKDAY;
+      else if (i == 3) day = I_CAL_THURSDAY_WEEKDAY;
+      else if (i == 4) day = I_CAL_FRIDAY_WEEKDAY;
+      else if (i == 5) day = I_CAL_SATURDAY_WEEKDAY;
+      else day = I_CAL_SUNDAY_WEEKDAY;
       g_array_append_val(array, day);
     }
   }
-
   g_ptr_array_free(week_days_btns, false);
-
-  *n_days = array->len;
-  if (*n_days > 0) {
-    *days = g_array_steal(array, NULL);
-  } else {
-    *days = NULL;
-    g_array_free(array, TRUE);
-  }
+  return array;
 }
 
 static void set_week_days(ErrandsTaskListDateDialogRruleRow *self, short *days, int n_days) {

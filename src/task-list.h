@@ -4,6 +4,7 @@
 #include "task-list-item.h"
 
 #include <adwaita.h>
+#include <libical-glib/libical-glib.h>
 
 // --- TASK LIST DATE DIALOG RRULE ROW --- //
 
@@ -12,9 +13,8 @@ G_DECLARE_FINAL_TYPE(ErrandsTaskListDateDialogRruleRow, errands_task_list_date_d
                      TASK_LIST_DATE_DIALOG_RRULE_ROW, AdwExpanderRow)
 
 ErrandsTaskListDateDialogRruleRow *errands_task_list_date_dialog_rrule_row_new();
-void errands_task_list_date_dialog_rrule_row_get_rrule(ErrandsTaskListDateDialogRruleRow *self, struct icalrecurrencetype *rrule);
-void errands_task_list_date_dialog_rrule_row_set_rrule(ErrandsTaskListDateDialogRruleRow *self,
-                                                       const struct icalrecurrencetype *rrule);
+void errands_task_list_date_dialog_rrule_row_get_rrule(ErrandsTaskListDateDialogRruleRow *self, ICalRecurrence *rrule);
+void errands_task_list_date_dialog_rrule_row_set_rrule(ErrandsTaskListDateDialogRruleRow *self, ICalRecurrence *rrule);
 void errands_task_list_date_dialog_rrule_row_reset(ErrandsTaskListDateDialogRruleRow *self);
 
 // --- TASK LIST --- //

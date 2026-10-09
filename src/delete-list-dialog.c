@@ -1,6 +1,5 @@
 #include "delete-list-dialog.h"
 #include "config.h"
-#include "glib.h"
 #include "sidebar.h"
 #include "state.h"
 
