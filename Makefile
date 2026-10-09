@@ -22,13 +22,13 @@ DEVEL ?= FALSE
 ifeq ($(DEVEL),TRUE)
 	APP_ID = io.github.mrvladus.List.Devel
 	RESOURCE_PATH = /io/github/mrvladus/Errands/Devel
-	ALL_CFLAGS  = -Wall -g -fno-omit-frame-pointer -pg
-	ALL_LDFLAGS = -pg
+	ALL_CFLAGS  += -Wall -g -fno-omit-frame-pointer -pg -DCALDAV_DEBUG
+	ALL_LDFLAGS += -pg
 else
 	APP_ID = io.github.mrvladus.List
 	RESOURCE_PATH = /io/github/mrvladus/Errands
-	ALL_CFLAGS = -O3 -flto -DG_DISABLE_CAST_CHECKS -DG_DISABLE_CHECKS -DG_DISABLE_ASSERT -fomit-frame-pointer
-	ALL_LDFLAGS = -O3 -flto
+	ALL_CFLAGS += -O3 -flto -DG_DISABLE_CAST_CHECKS -DG_DISABLE_CHECKS -DG_DISABLE_ASSERT -fomit-frame-pointer
+	ALL_LDFLAGS += -O3 -flto
 endif
 
 # --- Installation directories --- #
@@ -235,12 +235,14 @@ nextcloud-setup:
 		echo "Podman is required to run Nextcloud container"; \
 		exit 1; \
 	fi
+	podman rm nextcloud-errands --force
 	podman volume rm nextcloud-errands --force
 	podman volume create nextcloud-errands
 	podman run --detach \
 	  --env NEXTCLOUD_ADMIN_USER=errands \
 	  --env NEXTCLOUD_ADMIN_PASSWORD=errands \
-	  --volume nextcloud-errands:/var/www/html \
+	  --env SQLITE_DATABASE=nextcloud \
+	  --volume nextcloud-errands:/var/www/html:z \
 	  --restart on-failure \
 	  --name nextcloud-errands \
 	  --publish 8080:80 \

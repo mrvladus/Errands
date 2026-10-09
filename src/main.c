@@ -1,3 +1,4 @@
+#include "glib.h"
 #if !(defined(__GNUC__) || defined(__clang__))
 #error "This code requires GCC or Clang compiler because it uses features not supported by other compilers.\
 e.g. GLib's g_autoptr, g_auto and g_autofree"
@@ -9,8 +10,8 @@ e.g. GLib's g_autoptr, g_auto and g_autofree"
 #include "settings.h"
 #include "sidebar.h"
 #include "state.h"
+#include "sync.h"
 #include "utils.h"
-// #include "sync.h"
 #include "window.h"
 
 #include <glib/gi18n.h>
@@ -24,7 +25,7 @@ static void activate(GtkApplication *app) {
   state.main_window = errands_window_new(app);
   gtk_window_present(GTK_WINDOW(state.main_window));
   errands_sidebar_select_last_opened_page();
-  // errands_sync_init();
+  errands_sync();
 
   // Request background
   g_autoptr(XdpPortal) portal = xdp_portal_new();
