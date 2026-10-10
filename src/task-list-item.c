@@ -135,7 +135,7 @@ ErrandsTaskListItem *errands_task_list_item_create(const char *uid, const char *
 }
 
 ErrandsTaskListItem *errands_task_list_item_load_from_ics(const char *path) {
-  g_return_val_if_fail(path, NULL);
+  g_assert_nonnull(path);
 
   if (!g_str_has_suffix(path, ".ics")) {
     g_warning("File must be an .ics file");
@@ -180,7 +180,8 @@ ErrandsTaskListItem *errands_task_list_item_load_from_ics(const char *path) {
 }
 
 void errands_task_list_item_update_count(ErrandsTaskListItem *self) {
-  g_return_if_fail(self);
+  g_assert_nonnull(self);
+  g_assert(ERRANDS_IS_TASK_LIST_ITEM(self));
 
   gint total = 0, completed = 0;
   for_vtodo_in_vcalendar(c, self->ical) {
@@ -193,7 +194,7 @@ void errands_task_list_item_update_count(ErrandsTaskListItem *self) {
 }
 
 void errands_task_list_item_save(ErrandsTaskListItem *self) {
-  g_return_if_fail(self);
+  g_assert_nonnull(self);
 
   const char *path = tmp_str_printf("%s/%s.ics", calendars_dir, self->uid);
   g_autofree gchar *ical_str = i_cal_component_as_ical_string(self->ical);
@@ -205,7 +206,7 @@ void errands_task_list_item_save(ErrandsTaskListItem *self) {
 }
 
 void errands_task_list_item_delete(ErrandsTaskListItem *self) {
-  g_return_if_fail(self);
+  g_assert_nonnull(self);
 
   errands_data_set_deleted(self->ical, true);
   errands_task_list_item_save(self);
@@ -213,7 +214,8 @@ void errands_task_list_item_delete(ErrandsTaskListItem *self) {
 }
 
 int errands_task_list_item_delete_completed(ErrandsTaskListItem *self) {
-  g_return_val_if_fail(self, 0);
+  g_assert_nonnull(self);
+  g_assert(ERRANDS_IS_TASK_LIST_ITEM(self));
 
   GListModel *model = G_LIST_MODEL(self->tasks);
   int deleted_n = 0;
@@ -234,7 +236,8 @@ int errands_task_list_item_delete_completed(ErrandsTaskListItem *self) {
 }
 
 int errands_task_list_item_delete_cancelled(ErrandsTaskListItem *self) {
-  g_return_val_if_fail(self, 0);
+  g_assert_nonnull(self);
+  g_assert(ERRANDS_IS_TASK_LIST_ITEM(self));
 
   GListModel *model = G_LIST_MODEL(self->tasks);
   int deleted_n = 0;
@@ -255,7 +258,8 @@ int errands_task_list_item_delete_cancelled(ErrandsTaskListItem *self) {
 }
 
 void errands_task_list_item_remove_deleted_tasks(ErrandsTaskListItem *self) {
-  g_return_if_fail(self);
+  g_assert_nonnull(self);
+  g_assert(ERRANDS_IS_TASK_LIST_ITEM(self));
 
   bool sync_enabled = errands_settings_get_sync_enabled(state.settings);
   GListModel *model = G_LIST_MODEL(self->tasks);
@@ -280,6 +284,9 @@ void errands_task_list_item_remove_deleted_tasks(ErrandsTaskListItem *self) {
 
 struct ErrandsTaskItem *errands_task_list_item_create_task(ErrandsTaskListItem *self, struct ErrandsTaskItem *parent,
                                                            const char *text) {
+  g_assert_nonnull(self);
+  g_assert(ERRANDS_IS_TASK_LIST_ITEM(self));
+
   ICalComponent *ical = i_cal_component_new_vtodo();
   errands_data_set_text(ical, text);
   g_autofree gchar *uid = g_uuid_string_random();
@@ -291,4 +298,29 @@ struct ErrandsTaskItem *errands_task_list_item_create_task(ErrandsTaskListItem *
   errands_task_list_item_save(self);
 
   return (struct ErrandsTaskItem *)task;
+}
+
+// ---------- SETTERS ---------- //
+
+void errands_task_list_item_set_title(ErrandsTaskListItem *self, const char *title) {
+  g_assert_nonnull(self);
+  g_assert(ERRANDS_IS_TASK_LIST_ITEM(self));
+
+  g_object_set(self, "title", title, NULL);
+}
+
+void errands_task_list_item_set_color(ErrandsTaskListItem *self, GdkRGBA *color) {
+  g_assert_nonnull(self);
+  g_assert(ERRANDS_IS_TASK_LIST_ITEM(self));
+
+  g_object_set(self, "color", color, NULL);
+}
+
+void errands_task_list_item_set_color_from_string(ErrandsTaskListItem *self, const char *color) {
+  g_assert_nonnull(self);
+  g_assert(ERRANDS_IS_TASK_LIST_ITEM(self));
+
+  GdkRGBA rgba;
+  gdk_rgba_parse(&rgba, color);
+  g_object_set(self, "color", &rgba, NULL);
 }

@@ -33,3 +33,7 @@ void errands_task_list_item_remove_deleted_tasks(ErrandsTaskListItem *self);
 // Creates a new task item with the given text, saves the list and adds it to the list children model.
 struct ErrandsTaskItem *errands_task_list_item_create_task(ErrandsTaskListItem *self, struct ErrandsTaskItem *parent,
                                                            const char *text);
+
+void errands_task_list_item_set_title(ErrandsTaskListItem *self, const char *title);
+void errands_task_list_item_set_color(ErrandsTaskListItem *self, GdkRGBA *color);
+void errands_task_list_item_set_color_from_string(ErrandsTaskListItem *self, const char *color);

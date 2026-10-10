@@ -2,9 +2,11 @@
 #include "caldav.h"
 #include "data.h"
 #include "settings.h"
+#include "sidebar.h"
 #include "state.h"
 #include "task-item.h"
 #include "task-list-item.h"
+#include "task-list.h"
 #include "utils.h"
 
 #include <gio/gio.h>
@@ -15,7 +17,15 @@
 typedef struct {
   CalDAVCalendar *calendar;
   ICalComponent *task;
+  gchar *name;
+  gchar *color;
 } _CBData;
+
+static void cb_data_free(_CBData *data) {
+  g_clear_pointer(&data->name, g_free);
+  g_clear_pointer(&data->color, g_free);
+  g_clear_pointer(&data, g_free);
+}
 
 // ---------- GLOBAL ---------- //
 
@@ -52,7 +62,9 @@ static inline ErrandsTaskItem *find_parent_task(GListModel *model, const char *u
   return NULL;
 }
 
-// ---------- CALLBACKS ---------- //
+// static inline ErrandsTaskItem *find_task_for_ical(ErrandsTaskListItem *list, const char *uid){}
+
+// ---------- IDLE CALLBACKS ---------- //
 
 static gboolean cal_added_idle_cb(gpointer user_data) {
   const _CBData *data = user_data;
@@ -68,18 +80,31 @@ static gboolean cal_added_idle_cb(gpointer user_data) {
   return G_SOURCE_REMOVE;
 }
 
-static void cal_added_cb(CalDAVCalendar *c) {
-  _CBData *data = g_new0(_CBData, 1);
-  data->calendar = c;
-  g_idle_add_full(G_PRIORITY_DEFAULT, cal_added_idle_cb, data, g_free);
-}
+static gboolean cal_modified_idle_cb(gpointer user_data) {
+  const _CBData *data = user_data;
+  const char *uid = caldav_calendar_get_uid(data->calendar);
+  ErrandsTaskListItem *list = find_local_task_list(uid);
+  if (!list) {
+    g_warning("Sync: Couldn't find local list: %s", uid);
+    return G_SOURCE_REMOVE;
+  }
+  // Local list was modified first
+  if (!errands_data_get_synced(list->ical)) return G_SOURCE_REMOVE;
+  // TODO: lock sync
+  if (data->name && !g_str_equal(data->name, list->title)) {
+    errands_task_list_item_set_title(list, data->name);
+    errands_task_list_update(state.main_window->task_list);
+  }
+  if (data->color) {
+    char color[8];
+    gdk_rgba_to_hex_string(&list->color, color);
+    if (!g_str_equal(data->color, color)) errands_task_list_item_set_color_from_string(list, data->color);
+  }
 
-static void cal_modified_cb(CalDAVCalendar *c, const char *name, const char *color) {
-  g_message("Sync: Calendar changed: %s, Name: %s, Color: %s", caldav_calendar_get_uid(c), name ? name : "NULL",
-            color ? color : "NULL");
-}
+  g_message("Sync: Calendar properties changed on remote: %s", uid);
 
-static void cal_removed_cb(const char *uid) { printf("Calendar removed: %s", uid); }
+  return G_SOURCE_REMOVE;
+}
 
 static gboolean task_added_idle_cb(gpointer user_data) {
   const _CBData *data = user_data;
@@ -101,17 +126,37 @@ static gboolean task_added_idle_cb(gpointer user_data) {
     g_list_store_append(G_LIST_STORE(child_model), task_item);
   }
   errands_task_list_item_update_count(list);
+  errands_sidebar_update_filter_rows();
+  errands_task_list_update(state.main_window->task_list);
 
   g_message("Sync: Task added to list '%s': '%s'", list->uid, errands_data_get_uid(data->task));
 
   return G_SOURCE_REMOVE;
 }
 
+// ---------- CALLBACKS ---------- //
+
+static void cal_added_cb(CalDAVCalendar *c) {
+  _CBData *data = g_new0(_CBData, 1);
+  data->calendar = c;
+  g_idle_add_full(G_PRIORITY_DEFAULT, cal_added_idle_cb, data, (GDestroyNotify)cb_data_free);
+}
+
+static void cal_modified_cb(CalDAVCalendar *c, const char *name, const char *color) {
+  _CBData *data = g_new0(_CBData, 1);
+  data->calendar = c;
+  data->name = name ? g_strdup(name) : NULL;
+  data->color = color ? g_strdup(color) : NULL;
+  g_idle_add_full(G_PRIORITY_DEFAULT, cal_modified_idle_cb, data, (GDestroyNotify)cb_data_free);
+}
+
+static void cal_removed_cb(const char *uid) { printf("Calendar removed: %s", uid); }
+
 static void task_added_cb(CalDAVCalendar *c, ICalComponent *task) {
   _CBData *data = g_new0(_CBData, 1);
   data->calendar = c;
   data->task = i_cal_component_clone(task);
-  g_idle_add_full(G_PRIORITY_DEFAULT, task_added_idle_cb, data, g_free);
+  g_idle_add_full(G_PRIORITY_DEFAULT, task_added_idle_cb, data, (GDestroyNotify)cb_data_free);
 }
 
 static void task_modified_cb(CalDAVCalendar *c, ICalComponent *task) {
@@ -149,13 +194,15 @@ void errands_sync_cleanup(void) {
   if (client) caldav_client_free(client);
 }
 
-void errands_sync(void) {
-  if (!errands_settings_get_sync_enabled(state.settings)) return;
+gboolean errands_sync(void) {
+  if (!errands_settings_get_sync_enabled(state.settings)) return G_SOURCE_REMOVE;
 
   g_message("Sync: Start");
 
   GTask *task = g_task_new(NULL, NULL, sync_finished_cb, NULL);
   g_task_run_in_thread(task, sync_cb);
+
+  return G_SOURCE_CONTINUE;
 }
 
 void errands_sync_delete_list(ErrandsTaskListItem *list) {}

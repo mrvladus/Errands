@@ -3,7 +3,7 @@
 #include "task-item.h"
 #include "task-list-item.h"
 
-void errands_sync(void);
+gboolean errands_sync(void);
 void errands_sync_cleanup(void);
 
 void errands_sync_delete_list(ErrandsTaskListItem *list);
