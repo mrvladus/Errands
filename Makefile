@@ -49,7 +49,12 @@ symbolicicondir = $(icondir)/symbolic/apps
 
 # --- Compilation variables --- #
 
-PKG_CONFIG_LIBS = libadwaita-1 gtksourceview-5 libical-glib libsecret-1 libportal-gtk4 json-glib-1.0
+PKG_CONFIG_LIBS = libadwaita-1 \
+				  gtksourceview-5 \
+				  libsecret-1 \
+				  libportal-gtk4 \
+				  libedataserver-1.2 \
+				  libecal-2.0
 
 LDFLAGS     ?=
 ALL_LDFLAGS += $(LDFLAGS) -lm `pkg-config --libs $(PKG_CONFIG_LIBS)`

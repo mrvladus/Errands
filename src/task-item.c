@@ -320,6 +320,7 @@ static void update_search_blob(ErrandsTaskItem *self) {
 // --- PUBLIC --- //
 
 ErrandsTaskItem *errands_task_item_new(ICalComponent *ical, ErrandsTaskListItem *list, ErrandsTaskItem *parent) {
+  g_assert_nonnull(ical);
   g_assert_nonnull(list);
 
   ErrandsTaskItem *self = g_object_new(ERRANDS_TYPE_TASK_ITEM, NULL);
