@@ -12,6 +12,11 @@
 #include <libical-glib/libical-glib.h>
 #include <stdio.h>
 
+typedef struct {
+  CalDAVCalendar *calendar;
+  ICalComponent *task;
+} _CBData;
+
 // ---------- GLOBAL ---------- //
 
 static CalDAVClient *client = NULL;
@@ -49,14 +54,24 @@ static inline ErrandsTaskItem *find_parent_task(GListModel *model, const char *u
 
 // ---------- CALLBACKS ---------- //
 
-static void cal_added_cb(CalDAVCalendar *c) {
-  const char *uid = caldav_calendar_get_uid(c);
-  if (find_local_task_list(uid) != NULL) return;
-  const char *name = caldav_calendar_get_name(c);
-  const char *color = caldav_calendar_get_color(c);
+static gboolean cal_added_idle_cb(gpointer user_data) {
+  const _CBData *data = user_data;
+  const char *uid = caldav_calendar_get_uid(data->calendar);
+  if (find_local_task_list(uid) != NULL) return G_SOURCE_REMOVE;
+  const char *name = caldav_calendar_get_name(data->calendar);
+  const char *color = caldav_calendar_get_color(data->calendar);
   g_autoptr(ErrandsTaskListItem) item = errands_task_list_item_create(uid, name, color, false, true);
   g_list_store_append(task_lists_model, item);
+
   g_message("Sync: Remote list added: %s", uid);
+
+  return G_SOURCE_REMOVE;
+}
+
+static void cal_added_cb(CalDAVCalendar *c) {
+  _CBData *data = g_new0(_CBData, 1);
+  data->calendar = c;
+  g_idle_add_full(G_PRIORITY_DEFAULT, cal_added_idle_cb, data, g_free);
 }
 
 static void cal_modified_cb(CalDAVCalendar *c, const char *name, const char *color) {
@@ -66,25 +81,37 @@ static void cal_modified_cb(CalDAVCalendar *c, const char *name, const char *col
 
 static void cal_removed_cb(const char *uid) { printf("Calendar removed: %s", uid); }
 
-static void task_added_cb(CalDAVCalendar *c, ICalComponent *task) {
-  ErrandsTaskListItem *list = find_local_task_list(caldav_calendar_get_uid(c));
-  if (find_local_task(list, i_cal_component_get_uid(task))) return;
-  ICalComponent *clone = i_cal_component_clone(task);
-  i_cal_component_add_component(list->ical, clone);
-  const char *parent = errands_data_get_parent(task);
+static gboolean task_added_idle_cb(gpointer user_data) {
+  const _CBData *data = user_data;
+  ErrandsTaskListItem *list = find_local_task_list(caldav_calendar_get_uid(data->calendar));
+  if (find_local_task(list, i_cal_component_get_uid(data->task))) {
+    i_cal_component_free(data->task);
+    return G_SOURCE_REMOVE;
+  }
+  i_cal_component_add_component(list->ical, data->task);
+  const char *parent = errands_data_get_parent(data->task);
   if (!parent) {
-    ErrandsTaskItem *task_item = errands_task_item_new(clone, list, NULL);
+    ErrandsTaskItem *task_item = errands_task_item_new(data->task, list, NULL);
     g_list_store_append(list->tasks, task_item);
   } else {
     ErrandsTaskItem *parent_task_item = find_parent_task(G_LIST_MODEL(list->tasks), parent);
-    if (!parent_task_item) return;
+    if (!parent_task_item) return G_SOURCE_REMOVE;
     GListModel *child_model = errands_task_item_get_children_model(parent_task_item);
-    ErrandsTaskItem *task_item = errands_task_item_new(clone, list, parent_task_item);
+    ErrandsTaskItem *task_item = errands_task_item_new(data->task, list, parent_task_item);
     g_list_store_append(G_LIST_STORE(child_model), task_item);
   }
   errands_task_list_item_update_count(list);
 
-  g_message("Sync: Task added to list '%s': '%s'", caldav_calendar_get_uid(c), errands_data_get_uid(clone));
+  g_message("Sync: Task added to list '%s': '%s'", list->uid, errands_data_get_uid(data->task));
+
+  return G_SOURCE_REMOVE;
+}
+
+static void task_added_cb(CalDAVCalendar *c, ICalComponent *task) {
+  _CBData *data = g_new0(_CBData, 1);
+  data->calendar = c;
+  data->task = i_cal_component_clone(task);
+  g_idle_add_full(G_PRIORITY_DEFAULT, task_added_idle_cb, data, g_free);
 }
 
 static void task_modified_cb(CalDAVCalendar *c, ICalComponent *task) {
