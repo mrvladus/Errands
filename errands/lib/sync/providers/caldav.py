@@ -250,8 +250,9 @@ class SyncProviderCalDAV:
         for calendar in self.calendars:
             if calendar.id not in user_lists_uids:
                 Log.debug(f"Sync: Copy list from remote '{calendar.id}'")
+                # Calendars without display name are stored under their id
                 new_list: TaskListData = UserData.add_list(
-                    name=calendar.name, uuid=calendar.id, synced=True
+                    name=calendar.name or calendar.id, uuid=calendar.id, synced=True
                 )
                 self.update_ui_args.lists_to_add.append(new_list)
 
@@ -298,10 +299,12 @@ class SyncProviderCalDAV:
         if not color:
             color = list.color
 
-        if list.color != color or list.name != cal.name:
+        name: str = cal.name or cal.id
+
+        if list.color != color or list.name != name:
             Log.debug(f"Sync: Update local list '{list.uid}'")
             UserData.update_list_props(
-                cal.id, ["name", "color", "synced"], [cal.name, color, True]
+                cal.id, ["name", "color", "synced"], [name, color, True]
             )
             self.update_ui_args.lists_to_update_name.append(cal.id)
             self.update_ui_args.update_trash = True

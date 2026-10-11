@@ -646,6 +646,10 @@ class UserDataJSON:
             with open(self.__data_file_path, "r") as f:
                 data: dict[str, Any] = json.load(f)
                 self.__task_lists_data = [TaskListData(**lst) for lst in data["lists"]]
+                # Fix lists without name (e.g. CalDAV calendars without display name)
+                for lst in self.__task_lists_data:
+                    if not lst.name:
+                        lst.name = lst.uid
                 self.__tasks_data = [TaskData(**t) for t in data["tasks"]]
                 self.__tags_data = [TagsData(**t) for t in data["tags"]]
         except Exception as e:
