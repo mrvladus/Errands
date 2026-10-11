@@ -50,6 +50,7 @@ int errands_task_item_get_indent_level(ErrandsTaskItem *self);
 
 // --- SETTERS --- //
 
+void errands_task_item_set_ical(ErrandsTaskItem *self, const ICalComponent *ical);
 void errands_task_item_set_parent(ErrandsTaskItem *self, ErrandsTaskItem *parent);
 void errands_task_item_set_title(ErrandsTaskItem *self, const char *title);
 void errands_task_item_set_completed(ErrandsTaskItem *self, gboolean completed);
@@ -66,14 +67,6 @@ void errands_task_item_set_tags(ErrandsTaskItem *self, GStrv tags);
 void errands_task_item_set_attachments(ErrandsTaskItem *self, GStrv attachments);
 void errands_task_item_set_rrule(ErrandsTaskItem *self, const ICalRecurrence *rrule);
 void errands_task_item_set_search_matched(ErrandsTaskItem *self, gboolean matched);
-
-// void errands_task_data_get_flat_list(TaskData *parent, GPtrArray *array) {
-//   for_range(i, 0, parent->children->len) {
-//     TaskData *sub_task = g_ptr_array_index(parent->children, i);
-//     g_ptr_array_add(array, sub_task);
-//     errands_task_data_get_flat_list(sub_task, array);
-//   }
-// }
 
 // bool errands_task_data_move_to_list(TaskData *data, ListData *list, TaskData *parent) {
 //   if (!data || !list || (data->parent && data->parent == parent)) return false;

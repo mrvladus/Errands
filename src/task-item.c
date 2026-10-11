@@ -1,6 +1,7 @@
 #include "task-item.h"
 #include "data.h"
 #include "glib-object.h"
+#include "glib.h"
 #include "settings.h"
 #include "state.h"
 #include "task-list-item.h"
@@ -14,6 +15,8 @@ static void update_search_blob(ErrandsTaskItem *self);
 
 struct _ErrandsTaskItem {
   GObject parent_instance;
+
+  bool lock;
 
   // Properties
   const char *uid;
@@ -112,7 +115,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     if (self->title) g_free(self->title);
     self->title = g_strdup(new_title);
     errands_data_set_text(self->ical, self->title);
-    errands_task_list_item_save(self->list);
+    if (!self->lock) errands_task_list_item_save(self->list);
     update_search_blob(self);
   } break;
   case PROP_COMPLETED: {
@@ -139,7 +142,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     }
     if (update_task_list_count > 0) update_task_list_count--;
     if (update_task_list_count > 0) break;
-    errands_task_list_item_save(self->list);
+    if (!self->lock) errands_task_list_item_save(self->list);
     errands_sidebar_update_filter_rows();
     errands_sidebar_task_list_update_counter(errands_data_get_uid(self->ical));
     errands_task_list_sort(state.main_window->task_list, GTK_SORTER_CHANGE_MORE_STRICT);
@@ -162,7 +165,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     }
     if (update_task_list_count > 0) update_task_list_count--;
     if (update_task_list_count > 0) break;
-    errands_task_list_item_save(self->list);
+    if (!self->lock) errands_task_list_item_save(self->list);
     errands_sidebar_update_filter_rows();
     errands_sidebar_task_list_update_counter(errands_data_get_uid(self->ical));
     errands_task_list_sort(state.main_window->task_list, GTK_SORTER_CHANGE_MORE_STRICT);
@@ -174,14 +177,14 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     if (self->color) g_free(self->color);
     self->color = g_strdup(new_color);
     errands_data_set_color(self->ical, self->color);
-    errands_task_list_item_save(self->list);
+    if (!self->lock) errands_task_list_item_save(self->list);
   } break;
   case PROP_PRIORITY: {
     gint new_priority = g_value_get_int(value);
     if (new_priority == self->priority) break;
     self->priority = CLAMP(new_priority, 0, 10);
     errands_data_set_priority(self->ical, self->priority);
-    errands_task_list_item_save(self->list);
+    if (!self->lock) errands_task_list_item_save(self->list);
   } break;
   case PROP_NOTES: {
     const char *new_notes = g_value_get_string(value);
@@ -190,7 +193,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     if (self->notes) g_free(self->notes);
     self->notes = g_strdup(normalized);
     errands_data_set_notes(self->ical, self->notes);
-    errands_task_list_item_save(self->list);
+    if (!self->lock) errands_task_list_item_save(self->list);
     update_search_blob(self);
   } break;
   case PROP_DTSTART: {
@@ -198,46 +201,75 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     if (i_cal_time_is_null_time(self->dtstart)) i_cal_time_set_is_date(self->dtstart, true);
     if (i_cal_time_compare(dtstart, self->dtstart) == 0) break;
     self->dtstart = dtstart;
+    g_object_ref(dtstart);
     errands_data_set_start(self->ical, self->dtstart);
-    errands_task_list_item_save(self->list);
+    if (!self->lock) errands_task_list_item_save(self->list);
   } break;
   case PROP_DTEND: {
     ICalTime *dtend = g_value_get_object(value);
     if (i_cal_time_is_null_time(self->dtend)) i_cal_time_set_is_date(self->dtend, true);
     if (i_cal_time_compare(dtend, self->dtend) == 0) break;
     self->dtend = dtend;
+    g_object_ref(dtend);
     errands_data_set_due(self->ical, self->dtend);
-    errands_task_list_item_save(self->list);
+    if (!self->lock) errands_task_list_item_save(self->list);
   } break;
   case PROP_TAGS: {
     GStrv new_tags = g_value_get_pointer(value);
     if (g_strv_equal((const gchar *const *)self->tags, (const gchar *const *)new_tags)) break;
     if (self->tags) g_strfreev(self->tags);
     self->tags = g_value_get_pointer(value);
-    errands_task_list_item_save(self->list);
+    if (!self->lock) errands_task_list_item_save(self->list);
     update_search_blob(self);
   } break;
   case PROP_ATTACHMENTS: {
     GStrv new_attachments = g_value_get_pointer(value);
+    if (!new_attachments) {
+      g_clear_pointer(&self->attachments, g_strfreev);
+      errands_data_set_attachments(self->ical, NULL);
+      if (!self->lock) errands_task_list_item_save(self->list);
+      break;
+    }
     if (g_strv_equal((const gchar *const *)self->attachments, (const gchar *const *)new_attachments)) break;
     if (self->attachments) g_strfreev(self->attachments);
-    self->attachments = g_value_get_pointer(value);
-    errands_task_list_item_save(self->list);
+    self->attachments = new_attachments;
+    errands_data_set_attachments(self->ical, new_attachments);
+    if (!self->lock) errands_task_list_item_save(self->list);
   } break;
   case PROP_RRULE: {
     const ICalRecurrence *new_rrule = g_value_get_object(value);
+    if (!new_rrule) {
+      self->rrule = NULL;
+      errands_data_set_rrule(self->ical, self->rrule);
+      break;
+    }
     if (i_cal_recurrence_compare(self->rrule, (ICalRecurrence *)new_rrule)) break;
     if (self->rrule) i_cal_recurrence_unref(self->rrule);
-    if (!new_rrule || (new_rrule && i_cal_recurrence_get_freq((ICalRecurrence *)new_rrule) == I_CAL_NO_RECURRENCE))
-      self->rrule = NULL;
+    if (i_cal_recurrence_get_freq((ICalRecurrence *)new_rrule) == I_CAL_NO_RECURRENCE) self->rrule = NULL;
     else self->rrule = i_cal_recurrence_clone((ICalRecurrence *)new_rrule);
     errands_data_set_rrule(self->ical, self->rrule);
-    errands_task_list_item_save(self->list);
+    if (!self->lock) errands_task_list_item_save(self->list);
   } break;
   case PROP_SEARCH_MATCHED: self->search_matched = g_value_get_boolean(value); break;
   case PROP_UNCOMPLETED_COUNT: self->uncompleted_count = g_value_get_string(value); break;
   case PROP_HAS_NO_CHILDREN: self->has_no_children = g_value_get_boolean(value); break;
-  case PROP_ICAL: self->ical = g_value_get_object(value); break;
+  case PROP_ICAL: {
+    self->ical = g_value_get_object(value);
+    self->lock = true;
+    errands_task_item_set_title(self, errands_data_get_text(self->ical));
+    errands_task_item_set_color(self, errands_data_get_color(self->ical));
+    errands_task_item_set_notes(self, errands_data_get_notes(self->ical));
+    errands_task_item_set_completed(self, errands_data_is_completed(self->ical));
+    errands_task_item_set_cancelled(self, errands_data_get_cancelled(self->ical));
+    errands_task_item_set_priority(self, errands_data_get_priority(self->ical));
+    errands_task_item_set_dtstart(self, errands_data_get_start(self->ical));
+    errands_task_item_set_dtend(self, errands_data_get_due(self->ical));
+    // errands_task_item_set_tags(self, errands_data_get_tags(self->ical));
+    // errands_task_item_set_attachments(self, errands_data_get_attachments(self->ical));
+    // g_autoptr(ICalRecurrence) rrule = errands_data_get_rrule(self->ical);
+    // errands_task_item_set_rrule(self, rrule);
+    self->lock = false;
+  } break;
   case PROP_CHILDREN_MODEL: self->children_model = g_value_get_object(value); break;
   case PROP_TASK_WIDGET: self->task_widget = g_value_get_object(value); break;
   default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
@@ -324,6 +356,8 @@ ErrandsTaskItem *errands_task_item_new(ICalComponent *ical, ErrandsTaskListItem 
   g_assert_nonnull(list);
 
   ErrandsTaskItem *self = g_object_new(ERRANDS_TYPE_TASK_ITEM, NULL);
+
+  self->lock = false;
 
   self->uid = errands_data_get_uid(ical);
   self->title = g_strdup(errands_data_get_text(ical));
@@ -528,7 +562,9 @@ ICalTime *errands_task_item_get_dtstart(ErrandsTaskItem *self) { return self->dt
 ICalTime *errands_task_item_get_dtend(ErrandsTaskItem *self) { return self->dtend; }
 GStrv errands_task_item_get_tags(ErrandsTaskItem *self) { return self->tags; }
 GStrv errands_task_item_get_attachments(ErrandsTaskItem *self) { return self->attachments; }
-ICalRecurrence *errands_task_item_get_rrule(ErrandsTaskItem *self) { return i_cal_recurrence_clone(self->rrule); }
+ICalRecurrence *errands_task_item_get_rrule(ErrandsTaskItem *self) {
+  return self->rrule ? i_cal_recurrence_clone(self->rrule) : NULL;
+}
 const char *errands_task_item_get_color(ErrandsTaskItem *self) { return self->color; }
 ErrandsTaskItem *errands_task_item_get_parent(ErrandsTaskItem *self) { return self->parent; }
 gboolean errands_task_item_get_search_matched(ErrandsTaskItem *self) { return self->search_matched; }
@@ -593,6 +629,7 @@ gchar *errands_task_item_get_rrule_as_string(ErrandsTaskItem *self) {
 
 // --- SETTERS --- //
 
+void errands_task_item_set_ical(ErrandsTaskItem *self, const ICalComponent *ical) { g_object_set(self, "ical", ical, NULL); }
 void errands_task_item_set_title(ErrandsTaskItem *self, const char *title) { g_object_set(self, "title", title, NULL); }
 void errands_task_item_set_completed(ErrandsTaskItem *self, gboolean completed) {
   g_object_set(self, "completed", completed, NULL);
@@ -603,7 +640,6 @@ void errands_task_item_set_cancelled(ErrandsTaskItem *self, gboolean cancelled) 
 void errands_task_item_set_search_matched(ErrandsTaskItem *self, gboolean matched) {
   g_object_set(self, "search-matched", matched, NULL);
 }
-
 void errands_task_item_set_priority(ErrandsTaskItem *self, gint priority) { g_object_set(self, "priority", priority, NULL); }
 void errands_task_item_set_priority_from_string(ErrandsTaskItem *self, const char *priority) {
   gint p = 0;
@@ -615,8 +651,8 @@ void errands_task_item_set_priority_from_string(ErrandsTaskItem *self, const cha
 }
 void errands_task_item_set_notes(ErrandsTaskItem *self, const char *notes) { g_object_set(self, "notes", notes, NULL); }
 void errands_task_item_set_color(ErrandsTaskItem *self, const char *color) { g_object_set(self, "color", color, NULL); }
-void errands_task_item_set_dtstart(ErrandsTaskItem *self, ICalTime *dtstart) { g_object_set(self, "dtstart", &dtstart, NULL); }
-void errands_task_item_set_dtend(ErrandsTaskItem *self, ICalTime *dtend) { g_object_set(self, "dtend", &dtend, NULL); }
+void errands_task_item_set_dtstart(ErrandsTaskItem *self, ICalTime *dtstart) { g_object_set(self, "dtstart", dtstart, NULL); }
+void errands_task_item_set_dtend(ErrandsTaskItem *self, ICalTime *dtend) { g_object_set(self, "dtend", dtend, NULL); }
 void errands_task_item_set_tags(ErrandsTaskItem *self, GStrv tags) { g_object_set(self, "tags", tags, NULL); }
 void errands_task_item_set_attachments(ErrandsTaskItem *self, GStrv attachments) {
   g_object_set(self, "attachments", attachments, NULL);

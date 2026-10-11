@@ -51,9 +51,13 @@ void errands_data_set_text(ICalComponent *ical, const char *value);
 void errands_data_set_uid(ICalComponent *ical, const char *value);
 void errands_data_set_changed(ICalComponent *ical, ICalTime *value);
 void errands_data_set_completed(ICalComponent *ical, ICalTime *value);
+// Takes ownership of value. Ref it if needed.
 void errands_data_set_created(ICalComponent *ical, ICalTime *value);
+// Takes ownership of value. Ref it if needed.
 void errands_data_set_due(ICalComponent *ical, ICalTime *value);
+// Takes ownership of value. Ref it if needed.
 void errands_data_set_end(ICalComponent *ical, ICalTime *value);
+// Takes ownership of value. Ref it if needed.
 void errands_data_set_start(ICalComponent *ical, ICalTime *value);
 // Sets the rrule on the ical component, returns true if the rrule was set
 bool errands_data_set_rrule(ICalComponent *ical, ICalRecurrence *value);

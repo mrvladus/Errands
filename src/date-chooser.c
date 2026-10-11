@@ -110,7 +110,7 @@ void errands_date_chooser_reset(ErrandsDateChooser *self) {
 ICalTime *errands_date_chooser_get_dt(ErrandsDateChooser *self) { return i_cal_time_clone(self->dt); }
 
 void errands_date_chooser_set_dt(ErrandsDateChooser *self, ICalTime *dt) {
-  g_clear_object(&dt);
+  g_clear_object(&self->dt);
   self->dt = dt;
   bool is_null = i_cal_time_is_null_time(dt) || i_cal_time_is_null_date(dt);
   if (is_null) errands_date_chooser_reset(self);

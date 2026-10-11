@@ -1,11 +1,11 @@
 #include "task-properties-dialog.h"
 #include "config.h"
 #include "date-chooser.h"
+#include "glib.h"
 #include "settings.h"
 #include "state.h"
 // #include "sync.h"
 #include "task-item.h"
-#include "task-list.h"
 #include "utils.h"
 
 #include <glib/gi18n.h>
@@ -41,7 +41,7 @@ struct _ErrandsTaskPropertiesDialog {
   // Date
   ErrandsDateChooser *start_date_chooser;
   ErrandsDateChooser *due_date_chooser;
-  ErrandsTaskListDateDialogRruleRow *rrule_row;
+  ErrandsRruleRow *rrule_row;
   // Notes
   GtkSourceView *notes_view;
   GtkSourceBuffer *notes_buffer;
@@ -62,7 +62,7 @@ static void errands_task_properties_dialog_dispose(GObject *gobject) {
 
 static void errands_task_properties_dialog_class_init(ErrandsTaskPropertiesDialogClass *class) {
   g_type_ensure(ERRANDS_TYPE_DATE_CHOOSER);
-  g_type_ensure(ERRANDS_TYPE_TASK_LIST_DATE_DIALOG_RRULE_ROW);
+  g_type_ensure(ERRANDS_TYPE_RRULE_ROW);
 
   G_OBJECT_CLASS(class)->dispose = errands_task_properties_dialog_dispose;
   gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), RESOURCE_PATH "/ui/task-properties-dialog.ui");
@@ -118,16 +118,15 @@ void errands_task_properties_dialog_show(ErrandsTaskPropertiesDialogPage page, E
   // Date
   errands_date_chooser_reset(self->start_date_chooser);
   errands_date_chooser_reset(self->due_date_chooser);
-  errands_task_list_date_dialog_rrule_row_reset(self->rrule_row);
-
+  errands_rrule_row_reset(self->rrule_row);
   errands_date_chooser_set_dt(self->start_date_chooser, errands_task_item_get_dtstart(item));
   errands_date_chooser_set_dt(self->due_date_chooser, errands_task_item_get_dtend(item));
 
   ICalRecurrence *rrule = errands_task_item_get_rrule(item);
-  errands_task_list_date_dialog_rrule_row_set_rrule(self->rrule_row, rrule);
+  errands_rrule_row_set_rrule(self->rrule_row, rrule);
   adw_expander_row_set_expanded(ADW_EXPANDER_ROW(self->rrule_row),
                                 rrule && i_cal_recurrence_get_freq(rrule) != I_CAL_NO_RECURRENCE);
-  i_cal_recurrence_unref(rrule);
+  g_clear_pointer(&rrule, i_cal_recurrence_unref);
 
   // Notes
   const char *notes = errands_task_item_get_notes(item);
@@ -254,13 +253,12 @@ static void on_dialog_close_cb(ErrandsTaskPropertiesDialog *self) {
   if (errands_task_item_is_due(self->item)) changed = true;
 
   // Set rrule
-  ICalRecurrence *new_rrule = i_cal_recurrence_new();
-  if (adw_expander_row_get_expanded(ADW_EXPANDER_ROW(self->rrule_row)))
-    errands_task_list_date_dialog_rrule_row_get_rrule(self->rrule_row, new_rrule);
+  ICalRecurrence *new_rrule = NULL;
+  if (adw_expander_row_get_expanded(ADW_EXPANDER_ROW(self->rrule_row))) new_rrule = errands_rrule_row_get_rrule(self->rrule_row);
   errands_task_item_set_rrule(self->item, new_rrule);
-  if (i_cal_time_is_null_date(new_sdt) && i_cal_recurrence_get_freq(new_rrule) != I_CAL_NO_RECURRENCE)
+  if (i_cal_time_is_null_date(new_sdt) && new_rrule && i_cal_recurrence_get_freq(new_rrule) != I_CAL_NO_RECURRENCE)
     errands_task_item_set_dtstart(self->item, i_cal_time_get_date_time_now());
-  i_cal_recurrence_unref(new_rrule);
+  g_clear_pointer(&new_rrule, i_cal_recurrence_unref);
 
   // Notes
   GtkTextIter start, end;

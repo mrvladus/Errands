@@ -15,6 +15,7 @@
 
 // Print TODO formatted message.
 #define TODO(format, ...) fprintf(stderr, "%s:%d:%s: " format, __FILE__, __LINE__, __func__, ##__VA_ARGS__)
+#define HERE              fprintf(stderr, "%s:%d:%s: HERE\n", __FILE__, __LINE__, __func__)
 
 #define for_range(idx, idx_start, idx_end)  for (int idx = (int)(idx_start); idx < (int)(idx_end); ++idx)
 #define for_item_in_gptrarray(T, item, arr) for (T *item = (T *)arr->pdata; item < arr->pdata + arr->len; item++)

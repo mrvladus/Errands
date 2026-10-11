@@ -418,9 +418,7 @@ ICalRecurrence *errands_data_get_rrule(ICalComponent *ical) {
 }
 
 bool errands_data_set_rrule(ICalComponent *ical, ICalRecurrence *value) {
-  ICalRecurrence *old_rrule = errands_data_get_rrule(ical);
-  if (i_cal_recurrence_compare(value, old_rrule)) return false;
-  bool is_no_recurrence = value && i_cal_recurrence_get_freq(value) == I_CAL_NO_RECURRENCE;
+  bool is_no_recurrence = !value || (value && i_cal_recurrence_get_freq(value) == I_CAL_NO_RECURRENCE);
   g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_RRULE_PROPERTY);
   if (is_no_recurrence) {
     if (property) i_cal_component_remove_property(ical, property);

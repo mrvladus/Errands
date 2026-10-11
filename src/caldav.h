@@ -1,10 +1,12 @@
 /*
 
-caldav.h: Wrapper around Evolution Data Server to manage CalDAV calendars and VTODOS.
+DESCRIPTION
+
+Wrapper library for Evolution Data Server to manage CalDAV calendars and VTODOS.
 
 ----------------------------------------------------------------------
 
-Functionality
+FUNCTIONALITY
 
 Remote -> Local:
     [x] Calendars
@@ -28,8 +30,13 @@ Local -> Remote:
 
 ----------------------------------------------------------------------
 
-Compilation flags:
-    pkg-config --cflags --libs libedataserver-1.2 libecal-2.0
+COMPILATION FLAGS
+
+pkg-config --cflags --libs libedataserver-1.2 libecal-2.0
+
+----------------------------------------------------------------------
+
+EXAMPLE
 
 ----------------------------------------------------------------------
 

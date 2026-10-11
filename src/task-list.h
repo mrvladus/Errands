@@ -1,23 +1,8 @@
 #pragma once
 
-#include "gtk/gtk.h"
 #include "task-list-item.h"
 
 #include <adwaita.h>
-#include <libical-glib/libical-glib.h>
-
-// --- TASK LIST DATE DIALOG RRULE ROW --- //
-
-#define ERRANDS_TYPE_TASK_LIST_DATE_DIALOG_RRULE_ROW (errands_task_list_date_dialog_rrule_row_get_type())
-G_DECLARE_FINAL_TYPE(ErrandsTaskListDateDialogRruleRow, errands_task_list_date_dialog_rrule_row, ERRANDS,
-                     TASK_LIST_DATE_DIALOG_RRULE_ROW, AdwExpanderRow)
-
-ErrandsTaskListDateDialogRruleRow *errands_task_list_date_dialog_rrule_row_new();
-void errands_task_list_date_dialog_rrule_row_get_rrule(ErrandsTaskListDateDialogRruleRow *self, ICalRecurrence *rrule);
-void errands_task_list_date_dialog_rrule_row_set_rrule(ErrandsTaskListDateDialogRruleRow *self, ICalRecurrence *rrule);
-void errands_task_list_date_dialog_rrule_row_reset(ErrandsTaskListDateDialogRruleRow *self);
-
-// --- TASK LIST --- //
 
 typedef enum {
   ERRANDS_TASK_LIST_PAGE_ALL,
