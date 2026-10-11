@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Vlad Krupinskii <vladkrupinskii@gmail.com>
+// SPDX-License-Identifier: Zlib
+
 #include "caldav.h"
 
 #define CALDAV_MISS_THRESHOLD 3

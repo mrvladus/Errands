@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Vlad Krupinskii <vladkrupinskii@gmail.com>
+// SPDX-License-Identifier: Zlib
+
 #include "window.h"
 #include "config.h"
 #include "new-list-dialog.h"

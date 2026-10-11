@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Vlad Krupinskii <vladkrupinskii@gmail.com>
+// SPDX-License-Identifier: Zlib
+
 #include "widget.h"
 #include "config.h"
 
@@ -52,8 +55,7 @@ static void errands_widget_class_init(ErrandsWidgetClass *class) {
   object_class->get_property = get_property;
   object_class->set_property = set_property;
 
-  obj_properties[PROP_BOOL_PROP] =
-      g_param_spec_boolean("bool-prop", "Bool Prop", "This is bool prop", false, G_PARAM_READWRITE);
+  obj_properties[PROP_BOOL_PROP] = g_param_spec_boolean("bool-prop", "Bool Prop", "This is bool prop", false, G_PARAM_READWRITE);
 
   g_object_class_install_properties(object_class, N_PROPERTIES, obj_properties);
 

@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Vlad Krupinskii <vladkrupinskii@gmail.com>
+// SPDX-License-Identifier: Zlib
+
 #include "rename-list-dialog.h"
 #include "config.h"
 #include "state.h"
@@ -32,9 +35,7 @@ static void errands_rename_list_dialog_class_init(ErrandsRenameListDialogClass *
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_entry_activated_cb);
 }
 
-static void errands_rename_list_dialog_init(ErrandsRenameListDialog *dialog) {
-  gtk_widget_init_template(GTK_WIDGET(dialog));
-}
+static void errands_rename_list_dialog_init(ErrandsRenameListDialog *dialog) { gtk_widget_init_template(GTK_WIDGET(dialog)); }
 
 ErrandsRenameListDialog *errands_rename_list_dialog_new() {
   return g_object_ref_sink(g_object_new(ERRANDS_TYPE_RENAME_LIST_DIALOG, NULL));

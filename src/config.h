@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Vlad Krupinskii <vladkrupinskii@gmail.com>
+// SPDX-License-Identifier: Zlib
+
 #ifndef APP_ID
 #define APP_ID "io.github.mrvladus.List"
 #endif
