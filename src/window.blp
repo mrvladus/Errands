@@ -66,11 +66,11 @@ template $ErrandsWindow: Adw.ApplicationWindow {
                     title: _("Date and Time");
 
                     $ErrandsDateChooser start_date_chooser {
-                      title: _("Start");
+                      subtitle: _("Start");
                     }
 
                     $ErrandsDateChooser due_date_chooser {
-                      title: _("Due");
+                      subtitle: _("Due");
                       visible: bind rrule_row.enable-expansion inverted;
                     }
 
