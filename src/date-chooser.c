@@ -60,7 +60,11 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
 }
 
 static void errands_date_chooser_dispose(GObject *gobject) {
+  ErrandsDateChooser *self = ERRANDS_DATE_CHOOSER(gobject);
+
+  g_clear_object(&self->dt);
   gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_DATE_CHOOSER);
+
   G_OBJECT_CLASS(errands_date_chooser_parent_class)->dispose(gobject);
 }
 
@@ -100,38 +104,52 @@ ErrandsDateChooser *errands_date_chooser_new() { return g_object_new(ERRANDS_TYP
 // ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_date_chooser_reset(ErrandsDateChooser *self) {
+  g_clear_object(&self->dt);
+  self->dt = i_cal_time_new_null_date();
+
   gtk_spin_button_set_value(self->hours, 0);
   gtk_spin_button_set_value(self->minutes, 0);
+
   g_autoptr(GDateTime) today = g_date_time_new_now_local();
   gtk_calendar_set_date(self->calendar, today);
+
   g_object_set(self, "subtitle", "", NULL);
   g_object_set(self, "title", _("Not Set"), NULL);
   g_object_set(self->reset_btn, "visible", false, NULL);
-  self->dt = i_cal_time_new_null_date();
 }
 
 ICalTime *errands_date_chooser_get_dt(ErrandsDateChooser *self) { return i_cal_time_clone(self->dt); }
 
 void errands_date_chooser_set_dt(ErrandsDateChooser *self, ICalTime *dt) {
   g_clear_object(&self->dt);
-  self->dt = dt;
-  bool is_null = i_cal_time_is_null_time(dt) || i_cal_time_is_null_date(dt);
-  if (is_null) errands_date_chooser_reset(self);
-  else {
-    gtk_calendar_set_year(self->calendar, i_cal_time_get_year(dt));
-    gtk_calendar_set_month(self->calendar, i_cal_time_get_month(dt) - 1);
-    gtk_calendar_set_day(self->calendar, i_cal_time_get_day(dt));
-    g_autoptr(GDateTime) date = gtk_calendar_get_date(self->calendar);
-    g_autofree gchar *date_str = g_date_time_format(date, "%x");
-    g_object_set(self, "subtitle", date_str, NULL);
-    if (!i_cal_time_is_date(dt)) {
-      gtk_spin_button_set_value(self->hours, i_cal_time_get_hour(dt));
-      gtk_spin_button_set_value(self->minutes, i_cal_time_get_minute(dt));
-      const char *time_str = tmp_str_printf("%02d:%02d", i_cal_time_get_hour(dt), i_cal_time_get_minute(dt));
-      g_object_set(self, "title", is_null ? _("Not Set") : time_str, NULL);
-    }
+  self->dt = dt ? i_cal_time_clone(dt) : i_cal_time_new_null_date();
+
+  bool is_null = i_cal_time_is_null_time(self->dt) || i_cal_time_is_null_date(self->dt);
+
+  if (is_null) {
+    errands_date_chooser_reset(self);
+    return;
   }
-  g_object_set(self->reset_btn, "visible", !is_null, NULL);
+
+  gtk_calendar_set_year(self->calendar, i_cal_time_get_year(self->dt));
+  gtk_calendar_set_month(self->calendar, i_cal_time_get_month(self->dt) - 1);
+  gtk_calendar_set_day(self->calendar, i_cal_time_get_day(self->dt));
+
+  g_autoptr(GDateTime) date = gtk_calendar_get_date(self->calendar);
+  g_autofree gchar *date_str = g_date_time_format(date, "%x");
+  g_object_set(self, "subtitle", date_str, NULL);
+
+  if (!i_cal_time_is_date(self->dt)) {
+    int hour = i_cal_time_get_hour(self->dt);
+    int minute = i_cal_time_get_minute(self->dt);
+
+    gtk_spin_button_set_value(self->hours, hour);
+    gtk_spin_button_set_value(self->minutes, minute);
+
+    g_object_set(self, "title", tmp_str_printf("%02d:%02d", hour, minute), NULL);
+  }
+
+  g_object_set(self->reset_btn, "visible", true, NULL);
 }
 
 // ---------- ACTIONS ---------- //
