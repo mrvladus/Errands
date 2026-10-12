@@ -3,10 +3,10 @@
 
 #include "config.h"
 #include "date-chooser.h"
-#include "glib.h"
-#include "task-properties-dialog.h"
 #include "utils.h"
+#include "window.h"
 
+#include <glib.h>
 #include <glib/gi18n.h>
 #include <libical-glib/libical-glib.h>
 #include <libical/ical.h>

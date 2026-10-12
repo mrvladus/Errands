@@ -216,15 +216,11 @@ static inline void errands_add_shortcut(GtkWidget *widget, const char *trigger, 
   gtk_widget_add_controller(widget, ctrl);
 }
 
-static inline GStrv gstrv_remove_duplicates(GStrv strv) {
-  g_autoptr(GHashTable) hash_table = g_hash_table_new(g_str_hash, g_str_equal);
-  g_autoptr(GStrvBuilder) builder = g_strv_builder_new();
-  for (int i = 0; strv[i] != NULL; i++)
-    if (!g_hash_table_contains(hash_table, strv[i])) {
-      g_hash_table_add(hash_table, strv[i]);
-      g_strv_builder_add(builder, strv[i]);
-    }
-  return g_strv_builder_end(builder);
+static inline guint g_strv_hash(GStrv s) {
+  guint hash = 0;
+  if (!s) return hash;
+  for_range(i, 0, g_strv_length(s)) hash += g_str_hash(s[i]);
+  return hash;
 }
 
 static inline GSimpleActionGroup *errands_add_action_group(void *widget, const char *group_name) {

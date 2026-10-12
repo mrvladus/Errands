@@ -9,7 +9,6 @@
 #include "state.h"
 #include "task-item.h"
 #include "task-list.h"
-#include "task-properties-dialog.h"
 #include "utils.h"
 #include "window.h"
 
@@ -21,11 +20,8 @@ static GtkWidget *errands_task_tag_new(const char *tag);
 static void on_edit_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_copy_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_color_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
+static void on_properties_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_notes_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
-static void on_priority_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
-static void on_attachments_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
-static void on_tags_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
-static void on_date_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_cancel_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_delete_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_export_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
@@ -141,7 +137,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     gtk_widget_set_visible(self->attachments_btn, has_attachments);
     errands_task_update_toolbar(self);
     if (!has_attachments) break;
-    const char *label = tmp_str_printf("%ud", g_strv_length(self->attachments));
+    const char *label = tmp_str_printf("%u", g_strv_length(self->attachments));
     adw_button_content_set_label(ADW_BUTTON_CONTENT(self->attachments_btn_content), label);
   } break;
   case PROP_RRULE: {
@@ -228,10 +224,8 @@ static void errands_task_init(ErrandsTask *self) {
   errands_add_action(self->ag, "edit", on_edit_action_cb, self, NULL);
   errands_add_action(self->ag, "copy", on_copy_action_cb, self, NULL);
   errands_add_action(self->ag, "color", on_color_action_cb, self, NULL);
+  errands_add_action(self->ag, "properties", on_properties_action_cb, self, NULL);
   errands_add_action(self->ag, "notes", on_notes_action_cb, self, NULL);
-  errands_add_action(self->ag, "attachments", on_attachments_action_cb, self, NULL);
-  errands_add_action(self->ag, "tags", on_tags_action_cb, self, NULL);
-  errands_add_action(self->ag, "date", on_date_action_cb, self, NULL);
   errands_add_action(self->ag, "cancel", on_cancel_action_cb, self, NULL);
   errands_add_action(self->ag, "delete", on_delete_action_cb, self, NULL);
   errands_add_action(self->ag, "export", on_export_action_cb, self, NULL);
@@ -249,7 +243,7 @@ static GtkWidget *errands_task_tag_new(const char *tag) {
   GtkWidget *label = g_object_new(GTK_TYPE_LABEL, "label", tag, "max-width-chars", 15, "halign", GTK_ALIGN_START, "ellipsize",
                                   PANGO_ELLIPSIZE_END, NULL);
   gtk_box_append(GTK_BOX(box), label);
-  GtkWidget *button = g_object_new(GTK_TYPE_BUTTON, "child", box, "action-name", "task.tags", NULL);
+  GtkWidget *button = g_object_new(GTK_TYPE_BUTTON, "child", box, "action-name", "task.properties", NULL);
   gtk_widget_add_css_class(button, "caption-heading");
   gtk_widget_add_css_class(button, "tag");
 
@@ -306,25 +300,17 @@ static void on_copy_action_cb(GSimpleAction *action, GVariant *param, ErrandsTas
   errands_window_add_toast(_("Copied to Clipboard"), 1);
 }
 
-static void on_notes_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
-  errands_task_properties_dialog_show(ERRANDS_TASK_PROPERTY_DIALOG_PAGE_NOTES, self->item);
-}
-
 static void on_priority_action_cb(GSimpleAction *action, GVariant *value, ErrandsTask *self) {
   g_simple_action_set_state(action, value);
   errands_task_item_set_priority_from_string(self->item, g_variant_get_string(value, NULL));
 }
 
-static void on_attachments_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
-  errands_task_properties_dialog_show(ERRANDS_TASK_PROPERTY_DIALOG_PAGE_ATTACHMENTS, self->item);
+static void on_properties_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
+  errands_window_show_properties(state.main_window, self->item);
 }
 
-static void on_tags_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
-  errands_task_properties_dialog_show(ERRANDS_TASK_PROPERTY_DIALOG_PAGE_TAGS, self->item);
-}
-
-static void on_date_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
-  errands_task_properties_dialog_show(ERRANDS_TASK_PROPERTY_DIALOG_PAGE_DATE, self->item);
+static void on_notes_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
+  errands_window_show_notes(state.main_window, self->item);
 }
 
 static void on_cancel_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {

@@ -219,22 +219,32 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
   } break;
   case PROP_TAGS: {
     GStrv new_tags = g_value_get_pointer(value);
-    if (g_strv_equal((const gchar *const *)self->tags, (const gchar *const *)new_tags)) break;
-    if (self->tags) g_strfreev(self->tags);
-    self->tags = g_value_get_pointer(value);
-    if (!self->lock) errands_task_list_item_save(self->list);
+    if (!self->tags && !new_tags) break;
+    if (self->tags && !new_tags) {
+      errands_data_set_tags(self->ical, NULL);
+      if (!self->lock) errands_task_list_item_save(self->list);
+      break;
+    }
+    if (new_tags && self->tags && g_strv_equal((const gchar *const *)self->tags, (const gchar *const *)new_tags)) break;
+    g_clear_pointer(&self->tags, g_strfreev);
+    self->tags = new_tags;
+    errands_data_set_tags(self->ical, new_tags);
     update_search_blob(self);
+    if (!self->lock) errands_task_list_item_save(self->list);
   } break;
   case PROP_ATTACHMENTS: {
     GStrv new_attachments = g_value_get_pointer(value);
-    if (!new_attachments) {
+    if (self->attachments && !new_attachments) {
       g_clear_pointer(&self->attachments, g_strfreev);
       errands_data_set_attachments(self->ical, NULL);
       if (!self->lock) errands_task_list_item_save(self->list);
       break;
     }
-    if (g_strv_equal((const gchar *const *)self->attachments, (const gchar *const *)new_attachments)) break;
-    if (self->attachments) g_strfreev(self->attachments);
+    if (!self->attachments && !new_attachments) break;
+    if (new_attachments && self->attachments &&
+        g_strv_equal((const gchar *const *)self->attachments, (const gchar *const *)new_attachments))
+      break;
+    g_clear_pointer(&self->attachments, g_strfreev);
     self->attachments = new_attachments;
     errands_data_set_attachments(self->ical, new_attachments);
     if (!self->lock) errands_task_list_item_save(self->list);
@@ -345,10 +355,10 @@ static void errands_task_item_init(ErrandsTaskItem *self) {}
 static void update_search_blob(ErrandsTaskItem *self) {
   g_assert_nonnull(self);
 
-  if (self->search_blob) g_free(self->search_blob);
+  g_clear_pointer(&self->search_blob, g_free);
   g_autoptr(GString) str = g_string_new(NULL);
   g_string_printf(str, "%s\n%s\n", self->title, self->notes);
-  for (gchar *s = self->tags[0]; s; ++s) g_string_printf(str, "%s\n", s);
+  if (self->tags) for_range(i, 0, g_strv_length(self->tags)) g_string_append_printf(str, "%s\n", self->tags[i]);
   self->search_blob = g_utf8_casefold(str->str, -1);
 }
 

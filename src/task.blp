@@ -126,6 +126,11 @@ template $ErrandsTask: Box {
 
           menu-model: menu {
             section {
+              item (_("Properties"), "task.properties")
+              item (_("Notes"), "task.notes")
+            }
+
+            section {
               item (_("Edit Text"), "task.edit")
               item (_("Copy Text"), "task.copy")
               item (_("Task Color"), "task.color")
@@ -159,13 +164,6 @@ template $ErrandsTask: Box {
                   target: "high";
                 }
               }
-            }
-
-            section {
-              item (_("Date and Time"), "task.date")
-              item (_("Notes"), "task.notes")
-              item (_("Tags"), "task.tags")
-              item (_("Attachments"), "task.attachments")
             }
 
             section {
@@ -218,7 +216,7 @@ template $ErrandsTask: Box {
 
     Button dtstart_btn {
       valign: center;
-      action-name: "task.date";
+      action-name: "task.properties";
 
       styles [
         "caption",
@@ -234,7 +232,7 @@ template $ErrandsTask: Box {
 
     Button dtend_btn {
       valign: center;
-      action-name: "task.date";
+      action-name: "task.properties";
 
       styles [
         "caption",
@@ -250,7 +248,7 @@ template $ErrandsTask: Box {
 
     Button rrule_btn {
       valign: center;
-      action-name: "task.date";
+      action-name: "task.properties";
 
       styles [
         "caption",
@@ -277,7 +275,7 @@ template $ErrandsTask: Box {
     Button attachments_btn {
       tooltip-text: _("Attachments");
       valign: center;
-      action-name: "task.attachments";
+      action-name: "task.properties";
 
       Adw.ButtonContent attachments_btn_content {
         icon-name: "errands-attachment-symbolic";

@@ -8,6 +8,7 @@
 #include "utils.h"
 
 #include <json-glib/json-glib.h>
+#include <libical-glib/libical-glib.h>
 
 // ---------- GLOBALS ---------- //
 
@@ -453,11 +454,16 @@ GStrv errands_data_get_tags(ICalComponent *ical) {
 }
 
 void errands_data_set_attachments(ICalComponent *ical, GStrv value) {
-  g_autofree gchar *str = g_strjoinv(",", value);
-  set_x_prop_value(ical, "X-ERRANDS-ATTACHMENTS", str);
+  g_autoptr(ICalProperty) prop = get_x_prop(ical, "X-ERRANDS-ATTACHMENTS", "");
+  if (!value) i_cal_component_remove_property(ical, prop);
+  else {
+    g_autofree gchar *str = g_strjoinv(",", value);
+    set_x_prop_value(ical, "X-ERRANDS-ATTACHMENTS", str);
+  }
   errands_data_set_synced(ical, false);
   errands_data_set_changed(ical, i_cal_time_get_date_time_now());
 }
+
 void errands_data_set_tags(ICalComponent *ical, GStrv value) {
   for (ICalProperty *p = i_cal_component_get_first_property(ical, I_CAL_CATEGORIES_PROPERTY); p != 0;
        p = i_cal_component_get_next_property(ical, I_CAL_CATEGORIES_PROPERTY)) {
