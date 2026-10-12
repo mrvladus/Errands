@@ -472,10 +472,14 @@ void errands_data_set_attachments(ICalComponent *ical, GStrv value) {
 }
 
 void errands_data_set_tags(ICalComponent *ical, GStrv value) {
+  g_autoptr(GPtrArray) arr = g_ptr_array_new();
   for (ICalProperty *p = i_cal_component_get_first_property(ical, I_CAL_CATEGORIES_PROPERTY); p != 0;
        p = i_cal_component_get_next_property(ical, I_CAL_CATEGORIES_PROPERTY)) {
-    i_cal_component_remove_property(ical, p);
-    g_object_unref(p);
+    g_ptr_array_add(arr, p);
+  }
+  for_range(i, 0, arr->len) {
+    i_cal_component_remove_property(ical, arr->pdata[i]);
+    g_object_unref(arr->pdata[i]);
   }
   for (size_t i = 0; i < g_strv_length(value); i++) i_cal_component_add_property(ical, i_cal_property_new_categories(value[i]));
   errands_data_set_synced(ical, false);
@@ -489,8 +493,13 @@ void errands_data_add_tag(ICalComponent *ical, const char *tag) {
 }
 
 bool errands_data_remove_tag(ICalComponent *ical, const char *tag) {
-  for (ICalProperty *p = i_cal_component_get_first_property(ical, I_CAL_CATEGORIES_PROPERTY); p;
+  g_autoptr(GPtrArray) arr = g_ptr_array_new();
+  for (ICalProperty *p = i_cal_component_get_first_property(ical, I_CAL_CATEGORIES_PROPERTY); p != 0;
        p = i_cal_component_get_next_property(ical, I_CAL_CATEGORIES_PROPERTY)) {
+    g_ptr_array_add(arr, p);
+  }
+  for_range(i, 0, arr->len) {
+    ICalProperty *p = g_ptr_array_index(arr, i);
     g_autofree gchar *val = i_cal_property_get_value_as_string(p);
     if (g_str_equal(tag, val)) {
       i_cal_component_remove_property(ical, p);

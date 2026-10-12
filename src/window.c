@@ -160,7 +160,7 @@ static GtkWidget *tag_new(const char *tag) {
 
 static void add_tag(ErrandsWindow *self, const char *tag) {
   GtkWidget *row = tag_new(tag);
-  GStrv tags = errands_task_item_get_tags(self->item);
+  const GStrv tags = errands_task_item_get_tags(self->item);
   const bool has_tag = tags && g_strv_contains((const gchar *const *)tags, tag);
   GtkWidget *check_btn = adw_action_row_get_activatable_widget(ADW_ACTION_ROW(row));
   gtk_check_button_set_active(GTK_CHECK_BUTTON(check_btn), has_tag);
@@ -311,17 +311,15 @@ static void on_show_properties_toggled_cb(ErrandsWindow *self) {
 
   // Tags
   g_autoptr(GPtrArray) tag_rows = get_children(TAGS_LIST_BOX);
-  GStrv old_tags = errands_task_item_get_tags(self->item);
   g_autoptr(GStrvBuilder) builder = g_strv_builder_new();
   for_range(i, 0, tag_rows->len) {
     AdwActionRow *row = g_ptr_array_index(tag_rows, i);
     const char *tag = adw_preferences_row_get_title(ADW_PREFERENCES_ROW(row));
     bool active = gtk_check_button_get_active(GTK_CHECK_BUTTON(adw_action_row_get_activatable_widget(row)));
-    bool exists = old_tags && g_strv_contains((const gchar *const *)old_tags, tag);
-    if (active && !exists) g_strv_builder_add(builder, tag);
+    if (active) g_strv_builder_add(builder, tag);
   }
   GStrv new_tags = g_strv_builder_end(builder);
-  if (g_strv_hash(old_tags) != g_strv_hash(new_tags)) errands_task_item_set_tags(self->item, new_tags);
+  errands_task_item_set_tags(self->item, new_tags);
 }
 
 static void on_tag_entry_activated_cb(ErrandsWindow *self, AdwEntryRow *entry) {

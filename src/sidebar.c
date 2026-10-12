@@ -9,6 +9,7 @@
 #include "settings-dialog.h"
 #include "settings.h"
 #include "state.h"
+#include "sync.h"
 #include "task-list-item.h"
 #include "task-list.h"
 #include "utils.h"
@@ -80,7 +81,7 @@ static void errands_sidebar_init(ErrandsSidebar *sidebar) {
   errands_add_action(ag, "new_list", errands_new_list_dialog_show, self, NULL);
   errands_add_action(ag, "preferences", errands_settings_dialog_show, self, NULL);
   errands_add_action(ag, "about", errands_about_dialog_show, self, NULL);
-  // errands_add_action(ag, "sync", errands_sync, self, NULL);
+  errands_add_action(ag, "sync", errands_sync, NULL, NULL);
 
   adw_sidebar_section_bind_model(self->task_lists_section, G_LIST_MODEL(task_lists_model),
                                  (AdwSidebarSectionCreateItemFunc)create_sidebar_task_list_item_create_func, NULL, NULL);

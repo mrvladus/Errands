@@ -217,8 +217,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     if (!self->lock) errands_task_list_item_save(self->list);
   } break;
   case PROP_TAGS: {
-    GStrv new_tags = g_value_get_pointer(value);
-    if (g_strv_hash(new_tags) == g_strv_hash(self->tags)) break;
+    const GStrv new_tags = g_value_get_pointer(value);
     if (!self->tags && !new_tags) break;
     if (self->tags && !new_tags) {
       errands_data_set_tags(self->ical, NULL);
@@ -234,7 +233,6 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
   } break;
   case PROP_ATTACHMENTS: {
     GStrv new_attachments = g_value_get_pointer(value);
-    if (g_strv_hash(new_attachments) == g_strv_hash(self->attachments)) break;
     if (self->attachments && !new_attachments) {
       g_clear_pointer(&self->attachments, g_strfreev);
       errands_data_set_attachments(self->ical, NULL);
@@ -588,8 +586,8 @@ const char *errands_task_item_get_notes(ErrandsTaskItem *self) { return self->no
 const char *errands_task_item_get_search_blob(ErrandsTaskItem *self) { return self->search_blob; }
 ICalTime *errands_task_item_get_dtstart(ErrandsTaskItem *self) { return self->dtstart; }
 ICalTime *errands_task_item_get_dtend(ErrandsTaskItem *self) { return self->dtend; }
-GStrv errands_task_item_get_tags(ErrandsTaskItem *self) { return self->tags; }
-GStrv errands_task_item_get_attachments(ErrandsTaskItem *self) { return self->attachments; }
+const GStrv errands_task_item_get_tags(ErrandsTaskItem *self) { return self->tags; }
+const GStrv errands_task_item_get_attachments(ErrandsTaskItem *self) { return self->attachments; }
 ICalRecurrence *errands_task_item_get_rrule(ErrandsTaskItem *self) {
   return self->rrule ? i_cal_recurrence_clone(self->rrule) : NULL;
 }
@@ -681,8 +679,8 @@ void errands_task_item_set_notes(ErrandsTaskItem *self, const char *notes) { g_o
 void errands_task_item_set_color(ErrandsTaskItem *self, const char *color) { g_object_set(self, "color", color, NULL); }
 void errands_task_item_set_dtstart(ErrandsTaskItem *self, ICalTime *dtstart) { g_object_set(self, "dtstart", dtstart, NULL); }
 void errands_task_item_set_dtend(ErrandsTaskItem *self, ICalTime *dtend) { g_object_set(self, "dtend", dtend, NULL); }
-void errands_task_item_set_tags(ErrandsTaskItem *self, GStrv tags) { g_object_set(self, "tags", tags, NULL); }
-void errands_task_item_set_attachments(ErrandsTaskItem *self, GStrv attachments) {
+void errands_task_item_set_tags(ErrandsTaskItem *self, const GStrv tags) { g_object_set(self, "tags", tags, NULL); }
+void errands_task_item_set_attachments(ErrandsTaskItem *self, const GStrv attachments) {
   g_object_set(self, "attachments", attachments, NULL);
 }
 void errands_task_item_set_rrule(ErrandsTaskItem *self, const ICalRecurrence *rrule) { g_object_set(self, "rrule", rrule, NULL); }

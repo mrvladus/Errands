@@ -223,6 +223,12 @@ static inline guint g_strv_hash(GStrv s) {
   return hash;
 }
 
+static inline void g_strv_print(GStrv s) {
+  if (!s) return;
+  for_range(i, 0, g_strv_length(s)) g_print("%s ", s[i]);
+  g_print("\n");
+}
+
 static inline GSimpleActionGroup *errands_add_action_group(void *widget, const char *group_name) {
   g_autoptr(GSimpleActionGroup) ag = g_simple_action_group_new();
   gtk_widget_insert_action_group(GTK_WIDGET(widget), group_name, G_ACTION_GROUP(ag));

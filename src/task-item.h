@@ -39,8 +39,8 @@ const char *errands_task_item_get_notes(ErrandsTaskItem *self);
 const char *errands_task_item_get_search_blob(ErrandsTaskItem *self);
 ICalTime *errands_task_item_get_dtstart(ErrandsTaskItem *self);
 ICalTime *errands_task_item_get_dtend(ErrandsTaskItem *self);
-GStrv errands_task_item_get_tags(ErrandsTaskItem *self);
-GStrv errands_task_item_get_attachments(ErrandsTaskItem *self);
+const GStrv errands_task_item_get_tags(ErrandsTaskItem *self);
+const GStrv errands_task_item_get_attachments(ErrandsTaskItem *self);
 ICalRecurrence *errands_task_item_get_rrule(ErrandsTaskItem *self);
 // Returns the rrule as a human-readable string, or NULL if no rrule is set.
 // The caller owns the returned string and must free it with g_free().
@@ -65,9 +65,9 @@ void errands_task_item_set_color(ErrandsTaskItem *self, const char *color);
 void errands_task_item_set_dtstart(ErrandsTaskItem *self, ICalTime *dtstart);
 void errands_task_item_set_dtend(ErrandsTaskItem *self, ICalTime *dtend);
 // Set the tags for the task item. Item takes ownership of the tags array.
-void errands_task_item_set_tags(ErrandsTaskItem *self, GStrv tags);
+void errands_task_item_set_tags(ErrandsTaskItem *self, const GStrv tags);
 // Set the attachments for the task item. Item takes ownership of the attachments array.
-void errands_task_item_set_attachments(ErrandsTaskItem *self, GStrv attachments);
+void errands_task_item_set_attachments(ErrandsTaskItem *self, const GStrv attachments);
 void errands_task_item_set_rrule(ErrandsTaskItem *self, const ICalRecurrence *rrule);
 void errands_task_item_set_search_matched(ErrandsTaskItem *self, gboolean matched);
 
