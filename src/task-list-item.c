@@ -119,8 +119,6 @@ ErrandsTaskListItem *errands_task_list_item_new(ICalComponent *ical) {
   }
   errands_task_list_item_update_count(self);
 
-  // g_list_store_append(task_lists_model, self);
-
   return self;
 }
 

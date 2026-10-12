@@ -3,8 +3,6 @@
 
 #include "task-item.h"
 #include "data.h"
-#include "glib-object.h"
-#include "glib.h"
 #include "settings.h"
 #include "state.h"
 #include "task-list-item.h"
@@ -15,6 +13,7 @@
 #include <libical-glib/libical-glib.h>
 
 static void update_search_blob(ErrandsTaskItem *self);
+static void on_global_tags_changed_cb(ErrandsTaskItem *self);
 
 struct _ErrandsTaskItem {
   GObject parent_instance;
@@ -219,6 +218,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
   } break;
   case PROP_TAGS: {
     GStrv new_tags = g_value_get_pointer(value);
+    if (g_strv_hash(new_tags) == g_strv_hash(self->tags)) break;
     if (!self->tags && !new_tags) break;
     if (self->tags && !new_tags) {
       errands_data_set_tags(self->ical, NULL);
@@ -234,6 +234,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
   } break;
   case PROP_ATTACHMENTS: {
     GStrv new_attachments = g_value_get_pointer(value);
+    if (g_strv_hash(new_attachments) == g_strv_hash(self->attachments)) break;
     if (self->attachments && !new_attachments) {
       g_clear_pointer(&self->attachments, g_strfreev);
       errands_data_set_attachments(self->ical, NULL);
@@ -277,10 +278,10 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     errands_task_item_set_priority(self, errands_data_get_priority(self->ical));
     errands_task_item_set_dtstart(self, errands_data_get_start(self->ical));
     errands_task_item_set_dtend(self, errands_data_get_due(self->ical));
-    // errands_task_item_set_tags(self, errands_data_get_tags(self->ical));
-    // errands_task_item_set_attachments(self, errands_data_get_attachments(self->ical));
-    // g_autoptr(ICalRecurrence) rrule = errands_data_get_rrule(self->ical);
-    // errands_task_item_set_rrule(self, rrule);
+    errands_task_item_set_tags(self, errands_data_get_tags(self->ical));
+    errands_task_item_set_attachments(self, errands_data_get_attachments(self->ical));
+    g_autoptr(ICalRecurrence) rrule = errands_data_get_rrule(self->ical);
+    errands_task_item_set_rrule(self, rrule);
     self->lock = false;
   } break;
   case PROP_CHILDREN_MODEL: self->children_model = g_value_get_object(value); break;
@@ -348,7 +349,9 @@ static void errands_task_item_class_init(ErrandsTaskItemClass *klass) {
   g_object_class_install_properties(object_class, N_PROPERTIES, obj_properties);
 }
 
-static void errands_task_item_init(ErrandsTaskItem *self) {}
+static void errands_task_item_init(ErrandsTaskItem *self) {
+  g_signal_connect_swapped(state.settings, "notify::tags", G_CALLBACK(on_global_tags_changed_cb), self);
+}
 
 // --- PRIVATE --- //
 
@@ -360,6 +363,19 @@ static void update_search_blob(ErrandsTaskItem *self) {
   g_string_printf(str, "%s\n%s\n", self->title, self->notes);
   if (self->tags) for_range(i, 0, g_strv_length(self->tags)) g_string_append_printf(str, "%s\n", self->tags[i]);
   self->search_blob = g_utf8_casefold(str->str, -1);
+}
+
+static void on_global_tags_changed_cb(ErrandsTaskItem *self) {
+  const GStrv g_tags = errands_settings_get_tags(state.settings);
+  GStrv old_tags = errands_data_get_tags(self->ical);
+  g_autoptr(GStrvBuilder) builder = g_strv_builder_new();
+  for_range(i, 0, g_strv_length(g_tags)) {
+    const gchar *tag = g_tags[i];
+    bool contains = old_tags && g_strv_contains((const gchar *const *)old_tags, tag);
+    if (contains) g_strv_builder_add(builder, tag);
+  }
+  GStrv new_tags = g_strv_builder_end(builder);
+  if (g_strv_hash(g_tags) != g_strv_hash(old_tags)) errands_task_item_set_tags(self, new_tags);
 }
 
 // --- PUBLIC --- //
@@ -385,7 +401,6 @@ ErrandsTaskItem *errands_task_item_new(ICalComponent *ical, ErrandsTaskListItem 
   self->attachments = errands_data_get_attachments(ical);
   self->rrule = errands_data_get_rrule(ical);
   self->ical = ical;
-  self->children_model = NULL;
   self->parent = parent;
   self->list = list;
   self->search_matched = true;

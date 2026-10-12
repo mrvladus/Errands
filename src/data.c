@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Zlib
 
 #include "data.h"
+#include "glib.h"
 #include "settings.h"
 #include "state.h"
 #include "task-list-item.h"
@@ -439,18 +440,24 @@ bool errands_data_set_rrule(ICalComponent *ical, ICalRecurrence *value) {
 // --- STRV --- //
 
 GStrv errands_data_get_attachments(ICalComponent *ical) {
+  g_assert_nonnull(ical);
+
   g_autofree gchar *val = get_x_prop_value(ical, "X-ERRANDS-ATTACHMENTS", NULL);
   return val ? g_strsplit(val, ",", -1) : NULL;
 }
 
 GStrv errands_data_get_tags(ICalComponent *ical) {
+  g_assert_nonnull(ical);
+  g_assert(i_cal_component_is_valid(ical));
+
   g_autoptr(GStrvBuilder) builder = g_strv_builder_new();
-  for (ICalProperty *p = i_cal_component_get_first_property(ical, I_CAL_CATEGORIES_PROPERTY); p != 0;
+  for (ICalProperty *p = i_cal_component_get_first_property(ical, I_CAL_CATEGORIES_PROPERTY); p;
        p = i_cal_component_get_next_property(ical, I_CAL_CATEGORIES_PROPERTY)) {
     g_strv_builder_add(builder, i_cal_property_get_value_as_string(p));
     g_object_unref(p);
   }
-  return g_strv_builder_end(builder);
+  GStrv res = g_strv_builder_end(builder);
+  return (res && res[0]) ? res : NULL;
 }
 
 void errands_data_set_attachments(ICalComponent *ical, GStrv value) {

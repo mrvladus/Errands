@@ -3,6 +3,7 @@
 
 #include "settings.h"
 #include "config.h"
+#include "glib.h"
 
 #include <libsecret/secret.h>
 
@@ -194,9 +195,10 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
                                NULL, "account", "CalDAV", NULL);
   } break;
   case PROP_TAGS: {
-    if (self->tags) g_strfreev(self->tags);
+    g_clear_pointer(&self->tags, g_strfreev);
     self->tags = g_value_get_pointer(value);
-    g_key_file_set_string_list(self->key_file, "task_list", "tags", (const gchar *const *)self->tags, g_strv_length(self->tags));
+    guint len = self->tags ? g_strv_length(self->tags) : 0;
+    g_key_file_set_string_list(self->key_file, "task_list", "tags", (const gchar *const *)self->tags, len);
   } break;
   default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
   }

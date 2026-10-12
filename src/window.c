@@ -287,8 +287,6 @@ static void on_show_properties_toggled_cb(ErrandsWindow *self) {
   if (show) return;
   g_message("Window: Close properties");
 
-  bool changed = false;
-
   // Date
   ICalTime *new_sdt = errands_date_chooser_get_dt(self->start_date_chooser);
   errands_task_item_set_dtstart(self->item, new_sdt);
