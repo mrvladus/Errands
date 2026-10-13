@@ -4,6 +4,7 @@
 #pragma once
 
 #include "data.h"
+#include "gio/gio.h"
 #include "glib.h"
 
 #include <ctype.h>
@@ -306,7 +307,20 @@ static inline void gtk_widget_set_color(GtkWidget *widget, const char *color) {
   g_object_set_data(G_OBJECT(widget), "custom-color-provider", provider);
 }
 
-// ---------- ICAL UTILS ---------- //
+// ---------- LIST MODELS ---------- //
+
+static inline void g_list_store_remove_data(GListStore *model, gpointer data) {
+  guint pos;
+  if (g_list_store_find(model, data, &pos)) g_list_store_remove(model, pos);
+}
+
+static inline void run_in_thread(GTaskThreadFunc fn, gpointer task_data, GAsyncReadyCallback finish_cb, gpointer finish_data) {
+  GTask *task = g_task_new(NULL, NULL, finish_cb, finish_data);
+  if (task_data) g_task_set_task_data(task, task_data, NULL);
+  g_task_run_in_thread(task, fn);
+}
+
+// ---------- ICAL ---------- //
 
 #define for_vtodo_in_vcalendar(var, calendar)                                                                                    \
   for (ICalComponent *var = i_cal_component_get_first_component((calendar), I_CAL_VTODO_COMPONENT); var;                         \

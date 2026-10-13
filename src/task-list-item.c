@@ -218,16 +218,10 @@ void errands_task_list_item_delete(ErrandsTaskListItem *self) {
   g_assert_nonnull(self);
   g_assert(ERRANDS_IS_TASK_LIST_ITEM(self));
 
-  bool synced = errands_data_get_synced(self->ical);
   errands_data_set_deleted(self->ical, true);
   errands_task_list_item_save(self);
-  if (errands_settings_get_sync_enabled(state.settings)) {
-    errands_sync_delete_list(self);
-  } else {
-    guint pos;
-    g_list_store_find(task_lists_model, self, &pos);
-    g_list_store_remove(task_lists_model, pos);
-  }
+  errands_sync_delete_list(self);
+  g_list_store_remove_data(task_lists_model, self);
 }
 
 int errands_task_list_item_delete_completed(ErrandsTaskListItem *self) {

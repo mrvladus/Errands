@@ -170,7 +170,6 @@ void errands_sidebar_delete_list(const char *uid) {
     g_autoptr(ErrandsTaskListItem) item = g_list_model_get_item(model, i);
     if (item->uid && g_str_equal(uid, item->uid)) {
       errands_task_list_item_delete(item);
-      g_list_store_remove(task_lists_model, i);
       break;
     }
   }

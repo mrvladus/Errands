@@ -70,14 +70,15 @@ typedef struct {
 CalDAVClient *caldav_client_new(CalDAVClientConfig config);
 gboolean caldav_client_poll(CalDAVClient *c);
 CalDAVCalendar *caldav_client_create_calendar(CalDAVClient *c, const gchar *name, const gchar *color);
-gboolean caldav_client_remove_calendar(CalDAVCalendar *calendar);
+CalDAVCalendar *caldav_client_find_calendar(CalDAVClient *c, const gchar *uid);
 void caldav_client_free(CalDAVClient *c);
 
+// Remove remote calendar. `calendar` is deleted and set to `NULL`.
+gboolean caldav_calendar_remove(CalDAVCalendar *calendar);
 const gchar *caldav_calendar_get_color(CalDAVCalendar *c);
 const gchar *caldav_calendar_get_name(CalDAVCalendar *c);
 const gchar *caldav_calendar_get_href(CalDAVCalendar *c);
 const gchar *caldav_calendar_get_uid(CalDAVCalendar *c);
-gboolean caldav_calendar_get_deleted(CalDAVCalendar *c);
 gboolean caldav_calendar_set_color(CalDAVCalendar *c, const gchar *color);
 gboolean caldav_calendar_set_name(CalDAVCalendar *c, const gchar *name);
 gboolean caldav_calendar_set_properties(CalDAVCalendar *c, const gchar *name, const gchar *color);

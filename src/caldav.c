@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Zlib
 
 #include "caldav.h"
+#include "glib.h"
 
 #define CALDAV_MISS_THRESHOLD 3
 
@@ -15,6 +16,8 @@ struct _CalDAVCalendar {
   ECalClient *e_cal_client;
   ECalClientView *view;
   GPtrArray *tasks;
+
+  gboolean being_deleted;
 
   gboolean seen;    // Set during each discovery round
   guint miss_count; // Consecutive polls where the href was absent
@@ -276,7 +279,6 @@ const gchar *caldav_calendar_get_name(CalDAVCalendar *calendar) {
 }
 const gchar *caldav_calendar_get_href(CalDAVCalendar *c) { return c->href; }
 const gchar *caldav_calendar_get_uid(CalDAVCalendar *c) { return c->uid; }
-gboolean caldav_calendar_get_deleted(CalDAVCalendar *c) { return c->miss_count > 0; }
 gboolean caldav_calendar_set_properties(CalDAVCalendar *calendar, const gchar *name, const gchar *color) {
   g_assert_nonnull(calendar);
 
@@ -381,6 +383,32 @@ gboolean caldav_calendar_remove_task(CalDAVCalendar *c, const char *uid) {
     return FALSE;
   }
   caldav__info("Removed task: '%s'", uid);
+  return TRUE;
+}
+
+gboolean caldav_calendar_remove(CalDAVCalendar *calendar) {
+  g_assert_nonnull(calendar);
+  g_assert_nonnull(calendar->client);
+  g_assert_nonnull(calendar->href);
+  g_assert_nonnull(calendar->registered_source);
+
+  g_autoptr(GError) error = NULL;
+  g_autoptr(EWebDAVSession) session = e_webdav_session_new(calendar->registered_source);
+  e_soup_session_set_credentials(E_SOUP_SESSION(session), calendar->client->credentials);
+  if (!e_webdav_session_delete_sync(session, calendar->href, E_WEBDAV_DEPTH_INFINITY, NULL, NULL, &error)) {
+    caldav__error("Failed to remove calendar '%s': %s", calendar->href, error ? error->message : "unknown error");
+    return FALSE;
+  }
+  e_cal_client_view_stop(calendar->view, NULL);
+  if (!e_source_remove_sync(calendar->registered_source, NULL, &error)) {
+    // The server deletion already succeeded. Keep the calendar in the array so the caller does not get a dangling object; the
+    // next discovery round can clean up the local source.
+    caldav__error("Remote calendar '%s' was deleted, but local source removal failed: %s", calendar->href, error->message);
+    return FALSE;
+  }
+  g_ptr_array_remove(calendar->client->calendars, calendar);
+  calendar = NULL;
+
   return TRUE;
 }
 
@@ -759,30 +787,12 @@ CalDAVCalendar *caldav_client_create_calendar(CalDAVClient *c, const gchar *name
   // return TRUE;
 }
 
-gboolean caldav_client_remove_calendar(CalDAVCalendar *calendar) {
-  g_assert_nonnull(calendar);
-  g_assert_nonnull(calendar->client);
-  g_assert_nonnull(calendar->href);
-  g_assert_nonnull(calendar->registered_source);
-
-  g_autoptr(GError) error = NULL;
-  g_autoptr(EWebDAVSession) session = e_webdav_session_new(calendar->registered_source);
-  e_soup_session_set_credentials(E_SOUP_SESSION(session), calendar->client->credentials);
-  if (!e_webdav_session_delete_sync(session, calendar->href, E_WEBDAV_DEPTH_INFINITY, NULL, NULL, &error)) {
-    caldav__error("Failed to remove calendar '%s': %s", calendar->href, error ? error->message : "unknown error");
-    return FALSE;
+CalDAVCalendar *caldav_client_find_calendar(CalDAVClient *c, const gchar *uid) {
+  for (guint i = 0; i < c->calendars->len; ++i) {
+    CalDAVCalendar *cal = g_ptr_array_index(c->calendars, i);
+    if (g_str_equal(cal->uid, uid)) return cal;
   }
-  e_cal_client_view_stop(calendar->view, NULL);
-  if (!e_source_remove_sync(calendar->registered_source, NULL, &error)) {
-    // The server deletion already succeeded. Keep the calendar in the array so the caller does not get a dangling object; the
-    // next discovery round can clean up the local source.
-    caldav__error("Remote calendar '%s' was deleted, but local source removal failed: %s", calendar->href, error->message);
-    return FALSE;
-  }
-  if (calendar->client->cal_removed_cb) calendar->client->cal_removed_cb(calendar->uid);
-  g_ptr_array_remove(calendar->client->calendars, calendar);
-
-  return TRUE;
+  return NULL;
 }
 
 void caldav_client_free(CalDAVClient *c) {
