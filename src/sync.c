@@ -18,6 +18,14 @@
 #include <libical-glib/libical-glib.h>
 
 typedef struct {
+  enum {
+    CAL_ADDED,
+    CAL_MODIFIED,
+    CAL_REMOVED,
+    TASK_ADDED,
+    TASK_MODIFIED,
+    TASK_REMOVED,
+  } op;
   CalDAVCalendar *calendar;
   ICalComponent *task;
   gchar *name;
@@ -96,104 +104,103 @@ static inline bool merge_tasks(ICalComponent *dest, ICalComponent *source) {
 
 // ---------- IDLE CALLBACKS ---------- //
 
-static gboolean cal_added_idle_cb(gpointer user_data) {
+static gboolean idle_cb(gpointer user_data) {
   const _CBData *data = user_data;
-  const char *uid = caldav_calendar_get_uid(data->calendar);
-  if (find_local_task_list(uid) != NULL) return G_SOURCE_REMOVE;
-  const char *name = caldav_calendar_get_name(data->calendar);
-  const char *color = caldav_calendar_get_color(data->calendar);
-  g_autoptr(ErrandsTaskListItem) item = errands_task_list_item_create(uid, name, color, false, true);
-  g_list_store_append(task_lists_model, item);
+  switch (data->op) {
 
-  g_message("Sync: Remote list added: %s", uid);
+  case CAL_ADDED: {
+    const char *uid = caldav_calendar_get_uid(data->calendar);
+    if (find_local_task_list(uid) != NULL) return G_SOURCE_REMOVE;
+    g_message("Sync: Remote list added: %s", uid);
+    const char *name = caldav_calendar_get_name(data->calendar);
+    const char *color = caldav_calendar_get_color(data->calendar);
+    g_autoptr(ErrandsTaskListItem) item = errands_task_list_item_create(uid, name, color, false, true);
+    g_list_store_append(task_lists_model, item);
+    errands_sidebar_update_filter_rows();
+  } break;
 
-  return G_SOURCE_REMOVE;
-}
+  case CAL_MODIFIED: {
+    const char *uid = caldav_calendar_get_uid(data->calendar);
+    ErrandsTaskListItem *list = find_local_task_list(uid);
+    if (!list) {
+      g_warning("Sync: Couldn't find local list: %s", uid);
+      return G_SOURCE_REMOVE;
+    }
+    // Local list was modified first
+    if (!errands_data_get_synced(list->ical)) return G_SOURCE_REMOVE;
+    // TODO: lock sync
+    if (data->name && !g_str_equal(data->name, list->title)) {
+      errands_task_list_item_set_title(list, data->name);
+      errands_task_list_update(state.main_window->task_list);
+    }
+    if (data->color) {
+      char color[8];
+      gdk_rgba_to_hex_string(&list->color, color);
+      if (!g_str_equal(data->color, color)) errands_task_list_item_set_color_from_string(list, data->color);
+    }
+    g_message("Sync: Calendar properties changed on remote: %s", uid);
+  } break;
 
-static gboolean cal_modified_idle_cb(gpointer user_data) {
-  const _CBData *data = user_data;
-  const char *uid = caldav_calendar_get_uid(data->calendar);
-  ErrandsTaskListItem *list = find_local_task_list(uid);
-  if (!list) {
-    g_warning("Sync: Couldn't find local list: %s", uid);
-    return G_SOURCE_REMOVE;
-  }
-  // Local list was modified first
-  if (!errands_data_get_synced(list->ical)) return G_SOURCE_REMOVE;
-  // TODO: lock sync
-  if (data->name && !g_str_equal(data->name, list->title)) {
-    errands_task_list_item_set_title(list, data->name);
+  case CAL_REMOVED: {
+    g_message("Sync: Calendar removed on remote: %s", data->uid);
+    ErrandsTaskListItem *list = find_local_task_list(data->uid);
+    if (!list) {
+      g_warning("Sync: Couldn't find local list: %s", data->uid);
+      return G_SOURCE_REMOVE;
+    }
+    errands_task_list_item_delete(list);
+  } break;
+
+  case TASK_ADDED: {
+    ErrandsTaskListItem *list = find_local_task_list(caldav_calendar_get_uid(data->calendar));
+    if (find_local_task(list, i_cal_component_get_uid(data->task))) {
+      i_cal_component_free(data->task);
+      return G_SOURCE_REMOVE;
+    }
+    i_cal_component_add_component(list->ical, data->task);
+    const char *parent = errands_data_get_parent(data->task);
+    if (!parent) {
+      ErrandsTaskItem *task_item = errands_task_item_new(data->task, list, NULL);
+      g_list_store_append(list->tasks, task_item);
+    } else {
+      ErrandsTaskItem *parent_task_item = find_task_item(G_LIST_MODEL(list->tasks), parent);
+      if (!parent_task_item) return G_SOURCE_REMOVE;
+      GListModel *child_model = errands_task_item_get_children_model(parent_task_item);
+      ErrandsTaskItem *task_item = errands_task_item_new(data->task, list, parent_task_item);
+      g_list_store_append(G_LIST_STORE(child_model), task_item);
+    }
+    errands_task_list_item_update_count(list);
+    errands_sidebar_update_filter_rows();
     errands_task_list_update(state.main_window->task_list);
-  }
-  if (data->color) {
-    char color[8];
-    gdk_rgba_to_hex_string(&list->color, color);
-    if (!g_str_equal(data->color, color)) errands_task_list_item_set_color_from_string(list, data->color);
-  }
-  g_message("Sync: Calendar properties changed on remote: %s", uid);
-  return G_SOURCE_REMOVE;
-}
 
-static gboolean cal_removed_idle_cb(gpointer user_data) {
-  const _CBData *data = user_data;
-  g_message("Sync: Calendar removed on remote: %s", data->uid);
-  ErrandsTaskListItem *list = find_local_task_list(data->uid);
-  if (!list) {
-    g_warning("Sync: Couldn't find local list: %s", data->uid);
-    return G_SOURCE_REMOVE;
-  }
-  errands_task_list_item_delete(list);
-  return G_SOURCE_REMOVE;
-}
+    g_message("Sync: Task added to list '%s': '%s'", list->uid, errands_data_get_uid(data->task));
+  } break;
 
-static gboolean task_added_idle_cb(gpointer user_data) {
-  const _CBData *data = user_data;
-  ErrandsTaskListItem *list = find_local_task_list(caldav_calendar_get_uid(data->calendar));
-  if (find_local_task(list, i_cal_component_get_uid(data->task))) {
+  case TASK_MODIFIED: {
+    const char *list_uid = caldav_calendar_get_uid(data->calendar);
+    ErrandsTaskListItem *list = find_local_task_list(list_uid);
+    if (!list) {
+      g_warning("Sync: Failed to find local list: %s", list_uid);
+      return G_SOURCE_REMOVE;
+    }
+    const char *uid = errands_data_get_uid(data->task);
+    ErrandsTaskItem *task = find_task_item(G_LIST_MODEL(list->tasks), uid);
+    if (!task) {
+      g_warning("Sync: Failed to find local task: %s", uid);
+      return G_SOURCE_REMOVE;
+    }
+    ICalComponent *ical = errands_task_item_get_ical(task);
+    bool changed = merge_tasks(ical, data->task);
     i_cal_component_free(data->task);
-    return G_SOURCE_REMOVE;
-  }
-  i_cal_component_add_component(list->ical, data->task);
-  const char *parent = errands_data_get_parent(data->task);
-  if (!parent) {
-    ErrandsTaskItem *task_item = errands_task_item_new(data->task, list, NULL);
-    g_list_store_append(list->tasks, task_item);
-  } else {
-    ErrandsTaskItem *parent_task_item = find_task_item(G_LIST_MODEL(list->tasks), parent);
-    if (!parent_task_item) return G_SOURCE_REMOVE;
-    GListModel *child_model = errands_task_item_get_children_model(parent_task_item);
-    ErrandsTaskItem *task_item = errands_task_item_new(data->task, list, parent_task_item);
-    g_list_store_append(G_LIST_STORE(child_model), task_item);
-  }
-  errands_task_list_item_update_count(list);
-  errands_sidebar_update_filter_rows();
-  errands_task_list_update(state.main_window->task_list);
+    errands_task_item_set_ical(task, ical);
+    g_message("Sync: Task modified: %s", errands_task_item_get_uid(task));
+  } break;
 
-  g_message("Sync: Task added to list '%s': '%s'", list->uid, errands_data_get_uid(data->task));
-
-  return G_SOURCE_REMOVE;
-}
-
-static gboolean task_modified_idle_cb(gpointer user_data) {
-  const _CBData *data = user_data;
-  const char *list_uid = caldav_calendar_get_uid(data->calendar);
-  ErrandsTaskListItem *list = find_local_task_list(list_uid);
-  if (!list) {
-    g_warning("Sync: Failed to find local list: %s", list_uid);
-    return G_SOURCE_REMOVE;
+  case TASK_REMOVED: {
+    g_message("Sync: Task %s removed from remote list %s", data->uid, caldav_calendar_get_uid(data->calendar));
+    g_return_val_if_reached(G_SOURCE_REMOVE);
+  } break;
   }
-  const char *uid = errands_data_get_uid(data->task);
-  ErrandsTaskItem *task = find_task_item(G_LIST_MODEL(list->tasks), uid);
-  if (!task) {
-    g_warning("Sync: Failed to find local task: %s", uid);
-    return G_SOURCE_REMOVE;
-  }
-  ICalComponent *ical = errands_task_item_get_ical(task);
-  bool changed = merge_tasks(ical, data->task);
-  i_cal_component_free(data->task);
-  errands_task_item_set_ical(task, ical);
-
-  g_message("Sync: Task modified: %s", errands_task_item_get_uid(task));
 
   return G_SOURCE_REMOVE;
 }
@@ -202,40 +209,49 @@ static gboolean task_modified_idle_cb(gpointer user_data) {
 
 static void cal_added_cb(CalDAVCalendar *c) {
   _CBData *data = g_new0(_CBData, 1);
+  data->op = CAL_ADDED;
   data->calendar = c;
-  g_idle_add_full(G_PRIORITY_DEFAULT, cal_added_idle_cb, data, (GDestroyNotify)cb_data_free);
+  g_idle_add_full(G_PRIORITY_DEFAULT, idle_cb, data, (GDestroyNotify)cb_data_free);
 }
 
 static void cal_modified_cb(CalDAVCalendar *c, const char *name, const char *color) {
   _CBData *data = g_new0(_CBData, 1);
+  data->op = CAL_MODIFIED;
   data->calendar = c;
   data->name = name ? g_strdup(name) : NULL;
   data->color = color ? g_strdup(color) : NULL;
-  g_idle_add_full(G_PRIORITY_DEFAULT, cal_modified_idle_cb, data, (GDestroyNotify)cb_data_free);
+  g_idle_add_full(G_PRIORITY_DEFAULT, idle_cb, data, (GDestroyNotify)cb_data_free);
 }
 
 static void cal_removed_cb(const char *uid) {
   _CBData *data = g_new0(_CBData, 1);
+  data->op = CAL_REMOVED;
   data->uid = uid ? g_strdup(uid) : NULL;
-  g_idle_add_full(G_PRIORITY_DEFAULT, cal_removed_idle_cb, data, (GDestroyNotify)cb_data_free);
+  g_idle_add_full(G_PRIORITY_DEFAULT, idle_cb, data, (GDestroyNotify)cb_data_free);
 }
 
 static void task_added_cb(CalDAVCalendar *c, ICalComponent *task) {
   _CBData *data = g_new0(_CBData, 1);
+  data->op = TASK_ADDED;
   data->calendar = c;
   data->task = i_cal_component_clone(task);
-  g_idle_add_full(G_PRIORITY_DEFAULT, task_added_idle_cb, data, (GDestroyNotify)cb_data_free);
+  g_idle_add_full(G_PRIORITY_DEFAULT, idle_cb, data, (GDestroyNotify)cb_data_free);
 }
 
 static void task_modified_cb(CalDAVCalendar *c, ICalComponent *task) {
   _CBData *data = g_new0(_CBData, 1);
+  data->op = TASK_MODIFIED;
   data->calendar = c;
   data->task = i_cal_component_clone(task);
-  g_idle_add_full(G_PRIORITY_DEFAULT, task_modified_idle_cb, data, (GDestroyNotify)cb_data_free);
+  g_idle_add_full(G_PRIORITY_DEFAULT, idle_cb, data, (GDestroyNotify)cb_data_free);
 }
 
 static void task_removed_cb(CalDAVCalendar *c, const char *uid) {
-  g_message("Sync: Task removed from list '%s': '%s'", caldav_calendar_get_uid(c), uid);
+  _CBData *data = g_new0(_CBData, 1);
+  data->op = TASK_REMOVED;
+  data->calendar = c;
+  data->uid = uid ? g_strdup(uid) : NULL;
+  g_idle_add_full(G_PRIORITY_DEFAULT, idle_cb, data, (GDestroyNotify)cb_data_free);
 }
 
 // ---------- WORKER THREADS ---------- //

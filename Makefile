@@ -71,8 +71,10 @@ ALL_CFLAGS  += $(CFLAGS) \
 
 # --- Targets --- #
 
+.PHONY: all
 all: $(BUILD_DIR)/$(NAME)
 
+.PHONY: clean
 clean:
 	@rm -rf _* core.*
 
@@ -170,6 +172,7 @@ $(BUILD_DIR)/$(NAME): $(DEPS_CHECKED) $(OBJS)
 
 # --- Installation targets --- #
 
+.PHONY: install
 install: $(BUILD_DIR)/$(NAME)
 	# Executable
 	install -Dm 755 $(BUILD_DIR)/$(NAME) $(DESTDIR)$(bindir)/$(NAME)
@@ -187,6 +190,7 @@ install: $(BUILD_DIR)/$(NAME)
 	@sed -i "s|@BIN_DIR@|$(bindir)|g" $(BUILD_DIR)/$(APP_ID).service
 	install -Dm 644 $(BUILD_DIR)/$(APP_ID).service $(DESTDIR)$(dbusdir)/$(APP_ID).service
 
+.PHONY: uninstall
 uninstall:
 	rm -f $(DESTDIR)$(bindir)/$(NAME)
 	rm -f $(DESTDIR)$(desktopdir)/$(APP_ID).desktop
@@ -208,6 +212,7 @@ else
 endif
 
 # Build and run the application.
+.PHONY: run
 run: all
 	$(RUN_CMD)
 
@@ -216,15 +221,18 @@ run: all
 $(FLATPAK_BUILD_DIR): $(OBJS)
 	flatpak-builder --ccache --force-clean --repo=$(FLATPAK_REPO_DIR) $@ tools/flatpak/$(APP_ID).json
 
+.PHONY: flatpak-run
 flatpak-run: $(FLATPAK_BUILD_DIR)
 	flatpak-builder --run $< tools/flatpak/$(APP_ID).json $(NAME)
 
+.PHONY: flatpak-bundle
 flatpak-bundle: $(FLATPAK_BUILD_DIR) | $(BUILD_DIR)
 	flatpak build-bundle $(FLATPAK_REPO_DIR) $(BUILD_DIR)/$(APP_ID).flatpak $(APP_ID) --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo
 
 # --- Development targets --- #
 
 # Setup distrobox environment.
+.PHONY: distrobox-setup
 distrobox-setup:
 	@if ! command -v distrobox >/dev/null 2>&1; then \
 		wget -qO- https://raw.githubusercontent.com/89luca89/distrobox/main/install | sh -s -- --prefix ~/.local; \
@@ -235,6 +243,7 @@ distrobox-setup:
 	distrobox-enter errands-distrobox -- distrobox-export --app zeditor
 
 # Setup Nextcloud container for testing sync.
+.PHONY: nextcloud-setup
 nextcloud-setup:
 	@if ! command -v podman >/dev/null 2>&1; then \
 		echo "Podman is required to run Nextcloud container"; \
@@ -256,7 +265,32 @@ nextcloud-setup:
 	@echo "Username: 'errands', Password: 'errands'"
 
 # Count source lines of code.
+.PHONY: sloc
 sloc:
 	@find $(SRC_DIR) -type f \( -name '*.c' -o -name '*.h' -o -name '*.blp' \) -exec wc -l {} +
 
-.PHONY: all install uninstall distrobox-setup nextcloud-setup run clean sloc flatpak-run flatpak-bundle
+.PHONY: git-commit
+git-commit:
+	@bash -c '\
+		set -e; \
+		echo "Commit category:"; \
+		echo "  0) Fix"; \
+		echo "  1) UI"; \
+		echo "  2) Sync"; \
+		echo "  3) Build"; \
+		echo "  4) Misc (default)"; \
+		read -r -p "Enter category number: " category; \
+		case "$$category" in \
+		    0) prefix="Fix" ;; \
+			1) prefix="UI" ;; \
+			2) prefix="Sync" ;; \
+			3) prefix="Build" ;; \
+			*) prefix="Misc" ;; \
+		esac; \
+		read -r -p "Commit message: " message; \
+		if [[ -z "$$message" ]]; then \
+			echo "Using default message: 'Update'" >&2; \
+			message="Update"; \
+		fi; \
+		git add -A; \
+		git commit -m "$$prefix: $$message"'
