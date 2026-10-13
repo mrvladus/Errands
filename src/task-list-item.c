@@ -3,10 +3,12 @@
 
 #include "task-list-item.h"
 #include "data.h"
+#include "gio/gio.h"
 #include "glib-object.h"
 #include "glib.h"
 #include "settings.h"
 #include "state.h"
+#include "sync.h"
 #include "task-item.h"
 #include "utils.h"
 
@@ -67,19 +69,24 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
   }
 }
 
-static void errands_task_list_item_dispose(GObject *object) {
+static void errands_task_list_item_finalize(GObject *object) {
   ErrandsTaskListItem *self = ERRANDS_TASK_LIST_ITEM(object);
+
+  g_message("Finalize Task List Item: %s", self->uid);
+
+  g_list_store_remove_all(self->tasks);
+
   g_clear_object(&self->ical);
   g_clear_object(&self->tasks);
   g_clear_pointer(&self->uid, g_free);
   g_clear_pointer(&self->title, g_free);
 
-  G_OBJECT_CLASS(errands_task_list_item_parent_class)->dispose(object);
+  G_OBJECT_CLASS(errands_task_list_item_parent_class)->finalize(object);
 }
 
 static void errands_task_list_item_class_init(ErrandsTaskListItemClass *klass) {
   GObjectClass *object_class = G_OBJECT_CLASS(klass);
-  object_class->dispose = errands_task_list_item_dispose;
+  object_class->finalize = errands_task_list_item_finalize;
   object_class->get_property = get_property;
   object_class->set_property = set_property;
 
@@ -196,6 +203,7 @@ void errands_task_list_item_update_count(ErrandsTaskListItem *self) {
 
 void errands_task_list_item_save(ErrandsTaskListItem *self) {
   g_assert_nonnull(self);
+  g_assert(ERRANDS_IS_TASK_LIST_ITEM(self));
 
   const char *path = tmp_str_printf("%s/%s.ics", calendars_dir, self->uid);
   g_autofree gchar *ical_str = i_cal_component_as_ical_string(self->ical);
@@ -208,10 +216,18 @@ void errands_task_list_item_save(ErrandsTaskListItem *self) {
 
 void errands_task_list_item_delete(ErrandsTaskListItem *self) {
   g_assert_nonnull(self);
+  g_assert(ERRANDS_IS_TASK_LIST_ITEM(self));
 
+  bool synced = errands_data_get_synced(self->ical);
   errands_data_set_deleted(self->ical, true);
   errands_task_list_item_save(self);
-  // errands_sync_delete_list(self->data);
+  if (errands_settings_get_sync_enabled(state.settings)) {
+    errands_sync_delete_list(self);
+  } else {
+    guint pos;
+    g_list_store_find(task_lists_model, self, &pos);
+    g_list_store_remove(task_lists_model, pos);
+  }
 }
 
 int errands_task_list_item_delete_completed(ErrandsTaskListItem *self) {

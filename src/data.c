@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Zlib
 
 #include "data.h"
+#include "gio/gio.h"
+#include "glib-object.h"
 #include "glib.h"
 #include "settings.h"
 #include "state.h"

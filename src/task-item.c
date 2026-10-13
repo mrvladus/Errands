@@ -3,6 +3,7 @@
 
 #include "task-item.h"
 #include "data.h"
+#include "glib.h"
 #include "settings.h"
 #include "state.h"
 #include "task-list-item.h"
@@ -288,8 +289,10 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
   }
 }
 
-static void errands_task_item_dispose(GObject *object) {
+static void errands_task_item_finalize(GObject *object) {
   ErrandsTaskItem *self = ERRANDS_TASK_ITEM(object);
+
+  g_message("Finalize Task Item: %s", self->uid);
 
   g_clear_object(&self->dtstart);
   g_clear_object(&self->dtend);
@@ -300,12 +303,12 @@ static void errands_task_item_dispose(GObject *object) {
   g_clear_pointer(&self->tags, g_strfreev);
   g_clear_pointer(&self->attachments, g_strfreev);
 
-  G_OBJECT_CLASS(errands_task_item_parent_class)->dispose(object);
+  G_OBJECT_CLASS(errands_task_item_parent_class)->finalize(object);
 }
 
 static void errands_task_item_class_init(ErrandsTaskItemClass *klass) {
   GObjectClass *object_class = G_OBJECT_CLASS(klass);
-  object_class->dispose = errands_task_item_dispose;
+  object_class->finalize = errands_task_item_finalize;
 
   object_class->get_property = get_property;
   object_class->set_property = set_property;

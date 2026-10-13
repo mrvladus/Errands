@@ -3,6 +3,7 @@
 
 #include "sidebar.h"
 #include "about-dialog.h"
+#include "adwaita.h"
 #include "config.h"
 #include "data.h"
 #include "new-list-dialog.h"
@@ -190,6 +191,7 @@ static void on_sidebar_activated_cb(AdwSidebar *self, guint index, gpointer user
     errands_task_list_show_task_list(task_list, tl_item);
   }
   adw_navigation_split_view_set_show_content(state.main_window->split_view, true);
+  adw_overlay_split_view_set_show_sidebar(state.main_window->overlay_split_view, false);
 }
 
 static void __on_open_finish(GObject *obj, GAsyncResult *res) {

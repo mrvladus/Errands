@@ -49,10 +49,23 @@ template $ErrandsWindow: Adw.ApplicationWindow {
 
             [top]
             Adw.HeaderBar {
+              show-back-button: false;
+
               title-widget: Adw.InlineViewSwitcher {
                 stack: stack;
                 display-mode: both;
               };
+
+              [start]
+              Button {
+                icon-name: "errands-sidebar-symbolic";
+                action-name: "window.close-properties";
+                tooltip-text: _("Close Properties");
+
+                styles [
+                  "flat",
+                ]
+              }
             }
 
             content: Adw.ViewStack stack {
