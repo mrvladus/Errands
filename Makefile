@@ -292,5 +292,6 @@ git-commit:
 			echo "Using default message: 'Update'" >&2; \
 			message="Update"; \
 		fi; \
+		clear; \
 		git add -A; \
 		git commit -m "$$prefix: $$message"'
