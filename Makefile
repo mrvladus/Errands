@@ -287,9 +287,8 @@ git-commit:
 			3) prefix="Build" ;; \
 			*) prefix="Misc" ;; \
 		esac; \
-		read -r -p "Commit message: " message; \
+		read -r -p "Commit message (default: 'Update'): " message; \
 		if [[ -z "$$message" ]]; then \
-			echo "Using default message: 'Update'" >&2; \
 			message="Update"; \
 		fi; \
 		clear; \
