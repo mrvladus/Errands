@@ -3,6 +3,8 @@
 
 #include "task-item.h"
 #include "data.h"
+#include "gio/gio.h"
+#include "glib-object.h"
 #include "glib.h"
 #include "settings.h"
 #include "state.h"
@@ -467,12 +469,14 @@ void errands_task_item_remove_tag(ErrandsTaskItem *self, const char *tag) {
       errands_data_set_synced(self->ical, false);
       errands_data_set_changed(self->ical, i_cal_time_get_date_time_now());
     }
+    g_object_unref(p);
   }
   errands_task_item_set_tags(self, errands_data_get_tags(self->ical));
 }
 
 void errands_task_item_delete(ErrandsTaskItem *self) {
-  g_return_if_fail(self);
+  g_assert_nonnull(self);
+  g_assert(ERRANDS_IS_TASK_ITEM(self));
 
   errands_data_set_deleted(self->ical, true);
   GListModel *model = G_LIST_MODEL(self->children_model);
@@ -480,6 +484,7 @@ void errands_task_item_delete(ErrandsTaskItem *self) {
     g_autoptr(ErrandsTaskItem) item = g_list_model_get_item(model, i);
     errands_task_item_delete(item);
   }
+  if (!self->parent) g_list_store_remove_data(self->list->tasks, self);
 }
 
 int errands_task_item_delete_completed(ErrandsTaskItem *self) {
@@ -492,7 +497,6 @@ int errands_task_item_delete_completed(ErrandsTaskItem *self) {
     ICalComponent *ical = errands_task_item_get_ical(item);
     CONTINUE_IF(errands_data_is_completed(ical));
     errands_data_set_deleted(ical, true);
-    errands_data_set_synced(ical, false);
     deleted_n += errands_task_item_delete_cancelled(item);
   }
   if (deleted_n > 0) errands_task_item_update(self);
@@ -510,7 +514,6 @@ int errands_task_item_delete_cancelled(ErrandsTaskItem *self) {
     ICalComponent *ical = errands_task_item_get_ical(item);
     CONTINUE_IF(errands_data_get_cancelled(ical));
     errands_data_set_deleted(ical, true);
-    errands_data_set_synced(ical, false);
     deleted_n += errands_task_item_delete_cancelled(item);
   }
   if (deleted_n > 0) errands_task_item_update(self);

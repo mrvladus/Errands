@@ -319,34 +319,11 @@ static void on_cancel_action_cb(GSimpleAction *action, GVariant *param, ErrandsT
 }
 
 static void on_delete_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
+  const char *list_uid = errands_task_item_get_list(self->item)->uid;
+  errands_sync_delete_task(self->item);
   errands_task_item_delete(self->item);
-  // errands_task_list_item_remove_deleted_tasks();
-
-  // errands_data_set_deleted(self->data->ical, true);
-  // errands_sync_delete_task(self->data);
-  // g_autoptr(GPtrArray) children = g_ptr_array_sized_new(self->data->children->len);
-  // errands_task_data_get_flat_list(self->data, children);
-  // for_range(i, 0, children->len) {
-  //   TaskData *child = g_ptr_array_index(children, i);
-  //   errands_data_set_deleted(child->ical, true);
-  //   errands_sync_delete_task(child);
-  // }
-  // errands_list_data_save(self->data->list);
-
-  // GListStore *parent_model = NULL;
-  // ErrandsTaskItem *parent = errands_task_item_get_parent(self->item);
-  // if (parent) {
-  //   parent_model = G_LIST_STORE(errands_task_item_get_children_model(parent));
-  //   ErrandsTask *parent_task = NULL;
-  //   g_object_get(G_OBJECT(parent), "task-widget", &parent_task, NULL);
-  //   // if (parent_task && GTK_IS_WIDGET(parent_task)) errands_task_update_progress(parent_task);
-  // } else parent_model = state.main_window->task_list->all_tasks_model;
-  // guint pos;
-  // if (g_list_store_find(parent_model, self->item, &pos)) g_list_store_remove(parent_model, pos);
-  // // g_object_notify(G_OBJECT(parent), "children-model-is-empty");
-
   errands_sidebar_update_filter_rows();
-  errands_sidebar_task_list_update_counter(errands_task_item_get_uid(errands_task_item_get_parent(self->item)));
+  errands_sidebar_task_list_update_counter(list_uid);
   errands_task_list_update(state.main_window->task_list);
 }
 
@@ -408,6 +385,7 @@ static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointe
     gtk_widget_set_visible(self->title, true);
     g_autofree gchar *markup = str_to_markup(text);
     g_object_set(self->item, "title", markup, NULL);
+    errands_sync_update_task(self->item);
   }
 }
 

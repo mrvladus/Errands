@@ -3,6 +3,7 @@
 
 #include "caldav.h"
 #include "glib.h"
+#include "libecal/libecal.h"
 
 #define CALDAV_MISS_THRESHOLD 3
 
@@ -364,7 +365,7 @@ gboolean caldav_calendar_update_task(CalDAVCalendar *c, ICalComponent *task) {
     return FALSE;
   }
   g_autoptr(GError) error = NULL;
-  if (!e_cal_client_modify_object_sync(c->e_cal_client, task, E_CAL_OBJ_MOD_ALL, E_CAL_OPERATION_FLAG_NONE, NULL, &error)) {
+  if (!e_cal_client_modify_object_sync(c->e_cal_client, task, E_CAL_OBJ_MOD_THIS, E_CAL_OPERATION_FLAG_NONE, NULL, &error)) {
     caldav__error("Failed to update task '%s': %s", uid, error->message);
     return FALSE;
   }

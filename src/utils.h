@@ -317,6 +317,7 @@ static inline void gtk_widget_set_color(GtkWidget *widget, const char *color) {
 // ---------- LIST MODELS ---------- //
 
 static inline void g_list_store_remove_data(GListStore *model, gpointer data) {
+  if (!model || !data) return;
   guint pos;
   if (g_list_store_find(model, data, &pos)) g_list_store_remove(model, pos);
 }

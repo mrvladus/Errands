@@ -120,7 +120,7 @@ ErrandsTaskListItem *errands_task_list_item_new(ICalComponent *ical) {
   for (guint i = 0; i < vtodos->len; ++i) {
     ICalComponent *c = g_ptr_array_index(vtodos, i);
     const char *parent = errands_data_get_parent(c);
-    if (parent) continue;
+    if (parent || errands_data_get_deleted(c)) continue;
     g_autoptr(ErrandsTaskItem) task = errands_task_item_new(c, self, NULL);
     g_list_store_append(self->tasks, task);
   }
