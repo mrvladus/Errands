@@ -7,6 +7,7 @@
 #include "glib.h"
 #include "settings.h"
 #include "state.h"
+#include "sync.h"
 #include "task-list-item.h"
 #include "utils.h"
 
@@ -204,14 +205,18 @@ void errands_data_init() {
     if (errands_data_get_deleted(item->ical)) {
       if ((errands_settings_get_sync_enabled(state.settings) && errands_data_get_synced(item->ical)) ||
           !errands_settings_get_sync_enabled(state.settings)) {
-        g_message("User Data: Calendar was deleted. Removing %s", path);
+        g_message("User Data: Calendar was deleted. Removing: %s", path);
         remove(path);
       }
       continue;
     }
     g_list_store_append(task_lists_model, item);
     errands_task_list_item_remove_deleted_tasks(item);
-    g_message("User Data: Loaded calendar %s", path);
+    if (errands_settings_get_sync_enabled(state.settings) && !errands_data_get_synced(item->ical)) {
+      g_message("User Data: Calendar was created but not synced: %s", path);
+      errands_sync_create_list(item);
+    }
+    g_message("User Data: Loaded calendar: %s", item->uid);
     n++;
   }
   g_message("User Data: Loaded %d task-lists in %f sec.", n, TIMER_ELAPSED_MS);

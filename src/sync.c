@@ -18,6 +18,8 @@
 #include <libical-glib/libical-glib.h>
 #include <stdio.h>
 
+static inline bool ensure_client_connected(void);
+
 typedef struct {
   enum {
     CAL_ADDED,
@@ -43,6 +45,7 @@ static void cb_data_free(_CBData *data) {
 
 // ---------- GLOBAL ---------- //
 
+static gboolean initialized = false;
 static CalDAVClient *client = NULL;
 static GPtrArray *creating_calendars = NULL;
 static GPtrArray *updating_calendars = NULL;
@@ -260,26 +263,13 @@ static void task_removed_cb(CalDAVCalendar *c, const char *uid) {
 // ---------- WORKER THREADS ---------- //
 
 static void sync_thread_cb(GTask *task, gpointer source_object, gpointer task_data, GCancellable *cancellable) {
-  if (!client) {
-    CalDAVClientConfig config = {
-        .url = errands_settings_get_sync_url(state.settings),
-        .username = errands_settings_get_sync_username(state.settings),
-        .password = errands_settings_get_sync_password(state.settings),
-        .cal_added_cb = cal_added_cb,
-        .cal_modified_cb = cal_modified_cb,
-        .cal_removed_cb = cal_removed_cb,
-        .task_added_cb = task_added_cb,
-        .task_modified_cb = task_modified_cb,
-        .task_removed_cb = task_removed_cb,
-    };
-    client = caldav_client_new(config);
-  }
-  caldav_client_poll(client);
+  if (ensure_client_connected()) caldav_client_poll(client);
 }
 
 static void sync_finished_cb(GObject *source_object, GAsyncResult *res, gpointer user_data) { g_message("Sync: Finished"); }
 
 static void cal_delete_thread_cb(GTask *task, gpointer source_object, gpointer task_data, GCancellable *cancellable) {
+  if (!ensure_client_connected()) g_task_return_boolean(task, FALSE);
   CalDAVCalendar *c = task_data;
   g_autofree gchar *uid = g_strdup(caldav_calendar_get_uid(c));
   g_message("Sync: Deleting list on remote: %s", uid);
@@ -298,6 +288,7 @@ static void cal_delete_finished_cb(GObject *source_object, GAsyncResult *res, gp
 }
 
 static void cal_update_thread_cb(GTask *task, gpointer source_object, gpointer task_data, GCancellable *cancellable) {
+  if (!ensure_client_connected()) g_task_return_boolean(task, FALSE);
   _CBData *data = task_data;
   g_message("Sync: Updating list on remote: %s", caldav_calendar_get_uid(data->calendar));
   gboolean res = caldav_calendar_set_properties(data->calendar, data->name, data->color);
@@ -317,6 +308,7 @@ static void cal_update_finished_cb(GObject *source_object, GAsyncResult *res, gp
 }
 
 static void cal_create_thread_cb(GTask *task, gpointer source_object, gpointer task_data, GCancellable *cancellable) {
+  if (!ensure_client_connected()) g_task_return_boolean(task, FALSE);
   _CBData *data = task_data;
   g_message("Sync: Creating list on remote: %s", data->uid);
   CalDAVCalendar *cal = caldav_client_create_calendar(client, data->uid, data->name, data->color);
@@ -335,7 +327,36 @@ static void cal_create_finished_cb(GObject *source_object, GAsyncResult *res, gp
   g_ptr_array_remove(creating_calendars, list);
 }
 
+// ---------- PRIVATE FUNCTIONS ---------- //
+
+static inline bool ensure_client_connected(void) {
+  if (!client) {
+    CalDAVClientConfig config = {
+        .url = errands_settings_get_sync_url(state.settings),
+        .username = errands_settings_get_sync_username(state.settings),
+        .password = errands_settings_get_sync_password(state.settings),
+        .cal_added_cb = cal_added_cb,
+        .cal_modified_cb = cal_modified_cb,
+        .cal_removed_cb = cal_removed_cb,
+        .task_added_cb = task_added_cb,
+        .task_modified_cb = task_modified_cb,
+        .task_removed_cb = task_removed_cb,
+    };
+    client = caldav_client_new(config);
+  }
+  if (!client) g_warning("Sync: Failed to connect to CalDAV remote.");
+  return client != NULL;
+}
+
 // ---------- PUBLIC ---------- //
+
+void errands_sync_init(void) {
+  if (initialized) return;
+  if (!deleting_calendars) deleting_calendars = g_ptr_array_new_full(8, g_object_unref);
+  if (!updating_calendars) updating_calendars = g_ptr_array_new();
+  if (!creating_calendars) creating_calendars = g_ptr_array_new();
+  initialized = true;
+}
 
 void errands_sync_cleanup(void) {
   g_message("Sync: Cleanup");
@@ -343,13 +364,11 @@ void errands_sync_cleanup(void) {
   g_clear_object(&creating_calendars);
   g_clear_object(&updating_calendars);
   g_clear_object(&deleting_calendars);
+  initialized = false;
 }
 
 gboolean errands_sync(void) {
   if (!errands_settings_get_sync_enabled(state.settings)) return G_SOURCE_REMOVE;
-  if (!deleting_calendars) deleting_calendars = g_ptr_array_new_full(8, g_object_unref);
-  if (!updating_calendars) updating_calendars = g_ptr_array_new();
-  if (!creating_calendars) creating_calendars = g_ptr_array_new();
   g_message("Sync: Start");
   run_in_thread(sync_thread_cb, NULL, sync_finished_cb, NULL);
   return G_SOURCE_CONTINUE;
