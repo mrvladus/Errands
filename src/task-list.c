@@ -10,6 +10,7 @@
 #include "sidebar.h"
 #include "state.h"
 // #include "sync.h"
+#include "sync.h"
 #include "task-item.h"
 #include "task-list-item.h"
 #include "task.h"
@@ -563,7 +564,7 @@ static void on_task_list_entry_activated_cb(ErrandsTaskList *self) {
   // Update UI
   errands_sidebar_task_list_update_counter(list_uid);
   errands_sidebar_update_filter_rows();
-  g_message("Add task '%s' to task list '%s'", errands_task_item_get_uid(task), list_uid);
+  g_message("Task List: Add task '%s' to task list '%s'", errands_task_item_get_uid(task), list_uid);
   errands_task_list_update(self);
   gtk_list_view_scroll_to(GTK_LIST_VIEW(self->list_view), 0, 0, NULL);
 }

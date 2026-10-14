@@ -7,6 +7,7 @@
 #include "glib.h"
 #include "sidebar.h"
 #include "state.h"
+#include "sync.h"
 #include "task-item.h"
 #include "task-list.h"
 #include "utils.h"
@@ -414,7 +415,6 @@ static void on_sub_task_entry_activated_cb(GtkEntry *entry, ErrandsTask *self) {
   const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
   if (g_str_equal(text, "")) return;
   errands_task_item_create_task(self->item, text);
-  // g_list_store_append(state.main_window->task_list->all_tasks_model, task);
   GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_widget_get_ancestor(GTK_WIDGET(self), GTK_TYPE_TREE_EXPANDER));
   gtk_tree_list_row_set_expanded(gtk_tree_expander_get_list_row(expander), true);
   // Reset text

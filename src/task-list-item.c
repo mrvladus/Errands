@@ -307,6 +307,7 @@ struct ErrandsTaskItem *errands_task_list_item_create_task(ErrandsTaskListItem *
   ErrandsTaskItem *task = errands_task_item_new(ical, self, NULL);
   g_list_store_append(self->tasks, task);
   errands_task_list_item_save(self);
+  errands_sync_create_task(task);
 
   return (struct ErrandsTaskItem *)task;
 }

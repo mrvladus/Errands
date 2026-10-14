@@ -6,6 +6,7 @@
 #include "glib.h"
 #include "settings.h"
 #include "state.h"
+#include "sync.h"
 #include "task-list-item.h"
 #include "task.h"
 #include "utils.h"
@@ -554,7 +555,7 @@ ErrandsTaskListItem *errands_task_item_create_task(ErrandsTaskItem *parent, cons
   errands_task_list_item_save(parent->list);
   errands_task_item_update(parent);
 
-  // errands_sync_create_task(self);
+  errands_sync_create_task(task);
 
   return task->list;
 }
