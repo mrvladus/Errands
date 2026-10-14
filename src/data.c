@@ -2,15 +2,15 @@
 // SPDX-License-Identifier: Zlib
 
 #include "data.h"
-#include "gio/gio.h"
-#include "glib-object.h"
-#include "glib.h"
 #include "settings.h"
 #include "state.h"
 #include "sync.h"
 #include "task-list-item.h"
 #include "utils.h"
 
+#include <gio/gio.h>
+#include <glib-object.h>
+#include <glib.h>
 #include <json-glib/json-glib.h>
 #include <libical-glib/libical-glib.h>
 

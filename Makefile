@@ -273,6 +273,8 @@ sloc:
 git-commit:
 	@bash -c '\
 		set -e; \
+		echo "Modifications:"; \
+		git status --short; \
 		echo "Commit category:"; \
 		echo "  0) Fix"; \
 		echo "  1) UI"; \

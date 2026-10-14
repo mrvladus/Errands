@@ -4,7 +4,6 @@
 #include "sync.h"
 #include "caldav.h"
 #include "data.h"
-#include "glib-object.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "state.h"
@@ -12,11 +11,13 @@
 #include "task-list-item.h"
 #include "task-list.h"
 #include "utils.h"
+#include "window.h"
 
 #include <gio/gio.h>
+#include <glib-object.h>
 #include <glib.h>
+#include <glib/gi18n.h>
 #include <libical-glib/libical-glib.h>
-#include <stdio.h>
 
 static inline bool ensure_client_connected(void);
 
@@ -122,7 +123,9 @@ static gboolean idle_cb(gpointer user_data) {
     const char *color = caldav_calendar_get_color(data->calendar);
     g_autoptr(ErrandsTaskListItem) item = errands_task_list_item_create(uid, name, color, false, true);
     g_list_store_append(task_lists_model, item);
+    errands_task_list_item_save(item);
     errands_sidebar_update_filter_rows();
+    errands_window_add_toast(tmp_str_printf(_("Added remote task list: %s"), name), 5);
   } break;
 
   case CAL_MODIFIED: {
@@ -154,6 +157,7 @@ static gboolean idle_cb(gpointer user_data) {
       g_warning("Sync: Couldn't find local list: %s", data->uid);
       return G_SOURCE_REMOVE;
     }
+    errands_window_add_toast(tmp_str_printf(_("Removed remote task list: %s"), list->title), 5);
     errands_task_list_item_delete(list);
   } break;
 
