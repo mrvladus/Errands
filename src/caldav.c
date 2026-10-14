@@ -98,12 +98,12 @@ static void list_tasks(ECalClient *client) {
   e_client_util_free_object_slist(objects);
 }
 
-static gchar *caldav__make_calendar_href(const gchar *calendar_home) {
+static gchar *caldav__make_calendar_href(const gchar *calendar_home, const char *uid) {
   g_assert_nonnull(calendar_home);
   g_assert(*calendar_home);
 
-  g_autofree gchar *uid = g_uuid_string_random();
-  g_autofree gchar *segment = g_strdup_printf("%s/", uid);
+  g_autofree gchar *uuid = g_uuid_string_random();
+  g_autofree gchar *segment = g_strdup_printf("%s/", uid ? uid : uuid);
   g_autofree gchar *base = g_str_has_suffix(calendar_home, "/") ? g_strdup(calendar_home) : g_strconcat(calendar_home, "/", NULL);
   g_autoptr(GError) error = NULL;
   gchar *href = g_uri_resolve_relative(base, segment, G_URI_FLAGS_PARSE_RELAXED, &error);
@@ -680,7 +680,7 @@ gboolean caldav_client_poll(CalDAVClient *c) {
   return G_SOURCE_CONTINUE;
 }
 
-CalDAVCalendar *caldav_client_create_calendar(CalDAVClient *c, const gchar *name, const gchar *color) {
+CalDAVCalendar *caldav_client_create_calendar(CalDAVClient *c, const char *uid, const gchar *name, const gchar *color) {
   g_assert_nonnull(c);
   g_assert_nonnull(c->home_set_url);
   g_assert_nonnull(name);
@@ -691,7 +691,7 @@ CalDAVCalendar *caldav_client_create_calendar(CalDAVClient *c, const gchar *name
   g_autoptr(GError) error = NULL;
   g_autoptr(EWebDAVSession) session = e_webdav_session_new(c->server_source);
   e_soup_session_set_credentials(E_SOUP_SESSION(session), c->credentials);
-  g_autofree gchar *href = caldav__make_calendar_href(c->home_set_url);
+  g_autofree gchar *href = caldav__make_calendar_href(c->home_set_url, uid);
 
   if (!e_webdav_session_mkcalendar_sync(session, href, name, NULL, color, E_WEBDAV_RESOURCE_SUPPORTS_TASKS, NULL, &error)) {
     caldav__error("Failed to create calendar: %s", error->message);

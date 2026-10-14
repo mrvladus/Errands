@@ -6,6 +6,7 @@
 #include "data.h"
 #include "sidebar.h"
 #include "state.h"
+#include "sync.h"
 #include "task-list-item.h"
 
 static void on_response_cb(ErrandsNewListDialog *self, gchar *response, gpointer data);
@@ -63,8 +64,8 @@ static void on_response_cb(ErrandsNewListDialog *self, gchar *response, gpointer
     g_message("New List Dialog: Create new list: '%s'", item->uid);
     g_list_store_append(task_lists_model, item);
     errands_task_list_item_save(item);
+    errands_sync_create_list(item);
     errands_sidebar_update_filter_rows();
-    // errands_sync_create_list(item);
     errands_settings_set_last_list_uid(state.settings, item->uid);
     errands_sidebar_select_last_opened_page();
   }

@@ -208,6 +208,13 @@ static inline void gdk_rgba_to_hex_string(const GdkRGBA *rgba, char hex_string[8
   sprintf(hex_string, "#%02X%02X%02X", r, g, b);
 }
 
+static inline const char *gdk_rgba_to_str(const GdkRGBA *rgba) {
+  int r = (int)(rgba->red * 255);
+  int g = (int)(rgba->green * 255);
+  int b = (int)(rgba->blue * 255);
+  return tmp_str_printf("#%02X%02X%02X", r, g, b);
+}
+
 // Add shortcut to the widget
 static inline void errands_add_shortcut(GtkWidget *widget, const char *trigger, const char *action) {
   GtkEventController *ctrl = gtk_shortcut_controller_new();

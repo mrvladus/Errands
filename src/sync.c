@@ -16,6 +16,7 @@
 #include <gio/gio.h>
 #include <glib.h>
 #include <libical-glib/libical-glib.h>
+#include <stdio.h>
 
 typedef struct {
   enum {
@@ -43,6 +44,8 @@ static void cb_data_free(_CBData *data) {
 // ---------- GLOBAL ---------- //
 
 static CalDAVClient *client = NULL;
+static GPtrArray *creating_calendars = NULL;
+static GPtrArray *updating_calendars = NULL;
 static GPtrArray *deleting_calendars = NULL;
 
 // ---------- HELPERS ---------- //
@@ -205,7 +208,7 @@ static gboolean idle_cb(gpointer user_data) {
   return G_SOURCE_REMOVE;
 }
 
-// ---------- CALLBACKS ---------- //
+// ---------- CALDAV CALLBACKS ---------- //
 
 static void cal_added_cb(CalDAVCalendar *c) {
   _CBData *data = g_new0(_CBData, 1);
@@ -286,12 +289,50 @@ static void cal_delete_thread_cb(GTask *task, gpointer source_object, gpointer t
 static void cal_delete_finished_cb(GObject *source_object, GAsyncResult *res, gpointer user_data) {
   g_autoptr(GError) error = NULL;
   gboolean success = g_task_propagate_boolean(G_TASK(res), &error);
-  ErrandsTaskListItem *list = user_data;
   if (error) g_warning("Sync: Deleting remote list failed: %s", error->message);
   else g_message("Sync: Deleting remote list success: %s", success ? "yes" : "no");
+  ErrandsTaskListItem *list = user_data;
   errands_data_set_synced(list->ical, success);
   errands_task_list_item_save(list);
   g_ptr_array_remove(deleting_calendars, list);
+}
+
+static void cal_update_thread_cb(GTask *task, gpointer source_object, gpointer task_data, GCancellable *cancellable) {
+  _CBData *data = task_data;
+  g_message("Sync: Updating list on remote: %s", caldav_calendar_get_uid(data->calendar));
+  gboolean res = caldav_calendar_set_properties(data->calendar, data->name, data->color);
+  cb_data_free(data);
+  g_task_return_boolean(task, res);
+}
+
+static void cal_update_finished_cb(GObject *source_object, GAsyncResult *res, gpointer user_data) {
+  g_autoptr(GError) error = NULL;
+  gboolean success = g_task_propagate_boolean(G_TASK(res), &error);
+  if (error) g_warning("Sync: Updating remote list failed: %s", error->message);
+  else g_message("Sync: Updating remote list success: %s", success ? "yes" : "no");
+  ErrandsTaskListItem *list = user_data;
+  errands_data_set_synced(list->ical, success);
+  errands_task_list_item_save(list);
+  g_ptr_array_remove(updating_calendars, list);
+}
+
+static void cal_create_thread_cb(GTask *task, gpointer source_object, gpointer task_data, GCancellable *cancellable) {
+  _CBData *data = task_data;
+  g_message("Sync: Creating list on remote: %s", data->uid);
+  CalDAVCalendar *cal = caldav_client_create_calendar(client, data->uid, data->name, data->color);
+  cb_data_free(data);
+  g_task_return_boolean(task, cal != NULL);
+}
+
+static void cal_create_finished_cb(GObject *source_object, GAsyncResult *res, gpointer user_data) {
+  g_autoptr(GError) error = NULL;
+  gboolean success = g_task_propagate_boolean(G_TASK(res), &error);
+  if (error) g_warning("Sync: Creating remote list failed: %s", error->message);
+  else g_message("Sync: Creating remote list success: %s", success ? "yes" : "no");
+  ErrandsTaskListItem *list = user_data;
+  errands_data_set_synced(list->ical, success);
+  errands_task_list_item_save(list);
+  g_ptr_array_remove(creating_calendars, list);
 }
 
 // ---------- PUBLIC ---------- //
@@ -299,31 +340,55 @@ static void cal_delete_finished_cb(GObject *source_object, GAsyncResult *res, gp
 void errands_sync_cleanup(void) {
   g_message("Sync: Cleanup");
   if (client) caldav_client_free(client);
+  g_clear_object(&creating_calendars);
+  g_clear_object(&updating_calendars);
   g_clear_object(&deleting_calendars);
 }
 
 gboolean errands_sync(void) {
   if (!errands_settings_get_sync_enabled(state.settings)) return G_SOURCE_REMOVE;
   if (!deleting_calendars) deleting_calendars = g_ptr_array_new_full(8, g_object_unref);
+  if (!updating_calendars) updating_calendars = g_ptr_array_new();
+  if (!creating_calendars) creating_calendars = g_ptr_array_new();
   g_message("Sync: Start");
   run_in_thread(sync_thread_cb, NULL, sync_finished_cb, NULL);
   return G_SOURCE_CONTINUE;
 }
 
-void errands_sync_delete_list(ErrandsTaskListItem *list) {
-  ErrandsTaskListItem *l = g_object_ref(list);
-  for_range(i, 0, deleting_calendars->len) if (g_ptr_array_index(deleting_calendars, i) == l) return;
-  g_ptr_array_add(deleting_calendars, l);
-  CalDAVCalendar *c = caldav_client_find_calendar(client, l->uid);
-  if (c) run_in_thread(cal_delete_thread_cb, c, cal_delete_finished_cb, l);
+void errands_sync_create_list(ErrandsTaskListItem *list) {
+  if (g_ptr_array_find(creating_calendars, list, NULL)) return;
+  _CBData *data = g_new0(_CBData, 1);
+  data->uid = g_strdup(list->uid);
+  data->name = g_strdup(list->title);
+  data->color = g_strdup(gdk_rgba_to_str(&list->color));
+  run_in_thread(cal_create_thread_cb, data, cal_create_finished_cb, list);
 }
 
-void errands_sync_create_list(ErrandsTaskListItem *list) {}
+void errands_sync_update_list(ErrandsTaskListItem *list) {
+  if (g_ptr_array_find(updating_calendars, list, NULL)) return;
+  CalDAVCalendar *c = caldav_client_find_calendar(client, list->uid);
+  if (c) {
+    g_ptr_array_add(updating_calendars, list);
+    _CBData *data = g_new0(_CBData, 1);
+    data->calendar = c;
+    data->name = g_strdup(list->title);
+    data->color = g_strdup(gdk_rgba_to_str(&list->color));
+    run_in_thread(cal_update_thread_cb, data, cal_update_finished_cb, list);
+  }
+}
 
-void errands_sync_update_list(ErrandsTaskListItem *list) {}
-
-void errands_sync_delete_task(ErrandsTaskItem *task) {}
+void errands_sync_delete_list(ErrandsTaskListItem *list) {
+  if (g_ptr_array_find(deleting_calendars, list, NULL)) return;
+  CalDAVCalendar *c = caldav_client_find_calendar(client, list->uid);
+  if (c) {
+    ErrandsTaskListItem *l = g_object_ref(list);
+    g_ptr_array_add(deleting_calendars, l);
+    run_in_thread(cal_delete_thread_cb, c, cal_delete_finished_cb, l);
+  }
+}
 
 void errands_sync_create_task(ErrandsTaskItem *task) {}
 
 void errands_sync_update_task(ErrandsTaskItem *task) {}
+
+void errands_sync_delete_task(ErrandsTaskItem *task) {}

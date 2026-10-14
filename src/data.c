@@ -206,8 +206,8 @@ void errands_data_init() {
           !errands_settings_get_sync_enabled(state.settings)) {
         g_message("User Data: Calendar was deleted. Removing %s", path);
         remove(path);
-        continue;
       }
+      continue;
     }
     g_list_store_append(task_lists_model, item);
     errands_task_list_item_remove_deleted_tasks(item);
