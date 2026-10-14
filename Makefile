@@ -289,10 +289,10 @@ git-commit:
 			3) prefix="Build" ;; \
 			*) prefix="Misc" ;; \
 		esac; \
+		echo "Selected category: $$prefix"; \
 		read -r -p "Commit message (default: 'Update'): " message; \
 		if [[ -z "$$message" ]]; then \
 			message="Update"; \
 		fi; \
-		clear; \
 		git add -A; \
 		git commit -m "$$prefix: $$message"'
