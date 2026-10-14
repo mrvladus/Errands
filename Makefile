@@ -8,7 +8,7 @@ CC 		= gcc
 
 SRC_DIR           = src
 DATA_DIR          = data
-BUILD_DIR         = _build
+BUILD_DIR        ?= _build
 FLATPAK_BUILD_DIR = _flatpak-build
 FLATPAK_REPO_DIR  = _flatpak-repo
 
