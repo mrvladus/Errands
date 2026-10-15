@@ -265,22 +265,22 @@ static inline void caldav__calendar_poll(CalDAVCalendar *calendar) {
 
 // --- CALENDAR PUBLIC FUNCTIONS --- //
 
-const gchar *caldav_calendar_get_color(CalDAVCalendar *calendar) {
+const gchar *caldav_calendar_get_color(const CalDAVCalendar *calendar) {
   g_return_val_if_fail(calendar != NULL, NULL);
   g_return_val_if_fail(calendar->registered_source != NULL, NULL);
 
   ESourceTaskList *task_list = e_source_get_extension(calendar->registered_source, E_SOURCE_EXTENSION_TASK_LIST);
   return e_source_selectable_get_color(E_SOURCE_SELECTABLE(task_list));
 }
-const gchar *caldav_calendar_get_name(CalDAVCalendar *calendar) {
+const gchar *caldav_calendar_get_name(const CalDAVCalendar *calendar) {
   g_return_val_if_fail(calendar != NULL, NULL);
   g_return_val_if_fail(calendar->registered_source != NULL, NULL);
 
   return e_source_get_display_name(calendar->registered_source);
 }
-const gchar *caldav_calendar_get_href(CalDAVCalendar *c) { return c->href; }
-const gchar *caldav_calendar_get_uid(CalDAVCalendar *c) { return c->uid; }
-gboolean caldav_calendar_set_properties(CalDAVCalendar *calendar, const gchar *name, const gchar *color) {
+const gchar *caldav_calendar_get_hrefcons(const CalDAVCalendar *c) { return c->href; }
+const gchar *caldav_calendar_get_uid(const CalDAVCalendar *c) { return c->uid; }
+gboolean caldav_calendar_set_properties(const CalDAVCalendar *calendar, const gchar *name, const gchar *color) {
   g_assert_nonnull(calendar);
 
   GSList *changes = NULL;
@@ -312,10 +312,12 @@ gboolean caldav_calendar_set_properties(CalDAVCalendar *calendar, const gchar *n
 
   return success;
 }
-gboolean caldav_calendar_set_color(CalDAVCalendar *c, const gchar *color) {
+gboolean caldav_calendar_set_color(const CalDAVCalendar *c, const gchar *color) {
   return caldav_calendar_set_properties(c, NULL, color);
 }
-gboolean caldav_calendar_set_name(CalDAVCalendar *c, const gchar *name) { return caldav_calendar_set_properties(c, name, NULL); }
+gboolean caldav_calendar_set_name(const CalDAVCalendar *c, const gchar *name) {
+  return caldav_calendar_set_properties(c, name, NULL);
+}
 
 gboolean caldav_calendar_create_task(CalDAVCalendar *c, ICalComponent *task) {
   g_assert_nonnull(c);
@@ -387,7 +389,7 @@ gboolean caldav_calendar_remove_task(CalDAVCalendar *c, const char *uid) {
   return TRUE;
 }
 
-gboolean caldav_calendar_remove(CalDAVCalendar *calendar) {
+gboolean caldav_calendar_remove(const CalDAVCalendar *calendar) {
   g_assert_nonnull(calendar);
   g_assert_nonnull(calendar->client);
   g_assert_nonnull(calendar->href);
@@ -789,6 +791,9 @@ CalDAVCalendar *caldav_client_create_calendar(CalDAVClient *c, const char *uid, 
 }
 
 CalDAVCalendar *caldav_client_find_calendar(CalDAVClient *c, const gchar *uid) {
+  g_assert_nonnull(c);
+  g_assert_nonnull(uid);
+
   for (guint i = 0; i < c->calendars->len; ++i) {
     CalDAVCalendar *cal = g_ptr_array_index(c->calendars, i);
     if (g_str_equal(cal->uid, uid)) return cal;

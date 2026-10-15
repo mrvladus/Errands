@@ -4,6 +4,8 @@
 #include "rename-list-dialog.h"
 #include "config.h"
 #include "state.h"
+#include "sync.h"
+#include "task-list-item.h"
 
 static void on_response_cb(ErrandsRenameListDialog *self, gchar *response, gpointer data);
 static void on_entry_changed_cb(ErrandsRenameListDialog *self, AdwEntryRow *entry);
@@ -56,8 +58,9 @@ void errands_rename_list_dialog_show(ErrandsTaskListItem *item) {
 
 static void on_response_cb(ErrandsRenameListDialog *self, gchar *response, gpointer data) {
   if (!g_str_equal(response, "rename")) return;
-  g_object_set(self->item, "title", gtk_editable_get_text(GTK_EDITABLE(self->entry)), NULL);
+  errands_task_list_item_set_title(self->item, gtk_editable_get_text(GTK_EDITABLE(self->entry)));
   errands_task_list_update(state.main_window->task_list);
+  errands_sync_update_list(self->item);
 }
 
 static void on_entry_changed_cb(ErrandsRenameListDialog *self, AdwEntryRow *entry) {

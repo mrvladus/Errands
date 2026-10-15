@@ -37,6 +37,9 @@ COMPILATION FLAGS
 
 pkg-config --cflags --libs libedataserver-1.2 libecal-2.0
 
+OPTIONS:
+    -DCALDAV_ENABLE_LOGS - enable logs
+
 ----------------------------------------------------------------------
 
 EXAMPLE
@@ -74,14 +77,14 @@ CalDAVCalendar *caldav_client_find_calendar(CalDAVClient *c, const gchar *uid);
 void caldav_client_free(CalDAVClient *c);
 
 // Remove remote calendar. `calendar` is deleted and set to `NULL`.
-gboolean caldav_calendar_remove(CalDAVCalendar *calendar);
-const gchar *caldav_calendar_get_color(CalDAVCalendar *c);
-const gchar *caldav_calendar_get_name(CalDAVCalendar *c);
-const gchar *caldav_calendar_get_href(CalDAVCalendar *c);
-const gchar *caldav_calendar_get_uid(CalDAVCalendar *c);
-gboolean caldav_calendar_set_color(CalDAVCalendar *c, const gchar *color);
-gboolean caldav_calendar_set_name(CalDAVCalendar *c, const gchar *name);
-gboolean caldav_calendar_set_properties(CalDAVCalendar *c, const gchar *name, const gchar *color);
+gboolean caldav_calendar_remove(const CalDAVCalendar *calendar);
+const gchar *caldav_calendar_get_color(const CalDAVCalendar *c);
+const gchar *caldav_calendar_get_name(const CalDAVCalendar *c);
+const gchar *caldav_calendar_get_href(const CalDAVCalendar *c);
+const gchar *caldav_calendar_get_uid(const CalDAVCalendar *c);
+gboolean caldav_calendar_set_color(const CalDAVCalendar *c, const gchar *color);
+gboolean caldav_calendar_set_name(const CalDAVCalendar *c, const gchar *name);
+gboolean caldav_calendar_set_properties(const CalDAVCalendar *c, const gchar *name, const gchar *color);
 gboolean caldav_calendar_create_task(CalDAVCalendar *c, ICalComponent *task);
 gboolean caldav_calendar_update_task(CalDAVCalendar *c, ICalComponent *task);
 gboolean caldav_calendar_remove_task(CalDAVCalendar *c, const char *uid);
