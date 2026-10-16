@@ -275,7 +275,7 @@ git-commit:
 		set -e; \
 		echo "Modifications:"; \
 		git status --short; \
-		echo "Commit category:"; \
+		echo "Select commit category:"; \
 		echo "  0) Fix"; \
 		echo "  1) UI"; \
 		echo "  2) Sync"; \
