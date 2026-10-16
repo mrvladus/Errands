@@ -60,7 +60,7 @@ LDFLAGS     ?=
 ALL_LDFLAGS += $(LDFLAGS) -lm `pkg-config --libs $(PKG_CONFIG_LIBS)`
 CFLAGS      ?=
 ALL_CFLAGS  += $(CFLAGS) \
-			-MMD -MP -std=c11 -D_GNU_SOURCE \
+			-MMD -MP -std=c11 \
 			`pkg-config --cflags $(PKG_CONFIG_LIBS)` \
 			-DVERSION='"$(VERSION)"' \
 			-DVERSION_COMMIT='"$(shell git rev-parse --short HEAD)"' \
