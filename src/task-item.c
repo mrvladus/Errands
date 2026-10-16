@@ -150,7 +150,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     if (update_task_list_count > 0) break;
     if (!self->lock) errands_task_list_item_save(self->list);
     errands_sidebar_update_filter_rows();
-    errands_sidebar_task_list_update_counter(errands_data_get_uid(self->ical));
+    errands_sidebar_task_list_update_counter(self->list->uid);
     errands_task_list_sort(state.main_window->task_list, GTK_SORTER_CHANGE_MORE_STRICT);
     errands_task_list_filter(state.main_window->task_list, GTK_FILTER_CHANGE_MORE_STRICT);
   } break;
@@ -173,7 +173,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     if (update_task_list_count > 0) break;
     if (!self->lock) errands_task_list_item_save(self->list);
     errands_sidebar_update_filter_rows();
-    errands_sidebar_task_list_update_counter(errands_data_get_uid(self->ical));
+    errands_sidebar_task_list_update_counter(self->list->uid);
     errands_task_list_sort(state.main_window->task_list, GTK_SORTER_CHANGE_MORE_STRICT);
     errands_task_list_filter(state.main_window->task_list, GTK_FILTER_CHANGE_MORE_STRICT);
   } break;
