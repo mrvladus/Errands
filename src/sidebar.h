@@ -12,8 +12,9 @@ G_DECLARE_FINAL_TYPE(ErrandsSidebar, errands_sidebar, ERRANDS, SIDEBAR, AdwBin)
 
 struct _ErrandsSidebar {
   AdwBin parent_instance;
-  GtkWidget *add_btn;
-  GtkWidget *sync_indicator;
+  GtkWidget *popover;
+  GtkWidget *entry;
+  GtkWidget *create_btn;
   GtkLabel *all_counter;
   GtkLabel *today_counter;
   GtkWidget *sidebar;
@@ -23,7 +24,6 @@ struct _ErrandsSidebar {
 ErrandsSidebar *errands_sidebar_new(void);
 void errands_sidebar_update_filter_rows(void);
 void errands_sidebar_select_last_opened_page(void);
-void errands_sidebar_toggle_sync_indicator(bool on);
 void errands_sidebar_task_list_update_counter(const char *uid);
 void errands_sidebar_delete_list(const char *uid);
 ErrandsTaskListItem *errands_sidebar_find_list(const char *uid);

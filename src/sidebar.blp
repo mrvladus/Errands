@@ -14,29 +14,43 @@ template $ErrandsSidebar: Adw.Bin {
       };
 
       [start]
-      Adw.SplitButton add_btn {
+      MenuButton {
         icon-name: "errands-add-symbolic";
-        tooltip-text: _("Create Task List (Shift+Ctrl+L)");
+        tooltip-text: _("Add Task List");
 
-        menu-model: menu {
-          item (_("Import \".ics\""), "sidebar.import")
+        popover: PopoverMenu popover {
+          menu-model: menu {
+            item {
+              custom: "entry";
+            }
+
+            section {
+              item (_("Import \".ics\" file"), "sidebar.import")
+            }
+          };
+
+          [entry]
+          Box {
+            spacing: 6;
+            orientation: vertical;
+
+            Entry entry {
+              placeholder-text: _("New list name");
+              changed => $on_entry_changed_cb(template);
+              activate => $on_entry_activated_cb(template);
+            }
+
+            Button create_btn {
+              label: _("Create");
+              sensitive: false;
+              clicked => $on_create_btn_clicked_cb(template);
+
+              styles [
+                "suggested-action",
+              ]
+            }
+          }
         };
-
-        action-name: "sidebar.new_list";
-
-        ShortcutController {
-          scope: global;
-
-          Shortcut {
-            trigger: "<Control><Shift>L";
-            action: "action(sidebar.new_list)";
-          }
-
-          Shortcut {
-            trigger: "<Control><Shift>I";
-            action: "action(sidebar.import)";
-          }
-        }
       }
 
       [end]
@@ -70,14 +84,6 @@ template $ErrandsSidebar: Adw.Bin {
             action: "action(sidebar.sync)";
           }
         }
-      }
-
-      [end]
-      Adw.Spinner sync_indicator {
-        tooltip-text: _("Sync is Running");
-        visible: false;
-        valign: center;
-        halign: center;
       }
     }
 

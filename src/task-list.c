@@ -46,13 +46,14 @@ static int sort_func(ErrandsTaskItem *a, ErrandsTaskItem *b, ErrandsTaskList *se
 
 G_DEFINE_TYPE(ErrandsTaskList, errands_task_list, ADW_TYPE_BIN)
 
-static void errands_task_list_dispose(GObject *gobject) {
+static void finalize(GObject *gobject) {
   gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_TASK_LIST);
-  G_OBJECT_CLASS(errands_task_list_parent_class)->dispose(gobject);
+  TODO("Cleanup dialogs");
+  G_OBJECT_CLASS(errands_task_list_parent_class)->finalize(gobject);
 }
 
 static void errands_task_list_class_init(ErrandsTaskListClass *class) {
-  G_OBJECT_CLASS(class)->dispose = errands_task_list_dispose;
+  G_OBJECT_CLASS(class)->finalize = finalize;
 
   gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), RESOURCE_PATH "/ui/task-list.ui");
 

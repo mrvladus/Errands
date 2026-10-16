@@ -3,10 +3,10 @@
 
 #include "sidebar.h"
 #include "about-dialog.h"
-#include "adwaita.h"
 #include "config.h"
 #include "data.h"
-#include "new-list-dialog.h"
+#include "glib-object.h"
+#include "gtk/gtk.h"
 #include "settings-dialog.h"
 #include "settings.h"
 #include "state.h"
@@ -20,7 +20,11 @@
 static gint sort_func(gconstpointer a, gconstpointer b, gpointer data);
 
 static void on_import_action_cb(GSimpleAction *action, GVariant *param);
+
 static void on_sidebar_activated_cb(AdwSidebar *self, guint index, gpointer user_data);
+static void on_entry_changed_cb(ErrandsSidebar *self, GtkEntry *entry);
+static void on_entry_activated_cb(ErrandsSidebar *self, GtkEntry *entry);
+static void on_create_btn_clicked_cb(ErrandsSidebar *self, GtkButton *btn);
 
 static ErrandsSidebar *self = NULL;
 
@@ -28,23 +32,27 @@ static ErrandsSidebar *self = NULL;
 
 G_DEFINE_TYPE(ErrandsSidebar, errands_sidebar, ADW_TYPE_BIN)
 
-static void errands_sidebar_dispose(GObject *gobject) {
+static void errands_sidebar_finalize(GObject *gobject) {
   gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_SIDEBAR);
-  G_OBJECT_CLASS(errands_sidebar_parent_class)->dispose(gobject);
-  // TODO: unref dialogs
+  G_OBJECT_CLASS(errands_sidebar_parent_class)->finalize(gobject);
 }
 
 static void errands_sidebar_class_init(ErrandsSidebarClass *klass) {
-  G_OBJECT_CLASS(klass)->dispose = errands_sidebar_dispose;
+  G_OBJECT_CLASS(klass)->finalize = errands_sidebar_finalize;
 
   gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(klass), RESOURCE_PATH "/ui/sidebar.ui");
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsSidebar, sync_indicator);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsSidebar, popover);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsSidebar, create_btn);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsSidebar, entry);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsSidebar, sidebar);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsSidebar, all_counter);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsSidebar, today_counter);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsSidebar, task_lists_section);
 
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_sidebar_activated_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_entry_changed_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_entry_activated_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_create_btn_clicked_cb);
 }
 
 static gboolean counter_binding_transform_func(GBinding *binding, const GValue *from_value, GValue *to_value,
@@ -79,7 +87,6 @@ static void errands_sidebar_init(ErrandsSidebar *sidebar) {
   gtk_widget_init_template(GTK_WIDGET(self));
   GSimpleActionGroup *ag = errands_add_action_group(self, "sidebar");
   errands_add_action(ag, "import", on_import_action_cb, self, NULL);
-  errands_add_action(ag, "new_list", errands_new_list_dialog_show, self, NULL);
   errands_add_action(ag, "preferences", errands_settings_dialog_show, self, NULL);
   errands_add_action(ag, "about", errands_about_dialog_show, self, NULL);
   errands_add_action(ag, "sync", errands_sync, NULL, NULL);
@@ -157,8 +164,6 @@ void errands_sidebar_update_filter_rows(void) {
   gtk_widget_set_visible(self->sidebar, n_lists > 0);
 }
 
-void errands_sidebar_toggle_sync_indicator(bool on) { gtk_widget_set_visible(self->sync_indicator, on); }
-
 void errands_sidebar_task_list_update_counter(const char *uid) {
   errands_task_list_item_update_count(errands_sidebar_find_list(uid));
 }
@@ -174,6 +179,29 @@ void errands_sidebar_delete_list(const char *uid) {
     }
   }
   errands_sidebar_update_filter_rows();
+}
+
+// --- ACTIONS --- //
+
+static void on_import_action_finish_cb(GObject *obj, GAsyncResult *res) {
+  g_autoptr(GFile) file = gtk_file_dialog_open_finish(GTK_FILE_DIALOG(obj), res, NULL);
+  if (!file) return;
+  g_autofree gchar *path = g_file_get_path(file);
+  ErrandsTaskListItem *item = errands_task_list_item_load_from_ics(path);
+  if (!item) return;
+  errands_task_list_item_save(item);
+  // errands_sync_create_list(data);
+  errands_sidebar_update_filter_rows();
+  errands_settings_set_last_list_uid(state.settings, item->uid);
+  errands_sidebar_select_last_opened_page();
+}
+
+static void on_import_action_cb(GSimpleAction *action, GVariant *param) {
+  g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
+  g_autoptr(GtkFileFilter) filter = gtk_file_filter_new();
+  gtk_file_filter_add_pattern(filter, "*.ics");
+  gtk_file_dialog_set_default_filter(dialog, filter);
+  gtk_file_dialog_open(dialog, GTK_WINDOW(state.main_window), NULL, (GAsyncReadyCallback)on_import_action_finish_cb, self);
 }
 
 // --- SIGNAL HANDLERS --- //
@@ -193,28 +221,30 @@ static void on_sidebar_activated_cb(AdwSidebar *self, guint index, gpointer user
   adw_overlay_split_view_set_show_sidebar(state.main_window->overlay_split_view, false);
 }
 
-static void __on_open_finish(GObject *obj, GAsyncResult *res) {
-  g_autoptr(GFile) file = gtk_file_dialog_open_finish(GTK_FILE_DIALOG(obj), res, NULL);
-  if (!file) return;
-  g_autofree gchar *path = g_file_get_path(file);
-  ErrandsTaskListItem *item = errands_task_list_item_load_from_ics(path);
-  if (!item) return;
+static void on_entry_changed_cb(ErrandsSidebar *self, GtkEntry *entry) {
+  const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
+  gtk_widget_set_sensitive(self->create_btn, !g_str_equal("", text));
+}
+
+static void on_entry_activated_cb(ErrandsSidebar *self, GtkEntry *entry) {
+  gtk_popover_popdown(GTK_POPOVER(self->popover));
+  const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
+  if (g_str_equal(text, "")) return;
+  g_autofree gchar *uid = g_uuid_string_random();
+  g_autoptr(ErrandsTaskListItem) item = errands_task_list_item_create(uid, text, NULL, false, false);
+  g_message("New List Dialog: Create new list: '%s'", item->uid);
+  g_list_store_append(task_lists_model, item);
   errands_task_list_item_save(item);
-  // errands_sync_create_list(data);
+  errands_sync_create_list(item);
   errands_sidebar_update_filter_rows();
   errands_settings_set_last_list_uid(state.settings, item->uid);
   errands_sidebar_select_last_opened_page();
+  gtk_editable_set_text(GTK_EDITABLE(entry), "");
 }
 
-static void on_import_action_cb(GSimpleAction *action, GVariant *param) {
-  g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
-  g_autoptr(GtkFileFilter) filter = gtk_file_filter_new();
-  gtk_file_filter_add_pattern(filter, "*.ics");
-  gtk_file_dialog_set_default_filter(dialog, filter);
-  gtk_file_dialog_open(dialog, GTK_WINDOW(state.main_window), NULL, (GAsyncReadyCallback)__on_open_finish, self);
+static void on_create_btn_clicked_cb(ErrandsSidebar *self, GtkButton *btn) {
+  g_signal_emit_by_name(self->entry, "activate", self, self->entry, NULL);
 }
-
-// ---------- CALLBACKS ---------- /
 
 // --- DND --- //
 
