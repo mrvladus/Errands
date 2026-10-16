@@ -1,0 +1,13 @@
+[
+  {
+    "label": "Debug Errands",
+    "adapter": "GDB",
+    "request": "launch",
+    "program": "$ZED_WORKTREE_ROOT/_build/errands",
+    "build": {
+      "command": "make",
+      "args": ["-j12", "DEVEL=TRUE"],
+      "cwd": "$ZED_WORKTREE_ROOT",
+    },
+  },
+]
