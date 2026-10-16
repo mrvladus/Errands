@@ -33,14 +33,14 @@ struct _ErrandsRruleRow {
 
 G_DEFINE_TYPE(ErrandsRruleRow, errands_rrule_row, ADW_TYPE_EXPANDER_ROW)
 
-static void errands_rrule_row_dispose(GObject *gobject) {
+static void finalize(GObject *gobject) {
   gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_RRULE_ROW);
-  G_OBJECT_CLASS(errands_rrule_row_parent_class)->dispose(gobject);
+  G_OBJECT_CLASS(errands_rrule_row_parent_class)->finalize(gobject);
 }
 
 static void errands_rrule_row_class_init(ErrandsRruleRowClass *class) {
   g_type_ensure(ERRANDS_TYPE_DATE_CHOOSER);
-  G_OBJECT_CLASS(class)->dispose = errands_rrule_row_dispose;
+  G_OBJECT_CLASS(class)->finalize = finalize;
   gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), RESOURCE_PATH "/ui/rrule-row.ui");
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsRruleRow, freq_row);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsRruleRow, interval_row);

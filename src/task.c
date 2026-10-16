@@ -154,21 +154,20 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
   }
 }
 
-static void errands_task_dispose(GObject *gobject) {
+static void finalize(GObject *gobject) {
   ErrandsTask *self = ERRANDS_TASK(gobject);
   if (self->toolbar_update_id) {
     g_source_remove(self->toolbar_update_id);
     self->toolbar_update_id = 0;
   }
   gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_TASK);
-  G_OBJECT_CLASS(errands_task_parent_class)->dispose(gobject);
+  G_OBJECT_CLASS(errands_task_parent_class)->finalize(gobject);
 }
 
 static void errands_task_class_init(ErrandsTaskClass *klass) {
   GObjectClass *object_class = G_OBJECT_CLASS(klass);
 
-  object_class->dispose = errands_task_dispose;
-
+  object_class->finalize = finalize;
   object_class->get_property = get_property;
   object_class->set_property = set_property;
 

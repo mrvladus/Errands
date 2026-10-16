@@ -23,13 +23,13 @@ struct _ErrandsRenameListDialog {
 
 G_DEFINE_TYPE(ErrandsRenameListDialog, errands_rename_list_dialog, ADW_TYPE_ALERT_DIALOG)
 
-static void errands_rename_list_dialog_dispose(GObject *gobject) {
+static void finalize(GObject *gobject) {
   gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_RENAME_LIST_DIALOG);
-  G_OBJECT_CLASS(errands_rename_list_dialog_parent_class)->dispose(gobject);
+  G_OBJECT_CLASS(errands_rename_list_dialog_parent_class)->finalize(gobject);
 }
 
 static void errands_rename_list_dialog_class_init(ErrandsRenameListDialogClass *class) {
-  G_OBJECT_CLASS(class)->dispose = errands_rename_list_dialog_dispose;
+  G_OBJECT_CLASS(class)->finalize = finalize;
   gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), RESOURCE_PATH "/ui/rename-list-dialog.ui");
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsRenameListDialog, entry);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_response_cb);

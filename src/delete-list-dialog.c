@@ -19,13 +19,13 @@ struct _ErrandsDeleteListDialog {
 
 G_DEFINE_TYPE(ErrandsDeleteListDialog, errands_delete_list_dialog, ADW_TYPE_ALERT_DIALOG)
 
-static void errands_delete_list_dialog_dispose(GObject *gobject) {
+static void finalize(GObject *gobject) {
   gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_DELETE_LIST_DIALOG);
-  G_OBJECT_CLASS(errands_delete_list_dialog_parent_class)->dispose(gobject);
+  G_OBJECT_CLASS(errands_delete_list_dialog_parent_class)->finalize(gobject);
 }
 
 static void errands_delete_list_dialog_class_init(ErrandsDeleteListDialogClass *class) {
-  G_OBJECT_CLASS(class)->dispose = errands_delete_list_dialog_dispose;
+  G_OBJECT_CLASS(class)->finalize = finalize;
   gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), RESOURCE_PATH "/ui/delete-list-dialog.ui");
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_response_cb);
 }

@@ -31,13 +31,13 @@ struct _ErrandsSettingsDialog {
 
 G_DEFINE_TYPE(ErrandsSettingsDialog, errands_settings_dialog, ADW_TYPE_PREFERENCES_DIALOG)
 
-static void errands_settings_dialog_dispose(GObject *gobject) {
+static void finalize(GObject *gobject) {
   gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_SETTINGS_DIALOG);
-  G_OBJECT_CLASS(errands_settings_dialog_parent_class)->dispose(gobject);
+  G_OBJECT_CLASS(errands_settings_dialog_parent_class)->finalize(gobject);
 }
 
 static void errands_settings_dialog_class_init(ErrandsSettingsDialogClass *class) {
-  G_OBJECT_CLASS(class)->dispose = errands_settings_dialog_dispose;
+  G_OBJECT_CLASS(class)->finalize = finalize;
   gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), RESOURCE_PATH "/ui/settings-dialog.ui");
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSettingsDialog, theme);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSettingsDialog, light);

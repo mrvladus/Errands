@@ -292,7 +292,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
   }
 }
 
-static void errands_task_item_finalize(GObject *object) {
+static void finalize(GObject *object) {
   ErrandsTaskItem *self = ERRANDS_TASK_ITEM(object);
 
   g_message("Finalize Task Item: %s", self->uid);
@@ -311,7 +311,7 @@ static void errands_task_item_finalize(GObject *object) {
 
 static void errands_task_item_class_init(ErrandsTaskItemClass *klass) {
   GObjectClass *object_class = G_OBJECT_CLASS(klass);
-  object_class->finalize = errands_task_item_finalize;
+  object_class->finalize = finalize;
 
   object_class->get_property = get_property;
   object_class->set_property = set_property;

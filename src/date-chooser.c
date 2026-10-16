@@ -59,18 +59,18 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
   }
 }
 
-static void errands_date_chooser_dispose(GObject *gobject) {
+static void finalize(GObject *gobject) {
   ErrandsDateChooser *self = ERRANDS_DATE_CHOOSER(gobject);
 
   g_clear_object(&self->dt);
   gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_DATE_CHOOSER);
 
-  G_OBJECT_CLASS(errands_date_chooser_parent_class)->dispose(gobject);
+  G_OBJECT_CLASS(errands_date_chooser_parent_class)->finalize(gobject);
 }
 
 static void errands_date_chooser_class_init(ErrandsDateChooserClass *class) {
   GObjectClass *object_class = G_OBJECT_CLASS(class);
-  object_class->dispose = errands_date_chooser_dispose;
+  object_class->finalize = finalize;
   object_class->get_property = get_property;
   object_class->set_property = set_property;
 

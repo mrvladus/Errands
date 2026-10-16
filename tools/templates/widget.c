@@ -44,14 +44,14 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
   }
 }
 
-static void errands_widget_dispose(GObject *gobject) {
+static void finalize(GObject *gobject) {
   gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_WIDGET);
-  G_OBJECT_CLASS(errands_widget_parent_class)->dispose(gobject);
+  G_OBJECT_CLASS(errands_widget_parent_class)->finalize(gobject);
 }
 
 static void errands_widget_class_init(ErrandsWidgetClass *class) {
   GObjectClass *object_class = G_OBJECT_CLASS(class);
-  object_class->dispose = errands_widget_dispose;
+  object_class->finalize = finalize;
   object_class->get_property = get_property;
   object_class->set_property = set_property;
 

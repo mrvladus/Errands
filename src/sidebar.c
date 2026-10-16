@@ -32,13 +32,13 @@ static ErrandsSidebar *self = NULL;
 
 G_DEFINE_TYPE(ErrandsSidebar, errands_sidebar, ADW_TYPE_BIN)
 
-static void errands_sidebar_finalize(GObject *gobject) {
+static void finalize(GObject *gobject) {
   gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_SIDEBAR);
   G_OBJECT_CLASS(errands_sidebar_parent_class)->finalize(gobject);
 }
 
 static void errands_sidebar_class_init(ErrandsSidebarClass *klass) {
-  G_OBJECT_CLASS(klass)->finalize = errands_sidebar_finalize;
+  G_OBJECT_CLASS(klass)->finalize = finalize;
 
   gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(klass), RESOURCE_PATH "/ui/sidebar.ui");
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsSidebar, popover);

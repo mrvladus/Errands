@@ -205,7 +205,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
   g_idle_add(G_SOURCE_FUNC(save), self);
 }
 
-static void errands_settings_dispose(GObject *gobject) {
+static void finalize(GObject *gobject) {
   ErrandsSettings *self = ERRANDS_SETTINGS(gobject);
   g_clear_pointer(&self->last_list_uid, g_free);
   g_clear_pointer(&self->sync_provider, g_free);
@@ -215,12 +215,12 @@ static void errands_settings_dispose(GObject *gobject) {
   g_clear_pointer(&self->settings_path, g_free);
   g_clear_pointer(&self->tags, g_strfreev);
   g_key_file_free(self->key_file);
-  G_OBJECT_CLASS(errands_settings_parent_class)->dispose(gobject);
+  G_OBJECT_CLASS(errands_settings_parent_class)->finalize(gobject);
 }
 
 static void errands_settings_class_init(ErrandsSettingsClass *class) {
   GObjectClass *object_class = G_OBJECT_CLASS(class);
-  object_class->dispose = errands_settings_dispose;
+  object_class->finalize = finalize;
   object_class->get_property = get_property;
   object_class->set_property = set_property;
 

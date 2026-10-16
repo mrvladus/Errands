@@ -28,13 +28,13 @@ static void on_tag_entry_activated_cb(ErrandsWindow *self, AdwEntryRow *entry);
 
 G_DEFINE_TYPE(ErrandsWindow, errands_window, ADW_TYPE_APPLICATION_WINDOW)
 
-static void errands_window_dispose(GObject *gobject) {
+static void finalize(GObject *gobject) {
   gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_WINDOW);
-  G_OBJECT_CLASS(errands_window_parent_class)->dispose(gobject);
+  G_OBJECT_CLASS(errands_window_parent_class)->finalize(gobject);
 }
 
 static void errands_window_class_init(ErrandsWindowClass *class) {
-  G_OBJECT_CLASS(class)->dispose = errands_window_dispose;
+  G_OBJECT_CLASS(class)->finalize = finalize;
   g_type_ensure(ERRANDS_TYPE_SIDEBAR);
   g_type_ensure(ERRANDS_TYPE_TASK_LIST);
   gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), RESOURCE_PATH "/ui/window.ui");
