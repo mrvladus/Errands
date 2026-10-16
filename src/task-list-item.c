@@ -156,7 +156,7 @@ ErrandsTaskListItem *errands_task_list_item_load_from_ics(const char *path) {
   // Check if uid exists
   GListModel *model = G_LIST_MODEL(task_lists_model);
   for_range(i, 0, g_list_model_get_n_items(model)) {
-    ErrandsTaskListItem *item = g_list_model_get_item(model, i);
+    g_autoptr(ErrandsTaskListItem) item = g_list_model_get_item(model, i);
     if (g_str_equal(item->uid, uid)) {
       g_warning("List already exists");
       return NULL;

@@ -18,7 +18,7 @@
 #define BOOL_TO_STR_NUM(val) ((val) ? "1" : "0")
 
 // Print TODO formatted message.
-#define TODO(format, ...) fprintf(stderr, "%s:%d:%s: " format "\n", __FILE__, __LINE__, __func__, ##__VA_ARGS__)
+#define TODO(format, ...) fprintf(stderr, "%s:%d:%s: TODO: " format "\n", __FILE__, __LINE__, __func__, ##__VA_ARGS__)
 #define HERE              fprintf(stderr, "%s:%d:%s: HERE\n", __FILE__, __LINE__, __func__)
 
 #define for_range(idx, idx_start, idx_end)  for (int idx = (int)(idx_start); idx < (int)(idx_end); ++idx)

@@ -134,7 +134,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     if (self->completed) {
       GListStore *sub_tasks = self->children_model;
       for (guint i = 0; i < g_list_model_get_n_items(G_LIST_MODEL(sub_tasks)); i++) {
-        ErrandsTaskItem *sub_task = g_list_model_get_item(G_LIST_MODEL(sub_tasks), i);
+        g_autoptr(ErrandsTaskItem) sub_task = g_list_model_get_item(G_LIST_MODEL(sub_tasks), i);
         g_object_set(sub_task, "completed", true, NULL);
       }
       errands_task_item_update(self);
@@ -163,7 +163,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     if (self->cancelled) {
       GListStore *sub_tasks = self->children_model;
       for (guint i = 0; i < g_list_model_get_n_items(G_LIST_MODEL(sub_tasks)); i++) {
-        ErrandsTaskItem *sub_task = g_list_model_get_item(G_LIST_MODEL(sub_tasks), i);
+        g_autoptr(ErrandsTaskItem) sub_task = g_list_model_get_item(G_LIST_MODEL(sub_tasks), i);
         g_object_set(sub_task, "cancelled", true, NULL);
       }
     } else {
