@@ -1,3 +1,25 @@
+# BUILD TARGETS:
+#    all                Build the executable into $(BUILD_DIR) (default target)
+#    clean              Remove build artifacts
+#    install            Install binary, desktop, icons, D-Bus service into $(DESTDIR)$(prefix)
+#    uninstall          Remove installed files from $(DESTDIR)$(prefix)
+#    run                Build and run the app (DEBUG=GDB|GF2)
+#    flatpak-run        Build Flatpak and run it
+#    flatpak-bundle     Build Flatpak bundle into $(BUILD_DIR)
+#    distrobox-setup    Create/configure the errands-distrobox dev environment
+#    nextcloud-setup    Start a Nextcloud Podman container for sync testing
+#    sloc               Count source lines of code in src
+#    git-commit         Interactive staged-commit helper
+
+# BUILD OPTIONS:
+#    prefix  = /usr/local              Installation prefix directory
+#    DESTDIR = (not set)               Installation destination directory
+#    CFLAGS  = (not set)               Compile flags
+#    LDFLAGS = (not set)               Linker flags
+#    DEVEL   = FALSE (FALSE|TRUE)      Set development build type
+#    DEBUG   = FALSE (GDB|GF2|FALSE)   Run in the debugger
+
+
 # --- Project info --- #
 
 NAME    = errands
@@ -14,16 +36,12 @@ FLATPAK_REPO_DIR  = _flatpak-repo
 
 # --- Configuration options --- #
 
-# Pass them to `make` command like this: `make OPTION=VALUE`.
-
-# Development mode: TRUE, FALSE. Default: FALSE.
-# This option will set development APP_ID and change runtime directories and app icons.
 DEVEL ?= FALSE
 ifeq ($(DEVEL),TRUE)
 	APP_ID = io.github.mrvladus.List.Devel
 	RESOURCE_PATH = /io/github/mrvladus/Errands/Devel
-	ALL_CFLAGS  += -Wall -g -fno-omit-frame-pointer -pg -DCALDAV_DEBUG
-	ALL_LDFLAGS += -pg
+	ALL_CFLAGS  += -Wall -g -fno-omit-frame-pointer -DCALDAV_DEBUG
+	ALL_LDFLAGS +=
 else
 	APP_ID = io.github.mrvladus.List
 	RESOURCE_PATH = /io/github/mrvladus/Errands
@@ -33,10 +51,7 @@ endif
 
 # --- Installation directories --- #
 
-# Installation destination directory. Default: not set.
 DESTDIR        ?=
-# Installation prefix directory. Default: /usr/local.
-# For Flatpak builds, set `prefix=/app`.
 prefix         ?= /usr/local
 bindir          = $(prefix)/bin
 datarootdir     = $(prefix)/share
@@ -200,8 +215,6 @@ uninstall:
 
 # --- Run targets --- #
 
-# Debug mode: GDB, GF2, FALSE.
-# Run Errands in the debugger.
 DEBUG ?= FALSE
 ifeq ($(DEBUG),GDB)
     RUN_CMD = gdb -q -ex run $(BUILD_DIR)/$(NAME)
