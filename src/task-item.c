@@ -606,6 +606,7 @@ bool errands_task_item_move(ErrandsTaskItem *self, ErrandsTaskItem *parent, Erra
 
   if (parent && self == parent) return FALSE;
 
+  ErrandsTaskItem *old_parent_task = errands_task_item_get_parent(self);
   GListStore *old_parent_model = errands_task_item_get_parent_model(self);
   ErrandsTaskListItem *old_list = self->list;
   if (old_list != list) move_to_list_recursive(self, list);
@@ -619,6 +620,8 @@ bool errands_task_item_move(ErrandsTaskItem *self, ErrandsTaskItem *parent, Erra
     errands_sidebar_task_list_update_counter(list->uid);
     errands_task_list_item_save(old_list);
   }
+  if (parent) errands_task_item_update(parent);
+  if (old_parent_task) errands_task_item_update(old_parent_task);
   errands_task_list_update(state.main_window->task_list);
 
   return TRUE;
