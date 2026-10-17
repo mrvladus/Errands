@@ -3,12 +3,12 @@
 #    clean              Remove build artifacts
 #    install            Install binary, desktop, icons, D-Bus service into $(DESTDIR)$(prefix)
 #    uninstall          Remove installed files from $(DESTDIR)$(prefix)
-#    run                Build and run the app (DEBUG=GDB|GF2)
+#    run                Build and run the app
 #    flatpak-run        Build Flatpak and run it
 #    flatpak-bundle     Build Flatpak bundle into $(BUILD_DIR)
 #    distrobox-setup    Create/configure the errands-distrobox dev environment
 #    nextcloud-setup    Start a Nextcloud Podman container for sync testing
-#    sloc               Count source lines of code in src
+#    sloc               Count lines of code in src/
 #    git-commit         Interactive staged-commit helper
 
 # BUILD OPTIONS:

@@ -645,10 +645,10 @@ void errands_sync_update_task(ErrandsTaskItem *task) {
   if (!ensure_client_connected()) return;
 
   const char *uid = errands_task_item_get_uid(task);
-  if (objects_to_push_has(uid, PUSH_OBJ_TASK_CREATE)) return;
+  if (objects_to_push_has(uid, PUSH_OBJ_TASK_UPDATE)) return;
   CalDAVCalendar *c = caldav_client_find_calendar(client, errands_task_item_get_list(task)->uid);
   if (!c) return;
-  PushObj *o = push_obj_new(PUSH_OBJ_TASK_CREATE, uid);
+  PushObj *o = push_obj_new(PUSH_OBJ_TASK_UPDATE, uid);
   o->calendar = c;
   o->task = g_object_ref(task);
   o->ical = errands_task_item_get_ical(task);

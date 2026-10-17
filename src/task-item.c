@@ -13,6 +13,7 @@
 #include "task-list.h"
 #include "task.h"
 #include "utils.h"
+#include "window.h"
 
 #include <glib/gi18n.h>
 #include <libical-glib/libical-glib.h>
@@ -383,6 +384,16 @@ static void on_global_tags_changed_cb(ErrandsTaskItem *self) {
   if (g_strv_hash(g_tags) != g_strv_hash(old_tags)) errands_task_item_set_tags(self, new_tags);
 }
 
+static inline bool item_is_descendant_of(ErrandsTaskItem *item, ErrandsTaskItem *tagret) {
+  if (!item || !tagret) return false;
+  ErrandsTaskItem *parent = tagret->parent;
+  while (parent) {
+    if (parent == item) return true;
+    parent = parent->parent;
+  }
+  return false;
+}
+
 static void move_to_list_recursive(ErrandsTaskItem *self, ErrandsTaskListItem *new_list) {
   g_assert(ERRANDS_IS_TASK_ITEM(self));
   g_assert(self->list != new_list);
@@ -605,6 +616,12 @@ bool errands_task_item_move(ErrandsTaskItem *self, ErrandsTaskItem *parent, Erra
   g_assert_nonnull(list);
 
   if (parent && self == parent) return FALSE;
+  if (parent && self->parent && self->parent == parent) return FALSE;
+
+  if (item_is_descendant_of(self, parent)) {
+    errands_window_add_toast(tmp_str_printf(_("Can't make task as sub-task of itself.")), 5);
+    return FALSE;
+  }
 
   ErrandsTaskItem *old_parent_task = errands_task_item_get_parent(self);
   GListStore *old_parent_model = errands_task_item_get_parent_model(self);
