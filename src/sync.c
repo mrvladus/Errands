@@ -18,6 +18,7 @@
 #include <glib.h>
 #include <glib/gi18n.h>
 #include <libical-glib/libical-glib.h>
+#include <stdbool.h>
 
 static inline bool ensure_client_connected(void);
 static void obj_push_idle_cb(gpointer user_data);
@@ -523,6 +524,7 @@ static void sync_finished_cb(GObject *source_object, GAsyncResult *res, gpointer
 // ---------- PRIVATE FUNCTIONS ---------- //
 
 static inline bool ensure_client_connected(void) {
+  if (!errands_settings_get_sync_enabled(state.settings)) return false;
   if (!client) {
     CalDAVClientConfig config = {
         .url = errands_settings_get_sync_url(state.settings),
@@ -558,8 +560,8 @@ void errands_sync_cleanup(void) {
 }
 
 gboolean errands_sync(void) {
-  if (!errands_settings_get_sync_enabled(state.settings)) {
-    g_message("Sync: Disabled");
+  if (!ensure_client_connected()) {
+    g_message("Sync: Disable");
     return G_SOURCE_REMOVE;
   }
   g_message("Sync: Start");
@@ -576,6 +578,8 @@ void errands_sync_create_list(ErrandsTaskListItem *list) {
   g_assert_nonnull(list);
   g_assert(ERRANDS_IS_TASK_LIST_ITEM(list));
 
+  if (!ensure_client_connected()) return;
+
   if (objects_to_push_has(list->uid, PUSH_OBJ_LIST_CREATE)) return;
 
   PushObj *o = push_obj_new(PUSH_OBJ_LIST_CREATE, list->uid);
@@ -588,6 +592,8 @@ void errands_sync_create_list(ErrandsTaskListItem *list) {
 void errands_sync_update_list(ErrandsTaskListItem *list) {
   g_assert_nonnull(list);
   g_assert(ERRANDS_IS_TASK_LIST_ITEM(list));
+
+  if (!ensure_client_connected()) return;
 
   if (objects_to_push_has(list->uid, PUSH_OBJ_LIST_UPDATE)) return;
   CalDAVCalendar *c = caldav_client_find_calendar(client, list->uid);
@@ -604,6 +610,8 @@ void errands_sync_delete_list(ErrandsTaskListItem *list) {
   g_assert_nonnull(list);
   g_assert(ERRANDS_IS_TASK_LIST_ITEM(list));
 
+  if (!ensure_client_connected()) return;
+
   if (objects_to_push_has(list->uid, PUSH_OBJ_LIST_DELETE)) return;
   CalDAVCalendar *c = caldav_client_find_calendar(client, list->uid);
   if (!c) return;
@@ -616,6 +624,8 @@ void errands_sync_delete_list(ErrandsTaskListItem *list) {
 void errands_sync_create_task(ErrandsTaskItem *task) {
   g_assert_nonnull(task);
   g_assert(ERRANDS_IS_TASK_ITEM(task));
+
+  if (!ensure_client_connected()) return;
 
   const char *uid = errands_task_item_get_uid(task);
   if (objects_to_push_has(uid, PUSH_OBJ_TASK_CREATE)) return;
@@ -632,6 +642,8 @@ void errands_sync_update_task(ErrandsTaskItem *task) {
   g_assert_nonnull(task);
   g_assert(ERRANDS_IS_TASK_ITEM(task));
 
+  if (!ensure_client_connected()) return;
+
   const char *uid = errands_task_item_get_uid(task);
   if (objects_to_push_has(uid, PUSH_OBJ_TASK_CREATE)) return;
   CalDAVCalendar *c = caldav_client_find_calendar(client, errands_task_item_get_list(task)->uid);
@@ -647,6 +659,8 @@ void errands_sync_delete_task(ErrandsTaskItem *task) {
   g_assert_nonnull(task);
   g_assert(ERRANDS_IS_TASK_ITEM(task));
 
+  if (!ensure_client_connected()) return;
+
   const char *uid = errands_task_item_get_uid(task);
   if (objects_to_push_has(uid, PUSH_OBJ_TASK_DELETE)) return;
   CalDAVCalendar *c = caldav_client_find_calendar(client, errands_task_item_get_list(task)->uid);
@@ -655,4 +669,14 @@ void errands_sync_delete_task(ErrandsTaskItem *task) {
   o->calendar = c;
   o->task = g_object_ref(task);
   g_ptr_array_add(objects_to_push, o);
+}
+
+void errands_sync_move_task(ErrandsTaskItem *task, ErrandsTaskListItem *old_list) {
+  ErrandsTaskListItem *new_list = errands_task_item_get_list(task);
+  if (old_list == new_list) {
+    errands_sync_update_task(task);
+    return;
+  }
+  errands_sync_create_task(task);
+  errands_sync_delete_task(task);
 }

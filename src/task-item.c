@@ -10,6 +10,7 @@
 #include "state.h"
 #include "sync.h"
 #include "task-list-item.h"
+#include "task-list.h"
 #include "task.h"
 #include "utils.h"
 
@@ -382,6 +383,25 @@ static void on_global_tags_changed_cb(ErrandsTaskItem *self) {
   if (g_strv_hash(g_tags) != g_strv_hash(old_tags)) errands_task_item_set_tags(self, new_tags);
 }
 
+static void move_to_list_recursive(ErrandsTaskItem *self, ErrandsTaskListItem *new_list) {
+  g_assert(ERRANDS_IS_TASK_ITEM(self));
+  g_assert(self->list != new_list);
+  g_assert_nonnull(new_list);
+
+  ErrandsTaskListItem *old_list = self->list;
+  g_object_ref(self->ical);
+  i_cal_component_remove_component(old_list->ical, self->ical);
+  i_cal_component_add_component(new_list->ical, self->ical);
+  self->list = new_list;
+  errands_data_set_synced(self->ical, false);
+  errands_sync_move_task(self, old_list);
+  GListModel *children = G_LIST_MODEL(self->children_model);
+  for (guint i = 0; i < g_list_model_get_n_items(children); i++) {
+    g_autoptr(ErrandsTaskItem) child = g_list_model_get_item(children, i);
+    move_to_list_recursive(child, new_list);
+  }
+}
+
 // --- PUBLIC --- //
 
 ErrandsTaskItem *errands_task_item_new(ICalComponent *ical, ErrandsTaskListItem *list, ErrandsTaskItem *parent) {
@@ -580,6 +600,30 @@ bool errands_task_item_export(ErrandsTaskItem *self, const char *path) {
 
 bool errands_task_item_is_due(ErrandsTaskItem *self) { return errands_data_is_due(self->ical); }
 
+bool errands_task_item_move(ErrandsTaskItem *self, ErrandsTaskItem *parent, ErrandsTaskListItem *list) {
+  g_assert_nonnull(self);
+  g_assert_nonnull(list);
+
+  if (parent && self == parent) return FALSE;
+
+  GListStore *old_parent_model = errands_task_item_get_parent_model(self);
+  ErrandsTaskListItem *old_list = self->list;
+  if (old_list != list) move_to_list_recursive(self, list);
+  errands_task_item_set_parent(self, parent);
+  errands_sync_update_task(self);
+  g_list_store_append(parent ? parent->children_model : list->tasks, self);
+  errands_task_item_set_parent(self, parent ? parent : NULL);
+  g_list_store_remove_data(old_parent_model, self);
+  if (old_list != list) {
+    errands_sidebar_task_list_update_counter(old_list->uid);
+    errands_sidebar_task_list_update_counter(list->uid);
+    errands_task_list_item_save(old_list);
+  }
+  errands_task_list_update(state.main_window->task_list);
+
+  return TRUE;
+}
+
 // ---------- GETTERS ---------- //
 
 ErrandsTaskListItem *errands_task_item_get_list(ErrandsTaskItem *self) { return self->list; }
@@ -621,6 +665,10 @@ const char *errands_task_item_get_priority_as_tstring(ErrandsTaskItem *self) {
 }
 
 GListModel *errands_task_item_get_children_model(ErrandsTaskItem *self) { return G_LIST_MODEL(self->children_model); }
+
+GListStore *errands_task_item_get_parent_model(ErrandsTaskItem *self) {
+  return self->parent ? self->parent->children_model : self->list->tasks;
+}
 
 int errands_task_item_get_indent_level(ErrandsTaskItem *self) {
   int level = 0;
@@ -691,4 +739,9 @@ void errands_task_item_set_attachments(ErrandsTaskItem *self, const GStrv attach
   g_object_set(self, "attachments", attachments, NULL);
 }
 void errands_task_item_set_rrule(ErrandsTaskItem *self, const ICalRecurrence *rrule) { g_object_set(self, "rrule", rrule, NULL); }
-void errands_task_item_set_parent(ErrandsTaskItem *self, ErrandsTaskItem *parent) { self->parent = parent; }
+void errands_task_item_set_parent(ErrandsTaskItem *self, ErrandsTaskItem *parent) {
+  self->parent = parent;
+  errands_data_set_parent(self->ical, parent ? parent->uid : NULL);
+  errands_task_list_item_save(self->list);
+}
+void errands_task_item_set_list(ErrandsTaskItem *self, ErrandsTaskListItem *list) { self->list = list; }

@@ -393,10 +393,10 @@ void errands_data_set_list_description(ICalComponent *ical, const char *value) {
   errands_data_set_synced(ical, false);
 }
 void errands_data_set_parent(ICalComponent *ical, const char *value) {
-  if (!value || g_str_equal(value, ""))
-    i_cal_component_remove_property(ical, i_cal_component_get_first_property(ical, I_CAL_RELATEDTO_PROPERTY));
-  else {
-    g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_RELATEDTO_PROPERTY);
+  g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_RELATEDTO_PROPERTY);
+  if (!value || g_str_equal(value, "")) {
+    if (property) i_cal_component_remove_property(ical, property);
+  } else {
     if (property) i_cal_property_set_relatedto(property, value);
     else i_cal_component_add_property(ical, i_cal_property_new_relatedto(value));
   }

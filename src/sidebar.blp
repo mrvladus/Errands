@@ -32,7 +32,6 @@ template $ErrandsSidebar: Adw.Bin {
           [entry]
           Box {
             spacing: 6;
-            orientation: vertical;
 
             Entry entry {
               placeholder-text: _("New list name");
@@ -41,7 +40,8 @@ template $ErrandsSidebar: Adw.Bin {
             }
 
             Button create_btn {
-              label: _("Create");
+              tooltip-text: _("Create");
+              icon-name: "errands-select-symbolic";
               sensitive: false;
               clicked => $on_create_btn_clicked_cb(template);
 
@@ -93,7 +93,7 @@ template $ErrandsSidebar: Adw.Bin {
 
         Adw.Sidebar sidebar {
           activated => $on_sidebar_activated_cb();
-
+          // drop => $on_drop_cb();
           Adw.SidebarSection {
             Adw.SidebarItem {
               title: C_("All Tasks", "All");

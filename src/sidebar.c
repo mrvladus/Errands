@@ -5,16 +5,21 @@
 #include "about-dialog.h"
 #include "config.h"
 #include "data.h"
-#include "glib-object.h"
-#include "gtk/gtk.h"
 #include "settings-dialog.h"
 #include "settings.h"
 #include "state.h"
 #include "sync.h"
+#include "task-item.h"
 #include "task-list-item.h"
 #include "task-list.h"
 #include "utils.h"
 
+#include "adwaita.h"
+#include "gdk/gdk.h"
+#include "gio/gio.h"
+#include "glib-object.h"
+#include "glib.h"
+#include "gtk/gtk.h"
 #include <glib/gi18n.h>
 
 static gint sort_func(gconstpointer a, gconstpointer b, gpointer data);
@@ -22,6 +27,8 @@ static gint sort_func(gconstpointer a, gconstpointer b, gpointer data);
 static void on_import_action_cb(GSimpleAction *action, GVariant *param);
 
 static void on_sidebar_activated_cb(AdwSidebar *self, guint index, gpointer user_data);
+static gboolean on_drop_cb(AdwSidebar *self, guint index, const GValue *value, GdkDragAction preferred_action,
+                           gpointer user_data);
 static void on_entry_changed_cb(ErrandsSidebar *self, GtkEntry *entry);
 static void on_entry_activated_cb(ErrandsSidebar *self, GtkEntry *entry);
 static void on_create_btn_clicked_cb(ErrandsSidebar *self, GtkButton *btn);
@@ -85,14 +92,21 @@ static AdwSidebarItem *create_sidebar_task_list_item_create_func(ErrandsTaskList
 static void errands_sidebar_init(ErrandsSidebar *sidebar) {
   self = sidebar;
   gtk_widget_init_template(GTK_WIDGET(self));
+
   GSimpleActionGroup *ag = errands_add_action_group(self, "sidebar");
   errands_add_action(ag, "import", on_import_action_cb, self, NULL);
   errands_add_action(ag, "preferences", errands_settings_dialog_show, self, NULL);
   errands_add_action(ag, "about", errands_about_dialog_show, self, NULL);
   errands_add_action(ag, "sync", errands_sync, NULL, NULL);
 
+  GType dnd_types[] = {ERRANDS_TYPE_TASK_ITEM};
+  adw_sidebar_setup_drop_target(ADW_SIDEBAR(self->sidebar), GDK_ACTION_MOVE | GDK_ACTION_COPY, dnd_types,
+                                G_N_ELEMENTS(dnd_types));
+  g_signal_connect(self->sidebar, "drop", G_CALLBACK(on_drop_cb), NULL);
+
   adw_sidebar_section_bind_model(self->task_lists_section, G_LIST_MODEL(task_lists_model),
                                  (AdwSidebarSectionCreateItemFunc)create_sidebar_task_list_item_create_func, NULL, NULL);
+
   g_list_store_sort(task_lists_model, sort_func, NULL);
   errands_sidebar_update_filter_rows();
 }
@@ -246,61 +260,12 @@ static void on_create_btn_clicked_cb(ErrandsSidebar *self, GtkButton *btn) {
   g_signal_emit_by_name(self->entry, "activate", self, self->entry, NULL);
 }
 
-// --- DND --- //
-
-// static guint on_drop_motion_ctrl_enter_timeout_cb(ErrandsTaskListRow *self) {
-//   if (!gtk_drop_controller_motion_contains_pointer(self->drop_motion_ctrl)) return G_SOURCE_REMOVE;
-//   if (errands_sidebar_row_is_selected(self)) return G_SOURCE_REMOVE;
-//   gtk_widget_activate(GTK_WIDGET(self));
-
-//   return G_SOURCE_REMOVE;
-// }
-
-// static void on_drop_motion_ctrl_enter_cb(ErrandsTaskListRow *self) {
-//   g_timeout_add_once(500, (GSourceOnceFunc)on_drop_motion_ctrl_enter_timeout_cb, self);
-// }
-
-// static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x, double y, ErrandsTaskListRow *self)
-// {
-//   ErrandsTaskItem *drop_item = g_value_get_object(value);
-//   TaskData *drop_data = errands_task_item_get_data(drop_item);
-//   ListData *list_data = self->item->data;
-//   ListData *old_list_data = drop_data->list;
-
-//   bool changing_list = old_list_data != list_data;
-
-//   ErrandsTaskItem *drop_item_parent = errands_task_item_get_parent(drop_item);
-
-//   // Don't move toplevel task in the same list
-//   if (!changing_list && !drop_item_parent) return false;
-
-//   // Get old parent task
-//   ErrandsTask *old_parent_task = NULL;
-//   if (drop_data->parent && drop_item_parent) g_object_get(drop_item_parent, "task-widget", &old_parent_task, NULL);
-
-//   // Move data
-//   bool moved = errands_task_data_move_to_list(drop_data, list_data, NULL);
-//   if (!moved) return false;
-//   errands_list_data_save(list_data);
-//   if (changing_list) errands_list_data_save(old_list_data);
-
-//   // Update task model if necessary
-//   if (drop_item_parent) {
-//     // Add the item to the current task model
-//     GListStore *parent_model = G_LIST_STORE(errands_task_item_get_children_model(drop_item_parent));
-//     guint idx;
-//     if (g_list_store_find(parent_model, drop_item, &idx)) g_list_store_remove(parent_model, idx);
-//     g_object_notify(G_OBJECT(drop_item_parent), "children-model-is-empty");
-//     errands_task_item_set_parent(drop_item, NULL);
-//   }
-
-//   // Update filter
-//   errands_task_list_filter_toplevel(state.main_window->task_list, GTK_FILTER_CHANGE_DIFFERENT);
-//   if (old_parent_task) errands_task_update_progress(old_parent_task);
-
-//   // Update the UI after the operation
-//   // if (changing_list) errands_task_list_row_update(errands_task_list_row_get(old_list_data));
-//   // errands_task_list_row_update(self);
-
-//   return true;
-// }
+static gboolean on_drop_cb(AdwSidebar *self, guint index, const GValue *value, GdkDragAction preferred_action,
+                           gpointer user_data) {
+  if (!G_VALUE_HOLDS(value, ERRANDS_TYPE_TASK_ITEM)) return FALSE;
+  ErrandsTaskItem *task = g_value_get_object(value);
+  ErrandsTaskListItem *drop_list = errands_task_item_get_list(task);
+  g_autoptr(ErrandsTaskListItem) list = g_list_model_get_item(G_LIST_MODEL(task_lists_model), index - 2);
+  if (drop_list == list) return FALSE;
+  return errands_task_item_move(task, NULL, list);
+}

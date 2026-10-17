@@ -3,8 +3,7 @@
 
 #include "task.h"
 #include "config.h"
-#include "glib-object.h"
-#include "glib.h"
+#include "gio/gio.h"
 #include "sidebar.h"
 #include "state.h"
 #include "sync.h"
@@ -13,6 +12,8 @@
 #include "utils.h"
 #include "window.h"
 
+#include <glib-object.h>
+#include <glib.h>
 #include <glib/gi18n.h>
 
 static void errands_task_update_toolbar(ErrandsTask *task);
@@ -434,72 +435,9 @@ static void on_drag_begin_cb(GtkDragSource *source, GdkDrag *drag, ErrandsTask *
   g_object_set(gtk_drag_icon_get_for_drag(drag), "child", g_object_new(GTK_TYPE_BUTTON, "label", label, NULL), NULL);
 }
 
-// static bool __task_data_is_sub_task_of(TaskData *data, TaskData *possible_parent) {
-//   g_autoptr(GPtrArray) subs = g_ptr_array_new();
-//   errands_task_data_get_flat_list(possible_parent, subs);
-//   return g_ptr_array_find(subs, data, NULL);
-// }
-
 static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x, double y, ErrandsTask *task) {
-  //   // Check items
-  //   ErrandsTaskItem *drop_item = g_value_get_object(value);
-  //   ErrandsTaskItem *tgt_item = task->item;
-  //   if (!tgt_item || !drop_item || tgt_item == drop_item) return false;
-  //   TaskData *drop_data = errands_task_item_get_data(drop_item);
-  //   TaskData *tgt_data = errands_task_item_get_data(tgt_item);
-  //   if (__task_data_is_sub_task_of(tgt_data, drop_data)) {
-  //     errands_window_add_toast(_("Can't add task as a child of itself"), 2);
-  //     return false;
-  //   }
-
-  //   bool changing_list = tgt_data->list != drop_data->list;
-
-  //   ListData *drop_data_old_list = drop_data->list;
-
-  //   // Get old parent task
-  //   ErrandsTask *old_parent_task = NULL;
-  //   if (drop_data->parent) {
-  //     ErrandsTaskItem *drop_item_parent = errands_task_item_get_parent(drop_item);
-  //     if (drop_item_parent) g_object_get(drop_item_parent, "task-widget", &old_parent_task, NULL);
-  //   }
-
-  //   // Move task data
-  //   bool moved = errands_task_data_move_to_list(drop_data, tgt_data->list, tgt_data);
-  //   if (!moved) return false;
-
-  //   errands_list_data_save(tgt_data->list);
-  //   if (changing_list) {
-  //     errands_list_data_save(drop_data_old_list);
-  //     errands_sidebar_task_list_update_counter(errands_data_get_uid(drop_data_old_list->ical));
-  //     errands_task_list_update_title(state.main_window->task_list);
-  //   }
-  //   errands_sidebar_task_list_update_counter(errands_data_get_uid(tgt_data->list->ical));
-
-  //   // Add child to target model
-  //   GListStore *tgt_children_model = G_LIST_STORE(errands_task_item_get_children_model(tgt_item));
-  //   g_list_store_append(tgt_children_model, drop_item);
-
-  //   // Remove from parent model
-  //   ErrandsTaskItem *drop_parent_item = errands_task_item_get_parent(drop_item);
-  //   if (drop_parent_item) {
-  //     GListStore *drop_parent_model = G_LIST_STORE(errands_task_item_get_children_model(drop_parent_item));
-  //     guint idx;
-  //     if (drop_parent_model && g_list_store_find(drop_parent_model, drop_item, &idx))
-  //       g_list_store_remove(drop_parent_model, idx);
-  //   } else {
-  //     errands_task_list_filter_toplevel(state.main_window->task_list, GTK_FILTER_CHANGE_DIFFERENT);
-  //   }
-  //   errands_task_item_set_parent(drop_item, tgt_item);
-
-  //   // Uncomplete and uncancel
-  //   if (errands_data_is_completed(tgt_data->ical) && !errands_data_is_completed(drop_data->ical))
-  //     gtk_widget_activate_action(GTK_WIDGET(task), "task.complete", NULL, NULL);
-  //   if (errands_data_get_cancelled(tgt_data->ical) && !errands_data_get_cancelled(drop_data->ical))
-  //     gtk_widget_activate_action(GTK_WIDGET(task), "task.cancel", NULL, NULL);
-
-  //   // Update progress
-  //   errands_task_item_update(tgt_item);
-  //   if (!changing_list && old_parent_task) errands_task_item_update(old_parent_task->item);
-
-  return true;
+  ErrandsTaskItem *drop_item = g_value_get_object(value);
+  ErrandsTaskItem *tgt_item = task->item;
+  if (!tgt_item || !drop_item) return FALSE;
+  return errands_task_item_move(drop_item, tgt_item, errands_task_item_get_list(tgt_item));
 }
