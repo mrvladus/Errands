@@ -131,7 +131,9 @@ void errands_date_chooser_reset(ErrandsDateChooser *self) {
   g_object_set(self->reset_btn, "visible", false, NULL);
 }
 
-ICalTime *errands_date_chooser_get_dt(ErrandsDateChooser *self) { return i_cal_time_clone(self->dt); }
+ICalTime *errands_date_chooser_get_dt(ErrandsDateChooser *self) {
+  return i_cal_time_convert_to_zone(self->dt, i_cal_timezone_get_utc_timezone());
+}
 
 void errands_date_chooser_set_dt(ErrandsDateChooser *self, ICalTime *dt) {
   g_clear_object(&self->dt);
