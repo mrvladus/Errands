@@ -319,7 +319,7 @@ gboolean caldav_calendar_set_name(const CalDAVCalendar *c, const gchar *name) {
   return caldav_calendar_set_properties(c, name, NULL);
 }
 
-gboolean caldav_calendar_create_task(CalDAVCalendar *c, ICalComponent *task) {
+gboolean caldav_calendar_push_task(CalDAVCalendar *c, ICalComponent *task) {
   g_assert_nonnull(c);
   g_assert_nonnull(c->e_cal_client);
   g_assert_nonnull(task);
@@ -336,39 +336,23 @@ gboolean caldav_calendar_create_task(CalDAVCalendar *c, ICalComponent *task) {
     g_autoptr(ICalTime) now = i_cal_time_new_current_with_zone(i_cal_timezone_get_utc_timezone());
     i_cal_component_set_dtstamp(task, now);
   }
-  // Create the task on the server
-  g_autoptr(GError) error = NULL;
-  g_autofree gchar *out_uid = NULL;
-  if (!e_cal_client_create_object_sync(c->e_cal_client, task, E_CAL_OPERATION_FLAG_CONFLICT_KEEP_LOCAL, &out_uid, NULL, &error)) {
-    caldav__warning("Failed to create task: %s", error->message);
-    return FALSE;
-  }
-  // Update the UID if it has changed
-  const char *old_uid = i_cal_component_get_uid(task);
-  if (old_uid && out_uid && g_strcmp0(old_uid, out_uid) != 0) {
-    caldav__info("UID changed by server: '%s' -> '%s'", old_uid, out_uid);
-    i_cal_component_set_uid(task, out_uid);
-  }
-  caldav__debug("Created remote task in calendar '%s': '%s'", c->uid, out_uid);
-
-  return TRUE;
-}
-
-gboolean caldav_calendar_update_task(CalDAVCalendar *c, ICalComponent *task) {
-  g_assert_nonnull(c);
-  g_assert_nonnull(c->e_cal_client);
-  g_assert_nonnull(task);
-  g_assert(I_CAL_IS_COMPONENT(task));
-  g_assert(i_cal_component_isa(task) == I_CAL_VTODO_COMPONENT);
-
   const gchar *uid = i_cal_component_get_uid(task);
-  if (!uid || !*uid) {
-    caldav__error("Cannot update task: missing UID");
-    return FALSE;
-  }
   g_autoptr(GError) error = NULL;
   if (!e_cal_client_modify_object_sync(c->e_cal_client, task, E_CAL_OBJ_MOD_THIS, E_CAL_OPERATION_FLAG_NONE, NULL, &error)) {
     caldav__error("Failed to update task '%s': %s", uid, error->message);
+    caldav__info("Trying to create task: '%s'", uid);
+    g_autofree gchar *out_uid = NULL;
+    if (!e_cal_client_create_object_sync(c->e_cal_client, task, E_CAL_OPERATION_FLAG_CONFLICT_KEEP_LOCAL, &out_uid, NULL,
+                                         &error)) {
+      caldav__warning("Failed to create task: %s", error->message);
+      return FALSE;
+    } else {
+      if (uid && out_uid && g_strcmp0(uid, out_uid) != 0) {
+        caldav__info("UID changed by server: '%s' -> '%s'", old_uid, out_uid);
+        i_cal_component_set_uid(task, out_uid);
+      }
+      return TRUE;
+    }
     return FALSE;
   }
   caldav__info("Updated task: '%s'", uid);
@@ -409,7 +393,7 @@ gboolean caldav_calendar_remove(const CalDAVCalendar *calendar) {
     caldav__error("Remote calendar '%s' was deleted, but local source removal failed: %s", calendar->href, error->message);
     return FALSE;
   }
-  g_ptr_array_remove(calendar->client->calendars, calendar);
+  g_ptr_array_remove(calendar->client->calendars, (CalDAVCalendar *)calendar);
   calendar = NULL;
 
   return TRUE;

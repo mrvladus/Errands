@@ -365,13 +365,7 @@ static inline icaltimetype icaltime_merge_date_and_time(const struct icaltimetyp
 }
 
 static inline ICalTime *i_cal_time_get_date_time_now() {
-  g_autoptr(GDateTime) dt = g_date_time_new_now_local();
-  ICalTime *now = i_cal_time_new_today();
-  i_cal_time_set_is_date(now, false);
-  i_cal_time_set_hour(now, g_date_time_get_hour(dt));
-  i_cal_time_set_minute(now, g_date_time_get_minute(dt));
-  i_cal_time_set_second(now, g_date_time_get_second(dt));
-  return now;
+  return i_cal_time_new_current_with_zone(i_cal_timezone_get_utc_timezone());
 }
 
 static inline bool i_cal_recurrence_compare(ICalRecurrence *a, ICalRecurrence *b) {

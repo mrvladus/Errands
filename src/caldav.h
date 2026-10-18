@@ -85,7 +85,6 @@ const gchar *caldav_calendar_get_uid(const CalDAVCalendar *c);
 gboolean caldav_calendar_set_color(const CalDAVCalendar *c, const gchar *color);
 gboolean caldav_calendar_set_name(const CalDAVCalendar *c, const gchar *name);
 gboolean caldav_calendar_set_properties(const CalDAVCalendar *c, const gchar *name, const gchar *color);
-gboolean caldav_calendar_create_task(CalDAVCalendar *c, ICalComponent *task);
-gboolean caldav_calendar_update_task(CalDAVCalendar *c, ICalComponent *task);
+gboolean caldav_calendar_push_task(CalDAVCalendar *c, ICalComponent *task);
 gboolean caldav_calendar_remove_task(CalDAVCalendar *c, const char *uid);
 void caldav_calendar_free(CalDAVCalendar *c);

@@ -454,6 +454,8 @@ ErrandsTaskItem *errands_task_item_new(ICalComponent *ical, ErrandsTaskListItem 
   update_search_blob(self);
   errands_task_item_update(self);
 
+  if (!errands_data_get_synced(self->ical)) errands_sync_push_task(self);
+
   return self;
 }
 
@@ -589,7 +591,7 @@ ErrandsTaskListItem *errands_task_item_create_task(ErrandsTaskItem *parent, cons
   errands_task_list_item_save(parent->list);
   errands_task_item_update(parent);
 
-  errands_sync_create_task(task);
+  errands_sync_push_task(task);
 
   return task->list;
 }
@@ -628,7 +630,7 @@ bool errands_task_item_move(ErrandsTaskItem *self, ErrandsTaskItem *parent, Erra
   ErrandsTaskListItem *old_list = self->list;
   if (old_list != list) move_to_list_recursive(self, list);
   errands_task_item_set_parent(self, parent);
-  errands_sync_update_task(self);
+  errands_sync_push_task(self);
   g_list_store_append(parent ? parent->children_model : list->tasks, self);
   errands_task_item_set_parent(self, parent ? parent : NULL);
   g_list_store_remove_data(old_parent_model, self);
