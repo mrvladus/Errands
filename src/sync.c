@@ -66,7 +66,6 @@ typedef struct {
   gchar *name;
   gchar *color;
 
-  const CalDAVCalendar *calendar;
   ErrandsTaskListItem *list;
   ErrandsTaskItem *task;
   ICalComponent *ical;
@@ -106,7 +105,6 @@ static void obj_push(PushObj *o) {
     CalDAVCalendar *calendar = caldav_client_find_calendar(client, o->uid);
     if (calendar) {
       o->op = PUSH_OBJ_LIST_UPDATE;
-      o->calendar = calendar;
       obj_push(o);
       return;
     }
@@ -116,24 +114,31 @@ static void obj_push(PushObj *o) {
   } break;
 
   case PUSH_OBJ_LIST_UPDATE: {
-    g_message("Sync: Updating list on remote: %s", caldav_calendar_get_uid(o->calendar));
-    o->pushed = caldav_calendar_set_properties(o->calendar, o->name, o->color);
+    CalDAVCalendar *c = caldav_client_find_calendar(client, o->uid);
+    if (!c) return;
+    g_message("Sync: Updating list on remote: %s", o->uid);
+    o->pushed = caldav_calendar_set_properties(c, o->name, o->color);
   } break;
 
   case PUSH_OBJ_LIST_DELETE: {
-    g_message("Sync: Deleting list on remote: %s", caldav_calendar_get_uid(o->calendar));
-    o->pushed = caldav_calendar_remove(o->calendar);
+    CalDAVCalendar *c = caldav_client_find_calendar(client, o->uid);
+    if (!c) return;
+    g_message("Sync: Deleting list on remote: %s", o->uid);
+    o->pushed = caldav_calendar_remove(c);
   } break;
 
   case PUSH_OBJ_TASK_PUSH: {
-    g_message("Sync: Creating/Updating task '%s' in remote calendar '%s'", errands_data_get_uid(o->ical),
-              caldav_calendar_get_uid(o->calendar));
-    o->pushed = caldav_calendar_push_task((CalDAVCalendar *)o->calendar, o->ical);
+    CalDAVCalendar *c = caldav_client_find_calendar(client, o->list->uid);
+    if (!c) return;
+    g_message("Sync: Creating/Updating task '%s' in remote calendar '%s'", o->uid, o->list->uid);
+    o->pushed = caldav_calendar_push_task(c, o->ical);
   } break;
 
   case PUSH_OBJ_TASK_DELETE: {
-    g_message("Sync: Deleting task '%s' from remote list '%s'", o->uid, caldav_calendar_get_uid(o->calendar));
-    o->pushed = caldav_calendar_remove_task((CalDAVCalendar *)o->calendar, o->uid);
+    CalDAVCalendar *c = caldav_client_find_calendar(client, o->list->uid);
+    if (!c) return;
+    g_message("Sync: Deleting task '%s' from remote list '%s'", o->uid, o->list->uid);
+    o->pushed = caldav_calendar_remove_task(c, o->uid);
   } break;
   }
   g_idle_add_once(obj_push_idle_cb, o);
@@ -545,7 +550,7 @@ void errands_sync_cleanup(void) {
 }
 
 gboolean errands_sync(void) {
-  if (!ensure_client_connected()) {
+  if (!errands_settings_get_sync_enabled(state.settings)) {
     g_message("Sync: Disable");
     return G_SOURCE_REMOVE;
   }
@@ -563,7 +568,7 @@ void errands_sync_create_list(ErrandsTaskListItem *list) {
   g_assert_nonnull(list);
   g_assert(ERRANDS_IS_TASK_LIST_ITEM(list));
 
-  if (!ensure_client_connected()) return;
+  if (!errands_settings_get_sync_enabled(state.settings)) return;
 
   PushObj *o = objects_to_push_has(list->uid, PUSH_OBJ_LIST_CREATE);
   if (o) {
@@ -582,7 +587,7 @@ void errands_sync_update_list(ErrandsTaskListItem *list) {
   g_assert_nonnull(list);
   g_assert(ERRANDS_IS_TASK_LIST_ITEM(list));
 
-  if (!ensure_client_connected()) return;
+  if (!errands_settings_get_sync_enabled(state.settings)) return;
 
   PushObj *o = objects_to_push_has(list->uid, PUSH_OBJ_LIST_UPDATE);
   if (o) {
@@ -590,10 +595,7 @@ void errands_sync_update_list(ErrandsTaskListItem *list) {
     return;
   }
 
-  CalDAVCalendar *c = caldav_client_find_calendar(client, list->uid);
-  if (!c) return;
   o = push_obj_new(PUSH_OBJ_LIST_UPDATE, list->uid);
-  o->calendar = c;
   o->list = g_object_ref(list);
   o->name = g_strdup(list->title);
   o->color = g_strdup(gdk_rgba_to_str(&list->color));
@@ -604,7 +606,7 @@ void errands_sync_delete_list(ErrandsTaskListItem *list) {
   g_assert_nonnull(list);
   g_assert(ERRANDS_IS_TASK_LIST_ITEM(list));
 
-  if (!ensure_client_connected()) return;
+  if (!errands_settings_get_sync_enabled(state.settings)) return;
 
   PushObj *o = objects_to_push_has(list->uid, PUSH_OBJ_LIST_DELETE);
   if (o) {
@@ -612,10 +614,7 @@ void errands_sync_delete_list(ErrandsTaskListItem *list) {
     return;
   }
 
-  CalDAVCalendar *c = caldav_client_find_calendar(client, list->uid);
-  if (!c) return;
   o = push_obj_new(PUSH_OBJ_LIST_DELETE, list->uid);
-  o->calendar = c;
   o->list = g_object_ref(list);
   g_ptr_array_add(objects_to_push, o);
 }
@@ -624,7 +623,7 @@ void errands_sync_push_task(ErrandsTaskItem *task) {
   g_assert_nonnull(task);
   g_assert(ERRANDS_IS_TASK_ITEM(task));
 
-  if (!ensure_client_connected()) return;
+  if (!errands_settings_get_sync_enabled(state.settings)) return;
 
   const char *uid = errands_task_item_get_uid(task);
   PushObj *o = objects_to_push_has(uid, PUSH_OBJ_TASK_PUSH);
@@ -633,10 +632,8 @@ void errands_sync_push_task(ErrandsTaskItem *task) {
     return;
   }
 
-  CalDAVCalendar *c = caldav_client_find_calendar(client, errands_task_item_get_list(task)->uid);
-  if (!c) return;
   o = push_obj_new(PUSH_OBJ_TASK_PUSH, uid);
-  o->calendar = c;
+  o->list = g_object_ref(errands_task_item_get_list(task));
   o->task = g_object_ref(task);
   o->ical = errands_task_item_get_ical(task);
   g_ptr_array_add(objects_to_push, o);
@@ -646,7 +643,7 @@ void errands_sync_delete_task(ErrandsTaskItem *task) {
   g_assert_nonnull(task);
   g_assert(ERRANDS_IS_TASK_ITEM(task));
 
-  if (!ensure_client_connected()) return;
+  if (!errands_settings_get_sync_enabled(state.settings)) return;
 
   const char *uid = errands_task_item_get_uid(task);
   PushObj *o = objects_to_push_has(uid, PUSH_OBJ_TASK_DELETE);
@@ -655,10 +652,8 @@ void errands_sync_delete_task(ErrandsTaskItem *task) {
     return;
   }
 
-  CalDAVCalendar *c = caldav_client_find_calendar(client, errands_task_item_get_list(task)->uid);
-  if (!c) return;
   o = push_obj_new(PUSH_OBJ_TASK_DELETE, uid);
-  o->calendar = c;
+  o->list = g_object_ref(errands_task_item_get_list(task));
   o->task = g_object_ref(task);
   g_ptr_array_add(objects_to_push, o);
 }

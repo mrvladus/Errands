@@ -9,7 +9,6 @@ e.g. GLib's g_autoptr, g_auto and g_autofree"
 
 #include "config.h"
 #include "data.h"
-#include "notifications.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "state.h"
@@ -56,9 +55,6 @@ int main(int argc, char **argv) {
   state.settings = errands_settings_new();
   errands_sync_init();
   errands_data_init();
-  errands_notifications_init();
-
-  errands_notifications_start();
 
   // Run application
   state.app = adw_application_new(APP_ID, G_APPLICATION_DEFAULT_FLAGS);
@@ -70,9 +66,8 @@ int main(int argc, char **argv) {
   // Cleanup
   g_object_unref(state.app);
   errands_data_cleanup();
-  errands_notifications_cleanup();
   g_object_unref(state.settings);
-  // errands_sync_cleanup();
+  errands_sync_cleanup();
 
   return status;
 }
