@@ -6,7 +6,6 @@
 #include "task-item.h"
 #include "task-list-item.h"
 
-void errands_sync_init(void);
 gboolean errands_sync(void);
 void errands_sync_cleanup(void);
 

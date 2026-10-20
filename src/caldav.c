@@ -484,7 +484,7 @@ static inline gboolean caldav__principal_cb(EWebDAVSession *webdav, xmlNodePtr p
 }
 
 static inline gchar *caldav__discover_principal_url(CalDAVClient *c) {
-  g_assert_nonnull(c->caldav_url);
+  if (!c->caldav_url) return NULL;
 
   g_autoptr(GError) error = NULL;
   g_autoptr(EWebDAVSession) session = e_webdav_session_new(c->server_source);
@@ -530,7 +530,7 @@ static inline gboolean caldav__discover_home_set_cb(EWebDAVSession *webdav, xmlN
 }
 
 static inline gchar *caldav__discover_home_set(CalDAVClient *c) {
-  g_assert_nonnull(c->principal_url);
+  if (!c->principal_url) return NULL;
 
   g_autoptr(GError) error = NULL;
   g_autoptr(EWebDAVSession) session = e_webdav_session_new(c->server_source);
@@ -612,12 +612,17 @@ CalDAVClient *caldav_client_new(CalDAVClientConfig config) {
   c->principal_url = caldav__discover_principal_url(c);
   c->home_set_url = caldav__discover_home_set(c);
 
+  if (!c->caldav_url || !c->principal_url || !c->home_set_url) {
+    caldav_client_free(c);
+    return NULL;
+  }
+
   caldav_client_poll(c);
 
   return c;
 }
 
-gboolean caldav_client_poll(CalDAVClient *c) {
+void caldav_client_poll(CalDAVClient *c) {
   g_assert_nonnull(c);
   g_assert_nonnull(c->server_source);
   g_assert_nonnull(c->credentials);
@@ -630,7 +635,7 @@ gboolean caldav_client_poll(CalDAVClient *c) {
   if (!e_webdav_discover_sources_sync(c->server_source, NULL, E_WEBDAV_DISCOVER_SUPPORTS_TASKS, c->credentials, NULL, NULL,
                                       &discovered, NULL, NULL, &error)) {
     caldav__warning("Discovery failed: %s", error->message);
-    return G_SOURCE_CONTINUE;
+    return;
   }
 
   // Mark all calendars as not seen for this round
@@ -686,8 +691,6 @@ gboolean caldav_client_poll(CalDAVClient *c) {
   }
 
   e_webdav_discover_free_discovered_sources(discovered);
-
-  return G_SOURCE_CONTINUE;
 }
 
 CalDAVCalendar *caldav_client_create_calendar(CalDAVClient *c, const char *uid, const gchar *name, const gchar *color) {

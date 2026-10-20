@@ -25,7 +25,7 @@ static void obj_push_idle_cb(gpointer user_data);
 
 // ---------- GLOBAL ---------- //
 
-static gboolean initialized = false;
+static gint failed_attempts = 0;
 static gboolean sync_in_progress = false;
 static CalDAVClient *client = NULL;
 static GPtrArray *objects_to_push = NULL;
@@ -528,24 +528,20 @@ static inline bool ensure_client_connected(void) {
     };
     client = caldav_client_new(config);
   }
-  if (!client) g_warning("Sync: Failed to connect to CalDAV remote.");
+  if (!client) {
+    errands_window_add_toast(_("Failed to connect to CalDAV remote."), 5);
+    failed_attempts++;
+  }
+  failed_attempts = 0;
   return client != NULL;
 }
 
 // ---------- PUBLIC ---------- //
 
-void errands_sync_init(void) {
-  if (initialized) return;
-  g_message("Sync: Initialize");
-  if (!objects_to_push) objects_to_push = g_ptr_array_new_with_free_func((GDestroyNotify)obj_free);
-  initialized = true;
-}
-
 void errands_sync_cleanup(void) {
   g_message("Sync: Cleanup");
   g_clear_pointer(&objects_to_push, g_ptr_array_unref);
   g_clear_pointer(&client, caldav_client_free);
-  initialized = FALSE;
 }
 
 gboolean errands_sync(void) {
@@ -553,7 +549,12 @@ gboolean errands_sync(void) {
     g_message("Sync: Disable");
     return G_SOURCE_REMOVE;
   }
+  if (failed_attempts > 3) {
+    errands_window_add_toast(_("Failed 3 attempts to sync. Disabling for now."), 5);
+    return G_SOURCE_REMOVE;
+  }
   g_message("Sync: Start");
+  if (!objects_to_push) objects_to_push = g_ptr_array_new_with_free_func((GDestroyNotify)obj_free);
   if (sync_in_progress) {
     g_message("Sync: Already in progress");
     return G_SOURCE_CONTINUE;

@@ -53,7 +53,6 @@ int main(int argc, char **argv) {
 
   // Initialize systems
   state.settings = errands_settings_new();
-  errands_sync_init();
   errands_data_init();
 
   // Run application
