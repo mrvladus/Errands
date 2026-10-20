@@ -403,7 +403,7 @@ static void errands_task_item_init(ErrandsTaskItem *self) {
 
 // --- PRIVATE --- //
 
-static void task_item_save_and_sync(ErrandsTaskItem *self) {
+void errands_task_item_save_and_sync(ErrandsTaskItem *self) {
   if (self->lock || !self->list || !self->ical) return;
   errands_task_list_item_save(self->list);
   errands_sync_push_task(self);

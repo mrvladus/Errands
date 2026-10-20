@@ -51,7 +51,6 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     self->uid = g_strdup(uid);
     errands_data_set_uid(self->ical, self->uid);
     errands_task_list_item_save(self);
-    if (!self->lock) errands_sync_update_list(self);
   } break;
 
   case PROP_TITLE: {
@@ -61,7 +60,6 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     self->title = g_strdup(title);
     errands_data_set_list_name(self->ical, self->title);
     errands_task_list_item_save(self);
-    if (!self->lock) errands_sync_update_list(self);
   } break;
 
   case PROP_COLOR: {

@@ -21,8 +21,7 @@
 #define TODO(format, ...) fprintf(stderr, "%s:%d:%s: TODO: " format "\n", __FILE__, __LINE__, __func__, ##__VA_ARGS__)
 #define HERE              fprintf(stderr, "%s:%d:%s: HERE\n", __FILE__, __LINE__, __func__)
 
-#define for_range(var, idx_start, idx_end)                                                                                       \
-  for (__typeof__(idx_end) var = (__typeof__(idx_end))(idx_start); var < (idx_end); ++var)
+#define for_range(var, idx_start, idx_end)  for (gint64 var = (gint64)(idx_start); var < (gint64)(idx_end); ++var)
 #define for_item_in_gptrarray(T, item, arr) for (T *item = (T *)arr->pdata; item < arr->pdata + arr->len; item++)
 #define CONTINUE_IF(statement)                                                                                                   \
   if (statement) continue

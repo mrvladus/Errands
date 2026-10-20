@@ -277,8 +277,7 @@ static gboolean remote_event_idle_cb(gpointer user_data) {
       errands_task_list_update(state.main_window->task_list);
     }
     if (data->color) {
-      char color[8];
-      gdk_rgba_to_hex_string(&list->color, color);
+      const char *color = gdk_rgba_to_str(&list->color);
       if (!g_str_equal(data->color, color)) errands_task_list_item_set_color_from_string(list, data->color);
     }
     g_message("Sync: Calendar properties changed on remote: %s", uid);
