@@ -1,0 +1,657 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the errands package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: errands\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-05-16 13:01+0300\n"
+"PO-Revision-Date: 2026-01-26 07:05+0500\n"
+"Last-Translator: Baurzhan Muftakhidinov <baurthefirst@gmail.com>\n"
+"Language-Team: Kazakh <kk_KZ@googlegroups.com>\n"
+"Language: kk\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Poedit 3.8\n"
+
+#: errands/widgets/shared/components/buttons.py:45
+msgid "Info"
+msgstr "Ақпарат"
+
+#: errands/widgets/shared/components/dialogs.py:31
+msgid "Are you sure?"
+msgstr "Сенімдісіз бе?"
+
+#: errands/widgets/shared/components/dialogs.py:35
+#: errands/widgets/sidebar.py:300 errands/widgets/task.py:250
+#: errands/widgets/task_list/task_list_sidebar_row.py:99
+#: errands/widgets/today/today_task.py:146
+msgid "Cancel"
+msgstr "Бас тарту"
+
+#: errands/widgets/shared/color_selector.py:32
+#: errands/widgets/shared/task_toolbar/toolbar.py:100
+msgid "None"
+msgstr "Ешқандай"
+
+#: errands/widgets/shared/color_selector.py:41
+msgid "Blue"
+msgstr "Көк"
+
+#: errands/widgets/shared/color_selector.py:50
+msgid "Green"
+msgstr "Жасыл"
+
+#: errands/widgets/shared/color_selector.py:61
+msgid "Yellow"
+msgstr "Сары"
+
+#: errands/widgets/shared/color_selector.py:72
+msgid "Orange"
+msgstr "Қызғылт сары"
+
+#: errands/widgets/shared/color_selector.py:81
+msgid "Red"
+msgstr "Қызыл"
+
+#: errands/widgets/shared/color_selector.py:92
+msgid "Purple"
+msgstr "Күлгін"
+
+#: errands/widgets/shared/color_selector.py:101
+msgid "Brown"
+msgstr "Қоңыр"
+
+#: errands/widgets/shared/datetime_picker.py:138
+#: errands/widgets/today/today.py:57
+#: errands/widgets/today/today_sidebar_row.py:30 errands/widgets/window.py:69
+msgid "Today"
+msgstr "Бүгін"
+
+#: errands/widgets/shared/datetime_picker.py:143
+msgid "Tomorrow"
+msgstr "Ертең"
+
+#: errands/widgets/shared/datetime_picker.py:154
+msgid "Now"
+msgstr "Қазір"
+
+#: errands/widgets/shared/datetime_picker.py:160
+#: errands/widgets/trash/trash.py:40
+#: errands/widgets/trash/trash_sidebar_row.py:68
+msgid "Clear"
+msgstr "Тазарту"
+
+#: errands/widgets/shared/datetime_picker.py:214
+msgid "Set Date"
+msgstr "Күнді орнату"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:44
+msgid "Start / Due Date"
+msgstr "Басталу / Мерзімі"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:49 errands/lib/utils.py:24
+msgid "Date"
+msgstr "Күн"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:59
+#: errands/widgets/shared/task_toolbar/notes_window.py:29
+msgid "Notes"
+msgstr "Жазбалар"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:72
+msgid "Priority"
+msgstr "Басымдық"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:90
+msgid "High"
+msgstr "Жоғары"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:94
+msgid "Medium"
+msgstr "Орташа"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:98
+msgid "Low"
+msgstr "Төмен"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:103
+msgid "Custom"
+msgstr "Пайдаланушылық"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:113
+msgid "No Tags"
+msgstr "Тегтер жоқ"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:134
+#: errands/widgets/tags/tags.py:63 errands/widgets/tags/tags_sidebar_row.py:32
+#: errands/widgets/window.py:72
+msgid "Tags"
+msgstr "Тегтер"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:157
+#: errands/widgets/shared/task_toolbar/attachments_window.py:30
+msgid "Attachments"
+msgstr "Тіркемелер"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:191
+#: errands/widgets/shared/task_toolbar/toolbar.py:294
+msgid "Created:"
+msgstr "Жасалған:"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:202
+#: errands/widgets/shared/task_toolbar/toolbar.py:295
+msgid "Changed:"
+msgstr "Өзгертілген:"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:215
+msgid "More"
+msgstr "Көбірек"
+
+#: errands/widgets/shared/task_toolbar/attachments_window.py:33
+msgid "No Files Attached"
+msgstr "Файлдар тіркелмеген"
+
+#: errands/widgets/shared/task_toolbar/attachments_window.py:56
+msgid "Add Attachment"
+msgstr "Тіркемені қосу"
+
+#: errands/widgets/shared/task_toolbar/attachments_window.py:119
+msgid "Open File"
+msgstr "Файлды ашу"
+
+#: errands/widgets/shared/task_toolbar/attachments_window.py:123
+#: errands/widgets/tags/tags.py:140
+#: errands/widgets/task_list/task_list_sidebar_row.py:60
+#: errands/widgets/task_list/task_list_sidebar_row.py:191
+#: errands/widgets/trash/trash.py:159
+msgid "Delete"
+msgstr "Өшіру"
+
+#: errands/widgets/shared/task_toolbar/attachments_window.py:132
+msgid "Open Containing Folder"
+msgstr "Құрамындағы буманы ашу"
+
+#: errands/widgets/shared/task_toolbar/datetime_window.py:29
+msgid "Date and Time"
+msgstr "Күн мен уақыт"
+
+#: errands/widgets/shared/task_toolbar/datetime_window.py:39
+#: errands/widgets/shared/task_toolbar/datetime_window.py:41
+msgid "Due"
+msgstr "Мерзімі"
+
+#: errands/widgets/shared/task_toolbar/datetime_window.py:54
+#: errands/widgets/shared/task_toolbar/datetime_window.py:56
+msgid "Start"
+msgstr "Басталуы"
+
+#: errands/widgets/sidebar.py:42
+msgid "Add List (Ctrl+Shift+A)"
+msgstr "Тізім қосу (Ctrl+Shift+A)"
+
+#: errands/widgets/sidebar.py:61
+msgid "Syncing..."
+msgstr "Синхрондалуда..."
+
+#: errands/widgets/sidebar.py:67
+msgid "Add new List"
+msgstr "Жаңа тізім қосу"
+
+#: errands/widgets/sidebar.py:68
+msgid "Click \"+\" button"
+msgstr "\"+\" батырмасын шерту"
+
+#. Task lists group
+#: errands/widgets/sidebar.py:94 errands/widgets/preferences.py:66
+msgid "Task Lists"
+msgstr "Тапсырмалар тізімі"
+
+#: errands/widgets/sidebar.py:106 errands/widgets/window.py:44
+#: errands/widgets/window.py:167 data/io.github.mrvladus.List.desktop.in.in:3
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:6
+msgid "Errands"
+msgstr "Тапсырмалар"
+
+#: errands/widgets/sidebar.py:114
+msgid "Main Menu"
+msgstr "Негізгі мәзір"
+
+#: errands/widgets/sidebar.py:121 data/resources/gtk/help-overlay.ui:42
+msgid "Sync / Fetch Tasks"
+msgstr "Тапсырмаларды синхрондау / алу"
+
+#: errands/widgets/sidebar.py:128
+msgid "Import Task List"
+msgstr "Тапсырмалар тізімін импорттау"
+
+#: errands/widgets/sidebar.py:135 data/resources/gtk/help-overlay.ui:20
+msgid "Preferences"
+msgstr "Қалаулар"
+
+#: errands/widgets/sidebar.py:138
+msgid "Keyboard Shortcuts"
+msgstr "Пернетақта жарлықтары"
+
+#: errands/widgets/sidebar.py:142
+msgid "About Errands"
+msgstr "Errands туралы"
+
+#: errands/widgets/sidebar.py:144 data/resources/gtk/help-overlay.ui:27
+msgid "Quit"
+msgstr "Шығу"
+
+#: errands/widgets/sidebar.py:291
+msgid "New List Name"
+msgstr "Жаңа тізім атауы"
+
+#: errands/widgets/sidebar.py:295 data/resources/gtk/help-overlay.ui:57
+msgid "Add List"
+msgstr "Тізім қосу"
+
+#: errands/widgets/sidebar.py:301
+msgid "Add"
+msgstr "Қосу"
+
+#: errands/widgets/tags/tags.py:32
+msgid "No Tags Found"
+msgstr "Тегтер табылмады"
+
+#: errands/widgets/tags/tags.py:33
+msgid "Add new Tags in the entry above"
+msgstr "Жоғарыдағы өріске жаңа тегтерді қосыңыз"
+
+#: errands/widgets/tags/tags.py:82
+msgid "Add new Tag"
+msgstr "Жаңа тег қосу"
+
+#: errands/widgets/task.py:79
+#: errands/widgets/task_list/task_list_sidebar_row.py:125
+#: errands/widgets/today/today_task.py:73
+msgid "Exported"
+msgstr "Экспортталды"
+
+#: errands/widgets/task.py:87 errands/widgets/today/today_task.py:81
+msgid "Copied to Clipboard"
+msgstr "Алмасу буферіне көшірілді"
+
+#: errands/widgets/task.py:153
+msgid "Toggle Sub-Tasks"
+msgstr "Ішкі тапсырмалар күйін ауыстыру"
+
+#: errands/widgets/task.py:161 errands/widgets/today/today_task.py:100
+msgid "Toggle Completion"
+msgstr "Орындалу күйін ауыстыру"
+
+#: errands/widgets/task.py:191
+msgid "Toggle Toolbar"
+msgstr "Саймандар панелі күйін ауыстыру"
+
+#: errands/widgets/task.py:210 errands/widgets/task.py:230
+#: errands/widgets/today/today_task.py:117
+#: errands/widgets/today/today_task.py:127
+msgid "Edit"
+msgstr "Түзету"
+
+#: errands/widgets/task.py:211 errands/widgets/today/today_task.py:118
+msgid "Move to Trash"
+msgstr "Қоқыс шелегіне жылжыту"
+
+#: errands/widgets/task.py:212 errands/widgets/today/today_task.py:119
+msgid "Copy to Clipboard"
+msgstr "Алмасу буферіне көшіру"
+
+#: errands/widgets/task.py:213
+#: errands/widgets/task_list/task_list_sidebar_row.py:192
+#: errands/widgets/today/today_task.py:120
+msgid "Export"
+msgstr "Экспорттау"
+
+#: errands/widgets/task.py:306 errands/widgets/task_list/task_list.py:84
+msgid "Completed"
+msgstr "Орындалды"
+
+#: errands/widgets/task.py:330
+msgid "Add new Sub-Task"
+msgstr "Жаңа ішкі тапсырма қосу"
+
+#: errands/widgets/task.py:552 errands/widgets/task_list/task_list.py:238
+msgid "Completed:"
+msgstr "Орындалды:"
+
+#: errands/widgets/task.py:945
+msgid "Delete Tag"
+msgstr "Тегті өшіру"
+
+#: errands/widgets/task_list/task_list.py:50
+msgid "Toggle Completed Tasks"
+msgstr "Орындалған тапсырмаларды ауыстыру"
+
+#: errands/widgets/task_list/task_list.py:58
+msgid "Delete Completed Tasks"
+msgstr "Орындалған тапсырмаларды өшіру"
+
+#: errands/widgets/task_list/task_list.py:73
+msgid "Scroll Up"
+msgstr "Жоғары айналдыру"
+
+#: errands/widgets/task_list/task_list.py:143
+msgid "Add new Task"
+msgstr "Жаңа тапсырма қосу"
+
+#: errands/widgets/task_list/task_list_sidebar_row.py:59
+msgid "List will be permanently deleted"
+msgstr "Тізім біржола өшіріледі"
+
+#: errands/widgets/task_list/task_list_sidebar_row.py:89
+msgid "New Name"
+msgstr "Жаңа атау"
+
+#: errands/widgets/task_list/task_list_sidebar_row.py:94
+msgid "Rename List"
+msgstr "Тізім атын өзгерту"
+
+#: errands/widgets/task_list/task_list_sidebar_row.py:100
+msgid "Save"
+msgstr "Сақтау"
+
+#: errands/widgets/task_list/task_list_sidebar_row.py:123
+msgid "Export failed"
+msgstr "Экспорттау сәтсіз аяқталды"
+
+#: errands/widgets/task_list/task_list_sidebar_row.py:158
+msgid "Color"
+msgstr "Түс"
+
+#: errands/widgets/task_list/task_list_sidebar_row.py:190
+msgid "Rename"
+msgstr "Атын өзгерту"
+
+#: errands/widgets/today/today.py:31
+msgid "No Tasks for Today"
+msgstr "Бүгінге тапсырмалар жоқ"
+
+#: errands/widgets/trash/trash.py:31
+msgid "Empty Trash"
+msgstr "Қоқыс шелегін тазарту"
+
+#: errands/widgets/trash/trash.py:32
+msgid "No deleted items"
+msgstr "Өшірілген элементтер жоқ"
+
+#: errands/widgets/trash/trash.py:55 errands/widgets/trash/trash.py:189
+#: errands/widgets/trash/trash_sidebar_row.py:69
+msgid "Restore"
+msgstr "Қалпына келтіру"
+
+#: errands/widgets/trash/trash.py:89
+#: errands/widgets/trash/trash_sidebar_row.py:43 errands/widgets/window.py:75
+msgid "Trash"
+msgstr "Қоқыс шелегі"
+
+#: errands/widgets/trash/trash.py:158
+msgid "Tasks will be permanently deleted"
+msgstr "Тапсырмалар біржола өшіріледі"
+
+#: errands/widgets/window.py:57
+msgid "Sidebar"
+msgstr "Бүйірлік панель"
+
+#: errands/widgets/window.py:59
+msgid "Content"
+msgstr "Мазмұн"
+
+#: errands/widgets/window.py:66
+msgid "Loading Tasks"
+msgstr "Тапсырмалар жүктелуде"
+
+#: errands/widgets/window.py:88
+msgid "No Task Lists"
+msgstr "Тапсырмалар тізімі жоқ"
+
+#: errands/widgets/window.py:89
+msgid "Create new or import existing one"
+msgstr "Жаңасын жасау немесе барын импорттау"
+
+#: errands/widgets/window.py:93
+msgid "Create List"
+msgstr "Тізім жасау"
+
+#: errands/widgets/window.py:102
+msgid "Create new List"
+msgstr "Жаңа тізім жасау"
+
+#: errands/widgets/window.py:115 errands/widgets/window.py:123
+msgid "Syncing"
+msgstr "Синхрондалуда"
+
+#: errands/widgets/window.py:116
+msgid "First synchronization is running"
+msgstr "Алғашқы синхрондау орындалуда"
+
+#: errands/widgets/window.py:172
+msgid "translator-credits"
+msgstr "Baurzhan Muftakhidinov <baurthefirst@gmail.com>"
+
+#: errands/widgets/window.py:178
+msgid "Sync is disabled"
+msgstr "Синхрондау сөндірулі"
+
+#: errands/widgets/window.py:213
+msgid "Imported"
+msgstr "Импортталды"
+
+#: errands/widgets/preferences.py:26
+msgid "Application Theme"
+msgstr "Қолданба темасы"
+
+#: errands/widgets/preferences.py:34
+msgid "System"
+msgstr "Жүйе"
+
+#: errands/widgets/preferences.py:46
+msgid "Light"
+msgstr "Ақшыл"
+
+#: errands/widgets/preferences.py:58
+msgid "Dark"
+msgstr "Күңгірт"
+
+#: errands/widgets/preferences.py:70
+msgid "Add new Tasks"
+msgstr "Жаңа тапсырмаларды қосу"
+
+#: errands/widgets/preferences.py:71
+msgid "At the Bottom"
+msgstr "Төменде"
+
+#: errands/widgets/preferences.py:71
+msgid "At the Top"
+msgstr "Жоғарыда"
+
+#: errands/widgets/preferences.py:87
+msgid "Show Notifications"
+msgstr "Хабарландыруларды көрсету"
+
+#: errands/widgets/preferences.py:94
+msgid "Run in Background"
+msgstr "Фонда орындау"
+
+#: errands/widgets/preferences.py:95
+msgid "Hide the application window instead of closing it"
+msgstr "Қолданба терезесін жабудың орнына жасыру"
+
+#: errands/widgets/preferences.py:102
+msgid "Launch on Startup"
+msgstr "Жүйе іске қосылғанда жүктеу"
+
+#: errands/widgets/preferences.py:103
+msgid "Launch application when user logs in"
+msgstr "Пайдаланушы жүйеге кіргенде қолданбаны іске қосу"
+
+#: errands/widgets/preferences.py:112
+msgid "Notifications and Background"
+msgstr "Хабарландырулар және фон"
+
+#: errands/widgets/preferences.py:120 errands/widgets/preferences.py:181
+#: data/resources/gtk/help-overlay.ui:38
+msgid "Sync"
+msgstr "Синхрондау"
+
+#. Provider
+#: errands/widgets/preferences.py:123
+msgid "Disabled"
+msgstr "Сөндірулі"
+
+#: errands/widgets/preferences.py:125
+msgid "Sync Provider"
+msgstr "Синхрондау провайдері"
+
+#: errands/widgets/preferences.py:134
+msgid "Server URL"
+msgstr "Сервер URL-ы"
+
+#: errands/widgets/preferences.py:140
+msgid ""
+"URL needs to include protocol, like <b>http://</b> or <b>https://</b>. If "
+"you have problems with connection - try to change protocol first."
+msgstr ""
+"URL құрамында <b>http://</b> немесе <b>https://</b> сияқты хаттама болуы "
+"тиіс. Егер қосылымда мәселелер туындаса — алдымен хаттаманы өзгертіп "
+"көріңіз."
+
+#: errands/widgets/preferences.py:147
+msgid "Username"
+msgstr "Пайдаланушы аты"
+
+#: errands/widgets/preferences.py:153
+msgid "Password"
+msgstr "Пароль"
+
+#: errands/widgets/preferences.py:159
+msgid "Test"
+msgstr "Тест"
+
+#: errands/widgets/preferences.py:164
+msgid "Test Connection"
+msgstr "Қосылымды тексеру"
+
+#: errands/widgets/preferences.py:172 data/resources/gtk/help-overlay.ui:9
+msgid "General"
+msgstr "Жалпы"
+
+#: errands/widgets/preferences.py:217
+msgid "Connected"
+msgstr "Қосылған"
+
+#: errands/widgets/preferences.py:221
+msgid "Authorization failed"
+msgstr "Авторизация сәтсіз аяқталды"
+
+#: errands/widgets/preferences.py:223
+msgid "Could not locate server. Check network and url."
+msgstr "Сервер табылмады. Желіні және url-ді тексеріңіз."
+
+#: errands/widgets/preferences.py:225
+msgid "Can't connect"
+msgstr "Қосылу мүмкін емес"
+
+#. NOTE: Also catches invalid credentials
+#: errands/widgets/preferences.py:227
+msgid "Can't connect. Check credentials"
+msgstr "Қосылу мүмкін емес. Тіркелгі деректерін тексеріңіз"
+
+#: errands/lib/sync/providers/caldav.py:66
+msgid "Not all sync credentials provided. Please check settings."
+msgstr "Синхрондаудың барлық деректері көрсетілмеген. Баптауларды тексеріңіз."
+
+#: errands/lib/sync/providers/caldav.py:110
+msgid "Can't connect to CalDAV server at:"
+msgstr "Мына мекенжайдағы CalDAV серверіне қосылу мүмкін емес:"
+
+#: errands/lib/data.py:92
+msgid "New Task List"
+msgstr "Жаңа тапсырмалар тізімі"
+
+#: errands/lib/notifications.py:74
+msgid "Task is Due"
+msgstr "Тапсырманың мерзімі келді"
+
+#: errands/application.py:41
+msgid "Errands need to run in the background for notifications"
+msgstr "Хабарландырулар үшін Errands фондық режимде жұмыс істеуі керек"
+
+#: data/resources/gtk/help-overlay.ui:13
+msgid "Show keyboard shortcuts"
+msgstr "Пернетақта жарлықтарын көрсету"
+
+#: data/resources/gtk/help-overlay.ui:53
+msgid "Lists"
+msgstr "Тізімдер"
+
+#: data/resources/gtk/help-overlay.ui:64
+msgid "Import List"
+msgstr "Тізімді импорттау"
+
+#: data/resources/gtk/help-overlay.ui:75
+msgid "Details"
+msgstr "Толығырақ"
+
+#: data/resources/gtk/help-overlay.ui:79
+msgid "Toggle Details"
+msgstr "Толығырақ мәліметті ауыстырып қосу"
+
+#: data/io.github.mrvladus.List.desktop.in.in:4
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:7
+msgid "Manage your tasks"
+msgstr "Тапсырмаларыңызды басқарыңыз"
+
+#: data/io.github.mrvladus.List.desktop.in.in:10
+msgid "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
+msgstr "errands;тапсырмалар;тізім;todo;todos;caldav;nextcloud;синхрондау;"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:12
+msgid "Todo application for those who prefer simplicity."
+msgstr "Қарапайымдылықты ұнататындарға арналған істер тізімі қолданбасы."
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:13
+msgid "Features:"
+msgstr "Мүмкіндіктері:"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:15
+msgid "Multiple task lists support"
+msgstr "Бірнеше тапсырмалар тізімін қолдау"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:16
+msgid "Add, remove, edit tasks and sub-tasks"
+msgstr "Тапсырмаларды және ішкі тапсырмаларды қосу, өшіру, түзету"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:17
+msgid "Mark task and sub-tasks as completed"
+msgstr "Тапсырмаларды және ішкі тапсырмаларды орындалды деп белгілеу"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:18
+msgid "Add accent color for each task"
+msgstr "Әр тапсырма үшін екпін түсін қосу"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:19
+msgid "Sync tasks with Nextcloud or other CalDAV providers"
+msgstr ""
+"Тапсырмаларды Nextcloud немесе басқа CalDAV провайдерлерімен синхрондау"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:20
+msgid "Drag and Drop support"
+msgstr "Сүйреп апаруды қолдау"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:21
+msgid "Import .ics files"
+msgstr ".ics файлдарын импорттау"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:41
+msgid "Main Window View"
+msgstr "Негізгі терезе көрінісі"

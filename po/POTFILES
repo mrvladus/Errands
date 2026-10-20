@@ -1,0 +1,26 @@
+src/about-dialog.h
+src/date-chooser.c
+src/main.c
+src/rrule-row.c
+src/sidebar.c
+src/sync.c
+src/task.c
+src/task-list.c
+src/task-list.c
+src/task-list-item.c
+src/window.c
+
+src/date-chooser.blp
+src/delete-list-dialog.blp
+src/rename-list-dialog.blp
+src/rrule-row.blp
+src/settings-dialog.blp
+src/shortcuts-dialog.blp
+src/sidebar.blp
+src/task.blp
+src/task-list.blp
+src/window.blp
+
+data/errands.desktop.in
+
+# data/errands.metainfo.xml.in

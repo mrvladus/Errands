@@ -1,0 +1,655 @@
+# Georgian translation for errands.
+# Copyright (C) 2026 errands authors.
+# This file is distributed under the same license as the errands package.
+# Ekaterine Papava <papava.e@gtu.ge>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: errands\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-05-16 13:01+0300\n"
+"PO-Revision-Date: 2026-02-05 17:53+0100\n"
+"Last-Translator: Ekaterine Papava <papava.e@gtu.ge>\n"
+"Language-Team: Georgian <(nothing)>\n"
+"Language: ka\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.8\n"
+
+#: errands/widgets/shared/components/buttons.py:45
+msgid "Info"
+msgstr "ინფორმაცია"
+
+#: errands/widgets/shared/components/dialogs.py:31
+msgid "Are you sure?"
+msgstr "დარწმუნებული ბრძანდებით?"
+
+#: errands/widgets/shared/components/dialogs.py:35
+#: errands/widgets/sidebar.py:300 errands/widgets/task.py:250
+#: errands/widgets/task_list/task_list_sidebar_row.py:99
+#: errands/widgets/today/today_task.py:146
+msgid "Cancel"
+msgstr "გაუქმება"
+
+#: errands/widgets/shared/color_selector.py:32
+#: errands/widgets/shared/task_toolbar/toolbar.py:100
+msgid "None"
+msgstr "არაფერი"
+
+#: errands/widgets/shared/color_selector.py:41
+msgid "Blue"
+msgstr "ლურჯი"
+
+#: errands/widgets/shared/color_selector.py:50
+msgid "Green"
+msgstr "მწვანე"
+
+#: errands/widgets/shared/color_selector.py:61
+msgid "Yellow"
+msgstr "ყვითელი"
+
+#: errands/widgets/shared/color_selector.py:72
+msgid "Orange"
+msgstr "ნარინჯისფერი"
+
+#: errands/widgets/shared/color_selector.py:81
+msgid "Red"
+msgstr "წითელი"
+
+#: errands/widgets/shared/color_selector.py:92
+msgid "Purple"
+msgstr "იისფერი"
+
+#: errands/widgets/shared/color_selector.py:101
+msgid "Brown"
+msgstr "ყავისფერი"
+
+#: errands/widgets/shared/datetime_picker.py:138
+#: errands/widgets/today/today.py:57
+#: errands/widgets/today/today_sidebar_row.py:30 errands/widgets/window.py:69
+msgid "Today"
+msgstr "დღეს"
+
+#: errands/widgets/shared/datetime_picker.py:143
+msgid "Tomorrow"
+msgstr "ხვალ"
+
+#: errands/widgets/shared/datetime_picker.py:154
+msgid "Now"
+msgstr "ახლა"
+
+#: errands/widgets/shared/datetime_picker.py:160
+#: errands/widgets/trash/trash.py:40
+#: errands/widgets/trash/trash_sidebar_row.py:68
+msgid "Clear"
+msgstr "გასუფთავება"
+
+#: errands/widgets/shared/datetime_picker.py:214
+msgid "Set Date"
+msgstr "თარიღის დაყენება"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:44
+msgid "Start / Due Date"
+msgstr "დაწყების / შესრულების თარიღი"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:49 errands/lib/utils.py:24
+msgid "Date"
+msgstr "თარიღი"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:59
+#: errands/widgets/shared/task_toolbar/notes_window.py:29
+msgid "Notes"
+msgstr "შენიშვნები"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:72
+msgid "Priority"
+msgstr "პრიორიტეტი"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:90
+msgid "High"
+msgstr "მაღალი"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:94
+msgid "Medium"
+msgstr "საშუალო"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:98
+msgid "Low"
+msgstr "დაბალი"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:103
+msgid "Custom"
+msgstr "ხელით"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:113
+msgid "No Tags"
+msgstr "ჭდეების გარეშე"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:134
+#: errands/widgets/tags/tags.py:63 errands/widgets/tags/tags_sidebar_row.py:32
+#: errands/widgets/window.py:72
+msgid "Tags"
+msgstr "ჭდეები"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:157
+#: errands/widgets/shared/task_toolbar/attachments_window.py:30
+msgid "Attachments"
+msgstr "დანართი"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:191
+#: errands/widgets/shared/task_toolbar/toolbar.py:294
+msgid "Created:"
+msgstr "შექმნილია:"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:202
+#: errands/widgets/shared/task_toolbar/toolbar.py:295
+msgid "Changed:"
+msgstr "შეცვლილი:"
+
+#: errands/widgets/shared/task_toolbar/toolbar.py:215
+msgid "More"
+msgstr "მეტი"
+
+#: errands/widgets/shared/task_toolbar/attachments_window.py:33
+msgid "No Files Attached"
+msgstr "ფაილები მიმაგრებული არაა"
+
+#: errands/widgets/shared/task_toolbar/attachments_window.py:56
+msgid "Add Attachment"
+msgstr "მიმაგრების დამატება"
+
+#: errands/widgets/shared/task_toolbar/attachments_window.py:119
+msgid "Open File"
+msgstr "ფაილის გახსნა"
+
+#: errands/widgets/shared/task_toolbar/attachments_window.py:123
+#: errands/widgets/tags/tags.py:140
+#: errands/widgets/task_list/task_list_sidebar_row.py:60
+#: errands/widgets/task_list/task_list_sidebar_row.py:191
+#: errands/widgets/trash/trash.py:159
+msgid "Delete"
+msgstr "წაშლა"
+
+#: errands/widgets/shared/task_toolbar/attachments_window.py:132
+msgid "Open Containing Folder"
+msgstr "შემცველი საქაღალდის გახსნა"
+
+#: errands/widgets/shared/task_toolbar/datetime_window.py:29
+msgid "Date and Time"
+msgstr "თარიღი და დრო"
+
+#: errands/widgets/shared/task_toolbar/datetime_window.py:39
+#: errands/widgets/shared/task_toolbar/datetime_window.py:41
+msgid "Due"
+msgstr "ვადა"
+
+#: errands/widgets/shared/task_toolbar/datetime_window.py:54
+#: errands/widgets/shared/task_toolbar/datetime_window.py:56
+msgid "Start"
+msgstr "დაწყება"
+
+#: errands/widgets/sidebar.py:42
+msgid "Add List (Ctrl+Shift+A)"
+msgstr "სიის დამატება (Ctrl+Shift+A)"
+
+#: errands/widgets/sidebar.py:61
+msgid "Syncing..."
+msgstr "სინქრონიზაცია..."
+
+#: errands/widgets/sidebar.py:67
+msgid "Add new List"
+msgstr "ახალი სიის დამატება"
+
+#: errands/widgets/sidebar.py:68
+msgid "Click \"+\" button"
+msgstr "დააწკაპუნეთ ღილაკზე \"+\""
+
+#. Task lists group
+#: errands/widgets/sidebar.py:94 errands/widgets/preferences.py:66
+msgid "Task Lists"
+msgstr "ამოცანის სიები"
+
+#: errands/widgets/sidebar.py:106 errands/widgets/window.py:44
+#: errands/widgets/window.py:167 data/io.github.mrvladus.List.desktop.in.in:3
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:6
+msgid "Errands"
+msgstr "Errands"
+
+#: errands/widgets/sidebar.py:114
+msgid "Main Menu"
+msgstr "მთავარი მენიუ"
+
+#: errands/widgets/sidebar.py:121 data/resources/gtk/help-overlay.ui:42
+msgid "Sync / Fetch Tasks"
+msgstr "ამოცანების სინქრონიზაცია / გამოთხოვა"
+
+#: errands/widgets/sidebar.py:128
+msgid "Import Task List"
+msgstr "ამოცანების სიის შემოტანა"
+
+#: errands/widgets/sidebar.py:135 data/resources/gtk/help-overlay.ui:20
+msgid "Preferences"
+msgstr "მორგება"
+
+#: errands/widgets/sidebar.py:138
+msgid "Keyboard Shortcuts"
+msgstr "კლავიატურის მალსახმობები"
+
+#: errands/widgets/sidebar.py:142
+msgid "About Errands"
+msgstr "Errands-ის შესახებ"
+
+#: errands/widgets/sidebar.py:144 data/resources/gtk/help-overlay.ui:27
+msgid "Quit"
+msgstr "გასვლა"
+
+#: errands/widgets/sidebar.py:291
+msgid "New List Name"
+msgstr "ახალი სიის სახელი"
+
+#: errands/widgets/sidebar.py:295 data/resources/gtk/help-overlay.ui:57
+msgid "Add List"
+msgstr "სიის დამატება"
+
+#: errands/widgets/sidebar.py:301
+msgid "Add"
+msgstr "დამატება"
+
+#: errands/widgets/tags/tags.py:32
+msgid "No Tags Found"
+msgstr "ჭდეების გარეშე"
+
+#: errands/widgets/tags/tags.py:33
+msgid "Add new Tags in the entry above"
+msgstr "ახალი ჭდეების დამატება ზედა ჩანაწერზე"
+
+#: errands/widgets/tags/tags.py:82
+msgid "Add new Tag"
+msgstr "ახალი ჭდის დამატება"
+
+#: errands/widgets/task.py:79
+#: errands/widgets/task_list/task_list_sidebar_row.py:125
+#: errands/widgets/today/today_task.py:73
+msgid "Exported"
+msgstr "გატანილია"
+
+#: errands/widgets/task.py:87 errands/widgets/today/today_task.py:81
+msgid "Copied to Clipboard"
+msgstr "დაკოპირდა გაცვლის ბაფერში"
+
+#: errands/widgets/task.py:153
+msgid "Toggle Sub-Tasks"
+msgstr "ქვეამოცანების გადართვა"
+
+#: errands/widgets/task.py:161 errands/widgets/today/today_task.py:100
+msgid "Toggle Completion"
+msgstr "დასრულების გადართვა"
+
+#: errands/widgets/task.py:191
+msgid "Toggle Toolbar"
+msgstr "ხელსაწყოთა ზოლის გადართვა"
+
+#: errands/widgets/task.py:210 errands/widgets/task.py:230
+#: errands/widgets/today/today_task.py:117
+#: errands/widgets/today/today_task.py:127
+msgid "Edit"
+msgstr "ჩასწორება"
+
+#: errands/widgets/task.py:211 errands/widgets/today/today_task.py:118
+msgid "Move to Trash"
+msgstr "ნაგვის ყუთში გადატანა"
+
+#: errands/widgets/task.py:212 errands/widgets/today/today_task.py:119
+msgid "Copy to Clipboard"
+msgstr "ბუფერში კოპირება"
+
+#: errands/widgets/task.py:213
+#: errands/widgets/task_list/task_list_sidebar_row.py:192
+#: errands/widgets/today/today_task.py:120
+msgid "Export"
+msgstr "გატანა"
+
+#: errands/widgets/task.py:306 errands/widgets/task_list/task_list.py:84
+msgid "Completed"
+msgstr "დასრულებულია"
+
+#: errands/widgets/task.py:330
+msgid "Add new Sub-Task"
+msgstr "ახალი ქვეამოცანის დამატება"
+
+#: errands/widgets/task.py:552 errands/widgets/task_list/task_list.py:238
+msgid "Completed:"
+msgstr "დასრულებულია:"
+
+#: errands/widgets/task.py:945
+msgid "Delete Tag"
+msgstr "ჭდის წაშლა"
+
+#: errands/widgets/task_list/task_list.py:50
+msgid "Toggle Completed Tasks"
+msgstr "დასრულებული ამოცანების გადართვა"
+
+#: errands/widgets/task_list/task_list.py:58
+msgid "Delete Completed Tasks"
+msgstr "დასრულებული ამოცანების წაშლა"
+
+#: errands/widgets/task_list/task_list.py:73
+msgid "Scroll Up"
+msgstr "მაღლა აქაჩვა"
+
+#: errands/widgets/task_list/task_list.py:143
+msgid "Add new Task"
+msgstr "ახალი ამოცანის დამატება"
+
+#: errands/widgets/task_list/task_list_sidebar_row.py:59
+msgid "List will be permanently deleted"
+msgstr "სია სამუდამოდ წაიშლება"
+
+#: errands/widgets/task_list/task_list_sidebar_row.py:89
+msgid "New Name"
+msgstr "ახალი სახელი"
+
+#: errands/widgets/task_list/task_list_sidebar_row.py:94
+msgid "Rename List"
+msgstr "სიის სახელის გადარქმევა"
+
+#: errands/widgets/task_list/task_list_sidebar_row.py:100
+msgid "Save"
+msgstr "შენახვა"
+
+#: errands/widgets/task_list/task_list_sidebar_row.py:123
+msgid "Export failed"
+msgstr "გატანის შეცდომა"
+
+#: errands/widgets/task_list/task_list_sidebar_row.py:158
+msgid "Color"
+msgstr "ფერი"
+
+#: errands/widgets/task_list/task_list_sidebar_row.py:190
+msgid "Rename"
+msgstr "სახელის გადარქმევა"
+
+#: errands/widgets/today/today.py:31
+msgid "No Tasks for Today"
+msgstr "დღეისთვის ამოცანები არ გაქვთ"
+
+#: errands/widgets/trash/trash.py:31
+msgid "Empty Trash"
+msgstr "ნაგვის ყუთის დაცარიელება"
+
+#: errands/widgets/trash/trash.py:32
+msgid "No deleted items"
+msgstr "წაშლილი ელემენტების გარეშე"
+
+#: errands/widgets/trash/trash.py:55 errands/widgets/trash/trash.py:189
+#: errands/widgets/trash/trash_sidebar_row.py:69
+msgid "Restore"
+msgstr "აღდგენა"
+
+#: errands/widgets/trash/trash.py:89
+#: errands/widgets/trash/trash_sidebar_row.py:43 errands/widgets/window.py:75
+msgid "Trash"
+msgstr "ნაგვის ყუთი"
+
+#: errands/widgets/trash/trash.py:158
+msgid "Tasks will be permanently deleted"
+msgstr "ამოცანები სამუდამოდ წაიშლება"
+
+#: errands/widgets/window.py:57
+msgid "Sidebar"
+msgstr "გვერდითი პანელი"
+
+#: errands/widgets/window.py:59
+msgid "Content"
+msgstr "შემცველობა"
+
+#: errands/widgets/window.py:66
+msgid "Loading Tasks"
+msgstr "ამოცანების ჩატვირთვა"
+
+#: errands/widgets/window.py:88
+msgid "No Task Lists"
+msgstr "ამოცანის სიების გარეშე"
+
+#: errands/widgets/window.py:89
+msgid "Create new or import existing one"
+msgstr "შექმენით ახალი, ან შემოიტანეთ არსებული"
+
+#: errands/widgets/window.py:93
+msgid "Create List"
+msgstr "სიის შექმნა"
+
+#: errands/widgets/window.py:102
+msgid "Create new List"
+msgstr "ახალი სიის შექმნა"
+
+#: errands/widgets/window.py:115 errands/widgets/window.py:123
+msgid "Syncing"
+msgstr "სინქრონიზაცია"
+
+#: errands/widgets/window.py:116
+msgid "First synchronization is running"
+msgstr "მიმდინარეობს პირველი სინქრონიზაცია"
+
+#: errands/widgets/window.py:172
+msgid "translator-credits"
+msgstr "ეკატერინე პაპავა"
+
+#: errands/widgets/window.py:178
+msgid "Sync is disabled"
+msgstr "სინქრონიზაცია გამორთულია"
+
+#: errands/widgets/window.py:213
+msgid "Imported"
+msgstr "შემოტანილია"
+
+#: errands/widgets/preferences.py:26
+msgid "Application Theme"
+msgstr "აპლიკაციის თემა"
+
+#: errands/widgets/preferences.py:34
+msgid "System"
+msgstr "სისტემა"
+
+#: errands/widgets/preferences.py:46
+msgid "Light"
+msgstr "ღია"
+
+#: errands/widgets/preferences.py:58
+msgid "Dark"
+msgstr "მუქი"
+
+#: errands/widgets/preferences.py:70
+msgid "Add new Tasks"
+msgstr "ახალი ამოცანების დამატება"
+
+#: errands/widgets/preferences.py:71
+msgid "At the Bottom"
+msgstr "ქვემოთ"
+
+#: errands/widgets/preferences.py:71
+msgid "At the Top"
+msgstr "თავში"
+
+#: errands/widgets/preferences.py:87
+msgid "Show Notifications"
+msgstr "გაფრთხილებების ჩვენება"
+
+#: errands/widgets/preferences.py:94
+msgid "Run in Background"
+msgstr "ფონურად გაშვება"
+
+#: errands/widgets/preferences.py:95
+msgid "Hide the application window instead of closing it"
+msgstr "აპლიკაციის ფანჯრის დამალვა მისი დახურვის მაგიერ"
+
+#: errands/widgets/preferences.py:102
+msgid "Launch on Startup"
+msgstr "გაშვება ჩატვირთვისას"
+
+#: errands/widgets/preferences.py:103
+msgid "Launch application when user logs in"
+msgstr "აპლიკაციის გაშვება, როცა მომხმარებელი შევა"
+
+#: errands/widgets/preferences.py:112
+msgid "Notifications and Background"
+msgstr "გაფრთხილებები და ფონი"
+
+#: errands/widgets/preferences.py:120 errands/widgets/preferences.py:181
+#: data/resources/gtk/help-overlay.ui:38
+msgid "Sync"
+msgstr "სინქრონიზაცია"
+
+#. Provider
+#: errands/widgets/preferences.py:123
+msgid "Disabled"
+msgstr "გამორთულია"
+
+#: errands/widgets/preferences.py:125
+msgid "Sync Provider"
+msgstr "სინქრონიზაციის პროვაიდერი"
+
+#: errands/widgets/preferences.py:134
+msgid "Server URL"
+msgstr "სერვერის URL"
+
+#: errands/widgets/preferences.py:140
+msgid ""
+"URL needs to include protocol, like <b>http://</b> or <b>https://</b>. If "
+"you have problems with connection - try to change protocol first."
+msgstr ""
+"URL უნდა შეიცავდეს პროტოკოლებს. მაგ: <b>http://</b> ან <b>https://</b>. თუ "
+"დაკავშირებასთან პრობლემები გაქვთ, ჯერ სცადეთ, პროტოკოლი შეცვალოთ."
+
+#: errands/widgets/preferences.py:147
+msgid "Username"
+msgstr "მომხმარებლის სახელი"
+
+#: errands/widgets/preferences.py:153
+msgid "Password"
+msgstr "პაროლი"
+
+#: errands/widgets/preferences.py:159
+msgid "Test"
+msgstr "შემოწმება"
+
+#: errands/widgets/preferences.py:164
+msgid "Test Connection"
+msgstr "კავშირის შემოწმება"
+
+#: errands/widgets/preferences.py:172 data/resources/gtk/help-overlay.ui:9
+msgid "General"
+msgstr "ზოგადი"
+
+#: errands/widgets/preferences.py:217
+msgid "Connected"
+msgstr "დაკავშირებულია"
+
+#: errands/widgets/preferences.py:221
+msgid "Authorization failed"
+msgstr "ავტორიზაცია ჩავარდა"
+
+#: errands/widgets/preferences.py:223
+msgid "Could not locate server. Check network and url."
+msgstr "სერვერი ვერ ვიპოვე. შეამოწმეთ ქსელი და ბმული."
+
+#: errands/widgets/preferences.py:225
+msgid "Can't connect"
+msgstr "დაკავშირება შეუძლებელია"
+
+#. NOTE: Also catches invalid credentials
+#: errands/widgets/preferences.py:227
+msgid "Can't connect. Check credentials"
+msgstr "დაკავშირება შეუძლებელია. შეამოწმეთ ავტორიზაციის დეტალები"
+
+#: errands/lib/sync/providers/caldav.py:66
+msgid "Not all sync credentials provided. Please check settings."
+msgstr ""
+"მითითებული ავტორიზაციის დეტალებით შესვლა შეუძლებელია. გადაამოწმეთ "
+"პარამეტრები."
+
+#: errands/lib/sync/providers/caldav.py:110
+msgid "Can't connect to CalDAV server at:"
+msgstr "დაკავშირება შეუძლებელია CalDAV-ის სერვერთან მისამართზე:"
+
+#: errands/lib/data.py:92
+msgid "New Task List"
+msgstr "ახალი ამოცანების სია"
+
+#: errands/lib/notifications.py:74
+msgid "Task is Due"
+msgstr "ამოცანის შესრულების დროა"
+
+#: errands/application.py:41
+msgid "Errands need to run in the background for notifications"
+msgstr "გაფრთხილებებისთვის Erranda ფონურად უნდა იყოს გაშვებული"
+
+#: data/resources/gtk/help-overlay.ui:13
+msgid "Show keyboard shortcuts"
+msgstr "კლავიატურის მალსახმობების ჩვენება"
+
+#: data/resources/gtk/help-overlay.ui:53
+msgid "Lists"
+msgstr "სიები"
+
+#: data/resources/gtk/help-overlay.ui:64
+msgid "Import List"
+msgstr "სიის შემოტანა"
+
+#: data/resources/gtk/help-overlay.ui:75
+msgid "Details"
+msgstr "დეტალები"
+
+#: data/resources/gtk/help-overlay.ui:79
+msgid "Toggle Details"
+msgstr "დეტალების გადართვა"
+
+#: data/io.github.mrvladus.List.desktop.in.in:4
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:7
+msgid "Manage your tasks"
+msgstr "მართეთ თქვენი ამოცანები"
+
+#: data/io.github.mrvladus.List.desktop.in.in:10
+msgid "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
+msgstr "errands;tasks;list;todo;todos;caldav;nextcloud;sync;სინქრონიზაცია;ამოცანები;გასაკეთებელი;კალენდარი;"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:12
+msgid "Todo application for those who prefer simplicity."
+msgstr "გასაკეთებელი ამოცანების აპლიკაცია მათთვის, ვისაც სიმარტივე ურჩევნია."
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:13
+msgid "Features:"
+msgstr "თვისებები:"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:15
+msgid "Multiple task lists support"
+msgstr "ერთზე მეტი ამოცანების სიის მხარდაჭერა"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:16
+msgid "Add, remove, edit tasks and sub-tasks"
+msgstr "დაამატეთ, წაშალეთ და ჩაასწორეთ ამოცანები და ქვეამოცანები"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:17
+msgid "Mark task and sub-tasks as completed"
+msgstr "ამოცანის და მისი ქვეამოცანების დასრულებულად მონიშვნა"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:18
+msgid "Add accent color for each task"
+msgstr "აქცენტის ფერის დამატება თითოეულ ამოცანაზე"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:19
+msgid "Sync tasks with Nextcloud or other CalDAV providers"
+msgstr "ამოცანების სინქრონიზაცია Nextcloud-თან, ან სხვა CalDAV პროვაიდერთან"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:20
+msgid "Drag and Drop support"
+msgstr "გადათრევა/დაგდების მხარდაჭერა"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:21
+msgid "Import .ics files"
+msgstr ".ics ფაილების შემოტანა"
+
+#: data/io.github.mrvladus.List.metainfo.xml.in.in:41
+msgid "Main Window View"
+msgstr "მთავარი ფანჯრის ნახვა"
