@@ -293,13 +293,15 @@ git-commit:
 		echo "  1) UI"; \
 		echo "  2) Sync"; \
 		echo "  3) Build"; \
-		echo "  4) Misc (default)"; \
+		echo "  4) Translations"; \
+		echo "  5) Misc (default)"; \
 		read -r -p "Enter category number: " category; \
 		case "$$category" in \
 		    0) prefix="Fix" ;; \
 			1) prefix="UI" ;; \
 			2) prefix="Sync" ;; \
 			3) prefix="Build" ;; \
+			4) prefix="Translations" ;; \
 			*) prefix="Misc" ;; \
 		esac; \
 		echo "Selected category: $$prefix"; \
@@ -309,3 +311,27 @@ git-commit:
 		fi; \
 		git add -A; \
 		git commit -m "$$prefix: $$message"'
+
+
+# --- i18n --- #
+
+PO_DIR          = po
+POTFILES    	= $(PO_DIR)/POTFILES
+POT_FILE        = $(PO_DIR)/$(NAME).pot
+
+XGETTEXT_FLAGS = \
+	--from-code=UTF-8 \
+	--language=C \
+	--keyword=_ \
+	--keyword=C_:1c,2 \
+	--keyword=N_ \
+	--add-comments=Translators:
+
+.PHONY: pot
+pot:
+	xgettext --files-from=$(POTFILES) \
+		--directory=. \
+		--output=$(POT_FILE) \
+		$(XGETTEXT_FLAGS) \
+		--package-name="$(GETTEXT_PACKAGE)"
+	@echo "Generated $(POT_FILE)"
