@@ -199,15 +199,6 @@ static inline char *string_trim(char *str) {
   return str;
 }
 
-static inline void gdk_rgba_to_hex_string(const GdkRGBA *rgba, char hex_string[8]) {
-  // Convert the RGBA components to integers in the range [0, 255]
-  int r = (int)(rgba->red * 255);
-  int g = (int)(rgba->green * 255);
-  int b = (int)(rgba->blue * 255);
-  // Format the string as #RRGGBB
-  sprintf(hex_string, "#%02X%02X%02X", r, g, b);
-}
-
 static inline const char *gdk_rgba_to_str(const GdkRGBA *rgba) {
   int r = (int)(rgba->red * 255);
   int g = (int)(rgba->green * 255);
@@ -295,8 +286,7 @@ static inline void gtk_widget_set_color(GtkWidget *widget, const char *color) {
   GdkRGBA rgba = {0};
   gboolean res = gdk_rgba_parse(&rgba, color);
   if (!res) return;
-  char bg[8];
-  gdk_rgba_to_hex_string(&rgba, bg);
+  const char *bg = gdk_rgba_to_str(&rgba);
   g_autofree gchar *css_class = g_strdup_printf("custom-color-%s", bg + 1);
   gtk_widget_add_css_class(widget, css_class);
 
@@ -326,6 +316,7 @@ static inline void run_in_thread(GTaskThreadFunc fn, gpointer task_data, GAsyncR
   GTask *task = g_task_new(NULL, NULL, finish_cb, finish_data);
   if (task_data) g_task_set_task_data(task, task_data, NULL);
   g_task_run_in_thread(task, fn);
+  g_object_unref(task);
 }
 
 // ---------- ICAL ---------- //

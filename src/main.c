@@ -64,10 +64,10 @@ int main(int argc, char **argv) {
   const int status = g_application_run(G_APPLICATION(state.app), argc, argv);
 
   // Cleanup
-  g_object_unref(state.app);
+  errands_sync_cleanup();
   errands_data_cleanup();
   g_object_unref(state.settings);
-  errands_sync_cleanup();
+  g_object_unref(state.app);
 
   return status;
 }

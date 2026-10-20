@@ -266,20 +266,34 @@ static inline void caldav__calendar_poll(CalDAVCalendar *calendar) {
 // --- CALENDAR PUBLIC FUNCTIONS --- //
 
 const gchar *caldav_calendar_get_color(const CalDAVCalendar *calendar) {
-  g_return_val_if_fail(calendar != NULL, NULL);
-  g_return_val_if_fail(calendar->registered_source != NULL, NULL);
+  g_assert_nonnull(calendar);
+  g_assert_nonnull(calendar->registered_source);
 
   ESourceTaskList *task_list = e_source_get_extension(calendar->registered_source, E_SOURCE_EXTENSION_TASK_LIST);
   return e_source_selectable_get_color(E_SOURCE_SELECTABLE(task_list));
 }
+
 const gchar *caldav_calendar_get_name(const CalDAVCalendar *calendar) {
-  g_return_val_if_fail(calendar != NULL, NULL);
-  g_return_val_if_fail(calendar->registered_source != NULL, NULL);
+  g_assert_nonnull(calendar);
+  g_assert_nonnull(calendar->registered_source);
 
   return e_source_get_display_name(calendar->registered_source);
 }
-const gchar *caldav_calendar_get_hrefcons(const CalDAVCalendar *c) { return c->href; }
-const gchar *caldav_calendar_get_uid(const CalDAVCalendar *c) { return c->uid; }
+
+const gchar *caldav_calendar_get_href(const CalDAVCalendar *calendar) {
+  g_assert_nonnull(calendar);
+  g_assert_nonnull(calendar->registered_source);
+
+  return calendar->href;
+}
+
+const gchar *caldav_calendar_get_uid(const CalDAVCalendar *calendar) {
+  g_assert_nonnull(calendar);
+  g_assert_nonnull(calendar->registered_source);
+
+  return calendar->uid;
+}
+
 gboolean caldav_calendar_set_properties(const CalDAVCalendar *calendar, const gchar *name, const gchar *color) {
   g_assert_nonnull(calendar);
 
@@ -292,36 +306,42 @@ gboolean caldav_calendar_set_properties(const CalDAVCalendar *calendar, const gc
   g_autoptr(EWebDAVSession) session = e_webdav_session_new(calendar->registered_source);
   e_soup_session_set_credentials(E_SOUP_SESSION(session), calendar->client->credentials);
   gboolean success = e_webdav_session_update_properties_sync(session, NULL, changes, NULL, &error);
-  if (error) {
+  if (!success || error) {
     caldav__warning("%s", error->message);
     return FALSE;
   }
 
   g_slist_free_full(changes, (GDestroyNotify)e_webdav_property_change_free);
 
-  if (success) {
-    ESourceTaskList *task_list = e_source_get_extension(calendar->registered_source, E_SOURCE_EXTENSION_TASK_LIST);
-    if (name) e_source_set_display_name(calendar->registered_source, name);
-    if (color) e_source_selectable_set_color(E_SOURCE_SELECTABLE(task_list), color);
-    e_source_registry_commit_source_sync(calendar->client->registry, calendar->registered_source, NULL, &error);
-    if (error) {
-      caldav__warning("%s", error->message);
-      return FALSE;
-    }
+  ESourceTaskList *task_list = e_source_get_extension(calendar->registered_source, E_SOURCE_EXTENSION_TASK_LIST);
+  if (name) e_source_set_display_name(calendar->registered_source, name);
+  if (color) e_source_selectable_set_color(E_SOURCE_SELECTABLE(task_list), color);
+  e_source_registry_commit_source_sync(calendar->client->registry, calendar->registered_source, NULL, &error);
+  if (error) {
+    caldav__warning("%s", error->message);
+    return FALSE;
   }
 
-  return success;
-}
-gboolean caldav_calendar_set_color(const CalDAVCalendar *c, const gchar *color) {
-  return caldav_calendar_set_properties(c, NULL, color);
-}
-gboolean caldav_calendar_set_name(const CalDAVCalendar *c, const gchar *name) {
-  return caldav_calendar_set_properties(c, name, NULL);
+  return TRUE;
 }
 
-gboolean caldav_calendar_push_task(CalDAVCalendar *c, ICalComponent *task) {
-  g_assert_nonnull(c);
-  g_assert_nonnull(c->e_cal_client);
+gboolean caldav_calendar_set_color(const CalDAVCalendar *calendar, const gchar *color) {
+  g_assert_nonnull(calendar);
+  g_assert_nonnull(color);
+
+  return caldav_calendar_set_properties(calendar, NULL, color);
+}
+
+gboolean caldav_calendar_set_name(const CalDAVCalendar *calendar, const gchar *name) {
+  g_assert_nonnull(calendar);
+  g_assert_nonnull(name);
+
+  return caldav_calendar_set_properties(calendar, name, NULL);
+}
+
+gboolean caldav_calendar_push_task(CalDAVCalendar *calendar, ICalComponent *task) {
+  g_assert_nonnull(calendar);
+  g_assert_nonnull(calendar->e_cal_client);
   g_assert_nonnull(task);
   g_assert(I_CAL_IS_COMPONENT(task));
   g_assert(i_cal_component_isa(task) == I_CAL_VTODO_COMPONENT);
@@ -338,11 +358,13 @@ gboolean caldav_calendar_push_task(CalDAVCalendar *c, ICalComponent *task) {
   }
   const gchar *uid = i_cal_component_get_uid(task);
   g_autoptr(GError) error = NULL;
-  if (!e_cal_client_modify_object_sync(c->e_cal_client, task, E_CAL_OBJ_MOD_THIS, E_CAL_OPERATION_FLAG_NONE, NULL, &error)) {
+  if (!e_cal_client_modify_object_sync(calendar->e_cal_client, task, E_CAL_OBJ_MOD_THIS, E_CAL_OPERATION_FLAG_NONE, NULL,
+                                       &error)) {
     caldav__error("Failed to update task '%s': %s", uid, error->message);
     caldav__info("Trying to create task: '%s'", uid);
+    g_clear_error(&error);
     g_autofree gchar *out_uid = NULL;
-    if (!e_cal_client_create_object_sync(c->e_cal_client, task, E_CAL_OPERATION_FLAG_CONFLICT_KEEP_LOCAL, &out_uid, NULL,
+    if (!e_cal_client_create_object_sync(calendar->e_cal_client, task, E_CAL_OPERATION_FLAG_CONFLICT_KEEP_LOCAL, &out_uid, NULL,
                                          &error)) {
       caldav__warning("Failed to create task: %s", error->message);
       return FALSE;
@@ -359,13 +381,14 @@ gboolean caldav_calendar_push_task(CalDAVCalendar *c, ICalComponent *task) {
   return TRUE;
 }
 
-gboolean caldav_calendar_remove_task(CalDAVCalendar *c, const char *uid) {
-  g_assert_nonnull(c);
-  g_assert_nonnull(c->e_cal_client);
+gboolean caldav_calendar_remove_task(CalDAVCalendar *calendar, const char *uid) {
+  g_assert_nonnull(calendar);
+  g_assert_nonnull(calendar->e_cal_client);
   g_assert_nonnull(uid);
 
   g_autoptr(GError) error = NULL;
-  if (!e_cal_client_remove_object_sync(c->e_cal_client, uid, NULL, E_CAL_OBJ_MOD_ALL, E_CAL_OPERATION_FLAG_NONE, NULL, &error)) {
+  if (!e_cal_client_remove_object_sync(calendar->e_cal_client, uid, NULL, E_CAL_OBJ_MOD_ALL, E_CAL_OPERATION_FLAG_NONE, NULL,
+                                       &error)) {
     caldav__error("Failed to remove task '%s': %s", uid, error->message);
     return FALSE;
   }

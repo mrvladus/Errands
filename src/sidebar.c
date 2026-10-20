@@ -25,6 +25,7 @@
 static gint sort_func(gconstpointer a, gconstpointer b, gpointer data);
 
 static void on_import_action_cb(GSimpleAction *action, GVariant *param);
+static void on_sync_action_cb();
 
 static void on_sidebar_activated_cb(AdwSidebar *self, guint index, gpointer user_data);
 static gboolean on_drop_cb(AdwSidebar *self, guint index, const GValue *value, GdkDragAction preferred_action,
@@ -95,9 +96,9 @@ static void errands_sidebar_init(ErrandsSidebar *sidebar) {
 
   GSimpleActionGroup *ag = errands_add_action_group(self, "sidebar");
   errands_add_action(ag, "import", on_import_action_cb, self, NULL);
+  errands_add_action(ag, "sync", on_sync_action_cb, NULL, NULL);
   errands_add_action(ag, "preferences", errands_settings_dialog_show, self, NULL);
   errands_add_action(ag, "about", errands_about_dialog_show, self, NULL);
-  errands_add_action(ag, "sync", errands_sync, NULL, NULL);
 
   GType dnd_types[] = {ERRANDS_TYPE_TASK_ITEM};
   adw_sidebar_setup_drop_target(ADW_SIDEBAR(self->sidebar), GDK_ACTION_MOVE | GDK_ACTION_COPY, dnd_types,
@@ -159,12 +160,14 @@ void errands_sidebar_update_filter_rows(void) {
   for_range(i, 0, n_lists) {
     g_autoptr(ErrandsTaskListItem) item = g_list_model_get_item(model, i);
     CONTINUE_IF(errands_data_get_deleted(item->ical));
-    for_vtodo_in_vcalendar(c, item->ical) {
-      CONTINUE_IF(errands_data_get_deleted(c));
+    g_autoptr(GPtrArray) components = vcalendar_to_array(item->ical);
+    for (guint j = 0; components && j < components->len; j++) {
+      ICalComponent *c = g_ptr_array_index(components, j);
+      if (errands_data_get_deleted(c)) continue;
       bool is_completed = errands_data_is_completed(c);
-      CONTINUE_IF(!show_completed && is_completed);
+      if (!show_completed && is_completed) continue;
       bool is_cancelled = errands_data_get_cancelled(c);
-      CONTINUE_IF(!show_cancelled && is_cancelled);
+      if (!show_cancelled && is_cancelled) continue;
       if (is_completed) completed++;
       if (errands_data_is_due(c)) {
         today++;
@@ -198,13 +201,20 @@ void errands_sidebar_delete_list(const char *uid) {
 // --- ACTIONS --- //
 
 static void on_import_action_finish_cb(GObject *obj, GAsyncResult *res) {
-  g_autoptr(GFile) file = gtk_file_dialog_open_finish(GTK_FILE_DIALOG(obj), res, NULL);
-  if (!file) return;
+  g_autoptr(GError) error = NULL;
+  g_autoptr(GFile) file = gtk_file_dialog_open_finish(GTK_FILE_DIALOG(obj), res, &error);
+  if (!file) {
+    if (error && !g_error_matches(error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+      g_warning("Import: Failed to open file: %s", error->message);
+    return;
+  }
   g_autofree gchar *path = g_file_get_path(file);
-  ErrandsTaskListItem *item = errands_task_list_item_load_from_ics(path);
+  if (!path) return;
+  g_autoptr(ErrandsTaskListItem) item = errands_task_list_item_load_from_ics(path);
   if (!item) return;
+  g_list_store_append(task_lists_model, item);
   errands_task_list_item_save(item);
-  // errands_sync_create_list(data);
+  errands_sync_create_list(item);
   errands_sidebar_update_filter_rows();
   errands_settings_set_last_list_uid(state.settings, item->uid);
   errands_sidebar_select_last_opened_page();
@@ -217,6 +227,8 @@ static void on_import_action_cb(GSimpleAction *action, GVariant *param) {
   gtk_file_dialog_set_default_filter(dialog, filter);
   gtk_file_dialog_open(dialog, GTK_WINDOW(state.main_window), NULL, (GAsyncReadyCallback)on_import_action_finish_cb, self);
 }
+
+static void on_sync_action_cb() { errands_sync(); }
 
 // --- SIGNAL HANDLERS --- //
 

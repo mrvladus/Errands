@@ -3,6 +3,7 @@
 
 #include "task.h"
 #include "config.h"
+#include "gdk/gdk.h"
 #include "gio/gio.h"
 #include "sidebar.h"
 #include "state.h"
@@ -329,9 +330,9 @@ static void on_delete_action_cb(GSimpleAction *action, GVariant *param, ErrandsT
 
 static void on_export_finish_cb(GObject *obj, GAsyncResult *res, ErrandsTaskItem *item) {
   g_autoptr(GFile) f = gtk_file_dialog_save_finish(GTK_FILE_DIALOG(obj), res, NULL);
-  if (!f) return;
+  if (!f || !item) return;
   g_autofree char *path = g_file_get_path(f);
-  if (!errands_task_item_export(item, path)) {
+  if (!path || !errands_task_item_export(item, path)) {
     errands_window_add_toast(_("Failed to Export"), 2);
     return;
   }
@@ -346,12 +347,10 @@ static void on_export_action_cb(GSimpleAction *action, GVariant *param, ErrandsT
 }
 
 static void on_finish_cb(GObject *source_object, GAsyncResult *res, gpointer data) {
-  ErrandsTaskItem *item = data;
+  g_autoptr(ErrandsTaskItem) item = data; /* Owns the reference passed to the async operation. */
   g_autoptr(GdkRGBA) rgba = gtk_color_dialog_choose_rgba_finish(GTK_COLOR_DIALOG(source_object), res, NULL);
-  if (!rgba) return;
-  char hex_string[8];
-  gdk_rgba_to_hex_string(rgba, hex_string);
-  errands_task_item_set_color(item, hex_string);
+  if (!rgba || !item) return;
+  errands_task_item_set_color(item, gdk_rgba_to_str(rgba));
 }
 
 static void on_color_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
@@ -359,7 +358,7 @@ static void on_color_action_cb(GSimpleAction *action, GVariant *param, ErrandsTa
   const char *color = errands_task_item_get_color(self->item);
   GdkRGBA rgba = {1};
   if (color) gdk_rgba_parse(&rgba, color);
-  gtk_color_dialog_choose_rgba(color_dialog, GTK_WINDOW(state.main_window), &rgba, NULL, on_finish_cb, self->item);
+  gtk_color_dialog_choose_rgba(color_dialog, GTK_WINDOW(state.main_window), &rgba, NULL, on_finish_cb, g_object_ref(self->item));
 }
 
 // ---------- CALLBACKS ---------- //

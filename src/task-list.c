@@ -274,10 +274,15 @@ static void on_focus_entry_action_cb(GSimpleAction *action, GVariant *param, Err
   gtk_widget_grab_focus(self->entry);
 }
 
-static void on_action_export_finish_cb(GObject *obj, GAsyncResult *res, ErrandsTaskListItem *item) {
+static void on_action_export_finish_cb(GObject *obj, GAsyncResult *res, gpointer user_data) {
+  g_autoptr(ErrandsTaskListItem) item = user_data;
   g_autoptr(GFile) f = gtk_file_dialog_save_finish(GTK_FILE_DIALOG(obj), res, NULL);
-  if (!f) return;
+  if (!f || !item) return;
   g_autofree char *path = g_file_get_path(f);
+  if (!path) {
+    errands_window_add_toast(_("Export failed"), 2);
+    return;
+  }
   FILE *file = fopen(path, "w");
   if (!file) {
     errands_window_add_toast(_("Export failed"), 2);
@@ -294,7 +299,8 @@ static void on_action_export_cb(GSimpleAction *action, GVariant *param, ErrandsT
   g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
   const char *filename = tmp_str_printf("%s.ics", self->item->uid);
   g_object_set(dialog, "initial-name", filename, NULL);
-  gtk_file_dialog_save(dialog, GTK_WINDOW(state.main_window), NULL, (GAsyncReadyCallback)on_action_export_finish_cb, self->item);
+  gtk_file_dialog_save(dialog, GTK_WINDOW(state.main_window), NULL, (GAsyncReadyCallback)on_action_export_finish_cb,
+                       g_object_ref(self->item));
 }
 
 static void on_action_rename_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
@@ -305,24 +311,24 @@ static void on_action_delete_completed_cb(GSimpleAction *action, GVariant *param
   if (!self->item) return;
   int deleted_n = errands_task_list_item_delete_completed(self->item);
   if (deleted_n == 0) {
-    errands_window_add_toast(tmp_str_printf(_("No tasks to delete"), deleted_n), 2);
+    errands_window_add_toast(_("No tasks to delete"), 2);
     return;
   }
   errands_task_list_item_remove_deleted_tasks(self->item);
   errands_task_list_filter(self, GTK_FILTER_CHANGE_DIFFERENT);
-  errands_window_add_toast(tmp_str_printf(_("Deleted %zu tasks"), deleted_n), 2);
+  errands_window_add_toast(tmp_str_printf(ngettext("Deleted %d task", "Deleted %d tasks", deleted_n), deleted_n), 2);
 }
 
 static void on_action_delete_cancelled_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
   if (!self->item) return;
   int deleted_n = errands_task_list_item_delete_cancelled(self->item);
   if (deleted_n == 0) {
-    errands_window_add_toast(tmp_str_printf(_("No tasks to delete"), deleted_n), 2);
+    errands_window_add_toast(_("No tasks to delete"), 2);
     return;
   }
   errands_task_list_item_remove_deleted_tasks(self->item);
   errands_task_list_filter(self, GTK_FILTER_CHANGE_DIFFERENT);
-  errands_window_add_toast(tmp_str_printf(_("Deleted %zu tasks"), deleted_n), 2);
+  errands_window_add_toast(tmp_str_printf(ngettext("Deleted %d task", "Deleted %d tasks", deleted_n), deleted_n), 2);
 }
 
 static void on_action_delete_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {

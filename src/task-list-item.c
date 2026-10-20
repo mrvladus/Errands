@@ -45,26 +45,33 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
   ErrandsTaskListItem *self = ERRANDS_TASK_LIST_ITEM(object);
   switch (prop_id) {
   case PROP_UID: {
-    if (self->uid) g_free(self->uid);
-    self->uid = g_strdup(g_value_get_string(value));
+    const gchar *uid = g_value_get_string(value);
+    if (g_strcmp0(self->uid, uid) == 0) break;
+    g_clear_pointer(&self->uid, g_free);
+    self->uid = g_strdup(uid);
     errands_data_set_uid(self->ical, self->uid);
     errands_task_list_item_save(self);
+    if (!self->lock) errands_sync_update_list(self);
   } break;
+
   case PROP_TITLE: {
-    if (self->title) g_free(self->title);
-    self->title = g_strdup(g_value_get_string(value));
+    const gchar *title = g_value_get_string(value);
+    if (g_strcmp0(self->title, title) == 0) break;
+    g_clear_pointer(&self->uid, g_free);
+    self->title = g_strdup(title);
     errands_data_set_list_name(self->ical, self->title);
     errands_task_list_item_save(self);
+    if (!self->lock) errands_sync_update_list(self);
   } break;
+
   case PROP_COLOR: {
     GdkRGBA *color = g_value_get_boxed(value);
-    if (!color) return;
+    if (!color || gdk_rgba_equal(&self->color, color)) return;
     self->color = *color;
-    char hex_string[8];
-    gdk_rgba_to_hex_string(&self->color, hex_string);
-    errands_data_set_color(self->ical, hex_string);
+    errands_data_set_color(self->ical, gdk_rgba_to_str(&self->color));
     errands_task_list_item_save(self);
   } break;
+
   default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
   }
 }
@@ -106,7 +113,7 @@ static void errands_task_list_item_init(ErrandsTaskListItem *self) {}
 // ---------- PUBLIC ---------- //
 
 ErrandsTaskListItem *errands_task_list_item_new(ICalComponent *ical) {
-  g_return_val_if_fail(ical, NULL);
+  g_assert_nonnull(ical);
 
   ErrandsTaskListItem *self = g_object_new(ERRANDS_TYPE_TASK_LIST_ITEM, NULL);
   self->ical = ical;
@@ -192,8 +199,10 @@ void errands_task_list_item_update_count(ErrandsTaskListItem *self) {
   g_assert(ERRANDS_IS_TASK_LIST_ITEM(self));
 
   gint total = 0, completed = 0;
-  for_vtodo_in_vcalendar(c, self->ical) {
-    CONTINUE_IF(errands_data_get_deleted(c) || errands_data_get_cancelled(c));
+  g_autoptr(GPtrArray) components = vcalendar_to_array(self->ical);
+  for (guint i = 0; components && i < components->len; i++) {
+    ICalComponent *c = g_ptr_array_index(components, i);
+    if (errands_data_get_deleted(c) || errands_data_get_cancelled(c)) continue;
     if (errands_data_is_completed(c)) completed++;
     total++;
   }
@@ -287,6 +296,15 @@ void errands_task_list_item_remove_deleted_tasks(ErrandsTaskListItem *self) {
       deleted_n++;
     }
   }
+
+  g_autoptr(GPtrArray) components = vcalendar_to_array(self->ical);
+  for (guint i = 0; components && i < components->len; i++) {
+    ICalComponent *component = g_ptr_array_index(components, i);
+    if (!errands_data_get_deleted(component) || !errands_data_get_synced(component)) continue;
+    i_cal_component_remove_component(self->ical, component);
+    deleted_n++;
+  }
+
   if (deleted_n > 0) {
     errands_task_list_item_save(self);
     g_debug("Removed %d deleted tasks\n", deleted_n);

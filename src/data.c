@@ -201,6 +201,7 @@ void errands_data_init() {
     g_autofree gchar *path = g_build_filename(calendars_dir, filename, NULL);
     g_autoptr(ErrandsTaskListItem) item = errands_task_list_item_load_from_ics(path);
     if (!item) continue;
+
     // Delete file if calendar deleted
     if (errands_data_get_deleted(item->ical)) {
       if ((errands_settings_get_sync_enabled(state.settings) && errands_data_get_synced(item->ical)) ||
@@ -210,6 +211,7 @@ void errands_data_init() {
       }
       continue;
     }
+
     g_list_store_append(task_lists_model, item);
     errands_task_list_item_remove_deleted_tasks(item);
     if (errands_settings_get_sync_enabled(state.settings) && !errands_data_get_synced(item->ical)) {
@@ -316,9 +318,13 @@ void errands_data_set_percent(ICalComponent *ical, int value) {
 }
 
 void errands_data_set_priority(ICalComponent *ical, int value) {
+  g_return_if_fail(I_CAL_IS_COMPONENT(ical));
+
+  value = CLAMP(value, 0, 9);
   g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_PRIORITY_PROPERTY);
-  if (property) i_cal_property_set_percentcomplete(property, value);
+  if (property) i_cal_property_set_priority(property, value);
   else i_cal_component_add_property(ical, i_cal_property_new_priority(value));
+
   errands_data_set_synced(ical, false);
   errands_data_set_changed(ical, i_cal_time_get_date_time_now());
 }
@@ -352,9 +358,9 @@ const char *errands_data_get_uid(ICalComponent *ical) {
 }
 
 void errands_data_set_notes(ICalComponent *ical, const char *value) {
-  if (!value || g_str_equal(value, "")) {
+  if (!value || !*value) {
     g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_DESCRIPTION_PROPERTY);
-    i_cal_component_remove_property(ical, property);
+    if (property) i_cal_component_remove_property(ical, property);
   } else i_cal_component_set_description(ical, value);
   errands_data_set_synced(ical, false);
   errands_data_set_changed(ical, i_cal_time_get_date_time_now());
@@ -363,35 +369,35 @@ void errands_data_set_notes(ICalComponent *ical, const char *value) {
 void errands_data_set_color(ICalComponent *ical, const char *value) {
   const char *color = value;
   g_autofree char *fixed_color = NULL;
-  if (color && !g_str_has_prefix(color, "#")) {
-    if (strlen(color) != 7) {
-      fixed_color = g_strndup(color, 7);
-      color = fixed_color;
-    }
+  if (color && *color && !g_str_has_prefix(color, "#") && strlen(color) != 7) {
+    fixed_color = g_strndup(color, 7);
+    color = fixed_color;
   }
   if (i_cal_component_isa(ical) == I_CAL_VCALENDAR_COMPONENT) {
-    if (!color || g_str_equal(color, "")) color = generate_hex_as_str();
+    if (!color || !*color) color = generate_hex_as_str();
     set_x_prop_value(ical, "X-APPLE-CALENDAR-COLOR", color);
   } else {
-    if (!value || g_str_equal(value, "")) {
-      g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_COLOR_PROPERTY);
-      if (property) i_cal_component_remove_property(ical, property);
-    }
     g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_COLOR_PROPERTY);
-    if (property) i_cal_property_set_color(property, color);
+    if (!color || !*color) {
+      if (property) i_cal_component_remove_property(ical, property);
+    } else if (property) i_cal_property_set_color(property, color);
     else i_cal_component_add_property(ical, i_cal_property_new_color(color));
+
     errands_data_set_changed(ical, i_cal_time_get_date_time_now());
   }
   errands_data_set_synced(ical, false);
 }
+
 void errands_data_set_list_name(ICalComponent *ical, const char *value) {
   set_x_prop_value(ical, "X-WR-CALNAME", value);
   errands_data_set_synced(ical, false);
 }
+
 void errands_data_set_list_description(ICalComponent *ical, const char *value) {
   set_x_prop_value(ical, "X-WR-CALDESC", value);
   errands_data_set_synced(ical, false);
 }
+
 void errands_data_set_parent(ICalComponent *ical, const char *value) {
   g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_RELATEDTO_PROPERTY);
   if (!value || g_str_equal(value, "")) {
@@ -403,22 +409,25 @@ void errands_data_set_parent(ICalComponent *ical, const char *value) {
   errands_data_set_synced(ical, false);
   errands_data_set_changed(ical, i_cal_time_get_date_time_now());
 }
+
 void errands_data_set_text(ICalComponent *ical, const char *value) {
-  if (!value || g_str_equal(value, ""))
-    i_cal_component_remove_property(ical, i_cal_component_get_first_property(ical, I_CAL_SUMMARY_PROPERTY));
-  else i_cal_component_set_summary(ical, value);
+  if (!value || !*value) {
+    g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_SUMMARY_PROPERTY);
+    if (property) i_cal_component_remove_property(ical, property);
+  } else i_cal_component_set_summary(ical, value);
   errands_data_set_synced(ical, false);
   errands_data_set_changed(ical, i_cal_time_get_date_time_now());
 }
+
 void errands_data_set_uid(ICalComponent *ical, const char *value) {
-  if (!value || g_str_equal(value, ""))
-    i_cal_component_remove_property(ical, i_cal_component_get_first_property(ical, I_CAL_UID_PROPERTY));
-  else {
-    g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_UID_PROPERTY);
+  g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_UID_PROPERTY);
+  if (!value || !*value) {
+    if (property) i_cal_component_remove_property(ical, property);
+  } else {
     if (property) return;
     i_cal_component_add_property(ical, i_cal_property_new_uid(value));
   }
-  errands_data_set_synced(ical, false);
+  errands_data_set_synced(ical, FALSE);
   errands_data_set_changed(ical, i_cal_time_get_date_time_now());
 }
 
@@ -468,8 +477,7 @@ GStrv errands_data_get_tags(ICalComponent *ical) {
 }
 
 void errands_data_set_attachments(ICalComponent *ical, GStrv value) {
-  g_autoptr(ICalProperty) prop = get_x_prop(ical, "X-ERRANDS-ATTACHMENTS", "");
-  if (!value) i_cal_component_remove_property(ical, prop);
+  if (!value) set_x_prop_value(ical, "X-ERRANDS-ATTACHMENTS", NULL);
   else {
     g_autofree gchar *str = g_strjoinv(",", value);
     set_x_prop_value(ical, "X-ERRANDS-ATTACHMENTS", str);
