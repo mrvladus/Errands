@@ -318,8 +318,9 @@ git-commit:
 PO_DIR          = po
 POTFILES    	= $(PO_DIR)/POTFILES
 POT_FILE        = $(PO_DIR)/$(NAME).pot
-
-XGETTEXT_FLAGS = \
+LINGUAS         = $(shell sed -e '/^\#/d' -e '/^$$/d' $(PO_DIR)/LINGUAS)
+PO_FILES        = $(patsubst %,$(PO_DIR)/%.po,$(LANGUAS))
+XGETTEXT_FLAGS  = \
 	--from-code=UTF-8 \
 	--language=C \
 	--keyword=_ \
@@ -329,9 +330,23 @@ XGETTEXT_FLAGS = \
 
 .PHONY: pot
 pot:
-	xgettext --files-from=$(POTFILES) \
+	@xgettext --files-from=$(POTFILES) \
 		--directory=. \
 		--output=$(POT_FILE) \
 		$(XGETTEXT_FLAGS) \
 		--package-name="$(GETTEXT_PACKAGE)"
 	@echo "Generated $(POT_FILE)"
+
+.PHONY: update-po
+update-po: $(POT_FILE)
+	@for lang in $(LINGUAS); do \
+		po_file="$(PO_DIR)/$$lang.po"; \
+		if [ -f "$$po_file" ]; then \
+			echo "Updating existing: $$po_file"; \
+			msgmerge --update --backup=none "$$po_file" $(POT_FILE); \
+		else \
+			echo "Initializing new language: $$po_file"; \
+			msginit --no-translator --locale=$$lang --input=$(POT_FILE) --output="$$po_file"; \
+		fi \
+	done
+	@echo "Updated .po files"

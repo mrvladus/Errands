@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-10 12:25+0300\n"
+"POT-Creation-Date: 2026-10-20 18:53+0300\n"
 "PO-Revision-Date: 2024-01-28 13:51+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -18,752 +18,733 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.4.2\n"
 
-#: errands/widgets/shared/components/buttons.py:45
-msgid "Info"
+#: src/about-dialog.h:15 src/sidebar.blp:13 src/window.blp:8
+msgid "Errands"
+msgstr "Εrrands"
+
+#: src/about-dialog.h:18
+msgid "translator-credits"
+msgstr "itsnotAZ"
+
+#: src/date-chooser.c:104 src/date-chooser.blp:7
+msgid "Not Set"
+msgstr "Μη Ρυθμισμένο"
+
+#: src/rrule-row.c:171
+msgctxt "Repeat every ..."
+msgid "seconds"
 msgstr ""
 
-#: errands/widgets/shared/components/dialogs.py:31
-msgid "Are you sure?"
-msgstr "Είστε σίγουροι;"
-
-#: errands/widgets/shared/components/dialogs.py:35
-#: errands/widgets/sidebar.py:300 errands/widgets/task.py:250
-#: errands/widgets/task_list/task_list_sidebar_row.py:99
-#: errands/widgets/today/today_task.py:146
-msgid "Cancel"
-msgstr "Ακύρωση"
-
-#: errands/widgets/shared/color_selector.py:32
-#: errands/widgets/shared/task_toolbar/toolbar.py:100
-msgid "None"
+#: src/rrule-row.c:171
+msgctxt "Repeat every ..."
+msgid "minutes"
 msgstr ""
 
-#: errands/widgets/shared/color_selector.py:41
-msgid "Blue"
+#: src/rrule-row.c:172
+msgctxt "Repeat every ..."
+msgid "hours"
 msgstr ""
 
-#: errands/widgets/shared/color_selector.py:50
-msgid "Green"
+#: src/rrule-row.c:172
+msgctxt "Repeat every ..."
+msgid "days"
 msgstr ""
 
-#: errands/widgets/shared/color_selector.py:61
-msgid "Yellow"
+#: src/rrule-row.c:173
+msgctxt "Repeat every ..."
+msgid "weeks"
 msgstr ""
 
-#: errands/widgets/shared/color_selector.py:72
-msgid "Orange"
+#: src/rrule-row.c:173
+msgctxt "Repeat every ..."
+msgid "months"
 msgstr ""
 
-#: errands/widgets/shared/color_selector.py:81
-msgid "Red"
+#: src/rrule-row.c:174
+msgctxt "Repeat every ..."
+msgid "years"
 msgstr ""
 
-#: errands/widgets/shared/color_selector.py:92
-msgid "Purple"
+#: src/rrule-row.c:176
+#, c-format
+msgid "Repeat every %d %s"
 msgstr ""
 
-#: errands/widgets/shared/color_selector.py:101
-msgid "Brown"
+#: src/rrule-row.c:182
+msgid "Repeat forever"
 msgstr ""
 
-#: errands/widgets/shared/datetime_picker.py:138
-#: errands/widgets/today/today.py:57
-#: errands/widgets/today/today_sidebar_row.py:30 errands/widgets/window.py:69
-msgid "Today"
-msgstr "Σήμερα"
-
-#: errands/widgets/shared/datetime_picker.py:143
-msgid "Tomorrow"
-msgstr "Αύριο"
-
-#: errands/widgets/shared/datetime_picker.py:154
-msgid "Now"
-msgstr "Τώρα"
-
-#: errands/widgets/shared/datetime_picker.py:160
-#: errands/widgets/trash/trash.py:40
-#: errands/widgets/trash/trash_sidebar_row.py:68
-msgid "Clear"
-msgstr "Εκκαθάριση"
-
-#: errands/widgets/shared/datetime_picker.py:214
-msgid "Set Date"
-msgstr "Ρύθμιση Ημερομηνίας"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:44
-msgid "Start / Due Date"
+#: src/rrule-row.c:182
+#, c-format
+msgid "Repeat %zu times"
 msgstr ""
 
-#: errands/widgets/shared/task_toolbar/toolbar.py:49 errands/lib/utils.py:24
+#: src/sync.c:262
+#, c-format
+msgid "Added remote task list: %s"
+msgstr ""
+
+#: src/sync.c:293
+#, c-format
+msgid "Removed remote task list: %s"
+msgstr ""
+
+#: src/sync.c:372
+msgid "Creating remote list failed. Limits may be reached."
+msgstr ""
+
+#: src/sync.c:532
+#, fuzzy
+msgid "Failed to connect to CalDAV remote."
+msgstr "Αδυναμία σύνδεσης σε σέρβερ CalDAV στο:"
+
+#: src/sync.c:553
+msgid "Failed 3 attempts to sync. Disabling for now."
+msgstr ""
+
+#: src/task.c:110
+#, fuzzy
+msgctxt "Start date"
+msgid "Start"
+msgstr "Αρχή"
+
+#: src/task.c:125
+#, fuzzy
+msgctxt "Due date"
+msgid "Due"
+msgstr "Τέλος"
+
+#: src/task.c:302
+msgid "Copied to Clipboard"
+msgstr "Αντιγράφηκε στο Πρόχειρο"
+
+#: src/task.c:336
+msgid "Failed to Export"
+msgstr ""
+
+#: src/task.c:339 src/task-list.c:294
+msgid "Exported"
+msgstr "Εξαγωγή ολοκληρώθηκε"
+
+#: src/task-list.c:283 src/task-list.c:288
+msgid "Export failed"
+msgstr "Εξαγωγή απέτυχε"
+
+#: src/task-list.c:314 src/task-list.c:326
+msgid "No tasks to delete"
+msgstr ""
+
+#: src/task-list.c:319 src/task-list.c:331
+#, fuzzy, c-format
+msgid "Deleted %d task"
+msgid_plural "Deleted %d tasks"
+msgstr[0] "Διαγραφή Ολοκληρωμένων Δουλειών"
+msgstr[1] "Διαγραφή Ολοκληρωμένων Δουλειών"
+
+#: src/task-list.c:464 src/sidebar.blp:100
+#, fuzzy
+msgid "All Tasks"
+msgstr "Προσθήκη νέας Δουλειάς"
+
+#: src/task-list.c:465 src/sidebar.blp:113
+msgid "Tasks for Today"
+msgstr ""
+
+#: src/task-list-item.c:142
+msgid "Untitled"
+msgstr ""
+
+#: src/window.c:115
+msgid "Remove Attachment"
+msgstr ""
+
+#: src/window.c:146
+#, fuzzy
+msgid "Enable Tag"
+msgstr "Διαγραφή"
+
+#: src/window.c:151
+#, fuzzy
+msgid "Remove Tag"
+msgstr "Διαγραφή"
+
+#: src/date-chooser.blp:13
+msgid "Reset"
+msgstr ""
+
+#: src/date-chooser.blp:27 src/rrule-row.blp:51
 #, fuzzy
 msgid "Date"
 msgstr "Ρύθμιση Ημερομηνίας"
 
-#: errands/widgets/shared/task_toolbar/toolbar.py:59
-#: errands/widgets/shared/task_toolbar/notes_window.py:29
-msgid "Notes"
-msgstr "Σημειώσεις"
+#: src/date-chooser.blp:36
+msgid "Today"
+msgstr "Σήμερα"
 
-#: errands/widgets/shared/task_toolbar/toolbar.py:72
-msgid "Priority"
-msgstr "Προτεραιότητα"
+#: src/date-chooser.blp:50
+msgid "Tomorrow"
+msgstr "Αύριο"
 
-#: errands/widgets/shared/task_toolbar/toolbar.py:90
-msgid "High"
+#: src/date-chooser.blp:85
+msgid "Time"
 msgstr ""
 
-#: errands/widgets/shared/task_toolbar/toolbar.py:94
-msgid "Medium"
+#: src/date-chooser.blp:149
+msgid "9:00"
 msgstr ""
 
-#: errands/widgets/shared/task_toolbar/toolbar.py:98
-#, fuzzy
-msgid "Low"
-msgstr "Τώρα"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:103
-msgid "Custom"
+#: src/date-chooser.blp:164
+msgid "12:00"
 msgstr ""
 
-#: errands/widgets/shared/task_toolbar/toolbar.py:113
-#, fuzzy
-msgid "No Tags"
-msgstr "Ετικέτες"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:134
-#: errands/widgets/tags/tags.py:63 errands/widgets/tags/tags_sidebar_row.py:32
-#: errands/widgets/window.py:72
-msgid "Tags"
-msgstr "Ετικέτες"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:157
-#: errands/widgets/shared/task_toolbar/attachments_window.py:30
-msgid "Attachments"
+#: src/date-chooser.blp:179
+msgid "17:00"
 msgstr ""
 
-#: errands/widgets/shared/task_toolbar/toolbar.py:191
-#: errands/widgets/shared/task_toolbar/toolbar.py:294
-#, fuzzy
-msgid "Created:"
-msgstr "Ολοκληρωμένα:"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:202
-#: errands/widgets/shared/task_toolbar/toolbar.py:295
-msgid "Changed:"
+#: src/date-chooser.blp:194
+msgid "20:00"
 msgstr ""
 
-#: errands/widgets/shared/task_toolbar/toolbar.py:215
-msgid "More"
-msgstr ""
+#: src/delete-list-dialog.blp:8
+msgid "Are you sure?"
+msgstr "Είστε σίγουροι;"
 
-#: errands/widgets/shared/task_toolbar/attachments_window.py:33
-msgid "No Files Attached"
-msgstr ""
+#: src/delete-list-dialog.blp:12 src/rename-list-dialog.blp:11
+msgid "Cancel"
+msgstr "Ακύρωση"
 
-#: errands/widgets/shared/task_toolbar/attachments_window.py:56
-msgid "Add Attachment"
-msgstr ""
-
-#: errands/widgets/shared/task_toolbar/attachments_window.py:119
-msgid "Open File"
-msgstr ""
-
-#: errands/widgets/shared/task_toolbar/attachments_window.py:123
-#: errands/widgets/tags/tags.py:140
-#: errands/widgets/task_list/task_list_sidebar_row.py:60
-#: errands/widgets/task_list/task_list_sidebar_row.py:191
-#: errands/widgets/trash/trash.py:159
+#: src/delete-list-dialog.blp:13 src/task.blp:175
 msgid "Delete"
 msgstr "Διαγραφή"
 
-#: errands/widgets/shared/task_toolbar/attachments_window.py:132
-msgid "Open Containing Folder"
+#: src/rename-list-dialog.blp:12
+msgid "Rename"
+msgstr "Μετονομασία"
+
+#: src/rename-list-dialog.blp:21
+msgid "New List Name"
+msgstr "Όνομα Νέας Λίστας"
+
+#: src/rrule-row.blp:7 src/task.blp:258
+msgid "Repeat"
 msgstr ""
 
-#: errands/widgets/shared/task_toolbar/datetime_window.py:29
-msgid "Date and Time"
+#: src/rrule-row.blp:12
+msgid "Frequency"
 msgstr ""
 
-#: errands/widgets/shared/task_toolbar/datetime_window.py:39
-#: errands/widgets/shared/task_toolbar/datetime_window.py:41
-msgid "Due"
-msgstr "Τέλος"
+#: src/rrule-row.blp:13
+msgid "How often task will repeat"
+msgstr ""
 
-#: errands/widgets/shared/task_toolbar/datetime_window.py:54
-#: errands/widgets/shared/task_toolbar/datetime_window.py:56
-msgid "Start"
-msgstr "Αρχή"
+#: src/rrule-row.blp:17
+msgid "Secondly"
+msgstr ""
 
-#: errands/widgets/sidebar.py:42
-msgid "Add List (Ctrl+Shift+A)"
-msgstr "Προσθήκη Λίστας (Ctrl+Shift+A)"
+#: src/rrule-row.blp:18
+msgid "Minutely"
+msgstr ""
 
-#: errands/widgets/sidebar.py:61
-msgid "Syncing..."
-msgstr "Συγχρονισμός..."
+#: src/rrule-row.blp:19
+msgid "Hourly"
+msgstr ""
 
-#: errands/widgets/sidebar.py:67
-msgid "Add new List"
-msgstr "Προσθήκη νέας Λίστας"
+#: src/rrule-row.blp:20
+msgid "Daily"
+msgstr ""
 
-#: errands/widgets/sidebar.py:68
-msgid "Click \"+\" button"
-msgstr "Πατήστε το κουμπί \"+\""
+#: src/rrule-row.blp:21
+msgid "Weekly"
+msgstr ""
 
-#. Task lists group
-#: errands/widgets/sidebar.py:94 errands/widgets/preferences.py:66
+#: src/rrule-row.blp:22
+msgid "Monthly"
+msgstr ""
+
+#: src/rrule-row.blp:23
+msgid "Yearly"
+msgstr ""
+
+#: src/rrule-row.blp:24 src/task.blp:144
+msgid "None"
+msgstr ""
+
+#: src/rrule-row.blp:32
+msgid "Interval"
+msgstr ""
+
+#: src/rrule-row.blp:46
+msgid "Repeat Until"
+msgstr ""
+
+#: src/rrule-row.blp:50
+msgid "Indefinitely"
+msgstr ""
+
+#: src/rrule-row.blp:52
+msgid "Count"
+msgstr ""
+
+#: src/rrule-row.blp:60
+msgid "Repeat Until Date"
+msgstr ""
+
+#: src/rrule-row.blp:64
+msgid "Repeat Count"
+msgstr ""
+
+#: src/rrule-row.blp:87
+msgid "Week Days"
+msgstr ""
+
+#: src/rrule-row.blp:96
+msgid "Mo"
+msgstr ""
+
+#: src/rrule-row.blp:97
+msgid "Monday"
+msgstr ""
+
+#: src/rrule-row.blp:106
+msgid "Tu"
+msgstr ""
+
+#: src/rrule-row.blp:107
+msgid "Tuesday"
+msgstr ""
+
+#: src/rrule-row.blp:116
+msgid "We"
+msgstr ""
+
+#: src/rrule-row.blp:117
+msgid "Wednesday"
+msgstr ""
+
+#: src/rrule-row.blp:126
+msgid "Th"
+msgstr ""
+
+#: src/rrule-row.blp:127
+msgid "Thursday"
+msgstr ""
+
+#: src/rrule-row.blp:136
+msgid "Fr"
+msgstr ""
+
+#: src/rrule-row.blp:137
+msgid "Friday"
+msgstr ""
+
+#: src/rrule-row.blp:146
 #, fuzzy
-msgid "Task Lists"
-msgstr "Δεν υπάρχουν λίστες"
+msgid "Sa"
+msgstr "Αποθήκευση"
 
-#: errands/widgets/sidebar.py:106 errands/widgets/window.py:44
-#: errands/widgets/window.py:167 data/io.github.mrvladus.List.desktop.in.in:3
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:6
-msgid "Errands"
-msgstr "Εrrands"
+#: src/rrule-row.blp:147
+msgid "Saturday"
+msgstr ""
 
-#: errands/widgets/sidebar.py:114
-msgid "Main Menu"
+#: src/rrule-row.blp:156
+msgid "Su"
+msgstr ""
+
+#: src/rrule-row.blp:157
+msgid "Sunday"
+msgstr ""
+
+#: src/settings-dialog.blp:11
+msgid "Appearance"
+msgstr "Εμφάνιση"
+
+#: src/settings-dialog.blp:14
+msgid "Theme"
+msgstr ""
+
+#: src/settings-dialog.blp:21
+msgid "System"
+msgstr "Σύστημα"
+
+#: src/settings-dialog.blp:26
+msgid "Light"
+msgstr "Φωτεινό"
+
+#: src/settings-dialog.blp:31
+msgid "Dark"
+msgstr "Σκοτεινό"
+
+#: src/settings-dialog.blp:43
+msgid "Miscellaneous"
+msgstr ""
+
+#: src/settings-dialog.blp:46
+msgid "Show Notifications"
+msgstr ""
+
+#: src/settings-dialog.blp:50
+msgid "Work in the Background"
+msgstr ""
+
+#: src/settings-dialog.blp:54
+msgid "Launch at Startup"
+msgstr ""
+
+#: src/settings-dialog.blp:60 src/shortcuts-dialog.blp:84 src/sidebar.blp:64
+msgid "Sync"
+msgstr "Συγχρονισμός"
+
+#: src/settings-dialog.blp:63
+#, fuzzy
+msgid "Enabled"
+msgstr "Απενεργοποιημένο"
+
+#: src/settings-dialog.blp:67
+msgid "Sync Interval"
+msgstr ""
+
+#: src/settings-dialog.blp:68
+msgid "Seconds between pulling events from the server"
+msgstr ""
+
+#: src/settings-dialog.blp:80
+#, fuzzy
+msgid "CalDAV Server URL"
+msgstr "URL Σέρβερ"
+
+#: src/settings-dialog.blp:86
+msgid "Username"
+msgstr "Όνομα Χρήστη"
+
+#: src/settings-dialog.blp:92
+msgid "Password"
+msgstr "Συνθηματικό"
+
+#: src/shortcuts-dialog.blp:9
+msgid "General"
+msgstr "Γενικά"
+
+#: src/shortcuts-dialog.blp:12 src/sidebar.blp:68
+msgid "Preferences"
+msgstr "Προτιμήσεις"
+
+#: src/shortcuts-dialog.blp:17
+#, fuzzy
+msgid "Open Menu"
 msgstr "Κεντρικό Μενού"
 
-#: errands/widgets/sidebar.py:121 data/resources/gtk/help-overlay.ui:42
-msgid "Sync / Fetch Tasks"
-msgstr "Συγχρονισμός/ Εύρεση Δουλειών"
+#: src/shortcuts-dialog.blp:22
+msgid "Close Window"
+msgstr ""
 
-#: errands/widgets/sidebar.py:128
+#: src/shortcuts-dialog.blp:27
+msgid "Quit"
+msgstr "Έξοδος"
+
+#: src/shortcuts-dialog.blp:34 src/task-list.blp:12
+#, fuzzy
+msgid "Task List"
+msgstr "Δεν υπάρχουν λίστες"
+
+#: src/shortcuts-dialog.blp:37
+#, fuzzy
+msgid "Create Task List"
+msgstr "Δημιουργία Λίστας"
+
+#: src/shortcuts-dialog.blp:42
 #, fuzzy
 msgid "Import Task List"
 msgstr "Εισαγωγή Λίστας"
 
-#: errands/widgets/sidebar.py:135 data/resources/gtk/help-overlay.ui:20
-msgid "Preferences"
-msgstr "Προτιμήσεις"
+#: src/shortcuts-dialog.blp:47
+msgid "Sorting and Filtering Options"
+msgstr ""
 
-#: errands/widgets/sidebar.py:138
-msgid "Keyboard Shortcuts"
+#: src/shortcuts-dialog.blp:52
+msgid "Search"
+msgstr ""
+
+#: src/shortcuts-dialog.blp:57
+msgid "Select Task Entry"
+msgstr ""
+
+#: src/shortcuts-dialog.blp:62
+#, fuzzy
+msgid "Entry Task Properties"
+msgstr "Ιδιότητες"
+
+#: src/shortcuts-dialog.blp:67 src/task-list.blp:142
+#, fuzzy
+msgid "Add Task"
+msgstr "Προσθήκη νέας Δουλειάς"
+
+#: src/shortcuts-dialog.blp:74
+#, fuzzy
+msgid "Task Properties Dialog"
+msgstr "Ιδιότητες"
+
+#: src/shortcuts-dialog.blp:77 src/window.blp:99
+msgid "Add Attachment"
+msgstr ""
+
+#: src/shortcuts-dialog.blp:87
+#, fuzzy
+msgid "Sync Now"
+msgstr "Συγχρονισμός"
+
+#: src/sidebar.blp:19
+#, fuzzy
+msgid "Add Task List"
+msgstr "Δεν υπάρχουν λίστες"
+
+#: src/sidebar.blp:28
+#, fuzzy
+msgid "Import \".ics\" file"
+msgstr "Εισαγωγή αρχείων .ics"
+
+#: src/sidebar.blp:37
+#, fuzzy
+msgid "New list name"
+msgstr "Όνομα Νέας Λίστας"
+
+#: src/sidebar.blp:43
+#, fuzzy
+msgid "Create"
+msgstr "Ολοκληρωμένα:"
+
+#: src/sidebar.blp:60
+#, fuzzy
+msgid "Main Menu (F10)"
+msgstr "Κεντρικό Μενού"
+
+#: src/sidebar.blp:69
+#, fuzzy
+msgid "Shortcuts"
 msgstr "Συντομεύσεις Πληκτρολογίου"
 
-#: errands/widgets/sidebar.py:142
+#: src/sidebar.blp:70
 msgid "About Errands"
 msgstr "Περί Errands"
 
-#: errands/widgets/sidebar.py:144 data/resources/gtk/help-overlay.ui:27
-msgid "Quit"
-msgstr "Έξοδος"
-
-#: errands/widgets/sidebar.py:291
-msgid "New List Name"
-msgstr "Όνομα Νέας Λίστας"
-
-#: errands/widgets/sidebar.py:295 data/resources/gtk/help-overlay.ui:57
-msgid "Add List"
-msgstr "Προσθήκη Λίστας"
-
-#: errands/widgets/sidebar.py:301
-msgid "Add"
-msgstr "Προσθήκη"
-
-#: errands/widgets/tags/tags.py:32
-msgid "No Tags Found"
+#: src/sidebar.blp:99
+msgctxt "All Tasks"
+msgid "All"
 msgstr ""
 
-#: errands/widgets/tags/tags.py:33
-msgid "Add new Tags in the entry above"
+#: src/sidebar.blp:112
+#, fuzzy
+msgctxt "Tasks for Today"
+msgid "Today"
+msgstr "Σήμερα"
+
+#: src/sidebar.blp:126
+#, fuzzy
+msgid "Task Lists"
+msgstr "Δεν υπάρχουν λίστες"
+
+#: src/sidebar.blp:131
+msgid "No Task Lists"
+msgstr "Δεν υπάρχουν λίστες"
+
+#: src/sidebar.blp:132
+msgid "Create new or import “.ics”"
 msgstr ""
 
-#: errands/widgets/tags/tags.py:82
-#, fuzzy
-msgid "Add new Tag"
-msgstr "Προσθήκη νέας Δουλειάς"
-
-#: errands/widgets/task.py:79
-#: errands/widgets/task_list/task_list_sidebar_row.py:125
-#: errands/widgets/today/today_task.py:73
-msgid "Exported"
-msgstr "Εξαγωγή ολοκληρώθηκε"
-
-#: errands/widgets/task.py:87 errands/widgets/today/today_task.py:81
-msgid "Copied to Clipboard"
-msgstr "Αντιγράφηκε στο Πρόχειρο"
-
-#: errands/widgets/task.py:153
-#, fuzzy
-msgid "Toggle Sub-Tasks"
-msgstr "Εμφάνιση Υπο-Δουλειών"
-
-#: errands/widgets/task.py:161 errands/widgets/today/today_task.py:100
+#: src/task.blp:37
 #, fuzzy
 msgid "Toggle Completion"
 msgstr "Εναλλαγή Λεπτομερειών"
 
-#: errands/widgets/task.py:191
-#, fuzzy
-msgid "Toggle Toolbar"
-msgstr "Εναλλαγή Πλευρικής Εργαλειοθήκης"
+#: src/task.blp:48
+msgid "Restore"
+msgstr "Επαναφορά"
 
-#: errands/widgets/task.py:210 errands/widgets/task.py:230
-#: errands/widgets/today/today_task.py:117
-#: errands/widgets/today/today_task.py:127
-msgid "Edit"
+#: src/task.blp:106
+#, fuzzy
+msgid "Toggle Sub-Tasks Entry"
+msgstr "Εμφάνιση Υπο-Δουλειών"
+
+#: src/task.blp:129 src/window.blp:74
+msgid "Properties"
+msgstr "Ιδιότητες"
+
+#: src/task.blp:130 src/task.blp:264 src/window.blp:120
+msgid "Notes"
+msgstr "Σημειώσεις"
+
+#: src/task.blp:134
+#, fuzzy
+msgid "Edit Text"
+msgstr "Κείμενο"
+
+#: src/task.blp:135
+msgid "Copy Text"
+msgstr "Αντιγραφή Κειμένου"
+
+#: src/task.blp:136
+msgid "Task Color"
 msgstr ""
 
-#: errands/widgets/task.py:211 errands/widgets/today/today_task.py:118
-msgid "Move to Trash"
+#: src/task.blp:141 src/task.blp:200 src/task-list.blp:72
+msgid "Priority"
+msgstr "Προτεραιότητα"
+
+#: src/task.blp:150
+#, fuzzy
+msgid "Low"
+msgstr "Τώρα"
+
+#: src/task.blp:156
+msgid "Medium"
 msgstr ""
 
-#: errands/widgets/task.py:212 errands/widgets/today/today_task.py:119
+#: src/task.blp:162
+msgid "High"
+msgstr ""
+
+#: src/task.blp:170 src/task-list.blp:91
 #, fuzzy
-msgid "Copy to Clipboard"
-msgstr "Αντιγράφηκε στο Πρόχειρο"
+msgid "Export as \".ics\""
+msgstr "Εισαγωγή Λίστας"
 
-#: errands/widgets/task.py:213
-#: errands/widgets/task_list/task_list_sidebar_row.py:192
-#: errands/widgets/today/today_task.py:120
-msgid "Export"
-msgstr "Εξαγωγή"
+#: src/task.blp:174
+#, fuzzy
+msgid "Cancel / Restore"
+msgstr "Επαναφορά"
 
-#: errands/widgets/task.py:306 errands/widgets/task_list/task_list.py:84
+#: src/task.blp:226 src/window.blp:82
+msgid "Start"
+msgstr "Αρχή"
+
+#: src/task.blp:227 src/task-list.blp:60
+#, fuzzy
+msgid "Start Date"
+msgstr "Ρύθμιση Ημερομηνίας"
+
+#: src/task.blp:242 src/window.blp:86
+msgid "Due"
+msgstr "Τέλος"
+
+#: src/task.blp:243 src/task-list.blp:66
+#, fuzzy
+msgid "Due Date"
+msgstr "Ρύθμιση Ημερομηνίας"
+
+#: src/task.blp:274 src/task.blp:280 src/window.blp:94
+msgid "Attachments"
+msgstr ""
+
+#: src/task.blp:305
+#, fuzzy
+msgid "Add Sub-Task"
+msgstr "Προσθήκη νέας υπο-δουλειάς"
+
+#: src/task-list.blp:21
+#, fuzzy
+msgid "Show Tasks"
+msgstr "Προσθήκη νέας Δουλειάς"
+
+#: src/task-list.blp:24
 #, fuzzy
 msgid "Completed"
 msgstr "Ολοκληρωμένα:"
 
-#: errands/widgets/task.py:330
-msgid "Add new Sub-Task"
-msgstr "Προσθήκη νέας υπο-δουλειάς"
+#: src/task-list.blp:29
+#, fuzzy
+msgid "Cancelled"
+msgstr "Ακύρωση"
 
-#: errands/widgets/task.py:552 errands/widgets/task_list/task_list.py:238
-msgid "Completed:"
+#: src/task-list.blp:35
+msgid "Sort Order"
+msgstr ""
+
+#: src/task-list.blp:38
+msgid "Descending"
+msgstr ""
+
+#: src/task-list.blp:44
+msgid "Ascending"
+msgstr ""
+
+#: src/task-list.blp:51
+msgid "Sort By"
+msgstr ""
+
+#: src/task-list.blp:54
+#, fuzzy
+msgid "Created"
 msgstr "Ολοκληρωμένα:"
 
-#: errands/widgets/task.py:945
-#, fuzzy
-msgid "Delete Tag"
-msgstr "Διαγραφή"
-
-#: errands/widgets/task_list/task_list.py:50
-#, fuzzy
-msgid "Toggle Completed Tasks"
-msgstr "Διαγραφή Ολοκληρωμένων Δουλειών"
-
-#: errands/widgets/task_list/task_list.py:58
-msgid "Delete Completed Tasks"
-msgstr "Διαγραφή Ολοκληρωμένων Δουλειών"
-
-#: errands/widgets/task_list/task_list.py:73
-msgid "Scroll Up"
-msgstr "Κύλιση προς τ' απάνω"
-
-#: errands/widgets/task_list/task_list.py:143
-msgid "Add new Task"
-msgstr "Προσθήκη νέας Δουλειάς"
-
-#: errands/widgets/task_list/task_list_sidebar_row.py:59
-msgid "List will be permanently deleted"
-msgstr "Η Λίστα θα διαγραφεί διαπαντός"
-
-#: errands/widgets/task_list/task_list_sidebar_row.py:89
-msgid "New Name"
-msgstr "Νέο Όνομα"
-
-#: errands/widgets/task_list/task_list_sidebar_row.py:94
+#: src/task-list.blp:87
 msgid "Rename List"
 msgstr "Μετονομασία Λίστας"
 
-#: errands/widgets/task_list/task_list_sidebar_row.py:100
-msgid "Save"
-msgstr "Αποθήκευση"
-
-#: errands/widgets/task_list/task_list_sidebar_row.py:123
-msgid "Export failed"
-msgstr "Εξαγωγή απέτυχε"
-
-#: errands/widgets/task_list/task_list_sidebar_row.py:158
-msgid "Color"
+#: src/task-list.blp:92
+msgid "Print"
 msgstr ""
 
-#: errands/widgets/task_list/task_list_sidebar_row.py:190
-msgid "Rename"
-msgstr "Μετονομασία"
-
-#: errands/widgets/today/today.py:31
-msgid "No Tasks for Today"
-msgstr ""
-
-#: errands/widgets/trash/trash.py:31
-msgid "Empty Trash"
-msgstr "Άδειασμα Απορριμάτων"
-
-#: errands/widgets/trash/trash.py:32
-msgid "No deleted items"
-msgstr "Δεν υπάρχουν διαγραμμένα αντικείμενα"
-
-#: errands/widgets/trash/trash.py:55 errands/widgets/trash/trash.py:189
-#: errands/widgets/trash/trash_sidebar_row.py:69
-msgid "Restore"
-msgstr "Επαναφορά"
-
-#: errands/widgets/trash/trash.py:89
-#: errands/widgets/trash/trash_sidebar_row.py:43 errands/widgets/window.py:75
-msgid "Trash"
-msgstr "Απορρίμματα"
-
-#: errands/widgets/trash/trash.py:158
-msgid "Tasks will be permanently deleted"
-msgstr "Οι δουλειές θα διαγραφούν διαπαντός"
-
-#: errands/widgets/window.py:57
+#: src/task-list.blp:96
 #, fuzzy
-msgid "Sidebar"
-msgstr "Εναλλαγή Πλευρικής Εργαλειοθήκης"
+msgid "Delete Completed"
+msgstr "Διαγραφή Ολοκληρωμένων Δουλειών"
 
-#: errands/widgets/window.py:59
-msgid "Content"
+#: src/task-list.blp:97
+#, fuzzy
+msgid "Delete Cancelled"
+msgstr "Διαγραφή"
+
+#: src/task-list.blp:101
+#, fuzzy
+msgid "Delete List"
+msgstr "Δημιουργία Λίστας"
+
+#: src/task-list.blp:109
+msgid "Search (Ctrl+F)"
 msgstr ""
 
-#: errands/widgets/window.py:66
+#: src/task-list.blp:143
+#, fuzzy
+msgid "Add Task (Ctrl+N)"
+msgstr "Προσθήκη Λίστας (Ctrl+Shift+A)"
+
+#: src/task-list.blp:161
+#, fuzzy
+msgid "Add Task (Ctrl+Return)"
+msgstr "Προσθήκη Λίστας (Ctrl+Shift+A)"
+
+#: src/task-list.blp:185
+#, fuzzy
+msgid "No Tasks"
+msgstr "Ετικέτες"
+
+#: src/task-list.blp:212
 #, fuzzy
 msgid "Loading Tasks"
 msgstr "Προσθήκη νέας Δουλειάς"
 
-#: errands/widgets/window.py:88
-msgid "No Task Lists"
-msgstr "Δεν υπάρχουν λίστες"
-
-#: errands/widgets/window.py:89
-msgid "Create new or import existing one"
-msgstr ""
-
-#: errands/widgets/window.py:93
-msgid "Create List"
-msgstr "Δημιουργία Λίστας"
-
-#: errands/widgets/window.py:102
+#: src/window.blp:27
 #, fuzzy
-msgid "Create new List"
-msgstr "Δημιουργία Λίστας"
+msgid "Sidebar"
+msgstr "Εναλλαγή Πλευρικής Εργαλειοθήκης"
 
-#: errands/widgets/window.py:115 errands/widgets/window.py:123
+#: src/window.blp:34
+msgid "Content"
+msgstr ""
+
+#: src/window.blp:63
 #, fuzzy
-msgid "Syncing"
-msgstr "Συγχρονισμός..."
+msgid "Close Properties"
+msgstr "Ιδιότητες"
 
-#: errands/widgets/window.py:116
-msgid "First synchronization is running"
+#: src/window.blp:79
+msgid "Date and Time"
 msgstr ""
 
-#: errands/widgets/window.py:172
-msgid "translator-credits"
-msgstr "itsnotAZ"
+#: src/window.blp:106
+msgid "Tags"
+msgstr "Ετικέτες"
 
-#: errands/widgets/window.py:178
-msgid "Sync is disabled"
-msgstr "Ο Συγχρονισμός είναι απενεργοποιημένος"
-
-#: errands/widgets/window.py:213
-msgid "Imported"
-msgstr "Εισαγωγές"
-
-#: errands/widgets/preferences.py:26
-msgid "Application Theme"
-msgstr "Θέμα Εφαρμογής"
-
-#: errands/widgets/preferences.py:34
-msgid "System"
-msgstr "Σύστημα"
-
-#: errands/widgets/preferences.py:46
-msgid "Light"
-msgstr "Φωτεινό"
-
-#: errands/widgets/preferences.py:58
-msgid "Dark"
-msgstr "Σκοτεινό"
-
-#: errands/widgets/preferences.py:70
+#: src/window.blp:111
 #, fuzzy
-msgid "Add new Tasks"
-msgstr "Προσθήκη νέας Δουλειάς"
-
-#: errands/widgets/preferences.py:71
-msgid "At the Bottom"
-msgstr ""
-
-#: errands/widgets/preferences.py:71
-msgid "At the Top"
-msgstr ""
-
-#: errands/widgets/preferences.py:87
-msgid "Show Notifications"
-msgstr ""
-
-#: errands/widgets/preferences.py:94
-msgid "Run in Background"
-msgstr ""
-
-#: errands/widgets/preferences.py:95
-msgid "Hide the application window instead of closing it"
-msgstr ""
-
-#: errands/widgets/preferences.py:102
-msgid "Launch on Startup"
-msgstr ""
-
-#: errands/widgets/preferences.py:103
-msgid "Launch application when user logs in"
-msgstr ""
-
-#: errands/widgets/preferences.py:112
-msgid "Notifications and Background"
-msgstr ""
-
-#: errands/widgets/preferences.py:120 errands/widgets/preferences.py:181
-#: data/resources/gtk/help-overlay.ui:38
-msgid "Sync"
-msgstr "Συγχρονισμός"
-
-#. Provider
-#: errands/widgets/preferences.py:123
-msgid "Disabled"
-msgstr "Απενεργοποιημένο"
-
-#: errands/widgets/preferences.py:125
-msgid "Sync Provider"
-msgstr "Παροχέας Συγχρονισμού"
-
-#: errands/widgets/preferences.py:134
-msgid "Server URL"
-msgstr "URL Σέρβερ"
-
-#: errands/widgets/preferences.py:140
-msgid ""
-"URL needs to include protocol, like <b>http://</b> or <b>https://</b>. If "
-"you have problems with connection - try to change protocol first."
-msgstr ""
-
-#: errands/widgets/preferences.py:147
-msgid "Username"
-msgstr "Όνομα Χρήστη"
-
-#: errands/widgets/preferences.py:153
-msgid "Password"
-msgstr "Συνθηματικό"
-
-#: errands/widgets/preferences.py:159
-msgid "Test"
-msgstr "Δοκιμή"
-
-#: errands/widgets/preferences.py:164
-msgid "Test Connection"
-msgstr "Δοκιμή Σύνδεσης"
-
-#: errands/widgets/preferences.py:172 data/resources/gtk/help-overlay.ui:9
-msgid "General"
-msgstr "Γενικά"
-
-#: errands/widgets/preferences.py:217
-msgid "Connected"
-msgstr "Συνδεδεμένο"
-
-#: errands/widgets/preferences.py:221
-#, fuzzy
-msgid "Authorization failed"
-msgstr "Εξαγωγή απέτυχε"
-
-#: errands/widgets/preferences.py:223
-msgid "Could not locate server. Check network and url."
-msgstr ""
-
-#: errands/widgets/preferences.py:225
-msgid "Can't connect"
-msgstr "Αδυναμία Σύνδεσης"
-
-#. NOTE: Also catches invalid credentials
-#: errands/widgets/preferences.py:227
-msgid "Can't connect. Check credentials"
-msgstr ""
-
-#: errands/lib/sync/providers/caldav.py:66
-msgid "Not all sync credentials provided. Please check settings."
-msgstr "Λείπουν στοιχεία για τον συγχρονισμό. Παρακαλώ ελέγξτε τις ρυθμίσεις."
-
-#: errands/lib/sync/providers/caldav.py:110
-msgid "Can't connect to CalDAV server at:"
-msgstr "Αδυναμία σύνδεσης σε σέρβερ CalDAV στο:"
-
-#: errands/lib/data.py:92
-#, fuzzy
-msgid "New Task List"
-msgstr "Δεν υπάρχουν λίστες"
-
-#: errands/lib/notifications.py:74
-#, fuzzy
-msgid "Task is Due"
-msgstr "Δουλείες"
-
-#: errands/application.py:78
-msgid "Errands was updated"
-msgstr ""
-
-#: errands/application.py:79
-msgid "Restart is required"
-msgstr ""
-
-#: errands/application.py:82
-#, fuzzy
-msgid "Restart"
-msgstr "Επαναφορά"
-
-#: errands/application.py:111
-msgid "Errands need to run in the background for notifications"
-msgstr ""
-
-#: data/resources/gtk/help-overlay.ui:13
-msgid "Show keyboard shortcuts"
-msgstr "Προβολή συντομεύσεων πληκτρολογίου"
-
-#: data/resources/gtk/help-overlay.ui:53
-msgid "Lists"
-msgstr "Λίστες"
-
-#: data/resources/gtk/help-overlay.ui:64
-msgid "Import List"
-msgstr "Εισαγωγή Λίστας"
-
-#: data/resources/gtk/help-overlay.ui:75
-msgid "Details"
-msgstr "Λεπτομέρειες"
-
-#: data/resources/gtk/help-overlay.ui:79
-msgid "Toggle Details"
-msgstr "Εναλλαγή Λεπτομερειών"
-
-#: data/io.github.mrvladus.List.desktop.in.in:4
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:7
-msgid "Manage your tasks"
-msgstr "Διαχειριστείτε τις δουλειές σας"
-
-#: data/io.github.mrvladus.List.desktop.in.in:10
-msgid "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
-msgstr "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
-
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:12
-msgid "Todo application for those who prefer simplicity."
-msgstr "Εφαρμογή to-do για εκείνους  που προτιμούν την απλότητα."
-
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:13
-msgid "Features:"
-msgstr "Χαρακτηριστικά:"
-
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:15
-msgid "Multiple task lists support"
-msgstr "Υποστήριξη για πολλαπλές λίστες από δουλείες"
-
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:16
-msgid "Add, remove, edit tasks and sub-tasks"
-msgstr "Προσθήκη, Αφαίρεση και επεξεργασία δουλειών και υπο-δουλειών"
-
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:17
-msgid "Mark task and sub-tasks as completed"
-msgstr "Σημείωση δουλειών και υπο-δουλειών σαν ολοκληρωμένα"
-
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:18
-msgid "Add accent color for each task"
-msgstr "Προσθήκη χρώματος έμφασης για κάθε δουλειά"
-
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:19
-msgid "Sync tasks with Nextcloud or other CalDAV providers"
-msgstr "Συγχρονισμός δουλειών με Nextcloud ή άλλους παροχείς CalDAV"
-
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:20
-msgid "Drag and Drop support"
-msgstr "Υποστήριξη για Τράβηγμα και Απόθεση"
-
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:21
-msgid "Import .ics files"
-msgstr "Εισαγωγή αρχείων .ics"
-
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:41
-msgid "Main Window View"
-msgstr ""
-
-#, fuzzy
-#~ msgid "Loading..."
-#~ msgstr "Συγχρονισμός..."
-
-#~ msgid "Not Set"
-#~ msgstr "Μη Ρυθμισμένο"
-
-#~ msgid "Click Action"
-#~ msgstr "Δράση Κλικ"
-
-#~ msgid "Open Details Panel"
-#~ msgstr "Άνοιγμα Πίνακα Λεπομερειών"
-
-#~ msgid "Complete Button Size"
-#~ msgstr "Ολοκληρωμένο  Μέγεθος Κουμπιού"
-
-#~ msgid "Small"
-#~ msgstr "Μικρό"
-
-#~ msgid "Big"
-#~ msgstr "Μεγάλο"
-
-#~ msgid "Details Panel"
-#~ msgstr "Πίνακας Λεπτομερειών"
-
-#~ msgid "Position"
-#~ msgstr "Θέση"
-
-#~ msgid "Left"
-#~ msgstr "Αριστερά"
-
-#~ msgid "Right"
-#~ msgstr "Δεξιά"
-
-#~ msgid "Appearance"
-#~ msgstr "Εμφάνιση"
-
-#~ msgid "More Options"
-#~ msgstr "Περισσότερες Επιλογές"
-
-#~ msgid "Menu"
-#~ msgstr "Μενού"
-
-#~ msgid "No Details"
-#~ msgstr "Χωρίς Λεπτομέρειες"
-
-#~ msgid "Click on task to show more info"
-#~ msgstr "Κάντε κλικ πάνω στην Δουλεία για περισσότερες πληροφορίες"
-
-#~ msgid "Clear Style"
-#~ msgstr "Καθαρό Στυλ"
-
-#~ msgid "Text"
-#~ msgstr "Κείμενο"
-
-#~ msgid "Copy Text"
-#~ msgstr "Αντιγραφή Κειμένου"
-
-#~ msgid "Properties"
-#~ msgstr "Ιδιότητες"
-
-#~ msgid "Complete %"
-#~ msgstr "Ολοκλήρωση %"
-
-#~ msgid "Add Tag"
-#~ msgstr "Προσθήκη Ετικέτας"
-
-#~ msgid "Save Task as .ics file"
-#~ msgstr "Αποθήκευση ως αρχείο .ics"
-
-#~ msgid "Mark as Completed"
-#~ msgstr "Σημείωση ως Ολοκληρωμένο"
-
-#~ msgid "Expand / Fold"
-#~ msgstr "Ανάπτυξη / Δίπλωμα"
-
-#~ msgid "Restore All"
-#~ msgstr "Επαναφορά όλων"
-
-#~ msgid "Save changed details"
-#~ msgstr "Αποθήκευση αλλαγών"
+msgid "New Tag"
+msgstr "Ετικέτες"

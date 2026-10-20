@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-10 12:25+0300\n"
+"POT-Creation-Date: 2026-10-20 18:53+0300\n"
 "PO-Revision-Date: 2024-06-20 11:10+0200\n"
 "Last-Translator: Marcin Stasiak <contact@marcinstasiak.pl>Language-Team: "
 "Szymon Zielonka <szymon@zsdev.eu>\n"
@@ -20,714 +20,735 @@ msgstr ""
 "|| n%100>14) ? 1 : 2);\n"
 "X-Generator: Poedit 3.4.2\n"
 
-#: errands/widgets/shared/components/buttons.py:45
-msgid "Info"
-msgstr "Informacje"
-
-#: errands/widgets/shared/components/dialogs.py:31
-msgid "Are you sure?"
-msgstr "Jesteś pewien?"
-
-#: errands/widgets/shared/components/dialogs.py:35
-#: errands/widgets/sidebar.py:300 errands/widgets/task.py:250
-#: errands/widgets/task_list/task_list_sidebar_row.py:99
-#: errands/widgets/today/today_task.py:146
-msgid "Cancel"
-msgstr "Anuluj"
-
-#: errands/widgets/shared/color_selector.py:32
-#: errands/widgets/shared/task_toolbar/toolbar.py:100
-msgid "None"
-msgstr "Brak"
-
-#: errands/widgets/shared/color_selector.py:41
-msgid "Blue"
-msgstr "Niebieski"
-
-#: errands/widgets/shared/color_selector.py:50
-msgid "Green"
-msgstr "Zielony"
-
-#: errands/widgets/shared/color_selector.py:61
-msgid "Yellow"
-msgstr "Żółty"
-
-#: errands/widgets/shared/color_selector.py:72
-msgid "Orange"
-msgstr "Pomarańczowy"
-
-#: errands/widgets/shared/color_selector.py:81
-msgid "Red"
-msgstr "Czerwony"
-
-#: errands/widgets/shared/color_selector.py:92
-msgid "Purple"
-msgstr "Fioletowy"
-
-#: errands/widgets/shared/color_selector.py:101
-msgid "Brown"
-msgstr "Brązowy"
-
-#: errands/widgets/shared/datetime_picker.py:138
-#: errands/widgets/today/today.py:57
-#: errands/widgets/today/today_sidebar_row.py:30 errands/widgets/window.py:69
-msgid "Today"
-msgstr "Dziś"
-
-#: errands/widgets/shared/datetime_picker.py:143
-msgid "Tomorrow"
-msgstr "Jutro"
-
-#: errands/widgets/shared/datetime_picker.py:154
-msgid "Now"
-msgstr "Teraz"
-
-#: errands/widgets/shared/datetime_picker.py:160
-#: errands/widgets/trash/trash.py:40
-#: errands/widgets/trash/trash_sidebar_row.py:68
-msgid "Clear"
-msgstr "Wyczyść"
-
-#: errands/widgets/shared/datetime_picker.py:214
-msgid "Set Date"
-msgstr "Ustaw datę"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:44
-msgid "Start / Due Date"
-msgstr "Data rozpoczęcia / zakończenia"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:49 errands/lib/utils.py:24
-msgid "Date"
-msgstr "Data"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:59
-#: errands/widgets/shared/task_toolbar/notes_window.py:29
-msgid "Notes"
-msgstr "Notatki"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:72
-msgid "Priority"
-msgstr "Priorytet"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:90
-msgid "High"
-msgstr "Wysoki"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:94
-msgid "Medium"
-msgstr "Średni"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:98
-msgid "Low"
-msgstr "Niski"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:103
-msgid "Custom"
-msgstr "Własne"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:113
-msgid "No Tags"
-msgstr "Brak tagów"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:134
-#: errands/widgets/tags/tags.py:63 errands/widgets/tags/tags_sidebar_row.py:32
-#: errands/widgets/window.py:72
-msgid "Tags"
-msgstr "Tagi"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:157
-#: errands/widgets/shared/task_toolbar/attachments_window.py:30
-msgid "Attachments"
-msgstr "Załączniki"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:191
-#: errands/widgets/shared/task_toolbar/toolbar.py:294
-msgid "Created:"
-msgstr "Utworzono:"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:202
-#: errands/widgets/shared/task_toolbar/toolbar.py:295
-msgid "Changed:"
-msgstr "Zaktualizowano:"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:215
-msgid "More"
-msgstr "Więcej"
-
-#: errands/widgets/shared/task_toolbar/attachments_window.py:33
-msgid "No Files Attached"
-msgstr "Brak załączonych plików"
-
-#: errands/widgets/shared/task_toolbar/attachments_window.py:56
-msgid "Add Attachment"
-msgstr "Dodaj załącznik"
-
-#: errands/widgets/shared/task_toolbar/attachments_window.py:119
-msgid "Open File"
-msgstr "Otwórz plik"
-
-#: errands/widgets/shared/task_toolbar/attachments_window.py:123
-#: errands/widgets/tags/tags.py:140
-#: errands/widgets/task_list/task_list_sidebar_row.py:60
-#: errands/widgets/task_list/task_list_sidebar_row.py:191
-#: errands/widgets/trash/trash.py:159
-msgid "Delete"
-msgstr "Usuń"
-
-#: errands/widgets/shared/task_toolbar/attachments_window.py:132
-msgid "Open Containing Folder"
-msgstr "Otwórz folder załącznika"
-
-#: errands/widgets/shared/task_toolbar/datetime_window.py:29
-msgid "Date and Time"
-msgstr "Data i czas"
-
-#: errands/widgets/shared/task_toolbar/datetime_window.py:39
-#: errands/widgets/shared/task_toolbar/datetime_window.py:41
-msgid "Due"
-msgstr "Zakończenie"
-
-#: errands/widgets/shared/task_toolbar/datetime_window.py:54
-#: errands/widgets/shared/task_toolbar/datetime_window.py:56
-msgid "Start"
-msgstr "Rozpoczeńcie"
-
-#: errands/widgets/sidebar.py:42
-msgid "Add List (Ctrl+Shift+A)"
-msgstr "Dodaj listę (Ctrl+Shift+A)"
-
-#: errands/widgets/sidebar.py:61
-msgid "Syncing..."
-msgstr "Synchronizowanie.."
-
-#: errands/widgets/sidebar.py:67
-msgid "Add new List"
-msgstr "Dodaj nową listę"
-
-#: errands/widgets/sidebar.py:68
-msgid "Click \"+\" button"
-msgstr "Kliknij przycisk \"+\""
-
-#. Task lists group
-#: errands/widgets/sidebar.py:94 errands/widgets/preferences.py:66
-msgid "Task Lists"
-msgstr "Listy zadań"
-
-#: errands/widgets/sidebar.py:106 errands/widgets/window.py:44
-#: errands/widgets/window.py:167 data/io.github.mrvladus.List.desktop.in.in:3
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:6
+#: src/about-dialog.h:15 src/sidebar.blp:13 src/window.blp:8
 msgid "Errands"
 msgstr ""
 
-#: errands/widgets/sidebar.py:114
-msgid "Main Menu"
-msgstr "Menu główne"
-
-#: errands/widgets/sidebar.py:121 data/resources/gtk/help-overlay.ui:42
-msgid "Sync / Fetch Tasks"
-msgstr "Synchronizacja / pobieranie zadań"
-
-#: errands/widgets/sidebar.py:128
-msgid "Import Task List"
-msgstr "Importuj listę zadań"
-
-#: errands/widgets/sidebar.py:135 data/resources/gtk/help-overlay.ui:20
-msgid "Preferences"
-msgstr "Ustawienia"
-
-#: errands/widgets/sidebar.py:138
-msgid "Keyboard Shortcuts"
-msgstr "Skróty klawiaturowe"
-
-#: errands/widgets/sidebar.py:142
-msgid "About Errands"
-msgstr "O Errands"
-
-#: errands/widgets/sidebar.py:144 data/resources/gtk/help-overlay.ui:27
-msgid "Quit"
-msgstr "Zamknij"
-
-#: errands/widgets/sidebar.py:291
-msgid "New List Name"
-msgstr "Nazwa nowej listy"
-
-#: errands/widgets/sidebar.py:295 data/resources/gtk/help-overlay.ui:57
-msgid "Add List"
-msgstr "Dodaj listę"
-
-#: errands/widgets/sidebar.py:301
-msgid "Add"
-msgstr "Dodaj"
-
-#: errands/widgets/tags/tags.py:32
-msgid "No Tags Found"
-msgstr "Nie znaleziono żadnych tagów"
-
-#: errands/widgets/tags/tags.py:33
-msgid "Add new Tags in the entry above"
-msgstr "Dodaj nowe tagi w powyższym wpisie"
-
-#: errands/widgets/tags/tags.py:82
-msgid "Add new Tag"
-msgstr "Dodaj nowy tag"
-
-#: errands/widgets/task.py:79
-#: errands/widgets/task_list/task_list_sidebar_row.py:125
-#: errands/widgets/today/today_task.py:73
-msgid "Exported"
-msgstr "Wyeksportowane"
-
-#: errands/widgets/task.py:87 errands/widgets/today/today_task.py:81
-msgid "Copied to Clipboard"
-msgstr "Skopiowano do schowka"
-
-#: errands/widgets/task.py:153
-msgid "Toggle Sub-Tasks"
-msgstr "Pokaż podzadania"
-
-#: errands/widgets/task.py:161 errands/widgets/today/today_task.py:100
-msgid "Toggle Completion"
-msgstr "Oznacz jako ukończone"
-
-#: errands/widgets/task.py:191
-msgid "Toggle Toolbar"
-msgstr "Pokaż pasek zadań"
-
-#: errands/widgets/task.py:210 errands/widgets/task.py:230
-#: errands/widgets/today/today_task.py:117
-#: errands/widgets/today/today_task.py:127
-msgid "Edit"
-msgstr "Edytuj"
-
-#: errands/widgets/task.py:211 errands/widgets/today/today_task.py:118
-msgid "Move to Trash"
-msgstr "Przenieś do kosza"
-
-#: errands/widgets/task.py:212 errands/widgets/today/today_task.py:119
-msgid "Copy to Clipboard"
-msgstr "Skopiuj do schowka"
-
-#: errands/widgets/task.py:213
-#: errands/widgets/task_list/task_list_sidebar_row.py:192
-#: errands/widgets/today/today_task.py:120
-msgid "Export"
-msgstr "Eksportuj"
-
-#: errands/widgets/task.py:306 errands/widgets/task_list/task_list.py:84
-msgid "Completed"
-msgstr "Ukończone"
-
-#: errands/widgets/task.py:330
-msgid "Add new Sub-Task"
-msgstr "Dodaj nowe podzadanie"
-
-#: errands/widgets/task.py:552 errands/widgets/task_list/task_list.py:238
-msgid "Completed:"
-msgstr "Ukończone:"
-
-#: errands/widgets/task.py:945
-msgid "Delete Tag"
-msgstr "Usuń tag"
-
-#: errands/widgets/task_list/task_list.py:50
-msgid "Toggle Completed Tasks"
-msgstr "Zwiń zakończone zadania"
-
-#: errands/widgets/task_list/task_list.py:58
-msgid "Delete Completed Tasks"
-msgstr "Usuń zakończone zadania"
-
-#: errands/widgets/task_list/task_list.py:73
-msgid "Scroll Up"
-msgstr "Przenieś do góry"
-
-#: errands/widgets/task_list/task_list.py:143
-msgid "Add new Task"
-msgstr "Dodaj nowe zadanie"
-
-#: errands/widgets/task_list/task_list_sidebar_row.py:59
-msgid "List will be permanently deleted"
-msgstr "Lista zostanie trwale usunięta"
-
-#: errands/widgets/task_list/task_list_sidebar_row.py:89
-msgid "New Name"
-msgstr "Nowa nazwa"
-
-#: errands/widgets/task_list/task_list_sidebar_row.py:94
-msgid "Rename List"
-msgstr "Zmień nazwę listy"
-
-#: errands/widgets/task_list/task_list_sidebar_row.py:100
-msgid "Save"
-msgstr "Zapisz"
-
-#: errands/widgets/task_list/task_list_sidebar_row.py:123
-msgid "Export failed"
-msgstr "Eksport zakończył się niepowodzeniem"
-
-#: errands/widgets/task_list/task_list_sidebar_row.py:158
-msgid "Color"
-msgstr "Kolor"
-
-#: errands/widgets/task_list/task_list_sidebar_row.py:190
-msgid "Rename"
-msgstr "Zmień nazwę"
-
-#: errands/widgets/today/today.py:31
-msgid "No Tasks for Today"
-msgstr "Brak zadań na dziś"
-
-#: errands/widgets/trash/trash.py:31
-msgid "Empty Trash"
-msgstr "Opróżnij kosz"
-
-#: errands/widgets/trash/trash.py:32
-msgid "No deleted items"
-msgstr "Nie ma zadań do usunięcia"
-
-#: errands/widgets/trash/trash.py:55 errands/widgets/trash/trash.py:189
-#: errands/widgets/trash/trash_sidebar_row.py:69
-msgid "Restore"
-msgstr "Przywróć"
-
-#: errands/widgets/trash/trash.py:89
-#: errands/widgets/trash/trash_sidebar_row.py:43 errands/widgets/window.py:75
-msgid "Trash"
-msgstr "Kosz"
-
-#: errands/widgets/trash/trash.py:158
-msgid "Tasks will be permanently deleted"
-msgstr "Zadania zostaną usunięte"
-
-#: errands/widgets/window.py:57
-msgid "Sidebar"
-msgstr "Pasek boczny"
-
-#: errands/widgets/window.py:59
-msgid "Content"
-msgstr "Treść"
-
-#: errands/widgets/window.py:66
-#, fuzzy
-msgid "Loading Tasks"
-msgstr "Dodawanie nowych zadań"
-
-#: errands/widgets/window.py:88
-msgid "No Task Lists"
-msgstr "Brak list zadań"
-
-#: errands/widgets/window.py:89
-msgid "Create new or import existing one"
-msgstr "Utwórz nową lub zaimportuj istniejącą"
-
-#: errands/widgets/window.py:93
-msgid "Create List"
-msgstr "Utwórz listę"
-
-#: errands/widgets/window.py:102
-msgid "Create new List"
-msgstr "Utwórz nową listę"
-
-#: errands/widgets/window.py:115 errands/widgets/window.py:123
-#, fuzzy
-msgid "Syncing"
-msgstr "Synchronizowanie.."
-
-#: errands/widgets/window.py:116
-msgid "First synchronization is running"
-msgstr ""
-
-#: errands/widgets/window.py:172
+#: src/about-dialog.h:18
 msgid "translator-credits"
 msgstr ""
 "Szymon Zielonka <szymon@zsdev.eu>\n"
 "Marcin Stasiak <contact@marcinstasiak.pl>"
 
-#: errands/widgets/window.py:178
-msgid "Sync is disabled"
-msgstr "Synchronizacja jest wyłączona"
+#: src/date-chooser.c:104 src/date-chooser.blp:7
+msgid "Not Set"
+msgstr ""
 
-#: errands/widgets/window.py:213
-msgid "Imported"
-msgstr "Zaimportowane"
+#: src/rrule-row.c:171
+msgctxt "Repeat every ..."
+msgid "seconds"
+msgstr ""
 
-#: errands/widgets/preferences.py:26
-msgid "Application Theme"
-msgstr "Motyw aplikacji"
+#: src/rrule-row.c:171
+msgctxt "Repeat every ..."
+msgid "minutes"
+msgstr ""
 
-#: errands/widgets/preferences.py:34
+#: src/rrule-row.c:172
+msgctxt "Repeat every ..."
+msgid "hours"
+msgstr ""
+
+#: src/rrule-row.c:172
+msgctxt "Repeat every ..."
+msgid "days"
+msgstr ""
+
+#: src/rrule-row.c:173
+msgctxt "Repeat every ..."
+msgid "weeks"
+msgstr ""
+
+#: src/rrule-row.c:173
+msgctxt "Repeat every ..."
+msgid "months"
+msgstr ""
+
+#: src/rrule-row.c:174
+msgctxt "Repeat every ..."
+msgid "years"
+msgstr ""
+
+#: src/rrule-row.c:176
+#, c-format
+msgid "Repeat every %d %s"
+msgstr ""
+
+#: src/rrule-row.c:182
+msgid "Repeat forever"
+msgstr ""
+
+#: src/rrule-row.c:182
+#, c-format
+msgid "Repeat %zu times"
+msgstr ""
+
+#: src/sync.c:262
+#, c-format
+msgid "Added remote task list: %s"
+msgstr ""
+
+#: src/sync.c:293
+#, c-format
+msgid "Removed remote task list: %s"
+msgstr ""
+
+#: src/sync.c:372
+msgid "Creating remote list failed. Limits may be reached."
+msgstr ""
+
+#: src/sync.c:532
+#, fuzzy
+msgid "Failed to connect to CalDAV remote."
+msgstr "Nie można połączyć się z serwerem CalDAV pod adresem:"
+
+#: src/sync.c:553
+msgid "Failed 3 attempts to sync. Disabling for now."
+msgstr ""
+
+#: src/task.c:110
+#, fuzzy
+msgctxt "Start date"
+msgid "Start"
+msgstr "Rozpoczeńcie"
+
+#: src/task.c:125
+#, fuzzy
+msgctxt "Due date"
+msgid "Due"
+msgstr "Zakończenie"
+
+#: src/task.c:302
+msgid "Copied to Clipboard"
+msgstr "Skopiowano do schowka"
+
+#: src/task.c:336
+msgid "Failed to Export"
+msgstr ""
+
+#: src/task.c:339 src/task-list.c:294
+msgid "Exported"
+msgstr "Wyeksportowane"
+
+#: src/task-list.c:283 src/task-list.c:288
+msgid "Export failed"
+msgstr "Eksport zakończył się niepowodzeniem"
+
+#: src/task-list.c:314 src/task-list.c:326
+#, fuzzy
+msgid "No tasks to delete"
+msgstr "Brak zadań na dziś"
+
+#: src/task-list.c:319 src/task-list.c:331
+#, fuzzy, c-format
+msgid "Deleted %d task"
+msgid_plural "Deleted %d tasks"
+msgstr[0] "Pokaż usunięte zadania"
+msgstr[1] "Pokaż usunięte zadania"
+msgstr[2] "Pokaż usunięte zadania"
+
+#: src/task-list.c:464 src/sidebar.blp:100
+#, fuzzy
+msgid "All Tasks"
+msgstr "Dodawanie nowych zadań"
+
+#: src/task-list.c:465 src/sidebar.blp:113
+#, fuzzy
+msgid "Tasks for Today"
+msgstr "Brak zadań na dziś"
+
+#: src/task-list-item.c:142
+msgid "Untitled"
+msgstr ""
+
+#: src/window.c:115
+#, fuzzy
+msgid "Remove Attachment"
+msgstr "Załączniki"
+
+#: src/window.c:146
+#, fuzzy
+msgid "Enable Tag"
+msgstr "Usuń tag"
+
+#: src/window.c:151
+#, fuzzy
+msgid "Remove Tag"
+msgstr "Usuń tag"
+
+#: src/date-chooser.blp:13
+msgid "Reset"
+msgstr ""
+
+#: src/date-chooser.blp:27 src/rrule-row.blp:51
+msgid "Date"
+msgstr "Data"
+
+#: src/date-chooser.blp:36
+msgid "Today"
+msgstr "Dziś"
+
+#: src/date-chooser.blp:50
+msgid "Tomorrow"
+msgstr "Jutro"
+
+#: src/date-chooser.blp:85
+msgid "Time"
+msgstr ""
+
+#: src/date-chooser.blp:149
+msgid "9:00"
+msgstr ""
+
+#: src/date-chooser.blp:164
+msgid "12:00"
+msgstr ""
+
+#: src/date-chooser.blp:179
+msgid "17:00"
+msgstr ""
+
+#: src/date-chooser.blp:194
+msgid "20:00"
+msgstr ""
+
+#: src/delete-list-dialog.blp:8
+msgid "Are you sure?"
+msgstr "Jesteś pewien?"
+
+#: src/delete-list-dialog.blp:12 src/rename-list-dialog.blp:11
+msgid "Cancel"
+msgstr "Anuluj"
+
+#: src/delete-list-dialog.blp:13 src/task.blp:175
+msgid "Delete"
+msgstr "Usuń"
+
+#: src/rename-list-dialog.blp:12
+msgid "Rename"
+msgstr "Zmień nazwę"
+
+#: src/rename-list-dialog.blp:21
+msgid "New List Name"
+msgstr "Nazwa nowej listy"
+
+#: src/rrule-row.blp:7 src/task.blp:258
+msgid "Repeat"
+msgstr ""
+
+#: src/rrule-row.blp:12
+msgid "Frequency"
+msgstr ""
+
+#: src/rrule-row.blp:13
+msgid "How often task will repeat"
+msgstr ""
+
+#: src/rrule-row.blp:17
+msgid "Secondly"
+msgstr ""
+
+#: src/rrule-row.blp:18
+msgid "Minutely"
+msgstr ""
+
+#: src/rrule-row.blp:19
+msgid "Hourly"
+msgstr ""
+
+#: src/rrule-row.blp:20
+msgid "Daily"
+msgstr ""
+
+#: src/rrule-row.blp:21
+msgid "Weekly"
+msgstr ""
+
+#: src/rrule-row.blp:22
+msgid "Monthly"
+msgstr ""
+
+#: src/rrule-row.blp:23
+msgid "Yearly"
+msgstr ""
+
+#: src/rrule-row.blp:24 src/task.blp:144
+msgid "None"
+msgstr "Brak"
+
+#: src/rrule-row.blp:32
+msgid "Interval"
+msgstr ""
+
+#: src/rrule-row.blp:46
+msgid "Repeat Until"
+msgstr ""
+
+#: src/rrule-row.blp:50
+msgid "Indefinitely"
+msgstr ""
+
+#: src/rrule-row.blp:52
+msgid "Count"
+msgstr ""
+
+#: src/rrule-row.blp:60
+msgid "Repeat Until Date"
+msgstr ""
+
+#: src/rrule-row.blp:64
+msgid "Repeat Count"
+msgstr ""
+
+#: src/rrule-row.blp:87
+msgid "Week Days"
+msgstr ""
+
+#: src/rrule-row.blp:96
+#, fuzzy
+msgid "Mo"
+msgstr "Więcej"
+
+#: src/rrule-row.blp:97
+msgid "Monday"
+msgstr ""
+
+#: src/rrule-row.blp:106
+msgid "Tu"
+msgstr ""
+
+#: src/rrule-row.blp:107
+msgid "Tuesday"
+msgstr ""
+
+#: src/rrule-row.blp:116
+msgid "We"
+msgstr ""
+
+#: src/rrule-row.blp:117
+msgid "Wednesday"
+msgstr ""
+
+#: src/rrule-row.blp:126
+msgid "Th"
+msgstr ""
+
+#: src/rrule-row.blp:127
+msgid "Thursday"
+msgstr ""
+
+#: src/rrule-row.blp:136
+msgid "Fr"
+msgstr ""
+
+#: src/rrule-row.blp:137
+msgid "Friday"
+msgstr ""
+
+#: src/rrule-row.blp:146
+#, fuzzy
+msgid "Sa"
+msgstr "Zapisz"
+
+#: src/rrule-row.blp:147
+msgid "Saturday"
+msgstr ""
+
+#: src/rrule-row.blp:156
+msgid "Su"
+msgstr ""
+
+#: src/rrule-row.blp:157
+msgid "Sunday"
+msgstr ""
+
+#: src/settings-dialog.blp:11
+msgid "Appearance"
+msgstr ""
+
+#: src/settings-dialog.blp:14
+msgid "Theme"
+msgstr ""
+
+#: src/settings-dialog.blp:21
 msgid "System"
 msgstr "System"
 
-#: errands/widgets/preferences.py:46
+#: src/settings-dialog.blp:26
 msgid "Light"
 msgstr "Jasny"
 
-#: errands/widgets/preferences.py:58
+#: src/settings-dialog.blp:31
 msgid "Dark"
 msgstr "Ciemny"
 
-#: errands/widgets/preferences.py:70
-msgid "Add new Tasks"
-msgstr "Dodawanie nowych zadań"
+#: src/settings-dialog.blp:43
+msgid "Miscellaneous"
+msgstr ""
 
-#: errands/widgets/preferences.py:71
-msgid "At the Bottom"
-msgstr "Od dołu"
-
-#: errands/widgets/preferences.py:71
-msgid "At the Top"
-msgstr "Od góry"
-
-#: errands/widgets/preferences.py:87
+#: src/settings-dialog.blp:46
 msgid "Show Notifications"
 msgstr "Pokaż powiadomienia"
 
-#: errands/widgets/preferences.py:94
-msgid "Run in Background"
+#: src/settings-dialog.blp:50
+#, fuzzy
+msgid "Work in the Background"
 msgstr "Uruchamiaj w tle"
 
-#: errands/widgets/preferences.py:95
-msgid "Hide the application window instead of closing it"
-msgstr "Ukryj okno aplikacji zamiast je zamykać"
-
-#: errands/widgets/preferences.py:102
-msgid "Launch on Startup"
+#: src/settings-dialog.blp:54
+#, fuzzy
+msgid "Launch at Startup"
 msgstr "Uruchom na starcie"
 
-#: errands/widgets/preferences.py:103
-msgid "Launch application when user logs in"
-msgstr "Uruchom aplikacje automatycznie po zalogowaniu"
-
-#: errands/widgets/preferences.py:112
-msgid "Notifications and Background"
-msgstr "Powiadomienia i uruchamianie w tle"
-
-#: errands/widgets/preferences.py:120 errands/widgets/preferences.py:181
-#: data/resources/gtk/help-overlay.ui:38
+#: src/settings-dialog.blp:60 src/shortcuts-dialog.blp:84 src/sidebar.blp:64
 msgid "Sync"
 msgstr "Synchronizacja"
 
-#. Provider
-#: errands/widgets/preferences.py:123
-msgid "Disabled"
+#: src/settings-dialog.blp:63
+#, fuzzy
+msgid "Enabled"
 msgstr "Wyłączone"
 
-#: errands/widgets/preferences.py:125
-msgid "Sync Provider"
-msgstr "Dostawca usługi synchronizacji"
+#: src/settings-dialog.blp:67
+msgid "Sync Interval"
+msgstr ""
 
-#: errands/widgets/preferences.py:134
-msgid "Server URL"
+#: src/settings-dialog.blp:68
+msgid "Seconds between pulling events from the server"
+msgstr ""
+
+#: src/settings-dialog.blp:80
+#, fuzzy
+msgid "CalDAV Server URL"
 msgstr "Adres URL serwera"
 
-#: errands/widgets/preferences.py:140
-msgid ""
-"URL needs to include protocol, like <b>http://</b> or <b>https://</b>. If "
-"you have problems with connection - try to change protocol first."
-msgstr ""
-"Adres URL musi zawierać protokół np <b>http://</b> or <b>https://</b>.Jeśli "
-"masz problemy z połączeniem w pierwszej kolejności zmienić protokół."
-
-#: errands/widgets/preferences.py:147
+#: src/settings-dialog.blp:86
 msgid "Username"
 msgstr "Użytkownik"
 
-#: errands/widgets/preferences.py:153
+#: src/settings-dialog.blp:92
 msgid "Password"
 msgstr "Hasło"
 
-#: errands/widgets/preferences.py:159
-msgid "Test"
-msgstr "Test"
-
-#: errands/widgets/preferences.py:164
-msgid "Test Connection"
-msgstr "Test połaczenia"
-
-#: errands/widgets/preferences.py:172 data/resources/gtk/help-overlay.ui:9
+#: src/shortcuts-dialog.blp:9
 msgid "General"
 msgstr "Ogólne"
 
-#: errands/widgets/preferences.py:217
-msgid "Connected"
-msgstr "Podłączono"
+#: src/shortcuts-dialog.blp:12 src/sidebar.blp:68
+msgid "Preferences"
+msgstr "Ustawienia"
 
-#: errands/widgets/preferences.py:221
-msgid "Authorization failed"
-msgstr "Autoryzacja zakończona niepowodzeniem"
+#: src/shortcuts-dialog.blp:17
+#, fuzzy
+msgid "Open Menu"
+msgstr "Menu główne"
 
-#: errands/widgets/preferences.py:223
-msgid "Could not locate server. Check network and url."
-msgstr ""
-"Nie można zlokalizować serwera. Sprawdź połączenie z siecią i adres URL."
-
-#: errands/widgets/preferences.py:225
-msgid "Can't connect"
-msgstr "Nie można się połączyć"
-
-#. NOTE: Also catches invalid credentials
-#: errands/widgets/preferences.py:227
-msgid "Can't connect. Check credentials"
-msgstr "Nie można się połączyć. Sprawdź dane uwierzytelniające"
-
-#: errands/lib/sync/providers/caldav.py:66
-msgid "Not all sync credentials provided. Please check settings."
-msgstr ""
-"Nie podano wszystkich danych uwierzytelniających synchronizacji. Sprawdź "
-"ustawienia."
-
-#: errands/lib/sync/providers/caldav.py:110
-msgid "Can't connect to CalDAV server at:"
-msgstr "Nie można połączyć się z serwerem CalDAV pod adresem:"
-
-#: errands/lib/data.py:92
-msgid "New Task List"
-msgstr "Nowa lista zadań"
-
-#: errands/lib/notifications.py:74
-msgid "Task is Due"
-msgstr "Zadanie w trakcie"
-
-#: errands/application.py:78
-msgid "Errands was updated"
-msgstr "Errands został zaktualizowany"
-
-#: errands/application.py:79
-msgid "Restart is required"
-msgstr "Wymagane jest ponowne uruchomienie"
-
-#: errands/application.py:82
-msgid "Restart"
-msgstr "Restart"
-
-#: errands/application.py:111
-msgid "Errands need to run in the background for notifications"
-msgstr "Errands musi działać w tle aby wyświetlać powiadomienia"
-
-#: data/resources/gtk/help-overlay.ui:13
-msgid "Show keyboard shortcuts"
-msgstr "Pokarz skróty klawiaturowe"
-
-#: data/resources/gtk/help-overlay.ui:53
-msgid "Lists"
-msgstr "Listy"
-
-#: data/resources/gtk/help-overlay.ui:64
-msgid "Import List"
-msgstr "Importuj listę"
-
-#: data/resources/gtk/help-overlay.ui:75
-msgid "Details"
-msgstr "Szczegóły"
-
-#: data/resources/gtk/help-overlay.ui:79
-msgid "Toggle Details"
-msgstr "Pokaż szczegóły"
-
-#: data/io.github.mrvladus.List.desktop.in.in:4
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:7
-msgid "Manage your tasks"
-msgstr "Zarządzaj swoimi zadaniami"
-
-#: data/io.github.mrvladus.List.desktop.in.in:10
-msgid "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
+#: src/shortcuts-dialog.blp:22
+msgid "Close Window"
 msgstr ""
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:12
-msgid "Todo application for those who prefer simplicity."
-msgstr "Aplikacja TODO dla tych, którzy preferują prostotę."
+#: src/shortcuts-dialog.blp:27
+msgid "Quit"
+msgstr "Zamknij"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:13
-msgid "Features:"
-msgstr "Funkcionalności:"
+#: src/shortcuts-dialog.blp:34 src/task-list.blp:12
+#, fuzzy
+msgid "Task List"
+msgstr "Listy zadań"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:15
-msgid "Multiple task lists support"
-msgstr "Obsługa wielu list zadań"
+#: src/shortcuts-dialog.blp:37
+#, fuzzy
+msgid "Create Task List"
+msgstr "Utwórz listę"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:16
-msgid "Add, remove, edit tasks and sub-tasks"
-msgstr "Dodawanie, usuwanie i edytowanie zadań i podzadań"
+#: src/shortcuts-dialog.blp:42
+msgid "Import Task List"
+msgstr "Importuj listę zadań"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:17
-msgid "Mark task and sub-tasks as completed"
-msgstr "Oznaczanie zadań i podzadań jako ukończone"
+#: src/shortcuts-dialog.blp:47
+msgid "Sorting and Filtering Options"
+msgstr ""
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:18
-msgid "Add accent color for each task"
-msgstr "Dodawanie akcentów kolorystycznych dla każdego zadania"
+#: src/shortcuts-dialog.blp:52
+msgid "Search"
+msgstr ""
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:19
-msgid "Sync tasks with Nextcloud or other CalDAV providers"
-msgstr "Synchronizacja zadań z Nextcloud lub innymi dostawcami CalDAV"
+#: src/shortcuts-dialog.blp:57
+msgid "Select Task Entry"
+msgstr ""
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:20
-msgid "Drag and Drop support"
-msgstr "Obsługa funkcji przeciągnij i upuść"
+#: src/shortcuts-dialog.blp:62
+msgid "Entry Task Properties"
+msgstr ""
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:21
-msgid "Import .ics files"
+#: src/shortcuts-dialog.blp:67 src/task-list.blp:142
+#, fuzzy
+msgid "Add Task"
+msgstr "Dodaj nowe zadanie"
+
+#: src/shortcuts-dialog.blp:74
+msgid "Task Properties Dialog"
+msgstr ""
+
+#: src/shortcuts-dialog.blp:77 src/window.blp:99
+msgid "Add Attachment"
+msgstr "Dodaj załącznik"
+
+#: src/shortcuts-dialog.blp:87
+#, fuzzy
+msgid "Sync Now"
+msgstr "Synchronizacja"
+
+#: src/sidebar.blp:19
+#, fuzzy
+msgid "Add Task List"
+msgstr "Listy zadań"
+
+#: src/sidebar.blp:28
+#, fuzzy
+msgid "Import \".ics\" file"
 msgstr "Import zadań z plików .ics"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:41
-msgid "Main Window View"
-msgstr "Widok okna głównego"
-
-#~ msgid "Loading..."
-#~ msgstr "Ładowanie..."
-
+#: src/sidebar.blp:37
 #, fuzzy
-#~ msgid "Complete Button Size"
-#~ msgstr "Ukończone:"
+msgid "New list name"
+msgstr "Nazwa nowej listy"
 
+#: src/sidebar.blp:43
 #, fuzzy
-#~ msgid "Right"
-#~ msgstr "Jasny"
+msgid "Create"
+msgstr "Utworzono:"
 
-#~ msgid "Menu"
-#~ msgstr "Menu"
-
+#: src/sidebar.blp:60
 #, fuzzy
-#~ msgid "Clear Style"
-#~ msgstr "Wyczyść styl"
+msgid "Main Menu (F10)"
+msgstr "Menu główne"
 
+#: src/sidebar.blp:69
 #, fuzzy
-#~ msgid "Copy Text"
-#~ msgstr "Kopiuj"
+msgid "Shortcuts"
+msgstr "Skróty klawiaturowe"
 
+#: src/sidebar.blp:70
+msgid "About Errands"
+msgstr "O Errands"
+
+#: src/sidebar.blp:99
+msgctxt "All Tasks"
+msgid "All"
+msgstr ""
+
+#: src/sidebar.blp:112
 #, fuzzy
-#~ msgid "Complete %"
-#~ msgstr "Ukończone:"
+msgctxt "Tasks for Today"
+msgid "Today"
+msgstr "Dziś"
 
+#: src/sidebar.blp:126
+msgid "Task Lists"
+msgstr "Listy zadań"
+
+#: src/sidebar.blp:131
+msgid "No Task Lists"
+msgstr "Brak list zadań"
+
+#: src/sidebar.blp:132
 #, fuzzy
-#~ msgid "Add Tag"
-#~ msgstr "Dodaj nowe zadanie"
+msgid "Create new or import “.ics”"
+msgstr "Utwórz nową lub zaimportuj istniejącą"
 
-#~ msgid "Mark as Completed"
-#~ msgstr "Oznacz jako ukończone"
+#: src/task.blp:37
+msgid "Toggle Completion"
+msgstr "Oznacz jako ukończone"
 
-#~ msgid "Restore All"
-#~ msgstr "Odzyskaj wszystkie"
+#: src/task.blp:48
+msgid "Restore"
+msgstr "Przywróć"
 
+#: src/task.blp:106
 #, fuzzy
-#~ msgid "Toggle sidebar"
-#~ msgstr "Przełącz pasek boczny"
+msgid "Toggle Sub-Tasks Entry"
+msgstr "Pokaż podzadania"
 
-#~ msgid "Show Deleted Tasks"
-#~ msgstr "Pokaż usunięte zadania"
+#: src/task.blp:129 src/window.blp:74
+msgid "Properties"
+msgstr ""
 
-#~ msgid "Delete Completed Tasks (Ctrl+Delete)"
-#~ msgstr "Usuń zakończone zadania (Ctrl+Delete)"
+#: src/task.blp:130 src/task.blp:264 src/window.blp:120
+msgid "Notes"
+msgstr "Notatki"
 
-#~ msgid "Export Tasks..."
-#~ msgstr "Eksport zadań…"
+#: src/task.blp:134
+#, fuzzy
+msgid "Edit Text"
+msgstr "Edytuj"
 
-#~ msgid "Import Tasks..."
-#~ msgstr "Import zadań…"
+#: src/task.blp:135
+#, fuzzy
+msgid "Copy Text"
+msgstr "Kopiuj"
 
-#~ msgid "Import and Export"
-#~ msgstr "Import i eksport"
+#: src/task.blp:136
+#, fuzzy
+msgid "Task Color"
+msgstr "Kolor"
 
-#~ msgid "Expand Sub-Tasks on Startup"
-#~ msgstr "Rozwiń podzadania przy uruchamianiu"
+#: src/task.blp:141 src/task.blp:200 src/task-list.blp:72
+msgid "Priority"
+msgstr "Priorytet"
+
+#: src/task.blp:150
+msgid "Low"
+msgstr "Niski"
+
+#: src/task.blp:156
+msgid "Medium"
+msgstr "Średni"
+
+#: src/task.blp:162
+msgid "High"
+msgstr "Wysoki"
+
+#: src/task.blp:170 src/task-list.blp:91
+#, fuzzy
+msgid "Export as \".ics\""
+msgstr "Eksport zadań…"
+
+#: src/task.blp:174
+#, fuzzy
+msgid "Cancel / Restore"
+msgstr "Przywróć"
+
+#: src/task.blp:226 src/window.blp:82
+msgid "Start"
+msgstr "Rozpoczeńcie"
+
+#: src/task.blp:227 src/task-list.blp:60
+#, fuzzy
+msgid "Start Date"
+msgstr "Ustaw datę"
+
+#: src/task.blp:242 src/window.blp:86
+msgid "Due"
+msgstr "Zakończenie"
+
+#: src/task.blp:243 src/task-list.blp:66
+#, fuzzy
+msgid "Due Date"
+msgstr "Ustaw datę"
+
+#: src/task.blp:274 src/task.blp:280 src/window.blp:94
+msgid "Attachments"
+msgstr "Załączniki"
+
+#: src/task.blp:305
+#, fuzzy
+msgid "Add Sub-Task"
+msgstr "Dodaj nowe podzadanie"
+
+#: src/task-list.blp:21
+#, fuzzy
+msgid "Show Tasks"
+msgstr "Pokaż usunięte zadania"
+
+#: src/task-list.blp:24
+msgid "Completed"
+msgstr "Ukończone"
+
+#: src/task-list.blp:29
+#, fuzzy
+msgid "Cancelled"
+msgstr "Anuluj"
+
+#: src/task-list.blp:35
+msgid "Sort Order"
+msgstr ""
+
+#: src/task-list.blp:38
+msgid "Descending"
+msgstr ""
+
+#: src/task-list.blp:44
+msgid "Ascending"
+msgstr ""
+
+#: src/task-list.blp:51
+msgid "Sort By"
+msgstr ""
+
+#: src/task-list.blp:54
+#, fuzzy
+msgid "Created"
+msgstr "Utworzono:"
+
+#: src/task-list.blp:87
+msgid "Rename List"
+msgstr "Zmień nazwę listy"
+
+#: src/task-list.blp:92
+msgid "Print"
+msgstr ""
+
+#: src/task-list.blp:96
+#, fuzzy
+msgid "Delete Completed"
+msgstr "Usuń zakończone zadania"
+
+#: src/task-list.blp:97
+#, fuzzy
+msgid "Delete Cancelled"
+msgstr "Usuń tag"
+
+#: src/task-list.blp:101
+#, fuzzy
+msgid "Delete List"
+msgstr "Utwórz listę"
+
+#: src/task-list.blp:109
+msgid "Search (Ctrl+F)"
+msgstr ""
+
+#: src/task-list.blp:143
+#, fuzzy
+msgid "Add Task (Ctrl+N)"
+msgstr "Dodaj listę (Ctrl+Shift+A)"
+
+#: src/task-list.blp:161
+#, fuzzy
+msgid "Add Task (Ctrl+Return)"
+msgstr "Dodaj listę (Ctrl+Shift+A)"
+
+#: src/task-list.blp:185
+#, fuzzy
+msgid "No Tasks"
+msgstr "Brak tagów"
+
+#: src/task-list.blp:212
+#, fuzzy
+msgid "Loading Tasks"
+msgstr "Dodawanie nowych zadań"
+
+#: src/window.blp:27
+msgid "Sidebar"
+msgstr "Pasek boczny"
+
+#: src/window.blp:34
+msgid "Content"
+msgstr "Treść"
+
+#: src/window.blp:63
+msgid "Close Properties"
+msgstr ""
+
+#: src/window.blp:79
+msgid "Date and Time"
+msgstr "Data i czas"
+
+#: src/window.blp:106
+msgid "Tags"
+msgstr "Tagi"
+
+#: src/window.blp:111
+#, fuzzy
+msgid "New Tag"
+msgstr "Brak tagów"
