@@ -167,15 +167,18 @@ static ICalProperty *get_x_prop(ICalComponent *ical, const char *xprop, const ch
 }
 
 static gchar *get_x_prop_value(ICalComponent *ical, const char *xprop, const char *default_val) {
-  ICalProperty *property = get_x_prop(ical, xprop, default_val);
+  g_autoptr(ICalProperty) property = get_x_prop(ical, xprop, default_val);
   if (!property) return NULL;
   return i_cal_property_get_value_as_string(property);
 }
 
 static void set_x_prop_value(ICalComponent *ical, const char *xprop, const char *val) {
-  ICalProperty *property = get_x_prop(ical, xprop, val);
-  if (!val && property) i_cal_component_remove_property(ical, property);
-  else i_cal_property_set_x(property, val);
+  g_autoptr(ICalProperty) property = get_x_prop(ical, xprop, val);
+  if (!val) {
+    if (property) i_cal_component_remove_property(ical, property);
+    return;
+  }
+  if (property) i_cal_property_set_x(property, val);
 }
 
 // ---------- PUBLIC FUNCTIONS ---------- //
@@ -487,16 +490,14 @@ void errands_data_set_attachments(ICalComponent *ical, GStrv value) {
 }
 
 void errands_data_set_tags(ICalComponent *ical, GStrv value) {
-  g_autoptr(GPtrArray) arr = g_ptr_array_new();
-  for (ICalProperty *p = i_cal_component_get_first_property(ical, I_CAL_CATEGORIES_PROPERTY); p != 0;
-       p = i_cal_component_get_next_property(ical, I_CAL_CATEGORIES_PROPERTY)) {
-    g_ptr_array_add(arr, p);
-  }
-  for_range(i, 0, arr->len) {
-    i_cal_component_remove_property(ical, arr->pdata[i]);
-    g_object_unref(arr->pdata[i]);
-  }
-  for (size_t i = 0; i < g_strv_length(value); i++) i_cal_component_add_property(ical, i_cal_property_new_categories(value[i]));
+  g_autoptr(GPtrArray) properties = g_ptr_array_new_with_free_func(g_object_unref);
+  for (ICalProperty *property = i_cal_component_get_first_property(ical, I_CAL_CATEGORIES_PROPERTY); property;
+       property = i_cal_component_get_next_property(ical, I_CAL_CATEGORIES_PROPERTY))
+    g_ptr_array_add(properties, property);
+  for (guint i = 0; i < properties->len; i++) i_cal_component_remove_property(ical, g_ptr_array_index(properties, i));
+  if (value)
+    for (gsize i = 0; value[i]; i++)
+      if (*value[i]) i_cal_component_add_property(ical, i_cal_property_new_categories(value[i]));
   errands_data_set_synced(ical, false);
   errands_data_set_changed(ical, i_cal_time_get_date_time_now());
 }
@@ -508,23 +509,24 @@ void errands_data_add_tag(ICalComponent *ical, const char *tag) {
 }
 
 bool errands_data_remove_tag(ICalComponent *ical, const char *tag) {
-  g_autoptr(GPtrArray) arr = g_ptr_array_new();
-  for (ICalProperty *p = i_cal_component_get_first_property(ical, I_CAL_CATEGORIES_PROPERTY); p != 0;
-       p = i_cal_component_get_next_property(ical, I_CAL_CATEGORIES_PROPERTY)) {
-    g_ptr_array_add(arr, p);
-  }
-  for_range(i, 0, arr->len) {
-    ICalProperty *p = g_ptr_array_index(arr, i);
-    g_autofree gchar *val = i_cal_property_get_value_as_string(p);
-    if (g_str_equal(tag, val)) {
-      i_cal_component_remove_property(ical, p);
-      errands_data_set_synced(ical, false);
-      errands_data_set_changed(ical, i_cal_time_get_date_time_now());
-      return true;
+  g_autoptr(GPtrArray) properties = g_ptr_array_new_with_free_func(g_object_unref);
+  for (ICalProperty *property = i_cal_component_get_first_property(ical, I_CAL_CATEGORIES_PROPERTY); property;
+       property = i_cal_component_get_next_property(ical, I_CAL_CATEGORIES_PROPERTY))
+    g_ptr_array_add(properties, property);
+  gboolean removed = FALSE;
+  for (guint i = 0; i < properties->len; i++) {
+    ICalProperty *property = g_ptr_array_index(properties, i);
+    g_autofree gchar *value = g_strdup(i_cal_property_get_value_as_string(property));
+    if (!removed && g_strcmp0(tag, value) == 0) {
+      i_cal_component_remove_property(ical, property);
+      removed = TRUE;
     }
-    g_object_unref(p);
   }
-  return false;
+  if (removed) {
+    errands_data_set_synced(ical, false);
+    errands_data_set_changed(ical, i_cal_time_get_date_time_now());
+  }
+  return removed;
 }
 
 // --- TIME --- //
@@ -532,10 +534,8 @@ bool errands_data_remove_tag(ICalComponent *ical, const char *tag) {
 ICalTime *errands_data_get_changed(ICalComponent *ical) {
   g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_LASTMODIFIED_PROPERTY);
   if (property) return i_cal_property_get_lastmodified(property);
-  else {
-    property = i_cal_component_get_first_property(ical, I_CAL_DTSTAMP_PROPERTY);
-    if (property) return i_cal_property_get_dtstamp(property);
-  }
+  property = i_cal_component_get_first_property(ical, I_CAL_DTSTAMP_PROPERTY);
+  if (property) return i_cal_property_get_dtstamp(property);
   errands_data_set_changed(ical, i_cal_time_get_date_time_now());
   g_autoptr(ICalProperty) last_modified = i_cal_component_get_first_property(ical, I_CAL_LASTMODIFIED_PROPERTY);
   return i_cal_property_get_lastmodified(last_modified);
@@ -567,66 +567,67 @@ ICalTime *errands_data_get_start(ICalComponent *ical) { return i_cal_component_g
 
 void errands_data_set_changed(ICalComponent *ical, ICalTime *value) {
   g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_LASTMODIFIED_PROPERTY);
-  if (i_cal_time_is_null_time(value) && property) i_cal_component_remove_property(ical, property);
-  else {
-    if (!property) i_cal_component_add_property(ical, i_cal_property_new_lastmodified(value));
-    else i_cal_property_set_lastmodified(property, value);
-  }
-  g_object_unref(value);
+  if (!value || i_cal_time_is_null_time(value)) {
+    if (property) i_cal_component_remove_property(ical, property);
+  } else if (property) i_cal_property_set_lastmodified(property, value);
+  else i_cal_component_add_property(ical, i_cal_property_new_lastmodified(value));
+  g_clear_object(&value);
 }
 
 void errands_data_set_completed(ICalComponent *ical, ICalTime *value) {
   g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_COMPLETED_PROPERTY);
-  if (i_cal_time_is_null_time(value) && property) {
-    i_cal_component_remove_property(ical, property);
+  if (!value || i_cal_time_is_null_time(value)) {
+    if (property) i_cal_component_remove_property(ical, property);
     errands_data_set_percent(ical, 0);
     i_cal_component_set_status(ical, I_CAL_STATUS_NEEDSACTION);
   } else {
-    if (!property) i_cal_component_add_property(ical, i_cal_property_new_completed(value));
-    else i_cal_property_set_completed(property, value);
+    if (property) i_cal_property_set_completed(property, value);
+    else i_cal_component_add_property(ical, i_cal_property_new_completed(value));
     errands_data_set_percent(ical, 100);
     i_cal_component_set_status(ical, I_CAL_STATUS_COMPLETED);
   }
   errands_data_set_synced(ical, false);
   errands_data_set_changed(ical, i_cal_time_get_date_time_now());
-  g_object_unref(value);
+  g_clear_object(&value);
 }
 
 void errands_data_set_created(ICalComponent *ical, ICalTime *value) {
   g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_CREATED_PROPERTY);
-  if (i_cal_time_is_null_time(value) && property) i_cal_component_remove_property(ical, property);
-  else {
-    if (!property) i_cal_component_add_property(ical, i_cal_property_new_created(value));
-    else i_cal_property_set_created(property, value);
-  }
+  if (!value || i_cal_time_is_null_time(value)) {
+    if (property) i_cal_component_remove_property(ical, property);
+  } else if (property) i_cal_property_set_created(property, value);
+  else i_cal_component_add_property(ical, i_cal_property_new_created(value));
   errands_data_set_synced(ical, false);
   errands_data_set_changed(ical, i_cal_time_get_date_time_now());
-  g_object_unref(value);
+  g_clear_object(&value);
 }
 
 void errands_data_set_due(ICalComponent *ical, ICalTime *value) {
   g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_DUE_PROPERTY);
-  if (i_cal_time_is_null_time(value) && property) i_cal_component_remove_property(ical, property);
-  else i_cal_component_set_due(ical, value);
+  if (!value || i_cal_time_is_null_time(value)) {
+    if (property) i_cal_component_remove_property(ical, property);
+  } else i_cal_component_set_due(ical, value);
   errands_data_set_synced(ical, false);
   errands_data_set_changed(ical, i_cal_time_get_date_time_now());
-  g_object_unref(value);
+  g_clear_object(&value);
 }
 
 void errands_data_set_end(ICalComponent *ical, ICalTime *value) {
   g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_DTEND_PROPERTY);
-  if (i_cal_time_is_null_time(value) && property) i_cal_component_remove_property(ical, property);
-  else i_cal_component_set_dtend(ical, value);
+  if (!value || i_cal_time_is_null_time(value)) {
+    if (property) i_cal_component_remove_property(ical, property);
+  } else i_cal_component_set_dtend(ical, value);
   errands_data_set_synced(ical, false);
   errands_data_set_changed(ical, i_cal_time_get_date_time_now());
-  g_object_unref(value);
+  g_clear_object(&value);
 }
 
 void errands_data_set_start(ICalComponent *ical, ICalTime *value) {
   g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_DTSTART_PROPERTY);
-  if (i_cal_time_is_null_time(value) && property) i_cal_component_remove_property(ical, property);
-  else i_cal_component_set_dtstart(ical, value);
+  if (!value || i_cal_time_is_null_time(value)) {
+    if (property) i_cal_component_remove_property(ical, property);
+  } else i_cal_component_set_dtstart(ical, value);
   errands_data_set_synced(ical, false);
   errands_data_set_changed(ical, i_cal_time_get_date_time_now());
-  g_object_unref(value);
+  g_clear_object(&value);
 }
