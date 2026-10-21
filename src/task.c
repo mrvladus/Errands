@@ -75,10 +75,12 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
   ErrandsTask *self = ERRANDS_TASK(object);
   switch (prop_id) {
   case PROP_ITEM: self->item = g_value_get_object(value); break;
+
   case PROP_COLOR: {
     self->color = g_value_get_string(value);
     gtk_widget_set_color(GTK_WIDGET(self), self->color);
   } break;
+
   case PROP_PRIORITY: {
     self->priority = g_value_get_int(value);
     // Update action state
@@ -91,11 +93,13 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
 
     errands_task_update_toolbar(self);
   } break;
+
   case PROP_NOTES: {
     self->notes = g_value_get_string(value);
     gtk_widget_set_visible(self->notes_btn, self->notes != NULL);
     errands_task_update_toolbar(self);
   } break;
+
   case PROP_DTSTART: {
     self->dtstart = g_value_get_object(value);
     bool is_null = i_cal_time_is_null_date(self->dtstart);
@@ -110,6 +114,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     const char *label = tmp_str_printf("%s: %s", C_("Start date", "Start"), date_str);
     adw_button_content_set_label(ADW_BUTTON_CONTENT(self->dtstart_btn_content), label);
   } break;
+
   case PROP_DTEND: {
     self->dtend = g_value_get_object(value);
     bool has_dt = !i_cal_time_is_null_date(self->dtend);
@@ -127,6 +132,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     gtk_widget_remove_css_class(self->dtend_btn, "error");
     if (errands_task_item_is_due(self->item)) gtk_widget_add_css_class(self->dtend_btn, "error");
   } break;
+
   case PROP_TAGS: {
     self->tags = g_value_get_pointer(value);
     adw_wrap_box_remove_all(ADW_WRAP_BOX(self->tags_box));
@@ -134,6 +140,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     for_range(i, 0, tags_n) adw_wrap_box_append(ADW_WRAP_BOX(self->tags_box), errands_task_tag_new(self->tags[i]));
     errands_task_update_toolbar(self);
   } break;
+
   case PROP_ATTACHMENTS: {
     self->attachments = g_value_get_pointer(value);
     bool has_attachments = self->attachments && self->attachments[0] != NULL;
@@ -143,6 +150,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     const char *label = tmp_str_printf("%u", g_strv_length(self->attachments));
     adw_button_content_set_label(ADW_BUTTON_CONTENT(self->attachments_btn_content), label);
   } break;
+
   case PROP_RRULE: {
     self->rrule = g_value_get_object(value);
     g_autofree gchar *label = errands_task_item_get_rrule_as_string(self->item);
