@@ -15,6 +15,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Generator: Poedit 3.4.2\n"
 
 #: src/about-dialog.h:15 src/sidebar.blp:13 src/window.blp:8
@@ -32,86 +33,83 @@ msgstr "Не встановлено"
 #: src/rrule-row.c:171
 msgctxt "Repeat every ..."
 msgid "seconds"
-msgstr ""
+msgstr "секунд"
 
 #: src/rrule-row.c:171
 msgctxt "Repeat every ..."
 msgid "minutes"
-msgstr ""
+msgstr "хвилин"
 
 #: src/rrule-row.c:172
 msgctxt "Repeat every ..."
 msgid "hours"
-msgstr ""
+msgstr "годин"
 
 #: src/rrule-row.c:172
 msgctxt "Repeat every ..."
 msgid "days"
-msgstr ""
+msgstr "днів"
 
 #: src/rrule-row.c:173
 msgctxt "Repeat every ..."
 msgid "weeks"
-msgstr ""
+msgstr "тижнів"
 
 #: src/rrule-row.c:173
 msgctxt "Repeat every ..."
 msgid "months"
-msgstr ""
+msgstr "місяців"
 
 #: src/rrule-row.c:174
 msgctxt "Repeat every ..."
 msgid "years"
-msgstr ""
+msgstr "років"
 
 #: src/rrule-row.c:176
 #, c-format
 msgid "Repeat every %d %s"
-msgstr ""
+msgstr "Повторювати кожні %d %s"
 
 #: src/rrule-row.c:182
 msgid "Repeat forever"
-msgstr ""
+msgstr "Повторювати безкінечно"
 
 #: src/rrule-row.c:182
 #, c-format
 msgid "Repeat %zu times"
-msgstr ""
+msgstr "Повторити %zu разів"
 
 #: src/sync.c:262
 #, c-format
 msgid "Added remote task list: %s"
-msgstr ""
+msgstr "Віддалений список завдань додано: %s"
 
 #: src/sync.c:293
 #, c-format
 msgid "Removed remote task list: %s"
-msgstr ""
+msgstr "Віддалений список завдань вилучено: %s"
 
 #: src/sync.c:372
 msgid "Creating remote list failed. Limits may be reached."
-msgstr ""
+msgstr "Не вдалося створити віддалений список. Можливо, досягнуто обмеження."
 
 #: src/sync.c:532
-#, fuzzy
 msgid "Failed to connect to CalDAV remote."
-msgstr "Не вдалося з'єднатися з CalDAV сервером за адресою:"
+msgstr "Не вдалося підключитися до сервера CalDAV."
 
 #: src/sync.c:553
 msgid "Failed 3 attempts to sync. Disabling for now."
-msgstr ""
+msgstr "Не вдалося синхронізувати після 3 спроб. Синхронізацію тимчасово вимкнено."
 
 #: src/task.c:110
-#, fuzzy
 msgctxt "Start date"
 msgid "Start"
-msgstr "Розпочати"
+msgstr "Початок"
 
 #: src/task.c:125
-#, fuzzy
 msgctxt "Due date"
 msgid "Due"
-msgstr "До"
+msgstr "Термін"
 
 #: src/task.c:302
 msgid "Copied to Clipboard"
@@ -119,7 +117,7 @@ msgstr "Скопійовано в буфер обміну"
 
 #: src/task.c:336
 msgid "Failed to Export"
-msgstr ""
+msgstr "Не вдалося експортувати"
 
 #: src/task.c:339 src/task-list.c:294
 msgid "Exported"
@@ -131,50 +129,47 @@ msgstr "Не вдалося експортувати"
 
 #: src/task-list.c:314 src/task-list.c:326
 msgid "No tasks to delete"
-msgstr ""
+msgstr "Немає завдань для вилучення"
 
 #: src/task-list.c:319 src/task-list.c:331
-#, fuzzy, c-format
+#, c-format
 msgid "Deleted %d task"
 msgid_plural "Deleted %d tasks"
-msgstr[0] "Показати видалені задачі"
-msgstr[1] "Показати видалені задачі"
+msgstr[0] "Вилучено %d завдання"
+msgstr[1] "Вилучено %d завдання"
+msgstr[2] "Вилучено %d завдань"
 
 #: src/task-list.c:464 src/sidebar.blp:100
-#, fuzzy
 msgid "All Tasks"
-msgstr "Додати нову задачу"
+msgstr "Усі завдання"
 
 #: src/task-list.c:465 src/sidebar.blp:113
 msgid "Tasks for Today"
-msgstr ""
+msgstr "Завдання на сьогодні"
 
 #: src/task-list-item.c:142
 msgid "Untitled"
-msgstr ""
+msgstr "Без назви"
 
 #: src/window.c:115
 msgid "Remove Attachment"
-msgstr ""
+msgstr "Вилучити долучення"
 
 #: src/window.c:146
-#, fuzzy
 msgid "Enable Tag"
-msgstr "Видалені задачі"
+msgstr "Увімкнути мітку"
 
 #: src/window.c:151
-#, fuzzy
 msgid "Remove Tag"
-msgstr "Видалені задачі"
+msgstr "Вилучити мітку"
 
 #: src/date-chooser.blp:13
 msgid "Reset"
-msgstr ""
+msgstr "Скинути"
 
 #: src/date-chooser.blp:27 src/rrule-row.blp:51
-#, fuzzy
 msgid "Date"
-msgstr "Встановити дату"
+msgstr "Дата"
 
 #: src/date-chooser.blp:36
 msgid "Today"
@@ -186,23 +181,23 @@ msgstr "Завтра"
 
 #: src/date-chooser.blp:85
 msgid "Time"
-msgstr ""
+msgstr "Час"
 
 #: src/date-chooser.blp:149
 msgid "9:00"
-msgstr ""
+msgstr "9:00"
 
 #: src/date-chooser.blp:164
 msgid "12:00"
-msgstr ""
+msgstr "12:00"
 
 #: src/date-chooser.blp:179
 msgid "17:00"
-msgstr ""
+msgstr "17:00"
 
 #: src/date-chooser.blp:194
 msgid "20:00"
-msgstr ""
+msgstr "20:00"
 
 #: src/delete-list-dialog.blp:8
 msgid "Are you sure?"
@@ -226,140 +221,139 @@ msgstr "Назва нового списку"
 
 #: src/rrule-row.blp:7 src/task.blp:258
 msgid "Repeat"
-msgstr ""
+msgstr "Повтор"
 
 #: src/rrule-row.blp:12
 msgid "Frequency"
-msgstr ""
+msgstr "Частота"
 
 #: src/rrule-row.blp:13
 msgid "How often task will repeat"
-msgstr ""
+msgstr "Як часто повторюватиметься завдання"
 
 #: src/rrule-row.blp:17
 msgid "Secondly"
-msgstr ""
+msgstr "Щосекунди"
 
 #: src/rrule-row.blp:18
 msgid "Minutely"
-msgstr ""
+msgstr "Щохвилини"
 
 #: src/rrule-row.blp:19
 msgid "Hourly"
-msgstr ""
+msgstr "Щогодини"
 
 #: src/rrule-row.blp:20
 msgid "Daily"
-msgstr ""
+msgstr "Щодня"
 
 #: src/rrule-row.blp:21
 msgid "Weekly"
-msgstr ""
+msgstr "Щотижня"
 
 #: src/rrule-row.blp:22
 msgid "Monthly"
-msgstr ""
+msgstr "Щомісяця"
 
 #: src/rrule-row.blp:23
 msgid "Yearly"
-msgstr ""
+msgstr "Щороку"
 
 #: src/rrule-row.blp:24 src/task.blp:144
 msgid "None"
-msgstr ""
+msgstr "Немає"
 
 #: src/rrule-row.blp:32
 msgid "Interval"
-msgstr ""
+msgstr "Інтервал"
 
 #: src/rrule-row.blp:46
 msgid "Repeat Until"
-msgstr ""
+msgstr "Повторювати до"
 
 #: src/rrule-row.blp:50
 msgid "Indefinitely"
-msgstr ""
+msgstr "Безстроково"
 
 #: src/rrule-row.blp:52
 msgid "Count"
-msgstr ""
+msgstr "Кількість"
 
 #: src/rrule-row.blp:60
 msgid "Repeat Until Date"
-msgstr ""
+msgstr "Дата завершення повторення"
 
 #: src/rrule-row.blp:64
 msgid "Repeat Count"
-msgstr ""
+msgstr "Кількість повторень"
 
 #: src/rrule-row.blp:87
 msgid "Week Days"
-msgstr ""
+msgstr "Дні тижня"
 
 #: src/rrule-row.blp:96
 msgid "Mo"
-msgstr ""
+msgstr "Пн"
 
 #: src/rrule-row.blp:97
 msgid "Monday"
-msgstr ""
+msgstr "Понеділок"
 
 #: src/rrule-row.blp:106
 msgid "Tu"
-msgstr ""
+msgstr "Вт"
 
 #: src/rrule-row.blp:107
 msgid "Tuesday"
-msgstr ""
+msgstr "Вівторок"
 
 #: src/rrule-row.blp:116
 msgid "We"
-msgstr ""
+msgstr "Ср"
 
 #: src/rrule-row.blp:117
 msgid "Wednesday"
-msgstr ""
+msgstr "Середа"
 
 #: src/rrule-row.blp:126
 msgid "Th"
-msgstr ""
+msgstr "Чт"
 
 #: src/rrule-row.blp:127
 msgid "Thursday"
-msgstr ""
+msgstr "Четвер"
 
 #: src/rrule-row.blp:136
 msgid "Fr"
-msgstr ""
+msgstr "Пт"
 
 #: src/rrule-row.blp:137
 msgid "Friday"
-msgstr ""
+msgstr "П’ятниця"
 
 #: src/rrule-row.blp:146
-#, fuzzy
 msgid "Sa"
-msgstr "Зберегти"
+msgstr "Сб"
 
 #: src/rrule-row.blp:147
 msgid "Saturday"
-msgstr ""
+msgstr "Субота"
 
 #: src/rrule-row.blp:156
 msgid "Su"
-msgstr ""
+msgstr "Нд"
 
 #: src/rrule-row.blp:157
 msgid "Sunday"
-msgstr ""
+msgstr "Неділя"
 
 #: src/settings-dialog.blp:11
 msgid "Appearance"
-msgstr "Зовнішній вигляд"
+msgstr "Вигляд"
 
 #: src/settings-dialog.blp:14
 msgid "Theme"
-msgstr ""
+msgstr "Тема"
 
 #: src/settings-dialog.blp:21
 msgid "System"
@@ -375,41 +369,39 @@ msgstr "Темний стиль"
 
 #: src/settings-dialog.blp:43
 msgid "Miscellaneous"
-msgstr ""
+msgstr "Різне"
 
 #: src/settings-dialog.blp:46
 msgid "Show Notifications"
-msgstr ""
+msgstr "Показувати сповіщення"
 
 #: src/settings-dialog.blp:50
 msgid "Work in the Background"
-msgstr ""
+msgstr "Працювати у фоновому режимі"
 
 #: src/settings-dialog.blp:54
 msgid "Launch at Startup"
-msgstr ""
+msgstr "Запускати під час входу"
 
 #: src/settings-dialog.blp:60 src/shortcuts-dialog.blp:84 src/sidebar.blp:64
 msgid "Sync"
 msgstr "Сінхронізація"
 
 #: src/settings-dialog.blp:63
-#, fuzzy
 msgid "Enabled"
-msgstr "Немає / Вимкнено"
+msgstr "Увімкнено"
 
 #: src/settings-dialog.blp:67
 msgid "Sync Interval"
-msgstr ""
+msgstr "Інтервал синхронізації"
 
 #: src/settings-dialog.blp:68
 msgid "Seconds between pulling events from the server"
-msgstr ""
+msgstr "Секунд між отриманням подій із сервера"
 
 #: src/settings-dialog.blp:80
-#, fuzzy
 msgid "CalDAV Server URL"
-msgstr "URL-адреса сервера"
+msgstr "URL сервера CalDAV"
 
 #: src/settings-dialog.blp:86
 msgid "Username"
@@ -428,96 +420,82 @@ msgid "Preferences"
 msgstr "Налаштування"
 
 #: src/shortcuts-dialog.blp:17
-#, fuzzy
 msgid "Open Menu"
-msgstr "Головне меню"
+msgstr "Відкрити меню"
 
 #: src/shortcuts-dialog.blp:22
 msgid "Close Window"
-msgstr ""
+msgstr "Закрити вікно"
 
 #: src/shortcuts-dialog.blp:27
 msgid "Quit"
 msgstr "Вийти"
 
 #: src/shortcuts-dialog.blp:34 src/task-list.blp:12
-#, fuzzy
 msgid "Task List"
-msgstr "Немає списків із задачами"
+msgstr "Список завдань"
 
 #: src/shortcuts-dialog.blp:37
-#, fuzzy
 msgid "Create Task List"
-msgstr "Створити список"
+msgstr "Створити список завдань"
 
 #: src/shortcuts-dialog.blp:42
-#, fuzzy
 msgid "Import Task List"
 msgstr "Імпортувати список"
 
 #: src/shortcuts-dialog.blp:47
 msgid "Sorting and Filtering Options"
-msgstr ""
+msgstr "Параметри сортування й фільтрування"
 
 #: src/shortcuts-dialog.blp:52
 msgid "Search"
-msgstr ""
+msgstr "Пошук"
 
 #: src/shortcuts-dialog.blp:57
 msgid "Select Task Entry"
-msgstr ""
+msgstr "Вибрати запис завдання"
 
 #: src/shortcuts-dialog.blp:62
-#, fuzzy
 msgid "Entry Task Properties"
-msgstr "Властивості"
+msgstr "Властивості запису завдання"
 
 #: src/shortcuts-dialog.blp:67 src/task-list.blp:142
-#, fuzzy
 msgid "Add Task"
 msgstr "Додати нову задачу"
 
 #: src/shortcuts-dialog.blp:74
-#, fuzzy
 msgid "Task Properties Dialog"
-msgstr "Властивості"
+msgstr "Діалог властивостей завдання"
 
 #: src/shortcuts-dialog.blp:77 src/window.blp:99
 msgid "Add Attachment"
-msgstr ""
+msgstr "Додати долучення"
 
 #: src/shortcuts-dialog.blp:87
-#, fuzzy
 msgid "Sync Now"
-msgstr "Сінхронізація"
+msgstr "Синхронізувати зараз"
 
 #: src/sidebar.blp:19
-#, fuzzy
 msgid "Add Task List"
-msgstr "Немає списків із задачами"
+msgstr "Додати список завдань"
 
 #: src/sidebar.blp:28
-#, fuzzy
 msgid "Import \".ics\" file"
-msgstr "Імпортуват .ics файлів"
+msgstr "Імпортувати файл .ics"
 
 #: src/sidebar.blp:37
-#, fuzzy
 msgid "New list name"
 msgstr "Назва нового списку"
 
 #: src/sidebar.blp:43
-#, fuzzy
 msgid "Create"
 msgstr "Створити"
 
 #: src/sidebar.blp:60
-#, fuzzy
 msgid "Main Menu (F10)"
-msgstr "Головне меню"
+msgstr "Головне меню (F10)"
 
 #: src/sidebar.blp:69
-#, fuzzy
 msgid "Shortcuts"
 msgstr "Клавіатурні скорочення"
 
@@ -528,40 +506,36 @@ msgstr "Про Errands"
 #: src/sidebar.blp:99
 msgctxt "All Tasks"
 msgid "All"
-msgstr ""
+msgstr "Усі"
 
 #: src/sidebar.blp:112
-#, fuzzy
 msgctxt "Tasks for Today"
 msgid "Today"
 msgstr "Сьогодні"
 
 #: src/sidebar.blp:126
-#, fuzzy
 msgid "Task Lists"
-msgstr "Немає списків із задачами"
+msgstr "Списки завдань"
 
 #: src/sidebar.blp:131
 msgid "No Task Lists"
-msgstr "Немає списків із задачами"
+msgstr "Немає списків завдань"
 
 #: src/sidebar.blp:132
 msgid "Create new or import “.ics”"
-msgstr ""
+msgstr "Створити новий або імпортувати «.ics»"
 
 #: src/task.blp:37
-#, fuzzy
 msgid "Toggle Completion"
-msgstr "Перемкнути подробиці"
+msgstr "Перемкнути виконання"
 
 #: src/task.blp:48
 msgid "Restore"
 msgstr "Відновити"
 
 #: src/task.blp:106
-#, fuzzy
 msgid "Toggle Sub-Tasks Entry"
-msgstr "Показати підзадачі"
+msgstr "Перемкнути введення підзавдань"
 
 #: src/task.blp:129 src/window.blp:74
 msgid "Properties"
@@ -569,110 +543,99 @@ msgstr "Властивості"
 
 #: src/task.blp:130 src/task.blp:264 src/window.blp:120
 msgid "Notes"
-msgstr "Примітки"
+msgstr "Нотатки"
 
 #: src/task.blp:134
-#, fuzzy
 msgid "Edit Text"
-msgstr "Редагувати"
+msgstr "Редагувати текст"
 
 #: src/task.blp:135
 msgid "Copy Text"
-msgstr "Скопіювати текст"
+msgstr "Копіювати текст"
 
 #: src/task.blp:136
 msgid "Task Color"
-msgstr ""
+msgstr "Колір завдання"
 
 #: src/task.blp:141 src/task.blp:200 src/task-list.blp:72
 msgid "Priority"
 msgstr "Пріоритет"
 
 #: src/task.blp:150
-#, fuzzy
 msgid "Low"
-msgstr "Зараз"
+msgstr "Низький"
 
 #: src/task.blp:156
 msgid "Medium"
-msgstr ""
+msgstr "Середній"
 
 #: src/task.blp:162
 msgid "High"
-msgstr ""
+msgstr "Високий"
 
 #: src/task.blp:170 src/task-list.blp:91
-#, fuzzy
 msgid "Export as \".ics\""
-msgstr "Експортувати задачі..."
+msgstr "Експортувати як «.ics»"
 
 #: src/task.blp:174
-#, fuzzy
 msgid "Cancel / Restore"
-msgstr "Відновити"
+msgstr "Скасувати / відновити"
 
 #: src/task.blp:226 src/window.blp:82
 msgid "Start"
-msgstr "Розпочати"
+msgstr "Початок"
 
 #: src/task.blp:227 src/task-list.blp:60
-#, fuzzy
 msgid "Start Date"
-msgstr "Встановити дату"
+msgstr "Дата початку"
 
 #: src/task.blp:242 src/window.blp:86
 msgid "Due"
-msgstr "До"
+msgstr "Термін"
 
 #: src/task.blp:243 src/task-list.blp:66
-#, fuzzy
 msgid "Due Date"
-msgstr "Встановити дату"
+msgstr "Термін виконання"
 
 #: src/task.blp:274 src/task.blp:280 src/window.blp:94
 msgid "Attachments"
-msgstr ""
+msgstr "Долучення"
 
 #: src/task.blp:305
-#, fuzzy
 msgid "Add Sub-Task"
 msgstr "Додати нову підзадачу"
 
 #: src/task-list.blp:21
-#, fuzzy
 msgid "Show Tasks"
-msgstr "Показати видалені задачі"
+msgstr "Показати завдання"
 
 #: src/task-list.blp:24
-#, fuzzy
 msgid "Completed"
-msgstr "Завершено:"
+msgstr "Виконано"
 
 #: src/task-list.blp:29
-#, fuzzy
 msgid "Cancelled"
-msgstr "Скасувати"
+msgstr "Скасовані"
 
 #: src/task-list.blp:35
 msgid "Sort Order"
-msgstr ""
+msgstr "Порядок сортування"
 
 #: src/task-list.blp:38
 msgid "Descending"
-msgstr ""
+msgstr "За спаданням"
 
 #: src/task-list.blp:44
 msgid "Ascending"
-msgstr ""
+msgstr "За зростанням"
 
 #: src/task-list.blp:51
 msgid "Sort By"
-msgstr ""
+msgstr "Сортувати за"
 
 #: src/task-list.blp:54
-#, fuzzy
 msgid "Created"
-msgstr "Створити"
+msgstr "Створено"
 
 #: src/task-list.blp:87
 msgid "Rename List"
@@ -680,74 +643,63 @@ msgstr "Перейменувати список"
 
 #: src/task-list.blp:92
 msgid "Print"
-msgstr ""
+msgstr "Друк"
 
 #: src/task-list.blp:96
-#, fuzzy
 msgid "Delete Completed"
-msgstr "Видалити завершені задачі"
+msgstr "Вилучити виконані завдання"
 
 #: src/task-list.blp:97
-#, fuzzy
 msgid "Delete Cancelled"
-msgstr "Експорт скасовано"
+msgstr "Вилучити скасовані завдання"
 
 #: src/task-list.blp:101
-#, fuzzy
 msgid "Delete List"
-msgstr "Створити список"
+msgstr "Вилучити список"
 
 #: src/task-list.blp:109
-#, fuzzy
 msgid "Search (Ctrl+F)"
-msgstr "Синхронізувати/Отримати задачі (Ctrl+S)"
+msgstr "Пошук (Ctrl+F)"
 
 #: src/task-list.blp:143
-#, fuzzy
 msgid "Add Task (Ctrl+N)"
-msgstr "Додати список (Ctrl+Shift+A)"
+msgstr "Додати нову задачу (Ctrl+N)"
 
 #: src/task-list.blp:161
-#, fuzzy
 msgid "Add Task (Ctrl+Return)"
-msgstr "Додати список (Ctrl+Shift+A)"
+msgstr "Додати нову задачу (Ctrl+Return)"
 
 #: src/task-list.blp:185
-#, fuzzy
 msgid "No Tasks"
-msgstr "Теги"
+msgstr "Немає завдань"
 
 #: src/task-list.blp:212
-#, fuzzy
 msgid "Loading Tasks"
-msgstr "Додати нову задачу"
+msgstr "Завантаження завдань"
 
 #: src/window.blp:27
-#, fuzzy
 msgid "Sidebar"
-msgstr "Показати / сховати бічну панель"
+msgstr "Бічна панель"
 
 #: src/window.blp:34
 msgid "Content"
-msgstr ""
+msgstr "Вміст"
 
 #: src/window.blp:63
-#, fuzzy
 msgid "Close Properties"
-msgstr "Властивості"
+msgstr "Закрити властивості"
 
 #: src/window.blp:79
 msgid "Date and Time"
-msgstr ""
+msgstr "Дата й час"
 
 #: src/window.blp:106
 msgid "Tags"
-msgstr "Теги"
+msgstr "Мітки"
 
 #: src/window.blp:111
-#, fuzzy
 msgid "New Tag"
-msgstr "Теги"
+msgstr "Нова мітка"
 
 #~ msgid "Now"
 #~ msgstr "Зараз"
@@ -773,18 +725,15 @@ msgstr "Теги"
 #~ msgid "Add"
 #~ msgstr "Додати"
 
-#, fuzzy
 #~ msgid "Add new Tag"
 #~ msgstr "Додати нову задачу"
 
-#, fuzzy
 #~ msgid "Toggle Toolbar"
 #~ msgstr "Показати / сховати бічну панель"
 
 #~ msgid "Move to Trash"
 #~ msgstr "Пересунути у смітник"
 
-#, fuzzy
 #~ msgid "Copy to Clipboard"
 #~ msgstr "Скопійовано в буфер обміну"
 
@@ -794,7 +743,6 @@ msgstr "Теги"
 #~ msgid "Completed:"
 #~ msgstr "Завершено:"
 
-#, fuzzy
 #~ msgid "Toggle Completed Tasks"
 #~ msgstr "Видалити завершені задачі"
 
@@ -819,11 +767,9 @@ msgstr "Теги"
 #~ msgid "Tasks will be permanently deleted"
 #~ msgstr "Задачі будуть видалені назавжди"
 
-#, fuzzy
 #~ msgid "Create new List"
 #~ msgstr "Створити список"
 
-#, fuzzy
 #~ msgid "Syncing"
 #~ msgstr "Синхронізація…"
 
@@ -848,7 +794,6 @@ msgstr "Теги"
 #~ msgid "Connected"
 #~ msgstr "З'єднаний"
 
-#, fuzzy
 #~ msgid "Authorization failed"
 #~ msgstr "Не вдалося експортувати"
 
@@ -860,15 +805,12 @@ msgstr "Теги"
 #~ "Надано не всі облікові дані синхронізації. Будь ласка, перевірте "
 #~ "налаштування."
 
-#, fuzzy
 #~ msgid "New Task List"
 #~ msgstr "Немає списків із задачами"
 
-#, fuzzy
 #~ msgid "Task is Due"
 #~ msgstr "Задачі"
 
-#, fuzzy
 #~ msgid "Restart"
 #~ msgstr "Відновити"
 

@@ -87,7 +87,7 @@ ALL_CFLAGS  += $(CFLAGS) \
 # --- Targets --- #
 
 .PHONY: all
-all: $(BUILD_DIR)/$(NAME)
+all: $(BUILD_DIR)/$(NAME) mo
 
 .PHONY: clean
 clean:
@@ -204,6 +204,11 @@ install: $(BUILD_DIR)/$(NAME)
 	@sed -i "s/@APP_ID@/$(APP_ID)/g" $(BUILD_DIR)/$(APP_ID).service
 	@sed -i "s|@BIN_DIR@|$(bindir)|g" $(BUILD_DIR)/$(APP_ID).service
 	install -Dm 644 $(BUILD_DIR)/$(APP_ID).service $(DESTDIR)$(dbusdir)/$(APP_ID).service
+	# Locales
+	@for lang in $(LINGUAS); do \
+		install -Dm 644 $(BUILD_DIR)/locale/$$lang/LC_MESSAGES/$(NAME).mo \
+			$(DESTDIR)$(localedir)/$$lang/LC_MESSAGES/$(NAME).mo; \
+	done
 
 .PHONY: uninstall
 uninstall:
@@ -212,6 +217,9 @@ uninstall:
 	rm -f $(DESTDIR)$(scalableicondir)/$(APP_ID).svg
 	rm -f $(DESTDIR)$(symbolicicondir)/io.github.mrvladus.List-symbolic.svg
 	rm -f $(DESTDIR)$(dbusdir)/$(APP_ID).service
+	@for lang in $(LINGUAS); do \
+		rm -f $(DESTDIR)$(localedir)/$$lang/LC_MESSAGES/$(NAME).mo; \
+	done
 
 # --- Run targets --- #
 
@@ -320,6 +328,7 @@ POTFILES    	= $(PO_DIR)/POTFILES
 POT_FILE        = $(PO_DIR)/$(NAME).pot
 LINGUAS         = $(shell sed -e '/^\#/d' -e '/^$$/d' $(PO_DIR)/LINGUAS)
 PO_FILES        = $(patsubst %,$(PO_DIR)/%.po,$(LANGUAS))
+MO_FILES        = $(patsubst %,$(BUILD_DIR)/locale/%/LC_MESSAGES/$(NAME).mo,$(LINGUAS))
 XGETTEXT_FLAGS  = \
 	--from-code=UTF-8 \
 	--language=C \
@@ -350,3 +359,11 @@ update-po: $(POT_FILE)
 		fi \
 	done
 	@echo "Updated .po files"
+
+.PHONY: mo
+mo: $(MO_FILES)
+
+$(BUILD_DIR)/locale/%/LC_MESSAGES/$(NAME).mo: $(PO_DIR)/%.po | $(BUILD_DIR)
+	@echo "Compiling localization catalog [$*]"
+	@mkdir -p $(dir $@)
+	@msgfmt -o $@ $<

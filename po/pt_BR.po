@@ -18,6 +18,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Poedit 3.4.2\n"
 
 #: src/about-dialog.h:15 src/sidebar.blp:13 src/window.blp:8
@@ -34,91 +35,88 @@ msgstr ""
 
 #: src/date-chooser.c:104 src/date-chooser.blp:7
 msgid "Not Set"
-msgstr "Não configurado"
+msgstr "Não definido"
 
 #: src/rrule-row.c:171
 msgctxt "Repeat every ..."
 msgid "seconds"
-msgstr ""
+msgstr "segundos"
 
 #: src/rrule-row.c:171
 msgctxt "Repeat every ..."
 msgid "minutes"
-msgstr ""
+msgstr "minutos"
 
 #: src/rrule-row.c:172
 msgctxt "Repeat every ..."
 msgid "hours"
-msgstr ""
+msgstr "horas"
 
 #: src/rrule-row.c:172
 msgctxt "Repeat every ..."
 msgid "days"
-msgstr ""
+msgstr "dias"
 
 #: src/rrule-row.c:173
 msgctxt "Repeat every ..."
 msgid "weeks"
-msgstr ""
+msgstr "semanas"
 
 #: src/rrule-row.c:173
 msgctxt "Repeat every ..."
 msgid "months"
-msgstr ""
+msgstr "meses"
 
 #: src/rrule-row.c:174
 msgctxt "Repeat every ..."
 msgid "years"
-msgstr ""
+msgstr "anos"
 
 #: src/rrule-row.c:176
 #, c-format
 msgid "Repeat every %d %s"
-msgstr ""
+msgstr "Repetir a cada %d %s"
 
 #: src/rrule-row.c:182
 msgid "Repeat forever"
-msgstr ""
+msgstr "Repetir para sempre"
 
 #: src/rrule-row.c:182
 #, c-format
 msgid "Repeat %zu times"
-msgstr ""
+msgstr "Repetir %zu vezes"
 
 #: src/sync.c:262
 #, c-format
 msgid "Added remote task list: %s"
-msgstr ""
+msgstr "Lista de tarefas remota adicionada: %s"
 
 #: src/sync.c:293
 #, c-format
 msgid "Removed remote task list: %s"
-msgstr ""
+msgstr "Lista de tarefas remota removida: %s"
 
 #: src/sync.c:372
 msgid "Creating remote list failed. Limits may be reached."
-msgstr ""
+msgstr "Falha ao criar a lista remota. Talvez o limite tenha sido atingido."
 
 #: src/sync.c:532
-#, fuzzy
 msgid "Failed to connect to CalDAV remote."
-msgstr "Não é possível conectar-se ao servidor CalDAV em:"
+msgstr "Falha ao conectar ao servidor CalDAV."
 
 #: src/sync.c:553
 msgid "Failed 3 attempts to sync. Disabling for now."
-msgstr ""
+msgstr "A sincronização falhou após 3 tentativas. Será desativada por enquanto."
 
 #: src/task.c:110
-#, fuzzy
 msgctxt "Start date"
 msgid "Start"
-msgstr "Iniciar"
+msgstr "Início"
 
 #: src/task.c:125
-#, fuzzy
 msgctxt "Due date"
 msgid "Due"
-msgstr "Devido"
+msgstr "Vencimento"
 
 #: src/task.c:302
 msgid "Copied to Clipboard"
@@ -126,7 +124,7 @@ msgstr "Copiado para a área de transferência"
 
 #: src/task.c:336
 msgid "Failed to Export"
-msgstr ""
+msgstr "Falha ao exportar"
 
 #: src/task.c:339 src/task-list.c:294
 msgid "Exported"
@@ -137,49 +135,43 @@ msgid "Export failed"
 msgstr "Falha na exportação"
 
 #: src/task-list.c:314 src/task-list.c:326
-#, fuzzy
 msgid "No tasks to delete"
-msgstr "Nenhuma Tarefa para Hoje"
+msgstr "Não há tarefas para excluir"
 
 #: src/task-list.c:319 src/task-list.c:331
-#, fuzzy, c-format
+#, c-format
 msgid "Deleted %d task"
 msgid_plural "Deleted %d tasks"
-msgstr[0] "Mostrar itens deletados"
-msgstr[1] "Mostrar itens deletados"
+msgstr[0] "%d tarefa excluída"
+msgstr[1] "%d tarefas excluídas"
 
 #: src/task-list.c:464 src/sidebar.blp:100
-#, fuzzy
 msgid "All Tasks"
-msgstr "Adicionar novas Tarefas"
+msgstr "Todas as tarefas"
 
 #: src/task-list.c:465 src/sidebar.blp:113
-#, fuzzy
 msgid "Tasks for Today"
-msgstr "Nenhuma Tarefa para Hoje"
+msgstr "Tarefas de hoje"
 
 #: src/task-list-item.c:142
 msgid "Untitled"
-msgstr ""
+msgstr "Sem título"
 
 #: src/window.c:115
-#, fuzzy
 msgid "Remove Attachment"
-msgstr "Anexos"
+msgstr "Remover anexo"
 
 #: src/window.c:146
-#, fuzzy
 msgid "Enable Tag"
-msgstr "Apagar Etiqueta"
+msgstr "Ativar etiqueta"
 
 #: src/window.c:151
-#, fuzzy
 msgid "Remove Tag"
-msgstr "Apagar Etiqueta"
+msgstr "Remover etiqueta"
 
 #: src/date-chooser.blp:13
 msgid "Reset"
-msgstr ""
+msgstr "Redefinir"
 
 #: src/date-chooser.blp:27 src/rrule-row.blp:51
 msgid "Date"
@@ -195,23 +187,23 @@ msgstr "Amanhã"
 
 #: src/date-chooser.blp:85
 msgid "Time"
-msgstr ""
+msgstr "Hora"
 
 #: src/date-chooser.blp:149
 msgid "9:00"
-msgstr ""
+msgstr "9:00"
 
 #: src/date-chooser.blp:164
 msgid "12:00"
-msgstr ""
+msgstr "12:00"
 
 #: src/date-chooser.blp:179
 msgid "17:00"
-msgstr ""
+msgstr "17:00"
 
 #: src/date-chooser.blp:194
 msgid "20:00"
-msgstr ""
+msgstr "20:00"
 
 #: src/delete-list-dialog.blp:8
 msgid "Are you sure?"
@@ -231,47 +223,47 @@ msgstr "Renomear"
 
 #: src/rename-list-dialog.blp:21
 msgid "New List Name"
-msgstr "Novo nome da lista"
+msgstr "Nome da nova lista"
 
 #: src/rrule-row.blp:7 src/task.blp:258
 msgid "Repeat"
-msgstr ""
+msgstr "Repetir"
 
 #: src/rrule-row.blp:12
 msgid "Frequency"
-msgstr ""
+msgstr "Frequência"
 
 #: src/rrule-row.blp:13
 msgid "How often task will repeat"
-msgstr ""
+msgstr "Com que frequência a tarefa será repetida"
 
 #: src/rrule-row.blp:17
 msgid "Secondly"
-msgstr ""
+msgstr "A cada segundo"
 
 #: src/rrule-row.blp:18
 msgid "Minutely"
-msgstr ""
+msgstr "A cada minuto"
 
 #: src/rrule-row.blp:19
 msgid "Hourly"
-msgstr ""
+msgstr "A cada hora"
 
 #: src/rrule-row.blp:20
 msgid "Daily"
-msgstr ""
+msgstr "Diariamente"
 
 #: src/rrule-row.blp:21
 msgid "Weekly"
-msgstr ""
+msgstr "Semanalmente"
 
 #: src/rrule-row.blp:22
 msgid "Monthly"
-msgstr ""
+msgstr "Mensalmente"
 
 #: src/rrule-row.blp:23
 msgid "Yearly"
-msgstr ""
+msgstr "Anualmente"
 
 #: src/rrule-row.blp:24 src/task.blp:144
 msgid "None"
@@ -279,97 +271,95 @@ msgstr "Nenhum"
 
 #: src/rrule-row.blp:32
 msgid "Interval"
-msgstr ""
+msgstr "Intervalo"
 
 #: src/rrule-row.blp:46
 msgid "Repeat Until"
-msgstr ""
+msgstr "Repetir até"
 
 #: src/rrule-row.blp:50
 msgid "Indefinitely"
-msgstr ""
+msgstr "Indefinidamente"
 
 #: src/rrule-row.blp:52
 msgid "Count"
-msgstr ""
+msgstr "Contagem"
 
 #: src/rrule-row.blp:60
 msgid "Repeat Until Date"
-msgstr ""
+msgstr "Data final da repetição"
 
 #: src/rrule-row.blp:64
 msgid "Repeat Count"
-msgstr ""
+msgstr "Contagem de repetições"
 
 #: src/rrule-row.blp:87
 msgid "Week Days"
-msgstr ""
+msgstr "Dias da semana"
 
 #: src/rrule-row.blp:96
-#, fuzzy
 msgid "Mo"
-msgstr "Mais"
+msgstr "Seg"
 
 #: src/rrule-row.blp:97
 msgid "Monday"
-msgstr ""
+msgstr "Segunda-feira"
 
 #: src/rrule-row.blp:106
 msgid "Tu"
-msgstr ""
+msgstr "Ter"
 
 #: src/rrule-row.blp:107
 msgid "Tuesday"
-msgstr ""
+msgstr "Terça-feira"
 
 #: src/rrule-row.blp:116
 msgid "We"
-msgstr ""
+msgstr "Qua"
 
 #: src/rrule-row.blp:117
 msgid "Wednesday"
-msgstr ""
+msgstr "Quarta-feira"
 
 #: src/rrule-row.blp:126
 msgid "Th"
-msgstr ""
+msgstr "Qui"
 
 #: src/rrule-row.blp:127
 msgid "Thursday"
-msgstr ""
+msgstr "Quinta-feira"
 
 #: src/rrule-row.blp:136
 msgid "Fr"
-msgstr ""
+msgstr "Sex"
 
 #: src/rrule-row.blp:137
 msgid "Friday"
-msgstr ""
+msgstr "Sexta-feira"
 
 #: src/rrule-row.blp:146
-#, fuzzy
 msgid "Sa"
-msgstr "Salvar"
+msgstr "Sáb"
 
 #: src/rrule-row.blp:147
 msgid "Saturday"
-msgstr ""
+msgstr "Sábado"
 
 #: src/rrule-row.blp:156
 msgid "Su"
-msgstr ""
+msgstr "Dom"
 
 #: src/rrule-row.blp:157
 msgid "Sunday"
-msgstr ""
+msgstr "Domingo"
 
 #: src/settings-dialog.blp:11
 msgid "Appearance"
-msgstr ""
+msgstr "Aparência"
 
 #: src/settings-dialog.blp:14
 msgid "Theme"
-msgstr ""
+msgstr "Tema"
 
 #: src/settings-dialog.blp:21
 msgid "System"
@@ -385,43 +375,39 @@ msgstr "Escuro"
 
 #: src/settings-dialog.blp:43
 msgid "Miscellaneous"
-msgstr ""
+msgstr "Diversos"
 
 #: src/settings-dialog.blp:46
 msgid "Show Notifications"
 msgstr "Mostrar notificações"
 
 #: src/settings-dialog.blp:50
-#, fuzzy
 msgid "Work in the Background"
-msgstr "Executar em Segundo Plano"
+msgstr "Executar em segundo plano"
 
 #: src/settings-dialog.blp:54
-#, fuzzy
 msgid "Launch at Startup"
-msgstr "Iniciar aplicação na inicialização"
+msgstr "Iniciar ao entrar"
 
 #: src/settings-dialog.blp:60 src/shortcuts-dialog.blp:84 src/sidebar.blp:64
 msgid "Sync"
 msgstr "Sincronizar"
 
 #: src/settings-dialog.blp:63
-#, fuzzy
 msgid "Enabled"
-msgstr "Desabilitado"
+msgstr "Ativado"
 
 #: src/settings-dialog.blp:67
 msgid "Sync Interval"
-msgstr ""
+msgstr "Intervalo de sincronização"
 
 #: src/settings-dialog.blp:68
 msgid "Seconds between pulling events from the server"
-msgstr ""
+msgstr "Segundos entre a busca de eventos no servidor"
 
 #: src/settings-dialog.blp:80
-#, fuzzy
 msgid "CalDAV Server URL"
-msgstr "URL do servidor"
+msgstr "URL do servidor CalDAV"
 
 #: src/settings-dialog.blp:86
 msgid "Username"
@@ -440,27 +426,24 @@ msgid "Preferences"
 msgstr "Preferências"
 
 #: src/shortcuts-dialog.blp:17
-#, fuzzy
 msgid "Open Menu"
-msgstr "Menu principal"
+msgstr "Abrir menu"
 
 #: src/shortcuts-dialog.blp:22
 msgid "Close Window"
-msgstr ""
+msgstr "Fechar janela"
 
 #: src/shortcuts-dialog.blp:27
 msgid "Quit"
 msgstr "Sair"
 
 #: src/shortcuts-dialog.blp:34 src/task-list.blp:12
-#, fuzzy
 msgid "Task List"
-msgstr "Listas de tarefas"
+msgstr "Lista de tarefas"
 
 #: src/shortcuts-dialog.blp:37
-#, fuzzy
 msgid "Create Task List"
-msgstr "Criar lista"
+msgstr "Criar lista de tarefas"
 
 #: src/shortcuts-dialog.blp:42
 msgid "Import Task List"
@@ -468,69 +451,59 @@ msgstr "Importar Lista de Tarefas"
 
 #: src/shortcuts-dialog.blp:47
 msgid "Sorting and Filtering Options"
-msgstr ""
+msgstr "Opções de classificação e filtragem"
 
 #: src/shortcuts-dialog.blp:52
 msgid "Search"
-msgstr ""
+msgstr "Pesquisar"
 
 #: src/shortcuts-dialog.blp:57
 msgid "Select Task Entry"
-msgstr ""
+msgstr "Selecionar entrada da tarefa"
 
 #: src/shortcuts-dialog.blp:62
-#, fuzzy
 msgid "Entry Task Properties"
-msgstr "Propriedades"
+msgstr "Propriedades da entrada da tarefa"
 
 #: src/shortcuts-dialog.blp:67 src/task-list.blp:142
-#, fuzzy
 msgid "Add Task"
 msgstr "Adicionar nova tarefa"
 
 #: src/shortcuts-dialog.blp:74
-#, fuzzy
 msgid "Task Properties Dialog"
-msgstr "Propriedades"
+msgstr "Diálogo de propriedades da tarefa"
 
 #: src/shortcuts-dialog.blp:77 src/window.blp:99
 msgid "Add Attachment"
-msgstr "Adicionar Anexo"
+msgstr "Adicionar anexo"
 
 #: src/shortcuts-dialog.blp:87
-#, fuzzy
 msgid "Sync Now"
-msgstr "Sincronizar"
+msgstr "Sincronizar agora"
 
 #: src/sidebar.blp:19
-#, fuzzy
 msgid "Add Task List"
-msgstr "Listas de tarefas"
+msgstr "Adicionar lista de tarefas"
 
 #: src/sidebar.blp:28
-#, fuzzy
 msgid "Import \".ics\" file"
 msgstr "Importar arquivo .ics"
 
 #: src/sidebar.blp:37
-#, fuzzy
 msgid "New list name"
-msgstr "Novo nome da lista"
+msgstr "Nome da nova lista"
 
 #: src/sidebar.blp:43
-#, fuzzy
 msgid "Create"
-msgstr "Criado:"
+msgstr "Criar"
 
 #: src/sidebar.blp:60
-#, fuzzy
 msgid "Main Menu (F10)"
-msgstr "Menu principal"
+msgstr "Menu principal (F10)"
 
 #: src/sidebar.blp:69
-#, fuzzy
 msgid "Shortcuts"
-msgstr "Atalhos do teclado"
+msgstr "Atalhos de teclado"
 
 #: src/sidebar.blp:70
 msgid "About Errands"
@@ -539,10 +512,9 @@ msgstr "Sobre o Errands"
 #: src/sidebar.blp:99
 msgctxt "All Tasks"
 msgid "All"
-msgstr ""
+msgstr "Tudo"
 
 #: src/sidebar.blp:112
-#, fuzzy
 msgctxt "Tasks for Today"
 msgid "Today"
 msgstr "Hoje"
@@ -553,25 +525,23 @@ msgstr "Listas de tarefas"
 
 #: src/sidebar.blp:131
 msgid "No Task Lists"
-msgstr "Sem listas de tarefas"
+msgstr "Nenhuma lista de tarefas"
 
 #: src/sidebar.blp:132
-#, fuzzy
 msgid "Create new or import “.ics”"
-msgstr "Criar novo ou importar um existente"
+msgstr "Criar nova ou importar “.ics”"
 
 #: src/task.blp:37
 msgid "Toggle Completion"
-msgstr "Ver Progresso"
+msgstr "Alternar conclusão"
 
 #: src/task.blp:48
 msgid "Restore"
 msgstr "Restaurar"
 
 #: src/task.blp:106
-#, fuzzy
 msgid "Toggle Sub-Tasks Entry"
-msgstr "Ver Subtarefas"
+msgstr "Alternar entrada de subtarefas"
 
 #: src/task.blp:129 src/window.blp:74
 msgid "Properties"
@@ -582,18 +552,16 @@ msgid "Notes"
 msgstr "Notas"
 
 #: src/task.blp:134
-#, fuzzy
 msgid "Edit Text"
-msgstr "Editar"
+msgstr "Editar texto"
 
 #: src/task.blp:135
 msgid "Copy Text"
-msgstr "Copiar Texto"
+msgstr "Copiar texto"
 
 #: src/task.blp:136
-#, fuzzy
 msgid "Task Color"
-msgstr "Cor"
+msgstr "Cor da tarefa"
 
 #: src/task.blp:141 src/task.blp:200 src/task-list.blp:72
 msgid "Priority"
@@ -612,76 +580,68 @@ msgid "High"
 msgstr "Alta"
 
 #: src/task.blp:170 src/task-list.blp:91
-#, fuzzy
 msgid "Export as \".ics\""
-msgstr "Exportar Tarefas..."
+msgstr "Exportar como \".ics\""
 
 #: src/task.blp:174
-#, fuzzy
 msgid "Cancel / Restore"
-msgstr "Restaurar"
+msgstr "Cancelar / restaurar"
 
 #: src/task.blp:226 src/window.blp:82
 msgid "Start"
-msgstr "Iniciar"
+msgstr "Início"
 
 #: src/task.blp:227 src/task-list.blp:60
-#, fuzzy
 msgid "Start Date"
-msgstr "Definir Data"
+msgstr "Data de início"
 
 #: src/task.blp:242 src/window.blp:86
 msgid "Due"
-msgstr "Devido"
+msgstr "Vencimento"
 
 #: src/task.blp:243 src/task-list.blp:66
-#, fuzzy
 msgid "Due Date"
-msgstr "Definir Data"
+msgstr "Data de vencimento"
 
 #: src/task.blp:274 src/task.blp:280 src/window.blp:94
 msgid "Attachments"
 msgstr "Anexos"
 
 #: src/task.blp:305
-#, fuzzy
 msgid "Add Sub-Task"
 msgstr "Adicionar nova sub-tarefa"
 
 #: src/task-list.blp:21
-#, fuzzy
 msgid "Show Tasks"
-msgstr "Mostrar itens deletados"
+msgstr "Mostrar tarefas"
 
 #: src/task-list.blp:24
 msgid "Completed"
-msgstr "Completo"
+msgstr "Concluída"
 
 #: src/task-list.blp:29
-#, fuzzy
 msgid "Cancelled"
-msgstr "Cancelar"
+msgstr "Canceladas"
 
 #: src/task-list.blp:35
 msgid "Sort Order"
-msgstr ""
+msgstr "Ordem de classificação"
 
 #: src/task-list.blp:38
 msgid "Descending"
-msgstr ""
+msgstr "Decrescente"
 
 #: src/task-list.blp:44
 msgid "Ascending"
-msgstr ""
+msgstr "Crescente"
 
 #: src/task-list.blp:51
 msgid "Sort By"
-msgstr ""
+msgstr "Ordenar por"
 
 #: src/task-list.blp:54
-#, fuzzy
 msgid "Created"
-msgstr "Criado:"
+msgstr "Criado"
 
 #: src/task-list.blp:87
 msgid "Rename List"
@@ -689,47 +649,39 @@ msgstr "Renomear lista"
 
 #: src/task-list.blp:92
 msgid "Print"
-msgstr ""
+msgstr "Imprimir"
 
 #: src/task-list.blp:96
-#, fuzzy
 msgid "Delete Completed"
-msgstr "Deletar tarefas concluídas"
+msgstr "Excluir tarefas concluídas"
 
 #: src/task-list.blp:97
-#, fuzzy
 msgid "Delete Cancelled"
-msgstr "Exportação cancelada"
+msgstr "Excluir tarefas canceladas"
 
 #: src/task-list.blp:101
-#, fuzzy
 msgid "Delete List"
-msgstr "Criar lista"
+msgstr "Excluir lista"
 
 #: src/task-list.blp:109
-#, fuzzy
 msgid "Search (Ctrl+F)"
-msgstr "Sincronização/busca de tarefas (Ctrl+S)"
+msgstr "Pesquisar (Ctrl+F)"
 
 #: src/task-list.blp:143
-#, fuzzy
 msgid "Add Task (Ctrl+N)"
-msgstr "Adicionar lista (Ctrl+Shift+A)"
+msgstr "Adicionar nova tarefa (Ctrl+N)"
 
 #: src/task-list.blp:161
-#, fuzzy
 msgid "Add Task (Ctrl+Return)"
-msgstr "Adicionar lista (Ctrl+Shift+A)"
+msgstr "Adicionar nova tarefa (Ctrl+Return)"
 
 #: src/task-list.blp:185
-#, fuzzy
 msgid "No Tasks"
-msgstr "Sem Etiquetas"
+msgstr "Nenhuma tarefa"
 
 #: src/task-list.blp:212
-#, fuzzy
 msgid "Loading Tasks"
-msgstr "Adicionar novas Tarefas"
+msgstr "Carregando tarefas"
 
 #: src/window.blp:27
 msgid "Sidebar"
@@ -740,19 +692,17 @@ msgid "Content"
 msgstr "Conteúdo"
 
 #: src/window.blp:63
-#, fuzzy
 msgid "Close Properties"
-msgstr "Propriedades"
+msgstr "Fechar propriedades"
 
 #: src/window.blp:79
 msgid "Date and Time"
-msgstr "Data e Hora"
+msgstr "Data e hora"
 
 #: src/window.blp:106
 msgid "Tags"
 msgstr "Etiquetas"
 
 #: src/window.blp:111
-#, fuzzy
 msgid "New Tag"
-msgstr "Sem Etiquetas"
+msgstr "Nova etiqueta"

@@ -10,12 +10,12 @@ msgstr ""
 "POT-Creation-Date: 2026-10-20 18:53+0300\n"
 "PO-Revision-Date: 2023-12-02 00:14+0100\n"
 "Last-Translator: Sergio Varela <sergiovg01@outlook.com>\n"
-"Language-Team: Spanish - Spain <sergiovg01@outlook.com>\n"
-"Language: es_ES\n"
+"Language-Team: Basque\n"
+"Language: eu\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Gtranslator 45.3\n"
 
 #: src/about-dialog.h:15 src/sidebar.blp:13 src/window.blp:8
@@ -30,90 +30,88 @@ msgstr ""
 
 #: src/date-chooser.c:104 src/date-chooser.blp:7
 msgid "Not Set"
-msgstr ""
+msgstr "Ezarri gabe"
 
 #: src/rrule-row.c:171
 msgctxt "Repeat every ..."
 msgid "seconds"
-msgstr ""
+msgstr "segundo"
 
 #: src/rrule-row.c:171
 msgctxt "Repeat every ..."
 msgid "minutes"
-msgstr ""
+msgstr "minutu"
 
 #: src/rrule-row.c:172
 msgctxt "Repeat every ..."
 msgid "hours"
-msgstr ""
+msgstr "ordu"
 
 #: src/rrule-row.c:172
 msgctxt "Repeat every ..."
 msgid "days"
-msgstr ""
+msgstr "egun"
 
 #: src/rrule-row.c:173
 msgctxt "Repeat every ..."
 msgid "weeks"
-msgstr ""
+msgstr "aste"
 
 #: src/rrule-row.c:173
 msgctxt "Repeat every ..."
 msgid "months"
-msgstr ""
+msgstr "hilabete"
 
 #: src/rrule-row.c:174
 msgctxt "Repeat every ..."
 msgid "years"
-msgstr ""
+msgstr "urte"
 
 #: src/rrule-row.c:176
 #, c-format
 msgid "Repeat every %d %s"
-msgstr ""
+msgstr "Errepikatu %d %s-ro"
 
 #: src/rrule-row.c:182
 msgid "Repeat forever"
-msgstr ""
+msgstr "Errepikatu betiko"
 
 #: src/rrule-row.c:182
 #, c-format
 msgid "Repeat %zu times"
-msgstr ""
+msgstr "Errepikatu %zu aldiz"
 
 #: src/sync.c:262
 #, c-format
 msgid "Added remote task list: %s"
-msgstr ""
+msgstr "Urruneko ataza-zerrenda gehitu da: %s"
 
 #: src/sync.c:293
 #, c-format
 msgid "Removed remote task list: %s"
-msgstr ""
+msgstr "Urruneko ataza-zerrenda kendu da: %s"
 
 #: src/sync.c:372
 msgid "Creating remote list failed. Limits may be reached."
-msgstr ""
+msgstr "Ezin izan da urruneko zerrenda sortu. Baliteke muga gainditu izana."
 
 #: src/sync.c:532
-#, fuzzy
 msgid "Failed to connect to CalDAV remote."
-msgstr "Ezin da CalDAV zerbitzariarekin konektatu:"
+msgstr "Ezin izan da CalDAV zerbitzarira konektatu."
 
 #: src/sync.c:553
 msgid "Failed 3 attempts to sync. Disabling for now."
-msgstr ""
+msgstr "Sinkronizazioak huts egin du 3 saiakeraren ondoren. Oraingoz desgaitu egingo da."
 
 #: src/task.c:110
-#, fuzzy
 msgctxt "Start date"
 msgid "Start"
-msgstr "Leheneratu"
+msgstr "Hasiera"
 
 #: src/task.c:125
 msgctxt "Due date"
 msgid "Due"
-msgstr ""
+msgstr "Epemuga"
 
 #: src/task.c:302
 msgid "Copied to Clipboard"
@@ -121,91 +119,86 @@ msgstr "Arbelean kopiatuta"
 
 #: src/task.c:336
 msgid "Failed to Export"
-msgstr ""
+msgstr "Esportatzeak huts egin du"
 
 #: src/task.c:339 src/task-list.c:294
-#, fuzzy
 msgid "Exported"
 msgstr "Atazak esportatu egin dira"
 
 #: src/task-list.c:283 src/task-list.c:288
-#, fuzzy
 msgid "Export failed"
-msgstr "Atazak esportatu egin dira"
+msgstr "Esportatzeak huts egin du"
 
 #: src/task-list.c:314 src/task-list.c:326
 msgid "No tasks to delete"
-msgstr ""
+msgstr "Ez dago ezabatzeko atazarik"
 
 #: src/task-list.c:319 src/task-list.c:331
-#, fuzzy, c-format
+#, c-format
 msgid "Deleted %d task"
 msgid_plural "Deleted %d tasks"
-msgstr[0] "Erakutsi ezabatutako atazak"
-msgstr[1] "Erakutsi ezabatutako atazak"
+msgstr[0] "%d ataza ezabatu da"
+msgstr[1] "%d ataza ezabatu dira"
 
 #: src/task-list.c:464 src/sidebar.blp:100
-#, fuzzy
 msgid "All Tasks"
-msgstr "Gehitu ataza berria"
+msgstr "Ataza guztiak"
 
 #: src/task-list.c:465 src/sidebar.blp:113
 msgid "Tasks for Today"
-msgstr ""
+msgstr "Gaurko atazak"
 
 #: src/task-list-item.c:142
 msgid "Untitled"
-msgstr ""
+msgstr "Izenbururik gabe"
 
 #: src/window.c:115
 msgid "Remove Attachment"
-msgstr ""
+msgstr "Kendu eranskina"
 
 #: src/window.c:146
-#, fuzzy
 msgid "Enable Tag"
-msgstr "Ezabatutako atazak"
+msgstr "Gaitu etiketa"
 
 #: src/window.c:151
-#, fuzzy
 msgid "Remove Tag"
-msgstr "Ezabatutako atazak"
+msgstr "Kendu etiketa"
 
 #: src/date-chooser.blp:13
 msgid "Reset"
-msgstr ""
+msgstr "Berrezarri"
 
 #: src/date-chooser.blp:27 src/rrule-row.blp:51
 msgid "Date"
-msgstr ""
+msgstr "Data"
 
 #: src/date-chooser.blp:36
 msgid "Today"
-msgstr ""
+msgstr "Gaur"
 
 #: src/date-chooser.blp:50
 msgid "Tomorrow"
-msgstr ""
+msgstr "Bihar"
 
 #: src/date-chooser.blp:85
 msgid "Time"
-msgstr ""
+msgstr "Ordua"
 
 #: src/date-chooser.blp:149
 msgid "9:00"
-msgstr ""
+msgstr "9:00"
 
 #: src/date-chooser.blp:164
 msgid "12:00"
-msgstr ""
+msgstr "12:00"
 
 #: src/date-chooser.blp:179
 msgid "17:00"
-msgstr ""
+msgstr "17:00"
 
 #: src/date-chooser.blp:194
 msgid "20:00"
-msgstr ""
+msgstr "20:00"
 
 #: src/delete-list-dialog.blp:8
 msgid "Are you sure?"
@@ -220,149 +213,148 @@ msgid "Delete"
 msgstr "Ezabatu"
 
 #: src/rename-list-dialog.blp:12
-#, fuzzy
 msgid "Rename"
-msgstr "Erabiltzailearen izena"
+msgstr "Aldatu izena"
 
 #: src/rename-list-dialog.blp:21
 msgid "New List Name"
-msgstr ""
+msgstr "Zerrenda berriaren izena"
 
 #: src/rrule-row.blp:7 src/task.blp:258
 msgid "Repeat"
-msgstr ""
+msgstr "Errepikatu"
 
 #: src/rrule-row.blp:12
 msgid "Frequency"
-msgstr ""
+msgstr "Maiztasuna"
 
 #: src/rrule-row.blp:13
 msgid "How often task will repeat"
-msgstr ""
+msgstr "Ataza zenbatean behin errepikatuko den"
 
 #: src/rrule-row.blp:17
 msgid "Secondly"
-msgstr ""
+msgstr "Segundo bakoitzean"
 
 #: src/rrule-row.blp:18
 msgid "Minutely"
-msgstr ""
+msgstr "Minuturo"
 
 #: src/rrule-row.blp:19
 msgid "Hourly"
-msgstr ""
+msgstr "Orduro"
 
 #: src/rrule-row.blp:20
 msgid "Daily"
-msgstr ""
+msgstr "Egunero"
 
 #: src/rrule-row.blp:21
 msgid "Weekly"
-msgstr ""
+msgstr "Astero"
 
 #: src/rrule-row.blp:22
 msgid "Monthly"
-msgstr ""
+msgstr "Hilero"
 
 #: src/rrule-row.blp:23
 msgid "Yearly"
-msgstr ""
+msgstr "Urtero"
 
 #: src/rrule-row.blp:24 src/task.blp:144
 msgid "None"
-msgstr ""
+msgstr "Bat ere ez"
 
 #: src/rrule-row.blp:32
 msgid "Interval"
-msgstr ""
+msgstr "Tartea"
 
 #: src/rrule-row.blp:46
 msgid "Repeat Until"
-msgstr ""
+msgstr "Errepikatu noiz arte"
 
 #: src/rrule-row.blp:50
 msgid "Indefinitely"
-msgstr ""
+msgstr "Mugarik gabe"
 
 #: src/rrule-row.blp:52
 msgid "Count"
-msgstr ""
+msgstr "Zenbaketa"
 
 #: src/rrule-row.blp:60
 msgid "Repeat Until Date"
-msgstr ""
+msgstr "Errepikapenaren amaiera-data"
 
 #: src/rrule-row.blp:64
 msgid "Repeat Count"
-msgstr ""
+msgstr "Errepikapen kopurua"
 
 #: src/rrule-row.blp:87
 msgid "Week Days"
-msgstr ""
+msgstr "Asteko egunak"
 
 #: src/rrule-row.blp:96
 msgid "Mo"
-msgstr ""
+msgstr "As"
 
 #: src/rrule-row.blp:97
 msgid "Monday"
-msgstr ""
+msgstr "Astelehena"
 
 #: src/rrule-row.blp:106
 msgid "Tu"
-msgstr ""
+msgstr "Ar"
 
 #: src/rrule-row.blp:107
 msgid "Tuesday"
-msgstr ""
+msgstr "Asteartea"
 
 #: src/rrule-row.blp:116
 msgid "We"
-msgstr ""
+msgstr "Az"
 
 #: src/rrule-row.blp:117
 msgid "Wednesday"
-msgstr ""
+msgstr "Asteazkena"
 
 #: src/rrule-row.blp:126
 msgid "Th"
-msgstr ""
+msgstr "Og"
 
 #: src/rrule-row.blp:127
 msgid "Thursday"
-msgstr ""
+msgstr "Osteguna"
 
 #: src/rrule-row.blp:136
 msgid "Fr"
-msgstr ""
+msgstr "Or"
 
 #: src/rrule-row.blp:137
 msgid "Friday"
-msgstr ""
+msgstr "Ostirala"
 
 #: src/rrule-row.blp:146
 msgid "Sa"
-msgstr ""
+msgstr "La"
 
 #: src/rrule-row.blp:147
 msgid "Saturday"
-msgstr ""
+msgstr "Larunbata"
 
 #: src/rrule-row.blp:156
 msgid "Su"
-msgstr ""
+msgstr "Ig"
 
 #: src/rrule-row.blp:157
 msgid "Sunday"
-msgstr ""
+msgstr "Igandea"
 
 #: src/settings-dialog.blp:11
 msgid "Appearance"
-msgstr ""
+msgstr "Itxura"
 
 #: src/settings-dialog.blp:14
 msgid "Theme"
-msgstr ""
+msgstr "Gaia"
 
 #: src/settings-dialog.blp:21
 msgid "System"
@@ -378,41 +370,39 @@ msgstr "Iluna"
 
 #: src/settings-dialog.blp:43
 msgid "Miscellaneous"
-msgstr ""
+msgstr "Hainbat"
 
 #: src/settings-dialog.blp:46
 msgid "Show Notifications"
-msgstr ""
+msgstr "Erakutsi jakinarazpenak"
 
 #: src/settings-dialog.blp:50
 msgid "Work in the Background"
-msgstr ""
+msgstr "Atzeko planoan exekutatu"
 
 #: src/settings-dialog.blp:54
 msgid "Launch at Startup"
-msgstr ""
+msgstr "Abiarazi saioa hastean"
 
 #: src/settings-dialog.blp:60 src/shortcuts-dialog.blp:84 src/sidebar.blp:64
 msgid "Sync"
 msgstr "Sinkronizatu"
 
 #: src/settings-dialog.blp:63
-#, fuzzy
 msgid "Enabled"
-msgstr "Desgaitua"
+msgstr "Gaituta"
 
 #: src/settings-dialog.blp:67
 msgid "Sync Interval"
-msgstr ""
+msgstr "Sinkronizazio-tartea"
 
 #: src/settings-dialog.blp:68
 msgid "Seconds between pulling events from the server"
-msgstr ""
+msgstr "Zerbitzaritik gertaerak eskuratzeko tartea segundotan"
 
 #: src/settings-dialog.blp:80
-#, fuzzy
 msgid "CalDAV Server URL"
-msgstr "Zerbitzariaren URLa"
+msgstr "CalDAV zerbitzariaren URLa"
 
 #: src/settings-dialog.blp:86
 msgid "Username"
@@ -431,13 +421,12 @@ msgid "Preferences"
 msgstr "Hobespenak"
 
 #: src/shortcuts-dialog.blp:17
-#, fuzzy
 msgid "Open Menu"
-msgstr "Menu nagusia"
+msgstr "Ireki menua"
 
 #: src/shortcuts-dialog.blp:22
 msgid "Close Window"
-msgstr ""
+msgstr "Itxi leihoa"
 
 #: src/shortcuts-dialog.blp:27
 msgid "Quit"
@@ -446,84 +435,74 @@ msgstr "Irten"
 # ES_EU: Use "Atazak" instead of "Zereginak".
 # https://hiztegiak.elhuyar.eus/es/tarea#
 #: src/shortcuts-dialog.blp:34 src/task-list.blp:12
-#, fuzzy
 msgid "Task List"
-msgstr "Atazak"
+msgstr "Ataza-zerrenda"
 
 #: src/shortcuts-dialog.blp:37
-#, fuzzy
 msgid "Create Task List"
-msgstr "Inportatu atazak"
+msgstr "Sortu ataza-zerrenda"
 
 #: src/shortcuts-dialog.blp:42
-#, fuzzy
 msgid "Import Task List"
 msgstr "Inportatu atazak"
 
 #: src/shortcuts-dialog.blp:47
 msgid "Sorting and Filtering Options"
-msgstr ""
+msgstr "Ordenatzeko eta iragazteko aukerak"
 
 #: src/shortcuts-dialog.blp:52
 msgid "Search"
-msgstr ""
+msgstr "Bilatu"
 
 #: src/shortcuts-dialog.blp:57
 msgid "Select Task Entry"
-msgstr ""
+msgstr "Hautatu ataza-sarrera"
 
 #: src/shortcuts-dialog.blp:62
 msgid "Entry Task Properties"
-msgstr ""
+msgstr "Ataza-sarreraren propietateak"
 
 #: src/shortcuts-dialog.blp:67 src/task-list.blp:142
-#, fuzzy
 msgid "Add Task"
 msgstr "Gehitu ataza berria"
 
 #: src/shortcuts-dialog.blp:74
 msgid "Task Properties Dialog"
-msgstr ""
+msgstr "Atazaren propietateen elkarrizketa-koadroa"
 
 #: src/shortcuts-dialog.blp:77 src/window.blp:99
 msgid "Add Attachment"
-msgstr ""
+msgstr "Gehitu eranskina"
 
 #: src/shortcuts-dialog.blp:87
-#, fuzzy
 msgid "Sync Now"
-msgstr "Sinkronizatu"
+msgstr "Sinkronizatu orain"
 
 # ES_EU: Use "Atazak" instead of "Zereginak".
 # https://hiztegiak.elhuyar.eus/es/tarea#
 #: src/sidebar.blp:19
-#, fuzzy
 msgid "Add Task List"
-msgstr "Atazak"
+msgstr "Gehitu ataza-zerrenda"
 
 #: src/sidebar.blp:28
-#, fuzzy
 msgid "Import \".ics\" file"
-msgstr "Inportatu atazak"
+msgstr "Inportatu .ics fitxategia"
 
 #: src/sidebar.blp:37
 msgid "New list name"
-msgstr ""
+msgstr "Zerrenda berriaren izena"
 
 #: src/sidebar.blp:43
-#, fuzzy
 msgid "Create"
-msgstr "Eginda:"
+msgstr "Sortu"
 
 #: src/sidebar.blp:60
-#, fuzzy
 msgid "Main Menu (F10)"
-msgstr "Menu nagusia"
+msgstr "Menu nagusia (F10)"
 
 #: src/sidebar.blp:69
-#, fuzzy
 msgid "Shortcuts"
-msgstr "Teklatuko lasterbideak"
+msgstr "Laster-teklak"
 
 #: src/sidebar.blp:70
 msgid "About Errands"
@@ -532,220 +511,199 @@ msgstr "Errands-i buruz"
 #: src/sidebar.blp:99
 msgctxt "All Tasks"
 msgid "All"
-msgstr ""
+msgstr "Denak"
 
 #: src/sidebar.blp:112
 msgctxt "Tasks for Today"
 msgid "Today"
-msgstr ""
+msgstr "Gaur"
 
 # ES_EU: Use "Atazak" instead of "Zereginak".
 # https://hiztegiak.elhuyar.eus/es/tarea#
 #: src/sidebar.blp:126
-#, fuzzy
 msgid "Task Lists"
-msgstr "Atazak"
+msgstr "Ataza-zerrendak"
 
 #: src/sidebar.blp:131
 msgid "No Task Lists"
-msgstr ""
+msgstr "Ez dago ataza-zerrendarik"
 
 #: src/sidebar.blp:132
 msgid "Create new or import “.ics”"
-msgstr ""
+msgstr "Sortu berria edo inportatu “.ics”"
 
 #: src/task.blp:37
-#, fuzzy
 msgid "Toggle Completion"
-msgstr "Txandakatu alboko barra"
+msgstr "Txandakatu osaketa"
 
 #: src/task.blp:48
 msgid "Restore"
 msgstr "Leheneratu"
 
 #: src/task.blp:106
-#, fuzzy
 msgid "Toggle Sub-Tasks Entry"
-msgstr "Erantsi azpiataza berri bat"
+msgstr "Txandakatu azpiatazen sarrera"
 
 #: src/task.blp:129 src/window.blp:74
 msgid "Properties"
-msgstr ""
+msgstr "Propietateak"
 
 #: src/task.blp:130 src/task.blp:264 src/window.blp:120
 msgid "Notes"
-msgstr ""
+msgstr "Oharrak"
 
 #: src/task.blp:134
-#, fuzzy
 msgid "Edit Text"
-msgstr "Editatu"
+msgstr "Editatu testua"
 
 #: src/task.blp:135
-#, fuzzy
 msgid "Copy Text"
-msgstr "Kopiatu"
+msgstr "Kopiatu testua"
 
 #: src/task.blp:136
 msgid "Task Color"
-msgstr ""
+msgstr "Atazaren kolorea"
 
 #: src/task.blp:141 src/task.blp:200 src/task-list.blp:72
 msgid "Priority"
-msgstr ""
+msgstr "Lehentasuna"
 
 #: src/task.blp:150
 msgid "Low"
-msgstr ""
+msgstr "Txikia"
 
 #: src/task.blp:156
 msgid "Medium"
-msgstr ""
+msgstr "Ertaina"
 
 #: src/task.blp:162
 msgid "High"
-msgstr ""
+msgstr "Handia"
 
 #: src/task.blp:170 src/task-list.blp:91
-#, fuzzy
 msgid "Export as \".ics\""
-msgstr "Esportatu atazak..."
+msgstr "Esportatu \".ics\" gisa"
 
 #: src/task.blp:174
-#, fuzzy
 msgid "Cancel / Restore"
-msgstr "Leheneratu"
+msgstr "Utzi / leheneratu"
 
 #: src/task.blp:226 src/window.blp:82
 msgid "Start"
-msgstr ""
+msgstr "Hasiera"
 
 #: src/task.blp:227 src/task-list.blp:60
 msgid "Start Date"
-msgstr ""
+msgstr "Hasiera-data"
 
 #: src/task.blp:242 src/window.blp:86
 msgid "Due"
-msgstr ""
+msgstr "Epemuga"
 
 #: src/task.blp:243 src/task-list.blp:66
 msgid "Due Date"
-msgstr ""
+msgstr "Epemuga"
 
 #: src/task.blp:274 src/task.blp:280 src/window.blp:94
 msgid "Attachments"
-msgstr ""
+msgstr "Eranskinak"
 
 #: src/task.blp:305
-#, fuzzy
 msgid "Add Sub-Task"
 msgstr "Erantsi azpiataza berri bat"
 
 #: src/task-list.blp:21
-#, fuzzy
 msgid "Show Tasks"
-msgstr "Erakutsi ezabatutako atazak"
+msgstr "Erakutsi atazak"
 
 #: src/task-list.blp:24
-#, fuzzy
 msgid "Completed"
-msgstr "Eginda:"
+msgstr "Osatuta"
 
 #: src/task-list.blp:29
-#, fuzzy
 msgid "Cancelled"
-msgstr "Ezeztatu"
+msgstr "Ezeztatuta"
 
 #: src/task-list.blp:35
 msgid "Sort Order"
-msgstr ""
+msgstr "Ordena"
 
 #: src/task-list.blp:38
 msgid "Descending"
-msgstr ""
+msgstr "Beherantz"
 
 #: src/task-list.blp:44
 msgid "Ascending"
-msgstr ""
+msgstr "Gorantz"
 
 #: src/task-list.blp:51
 msgid "Sort By"
-msgstr ""
+msgstr "Ordenatu honen arabera"
 
 #: src/task-list.blp:54
-#, fuzzy
 msgid "Created"
-msgstr "Eginda:"
+msgstr "Sortuta"
 
 #: src/task-list.blp:87
 msgid "Rename List"
-msgstr ""
+msgstr "Aldatu zerrendaren izena"
 
 #: src/task-list.blp:92
 msgid "Print"
-msgstr ""
+msgstr "Inprimatu"
 
 #: src/task-list.blp:96
-#, fuzzy
 msgid "Delete Completed"
-msgstr "Ezabatu betetako atazak"
+msgstr "Ezabatu osatutako atazak"
 
 #: src/task-list.blp:97
-#, fuzzy
 msgid "Delete Cancelled"
-msgstr "Esportazioa ezeztatu da"
+msgstr "Ezabatu bertan behera utzitako atazak"
 
 #: src/task-list.blp:101
-#, fuzzy
 msgid "Delete List"
-msgstr "Inportatu atazak"
+msgstr "Ezabatu zerrenda"
 
 #: src/task-list.blp:109
-#, fuzzy
 msgid "Search (Ctrl+F)"
-msgstr "Atazak sinkronizatu/lortu (Ctrl+S)"
+msgstr "Bilatu (Ctrl+F)"
 
 #: src/task-list.blp:143
-#, fuzzy
 msgid "Add Task (Ctrl+N)"
-msgstr "Atazak sinkronizatu/lortu (Ctrl+S)"
+msgstr "Gehitu ataza berria (Ctrl+N)"
 
 #: src/task-list.blp:161
 msgid "Add Task (Ctrl+Return)"
-msgstr ""
+msgstr "Gehitu ataza berria (Ctrl+Return)"
 
 #: src/task-list.blp:185
-#, fuzzy
 msgid "No Tasks"
-msgstr "Gehitu ataza berria"
+msgstr "Ez dago atazarik"
 
 #: src/task-list.blp:212
-#, fuzzy
 msgid "Loading Tasks"
-msgstr "Gehitu ataza berria"
+msgstr "Atazak kargatzen"
 
 #: src/window.blp:27
-#, fuzzy
 msgid "Sidebar"
-msgstr "Txandakatu alboko barra"
+msgstr "Alboko barra"
 
 #: src/window.blp:34
 msgid "Content"
-msgstr ""
+msgstr "Edukia"
 
 #: src/window.blp:63
 msgid "Close Properties"
-msgstr ""
+msgstr "Itxi propietateak"
 
 #: src/window.blp:79
 msgid "Date and Time"
-msgstr ""
+msgstr "Data eta ordua"
 
 #: src/window.blp:106
 msgid "Tags"
-msgstr ""
+msgstr "Etiketak"
 
 #: src/window.blp:111
-#, fuzzy
 msgid "New Tag"
-msgstr "Gehitu ataza berria"
+msgstr "Etiketa berria"
