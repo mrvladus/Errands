@@ -11,15 +11,7 @@ static void load_user(ErrandsSettings *self);
 static void migrate_from_46(ErrandsSettings *self);
 static void save(ErrandsSettings *self);
 
-#define SECRET_SCHEMA                                                                                                            \
-  ((SecretSchema){                                                                                                               \
-      APP_ID,                                                                                                                    \
-      SECRET_SCHEMA_NONE,                                                                                                        \
-      {                                                                                                                          \
-          {"account", SECRET_SCHEMA_ATTRIBUTE_STRING},                                                                           \
-          {"NULL", 0},                                                                                                           \
-      },                                                                                                                         \
-  })
+#define SECRET_SCHEMA ((SecretSchema){APP_ID, SECRET_SCHEMA_NONE, {{"account", SECRET_SCHEMA_ATTRIBUTE_STRING}, {"NULL", 0}}})
 
 struct _ErrandsSettings {
   GObject parent_instance;
@@ -207,6 +199,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
 
 static void finalize(GObject *gobject) {
   ErrandsSettings *self = ERRANDS_SETTINGS(gobject);
+  save(self);
   g_clear_pointer(&self->last_list_uid, g_free);
   g_clear_pointer(&self->sync_provider, g_free);
   g_clear_pointer(&self->sync_url, g_free);
@@ -214,7 +207,7 @@ static void finalize(GObject *gobject) {
   g_clear_pointer(&self->sync_password, g_free);
   g_clear_pointer(&self->settings_path, g_free);
   g_clear_pointer(&self->tags, g_strfreev);
-  g_key_file_free(self->key_file);
+  g_clear_pointer(&self->key_file, g_key_file_free);
   G_OBJECT_CLASS(errands_settings_parent_class)->finalize(gobject);
 }
 
@@ -232,7 +225,7 @@ static void errands_settings_class_init(ErrandsSettingsClass *class) {
       g_param_spec_boolean("show-cancelled", "Show Cancelled", "Show cancelled tasks", FALSE, G_PARAM_READWRITE);
   obj_properties[PROP_BACKGROUND] =
       g_param_spec_boolean("background", "Background", "Run in background", TRUE, G_PARAM_READWRITE);
-  obj_properties[PROP_STARTUP] = g_param_spec_boolean("startup", "Startup", "Run on startup", FALSE, G_PARAM_READWRITE);
+  obj_properties[PROP_STARTUP] = g_param_spec_boolean("startup", "Startup", "Run on startup", TRUE, G_PARAM_READWRITE);
   obj_properties[PROP_SYNC] = g_param_spec_boolean("sync-enabled", "Sync", "Enable sync", FALSE, G_PARAM_READWRITE);
 
   obj_properties[PROP_THEME] = g_param_spec_int("theme", "Theme", "Theme", 0, 4, 0, G_PARAM_READWRITE);
@@ -262,20 +255,47 @@ static void errands_settings_class_init(ErrandsSettingsClass *class) {
   g_object_class_install_properties(object_class, N_PROPERTIES, obj_properties);
 }
 
+static void setup_defaults(ErrandsSettings *self) {
+  errands_settings_set_maximized(self, FALSE);
+  errands_settings_set_show_completed(self, FALSE);
+  errands_settings_set_show_cancelled(self, FALSE);
+  errands_settings_set_background(self, TRUE);
+  errands_settings_set_startup(self, TRUE);
+  errands_settings_set_sync_enabled(self, FALSE);
+
+  errands_settings_set_theme(self, 0);
+  errands_settings_set_sort_by(self, 0);
+  errands_settings_set_sort_order(self, 0);
+  errands_settings_set_sync_interval(self, 30);
+  errands_settings_set_window_width(self, 1280);
+  errands_settings_set_window_height(self, 720);
+
+  errands_settings_set_last_list_uid(self, "");
+  errands_settings_set_sync_provider(self, "caldav");
+  errands_settings_set_sync_url(self, "");
+  errands_settings_set_sync_username(self, "");
+  errands_settings_set_sync_password(self, "");
+}
+
 static void errands_settings_init(ErrandsSettings *self) {
   g_message("Settings: Initialize");
   self->key_file = g_key_file_new();
+  setup_defaults(self);
   self->settings_path = g_build_filename(g_get_user_data_dir(), "errands", "settings.ini", NULL);
-  gboolean need_save = FALSE;
   if (g_file_test(self->settings_path, G_FILE_TEST_EXISTS)) load_user(self);
   else {
     migrate_from_46(self);
-    need_save = TRUE;
+    save(self);
   }
-  if (need_save) save(self);
 }
 
 // --- PRIVATE --- //
+
+static void save(ErrandsSettings *self) {
+  g_autoptr(GError) error = NULL;
+  if (!g_key_file_save_to_file(self->key_file, self->settings_path, &error))
+    g_warning("Settings: Failed to save settings: %s", error->message);
+}
 
 static void load_user(ErrandsSettings *self) {
   g_message("Settings: Loading user configuration '%s'", self->settings_path);
@@ -316,12 +336,6 @@ static void migrate_from_46(ErrandsSettings *self) {
   g_autofree gchar *password = secret_password_lookup_sync(&SECRET_SCHEMA, NULL, NULL, "account", "Nextcloud", NULL);
   if (!password) return;
   errands_settings_set_sync_password(self, password);
-}
-
-static void save(ErrandsSettings *self) {
-  g_autoptr(GError) error = NULL;
-  if (!g_key_file_save_to_file(self->key_file, self->settings_path, &error))
-    g_warning("Settings: Failed to save settings: %s", error->message);
 }
 
 // --- PUBLIC --- //
