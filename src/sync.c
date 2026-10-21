@@ -531,6 +531,7 @@ static inline bool ensure_client_connected(void) {
   if (!client) {
     errands_window_add_toast(_("Failed to connect to CalDAV remote."), 5);
     failed_attempts++;
+    return NULL;
   }
   failed_attempts = 0;
   return client != NULL;
@@ -549,7 +550,7 @@ gboolean errands_sync(void) {
     g_message("Sync: Disable");
     return G_SOURCE_REMOVE;
   }
-  if (failed_attempts > 3) {
+  if (failed_attempts > 2) {
     errands_window_add_toast(_("Failed 3 attempts to sync. Disabling for now."), 5);
     return G_SOURCE_REMOVE;
   }

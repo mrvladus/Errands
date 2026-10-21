@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Vlad Krupinskii <vladkrupinskii@gmail.com>
 // SPDX-License-Identifier: Zlib
 
-#include "glib.h"
+#include "glib-object.h"
 #if !(defined(__GNUC__) || defined(__clang__))
 #error "This code requires GCC or Clang compiler because it uses features not supported by other compilers.\
 e.g. GLib's g_autoptr, g_auto and g_autofree"
@@ -16,11 +16,11 @@ e.g. GLib's g_autoptr, g_auto and g_autofree"
 #include "utils.h"
 #include "window.h"
 
+#include <glib.h>
 #include <glib/gi18n.h>
 #include <libportal-gtk4/portal-gtk4.h>
 
 extern GResource *errands_get_resource(void);
-const char *toolbox_log_prefix = "\033[0;32m[Errands] \033[0m";
 State state = {0};
 
 static void activate(GtkApplication *app) {
@@ -65,8 +65,8 @@ int main(int argc, char **argv) {
   // Cleanup
   errands_sync_cleanup();
   errands_data_cleanup();
-  g_object_unref(state.settings);
-  g_object_unref(state.app);
+  g_clear_object(&state.settings);
+  g_clear_object(&state.app);
 
   return status;
 }
