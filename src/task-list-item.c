@@ -114,7 +114,7 @@ ErrandsTaskListItem *errands_task_list_item_new(ICalComponent *ical) {
   g_assert_nonnull(ical);
 
   ErrandsTaskListItem *self = g_object_new(ERRANDS_TYPE_TASK_LIST_ITEM, NULL);
-  self->ical = ical;
+  self->ical = g_object_ref(ical);
   self->uid = g_strdup(errands_data_get_uid(self->ical));
   self->title = g_strdup(errands_data_get_list_name(self->ical));
   const char *color = errands_data_get_color(self->ical);
