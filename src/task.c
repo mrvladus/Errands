@@ -3,8 +3,6 @@
 
 #include "task.h"
 #include "config.h"
-#include "gdk/gdk.h"
-#include "gio/gio.h"
 #include "sidebar.h"
 #include "state.h"
 #include "sync.h"
@@ -13,6 +11,8 @@
 #include "utils.h"
 #include "window.h"
 
+#include <gdk/gdk.h>
+#include <gio/gio.h>
 #include <glib-object.h>
 #include <glib.h>
 #include <glib/gi18n.h>
@@ -392,7 +392,6 @@ static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointe
     gtk_widget_set_visible(self->title, true);
     g_autofree gchar *markup = str_to_markup(text);
     g_object_set(self->item, "title", markup, NULL);
-    errands_sync_push_task(self->item);
   }
 }
 

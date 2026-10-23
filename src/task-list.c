@@ -490,21 +490,18 @@ static void __filter_cb(_FilterCallbackData *cb_data) {
 
 typedef struct {
   ErrandsTaskList *self;
-  GtkFilterListModel *filter_model;
   GListModel *new_source_model;
 } _ModelSwitchData;
 
-static _ModelSwitchData *model_switch_data_new(ErrandsTaskList *self, GtkFilterListModel *filter_model,
-                                               GListModel *new_source_model) {
+static inline _ModelSwitchData *model_switch_data_new(ErrandsTaskList *self, GListModel *new_source_model) {
   _ModelSwitchData *data = g_new0(_ModelSwitchData, 1);
   data->self = self;
-  data->filter_model = filter_model;
   data->new_source_model = new_source_model;
   return data;
 }
 
 static void switch_model_idle_cb(_ModelSwitchData *data) {
-  gtk_filter_list_model_set_model(data->filter_model, data->new_source_model);
+  gtk_filter_list_model_set_model(data->self->current_model, data->new_source_model);
   gtk_widget_set_visible(data->self->loading_page, false);
   errands_task_list_update(data->self);
   g_free(data);
@@ -516,7 +513,7 @@ void errands_task_list_show_today_tasks(ErrandsTaskList *self) {
   self->page = ERRANDS_TASK_LIST_PAGE_TODAY;
   gtk_widget_set_visible(self->entry_box, false);
   gtk_widget_set_visible(self->menu_btn, false);
-  _ModelSwitchData *data = model_switch_data_new(self, self->current_model, G_LIST_MODEL(self->today_model));
+  _ModelSwitchData *data = model_switch_data_new(self, G_LIST_MODEL(self->today_model));
   gtk_widget_set_visible(self->loading_page, true);
   g_idle_add_once((GSourceOnceFunc)switch_model_idle_cb, data);
   __expand_all_visible_rows(self);
@@ -529,7 +526,7 @@ void errands_task_list_show_all_tasks(ErrandsTaskList *self) {
   gtk_widget_set_visible(self->entry_box, false);
   gtk_widget_set_visible(self->menu_btn, false);
   gtk_widget_set_visible(self->loading_page, true);
-  _ModelSwitchData *data = model_switch_data_new(self, self->current_model, G_LIST_MODEL(self->all_tasks_model));
+  _ModelSwitchData *data = model_switch_data_new(self, G_LIST_MODEL(self->all_tasks_model));
   g_idle_add_once((GSourceOnceFunc)switch_model_idle_cb, data);
   g_message("Task List: Show All Tasks");
 }
@@ -542,7 +539,7 @@ void errands_task_list_show_task_list(ErrandsTaskList *self, ErrandsTaskListItem
   gtk_widget_set_visible(self->entry_box, true);
   gtk_widget_set_visible(self->menu_btn, true);
   gtk_widget_set_visible(self->loading_page, self->item->count >= 100 || !old_item || old_item->count >= 100);
-  _ModelSwitchData *data = model_switch_data_new(self, self->current_model, G_LIST_MODEL(item->tasks));
+  _ModelSwitchData *data = model_switch_data_new(self, G_LIST_MODEL(item->tasks));
   g_idle_add_once((GSourceOnceFunc)switch_model_idle_cb, data);
   g_message("Task List: Show task list %s", item->uid);
 }
