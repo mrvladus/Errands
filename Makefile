@@ -40,7 +40,7 @@ DEVEL ?= FALSE
 ifeq ($(DEVEL),TRUE)
 	APP_ID = io.github.mrvladus.List.Devel
 	RESOURCE_PATH = /io/github/mrvladus/Errands/Devel
-	ALL_CFLAGS  += -Wall -g -fno-omit-frame-pointer -DCALDAV_DEBUG
+	ALL_CFLAGS  += -Wall -g -fno-omit-frame-pointer -DCALDAV_ENABLE_LOGS
 	ALL_LDFLAGS +=
 else
 	APP_ID = io.github.mrvladus.List

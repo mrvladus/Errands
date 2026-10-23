@@ -48,7 +48,6 @@ gint errands_settings_get_sync_interval(ErrandsSettings *self);
 gint errands_settings_get_window_width(ErrandsSettings *self);
 gint errands_settings_get_window_height(ErrandsSettings *self);
 const gchar *errands_settings_get_last_list_uid(ErrandsSettings *self);
-const gchar *errands_settings_get_sync_provider(ErrandsSettings *self);
 const gchar *errands_settings_get_sync_url(ErrandsSettings *self);
 const gchar *errands_settings_get_sync_username(ErrandsSettings *self);
 const gchar *errands_settings_get_sync_password(ErrandsSettings *self);
@@ -69,7 +68,6 @@ void errands_settings_set_sync_interval(ErrandsSettings *self, gint sync_interva
 void errands_settings_set_window_width(ErrandsSettings *self, gint window_width);
 void errands_settings_set_window_height(ErrandsSettings *self, gint window_height);
 void errands_settings_set_last_list_uid(ErrandsSettings *self, const gchar *last_list_uid);
-void errands_settings_set_sync_provider(ErrandsSettings *self, const gchar *sync_provider);
 void errands_settings_set_sync_url(ErrandsSettings *self, const gchar *sync_url);
 void errands_settings_set_sync_username(ErrandsSettings *self, const gchar *sync_username);
 void errands_settings_set_sync_password(ErrandsSettings *self, const gchar *sync_password);

@@ -17,7 +17,6 @@ struct _ErrandsSettings {
   GObject parent_instance;
 
   gchar *settings_path;
-  GKeyFile *key_file;
 
   // Properties
   gboolean maximized;
@@ -33,7 +32,6 @@ struct _ErrandsSettings {
   gint window_width;
   gint window_height;
   gchar *last_list_uid;
-  gchar *sync_provider;
   gchar *sync_url;
   gchar *sync_username;
   gchar *sync_password;
@@ -60,7 +58,6 @@ enum {
   PROP_WINDOW_HEIGHT,
 
   PROP_LAST_LIST_UID,
-  PROP_SYNC_PROVIDER,
   PROP_SYNC_URL,
   PROP_SYNC_USERNAME,
   PROP_SYNC_PASSWORD,
@@ -90,7 +87,6 @@ static void get_property(GObject *object, guint prop_id, GValue *value, GParamSp
   case PROP_WINDOW_HEIGHT: g_value_set_int(value, self->window_height); break;
 
   case PROP_LAST_LIST_UID: g_value_set_string(value, self->last_list_uid); break;
-  case PROP_SYNC_PROVIDER: g_value_set_string(value, self->sync_provider); break;
   case PROP_SYNC_URL: g_value_set_string(value, self->sync_url); break;
   case PROP_SYNC_USERNAME: g_value_set_string(value, self->sync_username); break;
   case PROP_SYNC_PASSWORD: g_value_set_string(value, self->sync_password); break;
@@ -101,97 +97,78 @@ static void get_property(GObject *object, guint prop_id, GValue *value, GParamSp
   }
 }
 
+static void save(ErrandsSettings *self) {
+  g_autoptr(GKeyFile) file = g_key_file_new();
+
+  g_key_file_set_boolean(file, "app", "background", self->background);
+  g_key_file_set_boolean(file, "app", "startup", self->startup);
+  g_key_file_set_boolean(file, "window", "maximized", self->maximized);
+  g_key_file_set_integer(file, "window", "theme", self->theme);
+  g_key_file_set_integer(file, "window", "height", self->window_height);
+  g_key_file_set_integer(file, "window", "width", self->window_width);
+  g_key_file_set_integer(file, "task_list", "sort_by", self->sort_by);
+  g_key_file_set_integer(file, "task_list", "sort_order", self->sort_order);
+  g_key_file_set_boolean(file, "task_list", "show_cancelled", self->show_cancelled);
+  g_key_file_set_boolean(file, "task_list", "show_completed", self->show_completed);
+  g_key_file_set_string(file, "task_list", "last_list_uid", self->last_list_uid);
+  g_key_file_set_string_list(file, "task_list", "tags", (const gchar *const *)self->tags,
+                             self->tags ? g_strv_length(self->tags) : 0);
+  g_key_file_set_boolean(file, "sync", "enabled", self->sync_enabled);
+  g_key_file_set_integer(file, "sync", "interval", self->sync_interval);
+  g_key_file_set_string(file, "sync", "url", self->sync_url);
+  g_key_file_set_string(file, "sync", "username", self->sync_username);
+
+  g_autoptr(GError) error = NULL;
+  if (!g_key_file_save_to_file(file, self->settings_path, &error))
+    g_warning("Settings: Failed to save settings: %s", error->message);
+}
+
 static void set_property(GObject *object, guint prop_id, const GValue *value, GParamSpec *pspec) {
   ErrandsSettings *self = ERRANDS_SETTINGS(object);
   switch (prop_id) {
-  case PROP_MAXIMIZED: {
-    self->maximized = g_value_get_boolean(value);
-    g_key_file_set_boolean(self->key_file, "window", "maximized", self->maximized);
-  } break;
-  case PROP_SHOW_COMPLETED: {
-    self->show_completed = g_value_get_boolean(value);
-    g_key_file_set_boolean(self->key_file, "task_list", "show_completed", self->show_completed);
-  } break;
-  case PROP_SHOW_CANCELLED: {
-    self->show_cancelled = g_value_get_boolean(value);
-    g_key_file_set_boolean(self->key_file, "task_list", "show_cancelled", self->show_cancelled);
-  } break;
-  case PROP_BACKGROUND: {
-    self->background = g_value_get_boolean(value);
-    g_key_file_set_boolean(self->key_file, "app", "background", self->background);
-  } break;
-  case PROP_STARTUP: {
-    self->startup = g_value_get_boolean(value);
-    g_key_file_set_boolean(self->key_file, "app", "startup", self->startup);
-  } break;
-  case PROP_SYNC: {
-    self->sync_enabled = g_value_get_boolean(value);
-    g_key_file_set_boolean(self->key_file, "sync", "enabled", self->sync_enabled);
-  } break;
+  case PROP_MAXIMIZED: self->maximized = g_value_get_boolean(value); break;
+  case PROP_SHOW_COMPLETED: self->show_completed = g_value_get_boolean(value); break;
+  case PROP_SHOW_CANCELLED: self->show_cancelled = g_value_get_boolean(value); break;
+  case PROP_BACKGROUND: self->background = g_value_get_boolean(value); break;
+  case PROP_STARTUP: self->startup = g_value_get_boolean(value); break;
+  case PROP_SYNC: self->sync_enabled = g_value_get_boolean(value); break;
 
   case PROP_THEME: {
     self->theme = g_value_get_int(value);
     if (self->theme == 2) self->theme = 4;
-    g_key_file_set_integer(self->key_file, "window", "theme", self->theme);
   } break;
-  case PROP_SORT_BY: {
-    self->sort_by = g_value_get_int(value);
-    g_key_file_set_integer(self->key_file, "task_list", "sort_by", self->sort_by);
-  } break;
-  case PROP_SORT_ORDER: {
-    self->sort_order = g_value_get_int(value);
-    g_key_file_set_integer(self->key_file, "task_list", "sort_order", self->sort_order);
-  } break;
-  case PROP_SYNC_INTERVAL: {
-    self->sync_interval = g_value_get_int(value);
-    g_key_file_set_integer(self->key_file, "sync", "interval", self->sync_interval);
-  } break;
-  case PROP_WINDOW_WIDTH: {
-    self->window_width = g_value_get_int(value);
-    g_key_file_set_integer(self->key_file, "window", "width", self->window_width);
-  } break;
-  case PROP_WINDOW_HEIGHT: {
-    self->window_height = g_value_get_int(value);
-    g_key_file_set_integer(self->key_file, "window", "height", self->window_height);
-  } break;
+  case PROP_SORT_BY: self->sort_by = g_value_get_int(value); break;
+  case PROP_SORT_ORDER: self->sort_order = g_value_get_int(value); break;
+  case PROP_SYNC_INTERVAL: self->sync_interval = g_value_get_int(value); break;
+  case PROP_WINDOW_WIDTH: self->window_width = g_value_get_int(value); break;
+  case PROP_WINDOW_HEIGHT: self->window_height = g_value_get_int(value); break;
 
   case PROP_LAST_LIST_UID: {
-    if (self->last_list_uid) g_free(self->last_list_uid);
+    g_clear_pointer(&self->last_list_uid, g_free);
     const char *last_list_uid = g_value_get_string(value);
     self->last_list_uid = g_strdup(last_list_uid ? last_list_uid : "");
-    g_key_file_set_string(self->key_file, "task_list", "last_list_uid", self->last_list_uid);
-  } break;
-  case PROP_SYNC_PROVIDER: {
-    if (self->sync_provider) g_free(self->sync_provider);
-    const char *sync_provider = g_value_get_string(value);
-    self->sync_provider = g_strdup(sync_provider ? sync_provider : "");
-    g_key_file_set_string(self->key_file, "sync", "provider", self->sync_provider);
   } break;
   case PROP_SYNC_URL: {
-    if (self->sync_url) g_free(self->sync_url);
+    g_clear_pointer(&self->sync_url, g_free);
     const char *sync_url = g_value_get_string(value);
     self->sync_url = g_strdup(sync_url ? sync_url : "");
-    g_key_file_set_string(self->key_file, "sync", "url", self->sync_url);
   } break;
   case PROP_SYNC_USERNAME: {
-    if (self->sync_username) g_free(self->sync_username);
+    g_clear_pointer(&self->sync_username, g_free);
     const char *sync_username = g_value_get_string(value);
     self->sync_username = g_strdup(sync_username ? sync_username : "");
-    g_key_file_set_string(self->key_file, "sync", "username", self->sync_username);
   } break;
   case PROP_SYNC_PASSWORD: {
-    if (self->sync_password) g_free(self->sync_password);
     const char *sync_password = g_value_get_string(value);
-    self->sync_password = g_strdup(sync_password ? sync_password : "");
-    secret_password_store_sync(&SECRET_SCHEMA, SECRET_COLLECTION_DEFAULT, "Errands CalDAV credentials", self->sync_password, NULL,
-                               NULL, "account", "CalDAV", NULL);
+    secret_password_store_sync(&SECRET_SCHEMA, SECRET_COLLECTION_DEFAULT, "Errands CalDAV credentials",
+                               sync_password ? sync_password : "", NULL, NULL, "account", "CalDAV", NULL);
+    g_message("PASS: %s", sync_password);
   } break;
   case PROP_TAGS: {
     g_clear_pointer(&self->tags, g_strfreev);
     self->tags = g_value_get_pointer(value);
-    guint len = self->tags ? g_strv_length(self->tags) : 0;
-    g_key_file_set_string_list(self->key_file, "task_list", "tags", (const gchar *const *)self->tags, len);
   } break;
+
   default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
   }
   g_idle_add(G_SOURCE_FUNC(save), self);
@@ -201,13 +178,10 @@ static void finalize(GObject *gobject) {
   ErrandsSettings *self = ERRANDS_SETTINGS(gobject);
   save(self);
   g_clear_pointer(&self->last_list_uid, g_free);
-  g_clear_pointer(&self->sync_provider, g_free);
   g_clear_pointer(&self->sync_url, g_free);
   g_clear_pointer(&self->sync_username, g_free);
-  g_clear_pointer(&self->sync_password, g_free);
   g_clear_pointer(&self->settings_path, g_free);
   g_clear_pointer(&self->tags, g_strfreev);
-  g_clear_pointer(&self->key_file, g_key_file_free);
   G_OBJECT_CLASS(errands_settings_parent_class)->finalize(gobject);
 }
 
@@ -242,8 +216,6 @@ static void errands_settings_class_init(ErrandsSettingsClass *class) {
 
   obj_properties[PROP_LAST_LIST_UID] =
       g_param_spec_string("last-list-uid", "Last List UID", "Last List UID", "", G_PARAM_READWRITE);
-  obj_properties[PROP_SYNC_PROVIDER] =
-      g_param_spec_string("sync-provider", "Sync Provider", "Sync Provider", "caldav", G_PARAM_READWRITE);
   obj_properties[PROP_SYNC_URL] = g_param_spec_string("sync-url", "Sync URL", "Sync URL", "", G_PARAM_READWRITE);
   obj_properties[PROP_SYNC_USERNAME] =
       g_param_spec_string("sync-username", "Sync Username", "Sync Username", "", G_PARAM_READWRITE);
@@ -255,32 +227,27 @@ static void errands_settings_class_init(ErrandsSettingsClass *class) {
   g_object_class_install_properties(object_class, N_PROPERTIES, obj_properties);
 }
 
-static void setup_defaults(ErrandsSettings *self) {
-  errands_settings_set_maximized(self, FALSE);
-  errands_settings_set_show_completed(self, FALSE);
-  errands_settings_set_show_cancelled(self, FALSE);
-  errands_settings_set_background(self, TRUE);
-  errands_settings_set_startup(self, TRUE);
-  errands_settings_set_sync_enabled(self, FALSE);
-
-  errands_settings_set_theme(self, 0);
-  errands_settings_set_sort_by(self, 0);
-  errands_settings_set_sort_order(self, 0);
-  errands_settings_set_sync_interval(self, 30);
-  errands_settings_set_window_width(self, 1280);
-  errands_settings_set_window_height(self, 720);
-
-  errands_settings_set_last_list_uid(self, "");
-  errands_settings_set_sync_provider(self, "caldav");
-  errands_settings_set_sync_url(self, "");
-  errands_settings_set_sync_username(self, "");
-  errands_settings_set_sync_password(self, "");
-}
-
 static void errands_settings_init(ErrandsSettings *self) {
   g_message("Settings: Initialize");
-  self->key_file = g_key_file_new();
-  setup_defaults(self);
+
+  // Setup default values
+  self->maximized = FALSE;
+  self->show_completed = FALSE;
+  self->show_cancelled = FALSE;
+  self->background = TRUE;
+  self->startup = TRUE;
+  self->sync_enabled = FALSE;
+  self->theme = 0;
+  self->sort_by = 0;
+  self->sort_order = 0;
+  self->sync_interval = 30;
+  self->window_width = 1280;
+  self->window_height = 720;
+  self->last_list_uid = g_strdup("");
+  self->sync_url = g_strdup("");
+  self->sync_username = g_strdup("");
+  self->sync_password = secret_password_lookup_sync(&SECRET_SCHEMA, NULL, NULL, "account", "CalDAV", NULL);
+
   self->settings_path = g_build_filename(g_get_user_data_dir(), "errands", "settings.ini", NULL);
   if (g_file_test(self->settings_path, G_FILE_TEST_EXISTS)) load_user(self);
   else {
@@ -291,45 +258,34 @@ static void errands_settings_init(ErrandsSettings *self) {
 
 // --- PRIVATE --- //
 
-static void save(ErrandsSettings *self) {
-  g_autoptr(GError) error = NULL;
-  if (!g_key_file_save_to_file(self->key_file, self->settings_path, &error))
-    g_warning("Settings: Failed to save settings: %s", error->message);
-}
-
 static void load_user(ErrandsSettings *self) {
   g_message("Settings: Loading user configuration '%s'", self->settings_path);
+  g_autoptr(GKeyFile) file = g_key_file_new();
   g_autoptr(GError) error = NULL;
-  if (!g_key_file_load_from_file(self->key_file, self->settings_path, G_KEY_FILE_NONE, &error)) {
+  if (!g_key_file_load_from_file(file, self->settings_path, G_KEY_FILE_NONE, &error)) {
     g_warning("Settings: Failed to load user configuration: %s", error->message);
     return;
   }
+  self->maximized = g_key_file_get_boolean(file, "window", "maximized", NULL);
+  self->show_completed = g_key_file_get_boolean(file, "task_list", "show_completed", NULL);
+  self->show_cancelled = g_key_file_get_boolean(file, "task_list", "show_cancelled", NULL);
+  self->background = g_key_file_get_boolean(file, "app", "background", NULL);
+  self->startup = g_key_file_get_boolean(file, "app", "startup", NULL);
+  self->sync_enabled = g_key_file_get_boolean(file, "sync", "enabled", NULL);
 
-  errands_settings_set_maximized(self, g_key_file_get_boolean(self->key_file, "window", "maximized", NULL));
-  errands_settings_set_show_completed(self, g_key_file_get_boolean(self->key_file, "task_list", "show_completed", NULL));
-  errands_settings_set_show_cancelled(self, g_key_file_get_boolean(self->key_file, "task_list", "show_cancelled", NULL));
-  errands_settings_set_background(self, g_key_file_get_boolean(self->key_file, "app", "background", NULL));
-  errands_settings_set_startup(self, g_key_file_get_boolean(self->key_file, "app", "startup", NULL));
-  errands_settings_set_sync_enabled(self, g_key_file_get_boolean(self->key_file, "sync", "enabled", NULL));
+  self->theme = g_key_file_get_integer(file, "window", "theme", NULL);
+  self->sort_by = g_key_file_get_integer(file, "task_list", "sort_by", NULL);
+  self->sort_order = g_key_file_get_integer(file, "task_list", "sort_order", NULL);
+  self->sync_interval = g_key_file_get_integer(file, "sync", "interval", NULL);
+  self->window_width = g_key_file_get_integer(file, "window", "width", NULL);
+  self->window_height = g_key_file_get_integer(file, "window", "height", NULL);
 
-  errands_settings_set_theme(self, g_key_file_get_integer(self->key_file, "window", "theme", NULL));
-  errands_settings_set_sort_by(self, g_key_file_get_integer(self->key_file, "task_list", "sort_by", NULL));
-  errands_settings_set_sort_order(self, g_key_file_get_integer(self->key_file, "task_list", "sort_order", NULL));
-  errands_settings_set_sync_interval(self, g_key_file_get_integer(self->key_file, "sync", "interval", NULL));
-  errands_settings_set_window_width(self, g_key_file_get_integer(self->key_file, "window", "width", NULL));
-  errands_settings_set_window_height(self, g_key_file_get_integer(self->key_file, "window", "height", NULL));
+  self->last_list_uid = g_key_file_get_string(file, "task_list", "last_list_uid", NULL);
+  self->sync_url = g_key_file_get_string(file, "sync", "url", NULL);
+  self->sync_username = g_key_file_get_string(file, "sync", "username", NULL);
+  self->sync_password = secret_password_lookup_sync(&SECRET_SCHEMA, NULL, NULL, "account", "CalDAV", NULL);
 
-  g_autofree gchar *last_list_uid = g_key_file_get_string(self->key_file, "task_list", "last_list_uid", NULL);
-  errands_settings_set_last_list_uid(self, last_list_uid);
-  g_autofree gchar *provider = g_key_file_get_string(self->key_file, "sync", "provider", NULL);
-  errands_settings_set_sync_provider(self, provider);
-  g_autofree gchar *url = g_key_file_get_string(self->key_file, "sync", "url", NULL);
-  errands_settings_set_sync_url(self, url);
-  g_autofree gchar *username = g_key_file_get_string(self->key_file, "sync", "username", NULL);
-  errands_settings_set_sync_username(self, username);
-  errands_settings_set_sync_password(self, secret_password_lookup_sync(&SECRET_SCHEMA, NULL, NULL, "account", "CalDAV", NULL));
-
-  errands_settings_set_tags(self, g_key_file_get_string_list(self->key_file, "task_list", "tags", NULL, NULL));
+  self->tags = g_key_file_get_string_list(file, "task_list", "tags", NULL, NULL);
 }
 
 static void migrate_from_46(ErrandsSettings *self) {
@@ -341,8 +297,6 @@ static void migrate_from_46(ErrandsSettings *self) {
 // --- PUBLIC --- //
 
 ErrandsSettings *errands_settings_new() { return g_object_new(ERRANDS_TYPE_SETTINGS, NULL); }
-
-// --- METHODS --- //
 
 void errands_settings_add_tag(ErrandsSettings *self, const gchar *tag) {
   if (!g_strv_contains((const char *const *)self->tags, tag)) {
@@ -381,7 +335,6 @@ gint errands_settings_get_window_width(ErrandsSettings *self) { return self->win
 gint errands_settings_get_window_height(ErrandsSettings *self) { return self->window_height; }
 
 const gchar *errands_settings_get_last_list_uid(ErrandsSettings *self) { return self->last_list_uid; }
-const gchar *errands_settings_get_sync_provider(ErrandsSettings *self) { return self->sync_provider; }
 const gchar *errands_settings_get_sync_url(ErrandsSettings *self) { return self->sync_url; }
 const gchar *errands_settings_get_sync_username(ErrandsSettings *self) { return self->sync_username; }
 const gchar *errands_settings_get_sync_password(ErrandsSettings *self) { return self->sync_password; }

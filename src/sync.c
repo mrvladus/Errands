@@ -85,6 +85,7 @@ static inline PushObj *push_obj_new(enum PushObjOP op, const char *uid) {
 
 static inline PushObj *objects_to_push_has(const char *uid, enum PushObjOP op) {
   g_assert_nonnull(uid);
+  g_assert_nonnull(objects_to_push);
 
   for_range(i, 0, objects_to_push->len) {
     PushObj *o = g_ptr_array_index(objects_to_push, i);
@@ -207,8 +208,7 @@ static inline void collect_task_items(GListModel *model, GPtrArray *array) {
 }
 
 static inline bool merge_tasks(ICalComponent *dest, ICalComponent *source) {
-  g_assert_nonnull(dest);
-  g_assert_nonnull(source);
+  if (!source || !dest) return FALSE;
   g_assert(I_CAL_IS_COMPONENT(dest));
   g_assert(I_CAL_IS_COMPONENT(source));
 
@@ -322,19 +322,21 @@ static gboolean remote_event_idle_cb(gpointer user_data) {
 
   case TASK_MODIFIED: {
     const char *list_uid = caldav_calendar_get_uid(data->calendar);
+    g_autoptr(ICalComponent) task_ical = data->ical;
     ErrandsTaskListItem *list = find_local_task_list(list_uid);
     if (!list) {
       g_warning("Sync: Failed to find local list: %s", list_uid);
       return G_SOURCE_REMOVE;
     }
-    const char *uid = errands_data_get_uid(data->ical);
+    const char *uid = errands_data_get_uid(task_ical);
     ErrandsTaskItem *task = find_task_item(G_LIST_MODEL(list->tasks), uid);
     if (!task) {
       g_warning("Sync: Failed to find local task: %s", uid);
       return G_SOURCE_REMOVE;
     }
     ICalComponent *ical = errands_task_item_get_ical(task);
-    bool changed = merge_tasks(ical, data->ical);
+    g_assert_nonnull(ical);
+    bool changed = merge_tasks(ical, task_ical);
     if (!changed) break;
     g_message("Sync: Task modified: %s", uid);
     errands_task_item_set_ical(task, ical);
@@ -474,12 +476,13 @@ static void task_modified_cb(CalDAVCalendar *c, ICalComponent *task) {
   g_assert_nonnull(c);
   g_assert_nonnull(task);
   g_assert(I_CAL_IS_COMPONENT(task));
-  g_assert(i_cal_component_isa(task) == I_CAL_VTODO_COMPONENT);
+
+  if (i_cal_component_isa(task) != I_CAL_VTODO_COMPONENT) return;
 
   _CBData *data = g_new0(_CBData, 1);
   data->op = TASK_MODIFIED;
   data->calendar = c;
-  data->ical = i_cal_component_clone(task);
+  data->ical = g_object_ref(task);
   g_idle_add_full(G_PRIORITY_DEFAULT, remote_event_idle_cb, data, (GDestroyNotify)cb_data_free);
 }
 
@@ -539,6 +542,8 @@ static inline bool ensure_client_connected(void) {
 
 // ---------- PUBLIC ---------- //
 
+void errands_sync_init(void) { objects_to_push = g_ptr_array_new_with_free_func((GDestroyNotify)obj_free); }
+
 void errands_sync_cleanup(void) {
   g_message("Sync: Cleanup");
   g_clear_pointer(&objects_to_push, g_ptr_array_unref);
@@ -555,7 +560,6 @@ gboolean errands_sync(void) {
     return G_SOURCE_REMOVE;
   }
   g_message("Sync: Start");
-  if (!objects_to_push) objects_to_push = g_ptr_array_new_with_free_func((GDestroyNotify)obj_free);
   if (sync_in_progress) {
     g_message("Sync: Already in progress");
     return G_SOURCE_CONTINUE;

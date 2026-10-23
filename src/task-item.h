@@ -8,6 +8,7 @@
 #define ERRANDS_TYPE_TASK_ITEM (errands_task_item_get_type())
 G_DECLARE_FINAL_TYPE(ErrandsTaskItem, errands_task_item, ERRANDS, TASK_ITEM, GObject)
 
+// Takes reference of `ical`.
 ErrandsTaskItem *errands_task_item_new(ICalComponent *ical, ErrandsTaskListItem *list, ErrandsTaskItem *parent);
 ErrandsTaskListItem *errands_task_item_create_task(ErrandsTaskItem *parent, const char *text);
 
@@ -55,7 +56,7 @@ GListStore *errands_task_item_get_parent_model(ErrandsTaskItem *self);
 // --- SETTERS --- //
 
 void errands_task_item_set_list(ErrandsTaskItem *self, ErrandsTaskListItem *list);
-void errands_task_item_set_ical(ErrandsTaskItem *self, const ICalComponent *ical);
+void errands_task_item_set_ical(ErrandsTaskItem *self, ICalComponent *ical);
 void errands_task_item_set_parent(ErrandsTaskItem *self, ErrandsTaskItem *parent);
 void errands_task_item_set_title(ErrandsTaskItem *self, const char *title);
 void errands_task_item_set_completed(ErrandsTaskItem *self, gboolean completed);

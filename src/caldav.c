@@ -59,7 +59,7 @@ static inline void caldav__log(const char *level, const char *fmt, ...) {
   va_end(ap);
 }
 #else
-#define caldav__log(level, fmt, ...) ((void)(0))
+#define caldav__log(level, fmt, ...)
 #endif // CALDAV_ENABLE_LOGS
 
 #define caldav__info(fmt, ...)    caldav__log("\033[34mINFO\033[0m", fmt, ##__VA_ARGS__)
@@ -360,7 +360,7 @@ gboolean caldav_calendar_push_task(CalDAVCalendar *calendar, ICalComponent *task
   g_autoptr(GError) error = NULL;
   if (!e_cal_client_modify_object_sync(calendar->e_cal_client, task, E_CAL_OBJ_MOD_THIS, E_CAL_OPERATION_FLAG_NONE, NULL,
                                        &error)) {
-    caldav__error("Failed to update task '%s': %s", uid, error->message);
+    caldav__warning("Failed to update task '%s': %s", uid, error->message);
     caldav__info("Trying to create task: '%s'", uid);
     g_clear_error(&error);
     g_autofree gchar *out_uid = NULL;
@@ -370,7 +370,7 @@ gboolean caldav_calendar_push_task(CalDAVCalendar *calendar, ICalComponent *task
       return FALSE;
     } else {
       if (uid && out_uid && g_strcmp0(uid, out_uid) != 0) {
-        caldav__info("UID changed by server: '%s' -> '%s'", old_uid, out_uid);
+        caldav__info("UID changed by server: '%s' -> '%s'", uid, out_uid);
         i_cal_component_set_uid(task, out_uid);
       }
       return TRUE;
@@ -616,8 +616,6 @@ CalDAVClient *caldav_client_new(CalDAVClientConfig config) {
     caldav_client_free(c);
     return NULL;
   }
-
-  caldav_client_poll(c);
 
   return c;
 }

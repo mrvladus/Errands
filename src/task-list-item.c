@@ -121,7 +121,7 @@ ErrandsTaskListItem *errands_task_list_item_new(ICalComponent *ical) {
   self->tasks = g_list_store_new(ERRANDS_TYPE_TASK_ITEM);
   g_autoptr(GPtrArray) vtodos = vcalendar_to_array(ical);
   for (guint i = 0; i < vtodos->len; ++i) {
-    ICalComponent *c = g_ptr_array_index(vtodos, i);
+    g_autoptr(ICalComponent) c = g_ptr_array_index(vtodos, i);
     const char *parent = errands_data_get_parent(c);
     if (parent || errands_data_get_deleted(c)) continue;
     g_autoptr(ErrandsTaskItem) task = errands_task_item_new(c, self, NULL);
@@ -312,7 +312,7 @@ struct ErrandsTaskItem *errands_task_list_item_create_task(ErrandsTaskListItem *
   g_assert_nonnull(self);
   g_assert(ERRANDS_IS_TASK_LIST_ITEM(self));
 
-  ICalComponent *ical = i_cal_component_new_vtodo();
+  g_autoptr(ICalComponent) ical = i_cal_component_new_vtodo();
   errands_data_set_text(ical, text);
   g_autofree gchar *uid = g_uuid_string_random();
   errands_data_set_uid(ical, uid);

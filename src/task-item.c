@@ -506,8 +506,6 @@ ErrandsTaskItem *errands_task_item_new(ICalComponent *ical, ErrandsTaskListItem 
 
   ErrandsTaskItem *self = g_object_new(ERRANDS_TYPE_TASK_ITEM, NULL);
 
-  self->lock = false;
-
   self->uid = g_strdup(errands_data_get_uid(ical));
   self->title = g_strdup(errands_data_get_text(ical));
   self->color = g_strdup(errands_data_get_color(ical));
@@ -521,6 +519,7 @@ ErrandsTaskItem *errands_task_item_new(ICalComponent *ical, ErrandsTaskListItem 
   self->attachments = errands_data_get_attachments(ical);
   self->rrule = errands_data_get_rrule(ical);
   self->ical = g_object_ref(ical);
+
   self->parent = parent;
   self->list = list;
   self->search_matched = true;
@@ -528,7 +527,7 @@ ErrandsTaskItem *errands_task_item_new(ICalComponent *ical, ErrandsTaskListItem 
   self->children_model = g_list_store_new(ERRANDS_TYPE_TASK_ITEM);
   g_autoptr(GPtrArray) vtodos = vcalendar_to_array(list->ical);
   for (guint i = 0; i < vtodos->len; ++i) {
-    ICalComponent *c = g_ptr_array_index(vtodos, i);
+    g_autoptr(ICalComponent) c = g_ptr_array_index(vtodos, i);
     const char *parent = errands_data_get_parent(c);
     if (errands_data_get_deleted(c) || !parent || !g_str_equal(parent, self->uid)) continue;
     g_autoptr(ErrandsTaskItem) item = errands_task_item_new(c, self->list, self);
@@ -656,7 +655,7 @@ int errands_task_item_remove_deleted_tasks(ErrandsTaskItem *self) {
 }
 
 ErrandsTaskListItem *errands_task_item_create_task(ErrandsTaskItem *parent, const char *text) {
-  ICalComponent *ical = i_cal_component_new(I_CAL_VTODO_COMPONENT);
+  g_autoptr(ICalComponent) ical = i_cal_component_new(I_CAL_VTODO_COMPONENT);
   errands_data_set_text(ical, text);
   g_autofree gchar *uid = g_uuid_string_random();
   errands_data_set_uid(ical, uid);
@@ -667,7 +666,6 @@ ErrandsTaskListItem *errands_task_item_create_task(ErrandsTaskItem *parent, cons
   g_list_store_append(parent->children_model, task);
   errands_task_list_item_save(parent->list);
   errands_task_item_update(parent);
-  errands_sync_push_task(task);
 
   return task->list;
 }
@@ -807,7 +805,7 @@ gchar *errands_task_item_get_rrule_as_string(ErrandsTaskItem *self) {
 
 // --- SETTERS --- //
 
-void errands_task_item_set_ical(ErrandsTaskItem *self, const ICalComponent *ical) { g_object_set(self, "ical", ical, NULL); }
+void errands_task_item_set_ical(ErrandsTaskItem *self, ICalComponent *ical) { g_object_set(self, "ical", ical, NULL); }
 void errands_task_item_set_title(ErrandsTaskItem *self, const char *title) { g_object_set(self, "title", title, NULL); }
 void errands_task_item_set_completed(ErrandsTaskItem *self, gboolean completed) {
   g_object_set(self, "completed", completed, NULL);
