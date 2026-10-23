@@ -202,7 +202,7 @@ static void set_item(ErrandsWindow *self, ErrandsTaskItem *item) {
   errands_rrule_row_set_rrule(self->rrule_row, rrule);
   adw_expander_row_set_expanded(ADW_EXPANDER_ROW(self->rrule_row),
                                 rrule && i_cal_recurrence_get_freq(rrule) != I_CAL_NO_RECURRENCE);
-  g_clear_pointer(&rrule, i_cal_recurrence_unref);
+  if (rrule) i_cal_recurrence_unref(rrule);
 
   // Notes
   const char *notes = errands_task_item_get_notes(item);
@@ -306,7 +306,7 @@ static void on_show_properties_toggled_cb(ErrandsWindow *self) {
   errands_task_item_set_rrule(self->item, new_rrule);
   if (i_cal_time_is_null_date(new_sdt) && new_rrule && i_cal_recurrence_get_freq(new_rrule) != I_CAL_NO_RECURRENCE)
     errands_task_item_set_dtstart(self->item, i_cal_time_get_date_time_now());
-  g_clear_pointer(&new_rrule, i_cal_recurrence_unref);
+  if (new_rrule) i_cal_recurrence_unref(new_rrule);
 
   // Notes
   GtkTextIter start, end;

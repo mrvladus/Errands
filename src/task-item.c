@@ -274,12 +274,12 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
   case PROP_RRULE: {
     const ICalRecurrence *new_rrule = g_value_get_object(value);
     if (!new_rrule) {
-      g_clear_pointer(&self->rrule, i_cal_recurrence_unref);
+      if (self->rrule) i_cal_recurrence_unref(self->rrule);
       errands_data_set_rrule(self->ical, NULL);
       break;
     }
     if (i_cal_recurrence_compare(self->rrule, (ICalRecurrence *)new_rrule)) break;
-    g_clear_pointer(&self->rrule, i_cal_recurrence_unref);
+    if (self->rrule) i_cal_recurrence_unref(self->rrule);
     if (i_cal_recurrence_get_freq((ICalRecurrence *)new_rrule) != I_CAL_NO_RECURRENCE)
       self->rrule = i_cal_recurrence_clone((ICalRecurrence *)new_rrule);
     errands_data_set_rrule(self->ical, self->rrule);
@@ -334,13 +334,11 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
 static void finalize(GObject *object) {
   ErrandsTaskItem *self = ERRANDS_TASK_ITEM(object);
 
-  g_message("Finalize Task Item: %s", self->uid);
-
   g_clear_object(&self->dtstart);
   g_clear_object(&self->dtend);
   g_clear_object(&self->ical);
   g_clear_object(&self->children_model);
-  g_clear_pointer(&self->rrule, i_cal_recurrence_unref);
+  if (self->rrule) i_cal_recurrence_unref(self->rrule);
   g_clear_pointer(&self->uid, g_free);
   g_clear_pointer(&self->title, g_free);
   g_clear_pointer(&self->color, g_free);

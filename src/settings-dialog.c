@@ -3,12 +3,12 @@
 
 #include "settings-dialog.h"
 #include "config.h"
-#include "settings.h"
+// #include "settings.h"
 #include "state.h"
 
 #include <libportal-gtk4/portal-gtk4.h>
 
-static void on_startup_toggled_cb(ErrandsSettingsDialog *self);
+// static void on_startup_toggled_cb(ErrandsSettingsDialog *self);
 
 static ErrandsSettingsDialog *settings_dialog = NULL;
 
@@ -19,9 +19,9 @@ struct _ErrandsSettingsDialog {
   GtkWidget *theme;
   GtkWidget *light;
   GtkWidget *dark;
-  GtkWidget *notifications;
-  GtkWidget *background;
-  GtkWidget *startup;
+  // GtkWidget *notifications;
+  // GtkWidget *background;
+  // GtkWidget *startup;
   GtkWidget *sync_enabled;
   GtkWidget *sync_interval;
   GtkWidget *sync_url;
@@ -42,15 +42,15 @@ static void errands_settings_dialog_class_init(ErrandsSettingsDialogClass *class
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSettingsDialog, theme);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSettingsDialog, light);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSettingsDialog, dark);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSettingsDialog, notifications);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSettingsDialog, background);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSettingsDialog, startup);
+  // gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSettingsDialog, notifications);
+  // gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSettingsDialog, background);
+  // gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSettingsDialog, startup);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSettingsDialog, sync_enabled);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSettingsDialog, sync_interval);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSettingsDialog, sync_url);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSettingsDialog, sync_username);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSettingsDialog, sync_password);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_startup_toggled_cb);
+  // gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_startup_toggled_cb);
 }
 
 static void errands_settings_dialog_init(ErrandsSettingsDialog *self) { gtk_widget_init_template(GTK_WIDGET(self)); }
@@ -64,9 +64,9 @@ static gboolean theme_transform_func(GBinding *binding, const GValue *from_value
 ErrandsSettingsDialog *errands_settings_dialog_new() {
   ErrandsSettingsDialog *dialog = g_object_ref_sink(g_object_new(ERRANDS_TYPE_SETTINGS_DIALOG, NULL));
 
-  g_object_bind_property(state.settings, "background", dialog->background, "active",
-                         G_BINDING_SYNC_CREATE | G_BINDING_BIDIRECTIONAL);
-  g_object_bind_property(state.settings, "startup", dialog->startup, "active", G_BINDING_SYNC_CREATE);
+  // g_object_bind_property(state.settings, "background", dialog->background, "active",
+  //                        G_BINDING_SYNC_CREATE | G_BINDING_BIDIRECTIONAL);
+  // g_object_bind_property(state.settings, "startup", dialog->startup, "active", G_BINDING_SYNC_CREATE);
   g_object_bind_property(state.settings, "sync-enabled", dialog->sync_enabled, "active",
                          G_BINDING_SYNC_CREATE | G_BINDING_BIDIRECTIONAL);
   g_object_bind_property(state.settings, "sync-interval", dialog->sync_interval, "value",
@@ -91,19 +91,19 @@ void errands_settings_dialog_show() {
 
 // ---------- CALLBACKS ---------- //
 
-static void on_startup_toggled_cb(ErrandsSettingsDialog *self) {
-  bool enabled = adw_switch_row_get_active(ADW_SWITCH_ROW(self->startup));
-  errands_settings_set_startup(state.settings, enabled);
-  g_autoptr(XdpPortal) portal = xdp_portal_new();
-  g_autoptr(XdpParent) parent = xdp_parent_new_gtk(GTK_WINDOW(state.main_window));
-  if (enabled) {
-    g_autoptr(GPtrArray) cmdline = g_ptr_array_sized_new(2);
-    g_ptr_array_add(cmdline, "errands");
-    g_ptr_array_add(cmdline, "--gapplication-service");
-    xdp_portal_request_background(portal, parent, "Errands needs to run in the background for sending notifications", cmdline,
-                                  XDP_BACKGROUND_FLAG_AUTOSTART, NULL, NULL, NULL);
-  } else xdp_portal_request_background(portal, parent, NULL, NULL, XDP_BACKGROUND_FLAG_NONE, NULL, NULL, NULL);
-}
+// static void on_startup_toggled_cb(ErrandsSettingsDialog *self) {
+//   bool enabled = adw_switch_row_get_active(ADW_SWITCH_ROW(self->startup));
+//   errands_settings_set_startup(state.settings, enabled);
+//   g_autoptr(XdpPortal) portal = xdp_portal_new();
+//   g_autoptr(XdpParent) parent = xdp_parent_new_gtk(GTK_WINDOW(state.main_window));
+//   if (enabled) {
+//     g_autoptr(GPtrArray) cmdline = g_ptr_array_sized_new(2);
+//     g_ptr_array_add(cmdline, "errands");
+//     g_ptr_array_add(cmdline, "--gapplication-service");
+//     xdp_portal_request_background(portal, parent, "Errands needs to run in the background for sending notifications", cmdline,
+//                                   XDP_BACKGROUND_FLAG_AUTOSTART, NULL, NULL, NULL);
+//   } else xdp_portal_request_background(portal, parent, NULL, NULL, XDP_BACKGROUND_FLAG_NONE, NULL, NULL, NULL);
+// }
 
 // static void on_notifications_toggled_cb(ErrandsSettingsDialog *self) {
 //   bool enabled = adw_switch_row_get_active(ADW_SWITCH_ROW(self->notifications));

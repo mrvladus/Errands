@@ -39,23 +39,22 @@ template $ErrandsSettingsDialog: Adw.PreferencesDialog {
       }
     }
 
-    Adw.PreferencesGroup {
-      title: _("Miscellaneous");
-
-      Adw.SwitchRow notifications {
-        title: _("Show Notifications");
-      }
-
-      Adw.SwitchRow background {
-        title: _("Work in the Background");
-      }
-
-      Adw.SwitchRow startup {
-        title: _("Launch at Startup");
-        notify::active => $on_startup_toggled_cb(template);
-      }
-    }
-
+    //     Adw.PreferencesGroup {
+    //       title: _("Miscellaneous");
+    //
+    //       Adw.SwitchRow notifications {
+    //         title: _("Show Notifications");
+    //       }
+    //
+    //       Adw.SwitchRow background {
+    //         title: _("Work in the Background");
+    //       }
+    //
+    //       Adw.SwitchRow startup {
+    //         title: _("Launch at Startup");
+    //         notify::active => $on_startup_toggled_cb(template);
+    //       }
+    //     }
     Adw.PreferencesGroup {
       title: _("Sync");
 

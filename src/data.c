@@ -132,8 +132,10 @@ static void migrate_from_46() {
       if (priority) errands_data_set_priority(ical, priority);
       if (rrule) {
         ICalRecurrence *rrule_ = i_cal_recurrence_new_from_string(rrule);
-        errands_data_set_rrule(ical, rrule_);
-        i_cal_recurrence_unref(rrule_);
+        if (rrule_) {
+          errands_data_set_rrule(ical, rrule_);
+          i_cal_recurrence_unref(rrule_);
+        }
       }
       if (start) errands_data_set_start(ical, i_cal_time_new_from_string(start));
       if (text) errands_data_set_text(ical, text);

@@ -31,15 +31,15 @@ static void activate(GtkApplication *app) {
   g_timeout_add_seconds(10, G_SOURCE_FUNC(errands_sync), NULL);
 
   // Request background
-  g_autoptr(XdpPortal) portal = xdp_portal_new();
-  g_autoptr(XdpParent) parent = xdp_parent_new_gtk(GTK_WINDOW(state.main_window));
-  if (errands_settings_get_startup(state.settings)) {
-    g_autoptr(GPtrArray) cmdline = g_ptr_array_sized_new(2);
-    g_ptr_array_add(cmdline, "errands");
-    g_ptr_array_add(cmdline, "--gapplication-service");
-    xdp_portal_request_background(portal, parent, "Errands needs to run in the background for sending notifications", cmdline,
-                                  XDP_BACKGROUND_FLAG_AUTOSTART, NULL, NULL, NULL);
-  } else xdp_portal_request_background(portal, NULL, NULL, NULL, XDP_BACKGROUND_FLAG_NONE, NULL, NULL, NULL);
+  // g_autoptr(XdpPortal) portal = xdp_portal_new();
+  // g_autoptr(XdpParent) parent = xdp_parent_new_gtk(GTK_WINDOW(state.main_window));
+  // if (errands_settings_get_startup(state.settings)) {
+  //   g_autoptr(GPtrArray) cmdline = g_ptr_array_sized_new(2);
+  //   g_ptr_array_add(cmdline, "errands");
+  //   g_ptr_array_add(cmdline, "--gapplication-service");
+  //   xdp_portal_request_background(portal, parent, "Errands needs to run in the background for sending notifications", cmdline,
+  //                                 XDP_BACKGROUND_FLAG_AUTOSTART, NULL, NULL, NULL);
+  // } else xdp_portal_request_background(portal, NULL, NULL, NULL, XDP_BACKGROUND_FLAG_NONE, NULL, NULL, NULL);
 }
 
 int main(int argc, char **argv) {

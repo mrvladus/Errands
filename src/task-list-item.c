@@ -77,8 +77,6 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
 static void finalize(GObject *object) {
   ErrandsTaskListItem *self = ERRANDS_TASK_LIST_ITEM(object);
 
-  g_message("Finalize Task List Item: %s", self->uid);
-
   g_list_store_remove_all(self->tasks);
 
   g_clear_object(&self->ical);
