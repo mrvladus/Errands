@@ -10,6 +10,7 @@
 
 #include <adwaita.h>
 #include <gtksourceview/gtksource.h>
+#include <libical/ical.h>
 
 // --- RRULE ROW --- //
 
@@ -17,8 +18,8 @@
 G_DECLARE_FINAL_TYPE(ErrandsRruleRow, errands_rrule_row, ERRANDS, TASK_RRULE_ROW, AdwExpanderRow)
 
 ErrandsRruleRow *errands_rrule_row_new();
-ICalRecurrence *errands_rrule_row_get_rrule(ErrandsRruleRow *self);
-void errands_rrule_row_set_rrule(ErrandsRruleRow *self, ICalRecurrence *rrule);
+struct icalrecurrencetype *errands_rrule_row_get_rrule(ErrandsRruleRow *self);
+void errands_rrule_row_set_rrule(ErrandsRruleRow *self, const struct icalrecurrencetype *rrule);
 void errands_rrule_row_reset(ErrandsRruleRow *self);
 
 // --- WINDOW --- //

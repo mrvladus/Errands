@@ -79,8 +79,8 @@ static void finalize(GObject *object) {
 
   g_list_store_remove_all(self->tasks);
 
-  g_clear_object(&self->ical);
   g_clear_object(&self->tasks);
+  g_clear_pointer(&self->ical, icalcomponent_free);
   g_clear_pointer(&self->uid, g_free);
   g_clear_pointer(&self->title, g_free);
 
@@ -108,11 +108,11 @@ static void errands_task_list_item_init(ErrandsTaskListItem *self) {}
 
 // ---------- PUBLIC ---------- //
 
-ErrandsTaskListItem *errands_task_list_item_new(ICalComponent *ical) {
+ErrandsTaskListItem *errands_task_list_item_new(icalcomponent *ical) {
   g_assert_nonnull(ical);
 
   ErrandsTaskListItem *self = g_object_new(ERRANDS_TYPE_TASK_LIST_ITEM, NULL);
-  self->ical = g_object_ref(ical);
+  self->ical = ical;
   self->uid = g_strdup(errands_data_get_uid(self->ical));
   self->title = g_strdup(errands_data_get_list_name(self->ical));
   const char *color = errands_data_get_color(self->ical);
@@ -121,7 +121,7 @@ ErrandsTaskListItem *errands_task_list_item_new(ICalComponent *ical) {
   self->tasks = g_list_store_new(ERRANDS_TYPE_TASK_ITEM);
   g_autoptr(GPtrArray) vtodos = vcalendar_to_array(ical);
   for (guint i = 0; i < vtodos->len; ++i) {
-    g_autoptr(ICalComponent) c = g_ptr_array_index(vtodos, i);
+    icalcomponent *c = g_ptr_array_index(vtodos, i);
     const char *parent = errands_data_get_parent(c);
     if (parent || errands_data_get_deleted(c)) continue;
     g_autoptr(ErrandsTaskItem) task = errands_task_item_new(c, self, NULL);
@@ -134,7 +134,7 @@ ErrandsTaskListItem *errands_task_list_item_new(ICalComponent *ical) {
 
 ErrandsTaskListItem *errands_task_list_item_create(const char *uid, const char *name, const char *color, bool deleted,
                                                    bool synced) {
-  ICalComponent *ical = i_cal_component_new_vcalendar();
+  icalcomponent *ical = icalcomponent_new_vcalendar();
   g_autofree gchar *gen_uid = g_uuid_string_random();
   errands_data_set_uid(ical, uid ? uid : gen_uid);
   errands_data_set_list_name(ical, name ? name : _("Untitled"));
@@ -174,7 +174,7 @@ ErrandsTaskListItem *errands_task_list_item_load_from_ics(const char *path) {
     return NULL;
   }
 
-  ICalComponent *ical = i_cal_component_new_from_string(contents);
+  icalcomponent *ical = icalcomponent_new_from_string(contents);
   if (!ical) {
     g_warning("Failed to parse ical");
     return NULL;
@@ -197,7 +197,7 @@ void errands_task_list_item_update_count(ErrandsTaskListItem *self) {
   gint total = 0, completed = 0;
   g_autoptr(GPtrArray) components = vcalendar_to_array(self->ical);
   for (guint i = 0; components && i < components->len; i++) {
-    ICalComponent *c = g_ptr_array_index(components, i);
+    icalcomponent *c = g_ptr_array_index(components, i);
     if (errands_data_get_deleted(c) || errands_data_get_cancelled(c)) continue;
     if (errands_data_is_completed(c)) completed++;
     total++;
@@ -211,7 +211,7 @@ void errands_task_list_item_save(ErrandsTaskListItem *self) {
   g_assert(ERRANDS_IS_TASK_LIST_ITEM(self));
 
   const char *path = tmp_str_printf("%s/%s.ics", calendars_dir, self->uid);
-  g_autofree gchar *ical_str = i_cal_component_as_ical_string(self->ical);
+  g_autofree gchar *ical_str = icalcomponent_as_ical_string(self->ical);
   if (ical_str && !g_file_set_contents(path, ical_str, -1, NULL)) {
     g_message("Task List Item: Failed to save list '%s'", path);
     return;
@@ -237,7 +237,7 @@ int errands_task_list_item_delete_completed(ErrandsTaskListItem *self) {
   int deleted_n = 0;
   for_range(i, 0, g_list_model_get_n_items(model)) {
     g_autoptr(ErrandsTaskItem) item = g_list_model_get_item(model, i);
-    g_autoptr(ICalComponent) ical = errands_task_item_get_ical(item);
+    icalcomponent *ical = errands_task_item_get_ical(item);
     CONTINUE_IF(errands_data_is_completed(ical));
     errands_data_set_deleted(ical, true);
     errands_data_set_synced(ical, false);
@@ -259,7 +259,7 @@ int errands_task_list_item_delete_cancelled(ErrandsTaskListItem *self) {
   int deleted_n = 0;
   for_range(i, 0, g_list_model_get_n_items(model)) {
     g_autoptr(ErrandsTaskItem) item = g_list_model_get_item(model, i);
-    g_autoptr(ICalComponent) ical = errands_task_item_get_ical(item);
+    icalcomponent *ical = errands_task_item_get_ical(item);
     CONTINUE_IF(errands_data_get_cancelled(ical));
     errands_data_set_deleted(ical, true);
     errands_data_set_synced(ical, false);
@@ -283,11 +283,11 @@ void errands_task_list_item_remove_deleted_tasks(ErrandsTaskListItem *self) {
   for_range(i, 0, g_list_model_get_n_items(model)) {
     g_autoptr(ErrandsTaskItem) item = g_list_model_get_item(model, i);
     deleted_n += errands_task_item_remove_deleted_tasks(item);
-    g_autoptr(ICalComponent) ical = errands_task_item_get_ical(item);
+    icalcomponent *ical = errands_task_item_get_ical(item);
     bool deleted = errands_data_get_deleted(ical);
     bool synced = errands_data_get_synced(ical);
     if (deleted && (synced || !sync_enabled)) {
-      i_cal_component_remove_component(self->ical, ical);
+      icalcomponent_remove_component(self->ical, ical);
       g_list_store_remove(self->tasks, i--);
       deleted_n++;
     }
@@ -295,9 +295,9 @@ void errands_task_list_item_remove_deleted_tasks(ErrandsTaskListItem *self) {
 
   g_autoptr(GPtrArray) components = vcalendar_to_array(self->ical);
   for (guint i = 0; components && i < components->len; i++) {
-    ICalComponent *component = g_ptr_array_index(components, i);
+    icalcomponent *component = g_ptr_array_index(components, i);
     if (!errands_data_get_deleted(component) || !errands_data_get_synced(component)) continue;
-    i_cal_component_remove_component(self->ical, component);
+    icalcomponent_remove_component(self->ical, component);
     deleted_n++;
   }
 
@@ -312,12 +312,12 @@ struct ErrandsTaskItem *errands_task_list_item_create_task(ErrandsTaskListItem *
   g_assert_nonnull(self);
   g_assert(ERRANDS_IS_TASK_LIST_ITEM(self));
 
-  g_autoptr(ICalComponent) ical = i_cal_component_new_vtodo();
+  icalcomponent *ical = icalcomponent_new_vtodo();
   errands_data_set_text(ical, text);
   g_autofree gchar *uid = g_uuid_string_random();
   errands_data_set_uid(ical, uid);
-  errands_data_set_created(ical, i_cal_time_get_date_time_now());
-  i_cal_component_add_component(self->ical, ical);
+  errands_data_set_created(ical, icaltime_now());
+  icalcomponent_add_component(self->ical, ical);
   ErrandsTaskItem *task = errands_task_item_new(ical, self, NULL);
   g_list_store_append(self->tasks, task);
   errands_task_list_item_save(self);

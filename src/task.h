@@ -6,7 +6,7 @@
 #include "task-item.h"
 
 #include <gtk/gtk.h>
-#include <libical-glib/libical-glib.h>
+#include <libical/ical.h>
 
 #define ERRANDS_TYPE_TASK (errands_task_get_type())
 G_DECLARE_FINAL_TYPE(ErrandsTask, errands_task, ERRANDS, TASK, GtkBox)
@@ -42,12 +42,12 @@ struct _ErrandsTask {
   ErrandsTaskItem *item;
   const char *color;
   const char *notes;
-  const ICalTime *dtstart;
-  const ICalTime *dtend;
+  icaltimetype dtstart;
+  icaltimetype dtend;
   gint priority;
   GStrv tags;
   GStrv attachments;
-  ICalRecurrence *rrule;
+  struct icalrecurrencetype *rrule;
 };
 
 ErrandsTask *errands_task_new();

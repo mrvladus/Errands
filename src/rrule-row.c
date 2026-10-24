@@ -8,7 +8,6 @@
 
 #include <glib.h>
 #include <glib/gi18n.h>
-#include <libical-glib/libical-glib.h>
 #include <libical/ical.h>
 
 static void reset_week_days(ErrandsRruleRow *self);
@@ -61,41 +60,47 @@ ErrandsRruleRow *errands_rrule_row_new(void) { return g_object_new(ERRANDS_TYPE_
 
 // ---------- PUBLIC FUNCTIONS ---------- //
 
-ICalRecurrence *errands_rrule_row_get_rrule(ErrandsRruleRow *self) {
+struct icalrecurrencetype *errands_rrule_row_get_rrule(ErrandsRruleRow *self) {
   g_assert_nonnull(self);
 
-  ICalRecurrence *rrule = i_cal_recurrence_new();
-  i_cal_recurrence_set_freq(rrule, adw_combo_row_get_selected(self->freq_row));
-  i_cal_recurrence_set_interval(rrule, adw_spin_row_get_value(self->interval_row));
+  struct icalrecurrencetype *rrule = icalrecurrencetype_new();
+  rrule->freq = adw_combo_row_get_selected(self->freq_row);
+  rrule->interval = adw_spin_row_get_value(self->interval_row);
+
   const guint dur = adw_combo_row_get_selected(self->repeat_duration);
-  if (dur == 1) i_cal_recurrence_set_until(rrule, errands_date_chooser_get_dt(self->until_date_chooser));
-  else if (dur == 2) i_cal_recurrence_set_count(rrule, adw_spin_row_get_value(self->count_row));
-  if (i_cal_recurrence_get_freq(rrule) >= 4) {
+  if (dur == 1) rrule->until = errands_date_chooser_get_dt(self->until_date_chooser);
+  else if (dur == 2) rrule->count = adw_spin_row_get_value(self->count_row);
+
+  if (rrule->freq >= ICAL_WEEKLY_RECURRENCE) {
     g_autoptr(GArray) days = get_week_days(self);
-    i_cal_recurrence_set_by_array(rrule, I_CAL_BY_DAY, days);
+    if (days->len > 0 && icalrecur_resize_by(&rrule->by[ICAL_BY_DAY], days->len)) {
+      for (guint i = 0; i < days->len; i++) {
+        icalrecurrencetype_weekday wd = icalrecurrencetype_day_day_of_week(g_array_index(days, short, i));
+        rrule->by[ICAL_BY_DAY].data[i] = icalrecurrencetype_encode_day(wd, 0);
+      }
+    }
   }
+
   return rrule;
 }
 
-void errands_rrule_row_set_rrule(ErrandsRruleRow *self, ICalRecurrence *rrule) {
+void errands_rrule_row_set_rrule(ErrandsRruleRow *self, const struct icalrecurrencetype *rrule) {
   if (!rrule) return;
-  ICalRecurrenceFrequency freq = i_cal_recurrence_get_freq(rrule);
-  if (freq == I_CAL_NO_RECURRENCE) return;
-  adw_combo_row_set_selected(self->freq_row, freq < 7 ? freq : 3);
-  adw_spin_row_set_value(self->interval_row, i_cal_recurrence_get_interval(rrule));
-  g_autoptr(GArray) by_day = i_cal_recurrence_get_by_array(rrule, I_CAL_BY_DAY);
-  if (by_day->len > 0) set_week_days(self, (short *)by_day->data, by_day->len);
+  if (rrule->freq == ICAL_NO_RECURRENCE) return;
+
+  adw_combo_row_set_selected(self->freq_row, rrule->freq);
+  adw_spin_row_set_value(self->interval_row, rrule->interval);
+  const icalrecurrence_by_data *by_day = &rrule->by[ICAL_BY_DAY];
+  if (by_day->size > 0) set_week_days(self, by_day->data, by_day->size);
   else reset_week_days(self);
-  ICalTime *until = i_cal_recurrence_get_until(rrule);
-  if (!i_cal_time_is_null_date(until)) {
+  icaltimetype until = rrule->until;
+  if (!icaltime_is_null_date(until)) {
     adw_combo_row_set_selected(self->repeat_duration, 1);
     errands_date_chooser_set_dt(self->until_date_chooser, until);
-  } else if (i_cal_recurrence_get_count(rrule) > 0) {
+  } else if (rrule->count > 0) {
     adw_combo_row_set_selected(self->repeat_duration, 2);
-    adw_spin_row_set_value(self->count_row, i_cal_recurrence_get_count(rrule));
-  } else {
-    adw_combo_row_set_selected(self->repeat_duration, 0);
-  }
+    adw_spin_row_set_value(self->count_row, rrule->count);
+  } else adw_combo_row_set_selected(self->repeat_duration, 0);
 }
 
 void errands_rrule_row_reset(ErrandsRruleRow *self) {
@@ -126,12 +131,12 @@ static GArray *get_week_days(ErrandsRruleRow *self) {
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(week_days_btns->pdata[i]))) {
       short day;
       if (i == 0) day = I_CAL_MONDAY_WEEKDAY;
-      else if (i == 1) day = I_CAL_TUESDAY_WEEKDAY;
-      else if (i == 2) day = I_CAL_WEDNESDAY_WEEKDAY;
-      else if (i == 3) day = I_CAL_THURSDAY_WEEKDAY;
-      else if (i == 4) day = I_CAL_FRIDAY_WEEKDAY;
-      else if (i == 5) day = I_CAL_SATURDAY_WEEKDAY;
-      else day = I_CAL_SUNDAY_WEEKDAY;
+      else if (i == 1) day = ICAL_TUESDAY_WEEKDAY;
+      else if (i == 2) day = ICAL_WEDNESDAY_WEEKDAY;
+      else if (i == 3) day = ICAL_THURSDAY_WEEKDAY;
+      else if (i == 4) day = ICAL_FRIDAY_WEEKDAY;
+      else if (i == 5) day = ICAL_SATURDAY_WEEKDAY;
+      else day = ICAL_SUNDAY_WEEKDAY;
       g_array_append_val(array, day);
     }
   }

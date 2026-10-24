@@ -16,6 +16,7 @@
 #include "window.h"
 
 #include <glib/gi18n.h>
+#include <libical/ical.h>
 
 static void on_setup_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_item);
 static void on_bind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_item);
@@ -196,29 +197,29 @@ static int sort_func(ErrandsTaskItem *a, ErrandsTaskItem *b, ErrandsTaskList *se
   bool asc_order = errands_settings_get_sort_order(state.settings) == SORT_ORDER_ASC;
   switch (errands_settings_get_sort_by(state.settings)) {
   case SORT_TYPE_CREATION_DATE: {
-    g_autoptr(ICalComponent) td_a = errands_task_item_get_ical(a);
-    g_autoptr(ICalComponent) td_b = errands_task_item_get_ical(b);
-    g_autoptr(ICalTime) creation_date_a = errands_data_get_created(asc_order ? td_b : td_a);
-    g_autoptr(ICalTime) creation_date_b = errands_data_get_created(asc_order ? td_a : td_b);
-    return i_cal_time_compare(creation_date_b, creation_date_a);
+    icalcomponent *td_a = errands_task_item_get_ical(a);
+    icalcomponent *td_b = errands_task_item_get_ical(b);
+    icaltimetype creation_date_a = errands_data_get_created(asc_order ? td_b : td_a);
+    icaltimetype creation_date_b = errands_data_get_created(asc_order ? td_a : td_b);
+    return icaltime_compare(creation_date_b, creation_date_a);
   }
   case SORT_TYPE_DUE_DATE: {
-    ICalTime *due_a = errands_task_item_get_dtend(asc_order ? b : a);
-    ICalTime *due_b = errands_task_item_get_dtend(asc_order ? a : b);
-    bool null_a = i_cal_time_is_null_time(due_a);
-    bool null_b = i_cal_time_is_null_time(due_b);
+    icaltimetype due_a = errands_task_item_get_dtend(asc_order ? b : a);
+    icaltimetype due_b = errands_task_item_get_dtend(asc_order ? a : b);
+    bool null_a = icaltime_is_null_time(due_a);
+    bool null_b = icaltime_is_null_time(due_b);
     if (null_a != null_b) return null_a - null_b;
-    return i_cal_time_compare(due_a, due_b);
+    return icaltime_compare(due_a, due_b);
   }
   case SORT_TYPE_PRIORITY:
     return errands_task_item_get_priority(asc_order ? a : b) - errands_task_item_get_priority(asc_order ? b : a);
   case SORT_TYPE_START_DATE: {
-    ICalTime *start_a = errands_task_item_get_dtstart(asc_order ? b : a);
-    ICalTime *start_b = errands_task_item_get_dtstart(asc_order ? a : b);
-    bool null_a = i_cal_time_is_null_time(start_a);
-    bool null_b = i_cal_time_is_null_time(start_b);
+    icaltimetype start_a = errands_task_item_get_dtstart(asc_order ? b : a);
+    icaltimetype start_b = errands_task_item_get_dtstart(asc_order ? a : b);
+    bool null_a = icaltime_is_null_time(start_a);
+    bool null_b = icaltime_is_null_time(start_b);
     if (null_a != null_b) return null_a - null_b;
-    return i_cal_time_compare(start_a, start_b);
+    return icaltime_compare(start_a, start_b);
   }
   default: return 0;
   }
@@ -288,7 +289,7 @@ static void on_action_export_finish_cb(GObject *obj, GAsyncResult *res, gpointer
     errands_window_add_toast(_("Export failed"), 2);
     return;
   }
-  g_autofree gchar *ical = i_cal_component_as_ical_string(item->ical);
+  const char *ical = icalcomponent_as_ical_string(item->ical);
   fprintf(file, "%s", ical);
   fclose(file);
   errands_window_add_toast(_("Exported"), 1);

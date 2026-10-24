@@ -14,13 +14,13 @@
 #include "task-list.h"
 #include "utils.h"
 
-#include "adwaita.h"
-#include "gdk/gdk.h"
-#include "gio/gio.h"
-#include "glib-object.h"
-#include "glib.h"
-#include "gtk/gtk.h"
+#include <adwaita.h>
+#include <gdk/gdk.h>
+#include <gio/gio.h>
+#include <glib-object.h>
+#include <glib.h>
 #include <glib/gi18n.h>
+#include <gtk/gtk.h>
 
 static gint sort_func(gconstpointer a, gconstpointer b, gpointer data);
 
@@ -162,7 +162,7 @@ void errands_sidebar_update_filter_rows(void) {
     CONTINUE_IF(errands_data_get_deleted(item->ical));
     g_autoptr(GPtrArray) components = vcalendar_to_array(item->ical);
     for (guint j = 0; components && j < components->len; j++) {
-      ICalComponent *c = g_ptr_array_index(components, j);
+      icalcomponent *c = g_ptr_array_index(components, j);
       if (errands_data_get_deleted(c)) continue;
       bool is_completed = errands_data_is_completed(c);
       if (!show_completed && is_completed) continue;

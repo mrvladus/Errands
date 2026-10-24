@@ -3,7 +3,6 @@
 
 #include "window.h"
 #include "config.h"
-#include "gtk/gtk.h"
 #include "settings.h"
 #include "state.h"
 #include "task-item.h"
@@ -13,6 +12,7 @@
 #include <adwaita.h>
 #include <glib.h>
 #include <glib/gi18n.h>
+#include <libical/ical.h>
 
 #define ATTACHMENTS_LIST_BOX                                                                                                     \
   gtk_widget_get_first_child(gtk_widget_get_last_child(gtk_widget_get_first_child(GTK_WIDGET(self->attachments))))
@@ -198,11 +198,10 @@ static void set_item(ErrandsWindow *self, ErrandsTaskItem *item) {
   errands_date_chooser_reset(self->due_date_chooser);
   errands_date_chooser_set_dt(self->due_date_chooser, errands_task_item_get_dtend(item));
   errands_rrule_row_reset(self->rrule_row);
-  ICalRecurrence *rrule = errands_task_item_get_rrule(item);
+  struct icalrecurrencetype *rrule = errands_task_item_get_rrule(item);
   errands_rrule_row_set_rrule(self->rrule_row, rrule);
-  adw_expander_row_set_expanded(ADW_EXPANDER_ROW(self->rrule_row),
-                                rrule && i_cal_recurrence_get_freq(rrule) != I_CAL_NO_RECURRENCE);
-  if (rrule) i_cal_recurrence_unref(rrule);
+  adw_expander_row_set_expanded(ADW_EXPANDER_ROW(self->rrule_row), rrule && rrule->freq != ICAL_NO_RECURRENCE);
+  if (rrule) icalrecurrencetype_unref(rrule);
 
   // Notes
   const char *notes = errands_task_item_get_notes(item);
@@ -294,19 +293,21 @@ static void on_show_properties_toggled_cb(ErrandsWindow *self) {
   g_message("Window: Close properties");
 
   // Date
-  ICalTime *new_sdt = errands_date_chooser_get_dt(self->start_date_chooser);
-  errands_task_item_set_dtstart(self->item, new_sdt);
-  ICalTime *new_ddt = errands_date_chooser_get_dt(self->due_date_chooser);
-  errands_task_item_set_dtend(self->item, new_ddt);
+  icaltimetype new_sdt = errands_date_chooser_get_dt(self->start_date_chooser);
+  errands_task_item_set_dtstart(self->item, &new_sdt);
+  icaltimetype new_ddt = errands_date_chooser_get_dt(self->due_date_chooser);
+  errands_task_item_set_dtend(self->item, &new_ddt);
   if (errands_task_item_is_due(self->item)) errands_sidebar_update_filter_rows();
 
   // Set rrule
-  ICalRecurrence *new_rrule = NULL;
+  struct icalrecurrencetype *new_rrule = NULL;
   if (adw_expander_row_get_expanded(ADW_EXPANDER_ROW(self->rrule_row))) new_rrule = errands_rrule_row_get_rrule(self->rrule_row);
   errands_task_item_set_rrule(self->item, new_rrule);
-  if (i_cal_time_is_null_date(new_sdt) && new_rrule && i_cal_recurrence_get_freq(new_rrule) != I_CAL_NO_RECURRENCE)
-    errands_task_item_set_dtstart(self->item, i_cal_time_get_date_time_now());
-  if (new_rrule) i_cal_recurrence_unref(new_rrule);
+  if (icaltime_is_null_date(new_sdt) && new_rrule && new_rrule->freq != ICAL_NO_RECURRENCE) {
+    icaltimetype now = icaltime_now();
+    errands_task_item_set_dtstart(self->item, &now);
+  }
+  if (new_rrule) icalrecurrencetype_unref(new_rrule);
 
   // Notes
   GtkTextIter start, end;

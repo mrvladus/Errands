@@ -12,7 +12,7 @@
 #include <glib-object.h>
 #include <glib.h>
 #include <json-glib/json-glib.h>
-#include <libical-glib/libical-glib.h>
+#include <libical/ical.h>
 
 // ---------- GLOBALS ---------- //
 
@@ -119,25 +119,25 @@ static void migrate_from_46() {
       gint64 percent_complete = json_object_get_int_member(task, "percent_complete");
 
       // Create iCalendar event
-      g_autoptr(ICalComponent) ical = i_cal_component_new_vtodo();
+      icalcomponent *ical = icalcomponent_new_vtodo();
 
-      if (completed) errands_data_set_completed(ical, i_cal_time_get_date_time_now());
+      if (completed) errands_data_set_completed(ical, icaltime_now());
       if (tags) errands_data_set_tags(ical, tags);
-      if (changed) errands_data_set_changed(ical, i_cal_time_new_from_string(changed));
-      if (created) errands_data_set_created(ical, i_cal_time_new_from_string(created));
-      if (due) errands_data_set_due(ical, i_cal_time_new_from_string(due));
+      if (changed) errands_data_set_changed(ical, icaltime_from_string(changed));
+      if (created) errands_data_set_created(ical, icaltime_from_string(created));
+      if (due) errands_data_set_due(ical, icaltime_from_string(due));
       if (notes) errands_data_set_notes(ical, notes);
       if (parent) errands_data_set_parent(ical, parent);
       if (percent_complete) errands_data_set_percent(ical, percent_complete);
       if (priority) errands_data_set_priority(ical, priority);
       if (rrule) {
-        ICalRecurrence *rrule_ = i_cal_recurrence_new_from_string(rrule);
+        struct icalrecurrencetype *rrule_ = icalrecurrencetype_new_from_string(rrule);
         if (rrule_) {
           errands_data_set_rrule(ical, rrule_);
-          i_cal_recurrence_unref(rrule_);
+          icalrecurrencetype_unref(rrule_);
         }
       }
-      if (start) errands_data_set_start(ical, i_cal_time_new_from_string(start));
+      if (start) errands_data_set_start(ical, icaltime_from_string(start));
       if (text) errands_data_set_text(ical, text);
       if (uid) errands_data_set_uid(ical, uid);
       errands_data_set_attachments(ical, attachments);
@@ -145,7 +145,7 @@ static void migrate_from_46() {
       errands_data_set_deleted(ical, deleted);
       errands_data_set_notified(ical, notified);
       errands_data_set_synced(ical, synced);
-      i_cal_component_add_component(list_item->ical, ical);
+      icalcomponent_add_component(list_item->ical, ical);
     }
     errands_task_list_item_save(list_item);
   }
@@ -153,34 +153,33 @@ static void migrate_from_46() {
   g_message("User Data: Migrated successfully");
 }
 
-static ICalProperty *get_x_prop(ICalComponent *ical, const char *xprop, const char *default_val) {
-  ICalProperty *property = i_cal_component_get_first_property(ical, I_CAL_X_PROPERTY);
+static icalproperty *get_x_prop(icalcomponent *ical, const char *xprop, const char *default_val) {
+  icalproperty *property = icalcomponent_get_first_property(ical, ICAL_X_PROPERTY);
   while (property) {
-    const char *name = i_cal_property_get_x_name(property);
+    const char *name = icalproperty_get_x_name(property);
     if (name && g_str_equal(name, xprop)) return property;
-    g_object_unref(property);
-    property = i_cal_component_get_next_property(ical, I_CAL_X_PROPERTY);
+    property = icalcomponent_get_next_property(ical, ICAL_X_PROPERTY);
   }
   if (!default_val) return NULL;
-  property = i_cal_property_new_x(default_val);
-  i_cal_property_set_x_name(property, xprop);
-  i_cal_component_add_property(ical, property);
+  property = icalproperty_new_x(default_val);
+  icalproperty_set_x_name(property, xprop);
+  icalcomponent_add_property(ical, property);
   return property;
 }
 
-static gchar *get_x_prop_value(ICalComponent *ical, const char *xprop, const char *default_val) {
-  g_autoptr(ICalProperty) property = get_x_prop(ical, xprop, default_val);
+static const char *get_x_prop_value(icalcomponent *ical, const char *xprop, const char *default_val) {
+  icalproperty *property = get_x_prop(ical, xprop, default_val);
   if (!property) return NULL;
-  return i_cal_property_get_value_as_string(property);
+  return icalproperty_get_value_as_string(property);
 }
 
-static void set_x_prop_value(ICalComponent *ical, const char *xprop, const char *val) {
-  g_autoptr(ICalProperty) property = get_x_prop(ical, xprop, val);
+static void set_x_prop_value(icalcomponent *ical, const char *xprop, const char *val) {
+  icalproperty *property = get_x_prop(ical, xprop, val);
   if (!val) {
-    if (property) i_cal_component_remove_property(ical, property);
+    if (property) icalcomponent_remove_property(ical, property);
     return;
   }
-  if (property) i_cal_property_set_x(property, val);
+  if (property) icalproperty_set_x(property, val);
 }
 
 // ---------- PUBLIC FUNCTIONS ---------- //
@@ -241,395 +240,384 @@ void errands_data_cleanup(void) {
 
 // --- BOOL --- //
 
-bool errands_data_get_cancelled(ICalComponent *ical) {
-  ICalPropertyStatus status = i_cal_component_get_status(ical);
-  return status == I_CAL_STATUS_CANCELLED;
+bool errands_data_get_cancelled(icalcomponent *ical) {
+  icalproperty_status status = icalcomponent_get_status(ical);
+  return status == ICAL_STATUS_CANCELLED;
 }
 
-bool errands_data_get_deleted(ICalComponent *ical) {
-  g_autofree gchar *val = get_x_prop_value(ical, "X-ERRANDS-DELETED", "0");
+bool errands_data_get_deleted(icalcomponent *ical) {
+  const char *val = get_x_prop_value(ical, "X-ERRANDS-DELETED", "0");
   return STR_TO_BOOL(val);
 }
 
-bool errands_data_get_notified(ICalComponent *ical) {
-  g_autofree gchar *val = get_x_prop_value(ical, "X-ERRANDS-NOTIFIED", "0");
+bool errands_data_get_notified(icalcomponent *ical) {
+  const char *val = get_x_prop_value(ical, "X-ERRANDS-NOTIFIED", "0");
   return STR_TO_BOOL(val);
 }
 
-bool errands_data_get_synced(ICalComponent *ical) {
-  g_autofree gchar *val = get_x_prop_value(ical, "X-ERRANDS-SYNCED", "0");
+bool errands_data_get_synced(icalcomponent *ical) {
+  const char *val = get_x_prop_value(ical, "X-ERRANDS-SYNCED", "0");
   return STR_TO_BOOL(val);
 }
 
-bool errands_data_is_completed(ICalComponent *ical) {
-  g_autoptr(ICalTime) time = errands_data_get_completed(ical);
-  return !i_cal_time_is_null_time(time);
+bool errands_data_is_completed(icalcomponent *ical) {
+  icaltimetype time = errands_data_get_completed(ical);
+  return !icaltime_is_null_time(time);
 }
 
-bool errands_data_is_due(ICalComponent *ical) {
-  g_autoptr(ICalTime) due_time = errands_data_get_due(ical);
-  if (i_cal_time_is_null_time(due_time)) return false;
+bool errands_data_is_due(icalcomponent *ical) {
+  icaltimetype due_time = errands_data_get_due(ical);
+  if (icaltime_is_null_time(due_time)) return false;
   bool is_due = false;
-  if (i_cal_time_is_date(due_time)) {
-    g_autoptr(ICalTime) today = i_cal_time_new_today();
-    is_due = i_cal_time_compare_date_only(due_time, today) < 1;
+  if (icaltime_is_date(due_time)) {
+    icaltimetype today = icaltime_today();
+    is_due = icaltime_compare_date_only(due_time, today) < 1;
   } else {
-    g_autoptr(ICalTime) now = i_cal_time_get_date_time_now();
-    is_due = i_cal_time_compare(due_time, now) < 1;
+    icaltimetype now = icaltime_now();
+    is_due = icaltime_compare(due_time, now) < 1;
   }
   return is_due;
 }
 
-void errands_data_set_cancelled(ICalComponent *ical, bool value) {
-  i_cal_component_set_status(ical, value ? I_CAL_STATUS_CANCELLED : I_CAL_STATUS_NEEDSACTION);
+void errands_data_set_cancelled(icalcomponent *ical, bool value) {
+  icalcomponent_set_status(ical, value ? ICAL_STATUS_CANCELLED : ICAL_STATUS_NEEDSACTION);
   errands_data_set_synced(ical, false);
-  errands_data_set_changed(ical, i_cal_time_get_date_time_now());
+  errands_data_set_changed(ical, icaltime_now());
 }
 
-void errands_data_set_deleted(ICalComponent *ical, bool value) {
+void errands_data_set_deleted(icalcomponent *ical, bool value) {
   set_x_prop_value(ical, "X-ERRANDS-DELETED", BOOL_TO_STR_NUM(value));
   errands_data_set_synced(ical, false);
-  errands_data_set_changed(ical, i_cal_time_get_date_time_now());
+  errands_data_set_changed(ical, icaltime_now());
 }
 
-void errands_data_set_notified(ICalComponent *ical, bool value) {
+void errands_data_set_notified(icalcomponent *ical, bool value) {
   set_x_prop_value(ical, "X-ERRANDS-NOTIFIED", BOOL_TO_STR_NUM(value));
   errands_data_set_synced(ical, false);
-  errands_data_set_changed(ical, i_cal_time_get_date_time_now());
+  errands_data_set_changed(ical, icaltime_now());
 }
 
-void errands_data_set_synced(ICalComponent *ical, bool value) {
+void errands_data_set_synced(icalcomponent *ical, bool value) {
   set_x_prop_value(ical, "X-ERRANDS-SYNCED", BOOL_TO_STR_NUM(value));
 }
 
 // --- INT --- //
 
-int errands_data_get_percent(ICalComponent *ical) {
-  g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_PERCENTCOMPLETE_PROPERTY);
-  return property ? i_cal_property_get_percentcomplete(property) : 0;
+int errands_data_get_percent(icalcomponent *ical) {
+  icalproperty *property = icalcomponent_get_first_property(ical, ICAL_PERCENTCOMPLETE_PROPERTY);
+  return property ? icalproperty_get_percentcomplete(property) : 0;
 }
 
-int errands_data_get_priority(ICalComponent *ical) {
-  g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_PRIORITY_PROPERTY);
-  return property ? i_cal_property_get_priority(property) : 0;
+int errands_data_get_priority(icalcomponent *ical) {
+  icalproperty *property = icalcomponent_get_first_property(ical, ICAL_PRIORITY_PROPERTY);
+  return property ? icalproperty_get_priority(property) : 0;
 }
 
-void errands_data_set_percent(ICalComponent *ical, int value) {
-  g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_PERCENTCOMPLETE_PROPERTY);
-  if (property) i_cal_property_set_percentcomplete(property, value);
-  else i_cal_component_add_property(ical, i_cal_property_new_percentcomplete(value));
+void errands_data_set_percent(icalcomponent *ical, int value) {
+  icalproperty *property = icalcomponent_get_first_property(ical, ICAL_PERCENTCOMPLETE_PROPERTY);
+  if (property) icalproperty_set_percentcomplete(property, value);
+  else icalcomponent_add_property(ical, icalproperty_new_percentcomplete(value));
   errands_data_set_synced(ical, false);
-  errands_data_set_changed(ical, i_cal_time_get_date_time_now());
+  errands_data_set_changed(ical, icaltime_now());
 }
 
-void errands_data_set_priority(ICalComponent *ical, int value) {
-  g_return_if_fail(I_CAL_IS_COMPONENT(ical));
-
+void errands_data_set_priority(icalcomponent *ical, int value) {
   value = CLAMP(value, 0, 9);
-  g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_PRIORITY_PROPERTY);
-  if (property) i_cal_property_set_priority(property, value);
-  else i_cal_component_add_property(ical, i_cal_property_new_priority(value));
+  icalproperty *property = icalcomponent_get_first_property(ical, ICAL_PRIORITY_PROPERTY);
+  if (property) icalproperty_set_priority(property, value);
+  else icalcomponent_add_property(ical, icalproperty_new_priority(value));
 
   errands_data_set_synced(ical, false);
-  errands_data_set_changed(ical, i_cal_time_get_date_time_now());
+  errands_data_set_changed(ical, icaltime_now());
 }
 
 // --- STRING --- //
 
-const char *errands_data_get_color(ICalComponent *ical) {
-  if (i_cal_component_isa(ical) == I_CAL_VCALENDAR_COMPONENT) return get_x_prop_value(ical, "X-APPLE-CALENDAR-COLOR", NULL);
+const char *errands_data_get_color(icalcomponent *ical) {
+  if (icalcomponent_isa(ical) == ICAL_VCALENDAR_COMPONENT) return get_x_prop_value(ical, "X-APPLE-CALENDAR-COLOR", NULL);
   else {
-    g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_COLOR_PROPERTY);
-    return property ? i_cal_property_get_color(property) : NULL;
+    icalproperty *property = icalcomponent_get_first_property(ical, ICAL_COLOR_PROPERTY);
+    return property ? icalproperty_get_color(property) : NULL;
   }
 }
 
-const char *errands_data_get_list_name(ICalComponent *ical) { return get_x_prop_value(ical, "X-WR-CALNAME", "Untitled"); }
+const char *errands_data_get_list_name(icalcomponent *ical) { return get_x_prop_value(ical, "X-WR-CALNAME", "Untitled"); }
 
-const char *errands_data_get_list_description(ICalComponent *ical) { return get_x_prop_value(ical, "X-WR-CALDESC", NULL); }
+const char *errands_data_get_list_description(icalcomponent *ical) { return get_x_prop_value(ical, "X-WR-CALDESC", NULL); }
 
-const char *errands_data_get_notes(ICalComponent *ical) { return i_cal_component_get_description(ical); }
+const char *errands_data_get_notes(icalcomponent *ical) { return icalcomponent_get_description(ical); }
 
-const char *errands_data_get_parent(ICalComponent *ical) {
-  g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_RELATEDTO_PROPERTY);
-  return property ? i_cal_property_get_relatedto(property) : NULL;
+const char *errands_data_get_parent(icalcomponent *ical) {
+  icalproperty *property = icalcomponent_get_first_property(ical, ICAL_RELATEDTO_PROPERTY);
+  return property ? icalproperty_get_relatedto(property) : NULL;
 }
 
-const char *errands_data_get_text(ICalComponent *ical) { return i_cal_component_get_summary(ical); }
+const char *errands_data_get_text(icalcomponent *ical) { return icalcomponent_get_summary(ical); }
 
-const char *errands_data_get_uid(ICalComponent *ical) {
-  g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_UID_PROPERTY);
-  return property ? i_cal_property_get_uid(property) : NULL;
+const char *errands_data_get_uid(icalcomponent *ical) {
+  icalproperty *property = icalcomponent_get_first_property(ical, ICAL_UID_PROPERTY);
+  return property ? icalproperty_get_uid(property) : NULL;
 }
 
-void errands_data_set_notes(ICalComponent *ical, const char *value) {
+void errands_data_set_notes(icalcomponent *ical, const char *value) {
   if (!value || !*value) {
-    g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_DESCRIPTION_PROPERTY);
-    if (property) i_cal_component_remove_property(ical, property);
-  } else i_cal_component_set_description(ical, value);
+    icalproperty *property = icalcomponent_get_first_property(ical, ICAL_DESCRIPTION_PROPERTY);
+    if (property) icalcomponent_remove_property(ical, property);
+  } else icalcomponent_set_description(ical, value);
   errands_data_set_synced(ical, false);
-  errands_data_set_changed(ical, i_cal_time_get_date_time_now());
+  errands_data_set_changed(ical, icaltime_now());
 }
 
-void errands_data_set_color(ICalComponent *ical, const char *value) {
+void errands_data_set_color(icalcomponent *ical, const char *value) {
   const char *color = value;
   g_autofree char *fixed_color = NULL;
   if (color && *color && !g_str_has_prefix(color, "#") && strlen(color) != 7) {
     fixed_color = g_strndup(color, 7);
     color = fixed_color;
   }
-  if (i_cal_component_isa(ical) == I_CAL_VCALENDAR_COMPONENT) {
+  if (icalcomponent_isa(ical) == ICAL_VCALENDAR_COMPONENT) {
     if (!color || !*color) color = generate_hex_as_str();
     set_x_prop_value(ical, "X-APPLE-CALENDAR-COLOR", color);
   } else {
-    g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_COLOR_PROPERTY);
+    icalproperty *property = icalcomponent_get_first_property(ical, ICAL_COLOR_PROPERTY);
     if (!color || !*color) {
-      if (property) i_cal_component_remove_property(ical, property);
-    } else if (property) i_cal_property_set_color(property, color);
-    else i_cal_component_add_property(ical, i_cal_property_new_color(color));
+      if (property) icalcomponent_remove_property(ical, property);
+    } else if (property) icalproperty_set_color(property, color);
+    else icalcomponent_add_property(ical, icalproperty_new_color(color));
 
-    errands_data_set_changed(ical, i_cal_time_get_date_time_now());
+    errands_data_set_changed(ical, icaltime_now());
   }
   errands_data_set_synced(ical, false);
 }
 
-void errands_data_set_list_name(ICalComponent *ical, const char *value) {
+void errands_data_set_list_name(icalcomponent *ical, const char *value) {
   set_x_prop_value(ical, "X-WR-CALNAME", value);
   errands_data_set_synced(ical, false);
 }
 
-void errands_data_set_list_description(ICalComponent *ical, const char *value) {
+void errands_data_set_list_description(icalcomponent *ical, const char *value) {
   set_x_prop_value(ical, "X-WR-CALDESC", value);
   errands_data_set_synced(ical, false);
 }
 
-void errands_data_set_parent(ICalComponent *ical, const char *value) {
-  g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_RELATEDTO_PROPERTY);
+void errands_data_set_parent(icalcomponent *ical, const char *value) {
+  icalproperty *property = icalcomponent_get_first_property(ical, ICAL_RELATEDTO_PROPERTY);
   if (!value || g_str_equal(value, "")) {
-    if (property) i_cal_component_remove_property(ical, property);
+    if (property) icalcomponent_remove_property(ical, property);
   } else {
-    if (property) i_cal_property_set_relatedto(property, value);
-    else i_cal_component_add_property(ical, i_cal_property_new_relatedto(value));
+    if (property) icalproperty_set_relatedto(property, value);
+    else icalcomponent_add_property(ical, icalproperty_new_relatedto(value));
   }
   errands_data_set_synced(ical, false);
-  errands_data_set_changed(ical, i_cal_time_get_date_time_now());
+  errands_data_set_changed(ical, icaltime_now());
 }
 
-void errands_data_set_text(ICalComponent *ical, const char *value) {
+void errands_data_set_text(icalcomponent *ical, const char *value) {
   if (!value || !*value) {
-    g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_SUMMARY_PROPERTY);
-    if (property) i_cal_component_remove_property(ical, property);
-  } else i_cal_component_set_summary(ical, value);
+    icalproperty *property = icalcomponent_get_first_property(ical, ICAL_SUMMARY_PROPERTY);
+    if (property) icalcomponent_remove_property(ical, property);
+  } else icalcomponent_set_summary(ical, value);
   errands_data_set_synced(ical, false);
-  errands_data_set_changed(ical, i_cal_time_get_date_time_now());
+  errands_data_set_changed(ical, icaltime_now());
 }
 
-void errands_data_set_uid(ICalComponent *ical, const char *value) {
-  g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_UID_PROPERTY);
+void errands_data_set_uid(icalcomponent *ical, const char *value) {
+  icalproperty *property = icalcomponent_get_first_property(ical, ICAL_UID_PROPERTY);
   if (!value || !*value) {
-    if (property) i_cal_component_remove_property(ical, property);
+    if (property) icalcomponent_remove_property(ical, property);
   } else {
     if (property) return;
-    i_cal_component_add_property(ical, i_cal_property_new_uid(value));
+    icalcomponent_add_property(ical, icalproperty_new_uid(value));
   }
   errands_data_set_synced(ical, FALSE);
-  errands_data_set_changed(ical, i_cal_time_get_date_time_now());
+  errands_data_set_changed(ical, icaltime_now());
 }
 
 // --- RRULE --- //
 
-ICalRecurrence *errands_data_get_rrule(ICalComponent *ical) {
-  g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_RRULE_PROPERTY);
-  return property ? i_cal_property_get_rrule(property) : NULL;
+struct icalrecurrencetype *errands_data_get_rrule(icalcomponent *ical) {
+  icalproperty *property = icalcomponent_get_first_property(ical, ICAL_RRULE_PROPERTY);
+  return property ? icalproperty_get_rrule(property) : NULL;
 }
 
-bool errands_data_set_rrule(ICalComponent *ical, ICalRecurrence *value) {
-  bool is_no_recurrence = !value || (value && i_cal_recurrence_get_freq(value) == I_CAL_NO_RECURRENCE);
-  g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_RRULE_PROPERTY);
+bool errands_data_set_rrule(icalcomponent *ical, struct icalrecurrencetype *value) {
+  bool is_no_recurrence = !value || (value && value->freq == ICAL_NO_RECURRENCE);
+  icalproperty *property = icalcomponent_get_first_property(ical, ICAL_RRULE_PROPERTY);
   if (is_no_recurrence) {
-    if (property) i_cal_component_remove_property(ical, property);
+    if (property) icalcomponent_remove_property(ical, property);
   } else {
-    if (property) i_cal_property_set_rrule(property, value);
-    else i_cal_component_add_property(ical, i_cal_property_new_rrule(value));
+    if (property) icalproperty_set_rrule(property, value);
+    else icalcomponent_add_property(ical, icalproperty_new_rrule(value));
   }
   errands_data_set_synced(ical, false);
-  errands_data_set_changed(ical, i_cal_time_get_date_time_now());
+  errands_data_set_changed(ical, icaltime_now());
 
   return true;
 }
 
 // --- STRV --- //
 
-GStrv errands_data_get_attachments(ICalComponent *ical) {
+GStrv errands_data_get_attachments(icalcomponent *ical) {
   g_assert_nonnull(ical);
 
-  g_autofree gchar *val = get_x_prop_value(ical, "X-ERRANDS-ATTACHMENTS", NULL);
+  const char *val = get_x_prop_value(ical, "X-ERRANDS-ATTACHMENTS", NULL);
   return val ? g_strsplit(val, ",", -1) : NULL;
 }
 
-GStrv errands_data_get_tags(ICalComponent *ical) {
+GStrv errands_data_get_tags(icalcomponent *ical) {
   g_assert_nonnull(ical);
-  g_assert(i_cal_component_is_valid(ical));
+  g_assert(icalcomponent_is_valid(ical));
 
   g_autoptr(GStrvBuilder) builder = g_strv_builder_new();
-  for (ICalProperty *p = i_cal_component_get_first_property(ical, I_CAL_CATEGORIES_PROPERTY); p;
-       p = i_cal_component_get_next_property(ical, I_CAL_CATEGORIES_PROPERTY)) {
-    g_strv_builder_add(builder, i_cal_property_get_value_as_string(p));
-    g_object_unref(p);
+  for (icalproperty *p = icalcomponent_get_first_property(ical, ICAL_CATEGORIES_PROPERTY); p;
+       p = icalcomponent_get_next_property(ical, ICAL_CATEGORIES_PROPERTY)) {
+    g_strv_builder_add(builder, icalproperty_get_value_as_string(p));
   }
   GStrv res = g_strv_builder_end(builder);
   return (res && res[0]) ? res : NULL;
 }
 
-void errands_data_set_attachments(ICalComponent *ical, GStrv value) {
+void errands_data_set_attachments(icalcomponent *ical, GStrv value) {
   if (!value) set_x_prop_value(ical, "X-ERRANDS-ATTACHMENTS", NULL);
   else {
     g_autofree gchar *str = g_strjoinv(",", value);
     set_x_prop_value(ical, "X-ERRANDS-ATTACHMENTS", str);
   }
   errands_data_set_synced(ical, false);
-  errands_data_set_changed(ical, i_cal_time_get_date_time_now());
+  errands_data_set_changed(ical, icaltime_now());
 }
 
-void errands_data_set_tags(ICalComponent *ical, GStrv value) {
-  g_autoptr(GPtrArray) properties = g_ptr_array_new_with_free_func(g_object_unref);
-  for (ICalProperty *property = i_cal_component_get_first_property(ical, I_CAL_CATEGORIES_PROPERTY); property;
-       property = i_cal_component_get_next_property(ical, I_CAL_CATEGORIES_PROPERTY))
+void errands_data_set_tags(icalcomponent *ical, GStrv value) {
+  g_autoptr(GPtrArray) properties = g_ptr_array_new();
+  for (icalproperty *property = icalcomponent_get_first_property(ical, ICAL_CATEGORIES_PROPERTY); property;
+       property = icalcomponent_get_next_property(ical, ICAL_CATEGORIES_PROPERTY))
     g_ptr_array_add(properties, property);
-  for (guint i = 0; i < properties->len; i++) i_cal_component_remove_property(ical, g_ptr_array_index(properties, i));
+  for (guint i = 0; i < properties->len; i++) icalcomponent_remove_property(ical, g_ptr_array_index(properties, i));
   if (value)
     for (gsize i = 0; value[i]; i++)
-      if (*value[i]) i_cal_component_add_property(ical, i_cal_property_new_categories(value[i]));
+      if (*value[i]) icalcomponent_add_property(ical, icalproperty_new_categories(value[i]));
   errands_data_set_synced(ical, false);
-  errands_data_set_changed(ical, i_cal_time_get_date_time_now());
+  errands_data_set_changed(ical, icaltime_now());
 }
 
-void errands_data_add_tag(ICalComponent *ical, const char *tag) {
-  i_cal_component_add_property(ical, i_cal_property_new_categories(tag));
+void errands_data_add_tag(icalcomponent *ical, const char *tag) {
+  icalcomponent_add_property(ical, icalproperty_new_categories(tag));
   errands_data_set_synced(ical, false);
-  errands_data_set_changed(ical, i_cal_time_get_date_time_now());
+  errands_data_set_changed(ical, icaltime_now());
 }
 
-bool errands_data_remove_tag(ICalComponent *ical, const char *tag) {
-  g_autoptr(GPtrArray) properties = g_ptr_array_new_with_free_func(g_object_unref);
-  for (ICalProperty *property = i_cal_component_get_first_property(ical, I_CAL_CATEGORIES_PROPERTY); property;
-       property = i_cal_component_get_next_property(ical, I_CAL_CATEGORIES_PROPERTY))
+bool errands_data_remove_tag(icalcomponent *ical, const char *tag) {
+  g_autoptr(GPtrArray) properties = g_ptr_array_new();
+  for (icalproperty *property = icalcomponent_get_first_property(ical, ICAL_CATEGORIES_PROPERTY); property;
+       property = icalcomponent_get_next_property(ical, ICAL_CATEGORIES_PROPERTY))
     g_ptr_array_add(properties, property);
   gboolean removed = FALSE;
   for (guint i = 0; i < properties->len; i++) {
-    ICalProperty *property = g_ptr_array_index(properties, i);
-    g_autofree gchar *value = g_strdup(i_cal_property_get_value_as_string(property));
+    icalproperty *property = g_ptr_array_index(properties, i);
+    const char *value = icalproperty_get_value_as_string(property);
     if (!removed && g_strcmp0(tag, value) == 0) {
-      i_cal_component_remove_property(ical, property);
+      icalcomponent_remove_property(ical, property);
       removed = TRUE;
     }
   }
   if (removed) {
     errands_data_set_synced(ical, false);
-    errands_data_set_changed(ical, i_cal_time_get_date_time_now());
+    errands_data_set_changed(ical, icaltime_now());
   }
   return removed;
 }
 
 // --- TIME --- //
 
-ICalTime *errands_data_get_changed(ICalComponent *ical) {
-  g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_LASTMODIFIED_PROPERTY);
-  if (property) return i_cal_property_get_lastmodified(property);
-  property = i_cal_component_get_first_property(ical, I_CAL_DTSTAMP_PROPERTY);
-  if (property) return i_cal_property_get_dtstamp(property);
-  errands_data_set_changed(ical, i_cal_time_get_date_time_now());
-  g_autoptr(ICalProperty) last_modified = i_cal_component_get_first_property(ical, I_CAL_LASTMODIFIED_PROPERTY);
-  return i_cal_property_get_lastmodified(last_modified);
+icaltimetype errands_data_get_changed(icalcomponent *ical) {
+  icalproperty *property = icalcomponent_get_first_property(ical, ICAL_LASTMODIFIED_PROPERTY);
+  if (property) return icalproperty_get_lastmodified(property);
+  property = icalcomponent_get_first_property(ical, ICAL_DTSTAMP_PROPERTY);
+  if (property) return icalproperty_get_dtstamp(property);
+  errands_data_set_changed(ical, icaltime_now());
+  icalproperty *last_modified = icalcomponent_get_first_property(ical, ICAL_LASTMODIFIED_PROPERTY);
+  return icalproperty_get_lastmodified(last_modified);
 }
 
-ICalTime *errands_data_get_completed(ICalComponent *ical) {
-  g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_COMPLETED_PROPERTY);
-  if (property) return i_cal_property_get_completed(property);
-  return i_cal_time_new_null_time();
+icaltimetype errands_data_get_completed(icalcomponent *ical) {
+  icalproperty *property = icalcomponent_get_first_property(ical, ICAL_COMPLETED_PROPERTY);
+  if (property) return icalproperty_get_completed(property);
+  return icaltime_null_time();
 }
 
-ICalTime *errands_data_get_created(ICalComponent *ical) {
-  g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_CREATED_PROPERTY);
-  if (property) return i_cal_property_get_created(property);
+icaltimetype errands_data_get_created(icalcomponent *ical) {
+  icalproperty *property = icalcomponent_get_first_property(ical, ICAL_CREATED_PROPERTY);
+  if (property) return icalproperty_get_created(property);
   else {
-    property = i_cal_component_get_first_property(ical, I_CAL_DTSTAMP_PROPERTY);
-    if (property) return i_cal_property_get_dtstamp(property);
+    property = icalcomponent_get_first_property(ical, ICAL_DTSTAMP_PROPERTY);
+    if (property) return icalproperty_get_dtstamp(property);
   }
-  errands_data_set_created(ical, i_cal_time_get_date_time_now());
-  g_autoptr(ICalProperty) created = i_cal_component_get_first_property(ical, I_CAL_CREATED_PROPERTY);
-  return i_cal_property_get_created(created);
+  errands_data_set_created(ical, icaltime_now());
+  icalproperty *created = icalcomponent_get_first_property(ical, ICAL_CREATED_PROPERTY);
+  return icalproperty_get_created(created);
 }
 
-ICalTime *errands_data_get_due(ICalComponent *ical) { return i_cal_component_get_due(ical); }
+icaltimetype errands_data_get_due(icalcomponent *ical) { return icalcomponent_get_due(ical); }
+icaltimetype errands_data_get_end(icalcomponent *ical) { return icalcomponent_get_dtend(ical); }
+icaltimetype errands_data_get_start(icalcomponent *ical) { return icalcomponent_get_dtstart(ical); }
 
-ICalTime *errands_data_get_end(ICalComponent *ical) { return i_cal_component_get_dtend(ical); }
-
-ICalTime *errands_data_get_start(ICalComponent *ical) { return i_cal_component_get_dtstart(ical); }
-
-void errands_data_set_changed(ICalComponent *ical, ICalTime *value) {
-  g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_LASTMODIFIED_PROPERTY);
-  if (!value || i_cal_time_is_null_time(value)) {
-    if (property) i_cal_component_remove_property(ical, property);
-  } else if (property) i_cal_property_set_lastmodified(property, value);
-  else i_cal_component_add_property(ical, i_cal_property_new_lastmodified(value));
-  g_clear_object(&value);
+void errands_data_set_changed(icalcomponent *ical, icaltimetype value) {
+  icalproperty *property = icalcomponent_get_first_property(ical, ICAL_LASTMODIFIED_PROPERTY);
+  if (icaltime_is_null_time(value)) {
+    if (property) icalcomponent_remove_property(ical, property);
+  } else if (property) icalproperty_set_lastmodified(property, value);
+  else icalcomponent_add_property(ical, icalproperty_new_lastmodified(value));
 }
 
-void errands_data_set_completed(ICalComponent *ical, ICalTime *value) {
-  g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_COMPLETED_PROPERTY);
-  if (!value || i_cal_time_is_null_time(value)) {
-    if (property) i_cal_component_remove_property(ical, property);
+void errands_data_set_completed(icalcomponent *ical, icaltimetype value) {
+  icalproperty *property = icalcomponent_get_first_property(ical, ICAL_COMPLETED_PROPERTY);
+  if (icaltime_is_null_time(value)) {
+    if (property) icalcomponent_remove_property(ical, property);
     errands_data_set_percent(ical, 0);
-    i_cal_component_set_status(ical, I_CAL_STATUS_NEEDSACTION);
+    icalcomponent_set_status(ical, ICAL_STATUS_NEEDSACTION);
   } else {
-    if (property) i_cal_property_set_completed(property, value);
-    else i_cal_component_add_property(ical, i_cal_property_new_completed(value));
+    if (property) icalproperty_set_completed(property, value);
+    else icalcomponent_add_property(ical, icalproperty_new_completed(value));
     errands_data_set_percent(ical, 100);
-    i_cal_component_set_status(ical, I_CAL_STATUS_COMPLETED);
+    icalcomponent_set_status(ical, ICAL_STATUS_COMPLETED);
   }
   errands_data_set_synced(ical, false);
-  errands_data_set_changed(ical, i_cal_time_get_date_time_now());
-  g_clear_object(&value);
+  errands_data_set_changed(ical, icaltime_now());
 }
 
-void errands_data_set_created(ICalComponent *ical, ICalTime *value) {
-  g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_CREATED_PROPERTY);
-  if (!value || i_cal_time_is_null_time(value)) {
-    if (property) i_cal_component_remove_property(ical, property);
-  } else if (property) i_cal_property_set_created(property, value);
-  else i_cal_component_add_property(ical, i_cal_property_new_created(value));
+void errands_data_set_created(icalcomponent *ical, icaltimetype value) {
+  icalproperty *property = icalcomponent_get_first_property(ical, ICAL_CREATED_PROPERTY);
+  if (icaltime_is_null_time(value)) {
+    if (property) icalcomponent_remove_property(ical, property);
+  } else if (property) icalproperty_set_created(property, value);
+  else icalcomponent_add_property(ical, icalproperty_new_created(value));
   errands_data_set_synced(ical, false);
-  errands_data_set_changed(ical, i_cal_time_get_date_time_now());
-  g_clear_object(&value);
+  errands_data_set_changed(ical, icaltime_now());
 }
 
-void errands_data_set_due(ICalComponent *ical, ICalTime *value) {
-  g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_DUE_PROPERTY);
-  if (!value || i_cal_time_is_null_time(value)) {
-    if (property) i_cal_component_remove_property(ical, property);
-  } else i_cal_component_set_due(ical, value);
+void errands_data_set_due(icalcomponent *ical, icaltimetype value) {
+  icalproperty *property = icalcomponent_get_first_property(ical, ICAL_DUE_PROPERTY);
+  if (icaltime_is_null_time(value)) {
+    if (property) icalcomponent_remove_property(ical, property);
+  } else icalcomponent_set_due(ical, value);
   errands_data_set_synced(ical, false);
-  errands_data_set_changed(ical, i_cal_time_get_date_time_now());
-  g_clear_object(&value);
+  errands_data_set_changed(ical, icaltime_now());
 }
 
-void errands_data_set_end(ICalComponent *ical, ICalTime *value) {
-  g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_DTEND_PROPERTY);
-  if (!value || i_cal_time_is_null_time(value)) {
-    if (property) i_cal_component_remove_property(ical, property);
-  } else i_cal_component_set_dtend(ical, value);
+void errands_data_set_end(icalcomponent *ical, icaltimetype value) {
+  icalproperty *property = icalcomponent_get_first_property(ical, ICAL_DTEND_PROPERTY);
+  if (icaltime_is_null_time(value)) {
+    if (property) icalcomponent_remove_property(ical, property);
+  } else icalcomponent_set_dtend(ical, value);
   errands_data_set_synced(ical, false);
-  errands_data_set_changed(ical, i_cal_time_get_date_time_now());
-  g_clear_object(&value);
+  errands_data_set_changed(ical, icaltime_now());
 }
 
-void errands_data_set_start(ICalComponent *ical, ICalTime *value) {
-  g_autoptr(ICalProperty) property = i_cal_component_get_first_property(ical, I_CAL_DTSTART_PROPERTY);
-  if (!value || i_cal_time_is_null_time(value)) {
-    if (property) i_cal_component_remove_property(ical, property);
-  } else i_cal_component_set_dtstart(ical, value);
+void errands_data_set_start(icalcomponent *ical, icaltimetype value) {
+  icalproperty *property = icalcomponent_get_first_property(ical, ICAL_DTSTART_PROPERTY);
+  if (icaltime_is_null_time(value)) {
+    if (property) icalcomponent_remove_property(ical, property);
+  } else icalcomponent_set_dtstart(ical, value);
   errands_data_set_synced(ical, false);
-  errands_data_set_changed(ical, i_cal_time_get_date_time_now());
-  g_clear_object(&value);
+  errands_data_set_changed(ical, icaltime_now());
 }

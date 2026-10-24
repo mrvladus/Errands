@@ -16,6 +16,7 @@
 #include <glib-object.h>
 #include <glib.h>
 #include <glib/gi18n.h>
+#include <libical/ical.h>
 
 static void errands_task_update_toolbar(ErrandsTask *task);
 static GtkWidget *errands_task_tag_new(const char *tag);
@@ -101,31 +102,33 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
   } break;
 
   case PROP_DTSTART: {
-    self->dtstart = g_value_get_object(value);
-    bool is_null = i_cal_time_is_null_date(self->dtstart);
+    icaltimetype *dt_p = g_value_get_pointer(value);
+    self->dtstart = *dt_p;
+    bool is_null = icaltime_is_null_date(self->dtstart);
     gtk_widget_set_visible(self->dtstart_btn, !is_null);
     errands_task_update_toolbar(self);
     if (is_null) break;
 
     g_autofree gchar *date_str = NULL;
-    g_autoptr(GDateTime) sdt = g_date_time_new_from_unix_local(i_cal_time_as_timet(self->dtstart));
-    if (!i_cal_time_is_date(self->dtstart)) date_str = g_date_time_format(sdt, "%d %b %H:%M");
+    g_autoptr(GDateTime) sdt = g_date_time_new_from_unix_local(icaltime_as_timet(self->dtstart));
+    if (!icaltime_is_date(self->dtstart)) date_str = g_date_time_format(sdt, "%d %b %H:%M");
     else date_str = g_date_time_format(sdt, "%d %b");
     const char *label = tmp_str_printf("%s: %s", C_("Start date", "Start"), date_str);
     adw_button_content_set_label(ADW_BUTTON_CONTENT(self->dtstart_btn_content), label);
   } break;
 
   case PROP_DTEND: {
-    self->dtend = g_value_get_object(value);
-    bool has_dt = !i_cal_time_is_null_date(self->dtend);
+    icaltimetype *dt_p = g_value_get_pointer(value);
+    self->dtend = *dt_p;
+    bool has_dt = !icaltime_is_null_date(self->dtend);
     g_autofree gchar *rrule = errands_task_item_get_rrule_as_string(self->item);
     gtk_widget_set_visible(self->dtend_btn, has_dt && !rrule);
     errands_task_update_toolbar(self);
     if (!has_dt) break;
 
     g_autofree gchar *date_str = NULL;
-    g_autoptr(GDateTime) sdt = g_date_time_new_from_unix_local(i_cal_time_as_timet(self->dtend));
-    if (!i_cal_time_is_date(self->dtend)) date_str = g_date_time_format(sdt, "%d %b %H:%M");
+    g_autoptr(GDateTime) sdt = g_date_time_new_from_unix_local(icaltime_as_timet(self->dtend));
+    if (!icaltime_is_date(self->dtend)) date_str = g_date_time_format(sdt, "%d %b %H:%M");
     else date_str = g_date_time_format(sdt, "%d %b");
     const char *label = tmp_str_printf("%s: %s", C_("Due date", "Due"), date_str);
     adw_button_content_set_label(ADW_BUTTON_CONTENT(self->dtend_btn_content), label);
@@ -152,7 +155,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
   } break;
 
   case PROP_RRULE: {
-    self->rrule = g_value_get_object(value);
+    self->rrule = g_value_get_pointer(value);
     g_autofree gchar *label = errands_task_item_get_rrule_as_string(self->item);
     if (label) gtk_widget_set_visible(self->dtend_btn, false);
     gtk_widget_set_visible(self->rrule_btn, label != NULL);
@@ -186,15 +189,12 @@ static void errands_task_class_init(ErrandsTaskClass *klass) {
   obj_properties[PROP_COLOR] = g_param_spec_string("color", "Color", "Color of the task.", NULL, G_PARAM_READWRITE);
   obj_properties[PROP_PRIORITY] = g_param_spec_int("priority", "Priority", "Priority of the task.", 0, 10, 0, G_PARAM_READWRITE);
   obj_properties[PROP_NOTES] = g_param_spec_string("notes", "Notes", "Notes of the task.", NULL, G_PARAM_WRITABLE);
-  obj_properties[PROP_DTSTART] =
-      g_param_spec_object("dtstart", "Start Date", "Start date of the task.", I_CAL_TYPE_TIME, G_PARAM_WRITABLE);
-  obj_properties[PROP_DTEND] =
-      g_param_spec_object("dtend", "End Date", "End date of the task.", I_CAL_TYPE_TIME, G_PARAM_WRITABLE);
+  obj_properties[PROP_DTSTART] = g_param_spec_pointer("dtstart", "Start Date", "Start date of the task.", G_PARAM_WRITABLE);
+  obj_properties[PROP_DTEND] = g_param_spec_pointer("dtend", "End Date", "End date of the task.", G_PARAM_WRITABLE);
   obj_properties[PROP_TAGS] = g_param_spec_pointer("tags", "Tags", "Tags of the task.", G_PARAM_WRITABLE);
   obj_properties[PROP_ATTACHMENTS] =
       g_param_spec_pointer("attachments", "Attachments", "Attachments of the task.", G_PARAM_WRITABLE);
-  obj_properties[PROP_RRULE] =
-      g_param_spec_object("rrule", "RRule", "RRule of the task.", I_CAL_TYPE_RECURRENCE, G_PARAM_WRITABLE);
+  obj_properties[PROP_RRULE] = g_param_spec_pointer("rrule", "RRule", "RRule of the task.", G_PARAM_WRITABLE);
 
   g_object_class_install_properties(object_class, N_PROPERTIES, obj_properties);
 
@@ -262,8 +262,8 @@ static GtkWidget *errands_task_tag_new(const char *tag) {
 
 static gboolean update_toolbar_cb(ErrandsTask *self) {
   self->toolbar_update_id = 0;
-  bool has_dtstart = !i_cal_time_is_null_date(self->dtstart);
-  bool has_dtend = !i_cal_time_is_null_date(self->dtend);
+  bool has_dtstart = !icaltime_is_null_date(self->dtstart);
+  bool has_dtend = !icaltime_is_null_date(self->dtend);
   bool has_tags = self->tags && self->tags[0];
   bool has_attachments = self->attachments && self->attachments[0];
   bool has_priority = self->priority != 0;

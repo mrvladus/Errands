@@ -16,14 +16,14 @@ struct _ErrandsTaskListItem {
   GListStore *tasks;
 
   // GObject Properties
-  ICalComponent *ical;
+  icalcomponent *ical;
   gchar *uid;
   gchar *title;
   GdkRGBA color;
   gint count; // Number of uncompleted tasks
 };
 
-ErrandsTaskListItem *errands_task_list_item_new(ICalComponent *ical);
+ErrandsTaskListItem *errands_task_list_item_new(icalcomponent *ical);
 ErrandsTaskListItem *errands_task_list_item_create(const char *uid, const char *name, const char *color, bool deleted,
                                                    bool synced);
 ErrandsTaskListItem *errands_task_list_item_load_from_ics(const char *path);
