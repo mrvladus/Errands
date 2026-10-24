@@ -310,7 +310,7 @@ static gboolean remote_event_idle_cb(gpointer user_data) {
       task_item = errands_task_item_new(data->ical, list, parent_task_item);
       g_list_store_append(G_LIST_STORE(child_model), task_item);
     }
-    ICalComponent *ical = errands_task_item_get_ical(task_item);
+    g_autoptr(ICalComponent) ical = errands_task_item_get_ical(task_item);
     errands_data_set_synced(ical, true);
     errands_task_list_item_save(list);
     errands_task_list_item_update_count(list);
@@ -334,8 +334,7 @@ static gboolean remote_event_idle_cb(gpointer user_data) {
       g_warning("Sync: Failed to find local task: %s", uid);
       return G_SOURCE_REMOVE;
     }
-    ICalComponent *ical = errands_task_item_get_ical(task);
-    g_assert_nonnull(ical);
+    g_autoptr(ICalComponent) ical = errands_task_item_get_ical(task);
     bool changed = merge_tasks(ical, task_ical);
     if (!changed) break;
     g_message("Sync: Task modified: %s", uid);
@@ -352,7 +351,7 @@ static gboolean remote_event_idle_cb(gpointer user_data) {
     if (!task) break;
     g_message("Sync: Task '%s' removed from remote list '%s'", data->uid, list_uid);
     errands_task_item_delete(task);
-    ICalComponent *ical = errands_task_item_get_ical(task);
+    g_autoptr(ICalComponent) ical = errands_task_item_get_ical(task);
     errands_data_set_synced(ical, true);
     errands_task_list_item_save(list);
     errands_task_list_item_update_count(list);
@@ -401,7 +400,7 @@ static void obj_push_idle_cb(gpointer user_data) {
   case PUSH_OBJ_TASK_PUSH: {
     if (!o->pushed) g_warning("Sync: Creating/Updating remote task failed: %s", errands_task_item_get_uid(o->task));
     else g_message("Sync: Created/Updated remote task: %s", errands_task_item_get_uid(o->task));
-    ICalComponent *ical = errands_task_item_get_ical(o->task);
+    g_autoptr(ICalComponent) ical = errands_task_item_get_ical(o->task);
     errands_data_set_synced(ical, o->pushed);
     errands_task_list_item_save(errands_task_item_get_list(o->task));
     if (!o->pushed) break;
@@ -416,7 +415,8 @@ static void obj_push_idle_cb(gpointer user_data) {
   case PUSH_OBJ_TASK_DELETE: {
     if (!o->pushed) g_warning("Sync: Deleting remote task failed: %s", o->uid);
     else g_message("Sync: Deleted remote task: %s", o->uid);
-    errands_data_set_synced(errands_task_item_get_ical(o->task), o->pushed);
+    g_autoptr(ICalComponent) ical = errands_task_item_get_ical(o->task);
+    errands_data_set_synced(ical, o->pushed);
     ErrandsTaskListItem *list = errands_task_item_get_list(o->task);
     errands_task_list_item_save(list);
     errands_task_list_item_update_count(list);
@@ -532,7 +532,7 @@ static inline bool ensure_client_connected(void) {
     client = caldav_client_new(config);
   }
   if (!client) {
-    errands_window_add_toast(_("Failed to connect to CalDAV remote."), 5);
+    errands_window_add_toast(_("Failed to connect to CalDAV remote."), 3);
     failed_attempts++;
     return NULL;
   }

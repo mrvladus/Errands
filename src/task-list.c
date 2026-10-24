@@ -196,8 +196,8 @@ static int sort_func(ErrandsTaskItem *a, ErrandsTaskItem *b, ErrandsTaskList *se
   bool asc_order = errands_settings_get_sort_order(state.settings) == SORT_ORDER_ASC;
   switch (errands_settings_get_sort_by(state.settings)) {
   case SORT_TYPE_CREATION_DATE: {
-    ICalComponent *td_a = errands_task_item_get_ical(a);
-    ICalComponent *td_b = errands_task_item_get_ical(b);
+    g_autoptr(ICalComponent) td_a = errands_task_item_get_ical(a);
+    g_autoptr(ICalComponent) td_b = errands_task_item_get_ical(b);
     g_autoptr(ICalTime) creation_date_a = errands_data_get_created(asc_order ? td_b : td_a);
     g_autoptr(ICalTime) creation_date_b = errands_data_get_created(asc_order ? td_a : td_b);
     return i_cal_time_compare(creation_date_b, creation_date_a);

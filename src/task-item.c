@@ -605,7 +605,7 @@ int errands_task_item_delete_completed(ErrandsTaskItem *self) {
   int deleted_n = 0;
   for_range(i, 0, g_list_model_get_n_items(model)) {
     g_autoptr(ErrandsTaskItem) item = g_list_model_get_item(model, i);
-    ICalComponent *ical = errands_task_item_get_ical(item);
+    g_autoptr(ICalComponent) ical = errands_task_item_get_ical(item);
     CONTINUE_IF(errands_data_is_completed(ical));
     errands_data_set_deleted(ical, true);
     deleted_n += errands_task_item_delete_cancelled(item);
@@ -622,7 +622,7 @@ int errands_task_item_delete_cancelled(ErrandsTaskItem *self) {
   int deleted_n = 0;
   for_range(i, 0, g_list_model_get_n_items(model)) {
     g_autoptr(ErrandsTaskItem) item = g_list_model_get_item(model, i);
-    ICalComponent *ical = errands_task_item_get_ical(item);
+    g_autoptr(ICalComponent) ical = errands_task_item_get_ical(item);
     CONTINUE_IF(errands_data_get_cancelled(ical));
     errands_data_set_deleted(ical, true);
     deleted_n += errands_task_item_delete_cancelled(item);
@@ -641,7 +641,7 @@ int errands_task_item_remove_deleted_tasks(ErrandsTaskItem *self) {
   for_range(i, 0, g_list_model_get_n_items(model)) {
     g_autoptr(ErrandsTaskItem) item = g_list_model_get_item(model, i);
     deleted_n += errands_task_item_remove_deleted_tasks(item);
-    ICalComponent *ical = errands_task_item_get_ical(item);
+    g_autoptr(ICalComponent) ical = errands_task_item_get_ical(item);
     bool deleted = errands_data_get_deleted(ical);
     bool synced = errands_data_get_synced(ical);
     if (deleted && (synced || !sync_enabled)) {
@@ -724,7 +724,7 @@ bool errands_task_item_move(ErrandsTaskItem *self, ErrandsTaskItem *parent, Erra
 ErrandsTaskListItem *errands_task_item_get_list(ErrandsTaskItem *self) { return self->list; }
 const char *errands_task_item_get_uid(ErrandsTaskItem *self) { return self->uid; }
 const char *errands_task_item_get_title(ErrandsTaskItem *self) { return self->title; }
-ICalComponent *errands_task_item_get_ical(ErrandsTaskItem *self) { return self->ical; }
+ICalComponent *errands_task_item_get_ical(ErrandsTaskItem *self) { return g_object_ref(self->ical); }
 gint errands_task_item_get_priority(ErrandsTaskItem *self) { return self->priority; }
 gboolean errands_task_item_get_completed(ErrandsTaskItem *self) { return self->completed; }
 gboolean errands_task_item_get_cancelled(ErrandsTaskItem *self) { return self->cancelled; }

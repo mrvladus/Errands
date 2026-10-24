@@ -237,7 +237,7 @@ int errands_task_list_item_delete_completed(ErrandsTaskListItem *self) {
   int deleted_n = 0;
   for_range(i, 0, g_list_model_get_n_items(model)) {
     g_autoptr(ErrandsTaskItem) item = g_list_model_get_item(model, i);
-    ICalComponent *ical = errands_task_item_get_ical(item);
+    g_autoptr(ICalComponent) ical = errands_task_item_get_ical(item);
     CONTINUE_IF(errands_data_is_completed(ical));
     errands_data_set_deleted(ical, true);
     errands_data_set_synced(ical, false);
@@ -259,7 +259,7 @@ int errands_task_list_item_delete_cancelled(ErrandsTaskListItem *self) {
   int deleted_n = 0;
   for_range(i, 0, g_list_model_get_n_items(model)) {
     g_autoptr(ErrandsTaskItem) item = g_list_model_get_item(model, i);
-    ICalComponent *ical = errands_task_item_get_ical(item);
+    g_autoptr(ICalComponent) ical = errands_task_item_get_ical(item);
     CONTINUE_IF(errands_data_get_cancelled(ical));
     errands_data_set_deleted(ical, true);
     errands_data_set_synced(ical, false);
@@ -283,11 +283,11 @@ void errands_task_list_item_remove_deleted_tasks(ErrandsTaskListItem *self) {
   for_range(i, 0, g_list_model_get_n_items(model)) {
     g_autoptr(ErrandsTaskItem) item = g_list_model_get_item(model, i);
     deleted_n += errands_task_item_remove_deleted_tasks(item);
-    ICalComponent *ical = errands_task_item_get_ical(item);
+    g_autoptr(ICalComponent) ical = errands_task_item_get_ical(item);
     bool deleted = errands_data_get_deleted(ical);
     bool synced = errands_data_get_synced(ical);
     if (deleted && (synced || !sync_enabled)) {
-      i_cal_component_remove_component(self->ical, errands_task_item_get_ical(item));
+      i_cal_component_remove_component(self->ical, ical);
       g_list_store_remove(self->tasks, i--);
       deleted_n++;
     }

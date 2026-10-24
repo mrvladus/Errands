@@ -29,6 +29,7 @@ bool errands_task_item_move(ErrandsTaskItem *self, ErrandsTaskItem *parent, Erra
 ErrandsTaskListItem *errands_task_item_get_list(ErrandsTaskItem *self);
 const char *errands_task_item_get_uid(ErrandsTaskItem *self);
 const char *errands_task_item_get_title(ErrandsTaskItem *self);
+// Get reference to `ICalComponent`. Free with `g_object_unref`.
 ICalComponent *errands_task_item_get_ical(ErrandsTaskItem *self);
 gboolean errands_task_item_get_completed(ErrandsTaskItem *self);
 gboolean errands_task_item_get_cancelled(ErrandsTaskItem *self);
