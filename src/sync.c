@@ -47,7 +47,6 @@ typedef struct {
 } _CBData;
 
 static void cb_data_free(_CBData *data) {
-  g_clear_object(&data->ical);
   g_clear_pointer(&data->name, g_free);
   g_clear_pointer(&data->color, g_free);
   g_clear_pointer(&data->uid, g_free);
@@ -298,6 +297,7 @@ static gboolean remote_event_idle_cb(gpointer user_data) {
     if (find_local_task(list, errands_data_get_uid(data->ical))) return G_SOURCE_REMOVE;
     icalcomponent_add_component(list->ical, data->ical);
     const char *parent = errands_data_get_parent(data->ical);
+    errands_data_set_synced(data->ical, true);
     ErrandsTaskItem *task_item = NULL;
     if (!parent) {
       task_item = errands_task_item_new(data->ical, list, NULL);
@@ -641,7 +641,7 @@ void errands_sync_push_task(ErrandsTaskItem *task) {
   o = push_obj_new(PUSH_OBJ_TASK_PUSH, uid);
   o->list = g_object_ref(errands_task_item_get_list(task));
   o->task = g_object_ref(task);
-  o->ical = errands_task_item_get_ical(task);
+  o->ical = icalcomponent_clone(errands_task_item_get_ical(task));
   g_ptr_array_add(objects_to_push, o);
 }
 

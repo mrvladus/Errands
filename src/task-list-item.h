@@ -13,6 +13,8 @@ G_DECLARE_FINAL_TYPE(ErrandsTaskListItem, errands_task_list_item, ERRANDS, TASK_
 struct _ErrandsTaskListItem {
   GObject parent_instance;
 
+  guint save_timeout_id;
+
   GListStore *tasks;
 
   // GObject Properties

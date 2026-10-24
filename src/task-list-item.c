@@ -106,6 +106,21 @@ static void errands_task_list_item_class_init(ErrandsTaskListItemClass *klass) {
 
 static void errands_task_list_item_init(ErrandsTaskListItem *self) {}
 
+// ---------- PRIVATE ---------- //
+
+static gboolean save_timeout_cb(gpointer user_data) {
+  ErrandsTaskListItem *self = ERRANDS_TASK_LIST_ITEM(user_data);
+  self->save_timeout_id = 0;
+  const char *path = tmp_str_printf("%s/%s.ics", calendars_dir, self->uid);
+  g_autofree gchar *ical_str = icalcomponent_as_ical_string(self->ical);
+  if (!ical_str || !g_file_set_contents(path, ical_str, -1, NULL)) {
+    g_message("Task List Item: Failed to save list '%s'", path);
+    return G_SOURCE_REMOVE;
+  }
+  g_message("Task List Item: Saved list '%s'", path);
+  return G_SOURCE_REMOVE;
+}
+
 // ---------- PUBLIC ---------- //
 
 ErrandsTaskListItem *errands_task_list_item_new(icalcomponent *ical) {
@@ -209,14 +224,8 @@ void errands_task_list_item_update_count(ErrandsTaskListItem *self) {
 void errands_task_list_item_save(ErrandsTaskListItem *self) {
   g_assert_nonnull(self);
   g_assert(ERRANDS_IS_TASK_LIST_ITEM(self));
-
-  const char *path = tmp_str_printf("%s/%s.ics", calendars_dir, self->uid);
-  g_autofree gchar *ical_str = icalcomponent_as_ical_string(self->ical);
-  if (ical_str && !g_file_set_contents(path, ical_str, -1, NULL)) {
-    g_message("Task List Item: Failed to save list '%s'", path);
-    return;
-  }
-  g_message("Task List Item: Saved list '%s'", path);
+  if (self->save_timeout_id) g_source_remove(self->save_timeout_id);
+  self->save_timeout_id = g_timeout_add_full(G_PRIORITY_DEFAULT, 250, save_timeout_cb, g_object_ref(self), g_object_unref);
 }
 
 void errands_task_list_item_delete(ErrandsTaskListItem *self) {

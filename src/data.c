@@ -61,10 +61,12 @@ static void migrate_from_46() {
 
   // Process tags
   JsonArray *tags_arr = json_object_get_array_member(root, "tags");
-  g_autoptr(GStrvBuilder) tags_builder = g_strv_builder_new();
-  for_range(i, 0, json_array_get_length(tags_arr)) g_strv_builder_add(tags_builder, json_array_get_string_element(tags_arr, i));
-  GStrv tags = g_strv_builder_end(tags_builder);
-  errands_settings_set_tags(state.settings, tags);
+  if (tags_arr) {
+    g_autoptr(GStrvBuilder) tags_builder = g_strv_builder_new();
+    for_range(i, 0, json_array_get_length(tags_arr)) g_strv_builder_add(tags_builder, json_array_get_string_element(tags_arr, i));
+    GStrv tags = g_strv_builder_end(tags_builder);
+    errands_settings_set_tags(state.settings, tags);
+  }
 
   // Process lists
   JsonArray *lists = json_object_get_array_member(root, "lists");
@@ -170,7 +172,7 @@ static icalproperty *get_x_prop(icalcomponent *ical, const char *xprop, const ch
 static const char *get_x_prop_value(icalcomponent *ical, const char *xprop, const char *default_val) {
   icalproperty *property = get_x_prop(ical, xprop, default_val);
   if (!property) return NULL;
-  return icalproperty_get_value_as_string(property);
+  return icalproperty_get_x(property);
 }
 
 static void set_x_prop_value(icalcomponent *ical, const char *xprop, const char *val) {
@@ -384,7 +386,6 @@ void errands_data_set_color(icalcomponent *ical, const char *value) {
       if (property) icalcomponent_remove_property(ical, property);
     } else if (property) icalproperty_set_color(property, color);
     else icalcomponent_add_property(ical, icalproperty_new_color(color));
-
     errands_data_set_changed(ical, icaltime_now());
   }
   errands_data_set_synced(ical, false);
@@ -471,7 +472,7 @@ GStrv errands_data_get_tags(icalcomponent *ical) {
   g_autoptr(GStrvBuilder) builder = g_strv_builder_new();
   for (icalproperty *p = icalcomponent_get_first_property(ical, ICAL_CATEGORIES_PROPERTY); p;
        p = icalcomponent_get_next_property(ical, ICAL_CATEGORIES_PROPERTY)) {
-    g_strv_builder_add(builder, icalproperty_get_value_as_string(p));
+    g_strv_builder_add(builder, icalproperty_get_categories(p));
   }
   GStrv res = g_strv_builder_end(builder);
   return (res && res[0]) ? res : NULL;
@@ -514,7 +515,7 @@ bool errands_data_remove_tag(icalcomponent *ical, const char *tag) {
   gboolean removed = FALSE;
   for (guint i = 0; i < properties->len; i++) {
     icalproperty *property = g_ptr_array_index(properties, i);
-    const char *value = icalproperty_get_value_as_string(property);
+    const char *value = icalproperty_get_categories(property);
     if (!removed && g_strcmp0(tag, value) == 0) {
       icalcomponent_remove_property(ical, property);
       removed = TRUE;

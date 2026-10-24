@@ -65,7 +65,7 @@ template $ErrandsSettingsDialog: Adw.PreferencesDialog {
       Adw.SpinRow sync_interval {
         title: _("Sync Interval");
         subtitle: _("Seconds between pulling events from the server");
-        visible: bind sync_enabled.active;
+        sensitive: bind sync_enabled.active;
         numeric: true;
 
         adjustment: Adjustment {
@@ -77,19 +77,19 @@ template $ErrandsSettingsDialog: Adw.PreferencesDialog {
 
       Adw.EntryRow sync_url {
         title: _("CalDAV Server URL");
-        visible: bind sync_enabled.active;
+        sensitive: bind sync_enabled.active;
         show-apply-button: true;
       }
 
       Adw.EntryRow sync_username {
         title: _("Username");
-        visible: bind sync_enabled.active;
+        sensitive: bind sync_enabled.active;
         show-apply-button: true;
       }
 
       Adw.PasswordEntryRow sync_password {
         title: _("Password");
-        visible: bind sync_enabled.active;
+        sensitive: bind sync_enabled.active;
         show-apply-button: true;
       }
     }
