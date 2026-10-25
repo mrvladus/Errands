@@ -138,6 +138,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
         g_object_set(sub_task, "completed", true, NULL);
       }
       errands_task_item_update(self);
+      if (self->parent) errands_task_item_update(self->parent);
     }
     // Uncomplete all parents
     else {
@@ -170,8 +171,13 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
         g_autoptr(ErrandsTaskItem) sub_task = g_list_model_get_item(G_LIST_MODEL(sub_tasks), i);
         g_object_set(sub_task, "cancelled", true, NULL);
       }
+      errands_task_item_update(self);
+      if (self->parent) errands_task_item_update(self->parent);
     } else {
-      if (self->parent && self->parent->cancelled) g_object_set(self->parent, "cancelled", false, NULL);
+      if (self->parent && self->parent->cancelled) {
+        g_object_set(self->parent, "cancelled", false, NULL);
+        errands_task_item_update(self->parent);
+      }
     }
     if (update_task_list_count > 0) update_task_list_count--;
     if (update_task_list_count > 0) break;

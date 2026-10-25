@@ -260,7 +260,7 @@ distrobox-setup:
 	fi
 	distrobox-rm errands-distrobox --force
 	distrobox-create --name errands-distrobox --image archlinux:latest --additional-packages \
-    "nano gcc make meson cmake gdb pkgconf git neovim zed curl glib2-devel libadwaita libportal-gtk4 libical libsecret gtksourceview5 blueprint-compiler clang flatpak-builder noto-fonts-emoji evolution-data-server"
+    "gcc make meson cmake gdb pkgconf git github-cli neovim zed curl glib2-devel libadwaita libportal-gtk4 libical libical-docs libsecret gtksourceview5 blueprint-compiler clang flatpak-builder noto-fonts-emoji evolution-data-server evolution-data-server-docs"
 	distrobox-enter errands-distrobox -- distrobox-export --app zeditor
 
 # Setup Nextcloud container for testing sync.
