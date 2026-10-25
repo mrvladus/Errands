@@ -11,8 +11,6 @@ static void on_response_cb(ErrandsRenameListDialog *self, gchar *response, gpoin
 static void on_entry_changed_cb(ErrandsRenameListDialog *self, AdwEntryRow *entry);
 static void on_entry_activated_cb(ErrandsRenameListDialog *self, AdwEntryRow *entry);
 
-static ErrandsRenameListDialog *self = NULL;
-
 // ---------- WIDGET TEMPLATE ---------- //
 
 struct _ErrandsRenameListDialog {
@@ -47,11 +45,11 @@ ErrandsRenameListDialog *errands_rename_list_dialog_new() {
 
 void errands_rename_list_dialog_show(ErrandsTaskListItem *item) {
   g_message("Rename List Dialog: Show");
-  if (!self) self = errands_rename_list_dialog_new();
-  self->item = item;
-  gtk_editable_set_text(GTK_EDITABLE(self->entry), item->title);
-  adw_dialog_present(ADW_DIALOG(self), GTK_WIDGET(state.main_window));
-  gtk_widget_grab_focus(self->entry);
+  if (!state.rename_list_dialog) state.rename_list_dialog = errands_rename_list_dialog_new();
+  state.rename_list_dialog->item = item;
+  gtk_editable_set_text(GTK_EDITABLE(state.rename_list_dialog->entry), item->title);
+  adw_dialog_present(ADW_DIALOG(state.rename_list_dialog), GTK_WIDGET(state.main_window));
+  gtk_widget_grab_focus(state.rename_list_dialog->entry);
 }
 
 // ---------- CALLBACKS ---------- //

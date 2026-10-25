@@ -71,7 +71,7 @@ struct icalrecurrencetype *errands_rrule_row_get_rrule(ErrandsRruleRow *self) {
   if (dur == 1) rrule->until = errands_date_chooser_get_dt(self->until_date_chooser);
   else if (dur == 2) rrule->count = adw_spin_row_get_value(self->count_row);
 
-  if (rrule->freq >= ICAL_WEEKLY_RECURRENCE) {
+  if (rrule->freq == ICAL_WEEKLY_RECURRENCE) {
     g_autoptr(GArray) days = get_week_days(self);
     if (days->len > 0 && icalrecur_resize_by(&rrule->by[ICAL_BY_DAY], days->len)) {
       for (guint i = 0; i < days->len; i++) {
@@ -167,7 +167,7 @@ static void set_week_days(ErrandsRruleRow *self, short *days, int n_days) {
 
 static void on_freq_changed_cb(ErrandsRruleRow *self, GParamSpec *param, AdwComboRow *row) {
   size_t idx = adw_combo_row_get_selected(row);
-  gtk_widget_set_visible(GTK_WIDGET(self->week_chooser), idx >= 4);
+  gtk_widget_set_visible(GTK_WIDGET(self->week_chooser), idx == 4);
   on_interval_changed_cb(self, NULL, self->interval_row);
   on_count_changed_cb(self, NULL, self->count_row);
 }
@@ -178,7 +178,7 @@ static void on_interval_changed_cb(ErrandsRruleRow *self, GParamSpec *param, Adw
                                    C_("Repeat every ...", "weeks"),   C_("Repeat every ...", "months"),
                                    C_("Repeat every ...", "years")};
   const guint selected_freq = adw_combo_row_get_selected(self->freq_row);
-  const char *subtitle = tmp_str_printf(_("Repeat every %d %s"), (int)adw_spin_row_get_value(row), intervals[selected_freq]);
+  const char *subtitle = tmp_str_printf(_("Repeat every %d %s"), (int)adw_spin_row_get_value(row), intervals[selected_freq - 1]);
   g_object_set(row, "subtitle", subtitle, NULL);
 }
 

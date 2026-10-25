@@ -3,14 +3,19 @@
 
 #pragma once
 
+#include "delete-list-dialog.h"
+#include "rename-list-dialog.h"
+#include "settings-dialog.h"
 #include "settings.h"
 #include "window.h"
 
-// Structure to hold the application state
 typedef struct {
   AdwApplication *app;
   ErrandsWindow *main_window;
   ErrandsSettings *settings;
+  ErrandsSettingsDialog *settings_dialog;
+  ErrandsRenameListDialog *rename_list_dialog;
+  ErrandsDeleteListDialog *delete_list_dialog;
 } State;
 
 // Global state object

@@ -8,8 +8,6 @@
 
 static void on_response_cb(ErrandsDeleteListDialog *dialog, gchar *response, gpointer data);
 
-static ErrandsDeleteListDialog *self = NULL;
-
 // ---------- WIDGET TEMPLATE ---------- //
 
 struct _ErrandsDeleteListDialog {
@@ -39,9 +37,9 @@ ErrandsDeleteListDialog *errands_delete_list_dialog_new() {
 // ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_delete_list_dialog_show(ErrandsTaskListItem *item) {
-  if (!self) self = errands_delete_list_dialog_new();
-  self->item = item;
-  adw_dialog_present(ADW_DIALOG(self), GTK_WIDGET(state.main_window));
+  if (!state.delete_list_dialog) state.delete_list_dialog = errands_delete_list_dialog_new();
+  state.delete_list_dialog->item = item;
+  adw_dialog_present(ADW_DIALOG(state.delete_list_dialog), GTK_WIDGET(state.main_window));
 }
 
 // ---------- CALLBACKS ---------- //

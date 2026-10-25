@@ -3,14 +3,9 @@
 
 #include "settings-dialog.h"
 #include "config.h"
-// #include "settings.h"
 #include "state.h"
 
-#include <libportal-gtk4/portal-gtk4.h>
-
 // static void on_startup_toggled_cb(ErrandsSettingsDialog *self);
-
-static ErrandsSettingsDialog *settings_dialog = NULL;
 
 // ---------- WIDGET TEMPLATE ---------- //
 
@@ -85,8 +80,8 @@ ErrandsSettingsDialog *errands_settings_dialog_new() {
 // ---------- PUBLIC FUNCTIONS ---------- //
 
 void errands_settings_dialog_show() {
-  if (!settings_dialog) settings_dialog = errands_settings_dialog_new();
-  adw_dialog_present(ADW_DIALOG(settings_dialog), GTK_WIDGET(state.main_window));
+  if (!state.settings_dialog) state.settings_dialog = errands_settings_dialog_new();
+  adw_dialog_present(ADW_DIALOG(state.settings_dialog), GTK_WIDGET(state.main_window));
 }
 
 // ---------- CALLBACKS ---------- //

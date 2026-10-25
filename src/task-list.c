@@ -6,6 +6,7 @@
 #include "data.h"
 #include "delete-list-dialog.h"
 #include "rename-list-dialog.h"
+#include "settings-dialog.h"
 #include "settings.h"
 #include "sidebar.h"
 #include "state.h"
@@ -49,7 +50,6 @@ G_DEFINE_TYPE(ErrandsTaskList, errands_task_list, ADW_TYPE_BIN)
 
 static void finalize(GObject *gobject) {
   gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_TASK_LIST);
-  TODO("Cleanup dialogs");
   G_OBJECT_CLASS(errands_task_list_parent_class)->finalize(gobject);
 }
 

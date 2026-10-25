@@ -29,6 +29,9 @@ static void on_tag_entry_activated_cb(ErrandsWindow *self, AdwEntryRow *entry);
 G_DEFINE_TYPE(ErrandsWindow, errands_window, ADW_TYPE_APPLICATION_WINDOW)
 
 static void finalize(GObject *gobject) {
+  g_clear_object(&state.settings_dialog);
+  g_clear_object(&state.rename_list_dialog);
+  g_clear_object(&state.delete_list_dialog);
   gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_WINDOW);
   G_OBJECT_CLASS(errands_window_parent_class)->finalize(gobject);
 }
