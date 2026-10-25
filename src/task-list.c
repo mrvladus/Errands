@@ -5,6 +5,7 @@
 #include "config.h"
 #include "data.h"
 #include "delete-list-dialog.h"
+#include "glib-object.h"
 #include "rename-list-dialog.h"
 #include "settings-dialog.h"
 #include "settings.h"
@@ -342,7 +343,6 @@ static void on_action_show_completed_cb(GSimpleAction *action, GVariant *param, 
   errands_settings_set_show_completed(state.settings, value);
   gtk_filter_changed(self->tree_filter, GTK_FILTER_CHANGE_DIFFERENT);
   errands_task_list_update(self);
-  TODO("call errands_task_item_update() on every task list item to show/hide expander");
 }
 
 static void on_action_show_cancelled_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
@@ -351,7 +351,6 @@ static void on_action_show_cancelled_cb(GSimpleAction *action, GVariant *param, 
   errands_settings_set_show_cancelled(state.settings, value);
   gtk_filter_changed(self->tree_filter, value ? GTK_FILTER_CHANGE_LESS_STRICT : GTK_FILTER_CHANGE_MORE_STRICT);
   errands_task_list_update(self);
-  TODO("call errands_task_item_update() on every task list item to show/hide expander");
 }
 
 static void on_action_sort_order_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {

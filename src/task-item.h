@@ -12,7 +12,7 @@ G_DECLARE_FINAL_TYPE(ErrandsTaskItem, errands_task_item, ERRANDS, TASK_ITEM, GOb
 
 // Takes reference of `ical`.
 ErrandsTaskItem *errands_task_item_new(icalcomponent *ical, ErrandsTaskListItem *list, ErrandsTaskItem *parent);
-ErrandsTaskListItem *errands_task_item_create_task(ErrandsTaskItem *parent, const char *text);
+void errands_task_item_create_task(ErrandsTaskItem *parent, const char *text);
 
 // Update "uncompleted-count" and "has-no-children" properties
 void errands_task_item_update(ErrandsTaskItem *self);

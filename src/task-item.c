@@ -102,13 +102,10 @@ static void get_property(GObject *object, guint prop_id, GValue *value, GParamSp
   case PROP_RRULE: g_value_set_pointer(value, self->rrule); break;
   case PROP_SEARCH_BLOB: g_value_set_string(value, self->search_blob); break;
   case PROP_SEARCH_MATCHED: g_value_set_boolean(value, self->search_matched); break;
-
   case PROP_UNCOMPLETED_COUNT: g_value_set_string(value, self->uncompleted_count); break;
   case PROP_HAS_NO_CHILDREN: g_value_set_boolean(value, self->has_no_children); break;
-
   case PROP_ICAL: g_value_set_pointer(value, self->ical); break;
   case PROP_CHILDREN_MODEL: g_value_set_object(value, self->children_model); break;
-
   case PROP_TASK_WIDGET: g_value_set_pointer(value, self->task_widget); break;
   default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
   }
@@ -124,10 +121,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     self->title = g_strdup(new_title);
     errands_data_set_text(self->ical, self->title);
     update_search_blob(self);
-    if (!self->lock) {
-      errands_task_list_item_save(self->list);
-      errands_sync_push_task(self);
-    }
+    if (!self->lock) errands_task_list_item_save(self->list);
   } break;
 
   case PROP_COMPLETED: {
@@ -421,15 +415,11 @@ static void errands_task_item_class_init(ErrandsTaskItemClass *klass) {
 
 static void errands_task_item_init(ErrandsTaskItem *self) {
   g_signal_connect_swapped(state.settings, "notify::tags", G_CALLBACK(on_global_tags_changed_cb), self);
+  g_signal_connect_swapped(state.settings, "notify::show-completed", G_CALLBACK(errands_task_item_update), self);
+  g_signal_connect_swapped(state.settings, "notify::show-cancelled", G_CALLBACK(errands_task_item_update), self);
 }
 
 // --- PRIVATE --- //
-
-void errands_task_item_save_and_sync(ErrandsTaskItem *self) {
-  if (self->lock || !self->list || !self->ical) return;
-  errands_task_list_item_save(self->list);
-  errands_sync_push_task(self);
-}
 
 static void update_search_blob(ErrandsTaskItem *self) {
   g_assert_nonnull(self);
@@ -533,17 +523,12 @@ void errands_task_item_update(ErrandsTaskItem *self) {
   bool show_completed = errands_settings_get_show_completed(state.settings);
   bool show_cancelled = errands_settings_get_show_cancelled(state.settings);
   GListModel *children_model = G_LIST_MODEL(self->children_model);
-  gint visible = 0;
-  gint uncompleted = 0;
+  gint visible = 0, uncompleted = 0;
   for_range(i, 0, g_list_model_get_n_items(children_model)) {
     g_autoptr(ErrandsTaskItem) item = g_list_model_get_item(children_model, i);
-    icalcomponent *ical = item->ical;
-    bool deleted = errands_data_get_deleted(ical);
-    bool completed = errands_data_is_completed(ical);
-    bool cancelled = errands_data_get_cancelled(ical);
-    if (deleted) continue;
-    if (!completed && !cancelled) uncompleted++;
-    if ((!show_completed && completed) || (!show_cancelled && cancelled)) continue;
+    if (errands_data_get_deleted(item->ical)) continue;
+    if (!item->completed && !item->cancelled) uncompleted++;
+    if ((!show_completed && item->completed) || (!show_cancelled && item->cancelled)) continue;
     visible++;
   }
   g_object_set(self, "uncompleted-count", uncompleted > 0 ? tmp_str_printf("%d", uncompleted) : "", "has-no-children",
@@ -639,7 +624,7 @@ int errands_task_item_remove_deleted_tasks(ErrandsTaskItem *self) {
   return deleted_n;
 }
 
-ErrandsTaskListItem *errands_task_item_create_task(ErrandsTaskItem *parent, const char *text) {
+void errands_task_item_create_task(ErrandsTaskItem *parent, const char *text) {
   icalcomponent *ical = icalcomponent_new(ICAL_VTODO_COMPONENT);
   errands_data_set_text(ical, text);
   g_autofree gchar *uid = g_uuid_string_random();
@@ -651,8 +636,7 @@ ErrandsTaskListItem *errands_task_item_create_task(ErrandsTaskItem *parent, cons
   g_list_store_append(parent->children_model, task);
   errands_task_list_item_save(parent->list);
   errands_task_item_update(parent);
-
-  return task->list;
+  errands_sync_push_task(task);
 }
 
 bool errands_task_item_export(ErrandsTaskItem *self, const char *path) {

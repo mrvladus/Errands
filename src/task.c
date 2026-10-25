@@ -355,7 +355,7 @@ static void on_export_action_cb(GSimpleAction *action, GVariant *param, ErrandsT
 }
 
 static void on_finish_cb(GObject *source_object, GAsyncResult *res, gpointer data) {
-  g_autoptr(ErrandsTaskItem) item = data; /* Owns the reference passed to the async operation. */
+  g_autoptr(ErrandsTaskItem) item = data;
   g_autoptr(GdkRGBA) rgba = gtk_color_dialog_choose_rgba_finish(GTK_COLOR_DIALOG(source_object), res, NULL);
   if (!rgba || !item) return;
   errands_task_item_set_color(item, gdk_rgba_to_str(rgba));
