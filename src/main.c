@@ -27,8 +27,7 @@ static void activate(GtkApplication *app) {
   state.main_window = errands_window_new(app);
   gtk_window_present(GTK_WINDOW(state.main_window));
   errands_sidebar_select_last_opened_page();
-  errands_sync();
-  g_timeout_add_seconds(10, G_SOURCE_FUNC(errands_sync), NULL);
+  g_timeout_add_seconds(errands_settings_get_sync_interval(state.settings), G_SOURCE_FUNC(errands_sync), NULL);
 
   // Request background
   // g_autoptr(XdpPortal) portal = xdp_portal_new();

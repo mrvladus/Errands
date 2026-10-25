@@ -25,7 +25,6 @@ static void obj_push_idle_cb(gpointer user_data);
 
 // ---------- GLOBAL ---------- //
 
-static gint failed_attempts = 0;
 static gboolean sync_in_progress = false;
 static CalDAVClient *client = NULL;
 static GPtrArray *objects_to_push = NULL;
@@ -511,6 +510,7 @@ static void sync_thread_cb(GTask *task, gpointer source_object, gpointer task_da
 
 static void sync_finished_cb(GObject *source_object, GAsyncResult *res, gpointer user_data) {
   sync_in_progress = FALSE;
+  errands_sidebar_toggle_sync_indicator(FALSE);
   g_message("Sync: Finished");
 }
 
@@ -532,12 +532,7 @@ static inline bool ensure_client_connected(void) {
     };
     client = caldav_client_new(config);
   }
-  if (!client) {
-    errands_window_add_toast(_("Failed to connect to CalDAV remote."), 3);
-    failed_attempts++;
-    return NULL;
-  }
-  failed_attempts = 0;
+  if (!client) return false;
   return client != NULL;
 }
 
@@ -552,20 +547,14 @@ void errands_sync_cleanup(void) {
 }
 
 gboolean errands_sync(void) {
-  if (!errands_settings_get_sync_enabled(state.settings)) {
-    g_message("Sync: Disable");
-    return G_SOURCE_REMOVE;
-  }
-  if (failed_attempts > 2) {
-    errands_window_add_toast(_("Failed 3 attempts to sync. Disabling for now."), 5);
-    return G_SOURCE_REMOVE;
-  }
+  if (!errands_settings_get_sync_enabled(state.settings)) return G_SOURCE_CONTINUE;
   g_message("Sync: Start");
   if (sync_in_progress) {
     g_message("Sync: Already in progress");
     return G_SOURCE_CONTINUE;
   }
   sync_in_progress = true;
+  errands_sidebar_toggle_sync_indicator(TRUE);
   run_in_thread(sync_thread_cb, NULL, sync_finished_cb, NULL);
   return G_SOURCE_CONTINUE;
 }

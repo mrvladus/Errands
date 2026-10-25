@@ -31,8 +31,6 @@ CC 		= gcc
 SRC_DIR           = src
 DATA_DIR          = data
 BUILD_DIR        ?= _build
-FLATPAK_BUILD_DIR = _flatpak-build
-FLATPAK_REPO_DIR  = _flatpak-repo
 
 # --- Configuration options --- #
 
@@ -61,28 +59,6 @@ dbusdir         = $(datarootdir)/dbus-1/services
 icondir         = $(datarootdir)/icons/hicolor
 scalableicondir = $(icondir)/scalable/apps
 symbolicicondir = $(icondir)/symbolic/apps
-
-# --- Compilation variables --- #
-
-PKG_CONFIG_LIBS = libadwaita-1 \
-				  gtksourceview-5 \
-				  libsecret-1 \
-				  libportal-gtk4 \
-				  libedataserver-1.2 \
-				  libecal-2.0
-
-LDFLAGS     ?=
-ALL_LDFLAGS += $(LDFLAGS) -lm `pkg-config --libs $(PKG_CONFIG_LIBS)`
-CFLAGS      ?=
-ALL_CFLAGS  += $(CFLAGS) \
-			-MMD -MP -std=c11 \
-			`pkg-config --cflags $(PKG_CONFIG_LIBS)` \
-			-DVERSION='"$(VERSION)"' \
-			-DVERSION_COMMIT='"$(shell git rev-parse --short HEAD)"' \
-			-DAPP_ID='"$(APP_ID)"' \
-			-DRESOURCE_PATH='"$(RESOURCE_PATH)"' \
-			-DLOCALE_DIR='"$(localedir)"' \
-			-DG_LOG_DOMAIN='"Errands"'
 
 # --- Targets --- #
 
@@ -122,6 +98,27 @@ $(DEPS_CHECKED): Makefile | $(BUILD_DIR)
 	fi
 	@echo "All dependencies found"
 	@touch $@
+
+# --- Compilation variables --- #
+
+PKG_CONFIG_LIBS = libadwaita-1 \
+				  gtksourceview-5 \
+				  libsecret-1 \
+				  libportal-gtk4 \
+				  libedataserver-1.2 \
+				  libecal-2.0
+LDFLAGS     ?=
+ALL_LDFLAGS += $(LDFLAGS) -lm `pkg-config --libs $(PKG_CONFIG_LIBS)`
+CFLAGS      ?=
+ALL_CFLAGS  += $(CFLAGS) \
+			-MMD -MP -std=c11 \
+			`pkg-config --cflags $(PKG_CONFIG_LIBS)` \
+			-DVERSION='"$(VERSION)"' \
+			-DVERSION_COMMIT='"$(shell git rev-parse --short HEAD)"' \
+			-DAPP_ID='"$(APP_ID)"' \
+			-DRESOURCE_PATH='"$(RESOURCE_PATH)"' \
+			-DLOCALE_DIR='"$(localedir)"' \
+			-DG_LOG_DOMAIN='"Errands"'
 
 # --- Resources targets --- #
 
@@ -238,6 +235,9 @@ run: all
 	$(RUN_CMD)
 
 # --- Flatpak targets --- #
+
+FLATPAK_BUILD_DIR = _flatpak-build
+FLATPAK_REPO_DIR  = _flatpak-repo
 
 $(FLATPAK_BUILD_DIR): $(OBJS)
 	flatpak-builder --ccache --force-clean --repo=$(FLATPAK_REPO_DIR) $@ tools/flatpak/$(APP_ID).json

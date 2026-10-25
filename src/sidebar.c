@@ -5,6 +5,7 @@
 #include "about-dialog.h"
 #include "config.h"
 #include "data.h"
+#include "gtk/gtkrevealer.h"
 #include "settings-dialog.h"
 #include "settings.h"
 #include "state.h"
@@ -56,6 +57,7 @@ static void errands_sidebar_class_init(ErrandsSidebarClass *klass) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsSidebar, all_counter);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsSidebar, today_counter);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsSidebar, task_lists_section);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsSidebar, sync_indicator);
 
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_sidebar_activated_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_entry_changed_cb);
@@ -125,6 +127,8 @@ static gint sort_func(gconstpointer a, gconstpointer b, gpointer data) {
 }
 
 // ---------- PUBLIC ---------- //
+
+void errands_sidebar_toggle_sync_indicator(gboolean on) { gtk_revealer_set_reveal_child(self->sync_indicator, on); }
 
 ErrandsTaskListItem *errands_sidebar_find_list(const char *uid) {
   if (!uid) return NULL;

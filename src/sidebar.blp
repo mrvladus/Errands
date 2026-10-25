@@ -85,6 +85,16 @@ template $ErrandsSidebar: Adw.Bin {
           }
         }
       }
+
+      [end]
+      Revealer sync_indicator {
+        transition-duration: 300;
+        transition-type: crossfade;
+
+        Adw.Spinner {
+          tooltip-text: _("Sync");
+        }
+      }
     }
 
     content: ScrolledWindow {

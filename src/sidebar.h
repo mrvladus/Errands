@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "glib.h"
 #include "task-list-item.h"
 
 #include <adwaita.h>
@@ -18,6 +19,7 @@ struct _ErrandsSidebar {
   GtkLabel *all_counter;
   GtkLabel *today_counter;
   GtkWidget *sidebar;
+  GtkRevealer *sync_indicator;
   AdwSidebarSection *task_lists_section;
 };
 
@@ -26,4 +28,5 @@ void errands_sidebar_update_filter_rows(void);
 void errands_sidebar_select_last_opened_page(void);
 void errands_sidebar_task_list_update_counter(const char *uid);
 void errands_sidebar_delete_list(const char *uid);
+void errands_sidebar_toggle_sync_indicator(gboolean on);
 ErrandsTaskListItem *errands_sidebar_find_list(const char *uid);
