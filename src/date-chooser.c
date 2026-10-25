@@ -61,7 +61,6 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
 }
 
 static void finalize(GObject *gobject) {
-  ErrandsDateChooser *self = ERRANDS_DATE_CHOOSER(gobject);
   gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_DATE_CHOOSER);
   G_OBJECT_CLASS(errands_date_chooser_parent_class)->finalize(gobject);
 }
@@ -119,7 +118,7 @@ static void update_title(ErrandsDateChooser *self) {
 ErrandsDateChooser *errands_date_chooser_new() { return g_object_new(ERRANDS_TYPE_DATE_CHOOSER, NULL); }
 
 void errands_date_chooser_reset(ErrandsDateChooser *self) {
-  self->dt = icaltime_null_date();
+  self->dt = icaltime_null_time();
   g_autoptr(GDateTime) today = g_date_time_new_now_local();
   gtk_calendar_set_date(self->calendar, today);
   gtk_spin_button_set_value(self->hours, 0);

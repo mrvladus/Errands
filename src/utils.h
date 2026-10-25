@@ -215,10 +215,17 @@ static inline void errands_add_shortcut(GtkWidget *widget, const char *trigger, 
   gtk_widget_add_controller(widget, ctrl);
 }
 
+// static inline bool g_strv_eq(GStrv a, GStrv b) {
+//   guint a_len = a ? g_strv_length(a) : 0;
+//   guint b_len = b ? g_strv_length(b) : 0;
+//   if (a_len != b_len) return false;
+//   return a && b ? g_strv_equal((const gchar *const *)a, (const gchar *const *)b) : false;
+// }
+
 static inline guint g_strv_hash(GStrv s) {
   guint hash = 0;
-  if (!s) return hash;
-  for_range(i, 0, g_strv_length(s)) hash += g_str_hash(s[i]);
+  if (s)
+    for (; *s; s++) hash = hash * 31u + g_str_hash(*s);
   return hash;
 }
 

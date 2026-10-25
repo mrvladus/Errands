@@ -297,18 +297,24 @@ static void on_show_properties_toggled_cb(ErrandsWindow *self) {
 
   // Date
   icaltimetype new_sdt = errands_date_chooser_get_dt(self->start_date_chooser);
-  errands_task_item_set_dtstart(self->item, &new_sdt);
+  icaltimetype old_sdt = errands_task_item_get_dtstart(self->item);
+  if (icaltime_compare(new_sdt, old_sdt) != 0) errands_task_item_set_dtstart(self->item, &new_sdt);
   icaltimetype new_ddt = errands_date_chooser_get_dt(self->due_date_chooser);
-  errands_task_item_set_dtend(self->item, &new_ddt);
+  icaltimetype old_ddt = errands_task_item_get_dtend(self->item);
+  if (icaltime_compare(new_ddt, old_ddt) != 0) errands_task_item_set_dtend(self->item, &new_ddt);
   if (errands_task_item_is_due(self->item)) errands_sidebar_update_filter_rows();
 
   // Set rrule
   struct icalrecurrencetype *new_rrule = NULL;
   if (adw_expander_row_get_expanded(ADW_EXPANDER_ROW(self->rrule_row))) new_rrule = errands_rrule_row_get_rrule(self->rrule_row);
-  errands_task_item_set_rrule(self->item, new_rrule);
-  if (icaltime_is_null_date(new_sdt) && new_rrule && new_rrule->freq != ICAL_NO_RECURRENCE) {
-    icaltimetype now = icaltime_now();
-    errands_task_item_set_dtstart(self->item, &now);
+  struct icalrecurrencetype *old_rrule = errands_task_item_get_rrule(self->item);
+  if (new_rrule && old_rrule && !icalrecurrence_compare(new_rrule, old_rrule)) {
+    HERE;
+    errands_task_item_set_rrule(self->item, new_rrule);
+    if (icaltime_is_null_date(new_sdt) && new_rrule->freq != ICAL_NO_RECURRENCE) {
+      icaltimetype now = icaltime_now();
+      errands_task_item_set_dtstart(self->item, &now);
+    }
   }
   if (new_rrule) icalrecurrencetype_unref(new_rrule);
 
@@ -317,7 +323,8 @@ static void on_show_properties_toggled_cb(ErrandsWindow *self) {
   gtk_text_buffer_get_start_iter(GTK_TEXT_BUFFER(self->notes_buffer), &start);
   gtk_text_buffer_get_end_iter(GTK_TEXT_BUFFER(self->notes_buffer), &end);
   g_autofree char *new_notes = gtk_text_buffer_get_text(GTK_TEXT_BUFFER(self->notes_buffer), &start, &end, FALSE);
-  errands_task_item_set_notes(self->item, new_notes);
+  const char *old_notes = errands_task_item_get_notes(self->item);
+  if (g_strcmp0(new_notes && *new_notes ? new_notes : NULL, old_notes) != 0) errands_task_item_set_notes(self->item, new_notes);
 
   // Tags
   g_autoptr(GPtrArray) tag_rows = get_children(TAGS_LIST_BOX);
@@ -329,7 +336,8 @@ static void on_show_properties_toggled_cb(ErrandsWindow *self) {
     if (active) g_strv_builder_add(builder, tag);
   }
   GStrv new_tags = g_strv_builder_end(builder);
-  errands_task_item_set_tags(self->item, new_tags);
+  const GStrv old_tags = errands_task_item_get_tags(self->item);
+  if (g_strv_hash(new_tags) != g_strv_hash(old_tags)) errands_task_item_set_tags(self->item, new_tags);
 }
 
 static void on_tag_entry_activated_cb(ErrandsWindow *self, AdwEntryRow *entry) {
