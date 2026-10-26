@@ -201,7 +201,6 @@ static inline bool merge_tasks(icalcomponent *old, icalcomponent *new) {
   icaltimetype new_changed = errands_data_get_changed(new);
   if (!icaltime_is_valid_time(new_changed) || icaltime_is_null_time(new_changed)) return false;
   if (icaltime_compare(new_changed, old_changed) <= 0) return false;
-  g_print("%s -> %s\n", icaltime_as_ical_string(old_changed), icaltime_as_ical_string(new_changed));
 
   // Snapshot new's properties so we can safely mutate old
   g_autoptr(GPtrArray) props = g_ptr_array_new();
@@ -323,16 +322,16 @@ static gboolean remote_event_idle_cb(gpointer user_data) {
 
   case TASK_MODIFIED: {
     if (pushed_objs_is_stored(data->uid)) break;
-    const char *uid = errands_data_get_uid(data->ical);
     ErrandsTaskListItem *list = find_local_task_list(caldav_calendar_get_uid(data->calendar));
     if (!list) break;
-    ErrandsTaskItem *task = find_task_item(G_LIST_MODEL(list->tasks), uid);
+    ErrandsTaskItem *task = find_task_item(G_LIST_MODEL(list->tasks), data->uid);
     if (!task) break;
     icalcomponent *old_ical = errands_task_item_get_ical(task);
     if (!merge_tasks(old_ical, data->ical)) break;
     errands_task_item_set_ical(task, old_ical);
     errands_data_set_synced(old_ical, true);
     errands_task_list_item_save(list);
+    g_message("Sync: Remote task modified: %s", data->uid);
   } break;
 
   case TASK_REMOVED: {
