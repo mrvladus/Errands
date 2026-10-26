@@ -4,7 +4,6 @@
 #include "data.h"
 #include "settings.h"
 #include "state.h"
-#include "sync.h"
 #include "task-list-item.h"
 #include "utils.h"
 
@@ -207,23 +206,12 @@ void errands_data_init() {
     g_autofree gchar *path = g_build_filename(calendars_dir, filename, NULL);
     g_autoptr(ErrandsTaskListItem) item = errands_task_list_item_load_from_ics(path);
     if (!item) continue;
-
-    // Delete file if calendar deleted
     if (errands_data_get_deleted(item->ical)) {
-      if ((errands_settings_get_sync_enabled(state.settings) && errands_data_get_synced(item->ical)) ||
-          !errands_settings_get_sync_enabled(state.settings)) {
-        g_message("User Data: Calendar was deleted. Removing: %s", path);
-        remove(path);
-      }
+      if (errands_settings_get_sync_enabled(state.settings)) errands_task_list_item_delete(item);
+      remove(path);
       continue;
     }
-
     g_list_store_append(task_lists_model, item);
-    errands_task_list_item_remove_deleted_tasks(item);
-    if (errands_settings_get_sync_enabled(state.settings) && !errands_data_get_synced(item->ical)) {
-      g_message("User Data: Calendar was created but not synced: %s", path);
-      errands_sync_create_list(item);
-    }
     g_message("User Data: Loaded calendar: %s", item->uid);
     n++;
   }
@@ -394,11 +382,13 @@ void errands_data_set_color(icalcomponent *ical, const char *value) {
 void errands_data_set_list_name(icalcomponent *ical, const char *value) {
   set_x_prop_value(ical, "X-WR-CALNAME", value);
   errands_data_set_synced(ical, false);
+  errands_data_set_changed(ical, icaltime_now());
 }
 
 void errands_data_set_list_description(icalcomponent *ical, const char *value) {
   set_x_prop_value(ical, "X-WR-CALDESC", value);
   errands_data_set_synced(ical, false);
+  errands_data_set_changed(ical, icaltime_now());
 }
 
 void errands_data_set_parent(icalcomponent *ical, const char *value) {
@@ -535,9 +525,9 @@ icaltimetype errands_data_get_changed(icalcomponent *ical) {
   if (property) return icalproperty_get_lastmodified(property);
   property = icalcomponent_get_first_property(ical, ICAL_DTSTAMP_PROPERTY);
   if (property) return icalproperty_get_dtstamp(property);
-  errands_data_set_changed(ical, icaltime_now());
-  icalproperty *last_modified = icalcomponent_get_first_property(ical, ICAL_LASTMODIFIED_PROPERTY);
-  return icalproperty_get_lastmodified(last_modified);
+  icaltimetype now = icaltime_now();
+  errands_data_set_changed(ical, now);
+  return now;
 }
 
 icaltimetype errands_data_get_completed(icalcomponent *ical) {
@@ -563,11 +553,11 @@ icaltimetype errands_data_get_end(icalcomponent *ical) { return icalcomponent_ge
 icaltimetype errands_data_get_start(icalcomponent *ical) { return icalcomponent_get_dtstart(ical); }
 
 void errands_data_set_changed(icalcomponent *ical, icaltimetype value) {
-  icalproperty *property = icalcomponent_get_first_property(ical, ICAL_LASTMODIFIED_PROPERTY);
-  if (icaltime_is_null_time(value)) {
-    if (property) icalcomponent_remove_property(ical, property);
-  } else if (property) icalproperty_set_lastmodified(property, value);
-  else icalcomponent_add_property(ical, icalproperty_new_lastmodified(value));
+  icalcomponent_set_dtstamp(ical, value);
+  icalproperty *last_modified = icalcomponent_get_first_property(ical, ICAL_LASTMODIFIED_PROPERTY);
+  if (last_modified) {
+    icalproperty_set_lastmodified(last_modified, value);
+  } else icalcomponent_add_property(ical, icalproperty_new_lastmodified(value));
 }
 
 void errands_data_set_completed(icalcomponent *ical, icaltimetype value) {

@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: Zlib
 
 #include "delete-list-dialog.h"
+#include "adwaita.h"
 #include "config.h"
+#include "settings.h"
 #include "sidebar.h"
 #include "state.h"
 
@@ -45,5 +47,8 @@ void errands_delete_list_dialog_show(ErrandsTaskListItem *item) {
 // ---------- CALLBACKS ---------- //
 
 static void on_response_cb(ErrandsDeleteListDialog *dialog, gchar *response, gpointer data) {
-  if (g_str_equal(response, "delete")) errands_sidebar_delete_list(dialog->item->uid);
+  if (!g_str_equal(response, "delete")) return;
+  errands_sidebar_delete_list(dialog->item->uid);
+  errands_settings_set_last_list_uid(state.settings, "");
+  errands_sidebar_select_last_opened_page();
 }

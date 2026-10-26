@@ -54,8 +54,7 @@ static void cb_data_free(_CBData *data) {
 
 typedef struct {
   enum PushObjOP {
-    PUSH_OBJ_LIST_CREATE,
-    PUSH_OBJ_LIST_UPDATE,
+    PUSH_OBJ_LIST_PUSH,
     PUSH_OBJ_LIST_DELETE,
     PUSH_OBJ_TASK_PUSH,
     PUSH_OBJ_TASK_DELETE,
@@ -99,44 +98,36 @@ static void obj_push(PushObj *o) {
   if (!ensure_client_connected()) return;
 
   switch (o->op) {
-  case PUSH_OBJ_LIST_CREATE: {
-    // List already exist - just update it
-    CalDAVCalendar *calendar = caldav_client_find_calendar(client, o->uid);
-    if (calendar) {
-      o->op = PUSH_OBJ_LIST_UPDATE;
-      obj_push(o);
-      return;
-    }
-    g_message("Sync: Creating list on remote: %s", o->uid);
-    CalDAVCalendar *cal = caldav_client_create_calendar(client, o->uid, o->name, o->color);
-    o->pushed = cal != NULL;
-  } break;
-
-  case PUSH_OBJ_LIST_UPDATE: {
+  case PUSH_OBJ_LIST_PUSH: {
     CalDAVCalendar *c = caldav_client_find_calendar(client, o->uid);
-    if (!c) return;
+    if (!c) {
+      g_message("Sync: Creating list on remote: %s", o->uid);
+      CalDAVCalendar *cal = caldav_client_create_calendar(client, o->uid, o->name, o->color);
+      o->pushed = cal != NULL;
+      break;
+    }
     g_message("Sync: Updating list on remote: %s", o->uid);
     o->pushed = caldav_calendar_set_properties(c, o->name, o->color);
   } break;
 
   case PUSH_OBJ_LIST_DELETE: {
     CalDAVCalendar *c = caldav_client_find_calendar(client, o->uid);
-    if (!c) return;
+    if (!c) break;
     g_message("Sync: Deleting list on remote: %s", o->uid);
     o->pushed = caldav_calendar_remove(c);
   } break;
 
   case PUSH_OBJ_TASK_PUSH: {
     CalDAVCalendar *c = caldav_client_find_calendar(client, o->list->uid);
-    if (!c) return;
-    g_message("Sync: Creating/Updating task '%s' in remote calendar '%s'", o->uid, o->list->uid);
+    if (!c) break;
+    g_message("Sync: Push task '%s' to remote calendar '%s'", o->uid, o->list->uid);
     g_autoptr(ICalComponent) wrapped = i_cal_object_construct(I_CAL_TYPE_COMPONENT, o->ical, NULL, FALSE, NULL);
     o->pushed = caldav_calendar_push_task(c, wrapped);
   } break;
 
   case PUSH_OBJ_TASK_DELETE: {
     CalDAVCalendar *c = caldav_client_find_calendar(client, o->list->uid);
-    if (!c) return;
+    if (!c) break;
     g_message("Sync: Deleting task '%s' from remote list '%s'", o->uid, o->list->uid);
     o->pushed = caldav_calendar_remove_task(c, o->uid);
   } break;
@@ -168,9 +159,7 @@ static inline ErrandsTaskListItem *find_local_task_list(const char *uid) {
 }
 
 static inline icalcomponent *find_local_task(ErrandsTaskListItem *list, const char *uid) {
-  g_assert_nonnull(list);
-  g_assert_nonnull(uid);
-  g_assert(ERRANDS_IS_TASK_LIST_ITEM(list));
+  if (!list || !uid) return NULL;
 
   g_autoptr(GPtrArray) tasks = vcalendar_to_array(list->ical);
   for_range(i, 0, tasks->len) {
@@ -195,46 +184,50 @@ static inline ErrandsTaskItem *find_task_item(GListModel *model, const char *uid
   return NULL;
 }
 
-static inline void collect_task_items(GListModel *model, GPtrArray *array) {
-  g_assert_nonnull(model);
-  g_assert_nonnull(array);
+static inline bool merge_tasks(icalcomponent *old, icalcomponent *new) {
+  if (!old || !new) return false;
 
-  for_range(i, 0, g_list_model_get_n_items(model)) {
-    g_autoptr(ErrandsTaskItem) task = g_list_model_get_item(model, i);
-    g_ptr_array_add(array, task);
-    collect_task_items(errands_task_item_get_children_model(task), array);
-  }
-}
+  icaltimetype old_changed = errands_data_get_changed(old);
+  icaltimetype new_changed = errands_data_get_changed(new);
+  if (!icaltime_is_valid_time(new_changed) || icaltime_is_null_time(new_changed)) return false;
+  if (icaltime_compare(new_changed, old_changed) <= 0) return false;
+  g_print("%s -> %s\n", icaltime_as_ical_string(old_changed), icaltime_as_ical_string(new_changed));
 
-static inline bool merge_tasks(icalcomponent *dest, icalcomponent *source) {
-  if (!source || !dest) return FALSE;
-
-  icaltimetype dest_changed = errands_data_get_changed(dest);
-  icaltimetype source_changed = errands_data_get_changed(source);
-  if (icaltime_compare(dest_changed, source_changed) <= 0) return false;
-
-  char *dest_str = icalcomponent_as_ical_string(dest);
-  char *source_str = icalcomponent_as_ical_string(source);
-  if (g_str_equal(dest_str, source_str)) return false;
-
+  // Snapshot new's properties so we can safely mutate old
   g_autoptr(GPtrArray) props = g_ptr_array_new();
-  for (icalproperty *prop = icalcomponent_get_first_property(source, ICAL_ANY_PROPERTY); prop;
-       prop = icalcomponent_get_next_property(source, ICAL_ANY_PROPERTY)) {
+  for (icalproperty *prop = icalcomponent_get_first_property(new, ICAL_ANY_PROPERTY); prop;
+       prop = icalcomponent_get_next_property(new, ICAL_ANY_PROPERTY)) {
     g_ptr_array_add(props, prop);
   }
+  // Group by kind: for each kind present in new, remove ALL old ones, then add all of new's.
+  // This avoids duplicates for multi-valued props.
+  GHashTable *by_kind = g_hash_table_new(g_direct_hash, g_direct_equal);
   for (guint i = 0; i < props->len; i++) {
     icalproperty *src = g_ptr_array_index(props, i);
     icalproperty_kind kind = icalproperty_isa(src);
-    icalproperty *dst = icalcomponent_get_first_property(dest, kind);
-    if (dst) {
-      const char *src_str = icalproperty_as_ical_string(src);
-      const char *dst_str = icalproperty_as_ical_string(dst);
-      if (g_strcmp0(src_str, dst_str) == 0) continue;
-      icalcomponent_remove_property(dest, dst);
-    }
-    icalcomponent_add_property(dest, icalproperty_clone(src));
+    // Never overwrite identity-bearing properties
+    if (kind == ICAL_UID_PROPERTY || kind == ICAL_RECURRENCEID_PROPERTY) continue;
+    g_hash_table_insert(by_kind, GINT_TO_POINTER(kind), src);
   }
 
+  GHashTableIter it;
+  gpointer key, value;
+  g_hash_table_iter_init(&it, by_kind);
+  while (g_hash_table_iter_next(&it, &key, &value)) {
+    icalproperty_kind kind = (icalproperty_kind)GPOINTER_TO_INT(key);
+    // Remove *all* existing properties of this kind
+    icalproperty *dst;
+    while ((dst = icalcomponent_get_first_property(old, kind))) icalcomponent_remove_property(old, dst);
+    // Add every property of this kind from new (handles repeats)
+    for (guint i = 0; i < props->len; i++) {
+      icalproperty *src = g_ptr_array_index(props, i);
+      if (icalproperty_isa(src) == kind) {
+        icalproperty *copy = icalproperty_clone(src);
+        if (copy) icalcomponent_add_property(old, copy);
+      }
+    }
+  }
+  g_hash_table_destroy(by_kind);
   return true;
 }
 
@@ -248,7 +241,7 @@ static gboolean remote_event_idle_cb(gpointer user_data) {
 
   case CAL_ADDED: {
     const char *uid = caldav_calendar_get_uid(data->calendar);
-    if (find_local_task_list(uid) != NULL) return G_SOURCE_REMOVE;
+    if (find_local_task_list(uid) != NULL) break;
     g_message("Sync: Remote list added: %s", uid);
     const char *name = caldav_calendar_get_name(data->calendar);
     const char *color = caldav_calendar_get_color(data->calendar);
@@ -264,11 +257,10 @@ static gboolean remote_event_idle_cb(gpointer user_data) {
     ErrandsTaskListItem *list = find_local_task_list(uid);
     if (!list) {
       g_warning("Sync: Couldn't find local list: %s", uid);
-      return G_SOURCE_REMOVE;
+      break;
     }
     // Local list was modified first
-    if (!errands_data_get_synced(list->ical)) return G_SOURCE_REMOVE;
-    // TODO: lock sync
+    if (!errands_data_get_synced(list->ical)) break;
     if (data->name && !g_str_equal(data->name, list->title)) {
       errands_task_list_item_set_title(list, data->name);
       errands_task_list_update(state.main_window->task_list);
@@ -285,7 +277,7 @@ static gboolean remote_event_idle_cb(gpointer user_data) {
     ErrandsTaskListItem *list = find_local_task_list(data->uid);
     if (!list) {
       g_warning("Sync: Couldn't find local list: %s", data->uid);
-      return G_SOURCE_REMOVE;
+      break;
     }
     errands_window_add_toast(tmp_str_printf(_("Removed remote task list: %s"), list->title), 5);
     errands_task_list_item_delete(list);
@@ -293,7 +285,7 @@ static gboolean remote_event_idle_cb(gpointer user_data) {
 
   case TASK_ADDED: {
     ErrandsTaskListItem *list = find_local_task_list(caldav_calendar_get_uid(data->calendar));
-    if (find_local_task(list, errands_data_get_uid(data->ical))) return G_SOURCE_REMOVE;
+    if (find_local_task(list, errands_data_get_uid(data->ical))) break;
     icalcomponent_add_component(list->ical, data->ical);
     const char *parent = errands_data_get_parent(data->ical);
     errands_data_set_synced(data->ical, true);
@@ -303,7 +295,7 @@ static gboolean remote_event_idle_cb(gpointer user_data) {
       g_list_store_append(list->tasks, task_item);
     } else {
       ErrandsTaskItem *parent_task_item = find_task_item(G_LIST_MODEL(list->tasks), parent);
-      if (!parent_task_item) return G_SOURCE_REMOVE;
+      if (!parent_task_item) break;
       GListModel *child_model = errands_task_item_get_children_model(parent_task_item);
       task_item = errands_task_item_new(data->ical, list, parent_task_item);
       g_list_store_append(G_LIST_STORE(child_model), task_item);
@@ -321,20 +313,19 @@ static gboolean remote_event_idle_cb(gpointer user_data) {
 
   case TASK_MODIFIED: {
     const char *list_uid = caldav_calendar_get_uid(data->calendar);
-    icalcomponent *task_ical = data->ical;
     ErrandsTaskListItem *list = find_local_task_list(list_uid);
     if (!list) {
       g_warning("Sync: Failed to find local list: %s", list_uid);
-      return G_SOURCE_REMOVE;
+      break;
     }
-    const char *uid = errands_data_get_uid(task_ical);
+    const char *uid = errands_data_get_uid(data->ical);
     ErrandsTaskItem *task = find_task_item(G_LIST_MODEL(list->tasks), uid);
     if (!task) {
       g_warning("Sync: Failed to find local task: %s", uid);
-      return G_SOURCE_REMOVE;
+      break;
     }
     icalcomponent *ical = errands_task_item_get_ical(task);
-    bool changed = merge_tasks(ical, task_ical);
+    bool changed = merge_tasks(ical, data->ical);
     if (!changed) break;
     g_message("Sync: Task modified: %s", uid);
     errands_task_item_set_ical(task, ical);
@@ -366,25 +357,9 @@ static void obj_push_idle_cb(gpointer user_data) {
   PushObj *o = user_data;
 
   switch (o->op) {
-  case PUSH_OBJ_LIST_CREATE: {
-    if (!o->pushed) {
-      g_warning("Sync: Creating remote list failed: %s", o->list->uid);
-      errands_window_add_toast(tmp_str_printf(_("Creating remote list failed. Limits may be reached.")), 5);
-    } else g_message("Sync: Created remote list: %s", o->list->uid);
-    errands_data_set_synced(o->list->ical, o->pushed);
-    errands_task_list_item_save(o->list);
-    if (!o->pushed) break;
-    g_autoptr(GPtrArray) tasks = g_ptr_array_new();
-    collect_task_items(G_LIST_MODEL(o->list->tasks), tasks);
-    for_range(i, 0, tasks->len) {
-      ErrandsTaskItem *task = g_ptr_array_index(tasks, i);
-      errands_sync_push_task(task);
-    }
-  } break;
-
-  case PUSH_OBJ_LIST_UPDATE: {
-    if (!o->pushed) g_warning("Sync: Updating remote list failed: %s", o->list->uid);
-    else g_message("Sync: Updated remote list: %s", o->list->uid);
+  case PUSH_OBJ_LIST_PUSH: {
+    if (!o->pushed) g_warning("Sync: Push remote list failed: %s", o->list->uid);
+    else g_message("Sync: Pushed remote list: %s", o->list->uid);
     errands_data_set_synced(o->list->ical, o->pushed);
     errands_task_list_item_save(o->list);
   } break;
@@ -397,18 +372,11 @@ static void obj_push_idle_cb(gpointer user_data) {
   } break;
 
   case PUSH_OBJ_TASK_PUSH: {
-    if (!o->pushed) g_warning("Sync: Creating/Updating remote task failed: %s", errands_task_item_get_uid(o->task));
-    else g_message("Sync: Created/Updated remote task: %s", errands_task_item_get_uid(o->task));
+    if (!o->pushed) g_warning("Sync: Push remote task failed: %s", o->uid);
+    else g_message("Sync: Pushed remote task: %s", o->uid);
     icalcomponent *ical = errands_task_item_get_ical(o->task);
     errands_data_set_synced(ical, o->pushed);
     errands_task_list_item_save(errands_task_item_get_list(o->task));
-    if (!o->pushed) break;
-    g_autoptr(GPtrArray) tasks = g_ptr_array_new();
-    collect_task_items(errands_task_item_get_children_model(o->task), tasks);
-    for_range(i, 0, tasks->len) {
-      ErrandsTaskItem *item = g_ptr_array_index(tasks, i);
-      errands_sync_push_task(item);
-    }
   } break;
 
   case PUSH_OBJ_TASK_DELETE: {
@@ -501,11 +469,8 @@ static void task_removed_cb(CalDAVCalendar *c, const char *uid) {
 
 static void sync_thread_cb(GTask *task, gpointer source_object, gpointer task_data, GCancellable *cancellable) {
   if (!ensure_client_connected()) return;
-  for_range(i, 0, objects_to_push->len) {
-    PushObj *o = g_ptr_array_index(objects_to_push, i);
-    obj_push(o);
-  }
   caldav_client_poll(client);
+  for_range(i, 0, objects_to_push->len) obj_push(g_ptr_array_index(objects_to_push, i));
 }
 
 static void sync_finished_cb(GObject *source_object, GAsyncResult *res, gpointer user_data) {
@@ -542,6 +507,7 @@ void errands_sync_init(void) { objects_to_push = g_ptr_array_new_with_free_func(
 
 void errands_sync_cleanup(void) {
   g_message("Sync: Cleanup");
+  g_ptr_array_set_size(objects_to_push, 0);
   g_clear_pointer(&objects_to_push, g_ptr_array_unref);
   g_clear_pointer(&client, caldav_client_free);
 }
@@ -559,58 +525,21 @@ gboolean errands_sync(void) {
   return G_SOURCE_CONTINUE;
 }
 
-void errands_sync_create_list(ErrandsTaskListItem *list) {
+void errands_sync_push_list(ErrandsTaskListItem *list) {
   g_assert_nonnull(list);
   g_assert(ERRANDS_IS_TASK_LIST_ITEM(list));
+  g_assert(list->uid);
 
   if (!errands_settings_get_sync_enabled(state.settings)) return;
 
-  PushObj *o = objects_to_push_has(list->uid, PUSH_OBJ_LIST_CREATE);
-  if (o) {
-    o->count++;
-    return;
-  }
+  gboolean deleted = errands_data_get_deleted(list->ical);
+  PushObj *o = objects_to_push_has(list->uid, deleted ? PUSH_OBJ_LIST_DELETE : PUSH_OBJ_LIST_PUSH);
+  if (o) return;
 
-  o = push_obj_new(PUSH_OBJ_LIST_CREATE, list->uid);
+  o = push_obj_new(deleted ? PUSH_OBJ_LIST_DELETE : PUSH_OBJ_LIST_PUSH, list->uid);
   o->list = g_object_ref(list);
   o->name = g_strdup(list->title);
   o->color = g_strdup(gdk_rgba_to_str(&list->color));
-  g_ptr_array_add(objects_to_push, o);
-}
-
-void errands_sync_update_list(ErrandsTaskListItem *list) {
-  g_assert_nonnull(list);
-  g_assert(ERRANDS_IS_TASK_LIST_ITEM(list));
-
-  if (!errands_settings_get_sync_enabled(state.settings)) return;
-
-  PushObj *o = objects_to_push_has(list->uid, PUSH_OBJ_LIST_UPDATE);
-  if (o) {
-    o->count++;
-    return;
-  }
-
-  o = push_obj_new(PUSH_OBJ_LIST_UPDATE, list->uid);
-  o->list = g_object_ref(list);
-  o->name = g_strdup(list->title);
-  o->color = g_strdup(gdk_rgba_to_str(&list->color));
-  g_ptr_array_add(objects_to_push, o);
-}
-
-void errands_sync_delete_list(ErrandsTaskListItem *list) {
-  g_assert_nonnull(list);
-  g_assert(ERRANDS_IS_TASK_LIST_ITEM(list));
-
-  if (!errands_settings_get_sync_enabled(state.settings)) return;
-
-  PushObj *o = objects_to_push_has(list->uid, PUSH_OBJ_LIST_DELETE);
-  if (o) {
-    o->count++;
-    return;
-  }
-
-  o = push_obj_new(PUSH_OBJ_LIST_DELETE, list->uid);
-  o->list = g_object_ref(list);
   g_ptr_array_add(objects_to_push, o);
 }
 
@@ -620,45 +549,19 @@ void errands_sync_push_task(ErrandsTaskItem *task) {
 
   if (!errands_settings_get_sync_enabled(state.settings)) return;
 
+  icalcomponent *ical = errands_task_item_get_ical(task);
+  gboolean deleted = errands_data_get_deleted(ical);
+
   const char *uid = errands_task_item_get_uid(task);
-  PushObj *o = objects_to_push_has(uid, PUSH_OBJ_TASK_PUSH);
+  PushObj *o = objects_to_push_has(uid, deleted ? PUSH_OBJ_TASK_DELETE : PUSH_OBJ_TASK_PUSH);
   if (o) {
     o->count++;
     return;
   }
 
-  o = push_obj_new(PUSH_OBJ_TASK_PUSH, uid);
+  o = push_obj_new(deleted ? PUSH_OBJ_TASK_DELETE : PUSH_OBJ_TASK_PUSH, uid);
   o->list = g_object_ref(errands_task_item_get_list(task));
   o->task = g_object_ref(task);
-  o->ical = icalcomponent_clone(errands_task_item_get_ical(task));
+  o->ical = icalcomponent_clone(ical);
   g_ptr_array_add(objects_to_push, o);
-}
-
-void errands_sync_delete_task(ErrandsTaskItem *task) {
-  g_assert_nonnull(task);
-  g_assert(ERRANDS_IS_TASK_ITEM(task));
-
-  if (!errands_settings_get_sync_enabled(state.settings)) return;
-
-  const char *uid = errands_task_item_get_uid(task);
-  PushObj *o = objects_to_push_has(uid, PUSH_OBJ_TASK_DELETE);
-  if (o) {
-    o->count++;
-    return;
-  }
-
-  o = push_obj_new(PUSH_OBJ_TASK_DELETE, uid);
-  o->list = g_object_ref(errands_task_item_get_list(task));
-  o->task = g_object_ref(task);
-  g_ptr_array_add(objects_to_push, o);
-}
-
-void errands_sync_move_task(ErrandsTaskItem *task, ErrandsTaskListItem *old_list) {
-  ErrandsTaskListItem *new_list = errands_task_item_get_list(task);
-  if (old_list == new_list) {
-    errands_sync_push_task(task);
-    return;
-  }
-  errands_sync_push_task(task);
-  errands_sync_delete_task(task);
 }

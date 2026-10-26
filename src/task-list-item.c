@@ -3,15 +3,15 @@
 
 #include "task-list-item.h"
 #include "data.h"
-#include "gio/gio.h"
-#include "glib-object.h"
-#include "glib.h"
 #include "settings.h"
 #include "state.h"
 #include "sync.h"
 #include "task-item.h"
 #include "utils.h"
 
+#include <gio/gio.h>
+#include <glib-object.h>
+#include <glib.h>
 #include <glib/gi18n.h>
 #include <libical/ical.h>
 
@@ -44,22 +44,14 @@ static void get_property(GObject *object, guint prop_id, GValue *value, GParamSp
 static void set_property(GObject *object, guint prop_id, const GValue *value, GParamSpec *pspec) {
   ErrandsTaskListItem *self = ERRANDS_TASK_LIST_ITEM(object);
   switch (prop_id) {
-  case PROP_UID: {
-    const gchar *uid = g_value_get_string(value);
-    if (g_strcmp0(self->uid, uid) == 0) break;
-    g_clear_pointer(&self->uid, g_free);
-    self->uid = g_strdup(uid);
-    errands_data_set_uid(self->ical, self->uid);
-    errands_task_list_item_save(self);
-  } break;
-
   case PROP_TITLE: {
     const gchar *title = g_value_get_string(value);
     if (g_strcmp0(self->title, title) == 0) break;
-    g_clear_pointer(&self->uid, g_free);
+    g_clear_pointer(&self->title, g_free);
     self->title = g_strdup(title);
     errands_data_set_list_name(self->ical, self->title);
     errands_task_list_item_save(self);
+    errands_sync_push_list(self);
   } break;
 
   case PROP_COLOR: {
@@ -68,6 +60,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     self->color = *color;
     errands_data_set_color(self->ical, gdk_rgba_to_str(&self->color));
     errands_task_list_item_save(self);
+    errands_sync_push_list(self);
   } break;
 
   default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
@@ -94,7 +87,7 @@ static void errands_task_list_item_class_init(ErrandsTaskListItemClass *klass) {
   object_class->set_property = set_property;
 
   obj_properties[PROP_UID] =
-      g_param_spec_pointer("uid", "Task List UID", "Unique identifier for the task list", G_PARAM_READWRITE);
+      g_param_spec_pointer("uid", "Task List UID", "Unique identifier for the task list", G_PARAM_READABLE);
   obj_properties[PROP_TITLE] = g_param_spec_string("title", "Task List Title", "Title of the task list", NULL, G_PARAM_READWRITE);
   obj_properties[PROP_COLOR] =
       g_param_spec_boxed("color", "Task List Color", "Color of the task list", GDK_TYPE_RGBA, G_PARAM_READWRITE);
@@ -143,6 +136,8 @@ ErrandsTaskListItem *errands_task_list_item_new(icalcomponent *ical) {
     g_list_store_append(self->tasks, task);
   }
   errands_task_list_item_update_count(self);
+
+  if (!errands_data_get_synced(self->ical)) errands_sync_push_list(self);
 
   return self;
 }
@@ -234,7 +229,7 @@ void errands_task_list_item_delete(ErrandsTaskListItem *self) {
 
   errands_data_set_deleted(self->ical, true);
   errands_task_list_item_save(self);
-  errands_sync_delete_list(self);
+  errands_sync_push_list(self);
   g_list_store_remove_data(task_lists_model, self);
 }
 
@@ -330,7 +325,6 @@ struct ErrandsTaskItem *errands_task_list_item_create_task(ErrandsTaskListItem *
   ErrandsTaskItem *task = errands_task_item_new(ical, self, NULL);
   g_list_store_append(self->tasks, task);
   errands_task_list_item_save(self);
-  errands_sync_push_task(task);
 
   return (struct ErrandsTaskItem *)task;
 }

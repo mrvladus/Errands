@@ -58,7 +58,6 @@ static void on_response_cb(ErrandsRenameListDialog *self, gchar *response, gpoin
   if (!g_str_equal(response, "rename")) return;
   errands_task_list_item_set_title(self->item, gtk_editable_get_text(GTK_EDITABLE(self->entry)));
   errands_task_list_update(state.main_window->task_list);
-  errands_sync_update_list(self->item);
 }
 
 static void on_entry_changed_cb(ErrandsRenameListDialog *self, AdwEntryRow *entry) {

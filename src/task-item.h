@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "glib.h"
 #include "task-list-item.h"
 
 #include <libical/ical.h>
@@ -54,6 +55,7 @@ GListModel *errands_task_item_get_children_model(ErrandsTaskItem *self);
 gboolean errands_task_item_get_search_matched(ErrandsTaskItem *self);
 int errands_task_item_get_indent_level(ErrandsTaskItem *self);
 GListStore *errands_task_item_get_parent_model(ErrandsTaskItem *self);
+gboolean errands_task_item_get_synced(ErrandsTaskItem *self);
 
 // --- SETTERS --- //
 

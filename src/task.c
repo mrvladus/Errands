@@ -329,7 +329,6 @@ static void on_cancel_action_cb(GSimpleAction *action, GVariant *param, ErrandsT
 
 static void on_delete_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
   const char *list_uid = errands_task_item_get_list(self->item)->uid;
-  errands_sync_delete_task(self->item);
   errands_task_item_delete(self->item);
   errands_sidebar_update_filter_rows();
   errands_sidebar_task_list_update_counter(list_uid);

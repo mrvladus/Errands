@@ -191,14 +191,8 @@ void errands_sidebar_task_list_update_counter(const char *uid) {
 
 void errands_sidebar_delete_list(const char *uid) {
   g_message("Sidebar: Deleting list %s", uid);
-  GListModel *model = G_LIST_MODEL(task_lists_model);
-  for_range(i, 0, g_list_model_get_n_items(model)) {
-    g_autoptr(ErrandsTaskListItem) item = g_list_model_get_item(model, i);
-    if (item->uid && g_str_equal(uid, item->uid)) {
-      errands_task_list_item_delete(item);
-      break;
-    }
-  }
+  ErrandsTaskListItem *list = errands_sidebar_find_list(uid);
+  errands_task_list_item_delete(list);
   errands_sidebar_update_filter_rows();
 }
 
@@ -218,7 +212,6 @@ static void on_import_action_finish_cb(GObject *obj, GAsyncResult *res) {
   if (!item) return;
   g_list_store_insert_sorted(task_lists_model, item, sort_func, NULL);
   errands_task_list_item_save(item);
-  errands_sync_create_list(item);
   errands_sidebar_update_filter_rows();
   errands_settings_set_last_list_uid(state.settings, item->uid);
   errands_sidebar_select_last_opened_page();
@@ -265,7 +258,6 @@ static void on_entry_activated_cb(ErrandsSidebar *self, GtkEntry *entry) {
   g_message("New List Dialog: Create new list: '%s'", item->uid);
   g_list_store_insert_sorted(task_lists_model, item, sort_func, NULL);
   errands_task_list_item_save(item);
-  errands_sync_create_list(item);
   errands_sidebar_update_filter_rows();
   errands_settings_set_last_list_uid(state.settings, item->uid);
   errands_sidebar_select_last_opened_page();

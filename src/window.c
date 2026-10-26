@@ -5,6 +5,7 @@
 #include "config.h"
 #include "settings.h"
 #include "state.h"
+#include "sync.h"
 #include "task-item.h"
 #include "task-list.h"
 #include "utils.h"
@@ -338,6 +339,8 @@ static void on_show_properties_toggled_cb(ErrandsWindow *self) {
   GStrv new_tags = g_strv_builder_end(builder);
   const GStrv old_tags = errands_task_item_get_tags(self->item);
   if (g_strv_hash(new_tags) != g_strv_hash(old_tags)) errands_task_item_set_tags(self->item, new_tags);
+
+  if (!errands_task_item_get_synced(self->item)) errands_sync_push_task(self->item);
 }
 
 static void on_tag_entry_activated_cb(ErrandsWindow *self, AdwEntryRow *entry) {
