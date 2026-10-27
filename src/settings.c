@@ -162,7 +162,6 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     const char *sync_password = g_value_get_string(value);
     secret_password_store_sync(&SECRET_SCHEMA, SECRET_COLLECTION_DEFAULT, "Errands CalDAV credentials",
                                sync_password ? sync_password : "", NULL, NULL, "account", "CalDAV", NULL);
-    g_message("PASS: %s", sync_password);
   } break;
   case PROP_TAGS: {
     g_clear_pointer(&self->tags, g_strfreev);

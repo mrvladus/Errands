@@ -38,7 +38,7 @@ DEVEL ?= FALSE
 ifeq ($(DEVEL),TRUE)
 	APP_ID = io.github.mrvladus.List.Devel
 	RESOURCE_PATH = /io/github/mrvladus/Errands/Devel
-	ALL_CFLAGS  += -Wall -g -fno-omit-frame-pointer
+	ALL_CFLAGS  += -Wall -g -fno-omit-frame-pointer -DCALDAV_ENABLE_LOGS
 	ALL_LDFLAGS +=
 else
 	APP_ID = io.github.mrvladus.List
@@ -267,7 +267,7 @@ distrobox-setup:
 .PHONY: nextcloud-setup
 nextcloud-setup:
 	@if ! command -v podman >/dev/null 2>&1; then \
-		echo "Podman is required to run Nextcloud container"; \
+		echo "Podman is required"; \
 		exit 1; \
 	fi
 	podman rm nextcloud-errands --force
@@ -284,6 +284,24 @@ nextcloud-setup:
 	  docker.io/library/nextcloud:latest
 	@echo "Nextcloud container is running on http://localhost:8080"
 	@echo "Username: 'errands', Password: 'errands'"
+
+.PHONY: radicale-setup
+radicale-setup:
+	@if ! command -v podman >/dev/null 2>&1; then \
+		echo "Podman is required"; \
+		exit 1; \
+	fi
+	podman rm radicale-errands --force
+	podman volume rm radicale-errands --force
+	podman volume create radicale-errands
+	podman run --detach \
+     --volume radicale-errands:/data:z \
+     --restart on-failure \
+     --name radicale-errands \
+     --publish 5232:5232 \
+     ghcr.io/kozea/radicale:stable --auth-type none --server-hosts 0.0.0.0:5232
+	@echo "Radicale container is running on http://0.0.0.0:5232"
+	@echo "Create collection by entering any username/password on login"
 
 # Count source lines of code.
 .PHONY: sloc

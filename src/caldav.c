@@ -612,6 +612,11 @@ CalDAVClient *caldav_client_new(CalDAVClientConfig config) {
   c->principal_url = caldav__discover_principal_url(c);
   c->home_set_url = caldav__discover_home_set(c);
 
+  // FALLBACK FOR SIMPLE LOCALHOST/RADICALE SETUPS:
+  if (!c->caldav_url) c->caldav_url = g_strdup(config.url);
+  if (!c->principal_url) c->principal_url = g_strdup(config.url);
+  if (!c->home_set_url) c->home_set_url = g_strdup(config.url);
+
   if (!c->caldav_url || !c->principal_url || !c->home_set_url) {
     caldav_client_free(c);
     return NULL;
