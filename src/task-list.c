@@ -520,7 +520,6 @@ void errands_task_list_show_today_tasks(ErrandsTaskList *self) {
 }
 
 void errands_task_list_show_all_tasks(ErrandsTaskList *self) {
-  g_message("Task List: Show all tasks");
   self->item = NULL;
   self->page = ERRANDS_TASK_LIST_PAGE_ALL;
   gtk_widget_set_visible(self->entry_box, false);
