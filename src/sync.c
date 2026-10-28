@@ -145,6 +145,8 @@ static void obj_push(PushObj *o) {
       obj_push(cal);
       break;
     }
+    c = caldav_client_find_calendar(client, o->list->uid);
+    if (!c) break;
     g_autoptr(ICalComponent) wrapped = i_cal_object_construct(I_CAL_TYPE_COMPONENT, o->ical, NULL, FALSE, NULL);
     o->pushed = caldav_calendar_push_task(c, wrapped);
     if (o->pushed) pushed_objs_store(o->uid);
