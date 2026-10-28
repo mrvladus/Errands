@@ -71,7 +71,7 @@ typedef struct {
 } CalDAVClientConfig;
 
 CalDAVClient *caldav_client_new(CalDAVClientConfig config);
-void caldav_client_poll(CalDAVClient *c);
+gboolean caldav_client_poll(CalDAVClient *c);
 CalDAVCalendar *caldav_client_create_calendar(CalDAVClient *c, const char *uid, const gchar *name, const gchar *color);
 CalDAVCalendar *caldav_client_find_calendar(CalDAVClient *c, const gchar *uid);
 void caldav_client_free(CalDAVClient *c);

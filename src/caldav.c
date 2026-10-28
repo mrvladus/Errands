@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: Zlib
 
 #include "caldav.h"
-#include "glib.h"
-#include "libecal/libecal.h"
 
 #define CALDAV_MISS_THRESHOLD 3
 
@@ -48,25 +46,6 @@ struct _CalDAVClient {
 
 // --- UTILS --- //
 
-#ifdef CALDAV_ENABLE_LOGS
-static inline void caldav__log(const char *level, const char *fmt, ...) {
-  va_list ap;
-  va_start(ap, fmt);
-  fputs(level, stderr);
-  fputs(": ", stderr);
-  vfprintf(stderr, fmt, ap);
-  fputc('\n', stderr);
-  va_end(ap);
-}
-#else
-#define caldav__log(level, fmt, ...)
-#endif // CALDAV_ENABLE_LOGS
-
-#define caldav__info(fmt, ...)    caldav__log("\033[34mINFO\033[0m", fmt, ##__VA_ARGS__)
-#define caldav__warning(fmt, ...) caldav__log("\033[33mWARNING\033[0m", fmt, ##__VA_ARGS__)
-#define caldav__error(fmt, ...)   caldav__log("\033[33mERROR\033[0m", fmt, ##__VA_ARGS__)
-#define caldav__debug(fmt, ...)   caldav__log("\033[32mDEBUG\033[0m", fmt, ##__VA_ARGS__)
-
 static inline gchar *caldav__compute_source_uid(EWebDAVDiscoveredSource *ds) {
   return g_strdup_printf("caldav-task-list-%s", g_compute_checksum_for_string(G_CHECKSUM_SHA256, ds->href, -1));
 }
@@ -108,7 +87,7 @@ static gchar *caldav__make_calendar_href(const gchar *calendar_home, const char 
   g_autofree gchar *base = g_str_has_suffix(calendar_home, "/") ? g_strdup(calendar_home) : g_strconcat(calendar_home, "/", NULL);
   g_autoptr(GError) error = NULL;
   gchar *href = g_uri_resolve_relative(base, segment, G_URI_FLAGS_PARSE_RELAXED, &error);
-  if (error) caldav__warning("Failed to construct calendar href from '%s': %s", calendar_home, error->message);
+  if (error) g_warning("CalDAV: Failed to construct calendar href from '%s': %s", calendar_home, error->message);
 
   return href;
 }
@@ -138,7 +117,7 @@ static inline CalDAVCalendar *caldav__connect_discovered_source(CalDAVClient *c,
   g_autofree gchar *uid = caldav__compute_source_uid(ds);
   g_autoptr(ESource) source = e_source_new_with_uid(uid, NULL, &error);
   if (!source) {
-    caldav__error("Failed to create calendar source '%s': %s", uid, error->message);
+    g_warning("CalDAV: Failed to create calendar source '%s': %s", uid, error->message);
     return NULL;
   }
   e_source_set_display_name(source, ds->display_name ? ds->display_name : "CalDAV Task List");
@@ -149,7 +128,7 @@ static inline CalDAVCalendar *caldav__connect_discovered_source(CalDAVClient *c,
   e_source_backend_set_backend_name(E_SOURCE_BACKEND(task_list), "caldav");
   g_autoptr(GUri) uri = g_uri_parse(ds->href, G_URI_FLAGS_PARSE_RELAXED, &error);
   if (!uri) {
-    caldav__error("Failed to parse URI '%s': %s", ds->href, error->message);
+    g_warning("CalDAV: Failed to parse URI '%s': %s", ds->href, error->message);
     return NULL;
   }
 
@@ -161,12 +140,12 @@ static inline CalDAVCalendar *caldav__connect_discovered_source(CalDAVClient *c,
   e_source_authentication_set_method(auth, "Basic");
   e_source_authentication_set_user(auth, c->username);
   if (!e_source_store_password_sync(source, c->password, FALSE, NULL, &error)) {
-    caldav__error("Failed to store password: %s", error->message);
+    g_warning("CalDAV: Failed to store password: %s", error->message);
     return NULL;
   }
   if (!e_source_registry_commit_source_sync(c->registry, source, NULL, &error)) {
     if (!g_error_matches(error, G_IO_ERROR, G_IO_ERROR_EXISTS)) {
-      caldav__error("Failed to commit source: %s", error->message);
+      g_warning("CalDAV: Failed to commit source: %s", error->message);
       return NULL;
     }
     g_clear_error(&error);
@@ -174,25 +153,25 @@ static inline CalDAVCalendar *caldav__connect_discovered_source(CalDAVClient *c,
 
   ESource *registered_source = e_source_registry_ref_source(c->registry, uid);
   if (!registered_source) {
-    caldav__error("Failed to ref source: source '%s' not found", uid);
+    g_warning("CalDAV: Failed to ref source: source '%s' not found", uid);
     return NULL;
   }
 
   EClient *e_client = e_cal_client_connect_sync(registered_source, E_CAL_CLIENT_SOURCE_TYPE_TASKS, 1, NULL, &error);
   if (!e_client) {
-    caldav__error("Failed to connect calendar '%s': %s", uid, error->message);
+    g_warning("CalDAV: Failed to connect calendar '%s': %s", uid, error->message);
     g_object_unref(registered_source);
     return NULL;
   }
 
   if (!e_client_refresh_sync(e_client, NULL, &error)) {
-    caldav__warning("Refresh failed for '%s': %s", ds->href, error->message);
+    g_warning("CalDAV: Refresh failed for '%s': %s", ds->href, error->message);
     g_clear_error(&error);
   }
 
   ECalClientView *view = NULL;
   if (!e_cal_client_get_view_sync(E_CAL_CLIENT(e_client), "#t", &view, NULL, &error)) {
-    caldav__error("Failed to get client view: %s", error->message);
+    g_warning("CalDAV: Failed to get client view: %s", error->message);
     g_object_unref(e_client);
     g_object_unref(registered_source);
     return NULL;
@@ -211,7 +190,7 @@ static inline CalDAVCalendar *caldav__connect_discovered_source(CalDAVClient *c,
   g_signal_connect(view, "objects-removed", G_CALLBACK(on_task_removed_cb), calendar);
   e_cal_client_view_start(view, &error);
   if (error) {
-    caldav__error("Failed to start client view: %s", error->message);
+    g_warning("CalDAV: Failed to start client view: %s", error->message);
     caldav_calendar_free(calendar);
     return NULL;
   }
@@ -220,7 +199,7 @@ static inline CalDAVCalendar *caldav__connect_discovered_source(CalDAVClient *c,
 }
 
 static inline void caldav__calendar_poll(CalDAVCalendar *calendar) {
-  caldav__info("Poll Calendar: %s", calendar->href);
+  g_message("CalDAV: Poll Calendar: %s", calendar->href);
 
   g_autoptr(GError) error = NULL;
   g_autoptr(EWebDAVSession) session = e_webdav_session_new(calendar->registered_source);
@@ -229,7 +208,7 @@ static inline void caldav__calendar_poll(CalDAVCalendar *calendar) {
   gboolean success = e_webdav_session_list_sync(session, NULL, E_WEBDAV_DEPTH_THIS,
                                                 E_WEBDAV_LIST_DISPLAY_NAME | E_WEBDAV_LIST_COLOR, &resources, NULL, &error);
   if (!success) {
-    caldav__warning("Failed to query calendar properties: %s", error->message);
+    g_warning("CalDAV: Failed to query calendar properties: %s", error->message);
     return;
   }
 
@@ -249,7 +228,7 @@ static inline void caldav__calendar_poll(CalDAVCalendar *calendar) {
     }
     if (changed) {
       if (!e_source_registry_commit_source_sync(calendar->client->registry, calendar->registered_source, NULL, &error))
-        caldav__warning("Failed to commit source: %s", error->message);
+        g_warning("CalDAV: Failed to commit source: %s", error->message);
       else {
         if (calendar->client->cal_modified_cb)
           calendar->client->cal_modified_cb(calendar, resource->display_name, resource->color);
@@ -258,7 +237,7 @@ static inline void caldav__calendar_poll(CalDAVCalendar *calendar) {
   }
 
   if (!e_client_refresh_sync(E_CLIENT(calendar->e_cal_client), NULL, &error))
-    caldav__warning("CalDAV refresh failed: %s", error->message);
+    g_warning("CalDAV: CalDAV refresh failed: %s", error->message);
 
   g_slist_free_full(resources, (GDestroyNotify)e_webdav_resource_free);
 }
@@ -307,7 +286,7 @@ gboolean caldav_calendar_set_properties(const CalDAVCalendar *calendar, const gc
   e_soup_session_set_credentials(E_SOUP_SESSION(session), calendar->client->credentials);
   gboolean success = e_webdav_session_update_properties_sync(session, NULL, changes, NULL, &error);
   if (!success || error) {
-    caldav__warning("%s", error->message);
+    g_warning("CalDAV: %s", error->message);
     return FALSE;
   }
 
@@ -318,7 +297,7 @@ gboolean caldav_calendar_set_properties(const CalDAVCalendar *calendar, const gc
   if (color) e_source_selectable_set_color(E_SOURCE_SELECTABLE(task_list), color);
   e_source_registry_commit_source_sync(calendar->client->registry, calendar->registered_source, NULL, &error);
   if (error) {
-    caldav__warning("%s", error->message);
+    g_warning("CalDAV: %s", error->message);
     return FALSE;
   }
 
@@ -360,24 +339,24 @@ gboolean caldav_calendar_push_task(CalDAVCalendar *calendar, ICalComponent *task
   g_autoptr(GError) error = NULL;
   if (!e_cal_client_modify_object_sync(calendar->e_cal_client, task, E_CAL_OBJ_MOD_THIS, E_CAL_OPERATION_FLAG_NONE, NULL,
                                        &error)) {
-    caldav__warning("Failed to update task '%s': %s", uid, error->message);
-    caldav__info("Trying to create task: '%s'", uid);
+    g_warning("CalDAV: Failed to update task '%s': %s", uid, error->message);
+    g_message("CalDAV: Trying to create task: '%s'", uid);
     g_clear_error(&error);
     g_autofree gchar *out_uid = NULL;
     if (!e_cal_client_create_object_sync(calendar->e_cal_client, task, E_CAL_OPERATION_FLAG_CONFLICT_KEEP_LOCAL, &out_uid, NULL,
                                          &error)) {
-      caldav__warning("Failed to create task: %s", error->message);
+      g_warning("CalDAV: Failed to create task: %s", error->message);
       return FALSE;
     } else {
       if (uid && out_uid && g_strcmp0(uid, out_uid) != 0) {
-        caldav__info("UID changed by server: '%s' -> '%s'", uid, out_uid);
+        g_message("CalDAV: UID changed by server: '%s' -> '%s'", uid, out_uid);
         i_cal_component_set_uid(task, out_uid);
       }
       return TRUE;
     }
     return FALSE;
   }
-  caldav__info("Updated task: '%s'", uid);
+  g_message("CalDAV: Updated task: '%s'", uid);
   return TRUE;
 }
 
@@ -389,10 +368,10 @@ gboolean caldav_calendar_remove_task(CalDAVCalendar *calendar, const char *uid) 
   g_autoptr(GError) error = NULL;
   if (!e_cal_client_remove_object_sync(calendar->e_cal_client, uid, NULL, E_CAL_OBJ_MOD_ALL, E_CAL_OPERATION_FLAG_NONE, NULL,
                                        &error)) {
-    caldav__error("Failed to remove task '%s': %s", uid, error->message);
+    g_warning("CalDAV: Failed to remove task '%s': %s", uid, error->message);
     return FALSE;
   }
-  caldav__info("Removed task: '%s'", uid);
+  g_message("CalDAV: Removed task: '%s'", uid);
   return TRUE;
 }
 
@@ -406,14 +385,14 @@ gboolean caldav_calendar_remove(const CalDAVCalendar *calendar) {
   g_autoptr(EWebDAVSession) session = e_webdav_session_new(calendar->registered_source);
   e_soup_session_set_credentials(E_SOUP_SESSION(session), calendar->client->credentials);
   if (!e_webdav_session_delete_sync(session, calendar->href, E_WEBDAV_DEPTH_INFINITY, NULL, NULL, &error)) {
-    caldav__error("Failed to remove calendar '%s': %s", calendar->href, error ? error->message : "unknown error");
+    g_warning("CalDAV: Failed to remove calendar '%s': %s", calendar->href, error ? error->message : "unknown error");
     return FALSE;
   }
   e_cal_client_view_stop(calendar->view, NULL);
   if (!e_source_remove_sync(calendar->registered_source, NULL, &error)) {
     // The server deletion already succeeded. Keep the calendar in the array so the caller does not get a dangling object; the
     // next discovery round can clean up the local source.
-    caldav__error("Remote calendar '%s' was deleted, but local source removal failed: %s", calendar->href, error->message);
+    g_warning("CalDAV: Remote calendar '%s' was deleted, but local source removal failed: %s", calendar->href, error->message);
     return FALSE;
   }
   g_ptr_array_remove(calendar->client->calendars, (CalDAVCalendar *)calendar);
@@ -566,20 +545,20 @@ CalDAVClient *caldav_client_new(CalDAVClientConfig config) {
 
   ESourceRegistry *registry = e_source_registry_new_sync(NULL, &error);
   if (error) {
-    caldav__error("Failed to create source registry: %s\n", error->message);
+    g_warning("CalDAV: Failed to create source registry: %s\n", error->message);
     return NULL;
   }
 
   ESource *server_source = e_source_new(NULL, NULL, &error);
   if (error) {
-    caldav__error("Failed to create server source: %s\n", error->message);
+    g_warning("CalDAV: Failed to create server source: %s\n", error->message);
     return NULL;
   }
 
   e_source_set_display_name(server_source, "CalDAV");
   g_autoptr(GUri) uri = g_uri_parse(config.url, G_URI_FLAGS_PARSE_RELAXED, &error);
   if (error) {
-    caldav__error("Failed to parse URI: %s\n", error->message);
+    g_warning("CalDAV: Failed to parse URI: %s\n", error->message);
     return NULL;
   }
 
@@ -589,7 +568,7 @@ CalDAVClient *caldav_client_new(CalDAVClientConfig config) {
   e_source_authentication_set_method(auth, "Basic");
   e_source_authentication_set_user(auth, config.username);
   if (!e_source_store_password_sync(server_source, config.password, FALSE, NULL, &error)) {
-    caldav__error("Failed to store password: %s\n", error->message);
+    g_warning("CalDAV: Failed to store password: %s\n", error->message);
     return NULL;
   }
 
@@ -612,33 +591,30 @@ CalDAVClient *caldav_client_new(CalDAVClientConfig config) {
   c->principal_url = caldav__discover_principal_url(c);
   c->home_set_url = caldav__discover_home_set(c);
 
-  // FALLBACK FOR SIMPLE LOCALHOST/RADICALE SETUPS:
   if (!c->caldav_url) c->caldav_url = g_strdup(config.url);
   if (!c->principal_url) c->principal_url = g_strdup(config.url);
   if (!c->home_set_url) c->home_set_url = g_strdup(config.url);
 
-  if (!c->caldav_url || !c->principal_url || !c->home_set_url) {
-    caldav_client_free(c);
-    return NULL;
-  }
+  if (!caldav_client_poll(c)) return NULL;
 
   return c;
 }
 
-void caldav_client_poll(CalDAVClient *c) {
+gboolean caldav_client_poll(CalDAVClient *c) {
   g_assert_nonnull(c);
   g_assert_nonnull(c->server_source);
   g_assert_nonnull(c->credentials);
   g_assert_nonnull(c->calendars);
 
-  caldav__info("Poll Client: %s", c->url);
+  g_message("CalDAV: Poll Client: %s", c->url);
 
   g_autoptr(GError) error = NULL;
+
   GSList *discovered = NULL;
   if (!e_webdav_discover_sources_sync(c->server_source, NULL, E_WEBDAV_DISCOVER_SUPPORTS_TASKS, c->credentials, NULL, NULL,
                                       &discovered, NULL, NULL, &error)) {
-    caldav__warning("Discovery failed: %s", error->message);
-    return;
+    g_warning("CalDAV: Discovery failed: %s", error->message);
+    return FALSE;
   }
 
   // Mark all calendars as not seen for this round
@@ -681,19 +657,20 @@ void caldav_client_poll(CalDAVClient *c) {
     CalDAVCalendar *cal = g_ptr_array_index(c->calendars, i);
     if (cal->seen) continue;
     cal->miss_count++;
-    caldav__debug("Calendar '%s' not seen (%u/%u)", cal->href, cal->miss_count, CALDAV_MISS_THRESHOLD);
+    g_message("CalDAV: Calendar '%s' not seen (%u/%u)", cal->href, cal->miss_count, CALDAV_MISS_THRESHOLD);
     if (cal->miss_count < CALDAV_MISS_THRESHOLD) continue;
     if (c->cal_removed_cb) c->cal_removed_cb(cal->uid); // uid still valid here
     // Delete the local ESource
     e_cal_client_view_stop(cal->view, NULL);
     if (!e_source_remove_sync(cal->registered_source, NULL, &error)) {
-      caldav__warning("Failed to remove source '%s': %s", cal->uid, error->message);
+      g_warning("CalDAV: Failed to remove source '%s': %s", cal->uid, error->message);
       g_clear_error(&error);
     }
     g_ptr_array_remove_index(c->calendars, i); // caldav_calendar_free is called
   }
 
-  e_webdav_discover_free_discovered_sources(discovered);
+  g_clear_pointer(&discovered, e_webdav_discover_free_discovered_sources);
+  return TRUE;
 }
 
 CalDAVCalendar *caldav_client_create_calendar(CalDAVClient *c, const char *uid, const gchar *name, const gchar *color) {
@@ -710,7 +687,7 @@ CalDAVCalendar *caldav_client_create_calendar(CalDAVClient *c, const char *uid, 
   g_autofree gchar *href = caldav__make_calendar_href(c->home_set_url, uid);
 
   if (!e_webdav_session_mkcalendar_sync(session, href, name, NULL, color, E_WEBDAV_RESOURCE_SUPPORTS_TASKS, NULL, &error)) {
-    caldav__error("Failed to create calendar: %s", error->message);
+    g_warning("CalDAV: Failed to create calendar: %s", error->message);
     return FALSE;
   }
 
@@ -775,10 +752,10 @@ CalDAVCalendar *caldav_client_create_calendar(CalDAVClient *c, const char *uid, 
   //       g_set_error(&error, E_SOUP_SESSION_ERROR, soup_message_get_status(message), "Failed to create calendar: HTTP %u (%s)",
   //                   soup_message_get_status(message), soup_message_get_reason_phrase(message));
   //     }
-  //     caldav__error("Failed to create calendar '%s': %s", href, error->message);
+  //     g_warning("CalDAV: Failed to create calendar '%s': %s", href, error->message);
   //     return FALSE;
   //   }
-  //   caldav__info("Created remote calendar: %s", href);
+  //   g_message("CalDAV: Created remote calendar: %s", href);
   //
   //   EWebDAVDiscoveredSource discovered = {0};
   //   discovered.href = href;
@@ -791,7 +768,7 @@ CalDAVCalendar *caldav_client_create_calendar(CalDAVClient *c, const char *uid, 
   //   if (!calendar) {
   //     g_clear_error(&error);
   //     if (!e_webdav_session_delete_sync(session, href, E_WEBDAV_DEPTH_INFINITY, NULL, NULL, &error))
-  //       caldav__error("Failed to roll back calendar '%s': %s", href, error->message);
+  //       g_warning("CalDAV: Failed to roll back calendar '%s': %s", href, error->message);
   //     return FALSE;
   //   }
   //   g_ptr_array_add(c->calendars, calendar);

@@ -4,6 +4,7 @@
 #include "data.h"
 #include "settings.h"
 #include "state.h"
+#include "sync.h"
 #include "task-list-item.h"
 #include "utils.h"
 
@@ -207,7 +208,7 @@ void errands_data_init() {
     g_autoptr(ErrandsTaskListItem) item = errands_task_list_item_load_from_ics(path);
     if (!item) continue;
     if (errands_data_get_deleted(item->ical)) {
-      if (errands_settings_get_sync_enabled(state.settings)) errands_task_list_item_delete(item);
+      errands_sync_push_list(item);
       remove(path);
       continue;
     }
