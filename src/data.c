@@ -450,15 +450,14 @@ bool errands_data_set_rrule(icalcomponent *ical, struct icalrecurrencetype *valu
 // --- STRV --- //
 
 GStrv errands_data_get_attachments(icalcomponent *ical) {
-  g_assert_nonnull(ical);
+  if (!ical) return NULL;
 
   const char *val = get_x_prop_value(ical, "X-ERRANDS-ATTACHMENTS", NULL);
   return val ? g_strsplit(val, ",", -1) : NULL;
 }
 
 GStrv errands_data_get_tags(icalcomponent *ical) {
-  g_assert_nonnull(ical);
-  g_assert(icalcomponent_is_valid(ical));
+  if (!ical) return NULL;
 
   g_autoptr(GStrvBuilder) builder = g_strv_builder_new();
   for (icalproperty *p = icalcomponent_get_first_property(ical, ICAL_CATEGORIES_PROPERTY); p;

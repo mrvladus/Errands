@@ -41,6 +41,11 @@
             >https://raw.githubusercontent.com/mrvladus/Errands/main/data/screenshots/main.png</image>
       <caption>Main Window View</caption>
     </screenshot>
+    <screenshot>
+      <image
+            >https://raw.githubusercontent.com/mrvladus/Errands/main/data/screenshots/properties.png</image>
+      <caption>Task Properties View</caption>
+    </screenshot>
   </screenshots>
   <translation type="gettext">errands</translation>
   <recommends>
