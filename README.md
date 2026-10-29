@@ -30,7 +30,7 @@ Use [Gnome Builder](https://flathub.org/en/apps/org.gnome.Builder) for building 
 
 ## Develop
 
-Setup distrobox container:
+Use [Gnome Builder](https://flathub.org/en/apps/org.gnome.Builder) for development or setup distrobox container:
 
 ```sh
 make distrobox-setup
