@@ -55,6 +55,7 @@ bindir          = $(prefix)/bin
 datarootdir     = $(prefix)/share
 localedir       = $(datarootdir)/locale
 desktopdir      = $(datarootdir)/applications
+metainfodir     = $(datarootdir)/metainfo
 dbusdir         = $(datarootdir)/dbus-1/services
 icondir         = $(datarootdir)/icons/hicolor
 scalableicondir = $(icondir)/scalable/apps
@@ -196,6 +197,10 @@ install: $(BUILD_DIR)/$(NAME)
 	# Icons
 	install -Dm 644 $(DATA_DIR)/icons/$(APP_ID).svg $(DESTDIR)$(scalableicondir)/$(APP_ID).svg
 	install -Dm 644 $(DATA_DIR)/icons/io.github.mrvladus.List-symbolic.svg $(DESTDIR)$(symbolicicondir)/io.github.mrvladus.List-symbolic.svg
+	# Metainfo
+	@cp $(DATA_DIR)/$(NAME).metainfo.xml.in $(BUILD_DIR)/$(APP_ID).metainfo.xml
+	@sed -i "s/@APP_ID@/$(APP_ID)/g" $(BUILD_DIR)/$(APP_ID).metainfo.xml
+	install -m 644 $(BUILD_DIR)/$(APP_ID).metainfo.xml $(DESTDIR)$(metainfodir)/$(APP_ID).metainfo.xml
 	# D-Bus service
 	@cp $(DATA_DIR)/$(NAME).service.in $(BUILD_DIR)/$(APP_ID).service
 	@sed -i "s/@APP_ID@/$(APP_ID)/g" $(BUILD_DIR)/$(APP_ID).service
@@ -213,6 +218,7 @@ uninstall:
 	rm -f $(DESTDIR)$(desktopdir)/$(APP_ID).desktop
 	rm -f $(DESTDIR)$(scalableicondir)/$(APP_ID).svg
 	rm -f $(DESTDIR)$(symbolicicondir)/io.github.mrvladus.List-symbolic.svg
+	rm -f $(DESTDIR)$(metainfodir)/$(APP_ID).metainfo.xml
 	rm -f $(DESTDIR)$(dbusdir)/$(APP_ID).service
 	@for lang in $(LINGUAS); do \
 		rm -f $(DESTDIR)$(localedir)/$$lang/LC_MESSAGES/$(NAME).mo; \
