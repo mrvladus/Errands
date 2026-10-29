@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-10 12:25+0300\n"
+"POT-Creation-Date: 2026-10-20 18:53+0300\n"
 "PO-Revision-Date: 2024-06-11 16:08+0200\n"
 "Last-Translator: acszoltan111@gmail.com\n"
 "Language-Team: \n"
@@ -15,744 +15,687 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Poedit 3.4.2\n"
 
-#: errands/widgets/shared/components/buttons.py:45
-msgid "Info"
-msgstr "Információ"
-
-#: errands/widgets/shared/components/dialogs.py:31
-msgid "Are you sure?"
-msgstr "Biztos benne?"
-
-#: errands/widgets/shared/components/dialogs.py:35
-#: errands/widgets/sidebar.py:300 errands/widgets/task.py:250
-#: errands/widgets/task_list/task_list_sidebar_row.py:99
-#: errands/widgets/today/today_task.py:146
-msgid "Cancel"
-msgstr "Mégse"
-
-#: errands/widgets/shared/color_selector.py:32
-#: errands/widgets/shared/task_toolbar/toolbar.py:100
-msgid "None"
-msgstr "Nincs"
-
-#: errands/widgets/shared/color_selector.py:41
-msgid "Blue"
-msgstr "Kék"
-
-#: errands/widgets/shared/color_selector.py:50
-msgid "Green"
-msgstr "Zöld"
-
-#: errands/widgets/shared/color_selector.py:61
-msgid "Yellow"
-msgstr "Sárga"
-
-#: errands/widgets/shared/color_selector.py:72
-msgid "Orange"
-msgstr "Narancs"
-
-#: errands/widgets/shared/color_selector.py:81
-msgid "Red"
-msgstr "Piros"
-
-#: errands/widgets/shared/color_selector.py:92
-msgid "Purple"
-msgstr "Lila"
-
-#: errands/widgets/shared/color_selector.py:101
-msgid "Brown"
-msgstr "Barna"
-
-#: errands/widgets/shared/datetime_picker.py:138
-#: errands/widgets/today/today.py:57
-#: errands/widgets/today/today_sidebar_row.py:30 errands/widgets/window.py:69
-msgid "Today"
-msgstr "Ma"
-
-#: errands/widgets/shared/datetime_picker.py:143
-msgid "Tomorrow"
-msgstr "Holnap"
-
-#: errands/widgets/shared/datetime_picker.py:154
-msgid "Now"
-msgstr "Most"
-
-#: errands/widgets/shared/datetime_picker.py:160
-#: errands/widgets/trash/trash.py:40
-#: errands/widgets/trash/trash_sidebar_row.py:68
-msgid "Clear"
-msgstr "Ürítés"
-
-#: errands/widgets/shared/datetime_picker.py:214
-msgid "Set Date"
-msgstr "Dátum beállítása"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:44
-msgid "Start / Due Date"
-msgstr "Kezdet / esedékesség dátuma"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:49 errands/lib/utils.py:24
-msgid "Date"
-msgstr "Dátum"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:59
-#: errands/widgets/shared/task_toolbar/notes_window.py:29
-msgid "Notes"
-msgstr "Jegyzetek"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:72
-msgid "Priority"
-msgstr "Prioritás"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:90
-msgid "High"
-msgstr "Magas"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:94
-msgid "Medium"
-msgstr "Közepes"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:98
-msgid "Low"
-msgstr "Alacsony"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:103
-msgid "Custom"
-msgstr "Egyéni"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:113
-msgid "No Tags"
-msgstr "Nincsenek címkék"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:134
-#: errands/widgets/tags/tags.py:63 errands/widgets/tags/tags_sidebar_row.py:32
-#: errands/widgets/window.py:72
-msgid "Tags"
-msgstr "Címkék"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:157
-#: errands/widgets/shared/task_toolbar/attachments_window.py:30
-msgid "Attachments"
-msgstr "Csatolmányok"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:191
-#: errands/widgets/shared/task_toolbar/toolbar.py:294
-msgid "Created:"
-msgstr "Létrehozva:"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:202
-#: errands/widgets/shared/task_toolbar/toolbar.py:295
-msgid "Changed:"
-msgstr "Módosítva:"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:215
-msgid "More"
-msgstr "Több"
-
-#: errands/widgets/shared/task_toolbar/attachments_window.py:33
-msgid "No Files Attached"
-msgstr "Nincsenek csatolt fájlok"
-
-#: errands/widgets/shared/task_toolbar/attachments_window.py:56
-msgid "Add Attachment"
-msgstr "Csatolmány hozzáadása"
-
-#: errands/widgets/shared/task_toolbar/attachments_window.py:119
-msgid "Open File"
-msgstr "Fájl megnyitása"
-
-#: errands/widgets/shared/task_toolbar/attachments_window.py:123
-#: errands/widgets/tags/tags.py:140
-#: errands/widgets/task_list/task_list_sidebar_row.py:60
-#: errands/widgets/task_list/task_list_sidebar_row.py:191
-#: errands/widgets/trash/trash.py:159
-msgid "Delete"
-msgstr "Törlés"
-
-#: errands/widgets/shared/task_toolbar/attachments_window.py:132
-msgid "Open Containing Folder"
-msgstr "Tartalmazó mappa megnyitása"
-
-#: errands/widgets/shared/task_toolbar/datetime_window.py:29
-msgid "Date and Time"
-msgstr "Dátum és idő"
-
-#: errands/widgets/shared/task_toolbar/datetime_window.py:39
-#: errands/widgets/shared/task_toolbar/datetime_window.py:41
-msgid "Due"
-msgstr "Esedékesség"
-
-#: errands/widgets/shared/task_toolbar/datetime_window.py:54
-#: errands/widgets/shared/task_toolbar/datetime_window.py:56
-msgid "Start"
-msgstr "Kezdet"
-
-#: errands/widgets/sidebar.py:42
-msgid "Add List (Ctrl+Shift+A)"
-msgstr "Lista hozzáadása (Ctrl+Shift+A)"
-
-#: errands/widgets/sidebar.py:61
-msgid "Syncing..."
-msgstr "Szinkronizálás..."
-
-#: errands/widgets/sidebar.py:67
-msgid "Add new List"
-msgstr "Új lista hozzáadása"
-
-#: errands/widgets/sidebar.py:68
-msgid "Click \"+\" button"
-msgstr "Kattintson a \"+\" gombra"
-
-#. Task lists group
-#: errands/widgets/sidebar.py:94 errands/widgets/preferences.py:66
-msgid "Task Lists"
-msgstr "Feladatlisták"
-
-#: errands/widgets/sidebar.py:106 errands/widgets/window.py:44
-#: errands/widgets/window.py:167 data/io.github.mrvladus.List.desktop.in.in:3
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:6
+#: src/about-dialog.h:15 src/sidebar.blp:13 src/window.blp:8
 msgid "Errands"
 msgstr "Tennivalók"
 
-#: errands/widgets/sidebar.py:114
-msgid "Main Menu"
-msgstr "Főmenü"
-
-#: errands/widgets/sidebar.py:121 data/resources/gtk/help-overlay.ui:42
-msgid "Sync / Fetch Tasks"
-msgstr "Feladatok szinkronizálása / lekérése"
-
-#: errands/widgets/sidebar.py:128
-msgid "Import Task List"
-msgstr "Feladatlista importálása"
-
-#: errands/widgets/sidebar.py:135 data/resources/gtk/help-overlay.ui:20
-msgid "Preferences"
-msgstr "Beállítások"
-
-#: errands/widgets/sidebar.py:138
-msgid "Keyboard Shortcuts"
-msgstr "Gyorsbillentyűk"
-
-#: errands/widgets/sidebar.py:142
-msgid "About Errands"
-msgstr "A Tennivalók névjegye"
-
-#: errands/widgets/sidebar.py:144 data/resources/gtk/help-overlay.ui:27
-msgid "Quit"
-msgstr "Kilépés"
-
-#: errands/widgets/sidebar.py:291
-msgid "New List Name"
-msgstr "Új listanév"
-
-#: errands/widgets/sidebar.py:295 data/resources/gtk/help-overlay.ui:57
-msgid "Add List"
-msgstr "Lista hozzáadása"
-
-#: errands/widgets/sidebar.py:301
-msgid "Add"
-msgstr "Hozzáadás"
-
-#: errands/widgets/tags/tags.py:32
-msgid "No Tags Found"
-msgstr "Nem találhatók címkék"
-
-#: errands/widgets/tags/tags.py:33
-msgid "Add new Tags in the entry above"
-msgstr "Adjon hozzá új címkéket a fenti szövegdobozban"
-
-#: errands/widgets/tags/tags.py:82
-msgid "Add new Tag"
-msgstr "Új címke hozzáadása"
-
-#: errands/widgets/task.py:79
-#: errands/widgets/task_list/task_list_sidebar_row.py:125
-#: errands/widgets/today/today_task.py:73
-msgid "Exported"
-msgstr "Exportálva"
-
-#: errands/widgets/task.py:87 errands/widgets/today/today_task.py:81
-msgid "Copied to Clipboard"
-msgstr "Vágólapra másolva"
-
-#: errands/widgets/task.py:153
-msgid "Toggle Sub-Tasks"
-msgstr "Alfeladatok megjelenítése / elrejtése"
-
-#: errands/widgets/task.py:161 errands/widgets/today/today_task.py:100
-msgid "Toggle Completion"
-msgstr "Befejezettek megjelenítése / elrejtése"
-
-#: errands/widgets/task.py:191
-msgid "Toggle Toolbar"
-msgstr "Eszköztár megjelenítése / elrejtése"
-
-#: errands/widgets/task.py:210 errands/widgets/task.py:230
-#: errands/widgets/today/today_task.py:117
-#: errands/widgets/today/today_task.py:127
-msgid "Edit"
-msgstr "Szerkesztés"
-
-#: errands/widgets/task.py:211 errands/widgets/today/today_task.py:118
-msgid "Move to Trash"
-msgstr "Kukába helyezés"
-
-#: errands/widgets/task.py:212 errands/widgets/today/today_task.py:119
-msgid "Copy to Clipboard"
-msgstr "Másolás vágólapra"
-
-#: errands/widgets/task.py:213
-#: errands/widgets/task_list/task_list_sidebar_row.py:192
-#: errands/widgets/today/today_task.py:120
-msgid "Export"
-msgstr "Exportálás"
-
-#: errands/widgets/task.py:306 errands/widgets/task_list/task_list.py:84
-msgid "Completed"
-msgstr "Befejezve"
-
-#: errands/widgets/task.py:330
-msgid "Add new Sub-Task"
-msgstr "Új alfeladat hozzáadása"
-
-#: errands/widgets/task.py:552 errands/widgets/task_list/task_list.py:238
-msgid "Completed:"
-msgstr "Befejezett:"
-
-#: errands/widgets/task.py:945
-msgid "Delete Tag"
-msgstr "Címke törlése"
-
-#: errands/widgets/task_list/task_list.py:50
-msgid "Toggle Completed Tasks"
-msgstr "Befejezett feladatok megjelenítése / elrejtése"
-
-#: errands/widgets/task_list/task_list.py:58
-msgid "Delete Completed Tasks"
-msgstr "Befejezett feladatok törlése"
-
-#: errands/widgets/task_list/task_list.py:73
-msgid "Scroll Up"
-msgstr "A tetejére"
-
-#: errands/widgets/task_list/task_list.py:143
-msgid "Add new Task"
-msgstr "Új feladat hozzáadása"
-
-#: errands/widgets/task_list/task_list_sidebar_row.py:59
-msgid "List will be permanently deleted"
-msgstr "A lista véglegesen törölve lesz"
-
-#: errands/widgets/task_list/task_list_sidebar_row.py:89
-msgid "New Name"
-msgstr "Új név"
-
-#: errands/widgets/task_list/task_list_sidebar_row.py:94
-msgid "Rename List"
-msgstr "Lista átnevezése"
-
-#: errands/widgets/task_list/task_list_sidebar_row.py:100
-msgid "Save"
-msgstr "Mentés"
-
-#: errands/widgets/task_list/task_list_sidebar_row.py:123
-msgid "Export failed"
-msgstr "Az exportálás sikertelen"
-
-#: errands/widgets/task_list/task_list_sidebar_row.py:158
-msgid "Color"
-msgstr "Szín"
-
-#: errands/widgets/task_list/task_list_sidebar_row.py:190
-msgid "Rename"
-msgstr "Átnevezés"
-
-#: errands/widgets/today/today.py:31
-msgid "No Tasks for Today"
-msgstr "Nincsenek feladatok mára"
-
-#: errands/widgets/trash/trash.py:31
-msgid "Empty Trash"
-msgstr "Kuka ürítése"
-
-#: errands/widgets/trash/trash.py:32
-msgid "No deleted items"
-msgstr "Nincsenek törölt elemek"
-
-#: errands/widgets/trash/trash.py:55 errands/widgets/trash/trash.py:189
-#: errands/widgets/trash/trash_sidebar_row.py:69
-msgid "Restore"
-msgstr "Visszaállítás"
-
-#: errands/widgets/trash/trash.py:89
-#: errands/widgets/trash/trash_sidebar_row.py:43 errands/widgets/window.py:75
-msgid "Trash"
-msgstr "Kuka"
-
-#: errands/widgets/trash/trash.py:158
-msgid "Tasks will be permanently deleted"
-msgstr "A feladatok véglegesen törölve lesznek"
-
-#: errands/widgets/window.py:57
-msgid "Sidebar"
-msgstr "Oldalsáv"
-
-#: errands/widgets/window.py:59
-msgid "Content"
-msgstr "Tartalom"
-
-#: errands/widgets/window.py:66
-#, fuzzy
-msgid "Loading Tasks"
-msgstr "Új feladatok hozzáadása"
-
-#: errands/widgets/window.py:88
-msgid "No Task Lists"
-msgstr "Nincsenek feladatlisták"
-
-#: errands/widgets/window.py:89
-msgid "Create new or import existing one"
-msgstr "Új létrehozása vagy létező importálása"
-
-#: errands/widgets/window.py:93
-msgid "Create List"
-msgstr "Lista létrehozása"
-
-#: errands/widgets/window.py:102
-msgid "Create new List"
-msgstr "Új lista létrehozása"
-
-#: errands/widgets/window.py:115 errands/widgets/window.py:123
-#, fuzzy
-msgid "Syncing"
-msgstr "Szinkronizálás..."
-
-#: errands/widgets/window.py:116
-msgid "First synchronization is running"
-msgstr ""
-
-#: errands/widgets/window.py:172
+#: src/about-dialog.h:18
 msgid "translator-credits"
 msgstr "zoli111"
 
-#: errands/widgets/window.py:178
-msgid "Sync is disabled"
-msgstr "A szinkronizáció letiltva"
+#: src/date-chooser.c:104 src/date-chooser.blp:7
+msgid "Not Set"
+msgstr "Nincs beállítva"
 
-#: errands/widgets/window.py:213
-msgid "Imported"
-msgstr "Importálva"
+#: src/rrule-row.c:171
+msgctxt "Repeat every ..."
+msgid "seconds"
+msgstr "másodperc"
 
-#: errands/widgets/preferences.py:26
-msgid "Application Theme"
-msgstr "Alkalmazástéma"
+#: src/rrule-row.c:171
+msgctxt "Repeat every ..."
+msgid "minutes"
+msgstr "perc"
 
-#: errands/widgets/preferences.py:34
+#: src/rrule-row.c:172
+msgctxt "Repeat every ..."
+msgid "hours"
+msgstr "óra"
+
+#: src/rrule-row.c:172
+msgctxt "Repeat every ..."
+msgid "days"
+msgstr "nap"
+
+#: src/rrule-row.c:173
+msgctxt "Repeat every ..."
+msgid "weeks"
+msgstr "hét"
+
+#: src/rrule-row.c:173
+msgctxt "Repeat every ..."
+msgid "months"
+msgstr "hónap"
+
+#: src/rrule-row.c:174
+msgctxt "Repeat every ..."
+msgid "years"
+msgstr "év"
+
+#: src/rrule-row.c:176
+#, c-format
+msgid "Repeat every %d %s"
+msgstr "Ismétlés minden %d %s"
+
+#: src/rrule-row.c:182
+msgid "Repeat forever"
+msgstr "Ismétlés örökké"
+
+#: src/rrule-row.c:182
+#, c-format
+msgid "Repeat %zu times"
+msgstr "Ismétlés %zu alkalommal"
+
+#: src/sync.c:262
+#, c-format
+msgid "Added remote task list: %s"
+msgstr "Távoli feladatlista hozzáadva: %s"
+
+#: src/sync.c:293
+#, c-format
+msgid "Removed remote task list: %s"
+msgstr "Távoli feladatlista eltávolítva: %s"
+
+#: src/sync.c:372
+msgid "Creating remote list failed. Limits may be reached."
+msgstr "A távoli lista létrehozása nem sikerült. Lehet, hogy elérte a korlátot."
+
+#: src/sync.c:532
+msgid "Failed to connect to CalDAV remote."
+msgstr "Nem sikerült csatlakozni a CalDAV-kiszolgálóhoz."
+
+#: src/sync.c:553
+msgid "Failed 3 attempts to sync. Disabling for now."
+msgstr "A szinkronizálás 3 próbálkozás után sem sikerült. Egyelőre le lesz tiltva."
+
+#: src/task.c:110
+msgctxt "Start date"
+msgid "Start"
+msgstr "Kezdés"
+
+#: src/task.c:125
+msgctxt "Due date"
+msgid "Due"
+msgstr "Határidő"
+
+#: src/task.c:302
+msgid "Copied to Clipboard"
+msgstr "Vágólapra másolva"
+
+#: src/task.c:336
+msgid "Failed to Export"
+msgstr "Az exportálás nem sikerült"
+
+#: src/task.c:339 src/task-list.c:294
+msgid "Exported"
+msgstr "Exportálva"
+
+#: src/task-list.c:283 src/task-list.c:288
+msgid "Export failed"
+msgstr "Az exportálás sikertelen"
+
+#: src/task-list.c:314 src/task-list.c:326
+msgid "No tasks to delete"
+msgstr "Nincs törölhető feladat"
+
+#: src/task-list.c:319 src/task-list.c:331
+#, c-format
+msgid "Deleted %d task"
+msgid_plural "Deleted %d tasks"
+msgstr[0] "%d feladat törölve"
+msgstr[1] "%d feladat törölve"
+
+#: src/task-list.c:464 src/sidebar.blp:100
+msgid "All Tasks"
+msgstr "Összes feladat"
+
+#: src/task-list.c:465 src/sidebar.blp:113
+msgid "Tasks for Today"
+msgstr "Mai feladatok"
+
+#: src/task-list-item.c:142
+msgid "Untitled"
+msgstr "Névtelen"
+
+#: src/window.c:115
+msgid "Remove Attachment"
+msgstr "Melléklet eltávolítása"
+
+#: src/window.c:146
+msgid "Enable Tag"
+msgstr "Címke engedélyezése"
+
+#: src/window.c:151
+msgid "Remove Tag"
+msgstr "Címke eltávolítása"
+
+#: src/date-chooser.blp:13
+msgid "Reset"
+msgstr "Visszaállítás"
+
+#: src/date-chooser.blp:27 src/rrule-row.blp:51
+msgid "Date"
+msgstr "Dátum"
+
+#: src/date-chooser.blp:36
+msgid "Today"
+msgstr "Ma"
+
+#: src/date-chooser.blp:50
+msgid "Tomorrow"
+msgstr "Holnap"
+
+#: src/date-chooser.blp:85
+msgid "Time"
+msgstr "Idő"
+
+#: src/date-chooser.blp:149
+msgid "9:00"
+msgstr "9:00"
+
+#: src/date-chooser.blp:164
+msgid "12:00"
+msgstr "12:00"
+
+#: src/date-chooser.blp:179
+msgid "17:00"
+msgstr "17:00"
+
+#: src/date-chooser.blp:194
+msgid "20:00"
+msgstr "20:00"
+
+#: src/delete-list-dialog.blp:8
+msgid "Are you sure?"
+msgstr "Biztos benne?"
+
+#: src/delete-list-dialog.blp:12 src/rename-list-dialog.blp:11
+msgid "Cancel"
+msgstr "Mégse"
+
+#: src/delete-list-dialog.blp:13 src/task.blp:175
+msgid "Delete"
+msgstr "Törlés"
+
+#: src/rename-list-dialog.blp:12
+msgid "Rename"
+msgstr "Átnevezés"
+
+#: src/rename-list-dialog.blp:21
+msgid "New List Name"
+msgstr "Új lista neve"
+
+#: src/rrule-row.blp:7 src/task.blp:258
+msgid "Repeat"
+msgstr "Ismétlés"
+
+#: src/rrule-row.blp:12
+msgid "Frequency"
+msgstr "Gyakoriság"
+
+#: src/rrule-row.blp:13
+msgid "How often task will repeat"
+msgstr "A feladat ismétlődésének gyakorisága"
+
+#: src/rrule-row.blp:17
+msgid "Secondly"
+msgstr "Másodpercenként"
+
+#: src/rrule-row.blp:18
+msgid "Minutely"
+msgstr "Percenként"
+
+#: src/rrule-row.blp:19
+msgid "Hourly"
+msgstr "Óránként"
+
+#: src/rrule-row.blp:20
+msgid "Daily"
+msgstr "Naponta"
+
+#: src/rrule-row.blp:21
+msgid "Weekly"
+msgstr "Hetente"
+
+#: src/rrule-row.blp:22
+msgid "Monthly"
+msgstr "Havonta"
+
+#: src/rrule-row.blp:23
+msgid "Yearly"
+msgstr "Évente"
+
+#: src/rrule-row.blp:24 src/task.blp:144
+msgid "None"
+msgstr "Nincs"
+
+#: src/rrule-row.blp:32
+msgid "Interval"
+msgstr "Időköz"
+
+#: src/rrule-row.blp:46
+msgid "Repeat Until"
+msgstr "Ismétlés eddig"
+
+#: src/rrule-row.blp:50
+msgid "Indefinitely"
+msgstr "Határozatlan ideig"
+
+#: src/rrule-row.blp:52
+msgid "Count"
+msgstr "Darabszám"
+
+#: src/rrule-row.blp:60
+msgid "Repeat Until Date"
+msgstr "Ismétlés záró dátuma"
+
+#: src/rrule-row.blp:64
+msgid "Repeat Count"
+msgstr "Ismétlések száma"
+
+#: src/rrule-row.blp:87
+msgid "Week Days"
+msgstr "A hét napjai"
+
+#: src/rrule-row.blp:96
+msgid "Mo"
+msgstr "H"
+
+#: src/rrule-row.blp:97
+msgid "Monday"
+msgstr "Hétfő"
+
+#: src/rrule-row.blp:106
+msgid "Tu"
+msgstr "K"
+
+#: src/rrule-row.blp:107
+msgid "Tuesday"
+msgstr "Kedd"
+
+#: src/rrule-row.blp:116
+msgid "We"
+msgstr "Sze"
+
+#: src/rrule-row.blp:117
+msgid "Wednesday"
+msgstr "Szerda"
+
+#: src/rrule-row.blp:126
+msgid "Th"
+msgstr "Cs"
+
+#: src/rrule-row.blp:127
+msgid "Thursday"
+msgstr "Csütörtök"
+
+#: src/rrule-row.blp:136
+msgid "Fr"
+msgstr "P"
+
+#: src/rrule-row.blp:137
+msgid "Friday"
+msgstr "Péntek"
+
+#: src/rrule-row.blp:146
+msgid "Sa"
+msgstr "Szo"
+
+#: src/rrule-row.blp:147
+msgid "Saturday"
+msgstr "Szombat"
+
+#: src/rrule-row.blp:156
+msgid "Su"
+msgstr "V"
+
+#: src/rrule-row.blp:157
+msgid "Sunday"
+msgstr "Vasárnap"
+
+#: src/settings-dialog.blp:11
+msgid "Appearance"
+msgstr "Megjelenés"
+
+#: src/settings-dialog.blp:14
+msgid "Theme"
+msgstr "Téma"
+
+#: src/settings-dialog.blp:21
 msgid "System"
 msgstr "Rendszer"
 
-#: errands/widgets/preferences.py:46
+#: src/settings-dialog.blp:26
 msgid "Light"
 msgstr "Világos"
 
-#: errands/widgets/preferences.py:58
+#: src/settings-dialog.blp:31
 msgid "Dark"
 msgstr "Sötét"
 
-#: errands/widgets/preferences.py:70
-msgid "Add new Tasks"
-msgstr "Új feladatok hozzáadása"
+#: src/settings-dialog.blp:43
+msgid "Miscellaneous"
+msgstr "Egyéb"
 
-#: errands/widgets/preferences.py:71
-msgid "At the Bottom"
-msgstr "Alul"
-
-#: errands/widgets/preferences.py:71
-msgid "At the Top"
-msgstr "Felül"
-
-#: errands/widgets/preferences.py:87
+#: src/settings-dialog.blp:46
 msgid "Show Notifications"
 msgstr "Értesítések megjelenítése"
 
-#: errands/widgets/preferences.py:94
-msgid "Run in Background"
+#: src/settings-dialog.blp:50
+msgid "Work in the Background"
 msgstr "Futtatás a háttérben"
 
-#: errands/widgets/preferences.py:95
-msgid "Hide the application window instead of closing it"
-msgstr "Az alkalmazásablak elrejtése bezárás helyett"
+#: src/settings-dialog.blp:54
+msgid "Launch at Startup"
+msgstr "Indítás bejelentkezéskor"
 
-#: errands/widgets/preferences.py:102
-msgid "Launch on Startup"
-msgstr "Indítás a munkamenettel"
-
-#: errands/widgets/preferences.py:103
-msgid "Launch application when user logs in"
-msgstr "Alkalmazás elindítása, amikor a felhasználó bejelentkezik"
-
-#: errands/widgets/preferences.py:112
-msgid "Notifications and Background"
-msgstr "Értesítések és háttér"
-
-#: errands/widgets/preferences.py:120 errands/widgets/preferences.py:181
-#: data/resources/gtk/help-overlay.ui:38
+#: src/settings-dialog.blp:60 src/shortcuts-dialog.blp:84 src/sidebar.blp:64
 msgid "Sync"
 msgstr "Szinkronizáció"
 
-#. Provider
-#: errands/widgets/preferences.py:123
-msgid "Disabled"
-msgstr "Letiltva"
+#: src/settings-dialog.blp:63
+msgid "Enabled"
+msgstr "Engedélyezve"
 
-#: errands/widgets/preferences.py:125
-msgid "Sync Provider"
-msgstr "Szinkronizáció szolgáltató"
+#: src/settings-dialog.blp:67
+msgid "Sync Interval"
+msgstr "Szinkronizálási időköz"
 
-#: errands/widgets/preferences.py:134
-msgid "Server URL"
-msgstr "Kiszolgáló URL"
+#: src/settings-dialog.blp:68
+msgid "Seconds between pulling events from the server"
+msgstr "A kiszolgálóról lekért események közötti másodpercek"
 
-#: errands/widgets/preferences.py:140
-msgid ""
-"URL needs to include protocol, like <b>http://</b> or <b>https://</b>. If "
-"you have problems with connection - try to change protocol first."
-msgstr ""
-"Az URL-címnek tartalmaznia kell a protokollt, például <b>http://</b> vagy "
-"<b>https://</b>. Ha problémái vannak a csatlakozással - először próbálja meg "
-"megváltoztatni a protokollt."
+#: src/settings-dialog.blp:80
+msgid "CalDAV Server URL"
+msgstr "CalDAV-kiszolgáló URL-címe"
 
-#: errands/widgets/preferences.py:147
+#: src/settings-dialog.blp:86
 msgid "Username"
 msgstr "Felhasználónév"
 
-#: errands/widgets/preferences.py:153
+#: src/settings-dialog.blp:92
 msgid "Password"
 msgstr "Jelszó"
 
-#: errands/widgets/preferences.py:159
-msgid "Test"
-msgstr "Teszt"
-
-#: errands/widgets/preferences.py:164
-msgid "Test Connection"
-msgstr "Kapcsolat tesztelése"
-
-#: errands/widgets/preferences.py:172 data/resources/gtk/help-overlay.ui:9
+#: src/shortcuts-dialog.blp:9
 msgid "General"
 msgstr "Általános"
 
-#: errands/widgets/preferences.py:217
-msgid "Connected"
-msgstr "Csatlakozva"
+#: src/shortcuts-dialog.blp:12 src/sidebar.blp:68
+msgid "Preferences"
+msgstr "Beállítások"
 
-#: errands/widgets/preferences.py:221
-msgid "Authorization failed"
-msgstr "A hitelesítés sikertelen"
+#: src/shortcuts-dialog.blp:17
+msgid "Open Menu"
+msgstr "Menü megnyitása"
 
-#: errands/widgets/preferences.py:223
-msgid "Could not locate server. Check network and url."
-msgstr "Nem található kiszolgáló. Ellenőrizze a hálózatot és az URL-t."
+#: src/shortcuts-dialog.blp:22
+msgid "Close Window"
+msgstr "Ablak bezárása"
 
-#: errands/widgets/preferences.py:225
-msgid "Can't connect"
-msgstr "Nem lehet csatlakozni"
+#: src/shortcuts-dialog.blp:27
+msgid "Quit"
+msgstr "Kilépés"
 
-#. NOTE: Also catches invalid credentials
-#: errands/widgets/preferences.py:227
-msgid "Can't connect. Check credentials"
-msgstr "Nem lehet csatlakozni. Ellenőrizze a hitelesítő adatokat"
+#: src/shortcuts-dialog.blp:34 src/task-list.blp:12
+msgid "Task List"
+msgstr "Feladatlista"
 
-#: errands/lib/sync/providers/caldav.py:66
-msgid "Not all sync credentials provided. Please check settings."
-msgstr ""
-"Nincs minden szinkronizálási adat megadva. Kérjük, ellenőrizze a "
-"beállításokat."
+#: src/shortcuts-dialog.blp:37
+msgid "Create Task List"
+msgstr "Feladatlista létrehozása"
 
-#: errands/lib/sync/providers/caldav.py:110
-msgid "Can't connect to CalDAV server at:"
-msgstr "Nem lehet csatlakozni a CalDAV kiszolgálóhoz itt:"
+#: src/shortcuts-dialog.blp:42
+msgid "Import Task List"
+msgstr "Feladatlista importálása"
 
-#: errands/lib/data.py:92
-msgid "New Task List"
-msgstr "Új feladatlista"
+#: src/shortcuts-dialog.blp:47
+msgid "Sorting and Filtering Options"
+msgstr "Rendezési és szűrési beállítások"
 
-#: errands/lib/notifications.py:74
-msgid "Task is Due"
-msgstr "A feladat esedékes"
+#: src/shortcuts-dialog.blp:52
+msgid "Search"
+msgstr "Keresés"
 
-#: errands/application.py:78
-msgid "Errands was updated"
-msgstr "A tennivalók frissítve lett"
+#: src/shortcuts-dialog.blp:57
+msgid "Select Task Entry"
+msgstr "Feladatbejegyzés kiválasztása"
 
-#: errands/application.py:79
-msgid "Restart is required"
-msgstr "Újraindítás szükséges"
+#: src/shortcuts-dialog.blp:62
+msgid "Entry Task Properties"
+msgstr "Feladatbejegyzés tulajdonságai"
 
-#: errands/application.py:82
-msgid "Restart"
-msgstr "Újraindítás"
+#: src/shortcuts-dialog.blp:67 src/task-list.blp:142
+msgid "Add Task"
+msgstr "Új feladat hozzáadása"
 
-#: errands/application.py:111
-msgid "Errands need to run in the background for notifications"
-msgstr "A Tennivalóknak a háttérben kell futnia az értesítésekhez"
+#: src/shortcuts-dialog.blp:74
+msgid "Task Properties Dialog"
+msgstr "Feladattulajdonságok párbeszédablak"
 
-#: data/resources/gtk/help-overlay.ui:13
-msgid "Show keyboard shortcuts"
-msgstr "Gyorsbillentyűk megjelenítése"
+#: src/shortcuts-dialog.blp:77 src/window.blp:99
+msgid "Add Attachment"
+msgstr "Melléklet hozzáadása"
 
-#: data/resources/gtk/help-overlay.ui:53
-msgid "Lists"
-msgstr "Listák"
+#: src/shortcuts-dialog.blp:87
+msgid "Sync Now"
+msgstr "Szinkronizálás most"
 
-#: data/resources/gtk/help-overlay.ui:64
-msgid "Import List"
-msgstr "Lista importálása"
+#: src/sidebar.blp:19
+msgid "Add Task List"
+msgstr "Feladatlista hozzáadása"
 
-#: data/resources/gtk/help-overlay.ui:75
-msgid "Details"
-msgstr "Részletek"
+#: src/sidebar.blp:28
+msgid "Import \".ics\" file"
+msgstr ".ics-fájl importálása"
 
-#: data/resources/gtk/help-overlay.ui:79
-msgid "Toggle Details"
-msgstr "Részletek megjelenítése / elrejtése"
+#: src/sidebar.blp:37
+msgid "New list name"
+msgstr "Új lista neve"
 
-#: data/io.github.mrvladus.List.desktop.in.in:4
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:7
-msgid "Manage your tasks"
-msgstr "Kezelje a feladatait"
+#: src/sidebar.blp:43
+msgid "Create"
+msgstr "Létrehozás"
 
-#: data/io.github.mrvladus.List.desktop.in.in:10
-msgid "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
-msgstr ""
-"errands;tasks;list;todo;caldav;nextcloud;feladatok;tennivalók;szinkronizáció;"
+#: src/sidebar.blp:60
+msgid "Main Menu (F10)"
+msgstr "Főmenü (F10)"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:12
-msgid "Todo application for those who prefer simplicity."
-msgstr "Egy teendők alkalmazás az egyszerűséget kedvelőknek."
+#: src/sidebar.blp:69
+msgid "Shortcuts"
+msgstr "Billentyűparancsok"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:13
-msgid "Features:"
-msgstr "Funkciók:"
+#: src/sidebar.blp:70
+msgid "About Errands"
+msgstr "A Tennivalók névjegye"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:15
-msgid "Multiple task lists support"
-msgstr "Több feladatlista támogatása"
+#: src/sidebar.blp:99
+msgctxt "All Tasks"
+msgid "All"
+msgstr "Összes"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:16
-msgid "Add, remove, edit tasks and sub-tasks"
-msgstr "Feladatok és alfeladatok hozzáadása, eltávolítása, szerkesztése"
+#: src/sidebar.blp:112
+msgctxt "Tasks for Today"
+msgid "Today"
+msgstr "Ma"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:17
-msgid "Mark task and sub-tasks as completed"
-msgstr "Feladatok és alfeladatok befejezettként jelölése"
+#: src/sidebar.blp:126
+msgid "Task Lists"
+msgstr "Feladatlisták"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:18
-msgid "Add accent color for each task"
-msgstr "Kiemelőszín hozzáadása minden egyes feladathoz"
+#: src/sidebar.blp:131
+msgid "No Task Lists"
+msgstr "Nincsenek feladatlisták"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:19
-msgid "Sync tasks with Nextcloud or other CalDAV providers"
-msgstr "Feladatok szinkronizálása Nextcloud vagy CalDAV szolgáltatókkal"
+#: src/sidebar.blp:132
+msgid "Create new or import “.ics”"
+msgstr "Új létrehozása vagy „.ics” importálása"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:20
-msgid "Drag and Drop support"
-msgstr "Húzd és ejtsd támogatás"
+#: src/task.blp:37
+msgid "Toggle Completion"
+msgstr "Befejezettség átváltása"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:21
-msgid "Import .ics files"
-msgstr ".ics fájlok importálása"
+#: src/task.blp:48
+msgid "Restore"
+msgstr "Visszaállítás"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:41
-msgid "Main Window View"
-msgstr "Főablak nézet"
+#: src/task.blp:106
+msgid "Toggle Sub-Tasks Entry"
+msgstr "Részfeladat-bevitel átváltása"
 
-#~ msgid "Loading..."
-#~ msgstr "Betöltés..."
+#: src/task.blp:129 src/window.blp:74
+msgid "Properties"
+msgstr "Tulajdonságok"
 
-#~ msgid "Not Set"
-#~ msgstr "Nincs beállítva"
+#: src/task.blp:130 src/task.blp:264 src/window.blp:120
+msgid "Notes"
+msgstr "Jegyzetek"
 
-#~ msgid "Click Action"
-#~ msgstr "Kattintás művelete"
+#: src/task.blp:134
+msgid "Edit Text"
+msgstr "Szöveg szerkesztése"
 
-#~ msgid "Open Details Panel"
-#~ msgstr "Részletek panel megnyitása"
+#: src/task.blp:135
+msgid "Copy Text"
+msgstr "Szöveg másolása"
 
-#~ msgid "Complete Button Size"
-#~ msgstr "Befejezés gomb mérete"
+#: src/task.blp:136
+msgid "Task Color"
+msgstr "Feladat színe"
 
-#~ msgid "Small"
-#~ msgstr "Kicsi"
+#: src/task.blp:141 src/task.blp:200 src/task-list.blp:72
+msgid "Priority"
+msgstr "Prioritás"
 
-#~ msgid "Big"
-#~ msgstr "Nagy"
+#: src/task.blp:150
+msgid "Low"
+msgstr "Alacsony"
 
-#~ msgid "Progress Bar"
-#~ msgstr "Folyamatsáv"
+#: src/task.blp:156
+msgid "Medium"
+msgstr "Közepes"
 
-#~ msgid "Tool Bar"
-#~ msgstr "Eszköztár"
+#: src/task.blp:162
+msgid "High"
+msgstr "Magas"
 
-#~ msgid "Details Panel"
-#~ msgstr "Részletek panel"
+#: src/task.blp:170 src/task-list.blp:91
+msgid "Export as \".ics\""
+msgstr "Exportálás „.ics” formátumban"
 
-#~ msgid "Position"
-#~ msgstr "Pozíció"
+#: src/task.blp:174
+msgid "Cancel / Restore"
+msgstr "Mégse / visszaállítás"
 
-#~ msgid "Left"
-#~ msgstr "Bal"
+#: src/task.blp:226 src/window.blp:82
+msgid "Start"
+msgstr "Kezdés"
 
-#~ msgid "Right"
-#~ msgstr "Jobb"
+#: src/task.blp:227 src/task-list.blp:60
+msgid "Start Date"
+msgstr "Kezdés dátuma"
 
-#~ msgid "Appearance"
-#~ msgstr "Megjelenés"
+#: src/task.blp:242 src/window.blp:86
+msgid "Due"
+msgstr "Határidő"
 
-#~ msgid "More Options"
-#~ msgstr "További lehetőségek"
+#: src/task.blp:243 src/task-list.blp:66
+msgid "Due Date"
+msgstr "Határidő"
 
-#~ msgid "Menu"
-#~ msgstr "Menü"
+#: src/task.blp:274 src/task.blp:280 src/window.blp:94
+msgid "Attachments"
+msgstr "Mellékletek"
 
-#~ msgid "No Details"
-#~ msgstr "Nincsenek részletek"
+#: src/task.blp:305
+msgid "Add Sub-Task"
+msgstr "Új alfeladat hozzáadása"
 
-#~ msgid "Click on task to show more info"
-#~ msgstr "Kattintson a feladatra a további információ megjelenítéséhez"
+#: src/task-list.blp:21
+msgid "Show Tasks"
+msgstr "Feladatok megjelenítése"
 
-#~ msgid "Clear Style"
-#~ msgstr "Stílus törlése"
+#: src/task-list.blp:24
+msgid "Completed"
+msgstr "Befejezve"
 
-#~ msgid "Text"
-#~ msgstr "Szöveg"
+#: src/task-list.blp:29
+msgid "Cancelled"
+msgstr "Megszakítva"
 
-#~ msgid "Copy Text"
-#~ msgstr "Szöveg másolása"
+#: src/task-list.blp:35
+msgid "Sort Order"
+msgstr "Rendezési sorrend"
 
-#~ msgid "Properties"
-#~ msgstr "Tulajdonságok"
+#: src/task-list.blp:38
+msgid "Descending"
+msgstr "Csökkenő"
 
-#~ msgid "Complete %"
-#~ msgstr "Befejezett %"
+#: src/task-list.blp:44
+msgid "Ascending"
+msgstr "Növekvő"
 
-#~ msgid "Add Tag"
-#~ msgstr "Címke hozzáadása"
+#: src/task-list.blp:51
+msgid "Sort By"
+msgstr "Rendezés ez alapján"
 
-#~ msgid "Save Task as .ics file"
-#~ msgstr "Feladat mentése .ics fájlként"
+#: src/task-list.blp:54
+msgid "Created"
+msgstr "Létrehozva"
 
-#~ msgid "Mark as Completed"
-#~ msgstr "Befejezettként jelölés"
+#: src/task-list.blp:87
+msgid "Rename List"
+msgstr "Lista átnevezése"
 
-#~ msgid "Expand / Fold"
-#~ msgstr "Kinyitás / becsukás"
+#: src/task-list.blp:92
+msgid "Print"
+msgstr "Nyomtatás"
 
-#~ msgid "Restore All"
-#~ msgstr "Összes visszaállítása"
+#: src/task-list.blp:96
+msgid "Delete Completed"
+msgstr "Befejezett feladatok törlése"
 
-#~ msgid "Save changed details"
-#~ msgstr "Megváltoztatott részletek mentése"
+#: src/task-list.blp:97
+msgid "Delete Cancelled"
+msgstr "Megszakított feladatok törlése"
+
+#: src/task-list.blp:101
+msgid "Delete List"
+msgstr "Lista törlése"
+
+#: src/task-list.blp:109
+msgid "Search (Ctrl+F)"
+msgstr "Keresés (Ctrl+F)"
+
+#: src/task-list.blp:143
+msgid "Add Task (Ctrl+N)"
+msgstr "Új feladat hozzáadása (Ctrl+N)"
+
+#: src/task-list.blp:161
+msgid "Add Task (Ctrl+Return)"
+msgstr "Új feladat hozzáadása (Ctrl+Return)"
+
+#: src/task-list.blp:185
+msgid "No Tasks"
+msgstr "Nincsenek feladatok"
+
+#: src/task-list.blp:212
+msgid "Loading Tasks"
+msgstr "Feladatok betöltése"
+
+#: src/window.blp:27
+msgid "Sidebar"
+msgstr "Oldalsáv"
+
+#: src/window.blp:34
+msgid "Content"
+msgstr "Tartalom"
+
+#: src/window.blp:63
+msgid "Close Properties"
+msgstr "Tulajdonságok bezárása"
+
+#: src/window.blp:79
+msgid "Date and Time"
+msgstr "Dátum és idő"
+
+#: src/window.blp:106
+msgid "Tags"
+msgstr "Címkék"
+
+#: src/window.blp:111
+msgid "New Tag"
+msgstr "Új címke"

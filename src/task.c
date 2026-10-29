@@ -1,0 +1,448 @@
+// Copyright (c) 2026 Vlad Krupinskii <vladkrupinskii@gmail.com>
+// SPDX-License-Identifier: Zlib
+
+#include "task.h"
+#include "config.h"
+#include "sidebar.h"
+#include "state.h"
+#include "sync.h"
+#include "task-item.h"
+#include "task-list.h"
+#include "utils.h"
+#include "window.h"
+
+#include <gdk/gdk.h>
+#include <gio/gio.h>
+#include <glib-object.h>
+#include <glib.h>
+#include <glib/gi18n.h>
+#include <libical/ical.h>
+
+static void errands_task_update_toolbar(ErrandsTask *task);
+static GtkWidget *errands_task_tag_new(const char *tag);
+
+static void on_edit_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
+static void on_copy_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
+static void on_color_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
+static void on_properties_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
+static void on_notes_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
+static void on_cancel_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
+static void on_delete_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
+static void on_export_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
+static void on_priority_action_cb(GSimpleAction *action, GVariant *value, ErrandsTask *self);
+
+// Callbacks
+static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointer user_data);
+static void on_sub_task_entry_activated_cb(GtkEntry *entry, ErrandsTask *self);
+static void on_drop_motion_ctrl_enter_cb(ErrandsTask *self);
+
+static GdkContentProvider *on_drag_prepare_cb(GtkDragSource *source, double x, double y, ErrandsTask *self);
+static void on_drag_begin_cb(GtkDragSource *source, GdkDrag *drag, ErrandsTask *self);
+static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x, double y, ErrandsTask *self);
+
+// ---------- WIDGET TEMPLATE ---------- //
+
+G_DEFINE_TYPE(ErrandsTask, errands_task, GTK_TYPE_BOX)
+
+enum {
+  PROP_0,
+
+  PROP_ITEM,
+  PROP_COLOR,
+  PROP_PRIORITY,
+  PROP_NOTES,
+  PROP_DTSTART,
+  PROP_DTEND,
+  PROP_TAGS,
+  PROP_ATTACHMENTS,
+  PROP_RRULE,
+
+  N_PROPERTIES,
+};
+
+static GParamSpec *obj_properties[N_PROPERTIES] = {NULL};
+
+static void get_property(GObject *object, guint prop_id, GValue *value, GParamSpec *pspec) {
+  ErrandsTask *self = ERRANDS_TASK(object);
+  switch (prop_id) {
+  case PROP_ITEM: g_value_set_object(value, self->item); break;
+  case PROP_COLOR: g_value_set_string(value, self->color); break;
+  case PROP_PRIORITY: g_value_set_int(value, self->priority); break;
+  default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
+  }
+}
+
+static void set_property(GObject *object, guint prop_id, const GValue *value, GParamSpec *pspec) {
+  ErrandsTask *self = ERRANDS_TASK(object);
+  switch (prop_id) {
+  case PROP_ITEM: self->item = g_value_get_object(value); break;
+
+  case PROP_COLOR: {
+    self->color = g_value_get_string(value);
+    gtk_widget_set_color(GTK_WIDGET(self), self->color);
+  } break;
+
+  case PROP_PRIORITY: {
+    self->priority = g_value_get_int(value);
+    // Update action state
+    GSimpleAction *priority_action = G_SIMPLE_ACTION(g_action_map_lookup_action(G_ACTION_MAP(self->ag), "priority"));
+    GVariant *value = g_variant_new_string(errands_task_item_get_priority_as_string(self->item));
+    g_simple_action_set_state(priority_action, value);
+    // UI
+    gtk_label_set_label(GTK_LABEL(self->priority_label), errands_task_item_get_priority_as_tstring(self->item));
+    gtk_widget_set_visible(self->priority_box, self->priority > 0);
+
+    errands_task_update_toolbar(self);
+  } break;
+
+  case PROP_NOTES: {
+    self->notes = g_value_get_string(value);
+    gtk_widget_set_visible(self->notes_btn, self->notes != NULL);
+    errands_task_update_toolbar(self);
+  } break;
+
+  case PROP_DTSTART: {
+    icaltimetype *dt_p = g_value_get_pointer(value);
+    self->dtstart = *dt_p;
+    bool is_null = icaltime_is_null_date(self->dtstart);
+    gtk_widget_set_visible(self->dtstart_btn, !is_null);
+    errands_task_update_toolbar(self);
+    if (is_null) break;
+
+    g_autofree gchar *date_str = NULL;
+    g_autoptr(GDateTime) sdt = g_date_time_new_from_unix_local(icaltime_as_timet(self->dtstart));
+    if (!icaltime_is_date(self->dtstart)) date_str = g_date_time_format(sdt, "%d %b %H:%M");
+    else date_str = g_date_time_format(sdt, "%d %b");
+    const char *label = tmp_str_printf("%s: %s", C_("Start date", "Start"), date_str);
+    adw_button_content_set_label(ADW_BUTTON_CONTENT(self->dtstart_btn_content), label);
+  } break;
+
+  case PROP_DTEND: {
+    icaltimetype *dt_p = g_value_get_pointer(value);
+    self->dtend = *dt_p;
+    bool has_dt = !icaltime_is_null_date(self->dtend);
+    g_autofree gchar *rrule = errands_task_item_get_rrule_as_string(self->item);
+    gtk_widget_set_visible(self->dtend_btn, has_dt && !rrule);
+    errands_task_update_toolbar(self);
+    if (!has_dt) break;
+
+    g_autofree gchar *date_str = NULL;
+    g_autoptr(GDateTime) sdt = g_date_time_new_from_unix_local(icaltime_as_timet(self->dtend));
+    if (!icaltime_is_date(self->dtend)) date_str = g_date_time_format(sdt, "%d %b %H:%M");
+    else date_str = g_date_time_format(sdt, "%d %b");
+    const char *label = tmp_str_printf("%s: %s", C_("Due date", "Due"), date_str);
+    adw_button_content_set_label(ADW_BUTTON_CONTENT(self->dtend_btn_content), label);
+    gtk_widget_remove_css_class(self->dtend_btn, "error");
+    if (errands_task_item_is_due(self->item)) gtk_widget_add_css_class(self->dtend_btn, "error");
+  } break;
+
+  case PROP_TAGS: {
+    self->tags = g_value_get_pointer(value);
+    adw_wrap_box_remove_all(ADW_WRAP_BOX(self->tags_box));
+    const guint tags_n = self->tags ? g_strv_length(self->tags) : 0;
+    for_range(i, 0, tags_n) adw_wrap_box_append(ADW_WRAP_BOX(self->tags_box), errands_task_tag_new(self->tags[i]));
+    errands_task_update_toolbar(self);
+  } break;
+
+  case PROP_ATTACHMENTS: {
+    self->attachments = g_value_get_pointer(value);
+    bool has_attachments = self->attachments && self->attachments[0] != NULL;
+    gtk_widget_set_visible(self->attachments_btn, has_attachments);
+    errands_task_update_toolbar(self);
+    if (!has_attachments) break;
+    const char *label = tmp_str_printf("%u", g_strv_length(self->attachments));
+    adw_button_content_set_label(ADW_BUTTON_CONTENT(self->attachments_btn_content), label);
+  } break;
+
+  case PROP_RRULE: {
+    self->rrule = g_value_get_pointer(value);
+    g_autofree gchar *label = errands_task_item_get_rrule_as_string(self->item);
+    if (label) gtk_widget_set_visible(self->dtend_btn, false);
+    gtk_widget_set_visible(self->rrule_btn, label != NULL);
+    errands_task_update_toolbar(self);
+    if (label) adw_button_content_set_label(ADW_BUTTON_CONTENT(self->rrule_btn_content), label);
+  } break;
+
+  default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
+  }
+}
+
+static void finalize(GObject *gobject) {
+  ErrandsTask *self = ERRANDS_TASK(gobject);
+  if (self->toolbar_update_id) {
+    g_source_remove(self->toolbar_update_id);
+    self->toolbar_update_id = 0;
+  }
+  gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_TASK);
+  G_OBJECT_CLASS(errands_task_parent_class)->finalize(gobject);
+}
+
+static void errands_task_class_init(ErrandsTaskClass *klass) {
+  GObjectClass *object_class = G_OBJECT_CLASS(klass);
+
+  object_class->finalize = finalize;
+  object_class->get_property = get_property;
+  object_class->set_property = set_property;
+
+  obj_properties[PROP_ITEM] =
+      g_param_spec_object("item", "Task Item", "Task item associated with the task.", ERRANDS_TYPE_TASK_ITEM, G_PARAM_READWRITE);
+  obj_properties[PROP_COLOR] = g_param_spec_string("color", "Color", "Color of the task.", NULL, G_PARAM_READWRITE);
+  obj_properties[PROP_PRIORITY] = g_param_spec_int("priority", "Priority", "Priority of the task.", 0, 10, 0, G_PARAM_READWRITE);
+  obj_properties[PROP_NOTES] = g_param_spec_string("notes", "Notes", "Notes of the task.", NULL, G_PARAM_WRITABLE);
+  obj_properties[PROP_DTSTART] = g_param_spec_pointer("dtstart", "Start Date", "Start date of the task.", G_PARAM_WRITABLE);
+  obj_properties[PROP_DTEND] = g_param_spec_pointer("dtend", "End Date", "End date of the task.", G_PARAM_WRITABLE);
+  obj_properties[PROP_TAGS] = g_param_spec_pointer("tags", "Tags", "Tags of the task.", G_PARAM_WRITABLE);
+  obj_properties[PROP_ATTACHMENTS] =
+      g_param_spec_pointer("attachments", "Attachments", "Attachments of the task.", G_PARAM_WRITABLE);
+  obj_properties[PROP_RRULE] = g_param_spec_pointer("rrule", "RRule", "RRule of the task.", G_PARAM_WRITABLE);
+
+  g_object_class_install_properties(object_class, N_PROPERTIES, obj_properties);
+
+  gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(klass), RESOURCE_PATH "/ui/task.ui");
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, complete_btn);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, title);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, edit_title);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, popover_menu);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, toolbar);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, priority_box);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, priority_label);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, tags_box);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, dtstart_btn);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, dtstart_btn_content);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, dtend_btn);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, dtend_btn_content);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, rrule_btn);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, rrule_btn_content);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, notes_btn);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, attachments_btn);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, attachments_btn_content);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, sub_entry);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, drop_motion_ctrl);
+
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_title_edit_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_sub_task_entry_activated_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_drop_motion_ctrl_enter_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_drag_prepare_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_drag_begin_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_drop_cb);
+}
+
+static void errands_task_init(ErrandsTask *self) {
+  gtk_widget_init_template(GTK_WIDGET(self));
+
+  self->ag = errands_add_action_group(self, "task");
+  errands_add_action(self->ag, "edit", on_edit_action_cb, self, NULL);
+  errands_add_action(self->ag, "copy", on_copy_action_cb, self, NULL);
+  errands_add_action(self->ag, "color", on_color_action_cb, self, NULL);
+  errands_add_action(self->ag, "properties", on_properties_action_cb, self, NULL);
+  errands_add_action(self->ag, "notes", on_notes_action_cb, self, NULL);
+  errands_add_action(self->ag, "cancel", on_cancel_action_cb, self, NULL);
+  errands_add_action(self->ag, "delete", on_delete_action_cb, self, NULL);
+  errands_add_action(self->ag, "export", on_export_action_cb, self, NULL);
+  errands_add_stateful_action(self->ag, "priority", G_VARIANT_TYPE_STRING, g_variant_new_string("none"), on_priority_action_cb,
+                              self);
+}
+
+ErrandsTask *errands_task_new() { return g_object_new(ERRANDS_TYPE_TASK, NULL); }
+
+// ---------- PRIVATE FUNCTIONS ---------- //
+
+static GtkWidget *errands_task_tag_new(const char *tag) {
+  GtkWidget *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
+  gtk_box_append(GTK_BOX(box), g_object_new(GTK_TYPE_IMAGE, "icon-name", "errands-tag-symbolic", NULL));
+  GtkWidget *label = g_object_new(GTK_TYPE_LABEL, "label", tag, "max-width-chars", 15, "halign", GTK_ALIGN_START, "ellipsize",
+                                  PANGO_ELLIPSIZE_END, NULL);
+  gtk_box_append(GTK_BOX(box), label);
+  GtkWidget *button = g_object_new(GTK_TYPE_BUTTON, "child", box, "action-name", "task.properties", NULL);
+  gtk_widget_add_css_class(button, "caption-heading");
+  gtk_widget_add_css_class(button, "tag");
+
+  return button;
+}
+
+static gboolean update_toolbar_cb(ErrandsTask *self) {
+  self->toolbar_update_id = 0;
+  bool has_dtstart = !icaltime_is_null_date(self->dtstart);
+  bool has_dtend = !icaltime_is_null_date(self->dtend);
+  bool has_tags = self->tags && self->tags[0];
+  bool has_attachments = self->attachments && self->attachments[0];
+  bool has_priority = self->priority != 0;
+  bool has_notes = self->notes != NULL;
+  bool has_rrule = self->rrule != NULL;
+  gtk_widget_set_visible(self->toolbar,
+                         has_dtstart || has_dtend || has_tags || has_attachments || has_priority || has_notes || has_rrule);
+  return G_SOURCE_REMOVE;
+}
+
+static void errands_task_update_toolbar(ErrandsTask *self) {
+  if (self->toolbar_update_id) return; // Already scheduled
+  self->toolbar_update_id = g_idle_add_full(G_PRIORITY_HIGH_IDLE, (GSourceFunc)update_toolbar_cb, self, NULL);
+}
+
+// ---------- PUBLIC FUNCTIONS ---------- //
+
+void errands_task_set_item(ErrandsTask *self, ErrandsTaskItem *item) {
+  g_object_set(self, "item", item, NULL);
+  g_object_set(item, "task-widget", self, NULL);
+  g_object_bind_property(item, "color", self, "color", G_BINDING_SYNC_CREATE);
+  g_object_bind_property(item, "priority", self, "priority", G_BINDING_SYNC_CREATE);
+  g_object_bind_property(item, "notes", self, "notes", G_BINDING_SYNC_CREATE);
+  g_object_bind_property(item, "dtstart", self, "dtstart", G_BINDING_SYNC_CREATE);
+  g_object_bind_property(item, "dtend", self, "dtend", G_BINDING_SYNC_CREATE);
+  g_object_bind_property(item, "tags", self, "tags", G_BINDING_SYNC_CREATE);
+  g_object_bind_property(item, "attachments", self, "attachments", G_BINDING_SYNC_CREATE);
+  g_object_bind_property(item, "rrule", self, "rrule", G_BINDING_SYNC_CREATE);
+  g_object_bind_property(item, "completed", self->complete_btn, "active", G_BINDING_SYNC_CREATE | G_BINDING_BIDIRECTIONAL);
+}
+
+// ---------- ACTION CALLBACKS ---------- //
+
+static void on_edit_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
+  gtk_popover_popdown(GTK_POPOVER(self->popover_menu));
+  gtk_editable_label_start_editing(GTK_EDITABLE_LABEL(self->edit_title));
+}
+
+static void on_copy_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
+  gtk_popover_popdown(GTK_POPOVER(self->popover_menu));
+  const char *text = errands_task_item_get_title(self->item);
+  GdkClipboard *clipboard = gdk_display_get_clipboard(gtk_widget_get_display(GTK_WIDGET(self)));
+  gdk_clipboard_set(clipboard, G_TYPE_STRING, text);
+  errands_window_add_toast(_("Copied to Clipboard"), 1);
+}
+
+static void on_priority_action_cb(GSimpleAction *action, GVariant *value, ErrandsTask *self) {
+  g_simple_action_set_state(action, value);
+  errands_task_item_set_priority_from_string(self->item, g_variant_get_string(value, NULL));
+}
+
+static void on_properties_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
+  errands_window_show_properties(state.main_window, self->item);
+}
+
+static void on_notes_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
+  errands_window_show_notes(state.main_window, self->item);
+}
+
+static void on_cancel_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
+  errands_task_item_set_cancelled(self->item, !errands_task_item_get_cancelled(self->item));
+}
+
+static void on_delete_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
+  const char *list_uid = errands_task_item_get_list(self->item)->uid;
+  errands_task_item_delete(self->item);
+  errands_sidebar_update_filter_rows();
+  errands_sidebar_task_list_update_counter(list_uid);
+  errands_task_list_update(state.main_window->task_list);
+}
+
+static void on_export_finish_cb(GObject *obj, GAsyncResult *res, ErrandsTaskItem *item) {
+  g_autoptr(GFile) f = gtk_file_dialog_save_finish(GTK_FILE_DIALOG(obj), res, NULL);
+  if (!f || !item) return;
+  g_autofree char *path = g_file_get_path(f);
+  if (!path || !errands_task_item_export(item, path)) {
+    errands_window_add_toast(_("Failed to Export"), 2);
+    return;
+  }
+  errands_window_add_toast(_("Exported"), 1);
+}
+
+static void on_export_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
+  g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
+  const char *filename = tmp_str_printf("%s.ics", errands_task_item_get_uid(self->item));
+  g_object_set(dialog, "initial-name", filename, NULL);
+  gtk_file_dialog_save(dialog, GTK_WINDOW(state.main_window), NULL, (GAsyncReadyCallback)on_export_finish_cb, self->item);
+}
+
+static void on_finish_cb(GObject *source_object, GAsyncResult *res, gpointer data) {
+  g_autoptr(ErrandsTaskItem) item = data;
+  g_autoptr(GdkRGBA) rgba = gtk_color_dialog_choose_rgba_finish(GTK_COLOR_DIALOG(source_object), res, NULL);
+  if (!rgba || !item) return;
+  errands_task_item_set_color(item, gdk_rgba_to_str(rgba));
+}
+
+static void on_color_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
+  g_autoptr(GtkColorDialog) color_dialog = g_object_new(GTK_TYPE_COLOR_DIALOG, "with-alpha", false, NULL);
+  const char *color = errands_task_item_get_color(self->item);
+  GdkRGBA rgba = {1};
+  if (color) gdk_rgba_parse(&rgba, color);
+  gtk_color_dialog_choose_rgba(color_dialog, GTK_WINDOW(state.main_window), &rgba, NULL, on_finish_cb, g_object_ref(self->item));
+}
+
+// ---------- CALLBACKS ---------- //
+
+static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointer user_data) {
+  bool editing = gtk_editable_label_get_editing(label);
+  ErrandsTask *self = user_data;
+  const char *curr_text = errands_task_item_get_title(self->item);
+  if (editing) {
+    gtk_widget_set_visible(GTK_WIDGET(label), true);
+    gtk_editable_set_text(GTK_EDITABLE(self->edit_title), curr_text);
+    gtk_widget_grab_focus(self->edit_title);
+  } else {
+    const char *text = gtk_editable_get_text(GTK_EDITABLE(self->edit_title));
+    if (!text || g_str_equal("", text)) {
+      gtk_widget_set_visible(self->title, true);
+      return;
+    }
+    if (g_str_equal(text, curr_text)) {
+      gtk_widget_set_visible(self->title, true);
+      return;
+    }
+    gtk_widget_set_visible(self->title, true);
+    g_autofree gchar *markup = str_to_markup(text);
+    g_object_set(self->item, "title", markup, NULL);
+  }
+}
+
+static void on_sub_task_entry_activated_cb(GtkEntry *entry, ErrandsTask *self) {
+  const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
+  if (g_str_equal(text, "")) return;
+  errands_task_item_create_task(self->item, text);
+  GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_widget_get_ancestor(GTK_WIDGET(self), GTK_TYPE_TREE_EXPANDER));
+  gtk_tree_list_row_set_expanded(gtk_tree_expander_get_list_row(expander), true);
+  // Reset text
+  gtk_editable_set_text(GTK_EDITABLE(entry), "");
+  errands_sidebar_update_filter_rows();
+}
+
+// --- DND CALLBACKS --- //
+
+static guint on_drop_motion_ctrl_enter_timeout_cb(ErrandsTask *self) {
+  if (!self || !GTK_IS_WIDGET(self)) return G_SOURCE_REMOVE;
+
+  GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_widget_get_ancestor(GTK_WIDGET(self), GTK_TYPE_TREE_EXPANDER));
+  GtkTreeListRow *row = gtk_tree_expander_get_list_row(expander);
+  bool expanded = gtk_tree_list_row_get_expanded(row);
+  if (!expanded && gtk_drop_controller_motion_contains_pointer(self->drop_motion_ctrl)) gtk_tree_list_row_set_expanded(row, true);
+
+  return G_SOURCE_REMOVE;
+}
+
+static void on_drop_motion_ctrl_enter_cb(ErrandsTask *self) {
+  g_timeout_add_once(500, (GSourceOnceFunc)on_drop_motion_ctrl_enter_timeout_cb, self);
+}
+
+static GdkContentProvider *on_drag_prepare_cb(GtkDragSource *source, double x, double y, ErrandsTask *task) {
+  GValue value = G_VALUE_INIT;
+  g_value_init(&value, ERRANDS_TYPE_TASK_ITEM);
+  g_value_set_object(&value, task->item);
+
+  return gdk_content_provider_new_for_value(&value);
+}
+
+static void on_drag_begin_cb(GtkDragSource *source, GdkDrag *drag, ErrandsTask *task) {
+  const char *text = errands_task_item_get_title(task->item);
+  g_autofree gchar *label;
+  if (strlen(text) > 20) {
+    g_autofree gchar *truncated = g_strndup(text, 17);
+    label = g_strconcat(truncated, "...", NULL);
+  } else label = g_strdup(text);
+  g_object_set(gtk_drag_icon_get_for_drag(drag), "child", g_object_new(GTK_TYPE_BUTTON, "label", label, NULL), NULL);
+}
+
+static gboolean on_drop_cb(GtkDropTarget *target, const GValue *value, double x, double y, ErrandsTask *task) {
+  ErrandsTaskItem *drop_item = g_value_get_object(value);
+  ErrandsTaskItem *tgt_item = task->item;
+  if (!tgt_item || !drop_item) return FALSE;
+  return errands_task_item_move(drop_item, tgt_item, errands_task_item_get_list(tgt_item));
+}

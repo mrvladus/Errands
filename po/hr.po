@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-16 13:01+0300\n"
+"POT-Creation-Date: 2026-10-20 18:53+0300\n"
 "PO-Revision-Date: 2025-10-24 14:42+0200\n"
 "Last-Translator: Milo Ivir <mail@mivirtype.de>\n"
 "Language-Team: \n"
@@ -15,657 +15,688 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Generator: Poedit 3.8\n"
 
-#: errands/widgets/shared/components/buttons.py:45
-msgid "Info"
-msgstr "Informacije"
-
-#: errands/widgets/shared/components/dialogs.py:31
-msgid "Are you sure?"
-msgstr "Jesi li siguran/na?"
-
-#: errands/widgets/shared/components/dialogs.py:35
-#: errands/widgets/sidebar.py:300 errands/widgets/task.py:250
-#: errands/widgets/task_list/task_list_sidebar_row.py:99
-#: errands/widgets/today/today_task.py:146
-msgid "Cancel"
-msgstr "Odustani"
-
-#: errands/widgets/shared/color_selector.py:32
-#: errands/widgets/shared/task_toolbar/toolbar.py:100
-msgid "None"
-msgstr "Ništa"
-
-#: errands/widgets/shared/color_selector.py:41
-msgid "Blue"
-msgstr "Plava"
-
-#: errands/widgets/shared/color_selector.py:50
-msgid "Green"
-msgstr "Zelena"
-
-#: errands/widgets/shared/color_selector.py:61
-msgid "Yellow"
-msgstr "Žuta"
-
-#: errands/widgets/shared/color_selector.py:72
-msgid "Orange"
-msgstr "Narančasta"
-
-#: errands/widgets/shared/color_selector.py:81
-msgid "Red"
-msgstr "Crvena"
-
-#: errands/widgets/shared/color_selector.py:92
-msgid "Purple"
-msgstr "Ljubičasta"
-
-#: errands/widgets/shared/color_selector.py:101
-msgid "Brown"
-msgstr "Smeđa"
-
-#: errands/widgets/shared/datetime_picker.py:138
-#: errands/widgets/today/today.py:57
-#: errands/widgets/today/today_sidebar_row.py:30 errands/widgets/window.py:69
-msgid "Today"
-msgstr "Danas"
-
-#: errands/widgets/shared/datetime_picker.py:143
-msgid "Tomorrow"
-msgstr "Sutra"
-
-#: errands/widgets/shared/datetime_picker.py:154
-msgid "Now"
-msgstr "Sada"
-
-#: errands/widgets/shared/datetime_picker.py:160
-#: errands/widgets/trash/trash.py:40
-#: errands/widgets/trash/trash_sidebar_row.py:68
-msgid "Clear"
-msgstr "Izbriši"
-
-#: errands/widgets/shared/datetime_picker.py:214
-msgid "Set Date"
-msgstr "Postavi datum"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:44
-msgid "Start / Due Date"
-msgstr "Datum početka/roka"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:49 errands/lib/utils.py:24
-msgid "Date"
-msgstr "Datum"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:59
-#: errands/widgets/shared/task_toolbar/notes_window.py:29
-msgid "Notes"
-msgstr "Bilješke"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:72
-msgid "Priority"
-msgstr "Prioritet"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:90
-msgid "High"
-msgstr "Visoki"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:94
-msgid "Medium"
-msgstr "Srednji"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:98
-msgid "Low"
-msgstr "Niski"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:103
-msgid "Custom"
-msgstr "Prilagođeno"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:113
-msgid "No Tags"
-msgstr "Nema oznaka"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:134
-#: errands/widgets/tags/tags.py:63 errands/widgets/tags/tags_sidebar_row.py:32
-#: errands/widgets/window.py:72
-msgid "Tags"
-msgstr "Oznake"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:157
-#: errands/widgets/shared/task_toolbar/attachments_window.py:30
-msgid "Attachments"
-msgstr "Prilozi"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:191
-#: errands/widgets/shared/task_toolbar/toolbar.py:294
-msgid "Created:"
-msgstr "Stvoreno:"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:202
-#: errands/widgets/shared/task_toolbar/toolbar.py:295
-msgid "Changed:"
-msgstr "Promijenjeno:"
-
-#: errands/widgets/shared/task_toolbar/toolbar.py:215
-msgid "More"
-msgstr "Više"
-
-#: errands/widgets/shared/task_toolbar/attachments_window.py:33
-msgid "No Files Attached"
-msgstr "Nema priloženih datoteka"
-
-#: errands/widgets/shared/task_toolbar/attachments_window.py:56
-msgid "Add Attachment"
-msgstr "Dodaj prilog"
-
-#: errands/widgets/shared/task_toolbar/attachments_window.py:119
-msgid "Open File"
-msgstr "Otvori datoteku"
-
-#: errands/widgets/shared/task_toolbar/attachments_window.py:123
-#: errands/widgets/tags/tags.py:140
-#: errands/widgets/task_list/task_list_sidebar_row.py:60
-#: errands/widgets/task_list/task_list_sidebar_row.py:191
-#: errands/widgets/trash/trash.py:159
-msgid "Delete"
-msgstr "Izbriši"
-
-#: errands/widgets/shared/task_toolbar/attachments_window.py:132
-msgid "Open Containing Folder"
-msgstr "Otvori mapu"
-
-#: errands/widgets/shared/task_toolbar/datetime_window.py:29
-msgid "Date and Time"
-msgstr "Datum i vrijeme"
-
-#: errands/widgets/shared/task_toolbar/datetime_window.py:39
-#: errands/widgets/shared/task_toolbar/datetime_window.py:41
-msgid "Due"
-msgstr "Rok"
-
-#: errands/widgets/shared/task_toolbar/datetime_window.py:54
-#: errands/widgets/shared/task_toolbar/datetime_window.py:56
-msgid "Start"
-msgstr "Početak"
-
-#: errands/widgets/sidebar.py:42
-msgid "Add List (Ctrl+Shift+A)"
-msgstr "Dodaj popis (Ctrl+Shift+A)"
-
-#: errands/widgets/sidebar.py:61
-msgid "Syncing..."
-msgstr "Sinkroniziranje …"
-
-#: errands/widgets/sidebar.py:67
-msgid "Add new List"
-msgstr "Dodaj novi popis"
-
-#: errands/widgets/sidebar.py:68
-msgid "Click \"+\" button"
-msgstr "Pritisni gumb „+”"
-
-#. Task lists group
-#: errands/widgets/sidebar.py:94 errands/widgets/preferences.py:66
-msgid "Task Lists"
-msgstr "Popisi zadataka"
-
-#: errands/widgets/sidebar.py:106 errands/widgets/window.py:44
-#: errands/widgets/window.py:167 data/io.github.mrvladus.List.desktop.in.in:3
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:6
+#: src/about-dialog.h:15 src/sidebar.blp:13 src/window.blp:8
 msgid "Errands"
 msgstr "Errands"
 
-#: errands/widgets/sidebar.py:114
-msgid "Main Menu"
-msgstr "Glavni izbornik"
-
-#: errands/widgets/sidebar.py:121 data/resources/gtk/help-overlay.ui:42
-msgid "Sync / Fetch Tasks"
-msgstr "Sinkroniziraj/Preuzmi zadatke"
-
-#: errands/widgets/sidebar.py:128
-msgid "Import Task List"
-msgstr "Uvezi popis zadataka"
-
-#: errands/widgets/sidebar.py:135 data/resources/gtk/help-overlay.ui:20
-msgid "Preferences"
-msgstr "Postavke"
-
-#: errands/widgets/sidebar.py:138
-msgid "Keyboard Shortcuts"
-msgstr "Tipkovnički prečaci"
-
-#: errands/widgets/sidebar.py:142
-msgid "About Errands"
-msgstr "O aplikaciji Errands"
-
-#: errands/widgets/sidebar.py:144 data/resources/gtk/help-overlay.ui:27
-msgid "Quit"
-msgstr "Zatvori aplikaciju"
-
-#: errands/widgets/sidebar.py:291
-msgid "New List Name"
-msgstr "Ime novog popisa"
-
-#: errands/widgets/sidebar.py:295 data/resources/gtk/help-overlay.ui:57
-msgid "Add List"
-msgstr "Dodaj popis"
-
-#: errands/widgets/sidebar.py:301
-msgid "Add"
-msgstr "Dodaj"
-
-#: errands/widgets/tags/tags.py:32
-msgid "No Tags Found"
-msgstr "Nije pronađena nijedna oznaka"
-
-#: errands/widgets/tags/tags.py:33
-msgid "Add new Tags in the entry above"
-msgstr "Dodaj nove oznake u gornje polje"
-
-#: errands/widgets/tags/tags.py:82
-msgid "Add new Tag"
-msgstr "Dodaj novu oznaku"
-
-#: errands/widgets/task.py:79
-#: errands/widgets/task_list/task_list_sidebar_row.py:125
-#: errands/widgets/today/today_task.py:73
-msgid "Exported"
-msgstr "Izvezeno"
-
-#: errands/widgets/task.py:87 errands/widgets/today/today_task.py:81
-msgid "Copied to Clipboard"
-msgstr "Kopirano u međuspremnik"
-
-#: errands/widgets/task.py:153
-msgid "Toggle Sub-Tasks"
-msgstr "Uključi/Isključi podzadatke"
-
-#: errands/widgets/task.py:161 errands/widgets/today/today_task.py:100
-msgid "Toggle Completion"
-msgstr "Uključi/Isključi završetak"
-
-#: errands/widgets/task.py:191
-msgid "Toggle Toolbar"
-msgstr "Uključi/Isključi alatnu traku"
-
-#: errands/widgets/task.py:210 errands/widgets/task.py:230
-#: errands/widgets/today/today_task.py:117
-#: errands/widgets/today/today_task.py:127
-msgid "Edit"
-msgstr "Uredi"
-
-#: errands/widgets/task.py:211 errands/widgets/today/today_task.py:118
-msgid "Move to Trash"
-msgstr "Premjesti u smeće"
-
-#: errands/widgets/task.py:212 errands/widgets/today/today_task.py:119
-msgid "Copy to Clipboard"
-msgstr "Kopiraj u međuspremnik"
-
-#: errands/widgets/task.py:213
-#: errands/widgets/task_list/task_list_sidebar_row.py:192
-#: errands/widgets/today/today_task.py:120
-msgid "Export"
-msgstr "Izvezi"
-
-#: errands/widgets/task.py:306 errands/widgets/task_list/task_list.py:84
-msgid "Completed"
-msgstr "Završeno"
-
-#: errands/widgets/task.py:330
-msgid "Add new Sub-Task"
-msgstr "Dodaj novi podzadatak"
-
-#: errands/widgets/task.py:552 errands/widgets/task_list/task_list.py:238
-msgid "Completed:"
-msgstr "Završeno:"
-
-#: errands/widgets/task.py:945
-msgid "Delete Tag"
-msgstr "Izbriši oznaku"
-
-#: errands/widgets/task_list/task_list.py:50
-msgid "Toggle Completed Tasks"
-msgstr "Uključi/Isključi završene zadatke"
-
-#: errands/widgets/task_list/task_list.py:58
-msgid "Delete Completed Tasks"
-msgstr "Izbriši završene zadatke"
-
-#: errands/widgets/task_list/task_list.py:73
-msgid "Scroll Up"
-msgstr "Klizni gore"
-
-#: errands/widgets/task_list/task_list.py:143
-msgid "Add new Task"
-msgstr "Dodaj novi zadatak"
-
-#: errands/widgets/task_list/task_list_sidebar_row.py:59
-msgid "List will be permanently deleted"
-msgstr "Popis će se zauvijek izbrisati"
-
-#: errands/widgets/task_list/task_list_sidebar_row.py:89
-msgid "New Name"
-msgstr "Novo ime"
-
-#: errands/widgets/task_list/task_list_sidebar_row.py:94
-msgid "Rename List"
-msgstr "Preimenuj popis"
-
-#: errands/widgets/task_list/task_list_sidebar_row.py:100
-msgid "Save"
-msgstr "Spremi"
-
-#: errands/widgets/task_list/task_list_sidebar_row.py:123
-msgid "Export failed"
-msgstr "Izvoz nije uspio"
-
-#: errands/widgets/task_list/task_list_sidebar_row.py:158
-msgid "Color"
-msgstr "Boja"
-
-#: errands/widgets/task_list/task_list_sidebar_row.py:190
-msgid "Rename"
-msgstr "Preimenuj"
-
-#: errands/widgets/today/today.py:31
-msgid "No Tasks for Today"
-msgstr "Nema zadataka za danas"
-
-#: errands/widgets/trash/trash.py:31
-msgid "Empty Trash"
-msgstr "Isprazni smeće"
-
-#: errands/widgets/trash/trash.py:32
-msgid "No deleted items"
-msgstr "Nema izbrisanih stavki"
-
-#: errands/widgets/trash/trash.py:55 errands/widgets/trash/trash.py:189
-#: errands/widgets/trash/trash_sidebar_row.py:69
-msgid "Restore"
-msgstr "Obnovi"
-
-#: errands/widgets/trash/trash.py:89
-#: errands/widgets/trash/trash_sidebar_row.py:43 errands/widgets/window.py:75
-msgid "Trash"
-msgstr "Smeće"
-
-#: errands/widgets/trash/trash.py:158
-msgid "Tasks will be permanently deleted"
-msgstr "Zadaci će se zauvijek izbrisati"
-
-#: errands/widgets/window.py:57
-msgid "Sidebar"
-msgstr "Bočni stupac"
-
-#: errands/widgets/window.py:59
-msgid "Content"
-msgstr "Sadržaj"
-
-#: errands/widgets/window.py:66
-msgid "Loading Tasks"
-msgstr "Učitavanje zadataka"
-
-#: errands/widgets/window.py:88
-msgid "No Task Lists"
-msgstr "Nema popisa zadataka"
-
-#: errands/widgets/window.py:89
-msgid "Create new or import existing one"
-msgstr "Stvori novu ili uvezi postojeću"
-
-#: errands/widgets/window.py:93
-msgid "Create List"
-msgstr "Stvori popis"
-
-#: errands/widgets/window.py:102
-msgid "Create new List"
-msgstr "Stvori novi popis"
-
-#: errands/widgets/window.py:115 errands/widgets/window.py:123
-msgid "Syncing"
-msgstr "Sinkroniziranje"
-
-#: errands/widgets/window.py:116
-msgid "First synchronization is running"
-msgstr "Pokreće se prva sinkronizacija"
-
-#: errands/widgets/window.py:172
+#: src/about-dialog.h:18
 msgid "translator-credits"
 msgstr "Milo Ivir <mail@milotype.de>"
 
-#: errands/widgets/window.py:178
-msgid "Sync is disabled"
-msgstr "Sinkronizacija je deaktivirana"
+#: src/date-chooser.c:104 src/date-chooser.blp:7
+msgid "Not Set"
+msgstr "Nije postavljeno"
 
-#: errands/widgets/window.py:213
-msgid "Imported"
-msgstr "Uvezeno"
+#: src/rrule-row.c:171
+msgctxt "Repeat every ..."
+msgid "seconds"
+msgstr "sekunde"
 
-#: errands/widgets/preferences.py:26
-msgid "Application Theme"
-msgstr "Tema aplikacije"
+#: src/rrule-row.c:171
+msgctxt "Repeat every ..."
+msgid "minutes"
+msgstr "minute"
 
-#: errands/widgets/preferences.py:34
+#: src/rrule-row.c:172
+msgctxt "Repeat every ..."
+msgid "hours"
+msgstr "sata"
+
+#: src/rrule-row.c:172
+msgctxt "Repeat every ..."
+msgid "days"
+msgstr "dana"
+
+#: src/rrule-row.c:173
+msgctxt "Repeat every ..."
+msgid "weeks"
+msgstr "tjedna"
+
+#: src/rrule-row.c:173
+msgctxt "Repeat every ..."
+msgid "months"
+msgstr "mjeseca"
+
+#: src/rrule-row.c:174
+msgctxt "Repeat every ..."
+msgid "years"
+msgstr "godine"
+
+#: src/rrule-row.c:176
+#, c-format
+msgid "Repeat every %d %s"
+msgstr "Ponavljaj svakih %d %s"
+
+#: src/rrule-row.c:182
+msgid "Repeat forever"
+msgstr "Ponavljaj zauvijek"
+
+#: src/rrule-row.c:182
+#, c-format
+msgid "Repeat %zu times"
+msgstr "Ponavljaj %zu puta"
+
+#: src/sync.c:262
+#, c-format
+msgid "Added remote task list: %s"
+msgstr "Udaljeni popis zadataka dodan: %s"
+
+#: src/sync.c:293
+#, c-format
+msgid "Removed remote task list: %s"
+msgstr "Udaljeni popis zadataka uklonjen: %s"
+
+#: src/sync.c:372
+msgid "Creating remote list failed. Limits may be reached."
+msgstr "Izrada udaljenog popisa nije uspjela. Možda je dosegnuto ograničenje."
+
+#: src/sync.c:532
+msgid "Failed to connect to CalDAV remote."
+msgstr "Povezivanje s CalDAV poslužiteljem nije uspjelo."
+
+#: src/sync.c:553
+msgid "Failed 3 attempts to sync. Disabling for now."
+msgstr "Sinkronizacija nije uspjela nakon 3 pokušaja. Zasad će biti onemogućena."
+
+#: src/task.c:110
+msgctxt "Start date"
+msgid "Start"
+msgstr "Početak"
+
+#: src/task.c:125
+msgctxt "Due date"
+msgid "Due"
+msgstr "Rok"
+
+#: src/task.c:302
+msgid "Copied to Clipboard"
+msgstr "Kopirano u međuspremnik"
+
+#: src/task.c:336
+msgid "Failed to Export"
+msgstr "Izvoz nije uspio"
+
+#: src/task.c:339 src/task-list.c:294
+msgid "Exported"
+msgstr "Izvezeno"
+
+#: src/task-list.c:283 src/task-list.c:288
+msgid "Export failed"
+msgstr "Izvoz nije uspio"
+
+#: src/task-list.c:314 src/task-list.c:326
+msgid "No tasks to delete"
+msgstr "Nema zadataka za brisanje"
+
+#: src/task-list.c:319 src/task-list.c:331
+#, c-format
+msgid "Deleted %d task"
+msgid_plural "Deleted %d tasks"
+msgstr[0] "Izbrisan je %d zadatak"
+msgstr[1] "Izbrisana su %d zadatka"
+msgstr[2] "Izbrisano je %d zadataka"
+
+#: src/task-list.c:464 src/sidebar.blp:100
+msgid "All Tasks"
+msgstr "Svi zadaci"
+
+#: src/task-list.c:465 src/sidebar.blp:113
+msgid "Tasks for Today"
+msgstr "Današnji zadaci"
+
+#: src/task-list-item.c:142
+msgid "Untitled"
+msgstr "Bez naslova"
+
+#: src/window.c:115
+msgid "Remove Attachment"
+msgstr "Ukloni privitak"
+
+#: src/window.c:146
+msgid "Enable Tag"
+msgstr "Omogući oznaku"
+
+#: src/window.c:151
+msgid "Remove Tag"
+msgstr "Ukloni oznaku"
+
+#: src/date-chooser.blp:13
+msgid "Reset"
+msgstr "Poništi"
+
+#: src/date-chooser.blp:27 src/rrule-row.blp:51
+msgid "Date"
+msgstr "Datum"
+
+#: src/date-chooser.blp:36
+msgid "Today"
+msgstr "Danas"
+
+#: src/date-chooser.blp:50
+msgid "Tomorrow"
+msgstr "Sutra"
+
+#: src/date-chooser.blp:85
+msgid "Time"
+msgstr "Vrijeme"
+
+#: src/date-chooser.blp:149
+msgid "9:00"
+msgstr "9:00"
+
+#: src/date-chooser.blp:164
+msgid "12:00"
+msgstr "12:00"
+
+#: src/date-chooser.blp:179
+msgid "17:00"
+msgstr "17:00"
+
+#: src/date-chooser.blp:194
+msgid "20:00"
+msgstr "20:00"
+
+#: src/delete-list-dialog.blp:8
+msgid "Are you sure?"
+msgstr "Jesi li siguran/na?"
+
+#: src/delete-list-dialog.blp:12 src/rename-list-dialog.blp:11
+msgid "Cancel"
+msgstr "Odustani"
+
+#: src/delete-list-dialog.blp:13 src/task.blp:175
+msgid "Delete"
+msgstr "Izbriši"
+
+#: src/rename-list-dialog.blp:12
+msgid "Rename"
+msgstr "Preimenuj"
+
+#: src/rename-list-dialog.blp:21
+msgid "New List Name"
+msgstr "Naziv novog popisa"
+
+#: src/rrule-row.blp:7 src/task.blp:258
+msgid "Repeat"
+msgstr "Ponavljanje"
+
+#: src/rrule-row.blp:12
+msgid "Frequency"
+msgstr "Učestalost"
+
+#: src/rrule-row.blp:13
+msgid "How often task will repeat"
+msgstr "Koliko često će se zadatak ponavljati"
+
+#: src/rrule-row.blp:17
+msgid "Secondly"
+msgstr "Svake sekunde"
+
+#: src/rrule-row.blp:18
+msgid "Minutely"
+msgstr "Svake minute"
+
+#: src/rrule-row.blp:19
+msgid "Hourly"
+msgstr "Svaki sat"
+
+#: src/rrule-row.blp:20
+msgid "Daily"
+msgstr "Dnevno"
+
+#: src/rrule-row.blp:21
+msgid "Weekly"
+msgstr "Tjedno"
+
+#: src/rrule-row.blp:22
+msgid "Monthly"
+msgstr "Mjesečno"
+
+#: src/rrule-row.blp:23
+msgid "Yearly"
+msgstr "Godišnje"
+
+#: src/rrule-row.blp:24 src/task.blp:144
+msgid "None"
+msgstr "Ništa"
+
+#: src/rrule-row.blp:32
+msgid "Interval"
+msgstr "Interval"
+
+#: src/rrule-row.blp:46
+msgid "Repeat Until"
+msgstr "Ponavljaj do"
+
+#: src/rrule-row.blp:50
+msgid "Indefinitely"
+msgstr "Neograničeno"
+
+#: src/rrule-row.blp:52
+msgid "Count"
+msgstr "Broj"
+
+#: src/rrule-row.blp:60
+msgid "Repeat Until Date"
+msgstr "Datum završetka ponavljanja"
+
+#: src/rrule-row.blp:64
+msgid "Repeat Count"
+msgstr "Broj ponavljanja"
+
+#: src/rrule-row.blp:87
+msgid "Week Days"
+msgstr "Dani u tjednu"
+
+#: src/rrule-row.blp:96
+msgid "Mo"
+msgstr "Po"
+
+#: src/rrule-row.blp:97
+msgid "Monday"
+msgstr "Ponedjeljak"
+
+#: src/rrule-row.blp:106
+msgid "Tu"
+msgstr "Ut"
+
+#: src/rrule-row.blp:107
+msgid "Tuesday"
+msgstr "Utorak"
+
+#: src/rrule-row.blp:116
+msgid "We"
+msgstr "Sr"
+
+#: src/rrule-row.blp:117
+msgid "Wednesday"
+msgstr "Srijeda"
+
+#: src/rrule-row.blp:126
+msgid "Th"
+msgstr "Če"
+
+#: src/rrule-row.blp:127
+msgid "Thursday"
+msgstr "Četvrtak"
+
+#: src/rrule-row.blp:136
+msgid "Fr"
+msgstr "Pe"
+
+#: src/rrule-row.blp:137
+msgid "Friday"
+msgstr "Petak"
+
+#: src/rrule-row.blp:146
+msgid "Sa"
+msgstr "Su"
+
+#: src/rrule-row.blp:147
+msgid "Saturday"
+msgstr "Subota"
+
+#: src/rrule-row.blp:156
+msgid "Su"
+msgstr "Ne"
+
+#: src/rrule-row.blp:157
+msgid "Sunday"
+msgstr "Nedjelja"
+
+#: src/settings-dialog.blp:11
+msgid "Appearance"
+msgstr "Izgled"
+
+#: src/settings-dialog.blp:14
+msgid "Theme"
+msgstr "Tema"
+
+#: src/settings-dialog.blp:21
 msgid "System"
 msgstr "Sustav"
 
-#: errands/widgets/preferences.py:46
+#: src/settings-dialog.blp:26
 msgid "Light"
 msgstr "Svijetla"
 
-#: errands/widgets/preferences.py:58
+#: src/settings-dialog.blp:31
 msgid "Dark"
 msgstr "Tamna"
 
-#: errands/widgets/preferences.py:70
-msgid "Add new Tasks"
-msgstr "Dodaj nove zadatke"
+#: src/settings-dialog.blp:43
+msgid "Miscellaneous"
+msgstr "Ostalo"
 
-#: errands/widgets/preferences.py:71
-msgid "At the Bottom"
-msgstr "Na kraj"
-
-#: errands/widgets/preferences.py:71
-msgid "At the Top"
-msgstr "Na početak"
-
-#: errands/widgets/preferences.py:87
+#: src/settings-dialog.blp:46
 msgid "Show Notifications"
 msgstr "Prikaži obavijesti"
 
-#: errands/widgets/preferences.py:94
-msgid "Run in Background"
-msgstr "Izvodi u pozadini"
+#: src/settings-dialog.blp:50
+msgid "Work in the Background"
+msgstr "Pokreni u pozadini"
 
-#: errands/widgets/preferences.py:95
-msgid "Hide the application window instead of closing it"
-msgstr "Sakrij prozor aplikacije umjesto zatvaranja prozora"
+#: src/settings-dialog.blp:54
+msgid "Launch at Startup"
+msgstr "Pokreni pri pokretanju"
 
-#: errands/widgets/preferences.py:102
-msgid "Launch on Startup"
-msgstr "Pokreni nakon pokretanja sustava"
-
-#: errands/widgets/preferences.py:103
-msgid "Launch application when user logs in"
-msgstr "Pokreni aplikaciju kada se korisnik prijavi"
-
-#: errands/widgets/preferences.py:112
-msgid "Notifications and Background"
-msgstr "Obavijesti i pozadina"
-
-#: errands/widgets/preferences.py:120 errands/widgets/preferences.py:181
-#: data/resources/gtk/help-overlay.ui:38
+#: src/settings-dialog.blp:60 src/shortcuts-dialog.blp:84 src/sidebar.blp:64
 msgid "Sync"
 msgstr "Sinkronizacija"
 
-#. Provider
-#: errands/widgets/preferences.py:123
-msgid "Disabled"
-msgstr "Isključeno"
+#: src/settings-dialog.blp:63
+msgid "Enabled"
+msgstr "Omogućeno"
 
-#: errands/widgets/preferences.py:125
-msgid "Sync Provider"
-msgstr "Pružatelj usluge sinkronizacije"
+#: src/settings-dialog.blp:67
+msgid "Sync Interval"
+msgstr "Interval sinkronizacije"
 
-#: errands/widgets/preferences.py:134
-msgid "Server URL"
-msgstr "URL servera"
+#: src/settings-dialog.blp:68
+msgid "Seconds between pulling events from the server"
+msgstr "Sekunde između dohvaćanja događaja s poslužitelja"
 
-#: errands/widgets/preferences.py:140
-msgid ""
-"URL needs to include protocol, like <b>http://</b> or <b>https://</b>. If "
-"you have problems with connection - try to change protocol first."
-msgstr ""
-"URL adresa mora sadržati protokol, kao što su <b>http://</b> ili <b>https://"
-"</b>. Ako dođe do problema s vezom – najprije pokušaj promijeniti protokol."
+#: src/settings-dialog.blp:80
+msgid "CalDAV Server URL"
+msgstr "URL CalDAV poslužitelja"
 
-#: errands/widgets/preferences.py:147
+#: src/settings-dialog.blp:86
 msgid "Username"
 msgstr "Korisničko ime"
 
-#: errands/widgets/preferences.py:153
+#: src/settings-dialog.blp:92
 msgid "Password"
 msgstr "Lozinka"
 
-#: errands/widgets/preferences.py:159
-msgid "Test"
-msgstr "Provjeri"
-
-#: errands/widgets/preferences.py:164
-msgid "Test Connection"
-msgstr "Testiraj vezu"
-
-#: errands/widgets/preferences.py:172 data/resources/gtk/help-overlay.ui:9
+#: src/shortcuts-dialog.blp:9
 msgid "General"
 msgstr "Općenito"
 
-#: errands/widgets/preferences.py:217
-msgid "Connected"
-msgstr "Povezano"
+#: src/shortcuts-dialog.blp:12 src/sidebar.blp:68
+msgid "Preferences"
+msgstr "Postavke"
 
-#: errands/widgets/preferences.py:221
-msgid "Authorization failed"
-msgstr "Autorizacija nije uspjela"
+#: src/shortcuts-dialog.blp:17
+msgid "Open Menu"
+msgstr "Otvori izbornik"
 
-#: errands/widgets/preferences.py:223
-msgid "Could not locate server. Check network and url."
-msgstr "Server nije pronađen. Provjeri mrežu i URL adresu."
+#: src/shortcuts-dialog.blp:22
+msgid "Close Window"
+msgstr "Zatvori prozor"
 
-#: errands/widgets/preferences.py:225
-msgid "Can't connect"
-msgstr "Povezivanje nije moguće"
+#: src/shortcuts-dialog.blp:27
+msgid "Quit"
+msgstr "Zatvori aplikaciju"
 
-#. NOTE: Also catches invalid credentials
-#: errands/widgets/preferences.py:227
-msgid "Can't connect. Check credentials"
-msgstr "Povezivanje nije moguće. Provjeri podatke za prijavu"
+#: src/shortcuts-dialog.blp:34 src/task-list.blp:12
+msgid "Task List"
+msgstr "Popis zadataka"
 
-#: errands/lib/sync/providers/caldav.py:66
-msgid "Not all sync credentials provided. Please check settings."
-msgstr "Nisu navedeni svi podaci za pristup sinkronizacije. Provjeri postavke."
+#: src/shortcuts-dialog.blp:37
+msgid "Create Task List"
+msgstr "Stvori popis zadataka"
 
-#: errands/lib/sync/providers/caldav.py:110
-msgid "Can't connect to CalDAV server at:"
-msgstr "Neuspjelo povezivanje s CalDAV serverom pri:"
+#: src/shortcuts-dialog.blp:42
+msgid "Import Task List"
+msgstr "Uvezi popis zadataka"
 
-#: errands/lib/data.py:92
-msgid "New Task List"
-msgstr "Novi popis zadataka"
+#: src/shortcuts-dialog.blp:47
+msgid "Sorting and Filtering Options"
+msgstr "Mogućnosti razvrstavanja i filtriranja"
 
-#: errands/lib/notifications.py:74
-msgid "Task is Due"
-msgstr "Rok za zadatak je"
+#: src/shortcuts-dialog.blp:52
+msgid "Search"
+msgstr "Pretraži"
 
-#: errands/application.py:41
-msgid "Errands need to run in the background for notifications"
-msgstr "Za obavijesti se Errands mora izvoditi u pozadini"
+#: src/shortcuts-dialog.blp:57
+msgid "Select Task Entry"
+msgstr "Odaberi unos zadatka"
 
-#: data/resources/gtk/help-overlay.ui:13
-msgid "Show keyboard shortcuts"
-msgstr "Prikaži tipkovničke prečace"
+#: src/shortcuts-dialog.blp:62
+msgid "Entry Task Properties"
+msgstr "Svojstva unosa zadatka"
 
-#: data/resources/gtk/help-overlay.ui:53
-msgid "Lists"
-msgstr "Popisi"
+#: src/shortcuts-dialog.blp:67 src/task-list.blp:142
+msgid "Add Task"
+msgstr "Dodaj novi zadatak"
 
-#: data/resources/gtk/help-overlay.ui:64
-msgid "Import List"
-msgstr "Uvezi popis"
+#: src/shortcuts-dialog.blp:74
+msgid "Task Properties Dialog"
+msgstr "Dijaloški okvir svojstava zadatka"
 
-#: data/resources/gtk/help-overlay.ui:75
-msgid "Details"
-msgstr "Detalji"
+#: src/shortcuts-dialog.blp:77 src/window.blp:99
+msgid "Add Attachment"
+msgstr "Dodaj privitak"
 
-#: data/resources/gtk/help-overlay.ui:79
-msgid "Toggle Details"
-msgstr "Uključi/Isključi detalje"
+#: src/shortcuts-dialog.blp:87
+msgid "Sync Now"
+msgstr "Sinkroniziraj sada"
 
-#: data/io.github.mrvladus.List.desktop.in.in:4
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:7
-msgid "Manage your tasks"
-msgstr "Upravljaj svojim zadacima"
+#: src/sidebar.blp:19
+msgid "Add Task List"
+msgstr "Dodaj popis zadataka"
 
-#: data/io.github.mrvladus.List.desktop.in.in:10
-msgid "errands;tasks;list;todo;todos;caldav;nextcloud;sync;"
-msgstr ""
-"errands;zadaci;popis;popis zadataka;popisi "
-"zadataka;caldav;nextcloud;sinkronizacija;"
+#: src/sidebar.blp:28
+msgid "Import \".ics\" file"
+msgstr "Uvezi .ics datoteku"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:12
-msgid "Todo application for those who prefer simplicity."
-msgstr "Aplikacija za zadatke za one koji vole jednostavnost."
+#: src/sidebar.blp:37
+msgid "New list name"
+msgstr "Naziv novog popisa"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:13
-msgid "Features:"
-msgstr "Značajke:"
+#: src/sidebar.blp:43
+msgid "Create"
+msgstr "Stvori"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:15
-msgid "Multiple task lists support"
-msgstr "Podrška za višestruke popise zadataka"
+#: src/sidebar.blp:60
+msgid "Main Menu (F10)"
+msgstr "Glavni izbornik (F10)"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:16
-msgid "Add, remove, edit tasks and sub-tasks"
-msgstr "Dodaj, ukloni, uredi zadatke i podzadatke"
+#: src/sidebar.blp:69
+msgid "Shortcuts"
+msgstr "Tipkovni prečaci"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:17
-msgid "Mark task and sub-tasks as completed"
-msgstr "Označi zadatak i podzadatke kao završene"
+#: src/sidebar.blp:70
+msgid "About Errands"
+msgstr "O aplikaciji Errands"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:18
-msgid "Add accent color for each task"
-msgstr "Dodaj boju za svaki zadatak"
+#: src/sidebar.blp:99
+msgctxt "All Tasks"
+msgid "All"
+msgstr "Sve"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:19
-msgid "Sync tasks with Nextcloud or other CalDAV providers"
-msgstr ""
-"Sinkroniziraj zadatke s Nextcloudom ili s drugim pružateljima usluge za "
-"CalDAV"
+#: src/sidebar.blp:112
+msgctxt "Tasks for Today"
+msgid "Today"
+msgstr "Danas"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:20
-msgid "Drag and Drop support"
-msgstr "Podrška za povuci i ispusti"
+#: src/sidebar.blp:126
+msgid "Task Lists"
+msgstr "Popisi zadataka"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:21
-msgid "Import .ics files"
-msgstr "Uvezi .ics datoteke"
+#: src/sidebar.blp:131
+msgid "No Task Lists"
+msgstr "Nema popisa zadataka"
 
-#: data/io.github.mrvladus.List.metainfo.xml.in.in:41
-msgid "Main Window View"
-msgstr "Prikaz glavnog prozora"
+#: src/sidebar.blp:132
+msgid "Create new or import “.ics”"
+msgstr "Stvori novo ili uvezi “.ics”"
 
-#~ msgid "Errands was updated"
-#~ msgstr "Errands je aktualiziran"
+#: src/task.blp:37
+msgid "Toggle Completion"
+msgstr "Promijeni stanje dovršenosti"
 
-#~ msgid "Restart is required"
-#~ msgstr "Potrebno je ponovno pokretanje"
+#: src/task.blp:48
+msgid "Restore"
+msgstr "Obnovi"
 
-#~ msgid "Restart"
-#~ msgstr "Pokreni ponovo"
+#: src/task.blp:106
+msgid "Toggle Sub-Tasks Entry"
+msgstr "Prikaži/sakrij unos podzadataka"
 
-#~ msgid "Loading..."
-#~ msgstr "Učitavanje …"
+#: src/task.blp:129 src/window.blp:74
+msgid "Properties"
+msgstr "Svojstva"
+
+#: src/task.blp:130 src/task.blp:264 src/window.blp:120
+msgid "Notes"
+msgstr "Bilješke"
+
+#: src/task.blp:134
+msgid "Edit Text"
+msgstr "Uredi tekst"
+
+#: src/task.blp:135
+msgid "Copy Text"
+msgstr "Kopiraj tekst"
+
+#: src/task.blp:136
+msgid "Task Color"
+msgstr "Boja zadatka"
+
+#: src/task.blp:141 src/task.blp:200 src/task-list.blp:72
+msgid "Priority"
+msgstr "Prioritet"
+
+#: src/task.blp:150
+msgid "Low"
+msgstr "Nisko"
+
+#: src/task.blp:156
+msgid "Medium"
+msgstr "Srednje"
+
+#: src/task.blp:162
+msgid "High"
+msgstr "Visoko"
+
+#: src/task.blp:170 src/task-list.blp:91
+msgid "Export as \".ics\""
+msgstr "Izvezi kao \".ics\""
+
+#: src/task.blp:174
+msgid "Cancel / Restore"
+msgstr "Odustani / vrati"
+
+#: src/task.blp:226 src/window.blp:82
+msgid "Start"
+msgstr "Početak"
+
+#: src/task.blp:227 src/task-list.blp:60
+msgid "Start Date"
+msgstr "Datum početka"
+
+#: src/task.blp:242 src/window.blp:86
+msgid "Due"
+msgstr "Rok"
+
+#: src/task.blp:243 src/task-list.blp:66
+msgid "Due Date"
+msgstr "Krajnji rok"
+
+#: src/task.blp:274 src/task.blp:280 src/window.blp:94
+msgid "Attachments"
+msgstr "Privici"
+
+#: src/task.blp:305
+msgid "Add Sub-Task"
+msgstr "Dodaj novi podzadatak"
+
+#: src/task-list.blp:21
+msgid "Show Tasks"
+msgstr "Prikaži zadatke"
+
+#: src/task-list.blp:24
+msgid "Completed"
+msgstr "Dovršeno"
+
+#: src/task-list.blp:29
+msgid "Cancelled"
+msgstr "Otkazani"
+
+#: src/task-list.blp:35
+msgid "Sort Order"
+msgstr "Redoslijed razvrstavanja"
+
+#: src/task-list.blp:38
+msgid "Descending"
+msgstr "Silazno"
+
+#: src/task-list.blp:44
+msgid "Ascending"
+msgstr "Uzlazno"
+
+#: src/task-list.blp:51
+msgid "Sort By"
+msgstr "Razvrstaj po"
+
+#: src/task-list.blp:54
+msgid "Created"
+msgstr "Stvoreno"
+
+#: src/task-list.blp:87
+msgid "Rename List"
+msgstr "Preimenuj popis"
+
+#: src/task-list.blp:92
+msgid "Print"
+msgstr "Ispiši"
+
+#: src/task-list.blp:96
+msgid "Delete Completed"
+msgstr "Izbriši dovršene zadatke"
+
+#: src/task-list.blp:97
+msgid "Delete Cancelled"
+msgstr "Izbriši otkazane zadatke"
+
+#: src/task-list.blp:101
+msgid "Delete List"
+msgstr "Izbriši popis"
+
+#: src/task-list.blp:109
+msgid "Search (Ctrl+F)"
+msgstr "Pretraži (Ctrl+F)"
+
+#: src/task-list.blp:143
+msgid "Add Task (Ctrl+N)"
+msgstr "Dodaj novi zadatak (Ctrl+N)"
+
+#: src/task-list.blp:161
+msgid "Add Task (Ctrl+Return)"
+msgstr "Dodaj novi zadatak (Ctrl+Return)"
+
+#: src/task-list.blp:185
+msgid "No Tasks"
+msgstr "Nema zadataka"
+
+#: src/task-list.blp:212
+msgid "Loading Tasks"
+msgstr "Učitavanje zadataka"
+
+#: src/window.blp:27
+msgid "Sidebar"
+msgstr "Bočna traka"
+
+#: src/window.blp:34
+msgid "Content"
+msgstr "Sadržaj"
+
+#: src/window.blp:63
+msgid "Close Properties"
+msgstr "Zatvori svojstva"
+
+#: src/window.blp:79
+msgid "Date and Time"
+msgstr "Datum i vrijeme"
+
+#: src/window.blp:106
+msgid "Tags"
+msgstr "Oznake"
+
+#: src/window.blp:111
+msgid "New Tag"
+msgstr "Nova oznaka"

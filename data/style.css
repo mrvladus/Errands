@@ -1,0 +1,115 @@
+/* Copyright (c) 2026 Vlad Krupinskii <vladkrupinskii@gmail.com> */
+/* SPDX-License-Identifier: Zlib */
+
+.sub-toggle-btn > image {
+    -gtk-icon-transform: scale(0.6);
+    transition: 0.2s;
+}
+.sub-toggle-btn:checked > image,
+.sub-toggle-btn:hover > image {
+    -gtk-icon-transform: scale(1);
+}
+
+.sub-entry {
+    background-color: var(--border-color);
+}
+.sub-entry > text > placeholder {
+    opacity: 0.9;
+}
+
+.task-toolbar-btn,
+.tag {
+    padding: 0px 6px;
+    border-radius: 24px;
+}
+
+.priority-label {
+    background-color: var(--border-color);
+    border-radius: 24px;
+    padding: 3px 6px;
+}
+
+/* Date and time widndow */
+
+.weekday {
+    padding: 2px;
+}
+
+/* Overrides */
+
+@media (prefers-color-scheme: dark) {
+    link {
+        color: white;
+    }
+}
+
+checkbutton > check {
+    transition: 0s;
+}
+
+colorbutton button {
+    border-radius: 9999px;
+    padding: 0px;
+    margin: 0px;
+    transform: scale(0.8);
+    min-height: 36px;
+    min-width: 36px;
+}
+
+colorbutton button colorswatch {
+    border-radius: 9999px;
+    transform: scale(0.8);
+}
+
+calendar {
+    background: var(--view-bg-color);
+}
+
+calendar,
+calendar header {
+    border: none;
+}
+
+calendar button {
+    border-radius: 9999px;
+}
+
+calendar label {
+    border-radius: 9999px;
+    padding: 5px;
+}
+
+editablelabel > stack > text {
+    background-color: transparent;
+}
+
+listview {
+    background-color: transparent;
+}
+
+listview > row {
+    border-radius: var(--window-radius);
+    margin-top: 3px;
+    margin-bottom: 3px;
+    margin-left: 3px;
+    margin-right: 6px;
+}
+
+expander {
+    -gtk-icon-source: -gtk-icontheme("errands-right-symbolic");
+    transition: 0.2s;
+}
+
+expander:hover {
+    -gtk-icon-transform: scale(1.5);
+    color: var(--accent-color);
+}
+
+expander:checked {
+    -gtk-icon-source: -gtk-icontheme("errands-down-symbolic");
+    color: var(--accent-color);
+}
+
+splitbutton > menubutton > button > arrow {
+    -gtk-icon-source: -gtk-icontheme("errands-down-symbolic");
+}

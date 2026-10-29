@@ -1,11 +1,5 @@
+_*/
+core.*
+gmon.out
+analysis.txt
 .flatpak-builder/
-.flatpak/
-_build/
-.vscode/
-venv/
-.venv/
-.ruff_cache/
-*.flatpak
-.idea/
-pug
-build/

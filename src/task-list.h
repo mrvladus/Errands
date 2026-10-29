@@ -1,0 +1,56 @@
+// Copyright (c) 2026 Vlad Krupinskii <vladkrupinskii@gmail.com>
+// SPDX-License-Identifier: Zlib
+
+#pragma once
+
+#include "task-list-item.h"
+
+#include <adwaita.h>
+
+typedef enum {
+  ERRANDS_TASK_LIST_PAGE_ALL,
+  ERRANDS_TASK_LIST_PAGE_TODAY,
+  ERRANDS_TASK_LIST_PAGE_TASK_LIST,
+} ErrandsTaskListPage;
+
+#define ERRANDS_TYPE_TASK_LIST (errands_task_list_get_type())
+G_DECLARE_FINAL_TYPE(ErrandsTaskList, errands_task_list, ERRANDS, TASK_LIST, AdwBin)
+
+struct _ErrandsTaskList {
+  AdwBin parent_instance;
+
+  GtkWidget *loading_page;
+  GtkWidget *title;
+  GtkWidget *search_btn;
+  GtkWidget *menu_btn;
+  GtkWidget *search_bar;
+  GtkWidget *search_entry;
+  GtkWidget *entry_box;
+  GtkWidget *entry;
+  GtkWidget *entry_apply_btn;
+  GtkWidget *scrl;
+  GtkWidget *list_view;
+
+  gchar *search_query;
+
+  GListStore *toplevel_tasks_models; // Model of task models
+  GtkFlattenListModel *all_tasks_model;
+  GtkFilterListModel *today_model;
+  GtkFilterListModel *current_model;
+  GtkTreeListModel *tree_model;
+  GtkTreeListRowSorter *tree_sorter;
+  GtkFilter *tree_filter;
+  GtkFilterListModel *tree_filter_model;
+
+  ErrandsTaskListItem *item;
+  ErrandsTaskListPage page;
+};
+
+ErrandsTaskList *errands_task_list_new();
+// Update title and placeholder
+void errands_task_list_update(ErrandsTaskList *self);
+void errands_task_list_show_all_tasks(ErrandsTaskList *self);
+void errands_task_list_show_today_tasks(ErrandsTaskList *self);
+void errands_task_list_show_task_list(ErrandsTaskList *self, ErrandsTaskListItem *item);
+void errands_task_list_sort(ErrandsTaskList *self, GtkSorterChange change);
+void errands_task_list_filter(ErrandsTaskList *self, GtkFilterChange change);

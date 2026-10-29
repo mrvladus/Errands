@@ -1,0 +1,155 @@
+// Copyright (c) 2026 Vlad Krupinskii <vladkrupinskii@gmail.com>
+// SPDX-License-Identifier: Zlib
+using Gtk 4.0;
+using Adw 1;
+
+template $ErrandsSidebar: Adw.Bin {
+  Adw.ToolbarView {
+    width-request: 200;
+
+    [top]
+    Adw.HeaderBar {
+      title-widget: Adw.WindowTitle {
+        title: _("Errands");
+      };
+
+      [start]
+      MenuButton {
+        icon-name: "errands-add-symbolic";
+        tooltip-text: _("Add Task List");
+
+        popover: PopoverMenu popover {
+          menu-model: menu {
+            item {
+              custom: "entry";
+            }
+
+            section {
+              item (_("Import \".ics\" file"), "sidebar.import")
+            }
+          };
+
+          [entry]
+          Box {
+            spacing: 6;
+
+            Entry entry {
+              placeholder-text: _("New list name");
+              changed => $on_entry_changed_cb(template);
+              activate => $on_entry_activated_cb(template);
+            }
+
+            Button create_btn {
+              tooltip-text: _("Create");
+              icon-name: "errands-select-symbolic";
+              sensitive: false;
+              clicked => $on_create_btn_clicked_cb(template);
+
+              styles [
+                "suggested-action",
+              ]
+            }
+          }
+        };
+      }
+
+      [end]
+      MenuButton {
+        icon-name: "errands-menu-symbolic";
+        primary: true;
+        tooltip-text: _("Main Menu (F10)");
+
+        menu-model: menu {
+          section {
+            item (_("Sync"), "sidebar.sync")
+          }
+
+          section {
+            item (_("Preferences"), "sidebar.preferences")
+            item (_("Shortcuts"), "app.shortcuts")
+            item (_("About Errands"), "sidebar.about")
+          }
+        };
+
+        ShortcutController {
+          scope: global;
+
+          Shortcut {
+            trigger: "<Control>comma";
+            action: "action(sidebar.preferences)";
+          }
+
+          Shortcut {
+            trigger: "<Control><Shift>S";
+            action: "action(sidebar.sync)";
+          }
+        }
+      }
+
+      [end]
+      Revealer sync_indicator {
+        transition-duration: 300;
+        transition-type: crossfade;
+
+        Adw.Spinner {
+          tooltip-text: _("Sync");
+        }
+      }
+    }
+
+    content: ScrolledWindow {
+      Box {
+        orientation: vertical;
+
+        Adw.Sidebar sidebar {
+          activated => $on_sidebar_activated_cb();
+          // drop => $on_drop_cb();
+          Adw.SidebarSection {
+            Adw.SidebarItem {
+              title: C_("All Tasks", "All");
+              tooltip: _("All Tasks");
+              icon-name: "errands-all-tasks-symbolic";
+
+              suffix: Label all_counter {
+                styles [
+                  "dim-label",
+                  "caption",
+                ]
+              };
+            }
+
+            Adw.SidebarItem {
+              title: C_("Tasks for Today", "Today");
+              tooltip: _("Tasks for Today");
+              icon-name: "errands-calendar-symbolic";
+
+              suffix: Label today_counter {
+                styles [
+                  "dim-label",
+                  "caption",
+                ]
+              };
+            }
+          }
+
+          Adw.SidebarSection task_lists_section {
+            title: _("Task Lists");
+          }
+        }
+
+        Adw.StatusPage {
+          title: _("No Task Lists");
+          description: _("Create new or import “.ics”");
+          icon-name: "errands-list-symbolic";
+          valign: center;
+          vexpand: true;
+          visible: bind sidebar.visible inverted;
+
+          styles [
+            "compact",
+          ]
+        }
+      }
+    };
+  }
+}

@@ -1,0 +1,118 @@
+{
+  "id": "io.github.mrvladus.List.Devel",
+  "runtime": "org.gnome.Platform",
+  "runtime-version": "51",
+  "sdk": "org.gnome.Sdk",
+  "command": "errands",
+  "finish-args": [
+    "--device=dri",
+    "--socket=wayland",
+    "--socket=fallback-x11",
+    "--share=ipc",
+    "--share=network",
+    "--talk-name=org.freedesktop.secrets",
+    "--filesystem=home"
+  ],
+  "cleanup": [
+    "/include",
+    "/lib/pkgconfig",
+    "/lib/cmake",
+    "/man",
+    "/share/aclocal",
+    "/share/gtk-doc",
+    "/share/man",
+    "/share/pkgconfig",
+    "/share/vala",
+    "*.la",
+    "*.a"
+  ],
+  "modules": [
+    {
+      "name": "libportal",
+      "buildsystem": "meson",
+      "config-opts": [
+        "-Dbackend-gtk4=enabled",
+        "-Dbackend-gtk3=disabled",
+        "-Dbackend-qt5=disabled",
+        "-Dbackend-qt6=disabled",
+        "-Dvapi=false",
+        "-Ddocs=false",
+        "-Dtests=false",
+        "-Dintrospection=false"
+      ],
+      "sources": [
+        {
+          "type": "git",
+          "url": "https://github.com/flatpak/libportal.git",
+          "tag": "0.11.0"
+        }
+      ]
+    },
+    {
+      "name": "libical",
+      "buildsystem": "cmake",
+      "config-opts": [
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DLIBICAL_CXX_BINDINGS=False",
+        "-DLIBICAL_JAVA_BINDINGS=False",
+        "-DLIBICAL_GOBJECT_INTROSPECTION=False",
+        "-DLIBICAL_BUILD_DOCS=False",
+        "-DLIBICAL_GLIB_BUILD_DOCS=False",
+        "-DLIBICAL_GLIB_VAPI=False",
+        "-DLIBICAL_BUILD_TESTING=False",
+        "-DLIBICAL_BUILD_EXAMPLES=False"
+      ],
+      "sources": [
+        {
+          "type": "git",
+          "url": "https://github.com/libical/libical.git",
+          "tag": "v4.0.7"
+        }
+      ]
+    },
+    {
+      "name": "evolution-data-server",
+      "cleanup": ["/share/GConf"],
+      "buildsystem": "cmake-ninja",
+      "config-opts": [
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DENABLE_TESTS=OFF",
+        "-DENABLE_EXAMPLES=OFF",
+        "-DENABLE_INSTALLED_TESTS=OFF",
+        "-DENABLE_GTK=OFF",
+        "-DENABLE_GTK4=ON",
+        "-DENABLE_GTK_DOC=OFF",
+        "-DENABLE_CANBERRA=OFF",
+        "-DENABLE_GOA=OFF",
+        "-DENABLE_DOT_LOCKING=OFF",
+        "-DENABLE_GOOGLE=OFF",
+        "-DENABLE_VALA_BINDINGS=OFF",
+        "-DENABLE_WEATHER=OFF",
+        "-DWITH_OPENLDAP=OFF",
+        "-DWITH_LIBDB=OFF",
+        "-DENABLE_INTROSPECTION=OFF",
+        "-DENABLE_OAUTH2_WEBKITGTK4=OFF",
+        "-DENABLE_OAUTH2_WEBKITGTK=OFF"
+      ],
+      "sources": [
+        {
+          "type": "git",
+          "url": "https://gitlab.gnome.org/GNOME/evolution-data-server.git"
+        }
+      ]
+    },
+    {
+      "name": "errands",
+      "buildsystem": "simple",
+      "build-commands": [
+        "make -j$FLATPAK_BUILDER_N_JOBS DEVEL=TRUE prefix=/app install"
+      ],
+      "sources": [
+        {
+          "type": "dir",
+          "path": "../../"
+        }
+      ]
+    }
+  ]
+}

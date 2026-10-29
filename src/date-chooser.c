@@ -1,0 +1,203 @@
+// Copyright (c) 2026 Vlad Krupinskii <vladkrupinskii@gmail.com>
+// SPDX-License-Identifier: Zlib
+
+#include "date-chooser.h"
+#include "config.h"
+#include "utils.h"
+
+#include <glib/gi18n.h>
+#include <libical/ical.h>
+
+static void on_reset_action_cb(GSimpleAction *action, GVariant *param, ErrandsDateChooser *self);
+static void on_today_action_cb(GSimpleAction *action, GVariant *param, ErrandsDateChooser *self);
+static void on_tomorrow_action_cb(GSimpleAction *action, GVariant *param, ErrandsDateChooser *self);
+static void on_time_preset_action_cb(GSimpleAction *action, GVariant *param, ErrandsDateChooser *self);
+
+static void on_day_selected(ErrandsDateChooser *self);
+static void on_time_set_cb(ErrandsDateChooser *self, GtkSpinButton *btn);
+
+// ---------- WIDGET TEMPLATE ---------- //
+
+struct _ErrandsDateChooser {
+  AdwActionRow parent_instance;
+  GtkCalendar *calendar;
+  GtkButton *reset_btn;
+  GtkPopover *date_popover;
+  GtkPopover *time_popover;
+  GtkSpinButton *hours, *minutes;
+
+  icaltimetype dt;
+
+  // Properties
+  const char *date_string;
+};
+
+G_DEFINE_TYPE(ErrandsDateChooser, errands_date_chooser, ADW_TYPE_ACTION_ROW)
+
+enum {
+  PROP_0,
+
+  PROP_DATE_STRING,
+
+  N_PROPERTIES,
+};
+
+static GParamSpec *obj_properties[N_PROPERTIES] = {NULL};
+
+static void get_property(GObject *object, guint prop_id, GValue *value, GParamSpec *pspec) {
+  ErrandsDateChooser *self = ERRANDS_DATE_CHOOSER(object);
+  switch (prop_id) {
+  case PROP_DATE_STRING: g_value_set_string(value, self->date_string); break;
+  default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
+  }
+}
+
+static void set_property(GObject *object, guint prop_id, const GValue *value, GParamSpec *pspec) {
+  ErrandsDateChooser *self = ERRANDS_DATE_CHOOSER(object);
+  switch (prop_id) {
+  case PROP_DATE_STRING: self->date_string = g_value_get_string(value); break;
+  default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
+  }
+}
+
+static void finalize(GObject *gobject) {
+  gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_DATE_CHOOSER);
+  G_OBJECT_CLASS(errands_date_chooser_parent_class)->finalize(gobject);
+}
+
+static void errands_date_chooser_class_init(ErrandsDateChooserClass *class) {
+  GObjectClass *object_class = G_OBJECT_CLASS(class);
+  object_class->finalize = finalize;
+  object_class->get_property = get_property;
+  object_class->set_property = set_property;
+
+  obj_properties[PROP_DATE_STRING] = g_param_spec_string("date-string", "Date String", "Date string", NULL, G_PARAM_READWRITE);
+
+  g_object_class_install_properties(object_class, N_PROPERTIES, obj_properties);
+
+  gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), RESOURCE_PATH "/ui/date-chooser.ui");
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsDateChooser, reset_btn);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsDateChooser, date_popover);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsDateChooser, time_popover);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsDateChooser, calendar);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsDateChooser, minutes);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsDateChooser, hours);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), errands_date_chooser_reset);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_day_selected);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_time_set_cb);
+}
+
+static void errands_date_chooser_init(ErrandsDateChooser *self) {
+  gtk_widget_init_template(GTK_WIDGET(self));
+  GSimpleActionGroup *ag = errands_add_action_group(self, "date-chooser");
+  errands_add_action(ag, "reset", on_reset_action_cb, self, NULL);
+  errands_add_action(ag, "today", on_today_action_cb, self, NULL);
+  errands_add_action(ag, "tomorrow", on_tomorrow_action_cb, self, NULL);
+  errands_add_action(ag, "time-preset", on_time_preset_action_cb, self, "i");
+}
+
+static void update_title(ErrandsDateChooser *self) {
+  if (icaltime_is_null_time(self->dt) || icaltime_is_null_date(self->dt)) {
+    g_object_set(self, "title", _("Not Set"), NULL);
+    return;
+  }
+  g_autoptr(GDateTime) date = gtk_calendar_get_date(self->calendar);
+  g_autofree gchar *date_str = g_date_time_format(date, "%x");
+  if (icaltime_is_date(self->dt)) {
+    g_object_set(self, "title", date_str, NULL);
+    return;
+  }
+  int hour = self->dt.hour;
+  int minute = self->dt.minute;
+  g_autofree gchar *title = g_strdup_printf("%s, %02d:%02d", date_str, hour, minute);
+  g_object_set(self, "title", title, NULL);
+}
+
+// ---------- PUBLIC FUNCTIONS ---------- //
+
+ErrandsDateChooser *errands_date_chooser_new() { return g_object_new(ERRANDS_TYPE_DATE_CHOOSER, NULL); }
+
+void errands_date_chooser_reset(ErrandsDateChooser *self) {
+  self->dt = icaltime_null_time();
+  g_autoptr(GDateTime) today = g_date_time_new_now_local();
+  gtk_calendar_set_date(self->calendar, today);
+  gtk_spin_button_set_value(self->hours, 0);
+  gtk_spin_button_set_value(self->minutes, 0);
+  update_title(self);
+  g_object_set(self->reset_btn, "visible", false, NULL);
+}
+
+icaltimetype errands_date_chooser_get_dt(ErrandsDateChooser *self) {
+  return icaltime_convert_to_zone(self->dt, icaltimezone_get_utc_timezone());
+}
+
+void errands_date_chooser_set_dt(ErrandsDateChooser *self, icaltimetype dt) {
+  self->dt = dt;
+  if (icaltime_is_null_time(self->dt) || icaltime_is_null_date(self->dt)) {
+    errands_date_chooser_reset(self);
+    return;
+  }
+  gtk_calendar_set_year(self->calendar, self->dt.year);
+  gtk_calendar_set_month(self->calendar, self->dt.month - 1);
+  gtk_calendar_set_day(self->calendar, self->dt.day);
+  if (!icaltime_is_date(self->dt)) {
+    gtk_spin_button_set_value(self->hours, self->dt.hour);
+    gtk_spin_button_set_value(self->minutes, self->dt.minute);
+  }
+  update_title(self);
+  g_object_set(self->reset_btn, "visible", true, NULL);
+}
+
+// ---------- ACTIONS ---------- //
+
+static void on_reset_action_cb(GSimpleAction *action, GVariant *param, ErrandsDateChooser *self) {
+  errands_date_chooser_reset(self);
+}
+
+static void on_today_action_cb(GSimpleAction *action, GVariant *param, ErrandsDateChooser *self) {
+  g_autoptr(GDateTime) today = g_date_time_new_now_local();
+  g_autoptr(GDateTime) tomorrow = g_date_time_add_days(today, 1);
+  gtk_calendar_set_date(self->calendar, tomorrow);
+  gtk_calendar_set_date(self->calendar, today);
+  gtk_popover_popdown(self->date_popover);
+  self->dt = icaltime_today();
+}
+
+static void on_tomorrow_action_cb(GSimpleAction *action, GVariant *param, ErrandsDateChooser *self) {
+  g_autoptr(GDateTime) today = g_date_time_new_now_local();
+  g_autoptr(GDateTime) tomorrow = g_date_time_add_days(today, 1);
+  gtk_calendar_set_date(self->calendar, tomorrow);
+  gtk_popover_popdown(self->date_popover);
+  self->dt = icaltime_today();
+  icaltime_adjust(&self->dt, 1, 0, 0, 0);
+}
+
+static void on_time_preset_action_cb(GSimpleAction *action, GVariant *param, ErrandsDateChooser *self) {
+  gtk_spin_button_set_value(self->minutes, 0);
+  gtk_spin_button_set_value(self->hours, g_variant_get_int32(param));
+}
+
+// ---------- CALLBACKS ---------- //
+
+static void on_day_selected(ErrandsDateChooser *self) {
+  g_autoptr(GDateTime) date = gtk_calendar_get_date(self->calendar);
+  self->dt.year = g_date_time_get_year(date);
+  self->dt.month = g_date_time_get_month(date);
+  self->dt.day = g_date_time_get_day_of_month(date);
+  update_title(self);
+  g_object_set(self->reset_btn, "visible", true, NULL);
+}
+
+static void on_time_set_cb(ErrandsDateChooser *self, GtkSpinButton *btn) {
+  int hour = gtk_spin_button_get_value_as_int(self->hours);
+  int minute = gtk_spin_button_get_value_as_int(self->minutes);
+  if (icaltime_is_null_date(self->dt)) on_today_action_cb(NULL, NULL, self);
+  self->dt.is_date = false;
+  self->dt.hour = hour;
+  self->dt.minute = minute;
+  self->dt.second = 0;
+  gtk_editable_set_text(GTK_EDITABLE(self->hours), tmp_str_printf("%02d", hour));
+  gtk_editable_set_text(GTK_EDITABLE(self->minutes), tmp_str_printf("%02d", minute));
+  update_title(self);
+  g_object_set(self->reset_btn, "visible", true, NULL);
+}

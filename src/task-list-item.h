@@ -1,0 +1,44 @@
+// Copyright (c) 2026 Vlad Krupinskii <vladkrupinskii@gmail.com>
+// SPDX-License-Identifier: Zlib
+
+#pragma once
+
+#include <gdk/gdk.h>
+#include <gio/gio.h>
+#include <libical-glib/libical-glib.h>
+
+#define ERRANDS_TYPE_TASK_LIST_ITEM (errands_task_list_item_get_type())
+G_DECLARE_FINAL_TYPE(ErrandsTaskListItem, errands_task_list_item, ERRANDS, TASK_LIST_ITEM, GObject)
+
+struct _ErrandsTaskListItem {
+  GObject parent_instance;
+
+  guint save_timeout_id;
+
+  GListStore *tasks;
+
+  // GObject Properties
+  icalcomponent *ical;
+  gchar *uid;
+  gchar *title;
+  GdkRGBA color;
+  gint count; // Number of uncompleted tasks
+};
+
+ErrandsTaskListItem *errands_task_list_item_new(icalcomponent *ical);
+ErrandsTaskListItem *errands_task_list_item_create(const char *uid, const char *name, const char *color, bool deleted,
+                                                   bool synced);
+ErrandsTaskListItem *errands_task_list_item_load_from_ics(const char *path);
+void errands_task_list_item_update_count(ErrandsTaskListItem *self);
+void errands_task_list_item_save(ErrandsTaskListItem *self);
+void errands_task_list_item_delete(ErrandsTaskListItem *self);
+int errands_task_list_item_delete_completed(ErrandsTaskListItem *self);
+int errands_task_list_item_delete_cancelled(ErrandsTaskListItem *self);
+void errands_task_list_item_remove_deleted_tasks(ErrandsTaskListItem *self);
+// Creates a new task item with the given text, saves the list and adds it to the list children model.
+struct ErrandsTaskItem *errands_task_list_item_create_task(ErrandsTaskListItem *self, struct ErrandsTaskItem *parent,
+                                                           const char *text);
+
+void errands_task_list_item_set_title(ErrandsTaskListItem *self, const char *title);
+void errands_task_list_item_set_color(ErrandsTaskListItem *self, GdkRGBA *color);
+void errands_task_list_item_set_color_from_string(ErrandsTaskListItem *self, const char *color);

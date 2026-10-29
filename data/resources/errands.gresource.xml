@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<gresources>
-  <gresource prefix="/io/github/mrvladus/Errands">
-    <file alias="style.css">style.css</file>
-    <file alias="style-dark.css">style-dark.css</file>
-    <file preprocess="xml-stripblanks" alias="gtk/help-overlay.ui">gtk/help-overlay.ui</file>
-  </gresource>
-</gresources>

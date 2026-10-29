@@ -1,0 +1,325 @@
+// Copyright (c) 2026 Vlad Krupinskii <vladkrupinskii@gmail.com>
+// SPDX-License-Identifier: Zlib
+using Gtk 4.0;
+using Adw 1;
+
+template $ErrandsTask: Box {
+  orientation: vertical;
+
+  styles [
+    "card",
+  ]
+
+  accessibility {
+    labelled-by: title;
+  }
+
+  EventControllerMotion motion_ctrl {}
+
+  DropControllerMotion drop_motion_ctrl {
+    enter => $on_drop_motion_ctrl_enter_cb(template);
+  }
+
+  // Title Box
+  Box {
+    spacing: 6;
+    margin-start: 6;
+    margin-end: 6;
+    margin-top: 6;
+    margin-bottom: 6;
+
+    accessibility {
+      labelled-by: title;
+    }
+
+    CheckButton complete_btn {
+      valign: center;
+      tooltip-text: _("Toggle Completion");
+      visible: bind cancel_btn.visible inverted;
+
+      styles [
+        "selection-mode",
+      ]
+    }
+
+    // Cancelled
+    Button cancel_btn {
+      icon-name: "errands-cancel-symbolic";
+      tooltip-text: _("Restore");
+      valign: center;
+      visible: bind template.item as <$ErrandsTaskItem>.cancelled;
+      action-name: "task.cancel";
+
+      styles [
+        "flat",
+        "error",
+        "circular",
+      ]
+    }
+
+    // Title
+    Box {
+      orientation: vertical;
+      valign: center;
+      spacing: 0;
+
+      Label title {
+        label: bind template.item as <$ErrandsTaskItem>.title;
+        hexpand: true;
+        halign: fill;
+        valign: center;
+        wrap: true;
+        wrap-mode: char;
+        xalign: 0;
+        use-markup: true;
+      }
+
+      EditableLabel edit_title {
+        hexpand: true;
+        vexpand: true;
+        halign: fill;
+        valign: center;
+        xalign: 0;
+        max-width-chars: 50;
+        visible: bind title.visible bidirectional inverted;
+        notify::editing => $on_title_edit_cb();
+      }
+    }
+
+    Box {
+      Label {
+        label: bind template.item as <$ErrandsTaskItem>.uncompleted-count;
+        margin-end: 12;
+
+        styles [
+          "dimmed",
+          "caption",
+        ]
+      }
+
+      Revealer {
+        transition-type: slide_left;
+        transition-duration: 300;
+        reveal-child: bind motion_ctrl.contains-pointer;
+
+        ToggleButton sub_toggle_btn {
+          tooltip-text: _("Toggle Sub-Tasks Entry");
+          icon-name: "errands-add-symbolic";
+          valign: center;
+          visible: bind edit_title.editing inverted;
+
+          styles [
+            "flat",
+            "circular",
+            "sub-toggle-btn",
+          ]
+        }
+      }
+
+      // Properties menu
+      MenuButton {
+        icon-name: "errands-more-symbolic";
+
+        popover: PopoverMenu popover_menu {
+          has-arrow: false;
+          position: bottom;
+
+          menu-model: menu {
+            section {
+              item (_("Properties"), "task.properties")
+              item (_("Notes"), "task.notes")
+            }
+
+            section {
+              item (_("Edit Text"), "task.edit")
+              item (_("Copy Text"), "task.copy")
+              item (_("Task Color"), "task.color")
+            }
+
+            section {
+              submenu {
+                label: _("Priority");
+
+                item {
+                  label: _("None");
+                  action: "task.priority";
+                  target: "none";
+                }
+
+                item {
+                  label: _("Low");
+                  action: "task.priority";
+                  target: "low";
+                }
+
+                item {
+                  label: _("Medium");
+                  action: "task.priority";
+                  target: "medium";
+                }
+
+                item {
+                  label: _("High");
+                  action: "task.priority";
+                  target: "high";
+                }
+              }
+            }
+
+            section {
+              item (_("Export as \".ics\""), "task.export")
+            }
+
+            section {
+              item (_("Cancel / Restore"), "task.cancel")
+              item (_("Delete"), "task.delete")
+            }
+          };
+        };
+
+        styles [
+          "circular",
+          "flat",
+        ]
+      }
+    }
+  }
+
+  // Toolbar
+  Adw.WrapBox toolbar {
+    child-spacing: 3;
+    line-spacing: 3;
+    margin-start: 6;
+    margin-end: 6;
+    margin-bottom: 6;
+    valign: center;
+    visible: false;
+
+    Box priority_box {
+      spacing: 3;
+      tooltip-text: _("Priority");
+      valign: center;
+
+      styles [
+        "caption",
+        "priority-label",
+      ]
+
+      Image {
+        icon-name: "errands-priority-symbolic";
+      }
+
+      Label priority_label {}
+    }
+
+    Button dtstart_btn {
+      valign: center;
+      action-name: "task.properties";
+
+      styles [
+        "caption",
+        "task-toolbar-btn",
+      ]
+
+      Adw.ButtonContent dtstart_btn_content {
+        icon-name: "errands-calendar-symbolic";
+        label: _("Start");
+        tooltip-text: _("Start Date");
+      }
+    }
+
+    Button dtend_btn {
+      valign: center;
+      action-name: "task.properties";
+
+      styles [
+        "caption",
+        "task-toolbar-btn",
+      ]
+
+      Adw.ButtonContent dtend_btn_content {
+        icon-name: "errands-calendar-symbolic";
+        label: _("Due");
+        tooltip-text: _("Due Date");
+      }
+    }
+
+    Button rrule_btn {
+      valign: center;
+      action-name: "task.properties";
+
+      styles [
+        "caption",
+        "task-toolbar-btn",
+      ]
+
+      Adw.ButtonContent rrule_btn_content {
+        icon-name: "errands-repeat-symbolic";
+        tooltip-text: _("Repeat");
+      }
+    }
+
+    Button notes_btn {
+      icon-name: "errands-notes-symbolic";
+      tooltip-text: _("Notes");
+      valign: center;
+      action-name: "task.notes";
+
+      styles [
+        "task-toolbar-btn",
+      ]
+    }
+
+    Button attachments_btn {
+      tooltip-text: _("Attachments");
+      valign: center;
+      action-name: "task.properties";
+
+      Adw.ButtonContent attachments_btn_content {
+        icon-name: "errands-attachment-symbolic";
+        tooltip-text: _("Attachments");
+      }
+
+      styles [
+        "caption",
+        "task-toolbar-btn",
+      ]
+    }
+
+    // Tags box
+    Adw.WrapBox tags_box {
+      child-spacing: 3;
+      line-spacing: 3;
+      halign: end;
+      hexpand: true;
+    }
+  }
+
+  Revealer sub_entry_revealer {
+    reveal-child: bind sub_toggle_btn.active;
+    // Sub-Tasks Entry
+    Entry sub_entry {
+      margin-start: 6;
+      margin-end: 6;
+      margin-bottom: 6;
+      placeholder-text: _("Add Sub-Task");
+      activate => $on_sub_task_entry_activated_cb(template) not-swapped;
+
+      styles [
+        "sub-entry",
+      ]
+    }
+  }
+
+  DragSource {
+    actions: move;
+    prepare => $on_drag_prepare_cb(template) not-swapped;
+    drag-begin => $on_drag_begin_cb(template) not-swapped;
+  }
+
+  DropTarget {
+    formats: "ErrandsTaskItem";
+    actions: move;
+    drop => $on_drop_cb(template) not-swapped;
+  }
+}

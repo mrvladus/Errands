@@ -1,0 +1,14 @@
+// Copyright (c) 2026 Vlad Krupinskii <vladkrupinskii@gmail.com>
+// SPDX-License-Identifier: Zlib
+
+#pragma once
+
+#include "task-list-item.h"
+
+#include <adwaita.h>
+
+#define ERRANDS_TYPE_RENAME_LIST_DIALOG (errands_rename_list_dialog_get_type())
+G_DECLARE_FINAL_TYPE(ErrandsRenameListDialog, errands_rename_list_dialog, ERRANDS, RENAME_LIST_DIALOG, AdwAlertDialog)
+
+ErrandsRenameListDialog *errands_rename_list_dialog_new();
+void errands_rename_list_dialog_show(ErrandsTaskListItem *item);

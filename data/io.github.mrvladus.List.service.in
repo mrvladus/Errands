@@ -1,3 +1,0 @@
-[D-BUS Service]
-Name=@APP_ID@
-Exec=@bindir@/errands --gapplication-service
