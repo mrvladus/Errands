@@ -429,12 +429,10 @@ static void move_to_list_recursive(ErrandsTaskItem *self, ErrandsTaskListItem *n
   g_assert_nonnull(new_list);
 
   ErrandsTaskListItem *old_list = self->list;
-  g_object_ref(self->ical);
+  icalcomponent_add_component(new_list->ical, icalcomponent_clone(self->ical));
   icalcomponent_remove_component(old_list->ical, self->ical);
-  icalcomponent_add_component(new_list->ical, self->ical);
   self->list = new_list;
   errands_data_set_synced(self->ical, false);
-  // errands_sync_move_task(self, old_list);
   GListModel *children = G_LIST_MODEL(self->children_model);
   for (guint i = 0; i < g_list_model_get_n_items(children); i++) {
     g_autoptr(ErrandsTaskItem) child = g_list_model_get_item(children, i);
@@ -639,7 +637,6 @@ bool errands_task_item_move(ErrandsTaskItem *self, ErrandsTaskItem *parent, Erra
   ErrandsTaskListItem *old_list = self->list;
   if (old_list != list) move_to_list_recursive(self, list);
   errands_task_item_set_parent(self, parent);
-  // errands_sync_move_task(self, old_list);
   g_list_store_append(parent ? parent->children_model : list->tasks, self);
   g_list_store_remove_data(old_model, self);
   errands_task_list_item_save(list);
