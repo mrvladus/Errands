@@ -3,3 +3,4 @@ core.*
 gmon.out
 analysis.txt
 .flatpak-builder/
+*.zip

@@ -423,21 +423,29 @@ static inline bool item_is_descendant_of(ErrandsTaskItem *item, ErrandsTaskItem 
   return false;
 }
 
-static void move_to_list_recursive(ErrandsTaskItem *self, ErrandsTaskListItem *new_list) {
-  g_assert(ERRANDS_IS_TASK_ITEM(self));
-  g_assert(self->list != new_list);
-  g_assert_nonnull(new_list);
-
-  ErrandsTaskListItem *old_list = self->list;
-  icalcomponent_add_component(new_list->ical, icalcomponent_clone(self->ical));
-  icalcomponent_remove_component(old_list->ical, self->ical);
-  self->list = new_list;
-  errands_data_set_synced(self->ical, false);
+static void clone_task_tree(ErrandsTaskItem *self, ErrandsTaskListItem *new_list, const char *new_parent_uid) {
+  icalcomponent *clone = icalcomponent_clone(self->ical);
+  errands_data_set_deleted(clone, false);
+  errands_data_set_synced(clone, false);
+  if (new_parent_uid) errands_data_set_parent(clone, new_parent_uid);
+  icalcomponent_add_component(new_list->ical, clone);
   GListModel *children = G_LIST_MODEL(self->children_model);
   for (guint i = 0; i < g_list_model_get_n_items(children); i++) {
     g_autoptr(ErrandsTaskItem) child = g_list_model_get_item(children, i);
-    move_to_list_recursive(child, new_list);
+    clone_task_tree(child, new_list, NULL);
   }
+}
+
+static inline icalcomponent *find_icalcomponent_by_uid(ErrandsTaskListItem *list, const char *uid) {
+  if (!list || !uid) return NULL;
+
+  g_autoptr(GPtrArray) tasks = vcalendar_to_array(list->ical);
+  for_range(i, 0, tasks->len) {
+    icalcomponent *task = g_ptr_array_index(tasks, i);
+    const char *task_uid = errands_data_get_uid(task);
+    if (g_str_equal(uid, task_uid)) return task;
+  }
+  return NULL;
 }
 
 // --- PUBLIC --- //
@@ -534,6 +542,7 @@ void errands_task_item_delete(ErrandsTaskItem *self) {
     errands_task_item_delete(item);
   }
   if (!self->parent) g_list_store_remove_data(self->list->tasks, self);
+  else g_list_store_remove_data(self->parent->children_model, self);
 }
 
 int errands_task_item_delete_completed(ErrandsTaskItem *self) {
@@ -635,10 +644,22 @@ bool errands_task_item_move(ErrandsTaskItem *self, ErrandsTaskItem *parent, Erra
   ErrandsTaskItem *old_parent = self->parent;
   GListStore *old_model = errands_task_item_get_parent_model(self);
   ErrandsTaskListItem *old_list = self->list;
-  if (old_list != list) move_to_list_recursive(self, list);
-  errands_task_item_set_parent(self, parent);
-  g_list_store_append(parent ? parent->children_model : list->tasks, self);
-  g_list_store_remove_data(old_model, self);
+  if (old_list != list) {
+    g_autoptr(ErrandsTaskItem) old_task = g_object_ref(self);
+    // Clone the entire hierarchy into the new calendar.
+    clone_task_tree(self, list, parent ? parent->uid : NULL);
+    // Delete old tasks (queues remote deletions recursively).
+    errands_task_item_delete(self);
+    // Create the new hierarchy (queues remote additions recursively).
+    icalcomponent *clone = find_icalcomponent_by_uid(list, self->uid);
+    g_assert_nonnull(clone);
+    g_autoptr(ErrandsTaskItem) new_task = errands_task_item_new(clone, list, parent);
+    g_list_store_append(parent ? parent->children_model : list->tasks, new_task);
+  } else {
+    errands_task_item_set_parent(self, parent);
+    g_list_store_append(parent ? parent->children_model : list->tasks, self);
+    g_list_store_remove_data(old_model, self);
+  }
   errands_task_list_item_save(list);
   if (old_list != list) {
     errands_sidebar_task_list_update_counter(old_list->uid);
