@@ -28,27 +28,6 @@
   ],
   "modules": [
     {
-      "name": "libportal",
-      "buildsystem": "meson",
-      "config-opts": [
-        "-Dbackend-gtk4=enabled",
-        "-Dbackend-gtk3=disabled",
-        "-Dbackend-qt5=disabled",
-        "-Dbackend-qt6=disabled",
-        "-Dvapi=false",
-        "-Ddocs=false",
-        "-Dtests=false",
-        "-Dintrospection=false"
-      ],
-      "sources": [
-        {
-          "type": "git",
-          "url": "https://github.com/flatpak/libportal.git",
-          "tag": "0.11.0"
-        }
-      ]
-    },
-    {
       "name": "libical",
       "buildsystem": "cmake",
       "config-opts": [

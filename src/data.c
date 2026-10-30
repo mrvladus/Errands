@@ -149,7 +149,7 @@ static void migrate_from_46() {
       errands_data_set_synced(ical, synced);
       icalcomponent_add_component(list_item->ical, ical);
     }
-    errands_task_list_item_save(list_item);
+    errands_task_list_item_save_now(list_item);
   }
   remove(filename);
   g_message("User Data: Migrated successfully");

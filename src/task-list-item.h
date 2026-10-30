@@ -31,6 +31,7 @@ ErrandsTaskListItem *errands_task_list_item_create(const char *uid, const char *
 ErrandsTaskListItem *errands_task_list_item_load_from_ics(const char *path);
 void errands_task_list_item_update_count(ErrandsTaskListItem *self);
 void errands_task_list_item_save(ErrandsTaskListItem *self);
+void errands_task_list_item_save_now(ErrandsTaskListItem *self);
 void errands_task_list_item_delete(ErrandsTaskListItem *self);
 int errands_task_list_item_delete_completed(ErrandsTaskListItem *self);
 int errands_task_list_item_delete_cancelled(ErrandsTaskListItem *self);

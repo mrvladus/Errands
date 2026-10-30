@@ -27,27 +27,6 @@
   ],
   "modules": [
     {
-      "name": "libportal",
-      "buildsystem": "meson",
-      "config-opts": [
-        "-Dbackend-gtk4=enabled",
-        "-Dbackend-gtk3=disabled",
-        "-Dbackend-qt5=disabled",
-        "-Dbackend-qt6=disabled",
-        "-Dvapi=false",
-        "-Ddocs=false",
-        "-Dtests=false",
-        "-Dintrospection=false"
-      ],
-      "sources": [
-        {
-          "type": "git",
-          "url": "https://github.com/flatpak/libportal.git",
-          "tag": "0.11.0"
-        }
-      ]
-    },
-    {
       "name": "libical",
       "buildsystem": "cmake",
       "config-opts": [
@@ -70,6 +49,37 @@
       ]
     },
     {
+      "name": "evolution-data-server",
+      "cleanup": ["/share/GConf"],
+      "buildsystem": "cmake-ninja",
+      "config-opts": [
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DENABLE_TESTS=OFF",
+        "-DENABLE_EXAMPLES=OFF",
+        "-DENABLE_INSTALLED_TESTS=OFF",
+        "-DENABLE_GTK=OFF",
+        "-DENABLE_GTK4=ON",
+        "-DENABLE_GTK_DOC=OFF",
+        "-DENABLE_CANBERRA=OFF",
+        "-DENABLE_GOA=OFF",
+        "-DENABLE_DOT_LOCKING=OFF",
+        "-DENABLE_GOOGLE=OFF",
+        "-DENABLE_VALA_BINDINGS=OFF",
+        "-DENABLE_WEATHER=OFF",
+        "-DWITH_OPENLDAP=OFF",
+        "-DWITH_LIBDB=OFF",
+        "-DENABLE_INTROSPECTION=OFF",
+        "-DENABLE_OAUTH2_WEBKITGTK4=OFF",
+        "-DENABLE_OAUTH2_WEBKITGTK=OFF"
+      ],
+      "sources": [
+        {
+          "type": "git",
+          "url": "https://gitlab.gnome.org/GNOME/evolution-data-server.git"
+        }
+      ]
+    },
+    {
       "name": "errands",
       "buildsystem": "simple",
       "build-commands": ["make -j$FLATPAK_BUILDER_N_JOBS prefix=/app install"],
@@ -77,7 +87,7 @@
         {
           "type": "git",
           "url": "https://github.com/mrvladus/Errands.git",
-          "tag": "49.0"
+          "commit": "041f3277200b7c83c0c1db35d2135bc814e1de9b"
         }
       ]
     }

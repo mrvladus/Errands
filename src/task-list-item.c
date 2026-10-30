@@ -223,6 +223,8 @@ void errands_task_list_item_save(ErrandsTaskListItem *self) {
   self->save_timeout_id = g_timeout_add_full(G_PRIORITY_DEFAULT, 250, save_timeout_cb, g_object_ref(self), g_object_unref);
 }
 
+void errands_task_list_item_save_now(ErrandsTaskListItem *self) { save_timeout_cb(self); }
+
 void errands_task_list_item_delete(ErrandsTaskListItem *self) {
   g_assert_nonnull(self);
   g_assert(ERRANDS_IS_TASK_LIST_ITEM(self));

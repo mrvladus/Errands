@@ -186,7 +186,7 @@ $(BUILD_DIR)/$(NAME): $(DEPS_CHECKED) $(OBJS)
 # --- Installation targets --- #
 
 .PHONY: install
-install: $(BUILD_DIR)/$(NAME)
+install: $(BUILD_DIR)/$(NAME) mo
 	# Executable
 	install -Dm 755 $(BUILD_DIR)/$(NAME) $(DESTDIR)$(bindir)/$(NAME)
 	# Desktop file
@@ -200,7 +200,7 @@ install: $(BUILD_DIR)/$(NAME)
 	# Metainfo
 	@cp $(DATA_DIR)/$(NAME).metainfo.xml.in $(BUILD_DIR)/$(APP_ID).metainfo.xml
 	@sed -i "s/@APP_ID@/$(APP_ID)/g" $(BUILD_DIR)/$(APP_ID).metainfo.xml
-	install -m 644 $(BUILD_DIR)/$(APP_ID).metainfo.xml $(DESTDIR)$(metainfodir)/$(APP_ID).metainfo.xml
+	install -Dm 644 $(BUILD_DIR)/$(APP_ID).metainfo.xml $(DESTDIR)$(metainfodir)/$(APP_ID).metainfo.xml
 	# D-Bus service
 	@cp $(DATA_DIR)/$(NAME).service.in $(BUILD_DIR)/$(APP_ID).service
 	@sed -i "s/@APP_ID@/$(APP_ID)/g" $(BUILD_DIR)/$(APP_ID).service
