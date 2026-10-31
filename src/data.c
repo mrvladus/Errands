@@ -105,7 +105,6 @@ static void migrate_from_46() {
       // Process properties
       const gchar *uid = json_object_get_string_member(task, "uid");
       const gchar *text = json_object_get_string_member(task, "text");
-      const gchar *color = json_object_get_string_member(task, "color");
       const gchar *parent = json_object_get_string_member(task, "parent");
       const gchar *changed = json_object_get_string_member(task, "changed_at");
       const gchar *created = json_object_get_string_member(task, "created_at");
@@ -142,8 +141,7 @@ static void migrate_from_46() {
       if (start) errands_data_set_start(ical, icaltime_from_string(start));
       if (text) errands_data_set_text(ical, text);
       if (uid) errands_data_set_uid(ical, uid);
-      errands_data_set_attachments(ical, attachments);
-      errands_data_set_color(ical, color);
+      if (attachments) errands_data_set_attachments(ical, attachments);
       errands_data_set_deleted(ical, deleted);
       errands_data_set_notified(ical, notified);
       errands_data_set_synced(ical, synced);
