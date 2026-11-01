@@ -60,11 +60,14 @@
   </requires>
 
   <releases>
-  <release version="51.0.1" date="2026-11-01">
-   <description translate="no">
-    <p>Fixed '&amp;' parsing</p>
-   </description>
- </release>
+    <release version="51.1" date="2026-11-03">
+        <description translate="no">
+        <ul>
+            <li
+                    >Added support for dragging .ics files from file manager to task lists panel</li>
+        </ul>
+        </description>
+    </release>
   <release version="51.0" date="2026-10-31">
    <description translate="no">
     <p>Errands has been rewritten from Python to C.</p>
