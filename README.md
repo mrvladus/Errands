@@ -16,6 +16,15 @@
 
 </div>
 
+**Features:**
+
+- Add, remove, edit tasks, sub-tasks, and task lists
+- Add accent color, time, tags, attachments and notes for each task
+- Recurrent tasks
+- Drag and Drop support
+- Import / Export .ics files
+- Sync tasks with Nextcloud or other CalDAV providers
+
 ## Install
 
 Install official flatpak from Flathub:
