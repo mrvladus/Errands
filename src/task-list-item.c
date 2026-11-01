@@ -191,13 +191,14 @@ ErrandsTaskListItem *errands_task_list_item_load_from_ics(const char *path) {
   }
 
   const char *list_uid = errands_data_get_uid(ical);
-  if (list_uid) errands_data_set_uid(ical, list_uid);
+  if (!list_uid) errands_data_set_uid(ical, uid);
   const char *name = errands_data_get_list_name(ical);
   if (!name) errands_data_set_list_name(ical, "Untitled");
   const char *color = errands_data_get_color(ical);
   if (!color) errands_data_set_color(ical, generate_hex_as_str());
-
-  return errands_task_list_item_new(ical);
+  ErrandsTaskListItem *list = errands_task_list_item_new(ical);
+  errands_task_list_item_save_now(list);
+  return list;
 }
 
 void errands_task_list_item_update_count(ErrandsTaskListItem *self) {

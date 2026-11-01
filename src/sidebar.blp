@@ -103,7 +103,7 @@ template $ErrandsSidebar: Adw.Bin {
 
         Adw.Sidebar sidebar {
           activated => $on_sidebar_activated_cb();
-          // drop => $on_drop_cb();
+
           Adw.SidebarSection {
             Adw.SidebarItem {
               title: C_("All Tasks", "All");
@@ -148,6 +148,12 @@ template $ErrandsSidebar: Adw.Bin {
           styles [
             "compact",
           ]
+        }
+
+        DropTarget {
+          formats: "GFile";
+          actions: copy;
+          drop => $on_file_drop_cb(template);
         }
       }
     };

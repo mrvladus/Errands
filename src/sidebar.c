@@ -5,7 +5,6 @@
 #include "about-dialog.h"
 #include "config.h"
 #include "data.h"
-#include "gtk/gtkrevealer.h"
 #include "settings-dialog.h"
 #include "settings.h"
 #include "state.h"
@@ -14,6 +13,7 @@
 #include "task-list-item.h"
 #include "task-list.h"
 #include "utils.h"
+#include "window.h"
 
 #include <adwaita.h>
 #include <gdk/gdk.h>
@@ -31,6 +31,7 @@ static void on_sync_action_cb();
 static void on_sidebar_activated_cb(AdwSidebar *self, guint index, gpointer user_data);
 static gboolean on_drop_cb(AdwSidebar *self, guint index, const GValue *value, GdkDragAction preferred_action,
                            gpointer user_data);
+static gboolean on_file_drop_cb(AdwSidebar *self, const GValue *value, double x, double y, GtkDropTarget *target);
 static void on_entry_changed_cb(ErrandsSidebar *self, GtkEntry *entry);
 static void on_entry_activated_cb(ErrandsSidebar *self, GtkEntry *entry);
 static void on_create_btn_clicked_cb(ErrandsSidebar *self, GtkButton *btn);
@@ -63,6 +64,7 @@ static void errands_sidebar_class_init(ErrandsSidebarClass *klass) {
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_entry_changed_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_entry_activated_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_create_btn_clicked_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_file_drop_cb);
 }
 
 static gboolean counter_binding_transform_func(GBinding *binding, const GValue *from_value, GValue *to_value,
@@ -276,4 +278,21 @@ static gboolean on_drop_cb(AdwSidebar *self, guint index, const GValue *value, G
   g_autoptr(ErrandsTaskListItem) list = g_list_model_get_item(G_LIST_MODEL(task_lists_model), index - 2);
   if (drop_list == list) return FALSE;
   return errands_task_item_move(task, NULL, list);
+}
+
+static gboolean on_file_drop_cb(AdwSidebar *self, const GValue *value, double x, double y, GtkDropTarget *target) {
+  if (!G_VALUE_HOLDS(value, G_TYPE_FILE)) return FALSE;
+  GFile *file = g_value_get_object(value);
+  g_autofree gchar *path = g_file_get_path(file);
+  if (!g_str_has_suffix(path, ".ics")) {
+    errands_window_add_toast(_("Only .ics files are supported"), 3);
+    return FALSE;
+  }
+  g_autoptr(ErrandsTaskListItem) item = errands_task_list_item_load_from_ics(path);
+  if (!item) {
+    errands_window_add_toast(_("Can't load list. It's incorrect or already exists"), 4);
+    return FALSE;
+  }
+  g_list_store_append(task_lists_model, item);
+  return TRUE;
 }
