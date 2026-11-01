@@ -12,7 +12,7 @@
     <p>Todo application for those who prefer simplicity.</p>
     <p>Features:</p>
     <ul>
-      <li>Add, remove, edit tasks and sub-tasks, and task lists</li>
+      <li>Add, remove, edit tasks, sub-tasks, and task lists</li>
       <li>Add accent color, time, tags, attachments and notes for each task</li>
       <li>Recurrent tasks</li>
       <li>Drag and Drop support</li>
@@ -63,6 +63,11 @@
   </requires>
 
   <releases>
+  <release version="51.0.1" date="2026-11-01">
+   <description translate="no">
+    <p>Fixed '&amp;' parsing</p>
+   </description>
+ </release>
   <release version="51.0" date="2026-10-31">
    <description translate="no">
     <p>Errands has been rewritten from Python to C.</p>
