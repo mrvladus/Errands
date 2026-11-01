@@ -241,11 +241,13 @@ static inline GSimpleActionGroup *errands_add_action_group(void *widget, const c
   return ag;
 }
 
-static inline void errands_add_action(GSimpleActionGroup *ag, const char *name, void *cb, void *data, const char *param_str) {
+static inline GSimpleAction *errands_add_action(GSimpleActionGroup *ag, const char *name, void *cb, void *data,
+                                                const char *param_str) {
   g_autoptr(GVariantType) vtype = param_str ? g_variant_type_new(param_str) : NULL;
   g_autoptr(GSimpleAction) action = g_simple_action_new(name, vtype);
   g_signal_connect(action, "activate", G_CALLBACK(cb), data);
   g_action_map_add_action(G_ACTION_MAP(ag), G_ACTION(action));
+  return action;
 }
 
 // Adds a stateful action to the action group.

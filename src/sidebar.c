@@ -100,7 +100,8 @@ static void errands_sidebar_init(ErrandsSidebar *sidebar) {
 
   GSimpleActionGroup *ag = errands_add_action_group(self, "sidebar");
   errands_add_action(ag, "import", on_import_action_cb, self, NULL);
-  errands_add_action(ag, "sync", on_sync_action_cb, NULL, NULL);
+  GSimpleAction *sync_action = errands_add_action(ag, "sync", on_sync_action_cb, NULL, NULL);
+  g_object_bind_property(state.settings, "sync-enabled", sync_action, "enabled", G_BINDING_SYNC_CREATE);
   errands_add_action(ag, "preferences", errands_settings_dialog_show, self, NULL);
   errands_add_action(ag, "about", errands_about_dialog_show, self, NULL);
 
