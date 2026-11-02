@@ -537,9 +537,7 @@ static inline gchar *caldav__discover_home_set(CalDAVClient *c) {
 // ---------- CLIENT PUBLIC FUNCTIONS ---------- //
 
 CalDAVClient *caldav_client_new(CalDAVClientConfig config) {
-  g_assert_nonnull(config.url);
-  g_assert_nonnull(config.username);
-  g_assert_nonnull(config.password);
+  if (!config.url || !config.username || !config.password) return NULL;
 
   g_autoptr(GError) error = NULL;
 
