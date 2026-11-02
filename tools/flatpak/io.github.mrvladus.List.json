@@ -12,6 +12,8 @@
     "--share=network",
     "--talk-name=org.freedesktop.secrets",
     "--talk-name=org.gnome.OnlineAccounts",
+    "--talk-name=org.gnome.evolution.dataserver.Sources5",
+    "--talk-name=org.gnome.evolution.dataserver.Subprocess.Backend.*",
     "--filesystem=home"
   ],
   "cleanup": [
@@ -89,7 +91,7 @@
         {
           "type": "git",
           "url": "https://github.com/mrvladus/Errands.git",
-          "tag": "51.0"
+          "tag": "51.0.2"
         }
       ]
     }

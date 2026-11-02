@@ -23,7 +23,7 @@
 # --- Project info --- #
 
 NAME    = errands
-VERSION = 51.1
+VERSION = 51.0.2
 CC 		= gcc
 
 # --- Project directories --- #
@@ -43,7 +43,7 @@ ifeq ($(DEVEL),TRUE)
 else
 	APP_ID = io.github.mrvladus.List
 	RESOURCE_PATH = /io/github/mrvladus/Errands
-	ALL_CFLAGS += -O3 -flto -DG_DISABLE_CAST_CHECKS -DG_DISABLE_CHECKS -DG_DISABLE_ASSERT -fomit-frame-pointer
+	ALL_CFLAGS += -O3 -flto -fomit-frame-pointer
 	ALL_LDFLAGS += -O3 -flto
 endif
 

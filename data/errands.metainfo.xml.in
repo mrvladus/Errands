@@ -60,11 +60,13 @@
   </requires>
 
   <releases>
-    <release version="51.1" date="2026-11-03">
+    <release version="51.0.2" date="2026-11-02">
         <description translate="no">
         <ul>
             <li
                     >Added support for dragging .ics files from file manager to task lists panel</li>
+            <li>Gnome Online Accounts sync credentials autofill</li>
+            <li>Fix some sync issues</li>
         </ul>
         </description>
     </release>
