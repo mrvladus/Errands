@@ -107,7 +107,8 @@ PKG_CONFIG_LIBS = libadwaita-1 \
 				  libsecret-1 \
 				  libportal-gtk4 \
 				  libedataserver-1.2 \
-				  libecal-2.0
+				  libecal-2.0 \
+				  goa-1.0
 LDFLAGS     ?=
 ALL_LDFLAGS += $(LDFLAGS) -lm `pkg-config --libs $(PKG_CONFIG_LIBS)`
 CFLAGS      ?=
@@ -266,7 +267,7 @@ distrobox-setup:
 	fi
 	distrobox-rm errands-distrobox --force
 	distrobox-create --name errands-distrobox --image archlinux:latest --additional-packages \
-    "gcc make meson cmake gdb pkgconf git github-cli neovim zed curl glib2-devel libadwaita libportal-gtk4 libical libical-docs libsecret gtksourceview5 blueprint-compiler clang flatpak-builder noto-fonts-emoji evolution-data-server evolution-data-server-docs"
+    "gcc make meson cmake gdb pkgconf git github-cli neovim zed curl libgoa libgoa-docs glib2-devel libadwaita libportal-gtk4 libical libical-docs libsecret gtksourceview5 blueprint-compiler clang flatpak-builder noto-fonts-emoji evolution-data-server evolution-data-server-docs"
 	distrobox-enter errands-distrobox -- distrobox-export --app zeditor
 
 # Setup Nextcloud container for testing sync.

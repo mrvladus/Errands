@@ -504,6 +504,7 @@ static void sync_finished_cb(GObject *source_object, GAsyncResult *res, gpointer
   gboolean success = g_task_propagate_boolean(G_TASK(res), NULL);
   if (!success) {
     g_warning("Sync: Error");
+    errands_window_add_toast(_("Sync Failed"), 3);
     errands_sync_cleanup();
     return;
   }

@@ -1,8 +1,15 @@
 // Copyright (c) 2026 Vlad Krupinskii <vladkrupinskii@gmail.com>
 // SPDX-License-Identifier: Zlib
 
-#include "settings-dialog.h"
+#include "glib.h"
+#include "goa/goa-generated.h"
+#include "settings.h"
+#include "utils.h"
+#define GOA_API_IS_SUBJECT_TO_CHANGE
+#include <goa/goa.h>
+
 #include "config.h"
+#include "settings-dialog.h"
 #include "state.h"
 
 // static void on_startup_toggled_cb(ErrandsSettingsDialog *self);
@@ -82,6 +89,49 @@ ErrandsSettingsDialog *errands_settings_dialog_new() {
 void errands_settings_dialog_show() {
   if (!state.settings_dialog) state.settings_dialog = errands_settings_dialog_new();
   adw_dialog_present(ADW_DIALOG(state.settings_dialog), GTK_WIDGET(state.main_window));
+
+  const gchar *user_name = errands_settings_get_sync_username(state.settings);
+  const gchar *url = errands_settings_get_sync_url(state.settings);
+  if (user_name && *user_name && url && *url) return;
+
+  // Load account from Gnome Online Accounts
+  g_autoptr(GError) error = NULL;
+  GoaClient *client = goa_client_new_sync(NULL, &error);
+  if (!client) {
+    g_warning("Could not create GoaClient: %s\n", error->message);
+    return;
+  }
+  GList *accounts = goa_client_get_accounts(client);
+  for (GList *l = accounts; l; l = l->next) {
+    GoaObject *object = GOA_OBJECT(l->data);
+    GoaAccount *account = goa_object_peek_account(object);
+    const gchar *type = goa_account_get_provider_type(account);
+    if (g_strcmp0(type, "owncloud") != 0) continue;
+    GoaCalendar *cal = goa_object_get_calendar(object);
+    g_autoptr(GUri) uri = g_uri_parse(goa_calendar_get_uri(cal), G_URI_FLAGS_PARSE_RELAXED, &error);
+    if (error) {
+      g_warning("Could not parse URI: %s\n", error->message);
+      g_clear_error(&error);
+      continue;
+    }
+    const char *scheme = g_uri_get_scheme(uri);
+    if (!scheme) continue;
+    const char *host = g_uri_get_host(uri);
+    if (!host) continue;
+    gint port = g_uri_get_port(uri);
+    const char *username = g_uri_get_user(uri);
+    if (!username) continue;
+    const char *url = tmp_str_printf("%s://%s", scheme, host);
+    if (port >= 0) url = tmp_str_printf("%s:%d", url, port);
+    errands_settings_set_sync_url(state.settings, url);
+    errands_settings_set_sync_username(state.settings, username);
+    GoaPasswordBased *password_based = goa_object_get_password_based(object);
+    if (!password_based) break;
+    g_autofree gchar *password = NULL;
+    goa_password_based_call_get_password_sync(password_based, "", &password, NULL, &error);
+    errands_settings_set_sync_password(state.settings, password ? password : "");
+    break;
+  }
 }
 
 // ---------- CALLBACKS ---------- //

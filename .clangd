@@ -33,6 +33,8 @@ CompileFlags:
     - -I/usr/include/webkitgtk-6.0
     - -I/usr/include/libportal
     - -I/usr/include/libportal-gtk4
+    - -I/usr/include/goa-1.0
+    - -I/usr/lib/goa-1.0/include
     - -pthread
     - -Wno-macro-redefined
     - -DCALDAV_IMPLEMENTATION
