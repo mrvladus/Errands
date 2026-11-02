@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Zlib
 
 #include "caldav.h"
+#include "glib.h"
 
 #define CALDAV_MISS_THRESHOLD 3
 
@@ -423,6 +424,7 @@ static inline gchar *caldav__discover_caldav_url(CalDAVClient *c) {
   e_soup_session_set_credentials(E_SOUP_SESSION(session), c->credentials);
 
   g_autoptr(GUri) base = g_uri_parse(c->url, G_URI_FLAGS_PARSE_RELAXED, &error);
+  if (!base) return NULL;
   g_autoptr(GUri) well_known_uri = g_uri_build(G_URI_FLAGS_NONE, g_uri_get_scheme(base), NULL, g_uri_get_host(base),
                                                g_uri_get_port(base), "/.well-known/caldav", NULL, NULL);
   g_autofree gchar *well_known = g_uri_to_string(well_known_uri);
@@ -432,10 +434,9 @@ static inline gchar *caldav__discover_caldav_url(CalDAVClient *c) {
   GByteArray *bytes = e_soup_session_send_message_simple_sync(E_SOUP_SESSION(session), message, NULL, &error);
   if (!bytes) return NULL;
   g_byte_array_free(bytes, TRUE);
+  if (!SOUP_STATUS_IS_SUCCESSFUL(soup_message_get_status(message))) return NULL;
   GUri *final_uri = soup_message_get_uri(message);
-  gchar *result = NULL;
-  if (final_uri) result = g_uri_to_string(final_uri);
-  return result;
+  return final_uri ? g_uri_to_string(final_uri) : NULL;
 }
 
 static inline gboolean caldav__principal_cb(EWebDAVSession *webdav, xmlNodePtr prop_node, const GUri *request_uri,
@@ -586,12 +587,9 @@ CalDAVClient *caldav_client_new(CalDAVClientConfig config) {
   c->task_removed_cb = config.task_removed_cb;
 
   c->caldav_url = caldav__discover_caldav_url(c);
-  c->principal_url = caldav__discover_principal_url(c);
-  c->home_set_url = caldav__discover_home_set(c);
-
   if (!c->caldav_url) c->caldav_url = g_strdup(config.url);
-  if (!c->principal_url) c->principal_url = g_strdup(config.url);
-  if (!c->home_set_url) c->home_set_url = g_strdup(config.url);
+
+  g_message("CalDAV: CalDAV URL is set to %s", c->caldav_url);
 
   if (!caldav_client_poll(c)) return NULL;
 
@@ -609,8 +607,8 @@ gboolean caldav_client_poll(CalDAVClient *c) {
   g_autoptr(GError) error = NULL;
 
   GSList *discovered = NULL;
-  if (!e_webdav_discover_sources_sync(c->server_source, NULL, E_WEBDAV_DISCOVER_SUPPORTS_TASKS, c->credentials, NULL, NULL,
-                                      &discovered, NULL, NULL, &error)) {
+  if (!e_webdav_discover_sources_sync(c->server_source, c->caldav_url, E_WEBDAV_DISCOVER_SUPPORTS_TASKS, c->credentials, NULL,
+                                      NULL, &discovered, NULL, NULL, &error)) {
     g_warning("CalDAV: Discovery failed: %s", error->message);
     return FALSE;
   }
@@ -673,11 +671,15 @@ gboolean caldav_client_poll(CalDAVClient *c) {
 
 CalDAVCalendar *caldav_client_create_calendar(CalDAVClient *c, const char *uid, const gchar *name, const gchar *color) {
   g_assert_nonnull(c);
-  g_assert_nonnull(c->home_set_url);
   g_assert_nonnull(name);
   g_assert_nonnull(color);
   g_assert(*name);
   g_assert(*color && color[0] == '#');
+
+  if (!c->principal_url) c->principal_url = caldav__discover_principal_url(c);
+  if (!c->principal_url) c->principal_url = c->caldav_url;
+  if (!c->home_set_url) c->home_set_url = caldav__discover_home_set(c);
+  if (!c->home_set_url) c->home_set_url = c->caldav_url;
 
   g_autoptr(GError) error = NULL;
   g_autoptr(EWebDAVSession) session = e_webdav_session_new(c->server_source);

@@ -13,6 +13,7 @@
     "--talk-name=org.freedesktop.secrets",
     "--talk-name=org.gnome.OnlineAccounts",
     "--talk-name=org.gnome.evolution.dataserver.Sources5",
+    "--talk-name=org.gnome.evolution.dataserver.Calendar8",
     "--talk-name=org.gnome.evolution.dataserver.Subprocess.Backend.*",
     "--filesystem=home"
   ],
@@ -30,6 +31,31 @@
     "*.a"
   ],
   "modules": [
+    {
+      "name": "gnome-online-accounts",
+      "buildsystem": "meson",
+      "config-opts": [
+        "-Dgoabackend=false",
+        "-Dexchange=false",
+        "-Dgoogle=false",
+        "-Dimap_smtp=false",
+        "-Dkerberos=false",
+        "-Dwebdav=false",
+        "-Dms_graph=false",
+        "-Ddocumentation=false",
+        "-Dintrospection=false",
+        "-Dman=false",
+        "-Dvapi=false"
+      ],
+      "cleanup": ["/bin", "/share/dbus-1", "/share/GConf"],
+      "sources": [
+        {
+          "type": "git",
+          "url": "https://gitlab.gnome.org/GNOME/gnome-online-accounts",
+          "tag": "3.58.1"
+        }
+      ]
+    },
     {
       "name": "libical",
       "buildsystem": "cmake",
