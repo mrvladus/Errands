@@ -178,7 +178,7 @@ static void on_interval_changed_cb(ErrandsRruleRow *self, GParamSpec *param, Adw
                                    C_("Repeat every ...", "weeks"),   C_("Repeat every ...", "months"),
                                    C_("Repeat every ...", "years")};
   const guint selected_freq = adw_combo_row_get_selected(self->freq_row);
-  const char *subtitle = tmp_str_printf(_("Repeat every %d %s"), (int)adw_spin_row_get_value(row), intervals[selected_freq - 1]);
+  const char *subtitle = tmp_str_printf(_("Repeat every %d %s"), (int)adw_spin_row_get_value(row), intervals[selected_freq]);
   g_object_set(row, "subtitle", subtitle, NULL);
 }
 
