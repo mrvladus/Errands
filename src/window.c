@@ -305,10 +305,9 @@ static void on_show_properties_toggled_cb(ErrandsWindow *self) {
   struct icalrecurrencetype *new_rrule = NULL;
   if (adw_expander_row_get_expanded(ADW_EXPANDER_ROW(self->rrule_row))) new_rrule = errands_rrule_row_get_rrule(self->rrule_row);
   struct icalrecurrencetype *old_rrule = errands_task_item_get_rrule(self->item);
-  if (new_rrule && old_rrule && !icalrecurrence_compare(new_rrule, old_rrule)) {
-    HERE;
+  if (!icalrecurrence_compare(new_rrule, old_rrule)) {
     errands_task_item_set_rrule(self->item, new_rrule);
-    if (icaltime_is_null_date(new_sdt) && new_rrule->freq != ICAL_NO_RECURRENCE) {
+    if (icaltime_is_null_date(new_sdt) && new_rrule && new_rrule->freq != ICAL_NO_RECURRENCE) {
       icaltimetype now = icaltime_now();
       errands_task_item_set_dtstart(self->item, &now);
     }
