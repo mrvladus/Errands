@@ -18,6 +18,20 @@ template $ErrandsWindow: Adw.ApplicationWindow {
     }
   }
 
+  ShortcutController {
+    scope: global;
+
+    Shortcut {
+      trigger: "<Control>W";
+      action: "action(window.close)";
+    }
+
+    Shortcut {
+      trigger: "<Control>Q";
+      action: "action(window.close)";
+    }
+  }
+
   Adw.ToastOverlay toast_overlay {
     Adw.NavigationSplitView split_view {
       min-sidebar-width: 250;
@@ -51,21 +65,10 @@ template $ErrandsWindow: Adw.ApplicationWindow {
             Adw.HeaderBar {
               show-back-button: false;
 
-              title-widget: Adw.InlineViewSwitcher {
+              title-widget: Adw.ViewSwitcher {
                 stack: stack;
-                display-mode: both;
+                policy: wide;
               };
-
-              [start]
-              Button {
-                icon-name: "errands-sidebar-symbolic";
-                action-name: "window.close-properties";
-                tooltip-text: _("Close Properties");
-
-                styles [
-                  "flat",
-                ]
-              }
             }
 
             content: Adw.ViewStack stack {
@@ -79,12 +82,20 @@ template $ErrandsWindow: Adw.ApplicationWindow {
                     title: _("Date and Time");
 
                     $ErrandsDateChooser start_date_chooser {
-                      subtitle: _("Start");
+                      subtitle: _("Start Date");
+
+                      styles [
+                        "property",
+                      ]
                     }
 
                     $ErrandsDateChooser due_date_chooser {
-                      subtitle: _("Due");
+                      subtitle: _("Due Date");
                       visible: bind rrule_row.enable-expansion inverted;
+
+                      styles [
+                        "property",
+                      ]
                     }
 
                     $ErrandsRruleRow rrule_row {}

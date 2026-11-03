@@ -388,9 +388,7 @@ static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointe
       gtk_widget_set_visible(self->title, true);
       return;
     }
-    gtk_widget_set_visible(self->title, true);
-    g_autofree gchar *markup = str_to_markup(text);
-    g_object_set(self->item, "title", markup, NULL);
+    g_object_set(self->item, "title", text, NULL);
   }
 }
 

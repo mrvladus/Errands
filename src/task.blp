@@ -14,8 +14,6 @@ template $ErrandsTask: Box {
     labelled-by: title;
   }
 
-  EventControllerMotion motion_ctrl {}
-
   DropControllerMotion drop_motion_ctrl {
     enter => $on_drop_motion_ctrl_enter_cb(template);
   }
@@ -96,23 +94,17 @@ template $ErrandsTask: Box {
         ]
       }
 
-      Revealer {
-        transition-type: slide_left;
-        transition-duration: 300;
-        reveal-child: bind motion_ctrl.contains-pointer;
+      ToggleButton sub_toggle_btn {
+        tooltip-text: _("Toggle Sub-Tasks Entry");
+        icon-name: "errands-add-symbolic";
+        valign: center;
+        visible: bind edit_title.editing inverted;
 
-        ToggleButton sub_toggle_btn {
-          tooltip-text: _("Toggle Sub-Tasks Entry");
-          icon-name: "errands-add-symbolic";
-          valign: center;
-          visible: bind edit_title.editing inverted;
-
-          styles [
-            "flat",
-            "circular",
-            "sub-toggle-btn",
-          ]
-        }
+        styles [
+          "flat",
+          "circular",
+          "sub-toggle-btn",
+        ]
       }
 
       // Properties menu
@@ -200,7 +192,7 @@ template $ErrandsTask: Box {
       valign: center;
 
       styles [
-        "caption",
+        "caption-heading",
         "priority-label",
       ]
 

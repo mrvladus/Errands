@@ -3,6 +3,7 @@
 
 #include "window.h"
 #include "config.h"
+#include "gtk/gtk.h"
 #include "settings.h"
 #include "state.h"
 #include "sync.h"
@@ -20,7 +21,6 @@
 #define TAGS_LIST_BOX gtk_widget_get_first_child(gtk_widget_get_last_child(gtk_widget_get_first_child(GTK_WIDGET(self->tags))))
 
 static void on_add_attachment_action_cb(GSimpleAction *action, GVariant *param, ErrandsWindow *self);
-static void on_close_properties_action_cb(GSimpleAction *action, GVariant *param, ErrandsWindow *self);
 static gboolean on_style_toggled_cb(GBinding *binding, const GValue *from_value, GValue *to_value, ErrandsWindow *self);
 static void on_show_properties_toggled_cb(ErrandsWindow *self);
 static void on_tag_entry_activated_cb(ErrandsWindow *self, AdwEntryRow *entry);
@@ -66,7 +66,6 @@ static void errands_window_init(ErrandsWindow *self) {
 
   GSimpleActionGroup *ag = errands_add_action_group(self, "window");
   errands_add_action(ag, "add-attachment", on_add_attachment_action_cb, self, NULL);
-  errands_add_action(ag, "close-properties", on_close_properties_action_cb, self, NULL);
 
   // Set theme
   AdwStyleManager *style_manager = adw_style_manager_get_default();
@@ -148,6 +147,7 @@ static GtkWidget *tag_new(const char *tag) {
 
   GtkWidget *check_btn = gtk_check_button_new();
   gtk_widget_set_tooltip_text(check_btn, _("Enable Tag"));
+  gtk_widget_set_valign(check_btn, GTK_ALIGN_CENTER);
   adw_action_row_add_prefix(ADW_ACTION_ROW(row), check_btn);
   adw_action_row_set_activatable_widget(ADW_ACTION_ROW(row), check_btn);
 
@@ -273,10 +273,6 @@ static void on_add_attachment_action_finish_cb(GObject *obj, GAsyncResult *res, 
 static void on_add_attachment_action_cb(GSimpleAction *action, GVariant *param, ErrandsWindow *self) {
   g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
   gtk_file_dialog_open(dialog, GTK_WINDOW(self), NULL, on_add_attachment_action_finish_cb, self);
-}
-
-static void on_close_properties_action_cb(GSimpleAction *action, GVariant *param, ErrandsWindow *self) {
-  adw_overlay_split_view_set_show_sidebar(self->overlay_split_view, false);
 }
 
 // ---------- CALLBACKS ---------- //
