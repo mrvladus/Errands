@@ -208,10 +208,7 @@ static inline void caldav__calendar_poll(CalDAVCalendar *calendar) {
   GSList *resources = NULL;
   gboolean success = e_webdav_session_list_sync(session, NULL, E_WEBDAV_DEPTH_THIS,
                                                 E_WEBDAV_LIST_DISPLAY_NAME | E_WEBDAV_LIST_COLOR, &resources, NULL, &error);
-  if (!success) {
-    g_warning("CalDAV: Failed to query calendar properties: %s", error->message);
-    return;
-  }
+  if (!success) g_warning("CalDAV: Failed to query calendar properties: %s", error->message);
 
   EWebDAVResource *resource = resources ? resources->data : NULL;
   if (resource) {
@@ -240,7 +237,7 @@ static inline void caldav__calendar_poll(CalDAVCalendar *calendar) {
   if (!e_client_refresh_sync(E_CLIENT(calendar->e_cal_client), NULL, &error))
     g_warning("CalDAV: CalDAV refresh failed: %s", error->message);
 
-  g_slist_free_full(resources, (GDestroyNotify)e_webdav_resource_free);
+  if (resources) g_slist_free_full(resources, (GDestroyNotify)e_webdav_resource_free);
 }
 
 // --- CALENDAR PUBLIC FUNCTIONS --- //
