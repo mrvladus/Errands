@@ -58,6 +58,12 @@ static inline ENamedParameters *caldav__make_credentials(const char *username, c
   return credentials;
 }
 
+// SOUP_HTTP_URI_FLAGS normalizes the scheme, so the default port (e.g. 443) is stored instead of 0, which EDS turns
+// into port 80 once the source is reloaded from the registry.
+static inline GUri *caldav__parse_webdav_uri(const gchar *url, GError **error) {
+  return g_uri_parse(url, SOUP_HTTP_URI_FLAGS | G_URI_FLAGS_PARSE_RELAXED, error);
+}
+
 static inline gchar *caldav__uid_from_href(const gchar *href) {
   if (!href || !*href) return NULL;
   g_autofree gchar *s = g_strdup(href);
@@ -127,7 +133,7 @@ static inline CalDAVCalendar *caldav__connect_discovered_source(CalDAVClient *c,
   if (ds->color && *ds->color) e_source_selectable_set_color(E_SOURCE_SELECTABLE(task_list), ds->color);
   e_source_selectable_set_order(E_SOURCE_SELECTABLE(task_list), ds->order);
   e_source_backend_set_backend_name(E_SOURCE_BACKEND(task_list), "caldav");
-  g_autoptr(GUri) uri = g_uri_parse(ds->href, G_URI_FLAGS_PARSE_RELAXED, &error);
+  g_autoptr(GUri) uri = caldav__parse_webdav_uri(ds->href, &error);
   if (!uri) {
     g_warning("CalDAV: Failed to parse URI '%s': %s", ds->href, error->message);
     return NULL;
@@ -156,6 +162,18 @@ static inline CalDAVCalendar *caldav__connect_discovered_source(CalDAVClient *c,
   if (!registered_source) {
     g_warning("CalDAV: Failed to ref source: source '%s' not found", uid);
     return NULL;
+  }
+
+  // Sources registered by older versions may have Port=0 stored. Fix them in place, since committing a source with
+  // an existing UID doesn't update it.
+  ESourceAuthentication *registered_auth = e_source_get_extension(registered_source, E_SOURCE_EXTENSION_AUTHENTICATION);
+  if (g_uri_get_port(uri) > 0 && e_source_authentication_get_port(registered_auth) != (guint)g_uri_get_port(uri)) {
+    ESourceWebdav *registered_webdav = e_source_get_extension(registered_source, E_SOURCE_EXTENSION_WEBDAV_BACKEND);
+    e_source_webdav_set_uri(registered_webdav, uri);
+    if (!e_source_registry_commit_source_sync(c->registry, registered_source, NULL, &error)) {
+      g_warning("CalDAV: Failed to update URI of source '%s': %s", uid, error->message);
+      g_clear_error(&error);
+    }
   }
 
   EClient *e_client = e_cal_client_connect_sync(registered_source, E_CAL_CLIENT_SOURCE_TYPE_TASKS, 1, NULL, &error);
@@ -552,7 +570,7 @@ CalDAVClient *caldav_client_new(CalDAVClientConfig config) {
   }
 
   e_source_set_display_name(server_source, "CalDAV");
-  g_autoptr(GUri) uri = g_uri_parse(config.url, G_URI_FLAGS_PARSE_RELAXED, &error);
+  g_autoptr(GUri) uri = caldav__parse_webdav_uri(config.url, &error);
   if (error) {
     g_warning("CalDAV: Failed to parse URI: %s\n", error->message);
     return NULL;
