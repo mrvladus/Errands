@@ -749,9 +749,12 @@ gchar *errands_task_item_get_rrule_as_string(ErrandsTaskItem *self) {
   icaltimetype until = r->until;
   gint count = r->count;
   if (!icaltime_is_null_date(until)) {
-    g_autoptr(GDateTime) d = g_date_time_new_from_unix_local(icaltime_as_timet(until));
-    g_autofree gchar *ds = g_date_time_format(d, "%x");
-    g_string_append_printf(s, _(" until %s"), ds);
+    g_autofree gchar *date_str = NULL;
+    g_autoptr(GDateTime) dt =
+        g_date_time_new_from_unix_local(icaltime_as_timet_with_zone(local_to_utc(until), icaltimezone_get_utc_timezone()));
+    if (until.is_date) date_str = g_date_time_format(dt, "%x");
+    else date_str = g_date_time_format(dt, "%x %H:%M");
+    g_string_append_printf(s, _(" until %s"), date_str);
   } else if (count > 0) g_string_append_printf(s, ngettext(" once", " %d times", count), count);
   return g_string_free(s, FALSE);
 }

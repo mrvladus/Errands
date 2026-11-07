@@ -361,7 +361,32 @@ static inline icaltimetype icaltime_merge_date_and_time(const struct icaltimetyp
   return result;
 }
 
-static inline icaltimetype icaltime_now() { return icaltime_current_time_with_zone(icaltimezone_get_utc_timezone()); }
+static inline icaltimetype local_to_utc(icaltimetype value) {
+  if (icaltime_is_null_time(value) || icaltime_is_date(value)) return value;
+  g_autoptr(GDateTime) local = g_date_time_new_local(value.year, value.month, value.day, value.hour, value.minute, value.second);
+  return icaltime_from_timet_with_zone(g_date_time_to_unix(local), 0, icaltimezone_get_utc_timezone());
+}
+
+static inline icaltimetype utc_to_local(icaltimetype value) {
+  if (icaltime_is_null_time(value) || icaltime_is_date(value)) return value;
+  g_autoptr(GDateTime) utc = g_date_time_new_utc(value.year, value.month, value.day, value.hour, value.minute, value.second);
+  if (!utc) return icaltime_null_time();
+  g_autoptr(GDateTime) local = g_date_time_to_local(utc);
+  value.year = g_date_time_get_year(local);
+  value.month = g_date_time_get_month(local);
+  value.day = g_date_time_get_day_of_month(local);
+  value.hour = g_date_time_get_hour(local);
+  value.minute = g_date_time_get_minute(local);
+  value.second = g_date_time_get_seconds(local);
+  value.zone = NULL;
+  value.is_daylight = 0;
+  return value;
+}
+
+static inline icaltimetype icaltime_now() {
+  g_autoptr(GDateTime) dt = g_date_time_new_now_local();
+  return local_to_utc(icaltime_from_timet_with_zone(g_date_time_to_unix(dt), 0, NULL));
+}
 
 static inline bool icalrecurrence_compare(const struct icalrecurrencetype *a, const struct icalrecurrencetype *b) {
   if (!a || !b) return false;

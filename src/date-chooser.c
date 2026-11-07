@@ -118,18 +118,17 @@ static void update_title(ErrandsDateChooser *self) {
 ErrandsDateChooser *errands_date_chooser_new() { return g_object_new(ERRANDS_TYPE_DATE_CHOOSER, NULL); }
 
 void errands_date_chooser_reset(ErrandsDateChooser *self) {
-  self->dt = icaltime_null_time();
   g_autoptr(GDateTime) today = g_date_time_new_now_local();
   gtk_calendar_set_date(self->calendar, today);
   gtk_spin_button_set_value(self->hours, 0);
   gtk_spin_button_set_value(self->minutes, 0);
-  update_title(self);
   g_object_set(self->reset_btn, "visible", false, NULL);
+  self->dt = icaltime_null_time();
+  self->dt.is_date = true;
+  update_title(self);
 }
 
-icaltimetype errands_date_chooser_get_dt(ErrandsDateChooser *self) {
-  return icaltime_convert_to_zone(self->dt, icaltimezone_get_utc_timezone());
-}
+icaltimetype errands_date_chooser_get_dt(ErrandsDateChooser *self) { return self->dt; }
 
 void errands_date_chooser_set_dt(ErrandsDateChooser *self, icaltimetype dt) {
   self->dt = dt;

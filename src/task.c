@@ -5,7 +5,6 @@
 #include "config.h"
 #include "sidebar.h"
 #include "state.h"
-#include "sync.h"
 #include "task-item.h"
 #include "task-list.h"
 #include "utils.h"
@@ -110,9 +109,11 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     if (is_null) break;
 
     g_autofree gchar *date_str = NULL;
-    g_autoptr(GDateTime) sdt = g_date_time_new_from_unix_local(icaltime_as_timet(self->dtstart));
-    if (!icaltime_is_date(self->dtstart)) date_str = g_date_time_format(sdt, "%d %b %H:%M");
-    else date_str = g_date_time_format(sdt, "%d %b");
+    g_autoptr(GDateTime) dt = g_date_time_new_from_unix_local(
+        icaltime_as_timet_with_zone(local_to_utc(self->dtstart), icaltimezone_get_utc_timezone()));
+    if (self->dtstart.is_date) date_str = g_date_time_format(dt, "%x");
+    else date_str = g_date_time_format(dt, "%x %H:%M");
+
     const char *label = tmp_str_printf("%s: %s", C_("Start date", "Start"), date_str);
     adw_button_content_set_label(ADW_BUTTON_CONTENT(self->dtstart_btn_content), label);
   } break;
@@ -127,10 +128,12 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     if (!has_dt) break;
 
     g_autofree gchar *date_str = NULL;
-    g_autoptr(GDateTime) sdt = g_date_time_new_from_unix_local(icaltime_as_timet(self->dtend));
-    if (!icaltime_is_date(self->dtend)) date_str = g_date_time_format(sdt, "%d %b %H:%M");
-    else date_str = g_date_time_format(sdt, "%d %b");
+    g_autoptr(GDateTime) dt =
+        g_date_time_new_from_unix_local(icaltime_as_timet_with_zone(local_to_utc(self->dtend), icaltimezone_get_utc_timezone()));
+    if (self->dtend.is_date) date_str = g_date_time_format(dt, "%x");
+    else date_str = g_date_time_format(dt, "%x %H:%M");
     const char *label = tmp_str_printf("%s: %s", C_("Due date", "Due"), date_str);
+
     adw_button_content_set_label(ADW_BUTTON_CONTENT(self->dtend_btn_content), label);
     gtk_widget_remove_css_class(self->dtend_btn, "error");
     if (errands_task_item_is_due(self->item)) gtk_widget_add_css_class(self->dtend_btn, "error");

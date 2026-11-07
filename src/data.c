@@ -528,12 +528,12 @@ icaltimetype errands_data_get_changed(icalcomponent *ical) {
     icaltimetype now = result = icaltime_now();
     errands_data_set_changed(ical, now);
   }
-  return icaltime_convert_to_zone(result, icaltimezone_get_utc_timezone());
+  return utc_to_local(result);
 }
 
 icaltimetype errands_data_get_completed(icalcomponent *ical) {
   icalproperty *property = icalcomponent_get_first_property(ical, ICAL_COMPLETED_PROPERTY);
-  if (property) return icalproperty_get_completed(property);
+  if (property) return utc_to_local(icalproperty_get_completed(property));
   return icaltime_null_time();
 }
 
@@ -547,21 +547,15 @@ icaltimetype errands_data_get_created(icalcomponent *ical) {
     icaltimetype now = result = icaltime_now();
     errands_data_set_created(ical, now);
   }
-  return icaltime_convert_to_zone(result, icaltimezone_get_utc_timezone());
+  return utc_to_local(result);
 }
 
-icaltimetype errands_data_get_due(icalcomponent *ical) {
-  return icaltime_convert_to_zone(icalcomponent_get_due(ical), icaltimezone_get_utc_timezone());
-}
-icaltimetype errands_data_get_end(icalcomponent *ical) {
-  return icaltime_convert_to_zone(icalcomponent_get_dtend(ical), icaltimezone_get_utc_timezone());
-}
-icaltimetype errands_data_get_start(icalcomponent *ical) {
-  return icaltime_convert_to_zone(icalcomponent_get_dtstart(ical), icaltimezone_get_utc_timezone());
-}
+icaltimetype errands_data_get_due(icalcomponent *ical) { return utc_to_local(icalcomponent_get_due(ical)); }
+icaltimetype errands_data_get_end(icalcomponent *ical) { return utc_to_local(icalcomponent_get_dtend(ical)); }
+icaltimetype errands_data_get_start(icalcomponent *ical) { return utc_to_local(icalcomponent_get_dtstart(ical)); }
 
 void errands_data_set_changed(icalcomponent *ical, icaltimetype value) {
-  value = icaltime_convert_to_zone(value, icaltimezone_get_utc_timezone());
+  value = local_to_utc(value);
   icalcomponent_set_dtstamp(ical, value);
   icalproperty *last_modified = icalcomponent_get_first_property(ical, ICAL_LASTMODIFIED_PROPERTY);
   if (last_modified) {
@@ -570,7 +564,7 @@ void errands_data_set_changed(icalcomponent *ical, icaltimetype value) {
 }
 
 void errands_data_set_completed(icalcomponent *ical, icaltimetype value) {
-  value = icaltime_convert_to_zone(value, icaltimezone_get_utc_timezone());
+  value = local_to_utc(value);
   icalproperty *property = icalcomponent_get_first_property(ical, ICAL_COMPLETED_PROPERTY);
   if (icaltime_is_null_time(value)) {
     if (property) icalcomponent_remove_property(ical, property);
@@ -587,7 +581,7 @@ void errands_data_set_completed(icalcomponent *ical, icaltimetype value) {
 }
 
 void errands_data_set_created(icalcomponent *ical, icaltimetype value) {
-  value = icaltime_convert_to_zone(value, icaltimezone_get_utc_timezone());
+  value = local_to_utc(value);
   icalproperty *property = icalcomponent_get_first_property(ical, ICAL_CREATED_PROPERTY);
   if (icaltime_is_null_time(value)) {
     if (property) icalcomponent_remove_property(ical, property);
@@ -598,7 +592,7 @@ void errands_data_set_created(icalcomponent *ical, icaltimetype value) {
 }
 
 void errands_data_set_due(icalcomponent *ical, icaltimetype value) {
-  value = icaltime_convert_to_zone(value, icaltimezone_get_utc_timezone());
+  value = local_to_utc(value);
   icalproperty *property = icalcomponent_get_first_property(ical, ICAL_DUE_PROPERTY);
   if (icaltime_is_null_time(value)) {
     if (property) icalcomponent_remove_property(ical, property);
@@ -608,7 +602,7 @@ void errands_data_set_due(icalcomponent *ical, icaltimetype value) {
 }
 
 void errands_data_set_end(icalcomponent *ical, icaltimetype value) {
-  value = icaltime_convert_to_zone(value, icaltimezone_get_utc_timezone());
+  value = local_to_utc(value);
   icalproperty *property = icalcomponent_get_first_property(ical, ICAL_DTEND_PROPERTY);
   if (icaltime_is_null_time(value)) {
     if (property) icalcomponent_remove_property(ical, property);
@@ -618,7 +612,7 @@ void errands_data_set_end(icalcomponent *ical, icaltimetype value) {
 }
 
 void errands_data_set_start(icalcomponent *ical, icaltimetype value) {
-  value = icaltime_convert_to_zone(value, icaltimezone_get_utc_timezone());
+  value = local_to_utc(value);
   icalproperty *property = icalcomponent_get_first_property(ical, ICAL_DTSTART_PROPERTY);
   if (icaltime_is_null_time(value)) {
     if (property) icalcomponent_remove_property(ical, property);
