@@ -102,12 +102,13 @@ $(DEPS_CHECKED): Makefile | $(BUILD_DIR)
 
 # --- Compilation variables --- #
 
-PKG_CONFIG_LIBS = libadwaita-1 \
+PKG_CONFIG_LIBS = "libadwaita-1 >= 1.10.0" \
 				  gtksourceview-5 \
 				  libsecret-1 \
 				  libportal-gtk4 \
 				  libedataserver-1.2 \
 				  libecal-2.0 \
+				  "libical >= 4.0.0" \
 				  goa-1.0
 LDFLAGS     ?=
 ALL_LDFLAGS += $(LDFLAGS) -lm `pkg-config --libs $(PKG_CONFIG_LIBS)`
@@ -349,7 +350,7 @@ git-commit:
 # --- i18n --- #
 
 PO_DIR          = po
-POTFILES    	= $(PO_DIR)/POTFILES
+POTFILES    	= $(PO_DIR)/POTFILES.in
 POT_FILE        = $(PO_DIR)/$(NAME).pot
 LINGUAS         = $(shell sed -e '/^\#/d' -e '/^$$/d' $(PO_DIR)/LINGUAS)
 PO_FILES        = $(patsubst %,$(PO_DIR)/%.po,$(LANGUAS))
