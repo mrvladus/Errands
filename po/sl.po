@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Errands main\n"
 "Report-Msgid-Bugs-To: https://github.com/mrvladus/Errands/issues\n"
 "POT-Creation-Date: 2026-11-08 15:27+0000\n"
-"PO-Revision-Date: 2026-11-08 22:36+0100\n"
+"PO-Revision-Date: 2026-11-08 22:55+0100\n"
 "Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
 "Language-Team: Slovenian <Slovenian>\n"
 "Language: sl\n"
@@ -20,7 +20,6 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 
 #: ../src/about-dialog.h:15 ../src/sidebar.blp:13 ../src/window.blp:8
-#, fuzzy
 msgid "Errands"
 msgstr "Opravki"
 
@@ -121,9 +120,8 @@ msgid "Exported"
 msgstr "izvoženo"
 
 #: ../src/task-item.c:638
-#, fuzzy
 msgid "Can't make task a sub-task of itself."
-msgstr "Naloge ni možno narediti podnaloge same sebe."
+msgstr "Naloge ni možno definirati kot podnaloge same sebe."
 
 #: ../src/task-item.c:707
 msgctxt "Priority"
@@ -553,7 +551,6 @@ msgid "Shortcuts"
 msgstr "Tipkovne bližnjice"
 
 #: ../src/sidebar.blp:70
-#, fuzzy
 msgid "About Errands"
 msgstr "O programu Opravki"
 
@@ -676,9 +673,8 @@ msgid "Cancelled"
 msgstr "Preklicano"
 
 #: ../src/task-list.blp:35
-#, fuzzy
 msgid "Sort Order"
-msgstr "Red razvrščanja"
+msgstr "Zaporedje razvrščanja"
 
 #: ../src/task-list.blp:38
 msgid "Descending"
