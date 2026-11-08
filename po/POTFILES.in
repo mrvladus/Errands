@@ -5,7 +5,7 @@ src/rrule-row.c
 src/sidebar.c
 src/sync.c
 src/task.c
-src/task-list.c
+src/task-item.c
 src/task-list.c
 src/task-list-item.c
 src/window.c
@@ -22,5 +22,4 @@ src/task-list.blp
 src/window.blp
 
 data/errands.desktop.in
-
-# data/errands.metainfo.xml.in
+data/errands.metainfo.xml.in
