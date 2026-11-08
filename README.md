@@ -37,6 +37,16 @@ Install official flatpak from Flathub:
 
 Use [Gnome Builder](https://flathub.org/en/apps/org.gnome.Builder) for building Flatpak.
 
+## Contribute
+
+#### Translations
+
+You can help translate **Errands** to your language via [Damned Lies](https://l10n.gnome.org/module/Errands/).
+
+#### Pull Requests
+
+Pull requests are welcome!
+
 ## Develop
 
 Use [Gnome Builder](https://flathub.org/en/apps/org.gnome.Builder) for development or setup distrobox container:

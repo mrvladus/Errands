@@ -237,10 +237,21 @@ else
 	RUN_CMD = $(BUILD_DIR)/$(NAME)
 endif
 
+# Dynamically detect TZID whether inside Distrobox, a normal container, or on the host.
+# 1. Tries distrobox-host-exec if available.
+# 2. Falls back to reading the local /etc/localtime symlink.
+# 3. Strips any messy 'posix/' or 'right/' prefixes to ensure a clean TZID.
+DETECTED_TZ = $(shell \
+    if command -v distrobox-host-exec >/dev/null 2>&1; then \
+        distrobox-host-exec readlink -f /etc/localtime 2>/dev/null; \
+    else \
+        readlink -f /etc/localtime 2>/dev/null; \
+    fi | sed -e 's|.*/zoneinfo/||' -e 's|^posix/||' -e 's|^right/||')
+
 # Build and run the application.
 .PHONY: run
 run: all
-	$(RUN_CMD)
+	TZ=$(DETECTED_TZ) $(RUN_CMD)
 
 # --- Flatpak targets --- #
 
