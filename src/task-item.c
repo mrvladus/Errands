@@ -229,6 +229,8 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     self->dtend = new_time;
     errands_data_set_due(self->ical, self->dtend);
     if (!self->lock) errands_task_list_item_save(self->list);
+    // Covers both edits in the UI and changes merged by sync
+    if (state.main_window && state.main_window->task_list) errands_task_list_refilter_today(state.main_window->task_list);
   } break;
 
   case PROP_TAGS: {

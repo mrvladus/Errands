@@ -48,6 +48,9 @@ static int sort_func(ErrandsTaskItem *a, ErrandsTaskItem *b, ErrandsTaskList *se
 G_DEFINE_TYPE(ErrandsTaskList, errands_task_list, ADW_TYPE_BIN)
 
 static void finalize(GObject *gobject) {
+  ErrandsTaskList *self = ERRANDS_TASK_LIST(gobject);
+  g_clear_handle_id(&self->today_refilter_id, g_source_remove);
+  g_clear_object(&self->today_filter);
   gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_TASK_LIST);
   G_OBJECT_CLASS(errands_task_list_parent_class)->finalize(gobject);
 }
@@ -120,8 +123,8 @@ static void errands_task_list_init(ErrandsTaskList *self) {
     g_list_store_append(self->toplevel_tasks_models, item->tasks);
   }
   self->all_tasks_model = gtk_flatten_list_model_new(G_LIST_MODEL(self->toplevel_tasks_models));
-  GtkFilter *today_filter = GTK_FILTER(gtk_custom_filter_new((GtkCustomFilterFunc)today_filter_func, self, NULL));
-  self->today_model = gtk_filter_list_model_new(G_LIST_MODEL(self->all_tasks_model), today_filter);
+  self->today_filter = GTK_FILTER(gtk_custom_filter_new((GtkCustomFilterFunc)today_filter_func, self, NULL));
+  self->today_model = gtk_filter_list_model_new(G_LIST_MODEL(self->all_tasks_model), g_object_ref(self->today_filter));
   self->current_model = gtk_filter_list_model_new(NULL, NULL);
   self->tree_model = gtk_tree_list_model_new(G_LIST_MODEL(self->current_model), false, true, task_children_func, NULL, NULL);
   self->tree_sorter = gtk_tree_list_row_sorter_new(GTK_SORTER(gtk_custom_sorter_new((GCompareDataFunc)sort_func, self, NULL)));
@@ -456,6 +459,20 @@ static void on_action_print_cb(GSimpleAction *action, GVariant *param, ErrandsTa
 
 // ---------- PUBLIC FUNCTIONS ---------- //
 
+static gboolean refilter_today_idle_cb(ErrandsTaskList *self) {
+  self->today_refilter_id = 0;
+  gtk_filter_changed(self->today_filter, GTK_FILTER_CHANGE_DIFFERENT);
+  errands_task_list_update(self);
+  return G_SOURCE_REMOVE;
+}
+
+void errands_task_list_refilter_today(ErrandsTaskList *self) {
+  if (!self || !self->today_filter) return;
+  // Coalesce bursts of changes (e.g. a sync updating many tasks) into one refilter
+  if (self->today_refilter_id) return;
+  self->today_refilter_id = g_idle_add((GSourceFunc)refilter_today_idle_cb, self);
+}
+
 void errands_task_list_update(ErrandsTaskList *self) {
   const char *title = NULL;
   switch (self->page) {
@@ -509,6 +526,8 @@ void errands_task_list_show_today_tasks(ErrandsTaskList *self) {
   g_message("Task List: Show today tasks");
   self->item = NULL;
   self->page = ERRANDS_TASK_LIST_PAGE_TODAY;
+  // Due dates may have changed since the filter last ran
+  gtk_filter_changed(self->today_filter, GTK_FILTER_CHANGE_DIFFERENT);
   gtk_widget_set_visible(self->entry_box, false);
   gtk_widget_set_visible(self->menu_btn, false);
   _ModelSwitchData *data = model_switch_data_new(self, G_LIST_MODEL(self->today_model));
