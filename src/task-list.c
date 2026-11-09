@@ -463,6 +463,8 @@ static gboolean refilter_today_idle_cb(ErrandsTaskList *self) {
   self->today_refilter_id = 0;
   gtk_filter_changed(self->today_filter, GTK_FILTER_CHANGE_DIFFERENT);
   errands_task_list_update(self);
+  // Keep the "Today" counter in the sidebar in step with the list
+  errands_sidebar_update_filter_rows();
   return G_SOURCE_REMOVE;
 }
 
