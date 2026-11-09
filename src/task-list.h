@@ -35,7 +35,9 @@ struct _ErrandsTaskList {
 
   GListStore *toplevel_tasks_models; // Model of task models
   GtkFlattenListModel *all_tasks_model;
+  GtkFilter *today_filter;
   GtkFilterListModel *today_model;
+  guint today_refilter_id;
   GtkFilterListModel *current_model;
   GtkTreeListModel *tree_model;
   GtkTreeListRowSorter *tree_sorter;
@@ -54,3 +56,5 @@ void errands_task_list_show_today_tasks(ErrandsTaskList *self);
 void errands_task_list_show_task_list(ErrandsTaskList *self, ErrandsTaskListItem *item);
 void errands_task_list_sort(ErrandsTaskList *self, GtkSorterChange change);
 void errands_task_list_filter(ErrandsTaskList *self, GtkFilterChange change);
+// Re-evaluate which tasks belong to the "Today" page, e.g. after a due date changed
+void errands_task_list_refilter_today(ErrandsTaskList *self);
